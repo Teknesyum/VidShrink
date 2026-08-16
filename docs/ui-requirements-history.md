@@ -102,6 +102,8 @@ Son güncelleme: 17 Ağustos 2026
 - Form satırları arasında yaklaşık 18 DIP dikey ritim bulunmalıdır.
 - Alan başlığı ile bağlı kontrol arasında yaklaşık 6 DIP boşluk bulunmalıdır.
 - CRF kaydırıcısı ile sayısal giriş alanı birbirinden ayrılmalıdır.
+- Varsayılan `23` değerinin CRF kalite değeri olduğu alan başlığında açıkça belirtilmeli; etiket `CRF Kalitesi / Bit Hızı K` olmalıdır.
+- CRF/bit hızı sayısal alanı 42 DIP yüksekliğinde, 18 DIP kalın neon mavi metinle tam görünmeli; rakamın üstü veya altı kırpılmamalıdır.
 - Sekme içeriği gerektiğinde kaydırılabilir olmalı; ancak normal başlangıç boyutunda kullanıcı mümkün olduğunca aşağı kaydırmak zorunda kalmamalıdır.
 - Program başlangıçta daha büyük açılmalıdır.
 - Hedef başlangıç boyutu 1440×1000'dır; pencere mevcut Windows çalışma alanını aşmamalıdır.

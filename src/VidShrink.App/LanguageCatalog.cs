@@ -49,7 +49,7 @@ internal static class LanguageCatalog
         ["Container"] = "Kapsayıcı",
         ["Quality Mode"] = "Kalite Modu",
         ["Fixed Bitrate"] = "Sabit Bit Hızı",
-        ["CRF / Bitrate K"] = "CRF / Bit Hızı K",
+        ["CRF Quality / Bitrate K"] = "CRF Kalitesi / Bit Hızı K",
         ["Custom"] = "Özel",
         ["Custom Width x Height"] = "Özel Genişlik x Yükseklik",
         ["Frame Rate"] = "Kare Hızı",

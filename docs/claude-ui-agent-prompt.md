@@ -57,6 +57,7 @@ Güncel içerik hiyerarşisi:
 - Çıktı, Aşama, Kalan ve Güncel Çıktı Boyutu neon mavidir; değerleri beyazdır.
 - Çıktı paneli kompakt 254 DIP'tir; toplam sütun yüksekliğine bağlanan döngüsel yerleşim kullanma.
 - Scrollbar native olamaz; 10 DIP koyu yol, mavi thumb, pembe hover ve mor sürükleme tepkisini koru.
+- Dönüştür kalite alanında 23'ün CRF kalite değeri olduğu başlıkta anlaşılmalı; 42 DIP alan, 18 DIP kalın mavi değer ve kırpılmayan dikey yerleşimi koru.
 - Sekmeler arasında 8 DIP boşluk ve alt anahat için 2 DIP güvenli alan vardır.
 
 Uygulama yöntemi:

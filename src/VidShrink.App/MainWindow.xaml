@@ -233,15 +233,15 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="CRF / Bitrate K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 starting point. In Fixed Bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
-<Grid Height="38">
+<StackPanel Orientation="Horizontal"><TextBlock Text="CRF Quality / Bitrate K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 starting point. In Fixed Bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<Grid Height="42">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
 <ColumnDefinition Width="12"/>
 <ColumnDefinition Width="72"/>
 </Grid.ColumnDefinitions>
 <Slider x:Name="SliderQuality" Minimum="0" Maximum="51" Value="23" ValueChanged="OnQualitySliderChanged" VerticalAlignment="Center"/>
-<TextBox x:Name="TxtQuality" Grid.Column="2" Text="23" TextChanged="OnQualityTextChanged"/>
+<TextBox x:Name="TxtQuality" Grid.Column="2" Height="42" Text="23" FontSize="18" FontWeight="Bold" Foreground="{StaticResource NeonBlue}" Padding="8,4" TextChanged="OnQualityTextChanged"/>
 </Grid>
 </StackPanel>
 <StackPanel>

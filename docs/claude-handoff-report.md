@@ -79,6 +79,7 @@ VidShrink, Windows için .NET 8 WPF ile geliştirilmiş, çevrimdışı çalış
 - Ana hedef değeri neon mavi ve kalın; preset chip metinleri beyazdır.
 - Çıktı paneli kompakt `254 DIP` yüksekliğindedir; toplam sütun yüksekliğine bağlanan döngüsel yerleşim kullanılmaz.
 - Scrollbar tamamen özel temalıdır: 10 DIP koyu yol, mavi thumb, pembe hover ve mor sürükleme tepkisi.
+- Dönüştür kalite alanı `CRF Kalitesi / Bit Hızı K` olarak açıklanır; varsayılan 23, 42 DIP hücrede 18 DIP kalın neon mavi gösterilir.
 - `?` rozetleri 12×12 DIP, metinden 12 DIP uzakta üst simge konumundadır; hover yalnızca işaret rengini pembeye çevirir ve iki dilde ayrıntılı tooltip gösterir.
 
 ## İkon ve Masaüstü Kısayolu
