@@ -141,6 +141,8 @@ The custom title bar keeps the mixed-case `VidShrink` brand name. The duplicate 
 
 The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media Converter`; the English catalog counterpart is `Target Size Media Compression & Media Converter`.
 
+Sliders now use a pink filled track with a blue outline and an inverse blue thumb with a pink outline. Hovering the control strengthens the thumb outline and adds a pink neon response without changing text colors.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.

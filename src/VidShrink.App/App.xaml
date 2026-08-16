@@ -268,6 +268,7 @@
 
             <Style TargetType="Slider">
                 <Setter Property="Height" Value="26"/>
+                <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Slider">
@@ -277,7 +278,7 @@
                                         <RepeatButton Command="{x:Static Slider.DecreaseLarge}" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton">
-                                                    <Border Height="10" VerticalAlignment="Center" Background="{StaticResource NeonBlue}" CornerRadius="5"/>
+                                                    <Border x:Name="FilledTrack" Height="10" VerticalAlignment="Center" Background="{StaticResource NeonPink}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="5"/>
                                                 </ControlTemplate>
                                             </RepeatButton.Template>
                                         </RepeatButton>
@@ -286,7 +287,7 @@
                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton">
-                                                    <Border Height="10" VerticalAlignment="Center" Background="#FF123033" BorderBrush="#6600F3FF" BorderThickness="1" CornerRadius="5"/>
+                                                    <Border x:Name="RemainingTrack" Height="10" VerticalAlignment="Center" Background="#FF123033" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="5"/>
                                                 </ControlTemplate>
                                             </RepeatButton.Template>
                                         </RepeatButton>
@@ -295,13 +296,28 @@
                                         <Thumb Width="20" Height="20">
                                             <Thumb.Template>
                                                 <ControlTemplate TargetType="Thumb">
-                                                    <Ellipse Fill="{StaticResource NeonPink}" Stroke="{StaticResource NeonBlue}" StrokeThickness="2"/>
+                                                    <Ellipse x:Name="ThumbVisual" Fill="{StaticResource NeonBlue}" Stroke="{StaticResource NeonPink}" StrokeThickness="2"/>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="ThumbVisual" Property="StrokeThickness" Value="3"/>
+                                                            <Setter TargetName="ThumbVisual" Property="Effect">
+                                                                <Setter.Value>
+                                                                    <DropShadowEffect Color="{StaticResource NeonPinkColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.75"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
                                                 </ControlTemplate>
                                             </Thumb.Template>
                                         </Thumb>
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Opacity" Value="0.9"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
