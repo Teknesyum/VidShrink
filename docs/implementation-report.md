@@ -173,6 +173,8 @@ Tab outlines now reserve 2 DIP below each header and disable parent clipping so 
 
 Tab borders are additionally inset by 1 DIP on every side and TabItem clipping is disabled. This keeps the final tab's right stroke, as well as the lower stroke, inside the allocated drawing surface.
 
+Because inset WPF Borders still produced missing right and lower edges on the target display, tab and checkbox frames now use explicit closed Rectangle strokes. Content and check marks are layered independently above those shapes, so measurement cannot omit a single side.
+
 Checkbox geometry now reserves a full 24×24 DIP layout cell for the centered 20×20 DIP box. The earlier width-only allowance left the vertical measure at 20 DIP and could clip the bottom stroke; explicit 24 DIP minimum height now protects all four edges under DPI rounding.
 
 Source and AI Settings now share the same 14 DIP heading-to-content spacing, removing the inconsistent compressed heading in the right panel.
