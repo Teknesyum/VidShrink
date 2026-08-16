@@ -55,7 +55,7 @@
 
             <Style x:Key="Hint" TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Foreground" Value="{StaticResource TextHint}"/>
             </Style>
 

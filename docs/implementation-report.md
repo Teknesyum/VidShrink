@@ -117,6 +117,8 @@ The form now uses a 16 px horizontal gutter, 18 px row spacing, 6 px label-to-co
 
 Text glow was removed from neon-blue section headings. Typography now uses flat, sharp foreground colors for improved readability; neon emphasis remains on borders, selection states, and controls rather than blurred text shadows.
 
+The interface also enforces a 12 DIP minimum font size. Labels and hint text that previously rendered at 10 DIP were raised to 12 DIP; no application text style now uses a smaller size.
+
 ## Files central to review
 
 - `src/VidShrink.App/LanguageCatalog.cs`
