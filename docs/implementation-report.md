@@ -149,7 +149,7 @@ The complete custom window is enclosed by a crisp 1 DIP neon-blue border with th
 
 The custom title bar now tests a restrained horizontal gradient: a dark cyan tint at the left transitions through the neutral surface into a subtle purple-pink tint at the right, preserving title and control contrast.
 
-The title bar was reduced from 54 to 46 DIP, with 34 DIP window controls and a 30 DIP icon. Its gradient now uses five closely spaced stops for a softer transition, while the description/language band below uses a separate lower-intensity centralized `SecondaryBarBackground` gradient.
+The title bar was reduced from 54 to 46 DIP and then to 38 DIP. Window controls now use a compact 48×30 DIP footprint, giving them a roughly 1.6:1 golden-ratio rectangle instead of a stretched shape; the icon is 26 DIP. Its gradient uses five closely spaced stops for a softer transition, while the description/language band below uses a separate lower-intensity centralized `SecondaryBarBackground` gradient.
 
 Sponsor and signature links were moved from About into the custom title bar. `Buy Me A Coffee` sits left of `GitHub / By Teknesyum`, which sits immediately left of the minimize control; both links react with pink text and an underline on hover.
 
