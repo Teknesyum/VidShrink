@@ -26,11 +26,6 @@
     <Setter Property="FontSize" Value="18"/>
     <Setter Property="FontWeight" Value="Bold"/>
     <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
-    <Setter Property="Effect">
-      <Setter.Value>
-        <DropShadowEffect Color="{StaticResource NeonBlueColor}" BlurRadius="10" ShadowDepth="0" Opacity="0.8"/>
-      </Setter.Value>
-    </Setter>
   </Style>
 
   <Style x:Key="H3" TargetType="TextBlock">

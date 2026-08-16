@@ -113,6 +113,10 @@ The two-column conversion form originally had no gutter between adjacent fields 
 
 The form now uses a 16 px horizontal gutter, 18 px row spacing, 6 px label-to-control spacing, and separate spacing between the CRF slider and its numeric field. The existing tab-level scroll viewer handles the additional height without overlap. The Turkish layout, which contains the longest labels, was visually verified at the application's minimum supported window size.
 
+## Typography follow-up
+
+Text glow was removed from neon-blue section headings. Typography now uses flat, sharp foreground colors for improved readability; neon emphasis remains on borders, selection states, and controls rather than blurred text shadows.
+
 ## Files central to review
 
 - `src/VidShrink.App/LanguageCatalog.cs`
