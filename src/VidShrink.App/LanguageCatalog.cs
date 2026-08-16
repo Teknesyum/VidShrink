@@ -5,6 +5,9 @@ internal static class LanguageCatalog
     internal static readonly IReadOnlyDictionary<string, string> EnglishToTurkish = new Dictionary<string, string>
     {
         ["Target-size compression and flexible media conversion."] = "Hedef boyutlu sıkıştırma ve esnek medya dönüştürme.",
+        ["Minimize"] = "Küçült",
+        ["Maximize"] = "Büyüt",
+        ["Close"] = "Kapat",
         ["SHRINK"] = "KÜÇÜLT",
         ["CONVERT"] = "DÖNÜŞTÜR",
         ["ABOUT"] = "HAKKINDA",

@@ -17,6 +17,11 @@ Son güncelleme: 17 Ağustos 2026
 - Panel başlıkları neon mavi olmalıdır.
 - Alan başlıkları ve ikincil bölüm başlıkları neon mor gibi temaya uygun bir vurgu rengi taşımalıdır.
 - Sayısal değerler ve komutlar mono yazı tipiyle gösterilmelidir.
+- Görünür Windows yerel başlık çubuğu ve yerel küçültme, büyütme veya kapatma düğmeleri kullanılmamalıdır.
+- Pencerenin üst kısmı neon temalı özel, sürüklenebilir bir başlık paneli olmalıdır.
+- Özel başlık panelinde neon küçültme, büyütme/geri yükleme ve kapatma düğmeleri bulunmalıdır.
+- Pencere kenarından yeniden boyutlandırma ve başlığa çift tıklayarak büyütme davranışı korunmalıdır.
+- Alt kısımda FFmpeg yolu gibi teknik durum bilgisi sürekli gösterilmemelidir.
 
 ## 2. Tipografi
 

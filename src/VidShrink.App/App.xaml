@@ -78,6 +78,50 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="WindowControlButton" TargetType="Button">
+                <Setter Property="Width" Value="48"/>
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="Margin" Value="4,0,0,0"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Background" Value="#1400F3FF"/>
+                <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+                <Setter Property="BorderBrush" Value="#6600F3FF"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="WindowButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="WindowButtonBorder" Property="Background" Value="{StaticResource NeonPurple}"/>
+                                    <Setter TargetName="WindowButtonBorder" Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="WindowButtonBorder" Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="CloseWindowButton" TargetType="Button" BasedOn="{StaticResource WindowControlButton}">
+                <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{StaticResource NeonPink}"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
             <Style TargetType="ToolTip">
                 <Setter Property="Background" Value="#FF07181B"/>
                 <Setter Property="Foreground" Value="White"/>

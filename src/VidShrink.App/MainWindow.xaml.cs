@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Windows.Media;
 using Microsoft.Win32;
@@ -28,10 +29,25 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        WindowStyle = WindowStyle.None;
+        ResizeMode = ResizeMode.CanResize;
         Width = Math.Min(1440, SystemParameters.WorkArea.Width);
         Height = Math.Min(1000, SystemParameters.WorkArea.Height);
+        StateChanged += (_, _) => UpdateMaximizeGlyph();
         Loaded += (_, _) => { SetLanguage(true); CheckTools(); };
     }
+
+    private void OnTitleBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2) ToggleMaximizeRestore();
+        else if (e.LeftButton == MouseButtonState.Pressed) DragMove();
+    }
+
+    private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    private void OnMaximizeRestore(object sender, RoutedEventArgs e) => ToggleMaximizeRestore();
+    private void OnClose(object sender, RoutedEventArgs e) => Close();
+    private void ToggleMaximizeRestore() => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    private void UpdateMaximizeGlyph() => BtnMaximize.Content = WindowState == WindowState.Maximized ? "❐" : "□";
 
     private string T(string turkish, string english) => _turkish ? turkish : english;
 
@@ -56,7 +72,8 @@ public partial class MainWindow : Window
         if (node is TextBlock text && translations.TryGetValue(text.Text, out var translatedText)) text.Text = translatedText;
         if (node is ContentControl content && content.Content is string value && translations.TryGetValue(value, out var translatedContent)) content.Content = translatedContent;
         if (node is HeaderedContentControl header && header.Header is string headerValue && translations.TryGetValue(headerValue, out var translatedHeader)) header.Header = translatedHeader;
-        if (node is FrameworkElement element && element.ToolTip is DependencyObject toolTip) TranslateTree(toolTip, translations, visited);
+        if (node is FrameworkElement element && element.ToolTip is string toolTipText && translations.TryGetValue(toolTipText, out var translatedToolTip)) element.ToolTip = translatedToolTip;
+        else if (node is FrameworkElement { ToolTip: DependencyObject toolTip }) TranslateTree(toolTip, translations, visited);
         foreach (var child in LogicalTreeHelper.GetChildren(node).OfType<DependencyObject>()) TranslateTree(child, translations, visited);
         if (node is Visual)
             for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++) TranslateTree(VisualTreeHelper.GetChild(node, index), translations, visited);
