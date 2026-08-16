@@ -69,6 +69,9 @@ Son güncelleme: 17 Ağustos 2026
 ## 5. Alan ve Panel Yerleşimi
 
 - Kontroller ve paneller sıkışık veya birbirine yapışık görünmemelidir.
+- Normal arayüz öğelerinde tam dikdörtgen kullanılmamalı; bütün köşeler küçük ve dengeli biçimde yuvarlatılmalıdır.
+- Genel köşe yarıçapı `6 DIP` olmalı; geniş, kapsül benzeri veya aşırı yuvarlak köşelerden kaçınılmalıdır.
+- Dairesel `?` yardım rozeti ve kaydırıcı tutamacı gibi işlevi gereği yuvarlak öğeler bu kuralın istisnasıdır.
 - Aynı satırdaki kontroller asimetrik görünmemelidir; bir kontrolün sol köşeleri yuvarlatılmışsa sağ köşeleri de aynı yarıçapla yuvarlatılmalıdır.
 - Eş görev seviyesindeki yan yana kontrollerin dış yükseklikleri mümkün olduğunca aynı olmalıdır.
 - Bir alan içindeki kaydırıcı ve sayısal değer gibi bağlı kontroller gereksiz yere üst üste konarak komşu alanı daha uzun göstermemeli; uygun olduğunda aynı satırda hizalanmalıdır.
@@ -176,6 +179,7 @@ Son güncelleme: 17 Ağustos 2026
 - İkincil yardım metni 14 DIP altına düşmemelidir.
 - Başlıklar ile değer/açıklamalar yalnızca konumla değil renk hiyerarşisiyle de ayrılmalıdır.
 - Yerel Windows onay kutusu görünümü kullanılmamalı; neon temalı özel kutu ve tik çizilmelidir.
+- Özel onay kutusunun içindeki tik neon mavi olmalıdır; pembe tik kullanılmamalıdır.
 - Onay kutusu, tik ve yanındaki yazı aynı dikey eksende ortalanmalıdır.
 - Yan yana kontroller birbirine değmemelidir.
 - Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.

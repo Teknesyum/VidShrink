@@ -19,7 +19,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border x:Name="bd" Background="Transparent" BorderBrush="#80B026FF"
-                                    BorderThickness="1" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                                    BorderThickness="1" CornerRadius="6" Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -94,7 +94,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="WindowButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                            <Border x:Name="WindowButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -133,6 +133,15 @@
                 <Setter Property="MaxWidth" Value="460"/>
                 <Setter Property="HasDropShadow" Value="False"/>
                 <Setter Property="Placement" Value="Mouse"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToolTip">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <Style x:Key="Body" TargetType="TextBlock">
@@ -327,7 +336,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Border x:Name="CheckBorder" Width="20" Height="20" Background="#FF07181B" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="4" VerticalAlignment="Center">
-                                    <Path x:Name="CheckMark" Data="M 4 10 L 8 14 L 16 5" Stroke="{StaticResource NeonPink}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Visibility="Collapsed"/>
+                                    <Path x:Name="CheckMark" Data="M 4 10 L 8 14 L 16 5" Stroke="{StaticResource NeonBlue}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Visibility="Collapsed"/>
                                 </Border>
                                 <ContentPresenter Grid.Column="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                             </Grid>

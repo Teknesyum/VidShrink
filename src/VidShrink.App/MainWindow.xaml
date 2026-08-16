@@ -1,6 +1,6 @@
 ﻿<Window x:Class="VidShrink.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="VidShrink" Height="900" Width="1220" MinHeight="720" MinWidth="1040" Background="{StaticResource AppBg}" AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver" WindowStartupLocation="CenterScreen">
  <WindowChrome.WindowChrome>
-  <WindowChrome CaptionHeight="54" ResizeBorderThickness="8" CornerRadius="0" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+  <WindowChrome CaptionHeight="54" ResizeBorderThickness="8" CornerRadius="6" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
  </WindowChrome.WindowChrome>
  <Grid>
 <Grid.RowDefinitions>
@@ -8,7 +8,7 @@
 <RowDefinition Height="Auto"/>
 <RowDefinition Height="*"/>
 </Grid.RowDefinitions>
-<Border Height="54" Background="#FF07181B" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
+<Border Height="54" Background="#FF07181B" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" CornerRadius="6" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
 <Grid Margin="18,0,12,0">
 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 <Image Source="Assets/VidShrink.png" Width="36" Height="36" Stretch="Uniform" Margin="0,0,10,0"/>
