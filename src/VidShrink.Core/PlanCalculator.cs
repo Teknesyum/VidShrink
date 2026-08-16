@@ -62,8 +62,11 @@ public static class PlanCalculator
 
         if (complexity.Measured)
         {
-            if (complexity.DetailExponent >= 0.6) notes.Add(AdviceCode.ScaleSavesMuch);
-            else if (complexity.DetailExponent <= 0.2) notes.Add(AdviceCode.ScaleSavesLittle);
+            if (effective.AllowResolutionDrop)
+            {
+                if (complexity.DetailExponent >= 0.6) notes.Add(AdviceCode.ScaleSavesMuch);
+                else if (complexity.DetailExponent <= 0.2) notes.Add(AdviceCode.ScaleSavesLittle);
+            }
             if (complexity.ReferenceBppf <= 0.02) notes.Add(AdviceCode.ContentIsSimple);
             else if (complexity.ReferenceBppf >= 0.25) notes.Add(AdviceCode.ContentIsComplex);
         }

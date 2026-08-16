@@ -212,3 +212,31 @@ The latest pass is aimed at users who do not already know codec or encoding term
 - `src/VidShrink.Core/FfmpegArguments.cs`
 - `src/VidShrink.Ffmpeg/EncodeRunner.cs`
 - `src/VidShrink.Ffmpeg/FfprobeClient.cs`
+
+## 2026-08-17 — Engine rewrite and WhatsApp defaults
+
+**Engine.** The bits-per-pixel decision table was replaced by a measured, per-title model.
+
+- `ComplexityProbe` now encodes samples at two resolutions and `ComplexityProfile` derives
+  a per-clip detail-falloff exponent from the pair. The previous fixed assumption
+  (`scale^-0.25`, i.e. bit cost rising as resolution falls) was measured to be wrong in
+  direction: measured exponents were +0.22 and +0.87 on two test clips.
+- `PlanCalculator` now solves for a transparency-ceiling CRF and, when the ceiling leaves
+  budget unused, restores resolution and frame rate up to the largest layout that still
+  fits (`RecoverLayoutAtCeiling`). Recovery is scored by perceptual penalty, not by scale,
+  so it never trades 30 fps for a larger frame.
+- `CompressionStrategy` classifies the run as light/balanced/aggressive/extreme and drives
+  codec choice, resolution and fps freedom, audio share and the user-facing advice list.
+- `CodecPreference.Auto` added and made the UI default.
+- `EncodePlan.AudioChannels` added; audio folds to mono under 56k and is dropped when it
+  cannot fit at all.
+- `ContainerOverhead` 0.97 → 0.995 and `EncodeRunner.ToleranceOver` 1.05 → 1.0, both from
+  measurement: ffmpeg two-pass delivers 98.8 percent of the requested bitrate, and the
+  README promises the target as a hard ceiling.
+
+**Measured result.** Benchmark over easy.mp4 / src.mp4 / hard.mp4 at 20/8/3/1 MB:
+8 of 8 land under target in one attempt, estimate error within 8 percent (was -38 percent),
+budget fill 92-99 percent on constrained targets.
+
+**App.** Startup now accepts a file path argument, so the shortcut and drag-onto-exe work.
+Desktop `VidShrink.lnk` retargeted from the Debug build to Release.

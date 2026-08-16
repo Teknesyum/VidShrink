@@ -270,3 +270,30 @@ Son güncelleme: 17 Ağustos 2026
 - `docs/implementation-report.md`
 
 Bu belge yeni arayüz talepleri geldikçe güncellenmelidir. Yeni düzenlemeler mevcut maddelerden sapıyorsa değişikliğin tarihi, önceki kural ve yeni kural açıkça kaydedilmelidir.
+
+## 16. 2026-08-17 — WhatsApp varsayılanı, bilgi rozetleri, tahmin yerleşimi
+
+**Talep.** Program varsayılan olarak WhatsApp'ın desteklediği en yüksek MB'ye ayarlı açılsın,
+WhatsApp için en iyi ayarlar önceden seçili gelsin. Kullanıcı "sıkıştırma algoritmaları
+arasındaki fark nedir" gibi soruları `?` simgesinden öğrenebilsin. Bir seçimin WhatsApp'a
+göndermede fark yaratıp yaratmadığını ve telefonların destekleyip desteklemediğini hem
+Dönüştür hem Küçült sekmesinde rahatça anlayabilsin.
+
+**Uygulanan.**
+
+- Varsayılan hedef 16 MB. Kaynak 16 MB'den büyükse dosya yüklendiğinde de 16 MB'de kalır;
+  daha küçükse kaynağın yarısı önerilir. Önceki davranış (her zaman kaynağın yarısı) değişti.
+- `WhatsApp 16` hedef çipi eklendi, `50` çipi kaldırıldı.
+- Sıkıştırma algoritması listesine `Otomatik - Motor Karar Versin` eklendi ve varsayılan yapıldı.
+- Küçült sekmesinde `?` rozeti eklenen yerler: Hedef başlığı, her hedef çipi, Amaç,
+  Sıkıştırma Algoritması, Çözünürlük Düşürülebilir, Kare Hızı Düşürülebilir, Tahmini Çıktı.
+- Dönüştür sekmesindeki Kapsayıcı, Video Kodeği ve Ses açıklamaları telefon ve WhatsApp
+  uyumluluğunu içerecek şekilde genişletildi.
+- Tüm metinler `LanguageCatalog` üzerinden TR/EN.
+
+**Sonraki düzeltmeler (aynı gün, kullanıcı geri bildirimi).**
+
+- Tahmini Çıktı bloğu Hedef panelinden Çıktı paneline taşındı, Güncel Çıktı Boyutu ile
+  yan yana küçük metin olarak duruyor. Hedef paneli yalnızca girdi tutuyor.
+- `InfoButton` sol boşluğu 12 → 6 DIP. Önceki kural (teknesyum-ui §5.3, metinden 12 DIP)
+  bu projede geçersiz: 12 DIP kullanıcıya "aşırı uzak" göründü.

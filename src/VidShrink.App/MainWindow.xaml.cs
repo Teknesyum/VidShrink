@@ -25,6 +25,8 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _probeCts;
     private SizeEstimate? _estimate;
     private double _predictedQuality;
+    private StrategyAdvice? _advice;
+    private const double WhatsAppTargetMb = 16;
     private string? _lastOutput;
     private bool _syncing;
     private bool _turkish;
@@ -40,7 +42,13 @@ public partial class MainWindow : Window
         Width = Math.Min(1440, SystemParameters.WorkArea.Width);
         Height = Math.Min(1000, SystemParameters.WorkArea.Height);
         StateChanged += (_, _) => UpdateMaximizeGlyph();
-        Loaded += (_, _) => { SetLanguage(true); CheckTools(); };
+        Loaded += async (_, _) =>
+        {
+            SetLanguage(true);
+            CheckTools();
+            var startupFile = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(File.Exists);
+            if (startupFile is not null) await LoadAsync(startupFile);
+        };
     }
 
     private void OnTitleBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -104,8 +112,8 @@ public partial class MainWindow : Window
         }
     }
 
-    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = (CodecPreference)Math.Max(0, CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true };
-    private double ParseTargetMb() => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : 25;
+    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true };
+    private double ParseTargetMb() => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : 16;
 
     private async void OnBrowse(object sender, RoutedEventArgs e)
     {
@@ -153,7 +161,9 @@ public partial class MainWindow : Window
         TxtConvertSource.Text = Path.GetFileName(path);
         ShowInfo(_info);
         _syncing = true;
-        var suggested = Math.Max(1, Math.Round(_info.FileSizeMb / 2));
+        var suggested = _info.FileSizeMb > WhatsAppTargetMb
+            ? WhatsAppTargetMb
+            : Math.Max(1, Math.Round(_info.FileSizeMb / 2));
         SliderTarget.Maximum = Math.Max(500, Math.Ceiling(suggested));
         SliderTarget.Value = suggested;
         TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
@@ -201,12 +211,21 @@ public partial class MainWindow : Window
         TxtHdr.Text = info.IsHdr ? T("Evet", "Yes") : T("Hayır", "No");
     }
 
+    private static CodecPreference CodecFromIndex(int index) => index switch
+    {
+        1 => CodecPreference.Compatible,
+        2 => CodecPreference.MaxCompression,
+        3 => CodecPreference.Fast,
+        _ => CodecPreference.Auto
+    };
+
     private void Recalculate()
     {
         if (_info is null) return;
         var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile);
         _autoPlan = detailed.Plan;
         _predictedQuality = detailed.PredictedQuality;
+        _advice = detailed.Advice;
         _profile ??= detailed.Profile;
         if (_aiPlan is not null)
         {
@@ -241,6 +260,7 @@ public partial class MainWindow : Window
             TxtEstimateValue.Text = "-";
             TxtEstimateRange.Text = "";
             TxtEstimateNote.Text = "";
+            TxtStrategyNote.Text = "";
             return;
         }
 
@@ -254,6 +274,46 @@ public partial class MainWindow : Window
             ? T("iki geçişli mod boyutu zorlar", "two-pass enforces this size")
             : T("kalite modu; hedefin altında kalır", "quality mode; stays under the target");
         TxtEstimateNote.Text = $"{basis} · {mode} · {T("öngörülen kalite", "predicted quality")} {_predictedQuality:0.#}/100";
+        TxtStrategyNote.Text = DescribeStrategy();
+    }
+
+    private string DescribeStrategy()
+    {
+        if (_advice is not { } advice) return "";
+
+        var regime = advice.Regime switch
+        {
+            CompressionRegime.Light => T("hafif", "light"),
+            CompressionRegime.Balanced => T("dengeli", "balanced"),
+            CompressionRegime.Aggressive => T("agresif", "aggressive"),
+            _ => T("uç", "extreme")
+        };
+
+        var lines = new List<string>
+        {
+            T($"{advice.Ratio:0.#}x küçültme — {regime} senaryo.", $"{advice.Ratio:0.#}x reduction — {regime} scenario.")
+        };
+
+        foreach (var note in advice.Notes.Distinct())
+        {
+            var text = note switch
+            {
+                AdviceCode.CodecUpgradeRecommended => T("Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını Otomatik veya H.265 yapmayı düşün.", "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to Automatic or H.265."),
+                AdviceCode.HardwareCodecCostsQuality => T("NVENC hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; yazılım kodeği daha iyi görünür.", "NVENC is fast but loses noticeable quality per megabyte at a target this tight; a software codec will look better."),
+                AdviceCode.ExtremeRatioWarning => T("Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.", "Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable."),
+                AdviceCode.ContentIsSimple => T("İçerik sade ölçüldü; hedefin altında rahat kalınıyor.", "The content measured as simple, so the target is met with room to spare."),
+                AdviceCode.ContentIsComplex => T("İçerik yoğun ölçüldü; bit bütçesi bu yüzden zorlanıyor.", "The content measured as detail-heavy, which is why the bit budget is tight."),
+                AdviceCode.ScaleSavesMuch => T("Bu klipte çözünürlük düşürmek çok bit kazandırıyor.", "Scaling down frees a lot of bits on this particular clip."),
+                AdviceCode.ScaleSavesLittle => T("Bu klipte çözünürlük düşürmek az kazandırıyor; çözünürlük korunuyor.", "Scaling down frees little on this clip, so resolution is preserved."),
+                AdviceCode.QualityCeilingReached => T("Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.", "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see."),
+                AdviceCode.AudioMono => T("Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.", "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture."),
+                AdviceCode.AudioDropped => T("Bu boyutta ses tutulamıyor, çıkarıldı.", "Audio cannot fit at this size and was removed."),
+                _ => null
+            };
+            if (text is not null) lines.Add(text);
+        }
+
+        return string.Join("  ", lines);
     }
 
     private static string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
