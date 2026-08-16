@@ -44,7 +44,7 @@ Değişmez UI kuralları:
 Güncel üst alan:
 - Dış pencere anahattı 1 DIP neon mavi.
 - Üst bar 38 DIP ve merkezi TitleBarBackground gradientini kullanır.
-- Alt açıklama/dil şeridi SecondaryBarBackground kullanır.
+- Açıklama/dil şeridi ve bütün sekme arkası tek kesintisiz WorkspaceBackground gradientini kullanır; ayrı bant oluşturma.
 - Logo 26 DIP.
 - Pencere düğmeleri 42×30 DIP.
 - Küçült simgesi 10×2 DIP çizgidir.

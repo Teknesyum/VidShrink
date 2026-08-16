@@ -20,11 +20,11 @@
     <GradientStop Color="#FF141117" Offset="0.75"/>
     <GradientStop Color="#FF171018" Offset="1"/>
   </LinearGradientBrush>
-  <LinearGradientBrush x:Key="SecondaryBarBackground" StartPoint="0,0.5" EndPoint="1,0.5">
-    <GradientStop Color="#FF0B0D11" Offset="0"/>
-    <GradientStop Color="#FF0D0D12" Offset="0.35"/>
-    <GradientStop Color="#FF100D13" Offset="0.7"/>
-    <GradientStop Color="#FF120D14" Offset="1"/>
+  <LinearGradientBrush x:Key="WorkspaceBackground" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#FF07090D" Offset="0"/>
+    <GradientStop Color="#FF09090F" Offset="0.35"/>
+    <GradientStop Color="#FF0D0912" Offset="0.7"/>
+    <GradientStop Color="#FF120A16" Offset="1"/>
   </LinearGradientBrush>
 
   <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>

@@ -3,7 +3,7 @@
   <WindowChrome CaptionHeight="38" ResizeBorderThickness="8" CornerRadius="6" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
  </WindowChrome.WindowChrome>
  <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
- <Grid UseLayoutRounding="True" SnapsToDevicePixels="True">
+ <Grid Background="{StaticResource WorkspaceBackground}" UseLayoutRounding="True" SnapsToDevicePixels="True">
 <Grid.RowDefinitions>
 <RowDefinition Height="Auto"/>
 <RowDefinition Height="Auto"/>
@@ -24,7 +24,7 @@
 </StackPanel>
 </Grid>
 </Border>
-<Border Grid.Row="1" Background="{StaticResource SecondaryBarBackground}">
+<Border Grid.Row="1" Background="Transparent">
 <Grid Margin="24,14,24,14">
 <TextBlock Text="Target Size Media Compression &amp; Media Converter" Style="{StaticResource ProductTagline}" VerticalAlignment="Center"/>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><Button x:Name="BtnTr" Content="TR" Style="{StaticResource ChipButton}" Click="OnTurkish"/><Button x:Name="BtnEn" Content="EN" Style="{StaticResource ChipButton}" Click="OnEnglish"/></StackPanel>

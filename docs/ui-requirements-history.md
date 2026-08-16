@@ -91,7 +91,7 @@ Son güncelleme: 17 Ağustos 2026
 - Üst bar yüksekliği kompakt `38 DIP` olmalı ve gradient en az beş yakın renk durağıyla yumuşak geçmelidir.
 - Küçült, büyüt ve kapat düğmeleri yayvan olmamalı; kompakt `42×30 DIP` dikdörtgen kullanmalıdır.
 - Küçült simgesi font karakteri yerine ortalanmış `10×2 DIP` kısa çizgi olarak çizilmelidir.
-- Üst barın altındaki açıklama ve dil şeridi de daha düşük yoğunluklu merkezi bir gradient kullanmalıdır.
+- Üst barın altındaki açıklama/dil şeridi ile sekmelerin arkasındaki bütün boş çalışma alanı tek ve kesintisiz merkezi `WorkspaceBackground` gradientini kullanmalıdır; açıklama satırı ayrı bir gradient bandı gibi görünmemelidir.
 - Sponsor ve imza bağlantıları Hakkında sekmesinde tekrarlanmamalı; üst başlık çubuğunda pencere düğmelerinin solunda yer almalıdır.
 - Sağdan sola sıralama küçült düğmesi, `GitHub / By Teknesyum`, `Buy Me A Coffee` olmalıdır.
 - Üst bar bağlantıları normalde beyaz, hover sırasında neon pembe ve altı çizili olmalıdır.
