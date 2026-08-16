@@ -143,7 +143,7 @@ The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media C
 
 Sliders now use a pink filled track with a blue outline and an inverse blue thumb with a pink outline. Hovering the control strengthens the thumb outline and adds a pink neon response without changing text colors.
 
-The Output panel labels are explicitly neon blue. Target and Output now use the same fixed 260 DIP panel height, eliminating the residual mismatch produced by runtime content measurement. The Output progress line was reduced from 8 to 5 DIP.
+The Output panel labels are explicitly neon blue. The right-side AI and Output panels now live in a grid whose total height is bound to the complete left column; Output consumes the remaining star-sized row after AI and the 16 DIP gap. This aligns both lower edges on the same physical pixel instead of merely assigning equal independent heights. The Output progress line remains 5 DIP.
 
 The complete custom window is enclosed by a crisp 1 DIP neon-blue border with the same subtle 6 DIP corner radius used across the interface.
 

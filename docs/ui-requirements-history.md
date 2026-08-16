@@ -20,7 +20,7 @@ Son güncelleme: 17 Ağustos 2026
 - Hedef boyutun ana sayısal değeri neon mavi ve kalın gösterilerek hazır seçimlerden daha baskın olmalıdır; hazır seçim düğmelerinin metni beyaz kalmalıdır.
 - Aynı işlev grubunda ikincil değerler ana değerden daha güçlü renkle vurgulanmamalıdır.
 - Çıktı panelindeki `Çıktı`, `Aşama`, `Kalan` ve `Güncel Çıktı Boyutu` başlıkları neon mavi olmalıdır.
-- `Hedef` ve `Çıktı` panelleri aynı kesin yüksekliğe sahip olmalıdır; içerik ölçümüne bağlı küçük farklar bırakılmamalıdır.
+- Sol panel sütununun alt kenarı ile sağdaki `Çıktı` panelinin alt kenarı aynı fiziksel pikselde bitmelidir; sabit bağımsız yükseklikler yerine ortak toplam yüksekliğe bağlı grid yerleşimi kullanılmalıdır.
 - Çıktı panelinin üst ilerleme çubuğu kalın görünmemeli; yüksekliği `5 DIP` olmalıdır.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
 - Eş panellerde başlık ile ilk içerik arasındaki dikey boşluk aynı olmalı; `Kaynak` ve `AI Ayarları` panelleri `14 DIP` kullanmalıdır.

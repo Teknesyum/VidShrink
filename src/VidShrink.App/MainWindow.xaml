@@ -39,7 +39,7 @@
 <ColumnDefinition Width="20"/>
 <ColumnDefinition/>
 </Grid.ColumnDefinitions>
-    <StackPanel>
+    <StackPanel x:Name="ShrinkLeftColumn">
 <Border Style="{StaticResource Panel}">
 <StackPanel>
 <TextBlock Text="Source" Style="{StaticResource H2}"/>
@@ -143,7 +143,13 @@
 </Border>
 </StackPanel>
     <StackPanel Grid.Column="2">
-<Border Style="{StaticResource Panel}">
+<Grid Height="{Binding ActualHeight, ElementName=ShrinkLeftColumn}" UseLayoutRounding="True" SnapsToDevicePixels="True">
+<Grid.RowDefinitions>
+<RowDefinition Height="Auto"/>
+<RowDefinition Height="16"/>
+<RowDefinition Height="*"/>
+</Grid.RowDefinitions>
+<Border Grid.Row="0" Style="{StaticResource Panel}">
 <StackPanel>
 <TextBlock Text="AI Settings" Style="{StaticResource H2}"/>
 <TextBlock Text="Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer." Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,14,0,0"/>
@@ -156,7 +162,7 @@
 <Button x:Name="BtnRevert" Content="Back To Automatic" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
 </StackPanel>
 </Border>
-<Border Style="{StaticResource Panel}" Margin="0,16,0,0" Height="260">
+<Border Grid.Row="2" Style="{StaticResource Panel}">
 <StackPanel>
 <TextBlock Text="Output" Style="{StaticResource H2}" Foreground="{StaticResource NeonBlue}"/>
 <ProgressBar x:Name="Progress" Height="5" Maximum="1" Margin="0,14,0,0"/>
@@ -176,6 +182,7 @@
 <Button x:Name="BtnReveal" Content="Show In Folder" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
 </StackPanel>
 </Border>
+</Grid>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
 <Button x:Name="BtnCancel" Content="Cancel" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
 <Button x:Name="BtnStart" Content="Shrink" Style="{StaticResource PrimaryButton}" Margin="12,0,0,0" IsEnabled="False" Click="OnStart"/>
