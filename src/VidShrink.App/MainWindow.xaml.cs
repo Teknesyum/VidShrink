@@ -28,6 +28,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Width = Math.Min(1440, SystemParameters.WorkArea.Width);
+        Height = Math.Min(1000, SystemParameters.WorkArea.Height);
         Loaded += (_, _) => { SetLanguage(true); CheckTools(); };
     }
 
@@ -63,8 +65,8 @@ public partial class MainWindow : Window
     {
         if (ToolLocator.IsAvailable(out var missing))
         {
-            TxtStatusBar.Text = $"ffmpeg: {T("hazır", "ready")} — {ToolLocator.Ffmpeg}";
-            TxtSystemStatus.Text = $"ffmpeg: {ToolLocator.Ffmpeg}\n{T("sürüm", "version")}: {ToolLocator.GetFfmpegVersion()}\n.NET: {Environment.Version}\nVidShrink: {Assembly.GetExecutingAssembly().GetName().Version}";
+            TxtStatusBar.Text = $"FFmpeg: {T("Hazır", "Ready")} — {ToolLocator.Ffmpeg}";
+            TxtSystemStatus.Text = $"FFmpeg: {ToolLocator.Ffmpeg}\n{T("Sürüm", "Version")}: {ToolLocator.GetFfmpegVersion()}\n.NET: {Environment.Version}\nVidShrink: {Assembly.GetExecutingAssembly().GetName().Version}";
         }
         else
         {
@@ -106,7 +108,7 @@ public partial class MainWindow : Window
     private async Task LoadAsync(string path)
     {
         TxtFileName.Text = Path.GetFileName(path);
-        TxtStatusBar.Text = T("ffprobe ile inceleniyor...", "Probing with ffprobe...");
+        TxtStatusBar.Text = T("FFprobe İle İnceleniyor...", "Probing With FFprobe...");
         try { _info = await FfprobeClient.ProbeAsync(path); }
         catch (Exception ex)
         {
@@ -128,7 +130,7 @@ public partial class MainWindow : Window
         SliderTarget.Value = suggested;
         TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
-        TxtStatusBar.Text = $"ffmpeg: {T("hazır", "ready")} — {ToolLocator.Ffmpeg}";
+        TxtStatusBar.Text = $"FFmpeg: {T("Hazır", "Ready")} — {ToolLocator.Ffmpeg}";
         Recalculate();
         RefreshConversion();
     }
@@ -141,9 +143,9 @@ public partial class MainWindow : Window
         TxtResolution.Text = $"{info.Width}x{info.Height}";
         TxtFps.Text = info.Fps.ToString("0.##", CultureInfo.InvariantCulture);
         TxtVideoCodec.Text = info.VideoCodec;
-        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : T("yok", "none");
+        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : T("Yok", "None");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
-        TxtHdr.Text = info.IsHdr ? T("evet", "yes") : T("hayır", "no");
+        TxtHdr.Text = info.IsHdr ? T("Evet", "Yes") : T("Hayır", "No");
     }
 
     private void Recalculate()
@@ -170,8 +172,8 @@ public partial class MainWindow : Window
         if (ActivePlan is not { } plan || _info is null) return;
         var quality = plan.ModeEnum == EncodeMode.Crf ? $"CRF {plan.Crf}" : $"{plan.VideoBitrateK}k two-pass";
         var estimate = PlanCalculator.EstimatedMb(plan, _info.DurationSeconds);
-        var size = estimate is null ? $"≤ {ParseTargetMb():0.##} MB {T("hedef", "target")} ({T("kalite modu; gerekirse düzeltilir", "quality mode; corrected if needed")})" : $"{T("tahmini", "estimated")} {estimate:0.0} MB";
-        TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("otomatik", "automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} fps · {(plan.AudioCodec is null ? T("ses yok", "no audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · preset {plan.Preset} → {size}";
+        var size = estimate is null ? $"≤ {ParseTargetMb():0.##} MB {T("Hedef", "Target")} ({T("Kalite Modu; Gerekirse Düzeltilir", "Quality Mode; Corrected If Needed")})" : $"{T("Tahmini", "Estimated")} {estimate:0.0} MB";
+        TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("Otomatik", "Automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} FPS · {(plan.AudioCodec is null ? T("Ses Yok", "No Audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · Preset {plan.Preset} → {size}";
         TxtPlanReason.Text = plan.Reason;
         TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
     }
@@ -301,16 +303,16 @@ public partial class MainWindow : Window
         catch (OperationCanceledException) { TxtConvertResult.Text = T("İptal edildi.", "Cancelled."); } catch (Exception ex) { TxtConvertResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); RefreshConversion(); }
     }
 
-    private void SetRunning(bool running) { BtnStart.IsEnabled = !running && _info is not null; BtnConvert.IsEnabled = !running && _info is not null; BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running; if (!running) { TxtStage.Text = TxtConvertStage.Text = T("boşta", "idle"); TxtRemaining.Text = "-"; } }
+    private void SetRunning(bool running) { BtnStart.IsEnabled = !running && _info is not null; BtnConvert.IsEnabled = !running && _info is not null; BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running; if (!running) { TxtStage.Text = TxtConvertStage.Text = T("Boşta", "Idle"); TxtRemaining.Text = "-"; } }
     private string LocalizeStage(string stage)
     {
-        if (!_turkish) return stage;
-        return stage.Replace("encoding", "kodlama", StringComparison.OrdinalIgnoreCase)
-            .Replace("converting", "dönüştürme", StringComparison.OrdinalIgnoreCase)
-            .Replace("pass", "geçiş", StringComparison.OrdinalIgnoreCase)
-            .Replace("attempt", "deneme", StringComparison.OrdinalIgnoreCase)
-            .Replace("GIF palette", "GIF paleti", StringComparison.OrdinalIgnoreCase)
-            .Replace("GIF encode", "GIF kodlama", StringComparison.OrdinalIgnoreCase);
+        if (!_turkish) return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(stage);
+        return stage.Replace("encoding", "Kodlama", StringComparison.OrdinalIgnoreCase)
+            .Replace("converting", "Dönüştürme", StringComparison.OrdinalIgnoreCase)
+            .Replace("pass", "Geçiş", StringComparison.OrdinalIgnoreCase)
+            .Replace("attempt", "Deneme", StringComparison.OrdinalIgnoreCase)
+            .Replace("GIF palette", "GIF Paleti", StringComparison.OrdinalIgnoreCase)
+            .Replace("GIF encode", "GIF Kodlama", StringComparison.OrdinalIgnoreCase);
     }
     private void OnCancel(object sender, RoutedEventArgs e) => _cts?.Cancel();
     private void OnReveal(object sender, RoutedEventArgs e) { if (_lastOutput is not null && File.Exists(_lastOutput)) Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_lastOutput}\"") { UseShellExecute = true }); }

@@ -96,11 +96,11 @@
 <ComboBox x:Name="CmbIntent" SelectedIndex="1" SelectionChanged="OnOptionChanged">
 <ComboBoxItem Content="Archive"/>
 <ComboBoxItem Content="Sharing"/>
-<ComboBoxItem Content="Social media"/>
+<ComboBoxItem Content="Social Media"/>
 </ComboBox>
 <ComboBox x:Name="CmbCodec" Grid.Column="2" SelectedIndex="0" SelectionChanged="OnOptionChanged">
 <ComboBoxItem Content="Compatible - H.264"/>
-<ComboBoxItem Content="Max compression - H.265"/>
+<ComboBoxItem Content="Max Compression - H.265"/>
 <ComboBoxItem Content="Fast - NVENC"/>
 </ComboBox>
 </Grid>
@@ -141,7 +141,7 @@
 <UniformGrid Columns="2" Margin="0,12,0,0">
 <StackPanel>
 <TextBlock Text="STAGE" Style="{StaticResource Label}"/>
-<TextBlock x:Name="TxtStage" Text="idle" Style="{StaticResource MonoValue}"/>
+<TextBlock x:Name="TxtStage" Text="Idle" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
 <TextBlock Text="REMAINING" Style="{StaticResource Label}"/>
@@ -208,7 +208,7 @@
 <TextBlock Text="QUALITY MODE" Style="{StaticResource Label}"/>
 <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="CRF"/>
-<ComboBoxItem Content="Fixed bitrate"/>
+<ComboBoxItem Content="Fixed Bitrate"/>
 </ComboBox>
 </StackPanel>
 <StackPanel>
@@ -282,9 +282,20 @@
 </Border>
 <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
+<TextBlock Text="QUICK SETTINGS GUIDE" Style="{StaticResource H2}"/>
+<TextBlock Text="CODEC" Style="{StaticResource H3}" Margin="0,12,0,4"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="H.264: Works on almost every phone, TV, and website. H.265: Makes smaller files but takes longer and may not play on older devices. VP9: A good WebM and browser choice. AV1: Produces very small modern files but is the slowest. Copy: Keeps the original stream without quality loss when the chosen container supports it."/>
+<TextBlock Text="QUALITY" Style="{StaticResource H3}" Margin="0,12,0,4"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="CRF: Choose visual quality; the final file size can vary. A lower number means higher quality and a larger file. Fixed Bitrate: Choose the data rate when a more predictable file size matters."/>
+<TextBlock Text="FINE TUNING" Style="{StaticResource H3}" Margin="0,12,0,4"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="Source preserves the original resolution or frame rate. Custom lets you enter your own value. Audio Copy avoids re-encoding; Drop removes audio completely. Start and End convert only the selected time range."/>
+</StackPanel>
+</Border>
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<StackPanel>
 <TextBlock Text="PROGRESS" Style="{StaticResource H2}"/>
 <ProgressBar x:Name="ConvertProgress" Height="8" Maximum="1" Margin="0,12,0,0"/>
-<TextBlock x:Name="TxtConvertStage" Text="idle" Style="{StaticResource MonoValue}"/>
+<TextBlock x:Name="TxtConvertStage" Text="Idle" Style="{StaticResource MonoValue}"/>
 <TextBlock x:Name="TxtConvertResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
 <Button x:Name="BtnConvertReveal" Content="SHOW IN FOLDER" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
 </StackPanel>
@@ -324,7 +335,7 @@
 </ScrollViewer>
 </TabItem>
   </TabControl>
-<TextBlock x:Name="TxtStatusBar" Grid.Row="2" Style="{StaticResource Hint}" Margin="0,14,0,0" Text="ffmpeg: checking..."/>
+<TextBlock x:Name="TxtStatusBar" Grid.Row="2" Style="{StaticResource Hint}" Margin="0,14,0,0" Text="FFmpeg: Checking..."/>
 </Grid>
 </Window>
 

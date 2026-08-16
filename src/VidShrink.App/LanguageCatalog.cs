@@ -21,9 +21,9 @@ internal static class LanguageCatalog
         ["HALF"] = "YARISI",
         ["Archive"] = "Arşiv",
         ["Sharing"] = "Paylaşım",
-        ["Social media"] = "Sosyal medya",
+        ["Social Media"] = "Sosyal Medya",
         ["Compatible - H.264"] = "Uyumlu - H.264",
-        ["Max compression - H.265"] = "En yüksek sıkıştırma - H.265",
+        ["Max Compression - H.265"] = "En Yüksek Sıkıştırma - H.265",
         ["Fast - NVENC"] = "Hızlı - NVENC",
         ["May lower resolution"] = "Çözünürlük düşürülebilir",
         ["May lower frame rate"] = "Kare hızı düşürülebilir",
@@ -45,7 +45,7 @@ internal static class LanguageCatalog
         ["BROWSE SOURCE"] = "KAYNAĞA GÖZAT",
         ["CONTAINER"] = "KAPSAYICI",
         ["QUALITY MODE"] = "KALİTE MODU",
-        ["Fixed bitrate"] = "Sabit bit hızı",
+        ["Fixed Bitrate"] = "Sabit Bit Hızı",
         ["CRF / BITRATE K"] = "CRF / BİT HIZI K",
         ["Source"] = "Kaynak",
         ["Custom"] = "Özel",
@@ -58,6 +58,13 @@ internal static class LanguageCatalog
         ["START (HH:MM:SS)"] = "BAŞLANGIÇ (SS:DD:SS)",
         ["END (HH:MM:SS)"] = "BİTİŞ (SS:DD:SS)",
         ["PROGRESS"] = "İLERLEME",
+        ["QUICK SETTINGS GUIDE"] = "HIZLI AYAR REHBERİ",
+        ["CODEC"] = "KODEK",
+        ["QUALITY"] = "KALİTE",
+        ["FINE TUNING"] = "İNCE AYARLAR",
+        ["H.264: Works on almost every phone, TV, and website. H.265: Makes smaller files but takes longer and may not play on older devices. VP9: A good WebM and browser choice. AV1: Produces very small modern files but is the slowest. Copy: Keeps the original stream without quality loss when the chosen container supports it."] = "H.264: Hemen her telefon, TV ve internet sitesinde çalışır. H.265: Daha küçük dosyalar üretir ancak daha uzun sürer ve eski cihazlarda açılmayabilir. VP9: WebM ve tarayıcılar için iyi bir seçimdir. AV1: Çok küçük ve modern dosyalar üretir ancak en yavaş seçenektir. Kopyala: Seçilen kapsayıcı destekliyorsa özgün akışı kalite kaybı olmadan korur.",
+        ["CRF: Choose visual quality; the final file size can vary. A lower number means higher quality and a larger file. Fixed Bitrate: Choose the data rate when a more predictable file size matters."] = "CRF: Görüntü kalitesini seçersiniz; son dosya boyutu değişebilir. Daha düşük sayı, daha yüksek kalite ve daha büyük dosya demektir. Sabit Bit Hızı: Dosya boyutunun daha öngörülebilir olması önemliyse veri hızını seçersiniz.",
+        ["Source preserves the original resolution or frame rate. Custom lets you enter your own value. Audio Copy avoids re-encoding; Drop removes audio completely. Start and End convert only the selected time range."] = "Kaynak, özgün çözünürlüğü veya kare hızını korur. Özel, kendi değerinizi girmenizi sağlar. Sesi Kopyala yeniden kodlamayı önler; At sesi tamamen kaldırır. Başlangıç ve Bitiş yalnızca seçilen zaman aralığını dönüştürür.",
         ["ABOUT VIDSHRINK"] = "VIDSHRINK HAKKINDA",
         ["VidShrink is an offline Windows tool for target-size video compression and format conversion. In SHRINK, the target size becomes a total bitrate budget: audio is reserved first, bits per pixel selects CRF or two-pass encoding, resolution steps down when necessary, and oversize output triggers a measured bitrate correction."] = "VidShrink, hedef boyutlu video sıkıştırma ve format dönüştürme için çevrimdışı bir Windows aracıdır. KÜÇÜLT modunda hedef boyut toplam bit hızı bütçesine dönüşür: önce ses payı ayrılır, piksel başına bit değeri CRF veya iki geçişli kodlamayı seçer, gerektiğinde çözünürlük düşürülür ve büyük çıktı ölçülmüş bit hızı düzeltmesini tetikler.",
         ["AUTOMATIC DECISION TABLE"] = "OTOMATİK KARAR TABLOSU",
@@ -69,7 +76,8 @@ internal static class LanguageCatalog
         ["SYSTEM STATUS"] = "SİSTEM DURUMU",
         ["GITHUB / BY TEKNESYUM"] = "GITHUB / TEKNESYUM",
         ["BUY ME A COFFEE"] = "KAHVE ISMARLA",
-        ["idle"] = "boşta"
+        ["Idle"] = "Boşta",
+        ["FFmpeg: Checking..."] = "FFmpeg: Kontrol Ediliyor..."
     };
 
     internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish = EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);

@@ -121,6 +121,18 @@ Normal interface typography now uses a 16 DIP minimum: labels, body copy, button
 
 All neutral text tokens now use pure white `#FFFFFFFF`; the interface no longer uses gray typography. Neon blue headings, neon-purple actions, and neon-pink mono values remain semantic accent colors. The primary UI font is Segoe UI, while commands and numeric values use Consolas with Cascadia Mono as fallback.
 
+## August 2026 UI usability follow-up
+
+The latest pass is aimed at users who do not already know codec or encoding terminology.
+
+- CONVERT now contains a bilingual Quick Settings Guide. It explains H.264, H.265, VP9, AV1, stream copy, CRF, fixed bitrate, source/custom values, audio copy/drop, and trim times in plain language.
+- Turkish remains the startup language; the guide and its headings switch with the existing TR/EN controls.
+- The startup window requests 1440x1000 and is capped to the available Windows work area. On a 1440x1000 work area the SHRINK layout is visible without vertical scrolling.
+- Field headings use neon purple, section headings use neon blue, and their child values or explanatory text remain pure white. This establishes a visible hierarchy without gray text or text glow.
+- Sliders use a dark cyan rail, neon-cyan filled range, and a pink/cyan thumb. Progress bars use the matching neon rail and fill treatment.
+- User-facing selector values and idle/tool statuses were normalized to initial capitals in both Turkish and English, including `Sosyal Medya`, `En Yüksek Sıkıştırma`, `Sabit Bit Hızı`, `Boşta`, and `FFmpeg: Hazır`.
+- The Debug build completed with **0 warnings and 0 errors**. The Turkish SHRINK screen was visually inspected at 1425x993; controls were separated, the neon slider rendered correctly, text was readable, and no scroll was required.
+
 ## Files central to review
 
 - `src/VidShrink.App/LanguageCatalog.cs`
