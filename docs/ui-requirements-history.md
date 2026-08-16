@@ -81,6 +81,7 @@ Son güncelleme: 17 Ağustos 2026
 - Kontroller ve paneller sıkışık veya birbirine yapışık görünmemelidir.
 - Normal arayüz öğelerinde tam dikdörtgen kullanılmamalı; bütün köşeler küçük ve dengeli biçimde yuvarlatılmalıdır.
 - Genel köşe yarıçapı `6 DIP` olmalı; geniş, kapsül benzeri veya aşırı yuvarlak köşelerden kaçınılmalıdır.
+- Uygulama penceresinin en dışında tüm pencereyi çevreleyen `1 DIP` neon mavi anahat bulunmalıdır.
 - Dairesel `?` yardım rozeti ve kaydırıcı tutamacı gibi işlevi gereği yuvarlak öğeler bu kuralın istisnasıdır.
 - Aynı satırdaki kontroller asimetrik görünmemelidir; bir kontrolün sol köşeleri yuvarlatılmışsa sağ köşeleri de aynı yarıçapla yuvarlatılmalıdır.
 - Eş görev seviyesindeki yan yana kontrollerin dış yükseklikleri mümkün olduğunca aynı olmalıdır.

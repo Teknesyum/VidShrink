@@ -145,6 +145,8 @@ Sliders now use a pink filled track with a blue outline and an inverse blue thum
 
 The Output panel labels are explicitly neon blue. Its height is bound to the Target panel on the left so the paired panels retain equal height as content or language changes.
 
+The complete custom window is enclosed by a crisp 1 DIP neon-blue border with the same subtle 6 DIP corner radius used across the interface.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.

@@ -2,6 +2,7 @@
  <WindowChrome.WindowChrome>
   <WindowChrome CaptionHeight="54" ResizeBorderThickness="8" CornerRadius="6" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
  </WindowChrome.WindowChrome>
+ <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
  <Grid>
 <Grid.RowDefinitions>
 <RowDefinition Height="Auto"/>
@@ -349,5 +350,6 @@
   </TabControl>
 <TextBlock x:Name="TxtStatusBar" Visibility="Collapsed"/>
 </Grid>
+ </Border>
 </Window>
 
