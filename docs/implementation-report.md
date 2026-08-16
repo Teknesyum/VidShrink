@@ -117,7 +117,7 @@ The form now uses a 16 px horizontal gutter, 18 px row spacing, 6 px label-to-co
 
 Text glow was removed from neon-blue section headings. Typography now uses flat, sharp foreground colors for improved readability; neon emphasis remains on borders, selection states, and controls rather than blurred text shadows.
 
-The interface also enforces a 12 DIP minimum font size. Labels and hint text that previously rendered at 10 DIP were raised to 12 DIP; no application text style now uses a smaller size.
+Normal interface typography now uses a 16 DIP minimum: labels, body copy, buttons, selectors, text fields, checkboxes, tabs, and mono values are all 16 DIP or larger. Section headings are 20 DIP. Only secondary hint and status copy may use the 14 DIP exception, and no application text style uses less than 14 DIP.
 
 ## Files central to review
 

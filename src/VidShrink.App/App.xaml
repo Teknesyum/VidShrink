@@ -11,7 +11,7 @@
             <Style x:Key="GhostButton" TargetType="Button">
                 <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontSize" Value="16"/>
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Padding" Value="14,8"/>
@@ -49,19 +49,19 @@
 
             <Style x:Key="Body" TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="16"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
             </Style>
 
             <Style x:Key="Hint" TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontSize" Value="14"/>
                 <Setter Property="Foreground" Value="{StaticResource TextHint}"/>
             </Style>
 
             <Style TargetType="ComboBox">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="16"/>
                 <Setter Property="Padding" Value="8,6"/>
                 <Setter Property="Background" Value="#FF07181B"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
@@ -103,7 +103,7 @@
 
             <Style TargetType="ComboBoxItem">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="16"/>
                 <Setter Property="Background" Value="#FF07181B"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
                 <Setter Property="Padding" Value="8,6"/>
@@ -134,7 +134,7 @@
 
             <Style TargetType="TextBox">
                 <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="16"/>
                 <Setter Property="Background" Value="#1A00F3FF"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
                 <Setter Property="BorderBrush" Value="#3300F3FF"/>
@@ -145,7 +145,7 @@
 
             <Style x:Key="CheckStyle" TargetType="CheckBox">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontSize" Value="16"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
                 <Setter Property="Margin" Value="0,0,16,0"/>
             </Style>

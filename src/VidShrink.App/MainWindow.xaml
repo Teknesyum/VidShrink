@@ -90,6 +90,7 @@
 <Grid Margin="0,16,0,0">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
+<ColumnDefinition Width="16"/>
 <ColumnDefinition/>
 </Grid.ColumnDefinitions>
 <ComboBox x:Name="CmbIntent" SelectedIndex="1" SelectionChanged="OnOptionChanged">
@@ -97,7 +98,7 @@
 <ComboBoxItem Content="Sharing"/>
 <ComboBoxItem Content="Social media"/>
 </ComboBox>
-<ComboBox x:Name="CmbCodec" Grid.Column="1" SelectedIndex="0" SelectionChanged="OnOptionChanged">
+<ComboBox x:Name="CmbCodec" Grid.Column="2" SelectedIndex="0" SelectionChanged="OnOptionChanged">
 <ComboBoxItem Content="Compatible - H.264"/>
 <ComboBoxItem Content="Max compression - H.265"/>
 <ComboBoxItem Content="Fast - NVENC"/>
