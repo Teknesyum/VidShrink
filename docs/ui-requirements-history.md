@@ -205,6 +205,9 @@ Son güncelleme: 17 Ağustos 2026
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
 - Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.
 - Neon tema karanlık zeminde kontrastı azaltmamalıdır.
+- Mavi metinlerin arkasında mavimsi koyu yüzey kullanılmamalı; kontrol ve panel zeminleri nötr kömür tonunda olmalıdır.
+- Genel yüzey tonu bileşenlerde sabit renk olarak tekrarlanmamalı; `Theme.xaml` içindeki tek `SurfaceToneColor` kaynağına bağlanmalıdır.
+- Üst bar gradienti de bileşen içinde tanımlanmamalı; merkezi `TitleBarBackground` tema kaynağından gelmelidir.
 - Başlangıç penceresi mümkün olan çalışma alanını kullanmalı ve tipik 1440×1000 çalışma alanında Küçült sekmesi kaydırmasız görünmelidir.
 
 ## 13. Doğrulama Beklentileri

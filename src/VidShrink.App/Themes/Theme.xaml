@@ -5,13 +5,19 @@
   <Color x:Key="NeonBlueColor">#FF00F3FF</Color>
   <Color x:Key="NeonPinkColor">#FFFF00EA</Color>
   <Color x:Key="NeonPurpleColor">#FFB026FF</Color>
+  <Color x:Key="SurfaceToneColor">#FF121216</Color>
 
   <SolidColorBrush x:Key="NeonBlue"    Color="#FF00F3FF"/>
   <SolidColorBrush x:Key="NeonPink"    Color="#FFFF00EA"/>
   <SolidColorBrush x:Key="NeonPurple"  Color="#FFB026FF"/>
   <SolidColorBrush x:Key="NeonSuccess" Color="#FF34D399"/>
-  <SolidColorBrush x:Key="Surface"     Color="#F208090A"/>
+  <SolidColorBrush x:Key="Surface"     Color="{StaticResource SurfaceToneColor}"/>
   <SolidColorBrush x:Key="AppBg"       Color="#FF050507"/>
+  <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0,0.5" EndPoint="1,0.5">
+    <GradientStop Color="#FF101318" Offset="0"/>
+    <GradientStop Color="{StaticResource SurfaceToneColor}" Offset="0.5"/>
+    <GradientStop Color="#FF171018" Offset="1"/>
+  </LinearGradientBrush>
 
   <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
   <SolidColorBrush x:Key="TextDim"   Color="#FFFFFFFF"/>

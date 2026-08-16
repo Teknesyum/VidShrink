@@ -151,6 +151,8 @@ The custom title bar now tests a restrained horizontal gradient: a dark cyan tin
 
 Sponsor and signature links were moved from About into the custom title bar. `Buy Me A Coffee` sits left of `GitHub / By Teknesyum`, which sits immediately left of the minimize control; both links react with pink text and an underline on hover.
 
+The blue-green control background was replaced by a neutral charcoal surface to improve cyan text contrast. Panels, inputs, menus, tooltips, checks, inactive tracks, and window controls now resolve through the central `SurfaceToneColor` resource; the title gradient is likewise centralized as `TitleBarBackground`.
+
 Target-size hierarchy now emphasizes the editable primary value in bold neon blue, while preset chip labels remain white. This prevents secondary shortcuts from visually overpowering the value they control.
 
 ## August 2026 UI usability follow-up
