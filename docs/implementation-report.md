@@ -151,6 +151,8 @@ The custom title bar now tests a restrained horizontal gradient: a dark cyan tin
 
 The title bar was reduced from 54 to 46 DIP and then to 38 DIP. Window controls were first normalized to 48×30 DIP, then narrowed to a more compact 42×30 DIP footprint; the icon is 26 DIP. Its gradient uses five closely spaced stops for a softer transition, while the description/language band below uses a separate lower-intensity centralized `SecondaryBarBackground` gradient.
 
+The minimize glyph is no longer a font em dash. It is a centered 10×2 DIP rounded line bound to the button foreground, producing a shorter and more predictable icon with matching hover feedback.
+
 Sponsor and signature links were moved from About into the custom title bar. `Buy Me A Coffee` sits left of `GitHub / By Teknesyum`, which sits immediately left of the minimize control; both links react with pink text and an underline on hover.
 
 The blue-green control background was replaced by a neutral charcoal surface to improve cyan text contrast. Panels, inputs, menus, tooltips, checks, inactive tracks, and window controls now resolve through the central `SurfaceToneColor` resource; the title gradient is likewise centralized as `TitleBarBackground`.

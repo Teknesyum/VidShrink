@@ -89,6 +89,7 @@ Son güncelleme: 17 Ağustos 2026
 - Özel üst başlık çubuğunda okunurluğu koruyan koyu yatay gradient kullanılmalıdır: sol tarafta hafif neon mavi, sağ tarafta düşük yoğunluklu mor/pembe ton bulunmalıdır.
 - Üst bar yüksekliği kompakt `38 DIP` olmalı ve gradient en az beş yakın renk durağıyla yumuşak geçmelidir.
 - Küçült, büyüt ve kapat düğmeleri yayvan olmamalı; kompakt `42×30 DIP` dikdörtgen kullanmalıdır.
+- Küçült simgesi font karakteri yerine ortalanmış `10×2 DIP` kısa çizgi olarak çizilmelidir.
 - Üst barın altındaki açıklama ve dil şeridi de daha düşük yoğunluklu merkezi bir gradient kullanmalıdır.
 - Sponsor ve imza bağlantıları Hakkında sekmesinde tekrarlanmamalı; üst başlık çubuğunda pencere düğmelerinin solunda yer almalıdır.
 - Sağdan sola sıralama küçült düğmesi, `GitHub / By Teknesyum`, `Buy Me A Coffee` olmalıdır.

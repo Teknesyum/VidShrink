@@ -18,7 +18,7 @@
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
 <TextBlock Margin="0,0,18,0" VerticalAlignment="Center"><Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Style="{StaticResource TitleBarLink}" RequestNavigate="OnSignatureNavigate">Buy Me A Coffee</Hyperlink></TextBlock>
 <TextBlock Margin="0,0,18,0" VerticalAlignment="Center"><Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Style="{StaticResource TitleBarLink}" RequestNavigate="OnSignatureNavigate">GitHub / By Teknesyum</Hyperlink></TextBlock>
-<Button Content="—" Style="{StaticResource WindowControlButton}" ToolTip="Minimize" Click="OnMinimize"/>
+<Button Style="{StaticResource WindowControlButton}" ToolTip="Minimize" Click="OnMinimize"><Rectangle Width="10" Height="2" RadiusX="1" RadiusY="1" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/></Button>
 <Button x:Name="BtnMaximize" Content="□" Style="{StaticResource WindowControlButton}" ToolTip="Maximize" Click="OnMaximizeRestore"/>
 <Button Content="×" Style="{StaticResource CloseWindowButton}" ToolTip="Close" Click="OnClose"/>
 </StackPanel>
