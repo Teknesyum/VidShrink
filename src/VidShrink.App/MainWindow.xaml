@@ -178,7 +178,6 @@
 <UniformGrid Columns="2" Margin="-8,16,-8,0">
 <UniformGrid.Resources>
 <Style TargetType="StackPanel"><Setter Property="Margin" Value="8,0,8,18"/></Style>
-<Style TargetType="Slider"><Setter Property="Margin" Value="0,2,0,6"/></Style>
 </UniformGrid.Resources>
 <StackPanel>
 <TextBlock Text="CONTAINER" Style="{StaticResource Label}"/>
@@ -213,8 +212,15 @@
 </StackPanel>
 <StackPanel>
 <TextBlock Text="CRF / BITRATE K" Style="{StaticResource Label}"/>
-<Slider x:Name="SliderQuality" Minimum="0" Maximum="51" Value="23" ValueChanged="OnQualitySliderChanged"/>
-<TextBox x:Name="TxtQuality" Text="23" TextChanged="OnQualityTextChanged"/>
+<Grid Height="38">
+<Grid.ColumnDefinitions>
+<ColumnDefinition/>
+<ColumnDefinition Width="12"/>
+<ColumnDefinition Width="72"/>
+</Grid.ColumnDefinitions>
+<Slider x:Name="SliderQuality" Minimum="0" Maximum="51" Value="23" ValueChanged="OnQualitySliderChanged" VerticalAlignment="Center"/>
+<TextBox x:Name="TxtQuality" Grid.Column="2" Text="23" TextChanged="OnQualityTextChanged"/>
+</Grid>
 </StackPanel>
 <StackPanel>
 <TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/>

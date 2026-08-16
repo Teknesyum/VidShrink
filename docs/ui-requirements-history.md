@@ -58,6 +58,9 @@ Son güncelleme: 17 Ağustos 2026
 ## 5. Alan ve Panel Yerleşimi
 
 - Kontroller ve paneller sıkışık veya birbirine yapışık görünmemelidir.
+- Aynı satırdaki kontroller asimetrik görünmemelidir; bir kontrolün sol köşeleri yuvarlatılmışsa sağ köşeleri de aynı yarıçapla yuvarlatılmalıdır.
+- Eş görev seviyesindeki yan yana kontrollerin dış yükseklikleri mümkün olduğunca aynı olmalıdır.
+- Bir alan içindeki kaydırıcı ve sayısal değer gibi bağlı kontroller gereksiz yere üst üste konarak komşu alanı daha uzun göstermemeli; uygun olduğunda aynı satırda hizalanmalıdır.
 - Dönüştür formundaki iki sütun arasında 16 DIP yatay oluk bulunmalıdır.
 - Form satırları arasında yaklaşık 18 DIP dikey ritim bulunmalıdır.
 - Alan başlığı ile bağlı kontrol arasında yaklaşık 6 DIP boşluk bulunmalıdır.
@@ -156,6 +159,7 @@ Son güncelleme: 17 Ağustos 2026
 - İkincil yardım metni 14 DIP altına düşmemelidir.
 - Başlıklar ile değer/açıklamalar yalnızca konumla değil renk hiyerarşisiyle de ayrılmalıdır.
 - Yan yana kontroller birbirine değmemelidir.
+- Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
 - Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.
 - Neon tema karanlık zeminde kontrastı azaltmamalıdır.
