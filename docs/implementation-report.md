@@ -139,6 +139,8 @@ The desktop `VidShrink` shortcut targets `Launch-VidShrink.ps1` instead of a cop
 
 The custom title bar keeps the mixed-case `VidShrink` brand name. The duplicate application name below the title bar was removed, leaving only the product description beside the language controls.
 
+The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media Converter`; the English catalog counterpart is `Target Size Media Compression & Media Converter`.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.

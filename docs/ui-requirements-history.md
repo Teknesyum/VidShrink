@@ -18,6 +18,7 @@ Son güncelleme: 17 Ağustos 2026
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
 - Uygulama adı `VIDSHRINK` olarak tamamen büyük yazılmamalı; marka yazımı her yerde `VidShrink` olmalıdır.
 - Ana pencerenin özel başlık çubuğundaki `VidShrink` adı yeterlidir; içerik alanında aynı başlık ikinci kez tekrarlanmamalı, yalnızca açıklama gösterilmelidir.
+- Ana pencere açıklamasının Türkçe metni `Boyut Hedefli Media Sıkıştırma & Media Converter` olmalıdır.
 - Panel başlıkları neon mavi olmalıdır.
 - Alan başlıkları ve ikincil bölüm başlıkları okunaklı neon mavi kullanmalıdır; pembe ve mor etkileşim vurgularına ayrılmalıdır.
 - Sayısal değerler ve komutlar mono yazı tipiyle gösterilmelidir.
