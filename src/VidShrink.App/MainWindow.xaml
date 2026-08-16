@@ -1,6 +1,6 @@
 ﻿<Window x:Class="VidShrink.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="VidShrink" Height="900" Width="1220" MinHeight="720" MinWidth="1040" Background="{StaticResource AppBg}" AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver" WindowStartupLocation="CenterScreen">
  <WindowChrome.WindowChrome>
-  <WindowChrome CaptionHeight="54" ResizeBorderThickness="8" CornerRadius="6" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+  <WindowChrome CaptionHeight="46" ResizeBorderThickness="8" CornerRadius="6" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
  </WindowChrome.WindowChrome>
  <Border Background="{StaticResource AppBg}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
  <Grid>
@@ -9,10 +9,10 @@
 <RowDefinition Height="Auto"/>
 <RowDefinition Height="*"/>
 </Grid.RowDefinitions>
-<Border Height="54" Background="{StaticResource TitleBarBackground}" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" CornerRadius="6" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
+<Border Height="46" Background="{StaticResource TitleBarBackground}" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" CornerRadius="6" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
 <Grid Margin="18,0,12,0">
 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-<Image Source="Assets/VidShrink.png" Width="36" Height="36" Stretch="Uniform" Margin="0,0,10,0"/>
+<Image Source="Assets/VidShrink.png" Width="30" Height="30" Stretch="Uniform" Margin="0,0,10,0"/>
 <TextBlock Text="VidShrink" Style="{StaticResource H2}" FontSize="18" VerticalAlignment="Center"/>
 </StackPanel>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
@@ -24,10 +24,12 @@
 </StackPanel>
 </Grid>
 </Border>
-<Grid Grid.Row="1" Margin="24,18,24,16">
+<Border Grid.Row="1" Background="{StaticResource SecondaryBarBackground}">
+<Grid Margin="24,14,24,14">
 <TextBlock Text="Target Size Media Compression &amp; Media Converter" Style="{StaticResource Hint}" VerticalAlignment="Center"/>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><Button x:Name="BtnTr" Content="TR" Style="{StaticResource ChipButton}" Click="OnTurkish"/><Button x:Name="BtnEn" Content="EN" Style="{StaticResource ChipButton}" Click="OnEnglish"/></StackPanel>
 </Grid>
+</Border>
   <TabControl Grid.Row="2" Margin="24,0,24,24" Style="{StaticResource NeonTabControl}">
    <TabItem Header="Shrink" Style="{StaticResource NeonTabItem}">
 <ScrollViewer VerticalScrollBarVisibility="Auto">

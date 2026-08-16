@@ -15,8 +15,16 @@
   <SolidColorBrush x:Key="AppBg"       Color="#FF050507"/>
   <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0,0.5" EndPoint="1,0.5">
     <GradientStop Color="#FF101318" Offset="0"/>
+    <GradientStop Color="#FF111218" Offset="0.25"/>
     <GradientStop Color="{StaticResource SurfaceToneColor}" Offset="0.5"/>
+    <GradientStop Color="#FF141117" Offset="0.75"/>
     <GradientStop Color="#FF171018" Offset="1"/>
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="SecondaryBarBackground" StartPoint="0,0.5" EndPoint="1,0.5">
+    <GradientStop Color="#FF0B0D11" Offset="0"/>
+    <GradientStop Color="#FF0D0D12" Offset="0.35"/>
+    <GradientStop Color="#FF100D13" Offset="0.7"/>
+    <GradientStop Color="#FF120D14" Offset="1"/>
   </LinearGradientBrush>
 
   <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
