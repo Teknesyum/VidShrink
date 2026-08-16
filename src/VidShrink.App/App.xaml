@@ -420,7 +420,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Rectangle x:Name="CheckOutline" Fill="{StaticResource Surface}" Stroke="{StaticResource NeonBlue}" StrokeThickness="1" RadiusX="4" RadiusY="4"/>
+                                    <Border x:Name="CheckOutline" Margin="1" Background="{StaticResource Surface}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="4"/>
                                     <Path x:Name="CheckMark" Data="M 4 10 L 8 14 L 16 5" Stroke="{StaticResource NeonBlue}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Visibility="Collapsed"/>
                                 </Grid>
                                 <ContentPresenter Grid.Column="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
@@ -428,11 +428,11 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="CheckOutline" Property="Stroke" Value="{StaticResource NeonPurple}"/>
-                                    <Setter TargetName="CheckOutline" Property="Fill" Value="#3300F3FF"/>
+                                    <Setter TargetName="CheckOutline" Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
+                                    <Setter TargetName="CheckOutline" Property="Background" Value="#3300F3FF"/>
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="CheckOutline" Property="Stroke" Value="{StaticResource NeonPink}"/>
+                                    <Setter TargetName="CheckOutline" Property="BorderBrush" Value="{StaticResource NeonPink}"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter Property="Opacity" Value="0.45"/>

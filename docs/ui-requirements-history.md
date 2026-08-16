@@ -218,11 +218,12 @@ Son güncelleme: 17 Ağustos 2026
 - Üst gezinme sekmeleri de bu ayrıklık kuralına uymalı; sekmeler arasında `8 DIP` boşluk bulunmalıdır.
 - Sekme ve panel anahatları dört kenarda kesintisiz kapanmalı; alt kenarlar yerleşim alanı tarafından kırpılmamalıdır.
 - Sekme anahattı kontrol sınırından 1 DIP içeride çizilmeli; özellikle son sekmenin sağ kenarı ölçüm sınırına veya header panel kırpmasına bırakılmamalıdır.
-- Sekme ve checkbox çerçevelerinde kenarları ayrı ayrı ölçen `Border` yerine dört kenarı tek kapalı geometride çizen `Rectangle Stroke` kullanılmalıdır.
+- Sekme çerçeveleri dört kenarı tek kapalı geometride çizen, sınırdan içeri alınmış `Rectangle Stroke` kullanmalıdır. Onay kutusunda bir DIP konturu kendi ölçüm alanının içine çizen, 1 DIP içeri alınmış `Border` kullanılmalıdır; seçili ve seçili olmayan durumda dört kenar da canlı görüntüde doğrulanmalıdır.
 - Sekmelerin sağ kenarı ile checkboxların alt kenarı gerçek uygulamada açıkça görünmeden değişiklik tamamlanmış sayılmamalıdır.
 - Pencere genelinde tam piksel yerleşimi ve piksele hizalı kenarlık çizimi kullanılmalıdır.
 - Grid hücresi, çizilecek nesneyle aynı çıplak ölçüye zorlanmamalıdır; nesne boyutu, border stroke kalınlığı, DPI yuvarlaması ve en az 2 DIP güvenlik payı birlikte hesaplanmalıdır.
 - Onay kutusunun 20×20 DIP çizimi hem yatay hem dikey yönde 24×24 DIP hücre içinde ortalanmalı; hiçbir kenarı veya tik ucu kırpılmamalıdır.
+- WPF `Shape` konturları hücre sınırına sıfır mesafeyle yaslanmamalıdır. Sağ ve alt yarım konturun piksel hizalamasında kırpılmasını önlemek için sekme ve onay kutusu gibi kapalı çerçeveler kendi çizim sınırından en az 1 DIP içeri alınmalı; çalışan uygulamanın ekran görüntüsünde dört kenar ayrı ayrı kontrol edilmelidir.
 - Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
 - Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.

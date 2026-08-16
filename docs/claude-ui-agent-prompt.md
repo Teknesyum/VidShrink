@@ -36,7 +36,8 @@ Değişmez UI kuralları:
 - Simetri zorunludur: köşe, yükseklik, dikey merkez ve panel alt kenarları piksel düzeyinde eşleşmelidir.
 - 1 px fark, yarım çizgi veya kapanmayan anahat kabul edilmez.
 - Sekme borderını kontrol sınırından 1 DIP içeride tut ve TabItem kırpmasını kapalı bırak; özellikle son sekmenin sağ kenarını doğrula.
-- Sekme ve checkbox çerçevelerinde kapalı Rectangle stroke geometrisini koru; sağ veya alt kenarı eksik çizilen WPF Border şablonuna dönme.
+- Sekmelerde sınırdan içeri alınmış kapalı Rectangle stroke geometrisini koru. Checkbox için 20×20 çizim alanında 1 DIP içeri alınmış Border kullan; seçili ve seçili olmayan durumda dört kenarı canlı görüntüde doğrula.
+- Kapalı WPF şekil konturlarını kendi çizim sınırından en az 1 DIP içeri al; sağ ve alt kenarları çalışan uygulamanın ekran görüntüsünde ayrıca doğrula.
 - Hücre boyutunu yalnızca iç nesnenin nominal ölçüsüne eşitleme; stroke, DPI yuvarlaması ve yatay/dikey her iki tarafta en az 2 DIP güvenlik payını hesaba kat. 20×20 checkbox için 24×24 DIP hücre kullan.
 - UseLayoutRounding ve SnapsToDevicePixels davranışını koru.
 - Türkçe metni esas alarak taşma kontrolü yap; EN geçişini de doğrula.

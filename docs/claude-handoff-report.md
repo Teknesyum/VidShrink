@@ -68,7 +68,8 @@ VidShrink, Windows için .NET 8 WPF ile geliştirilmiş, çevrimdışı çalış
 - Birleşik görünen komşu kontroller kabul edilmez; sekmeler arasında 8 DIP boşluk vardır.
 - Panel ve sekme anahatları dört kenarda tam kapanır; layout rounding ve pixel snapping aktiftir.
 - Sekme borderı kontrol sınırından 1 DIP içeride çizilir ve TabItem kırpması kapalıdır; son sekmenin sağ kenarı eksiksiz görünmelidir.
-- Sekme ve checkbox çerçeveleri kapalı Rectangle stroke geometrileridir; sağ veya alt kenarı eksik WPF Border yaklaşımına geri dönülmemelidir.
+- Sekmeler sınırdan içeri alınmış kapalı Rectangle stroke geometrisidir. Checkbox, 20×20 çizim alanında 1 DIP içeri alınmış Border kullanır; seçili ve seçili olmayan durumda dört kenarı canlı görüntüde doğrulanır.
+- Kapalı WPF şekil konturları kendi çizim sınırından en az 1 DIP içeri alınır; özellikle sağ ve alt kenarların eksiksizliği çalışan uygulamanın ekran görüntüsüyle doğrulanır.
 - Bir hücre yeniden boyutlandırılırken nesne, stroke, DPI yuvarlaması ve her iki eksende en az 2 DIP güvenlik payı birlikte hesaplanır; 20×20 checkbox 24×24 DIP hücrede ortalanır.
 - Tüm uygulamanın dışında 1 DIP neon mavi anahat vardır.
 - Yüzey rengi `Themes/Theme.xaml` içindeki merkezi `SurfaceToneColor` kaynağından gelir.
