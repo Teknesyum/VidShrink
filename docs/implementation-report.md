@@ -141,7 +141,7 @@ The custom title bar keeps the mixed-case `VidShrink` brand name. The duplicate 
 
 The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media Converter`; the English catalog counterpart is `Target Size Media Compression & Media Converter`.
 
-The product description now uses its own centralized `ProductTagline` style at 17 DIP, semi-bold, and pure white, giving it slightly more identity than ordinary body or hint text without competing with section headings.
+The product description now uses its own centralized `ProductTagline` style at 17 DIP, semi-bold, and neon blue, giving it slightly more identity than ordinary body or hint text without competing with section headings.
 
 Sliders now use a pink filled track with a blue outline and an inverse blue thumb with a pink outline. Hovering the control strengthens the thumb outline and adds a pink neon response without changing text colors.
 
@@ -166,6 +166,8 @@ All application gradients now follow one smoothness rule: centralized brushes, a
 The minimize glyph is no longer a font em dash. It is a centered 10×2 DIP rounded line bound to the button foreground, producing a shorter and more predictable icon with matching hover feedback.
 
 Sponsor and signature links were moved from About into the custom title bar. `Buy Me A Coffee` sits left of `GitHub / By Teknesyum`, which sits immediately left of the minimize control; both links react with pink text and an underline on hover.
+
+The product tagline and both title-bar sponsor/signature links now use the centralized neon-blue brush. The two title-bar links use a compact 14 DIP font size while retaining their pink hover response.
 
 The blue-green control background was replaced by a neutral charcoal surface to improve cyan text contrast. Panels, inputs, menus, tooltips, checks, inactive tracks, and window controls now resolve through the central `SurfaceToneColor` resource; the title gradient is likewise centralized as `TitleBarBackground`.
 

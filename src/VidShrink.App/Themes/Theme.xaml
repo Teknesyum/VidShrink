@@ -73,7 +73,7 @@
     <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
     <Setter Property="FontSize" Value="17"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
-    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+    <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
   </Style>
 
   <Style x:Key="Panel" TargetType="Border">
