@@ -135,7 +135,7 @@ Contextual-help badges were reduced from 22×22 to 16×16 DIP and positioned as 
 
 Pink and purple are no longer persistent text colors. Section and field headings use neon blue, while values, secondary actions, and window controls use white. Pink remains an interaction accent for hover, focus, selection, borders, and slider details.
 
-The desktop `VidShrink` shortcut targets `Launch-VidShrink.ps1` instead of a copied executable. The launcher uses `dotnet run` against the application project, so changed source is rebuilt when needed and the shortcut always opens the newest local project version.
+The desktop `VidShrink` shortcut targets the stable Debug output inside the project instead of a copied executable, so every verified build replaces the file opened by the shortcut. Direct executable targeting also lets Windows associate the running window with VidShrink's embedded multi-size icon; targeting the PowerShell launcher caused the taskbar/Start surface to associate the launch with PowerShell and omit the expected application icon. `Launch-VidShrink.ps1` remains available as a rebuild-on-launch development helper.
 
 The custom title bar keeps the mixed-case `VidShrink` brand name. The duplicate application name below the title bar was removed, leaving only the product description beside the language controls.
 
