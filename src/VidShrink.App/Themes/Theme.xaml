@@ -13,17 +13,22 @@
   <SolidColorBrush x:Key="NeonSuccess" Color="#FF34D399"/>
   <SolidColorBrush x:Key="Surface"     Color="{StaticResource SurfaceToneColor}"/>
   <SolidColorBrush x:Key="AppBg"       Color="#FF050507"/>
-  <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0,0.5" EndPoint="1,0.5">
+  <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0,0.5" EndPoint="1,0.5" ColorInterpolationMode="ScRgbLinearInterpolation">
     <GradientStop Color="#FF101318" Offset="0"/>
-    <GradientStop Color="#FF111218" Offset="0.25"/>
+    <GradientStop Color="#FF101218" Offset="0.16"/>
+    <GradientStop Color="#FF111217" Offset="0.32"/>
     <GradientStop Color="{StaticResource SurfaceToneColor}" Offset="0.5"/>
-    <GradientStop Color="#FF141117" Offset="0.75"/>
+    <GradientStop Color="#FF131117" Offset="0.68"/>
+    <GradientStop Color="#FF151118" Offset="0.84"/>
     <GradientStop Color="#FF171018" Offset="1"/>
   </LinearGradientBrush>
-  <LinearGradientBrush x:Key="WorkspaceBackground" StartPoint="0,0" EndPoint="1,1">
+  <LinearGradientBrush x:Key="WorkspaceBackground" StartPoint="0,0" EndPoint="1,1" ColorInterpolationMode="ScRgbLinearInterpolation">
     <GradientStop Color="#FF07090D" Offset="0"/>
-    <GradientStop Color="#FF09090F" Offset="0.35"/>
-    <GradientStop Color="#FF0D0912" Offset="0.7"/>
+    <GradientStop Color="#FF08090E" Offset="0.16"/>
+    <GradientStop Color="#FF09090F" Offset="0.32"/>
+    <GradientStop Color="#FF0A0910" Offset="0.5"/>
+    <GradientStop Color="#FF0C0912" Offset="0.68"/>
+    <GradientStop Color="#FF0F0A14" Offset="0.84"/>
     <GradientStop Color="#FF120A16" Offset="1"/>
   </LinearGradientBrush>
 

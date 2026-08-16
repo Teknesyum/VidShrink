@@ -73,6 +73,7 @@ VidShrink, Windows için .NET 8 WPF ile geliştirilmiş, çevrimdışı çalış
 - Tüm uygulamanın dışında 1 DIP neon mavi anahat vardır.
 - Yüzey rengi `Themes/Theme.xaml` içindeki merkezi `SurfaceToneColor` kaynağından gelir.
 - Üst bar gradienti `TitleBarBackground` kaynağındadır; açıklama satırı ve bütün sekme çalışma alanı tek kesintisiz `WorkspaceBackground` gradientini kullanır.
+- Bütün gradientler en az yedi yakın renk durağı ve `ScRgbLinearInterpolation` kullanır; görünür bantlaşma veya ani ton sıçraması kabul edilmez.
 - Üst bar 38 DIP; pencere düğmeleri 42×30 DIP; simge 26 DIP.
 - Küçült simgesi 10×2 DIP çizilmiş kısa çizgidir.
 - Sponsor bağlantıları üst bardadır: `Buy Me A Coffee`, `GitHub / By Teknesyum`, ardından pencere düğmeleri.

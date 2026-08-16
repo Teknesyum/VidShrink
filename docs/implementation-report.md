@@ -161,6 +161,8 @@ The title bar was reduced from 54 to 46 DIP and then to 38 DIP. Window controls 
 
 The former description-only secondary gradient was replaced by one centralized `WorkspaceBackground` gradient spanning the description/language row and the entire empty workspace behind all tabs. This removes the isolated strip and gives the whole lower black area one continuous transition.
 
+All application gradients now follow one smoothness rule: centralized brushes, at least seven closely spaced color stops, and ScRGB linear interpolation. Both `TitleBarBackground` and `WorkspaceBackground` were expanded to seven stops with smaller neighboring color deltas to suppress visible banding.
+
 The minimize glyph is no longer a font em dash. It is a centered 10×2 DIP rounded line bound to the button foreground, producing a shorter and more predictable icon with matching hover feedback.
 
 Sponsor and signature links were moved from About into the custom title bar. `Buy Me A Coffee` sits left of `GitHub / By Teknesyum`, which sits immediately left of the minimize control; both links react with pink text and an underline on hover.
