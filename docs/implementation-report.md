@@ -135,6 +135,8 @@ Contextual-help badges were reduced from 22×22 to 16×16 DIP and positioned as 
 
 Pink and purple are no longer persistent text colors. Section and field headings use neon blue, while values, secondary actions, and window controls use white. Pink remains an interaction accent for hover, focus, selection, borders, and slider details.
 
+The desktop `VidShrink` shortcut targets `Launch-VidShrink.ps1` instead of a copied executable. The launcher uses `dotnet run` against the application project, so changed source is rebuilt when needed and the shortcut always opens the newest local project version.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.
