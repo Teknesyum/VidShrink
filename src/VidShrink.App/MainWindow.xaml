@@ -180,7 +180,7 @@
 <Style TargetType="StackPanel"><Setter Property="Margin" Value="8,0,8,18"/></Style>
 </UniformGrid.Resources>
 <StackPanel>
-<TextBlock Text="CONTAINER" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="CONTAINER" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="The container is the file type. MP4 is the safest general choice. MKV supports many stream types. WebM is intended for browsers. MOV suits Apple workflows. AVI is mainly for older software. MP3, M4A, and WAV create audio-only files." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbContainer" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="MP4"/>
 <ComboBoxItem Content="MKV"/>
@@ -194,7 +194,7 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="H.264 plays on almost every device. H.265 creates smaller files but may not play on older devices. VP9 is useful for WebM and browsers. AV1 offers strong compression but is the slowest. Copy keeps the original video without quality loss when the container supports it." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbConvertCodec" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="H.264"/>
 <ComboBoxItem Content="H.265"/>
@@ -204,14 +204,14 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="QUALITY MODE" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="QUALITY MODE" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="CRF targets visual quality, so final size can vary. Fixed Bitrate targets a data rate, making file size more predictable. Use CRF for normal viewing quality and Fixed Bitrate when size or bandwidth matters more." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="CRF"/>
 <ComboBoxItem Content="Fixed Bitrate"/>
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="CRF / BITRATE K" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="CRF / BITRATE K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 starting point. In Fixed Bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <Grid Height="38">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
@@ -223,7 +223,7 @@
 </Grid>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Source keeps the original dimensions. A numbered option limits output height while preserving aspect ratio. Lower resolution reduces file size and processing demand. Custom allows an exact width and height." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbResolution" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="Source"/>
 <ComboBoxItem Content="2160"/>
@@ -235,11 +235,11 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="CUSTOM WIDTH x HEIGHT" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="CUSTOM WIDTH x HEIGHT" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Used only when Resolution is Custom. Enter width and height as 1280x720. Even dimensions are the safest choice for common video codecs." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtCustomResolution" Text="1280x720" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="FRAME RATE" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="FRAME RATE" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Source preserves the original frame rate. 60 is smoother but needs more data. 30 suits most video. 24 gives a cinema-like motion style. Reducing frame rate can reduce file size." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbConvertFps" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="Source"/>
 <ComboBoxItem Content="60"/>
@@ -249,11 +249,11 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="CUSTOM FPS" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="CUSTOM FPS" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Used only when Frame Rate is Custom. Enter the desired frames per second, such as 25 or 29.97. Values above the source frame rate usually add no real motion detail." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtCustomFps" Text="25" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="AUDIO" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="AUDIO" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="AAC is broadly compatible with MP4. Opus is efficient for WebM. MP3 suits older players. PCM is uncompressed and large. Copy preserves the original audio without re-encoding when supported. Drop removes audio completely." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbConvertAudio" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="AAC"/>
 <ComboBoxItem Content="Opus"/>
@@ -264,15 +264,15 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="AUDIO BITRATE K" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="AUDIO BITRATE K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Audio data rate in kilobits per second. 128 is a compact general setting, 192 provides more detail, and 256 or 320 is useful for music. This value is ignored for Copy, Drop, and uncompressed PCM." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtAudioBitrate" Text="128" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="START (HH:MM:SS)" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="START (HH:MM:SS)" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Optional trim start time. Leave empty to begin at the start of the source. Use hours:minutes:seconds, for example 00:01:30." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtTrimStart" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="END (HH:MM:SS)" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal"><TextBlock Text="END (HH:MM:SS)" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Optional trim end time. Leave empty to continue to the end of the source. The end time must be later than the start time." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtTrimEnd" TextChanged="OnConvertChanged"/>
 </StackPanel>
 </UniformGrid>
@@ -284,17 +284,6 @@
 <TextBlock Text="FFMPEG COMMAND" Style="{StaticResource H2}"/>
 <TextBox x:Name="TxtConvertCommand" Height="150" Margin="0,12,0,0" IsReadOnly="True" TextWrapping="Wrap"/>
 <TextBlock x:Name="TxtConvertValidation" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
-</StackPanel>
-</Border>
-<Border Style="{StaticResource Panel}" Margin="0,16,0,0">
-<StackPanel>
-<TextBlock Text="QUICK SETTINGS GUIDE" Style="{StaticResource H2}"/>
-<TextBlock Text="CODEC" Style="{StaticResource H3}" Margin="0,12,0,4"/>
-<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="H.264: Works on almost every phone, TV, and website. H.265: Makes smaller files but takes longer and may not play on older devices. VP9: A good WebM and browser choice. AV1: Produces very small modern files but is the slowest. Copy: Keeps the original stream without quality loss when the chosen container supports it."/>
-<TextBlock Text="QUALITY" Style="{StaticResource H3}" Margin="0,12,0,4"/>
-<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="CRF: Choose visual quality; the final file size can vary. A lower number means higher quality and a larger file. Fixed Bitrate: Choose the data rate when a more predictable file size matters."/>
-<TextBlock Text="FINE TUNING" Style="{StaticResource H3}" Margin="0,12,0,4"/>
-<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="Source preserves the original resolution or frame rate. Custom lets you enter your own value. Audio Copy avoids re-encoding; Drop removes audio completely. Start and End convert only the selected time range."/>
 </StackPanel>
 </Border>
 <Border Style="{StaticResource Panel}" Margin="0,16,0,0">

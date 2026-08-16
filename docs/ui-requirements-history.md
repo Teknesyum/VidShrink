@@ -121,11 +121,14 @@ Son güncelleme: 17 Ağustos 2026
 - Form alanları hem yatay hem dikey yönde birbirinden ayrılmalıdır.
 - Normal pencere boyutunda mümkün olduğunca kaydırmadan kullanılabilmelidir.
 
-## 10. Kullanıcı Dostu Bilgi Paneli
+## 10. Bağlamsal Ayar Yardımı
 
 - Kullanıcının `kodek`, `CRF`, `bit hızı`, `stream copy` veya kapsayıcı gibi teknik terimleri bildiği varsayılmamalıdır.
-- Dönüştür ekranında görünür bir Hızlı Ayar Rehberi bulunmalıdır.
-- Rehber Türkçe ve İngilizce olmalıdır.
+- Önceki tek ve görünür Hızlı Ayar Rehberi talebi iptal edilmiştir; bütün açıklamalar ayrı bir panelde toplanmamalıdır.
+- Açıklama gerektiren her ayarın başlığının yanında yuvarlak içinde `?` simgesi bulunmalıdır.
+- Fare `?` simgesinin üzerine geldiğinde ilgili ayarın ayrıntılı açıklaması gösterilmelidir.
+- Yardım balonu koyu neon zemine, neon kenarlığa, tam beyaz metne ve en az 16 DIP yazı boyutuna sahip olmalıdır.
+- Yardım içeriği Türkçe ve İngilizce dil geçişini takip etmelidir.
 - H.264 için geniş cihaz, TV, telefon ve internet uyumluluğu açıklanmalıdır.
 - H.265 için daha küçük dosya avantajı, daha uzun işlem süresi ve eski cihaz uyumluluğu riski açıklanmalıdır.
 - VP9'un WebM ve tarayıcı kullanımı için uygun olduğu açıklanmalıdır.
@@ -136,7 +139,7 @@ Son güncelleme: 17 Ağustos 2026
 - Kaynak ve Özel çözünürlük/kare hızı seçenekleri açıklanmalıdır.
 - Ses Kopyala ve At seçeneklerinin etkileri açıklanmalıdır.
 - Başlangıç/Bitiş alanlarının yalnızca seçilen zaman aralığını dönüştürdüğü açıklanmalıdır.
-- Bilgi panelinde başlıklar neon renkli, açıklamalar beyaz olmalıdır.
+- Yardım yalnızca ihtiyaç duyulan yerde görünmeli ve ana formu gereksiz yere uzatmamalıdır.
 
 ## 11. Hakkında Sekmesi
 
@@ -187,7 +190,7 @@ Son güncelleme: 17 Ağustos 2026
 - Alan başlıkları neon mora, bölüm başlıkları neon maviye ayrıldı.
 - Kaydırıcılar ve ilerleme çubukları neon temayla yeniden çizildi.
 - Başlangıç penceresi çalışma alanına bağlı 1440×1000 hedef boyuta yükseltildi.
-- Türkçe/İngilizce Hızlı Ayar Rehberi eklendi.
+- Tek Hızlı Ayar Rehberi kaldırıldı; teknik alanların yanına Türkçe/İngilizce ayrıntılı `?` yardım balonları eklendi.
 - Seçenek ve durum metinlerinin ilk harf kullanımı düzenlendi.
 
 ## 15. İlgili Dosyalar

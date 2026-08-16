@@ -56,6 +56,7 @@ public partial class MainWindow : Window
         if (node is TextBlock text && translations.TryGetValue(text.Text, out var translatedText)) text.Text = translatedText;
         if (node is ContentControl content && content.Content is string value && translations.TryGetValue(value, out var translatedContent)) content.Content = translatedContent;
         if (node is HeaderedContentControl header && header.Header is string headerValue && translations.TryGetValue(headerValue, out var translatedHeader)) header.Header = translatedHeader;
+        if (node is FrameworkElement element && element.ToolTip is DependencyObject toolTip) TranslateTree(toolTip, translations, visited);
         foreach (var child in LogicalTreeHelper.GetChildren(node).OfType<DependencyObject>()) TranslateTree(child, translations, visited);
         if (node is Visual)
             for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++) TranslateTree(VisualTreeHelper.GetChild(node, index), translations, visited);
