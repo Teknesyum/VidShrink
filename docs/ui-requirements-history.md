@@ -201,6 +201,7 @@ Son güncelleme: 17 Ağustos 2026
 - Özel onay kutusunun içindeki tik neon mavi olmalıdır; pembe tik kullanılmamalıdır.
 - Onay kutusu, tik ve yanındaki yazı aynı dikey eksende ortalanmalıdır.
 - Yan yana kontroller birbirine değmemelidir.
+- Üst gezinme sekmeleri de bu ayrıklık kuralına uymalı; sekmeler arasında `8 DIP` boşluk bulunmalıdır.
 - Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
 - Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.
