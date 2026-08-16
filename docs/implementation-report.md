@@ -141,6 +141,8 @@ The custom title bar keeps the mixed-case `VidShrink` brand name. The duplicate 
 
 The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media Converter`; the English catalog counterpart is `Target Size Media Compression & Media Converter`.
 
+The product description now uses its own centralized `ProductTagline` style at 17 DIP, semi-bold, and pure white, giving it slightly more identity than ordinary body or hint text without competing with section headings.
+
 Sliders now use a pink filled track with a blue outline and an inverse blue thumb with a pink outline. Hovering the control strengthens the thumb outline and adds a pink neon response without changing text colors.
 
 The Output panel labels are explicitly neon blue. A total-height binding experiment caused a layout feedback loop and made Output excessively tall, so it was removed. Output is compact at 254 DIP, matching the measured column edge without stretching through unused space. The Output progress line remains 5 DIP.

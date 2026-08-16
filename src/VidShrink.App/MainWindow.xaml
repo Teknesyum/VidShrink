@@ -26,7 +26,7 @@
 </Border>
 <Border Grid.Row="1" Background="{StaticResource SecondaryBarBackground}">
 <Grid Margin="24,14,24,14">
-<TextBlock Text="Target Size Media Compression &amp; Media Converter" Style="{StaticResource Hint}" VerticalAlignment="Center"/>
+<TextBlock Text="Target Size Media Compression &amp; Media Converter" Style="{StaticResource ProductTagline}" VerticalAlignment="Center"/>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><Button x:Name="BtnTr" Content="TR" Style="{StaticResource ChipButton}" Click="OnTurkish"/><Button x:Name="BtnEn" Content="EN" Style="{StaticResource ChipButton}" Click="OnEnglish"/></StackPanel>
 </Grid>
 </Border>

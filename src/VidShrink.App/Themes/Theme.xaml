@@ -64,6 +64,13 @@
     <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
   </Style>
 
+  <Style x:Key="ProductTagline" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="17"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+  </Style>
+
   <Style x:Key="Panel" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource Surface}"/>
     <Setter Property="BorderBrush" Value="#3300F3FF"/>

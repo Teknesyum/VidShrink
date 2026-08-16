@@ -27,6 +27,7 @@ Son güncelleme: 17 Ağustos 2026
 - Uygulama adı `VIDSHRINK` olarak tamamen büyük yazılmamalı; marka yazımı her yerde `VidShrink` olmalıdır.
 - Ana pencerenin özel başlık çubuğundaki `VidShrink` adı yeterlidir; içerik alanında aynı başlık ikinci kez tekrarlanmamalı, yalnızca açıklama gösterilmelidir.
 - Ana pencere açıklamasının Türkçe metni `Boyut Hedefli Media Sıkıştırma & Media Converter` olmalıdır.
+- Ürün açıklaması normal veya ikincil yardım metni gibi görünmemeli; merkezi `ProductTagline` stiliyle 17 DIP, yarı kalın ve tam beyaz gösterilmelidir.
 - Panel başlıkları neon mavi olmalıdır.
 - Alan başlıkları ve ikincil bölüm başlıkları okunaklı neon mavi kullanmalıdır; pembe ve mor etkileşim vurgularına ayrılmalıdır.
 - Sayısal değerler ve komutlar mono yazı tipiyle gösterilmelidir.
