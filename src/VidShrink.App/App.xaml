@@ -407,16 +407,18 @@
                 <Setter Property="Margin" Value="0,0,16,0"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="UseLayoutRounding" Value="True"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="CheckBox">
-                            <Grid VerticalAlignment="Center">
+                            <Grid VerticalAlignment="Center" UseLayoutRounding="True" SnapsToDevicePixels="True">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="24"/>
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Border x:Name="CheckBorder" Width="20" Height="20" Background="{StaticResource Surface}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="4" VerticalAlignment="Center">
+                                <Border x:Name="CheckBorder" Width="20" Height="20" Background="{StaticResource Surface}" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Center" VerticalAlignment="Center" UseLayoutRounding="True" SnapsToDevicePixels="True">
                                     <Path x:Name="CheckMark" Data="M 4 10 L 8 14 L 16 5" Stroke="{StaticResource NeonBlue}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Visibility="Collapsed"/>
                                 </Border>
                                 <ContentPresenter Grid.Column="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
