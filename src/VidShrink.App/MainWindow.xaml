@@ -339,7 +339,7 @@
 <Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">GitHub / By Teknesyum</Hyperlink>
 </TextBlock>
 <TextBlock Margin="16,0,0,0">
-<Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Foreground="{StaticResource NeonPurple}" RequestNavigate="OnSignatureNavigate">Buy Me A Coffee</Hyperlink>
+<Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">Buy Me A Coffee</Hyperlink>
 </TextBlock>
 </StackPanel>
 </StackPanel>

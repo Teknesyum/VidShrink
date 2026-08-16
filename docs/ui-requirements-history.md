@@ -13,9 +13,11 @@ Son güncelleme: 17 Ağustos 2026
 - Neon vurgu renkleri özellikle başlıklarda, kenarlıklarda, seçili durumlarda, kaydırıcılarda ve eylem kontrollerinde kullanılmalıdır.
 - Yazılarda parlama veya bulanık gölge efekti kullanılmamalıdır. Metinler düz, keskin ve kolay okunur olmalıdır.
 - Nötr metin rengi gri olmamalı; tam beyaz kullanılmalıdır.
+- Pembe ve mor tonlar sürekli metin rengi olarak kullanılmamalıdır; bu renkler hover, odak, seçili durum ve ince vurgu ayrıntılarıyla sınırlandırılmalıdır.
+- Başlık ve alan etiketlerinde neon mavi, normal içerik ve değerlerde tam beyaz tercih edilmelidir.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
 - Panel başlıkları neon mavi olmalıdır.
-- Alan başlıkları ve ikincil bölüm başlıkları neon mor gibi temaya uygun bir vurgu rengi taşımalıdır.
+- Alan başlıkları ve ikincil bölüm başlıkları okunaklı neon mavi kullanmalıdır; pembe ve mor etkileşim vurgularına ayrılmalıdır.
 - Sayısal değerler ve komutlar mono yazı tipiyle gösterilmelidir.
 - Görünür Windows yerel başlık çubuğu ve yerel küçültme, büyütme veya kapatma düğmeleri kullanılmamalıdır.
 - Pencerenin üst kısmı neon temalı özel, sürüklenebilir bir başlık paneli olmalıdır.
@@ -209,7 +211,7 @@ Son güncelleme: 17 Ağustos 2026
 - Metin parlama efektleri kaldırıldı.
 - Genel tipografi 16 DIP seviyesine yükseltildi; ikincil metin alt sınırı 14 DIP yapıldı.
 - Gri nötr metinler tam beyaza çevrildi.
-- Alan başlıkları neon mora, bölüm başlıkları neon maviye ayrıldı.
+- Alan ve bölüm başlıkları neon maviye, değerler ve normal içerik tam beyaza taşındı; pembe ve mor etkileşim vurgularına ayrıldı.
 - Kaydırıcılar ve ilerleme çubukları neon temayla yeniden çizildi.
 - Başlangıç penceresi çalışma alanına bağlı 1440×1000 hedef boyuta yükseltildi.
 - Tek Hızlı Ayar Rehberi kaldırıldı; teknik alanların yanına Türkçe/İngilizce ayrıntılı `?` yardım balonları eklendi.

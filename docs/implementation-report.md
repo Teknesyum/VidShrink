@@ -133,6 +133,8 @@ Short interface headings, tabs, labels, actions, options, and status names now c
 
 Contextual-help badges were reduced from 22×22 to 16×16 DIP and positioned as superscript marks at the upper-right of their labels. Their hover delay is 120 ms and the tooltip remains available for up to 30 seconds, using the existing 16 DIP white-on-dark neon tooltip style.
 
+Pink and purple are no longer persistent text colors. Section and field headings use neon blue, while values, secondary actions, and window controls use white. Pink remains an interaction accent for hover, focus, selection, borders, and slider details.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.
