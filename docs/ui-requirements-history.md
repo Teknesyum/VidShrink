@@ -16,6 +16,8 @@ Son güncelleme: 17 Ağustos 2026
 - Pembe ve mor tonlar sürekli metin rengi olarak kullanılmamalıdır; bu renkler hover, odak, seçili durum ve ince vurgu ayrıntılarıyla sınırlandırılmalıdır.
 - Başlık ve alan etiketlerinde neon mavi, normal içerik ve değerlerde tam beyaz tercih edilmelidir.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
+- Uygulama adı `VIDSHRINK` olarak tamamen büyük yazılmamalı; marka yazımı her yerde `VidShrink` olmalıdır.
+- Ana pencerenin özel başlık çubuğundaki `VidShrink` adı yeterlidir; içerik alanında aynı başlık ikinci kez tekrarlanmamalı, yalnızca açıklama gösterilmelidir.
 - Panel başlıkları neon mavi olmalıdır.
 - Alan başlıkları ve ikincil bölüm başlıkları okunaklı neon mavi kullanmalıdır; pembe ve mor etkileşim vurgularına ayrılmalıdır.
 - Sayısal değerler ve komutlar mono yazı tipiyle gösterilmelidir.

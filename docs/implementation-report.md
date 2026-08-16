@@ -137,6 +137,8 @@ Pink and purple are no longer persistent text colors. Section and field headings
 
 The desktop `VidShrink` shortcut targets `Launch-VidShrink.ps1` instead of a copied executable. The launcher uses `dotnet run` against the application project, so changed source is rebuilt when needed and the shortcut always opens the newest local project version.
 
+The custom title bar keeps the mixed-case `VidShrink` brand name. The duplicate application name below the title bar was removed, leaving only the product description beside the language controls.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.

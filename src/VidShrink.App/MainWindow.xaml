@@ -22,7 +22,7 @@
 </Grid>
 </Border>
 <Grid Grid.Row="1" Margin="24,18,24,16">
-<StackPanel><TextBlock Text="VidShrink" Style="{StaticResource H2}" FontSize="24"/><TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}"/></StackPanel>
+<TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}" VerticalAlignment="Center"/>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><Button x:Name="BtnTr" Content="TR" Style="{StaticResource ChipButton}" Click="OnTurkish"/><Button x:Name="BtnEn" Content="EN" Style="{StaticResource ChipButton}" Click="OnEnglish"/></StackPanel>
 </Grid>
   <TabControl Grid.Row="2" Margin="24,0,24,24" Style="{StaticResource NeonTabControl}">
