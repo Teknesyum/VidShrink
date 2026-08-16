@@ -6,7 +6,7 @@ public enum EncodeMode { Crf, TwoPass }
 
 public enum Intent { Archive, Sharing, SocialMedia }
 
-public enum CodecPreference { Compatible, MaxCompression, Fast }
+public enum CodecPreference { Compatible, MaxCompression, Fast, Auto }
 
 public sealed class EncodePlan
 {
@@ -16,6 +16,7 @@ public sealed class EncodePlan
     [JsonPropertyName("crf")] public int? Crf { get; set; }
     [JsonPropertyName("audioCodec")] public string? AudioCodec { get; set; } = "aac";
     [JsonPropertyName("audioBitrateK")] public int AudioBitrateK { get; set; } = 128;
+    [JsonPropertyName("audioChannels")] public int? AudioChannels { get; set; }
     [JsonPropertyName("width")] public int Width { get; set; }
     [JsonPropertyName("height")] public int Height { get; set; }
     [JsonPropertyName("fps")] public double Fps { get; set; }
@@ -40,6 +41,7 @@ public sealed class EncodePlan
         if (Crf != other.Crf) yield return $"crf: {Crf?.ToString() ?? "-"} → {other.Crf?.ToString() ?? "-"}";
         if (AudioCodec != other.AudioCodec) yield return $"audio codec: {AudioCodec} → {other.AudioCodec}";
         if (AudioBitrateK != other.AudioBitrateK) yield return $"audio bitrate: {AudioBitrateK}k → {other.AudioBitrateK}k";
+        if (AudioChannels != other.AudioChannels) yield return $"audio channels: {AudioChannels?.ToString() ?? "source"} → {other.AudioChannels?.ToString() ?? "source"}";
         if (Width != other.Width || Height != other.Height) yield return $"resolution: {Width}x{Height} → {other.Width}x{other.Height}";
         if (Math.Abs(Fps - other.Fps) > 0.01) yield return $"fps: {Fps:0.##} → {other.Fps:0.##}";
         if (Preset != other.Preset) yield return $"preset: {Preset} → {other.Preset}";

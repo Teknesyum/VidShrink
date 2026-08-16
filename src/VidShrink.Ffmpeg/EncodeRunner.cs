@@ -12,7 +12,7 @@ public sealed record ConversionResult(string OutputPath, double OutputMb);
 
 public sealed class EncodeRunner
 {
-    private const double ToleranceOver = 1.05;
+    private const double ToleranceOver = 1.0;
     private const int MaxAttempts = 3;
 
     public async Task<EncodeResult> RunAsync(

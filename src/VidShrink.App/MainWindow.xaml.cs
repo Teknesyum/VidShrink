@@ -21,6 +21,10 @@ public partial class MainWindow : Window
     private EncodePlan? _autoPlan;
     private EncodePlan? _aiPlan;
     private CancellationTokenSource? _cts;
+    private ComplexityProfile? _profile;
+    private CancellationTokenSource? _probeCts;
+    private SizeEstimate? _estimate;
+    private double _predictedQuality;
     private string? _lastOutput;
     private bool _syncing;
     private bool _turkish;
@@ -143,6 +147,7 @@ public partial class MainWindow : Window
         }
 
         _aiPlan = null;
+        _profile = null;
         BtnRevert.Visibility = Visibility.Collapsed;
         TxtAiStatus.Text = "";
         TxtConvertSource.Text = Path.GetFileName(path);
@@ -156,6 +161,31 @@ public partial class MainWindow : Window
         TxtStatusBar.Text = $"FFmpeg: {T("Hazır", "Ready")} — {ToolLocator.Ffmpeg}";
         Recalculate();
         RefreshConversion();
+        await MeasureComplexityAsync(_info);
+    }
+
+    private async Task MeasureComplexityAsync(MediaInfo info)
+    {
+        _probeCts?.Cancel();
+        _probeCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _probeCts = cts;
+
+        TxtEstimateNote.Text = T("Karmaşıklık ölçülüyor...", "Measuring complexity...");
+        try
+        {
+            var profile = await ComplexityProbe.RunAsync(info, cts.Token);
+            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            _profile = profile;
+            Recalculate();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            if (ReferenceEquals(_info, info)) TxtEstimateNote.Text = $"{T("Ölçüm yapılamadı", "Measurement failed")}: {ex.Message}";
+        }
     }
 
     private void ShowInfo(MediaInfo info)
@@ -174,7 +204,10 @@ public partial class MainWindow : Window
     private void Recalculate()
     {
         if (_info is null) return;
-        _autoPlan = PlanCalculator.Build(_info, CurrentOptions());
+        var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile);
+        _autoPlan = detailed.Plan;
+        _predictedQuality = detailed.PredictedQuality;
+        _profile ??= detailed.Profile;
         if (_aiPlan is not null)
         {
             var validation = PlanParser.Parse(TxtAiJson.Text, _info, CurrentOptions());
@@ -194,11 +227,33 @@ public partial class MainWindow : Window
     {
         if (ActivePlan is not { } plan || _info is null) return;
         var quality = plan.ModeEnum == EncodeMode.Crf ? $"CRF {plan.Crf}" : $"{plan.VideoBitrateK}k two-pass";
-        var estimate = PlanCalculator.EstimatedMb(plan, _info.DurationSeconds);
-        var size = estimate is null ? $"≤ {ParseTargetMb():0.##} MB {T("Hedef", "Target")} ({T("Kalite Modu; Gerekirse Düzeltilir", "Quality Mode; Corrected If Needed")})" : $"{T("Tahmini", "Estimated")} {estimate:0.0} MB";
-        TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("Otomatik", "Automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} FPS · {(plan.AudioCodec is null ? T("Ses Yok", "No Audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · Preset {plan.Preset} → {size}";
+        _estimate = PlanCalculator.Estimate(plan, _info, _profile);
+        TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("Otomatik", "Automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} FPS · {(plan.AudioCodec is null ? T("Ses Yok", "No Audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · Preset {plan.Preset}";
         TxtPlanReason.Text = plan.Reason;
+        RefreshEstimateView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
+    }
+
+    private void RefreshEstimateView()
+    {
+        if (_estimate is not { } estimate || _info is null)
+        {
+            TxtEstimateValue.Text = "-";
+            TxtEstimateRange.Text = "";
+            TxtEstimateNote.Text = "";
+            return;
+        }
+
+        TxtEstimateValue.Text = $"{estimate.ExpectedMb:0.0} MB";
+        TxtEstimateRange.Text = $"{estimate.LowMb:0.0} - {estimate.HighMb:0.0} MB · {T("Kaynağın", "Of source")} %{estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01) * 100:0.#}";
+
+        var basis = estimate.Measured
+            ? T("kaynaktan ölçülen karmaşıklık", "measured source complexity")
+            : T("kaynak bit hızından tahmin", "estimated from source bitrate");
+        var mode = estimate.Enforced
+            ? T("iki geçişli mod boyutu zorlar", "two-pass enforces this size")
+            : T("kalite modu; hedefin altında kalır", "quality mode; stays under the target");
+        TxtEstimateNote.Text = $"{basis} · {mode} · {T("öngörülen kalite", "predicted quality")} {_predictedQuality:0.#}/100";
     }
 
     private static string BuildUniqueOutputPath(string inputPath, string suffix, string extension)

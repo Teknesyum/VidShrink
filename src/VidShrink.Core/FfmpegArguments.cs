@@ -75,7 +75,10 @@ public static class FfmpegArguments
         else if (plan.AudioCodec == "copy")
             a.AddRange(new[] { "-c:a", "copy" });
         else
+        {
             a.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
+            if (plan.AudioChannels is > 0) a.AddRange(new[] { "-ac", plan.AudioChannels.Value.ToString() });
+        }
 
         a.AddRange(new[] { "-movflags", "+faststart" });
         a.AddRange(plan.ExtraArgs);

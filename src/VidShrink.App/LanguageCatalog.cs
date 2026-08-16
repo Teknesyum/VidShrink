@@ -21,6 +21,7 @@ internal static class LanguageCatalog
         ["Audio"] = "Ses",
         ["Bitrate"] = "Bit Hızı",
         ["Target"] = "Hedef",
+        ["Estimated Output"] = "Tahmini Çıktı",
         ["Half"] = "Yarısı",
         ["Archive"] = "Arşiv",
         ["Sharing"] = "Paylaşım",

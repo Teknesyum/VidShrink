@@ -87,7 +87,7 @@
 </UniformGrid>
 </StackPanel>
 </Border>
-     <Border x:Name="TargetPanel" Style="{StaticResource Panel}" Margin="0,16,0,0" Height="260">
+     <Border x:Name="TargetPanel" Style="{StaticResource Panel}" Margin="0,16,0,0" MinHeight="260">
 <StackPanel>
 <TextBlock Text="Target" Style="{StaticResource H2}"/>
 <Grid Margin="0,14,0,0">
@@ -130,6 +130,16 @@
 <CheckBox x:Name="ChkResolution" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May Lower Resolution" Click="OnOptionChanged"/>
 <CheckBox x:Name="ChkFps" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May Lower Frame Rate" Click="OnOptionChanged"/>
 </StackPanel>
+<Border Margin="0,16,0,0" Padding="16,12" CornerRadius="8" Background="#1400F3FF" BorderBrush="#4000F3FF" BorderThickness="1" SnapsToDevicePixels="True">
+<StackPanel>
+<TextBlock x:Name="LblEstimate" Text="Estimated Output" Style="{StaticResource Label}"/>
+<StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+<TextBlock x:Name="TxtEstimateValue" Style="{StaticResource MonoValue}" FontSize="24" Text="-" VerticalAlignment="Bottom"/>
+<TextBlock x:Name="TxtEstimateRange" Style="{StaticResource Hint}" Margin="12,0,0,4" VerticalAlignment="Bottom"/>
+</StackPanel>
+<TextBlock x:Name="TxtEstimateNote" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+</StackPanel>
+</Border>
 </StackPanel>
 </Border>
      <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
@@ -156,7 +166,7 @@
 <Button x:Name="BtnRevert" Content="Back To Automatic" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
 </StackPanel>
 </Border>
-<Border Style="{StaticResource Panel}" Margin="0,16,0,0" Height="254">
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0" MinHeight="254">
 <StackPanel>
 <TextBlock Text="Output" Style="{StaticResource H2}" Foreground="{StaticResource NeonBlue}"/>
 <ProgressBar x:Name="Progress" Height="5" Maximum="1" Margin="0,14,0,0"/>
