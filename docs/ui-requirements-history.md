@@ -212,7 +212,7 @@ Son güncelleme: 17 Ağustos 2026
 - Sekme ve panel anahatları dört kenarda kesintisiz kapanmalı; alt kenarlar yerleşim alanı tarafından kırpılmamalıdır.
 - Pencere genelinde tam piksel yerleşimi ve piksele hizalı kenarlık çizimi kullanılmalıdır.
 - Grid hücresi, çizilecek nesneyle aynı çıplak ölçüye zorlanmamalıdır; nesne boyutu, border stroke kalınlığı, DPI yuvarlaması ve en az 2 DIP güvenlik payı birlikte hesaplanmalıdır.
-- Onay kutusunun 20×20 DIP çizimi 24 DIP hücre içinde ortalanmalı; hiçbir kenarı veya tik ucu kırpılmamalıdır.
+- Onay kutusunun 20×20 DIP çizimi hem yatay hem dikey yönde 24×24 DIP hücre içinde ortalanmalı; hiçbir kenarı veya tik ucu kırpılmamalıdır.
 - Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
 - Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.

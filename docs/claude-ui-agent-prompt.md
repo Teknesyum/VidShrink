@@ -35,7 +35,7 @@ Değişmez UI kuralları:
 - Yan yana kontroller birleşmemeli; aralarında açık boşluk olmalıdır.
 - Simetri zorunludur: köşe, yükseklik, dikey merkez ve panel alt kenarları piksel düzeyinde eşleşmelidir.
 - 1 px fark, yarım çizgi veya kapanmayan anahat kabul edilmez.
-- Hücre boyutunu yalnızca iç nesnenin nominal ölçüsüne eşitleme; stroke, DPI yuvarlaması ve her iki tarafta en az 2 DIP güvenlik payını hesaba kat. 20×20 checkbox için 24 DIP hücre kullan.
+- Hücre boyutunu yalnızca iç nesnenin nominal ölçüsüne eşitleme; stroke, DPI yuvarlaması ve yatay/dikey her iki tarafta en az 2 DIP güvenlik payını hesaba kat. 20×20 checkbox için 24×24 DIP hücre kullan.
 - UseLayoutRounding ve SnapsToDevicePixels davranışını koru.
 - Türkçe metni esas alarak taşma kontrolü yap; EN geçişini de doğrula.
 - Teknik ayarlarda metinden 12 DIP uzakta, 12×12 üst simge konumlu `?` ve ayrıntılı iki dilli tooltip kullan; hover yalnızca işaret rengini değiştirsin, glow kullanma.

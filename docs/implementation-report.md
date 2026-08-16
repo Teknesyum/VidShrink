@@ -163,7 +163,7 @@ Navigation tabs now have an 8 DIP gap, so each tab reads as an independent subtl
 
 Tab outlines now reserve 2 DIP below each header and disable parent clipping so the bottom edge closes fully. Window content, tabs, and panels use layout rounding and device-pixel snapping to prevent partial one-pixel borders.
 
-Checkbox geometry now reserves a 24 DIP layout cell for the centered 20×20 DIP box. The extra two-sided allowance, layout rounding, and device-pixel snapping protect the full border and check stroke from DPI clipping.
+Checkbox geometry now reserves a full 24×24 DIP layout cell for the centered 20×20 DIP box. The earlier width-only allowance left the vertical measure at 20 DIP and could clip the bottom stroke; explicit 24 DIP minimum height now protects all four edges under DPI rounding.
 
 Source and AI Settings now share the same 14 DIP heading-to-content spacing, removing the inconsistent compressed heading in the right panel.
 
