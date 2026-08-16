@@ -205,6 +205,8 @@ Son güncelleme: 17 Ağustos 2026
 - Onay kutusu, tik ve yanındaki yazı aynı dikey eksende ortalanmalıdır.
 - Yan yana kontroller birbirine değmemelidir.
 - Üst gezinme sekmeleri de bu ayrıklık kuralına uymalı; sekmeler arasında `8 DIP` boşluk bulunmalıdır.
+- Sekme ve panel anahatları dört kenarda kesintisiz kapanmalı; alt kenarlar yerleşim alanı tarafından kırpılmamalıdır.
+- Pencere genelinde tam piksel yerleşimi ve piksele hizalı kenarlık çizimi kullanılmalıdır.
 - Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
 - Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.

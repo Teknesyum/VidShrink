@@ -157,6 +157,8 @@ The blue-green control background was replaced by a neutral charcoal surface to 
 
 Navigation tabs now have an 8 DIP gap, so each tab reads as an independent subtly rounded control rather than a joined segmented strip.
 
+Tab outlines now reserve 2 DIP below each header and disable parent clipping so the bottom edge closes fully. Window content, tabs, and panels use layout rounding and device-pixel snapping to prevent partial one-pixel borders.
+
 Source and AI Settings now share the same 14 DIP heading-to-content spacing, removing the inconsistent compressed heading in the right panel.
 
 Target-size hierarchy now emphasizes the editable primary value in bold neon blue, while preset chip labels remain white. This prevents secondary shortcuts from visually overpowering the value they control.
