@@ -147,6 +147,8 @@ The Output panel labels are explicitly neon blue. Its height is bound to the Tar
 
 The complete custom window is enclosed by a crisp 1 DIP neon-blue border with the same subtle 6 DIP corner radius used across the interface.
 
+The custom title bar now tests a restrained horizontal gradient: a dark cyan tint at the left transitions through the neutral surface into a subtle purple-pink tint at the right, preserving title and control contrast.
+
 Target-size hierarchy now emphasizes the editable primary value in bold neon blue, while preset chip labels remain white. This prevents secondary shortcuts from visually overpowering the value they control.
 
 ## August 2026 UI usability follow-up

@@ -9,7 +9,14 @@
 <RowDefinition Height="Auto"/>
 <RowDefinition Height="*"/>
 </Grid.RowDefinitions>
-<Border Height="54" Background="#FF07181B" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" CornerRadius="6" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
+<Border Height="54" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" CornerRadius="6" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
+<Border.Background>
+<LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+<GradientStop Color="#FF062126" Offset="0"/>
+<GradientStop Color="#FF081419" Offset="0.48"/>
+<GradientStop Color="#FF170C20" Offset="1"/>
+</LinearGradientBrush>
+</Border.Background>
 <Grid Margin="18,0,12,0">
 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 <Image Source="Assets/VidShrink.png" Width="36" Height="36" Stretch="Uniform" Margin="0,0,10,0"/>
