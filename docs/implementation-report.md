@@ -119,6 +119,8 @@ Text glow was removed from neon-blue section headings. Typography now uses flat,
 
 Normal interface typography now uses a 16 DIP minimum: labels, body copy, buttons, selectors, text fields, checkboxes, tabs, and mono values are all 16 DIP or larger. Section headings are 20 DIP. Only secondary hint and status copy may use the 14 DIP exception, and no application text style uses less than 14 DIP.
 
+All neutral text tokens now use pure white `#FFFFFFFF`; the interface no longer uses gray typography. Neon blue headings, neon-purple actions, and neon-pink mono values remain semantic accent colors. The primary UI font is Segoe UI, while commands and numeric values use Consolas with Cascadia Mono as fallback.
+
 ## Files central to review
 
 - `src/VidShrink.App/LanguageCatalog.cs`

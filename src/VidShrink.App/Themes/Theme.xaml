@@ -13,10 +13,10 @@
   <SolidColorBrush x:Key="Surface"     Color="#F208090A"/>
   <SolidColorBrush x:Key="AppBg"       Color="#FF050507"/>
 
-  <SolidColorBrush x:Key="TextBody"  Color="#FFD1D5DB"/>
-  <SolidColorBrush x:Key="TextDim"   Color="#FF9CA3AF"/>
-  <SolidColorBrush x:Key="TextLabel" Color="#FF6B7280"/>
-  <SolidColorBrush x:Key="TextHint"  Color="#FF4B5563"/>
+  <SolidColorBrush x:Key="TextBody"  Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="TextDim"   Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="TextLabel" Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="TextHint"  Color="#FFFFFFFF"/>
 
   <FontFamily x:Key="FontSans">Segoe UI</FontFamily>
   <FontFamily x:Key="FontMono">Consolas, Cascadia Mono</FontFamily>
