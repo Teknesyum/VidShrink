@@ -144,7 +144,7 @@
 <Border Style="{StaticResource Panel}">
 <StackPanel>
 <TextBlock Text="AI Settings" Style="{StaticResource H2}"/>
-<TextBlock Text="Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer." Style="{StaticResource Hint}" TextWrapping="Wrap"/>
+<TextBlock Text="Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer." Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,14,0,0"/>
 <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
 <Button Content="Copy Prompt" Style="{StaticResource GhostButton}" Click="OnCopyPrompt"/>
 <Button Content="Apply Pasted JSON" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="OnApplyJson"/>

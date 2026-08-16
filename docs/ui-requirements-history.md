@@ -23,6 +23,7 @@ Son güncelleme: 17 Ağustos 2026
 - `Hedef` ve `Çıktı` panelleri aynı kesin yüksekliğe sahip olmalıdır; içerik ölçümüne bağlı küçük farklar bırakılmamalıdır.
 - Çıktı panelinin üst ilerleme çubuğu kalın görünmemeli; yüksekliği `5 DIP` olmalıdır.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
+- Eş panellerde başlık ile ilk içerik arasındaki dikey boşluk aynı olmalı; `Kaynak` ve `AI Ayarları` panelleri `14 DIP` kullanmalıdır.
 - Uygulama adı `VIDSHRINK` olarak tamamen büyük yazılmamalı; marka yazımı her yerde `VidShrink` olmalıdır.
 - Ana pencerenin özel başlık çubuğundaki `VidShrink` adı yeterlidir; içerik alanında aynı başlık ikinci kez tekrarlanmamalı, yalnızca açıklama gösterilmelidir.
 - Ana pencere açıklamasının Türkçe metni `Boyut Hedefli Media Sıkıştırma & Media Converter` olmalıdır.
