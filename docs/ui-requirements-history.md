@@ -20,7 +20,7 @@ Son güncelleme: 17 Ağustos 2026
 - Hedef boyutun ana sayısal değeri neon mavi ve kalın gösterilerek hazır seçimlerden daha baskın olmalıdır; hazır seçim düğmelerinin metni beyaz kalmalıdır.
 - Aynı işlev grubunda ikincil değerler ana değerden daha güçlü renkle vurgulanmamalıdır.
 - Çıktı panelindeki `Çıktı`, `Aşama`, `Kalan` ve `Güncel Çıktı Boyutu` başlıkları neon mavi olmalıdır.
-- Sol panel sütununun alt kenarı ile sağdaki `Çıktı` panelinin alt kenarı aynı fiziksel pikselde bitmelidir; sabit bağımsız yükseklikler yerine ortak toplam yüksekliğe bağlı grid yerleşimi kullanılmalıdır.
+- Sol panel sütununun alt kenarı ile sağdaki `Çıktı` panelinin alt kenarı aynı fiziksel pikselde bitmelidir; toplam yüksekliği bağlayarak paneli esneten döngüsel yerleşim kullanılmamalı, Çıktı paneli kompakt kalmalıdır.
 - Çıktı panelinin üst ilerleme çubuğu kalın görünmemeli; yüksekliği `5 DIP` olmalıdır.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
 - Eş panellerde başlık ile ilk içerik arasındaki dikey boşluk aynı olmalı; `Kaynak` ve `AI Ayarları` panelleri `14 DIP` kullanmalıdır.
@@ -106,6 +106,7 @@ Son güncelleme: 17 Ağustos 2026
 - Program başlangıçta daha büyük açılmalıdır.
 - Hedef başlangıç boyutu 1440×1000'dır; pencere mevcut Windows çalışma alanını aşmamalıdır.
 - Daha küçük ekranlarda içerik kaybolmamalı, sekme içi kaydırma devreye girmelidir.
+- Scrollbar native Windows görünümünde olmamalı; koyu nötr yol, neon mavi thumb, pembe hover ve mor sürükleme tepkisi kullanmalıdır.
 - Minimum pencere boyutunda bile kontroller üst üste binmemeli veya kırpılmamalıdır.
 
 ## 6. Kaydırıcılar ve İlerleme Çubukları
@@ -166,7 +167,8 @@ Son güncelleme: 17 Ağustos 2026
 - Kullanıcının `kodek`, `CRF`, `bit hızı`, `stream copy` veya kapsayıcı gibi teknik terimleri bildiği varsayılmamalıdır.
 - Önceki tek ve görünür Hızlı Ayar Rehberi talebi iptal edilmiştir; bütün açıklamalar ayrı bir panelde toplanmamalıdır.
 - Açıklama gerektiren her ayarın başlığının yanında yuvarlak içinde `?` simgesi bulunmalıdır.
-- `?` rozeti 16×16 DIP boyutunda küçük olmalı ve bağlı yazının sağ üstünde matematikteki üs işareti gibi konumlanmalıdır.
+- `?` rozeti 12×12 DIP boyutunda küçük olmalı, bağlı yazının sağ üstünde matematikteki üs işareti gibi konumlanmalı ve metinden 12 DIP uzakta durmalıdır.
+- Bilgi rozeti hover sırasında dolgu veya parlama göstermemeli; yalnızca soru işareti mavi renkten pembeye dönmeli ve `Help` imleci kullanılmalıdır.
 - Fare `?` simgesinin üzerine geldiğinde ilgili ayarın ayrıntılı açıklaması gösterilmelidir.
 - Yardım balonu koyu neon zemine, neon kenarlığa, tam beyaz metne ve en az 16 DIP yazı boyutuna sahip olmalıdır.
 - Yardım içeriği Türkçe ve İngilizce dil geçişini takip etmelidir.
@@ -192,7 +194,7 @@ Son güncelleme: 17 Ağustos 2026
 - Gömülü AI bulunmamasının nedenleri açıklanmalıdır: çevrimdışı çalışma, API anahtarı gerektirmeme, yanıt doğrulama ve hatada otomatik motora dönüş.
 - Kodeklerin hangi durumda tercih edilebileceği açıklanmalıdır.
 - ffmpeg yolu ve sürümü, .NET sürümü ve uygulama sürümü gösterilmelidir.
-- GitHub bağlantısı ile imza/destek bloğu yalnızca bir kez bulunmalı ve Hakkında sekmesinin en altında yer almalıdır.
+- GitHub bağlantısı ile imza/destek bloğu yalnızca bir kez bulunmalı; en yeni karara göre Hakkında sekmesinde değil üst başlık çubuğunda yer almalıdır.
 
 ## 12. Erişilebilirlik ve Okunabilirlik Kabul Ölçütleri
 

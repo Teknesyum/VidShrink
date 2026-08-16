@@ -131,7 +131,7 @@ The selected compression-bracket and play-symbol prototype is now the product ic
 
 Short interface headings, tabs, labels, actions, options, and status names now capitalize the first letter of every word. Long explanations, help text, and paragraphs retain natural sentence casing. Technical abbreviations such as CRF, FPS, HDR, AI, TR/EN, codecs, and file formats retain their correct capitalization. The Turkish and English catalogs are updated together, and runtime startup checks guard against ambiguous Turkish reverse-translation keys.
 
-Contextual-help badges were reduced from 22×22 to 16×16 DIP and positioned as superscript marks at the upper-right of their labels. Their hover delay is 120 ms and the tooltip remains available for up to 30 seconds, using the existing 16 DIP white-on-dark neon tooltip style.
+Contextual-help badges were reduced from 22×22 to 16×16 and finally to 12×12 DIP. They sit 12 DIP from the label as superscript marks. Hover adds no fill or glow; only the question mark changes from blue to pink, while the Help cursor and detailed tooltip provide feedback.
 
 Pink and purple are no longer persistent text colors. Section and field headings use neon blue, while values, secondary actions, and window controls use white. Pink remains an interaction accent for hover, focus, selection, borders, and slider details.
 
@@ -143,7 +143,9 @@ The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media C
 
 Sliders now use a pink filled track with a blue outline and an inverse blue thumb with a pink outline. Hovering the control strengthens the thumb outline and adds a pink neon response without changing text colors.
 
-The Output panel labels are explicitly neon blue. The right-side AI and Output panels now live in a grid whose total height is bound to the complete left column; Output consumes the remaining star-sized row after AI and the 16 DIP gap. This aligns both lower edges on the same physical pixel instead of merely assigning equal independent heights. The Output progress line remains 5 DIP.
+The Output panel labels are explicitly neon blue. A total-height binding experiment caused a layout feedback loop and made Output excessively tall, so it was removed. Output is compact at 254 DIP, matching the measured column edge without stretching through unused space. The Output progress line remains 5 DIP.
+
+Native white scrollbars were replaced globally. The custom 10 DIP scrollbar uses the centralized charcoal surface, a rounded neon-blue thumb, pink hover feedback, and purple dragging feedback in both vertical and horizontal orientations.
 
 The complete custom window is enclosed by a crisp 1 DIP neon-blue border with the same subtle 6 DIP corner radius used across the interface.
 
