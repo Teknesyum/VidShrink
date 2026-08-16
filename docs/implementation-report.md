@@ -147,6 +147,8 @@ The Output panel labels are explicitly neon blue. Its height is bound to the Tar
 
 The complete custom window is enclosed by a crisp 1 DIP neon-blue border with the same subtle 6 DIP corner radius used across the interface.
 
+Target-size hierarchy now emphasizes the editable primary value in bold neon blue, while preset chip labels remain white. This prevents secondary shortcuts from visually overpowering the value they control.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.

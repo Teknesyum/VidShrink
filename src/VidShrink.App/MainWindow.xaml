@@ -95,7 +95,7 @@
 <ColumnDefinition Width="Auto"/>
 </Grid.ColumnDefinitions>
 <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="25" ValueChanged="OnTargetSliderChanged" VerticalAlignment="Center"/>
-<TextBox x:Name="TxtTarget" Grid.Column="2" Text="25" TextChanged="OnTargetTextChanged"/>
+<TextBox x:Name="TxtTarget" Grid.Column="2" Text="25" Foreground="{StaticResource NeonBlue}" FontWeight="Bold" TextChanged="OnTargetTextChanged"/>
 <TextBlock Grid.Column="4" Text="MB" Style="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
 </Grid>
 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">

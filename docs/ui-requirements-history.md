@@ -17,6 +17,8 @@ Son güncelleme: 17 Ağustos 2026
 - Başlık ve alan etiketlerinde neon mavi, normal içerik ve değerlerde tam beyaz tercih edilmelidir.
 - Hedef kaydırıcısının dolu bölümü pembe dolgulu ve mavi anahatlı; sürükleme noktası ters renk düzeniyle mavi dolgulu ve pembe anahatlı olmalıdır.
 - Kaydırıcı fareyle üzerine gelindiğinde sürükleme noktasında neon geri bildirim göstermelidir.
+- Hedef boyutun ana sayısal değeri neon mavi ve kalın gösterilerek hazır seçimlerden daha baskın olmalıdır; hazır seçim düğmelerinin metni beyaz kalmalıdır.
+- Aynı işlev grubunda ikincil değerler ana değerden daha güçlü renkle vurgulanmamalıdır.
 - Çıktı panelindeki `Çıktı`, `Aşama`, `Kalan` ve `Güncel Çıktı Boyutu` başlıkları neon mavi olmalıdır.
 - Çıktı panelinin yüksekliği soldaki `Hedef` panelinin yüksekliğini takip etmelidir.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
