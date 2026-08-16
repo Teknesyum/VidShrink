@@ -96,7 +96,8 @@ Son güncelleme: 17 Ağustos 2026
 - Üst barın altındaki açıklama/dil şeridi ile sekmelerin arkasındaki bütün boş çalışma alanı tek ve kesintisiz merkezi `WorkspaceBackground` gradientini kullanmalıdır; açıklama satırı ayrı bir gradient bandı gibi görünmemelidir.
 - Sponsor ve imza bağlantıları Hakkında sekmesinde tekrarlanmamalı; üst başlık çubuğunda pencere düğmelerinin solunda yer almalıdır.
 - Sağdan sola sıralama küçült düğmesi, `GitHub / By Teknesyum`, `Buy Me A Coffee` olmalıdır.
-- Ürün açıklaması, `Buy Me A Coffee` ve `GitHub / By Teknesyum` metinlerinin üçü de beyaz yerine merkezi neon mavi rengi kullanmalıdır; sponsor ve imza bağlantıları üst barı kalabalıklaştırmamak için 14 DIP olmalıdır.
+- `Buy Me A Coffee` ve `GitHub / By Teknesyum` metinleri beyaz yerine merkezi neon mavi rengi kullanmalıdır; sponsor ve imza bağlantıları üst barı kalabalıklaştırmamak için 14 DIP olmalıdır.
+- Ürün açıklamasında ana ifade neon mavi, `&` işareti tam beyaz ve `Media Converter` ifadesi neon pembe olmalıdır; bu parçalı renk düzeni TR/EN geçişinde korunmalıdır.
 - Üst bar bağlantıları normalde beyaz, hover sırasında neon pembe ve altı çizili olmalıdır.
 - Dairesel `?` yardım rozeti ve kaydırıcı tutamacı gibi işlevi gereği yuvarlak öğeler bu kuralın istisnasıdır.
 - Aynı satırdaki kontroller asimetrik görünmemelidir; bir kontrolün sol köşeleri yuvarlatılmışsa sağ köşeleri de aynı yarıçapla yuvarlatılmalıdır.

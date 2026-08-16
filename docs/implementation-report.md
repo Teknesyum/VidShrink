@@ -169,6 +169,8 @@ Sponsor and signature links were moved from About into the custom title bar. `Bu
 
 The product tagline and both title-bar sponsor/signature links now use the centralized neon-blue brush. The two title-bar links use a compact 14 DIP font size while retaining their pink hover response.
 
+The product tagline is split into language-aware inline runs: its leading phrase remains neon blue, the ampersand is pure white, and `Media Converter` is neon pink. The language switch updates the leading run explicitly so the inline color hierarchy remains intact in Turkish and English.
+
 The blue-green control background was replaced by a neutral charcoal surface to improve cyan text contrast. Panels, inputs, menus, tooltips, checks, inactive tracks, and window controls now resolve through the central `SurfaceToneColor` resource; the title gradient is likewise centralized as `TitleBarBackground`.
 
 Navigation tabs now have an 8 DIP gap, so each tab reads as an independent subtly rounded control rather than a joined segmented strip.

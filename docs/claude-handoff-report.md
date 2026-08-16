@@ -78,6 +78,7 @@ VidShrink, Windows için .NET 8 WPF ile geliştirilmiş, çevrimdışı çalış
 - Üst bar 38 DIP; pencere düğmeleri 42×30 DIP; simge 26 DIP.
 - Küçült simgesi 10×2 DIP çizilmiş kısa çizgidir.
 - Sponsor bağlantıları üst bardadır: `Buy Me A Coffee`, `GitHub / By Teknesyum`, ardından pencere düğmeleri. Ürün açıklamasıyla birlikte bu üç metin merkezi neon mavidir; iki üst-bar bağlantısı 14 DIP kullanır ve yalnızca hover sırasında pembeye döner.
+- Ürün açıklamasının ana bölümü neon mavi, `&` tam beyaz, `Media Converter` neon pembedir; TR/EN geçişi bu parçalı renkleri korur.
 - Hedef slider dolu kısmı pembe/mavi anahatlı; thumb mavi/pembe anahatlıdır ve hover tepki verir.
 - Ana hedef değeri neon mavi ve kalın; preset chip metinleri beyazdır.
 - Çıktı paneli kompakt `254 DIP` yüksekliğindedir; toplam sütun yüksekliğine bağlanan döngüsel yerleşim kullanılmaz.

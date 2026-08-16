@@ -61,6 +61,9 @@ public partial class MainWindow : Window
         if (IsLoaded && _turkish == turkish) return;
         var translations = turkish ? LanguageCatalog.EnglishToTurkish : LanguageCatalog.TurkishToEnglish;
         TranslateTree(this, translations, new HashSet<DependencyObject>());
+        TaglineLead.Text = turkish ? "Boyut Hedefli Media Sıkıştırma" : "Target Size Media Compression";
+        TaglineSeparator.Text = " & ";
+        TaglineConverter.Text = "Media Converter";
         _turkish = turkish;
         BtnTr.Opacity = turkish ? 1 : 0.45;
         BtnEn.Opacity = turkish ? 0.45 : 1;

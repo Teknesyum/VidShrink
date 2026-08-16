@@ -53,6 +53,7 @@ Güncel üst alan:
 - Küçült simgesi 10×2 DIP çizgidir.
 - Sıra: Buy Me A Coffee, GitHub / By Teknesyum, küçült, büyüt, kapat.
 - Ürün açıklaması ile iki üst-bar linki neon mavidir. Linkler 14 DIP; hover sırasında pembe ve altı çizilidir.
+- Ürün açıklamasında ana bölüm neon mavi, `&` tam beyaz ve `Media Converter` neon pembe olmalı; TR/EN geçişinde bu renk ayrımını koru.
 
 Güncel içerik hiyerarşisi:
 - Hedef slider dolu kısmı pembe, mavi anahatlı; thumb ters renklidir ve hover tepki verir.
