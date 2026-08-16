@@ -52,7 +52,7 @@ Güncel üst alan:
 - Pencere düğmeleri 42×30 DIP.
 - Küçült simgesi 10×2 DIP çizgidir.
 - Sıra: Buy Me A Coffee, GitHub / By Teknesyum, küçült, büyüt, kapat.
-- Ürün açıklaması ile iki üst-bar linki neon mavidir. Linkler 14 DIP; hover sırasında pembe ve altı çizilidir.
+- İki üst-bar linki neon mavidir. Linkler 14 DIP; hover sırasında pembe ve altı çizilidir.
 - Ürün açıklamasında ana bölüm neon mavi, `&` tam beyaz ve `Media Converter` neon pembe olmalı; TR/EN geçişinde bu renk ayrımını koru.
 
 Güncel içerik hiyerarşisi:

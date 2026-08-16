@@ -46,6 +46,7 @@ UI değişikliğinde ayrıca:
 - Türkçe başlangıcı, İngilizce geçişi ve üç sekmeyi kontrol et.
 - Hover, focus, açılır liste, slider, tooltip ve pencere boyutlandırma durumlarını incele.
 - Bir piksellik hizasızlığı, yarım kenarlığı, kesilmiş metni veya native kontrol görünümünü hata kabul et.
+- Görsel doğrulamada doğru çalışan pencereyi işlem yolu ve `VidShrink` başlığıyla eşleştir; yakalamanın gerçekten VidShrink içeriği olduğunu görmeden testi başarılı sayma.
 
 Teslim biçimi:
 - Önce sonucu söyle.
@@ -56,4 +57,3 @@ Teslim biçimi:
 
 Şimdi mevcut git durumunu ve son commitleri incele, belgelerdeki güncel durumu kaynakla karşılaştır ve kullanıcının sıradaki talebini uygulamaya hazır biçimde projeyi devral.
 ```
-
