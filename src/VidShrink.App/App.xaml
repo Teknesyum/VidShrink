@@ -63,18 +63,73 @@
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
                 <Setter Property="FontSize" Value="13"/>
                 <Setter Property="Padding" Value="8,6"/>
-                <Setter Property="Background" Value="#FFF3F4F6"/>
-                <Setter Property="Foreground" Value="#FF111827"/>
+                <Setter Property="Background" Value="#FF07181B"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
                 <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+                                <ToggleButton x:Name="Toggle" Focusable="False" IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" ClickMode="Press">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border x:Name="SelectorBorder" Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ComboBox}}" BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType=ComboBox}}" BorderThickness="{Binding BorderThickness, RelativeSource={RelativeSource AncestorType=ComboBox}}" CornerRadius="6" Padding="{Binding Padding, RelativeSource={RelativeSource AncestorType=ComboBox}}">
+                                                <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="20"/></Grid.ColumnDefinitions>
+                                                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}" TextElement.Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
+                                                    <Path Grid.Column="1" Data="M 0 0 L 4 4 L 8 0" Stroke="{StaticResource NeonBlue}" StrokeThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="SelectorBorder" Property="BorderBrush" Value="{StaticResource NeonPink}"/></Trigger>
+                                                <Trigger Property="IsChecked" Value="True"><Setter TargetName="SelectorBorder" Property="BorderBrush" Value="{StaticResource NeonBlue}"/></Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                                <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+                                    <Border Background="#FF07181B" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="6" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="280">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsPresenter/></ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <Style TargetType="ComboBoxItem">
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
                 <Setter Property="FontSize" Value="13"/>
-                <Setter Property="Background" Value="#FFF3F4F6"/>
-                <Setter Property="Foreground" Value="#FF111827"/>
+                <Setter Property="Background" Value="#FF07181B"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
                 <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBoxItem">
+                            <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                <ContentPresenter VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource NeonBlue}"/><Setter Property="Foreground" Value="Black"/></Trigger>
+                                <Trigger Property="IsSelected" Value="True"><Setter TargetName="ItemBorder" Property="Background" Value="#3300F3FF"/><Setter Property="Foreground" Value="{StaticResource NeonBlue}"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                        <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="#3300F3FF"/>
+                        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style TargetType="TextBox">

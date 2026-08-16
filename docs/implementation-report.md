@@ -18,12 +18,13 @@ The original implicit WPF `ComboBox` style requested a light foreground while Wi
 
 The shared theme now explicitly applies:
 
-- background `#FFF3F4F6`;
-- foreground `#FF111827`;
+- opaque dark-teal background `#FF07181B`;
+- light body text for high contrast;
 - neon-blue border;
-- the same dark-on-light treatment to drop-down items.
+- neon-blue highlighted rows with black text;
+- a translucent neon selected state inside the drop-down.
 
-This is applied globally to every `ComboBox` and `ComboBoxItem`, including codec, intent, container, quality, resolution, frame-rate, and audio selectors.
+This is applied globally to every `ComboBox` and `ComboBoxItem`, including codec, intent, container, quality, resolution, frame-rate, and audio selectors. No selector uses a white background.
 
 ## Processing corrections
 
