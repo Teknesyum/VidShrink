@@ -25,7 +25,12 @@ public sealed class EncodePlan
 
     [JsonIgnore] public EncodeMode ModeEnum => Mode.Equals("crf", StringComparison.OrdinalIgnoreCase) ? EncodeMode.Crf : EncodeMode.TwoPass;
 
-    public EncodePlan Clone() => (EncodePlan)MemberwiseClone();
+    public EncodePlan Clone()
+    {
+        var clone = (EncodePlan)MemberwiseClone();
+        clone.ExtraArgs = new List<string>(ExtraArgs);
+        return clone;
+    }
 
     public IEnumerable<string> DescribeDifferences(EncodePlan other)
     {

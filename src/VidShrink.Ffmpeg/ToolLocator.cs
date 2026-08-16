@@ -18,6 +18,15 @@ public static class ToolLocator
         return true;
     }
 
+    public static string GetFfmpegVersion()
+    {
+        using var process = new Process { StartInfo = StartInfo(Ffmpeg, new[] { "-version" }) };
+        process.Start();
+        var line = process.StandardOutput.ReadLine();
+        process.WaitForExit(3000);
+        return line?.Replace("ffmpeg version ", "", StringComparison.OrdinalIgnoreCase) ?? "unknown";
+    }
+
     private static string Locate(string name)
     {
         var exe = OperatingSystem.IsWindows() ? name + ".exe" : name;

@@ -1,245 +1,325 @@
-<Window x:Class="VidShrink.App.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="VidShrink" Height="820" Width="1180" MinHeight="700" MinWidth="1000"
-        Background="{StaticResource AppBg}" AllowDrop="True"
-        Drop="OnDrop" DragOver="OnDragOver"
-        WindowStartupLocation="CenterScreen">
-
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.05*"/>
-            <ColumnDefinition Width="24"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-
-        <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,0,20">
-            <TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="24" FontWeight="Black"/>
-            <TextBlock Text="Hit a target file size with the least quality loss." Style="{StaticResource Hint}" Margin="0,4,0,0"/>
-        </StackPanel>
-
-        <!-- LEFT -->
-        <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-
-                <Border Style="{StaticResource Panel}" AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver">
-                    <StackPanel>
-                        <TextBlock Text="SOURCE" Style="{StaticResource H2}" Margin="0,0,0,16"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="TxtFileName" Grid.Column="0" Style="{StaticResource Body}"
-                                       Text="Drop a video here, or browse." TextTrimming="CharacterEllipsis"
-                                       VerticalAlignment="Center"/>
-                            <Button Grid.Column="1" Content="BROWSE" Style="{StaticResource GhostButton}" Click="OnBrowse"/>
-                        </Grid>
-
-                        <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" Margin="0,20,0,0" Visibility="Collapsed">
-                            <StackPanel Margin="0,0,12,12">
-                                <TextBlock Text="DURATION" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtDuration" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,12">
-                                <TextBlock Text="SIZE" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtSize" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,12">
-                                <TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtResolution" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,12">
-                                <TextBlock Text="FPS" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtFps" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,0">
-                                <TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtVideoCodec" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,0">
-                                <TextBlock Text="AUDIO" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtAudio" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,0">
-                                <TextBlock Text="BITRATE" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtBitrate" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,12,0">
-                                <TextBlock Text="HDR" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtHdr" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                        </UniformGrid>
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
-                    <StackPanel>
-                        <TextBlock Text="TARGET" Style="{StaticResource H2}" Margin="0,0,0,16"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Slider x:Name="SliderTarget" Grid.Column="0" Minimum="1" Maximum="500" Value="25"
-                                    VerticalAlignment="Center" Foreground="{StaticResource NeonBlue}"
-                                    ValueChanged="OnTargetSliderChanged"/>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16,0,0,0">
-                                <TextBox x:Name="TxtTarget" Width="80" Text="25" TextAlignment="Center"
-                                         TextChanged="OnTargetTextChanged"/>
-                                <TextBlock Text="MB" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                            <Button Content="8" Style="{StaticResource ChipButton}" Click="OnPreset" Tag="8"/>
-                            <Button Content="25" Style="{StaticResource ChipButton}" Click="OnPreset" Tag="25"/>
-                            <Button Content="50" Style="{StaticResource ChipButton}" Click="OnPreset" Tag="50"/>
-                            <Button Content="100" Style="{StaticResource ChipButton}" Click="OnPreset" Tag="100"/>
-                            <Button Content="HALF" Style="{StaticResource ChipButton}" Click="OnPresetHalf"/>
-                        </StackPanel>
-
-                        <Grid Margin="0,24,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="16"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="INTENT" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <ComboBox x:Name="CmbIntent" SelectedIndex="1" SelectionChanged="OnOptionChanged">
-                                    <ComboBoxItem Content="Archive — keep every detail"/>
-                                    <ComboBoxItem Content="Sharing — balanced"/>
-                                    <ComboBoxItem Content="Social media — smallest"/>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="CODEC" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <ComboBox x:Name="CmbCodec" SelectedIndex="0" SelectionChanged="OnOptionChanged">
-                                    <ComboBoxItem Content="Compatible — H.264"/>
-                                    <ComboBoxItem Content="Max compression — H.265"/>
-                                    <ComboBoxItem Content="Fast — GPU (NVENC)"/>
-                                </ComboBox>
-                            </StackPanel>
-                        </Grid>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                            <CheckBox x:Name="ChkResolution" Style="{StaticResource CheckStyle}" IsChecked="True"
-                                      Content="May lower resolution" Click="OnOptionChanged"/>
-                            <CheckBox x:Name="ChkFps" Style="{StaticResource CheckStyle}" IsChecked="True"
-                                      Content="May lower frame rate" Click="OnOptionChanged"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
-                    <StackPanel>
-                        <TextBlock Text="WHAT IT WILL DO" Style="{StaticResource H2}" Margin="0,0,0,16"/>
-                        <TextBlock x:Name="TxtPlanSummary" Style="{StaticResource Body}" TextWrapping="Wrap" Text="-"/>
-                        <TextBlock x:Name="TxtPlanReason" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,8,0,0"/>
-                        <TextBlock Text="FFMPEG COMMAND" Style="{StaticResource Label}" Margin="0,16,0,6"/>
-                        <TextBox x:Name="TxtCommand" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120"
-                                 VerticalScrollBarVisibility="Auto" FontSize="11"
-                                 Foreground="{StaticResource TextDim}"/>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </ScrollViewer>
-
-        <!-- RIGHT -->
-        <ScrollViewer Grid.Row="1" Grid.Column="2" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <Border Style="{StaticResource Panel}">
-                    <StackPanel>
-                        <TextBlock Text="AI SETTINGS" Style="{StaticResource H2}" Margin="0,0,0,8"/>
-                        <TextBlock Style="{StaticResource Hint}" TextWrapping="Wrap"
-                                   Text="Optional. Copy the prompt into any chat AI, paste its JSON answer back. Leave this alone and the built-in engine decides."/>
-                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                            <Button Content="COPY PROMPT" Style="{StaticResource GhostButton}" Click="OnCopyPrompt" Margin="0,0,8,0"/>
-                            <Button Content="APPLY PASTED JSON" Style="{StaticResource GhostButton}" Click="OnApplyJson"/>
-                        </StackPanel>
-                        <TextBox x:Name="TxtAiJson" Margin="0,12,0,0" Height="150" AcceptsReturn="True"
-                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="11"/>
-                        <TextBlock x:Name="TxtAiStatus" Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,8,0,0"/>
-                        <Button x:Name="BtnRevert" Content="BACK TO AUTOMATIC" Style="{StaticResource GhostButton}"
-                                HorizontalAlignment="Left" Margin="0,12,0,0" Visibility="Collapsed" Click="OnRevertAuto"/>
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
-                    <StackPanel>
-                        <TextBlock Text="OUTPUT" Style="{StaticResource H2}" Margin="0,0,0,16"/>
-                        <ProgressBar x:Name="Progress" Height="8" Minimum="0" Maximum="1" Value="0"
-                                     Background="#1400F3FF" Foreground="{StaticResource NeonBlue}" BorderThickness="0"/>
-                        <Grid Margin="0,12,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="STAGE" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtStage" Style="{StaticResource MonoValue}" Text="idle"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="REMAINING" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="TxtRemaining" Style="{StaticResource MonoValue}" Text="-"/>
-                            </StackPanel>
-                        </Grid>
-                        <StackPanel Margin="0,16,0,0">
-                            <TextBlock Text="CURRENT OUTPUT SIZE" Style="{StaticResource Label}"/>
-                            <TextBlock x:Name="TxtOutSize" Style="{StaticResource MonoValue}" FontSize="24" Text="-"/>
-                        </StackPanel>
-                        <TextBlock x:Name="TxtResult" Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,16,0,0"/>
-                        <Button x:Name="BtnReveal" Content="SHOW IN FOLDER" Style="{StaticResource GhostButton}"
-                                HorizontalAlignment="Left" Margin="0,12,0,0" Visibility="Collapsed" Click="OnReveal"/>
-                    </StackPanel>
-                </Border>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                    <Button x:Name="BtnCancel" Content="CANCEL" Style="{StaticResource GhostButton}"
-                            Margin="0,0,12,0" IsEnabled="False" Click="OnCancel"/>
-                    <Button x:Name="BtnStart" Content="SHRINK" Style="{StaticResource PrimaryButton}"
-                            IsEnabled="False" Click="OnStart"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
-                    <TextBlock VerticalAlignment="Center" Margin="0,0,12,0">
-                        <Hyperlink NavigateUri="https://github.com/Teknesyum" TextDecorations="None"
-                                   Foreground="#FF6B7280" RequestNavigate="OnSignatureNavigate">
-                            <TextBlock Text="BY TEKNESYUM" FontSize="10" FontWeight="Bold"/>
-                        </Hyperlink>
-                    </TextBlock>
-                    <Border Background="Transparent" BorderBrush="#80B026FF" BorderThickness="1"
-                            CornerRadius="8" Padding="12,6">
-                        <Border.Effect>
-                            <DropShadowEffect Color="#B026FF" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/>
-                        </Border.Effect>
-                        <StackPanel Orientation="Horizontal">
-                            <Canvas Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,6,0">
-                                <Path Stroke="#FFB026FF" StrokeThickness="2" StrokeLineJoin="Round"
-                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                      Data="M2 4.5 H8.5 V8 A2 2 0 0 1 6.5 10 H4 A2 2 0 0 1 2 8 Z
-                                            M8.5 5.5 H9.25 A1.25 1.25 0 0 1 9.25 8 H8.5
-                                            M4 1.25 V2.25 M6 1.25 V2.25"/>
-                            </Canvas>
-                            <TextBlock VerticalAlignment="Center">
-                                <Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" TextDecorations="None"
-                                           Foreground="#FFB026FF" RequestNavigate="OnSignatureNavigate">
-                                    <TextBlock Text="BUY ME A COFFEE" FontSize="10" FontWeight="Bold"/>
-                                </Hyperlink>
-                            </TextBlock>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
-
-        <TextBlock x:Name="TxtStatusBar" Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource Hint}"
-                   Margin="0,16,0,0" Text="ffmpeg: checking..."/>
-    </Grid>
+﻿<Window x:Class="VidShrink.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="VidShrink" Height="900" Width="1220" MinHeight="720" MinWidth="1040" Background="{StaticResource AppBg}" AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver" WindowStartupLocation="CenterScreen">
+ <Grid Margin="24">
+<Grid.RowDefinitions>
+<RowDefinition Height="Auto"/>
+<RowDefinition Height="*"/>
+<RowDefinition Height="Auto"/>
+</Grid.RowDefinitions>
+  <StackPanel Margin="0,0,0,16">
+<TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="24"/>
+<TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}"/>
+</StackPanel>
+  <TabControl Grid.Row="1" Style="{StaticResource NeonTabControl}">
+   <TabItem Header="SHRINK" Style="{StaticResource NeonTabItem}">
+<ScrollViewer VerticalScrollBarVisibility="Auto">
+<Grid Margin="0,16,0,0">
+<Grid.ColumnDefinitions>
+<ColumnDefinition/>
+<ColumnDefinition Width="20"/>
+<ColumnDefinition/>
+</Grid.ColumnDefinitions>
+    <StackPanel>
+<Border Style="{StaticResource Panel}">
+<StackPanel>
+<TextBlock Text="SOURCE" Style="{StaticResource H2}"/>
+<Grid Margin="0,14,0,0">
+<Grid.ColumnDefinitions>
+<ColumnDefinition/>
+<ColumnDefinition Width="Auto"/>
+</Grid.ColumnDefinitions>
+<TextBlock x:Name="TxtFileName" Text="Drop any media file here, or browse." Style="{StaticResource Body}" TextTrimming="CharacterEllipsis"/>
+<Button Grid.Column="1" Content="BROWSE" Style="{StaticResource GhostButton}" Click="OnBrowse"/>
+</Grid>
+<UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" Margin="0,18,0,0" Visibility="Collapsed">
+<StackPanel>
+<TextBlock Text="DURATION" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtDuration" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="SIZE" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtSize" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtResolution" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="FPS" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtFps" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtVideoCodec" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="AUDIO" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtAudio" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="BITRATE" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtBitrate" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="HDR" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtHdr" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+</UniformGrid>
+</StackPanel>
+</Border>
+     <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<StackPanel>
+<TextBlock Text="TARGET" Style="{StaticResource H2}"/>
+<Grid Margin="0,14,0,0">
+<Grid.ColumnDefinitions>
+<ColumnDefinition/>
+<ColumnDefinition Width="100"/>
+</Grid.ColumnDefinitions>
+<Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="25" ValueChanged="OnTargetSliderChanged"/>
+<StackPanel Grid.Column="1" Orientation="Horizontal">
+<TextBox x:Name="TxtTarget" Width="64" Text="25" TextChanged="OnTargetTextChanged"/>
+<TextBlock Text=" MB" Style="{StaticResource Label}" VerticalAlignment="Center"/>
+</StackPanel>
+</Grid>
+<StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+<Button Content="8" Tag="8" Style="{StaticResource ChipButton}" Click="OnPreset"/>
+<Button Content="25" Tag="25" Style="{StaticResource ChipButton}" Click="OnPreset"/>
+<Button Content="50" Tag="50" Style="{StaticResource ChipButton}" Click="OnPreset"/>
+<Button Content="100" Tag="100" Style="{StaticResource ChipButton}" Click="OnPreset"/>
+<Button Content="HALF" Style="{StaticResource ChipButton}" Click="OnPresetHalf"/>
+</StackPanel>
+<Grid Margin="0,16,0,0">
+<Grid.ColumnDefinitions>
+<ColumnDefinition/>
+<ColumnDefinition/>
+</Grid.ColumnDefinitions>
+<ComboBox x:Name="CmbIntent" SelectedIndex="1" SelectionChanged="OnOptionChanged">
+<ComboBoxItem Content="Archive"/>
+<ComboBoxItem Content="Sharing"/>
+<ComboBoxItem Content="Social media"/>
+</ComboBox>
+<ComboBox x:Name="CmbCodec" Grid.Column="1" SelectedIndex="0" SelectionChanged="OnOptionChanged">
+<ComboBoxItem Content="Compatible - H.264"/>
+<ComboBoxItem Content="Max compression - H.265"/>
+<ComboBoxItem Content="Fast - NVENC"/>
+</ComboBox>
+</Grid>
+<StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+<CheckBox x:Name="ChkResolution" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May lower resolution" Click="OnOptionChanged"/>
+<CheckBox x:Name="ChkFps" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May lower frame rate" Click="OnOptionChanged"/>
+</StackPanel>
+</StackPanel>
+</Border>
+     <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<StackPanel>
+<TextBlock Text="WHAT IT WILL DO" Style="{StaticResource H2}"/>
+<TextBlock x:Name="TxtPlanSummary" Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,12,0,0"/>
+<TextBlock x:Name="TxtPlanReason" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
+<TextBlock Text="FFMPEG COMMAND" Style="{StaticResource Label}" Margin="0,12,0,4"/>
+<TextBox x:Name="TxtCommand" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="100"/>
+</StackPanel>
+</Border>
+</StackPanel>
+    <StackPanel Grid.Column="2">
+<Border Style="{StaticResource Panel}">
+<StackPanel>
+<TextBlock Text="AI SETTINGS" Style="{StaticResource H2}"/>
+<TextBlock Text="Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer." Style="{StaticResource Hint}" TextWrapping="Wrap"/>
+<StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+<Button Content="COPY PROMPT" Style="{StaticResource GhostButton}" Click="OnCopyPrompt"/>
+<Button Content="APPLY PASTED JSON" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="OnApplyJson"/>
+</StackPanel>
+<TextBox x:Name="TxtAiJson" Height="150" Margin="0,12,0,0" AcceptsReturn="True" TextWrapping="Wrap"/>
+<TextBlock x:Name="TxtAiStatus" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
+<Button x:Name="BtnRevert" Content="BACK TO AUTOMATIC" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
+</StackPanel>
+</Border>
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<StackPanel>
+<TextBlock Text="OUTPUT" Style="{StaticResource H2}"/>
+<ProgressBar x:Name="Progress" Height="8" Maximum="1" Margin="0,14,0,0"/>
+<UniformGrid Columns="2" Margin="0,12,0,0">
+<StackPanel>
+<TextBlock Text="STAGE" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtStage" Text="idle" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="REMAINING" Style="{StaticResource Label}"/>
+<TextBlock x:Name="TxtRemaining" Text="-" Style="{StaticResource MonoValue}"/>
+</StackPanel>
+</UniformGrid>
+<TextBlock Text="CURRENT OUTPUT SIZE" Style="{StaticResource Label}" Margin="0,12,0,0"/>
+<TextBlock x:Name="TxtOutSize" Text="-" Style="{StaticResource MonoValue}" FontSize="24"/>
+<TextBlock x:Name="TxtResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
+<Button x:Name="BtnReveal" Content="SHOW IN FOLDER" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
+</StackPanel>
+</Border>
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+<Button x:Name="BtnCancel" Content="CANCEL" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
+<Button x:Name="BtnStart" Content="SHRINK" Style="{StaticResource PrimaryButton}" Margin="12,0,0,0" IsEnabled="False" Click="OnStart"/>
+</StackPanel>
+</StackPanel>
+   </Grid>
+</ScrollViewer>
+</TabItem>
+   <TabItem Header="CONVERT" Style="{StaticResource NeonTabItem}">
+<ScrollViewer VerticalScrollBarVisibility="Auto">
+<Grid Margin="0,16,0,0">
+<Grid.ColumnDefinitions>
+<ColumnDefinition/>
+<ColumnDefinition Width="20"/>
+<ColumnDefinition/>
+</Grid.ColumnDefinitions>
+<Border Style="{StaticResource Panel}">
+<StackPanel>
+<TextBlock Text="CONVERSION" Style="{StaticResource H2}"/>
+<TextBlock x:Name="TxtConvertSource" Text="Load a source in SHRINK or browse here." Style="{StaticResource Body}" Margin="0,10,0,10"/>
+<Button Content="BROWSE SOURCE" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
+<UniformGrid Columns="2" Margin="0,16,0,0">
+<StackPanel>
+<TextBlock Text="CONTAINER" Style="{StaticResource Label}"/>
+<ComboBox x:Name="CmbContainer" SelectedIndex="0" SelectionChanged="OnConvertChanged">
+<ComboBoxItem Content="MP4"/>
+<ComboBoxItem Content="MKV"/>
+<ComboBoxItem Content="WebM"/>
+<ComboBoxItem Content="MOV"/>
+<ComboBoxItem Content="AVI"/>
+<ComboBoxItem Content="GIF"/>
+<ComboBoxItem Content="MP3"/>
+<ComboBoxItem Content="M4A"/>
+<ComboBoxItem Content="WAV"/>
+</ComboBox>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/>
+<ComboBox x:Name="CmbConvertCodec" SelectedIndex="0" SelectionChanged="OnConvertChanged">
+<ComboBoxItem Content="H.264"/>
+<ComboBoxItem Content="H.265"/>
+<ComboBoxItem Content="VP9"/>
+<ComboBoxItem Content="AV1"/>
+<ComboBoxItem Content="Copy"/>
+</ComboBox>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="QUALITY MODE" Style="{StaticResource Label}"/>
+<ComboBox x:Name="CmbQualityMode" SelectedIndex="0" SelectionChanged="OnConvertChanged">
+<ComboBoxItem Content="CRF"/>
+<ComboBoxItem Content="Fixed bitrate"/>
+</ComboBox>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="CRF / BITRATE K" Style="{StaticResource Label}"/>
+<Slider x:Name="SliderQuality" Minimum="0" Maximum="51" Value="23" ValueChanged="OnQualitySliderChanged"/>
+<TextBox x:Name="TxtQuality" Text="23" TextChanged="OnQualityTextChanged"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/>
+<ComboBox x:Name="CmbResolution" SelectedIndex="0" SelectionChanged="OnConvertChanged">
+<ComboBoxItem Content="Source"/>
+<ComboBoxItem Content="2160"/>
+<ComboBoxItem Content="1440"/>
+<ComboBoxItem Content="1080"/>
+<ComboBoxItem Content="720"/>
+<ComboBoxItem Content="480"/>
+<ComboBoxItem Content="Custom"/>
+</ComboBox>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="CUSTOM WIDTH x HEIGHT" Style="{StaticResource Label}"/>
+<TextBox x:Name="TxtCustomResolution" Text="1280x720" TextChanged="OnConvertChanged"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="FRAME RATE" Style="{StaticResource Label}"/>
+<ComboBox x:Name="CmbConvertFps" SelectedIndex="0" SelectionChanged="OnConvertChanged">
+<ComboBoxItem Content="Source"/>
+<ComboBoxItem Content="60"/>
+<ComboBoxItem Content="30"/>
+<ComboBoxItem Content="24"/>
+<ComboBoxItem Content="Custom"/>
+</ComboBox>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="CUSTOM FPS" Style="{StaticResource Label}"/>
+<TextBox x:Name="TxtCustomFps" Text="25" TextChanged="OnConvertChanged"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="AUDIO" Style="{StaticResource Label}"/>
+<ComboBox x:Name="CmbConvertAudio" SelectedIndex="0" SelectionChanged="OnConvertChanged">
+<ComboBoxItem Content="AAC"/>
+<ComboBoxItem Content="Opus"/>
+<ComboBoxItem Content="MP3"/>
+<ComboBoxItem Content="PCM"/>
+<ComboBoxItem Content="Copy"/>
+<ComboBoxItem Content="Drop"/>
+</ComboBox>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="AUDIO BITRATE K" Style="{StaticResource Label}"/>
+<TextBox x:Name="TxtAudioBitrate" Text="128" TextChanged="OnConvertChanged"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="START (HH:MM:SS)" Style="{StaticResource Label}"/>
+<TextBox x:Name="TxtTrimStart" TextChanged="OnConvertChanged"/>
+</StackPanel>
+<StackPanel>
+<TextBlock Text="END (HH:MM:SS)" Style="{StaticResource Label}"/>
+<TextBox x:Name="TxtTrimEnd" TextChanged="OnConvertChanged"/>
+</StackPanel>
+</UniformGrid>
+</StackPanel>
+</Border>
+    <StackPanel Grid.Column="2">
+<Border Style="{StaticResource Panel}">
+<StackPanel>
+<TextBlock Text="FFMPEG COMMAND" Style="{StaticResource H2}"/>
+<TextBox x:Name="TxtConvertCommand" Height="150" Margin="0,12,0,0" IsReadOnly="True" TextWrapping="Wrap"/>
+<TextBlock x:Name="TxtConvertValidation" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
+</StackPanel>
+</Border>
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<StackPanel>
+<TextBlock Text="PROGRESS" Style="{StaticResource H2}"/>
+<ProgressBar x:Name="ConvertProgress" Height="8" Maximum="1" Margin="0,12,0,0"/>
+<TextBlock x:Name="TxtConvertStage" Text="idle" Style="{StaticResource MonoValue}"/>
+<TextBlock x:Name="TxtConvertResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
+<Button x:Name="BtnConvertReveal" Content="SHOW IN FOLDER" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
+</StackPanel>
+</Border>
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+<Button x:Name="BtnConvertCancel" Content="CANCEL" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
+<Button x:Name="BtnConvert" Content="CONVERT" Style="{StaticResource PrimaryButton}" IsEnabled="False" Margin="12,0,0,0" Click="OnConvert"/>
+</StackPanel>
+</StackPanel>
+</Grid>
+</ScrollViewer>
+</TabItem>
+   <TabItem Header="ABOUT" Style="{StaticResource NeonTabItem}">
+<ScrollViewer VerticalScrollBarVisibility="Auto">
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<StackPanel>
+<TextBlock Text="ABOUT VIDSHRINK" Style="{StaticResource H2}"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,12,0,0" Text="VidShrink is an offline Windows tool for target-size video compression and format conversion. In SHRINK, the target size becomes a total bitrate budget: audio is reserved first, bits per pixel selects CRF or two-pass encoding, resolution steps down when necessary, and oversize output triggers a measured bitrate correction."/>
+<TextBlock Text="AUTOMATIC DECISION TABLE" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock FontFamily="{StaticResource FontMono}" Foreground="{StaticResource TextBody}" Text="&gt;= 0.10      Keep resolution, quality-first CRF&#x0a;0.05-0.10    Keep resolution, two-pass VBR&#x0a;0.03-0.05    Halve high frame rates when needed&#x0a;&lt; 0.03       Step down the resolution ladder, then two-pass"/>
+<TextBlock Text="AI MODE" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="AI mode only creates a prompt and validates pasted JSON. No AI is embedded, so VidShrink works offline, asks for no API key, and falls back to the complete automatic engine when an answer is malformed or incompatible."/>
+<TextBlock Text="CODECS" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="H.264 offers the broadest compatibility. H.265 compresses more efficiently. VP9 is a strong WebM choice. AV1 maximizes modern compression at higher CPU cost. Stream copy is fastest and lossless when the destination supports the source streams."/>
+<TextBlock Text="SYSTEM STATUS" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock x:Name="TxtSystemStatus" Style="{StaticResource MonoValue}" TextWrapping="Wrap"/>
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,28,0,0">
+<TextBlock>
+<Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">GITHUB / BY TEKNESYUM</Hyperlink>
+</TextBlock>
+<TextBlock Margin="16,0,0,0">
+<Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Foreground="{StaticResource NeonPurple}" RequestNavigate="OnSignatureNavigate">BUY ME A COFFEE</Hyperlink>
+</TextBlock>
+</StackPanel>
+</StackPanel>
+</Border>
+</ScrollViewer>
+</TabItem>
+  </TabControl>
+<TextBlock x:Name="TxtStatusBar" Grid.Row="2" Style="{StaticResource Hint}" Margin="0,14,0,0" Text="ffmpeg: checking..."/>
+</Grid>
 </Window>
+

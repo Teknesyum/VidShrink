@@ -87,8 +87,10 @@ public static class PlanCalculator
     public static double BitsPerPixel(double videoK, int width, int height, double fps)
         => videoK * 1000.0 / Math.Max(1.0, (double)width * height * fps);
 
-    public static double EstimatedMb(EncodePlan plan, double durationSeconds)
-        => (plan.VideoBitrateK + plan.AudioBitrateK) * durationSeconds / 8192.0 / ContainerOverhead;
+    public static double? EstimatedMb(EncodePlan plan, double durationSeconds)
+        => plan.ModeEnum == EncodeMode.Crf
+            ? null
+            : (plan.VideoBitrateK + plan.AudioBitrateK) * durationSeconds / 8192.0 / ContainerOverhead;
 
     private static int PickAudioBitrateK(MediaInfo info, PlanOptions options)
     {

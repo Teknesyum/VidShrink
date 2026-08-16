@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Collections.Concurrent;
 using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
@@ -7,6 +8,7 @@ namespace VidShrink.Ffmpeg;
 public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan? Remaining, double OutputMb, string Stage);
 
 public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error);
+public sealed record ConversionResult(string OutputPath, double OutputMb);
 
 public sealed class EncodeRunner
 {
@@ -63,18 +65,54 @@ public sealed class EncodeRunner
         }
     }
 
+    public async Task<ConversionResult> ConvertAsync(
+        MediaInfo info, ConversionPlan plan, string outputPath,
+        IProgress<EncodeProgress>? progress, CancellationToken ct = default)
+    {
+        try
+        {
+            var errors = ConversionArguments.Validate(info, plan);
+            if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+            var duration = EffectiveDuration(info, plan);
+            if (plan.Gif)
+            {
+                var palettePath = Path.Combine(Path.GetTempPath(), $"vidshrink_{Guid.NewGuid():N}.png");
+                try
+                {
+                    await RunCommandAsync(ConversionArguments.Build(info, plan, palettePath), duration, progress, "GIF palette 1/2", 0, 0.35, ct);
+                    await RunCommandAsync(ConversionArguments.Build(info, plan, outputPath, palettePath), duration, progress, "GIF encode 2/2", 0.35, 1, ct);
+                }
+                finally { TryDelete(palettePath); }
+            }
+            else
+                await RunCommandAsync(ConversionArguments.Build(info, plan, outputPath), duration, progress, "converting", 0, 1, ct);
+
+            return new ConversionResult(outputPath, new FileInfo(outputPath).Length / 1024.0 / 1024.0);
+        }
+        catch (OperationCanceledException) { TryDelete(outputPath); throw; }
+    }
+
     private static async Task RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
         IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo, CancellationToken ct)
     {
-        var args = FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix).ToList();
+        var args = FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix);
+        await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
+    }
+
+    private static async Task RunCommandAsync(
+        IReadOnlyList<string> commandArgs, double durationSeconds, IProgress<EncodeProgress>? progress,
+        string stage, double spanFrom, double spanTo, CancellationToken ct)
+    {
+        var args = commandArgs.ToList();
         args.InsertRange(0, new[] { "-progress", "pipe:1", "-nostats" });
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
         var stopwatch = Stopwatch.StartNew();
-        var tail = new Queue<string>();
+        var tail = new ConcurrentQueue<string>();
 
         process.Start();
+        using var cancellationRegistration = ct.Register(() => TryKill(process));
 
         var stderrTask = Task.Run(async () =>
         {
@@ -82,7 +120,7 @@ public sealed class EncodeRunner
             while ((line = await process.StandardError.ReadLineAsync()) is not null)
             {
                 tail.Enqueue(line);
-                while (tail.Count > 15) tail.Dequeue();
+                while (tail.Count > 15) tail.TryDequeue(out _);
             }
         }, CancellationToken.None);
 
@@ -100,7 +138,7 @@ public sealed class EncodeRunner
 
             if (key != "out_time_ms" || !long.TryParse(value, out var us)) continue;
 
-            var local = Math.Clamp(us / 1_000_000.0 / info.DurationSeconds, 0, 1);
+            var local = Math.Clamp(us / 1_000_000.0 / durationSeconds, 0, 1);
             var overall = spanFrom + local * (spanTo - spanFrom);
             var remaining = overall > 0.01
                 ? TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds / overall - stopwatch.Elapsed.TotalSeconds)
@@ -108,8 +146,7 @@ public sealed class EncodeRunner
             progress?.Report(new EncodeProgress(overall, stopwatch.Elapsed, remaining, outMb, stage));
         }
 
-        using (ct.Register(() => TryKill(process)))
-            await process.WaitForExitAsync(ct);
+        await process.WaitForExitAsync(ct);
 
         await stderrTask;
 
@@ -117,6 +154,13 @@ public sealed class EncodeRunner
             throw new InvalidOperationException($"ffmpeg failed ({process.ExitCode}):{Environment.NewLine}{string.Join(Environment.NewLine, tail)}");
 
         progress?.Report(new EncodeProgress(spanTo, stopwatch.Elapsed, TimeSpan.Zero, outMb, stage));
+    }
+
+    private static double EffectiveDuration(MediaInfo info, ConversionPlan plan)
+    {
+        var start = plan.Start?.TotalSeconds ?? 0;
+        var end = plan.End?.TotalSeconds ?? info.DurationSeconds;
+        return Math.Max(0.1, Math.Min(end, info.DurationSeconds) - start);
     }
 
     private static void TryKill(Process process)

@@ -92,5 +92,12 @@
       </Setter.Value>
     </Setter>
   </Style>
+  <Style x:Key="NeonTabControl" TargetType="TabControl">
+    <Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/>
+  </Style>
+  <Style x:Key="NeonTabItem" TargetType="TabItem">
+    <Setter Property="Foreground" Value="{StaticResource TextDim}"/><Setter Property="FontFamily" Value="{StaticResource FontMono}"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Padding" Value="22,10"/>
+    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem"><Border x:Name="TabBorder" Background="#1400F3FF" BorderBrush="#3300F3FF" BorderThickness="1" CornerRadius="10,10,0,0" Padding="{TemplateBinding Padding}"><ContentPresenter ContentSource="Header" HorizontalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource NeonBlue}"/><Setter Property="Foreground" Value="{StaticResource NeonBlue}"/></Trigger><Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{StaticResource NeonPink}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
+  </Style>
 
 </ResourceDictionary>

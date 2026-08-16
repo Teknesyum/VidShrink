@@ -59,8 +59,8 @@ public static class FfprobeClient
             FilePath = filePath,
             FileSizeBytes = fileSize,
             DurationSeconds = duration,
-            Width = GetInt(v, "width") ?? 0,
-            Height = GetInt(v, "height") ?? 0,
+            Width = DisplayDimensions(v).width,
+            Height = DisplayDimensions(v).height,
             Fps = ParseFraction(GetString(v, "avg_frame_rate")) ?? ParseFraction(GetString(v, "r_frame_rate")) ?? 30,
             VideoCodec = GetString(v, "codec_name") ?? "unknown",
             TotalBitrateBps = ParseLong(format, "bit_rate") ?? (long)(fileSize * 8 / duration),
@@ -70,6 +70,19 @@ public static class FfprobeClient
             AudioBitrateBps = audio is null ? 0 : ParseLong(audio.Value, "bit_rate") ?? 128_000,
             AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2
         };
+    }
+
+    private static (int width, int height) DisplayDimensions(JsonElement stream)
+    {
+        var width = GetInt(stream, "width") ?? 0;
+        var height = GetInt(stream, "height") ?? 0;
+        var rotation = 0;
+        if (stream.TryGetProperty("tags", out var tags))
+            rotation = GetInt(tags, "rotate") ?? 0;
+        if (stream.TryGetProperty("side_data_list", out var sideData))
+            foreach (var item in sideData.EnumerateArray())
+                rotation = GetInt(item, "rotation") ?? rotation;
+        return Math.Abs(rotation) % 180 == 90 ? (height, width) : (width, height);
     }
 
     private static bool IsAttachedPicture(JsonElement stream)

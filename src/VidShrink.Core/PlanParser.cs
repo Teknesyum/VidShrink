@@ -89,6 +89,10 @@ public static class PlanParser
             warnings.Add("The source has no audio track, audio settings were dropped.");
         }
 
+        if (string.IsNullOrWhiteSpace(plan.Preset)) plan.Preset = FfmpegArguments.DefaultPreset(plan.Codec);
+        if (!FfmpegArguments.IsValidPreset(plan.Codec, plan.Preset))
+            errors.Add($"Preset '{plan.Preset}' is invalid for codec '{plan.Codec}'.");
+
         if (plan.ModeEnum == EncodeMode.TwoPass && errors.Count == 0)
         {
             var estimated = PlanCalculator.EstimatedMb(plan, info.DurationSeconds);
@@ -96,7 +100,6 @@ public static class PlanParser
                 warnings.Add($"These settings estimate to {estimated:0.0} MB, above the {options.TargetMb:0.##} MB target. The size-correction retry will fix it if it overshoots.");
         }
 
-        if (string.IsNullOrWhiteSpace(plan.Preset)) plan.Preset = "slow";
         plan.ExtraArgs ??= new List<string>();
         plan.ExtraArgs.RemoveAll(a => string.IsNullOrWhiteSpace(a) || a.Contains("..") || a.Contains('&') || a.Contains('|'));
 

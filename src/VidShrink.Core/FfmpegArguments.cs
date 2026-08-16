@@ -5,6 +5,30 @@ namespace VidShrink.Core;
 
 public static class FfmpegArguments
 {
+    private static readonly IReadOnlyDictionary<string, string[]> Presets = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["libx264"] = new[] { "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" },
+        ["libx265"] = new[] { "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" },
+        ["libvpx-vp9"] = new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" },
+        ["libsvtav1"] = new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" },
+        ["h264_nvenc"] = new[] { "p1", "p2", "p3", "p4", "p5", "p6", "p7" },
+        ["hevc_nvenc"] = new[] { "p1", "p2", "p3", "p4", "p5", "p6", "p7" },
+        ["h264_qsv"] = new[] { "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" },
+        ["hevc_qsv"] = new[] { "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" }
+    };
+
+    public static string DefaultPreset(string codec) => codec.ToLowerInvariant() switch
+    {
+        "libsvtav1" => "8",
+        "libvpx-vp9" => "4",
+        "h264_nvenc" or "hevc_nvenc" => "p4",
+        "h264_qsv" or "hevc_qsv" => "medium",
+        _ => "slow"
+    };
+
+    public static bool IsValidPreset(string codec, string preset)
+        => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
+
     public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix)
     {
         var a = new List<string> { "-hide_banner", "-y", "-i", info.FilePath };
@@ -40,9 +64,9 @@ public static class FfmpegArguments
 
         if (pass == 1)
         {
+            a.AddRange(plan.ExtraArgs);
             a.AddRange(new[] { "-an", "-f", "null" });
             a.Add(OperatingSystem.IsWindows() ? "NUL" : "/dev/null");
-            a.AddRange(plan.ExtraArgs);
             return a;
         }
 
