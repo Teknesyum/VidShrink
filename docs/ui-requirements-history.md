@@ -85,6 +85,9 @@ Son güncelleme: 17 Ağustos 2026
 - Genel köşe yarıçapı `6 DIP` olmalı; geniş, kapsül benzeri veya aşırı yuvarlak köşelerden kaçınılmalıdır.
 - Uygulama penceresinin en dışında tüm pencereyi çevreleyen `1 DIP` neon mavi anahat bulunmalıdır.
 - Özel üst başlık çubuğunda okunurluğu koruyan koyu yatay gradient kullanılmalıdır: sol tarafta hafif neon mavi, sağ tarafta düşük yoğunluklu mor/pembe ton bulunmalıdır.
+- Sponsor ve imza bağlantıları Hakkında sekmesinde tekrarlanmamalı; üst başlık çubuğunda pencere düğmelerinin solunda yer almalıdır.
+- Sağdan sola sıralama küçült düğmesi, `GitHub / By Teknesyum`, `Buy Me A Coffee` olmalıdır.
+- Üst bar bağlantıları normalde beyaz, hover sırasında neon pembe ve altı çizili olmalıdır.
 - Dairesel `?` yardım rozeti ve kaydırıcı tutamacı gibi işlevi gereği yuvarlak öğeler bu kuralın istisnasıdır.
 - Aynı satırdaki kontroller asimetrik görünmemelidir; bir kontrolün sol köşeleri yuvarlatılmışsa sağ köşeleri de aynı yarıçapla yuvarlatılmalıdır.
 - Eş görev seviyesindeki yan yana kontrollerin dış yükseklikleri mümkün olduğunca aynı olmalıdır.

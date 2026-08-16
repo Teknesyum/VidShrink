@@ -23,6 +23,8 @@
 <TextBlock Text="VidShrink" Style="{StaticResource H2}" FontSize="18" VerticalAlignment="Center"/>
 </StackPanel>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
+<TextBlock Margin="0,0,18,0" VerticalAlignment="Center"><Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Style="{StaticResource TitleBarLink}" RequestNavigate="OnSignatureNavigate">Buy Me A Coffee</Hyperlink></TextBlock>
+<TextBlock Margin="0,0,18,0" VerticalAlignment="Center"><Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Style="{StaticResource TitleBarLink}" RequestNavigate="OnSignatureNavigate">GitHub / By Teknesyum</Hyperlink></TextBlock>
 <Button Content="—" Style="{StaticResource WindowControlButton}" ToolTip="Minimize" Click="OnMinimize"/>
 <Button x:Name="BtnMaximize" Content="□" Style="{StaticResource WindowControlButton}" ToolTip="Maximize" Click="OnMaximizeRestore"/>
 <Button Content="×" Style="{StaticResource CloseWindowButton}" ToolTip="Close" Click="OnClose"/>
@@ -342,14 +344,6 @@
 <TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="H.264 offers the broadest compatibility. H.265 compresses more efficiently. VP9 is a strong WebM choice. AV1 maximizes modern compression at higher CPU cost. Stream copy is fastest and lossless when the destination supports the source streams."/>
 <TextBlock Text="System Status" Style="{StaticResource H2}" Margin="0,20,0,8"/>
 <TextBlock x:Name="TxtSystemStatus" Style="{StaticResource MonoValue}" TextWrapping="Wrap"/>
-<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,28,0,0">
-<TextBlock>
-<Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">GitHub / By Teknesyum</Hyperlink>
-</TextBlock>
-<TextBlock Margin="16,0,0,0">
-<Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">Buy Me A Coffee</Hyperlink>
-</TextBlock>
-</StackPanel>
 </StackPanel>
 </Border>
 </ScrollViewer>
