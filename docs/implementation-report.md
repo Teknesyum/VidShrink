@@ -106,6 +106,12 @@ The WPF application was launched from the Release output and inspected at 1220x9
 - SHRINK, CONVERT, and ABOUT layouts fit without overlapping controls;
 - the signature/support block appears only once, at the bottom of ABOUT.
 
+## Conversion-form spacing follow-up
+
+The two-column conversion form originally had no gutter between adjacent fields and no vertical rhythm between rows. Labels and controls visually touched at the center seam.
+
+The form now uses a 16 px horizontal gutter, 18 px row spacing, 6 px label-to-control spacing, and separate spacing between the CRF slider and its numeric field. The existing tab-level scroll viewer handles the additional height without overlap. The Turkish layout, which contains the longest labels, was visually verified at the application's minimum supported window size.
+
 ## Files central to review
 
 - `src/VidShrink.App/LanguageCatalog.cs`
