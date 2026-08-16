@@ -22,6 +22,9 @@ Son güncelleme: 17 Ağustos 2026
 - Özel başlık panelinde neon küçültme, büyütme/geri yükleme ve kapatma düğmeleri bulunmalıdır.
 - Pencere kenarından yeniden boyutlandırma ve başlığa çift tıklayarak büyütme davranışı korunmalıdır.
 - Alt kısımda FFmpeg yolu gibi teknik durum bilgisi sürekli gösterilmemelidir.
+- Uygulama ikonu, camgöbeği sıkıştırma parantezleri ve pembe oynat simgesinden oluşan seçilmiş A prototipi olmalıdır.
+- İkonun dış arka planı gerçek alfa şeffaflığına sahip olmalı; siyah veya koyu kare tuval görünmemelidir.
+- Aynı ikon EXE, Windows görev çubuğu, pencere kimliği ve özel neon başlık panelinde kullanılmalıdır.
 
 ## 2. Tipografi
 

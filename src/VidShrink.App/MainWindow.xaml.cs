@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -29,6 +30,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Icon = BitmapFrame.Create(new Uri("pack://application:,,,/VidShrink.App;component/Assets/VidShrink.ico"));
         WindowStyle = WindowStyle.None;
         ResizeMode = ResizeMode.CanResize;
         Width = Math.Min(1440, SystemParameters.WorkArea.Width);

@@ -10,7 +10,10 @@
 </Grid.RowDefinitions>
 <Border Height="54" Background="#FF07181B" BorderBrush="#6600F3FF" BorderThickness="0,0,0,1" MouseLeftButtonDown="OnTitleBarMouseLeftButtonDown">
 <Grid Margin="18,0,12,0">
+<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+<Image Source="Assets/VidShrink.png" Width="36" Height="36" Stretch="Uniform" Margin="0,0,10,0"/>
 <TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="18" VerticalAlignment="Center"/>
+</StackPanel>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
 <Button Content="—" Style="{StaticResource WindowControlButton}" ToolTip="Minimize" Click="OnMinimize"/>
 <Button x:Name="BtnMaximize" Content="□" Style="{StaticResource WindowControlButton}" ToolTip="Maximize" Click="OnMaximizeRestore"/>

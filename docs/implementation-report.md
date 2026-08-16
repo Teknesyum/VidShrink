@@ -123,6 +123,10 @@ All neutral text tokens now use pure white `#FFFFFFFF`; the interface no longer 
 
 Atkinson Hyperlegible Next was selected because its letterforms are intentionally differentiated for low-vision legibility, its expanded character set supports Turkish, and its SIL Open Font License permits bundling with the application. Regular, SemiBold, and Bold TTF files plus the license are embedded in the WPF project, so the result does not depend on a system font installation.
 
+## Application icon
+
+The selected compression-bracket and play-symbol prototype is now the product icon. Its outer canvas uses genuine PNG alpha transparency, while the symbol's intentional dark internal outlines remain intact. The same asset is embedded as a full-resolution PNG for the custom title panel and as a multi-resolution Windows ICO containing 16, 20, 24, 32, 40, 48, 64, 128, and 256 px layers for the executable and window identity.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.
