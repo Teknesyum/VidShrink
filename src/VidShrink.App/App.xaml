@@ -214,13 +214,13 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Slider">
-                            <Grid VerticalAlignment="Center">
-                                <Track x:Name="PART_Track" Height="10">
+                            <Grid Margin="10,0" VerticalAlignment="Center">
+                                <Track x:Name="PART_Track" Height="20">
                                     <Track.DecreaseRepeatButton>
                                         <RepeatButton Command="{x:Static Slider.DecreaseLarge}" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton">
-                                                    <Border Background="{StaticResource NeonBlue}" CornerRadius="5"/>
+                                                    <Border Height="10" VerticalAlignment="Center" Background="{StaticResource NeonBlue}" CornerRadius="5"/>
                                                 </ControlTemplate>
                                             </RepeatButton.Template>
                                         </RepeatButton>
@@ -229,7 +229,7 @@
                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton">
-                                                    <Border Background="#FF123033" BorderBrush="#6600F3FF" BorderThickness="1" CornerRadius="5"/>
+                                                    <Border Height="10" VerticalAlignment="Center" Background="#FF123033" BorderBrush="#6600F3FF" BorderThickness="1" CornerRadius="5"/>
                                                 </ControlTemplate>
                                             </RepeatButton.Template>
                                         </RepeatButton>
@@ -271,6 +271,38 @@
                 <Setter Property="FontSize" Value="16"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
                 <Setter Property="Margin" Value="0,0,16,0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="CheckBox">
+                            <Grid VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="CheckBorder" Width="20" Height="20" Background="#FF07181B" BorderBrush="{StaticResource NeonBlue}" BorderThickness="1" CornerRadius="4" VerticalAlignment="Center">
+                                    <Path x:Name="CheckMark" Data="M 4 10 L 8 14 L 16 5" Stroke="{StaticResource NeonPink}" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Visibility="Collapsed"/>
+                                </Border>
+                                <ContentPresenter Grid.Column="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
+                                    <Setter TargetName="CheckBorder" Property="Background" Value="#3300F3FF"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

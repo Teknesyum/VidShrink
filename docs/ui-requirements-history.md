@@ -79,6 +79,9 @@ Son güncelleme: 17 Ağustos 2026
 - Dolu bölüm neon camgöbeği olmalıdır.
 - Tutamaç pembe/camgöbeği neon vurgulu olmalıdır.
 - Tutamaç ve yol rahatça görülecek büyüklükte olmalıdır.
+- Kaydırıcı yolu iki uçta da tamamen görünmeli; tutamaç kontrol sınırlarında kırpılmamalıdır.
+- Kaydırıcı tutamacı yolun dikey merkezinde olmalı, üstte veya altta yarım görünmemelidir.
+- Hedef boyut değeri ile `MB` birimi ayrı yerleşim sütunlarında tutulmalı ve daralmada birim kırpılmamalıdır.
 - Dönüştür ekranındaki CRF/bit hızı kaydırıcısı aynı tasarım sistemini kullanmalıdır.
 - İlerleme çubukları da koyu neon yol ve camgöbeği dolgu kullanmalıdır.
 - Neon görünüm metin parlamasıyla değil, kontrol yüzeyleri ve kenarlıklarıyla sağlanmalıdır.
@@ -161,6 +164,8 @@ Son güncelleme: 17 Ağustos 2026
 - Normal arayüz yazısı 16 DIP altına düşmemelidir.
 - İkincil yardım metni 14 DIP altına düşmemelidir.
 - Başlıklar ile değer/açıklamalar yalnızca konumla değil renk hiyerarşisiyle de ayrılmalıdır.
+- Yerel Windows onay kutusu görünümü kullanılmamalı; neon temalı özel kutu ve tik çizilmelidir.
+- Onay kutusu, tik ve yanındaki yazı aynı dikey eksende ortalanmalıdır.
 - Yan yana kontroller birbirine değmemelidir.
 - Yan yana kontrollerin köşe geometrileri ve yükseklikleri görsel olarak dengeli olmalıdır.
 - Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.

@@ -72,13 +72,14 @@
 <Grid Margin="0,14,0,0">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
-<ColumnDefinition Width="100"/>
+<ColumnDefinition Width="12"/>
+<ColumnDefinition Width="82"/>
+<ColumnDefinition Width="8"/>
+<ColumnDefinition Width="Auto"/>
 </Grid.ColumnDefinitions>
-<Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="25" ValueChanged="OnTargetSliderChanged"/>
-<StackPanel Grid.Column="1" Orientation="Horizontal">
-<TextBox x:Name="TxtTarget" Width="64" Text="25" TextChanged="OnTargetTextChanged"/>
-<TextBlock Text=" MB" Style="{StaticResource Label}" VerticalAlignment="Center"/>
-</StackPanel>
+<Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="25" ValueChanged="OnTargetSliderChanged" VerticalAlignment="Center"/>
+<TextBox x:Name="TxtTarget" Grid.Column="2" Text="25" TextChanged="OnTargetTextChanged"/>
+<TextBlock Grid.Column="4" Text="MB" Style="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
 </Grid>
 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
 <Button Content="8" Tag="8" Style="{StaticResource ChipButton}" Click="OnPreset"/>
