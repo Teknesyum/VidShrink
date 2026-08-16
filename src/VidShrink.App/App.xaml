@@ -1,0 +1,89 @@
+<Application x:Class="VidShrink.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="GhostButton" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Padding" Value="14,8"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="Transparent" BorderBrush="#80B026FF"
+                                    BorderThickness="1" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
+                                    <Setter TargetName="bd" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect Color="{StaticResource NeonPurpleColor}" BlurRadius="14" ShadowDepth="0" Opacity="0.5"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="bd" Property="Opacity" Value="0.3"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+                <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+                <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+            </Style>
+
+            <Style x:Key="Body" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+            </Style>
+
+            <Style x:Key="Hint" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="Foreground" Value="{StaticResource TextHint}"/>
+            </Style>
+
+            <Style TargetType="ComboBox">
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="Background" Value="#14000000"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+            </Style>
+
+            <Style TargetType="TextBox">
+                <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Background" Value="#1A00F3FF"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+                <Setter Property="BorderBrush" Value="#3300F3FF"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="CaretBrush" Value="{StaticResource NeonBlue}"/>
+            </Style>
+
+            <Style x:Key="CheckStyle" TargetType="CheckBox">
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+                <Setter Property="Margin" Value="0,0,16,0"/>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

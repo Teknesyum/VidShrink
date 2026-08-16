@@ -1,0 +1,143 @@
+using System.Diagnostics;
+using System.Globalization;
+using VidShrink.Core;
+
+namespace VidShrink.Ffmpeg;
+
+public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan? Remaining, double OutputMb, string Stage);
+
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error);
+
+public sealed class EncodeRunner
+{
+    private const double ToleranceOver = 1.05;
+    private const int MaxAttempts = 3;
+
+    public async Task<EncodeResult> RunAsync(
+        MediaInfo info,
+        EncodePlan plan,
+        string outputPath,
+        double targetMb,
+        IProgress<EncodeProgress>? progress,
+        CancellationToken ct = default)
+    {
+        var current = plan;
+        var attempt = 0;
+        var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            while (attempt < MaxAttempts)
+            {
+                attempt++;
+                var twoPass = current.ModeEnum == EncodeMode.TwoPass;
+
+                if (twoPass)
+                {
+                    await RunOneAsync(info, current, outputPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, ct);
+                    await RunOneAsync(info, current, outputPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, ct);
+                }
+                else
+                {
+                    await RunOneAsync(info, current, outputPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, ct);
+                }
+
+                var actualMb = new FileInfo(outputPath).Length / 1024.0 / 1024.0;
+                if (actualMb <= targetMb * ToleranceOver || attempt >= MaxAttempts)
+                    return new EncodeResult(actualMb <= targetMb * ToleranceOver, outputPath, actualMb, current, attempt,
+                        actualMb <= targetMb * ToleranceOver ? null : $"Could not get under the target after {attempt} attempts (last result: {actualMb:0.0} MB).");
+
+                current = PlanCalculator.Correct(current, actualMb, targetMb);
+            }
+
+            return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.");
+        }
+        catch (OperationCanceledException)
+        {
+            TryDelete(outputPath);
+            throw;
+        }
+        finally
+        {
+            CleanupPassLogs(passLogPrefix);
+        }
+    }
+
+    private static async Task RunOneAsync(
+        MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
+        IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo, CancellationToken ct)
+    {
+        var args = FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix).ToList();
+        args.InsertRange(0, new[] { "-progress", "pipe:1", "-nostats" });
+
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+        var stopwatch = Stopwatch.StartNew();
+        var tail = new Queue<string>();
+
+        process.Start();
+
+        var stderrTask = Task.Run(async () =>
+        {
+            string? line;
+            while ((line = await process.StandardError.ReadLineAsync()) is not null)
+            {
+                tail.Enqueue(line);
+                while (tail.Count > 15) tail.Dequeue();
+            }
+        }, CancellationToken.None);
+
+        double outMb = 0;
+        string? readLine;
+        while ((readLine = await process.StandardOutput.ReadLineAsync(ct)) is not null)
+        {
+            var sep = readLine.IndexOf('=');
+            if (sep <= 0) continue;
+            var key = readLine[..sep];
+            var value = readLine[(sep + 1)..];
+
+            if (key == "total_size" && long.TryParse(value, out var size))
+                outMb = size / 1024.0 / 1024.0;
+
+            if (key != "out_time_ms" || !long.TryParse(value, out var us)) continue;
+
+            var local = Math.Clamp(us / 1_000_000.0 / info.DurationSeconds, 0, 1);
+            var overall = spanFrom + local * (spanTo - spanFrom);
+            var remaining = overall > 0.01
+                ? TimeSpan.FromSeconds(stopwatch.Elapsed.TotalSeconds / overall - stopwatch.Elapsed.TotalSeconds)
+                : (TimeSpan?)null;
+            progress?.Report(new EncodeProgress(overall, stopwatch.Elapsed, remaining, outMb, stage));
+        }
+
+        using (ct.Register(() => TryKill(process)))
+            await process.WaitForExitAsync(ct);
+
+        await stderrTask;
+
+        if (process.ExitCode != 0)
+            throw new InvalidOperationException($"ffmpeg failed ({process.ExitCode}):{Environment.NewLine}{string.Join(Environment.NewLine, tail)}");
+
+        progress?.Report(new EncodeProgress(spanTo, stopwatch.Elapsed, TimeSpan.Zero, outMb, stage));
+    }
+
+    private static void TryKill(Process process)
+    {
+        try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
+    }
+
+    private static void TryDelete(string path)
+    {
+        try { if (File.Exists(path)) File.Delete(path); } catch { }
+    }
+
+    private static void CleanupPassLogs(string prefix)
+    {
+        try
+        {
+            var dir = Path.GetDirectoryName(prefix)!;
+            var name = Path.GetFileName(prefix);
+            foreach (var file in Directory.EnumerateFiles(dir, name + "*"))
+                TryDelete(file);
+        }
+        catch { }
+    }
+}

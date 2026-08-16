@@ -1,0 +1,96 @@
+<!-- Teknesyum Neon — WPF. App.xaml > Application.Resources > MergedDictionaries içine ekle. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Color x:Key="NeonBlueColor">#FF00F3FF</Color>
+  <Color x:Key="NeonPinkColor">#FFFF00EA</Color>
+  <Color x:Key="NeonPurpleColor">#FFB026FF</Color>
+
+  <SolidColorBrush x:Key="NeonBlue"    Color="#FF00F3FF"/>
+  <SolidColorBrush x:Key="NeonPink"    Color="#FFFF00EA"/>
+  <SolidColorBrush x:Key="NeonPurple"  Color="#FFB026FF"/>
+  <SolidColorBrush x:Key="NeonSuccess" Color="#FF34D399"/>
+  <SolidColorBrush x:Key="Surface"     Color="#F208090A"/>
+  <SolidColorBrush x:Key="AppBg"       Color="#FF050507"/>
+
+  <SolidColorBrush x:Key="TextBody"  Color="#FFD1D5DB"/>
+  <SolidColorBrush x:Key="TextDim"   Color="#FF9CA3AF"/>
+  <SolidColorBrush x:Key="TextLabel" Color="#FF6B7280"/>
+  <SolidColorBrush x:Key="TextHint"  Color="#FF4B5563"/>
+
+  <FontFamily x:Key="FontSans">Segoe UI</FontFamily>
+  <FontFamily x:Key="FontMono">Consolas, Cascadia Mono</FontFamily>
+
+  <Style x:Key="H2" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="18"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+    <Setter Property="Effect">
+      <Setter.Value>
+        <DropShadowEffect Color="{StaticResource NeonBlueColor}" BlurRadius="10" ShadowDepth="0" Opacity="0.8"/>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="H3" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="14"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextDim}"/>
+  </Style>
+
+  <Style x:Key="Label" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="FontSize" Value="10"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextLabel}"/>
+  </Style>
+
+  <Style x:Key="MonoValue" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="14"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+  </Style>
+
+  <Style x:Key="Panel" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource Surface}"/>
+    <Setter Property="BorderBrush" Value="#3300F3FF"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="16"/>
+    <Setter Property="Padding" Value="24"/>
+  </Style>
+
+  <Style x:Key="PrimaryButton" TargetType="Button">
+    <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+    <Setter Property="Foreground" Value="Black"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+    <Setter Property="Padding" Value="20,14"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="12"
+                  Padding="{TemplateBinding Padding}">
+            <Border.Effect>
+              <DropShadowEffect Color="{StaticResource NeonBlueColor}" BlurRadius="20" ShadowDepth="0" Opacity="0.35"/>
+            </Border.Effect>
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="bd" Property="Opacity" Value="0.3"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>
