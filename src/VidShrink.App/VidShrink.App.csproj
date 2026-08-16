@@ -5,6 +5,13 @@
     <ProjectReference Include="..\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Fonts\AtkinsonHyperlegibleNext-Regular.ttf" />
+    <Resource Include="Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" />
+    <Resource Include="Fonts\AtkinsonHyperlegibleNext-Bold.ttf" />
+    <None Include="Fonts\OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>

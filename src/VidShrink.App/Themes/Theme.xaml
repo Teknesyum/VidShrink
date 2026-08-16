@@ -18,7 +18,7 @@
   <SolidColorBrush x:Key="TextLabel" Color="#FFFFFFFF"/>
   <SolidColorBrush x:Key="TextHint"  Color="#FFFFFFFF"/>
 
-  <FontFamily x:Key="FontSans">Segoe UI</FontFamily>
+  <FontFamily x:Key="FontSans">./Fonts/#Atkinson Hyperlegible Next</FontFamily>
   <FontFamily x:Key="FontMono">Consolas, Cascadia Mono</FontFamily>
 
   <Style x:Key="H2" TargetType="TextBlock">

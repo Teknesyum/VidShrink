@@ -20,7 +20,10 @@ Son güncelleme: 17 Ağustos 2026
 
 ## 2. Tipografi
 
-- Ana arayüz yazı tipi `Segoe UI` olmalıdır.
+- Ana arayüz yazı tipinde ciddi veya kurumsal görünümden önce azami okunurluk hedeflenmelidir.
+- İlk deneme adayı, özellikle harf ayrımı ve düşük görme okunurluğu için tasarlanan `Atkinson Hyperlegible Next` ailesidir.
+- Seçilen font `ç, ğ, ı, İ, ö, ş, ü` dahil bütün Türkçe karakterleri eksiksiz desteklemelidir.
+- Font uygulamayla birlikte paketlenmeli; kullanıcının bilgisayarında ayrıca kurulu olmasına güvenilmemelidir.
 - Komut ve sayısal değerlerde `Consolas`, yedek olarak `Cascadia Mono` kullanılmalıdır.
 - Normal arayüz metinleri 16 DIP altına inmemelidir.
 - Etiketler, düğmeler, açılır listeler, giriş alanları, onay kutuları, sekmeler, açıklamalar ve değerler normalde en az 16 DIP olmalıdır.
@@ -201,6 +204,7 @@ Son güncelleme: 17 Ağustos 2026
 ## 15. İlgili Dosyalar
 
 - `src/VidShrink.App/Themes/Theme.xaml`
+- `src/VidShrink.App/Fonts/`
 - `src/VidShrink.App/App.xaml`
 - `src/VidShrink.App/MainWindow.xaml`
 - `src/VidShrink.App/MainWindow.xaml.cs`

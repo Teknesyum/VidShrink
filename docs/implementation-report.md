@@ -119,7 +119,9 @@ Text glow was removed from neon-blue section headings. Typography now uses flat,
 
 Normal interface typography now uses a 16 DIP minimum: labels, body copy, buttons, selectors, text fields, checkboxes, tabs, and mono values are all 16 DIP or larger. Section headings are 20 DIP. Only secondary hint and status copy may use the 14 DIP exception, and no application text style uses less than 14 DIP.
 
-All neutral text tokens now use pure white `#FFFFFFFF`; the interface no longer uses gray typography. Neon blue headings, neon-purple actions, and neon-pink mono values remain semantic accent colors. The primary UI font is Segoe UI, while commands and numeric values use Consolas with Cascadia Mono as fallback.
+All neutral text tokens now use pure white `#FFFFFFFF`; the interface no longer uses gray typography. Neon blue headings, neon-purple actions, and neon-pink mono values remain semantic accent colors. The first maximum-legibility typography trial replaces Segoe UI with the bundled Atkinson Hyperlegible Next family for interface text. Commands and numeric values continue to use Consolas with Cascadia Mono as fallback.
+
+Atkinson Hyperlegible Next was selected because its letterforms are intentionally differentiated for low-vision legibility, its expanded character set supports Turkish, and its SIL Open Font License permits bundling with the application. Regular, SemiBold, and Bold TTF files plus the license are embedded in the WPF project, so the result does not depend on a system font installation.
 
 ## August 2026 UI usability follow-up
 
