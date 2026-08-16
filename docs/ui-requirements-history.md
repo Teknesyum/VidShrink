@@ -20,7 +20,8 @@ Son güncelleme: 17 Ağustos 2026
 - Hedef boyutun ana sayısal değeri neon mavi ve kalın gösterilerek hazır seçimlerden daha baskın olmalıdır; hazır seçim düğmelerinin metni beyaz kalmalıdır.
 - Aynı işlev grubunda ikincil değerler ana değerden daha güçlü renkle vurgulanmamalıdır.
 - Çıktı panelindeki `Çıktı`, `Aşama`, `Kalan` ve `Güncel Çıktı Boyutu` başlıkları neon mavi olmalıdır.
-- Çıktı panelinin yüksekliği soldaki `Hedef` panelinin yüksekliğini takip etmelidir.
+- `Hedef` ve `Çıktı` panelleri aynı kesin yüksekliğe sahip olmalıdır; içerik ölçümüne bağlı küçük farklar bırakılmamalıdır.
+- Çıktı panelinin üst ilerleme çubuğu kalın görünmemeli; yüksekliği `5 DIP` olmalıdır.
 - Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
 - Uygulama adı `VIDSHRINK` olarak tamamen büyük yazılmamalı; marka yazımı her yerde `VidShrink` olmalıdır.
 - Ana pencerenin özel başlık çubuğundaki `VidShrink` adı yeterlidir; içerik alanında aynı başlık ikinci kez tekrarlanmamalı, yalnızca açıklama gösterilmelidir.

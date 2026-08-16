@@ -92,7 +92,7 @@
 </UniformGrid>
 </StackPanel>
 </Border>
-     <Border x:Name="TargetPanel" Style="{StaticResource Panel}" Margin="0,16,0,0">
+     <Border x:Name="TargetPanel" Style="{StaticResource Panel}" Margin="0,16,0,0" Height="260">
 <StackPanel>
 <TextBlock Text="Target" Style="{StaticResource H2}"/>
 <Grid Margin="0,14,0,0">
@@ -161,10 +161,10 @@
 <Button x:Name="BtnRevert" Content="Back To Automatic" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
 </StackPanel>
 </Border>
-<Border Style="{StaticResource Panel}" Margin="0,16,0,0" Height="{Binding ActualHeight, ElementName=TargetPanel}">
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0" Height="260">
 <StackPanel>
 <TextBlock Text="Output" Style="{StaticResource H2}" Foreground="{StaticResource NeonBlue}"/>
-<ProgressBar x:Name="Progress" Height="8" Maximum="1" Margin="0,14,0,0"/>
+<ProgressBar x:Name="Progress" Height="5" Maximum="1" Margin="0,14,0,0"/>
 <UniformGrid Columns="2" Margin="0,12,0,0">
 <StackPanel>
 <TextBlock Text="Stage" Style="{StaticResource Label}" Foreground="{StaticResource NeonBlue}"/>
