@@ -12,7 +12,7 @@
 <Grid Margin="18,0,12,0">
 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 <Image Source="Assets/VidShrink.png" Width="36" Height="36" Stretch="Uniform" Margin="0,0,10,0"/>
-<TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="18" VerticalAlignment="Center"/>
+<TextBlock Text="VidShrink" Style="{StaticResource H2}" FontSize="18" VerticalAlignment="Center"/>
 </StackPanel>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
 <Button Content="—" Style="{StaticResource WindowControlButton}" ToolTip="Minimize" Click="OnMinimize"/>
@@ -22,11 +22,11 @@
 </Grid>
 </Border>
 <Grid Grid.Row="1" Margin="24,18,24,16">
-<StackPanel><TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="24"/><TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}"/></StackPanel>
+<StackPanel><TextBlock Text="VidShrink" Style="{StaticResource H2}" FontSize="24"/><TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}"/></StackPanel>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><Button x:Name="BtnTr" Content="TR" Style="{StaticResource ChipButton}" Click="OnTurkish"/><Button x:Name="BtnEn" Content="EN" Style="{StaticResource ChipButton}" Click="OnEnglish"/></StackPanel>
 </Grid>
   <TabControl Grid.Row="2" Margin="24,0,24,24" Style="{StaticResource NeonTabControl}">
-   <TabItem Header="SHRINK" Style="{StaticResource NeonTabItem}">
+   <TabItem Header="Shrink" Style="{StaticResource NeonTabItem}">
 <ScrollViewer VerticalScrollBarVisibility="Auto">
 <Grid Margin="0,16,0,0">
 <Grid.ColumnDefinitions>
@@ -37,26 +37,26 @@
     <StackPanel>
 <Border Style="{StaticResource Panel}">
 <StackPanel>
-<TextBlock Text="SOURCE" Style="{StaticResource H2}"/>
+<TextBlock Text="Source" Style="{StaticResource H2}"/>
 <Grid Margin="0,14,0,0">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
 <ColumnDefinition Width="Auto"/>
 </Grid.ColumnDefinitions>
 <TextBlock x:Name="TxtFileName" Text="Drop any media file here, or browse." Style="{StaticResource Body}" TextTrimming="CharacterEllipsis"/>
-<Button Grid.Column="1" Content="BROWSE" Style="{StaticResource GhostButton}" Click="OnBrowse"/>
+<Button Grid.Column="1" Content="Browse" Style="{StaticResource GhostButton}" Click="OnBrowse"/>
 </Grid>
 <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" Margin="0,18,0,0" Visibility="Collapsed">
 <StackPanel>
-<TextBlock Text="DURATION" Style="{StaticResource Label}"/>
+<TextBlock Text="Duration" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtDuration" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="SIZE" Style="{StaticResource Label}"/>
+<TextBlock Text="Size" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtSize" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/>
+<TextBlock Text="Resolution" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtResolution" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
@@ -64,15 +64,15 @@
 <TextBlock x:Name="TxtFps" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/>
+<TextBlock Text="Video codec" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtVideoCodec" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="AUDIO" Style="{StaticResource Label}"/>
+<TextBlock Text="Audio" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtAudio" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="BITRATE" Style="{StaticResource Label}"/>
+<TextBlock Text="Bitrate" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtBitrate" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
@@ -84,7 +84,7 @@
 </Border>
      <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
-<TextBlock Text="TARGET" Style="{StaticResource H2}"/>
+<TextBlock Text="Target" Style="{StaticResource H2}"/>
 <Grid Margin="0,14,0,0">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
@@ -102,7 +102,7 @@
 <Button Content="25" Tag="25" Style="{StaticResource ChipButton}" Click="OnPreset"/>
 <Button Content="50" Tag="50" Style="{StaticResource ChipButton}" Click="OnPreset"/>
 <Button Content="100" Tag="100" Style="{StaticResource ChipButton}" Click="OnPreset"/>
-<Button Content="HALF" Style="{StaticResource ChipButton}" Click="OnPresetHalf"/>
+<Button Content="Half" Style="{StaticResource ChipButton}" Click="OnPresetHalf"/>
 </StackPanel>
 <Grid Margin="0,16,0,0">
 <Grid.ColumnDefinitions>
@@ -113,11 +113,11 @@
 <ComboBox x:Name="CmbIntent" SelectedIndex="1" SelectionChanged="OnOptionChanged">
 <ComboBoxItem Content="Archive"/>
 <ComboBoxItem Content="Sharing"/>
-<ComboBoxItem Content="Social Media"/>
+<ComboBoxItem Content="Social media"/>
 </ComboBox>
 <ComboBox x:Name="CmbCodec" Grid.Column="2" SelectedIndex="0" SelectionChanged="OnOptionChanged">
 <ComboBoxItem Content="Compatible - H.264"/>
-<ComboBoxItem Content="Max Compression - H.265"/>
+<ComboBoxItem Content="Max compression - H.265"/>
 <ComboBoxItem Content="Fast - NVENC"/>
 </ComboBox>
 </Grid>
@@ -129,10 +129,10 @@
 </Border>
      <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
-<TextBlock Text="WHAT IT WILL DO" Style="{StaticResource H2}"/>
+<TextBlock Text="What it will do" Style="{StaticResource H2}"/>
 <TextBlock x:Name="TxtPlanSummary" Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,12,0,0"/>
 <TextBlock x:Name="TxtPlanReason" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
-<TextBlock Text="FFMPEG COMMAND" Style="{StaticResource Label}" Margin="0,12,0,4"/>
+<TextBlock Text="FFmpeg command" Style="{StaticResource Label}" Margin="0,12,0,4"/>
 <TextBox x:Name="TxtCommand" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="100"/>
 </StackPanel>
 </Border>
@@ -140,46 +140,46 @@
     <StackPanel Grid.Column="2">
 <Border Style="{StaticResource Panel}">
 <StackPanel>
-<TextBlock Text="AI SETTINGS" Style="{StaticResource H2}"/>
+<TextBlock Text="AI settings" Style="{StaticResource H2}"/>
 <TextBlock Text="Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer." Style="{StaticResource Hint}" TextWrapping="Wrap"/>
 <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
-<Button Content="COPY PROMPT" Style="{StaticResource GhostButton}" Click="OnCopyPrompt"/>
-<Button Content="APPLY PASTED JSON" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="OnApplyJson"/>
+<Button Content="Copy prompt" Style="{StaticResource GhostButton}" Click="OnCopyPrompt"/>
+<Button Content="Apply pasted JSON" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="OnApplyJson"/>
 </StackPanel>
 <TextBox x:Name="TxtAiJson" Height="150" Margin="0,12,0,0" AcceptsReturn="True" TextWrapping="Wrap"/>
 <TextBlock x:Name="TxtAiStatus" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
-<Button x:Name="BtnRevert" Content="BACK TO AUTOMATIC" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
+<Button x:Name="BtnRevert" Content="Back to automatic" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
 </StackPanel>
 </Border>
 <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
-<TextBlock Text="OUTPUT" Style="{StaticResource H2}"/>
+<TextBlock Text="Output" Style="{StaticResource H2}"/>
 <ProgressBar x:Name="Progress" Height="8" Maximum="1" Margin="0,14,0,0"/>
 <UniformGrid Columns="2" Margin="0,12,0,0">
 <StackPanel>
-<TextBlock Text="STAGE" Style="{StaticResource Label}"/>
+<TextBlock Text="Stage" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtStage" Text="Idle" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="REMAINING" Style="{StaticResource Label}"/>
+<TextBlock Text="Remaining" Style="{StaticResource Label}"/>
 <TextBlock x:Name="TxtRemaining" Text="-" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 </UniformGrid>
-<TextBlock Text="CURRENT OUTPUT SIZE" Style="{StaticResource Label}" Margin="0,12,0,0"/>
+<TextBlock Text="Current output size" Style="{StaticResource Label}" Margin="0,12,0,0"/>
 <TextBlock x:Name="TxtOutSize" Text="-" Style="{StaticResource MonoValue}" FontSize="24"/>
 <TextBlock x:Name="TxtResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
-<Button x:Name="BtnReveal" Content="SHOW IN FOLDER" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
+<Button x:Name="BtnReveal" Content="Show in folder" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
 </StackPanel>
 </Border>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-<Button x:Name="BtnCancel" Content="CANCEL" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
-<Button x:Name="BtnStart" Content="SHRINK" Style="{StaticResource PrimaryButton}" Margin="12,0,0,0" IsEnabled="False" Click="OnStart"/>
+<Button x:Name="BtnCancel" Content="Cancel" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
+<Button x:Name="BtnStart" Content="Shrink" Style="{StaticResource PrimaryButton}" Margin="12,0,0,0" IsEnabled="False" Click="OnStart"/>
 </StackPanel>
 </StackPanel>
    </Grid>
 </ScrollViewer>
 </TabItem>
-   <TabItem Header="CONVERT" Style="{StaticResource NeonTabItem}">
+   <TabItem Header="Convert" Style="{StaticResource NeonTabItem}">
 <ScrollViewer VerticalScrollBarVisibility="Auto">
 <Grid Margin="0,16,0,0">
 <Grid.ColumnDefinitions>
@@ -189,15 +189,15 @@
 </Grid.ColumnDefinitions>
 <Border Style="{StaticResource Panel}">
 <StackPanel>
-<TextBlock Text="CONVERSION" Style="{StaticResource H2}"/>
-<TextBlock x:Name="TxtConvertSource" Text="Load a source in SHRINK or browse here." Style="{StaticResource Body}" Margin="0,10,0,10"/>
-<Button Content="BROWSE SOURCE" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
+<TextBlock Text="Conversion" Style="{StaticResource H2}"/>
+<TextBlock x:Name="TxtConvertSource" Text="Load a source in Shrink or browse here." Style="{StaticResource Body}" Margin="0,10,0,10"/>
+<Button Content="Browse source" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
 <UniformGrid Columns="2" Margin="-8,16,-8,0">
 <UniformGrid.Resources>
 <Style TargetType="StackPanel"><Setter Property="Margin" Value="8,0,8,18"/></Style>
 </UniformGrid.Resources>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="CONTAINER" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="The container is the file type. MP4 is the safest general choice. MKV supports many stream types. WebM is intended for browsers. MOV suits Apple workflows. AVI is mainly for older software. MP3, M4A, and WAV create audio-only files." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Container" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="The container is the file type. MP4 is the safest general choice. MKV supports many stream types. WebM is intended for browsers. MOV suits Apple workflows. AVI is mainly for older software. MP3, M4A, and WAV create audio-only files." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbContainer" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="MP4"/>
 <ComboBoxItem Content="MKV"/>
@@ -211,7 +211,7 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="VIDEO CODEC" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="H.264 plays on almost every device. H.265 creates smaller files but may not play on older devices. VP9 is useful for WebM and browsers. AV1 offers strong compression but is the slowest. Copy keeps the original video without quality loss when the container supports it." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Video codec" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="H.264 plays on almost every device. H.265 creates smaller files but may not play on older devices. VP9 is useful for WebM and browsers. AV1 offers strong compression but is the slowest. Copy keeps the original video without quality loss when the container supports it." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbConvertCodec" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="H.264"/>
 <ComboBoxItem Content="H.265"/>
@@ -221,14 +221,14 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="QUALITY MODE" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="CRF targets visual quality, so final size can vary. Fixed Bitrate targets a data rate, making file size more predictable. Use CRF for normal viewing quality and Fixed Bitrate when size or bandwidth matters more." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Quality mode" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="CRF targets visual quality, so final size can vary. Fixed Bitrate targets a data rate, making file size more predictable. Use CRF for normal viewing quality and Fixed Bitrate when size or bandwidth matters more." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="CRF"/>
-<ComboBoxItem Content="Fixed Bitrate"/>
+<ComboBoxItem Content="Fixed bitrate"/>
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="CRF / BITRATE K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 starting point. In Fixed Bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="CRF / bitrate K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 starting point. In Fixed Bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <Grid Height="38">
 <Grid.ColumnDefinitions>
 <ColumnDefinition/>
@@ -240,7 +240,7 @@
 </Grid>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="RESOLUTION" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Source keeps the original dimensions. A numbered option limits output height while preserving aspect ratio. Lower resolution reduces file size and processing demand. Custom allows an exact width and height." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Resolution" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Source keeps the original dimensions. A numbered option limits output height while preserving aspect ratio. Lower resolution reduces file size and processing demand. Custom allows an exact width and height." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbResolution" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="Source"/>
 <ComboBoxItem Content="2160"/>
@@ -252,11 +252,11 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="CUSTOM WIDTH x HEIGHT" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Used only when Resolution is Custom. Enter width and height as 1280x720. Even dimensions are the safest choice for common video codecs." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Custom width x height" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Used only when Resolution is Custom. Enter width and height as 1280x720. Even dimensions are the safest choice for common video codecs." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtCustomResolution" Text="1280x720" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="FRAME RATE" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Source preserves the original frame rate. 60 is smoother but needs more data. 30 suits most video. 24 gives a cinema-like motion style. Reducing frame rate can reduce file size." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Frame rate" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Source preserves the original frame rate. 60 is smoother but needs more data. 30 suits most video. 24 gives a cinema-like motion style. Reducing frame rate can reduce file size." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbConvertFps" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="Source"/>
 <ComboBoxItem Content="60"/>
@@ -266,11 +266,11 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="CUSTOM FPS" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Used only when Frame Rate is Custom. Enter the desired frames per second, such as 25 or 29.97. Values above the source frame rate usually add no real motion detail." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Custom FPS" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Used only when Frame Rate is Custom. Enter the desired frames per second, such as 25 or 29.97. Values above the source frame rate usually add no real motion detail." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtCustomFps" Text="25" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="AUDIO" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="AAC is broadly compatible with MP4. Opus is efficient for WebM. MP3 suits older players. PCM is uncompressed and large. Copy preserves the original audio without re-encoding when supported. Drop removes audio completely." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Audio" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="AAC is broadly compatible with MP4. Opus is efficient for WebM. MP3 suits older players. PCM is uncompressed and large. Copy preserves the original audio without re-encoding when supported. Drop removes audio completely." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <ComboBox x:Name="CmbConvertAudio" SelectedIndex="0" SelectionChanged="OnConvertChanged">
 <ComboBoxItem Content="AAC"/>
 <ComboBoxItem Content="Opus"/>
@@ -281,15 +281,15 @@
 </ComboBox>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="AUDIO BITRATE K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Audio data rate in kilobits per second. 128 is a compact general setting, 192 provides more detail, and 256 or 320 is useful for music. This value is ignored for Copy, Drop, and uncompressed PCM." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Audio bitrate K" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Audio data rate in kilobits per second. 128 is a compact general setting, 192 provides more detail, and 256 or 320 is useful for music. This value is ignored for Copy, Drop, and uncompressed PCM." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtAudioBitrate" Text="128" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="START (HH:MM:SS)" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Optional trim start time. Leave empty to begin at the start of the source. Use hours:minutes:seconds, for example 00:01:30." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="Start (HH:MM:SS)" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Optional trim start time. Leave empty to begin at the start of the source. Use hours:minutes:seconds, for example 00:01:30." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtTrimStart" TextChanged="OnConvertChanged"/>
 </StackPanel>
 <StackPanel>
-<StackPanel Orientation="Horizontal"><TextBlock Text="END (HH:MM:SS)" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Optional trim end time. Leave empty to continue to the end of the source. The end time must be later than the start time." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
+<StackPanel Orientation="Horizontal"><TextBlock Text="End (HH:MM:SS)" Style="{StaticResource Label}"/><Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Text="Optional trim end time. Leave empty to continue to the end of the source. The end time must be later than the start time." TextWrapping="Wrap"/></Button.ToolTip></Button></StackPanel>
 <TextBox x:Name="TxtTrimEnd" TextChanged="OnConvertChanged"/>
 </StackPanel>
 </UniformGrid>
@@ -298,48 +298,48 @@
     <StackPanel Grid.Column="2">
 <Border Style="{StaticResource Panel}">
 <StackPanel>
-<TextBlock Text="FFMPEG COMMAND" Style="{StaticResource H2}"/>
+<TextBlock Text="FFmpeg command" Style="{StaticResource H2}"/>
 <TextBox x:Name="TxtConvertCommand" Height="150" Margin="0,12,0,0" IsReadOnly="True" TextWrapping="Wrap"/>
 <TextBlock x:Name="TxtConvertValidation" Style="{StaticResource Hint}" TextWrapping="Wrap"/>
 </StackPanel>
 </Border>
 <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
-<TextBlock Text="PROGRESS" Style="{StaticResource H2}"/>
+<TextBlock Text="Progress" Style="{StaticResource H2}"/>
 <ProgressBar x:Name="ConvertProgress" Height="8" Maximum="1" Margin="0,12,0,0"/>
 <TextBlock x:Name="TxtConvertStage" Text="Idle" Style="{StaticResource MonoValue}"/>
 <TextBlock x:Name="TxtConvertResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
-<Button x:Name="BtnConvertReveal" Content="SHOW IN FOLDER" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
+<Button x:Name="BtnConvertReveal" Content="Show in folder" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
 </StackPanel>
 </Border>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-<Button x:Name="BtnConvertCancel" Content="CANCEL" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
-<Button x:Name="BtnConvert" Content="CONVERT" Style="{StaticResource PrimaryButton}" IsEnabled="False" Margin="12,0,0,0" Click="OnConvert"/>
+<Button x:Name="BtnConvertCancel" Content="Cancel" Style="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
+<Button x:Name="BtnConvert" Content="Convert" Style="{StaticResource PrimaryButton}" IsEnabled="False" Margin="12,0,0,0" Click="OnConvert"/>
 </StackPanel>
 </StackPanel>
 </Grid>
 </ScrollViewer>
 </TabItem>
-   <TabItem Header="ABOUT" Style="{StaticResource NeonTabItem}">
+   <TabItem Header="About" Style="{StaticResource NeonTabItem}">
 <ScrollViewer VerticalScrollBarVisibility="Auto">
 <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
-<TextBlock Text="ABOUT VIDSHRINK" Style="{StaticResource H2}"/>
-<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,12,0,0" Text="VidShrink is an offline Windows tool for target-size video compression and format conversion. In SHRINK, the target size becomes a total bitrate budget: audio is reserved first, bits per pixel selects CRF or two-pass encoding, resolution steps down when necessary, and oversize output triggers a measured bitrate correction."/>
-<TextBlock Text="AUTOMATIC DECISION TABLE" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock Text="About VidShrink" Style="{StaticResource H2}"/>
+<TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,12,0,0" Text="VidShrink is an offline Windows tool for target-size video compression and format conversion. In Shrink, the target size becomes a total bitrate budget: audio is reserved first, bits per pixel selects CRF or two-pass encoding, resolution steps down when necessary, and oversize output triggers a measured bitrate correction."/>
+<TextBlock Text="Automatic decision table" Style="{StaticResource H2}" Margin="0,20,0,8"/>
 <TextBlock FontFamily="{StaticResource FontMono}" Foreground="{StaticResource TextBody}" Text="&gt;= 0.10      Keep resolution, quality-first CRF&#x0a;0.05-0.10    Keep resolution, two-pass VBR&#x0a;0.03-0.05    Halve high frame rates when needed&#x0a;&lt; 0.03       Step down the resolution ladder, then two-pass"/>
-<TextBlock Text="AI MODE" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock Text="AI mode" Style="{StaticResource H2}" Margin="0,20,0,8"/>
 <TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="AI mode only creates a prompt and validates pasted JSON. No AI is embedded, so VidShrink works offline, asks for no API key, and falls back to the complete automatic engine when an answer is malformed or incompatible."/>
-<TextBlock Text="CODECS" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock Text="Codecs" Style="{StaticResource H2}" Margin="0,20,0,8"/>
 <TextBlock Style="{StaticResource Body}" TextWrapping="Wrap" Text="H.264 offers the broadest compatibility. H.265 compresses more efficiently. VP9 is a strong WebM choice. AV1 maximizes modern compression at higher CPU cost. Stream copy is fastest and lossless when the destination supports the source streams."/>
-<TextBlock Text="SYSTEM STATUS" Style="{StaticResource H2}" Margin="0,20,0,8"/>
+<TextBlock Text="System status" Style="{StaticResource H2}" Margin="0,20,0,8"/>
 <TextBlock x:Name="TxtSystemStatus" Style="{StaticResource MonoValue}" TextWrapping="Wrap"/>
 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,28,0,0">
 <TextBlock>
-<Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">GITHUB / BY TEKNESYUM</Hyperlink>
+<Hyperlink NavigateUri="https://github.com/Teknesyum/vidshrink" Foreground="{StaticResource NeonBlue}" RequestNavigate="OnSignatureNavigate">GitHub / By Teknesyum</Hyperlink>
 </TextBlock>
 <TextBlock Margin="16,0,0,0">
-<Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Foreground="{StaticResource NeonPurple}" RequestNavigate="OnSignatureNavigate">BUY ME A COFFEE</Hyperlink>
+<Hyperlink NavigateUri="https://github.com/sponsors/Teknesyum" Foreground="{StaticResource NeonPurple}" RequestNavigate="OnSignatureNavigate">Buy me a coffee</Hyperlink>
 </TextBlock>
 </StackPanel>
 </StackPanel>

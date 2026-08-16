@@ -48,23 +48,27 @@
             </Style>
 
             <Style x:Key="InfoButton" TargetType="Button">
-                <Setter Property="Width" Value="22"/>
-                <Setter Property="Height" Value="22"/>
-                <Setter Property="Margin" Value="8,0,0,6"/>
+                <Setter Property="Width" Value="16"/>
+                <Setter Property="Height" Value="16"/>
+                <Setter Property="Margin" Value="4,-3,0,0"/>
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="Background" Value="#2200F3FF"/>
                 <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontSize" Value="11"/>
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Cursor" Value="Help"/>
                 <Setter Property="Focusable" Value="False"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="ToolTipService.InitialShowDelay" Value="120"/>
+                <Setter Property="ToolTipService.BetweenShowDelay" Value="0"/>
+                <Setter Property="ToolTipService.ShowDuration" Value="30000"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="InfoBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="11">
+                            <Border x:Name="InfoBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>

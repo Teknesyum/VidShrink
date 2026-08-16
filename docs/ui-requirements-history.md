@@ -39,9 +39,9 @@ Son güncelleme: 17 Ağustos 2026
 - Yalnızca gerçekten ikincil yardım ve durum metinlerinde 14 DIP istisnasına izin verilebilir.
 - Hiçbir metin 14 DIP değerinin altına düşmemelidir.
 - `FFMPEG KOMUTU` gibi küçük alan başlıkları da rahatça okunabilmelidir.
-- Rutin arayüz seçenekleri ve durum ifadeleri tamamen küçük harfle yazılmamalıdır.
-- Türkçe ve İngilizce seçeneklerde mümkün olduğunca her kelimenin ilk harfi büyük olmalıdır. Örnekler: `Sosyal Medya`, `En Yüksek Sıkıştırma`, `Sabit Bit Hızı`, `Boşta`, `FFmpeg: Hazır`.
-- Paragraf biçimindeki doğal açıklamalarda dilin normal yazım kuralları korunabilir; başlık ve kontrol metinleri için ilk harfleri büyük kullanım tercih edilmelidir.
+- Başlıklar dahil genel arayüz metinleri TAM BÜYÜK HARFLE yazılmamalıdır.
+- Metinler normal cümle biçiminde olmalı: ilk harf büyük, devamı küçük yazılmalıdır.
+- `CRF`, `FPS`, `HDR`, `AI`, `FFmpeg`, `TR`, `EN`, kodek ve dosya biçimi adları gibi gerçek kısaltmalar kendi doğru yazımını koruyabilir.
 
 ## 3. Dil Desteği
 
@@ -143,6 +143,7 @@ Son güncelleme: 17 Ağustos 2026
 - Kullanıcının `kodek`, `CRF`, `bit hızı`, `stream copy` veya kapsayıcı gibi teknik terimleri bildiği varsayılmamalıdır.
 - Önceki tek ve görünür Hızlı Ayar Rehberi talebi iptal edilmiştir; bütün açıklamalar ayrı bir panelde toplanmamalıdır.
 - Açıklama gerektiren her ayarın başlığının yanında yuvarlak içinde `?` simgesi bulunmalıdır.
+- `?` rozeti 16×16 DIP boyutunda küçük olmalı ve bağlı yazının sağ üstünde matematikteki üs işareti gibi konumlanmalıdır.
 - Fare `?` simgesinin üzerine geldiğinde ilgili ayarın ayrıntılı açıklaması gösterilmelidir.
 - Yardım balonu koyu neon zemine, neon kenarlığa, tam beyaz metne ve en az 16 DIP yazı boyutuna sahip olmalıdır.
 - Yardım içeriği Türkçe ve İngilizce dil geçişini takip etmelidir.

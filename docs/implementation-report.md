@@ -127,6 +127,12 @@ Atkinson Hyperlegible Next was selected because its letterforms are intentionall
 
 The selected compression-bracket and play-symbol prototype is now the product icon. Its outer canvas uses genuine PNG alpha transparency, while the symbol's intentional dark internal outlines remain intact. The same asset is embedded as a full-resolution PNG for the custom title panel and as a multi-resolution Windows ICO containing 16, 20, 24, 32, 40, 48, 64, 128, and 256 px layers for the executable and window identity.
 
+## Sentence-case and contextual-help refinement
+
+Interface headings, tabs, labels, and actions now use sentence case rather than all-capital text. Technical abbreviations such as CRF, FPS, HDR, AI, TR/EN, codecs, and file formats retain their correct capitalization. The Turkish and English catalogs were updated together and a real startup check caught and removed an ambiguous Turkish reverse-translation key.
+
+Contextual-help badges were reduced from 22×22 to 16×16 DIP and positioned as superscript marks at the upper-right of their labels. Their hover delay is 120 ms and the tooltip remains available for up to 30 seconds, using the existing 16 DIP white-on-dark neon tooltip style.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.
