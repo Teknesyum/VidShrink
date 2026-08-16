@@ -143,6 +143,8 @@ The Turkish product description is `Boyut Hedefli Media Sıkıştırma & Media C
 
 Sliders now use a pink filled track with a blue outline and an inverse blue thumb with a pink outline. Hovering the control strengthens the thumb outline and adds a pink neon response without changing text colors.
 
+The Output panel labels are explicitly neon blue. Its height is bound to the Target panel on the left so the paired panels retain equal height as content or language changes.
+
 ## August 2026 UI usability follow-up
 
 The latest pass is aimed at users who do not already know codec or encoding terminology.

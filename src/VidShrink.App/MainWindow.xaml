@@ -82,7 +82,7 @@
 </UniformGrid>
 </StackPanel>
 </Border>
-     <Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+     <Border x:Name="TargetPanel" Style="{StaticResource Panel}" Margin="0,16,0,0">
 <StackPanel>
 <TextBlock Text="Target" Style="{StaticResource H2}"/>
 <Grid Margin="0,14,0,0">
@@ -151,21 +151,21 @@
 <Button x:Name="BtnRevert" Content="Back To Automatic" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnRevertAuto"/>
 </StackPanel>
 </Border>
-<Border Style="{StaticResource Panel}" Margin="0,16,0,0">
+<Border Style="{StaticResource Panel}" Margin="0,16,0,0" Height="{Binding ActualHeight, ElementName=TargetPanel}">
 <StackPanel>
-<TextBlock Text="Output" Style="{StaticResource H2}"/>
+<TextBlock Text="Output" Style="{StaticResource H2}" Foreground="{StaticResource NeonBlue}"/>
 <ProgressBar x:Name="Progress" Height="8" Maximum="1" Margin="0,14,0,0"/>
 <UniformGrid Columns="2" Margin="0,12,0,0">
 <StackPanel>
-<TextBlock Text="Stage" Style="{StaticResource Label}"/>
+<TextBlock Text="Stage" Style="{StaticResource Label}" Foreground="{StaticResource NeonBlue}"/>
 <TextBlock x:Name="TxtStage" Text="Idle" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 <StackPanel>
-<TextBlock Text="Remaining" Style="{StaticResource Label}"/>
+<TextBlock Text="Remaining" Style="{StaticResource Label}" Foreground="{StaticResource NeonBlue}"/>
 <TextBlock x:Name="TxtRemaining" Text="-" Style="{StaticResource MonoValue}"/>
 </StackPanel>
 </UniformGrid>
-<TextBlock Text="Current Output Size" Style="{StaticResource Label}" Margin="0,12,0,0"/>
+<TextBlock Text="Current Output Size" Style="{StaticResource Label}" Foreground="{StaticResource NeonBlue}" Margin="0,12,0,0"/>
 <TextBlock x:Name="TxtOutSize" Text="-" Style="{StaticResource MonoValue}" FontSize="24"/>
 <TextBlock x:Name="TxtResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
 <Button x:Name="BtnReveal" Content="Show In Folder" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
