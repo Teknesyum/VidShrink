@@ -1,0 +1,198 @@
+# VidShrink Arayüz Talep Geçmişi
+
+Bu dosya, VidShrink için kullanıcı tarafından bugüne kadar iletilen bütün arayüz taleplerinin kalıcı kaydıdır. Gelecekte yapılacak arayüz çalışmalarında bu belge tasarım kontrol listesi olarak kullanılmalıdır. Yeni bir talep önceki bir maddeyi açıkça değiştiriyorsa en yeni talep geçerlidir.
+
+Son güncelleme: 17 Ağustos 2026
+
+## 1. Genel Tasarım Dili
+
+- Arayüz `teknesyum-ui` neon standardına uymalıdır.
+- Renk ve ölçüler gelişigüzel belirlenmemeli; öncelikle `Themes/Theme.xaml` içindeki ortak tasarım tokenları kullanılmalıdır.
+- WPF'in varsayılan gri veya beyaz kontrol görünümü kullanılmamalıdır.
+- Genel zemin koyu ve neon temayla uyumlu olmalıdır.
+- Neon vurgu renkleri özellikle başlıklarda, kenarlıklarda, seçili durumlarda, kaydırıcılarda ve eylem kontrollerinde kullanılmalıdır.
+- Yazılarda parlama veya bulanık gölge efekti kullanılmamalıdır. Metinler düz, keskin ve kolay okunur olmalıdır.
+- Nötr metin rengi gri olmamalı; tam beyaz kullanılmalıdır.
+- Başlık ile alt içerik arasında görsel hiyerarşi kurulmalıdır: başlık neon renkli, başlığa bağlı açıklama veya değer beyaz olmalıdır.
+- Panel başlıkları neon mavi olmalıdır.
+- Alan başlıkları ve ikincil bölüm başlıkları neon mor gibi temaya uygun bir vurgu rengi taşımalıdır.
+- Sayısal değerler ve komutlar mono yazı tipiyle gösterilmelidir.
+
+## 2. Tipografi
+
+- Ana arayüz yazı tipi `Segoe UI` olmalıdır.
+- Komut ve sayısal değerlerde `Consolas`, yedek olarak `Cascadia Mono` kullanılmalıdır.
+- Normal arayüz metinleri 16 DIP altına inmemelidir.
+- Etiketler, düğmeler, açılır listeler, giriş alanları, onay kutuları, sekmeler, açıklamalar ve değerler normalde en az 16 DIP olmalıdır.
+- Bölüm başlıkları 20 DIP veya daha büyük olabilir.
+- Yalnızca gerçekten ikincil yardım ve durum metinlerinde 14 DIP istisnasına izin verilebilir.
+- Hiçbir metin 14 DIP değerinin altına düşmemelidir.
+- `FFMPEG KOMUTU` gibi küçük alan başlıkları da rahatça okunabilmelidir.
+- Rutin arayüz seçenekleri ve durum ifadeleri tamamen küçük harfle yazılmamalıdır.
+- Türkçe ve İngilizce seçeneklerde mümkün olduğunca her kelimenin ilk harfi büyük olmalıdır. Örnekler: `Sosyal Medya`, `En Yüksek Sıkıştırma`, `Sabit Bit Hızı`, `Boşta`, `FFmpeg: Hazır`.
+- Paragraf biçimindeki doğal açıklamalarda dilin normal yazım kuralları korunabilir; başlık ve kontrol metinleri için ilk harfleri büyük kullanım tercih edilmelidir.
+
+## 3. Dil Desteği
+
+- Arayüz Türkçe ve İngilizce çalışmalıdır.
+- Programın varsayılan başlangıç dili Türkçe olmalıdır.
+- Kullanıcı çalışma sırasında `TR` ve `EN` kontrolleriyle dil değiştirebilmelidir.
+- Dil değişimi yalnızca sekme adlarını değil; düğmeleri, alan başlıklarını, seçenekleri, açıklamaları, doğrulama metinlerini, ilerleme aşamalarını ve durum çubuğunu da kapsamalıdır.
+- Dil değiştirildiğinde yüklenmiş dosya, seçili değerler ve hazırlanmış dönüştürme planı kaybolmamalıdır.
+- Türkçe metinler İngilizce karşılıklarından daha uzun olabileceği için yerleşim Türkçe görünüm esas alınarak doğrulanmalıdır.
+
+## 4. Açılır Listeler
+
+- `Sharing` gibi seçili değerler ilk bakışta net şekilde okunmalıdır.
+- Beyaz açılır liste zemini kullanılmamalıdır.
+- Açılır listelerin zemini koyu ve neon temayla uyumlu olmalıdır.
+- Seçili değerler tam beyaz ve yüksek kontrastlı olmalıdır.
+- Normal kenarlık neon mavi olabilir.
+- Üzerine gelindiğinde mor veya pembe neon anahat gösterilmesi istenmektedir.
+- Açılır liste içindeki vurgulanmış satır okunabilir bir metin–zemin kontrastına sahip olmalıdır.
+- Yan yana açılır listeler birbirine yapışmamalıdır.
+- Küçült ekranındaki amaç ve kodek seçicileri arasında en az 16 DIP boşluk bulunmalıdır.
+- Dönüştür ekranındaki iki sütunlu alanlar arasında belirgin yatay boşluk olmalıdır.
+- Açılır menü seçenekleri de 16 DIP yazı boyutunu korumalıdır.
+
+## 5. Alan ve Panel Yerleşimi
+
+- Kontroller ve paneller sıkışık veya birbirine yapışık görünmemelidir.
+- Dönüştür formundaki iki sütun arasında 16 DIP yatay oluk bulunmalıdır.
+- Form satırları arasında yaklaşık 18 DIP dikey ritim bulunmalıdır.
+- Alan başlığı ile bağlı kontrol arasında yaklaşık 6 DIP boşluk bulunmalıdır.
+- CRF kaydırıcısı ile sayısal giriş alanı birbirinden ayrılmalıdır.
+- Sekme içeriği gerektiğinde kaydırılabilir olmalı; ancak normal başlangıç boyutunda kullanıcı mümkün olduğunca aşağı kaydırmak zorunda kalmamalıdır.
+- Program başlangıçta daha büyük açılmalıdır.
+- Hedef başlangıç boyutu 1440×1000'dır; pencere mevcut Windows çalışma alanını aşmamalıdır.
+- Daha küçük ekranlarda içerik kaybolmamalı, sekme içi kaydırma devreye girmelidir.
+- Minimum pencere boyutunda bile kontroller üst üste binmemeli veya kırpılmamalıdır.
+
+## 6. Kaydırıcılar ve İlerleme Çubukları
+
+- `0–500 MB` hedef çubuğu varsayılan WPF görünümünde veya fazla sade olmamalıdır.
+- Kaydırıcılarda neon tema belirgin biçimde hissedilmelidir.
+- Kaydırıcı yolu koyu camgöbeği tonunda olmalıdır.
+- Dolu bölüm neon camgöbeği olmalıdır.
+- Tutamaç pembe/camgöbeği neon vurgulu olmalıdır.
+- Tutamaç ve yol rahatça görülecek büyüklükte olmalıdır.
+- Dönüştür ekranındaki CRF/bit hızı kaydırıcısı aynı tasarım sistemini kullanmalıdır.
+- İlerleme çubukları da koyu neon yol ve camgöbeği dolgu kullanmalıdır.
+- Neon görünüm metin parlamasıyla değil, kontrol yüzeyleri ve kenarlıklarıyla sağlanmalıdır.
+
+## 7. Sekme Yapısı
+
+- Ana pencere üç sekmeli olmalıdır: `KÜÇÜLT / SHRINK`, `DÖNÜŞTÜR / CONVERT`, `HAKKINDA / ABOUT`.
+- TabControl ve TabItem görünümleri neon temaya özel tasarlanmalıdır.
+- WPF'in varsayılan gri sekmeleri kabul edilmez.
+- Aktif sekme belirgin olmalı; üzerine gelme durumu da neon vurgu taşımalıdır.
+- Sekme başlıkları en az 16 DIP olmalıdır.
+
+## 8. Küçült Sekmesi
+
+- Kaynak seçimi, hedef boyut, otomatik/AI planı, yapılacak işlem, ffmpeg komutu, ilerleme ve çıktı bilgileri tek iş akışı içinde görünmelidir.
+- `Paylaşım / Sharing` ve `Uyumlu - H.264 / Compatible - H.264` metinleri eksiksiz ve yüksek kontrastla okunmalıdır.
+- Amaç ve kodek seçicileri yan yana durabilir ancak aralarında açık boşluk olmalıdır.
+- Hedef boyut kaydırıcısı neon temalı olmalıdır.
+- Hedef boyut değerinin yazıldığı alan beyaz ve okunaklı olmalıdır.
+- `Çözünürlük Düşürülebilir` ve `Kare Hızı Düşürülebilir` seçenekleri rahat okunmalıdır.
+- `Yapılacak İşlem` başlığı renkli olmalı; plan özeti ve gerekçesi beyaz olmalıdır.
+- CRF kullanıldığında arayüz kesin dosya boyutu uydurmamalı; hedef tavanı ve gerekirse düzeltileceğini dürüstçe belirtmelidir.
+- AI paneli isteğe bağlı görünmeli; otomatik motorun varsayılan olduğu anlaşılmalıdır.
+- İlerleme aşaması, kalan süre ve güncel çıktı boyutu açıkça gösterilmelidir.
+
+## 9. Dönüştür Sekmesi
+
+- Hedef boyut zorunluluğu olmadan format ve kodek dönüşümü sunmalıdır.
+- Hedef kapsayıcı seçenekleri: MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A ve WAV.
+- Video kodeği seçenekleri: H.264, H.265, VP9, AV1 ve Kopyala.
+- Kalite seçenekleri: CRF veya Sabit Bit Hızı.
+- Çözünürlük seçenekleri: Kaynak, 2160, 1440, 1080, 720, 480 ve Özel.
+- Kare hızı seçenekleri: Kaynak, 60, 30, 24 ve Özel.
+- Ses için kodek, bit hızı, Kopyala ve At seçenekleri bulunmalıdır.
+- Başlangıç ve bitiş zamanı ile isteğe bağlı kırpma yapılabilmelidir.
+- Çalıştırılacak ffmpeg komutu dönüşüm başlamadan önce görünmelidir.
+- İlerleme, iptal ve klasörde gösterme kontrolleri bulunmalıdır.
+- Alan başlıkları beyaz ve renksiz bırakılmamalı; neon renkle ayrıştırılmalıdır.
+- Alanların altındaki seçili değerler ve girilen değerler tam beyaz olmalıdır.
+- Form alanları hem yatay hem dikey yönde birbirinden ayrılmalıdır.
+- Normal pencere boyutunda mümkün olduğunca kaydırmadan kullanılabilmelidir.
+
+## 10. Kullanıcı Dostu Bilgi Paneli
+
+- Kullanıcının `kodek`, `CRF`, `bit hızı`, `stream copy` veya kapsayıcı gibi teknik terimleri bildiği varsayılmamalıdır.
+- Dönüştür ekranında görünür bir Hızlı Ayar Rehberi bulunmalıdır.
+- Rehber Türkçe ve İngilizce olmalıdır.
+- H.264 için geniş cihaz, TV, telefon ve internet uyumluluğu açıklanmalıdır.
+- H.265 için daha küçük dosya avantajı, daha uzun işlem süresi ve eski cihaz uyumluluğu riski açıklanmalıdır.
+- VP9'un WebM ve tarayıcı kullanımı için uygun olduğu açıklanmalıdır.
+- AV1'in daha küçük modern dosyalar üretebildiği ancak en yavaş seçenek olduğu açıklanmalıdır.
+- Kopyala seçeneğinin yeniden kodlama yapmadan kaliteyi koruduğu, ancak kapsayıcı desteğine bağlı olduğu açıklanmalıdır.
+- CRF'nin görsel kaliteyi seçtiği, dosya boyutunun değişebileceği ve düşük sayının daha yüksek kalite/daha büyük dosya anlamına geldiği anlatılmalıdır.
+- Sabit Bit Hızının daha öngörülebilir boyut gereken durumlara uygun olduğu anlatılmalıdır.
+- Kaynak ve Özel çözünürlük/kare hızı seçenekleri açıklanmalıdır.
+- Ses Kopyala ve At seçeneklerinin etkileri açıklanmalıdır.
+- Başlangıç/Bitiş alanlarının yalnızca seçilen zaman aralığını dönüştürdüğü açıklanmalıdır.
+- Bilgi panelinde başlıklar neon renkli, açıklamalar beyaz olmalıdır.
+
+## 11. Hakkında Sekmesi
+
+- Programın ne yaptığını kısa ve anlaşılır biçimde anlatmalıdır.
+- Hedef boyut yaklaşımını açıklamalıdır.
+- Otomatik karar sırasını açıklamalıdır: ses bütçesi, bit hızı, piksel başına bit tablosu, çözünürlük merdiveni ve boyut düzeltme turu.
+- Otomatik karar tablosu görünür olmalıdır.
+- AI modunun yalnızca istem oluşturduğu ve yapıştırılan JSON'u doğruladığı belirtilmelidir.
+- Gömülü AI bulunmamasının nedenleri açıklanmalıdır: çevrimdışı çalışma, API anahtarı gerektirmeme, yanıt doğrulama ve hatada otomatik motora dönüş.
+- Kodeklerin hangi durumda tercih edilebileceği açıklanmalıdır.
+- ffmpeg yolu ve sürümü, .NET sürümü ve uygulama sürümü gösterilmelidir.
+- GitHub bağlantısı ile imza/destek bloğu yalnızca bir kez bulunmalı ve Hakkında sekmesinin en altında yer almalıdır.
+
+## 12. Erişilebilirlik ve Okunabilirlik Kabul Ölçütleri
+
+- Beyaz zeminli açılır liste kalmamalıdır.
+- Gri nötr yazı kalmamalıdır.
+- Parlama efektli yazı kalmamalıdır.
+- Normal arayüz yazısı 16 DIP altına düşmemelidir.
+- İkincil yardım metni 14 DIP altına düşmemelidir.
+- Başlıklar ile değer/açıklamalar yalnızca konumla değil renk hiyerarşisiyle de ayrılmalıdır.
+- Yan yana kontroller birbirine değmemelidir.
+- Türkçe uzun metinler kesilmemeli veya komşu kontrolün üzerine taşmamalıdır.
+- Seçili açılır liste değeri kapalı durumda da açık durumda da okunmalıdır.
+- Neon tema karanlık zeminde kontrastı azaltmamalıdır.
+- Başlangıç penceresi mümkün olan çalışma alanını kullanmalı ve tipik 1440×1000 çalışma alanında Küçült sekmesi kaydırmasız görünmelidir.
+
+## 13. Doğrulama Beklentileri
+
+- Yalnızca derleme yapmak yeterli değildir; uygulama gerçekten açılmalıdır.
+- Üç sekme gerçek uygulama penceresinde gezilerek yerleşim kontrol edilmelidir.
+- Türkçe başlangıç görünümü ve İngilizce geçişi ayrı ayrı kontrol edilmelidir.
+- Açılır listelerin kapalı, açık, seçili ve üzerine gelinmiş durumları incelenmelidir.
+- Küçük ve normal pencere boyutlarında taşma, üst üste binme ve gereksiz kaydırma kontrol edilmelidir.
+- Kaydırıcı ve ilerleme çubuklarının neon teması gerçek WPF çiziminde doğrulanmalıdır.
+- Kullanıcıya sunulan rapor, gerçekten doğrulananlarla yalnızca kaynak üzerinden kontrol edilenleri birbirinden ayırmalıdır.
+
+## 14. Uygulanan Başlıca Düzeltmelerin Kaydı
+
+- Türkçe varsayılan dil ve çalışma zamanında TR/EN geçişi eklendi.
+- Beyaz yerel WPF açılır listeleri koyu neon şablonla değiştirildi.
+- Açılır liste yazıları tam beyaz ve 16 DIP yapıldı.
+- Küçült amaç/kodek seçicileri ve Dönüştür form alanları birbirinden ayrıldı.
+- Metin parlama efektleri kaldırıldı.
+- Genel tipografi 16 DIP seviyesine yükseltildi; ikincil metin alt sınırı 14 DIP yapıldı.
+- Gri nötr metinler tam beyaza çevrildi.
+- Alan başlıkları neon mora, bölüm başlıkları neon maviye ayrıldı.
+- Kaydırıcılar ve ilerleme çubukları neon temayla yeniden çizildi.
+- Başlangıç penceresi çalışma alanına bağlı 1440×1000 hedef boyuta yükseltildi.
+- Türkçe/İngilizce Hızlı Ayar Rehberi eklendi.
+- Seçenek ve durum metinlerinin ilk harf kullanımı düzenlendi.
+
+## 15. İlgili Dosyalar
+
+- `src/VidShrink.App/Themes/Theme.xaml`
+- `src/VidShrink.App/App.xaml`
+- `src/VidShrink.App/MainWindow.xaml`
+- `src/VidShrink.App/MainWindow.xaml.cs`
+- `src/VidShrink.App/LanguageCatalog.cs`
+- `docs/implementation-report.md`
+
+Bu belge yeni arayüz talepleri geldikçe güncellenmelidir. Yeni düzenlemeler mevcut maddelerden sapıyorsa değişikliğin tarihi, önceki kural ve yeni kural açıkça kaydedilmelidir.
