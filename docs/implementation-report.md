@@ -149,6 +149,8 @@ Native white scrollbars were replaced globally. The custom 10 DIP scrollbar uses
 
 The conversion quality value now identifies itself as `CRF Quality / Bitrate K` (`CRF Kalitesi / Bit Hızı K`). Its default 23 is rendered in a 42 DIP field using an 18 DIP bold cyan value and tighter vertical padding, preventing the number from appearing clipped or visually insignificant.
 
+The Convert progress status now starts 12 DIP below the progress line, preventing `Idle` / `Boşta` from visually touching the bar.
+
 The complete custom window is enclosed by a crisp 1 DIP neon-blue border with the same subtle 6 DIP corner radius used across the interface.
 
 The custom title bar now tests a restrained horizontal gradient: a dark cyan tint at the left transitions through the neutral surface into a subtle purple-pink tint at the right, preserving title and control contrast.

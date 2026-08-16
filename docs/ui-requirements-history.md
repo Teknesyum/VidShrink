@@ -159,6 +159,7 @@ Son güncelleme: 17 Ağustos 2026
 - Başlangıç ve bitiş zamanı ile isteğe bağlı kırpma yapılabilmelidir.
 - Çalıştırılacak ffmpeg komutu dönüşüm başlamadan önce görünmelidir.
 - İlerleme, iptal ve klasörde gösterme kontrolleri bulunmalıdır.
+- Dönüştür ilerleme panelindeki durum metni, ilerleme çizgisinden 12 DIP aşağıda başlamalıdır.
 - Alan başlıkları beyaz ve renksiz bırakılmamalı; neon renkle ayrıştırılmalıdır.
 - Alanların altındaki seçili değerler ve girilen değerler tam beyaz olmalıdır.
 - Form alanları hem yatay hem dikey yönde birbirinden ayrılmalıdır.

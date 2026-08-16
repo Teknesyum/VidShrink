@@ -312,7 +312,7 @@
 <StackPanel>
 <TextBlock Text="Progress" Style="{StaticResource H2}"/>
 <ProgressBar x:Name="ConvertProgress" Height="8" Maximum="1" Margin="0,12,0,0"/>
-<TextBlock x:Name="TxtConvertStage" Text="Idle" Style="{StaticResource MonoValue}"/>
+<TextBlock x:Name="TxtConvertStage" Text="Idle" Style="{StaticResource MonoValue}" Margin="0,12,0,0"/>
 <TextBlock x:Name="TxtConvertResult" Style="{StaticResource Body}" TextWrapping="Wrap"/>
 <Button x:Name="BtnConvertReveal" Content="Show In Folder" Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Visibility="Collapsed" Click="OnReveal"/>
 </StackPanel>
