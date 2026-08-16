@@ -157,11 +157,11 @@ The complete custom window is enclosed by a crisp 1 DIP neon-blue border with th
 
 The custom title bar now tests a restrained horizontal gradient: a dark cyan tint at the left transitions through the neutral surface into a subtle purple-pink tint at the right, preserving title and control contrast.
 
-The title bar was reduced from 54 to 46 DIP and then to 38 DIP. Window controls were first normalized to 48×30 DIP, then narrowed to a more compact 42×30 DIP footprint; the icon is 26 DIP. Its gradient uses five closely spaced stops for a softer transition.
+The title bar was reduced from 54 to 46 DIP and then to 38 DIP. Window controls were first normalized to 48×30 DIP, then narrowed to a more compact 42×30 DIP footprint; the icon is 26 DIP. Its gradient uses eleven extremely close stops for a softer transition.
 
 The former description-only secondary gradient was replaced by one centralized `WorkspaceBackground` gradient spanning the description/language row and the entire empty workspace behind all tabs. This removes the isolated strip and gives the whole lower black area one continuous transition.
 
-All application gradients now follow one smoothness rule: centralized brushes, at least seven closely spaced color stops, and ScRGB linear interpolation. Both `TitleBarBackground` and `WorkspaceBackground` were expanded to seven stops with smaller neighboring color deltas to suppress visible banding.
+All application gradients now follow one smoothness rule: centralized brushes, at least eleven extremely close color stops, low total endpoint contrast, and ScRGB linear interpolation. Both `TitleBarBackground` and `WorkspaceBackground` use eleven stops with tiny neighboring channel deltas to suppress visible banding and abrupt transitions.
 
 The minimize glyph is no longer a font em dash. It is a centered 10×2 DIP rounded line bound to the button foreground, producing a shorter and more predictable icon with matching hover feedback.
 

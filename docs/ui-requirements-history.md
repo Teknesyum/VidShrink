@@ -88,9 +88,9 @@ Son güncelleme: 17 Ağustos 2026
 - Genel köşe yarıçapı `6 DIP` olmalı; geniş, kapsül benzeri veya aşırı yuvarlak köşelerden kaçınılmalıdır.
 - Uygulama penceresinin en dışında tüm pencereyi çevreleyen `1 DIP` neon mavi anahat bulunmalıdır.
 - Özel üst başlık çubuğunda okunurluğu koruyan koyu yatay gradient kullanılmalıdır: sol tarafta hafif neon mavi, sağ tarafta düşük yoğunluklu mor/pembe ton bulunmalıdır.
-- Üst bar yüksekliği kompakt `38 DIP` olmalı ve gradient en az beş yakın renk durağıyla yumuşak geçmelidir.
-- Uygulamadaki bütün gradientler yumuşak geçişli olmalıdır; merkezi tema kaynağında en az yedi birbirine yakın renk durağı ve `ScRgbLinearInterpolation` kullanılmalıdır.
-- Komşu gradient durakları arasında ani renk veya parlaklık sıçraması bulunmamalı; görünür bantlaşma kabul edilmemelidir.
+- Üst bar yüksekliği kompakt `38 DIP` olmalı ve gradient en az on bir çok yakın renk durağıyla yumuşak geçmelidir.
+- Uygulamadaki bütün gradientler yumuşak geçişli olmalıdır; merkezi tema kaynağında en az on bir birbirine çok yakın renk durağı, düşük uç renk kontrastı ve `ScRgbLinearInterpolation` kullanılmalıdır.
+- Komşu gradient durakları arasında ani renk veya parlaklık sıçraması bulunmamalı; uç renklerin toplam kanal farkı sınırlı tutulmalı ve görünür bantlaşma kabul edilmemelidir.
 - Küçült, büyüt ve kapat düğmeleri yayvan olmamalı; kompakt `42×30 DIP` dikdörtgen kullanmalıdır.
 - Küçült simgesi font karakteri yerine ortalanmış `10×2 DIP` kısa çizgi olarak çizilmelidir.
 - Üst barın altındaki açıklama/dil şeridi ile sekmelerin arkasındaki bütün boş çalışma alanı tek ve kesintisiz merkezi `WorkspaceBackground` gradientini kullanmalıdır; açıklama satırı ayrı bir gradient bandı gibi görünmemelidir.

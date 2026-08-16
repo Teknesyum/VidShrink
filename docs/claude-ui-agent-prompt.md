@@ -47,7 +47,7 @@ Güncel üst alan:
 - Dış pencere anahattı 1 DIP neon mavi.
 - Üst bar 38 DIP ve merkezi TitleBarBackground gradientini kullanır.
 - Açıklama/dil şeridi ve bütün sekme arkası tek kesintisiz WorkspaceBackground gradientini kullanır; ayrı bant oluşturma.
-- Bütün gradientlerde en az yedi yakın renk durağı ve ScRgbLinearInterpolation kullan; görünür bantlaşma veya ani ton sıçramasını hata kabul et.
+- Bütün gradientlerde en az on bir çok yakın renk durağı, düşük uç renk kontrastı ve ScRgbLinearInterpolation kullan; görünür bantlaşma veya ani ton sıçramasını hata kabul et.
 - Logo 26 DIP.
 - Pencere düğmeleri 42×30 DIP.
 - Küçült simgesi 10×2 DIP çizgidir.
