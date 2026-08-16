@@ -40,7 +40,8 @@ Son güncelleme: 17 Ağustos 2026
 - Hiçbir metin 14 DIP değerinin altına düşmemelidir.
 - `FFMPEG KOMUTU` gibi küçük alan başlıkları da rahatça okunabilmelidir.
 - Başlıklar dahil genel arayüz metinleri TAM BÜYÜK HARFLE yazılmamalıdır.
-- Metinler normal cümle biçiminde olmalı: ilk harf büyük, devamı küçük yazılmalıdır.
+- Kısa arayüz metinlerinde (başlık, alan etiketi, düğme, seçenek ve kısa durum adı) her kelimenin ilk harfi büyük yazılmalıdır.
+- Uzun açıklamalar, yardım metinleri ve paragraflar doğal cümle biçiminde kalmalıdır.
 - `CRF`, `FPS`, `HDR`, `AI`, `FFmpeg`, `TR`, `EN`, kodek ve dosya biçimi adları gibi gerçek kısaltmalar kendi doğru yazımını koruyabilir.
 
 ## 3. Dil Desteği
@@ -212,7 +213,7 @@ Son güncelleme: 17 Ağustos 2026
 - Kaydırıcılar ve ilerleme çubukları neon temayla yeniden çizildi.
 - Başlangıç penceresi çalışma alanına bağlı 1440×1000 hedef boyuta yükseltildi.
 - Tek Hızlı Ayar Rehberi kaldırıldı; teknik alanların yanına Türkçe/İngilizce ayrıntılı `?` yardım balonları eklendi.
-- Seçenek ve durum metinlerinin ilk harf kullanımı düzenlendi.
+- Kısa başlık, alan etiketi, düğme, seçenek ve durum metinleri her kelimenin ilk harfi büyük olacak biçimde düzenlendi; uzun açıklamalar doğal cümle düzeninde bırakıldı.
 
 ## 15. İlgili Dosyalar
 
