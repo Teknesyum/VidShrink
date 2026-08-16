@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using System.Windows.Media;
 using Microsoft.Win32;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -20,25 +21,56 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _cts;
     private string? _lastOutput;
     private bool _syncing;
+    private bool _turkish;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += (_, _) => CheckTools();
+        Loaded += (_, _) => { SetLanguage(true); CheckTools(); };
+    }
+
+    private string T(string turkish, string english) => _turkish ? turkish : english;
+
+    private void OnTurkish(object sender, RoutedEventArgs e) => SetLanguage(true);
+    private void OnEnglish(object sender, RoutedEventArgs e) => SetLanguage(false);
+
+    private void SetLanguage(bool turkish)
+    {
+        if (IsLoaded && _turkish == turkish) return;
+        var translations = turkish ? LanguageCatalog.EnglishToTurkish : LanguageCatalog.TurkishToEnglish;
+        TranslateTree(this, translations, new HashSet<DependencyObject>());
+        _turkish = turkish;
+        BtnTr.Opacity = turkish ? 1 : 0.45;
+        BtnEn.Opacity = turkish ? 0.45 : 1;
+        CheckTools();
+        if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
+    }
+
+    private static void TranslateTree(DependencyObject node, IReadOnlyDictionary<string, string> translations, HashSet<DependencyObject> visited)
+    {
+        if (!visited.Add(node)) return;
+        if (node is TextBlock text && translations.TryGetValue(text.Text, out var translatedText)) text.Text = translatedText;
+        if (node is ContentControl content && content.Content is string value && translations.TryGetValue(value, out var translatedContent)) content.Content = translatedContent;
+        if (node is HeaderedContentControl header && header.Header is string headerValue && translations.TryGetValue(headerValue, out var translatedHeader)) header.Header = translatedHeader;
+        foreach (var child in LogicalTreeHelper.GetChildren(node).OfType<DependencyObject>()) TranslateTree(child, translations, visited);
+        if (node is Visual)
+            for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++) TranslateTree(VisualTreeHelper.GetChild(node, index), translations, visited);
     }
 
     private void CheckTools()
     {
         if (ToolLocator.IsAvailable(out var missing))
         {
-            TxtStatusBar.Text = $"ffmpeg: ready — {ToolLocator.Ffmpeg}";
-            TxtSystemStatus.Text = $"ffmpeg: {ToolLocator.Ffmpeg}\nversion: {ToolLocator.GetFfmpegVersion()}\n.NET: {Environment.Version}\nVidShrink: {Assembly.GetExecutingAssembly().GetName().Version}";
+            TxtStatusBar.Text = $"ffmpeg: {T("hazır", "ready")} — {ToolLocator.Ffmpeg}";
+            TxtSystemStatus.Text = $"ffmpeg: {ToolLocator.Ffmpeg}\n{T("sürüm", "version")}: {ToolLocator.GetFfmpegVersion()}\n.NET: {Environment.Version}\nVidShrink: {Assembly.GetExecutingAssembly().GetName().Version}";
         }
         else
         {
-            TxtStatusBar.Text = $"{missing} not found. Put ffmpeg.exe and ffprobe.exe in tools\\ffmpeg next to VidShrink.exe, or install them on PATH.";
+            TxtStatusBar.Text = _turkish
+                ? $"{missing} bulunamadı. VidShrink.exe yanındaki tools\\ffmpeg klasörüne koyun veya PATH'e kurun."
+                : $"{missing} not found. Put it in tools\\ffmpeg next to VidShrink.exe, or install it on PATH.";
             TxtSystemStatus.Text = TxtStatusBar.Text;
         }
     }
@@ -74,14 +106,14 @@ public partial class MainWindow : Window
     private async Task LoadAsync(string path)
     {
         TxtFileName.Text = Path.GetFileName(path);
-        TxtStatusBar.Text = "Probing with ffprobe...";
+        TxtStatusBar.Text = T("ffprobe ile inceleniyor...", "Probing with ffprobe...");
         try { _info = await FfprobeClient.ProbeAsync(path); }
         catch (Exception ex)
         {
             _info = null;
             BtnStart.IsEnabled = BtnConvert.IsEnabled = false;
             InfoGrid.Visibility = Visibility.Collapsed;
-            TxtStatusBar.Text = $"This file cannot be used: {ex.Message}";
+            TxtStatusBar.Text = $"{T("Bu dosya kullanılamıyor", "This file cannot be used")}: {ex.Message}";
             return;
         }
 
@@ -96,7 +128,7 @@ public partial class MainWindow : Window
         SliderTarget.Value = suggested;
         TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
-        TxtStatusBar.Text = $"ffmpeg: ready — {ToolLocator.Ffmpeg}";
+        TxtStatusBar.Text = $"ffmpeg: {T("hazır", "ready")} — {ToolLocator.Ffmpeg}";
         Recalculate();
         RefreshConversion();
     }
@@ -109,9 +141,9 @@ public partial class MainWindow : Window
         TxtResolution.Text = $"{info.Width}x{info.Height}";
         TxtFps.Text = info.Fps.ToString("0.##", CultureInfo.InvariantCulture);
         TxtVideoCodec.Text = info.VideoCodec;
-        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : "none";
+        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : T("yok", "none");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
-        TxtHdr.Text = info.IsHdr ? "yes" : "no";
+        TxtHdr.Text = info.IsHdr ? T("evet", "yes") : T("hayır", "no");
     }
 
     private void Recalculate()
@@ -126,7 +158,7 @@ public partial class MainWindow : Window
             {
                 _aiPlan = null;
                 BtnRevert.Visibility = Visibility.Collapsed;
-                TxtAiStatus.Text = "AI plan no longer matches the current options; using the automatic plan.";
+                TxtAiStatus.Text = T("AI planı güncel seçeneklerle artık eşleşmiyor; otomatik plan kullanılıyor.", "AI plan no longer matches the current options; using the automatic plan.");
             }
         }
         RefreshPlanView();
@@ -138,8 +170,8 @@ public partial class MainWindow : Window
         if (ActivePlan is not { } plan || _info is null) return;
         var quality = plan.ModeEnum == EncodeMode.Crf ? $"CRF {plan.Crf}" : $"{plan.VideoBitrateK}k two-pass";
         var estimate = PlanCalculator.EstimatedMb(plan, _info.DurationSeconds);
-        var size = estimate is null ? $"≤ {ParseTargetMb():0.##} MB target (quality mode; corrected if needed)" : $"estimated {estimate:0.0} MB";
-        TxtPlanSummary.Text = $"[{(_aiPlan is null ? "automatic" : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} fps · {(plan.AudioCodec is null ? "no audio" : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · preset {plan.Preset} → {size}";
+        var size = estimate is null ? $"≤ {ParseTargetMb():0.##} MB {T("hedef", "target")} ({T("kalite modu; gerekirse düzeltilir", "quality mode; corrected if needed")})" : $"{T("tahmini", "estimated")} {estimate:0.0} MB";
+        TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("otomatik", "automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} fps · {(plan.AudioCodec is null ? T("ses yok", "no audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · preset {plan.Preset} → {size}";
         TxtPlanReason.Text = plan.Reason;
         TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
     }
@@ -169,34 +201,34 @@ public partial class MainWindow : Window
 
     private void OnCopyPrompt(object sender, RoutedEventArgs e)
     {
-        if (_info is null || _autoPlan is null) { TxtAiStatus.Text = "Load a video first."; return; }
-        try { Clipboard.SetText(PromptBuilder.Build(_info, CurrentOptions(), _autoPlan)); TxtAiStatus.Text = "Prompt copied. Paste its JSON answer below."; }
-        catch (Exception ex) { TxtAiStatus.Text = $"The clipboard is unavailable: {ex.Message}"; }
+        if (_info is null || _autoPlan is null) { TxtAiStatus.Text = T("Önce bir video yükleyin.", "Load a video first."); return; }
+        try { Clipboard.SetText(PromptBuilder.Build(_info, CurrentOptions(), _autoPlan)); TxtAiStatus.Text = T("İstem kopyalandı. JSON yanıtını aşağıya yapıştırın.", "Prompt copied. Paste its JSON answer below."); }
+        catch (Exception ex) { TxtAiStatus.Text = $"{T("Pano kullanılamıyor", "The clipboard is unavailable")}: {ex.Message}"; }
     }
 
     private void OnApplyJson(object sender, RoutedEventArgs e)
     {
-        if (_info is null || _autoPlan is null) { TxtAiStatus.Text = "Load a video first."; return; }
+        if (_info is null || _autoPlan is null) { TxtAiStatus.Text = T("Önce bir video yükleyin.", "Load a video first."); return; }
         var result = PlanParser.Parse(TxtAiJson.Text, _info, CurrentOptions());
-        if (!result.Ok) { _aiPlan = null; TxtAiStatus.Text = "Rejected; using automatic:\n• " + string.Join("\n• ", result.Errors); RefreshPlanView(); return; }
+        if (!result.Ok) { _aiPlan = null; TxtAiStatus.Text = T("Reddedildi; otomatik plan kullanılıyor:\n• ", "Rejected; using automatic:\n• ") + string.Join("\n• ", result.Errors); RefreshPlanView(); return; }
         _aiPlan = result.Plan;
         BtnRevert.Visibility = Visibility.Visible;
         var differences = _autoPlan.DescribeDifferences(_aiPlan!).ToList();
-        TxtAiStatus.Text = differences.Count == 0 ? "The AI agreed with the automatic plan." : "Changes vs automatic:\n• " + string.Join("\n• ", differences);
-        if (result.Warnings.Count > 0) TxtAiStatus.Text += "\nWarnings:\n• " + string.Join("\n• ", result.Warnings);
+        TxtAiStatus.Text = differences.Count == 0 ? T("AI otomatik planla aynı kararı verdi.", "The AI agreed with the automatic plan.") : T("Otomatik plana göre değişiklikler:\n• ", "Changes vs automatic:\n• ") + string.Join("\n• ", differences);
+        if (result.Warnings.Count > 0) TxtAiStatus.Text += T("\nUyarılar:\n• ", "\nWarnings:\n• ") + string.Join("\n• ", result.Warnings);
         RefreshPlanView();
     }
 
-    private void OnRevertAuto(object sender, RoutedEventArgs e) { _aiPlan = null; BtnRevert.Visibility = Visibility.Collapsed; TxtAiStatus.Text = "Back on the automatic plan."; RefreshPlanView(); }
+    private void OnRevertAuto(object sender, RoutedEventArgs e) { _aiPlan = null; BtnRevert.Visibility = Visibility.Collapsed; TxtAiStatus.Text = T("Otomatik plana dönüldü.", "Back on the automatic plan."); RefreshPlanView(); }
 
     private async void OnStart(object sender, RoutedEventArgs e)
     {
         if (_info is null || ActivePlan is null) return;
         var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4");
         _cts = new CancellationTokenSource(); SetRunning(true); TxtResult.Text = ""; BtnReveal.Visibility = Visibility.Collapsed;
-        var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = p.Stage; TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
-        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, ParseTargetMb(), progress, _cts.Token); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller)." : result.Error; BtnReveal.Visibility = Visibility.Visible; }
-        catch (OperationCanceledException) { TxtResult.Text = "Cancelled."; } catch (Exception ex) { TxtResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); }
+        var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = LocalizeStage(p.Stage); TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
+        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, ParseTargetMb(), progress, _cts.Token); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
+        catch (OperationCanceledException) { TxtResult.Text = T("İptal edildi.", "Cancelled."); } catch (Exception ex) { TxtResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); }
     }
 
     private ConversionPlan ReadConversionPlan()
@@ -254,7 +286,7 @@ public partial class MainWindow : Window
         var errors = ConversionArguments.Validate(_info, plan).ToList();
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue) errors.Add("Trim times must use HH:MM:SS format.");
         var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
-        TxtConvertValidation.Text = errors.Count == 0 ? "Ready." : string.Join("\n", errors);
+        TxtConvertValidation.Text = errors.Count == 0 ? T("Hazır.", "Ready.") : string.Join("\n", errors);
         BtnConvert.IsEnabled = errors.Count == 0 && _cts is null;
         try { TxtConvertCommand.Text = errors.Count == 0 ? FfmpegArguments.ToCommandLine(ConversionArguments.Build(_info, plan, output, plan.Gif ? "palette.png" : null)) : ""; } catch (Exception ex) { TxtConvertValidation.Text = ex.Message; BtnConvert.IsEnabled = false; }
     }
@@ -264,12 +296,22 @@ public partial class MainWindow : Window
         if (_info is null) return;
         var plan = ReadConversionPlan(); var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
         _cts = new CancellationTokenSource(); SetRunning(true); TxtConvertResult.Text = ""; BtnConvertReveal.Visibility = Visibility.Collapsed;
-        var progress = new Progress<EncodeProgress>(p => { ConvertProgress.Value = p.Fraction; TxtConvertStage.Text = p.Stage; });
-        try { var result = await new EncodeRunner().ConvertAsync(_info, plan, output, progress, _cts.Token); _lastOutput = result.OutputPath; TxtConvertResult.Text = $"Done. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB."; BtnConvertReveal.Visibility = Visibility.Visible; }
-        catch (OperationCanceledException) { TxtConvertResult.Text = "Cancelled."; } catch (Exception ex) { TxtConvertResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); RefreshConversion(); }
+        var progress = new Progress<EncodeProgress>(p => { ConvertProgress.Value = p.Fraction; TxtConvertStage.Text = LocalizeStage(p.Stage); });
+        try { var result = await new EncodeRunner().ConvertAsync(_info, plan, output, progress, _cts.Token); _lastOutput = result.OutputPath; TxtConvertResult.Text = $"{T("Tamamlandı", "Done")}. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB."; BtnConvertReveal.Visibility = Visibility.Visible; }
+        catch (OperationCanceledException) { TxtConvertResult.Text = T("İptal edildi.", "Cancelled."); } catch (Exception ex) { TxtConvertResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); RefreshConversion(); }
     }
 
-    private void SetRunning(bool running) { BtnStart.IsEnabled = !running && _info is not null; BtnConvert.IsEnabled = !running && _info is not null; BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running; if (!running) { TxtStage.Text = TxtConvertStage.Text = "idle"; TxtRemaining.Text = "-"; } }
+    private void SetRunning(bool running) { BtnStart.IsEnabled = !running && _info is not null; BtnConvert.IsEnabled = !running && _info is not null; BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running; if (!running) { TxtStage.Text = TxtConvertStage.Text = T("boşta", "idle"); TxtRemaining.Text = "-"; } }
+    private string LocalizeStage(string stage)
+    {
+        if (!_turkish) return stage;
+        return stage.Replace("encoding", "kodlama", StringComparison.OrdinalIgnoreCase)
+            .Replace("converting", "dönüştürme", StringComparison.OrdinalIgnoreCase)
+            .Replace("pass", "geçiş", StringComparison.OrdinalIgnoreCase)
+            .Replace("attempt", "deneme", StringComparison.OrdinalIgnoreCase)
+            .Replace("GIF palette", "GIF paleti", StringComparison.OrdinalIgnoreCase)
+            .Replace("GIF encode", "GIF kodlama", StringComparison.OrdinalIgnoreCase);
+    }
     private void OnCancel(object sender, RoutedEventArgs e) => _cts?.Cancel();
     private void OnReveal(object sender, RoutedEventArgs e) { if (_lastOutput is not null && File.Exists(_lastOutput)) Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_lastOutput}\"") { UseShellExecute = true }); }
     private void OnSignatureNavigate(object sender, RequestNavigateEventArgs e) { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); e.Handled = true; }

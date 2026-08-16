@@ -63,8 +63,18 @@
                 <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
                 <Setter Property="FontSize" Value="13"/>
                 <Setter Property="Padding" Value="8,6"/>
-                <Setter Property="Background" Value="#14000000"/>
-                <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+                <Setter Property="Background" Value="#FFF3F4F6"/>
+                <Setter Property="Foreground" Value="#FF111827"/>
+                <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+
+            <Style TargetType="ComboBoxItem">
+                <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Background" Value="#FFF3F4F6"/>
+                <Setter Property="Foreground" Value="#FF111827"/>
+                <Setter Property="Padding" Value="8,6"/>
             </Style>
 
             <Style TargetType="TextBox">

@@ -2,6 +2,8 @@
 
 VidShrink is a free, offline Windows application for shrinking video to a target file size and converting media with ffmpeg.
 
+The interface starts in Turkish and can be switched instantly between Turkish and English with the `TR` and `EN` buttons. The selected values in all drop-down controls use a high-contrast dark-on-light style for readability.
+
 ## Shrink
 
 Drop or browse to any file that `ffprobe` recognizes as containing a video stream. The filename extension is never an acceptance gate. Silent video, variable-frame-rate sources, animated GIF, rotation metadata, and uncommon containers work whenever the installed ffmpeg build can decode them.

@@ -5,10 +5,10 @@
 <RowDefinition Height="*"/>
 <RowDefinition Height="Auto"/>
 </Grid.RowDefinitions>
-  <StackPanel Margin="0,0,0,16">
-<TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="24"/>
-<TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}"/>
-</StackPanel>
+<Grid Margin="0,0,0,16">
+<StackPanel><TextBlock Text="VIDSHRINK" Style="{StaticResource H2}" FontSize="24"/><TextBlock Text="Target-size compression and flexible media conversion." Style="{StaticResource Hint}"/></StackPanel>
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><Button x:Name="BtnTr" Content="TR" Style="{StaticResource ChipButton}" Click="OnTurkish"/><Button x:Name="BtnEn" Content="EN" Style="{StaticResource ChipButton}" Click="OnEnglish"/></StackPanel>
+</Grid>
   <TabControl Grid.Row="1" Style="{StaticResource NeonTabControl}">
    <TabItem Header="SHRINK" Style="{StaticResource NeonTabItem}">
 <ScrollViewer VerticalScrollBarVisibility="Auto">
