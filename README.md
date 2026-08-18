@@ -6,6 +6,24 @@ Give it a file and a ceiling in megabytes. It never returns a file larger than y
 
 The interface starts in Turkish and switches to English instantly with the `TR` / `EN` buttons.
 
+![VidShrink current interface](docs/assets/vidshrink-current.png)
+
+## One-command Windows installation
+
+Open PowerShell and run:
+
+```powershell
+irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
+```
+
+The installer checks for the .NET 8 SDK and FFmpeg/FFprobe, installs missing dependencies through WinGet, downloads the latest `main` source, publishes a self-contained Windows x64 Release build, installs it under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. Running the same command again replaces the installed app with the newest version.
+
+If PowerShell script execution is restricted by organizational policy, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session.
+
+### README image portability
+
+The screenshot above is committed at `docs/assets/vidshrink-current.png` and referenced with a repository-relative path. Do not replace it with a path such as `C:\Users\...`, a temporary Codex attachment path, or a `file://` URL: those addresses exist only on the computer that created them. On GitHub, also keep filename capitalization identical and make sure the image file is committed and pushed rather than merely present in the local working folder.
+
 ## Why this one
 
 Most size-target compressors apply a lookup table. So many megabytes per minute becomes so much resolution, regardless of whether you handed it a static screen recording or a handheld night shot. That table is wrong for every clip that is not average — which is most clips.
@@ -87,7 +105,7 @@ Stream copy uses real `-c:v copy` and `-c:a copy`. Incompatible container and so
 - **AV1** compresses best and encodes slowest; only recent phones decode it.
 - **Stream copy** is instant and lossless when the destination accepts the source streams.
 
-## Requirements and build
+## Requirements and development build
 
 - Windows 10 or 11
 - .NET 8 Desktop Runtime

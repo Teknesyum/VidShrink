@@ -4,6 +4,10 @@
 
 A full correctness and competitiveness audit is documented in `docs/claude-engine-audit-report.md`. The audit fixed the unfiltered GIF palette graph, audio-aware target-size correction, invalid container/codec combinations, unsafe AI extra arguments, AI plans bypassing resolution/FPS permissions, odd custom dimensions, invalid trim starts, and partial files left by FFmpeg failures. The solution now contains a real xUnit project with 11 passing regression tests; previously `dotnet test` ran no tests.
 
+## Portable README and one-command installation
+
+The README now embeds a committed current-interface capture through the repository-relative `docs/assets/vidshrink-current.png` path. `Install-VidShrink.ps1` provides the documented one-command Windows installation: it checks .NET 8 SDK and FFmpeg/FFprobe, installs missing dependencies through WinGet, downloads the current `main` source, publishes a self-contained x64 Release build, installs under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. An isolated installation under `VidShrink-InstallerTest` was executed, its app and bundled FFmpeg tools were verified, the installed application was launched successfully, and the test installation was then removed.
+
 This report is intended for an independent code and product review.
 
 ## Product behavior

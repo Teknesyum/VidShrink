@@ -6,6 +6,7 @@
 - Çözümde artık `tests/VidShrink.Tests` bulunur; 11 regresyon testi gerçek davranışları doğrular.
 - Filtresiz GIF, ses payını ayıran hedef düzeltmesi, container/codec doğrulaması, güvenli AI extraArgs allowlist'i, AI çözünürlük/FPS izinleri ve hata sonrası kısmi çıktı temizliği uygulanmıştır.
 - "Piyasanın en iyisi" henüz kanıtlanmış değildir. HDR/10-bit doğruluğu, algısal örnek arama ve rakip benchmark laboratuvarı P0 kabul edilmelidir.
+- README güncel uygulama ekran görüntüsünü `docs/assets/vidshrink-current.png` göreli yolundan gösterir. Tek komutlu Windows kurulumu kökteki `Install-VidShrink.ps1` ile yapılır; kurucu bağımlılıkları tamamlar, self-contained Release yayımlar ve masaüstü/Başlat Menüsü kısayollarını oluşturur.
 
 Son güncelleme: 17 Ağustos 2026  
 Depo: `C:\Users\Administrator\Desktop\Projeler\vidshrink`  
