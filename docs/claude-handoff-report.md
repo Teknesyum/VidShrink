@@ -1,5 +1,12 @@
 # VidShrink Claude Teslim Raporu
 
+## 18 Ağustos 2026 motor denetimi
+
+- Ayrıntılı hata analizi, düzeltilen motor kusurları ve piyasa liderliği yol haritası: `docs/claude-engine-audit-report.md`.
+- Çözümde artık `tests/VidShrink.Tests` bulunur; 11 regresyon testi gerçek davranışları doğrular.
+- Filtresiz GIF, ses payını ayıran hedef düzeltmesi, container/codec doğrulaması, güvenli AI extraArgs allowlist'i, AI çözünürlük/FPS izinleri ve hata sonrası kısmi çıktı temizliği uygulanmıştır.
+- "Piyasanın en iyisi" henüz kanıtlanmış değildir. HDR/10-bit doğruluğu, algısal örnek arama ve rakip benchmark laboratuvarı P0 kabul edilmelidir.
+
 Son güncelleme: 17 Ağustos 2026  
 Depo: `C:\Users\Administrator\Desktop\Projeler\vidshrink`  
 Dal: `main`

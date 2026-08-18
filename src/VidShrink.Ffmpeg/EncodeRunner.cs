@@ -49,12 +49,17 @@ public sealed class EncodeRunner
                     return new EncodeResult(actualMb <= targetMb * ToleranceOver, outputPath, actualMb, current, attempt,
                         actualMb <= targetMb * ToleranceOver ? null : $"Could not get under the target after {attempt} attempts (last result: {actualMb:0.0} MB).");
 
-                current = PlanCalculator.Correct(current, actualMb, targetMb);
+                current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds);
             }
 
             return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.");
         }
         catch (OperationCanceledException)
+        {
+            TryDelete(outputPath);
+            throw;
+        }
+        catch
         {
             TryDelete(outputPath);
             throw;
@@ -90,6 +95,7 @@ public sealed class EncodeRunner
             return new ConversionResult(outputPath, new FileInfo(outputPath).Length / 1024.0 / 1024.0);
         }
         catch (OperationCanceledException) { TryDelete(outputPath); throw; }
+        catch { TryDelete(outputPath); throw; }
     }
 
     private static async Task RunOneAsync(

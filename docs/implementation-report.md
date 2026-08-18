@@ -1,5 +1,9 @@
 # VidShrink v0.2 implementation report
 
+## August 18, 2026 engine audit
+
+A full correctness and competitiveness audit is documented in `docs/claude-engine-audit-report.md`. The audit fixed the unfiltered GIF palette graph, audio-aware target-size correction, invalid container/codec combinations, unsafe AI extra arguments, AI plans bypassing resolution/FPS permissions, odd custom dimensions, invalid trim starts, and partial files left by FFmpeg failures. The solution now contains a real xUnit project with 11 passing regression tests; previously `dotnet test` ran no tests.
+
 This report is intended for an independent code and product review.
 
 ## Product behavior

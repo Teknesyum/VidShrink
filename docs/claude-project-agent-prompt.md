@@ -9,15 +9,16 @@ C:\Users\Administrator\Desktop\Projeler\vidshrink
 İlk iş olarak aşağıdaki dosyaları tamamen oku:
 1. AGENTS.md ve referans verdiği C:\Users\Administrator\.codex\RTK.md
 2. docs/claude-handoff-report.md
-3. docs/implementation-report.md
-4. docs/ui-requirements-history.md
-5. README.md
-6. src/VidShrink.App/MainWindow.xaml
-7. src/VidShrink.App/MainWindow.xaml.cs
-8. src/VidShrink.App/App.xaml
-9. src/VidShrink.App/Themes/Theme.xaml
-10. src/VidShrink.App/LanguageCatalog.cs
-11. src/VidShrink.Core ve src/VidShrink.Ffmpeg içindeki ilgili kaynaklar
+3. docs/claude-engine-audit-report.md
+4. docs/implementation-report.md
+5. docs/ui-requirements-history.md
+6. README.md
+7. src/VidShrink.App/MainWindow.xaml
+8. src/VidShrink.App/MainWindow.xaml.cs
+9. src/VidShrink.App/App.xaml
+10. src/VidShrink.App/Themes/Theme.xaml
+11. src/VidShrink.App/LanguageCatalog.cs
+12. src/VidShrink.Core, src/VidShrink.Ffmpeg ve tests/VidShrink.Tests içindeki ilgili kaynaklar
 
 Görevin:
 - Mevcut davranışı bozmadan projeyi sürdürmek.

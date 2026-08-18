@@ -7,11 +7,22 @@ public static class ConversionArguments
     public static IReadOnlyList<string> Validate(MediaInfo info, ConversionPlan plan)
     {
         var errors = new List<string>();
+        if (plan.Start is { } startValue && startValue < TimeSpan.Zero) errors.Add("Start time cannot be negative.");
+        if (plan.End is { } endValue && endValue <= TimeSpan.Zero) errors.Add("End time must be greater than zero.");
         if (plan.End is { } end && plan.Start is { } start && end <= start) errors.Add("End time must be after start time.");
+        if (plan.Start is { } sourceEnd && sourceEnd.TotalSeconds >= info.DurationSeconds) errors.Add("Start time must be before the end of the source.");
+        if (plan.Width is <= 0 || plan.Height is <= 0) errors.Add("Resolution dimensions must be positive.");
+        if (plan.Width is { } width && width % 2 != 0 || plan.Height is { } height && height % 2 != 0) errors.Add("Resolution dimensions must be even for the selected pixel format.");
+        if (plan.Fps is <= 0) errors.Add("Frame rate must be greater than zero.");
         if (plan.VideoCodec == "copy" && (plan.Height is not null || plan.Width is not null || plan.Fps is not null)) errors.Add("Stream copy cannot change resolution or frame rate.");
         if (plan.VideoCodec == "copy" && plan.Container == "gif") errors.Add("GIF requires video encoding and cannot use stream copy.");
         if (plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
         if (plan.AudioOnly && !info.HasAudio) errors.Add("The source has no audio stream to extract.");
+
+        if (!plan.AudioOnly && !plan.Gif && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
+            errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
+        if (!plan.Gif && plan.AudioCodec is { } audioCodec && audioCodec != "copy" && !AudioEncodeCompatible(plan.Container, audioCodec))
+            errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {audioCodec} audio encoder.");
 
         var source = info.VideoCodec.ToLowerInvariant();
         if (plan.VideoCodec == "copy" && !VideoCopyCompatible(plan.Container, source))
@@ -45,7 +56,10 @@ public static class ConversionArguments
                 a.AddRange(new[] { "-vf", string.Join(',', filters.Append("palettegen=stats_mode=diff")), palettePath = outputPath });
             else
             {
-                a.AddRange(new[] { "-i", palettePath, "-lavfi", $"{string.Join(',', filters)}[x];[x][1:v]paletteuse=dither=sierra2_4a" });
+                var graph = filters.Count == 0
+                    ? "[0:v][1:v]paletteuse=dither=sierra2_4a"
+                    : $"{string.Join(',', filters)}[x];[x][1:v]paletteuse=dither=sierra2_4a";
+                a.AddRange(new[] { "-i", palettePath, "-lavfi", graph });
                 a.Add(outputPath);
             }
             return a;
@@ -100,6 +114,27 @@ public static class ConversionArguments
         "wav" => codec is "pcm_s16le" or "pcm_s24le" or "pcm_f32le",
         "avi" => codec is "mp3" or "aac" or "pcm_s16le",
         "mkv" => true,
+        _ => false
+    };
+
+    private static bool VideoEncodeCompatible(string container, string codec) => container switch
+    {
+        "mp4" or "mov" => codec is "libx264" or "libx265" or "libsvtav1" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv",
+        "webm" => codec is "libvpx-vp9" or "libsvtav1",
+        "avi" => codec is "libx264",
+        "mkv" => true,
+        _ => false
+    };
+
+    private static bool AudioEncodeCompatible(string container, string codec) => container switch
+    {
+        "mp4" or "m4a" => codec is "aac" or "libmp3lame",
+        "mov" => codec is "aac" or "libmp3lame" or "pcm_s16le",
+        "webm" => codec is "libopus",
+        "mp3" => codec is "libmp3lame",
+        "wav" => codec is "pcm_s16le",
+        "avi" => codec is "libmp3lame" or "pcm_s16le",
+        "mkv" => codec is "aac" or "libopus" or "libmp3lame" or "pcm_s16le",
         _ => false
     };
 

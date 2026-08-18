@@ -162,15 +162,21 @@ public static class PlanCalculator
         return new SizeEstimate(expectedMb, expectedMb * (1 - band), expectedMb * (1 + band), complexity.Measured, false);
     }
 
-    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb)
+    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds)
     {
         var corrected = plan.Clone();
-        var factor = targetMb * CrfFitMargin / Math.Max(actualMb, 0.01);
+        var desiredMb = targetMb * CrfFitMargin;
+        var audioMb = SizeMb(0, plan.AudioBitrateK, durationSeconds);
+        var actualVideoMb = Math.Max(actualMb - audioMb, 0.01);
+        var desiredVideoMb = Math.Max(desiredMb - audioMb, 0.01);
+        var factor = desiredVideoMb / actualVideoMb;
+        var totalBudgetK = desiredMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
+        var videoBudgetK = Math.Max(1, totalBudgetK - plan.AudioBitrateK);
         var previousVideoK = plan.VideoBitrateK;
         corrected.Mode = "2pass";
         corrected.Crf = null;
-        corrected.VideoBitrateK = Math.Max(MinVideoBitrateK, (int)Math.Round(previousVideoK * factor));
-        corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target, so the video bitrate was scaled by {factor:0.###}";
+        corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
+        corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###} and capped to the remaining budget";
         return corrected;
     }
 

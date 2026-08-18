@@ -95,6 +95,7 @@ Stream copy uses real `-c:v copy` and `-c:a copy`. Incompatible container and so
 
 ```powershell
 dotnet build VidShrink.sln -c Release
+dotnet test VidShrink.sln
 ```
 
 ## Project layout
@@ -103,7 +104,10 @@ dotnet build VidShrink.sln -c Release
 src/VidShrink.Core     complexity model, strategy, planning, ffmpeg argument construction
 src/VidShrink.Ffmpeg   ffprobe, complexity probe, encode execution
 src/VidShrink.App      WPF user interface
+tests/VidShrink.Tests  engine and argument-generation regression tests
 ```
+
+The current engine audit, fixed defects, benchmark requirements, and quality roadmap are documented in [`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md). A market-leading claim is intentionally deferred until the HDR/10-bit, perceptual-metric, and competitor benchmark gates in that report are met.
 
 ## License
 

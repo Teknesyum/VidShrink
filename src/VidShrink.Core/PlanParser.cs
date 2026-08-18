@@ -61,6 +61,23 @@ public static class PlanParser
         if (plan.Width % 2 != 0) { plan.Width++; warnings.Add("Width was odd, rounded up by one pixel."); }
         if (plan.Height % 2 != 0) { plan.Height++; warnings.Add("Height was odd, rounded up by one pixel."); }
 
+        if (!options.AllowResolutionDrop && (plan.Width != info.Width || plan.Height != info.Height))
+        {
+            plan.Width = info.Width % 2 == 0 ? info.Width : info.Width - 1;
+            plan.Height = info.Height % 2 == 0 ? info.Height : info.Height - 1;
+            warnings.Add("Resolution reduction is disabled, so the source resolution was restored.");
+        }
+        else
+        {
+            if (plan.Width > info.Width || plan.Height > info.Height)
+                errors.Add("AI plans cannot upscale beyond the source resolution.");
+
+            var sourceAspect = (double)info.Width / Math.Max(info.Height, 1);
+            var planAspect = (double)plan.Width / Math.Max(plan.Height, 1);
+            if (Math.Abs(planAspect / sourceAspect - 1.0) > 0.015)
+                errors.Add("AI plan resolution must preserve the source aspect ratio.");
+        }
+
         if (plan.Fps <= 0)
         {
             plan.Fps = info.Fps;
@@ -71,6 +88,13 @@ public static class PlanParser
         {
             plan.Fps = info.Fps;
             warnings.Add("Frame rate above the source was requested, clamped to the source.");
+        }
+
+
+        if (!options.AllowFpsDrop && plan.Fps < info.Fps - 0.01)
+        {
+            plan.Fps = info.Fps;
+            warnings.Add("Frame-rate reduction is disabled, so the source frame rate was restored.");
         }
 
         if (plan.ModeEnum == EncodeMode.TwoPass && plan.VideoBitrateK <= 0)
@@ -100,8 +124,7 @@ public static class PlanParser
                 warnings.Add($"These settings estimate to {estimated:0.0} MB, above the {options.TargetMb:0.##} MB target. The size-correction retry will fix it if it overshoots.");
         }
 
-        plan.ExtraArgs ??= new List<string>();
-        plan.ExtraArgs.RemoveAll(a => string.IsNullOrWhiteSpace(a) || a.Contains("..") || a.Contains('&') || a.Contains('|'));
+        plan.ExtraArgs = SanitizeExtraArgs(plan.ExtraArgs, warnings);
 
         return new PlanParseResult(errors.Count == 0 ? plan : null, errors, warnings);
     }
@@ -114,5 +137,34 @@ public static class PlanParser
         var start = raw.IndexOf('{');
         var end = raw.LastIndexOf('}');
         return start >= 0 && end > start ? raw[start..(end + 1)] : null;
+    }
+
+    private static List<string> SanitizeExtraArgs(IReadOnlyList<string>? raw, List<string> warnings)
+    {
+        if (raw is null || raw.Count == 0) return new List<string>();
+
+        var allowed = new Dictionary<string, Func<string, bool>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["-tune"] = value => new[] { "film", "animation", "grain", "stillimage", "fastdecode", "zerolatency", "psnr", "ssim" }.Contains(value, StringComparer.OrdinalIgnoreCase),
+            ["-profile:v"] = value => new[] { "baseline", "main", "high", "high10", "main10" }.Contains(value, StringComparer.OrdinalIgnoreCase),
+            ["-level:v"] = value => Regex.IsMatch(value, @"^\d(?:\.\d)?$"),
+            ["-aq-mode"] = value => int.TryParse(value, out var number) && number is >= 0 and <= 4,
+            ["-aq-strength"] = value => double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var number) && number is >= 0 and <= 3
+        };
+
+        var result = new List<string>();
+        for (var index = 0; index < raw.Count; index++)
+        {
+            var flag = raw[index];
+            if (!allowed.TryGetValue(flag, out var validator) || index + 1 >= raw.Count || !validator(raw[index + 1]))
+            {
+                warnings.Add($"Unsafe or unsupported extra argument was removed: {flag}");
+                continue;
+            }
+
+            result.Add(flag);
+            result.Add(raw[++index]);
+        }
+        return result;
     }
 }
