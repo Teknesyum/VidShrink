@@ -49,3 +49,22 @@ gerçekten tuttuğu T2c sonrası T5'te ölçülür.
 - T4'ün bppf tabanları ilk değerlerdir (x264 0,035 · x265 0,025 · AV1 0,020);
   T5 ölçümü bunları oynatabilir.
 - T2 her plana ~%5–8 ek süre bindirir. Kapatılabilir olmalı.
+
+## Durum — 2026-08-20
+
+| # | Durum | Not |
+|---|---|---|
+| T1 | done | QualityMeter + bench. Denetimde stdout drenaji eksigi cikti, duzeltildi. |
+| T2 | done | Kalibrasyon probu. Olculen yarilanma adimi 4,65 (model 6,0 diyordu). |
+| T2b | done | Pencere sapmasi 1,065 olculdu; hata %20,6 -> %13,3. K1 (adaptif paket okuma) T2c'ye devredildi. |
+| T2c | active | Sabit maliyetli tarama. Hedef: 180 MB'da hata %5 alti. |
+| T3 | submitted | Doluluk bandi. Bes hedefin besi de bandin icinde; 180 -> 175,06 MB. Denetimde. |
+| T4 | open | Asiri sikistirma uzmanligi. T3 muhurlenince acilir. |
+| T5 | open | Gercek dosya A/B ve rapor. T1 + T4 bekliyor. |
+
+Acik risk: 180 MB hedefte marj 0,06 MB. Bandi tutturan sey buyuk olcude duzeltme turu,
+tahmin degil. T2c bu marji guvenli hale getirmezse T5'te bant guvenilir sayilmamali.
+
+Ek bulgu (kapsam disi, sozlesmesi yok): `av1_nvenc` bu makinede x265 slow ile bas basa
+kaliteye 7 kat hizda ulasiyor ve motor onu hic tanimiyor; `-hwaccel cuda` cozmede %19
+bedava. Ayrinti: `docs/gpu-kodlama-bulgusu.md`.
