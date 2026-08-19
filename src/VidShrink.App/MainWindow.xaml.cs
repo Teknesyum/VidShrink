@@ -112,7 +112,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true, HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve };
+    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true, HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve, FillPolicy = CmbFillPolicy.SelectedIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget };
     private double ParseTargetMb() => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : 16;
 
     private async void OnBrowse(object sender, RoutedEventArgs e)
@@ -304,6 +304,8 @@ public partial class MainWindow : Window
                 ReasonCode.RetryScaled => T($"yeniden deneme: önceki girişim {note.TargetMb:0.##} MB hedefe karşı {note.Mb:0.0} MB üretti; ses için {note.AudioMb:0.00} MB ayrıldıktan sonra video bit hızı {note.Factor:0.###} ile ölçeklendi ve kalan bütçeyle sınırlandı", $"retry: the previous attempt produced {note.Mb:0.0} MB against a {note.TargetMb:0.##} MB target; after reserving {note.AudioMb:0.00} MB for audio, video bitrate was scaled by {note.Factor:0.###} and capped to the remaining budget"),
                 ReasonCode.EncoderFallback => T($"{note.RequestedCodec} kodlayıcısı bu ffmpeg sürümünde yok, bu yüzden {note.FallbackCodec}'e düşüldü", $"the {note.RequestedCodec} encoder is not available on this ffmpeg build, so encoding falls back to {note.FallbackCodec}"),
                 ReasonCode.HdrTonemapped => T("kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi", "the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709"),
+                ReasonCode.FillCrfLowered => T($"hedefi doldur politikası CRF'yi {note.Crf:0.#}'e düşürdü; şeffaflık tavanında durmak yerine {note.BandLowerMb:0.0}-{note.TargetMb:0.0} MB bandına, {note.Mb:0.0} MB bant merkezine yaklaşıldı", $"the fill target policy lowered CRF to {note.Crf:0.#} instead of stopping at the transparency ceiling, landing near the {note.Mb:0.0} MB band center inside the {note.BandLowerMb:0.0}-{note.TargetMb:0.0} MB band"),
+                ReasonCode.FillTwoPassBandCenter => T($"CRF {note.Crf:0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {note.Mb:0.0} MB bant merkezini hedefliyor", $"CRF floor {note.Crf:0} was reached before the fill band, so two-pass VBR targets the {note.Mb:0.0} MB band center directly"),
                 _ => null
             };
             if (text is not null) parts.Add(text);
@@ -412,7 +414,7 @@ public partial class MainWindow : Window
         _probeCts?.Cancel();
         _cts = new CancellationTokenSource(); SetRunning(true); TxtResult.Text = ""; BtnReveal.Visibility = Visibility.Collapsed;
         var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = LocalizeStage(p.Stage); TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
-        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
+        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token, CurrentOptions().FillPolicy); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
         catch (OperationCanceledException) { TxtResult.Text = T("İptal edildi.", "Cancelled."); } catch (Exception ex) { TxtResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); }
     }
 

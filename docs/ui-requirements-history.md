@@ -308,3 +308,15 @@ Dönüştür hem Küçült sekmesinde rahatça anlayabilsin.
 - Varsayılan `HDR'yi Koru`. Seçilen kodlayıcı 10-bit'i desteklemiyorsa (örn. H.264 veya
   eksik `libx265`/`libsvtav1`/`hevc_nvenc`) motor otomatik olarak SDR'ye tone-map eder ve
   bunu `ReasonCode.HdrTonemapped` ile "Yapılacak İşlem" ve strateji notlarında açıklar.
+
+## Doluluk Bandı (Fill Policy) (T3)
+
+- Hedef panelinde, Çözünürlük/Kare Hızı düşürme onay kutularının altına `Fill Policy`
+  etiketiyle iki seçenekli bir kutu eklendi: `Fill Target` (`Hedefi Doldur`) / `Stay At
+  Quality Ceiling` (`Kalite Tavanında Dur`). Yanında mevcut `InfoButton` kalıbıyla `?`
+  rozeti, ikisinin farkını açıklıyor.
+- Varsayılan `Fill Target`: motor artık kalite tavanına ulaştığında dosyayı hedefin çok
+  altında bırakmak yerine, önce CRF düşürerek sonra gerekirse iki geçişli VBR'a geçerek
+  dosyayı hedefe yakın banda (bkz. `FillBand.For`) çeker. `Kalite Tavanında Dur` eski
+  davranışı (tavana ulaşınca dur, dosya küçük kalabilir) korur.
+- Metinler `LanguageCatalog` üzerinden TR/EN.

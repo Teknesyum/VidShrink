@@ -1,5 +1,7 @@
 namespace VidShrink.Core;
 
+public enum FillPolicy { FillTarget, QualityCeiling }
+
 public sealed class PlanOptions
 {
     public double TargetMb { get; set; } = 25;
@@ -8,6 +10,19 @@ public sealed class PlanOptions
     public bool AllowResolutionDrop { get; set; } = true;
     public bool AllowFpsDrop { get; set; } = true;
     public HdrPolicy HdrPolicy { get; set; } = HdrPolicy.Preserve;
+    public FillPolicy FillPolicy { get; set; } = FillPolicy.FillTarget;
+}
+
+public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
+{
+    public static FillBand For(double targetMb)
+    {
+        double lowerFactor, floorFactor;
+        if (targetMb >= 50) { lowerFactor = 0.972; floorFactor = 0.944; }
+        else if (targetMb >= 10) { lowerFactor = 0.95; floorFactor = 0.90; }
+        else { lowerFactor = 0.92; floorFactor = 0.85; }
+        return new FillBand(targetMb * lowerFactor, targetMb * floorFactor, targetMb);
+    }
 }
 
 public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice);
@@ -137,6 +152,36 @@ public static class PlanCalculator
             plan.Mode = "crf";
             plan.Crf = (int)Math.Round(ceilingCrf);
             plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, MinVideoBitrateK));
+
+            if (options.FillPolicy == FillPolicy.FillTarget)
+            {
+                var band = FillBand.For(options.TargetMb);
+                if (ceilingSizeMb < band.LowerMb)
+                {
+                    var (minCrf, _) = CodecModel.CrfRange(codec);
+                    var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
+                    var totalBudgetK = bandCenterMb * 8192.0 * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
+                    var desiredVideoK = Math.Max(MinVideoBitrateK, totalBudgetK - audioK);
+                    var desiredBppf = desiredVideoK * 1000.0 / ((double)best.Width * best.Height * best.Fps);
+                    var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
+
+                    if (fillCrf >= minCrf)
+                    {
+                        plan.Crf = (int)Math.Round(fillCrf);
+                        plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
+                        reason.Add($"the fill target policy lowered CRF to {fillCrf:0.#} instead of stopping at the transparency ceiling, landing near {bandCenterMb:0.0} MB inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band");
+                        reasonCodes.Add(new ReasonNote(ReasonCode.FillCrfLowered, Crf: fillCrf, Mb: bandCenterMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
+                    }
+                    else
+                    {
+                        plan.Mode = "2pass";
+                        plan.Crf = null;
+                        plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
+                        reason.Add($"CRF floor {minCrf} was reached before the fill band, so two-pass VBR targets the {bandCenterMb:0.0} MB band center directly");
+                        reasonCodes.Add(new ReasonNote(ReasonCode.FillTwoPassBandCenter, Crf: minCrf, Mb: bandCenterMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
+                    }
+                }
+            }
         }
         else
         {
@@ -189,23 +234,37 @@ public static class PlanCalculator
         var bppf = complexity.BppfAtCrf(plan.Codec, plan.Crf ?? CodecModel.ReferenceCrf(plan.Codec), scale, plan.Fps, info.Fps);
         var videoK = bppf * plan.Width * plan.Height * plan.Fps / 1000.0;
         var expectedMb = SizeMb(videoK, plan.AudioBitrateK, info.DurationSeconds);
-        var band = complexity.Measured ? 0.14 : 0.32;
+        var band = complexity.EstimateBandFor(plan.Codec, scale, plan.Fps);
         return new SizeEstimate(expectedMb, expectedMb * (1 - band), expectedMb * (1 + band), complexity.Measured, false);
     }
 
-    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds)
+    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, bool fillUnderBand = false)
     {
         var corrected = plan.Clone();
-        var desiredMb = targetMb * CrfFitMargin;
         var audioMb = SizeMb(0, plan.AudioBitrateK, durationSeconds);
+        var previousVideoK = plan.VideoBitrateK;
+        corrected.Mode = "2pass";
+        corrected.Crf = null;
+
+        if (fillUnderBand)
+        {
+            var band = FillBand.For(targetMb);
+            var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
+            var factorUp = bandCenterMb / Math.Max(actualMb, 0.01);
+            var totalBudgetKUp = targetMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
+            var videoBudgetKUp = Math.Max(1, totalBudgetKUp - plan.AudioBitrateK);
+            corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factorUp, videoBudgetKUp)));
+            corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.HardFloorMb:0.0} MB floor for a {targetMb:0.##} MB target; video bitrate was scaled by {factorUp:0.###} toward the {bandCenterMb:0.0} MB band center and capped to the remaining budget";
+            corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factorUp) };
+            return corrected;
+        }
+
+        var desiredMb = targetMb * CrfFitMargin;
         var actualVideoMb = Math.Max(actualMb - audioMb, 0.01);
         var desiredVideoMb = Math.Max(desiredMb - audioMb, 0.01);
         var factor = desiredVideoMb / actualVideoMb;
         var totalBudgetK = desiredMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
         var videoBudgetK = Math.Max(1, totalBudgetK - plan.AudioBitrateK);
-        var previousVideoK = plan.VideoBitrateK;
-        corrected.Mode = "2pass";
-        corrected.Crf = null;
         corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
         corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###} and capped to the remaining budget";
         corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor) };

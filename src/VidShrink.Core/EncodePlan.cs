@@ -21,7 +21,9 @@ public enum ReasonCode
     PredictedQualityEstimated,
     RetryScaled,
     EncoderFallback,
-    HdrTonemapped
+    HdrTonemapped,
+    FillCrfLowered,
+    FillTwoPassBandCenter
 }
 
 public sealed record ReasonNote(
@@ -40,7 +42,8 @@ public sealed record ReasonNote(
     double Bppf = 0,
     double DetailExponent = 0,
     string? RequestedCodec = null,
-    string? FallbackCodec = null);
+    string? FallbackCodec = null,
+    double BandLowerMb = 0);
 
 public sealed class EncodePlan
 {

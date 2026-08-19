@@ -7,7 +7,7 @@ namespace VidShrink.Ffmpeg;
 
 public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan? Remaining, double OutputMb, string Stage);
 
-public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error);
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false);
 public sealed record ConversionResult(string OutputPath, double OutputMb);
 
 public sealed class EncodeRunner
@@ -21,7 +21,8 @@ public sealed class EncodeRunner
         string outputPath,
         double targetMb,
         IProgress<EncodeProgress>? progress,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        FillPolicy fillPolicy = FillPolicy.QualityCeiling)
     {
         var current = plan;
         var attempt = 0;
@@ -46,14 +47,21 @@ public sealed class EncodeRunner
                 }
 
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
-                if (actualMb <= targetMb * ToleranceOver || attempt >= MaxAttempts)
+                var over = actualMb > targetMb * ToleranceOver;
+                var underBand = fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).HardFloorMb;
+
+                if ((!over && !underBand) || attempt >= MaxAttempts)
                 {
                     File.Move(partialPath, outputPath, overwrite: true);
-                    return new EncodeResult(actualMb <= targetMb * ToleranceOver, outputPath, actualMb, current, attempt,
-                        actualMb <= targetMb * ToleranceOver ? null : $"Could not get under the target after {attempt} attempts (last result: {actualMb:0.0} MB).");
+                    var success = !over;
+                    return new EncodeResult(success, outputPath, actualMb, current, attempt,
+                        success ? null : $"Could not get under the target after {attempt} attempts (last result: {actualMb:0.0} MB).",
+                        UnderBand: underBand);
                 }
 
-                current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds);
+                current = over
+                    ? PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds)
+                    : PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true);
             }
 
             return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.");

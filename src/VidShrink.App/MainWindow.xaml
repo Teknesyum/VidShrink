@@ -148,6 +148,14 @@
 <CheckBox x:Name="ChkFps" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May Lower Frame Rate" Click="OnOptionChanged"/>
 <Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="Halving the frame rate frees bits for the frames that remain. The engine only does this on hard targets and never drops below a level where motion starts to stutter. Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility."/></Button.ToolTip></Button>
 </StackPanel>
+<StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+<TextBlock Text="Fill Policy" Style="{StaticResource Label}" VerticalAlignment="Center"/>
+<Button Content="?" Style="{StaticResource InfoButton}" Margin="6,-2,8,0"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="Fill Target lands close to the target size and squeezes out the best quality the budget allows. Stay At Quality Ceiling stops once quality stops improving, which avoids padding the file but can leave it noticeably smaller."/></Button.ToolTip></Button>
+<ComboBox x:Name="CmbFillPolicy" Width="190" SelectedIndex="0" SelectionChanged="OnOptionChanged">
+<ComboBoxItem Content="Fill Target"/>
+<ComboBoxItem Content="Stay At Quality Ceiling"/>
+</ComboBox>
+</StackPanel>
 <StackPanel x:Name="HdrPolicyPanel" Orientation="Horizontal" Margin="0,12,0,0" Visibility="Collapsed">
 <TextBlock Text="HDR" Style="{StaticResource Label}" VerticalAlignment="Center"/>
 <ComboBox x:Name="CmbHdrPolicy" Width="170" Margin="8,0,0,0" SelectedIndex="0" SelectionChanged="OnOptionChanged">

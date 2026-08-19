@@ -109,7 +109,11 @@ internal static class LanguageCatalog
         ["Preserve HDR"] = "HDR'yi Koru",
         ["Convert to SDR"] = "SDR'ye Çevir",
         ["Preserving HDR keeps the source's wider color and brightness range, but the file is larger 10-bit and only recent devices and apps play it correctly. Converting to SDR tone-maps the picture down to the standard range — smaller, and safe for WhatsApp and any phone."] = "HDR'yi korumak kaynağın daha geniş renk ve parlaklık aralığını saklar, ancak dosya daha büyük 10-bit olur ve yalnızca yeni cihazlar ve uygulamalar doğru oynatır. SDR'ye çevirmek görüntüyü standart aralığa tone-map eder — daha küçüktür ve WhatsApp ile her telefon için güvenlidir.",
-        ["FFmpeg: Checking..."] = "FFmpeg: Kontrol Ediliyor..."
+        ["FFmpeg: Checking..."] = "FFmpeg: Kontrol Ediliyor...",
+        ["Fill Policy"] = "Doldurma Politikası",
+        ["Fill Target"] = "Hedefi Doldur",
+        ["Stay At Quality Ceiling"] = "Kalite Tavanında Dur",
+        ["Fill Target lands close to the target size and squeezes out the best quality the budget allows. Stay At Quality Ceiling stops once quality stops improving, which avoids padding the file but can leave it noticeably smaller."] = "Hedefi Doldur, hedef boyuta yakın durur ve bütçenin izin verdiği en iyi kaliteyi sıkar. Kalite Tavanında Dur, kalite artmayı bıraktığında durur; dosyayı şişirmez ama belirgin biçimde küçük kalabilir."
     };
 
     internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish = EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);
