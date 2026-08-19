@@ -7,6 +7,7 @@ public sealed class PlanOptions
     public CodecPreference Codec { get; set; } = CodecPreference.Compatible;
     public bool AllowResolutionDrop { get; set; } = true;
     public bool AllowFpsDrop { get; set; } = true;
+    public HdrPolicy HdrPolicy { get; set; } = HdrPolicy.Preserve;
 }
 
 public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice);
@@ -21,21 +22,39 @@ public static class PlanCalculator
     private const double MinFps = 12.0;
     private const int MinVideoBitrateK = 48;
 
-    public static EncodePlan Build(MediaInfo info, PlanOptions options)
-        => BuildDetailed(info, options, null).Plan;
+    public static EncodePlan Build(MediaInfo info, PlanOptions options, IEncoderAvailability? availability = null)
+        => BuildDetailed(info, options, null, availability).Plan;
 
-    public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile)
+    public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
     {
         var complexity = profile ?? ComplexityProfile.FromSourceBitrate(info);
         var regime = CompressionStrategy.RegimeFor(info.FileSizeMb, options.TargetMb);
         var ratio = CompressionStrategy.Ratio(info.FileSizeMb, options.TargetMb);
         var notes = new List<AdviceCode>();
+        var reason = new List<string>();
+        var reasonCodes = new List<ReasonNote>();
 
         var preference = options.Codec == CodecPreference.Auto
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
-        var codec = PickCodec(preference);
+        var codec = PickCodec(preference, availability);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
+
+        var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
+        if (hdr.PolicyChanged)
+        {
+            notes.Add(AdviceCode.HdrTonemapped);
+            reason.Add("the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709");
+            reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
+        }
+
+        var preferredCodec = PreferredCodecFor(preference);
+        if (codec != preferredCodec)
+        {
+            notes.Add(AdviceCode.EncoderFallback);
+            reason.Add($"the {preferredCodec} encoder is not available on this ffmpeg build, so encoding falls back to {codec}");
+            reasonCodes.Add(new ReasonNote(ReasonCode.EncoderFallback, RequestedCodec: preferredCodec, FallbackCodec: codec));
+        }
 
         if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
             notes.Add(AdviceCode.CodecUpgradeRecommended);
@@ -58,7 +77,6 @@ public static class PlanCalculator
         };
 
         var best = SearchLayout(info, effective, complexity, codec, videoK);
-        var reason = new List<string>();
 
         if (complexity.Measured)
         {
@@ -75,11 +93,13 @@ public static class PlanCalculator
         {
             notes.Add(AdviceCode.ResolutionReduced);
             reason.Add($"scaled to {best.Width}x{best.Height} ({best.Scale * 100:0.#}% of source); at this title's measured detail falloff that frees enough bits to raise predicted quality");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ResolutionScaled, Width: best.Width, Height: best.Height, ScalePercent: best.Scale * 100));
         }
         if (best.Fps < info.Fps - 0.01)
         {
             notes.Add(AdviceCode.FrameRateReduced);
             reason.Add($"frame rate reduced to {best.Fps:0.##} to keep per-frame detail");
+            reasonCodes.Add(new ReasonNote(ReasonCode.FrameRateReduced, Fps: best.Fps));
         }
 
         var budgetBppf = videoK * 1000.0 / ((double)best.Width * best.Height * best.Fps);
@@ -97,9 +117,11 @@ public static class PlanCalculator
             if (recovered.Scale > best.Scale + 1e-6 || recovered.Fps > best.Fps + 0.01)
             {
                 reason.Add($"the ceiling left budget unused, so resolution was restored to {recovered.Width}x{recovered.Height}@{recovered.Fps:0.##} — the largest layout that still fits the target at CRF {ceilingCrf:0}");
+                reasonCodes.Add(new ReasonNote(ReasonCode.ResolutionRestoredAtCeiling, Width: recovered.Width, Height: recovered.Height, Fps: recovered.Fps, Crf: ceilingCrf));
                 best = recovered;
                 notes.Remove(AdviceCode.ResolutionReduced);
                 notes.Remove(AdviceCode.FrameRateReduced);
+                reasonCodes.RemoveAll(n => n.Code is ReasonCode.ResolutionScaled or ReasonCode.FrameRateReduced);
                 if (best.Width != info.Width || best.Height != info.Height) notes.Add(AdviceCode.ResolutionReduced);
                 if (best.Fps < info.Fps - 0.01) notes.Add(AdviceCode.FrameRateReduced);
                 ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
@@ -110,7 +132,8 @@ public static class PlanCalculator
             notes.Add(AdviceCode.BudgetIsGenerous);
             notes.Add(AdviceCode.QualityCeilingReached);
             reason.Add($"the budget affords CRF {budgetCrf:0.#}, better than the CRF {ceilingCrf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {ceilingSizeMb:0.0} MB instead of padding the file to {options.TargetMb:0.##} MB");
-            plan = NewPlan(codec, effective, info, best, audioK, audioChannels);
+            reasonCodes.Add(new ReasonNote(ReasonCode.BudgetExceedsCeiling, BudgetCrf: budgetCrf, Crf: ceilingCrf, Mb: ceilingSizeMb, TargetMb: options.TargetMb));
+            plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "crf";
             plan.Crf = (int)Math.Round(ceilingCrf);
             plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, MinVideoBitrateK));
@@ -119,20 +142,25 @@ public static class PlanCalculator
         {
             notes.Add(AdviceCode.TargetEnforcedTwoPass);
             reason.Add($"the budget lands near CRF {budgetCrf:0.#}, short of the CRF {ceilingCrf:0} ceiling, so two-pass VBR spends the whole {options.TargetMb:0.##} MB");
-            plan = NewPlan(codec, effective, info, best, audioK, audioChannels);
+            reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: options.TargetMb));
+            plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "2pass";
             plan.VideoBitrateK = (int)Math.Round(videoK);
         }
 
         reason.Add($"predicted quality {best.Score:0.#}/100{(complexity.Measured ? $" from a measured sample (bppf {complexity.ReferenceBppf:0.0000}, detail falloff {complexity.DetailExponent:0.00})" : " estimated from the source bitrate")}");
+        reasonCodes.Add(complexity.Measured
+            ? new ReasonNote(ReasonCode.PredictedQualityMeasured, Score: best.Score, Bppf: complexity.ReferenceBppf, DetailExponent: complexity.DetailExponent)
+            : new ReasonNote(ReasonCode.PredictedQualityEstimated, Score: best.Score));
         plan.Reason = string.Join("; ", reason);
+        plan.ReasonCodes = reasonCodes;
 
         var estimate = Estimate(plan, info, complexity);
-        var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference), suggestedPreference, best.Score, notes);
+        var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, best.Score, notes);
         return new PlanResult(plan, estimate, best.Score, complexity, advice);
     }
 
-    private static EncodePlan NewPlan(string codec, PlanOptions options, MediaInfo info, Layout best, int audioK, int? audioChannels) => new()
+    private static EncodePlan NewPlan(string codec, PlanOptions options, MediaInfo info, Layout best, int audioK, int? audioChannels, HdrResolution hdr) => new()
     {
         Codec = codec,
         AudioCodec = info.HasAudio && audioK > 0 ? PickAudioCodec() : null,
@@ -141,7 +169,10 @@ public static class PlanCalculator
         Width = best.Width,
         Height = best.Height,
         Fps = best.Fps,
-        Preset = PickPreset(codec, options.Codec)
+        Preset = PickPreset(codec, options.Codec),
+        PixelFormat = hdr.PixelFormat,
+        HdrVideoFilter = hdr.VideoFilter,
+        HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
 
     public static SizeEstimate Estimate(EncodePlan plan, MediaInfo info, ComplexityProfile? profile)
@@ -177,6 +208,7 @@ public static class PlanCalculator
         corrected.Crf = null;
         corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
         corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###} and capped to the remaining budget";
+        corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor) };
         return corrected;
     }
 
@@ -336,12 +368,27 @@ public static class PlanCalculator
         return (audioK, channels);
     }
 
-    private static string PickCodec(CodecPreference pref) => pref switch
+    private static string PreferredCodecFor(CodecPreference pref) => pref switch
     {
-        CodecPreference.MaxCompression => "libx265",
+        CodecPreference.MaxCompression => "libsvtav1",
         CodecPreference.Fast => "h264_nvenc",
         _ => "libx264"
     };
+
+    private static string FallbackCodecFor(CodecPreference pref) => pref switch
+    {
+        CodecPreference.MaxCompression => "libx265",
+        CodecPreference.Fast => "libx264",
+        _ => "libx264"
+    };
+
+    private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
+    {
+        var preferred = PreferredCodecFor(pref);
+        if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
+        if (availability is null || availability.HasEncoder(preferred)) return preferred;
+        return FallbackCodecFor(pref);
+    }
 
     private static string PickAudioCodec() => "aac";
 

@@ -16,6 +16,7 @@ public sealed class ConversionPlan
     public int AudioBitrateK { get; init; } = 128;
     public TimeSpan? Start { get; init; }
     public TimeSpan? End { get; init; }
+    public HdrPolicy HdrPolicy { get; init; } = HdrPolicy.Preserve;
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav";
     public bool Gif => Container == "gif";
 }

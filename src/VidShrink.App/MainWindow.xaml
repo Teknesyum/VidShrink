@@ -148,6 +148,14 @@
 <CheckBox x:Name="ChkFps" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May Lower Frame Rate" Click="OnOptionChanged"/>
 <Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="Halving the frame rate frees bits for the frames that remain. The engine only does this on hard targets and never drops below a level where motion starts to stutter. Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility."/></Button.ToolTip></Button>
 </StackPanel>
+<StackPanel x:Name="HdrPolicyPanel" Orientation="Horizontal" Margin="0,12,0,0" Visibility="Collapsed">
+<TextBlock Text="HDR" Style="{StaticResource Label}" VerticalAlignment="Center"/>
+<ComboBox x:Name="CmbHdrPolicy" Width="170" Margin="8,0,0,0" SelectedIndex="0" SelectionChanged="OnOptionChanged">
+<ComboBoxItem Content="Preserve HDR"/>
+<ComboBoxItem Content="Convert to SDR"/>
+</ComboBox>
+<Button Content="?" Style="{StaticResource InfoButton}" Margin="6,-2,0,0"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="Preserving HDR keeps the source's wider color and brightness range, but the file is larger 10-bit and only recent devices and apps play it correctly. Converting to SDR tone-maps the picture down to the standard range — smaller, and safe for WhatsApp and any phone."/></Button.ToolTip></Button>
+</StackPanel>
 </StackPanel>
 </Border>
      <Border Style="{StaticResource Panel}" Margin="0,16,0,0">

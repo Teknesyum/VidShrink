@@ -33,8 +33,13 @@ public static class FfmpegArguments
     {
         var a = new List<string> { "-hide_banner", "-y", "-i", info.FilePath };
 
+        var filters = new List<string>();
         if (plan.Width != info.Width || plan.Height != info.Height)
-            a.AddRange(new[] { "-vf", $"scale={plan.Width}:{plan.Height}:flags=lanczos" });
+            filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
+        if (!string.IsNullOrEmpty(plan.HdrVideoFilter))
+            filters.Add(plan.HdrVideoFilter);
+        if (filters.Count > 0)
+            a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
         if (plan.Fps < info.Fps - 0.01)
             a.AddRange(new[] { "-r", plan.Fps.ToString("0.###", CultureInfo.InvariantCulture) });
@@ -60,7 +65,9 @@ public static class FfmpegArguments
         }
 
         a.AddRange(new[] { "-g", Math.Max(2, (int)Math.Round(plan.Fps * 2)).ToString(CultureInfo.InvariantCulture) });
-        a.AddRange(new[] { "-pix_fmt", "yuv420p" });
+        a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
+        if (plan.HdrColorArgs.Count > 0)
+            a.AddRange(plan.HdrColorArgs);
 
         if (pass == 1)
         {

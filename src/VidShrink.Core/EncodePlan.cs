@@ -8,6 +8,40 @@ public enum Intent { Archive, Sharing, SocialMedia }
 
 public enum CodecPreference { Compatible, MaxCompression, Fast, Auto }
 
+public enum HdrPolicy { Preserve, TonemapToSdr }
+
+public enum ReasonCode
+{
+    ResolutionScaled,
+    FrameRateReduced,
+    ResolutionRestoredAtCeiling,
+    BudgetExceedsCeiling,
+    BudgetBelowCeilingTwoPass,
+    PredictedQualityMeasured,
+    PredictedQualityEstimated,
+    RetryScaled,
+    EncoderFallback,
+    HdrTonemapped
+}
+
+public sealed record ReasonNote(
+    ReasonCode Code,
+    int Width = 0,
+    int Height = 0,
+    double Fps = 0,
+    double ScalePercent = 0,
+    double Crf = 0,
+    double BudgetCrf = 0,
+    double Mb = 0,
+    double TargetMb = 0,
+    double AudioMb = 0,
+    double Factor = 0,
+    double Score = 0,
+    double Bppf = 0,
+    double DetailExponent = 0,
+    string? RequestedCodec = null,
+    string? FallbackCodec = null);
+
 public sealed class EncodePlan
 {
     [JsonPropertyName("codec")] public string Codec { get; set; } = "libx264";
@@ -21,8 +55,12 @@ public sealed class EncodePlan
     [JsonPropertyName("height")] public int Height { get; set; }
     [JsonPropertyName("fps")] public double Fps { get; set; }
     [JsonPropertyName("preset")] public string Preset { get; set; } = "slow";
+    [JsonPropertyName("pixelFormat")] public string PixelFormat { get; set; } = "yuv420p";
+    [JsonIgnore] public string? HdrVideoFilter { get; set; }
+    [JsonIgnore] public List<string> HdrColorArgs { get; set; } = new();
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
+    [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
 
     [JsonIgnore] public EncodeMode ModeEnum => Mode.Equals("crf", StringComparison.OrdinalIgnoreCase) ? EncodeMode.Crf : EncodeMode.TwoPass;
 
@@ -30,6 +68,8 @@ public sealed class EncodePlan
     {
         var clone = (EncodePlan)MemberwiseClone();
         clone.ExtraArgs = new List<string>(ExtraArgs);
+        clone.HdrColorArgs = new List<string>(HdrColorArgs);
+        clone.ReasonCodes = new List<ReasonNote>(ReasonCodes);
         return clone;
     }
 

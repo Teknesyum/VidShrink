@@ -112,7 +112,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true };
+    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true, HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve };
     private double ParseTargetMb() => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : 16;
 
     private async void OnBrowse(object sender, RoutedEventArgs e)
@@ -209,6 +209,7 @@ public partial class MainWindow : Window
         TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : T("Yok", "None");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
         TxtHdr.Text = info.IsHdr ? T("Evet", "Yes") : T("Hayır", "No");
+        HdrPolicyPanel.Visibility = info.IsHdr ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private static CodecPreference CodecFromIndex(int index) => index switch
@@ -222,7 +223,7 @@ public partial class MainWindow : Window
     private void Recalculate()
     {
         if (_info is null) return;
-        var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile);
+        var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, EncoderCapabilities.Instance);
         _autoPlan = detailed.Plan;
         _predictedQuality = detailed.PredictedQuality;
         _advice = detailed.Advice;
@@ -248,7 +249,7 @@ public partial class MainWindow : Window
         var quality = plan.ModeEnum == EncodeMode.Crf ? $"CRF {plan.Crf}" : $"{plan.VideoBitrateK}k two-pass";
         _estimate = PlanCalculator.Estimate(plan, _info, _profile);
         TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("Otomatik", "Automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} FPS · {(plan.AudioCodec is null ? T("Ses Yok", "No Audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · Preset {plan.Preset}";
-        TxtPlanReason.Text = plan.Reason;
+        TxtPlanReason.Text = DescribeReason(plan);
         RefreshEstimateView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
     }
@@ -275,6 +276,33 @@ public partial class MainWindow : Window
             : T("kalite modu; hedefin altında kalır", "quality mode; stays under the target");
         TxtEstimateNote.Text = $"{basis} · {mode} · {T("öngörülen kalite", "predicted quality")} {_predictedQuality:0.#}/100";
         TxtStrategyNote.Text = DescribeStrategy();
+    }
+
+    private string DescribeReason(EncodePlan plan)
+    {
+        if (plan.ReasonCodes.Count == 0) return plan.Reason;
+
+        var parts = new List<string>();
+        foreach (var note in plan.ReasonCodes)
+        {
+            var text = note.Code switch
+            {
+                ReasonCode.ResolutionScaled => T($"{note.Width}x{note.Height}'e ölçeklendi (kaynağın %{note.ScalePercent:0.#}'i); bu klibin ölçülen ayrıntı düşüşünde bu, öngörülen kaliteyi yükseltecek kadar bit kazandırıyor", $"scaled to {note.Width}x{note.Height} ({note.ScalePercent:0.#}% of source); at this title's measured detail falloff that frees enough bits to raise predicted quality"),
+                ReasonCode.FrameRateReduced => T($"kare başına ayrıntıyı korumak için kare hızı {note.Fps:0.##}'e düşürüldü", $"frame rate reduced to {note.Fps:0.##} to keep per-frame detail"),
+                ReasonCode.ResolutionRestoredAtCeiling => T($"tavan bütçeyi boşta bıraktığı için çözünürlük {note.Width}x{note.Height}@{note.Fps:0.##}'e geri getirildi — CRF {note.Crf:0}'te hedefe hâlâ sığan en büyük düzen", $"the ceiling left budget unused, so resolution was restored to {note.Width}x{note.Height}@{note.Fps:0.##} — the largest layout that still fits the target at CRF {note.Crf:0}"),
+                ReasonCode.BudgetExceedsCeiling => T($"bütçe CRF {note.BudgetCrf:0.#}'e imkan tanıyor, bu amaç için CRF {note.Crf:0} şeffaflık tavanından daha iyi; bu yüzden kodlayıcı tavanda durup dosyayı {note.TargetMb:0.##} MB'a şişirmek yerine yaklaşık {note.Mb:0.0} MB verir", $"the budget affords CRF {note.BudgetCrf:0.#}, better than the CRF {note.Crf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {note.Mb:0.0} MB instead of padding the file to {note.TargetMb:0.##} MB"),
+                ReasonCode.BudgetBelowCeilingTwoPass => T($"bütçe CRF {note.BudgetCrf:0.#} civarında kalıyor, CRF {note.Crf:0} tavanının altında; bu yüzden iki geçişli VBR {note.TargetMb:0.##} MB'ın tamamını harcıyor", $"the budget lands near CRF {note.BudgetCrf:0.#}, short of the CRF {note.Crf:0} ceiling, so two-pass VBR spends the whole {note.TargetMb:0.##} MB"),
+                ReasonCode.PredictedQualityMeasured => T($"öngörülen kalite {note.Score:0.#}/100, ölçülen bir örnekten (bppf {note.Bppf:0.0000}, ayrıntı düşüşü {note.DetailExponent:0.00})", $"predicted quality {note.Score:0.#}/100 from a measured sample (bppf {note.Bppf:0.0000}, detail falloff {note.DetailExponent:0.00})"),
+                ReasonCode.PredictedQualityEstimated => T($"öngörülen kalite {note.Score:0.#}/100, kaynak bit hızından tahmin", $"predicted quality {note.Score:0.#}/100 estimated from the source bitrate"),
+                ReasonCode.RetryScaled => T($"yeniden deneme: önceki girişim {note.TargetMb:0.##} MB hedefe karşı {note.Mb:0.0} MB üretti; ses için {note.AudioMb:0.00} MB ayrıldıktan sonra video bit hızı {note.Factor:0.###} ile ölçeklendi ve kalan bütçeyle sınırlandı", $"retry: the previous attempt produced {note.Mb:0.0} MB against a {note.TargetMb:0.##} MB target; after reserving {note.AudioMb:0.00} MB for audio, video bitrate was scaled by {note.Factor:0.###} and capped to the remaining budget"),
+                ReasonCode.EncoderFallback => T($"{note.RequestedCodec} kodlayıcısı bu ffmpeg sürümünde yok, bu yüzden {note.FallbackCodec}'e düşüldü", $"the {note.RequestedCodec} encoder is not available on this ffmpeg build, so encoding falls back to {note.FallbackCodec}"),
+                ReasonCode.HdrTonemapped => T("kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi", "the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709"),
+                _ => null
+            };
+            if (text is not null) parts.Add(text);
+        }
+
+        return string.Join("; ", parts);
     }
 
     private string DescribeStrategy()
@@ -308,6 +336,8 @@ public partial class MainWindow : Window
                 AdviceCode.QualityCeilingReached => T("Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.", "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see."),
                 AdviceCode.AudioMono => T("Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.", "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture."),
                 AdviceCode.AudioDropped => T("Bu boyutta ses tutulamıyor, çıkarıldı.", "Audio cannot fit at this size and was removed."),
+                AdviceCode.EncoderFallback => T("Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.", "The preferred encoder is not available on this ffmpeg build; falling back to a software encoder."),
+                AdviceCode.HdrTonemapped => T("Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.", "The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709."),
                 _ => null
             };
             if (text is not null) lines.Add(text);
@@ -365,9 +395,16 @@ public partial class MainWindow : Window
     {
         if (_info is null || ActivePlan is null) return;
         var output = BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4");
+        var targetMb = ParseTargetMb();
+        if (DiskSpaceGuard.TryGetFreeBytes(output, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
+        {
+            var neededMb = DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0;
+            TxtResult.Text = T($"Hedef sürücüde yeterli boş alan yok; en az {neededMb:0} MB gerekiyor.", $"Not enough free space on the target drive; at least {neededMb:0} MB is needed.");
+            return;
+        }
         _cts = new CancellationTokenSource(); SetRunning(true); TxtResult.Text = ""; BtnReveal.Visibility = Visibility.Collapsed;
         var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = LocalizeStage(p.Stage); TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
-        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, ParseTargetMb(), progress, _cts.Token); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
+        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
         catch (OperationCanceledException) { TxtResult.Text = T("İptal edildi.", "Cancelled."); } catch (Exception ex) { TxtResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); }
     }
 

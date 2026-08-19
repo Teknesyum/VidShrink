@@ -53,6 +53,7 @@ public static class FfprobeClient
 
         var pixFmt = GetString(v, "pix_fmt");
         var colorTransfer = GetString(v, "color_transfer");
+        var fieldOrder = GetString(v, "field_order");
 
         return new MediaInfo
         {
@@ -66,10 +67,66 @@ public static class FfprobeClient
             TotalBitrateBps = ParseLong(format, "bit_rate") ?? (long)(fileSize * 8 / duration),
             PixelFormat = pixFmt,
             IsHdr = colorTransfer is "smpte2084" or "arib-std-b67" || (pixFmt?.Contains("10le") ?? false),
+            ColorPrimaries = GetString(v, "color_primaries"),
+            ColorTransfer = colorTransfer,
+            ColorSpace = GetString(v, "color_space"),
+            ColorRange = GetString(v, "color_range"),
+            BitDepth = GetInt(v, "bits_per_raw_sample") ?? BitDepthFromPixFmt(pixFmt),
+            MasteringDisplayMetadata = ParseMasteringDisplay(v),
+            ContentLightLevel = ParseContentLightLevel(v),
+            IsInterlaced = fieldOrder is not null and not "progressive" and not "unknown",
             AudioCodec = audio is null ? null : GetString(audio.Value, "codec_name"),
             AudioBitrateBps = audio is null ? 0 : ParseLong(audio.Value, "bit_rate") ?? 128_000,
             AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2
         };
+    }
+
+    private static int BitDepthFromPixFmt(string? pixFmt)
+    {
+        if (pixFmt is null) return 8;
+        if (pixFmt.Contains("12le") || pixFmt.Contains("12be")) return 12;
+        if (pixFmt.Contains("10le") || pixFmt.Contains("10be")) return 10;
+        return 8;
+    }
+
+    private static string? ParseMasteringDisplay(JsonElement stream)
+    {
+        if (!stream.TryGetProperty("side_data_list", out var list)) return null;
+        foreach (var item in list.EnumerateArray())
+        {
+            if (GetString(item, "side_data_type") != "Mastering display metadata") continue;
+            var rx = ParseFraction(GetString(item, "red_x"));
+            var ry = ParseFraction(GetString(item, "red_y"));
+            var gx = ParseFraction(GetString(item, "green_x"));
+            var gy = ParseFraction(GetString(item, "green_y"));
+            var bx = ParseFraction(GetString(item, "blue_x"));
+            var by = ParseFraction(GetString(item, "blue_y"));
+            var wx = ParseFraction(GetString(item, "white_point_x"));
+            var wy = ParseFraction(GetString(item, "white_point_y"));
+            var maxLum = ParseFraction(GetString(item, "max_luminance"));
+            var minLum = ParseFraction(GetString(item, "min_luminance"));
+            if (rx is null || ry is null || gx is null || gy is null || bx is null || by is null || wx is null || wy is null || maxLum is null || minLum is null)
+                return null;
+
+            int Chroma(double value) => (int)Math.Round(value * 50000);
+            int Luma(double value) => (int)Math.Round(value * 10000);
+            return $"G({Chroma(gx.Value)},{Chroma(gy.Value)})B({Chroma(bx.Value)},{Chroma(by.Value)})R({Chroma(rx.Value)},{Chroma(ry.Value)})WP({Chroma(wx.Value)},{Chroma(wy.Value)})L({Luma(maxLum.Value)},{Luma(minLum.Value)})";
+        }
+        return null;
+    }
+
+    private static string? ParseContentLightLevel(JsonElement stream)
+    {
+        if (!stream.TryGetProperty("side_data_list", out var list)) return null;
+        foreach (var item in list.EnumerateArray())
+        {
+            if (GetString(item, "side_data_type") != "Content light level metadata") continue;
+            var max = GetInt(item, "max_content");
+            var avg = GetInt(item, "average_content");
+            if (max is null || avg is null) return null;
+            return $"{max},{avg}";
+        }
+        return null;
     }
 
     private static (int width, int height) DisplayDimensions(JsonElement stream)

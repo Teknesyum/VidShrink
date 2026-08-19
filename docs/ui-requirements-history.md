@@ -297,3 +297,14 @@ Dönüştür hem Küçült sekmesinde rahatça anlayabilsin.
   yan yana küçük metin olarak duruyor. Hedef paneli yalnızca girdi tutuyor.
 - `InfoButton` sol boşluğu 12 → 6 DIP. Önceki kural (teknesyum-ui §5.3, metinden 12 DIP)
   bu projede geçersiz: 12 DIP kullanıcıya "aşırı uzak" göründü.
+
+## HDR ve 10-bit Doğruluğu (P1)
+
+- Küçült sekmesinde, kaynak HDR olduğunda `Target` panelinde `HDR` etiketiyle bir seçim
+  kutusu görünür: `HDR'yi Koru` / `SDR'ye Çevir`. Kaynak HDR değilse bu grup gizli kalır
+  (`HdrPolicyPanel.Visibility`, mevcut `InfoGrid` gizleme kalıbı ile aynı).
+- Yanında mevcut `InfoButton` kalıbıyla `?` rozeti: koruma daha büyük 10-bit dosya ve dar
+  cihaz uyumluluğu demek, SDR'ye çevirme WhatsApp ve telefon için güvenli demek.
+- Varsayılan `HDR'yi Koru`. Seçilen kodlayıcı 10-bit'i desteklemiyorsa (örn. H.264 veya
+  eksik `libx265`/`libsvtav1`/`hevc_nvenc`) motor otomatik olarak SDR'ye tone-map eder ve
+  bunu `ReasonCode.HdrTonemapped` ile "Yapılacak İşlem" ve strateji notlarında açıklar.

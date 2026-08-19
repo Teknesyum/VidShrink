@@ -18,7 +18,9 @@ public enum AdviceCode
     ContentIsSimple,
     ContentIsComplex,
     ScaleSavesLittle,
-    ScaleSavesMuch
+    ScaleSavesMuch,
+    EncoderFallback,
+    HdrTonemapped
 }
 
 public sealed record StrategyAdvice(

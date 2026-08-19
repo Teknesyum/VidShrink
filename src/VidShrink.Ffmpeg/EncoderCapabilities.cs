@@ -1,0 +1,91 @@
+using System.Diagnostics;
+using VidShrink.Core;
+
+namespace VidShrink.Ffmpeg;
+
+public sealed class EncoderCapabilities : IEncoderAvailability
+{
+    private static readonly Lazy<EncoderCapabilities> LazyInstance = new(Load);
+
+    public static EncoderCapabilities Instance => LazyInstance.Value;
+
+    public IReadOnlySet<string> Encoders { get; }
+    public IReadOnlySet<string> Filters { get; }
+    public string Version { get; }
+
+    private EncoderCapabilities(IReadOnlySet<string> encoders, IReadOnlySet<string> filters, string version)
+    {
+        Encoders = encoders;
+        Filters = filters;
+        Version = version;
+    }
+
+    public bool HasEncoder(string name) => Encoders.Contains(name);
+    public bool HasFilter(string name) => Filters.Contains(name);
+
+    public static EncoderCapabilities Parse(string encodersOutput, string filtersOutput, string versionOutput)
+        => new(ParseEncoders(encodersOutput), ParseFilters(filtersOutput), ParseVersion(versionOutput));
+
+    internal static HashSet<string> ParseEncoders(string output)
+    {
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var rawLine in output.Split('\n'))
+        {
+            var line = rawLine.TrimEnd('\r').Trim();
+            if (line.Length == 0 || line.StartsWith('-') || line.Contains('=')) continue;
+            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2) continue;
+            if (parts[0].Length != 6 || !parts[0].All(c => c == '.' || char.IsUpper(c))) continue;
+            names.Add(parts[1]);
+        }
+        return names;
+    }
+
+    internal static HashSet<string> ParseFilters(string output)
+    {
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var rawLine in output.Split('\n'))
+        {
+            var line = rawLine.TrimEnd('\r').Trim();
+            if (line.Length == 0 || line.StartsWith('-') || line.Contains('=')) continue;
+            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 3) continue;
+            if (!parts[0].All(c => c is '.' or '|' or 'T' or 'S' or 'C')) continue;
+            names.Add(parts[1]);
+        }
+        return names;
+    }
+
+    internal static string ParseVersion(string output)
+    {
+        var line = output.Split('\n').FirstOrDefault()?.Trim() ?? "";
+        return line.Replace("ffmpeg version ", "", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static EncoderCapabilities Load()
+    {
+        try
+        {
+            var encoders = RunCapture(new[] { "-hide_banner", "-encoders" });
+            var filters = RunCapture(new[] { "-hide_banner", "-filters" });
+            var version = RunCapture(new[] { "-version" });
+            return Parse(encoders, filters, version);
+        }
+        catch
+        {
+            return new EncoderCapabilities(
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                "unknown");
+        }
+    }
+
+    private static string RunCapture(IEnumerable<string> args)
+    {
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+        process.Start();
+        var output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit(5000);
+        return output;
+    }
+}

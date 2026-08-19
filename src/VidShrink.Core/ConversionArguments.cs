@@ -32,7 +32,7 @@ public static class ConversionArguments
         return errors;
     }
 
-    public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null)
+    public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null)
     {
         var errors = Validate(info, plan);
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
@@ -65,15 +65,23 @@ public static class ConversionArguments
             return a;
         }
 
-        if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
-        if (plan.VideoCodec == "copy") a.AddRange(new[] { "-c:v", "copy" });
+        if (plan.VideoCodec == "copy")
+        {
+            if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
+            a.AddRange(new[] { "-c:v", "copy" });
+        }
         else
         {
+            var hdr = HdrResolver.Resolve(info, plan.HdrPolicy, plan.VideoCodec, availability);
+            if (!string.IsNullOrEmpty(hdr.VideoFilter)) filters.Add(hdr.VideoFilter);
+            if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
+
             a.AddRange(new[] { "-c:v", plan.VideoCodec, "-preset", FfmpegArguments.DefaultPreset(plan.VideoCodec) });
             a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
                 ? new[] { plan.VideoCodec.Contains("nvenc") || plan.VideoCodec.Contains("qsv") ? "-cq" : "-crf", plan.Crf.ToString(CultureInfo.InvariantCulture) }
                 : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
-            a.AddRange(new[] { "-pix_fmt", "yuv420p" });
+            a.AddRange(new[] { "-pix_fmt", hdr.PixelFormat });
+            if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
         }
         AddAudio(a, plan);
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });

@@ -1,5 +1,67 @@
 # VidShrink v0.2 implementation report
 
+## August 19, 2026 — P0/P1 engine roadmap (docs/tasks/yol-haritasi.md)
+
+Independent audit findings from `docs/claude-engine-audit-report.md` were split into
+packages and executed. P0 (leftovers and durability) and P1 (HDR/10-bit correctness)
+are complete; P2 and later remain open.
+
+**P0.1 — Localized plan reasoning.** `PlanCalculator` reasons were previously written
+as English sentences into `EncodePlan.Reason`, which the Turkish UI displayed verbatim.
+`EncodePlan.ReasonCode`/`ReasonNote` now carry the reason as a language-neutral code
+alongside numeric parameters, mirroring `CompressionStrategy.AdviceCode`. `Reason`
+(string) is unchanged for the AI JSON schema; `MainWindow.DescribeReason()` renders
+`ReasonCodes` through the existing inline `T(tr, en)` pattern, falling back to `Reason`
+when codes are absent (AI-plan path).
+
+**P0.2 — Atomic output.** `EncodeRunner` now writes to `<target>.partial` and moves it
+to the final name only on success, for both compression and conversion. Startup runs
+`TempCleanup.CleanupStaleArtifacts` to remove leftover `vidshrink_*` pass logs and
+`.partial` files from prior crashes.
+
+**P0.3 — Disk space guard.** `DiskSpaceGuard.HasEnoughSpace` is a pure function
+(`targetMB * 3 + 200 MB` against free bytes) wrapped by `TryGetFreeBytes` for the
+`DriveInfo` call; `MainWindow` blocks the run with a TR/EN error when space is short.
+
+**P0.4 — Encoder capability cache.** `EncoderCapabilities` is a lazy singleton that
+parses `ffmpeg -encoders`/`-filters`/`-version` once per process. `PlanCalculator`
+queries it before selecting `libsvtav1` or `h264_nvenc`, falling back to `libx265`/
+`libx264` with `ReasonCode.EncoderFallback` explaining why.
+
+**P1 — HDR and 10-bit correctness.** `MediaInfo` now carries `ColorPrimaries`,
+`ColorTransfer`, `ColorSpace`, `ColorRange`, `BitDepth`, `MasteringDisplayMetadata`,
+`ContentLightLevel`, and `IsInterlaced`. `PlanOptions.HdrPolicy` (`Preserve` default,
+`TonemapToSdr`) drives `HdrResolver`, which selects `EncodePlan.PixelFormat` and the
+color/tonemap filter chain instead of the previous unconditional `yuv420p`:
+
+- **Preserve** requires a 10-bit-capable encoder (checked via `EncoderCapabilities`);
+  writes `yuv420p10le`, propagates source color primaries/transfer/matrix, and for
+  x265 adds `-x265-params hdr10-opt=1:colorprim=...:transfer=...:colormatrix=...`
+  plus `master-display`/`max-cll` when present. Global `-color_primaries`/`-color_trc`
+  flags alone did not reach the HEVC VUI on this ffmpeg build — the x265-params route
+  was required and verified in the real-file check below.
+- **TonemapToSdr** applies `zscale=t=linear:npl=100,tonemap=hable:desat=0,
+  zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p` and writes BT.709 metadata.
+- H.264 cannot carry 10-bit in this pipeline, so an HDR source with H.264 selected is
+  automatically tone-mapped, surfaced as `ReasonCode.HdrTonemapped` /
+  `AdviceCode.HdrTonemapped` in the UI.
+- Shrink tab shows a Preserve/Tonemap choice with a `?` badge only when the loaded
+  source is HDR; documented in `docs/ui-requirements-history.md`.
+
+Real-file verification (libx265, HEVC, ffmpeg 9.0-full), `ffprobe -show_streams`:
+
+```
+Preserve:   pix_fmt=yuv420p10le  color_space=bt2020nc  color_transfer=smpte2084  color_primaries=bt2020
+TonemapToSdr: pix_fmt=yuv420p    color_space=bt709      color_transfer=bt709      color_primaries=bt709
+```
+
+**Tests.** 30/30 passing (was 11): 1 for P0.1, 12 for P0.2-0.4 (`DiskSpaceGuardTests`,
+`EncoderCapabilitiesTests`, `EncodeRunnerAtomicOutputTests`, `TempCleanupTests`), 6 for
+P1 (`HdrArgumentsTests`). Release build: 0 warnings, 0 errors.
+
+P2 (quality measurement infrastructure: `QualityMeter`, benchmark CLI, corpus) and
+later packages are out of scope for this pass — see `docs/tasks/yol-haritasi.md`.
+
 ## August 18, 2026 engine audit
 
 A full correctness and competitiveness audit is documented in `docs/claude-engine-audit-report.md`. The audit fixed the unfiltered GIF palette graph, audio-aware target-size correction, invalid container/codec combinations, unsafe AI extra arguments, AI plans bypassing resolution/FPS permissions, odd custom dimensions, invalid trim starts, and partial files left by FFmpeg failures. The solution now contains a real xUnit project with 11 passing regression tests; previously `dotnet test` ran no tests.

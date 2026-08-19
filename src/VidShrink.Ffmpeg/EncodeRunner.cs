@@ -26,6 +26,7 @@ public sealed class EncodeRunner
         var current = plan;
         var attempt = 0;
         var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
+        var partialPath = outputPath + ".partial";
 
         try
         {
@@ -36,18 +37,21 @@ public sealed class EncodeRunner
 
                 if (twoPass)
                 {
-                    await RunOneAsync(info, current, outputPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, ct);
-                    await RunOneAsync(info, current, outputPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, ct);
+                    await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, ct);
+                    await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, ct);
                 }
                 else
                 {
-                    await RunOneAsync(info, current, outputPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, ct);
+                    await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, ct);
                 }
 
-                var actualMb = new FileInfo(outputPath).Length / 1024.0 / 1024.0;
+                var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
                 if (actualMb <= targetMb * ToleranceOver || attempt >= MaxAttempts)
+                {
+                    File.Move(partialPath, outputPath, overwrite: true);
                     return new EncodeResult(actualMb <= targetMb * ToleranceOver, outputPath, actualMb, current, attempt,
                         actualMb <= targetMb * ToleranceOver ? null : $"Could not get under the target after {attempt} attempts (last result: {actualMb:0.0} MB).");
+                }
 
                 current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds);
             }
@@ -56,12 +60,12 @@ public sealed class EncodeRunner
         }
         catch (OperationCanceledException)
         {
-            TryDelete(outputPath);
+            TryDelete(partialPath);
             throw;
         }
         catch
         {
-            TryDelete(outputPath);
+            TryDelete(partialPath);
             throw;
         }
         finally
@@ -74,6 +78,7 @@ public sealed class EncodeRunner
         MediaInfo info, ConversionPlan plan, string outputPath,
         IProgress<EncodeProgress>? progress, CancellationToken ct = default)
     {
+        var partialPath = outputPath + ".partial";
         try
         {
             var errors = ConversionArguments.Validate(info, plan);
@@ -84,18 +89,19 @@ public sealed class EncodeRunner
                 var palettePath = Path.Combine(Path.GetTempPath(), $"vidshrink_{Guid.NewGuid():N}.png");
                 try
                 {
-                    await RunCommandAsync(ConversionArguments.Build(info, plan, palettePath), duration, progress, "GIF palette 1/2", 0, 0.35, ct);
-                    await RunCommandAsync(ConversionArguments.Build(info, plan, outputPath, palettePath), duration, progress, "GIF encode 2/2", 0.35, 1, ct);
+                    await RunCommandAsync(ConversionArguments.Build(info, plan, palettePath, availability: EncoderCapabilities.Instance), duration, progress, "GIF palette 1/2", 0, 0.35, ct);
+                    await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, palettePath, EncoderCapabilities.Instance), duration, progress, "GIF encode 2/2", 0.35, 1, ct);
                 }
                 finally { TryDelete(palettePath); }
             }
             else
-                await RunCommandAsync(ConversionArguments.Build(info, plan, outputPath), duration, progress, "converting", 0, 1, ct);
+                await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
 
+            File.Move(partialPath, outputPath, overwrite: true);
             return new ConversionResult(outputPath, new FileInfo(outputPath).Length / 1024.0 / 1024.0);
         }
-        catch (OperationCanceledException) { TryDelete(outputPath); throw; }
-        catch { TryDelete(outputPath); throw; }
+        catch (OperationCanceledException) { TryDelete(partialPath); throw; }
+        catch { TryDelete(partialPath); throw; }
     }
 
     private static async Task RunOneAsync(
