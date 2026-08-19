@@ -1,0 +1,1 @@
+- [ffmpeg Process kalıbı](vidshrink-ffmpeg-process-pattern.md) — stdout okunmama (-f null - için düşük risk) + ct.Register(Kill) eksikliği (asıl tekrar eden kusur, yetim süreç)

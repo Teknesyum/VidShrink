@@ -1,0 +1,1 @@
+- [VidShrink build ve prob](vidshrink-build-and-probe.md) — calisan build/test komutlari, ffmpeg pipe tuzagi, scratchpad harness kalibi, olcum bulgulari

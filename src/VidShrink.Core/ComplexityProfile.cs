@@ -1,5 +1,22 @@
 namespace VidShrink.Core;
 
+public sealed record CalibrationSignature
+{
+    private const double ScaleTolerance = 0.005;
+    private const double FpsTolerance = 0.01;
+
+    public required string Codec { get; init; }
+    public required int Width { get; init; }
+    public required int Height { get; init; }
+    public required double Fps { get; init; }
+    public required double Scale { get; init; }
+
+    public bool Matches(string codec, double scale, double fps)
+        => string.Equals(Codec, codec, StringComparison.OrdinalIgnoreCase)
+           && Math.Abs(Scale - scale) <= ScaleTolerance
+           && Math.Abs(Fps - fps) <= FpsTolerance;
+}
+
 public sealed record ComplexityProfile
 {
     public const double ProbeCrf = 23.0;
@@ -11,12 +28,29 @@ public sealed record ComplexityProfile
     private const double LowScaleDamping = 0.3;
     private const double DetailExponentMin = -0.2;
     private const double DetailExponentMax = 1.4;
+    private const double HalvingStepMin = 3.0;
+    private const double HalvingStepMax = 12.0;
+    private const double LevelFactorMin = 0.1;
+    private const double LevelFactorMax = 10.0;
+    private const double CalibratedBand = 0.05;
+    private const double MeasuredBand = 0.14;
+    private const double EstimatedBand = 0.32;
 
     public required double ReferenceBppf { get; init; }
     public required bool Measured { get; init; }
     public double DetailExponent { get; init; } = DefaultDetailExponent;
     public double SampledSeconds { get; init; }
     public long SampledFrames { get; init; }
+    public double LevelFactor { get; init; } = 1.0;
+    public double HalvingStep { get; init; }
+    public CalibrationSignature? Calibration { get; init; }
+
+    public bool Calibrated => Calibration is not null && LevelFactor > 0 && HalvingStep > 0;
+
+    public double EstimateBand => Calibrated ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
+
+    public double EstimateBandFor(string codec, double scale, double fps)
+        => AppliesTo(codec, scale, fps) ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
 
     public static ComplexityProfile FromSourceBitrate(MediaInfo info)
     {
@@ -67,17 +101,56 @@ public sealed record ComplexityProfile
 
     public double BppfAtCrf(string codec, double crf, double scale, double fps, double sourceFps)
     {
-        var reference = RequiredBppf(codec, scale, fps, sourceFps);
-        var offset = (CodecModel.ReferenceCrf(codec) - crf) / CodecModel.CrfHalvingStep(codec);
+        var applies = AppliesTo(codec, scale, fps);
+        var reference = RequiredBppf(codec, scale, fps, sourceFps) * (applies ? LevelFactor : 1.0);
+        var step = applies ? HalvingStep : CodecModel.CrfHalvingStep(codec);
+        var offset = (CodecModel.ReferenceCrf(codec) - crf) / step;
         return reference * Math.Pow(2, offset);
     }
 
     public double CrfForBppf(string codec, double bppf, double scale, double fps, double sourceFps)
     {
-        var reference = RequiredBppf(codec, scale, fps, sourceFps);
+        var applies = AppliesTo(codec, scale, fps);
+        var reference = RequiredBppf(codec, scale, fps, sourceFps) * (applies ? LevelFactor : 1.0);
+        var step = applies ? HalvingStep : CodecModel.CrfHalvingStep(codec);
         var ratio = Math.Max(bppf, 1e-6) / Math.Max(reference, 1e-6);
-        return CodecModel.ReferenceCrf(codec) - CodecModel.CrfHalvingStep(codec) * Math.Log2(ratio);
+        return CodecModel.ReferenceCrf(codec) - step * Math.Log2(ratio);
     }
+
+    public bool AppliesTo(string codec, double scale, double fps)
+        => Calibrated && Calibration!.Matches(codec, scale, fps);
+
+    public ComplexityProfile Calibrate(CalibrationSignature signature, double lowCrf, double lowBppf, double highCrf, double highBppf, double sourceFps)
+    {
+        if (!IsUsable(lowBppf) || !IsUsable(highBppf)) return WithoutCalibration();
+        if (!double.IsFinite(lowCrf) || !double.IsFinite(highCrf)) return WithoutCalibration();
+
+        var gap = highCrf - lowCrf;
+        if (gap <= 0.5 || lowBppf <= highBppf) return WithoutCalibration();
+
+        var decades = Math.Log2(lowBppf / highBppf);
+        if (!double.IsFinite(decades) || decades <= 1e-6) return WithoutCalibration();
+
+        var step = Math.Clamp(gap / decades, HalvingStepMin, HalvingStepMax);
+        var modelled = RequiredBppf(signature.Codec, signature.Scale, signature.Fps, sourceFps)
+                       * Math.Pow(2, (CodecModel.ReferenceCrf(signature.Codec) - lowCrf) / step);
+        if (!IsUsable(modelled)) return WithoutCalibration();
+
+        var level = lowBppf / modelled;
+        if (!double.IsFinite(level) || level <= 0) return WithoutCalibration();
+
+        return this with
+        {
+            LevelFactor = Math.Clamp(level, LevelFactorMin, LevelFactorMax),
+            HalvingStep = step,
+            Calibration = signature
+        };
+    }
+
+    public ComplexityProfile WithoutCalibration()
+        => Calibration is null ? this : this with { LevelFactor = 1.0, HalvingStep = 0, Calibration = null };
+
+    private static bool IsUsable(double value) => double.IsFinite(value) && value > 0;
 }
 
 public sealed record SizeEstimate(double ExpectedMb, double LowMb, double HighMb, bool Measured, bool Enforced)

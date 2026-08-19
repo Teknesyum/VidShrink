@@ -188,6 +188,13 @@ public partial class MainWindow : Window
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             _profile = profile;
             Recalculate();
+
+            var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, EncoderCapabilities.Instance).Plan;
+            TxtEstimateNote.Text = T("Plan ayarlarıyla kalibre ediliyor...", "Calibrating with the planned settings...");
+            var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, cts.Token);
+            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            _profile = calibrated;
+            Recalculate();
         }
         catch (OperationCanceledException)
         {
@@ -402,6 +409,7 @@ public partial class MainWindow : Window
             TxtResult.Text = T($"Hedef sürücüde yeterli boş alan yok; en az {neededMb:0} MB gerekiyor.", $"Not enough free space on the target drive; at least {neededMb:0} MB is needed.");
             return;
         }
+        _probeCts?.Cancel();
         _cts = new CancellationTokenSource(); SetRunning(true); TxtResult.Text = ""; BtnReveal.Visibility = Visibility.Collapsed;
         var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = LocalizeStage(p.Stage); TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
         try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
@@ -489,7 +497,7 @@ public partial class MainWindow : Window
             .Replace("GIF palette", "GIF Paleti", StringComparison.OrdinalIgnoreCase)
             .Replace("GIF encode", "GIF Kodlama", StringComparison.OrdinalIgnoreCase);
     }
-    private void OnCancel(object sender, RoutedEventArgs e) => _cts?.Cancel();
+    private void OnCancel(object sender, RoutedEventArgs e) { _probeCts?.Cancel(); _cts?.Cancel(); }
     private void OnReveal(object sender, RoutedEventArgs e) { if (_lastOutput is not null && File.Exists(_lastOutput)) Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_lastOutput}\"") { UseShellExecute = true }); }
     private void OnSignatureNavigate(object sender, RequestNavigateEventArgs e) { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); e.Handled = true; }
 }
