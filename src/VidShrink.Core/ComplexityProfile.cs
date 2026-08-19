@@ -32,6 +32,9 @@ public sealed record ComplexityProfile
     private const double HalvingStepMax = 12.0;
     private const double LevelFactorMin = 0.1;
     private const double LevelFactorMax = 10.0;
+    public const double WindowBiasMin = 0.5;
+    public const double WindowBiasMax = 2.0;
+
     private const double CalibratedBand = 0.05;
     private const double MeasuredBand = 0.14;
     private const double EstimatedBand = 0.32;
@@ -44,13 +47,18 @@ public sealed record ComplexityProfile
     public double LevelFactor { get; init; } = 1.0;
     public double HalvingStep { get; init; }
     public CalibrationSignature? Calibration { get; init; }
+    public double WindowBias { get; init; } = 1.0;
 
     public bool Calibrated => Calibration is not null && LevelFactor > 0 && HalvingStep > 0;
 
-    public double EstimateBand => Calibrated ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
+    public bool WindowBiasKnown => double.IsFinite(WindowBias) && WindowBias > 0;
+
+    private double WindowDomainFactor => WindowBiasKnown ? WindowBias : 1.0;
+
+    public double EstimateBand => Calibrated && WindowBiasKnown ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
 
     public double EstimateBandFor(string codec, double scale, double fps)
-        => AppliesTo(codec, scale, fps) ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
+        => AppliesTo(codec, scale, fps) && WindowBiasKnown ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
 
     public static ComplexityProfile FromSourceBitrate(MediaInfo info)
     {
@@ -61,25 +69,33 @@ public sealed record ComplexityProfile
         {
             ReferenceBppf = Math.Clamp(x264Equivalent, 0.004, 1.5),
             Measured = false,
-            DetailExponent = DefaultDetailExponent
+            DetailExponent = DefaultDetailExponent,
+            WindowBias = 0.0
         };
     }
 
-    public static ComplexityProfile FromProbe(double fullScaleBppf, double halfScaleBppf, double sampledSeconds, long sampledFrames)
+    public static ComplexityProfile FromProbe(double fullScaleBppf, double halfScaleBppf, double sampledSeconds, long sampledFrames, double windowBias = 0)
     {
         var exponent = DefaultDetailExponent;
         if (fullScaleBppf > 0 && halfScaleBppf > 0)
             exponent = Math.Clamp(Math.Log(halfScaleBppf / fullScaleBppf) / Math.Log(ProbeScale), DetailExponentMin, DetailExponentMax);
 
+        var bias = IsTrustedBias(windowBias) ? windowBias : 0.0;
+        var corrected = bias > 0 ? fullScaleBppf / bias : fullScaleBppf;
+
         return new ComplexityProfile
         {
-            ReferenceBppf = Math.Clamp(fullScaleBppf, 0.002, 2.0),
+            ReferenceBppf = Math.Clamp(corrected, 0.002, 2.0),
             Measured = true,
             DetailExponent = exponent,
             SampledSeconds = sampledSeconds,
-            SampledFrames = sampledFrames
+            SampledFrames = sampledFrames,
+            WindowBias = bias
         };
     }
+
+    public static bool IsTrustedBias(double bias)
+        => double.IsFinite(bias) && bias >= WindowBiasMin && bias <= WindowBiasMax;
 
     public double ScaleFactor(double scale)
     {
@@ -133,6 +149,7 @@ public sealed record ComplexityProfile
 
         var step = Math.Clamp(gap / decades, HalvingStepMin, HalvingStepMax);
         var modelled = RequiredBppf(signature.Codec, signature.Scale, signature.Fps, sourceFps)
+                       * WindowDomainFactor
                        * Math.Pow(2, (CodecModel.ReferenceCrf(signature.Codec) - lowCrf) / step);
         if (!IsUsable(modelled)) return WithoutCalibration();
 

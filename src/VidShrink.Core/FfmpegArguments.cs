@@ -26,6 +26,9 @@ public static class FfmpegArguments
         _ => "slow"
     };
 
+    public static bool SupportsRateLimits(string codec)
+        => !string.Equals(codec, "libsvtav1", StringComparison.OrdinalIgnoreCase);
+
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
@@ -51,12 +54,14 @@ public static class FfmpegArguments
         {
             var qualityFlag = plan.Codec.Contains("nvenc") || plan.Codec.Contains("qsv") ? "-cq" : "-crf";
             a.AddRange(new[] { qualityFlag, plan.Crf!.Value.ToString(CultureInfo.InvariantCulture) });
-            a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK * 2}k", "-bufsize", $"{plan.VideoBitrateK * 4}k" });
+            if (SupportsRateLimits(plan.Codec))
+                a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK * 2}k", "-bufsize", $"{plan.VideoBitrateK * 4}k" });
         }
         else
         {
             a.AddRange(new[] { "-b:v", $"{plan.VideoBitrateK}k" });
-            a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * 1.5)}k", "-bufsize", $"{plan.VideoBitrateK * 2}k" });
+            if (SupportsRateLimits(plan.Codec))
+                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * 1.5)}k", "-bufsize", $"{plan.VideoBitrateK * 2}k" });
             if (pass > 0)
             {
                 a.AddRange(new[] { "-pass", pass.ToString(CultureInfo.InvariantCulture) });

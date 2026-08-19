@@ -15,7 +15,8 @@ Test dosyası: `C:\Users\Administrator\Videos\gothic2026-08-15 14-01-29.mp4`
 
 ```
 T1 (bağımsız) ─────────────────────────┐
-T2 → T2b → T3 → T4 ──────────────────────────┴─► T5
+T2 → T2b → T2c ─┐
+                  T3 → T4 ──────────────────────────┴─► T5
 ```
 
 | # | İş | Rol / model | Bekliyor |
@@ -23,11 +24,16 @@ T2 → T2b → T3 → T4 ──────────────────�
 | T1 | QualityMeter (VMAF NEG harmonik + p10, XPSNR) ve ölçüm harness'i | builder / sonnet | — |
 | T2 | S1 kalibrasyon probu — tahmin ±%8 → ±%3 | builder / opus | — |
 | T2b | Pencere sapmasi duzeltmesi + svtav1 -maxrate hatasi | builder / opus | T2 |
+| T2c | Sabit maliyetli karmasiklik taramasi | builder / opus | T2b |
 | T3 | S2+S3 doluluk bandı ve alt-taşma tekrarı | builder / sonnet | T2b |
 | T4 | S4 aşırı sıkıştırma uzmanlığı — bppf tabanı, rejime bağlı ceza | builder / opus | T3 |
 | T5 | Gerçek dosyayla A/B ve bant doğrulaması, rapor | builder / sonnet | T1, T4 |
 
-T1 ile T2 paralel; `owns` kesişmiyor. T3 ve T4 `PlanCalculator.cs`'i paylaşır, sıralı.
+T2c ile T3 paralel: T2c `ComplexityProbe`/`ComplexityProfile`, T3 `PlanCalculator`/`EncodeRunner`
+tutuyor, `owns` kesişmiyor. T3 ve T4 `PlanCalculator.cs`'i paylaşır, sıralı.
+
+T3 bandı T2c bitmeden gerçek dosyada tutmaz; T3 mantığı ve testleri kurar, bandın
+gerçekten tuttuğu T2c sonrası T5'te ölçülür.
 
 ## Kapsam dışı
 

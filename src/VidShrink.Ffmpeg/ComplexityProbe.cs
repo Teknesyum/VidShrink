@@ -5,10 +5,13 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
+public readonly record struct PacketSample(double PtsSeconds, long Size);
+
 public static class ComplexityProbe
 {
     private const double WindowSeconds = 2.0;
     private const int MaxWindows = 3;
+    private const int MinProfileSeconds = 4;
 
     public static async Task<ComplexityProfile> RunAsync(MediaInfo info, CancellationToken ct = default)
     {
@@ -45,7 +48,9 @@ public static class ComplexityProbe
                 ? halfBytes * 8.0 / ((double)halfWidth * halfHeight * halfFrames)
                 : 0.0;
 
-            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames);
+            var bias = await MeasureWindowBiasAsync(info, ct);
+
+            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias);
         }
         catch (OperationCanceledException)
         {
@@ -57,7 +62,7 @@ public static class ComplexityProbe
         }
     }
 
-    private static IEnumerable<double> Windows(double duration)
+    public static IEnumerable<double> Windows(double duration)
     {
         if (duration <= WindowSeconds * 1.5)
         {
@@ -69,6 +74,109 @@ public static class ComplexityProbe
         var count = duration < WindowSeconds * 6 ? 2 : MaxWindows;
         for (var i = 0; i < count; i++)
             yield return usable * (i + 0.5) / count;
+    }
+
+    public static double ComputeWindowBias(IReadOnlyList<PacketSample> packets, double duration)
+    {
+        var profile = SecondProfile(packets, duration);
+        if (profile.Length < MinProfileSeconds) return 0.0;
+
+        var selected = new HashSet<int>();
+        foreach (var start in Windows(duration))
+        {
+            var first = (int)Math.Floor(start);
+            var last = (int)Math.Floor(start + WindowSeconds) - 1;
+            for (var i = first; i <= last; i++)
+                if (i >= 0 && i < profile.Length) selected.Add(i);
+        }
+
+        if (selected.Count == 0 || selected.Count >= profile.Length) return 0.0;
+
+        var windowMean = selected.Sum(i => profile[i]) / selected.Count;
+        var fileMean = profile.Sum() / profile.Length;
+        if (windowMean <= 0 || fileMean <= 0) return 0.0;
+
+        var bias = windowMean / fileMean;
+        return double.IsFinite(bias) ? bias : 0.0;
+    }
+
+    private static double[] SecondProfile(IReadOnlyList<PacketSample> packets, double duration)
+    {
+        var seconds = (int)Math.Floor(duration);
+        if (seconds < MinProfileSeconds || packets.Count == 0) return Array.Empty<double>();
+
+        var buckets = new double[seconds];
+        foreach (var packet in packets)
+        {
+            if (!double.IsFinite(packet.PtsSeconds) || packet.PtsSeconds < 0 || packet.Size <= 0) continue;
+            var index = (int)packet.PtsSeconds;
+            if (index < buckets.Length) buckets[index] += packet.Size * 8.0;
+        }
+
+        var end = buckets.Length;
+        while (end > 0 && buckets[end - 1] <= 0) end--;
+        if (end < MinProfileSeconds) return Array.Empty<double>();
+        return end == buckets.Length ? buckets : buckets[..end];
+    }
+
+    private static async Task<double> MeasureWindowBiasAsync(MediaInfo info, CancellationToken ct)
+    {
+        try
+        {
+            var packets = await ReadPacketsAsync(info.FilePath, ct);
+            return ComputeWindowBias(packets, info.DurationSeconds);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+            return 0.0;
+        }
+    }
+
+    private static async Task<IReadOnlyList<PacketSample>> ReadPacketsAsync(string path, CancellationToken ct)
+    {
+        var args = new[]
+        {
+            "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "packet=pts_time,size",
+            "-of", "csv=p=0",
+            path
+        };
+
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
+        process.Start();
+        using var cancellationRegistration = ct.Register(() => TryKill(process));
+
+        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
+        var stderrTask = process.StandardError.ReadToEndAsync(ct);
+        await Task.WhenAll(stdoutTask, stderrTask);
+        var stdout = await stdoutTask;
+        await process.WaitForExitAsync(ct);
+
+        if (process.ExitCode != 0) return Array.Empty<PacketSample>();
+        return ParsePackets(stdout);
+    }
+
+    public static IReadOnlyList<PacketSample> ParsePackets(string csv)
+    {
+        var samples = new List<PacketSample>();
+        foreach (var line in csv.Split('\n'))
+        {
+            var trimmed = line.Trim();
+            if (trimmed.Length == 0) continue;
+
+            var comma = trimmed.IndexOf(',');
+            if (comma <= 0) continue;
+
+            if (!double.TryParse(trimmed[..comma], NumberStyles.Float, CultureInfo.InvariantCulture, out var pts)) continue;
+            if (!long.TryParse(trimmed[(comma + 1)..].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var size)) continue;
+
+            samples.Add(new PacketSample(pts, size));
+        }
+        return samples;
     }
 
     private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
@@ -100,7 +208,12 @@ public static class ComplexityProbe
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
         process.Start();
-        var stderr = await process.StandardError.ReadToEndAsync(ct);
+        using var cancellationRegistration = ct.Register(() => TryKill(process));
+
+        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
+        var stderrTask = process.StandardError.ReadToEndAsync(ct);
+        await Task.WhenAll(stdoutTask, stderrTask);
+        var stderr = await stderrTask;
         await process.WaitForExitAsync(ct);
 
         if (process.ExitCode != 0) return (0, 0);
@@ -108,6 +221,11 @@ public static class ComplexityProbe
         var bytes = ParseVideoBytes(stderr);
         var frames = ParseFrames(stderr);
         return (bytes, frames);
+    }
+
+    private static void TryKill(Process process)
+    {
+        try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
     }
 
     private static long ParseVideoBytes(string stderr)

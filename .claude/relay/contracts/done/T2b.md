@@ -6,13 +6,13 @@ model: opus
 depends: [T2]
 owns: [src/VidShrink.Ffmpeg/ComplexityProbe.cs, src/VidShrink.Core/ComplexityProfile.cs, src/VidShrink.Ffmpeg/FfmpegArguments.cs, tests/VidShrink.Tests/WindowSamplingTests.cs]
 side_effects: []
-status: open
-round: 0
-agent_id: —
-audit: —
-auditor_id: —
-diff: —
-verification: —
+status: done
+round: 1
+agent_id: teknesyum-builder
+audit: passed
+auditor_id: T2b-auditor
+diff: ComplexityProfile.cs, ComplexityProbe.cs, FfmpegArguments.cs, WindowSamplingTests.cs
+verification: build 0 uyarı / test 56/56 / gerçek dosyada 180 MB + 8 MB ölçüldü
 ---
 
 ## Amaç
@@ -108,8 +108,81 @@ Ek olarak gerçek dosyada 180 MB ve 8 MB: tahmin, gerçek, mutlak hata, ölçül
 
 ## Kayıt noktası
 
-—
+Tamamlandı, submitted.
+
+- `ComplexityProfile`: `WindowBias`, `WindowBiasKnown`, `IsTrustedBias`, `FromProbe(..., windowBias)`.
+  Bias `[0,5 , 2,0]` dışındaysa uygulanmaz ve `WindowBias = 0` kalır. `EstimateBand` ve
+  `EstimateBandFor` yalnızca kalibrasyon **ve** bias birlikte varken 0,05 döndürür.
+  `Calibrate` içindeki `modelled` pencere alanına taşındı (`WindowDomainFactor`), yoksa
+  `LevelFactor` bias düzeltmesini birebir geri emiyordu — ölçüldü, doğrulandı.
+- `ComplexityProbe`: `ParsePackets`, `ComputeWindowBias`, `Windows` public; ffprobe
+  `packet=pts_time,size` okuması eklendi; `SampleAsync` ve yeni ffprobe çağrısı
+  `Task.WhenAll` + `ct.Register(TryKill)` kalıbına geçirildi.
+- `FfmpegArguments.SupportsRateLimits` — `libsvtav1`'de `-maxrate/-bufsize` üretilmiyor.
+- `WindowSamplingTests` 9 test.
+
+Kalan iş yok. 180 MB hedefte hata %5'in altına inmedi (%13,3) — sebep ve ölçülmüş
+alternatif Çıktı'da.
 
 ## Çıktı
 
-—
+**Değişen dosyalar**
+
+- `src/VidShrink.Core/ComplexityProfile.cs`
+- `src/VidShrink.Core/FfmpegArguments.cs`  ← sözleşmedeki `owns` yolu
+  `src/VidShrink.Ffmpeg/FfmpegArguments.cs` yazıyor, dosya gerçekte `Core` altında;
+  aynı dosya olduğu için orada düzenlendi.
+- `src/VidShrink.Ffmpeg/ComplexityProbe.cs`
+- `tests/VidShrink.Tests/WindowSamplingTests.cs` (yeni)
+
+**Ölçüm** — `gothic2026-08-15 14-01-29.mp4`, 830 MB / 52,6 sn / 1920x1080@48
+
+| hedef | plan | tahmin | gerçek | tahmin hatası | hedef sapması |
+|---|---|---|---|---|---|
+| 180 MB | libx264 / crf 20 / 1920x1080@48 | 143,59 MB | 126,70 MB | **+%13,3** | −%29,6 |
+| 8 MB | libx264 / 2pass / 1190x670@48 | 8,00 MB | 7,98 MB | +%0,2 | −%0,2 |
+| 8 MB (Auto → libsvtav1 / 2pass) | 1190x670@48 | 8,00 MB | 7,84 MB | +%2,0 | −%2,0 |
+
+Ölçülen `WindowBias` = **1,0646**. ffprobe paket çağrısı 0,56 sn sürdü (1 sn sınırının
+altında, `-read_intervals` gerekmedi).
+
+**Hedefe ulaşılamadı — %5 yerine %13,3.** Sebebi ölçtüm: gerçek pencere sapması x264
+alanında **1,191** (tam dosya CRF 23 medium = 0,12597 bppf, pencerelerin ölçtüğü 0,15003
+bppf). Kaynak paketlerinden okunan oran ise yalnızca 1,065. Fark yöntemin kendisinde:
+bu kaynak ~133 Mbit/s ile neredeyse kayıpsız kaydedilmiş, o bit hızında paket boyutu
+sahne karmaşıklığını değil ağırlıkla gürültü/detayı izliyor, dolayısıyla kaynak kodlayıcının
+bit dağılımı x264-CRF dağılımının zayıf bir vekili. Sapmanın 1,191/1,065 = **%11,8'i
+ölçülemeden kalıyor**; kalan tahmin hatası tam olarak bu.
+
+**T0 için karar (uygulamadım, kapsam dışı):** aynı sapma kodlama alanında ucuza
+ölçülebiliyor — tam dosyayı `scale=480:270, libx264, crf 23, preset ultrafast` ile tarayıp
+aynı ayarla kodlanmış pencerelerle karşılaştırınca oran **1,176** çıkıyor (gerçek 1,191'e
+%1,3 uzak). Bu, 180 MB hatasını %5'in altına indirir. Bedeli: 52 sn'lik kaynakta 5,9 sn
+(≈9x gerçek zaman) — 2 saatlik bir videoda ~13,5 dakika. Bu yüzden ya süre eşiğine
+bağlanmalı ya da T4'ün üçüncü ölçüm noktasıyla birleştirilmeli; ikisi de sözleşme dışı
+tasarım kararı.
+
+**Not (kapsam dışı, dokunmadım):** `PlanCalculator.Estimate` bandı hâlâ sabit 0,14/0,32
+kullanıyor, `EstimateBandFor`'u çağırmıyor — T3'ün işi. `libsvtav1` düzeltmesi gerçek
+kodlamayla doğrulandı: `-maxrate` ile çıktı 0 bayt ("Terminating thread with return code
+-22"), `-maxrate` olmadan 413 KB sağlam çıktı.
+
+## Denetim
+
+Auditor K2 (bias yonu ve cifte-duzeltme), K4, K5, K6, K8 ve kod yorumu maddelerini
+gecirdi. `PlanCalculator.cs` owns disi ve dokunulmamis; T0 `git status` ile owns disi
+degisiklik olmadigini ayrica dogruladi.
+
+K1 kaldi: `ReadPacketsAsync` kaynagin uzunluguna bakmaksizin dosyanin tamaminin
+paketlerini okuyor, `-read_intervals` ile adaptif dusme yok. 52 saniyelik test
+dosyasinda 0,56 sn suruyor ama uzun veya yuksek bit hizli kaynakta sinirsiz.
+
+Bu madde T2c'ye devredildi (madde 9). Gerekce: T2c ayni dosyayi (`ComplexityProbe.cs`)
+sahipleniyor ve zaten "olcum suresi kaynak uzunlugundan bagimsiz olmali" ilkesini
+getiriyor; ayni sorunu iki ayri turda cozmek yerine tek yerde cozulur. T2b'nin uretimi
+bu maddeyi bekletmeyi gerektirmiyor — paket tabanli bias T2c'de zaten yedek kademeye
+iniyor.
+
+K6'nin sayisal hedefi (180 MB'da hata %5 alti) tutmadi: %20,6 -> %13,3. Auditor
+dususlu raporlamayi dogru buldu — sayi suslenmemis, sebep olculup aciklanmis,
+uygulanmayan alternatif ayrica isaretlenmis. Kalan sapmanin kapatilmasi T2c'nin isi.
