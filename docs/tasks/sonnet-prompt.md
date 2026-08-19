@@ -13,8 +13,11 @@ uygulanabilir paketlere bölündü.
 2. `docs/claude-engine-audit-report.md` — bulguların gerekçesi ve referanslar
 3. `docs/implementation-report.md` — motorun bugünkü hâli neden böyle
 
-Sonra sırasıyla **P0** ve **P1** paketlerini uygula. P2 ve sonrasına bu oturumda girme;
-P0 ile P1 bitince dur ve rapor ver.
+Sonra **P2** paketini (kalite ölçüm altyapısı) uygula. P3 ve sonrasına bu oturumda girme;
+P2 bitince dur ve rapor ver.
+
+P0 ve P1 tamamlandı (commit `fe95925`): gerekçe kodları, atomic çıktı, disk kontrolü,
+encoder capability cache, HDR/10-bit politikası. Bunları yeniden yapma.
 
 Motorun bugünkü mimarisi:
 
@@ -51,12 +54,20 @@ Ortam bilgisi, tekrar araştırmana gerek yok: ffmpeg 9.0-full kurulu; `libvmaf`
 Test klipleri lavfi ile üretilebilir, depoya klip ekleme.
 
 Sonuç raporunda şunlar olsun: hangi paket bitti, hangi dosyalar değişti, test sayısı ve sonucu,
-HDR koruma ile tone-map yollarının gerçek bir dosyada doğrulanmış `ffprobe` çıktısı, commit kimliği.
+`bench run` çıktısının bir özeti ve `bench/results/baseline.json` yolu, commit kimliği.
 
 ---
 
 ## Sonraki oturumlar
 
-P0 ve P1 bittikten sonra aynı prompt, ilgili paket numaraları değiştirilerek tekrar kullanılır.
-P2 (ölçüm altyapısı) tek başına bir oturumdur ve bittiğinde `bench/results/baseline.json`
-depoya girmiş olmalıdır; P4 ve sonrası o dosya olmadan başlatılmaz.
+Aynı prompt, paket numarası değiştirilerek tekrar kullanılır.
+P2 bittiğinde `bench/results/baseline.json` depoya girmiş olmalıdır;
+P4 ve sonrası o dosya olmadan başlatılmaz.
+
+## P0/P1 denetiminde çıkan ders
+
+Atomic çıktı ilk hâlinde `<hedef>.partial` adını kullanıyordu. ffmpeg konteyner biçimini
+dosya uzantısından seçtiği için bu **her kodlamayı** kırıyordu, ama 30 testin hiçbiri
+başarılı bir encode'u uçtan uca çalıştırmadığı için yeşil görünüyordu.
+Bundan sonra: bir davranış değiştiğinde, o davranışın **mutlu yolunu** gerçek ffmpeg ile
+sınayan en az bir test yaz. Yalnızca hata yolunu test etmek yeterli değil.

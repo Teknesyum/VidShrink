@@ -1,0 +1,29 @@
+{
+  "toplam": 16,
+  "ajanli": 1,
+  "olaylar": {
+    "PostToolUse": 15,
+    "SubagentStop": 1
+  },
+  "ilk": "2026-08-19 16:22:43",
+  "son": "2026-08-19 16:41:37",
+  "ornek_alanlar": [
+    "cwd",
+    "duration_ms",
+    "effort",
+    "hook_event_name",
+    "permission_mode",
+    "prompt_id",
+    "session_id",
+    "tool_input",
+    "tool_name",
+    "tool_response",
+    "tool_use_id",
+    "transcript_path"
+  ],
+  "alanlar": {
+    "PostToolUse": "cwd,duration_ms,effort,hook_event_name,permission_mode,prompt_id,session_id,tool_input,tool_name,tool_response,tool_use_id,transcript_path",
+    "SubagentStop": "agent_id,agent_transcript_path,agent_type,background_tasks,cwd,effort,hook_event_name,last_assistant_message,permission_mode,prompt_id,session_crons,session_id,stop_hook_active,transcript_path"
+  },
+  "ptu_ajanli": 0
+}

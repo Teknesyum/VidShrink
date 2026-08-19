@@ -26,7 +26,7 @@ public sealed class EncodeRunner
         var current = plan;
         var attempt = 0;
         var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
-        var partialPath = outputPath + ".partial";
+        var partialPath = PartialPathFor(outputPath);
 
         try
         {
@@ -78,7 +78,7 @@ public sealed class EncodeRunner
         MediaInfo info, ConversionPlan plan, string outputPath,
         IProgress<EncodeProgress>? progress, CancellationToken ct = default)
     {
-        var partialPath = outputPath + ".partial";
+        var partialPath = PartialPathFor(outputPath);
         try
         {
             var errors = ConversionArguments.Validate(info, plan);
@@ -178,6 +178,13 @@ public sealed class EncodeRunner
     private static void TryKill(Process process)
     {
         try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
+    }
+
+    public static string PartialPathFor(string outputPath)
+    {
+        var dir = Path.GetDirectoryName(outputPath);
+        var name = "vidshrink_partial_" + Guid.NewGuid().ToString("N") + Path.GetExtension(outputPath);
+        return string.IsNullOrEmpty(dir) ? name : Path.Combine(dir, name);
     }
 
     private static void TryDelete(string path)
