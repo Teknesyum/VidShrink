@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title description">
+  <title id="title">VidShrink measured size-targeting engine</title>
+  <desc id="description">A video stream enters a measurement and decision node, which produces a target size plan and a quality output.</desc>
+  <defs>
+    <linearGradient id="blue-pink" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00f3ff"/>
+      <stop offset="1" stop-color="#ff00ea"/>
+    </linearGradient>
+    <filter id="box-glow" x="-30%" y="-40%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feFlood flood-color="#00f3ff" flood-opacity="0.28" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="purple-box-glow" x="-30%" y="-40%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feFlood flood-color="#b026ff" flood-opacity="0.28" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#00f3ff"/>
+    </marker>
+    <marker id="arrow-pink" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#ff00ea"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="620" fill="#000000"/>
+  <path d="M 80 86 H 1120" stroke="#00f3ff" stroke-opacity="0.3"/>
+  <text x="80" y="68" fill="#00f3ff" font-family="Segoe UI, system-ui, sans-serif" font-size="24" font-weight="700" letter-spacing="3">Measured compression, not a lookup table</text>
+
+  <g filter="url(#box-glow)">
+    <rect x="70" y="205" width="260" height="180" rx="16" fill="#0a0a0c" stroke="#00f3ff" stroke-width="3"/>
+  </g>
+  <g fill="none" stroke="#00f3ff" stroke-width="3">
+    <path d="M 105 285 C 130 245, 155 325, 180 285 S 230 245, 255 285 S 305 325, 325 285"/>
+    <path d="M 105 315 C 130 275, 155 355, 180 315 S 230 275, 255 315 S 305 355, 325 315" stroke-opacity="0.5"/>
+  </g>
+  <text x="100" y="245" fill="#ffffff" font-family="Segoe UI, system-ui, sans-serif" font-size="20" font-weight="700">Input video stream</text>
+  <text x="100" y="350" fill="#00f3ff" font-family="Consolas, Cascadia Mono, ui-monospace, monospace" font-size="18">frames · motion · detail</text>
+
+  <path d="M 350 295 H 445" fill="none" stroke="#00f3ff" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="350" y="270" fill="#ffffff" font-family="Consolas, Cascadia Mono, ui-monospace, monospace" font-size="17">sample</text>
+
+  <g filter="url(#purple-box-glow)">
+    <rect x="465" y="175" width="270" height="240" rx="16" fill="#0a0a0c" stroke="#b026ff" stroke-width="3"/>
+  </g>
+  <path d="M 600 225 L 670 295 L 600 365 L 530 295 Z" fill="#000000" stroke="#b026ff" stroke-width="3"/>
+  <path d="M 560 295 H 640 M 600 255 V 335" stroke="#ff00ea" stroke-width="3"/>
+  <text x="505" y="215" fill="#ffffff" font-family="Segoe UI, system-ui, sans-serif" font-size="20" font-weight="700">Measure + decide</text>
+  <text x="505" y="395" fill="#b026ff" font-family="Consolas, Cascadia Mono, ui-monospace, monospace" font-size="18">scale · fps · codec</text>
+
+  <path d="M 755 250 H 850" fill="none" stroke="#ff00ea" stroke-width="4" marker-end="url(#arrow-pink)"/>
+  <path d="M 755 340 H 850" fill="none" stroke="#00f3ff" stroke-width="4" marker-end="url(#arrow-blue)"/>
+
+  <g filter="url(#box-glow)">
+    <rect x="870" y="175" width="260" height="130" rx="16" fill="#0a0a0c" stroke="#ff00ea" stroke-width="3"/>
+  </g>
+  <text x="900" y="220" fill="#ffffff" font-family="Segoe UI, system-ui, sans-serif" font-size="20" font-weight="700">Target size</text>
+  <text x="900" y="265" fill="#ff00ea" font-family="Consolas, Cascadia Mono, ui-monospace, monospace" font-size="22" font-weight="700">≤ 16 MB</text>
+
+  <g filter="url(#box-glow)">
+    <rect x="870" y="335" width="260" height="130" rx="16" fill="#0a0a0c" stroke="#00f3ff" stroke-width="3"/>
+  </g>
+  <text x="900" y="380" fill="#ffffff" font-family="Segoe UI, system-ui, sans-serif" font-size="20" font-weight="700">Quality output</text>
+  <text x="900" y="425" fill="#00f3ff" font-family="Consolas, Cascadia Mono, ui-monospace, monospace" font-size="22" font-weight="700">best visible detail</text>
+
+  <path d="M 80 530 H 1120" stroke="url(#blue-pink)" stroke-width="3"/>
+  <text x="80" y="570" fill="#ffffff" font-family="Segoe UI, system-ui, sans-serif" font-size="18">Every clip gets a plan from what it measures.</text>
+</svg>

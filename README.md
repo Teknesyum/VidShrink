@@ -8,6 +8,10 @@ The interface starts in Turkish and switches to English instantly with the `TR` 
 
 ![VidShrink current interface](docs/assets/vidshrink-current.png)
 
+### Measured compression flow
+
+![VidShrink measured compression engine](docs/assets/vidshrink-neon.svg)
+
 ## One-command Windows installation
 
 Open PowerShell and run:
