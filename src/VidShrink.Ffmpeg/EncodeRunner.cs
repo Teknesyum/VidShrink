@@ -7,7 +7,7 @@ namespace VidShrink.Ffmpeg;
 
 public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan? Remaining, double OutputMb, string Stage);
 
-public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false);
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false);
 public sealed record ConversionResult(string OutputPath, double OutputMb);
 
 public sealed class EncodeRunner
@@ -26,6 +26,7 @@ public sealed class EncodeRunner
     {
         var current = plan;
         var attempt = 0;
+        var usedUnderBandRetry = false;
         var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
         var partialPath = PartialPathFor(outputPath);
 
@@ -48,20 +49,38 @@ public sealed class EncodeRunner
 
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
                 var over = actualMb > targetMb * ToleranceOver;
-                var underBand = fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).HardFloorMb;
+                var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).HardFloorMb;
+                var retryUnderBand = underBand && !usedUnderBandRetry && attempt < MaxAttempts;
 
-                if ((!over && !underBand) || attempt >= MaxAttempts)
+                if (!over && !underBand)
                 {
                     File.Move(partialPath, outputPath, overwrite: true);
-                    var success = !over;
-                    return new EncodeResult(success, outputPath, actualMb, current, attempt,
-                        success ? null : $"Could not get under the target after {attempt} attempts (last result: {actualMb:0.0} MB).",
-                        UnderBand: underBand);
+                    return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false);
                 }
 
-                current = over
-                    ? PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds)
-                    : PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true);
+                if (retryUnderBand)
+                {
+                    usedUnderBandRetry = true;
+                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true);
+                    continue;
+                }
+
+                if (over)
+                {
+                    if (attempt >= MaxAttempts)
+                    {
+                        TryDelete(partialPath);
+                        return new EncodeResult(false, outputPath, actualMb, current, attempt,
+                            $"Stayed over the {targetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
+                            UnderBand: false, CeilingExceeded: true);
+                    }
+
+                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds);
+                    continue;
+                }
+
+                File.Move(partialPath, outputPath, overwrite: true);
+                return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true);
             }
 
             return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.");

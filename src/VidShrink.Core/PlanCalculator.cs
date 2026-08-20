@@ -31,6 +31,8 @@ public static class PlanCalculator
 {
     private const double ContainerOverhead = 0.995;
     private const double CrfFitMargin = 0.94;
+    private const double TwoPassUncertainty = 0.04;
+    private const double UnderBandRetryCapMargin = 1 - TwoPassUncertainty / 2;
     private const double MinScale = 0.25;
     private const double ScaleStep = 0.02;
     private const int MinHeight = 240;
@@ -227,7 +229,7 @@ public static class PlanCalculator
         if (plan.ModeEnum == EncodeMode.TwoPass)
         {
             var expected = SizeMb(plan.VideoBitrateK, plan.AudioBitrateK, info.DurationSeconds);
-            return new SizeEstimate(expected, expected * 0.96, expected * 1.04, complexity.Measured, true);
+            return new SizeEstimate(expected, expected * (1 - TwoPassUncertainty), expected * (1 + TwoPassUncertainty), complexity.Measured, true);
         }
 
         var scale = info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
@@ -251,10 +253,10 @@ public static class PlanCalculator
             var band = FillBand.For(targetMb);
             var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
             var factorUp = bandCenterMb / Math.Max(actualMb, 0.01);
-            var totalBudgetKUp = targetMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
+            var totalBudgetKUp = targetMb * UnderBandRetryCapMargin * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
             var videoBudgetKUp = Math.Max(1, totalBudgetKUp - plan.AudioBitrateK);
             corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factorUp, videoBudgetKUp)));
-            corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.HardFloorMb:0.0} MB floor for a {targetMb:0.##} MB target; video bitrate was scaled by {factorUp:0.###} toward the {bandCenterMb:0.0} MB band center and capped to the remaining budget";
+            corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.HardFloorMb:0.0} MB floor for a {targetMb:0.##} MB target; video bitrate was scaled by {factorUp:0.###} toward the {bandCenterMb:0.0} MB band center and capped to {targetMb * UnderBandRetryCapMargin:0.0} MB of remaining budget, leaving pay below the hard ceiling for two-pass VBR's own targeting uncertainty";
             corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factorUp) };
             return corrected;
         }

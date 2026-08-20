@@ -6,9 +6,9 @@ model: opus
 depends: [T2b]
 owns: [src/VidShrink.Ffmpeg/ComplexityProbe.cs, src/VidShrink.Core/ComplexityProfile.cs, tests/VidShrink.Tests/ComplexityScanTests.cs]
 side_effects: []
-status: open
+status: active
 round: 0
-agent_id: —
+agent_id: T2c-builder-opus
 audit: —
 auditor_id: —
 diff: —
@@ -104,7 +104,20 @@ Ek olarak Çıktı'ya: 52 sn ve ~2 saatlik kaynakta tarama süresi · ölçülen
 
 ## Kayıt noktası
 
-—
+Kod yazildi, `dotnet build -c Release` 0 uyari.
+- `ComplexityProfile.cs`: `WindowBiasSource {None,Packets,Scan}`, `BiasSource`, band 0,05/0,08/0,14/0,32.
+- `ComplexityProbe.cs`: `ScanPoints`/`WindowScanPoints`/`ComputeScanBias`/`ScanBiasAsync`,
+  `PacketIntervals` + `-read_intervals`, `ComputeWindowBias` kapsam asiri yuklemesi,
+  `SampleAsync` public + preset parametresi, uc kademeli `MeasureWindowBiasAsync`.
+Olcumler bitti, hedef tuttu.
+- Kisa segmentin ilk karesi IDR oldugu icin oran 1'e dogru sonumleniyordu. Cozum:
+  nokta 1,0 sn, ilk 0,75 sn isinma olarak atiliyor; kare boyutlari `-vstats_file`
+  ile okunuyor (`ScanSampleAsync` + `ParseVstats`). Bias 1,124 -> 1,1865 (gercek 1,191).
+- seek vs select: seek 52sn 2,86 sn / 2sa 2,91 sn (ayni bit hizinda); select 52sn
+  2,10 sn / 2sa 262 sn. seek secildi.
+- verify: bias 1,1865 · 180 MB est 172,85 gercek 170,19 hata +%1,6 · 8 MB est 8,00
+  gercek 7,98 hata +%0,2. Probe toplam 20,5 sn (830 MB / 133 Mbit-sn kaynak).
+Siradaki: `ComplexityScanTests` ve `CalibrationProbeTests` band testinin guncellenmesi.
 
 ## Çıktı
 

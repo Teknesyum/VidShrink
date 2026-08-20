@@ -17,6 +17,13 @@ public sealed record CalibrationSignature
            && Math.Abs(Fps - fps) <= FpsTolerance;
 }
 
+public enum WindowBiasSource
+{
+    None,
+    Packets,
+    Scan
+}
+
 public sealed record ComplexityProfile
 {
     public const double ProbeCrf = 23.0;
@@ -36,6 +43,7 @@ public sealed record ComplexityProfile
     public const double WindowBiasMax = 2.0;
 
     private const double CalibratedBand = 0.05;
+    private const double PacketBiasBand = 0.08;
     private const double MeasuredBand = 0.14;
     private const double EstimatedBand = 0.32;
 
@@ -48,6 +56,7 @@ public sealed record ComplexityProfile
     public double HalvingStep { get; init; }
     public CalibrationSignature? Calibration { get; init; }
     public double WindowBias { get; init; } = 1.0;
+    public WindowBiasSource BiasSource { get; init; } = WindowBiasSource.None;
 
     public bool Calibrated => Calibration is not null && LevelFactor > 0 && HalvingStep > 0;
 
@@ -55,10 +64,17 @@ public sealed record ComplexityProfile
 
     private double WindowDomainFactor => WindowBiasKnown ? WindowBias : 1.0;
 
-    public double EstimateBand => Calibrated && WindowBiasKnown ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
+    private double BiasBand => BiasSource switch
+    {
+        WindowBiasSource.Scan => CalibratedBand,
+        WindowBiasSource.Packets => PacketBiasBand,
+        _ => MeasuredBand
+    };
+
+    public double EstimateBand => Calibrated && WindowBiasKnown ? BiasBand : Measured ? MeasuredBand : EstimatedBand;
 
     public double EstimateBandFor(string codec, double scale, double fps)
-        => AppliesTo(codec, scale, fps) && WindowBiasKnown ? CalibratedBand : Measured ? MeasuredBand : EstimatedBand;
+        => AppliesTo(codec, scale, fps) && WindowBiasKnown ? BiasBand : Measured ? MeasuredBand : EstimatedBand;
 
     public static ComplexityProfile FromSourceBitrate(MediaInfo info)
     {
@@ -70,11 +86,12 @@ public sealed record ComplexityProfile
             ReferenceBppf = Math.Clamp(x264Equivalent, 0.004, 1.5),
             Measured = false,
             DetailExponent = DefaultDetailExponent,
-            WindowBias = 0.0
+            WindowBias = 0.0,
+            BiasSource = WindowBiasSource.None
         };
     }
 
-    public static ComplexityProfile FromProbe(double fullScaleBppf, double halfScaleBppf, double sampledSeconds, long sampledFrames, double windowBias = 0)
+    public static ComplexityProfile FromProbe(double fullScaleBppf, double halfScaleBppf, double sampledSeconds, long sampledFrames, double windowBias = 0, WindowBiasSource biasSource = WindowBiasSource.Scan)
     {
         var exponent = DefaultDetailExponent;
         if (fullScaleBppf > 0 && halfScaleBppf > 0)
@@ -90,7 +107,8 @@ public sealed record ComplexityProfile
             DetailExponent = exponent,
             SampledSeconds = sampledSeconds,
             SampledFrames = sampledFrames,
-            WindowBias = bias
+            WindowBias = bias,
+            BiasSource = bias > 0 ? biasSource : WindowBiasSource.None
         };
     }
 

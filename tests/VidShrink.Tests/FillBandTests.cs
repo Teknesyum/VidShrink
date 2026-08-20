@@ -160,6 +160,34 @@ public sealed class FillBandTests
     }
 
     [Fact]
+    public void CorrectFillsUnderBandLeavesPayBelowTheHardCeiling()
+    {
+        var plan = new EncodePlan
+        {
+            Mode = "2pass",
+            VideoBitrateK = 30000,
+            AudioBitrateK = 128,
+            AudioCodec = "aac",
+            Width = 1920,
+            Height = 1080,
+            Fps = 48,
+            Codec = "libx264",
+            Preset = "slow"
+        };
+
+        var corrected = PlanCalculator.Correct(plan, actualMb: 170, targetMb: 180, durationSeconds: 120, fillUnderBand: true);
+        var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
+        var band = FillBand.For(180);
+
+        Assert.True(estimated < 180,
+            $"Retry must never aim at or above the hard ceiling, got {estimated:0.0} MB.");
+        Assert.True(estimated <= 180 * 0.99,
+            $"Expected the retry cap to leave real pay below the target for two-pass VBR's own overshoot, got {estimated:0.0} MB.");
+        Assert.True(estimated > band.LowerMb - 1.0,
+            $"Expected the capped retry to still land near the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {estimated:0.0} MB.");
+    }
+
+    [Fact]
     public async Task EncodeRunnerRetriesWhenUnderTheHardFloorInFillTargetMode()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
@@ -220,6 +248,74 @@ public sealed class FillBandTests
             Assert.True(File.Exists(outputPath));
             Assert.True(result.Attempts > 1,
                 $"Expected the under-floor result to trigger a retry, got {result.Attempts} attempt(s) at {result.OutputMb:0.0} MB.");
+            Assert.True(result.Attempts <= 2,
+                $"Expected the under-band correction to be used at most once, leaving the rest of MaxAttempts for the ceiling side; got {result.Attempts} attempt(s).");
+        }
+        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+    }
+
+    [Fact]
+    public async Task EncodeRunnerWritesNoFileWhenStillOverTheCeilingAfterMaxAttempts()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_fillband_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        var source = Path.Combine(dir, "source.mp4");
+        var outputPath = Path.Combine(dir, "result.mp4");
+        try
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = ToolLocator.Ffmpeg,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            foreach (var arg in new[]
+            {
+                "-y", "-f", "lavfi", "-i", "testsrc=size=320x240:rate=10:duration=2",
+                "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", source
+            }) psi.ArgumentList.Add(arg);
+            using var make = new System.Diagnostics.Process { StartInfo = psi };
+            make.Start();
+            var drain = Task.WhenAll(make.StandardOutput.ReadToEndAsync(), make.StandardError.ReadToEndAsync());
+            await make.WaitForExitAsync();
+            await drain;
+            Assert.True(File.Exists(source));
+
+            var info = new MediaInfo
+            {
+                FilePath = source,
+                FileSizeBytes = new FileInfo(source).Length,
+                DurationSeconds = 2,
+                Width = 320,
+                Height = 240,
+                Fps = 10,
+                VideoCodec = "h264",
+                TotalBitrateBps = 400_000
+            };
+            var plan = new EncodePlan
+            {
+                Codec = "libx264",
+                Mode = "crf",
+                Crf = 18,
+                VideoBitrateK = 2000,
+                AudioCodec = null,
+                AudioBitrateK = 0,
+                Width = 320,
+                Height = 240,
+                Fps = 10,
+                Preset = "ultrafast"
+            };
+
+            var result = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb: 0.001, progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.QualityCeiling);
+
+            Assert.False(result.Success);
+            Assert.True(result.CeilingExceeded);
+            Assert.False(File.Exists(outputPath), "A file larger than the target must never be handed back.");
+            Assert.Equal(3, result.Attempts);
         }
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
     }

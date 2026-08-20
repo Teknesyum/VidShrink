@@ -414,7 +414,31 @@ public partial class MainWindow : Window
         _probeCts?.Cancel();
         _cts = new CancellationTokenSource(); SetRunning(true); TxtResult.Text = ""; BtnReveal.Visibility = Visibility.Collapsed;
         var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = LocalizeStage(p.Stage); TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
-        try { var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token, CurrentOptions().FillPolicy); _lastOutput = result.OutputPath; TxtOutSize.Text = $"{result.OutputMb:0.0} MB"; TxtResult.Text = result.Success ? (_turkish ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)." : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).") : result.Error; BtnReveal.Visibility = Visibility.Visible; }
+        try
+        {
+            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token, CurrentOptions().FillPolicy);
+            _lastOutput = result.OutputPath;
+            if (result.Success)
+            {
+                TxtOutSize.Text = $"{result.OutputMb:0.0} MB";
+                TxtResult.Text = _turkish
+                    ? $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{100 - result.OutputMb / _info.FileSizeMb * 100:0.#} daha küçük)."
+                    : $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({100 - result.OutputMb / _info.FileSizeMb * 100:0.#}% smaller).";
+            }
+            else if (result.CeilingExceeded)
+            {
+                TxtOutSize.Text = "-";
+                TxtResult.Text = T(
+                    $"{result.Attempts} denemede {targetMb:0.##} MB hedefinin altına inilemedi (son sonuç {result.OutputMb:0.0} MB). Dosya teslim edilmedi, çünkü hedeften büyük dosya asla verilmez. Hedefi büyütüp yeniden deneyin.",
+                    $"Could not get under the {targetMb:0.##} MB target after {result.Attempts} attempt(s) (last result was {result.OutputMb:0.0} MB). No file was written, because a file larger than the target is never handed back. Raise the target and try again.");
+            }
+            else
+            {
+                TxtOutSize.Text = "-";
+                TxtResult.Text = result.Error;
+            }
+            BtnReveal.Visibility = result.Success ? Visibility.Visible : Visibility.Collapsed;
+        }
         catch (OperationCanceledException) { TxtResult.Text = T("İptal edildi.", "Cancelled."); } catch (Exception ex) { TxtResult.Text = ex.Message; } finally { _cts.Dispose(); _cts = null; SetRunning(false); }
     }
 

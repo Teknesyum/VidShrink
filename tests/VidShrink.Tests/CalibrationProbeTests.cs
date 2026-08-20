@@ -110,13 +110,14 @@ public sealed class CalibrationProbeTests
     {
         var measured = BaseProfile();
         var estimated = measured with { Measured = false };
-        var calibrated = measured.Calibrate(Signature(), 25, 0.12, 29, 0.06, SourceFps);
+        var scanned = (measured with { WindowBias = 1.19, BiasSource = WindowBiasSource.Scan })
+            .Calibrate(Signature(), 25, 0.12, 29, 0.06, SourceFps);
 
         Assert.Equal(0.32, estimated.EstimateBand, 9);
         Assert.Equal(0.14, measured.EstimateBand, 9);
-        Assert.Equal(0.05, calibrated.EstimateBand, 9);
-        Assert.Equal(0.05, calibrated.EstimateBandFor(Codec, 1.0, SourceFps), 9);
-        Assert.Equal(0.14, calibrated.EstimateBandFor(Codec, 0.62, SourceFps), 9);
+        Assert.Equal(0.05, scanned.EstimateBand, 9);
+        Assert.Equal(0.05, scanned.EstimateBandFor(Codec, 1.0, SourceFps), 9);
+        Assert.Equal(0.14, scanned.EstimateBandFor(Codec, 0.62, SourceFps), 9);
     }
 
     [Fact]

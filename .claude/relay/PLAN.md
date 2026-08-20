@@ -58,7 +58,7 @@ gerçekten tuttuğu T2c sonrası T5'te ölçülür.
 | T2 | done | Kalibrasyon probu. Olculen yarilanma adimi 4,65 (model 6,0 diyordu). |
 | T2b | done | Pencere sapmasi 1,065 olculdu; hata %20,6 -> %13,3. K1 (adaptif paket okuma) T2c'ye devredildi. |
 | T2c | active | Sabit maliyetli tarama. Hedef: 180 MB'da hata %5 alti. |
-| T3 | submitted | Doluluk bandi. Bes hedefin besi de bandin icinde; 180 -> 175,06 MB. Denetimde. |
+| T3 | active | Doluluk bandi. Bes hedefin besi de bandin icinde; 180 -> 175,06 MB. Duzeltme turu 1: uc madde acik. |
 | T4 | open | Asiri sikistirma uzmanligi. T3 muhurlenince acilir. |
 | T5 | open | Gercek dosya A/B ve rapor. T1 + T4 bekliyor. |
 

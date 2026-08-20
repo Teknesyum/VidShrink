@@ -13,6 +13,20 @@ public static class ComplexityProbe
     private const int MaxWindows = 3;
     private const int MinProfileSeconds = 4;
 
+    private const double ScanPointSeconds = 1.0;
+    private const double ScanWarmupSeconds = 0.75;
+    private const int ScanPointCount = 40;
+    private const int ScanPointsPerWindow = 4;
+    private const int ScanConcurrency = 8;
+    private const int ScanWidth = 480;
+    private const int ScanHeight = 270;
+    private const string ScanPreset = "ultrafast";
+
+    private const double PacketFullReadSeconds = 180.0;
+    private const int PacketIntervalCount = 40;
+    private const int PacketIntervalSeconds = 2;
+    private const int PacketWindowIntervalSeconds = 3;
+
     public static async Task<ComplexityProfile> RunAsync(MediaInfo info, CancellationToken ct = default)
     {
         try
@@ -48,9 +62,9 @@ public static class ComplexityProbe
                 ? halfBytes * 8.0 / ((double)halfWidth * halfHeight * halfFrames)
                 : 0.0;
 
-            var bias = await MeasureWindowBiasAsync(info, ct);
+            var (bias, source) = await MeasureWindowBiasAsync(info, ct);
 
-            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias);
+            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source);
         }
         catch (OperationCanceledException)
         {
@@ -76,29 +90,134 @@ public static class ComplexityProbe
             yield return usable * (i + 0.5) / count;
     }
 
+    public static IReadOnlyList<double> WindowScanPoints(double duration)
+    {
+        var points = new SortedSet<double>();
+        var span = WindowSeconds - ScanPointSeconds;
+        foreach (var start in Windows(duration))
+            for (var i = 0; i < ScanPointsPerWindow; i++)
+                points.Add(Round(start + span * i / (ScanPointsPerWindow - 1)));
+        return points.ToList();
+    }
+
+    public static IReadOnlyList<double> ScanPoints(double duration)
+    {
+        var points = new SortedSet<double>(WindowScanPoints(duration));
+        var usable = Math.Max(0.0, duration - ScanPointSeconds);
+        var extra = Math.Max(1, ScanPointCount - points.Count);
+        for (var i = 0; i < extra; i++)
+            points.Add(Round(usable * (i + 0.5) / extra));
+        return points.ToList();
+    }
+
+    public static double ComputeScanBias(IReadOnlyList<double> points, IReadOnlyList<double> windowPoints, IReadOnlyList<(long Bytes, long Frames)> samples, double duration)
+    {
+        if (points.Count != samples.Count || windowPoints.Count == 0) return 0.0;
+        if (points.Count <= windowPoints.Count || duration <= 0) return 0.0;
+
+        var selected = new HashSet<double>(windowPoints);
+        long spreadBytes = 0, spreadFrames = 0, windowBytes = 0, windowFrames = 0;
+        for (var i = 0; i < points.Count; i++)
+        {
+            var (bytes, frames) = samples[i];
+            if (frames <= 0 || bytes <= 0) continue;
+            if (selected.Contains(points[i]))
+            {
+                windowBytes += bytes;
+                windowFrames += frames;
+            }
+            else
+            {
+                spreadBytes += bytes;
+                spreadFrames += frames;
+            }
+        }
+
+        if (windowFrames <= 0 || spreadFrames <= 0) return 0.0;
+
+        var windowMean = windowBytes / (double)windowFrames;
+        var spreadMean = spreadBytes / (double)spreadFrames;
+        if (windowMean <= 0 || spreadMean <= 0) return 0.0;
+
+        var share = Math.Clamp(Windows(duration).Count() * WindowSeconds / duration, 0.0, 0.5);
+        var fileMean = share * windowMean + (1.0 - share) * spreadMean;
+        if (fileMean <= 0) return 0.0;
+
+        var bias = windowMean / fileMean;
+        return double.IsFinite(bias) ? bias : 0.0;
+    }
+
+    public static IReadOnlyList<(double Start, double Length)> PacketIntervals(double duration)
+    {
+        if (!double.IsFinite(duration) || duration <= PacketFullReadSeconds) return Array.Empty<(double, double)>();
+
+        var intervals = new SortedDictionary<double, double>();
+        foreach (var start in Windows(duration))
+            intervals[Math.Floor(start)] = PacketWindowIntervalSeconds;
+
+        var usable = Math.Max(0.0, duration - PacketIntervalSeconds);
+        var extra = Math.Max(1, PacketIntervalCount - intervals.Count);
+        for (var i = 0; i < extra; i++)
+        {
+            var start = Math.Floor(usable * (i + 0.5) / extra);
+            if (!intervals.ContainsKey(start)) intervals[start] = PacketIntervalSeconds;
+        }
+
+        return intervals.Select(pair => (pair.Key, pair.Value)).ToList();
+    }
+
     public static double ComputeWindowBias(IReadOnlyList<PacketSample> packets, double duration)
+        => ComputeWindowBias(packets, duration, Array.Empty<(double, double)>());
+
+    public static double ComputeWindowBias(IReadOnlyList<PacketSample> packets, double duration, IReadOnlyList<(double Start, double Length)> intervals)
     {
         var profile = SecondProfile(packets, duration);
         if (profile.Length < MinProfileSeconds) return 0.0;
 
+        var covered = CoveredSeconds(profile.Length, intervals);
         var selected = new HashSet<int>();
         foreach (var start in Windows(duration))
         {
             var first = (int)Math.Floor(start);
             var last = (int)Math.Floor(start + WindowSeconds) - 1;
             for (var i = first; i <= last; i++)
-                if (i >= 0 && i < profile.Length) selected.Add(i);
+                if (i >= 0 && i < profile.Length && covered[i] && profile[i] > 0) selected.Add(i);
         }
 
-        if (selected.Count == 0 || selected.Count >= profile.Length) return 0.0;
+        var pool = new List<int>();
+        for (var i = 0; i < profile.Length; i++)
+            if (covered[i] && profile[i] > 0) pool.Add(i);
+
+        if (selected.Count == 0 || pool.Count < MinProfileSeconds || selected.Count >= pool.Count) return 0.0;
 
         var windowMean = selected.Sum(i => profile[i]) / selected.Count;
-        var fileMean = profile.Sum() / profile.Length;
+        var fileMean = pool.Sum(i => profile[i]) / pool.Count;
         if (windowMean <= 0 || fileMean <= 0) return 0.0;
 
         var bias = windowMean / fileMean;
         return double.IsFinite(bias) ? bias : 0.0;
     }
+
+    private static bool[] CoveredSeconds(int seconds, IReadOnlyList<(double Start, double Length)> intervals)
+    {
+        var covered = new bool[seconds];
+        if (intervals.Count == 0)
+        {
+            Array.Fill(covered, true);
+            return covered;
+        }
+
+        foreach (var (start, length) in intervals)
+        {
+            var first = (int)Math.Ceiling(start);
+            var last = (int)Math.Floor(start + length) - 1;
+            for (var i = first; i <= last; i++)
+                if (i >= 0 && i < seconds) covered[i] = true;
+        }
+        return covered;
+    }
+
+    private static double Round(double value) => Math.Round(Math.Max(0.0, value), 3, MidpointRounding.AwayFromZero);
 
     private static double[] SecondProfile(IReadOnlyList<PacketSample> packets, double duration)
     {
@@ -119,12 +238,42 @@ public static class ComplexityProbe
         return end == buckets.Length ? buckets : buckets[..end];
     }
 
-    private static async Task<double> MeasureWindowBiasAsync(MediaInfo info, CancellationToken ct)
+    private static async Task<(double Bias, WindowBiasSource Source)> MeasureWindowBiasAsync(MediaInfo info, CancellationToken ct)
+    {
+        var scan = await ScanBiasAsync(info, ct);
+        if (ComplexityProfile.IsTrustedBias(scan)) return (scan, WindowBiasSource.Scan);
+
+        var packet = await PacketBiasAsync(info, ct);
+        if (ComplexityProfile.IsTrustedBias(packet)) return (packet, WindowBiasSource.Packets);
+
+        return (0.0, WindowBiasSource.None);
+    }
+
+    public static async Task<double> ScanBiasAsync(MediaInfo info, CancellationToken ct)
     {
         try
         {
-            var packets = await ReadPacketsAsync(info.FilePath, ct);
-            return ComputeWindowBias(packets, info.DurationSeconds);
+            var points = ScanPoints(info.DurationSeconds);
+            var windowPoints = WindowScanPoints(info.DurationSeconds);
+            if (points.Count <= windowPoints.Count) return 0.0;
+
+            var filter = $"scale={ScanWidth}:{ScanHeight}";
+            using var gate = new SemaphoreSlim(ScanConcurrency);
+            var pending = points.Select(async point =>
+            {
+                await gate.WaitAsync(ct);
+                try
+                {
+                    return await ScanSampleAsync(info.FilePath, point, filter, ct);
+                }
+                finally
+                {
+                    gate.Release();
+                }
+            }).ToArray();
+
+            var samples = await Task.WhenAll(pending);
+            return ComputeScanBias(points, windowPoints, samples, info.DurationSeconds);
         }
         catch (OperationCanceledException)
         {
@@ -136,17 +285,43 @@ public static class ComplexityProbe
         }
     }
 
-    private static async Task<IReadOnlyList<PacketSample>> ReadPacketsAsync(string path, CancellationToken ct)
+    public static async Task<double> PacketBiasAsync(MediaInfo info, CancellationToken ct)
     {
-        var args = new[]
+        try
+        {
+            var intervals = PacketIntervals(info.DurationSeconds);
+            var packets = await ReadPacketsAsync(info.FilePath, intervals, ct);
+            return ComputeWindowBias(packets, info.DurationSeconds, intervals);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+            return 0.0;
+        }
+    }
+
+    private static async Task<IReadOnlyList<PacketSample>> ReadPacketsAsync(string path, IReadOnlyList<(double Start, double Length)> intervals, CancellationToken ct)
+    {
+        var args = new List<string>
         {
             "-v", "error", "-select_streams", "v:0",
             "-show_entries", "packet=pts_time,size",
-            "-of", "csv=p=0",
-            path
+            "-of", "csv=p=0"
         };
 
-        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
+        if (intervals.Count > 0)
+        {
+            args.Add("-read_intervals");
+            args.Add(string.Join(",", intervals.Select(i =>
+                $"{i.Start.ToString("0.###", CultureInfo.InvariantCulture)}%+{i.Length.ToString("0.###", CultureInfo.InvariantCulture)}")));
+        }
+
+        args.Add(path);
+
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args.ToArray()) };
         process.Start();
         using var cancellationRegistration = ct.Register(() => TryKill(process));
 
@@ -181,7 +356,7 @@ public static class ComplexityProbe
 
     private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
-    private static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, CancellationToken ct)
+    public static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, CancellationToken ct)
     {
         var args = new List<string>
         {
@@ -220,6 +395,64 @@ public static class ComplexityProbe
 
         var bytes = ParseVideoBytes(stderr);
         var frames = ParseFrames(stderr);
+        return (bytes, frames);
+    }
+
+    private static async Task<(long Bytes, long Frames)> ScanSampleAsync(string path, double start, string filter, CancellationToken ct)
+    {
+        var statsPath = Path.Combine(Path.GetTempPath(), "vidshrink_scan_" + Guid.NewGuid().ToString("N") + ".txt");
+        try
+        {
+            var args = new[]
+            {
+                "-hide_banner", "-nostdin", "-v", "error", "-y",
+                "-vstats_file", statsPath,
+                "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
+                "-t", ScanPointSeconds.ToString("0.###", CultureInfo.InvariantCulture),
+                "-i", path,
+                "-an", "-sn", "-dn",
+                "-vf", filter,
+                "-c:v", "libx264",
+                "-crf", ComplexityProfile.ProbeCrf.ToString("0", CultureInfo.InvariantCulture),
+                "-preset", ScanPreset,
+                "-f", "null", "-"
+            };
+
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+            process.Start();
+            using var cancellationRegistration = ct.Register(() => TryKill(process));
+
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
+            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            await Task.WhenAll(stdoutTask, stderrTask);
+            await process.WaitForExitAsync(ct);
+
+            if (process.ExitCode != 0 || !File.Exists(statsPath)) return (0, 0);
+            return ParseVstats(await File.ReadAllTextAsync(statsPath, ct), ScanWarmupSeconds);
+        }
+        finally
+        {
+            try { File.Delete(statsPath); } catch { }
+        }
+    }
+
+    public static (long Bytes, long Frames) ParseVstats(string vstats, double warmupSeconds)
+    {
+        long bytes = 0, frames = 0;
+        foreach (var line in vstats.Split('\n'))
+        {
+            var sizeMatch = Regex.Match(line, @"f_size=\s*(\d+)");
+            if (!sizeMatch.Success) continue;
+
+            var timeMatch = Regex.Match(line, @"\btime=\s*([\d.]+)");
+            if (!timeMatch.Success) continue;
+            if (!double.TryParse(timeMatch.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var time)) continue;
+            if (time < warmupSeconds) continue;
+            if (!long.TryParse(sizeMatch.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var size)) continue;
+
+            bytes += size;
+            frames++;
+        }
         return (bytes, frames);
     }
 

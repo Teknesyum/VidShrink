@@ -26,7 +26,10 @@ T2b'de ffprobe packet çağrısı); her yeni `Process` kullanan builder aynı ik
 kontrol et: (a) her iki akış da `Task.WhenAll` ile okunuyor mu, (b) `ct.Register` ile
 `Kill(entireProcessTree: true)` var mı. T2b'de her iki nokta da doğru uygulanmış bulundu
 (ComplexityProbe.cs SampleAsync + ReadPacketsAsync) — bu artık iyi örnek referansı olarak
-kullanılabilir.
+kullanılabilir. T3'te de `EncodeRunner.RunCommandAsync` aynı kalıba uyuyor (stdout progress
+döngüsü + ayrı stderr `Task.Run` kuyruğu + `ct.Register(() => TryKill(process))`) — üçüncü
+doğrulama, artık bu dosyada bu iki madde için ayrıca risk aranmasına gerek yok, yalnızca
+yeni bir Process başlatan dosya eklendiğinde kontrol listesi geçerli.
 
 Ayrıca genel ders: kabul kriterinde "büyük/uzun kaynakta X saniyeyi aşmamalı, aşarsa Y
 mekanizmasına düş" gibi adaptif bir davranış isteniyorsa, sadece verilen test dosyasında
