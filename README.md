@@ -1,6 +1,6 @@
 # VidShrink
 
-Free, offline Windows app that shrinks a video to a target file size — and loses the least of what a person can actually see while doing it.
+Free, offline desktop app for Windows, macOS and Linux that shrinks a video to a target file size — and loses the least of what a person can actually see while doing it.
 
 Give it a file and a ceiling in megabytes. It never returns a file larger than you asked for, and it tells you the expected size before you press start.
 
@@ -12,7 +12,9 @@ The interface starts in Turkish and switches to English instantly with the `TR` 
 
 ![VidShrink measured compression engine](docs/assets/vidshrink-neon.svg)
 
-## One-command Windows installation
+## One-command installation
+
+### Windows
 
 Open PowerShell and run:
 
@@ -23,6 +25,18 @@ irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink
 The installer needs no administrator rights. It reuses an installed .NET 8 SDK when it finds one and otherwise bootstraps it with Microsoft's own `dotnet-install.ps1` into `%LOCALAPPDATA%\Microsoft\dotnet`; FFmpeg and FFprobe come from WinGet. It then downloads the latest `main` source, publishes a self-contained Release build for the machine's own architecture, installs it under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. Running the same command again replaces the installed app with the newest version.
 
 If PowerShell script execution is restricted by organizational policy, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session.
+
+### macOS and Linux
+
+Open a terminal and run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+```
+
+The installer needs no root. It reuses an installed .NET 8 SDK when it finds one and otherwise bootstraps it with Microsoft's own `dotnet-install.sh` into `~/.dotnet`. It then downloads the latest `main` source, publishes a self-contained Release build for the machine's own architecture — `osx-arm64`, `osx-x64`, `linux-x64` or `linux-arm64`, decided from `uname` — installs it under `~/.local/share/vidshrink`, and links it as `~/.local/bin/vidshrink`. Running the same command again replaces the installed app with the newest version.
+
+FFmpeg is the one thing this installer will not put on your machine for you. If `ffmpeg` or `ffprobe` is missing it prints the command for your package manager — `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading anything else.
 
 ### README image portability
 
@@ -111,11 +125,13 @@ Stream copy uses real `-c:v copy` and `-c:a copy`. Incompatible container and so
 
 ## Requirements and development build
 
-- Windows 10 or 11
-- .NET 8 Desktop Runtime
-- `ffmpeg.exe` and `ffprobe.exe` in `tools\ffmpeg` beside the application, or on `PATH`
+- Windows 10 or 11, macOS 12 or newer, or a Linux desktop running X11 or Wayland
+- `ffmpeg` and `ffprobe` in a `tools/ffmpeg` folder beside the application, or on `PATH`
+- No .NET runtime. Both installers publish a self-contained build, so the runtime travels inside the installed application
 
-```powershell
+Building from a clone needs the .NET 8 SDK:
+
+```sh
 dotnet build VidShrink.sln -c Release
 dotnet test VidShrink.sln
 ```
@@ -125,7 +141,7 @@ dotnet test VidShrink.sln
 ```text
 src/VidShrink.Core     complexity model, strategy, planning, ffmpeg argument construction
 src/VidShrink.Ffmpeg   ffprobe, complexity probe, encode execution
-src/VidShrink.App      WPF user interface
+src/VidShrink.App      Avalonia user interface, one source tree for all three platforms
 tests/VidShrink.Tests  engine and argument-generation regression tests
 ```
 
@@ -133,4 +149,8 @@ Release history is in [`CHANGELOG.md`](CHANGELOG.md). The current engine audit, 
 
 ## License
 
-MIT
+VidShrink itself is MIT licensed; the terms are in [`LICENSE`](LICENSE).
+
+**FFmpeg is a separate program under its own license, and VidShrink does not redistribute it.** On Windows the installer asks WinGet for `Gyan.FFmpeg`, whose builds are GPLv3. On macOS and Linux the installer installs nothing — it prints your package manager's command and you fetch FFmpeg yourself. Either way the binary arrives on your own machine, under its own terms, at install time. It is not in this repository and not inside anything this repository hands out. VidShrink runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the MIT application.
+
+That separation is what keeps the two licenses apart, and it holds only while no packaged download exists. **Shipping a VidShrink release with an FFmpeg binary inside it would place a GPLv3 build in an MIT product and pull in the GPL's source-offer and license-notice obligations.** Such a release would first have to move to an LGPL FFmpeg build or adopt the GPLv3 terms. That decision has not been taken and no packaged release is published.

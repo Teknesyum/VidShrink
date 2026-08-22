@@ -1,0 +1,136 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Color x:Key="NeonBlueColor">#FF00F3FF</Color>
+  <Color x:Key="NeonPinkColor">#FFFF00EA</Color>
+  <Color x:Key="NeonPurpleColor">#FFB026FF</Color>
+  <Color x:Key="NeonSuccessColor">#FF34D399</Color>
+  <Color x:Key="SurfaceToneColor">#FF121216</Color>
+  <Color x:Key="AppBgColor">#FF050507</Color>
+  <Color x:Key="TextBodyColor">#FFFFFFFF</Color>
+  <Color x:Key="TextDisabledColor">#FF71717A</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1A00F3FF</Color>
+  <Color x:Key="NeonBlueHoverColor">#3300F3FF</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D00F3FF</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D00F3FF</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#8000F3FF</Color>
+  <Color x:Key="NeonPinkFillColor">#1AFF00EA</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80B026FF</Color>
+
+  <SolidColorBrush x:Key="NeonBlue" Color="{StaticResource NeonBlueColor}"/>
+  <SolidColorBrush x:Key="NeonPink" Color="{StaticResource NeonPinkColor}"/>
+  <SolidColorBrush x:Key="NeonPurple" Color="{StaticResource NeonPurpleColor}"/>
+  <SolidColorBrush x:Key="NeonSuccess" Color="{StaticResource NeonSuccessColor}"/>
+  <SolidColorBrush x:Key="Surface" Color="{StaticResource SurfaceToneColor}"/>
+  <SolidColorBrush x:Key="AppBg" Color="{StaticResource AppBgColor}"/>
+  <SolidColorBrush x:Key="TextBody" Color="{StaticResource TextBodyColor}"/>
+  <SolidColorBrush x:Key="TextDisabled" Color="{StaticResource TextDisabledColor}"/>
+
+  <SolidColorBrush x:Key="NeonBlueFill" Color="{StaticResource NeonBlueFillColor}"/>
+  <SolidColorBrush x:Key="NeonBlueHover" Color="{StaticResource NeonBlueHoverColor}"/>
+  <SolidColorBrush x:Key="NeonBlueActive" Color="{StaticResource NeonBlueActiveColor}"/>
+  <SolidColorBrush x:Key="NeonBlueBorder" Color="{StaticResource NeonBlueBorderColor}"/>
+  <SolidColorBrush x:Key="NeonBlueBorderStrong" Color="{StaticResource NeonBlueBorderStrongColor}"/>
+  <SolidColorBrush x:Key="NeonPinkFill" Color="{StaticResource NeonPinkFillColor}"/>
+  <SolidColorBrush x:Key="NeonPurpleBorder" Color="{StaticResource NeonPurpleBorderColor}"/>
+  <SolidColorBrush x:Key="OnNeon" Color="#FF000000"/>
+
+  <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0%,50%" EndPoint="100%,50%">
+    <GradientStop Color="#FF101217" Offset="0"/>
+    <GradientStop Color="#FF101217" Offset="0.1"/>
+    <GradientStop Color="#FF111217" Offset="0.2"/>
+    <GradientStop Color="#FF111217" Offset="0.3"/>
+    <GradientStop Color="#FF121217" Offset="0.4"/>
+    <GradientStop Color="{StaticResource SurfaceToneColor}" Offset="0.5"/>
+    <GradientStop Color="#FF121117" Offset="0.6"/>
+    <GradientStop Color="#FF131117" Offset="0.7"/>
+    <GradientStop Color="#FF131117" Offset="0.8"/>
+    <GradientStop Color="#FF141117" Offset="0.9"/>
+    <GradientStop Color="#FF141117" Offset="1"/>
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="WorkspaceBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+    <GradientStop Color="#FF08090D" Offset="0"/>
+    <GradientStop Color="#FF08090D" Offset="0.1"/>
+    <GradientStop Color="#FF09090E" Offset="0.2"/>
+    <GradientStop Color="#FF09090E" Offset="0.3"/>
+    <GradientStop Color="#FF0A090F" Offset="0.4"/>
+    <GradientStop Color="#FF0A090F" Offset="0.5"/>
+    <GradientStop Color="#FF0B0910" Offset="0.6"/>
+    <GradientStop Color="#FF0B0910" Offset="0.7"/>
+    <GradientStop Color="#FF0C0A11" Offset="0.8"/>
+    <GradientStop Color="#FF0C0A11" Offset="0.9"/>
+    <GradientStop Color="#FF0D0A12" Offset="1"/>
+  </LinearGradientBrush>
+
+  <FontFamily x:Key="FontSans">avares://VidShrink.App/Fonts#Atkinson Hyperlegible Next</FontFamily>
+  <FontFamily x:Key="FontMono">Consolas,Cascadia Mono,Menlo,DejaVu Sans Mono,Liberation Mono,Courier New</FontFamily>
+
+  <x:Double x:Key="FontSizeSm">14</x:Double>
+  <x:Double x:Key="FontSizeMd">16</x:Double>
+  <x:Double x:Key="FontSizeLg">20</x:Double>
+  <x:Double x:Key="FontSizeHero">28</x:Double>
+
+  <x:Double x:Key="TrackingLg">2</x:Double>
+  <x:Double x:Key="TrackingMd">1.6</x:Double>
+  <x:Double x:Key="TrackingLabel">2.1</x:Double>
+  <x:Double x:Key="LineHeightBody">24</x:Double>
+  <x:Double x:Key="TipMaxWidth">420</x:Double>
+
+  <x:Double x:Key="SpaceXs">4</x:Double>
+  <x:Double x:Key="SpaceSm">8</x:Double>
+  <x:Double x:Key="SpaceMd">12</x:Double>
+  <x:Double x:Key="SpaceLg">16</x:Double>
+  <x:Double x:Key="SpaceXl">24</x:Double>
+
+  <Thickness x:Key="PanelPadding">24</Thickness>
+  <Thickness x:Key="ButtonPadding">24,12</Thickness>
+  <Thickness x:Key="ButtonPaddingSm">16,8</Thickness>
+  <Thickness x:Key="ChipPadding">12,4</Thickness>
+  <Thickness x:Key="FieldPadding">12,8</Thickness>
+  <Thickness x:Key="TabPadding">24,12</Thickness>
+  <Thickness x:Key="TooltipPadding">16,12</Thickness>
+  <Thickness x:Key="LabelMargin">0,0,0,8</Thickness>
+  <Thickness x:Key="ChipMargin">0,0,8,0</Thickness>
+  <Thickness x:Key="TabMargin">0,0,8,2</Thickness>
+  <Thickness x:Key="WindowButtonMargin">4,0,0,0</Thickness>
+  <Thickness x:Key="CheckMargin">0,0,16,0</Thickness>
+  <Thickness x:Key="InfoBadgeMargin">6,0,0,0</Thickness>
+  <Thickness x:Key="SectionMargin">0,24,0,0</Thickness>
+  <Thickness x:Key="RowMargin">0,12,0,0</Thickness>
+  <Thickness x:Key="BorderThin">1</Thickness>
+  <Thickness x:Key="FocusRingThickness">2</Thickness>
+  <Thickness x:Key="PopupPadding">4</Thickness>
+
+  <CornerRadius x:Key="RadiusChip">6</CornerRadius>
+  <CornerRadius x:Key="RadiusCell">8</CornerRadius>
+  <CornerRadius x:Key="RadiusControl">12</CornerRadius>
+  <CornerRadius x:Key="RadiusPanel">16</CornerRadius>
+  <CornerRadius x:Key="RadiusBadge">10</CornerRadius>
+
+  <x:Double x:Key="TargetMinSize">24</x:Double>
+  <x:Double x:Key="InfoBadgeSize">20</x:Double>
+  <x:Double x:Key="FieldMinHeight">40</x:Double>
+  <x:Double x:Key="WindowButtonWidth">42</x:Double>
+  <x:Double x:Key="WindowButtonHeight">30</x:Double>
+  <x:Double x:Key="ScrollBarThickness">10</x:Double>
+  <x:Double x:Key="CheckGlyphSize">20</x:Double>
+  <x:Double x:Key="SliderTrackHeight">10</x:Double>
+  <x:Double x:Key="SliderThumbSize">20</x:Double>
+  <x:Double x:Key="ProgressBarHeight">8</x:Double>
+  <x:Double x:Key="TitleBarHeight">38</x:Double>
+  <x:Double x:Key="TooltipMaxWidth">460</x:Double>
+  <x:Double x:Key="DropDownMaxHeight">280</x:Double>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #4000F3FF</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #40FF00EA</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40B026FF</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+  <x:String x:Key="LinkGitHub">https://github.com/Teknesyum</x:String>
+  <x:String x:Key="LinkRepo">https://github.com/Teknesyum/vidshrink</x:String>
+  <x:String x:Key="LinkSponsor">https://github.com/sponsors/Teknesyum</x:String>
+  <x:String x:Key="AppIconUri">avares://VidShrink.App/Assets/VidShrink.png</x:String>
+
+</ResourceDictionary>

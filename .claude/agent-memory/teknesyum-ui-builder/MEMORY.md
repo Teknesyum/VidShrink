@@ -1,1 +1,2 @@
 - [VidShrink arayüz doğrulama](vidshrink-arayuz-dogrulama.md) — computer-use ve UI Automation bu WPF projesinde çalışmıyor; PrintWindow betiğine geç
+- [Avalonia tema tuzakları](avalonia-tema-tuzaklari.md) — FocusAdorner sızıntısı, MaxWidth ortalaması, gradyan noktaları ve deneme projesiyle doğrulama

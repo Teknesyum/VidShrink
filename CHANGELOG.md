@@ -6,8 +6,38 @@ tags yet, so releases are grouped by the day their work landed on `main`.
 
 ## [Unreleased]
 
+### Changed
+
+- The interface moved from WPF to Avalonia 11.3.20 and the application now targets
+  `net8.0` instead of `net8.0-windows`. One source tree publishes for `win-x64`,
+  `osx-arm64`, `osx-x64` and `linux-x64`. The neon theme was rebuilt as Avalonia
+  `ControlTheme` resources with the base palette carried over unchanged; disabled-state
+  contrast rose from 2.5:1 to 4.2:1 and the `?` badges became keyboard reachable.
+- Revealing a finished file works on all three platforms: `explorer /select,` on Windows,
+  `open -R` on macOS, `xdg-open` on Linux. `xdg-open` cannot highlight a file, so on
+  Linux the containing folder opens instead of the file being selected.
+
+### Added
+
+- `install-vidshrink.sh`, a one-command installer for macOS and Linux. It bootstraps the
+  .NET 8 SDK into `~/.dotnet` when the machine has none, reads the runtime identifier
+  from `uname`, publishes a self-contained build into `~/.local/share/vidshrink` and
+  links `~/.local/bin/vidshrink`. It never installs FFmpeg itself: when `ffmpeg` or
+  `ffprobe` is missing it prints the package manager command and stops before
+  downloading anything.
+- A license section in the README separating VidShrink's MIT terms from FFmpeg's. The
+  FFmpeg binary arrives on the user's own machine under its own license and is not
+  redistributed by this project; a packaged release would change that and has not been
+  built.
+
 ### Fixed
 
+- Targets of 50 MB and above now land inside the fill band on the first attempt. The
+  first plan switches to two-pass whenever the band is narrower than one CRF step, the
+  retry aim is clamped to the band, `KbitPerMib` is the exact 8388.608, and the source
+  size is capped at ×0.95. Measured end to end: 180 MB → 178.35, 100 MB → 99.16,
+  25 MB → 24.63, 8 MB → 7.85. All four landed inside the band on the first attempt and
+  the ceiling was never crossed.
 - The installer no longer asks WinGet for the .NET 8 SDK. `Microsoft.DotNet.SDK.8`
   ships no user-scope installer, so `--scope user` aborted with
   `NO_APPLICABLE_INSTALLER` (`-1978335216`) before any other step could run — the
@@ -23,10 +53,6 @@ tags yet, so releases are grouped by the day their work landed on `main`.
 
 ### Known gaps
 
-- Targets of 50 MB and above spend all three encode attempts. The fill band is 2.8%
-  wide at that size while one integer CRF step moves the output by roughly 12%, so the
-  single-pass CRF path cannot land inside the band. Moving the first plan to two-pass
-  fixes it and is tracked for the next engine round.
 - Hardware VBR delivery is not measured yet. `av1_nvenc` overshoots its request on the
   first two-pass attempt, and the 1.06 correction factor only engages when calibration
   is unavailable.

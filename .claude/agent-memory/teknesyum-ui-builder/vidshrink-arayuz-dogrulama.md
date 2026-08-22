@@ -31,3 +31,5 @@ yanlış sonuç verdi — `CopyFromScreen` bir kez başka uygulamanın penceresi
 
 **How to apply:** Bu depoda arayüz işi teslim ederken doğrudan PrintWindow betiğine geç,
 computer-use ve UIA denemesiyle tur harcama.
+
+**Not (2026-08-22):** Arayüz T11'de Avalonia'ya taşındı. Yukarıdaki UIA gözlemi WPF penceresine aitti; Avalonia kendi otomasyon ağacını kuruyor, T12 bittikten sonra yeniden denenmeli. PrintWindow yolu her iki durumda da çalışıyor.
