@@ -1,3 +1,3 @@
 - [ffmpeg Process kalıbı](vidshrink-ffmpeg-process-pattern.md) — stdout okunmama (-f null - için düşük risk) + ct.Register(Kill) eksikliği (asıl tekrar eden kusur, yetim süreç)
-- [FillBand marjları](vidshrink-fillband-ceiling-margin.md) — Correct()'in iki marjı da bandın altına nişan alıyor; bant kaçırmayı kalibrasyona bağlayan açıklamaya inanma
-- [Saha ölçümü kanıtı](vidshrink-saha-olcumu-kanit.md) — ölçüm sayıları hep builder beyanı; maddeyi yapısal/sayısal diye ayır, tek dosyaya uydurulan sabitlere dikkat
+- [FillBand marjları](vidshrink-fillband-ceiling-margin.md) — retry kelepçesi istenen bitrate'i sınırlıyor; bant ancak encoderHatası+yayılım < bantGenişliği ise tutar
+- [Saha ölçümü kanıtı](vidshrink-saha-olcumu-kanit.md) — ölçüm hep builder beyanı; gated canlı test sessizce atlanır, adı assert ettiğinden fazlasını iddia edebilir

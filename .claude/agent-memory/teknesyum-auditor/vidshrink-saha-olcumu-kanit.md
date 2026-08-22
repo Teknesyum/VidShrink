@@ -19,6 +19,15 @@ doğrudan denetlenir ve ✓ verilir. (b) Sayısal yarı — yalnızca beyan vars
 `? kanıtsız: bench çıktısı verilmedi` diye işaretle, sayıyı onaylama. Sırf bu yüzden tur
 başlatma; T0'a "sayıyı doğrulamak istiyorsan bench çıktısını ekle" diye yaz.
 
+**Gated canlı test kalıbı (T3 round 2).** Ölçümü depoya sokmanın kabul edilen yolu:
+ortam değişkeniyle açılan `[Theory]` (`VIDSHRINK_LIVE_SOURCE` / `VIDSHRINK_LIVE_OUT`,
+`FillBandTests.LiveFillTargetRunStaysInsideTheBand`). İki tuzağı her seferinde kontrol et:
+(a) değişken yoksa test çıplak `return` ile **sessizce yeşil** geçiyor — yeşil koşu ölçüm
+yapıldığını kanıtlamaz; (b) test adı iddia ettiğini assert etmiyor olabilir (bu testin adı
+"bandın içinde" diyor, yalnız tavan ve sert tabanı assert ediyor, bandı sadece yazdırıyor).
+Zinciri de doğrula: probe → taslak → kalibrasyon → plan → runner sırası uygulamanınkiyle
+(`MainWindow.xaml.cs`) aynı değilse ölçüm temsili değildir.
+
 İkinci ve bağlantılı risk: **tek dosyaya uydurulan sabitler.** `ScanWarmupSeconds = 0,75`
 (T2c) doğrulama dosyasının bilinen doğru cevabına göre seçilmiş ve builder'ın verdiği
 merdiven (0 → 1,1437 · 0,5 → 1,1636 · 0,75 → 1,1865; gerçek 1,191) seçilen noktada hâlâ

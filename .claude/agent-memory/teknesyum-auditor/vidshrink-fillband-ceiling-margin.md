@@ -1,34 +1,31 @@
 ---
 name: vidshrink-fillband-ceiling-margin
-description: FillBand marjları birbirine geçmiş — Correct() düzeltme hedefleri bandın altına düşüyor; her Correct/FillBand dokunuşunda tekrar kontrol et
+description: Alt-taşma tekrarının nişanı istenen bit hızını kelepçeliyor, teslim edilen boyutu değil; bant ancak (encoder hatası + yayılım) < bant genişliği ise tutar
 metadata:
   type: project
 ---
 
-`PlanCalculator.Correct()` iki yönlü düzeltme yapıyor ve her iki yön de sabit bir marjla
-hedefin altına nişan alıyor. Marjlar `FillBand` sınırlarıyla uyumsuz:
+`PlanCalculator.Correct(fillUnderBand: true)` bitrate'i iki terimin **küçüğüne** kuruyor:
+oransal büyütme (`previousVideoK * aim/actual`) ve bütçe kelepçesi (`aim` nominal boyutunu
+veren bitrate). Kelepçe **istenen** bit hızını sınırlıyor, encoder'ın teslim ettiğini değil —
+encoder'ın sistematik olarak talebin altında kalmasını telafi eden tek terim (oran) böylece
+her zaman eziliyor. Sonuç sabit noktaya oturuyor: `aim × encoderVerimi`.
 
-- Alt-taşma dalı (`fillUnderBand: true`) tavanı `UnderBandRetryCapMargin = 0.98`.
-  ≥50 MB sınıfında bant alt sınırı hedefin %97,2'si → nişan ile bant alt sınırı arasında
-  yalnız **%0,8** boşluk var. Aynı dosyadaki `TwoPassUncertainty = 0.04` iki geçişli VBR'ın
-  ±%4 ıskaladığını söylüyor. Yani düzeltme denemesi banda ancak dar bir aralıkta oturur.
-- Üst-taşma dalı `CrfFitMargin = 0.94` kullanıyor; ≥50 MB sınıfının sert tabanı %94,4.
-  **Üst-taşma düzeltmesi tasarımı gereği sert tabanın altına nişan alıyor** — bir kez
-  tavan düzeltmesi çalıştıysa sonuç bandın içine düşemez.
+Bu yüzden aynı hedefte ikinci ve üçüncü deneme **bit-bit aynı** bitrate'i ister ve aynı boyutu
+verir. "Bir deneme daha olsa tutardı" açıklamasını kabul etme; kelepçeyi elle hesapla.
 
-**Neden önemli:** Bant kaçırıldığında builder'lar bunu kalibrasyona (`ComplexityProfile`,
-T2c) bağlama eğiliminde. `Correct()` profil almıyor ve döndürdüğü plan 2-pass bitrate
-hedefli — kalibrasyon o denemenin isabetini etkilemiyor. Düzeltme denemesinden çıkan
-bant kaçırması **marjdan** gelir, kalibrasyondan değil.
+Bant ancak şu eşitsizlikte tutar: `encoderHatası + yayılım ≲ bantGenişliği`.
+≥50 MB sınıfında genişlik %2,8; nişan `hedef/(1+u)` tavan tarafından kuruluyor.
+Ölçülen iki geçişli libx264 hatası %1,85, `CalibratedRetrySpread = 0,016` → %3,45 > %2,8,
+yani ≥50 MB bandı **deterministik olarak** kaçırılıyor. Küçük hedeflerde bant geniş
+(%5 / %8) olduğu için aynı kod tutturuyor — tek hedefte geçen ölçüm sınıfı kanıtlamaz.
 
-T7 üçüncü örnek: donanım yolunda kalibrasyon düşerse iki geçişli bitrate `1.06` ile
-çarpılıyor (`PlanCalculator.HardwareUncalibratedBias`). Bu, planı bilerek hedefin ~%6
-üstüne nişanlıyor; sert tavan yalnızca `EncodeRunner`'ın `over` kontrolüyle korunuyor,
-plan tarafında değil. Yani "plan hedefi aşıyor" ile "program hedefi aşıyor" ayrı sorular —
-tavan sözünü denetlerken hep runner'daki `over` + `MaxAttempts` dalına bak.
+Yayılım sabitleri birbirini tutmuyor: `PlanCalculator.CalibratedRetrySpread = 0,016` ile
+`ComplexityProfile.CalibratedBand = 0,05` aynı kalibre profil için iki ayrı belirsizlik.
+Retry yolu iyimser olanı kullanıyor ve kaynağı kodda yok.
 
-**Nasıl uygula:** `Correct` / `FillBand` / `CrfFitMargin` alanına dokunan her sözleşmede
-iki marjı bant sınıflarına karşı elle hesapla. Bant kaçıran gerçek ölçüm raporlanmışsa
-"başka T'nin işi" açıklamasını deneme-deneme izine bakmadan kabul etme; iz verilmemişse
-`? kanıtsız` işaretle. Sert tavan tarafı ayrı: `EncodeRunner.cs` artık `attempt >= MaxAttempts`
-ve `over` iken dosyayı silip `CeilingExceeded` dönüyor, tavan sözü kodda tutuluyor.
+**Nasıl uygula:** `Correct` / `FillBand` / `RetryAimMb` alanına dokunan her sözleşmede
+(a) kelepçenin istenen mi teslim edilen mi olduğunu, (b) `u + e` toplamını bant genişliğine
+karşı, (c) tetikleyici ile gerekçe metninin aynı eşiği söyleyip söylemediğini kontrol et.
+Sert tavan tarafı ayrı ve sağlam: `EncodeRunner` `attempt >= MaxAttempts` + `over` iken
+dosyayı siliyor, `CeilingExceeded` dönüyor.
