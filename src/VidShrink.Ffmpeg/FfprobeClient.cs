@@ -66,7 +66,8 @@ public static class FfprobeClient
             VideoCodec = GetString(v, "codec_name") ?? "unknown",
             TotalBitrateBps = ParseLong(format, "bit_rate") ?? (long)(fileSize * 8 / duration),
             PixelFormat = pixFmt,
-            IsHdr = colorTransfer is "smpte2084" or "arib-std-b67" || (pixFmt?.Contains("10le") ?? false),
+            IsHdr = colorTransfer is "smpte2084" or "arib-std-b67"
+                || (GetString(v, "color_primaries") is "bt2020" && (pixFmt?.Contains("10le") ?? false)),
             ColorPrimaries = GetString(v, "color_primaries"),
             ColorTransfer = colorTransfer,
             ColorSpace = GetString(v, "color_space"),

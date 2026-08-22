@@ -174,6 +174,7 @@ public partial class MainWindow : Window
             BtnStart.IsEnabled = BtnConvert.IsEnabled = false;
             InfoGrid.Visibility = Visibility.Collapsed;
             TxtStatusBar.Text = $"{T("Bu dosya kullanılamıyor", "This file cannot be used")}: {ex.Message}";
+            TxtSystemStatus.Text = TxtStatusBar.Text;
             return;
         }
 
@@ -477,7 +478,7 @@ public partial class MainWindow : Window
         double? fps = CmbConvertFps.SelectedIndex switch { 1 => 60, 2 => 30, 3 => 24, 4 when double.TryParse(TxtCustomFps.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var custom) => custom, _ => null };
         var audio = CmbConvertAudio.SelectedIndex switch { 0 => "aac", 1 => "libopus", 2 => "libmp3lame", 3 => "pcm_s16le", 4 => "copy", _ => null };
         if (container == "mp3") audio = "libmp3lame"; else if (container == "m4a") audio = "aac"; else if (container == "wav") audio = "pcm_s16le";
-        return new ConversionPlan { Container = container, VideoCodec = codec, QualityMode = CmbQualityMode.SelectedIndex == 0 ? ConversionQualityMode.Crf : ConversionQualityMode.Bitrate, Crf = quality > 0 ? quality : 23, VideoBitrateK = quality > 0 ? quality : 2500, Width = width, Height = height, Fps = fps, AudioCodec = audio, AudioBitrateK = audioK > 0 ? audioK : 128, Start = ParseTime(TxtTrimStart.Text), End = ParseTime(TxtTrimEnd.Text) };
+        return new ConversionPlan { Container = container, VideoCodec = codec, QualityMode = CmbQualityMode.SelectedIndex == 0 ? ConversionQualityMode.Crf : ConversionQualityMode.Bitrate, Crf = quality > 0 ? quality : 23, VideoBitrateK = quality > 0 ? quality : 2500, Width = width, Height = height, Fps = fps, AudioCodec = audio, AudioBitrateK = audioK > 0 ? audioK : 128, Start = ParseTime(TxtTrimStart.Text), End = ParseTime(TxtTrimEnd.Text), HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve };
     }
 
     private static TimeSpan? ParseTime(string text) => string.IsNullOrWhiteSpace(text) ? null : TimeSpan.TryParse(text, CultureInfo.InvariantCulture, out var value) ? value : TimeSpan.MinValue;

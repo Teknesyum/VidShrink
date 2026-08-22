@@ -27,6 +27,8 @@ public static class ConversionArguments
         var source = info.VideoCodec.ToLowerInvariant();
         if (plan.VideoCodec == "copy" && !VideoCopyCompatible(plan.Container, source))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {source} video stream.");
+        if (plan.Start is { } trimStart && plan.End is { } trimEnd && trimEnd <= trimStart)
+            errors.Add("The trim end must come after the trim start.");
         if (plan.AudioCodec == "copy" && !AudioCopyCompatible(plan.Container, info.AudioCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {info.AudioCodec} audio stream.");
         return errors;
@@ -39,7 +41,11 @@ public static class ConversionArguments
         var a = new List<string> { "-hide_banner", "-y" };
         if (plan.Start is { } start) a.AddRange(new[] { "-ss", FormatTime(start) });
         a.AddRange(new[] { "-i", info.FilePath });
-        if (plan.End is { } end) a.AddRange(new[] { "-to", FormatTime(end) });
+        if (plan.End is { } end)
+        {
+            var trimSeconds = end.TotalSeconds - (plan.Start?.TotalSeconds ?? 0);
+            a.AddRange(new[] { "-t", FormatTime(TimeSpan.FromSeconds(trimSeconds)) });
+        }
 
         if (plan.AudioOnly)
         {

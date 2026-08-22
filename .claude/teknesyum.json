@@ -1,0 +1,4 @@
+{
+  "platformlar": ["windows", "macos", "linux"],
+  "platformNeden": "Kullanıcı 2026-08-22'de üç platformu hedef olarak verdi. Bugünkü kod bunu karşılamıyor: VidShrink.App WPF ve net8.0-windows, yani yalnız Windows'ta çalışır. VidShrink.Core ve VidShrink.Ffmpeg saf .NET, taşınabilir. Üç platform için arayüzün Avalonia'ya taşınması gerekiyor; bu ayrı bir iş olarak açılacak."
+}

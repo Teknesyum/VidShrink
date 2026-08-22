@@ -220,5 +220,65 @@
     "effort": "high",
     "t": "2026-08-22 15:30:06",
     "ajan": "general-purpose"
+  },
+  ".claude/teknesyum.json": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:39:51",
+    "ajan": "ana oturum"
+  },
+  "fix4.js": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:40:08",
+    "ajan": "ana oturum"
+  },
+  "docs/taramalar/RAPOR.md": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "new234.md": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "splice.py": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "kunye.md": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "splice2.py": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "trim.py": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "trim2.py": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
+  },
+  "trim3.py": {
+    "model": "claude-opus-5",
+    "effort": "low",
+    "t": "2026-08-22 15:40:59",
+    "ajan": "scribe"
   }
 }
