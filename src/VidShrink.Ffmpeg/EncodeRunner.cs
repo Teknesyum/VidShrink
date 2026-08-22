@@ -27,6 +27,11 @@ public sealed class EncodeRunner
         FillPolicy fillPolicy = FillPolicy.QualityCeiling,
         ComplexityProfile? profile = null)
     {
+        if (plan.ModeEnum == EncodeMode.PassThrough)
+            return PassThrough(info, plan, outputPath);
+
+        var effectiveTargetMb = Math.Min(targetMb, plan.EffectiveTargetMb ?? targetMb);
+        var band = FillBand.For(effectiveTargetMb);
         var current = plan;
         var attempt = 0;
         var trace = new List<EncodeAttempt>();
@@ -57,9 +62,9 @@ public sealed class EncodeRunner
 
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
                 var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, info.DurationSeconds);
-                var aimMb = PlanCalculator.RetryAimMb(targetMb, efficiency);
-                var over = actualMb > targetMb * ToleranceOver;
-                var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).LowerMb;
+                var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
+                var over = actualMb > effectiveTargetMb * ToleranceOver;
+                var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < band.LowerMb;
                 var informedByYield = efficiency is not null;
                 var retryUnderBand = underBand && attempt < MaxAttempts
                     && (!usedUnderBandRetry || (informedByYield && !usedMeasuredUnderBandRetry));
@@ -80,7 +85,7 @@ public sealed class EncodeRunner
                     File.Move(partialPath, fallbackPath, overwrite: true);
                     fallbackMb = actualMb;
                     fallbackPlan = current;
-                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true);
+                    current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds, fillUnderBand: true);
                     continue;
                 }
 
@@ -100,11 +105,11 @@ public sealed class EncodeRunner
                         }
 
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
-                            $"Stayed over the {targetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
+                            $"Stayed over the {effectiveTargetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
                             UnderBand: false, CeilingExceeded: true, Trace: trace);
                     }
 
-                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds);
+                    current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
                     continue;
                 }
 
@@ -130,6 +135,21 @@ public sealed class EncodeRunner
             TryDelete(fallbackPath);
             CleanupPassLogs(passLogPrefix);
         }
+    }
+
+    private static EncodeResult PassThrough(MediaInfo info, EncodePlan plan, string outputPath)
+    {
+        var sourceExtension = Path.GetExtension(info.FilePath);
+        var deliveredPath = string.IsNullOrEmpty(sourceExtension) || sourceExtension.Equals(Path.GetExtension(outputPath), StringComparison.OrdinalIgnoreCase)
+            ? outputPath
+            : Path.ChangeExtension(outputPath, sourceExtension);
+
+        if (!string.Equals(Path.GetFullPath(info.FilePath), Path.GetFullPath(deliveredPath), StringComparison.OrdinalIgnoreCase))
+            File.Copy(info.FilePath, deliveredPath, overwrite: true);
+
+        var mb = new FileInfo(deliveredPath).Length / 1024.0 / 1024.0;
+        var trace = new List<EncodeAttempt> { new(1, "pass-through", mb, mb, plan.VideoBitrateK, plan.Mode) };
+        return new EncodeResult(true, deliveredPath, mb, plan, 1, null, Trace: trace);
     }
 
     public async Task<ConversionResult> ConvertAsync(

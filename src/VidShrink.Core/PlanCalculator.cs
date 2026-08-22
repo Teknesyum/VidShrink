@@ -18,6 +18,10 @@ public sealed class PlanOptions
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
 {
+    public double CenterMb => (LowerMb + UpperMb) / 2.0;
+
+    public double RelativeWidth => UpperMb <= 0 ? 0 : (UpperMb - LowerMb) / UpperMb;
+
     public static FillBand For(double targetMb)
     {
         double lowerFactor, floorFactor;
@@ -33,14 +37,16 @@ public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double P
 public static class PlanCalculator
 {
     private const double ContainerOverhead = 0.995;
-    private const double CrfFitMargin = 0.94;
-    public const double TwoPassUncertainty = 0.04;
+    private const double KbitPerMib = 8388.608;
+    public const double TwoPassUncertainty = 0.012;
+    public const double SourceSizeCap = 0.95;
     private const double MinScale = 0.25;
     private const double ScaleStep = 0.02;
     private const int MinHeight = 240;
     private const double MinFps = 12.0;
     private const int MinVideoBitrateK = 48;
     private const double HardwareUncalibratedBias = 1.06;
+    private const double SourceQualityScore = 100.0;
 
     private static readonly string[] FastHardwareOrder =
     {
@@ -67,6 +73,20 @@ public static class PlanCalculator
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
+
+        if (CanPassThrough(info, options, codec, hdr))
+            return PassThroughResult(info, options, complexity, regime, ratio, suggestedPreference, availability, notes);
+
+        var effectiveTargetMb = EffectiveTargetMb(options.TargetMb, info.FileSizeMb);
+        if (effectiveTargetMb < options.TargetMb - 1e-9)
+        {
+            reason.Add($"the target was capped to {effectiveTargetMb:0.##} MB, {SourceSizeCap * 100:0.#}% of the {info.FileSizeMb:0.0} MB source, so the output is never larger than what it was made from");
+            reasonCodes.Add(new ReasonNote(ReasonCode.TargetCappedToSource, Mb: effectiveTargetMb, TargetMb: options.TargetMb));
+        }
+
+        var band = FillBand.For(effectiveTargetMb);
+        var aimMb = RetryAimMb(effectiveTargetMb, null);
+
         if (hdr.PolicyChanged)
         {
             notes.Add(AdviceCode.HdrTonemapped);
@@ -89,13 +109,13 @@ public static class PlanCalculator
         if (regime == CompressionRegime.Extreme)
             notes.Add(AdviceCode.ExtremeRatioWarning);
 
-        var totalK = options.TargetMb * 8192.0 / Math.Max(info.DurationSeconds, 0.1);
+        var totalK = aimMb * KbitPerMib / Math.Max(info.DurationSeconds, 0.1);
         var (audioK, audioChannels) = PickAudio(info, options, regime, totalK, notes);
         var videoK = Math.Max(MinVideoBitrateK, totalK * ContainerOverhead - audioK);
 
         var effective = new PlanOptions
         {
-            TargetMb = options.TargetMb,
+            TargetMb = effectiveTargetMb,
             Intent = options.Intent,
             Codec = preference,
             AllowResolutionDrop = options.AllowResolutionDrop && CompressionStrategy.AllowsResolutionDrop(regime),
@@ -129,18 +149,18 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.FrameRateReduced, Fps: best.Fps));
         }
 
-        var budgetBppf = videoK * 1000.0 / ((double)best.Width * best.Height * best.Fps);
+        var budgetBppf = BitsPerPixel(videoK, best.Width, best.Height, best.Fps);
         var budgetCrf = complexity.CrfForBppf(codec, budgetBppf, best.Scale, best.Fps, info.Fps);
         var ceilingCrf = TransparencyCrf(codec, options.Intent);
 
         EncodePlan plan;
         var ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
-        var ceilingVideoK = ceilingBppf * best.Width * best.Height * best.Fps / 1000.0;
+        var ceilingVideoK = VideoBitrateK(ceilingBppf, best.Width, best.Height, best.Fps);
         var ceilingSizeMb = SizeMb(ceilingVideoK, audioK, info.DurationSeconds);
 
-        if (budgetCrf <= ceilingCrf && ceilingSizeMb <= options.TargetMb * CrfFitMargin)
+        if (budgetCrf <= ceilingCrf && ceilingSizeMb < band.LowerMb)
         {
-            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, options.TargetMb);
+            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, band.LowerMb);
             if (recovered.Scale > best.Scale + 1e-6 || recovered.Fps > best.Fps + 0.01)
             {
                 reason.Add($"the ceiling left budget unused, so resolution was restored to {recovered.Width}x{recovered.Height}@{recovered.Fps:0.##} — the largest layout that still fits the target at CRF {ceilingCrf:0}");
@@ -152,14 +172,14 @@ public static class PlanCalculator
                 if (best.Width != info.Width || best.Height != info.Height) notes.Add(AdviceCode.ResolutionReduced);
                 if (best.Fps < info.Fps - 0.01) notes.Add(AdviceCode.FrameRateReduced);
                 ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
-                ceilingVideoK = ceilingBppf * best.Width * best.Height * best.Fps / 1000.0;
+                ceilingVideoK = VideoBitrateK(ceilingBppf, best.Width, best.Height, best.Fps);
                 ceilingSizeMb = SizeMb(ceilingVideoK, audioK, info.DurationSeconds);
             }
 
             notes.Add(AdviceCode.BudgetIsGenerous);
             notes.Add(AdviceCode.QualityCeilingReached);
-            reason.Add($"the budget affords CRF {budgetCrf:0.#}, better than the CRF {ceilingCrf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {ceilingSizeMb:0.0} MB instead of padding the file to {options.TargetMb:0.##} MB");
-            reasonCodes.Add(new ReasonNote(ReasonCode.BudgetExceedsCeiling, BudgetCrf: budgetCrf, Crf: ceilingCrf, Mb: ceilingSizeMb, TargetMb: options.TargetMb));
+            reason.Add($"the budget affords CRF {budgetCrf:0.#}, better than the CRF {ceilingCrf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {ceilingSizeMb:0.0} MB instead of padding the file to {effectiveTargetMb:0.##} MB");
+            reasonCodes.Add(new ReasonNote(ReasonCode.BudgetExceedsCeiling, BudgetCrf: budgetCrf, Crf: ceilingCrf, Mb: ceilingSizeMb, TargetMb: effectiveTargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "crf";
             plan.Crf = (int)Math.Round(ceilingCrf);
@@ -167,45 +187,47 @@ public static class PlanCalculator
 
             if (options.FillPolicy == FillPolicy.FillTarget)
             {
-                var band = FillBand.For(options.TargetMb);
-                if (ceilingSizeMb < band.LowerMb)
-                {
-                    var (minCrf, _) = CodecModel.CrfRange(codec);
-                    var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
-                    var totalBudgetK = bandCenterMb * 8192.0 * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
-                    var desiredVideoK = Math.Max(MinVideoBitrateK, totalBudgetK - audioK);
-                    var desiredBppf = desiredVideoK * 1000.0 / ((double)best.Width * best.Height * best.Fps);
-                    var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
+                var (minCrf, _) = CodecModel.CrfRange(codec);
+                var totalBudgetK = aimMb * KbitPerMib * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
+                var desiredVideoK = Math.Max(MinVideoBitrateK, totalBudgetK - audioK);
+                var desiredBppf = BitsPerPixel(desiredVideoK, best.Width, best.Height, best.Fps);
+                var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
+                var crfStep = complexity.CrfStepSizeEffect(codec, best.Scale, best.Fps);
+                var gridIsCoarserThanBand = crfStep > band.RelativeWidth;
 
-                    if (fillCrf >= minCrf)
-                    {
-                        plan.Crf = (int)Math.Round(fillCrf);
-                        plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
-                        reason.Add($"the fill target policy lowered CRF to {fillCrf:0.#} instead of stopping at the transparency ceiling, landing near {bandCenterMb:0.0} MB inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band");
-                        reasonCodes.Add(new ReasonNote(ReasonCode.FillCrfLowered, Crf: fillCrf, Mb: bandCenterMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
-                    }
-                    else
-                    {
-                        plan.Mode = "2pass";
-                        plan.Crf = null;
-                        var fillBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
-                        plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK * fillBias, MinVideoBitrateK));
-                        reason.Add($"CRF floor {minCrf} was reached before the fill band, so two-pass VBR targets the {bandCenterMb:0.0} MB band center directly");
-                        reasonCodes.Add(new ReasonNote(ReasonCode.FillTwoPassBandCenter, Crf: minCrf, Mb: bandCenterMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
-                        AddHardwareBiasNote(codec, fillBias, reason, reasonCodes);
-                    }
+                if (fillCrf >= minCrf && !gridIsCoarserThanBand)
+                {
+                    plan.Crf = (int)Math.Round(fillCrf);
+                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
+                    reason.Add($"the fill target policy lowered CRF to {fillCrf:0.#} instead of stopping at the transparency ceiling, landing near {aimMb:0.0} MB inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band");
+                    reasonCodes.Add(new ReasonNote(ReasonCode.FillCrfLowered, Crf: fillCrf, Mb: aimMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
+                }
+                else
+                {
+                    plan.Mode = "2pass";
+                    plan.Crf = null;
+                    var fillBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
+                    plan.BitrateBias = fillBias;
+                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK * fillBias, MinVideoBitrateK));
+                    reason.Add(gridIsCoarserThanBand
+                        ? $"one CRF step moves the file by {crfStep * 100:0.#}%, wider than the {band.RelativeWidth * 100:0.#}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {aimMb:0.0} MB directly"
+                        : $"CRF floor {minCrf} was reached before the fill band, so two-pass VBR targets the {aimMb:0.0} MB band center directly");
+                    reasonCodes.Add(new ReasonNote(gridIsCoarserThanBand ? ReasonCode.FillTwoPassBandTooNarrowForCrf : ReasonCode.FillTwoPassBandCenter,
+                        Crf: minCrf, Mb: aimMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb, Factor: crfStep));
+                    AddHardwareBiasNote(codec, fillBias, reason, reasonCodes);
                 }
             }
         }
         else
         {
             notes.Add(AdviceCode.TargetEnforcedTwoPass);
-            reason.Add($"the budget lands near CRF {budgetCrf:0.#}, short of the CRF {ceilingCrf:0} ceiling, so two-pass VBR spends the whole {options.TargetMb:0.##} MB");
-            reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: options.TargetMb));
+            reason.Add($"the budget lands near CRF {budgetCrf:0.#}, short of the CRF {ceilingCrf:0} ceiling, so two-pass VBR spends {aimMb:0.##} MB, the band center of the {effectiveTargetMb:0.##} MB target");
+            reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: effectiveTargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "2pass";
             var enforcedBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
-            plan.VideoBitrateK = (int)Math.Round(videoK * enforcedBias);
+            plan.BitrateBias = enforcedBias;
+            plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK * enforcedBias, MinVideoBitrateK));
             AddHardwareBiasNote(codec, enforcedBias, reason, reasonCodes);
         }
 
@@ -215,6 +237,7 @@ public static class PlanCalculator
             : new ReasonNote(ReasonCode.PredictedQualityEstimated, Score: best.Score));
         plan.Reason = string.Join("; ", reason);
         plan.ReasonCodes = reasonCodes;
+        plan.EffectiveTargetMb = effectiveTargetMb;
 
         var estimate = Estimate(plan, info, complexity);
         var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, best.Score, notes);
@@ -236,19 +259,58 @@ public static class PlanCalculator
         HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
 
+    private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
+    {
+        if (info.FileSizeMb <= 0 || info.FileSizeMb > options.TargetMb) return false;
+        if (hdr.PolicyChanged) return false;
+        if (options.Codec == CodecPreference.Auto) return true;
+        return string.Equals(CodecModel.SourceFamily(info.VideoCodec), CodecModel.SourceFamily(codec), StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static PlanResult PassThroughResult(MediaInfo info, PlanOptions options, ComplexityProfile complexity,
+        CompressionRegime regime, double ratio, CodecPreference suggestedPreference, IEncoderAvailability? availability, List<AdviceCode> notes)
+    {
+        var videoBps = Math.Max(0, info.TotalBitrateBps - info.AudioBitrateBps);
+        var plan = new EncodePlan
+        {
+            Codec = info.VideoCodec,
+            Mode = "passthrough",
+            VideoBitrateK = (int)Math.Round(videoBps / 1000.0),
+            Crf = null,
+            AudioCodec = info.AudioCodec,
+            AudioBitrateK = (int)Math.Round(info.AudioBitrateBps / 1000.0),
+            Width = info.Width,
+            Height = info.Height,
+            Fps = info.Fps,
+            Preset = "copy",
+            PixelFormat = info.PixelFormat ?? "yuv420p",
+            Reason = $"the source is already {info.FileSizeMb:0.0} MB, under the {options.TargetMb:0.##} MB target, so it is copied as it is instead of being re-encoded",
+            ReasonCodes = new List<ReasonNote> { new(ReasonCode.SourceAlreadyUnderTarget, Mb: info.FileSizeMb, TargetMb: options.TargetMb) }
+        };
+
+        notes.Add(AdviceCode.BudgetIsGenerous);
+        var estimate = new SizeEstimate(info.FileSizeMb, info.FileSizeMb, info.FileSizeMb, complexity.Measured, true);
+        var advice = new StrategyAdvice(regime, ratio, PickCodec(suggestedPreference, availability), suggestedPreference, SourceQualityScore, notes);
+        return new PlanResult(plan, estimate, SourceQualityScore, complexity, advice);
+    }
+
     public static SizeEstimate Estimate(EncodePlan plan, MediaInfo info, ComplexityProfile? profile)
     {
         var complexity = profile ?? ComplexityProfile.FromSourceBitrate(info);
 
+        if (plan.ModeEnum == EncodeMode.PassThrough)
+            return new SizeEstimate(info.FileSizeMb, info.FileSizeMb, info.FileSizeMb, complexity.Measured, true);
+
         if (plan.ModeEnum == EncodeMode.TwoPass)
         {
-            var expected = SizeMb(plan.VideoBitrateK, plan.AudioBitrateK, info.DurationSeconds);
+            var requestedK = plan.VideoBitrateK / Math.Max(plan.BitrateBias, 0.01);
+            var expected = SizeMb(requestedK, plan.AudioBitrateK, info.DurationSeconds);
             return new SizeEstimate(expected, expected * (1 - TwoPassUncertainty), expected * (1 + TwoPassUncertainty), complexity.Measured, true);
         }
 
         var scale = info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
         var bppf = complexity.BppfAtCrf(plan.Codec, plan.Crf ?? CodecModel.ReferenceCrf(plan.Codec), scale, plan.Fps, info.Fps);
-        var videoK = bppf * plan.Width * plan.Height * plan.Fps / 1000.0;
+        var videoK = VideoBitrateK(bppf, plan.Width, plan.Height, plan.Fps);
         var expectedMb = SizeMb(videoK, plan.AudioBitrateK, info.DurationSeconds);
         var band = complexity.EstimateBandFor(plan.Codec, scale, plan.Fps);
         return new SizeEstimate(expectedMb, expectedMb * (1 - band), expectedMb * (1 + band), complexity.Measured, false);
@@ -264,15 +326,16 @@ public static class PlanCalculator
         return efficiency is > 0.5 and < 2.0 ? efficiency : null;
     }
 
+    public static double EffectiveTargetMb(double targetMb, double sourceMb)
+        => sourceMb > 0 ? Math.Min(targetMb, sourceMb * SourceSizeCap) : targetMb;
+
     public static double RetryAimMb(double targetMb, double? measuredEfficiency)
     {
         var band = FillBand.For(targetMb);
-        var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
-        if (measuredEfficiency is not null) return bandCenterMb;
+        if (measuredEfficiency is not null) return band.CenterMb;
 
         var ceilingAim = targetMb / (1 + TwoPassUncertainty);
-        var bandAim = band.LowerMb / (1 - TwoPassUncertainty);
-        return Math.Max(band.HardFloorMb, Math.Min(ceilingAim, Math.Max(bandAim, bandCenterMb)));
+        return Math.Max(band.LowerMb, Math.Min(band.CenterMb, ceilingAim));
     }
 
     public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, bool fillUnderBand = false)
@@ -287,14 +350,15 @@ public static class PlanCalculator
         var aimedVideoMb = Math.Max(aimMb - audioMb, 0.01);
         var factor = aimedVideoMb / deliveredVideoMb;
         var requestedVideoMb = aimedVideoMb / (efficiency ?? 1.0);
-        var videoBudgetK = Math.Max(1.0, requestedVideoMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1));
+        var videoBudgetK = Math.Max(MinVideoBitrateK, requestedVideoMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1));
         var aimSource = efficiency is double e
             ? $"aimed at the {aimMb:0.0} MB band center and divided by the {e:0.###} encoder yield measured on the previous attempt"
-            : $"aimed at {aimMb:0.0} MB, the most it can ask for without a measured encoder yield and the +{TwoPassUncertainty * 100:0.#}% two-pass spread on top";
+            : $"aimed at {aimMb:0.0} MB, the band center held back by the +{TwoPassUncertainty * 100:0.#}% two-pass spread because no encoder yield was measured yet";
 
         corrected.Mode = "2pass";
         corrected.Crf = null;
-        corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
+        corrected.BitrateBias = 1.0;
+        corrected.VideoBitrateK = Math.Max(MinVideoBitrateK, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
 
         corrected.Reason = fillUnderBand
             ? $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.LowerMb:0.0} MB lower edge of the fill band for a {targetMb:0.##} MB target; video bitrate was scaled by {factor:0.###} and {aimSource}"
@@ -309,12 +373,15 @@ public static class PlanCalculator
     public static double BitsPerPixel(double videoK, int width, int height, double fps)
         => videoK * 1000.0 / Math.Max(1.0, (double)width * height * fps);
 
+    private static double VideoBitrateK(double bppf, int width, int height, double fps)
+        => bppf * Math.Max(1.0, (double)width * height * fps) / 1000.0;
+
     private static double SizeMb(double videoK, double audioK, double durationSeconds)
-        => (videoK + audioK) * durationSeconds / 8192.0 / ContainerOverhead;
+        => (videoK + audioK) * durationSeconds / KbitPerMib / ContainerOverhead;
 
     private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score);
 
-    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double targetMb)
+    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb)
     {
         Layout? best = null;
 
@@ -329,15 +396,23 @@ public static class PlanCalculator
 
             var effectiveScale = (double)height / Math.Max(1, info.Height);
             var bppf = complexity.BppfAtCrf(codec, ceilingCrf, effectiveScale, fps, info.Fps);
-            var videoK = bppf * width * height * fps / 1000.0;
-            if (SizeMb(videoK, audioK, info.DurationSeconds) > targetMb * CrfFitMargin) continue;
+            var videoK = VideoBitrateK(bppf, width, height, fps);
+            if (SizeMb(videoK, audioK, info.DurationSeconds) >= capMb) continue;
 
-            var score = -ScalePenalty(effectiveScale) - FpsPenalty(fps, info.Fps);
+            var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
+            var score = LayoutScore(codec, required, bppf, effectiveScale, fps, info.Fps);
             if (best is null || score > best.Score)
                 best = new Layout(width, height, fps, effectiveScale, score);
         }
 
-        return best is null ? fallback : best with { Score = fallback.Score };
+        return best ?? fallback;
+    }
+
+    private static double LayoutScore(string codec, double required, double provided, double scale, double fps, double sourceFps)
+    {
+        var rate = CodecModel.QualityAtReference - CodecModel.QualityPerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
+        rate = Math.Min(rate, CodecModel.QualityLimit(codec));
+        return rate - ScalePenalty(scale) - FpsPenalty(fps, sourceFps);
     }
 
     private static Layout SearchLayout(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, double videoK)
@@ -353,12 +428,9 @@ public static class PlanCalculator
 
             var effectiveScale = (double)height / Math.Max(1, info.Height);
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
-            var provided = videoK * 1000.0 / ((double)width * height * fps);
+            var provided = BitsPerPixel(videoK, width, height, fps);
 
-            var rate = CodecModel.QualityAtReference - CodecModel.QualityPerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
-            rate = Math.Min(rate, CodecModel.QualityLimit(codec));
-
-            var score = rate - ScalePenalty(effectiveScale) - FpsPenalty(fps, info.Fps);
+            var score = LayoutScore(codec, required, provided, effectiveScale, fps, info.Fps);
 
             if (best is null || score > best.Score)
                 best = new Layout(width, height, fps, effectiveScale, score);

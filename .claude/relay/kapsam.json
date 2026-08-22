@@ -280,5 +280,11 @@
     "effort": "low",
     "t": "2026-08-22 15:40:59",
     "ajan": "scribe"
+  },
+  "tests.js": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 17:44:15",
+    "ajan": "ana oturum"
   }
 }

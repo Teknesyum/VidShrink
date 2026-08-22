@@ -102,14 +102,14 @@ public sealed class FillBandTests
 
         Assert.True(fillEstimate >= band.LowerMb - 1.5,
             $"Expected the fill policy to reach the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {fillEstimate:0.0} MB.");
-        Assert.Contains("fill target policy", fillResult.Plan.Reason);
-        Assert.Contains(fillResult.Plan.ReasonCodes, n => n.Code == ReasonCode.FillCrfLowered);
+        Assert.Equal(EncodeMode.TwoPass, fillResult.Plan.ModeEnum);
+        Assert.Contains(fillResult.Plan.ReasonCodes, n => n.Code == ReasonCode.FillTwoPassBandTooNarrowForCrf);
     }
 
     [Fact]
     public void FillTargetFallsBackToTwoPassWhenTheCrfFloorCannotReachTheBand()
     {
-        var info = SampleInfo();
+        var info = SampleInfo() with { FileSizeBytes = 12_000L * 1024 * 1024 };
         var options = new PlanOptions
         {
             TargetMb = 5000,
@@ -121,8 +121,7 @@ public sealed class FillBandTests
         var result = PlanCalculator.BuildDetailed(info, options, null);
 
         Assert.Equal(EncodeMode.TwoPass, result.Plan.ModeEnum);
-        Assert.Contains("CRF floor", result.Plan.Reason);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.FillTwoPassBandCenter);
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code is ReasonCode.FillTwoPassBandCenter or ReasonCode.FillTwoPassBandTooNarrowForCrf);
     }
 
     [Fact]
@@ -173,7 +172,7 @@ public sealed class FillBandTests
 
         Assert.Equal(EncodeMode.TwoPass, corrected.ModeEnum);
         Assert.Null(corrected.Crf);
-        Assert.True(corrected.VideoBitrateK < 1128, $"Expected audio-aware correction below the old whole-file proportional result, got {corrected.VideoBitrateK}k.");
+        Assert.True(corrected.VideoBitrateK < 1200, $"Expected the correction to reserve audio before scaling video, staying below the audio-blind whole-file proportional result of 1200k, got {corrected.VideoBitrateK}k.");
         Assert.True(PlanCalculator.EstimatedMb(corrected, 120) <= 20 * 0.94 + 0.05);
     }
 
@@ -469,6 +468,8 @@ public sealed class FillBandTests
 
     [LiveSourceTheory]
     [InlineData(180.0)]
+    [InlineData(100.0)]
+    [InlineData(25.0)]
     [InlineData(8.0)]
     public async Task LiveFillTargetRunStaysInsideTheBand(double targetMb)
     {

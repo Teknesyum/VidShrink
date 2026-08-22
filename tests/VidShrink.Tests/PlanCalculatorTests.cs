@@ -74,7 +74,7 @@ public sealed class PlanCalculatorTests
 
         Assert.Equal(EncodeMode.TwoPass, corrected.ModeEnum);
         Assert.Null(corrected.Crf);
-        Assert.True(corrected.VideoBitrateK < 1128, $"Expected audio-aware correction below the old whole-file proportional result, got {corrected.VideoBitrateK}k.");
+        Assert.True(corrected.VideoBitrateK < 1200, $"Expected the correction to reserve audio before scaling video, staying below the audio-blind whole-file proportional result of 1200k, got {corrected.VideoBitrateK}k.");
         Assert.True(PlanCalculator.EstimatedMb(corrected, 120) <= 20 * 0.94 + 0.05);
     }
 

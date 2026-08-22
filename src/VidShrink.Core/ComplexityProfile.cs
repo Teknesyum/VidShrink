@@ -154,6 +154,12 @@ public sealed record ComplexityProfile
     public bool AppliesTo(string codec, double scale, double fps)
         => Calibrated && Calibration!.Matches(codec, scale, fps);
 
+    public double CrfStepSizeEffect(string codec, double scale, double fps)
+    {
+        var step = AppliesTo(codec, scale, fps) ? HalvingStep : CodecModel.CrfHalvingStep(codec);
+        return Math.Pow(2, 1.0 / Math.Max(step, HalvingStepMin)) - 1.0;
+    }
+
     public ComplexityProfile Calibrate(CalibrationSignature signature, double lowCrf, double lowBppf, double highCrf, double highBppf, double sourceFps)
     {
         if (!IsUsable(lowBppf) || !IsUsable(highBppf)) return WithoutCalibration();

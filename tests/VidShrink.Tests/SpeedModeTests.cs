@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -274,24 +274,24 @@ public sealed class SpeedModeTests
     {
         var expected = new[]
         {
-            "Compatible|180|FillTarget|libx264|crf|19|11927|128|1152x648@30|slow",
-            "Compatible|180|QualityCeiling|libx264|crf|20|10992|128|1152x648@30|slow",
-            "Compatible|25|FillTarget|libx264|2pass||1570|128|960x540@30|slow",
-            "Compatible|25|QualityCeiling|libx264|2pass||1570|128|960x540@30|slow",
-            "Compatible|8|FillTarget|libx264|2pass||477|66|960x540@30|slow",
-            "Compatible|8|QualityCeiling|libx264|2pass||477|66|960x540@30|slow",
-            "MaxCompression|180|FillTarget|libsvtav1|crf|31|11927|128|1458x820@30|6",
-            "MaxCompression|180|QualityCeiling|libsvtav1|crf|32|11021|128|1458x820@30|6",
-            "MaxCompression|25|FillTarget|libsvtav1|2pass||1570|128|960x540@30|6",
-            "MaxCompression|25|QualityCeiling|libsvtav1|2pass||1570|128|960x540@30|6",
-            "MaxCompression|8|FillTarget|libsvtav1|2pass||477|66|960x540@30|6",
-            "MaxCompression|8|QualityCeiling|libsvtav1|2pass||477|66|960x540@30|6",
-            "Auto|180|FillTarget|libx264|crf|19|11927|128|1152x648@30|slow",
-            "Auto|180|QualityCeiling|libx264|crf|20|10992|128|1152x648@30|slow",
-            "Auto|25|FillTarget|libsvtav1|2pass||1570|128|960x540@30|6",
-            "Auto|25|QualityCeiling|libsvtav1|2pass||1570|128|960x540@30|6",
-            "Auto|8|FillTarget|libsvtav1|2pass||477|66|960x540@30|6",
-            "Auto|8|QualityCeiling|libsvtav1|2pass||477|66|960x540@30|6"
+            "Compatible|180|FillTarget|libx264|2pass||12217|128|1190x670@30|slow",
+            "Compatible|180|QualityCeiling|libx264|crf|20|11958|128|1190x670@30|slow",
+            "Compatible|25|FillTarget|libx264|2pass||1567|128|960x540@30|slow",
+            "Compatible|25|QualityCeiling|libx264|2pass||1567|128|960x540@30|slow",
+            "Compatible|8|FillTarget|libx264|2pass||470|64|960x540@30|slow",
+            "Compatible|8|QualityCeiling|libx264|2pass||470|64|960x540@30|slow",
+            "MaxCompression|180|FillTarget|libsvtav1|2pass||12217|128|1498x842@30|6",
+            "MaxCompression|180|QualityCeiling|libsvtav1|crf|32|11798|128|1498x842@30|6",
+            "MaxCompression|25|FillTarget|libsvtav1|2pass||1567|128|960x540@30|6",
+            "MaxCompression|25|QualityCeiling|libsvtav1|2pass||1567|128|960x540@30|6",
+            "MaxCompression|8|FillTarget|libsvtav1|2pass||470|64|960x540@30|6",
+            "MaxCompression|8|QualityCeiling|libsvtav1|2pass||470|64|960x540@30|6",
+            "Auto|180|FillTarget|libx264|2pass||12217|128|1190x670@30|slow",
+            "Auto|180|QualityCeiling|libx264|crf|20|11958|128|1190x670@30|slow",
+            "Auto|25|FillTarget|libsvtav1|2pass||1567|128|960x540@30|6",
+            "Auto|25|QualityCeiling|libsvtav1|2pass||1567|128|960x540@30|6",
+            "Auto|8|FillTarget|libsvtav1|2pass||470|64|960x540@30|6",
+            "Auto|8|QualityCeiling|libsvtav1|2pass||470|64|960x540@30|6"
         };
 
         var actual = new List<string>();

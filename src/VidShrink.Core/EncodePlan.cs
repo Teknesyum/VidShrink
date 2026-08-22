@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace VidShrink.Core;
 
-public enum EncodeMode { Crf, TwoPass }
+public enum EncodeMode { Crf, TwoPass, PassThrough }
 
 public enum Intent { Archive, Sharing, SocialMedia }
 
@@ -24,7 +24,10 @@ public enum ReasonCode
     HdrTonemapped,
     FillCrfLowered,
     FillTwoPassBandCenter,
-    HardwareBitrateBias
+    FillTwoPassBandTooNarrowForCrf,
+    HardwareBitrateBias,
+    SourceAlreadyUnderTarget,
+    TargetCappedToSource
 }
 
 public sealed record ReasonNote(
@@ -65,8 +68,15 @@ public sealed class EncodePlan
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
+    [JsonIgnore] public double BitrateBias { get; set; } = 1.0;
+    [JsonIgnore] public double? EffectiveTargetMb { get; set; }
 
-    [JsonIgnore] public EncodeMode ModeEnum => Mode.Equals("crf", StringComparison.OrdinalIgnoreCase) ? EncodeMode.Crf : EncodeMode.TwoPass;
+    [JsonIgnore] public EncodeMode ModeEnum => Mode.ToLowerInvariant() switch
+    {
+        "crf" => EncodeMode.Crf,
+        "passthrough" => EncodeMode.PassThrough,
+        _ => EncodeMode.TwoPass
+    };
 
     public EncodePlan Clone()
     {
