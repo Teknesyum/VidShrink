@@ -1,3 +1,4 @@
+﻿using Xunit.Abstractions;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -5,6 +6,10 @@ namespace VidShrink.Tests;
 
 public sealed class FillBandTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public FillBandTests(ITestOutputHelper output) => _output = output;
+
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
@@ -412,5 +417,42 @@ public sealed class FillBandTests
             Assert.Equal(3, result.Attempts);
         }
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+    }
+
+    [Theory]
+    [InlineData(180.0)]
+    [InlineData(8.0)]
+    public async Task LiveFillTargetRunStaysInsideTheBand(double targetMb)
+    {
+        var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE");
+        if (string.IsNullOrWhiteSpace(source) || !File.Exists(source)) return;
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
+            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
+        Directory.CreateDirectory(outDir);
+        var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_fill_{targetMb:0.#}mb.mp4");
+
+        var info = await FfprobeClient.ProbeAsync(source);
+        var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget };
+
+        var profile = await ComplexityProbe.RunAsync(info, CancellationToken.None);
+        var draft = PlanCalculator.BuildDetailed(info, options, profile, EncoderCapabilities.Instance).Plan;
+        profile = await CalibrationProbe.RunAsync(info, draft, profile, CancellationToken.None);
+
+        var plan = PlanCalculator.BuildDetailed(info, options, profile, EncoderCapabilities.Instance).Plan;
+        var result = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, FillPolicy.FillTarget, profile);
+
+        var band = FillBand.For(targetMb);
+        _output.WriteLine($"target {targetMb:0.##} MB | band {band.LowerMb:0.00}-{band.UpperMb:0.00} | hard floor {band.HardFloorMb:0.00} | calibrated {profile.Calibrated}");
+        foreach (var attempt in result.Trace ?? Array.Empty<EncodeAttempt>())
+            _output.WriteLine($"  attempt {attempt.Number}: branch={attempt.Branch} aim={attempt.AimMb:0.00} MB actual={attempt.ActualMb:0.00} MB bitrate={attempt.VideoBitrateK}k mode={attempt.Mode}");
+        _output.WriteLine($"  result: success={result.Success} size={result.OutputMb:0.00} MB attempts={result.Attempts} underBand={result.UnderBand} ceilingExceeded={result.CeilingExceeded}");
+
+        _output.WriteLine($"  inside the band: {result.OutputMb >= band.LowerMb}");
+
+        Assert.True(result.Success, result.Error);
+        Assert.True(result.OutputMb <= targetMb, $"The hard ceiling was crossed: {result.OutputMb:0.00} MB against a {targetMb:0.##} MB target.");
+        Assert.True(result.OutputMb >= band.HardFloorMb, $"The result fell below the {band.HardFloorMb:0.00} MB hard floor at {result.OutputMb:0.00} MB.");
     }
 }

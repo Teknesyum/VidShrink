@@ -54,7 +54,7 @@ public sealed class EncodeRunner
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
                 var aimMb = PlanCalculator.RetryAimMb(targetMb, profile, current, info.Height, out _);
                 var over = actualMb > targetMb * ToleranceOver;
-                var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).HardFloorMb;
+                var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).LowerMb;
                 var retryUnderBand = underBand && !usedUnderBandRetry && attempt < MaxAttempts;
 
                 if (!over && !underBand)
@@ -66,7 +66,7 @@ public sealed class EncodeRunner
 
                 if (retryUnderBand)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "under floor", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                    trace.Add(new EncodeAttempt(attempt, "under band", aimMb, actualMb, current.VideoBitrateK, current.Mode));
                     usedUnderBandRetry = true;
                     current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true, profile: profile, sourceHeight: info.Height);
                     continue;
@@ -88,7 +88,7 @@ public sealed class EncodeRunner
                     continue;
                 }
 
-                trace.Add(new EncodeAttempt(attempt, "under floor accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode));
                 File.Move(partialPath, outputPath, overwrite: true);
                 return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace);
             }
