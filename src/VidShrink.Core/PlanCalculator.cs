@@ -259,11 +259,11 @@ public static class PlanCalculator
     {
         var scale = sourceHeight > 0 ? plan.Height / sourceHeight : 1.0;
         calibrated = profile is not null && profile.AppliesTo(plan.Codec, scale, plan.Fps);
-        if (!calibrated) return targetMb * CrfFitMargin;
+        var spread = calibrated ? CalibratedRetrySpread : TwoPassUncertainty;
 
         var band = FillBand.For(targetMb);
-        var ceilingAim = targetMb / (1 + CalibratedRetrySpread);
-        var bandAim = band.LowerMb / (1 - CalibratedRetrySpread);
+        var ceilingAim = targetMb / (1 + spread);
+        var bandAim = band.LowerMb / (1 - spread);
         var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
         return Math.Max(band.HardFloorMb, Math.Min(ceilingAim, Math.Max(bandAim, bandCenterMb)));
     }
@@ -276,7 +276,7 @@ public static class PlanCalculator
         var aimMb = RetryAimMb(targetMb, profile, plan, sourceHeight, out var calibrated);
         var aimSource = calibrated
             ? $"aimed at {aimMb:0.0} MB from the calibrated ±{CalibratedRetrySpread * 100:0.#}% retry error"
-            : $"aimed at {aimMb:0.0} MB from the uncalibrated {CrfFitMargin * 100:0.#}% margin";
+            : $"aimed at {aimMb:0.0} MB from the uncalibrated ±{TwoPassUncertainty * 100:0.#}% two-pass spread";
         corrected.Mode = "2pass";
         corrected.Crf = null;
 

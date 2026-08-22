@@ -211,19 +211,40 @@ public sealed class FillBandTests
             $"The retry aim itself must sit inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {aim:0.0} MB.");
     }
 
-    [Fact]
-    public void UncalibratedRetryAimFallsBackToTheFixedMarginAndIsConsistentWithIt()
+    [Theory]
+    [InlineData(180.0)]
+    [InlineData(25.0)]
+    [InlineData(8.0)]
+    public void UncalibratedRetryAimStaysAboveTheHardFloorAndUnderTheCeiling(double targetMb)
     {
         var plan = BigPlan();
 
-        var aim = PlanCalculator.RetryAimMb(180, null, plan, sourceHeight: 1080, out var calibrated);
+        var aim = PlanCalculator.RetryAimMb(targetMb, null, plan, sourceHeight: 1080, out var calibrated);
 
         Assert.False(calibrated);
-        Assert.Equal(180 * 0.94, aim, 3);
 
-        var impliedError = 180 / aim - 1;
+        var band = FillBand.For(targetMb);
+        var impliedError = targetMb / aim - 1;
+
+        Assert.True(aim > band.HardFloorMb,
+            $"The uncalibrated retry aim must stay above the {band.HardFloorMb:0.0} MB hard floor, got {aim:0.0} MB.");
+        Assert.True(aim <= targetMb + 1e-9,
+            $"The uncalibrated retry aim must stay at or under the {targetMb:0.##} MB ceiling, got {aim:0.0} MB.");
         Assert.True(impliedError >= PlanCalculator.CalibratedRetrySpread,
-            $"The uncalibrated fallback margin must be at least as conservative as the calibrated retry spread; implied {impliedError * 100:0.#}% vs {PlanCalculator.CalibratedRetrySpread * 100:0.#}%.");
+            $"The uncalibrated aim must be at least as conservative as the calibrated retry spread; implied {impliedError * 100:0.#}% vs {PlanCalculator.CalibratedRetrySpread * 100:0.#}%.");
+    }
+
+    [Fact]
+    public void UncalibratedOverTargetCorrectionNoLongerAimsBelowTheHardFloor()
+    {
+        var plan = BigPlan();
+
+        var corrected = PlanCalculator.Correct(plan, actualMb: 190, targetMb: 180, durationSeconds: 120, sourceHeight: 1080);
+        var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
+        var band = FillBand.For(180);
+
+        Assert.True(estimated > band.HardFloorMb,
+            $"An uncalibrated over-ceiling correction must not aim under the {band.HardFloorMb:0.0} MB hard floor, got {estimated:0.0} MB.");
     }
 
     [Fact]
