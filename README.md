@@ -20,7 +20,7 @@ Open PowerShell and run:
 irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
 ```
 
-The installer checks for the .NET 8 SDK and FFmpeg/FFprobe, installs missing dependencies through WinGet, downloads the latest `main` source, publishes a self-contained Windows x64 Release build, installs it under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. Running the same command again replaces the installed app with the newest version.
+The installer needs no administrator rights. It reuses an installed .NET 8 SDK when it finds one and otherwise bootstraps it with Microsoft's own `dotnet-install.ps1` into `%LOCALAPPDATA%\Microsoft\dotnet`; FFmpeg and FFprobe come from WinGet. It then downloads the latest `main` source, publishes a self-contained Release build for the machine's own architecture, installs it under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. Running the same command again replaces the installed app with the newest version.
 
 If PowerShell script execution is restricted by organizational policy, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session.
 
@@ -129,7 +129,7 @@ src/VidShrink.App      WPF user interface
 tests/VidShrink.Tests  engine and argument-generation regression tests
 ```
 
-The current engine audit, fixed defects, benchmark requirements, and quality roadmap are documented in [`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md). A market-leading claim is intentionally deferred until the HDR/10-bit, perceptual-metric, and competitor benchmark gates in that report are met.
+Release history is in [`CHANGELOG.md`](CHANGELOG.md). The current engine audit, fixed defects, benchmark requirements, and quality roadmap are documented in [`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md). A market-leading claim is intentionally deferred until the HDR/10-bit, perceptual-metric, and competitor benchmark gates in that report are met.
 
 ## License
 
