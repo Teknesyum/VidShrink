@@ -1,3 +1,5 @@
+Tema: frameserver ve ffmpeg cekirdegi · kaynak: frameserver.md
+
 # Frameserver ve ffmpeg çekirdeği taraması
 Tarih 2026-08-22. Rakamlar `gh api` ile depodan alındı, blogdan değil.
 
@@ -24,34 +26,6 @@ ile GPL-2+ (x264/x265 orada) · GitHub'da release yok, mirror etiketi `v0.6.1` y
 - **Nereye dokunur** — `src/VidShrink.Ffmpeg/ComplexityProbe.cs` (pencere başına süreç → tek grafik),
   `src/VidShrink.Core/FfmpegArguments.cs`, `src/VidShrink.Core/ComplexityProfile.cs`,
   `tests/VidShrink.Tests/WindowSamplingTests.cs`.
-
-## Depo: vapoursynth/vapoursynth
-2.077 yıldız · push 2026-08-21 · açık issue 10 · LGPL-2.1 · son kararlı R79 (2026-08-07), R80A1/A2 ön sürüm.
-- **Ne yapıyor** — Kare indeksli rastgele erişimli frameserver. `std.Trim(clip, first, last)` aralık
-  keser, `std.Splice([...])` birleştirir: dağınık pencereler tek klip olur. `vspipe` bunu tek seferde
-  Y4M olarak ffmpeg'e borular; `-r/--requests` eşzamanlı kare isteği, `-s/-e` kare aralığı,
-  `--filter-time` filtre başına süre, `-j` kare özellikleri JSON.
-- **Alınacak fikir** — Pencereleri ayrı ölçüm birimi değil *tek sanal klip* say. Trim+Splice mantığı
-  ffmpeg'de `trim`+`concat` ile birebir kurulur: tek kodlama, tek sayı, pencereler arası
-  normalizasyon derdi biter. Maliyet: pencere sınırına düşen sahne kesmeleri I-kare şişmesi yaratır.
-- **Alınmayacak** — VapourSynth'i bağımlılık yapmak. WPF kurulumuna Python çalışma zamanı ve yerel
-  eklenti yüzeyi eklemenin bedeli kazanılan hızın çok üstünde.
-- **Nereye dokunur** — `src/VidShrink.Ffmpeg/ComplexityProbe.cs`,
-  `src/VidShrink.Ffmpeg/CalibrationProbe.cs` (birleşik klip sapması).
-
-## Depo: AviSynth/AviSynthPlus
-1.199 yıldız · push 2026-08-21 · açık issue 89 · GitHub lisans alanı boş; `avisynth.h` GPL-2+ **artı
-bağlama istisnası** · son etiket v3.7.5 (2025-04-21), 16 aydır etiket yok ama ana dal canlı.
-- **Ne yapıyor** — Windows'ta DLL olarak yüklenen, betikle tanımlanan tembel frameserver. Sunucu
-  filtreye iş parçacığı sayısını `SetCacheHints` / `CACHE_INFORM_NUM_THREADS` ile bildirir, önbellek
-  boyutu `AEP_CACHESIZE_L2` gibi ortam özelliklerinden okunur.
-- **Alınacak fikir** — Paralelliği filtreye *söylemek*. VidShrink pencereleri paralel işliyor ama her
-  sürece kaç çekirdek düştüğünü ffmpeg'e bildirmiyor; tek grafiğe geçilirse `-threads` /
-  `-filter_threads` bütçesi pencere sayısına göre açıkça dağıtılmalı. Maliyet düşük.
-- **Alınmayacak** — AviSynth'i kurulum zincirine sokmak: 32/64-bit DLL kaydı, eklenti klasörü, sürüm
-  çakışması. Lisans istisnası kapalı kaynak barındırmayı mümkün kılıyor, teknik yük ayrı mesele.
-- **Nereye dokunur** — `src/VidShrink.Core/FfmpegArguments.cs` (thread bütçesi),
-  `src/VidShrink.Ffmpeg/ComplexityProbe.cs` (paralel pencere ↔ thread eşlemesi).
 
 ## Kaynaklar
 `gh api repos/{FFmpeg/FFmpeg, vapoursynth/vapoursynth, AviSynth/AviSynthPlus}` (2026-08-22) · FFmpeg

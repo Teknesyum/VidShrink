@@ -14,7 +14,7 @@ BtbN/FFmpeg-Builds `lgpl` varyantı bu çelişkiyi kapatıyor: `scripts.d/` içi
 kapatılan tek şey x264 ve x265; nvenc, qsv (onevpl), amf ve libsvtav1 lgpl'de de var.
 `nonfree` varyantı (fdk-aac) hiçbir koşulda dağıtılamaz.
 
-**Why:** Tarama 2026-08-22'de yapıldı, bulgu `docs/taramalar/ffmpeg-dagitimi.md` dosyasında.
+**Why:** Tarama 2026-08-22'de yapıldı, bulgu `docs/taramalar/codexffmpeg.md` ve `docs/taramalar/ffmpeg-builds.md` dosyasında.
 Lisans uyumsuzluğu sessizdi — kimse kararla seçmemişti, WinGet varsayılanından geldi.
 
 **How to apply:** ffmpeg dağıtımı, kurulum betiği veya kodlayıcı seçimi konuşulduğunda bunu

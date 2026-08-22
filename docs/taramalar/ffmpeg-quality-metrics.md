@@ -1,6 +1,12 @@
+Tema: kalite olcumu · kaynak: kalite-olcumu.md
+
 # Kalite ölçümü taraması
 
 Ortak bulgu: **üç deponun hiçbiri VMAF skorunu "yeterince iyi" eşiğine çevirmiyor.** Ölçer, raporlar, kararı kullanıcıya bırakır. "6 puan = JND", "hedef 93" gibi rakamlar Netflix blog yazılarından gelir, deponun belgelerinde geçmiyor (`resource/doc/*.md` grep boş) — **doğrulanamadı**. Şeffaflık tavanı VidShrink'in kendi işi.
+
+## Ne yapıyor
+
+**slhck/ffmpeg-quality-metrics** — tek ffmpeg çağrısında PSNR/SSIM/VMAF/VIF/MSAD. Referansı `settb=AVTB,setpts=PTS-STARTPTS` ile hizalar, `split=2` ile ikiye ayırır, bozulmuşu `scale=rw:rh` ile referans boyutuna getirir (`scale2ref` ffmpeg 7.1'de kalktı). libvmaf'a `shortest=1:repeatlast=0` ekler; koddaki gerekçe: framesync varsayılanı kısa akışın son karesini tekrarlar, donmuş kare fazla referans kareleriyle eşleşir, havuzlanmış skor çöker. Hız: `n_subsample`, `--vmaf-threads`, `--threads`, `select='lt(n\,N)'` ile ilk N kare. Ölçümden önce `libvmaf` filtresini sınar, yoksa açık mesaj verir; v1 modeli eski libvmaf'la istenirse ayrı mesaj. Varsayılan model `vmaf_v0.6.1.json`, 11 model paketle gelir.
 
 ## Depo
 
@@ -9,16 +15,6 @@ Ortak bulgu: **üç deponun hiçbiri VMAF skorunu "yeterince iyi" eşiğine çev
 | Netflix/vmaf | BSD+Patent (API `NOASSERTION`, README beyanı) | 2026-08-14 | v3.2.0 · 2026-06-20 | 115 | 5457 |
 | slhck/ffmpeg-quality-metrics | MIT | 2026-07-29 | v3.12.1 · 2026-07-29 | 4 | 557 |
 | CrypticSignal/video-quality-metrics | MIT | 2026-05-04 | **yok** (`releases/latest` 404) | 0 | 143 |
-
-## Ne yapıyor
-
-**Netflix/vmaf** — libvmaf, model dosyaları, referans CLI. Kanonik ffmpeg komutu `resource/doc/ffmpeg.md`: iki girişi `setpts=PTS-STARTPTS` ile hizala, bozulmuşu `scale=W:H:flags=bicubic` ile referans çözünürlüğüne çıkar, `[distorted][reference]libvmaf=log_fmt=xml:log_path=...:model_path=...:n_threads=4`, çıkış `-f null -`. Sıra **bozulmuş önce, referans sonra**. Windows `model_path` kaçışına ayrı başlık: ters bölü → bölü, iki nokta `\\:` (`D\\:/mypath/vmaf_v0.6.1.json`).
-
-2026-06'da v1 kuşağı (`vmaf_v1.0.16_*`): 1080p/3H, telefon/5H, 4K/1.5H [0,100], 4K/3H [0,110]. v1 **libvmaf > 3.2.0** ve 10-bit ölçüm ister; CAMBI'ye kodlama boyutları `cambi.enc_width/enc_height/enc_bitdepth` ile verilebilir.
-
-**slhck/ffmpeg-quality-metrics** — tek ffmpeg çağrısında PSNR/SSIM/VMAF/VIF/MSAD. Referansı `settb=AVTB,setpts=PTS-STARTPTS` ile hizalar, `split=2` ile ikiye ayırır, bozulmuşu `scale=rw:rh` ile referans boyutuna getirir (`scale2ref` ffmpeg 7.1'de kalktı). libvmaf'a `shortest=1:repeatlast=0` ekler; koddaki gerekçe: framesync varsayılanı kısa akışın son karesini tekrarlar, donmuş kare fazla referans kareleriyle eşleşir, havuzlanmış skor çöker. Hız: `n_subsample`, `--vmaf-threads`, `--threads`, `select='lt(n\,N)'` ile ilk N kare. Ölçümden önce `libvmaf` filtresini sınar, yoksa açık mesaj verir; v1 modeli eski libvmaf'la istenirse ayrı mesaj. Varsayılan model `vmaf_v0.6.1.json`, 11 model paketle gelir.
-
-**CrypticSignal/video-quality-metrics** — aynı videoyu farklı CRF/preset ile kodlayıp VMAF/PSNR/SSIM tablosu ve kare bazlı grafik üretir. Filtre: `model=path=...|enable_transform=true`, `log_fmt=json`, `n_subsample`, `n_threads`, `feature=name=psnr|name=float_ssim`. Asıl fikir **Overview Mode**: her `--interval` saniyede `--clip-length` saniyelik parça alıp birleştirir; README örneğinde 60 sn video 20 sn'ye iner (`--interval 5 --clip-length 2`), kesimler en yakın I-frame'e yuvarlandığı için tam değil. Skorları tek ortalama değil **Min | StdDev | Mean** olarak raporlar.
 
 ## Alınacak fikir
 

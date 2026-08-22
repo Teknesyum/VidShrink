@@ -1,6 +1,14 @@
+Tema: donanim kodlayici · kaynak: donanim-kodlayici.md
+
 # Donanım kodlayıcı sarmalayıcıları — rigaya NVEnc / QSVEnc / VCEEnc
 
 Ortak bulgu: **üçü de hedef bit hızını varsayılan yapmıyor.** NVEnc varsayılanı QVBR, QSVEnc varsayılanı ICQ, VCEEnc varsayılanı CQP — hepsi kalite tabanlı. Bit hızı, üçünde de `--max-bitrate` + `--vbv-bufsize` ile *tavan* olarak veriliyor, sürücü olarak değil. VidShrink'in "VBR hedefi tutturamıyor, 2-3 düzeltme turu" sorunu bu tasarımın tersinden gidiyor.
+
+## Ne yapıyor
+
+**NVEnc (NVEncC)** — Modlar `--cqp`, `--cbr`, `--vbr`, `--qvbr <float 0-51, AV1'de 0-63>`. Belge açıkça yazıyor: `--qvbr X` = `--vbr 0 --vbr-quality X` — bit hızı sıfır verilip direksiyon kaliteye bırakılıyor. `--multipass none|2pass-quarter|2pass-full` **yalnız `--vbr`/`--cbr` ile** geçerli; gerekçe belgede: "2-pass bitleri kare içinde daha iyi dağıtır ve hedef bit hızına daha yakın çıkar, özellikle CBR'de". Sınırlar: `--max-bitrate`, `--vbv-bufsize`, `--qp-min`, `--qp-max` (CQP'de yok sayılır), `--qp-init`. Ön bakış `--lookahead 0-32` + `--lookahead-level 0-3`, varsayılanları preset/tune'a bağlı. Preset `-u P1..P7`, **varsayılan P4**; `--tune` varsayılanı `hq`. Sınama: `--check-device` (DeviceId + PCI Bus ID), `--check-hw [id]`, `--check-features [id]`, `--check-preset-params`. Çok GPU'da otomatik seçim üç şarta bakıyor: cihaz istenen kodlamayı destekliyor mu, `--avhw` istendiyse girdinin donanım çözümünü destekliyor mu, interlace istendiyse destekliyor mu.
+
+Üçünde de `GPUFeatures/` klasörü var: gerçek donanımdan alınmış `--check-features` çıktıları depoya işlenmiş (NVEnc GTX 660Ti→RTX 5060, QSVEnc Haswell→Battlemage, VCEEnc RX 460→RX 7900 XT). Yetenek matrisi kodda değil veri dosyasında.
 
 ## Depo
 
@@ -11,16 +19,6 @@ Ortak bulgu: **üçü de hedef bit hızını varsayılan yapmıyor.** NVEnc vars
 | rigaya/VCEEnc | 2026-08-22 | 9.13 (2026-08-22) | 289 | 10 | MIT (`VCEEnc_license.txt`) |
 
 Üçü de aktif, arşivlenmemiş, aynı yazarın aynı iskeleti. MIT dışında ayrı marka/isim kısıtı bulamadım.
-
-## Ne yapıyor
-
-**NVEnc (NVEncC)** — Modlar `--cqp`, `--cbr`, `--vbr`, `--qvbr <float 0-51, AV1'de 0-63>`. Belge açıkça yazıyor: `--qvbr X` = `--vbr 0 --vbr-quality X` — bit hızı sıfır verilip direksiyon kaliteye bırakılıyor. `--multipass none|2pass-quarter|2pass-full` **yalnız `--vbr`/`--cbr` ile** geçerli; gerekçe belgede: "2-pass bitleri kare içinde daha iyi dağıtır ve hedef bit hızına daha yakın çıkar, özellikle CBR'de". Sınırlar: `--max-bitrate`, `--vbv-bufsize`, `--qp-min`, `--qp-max` (CQP'de yok sayılır), `--qp-init`. Ön bakış `--lookahead 0-32` + `--lookahead-level 0-3`, varsayılanları preset/tune'a bağlı. Preset `-u P1..P7`, **varsayılan P4**; `--tune` varsayılanı `hq`. Sınama: `--check-device` (DeviceId + PCI Bus ID), `--check-hw [id]`, `--check-features [id]`, `--check-preset-params`. Çok GPU'da otomatik seçim üç şarta bakıyor: cihaz istenen kodlamayı destekliyor mu, `--avhw` istendiyse girdinin donanım çözümünü destekliyor mu, interlace istendiyse destekliyor mu.
-
-**QSVEnc** — `--icq 23` (varsayılan), `--la-icq`, `--cqp`, `--cbr`, `--vbr`, `--avbr`, `--la`, `--la-hrd`, `--vcm`, `--qvbr` + `--qvbr-quality 0-51 (23)`. Belgenin kendi mod notu: "CBR/VBR/AVBR temel ve hızlı ama kalitesi düşük; ICQ/LA-ICQ/QVBR/LA daha iyi. Maksimum bit hızı **sadece** VBR ve CBR'de verilebilir." İki ayırt edici bayrak: `--fallback-rc` (platform yeni hız kontrol modunu desteklemiyorsa eskiye düş) ve `--workaround-hevc10bit-enctools` (AlderLake ve öncesi iGPU'da 10-bit HEVC + EncTools bozulması — **varsayılan açık**, uyarı basıp ilgili seçenekleri kapatıyor). AV1'de ön bakış ayrı mod değil: `--la-depth 10-100` + `--extbrc`, `--icq` üstüne bindiriliyor. Preset `-u best|higher|high|balanced|fast|faster|fastest`, **varsayılan balanced**. Sınama: `--check-hw`, `--check-impl`, `--check-features`, `--check-features-html`, `--check-device`.
-
-**VCEEnc (AMF)** — `--cqp` (varsayılan), `--cbr`, `--cbrhq`, `--vbr`, `--vbrhq`, `--qvbr` = `--vbr 0 --qvbr-quality <0-51>`. `--pa` ön analizi **yalnız VBR'de** çalışıyor (`sc`, `ss`, `caq-strength`, `initqpsc`, `fskip-maxqp`), `--pe` ön kodlama destekli hız kontrolü varsayılan kapalı. Preset `-u balanced|fast|slow|slower`. Sınama `--check-hw [id]`, `--check-features [id]`, `--check-clinfo`.
-
-Üçünde de `GPUFeatures/` klasörü var: gerçek donanımdan alınmış `--check-features` çıktıları depoya işlenmiş (NVEnc GTX 660Ti→RTX 5060, QSVEnc Haswell→Battlemage, VCEEnc RX 460→RX 7900 XT). Yetenek matrisi kodda değil veri dosyasında.
 
 ## Alınacak fikir
 

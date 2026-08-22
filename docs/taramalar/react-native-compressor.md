@@ -1,30 +1,10 @@
+Tema: mobil sikistirma · kaynak: mobil-sikistirma.md
+
 # Mobil paylaşım için video sıkıştırma — üç depo
 
 `natario1/Transcoder` boş kabuk (2 yıldız, lisanssız, yalnız README + docs, sürüm yok). Gerçek kod **`deepmedia/Transcoder`**'da; tarama onun üstünden yapıldı.
 
 **Ortak bulgu:** üçünde de hedef boyut girişi yok. Hepsi "bit hızını düşür, boyut düşsün" mantığında. VidShrink'in bütçe + doldurma bandı zaten öndedir; buradan alınacak şey formül değil, merdiven değerleri ve emniyet sınırları.
-
-## AbedElazizShe/LightCompressor
-Apache-2.0 · **arşivlenmiş** · 587 yıldız · 38 açık issue · son push ve son etiket `1.3.3` 2024-08-17.
-
-**Ne yapıyor.** Telegram for Android kodundan türetilmiş MediaCodec sarmalayıcısı. Kalite = kaynak bit hızının çarpanı: VERY_HIGH ×0.6 · HIGH ×0.4 · MEDIUM ×0.3 · LOW ×0.2 · VERY_LOW ×0.1. Ölçek merdiveni uzun kenara göre: ≥1920 → ×0.5 · ≥1280 → ×0.75 · ≥960 → ×0.95 · altı → ×0.9. Kare hızı ve I-frame aralığı kaynaktan kopyalanır, düşürülmez. Kaynak ≤2 Mbps ise işi reddeder — arka arkaya sıkıştırmanın videoyu çamura çevirmesini engellemek için. H.264 Baseline'a düşme yolu var.
-
-**Alınacak.** (a) Ölçek merdiveni, VidShrink'in `MinScale=0.25` / `ScaleStep=0.02` sürekli aramasına **başlangıç tahmini** olur; ilk denemeyi doğru yere koyar. (b) 2 Mbps altı girdide "zaten sıkıştırılmış, tekrar kodlamak bozar" uyarısı — VidShrink yine kodlasın, kullanıcı bilerek onaylasın.
-
-**Alınmayacak.** Sabit çarpan. 40 Mbps girdide ×0.3 hâlâ 12 Mbps'tir; hedef boyutu olan üründe yanlış eksen. Kare hızını hiç düşürmemesi de 60 fps kaynakta bütçeyi harcar.
-
-**Nereye dokunur.** `src/VidShrink.Core/PlanCalculator.cs` (merdiven tohumu) · `src/VidShrink.App/MainWindow.xaml.cs` + `LanguageCatalog.cs` (düşük bit hızı uyarısı).
-
-## deepmedia/Transcoder — `natario1/Transcoder` yerine
-Apache-2.0 · 863 yıldız · 32 açık issue · son push ve `v0.11.2` 2024-11-05.
-
-**Ne yapıyor.** Genel amaçlı MediaCodec transcoder (kırpma, birleştirme, hız). Hedef boyut hesabı yok; hazır ayarlar sabit: `for720x1280()` = 720×1280 · 2 Mbps · 30 fps · 3 sn anahtar kare, `for360x480()` = 360×480 · 500 kbps · 30 fps · 3 sn. Bunun yerine Resizer zinciri: `Exact` · `AspectRatio` · `Fraction(0..1)` · `AtMost(limit)` · `PassThrough`, `MultiResizer` ile sıralanır. Kare hızı daima `min(girdi, hedef)`. Bit hızı `BITRATE_UNKNOWN` bırakılırsa tahmin edilir.
-
-**Alınacak — bu taramanın en değerlisi.** **Validator + `PASS_THROUGH`**: MIME, çözünürlük, fps ve anahtar kare aralığı zaten hedefe uygunsa iz yeniden kodlanmaz, kopyalanır; hiçbir iz işlenmeyecekse iş `SUCCESS_NOT_NEEDED` ile *başlamadan* biter. VidShrink karşılığı: dosya zaten hedefin altında ve codec uyumluysa kodlama başlatma, "gerek yoktu" de. Ek olarak `WriteVideoValidator` mantığı — yalnız ses sıkıştırmak boyutu kayda değer düşürmüyorsa video izine dokunma. Bu, en sık yaşanacak sessiz kalite kaybını kapatır.
-
-**Alınmayacak.** İki sabit ön ayarı hedef boyut yerine koymak; otuz saniyelik ve üç dakikalık videoya aynı bit hızını verirler.
-
-**Nereye dokunur.** `src/VidShrink.Core/CompressionStrategy.cs` + `PlanCalculator.cs` (pass-through kararı) · `src/VidShrink.Ffmpeg/EncodeRunner.cs` (`-c copy` yolu) · `tests/VidShrink.Tests/PlanCalculatorTests.cs`.
 
 ## numandev1/react-native-compressor
 MIT · 1325 yıldız · 32 açık issue · son push ve `v2.0.3` 2026-07-25. Üçünün en canlısı. Android'de LightCompressor'ı içeri kopyalayıp üstüne profil katmanı koymuş.

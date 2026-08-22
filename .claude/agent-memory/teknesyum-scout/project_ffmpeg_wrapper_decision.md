@@ -17,4 +17,4 @@ stderr regex'inden okuyor, bu daha kırılgan. Ayrıca boyut hedefli çok deneme
 alınmaya değer bulunan üç şey vardı ve hiçbiri bağımlılık değil: (1) iptalde `Kill()`
 öncesi ffmpeg stdin'ine `q` yazıp temiz kapanış beklemek, (2) geçici kaynağı üreten
 argümanın kendi temizliğinden sorumlu olması, (3) GIF paletini geçici PNG olmadan tek
-`filter_complex` içinde üretmek. Ayrıntı: `docs/taramalar/dotnet-ffmpeg.md`.
+`filter_complex` içinde üretmek. Ayrıntı: `docs/taramalar/ffmpegcore.md`, `docs/taramalar/ffmpeg-net.md`, `docs/taramalar/ffmpeg-autogen.md`.

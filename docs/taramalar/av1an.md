@@ -1,7 +1,13 @@
+Tema: AV1 ve parcali hedef-kalite kodlama · kaynak: av1-parcali.md
+
 # AV1 ve parçalı hedef-kalite kodlama taraması
 
 Sapma: `master-of-zen/Av1an` artık `rust-av/Av1an`'a yönleniyor (GitHub API kalıcı yönlendirme). Aynı depo, yeni sahip adı.
 Rakamlar 2026-08-22'de `gh api` ile çekildi. Kaynağı verilmeyen hiçbir sayı yazılmadı.
+
+## Ne yapıyor
+
+**Av1an** — videoyu sahne kesmesiyle parçalara böler, her parçayı ayrı işlemde paralel kodlar, sonda birleştirir. Hedef BOYUT yok, hedef KALİTE var (`--target-quality`). Köprü: her parça için kalite metriğini (VMAF / SSIMULACRA2 / Butteraugli / XPSNR) hedefe getiren quantizer'ı arar. Arama şöyle: 1-2. deneme min/max quantizer aralığının orta noktası (saf ikili arama), 3. deneme geçmişteki (skor, q) çiftleri üzerinden doğrusal enterpolasyon, 4. deneme kuadratik, 5+ PCHIP/Catmull-Rom/Akima gibi monoton eğri — enterpolasyon başarısız olursa ikili aramaya düşer. Varsayılan deneme sayısı **4**. Hedef tek sayı değil **aralık** (`FLOAT-FLOAT`); skor aralığa girince erken çıkar. Her başarısız denemeden sonra aralık daraltılır (q ± adım; x264/x265/SVT-AV1 için adım 0.25, diğerlerinde 1.0). Aralığa giren birden çok aday varsa **en yüksek quantizer** seçilir — yani hedefi tutturan en ucuz olan. Hiçbiri girmezse aralık ortasına en yakın olan. `--min-q`/`--max-q` uçlarında erken çıkış var. Prob'lar varsayılan olarak `veryfast` ve tam çözünürlükte, `--probing-rate` ile kare atlanabilir. Skor toplama yöntemi seçilebilir; varsayılan `auto`, eski varsayılan `percentile=1`.
 
 ## Depo
 
@@ -12,14 +18,6 @@ Rakamlar 2026-08-22'de `gh api` ile çekildi. Kaynağı verilmeyen hiçbir sayı
 | xiph/rav1e | BSD-2-Clause | 2026-08-19 | v0.8.1 (2025-06-16) | 257 | 4143 |
 
 SVT-AV1'in kanonik deposu GitLab; GitHub aynası olduğu için 3 açık issue ve 69 yıldız yanıltıcı — issue/tartışma orada.
-
-## Ne yapıyor
-
-**Av1an** — videoyu sahne kesmesiyle parçalara böler, her parçayı ayrı işlemde paralel kodlar, sonda birleştirir. Hedef BOYUT yok, hedef KALİTE var (`--target-quality`). Köprü: her parça için kalite metriğini (VMAF / SSIMULACRA2 / Butteraugli / XPSNR) hedefe getiren quantizer'ı arar. Arama şöyle: 1-2. deneme min/max quantizer aralığının orta noktası (saf ikili arama), 3. deneme geçmişteki (skor, q) çiftleri üzerinden doğrusal enterpolasyon, 4. deneme kuadratik, 5+ PCHIP/Catmull-Rom/Akima gibi monoton eğri — enterpolasyon başarısız olursa ikili aramaya düşer. Varsayılan deneme sayısı **4**. Hedef tek sayı değil **aralık** (`FLOAT-FLOAT`); skor aralığa girince erken çıkar. Her başarısız denemeden sonra aralık daraltılır (q ± adım; x264/x265/SVT-AV1 için adım 0.25, diğerlerinde 1.0). Aralığa giren birden çok aday varsa **en yüksek quantizer** seçilir — yani hedefi tutturan en ucuz olan. Hiçbiri girmezse aralık ortasına en yakın olan. `--min-q`/`--max-q` uçlarında erken çıkış var. Prob'lar varsayılan olarak `veryfast` ve tam çözünürlükte, `--probing-rate` ile kare atlanabilir. Skor toplama yöntemi seçilebilir; varsayılan `auto`, eski varsayılan `percentile=1`.
-
-**SVT-AV1** — AV1 kodlayıcısının kendisi. Hedef boyut köprüsü iki geçişli VBR'de: **birinci geçiş, ikinci geçişle aynı öngörü yapısında (aynı mini-GoP) ama CRF modunda** koşar; hızlı bir ön-tarama (IPP) yerine gerçek bir kodlama olduğu için istatistikleri çok daha isabetli. Birinci geçişin CRF'i girdi boyutu, kare hızı ve hedef bit hızından tahmin edilerek hedefe yakın seçilir. Hız için birinci geçiş daha hızlı preset kullanır (belge örneği: ikinci geçiş M5 ise birinci geçiş M11). Bit dağıtımı hiyerarşik: GoP → mini-GoP → kare. İki geçişte pay, birinci geçişteki **gerçek bit sayısı** oranıyla verilir (`kf_group_bits = kalan bit × grup_biti / kalan_bit`), tek geçişte ise hareket tahmini hatasıyla. Kare kodlandıktan sonra paketleme gerçek bit sayısını geri besler, model güncellenir; gerekirse aynı kare yeni QP ile **yeniden kodlanır**.
-
-**rav1e** — AV1 kodlayıcısı, hedef bit hızı rate control'ü Daala/Theora soyundan. Köprü bir model: kare alt-tipi başına (I/P/B0/B1) `bit ≈ ölçek × q^(-üs)`; ölçek ve üs kare tipine ayrı tutulur. Soğuk başlangıçta ölçek/üs değerleri piksel başına bit (ibpp) eşiklerine göre sabit tablodan seçilir — bu tablo "çok sayıda klibi her quantizer'da kodlayıp ikili log uzayında parçalı-doğrusal regresyon" ile türetilmiş (kaynak: `src/rate.rs` içi açıklama; sayısal doğrulama yapılmadı). Kodlama ilerledikçe ölçek, **2. derece Bessel alçak geçiren IIR filtresiyle** izlenir — hızlı tepki, kritik sönümlü, salınım yok. Bir bit rezervuarı (doluluk / hedef / tavan; hedef tavanın %50'si) taşma ve boşalmayı sınırlar. İki geçişte kare başına `log_scale` istatistiği dosyaya yazılır, ikinci geçiş bunu okur.
 
 ## Alınacak fikir
 

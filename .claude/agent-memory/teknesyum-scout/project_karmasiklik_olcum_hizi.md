@@ -7,7 +7,7 @@ metadata:
 
 VidShrink hedef boyuta sıkıştırmak için videodan pencereler kesip kodluyor ve bu ölçümün
 hızı sürekli gündemde. 2026-08-22'de frameserver teması tarandı (FFmpeg, VapourSynth,
-AviSynth+); rapor `docs/taramalar/frameserver.md`.
+AviSynth+); rapor `docs/taramalar/ffmpeg.md`, `docs/taramalar/vapoursynth.md`, `docs/taramalar/avisynthplus.md`.
 
 **Why:** Bugünkü tasarım pencere başına ayrı ffmpeg süreci + ayrı `-ss` kullanıyor, yani
 girdi N kez çözülüyor. Tarama, tek çözme geçişiyle çok çıkış üretmenin (`select=n=K`,

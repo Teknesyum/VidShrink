@@ -1,3 +1,5 @@
+Tema: hedef dosya boyutu kodlayicilari (ek arama) · kaynak: ek-arama.md
+
 # Ek arama — hedef dosya boyutu kodlayıcıları
 
 Seçilenler: **cyroz1/vidcord** ve **zfleeman/ffmpeg4discord**. İkisi de VidShrink'in tam
@@ -5,13 +7,6 @@ problemini çözüyor: kullanıcı MB verir, araç plan kurar, çıktıyı ölç
 vidcord masaüstü GUI + donanım kodlayıcı + turlu düzeltmeyle en yakın eş; ff4d'nin formülü ve
 döngüsü en açık yazılmış olan. Elenenler: KickerMix/kennethprose DiscordVideoCompressor (tek
 atış), MyloBishop/discompress (arşivli script).
-
-## Depo
-
-- **cyroz1/vidcord** — Rust + React (Tauri 2), MIT, 70 yıldız, 0 açık issue,
-  son push 2026-08-19, son sürüm v7.3 (2026-08-14).
-- **zfleeman/ffmpeg4discord** — Python (ffmpeg-python + Flask), GPL-3.0, 110 yıldız,
-  3 açık issue, son push 2026-08-19, son sürüm v0.2.3 (2026-08-19). Rakamlar `gh api` çıktısı (2026-08-22).
 
 ## Ne yapıyor
 
@@ -26,11 +21,12 @@ sabit, sonra CPU'ya (`libx264`) düşer — README'ye göre donanımda 4, CPU'da
 inemezse en küçük aşan sonucu bildirir. GIF yolunda 1 sn'lik örnek kodlanıp
 `örnek_bayt*klip/örnek*1.10` ile projelendirilir; oran 0.80–1.25 bandına düşerse örnek 3 sn.
 
-**ff4d** — CLI + isteğe bağlı Flask arayüzü, iki geçişli VBR. `twopass.py`:
-`br = floor((hedef_MiB*8192)/süre_sn - ses_kbps/1000)*1000` bps, `minrate = 0.5×br`,
-`maxrate = 1.45×br`. `__main__.py` döngüsü üst sınırsız: çıktı hedefin üstündeyse
-`hedef *= hedef/ölçülen` (taban 0.1 MB) ile küçültülüp baştan iki geçiş. `--approx` döngüyü
-kapatır; girdi zaten hedeften küçükse uyarır.
+## Depo
+
+- **cyroz1/vidcord** — Rust + React (Tauri 2), MIT, 70 yıldız, 0 açık issue,
+  son push 2026-08-19, son sürüm v7.3 (2026-08-14).
+- **zfleeman/ffmpeg4discord** — Python (ffmpeg-python + Flask), GPL-3.0, 110 yıldız,
+  3 açık issue, son push 2026-08-19, son sürüm v0.2.3 (2026-08-19). Rakamlar `gh api` çıktısı (2026-08-22).
 
 ## Alınacak fikir
 
@@ -51,6 +47,7 @@ kapatır; girdi zaten hedeften küçükse uyarır.
 - **vidcord'un sabit %10 payı ve tek geçiş ABR'si.** Pay karmaşıklıktan bağımsız, kolay
   içerikte doluluk kaybettirir; `CrfFitMargin`/`TwoPassUncertainty` ölçüme bağlı, geri adım olur.
 - İki depoda da MB/MiB ayrımı gevşek; VidShrink tek birim tanımını korumalı.
+
 ## VidShrink'te nereye dokunur
 
 - Fikir 1 → `src/VidShrink.Ffmpeg/CalibrationProbe.cs` (`MaxWindows`, `MinWindows`).

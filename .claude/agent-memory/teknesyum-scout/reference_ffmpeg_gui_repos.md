@@ -15,4 +15,4 @@ ffmpeg üstü masaüstü arayüz taramalarında kullanılan depolar (2026-08-22 
   saymama örneği. Boyut tahmini yok (kayıpsız kesme aracı).
 - `gianni-rosato/aviator` (GPL-3.0) — dar kapsam örneği; hata ve iş parçacığı yönetimi zayıf.
 
-Rapor: `docs/taramalar/kalite-arayuzleri.md`.
+Rapor: `docs/taramalar/ffmetrics.md`, `docs/taramalar/fastflix.md`, `docs/taramalar/lossless-cut.md`, `docs/taramalar/aviator.md`.

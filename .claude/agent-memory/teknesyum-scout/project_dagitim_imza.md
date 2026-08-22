@@ -19,5 +19,5 @@ emsalin ne yaptığı belirleyici oldu.
 **How to apply:** SmartScreen sorunu gündeme geldiğinde önce ucuz olanı öner —
 README'de uyarının geleceğini önceden yazmak, tek sabit indirme adresi, yayın
 varlığının yanında SHA-256. Kod imzalama sertifikası bu üçü yapılmadan önerilmemeli.
-Ayrıntılı tarama: `docs/taramalar/windows-medya-yigini.md`.
+Ayrıntılı tarama: `docs/taramalar/mpc-hc.md`, `docs/taramalar/media-autobuild-suite.md`, `docs/taramalar/mpv-winbuild-cmake.md`.
 Bkz. [[vidshrink-kurulum-zinciri]].
