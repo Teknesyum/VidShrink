@@ -2,25 +2,35 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.Transformation;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
+using Avalonia.Threading;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.App;
 
+public enum DropVisual { Idle, Accept, Reject }
+
 public partial class MainWindow : Window
 {
     private const double WhatsAppTargetMb = 16;
     private const double MacTrafficLightInset = 80;
+    private const uint ClientAreaAnimationQuery = 0x1042;
 
     private const string HardwareTipEnglish = "The graphics card encodes many times faster than the processor. VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed. On older cards the speed still arrives, but it costs some quality per megabyte.";
     private const string NoHardwareTipEnglish = "No usable hardware encoder was found on this computer, so fast shrink is unavailable. The graphics card would normally encode many times faster than the processor.";
@@ -62,6 +72,10 @@ public partial class MainWindow : Window
     private bool _languageApplied;
     private bool _hardwareProbed;
     private bool _hardwareEncoderAvailable;
+    private bool _motionReduced;
+    private DropVisual _dropVisual = DropVisual.Idle;
+    private DispatcherTimer? _recalculateTimer;
+    private DateTime _lastEstimatePulse = DateTime.MinValue;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
@@ -69,8 +83,14 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        _motionReduced = !AnimationsAllowed();
+        if (_motionReduced) Classes.Add("reduced-motion");
+        ApplyStartupSize();
+        PreparePanelEntrance();
+
         DragDrop.SetAllowDrop(this, true);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         LoadTitleBarLogo();
@@ -101,6 +121,135 @@ public partial class MainWindow : Window
         Loaded += OnWindowLoaded;
     }
 
+    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
+    private static extern bool SystemParametersInfoW(uint action, uint param, ref int value, uint update);
+
+    private static bool AnimationsAllowed()
+    {
+        if (!OperatingSystem.IsWindows()) return true;
+        try
+        {
+            var enabled = 1;
+            return !SystemParametersInfoW(ClientAreaAnimationQuery, 0, ref enabled, 0) || enabled != 0;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+    }
+
+    private TimeSpan Motion(string key, double fallbackMs)
+        => this.TryFindResource(key, out var value) && value is TimeSpan span ? span : TimeSpan.FromMilliseconds(fallbackMs);
+
+    private double Scalar(string key, double fallback)
+        => this.TryFindResource(key, out var value) && value is double number ? number : fallback;
+
+    private IBrush? Paint(string key)
+        => this.TryFindResource(key, out var value) ? value as IBrush : null;
+
+    private ControlTheme? Look(string key)
+        => this.TryFindResource(key, out var value) ? value as ControlTheme : null;
+
+    private void ApplyStartupSize()
+    {
+        try
+        {
+            var screen = Screens.Primary ?? Screens.All.FirstOrDefault();
+            if (screen is null) return;
+
+            var scaling = screen.Scaling <= 0 ? 1 : screen.Scaling;
+            var share = Scalar("WindowWorkAreaShare", 0.9);
+            var roomWidth = screen.WorkingArea.Width / scaling * share;
+            var roomHeight = screen.WorkingArea.Height / scaling * share;
+
+            Width = Math.Max(MinWidth, Math.Min(Scalar("WindowPreferredWidth", Width), roomWidth));
+            Height = Math.Max(MinHeight, Math.Min(Scalar("WindowPreferredHeight", Height), roomHeight));
+        }
+        catch (Exception)
+        {
+            // the declared Width/Height in markup stay in force
+        }
+    }
+
+    private Control[] EntrancePanels() => new Control[] { SourcePanel, TargetPanel, PlanPanel, OutputPanel, AiPanel };
+
+    private void PreparePanelEntrance()
+    {
+        var entering = _motionReduced ? "enter-flat" : "enter";
+        foreach (var panel in EntrancePanels()) panel.Classes.Add(entering);
+    }
+
+    private void PlayPanelEntrance()
+    {
+        var entering = _motionReduced ? "enter-flat" : "enter";
+        var step = Scalar("MotionStaggerMs", 40);
+        var panels = EntrancePanels();
+        for (var index = 0; index < panels.Length; index++)
+        {
+            var panel = panels[index];
+            if (index == 0) panel.Classes.Remove(entering);
+            else DispatcherTimer.RunOnce(() => panel.Classes.Remove(entering), TimeSpan.FromMilliseconds(step * index));
+        }
+    }
+
+    private void EnsureFade(Control control)
+    {
+        if (control.Transitions is not null) return;
+        control.Transitions = new Transitions
+        {
+            new DoubleTransition { Property = OpacityProperty, Duration = Motion("MotionBase", 240), Easing = new CubicEaseOut() }
+        };
+    }
+
+    private void Fade(Control control, bool visible)
+    {
+        EnsureFade(control);
+        if (visible)
+        {
+            if (control.IsVisible && control.Opacity > 0.99) return;
+            control.Opacity = 0;
+            control.IsVisible = true;
+            Dispatcher.UIThread.Post(() => control.Opacity = 1, DispatcherPriority.Loaded);
+            return;
+        }
+
+        if (!control.IsVisible) return;
+        control.Opacity = 0;
+        DispatcherTimer.RunOnce(() => { if (control.Opacity < 0.01) control.IsVisible = false; }, Motion("MotionBase", 240));
+    }
+
+    private void Pulse(Control control, bool throttled)
+    {
+        if (_motionReduced) return;
+        var now = DateTime.UtcNow;
+        if (throttled && now - _lastEstimatePulse < Motion("MotionSlow", 360) + Motion("MotionBase", 240)) return;
+        _lastEstimatePulse = now;
+        control.Opacity = 0.35;
+        DispatcherTimer.RunOnce(() => control.Opacity = 1, Motion("MotionFast", 160));
+    }
+
+    private void SetStage(TextBlock target, string text)
+    {
+        if (target.Text == text) return;
+        target.Text = text;
+        Pulse(target, false);
+    }
+
+    private void ScheduleRecalculate()
+    {
+        _recalculateTimer ??= new DispatcherTimer { Interval = Motion("MotionFast", 160) };
+        _recalculateTimer.Stop();
+        _recalculateTimer.Tick -= OnRecalculateTick;
+        _recalculateTimer.Tick += OnRecalculateTick;
+        _recalculateTimer.Start();
+    }
+
+    private void OnRecalculateTick(object? sender, EventArgs e)
+    {
+        _recalculateTimer?.Stop();
+        Recalculate();
+    }
+
     private void LoadTitleBarLogo()
     {
         try
@@ -124,6 +273,7 @@ public partial class MainWindow : Window
         try
         {
             SetLanguage(true);
+            PlayPanelEntrance();
             var startupFile = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(File.Exists);
             if (startupFile is not null) await LoadAsync(startupFile);
             await LoadFfmpegVersionAsync();
@@ -167,7 +317,7 @@ public partial class MainWindow : Window
     private void ToggleMaximizeRestore() => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     private void UpdateMaximizeGlyph() => BtnMaximize.Content = WindowState == WindowState.Maximized ? "❐" : "□";
 
-    private void OnOpenGitHub(object? sender, RoutedEventArgs e) => OpenExternal(this.TryFindResource("LinkRepo", out var url) ? url as string : null);
+    private void OnOpenGitHub(object? sender, RoutedEventArgs e) => OpenExternal(this.TryFindResource("LinkGitHub", out var url) ? url as string : null);
     private void OnOpenSponsor(object? sender, RoutedEventArgs e) => OpenExternal(this.TryFindResource("LinkSponsor", out var url) ? url as string : null);
 
     private void OpenExternal(string? url)
@@ -347,7 +497,15 @@ public partial class MainWindow : Window
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = _cts is null && TryGetDroppedFile(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
+        var accepted = _cts is null && TryGetDroppedFile(e) is not null;
+        e.DragEffects = accepted ? DragDropEffects.Copy : DragDropEffects.None;
+        SetDropVisual(accepted ? DropVisual.Accept : DropVisual.Reject);
+        e.Handled = true;
+    }
+
+    private void OnDragLeave(object? sender, DragEventArgs e)
+    {
+        SetDropVisual(DropVisual.Idle);
         e.Handled = true;
     }
 
@@ -355,14 +513,48 @@ public partial class MainWindow : Window
     {
         var file = TryGetDroppedFile(e);
         e.Handled = true;
+        SetDropVisual(DropVisual.Idle);
         if (_cts is not null || file is null) return;
         await LoadAsync(file);
     }
 
+    private void SetDropVisual(DropVisual state)
+    {
+        if (_dropVisual == state) return;
+        _dropVisual = state;
+
+        var (outline, fill, icon, scale) = state switch
+        {
+            DropVisual.Accept => ("NeonBlue", "NeonBlueActive", "NeonBlue", "scale(1.08)"),
+            DropVisual.Reject => ("NeonPink", "NeonPinkFill", "NeonPink", "scale(0.94)"),
+            _ => ("NeonBlueBorderStrong", "NeonBlueFill", "NeonBlue", "none")
+        };
+
+        DropOutline.Stroke = Paint(outline);
+        DropOutline.Fill = Paint(fill);
+        DropIcon.Stroke = Paint(icon);
+        DropIcon.RenderTransform = TransformOperations.Parse(_motionReduced ? "none" : scale);
+
+        var (title, hint) = state switch
+        {
+            DropVisual.Accept => ("Release to load this file", "Any format ffmpeg can open"),
+            DropVisual.Reject => ("Only one file at a time", "Folders cannot be dropped"),
+            _ => ("Drop a media file here", "Any format ffmpeg can open")
+        };
+
+        TxtDropTitle.Text = Localize(title);
+        TxtDropHint.Text = Localize(hint);
+    }
+
     private static string? TryGetDroppedFile(DragEventArgs e)
-        => e.DataTransfer.TryGetFiles()?
-            .Select(item => item.TryGetLocalPath())
-            .FirstOrDefault(path => path is not null && File.Exists(path));
+    {
+        var items = e.DataTransfer.TryGetFiles()?.ToList();
+        if (items is null || items.Count != 1) return null;
+        if (items[0] is IStorageFolder) return null;
+        var path = items[0].TryGetLocalPath();
+        if (path is null || Directory.Exists(path) || !File.Exists(path)) return null;
+        return path;
+    }
 
     private void ReportSourceError(string message)
     {
@@ -381,6 +573,7 @@ public partial class MainWindow : Window
     private async Task LoadAsync(string path)
     {
         TxtFileName.Text = Path.GetFileName(path);
+        Fade(SourceCard, true);
         ClearSourceError();
         TxtStatusBar.Text = T("Ffprobe ile inceleniyor...", "Probing with ffprobe...");
 
@@ -389,10 +582,14 @@ public partial class MainWindow : Window
         {
             _info = null;
             BtnStart.IsEnabled = BtnConvert.IsEnabled = false;
-            InfoGrid.IsVisible = false;
+            Fade(InfoGrid, false);
+            Fade(DropZone, true);
+            ResetPlanView();
             ReportSourceError($"{T("Bu dosya kullanılamıyor", "This file cannot be used")}: {DescribeFailure(ex)}");
             return;
         }
+
+        Fade(DropZone, false);
 
         _aiPlan = null;
         _profile = null;
@@ -454,7 +651,7 @@ public partial class MainWindow : Window
 
     private void ShowInfo(MediaInfo info)
     {
-        InfoGrid.IsVisible = true;
+        Fade(InfoGrid, true);
         TxtDuration.Text = TimeSpan.FromSeconds(info.DurationSeconds).ToString(@"hh\:mm\:ss");
         TxtSize.Text = $"{info.FileSizeMb:0.0} MB";
         TxtResolution.Text = $"{info.Width}x{info.Height}";
@@ -463,7 +660,7 @@ public partial class MainWindow : Window
         TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : T("Yok", "None");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
         TxtHdr.Text = info.IsHdr ? T("Evet", "Yes") : T("Hayır", "No");
-        HdrPolicyPanel.IsVisible = info.IsHdr;
+        Fade(HdrPolicyPanel, info.IsHdr);
     }
 
     private static CodecPreference CodecFromIndex(int index) => index switch
@@ -498,13 +695,74 @@ public partial class MainWindow : Window
         BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
     }
 
+    private void ResetPlanView()
+    {
+        PlanFacts.Children.Clear();
+        PlanFacts.RowDefinitions.Clear();
+        PlanReasons.Children.Clear();
+        PlanRule.IsVisible = false;
+        TxtPlanEmpty.IsVisible = true;
+        TxtCommand.Text = "";
+    }
+
+    private void AddPlanFact(string label, string value)
+    {
+        var row = PlanFacts.RowDefinitions.Count;
+        PlanFacts.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+
+        var key = new TextBlock { Text = label, Theme = Look("PlanFactLabel") };
+        Grid.SetRow(key, row);
+        Grid.SetColumn(key, 0);
+
+        var read = new TextBlock { Text = value, Theme = Look("PlanFactValue") };
+        Grid.SetRow(read, row);
+        Grid.SetColumn(read, 1);
+
+        PlanFacts.Children.Add(key);
+        PlanFacts.Children.Add(read);
+    }
+
+    private void AddPlanReason(string text)
+    {
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+        row.Children.Add(new TextBlock { Text = "•", Theme = Look("PlanBullet") });
+
+        var body = new TextBlock { Text = text, Theme = Look("PlanReasonText") };
+        Grid.SetColumn(body, 1);
+        row.Children.Add(body);
+
+        PlanReasons.Children.Add(row);
+    }
+
     private void RefreshPlanView()
     {
         if (ActivePlan is not { } plan || _info is null) return;
-        var quality = plan.ModeEnum == EncodeMode.Crf ? $"CRF {plan.Crf}" : $"{plan.VideoBitrateK}k two-pass";
         _estimate = PlanCalculator.Estimate(plan, _info, _profile);
-        TxtPlanSummary.Text = $"[{(_aiPlan is null ? T("Otomatik", "Automatic") : "AI")}] {plan.Codec} · {quality} · {plan.Width}x{plan.Height} @ {plan.Fps:0.##} FPS · {(plan.AudioCodec is null ? T("Ses yok", "No audio") : $"{plan.AudioCodec} {plan.AudioBitrateK}k")} · Preset {plan.Preset}";
-        TxtPlanReason.Text = DescribeReason(plan);
+
+        PlanFacts.Children.Clear();
+        PlanFacts.RowDefinitions.Clear();
+        PlanReasons.Children.Clear();
+        TxtPlanEmpty.IsVisible = false;
+
+        var channels = plan.AudioChannels == 1 ? $" {T("tek kanal", "mono")}" : "";
+        AddPlanFact("Plan", _aiPlan is null ? T("Otomatik", "Automatic") : "AI");
+        AddPlanFact(Localize("Encoder"), plan.Codec);
+        AddPlanFact(Localize("Mode"), plan.ModeEnum switch
+        {
+            EncodeMode.Crf => $"CRF {plan.Crf}",
+            EncodeMode.PassThrough => T("kopyala", "stream copy"),
+            _ => $"{plan.VideoBitrateK}k · {T("iki geçiş", "two-pass")}"
+        });
+        AddPlanFact(Localize("Resolution"), $"{plan.Width}x{plan.Height}");
+        AddPlanFact(Localize("Frame rate"), $"{plan.Fps:0.##} FPS");
+        AddPlanFact(Localize("Audio"), plan.AudioCodec is null ? T("Yok", "None") : $"{plan.AudioCodec} {plan.AudioBitrateK}k{channels}");
+        AddPlanFact(Localize("Preset"), plan.Preset);
+        AddPlanFact(Localize("Estimated size"), _estimate is { } size ? $"{size.ExpectedMb:0.0} MB" : "-");
+
+        foreach (var line in StrategyLines()) AddPlanReason(line);
+        foreach (var line in ReasonLines(plan)) AddPlanReason(line);
+        PlanRule.IsVisible = PlanReasons.Children.Count > 0;
+
         RefreshEstimateView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
     }
@@ -516,11 +774,12 @@ public partial class MainWindow : Window
             TxtEstimateValue.Text = "-";
             TxtEstimateRange.Text = "";
             TxtEstimateNote.Text = "";
-            TxtStrategyNote.Text = "";
             return;
         }
 
-        TxtEstimateValue.Text = $"{estimate.ExpectedMb:0.0} MB";
+        var reading = $"{estimate.ExpectedMb:0.0} MB";
+        if (TxtEstimateValue.Text != reading) Pulse(TxtEstimateValue, true);
+        TxtEstimateValue.Text = reading;
         TxtEstimateRange.Text = $"{estimate.LowMb:0.0} - {estimate.HighMb:0.0} MB · {T("Kaynağın", "Of source")} %{estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01) * 100:0.#}";
 
         var basis = estimate.Measured
@@ -530,14 +789,10 @@ public partial class MainWindow : Window
             ? T("iki geçişli mod boyutu zorlar", "two-pass enforces this size")
             : T("kalite modu; hedefin altında kalır", "quality mode; stays under the target");
         TxtEstimateNote.Text = $"{basis} · {mode} · {T("öngörülen kalite", "predicted quality")} {_predictedQuality:0.#}/100";
-        TxtStrategyNote.Text = DescribeStrategy();
     }
 
-    private string DescribeReason(EncodePlan plan)
+    private List<string> ReasonLines(EncodePlan plan)
     {
-        if (plan.ReasonCodes.Count == 0)
-            return T("Motor bu klip için ek bir gerekçe bildirmedi.", "The engine reported no extra reasoning for this clip.");
-
         var parts = new List<string>();
         foreach (var note in plan.ReasonCodes)
         {
@@ -564,12 +819,12 @@ public partial class MainWindow : Window
             if (text is not null) parts.Add(text);
         }
 
-        return string.Join("; ", parts);
+        return parts;
     }
 
-    private string DescribeStrategy()
+    private List<string> StrategyLines()
     {
-        if (_advice is not { } advice) return "";
+        if (_advice is not { } advice) return new List<string>();
 
         var regime = advice.Regime switch
         {
@@ -612,7 +867,7 @@ public partial class MainWindow : Window
             if (text is not null) lines.Add(text);
         }
 
-        return string.Join("  ", lines);
+        return lines;
     }
 
     private static string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
@@ -637,7 +892,7 @@ public partial class MainWindow : Window
         _syncing = true;
         TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
-        Recalculate();
+        ScheduleRecalculate();
     }
 
     private void OnTargetTextChanged()
@@ -648,7 +903,7 @@ public partial class MainWindow : Window
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
         _syncing = false;
-        Recalculate();
+        ScheduleRecalculate();
     }
 
     private void OnPreset(object? sender, RoutedEventArgs e)
@@ -668,7 +923,7 @@ public partial class MainWindow : Window
     private void OnOptionChanged()
     {
         if (_syncing) return;
-        Recalculate();
+        ScheduleRecalculate();
     }
 
     private async void OnCopyPrompt(object? sender, RoutedEventArgs e)
@@ -751,7 +1006,7 @@ public partial class MainWindow : Window
             var progress = new Progress<EncodeProgress>(p =>
             {
                 Progress.Value = p.Fraction;
-                TxtStage.Text = LocalizeStage(p.Stage);
+                SetStage(TxtStage, LocalizeStage(p.Stage));
                 TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-";
                 if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB";
             });
@@ -947,7 +1202,7 @@ public partial class MainWindow : Window
             var progress = new Progress<EncodeProgress>(p =>
             {
                 ConvertProgress.Value = p.Fraction;
-                TxtConvertStage.Text = LocalizeStage(p.Stage);
+                SetStage(TxtConvertStage, LocalizeStage(p.Stage));
             });
 
             var result = await new EncodeRunner().ConvertAsync(_info, plan, output, progress, cts.Token);
@@ -1013,7 +1268,8 @@ public partial class MainWindow : Window
         BtnConvert.IsEnabled = !running && _info is not null;
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         if (running) return;
-        TxtStage.Text = TxtConvertStage.Text = T("Boşta", "Idle");
+        SetStage(TxtStage, T("Boşta", "Idle"));
+        SetStage(TxtConvertStage, T("Boşta", "Idle"));
         TxtRemaining.Text = "-";
     }
 

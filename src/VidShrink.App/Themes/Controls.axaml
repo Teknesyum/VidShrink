@@ -48,6 +48,22 @@
         <Setter Property="LetterSpacing" Value="{StaticResource TrackingLabel}"/>
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         <Setter Property="Margin" Value="{StaticResource LabelMargin}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="DropTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="LetterSpacing" Value="{StaticResource TrackingMd}"/>
+        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="DropHint" TargetType="TextBlock" BasedOn="{StaticResource Hint}">
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
       </ControlTheme>
 
       <ControlTheme x:Key="MonoValue" TargetType="TextBlock">
@@ -55,6 +71,32 @@
         <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="PlanFactLabel" TargetType="TextBlock" BasedOn="{StaticResource Label}">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="MinWidth" Value="{StaticResource PlanFactMinWidth}"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="PlanFactValue" TargetType="TextBlock" BasedOn="{StaticResource MonoValue}">
+        <Setter Property="TextWrapping" Value="Wrap"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="PlanBullet" TargetType="TextBlock" BasedOn="{StaticResource MonoValue}">
+        <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+        <Setter Property="Margin" Value="{StaticResource PlanBulletMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="PlanReasonText" TargetType="TextBlock" BasedOn="{StaticResource Body}">
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="LineHeight" Value="{StaticResource LineHeightBody}"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="PanelRule" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource BorderThinScalar}"/>
+        <Setter Property="Background" Value="{StaticResource NeonBlueBorder}"/>
       </ControlTheme>
 
       <ControlTheme x:Key="HeroValue" TargetType="TextBlock">
@@ -94,6 +136,20 @@
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusPanel}"/>
         <Setter Property="Padding" Value="{StaticResource PanelPadding}"/>
+        <Setter Property="RenderTransform" Value="none"/>
+        <Setter Property="Transitions">
+          <Transitions>
+            <DoubleTransition Property="Opacity" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+            <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+          </Transitions>
+        </Setter>
+        <Style Selector="^.enter">
+          <Setter Property="Opacity" Value="0"/>
+          <Setter Property="RenderTransform" Value="translateY(10px)"/>
+        </Style>
+        <Style Selector="^.enter-flat">
+          <Setter Property="Opacity" Value="0"/>
+        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="GhostButton" TargetType="Button">
@@ -111,6 +167,12 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="RenderTransform" Value="none"/>
+        <Setter Property="Transitions">
+          <Transitions>
+            <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+          </Transitions>
+        </Setter>
         <Setter Property="Template">
           <ControlTemplate TargetType="Button">
             <Border Name="Root"
@@ -120,8 +182,8 @@
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Border.Transitions>
                 <Transitions>
-                  <BrushTransition Property="Background" Duration="0:0:0.09"/>
-                  <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                  <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>
+                  <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                 </Transitions>
               </Border.Transitions>
               <Panel>
@@ -143,10 +205,14 @@
         </Setter>
         <Style Selector="^:pointerover">
           <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
+          <Setter Property="RenderTransform" Value="scale(1.02)"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
           <Setter Property="BoxShadow" Value="{StaticResource GlowPurple}"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="RenderTransform" Value="scale(0.98)"/>
         </Style>
         <Style Selector="^:pressed /template/ Border#Root">
           <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
@@ -180,6 +246,12 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="RenderTransform" Value="none"/>
+        <Setter Property="Transitions">
+          <Transitions>
+            <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+          </Transitions>
+        </Setter>
         <Setter Property="Template">
           <ControlTemplate TargetType="Button">
             <Border Name="Root"
@@ -190,8 +262,9 @@
                     BoxShadow="{StaticResource GlowBlue}">
               <Border.Transitions>
                 <Transitions>
-                  <BrushTransition Property="Background" Duration="0:0:0.09"/>
-                  <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                  <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>
+                  <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
+                  <DoubleTransition Property="Opacity" Duration="{StaticResource MotionInstant}"/>
                 </Transitions>
               </Border.Transitions>
               <Panel>
@@ -211,8 +284,14 @@
             </Border>
           </ControlTemplate>
         </Setter>
+        <Style Selector="^:pointerover">
+          <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
           <Setter Property="Opacity" Value="0.85"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="RenderTransform" Value="scale(0.98)"/>
         </Style>
         <Style Selector="^:pressed /template/ Border#Root">
           <Setter Property="Opacity" Value="0.7"/>
@@ -248,6 +327,39 @@
         </Style>
       </ControlTheme>
 
+      <ControlTheme x:Key="TitleBarSupportButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+        <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
+        <Setter Property="Margin" Value="{StaticResource WindowButtonMargin}"/>
+        <Setter Property="Height" Value="{StaticResource WindowButtonHeight}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeonPurpleBorder}"/>
+        <Style Selector="^:pressed /template/ Border#Root">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="TitleBarLinkButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
+        <Setter Property="Margin" Value="{StaticResource WindowButtonMargin}"/>
+        <Setter Property="Height" Value="{StaticResource WindowButtonHeight}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#Root">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+          <Setter Property="BoxShadow" Value="{StaticResource GlowPink}"/>
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Root">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+      </ControlTheme>
+
       <ControlTheme x:Key="LinkButton" TargetType="Button">
         <Setter Property="FocusAdorner" Value="{x:Null}"/>
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
@@ -260,6 +372,12 @@
         <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
         <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+        <Setter Property="RenderTransform" Value="none"/>
+        <Setter Property="Transitions">
+          <Transitions>
+            <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+          </Transitions>
+        </Setter>
         <Setter Property="Template">
           <ControlTemplate TargetType="Button">
             <Panel>
@@ -279,6 +397,10 @@
         </Setter>
         <Style Selector="^:pointerover">
           <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+          <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        </Style>
+        <Style Selector="^:pressed">
+          <Setter Property="RenderTransform" Value="scale(0.98)"/>
         </Style>
         <Style Selector="^:focus-visible /template/ Border#FocusRing">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
@@ -322,7 +444,7 @@
                       CornerRadius="{StaticResource RadiusBadge}">
                 <Border.Transitions>
                   <Transitions>
-                    <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                    <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                   </Transitions>
                 </Border.Transitions>
                 <ContentPresenter Name="PART_ContentPresenter"
@@ -374,8 +496,8 @@
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Border.Transitions>
                 <Transitions>
-                  <BrushTransition Property="Background" Duration="0:0:0.09"/>
-                  <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                  <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>
+                  <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                 </Transitions>
               </Border.Transitions>
               <Panel>
@@ -442,8 +564,8 @@
                         CornerRadius="{StaticResource RadiusChip}">
                   <Border.Transitions>
                     <Transitions>
-                      <BrushTransition Property="Background" Duration="0:0:0.09"/>
-                      <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                      <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>
+                      <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                     </Transitions>
                   </Border.Transitions>
                 </Border>
@@ -455,7 +577,15 @@
                       StrokeThickness="2.5"
                       StrokeLineCap="Round"
                       StrokeJoin="Round"
-                      IsVisible="False"/>
+                      Opacity="0"
+                      RenderTransform="scale(0.6)">
+                  <Path.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+                      <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                    </Transitions>
+                  </Path.Transitions>
+                </Path>
                 <Border Name="FocusRing"
                         IsHitTestVisible="False"
                         BorderBrush="Transparent"
@@ -472,7 +602,8 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:checked /template/ Path#CheckMark">
-          <Setter Property="IsVisible" Value="True"/>
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="RenderTransform" Value="none"/>
         </Style>
         <Style Selector="^:checked /template/ Border#CheckOutline">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
@@ -516,10 +647,16 @@
                               ItemsPanel="{TemplateBinding ItemsPanel}"
                               ClipToBounds="False"
                               Margin="0,0,0,2"/>
-              <ContentPresenter Name="PART_SelectedContentHost"
-                                Grid.Row="1"
-                                Content="{TemplateBinding SelectedContent}"
-                                ContentTemplate="{TemplateBinding SelectedContentTemplate}"/>
+              <TransitioningContentControl Name="SelectedContentHost"
+                                           Grid.Row="1"
+                                           Content="{TemplateBinding SelectedContent}"
+                                           ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                           HorizontalContentAlignment="Stretch"
+                                           VerticalContentAlignment="Stretch">
+                <TransitioningContentControl.PageTransition>
+                  <CrossFade Duration="{StaticResource MotionBase}"/>
+                </TransitioningContentControl.PageTransition>
+              </TransitioningContentControl>
             </Grid>
           </ControlTemplate>
         </Setter>
@@ -551,8 +688,8 @@
                     UseLayoutRounding="True">
               <Border.Transitions>
                 <Transitions>
-                  <BrushTransition Property="Background" Duration="0:0:0.09"/>
-                  <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                  <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}"/>
+                  <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                 </Transitions>
               </Border.Transitions>
               <Panel>
@@ -663,7 +800,7 @@
                       MinHeight="{TemplateBinding MinHeight}">
                 <Border.Transitions>
                   <Transitions>
-                    <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                    <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                   </Transitions>
                 </Border.Transitions>
                 <Grid ColumnDefinitions="*,20">
@@ -753,7 +890,7 @@
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Border.Transitions>
                 <Transitions>
-                  <BrushTransition Property="BorderBrush" Duration="0:0:0.09"/>
+                  <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
                 </Transitions>
               </Border.Transitions>
               <Panel>
@@ -842,11 +979,21 @@
             <Ellipse Name="Knob"
                      Fill="{StaticResource NeonBlue}"
                      Stroke="{StaticResource NeonPink}"
-                     StrokeThickness="2"/>
+                     StrokeThickness="2"
+                     RenderTransform="none">
+              <Ellipse.Transitions>
+                <Transitions>
+                  <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+                </Transitions>
+              </Ellipse.Transitions>
+            </Ellipse>
           </ControlTemplate>
         </Setter>
         <Style Selector="^:pointerover /template/ Ellipse#Knob">
-          <Setter Property="StrokeThickness" Value="3"/>
+          <Setter Property="RenderTransform" Value="scale(1.1)"/>
+        </Style>
+        <Style Selector="^:pressed /template/ Ellipse#Knob">
+          <Setter Property="RenderTransform" Value="scale(1.1)"/>
         </Style>
       </ControlTheme>
 
@@ -902,6 +1049,11 @@
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusCell}"/>
         <Setter Property="MinHeight" Value="{StaticResource ProgressBarHeight}"/>
+        <Setter Property="Transitions">
+          <Transitions>
+            <DoubleTransition Property="Value" Duration="{StaticResource MotionFast}" Easing="LinearEasing"/>
+          </Transitions>
+        </Setter>
         <Setter Property="Template">
           <ControlTemplate TargetType="ProgressBar">
             <Border Name="Root"
