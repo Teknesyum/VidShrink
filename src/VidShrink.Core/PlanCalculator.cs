@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace VidShrink.Core;
 
 public enum FillPolicy { FillTarget, QualityCeiling }
@@ -11,6 +13,7 @@ public sealed class PlanOptions
     public bool AllowFpsDrop { get; set; } = true;
     public HdrPolicy HdrPolicy { get; set; } = HdrPolicy.Preserve;
     public FillPolicy FillPolicy { get; set; } = FillPolicy.FillTarget;
+    public SpeedMode SpeedMode { get; set; } = SpeedMode.Quality;
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -32,12 +35,18 @@ public static class PlanCalculator
     private const double ContainerOverhead = 0.995;
     private const double CrfFitMargin = 0.94;
     private const double TwoPassUncertainty = 0.04;
-    private const double UnderBandRetryCapMargin = 1 - TwoPassUncertainty / 2;
+    public const double CalibratedRetrySpread = 0.016;
     private const double MinScale = 0.25;
     private const double ScaleStep = 0.02;
     private const int MinHeight = 240;
     private const double MinFps = 12.0;
     private const int MinVideoBitrateK = 48;
+    private const double HardwareUncalibratedBias = 1.06;
+
+    private static readonly string[] FastHardwareOrder =
+    {
+        "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
+    };
 
     public static EncodePlan Build(MediaInfo info, PlanOptions options, IEncoderAvailability? availability = null)
         => BuildDetailed(info, options, null, availability).Plan;
@@ -54,7 +63,8 @@ public static class PlanCalculator
         var preference = options.Codec == CodecPreference.Auto
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
-        var codec = PickCodec(preference, availability);
+        var fast = options.SpeedMode == SpeedMode.Fast;
+        var codec = fast ? PickFastCodec(preference, availability) : PickCodec(preference, availability);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
@@ -65,7 +75,7 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
         }
 
-        var preferredCodec = PreferredCodecFor(preference);
+        var preferredCodec = fast ? FastHardwareOrder[0] : PreferredCodecFor(preference);
         if (codec != preferredCodec)
         {
             notes.Add(AdviceCode.EncoderFallback);
@@ -75,7 +85,7 @@ public static class PlanCalculator
 
         if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
             notes.Add(AdviceCode.CodecUpgradeRecommended);
-        if (preference == CodecPreference.Fast && regime is CompressionRegime.Aggressive or CompressionRegime.Extreme)
+        if (CostsQualityInHardware(codec) && regime is CompressionRegime.Aggressive or CompressionRegime.Extreme)
             notes.Add(AdviceCode.HardwareCodecCostsQuality);
         if (regime == CompressionRegime.Extreme)
             notes.Add(AdviceCode.ExtremeRatioWarning);
@@ -90,7 +100,8 @@ public static class PlanCalculator
             Intent = options.Intent,
             Codec = preference,
             AllowResolutionDrop = options.AllowResolutionDrop && CompressionStrategy.AllowsResolutionDrop(regime),
-            AllowFpsDrop = options.AllowFpsDrop && CompressionStrategy.AllowsFpsDrop(regime)
+            AllowFpsDrop = options.AllowFpsDrop && CompressionStrategy.AllowsFpsDrop(regime),
+            SpeedMode = options.SpeedMode
         };
 
         var best = SearchLayout(info, effective, complexity, codec, videoK);
@@ -178,9 +189,11 @@ public static class PlanCalculator
                     {
                         plan.Mode = "2pass";
                         plan.Crf = null;
-                        plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
+                        var fillBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
+                        plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK * fillBias, MinVideoBitrateK));
                         reason.Add($"CRF floor {minCrf} was reached before the fill band, so two-pass VBR targets the {bandCenterMb:0.0} MB band center directly");
                         reasonCodes.Add(new ReasonNote(ReasonCode.FillTwoPassBandCenter, Crf: minCrf, Mb: bandCenterMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
+                        AddHardwareBiasNote(codec, fillBias, reason, reasonCodes);
                     }
                 }
             }
@@ -192,7 +205,9 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: options.TargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "2pass";
-            plan.VideoBitrateK = (int)Math.Round(videoK);
+            var enforcedBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
+            plan.VideoBitrateK = (int)Math.Round(videoK * enforcedBias);
+            AddHardwareBiasNote(codec, enforcedBias, reason, reasonCodes);
         }
 
         reason.Add($"predicted quality {best.Score:0.#}/100{(complexity.Measured ? $" from a measured sample (bppf {complexity.ReferenceBppf:0.0000}, detail falloff {complexity.DetailExponent:0.00})" : " estimated from the source bitrate")}");
@@ -216,7 +231,7 @@ public static class PlanCalculator
         Width = best.Width,
         Height = best.Height,
         Fps = best.Fps,
-        Preset = PickPreset(codec, options.Codec),
+        Preset = PickPreset(codec, options.Codec, options.SpeedMode),
         PixelFormat = hdr.PixelFormat,
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
@@ -240,36 +255,52 @@ public static class PlanCalculator
         return new SizeEstimate(expectedMb, expectedMb * (1 - band), expectedMb * (1 + band), complexity.Measured, false);
     }
 
-    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, bool fillUnderBand = false)
+    public static double RetryAimMb(double targetMb, ComplexityProfile? profile, EncodePlan plan, double sourceHeight, out bool calibrated)
+    {
+        var scale = sourceHeight > 0 ? plan.Height / sourceHeight : 1.0;
+        calibrated = profile is not null && profile.AppliesTo(plan.Codec, scale, plan.Fps);
+        if (!calibrated) return targetMb * CrfFitMargin;
+
+        var band = FillBand.For(targetMb);
+        var ceilingAim = targetMb / (1 + CalibratedRetrySpread);
+        var bandAim = band.LowerMb / (1 - CalibratedRetrySpread);
+        var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
+        return Math.Max(band.HardFloorMb, Math.Min(ceilingAim, Math.Max(bandAim, bandCenterMb)));
+    }
+
+    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, bool fillUnderBand = false, ComplexityProfile? profile = null, double sourceHeight = 0)
     {
         var corrected = plan.Clone();
         var audioMb = SizeMb(0, plan.AudioBitrateK, durationSeconds);
         var previousVideoK = plan.VideoBitrateK;
+        var aimMb = RetryAimMb(targetMb, profile, plan, sourceHeight, out var calibrated);
+        var aimSource = calibrated
+            ? $"aimed at {aimMb:0.0} MB from the calibrated ±{CalibratedRetrySpread * 100:0.#}% retry error"
+            : $"aimed at {aimMb:0.0} MB from the uncalibrated {CrfFitMargin * 100:0.#}% margin";
         corrected.Mode = "2pass";
         corrected.Crf = null;
 
         if (fillUnderBand)
         {
             var band = FillBand.For(targetMb);
-            var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
-            var factorUp = bandCenterMb / Math.Max(actualMb, 0.01);
-            var totalBudgetKUp = targetMb * UnderBandRetryCapMargin * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
+            var factorUp = aimMb / Math.Max(actualMb, 0.01);
+            var totalBudgetKUp = aimMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
             var videoBudgetKUp = Math.Max(1, totalBudgetKUp - plan.AudioBitrateK);
             corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factorUp, videoBudgetKUp)));
-            corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.HardFloorMb:0.0} MB floor for a {targetMb:0.##} MB target; video bitrate was scaled by {factorUp:0.###} toward the {bandCenterMb:0.0} MB band center and capped to {targetMb * UnderBandRetryCapMargin:0.0} MB of remaining budget, leaving pay below the hard ceiling for two-pass VBR's own targeting uncertainty";
-            corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factorUp) };
+            corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.HardFloorMb:0.0} MB floor for a {targetMb:0.##} MB target; video bitrate was scaled by {factorUp:0.###} and {aimSource}, which keeps the whole predicted spread under the hard ceiling";
+            corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factorUp, BandLowerMb: band.LowerMb) };
             return corrected;
         }
 
-        var desiredMb = targetMb * CrfFitMargin;
+        var desiredMb = aimMb;
         var actualVideoMb = Math.Max(actualMb - audioMb, 0.01);
         var desiredVideoMb = Math.Max(desiredMb - audioMb, 0.01);
         var factor = desiredVideoMb / actualVideoMb;
         var totalBudgetK = desiredMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
         var videoBudgetK = Math.Max(1, totalBudgetK - plan.AudioBitrateK);
         corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
-        corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###} and capped to the remaining budget";
-        corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor) };
+        corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###}, {aimSource}";
+        corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor, BandLowerMb: FillBand.For(targetMb).LowerMb) };
         return corrected;
     }
 
@@ -451,12 +482,50 @@ public static class PlanCalculator
         return FallbackCodecFor(pref);
     }
 
+    private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability)
+    {
+        if (availability is null) return FastHardwareOrder[0];
+        foreach (var candidate in FastHardwareOrder)
+            if (availability.WorksAsEncoder(candidate)) return candidate;
+        return FallbackCodecFor(pref);
+    }
+
+    private static bool CostsQualityInHardware(string codec)
+        => CodecModel.IsHardware(codec)
+           && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
+           && !codec.Equals("av1_qsv", StringComparison.OrdinalIgnoreCase);
+
+    private static double HardwareBitrateBias(string codec, ComplexityProfile complexity, double scale, double fps)
+        => CodecModel.IsHardware(codec) && !complexity.AppliesTo(codec, scale, fps)
+            ? HardwareUncalibratedBias
+            : 1.0;
+
+    private static void AddHardwareBiasNote(string codec, double bias, List<string> reason, List<ReasonNote> reasonCodes)
+    {
+        if (bias <= 1.0) return;
+        reason.Add($"{codec} was not calibrated on this source, and hardware encoders land below a requested bitrate, so the two-pass target was raised by {(bias - 1) * 100:0.#}%");
+        reasonCodes.Add(new ReasonNote(ReasonCode.HardwareBitrateBias, Factor: bias, FallbackCodec: codec));
+    }
+
     private static string PickAudioCodec() => "aac";
 
-    private static string PickPreset(string codec, CodecPreference pref)
+    private static string PickPreset(string codec, CodecPreference pref, SpeedMode speed)
     {
-        if (CodecModel.UsesCq(codec)) return "p5";
+        if (CodecModel.IsHardware(codec))
+        {
+            var preset = FfmpegArguments.DefaultPreset(codec);
+            if (speed == SpeedMode.Fast) preset = OneStepFaster(codec, preset);
+            return FfmpegArguments.IsValidPreset(codec, preset) ? preset : FfmpegArguments.DefaultPreset(codec);
+        }
         if (codec == "libsvtav1") return "6";
         return pref == CodecPreference.Fast ? "medium" : "slow";
+    }
+
+    private static string OneStepFaster(string codec, string preset)
+    {
+        if (preset.Length < 2 || preset[0] != 'p') return preset;
+        if (!int.TryParse(preset[1..], NumberStyles.Integer, CultureInfo.InvariantCulture, out var level)) return preset;
+        var faster = "p" + Math.Max(1, level - 1).ToString(CultureInfo.InvariantCulture);
+        return FfmpegArguments.IsValidPreset(codec, faster) ? faster : preset;
     }
 }

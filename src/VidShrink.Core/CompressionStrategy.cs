@@ -2,6 +2,8 @@ namespace VidShrink.Core;
 
 public enum CompressionRegime { Light, Balanced, Aggressive, Extreme }
 
+public enum SpeedMode { Quality, Fast }
+
 public enum AdviceCode
 {
     BudgetIsGenerous,

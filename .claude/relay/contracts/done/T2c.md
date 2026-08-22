@@ -6,13 +6,13 @@ model: opus
 depends: [T2b]
 owns: [src/VidShrink.Ffmpeg/ComplexityProbe.cs, src/VidShrink.Core/ComplexityProfile.cs, tests/VidShrink.Tests/ComplexityScanTests.cs]
 side_effects: []
-status: active
+status: done
 round: 0
 agent_id: T2c-builder-opus
-audit: —
-auditor_id: —
-diff: —
-verification: —
+audit: passed
+auditor_id: T2c-auditor
+diff: ComplexityProbe.cs, ComplexityProfile.cs, ComplexityScanTests.cs, CalibrationProbeTests.cs
+verification: build 0 uyari 0 hata, dotnet test 134/134
 ---
 
 ## Amaç
@@ -121,4 +121,78 @@ Siradaki: `ComplexityScanTests` ve `CalibrationProbeTests` band testinin guncell
 
 ## Çıktı
 
-—
+Hedef tuttu: 180 MB'da tahmin hatası **%1,6** (%13,3'ten indi), 8 MB'da **%0,3**.
+
+**Ne değişti.** Tarama, dosya boyunca yayılmış 40 kısa noktadan örnekleniyor
+(`ScanPoints`), 12'si `Windows()` pencerelerinin içine düşüyor (`WindowScanPoints`),
+hepsi aynı ayarla ölçülüyor: `scale=480:270`, `ultrafast`, `crf 23`, `-an`, `-f null -`.
+Sapma `ortalamaPencereNoktaları / ağırlıklıDosyaOrtalaması` olarak hesaplanıyor.
+
+**Kritik bulgu — ısınma.** Her kısa parça ayrı bir ffmpeg çağrısı olduğu için ilk kare
+IDR ve bir P karesinin ~7 katı. Bu sabit yük hem pencere hem dosya ortalamasını şişirip
+oranı 1'e doğru sönümlüyordu: 0,25 sn'lik noktalarla ölçülen sapma 1,124'te kalıyordu
+(gerçek 1,191). Nokta 1,0 sn'ye çıkarıldı ve ilk 0,75 sn **ısınma** olarak atıldı;
+kare boyutları `-vstats_file` ile okunup (`ScanSampleAsync` + `ParseVstats`) yalnızca
+`time >= 0,75` olan kareler sayılıyor. Sapma 1,124 -> **1,1865**. Ara ölçümler:
+yalnız IDR'yi atmak 1,1437; 0,5 sn ısınma 1,1636; 0,75 sn ısınma 1,1865.
+
+**Seek mi select mi.** İkisi de ölçüldü, aynı 40 nokta, aynı içerik (52 sn / 2 sa,
+aynı bit hızı):
+
+| | 52 sn | 2 saat |
+|---|---|---|
+| seek (`-ss` başına bir çağrı) | 2,86 sn | 2,91 sn |
+| select (tek çağrı, `select` süzgeci) | 2,10 sn | 262 sn |
+
+`select` tüm dosyayı çözmek zorunda, maliyeti süreyle doğrusal — elendi. Seek seçildi.
+
+**Sabit maliyet (kabul kriteri 1).** Üretim yolundaki `ScanBiasAsync`: 52 sn -> **3,82 sn**,
+2 saat -> **3,91 sn**. Oran **1,02** (sınır 2). Süre değil, bit hızı belirleyici: asıl test
+dosyası (830 MB, ~133 Mbit/sn, 52 sn) 17,9 sn sürüyor — çünkü her seek yüksek bit hızlı
+1080p GOP'u çözüyor. Tam `ComplexityProbe.RunAsync` o dosyada 22,3 sn.
+
+**Paket okuma (kabul kriteri 9).** `PacketIntervals` 180 sn üstündeki kaynakta ~40
+aralığa düşüyor. 2 saatlik kaynakta `PacketBiasAsync` **0,14 sn**; 52 sn'lik kaynakta
+(tam okuma) 0,10 sn, asıl 830 MB'lık dosyada 0,87 sn. Süre kaynak uzunluğundan bağımsız.
+
+**Üç kademe.** `ComplexityProfile.BiasSource` ile okunuyor: `Scan` -> band 0,05,
+`Packets` -> 0,08, `None` -> bugünkü değerler (ölçülmüş 0,14 / tahmin 0,32). Dar band
+yalnızca kalibrasyon **ve** tarama birlikte geçerliyken dönüyor. Kırpma `[0,5 , 2,0]`
+korundu; dışına çıkan oran uygulanmıyor ve `BiasSource` `None` kalıyor.
+
+**Doğrulama (gerçek dosya, `gothic2026-08-15 14-01-29.mp4`).**
+- probe 22,3 sn · bppf 0,12645 · bias **1,1865**
+- 180 MB: tahmin 172,85 MB, gerçek 170,19 MB, mutlak hata **%1,6**
+- 8 MB: tahmin 8,00 MB, gerçek 7,98 MB, mutlak hata **%0,3**
+
+`dotnet build VidShrink.sln -c Release` 0 uyarı · `dotnet test VidShrink.sln` 99/99.
+Kırık `CalibrationProbeTests.EstimateBandNarrowsOnlyWhenCalibrationApplies` üç kademeye
+göre güncellendi, dosyada başka değişiklik yok.
+
+**Kapsam dışı not.** 180 MB hedefinde çıktı 170,19 MB, yani hedefin %5,5 altında —
+tahmin doğru, doluluk bandı T3'ün alanı, dokunulmadı.
+
+## Denetim
+
+GECTI. On kabul kriteri de dogrulandi.
+
+Sozlesmeden bilincli sapma (0,25 sn -> 1,0 sn nokta + 0,75 sn isinma) denetimde
+teknik olarak gecerli bulundu: her nokta ayri bir ffmpeg cagrisi oldugu icin ilk kare
+IDR; isinma esigi hem pencere hem yayilim noktalarina AYNI uygulaniyor, dolayisiyla
+orani pencereler lehine egmiyor.
+
+`CalibrationProbeTests` zayiflatilmamis — tek degisen test iddiasini gevsetmemis,
+aksine genisletmis; diger alti test tam gucte, silinmis test izi yok.
+
+Denetim iki metodoloji notu birakti, ikisi de T5'e devredildi:
+
+1. `ScanWarmupSeconds = 0,75` tek dosyanin bilinen dogru cevabina gore secilmis ve
+   verilen merdiven secilen noktada hala yukseliyor (0 -> 1,1437 · 0,5 -> 1,1636 ·
+   0,75 -> 1,1865, gercek 1,191). Yakinsadigi gosterilmemis; ayar ve dogrulama ayni
+   dosyada yapilmis.
+2. `ComplexityProfile.FromProbe`'un `biasSource` varsayilani `Scan` — kaynagi
+   belirtmeyen bir cagiran sessizce en dar bandi (0,05) alir. Uretimde tek cagiran
+   acikca gecirdigi icin bugun risk yok, ama varsayilanin en iyimser kademe olmasi tuzak.
+
+Kanitsiz kalanlar: dogrulama olcumu (180 MB %1,6 · 8 MB %0,3 · bias 1,1865) ve sure
+sayilari (3,82 / 3,91 sn) denetciye kosu ciktisi olarak verilmedi. T5 bagimsiz olcecek.

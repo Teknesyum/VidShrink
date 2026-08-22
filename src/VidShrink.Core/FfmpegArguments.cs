@@ -14,7 +14,12 @@ public static class FfmpegArguments
         ["h264_nvenc"] = new[] { "p1", "p2", "p3", "p4", "p5", "p6", "p7" },
         ["hevc_nvenc"] = new[] { "p1", "p2", "p3", "p4", "p5", "p6", "p7" },
         ["h264_qsv"] = new[] { "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" },
-        ["hevc_qsv"] = new[] { "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" }
+        ["hevc_qsv"] = new[] { "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" },
+        ["av1_nvenc"] = new[] { "p1", "p2", "p3", "p4", "p5", "p6", "p7" },
+        ["av1_qsv"] = new[] { "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" },
+        ["h264_amf"] = new[] { "speed", "balanced", "quality", "high_quality" },
+        ["hevc_amf"] = new[] { "speed", "balanced", "quality", "high_quality" },
+        ["av1_amf"] = new[] { "speed", "balanced", "quality", "high_quality" }
     };
 
     public static string DefaultPreset(string codec) => codec.ToLowerInvariant() switch
@@ -22,19 +27,23 @@ public static class FfmpegArguments
         "libsvtav1" => "8",
         "libvpx-vp9" => "4",
         "h264_nvenc" or "hevc_nvenc" => "p4",
-        "h264_qsv" or "hevc_qsv" => "medium",
+        "av1_nvenc" => "p6",
+        "h264_qsv" or "hevc_qsv" or "av1_qsv" => "medium",
+        "h264_amf" or "hevc_amf" or "av1_amf" => "quality",
         _ => "slow"
     };
 
     public static bool SupportsRateLimits(string codec)
         => !string.Equals(codec, "libsvtav1", StringComparison.OrdinalIgnoreCase);
 
+    public static bool NeedsTwoPasses(string codec) => !CodecModel.IsHardware(codec);
+
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
     public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix)
     {
-        var a = new List<string> { "-hide_banner", "-y", "-i", info.FilePath };
+        var a = new List<string> { "-hide_banner", "-y", "-hwaccel", "auto", "-i", info.FilePath };
 
         var filters = new List<string>();
         if (plan.Width != info.Width || plan.Height != info.Height)
@@ -52,7 +61,7 @@ public static class FfmpegArguments
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
-            var qualityFlag = plan.Codec.Contains("nvenc") || plan.Codec.Contains("qsv") ? "-cq" : "-crf";
+            var qualityFlag = CodecModel.UsesCq(plan.Codec) ? "-cq" : "-crf";
             a.AddRange(new[] { qualityFlag, plan.Crf!.Value.ToString(CultureInfo.InvariantCulture) });
             if (SupportsRateLimits(plan.Codec))
                 a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK * 2}k", "-bufsize", $"{plan.VideoBitrateK * 4}k" });
@@ -62,7 +71,9 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-b:v", $"{plan.VideoBitrateK}k" });
             if (SupportsRateLimits(plan.Codec))
                 a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * 1.5)}k", "-bufsize", $"{plan.VideoBitrateK * 2}k" });
-            if (pass > 0)
+            if (CodecModel.IsHardware(plan.Codec))
+                a.AddRange(HardwareRateControl(plan.Codec));
+            else if (pass > 0)
             {
                 a.AddRange(new[] { "-pass", pass.ToString(CultureInfo.InvariantCulture) });
                 if (passLogPrefix is not null) a.AddRange(new[] { "-passlogfile", passLogPrefix });
@@ -96,6 +107,15 @@ public static class FfmpegArguments
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
         return a;
+    }
+
+    private static IReadOnlyList<string> HardwareRateControl(string codec)
+    {
+        var c = codec.ToLowerInvariant();
+        if (c.Contains("nvenc")) return new[] { "-rc", "vbr", "-multipass", "fullres" };
+        if (c.Contains("amf")) return new[] { "-rc", "vbr_peak" };
+        if (c.Equals("h264_qsv")) return new[] { "-look_ahead", "1" };
+        return Array.Empty<string>();
     }
 
     public static string ToCommandLine(IEnumerable<string> args)

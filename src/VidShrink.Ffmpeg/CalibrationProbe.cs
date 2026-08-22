@@ -12,7 +12,7 @@ public static class CalibrationProbe
     private const int MinWindows = 2;
     private const double CrfGap = 4.0;
 
-    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, CancellationToken ct = default)
+    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, CancellationToken ct = default, SpeedMode speed = SpeedMode.Quality)
     {
         try
         {
@@ -36,12 +36,12 @@ public static class CalibrationProbe
             long lowBytes = 0, highBytes = 0;
             long lowFrames = 0, highFrames = 0;
 
-            var windows = Windows(info).ToArray();
+            var windows = Windows(info, speed).ToArray();
             var pending = new List<Task<(long Bytes, long Frames)>>(windows.Length * 2);
             foreach (var start in windows)
             {
-                pending.Add(SampleAsync(info, draft, start, lowCrf, ct));
-                pending.Add(SampleAsync(info, draft, start, highCrf, ct));
+                pending.Add(SampleAsync(info, draft, start, lowCrf, speed, ct));
+                pending.Add(SampleAsync(info, draft, start, highCrf, speed, ct));
             }
 
             var samples = await Task.WhenAll(pending);
@@ -98,7 +98,7 @@ public static class CalibrationProbe
         return CodecModel.ReferenceCrf(draft.Codec);
     }
 
-    private static IEnumerable<double> Windows(MediaInfo info)
+    private static IEnumerable<double> Windows(MediaInfo info, SpeedMode speed)
     {
         var duration = info.DurationSeconds;
         if (duration <= WindowSeconds * 1.5)
@@ -108,21 +108,22 @@ public static class CalibrationProbe
         }
 
         var usable = Math.Max(0.0, duration - WindowSeconds);
-        var count = duration < WindowSeconds * 6 ? MinWindows : MaxWindows;
+        var count = duration < WindowSeconds * 6 || speed == SpeedMode.Fast ? MinWindows : MaxWindows;
         for (var i = 0; i < count; i++)
             yield return usable * (i + 0.5) / count;
     }
 
-    private static async Task<(long Bytes, long Frames)> SampleAsync(MediaInfo info, EncodePlan draft, double start, double crf, CancellationToken ct)
+    private static async Task<(long Bytes, long Frames)> SampleAsync(MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
     {
-        var args = new List<string>
+        var args = new List<string> { "-hide_banner", "-nostdin" };
+        if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
+        args.AddRange(new[]
         {
-            "-hide_banner", "-nostdin",
             "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
             "-t", WindowSeconds.ToString("0.###", CultureInfo.InvariantCulture),
             "-i", info.FilePath,
             "-an", "-sn", "-dn"
-        };
+        });
 
         var filter = BuildFilter(info, draft);
         if (filter is not null)

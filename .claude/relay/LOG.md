@@ -3,3 +3,12 @@
 2026-08-19 20:02 T2  builder: submitted, kalibrasyon probu; build 0 uyari, test 47/47, 8MB %-2,0 / 180MB %+20,6 (kalan sapma ComplexityProbe pencere secimi)
 2026-08-20 T2b builder: submitted, pencere bias (ffprobe paket) + libsvtav1 maxrate duzeltmesi; build 0 uyari, test 56/56, bias=1,0646, 180MB %+13,3 (hedef %5 tutmadi, gerekce Ciktida), 8MB %+0,2
 2026-08-20 T3  builder: submitted, doluluk bandi + iki yonlu alt-tasma tekrari; build 0 uyari, test 69/69, gercek dosyada 180/100/25/16/8 MB bes hedef ilk denemede bantta
+2026-08-20 T3  builder: duzeltme turu 1 submitted, sert tavan asimi/paylasim/pay maddeleri kapatildi; build 0 uyari, test 70/71 (kirik test T2c'nin, kapsam disi); gercek dosyada 180MB=173,12 8MB=7,98, tavan hic asilmadi
+2026-08-20 T2c builder: submitted, sabit maliyetli tarama biasi (isinmali nokta ornekleme + vstats); build 0 uyari, test 99/99, bias=1,1865, 180MB %+1,6, 8MB %+0,3, tarama 52sn 3,82sn / 2sa 3,91sn
+
+2026-08-20 T0  plan: GPU hizli mod dalgasi acildi — T6 -> T7 -> T8. T4 beklemeye alindi (owns cakismasi: PlanCalculator, CodecModel, ComplexityProbe), depends T7 eklendi. CPU check-up: docs/cpu-algoritma-checkup.md
+- T6 · donanim kodlayici yolu · submitted · sahte iki gecis kalkti, av1_nvenc/av1_qsv/*_amf eklendi, gercek GPU yoklamasi geldi, -hwaccel auto acildi · 118/118 test yesil
+2026-08-20 T6  builder: submitted, denetim GECTI (7/7 kriter); sahte NVENC iki gecisi kalkti (-rc vbr -multipass fullres), av1_nvenc/amf tanindi, gercek GPU yoklamasi (256x256, 4sn timeout, onbellekli), -hwaccel auto girdiden once; build 0 uyari, test 118/118; av1_nvenc 25MB tek kosu 5,1sn 24,9MB. Sapma: IEncoderAvailability.cs owns disi ama kriter 1 sart kosuyordu, denetci kabul etti.
+2026-08-20 T7 teslim edildi — hizli dusur modu: donanim kodlayici secimi, sapma notu, paralel ve tek cozmeli prob; 134/134 yesil
+2026-08-20 T7  builder: submitted, hizli mod motoru; build 0 uyari, test 134/134 (T0 bagimsiz dogruladi). Olcum turu %15,9 hizlandi, ReferenceBppf sapmasi %0,002. Alti kosu bantta, hedef hic asilmadi, ucdan uca %39 kisa. DENETIM BEKLIYOR.
+2026-08-20 T0  acik: donanim VBR teslim sapmasi olculmeli (av1_nvenc iki gecisde hedefin uzerine cikiyor, 2-3 duzeltme turu yiyor). ComplexityProfile.cs gerekiyor - T4 owns. T4 kriterine eklenecek.

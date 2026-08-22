@@ -159,32 +159,105 @@ public sealed class FillBandTests
         Assert.True(PlanCalculator.EstimatedMb(corrected, 120) <= 20 * 0.94 + 0.05);
     }
 
-    [Fact]
-    public void CorrectFillsUnderBandLeavesPayBelowTheHardCeiling()
+    private static ComplexityProfile CalibratedProfile(string codec, double scale, double fps, double sourceFps)
     {
-        var plan = new EncodePlan
+        var signature = new CalibrationSignature
         {
-            Mode = "2pass",
-            VideoBitrateK = 30000,
-            AudioBitrateK = 128,
-            AudioCodec = "aac",
+            Codec = codec,
             Width = 1920,
-            Height = 1080,
-            Fps = 48,
-            Codec = "libx264",
-            Preset = "slow"
+            Height = (int)Math.Round(1080 * scale),
+            Fps = fps,
+            Scale = scale
         };
+        return ComplexityProfile
+            .FromProbe(0.06, 0.03, sampledSeconds: 6, sampledFrames: 180, windowBias: 1.0)
+            .Calibrate(signature, lowCrf: 18, lowBppf: 0.10, highCrf: 28, highBppf: 0.03, sourceFps: sourceFps);
+    }
 
-        var corrected = PlanCalculator.Correct(plan, actualMb: 170, targetMb: 180, durationSeconds: 120, fillUnderBand: true);
+    private static EncodePlan BigPlan() => new()
+    {
+        Mode = "2pass",
+        VideoBitrateK = 30000,
+        AudioBitrateK = 128,
+        AudioCodec = "aac",
+        Width = 1920,
+        Height = 1080,
+        Fps = 48,
+        Codec = "libx264",
+        Preset = "slow"
+    };
+
+    [Theory]
+    [InlineData(180.0)]
+    [InlineData(25.0)]
+    [InlineData(8.0)]
+    public void CalibratedRetryAimKeepsItsWholeSpreadUnderTheCeiling(double targetMb)
+    {
+        var plan = BigPlan();
+        var profile = CalibratedProfile("libx264", 1.0, 48, 48);
+        Assert.True(profile.Calibrated);
+
+        var aim = PlanCalculator.RetryAimMb(targetMb, profile, plan, sourceHeight: 1080, out var calibrated);
+        Assert.True(calibrated, "The retry aim must use the calibrated profile when it applies to this codec, scale and fps.");
+
+        var band = FillBand.For(targetMb);
+        var spread = PlanCalculator.CalibratedRetrySpread;
+
+        Assert.True(aim * (1 + spread) <= targetMb + 1e-9,
+            $"The upper end of the retry spread must stay at or under the {targetMb:0.##} MB ceiling, got {aim * (1 + spread):0.00} MB.");
+        Assert.True(aim > band.HardFloorMb,
+            $"The retry aim must stay above the {band.HardFloorMb:0.0} MB hard floor, got {aim:0.0} MB.");
+        Assert.True(aim >= band.LowerMb,
+            $"The retry aim itself must sit inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {aim:0.0} MB.");
+    }
+
+    [Fact]
+    public void UncalibratedRetryAimFallsBackToTheFixedMarginAndIsConsistentWithIt()
+    {
+        var plan = BigPlan();
+
+        var aim = PlanCalculator.RetryAimMb(180, null, plan, sourceHeight: 1080, out var calibrated);
+
+        Assert.False(calibrated);
+        Assert.Equal(180 * 0.94, aim, 3);
+
+        var impliedError = 180 / aim - 1;
+        Assert.True(impliedError >= PlanCalculator.CalibratedRetrySpread,
+            $"The uncalibrated fallback margin must be at least as conservative as the calibrated retry spread; implied {impliedError * 100:0.#}% vs {PlanCalculator.CalibratedRetrySpread * 100:0.#}%.");
+    }
+
+    [Fact]
+    public void CalibratedOverTargetCorrectionNoLongerAimsBelowTheHardFloor()
+    {
+        var plan = BigPlan();
+        var profile = CalibratedProfile("libx264", 1.0, 48, 48);
+
+        var corrected = PlanCalculator.Correct(plan, actualMb: 190, targetMb: 180, durationSeconds: 120, profile: profile, sourceHeight: 1080);
         var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
         var band = FillBand.For(180);
 
-        Assert.True(estimated < 180,
-            $"Retry must never aim at or above the hard ceiling, got {estimated:0.0} MB.");
-        Assert.True(estimated <= 180 * 0.99,
-            $"Expected the retry cap to leave real pay below the target for two-pass VBR's own overshoot, got {estimated:0.0} MB.");
-        Assert.True(estimated > band.LowerMb - 1.0,
-            $"Expected the capped retry to still land near the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {estimated:0.0} MB.");
+        Assert.True(estimated > band.HardFloorMb,
+            $"An over-ceiling correction must not aim under the {band.HardFloorMb:0.0} MB hard floor, got {estimated:0.0} MB.");
+        Assert.True(estimated >= band.LowerMb - 0.5,
+            $"An over-ceiling correction must aim at the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {estimated:0.0} MB.");
+        Assert.True(estimated * (1 + PlanCalculator.CalibratedRetrySpread) <= 180 + 1e-9,
+            $"The corrected plan plus its own spread must stay under the ceiling, got {estimated * (1 + PlanCalculator.CalibratedRetrySpread):0.0} MB.");
+    }
+
+    [Fact]
+    public void CorrectFillsUnderBandLeavesPayBelowTheHardCeiling()
+    {
+        var plan = BigPlan();
+        var profile = CalibratedProfile("libx264", 1.0, 48, 48);
+
+        var corrected = PlanCalculator.Correct(plan, actualMb: 170, targetMb: 180, durationSeconds: 120, fillUnderBand: true, profile: profile, sourceHeight: 1080);
+        var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
+        var band = FillBand.For(180);
+
+        Assert.True(estimated * (1 + PlanCalculator.CalibratedRetrySpread) <= 180 + 1e-9,
+            $"Retry plus its own spread must never reach the hard ceiling, got {estimated * (1 + PlanCalculator.CalibratedRetrySpread):0.0} MB.");
+        Assert.True(estimated >= band.LowerMb,
+            $"Expected the capped retry to aim inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {estimated:0.0} MB.");
     }
 
     [Fact]

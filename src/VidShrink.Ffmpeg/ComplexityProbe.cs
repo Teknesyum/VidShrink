@@ -21,13 +21,14 @@ public static class ComplexityProbe
     private const int ScanWidth = 480;
     private const int ScanHeight = 270;
     private const string ScanPreset = "ultrafast";
+    private const string FastProbePreset = "veryfast";
 
     private const double PacketFullReadSeconds = 180.0;
     private const int PacketIntervalCount = 40;
     private const int PacketIntervalSeconds = 2;
     private const int PacketWindowIntervalSeconds = 3;
 
-    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, CancellationToken ct = default)
+    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, CancellationToken ct = default, SpeedMode speed = SpeedMode.Quality)
     {
         try
         {
@@ -38,20 +39,23 @@ public static class ComplexityProbe
             var halfWidth = EvenDown((int)Math.Round(info.Width * ComplexityProfile.ProbeScale));
             var halfHeight = EvenDown((int)Math.Round(info.Height * ComplexityProfile.ProbeScale));
             var canProbeHalf = halfWidth >= 64 && halfHeight >= 64;
+            var preset = speed == SpeedMode.Fast ? FastProbePreset : ComplexityProfile.ProbePreset;
 
-            foreach (var start in Windows(info.DurationSeconds))
+            var pending = Windows(info.DurationSeconds)
+                .Select(start => SampleWindowAsync(info.FilePath, start, canProbeHalf ? (halfWidth, halfHeight) : null, preset, speed, ct))
+                .ToArray();
+            var windowSamples = await Task.WhenAll(pending);
+
+            foreach (var sample in windowSamples)
             {
-                var (bytes, frames) = await SampleAsync(info.FilePath, start, WindowSeconds, null, ct);
-                if (frames <= 0) continue;
-                fullBytes += bytes;
-                fullFrames += frames;
+                if (sample.FullFrames <= 0) continue;
+                fullBytes += sample.FullBytes;
+                fullFrames += sample.FullFrames;
                 sampled += WindowSeconds;
 
-                if (!canProbeHalf) continue;
-                var (hb, hf) = await SampleAsync(info.FilePath, start, WindowSeconds, $"scale={halfWidth}:{halfHeight}", ct);
-                if (hf <= 0) continue;
-                halfBytes += hb;
-                halfFrames += hf;
+                if (sample.HalfFrames <= 0) continue;
+                halfBytes += sample.HalfBytes;
+                halfFrames += sample.HalfFrames;
             }
 
             if (fullFrames <= 0 || fullBytes <= 0)
@@ -62,7 +66,7 @@ public static class ComplexityProbe
                 ? halfBytes * 8.0 / ((double)halfWidth * halfHeight * halfFrames)
                 : 0.0;
 
-            var (bias, source) = await MeasureWindowBiasAsync(info, ct);
+            var (bias, source) = await MeasureWindowBiasAsync(info, speed, ct);
 
             return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source);
         }
@@ -238,9 +242,9 @@ public static class ComplexityProbe
         return end == buckets.Length ? buckets : buckets[..end];
     }
 
-    private static async Task<(double Bias, WindowBiasSource Source)> MeasureWindowBiasAsync(MediaInfo info, CancellationToken ct)
+    private static async Task<(double Bias, WindowBiasSource Source)> MeasureWindowBiasAsync(MediaInfo info, SpeedMode speed, CancellationToken ct)
     {
-        var scan = await ScanBiasAsync(info, ct);
+        var scan = await ScanBiasAsync(info, ct, speed);
         if (ComplexityProfile.IsTrustedBias(scan)) return (scan, WindowBiasSource.Scan);
 
         var packet = await PacketBiasAsync(info, ct);
@@ -249,7 +253,7 @@ public static class ComplexityProbe
         return (0.0, WindowBiasSource.None);
     }
 
-    public static async Task<double> ScanBiasAsync(MediaInfo info, CancellationToken ct)
+    public static async Task<double> ScanBiasAsync(MediaInfo info, CancellationToken ct, SpeedMode speed = SpeedMode.Quality)
     {
         try
         {
@@ -264,7 +268,7 @@ public static class ComplexityProbe
                 await gate.WaitAsync(ct);
                 try
                 {
-                    return await ScanSampleAsync(info.FilePath, point, filter, ct);
+                    return await ScanSampleAsync(info.FilePath, point, filter, speed, ct);
                 }
                 finally
                 {
@@ -356,16 +360,102 @@ public static class ComplexityProbe
 
     private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
-    public static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, CancellationToken ct)
+    private readonly record struct WindowSample(long FullBytes, long FullFrames, long HalfBytes, long HalfFrames);
+
+    private static async Task<WindowSample> SampleWindowAsync(string path, double start, (int Width, int Height)? half, string preset, SpeedMode speed, CancellationToken ct)
     {
-        var args = new List<string>
+        if (half is null)
         {
-            "-hide_banner", "-nostdin",
+            var (bytes, frames) = await SampleAsync(path, start, WindowSeconds, null, ct, preset, speed);
+            return new WindowSample(bytes, frames, 0, 0);
+        }
+
+        var split = await SplitSampleAsync(path, start, half.Value, preset, speed, ct);
+        if (split is { } measured) return measured;
+
+        var (fullBytes, fullFrames) = await SampleAsync(path, start, WindowSeconds, null, ct, preset, speed);
+        var (halfBytes, halfFrames) = await SampleAsync(path, start, WindowSeconds, $"scale={half.Value.Width}:{half.Value.Height}", ct, preset, speed);
+        return new WindowSample(fullBytes, fullFrames, halfBytes, halfFrames);
+    }
+
+    private static async Task<WindowSample?> SplitSampleAsync(string path, double start, (int Width, int Height) half, string preset, SpeedMode speed, CancellationToken ct)
+    {
+        var stem = Path.Combine(Path.GetTempPath(), "vidshrink_probe_" + Guid.NewGuid().ToString("N"));
+        var fullPath = stem + "_full.h264";
+        var halfPath = stem + "_half.h264";
+        try
+        {
+            var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+            if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
+            args.AddRange(new[]
+            {
+                "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
+                "-t", WindowSeconds.ToString("0.###", CultureInfo.InvariantCulture),
+                "-i", path,
+                "-an", "-sn", "-dn",
+                "-filter_complex", $"[0:v]split=2[full][raw];[raw]scale={half.Width}:{half.Height}[small]"
+            });
+
+            foreach (var (label, target) in new[] { ("[full]", fullPath), ("[small]", halfPath) })
+            {
+                args.AddRange(new[]
+                {
+                    "-map", label,
+                    "-c:v", "libx264",
+                    "-crf", ComplexityProfile.ProbeCrf.ToString("0", CultureInfo.InvariantCulture),
+                    "-preset", preset,
+                    "-f", "h264", target
+                });
+            }
+
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
+            process.Start();
+            using var cancellationRegistration = ct.Register(() => TryKill(process));
+
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
+            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            await Task.WhenAll(stdoutTask, stderrTask);
+            var stderr = await stderrTask;
+            await process.WaitForExitAsync(ct);
+
+            if (process.ExitCode != 0) return null;
+            if (!File.Exists(fullPath) || !File.Exists(halfPath)) return null;
+
+            var frames = ParseFrames(stderr);
+            if (frames <= 0) return null;
+
+            var fullBytes = new FileInfo(fullPath).Length;
+            var halfBytes = new FileInfo(halfPath).Length;
+            if (fullBytes <= 0 || halfBytes <= 0) return null;
+
+            return new WindowSample(fullBytes, frames, halfBytes, frames);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+            return null;
+        }
+        finally
+        {
+            try { File.Delete(fullPath); } catch { }
+            try { File.Delete(halfPath); } catch { }
+        }
+    }
+
+    public static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, CancellationToken ct, string? preset = null, SpeedMode speed = SpeedMode.Quality)
+    {
+        var args = new List<string> { "-hide_banner", "-nostdin" };
+        if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
+        args.AddRange(new[]
+        {
             "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
             "-t", length.ToString("0.###", CultureInfo.InvariantCulture),
             "-i", path,
             "-an", "-sn", "-dn"
-        };
+        });
 
         if (filter is not null)
         {
@@ -377,7 +467,7 @@ public static class ComplexityProbe
         {
             "-c:v", "libx264",
             "-crf", ComplexityProfile.ProbeCrf.ToString("0", CultureInfo.InvariantCulture),
-            "-preset", ComplexityProfile.ProbePreset,
+            "-preset", preset ?? ComplexityProfile.ProbePreset,
             "-f", "null", "-"
         });
 
@@ -398,15 +488,15 @@ public static class ComplexityProbe
         return (bytes, frames);
     }
 
-    private static async Task<(long Bytes, long Frames)> ScanSampleAsync(string path, double start, string filter, CancellationToken ct)
+    private static async Task<(long Bytes, long Frames)> ScanSampleAsync(string path, double start, string filter, SpeedMode speed, CancellationToken ct)
     {
         var statsPath = Path.Combine(Path.GetTempPath(), "vidshrink_scan_" + Guid.NewGuid().ToString("N") + ".txt");
         try
         {
-            var args = new[]
+            var args = new List<string> { "-hide_banner", "-nostdin", "-v", "error", "-y", "-vstats_file", statsPath };
+            if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
+            args.AddRange(new[]
             {
-                "-hide_banner", "-nostdin", "-v", "error", "-y",
-                "-vstats_file", statsPath,
                 "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
                 "-t", ScanPointSeconds.ToString("0.###", CultureInfo.InvariantCulture),
                 "-i", path,
@@ -416,9 +506,9 @@ public static class ComplexityProbe
                 "-crf", ComplexityProfile.ProbeCrf.ToString("0", CultureInfo.InvariantCulture),
                 "-preset", ScanPreset,
                 "-f", "null", "-"
-            };
+            });
 
-            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
             process.Start();
             using var cancellationRegistration = ct.Register(() => TryKill(process));
 

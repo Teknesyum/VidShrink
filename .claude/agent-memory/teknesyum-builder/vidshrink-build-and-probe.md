@@ -38,3 +38,21 @@ yoksa App.dll kilitli kalir.
   calisma zamaninda anahtar-deger sozlugunden ceviren genel bir agac gezicisiyle
   tuketiliyor (`MainWindow.xaml.cs`'de ~74. satir civari) — yeni ComboBoxItem/ToolTip
   eklerken sadece sozluge girdi eklemek yeterli, ayrica kod yazmaya gerek yok.
+- NVENC'i `lavfi` ile yoklarken kare boyutu **256x256'dan kucuk olmamali**; 128x128'de
+  `InitializeEncoder failed: Frame dimensions are less than the minimum supported value`
+  donuyor ve saglam bir GPU yanlis negatif veriyor.
+- Donanim kodlayici bayraklari ailelere gore ayriliyor: `-rc` sadece NVENC ve AMF'de var
+  (AMF'de `vbr` yok, `vbr_peak` var), QSV'de hic yok; `-cq` sadece NVENC'te; `-look_ahead`
+  sadece `h264_qsv`'de. Yazmadan once `ffmpeg -h encoder=<ad>` ile bak.
+- `mov` kapsayicisi av1 kabul etmiyor (`av1 only supported in MP4 and AVIF`), `mp4` ve `mkv` kabul ediyor.
+- Tek ffmpeg kosusunda iki olcum almak icin `-vstats_file` **ise yaramaz**: global secenek,
+  cikis basina ayrilamiyor ve satirlarda akis kimligi yok. `-f null` da cikis basina boyut
+  vermiyor. Calisan kalip: `-filter_complex split` + iki `-map` + iki `-f h264` gecici
+  dosya, boyutu `FileInfo.Length`'ten oku. Sonuc `video:NNNKiB` ozetiyle %0,002 icinde
+  ortusuyor ve daha hassas (ozet kB'a yuvarli).
+- `ComplexityProbe` suresini pencere ornekleme degil `ScanBiasAsync`'in 40 noktali taramasi
+  baskiliyor; pencereleri paralellestirmek uctan uca ancak %16 kazandiriyor.
+- `av1_nvenc` iki gecisli VBR hedefinde bu makinede hedefin **ustune** cikiyor (25 MB'da
+  25,07), `docs/gpu-kodlama-bulgusu.md`'deki "%12 alti" tek gecis olcumu bu yola uymuyor.
+- Yeni parametreleri public prob imzalarinin **sonuna** varsayilanli ekle; `MainWindow.xaml.cs`
+  cogu zaman `owns` disinda ve pozisyonel `ct` gecisi kiriliyor.

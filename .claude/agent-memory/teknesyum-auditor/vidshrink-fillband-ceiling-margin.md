@@ -1,30 +1,34 @@
 ---
 name: vidshrink-fillband-ceiling-margin
-description: T3 fill-band alt-taşma düzeltmesi tavana sıfıra yakın payla dayanıyor — T4/T5'te tekrar kontrol edilmeli
+description: FillBand marjları birbirine geçmiş — Correct() düzeltme hedefleri bandın altına düşüyor; her Correct/FillBand dokunuşunda tekrar kontrol et
 metadata:
   type: project
 ---
 
-T3 (Doluluk bandı / FillBand) turunda `PlanCalculator.Correct(..., fillUnderBand: true)`
-(`src/VidShrink.Core/PlanCalculator.cs:249-260`) sonucu bandın altında kaldığında bitrate'i
-`bandCenterMb/actual` oranıyla yukarı çekiyor ve `videoBudgetKUp` ile sınırlıyor. Bu üst sınır
-`targetMb * ContainerOverhead` (yani hedefin ~%99,5'i) — pratikte payı yok.
+`PlanCalculator.Correct()` iki yönlü düzeltme yapıyor ve her iki yön de sabit bir marjla
+hedefin altına nişan alıyor. Marjlar `FillBand` sınırlarıyla uyumsuz:
 
-Buna karşılık aynı fonksiyonun üst-taşma dalı (`Correct(..., fillUnderBand: false`, satır
-262-268) `desiredMb = targetMb * CrfFitMargin (0.94)` kullanıyor, yani hedefin altında %6
-güvenlik payı bırakıyor.
+- Alt-taşma dalı (`fillUnderBand: true`) tavanı `UnderBandRetryCapMargin = 0.98`.
+  ≥50 MB sınıfında bant alt sınırı hedefin %97,2'si → nişan ile bant alt sınırı arasında
+  yalnız **%0,8** boşluk var. Aynı dosyadaki `TwoPassUncertainty = 0.04` iki geçişli VBR'ın
+  ±%4 ıskaladığını söylüyor. Yani düzeltme denemesi banda ancak dar bir aralıkta oturur.
+- Üst-taşma dalı `CrfFitMargin = 0.94` kullanıyor; ≥50 MB sınıfının sert tabanı %94,4.
+  **Üst-taşma düzeltmesi tasarımı gereği sert tabanın altına nişan alıyor** — bir kez
+  tavan düzeltmesi çalıştıysa sonuç bandın içine düşemez.
 
-**Neden önemli:** İki geçişli VBR'ın gerçek çıktısı istenen ortalama bitrate'i aşabiliyor —
-zaten bu yüzden `EncodeRunner`'da `over` kontrolü ve yeniden deneme var. Yukarı yönlü düzeltme
-sıfıra yakın payla çalıştığından, alt-taşma tekrarı sonrası gerçek dosya hedefi (`targetMb`,
-sert tavan) aşabilir. `MaxAttempts=3` alt-taşma ve üst-taşma denemeleri arasında paylaşıldığı
-için, alt-taşmadan harcanan bir deneme üst-taşma düzeltmesine daha az hak bırakıyor;
-`attempt >= MaxAttempts` durumunda dosya `over` olsa bile olduğu gibi teslim ediliyor
-(`EncodeRunner.cs:53-59`, T3'ten önce de var olan "attempts tükenirse teslim et" kaçış kapısı,
-T3 onu değiştirmedi ama tetiklenme ihtimalini artırdı).
+**Neden önemli:** Bant kaçırıldığında builder'lar bunu kalibrasyona (`ComplexityProfile`,
+T2c) bağlama eğiliminde. `Correct()` profil almıyor ve döndürdüğü plan 2-pass bitrate
+hedefli — kalibrasyon o denemenin isabetini etkilemiyor. Düzeltme denemesinden çıkan
+bant kaçırması **marjdan** gelir, kalibrasyondan değil.
 
-**Nasıl uygula:** T4/T5'te `FillBand`/`Correct` alanına dokunan her sözleşmede bu asimetriyi
-kontrol et — alt-taşma düzeltmesinin üst sınırı hâlâ `targetMb` (payı yok) mu, yoksa
-[[vidshrink-fillband-ceiling-margin]] bulgusuna göre güvenlik payı eklendi mi. T3 denetiminde
-gerçek 5 ölçümün hiçbiri alt-taşma tekrarını tetiklemedi (hepsi ilk denemede banda düştü), bu
-yüzden risk gözlemlenmedi, sadece koddan çıkarıldı — canlı bir teyit yok.
+T7 üçüncü örnek: donanım yolunda kalibrasyon düşerse iki geçişli bitrate `1.06` ile
+çarpılıyor (`PlanCalculator.HardwareUncalibratedBias`). Bu, planı bilerek hedefin ~%6
+üstüne nişanlıyor; sert tavan yalnızca `EncodeRunner`'ın `over` kontrolüyle korunuyor,
+plan tarafında değil. Yani "plan hedefi aşıyor" ile "program hedefi aşıyor" ayrı sorular —
+tavan sözünü denetlerken hep runner'daki `over` + `MaxAttempts` dalına bak.
+
+**Nasıl uygula:** `Correct` / `FillBand` / `CrfFitMargin` alanına dokunan her sözleşmede
+iki marjı bant sınıflarına karşı elle hesapla. Bant kaçıran gerçek ölçüm raporlanmışsa
+"başka T'nin işi" açıklamasını deneme-deneme izine bakmadan kabul etme; iz verilmemişse
+`? kanıtsız` işaretle. Sert tavan tarafı ayrı: `EncodeRunner.cs` artık `attempt >= MaxAttempts`
+ve `over` iken dosyayı silip `CeilingExceeded` dönüyor, tavan sözü kodda tutuluyor.

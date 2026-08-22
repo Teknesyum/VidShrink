@@ -1,2 +1,3 @@
 - [ffmpeg Process kalıbı](vidshrink-ffmpeg-process-pattern.md) — stdout okunmama (-f null - için düşük risk) + ct.Register(Kill) eksikliği (asıl tekrar eden kusur, yetim süreç)
-- [FillBand tavan payı](vidshrink-fillband-ceiling-margin.md) — alt-taşma düzeltmesi tavana ~%0,5 payla dayanıyor (üst-taşma dalı %6 kullanıyor), T4/T5'te tekrar kontrol et
+- [FillBand marjları](vidshrink-fillband-ceiling-margin.md) — Correct()'in iki marjı da bandın altına nişan alıyor; bant kaçırmayı kalibrasyona bağlayan açıklamaya inanma
+- [Saha ölçümü kanıtı](vidshrink-saha-olcumu-kanit.md) — ölçüm sayıları hep builder beyanı; maddeyi yapısal/sayısal diye ayır, tek dosyaya uydurulan sabitlere dikkat

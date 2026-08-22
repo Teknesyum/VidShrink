@@ -23,7 +23,8 @@ public enum ReasonCode
     EncoderFallback,
     HdrTonemapped,
     FillCrfLowered,
-    FillTwoPassBandCenter
+    FillTwoPassBandCenter,
+    HardwareBitrateBias
 }
 
 public sealed record ReasonNote(

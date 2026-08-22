@@ -31,6 +31,16 @@ döngüsü + ayrı stderr `Task.Run` kuyruğu + `ct.Register(() => TryKill(proce
 doğrulama, artık bu dosyada bu iki madde için ayrıca risk aranmasına gerek yok, yalnızca
 yeni bir Process başlatan dosya eklendiğinde kontrol listesi geçerli.
 
+T6'da `EncoderCapabilities.ProbeEncoder` de doğru: `ct.Register` yok ama zaten `CancellationToken`
+almıyor, kendi içinde `WaitForExit(4000)` + zaman aşımında `process.Kill(true)` ile kendini
+kapatıyor, iki akış da `ReadToEndAsync` ile okunuyor. Kendi kendine sınırlı (bounded, dışarıdan
+iptal edilmeyen) tek seferlik çağrılarda bu kalıp `ct.Register` yerine geçerli sayılabilir.
+
+İki yeni Process çağrısı da kalıba uyuyor: `ComplexityProbe.ScanSampleAsync` (T2c) ve
+`SplitSampleAsync` (T7). `ScanSampleAsync` ayrıca geçici `-vstats_file`'ı `finally`'de
+siliyor — geçici dosya bırakan yeni çağrılarda bunu da kontrol et. Bu dosyalarda artık
+kusur değil kalıp var; denetimde yeni eklenen Process bloğunu bul, eskisini tekrar okuma.
+
 Ayrıca genel ders: kabul kriterinde "büyük/uzun kaynakta X saniyeyi aşmamalı, aşarsa Y
 mekanizmasına düş" gibi adaptif bir davranış isteniyorsa, sadece verilen test dosyasında
 ölçüm yapıp "sınırın altında kaldı" demek yetmez — Y mekanizmasının (örn. `-read_intervals`)

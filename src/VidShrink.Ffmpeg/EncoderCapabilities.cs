@@ -9,6 +9,8 @@ public sealed class EncoderCapabilities : IEncoderAvailability
 
     public static EncoderCapabilities Instance => LazyInstance.Value;
 
+    private readonly Dictionary<string, bool> _probed = new(StringComparer.OrdinalIgnoreCase);
+
     public IReadOnlySet<string> Encoders { get; }
     public IReadOnlySet<string> Filters { get; }
     public string Version { get; }
@@ -22,6 +24,46 @@ public sealed class EncoderCapabilities : IEncoderAvailability
 
     public bool HasEncoder(string name) => Encoders.Contains(name);
     public bool HasFilter(string name) => Filters.Contains(name);
+
+    public bool WorksAsEncoder(string codec)
+    {
+        lock (_probed)
+        {
+            if (_probed.TryGetValue(codec, out var cached)) return cached;
+            var works = HasEncoder(codec) && ProbeEncoder(codec);
+            _probed[codec] = works;
+            return works;
+        }
+    }
+
+    private static bool ProbeEncoder(string codec)
+    {
+        try
+        {
+            var args = new[]
+            {
+                "-hide_banner", "-loglevel", "error",
+                "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
+                "-c:v", codec, "-frames:v", "1",
+                "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
+            };
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+            process.Start();
+            var output = process.StandardOutput.ReadToEndAsync();
+            var error = process.StandardError.ReadToEndAsync();
+            if (!process.WaitForExit(4000))
+            {
+                try { process.Kill(true); } catch { }
+                return false;
+            }
+            Task.WaitAll(new Task[] { output, error }, 1000);
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     public static EncoderCapabilities Parse(string encodersOutput, string filtersOutput, string versionOutput)
         => new(ParseEncoders(encodersOutput), ParseFilters(filtersOutput), ParseVersion(versionOutput));

@@ -10,7 +10,7 @@ public sealed record PlanParseResult(EncodePlan? Plan, IReadOnlyList<string> Err
 
 public static class PlanParser
 {
-    private static readonly string[] AllowedCodecs = { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "h264_qsv", "hevc_qsv" };
+    private static readonly string[] AllowedCodecs = { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "h264_qsv", "hevc_qsv", "av1_nvenc", "av1_qsv", "h264_amf", "hevc_amf", "av1_amf" };
     private static readonly string[] AllowedAudioCodecs = { "aac", "libopus", "libmp3lame", "copy" };
 
     private static readonly JsonSerializerOptions JsonOptions = new()

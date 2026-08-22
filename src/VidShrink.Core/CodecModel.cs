@@ -25,6 +25,11 @@ public static class CodecModel
         "hevc_nvenc" => 0.88,
         "h264_qsv" => 1.25,
         "hevc_qsv" => 0.90,
+        "av1_nvenc" => 0.60,
+        "av1_qsv" => 0.62,
+        "av1_amf" => 0.66,
+        "hevc_amf" => 0.95,
+        "h264_amf" => 1.30,
         _ => 1.0
     };
 
@@ -34,9 +39,19 @@ public static class CodecModel
         _ => 6.0
     };
 
-    public static double QualityLimit(string codec) => codec.Contains("nvenc") || codec.Contains("qsv") ? 96.0 : 99.0;
+    public static double QualityLimit(string codec)
+    {
+        if (!IsHardware(codec)) return 99.0;
+        return codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase) ? 98.0 : 96.0;
+    }
 
-    public static bool UsesCq(string codec) => codec.Contains("nvenc") || codec.Contains("qsv");
+    public static bool IsHardware(string codec)
+    {
+        var c = codec.ToLowerInvariant();
+        return c.Contains("nvenc") || c.Contains("qsv") || c.Contains("amf");
+    }
+
+    public static bool UsesCq(string codec) => IsHardware(codec);
 
     public static (int Min, int Max) CrfRange(string codec) => Family(codec) switch
     {

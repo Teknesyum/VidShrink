@@ -9,6 +9,7 @@ public sealed class HdrArgumentsTests
         private readonly HashSet<string> _encoders;
         public FakeAvailability(params string[] encoders) => _encoders = new HashSet<string>(encoders, StringComparer.OrdinalIgnoreCase);
         public bool HasEncoder(string name) => _encoders.Contains(name);
+        public bool WorksAsEncoder(string codec) => _encoders.Contains(codec);
     }
 
     private static MediaInfo BaseInfo() => new()

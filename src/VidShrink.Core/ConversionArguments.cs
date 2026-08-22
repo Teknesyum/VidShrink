@@ -78,7 +78,7 @@ public static class ConversionArguments
 
             a.AddRange(new[] { "-c:v", plan.VideoCodec, "-preset", FfmpegArguments.DefaultPreset(plan.VideoCodec) });
             a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
-                ? new[] { plan.VideoCodec.Contains("nvenc") || plan.VideoCodec.Contains("qsv") ? "-cq" : "-crf", plan.Crf.ToString(CultureInfo.InvariantCulture) }
+                ? new[] { CodecModel.UsesCq(plan.VideoCodec) ? "-cq" : "-crf", plan.Crf.ToString(CultureInfo.InvariantCulture) }
                 : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
             a.AddRange(new[] { "-pix_fmt", hdr.PixelFormat });
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
@@ -107,7 +107,8 @@ public static class ConversionArguments
 
     private static bool VideoCopyCompatible(string container, string codec) => container switch
     {
-        "mp4" or "mov" => codec is "h264" or "hevc" or "mpeg4" or "av1",
+        "mp4" => codec is "h264" or "hevc" or "mpeg4" or "av1",
+        "mov" => codec is "h264" or "hevc" or "mpeg4",
         "webm" => codec is "vp8" or "vp9" or "av1",
         "avi" => codec is "h264" or "mpeg4" or "mpeg2video" or "mjpeg",
         "mkv" => true,
@@ -127,7 +128,8 @@ public static class ConversionArguments
 
     private static bool VideoEncodeCompatible(string container, string codec) => container switch
     {
-        "mp4" or "mov" => codec is "libx264" or "libx265" or "libsvtav1" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv",
+        "mp4" => codec is "libx264" or "libx265" or "libsvtav1" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "av1_nvenc" or "av1_qsv" or "h264_amf" or "hevc_amf" or "av1_amf",
+        "mov" => codec is "libx264" or "libx265" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "h264_amf" or "hevc_amf",
         "webm" => codec is "libvpx-vp9" or "libsvtav1",
         "avi" => codec is "libx264",
         "mkv" => true,

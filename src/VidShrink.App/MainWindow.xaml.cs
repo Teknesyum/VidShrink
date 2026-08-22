@@ -416,7 +416,7 @@ public partial class MainWindow : Window
         var progress = new Progress<EncodeProgress>(p => { Progress.Value = p.Fraction; TxtStage.Text = LocalizeStage(p.Stage); TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-"; if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB"; });
         try
         {
-            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token, CurrentOptions().FillPolicy);
+            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, _cts.Token, CurrentOptions().FillPolicy, _profile);
             _lastOutput = result.OutputPath;
             if (result.Success)
             {
