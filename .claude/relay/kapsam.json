@@ -1,0 +1,224 @@
+{
+  "CHANGELOG.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:07:53",
+    "ajan": "ana oturum"
+  },
+  "readme-fix.js": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:08:13",
+    "ajan": "ana oturum"
+  },
+  "docs/taramalar/hedef-boyut-gui.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:10:21",
+    "ajan": "scout"
+  },
+  "docs/taramalar/kalite-olcumu.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:10:29",
+    "ajan": "scout"
+  },
+  "docs/taramalar/donanim-kodlayici.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:10:54",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/reference_taramalar.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:07",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/MEMORY.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:11",
+    "ajan": "scout"
+  },
+  "docs/taramalar/sahne-karmasiklik.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:13:18",
+    "ajan": "scout"
+  },
+  "docs/taramalar/duzenleyici-gui.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:14:04",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/reference_upstream_repos.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:14:04",
+    "ajan": "scout"
+  },
+  "docs/taramalar/mobil-sikistirma.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:14:19",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/reference_transcoder-repo.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:14:19",
+    "ajan": "scout"
+  },
+  "docs/taramalar/kalite-arayuzleri.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:14:31",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/reference_ffmpeg_gui_repos.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:14:31",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/project_ffmpeg_wrapper_decision.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:15:06",
+    "ajan": "scout"
+  },
+  "docs/taramalar/windows-medya-yigini.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:15:23",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/project_dagitim_imza.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:15:23",
+    "ajan": "scout"
+  },
+  "docs/taramalar/ffmpeg-dagitimi.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:15:36",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/project_ffmpeg_dagitim_lisansi.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:15:36",
+    "ajan": "scout"
+  },
+  "docs/taramalar/transcode-sunucu.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:04",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/ref-tdarr-kaynak-kapali.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:04",
+    "ajan": "scout"
+  },
+  "docs/taramalar/psikogorsel-ayar.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:07",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/project_ffmpeg_sessiz_hata.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:07",
+    "ajan": "scout"
+  },
+  ".claude/agent-memory/teknesyum-scout/project_karmasiklik_olcum_hizi.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:11",
+    "ajan": "scout"
+  },
+  "docs/inceleme/complexityprobe.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:39",
+    "ajan": "general-purpose"
+  },
+  "docs/taramalar/ek-arama.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:16:50",
+    "ajan": "scout"
+  },
+  "docs/inceleme/encoderunner.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:17:59",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/problar.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:18:44",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/plancalculator.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:19:33",
+    "ajan": "general-purpose"
+  },
+  "docs/taramalar/medya-probe.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:20:08",
+    "ajan": "scout"
+  },
+  "docs/inceleme/dis-dunya.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:20:13",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/testler.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:20:15",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/xaml-arayuz.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:21:27",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/argumanlar.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:23:22",
+    "ajan": "general-purpose"
+  },
+  "diff.py": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:27:52",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/uygulama-katmani.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:27:52",
+    "ajan": "general-purpose"
+  },
+  "docs/inceleme/model-strateji.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-22 15:30:06",
+    "ajan": "general-purpose"
+  }
+}
