@@ -441,7 +441,7 @@
                       Background="{TemplateBinding Background}"
                       BorderBrush="{TemplateBinding BorderBrush}"
                       BorderThickness="{TemplateBinding BorderThickness}"
-                      CornerRadius="{StaticResource RadiusBadge}">
+                      CornerRadius="{StaticResource RadiusChip}">
                 <Border.Transitions>
                   <Transitions>
                     <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>

@@ -25,6 +25,8 @@ internal static class LanguageCatalog
         ["Bitrate"] = "Bit hızı",
         ["Target"] = "Hedef",
         ["Estimated output"] = "Tahmini çıktı",
+        ["Estimated time"] = "Tahmini süre",
+        ["VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file rather than from a table of presets. Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured. When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."] = "VidShrink bu klip için zaten koşturduğu örnek kodlamaların süresini ölçer; bu sayının arkasındaki hız bir ön ayar tablosundan değil, bu makineden ve bu dosyadan gelir. İki geçişli işlerde aralık geniştir, çünkü birinci geçiş yalnızca görüntüyü çözümler ve ikinciden ucuza mal olur, ne kadar ucuz olduğu ise ölçülmez. Plan, örneklerin kodlanmadığı ayarlara geçtiğinde süre tahmin edilmez, boş bırakılır.",
         ["Intent"] = "Amaç",
         ["Compression algorithm"] = "Sıkıştırma algoritması",
         ["Automatic"] = "Otomatik",

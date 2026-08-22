@@ -37,7 +37,8 @@ public static class CalibrationProbe
             long lowFrames = 0, highFrames = 0;
 
             var windows = Windows(info, speed).ToArray();
-            var pending = new List<Task<(long Bytes, long Frames)>>(windows.Length * 2);
+            var pending = new List<Task<Sample>>(windows.Length * 2);
+            var batch = Stopwatch.StartNew();
             foreach (var start in windows)
             {
                 pending.Add(SampleAsync(info, draft, start, lowCrf, speed, ct));
@@ -45,6 +46,10 @@ public static class CalibrationProbe
             }
 
             var samples = await Task.WhenAll(pending);
+            batch.Stop();
+
+            var measured = MeasureSpeed(draft, samples, batch.Elapsed.TotalSeconds);
+
             for (var i = 0; i < samples.Length; i += 2)
             {
                 var (lb, lf) = samples[i];
@@ -56,7 +61,7 @@ public static class CalibrationProbe
                 highFrames += hf;
             }
 
-            if (lowFrames <= 0 || highFrames <= 0) return profile.WithoutCalibration();
+            if (lowFrames <= 0 || highFrames <= 0) return profile.WithoutCalibration().WithSpeed(measured);
 
             var pixels = (double)draft.Width * draft.Height;
             var lowBppf = lowBytes * 8.0 / (pixels * lowFrames);
@@ -71,7 +76,7 @@ public static class CalibrationProbe
                 Scale = info.Height <= 0 ? 1.0 : (double)draft.Height / info.Height
             };
 
-            return profile.Calibrate(signature, lowCrf, lowBppf, highCrf, highBppf, info.Fps);
+            return profile.Calibrate(signature, lowCrf, lowBppf, highCrf, highBppf, info.Fps).WithSpeed(measured);
         }
         catch (OperationCanceledException)
         {
@@ -81,6 +86,30 @@ public static class CalibrationProbe
         {
             return profile.WithoutCalibration();
         }
+    }
+
+    private readonly record struct Sample(long Bytes, long Frames);
+
+    private static EncodeSpeed? MeasureSpeed(EncodePlan draft, Sample[] samples, double batchSeconds)
+    {
+        long frames = 0;
+        foreach (var sample in samples)
+        {
+            if (sample.Frames > 0) frames += sample.Frames;
+        }
+
+        if (frames <= 0 || batchSeconds <= 0) return null;
+
+        return new EncodeSpeed
+        {
+            Codec = draft.Codec,
+            Preset = draft.Preset,
+            Width = draft.Width,
+            Height = draft.Height,
+            FramesPerSecond = frames / batchSeconds,
+            Frames = frames,
+            Seconds = batchSeconds
+        };
     }
 
     private static double AnchorCrf(MediaInfo info, EncodePlan draft, ComplexityProfile profile)
@@ -113,7 +142,7 @@ public static class CalibrationProbe
             yield return usable * (i + 0.5) / count;
     }
 
-    private static async Task<(long Bytes, long Frames)> SampleAsync(MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
+    private static async Task<Sample> SampleAsync(MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
     {
         var args = new List<string> { "-hide_banner", "-nostdin" };
         if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
@@ -152,8 +181,8 @@ public static class CalibrationProbe
         var stderr = await stderrTask;
         await process.WaitForExitAsync(ct);
 
-        if (process.ExitCode != 0) return (0, 0);
-        return (ParseVideoBytes(stderr), ParseFrames(stderr));
+        if (process.ExitCode != 0) return default;
+        return new Sample(ParseVideoBytes(stderr), ParseFrames(stderr));
     }
 
     private static void TryKill(Process process)
@@ -192,4 +221,5 @@ public static class CalibrationProbe
         if (matches.Count == 0) return 0;
         return long.TryParse(matches[^1].Groups[1].Value, out var frames) ? frames : 0;
     }
+
 }

@@ -56,3 +56,16 @@ yoksa App.dll kilitli kalir.
   25,07), `docs/gpu-kodlama-bulgusu.md`'deki "%12 alti" tek gecis olcumu bu yola uymuyor.
 - Yeni parametreleri public prob imzalarinin **sonuna** varsayilanli ekle; `MainWindow.xaml.cs`
   cogu zaman `owns` disinda ve pozisyonel `ct` gecisi kiriliyor.
+- Kodlama hizini prob orneklerinden cikarirken **her surecin kendi `fps=` degerini toplama**.
+  Paralel kosan 6 ornegin toplami makinenin toplam kapasitesini verir; tek bir ffmpeg
+  dusuk cozunurlukte bunu yakalayamaz (670p'de toplam 469 fps, ayni komut yalniz kosunca
+  282 fps). Guvenilir olcu: toplam kare / prob turunun toplam duvar saati. ffmpeg 9'un
+  stats satirinda `elapsed=` alani var ve `-stats_period 0.1` daha cok satir verir, ama
+  ikisi de bu toplama sorununu cozmuyor.
+- `CalibrationSignature` ve hiz imzasi kalibrasyonu plana kilitliyor; kalibrasyon dosya
+  yuklenirken bir kez, acilis hedefinin (16 MB) taslagiyla kosuyor. Kullanici hedefi
+  buyutup cozunurluk degisince kalibrasyon ve sure dusuyor. Kalibrasyona bagli yeni bir
+  gosterge eklerken bunu once olc, sonra soz ver.
+- Canli test iskeleti `FillBandTests.cs`'te: `LiveSourceTheoryAttribute` (`VIDSHRINK_LIVE_SOURCE`
+  yoksa Skip). Ayni namespace'ten kullanilabiliyor; `Fact` karsiligi
+  `LiveSourceFactAttribute` `CalibrationProbeTests.cs`'te.

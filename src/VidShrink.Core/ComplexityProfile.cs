@@ -17,6 +17,28 @@ public sealed record CalibrationSignature
            && Math.Abs(Fps - fps) <= FpsTolerance;
 }
 
+public sealed record EncodeSpeed
+{
+    public required string Codec { get; init; }
+    public required string Preset { get; init; }
+    public required int Width { get; init; }
+    public required int Height { get; init; }
+    public required double FramesPerSecond { get; init; }
+    public required long Frames { get; init; }
+    public required double Seconds { get; init; }
+
+    public bool Matches(EncodePlan plan)
+        => string.Equals(Codec, plan.Codec, StringComparison.OrdinalIgnoreCase)
+           && string.Equals(Preset, plan.Preset, StringComparison.OrdinalIgnoreCase)
+           && Width == plan.Width
+           && Height == plan.Height;
+}
+
+public sealed record TimeEstimate(double ExpectedSeconds, double LowSeconds, double HighSeconds, bool StreamCopy)
+{
+    public static TimeEstimate Copy { get; } = new(0, 0, 0, true);
+}
+
 public enum WindowBiasSource
 {
     None,
@@ -42,6 +64,10 @@ public sealed record ComplexityProfile
     public const double WindowBiasMin = 0.5;
     public const double WindowBiasMax = 2.0;
 
+    private const double SpeedBand = 0.30;
+    private const double FirstPassMinShare = 0.0;
+    private const double FirstPassMaxShare = 1.0;
+
     private const double CalibratedBand = 0.05;
     private const double PacketBiasBand = 0.08;
     private const double MeasuredBand = 0.14;
@@ -55,6 +81,7 @@ public sealed record ComplexityProfile
     public double LevelFactor { get; init; } = 1.0;
     public double HalvingStep { get; init; }
     public CalibrationSignature? Calibration { get; init; }
+    public EncodeSpeed? Speed { get; init; }
     public double WindowBias { get; init; } = 1.0;
     public WindowBiasSource BiasSource { get; init; } = WindowBiasSource.None;
 
@@ -186,6 +213,27 @@ public sealed record ComplexityProfile
             HalvingStep = step,
             Calibration = signature
         };
+    }
+
+    public ComplexityProfile WithSpeed(EncodeSpeed? speed)
+        => speed is null ? this : this with { Speed = speed };
+
+    public TimeEstimate? EstimateTime(EncodePlan plan, double durationSeconds)
+    {
+        if (plan.ModeEnum == EncodeMode.PassThrough) return TimeEstimate.Copy;
+        if (Speed is not { } speed || !speed.Matches(plan)) return null;
+        if (speed.FramesPerSecond <= 0 || durationSeconds <= 0 || plan.Fps <= 0) return null;
+
+        var onePass = durationSeconds * plan.Fps / speed.FramesPerSecond;
+        if (!double.IsFinite(onePass) || onePass <= 0) return null;
+
+        var twoPass = plan.ModeEnum == EncodeMode.TwoPass;
+        var minShare = twoPass ? FirstPassMinShare : 0.0;
+        var maxShare = twoPass ? FirstPassMaxShare : 0.0;
+        var expected = onePass * (1.0 + (minShare + maxShare) / 2.0);
+        var low = onePass * (1.0 + minShare) * (1.0 - SpeedBand);
+        var high = onePass * (1.0 + maxShare) * (1.0 + SpeedBand);
+        return new TimeEstimate(expected, low, high, false);
     }
 
     public ComplexityProfile WithoutCalibration()

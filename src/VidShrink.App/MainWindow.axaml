@@ -32,7 +32,7 @@
           Background="{StaticResource WorkspaceBackground}"
           BorderBrush="{StaticResource NeonBlue}"
           BorderThickness="{StaticResource BorderThin}"
-          CornerRadius="{StaticResource RadiusCell}"
+          CornerRadius="{StaticResource RadiusControl}"
           UseLayoutRounding="True">
     <Grid RowDefinitions="Auto,Auto,*">
 
@@ -382,6 +382,24 @@
                           </TextBlock.Transitions>
                         </TextBlock>
                         <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                          <TextBlock x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource Label}"/>
+                          <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated time">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" Text="VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file rather than from a table of presets. Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured. When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."/>
+                            </ToolTip.Tip>
+                          </Button>
+                        </StackPanel>
+                        <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource HeroValue}">
+                          <TextBlock.Transitions>
+                            <Transitions>
+                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                            </Transitions>
+                          </TextBlock.Transitions>
+                        </TextBlock>
+                        <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                       </StackPanel>
                     </UniformGrid>
                     <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>

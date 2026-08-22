@@ -109,7 +109,6 @@
   <CornerRadius x:Key="RadiusCell">8</CornerRadius>
   <CornerRadius x:Key="RadiusControl">12</CornerRadius>
   <CornerRadius x:Key="RadiusPanel">16</CornerRadius>
-  <CornerRadius x:Key="RadiusBadge">10</CornerRadius>
   <x:Double x:Key="RadiusPanelScalar">16</x:Double>
 
   <sys:TimeSpan x:Key="MotionInstant">00:00:00.0900000</sys:TimeSpan>

@@ -764,6 +764,7 @@ public partial class MainWindow : Window
         PlanRule.IsVisible = PlanReasons.Children.Count > 0;
 
         RefreshEstimateView();
+        RefreshDurationView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
     }
 
@@ -789,6 +790,61 @@ public partial class MainWindow : Window
             ? T("iki geçişli mod boyutu zorlar", "two-pass enforces this size")
             : T("kalite modu; hedefin altında kalır", "quality mode; stays under the target");
         TxtEstimateNote.Text = $"{basis} · {mode} · {T("öngörülen kalite", "predicted quality")} {_predictedQuality:0.#}/100";
+    }
+
+    private void RefreshDurationView()
+    {
+        if (ActivePlan is not { } plan || _info is null)
+        {
+            TxtDurationValue.Text = "-";
+            TxtDurationRange.Text = "";
+            return;
+        }
+
+        var profile = _profile ?? ComplexityProfile.FromSourceBitrate(_info);
+        if (profile.EstimateTime(plan, _info.DurationSeconds) is not { } duration)
+        {
+            TxtDurationValue.Text = "-";
+            TxtDurationRange.Text = profile.Speed is null
+                ? T("Kodlama hızı bu makinede henüz ölçülmedi.", "The encoding speed has not been measured on this machine yet.")
+                : T("Örnekler bu plan ayarlarıyla kodlanmadı; süre tahmin edilmiyor.", "The samples were not encoded with these settings, so no time is shown.");
+            return;
+        }
+
+        if (duration.StreamCopy)
+        {
+            TxtDurationValue.Text = T("kopyalanacak", "copied");
+            TxtDurationRange.Text = T("Yeniden kodlama yok, dosya olduğu gibi aktarılıyor.", "Nothing is re-encoded; the file is carried over as it is.");
+            return;
+        }
+
+        var reading = $"~{HumanDuration(duration.ExpectedSeconds)}";
+        if (TxtDurationValue.Text != reading) Pulse(TxtDurationValue, true);
+        TxtDurationValue.Text = reading;
+
+        var rate = profile.Speed!.FramesPerSecond;
+        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {T("ölçülen", "measured")} {rate:0} {T("kare/sn", "frames/s")}";
+    }
+
+    private string HumanDuration(double seconds)
+    {
+        if (seconds < 60) return $"{Math.Max(5, Math.Round(seconds / 5.0) * 5.0):0} {T("sn", "s")}";
+
+        if (seconds < 3600)
+        {
+            var minutes = seconds / 60.0;
+            if (minutes < 10) return $"{Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0):0.#} {T("dk", "min")}";
+            return $"{Math.Round(minutes):0} {T("dk", "min")}";
+        }
+
+        var hours = (int)(seconds / 3600);
+        var rest = (int)Math.Round((seconds - hours * 3600.0) / 60.0);
+        if (rest >= 60)
+        {
+            hours++;
+            rest = 0;
+        }
+        return rest == 0 ? $"{hours} {T("sa", "h")}" : $"{hours} {T("sa", "h")} {rest} {T("dk", "min")}";
     }
 
     private List<string> ReasonLines(EncodePlan plan)
