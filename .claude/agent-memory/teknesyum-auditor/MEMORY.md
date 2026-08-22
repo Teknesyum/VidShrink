@@ -1,3 +1,5 @@
 - [ffmpeg Process kalıbı](vidshrink-ffmpeg-process-pattern.md) — stdout okunmama (-f null - için düşük risk) + ct.Register(Kill) eksikliği (asıl tekrar eden kusur, yetim süreç)
 - [FillBand marjları](vidshrink-fillband-ceiling-margin.md) — retry kelepçesi istenen bitrate'i sınırlıyor; bant ancak encoderHatası+yayılım < bantGenişliği ise tutar
 - [Saha ölçümü kanıtı](vidshrink-saha-olcumu-kanit.md) — ölçüm hep builder beyanı; gated canlı test sessizce atlanır, adı assert ettiğinden fazlasını iddia edebilir
+- [VidShrink doğrulama beyanı](vidshrink-dogrulama-beyani.md) — build/test/canlı ekran hep builder beyanı; `? kanıtsız` yaz, obj/*.g.cs derleme izi verir
+- [VidShrink owns sınırı kopyalama](vidshrink-owns-siniri-kopyalama.md) — dar owns yüzünden sabitler kopyalanıyor ya da owns dışına yazılıyor; her turda ara
