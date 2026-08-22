@@ -1,0 +1,1 @@
+- [VidShrink arayüz doğrulama](vidshrink-arayuz-dogrulama.md) — computer-use ve UI Automation bu WPF projesinde çalışmıyor; PrintWindow betiğine geç
