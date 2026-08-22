@@ -1,8 +1,21 @@
-﻿using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
+using Xunit.Sdk;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
+
+public sealed class LiveSourceTheoryAttribute : TheoryAttribute
+{
+    public LiveSourceTheoryAttribute()
+    {
+        var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE");
+        if (string.IsNullOrWhiteSpace(source) || !File.Exists(source))
+            Skip = "VIDSHRINK_LIVE_SOURCE does not point at an existing file, so the live fill band measurement was not run.";
+        else if (!ToolLocator.IsAvailable(out _))
+            Skip = "ffmpeg was not found, so the live fill band measurement was not run.";
+    }
+}
 
 public sealed class FillBandTests
 {
@@ -164,21 +177,6 @@ public sealed class FillBandTests
         Assert.True(PlanCalculator.EstimatedMb(corrected, 120) <= 20 * 0.94 + 0.05);
     }
 
-    private static ComplexityProfile CalibratedProfile(string codec, double scale, double fps, double sourceFps)
-    {
-        var signature = new CalibrationSignature
-        {
-            Codec = codec,
-            Width = 1920,
-            Height = (int)Math.Round(1080 * scale),
-            Fps = fps,
-            Scale = scale
-        };
-        return ComplexityProfile
-            .FromProbe(0.06, 0.03, sampledSeconds: 6, sampledFrames: 180, windowBias: 1.0)
-            .Calibrate(signature, lowCrf: 18, lowBppf: 0.10, highCrf: 28, highBppf: 0.03, sourceFps: sourceFps);
-    }
-
     private static EncodePlan BigPlan() => new()
     {
         Mode = "2pass",
@@ -192,28 +190,22 @@ public sealed class FillBandTests
         Preset = "slow"
     };
 
+    private const double MeasuredLibx264Yield = 0.9815;
+
     [Theory]
     [InlineData(180.0)]
     [InlineData(25.0)]
     [InlineData(8.0)]
-    public void CalibratedRetryAimKeepsItsWholeSpreadUnderTheCeiling(double targetMb)
+    public void RetryAimTargetsTheBandCenterWhenTheYieldIsMeasured(double targetMb)
     {
-        var plan = BigPlan();
-        var profile = CalibratedProfile("libx264", 1.0, 48, 48);
-        Assert.True(profile.Calibrated);
-
-        var aim = PlanCalculator.RetryAimMb(targetMb, profile, plan, sourceHeight: 1080, out var calibrated);
-        Assert.True(calibrated, "The retry aim must use the calibrated profile when it applies to this codec, scale and fps.");
-
         var band = FillBand.For(targetMb);
-        var spread = PlanCalculator.CalibratedRetrySpread;
+        var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
 
-        Assert.True(aim * (1 + spread) <= targetMb + 1e-9,
-            $"The upper end of the retry spread must stay at or under the {targetMb:0.##} MB ceiling, got {aim * (1 + spread):0.00} MB.");
-        Assert.True(aim > band.HardFloorMb,
-            $"The retry aim must stay above the {band.HardFloorMb:0.0} MB hard floor, got {aim:0.0} MB.");
-        Assert.True(aim >= band.LowerMb,
-            $"The retry aim itself must sit inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {aim:0.0} MB.");
+        var aim = PlanCalculator.RetryAimMb(targetMb, MeasuredLibx264Yield);
+
+        Assert.Equal(bandCenterMb, aim, 6);
+        Assert.True(aim >= band.LowerMb && aim <= band.UpperMb,
+            $"A measured yield must let the retry aim at the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {aim:0.0} MB.");
     }
 
     [Theory]
@@ -222,68 +214,119 @@ public sealed class FillBandTests
     [InlineData(8.0)]
     public void UncalibratedRetryAimStaysAboveTheHardFloorAndUnderTheCeiling(double targetMb)
     {
-        var plan = BigPlan();
-
-        var aim = PlanCalculator.RetryAimMb(targetMb, null, plan, sourceHeight: 1080, out var calibrated);
-
-        Assert.False(calibrated);
+        var aim = PlanCalculator.RetryAimMb(targetMb, null);
 
         var band = FillBand.For(targetMb);
         var impliedError = targetMb / aim - 1;
 
         Assert.True(aim > band.HardFloorMb,
-            $"The uncalibrated retry aim must stay above the {band.HardFloorMb:0.0} MB hard floor, got {aim:0.0} MB.");
+            $"The unmeasured retry aim must stay above the {band.HardFloorMb:0.0} MB hard floor, got {aim:0.0} MB.");
         Assert.True(aim <= targetMb + 1e-9,
-            $"The uncalibrated retry aim must stay at or under the {targetMb:0.##} MB ceiling, got {aim:0.0} MB.");
-        Assert.True(impliedError >= PlanCalculator.CalibratedRetrySpread,
-            $"The uncalibrated aim must be at least as conservative as the calibrated retry spread; implied {impliedError * 100:0.#}% vs {PlanCalculator.CalibratedRetrySpread * 100:0.#}%.");
+            $"The unmeasured retry aim must stay at or under the {targetMb:0.##} MB ceiling, got {aim:0.0} MB.");
+        Assert.True(impliedError >= PlanCalculator.TwoPassUncertainty - 1e-9,
+            $"Without a measured yield the aim must carry the whole two-pass spread; implied {impliedError * 100:0.#}% vs {PlanCalculator.TwoPassUncertainty * 100:0.#}%.");
+    }
+
+    [Fact]
+    public void MeasuredEncoderEfficiencyIsNullForACrfAttempt()
+    {
+        var plan = BigPlan();
+        plan.Mode = "crf";
+        plan.Crf = 22;
+
+        Assert.Null(PlanCalculator.MeasuredEncoderEfficiency(plan, actualMb: 170, durationSeconds: 120));
+    }
+
+    [Fact]
+    public void MeasuredEncoderEfficiencyIsTheDeliveredShareOfTheRequest()
+    {
+        var plan = BigPlan();
+        var requested = PlanCalculator.EstimatedMb(plan, 120)!.Value;
+        var audioMb = requested - PlanCalculator.EstimatedMb(new EncodePlan
+        {
+            Mode = "2pass",
+            VideoBitrateK = plan.VideoBitrateK,
+            AudioBitrateK = 0,
+            Width = plan.Width,
+            Height = plan.Height,
+            Fps = plan.Fps,
+            Codec = plan.Codec,
+            Preset = plan.Preset
+        }, 120)!.Value;
+        var delivered = audioMb + (requested - audioMb) * MeasuredLibx264Yield;
+
+        var efficiency = PlanCalculator.MeasuredEncoderEfficiency(plan, delivered, 120);
+
+        Assert.NotNull(efficiency);
+        Assert.Equal(MeasuredLibx264Yield, efficiency!.Value, 4);
+    }
+
+    [Theory]
+    [InlineData(180.0)]
+    [InlineData(25.0)]
+    [InlineData(8.0)]
+    public void UnderBandRetryDividesTheRequestByTheMeasuredYieldAndLandsInTheBand(double targetMb)
+    {
+        var plan = BigPlan();
+        var band = FillBand.For(targetMb);
+        var requested = PlanCalculator.EstimatedMb(plan, 120)!.Value;
+        var delivered = requested * MeasuredLibx264Yield;
+
+        var corrected = PlanCalculator.Correct(plan, delivered, targetMb, 120, fillUnderBand: true);
+        var nextRequest = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
+        var nextDelivered = nextRequest * MeasuredLibx264Yield;
+
+        Assert.True(nextDelivered >= band.LowerMb && nextDelivered <= band.UpperMb,
+            $"With the yield measured at {MeasuredLibx264Yield:0.####} the retry must deliver inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {nextDelivered:0.0} MB from a {nextRequest:0.0} MB request.");
+    }
+
+    [Fact]
+    public void UnderBandRetryMayRequestAboveTheTargetWhenTheYieldIsMeasured()
+    {
+        var plan = BigPlan();
+        var requested = PlanCalculator.EstimatedMb(plan, 120)!.Value;
+        var delivered = requested * MeasuredLibx264Yield;
+
+        var corrected = PlanCalculator.Correct(plan, delivered, 180, 120, fillUnderBand: true);
+        var nextRequest = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
+
+        Assert.True(nextRequest > FillBand.For(180).LowerMb,
+            $"The nominal request must not be clamped back onto the band edge, got {nextRequest:0.0} MB.");
+        Assert.Contains("encoder yield", corrected.Reason);
     }
 
     [Fact]
     public void UncalibratedOverTargetCorrectionNoLongerAimsBelowTheHardFloor()
     {
         var plan = BigPlan();
+        plan.Mode = "crf";
+        plan.Crf = 20;
 
-        var corrected = PlanCalculator.Correct(plan, actualMb: 190, targetMb: 180, durationSeconds: 120, sourceHeight: 1080);
+        var corrected = PlanCalculator.Correct(plan, actualMb: 190, targetMb: 180, durationSeconds: 120);
         var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
         var band = FillBand.For(180);
 
         Assert.True(estimated > band.HardFloorMb,
-            $"An uncalibrated over-ceiling correction must not aim under the {band.HardFloorMb:0.0} MB hard floor, got {estimated:0.0} MB.");
+            $"An unmeasured over-ceiling correction must not aim under the {band.HardFloorMb:0.0} MB hard floor, got {estimated:0.0} MB.");
+        Assert.True(estimated <= 180, $"It must still stay under the ceiling, got {estimated:0.0} MB.");
     }
 
     [Fact]
-    public void CalibratedOverTargetCorrectionNoLongerAimsBelowTheHardFloor()
+    public void OverCeilingCorrectionWithAMeasuredYieldStaysUnderTheCeiling()
     {
         var plan = BigPlan();
-        var profile = CalibratedProfile("libx264", 1.0, 48, 48);
+        var requested = PlanCalculator.EstimatedMb(plan, 120)!.Value;
+        var overshootYield = 1.04;
+        var delivered = requested * overshootYield;
 
-        var corrected = PlanCalculator.Correct(plan, actualMb: 190, targetMb: 180, durationSeconds: 120, profile: profile, sourceHeight: 1080);
-        var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
+        var corrected = PlanCalculator.Correct(plan, delivered, 180, 120);
+        var nextDelivered = PlanCalculator.EstimatedMb(corrected, 120)!.Value * overshootYield;
         var band = FillBand.For(180);
 
-        Assert.True(estimated > band.HardFloorMb,
-            $"An over-ceiling correction must not aim under the {band.HardFloorMb:0.0} MB hard floor, got {estimated:0.0} MB.");
-        Assert.True(estimated >= band.LowerMb - 0.5,
-            $"An over-ceiling correction must aim at the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {estimated:0.0} MB.");
-        Assert.True(estimated * (1 + PlanCalculator.CalibratedRetrySpread) <= 180 + 1e-9,
-            $"The corrected plan plus its own spread must stay under the ceiling, got {estimated * (1 + PlanCalculator.CalibratedRetrySpread):0.0} MB.");
-    }
-
-    [Fact]
-    public void CorrectFillsUnderBandLeavesPayBelowTheHardCeiling()
-    {
-        var plan = BigPlan();
-        var profile = CalibratedProfile("libx264", 1.0, 48, 48);
-
-        var corrected = PlanCalculator.Correct(plan, actualMb: 170, targetMb: 180, durationSeconds: 120, fillUnderBand: true, profile: profile, sourceHeight: 1080);
-        var estimated = PlanCalculator.EstimatedMb(corrected, 120)!.Value;
-        var band = FillBand.For(180);
-
-        Assert.True(estimated * (1 + PlanCalculator.CalibratedRetrySpread) <= 180 + 1e-9,
-            $"Retry plus its own spread must never reach the hard ceiling, got {estimated * (1 + PlanCalculator.CalibratedRetrySpread):0.0} MB.");
-        Assert.True(estimated >= band.LowerMb,
-            $"Expected the capped retry to aim inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {estimated:0.0} MB.");
+        Assert.True(nextDelivered <= 180 + 1e-9,
+            $"An over-ceiling correction that knows the yield must land under the ceiling, got {nextDelivered:0.0} MB.");
+        Assert.True(nextDelivered >= band.LowerMb,
+            $"It must also land inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band, got {nextDelivered:0.0} MB.");
     }
 
     [Fact]
@@ -347,8 +390,13 @@ public sealed class FillBandTests
             Assert.True(File.Exists(outputPath));
             Assert.True(result.Attempts > 1,
                 $"Expected the under-floor result to trigger a retry, got {result.Attempts} attempt(s) at {result.OutputMb:0.0} MB.");
-            Assert.True(result.Attempts <= 2,
-                $"Expected the under-band correction to be used at most once, leaving the rest of MaxAttempts for the ceiling side; got {result.Attempts} attempt(s).");
+            var underBandRetries = (result.Trace ?? Array.Empty<EncodeAttempt>()).Where(a => a.Branch == "under band").ToList();
+            Assert.True(underBandRetries.Count <= 2,
+                $"The under-band branch must not spend more than two attempts, got {underBandRetries.Count}.");
+            if (underBandRetries.Count == 2)
+                Assert.NotNull(underBandRetries[1].MeasuredEfficiency);
+            Assert.DoesNotContain(result.Trace ?? Array.Empty<EncodeAttempt>(), a => a.Branch == "over ceiling");
+            Assert.True(result.OutputMb <= 5, $"The hard ceiling must hold, got {result.OutputMb:0.00} MB.");
         }
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
     }
@@ -419,14 +467,12 @@ public sealed class FillBandTests
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
     }
 
-    [Theory]
+    [LiveSourceTheory]
     [InlineData(180.0)]
     [InlineData(8.0)]
     public async Task LiveFillTargetRunStaysInsideTheBand(double targetMb)
     {
-        var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE");
-        if (string.IsNullOrWhiteSpace(source) || !File.Exists(source)) return;
-        if (!ToolLocator.IsAvailable(out _)) return;
+        var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
 
         var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
             ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
@@ -454,5 +500,7 @@ public sealed class FillBandTests
         Assert.True(result.Success, result.Error);
         Assert.True(result.OutputMb <= targetMb, $"The hard ceiling was crossed: {result.OutputMb:0.00} MB against a {targetMb:0.##} MB target.");
         Assert.True(result.OutputMb >= band.HardFloorMb, $"The result fell below the {band.HardFloorMb:0.00} MB hard floor at {result.OutputMb:0.00} MB.");
+        Assert.True(result.OutputMb >= band.LowerMb,
+            $"The result missed the {band.LowerMb:0.00}-{band.UpperMb:0.00} MB fill band at {result.OutputMb:0.00} MB.");
     }
 }

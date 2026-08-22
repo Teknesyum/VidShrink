@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -7,7 +7,7 @@ namespace VidShrink.Ffmpeg;
 
 public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan? Remaining, double OutputMb, string Stage);
 
-public sealed record EncodeAttempt(int Number, string Branch, double AimMb, double ActualMb, int VideoBitrateK, string Mode);
+public sealed record EncodeAttempt(int Number, string Branch, double AimMb, double ActualMb, int VideoBitrateK, string Mode, double? MeasuredEfficiency = null);
 
 public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null);
 public sealed record ConversionResult(string OutputPath, double OutputMb);
@@ -31,8 +31,12 @@ public sealed class EncodeRunner
         var attempt = 0;
         var trace = new List<EncodeAttempt>();
         var usedUnderBandRetry = false;
+        var usedMeasuredUnderBandRetry = false;
         var passLogPrefix = Path.Combine(Path.GetTempPath(), "vidshrink_" + Guid.NewGuid().ToString("N"));
         var partialPath = PartialPathFor(outputPath);
+        var fallbackPath = PartialPathFor(outputPath);
+        var fallbackMb = 0.0;
+        EncodePlan? fallbackPlan = null;
 
         try
         {
@@ -52,43 +56,59 @@ public sealed class EncodeRunner
                 }
 
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
-                var aimMb = PlanCalculator.RetryAimMb(targetMb, profile, current, info.Height, out _);
+                var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, info.DurationSeconds);
+                var aimMb = PlanCalculator.RetryAimMb(targetMb, efficiency);
                 var over = actualMb > targetMb * ToleranceOver;
                 var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < FillBand.For(targetMb).LowerMb;
-                var retryUnderBand = underBand && !usedUnderBandRetry && attempt < MaxAttempts;
+                var informedByYield = efficiency is not null;
+                var retryUnderBand = underBand && attempt < MaxAttempts
+                    && (!usedUnderBandRetry || (informedByYield && !usedMeasuredUnderBandRetry));
 
                 if (!over && !underBand)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                    trace.Add(new EncodeAttempt(attempt, "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     File.Move(partialPath, outputPath, overwrite: true);
                     return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace);
                 }
 
                 if (retryUnderBand)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "under band", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                    trace.Add(new EncodeAttempt(attempt, "under band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     usedUnderBandRetry = true;
-                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true, profile: profile, sourceHeight: info.Height);
+                    usedMeasuredUnderBandRetry |= informedByYield;
+                    TryDelete(fallbackPath);
+                    File.Move(partialPath, fallbackPath, overwrite: true);
+                    fallbackMb = actualMb;
+                    fallbackPlan = current;
+                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, fillUnderBand: true);
                     continue;
                 }
 
                 if (over)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                    trace.Add(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
 
                     if (attempt >= MaxAttempts)
                     {
                         TryDelete(partialPath);
+
+                        if (fallbackPlan is not null && File.Exists(fallbackPath))
+                        {
+                            trace.Add(new EncodeAttempt(attempt, "fallback to the last under-band result", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode));
+                            File.Move(fallbackPath, outputPath, overwrite: true);
+                            return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace);
+                        }
+
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
                             $"Stayed over the {targetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
                             UnderBand: false, CeilingExceeded: true, Trace: trace);
                     }
 
-                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds, profile: profile, sourceHeight: info.Height);
+                    current = PlanCalculator.Correct(current, actualMb, targetMb, info.DurationSeconds);
                     continue;
                 }
 
-                trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                 File.Move(partialPath, outputPath, overwrite: true);
                 return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace);
             }
@@ -107,6 +127,7 @@ public sealed class EncodeRunner
         }
         finally
         {
+            TryDelete(fallbackPath);
             CleanupPassLogs(passLogPrefix);
         }
     }

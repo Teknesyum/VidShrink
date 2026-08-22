@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -34,8 +34,7 @@ public static class PlanCalculator
 {
     private const double ContainerOverhead = 0.995;
     private const double CrfFitMargin = 0.94;
-    private const double TwoPassUncertainty = 0.04;
-    public const double CalibratedRetrySpread = 0.016;
+    public const double TwoPassUncertainty = 0.04;
     private const double MinScale = 0.25;
     private const double ScaleStep = 0.02;
     private const int MinHeight = 240;
@@ -255,52 +254,52 @@ public static class PlanCalculator
         return new SizeEstimate(expectedMb, expectedMb * (1 - band), expectedMb * (1 + band), complexity.Measured, false);
     }
 
-    public static double RetryAimMb(double targetMb, ComplexityProfile? profile, EncodePlan plan, double sourceHeight, out bool calibrated)
+    public static double? MeasuredEncoderEfficiency(EncodePlan plan, double actualMb, double durationSeconds)
     {
-        var scale = sourceHeight > 0 ? plan.Height / sourceHeight : 1.0;
-        calibrated = profile is not null && profile.AppliesTo(plan.Codec, scale, plan.Fps);
-        var spread = calibrated ? CalibratedRetrySpread : TwoPassUncertainty;
+        if (plan.ModeEnum != EncodeMode.TwoPass || plan.VideoBitrateK <= 0) return null;
+        var requestedVideoMb = SizeMb(plan.VideoBitrateK, 0, durationSeconds);
+        var deliveredVideoMb = actualMb - SizeMb(0, plan.AudioBitrateK, durationSeconds);
+        if (requestedVideoMb <= 0.01 || deliveredVideoMb <= 0.01) return null;
+        var efficiency = deliveredVideoMb / requestedVideoMb;
+        return efficiency is > 0.5 and < 2.0 ? efficiency : null;
+    }
 
+    public static double RetryAimMb(double targetMb, double? measuredEfficiency)
+    {
         var band = FillBand.For(targetMb);
-        var ceilingAim = targetMb / (1 + spread);
-        var bandAim = band.LowerMb / (1 - spread);
         var bandCenterMb = (band.LowerMb + band.UpperMb) / 2.0;
+        if (measuredEfficiency is not null) return bandCenterMb;
+
+        var ceilingAim = targetMb / (1 + TwoPassUncertainty);
+        var bandAim = band.LowerMb / (1 - TwoPassUncertainty);
         return Math.Max(band.HardFloorMb, Math.Min(ceilingAim, Math.Max(bandAim, bandCenterMb)));
     }
 
-    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, bool fillUnderBand = false, ComplexityProfile? profile = null, double sourceHeight = 0)
+    public static EncodePlan Correct(EncodePlan plan, double actualMb, double targetMb, double durationSeconds, bool fillUnderBand = false)
     {
         var corrected = plan.Clone();
+        var band = FillBand.For(targetMb);
         var audioMb = SizeMb(0, plan.AudioBitrateK, durationSeconds);
         var previousVideoK = plan.VideoBitrateK;
-        var aimMb = RetryAimMb(targetMb, profile, plan, sourceHeight, out var calibrated);
-        var aimSource = calibrated
-            ? $"aimed at {aimMb:0.0} MB from the calibrated ±{CalibratedRetrySpread * 100:0.#}% retry error"
-            : $"aimed at {aimMb:0.0} MB from the uncalibrated ±{TwoPassUncertainty * 100:0.#}% two-pass spread";
+        var efficiency = MeasuredEncoderEfficiency(plan, actualMb, durationSeconds);
+        var aimMb = RetryAimMb(targetMb, efficiency);
+        var deliveredVideoMb = Math.Max(actualMb - audioMb, 0.01);
+        var aimedVideoMb = Math.Max(aimMb - audioMb, 0.01);
+        var factor = aimedVideoMb / deliveredVideoMb;
+        var requestedVideoMb = aimedVideoMb / (efficiency ?? 1.0);
+        var videoBudgetK = Math.Max(1.0, requestedVideoMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1));
+        var aimSource = efficiency is double e
+            ? $"aimed at the {aimMb:0.0} MB band center and divided by the {e:0.###} encoder yield measured on the previous attempt"
+            : $"aimed at {aimMb:0.0} MB, the most it can ask for without a measured encoder yield and the +{TwoPassUncertainty * 100:0.#}% two-pass spread on top";
+
         corrected.Mode = "2pass";
         corrected.Crf = null;
-
-        if (fillUnderBand)
-        {
-            var band = FillBand.For(targetMb);
-            var factorUp = aimMb / Math.Max(actualMb, 0.01);
-            var totalBudgetKUp = aimMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
-            var videoBudgetKUp = Math.Max(1, totalBudgetKUp - plan.AudioBitrateK);
-            corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factorUp, videoBudgetKUp)));
-            corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.HardFloorMb:0.0} MB floor for a {targetMb:0.##} MB target; video bitrate was scaled by {factorUp:0.###} and {aimSource}, which keeps the whole predicted spread under the hard ceiling";
-            corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factorUp, BandLowerMb: band.LowerMb) };
-            return corrected;
-        }
-
-        var desiredMb = aimMb;
-        var actualVideoMb = Math.Max(actualMb - audioMb, 0.01);
-        var desiredVideoMb = Math.Max(desiredMb - audioMb, 0.01);
-        var factor = desiredVideoMb / actualVideoMb;
-        var totalBudgetK = desiredMb * 8192.0 * ContainerOverhead / Math.Max(durationSeconds, 0.1);
-        var videoBudgetK = Math.Max(1, totalBudgetK - plan.AudioBitrateK);
         corrected.VideoBitrateK = Math.Max(1, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
-        corrected.Reason = $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###}, {aimSource}";
-        corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor, BandLowerMb: FillBand.For(targetMb).LowerMb) };
+
+        corrected.Reason = fillUnderBand
+            ? $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.LowerMb:0.0} MB lower edge of the fill band for a {targetMb:0.##} MB target; video bitrate was scaled by {factor:0.###} and {aimSource}"
+            : $"retry: the previous attempt produced {actualMb:0.0} MB against a {targetMb:0.##} MB target; after reserving {audioMb:0.00} MB for audio, video bitrate was scaled by {factor:0.###}, {aimSource}";
+        corrected.ReasonCodes = new List<ReasonNote> { new(ReasonCode.RetryScaled, Mb: actualMb, TargetMb: targetMb, AudioMb: audioMb, Factor: factor, BandLowerMb: band.LowerMb) };
         return corrected;
     }
 
