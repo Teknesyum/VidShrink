@@ -22,9 +22,53 @@ function Require-WinGet {
 
 function Install-WinGetPackage([string]$Id) {
     Require-WinGet
+    $noApplicableInstaller = -1978335216
     & winget.exe install --id $Id --exact --scope user --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
+    if ($LASTEXITCODE -eq $noApplicableInstaller) {
+        Write-Host "$Id kullanıcı kapsamında sunulmuyor, makine kapsamı deneniyor (yönetici onayı isteyebilir)..." -ForegroundColor Yellow
+        & winget.exe install --id $Id --exact --silent --accept-package-agreements --accept-source-agreements
+    }
     if ($LASTEXITCODE -ne 0) { throw "$Id kurulamadı. WinGet çıkış kodu: $LASTEXITCODE" }
     Refresh-ProcessPath
+}
+
+function Get-RuntimeIdentifier {
+    switch ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
+        'Arm64' { return 'win-arm64' }
+        'X86'   { return 'win-x86' }
+        default { return 'win-x64' }
+    }
+}
+
+function Find-DotNetSdk8 {
+    $candidates = New-Object System.Collections.Generic.List[string]
+    $command = Get-Command dotnet.exe -ErrorAction SilentlyContinue
+    if ($command) { $candidates.Add($command.Source) }
+    $candidates.Add((Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet\dotnet.exe'))
+    if ($env:ProgramFiles) { $candidates.Add((Join-Path $env:ProgramFiles 'dotnet\dotnet.exe')) }
+
+    foreach ($candidate in $candidates) {
+        if (-not (Test-Path -LiteralPath $candidate)) { continue }
+        $sdks = & $candidate --list-sdks 2>$null
+        if ($LASTEXITCODE -eq 0 -and ($sdks | Select-String -Pattern '^8\.' -Quiet)) { return $candidate }
+    }
+    return $null
+}
+
+function Install-DotNetSdk8 {
+    $installDirectory = Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet'
+    $bootstrapper = Join-Path ([IO.Path]::GetTempPath()) ('dotnet-install-' + [Guid]::NewGuid().ToString('N') + '.ps1')
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri 'https://dot.net/v1/dotnet-install.ps1' -OutFile $bootstrapper
+        & $bootstrapper -Channel '8.0' -InstallDir $installDirectory -NoPath
+    }
+    finally {
+        Remove-Item -LiteralPath $bootstrapper -Force -ErrorAction SilentlyContinue
+    }
+
+    $executable = Join-Path $installDirectory 'dotnet.exe'
+    if (-not (Test-Path -LiteralPath $executable)) { throw '.NET 8 SDK kurulumdan sonra bulunamadı.' }
+    return $executable
 }
 
 function Find-Tool([string]$Name) {
@@ -38,11 +82,14 @@ function Find-Tool([string]$Name) {
 
 Write-Host 'VidShrink kurulumu hazırlanıyor...' -ForegroundColor Cyan
 
-if (-not (Get-Command dotnet.exe -ErrorAction SilentlyContinue) -or
-    -not (& dotnet.exe --list-sdks | Select-String -Pattern '^8\.')) {
-    Write-Host '.NET 8 SDK yükleniyor...' -ForegroundColor Cyan
-    Install-WinGetPackage 'Microsoft.DotNet.SDK.8'
+$dotnet = Find-DotNetSdk8
+if (-not $dotnet) {
+    Write-Host '.NET 8 SDK yükleniyor (kullanıcı kapsamı, yönetici gerekmez)...' -ForegroundColor Cyan
+    $dotnet = Install-DotNetSdk8
 }
+$env:DOTNET_ROOT = Split-Path -Parent $dotnet
+$env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+$env:DOTNET_NOLOGO = '1'
 
 $ffmpeg = Find-Tool 'ffmpeg'
 $ffprobe = Find-Tool 'ffprobe'
@@ -75,9 +122,10 @@ try {
     $sourceRoot = Get-ChildItem -LiteralPath $extractRoot -Directory | Select-Object -First 1
     if (-not $sourceRoot) { throw 'İndirilen kaynak paketi açılamadı.' }
 
-    Write-Host 'VidShrink Release sürümü yayımlanıyor...' -ForegroundColor Cyan
-    & dotnet.exe publish (Join-Path $sourceRoot.FullName 'src\VidShrink.App\VidShrink.App.csproj') `
-        --configuration Release --runtime win-x64 --self-contained true `
+    $runtimeIdentifier = Get-RuntimeIdentifier
+    Write-Host "VidShrink Release sürümü yayımlanıyor ($runtimeIdentifier)..." -ForegroundColor Cyan
+    & $dotnet publish (Join-Path $sourceRoot.FullName 'src\VidShrink.App\VidShrink.App.csproj') `
+        --configuration Release --runtime $runtimeIdentifier --self-contained true `
         -p:PublishSingleFile=false --output $publishRoot
     if ($LASTEXITCODE -ne 0) { throw "VidShrink derlenemedi. dotnet çıkış kodu: $LASTEXITCODE" }
 
