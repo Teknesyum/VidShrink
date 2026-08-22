@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -30,6 +30,9 @@ public partial class MainWindow : Window
     private string? _lastOutput;
     private bool _syncing;
     private bool _turkish;
+    private bool _hardwareEncoderAvailable = true;
+
+    private static readonly string[] HardwareEncoderOrder = { "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc" };
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
@@ -46,6 +49,7 @@ public partial class MainWindow : Window
         {
             SetLanguage(true);
             CheckTools();
+            _ = ProbeHardwareEncodersAsync();
             var startupFile = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(File.Exists);
             if (startupFile is not null) await LoadAsync(startupFile);
         };
@@ -83,6 +87,25 @@ public partial class MainWindow : Window
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
     }
 
+    private async Task ProbeHardwareEncodersAsync()
+    {
+        var available = await Task.Run(() => HardwareEncoderOrder.Any(EncoderCapabilities.Instance.WorksAsEncoder));
+        _hardwareEncoderAvailable = available;
+        ChkFastGpu.IsEnabled = available;
+        if (available) return;
+        ChkFastGpu.IsChecked = false;
+        ApplyFastGpuTip();
+        Recalculate();
+    }
+
+    private void ApplyFastGpuTip()
+    {
+        if (_hardwareEncoderAvailable) return;
+        TipFastGpu.Text = T(
+            "Bu bilgisayarda kullanılabilir bir donanım kodlayıcı bulunamadı, bu yüzden hızlı düşürme kullanılamıyor. Ekran kartı normalde kodlamayı işlemciye göre kat kat hızlandırır.",
+            "No usable hardware encoder was found on this computer, so fast shrink is unavailable. The graphics card would normally encode many times faster than the processor.");
+    }
+
     private static void TranslateTree(DependencyObject node, IReadOnlyDictionary<string, string> translations, HashSet<DependencyObject> visited)
     {
         if (!visited.Add(node)) return;
@@ -112,7 +135,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true, HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve, FillPolicy = CmbFillPolicy.SelectedIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget };
+    private PlanOptions CurrentOptions() => new() { TargetMb = ParseTargetMb(), Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex), Codec = CodecFromIndex(CmbCodec.SelectedIndex), AllowResolutionDrop = ChkResolution.IsChecked == true, AllowFpsDrop = ChkFps.IsChecked == true, HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve, FillPolicy = CmbFillPolicy.SelectedIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget, SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality };
     private double ParseTargetMb() => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : 16;
 
     private async void OnBrowse(object sender, RoutedEventArgs e)
@@ -223,7 +246,6 @@ public partial class MainWindow : Window
     {
         1 => CodecPreference.Compatible,
         2 => CodecPreference.MaxCompression,
-        3 => CodecPreference.Fast,
         _ => CodecPreference.Auto
     };
 
@@ -336,7 +358,7 @@ public partial class MainWindow : Window
             var text = note switch
             {
                 AdviceCode.CodecUpgradeRecommended => T("Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını Otomatik veya H.265 yapmayı düşün.", "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to Automatic or H.265."),
-                AdviceCode.HardwareCodecCostsQuality => T("NVENC hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; yazılım kodeği daha iyi görünür.", "NVENC is fast but loses noticeable quality per megabyte at a target this tight; a software codec will look better."),
+                AdviceCode.HardwareCodecCostsQuality => T("Donanım kodlayıcısı hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; Hızlı Düşür (GPU) kapalıyken sonuç daha iyi görünür.", "The hardware encoder is fast but loses noticeable quality per megabyte at a target this tight; the result looks better with Fast Shrink (GPU) turned off."),
                 AdviceCode.ExtremeRatioWarning => T("Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.", "Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable."),
                 AdviceCode.ContentIsSimple => T("İçerik sade ölçüldü; hedefin altında rahat kalınıyor.", "The content measured as simple, so the target is met with room to spare."),
                 AdviceCode.ContentIsComplex => T("İçerik yoğun ölçüldü; bit bütçesi bu yüzden zorlanıyor.", "The content measured as detail-heavy, which is why the bit budget is tight."),
@@ -345,7 +367,9 @@ public partial class MainWindow : Window
                 AdviceCode.QualityCeilingReached => T("Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.", "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see."),
                 AdviceCode.AudioMono => T("Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.", "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture."),
                 AdviceCode.AudioDropped => T("Bu boyutta ses tutulamıyor, çıkarıldı.", "Audio cannot fit at this size and was removed."),
-                AdviceCode.EncoderFallback => T("Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.", "The preferred encoder is not available on this ffmpeg build; falling back to a software encoder."),
+                AdviceCode.EncoderFallback => ChkFastGpu.IsChecked == true
+                    ? T("Hızlı Düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.", "Fast Shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.")
+                    : T("Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.", "The preferred encoder is not available on this ffmpeg build; falling back to a software encoder."),
                 AdviceCode.HdrTonemapped => T("Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.", "The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709."),
                 _ => null
             };

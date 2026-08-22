@@ -132,13 +132,12 @@
 <StackPanel Grid.Column="2">
 <StackPanel Orientation="Horizontal">
 <TextBlock Text="Compression Algorithm" Style="{StaticResource Label}"/>
-<Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="H.264 is the universal one: every phone made in the last fifteen years plays it, and WhatsApp never has to re-encode it. H.265 needs roughly a third fewer bits for the same picture, so it wins badly compressed targets — but some older Android phones and some web players refuse it. NVENC runs on the graphics card and is many times faster, at the cost of noticeably worse quality per megabyte; use it for long files you are not squeezing hard. Automatic picks H.264 for mild targets and H.265 once the target is tight enough that the quality gain outweighs the compatibility risk."/></Button.ToolTip></Button>
+<Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="H.264 is the universal one: every phone made in the last fifteen years plays it, and WhatsApp never has to re-encode it. H.265 needs roughly a third fewer bits for the same picture, so it wins badly compressed targets — but some older Android phones and some web players refuse it. Automatic picks H.264 for mild targets and H.265 once the target is tight enough that the quality gain outweighs the compatibility risk. Speed is not chosen here any more: turn on Fast Shrink (GPU) below when you want the graphics card to do the encoding."/></Button.ToolTip></Button>
 </StackPanel>
 <ComboBox x:Name="CmbCodec" Margin="0,4,0,0" SelectedIndex="0" SelectionChanged="OnOptionChanged">
 <ComboBoxItem Content="Automatic - Engine Decides"/>
 <ComboBoxItem Content="Compatible - H.264"/>
 <ComboBoxItem Content="Max Compression - H.265"/>
-<ComboBoxItem Content="Fast - NVENC"/>
 </ComboBox>
 </StackPanel>
 </Grid>
@@ -147,6 +146,10 @@
 <Button Content="?" Style="{StaticResource InfoButton}" Margin="6,-2,24,0"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="When the target is tight, fewer pixels encoded well beat many pixels encoded badly — blur is far less objectionable than blocking. The engine measures how much this particular clip actually saves by scaling down, then picks the largest resolution the budget can still hold cleanly. On a phone screen a well-encoded 720p is indistinguishable from 1080p; leaving this on is almost always the better trade."/></Button.ToolTip></Button>
 <CheckBox x:Name="ChkFps" Style="{StaticResource CheckStyle}" IsChecked="True" Content="May Lower Frame Rate" Click="OnOptionChanged"/>
 <Button Content="?" Style="{StaticResource InfoButton}"><Button.ToolTip><TextBlock Style="{StaticResource TipText}" Text="Halving the frame rate frees bits for the frames that remain. The engine only does this on hard targets and never drops below a level where motion starts to stutter. Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility."/></Button.ToolTip></Button>
+</StackPanel>
+<StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+<CheckBox x:Name="ChkFastGpu" Style="{StaticResource CheckStyle}" IsChecked="False" Content="Fast Shrink (GPU)" Click="OnOptionChanged"/>
+<Button Content="?" Style="{StaticResource InfoButton}" Margin="6,-2,0,0"><Button.ToolTip><TextBlock x:Name="TipFastGpu" Style="{StaticResource TipText}" Text="The graphics card encodes many times faster than the processor. VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed. On older cards the speed still arrives, but it costs some quality per megabyte."/></Button.ToolTip></Button>
 </StackPanel>
 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
 <TextBlock Text="Fill Policy" Style="{StaticResource Label}" VerticalAlignment="Center"/>
