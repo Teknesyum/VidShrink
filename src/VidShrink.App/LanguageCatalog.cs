@@ -126,7 +126,12 @@ internal static class LanguageCatalog
         ["Fill policy"] = "Doldurma politikası",
         ["Fill target"] = "Hedefi doldur",
         ["Stay at quality ceiling"] = "Kalite tavanında dur",
-        ["Fill target lands close to the target size and squeezes out the best quality the budget allows. Stay at quality ceiling stops once quality stops improving, which avoids padding the file but can leave it noticeably smaller."] = "Hedefi doldur, hedef boyuta yakın durur ve bütçenin izin verdiği en iyi kaliteyi sıkar. Kalite tavanında dur, kalite artmayı bıraktığında durur; dosyayı şişirmez ama belirgin biçimde küçük kalabilir."
+        ["Fill target lands close to the target size and squeezes out the best quality the budget allows. Stay at quality ceiling stops once quality stops improving, which avoids padding the file but can leave it noticeably smaller."] = "Hedefi doldur, hedef boyuta yakın durur ve bütçenin izin verdiği en iyi kaliteyi sıkar. Kalite tavanında dur, kalite artmayı bıraktığında durur; dosyayı şişirmez ama belirgin biçimde küçük kalabilir.",
+        ["Updates"] = "Güncelleme",
+        ["Update automatically"] = "Kendiliğinden güncelle",
+        ["When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."] = "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
+        ["VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it."] = "VidShrink bu sistemde kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
+        ["A new version is available"] = "Yeni bir sürüm var"
     };
 
     internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish = EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);

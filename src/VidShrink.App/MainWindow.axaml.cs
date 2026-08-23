@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia;
@@ -33,7 +34,18 @@ public partial class MainWindow : Window
     private const int CalibrationRounds = 2;
     private const uint ClientAreaAnimationQuery = 0x1042;
 
-    private const string HardwareTipEnglish = "The graphics card encodes many times faster than the processor. VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed. On older cards the speed still arrives, but it costs some quality per megabyte.";
+    // Ayar kapalıyken açılışta bir kez sorulur. Ağ yoksa bekleyen tek şey bu arka plan işi;
+    // pencere zaten açılmış olur.
+    private static readonly TimeSpan UpdateProbeTimeout = TimeSpan.FromSeconds(8);
+
+    // Şeridin kapatıldığı sürüm. Ayar dosyası değil, T18'in last-check.json'u gibi bir
+    // işaret dosyası; UpdateSettings'e ait olduğu için oraya yazılmaz.
+    private const string DismissedNoticeFileName = "dismissed-update.txt";
+
+    private const string AutoUpdateEffectEnglish = "When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it.";
+    private const string NoSelfUpdateEffectEnglish = "VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it.";
+
+    private const string HardwareTipEnglish ="The graphics card encodes many times faster than the processor. VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed. On older cards the speed still arrives, but it costs some quality per megabyte.";
     private const string NoHardwareTipEnglish = "No usable hardware encoder was found on this computer, so fast shrink is unavailable. The graphics card would normally encode many times faster than the processor.";
 
     private static readonly string[] MediaExtensions =
@@ -78,6 +90,8 @@ public partial class MainWindow : Window
     private DispatcherTimer? _recalculateTimer;
     private DateTime _lastEstimatePulse = DateTime.MinValue;
     private bool _controlsReady;
+    private bool _updateUiSyncing;
+    private string? _noticeVersion;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
@@ -120,6 +134,8 @@ public partial class MainWindow : Window
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
+
+        Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
 
         Loaded += OnWindowLoaded;
     }
@@ -278,6 +294,8 @@ public partial class MainWindow : Window
             UpdateMaximizeGlyph();
             WindowShell.Margin = OffScreenMargin;
             SetLanguage(true);
+            InitializeUpdateUi();
+            _ = CheckForUpdateAsync();
             PlayPanelEntrance();
             var startupFile = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(File.Exists);
             if (startupFile is not null) await LoadAsync(startupFile);
@@ -354,6 +372,7 @@ public partial class MainWindow : Window
         BtnTr.IsEnabled = !turkish;
         BtnEn.IsEnabled = turkish;
         ApplyFastGpuTip();
+        RefreshUpdateTexts();
         UpdateToolStatus();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
     }
@@ -428,17 +447,134 @@ public partial class MainWindow : Window
             $"VidShrink: {AppVersion()}");
     }
 
-    // AssemblyVersion is only ever "1.0.0.0" — the SDK pads it and drops everything after
-    // the patch number. AssemblyInformationalVersion is the one Directory.Build.props feeds,
-    // and it carries the commit CI appends, so a user reading the About box can tell two
-    // builds of the same version apart.
-    private static string AppVersion()
+    /// <summary>
+    /// Uygulamanın kendi sürümü. Hakkında kutusu da bildirim şeridi de burayı okur;
+    /// AssemblyInformationalVersion'a giden ikinci bir yol açılmaz.
+    /// </summary>
+    private static string AppVersion() => UpdateCheck.CurrentVersion(Assembly.GetExecutingAssembly());
+
+    private void InitializeUpdateUi()
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        var informational = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-        return string.IsNullOrWhiteSpace(informational)
-            ? assembly.GetName().Version?.ToString() ?? "?"
-            : informational;
+        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate;
+
+        _updateUiSyncing = true;
+        try { ChkAutoUpdate.IsChecked = UpdateSettings.Load().AutoUpdate; }
+        finally { _updateUiSyncing = false; }
+
+        RefreshUpdateTexts();
+    }
+
+    private void RefreshUpdateTexts()
+        => TxtAutoUpdateEffect.Text = Localize(UpdateCheck.CanSelfUpdate ? AutoUpdateEffectEnglish : NoSelfUpdateEffectEnglish);
+
+    private void OnAutoUpdateChanged()
+    {
+        if (_updateUiSyncing) return;
+
+        var settings = UpdateSettings.Load();
+        settings.AutoUpdate = ChkAutoUpdate.IsChecked == true;
+        try
+        {
+            settings.Save();
+        }
+        catch (Exception ex)
+        {
+            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+            return;
+        }
+
+        // Açıkken güncellemeyi başlatıcı sessizce yapıyor, söylenecek bir şey yok.
+        // Kapatıldığı anda haber verme görevi uygulamaya geçer.
+        if (UpdateCheck.AutoUpdateEnabled(settings)) UpdateNotice.IsVisible = false;
+        else _ = CheckForUpdateAsync();
+    }
+
+    /// <summary>
+    /// Yeni sürümü arka planda sorar. Açılışı geciktirmez ve hiçbir hatada kullanıcıya
+    /// bir şey göstermez: haber verilecek bir şey yoksa şerit hiç belirmez.
+    /// </summary>
+    private async Task CheckForUpdateAsync()
+    {
+        if (UpdateCheck.AutoUpdateEnabled()) return;
+
+        string version;
+        try
+        {
+            using var http = new HttpClient { Timeout = UpdateProbeTimeout };
+            var asset = UpdateCheck.ManifestAssetName(UpdateCheck.Rid);
+            var json = await http.GetStringAsync(UpdateCheck.LatestAssetUrl(asset));
+            version = UpdateCheck.ParseManifest(json).Version;
+        }
+        catch (Exception)
+        {
+            // Ağ yok, oran sınırı, bozuk manifest: sessizce vazgeçilir.
+            return;
+        }
+
+        if (!UpdateCheck.IsNewer(version, AppVersion())) return;
+        if (string.Equals(ReadDismissedVersion(), version, StringComparison.OrdinalIgnoreCase)) return;
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            _noticeVersion = version;
+            TxtNoticeVersion.Text = version;
+            TxtNoticeCommand.Text = UpdateCheck.UpdateInstruction();
+            UpdateNotice.IsVisible = true;
+        });
+    }
+
+    private async void OnCopyUpdateCommand(object? sender, RoutedEventArgs e)
+    {
+        // Pano yoksa komut yine de okunabilir ve seçilebilir kalır; kullanıcıya hata basılmaz.
+        try
+        {
+            if (Clipboard is null) return;
+            await Clipboard.SetTextAsync(TxtNoticeCommand.Text ?? "");
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private void OnDismissUpdateNotice(object? sender, RoutedEventArgs e)
+    {
+        UpdateNotice.IsVisible = false;
+        if (_noticeVersion is not null) WriteDismissedVersion(_noticeVersion);
+    }
+
+    private static string DismissedNoticePath
+    {
+        get
+        {
+            var folder = Path.GetDirectoryName(UpdateSettings.DefaultPath);
+            return string.IsNullOrEmpty(folder) ? DismissedNoticeFileName : Path.Combine(folder, DismissedNoticeFileName);
+        }
+    }
+
+    private static string? ReadDismissedVersion()
+    {
+        try
+        {
+            return File.Exists(DismissedNoticePath) ? File.ReadAllText(DismissedNoticePath).Trim() : null;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    private void WriteDismissedVersion(string version)
+    {
+        try
+        {
+            var folder = Path.GetDirectoryName(DismissedNoticePath);
+            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+            File.WriteAllText(DismissedNoticePath, version);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // Yazılamazsa şerit bir sonraki açılışta yeniden belirir; başka bir sonucu yok.
+        }
     }
 
     private async Task ProbeHardwareEncodersAsync()
