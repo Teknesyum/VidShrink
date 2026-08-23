@@ -1,3 +1,5 @@
 - [VidShrink arayüz doğrulama](vidshrink-arayuz-dogrulama.md) — Avalonia'da UIA ile arayüzü sür, PrintWindow ile yakala; computer-use çalışmıyor
 - [Avalonia tema tuzakları](avalonia-tema-tuzaklari.md) — FocusAdorner sızıntısı, MaxWidth ortalaması, gradyan noktaları ve deneme projesiyle doğrulama
 - [Bağımlı sözleşmeyi doğrulama](relay-bagimli-sozlesme.md) — depends verilen kod kardeş worktree'de; imzayı oradan oku, geçici sahneleyip build et, sil
+- [Tema okuma deseni](vidshrink-tema-okuma-deseni.md) — Theme.axaml'ı regexle okuyan iki yer var; etiket listesi eksikse derleme MSB3073 ile düşer
+- [Win32 panel doğrulama](win32-panel-dogrulama.md) — bekleme panelini görmek için Splash.cs'i bağlayan geçici WinExe projesi; exe'yi çalıştırmak işe yaramaz

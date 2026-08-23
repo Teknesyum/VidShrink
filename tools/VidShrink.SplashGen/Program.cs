@@ -90,8 +90,9 @@ internal static class Program
             $"NeonBlueColor={theme.Raw("NeonBlueColor")}",
             $"NeonBlueBorderStrongColor={theme.Raw("NeonBlueBorderStrongColor")}",
             $"NeonBlueFillColor={theme.Raw("NeonBlueFillColor")}",
+            // Gezen parçanın gradyanı: ortada neon mavi, uçlarda neon mor.
+            $"NeonPurpleColor={theme.Raw("NeonPurpleColor")}",
             $"TextBodyColor={theme.Raw("TextBodyColor")}",
-            $"TextDisabledColor={theme.Raw("TextDisabledColor")}",
             $"GlowBlue={theme.Raw("GlowBlue")}",
             $"FontMono={theme.Raw("FontMono")}",
             $"FontSizeMd={theme.Raw("FontSizeMd")}",
@@ -105,6 +106,9 @@ internal static class Program
             $"BorderThinScalar={theme.Raw("BorderThinScalar")}",
             $"TipMaxWidth={theme.Raw("TipMaxWidth")}",
             $"MotionStaggerMs={theme.Raw("MotionStaggerMs")}",
+            // Tarama hızı bu ikisinden türer; başlatıcıda sabit süre yok.
+            $"MotionSlow={theme.Raw("MotionSlow")}",
+            $"MotionStaggerCount={theme.Raw("MotionStaggerCount")}",
             // Türetilmiş yerleşim: başlatıcı metni ve gezen parçayı bunlara göre koyar.
             $"panel={Box(panel)}",
             $"track={Box(track)}",
@@ -146,7 +150,7 @@ internal sealed class Theme
 
         // <Color x:Key="X">#AARRGGBB</Color> ve aynı biçimdeki sayı/ölçü belirteçleri.
         foreach (Match match in Regex.Matches(
-                     text, @"<(?<tag>Color|x:Double|x:String|CornerRadius|Thickness|FontFamily)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
+                     text, @"<(?<tag>Color|x:Double|x:Int32|x:String|sys:TimeSpan|CornerRadius|Thickness|FontFamily)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
         {
             values[match.Groups["key"].Value] = match.Groups["value"].Value.Trim();
         }
