@@ -424,7 +424,20 @@ public partial class MainWindow : Window
             $"FFmpeg: {ToolLocator.Ffmpeg}",
             $"{T("Sürüm", "Version")}: {_ffmpegVersion ?? T("okunuyor...", "reading...")}",
             $".NET: {Environment.Version}",
-            $"VidShrink: {Assembly.GetExecutingAssembly().GetName().Version}");
+            $"VidShrink: {AppVersion()}");
+    }
+
+    // AssemblyVersion is only ever "1.0.0.0" — the SDK pads it and drops everything after
+    // the patch number. AssemblyInformationalVersion is the one Directory.Build.props feeds,
+    // and it carries the commit CI appends, so a user reading the About box can tell two
+    // builds of the same version apart.
+    private static string AppVersion()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var informational = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        return string.IsNullOrWhiteSpace(informational)
+            ? assembly.GetName().Version?.ToString() ?? "?"
+            : informational;
     }
 
     private async Task ProbeHardwareEncodersAsync()

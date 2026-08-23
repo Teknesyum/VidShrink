@@ -391,9 +391,9 @@
   },
   "src/VidShrink.App/MainWindow.axaml.cs": {
     "model": "claude-opus-5",
-    "effort": "medium",
-    "t": "2026-08-23 15:26:42",
-    "ajan": "ui-builder"
+    "effort": "high",
+    "t": "2026-08-23 17:57:57",
+    "ajan": "ana oturum"
   },
   "src/VidShrink.App/LanguageCatalog.cs": {
     "model": "claude-opus-5",
@@ -507,6 +507,42 @@
     "model": "claude-opus-5",
     "effort": "high",
     "t": "2026-08-23 17:05:28",
+    "ajan": "ana oturum"
+  },
+  "Directory.Build.props": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 17:51:50",
+    "ajan": "builder"
+  },
+  "tools/VidShrink.Manifest/VidShrink.Manifest.csproj": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 17:51:50",
+    "ajan": "builder"
+  },
+  "tools/VidShrink.Manifest/Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 17:51:50",
+    "ajan": "builder"
+  },
+  ".github/workflows/release.yml": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 17:51:50",
+    "ajan": "builder"
+  },
+  ".github/workflows/manifest.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 17:51:50",
+    "ajan": "builder"
+  },
+  "t17fix.py": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-23 17:59:36",
     "ajan": "ana oturum"
   }
 }
