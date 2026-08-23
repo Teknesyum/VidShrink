@@ -61,11 +61,15 @@
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
-                <Path Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center"
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <!-- The two empty MoveTo commands pin the icon's own 24x24 design box, so Uniform
+                     scales that box instead of the ink. Without them the stretch centres the ink,
+                     and because the steam sits above the cup the cup itself landed below the text.
+                     Inside the box the drawing is raised so the cup body is what the box centres. -->
+                <Path Width="16" Height="16" Stretch="Uniform" VerticalAlignment="Center"
                       Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.5"
                       StrokeLineCap="Round" StrokeJoin="Round"
-                      Data="M 5 9 L 5 17 A 3 3 0 0 0 8 20 L 13 20 A 3 3 0 0 0 16 17 L 16 9 Z M 16 11 L 18 11 A 2.5 2.5 0 0 1 18 16 L 16 16 M 8 3 L 8 6 M 12 3 L 12 6"/>
+                      Data="M 0 0 M 24 24 M 5 6.5 L 5 14.5 A 3 3 0 0 0 8 17.5 L 13 17.5 A 3 3 0 0 0 16 14.5 L 16 6.5 Z M 16 8.5 L 18 8.5 A 2.5 2.5 0 0 1 18 13.5 L 16 13.5 M 8 0.5 L 8 3.5 M 12 0.5 L 12 3.5"/>
                 <TextBlock x:Name="TxtSponsor" Text="Buy Me a Coffee" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
