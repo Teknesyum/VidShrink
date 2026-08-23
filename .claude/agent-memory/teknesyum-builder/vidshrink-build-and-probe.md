@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-VidShrink (WPF + .NET 8): `dotnet build VidShrink.sln -c Release` ve `dotnet test VidShrink.sln`
-kok dizinden calisir. Derlemeden once `Get-Process VidShrink.App | Stop-Process -Force`,
-yoksa App.dll kilitli kalir.
+VidShrink (Avalonia 11 + .NET 8; arayuz dosyalari `.axaml` / `.axaml.cs`):
+`dotnet build VidShrink.sln -c Release` ve `dotnet test VidShrink.sln` kok dizinden calisir.
+PATH'teki `dotnet` 3.1.201 ve MSB3644 ile duser; `$env:DOTNET_ROOT = "$env:LOCALAPPDATA\Microsoft\dotnet"`
+kurup `& "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe"` cagir. Derlemeden once
+`Get-Process VidShrink.App | Stop-Process -Force`, yoksa App.dll kilitli kalir.
 
 **Why:** Ayni anda baska sozlesme kosarken bin/ kilidi cakisiyor; ikinci deneme genelde geciyor.
 
@@ -88,5 +90,14 @@ yoksa App.dll kilitli kalir.
   degil **anahtar kare uzakligi** (x264/x265 varsayilan GoP 250 kare ≈ 8,3 sn). Soguk/sicak
   farki olcum gurultusu icinde. Kare cekme maliyeti kod cozmede, olceklemede degil:
   960 px yerine 3840 px istemek %10'dan az fark yapiyor.
+- `VidShrink.Tests` `VidShrink.Core`'un **internal** uyelerini goremiyor (Core'da
+  `InternalsVisibleTo` yok; yalniz `VidShrink.App/LanguageCatalog.cs`'te var). Sozlesme csproj'u
+  `owns`'a koymuyorsa sinanacak yardimci uyeyi bastan `public` yaz — sonradan
+  `InternalsVisibleTo` eklemek owns disina yazmak demek.
+- `VidShrink.Core.csproj` hicbir NuGet paketi tasimiyor (sade net8.0). Paket gerektiren bir
+  cozum secmeden once BCL/P/Invoke karsiligina bak: orn. DPAPI icin
+  `System.Security.Cryptography.ProtectedData` paketi yerine `crypt32.dll`'den
+  `CryptProtectData`/`CryptUnprotectData` P/Invoke, csproj'a dokunmadan calisiyor
+  (`[SupportedOSPlatform("windows")]` koy, yoksa CA1416 uyarisi cikar ve 0-uyari kurali kirilir).
 - PE alt sistemini dogrulama: `$pe = [BitConverter]::ToInt32($bytes,0x3C)`,
   `[BitConverter]::ToUInt16($bytes,$pe+92)` -> 2 GUI, 3 konsol.
