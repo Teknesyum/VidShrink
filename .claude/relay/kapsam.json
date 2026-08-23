@@ -610,5 +610,11 @@
     "effort": "high",
     "t": "2026-08-23 22:58:36",
     "ajan": "ana oturum"
+  },
+  "docs/taramalar/yukleme-platformlari.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-23 23:08:34",
+    "ajan": "scout"
   }
 }
