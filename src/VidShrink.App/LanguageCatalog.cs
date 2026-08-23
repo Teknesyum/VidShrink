@@ -14,6 +14,7 @@ internal static class LanguageCatalog
         ["Shrink"] = "Küçült",
         ["Convert"] = "Dönüştür",
         ["About"] = "Hakkında",
+        ["Advanced"] = "Gelişmiş",
         ["Source"] = "Kaynak",
         ["Drop any media file here, or browse."] = "Herhangi bir medya dosyasını buraya bırakın veya gözatın.",
         ["Browse"] = "Gözat",

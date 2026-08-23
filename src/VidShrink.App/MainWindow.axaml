@@ -369,7 +369,7 @@
                       Theme="{StaticResource Panel}"
                       VerticalAlignment="Stretch"
                       MinHeight="{StaticResource PlanPanelMinHeight}">
-                <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="{StaticResource SpaceMd}">
+                <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
                   <TextBlock Grid.Row="0" Text="What it will do" Theme="{StaticResource H2}"/>
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
@@ -379,18 +379,6 @@
                       <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}"/>
                     </StackPanel>
                   </ScrollViewer>
-                  <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" x:Name="LblCommand" Text="FFmpeg command" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                    <Button Grid.Column="1"
-                            x:Name="BtnCommandExpand"
-                            Content="▾"
-                            Theme="{StaticResource GhostButton}"
-                            FontFamily="{StaticResource FontMono}"
-                            VerticalAlignment="Center"
-                            auto:AutomationProperties.Name="FFmpeg command"
-                            Click="OnToggleCommand"/>
-                  </Grid>
-                  <TextBox Grid.Row="3" x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1" VerticalAlignment="Top"/>
                 </Grid>
               </Border>
 
@@ -487,41 +475,6 @@
                   </StackPanel>
                 </Border>
 
-                <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
-                  <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="AI settings" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                      <TextBlock Grid.Column="1"
-                                 x:Name="TxtAiHint"
-                                 Text="{StaticResource AiHintText}"
-                                 Theme="{StaticResource Hint}"
-                                 TextWrapping="Wrap"
-                                 VerticalAlignment="Center">
-                        <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="{StaticResource AiHintText}"/>
-                        </ToolTip.Tip>
-                      </TextBlock>
-                      <Button Grid.Column="2"
-                              x:Name="BtnAiDetails"
-                              Content="▾"
-                              Theme="{StaticResource GhostButton}"
-                              VerticalAlignment="Center"
-                              FontFamily="{StaticResource FontMono}"
-                              auto:AutomationProperties.Name="AI settings"
-                              Click="OnToggleAiDetails"/>
-                    </Grid>
-                    <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
-                      <TextBlock Text="{StaticResource AiHintText}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                      <WrapPanel>
-                        <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
-                        <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
-                        <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
-                      </WrapPanel>
-                      <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
-                      <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                  </StackPanel>
-                </Border>
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
                   <Button x:Name="BtnCancel" Content="Cancel" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
@@ -801,7 +754,68 @@
           </ScrollViewer>
         </TabItem>
 
-        </TabControl>
+          <TabItem Header="Advanced" Theme="{StaticResource NeonTabItem}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+
+              <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <TextBlock Grid.Column="0" Text="FFmpeg command" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            x:Name="BtnCommandExpand"
+                            Content="▾"
+                            Theme="{StaticResource GhostButton}"
+                            FontFamily="{StaticResource FontMono}"
+                            VerticalAlignment="Center"
+                            auto:AutomationProperties.Name="FFmpeg command"
+                            Click="OnToggleCommand"/>
+                  </Grid>
+                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1"/>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <TextBlock Grid.Column="0" Text="AI settings" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1"
+                               x:Name="TxtAiHint"
+                               Text="{StaticResource AiHintText}"
+                               Theme="{StaticResource Hint}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center">
+                      <ToolTip.Tip>
+                        <TextBlock Theme="{StaticResource TipText}" Text="{StaticResource AiHintText}"/>
+                      </ToolTip.Tip>
+                    </TextBlock>
+                    <Button Grid.Column="2"
+                            x:Name="BtnAiDetails"
+                            Content="▾"
+                            Theme="{StaticResource GhostButton}"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource FontMono}"
+                            auto:AutomationProperties.Name="AI settings"
+                            Click="OnToggleAiDetails"/>
+                  </Grid>
+                  <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                    <TextBlock Text="{StaticResource AiHintText}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <WrapPanel>
+                      <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
+                      <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
+                      <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
+                    </WrapPanel>
+                    <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
+                    <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+      </TabControl>
 
       </Grid>
     </Grid>

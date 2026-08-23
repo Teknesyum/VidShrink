@@ -102,6 +102,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         _controlsReady = true;
 
+        ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
+
         _motionReduced = !AnimationsAllowed();
         if (_motionReduced) Classes.Add("reduced-motion");
         ApplyStartupSize();
@@ -214,6 +216,26 @@ public partial class MainWindow : Window
     }
 
     private readonly Dictionary<Control, int> _fadeGeneration = new();
+
+    private void ShowScrollOnlyOnHover(params TextBox[] boxes)
+    {
+        foreach (var box in boxes)
+        {
+            ApplyScrollAffordance(box, false);
+            box.PointerEntered += (_, _) => ApplyScrollAffordance(box, true);
+            box.PointerExited += (_, _) => ApplyScrollAffordance(box, false);
+        }
+    }
+
+    private static void ApplyScrollAffordance(TextBox box, bool hovered)
+    {
+        var shown = hovered ? ScrollBarVisibility.Auto : ScrollBarVisibility.Hidden;
+        ScrollViewer.SetVerticalScrollBarVisibility(box, shown);
+        ScrollViewer.SetHorizontalScrollBarVisibility(
+            box,
+            box.TextWrapping == TextWrapping.Wrap ? ScrollBarVisibility.Disabled : shown);
+    }
+
 
     private void EnsureFade(Control control)
     {
@@ -1200,6 +1222,7 @@ public partial class MainWindow : Window
         TxtCommand.TextWrapping = expanded ? TextWrapping.Wrap : TextWrapping.NoWrap;
         TxtCommand.MaxLines = expanded ? 8 : 1;
         BtnCommandExpand.Content = expanded ? "▴" : "▾";
+        ApplyScrollAffordance(TxtCommand, TxtCommand.IsPointerOver);
     }
 
     private void OnToggleAiDetails(object? sender, RoutedEventArgs e) => SetAiDetails(!AiDetails.IsVisible);
