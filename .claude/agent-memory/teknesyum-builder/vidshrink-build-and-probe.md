@@ -69,3 +69,11 @@ yoksa App.dll kilitli kalir.
 - Canli test iskeleti `FillBandTests.cs`'te: `LiveSourceTheoryAttribute` (`VIDSHRINK_LIVE_SOURCE`
   yoksa Skip). Ayni namespace'ten kullanilabiliyor; `Fact` karsiligi
   `LiveSourceFactAttribute` `CalibrationProbeTests.cs`'te.
+- GUI kosturan bir exe'yi PowerShell'den olcerken `Start-Process -Wait` asilir (acilan
+  pencere kapanana kadar bekler). Calisan kalip: `[Diagnostics.Process]::Start($psi)` +
+  `WaitForExit()`, sonra `Get-Process VidShrink.App | Stop-Process -Force`.
+- Scratchpad yolu 8.3 kisa adla (`TEKNES~1`) geliyor; `FileInfo.FullName` uzun adi
+  dondugu icin `Substring($kok.Length+1)` ile goreli yol cikarmak bir karakter kayiyor.
+  Once `(Get-Item $kok).FullName` ile normalize et.
+- PE alt sistemini dogrulama: `$pe = [BitConverter]::ToInt32($bytes,0x3C)`,
+  `[BitConverter]::ToUInt16($bytes,$pe+92)` -> 2 GUI, 3 konsol.
