@@ -1,6 +1,6 @@
 ---
 name: vidshrink-arayuz-dogrulama
-description: VidShrink WPF arayüzünü ekranda doğrulamanın işe yarayan yolu — computer-use ve UI Automation bu projede çalışmıyor
+description: VidShrink arayüzünü ekranda doğrulama — Avalonia'da UI Automation çalışıyor, computer-use çalışmıyor, PrintWindow yakalama kalıbı
 metadata:
   type: project
 ---
@@ -44,3 +44,19 @@ computer-use ve UIA denemesiyle tur harcama.
   pencere dikdörtgenine göre farkıyla yap.
 - Uygulama çalışırken `dotnet build` MSB3021 ile düşüyor. Yakalamadan önce
   `Get-Process VidShrink.App | Stop-Process -Force`.
+
+**Not (2026-08-23, T21 — Avalonia'da UIA artık tam çalışıyor):** WPF'teki 23 öğelik
+kısır ağaç geçti; Avalonia penceresinde 168 öğe görünüyor ve arayüzün tamamı sürülebilir.
+İşleyen kalıp: pid'e göre pencereyi bul, `AutomationIdProperty` ile `x:Name` üzerinden
+öğeyi al, `InvokePattern` ile düğmeye bas, `TogglePattern` ile onay kutusu, `ValuePattern`
+ile `TxtTarget`, `RangeValuePattern` ile `SliderTarget`. `TextBlock` metni UIA'da `Name`
+olarak okunuyor, yani ekrandaki dinamik metni doğrulamak için ekran görüntüsü şart değil.
+
+Üç tuzak:
+- `ChkFastGpu` açılışta `IsEnabled=False`; donanım taraması bitene kadar bekle, yoksa
+  `Toggle()` özel durum atar. 12 saniye yetmiyor, `IsEnabled` olana kadar dönerek bekle.
+- `TxtTarget` üzerinde `ValuePattern.SetValue` metni değiştirmek yerine araya sokuyor
+  ("100" → "dü100"). Hedefi hazır çip düğmesiyle (`Name` = "8"/"25"/"100") ya da
+  `SliderTarget` üzerinde `RangeValuePattern.SetValue` ile ayarla.
+- `GetWindowTextW` P/Invoke bildirimine `CharSet = CharSet.Unicode` yazmazsan başlık tek
+  harf ("V") dönüyor ve pencere eşleşmesi sessizce başarısız oluyor.
