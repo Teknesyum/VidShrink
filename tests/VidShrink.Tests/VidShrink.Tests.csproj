@@ -6,7 +6,15 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+  <!--
+    T27: ipucu satırlarının genişliği uygulamanın kendi yazı tipiyle ölçülüyor. Yazı tipi
+    VidShrink.App içine gömülü, sistemde kurulu değil; sistem yazı tipiyle ölçüm yanlış
+    çıkar. Uygulamaya başvurulduğu için ölçüm aynı avares:// kaynağını okuyor ve satırı
+    uygulamanın kullandığı Avalonia metin dizgicisiyle bölüyor.
+  -->
   <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
@@ -15,6 +23,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- T27: ölçüm ekrandaki metni LanguageCatalog.Title() geçidinden geçirerek alır. -->
+    <ProjectReference Include="..\..\src\VidShrink.App\VidShrink.App.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />
   </ItemGroup>
