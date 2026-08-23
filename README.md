@@ -153,8 +153,10 @@ Release history is in [`CHANGELOG.md`](CHANGELOG.md). The current engine audit, 
 
 ## License
 
-VidShrink itself is MIT licensed; the terms are in [`LICENSE`](LICENSE).
+AGPL-3.0-or-later — see [LICENSE](LICENSE).
 
-**FFmpeg is a separate program under its own license, and VidShrink does not redistribute it.** On Windows the installer asks WinGet for `Gyan.FFmpeg`, whose builds are GPLv3. On macOS and Linux the installer installs nothing — it prints your package manager's command and you fetch FFmpeg yourself. Either way the binary arrives on your own machine, under its own terms, at install time. It is not in this repository and not inside anything this repository hands out. VidShrink runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the MIT application.
+Copyright (C) 2026 Teknesyum
 
-That separation is what keeps the two licenses apart, and it holds only while no packaged download exists. **Shipping a VidShrink release with an FFmpeg binary inside it would place a GPLv3 build in an MIT product and pull in the GPL's source-offer and license-notice obligations.** Such a release would first have to move to an LGPL FFmpeg build or adopt the GPLv3 terms. That decision has not been taken and no packaged release is published.
+**FFmpeg is a separate program under its own license, and VidShrink does not redistribute it.** On Windows the installer asks WinGet for `Gyan.FFmpeg`, whose builds are GPLv3. On macOS and Linux the installer installs nothing — it prints your package manager's command and you fetch FFmpeg yourself. Either way the binary arrives on your own machine, under its own terms, at install time. It is not in this repository and not inside anything this repository hands out. VidShrink runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the AGPL-3.0 application.
+
+That separation is what keeps the two licenses apart, and it holds only while no packaged download exists. **Shipping a VidShrink release with an FFmpeg binary inside it would place a GPLv3 build in an AGPL-3.0 product and pull in the GPL's source-offer and license-notice obligations.** Such a release would first have to move to an LGPL FFmpeg build or adopt the GPLv3 terms. That decision has not been taken and no packaged release is published.
