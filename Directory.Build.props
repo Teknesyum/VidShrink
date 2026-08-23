@@ -1,0 +1,21 @@
+<Project>
+
+  <!-- The single place the version is written. Every project under this directory picks
+       it up; no csproj carries a version of its own. The release workflow checks that the
+       pushed tag is v$(Version) and that CHANGELOG.md has a heading for it. -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>Teknesyum</Company>
+    <Product>VidShrink</Product>
+    <Authors>Teknesyum</Authors>
+    <Copyright>Copyright (c) Teknesyum</Copyright>
+    <!-- CI passes -p:SourceRevisionId=<short sha>, which the SDK appends to
+         AssemblyInformationalVersion as "1.0.0+abc1234". A local build leaves it empty
+         and the informational version stays "1.0.0". -->
+    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+</Project>
