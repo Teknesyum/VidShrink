@@ -45,8 +45,10 @@ public partial class MainWindow : Window
     private const string AutoUpdateEffectEnglish = "When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it.";
     private const string NoSelfUpdateEffectEnglish = "VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it.";
 
-    private const string HardwareTipEnglish ="The graphics card encodes many times faster than the processor. VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed. On older cards the speed still arrives, but it costs some quality per megabyte.";
-    private const string NoHardwareTipEnglish = "No usable hardware encoder was found on this computer, so fast shrink is unavailable. The graphics card would normally encode many times faster than the processor.";
+    // Bu iki metnin LanguageCatalog içinde birebir karşılığı olmalı. Metni değiştirirsen
+    // sözlüğü de değiştir; TipTranslationTests eşleşmeyi ölçer.
+    private const string HardwareTipEnglish = "• The graphics card encodes many times faster than the processor.\n• VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.";
+    private const string NoHardwareTipEnglish = "• No usable hardware encoder was found on this computer, so fast shrink is unavailable.\n• The graphics card would normally encode many times faster than the processor.";
 
     private static readonly string[] MediaExtensions =
     {

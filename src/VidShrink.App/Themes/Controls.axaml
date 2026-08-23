@@ -17,9 +17,15 @@
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
       </ControlTheme>
 
+      <!--
+        Balonun genişliği içerikten gelir: TextBlock genişliği kendi metnine göre ölçülür,
+        yalnızca tavana dayandığında satır böler. Tavan balonun kendi tavanıyla aynı
+        belirteçtir (TooltipMaxWidth), böylece iki ayrı sınır birbirini kırpmaz. TipMaxWidth
+        açılış paneline ait, ipucuna değil.
+      -->
       <ControlTheme x:Key="TipText" TargetType="TextBlock" BasedOn="{StaticResource Body}">
         <Setter Property="TextWrapping" Value="Wrap"/>
-        <Setter Property="MaxWidth" Value="{StaticResource TipMaxWidth}"/>
+        <Setter Property="MaxWidth" Value="{StaticResource TooltipMaxWidth}"/>
         <Setter Property="LineHeight" Value="{StaticResource LineHeightBody}"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
       </ControlTheme>

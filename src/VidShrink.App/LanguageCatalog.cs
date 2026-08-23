@@ -183,7 +183,7 @@ internal static class LanguageCatalog
         ["Estimated size"] = "Tahmini boyut",
         ["FFmpeg command"] = "FFmpeg komutu",
         ["AI settings"] = "AI ayarları",
-        ["Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer."] = "İsteğe bağlı. İstemi herhangi bir sohbet AI'ına kopyalayın, ardından JSON yanıtını yapıştırıp doğrulayın.",
+        ["• This step is optional.\n• Copy a prompt to any chat AI, then paste and validate its JSON answer."] = "• Bu adım isteğe bağlı.\n• İstemi herhangi bir sohbet AI'ına kopyalayın, ardından JSON yanıtını yapıştırıp doğrulayın.",
         ["Copy prompt"] = "İstemi kopyala",
         ["Apply pasted JSON"] = "Yapıştırılan JSON'u uygula",
         ["Back to automatic"] = "Otomatiğe dön",
