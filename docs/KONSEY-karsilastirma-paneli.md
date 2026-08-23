@@ -289,3 +289,21 @@ panel iki barınak arasında çırpınır.
 
 Ayrıca `t=1`'in ötesinde tekerleğin ne yapacağı kararlaştırılmalı: hiçbir şey mi, yoksa
 yalnız görüntüyü yakınlaştırmaya devam mı.
+
+---
+
+## Kullanıcının kararı — 24.08.2026
+
+**Tavan: tüm program.** Opus'un B okuması seçildi. Panel en büyük hâlinde tam ekrana yakın
+bir görüntü verecek, boyutu programın tamamı kadar olacak.
+
+Opus'un B için yazdığı teknik şartlar bağlayıcı:
+
+- Terfi anında panelin pencere içindeki dikdörtgeni ölçülür
+- Kök katmandaki kopya **tam o dikdörtgende** doğar
+- Banda aynı boyutta bir yer tutucu bırakılır
+- Geri dönüşte histerezis olur: terfi t=1.00'de, iniş t=0.92'de
+
+Histerezisin sebebi: yoksa titrek tekerlekte panel iki barınak arasında çırpınır.
+
+**Tavana varınca tekerlek durur.** t=1'in ötesinde yakınlaştırmaya devam edilmeyecek.
