@@ -93,16 +93,21 @@ internal static class TipLineMetrics
         }
 
         return new Typeface(new FontFamily(
-            "avares://VidShrink.Tests/Fonts#Atkinson Hyperlegible Next"));
+            "avares://VidShrink.App/Fonts#Atkinson Hyperlegible Next"));
     }
 
     /// <summary>
     /// Bir ipucu metnindeki her mantıksal satırı ölçer. Boş satırlar atlanır.
+    ///
+    /// Ekranda görünen metin ham metin değil: uygulama her metni
+    /// <c>LanguageCatalog.Title</c> geçidinden geçiriyor ve büyük harf küçük harften
+    /// geniştir. Ölçüm de aynı geçitten geçer, yoksa satırlar olduğundan dar görünür.
     /// </summary>
-    internal static IEnumerable<LineMeasurement> Measure(string source, string language, string text)
+    internal static IEnumerable<LineMeasurement> Measure(
+        string source, string language, string text, bool turkish)
     {
         var typeface = Prepare();
-        var lines = text.Split('\n');
+        var lines = VidShrink.App.LanguageCatalog.Title(text, turkish).Split('\n');
 
         for (var index = 0; index < lines.Length; index++)
         {
@@ -135,9 +140,9 @@ internal static class TipLineMetrics
         foreach (var tip in TipSources.ReadTips())
         {
             var label = Label(tip);
-            all.AddRange(Measure(label, "EN", tip.Text));
-            if (catalogue.TryGetValue(tip.Text, out var turkish))
-                all.AddRange(Measure(label, "TR", turkish));
+            all.AddRange(Measure(label, "EN", tip.Text, turkish: false));
+            if (catalogue.TryGetValue(tip.Text, out var translated))
+                all.AddRange(Measure(label, "TR", translated, turkish: true));
         }
 
         return all;

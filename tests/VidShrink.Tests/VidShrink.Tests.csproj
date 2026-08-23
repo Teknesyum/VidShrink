@@ -8,16 +8,10 @@
   </PropertyGroup>
   <!--
     T27: ipucu satırlarının genişliği uygulamanın kendi yazı tipiyle ölçülüyor. Yazı tipi
-    projeye gömülü, sistemde kurulu değil; sistem yazı tipiyle ölçüm yanlış çıkar. Bu
-    yüzden aynı .ttf dosyaları buraya da kaynak olarak bağlanıyor (kopyalanmıyor) ve ölçüm
-    uygulamanın kullandığı Avalonia metin dizgicisiyle yapılıyor.
+    VidShrink.App içine gömülü, sistemde kurulu değil; sistem yazı tipiyle ölçüm yanlış
+    çıkar. Uygulamaya başvurulduğu için ölçüm aynı avares:// kaynağını okuyor ve satırı
+    uygulamanın kullandığı Avalonia metin dizgicisiyle bölüyor.
   -->
-  <ItemGroup>
-    <AvaloniaResource Include="..\..\src\VidShrink.App\Fonts\AtkinsonHyperlegibleNext-Regular.ttf" Link="Fonts\AtkinsonHyperlegibleNext-Regular.ttf" />
-    <AvaloniaResource Include="..\..\src\VidShrink.App\Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" Link="Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" />
-    <AvaloniaResource Include="..\..\src\VidShrink.App\Fonts\AtkinsonHyperlegibleNext-Bold.ttf" Link="Fonts\AtkinsonHyperlegibleNext-Bold.ttf" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.20" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
@@ -29,6 +23,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- T27: ölçüm ekrandaki metni LanguageCatalog.Title() geçidinden geçirerek alır. -->
+    <ProjectReference Include="..\..\src\VidShrink.App\VidShrink.App.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />
   </ItemGroup>

@@ -323,7 +323,7 @@
                         <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="May lower frame rate"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="May lower frame rate">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Halving the frame rate frees bits for the remaining frames.&#10;• The engine only does this on hard targets and never drops below a level where motion starts to stutter.&#10;• Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• Halving the frame rate frees bits for the frames left.&#10;• The engine only does this on hard targets and never drops below a level where motion starts to stutter.&#10;• Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -341,7 +341,7 @@
                         <TextBlock Text="Fill policy" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Fill policy">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Fill target lands close to the target size and squeezes out the best quality the budget allows.&#10;• Stay at quality ceiling stops when quality stops improving: no padding, but the file can end up noticeably smaller."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• Fill target lands close to the target size and squeezes out the best quality the budget allows.&#10;• Stay at quality ceiling stops when quality stops improving: no padding, but the file can come out smaller."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -355,7 +355,7 @@
                         <TextBlock Text="HDR" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="HDR">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Preserving HDR keeps the source's wider color and brightness range, but the file is larger 10-bit and only recent devices and apps play it correctly.&#10;• Converting to SDR tone-maps the picture to the standard range — smaller, and safe on WhatsApp and any phone."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• Preserving HDR keeps the source's wider color and brightness range, but the file is larger 10-bit and only recent devices and apps play it correctly.&#10;• Converting to SDR maps the picture to the standard range — smaller, safe on WhatsApp and any phone."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -424,7 +424,7 @@
                           <TextBlock x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource OutFactLabel}"/>
                           <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated time">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" Text="• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file rather than from a table of presets.&#10;• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.&#10;• When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."/>
+                              <TextBlock Theme="{StaticResource TipText}" Text="• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.&#10;• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.&#10;• When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."/>
                             </ToolTip.Tip>
                           </Button>
                         </StackPanel>
@@ -443,7 +443,7 @@
                           <TextBlock x:Name="LblEstimate" Text="Estimated output" Theme="{StaticResource OutFactLabel}"/>
                           <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated output">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" Text="• Before planning, VidShrink encodes short samples of this exact clip at two resolutions and measures how many bits it really needs — it does not guess from the source bitrate.&#10;• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.&#10;• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see."/>
+                              <TextBlock Theme="{StaticResource TipText}" Text="• Before planning, VidShrink encodes short samples of this clip at two resolutions and measures how many bits it needs — it does not guess from the source bitrate.&#10;• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.&#10;• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see."/>
                             </ToolTip.Tip>
                           </Button>
                         </StackPanel>
@@ -530,7 +530,7 @@
                         <TextBlock Text="Video codec" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Video codec">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• H.264 plays on nearly every device ever made and is what WhatsApp expects; pick it when the file has to just work.&#10;• H.265 makes files roughly a third smaller at the same picture, and every phone since about 2016 decodes it in hardware — but older handsets, some smart TVs, and several web players will not open it, and WhatsApp may re-encode it.&#10;• VP9 is a browser and WebM format; phones play it in apps but rarely in the gallery.&#10;• AV1 compresses best and is the slowest to encode, and only recent phones decode it.&#10;• Copy keeps the original video untouched — no quality loss, no waiting — whenever the container accepts it."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• H.264 plays on nearly every device made and is what WhatsApp expects; pick it when the file must just work.&#10;• H.265 makes files a third smaller at the same picture, and every phone since 2016 decodes it in hardware.&#10;• But older handsets, some smart TVs, and several web players will not open it, and WhatsApp may re-encode it.&#10;• VP9 is a browser and WebM format; phones play it in apps but rarely in the gallery.&#10;• AV1 compresses best and is the slowest to encode, and only recent phones decode it.&#10;• Copy keeps the original video untouched — no quality loss, no waiting — whenever the container accepts it."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -548,7 +548,7 @@
                         <TextBlock Text="Quality mode" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Quality mode">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• CRF targets visual quality, so final size can vary.&#10;• Fixed bitrate targets a data rate, so size stays predictable.&#10;• Use CRF for normal viewing quality and fixed bitrate when size or bandwidth matters more."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• CRF targets visual quality, so final size can vary.&#10;• Fixed bitrate targets a data rate, so size is predictable.&#10;• Use CRF for normal viewing quality and fixed bitrate when size or bandwidth matters more."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -578,7 +578,7 @@
                         <TextBlock Text="Resolution" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Resolution">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Source keeps the original dimensions.&#10;• A numbered option limits output height while preserving aspect ratio.&#10;• Lower resolution reduces file size and processing demand.&#10;• Custom allows an exact width and height."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• Source keeps the original dimensions.&#10;• A numbered option limits output height while preserving aspect ratio.&#10;• Lower resolution reduces file size and processing load.&#10;• Custom allows an exact width and height."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -628,7 +628,7 @@
                         <TextBlock Text="Custom FPS" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Custom FPS">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Used only when frame rate is custom.&#10;• Enter the desired frames per second, such as 25 or 29.97.&#10;• Values above the source frame rate usually add no real motion detail."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• Used only when frame rate is custom.&#10;• Enter the frames per second, such as 25 or 29.97.&#10;• Values above the source frame rate usually add no real motion detail."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -640,7 +640,7 @@
                         <TextBlock Text="Audio" Theme="{StaticResource Label}"/>
                         <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Audio">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• AAC is the safe pairing for MP4 and the only audio codec every phone and WhatsApp handle without complaint.&#10;• Opus sounds better at low bitrates but belongs in WebM; inside MP4 it will not play on many phones.&#10;• MP3 suits older players.&#10;• PCM is uncompressed and very large.&#10;• Copy preserves the original audio without re-encoding when the container supports it.&#10;• Drop removes audio completely, which is the right call when you are squeezing a silent clip."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• AAC is the safe pairing for MP4 and the only audio codec every phone and WhatsApp take without complaint.&#10;• Opus sounds better at low bitrates but belongs in WebM; inside MP4 it will not play on many phones.&#10;• MP3 suits older players.&#10;• PCM is uncompressed and very large.&#10;• Copy preserves the original audio without re-encoding when the container supports it.&#10;• Drop removes audio completely, which is the right call when you are squeezing a silent clip."/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
