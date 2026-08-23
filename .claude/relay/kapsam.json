@@ -290,7 +290,7 @@
   "src/VidShrink.App/VidShrink.App.csproj": {
     "model": "claude-opus-5",
     "effort": "high",
-    "t": "2026-08-22 19:01:32",
+    "t": "2026-08-23 17:04:47",
     "ajan": "ana oturum"
   },
   "src/VidShrink.App/Themes/Theme.axaml": {
@@ -495,6 +495,18 @@
     "model": "claude-opus-5",
     "effort": "high",
     "t": "2026-08-23 15:29:30",
+    "ajan": "ana oturum"
+  },
+  "pe.py": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-23 17:04:31",
+    "ajan": "ana oturum"
+  },
+  "winexe.py": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-23 17:05:28",
     "ajan": "ana oturum"
   }
 }

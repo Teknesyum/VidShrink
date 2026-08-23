@@ -53,6 +53,11 @@ tags yet, so releases are grouped by the day their work landed on `main`.
 
 ### Fixed
 
+- Launching the application no longer opens a console window beside it. The project was
+  built as `OutputType Exe`, which is the console subsystem on Windows; a desktop
+  Avalonia application has to be `WinExe`. Measured in the PE header: the executable's
+  subsystem field went from 3 (console) to 2 (GUI).
+
 - The application no longer crashes on startup. Setting `WindowState` in XAML makes
   `OnPropertyChanged` run before `InitializeComponent` has finished, and the maximize
   button was still null when the handler reached for it. The build did not show this; it
