@@ -550,5 +550,11 @@
     "effort": "medium",
     "t": "2026-08-23 18:07:25",
     "ajan": "builder"
+  },
+  "sln.py": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-23 18:26:39",
+    "ajan": "ana oturum"
   }
 }
