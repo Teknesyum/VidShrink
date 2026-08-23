@@ -131,7 +131,10 @@ internal static class LanguageCatalog
         ["Update automatically"] = "Kendiliğinden güncelle",
         ["When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."] = "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
         ["VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it."] = "VidShrink bu sistemde kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
-        ["A new version is available"] = "Yeni bir sürüm var"
+        ["A new version is available"] = "Yeni bir sürüm var",
+        ["Over the target"] = "Hedefin üzerinde",
+        ["Try again"] = "Tekrar dene",
+        ["Leave it as is"] = "Bu haliyle bırak"
     };
 
     internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish = EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);
@@ -177,5 +180,37 @@ internal static class LanguageCatalog
             if (match.Success) return string.Format(template, match.Groups[1].Value.Trim(), match.Groups[2].Value.Trim());
         }
         return english;
+    }
+
+    /// <summary>
+    /// The question shown when an attempt lands over the target and another attempt is still allowed.
+    /// Every number arrives already formatted by the caller, so no formatting lives in the translation.
+    /// </summary>
+    internal static (string Outcome, string Meaning) RetryQuestion(
+        bool turkish,
+        string attempt,
+        string maxAttempts,
+        string actualMb,
+        string targetMb,
+        string overMb,
+        string overPercent,
+        string attemptDuration,
+        bool hasUnderBandFallback,
+        string fallbackMb)
+    {
+        if (turkish)
+        {
+            var outcome = $"{attempt}/{maxAttempts}. deneme {actualMb} MB çıktı — {targetMb} MB hedefinin {overMb} MB (%{overPercent}) üzerinde. Bu deneme {attemptDuration} sürdü; yeni bir deneme kabaca aynı süreyi alır.";
+            var meaning = hasUnderBandFallback
+                ? $"“Bu haliyle bırak” taşan dosyayı teslim etmek değildir; koşuyu bitirir. Hedeften büyük dosya asla verilmez: hedefin altında kalan son sonuç ({fallbackMb} MB) teslim edilir."
+                : "“Bu haliyle bırak” taşan dosyayı teslim etmek değildir; koşuyu bitirir. Hedeften büyük dosya asla verilmez ve hedefin altında kalan bir sonuç henüz yok, bu yüzden dosya yazılmaz.";
+            return (outcome, meaning);
+        }
+
+        var outcomeEn = $"Attempt {attempt} of {maxAttempts} came out at {actualMb} MB — {overMb} MB ({overPercent}%) over the {targetMb} MB target. It took {attemptDuration}; another attempt would take about the same.";
+        var meaningEn = hasUnderBandFallback
+            ? $"“Leave it as is” does not hand you the oversized file; it ends the run. A file larger than the target is never handed back: the last result that stayed under the target ({fallbackMb} MB) is delivered instead."
+            : "“Leave it as is” does not hand you the oversized file; it ends the run. A file larger than the target is never handed back, and no result has stayed under the target yet, so no file will be written.";
+        return (outcomeEn, meaningEn);
     }
 }

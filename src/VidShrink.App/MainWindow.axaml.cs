@@ -82,6 +82,8 @@ public partial class MainWindow : Window
     private string? _ffmpegVersion;
     private bool _syncing;
     private bool _turkish;
+    private TaskCompletionSource<bool>? _retryDecision;
+    private RetryPrompt? _activeRetryPrompt;
     private bool _languageApplied;
     private bool _hardwareProbed;
     private bool _hardwareEncoderAvailable;
@@ -372,6 +374,7 @@ public partial class MainWindow : Window
         BtnTr.IsEnabled = !turkish;
         BtnEn.IsEnabled = turkish;
         ApplyFastGpuTip();
+        if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         UpdateToolStatus();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
@@ -1244,6 +1247,7 @@ public partial class MainWindow : Window
             SetRunning(true);
             TxtResult.Text = "";
             BtnReveal.IsVisible = false;
+            HideRetryAsk();
             var progress = new Progress<EncodeProgress>(p =>
             {
                 Progress.Value = p.Fraction;
@@ -1252,7 +1256,7 @@ public partial class MainWindow : Window
                 if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB";
             });
 
-            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile);
+            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync);
             _lastOutput = result.OutputPath;
 
             if (result.Success)
@@ -1290,10 +1294,64 @@ public partial class MainWindow : Window
         {
             _cts = null;
             cts.Dispose();
+            HideRetryAsk();
             SetRunning(false);
             RefreshConversion();
         }
     }
+
+    // The engine stops after an attempt that lands over the target and hands the decision here.
+    // Nothing blocks: the panel is shown, the awaited task completes when a button is pressed.
+    private async Task<bool> AskBeforeRetryAsync(RetryPrompt prompt, CancellationToken ct)
+    {
+        var decision = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _retryDecision = decision;
+
+        await Dispatcher.UIThread.InvokeAsync(() => ShowRetryAsk(prompt));
+        using var cancellation = ct.Register(() => decision.TrySetCanceled(ct));
+
+        try
+        {
+            return await decision.Task;
+        }
+        finally
+        {
+            _retryDecision = null;
+            await Dispatcher.UIThread.InvokeAsync(HideRetryAsk);
+        }
+    }
+
+    private void ShowRetryAsk(RetryPrompt prompt)
+    {
+        _activeRetryPrompt = prompt;
+        TxtOutSize.Text = $"{prompt.ActualMb:0.0} MB";
+        var (outcome, meaning) = LanguageCatalog.RetryQuestion(
+            _turkish,
+            prompt.Attempt.ToString(CultureInfo.CurrentCulture),
+            prompt.MaxAttempts.ToString(CultureInfo.CurrentCulture),
+            prompt.ActualMb.ToString("0.0", CultureInfo.CurrentCulture),
+            prompt.TargetMb.ToString("0.##", CultureInfo.CurrentCulture),
+            prompt.OverMb.ToString("0.0", CultureInfo.CurrentCulture),
+            prompt.OverPercent.ToString("0.#", CultureInfo.CurrentCulture),
+            prompt.AttemptDuration.ToString(@"mm\:ss"),
+            prompt.HasUnderBandFallback,
+            prompt.FallbackMb.ToString("0.0", CultureInfo.CurrentCulture));
+
+        TxtRetryOutcome.Text = outcome;
+        TxtRetryMeaning.Text = meaning;
+        RetryAskPanel.IsVisible = true;
+        SetStage(TxtStage, T("Kararınız bekleniyor", "Waiting for your decision"));
+    }
+
+    private void HideRetryAsk()
+    {
+        _activeRetryPrompt = null;
+        RetryAskPanel.IsVisible = false;
+    }
+
+    private void OnRetryAgain(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(true);
+
+    private void OnRetryStop(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(false);
 
     private ConversionPlan ReadConversionPlan()
     {

@@ -442,6 +442,23 @@
                     </UniformGrid>
                     <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <TextBlock x:Name="TxtResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    <Border x:Name="RetryAskPanel"
+                            IsVisible="False"
+                            Background="{StaticResource NeonPinkFill}"
+                            BorderBrush="{StaticResource NeonPink}"
+                            BorderThickness="{StaticResource BorderThin}"
+                            CornerRadius="{StaticResource RadiusCell}"
+                            Padding="{StaticResource PanelPadding}">
+                      <StackPanel Spacing="{StaticResource SpaceSm}">
+                        <TextBlock Text="Over the target" Theme="{StaticResource H3}"/>
+                        <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
+                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
+                        <WrapPanel>
+                          <Button x:Name="BtnRetryAgain" Content="Try again" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
+                          <Button x:Name="BtnRetryStop" Content="Leave it as is" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
+                        </WrapPanel>
+                      </StackPanel>
+                    </Border>
                     <Button x:Name="BtnReveal" Content="Show in folder" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
                   </StackPanel>
                 </Border>

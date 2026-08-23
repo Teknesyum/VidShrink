@@ -12,6 +12,28 @@ public sealed record EncodeAttempt(int Number, string Branch, double AimMb, doub
 public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null);
 public sealed record ConversionResult(string OutputPath, double OutputMb);
 
+/// <summary>
+/// What the caller is told when an attempt lands over the target and another attempt is still allowed.
+/// </summary>
+public sealed record RetryPrompt(
+    int Attempt,
+    int MaxAttempts,
+    double TargetMb,
+    double ActualMb,
+    TimeSpan AttemptDuration,
+    bool HasUnderBandFallback,
+    double FallbackMb)
+{
+    public double OverMb => ActualMb - TargetMb;
+    public double OverPercent => TargetMb > 0 ? (ActualMb - TargetMb) / TargetMb * 100.0 : 0.0;
+}
+
+/// <summary>
+/// Returns true to run one more attempt, false to end the run. Ending the run never hands back an
+/// oversized file: the last under-band result is delivered if there is one, otherwise no file is written.
+/// </summary>
+public delegate Task<bool> RetryDecisionAsync(RetryPrompt prompt, CancellationToken ct);
+
 public sealed class EncodeRunner
 {
     private const double ToleranceOver = 1.0;
@@ -25,7 +47,8 @@ public sealed class EncodeRunner
         IProgress<EncodeProgress>? progress,
         CancellationToken ct = default,
         FillPolicy fillPolicy = FillPolicy.QualityCeiling,
-        ComplexityProfile? profile = null)
+        ComplexityProfile? profile = null,
+        RetryDecisionAsync? askBeforeRetry = null)
     {
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return PassThrough(info, plan, outputPath);
@@ -49,6 +72,7 @@ public sealed class EncodeRunner
             {
                 attempt++;
                 var twoPass = current.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(current.Codec);
+                var attemptClock = Stopwatch.StartNew();
 
                 if (twoPass)
                 {
@@ -60,6 +84,7 @@ public sealed class EncodeRunner
                     await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, ct);
                 }
 
+                attemptClock.Stop();
                 var actualMb = new FileInfo(partialPath).Length / 1024.0 / 1024.0;
                 var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, info.DurationSeconds);
                 var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
@@ -93,7 +118,10 @@ public sealed class EncodeRunner
                 {
                     trace.Add(new EncodeAttempt(attempt, "over ceiling", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
 
-                    if (attempt >= MaxAttempts)
+                    // Ending the run — whether the attempt ceiling was hit or the user chose to stop —
+                    // never hands back the oversized file. The last under-band result is delivered if
+                    // there is one; otherwise no file is written and the reason is reported.
+                    EncodeResult EndRun()
                     {
                         TryDelete(partialPath);
 
@@ -107,6 +135,27 @@ public sealed class EncodeRunner
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
                             $"Stayed over the {effectiveTargetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
                             UnderBand: false, CeilingExceeded: true, Trace: trace);
+                    }
+
+                    if (attempt >= MaxAttempts)
+                        return EndRun();
+
+                    if (askBeforeRetry is not null)
+                    {
+                        var prompt = new RetryPrompt(
+                            attempt,
+                            MaxAttempts,
+                            effectiveTargetMb,
+                            actualMb,
+                            attemptClock.Elapsed,
+                            fallbackPlan is not null && File.Exists(fallbackPath),
+                            fallbackMb);
+
+                        if (!await askBeforeRetry(prompt, ct))
+                        {
+                            trace.Add(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                            return EndRun();
+                        }
                     }
 
                     current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
