@@ -1,10 +1,127 @@
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace VidShrink.App;
 
 internal static class LanguageCatalog
 {
-    internal static readonly IReadOnlyDictionary<string, string> EnglishToTurkish = new Dictionary<string, string>
+    /// <summary>
+    /// Turkish casing. The invariant culture maps <c>i</c> to <c>I</c> and writes "Islem" where
+    /// "İşlem" belongs, so every Turkish capitalisation goes through this culture instead.
+    /// </summary>
+    private static readonly CultureInfo TurkishCulture = CultureInfo.GetCultureInfo("tr-TR");
+
+    /// <summary>Conjunctions stay lower case unless they open the line.</summary>
+    private static readonly HashSet<string> Conjunctions =
+        new(StringComparer.Ordinal) { "ve", "veya", "ile", "ki", "da", "de" };
+
+    /// <summary>
+    /// Names and abbreviations that are written a fixed way. A word typed in lower case here is
+    /// restored to its own spelling instead of getting a single capital.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> Names =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["ffmpeg"] = "FFmpeg",
+            ["mp4"] = "MP4",
+            ["mp3"] = "MP3",
+            ["m4a"] = "M4A",
+            ["wav"] = "WAV",
+            ["mkv"] = "MKV",
+            ["mov"] = "MOV",
+            ["avi"] = "AVI",
+            ["gif"] = "GIF",
+            ["webm"] = "WebM",
+            ["aac"] = "AAC",
+            ["pcm"] = "PCM",
+            ["opus"] = "Opus",
+            ["crf"] = "CRF",
+            ["json"] = "JSON",
+            ["gpu"] = "GPU",
+            ["cpu"] = "CPU",
+            ["api"] = "API",
+            ["hdr"] = "HDR",
+            ["sdr"] = "SDR",
+            ["fps"] = "FPS",
+            ["kbps"] = "kbps",
+            ["av1"] = "AV1",
+            ["vp9"] = "VP9",
+            ["whatsapp"] = "WhatsApp",
+            ["vidshrink"] = "VidShrink",
+            ["teknesyum"] = "Teknesyum",
+            ["windows"] = "Windows",
+        };
+
+    /// <summary>
+    /// Capitalises the first letter of every word. Words that already carry a capital anywhere
+    /// (MP4, GPU, H.264, WhatsApp, FFmpeg, VidShrink) and words that do not start with a letter
+    /// (8, 1280x720, 00:01:30) are handed back untouched, so nothing is invented and nothing is
+    /// flattened. Applying it twice changes nothing.
+    /// </summary>
+    internal static string Title(string text, bool turkish)
+    {
+        if (string.IsNullOrEmpty(text)) return text;
+        var culture = turkish ? TurkishCulture : CultureInfo.InvariantCulture;
+        var builder = new StringBuilder(text.Length);
+        var index = 0;
+        var lineStart = true;
+
+        while (index < text.Length)
+        {
+            if (char.IsWhiteSpace(text[index]))
+            {
+                if (text[index] == '\n') lineStart = true;
+                builder.Append(text[index]);
+                index++;
+                continue;
+            }
+
+            var end = index;
+            while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+            var word = text[index..end];
+            builder.Append(CapitaliseWord(word, culture, lineStart));
+            lineStart = false;
+            index = end;
+        }
+
+        return builder.ToString();
+    }
+
+    private static string CapitaliseWord(string word, CultureInfo culture, bool lineStart)
+    {
+        var offset = 0;
+        while (offset < word.Length && !char.IsLetter(word[offset]))
+        {
+            // A digit before the first letter means the word is a measurement, not a name.
+            if (char.IsDigit(word[offset])) return word;
+            offset++;
+        }
+
+        if (offset == word.Length) return word;
+
+        var body = word[offset..];
+        var bare = new string(body.TakeWhile(char.IsLetter).ToArray());
+        var token = new string(body.TakeWhile(char.IsLetterOrDigit).ToArray());
+
+        if (Names.TryGetValue(token, out var known))
+            return string.Concat(word.AsSpan(0, offset), known, body.AsSpan(token.Length));
+        if (Names.TryGetValue(bare, out var name))
+            return string.Concat(word.AsSpan(0, offset), name, body.AsSpan(bare.Length));
+
+        foreach (var letter in body)
+            if (char.IsUpper(letter))
+                return word;
+
+        if (!lineStart && Conjunctions.Contains(bare)) return word;
+
+        return string.Concat(
+            word.AsSpan(0, offset),
+            body[..1].ToUpper(culture),
+            body.AsSpan(1));
+    }
+
+    private static readonly IReadOnlyDictionary<string, string> EnglishSource = new Dictionary<string, string>
     {
         ["Minimize"] = "Simge durumuna küçült",
         ["Maximize"] = "Büyüt",
@@ -137,7 +254,15 @@ internal static class LanguageCatalog
         ["Leave it as is"] = "Bu haliyle bırak"
     };
 
-    internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish = EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);
+    /// <summary>
+    /// Both sides are stored already capitalised, so a lookup made from on-screen text finds its
+    /// partner and the answer needs no further work.
+    /// </summary>
+    internal static readonly IReadOnlyDictionary<string, string> EnglishToTurkish =
+        EnglishSource.ToDictionary(item => Title(item.Key, false), item => Title(item.Value, true));
+
+    internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish =
+        EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);
 
     private static readonly IReadOnlyDictionary<string, string> ValidationTurkish = new Dictionary<string, string>
     {
@@ -172,14 +297,14 @@ internal static class LanguageCatalog
 
     internal static string Validation(string english, bool turkish)
     {
-        if (!turkish) return english;
-        if (ValidationTurkish.TryGetValue(english, out var known)) return known;
+        if (!turkish) return Title(english, false);
+        if (ValidationTurkish.TryGetValue(english, out var known)) return Title(known, true);
         foreach (var (pattern, template) in ValidationPatterns)
         {
             var match = pattern.Match(english);
-            if (match.Success) return string.Format(template, match.Groups[1].Value.Trim(), match.Groups[2].Value.Trim());
+            if (match.Success) return Title(string.Format(template, match.Groups[1].Value.Trim(), match.Groups[2].Value.Trim()), true);
         }
-        return english;
+        return Title(english, false);
     }
 
     /// <summary>
@@ -204,13 +329,13 @@ internal static class LanguageCatalog
             var meaning = hasUnderBandFallback
                 ? $"“Bu haliyle bırak” taşan dosyayı teslim etmek değildir; koşuyu bitirir. Hedeften büyük dosya asla verilmez: hedefin altında kalan son sonuç ({fallbackMb} MB) teslim edilir."
                 : "“Bu haliyle bırak” taşan dosyayı teslim etmek değildir; koşuyu bitirir. Hedeften büyük dosya asla verilmez ve hedefin altında kalan bir sonuç henüz yok, bu yüzden dosya yazılmaz.";
-            return (outcome, meaning);
+            return (Title(outcome, true), Title(meaning, true));
         }
 
         var outcomeEn = $"Attempt {attempt} of {maxAttempts} came out at {actualMb} MB — {overMb} MB ({overPercent}%) over the {targetMb} MB target. It took {attemptDuration}; another attempt would take about the same.";
         var meaningEn = hasUnderBandFallback
             ? $"“Leave it as is” does not hand you the oversized file; it ends the run. A file larger than the target is never handed back: the last result that stayed under the target ({fallbackMb} MB) is delivered instead."
             : "“Leave it as is” does not hand you the oversized file; it ends the run. A file larger than the target is never handed back, and no result has stayed under the target yet, so no file will be written.";
-        return (outcomeEn, meaningEn);
+        return (Title(outcomeEn, false), Title(meaningEn, false));
     }
 }

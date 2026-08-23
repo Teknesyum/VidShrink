@@ -139,6 +139,7 @@ public partial class MainWindow : Window
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
 
+        ApplyTextCase();
         Loaded += OnWindowLoaded;
     }
 
@@ -353,10 +354,14 @@ public partial class MainWindow : Window
         catch (Exception ex) { TxtSystemStatus.Text = $"{T("Bağlantı açılamadı", "The link could not be opened")}: {ex.Message}"; }
     }
 
-    private string T(string turkish, string english) => _turkish ? turkish : english;
+    private string T(string turkish, string english)
+        => LanguageCatalog.Title(_turkish ? turkish : english, _turkish);
 
     private string Localize(string english)
-        => _turkish && LanguageCatalog.EnglishToTurkish.TryGetValue(english, out var turkish) ? turkish : english;
+    {
+        var titled = LanguageCatalog.Title(english, false);
+        return _turkish && LanguageCatalog.EnglishToTurkish.TryGetValue(titled, out var turkish) ? turkish : titled;
+    }
 
     private void OnTurkish(object? sender, RoutedEventArgs e) => SetLanguage(true);
     private void OnEnglish(object? sender, RoutedEventArgs e) => SetLanguage(false);
@@ -367,7 +372,7 @@ public partial class MainWindow : Window
         var translations = turkish ? LanguageCatalog.EnglishToTurkish : LanguageCatalog.TurkishToEnglish;
         var wasSyncing = _syncing;
         _syncing = true;
-        TranslateTree(this, translations, new HashSet<StyledElement>());
+        WalkText(this, value => Swap(value, translations, turkish), new HashSet<StyledElement>());
         _syncing = wasSyncing;
         _turkish = turkish;
         _languageApplied = true;
@@ -380,36 +385,51 @@ public partial class MainWindow : Window
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
     }
 
-    private void TranslateTree(StyledElement node, IReadOnlyDictionary<string, string> translations, HashSet<StyledElement> visited)
+    /// <summary>
+    /// Puts the text into the wanted language and leaves it capitalised. A lookup miss is not a
+    /// failure: the word simply stays where it is and only its casing is fixed.
+    /// </summary>
+    private static string Swap(string value, IReadOnlyDictionary<string, string> translations, bool turkish)
+    {
+        if (translations.TryGetValue(value, out var direct)) return direct;
+        if (translations.TryGetValue(LanguageCatalog.Title(value, !turkish), out var viaTitle)) return viaTitle;
+        return LanguageCatalog.Title(value, turkish);
+    }
+
+    /// <summary>Capitalises everything already on screen without changing the language.</summary>
+    private void ApplyTextCase()
+        => WalkText(this, value => LanguageCatalog.Title(value, _turkish), new HashSet<StyledElement>());
+
+    private void WalkText(StyledElement node, Func<string, string> map, HashSet<StyledElement> visited)
     {
         if (!visited.Add(node)) return;
 
         switch (node)
         {
-            case TextBlock text when text.Text is { } value && translations.TryGetValue(value, out var translatedText):
-                text.Text = translatedText;
+            case TextBlock text when text.Text is { } value:
+                text.Text = map(value);
                 break;
-            case HeaderedContentControl header when header.Header is string headerValue && translations.TryGetValue(headerValue, out var translatedHeader):
-                header.Header = translatedHeader;
+            case HeaderedContentControl header when header.Header is string headerValue:
+                header.Header = map(headerValue);
                 break;
-            case ContentControl content when content.Content is string contentValue && translations.TryGetValue(contentValue, out var translatedContent):
-                content.Content = translatedContent;
+            case ContentControl content when content.Content is string contentValue:
+                content.Content = map(contentValue);
                 break;
         }
 
         if (node is Control control)
         {
             var tip = ToolTip.GetTip(control);
-            if (tip is string tipText && translations.TryGetValue(tipText, out var translatedTip)) ToolTip.SetTip(control, translatedTip);
-            else if (tip is StyledElement tipElement) TranslateTree(tipElement, translations, visited);
+            if (tip is string tipText) ToolTip.SetTip(control, map(tipText));
+            else if (tip is StyledElement tipElement) WalkText(tipElement, map, visited);
         }
 
         if (node is ItemsControl items)
-            foreach (var item in items.Items.OfType<StyledElement>()) TranslateTree(item, translations, visited);
+            foreach (var item in items.Items.OfType<StyledElement>()) WalkText(item, map, visited);
 
-        if (node is ContentControl owner && owner.Content is StyledElement contentElement) TranslateTree(contentElement, translations, visited);
+        if (node is ContentControl owner && owner.Content is StyledElement contentElement) WalkText(contentElement, map, visited);
 
-        foreach (var child in node.GetLogicalChildren().OfType<StyledElement>()) TranslateTree(child, translations, visited);
+        foreach (var child in node.GetLogicalChildren().OfType<StyledElement>()) WalkText(child, map, visited);
 
         if (node is ComboBox combo && combo.SelectedIndex >= 0)
         {
@@ -912,7 +932,7 @@ public partial class MainWindow : Window
         var row = PlanFacts.RowDefinitions.Count;
         PlanFacts.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
 
-        var key = new TextBlock { Text = label, Theme = Look("PlanFactLabel") };
+        var key = new TextBlock { Text = LanguageCatalog.Title(label, _turkish), Theme = Look("PlanFactLabel") };
         Grid.SetRow(key, row);
         Grid.SetColumn(key, 0);
 
@@ -929,7 +949,7 @@ public partial class MainWindow : Window
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
         row.Children.Add(new TextBlock { Text = "•", Theme = Look("PlanBullet") });
 
-        var body = new TextBlock { Text = text, Theme = Look("PlanReasonText") };
+        var body = new TextBlock { Text = LanguageCatalog.Title(text, _turkish), Theme = Look("PlanReasonText") };
         Grid.SetColumn(body, 1);
         row.Children.Add(body);
 
@@ -1598,13 +1618,13 @@ public partial class MainWindow : Window
 
     private string LocalizeStage(string stage)
     {
-        if (!_turkish) return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(stage);
-        return stage.Replace("encoding", "Kodlama", StringComparison.OrdinalIgnoreCase)
+        if (!_turkish) return LanguageCatalog.Title(stage, false);
+        return LanguageCatalog.Title(stage.Replace("encoding", "Kodlama", StringComparison.OrdinalIgnoreCase)
             .Replace("converting", "Dönüştürme", StringComparison.OrdinalIgnoreCase)
             .Replace("pass", "Geçiş", StringComparison.OrdinalIgnoreCase)
             .Replace("attempt", "Deneme", StringComparison.OrdinalIgnoreCase)
             .Replace("GIF palette", "GIF paleti", StringComparison.OrdinalIgnoreCase)
-            .Replace("GIF encode", "GIF kodlama", StringComparison.OrdinalIgnoreCase);
+            .Replace("GIF encode", "GIF kodlama", StringComparison.OrdinalIgnoreCase), true);
     }
 
     private void OnCancel(object? sender, RoutedEventArgs e)
