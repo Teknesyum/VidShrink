@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -70,13 +70,15 @@ public sealed class DriveClient
     private readonly ShareLedger? _ledger;
     private readonly Func<DateTimeOffset> _clock;
     private readonly int _chunkSize;
+    private readonly SharedFileLog? _files;
 
     public DriveClient(
         IHttpTransport transport,
         IAccessTokenProvider tokens,
         ShareLedger? ledger = null,
         Func<DateTimeOffset>? clock = null,
-        int chunkSize = DefaultChunkSize)
+        int chunkSize = DefaultChunkSize,
+        SharedFileLog? files = null)
     {
         if (chunkSize <= 0 || chunkSize % ChunkAlignment != 0)
         {
@@ -87,6 +89,7 @@ public sealed class DriveClient
         _ledger = ledger;
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
         _chunkSize = chunkSize;
+        _files = files;
     }
 
     /// <summary>Bu istemcinin kullandığı parça boyu.</summary>
@@ -226,6 +229,8 @@ public sealed class DriveClient
             }
 
             _ledger?.Remove(link.FileId);
+            // Yayın kapandı, dosya durmaya devam ediyor: kayıt silinmez, yalnız durumu düşer.
+            _files?.MarkUnshared(link.FileId);
             return ShareResult.Success(link);
         }
         catch (DriveAuthException e)
@@ -356,7 +361,131 @@ public sealed class DriveClient
             Path.GetFileName(upload.FilePath),
             _clock());
         _ledger?.Add(link);
+        _files?.Record(new UploadedFile(
+            fileId,
+            link.FileName,
+            upload.TotalBytes,
+            link.SharedAt,
+            Shared: true,
+            permissionId,
+            webViewLink));
         return ShareResult.Success(link);
+    }
+
+    /// <summary>
+    /// Dosyayı Drive'dan siler. Yayını kapatmaktan farklıdır: bu çağrı yeri boşaltır, geri
+    /// dönüşü yoktur. Dosya zaten yoksa (404) amaç gerçekleşmiş sayılır.
+    /// </summary>
+    public async Task<DeleteOutcome> DeleteFileAsync(string fileId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var request = await AuthorizedAsync(
+                HttpMethod.Delete,
+                $"{FilesEndpoint}/{Uri.EscapeDataString(fileId)}",
+                cancellationToken);
+            using var response = await SendAsync(request, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                Forget(fileId);
+                return DeleteOutcome.Missing(fileId);
+            }
+            if (!response.IsSuccessStatusCode) throw await ErrorAsync(response, cancellationToken);
+
+            Forget(fileId);
+            return DeleteOutcome.Deleted(fileId);
+        }
+        catch (DriveAuthException e)
+        {
+            return DeleteOutcome.Failed(fileId, e.Failure, e.Message);
+        }
+        catch (DriveApiException e)
+        {
+            return DeleteOutcome.Failed(fileId, e.Failure, e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Uygulamanın yüklediği dosyaları Drive'dan listeler. <c>drive.file</c> kapsamı
+    /// kullanıcının Drive'ının geri kalanını göstermez. Ulaşılamazsa <c>null</c> döner.
+    /// </summary>
+    public async Task<IReadOnlyList<UploadedFile>?> ListAppFilesAsync(CancellationToken cancellationToken = default)
+    {
+        var found = new List<UploadedFile>();
+        string? pageToken = null;
+
+        try
+        {
+            do
+            {
+                var url = $"{FilesEndpoint}?spaces=drive&pageSize=100&fields="
+                    + Uri.EscapeDataString("nextPageToken,files(id,name,size,createdTime,webViewLink,trashed,permissions(id,type,role))");
+                if (pageToken is not null) url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
+
+                using var request = await AuthorizedAsync(HttpMethod.Get, url, cancellationToken);
+                using var response = await SendAsync(request, cancellationToken);
+                if (!response.IsSuccessStatusCode) throw await ErrorAsync(response, cancellationToken);
+
+                var json = await response.Content.ReadAsStringAsync(cancellationToken);
+                using var document = JsonDocument.Parse(json);
+                var root = document.RootElement;
+
+                if (root.TryGetProperty("files", out var files) && files.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var file in files.EnumerateArray())
+                    {
+                        var entry = ReadFile(file);
+                        if (entry is not null) found.Add(entry);
+                    }
+                }
+
+                pageToken = root.TryGetProperty("nextPageToken", out var next) ? next.GetString() : null;
+            }
+            while (!string.IsNullOrEmpty(pageToken));
+
+            return found;
+        }
+        catch (Exception e) when (e is DriveAuthException or DriveApiException or JsonException or HttpRequestException)
+        {
+            return null;
+        }
+    }
+
+    private void Forget(string fileId)
+    {
+        _ledger?.Remove(fileId);
+        _files?.Remove(fileId);
+    }
+
+    private UploadedFile? ReadFile(JsonElement file)
+    {
+        if (!file.TryGetProperty("id", out var id) || id.GetString() is not { Length: > 0 } fileId) return null;
+        if (file.TryGetProperty("trashed", out var trashed) && trashed.ValueKind == JsonValueKind.True) return null;
+
+        var name = file.TryGetProperty("name", out var value) ? value.GetString() ?? fileId : fileId;
+        var size = Number(file, "size") ?? 0;
+        var created = file.TryGetProperty("createdTime", out var time)
+                      && DateTimeOffset.TryParse(time.GetString(), out var parsed)
+            ? parsed
+            // Zamanı bilinmiyorsa dosya yeni sayılır; saklama süresi yüzünden erken silinmesin.
+            : _clock();
+        var link = file.TryGetProperty("webViewLink", out var web) ? web.GetString() : null;
+
+        string? permissionId = null;
+        if (file.TryGetProperty("permissions", out var permissions) && permissions.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var permission in permissions.EnumerateArray())
+            {
+                if (permission.TryGetProperty("type", out var type) && type.GetString() == "anyone")
+                {
+                    permissionId = permission.TryGetProperty("id", out var pid) ? pid.GetString() : "anyoneWithLink";
+                    break;
+                }
+            }
+        }
+
+        return new UploadedFile(fileId, name, size, created, permissionId is not null, permissionId, link);
     }
 
     private async Task<string> GetWebViewLinkAsync(string fileId, CancellationToken cancellationToken)
