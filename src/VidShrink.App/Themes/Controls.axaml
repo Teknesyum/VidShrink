@@ -27,6 +27,12 @@
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="MaxWidth" Value="{StaticResource TooltipMaxWidth}"/>
         <Setter Property="LineHeight" Value="{StaticResource LineHeightBody}"/>
+        <!--
+          K7: maddeler arasına bir kademe boşluk. Satır aralığı `SpaceXs`, yani ölçek
+          tablosunun en küçük adımı. Bu boşluk balonu yükseltir, genişletmez — satır
+          genişlikleri ve dolayısıyla `TipOverflowTests` ölçümü değişmez.
+        -->
+        <Setter Property="LineSpacing" Value="{StaticResource SpaceXs}"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
       </ControlTheme>
 
@@ -508,21 +514,28 @@
         </Style>
       </ControlTheme>
 
+      <!--
+        Windows'un kendi pencere düğmeleri gibi: bitişik, köşesiz dikdörtgenler, başlık
+        çubuğu boyunca tam yükseklikte. Yükseklik `Height` ile değil `Stretch` ile geliyor,
+        böylece kapatma düğmesi çubuğun üst pikseline kadar uzanıyor ve tam ekranda ekranın
+        köşesine dayanıyor. Genişlik yine `WindowButtonWidth`; boşluk, kenarlık ve köşe
+        yarıçapı sıfır, çünkü bitişiklik ölçü değil boşluğun yokluğudur.
+      -->
       <ControlTheme x:Key="WindowControlButton" TargetType="Button">
         <Setter Property="FocusAdorner" Value="{x:Null}"/>
         <Setter Property="Width" Value="{StaticResource WindowButtonWidth}"/>
-        <Setter Property="Height" Value="{StaticResource WindowButtonHeight}"/>
-        <Setter Property="Margin" Value="{StaticResource WindowButtonMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Margin" Value="0"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="Background" Value="{StaticResource Surface}"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
-        <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
+        <Setter Property="CornerRadius" Value="0"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="Button">
             <Border Name="Root"
