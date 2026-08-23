@@ -115,11 +115,31 @@ Below a certain bit budget something has to give. VidShrink spends the loss wher
 
 ### Measured results
 
-Development benchmark over three synthetic clips (easy gradients, standard test pattern, pure noise) at four targets each:
+Measured end to end on real footage rather than synthetic clips.
 
-- **8 of 8 runs landed under target on the first attempt** — no retry needed
+Software encoding, 400 s of 1080p60:
+
+| Target | Result | Attempts |
+|---|---|---|
+| 180 MB | 178.35 MB | 1 |
+| 100 MB | 99.16 MB | 1 |
+| 25 MB | 24.63 MB | 1 |
+| 8 MB | 7.85 MB | 1 |
+
+All four landed inside the fill band on the first attempt and the ceiling was never crossed.
+
+Hardware encoding (`av1_amf`) is not there yet. Large targets reach the band on the first attempt — 100 MB in 99.01, 50 MB in 49.97 — but small ones still take a second: 25 MB in 24.43 and 8 MB in 7.80, both after two attempts. The overshoot comes from the peak rate being pinned to a fixed multiple of the source regardless of target size.
+
 - **Size estimate accurate to within 8%**, typically within 4%
 - **Budget fill 92–99%** on constrained targets
+
+## When a run overshoots
+
+A result that lands over the target does not start a second run on its own. The run stops, shows what came out and how far over it went, says how long that attempt took, and asks whether to try again or end there. A retry costs roughly what the first attempt cost, which is why the number is on screen before you decide.
+
+Ending there is not the same as accepting an oversized file. VidShrink never hands back a file larger than the target: ending the run delivers the last result that came in under the target, and writes nothing at all if there isn't one. The question says so in as many words, because "leave it as is" reads like the opposite.
+
+In practice the question only appears on hardware encoding at small targets. Software encoding reaches the band on the first attempt at every target measured above.
 
 ## Shrink
 
@@ -178,4 +198,6 @@ Copyright (C) 2026 Teknesyum
 
 **FFmpeg is a separate program under its own license, and VidShrink does not redistribute it.** On Windows the installer asks WinGet for `Gyan.FFmpeg`, whose builds are GPLv3. On macOS and Linux the installer installs nothing — it prints your package manager's command and you fetch FFmpeg yourself. Either way the binary arrives on your own machine, under its own terms, at install time. It is not in this repository and not inside anything this repository hands out. VidShrink runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the AGPL-3.0 application.
 
-That separation is what keeps the two licenses apart, and it holds only while no packaged download exists. **Shipping a VidShrink release with an FFmpeg binary inside it would place a GPLv3 build in an AGPL-3.0 product and pull in the GPL's source-offer and license-notice obligations.** Such a release would first have to move to an LGPL FFmpeg build or adopt the GPLv3 terms. That decision has not been taken and no packaged release is published.
+Releases do not carry FFmpeg either, and the reason is size rather than licensing. FFmpeg and FFprobe are 424 MB of a 519 MB installation and do not change when VidShrink does; shipping them with every release would send 424 MB down the wire to replace nothing. They are fetched once, at install time, from your package manager.
+
+The licence note above was first written when VidShrink was MIT, where bundling a GPLv3 build would have been the problem. Under AGPL-3.0-or-later the question is a different one — AGPLv3 and GPLv3 are written to be compatible, and a copyleft source obligation is already what this project carries. Anyone preparing a packaged release that includes FFmpeg should work the licensing through for that specific build rather than rely on this paragraph.
