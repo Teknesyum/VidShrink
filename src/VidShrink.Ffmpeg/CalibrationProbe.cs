@@ -11,8 +11,11 @@ public static class CalibrationProbe
     private const int MaxWindows = 3;
     private const int MinWindows = 2;
     private const double CrfGap = 4.0;
+    private const int SoftwareConcurrency = 4;
+    private const int HardwareConcurrency = 2;
+    private static readonly TimeSpan SampleTimeout = TimeSpan.FromSeconds(90);
 
-    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, CancellationToken ct = default, SpeedMode speed = SpeedMode.Quality)
+    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, SpeedMode speed, CancellationToken ct = default)
     {
         try
         {
@@ -38,11 +41,12 @@ public static class CalibrationProbe
 
             var windows = Windows(info, speed).ToArray();
             var pending = new List<Task<Sample>>(windows.Length * 2);
+            using var gate = new SemaphoreSlim(CodecModel.IsHardware(draft.Codec) ? HardwareConcurrency : SoftwareConcurrency);
             var batch = Stopwatch.StartNew();
             foreach (var start in windows)
             {
-                pending.Add(SampleAsync(info, draft, start, lowCrf, speed, ct));
-                pending.Add(SampleAsync(info, draft, start, highCrf, speed, ct));
+                pending.Add(GatedSampleAsync(gate, info, draft, start, lowCrf, speed, ct));
+                pending.Add(GatedSampleAsync(gate, info, draft, start, highCrf, speed, ct));
             }
 
             var samples = await Task.WhenAll(pending);
@@ -78,7 +82,7 @@ public static class CalibrationProbe
 
             return profile.Calibrate(signature, lowCrf, lowBppf, highCrf, highBppf, info.Fps).WithSpeed(measured);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             throw;
         }
@@ -142,6 +146,39 @@ public static class CalibrationProbe
             yield return usable * (i + 0.5) / count;
     }
 
+    private static async Task<Sample> GatedSampleAsync(SemaphoreSlim gate, MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
+    {
+        await gate.WaitAsync(ct);
+        try
+        {
+            return await SampleAsync(info, draft, start, crf, speed, ct);
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    /// <summary>
+    /// The quality flag the encoder family actually understands, together with the rate control the
+    /// real encode uses, so the probe measures the point the encode lands on. Verified against
+    /// <c>ffmpeg -h encoder=...</c>: only the nvenc family carries <c>-cq</c>, qsv carries none of
+    /// the private quality flags and takes the shared <c>-global_quality</c>, and amf carries
+    /// <c>-qp_i/-qp_p/-qp_b</c> under <c>-rc cqp</c>.
+    /// </summary>
+    public static IReadOnlyList<string> QualityArgs(string codec, double quality)
+    {
+        var c = codec.ToLowerInvariant();
+        var exact = quality.ToString("0.#", CultureInfo.InvariantCulture);
+        var whole = Math.Round(quality).ToString("0", CultureInfo.InvariantCulture);
+
+        if (c.Contains("nvenc")) return new[] { "-rc", "vbr", "-multipass", "fullres", "-cq", exact };
+        if (c.Equals("h264_qsv")) return new[] { "-global_quality", whole, "-look_ahead", "1" };
+        if (c.Contains("qsv")) return new[] { "-global_quality", whole };
+        if (c.Contains("amf")) return new[] { "-rc", "cqp", "-qp_i", whole, "-qp_p", whole, "-qp_b", whole };
+        return new[] { "-crf", exact };
+    }
+
     private static async Task<Sample> SampleAsync(MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
     {
         var args = new List<string> { "-hide_banner", "-nostdin" };
@@ -163,26 +200,36 @@ public static class CalibrationProbe
 
         args.Add("-c:v");
         args.Add(draft.Codec);
-        args.Add(CodecModel.UsesCq(draft.Codec) ? "-cq" : "-crf");
-        args.Add(crf.ToString("0.#", CultureInfo.InvariantCulture));
+        args.AddRange(QualityArgs(draft.Codec, crf));
         args.Add("-preset");
         args.Add(draft.Preset);
         args.Add("-pix_fmt");
         args.Add(draft.PixelFormat);
         args.AddRange(new[] { "-f", "null", "-" });
 
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        deadline.CancelAfter(SampleTimeout);
+        var token = deadline.Token;
+
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
         process.Start();
-        using var cancellationRegistration = ct.Register(() => TryKill(process));
+        using var cancellationRegistration = token.Register(() => TryKill(process));
 
-        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-        var stderrTask = process.StandardError.ReadToEndAsync(ct);
-        await Task.WhenAll(stdoutTask, stderrTask);
-        var stderr = await stderrTask;
-        await process.WaitForExitAsync(ct);
+        try
+        {
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(token);
+            var stderrTask = process.StandardError.ReadToEndAsync(token);
+            await Task.WhenAll(stdoutTask, stderrTask);
+            var stderr = await stderrTask;
+            await process.WaitForExitAsync(token);
 
-        if (process.ExitCode != 0) return default;
-        return new Sample(ParseVideoBytes(stderr), ParseFrames(stderr));
+            if (process.ExitCode != 0) return default;
+            return new Sample(ParseVideoBytes(stderr), ParseFrames(stderr));
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return default;
+        }
     }
 
     private static void TryKill(Process process)

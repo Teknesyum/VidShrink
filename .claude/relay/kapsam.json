@@ -373,8 +373,8 @@
   },
   "src/VidShrink.Ffmpeg/CalibrationProbe.cs": {
     "model": "claude-opus-5",
-    "effort": "xhigh",
-    "t": "2026-08-22 21:03:15",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
     "ajan": "builder"
   },
   "src/VidShrink.Core/ComplexityProfile.cs": {
@@ -392,8 +392,8 @@
   "src/VidShrink.App/MainWindow.axaml.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-23 15:26:42",
-    "ajan": "ui-builder"
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
   },
   "src/VidShrink.App/LanguageCatalog.cs": {
     "model": "claude-opus-5",
@@ -508,5 +508,47 @@
     "effort": "high",
     "t": "2026-08-23 17:05:28",
     "ajan": "ana oturum"
+  },
+  "src/VidShrink.Ffmpeg/ComplexityProbe.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
+  },
+  "tests/VidShrink.Tests/CalibrationProbeTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
+  },
+  "tools/VidShrink.Bench/Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
+  },
+  ".claude/relay/contracts/T10.checkpoint.tmp": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
+  },
+  "t10before.csproj": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
+  },
+  "Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
+  },
+  "tests/VidShrink.Tests/FillBandTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:07:25",
+    "ajan": "builder"
   }
 }

@@ -81,7 +81,7 @@ static async Task<int> ShrinkAsync(string[] args)
     Directory.CreateDirectory(outDir);
 
     var info = await FfprobeClient.ProbeAsync(source);
-    var complexity = await ComplexityProbe.RunAsync(info);
+    var complexity = await ComplexityProbe.RunAsync(info, SpeedMode.Quality);
     var results = new List<BenchResult>();
 
     foreach (var targetMb in targets)

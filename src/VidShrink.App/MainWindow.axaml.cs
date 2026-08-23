@@ -30,6 +30,7 @@ public partial class MainWindow : Window
 {
     private const double WhatsAppTargetMb = 16;
     private const double MacTrafficLightInset = 80;
+    private const int CalibrationRounds = 2;
     private const uint ClientAreaAnimationQuery = 0x1042;
 
     private const string HardwareTipEnglish = "The graphics card encodes many times faster than the processor. VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed. On older cards the speed still arrives, but it costs some quality per megabyte.";
@@ -629,17 +630,33 @@ public partial class MainWindow : Window
         TxtEstimateNote.Text = T("Karmaşıklık ölçülüyor...", "Measuring complexity...");
         try
         {
-            var profile = await ComplexityProbe.RunAsync(info, cts.Token);
+            var speed = CurrentOptions().SpeedMode;
+            var profile = await ComplexityProbe.RunAsync(info, speed, cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             _profile = profile;
             Recalculate();
 
-            var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, _encoders).Plan;
             TxtEstimateNote.Text = T("Plan ayarlarıyla kalibre ediliyor...", "Calibrating with the planned settings...");
-            var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, cts.Token);
-            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
-            _profile = calibrated;
-            Recalculate();
+            var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, _encoders).Plan;
+
+            // The calibration is keyed to the plan it measured, and feeding it back changes the plan,
+            // which would throw the measurement away. Measure again on the plan the calibration
+            // produced, until the two agree.
+            for (var round = 0; round < CalibrationRounds; round++)
+            {
+                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token);
+                if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+                _profile = calibrated;
+                Recalculate();
+
+                if (!calibrated.Calibrated) break;
+
+                var settled = PlanCalculator.BuildDetailed(info, CurrentOptions(), calibrated, _encoders).Plan;
+                if (calibrated.AppliesTo(settled.Codec, PlanScale(info, settled), settled.Fps)) break;
+
+                draft = settled;
+                profile = calibrated.WithoutCalibration();
+            }
         }
         catch (OperationCanceledException)
         {
@@ -654,6 +671,9 @@ public partial class MainWindow : Window
             cts.Dispose();
         }
     }
+
+    private static double PlanScale(MediaInfo info, EncodePlan plan)
+        => info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
 
     private void ShowInfo(MediaInfo info)
     {
