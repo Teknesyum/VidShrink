@@ -123,4 +123,121 @@ Kaynak tavanı devreye girdiğinde (1080p kaynakta 4× istemek) teslim edilen ge
 1920'de duruyor ve servis bunu bildirebiliyor — panelde "1:1" ve "kaynak sınırı"
 durumlarını göstermek için gereken bilgi ölçüm yolunda zaten var.
 
-<!-- kayıt noktası: Ö1, Ö4, Ö5 bitti; Ö3 ve Ö2 kaldı -->
+## Ö3 — Örnek kodlama süresi
+
+Zincir `FfprobeClient.ProbeAsync` → `ComplexityProbe.RunAsync` → `PlanCalculator.BuildDetailed`
+(taslak) → `CalibrationProbe.RunAsync`. Yeni bir yol açılmadı, o kodun kendi maliyeti ölçüldü.
+
+| Klip | Plan | Kalibrasyon toplam s | Örnek fps | Kare | Toplam hıza göre 2 sn pencere |
+|---|---|---|---|---|---|
+| 1080p_h264 | 1306x734@30 libx264/slow | 2,45 | 147,3 | 360 | 0,41 sn |
+| 4k_h264 | 1920x1080@30 libx264/slow | 5,92 | 60,8 | 360 | 0,99 sn |
+
+Kalibrasyon 3 pencere × 2 CRF = **6 örnek** koşuyor (`CalibrationProbe.cs:11` `MaxWindows`,
+`:13` `CrfGap`), her örnek 2 saniyelik pencere (`:10` `WindowSeconds`), yazılım codec'inde
+eşzamanlılık 4 (`:14` `SoftwareConcurrency`).
+
+**0,41 / 0,99 sn toplam hıza göre türetilmiş sayılar, tek bir pencerenin süresi değil.**
+6 örnek eşzamanlılık 4'te iki dalgada bitiyor; yalnız koşan tek bir pencerenin duvar
+saati bir dalgadan uzun olamaz: 1080p'de ≤ 1,2 sn, 4K'da ≤ 3,0 sn. Tek pencere yalnız
+koşarken ayrıca ölçülmedi.
+
+### `CalibrationProbe` kodladığı dilimi diskte tutuyor mu?
+
+**Hayır.** `CalibrationProbe.cs:208` çıkışı `-f null -` ile bağlıyor; kodlanmış piksel
+hiçbir yere yazılmıyor, yalnız stderr'deki `video:NNNKiB` ve `frame=NN` özeti okunuyor
+(`:224`). Dosya adı üreten, geçici klasöre yazan tek satır yok.
+
+Sonraki sözleşme için doğrudan sonuç: **örnek kareyi almak için yeniden kodlama gerekiyor
+ama yeni bir kodlama maliyeti gerekmiyor.** `-f null -` yerine bir çıkış hedefi verilirse
+zaten harcanan kodlama işi diske ya da boruya düşer; ek maliyet yalnız yazma. Konseyin
+"hâlihazırda atılan bir çıktı" tespiti kodda birebir doğrulandı.
+
+## Ö2 — Kodlama sürerken aynı işlem
+
+Gerçek kodlama `EncodeRunner.RunAsync` ile, 20 MB hedefe. Önce boş koşum ölçüldü, sonra
+aynı kodlama tekrar koşarken 960 px kare çekme döngüsü arka planda **aralıksız** döndü.
+
+| Koşum | Klip | Boş kodlama s | Kare çekerken s | Kodlama yavaşlaması % | Çekim n | Medyan ms | p95 ms |
+|---|---|---|---|---|---|---|---|
+| 1 | 1080p_h264 | 14,19 | 16,72 | **17,8** | 36 | 371,6 | 1000,6 |
+| 2 | 1080p_h264 | 13,97 | 16,77 | **20,0** | 33 | 382,2 | 1029,5 |
+| 2 | 4k_h264 | 29,58 | 37,98 | **28,4** | 30 | 1468,7 | 2026,4 |
+
+İki bağımsız koşumda 1080p için 17,8% ve 20,0% çıktı; ölçüm tekrarlanabilir.
+
+**İki sayı:**
+
+1. **Kare çekme gecikmesi:** 1080p'de medyan 175 ms → 372-382 ms, yani **2,1-2,2 kat**.
+   4K'da 529 ms → 1469 ms, **2,8 kat**.
+2. **Kodlamanın kendisi:** 1080p'de %17,8-20,0, 4K'da %28,4 yavaşladı.
+
+**Ölçümün sınırı:** çekim döngüsü boşluk bırakmadan döndü, yani bu **en kötü hâl** —
+kullanıcının sürgüyü aralıksız sürüklediği durum. Tek bir çekim koşum boyunca bir kez
+yapılırsa bedeli o çekimin süresi kadar bir çekirdek. Ama eşiğin sorduğu şey tam olarak
+"gösterge ölçtüğü şeyi bozuyor mu" ve cevap her iki çözünürlükte de %5'in çok üstünde.
+
+Boş koşum önce koştuğu için dosya önbelleği ikinci koşumun lehine; yani ölçülen yavaşlama
+gerçeğin **alt sınırı**.
+
+## Kapı kararı
+
+**Ö1 → üçüncü kapı: yalnız önceden çekilmiş sabit noktalar.**
+
+Konseyin ölçütü 1080p'de p95. Ölçülen p95 soğukta **775 ms**, sıcakta **650 ms**; ikisi de
+400 ms eşiğinin üstünde. Medyan 172 ms ile "gecikmeli" bandına düşse de karar p95'e göre
+verilecekti ve p95 net biçimde üçüncü kapıda. Sürgü sürüklenirken canlı kare yenilemesi
+bu makinede yapılamaz.
+
+p95'i medyanın 4-5 katına çıkaran şey anahtar kare uzaklığı: damga GoP'un sonuna düşünce
+ffmpeg 8 saniyeye kadar kare çözüyor. Bu, sabit noktaların **anahtar karelere
+hizalanması** gerektiğini söylüyor. Anahtar kare damgalarındaki gecikme bu sözleşmede
+ayrıca ölçülmedi.
+
+**Ö2 → %5 eşiği aşıldı, açık farkla.** Kodlama yavaşlaması 1080p'de %17,8-20,0, 4K'da
+%28,4. Konseyin kuralı gereği **kodlama sürerken kare çekimi tamamen kapatılacak ve son
+önbellekli kare gösterilecek.**
+
+**Ö5 → yakınlaştırılmış kare istemek bedava sayılır** (+8,5% ile -5% arası). Kare servisi
+her zaman "panel genişliği × yakınlaştırma, kaynak çözünürlüğüyle tavanlanmış" istemeli;
+Opus'un yakalattığı "kullanıcı bizim ölçeklememizi sıkıştırma hatası sanar" hatası ek bir
+gecikme bedeli ödemeden kapatılabilir.
+
+**Ö4 → önbellek tavanı bayt cinsinden 128 MB.** 4K'da iki kare çifti, 1080p'de sekiz çift.
+
+## Doğrulama
+
+| Kontrol | Sonuç |
+|---|---|
+| `dotnet build VidShrink.sln -c Release` | 0 uyarı, 0 hata |
+| `dotnet test VidShrink.sln -c Release` | 218 başarılı, 0 başarısız, 6 atlanan |
+| `src/` altına değişiklik | yok |
+
+K1 kanıtı — T30'un commit'i yalnız üç dosyaya dokunuyor:
+
+```
+$ git diff --name-only HEAD~1..HEAD
+.claude/relay/contracts/T30.md
+docs/olcumler/T30-panel-olcumleri.md
+tools/VidShrink.Bench/Program.cs
+
+$ git diff --stat HEAD~1..HEAD -- src/
+(bos)
+```
+
+Ölçüm komutu:
+
+```
+bench panel <klip,...> --only o1,o2,o3,o4,o5 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]
+```
+
+## Ölçülemeyenler
+
+- İşletim sistemi dosya önbelleği güvenilir biçimde boşaltılamadığı için "gerçekten soğuk"
+  disk okuması ölçülemedi. Sonuçlar gecikmenin diskle değil kod çözmeyle belirlendiğini
+  gösteriyor.
+- Tek bir 2 saniyelik kalibrasyon penceresinin yalnız koşarken süresi ölçülmedi; yalnızca
+  dalga aritmetiğinden üst sınır verildi.
+- Anahtar kare damgalarındaki kare çekme gecikmesi ölçülmedi.
+- Donanım kodlayıcı (av1_amf) ile Ö2 tekrarlanmadı; ölçümler libx264/slow planıyla.
+
