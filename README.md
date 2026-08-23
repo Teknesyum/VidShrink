@@ -157,6 +157,21 @@ The CONVERT tab supports MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, and WAV. Choos
 
 Stream copy uses real `-c:v copy` and `-c:a copy`. Incompatible container and source-codec combinations are blocked before execution. The exact ffmpeg command is visible for every operation.
 
+## Advanced
+
+Two things live on their own tab rather than in the way of the main flow.
+
+The **FFmpeg command** is the exact command the engine will run. It sits on one line and
+expands when you want to read it; it is selectable and copyable either way. Nothing here
+is a summary — it is the command itself, so you can take it elsewhere or check what the
+engine decided.
+
+**AI settings** are optional. Copy the prompt into any chat AI, paste the JSON it answers
+with, and the plan is applied. VidShrink makes no network request of its own for this;
+you carry the text both ways.
+
+Scrollbars on both boxes appear only while the pointer is over them.
+
 ## Codec guidance
 
 - **H.264** plays on essentially every device ever made and is what WhatsApp expects.
