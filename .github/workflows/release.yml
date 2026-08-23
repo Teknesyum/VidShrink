@@ -1,0 +1,145 @@
+name: release
+
+# Runs when a version tag is pushed. Publishes VidShrink self-contained for the four
+# supported targets, writes a per-file manifest next to each archive, and collects
+# everything into a draft GitHub Release.
+#
+# ffmpeg is not part of any archive. It is GPLv3 and VidShrink is MIT; the installer
+# fetches it onto the user's machine under its own licence. See README.
+#
+# The asset names and the manifest format are defined in .github/workflows/manifest.md.
+# The updater reads that file, not this one.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.read.outputs.tag }}
+      version: ${{ steps.read.outputs.version }}
+      commit: ${{ steps.read.outputs.commit }}
+      built: ${{ steps.read.outputs.built }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: read
+        name: Read the version from the tag and check it against the tree
+        run: |
+          set -euo pipefail
+          tag="${{ github.ref_name }}"
+          version="${tag#v}"
+
+          declared=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props | head -1)
+          if [ "$declared" != "$version" ]; then
+            echo "Etiket $tag ile Directory.Build.props sürümü $declared uyuşmuyor." >&2
+            exit 1
+          fi
+
+          if ! grep -q "^## \[$version\]" CHANGELOG.md; then
+            echo "CHANGELOG.md içinde '## [$version]' başlığı yok." >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+          echo "built=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet test VidShrink.sln -c Release
+
+  publish:
+    needs: [version, test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Self-contained publish needs no target machine: all four are produced on the
+        # Linux runner. zip is used rather than actions/upload-artifact's own packing
+        # because it keeps the executable bit on the macOS and Linux binaries.
+        rid: [win-x64, osx-arm64, osx-x64, linux-x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish
+        run: |
+          dotnet publish src/VidShrink.App/VidShrink.App.csproj \
+            -c Release -r ${{ matrix.rid }} --self-contained \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish/${{ matrix.rid }}
+
+      - name: Write manifest.json
+        # The manifest tool is a CI helper and is not in VidShrink.sln, so it is built
+        # from its own project file.
+        run: |
+          dotnet build tools/VidShrink.Manifest/VidShrink.Manifest.csproj -c Release
+          dotnet tools/VidShrink.Manifest/bin/Release/net8.0/vidshrink-manifest.dll write \
+            publish/${{ matrix.rid }} \
+            --version ${{ needs.version.outputs.version }} \
+            --rid ${{ matrix.rid }} \
+            --commit ${{ needs.version.outputs.commit }} \
+            --built ${{ needs.version.outputs.built }}
+
+      - name: Archive, copy the manifest out, checksum both
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          ( cd publish/${{ matrix.rid }} && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-${{ matrix.rid }}.zip" . )
+          # The same bytes ship twice: inside the archive as manifest.json, and beside it
+          # as a standalone asset the updater can fetch without downloading the archive.
+          cp publish/${{ matrix.rid }}/manifest.json assets/manifest-${{ matrix.rid }}.json
+          ( cd assets && sha256sum "vidshrink-${{ matrix.rid }}.zip" "manifest-${{ matrix.rid }}.json" \
+              > "checksums-${{ matrix.rid }}.txt" )
+          cat assets/checksums-${{ matrix.rid }}.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assets-${{ matrix.rid }}
+          path: assets/
+          if-no-files-found: error
+
+  release:
+    needs: [version, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: downloaded
+          pattern: assets-*
+          merge-multiple: true
+
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ls -l downloaded
+          gh release create "${{ needs.version.outputs.tag }}" \
+            --draft \
+            --title "VidShrink ${{ needs.version.outputs.version }}" \
+            --notes "CHANGELOG.md içindeki ${{ needs.version.outputs.version }} bölümüne bakın." \
+            downloaded/*
