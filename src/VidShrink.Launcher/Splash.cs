@@ -289,6 +289,10 @@ internal sealed class SplashArt
     }
 
     public int FrameMilliseconds => Number("MotionStaggerMs");
+
+    /// <summary>"00:00:00.3600000" biçimindeki hareket belirteçlerini süreye çevirir.</summary>
+    public TimeSpan Duration(string key) =>
+        TimeSpan.Parse(Token(key), CultureInfo.InvariantCulture);
 }
 
 /// <summary>
@@ -388,8 +392,10 @@ internal sealed class SplashWindow : IDisposable
         var statusBox = _art.Box("status");
 
         SetBkMode(_memoryDc, TransparentBackground);
-        DrawLine(title, "VIDSHRINK", _titleFont, _art.ColorRef("TextBodyColor"));
-        DrawLine(statusBox, status, _statusFont, _art.ColorRef("TextDisabledColor"));
+        // Tema kuralı: başlık vurgudur, neon mavi alır; durum satırı gövde metnidir.
+        // §2 gereği ikisine de hale verilmiyor — panel dar, hale komşunun altına girer.
+        DrawLine(title, "VIDSHRINK", _titleFont, _art.ColorRef("NeonBlueColor"));
+        DrawLine(statusBox, status, _statusFont, _art.ColorRef("TextBodyColor"));
         DrawSweep(elapsed);
 
         // GDI alfa kanalını sıfırlıyor. Yazının ve parçanın düştüğü alan panelin tümüyle
@@ -441,6 +447,15 @@ internal sealed class SplashWindow : IDisposable
     }
 
     /// <summary>
+    /// Gezen parçanın tam bir gidiş dönüşü. Tek yön <c>MotionSlow</c> × <c>MotionStaggerCount</c>,
+    /// tur bunun iki katı; ikisi de tema belirteci, burada sabit süre yok. Temanın en yavaş
+    /// hareket tabanı, bir ucu görmeye yeten adım sayısıyla çarpılıyor: bekleyen kullanıcı
+    /// panele 900 ms de baksa 20 saniye de baksa tempo aynı ve rahatsız etmiyor.
+    /// </summary>
+    private TimeSpan SweepPeriod => TimeSpan.FromMilliseconds(
+        _art.Duration("MotionSlow").TotalMilliseconds * _art.Number("MotionStaggerCount") * 2);
+
+    /// <summary>
     /// İlerleme yolu görüntüde duruk; üzerinde gezen parça burada çiziliyor. Süre
     /// bilinmediği için belirsiz kip: parça yolu bir uçtan diğerine tarar.
     /// </summary>
@@ -449,18 +464,51 @@ internal sealed class SplashWindow : IDisposable
         var track = _art.Box("track");
         var height = _art.Number("ProgressBarHeight");
         var width = track.Width / 4;
-        var period = _art.FrameMilliseconds * 36.0; // tam bir tarama
+        var period = SweepPeriod.TotalMilliseconds;
         var phase = (elapsed.TotalMilliseconds % period) / period;
 
         // Gidiş dönüş: parça uçta durup geri döner, kesik bir sıçrama olmaz.
         var travel = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
         var left = track.X + (int)((track.Width - width) * travel);
 
-        var brush = CreateSolidBrush(_art.ColorRef("NeonBlueColor"));
+        // Gradyan dilim dilim çiziliyor; dilimler parçanın yuvarlak biçimine kırpılıyor.
         var region = CreateRoundRectRgn(left, track.Y, left + width, track.Y + height, height, height);
-        FillRgn(_memoryDc, region, brush);
+        SelectClipRgn(_memoryDc, region);
+
+        // Ortada neon mavi, uçlarda neon mor. Simetrik olduğu için parça yön
+        // değiştirdiğinde renk sıçraması olmuyor.
+        var core = _art.ColorRef("NeonBlueColor");
+        var edge = _art.ColorRef("NeonPurpleColor");
+        const int step = 2; // iki piksellik dilim: geçiş gözle sürekli görünüyor, kare başına brush sayısı düşük kalıyor
+        for (var offset = 0; offset < width; offset += step)
+        {
+            var distance = Math.Abs(((offset + (step / 2.0)) / width) - 0.5) * 2;
+            var brush = CreateSolidBrush(Mix(core, edge, distance));
+            var slice = new RECT
+            {
+                left = left + offset,
+                top = track.Y,
+                right = left + Math.Min(offset + step, width),
+                bottom = track.Y + height,
+            };
+            FillRect(_memoryDc, ref slice, brush);
+            DeleteObject(brush);
+        }
+
+        SelectClipRgn(_memoryDc, IntPtr.Zero);
         DeleteObject(region);
-        DeleteObject(brush);
+    }
+
+    /// <summary>İki COLORREF arasında kanal kanal karışım.</summary>
+    private static uint Mix(uint from, uint to, double amount)
+    {
+        uint Channel(int shift)
+        {
+            double start = (from >> shift) & 0xFF;
+            double end = (to >> shift) & 0xFF;
+            return (uint)Math.Clamp(Math.Round(start + ((end - start) * amount)), 0, 255);
+        }
+        return Channel(0) | (Channel(8) << 8) | (Channel(16) << 16);
     }
 
     private void RestoreAlpha(int x, int y, int width, int height)
@@ -686,7 +734,10 @@ internal sealed class SplashWindow : IDisposable
     private static extern IntPtr CreateRoundRectRgn(int left, int top, int right, int bottom, int width, int height);
 
     [DllImport("gdi32.dll")]
-    private static extern int FillRgn(IntPtr dc, IntPtr region, IntPtr brush);
+    private static extern int SelectClipRgn(IntPtr dc, IntPtr region);
+
+    [DllImport("user32.dll")]
+    private static extern int FillRect(IntPtr dc, ref RECT rect, IntPtr brush);
 
     [DllImport("gdi32.dll")]
     private static extern bool GdiFlush();

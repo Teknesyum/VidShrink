@@ -156,6 +156,40 @@ public sealed class SplashTests
         Assert.Contains("using (SplashGate.Arm(", program);
     }
 
+    /// <summary>
+    /// K1: gezen parçanın turu tema belirteçlerinden türüyor ve T22'deki 1440 ms'lik
+    /// turdan belirgin biçimde yavaş. Sabit bir süreye dönülürse buradan görülür.
+    /// </summary>
+    [SplashImageFact]
+    public void SweepPeriodComesFromMotionTokensAndIsSlowerThanBefore()
+    {
+        var tokens = ReadTokens(File.ReadAllBytes(ImagePath));
+        var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
+
+        Assert.Contains("_art.Duration(\"MotionSlow\")", source);
+        Assert.Contains("_art.Number(\"MotionStaggerCount\")", source);
+
+        var period = TimeSpan.Parse(tokens["MotionSlow"], CultureInfo.InvariantCulture).TotalMilliseconds
+                     * double.Parse(tokens["MotionStaggerCount"], CultureInfo.InvariantCulture) * 2;
+        var before = double.Parse(tokens["MotionStaggerMs"], CultureInfo.InvariantCulture) * 36;
+        Assert.True(period >= before * 2, $"Tur {period} ms; {before} ms'den belirgin biçimde yavaş değil.");
+    }
+
+    /// <summary>
+    /// K2/K3: parçanın iki gradyan ucu ve iki metin rengi de belirteçten okunuyor;
+    /// başlatıcıda elle yazılmış renk yok.
+    /// </summary>
+    [Fact]
+    public void PanelColoursAreReadFromTokensOnly()
+    {
+        var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
+        foreach (var key in new[] { "NeonBlueColor", "NeonPurpleColor", "TextBodyColor" })
+            Assert.Contains($"ColorRef(\"{key}\")", source);
+
+        // Renk sabitlenmiş olamaz: 0x00BBGGRR biçiminde elle yazılmış bir değer yok.
+        Assert.Empty(Regex.Matches(source, @"CreateSolidBrush\(\s*0x"));
+    }
+
     private static Dictionary<string, string> ReadTokens(byte[] png)
     {
         var tokens = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -188,7 +222,7 @@ public sealed class SplashTests
         var text = File.ReadAllText(ThemePath);
         var values = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (Match match in Regex.Matches(
-                     text, @"<(?<tag>Color|x:Double|x:String|CornerRadius|Thickness|FontFamily|BoxShadows)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
+                     text, @"<(?<tag>Color|x:Double|x:Int32|x:String|sys:TimeSpan|CornerRadius|Thickness|FontFamily|BoxShadows)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
         {
             values[match.Groups["key"].Value] = match.Groups["value"].Value.Trim();
         }
