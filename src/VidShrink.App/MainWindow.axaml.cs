@@ -47,8 +47,8 @@ public partial class MainWindow : Window
 
     // Bu iki metnin LanguageCatalog içinde birebir karşılığı olmalı. Metni değiştirirsen
     // sözlüğü de değiştir; TipTranslationTests eşleşmeyi ölçer.
-    private const string HardwareTipEnglish = "• The graphics card encodes many times faster than the processor.\n• VidShrink picks the best encoder your card offers, and on a modern card the AV1 encoder reaches nearly the same quality as the software encoder at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.";
-    private const string NoHardwareTipEnglish = "• No usable hardware encoder was found on this computer, so fast shrink is unavailable.\n• The graphics card would normally encode many times faster than the processor.";
+    private const string HardwareTipEnglish = "• Graphics cards encode many times faster than the CPU.\n• VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.";
+    private const string NoHardwareTipEnglish = "• No usable hardware encoder was found on this computer, so fast shrink is unavailable.\n• The graphics card would normally encode many times faster than the CPU.";
 
     private static readonly string[] MediaExtensions =
     {
