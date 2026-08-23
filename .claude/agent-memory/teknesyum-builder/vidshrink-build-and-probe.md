@@ -75,5 +75,18 @@ yoksa App.dll kilitli kalir.
 - Scratchpad yolu 8.3 kisa adla (`TEKNES~1`) geliyor; `FileInfo.FullName` uzun adi
   dondugu icin `Substring($kok.Length+1)` ile goreli yol cikarmak bir karakter kayiyor.
   Once `(Get-Item $kok).FullName` ile normalize et.
+- Test klibi depoda ve `%USERPROFILE%\Downloads` altinda **yok**; olcum sozlesmelerinde
+  klibi kendin uretmen gerekiyor. Calisan kalip:
+  `ffmpeg -f lavfi -i "testsrc2=size=1920x1080:rate=30:duration=60" -c:v libx264 -preset veryfast -crf 23 -pix_fmt yuv420p`
+  (4K icin `size=3840x2160`, HEVC icin `libx265 -crf 25 -tag:v hvc1`). Cikan bit hizlari
+  gercek kayda yakin (1080p ~5,7 Mbps, 4K ~19,8 Mbps) ama testsrc2 yuksek entropili, kod
+  cozme maliyeti kotumser tarafta.
+- Bu makinede ffmpeg **surec acilis tabani** medyan 53 ms, p95 95 ms
+  (`ffmpeg -f lavfi -i nullsrc=s=64x64 -frames:v 1 -f null -`, 20 tekrar). Tek kare cekme
+  gibi kisa isleri olcerken bu tabani ayirmadan yorumlama.
+- `-ss T -i dosya -frames:v 1` gecikmesinin p95'i medyanin 4-5 kati cikiyor ve sebep disk
+  degil **anahtar kare uzakligi** (x264/x265 varsayilan GoP 250 kare ≈ 8,3 sn). Soguk/sicak
+  farki olcum gurultusu icinde. Kare cekme maliyeti kod cozmede, olceklemede degil:
+  960 px yerine 3840 px istemek %10'dan az fark yapiyor.
 - PE alt sistemini dogrulama: `$pe = [BitConverter]::ToInt32($bytes,0x3C)`,
   `[BitConverter]::ToUInt16($bytes,$pe+92)` -> 2 GUI, 3 konsol.
