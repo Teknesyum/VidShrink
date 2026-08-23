@@ -483,9 +483,9 @@ public sealed class FillBandTests
         var info = await FfprobeClient.ProbeAsync(source);
         var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget };
 
-        var profile = await ComplexityProbe.RunAsync(info, CancellationToken.None);
+        var profile = await ComplexityProbe.RunAsync(info, options.SpeedMode, CancellationToken.None);
         var draft = PlanCalculator.BuildDetailed(info, options, profile, EncoderCapabilities.Instance).Plan;
-        profile = await CalibrationProbe.RunAsync(info, draft, profile, CancellationToken.None);
+        profile = await CalibrationProbe.RunAsync(info, draft, profile, options.SpeedMode, CancellationToken.None);
 
         var plan = PlanCalculator.BuildDetailed(info, options, profile, EncoderCapabilities.Instance).Plan;
         var result = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, FillPolicy.FillTarget, profile);

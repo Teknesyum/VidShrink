@@ -28,7 +28,10 @@ public static class ComplexityProbe
     private const int PacketIntervalSeconds = 2;
     private const int PacketWindowIntervalSeconds = 3;
 
-    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, CancellationToken ct = default, SpeedMode speed = SpeedMode.Quality)
+    private static readonly TimeSpan SampleTimeout = TimeSpan.FromSeconds(90);
+    private static readonly TimeSpan PacketReadTimeout = TimeSpan.FromSeconds(120);
+
+    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, SpeedMode speed, CancellationToken ct = default)
     {
         try
         {
@@ -70,7 +73,7 @@ public static class ComplexityProbe
 
             return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             throw;
         }
@@ -244,7 +247,7 @@ public static class ComplexityProbe
 
     private static async Task<(double Bias, WindowBiasSource Source)> MeasureWindowBiasAsync(MediaInfo info, SpeedMode speed, CancellationToken ct)
     {
-        var scan = await ScanBiasAsync(info, ct, speed);
+        var scan = await ScanBiasAsync(info, speed, ct);
         if (ComplexityProfile.IsTrustedBias(scan)) return (scan, WindowBiasSource.Scan);
 
         var packet = await PacketBiasAsync(info, ct);
@@ -253,7 +256,7 @@ public static class ComplexityProbe
         return (0.0, WindowBiasSource.None);
     }
 
-    public static async Task<double> ScanBiasAsync(MediaInfo info, CancellationToken ct, SpeedMode speed = SpeedMode.Quality)
+    public static async Task<double> ScanBiasAsync(MediaInfo info, SpeedMode speed, CancellationToken ct)
     {
         try
         {
@@ -279,7 +282,7 @@ public static class ComplexityProbe
             var samples = await Task.WhenAll(pending);
             return ComputeScanBias(points, windowPoints, samples, info.DurationSeconds);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             throw;
         }
@@ -297,7 +300,7 @@ public static class ComplexityProbe
             var packets = await ReadPacketsAsync(info.FilePath, intervals, ct);
             return ComputeWindowBias(packets, info.DurationSeconds, intervals);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             throw;
         }
@@ -325,18 +328,28 @@ public static class ComplexityProbe
 
         args.Add(path);
 
+        using var deadline = Deadline(ct, PacketReadTimeout);
+        var token = deadline.Token;
+
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args.ToArray()) };
         process.Start();
-        using var cancellationRegistration = ct.Register(() => TryKill(process));
+        using var cancellationRegistration = token.Register(() => TryKill(process));
 
-        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-        var stderrTask = process.StandardError.ReadToEndAsync(ct);
-        await Task.WhenAll(stdoutTask, stderrTask);
-        var stdout = await stdoutTask;
-        await process.WaitForExitAsync(ct);
+        try
+        {
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(token);
+            var stderrTask = process.StandardError.ReadToEndAsync(token);
+            await Task.WhenAll(stdoutTask, stderrTask);
+            var stdout = await stdoutTask;
+            await process.WaitForExitAsync(token);
 
-        if (process.ExitCode != 0) return Array.Empty<PacketSample>();
-        return ParsePackets(stdout);
+            if (process.ExitCode != 0) return Array.Empty<PacketSample>();
+            return ParsePackets(stdout);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return Array.Empty<PacketSample>();
+        }
     }
 
     public static IReadOnlyList<PacketSample> ParsePackets(string csv)
@@ -366,15 +379,15 @@ public static class ComplexityProbe
     {
         if (half is null)
         {
-            var (bytes, frames) = await SampleAsync(path, start, WindowSeconds, null, ct, preset, speed);
+            var (bytes, frames) = await SampleAsync(path, start, WindowSeconds, null, preset, speed, ct);
             return new WindowSample(bytes, frames, 0, 0);
         }
 
         var split = await SplitSampleAsync(path, start, half.Value, preset, speed, ct);
         if (split is { } measured) return measured;
 
-        var (fullBytes, fullFrames) = await SampleAsync(path, start, WindowSeconds, null, ct, preset, speed);
-        var (halfBytes, halfFrames) = await SampleAsync(path, start, WindowSeconds, $"scale={half.Value.Width}:{half.Value.Height}", ct, preset, speed);
+        var (fullBytes, fullFrames) = await SampleAsync(path, start, WindowSeconds, null, preset, speed, ct);
+        var (halfBytes, halfFrames) = await SampleAsync(path, start, WindowSeconds, $"scale={half.Value.Width}:{half.Value.Height}", preset, speed, ct);
         return new WindowSample(fullBytes, fullFrames, halfBytes, halfFrames);
     }
 
@@ -408,15 +421,18 @@ public static class ComplexityProbe
                 });
             }
 
+            using var deadline = Deadline(ct, SampleTimeout);
+            var token = deadline.Token;
+
             using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
             process.Start();
-            using var cancellationRegistration = ct.Register(() => TryKill(process));
+            using var cancellationRegistration = token.Register(() => TryKill(process));
 
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(token);
+            var stderrTask = process.StandardError.ReadToEndAsync(token);
             await Task.WhenAll(stdoutTask, stderrTask);
             var stderr = await stderrTask;
-            await process.WaitForExitAsync(ct);
+            await process.WaitForExitAsync(token);
 
             if (process.ExitCode != 0) return null;
             if (!File.Exists(fullPath) || !File.Exists(halfPath)) return null;
@@ -430,7 +446,7 @@ public static class ComplexityProbe
 
             return new WindowSample(fullBytes, frames, halfBytes, frames);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             throw;
         }
@@ -445,7 +461,7 @@ public static class ComplexityProbe
         }
     }
 
-    public static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, CancellationToken ct, string? preset = null, SpeedMode speed = SpeedMode.Quality)
+    public static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, string? preset, SpeedMode speed, CancellationToken ct)
     {
         var args = new List<string> { "-hide_banner", "-nostdin" };
         if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
@@ -471,21 +487,38 @@ public static class ComplexityProbe
             "-f", "null", "-"
         });
 
+        using var deadline = Deadline(ct, SampleTimeout);
+        var token = deadline.Token;
+
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
         process.Start();
-        using var cancellationRegistration = ct.Register(() => TryKill(process));
+        using var cancellationRegistration = token.Register(() => TryKill(process));
 
-        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-        var stderrTask = process.StandardError.ReadToEndAsync(ct);
-        await Task.WhenAll(stdoutTask, stderrTask);
-        var stderr = await stderrTask;
-        await process.WaitForExitAsync(ct);
+        try
+        {
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(token);
+            var stderrTask = process.StandardError.ReadToEndAsync(token);
+            await Task.WhenAll(stdoutTask, stderrTask);
+            var stderr = await stderrTask;
+            await process.WaitForExitAsync(token);
 
-        if (process.ExitCode != 0) return (0, 0);
+            if (process.ExitCode != 0) return (0, 0);
 
-        var bytes = ParseVideoBytes(stderr);
-        var frames = ParseFrames(stderr);
-        return (bytes, frames);
+            var bytes = ParseVideoBytes(stderr);
+            var frames = ParseFrames(stderr);
+            return (bytes, frames);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return (0, 0);
+        }
+    }
+
+    private static CancellationTokenSource Deadline(CancellationToken ct, TimeSpan timeout)
+    {
+        var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        deadline.CancelAfter(timeout);
+        return deadline;
     }
 
     private static async Task<(long Bytes, long Frames)> ScanSampleAsync(string path, double start, string filter, SpeedMode speed, CancellationToken ct)
@@ -508,17 +541,24 @@ public static class ComplexityProbe
                 "-f", "null", "-"
             });
 
+            using var deadline = Deadline(ct, SampleTimeout);
+            var token = deadline.Token;
+
             using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args.ToArray()) };
             process.Start();
-            using var cancellationRegistration = ct.Register(() => TryKill(process));
+            using var cancellationRegistration = token.Register(() => TryKill(process));
 
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            var stdoutTask = process.StandardOutput.ReadToEndAsync(token);
+            var stderrTask = process.StandardError.ReadToEndAsync(token);
             await Task.WhenAll(stdoutTask, stderrTask);
-            await process.WaitForExitAsync(ct);
+            await process.WaitForExitAsync(token);
 
             if (process.ExitCode != 0 || !File.Exists(statsPath)) return (0, 0);
-            return ParseVstats(await File.ReadAllTextAsync(statsPath, ct), ScanWarmupSeconds);
+            return ParseVstats(await File.ReadAllTextAsync(statsPath, token), ScanWarmupSeconds);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return (0, 0);
         }
         finally
         {
