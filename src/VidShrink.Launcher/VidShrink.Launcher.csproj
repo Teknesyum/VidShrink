@@ -34,6 +34,11 @@
   <Target Name="GenerateSplashImage" BeforeTargets="BeforeBuild"
           Inputs="$(SplashTheme);$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\Program.cs"
           Outputs="$(SplashImage)">
+    <!-- Restore önce, ayrı bir çağrı olarak. Çözüm derlenirken geri yükleme çözüm
+         genelinden geliyordu ve bu adım gereksiz görünüyordu; kurulum betiği başlatıcıyı
+         tek başına yayımlayınca SplashGen hiç geri yüklenmemiş oluyor ve derleme
+         NETSDK1004 ile düşüyor. Kurulum bu yüzden bir tur bozuldu. -->
+    <MSBuild Projects="$(SplashGenProject)" Targets="Restore" Properties="Configuration=$(Configuration)" />
     <MSBuild Projects="$(SplashGenProject)" Targets="Build" Properties="Configuration=$(Configuration)">
       <Output TaskParameter="TargetOutputs" ItemName="SplashGenAssembly" />
     </MSBuild>
