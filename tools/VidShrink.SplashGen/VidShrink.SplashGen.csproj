@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>vidshrink-splashgen</AssemblyName>
+    <RootNamespace>VidShrink.SplashGen</RootNamespace>
+  </PropertyGroup>
+
+  <!-- No ProjectReference on purpose: this is a build helper. It reads Theme.axaml as
+       text and writes a PNG; nothing it produces depends on application code. -->
+
+</Project>

@@ -15,6 +15,12 @@ internal static class Program
     private const string AppExecutableName = "VidShrink.App.exe";
     private const string Caption = "VidShrink";
 
+    /// <summary>İndirilenlerin toplandığı klasör; Updater ile aynı ad.</summary>
+    private const string StageDirectoryName = "update-stage";
+
+    /// <summary>Uygulamanın "hangi sürüme geçildi" satırı için okuduğu işaret.</summary>
+    public const string AppliedMarkerName = ".update-applied";
+
     [STAThread]
     private static int Main(string[] args)
     {
@@ -29,12 +35,22 @@ internal static class Program
             return 1;
         }
 
-        // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
-        try { UpdateStage.ResumePending(appDirectory); }
-        catch (Exception) { }
+        var previousVersion = UpdateCheck.ReadVersionMarker(appDirectory);
 
-        // Ağ yok, manifest bozuk, disk dolu: hepsinde sessizce vazgeçilir.
-        try { Updater.Run(baseDirectory, appDirectory); }
+        // Panel ancak eşik dolarsa çizilir; hızlı turda hiç oluşturulmaz. Bloktan çıkış
+        // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
+        using (SplashGate.Arm(() => Status(baseDirectory)))
+        {
+            // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
+            try { UpdateStage.ResumePending(appDirectory); }
+            catch (Exception) { }
+
+            // Ağ yok, manifest bozuk, disk dolu: hepsinde sessizce vazgeçilir.
+            try { Updater.Run(baseDirectory, appDirectory); }
+            catch (Exception) { }
+        }
+
+        try { RecordAppliedUpdate(appDirectory, previousVersion); }
         catch (Exception) { }
 
         if (!ToolsPresent(baseDirectory, out var missing))
@@ -57,6 +73,28 @@ internal static class Program
         foreach (var argument in args) start.ArgumentList.Add(argument);
         Process.Start(start);
         return 0;
+    }
+
+    /// <summary>
+    /// Panelin iki durumu. İndirilenlerin toplandığı klasör görünmüşse iş artık ağ
+    /// denetimi değil, uygulamadır. Güncelleyiciye haber kancası eklemeye gerek yok:
+    /// klasörün varlığı zaten aynı bilgiyi taşıyor.
+    /// </summary>
+    private static string Status(string baseDirectory) =>
+        Directory.Exists(Path.Combine(baseDirectory, StageDirectoryName))
+            ? "Güncelleme uygulanıyor"
+            : "Güncelleme kontrol ediliyor";
+
+    /// <summary>
+    /// Bir güncelleme uygulandıysa geçilen sürümü uygulamanın okuyacağı yere bırakır.
+    /// Panel hiç görünmemiş olsa bile (hızlı tur) bu bilgi kalır; kullanıcı ne olduğunu
+    /// sonradan da öğrenebilmeli. İlk kurulumda işaret yazılmaz: geçilmiş bir sürüm yok.
+    /// </summary>
+    private static void RecordAppliedUpdate(string appDirectory, string? previousVersion)
+    {
+        var current = UpdateCheck.ReadVersionMarker(appDirectory);
+        if (previousVersion is null || current is null || current == previousVersion) return;
+        File.WriteAllText(Path.Combine(appDirectory, AppliedMarkerName), current);
     }
 
     /// <summary>
