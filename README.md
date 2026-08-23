@@ -42,6 +42,22 @@ The installer needs no root. It reuses an installed .NET 8 SDK when it finds one
 
 FFmpeg is the one thing this installer will not put on your machine for you. If `ffmpeg` or `ffprobe` is missing it prints the command for your package manager — `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading anything else.
 
+### Staying up to date
+
+**On Windows the application updates itself while it opens, without asking.** The Desktop and Start Menu shortcuts point at `VidShrink.exe`, a small launcher that sits above the application. Before the application is loaded, the launcher fetches the release manifest, compares the SHA-256 of every file under `app\` with the published one, downloads only the files whose digest differs, verifies each download against the manifest, and applies them in one step. A typical release changes about 1.7 MB of a 519 MB installation, so that is what comes down the wire.
+
+The launcher never blocks the application from opening. No network, unresolved DNS, a rate limit, a broken manifest, a full disk: in all of them it gives up silently and starts the installed version as it is. Fetching the manifest has a two-second timeout, so a machine that is offline opens the application at its normal speed.
+
+Downloaded files are verified before anything is replaced. A file whose digest does not match is discarded and the update is cancelled for that round, which is what catches a half-downloaded file. Files land in a staging folder first and move into `app\` only after all of them verify, so a half-updated `app\` folder never becomes visible. FFmpeg does not travel with releases and is never downloaded again; the launcher only checks that `ffmpeg.exe` and `ffprobe.exe` are still there and tells you the install command if they are not.
+
+**Automatic updates are on by default and can be switched off.** The switch lives in the application's settings and is stored in `%APPDATA%\VidShrink\settings.json`, next to your other settings rather than next to the executable, so reinstalling does not reset it. With it off the launcher does not even fetch the manifest — no network request is made at startup — and Windows behaves exactly like macOS and Linux: the application only tells you that a new version exists and you update by running the install command again.
+
+**On macOS and Linux the application only tells you that a new version exists.** Changing a file inside a `.app` bundle breaks its Gatekeeper signature and the application then refuses to open at all, so nothing is replaced in place. Update by running the install command again:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+```
+
 ### README image portability
 
 The screenshot above is committed at `docs/assets/vidshrink-current.png` and referenced with a repository-relative path. Do not replace it with a path such as `C:\Users\...`, a temporary Codex attachment path, or a `file://` URL: those addresses exist only on the computer that created them. On GitHub, also keep filename capitalization identical and make sure the image file is committed and pushed rather than merely present in the local working folder.
@@ -146,6 +162,7 @@ dotnet test VidShrink.sln
 src/VidShrink.Core     complexity model, strategy, planning, ffmpeg argument construction
 src/VidShrink.Ffmpeg   ffprobe, complexity probe, encode execution
 src/VidShrink.App      Avalonia user interface, one source tree for all three platforms
+src/VidShrink.Launcher Windows launcher, applies the file-level update before the app loads
 tests/VidShrink.Tests  engine and argument-generation regression tests
 ```
 

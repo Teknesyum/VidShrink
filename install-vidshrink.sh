@@ -166,6 +166,10 @@ chmod +x "$installed_executable"
 ln -sf "$installed_executable" "$bin_directory/vidshrink"
 
 say "VidShrink kuruldu: $install_root"
+# macOS ve Linux'ta uygulama kendini güncellemez: paket içindeki bir dosya değişince
+# Gatekeeper imzası bozulur ve uygulama hiç açılmaz. Güncelleme bu betiği yeniden
+# çalıştırmakla olur.
+say 'Güncellemek için bu komutu yeniden çalıştırın.'
 case ":${PATH}:" in
     *":$bin_directory:"*) say 'Çalıştırmak için: vidshrink' ;;
     *) say "Çalıştırmak için: $bin_directory/vidshrink ($bin_directory henüz PATH içinde değil)" ;;

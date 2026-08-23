@@ -126,21 +126,33 @@ try {
     if (-not $sourceRoot) { throw 'İndirilen kaynak paketi açılamadı.' }
 
     $runtimeIdentifier = Get-RuntimeIdentifier
+
+    # Kurulum düzeni: kökte başlatıcı ve ffmpeg, app\ altında güncellenen uygulama.
+    # Çalışan bir exe ve yüklü dll'ler üzerine yazılamadığı için güncelleme, uygulama
+    # yüklenmeden önce başlatıcı tarafından app\ klasörüne uygulanır.
+    $appPublishRoot = Join-Path $publishRoot 'app'
     Write-Host "VidShrink Release sürümü yayımlanıyor ($runtimeIdentifier)..." -ForegroundColor Cyan
     & $dotnet publish (Join-Path $sourceRoot.FullName 'src\VidShrink.App\VidShrink.App.csproj') `
         --configuration Release --runtime $runtimeIdentifier --self-contained true `
-        -p:PublishSingleFile=false --output $publishRoot
+        -p:PublishSingleFile=false --output $appPublishRoot
     if ($LASTEXITCODE -ne 0) { throw "VidShrink derlenemedi. dotnet çıkış kodu: $LASTEXITCODE" }
+
+    Write-Host 'Başlatıcı yayımlanıyor...' -ForegroundColor Cyan
+    & $dotnet publish (Join-Path $sourceRoot.FullName 'src\VidShrink.Launcher\VidShrink.Launcher.csproj') `
+        --configuration Release --runtime $runtimeIdentifier --self-contained true `
+        -p:PublishSingleFile=true --output $publishRoot
+    if ($LASTEXITCODE -ne 0) { throw "Başlatıcı derlenemedi. dotnet çıkış kodu: $LASTEXITCODE" }
 
     $toolsRoot = Join-Path $publishRoot 'tools\ffmpeg'
     New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null
     Copy-Item -LiteralPath $ffmpeg -Destination (Join-Path $toolsRoot 'ffmpeg.exe') -Force
     Copy-Item -LiteralPath $ffprobe -Destination (Join-Path $toolsRoot 'ffprobe.exe') -Force
 
-    $runningExecutable = Join-Path $resolvedInstallRoot 'VidShrink.App.exe'
-    Get-Process VidShrink.App -ErrorAction SilentlyContinue |
-        Where-Object { $_.Path -eq $runningExecutable } |
-        Stop-Process -Force
+    foreach ($processName in 'VidShrink.App', 'VidShrink') {
+        Get-Process $processName -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -and $_.Path.StartsWith($resolvedInstallRoot, [StringComparison]::OrdinalIgnoreCase) } |
+            Stop-Process -Force
+    }
 
     if (Test-Path -LiteralPath $resolvedInstallRoot) {
         Remove-Item -LiteralPath $resolvedInstallRoot -Recurse -Force
@@ -148,8 +160,12 @@ try {
     New-Item -ItemType Directory -Path $resolvedInstallRoot -Force | Out-Null
     Copy-Item -Path (Join-Path $publishRoot '*') -Destination $resolvedInstallRoot -Recurse -Force
 
-    $installedExe = Join-Path $resolvedInstallRoot 'VidShrink.App.exe'
-    if (-not (Test-Path -LiteralPath $installedExe)) { throw 'Kurulan VidShrink.App.exe bulunamadı.' }
+    # Kısayollar başlatıcıyı gösterir; uygulamayı doğrudan gösterirlerse güncelleme hiç çalışmaz.
+    $installedExe = Join-Path $resolvedInstallRoot 'VidShrink.exe'
+    if (-not (Test-Path -LiteralPath $installedExe)) { throw 'Kurulan VidShrink.exe bulunamadı.' }
+    if (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot 'app\VidShrink.App.exe'))) {
+        throw 'Kurulan app\VidShrink.App.exe bulunamadı.'
+    }
 
     if (-not $SkipShortcuts) {
         $shell = New-Object -ComObject WScript.Shell
