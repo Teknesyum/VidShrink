@@ -132,8 +132,8 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     ZIndex="1">
-          <Button x:Name="BtnTr" Content="TR" Theme="{StaticResource LangButton}" Click="OnTurkish"/>
-          <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource LangButton}" Click="OnEnglish"/>
+          <Button x:Name="BtnTr" Content="TR" Theme="{StaticResource ChipButton}" Click="OnTurkish"/>
+          <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource ChipButton}" Click="OnEnglish"/>
         </StackPanel>
 
         <TabControl Theme="{StaticResource NeonTabControl}">
