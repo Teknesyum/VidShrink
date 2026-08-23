@@ -391,9 +391,9 @@
   },
   "src/VidShrink.App/MainWindow.axaml.cs": {
     "model": "claude-opus-5",
-    "effort": "medium",
-    "t": "2026-08-23 18:07:25",
-    "ajan": "builder"
+    "effort": "high",
+    "t": "2026-08-23 18:57:03",
+    "ajan": "ana oturum"
   },
   "src/VidShrink.App/LanguageCatalog.cs": {
     "model": "claude-opus-5",

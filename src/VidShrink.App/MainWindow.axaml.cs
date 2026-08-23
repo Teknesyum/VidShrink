@@ -465,6 +465,30 @@ public partial class MainWindow : Window
         finally { _updateUiSyncing = false; }
 
         RefreshUpdateTexts();
+        ReportAppliedUpdate();
+    }
+
+    // The launcher writes this file after it has swapped a new version into app\, whether or
+    // not the splash was on screen long enough to be seen. Reading it here is how someone who
+    // saw nothing still finds out what happened. It is deleted straight away so the line shows
+    // once; UpdateNotice is a different message and says a new version is waiting, not applied.
+    private void ReportAppliedUpdate()
+    {
+        var marker = Path.Combine(AppContext.BaseDirectory, ".update-applied");
+        string version;
+        try
+        {
+            if (!File.Exists(marker)) return;
+            version = File.ReadAllText(marker).Trim();
+            File.Delete(marker);
+        }
+        catch
+        {
+            return;
+        }
+
+        if (version.Length == 0) return;
+        TxtSystemStatus.Text = T($"Yeni sürüme geçildi: {version}", $"Updated to {version}");
     }
 
     private void RefreshUpdateTexts()
