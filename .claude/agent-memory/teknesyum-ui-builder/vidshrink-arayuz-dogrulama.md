@@ -44,3 +44,10 @@ computer-use ve UIA denemesiyle tur harcama.
   pencere dikdörtgenine göre farkıyla yap.
 - Uygulama çalışırken `dotnet build` MSB3021 ile düşüyor. Yakalamadan önce
   `Get-Process VidShrink.App | Stop-Process -Force`.
+
+**Not (2026-08-23, T22 — katmanlı Win32 penceresi):** Başlatıcının bekleme paneli
+`UpdateLayeredWindow` ile çiziliyor. `PrintWindow` katmanlı pencerede boş dönüyor;
+burada tek çalışan yol tam ekran `CopyFromScreen`. Panel `WS_EX_TOPMOST` olduğu için
+üstteki uygulama sorunu da çıkmıyor. Panel Launcher'da yaşadığı için doğrulaması,
+`Splash.cs`'i bağlayan ve üretilen PNG'yi gömen küçük bir deneme projesiyle yapıldı —
+uygulamayı hiç açmadan.
