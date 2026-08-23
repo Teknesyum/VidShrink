@@ -43,7 +43,12 @@
               Background="{StaticResource TitleBarBackground}"
               BorderBrush="{StaticResource NeonBlueBorderStrong}"
               BorderThickness="0,0,0,1">
-        <Grid x:Name="TitleBarContent" Margin="16,0,12,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
+        <!--
+          Sağda boşluk yok: kapatma düğmesi pencerenin sağ kenarına dayanır. Ekranın köşesi
+          işaretçiyle vurulması en kolay hedeftir ve fare orada durur; araya konan her piksel
+          o kazancı siler. Soldaki 16 px başlık için duruyor.
+        -->
+        <Grid x:Name="TitleBarContent" Margin="16,0,0,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
           <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
             <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
@@ -59,7 +64,7 @@
             <TextBlock x:Name="TaglineSeparator" Text=" &amp; " Theme="{StaticResource ProductTagline}" Foreground="{StaticResource TextBody}"/>
             <TextBlock x:Name="TaglineConverter" Text="Media converter" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
           </StackPanel>
-          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <!-- The two empty MoveTo commands pin the icon's own 24x24 design box, so Uniform
@@ -76,7 +81,12 @@
             <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
               <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
             </Button>
-            <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Center">
+            <!--
+              Üç düğme Windows'taki gibi bitişik dikdörtgen: aralarında boşluk yok, başlık
+              çubuğu boyunca tam yükseklikte. Soldaki tek boşluk imza bloğundan ayırmak için.
+            -->
+            <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Stretch"
+                        Margin="{StaticResource WindowButtonMargin}">
               <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="Minimize" auto:AutomationProperties.Name="Minimize" Click="OnMinimize">
                 <Rectangle Width="10" Height="2" RadiusX="1" RadiusY="1" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>

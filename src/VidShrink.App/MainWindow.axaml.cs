@@ -8,6 +8,7 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -330,6 +331,7 @@ public partial class MainWindow : Window
         try
         {
             UpdateMaximizeGlyph();
+            ApplyWindowFrame();
             WindowShell.Margin = OffScreenMargin;
             SetLanguage(true);
             InitializeUpdateUi();
@@ -350,7 +352,7 @@ public partial class MainWindow : Window
     {
         base.OnPropertyChanged(change);
         if (!_controlsReady) return;
-        if (change.Property == WindowStateProperty) UpdateMaximizeGlyph();
+        if (change.Property == WindowStateProperty) { UpdateMaximizeGlyph(); ApplyWindowFrame(); }
         else if (change.Property == OffScreenMarginProperty) WindowShell.Margin = OffScreenMargin;
     }
 
@@ -371,6 +373,27 @@ public partial class MainWindow : Window
             return;
         }
         BeginMoveDrag(e);
+    }
+
+    /// <summary>
+    /// Tam ekranda kabuk kenarlığını ve köşe yuvarlamasını kaldırır. Windows kendi pencerelerinde
+    /// de böyle yapar ve sebebi süs değil: 1 piksellik kenarlık kalırsa ekranın sağ üst pikseli
+    /// kapatma düğmesinin değil kenarlığın üstüne düşer, köşenin kolay hedef olma kazancı gider.
+    /// Normal boyutta kenarlık ve yuvarlama belirteçlerden geri gelir.
+    /// </summary>
+    private void ApplyWindowFrame()
+    {
+        var maximized = WindowState == WindowState.Maximized;
+        WindowShell.BorderThickness = maximized
+            ? new Thickness(0)
+            : this.TryFindResource("BorderThin", out var border) && border is Thickness thickness
+                ? thickness
+                : new Thickness(1);
+        WindowShell.CornerRadius = maximized
+            ? new CornerRadius(0)
+            : this.TryFindResource("RadiusControl", out var radius) && radius is CornerRadius corner
+                ? corner
+                : default;
     }
 
     private void OnMinimize(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
@@ -437,12 +460,47 @@ public partial class MainWindow : Window
     private void ApplyTextCase()
         => WalkText(this, value => LanguageCatalog.Title(value, _turkish), new HashSet<StyledElement>());
 
+    private bool IsTipBody(TextBlock block) => block.Theme is { } theme && ReferenceEquals(theme, Look("TipText"));
+
+    /// <summary>
+    /// K6: madde işaretini gövde metninden ayırır. Yuvarlak işaret neon mavisi bir koşu olur,
+    /// cümle gövde renginde kalır; göz maddenin nerede başladığını sarma satırından ayırt eder.
+    /// Düz metin <see cref="StyledElement.Tag"/> içinde saklanır, çünkü koşulardan kurulmuş bir
+    /// <see cref="TextBlock"/> artık <c>Text</c> üzerinden okunup yazılamaz ve dil geçidi ile
+    /// büyük harf geçidi kaynak metni oradan alır.
+    /// </summary>
+    private void PaintTip(TextBlock block, string plain)
+    {
+        block.Tag = plain;
+        if (block.Inlines is not { } inlines) { block.Text = plain; return; }
+
+        inlines.Clear();
+        var bullet = Paint("NeonBlue");
+        var lines = plain.Split('\n');
+        for (var index = 0; index < lines.Length; index++)
+        {
+            if (index > 0) inlines.Add(new LineBreak());
+            var line = lines[index];
+            if (line.StartsWith("• ", StringComparison.Ordinal))
+            {
+                inlines.Add(new Run("• ") { Foreground = bullet });
+                line = line[2..];
+            }
+            inlines.Add(new Run(line));
+        }
+    }
+
     private void WalkText(StyledElement node, Func<string, string> map, HashSet<StyledElement> visited)
     {
         if (!visited.Add(node)) return;
 
         switch (node)
         {
+            // İpucu gövdesi renkli koşulardan kuruluyor, bu yüzden düz metni artık Text
+            // taşımıyor; kaynak metin Tag'da duruyor ve dil değişiminde oradan okunuyor.
+            case TextBlock tip when IsTipBody(tip):
+                PaintTip(tip, map(tip.Tag as string ?? tip.Text ?? string.Empty));
+                break;
             // A TextBlock built from runs carries its own colouring; writing Text would erase it.
             case TextBlock text when text.Inlines is not { Count: > 0 } && text.Text is { } value:
                 text.Text = map(value);
@@ -478,7 +536,8 @@ public partial class MainWindow : Window
     }
 
     private void ApplyFastGpuTip()
-        => TipFastGpu.Text = Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish);
+        // Text yazmak koşuları silerdi: ipucu gövdesi aynı boyayıcıdan geçmeli.
+        => PaintTip(TipFastGpu, Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish));
 
     private async Task LoadFfmpegVersionAsync()
     {
