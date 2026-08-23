@@ -6,7 +6,21 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+  <!--
+    T27: ipucu satırlarının genişliği uygulamanın kendi yazı tipiyle ölçülüyor. Yazı tipi
+    projeye gömülü, sistemde kurulu değil; sistem yazı tipiyle ölçüm yanlış çıkar. Bu
+    yüzden aynı .ttf dosyaları buraya da kaynak olarak bağlanıyor (kopyalanmıyor) ve ölçüm
+    uygulamanın kullandığı Avalonia metin dizgicisiyle yapılıyor.
+  -->
   <ItemGroup>
+    <AvaloniaResource Include="..\..\src\VidShrink.App\Fonts\AtkinsonHyperlegibleNext-Regular.ttf" Link="Fonts\AtkinsonHyperlegibleNext-Regular.ttf" />
+    <AvaloniaResource Include="..\..\src\VidShrink.App\Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" Link="Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" />
+    <AvaloniaResource Include="..\..\src\VidShrink.App\Fonts\AtkinsonHyperlegibleNext-Bold.ttf" Link="Fonts\AtkinsonHyperlegibleNext-Bold.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
