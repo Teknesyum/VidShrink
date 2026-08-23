@@ -67,6 +67,20 @@ burada tek çalışan yol tam ekran `CopyFromScreen`. Panel `WS_EX_TOPMOST` oldu
 `Splash.cs`'i bağlayan ve üretilen PNG'yi gömen küçük bir deneme projesiyle yapıldı —
 uygulamayı hiç açmadan.
 
+**Not (2026-08-23, T23 — yakalama betiğine eklenen üç yetenek):**
+- **Sekme seçme.** `AutomationElement`i `NameProperty` ile bul (TR'de `Gelişmiş`, EN'de
+  `Advanced`), `SelectionItemPattern.Select()` çağır. `AutomationIdProperty` sekmelerde
+  yok, ad üzerinden gitmek gerekiyor.
+- **Büyütülmüş pencereyi küçültüp yakalama.** `ShowWindow(hwnd, 1)` (SW_NORMAL) sonrası
+  `PrintWindow` **tamamen siyah** dönüyor. Çalışan sıra: `ShowWindow(hwnd, 9)`
+  (SW_RESTORE) → 2 sn → `MoveWindow` → 2 sn → `SetForegroundWindow` → 3 sn → yakala.
+- **Hover durumu.** `SetCursorPos(pencereSol + x, pencereÜst + y)` ile fareyi denetimin
+  üstüne koy, 2 sn bekle, sonra `PrintWindow`. `:pointerover` durumu böyle kanıtlanıyor.
+
+**Not (2026-08-23, T23 — test/uygulama çakışması):** Uygulama ekran görüntüsü için
+açıkken `dotnet test` koşturma. ffmpeg tabanlı testler `libx264` "Error while opening
+encoder" ile düşüyor; kod kaynaklı değil, çakışma. Yakalamadan önce ya da sonra, uygulama
+kapalıyken koştur.
 **Not (2026-08-23, T25 — ipucu balonu yakalama):** Avalonia ipucu balonu ayrı bir üst düzey
 pencere. `PrintWindow` ana pencerede balonu göstermez; balonun kendi tutamağını
 `EnumWindows` ile pid altında ana pencere dışındaki görünür pencere olarak bul ve onu

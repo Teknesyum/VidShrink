@@ -35,7 +35,7 @@
           BorderThickness="{StaticResource BorderThin}"
           CornerRadius="{StaticResource RadiusControl}"
           UseLayoutRounding="True">
-    <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
       <Border x:Name="TitleBar"
               Grid.Row="0"
@@ -43,14 +43,23 @@
               Background="{StaticResource TitleBarBackground}"
               BorderBrush="{StaticResource NeonBlueBorderStrong}"
               BorderThickness="0,0,0,1">
-        <Grid x:Name="TitleBarContent" Margin="16,0,12,0">
-          <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+        <Grid x:Name="TitleBarContent" Margin="16,0,12,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
             <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
               <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
             </TextBlock>
           </StackPanel>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+          <StackPanel Grid.Column="1"
+                      x:Name="TaglineRow"
+                      Orientation="Horizontal"
+                      VerticalAlignment="Center"
+                      ClipToBounds="True">
+            <TextBlock x:Name="TaglineLead" Text="Target size media compression" Theme="{StaticResource ProductTagline}"/>
+            <TextBlock x:Name="TaglineSeparator" Text=" &amp; " Theme="{StaticResource ProductTagline}" Foreground="{StaticResource TextBody}"/>
+            <TextBlock x:Name="TaglineConverter" Text="Media converter" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
                 <Path Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center"
@@ -119,22 +128,20 @@
       </Border>
 
       <Grid Grid.Row="2" Margin="24,12,24,12">
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-          <TextBlock x:Name="TaglineLead" Text="Target size media compression" Theme="{StaticResource ProductTagline}"/>
-          <TextBlock x:Name="TaglineSeparator" Text=" &amp; " Theme="{StaticResource ProductTagline}" Foreground="{StaticResource TextBody}"/>
-          <TextBlock x:Name="TaglineConverter" Text="Media converter" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <StackPanel x:Name="LangSwitch"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    ZIndex="1">
           <Button x:Name="BtnTr" Content="TR" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="TR" Click="OnTurkish"/>
           <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="EN" Click="OnEnglish"/>
         </StackPanel>
-      </Grid>
 
-      <TabControl Grid.Row="3" Margin="24,0,24,24" Theme="{StaticResource NeonTabControl}">
+        <TabControl Theme="{StaticResource NeonTabControl}">
 
         <TabItem Header="Shrink" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceXl}">
+            <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
               <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceLg}">
 
@@ -363,7 +370,7 @@
                       Theme="{StaticResource Panel}"
                       VerticalAlignment="Stretch"
                       MinHeight="{StaticResource PlanPanelMinHeight}">
-                <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="{StaticResource SpaceMd}">
+                <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
                   <TextBlock Grid.Row="0" Text="What it will do" Theme="{StaticResource H2}"/>
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
@@ -373,8 +380,6 @@
                       <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}"/>
                     </StackPanel>
                   </ScrollViewer>
-                  <TextBlock Grid.Row="2" Text="FFmpeg command" Theme="{StaticResource Label}" Margin="0"/>
-                  <TextBox Grid.Row="3" x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="3" MaxLines="3"/>
                 </Grid>
               </Border>
 
@@ -384,10 +389,14 @@
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="Output" Theme="{StaticResource H2}"/>
                     <ProgressBar x:Name="Progress" Maximum="1"/>
-                    <UniformGrid Columns="2">
-                      <StackPanel>
-                        <TextBlock Text="Stage" Theme="{StaticResource Label}"/>
-                        <TextBlock x:Name="TxtStage" Text="Idle" Theme="{StaticResource MonoValue}">
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto,Auto"
+                          ColumnSpacing="{StaticResource SpaceMd}"
+                          RowSpacing="{StaticResource SpaceMd}">
+
+                      <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="Stage" Theme="{StaticResource OutFactLabel}"/>
+                        <TextBlock x:Name="TxtStage" Text="Idle" Theme="{StaticResource OutFactValue}">
                           <TextBlock.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
@@ -395,44 +404,27 @@
                           </TextBlock.Transitions>
                         </TextBlock>
                       </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="Remaining" Theme="{StaticResource Label}"/>
-                        <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource MonoValue}"/>
+
+                      <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="Current output size" Theme="{StaticResource OutFactLabel}"/>
+                        <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
-                    </UniformGrid>
-                    <UniformGrid Columns="2">
-                      <StackPanel>
-                        <TextBlock Text="Current output size" Theme="{StaticResource Label}"/>
-                        <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource HeroValue}"/>
+
+                      <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="Remaining" Theme="{StaticResource OutFactLabel}"/>
+                        <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
-                      <StackPanel>
+
+                      <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
                         <StackPanel Orientation="Horizontal">
-                          <TextBlock x:Name="LblEstimate" Text="Estimated output" Theme="{StaticResource Label}"/>
-                          <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated output">
-                            <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" Text="• Before planning, VidShrink encodes short samples of this exact clip at two resolutions and measures how many bits it really needs — it does not guess from the source bitrate.&#10;• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.&#10;• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see."/>
-                            </ToolTip.Tip>
-                          </Button>
-                        </StackPanel>
-                        <TextBlock x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource HeroValue}">
-                          <TextBlock.Transitions>
-                            <Transitions>
-                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
-                            </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
-                        <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                          <TextBlock x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource Label}"/>
+                          <TextBlock x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource OutFactLabel}"/>
                           <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated time">
                             <ToolTip.Tip>
                               <TextBlock Theme="{StaticResource TipText}" Text="• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file rather than from a table of presets.&#10;• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.&#10;• When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."/>
                             </ToolTip.Tip>
                           </Button>
                         </StackPanel>
-                        <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource HeroValue}">
+                        <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource OutFactValue}">
                           <TextBlock.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
@@ -441,7 +433,26 @@
                         </TextBlock>
                         <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                       </StackPanel>
-                    </UniformGrid>
+
+                      <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceXs}">
+                        <StackPanel Orientation="Horizontal">
+                          <TextBlock x:Name="LblEstimate" Text="Estimated output" Theme="{StaticResource OutFactLabel}"/>
+                          <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated output">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" Text="• Before planning, VidShrink encodes short samples of this exact clip at two resolutions and measures how many bits it really needs — it does not guess from the source bitrate.&#10;• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.&#10;• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see."/>
+                            </ToolTip.Tip>
+                          </Button>
+                        </StackPanel>
+                        <TextBlock x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource OutFactValue}">
+                          <TextBlock.Transitions>
+                            <Transitions>
+                              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+                            </Transitions>
+                          </TextBlock.Transitions>
+                        </TextBlock>
+                        <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Grid>
                     <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <TextBlock x:Name="TxtResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                     <Border x:Name="RetryAskPanel"
@@ -465,41 +476,6 @@
                   </StackPanel>
                 </Border>
 
-                <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
-                  <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="AI settings" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                      <TextBlock Grid.Column="1"
-                                 x:Name="TxtAiHint"
-                                 Text="{StaticResource AiHintText}"
-                                 Theme="{StaticResource Hint}"
-                                 TextTrimming="CharacterEllipsis"
-                                 VerticalAlignment="Center">
-                        <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="{StaticResource AiHintText}"/>
-                        </ToolTip.Tip>
-                      </TextBlock>
-                      <Button Grid.Column="2"
-                              x:Name="BtnAiDetails"
-                              Content="▾"
-                              Theme="{StaticResource GhostButton}"
-                              VerticalAlignment="Center"
-                              FontFamily="{StaticResource FontMono}"
-                              auto:AutomationProperties.Name="AI settings"
-                              Click="OnToggleAiDetails"/>
-                    </Grid>
-                    <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
-                      <TextBlock Text="{StaticResource AiHintText}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                      <WrapPanel>
-                        <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
-                        <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
-                        <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
-                      </WrapPanel>
-                      <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
-                      <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                  </StackPanel>
-                </Border>
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
                   <Button x:Name="BtnCancel" Content="Cancel" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
@@ -779,9 +755,70 @@
           </ScrollViewer>
         </TabItem>
 
+          <TabItem Header="Advanced" Theme="{StaticResource NeonTabItem}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+
+              <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <TextBlock Grid.Column="0" Text="FFmpeg command" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            x:Name="BtnCommandExpand"
+                            Content="▾"
+                            Theme="{StaticResource GhostButton}"
+                            FontFamily="{StaticResource FontMono}"
+                            VerticalAlignment="Center"
+                            auto:AutomationProperties.Name="FFmpeg command"
+                            Click="OnToggleCommand"/>
+                  </Grid>
+                  <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1"/>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <TextBlock Grid.Column="0" Text="AI settings" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1"
+                               x:Name="TxtAiHint"
+                               Text="{StaticResource AiHintText}"
+                               Theme="{StaticResource Hint}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center">
+                      <ToolTip.Tip>
+                        <TextBlock Theme="{StaticResource TipText}" Text="{StaticResource AiHintText}"/>
+                      </ToolTip.Tip>
+                    </TextBlock>
+                    <Button Grid.Column="2"
+                            x:Name="BtnAiDetails"
+                            Content="▾"
+                            Theme="{StaticResource GhostButton}"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource FontMono}"
+                            auto:AutomationProperties.Name="AI settings"
+                            Click="OnToggleAiDetails"/>
+                  </Grid>
+                  <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                    <TextBlock Text="{StaticResource AiHintText}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <WrapPanel>
+                      <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
+                      <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
+                      <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
+                    </WrapPanel>
+                    <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
+                    <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
       </TabControl>
 
-      <TextBlock x:Name="TxtStatusBar" Grid.Row="3" IsVisible="False"/>
+      </Grid>
     </Grid>
   </Border>
 </Window>

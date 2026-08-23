@@ -102,6 +102,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         _controlsReady = true;
 
+        ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
+
         _motionReduced = !AnimationsAllowed();
         if (_motionReduced) Classes.Add("reduced-motion");
         ApplyStartupSize();
@@ -215,6 +217,28 @@ public partial class MainWindow : Window
         }
     }
 
+    private readonly Dictionary<Control, int> _fadeGeneration = new();
+
+    private void ShowScrollOnlyOnHover(params TextBox[] boxes)
+    {
+        foreach (var box in boxes)
+        {
+            ApplyScrollAffordance(box, false);
+            box.PointerEntered += (_, _) => ApplyScrollAffordance(box, true);
+            box.PointerExited += (_, _) => ApplyScrollAffordance(box, false);
+        }
+    }
+
+    private static void ApplyScrollAffordance(TextBox box, bool hovered)
+    {
+        var shown = hovered ? ScrollBarVisibility.Auto : ScrollBarVisibility.Hidden;
+        ScrollViewer.SetVerticalScrollBarVisibility(box, shown);
+        ScrollViewer.SetHorizontalScrollBarVisibility(
+            box,
+            box.TextWrapping == TextWrapping.Wrap ? ScrollBarVisibility.Disabled : shown);
+    }
+
+
     private void EnsureFade(Control control)
     {
         if (control.Transitions is not null) return;
@@ -229,6 +253,7 @@ public partial class MainWindow : Window
         EnsureFade(control);
         if (visible)
         {
+            _fadeGeneration[control] = NextFadeGeneration(control);
             if (control.IsVisible && control.Opacity > 0.99) return;
             control.Opacity = 0;
             control.IsVisible = true;
@@ -237,9 +262,16 @@ public partial class MainWindow : Window
         }
 
         if (!control.IsVisible) return;
+        var generation = _fadeGeneration[control] = NextFadeGeneration(control);
         control.Opacity = 0;
-        DispatcherTimer.RunOnce(() => { if (control.Opacity < 0.01) control.IsVisible = false; }, Motion("MotionBase", 240));
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (_fadeGeneration.TryGetValue(control, out var current) && current == generation) control.IsVisible = false;
+        }, Motion("MotionBase", 240));
     }
+
+    private int NextFadeGeneration(Control control)
+        => _fadeGeneration.TryGetValue(control, out var current) ? current + 1 : 1;
 
     private void Pulse(Control control, bool throttled)
     {
@@ -461,12 +493,10 @@ public partial class MainWindow : Window
             var message = T(
                 $"{missing} bulunamadı. VidShrink'in yanındaki tools/ffmpeg klasörüne koyun veya PATH'e kurun.",
                 $"{missing} not found. Put it in tools/ffmpeg next to VidShrink, or install it on PATH.");
-            TxtStatusBar.Text = message;
             TxtSystemStatus.Text = message;
             return;
         }
 
-        TxtStatusBar.Text = $"FFmpeg: {T("Hazır", "Ready")} — {ToolLocator.Ffmpeg}";
         TxtSystemStatus.Text = string.Join("\n",
             $"FFmpeg: {ToolLocator.Ffmpeg}",
             $"{T("Sürüm", "Version")}: {_ffmpegVersion ?? T("okunuyor...", "reading...")}",
@@ -647,7 +677,7 @@ public partial class MainWindow : Window
         {
             encoders = null;
             available = false;
-            TxtStatusBar.Text = $"{T("Donanım kodlayıcı yoklaması başarısız", "The hardware encoder probe failed")}: {ex.Message}";
+            TxtSystemStatus.Text = $"{T("Donanım kodlayıcı yoklaması başarısız", "The hardware encoder probe failed")}: {ex.Message}";
         }
 
         _encoders = encoders;
@@ -766,7 +796,6 @@ public partial class MainWindow : Window
     {
         TxtSourceStatus.Text = message;
         TxtSourceStatus.IsVisible = true;
-        TxtStatusBar.Text = message;
         TxtSystemStatus.Text = message;
     }
 
@@ -781,7 +810,6 @@ public partial class MainWindow : Window
         TxtFileName.Text = Path.GetFileName(path);
         Fade(SourceCard, true);
         ClearSourceError();
-        TxtStatusBar.Text = T("Ffprobe ile inceleniyor...", "Probing with ffprobe...");
 
         try { _info = await FfprobeClient.ProbeAsync(path); }
         catch (Exception ex)
@@ -1206,6 +1234,19 @@ public partial class MainWindow : Window
     {
         if (_syncing) return;
         ScheduleRecalculate();
+    }
+
+    private bool _commandExpanded;
+
+    private void OnToggleCommand(object? sender, RoutedEventArgs e) => SetCommandExpanded(!_commandExpanded);
+
+    private void SetCommandExpanded(bool expanded)
+    {
+        _commandExpanded = expanded;
+        TxtCommand.TextWrapping = expanded ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        TxtCommand.MaxLines = expanded ? 8 : 1;
+        BtnCommandExpand.Content = expanded ? "▴" : "▾";
+        ApplyScrollAffordance(TxtCommand, TxtCommand.IsPointerOver);
     }
 
     private void OnToggleAiDetails(object? sender, RoutedEventArgs e) => SetAiDetails(!AiDetails.IsVisible);
