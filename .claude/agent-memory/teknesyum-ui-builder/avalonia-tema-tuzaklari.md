@@ -48,3 +48,23 @@ kurulmalı ve `OnPropertyChanged` bayrak yokken erken dönmeli.
 **Bu projede `Expander` için `ControlTheme` yok.** Açılır bölüm gerekince temasız
 `Expander` koyma — kendi başlığını ve okunu sızdırır. `GhostButton` + `IsVisible`
 ile aç/kapa yap.
+
+**Not (2026-08-23, T23 — üç yeni tuzak):**
+
+- **`Fade()` gizlemesi geçişle yarışıyor.** `control.Opacity = 0` yazıp
+  `DispatcherTimer.RunOnce(..., MotionBase)` içinde `Opacity < 0.01` diye bakan kalıp
+  güvenilir değil: zamanlayıcı geçiş bitmeden ateşlendiğinde koşul tutmuyor, `IsVisible`
+  `True` kalıyor ve denetim görünmez halde yerini korumaya devam ediyor. VidShrink'te
+  `DropZone` bu yüzden dosya yüklendikten sonra 215 piksel boşluk bırakıyordu ve sebep
+  `MinHeight` sanılmıştı. Çözüm: denetim başına bir kuşak sayacı tut, gizleme kararını
+  opaklık okumasına değil araya yeni bir `Fade` girip girmediğine bağla.
+- **`ScrollBarVisibility` `ControlTheme`'den tutmuyor.** `TextBox` temasına
+  `<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>` ve
+  `^:pointerover` kuralı yazmak ekranda hiçbir şey değiştirmedi; kaydırma çubuğu yine
+  duruyordu. Çalışan yol kod tarafı: `PointerEntered`/`PointerExited` içinde
+  `ScrollViewer.SetHorizontalScrollBarVisibility` / `SetVerticalScrollBarVisibility`.
+  Sarma kipi (`TextWrapping`) sonradan değişiyorsa göstergeyi yeniden uygula.
+- **İki denetimin yüksekliğini eşitlemenin ucuz yolu.** Ölçü uydurmadan eşitlemek için
+  ikisine de aynı `FontFamily` + `FontSize` + `Padding` + `MinHeight` belirteçlerini ver;
+  `Height` yazmaya gerek yok. `NeonTabItem`i `ChipButton`ın ölçülerine (`FontSizeSm`,
+  `ChipPadding`, `RadiusChip`) indirmek sekmelerle `TR`/`EN` çiplerini birebir eşitledi.
