@@ -35,7 +35,7 @@
           BorderThickness="{StaticResource BorderThin}"
           CornerRadius="{StaticResource RadiusControl}"
           UseLayoutRounding="True">
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
 
       <Border x:Name="TitleBar"
               Grid.Row="0"
@@ -72,7 +72,51 @@
         </Grid>
       </Border>
 
-      <Grid Grid.Row="1" Margin="24,12,24,12">
+      <Border x:Name="UpdateNotice"
+              Grid.Row="1"
+              Margin="24,12,24,0"
+              IsVisible="False"
+              Background="{StaticResource Surface}"
+              BorderBrush="{StaticResource NeonPurpleBorder}"
+              BorderThickness="{StaticResource BorderThin}"
+              CornerRadius="{StaticResource RadiusControl}"
+              BoxShadow="{StaticResource GlowPurple}"
+              Padding="{StaticResource ButtonPaddingSm}">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+          <TextBlock Grid.Column="0"
+                     x:Name="TxtNoticeLead"
+                     Text="A new version is available"
+                     Theme="{StaticResource Body}"
+                     VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1"
+                     x:Name="TxtNoticeVersion"
+                     Theme="{StaticResource MonoValue}"
+                     Foreground="{StaticResource NeonPurple}"
+                     VerticalAlignment="Center"/>
+          <TextBox Grid.Column="2"
+                   x:Name="TxtNoticeCommand"
+                   IsReadOnly="True"
+                   MaxLines="1"
+                   FontFamily="{StaticResource FontMono}"
+                   VerticalAlignment="Center"/>
+          <Button Grid.Column="3"
+                  x:Name="BtnNoticeCopy"
+                  Content="Copy"
+                  Theme="{StaticResource GhostButton}"
+                  VerticalAlignment="Center"
+                  Click="OnCopyUpdateCommand"/>
+          <Button Grid.Column="4"
+                  x:Name="BtnNoticeDismiss"
+                  Content="×"
+                  Theme="{StaticResource GhostButton}"
+                  FontFamily="{StaticResource FontMono}"
+                  VerticalAlignment="Center"
+                  auto:AutomationProperties.Name="Close"
+                  Click="OnDismissUpdateNotice"/>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="2" Margin="24,12,24,12">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
           <TextBlock x:Name="TaglineLead" Text="Target size media compression" Theme="{StaticResource ProductTagline}"/>
           <TextBlock x:Name="TaglineSeparator" Text=" &amp; " Theme="{StaticResource ProductTagline}" Foreground="{StaticResource TextBody}"/>
@@ -84,7 +128,7 @@
         </StackPanel>
       </Grid>
 
-      <TabControl Grid.Row="2" Margin="24,0,24,24" Theme="{StaticResource NeonTabControl}">
+      <TabControl Grid.Row="3" Margin="24,0,24,24" Theme="{StaticResource NeonTabControl}">
 
         <TabItem Header="Shrink" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -703,6 +747,14 @@
                 <TextBlock Theme="{StaticResource Body}" TextWrapping="Wrap" Text="H.264 offers the broadest compatibility. H.265 compresses more efficiently. VP9 is a strong WebM choice. AV1 maximizes modern compression at higher CPU cost. Stream copy is fastest and lossless when the destination supports the source streams."/>
                 <TextBlock Text="System status" Theme="{StaticResource H3}"/>
                 <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
+                <TextBlock Text="Updates" Theme="{StaticResource H3}"/>
+                <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
+                  <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="Update automatically"/>
+                </StackPanel>
+                <TextBlock x:Name="TxtAutoUpdateEffect"
+                           Theme="{StaticResource Hint}"
+                           TextWrapping="Wrap"
+                           Text="When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."/>
               </StackPanel>
             </Border>
           </ScrollViewer>
@@ -710,7 +762,7 @@
 
       </TabControl>
 
-      <TextBlock x:Name="TxtStatusBar" Grid.Row="2" IsVisible="False"/>
+      <TextBlock x:Name="TxtStatusBar" Grid.Row="3" IsVisible="False"/>
     </Grid>
   </Border>
 </Window>
