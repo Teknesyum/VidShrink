@@ -5,3 +5,4 @@
 - [Win32 panel doğrulama](win32-panel-dogrulama.md) — bekleme panelini görmek için Splash.cs'i bağlayan geçici WinExe projesi; exe'yi çalıştırmak işe yaramaz
 - [VidShrink metin geçidi](vidshrink-metin-geciti.md) — Tüm metne kural uygularken tek geçit kullan; sözlük anahtarı ve Theme.axaml tuzakları
 - [İpucu metin kaynakları](vidshrink-ipucu-metin-kaynaklari.md) — İpucu metni üç yerde yaşıyor; yalnız XAML'i tarayan çeviri ölçümü sessizce yeşil verir
+- [VidShrink metin ölçümü](vidshrink-metin-olcumu.md) — Ham metni ölçme; ekranda görünen metin Title() geçidinden geçmiş ve daha geniş, tavan 426 px
