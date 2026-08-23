@@ -293,6 +293,59 @@ public sealed class UpdaterTests : IDisposable
         Assert.Equal(OperatingSystem.IsWindows(), UpdateCheck.AutoUpdateEnabled(on));
     }
 
+    [Fact]
+    public void FirstLaunchChecksAndTheNextOnesWithinADayDoNot()
+    {
+        var file = Path.Combine(_root, "last-check.json");
+        var now = DateTimeOffset.UtcNow;
+
+        Assert.True(UpdateSchedule.DueNow(now, file));
+
+        UpdateSchedule.Record(now, file);
+        Assert.False(UpdateSchedule.DueNow(now, file));
+        Assert.False(UpdateSchedule.DueNow(now.AddHours(23), file));
+        Assert.True(UpdateSchedule.DueNow(now.AddHours(24), file));
+        Assert.Equal(now, UpdateSchedule.ReadLastCheck(file)!.Value, TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void MissingOrBrokenOrFutureDatedRecordMeansCheckNow()
+    {
+        var file = Path.Combine(_root, "last-check.json");
+        var now = DateTimeOffset.UtcNow;
+
+        Assert.True(UpdateSchedule.DueNow(now, file));
+
+        File.WriteAllText(file, "{ bozuk");
+        Assert.True(UpdateSchedule.DueNow(now, file));
+
+        // Saat geriye alınmış: kayıt gelecekte kalır, beklemek yerine denetlenir.
+        UpdateSchedule.Record(now.AddDays(3), file);
+        Assert.True(UpdateSchedule.DueNow(now, file));
+    }
+
+    [Fact]
+    public void ScheduleFileSitsNextToTheSettingsFile()
+    {
+        var settings = Path.Combine(_root, "appdata", "settings.json");
+        Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", settings);
+        try
+        {
+            Assert.Equal(Path.Combine(_root, "appdata", UpdateSchedule.FileName), UpdateSchedule.DefaultPath);
+        }
+        finally { Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", null); }
+    }
+
+    [Fact]
+    public void PendingUpdateIsSeenSoTheDailyLimitCanBeSkipped()
+    {
+        var app = Folder("app");
+        Assert.False(UpdateStage.HasPending(app));
+
+        File.WriteAllText(Path.Combine(app, UpdateStage.JournalName), "{}");
+        Assert.True(UpdateStage.HasPending(app));
+    }
+
     [LiveLauncherFact]
     public void LauncherStartsTheAppWithinTheTimeoutWithAndWithoutNetwork()
     {
@@ -301,12 +354,16 @@ public sealed class UpdaterTests : IDisposable
         new UpdateSettings { AutoUpdate = true }.Save(settings);
 
         // 10.255.255.1 yönlendirilemeyen adres: ağ yokmuş gibi davranır.
-        var offline = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink");
+        var offlineFirst = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink");
+        // Aynı gün içindeki ikinci açılış: denetim yapılmaz, ağa hiç çıkılmaz.
+        var offlineSameDay = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink", resetSchedule: false);
         var online = MeasureLaunch(exe, settings, null);
 
-        _output.WriteLine($"ağsız açılış: {offline.TotalMilliseconds:F0} ms");
+        _output.WriteLine($"ağsız ilk açılış (denetim günü): {offlineFirst.TotalMilliseconds:F0} ms");
+        _output.WriteLine($"ağsız aynı gün ikinci açılış: {offlineSameDay.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
-        Assert.True(offline < TimeSpan.FromSeconds(6), $"ağsız açılış çok uzun: {offline}");
+        Assert.True(offlineFirst < TimeSpan.FromSeconds(3), $"ağsız açılış çok uzun: {offlineFirst}");
+        Assert.True(offlineSameDay < offlineFirst, "günlük kısıt ikinci açılışı hızlandırmadı");
     }
 
     [LiveLauncherFact]
@@ -332,8 +389,11 @@ public sealed class UpdaterTests : IDisposable
         Assert.True(requestsWhileOn > 0, "ayar açıkken manifest hiç istenmedi");
     }
 
-    private static TimeSpan MeasureLaunch(string exe, string settingsPath, string? baseUrl)
+    private static TimeSpan MeasureLaunch(string exe, string settingsPath, string? baseUrl, bool resetSchedule = true)
     {
+        var schedule = Path.Combine(Path.GetDirectoryName(settingsPath)!, UpdateSchedule.FileName);
+        if (resetSchedule && File.Exists(schedule)) File.Delete(schedule);
+
         var start = new ProcessStartInfo { FileName = exe, UseShellExecute = false };
         start.Environment["VIDSHRINK_SETTINGS_PATH"] = settingsPath;
         if (baseUrl is not null) start.Environment["VIDSHRINK_UPDATE_BASE_URL"] = baseUrl;

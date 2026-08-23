@@ -274,6 +274,82 @@ public sealed class UpdateSettings
 }
 
 /// <summary>
+/// Güncelleme denetiminin sıklığı. Ağsız çalışan biri her açılışta zaman aşımı kadar
+/// beklemesin diye denetim günde en çok bir kez yapılır; ara açılışlarda ağa hiç
+/// çıkılmaz.
+/// </summary>
+public static class UpdateSchedule
+{
+    public static readonly TimeSpan Interval = TimeSpan.FromHours(24);
+
+    public const string FileName = "last-check.json";
+
+    public static string DefaultPath
+    {
+        get
+        {
+            var folder = Path.GetDirectoryName(UpdateSettings.DefaultPath);
+            return string.IsNullOrEmpty(folder) ? FileName : Path.Combine(folder, FileName);
+        }
+    }
+
+    /// <summary>Son denetimden bu yana 24 saat geçtiyse ağa çıkılır.</summary>
+    public static bool DueNow(DateTimeOffset now, string? path = null)
+    {
+        var last = ReadLastCheck(path);
+        if (last is null) return true;
+
+        // Saat geriye alınmışsa kayıt gelecekte kalır; o durumda beklemek yerine denetle.
+        if (last > now) return true;
+        return now - last >= Interval;
+    }
+
+    public static DateTimeOffset? ReadLastCheck(string? path = null)
+    {
+        var file = path ?? DefaultPath;
+        try
+        {
+            if (!File.Exists(file)) return null;
+            using var document = JsonDocument.Parse(File.ReadAllText(file));
+            if (!document.RootElement.TryGetProperty("lastCheck", out var value)) return null;
+            var text = value.GetString();
+            return string.IsNullOrWhiteSpace(text)
+                ? null
+                : DateTimeOffset.Parse(text!, null, System.Globalization.DateTimeStyles.RoundtripKind);
+        }
+        catch (Exception exception) when (exception is JsonException or IOException or FormatException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Denetim denemesini işaretler. Sonucu değil denemeyi yazar: ağ yokken de tur
+    /// harcandı sayılır, yoksa ağsız makine her açılışta yeniden bekler.
+    /// </summary>
+    public static void Record(DateTimeOffset now, string? path = null)
+    {
+        var file = path ?? DefaultPath;
+        try
+        {
+            var folder = Path.GetDirectoryName(file);
+            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+
+            using var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+            writer.WriteStartObject();
+            writer.WriteString("lastCheck", now.ToString("o"));
+            writer.WriteEndObject();
+            writer.Flush();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // Yazılamazsa en fazla bir sonraki açılışta yeniden denetlenir; açılış durmaz.
+        }
+    }
+}
+
+/// <summary>
 /// Yerel özetleri yol + boyut + son yazma tarihiyle önbelleğe alır; her açılışta bütün
 /// kurulumun yeniden özetlenmesini engeller.
 /// </summary>
@@ -359,6 +435,10 @@ public sealed class HashCache
 public static class UpdateStage
 {
     public const string JournalName = ".update-pending.json";
+
+    /// <summary>Tamamlanmamış bir güncelleme duruyor mu.</summary>
+    public static bool HasPending(string appDirectory) =>
+        File.Exists(Path.Combine(appDirectory, JournalName));
 
     /// <summary>Özeti tutmayan ilk dosyayı döndürür; hepsi doğruysa null.</summary>
     public static ManifestFile? FindMismatch(string stageDirectory, IReadOnlyList<ManifestFile> files)

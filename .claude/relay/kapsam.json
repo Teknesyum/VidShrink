@@ -508,5 +508,59 @@
     "effort": "high",
     "t": "2026-08-23 17:05:28",
     "ajan": "ana oturum"
+  },
+  "src/VidShrink.Core/UpdateCheck.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "src/VidShrink.Launcher/VidShrink.Launcher.csproj": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "src/VidShrink.Launcher/Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "src/VidShrink.Launcher/Updater.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "tests/VidShrink.Tests/UpdaterTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "Install-VidShrink.ps1": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "install-vidshrink.sh": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "README.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
+  },
+  "measure.ps1": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-23 18:03:59",
+    "ajan": "builder"
   }
 }
