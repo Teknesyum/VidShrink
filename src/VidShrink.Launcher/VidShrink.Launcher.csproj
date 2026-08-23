@@ -19,4 +19,25 @@
     <ProjectReference Include="..\VidShrink.Core\VidShrink.Core.csproj" />
   </ItemGroup>
 
+  <!-- Bekleme panelinin görüntüsü elle hazırlanmıyor: her derlemede Theme.axaml'dan
+       üretiliyor. Tema değişince görüntü de değişir, sessizce eskimez. -->
+  <PropertyGroup>
+    <SplashTheme>$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\Theme.axaml</SplashTheme>
+    <SplashGenProject>$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\VidShrink.SplashGen.csproj</SplashGenProject>
+    <SplashImage>$(BaseIntermediateOutputPath)splash.png</SplashImage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(SplashImage)" LogicalName="VidShrink.Launcher.splash.png" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="GenerateSplashImage" BeforeTargets="BeforeBuild"
+          Inputs="$(SplashTheme);$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\Program.cs"
+          Outputs="$(SplashImage)">
+    <MSBuild Projects="$(SplashGenProject)" Targets="Build" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="SplashGenAssembly" />
+    </MSBuild>
+    <Exec Command="&quot;$(DOTNET_HOST_PATH)&quot; &quot;%(SplashGenAssembly.FullPath)&quot; &quot;$(SplashTheme)&quot; &quot;$(SplashImage)&quot;" />
+  </Target>
+
 </Project>

@@ -60,3 +60,9 @@ olarak okunuyor, yani ekrandaki dinamik metni doğrulamak için ekran görüntü
   `SliderTarget` üzerinde `RangeValuePattern.SetValue` ile ayarla.
 - `GetWindowTextW` P/Invoke bildirimine `CharSet = CharSet.Unicode` yazmazsan başlık tek
   harf ("V") dönüyor ve pencere eşleşmesi sessizce başarısız oluyor.
+**Not (2026-08-23, T22 — katmanlı Win32 penceresi):** Başlatıcının bekleme paneli
+`UpdateLayeredWindow` ile çiziliyor. `PrintWindow` katmanlı pencerede boş dönüyor;
+burada tek çalışan yol tam ekran `CopyFromScreen`. Panel `WS_EX_TOPMOST` olduğu için
+üstteki uygulama sorunu da çıkmıyor. Panel Launcher'da yaşadığı için doğrulaması,
+`Splash.cs`'i bağlayan ve üretilen PNG'yi gömen küçük bir deneme projesiyle yapıldı —
+uygulamayı hiç açmadan.
