@@ -108,9 +108,18 @@
 
       <ControlTheme x:Key="ProductTagline" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-        <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="OutFactLabel" TargetType="TextBlock" BasedOn="{StaticResource Label}">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
+        <Setter Property="Margin" Value="0"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="OutFactValue" TargetType="TextBlock" BasedOn="{StaticResource MonoValue}">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
       </ControlTheme>
 
       <ControlTheme x:Key="StatusSuccess" TargetType="TextBlock" BasedOn="{StaticResource Body}">
@@ -316,6 +325,12 @@
         <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
         <Setter Property="Margin" Value="{StaticResource ChipMargin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+      </ControlTheme>
+
+      <ControlTheme x:Key="LangButton" TargetType="Button" BasedOn="{StaticResource ChipButton}">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
+        <Setter Property="Padding" Value="{StaticResource TabPadding}"/>
+        <Setter Property="Margin" Value="{StaticResource TabMargin}"/>
       </ControlTheme>
 
       <ControlTheme x:Key="SupportButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
