@@ -37,3 +37,14 @@ PrintWindow ile yakala. Açılan liste ayrı bir HWND olduğu için PrintWindow'
 **How to apply:** Bu depoda Avalonia teması değiştirirken önce bu dört maddeyi kontrol et,
 sonra deneme projesiyle ekran görüntüsü al. Yakalama yöntemi için
 [[vidshrink-arayuz-dogrulama]].
+
+**`Window` özniteliği `OnPropertyChanged`'i erken tetikliyor (T16).** XAML'de
+`WindowState="Maximized"` yazınca `OnPropertyChanged` daha `InitializeComponent` bitmeden
+koşuyor; `x:Name`li denetimler henüz null olduğu için orada onlara dokunan kod
+`NullReferenceException` ile uygulamayı açılışta düşürüyor. Derleme temiz geçiyor.
+`MainWindow`'da bir `_controlsReady` bayrağı `InitializeComponent`ten hemen sonra
+kurulmalı ve `OnPropertyChanged` bayrak yokken erken dönmeli.
+
+**Bu projede `Expander` için `ControlTheme` yok.** Açılır bölüm gerekince temasız
+`Expander` koyma — kendi başlığını ve okunu sızdırır. `GhostButton` + `IsVisible`
+ile aç/kapa yap.

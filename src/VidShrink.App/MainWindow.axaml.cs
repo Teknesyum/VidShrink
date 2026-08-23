@@ -76,12 +76,14 @@ public partial class MainWindow : Window
     private DropVisual _dropVisual = DropVisual.Idle;
     private DispatcherTimer? _recalculateTimer;
     private DateTime _lastEstimatePulse = DateTime.MinValue;
+    private bool _controlsReady;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
     public MainWindow()
     {
         InitializeComponent();
+        _controlsReady = true;
 
         _motionReduced = !AnimationsAllowed();
         if (_motionReduced) Classes.Add("reduced-motion");
@@ -272,6 +274,8 @@ public partial class MainWindow : Window
     {
         try
         {
+            UpdateMaximizeGlyph();
+            WindowShell.Margin = OffScreenMargin;
             SetLanguage(true);
             PlayPanelEntrance();
             var startupFile = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(File.Exists);
@@ -288,6 +292,7 @@ public partial class MainWindow : Window
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        if (!_controlsReady) return;
         if (change.Property == WindowStateProperty) UpdateMaximizeGlyph();
         else if (change.Property == OffScreenMarginProperty) WindowShell.Margin = OffScreenMargin;
     }
@@ -595,6 +600,7 @@ public partial class MainWindow : Window
         _profile = null;
         BtnRevert.IsVisible = false;
         TxtAiStatus.Text = "";
+        SetAiDetails(false);
         TxtConvertSource.Text = Path.GetFileName(path);
         ShowInfo(_info);
 
@@ -982,8 +988,18 @@ public partial class MainWindow : Window
         ScheduleRecalculate();
     }
 
+    private void OnToggleAiDetails(object? sender, RoutedEventArgs e) => SetAiDetails(!AiDetails.IsVisible);
+
+    private void SetAiDetails(bool visible)
+    {
+        AiDetails.IsVisible = visible;
+        TxtAiHint.IsVisible = !visible;
+        BtnAiDetails.Content = visible ? "▴" : "▾";
+    }
+
     private async void OnCopyPrompt(object? sender, RoutedEventArgs e)
     {
+        SetAiDetails(true);
         if (_info is null || _autoPlan is null)
         {
             TxtAiStatus.Text = T("Önce bir video yükleyin.", "Load a video first.");

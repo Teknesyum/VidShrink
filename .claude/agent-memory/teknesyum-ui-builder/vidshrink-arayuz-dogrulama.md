@@ -33,3 +33,14 @@ yanlış sonuç verdi — `CopyFromScreen` bir kez başka uygulamanın penceresi
 computer-use ve UIA denemesiyle tur harcama.
 
 **Not (2026-08-22):** Arayüz T11'de Avalonia'ya taşındı. Yukarıdaki UIA gözlemi WPF penceresine aitti; Avalonia kendi otomasyon ağacını kuruyor, T12 bittikten sonra yeniden denenmeli. PrintWindow yolu her iki durumda da çalışıyor.
+
+**Not (2026-08-23, T16 — Avalonia yakalama betiğinin üç tuzağı):**
+- `Process.MainWindowHandle` boş dönüyor ve exe konsol penceresi de açıyor. `EnumWindows`
+  ile pid'e göre ara, **pencere başlığının `VidShrink` olmasını şart koş** — yoksa konsol
+  penceresini yakalarsın.
+- `PrintWindow` bitmap'i `GetWindowRect` ölçüsünde olmalı, `DwmGetWindowAttribute(9)`
+  ölçüsünde değil. Büyütülmüş pencerede ikisi 8 piksel kayıyor; DWM ölçüsüyle bitmap
+  açarsan görüntü sola kayar ve sağ kenar kesik görünür — kırpmayı DWM dikdörtgeninin
+  pencere dikdörtgenine göre farkıyla yap.
+- Uygulama çalışırken `dotnet build` MSB3021 ile düşüyor. Yakalamadan önce
+  `Get-Process VidShrink.App | Stop-Process -Force`.

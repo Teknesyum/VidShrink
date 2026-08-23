@@ -83,6 +83,18 @@ find_dotnet_sdk8() {
     return 1
 }
 
+# `dotnet` bir sembolik bag olabilir: /usr/bin/dotnet -> /usr/share/dotnet/dotnet.
+# O durumda dirname yanlis kok verir. Koku ikilinin yolundan degil, dotnet'in kendi
+# bildirdigi SDK klasorunden turet: "8.0.424 [/usr/share/dotnet/sdk]" -> /usr/share/dotnet
+dotnet_root_of() {
+    sdk_dir=$("$1" --list-sdks 2>/dev/null | sed -n 's/.*\[\(.*\)\]$/\1/p' | head -n 1)
+    if [ -n "$sdk_dir" ]; then
+        dirname "$sdk_dir"
+    else
+        dirname "$1"
+    fi
+}
+
 install_dotnet_sdk8() {
     install_directory="$HOME/.dotnet"
     bootstrapper="$work_root/dotnet-install.sh"
@@ -121,7 +133,7 @@ else
     say '.NET 8 SDK yükleniyor (kullanıcı dizini, yönetici gerekmez)...'
     dotnet=$(install_dotnet_sdk8)
 fi
-DOTNET_ROOT=$(dirname "$dotnet")
+DOTNET_ROOT=$(dotnet_root_of "$dotnet")
 export DOTNET_ROOT
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_NOLOGO=1

@@ -24,7 +24,11 @@ irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink
 
 The installer needs no administrator rights. It reuses an installed .NET 8 SDK when it finds one and otherwise bootstraps it with Microsoft's own `dotnet-install.ps1` into `%LOCALAPPDATA%\Microsoft\dotnet`; FFmpeg and FFprobe come from WinGet. It then downloads the latest `main` source, publishes a self-contained Release build for the machine's own architecture, installs it under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. Running the same command again replaces the installed app with the newest version.
 
-If PowerShell script execution is restricted by organizational policy, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session.
+The command needs no change to your execution policy. `irm | iex` runs the installer from memory rather than from a file, and the installer runs Microsoft's `dotnet-install.ps1` the same way, so Windows' default `Restricted` policy blocks neither of them. If a stricter organizational policy blocks the command outright, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session with the command below. Read the file explicitly as UTF-8 rather than passing `-File`: the script is stored as UTF-8 without a byte order mark, and Windows PowerShell 5.1 reads a mark-less script file in the system ANSI code page, which turns every non-ASCII character in the installer's messages into mojibake.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllText('C:\path\to\Install-VidShrink.ps1',[Text.Encoding]::UTF8))"
+```
 
 ### macOS and Linux
 

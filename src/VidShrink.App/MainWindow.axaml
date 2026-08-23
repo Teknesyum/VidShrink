@@ -4,6 +4,7 @@
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
         Width="1560" Height="1060" MinWidth="1040" MinHeight="720"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         Background="Transparent"
         TransparencyLevelHint="Transparent"
@@ -58,13 +59,7 @@
               </StackPanel>
             </Button>
             <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
-                <Path Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center"
-                      Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.8"
-                      StrokeLineCap="Round" StrokeJoin="Round"
-                      Data="M 9 5 L 3 12 L 9 19 M 15 5 L 21 12 L 15 19"/>
-                <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
-              </StackPanel>
+              <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
             </Button>
             <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Center">
               <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="Minimize" auto:AutomationProperties.Name="Minimize" Click="OnMinimize">
@@ -320,9 +315,8 @@
               <Border x:Name="PlanPanel"
                       Grid.Column="1"
                       Theme="{StaticResource Panel}"
-                      VerticalAlignment="Top"
-                      MinHeight="{StaticResource PlanPanelMinHeight}"
-                      MaxHeight="{StaticResource PlanPanelMaxHeight}">
+                      VerticalAlignment="Stretch"
+                      MinHeight="{StaticResource PlanPanelMinHeight}">
                 <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="{StaticResource SpaceMd}">
                   <TextBlock Grid.Row="0" Text="What it will do" Theme="{StaticResource H2}"/>
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -410,15 +404,37 @@
 
                 <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="AI settings" Theme="{StaticResource H2}"/>
-                    <TextBlock Text="Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer." Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    <WrapPanel>
-                      <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
-                      <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
-                    </WrapPanel>
-                    <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
-                    <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnRevertAuto"/>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                      <TextBlock Grid.Column="0" Text="AI settings" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1"
+                                 x:Name="TxtAiHint"
+                                 Text="{StaticResource AiHintText}"
+                                 Theme="{StaticResource Hint}"
+                                 TextTrimming="CharacterEllipsis"
+                                 VerticalAlignment="Center">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" Text="{StaticResource AiHintText}"/>
+                        </ToolTip.Tip>
+                      </TextBlock>
+                      <Button Grid.Column="2"
+                              x:Name="BtnAiDetails"
+                              Content="▾"
+                              Theme="{StaticResource GhostButton}"
+                              VerticalAlignment="Center"
+                              FontFamily="{StaticResource FontMono}"
+                              auto:AutomationProperties.Name="AI settings"
+                              Click="OnToggleAiDetails"/>
+                    </Grid>
+                    <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                      <TextBlock Text="{StaticResource AiHintText}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      <WrapPanel>
+                        <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
+                        <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
+                        <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
+                      </WrapPanel>
+                      <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
+                      <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    </StackPanel>
                   </StackPanel>
                 </Border>
 

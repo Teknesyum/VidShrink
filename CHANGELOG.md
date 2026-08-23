@@ -8,6 +8,27 @@ tags yet, so releases are grouped by the day their work landed on `main`.
 
 ### Changed
 
+- The window opens maximized. It used to open at a fixed 1560x1060 in the middle of the
+  screen, which squeezed the panels while the space above and below them went unused; the
+  plan panel in particular fell into a scrollbar as soon as a file was loaded. The normal
+  size is still defined and is what the window returns to when it is restored.
+- The plan panel grows into the height it is given instead of stopping at a fixed 640 px
+  cap. Its scroll view is still there for a very long plan, but an ordinary plan no longer
+  scrolls at either the maximized size or the minimum window size.
+- The AI settings panel is a single line. The heading, a one-line summary of what the panel
+  does, and a disclosure arrow are all that show until it is opened; the prompt buttons,
+  the JSON box and the status line appear underneath once it is. Opening it reveals the
+  full sentence, so the explanation is readable in both states and is never shown twice.
+- The Teknesyum signature in the title bar no longer carries a `<>` icon. The interface
+  standard gives that label no icon; the coffee cup on the support label stays.
+
+- `Install-VidShrink.ps1` no longer writes Microsoft's `dotnet-install.ps1` to a temporary
+  file before running it. Executing that file failed on any machine left at Windows'
+  default `Restricted` execution policy, which aborted the install with
+  `PSSecurityException` right after the .NET 8 SDK step began. The bootstrapper is now
+  built with `[scriptblock]::Create` and invoked in memory, where execution policy does
+  not apply. Windows PowerShell 5.1 returns the download as a `byte[]` for that URL, so
+  the content is decoded as UTF-8 before it is parsed.
 - The interface moved from WPF to Avalonia 11.3.20 and the application now targets
   `net8.0` instead of `net8.0-windows`. One source tree publishes for `win-x64`,
   `osx-arm64`, `osx-x64` and `linux-x64`. The neon theme was rebuilt as Avalonia
@@ -31,6 +52,11 @@ tags yet, so releases are grouped by the day their work landed on `main`.
   built.
 
 ### Fixed
+
+- The application no longer crashes on startup. Setting `WindowState` in XAML makes
+  `OnPropertyChanged` run before `InitializeComponent` has finished, and the maximize
+  button was still null when the handler reached for it. The build did not show this; it
+  only appeared when the application was actually launched.
 
 - Targets of 50 MB and above now land inside the fill band on the first attempt. The
   first plan switches to two-pass whenever the band is narrower than one CRF step, the

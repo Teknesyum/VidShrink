@@ -57,14 +57,17 @@ function Find-DotNetSdk8 {
 
 function Install-DotNetSdk8 {
     $installDirectory = Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet'
-    $bootstrapper = Join-Path ([IO.Path]::GetTempPath()) ('dotnet-install-' + [Guid]::NewGuid().ToString('N') + '.ps1')
-    try {
-        Invoke-WebRequest -UseBasicParsing -Uri 'https://dot.net/v1/dotnet-install.ps1' -OutFile $bootstrapper
-        & $bootstrapper -Channel '8.0' -InstallDir $installDirectory -NoPath
+
+    # Bootstrapper'ı diske yazıp dosya olarak çalıştırmak, varsayılan Restricted
+    # execution policy altında engellenir. İçeriği bellekte scriptblock olarak
+    # çalıştırdığımız için kullanıcının policy değiştirmesine gerek kalmıyor.
+    $bootstrapperSource = (Invoke-WebRequest -UseBasicParsing -Uri 'https://dot.net/v1/dotnet-install.ps1').Content
+    # Windows PowerShell 5.1 metin olmayan Content-Type için Content'i byte[] döndürür.
+    if ($bootstrapperSource -is [byte[]]) {
+        $bootstrapperSource = [Text.Encoding]::UTF8.GetString($bootstrapperSource)
     }
-    finally {
-        Remove-Item -LiteralPath $bootstrapper -Force -ErrorAction SilentlyContinue
-    }
+    $bootstrapper = [scriptblock]::Create(([string]$bootstrapperSource).TrimStart([char]0xFEFF))
+    & $bootstrapper -Channel '8.0' -InstallDir $installDirectory -NoPath
 
     $executable = Join-Path $installDirectory 'dotnet.exe'
     if (-not (Test-Path -LiteralPath $executable)) { throw '.NET 8 SDK kurulumdan sonra bulunamadı.' }

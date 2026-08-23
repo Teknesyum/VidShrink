@@ -133,7 +133,6 @@
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>
   <x:Double x:Key="PanelMinHeight">256</x:Double>
   <x:Double x:Key="PlanPanelMinHeight">320</x:Double>
-  <x:Double x:Key="PlanPanelMaxHeight">640</x:Double>
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
   <x:Double x:Key="DropOutlineThickness">2</x:Double>
@@ -149,6 +148,8 @@
   <BoxShadows x:Key="GlowPink">0 0 20 0 #40FF00EA</BoxShadows>
   <BoxShadows x:Key="GlowPurple">0 0 20 0 #40B026FF</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+  <x:String x:Key="AiHintText">Optional. Copy a prompt to any chat AI, then paste and validate its JSON answer.</x:String>
 
   <x:String x:Key="LinkGitHub">https://github.com/Teknesyum</x:String>
   <x:String x:Key="LinkRepo">https://github.com/Teknesyum/vidshrink</x:String>
