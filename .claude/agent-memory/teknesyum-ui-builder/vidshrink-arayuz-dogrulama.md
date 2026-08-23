@@ -66,3 +66,12 @@ burada tek çalışan yol tam ekran `CopyFromScreen`. Panel `WS_EX_TOPMOST` oldu
 üstteki uygulama sorunu da çıkmıyor. Panel Launcher'da yaşadığı için doğrulaması,
 `Splash.cs`'i bağlayan ve üretilen PNG'yi gömen küçük bir deneme projesiyle yapıldı —
 uygulamayı hiç açmadan.
+
+**Not (2026-08-23, T25 — ipucu balonu yakalama):** Avalonia ipucu balonu ayrı bir üst düzey
+pencere. `PrintWindow` ana pencerede balonu göstermez; balonun kendi tutamağını
+`EnumWindows` ile pid altında ana pencere dışındaki görünür pencere olarak bul ve onu
+`PrintWindow` ile yakala. Tam ekran `CopyFromScreen` kullanma: `SetForegroundWindow` sessizce
+başarısız oluyor ve kullanıcının tarayıcısını kaydediyor. Ön plana almak için ALT tuşunu
+`keybd_event` ile basıp bırakmak `SetForegroundWindow` kilidini açıyor — bu yol çalışıyor.
+Balon hizasını görüntüyle değil sayıyla kanıtla: düğmenin ve balonun `GetWindowRect`
+değerlerini yazdır.
