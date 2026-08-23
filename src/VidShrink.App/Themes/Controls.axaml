@@ -310,12 +310,29 @@
         </Style>
       </ControlTheme>
 
+      <!-- Readable pink for text. The fill pink measures 4.57:1 on the surface and misses the
+           floor; this one measures 7.72:1, so coloured words use it and fills keep NeonPink. -->
+      <SolidColorBrush x:Key="PinkText" Color="#FFFF54EB"/>
+
       <ControlTheme x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
         <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
         <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
         <Setter Property="Margin" Value="{StaticResource ChipMargin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+      </ControlTheme>
+
+      <!-- TR and EN. Same size as a chip; only the colour says which language is running.
+           The one that is not running stays white, stays clickable, and keeps its hover. -->
+      <ControlTheme x:Key="LanguageButton" TargetType="Button" BasedOn="{StaticResource ChipButton}">
+        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        <Style Selector="^.selected">
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        </Style>
+        <Style Selector="^.selected /template/ Border#Root">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+          <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="SupportButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
@@ -429,7 +446,11 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Content" Value="?"/>
         <Setter Property="ToolTip.ShowDelay" Value="120"/>
-        <Setter Property="ToolTip.Placement" Value="Pointer"/>
+        <!-- Anchored to the badge, not to the pointer, so the balloon lines up with the ? it
+             belongs to. Avalonia flips the popup itself when the button sits near a screen edge. -->
+        <Setter Property="ToolTip.Placement" Value="BottomEdgeAlignedLeft"/>
+        <Setter Property="ToolTip.HorizontalOffset" Value="0"/>
+        <Setter Property="ToolTip.VerticalOffset" Value="0"/>
         <Setter Property="Template">
           <ControlTemplate TargetType="Button">
             <Panel Background="Transparent">

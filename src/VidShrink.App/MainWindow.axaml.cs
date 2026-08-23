@@ -140,6 +140,7 @@ public partial class MainWindow : Window
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
 
         ApplyTextCase();
+        BtnEn.Classes.Set("selected", true);
         Loaded += OnWindowLoaded;
     }
 
@@ -376,8 +377,10 @@ public partial class MainWindow : Window
         _syncing = wasSyncing;
         _turkish = turkish;
         _languageApplied = true;
-        BtnTr.IsEnabled = !turkish;
-        BtnEn.IsEnabled = turkish;
+        // Both stay clickable. Only the colour says which language is running, so the idle one
+        // must not be mistaken for a disabled control.
+        BtnTr.Classes.Set("selected", turkish);
+        BtnEn.Classes.Set("selected", !turkish);
         ApplyFastGpuTip();
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
@@ -406,7 +409,8 @@ public partial class MainWindow : Window
 
         switch (node)
         {
-            case TextBlock text when text.Text is { } value:
+            // A TextBlock built from runs carries its own colouring; writing Text would erase it.
+            case TextBlock text when text.Inlines is not { Count: > 0 } && text.Text is { } value:
                 text.Text = map(value);
                 break;
             case HeaderedContentControl header when header.Header is string headerValue:

@@ -46,7 +46,9 @@
         <Grid x:Name="TitleBarContent" Margin="16,0,12,0">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
-            <TextBlock Text="VidShrink" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
+              <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
+            </TextBlock>
           </StackPanel>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
@@ -123,8 +125,8 @@
           <TextBlock x:Name="TaglineConverter" Text="Media converter" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-          <Button x:Name="BtnTr" Content="TR" Theme="{StaticResource ChipButton}" Click="OnTurkish"/>
-          <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource ChipButton}" Click="OnEnglish"/>
+          <Button x:Name="BtnTr" Content="TR" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="TR" Click="OnTurkish"/>
+          <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="EN" Click="OnEnglish"/>
         </StackPanel>
       </Grid>
 
