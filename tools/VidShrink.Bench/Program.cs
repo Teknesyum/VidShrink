@@ -18,6 +18,7 @@ try
         "shrink" => await ShrinkAsync(args),
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
+        "play" => await PlayAsync(args),
         _ => Unknown(args[0])
     };
 }
@@ -34,6 +35,7 @@ static void PrintUsage()
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor>");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
+    Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p2,p3,p5,p6 [--seconds 10] [--fps 60] [--target 20] [--matrix klip,...]");
 }
 
 static int Unknown(string command)
@@ -212,7 +214,7 @@ static async Task<int> PanelAsync(string[] args)
     }
 
     Directory.CreateDirectory(outDir);
-    Console.WriteLine($"<!-- makine: {Environment.MachineName} · ffmpeg {ToolLocator.GetFfmpegVersion()} · panel {panelWidth}px · zoom {zoom}x · n={samples} -->");
+    Console.WriteLine($"<!-- makine: {Environment.MachineName} Â· ffmpeg {ToolLocator.GetFfmpegVersion()} Â· panel {panelWidth}px Â· zoom {zoom}x Â· n={samples} -->");
 
     if (only.Contains("o1")) await Measure1Async(clips, panelWidth, samples);
     if (only.Contains("o4")) await Measure4Async(clips);
@@ -654,6 +656,520 @@ static async Task Measure2Async(List<string> clips, int panelWidth, double targe
     }
 }
 
+// --- T33: oynatma mimarisi olcum kapisi ----------------------------------------------
+// Aday A: tek ffmpeg sureci, iki girdi, hstack, BGRA boru.
+// Aday B (libmpv) bu araca girmiyor; ikili indirilemedigi icin raporda ayrica anlatiliyor.
+// Bu komut da yalniz sayi uretir, src/ altina hicbir sey yazmaz.
+
+static async Task<int> PlayAsync(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.Error.WriteLine("usage: bench play <klipA,klipB> --only k2,p1,p2,p3,p5,p6");
+        return 1;
+    }
+
+    var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+    var only = new HashSet<string> { "k2", "p1", "p1b", "k3", "p2", "p3", "p5", "p6" };
+    var seconds = 10.0;
+    var fps = 60;
+    var targetMb = 20.0;
+    var matrix = new List<string>();
+    var outDir = Path.Combine(Path.GetTempPath(), "vidshrink-play");
+
+    for (var i = 2; i < args.Length; i++)
+    {
+        switch (args[i])
+        {
+            case "--only" when i + 1 < args.Length:
+                only = args[++i].Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLowerInvariant()).ToHashSet();
+                break;
+            case "--seconds" when i + 1 < args.Length:
+                seconds = double.Parse(args[++i], CultureInfo.InvariantCulture);
+                break;
+            case "--fps" when i + 1 < args.Length:
+                fps = int.Parse(args[++i], CultureInfo.InvariantCulture);
+                break;
+            case "--target" when i + 1 < args.Length:
+                targetMb = double.Parse(args[++i], CultureInfo.InvariantCulture);
+                break;
+            case "--matrix" when i + 1 < args.Length:
+                matrix = args[++i].Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+                break;
+            case "--out" when i + 1 < args.Length:
+                outDir = args[++i];
+                break;
+        }
+    }
+
+    Directory.CreateDirectory(outDir);
+    var left = clips[0];
+    var right = clips.Count > 1 ? clips[1] : clips[0];
+    var frames = (int)Math.Round(seconds * fps);
+
+    Console.WriteLine($"<!-- makine: {Environment.MachineName} Â· {Environment.ProcessorCount} mantiksal cekirdek Â· ffmpeg {ToolLocator.GetFfmpegVersion()} Â· hedef {fps} fps Â· {frames} kare -->");
+
+    if (only.Contains("k2")) await ProbeFiltersAsync(left);
+    if (only.Contains("p1")) await PlayPipeSizesAsync(left, right, fps, frames);
+    if (only.Contains("p1b")) await PlayWallAsync(left, right, fps, frames);
+    if (only.Contains("k3")) await PlayLadderAsync(left, right, frames);
+    if (only.Contains("p6")) await PlayAllocAsync(left, right, fps, frames);
+    if (only.Contains("p3")) await PlayHwAsync(left, right, fps, frames);
+    if (only.Contains("p5")) await PlayMatrixAsync(matrix.Count > 0 ? matrix : clips, fps, frames);
+    if (only.Contains("p2")) await PlayDuringEncodeAsync(left, right, fps, frames, targetMb, outDir);
+    return 0;
+}
+
+/// <summary>
+/// Tek ffmpeg sureci, iki girdi, hstack, BGRA ham boru. Tuketici kareyi **sabit havuzdan**
+/// okur: kare basina yeni tampon ayrilmaz. stderr ayni anda bosaltilir, yoksa boru dolar
+/// ve ffmpeg asilir (docs/taramalar/RAPOR.md:27).
+/// Sure olcumu **ilk kare geldikten sonra** baslar; surec acilisi ayri raporlanir, cunku
+/// kalici tek surecte o bedel bir kez odenir.
+/// </summary>
+static async Task<PipeStats> PipeAsync(
+    string left, string right, int width, int height, int fps, int maxFrames,
+    string? hwaccel = null, bool explicitDownload = false, bool naiveAlloc = false, bool realtime = false,
+    bool loop = false, CancellationToken ct = default)
+{
+    var a = new List<string> { "-hide_banner", "-nostdin", "-loglevel", "error" };
+
+    void AddInput(string path)
+    {
+        // -re girisi gercek zamanli okur: boru azami hizda degil oynatma hizinda akar.
+        // Kodlamayla yarisi olcerken dogru olan bu; uretimde panel 60 fps ister, 300 degil.
+        if (realtime) a.Add("-re");
+        if (loop) { a.Add("-stream_loop"); a.Add("-1"); }
+
+        if (hwaccel is { } hw)
+        {
+            a.Add("-hwaccel");
+            a.Add(hw);
+            if (explicitDownload)
+            {
+                a.Add("-hwaccel_output_format");
+                a.Add(hw == "d3d11va" ? "d3d11" : hw);
+            }
+        }
+
+        a.Add("-i");
+        a.Add(path);
+    }
+
+    AddInput(left);
+    AddInput(right);
+
+    var head = explicitDownload ? "hwdownload,format=nv12," : "";
+    var chain = $"{head}fps={fps},scale={width}:{height}:flags=bilinear,format=bgra";
+    a.Add("-filter_complex");
+    a.Add($"[0:v]{chain}[l];[1:v]{chain}[r];[l][r]hstack=inputs=2[o]");
+    a.AddRange(new[] { "-map", "[o]", "-an", "-sn", "-dn", "-f", "rawvideo", "-pix_fmt", "bgra", "-" });
+
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffmpeg,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in a) psi.ArgumentList.Add(arg);
+
+    var frameBytes = width * 2 * height * 4;
+    var pool = new byte[frameBytes];
+    var intervals = new List<double>(maxFrames);
+
+    using var process = new Process { StartInfo = psi };
+    var launch = Stopwatch.StartNew();
+    process.Start();
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    var stream = process.StandardOutput.BaseStream;
+
+    var allocBefore = GC.GetTotalAllocatedBytes(precise: true);
+    var count = 0;
+    var startupMs = double.NaN;
+    var clock = new Stopwatch();
+    var previous = 0.0;
+
+    while (count < maxFrames && !ct.IsCancellationRequested)
+    {
+        var buffer = naiveAlloc ? new byte[frameBytes] : pool;
+        var read = await stream.ReadAtLeastAsync(buffer.AsMemory(0, frameBytes), frameBytes, throwOnEndOfStream: false);
+        if (read < frameBytes) break;
+
+        if (count == 0)
+        {
+            startupMs = launch.Elapsed.TotalMilliseconds;
+            clock.Start();
+        }
+        else
+        {
+            var now = clock.Elapsed.TotalMilliseconds;
+            intervals.Add(now - previous);
+            previous = now;
+        }
+
+        count++;
+    }
+
+    clock.Stop();
+    var allocated = GC.GetTotalAllocatedBytes(precise: true) - allocBefore;
+
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { /* surec kapanmis olabilir */ }
+
+    try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    var achieved = elapsed > 0 ? (count - 1) / elapsed : 0;
+    var mbps = achieved * frameBytes / 1024.0 / 1024.0;
+    var cpuPercent = elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0;
+
+    return new PipeStats(
+        count, startupMs, elapsed, achieved,
+        Percentile(intervals, 50), Percentile(intervals, 95), Percentile(intervals, 99),
+        intervals.Count > 0 ? intervals.Max() : double.NaN,
+        mbps, cpuPercent,
+        count > 0 ? (double)allocated / count : double.NaN,
+        count == 0 ? error.Trim() : "");
+}
+
+/// <summary>K2: filtreyi liste sorgusuyla degil kucuk bir girdiyle grafigi kurarak sinar.</summary>
+static async Task<(bool Ok, string Error)> TryGraphAsync(IEnumerable<string> arguments)
+{
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffmpeg,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in arguments) psi.ArgumentList.Add(arg);
+
+    using var process = new Process { StartInfo = psi };
+    process.Start();
+    var stdoutTask = DrainAsync(process.StandardOutput.BaseStream);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    _ = await stdoutTask;
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+
+    var text = error.Trim();
+    var bad = process.ExitCode != 0
+        || text.Contains("Error parsing option", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("No such filter", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("Unrecognized option", StringComparison.OrdinalIgnoreCase);
+
+    var firstLine = text.Split('\n').FirstOrDefault(l => l.Trim().Length > 0)?.Trim() ?? "";
+    return (!bad, bad ? firstLine : "");
+}
+
+static async Task ProbeFiltersAsync(string clip)
+{
+    Console.WriteLine();
+    Console.WriteLine("## K2 - Bu makinedeki ffmpeg'de gercekten ne var");
+    Console.WriteLine();
+    Console.WriteLine("| Yetenek | Deneme | Sonuc | stderr |");
+    Console.WriteLine("|---|---|---|---|");
+
+    var tiny = new[] { "-f", "lavfi", "-i", "testsrc2=s=64x64:r=10:d=0.2" };
+
+    var cases = new List<(string Name, string What, string[] Args)>
+    {
+        ("hstack", "iki lavfi girdi hstack=inputs=2",
+            tiny.Concat(tiny).Concat(new[] { "-filter_complex", "[0:v][1:v]hstack=inputs=2[o]", "-map", "[o]", "-frames:v", "1", "-f", "null", "-" }).ToArray()),
+        ("scale+format=bgra", "scale=64:36,format=bgra",
+            tiny.Concat(new[] { "-vf", "scale=64:36,format=bgra", "-frames:v", "1", "-f", "null", "-" }).ToArray()),
+        ("fps", "fps=60",
+            tiny.Concat(new[] { "-vf", "fps=60", "-frames:v", "1", "-f", "null", "-" }).ToArray()),
+        ("zscale", "zscale=w=32:h=32",
+            tiny.Concat(new[] { "-vf", "zscale=w=32:h=32", "-frames:v", "1", "-f", "null", "-" }).ToArray()),
+        // T32: libx264/libx265 uzerinden verilen -color_trc/-color_primaries sessizce dusuyor.
+        // HDR girdisi setparams ile kuruluyor; yoksa zscale "no path between colorspaces" der
+        // ve tonemap yokmus gibi gorunur.
+        ("tonemap", "setparams=HDR -> zscale=t=linear,tonemap=hable,zscale=t=bt709",
+            tiny.Concat(new[]
+            {
+                "-vf",
+                "setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc," +
+                "zscale=t=linear:npl=100,tonemap=hable,zscale=t=bt709:m=bt709:p=bt709:r=tv",
+                "-frames:v", "1", "-f", "null", "-"
+            }).ToArray()),
+        ("rawvideo/bgra boru", "-f rawvideo -pix_fmt bgra -",
+            tiny.Concat(new[] { "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "bgra", "-" }).ToArray())
+    };
+
+    foreach (var hw in new[] { "d3d11va", "dxva2", "qsv", "cuda", "vulkan" })
+    {
+        cases.Add(($"-hwaccel {hw}", "gercek dosyada tek kare",
+            new[] { "-hide_banner", "-v", "error", "-hwaccel", hw, "-i", clip, "-frames:v", "1", "-f", "null", "-" }));
+    }
+
+    cases.Add(("d3d11va + hwdownload", "-hwaccel_output_format d3d11 -vf hwdownload,format=nv12",
+        new[] { "-hide_banner", "-v", "error", "-hwaccel", "d3d11va", "-hwaccel_output_format", "d3d11", "-i", clip, "-vf", "hwdownload,format=nv12", "-frames:v", "1", "-f", "null", "-" }));
+
+    foreach (var (name, what, arguments) in cases)
+    {
+        var full = arguments[0] == "-hide_banner" ? arguments : new[] { "-hide_banner", "-v", "error" }.Concat(arguments).ToArray();
+        var result = await TryGraphAsync(full);
+        var note = result.Error.Length > 80 ? result.Error[..80] + "..." : result.Error;
+        Console.WriteLine($"| {name} | {what} | {(result.Ok ? "**var**" : "yok")} | {(note.Length == 0 ? "-" : note)} |");
+    }
+}
+
+static string Row(string label, PipeStats s) =>
+    $"| {label} | {s.Frames} | {s.StartupMs:0.#} | {s.Fps:0.#} | {s.P50:0.##} | {s.P95:0.##} | {s.P99:0.##} | {s.MaxMs:0.#} | {s.MBps:0.#} | {s.CpuPercent:0.#} |" +
+    (s.Error.Length > 0 ? $" <!-- {s.Error} -->" : "");
+
+static void Header(string first)
+{
+    Console.WriteLine($"| {first} | Kare | Acilis ms | Surdurulen fps | Aralik p50 ms | p95 ms | p99 ms | max ms | MB/s | CPU % |");
+    Console.WriteLine("|---|---|---|---|---|---|---|---|---|---|");
+}
+
+/// <summary>Sozlesmedeki uc panel boyutu. Kapilar G1 ilkine, G2 sonuncusuna bakiyor.</summary>
+static (int W, int H)[] PanelSizes() => new[] { (960, 540), (1280, 720), (1920, 1080) };
+
+static async Task PlayPipeSizesAsync(string left, string right, int fps, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P1 - Boru akisinin hizi (tek surec, iki girdi, hstack, BGRA)");
+    Console.WriteLine();
+    Header("Boyut");
+
+    foreach (var (w, h) in PanelSizes())
+    {
+        var stats = await PipeAsync(left, right, w, h, fps, frames);
+        Console.WriteLine(Row($"2x{w}x{h}", stats));
+    }
+}
+
+/// <summary>
+/// Ayni grafik, ama kareler boruya yazilmiyor (<c>-f null -</c>). Kod cozme+olcekleme+hstack
+/// kapasitesini boru tasima kapasitesinden ayirir: iki sayi arasindaki fark **borunun duvari**.
+/// </summary>
+static async Task<(double Fps, double CpuPercent, string Error)> NullSinkAsync(
+    string left, string right, int width, int height, int fps, int maxFrames)
+{
+    var a = new List<string> { "-hide_banner", "-nostdin", "-loglevel", "error", "-i", left, "-i", right };
+    var chain = $"fps={fps},scale={width}:{height}:flags=bilinear,format=bgra";
+    a.Add("-filter_complex");
+    a.Add($"[0:v]{chain}[l];[1:v]{chain}[r];[l][r]hstack=inputs=2[o]");
+    a.AddRange(new[] { "-map", "[o]", "-an", "-sn", "-dn", "-frames:v", maxFrames.ToString(CultureInfo.InvariantCulture), "-f", "null", "-" });
+
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffmpeg,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in a) psi.ArgumentList.Add(arg);
+
+    using var process = new Process { StartInfo = psi };
+    var clock = Stopwatch.StartNew();
+    process.Start();
+    var stdoutTask = DrainAsync(process.StandardOutput.BaseStream);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    _ = await stdoutTask;
+    var error = await stderrTask;
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { }
+    await process.WaitForExitAsync();
+    clock.Stop();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    return (elapsed > 0 ? maxFrames / elapsed : 0, elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0,
+        process.ExitCode == 0 ? "" : error.Trim());
+}
+
+static async Task PlayWallAsync(string left, string right, int fps, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P1b - Duvar nerede: boru mu, kod cozme mi");
+    Console.WriteLine();
+    Console.WriteLine("| Boyut | Boruyla fps | Borusuz (-f null) fps | Boru kaybi % | Boru MB/s | Borusuz CPU % |");
+    Console.WriteLine("|---|---|---|---|---|---|");
+
+    foreach (var (w, h) in PanelSizes())
+    {
+        var piped = await PipeAsync(left, right, w, h, fps, frames);
+        var raw = await NullSinkAsync(left, right, w, h, fps, frames);
+        var loss = raw.Fps > 0 ? (1.0 - piped.Fps / raw.Fps) * 100.0 : double.NaN;
+        Console.WriteLine($"| 2x{w}x{h} | {piped.Fps:0.#} | {raw.Fps:0.#} | {loss:0.#} | {piped.MBps:0.#} | {raw.CpuPercent:0.#} |");
+    }
+}
+
+/// <summary>
+/// K3: duvara carpildiginda fps mi cozunurluk mu dusurulecek? Ayni cozunurlukte fps
+/// merdiveni cikip her basamakta hedefin tutulup tutulmadigina bakilir.
+/// </summary>
+static async Task PlayLadderAsync(string left, string right, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## K3 - fps merdiveni (cozunurluk sabit)");
+    Console.WriteLine();
+    Console.WriteLine("| Boyut | Hedef fps | Surdurulen fps | Hedefi tutuyor mu | Aralik p99 ms | MB/s | CPU % |");
+    Console.WriteLine("|---|---|---|---|---|---|---|");
+
+    foreach (var (w, h) in new[] { (1920, 1080), (1280, 720) })
+    {
+        foreach (var target in new[] { 60, 48, 30, 24 })
+        {
+            // Klip 20 sn; dusuk hedefte 600 kare klibi asar, o yuzden 15 sn'lik icerikle sinirla.
+            var capped = Math.Min(frames, target * 15);
+            var stats = await PipeAsync(left, right, w, h, target, capped);
+            var keeps = stats.Fps >= target * 0.98 ? "**evet**" : "hayir";
+            Console.WriteLine($"| 2x{w}x{h} | {target} | {stats.Fps:0.#} | {keeps} | {stats.P99:0.##} | {stats.MBps:0.#} | {stats.CpuPercent:0.#} |");
+        }
+    }
+}
+
+static async Task PlayAllocAsync(string left, string right, int fps, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P6 - Kare basina bellek ayirma");
+    Console.WriteLine();
+    Console.WriteLine("| Boyut | Okuma bicimi | Kare | Kare basi ayrilan bayt | Kare boyutu bayt | Surdurulen fps |");
+    Console.WriteLine("|---|---|---|---|---|---|");
+
+    foreach (var (w, h) in PanelSizes())
+    {
+        foreach (var naive in new[] { false, true })
+        {
+            var stats = await PipeAsync(left, right, w, h, fps, frames, naiveAlloc: naive);
+            var name = naive ? "kare basi yeni tampon" : "**sabit havuz**";
+            Console.WriteLine($"| 2x{w}x{h} | {name} | {stats.Frames} | {stats.BytesPerFrame:0} | {w * 2 * h * 4} | {stats.Fps:0.#} |");
+        }
+    }
+}
+
+static async Task PlayHwAsync(string left, string right, int fps, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P3 - Donanim kod cozme");
+    Console.WriteLine();
+    Header("Yol");
+
+    var (w, h) = (1920, 1080);
+    var variants = new (string Name, string? Hw, bool Download)[]
+    {
+        ("yazilim (taban)", null, false),
+        ("d3d11va ortuk indirme", "d3d11va", false),
+        ("d3d11va + hwdownload", "d3d11va", true),
+        ("dxva2 ortuk indirme", "dxva2", false)
+    };
+
+    foreach (var (name, hw, download) in variants)
+    {
+        var stats = await PipeAsync(left, right, w, h, fps, frames, hw, download);
+        Console.WriteLine(Row($"2x{w}x{h} Â· {name}", stats));
+    }
+}
+
+static async Task PlayMatrixAsync(List<string> clips, int fps, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P5 - Codec matrisi (ayni klip iki kez, 2x960x540 panel)");
+    Console.WriteLine();
+    Header("Klip");
+
+    foreach (var clip in clips)
+    {
+        var info = await FfprobeClient.ProbeAsync(clip);
+        var stats = await PipeAsync(clip, clip, 960, 540, fps, frames);
+        Console.WriteLine(Row($"{Label(clip)} ({info.Width}x{info.Height} {info.VideoCodec})", stats));
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("### P5 - Ayni klipler 2x1920x1080 panelde");
+    Console.WriteLine();
+    Header("Klip");
+
+    foreach (var clip in clips)
+    {
+        var stats = await PipeAsync(clip, clip, 1920, 1080, fps, frames);
+        Console.WriteLine(Row(Label(clip), stats));
+    }
+}
+
+static async Task PlayDuringEncodeAsync(string left, string right, int fps, int frames, double targetMb, string outDir)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P2 - Kodlama koserken");
+    Console.WriteLine();
+    Console.WriteLine("| Boyut | Boru kipi | Bos kodlama s | Boru koserken kodlama s | Kodlama yavaslamasi % | Akis fps | fps kaybi % | p99 ms |");
+    Console.WriteLine("|---|---|---|---|---|---|---|---|");
+
+    var info = await FfprobeClient.ProbeAsync(left);
+    var complexity = await ComplexityProbe.RunAsync(info, SpeedMode.Quality);
+    var options = new PlanOptions { TargetMb = targetMb };
+    var plan = PlanCalculator.BuildDetailed(info, options, complexity, EncoderCapabilities.Instance).Plan;
+    var outputPath = Path.Combine(outDir, Label(left) + "_p2.mp4");
+
+    async Task<double> EncodeMedianAsync(int runs)
+    {
+        var times = new List<double>();
+        for (var i = 0; i < runs; i++)
+        {
+            var clock = Stopwatch.StartNew();
+            await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None);
+            clock.Stop();
+            times.Add(clock.Elapsed.TotalSeconds);
+        }
+
+        return Percentile(times, 50);
+    }
+
+    var baseline = await EncodeMedianAsync(3);
+
+    foreach (var (w, h) in PanelSizes())
+    {
+        // Uretimde panel oynatma hizinda akar ve **tek kalici surectir**. Azami hizli boru
+        // ust siniri gosterir, -re ile gercek zamanli tek boru ise fiilen kurulacak olan sey.
+        // Kapi ikincisine bakar.
+        foreach (var realtime in new[] { false, true })
+        {
+            // 2x1080p'nin olculen tavani ~38 fps; orada gercekci hedef 60 degil 30.
+            var wanted = realtime && w >= 1920 ? 30 : fps;
+            var alone = await PipeAsync(left, right, w, h, wanted, frames, realtime: realtime);
+
+            // Tek boru surekli koser; kodlama uc kez yanibasinda calisir.
+            using var stop = new CancellationTokenSource();
+            var pipeTask = PipeAsync(left, right, w, h, wanted, int.MaxValue, realtime: realtime, loop: true, ct: stop.Token);
+
+            var during = await EncodeMedianAsync(3);
+            stop.Cancel();
+            var pipe = await pipeTask;
+
+            var slowdown = (during / baseline - 1.0) * 100.0;
+            var loss = alone.Fps > 0 ? (1.0 - pipe.Fps / alone.Fps) * 100.0 : double.NaN;
+            var mode = realtime ? $"**-re {wanted} fps**" : "azami hiz";
+            Console.WriteLine(
+                $"| 2x{w}x{h} | {mode} | {baseline:0.##} | {during:0.##} | {slowdown:0.#} | " +
+                $"{pipe.Fps:0.#} | {loss:0.#} | {pipe.P99:0.##} |");
+        }
+    }
+}
+
+sealed record PipeStats(
+    int Frames,
+    double StartupMs,
+    double Seconds,
+    double Fps,
+    double P50,
+    double P95,
+    double P99,
+    double MaxMs,
+    double MBps,
+    double CpuPercent,
+    double BytesPerFrame,
+    string Error);
+
 sealed record BenchResult(
     double TargetMb,
     double ActualMb,
@@ -668,3 +1184,4 @@ sealed record BenchResult(
     double? VmafNegHarmonic,
     double? VmafNegP10,
     double? Xpsnr);
+
