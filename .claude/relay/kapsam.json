@@ -664,5 +664,17 @@
     "effort": "high",
     "t": "2026-08-24 14:56:52",
     "ajan": "ana oturum"
+  },
+  "tools/VidShrink.PresentBench/Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 19:31:48",
+    "ajan": "ana oturum"
+  },
+  "docs/olcumler/T37-sunum-olcumleri.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 19:35:22",
+    "ajan": "ana oturum"
   }
 }
