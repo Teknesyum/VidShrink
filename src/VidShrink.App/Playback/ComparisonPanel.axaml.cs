@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
@@ -15,7 +14,8 @@ namespace VidShrink.App.Playback;
 /// <summary>
 /// Karşılaştırma paneli: sunum yüzeyi, ayırıcı, yakınlaştırma ve terfi.
 ///
-/// Denetim şeridi burada değil — o T40'ın işi. Kare kaynağı da burada değil: panel
+/// Denetim şeridi T40'ta eklendi ve <see cref="ControlStrip"/> içinde yaşıyor; panel
+/// ona yalnız yer ve fare konumu verir. Kare kaynağı burada değil: panel
 /// kaynağı bilmez, <see cref="ComparisonSurface"/> üstünden "elimde bir kare var"
 /// varsayımıyla çalışır.
 /// </summary>
@@ -23,8 +23,6 @@ internal partial class ComparisonPanel : UserControl
 {
     /// <summary>Klavyeyle ayırıcının küçük adımı: pano genişliğinin yüzde biri.</summary>
     private const double SplitKeyStep = 0.01;
-
-    private const uint ClientAreaAnimationQuery = 0x1042;
 
     /// <summary>
     /// Sentetik kare ölçüsü. İki 720p taraf yan yana. T37 2x1080p'yi ölçtü ve sunum yolu
@@ -55,7 +53,8 @@ internal partial class ComparisonPanel : UserControl
     {
         InitializeComponent();
 
-        _motionReduced = !AnimationsAllowed();
+        // K5: azaltılmış hareket ayarını okuyan tek yer HoverZone. İkinci kopya yok.
+        _motionReduced = HoverZone.MotionReduced;
         Surface.Gesture = _gesture;
         SeparatorGrip.RenderTransform = _separatorAt;
 
@@ -76,6 +75,7 @@ internal partial class ComparisonPanel : UserControl
         SeparatorGrip.KeyDown += OnSeparatorKey;
 
         Stage.SizeChanged += (_, _) => ApplySplit();
+        Stage.PointerExited += (_, _) => Strip.PointerGone();
 
         SetLanguage(false);
         ApplySplit();
@@ -119,6 +119,7 @@ internal partial class ComparisonPanel : UserControl
             TargetFps = 60
         };
         _demo.Start();
+        Strip.StartDemoClock();
         RefreshEmptyState();
         DispatcherTimer.RunOnce(RefreshEmptyState, Motion("MotionSlow", 360));
     }
@@ -127,6 +128,7 @@ internal partial class ComparisonPanel : UserControl
     {
         _demo?.Dispose();
         _demo = null;
+        Strip.StopDemoClock();
     }
 
     /// <summary>
@@ -143,6 +145,7 @@ internal partial class ComparisonPanel : UserControl
         PlaceholderText.Text = Say("Panel üste alındı", "The panel moved to the front");
         LeftBadgeText.Text = turkish ? "ORİJİNAL" : "ORIGINAL";
         RightBadgeText.Text = turkish ? "İŞLENMİŞ" : "PROCESSED";
+        Strip.SetLanguage(turkish);
 
         RefreshReadout();
     }
@@ -242,6 +245,10 @@ internal partial class ComparisonPanel : UserControl
 
     private void OnStageMoved(object? sender, PointerEventArgs e)
     {
+        // T40: şerit panelin alt bölgesinde belirir; bölge oranı Stage yüksekliğinden.
+        var here = e.GetPosition(Stage);
+        Strip.PointerAt(here.Y, Stage.Bounds.Height);
+
         if (!_panning) return;
         var now = e.GetPosition(Stage);
         if (_gesture.Drag(now.X - _panFrom.X, now.Y - _panFrom.Y)) Surface.InvalidateVisual();
@@ -270,6 +277,7 @@ internal partial class ComparisonPanel : UserControl
         RightBadge.IsVisible = !empty;
         ZoomBadge.IsVisible = !empty;
         SeparatorGrip.IsVisible = !empty;
+        Strip.IsVisible = !empty;
     }
 
     // ---- terfi ve yer tutucu (K4, K5) ---------------------------------------------
@@ -398,6 +406,14 @@ internal partial class ComparisonPanel : UserControl
 
     private void OnShellKey(object? sender, KeyEventArgs e)
     {
+        // K4: boşluk tuşu oynat/duraklat, panel odaktayken.
+        if (e.Key == Key.Space)
+        {
+            Strip.TogglePlay();
+            e.Handled = true;
+            return;
+        }
+
         if (e.Key != Key.Escape || !_promoted) return;
         Descend();
         e.Handled = true;
@@ -444,23 +460,6 @@ internal partial class ComparisonPanel : UserControl
         => this.TryFindResource("RadiusPanelScalar", out var value) && value is double scalar
             ? (int)Math.Max(2, scalar)
             : 16;
-
-    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
-    private static extern bool SystemParametersInfoW(uint action, uint param, ref int value, uint update);
-
-    private static bool AnimationsAllowed()
-    {
-        if (!OperatingSystem.IsWindows()) return true;
-        try
-        {
-            var enabled = 1;
-            return !SystemParametersInfoW(ClientAreaAnimationQuery, 0, ref enabled, 0) || enabled != 0;
-        }
-        catch (Exception)
-        {
-            return true;
-        }
-    }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {

@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="VidShrink.App.Playback.ControlStrip">
+
+  <!--
+    Denetim şeridi. Planın §5 çizimi bağlayıcı:
+
+      ▶  ──────●─────────────  00:12 / 01:30   [analiz 1/2 · dnm 2]
+
+    Şerit gizliyken IsVisible değil Opacity sıfırdır: gizli şerit klavyeyle hâlâ
+    odaklanabilir olmalı, odak içine düşünce belirir. Gizliyken fareye görünmez
+    olsun diye IsHitTestVisible kod tarafında kapatılıyor.
+  -->
+  <Border x:Name="Bar"
+          Theme="{StaticResource PlaybackStrip}"
+          Opacity="0"
+          IsHitTestVisible="False"
+          HorizontalAlignment="Stretch">
+
+    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" VerticalAlignment="Center">
+
+      <Button x:Name="PlayPause" Grid.Column="0" Theme="{StaticResource ChipButton}"/>
+      <Button x:Name="Restart" Grid.Column="1" Theme="{StaticResource ChipButton}"/>
+
+      <!--
+        Zaman çizgisi. Izgara dokunma hedefi kadar yüksek; yol ortada durur.
+        Tutamaç ve kodlama imleci Margin ile değil dönüşümle taşınıyor — Margin
+        ölçüme girip sütunu şişirir.
+      -->
+      <Grid x:Name="Timeline"
+            Grid.Column="2"
+            Height="{StaticResource PlaybackTimelineHeight}"
+            Margin="{StaticResource PlaybackStripGap}"
+            Background="Transparent"
+            Focusable="True"
+            ClipToBounds="False"
+            Cursor="Hand">
+
+        <Border x:Name="Track"
+                Theme="{StaticResource PlaybackTrack}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"/>
+
+        <Border x:Name="Fill"
+                Theme="{StaticResource PlaybackTrackFill}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"
+                Width="0"/>
+
+        <Border x:Name="EncodeCursor"
+                Theme="{StaticResource PlaybackEncodeCursor}"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Left"
+                IsVisible="False"/>
+
+        <Border x:Name="Thumb"
+                Theme="{StaticResource PlaybackThumb}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"/>
+      </Grid>
+
+      <TextBlock x:Name="TimeText"
+                 Grid.Column="3"
+                 Theme="{StaticResource PlaybackTimeText}"
+                 Margin="{StaticResource PlaybackStripGap}"
+                 VerticalAlignment="Center"/>
+
+      <!-- K3: kodlama yokken hem imleç hem bu çip gizli. -->
+      <Border x:Name="EncodeChip"
+              Grid.Column="4"
+              Theme="{StaticResource PlaybackEncodeChip}"
+              VerticalAlignment="Center"
+              IsVisible="False">
+        <TextBlock x:Name="EncodeText" Theme="{StaticResource PlaybackEncodeText}"/>
+      </Border>
+
+    </Grid>
+  </Border>
+</UserControl>

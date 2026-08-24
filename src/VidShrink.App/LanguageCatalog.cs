@@ -334,6 +334,18 @@ internal static class LanguageCatalog
     }
 
     /// <summary>
+    /// T40 — the encode cursor label on the playback timeline: "analiz 1/2 · deneme 2".
+    /// The numbers arrive from the caller so no counting lives in the translation.
+    /// </summary>
+    internal static string EncodeMarker(bool turkish, int pass, int passCount, int attempt)
+    {
+        var text = turkish
+            ? $"analiz {pass}/{passCount} · deneme {attempt}"
+            : $"analysis {pass}/{passCount} · attempt {attempt}";
+        return Title(text, turkish);
+    }
+
+    /// <summary>
     /// The question shown when an attempt lands over the target and another attempt is still allowed.
     /// Every number arrives already formatted by the caller, so no formatting lives in the translation.
     /// </summary>

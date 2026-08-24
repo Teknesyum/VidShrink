@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=netstandard">
 
   <!--
     K6: burada tanımlanan her belirteç Theme.axaml'daki bir belirtecin değerini alır.
@@ -12,6 +13,18 @@
       PlaybackBadgeMargin      <- SpaceMd (12)
       PlaybackScrimColor       <- AppBgColor (#050507), %80 örtücülük
       PlaybackMaxContentZoom   <- ölçü değil, jest aralığı; ZoomGesture ile aynı sayı
+
+    T40 — denetim şeridi:
+
+      PlaybackStripPadding     <- TooltipPadding (16,12)
+      PlaybackStripMargin      <- SpaceMd (12), rozet kenar boşluğuyla aynı
+      PlaybackStripGap         <- SpaceMd (12), şerit içindeki sütun arası
+      PlaybackStripHideDelay   <- MotionSlow (360 ms)
+      PlaybackHoverZoneShare   <- SpaceXs / SpaceLg (4/16 = 0,25); oran, piksel değil
+      PlaybackTimelineHeight   <- TargetMinSize (24), dokunma hedefi
+      PlaybackTrackHeight      <- ProgressBarHeight (8)
+      PlaybackThumbSize        <- SliderThumbSize (20)
+      PlaybackCursorWidth      <- DropOutlineThickness (2)
   -->
 
   <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
@@ -20,6 +33,16 @@
   <x:Double x:Key="PlaybackStageMinHeight">256</x:Double>
   <Thickness x:Key="PlaybackBadgeMargin">12</Thickness>
   <x:Double x:Key="PlaybackMaxContentZoom">4</x:Double>
+
+  <Thickness x:Key="PlaybackStripPadding">16,12</Thickness>
+  <Thickness x:Key="PlaybackStripMargin">12</Thickness>
+  <Thickness x:Key="PlaybackStripGap">0,0,12,0</Thickness>
+  <sys:TimeSpan x:Key="PlaybackStripHideDelay">00:00:00.3600000</sys:TimeSpan>
+  <x:Double x:Key="PlaybackHoverZoneShare">0.25</x:Double>
+  <x:Double x:Key="PlaybackTimelineHeight">24</x:Double>
+  <x:Double x:Key="PlaybackTrackHeight">8</x:Double>
+  <x:Double x:Key="PlaybackThumbSize">20</x:Double>
+  <x:Double x:Key="PlaybackCursorWidth">2</x:Double>
 
   <Color x:Key="PlaybackScrimColor">#CC050507</Color>
   <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
@@ -87,6 +110,107 @@
     <Setter Property="BorderBrush" Value="{StaticResource NeonPurpleBorder}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusPanel}"/>
+  </ControlTheme>
+
+  <!--
+    T40 — denetim şeridi. Normalde saydam (Opacity 0), fare panelin alt çeyreğine girince
+    ya da klavye odağı içine düşünce belirir. Okunabilirliği arka planı değil kontrastı
+    taşır: örtücü perde görüntünün üstünde durur ve metin beyaz mono kalır.
+  -->
+  <ControlTheme x:Key="PlaybackStrip" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
+    <Setter Property="Padding" Value="{StaticResource PlaybackStripPadding}"/>
+    <Setter Property="Margin" Value="{StaticResource PlaybackStripMargin}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+  </ControlTheme>
+
+  <!-- Zaman çizgisi. Yol hep görünür; dolgu ve tutamaç süre bilinmiyorken gizlenir. -->
+  <ControlTheme x:Key="PlaybackTrack" TargetType="Border">
+    <Setter Property="Height" Value="{StaticResource PlaybackTrackHeight}"/>
+    <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <!--
+      Odak zaman çizgisindeyken yol kalın ve parlak çerçeveye geçer. Odak rengi burada
+      pembe değil mavi: pembe bu şeritte kodlama imlecinin rengi, ikisi karışmasın.
+    -->
+    <Style Selector="^.focused">
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+      <Setter Property="BorderThickness" Value="{StaticResource FocusRingThickness}"/>
+    </Style>
+    <!-- Süre bilinmiyorsa yol soluk çerçeveyle durur: sıfır değil, belirsiz. -->
+    <Style Selector="^.unknown">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="{StaticResource TextDisabled}"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackTrackFill" TargetType="Border">
+    <Setter Property="Height" Value="{StaticResource PlaybackTrackHeight}"/>
+    <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackThumb" TargetType="Border">
+    <Setter Property="Width" Value="{StaticResource PlaybackThumbSize}"/>
+    <Setter Property="Height" Value="{StaticResource PlaybackThumbSize}"/>
+    <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BoxShadowsTransition Property="BoxShadow" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+      </Transitions>
+    </Setter>
+    <Style Selector="^.lit">
+      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    </Style>
+  </ControlTheme>
+
+  <!--
+    K3: kodlama imleci. Oynatma tutamacı mavi ve yuvarlak, kodlama imleci pembe ve ince
+    dikey çizgi — biçim de renk de ayrı, ikisi karışmaz.
+  -->
+  <ControlTheme x:Key="PlaybackEncodeCursor" TargetType="Border">
+    <Setter Property="Width" Value="{StaticResource PlaybackCursorWidth}"/>
+    <Setter Property="Background" Value="{StaticResource NeonPink}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowPink}"/>
+  </ControlTheme>
+
+  <!--
+    Çipin zemini pembe dolgu değil perde. Şeridin kendi perdesinin üstüne ikinci bir perde
+    binince görüntü ne olursa olsun zemin koyu kalıyor: beyaz karede pembe metnin kontrastı
+    tek perdede 3,49:1 iken çift perdede 5,87:1'e çıkıyor (siyah karede 6,25:1).
+  -->
+  <ControlTheme x:Key="PlaybackEncodeChip" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowPink}"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackEncodeText" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+  </ControlTheme>
+
+  <!-- Süre okuması. Sayı olduğu için mono; rengi beyaz, kontrastı perdeden alır. -->
+  <ControlTheme x:Key="PlaybackTimeText" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
   </ControlTheme>
 
 </ResourceDictionary>

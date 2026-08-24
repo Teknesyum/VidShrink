@@ -61,13 +61,21 @@
           <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
         </Border>
 
-        <Border x:Name="ZoomBadge"
-                Theme="{StaticResource PlaybackBadge}"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Margin="{StaticResource PlaybackBadgeMargin}">
-          <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
-        </Border>
+<!--
+          T40: yakınlaştırma okuması ile denetim şeridi alt kenarı paylaşıyor. Yığın
+          ikisini üst üste değil alt alta koyar — şerit belirdiğinde okuma kaybolmaz.
+        -->
+        <StackPanel VerticalAlignment="Bottom">
+          <Border x:Name="ZoomBadge"
+                  Theme="{StaticResource PlaybackBadge}"
+                  HorizontalAlignment="Right"
+                  Margin="{StaticResource PlaybackBadgeMargin}">
+            <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
+          </Border>
+
+          <!-- Denetim şeridi. Yüzeyin üstünde, panelin alt kenarında durur. -->
+          <playback:ControlStrip x:Name="Strip"/>
+        </StackPanel>
 
         <!--
           K2: ayırıcı. Tutma şeridi çizgiden geniştir ki fare ile yakalamak kolay olsun;
