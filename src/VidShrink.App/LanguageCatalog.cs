@@ -135,6 +135,10 @@ internal static class LanguageCatalog
         ["Minimize"] = "Simge durumuna küçült",
         ["Maximize"] = "Büyüt",
         ["Close"] = "Kapat",
+        // The signature block's support label had no entry, so switching to Turkish left it in
+        // English while every neighbouring control changed. `Teknesyum` deliberately has no entry
+        // either — it is a proper noun and `Names` already pins its spelling.
+        ["Buy me a coffee"] = "Bana bir kahve ısmarla",
         ["Target size media compression"] = "Boyut hedefli medya sıkıştırma",
         ["Media converter"] = "Medya dönüştürücü",
         ["Shrink"] = "Küçült",
