@@ -670,7 +670,7 @@ static async Task<int> PlayAsync(string[] args)
     }
 
     var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-    var only = new HashSet<string> { "k2", "p1", "p2", "p3", "p5", "p6" };
+    var only = new HashSet<string> { "k2", "p1", "p1b", "k3", "p2", "p3", "p5", "p6" };
     var seconds = 10.0;
     var fps = 60;
     var targetMb = 20.0;
@@ -711,6 +711,8 @@ static async Task<int> PlayAsync(string[] args)
 
     if (only.Contains("k2")) await ProbeFiltersAsync(left);
     if (only.Contains("p1")) await PlayPipeSizesAsync(left, right, fps, frames);
+    if (only.Contains("p1b")) await PlayWallAsync(left, right, fps, frames);
+    if (only.Contains("k3")) await PlayLadderAsync(left, right, frames);
     if (only.Contains("p6")) await PlayAllocAsync(left, right, fps, frames);
     if (only.Contains("p3")) await PlayHwAsync(left, right, fps, frames);
     if (only.Contains("p5")) await PlayMatrixAsync(matrix.Count > 0 ? matrix : clips, fps, frames);
@@ -936,6 +938,88 @@ static async Task PlayPipeSizesAsync(string left, string right, int fps, int fra
     {
         var stats = await PipeAsync(left, right, w, h, fps, frames);
         Console.WriteLine(Row($"2x{w}x{h}", stats));
+    }
+}
+
+/// <summary>
+/// Ayni grafik, ama kareler boruya yazilmiyor (<c>-f null -</c>). Kod cozme+olcekleme+hstack
+/// kapasitesini boru tasima kapasitesinden ayirir: iki sayi arasindaki fark **borunun duvari**.
+/// </summary>
+static async Task<(double Fps, double CpuPercent, string Error)> NullSinkAsync(
+    string left, string right, int width, int height, int fps, int maxFrames)
+{
+    var a = new List<string> { "-hide_banner", "-nostdin", "-loglevel", "error", "-i", left, "-i", right };
+    var chain = $"fps={fps},scale={width}:{height}:flags=bilinear,format=bgra";
+    a.Add("-filter_complex");
+    a.Add($"[0:v]{chain}[l];[1:v]{chain}[r];[l][r]hstack=inputs=2[o]");
+    a.AddRange(new[] { "-map", "[o]", "-an", "-sn", "-dn", "-frames:v", maxFrames.ToString(CultureInfo.InvariantCulture), "-f", "null", "-" });
+
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffmpeg,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in a) psi.ArgumentList.Add(arg);
+
+    using var process = new Process { StartInfo = psi };
+    var clock = Stopwatch.StartNew();
+    process.Start();
+    var stdoutTask = DrainAsync(process.StandardOutput.BaseStream);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    _ = await stdoutTask;
+    var error = await stderrTask;
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { }
+    await process.WaitForExitAsync();
+    clock.Stop();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    return (elapsed > 0 ? maxFrames / elapsed : 0, elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0,
+        process.ExitCode == 0 ? "" : error.Trim());
+}
+
+static async Task PlayWallAsync(string left, string right, int fps, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P1b - Duvar nerede: boru mu, kod cozme mi");
+    Console.WriteLine();
+    Console.WriteLine("| Boyut | Boruyla fps | Borusuz (-f null) fps | Boru kaybi % | Boru MB/s | Borusuz CPU % |");
+    Console.WriteLine("|---|---|---|---|---|---|");
+
+    foreach (var (w, h) in PanelSizes())
+    {
+        var piped = await PipeAsync(left, right, w, h, fps, frames);
+        var raw = await NullSinkAsync(left, right, w, h, fps, frames);
+        var loss = raw.Fps > 0 ? (1.0 - piped.Fps / raw.Fps) * 100.0 : double.NaN;
+        Console.WriteLine($"| 2x{w}x{h} | {piped.Fps:0.#} | {raw.Fps:0.#} | {loss:0.#} | {piped.MBps:0.#} | {raw.CpuPercent:0.#} |");
+    }
+}
+
+/// <summary>
+/// K3: duvara carpildiginda fps mi cozunurluk mu dusurulecek? Ayni cozunurlukte fps
+/// merdiveni cikip her basamakta hedefin tutulup tutulmadigina bakilir.
+/// </summary>
+static async Task PlayLadderAsync(string left, string right, int frames)
+{
+    Console.WriteLine();
+    Console.WriteLine("## K3 - fps merdiveni (cozunurluk sabit)");
+    Console.WriteLine();
+    Console.WriteLine("| Boyut | Hedef fps | Surdurulen fps | Hedefi tutuyor mu | Aralik p99 ms | MB/s | CPU % |");
+    Console.WriteLine("|---|---|---|---|---|---|---|");
+
+    foreach (var (w, h) in new[] { (1920, 1080), (1280, 720) })
+    {
+        foreach (var target in new[] { 60, 48, 30, 24 })
+        {
+            // Klip 20 sn; dusuk hedefte 600 kare klibi asar, o yuzden 15 sn'lik icerikle sinirla.
+            var capped = Math.Min(frames, target * 15);
+            var stats = await PipeAsync(left, right, w, h, target, capped);
+            var keeps = stats.Fps >= target * 0.98 ? "**evet**" : "hayir";
+            Console.WriteLine($"| 2x{w}x{h} | {target} | {stats.Fps:0.#} | {keeps} | {stats.P99:0.##} | {stats.MBps:0.#} | {stats.CpuPercent:0.#} |");
+        }
     }
 }
 
