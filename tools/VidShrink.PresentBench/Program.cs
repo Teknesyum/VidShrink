@@ -99,6 +99,8 @@ internal sealed class BenchWindow : Window
     private bool _done;
 
     private FrameFeeder? _feeder;
+    private VidShrink.Core.Playback.IComparisonFrameSource? _source;
+    private VidShrink.Core.Playback.PlaybackFrame? _pendingReturn;
 
     public BenchWindow(BenchOptions opt)
     {
@@ -172,6 +174,21 @@ internal sealed class BenchWindow : Window
             _feeder = new FrameFeeder(_opt);
             _feeder.Start();
         }
+        else if (_opt.Mode == "source")
+        {
+            var pipe = new VidShrink.Ffmpeg.Playback.PipeComparisonFrameSource();
+            _source = pipe;
+            _ = pipe.StartAsync(new VidShrink.Core.Playback.ComparisonFrameRequest
+            {
+                LeftPath = _opt.Left!,
+                RightPath = _opt.Right!,
+                PanelWidth = _opt.Width / 2,
+                PanelHeight = _opt.Height,
+                Fps = _opt.SourceFps,
+                Realtime = _opt.Realtime,
+                Loop = true
+            });
+        }
 
         var top = GetTopLevel(this)!;
 
@@ -195,6 +212,12 @@ internal sealed class BenchWindow : Window
                 _copyTicks += Stopwatch.GetTimestamp() - t0;
                 _copyCount++;
                 _image.InvalidateVisual();
+
+                if (_pendingReturn is not null)
+                {
+                    _source!.Return(_pendingReturn);
+                    _pendingReturn = null;
+                }
             }
 
             if (_startedAt >= 0) _presented++;
@@ -215,6 +238,12 @@ internal sealed class BenchWindow : Window
 
     private byte[]? NextFrame()
     {
+        if (_opt.Mode == "source")
+        {
+            if (!_source!.TryTake(out var live)) return null;
+            _pendingReturn = live;
+            return live.Buffer;
+        }
         if (_opt.Mode == "pipe") return _feeder!.TryTake();
         if (_opt.Mode == "static") return _frameIndex++ == 0 ? _frames[0] : null;
         return _frames[_frameIndex++ % _frames.Length];
@@ -244,10 +273,19 @@ internal sealed class BenchWindow : Window
             $"copies={_copyCount} copyMsAvg={copyMs:F3}" +
             (_feeder is null ? "" : $" fed={_feeder.Produced} starved={_feeder.Starved} feedFps={_feeder.Produced / elapsed:F1}");
 
+        if (_source is not null)
+        {
+            var s = _source.Status;
+            line += $" state={s.State} produced={s.ProducedFrames} dropped={s.DroppedFrames}" +
+                    $" feedFps={s.FeedFps:F1} readErrors={s.ReadErrors} poolAlloc={s.PoolAllocations}" +
+                    (s.MessageTr is null ? "" : $" msg={s.MessageTr}");
+        }
+
         Console.Error.WriteLine(line);
         Console.Error.Flush();
         _status.Text = line;
         _feeder?.Stop();
+        _source?.Dispose();
         DispatcherTimer.RunOnce(Close, TimeSpan.FromMilliseconds(300));
     }
 }
