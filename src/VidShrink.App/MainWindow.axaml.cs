@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
@@ -97,6 +98,7 @@ public partial class MainWindow : Window
     private bool _controlsReady;
     private bool _updateUiSyncing;
     private string? _noticeVersion;
+    private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
@@ -143,6 +145,7 @@ public partial class MainWindow : Window
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
+        Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
 
         ApplyTextCase();
         BtnEn.Classes.Set("selected", true);
@@ -334,6 +337,7 @@ public partial class MainWindow : Window
             ApplyWindowFrame();
             WindowShell.Margin = OffScreenMargin;
             SetLanguage(true);
+            InitializeShareUi();
             InitializeUpdateUi();
             _ = CheckForUpdateAsync();
             PlayPanelEntrance();
@@ -441,8 +445,11 @@ public partial class MainWindow : Window
         ApplyFastGpuTip();
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
+        RefreshShareTarget();
         UpdateToolStatus();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
+        // Recalculate() panelleri kendisi tazeliyor; dosya yokken de boş panel dile uymalı.
+        else RefreshQualityPanels();
     }
 
     /// <summary>
@@ -608,6 +615,100 @@ public partial class MainWindow : Window
 
     private void RefreshUpdateTexts()
         => TxtAutoUpdateEffect.Text = Localize(UpdateCheck.CanSelfUpdate ? AutoUpdateEffectEnglish : NoSelfUpdateEffectEnglish);
+
+    /// <summary>
+    /// Hedef listesi <c>paylasim-hedefleri.json</c>'dan gelir. Dosya yoksa şema
+    /// varsayılanları kullanılır; ne liste ne de tavanlar XAML'de sabit durur, bu yüzden
+    /// JSON'a eklenen üçüncü bir hedef burada kendiliğinden belirir.
+    /// </summary>
+    private void InitializeShareUi()
+    {
+        _shareTargets = ShareTargetTable.Load();
+
+        var wasSyncing = _syncing;
+        _syncing = true;
+        CmbShareTarget.ItemsSource = _shareTargets.Targets.Select(target => target.DisplayName).ToList();
+        CmbShareTarget.SelectedIndex = Math.Max(0, IndexOfTarget(_shareTargets.Default));
+        _syncing = wasSyncing;
+
+        RefreshShareTarget();
+    }
+
+    private int IndexOfTarget(ShareTarget target)
+    {
+        for (var index = 0; index < _shareTargets.Targets.Count; index++)
+            if (ReferenceEquals(_shareTargets.Targets[index], target)) return index;
+        return -1;
+    }
+
+    private void OnShareTargetChanged()
+    {
+        if (_syncing) return;
+        RefreshShareTarget();
+    }
+
+    private ShareTarget SelectedShareTarget()
+    {
+        var index = CmbShareTarget.SelectedIndex;
+        return index >= 0 && index < _shareTargets.Targets.Count
+            ? _shareTargets.Targets[index]
+            : _shareTargets.Default;
+    }
+
+    private void RefreshShareTarget()
+    {
+        var target = SelectedShareTarget();
+        TxtShareCeiling.Text = DescribeBytes(target.MaxBytes);
+
+        var wasSyncing = _syncing;
+        _syncing = true;
+        CmbShareRetention.IsVisible = target.RetentionDays.Count > 0;
+        TxtShareRetentionFixed.IsVisible = target.RetentionDays.Count == 0;
+        if (target.RetentionDays.Count > 0)
+        {
+            CmbShareRetention.ItemsSource = target.RetentionDays
+                .Select(day => T($"{day} gün", day == 1 ? "1 day" : $"{day} days"))
+                .ToList();
+            var chosen = target.RetentionDays.ToList().IndexOf(target.DefaultRetentionDays);
+            CmbShareRetention.SelectedIndex = chosen >= 0 ? chosen : 0;
+        }
+        else
+        {
+            TxtShareRetentionFixed.Text = target.FixedRetentionHours is { } hours
+                ? T($"{hours} saat, sabit", hours == 1 ? "1 hour, fixed" : $"{hours} hours, fixed")
+                : T("Bildirilmemiş", "Not stated");
+        }
+        _syncing = wasSyncing;
+
+        // Silme yeteneği hedefe göre değişir ve gizlenmez: uguu.se gönderene silme jetonu
+        // vermiyor, kullanıcı bunu seçim anında bilmek zorunda.
+        BtnShareDelete.IsVisible = target.CanDelete;
+        TxtShareDeleteNote.Text = target.CanDelete
+            ? T(
+                $"{target.DisplayName} silme jetonu veriyor, bu yüzden bağlantı ömrü dolmadan kapatılabilir. Düğme bir dosya paylaşıldıktan sonra çalışır.",
+                $"{target.DisplayName} hands out a delete token, so a link can be closed before its lifetime runs out. The button works once a file has been shared.")
+            : target.FixedRetentionHours is { } window
+                ? T(
+                    $"{target.DisplayName} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz. Onun yerine {window} saatlik kendiliğinden silme geçer.",
+                    $"{target.DisplayName} hands out no delete token, so neither you nor VidShrink can close the link early. Its own deletion after {window} hours stands in for that.")
+                : T(
+                    $"{target.DisplayName} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz.",
+                    $"{target.DisplayName} hands out no delete token, so neither you nor VidShrink can close the link early.");
+    }
+
+    /// <summary>
+    /// Tavan JSON'da bayt olarak duruyor ve tam ikilik katlar: 128 MiB ve 25 GiB. Ondalık
+    /// birime yuvarlamak sayıyı değiştirirdi, bu yüzden ikilik ad yazılır.
+    /// </summary>
+    internal static string DescribeBytes(long bytes)
+    {
+        if (bytes <= 0) return "-";
+        string[] units = { "B", "KiB", "MiB", "GiB", "TiB" };
+        double size = bytes;
+        var unit = 0;
+        while (size >= 1024 && unit < units.Length - 1) { size /= 1024; unit++; }
+        return $"{size.ToString("0.##", CultureInfo.InvariantCulture)} {units[unit]}";
+    }
 
     private void OnAutoUpdateChanged()
     {
@@ -880,6 +981,7 @@ public partial class MainWindow : Window
             Fade(InfoGrid, false);
             Fade(DropZone, true);
             ResetPlanView();
+            RefreshQualityPanels();
             ReportSourceError($"{T("Bu dosya kullanılamıyor", "This file cannot be used")}: {DescribeFailure(ex)}");
             return;
         }
@@ -1007,7 +1109,104 @@ public partial class MainWindow : Window
         }
 
         RefreshPlanView();
+        RefreshQualityPanels();
         BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
+    }
+
+    /// <summary>
+    /// Yongalar ve her birinin hedefi. <c>Half</c>'ın hedefi kaynağa bağlı olduğu için
+    /// burada boş durur ve hesap anında kaynaktan türetilir.
+    /// </summary>
+    private IReadOnlyList<(Button Chip, double? TargetMb)> QualityChips() => new (Button, double?)[]
+    {
+        (ChipWhatsApp, 16), (Chip8, 8), (Chip25, 25), (Chip100, 100),
+        (Chip128, 128), (Chip180, 180), (ChipHalf, null)
+    };
+
+    private double? ChipTargetMb(double? declared)
+    {
+        if (declared is { } fixedMb) return fixedMb;
+        return _info is null ? null : Math.Max(1, Math.Round(_info.FileSizeMb / 2, 1));
+    }
+
+    /// <summary>
+    /// Her yonganın balonuna tahmini kalite paneli koyar.
+    ///
+    /// Hesap <see cref="PlanCalculator.BuildDetailed"/>'dır ve ffmpeg çağırmaz: ölçülmüş
+    /// karmaşıklık profili varsa o kullanılır, yoksa <c>BuildDetailed</c> kendi içinde
+    /// <see cref="ComplexityProfile.FromSourceBitrate"/>'a düşer. İkisi de saf aritmetik,
+    /// bu yüzden panel fare üstüne gelince beklemeden çıkar. Profilin ölçülmüş olup
+    /// olmadığını panel ayrıca yazar; tahmin ölçüm gibi sunulmaz.
+    /// </summary>
+    private void RefreshQualityPanels()
+    {
+        foreach (var (chip, declared) in QualityChips())
+        {
+            if (ToolTip.GetTip(chip) is not StackPanel panel || panel.Children.Count == 0) continue;
+
+            while (panel.Children.Count > 1) panel.Children.RemoveAt(panel.Children.Count - 1);
+            panel.Children.Add(new Border { Theme = Look("PanelRule") });
+            panel.Children.Add(QualityBody(ChipTargetMb(declared)));
+        }
+    }
+
+    private Control QualityBody(double? targetMb)
+    {
+        // Video yüklü değilken skor hesaplanamaz. Sıfır ya da uydurma bir sayı yerine alan
+        // boş kalır ve yonganın ne işe yaradığı yukarıdaki maddelerde durmaya devam eder.
+        if (_info is null || targetMb is not { } target)
+            return new TextBlock
+            {
+                Text = T(
+                    "Bir video yükleyin; bu hedefin tahmini kalite skoru burada çıkar.",
+                    "Load a video and this target's predicted quality score appears here."),
+                Theme = Look("Hint"),
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = Scalar("TooltipMaxWidth", 460)
+            };
+
+        var options = CurrentOptions();
+        options.TargetMb = target;
+        var result = PlanCalculator.BuildDetailed(_info, options, _profile, _encoders);
+        var codes = result.Plan.ReasonCodes.Select(note => note.Code).ToHashSet();
+
+        var basis = codes.Contains(ReasonCode.PredictedQualityMeasured)
+            ? T("Bu klipten kodlanan örnekle ölçüldü", "Measured from a sample encoded from this clip")
+            : codes.Contains(ReasonCode.PredictedQualityEstimated)
+                ? T("Kaynak bit hızından tahmin edildi", "Estimated from the source bitrate")
+                : T("Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır", "The source is already under this target and is copied as it is");
+
+        var grid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("Auto,*"),
+            ColumnSpacing = Scalar("SpaceMd", 12),
+            RowSpacing = Scalar("SpaceSm", 8),
+            MaxWidth = Scalar("TooltipMaxWidth", 460)
+        };
+
+        AddQualityRow(grid, Localize("Target"), $"{target.ToString("0.##", CultureInfo.InvariantCulture)} MB");
+        AddQualityRow(grid, T("Tahmini kalite", "Predicted quality"), $"{result.PredictedQuality:0.#}/100");
+        AddQualityRow(grid, T("Kaynağa göre kayıp", "Loss against the source"),
+            T($"{100 - result.PredictedQuality:0.#} puan", $"{100 - result.PredictedQuality:0.#} points"));
+        AddQualityRow(grid, T("Dayanak", "Basis"), basis);
+        return grid;
+    }
+
+    private void AddQualityRow(Grid grid, string label, string value)
+    {
+        var row = grid.RowDefinitions.Count;
+        grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+
+        var key = new TextBlock { Text = LanguageCatalog.Title(label, _turkish), Theme = Look("PlanFactLabel") };
+        Grid.SetRow(key, row);
+        Grid.SetColumn(key, 0);
+
+        var read = new TextBlock { Text = LanguageCatalog.Title(value, _turkish), Theme = Look("PlanFactValue") };
+        Grid.SetRow(read, row);
+        Grid.SetColumn(read, 1);
+
+        grid.Children.Add(key);
+        grid.Children.Add(read);
     }
 
     private void ResetPlanView()
@@ -1750,5 +1949,135 @@ public partial class MainWindow : Window
         {
             TxtSystemStatus.Text = $"{T("Klasör açılamadı", "The folder could not be opened")}: {ex.Message}";
         }
+    }
+}
+
+/// <summary>
+/// Tek bir paylaşım hedefi. Alan adları <c>paylasim-hedefleri.json</c> şemasıyla birebir
+/// aynı; şema T35'te sabitlendi ve iki taraf da onu okuyor.
+/// </summary>
+internal sealed record ShareTarget(
+    string Id,
+    string DisplayName,
+    long MaxBytes,
+    IReadOnlyList<int> RetentionDays,
+    int DefaultRetentionDays,
+    int? FixedRetentionHours,
+    bool CanDelete,
+    bool PlaysInBrowser);
+
+/// <summary>
+/// Hedef listesi arayüze koddan değil dosyadan gelir: JSON'a üçüncü bir hedef eklenince
+/// açılır kutuda kendiliğinden belirir ve tek satır C# değişmez.
+///
+/// Dosyayı T35 yazıyor. Henüz yoksa <see cref="Fallback"/> devreye girer — bunlar
+/// sözleşmede yazılı şema varsayılanlarıdır, uydurma değer değil.
+/// </summary>
+internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTarget> Targets)
+{
+    internal const string FileName = "paylasim-hedefleri.json";
+
+    /// <summary>Ölçülmüş tavan: uguu.se ana sayfası "Max upload size is 128 MiB" diyor.</summary>
+    internal const long UguuMaxBytes = 134_217_728;
+
+    /// <summary>storage.to'nun ilan ettiği 25 GB tavanı.</summary>
+    internal const long StorageToMaxBytes = 26_843_545_600;
+
+    internal static ShareTargetTable Fallback { get; } = new(
+        "storage.to",
+        new[]
+        {
+            new ShareTarget("storage.to", "storage.to", StorageToMaxBytes,
+                new[] { 1, 2, 3, 4, 5, 6, 7 }, 3, null, true, true),
+            new ShareTarget("uguu.se", "uguu.se", UguuMaxBytes,
+                Array.Empty<int>(), 0, 3, false, true)
+        });
+
+    internal ShareTarget Default =>
+        Targets.FirstOrDefault(target => string.Equals(target.Id, DefaultId, StringComparison.Ordinal))
+        ?? Targets[0];
+
+    /// <summary>
+    /// Dosya çalışma dizininin yanında da olabilir, depo kökünde de. Yayında ikisi aynı yer;
+    /// geliştirmede exe <c>bin/</c> altındadır, bu yüzden üst dizinler taranır.
+    /// </summary>
+    internal static string? Locate(string startDirectory)
+    {
+        var directory = new DirectoryInfo(startDirectory);
+        while (directory is not null)
+        {
+            var candidate = Path.Combine(directory.FullName, FileName);
+            if (File.Exists(candidate)) return candidate;
+            directory = directory.Parent;
+        }
+
+        return null;
+    }
+
+    internal static ShareTargetTable Load()
+    {
+        try
+        {
+            var path = Locate(AppContext.BaseDirectory);
+            return path is null ? Fallback : Parse(File.ReadAllText(path));
+        }
+        catch (Exception)
+        {
+            // Dosya bozuksa arayüz açılmaya devam eder; şema varsayılanları gösterilir.
+            return Fallback;
+        }
+    }
+
+    internal static ShareTargetTable Parse(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        var targets = new List<ShareTarget>();
+        if (root.TryGetProperty("targets", out var list) && list.ValueKind == JsonValueKind.Array)
+            foreach (var item in list.EnumerateArray())
+                if (ReadTarget(item) is { } target)
+                    targets.Add(target);
+
+        if (targets.Count == 0) return Fallback;
+
+        var defaultId = root.TryGetProperty("default", out var chosen) && chosen.ValueKind == JsonValueKind.String
+            ? chosen.GetString() ?? targets[0].Id
+            : targets[0].Id;
+
+        return new ShareTargetTable(defaultId, targets);
+    }
+
+    private static ShareTarget? ReadTarget(JsonElement item)
+    {
+        if (item.ValueKind != JsonValueKind.Object) return null;
+        if (!item.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String) return null;
+
+        var identifier = id.GetString();
+        if (string.IsNullOrWhiteSpace(identifier)) return null;
+
+        var days = new List<int>();
+        if (item.TryGetProperty("retentionDays", out var retention) && retention.ValueKind == JsonValueKind.Array)
+            foreach (var day in retention.EnumerateArray())
+                if (day.TryGetInt32(out var value))
+                    days.Add(value);
+
+        int? fixedHours = item.TryGetProperty("fixedRetentionHours", out var hours) && hours.TryGetInt32(out var hoursValue)
+            ? hoursValue
+            : null;
+
+        return new ShareTarget(
+            identifier,
+            item.TryGetProperty("displayName", out var name) && name.ValueKind == JsonValueKind.String
+                ? name.GetString() ?? identifier
+                : identifier,
+            item.TryGetProperty("maxBytes", out var max) && max.TryGetInt64(out var maxValue) ? maxValue : 0,
+            days,
+            item.TryGetProperty("defaultRetentionDays", out var fallbackDay) && fallbackDay.TryGetInt32(out var dayValue)
+                ? dayValue
+                : days.FirstOrDefault(),
+            fixedHours,
+            item.TryGetProperty("canDelete", out var canDelete) && canDelete.ValueKind == JsonValueKind.True,
+            item.TryGetProperty("playsInBrowser", out var plays) && plays.ValueKind == JsonValueKind.True);
     }
 }
