@@ -388,6 +388,36 @@ public sealed class ShareProviderTests
         Assert.Equal(string.Empty, request.Body);
     }
 
+    /// <summary>
+    /// Ölçüldü: storage.to'nun init yolu HEAD'e 404 döndürüyor. Bu "servis öldü" değil "bu yol
+    /// yalnız POST kabul ediyor" demek; yoklama buna ayakta demeli.
+    /// </summary>
+    [Theory]
+    [InlineData(HttpStatusCode.NotFound)]
+    [InlineData(HttpStatusCode.MethodNotAllowed)]
+    [InlineData(HttpStatusCode.Forbidden)]
+    public async Task AnEndpointThatAnswersAtAllCountsAsAlive(HttpStatusCode status)
+    {
+        var transport = new FakeTransport();
+        transport.Enqueue(status, string.Empty);
+        var provider = ShareProviderFactory.Create(RealTable().Find("storage.to")!, transport);
+
+        Assert.True((await provider.CheckHealthAsync()).Ok);
+    }
+
+    [Fact]
+    public async Task AServerErrorOnTheProbeMarksTheTargetDown()
+    {
+        var transport = new FakeTransport();
+        transport.Enqueue(HttpStatusCode.ServiceUnavailable, "down");
+        var provider = ShareProviderFactory.Create(RealTable().Find("storage.to")!, transport);
+
+        var result = await provider.CheckHealthAsync();
+
+        Assert.False(result.Ok);
+        Assert.Equal(ShareFailure.ServiceError, result.Failure);
+    }
+
     [Fact]
     public async Task ADeadEndpointComesBackWithAReasonTheInterfaceCanShow()
     {

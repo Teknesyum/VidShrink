@@ -128,8 +128,12 @@ public static class ShareHealth
 
             using var response = await transport.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-            // Uç nokta yalnız POST kabul ediyor olabilir; 405 de "ayakta" demektir.
-            if (response.IsSuccessStatusCode || (int)response.StatusCode is 405 or 400 or 401 or 403)
+            // Ölçülen: storage.to'nun init yolu HEAD'e 404, uguu.se 200 döndü. Yoklamanın ölçtüğü
+            // şey uç noktanın POST'u kabul edip etmediği değil, sunucunun yanıt verip vermediği:
+            // yalnız POST kabul eden bir yol 404/405, Cloudflare arkasındaki bir yol 403 döndürür
+            // ve üçünde de servis ayaktadır. Ölü hedefin işareti bunlar değil, yanıtın hiç
+            // gelmemesi ya da 5xx olmasıdır.
+            if (response.IsSuccessStatusCode || (int)response.StatusCode is 400 or 401 or 403 or 404 or 405 or 410)
                 return ShareResult.Success(new ShareLink(
                     target.Id, string.Empty, url, string.Empty, DateTimeOffset.UtcNow));
 
