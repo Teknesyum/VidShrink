@@ -33,7 +33,7 @@ static void PrintUsage()
     Console.WriteLine("  bench measure <referans> <test>");
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor>");
     Console.WriteLine("  bench compare <a.json> <b.json>");
-    Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
+    Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
 }
 
 static int Unknown(string command)
@@ -174,12 +174,12 @@ static async Task<int> PanelAsync(string[] args)
 {
     if (args.Length < 2)
     {
-        Console.Error.WriteLine("usage: bench panel <klip,...> --only o1,o2,o3,o4,o5");
+        Console.Error.WriteLine("usage: bench panel <klip,...> --only o1,o2,o3,o4,o5,o6");
         return 1;
     }
 
     var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-    var only = new HashSet<string> { "o1", "o2", "o3", "o4", "o5" };
+    var only = new HashSet<string> { "o1", "o2", "o3", "o4", "o5", "o6" };
     var panelWidth = 960;
     var zoom = 4;
     var samples = 12;
@@ -217,6 +217,7 @@ static async Task<int> PanelAsync(string[] args)
     if (only.Contains("o1")) await Measure1Async(clips, panelWidth, samples);
     if (only.Contains("o4")) await Measure4Async(clips);
     if (only.Contains("o5")) await Measure5Async(clips, panelWidth, zoom, samples);
+    if (only.Contains("o6")) await Measure6Async(clips, panelWidth, samples);
     if (only.Contains("o3")) await Measure3Async(clips);
     if (only.Contains("o2")) await Measure2Async(clips, panelWidth, targetMb, outDir);
     return 0;
@@ -400,6 +401,210 @@ static async Task Measure3Async(List<string> clips)
             $"| {Label(clip)} | {draft.Width}x{draft.Height}@{draft.Fps:0.##} {draft.Codec}/{draft.Preset} | " +
             $"{stopwatch.Elapsed.TotalSeconds:0.##} | {Fmt(speed?.FramesPerSecond)} | {speed?.Frames.ToString() ?? "-"} | {window} |");
     }
+}
+
+// --- T32/K1: anahtar kare hizali cekme -----------------------------------------------
+// T30 p95'i medyanin 4-5 kati buldu ve sebebi anahtar kare uzakligina bagladi ama olcmedi.
+// Bu olcum ayni damgalari iki kez cekiyor: bir kez istenen anda (hizasiz), bir kez o andan
+// once gelen en yakin anahtar karede (hizali).
+
+/// <summary>
+/// Anahtar kare damgalarini ffprobe paket listesinden cikarir. stdout ve stderr **ayni anda**
+/// bosaltilir; ayni boru tuzagi (docs/taramalar/RAPOR.md:27) ffprobe icin de gecerli.
+/// </summary>
+static async Task<(List<double> Stamps, double Ms, string Error)> KeyframeStampsAsync(string path)
+{
+    var a = new[]
+    {
+        "-hide_banner", "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "packet=pts_time,flags",
+        "-of", "csv=p=0",
+        path
+    };
+
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffprobe,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in a) psi.ArgumentList.Add(arg);
+
+    var stopwatch = Stopwatch.StartNew();
+    using var process = new Process { StartInfo = psi };
+    process.Start();
+    var stdoutTask = process.StandardOutput.ReadToEndAsync();
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    var stdout = await stdoutTask;
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+    stopwatch.Stop();
+
+    var stamps = new List<double>();
+    foreach (var line in stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+    {
+        var parts = line.Trim().Split(',');
+        if (parts.Length < 2) continue;
+        if (!parts[1].Contains('K')) continue;
+        if (double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var pts)) stamps.Add(pts);
+    }
+
+    stamps.Sort();
+    return (stamps, stopwatch.Elapsed.TotalMilliseconds, process.ExitCode == 0 ? "" : error.Trim());
+}
+
+/// <summary>Dosyayi acar, hicbir kare cozmez. Kuyrugun surec acilisindan mi geldigini ayirir.</summary>
+static async Task<(double Ms, string Error)> OpenOnlyAsync(string path)
+{
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffprobe,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in new[] { "-hide_banner", "-v", "error", "-show_format", "-of", "csv=p=0", path })
+        psi.ArgumentList.Add(arg);
+
+    var stopwatch = Stopwatch.StartNew();
+    using var process = new Process { StartInfo = psi };
+    process.Start();
+    var stdoutTask = process.StandardOutput.ReadToEndAsync();
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    _ = await stdoutTask;
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+    stopwatch.Stop();
+    return (stopwatch.Elapsed.TotalMilliseconds, process.ExitCode == 0 ? "" : error.Trim());
+}
+
+static double FloorKeyframe(List<double> keyframes, double at)
+{
+    var chosen = keyframes.Count > 0 ? keyframes[0] : 0;
+    foreach (var k in keyframes)
+    {
+        if (k > at + 1e-6) break;
+        chosen = k;
+    }
+    return chosen;
+}
+
+static async Task Measure6Async(List<string> clips, int panelWidth, int samples)
+{
+    Console.WriteLine();
+    Console.WriteLine("## O6 - Anahtar kare dizini cikarma maliyeti");
+    Console.WriteLine();
+    Console.WriteLine("| Klip | Anahtar kare | Ortalama aralik s | Ilk cikarma ms | Tekrar ms |");
+    Console.WriteLine("|---|---|---|---|---|");
+
+    var index = new Dictionary<string, List<double>>();
+    foreach (var clip in clips)
+    {
+        var first = await KeyframeStampsAsync(clip);
+        if (first.Error.Length > 0) { Console.Error.WriteLine($"{Label(clip)}: {first.Error}"); continue; }
+        var second = await KeyframeStampsAsync(clip);
+        index[clip] = first.Stamps;
+
+        var info = await FfprobeClient.ProbeAsync(clip);
+        var gap = first.Stamps.Count > 1 ? info.DurationSeconds / (first.Stamps.Count - 1) : double.NaN;
+        Console.WriteLine($"| {Label(clip)} | {first.Stamps.Count} | {gap:0.##} | {first.Ms:0.#} | {second.Ms:0.#} |");
+    }
+
+    // Kuyruk kod cozmeden mi geliyor yoksa surec acilisindan mi? Ayni dosyayi acan ama hic
+    // kare cozmeyen bir cagri tabani verir; kuyruk burada da varsa kod cozmenin sucu degil.
+    Console.WriteLine();
+    Console.WriteLine("## O6 - Kod cozmesiz taban (ffprobe -show_format, ayni dosya)");
+    Console.WriteLine();
+    Console.WriteLine("| Klip | n | p50 ms | p90 ms | p95 ms | max ms | >400ms |");
+    Console.WriteLine("|---|---|---|---|---|---|---|");
+
+    foreach (var clip in clips)
+    {
+        var times = new List<double>();
+        for (var i = 0; i < samples; i++)
+        {
+            var probe = await OpenOnlyAsync(clip);
+            if (probe.Error.Length == 0) times.Add(probe.Ms);
+        }
+
+        Console.WriteLine(
+            $"| {Label(clip)} | {times.Count} | {Percentile(times, 50):0.#} | {Percentile(times, 90):0.#} | " +
+            $"{Percentile(times, 95):0.#} | {(times.Count > 0 ? times.Max() : double.NaN):0.#} | {times.Count(v => v > 400)} |");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("## O6 - Hizali ve hizasiz kare cekme gecikmesi (PNG, stdout)");
+    Console.WriteLine();
+    Console.WriteLine("| Klip | Cozunurluk | Codec | Hizalama | Durum | n | p50 ms | p90 ms | p95 ms | max ms | >400ms |");
+    Console.WriteLine("|---|---|---|---|---|---|---|---|---|---|---|");
+
+    var pooled = new Dictionary<string, List<double>>();
+
+    foreach (var clip in clips)
+    {
+        if (!index.TryGetValue(clip, out var keyframes)) continue;
+        var info = await FfprobeClient.ProbeAsync(clip);
+        var stamps = Timestamps(info.DurationSeconds, samples).ToList();
+        var aligned = stamps.Select(t => FloorKeyframe(keyframes, t)).ToList();
+
+        foreach (var (mode, targets) in new[] { ("hizasiz", stamps), ("hizali", aligned) })
+        {
+            var poolKey = Label(clip) + "/" + mode;
+            if (!pooled.ContainsKey(poolKey)) pooled[poolKey] = new List<double>();
+            var cold = new List<double>();
+            var warm = new List<double>();
+
+            foreach (var t in targets)
+            {
+                var grab = await GrabAsync(clip, t, panelWidth, "png");
+                if (grab.Error.Length > 0) { Console.Error.WriteLine($"{Label(clip)} {mode} @{t:0.##}: {grab.Error}"); continue; }
+                cold.Add(grab.Ms);
+            }
+
+            foreach (var t in targets)
+            {
+                var grab = await GrabAsync(clip, t, panelWidth, "png");
+                if (grab.Error.Length > 0) continue;
+                warm.Add(grab.Ms);
+            }
+
+            pooled[poolKey].AddRange(cold);
+            pooled[poolKey].AddRange(warm);
+            Row("soguk", cold);
+            Row("sicak", warm);
+
+            void Row(string state, List<double> times) => Console.WriteLine(
+                $"| {Label(clip)} | {info.Width}x{info.Height} | {info.VideoCodec} | {mode} | {state} | {times.Count} | " +
+                $"{Percentile(times, 50):0.#} | {Percentile(times, 90):0.#} | {Percentile(times, 95):0.#} | " +
+                $"{(times.Count > 0 ? times.Max() : double.NaN):0.#} | {times.Count(v => v > 400)} |");
+        }
+    }
+
+    // Soguk ve sicak gecis ayni dagilimdan geliyor; kapi karari icin ikisi havuzlanir.
+    // Kuyruk bandi (600-1000 ms) ayri sayilir: kod cozmesiz tabanda da gorunen durakalma.
+    Console.WriteLine();
+    Console.WriteLine("## O6 - Havuzlanmis (soguk+sicak) ve kuyruk bandi");
+    Console.WriteLine();
+    Console.WriteLine("| Klip/hizalama | n | p50 ms | p90 ms | p95 ms | p99 ms | 600-1000ms | >400ms % |");
+    Console.WriteLine("|---|---|---|---|---|---|---|---|");
+
+    foreach (var (key, times) in pooled)
+        Console.WriteLine(
+            $"| {key} | {times.Count} | {Percentile(times, 50):0.#} | {Percentile(times, 90):0.#} | " +
+            $"{Percentile(times, 95):0.#} | {Percentile(times, 99):0.#} | " +
+            $"{times.Count(v => v is > 600 and < 1000)} | {100.0 * times.Count(v => v > 400) / Math.Max(1, times.Count):0.#} |");
+
+    var dumpPath = Path.Combine(Path.GetTempPath(), "vidshrink-o6-ornekler.csv");
+    var lines = new List<string> { "klip_hizalama,ms" };
+    foreach (var (key, times) in pooled)
+        lines.AddRange(times.Select(v => $"{key},{v.ToString("0.###", CultureInfo.InvariantCulture)}"));
+    await File.WriteAllLinesAsync(dumpPath, lines);
+    Console.WriteLine();
+    Console.WriteLine($"Ham ornekler: {dumpPath}");
 }
 
 static async Task Measure2Async(List<string> clips, int panelWidth, double targetMb, string outDir)
