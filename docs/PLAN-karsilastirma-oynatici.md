@@ -1,7 +1,26 @@
 # Plan — ortadaki iki taraflı karşılaştırma oynatıcısı
 
-Tarih: 24.08.2026. Durum: **T33 ölçüm kapısı koşuyor**, mimari kararı o verecek.
-Bu plan kapının iki olası sonucu için de yazıldı.
+Tarih: 24.08.2026. Durum: **T33 kısmen ölçüldü** — boru yaklaşımı G1'i geçti, G2'de kaldı;
+libmpv (Aday B) henüz hiç ölçülmedi. Ölçüm: `docs/olcumler/T33-oynatma-olcumleri.md`.
+
+> **Ölçülmüş sonuç — planın bant genişliği bölümü artık tahmin değil.**
+>
+> | Panel | Boruyla | Borusuz | Boruda kaybolan |
+> |---|---|---|---|
+> | 2×960×540 | 324,8 fps | 341,5 fps | %4,9 |
+> | 2×1280×720 | 154,9 fps | 314,6 fps | %50,8 |
+> | 2×1920×1080 | 37,3 fps | 171,8 fps | **%78,3** |
+>
+> **Duvar borunun kendisi, kod çözme değil.** 2×1080p'de ffmpeg 172 fps üretebiliyor ama
+> boru 37 teslim ediyor. Kanıt CPU'da: çözünürlük yükseldikçe ffmpeg'in CPU'su **düşüyor**
+> (%638 → %137) — süreç kareyi hesaplamakla değil boruya yazmakla meşgul.
+>
+> Kullanıcının "1080p sınırı" itirazının sayısal karşılığı buydu ve haklı çıktı: sınır kod
+> çözmede değil, ham kareyi işlemciden geçirmekte.
+>
+> **Sonuç: boru yolunda 2×1080p'nin pratik tavanı 30 fps.** Kullanıcının istediği 60+ fps
+> 1080p'de boruyla karşılanamıyor; 2×1280×720'de (153 fps) ve 2×960×540'ta (309 fps)
+> rahat karşılanıyor. 60+ fps'i 1080p'de isteyen tek aday **libmpv** ve o henüz ölçülmedi.
 
 ## 1. İstenen
 
@@ -74,6 +93,15 @@ kaynak çözünürlüğü değil panel boyutu belirliyor:
 | 2×1920×1080 | 16,6 MB | ~995 MB/s |
 
 Son satır adayın duvarı. Kullanıcının aşmak istediği 1080p sınırı **borunun sınırı**.
+
+**Ölçüldü ve doğrulandı.** Makinenin boru tavanı ~590 MB/s (16,6 MB'lık karelerde) ile
+~1285 MB/s (4,1 MB'lık karelerde) arasında — kare büyüdükçe taşıma verimi düşüyor.
+Konseyin öngördüğü ~1 GB/s rakamı doğru çıktı ve tavan tam oraya düşüyor.
+
+**K3 kararı ölçümle desteklendi.** Sürdürülen fps 2×1080p'de hedeften bağımsız olarak
+~37,7 kalıyor, çünkü duvar bayt/saniye cinsinden. Fps'i 30'a düşürmek tam çözünürlüğü
+kurtarıyor (37,7 > 30). Aynı bütçeyi çözünürlük düşürerek de almak mümkün ama o zaman
+incelenecek artefakt yok oluyor — **fps düşer, çözünürlük düşmez** kararı geçerli.
 
 ### Aday B: libmpv render API
 

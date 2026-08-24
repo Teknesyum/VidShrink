@@ -18,7 +18,7 @@ mühürlenmedi. Bu dosya devam eden oturumun ilk okuyacağı yer.
 
 | # | İş | Nerede kaldı |
 |---|---|---|
-| **T33** | oynatma mimarisi ölçüm kapısı | boru duvarı bulundu, fps/çözünürlük sorusu karara bağlandı. **Ö7 (libmpv) sırası geldi mi belirsiz** — raporuna bakılacak |
+| **T33** | oynatma mimarisi ölçüm kapısı | **main'e birleşti** (`621d41e`), `status: active`, mühürsüz. Boru: **G1 geçti** (2×960×540'ta 309 fps, p99 5,02 ms), **G2 kaldı** (2×1080p'de 37,5 fps, p99 30,5 ms), G3 karara bağlanmadı (ön sonuç %36-84). **libmpv hiç ölçülmedi** |
 | ~~T35~~ | storage.to + uguu.se sağlayıcıları | **main'e birleşti** (`4e0805f`). 296 test yeşil, canlı ağ denemesi iki sağlayıcıda da geçti, Drive'ın yedi dosyası silindi, `t31-drive` etiketi atıldı |
 | **T36** | ayarlar sekmesi + kalite panelleri | iki dilli metin geçişi bitti, testler commit'siz kalmıştı |
 
@@ -74,3 +74,21 @@ T20 (donanım ilk deneme aşımı), T28 (ilk kurulumda GPU teşhisi), T4, T5, T9
   sayfayı çekti, içinde `<video controls playsInline preload="metadata">` ve imzalı CDN
   kaynağı var, CDN başlıkları da ölçüldü (`video/mp4`, `Accept-Ranges`, `206`).
   Tekrar ölçmeye gerek yok; 403 tarayıcı olmayan istemciye çıkan bot koruması.
+
+## T33'ün en önemli bulgusu — sonraki kararı bu belirliyor
+
+**Duvar borunun kendisi, kod çözme değil.** 2×1080p'de ffmpeg 172 fps üretebiliyor ama
+boru 37 teslim ediyor; kapasitenin %78'i taşımada kayboluyor. Kanıt CPU sütununda:
+çözünürlük yükseldikçe ffmpeg'in CPU'su **düşüyor** (%638 → %137) — süreç kareyi
+hesaplamakla değil boruya yazmakla meşgul.
+
+Sonucu: **boru yolunda 2×1080p'nin pratik tavanı 30 fps.** Kullanıcının açıkça istediği
+60+ fps 1080p'de boruyla karşılanamıyor. 2×1280×720'de (153 fps) ve 2×960×540'ta
+(309 fps) rahat karşılanıyor.
+
+**60+ fps'i 1080p'de verebilecek tek aday libmpv ve o hiç ölçülmedi.** Devam eden oturumun
+ilk işi Ö7 olmalı — karar kuralı onsuz işletilemiyor.
+
+T33 iki şeyin de denenmediğini yazdı ve ikisi duvarı kaldırabilir: **paylaşımlı bellek**
+ve **daha büyük boru tamponu**. Ö7'den önce bunlar denenmeli; ucuzsa boru yolu 1080p'de
+kurtarılabilir.
