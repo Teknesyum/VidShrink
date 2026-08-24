@@ -209,3 +209,61 @@ hangi ikili kaynağının kullanılabileceği T33'te ayrıca araştırılıyor.
 **Airspace.** `VideoView` yaklaşımı bu yüzden zaten elendi; kazanan mimari ne olursa olsun
 ayırıcı çizgisi native bir yüzeyin üstüne çizilemez. Her iki aday da tek yüzeye çizdiği
 için sorun yok — bu şart kapı sonrasında da korunacak.
+
+---
+
+## 9. Platform ayrışması — ikinci görüş ve karar
+
+Kullanıcı şunu önerdi:
+
+> eğer bu dediğim linux versiyon için mümkün değilse linux ve macos için ses olmayan
+> max 1080p destekleyen çözümü uygulayıp uygulamayı onlar için farklı bizim için farklı
+> yapabiliriz
+
+Geri alınması pahalı bir mimari seçim olduğu için ikinci görüş alındı (opus, advisor).
+
+### Karar: ayrışma evet, iki mimari hayır
+
+Görüş öneriyi kabul etti ama biçimini değiştirdi ve gerekçesi ikna edici:
+
+**İki eşit kod yolu kurma. Tek mimari, tek yetenek bayrağı kur.**
+
+- Kare kaynağı bir arayüz olarak yazılır.
+- **Boru uygulaması üç platformda da varsayılandır** ve tek gerçek yoldur.
+- libmpv, üstüne takılan bir **hızlandırıcıdır** — alternatif bir program değil.
+- libmpv yüklenemezse (kütüphane yok, çökme) sessizce boruya düşülür.
+
+Kritik nokta: **bu düşüş zaten Linux/macOS davranışıdır.** Yani ayrı bir kod yolu değil,
+her gün çalışan ve test edilen yoldur. İki eşit yol kurulursa ikisi de "asıl" olur ve
+Linux'ta çıkan bir hata Windows'ta üretilemez hâle gelir; bakım maliyeti kod satırından
+değil buradan doğar.
+
+### Bayrak "Windows mu" değil, "libmpv var mı"
+
+Görüşün yakaladığı ve planın kaçırdığı şey: **macOS'u Linux'la aynı kefeye koymak
+yanlış.** libmpv macOS'ta Homebrew üzerinden gelir ve Linux'takinden temiz paketlenir.
+Asıl sorunlu olan yalnız **Linux'un self-contained yayımı**.
+
+Bayrak `OperatingSystem.IsWindows()` değil, `libmpv bulunabildi mi` olacak. Böylece
+macOS de sesi bedavaya alır ve Windows'ta mpv kurulu değilse doğru davranır.
+
+### Ses ve 4K yetenektir, farklı davranış değil
+
+Program "iki platformda farklı davranmıyor" — panel daha az yetenek gösteriyor. Denetim
+şeridi ses düğmesini göstermezse kullanıcı bunu bozukluk saymaz.
+
+Kabul edilemez olan tek fark **30 fps ile 60 fps arası**. O bayrakla açıklanmayacak;
+§4'ün **fps düşer, çözünürlük düşmez** kararıyla açıklanacak ve üç platformda da aynı
+kural uygulanacak.
+
+### Önce ölçüm — bu karar henüz uygulanmayacak
+
+Görüş bir sıra hatası daha yakaladı: **Ö4 hiç ölçülmedi.** Avalonia'nın
+`WriteableBitmap` sunum yolu 309 fps'i taşıyamıyorsa boru ile mpv tartışması yanlış
+yerde yapılıyor demektir.
+
+Bu, T33 tur 1'in Ö10 ölçümüyle örtüşüyor (tüketicisiz boru tavanı) — bağımsız olarak
+aynı yere işaret ettiler. **libmpv indirme izni istenmeden önce o ölçüm koşulacak.**
+
+Ölçümlerden biri 2×1080p'de 60 fps verirse bu bölümün tamamı gereksizleşir: boru
+kurtulur, libmpv hiç ödenmez, ayrışma sorusu ortadan kalkar.
