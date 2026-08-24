@@ -19,7 +19,7 @@ mühürlenmedi. Bu dosya devam eden oturumun ilk okuyacağı yer.
 | # | İş | Nerede kaldı |
 |---|---|---|
 | **T33** | oynatma mimarisi ölçüm kapısı | boru duvarı bulundu, fps/çözünürlük sorusu karara bağlandı. **Ö7 (libmpv) sırası geldi mi belirsiz** — raporuna bakılacak |
-| **T35** | storage.to + uguu.se sağlayıcıları | canlı ağ denemesinin hemen öncesinde durdu. Drive silme ve `t31-drive` etiketi durumu raporunda |
+| ~~T35~~ | storage.to + uguu.se sağlayıcıları | **main'e birleşti** (`4e0805f`). 296 test yeşil, canlı ağ denemesi iki sağlayıcıda da geçti, Drive'ın yedi dosyası silindi, `t31-drive` etiketi atıldı |
 | **T36** | ayarlar sekmesi + kalite panelleri | iki dilli metin geçişi bitti, testler commit'siz kalmıştı |
 
 Üçü de kendi worktree'sinde. Devam ederken **worktree'leri main'e birleştir**, yeni ajan
@@ -63,3 +63,14 @@ Bu oturumda bu makineden gerçek dosyayla ölçüldü (ayrıntı:
 ## Açık kalan eski işler
 
 T20 (donanım ilk deneme aşımı), T28 (ilk kurulumda GPU teşhisi), T4, T5, T9.
+
+## T35'in bıraktıkları — devam eden oturuma
+
+- Sağlayıcılar **arayüze bağlanmadı**. `paylasim-hedefleri.json` şemaya göre yazıldı ama
+  T36'nın arayüzüyle birlikte görülmedi; son hâli sayılmamalı.
+- Sürdürülebilir (resumable) yükleme yok — büyük dosyada kopan bağlantı baştan başlar.
+- T35 "storage.to paylaşım sayfasının tarayıcıda oynadığı teyit edilmedi" diye yazdı,
+  sebebi `HttpClient`'a dönen Cloudflare 403'ü. **Bu zaten doğrulandı** — T0 aynı oturumda
+  sayfayı çekti, içinde `<video controls playsInline preload="metadata">` ve imzalı CDN
+  kaynağı var, CDN başlıkları da ölçüldü (`video/mp4`, `Accept-Ranges`, `206`).
+  Tekrar ölçmeye gerek yok; 403 tarayıcı olmayan istemciye çıkan bot koruması.
