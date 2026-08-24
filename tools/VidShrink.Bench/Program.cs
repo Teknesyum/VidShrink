@@ -729,12 +729,18 @@ static async Task<int> PlayAsync(string[] args)
 /// </summary>
 static async Task<PipeStats> PipeAsync(
     string left, string right, int width, int height, int fps, int maxFrames,
-    string? hwaccel = null, bool explicitDownload = false, bool naiveAlloc = false)
+    string? hwaccel = null, bool explicitDownload = false, bool naiveAlloc = false, bool realtime = false,
+    bool loop = false, CancellationToken ct = default)
 {
     var a = new List<string> { "-hide_banner", "-nostdin", "-loglevel", "error" };
 
     void AddInput(string path)
     {
+        // -re girisi gercek zamanli okur: boru azami hizda degil oynatma hizinda akar.
+        // Kodlamayla yarisi olcerken dogru olan bu; uretimde panel 60 fps ister, 300 degil.
+        if (realtime) a.Add("-re");
+        if (loop) { a.Add("-stream_loop"); a.Add("-1"); }
+
         if (hwaccel is { } hw)
         {
             a.Add("-hwaccel");
@@ -785,7 +791,7 @@ static async Task<PipeStats> PipeAsync(
     var clock = new Stopwatch();
     var previous = 0.0;
 
-    while (count < maxFrames)
+    while (count < maxFrames && !ct.IsCancellationRequested)
     {
         var buffer = naiveAlloc ? new byte[frameBytes] : pool;
         var read = await stream.ReadAtLeastAsync(buffer.AsMemory(0, frameBytes), frameBytes, throwOnEndOfStream: false);
@@ -1096,7 +1102,7 @@ static async Task PlayDuringEncodeAsync(string left, string right, int fps, int 
     Console.WriteLine();
     Console.WriteLine("## P2 - Kodlama koserken");
     Console.WriteLine();
-    Console.WriteLine("| Boyut | Bos kodlama s | Boru koserken kodlama s | Kodlama yavaslamasi % | Akis fps | fps kaybi % | p99 ms | CPU % |");
+    Console.WriteLine("| Boyut | Boru kipi | Bos kodlama s | Boru koserken kodlama s | Kodlama yavaslamasi % | Akis fps | fps kaybi % | p99 ms |");
     Console.WriteLine("|---|---|---|---|---|---|---|---|");
 
     var info = await FfprobeClient.ProbeAsync(left);
@@ -1105,36 +1111,48 @@ static async Task PlayDuringEncodeAsync(string left, string right, int fps, int 
     var plan = PlanCalculator.BuildDetailed(info, options, complexity, EncoderCapabilities.Instance).Plan;
     var outputPath = Path.Combine(outDir, Label(left) + "_p2.mp4");
 
-    var baseline = Stopwatch.StartNew();
-    await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None);
-    baseline.Stop();
+    async Task<double> EncodeMedianAsync(int runs)
+    {
+        var times = new List<double>();
+        for (var i = 0; i < runs; i++)
+        {
+            var clock = Stopwatch.StartNew();
+            await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None);
+            clock.Stop();
+            times.Add(clock.Elapsed.TotalSeconds);
+        }
+
+        return Percentile(times, 50);
+    }
+
+    var baseline = await EncodeMedianAsync(3);
 
     foreach (var (w, h) in PanelSizes())
     {
-        var alone = await PipeAsync(left, right, w, h, fps, frames);
-
-        using var stop = new CancellationTokenSource();
-        PipeStats? during = null;
-        var pipeTask = Task.Run(async () =>
+        // Uretimde panel oynatma hizinda akar ve **tek kalici surectir**. Azami hizli boru
+        // ust siniri gosterir, -re ile gercek zamanli tek boru ise fiilen kurulacak olan sey.
+        // Kapi ikincisine bakar.
+        foreach (var realtime in new[] { false, true })
         {
-            while (!stop.IsCancellationRequested)
-            {
-                var s = await PipeAsync(left, right, w, h, fps, frames);
-                during ??= s;
-            }
-        });
+            // 2x1080p'nin olculen tavani ~38 fps; orada gercekci hedef 60 degil 30.
+            var wanted = realtime && w >= 1920 ? 30 : fps;
+            var alone = await PipeAsync(left, right, w, h, wanted, frames, realtime: realtime);
 
-        var withPipe = Stopwatch.StartNew();
-        await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None);
-        withPipe.Stop();
-        stop.Cancel();
-        await pipeTask;
+            // Tek boru surekli koser; kodlama uc kez yanibasinda calisir.
+            using var stop = new CancellationTokenSource();
+            var pipeTask = PipeAsync(left, right, w, h, wanted, int.MaxValue, realtime: realtime, loop: true, ct: stop.Token);
 
-        var slowdown = (withPipe.Elapsed.TotalSeconds / baseline.Elapsed.TotalSeconds - 1.0) * 100.0;
-        var loss = alone.Fps > 0 && during is not null ? (1.0 - during.Fps / alone.Fps) * 100.0 : double.NaN;
-        Console.WriteLine(
-            $"| 2x{w}x{h} | {baseline.Elapsed.TotalSeconds:0.##} | {withPipe.Elapsed.TotalSeconds:0.##} | {slowdown:0.#} | " +
-            $"{during?.Fps ?? double.NaN:0.#} | {loss:0.#} | {during?.P99 ?? double.NaN:0.##} | {during?.CpuPercent ?? double.NaN:0.#} |");
+            var during = await EncodeMedianAsync(3);
+            stop.Cancel();
+            var pipe = await pipeTask;
+
+            var slowdown = (during / baseline - 1.0) * 100.0;
+            var loss = alone.Fps > 0 ? (1.0 - pipe.Fps / alone.Fps) * 100.0 : double.NaN;
+            var mode = realtime ? $"**-re {wanted} fps**" : "azami hiz";
+            Console.WriteLine(
+                $"| 2x{w}x{h} | {mode} | {baseline:0.##} | {during:0.##} | {slowdown:0.#} | " +
+                $"{pipe.Fps:0.#} | {loss:0.#} | {pipe.P99:0.##} |");
+        }
     }
 }
 

@@ -169,3 +169,134 @@ yok, ama açılışa 1,7 saniye ekliyor (201 → 1882 ms). Kalıcı süreçte bu
 kullanıcı dosyayı her değiştirdiğinde yeniden ödenir.
 
 Öneri: `d3d11va` örtük indirme. CPU'yu %23 düşürüyor, açılışa 70 ms ekliyor.
+
+## Ö5 — Codec matrisi
+
+Aynı klip iki kez, altı kaynak. n = 600 kare/satır.
+
+**2×960×540 panelde:**
+
+| Klip | Açılış ms | Sürdürülen fps | p50 ms | p95 ms | p99 ms | MB/s | CPU % |
+|---|---|---|---|---|---|---|---|
+| 1080p h264 | 140,3 | 328,4 | 2,92 | 4,06 | 5,18 | 1299 | 534,5 |
+| 1080p hevc | 157,0 | 326,6 | 2,97 | 4,02 | 4,98 | 1292 | 794,0 |
+| 1080p av1 | 89,9 | 334,3 | 2,93 | 3,80 | 4,28 | 1322 | 654,9 |
+| 4K h264 | 306,0 | 200,1 | 4,12 | 9,58 | 11,93 | 791 | 1150,2 |
+| 4K hevc | 374,8 | 154,0 | 4,63 | 15,72 | 23,20 | 609 | 1210,6 |
+| 4K av1 | 118,4 | 149,5 | 6,64 | 9,48 | 11,09 | 591 | 734,9 |
+
+**Altı kombinasyonun altısı da 60 fps'i tutturuyor.** En yavaşı 4K av1 ile 149,5 fps, yani
+hedefin 2,5 katı. 4K kaynaklarda p99 yükseliyor (4K hevc'de 23,2 ms) ama 25 ms eşiğinin
+altında kalıyor. 4K hevc CPU'yu %1210'a çıkarıyor — 16 çekirdeğin dörtte üçü.
+
+**2×1920×1080 panelde:**
+
+| Klip | Açılış ms | Sürdürülen fps | p99 ms | MB/s | CPU % |
+|---|---|---|---|---|---|
+| 1080p h264 | 739,8 | 37,4 | 31,51 | 593 | 129,7 |
+| 1080p hevc | 1777,9 | 38,0 | 30,55 | 601 | 149,4 |
+| 1080p av1 | 124,9 | 37,9 | 30,05 | 600 | 144,8 |
+| 4K h264 | 1957,1 | 38,5 | 29,99 | 609 | 240,6 |
+| 4K hevc | 1990,2 | 38,4 | 29,80 | 607 | 313,8 |
+| 4K av1 | 1768,5 | 38,1 | 29,58 | 602 | 264,4 |
+
+**Altısı da aynı yere düşüyor: ~38 fps.** Codec'in hiçbir etkisi yok, çünkü sınırlayan
+kod çözme değil boru. Ö1b'nin bulgusunu bağımsız olarak doğruluyor: kaynak ne olursa olsun
+duvar ~600 MB/s.
+
+Not: `av1_amf` ile üretilen 1080p klip 1920×1082 çıktı (kodlayıcının hizalama dolgusu).
+Ölçümü etkilemiyor, panel zaten yeniden ölçekliyor.
+
+## Ö2 — Kodlama koşarken (ÖN SONUÇ, yöntem düzeltiliyor)
+
+> **Bu bölüm kesin değil.** İki geçiş yapıldı, ikisi de aynı yöntem hatasını taşıyor:
+> ölçüm boruyu kodlama boyunca **defalarca yeniden başlatıyor**, oysa mimarinin iddiası
+> tek kalıcı süreç. Süreç sağanağı hem kodlamayı hem boruyu haksız yere cezalandırıyor.
+> Düzeltilmiş ölçüm (tek `-stream_loop` borusu + 3 kodlamanın medyanı) koda yazıldı,
+> derleniyor, **çalıştırılmadı.**
+
+Kaynak `1080p_h264` (18,8 MB), hedef 5 MB. İlk denemede hedef 20 MB verilmişti; kaynak
+zaten 18,8 MB olduğu için plan geçişli çıktı ve kodlama 0,01 sn sürdü — o geçiş atıldı.
+
+| Boyut | Boru kipi | Boş kodlama s | Boru koşarken s | Kodlama yavaşlaması % | Akış fps | fps kaybı % |
+|---|---|---|---|---|---|---|
+| 2×960×540 | azami hız | 6,15 | 10,01 | 62,7 | 220,7 | 36,3 |
+| 2×960×540 | `-re` 60 fps | 6,15 | 8,37 | **36,1** | 61,8 | −0,1 |
+| 2×1280×720 | azami hız | 6,15 | 9,30 | 51,2 | 114,2 | 24,9 |
+| 2×1280×720 | `-re` 60 fps | 6,15 | 9,21 | **49,6** | 61,7 | 0,1 |
+| 2×1920×1080 | azami hız | 6,15 | 10,74 | 74,5 | 34,8 | 8,1 |
+| 2×1920×1080 | `-re` 30 fps | 6,15 | 11,30 | **83,6** | 30,5 | −0,5 |
+
+Şimdilik okunabilen tek şey: **throttle edilmiş boru kendi hedefini şaşmadan tutuyor**
+(fps kaybı ≈ %0, üç boyutta da). Kodlamaya verdiği zarar ise ön sonuçta %36-84 ve
+kapının %10 eşiğinin çok üstünde — ama bu sayı süreç sağanağını da içeriyor, bu yüzden
+karar için kullanılamaz.
+
+## Kapı kararları
+
+Kapılar iki aday için ayrı ayrı uygulanır. **Aday B ölçülmedi**, o yüzden onun satırları boş.
+
+| Kapı | Ölçü | Aday A (boru) | Aday B (libmpv) |
+|---|---|---|---|
+| **G1** | 2×960×540'ta ≥60 fps, p99 < 25 ms | **GEÇTİ** — 309 fps, p99 5,02 ms | ölçülmedi |
+| **G2** | 2×1920×1080'de aynısı | **KALDI** — 37,5 fps, p99 30,5 ms | ölçülmedi |
+| **G3** | Kodlama koşarken yavaşlama ≤ %10 | karara bağlanmadı (ön sonuç %36-84) | ölçülmedi |
+
+Cümleyle:
+
+> **Boru yaklaşımı G1'den rahat geçiyor:** 2×960×540 panelde 309 fps sürdürüyor, kare
+> aralığı p99'u 5,02 ms ile 25 ms eşiğinin beşte biri. Codec matrisi bunu altı kaynak
+> için de doğruluyor; en yavaş kombinasyon (4K av1) bile 149,5 fps veriyor.
+
+> **Boru yaklaşımı G2'de kalıyor:** 2×1920×1080 panelde 37,5 fps ve p99 30,5 ms; hem fps
+> hem gecikme eşiği tutmuyor. Sebep kod çözme değil, borunun kendisi — aynı grafik boruya
+> yazmadan 171,8 fps üretiyor, yani kapasitenin %78'i ham kareyi işlemciden geçirirken
+> kayboluyor. Donanım kod çözme bunu kurtarmıyor (38-39 fps'te kalıyor), çünkü sorun kod
+> çözmede değil.
+
+> **G3 için boru hakkında henüz geçti/kaldı denemez.** Ön sonuçlar eşiğin çok üstünde
+> (%36-84) ama ölçüm yöntemi kalıcı tek süreci değil süreç sağanağını ölçüyordu; düzeltilmiş
+> koşum yapılmadı.
+
+> **Aday B (libmpv) hiçbir kapıdan geçmedi ya da kalmadı — sırası gelmeden durduruldu.**
+
+Karar kuralı bu tabloyla **henüz işletilemiyor**: G3'ün boru için sonucu ve Aday B'nin
+tamamı eksik.
+
+## Ölçülmeyenler
+
+Sırayla, devam eden oturumun başlayacağı yer en üstte.
+
+1. **Ö7 — Aday B (libmpv) hiç ölçülmedi. Sırası gelmedi.** Ne fps, ne kare aralığı, ne CPU,
+   ne kurulum MB'ı, ne Linux durumu, ne lisans, ne ses, ne 4K, ne çökme. Hiçbiri.
+   Makinede mpv veya `libmpv-2.dll` kurulu değil (`PATH`'te yok, `C:\Program Files\mpv` yok).
+   **Engel:** ölçüm için `libmpv` ikilisinin indirilmesi gerekiyor ve dosya indirmek
+   kullanıcının açık iznine bağlı; bu oturumda o izin istenmedi. Devam eden oturum önce bu
+   izni almalı. Sözleşme `RAPOR.md:106` gereği shinchiro yapılarının kullanılamayacağını
+   söylüyor, yani kaynak seçimi de ayrıca karara bağlanacak.
+2. **Ö2 düzeltilmiş koşumu.** Tek `-stream_loop` borusu + 3 kodlamanın medyanı koda yazıldı
+   ve derleniyor, çalıştırılmadı. `bench play <a,b> --only p2 --seconds 10 --target 5`.
+   G3'ün boru için kararı buna bağlı.
+3. **Ö4 — Arayüze yükleme ölçülmedi.** Avalonia `WriteableBitmap` ile çift tamponlu sunum
+   ve atılabilir pencerede sunulan fps. `VidShrink.Bench` konsol projesi ve Avalonia
+   referansı yok; csproj `owns` dışında olduğu için ölçüm scratchpad'de ayrı bir harness
+   isteyecek. Boru 2×960×540'ta 309 fps üretiyor, ama sunum yolunun bunu taşıyıp taşımadığı
+   **bilinmiyor.**
+4. **Ses ölçülmedi** (boru zaten veremiyor; mpv tarafı ölçülmediği için karşılaştırma yok).
+5. **Boru duvarının sebebi ayrıştırılmadı.** ~590 MB/s (16,6 MB kare) ile ~1285 MB/s
+   (4,1 MB kare) arasında değişiyor; kare büyüdükçe verim düşüyor. Adlandırılmış boru,
+   paylaşımlı bellek ya da daha büyük boru tamponu denenmedi — duvarı kaldırabilirler.
+6. **Gerçek kamera kaydıyla tekrarlanmadı.** `testsrc2` yüksek entropili; kod çözme
+   maliyeti kötümser tarafta, boru maliyeti ise içerikten bağımsız.
+7. **`cuda` ve `vulkan` hızlandırıcıları** K2'de var çıktı ama Ö3'te ölçülmedi.
+
+## Doğrulama
+
+| Kontrol | Sonuç |
+|---|---|
+| `dotnet build VidShrink.sln -c Release` | 0 uyarı, 0 hata |
+| `dotnet test VidShrink.sln -c Release` | 306 başarılı, 0 başarısız, 6 atlanan |
+| `git status -- src/ VidShrink.sln` | çıktı boş — **K1 sağlandı** |
+
+Atlanan 6 test T33'ten önce de atlanıyordu (`VIDSHRINK_LIVE_SOURCE` isteyen canlı ölçümler).
+Değişen tek kaynak dosyası `tools/VidShrink.Bench/Program.cs`.
