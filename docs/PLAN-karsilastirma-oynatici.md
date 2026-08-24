@@ -1,27 +1,30 @@
 # Plan — ortadaki iki taraflı karşılaştırma oynatıcısı
 
-Tarih: 24.08.2026. Durum: **T33 kısmen ölçüldü** — boru yaklaşımı G1'i geçti, G2'de kaldı;
-libmpv (Aday B) henüz hiç ölçülmedi. Ölçüm: `docs/olcumler/T33-oynatma-olcumleri.md`.
+Tarih: 24.08.2026. Durum: **kapı kapandı — Aday A (boru) seçildi.** Ölçümler:
+`docs/olcumler/T33-oynatma-olcumleri.md` (kaynak tarafı) ve
+`docs/olcumler/T37-sunum-olcumleri.md` (sunum tarafı).
 
-> **Ölçülmüş sonuç — planın bant genişliği bölümü artık tahmin değil.**
+> **Kapı sonucu — 2×1080p60 boruyla karşılanıyor, libmpv ödenmiyor.**
 >
-> | Panel | Boruyla | Borusuz | Boruda kaybolan |
-> |---|---|---|---|
-> | 2×960×540 | 324,8 fps | 341,5 fps | %4,9 |
-> | 2×1280×720 | 154,9 fps | 314,6 fps | %50,8 |
-> | 2×1920×1080 | 37,3 fps | 171,8 fps | **%78,3** |
+> | Ölçülen uç | Tavan | Hedefe pay |
+> |---|---|---|
+> | Boru → kare tamponu (T33 tur 1) | 148,0 fps | 2,5× |
+> | Uçtan uca: boru + kod çözme + ekrana koyma (T37) | **~90 fps** | **1,5×** |
+> | Yalnız sunum yolu, sentetik kare (T37) | 166 fps | 2,8× |
 >
-> **Duvar borunun kendisi, kod çözme değil.** 2×1080p'de ffmpeg 172 fps üretebiliyor ama
-> boru 37 teslim ediyor. Kanıt CPU'da: çözünürlük yükseldikçe ffmpeg'in CPU'su **düşüyor**
-> (%638 → %137) — süreç kareyi hesaplamakla değil boruya yazmakla meşgul.
+> Gerçek zamanlı 60 fps koşulunda sunum tarafı animasyon turlarının **%61'inde elinde
+> yeni kare bulamıyor** — bekleyen taraf sunum değil, boru.
 >
-> Kullanıcının "1080p sınırı" itirazının sayısal karşılığı buydu ve haklı çıktı: sınır kod
-> çözmede değil, ham kareyi işlemciden geçirmekte.
+> **İki tur-0 iddiası çürüdü ve geçersizdir:**
 >
-> **Sonuç: boru yolunda 2×1080p'nin pratik tavanı 30 fps.** Kullanıcının istediği 60+ fps
-> 1080p'de boruyla karşılanamıyor; 2×1280×720'de (153 fps) ve 2×960×540'ta (309 fps)
-> rahat karşılanıyor. 60+ fps'i 1080p'de isteyen tek aday **libmpv** ve o henüz ölçülmedi.
-
+> 1. *"Boruda %78,3 kayboluyor, 2×1080p'de tavan 37 fps."* Yanlış. Boru 161,8 fps
+>    taşıyor; ölçülen 37 fps **okuma şeklinin** eseriydi — bir kareyi tek okumada
+>    istemek 70,9 fps veriyor, aynı kareyi 64 KB parçalardan toplamak 148,0.
+> 2. *"60+ fps'i 1080p'de isteyen tek aday libmpv."* Yanlış. Boru istenen fps'i
+>    1,5× payla veriyor. libmpv yalnız **ses** ve **4K üstü** için gündeme gelebilir;
+>    §9'un platform ayrışması tartışması konusuz kaldı.
+>
+> §4 ve §8'de bu iki iddiaya dayanan cümleler **üstü çizili sayılmalıdır.**
 ## 1. İstenen
 
 Kullanıcının kendi cümleleriyle, üç mesaja dağılmış hâlde:
