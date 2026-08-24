@@ -1262,6 +1262,51 @@ static async Task<(double Fps, double CpuPercent, string Error)> PipeDrainAsync(
         read >= frameBytes ? "" : error.Trim());
 }
 
+static async Task<(double Fps, double CpuPercent, string Error)> PipeChunkedAsync(
+    string left, string right, int width, int height, int fps, int maxFrames, int chunkBytes)
+{
+    var a = GraphArgs(left, right, width, height, fps);
+    a.AddRange(new[] { "-f", "rawvideo", "-pix_fmt", "bgra", "-" });
+
+    var frameBytes = width * 2 * height * 4;
+    var pool = new byte[frameBytes];
+
+    using var process = StartFfmpeg(a);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    var stream = process.StandardOutput.BaseStream;
+
+    var count = 0;
+    var clock = new Stopwatch();
+    var broken = false;
+    while (count < maxFrames && !broken)
+    {
+        var filled = 0;
+        while (filled < frameBytes)
+        {
+            var want = Math.Min(chunkBytes, frameBytes - filled);
+            var n = await stream.ReadAtLeastAsync(pool.AsMemory(filled, want), want, throwOnEndOfStream: false);
+            if (n < want) { broken = true; break; }
+            filled += n;
+        }
+
+        if (broken) break;
+        if (count == 0) clock.Start();
+        count++;
+    }
+    clock.Stop();
+
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { }
+    try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    return (elapsed > 0 ? (count - 1) / elapsed : 0,
+        elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0,
+        count > 1 ? "" : error.Trim());
+}
+
 static async Task<(double Fps, double CpuPercent, string Error)> PipeSharedAsync(
     string left, string right, int width, int height, int fps, int maxFrames, int slots)
 {
@@ -1402,6 +1447,16 @@ static async Task PlayBufferAsync(string left, string right, int fps, int frames
                  })
         {
             await RepeatAsync(name, runs, () => PipeDrainAsync(left, right, w, h, fps, frames, block));
+        }
+
+        foreach (var (name, chunk) in new (string, int)[]
+                 {
+                     ("kare havuzu, 64 KB parcalarla toplanir", 64 * 1024),
+                     ("kare havuzu, 256 KB parcalarla toplanir", 256 * 1024),
+                     ("kare havuzu, 1 MB parcalarla toplanir", 1 << 20)
+                 })
+        {
+            await RepeatAsync(name, runs, () => PipeChunkedAsync(left, right, w, h, fps, frames, chunk));
         }
 
         Console.WriteLine();
