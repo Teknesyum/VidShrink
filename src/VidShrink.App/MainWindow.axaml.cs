@@ -1152,9 +1152,11 @@ public partial class MainWindow : Window
 
     private Control QualityBody(double? targetMb)
     {
+        var hint = QualityHint.For(_info, CurrentOptions(), targetMb, _profile, _encoders);
+
         // Video yüklü değilken skor hesaplanamaz. Sıfır ya da uydurma bir sayı yerine alan
         // boş kalır ve yonganın ne işe yaradığı yukarıdaki maddelerde durmaya devam eder.
-        if (_info is null || targetMb is not { } target)
+        if (hint.Score is not { } score || hint.TargetMb is not { } target)
             return new TextBlock
             {
                 Text = T(
@@ -1165,16 +1167,14 @@ public partial class MainWindow : Window
                 MaxWidth = Scalar("TooltipMaxWidth", 460)
             };
 
-        var options = CurrentOptions();
-        options.TargetMb = target;
-        var result = PlanCalculator.BuildDetailed(_info, options, _profile, _encoders);
-        var codes = result.Plan.ReasonCodes.Select(note => note.Code).ToHashSet();
-
-        var basis = codes.Contains(ReasonCode.PredictedQualityMeasured)
-            ? T("Bu klipten kodlanan örnekle ölçüldü", "Measured from a sample encoded from this clip")
-            : codes.Contains(ReasonCode.PredictedQualityEstimated)
-                ? T("Kaynak bit hızından tahmin edildi", "Estimated from the source bitrate")
-                : T("Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır", "The source is already under this target and is copied as it is");
+        // Ölçülen ile tahmin edilen ayrı kelimelerle söylenir; tahmini ölçüm gibi sunmak
+        // kullanıcının güvenerek yanlış hedef seçmesine yol açar.
+        var basis = hint.Basis switch
+        {
+            QualityBasis.Measured => T("Bu klipten kodlanan örnekle ölçüldü", "Measured from a sample encoded from this clip"),
+            QualityBasis.Estimated => T("Kaynak bit hızından tahmin edildi", "Estimated from the source bitrate"),
+            _ => T("Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır", "The source is already under this target and is copied as it is")
+        };
 
         var grid = new Grid
         {
@@ -1185,9 +1185,9 @@ public partial class MainWindow : Window
         };
 
         AddQualityRow(grid, Localize("Target"), $"{target.ToString("0.##", CultureInfo.InvariantCulture)} MB");
-        AddQualityRow(grid, T("Tahmini kalite", "Predicted quality"), $"{result.PredictedQuality:0.#}/100");
+        AddQualityRow(grid, T("Tahmini kalite", "Predicted quality"), $"{score:0.#}/100");
         AddQualityRow(grid, T("Kaynağa göre kayıp", "Loss against the source"),
-            T($"{100 - result.PredictedQuality:0.#} puan", $"{100 - result.PredictedQuality:0.#} points"));
+            T($"{hint.LossPoints:0.#} puan", $"{hint.LossPoints:0.#} points"));
         AddQualityRow(grid, T("Dayanak", "Basis"), basis);
         return grid;
     }
@@ -1949,6 +1949,62 @@ public partial class MainWindow : Window
         {
             TxtSystemStatus.Text = $"{T("Klasör açılamadı", "The folder could not be opened")}: {ex.Message}";
         }
+    }
+}
+
+/// <summary>Skorun neye dayandığı. Panel üçünü ayrı kelimeyle söyler.</summary>
+internal enum QualityBasis
+{
+    /// <summary>Video yüklü değil; skor yok.</summary>
+    NoSource,
+
+    /// <summary>Kalibrasyon ölçümü çalıştı, skor ölçüme dayanıyor.</summary>
+    Measured,
+
+    /// <summary>Ölçüm yok; skor kaynak bit hızından türetilmiş tahmin.</summary>
+    Estimated,
+
+    /// <summary>Kaynak zaten hedefin altında, yeniden kodlama yok.</summary>
+    SourceUnderTarget
+}
+
+/// <summary>
+/// Bir yonganın kalite paneline giren veri. Denetim burada bitiyor: panel yalnız bu
+/// kaydı çizer, karar vermez.
+///
+/// <see cref="For"/> ffmpeg ya da ffprobe çağırmaz. Ölçülmüş bir profil verilmişse o
+/// kullanılır, verilmemişse <see cref="PlanCalculator.BuildDetailed"/> kendi içinde
+/// <see cref="ComplexityProfile.FromSourceBitrate"/>'a düşer; ikisi de saf aritmetik.
+/// </summary>
+internal readonly record struct QualityHint(double? TargetMb, double? Score, QualityBasis Basis)
+{
+    /// <summary>Kaynak kalitesi 100 sayılır; kayıp o tavana göre okunur.</summary>
+    private const double SourceQualityScore = 100.0;
+
+    internal double LossPoints => Score is { } score ? SourceQualityScore - score : 0;
+
+    internal static QualityHint None { get; } = new(null, null, QualityBasis.NoSource);
+
+    internal static QualityHint For(
+        MediaInfo? info,
+        PlanOptions options,
+        double? targetMb,
+        ComplexityProfile? profile,
+        IEncoderAvailability? availability)
+    {
+        if (info is null || targetMb is not { } target || target <= 0) return None;
+
+        options.TargetMb = target;
+        var result = PlanCalculator.BuildDetailed(info, options, profile, availability);
+        var codes = result.Plan.ReasonCodes.Select(note => note.Code).ToList();
+
+        var basis = codes.Contains(ReasonCode.PredictedQualityMeasured)
+            ? QualityBasis.Measured
+            : codes.Contains(ReasonCode.PredictedQualityEstimated)
+                ? QualityBasis.Estimated
+                : QualityBasis.SourceUnderTarget;
+
+        return new QualityHint(target, result.PredictedQuality, basis);
     }
 }
 
