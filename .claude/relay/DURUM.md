@@ -20,7 +20,7 @@ mühürlenmedi. Bu dosya devam eden oturumun ilk okuyacağı yer.
 |---|---|---|
 | **T33** | oynatma mimarisi ölçüm kapısı | **main'e birleşti** (`621d41e`), `status: active`, mühürsüz. Boru: **G1 geçti** (2×960×540'ta 309 fps, p99 5,02 ms), **G2 kaldı** (2×1080p'de 37,5 fps, p99 30,5 ms), G3 karara bağlanmadı (ön sonuç %36-84). **libmpv hiç ölçülmedi** |
 | ~~T35~~ | storage.to + uguu.se sağlayıcıları | **main'e birleşti** (`4e0805f`). 296 test yeşil, canlı ağ denemesi iki sağlayıcıda da geçti, Drive'ın yedi dosyası silindi, `t31-drive` etiketi atıldı |
-| **T36** | ayarlar sekmesi + kalite panelleri | iki dilli metin geçişi bitti, testler commit'siz kalmıştı |
+| **T36** | ayarlar sekmesi + kalite panelleri | **main'e birleşti** (`b34f3ba`), `status: open`, tur 1. Build 0 uyarı, 343 test yeşil. Kalan: `paylasim-hedefleri.json` ile gerçek okuma denemesi ve pencereyi açıp yerleşim ölçümü |
 
 Üçü de kendi worktree'sinde. Devam ederken **worktree'leri main'e birleştir**, yeni ajan
 açma — işleri yarım ve bağlamları kendi transcript'lerinde.
@@ -92,3 +92,19 @@ ilk işi Ö7 olmalı — karar kuralı onsuz işletilemiyor.
 T33 iki şeyin de denenmediğini yazdı ve ikisi duvarı kaldırabilir: **paylaşımlı bellek**
 ve **daha büyük boru tamponu**. Ö7'den önce bunlar denenmeli; ucuzsa boru yolu 1080p'de
 kurtarılabilir.
+
+## 180 sorusunun cevabı geldi — karar kullanıcıda
+
+T36 WhatsApp'ın yardım sayfasını okumayı denedi ve **okuyamadı**: `faq.whatsapp.com`
+sayfaları JavaScript ile kuruluyor, dört makale çekildi, üçü "Sayfa bulunamadı" döndü,
+biri kırpılmış geldi ve hiçbirinde sayı yoktu.
+
+WhatsApp'ın kendi SSS metninden alıntılanmış hâlde doğrulanabilen iki sayı var:
+**sohbet içi medya 16 MB, belge 2 GB.** 180 MB'ı destekleyen hiçbir kaynak bulunamadı.
+
+T36'nın kararı: yonga eklendi (kullanıcı istedi) ama etiketi **"WhatsApp için en fazla"
+değil, "Yalnız belge olarak"** — doğrulanmış 16 MB tavanından kuruldu. Doğru davranış:
+yongayı atmadı, uydurma da yapmadı.
+
+**Kullanıcıya sorulacak:** 180 nereden geliyor? Kaynağı yoksa etiket "Yalnız belge olarak"
+kalsın mı, yoksa yonga sayısız mı bırakılsın?
