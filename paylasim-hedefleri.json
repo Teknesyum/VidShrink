@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "default": "storage.to",
+  "targets": [
+    {
+      "id": "storage.to",
+      "displayName": "storage.to",
+      "maxBytes": 26843545600,
+      "retentionDays": [1, 2, 3, 4, 5, 6, 7],
+      "defaultRetentionDays": 3,
+      "canDelete": true,
+      "playsInBrowser": true,
+      "endpoints": {
+        "init": "https://storage.to/api/upload/init",
+        "confirm": "https://storage.to/api/upload/confirm",
+        "delete": "https://storage.to/api/file/{id}"
+      }
+    },
+    {
+      "id": "uguu.se",
+      "displayName": "uguu.se",
+      "maxBytes": 134217728,
+      "retentionDays": [],
+      "fixedRetentionHours": 3,
+      "canDelete": false,
+      "playsInBrowser": true,
+      "endpoints": { "upload": "https://uguu.se/upload?output=text" }
+    }
+  ]
+}
