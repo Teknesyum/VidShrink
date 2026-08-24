@@ -104,3 +104,21 @@ kaybetti, ikisi sözleşme dosyası commit'li olmadığı için hiç başlayamad
 Sözleşmelere "her adımdan sonra commit at" maddesini yazmak yetmedi — ajanlar duraklarken
 uygulamıyor. Devralan oturum ajan açarken **sözleşmeyi önce commit etsin** ve ajan
 durduğunda worktree'yi kendi kontrol etsin.
+
+---
+
+## Güncelleme — 180 MB'ın kaynağı bulundu
+
+Kullanıcı sorunun cevabını verdi: **WhatsApp Web**. Kendi hesabında Web arayüzünden
+dosya gönderirken "en fazla 180 MB" diyor.
+
+Bu, T36'nın neden kaynak bulamadığını da açıklıyor: WhatsApp'ın **iki ayrı sınırı** var
+ve yardım sayfaları yalnız mobil olanı yazıyor.
+
+- Mobil sohbet içi medya: **16 MB**
+- WhatsApp Web üzerinden gönderim: **180 MB** (kullanıcının kendi arayüzünde gördüğü)
+- Belge olarak: 2 GB
+
+Yani 180 uydurma değil, yalnız **Web'e özgü**. Etiketin bunu söylemesi gerekiyor;
+"Yalnız belge olarak" yanlış, doğrusu "WhatsApp Web için en fazla" ya da benzeri.
+Bu bir arayüz metni işi, ayrı turda kapatılacak.

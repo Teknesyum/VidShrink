@@ -652,5 +652,17 @@
     "effort": "high",
     "t": "2026-08-24 08:41:51",
     "ajan": "ana oturum"
+  },
+  "HATA-pano-depo-geride-mi-sorusunu-yanlis-soruyor-107-commit-gerid.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 14:56:07",
+    "ajan": "ana oturum"
+  },
+  "HATA-acilis-bildirimi-tek-satira-sikistiriliyor-uzun-metin-bolunm.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 14:56:52",
+    "ajan": "ana oturum"
   }
 }
