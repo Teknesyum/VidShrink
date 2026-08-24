@@ -29,7 +29,23 @@ gerçekten kodlanmış görüntü durabilir.
 Etiket sözleşmesi: "bu ayarlarla örnek kodlama" denir, "çıktınız" denmez. Koşum bitince
 gerçek dosyaya döner.
 
-### 2. Duran kare, oynatma yok
+### 2. Duran kare, oynatma yok — HÜKÜMSÜZ (24.08.2026)
+
+> **Bu madde geçerli değildir.** Kullanıcı reddetti ve talebi nihaidir:
+> *"ben orda 60+fps oynayan 2 videoyu karşılaştırabileceğim bir panel istiyorum,
+> ajanların konseyi ancak destekler, kullanıcı talebi nihaidir."*
+>
+> Maddenin sayısal gerekçesi de kısmen yanlıştı: hesap iki ham akışı ayrı ayrı
+> istemciye taşımayı varsayıyor. Seçilen mimaride ffmpeg kareleri **boruya girmeden
+> önce** panel çözünürlüğüne indirip birleştiriyor, yani taşınan tek akış ve kaynak
+> çözünürlüğünde değil panel çözünürlüğünde. Yine de bant genişliği gerçek bir sınır —
+> T33 tam olarak bunu ölçüyor.
+>
+> Ayrıca ayırıcı sürükleme ve yakınlaştırma bu maliyetin **dışında**: ikisi de
+> birleştirilmiş kare üstünde kırpma/dönüşüm, kod çözme tetiklemiyorlar.
+> Plan: `docs/PLAN-karsilastirma-oynatici.md`
+
+### 2 (özgün metin). Duran kare, oynatma yok
 
 İkisi de reddetti. Opus sayıyla gerekçelendirdi: 1080p yuv420p'de kare başına ~3,1 MB,
 24 fps'te saniyede ~75 MB ham veri — **iki dosya için iki katı**, üstüne renk çevrimi ve
