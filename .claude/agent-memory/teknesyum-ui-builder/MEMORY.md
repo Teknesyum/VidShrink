@@ -7,3 +7,5 @@
 - [İpucu metin kaynakları](vidshrink-ipucu-metin-kaynaklari.md) — İpucu metni üç yerde yaşıyor; yalnız XAML'i tarayan çeviri ölçümü sessizce yeşil verir
 - [VidShrink metin ölçümü](vidshrink-metin-olcumu.md) — Ham metni ölçme; ekranda görünen metin Title() geçidinden geçmiş ve daha geniş, tavan 426 px
 - [Pencere içi ölçüm](vidshrink-pencere-ici-olcum.md) — düzen ve tıklama kanıtı için gerçek pencereyi süreç içinde açan geçici exe; UIA'ya gerek yok
+- [Owns listesi daraltıyor](vidshrink-owns-listesi-daraltiyor.md) — Controls.axaml ve csproj owns dışında; yeni tema anahtarı yok, Headless yok, kural veri katmanında ölçülür
+- [Büyük harf ve servis adları](vidshrink-buyuk-harf-servis-adlari.md) — Title() "storage.to"yu bozar; Names anahtarı tam ad değil, nokta öncesi ilk sözcük
