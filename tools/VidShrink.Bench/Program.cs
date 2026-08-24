@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.IO.MemoryMappedFiles;
 using System.Text.Json;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -35,7 +36,7 @@ static void PrintUsage()
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor>");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
-    Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p2,p3,p5,p6 [--seconds 10] [--fps 60] [--target 20] [--matrix klip,...]");
+    Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p2,p3,p5,p6,p8,p9,p10 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
 }
 
 static int Unknown(string command)
@@ -672,6 +673,7 @@ static async Task<int> PlayAsync(string[] args)
     var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
     var only = new HashSet<string> { "k2", "p1", "p1b", "k3", "p2", "p3", "p5", "p6" };
     var seconds = 10.0;
+    var runs = 3;
     var fps = 60;
     var targetMb = 20.0;
     var matrix = new List<string>();
@@ -686,6 +688,9 @@ static async Task<int> PlayAsync(string[] args)
                 break;
             case "--seconds" when i + 1 < args.Length:
                 seconds = double.Parse(args[++i], CultureInfo.InvariantCulture);
+                break;
+            case "--runs" when i + 1 < args.Length:
+                runs = int.Parse(args[++i], CultureInfo.InvariantCulture);
                 break;
             case "--fps" when i + 1 < args.Length:
                 fps = int.Parse(args[++i], CultureInfo.InvariantCulture);
@@ -717,6 +722,9 @@ static async Task<int> PlayAsync(string[] args)
     if (only.Contains("p3")) await PlayHwAsync(left, right, fps, frames);
     if (only.Contains("p5")) await PlayMatrixAsync(matrix.Count > 0 ? matrix : clips, fps, frames);
     if (only.Contains("p2")) await PlayDuringEncodeAsync(left, right, fps, frames, targetMb, outDir);
+    if (only.Contains("p10")) await PlayCeilingAsync(left, right, fps, frames, runs);
+    if (only.Contains("p8")) await PlayBufferAsync(left, right, fps, frames, runs);
+    if (only.Contains("p9")) await PlaySharedAsync(left, right, fps, frames, runs);
     return 0;
 }
 
@@ -1153,6 +1161,279 @@ static async Task PlayDuringEncodeAsync(string left, string right, int fps, int 
                 $"| 2x{w}x{h} | {mode} | {baseline:0.##} | {during:0.##} | {slowdown:0.#} | " +
                 $"{pipe.Fps:0.#} | {loss:0.#} | {pipe.P99:0.##} |");
         }
+    }
+}
+
+static (double Mean, double Sd) MeanSd(IReadOnlyList<double> values)
+{
+    if (values.Count == 0) return (double.NaN, double.NaN);
+    var mean = values.Average();
+    if (values.Count < 2) return (mean, 0);
+    return (mean, Math.Sqrt(values.Sum(v => (v - mean) * (v - mean)) / (values.Count - 1)));
+}
+
+static List<string> GraphArgs(string left, string right, int width, int height, int fps)
+{
+    var a = new List<string> { "-hide_banner", "-nostdin", "-loglevel", "error", "-i", left, "-i", right };
+    var chain = $"fps={fps},scale={width}:{height}:flags=bilinear,format=bgra";
+    a.Add("-filter_complex");
+    a.Add($"[0:v]{chain}[l];[1:v]{chain}[r];[l][r]hstack=inputs=2[o]");
+    a.AddRange(new[] { "-map", "[o]", "-an", "-sn", "-dn" });
+    return a;
+}
+
+static Process StartFfmpeg(IEnumerable<string> arguments)
+{
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffmpeg,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in arguments) psi.ArgumentList.Add(arg);
+    var process = new Process { StartInfo = psi };
+    process.Start();
+    return process;
+}
+
+static async Task<(double Fps, double CpuPercent, string Error)> SinkAsync(
+    string left, string right, int width, int height, int fps, int maxFrames, params string[] tail)
+{
+    var a = GraphArgs(left, right, width, height, fps);
+    a.Add("-frames:v");
+    a.Add(maxFrames.ToString(CultureInfo.InvariantCulture));
+    a.AddRange(tail);
+
+    var clock = Stopwatch.StartNew();
+    using var process = StartFfmpeg(a);
+    var stdoutTask = DrainAsync(process.StandardOutput.BaseStream);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    _ = await stdoutTask;
+    var error = await stderrTask;
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { }
+    await process.WaitForExitAsync();
+    clock.Stop();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    return (elapsed > 0 ? maxFrames / elapsed : 0, elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0,
+        process.ExitCode == 0 ? "" : error.Trim());
+}
+
+static async Task<(double Fps, double CpuPercent, string Error)> PipeDrainAsync(
+    string left, string right, int width, int height, int fps, int maxFrames, int blockBytes)
+{
+    var a = GraphArgs(left, right, width, height, fps);
+    a.AddRange(new[] { "-f", "rawvideo", "-pix_fmt", "bgra", "-" });
+
+    var frameBytes = (long)width * 2 * height * 4;
+    var total = frameBytes * maxFrames;
+    var buffer = new byte[blockBytes];
+
+    using var process = StartFfmpeg(a);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    var stream = process.StandardOutput.BaseStream;
+
+    long read = 0;
+    long timed = 0;
+    var clock = new Stopwatch();
+    while (read < total)
+    {
+        var n = await stream.ReadAtLeastAsync(buffer, buffer.Length, throwOnEndOfStream: false);
+        if (n <= 0) break;
+        read += n;
+        if (clock.IsRunning) timed += n; else clock.Start();
+        if (n < buffer.Length) break;
+    }
+    clock.Stop();
+
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { }
+    try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    var delivered = timed / (double)frameBytes;
+    return (elapsed > 0 ? delivered / elapsed : 0,
+        elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0,
+        read >= frameBytes ? "" : error.Trim());
+}
+
+static async Task<(double Fps, double CpuPercent, string Error)> PipeSharedAsync(
+    string left, string right, int width, int height, int fps, int maxFrames, int slots)
+{
+    var a = GraphArgs(left, right, width, height, fps);
+    a.AddRange(new[] { "-f", "rawvideo", "-pix_fmt", "bgra", "-" });
+
+    var frameBytes = width * 2 * height * 4;
+    using var mmf = MemoryMappedFile.CreateNew(null, (long)frameBytes * slots);
+    var views = new MemoryMappedViewStream[slots];
+    for (var i = 0; i < slots; i++) views[i] = mmf.CreateViewStream((long)frameBytes * i, frameBytes);
+
+    var freeCh = System.Threading.Channels.Channel.CreateBounded<int>(slots);
+    var fillCh = System.Threading.Channels.Channel.CreateBounded<int>(slots);
+    for (var i = 0; i < slots; i++) freeCh.Writer.TryWrite(i);
+
+    using var process = StartFfmpeg(a);
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    var stream = process.StandardOutput.BaseStream;
+
+    var producer = Task.Run(async () =>
+    {
+        var staging = new byte[frameBytes];
+        for (var i = 0; i < maxFrames; i++)
+        {
+            var n = await stream.ReadAtLeastAsync(staging, frameBytes, throwOnEndOfStream: false);
+            if (n < frameBytes) break;
+            var slot = await freeCh.Reader.ReadAsync();
+            views[slot].Position = 0;
+            views[slot].Write(staging, 0, frameBytes);
+            await fillCh.Writer.WriteAsync(slot);
+        }
+        fillCh.Writer.Complete();
+    });
+
+    var sink = new byte[frameBytes];
+    var count = 0;
+    var clock = new Stopwatch();
+    await foreach (var slot in fillCh.Reader.ReadAllAsync())
+    {
+        views[slot].Position = 0;
+        views[slot].ReadExactly(sink, 0, frameBytes);
+        if (count == 0) clock.Start();
+        count++;
+        freeCh.Writer.TryWrite(slot);
+        if (count >= maxFrames) break;
+    }
+    clock.Stop();
+
+    var cpu = TimeSpan.Zero;
+    try { cpu = process.TotalProcessorTime; } catch { }
+    try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
+    var error = await stderrTask;
+    await process.WaitForExitAsync();
+    try { await producer; } catch { }
+    foreach (var view in views) view.Dispose();
+
+    var elapsed = clock.Elapsed.TotalSeconds;
+    return (elapsed > 0 ? (count - 1) / elapsed : 0,
+        elapsed > 0 ? cpu.TotalSeconds / elapsed * 100.0 : 0,
+        count > 0 ? "" : error.Trim());
+}
+
+static async Task RepeatAsync(string label, int runs, Func<Task<(double Fps, double CpuPercent, string Error)>> once)
+{
+    var values = new List<double>();
+    var cpus = new List<double>();
+    var error = "";
+    for (var i = 0; i < runs; i++)
+    {
+        var (fps, cpu, err) = await once();
+        if (err.Length > 0) error = err;
+        values.Add(fps);
+        cpus.Add(cpu);
+    }
+
+    var (mean, sd) = MeanSd(values);
+    var (cpuMean, _) = MeanSd(cpus);
+    var each = string.Join(" / ", values.Select(v => v.ToString("0.#", CultureInfo.InvariantCulture)));
+    Console.WriteLine($"| {label} | {runs} | {mean:0.#} | {sd:0.##} | {each} | {cpuMean:0.#} |" +
+        (error.Length > 0 ? $" <!-- {error} -->" : ""));
+}
+
+static void RunHeader(string first)
+{
+    Console.WriteLine($"| {first} | Kosu | Ortalama fps | Sapma | Tek tek | ffmpeg CPU % |");
+    Console.WriteLine("|---|---|---|---|---|---|");
+}
+
+static async Task PlayCeilingAsync(string left, string right, int fps, int frames, int runs)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P10 - Tasima tavani: duvar boru mu, tuketici mi");
+    Console.WriteLine();
+
+    foreach (var (w, h) in new[] { (1920, 1080), (960, 540) })
+    {
+        Console.WriteLine($"### 2x{w}x{h} - {(long)w * 2 * h * 4 / 1024 / 1024.0:0.#} MB kare");
+        Console.WriteLine();
+        RunHeader("Cikis yolu");
+
+        await RepeatAsync("`-f null -` (kare hic paketlenmiyor)", runs,
+            () => SinkAsync(left, right, w, h, fps, frames, "-f", "null", "-"));
+        await RepeatAsync("`-f rawvideo` -> NUL (paketlenir, boru yok)", runs,
+            () => SinkAsync(left, right, w, h, fps, frames, "-f", "rawvideo", "-pix_fmt", "bgra", "NUL"));
+        await RepeatAsync("boru -> ham bosaltma, 1 MB blok, kare siniri yok", runs,
+            () => PipeDrainAsync(left, right, w, h, fps, frames, 1 << 20));
+        await RepeatAsync("boru -> kare hizali havuz okumasi, kare atiliyor", runs,
+            async () =>
+            {
+                var s = await PipeAsync(left, right, w, h, fps, frames);
+                return (s.Fps, s.CpuPercent, s.Error);
+            });
+
+        Console.WriteLine();
+    }
+}
+
+static async Task PlayBufferAsync(string left, string right, int fps, int frames, int runs)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P8 - Okuma blogu buyutulunce ne oluyor");
+    Console.WriteLine();
+
+    foreach (var (w, h) in new[] { (1920, 1080), (960, 540) })
+    {
+        var frameBytes = w * 2 * h * 4;
+        Console.WriteLine($"### 2x{w}x{h} - kare {frameBytes / 1024 / 1024.0:0.#} MB");
+        Console.WriteLine();
+        RunHeader("Okuma blogu");
+
+        foreach (var (name, block) in new (string, int)[]
+                 {
+                     ("64 KB", 64 * 1024),
+                     ("1 MB", 1 << 20),
+                     ("1 kare", frameBytes),
+                     ("2 kare", frameBytes * 2),
+                     ("4 kare", frameBytes * 4)
+                 })
+        {
+            await RepeatAsync(name, runs, () => PipeDrainAsync(left, right, w, h, fps, frames, block));
+        }
+
+        Console.WriteLine();
+    }
+}
+
+static async Task PlaySharedAsync(string left, string right, int fps, int frames, int runs)
+{
+    Console.WriteLine();
+    Console.WriteLine("## P9 - Paylasimli bellek boruyu geciyor mu");
+    Console.WriteLine();
+
+    foreach (var (w, h) in new[] { (1920, 1080), (960, 540) })
+    {
+        Console.WriteLine($"### 2x{w}x{h}");
+        Console.WriteLine();
+        RunHeader("Yol");
+
+        await RepeatAsync("boru, tek is parcacigi (P1 taban)", runs,
+            async () =>
+            {
+                var s = await PipeAsync(left, right, w, h, fps, frames);
+                return (s.Fps, s.CpuPercent, s.Error);
+            });
+
+        foreach (var slots in new[] { 2, 4, 8 })
+        {
+            await RepeatAsync($"boru -> MMF halka, {slots} yuva", runs,
+                () => PipeSharedAsync(left, right, w, h, fps, frames, slots));
+        }
+
+        Console.WriteLine();
     }
 }
 
