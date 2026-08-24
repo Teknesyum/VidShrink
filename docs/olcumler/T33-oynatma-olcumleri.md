@@ -300,3 +300,88 @@ Sırayla, devam eden oturumun başlayacağı yer en üstte.
 
 Atlanan 6 test T33'ten önce de atlanıyordu (`VIDSHRINK_LIVE_SOURCE` isteyen canlı ölçümler).
 Değişen tek kaynak dosyası `tools/VidShrink.Bench/Program.cs`.
+
+---
+
+# Tur 1 — duvar boru değilmiş
+
+Makine: DESKTOP-0J80KVV · 16 mantıksal çekirdek · ffmpeg 9.0-full_build (Gyan)
+Kaynak: `gothic2026-08-15 14-01-29.mp4` (830 MB, 1080p), iki taraf da aynı klip.
+Her ölçüm **3 koşu**, 5 saniye, 300 kare. Ölçen: T0 (üç ajan üst üste düştü).
+
+## P10 — taşıma tavanı: duvar boru mu, tüketici mi
+
+### 2×1920×1080 — 15,8 MB kare
+
+| Çıkış yolu | Koşu | Ortalama fps | Sapma | Tek tek |
+|---|---|---|---|---|
+| `-f null -` (kare hiç paketlenmiyor) | 3 | 267,4 | 8,75 | 267 / 258,8 / 276,3 |
+| `-f rawvideo` → NUL (paketlenir, boru yok) | 3 | 213,6 | 12,97 | 198,6 / 221,5 / 220,6 |
+| **boru → ham boşaltma, 1 MB blok** | 3 | **161,8** | 0,65 | 161,3 / 162,5 / 161,7 |
+| **boru → kare hizalı havuz okuması** | 3 | **70,1** | 0,20 | 69,9 / 70,3 / 70,1 |
+
+### 2×960×540 — 4 MB kare
+
+| Çıkış yolu | Koşu | Ortalama fps | Sapma |
+|---|---|---|---|
+| `-f null -` | 3 | 302,8 | 8,59 |
+| `-f rawvideo` → NUL | 3 | 305,5 | 4,44 |
+| boru → ham boşaltma | 3 | 407,9 | 11,01 |
+| boru → kare hizalı havuz | 3 | 387,9 | 5,09 |
+
+## P8 — okuma bloğu büyütülünce ne oluyor
+
+### 2×1920×1080 — 15,8 MB kare
+
+| Okuma bloğu | Koşu | Ortalama fps | Sapma |
+|---|---|---|---|
+| 64 KB | 3 | 163,3 | 1,84 |
+| 1 MB | 3 | 165,2 | 0,99 |
+| **1 kare (15,8 MB) tek okumada** | 3 | **70,9** | 0 |
+| 2 kare | 3 | 41,8 | 0,11 |
+| 4 kare | 3 | 22,6 | 0,08 |
+| **kare havuzu, 64 KB parçalarla toplanır** | 3 | **148,0** | 0,29 |
+| kare havuzu, 256 KB parçalarla toplanır | 3 | 148,3 | 0,40 |
+| kare havuzu, 1 MB parçalarla toplanır | 3 | 143,9 | 0,69 |
+
+## Sonuç — round 0'ın vardığı yargı yanlış
+
+Round 0 şunu yazmıştı: *"2×1080p'de ffmpeg 172 fps üretiyor, boru 37,5 teslim ediyor,
+%78 taşımada kayboluyor. Duvar boru, kod çözme değil."*
+
+**Boru 2×1080p'de 161,8 fps taşıyor.** Round 0'ın 37,5 rakamı borunun kapasitesi değil,
+**okuma biçiminin** sonucuymuş.
+
+P8 kök nedeni tek satırda gösteriyor: kareyi **tek okumada** almak 70,9 fps veriyor,
+**aynı kareyi 64 KB parçalarla toplamak 148 fps** veriyor. İki katından fazla fark, ve
+okuma bloğu büyüdükçe durum kötüleşiyor — 2 kare 41,8, 4 kare 22,6.
+
+Sebep: Windows anonim borusunun iç tamponu küçük. 15,8 MB'lık tek bir okuma isteği
+tamamı gelene kadar blokluyor ve üretici ile tüketiciyi sıraya sokuyor. Küçük parçalarla
+okumak ikisini birlikte çalıştırıyor.
+
+### Karar için anlamı
+
+| | Ölçülen | Hedef |
+|---|---|---|
+| Boru taşıma tavanı, 2×1080p | 161,8 fps | — |
+| Parçalı okumayla kare teslimi, 2×1080p | **148 fps** | 60 fps |
+| Round 0'ın "duvar" dediği sayı | 37,5 fps | — |
+
+**60 fps @ 2×1080p boru yoluyla karşılanıyor, hem de 2,5 kat payla.**
+
+libmpv'nin +60-100 MB kurulumu, karışık GPLv2+/LGPL lisansı, Linux self-contained sorunu
+ve süreç içi çökme riski **kullanıcının istediği hedef için gerekli değil.** Ö7 açılmadı.
+
+Ses ve 4K hâlâ yalnız libmpv'de; onlar ayrı bir gerekçe ve ayrı bir karar.
+
+### P9 ölçülmedi — gerekmedi
+
+Paylaşımlı bellek, borunun yetersiz kaldığı varsayımı üzerine planlanmıştı. Boru 148 fps
+verdiğine göre çözülecek bir sorun yok. Ölçüm koşulmadı; gerekirse sonra koşulabilir.
+
+### Sıradaki soru
+
+Duvar artık okuma tarafında değil. Geriye **Ö4** kalıyor: Avalonia `WriteableBitmap`
+sunum yolu bu kareleri ekrana koyabiliyor mu? İkinci görüş de bağımsız olarak buraya
+işaret etmişti. 148 fps üretilen kareyi ekrana basamıyorsa darboğaz oraya taşınmış olur.
