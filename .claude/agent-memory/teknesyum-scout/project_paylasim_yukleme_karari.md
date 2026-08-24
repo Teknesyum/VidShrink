@@ -1,44 +1,44 @@
 ---
 name: paylasim-yukleme-karari
-description: VidShrink'in "tek tıkla yükle ve bağlantı paylaş" özelliği için platform kararı — Streamable elendi (2026-08-24), Google Drive drive.file önerildi (2026-08-24)
+description: VidShrink'in "tek tıkla yükle ve bağlantı paylaş" özelliği için platform kararı — ölçüt 2026-08-24'te "büyük şirket API'si"nden "anonim, kısa ömürlü, tarayıcıda oynayan"a değişti; storage.to ve filebin.net öne çıktı
 metadata:
   type: project
 ---
 
 VidShrink'e sıkıştırılan videoyu tek tıkla yükleyip bağlantı paylaşma özelliği düşünülüyor.
-İki tarama yapıldı, ikisi de 2026-08-24.
+Üç tarama yapıldı, hepsi 2026-08-24.
 
-**Tarama 1 — Streamable (`docs/taramalar/streamable.md`): elendi.** Belgelenmiş yükleme API'si yok;
-kullanım şartları "Use automated means to submit or edit User Content" fiilini açıkça yasaklıyor;
-eski `POST /upload` uç noktası hâlâ 401 dönüyor ama belgesiz ve Basic Auth, yani kullanıcının hesap
-parolasını masaüstünde saklamak gerekir.
+**Ölçüt 2026-08-24'te değişti.** Eski ölçüt "büyük şirketin belgelenmiş API'si"ydi ve ilk iki
+tarama (`docs/taramalar/streamable.md`, `docs/taramalar/yukleme-platformlari.md`) bu yüzden
+**yanlış ölçüte göre yapıldı**. Yeni ölçüt kullanıcının kendi cümlesi: hesapsız, anahtarsız,
+kısa ömürlü, alıcının indirmeden tarayıcıda izleyebildiği bir hedef.
 
-**Tarama 2 — yedi büyük platform (`docs/taramalar/yukleme-platformlari.md`).** Kullanıcının ölçütü:
-büyük ve köklü şirket, belgelenmiş yükleme API'si, tek tıkla yükle ve bağlantı al.
+**Tarama 3 — `docs/taramalar/anonim-kisa-omurlu-video.md`.** 19 aday yedi şarta karşı ölçüldü.
+Yedisini de geçen iki aday:
+- **storage.to** — anonim REST API, anahtar yok; paylaşım sayfasında gerçek `<video controls>`;
+  3 gün (1–7 seçilebilir); `owner_token` ile anonim silme; ToS §3 resmî API'yi açıkça muaf
+  tutuyor; 25 GB tavan. Uçtan uca test edildi ve silme doğrulandı.
+- **filebin.net** — anonim POST, anahtar yok; dosya `Content-Disposition: inline` +
+  `video/mp4` ile servis ediliyor; 6 gün sabit; URL'yi bilen herkes silebiliyor; OpenAPI
+  belgesi araç yazmayı teşvik ediyor. Dosya başına boyut tavanı belgesiz.
 
-Önerilen: **Google Drive, `drive.file` kapsamı.** Ayırt edici bulgu: `drive.file` non-sensitive
-olduğu için doğrulanmamış yayımlanmış uygulamada 100 kullanıcı tavanı ve "tehlike" onay ekranı
-uygulanmıyor (bunlar yalnız sensitive/restricted kapsamlar için). Elle inceleme kuyruğu yok,
-15 GB ücretsiz, `client_secret` installed-app akışında opsiyonel (AGPL kaynak kod için önemli).
-İkinci sırada OneDrive (kuyruk yok ama 5 GB).
+Elenenlerin öğretici olanları: **pixeldrain** anonim yüklemeyi kapatmış (2024-08 ile 2024-11
+arasında, kesin tarih doğrulanamadı); **catbox.moe** 2 yıl saklıyor; **0x0.st** minimum 30 gün
+saklıyor ve otomatik istemcilere düşman; **bashupload** tek indirme hakkı verdiği için oynatıcı
+çalışmıyor; **send.vis.ee** tarayıcıda şifrelediği için sunucuda oynatılabilir URL yok.
 
-Elenenler ve nedenleri:
-- **YouTube:** `videos.insert` kotası **proje başına günde 100** — bütün kullanıcılar VidShrink'in
-  tek OAuth istemcisini paylaşır, 100 kullanıcıda kişi başı günde 1 video kalır. Üstüne
-  denetimden geçmemiş projelerin yüklediği videolar zorla `private` kalıyor.
-- **Vimeo:** ücretsiz hesap için yükleme erişimi elle inceleme, "up to five business days";
-  ücretsiz plan hesap ömrü boyunca toplam 1 GB.
-- **Dropbox:** 50 kullanıcıdan sonra iki hafta içinde production onayı alınmazsa yeni bağlantı donuyor.
-- **Cloudflare Stream:** ücretsiz katman yok; kullanıcı hesap kimliği + API jetonu yapıştırmalı.
-- **Bunny Stream:** BunnyWay d.o.o. — "büyük şirket" ölçütünü karşılamıyor.
+**Why:** Proje AGPL-3.0-or-later, tek bakımcı. Kaynak yayımlandığı için ikiliye gizli anahtar
+konamaz — anahtar isteyen her aday bu tek gerekçeyle eleniyor.
 
-**Why:** Proje AGPL-3.0-or-later, tek bakımcı, henüz yayınlanmamış. Sözleşme ihlali riskini, parola
-saklama yükünü ve onay kuyruğu bakımını tek bakımcı taşıyamaz. Kullanıcı kendi hesabını girecek;
-uygulamanın gömülü hesabı olmayacak.
+**How to apply:** Yükleme/paylaşım konusu tekrar açılırsa sıfırdan araştırma yapma, üç raporu
+oku; `anonim-kisa-omurlu-video.md` güncel ölçüte göre olanı. Anahtar isteyen, hesap isteyen ya
+da alıcıyı indirmeye zorlayan hiçbir hedefi önerme. İki somut tuzak: (1) storage.to ToS'u
+uygulama içi hotlink/gömme'yi custom plan'a bağlıyor — VidShrink içine önizleme oynatıcısı
+koyma, yalnız bağlantıyı ver. (2) filebin'de bin adını asla kendin türetme, sunucunun ürettiği
+rastgele adı kullan; adlar çakışabilir ve tahmin eden herkes bin'i silebilir. Kota/tavan
+rakamlarını arayüze sabit yazma, sunucu hatasıyla göster.
 
-**How to apply:** Yükleme/paylaşım konusu tekrar açılırsa sıfırdan araştırma yapma, o iki raporu oku.
-Basic Auth ile parola saklayan hiçbir yükleme yolunu önerme. Plan/kota rakamlarını arayüze sabit
-yazmayı önerme — taranan yedi belgeden beşi son 60 gün içinde güncellenmişti; kotayı sunucudan sor
-(Drive'da `about.get`), sınırı sunucu hatasıyla göster. Drive'ın iki bilinen eksiğini karar
-verirken hatırla: `type: anyone` bağlantısına süre konamıyor (`expirationTime` yalnız user/group)
-ve 15 GB Gmail + Photos ile paylaşımlı.
+**Ağ notu:** Ölçümler Türkiye'den yapıldı. `0x0.st`, `bashupload.com`, `gofile.io`, `qu.ax`
+yükleme yolları ve `litter.catbox.moe` bu ağdan erişilemedi (bağlantı sıfırlaması / TLS zincir
+hatası). Catbox FAQ'si Türkiye'yi engelli ülkeler arasında sayıyor. Hedefin Türkiye'den
+erişilebilir olması ayrı bir şart gibi ele alınmalı.

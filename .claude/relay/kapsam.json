@@ -602,7 +602,7 @@
   ".claude/agent-memory/teknesyum-scout/project_paylasim_yukleme_karari.md": {
     "model": "claude-opus-5",
     "effort": "high",
-    "t": "2026-08-23 22:50:24",
+    "t": "2026-08-24 00:26:55",
     "ajan": "scout"
   },
   "konsey2.py": {
@@ -622,5 +622,17 @@
     "effort": "high",
     "t": "2026-08-23 23:52:58",
     "ajan": "ana oturum"
+  },
+  "HATA-200k-baglam-penceresi-iddiasi.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 00:00:59",
+    "ajan": "ana oturum"
+  },
+  "docs/taramalar/anonim-kisa-omurlu-video.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 00:26:55",
+    "ajan": "scout"
   }
 }

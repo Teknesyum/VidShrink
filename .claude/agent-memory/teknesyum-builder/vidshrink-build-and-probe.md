@@ -101,3 +101,22 @@ kurup `& "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe"` cagir. Derlemeden once
   (`[SupportedOSPlatform("windows")]` koy, yoksa CA1416 uyarisi cikar ve 0-uyari kurali kirilir).
 - PE alt sistemini dogrulama: `$pe = [BitConverter]::ToInt32($bytes,0x3C)`,
   `[BitConverter]::ToUInt16($bytes,$pe+92)` -> 2 GUI, 3 konsol.
+- ffmpeg olcumlerinde **p95 icin n=12 yetmiyor**: Percentile(v,95) o orneklemde dizinin
+  maksimumunu donduruyor, tek bir zamanlama tokezlemesi kapi kararini belirliyor. Bu
+  makinede kare cekme cagrilarinin %2-6 kadari 700-850 ms bandinda takiliyor ve ayni
+  kuyruk **hic kare cozmeyen** `ffprobe -show_format` cagrisinda da var - yani kuyruk kod
+  cozmenin degil surec acilisinin. Gecikme kapisi kuran her olcumde n>=200 al ve yaninda
+  kod cozmesiz bir taban olc, yoksa kuyrugu yanlis seye baglarsin.
+- `-autorotate` **deger almayan bir bayrak**; `-autorotate 1` yazilirsa 1 bir cikis
+  dosyasi sanilir ve ffmpeg "cannot be applied to output url" ile duser.
+- `-ss` giris damgalarini sifirlar; kaynagin kendi zaman damgasi isteniyorsa `-copyts`
+  gerekiyor. Teslim edilen kareyi tahmin etme, `showinfo` suzgecini zincire ekleyip
+  stderr'den `pts_time` ve `s:WxH` oku. showinfo kodlayicidan cok kare gorur
+  (`-frames:v 1` olsa bile), teslim edilen **ilkidir** - LastIndexOf degil IndexOf.
+- Test klibine HDR etiketi basmak icin `setparams=color_primaries=bt2020:color_trc=smpte2084`
+  kullan. Cikis secenegi olarak verilen `-color_trc`/`-color_primaries` libx264/libx265
+  uzerinden **sessizce dusuyor**: dosya yaziliyor, hata yok, ama ffprobe'da color_transfer
+  alani hic cikmiyor ve HDR tespiti dogru olarak false donuyor. Dondurme metadatasi icin
+  `-display_rotation 90 -i giris -c copy cikis` calisiyor; `-metadata:s:v rotate=90`
+  artik yazmiyor.
+
