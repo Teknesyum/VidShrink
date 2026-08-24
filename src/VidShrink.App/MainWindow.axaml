@@ -263,30 +263,71 @@
                       <TextBox x:Name="TxtTarget" Grid.Column="1" Text="16" Width="96" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                       <TextBlock Grid.Column="2" Text="MB" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     </Grid>
+                    <!--
+                      Etiket yonganın parçası: ipucu değil, kapalı balonla da okunan görünür
+                      metin. Etiketsiz yongalar aynı satırda aynı yüksekliği alır, çünkü
+                      WrapPanel çocuklarını satır yüksekliğine gerer.
+                    -->
                     <WrapPanel>
-                      <Button x:Name="ChipWhatsApp" Content="WhatsApp 16" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                      <Button x:Name="ChipWhatsApp" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                        <StackPanel>
+                          <TextBlock Text="WhatsApp recommended" Theme="{StaticResource Label}" Margin="0"/>
+                          <TextBlock Text="WhatsApp 16"/>
+                        </StackPanel>
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp re-encodes in-chat video with its own low-bitrate encoder.&#10;• Under 16 MB it usually passes your file through with far less damage, so what the other side sees is VidShrink's quality, not WhatsApp's.&#10;• To bypass re-encoding entirely, send the result as a document instead of as a video."/>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp re-encodes in-chat video with its own low-bitrate encoder.&#10;• Under 16 MB it usually passes your file through with far less damage, so what the other side sees is VidShrink's quality, not WhatsApp's.&#10;• To bypass re-encoding entirely, send the result as a document instead of as a video."/>
+                          </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                      <Button x:Name="Chip8" Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="8 MB fits Discord without Nitro, older forums, and strict e-mail gateways."/>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="8 MB fits Discord without Nitro, older forums, and strict e-mail gateways."/>
+                          </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button Content="25" Tag="25" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                      <Button x:Name="Chip25" Content="25" Tag="25" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="25 MB fits Gmail attachments, Discord Nitro Basic, and most ticket systems."/>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="25 MB fits Gmail attachments, Discord Nitro Basic, and most ticket systems."/>
+                          </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button Content="100" Tag="100" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                      <Button x:Name="Chip100" Content="100" Tag="100" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="100 MB suits archiving and uploads where quality matters more than transfer time."/>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="100 MB suits archiving and uploads where quality matters more than transfer time."/>
+                          </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button Content="Half" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
+                      <Button x:Name="Chip128" Tag="128" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                        <StackPanel>
+                          <TextBlock Text="Sharing maximum" Theme="{StaticResource Label}" Margin="0"/>
+                          <TextBlock Text="128"/>
+                        </StackPanel>
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="• Half of the source size.&#10;• A mild request, so the engine usually keeps the original resolution and frame rate."/>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="• 128 MiB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit.&#10;• A file at or under this size can be handed to either share target without being refused.&#10;• The other target, storage.to, carries far more, so this chip is the safe number for both."/>
+                          </StackPanel>
+                        </ToolTip.Tip>
+                      </Button>
+                      <Button x:Name="Chip180" Tag="180" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                        <StackPanel>
+                          <TextBlock Text="Document only" Theme="{StaticResource Label}" Margin="0"/>
+                          <TextBlock Text="180"/>
+                        </StackPanel>
+                        <ToolTip.Tip>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp allows 16 MB for media sent in chat and 2 GB for a document, and publishes no limit in between.&#10;• 180 MB is therefore past the in-chat ceiling: the file goes through only when it is sent as a document.&#10;• Sent that way nothing is re-encoded, but the other side opens a file instead of playing a video."/>
+                          </StackPanel>
+                        </ToolTip.Tip>
+                      </Button>
+                      <Button x:Name="ChipHalf" Content="Half" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
+                        <ToolTip.Tip>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" Text="• Half of the source size.&#10;• A mild request, so the engine usually keeps the original resolution and frame rate."/>
+                          </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                     </WrapPanel>
@@ -736,6 +777,66 @@
           </ScrollViewer>
         </TabItem>
 
+        <TabItem Header="Settings" Theme="{StaticResource NeonTabItem}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+
+              <Border x:Name="SharePanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Share target" Theme="{StaticResource H2}"/>
+                    <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Share target">
+                      <ToolTip.Tip>
+                        <TextBlock Theme="{StaticResource TipText}" Text="• The share target is the service a finished file is uploaded to.&#10;• storage.to carries up to 25 GiB and lets VidShrink delete the file again, so a link can be closed early.&#10;• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early."/>
+                      </ToolTip.Tip>
+                    </Button>
+                  </StackPanel>
+
+                  <ComboBox x:Name="CmbShareTarget" HorizontalAlignment="Stretch"/>
+
+                  <Grid ColumnDefinitions="Auto,*"
+                        RowDefinitions="Auto,Auto,Auto"
+                        ColumnSpacing="{StaticResource SpaceMd}"
+                        RowSpacing="{StaticResource SpaceSm}">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Ceiling" Theme="{StaticResource PlanFactLabel}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Lifetime" Theme="{StaticResource PlanFactLabel}"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                      <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
+                      <TextBlock x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Deletion" Theme="{StaticResource PlanFactLabel}"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                      <Button x:Name="BtnShareDelete"
+                              Content="Delete the shared file"
+                              Theme="{StaticResource GhostButton}"
+                              HorizontalAlignment="Left"
+                              IsEnabled="False"/>
+                      <TextBlock x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="UpdatePanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <TextBlock Text="Updates" Theme="{StaticResource H2}"/>
+                  <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
+                    <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="Update automatically"/>
+                  </StackPanel>
+                  <TextBlock x:Name="TxtAutoUpdateEffect"
+                             Theme="{StaticResource Hint}"
+                             TextWrapping="Wrap"
+                             Text="When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."/>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
         <TabItem Header="About" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Border Theme="{StaticResource Panel}" Margin="{StaticResource SectionMargin}">
@@ -756,14 +857,6 @@
                 <TextBlock Theme="{StaticResource Body}" TextWrapping="Wrap" Text="• H.264 offers the broadest compatibility.&#10;• H.265 compresses more efficiently.&#10;• VP9 is a strong WebM choice.&#10;• AV1 maximizes modern compression at higher CPU cost.&#10;• Stream copy is fastest and lossless when the destination supports the source streams."/>
                 <TextBlock Text="System status" Theme="{StaticResource H3}"/>
                 <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
-                <TextBlock Text="Updates" Theme="{StaticResource H3}"/>
-                <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
-                  <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="Update automatically"/>
-                </StackPanel>
-                <TextBlock x:Name="TxtAutoUpdateEffect"
-                           Theme="{StaticResource Hint}"
-                           TextWrapping="Wrap"
-                           Text="When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."/>
               </StackPanel>
             </Border>
           </ScrollViewer>

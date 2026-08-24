@@ -10,7 +10,7 @@ dotnet test VidShrink.sln -c Release --filter TipOverflowTests
 16 px). Tavan `Themes/Theme.axaml` belirteçlerinden
 hesaplanır: `TooltipMaxWidth` eksi iki yanın dolgusu ve kenarlığı = **426 px**.
 
-Ölçülen satır: **192** · tavanı aşan: **123** ·
+Ölçülen satır: **210** · tavanı aşan: **140** ·
 tek kelimeyle aşan: **0**
 
 | Dil | İpucu | Satır | Genişlik | Taşma | Görsel satır | Alt satır | Tek kelime |
@@ -35,6 +35,18 @@ tek kelimeyle aşan: **0**
 | TR | MainWindow.axaml · 25 MB fits Gmail attachments, Discord Nitro… | 0 | 506 | 80 | 2 | Sistemine Uyar. |  |
 | EN | MainWindow.axaml · 100 MB suits archiving and uploads where qua… | 0 | 603 | 177 | 2 | More Than Transfer Time. |  |
 | TR | MainWindow.axaml · 100 MB suits archiving and uploads where qua… | 0 | 602 | 176 | 2 | ve Yüklemelere Uygundur. |  |
+| EN | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 0 | 712 | 286 | 2 | Anonymous Share Target With The Smallest Limit. |  |
+| EN | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 1 | 648 | 222 | 2 | Share Target Without Being Refused. |  |
+| EN | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 2 | 641 | 215 | 2 | Chip Is The Safe Number For Both. |  |
+| TR | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 0 | 600 | 174 | 2 | uguu.se'nin Ölçülmüş Tavanıdır. |  |
+| TR | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 1 | 637 | 211 | 2 | de Geri Çevrilmeden Verilebilir. |  |
+| TR | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 2 | 694 | 268 | 2 | Bu Yonga İkisi İçin de Güvenli Sayıdır. |  |
+| EN | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 0 | 797 | 371 | 2 | For A Document, And Publishes No Limit In Between. |  |
+| EN | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 1 | 763 | 337 | 2 | Goes Through Only When It Is Sent As A Document. |  |
+| EN | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 2 | 711 | 285 | 2 | Opens A File Instead Of Playing A Video. |  |
+| TR | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 0 | 810 | 384 | 2 | GB İzin Verir ve İkisinin Arasında Bir Sınır Yayımlamaz. |  |
+| TR | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 1 | 710 | 284 | 2 | Yalnız Belge Olarak Gönderildiğinde Geçer. |  |
+| TR | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 2 | 727 | 301 | 2 | Karşı Taraf Video Oynatmak Yerine Dosya Açar. |  |
 | EN | MainWindow.axaml · Half of the source size. | 1 | 621 | 195 | 2 | Resolution And Frame Rate. |  |
 | TR | MainWindow.axaml · Half of the source size. | 1 | 632 | 206 | 2 | Çözünürlüğü ve Kare Hızını Korur. |  |
 | EN | MainWindow.axaml · Intent sets how early the engine stops spend… | 1 | 660 | 234 | 2 | Leave A Lot Of The Target Unused. |  |
@@ -125,6 +137,11 @@ tek kelimeyle aşan: **0**
 | EN | MainWindow.axaml · Audio data rate in kilobits per second. | 1 | 700 | 274 | 2 | Detail, And 256 Or 320 Is Useful For Music. |  |
 | TR | MainWindow.axaml · Audio data rate in kilobits per second. | 1 | 683 | 257 | 2 | 256 veya 320 Müzik İçin Kullanışlıdır. |  |
 | TR | MainWindow.axaml · Audio data rate in kilobits per second. | 2 | 528 | 102 | 2 | Değer Kullanılmaz. |  |
+| EN | MainWindow.axaml · The share target is the service a finished f… | 0 | 459 | 33 | 2 | Uploaded To. |  |
+| EN | MainWindow.axaml · The share target is the service a finished f… | 1 | 751 | 325 | 2 | The File Again, So A Link Can Be Closed Early. |  |
+| EN | MainWindow.axaml · The share target is the service a finished f… | 2 | 960 | 534 | 3 | Close The Link Early. |  |
+| TR | MainWindow.axaml · The share target is the service a finished f… | 1 | 769 | 343 | 2 | Silmesine İzin Verir, Bağlantı Erken Kapatılabilir. |  |
+| TR | MainWindow.axaml · The share target is the service a finished f… | 2 | 796 | 370 | 2 | Ama Silme Jetonu Vermez; Bağlantı Erken Kapatılamaz. |  |
 | EN | Theme.axaml/AiHintText · This step is optional. | 1 | 530 | 104 | 2 | Its JSON Answer. |  |
 | TR | Theme.axaml/AiHintText · This step is optional. | 1 | 653 | 227 | 2 | JSON Yanıtını Yapıştırıp Doğrulayın. |  |
 | EN | MainWindow.axaml.cs/AutoUpdateEffectEnglish · When this is off, VidShrink does not update… | 0 | 967 | 541 | 3 | Command That Installs It. |  |
