@@ -4,30 +4,37 @@ using System.Text.Json.Serialization;
 namespace VidShrink.Core.Share;
 
 /// <summary>
-/// Paylaşım işleminin nasıl bittiği. Arayüz bu değeri kendi diline çevirir; ham sunucu
-/// metni <see cref="ShareResult.Detail"/> alanında ayrıca taşınır.
+/// Paylaşım işleminin nasıl bittiği. Arayüz bu değeri kendi diline çevirir; kullanıcıya
+/// gösterilecek eyleme dönüşebilir cümle <see cref="ShareDiagnosis.Message"/> alanındadır,
+/// ham sunucu metni <see cref="ShareResult.Detail"/> alanında ayrıca taşınır.
 /// </summary>
 public enum ShareFailure
 {
     /// <summary>Hata yok.</summary>
     None = 0,
 
-    /// <summary>Kullanıcı izin vermedi ya da izni geri çekti. Yeniden izin istenmeli.</summary>
+    /// <summary>Sunucu isteği reddetti (403). Sahiplik jetonu yanlış ya da içerik engellenmiş.</summary>
     NotAuthorized,
 
-    /// <summary>Jeton geçersiz veya süresi doldu. Tarayıcı akışı yeniden açılmalı.</summary>
+    /// <summary>
+    /// Sahiplik jetonu artık geçerli değil ya da dosyanın ömrü dolmuş. Silinecek bir şey kalmadı;
+    /// kayıt defterindeki satır düşürülmelidir.
+    /// </summary>
     TokenExpired,
 
     /// <summary>
-    /// Drive deposu dolu. Drive'ın 15 GB'ı Gmail ve Photos ile paylaşımlıdır; kullanıcıya
-    /// "yükleme başarısız" değil, deponun neden dolduğu anlatılmalı.
+    /// Hedefin kotası doldu: anonim yükleme sayısı ya da bant genişliği eşiği aşıldı.
+    /// Dosyanın kendi boyutu için <see cref="FileTooLarge"/> kullanılır.
     /// </summary>
     QuotaExceeded,
 
-    /// <summary>Çok fazla istek. Bir süre sonra yeniden denenebilir.</summary>
+    /// <summary>Dosya hedefin boyut tavanının üstünde. Yükleme hiç başlatılmaz.</summary>
+    FileTooLarge,
+
+    /// <summary>Çok fazla istek (429). Bir süre sonra yeniden denenebilir.</summary>
     RateLimited,
 
-    /// <summary>Ağ koptu veya sunucuya ulaşılamadı. Sürdürülebilir yükleme devam ettirilebilir.</summary>
+    /// <summary>Ağ koptu veya uç noktaya ulaşılamadı.</summary>
     NetworkFailure,
 
     /// <summary>Yerel diskte yer kalmadı.</summary>
@@ -39,7 +46,7 @@ public enum ShareFailure
     /// <summary>Kullanıcı iptal etti.</summary>
     Cancelled,
 
-    /// <summary>Sunucu tarafında beklenmeyen bir durum.</summary>
+    /// <summary>Sunucu tarafında beklenmeyen bir durum (5xx).</summary>
     ServiceError,
 
     /// <summary>Sınıflandırılamayan durum.</summary>
@@ -47,26 +54,35 @@ public enum ShareFailure
 }
 
 /// <summary>
-/// Yüklenip paylaşılmış bir dosya. <see cref="PermissionId"/> saklanır çünkü yayını kapatmak
-/// <c>permissions.delete</c> çağrısıdır ve uygulama kapanıp açıldıktan sonra da yapılabilmelidir.
+/// Yüklenip paylaşılmış bir dosya.
 /// </summary>
 /// <remarks>
-/// Süreli bağlantı yoktur. Drive'ın <c>expirationTime</c> alanı yalnız <c>user</c> ve <c>group</c>
-/// izinlerinde çalışır, <c>anyone</c> (bağlantısı olan herkes) izninde çalışmaz. Yani "30 dakika
-/// sonra kendiliğinden kapansın" kurulamaz; bağlantı <see cref="ShareFailure"/> olmadan
-/// kapatılana kadar açık kalır. Kapatma <c>permissions.delete</c> ile anında etkilidir.
+/// <para>
+/// <see cref="Url"/> <b>kullanıcıya verilecek bağlantıdır</b> — sağlayıcının paylaşım sayfası.
+/// Medyanın kendisi ayrı bir CDN alan adından, imzalı ve kısa ömürlü (storage.to'da ~30 dakika)
+/// bir adresle gelir; paylaşım sayfası her ziyarette yeniden imzalar. <b>CDN adresini asla
+/// paylaşma:</b> kopyalandığı anda çalışır, yarım saat sonra sessizce ölür ve hata hiçbir yerde
+/// görünmez. Bu yüzden bu kayıtta CDN adresi için alan bile yoktur.
+/// </para>
+/// <para>
+/// <see cref="OwnerToken"/> dosyaya özgü bir silme yetkisidir, hesap kimliği değil. Kayıt
+/// defterinde düz metin durur: uygulama kapanıp açıldıktan sonra da yayının kapatılabilmesi,
+/// jetonu saklamamaktan daha değerli. Jeton kaybolursa dosya ömrü dolana kadar silinemez.
+/// Silme desteklemeyen hedeflerde (uguu.se) boştur.
+/// </para>
 /// </remarks>
 public sealed record ShareLink(
+    string TargetId,
     string FileId,
-    string PermissionId,
-    string WebViewLink,
+    string Url,
     string FileName,
-    DateTimeOffset SharedAt)
+    DateTimeOffset SharedAt,
+    DateTimeOffset? ExpiresAt = null,
+    string? OwnerToken = null)
 {
-    /// <summary>
-    /// Bu platformda süreli bağlantı kurulamaz. Arayüz bunu kullanıcıya açıkça söylemelidir.
-    /// </summary>
-    public static bool SupportsExpiry => false;
+    /// <summary>Bu kaydın silinebilmesi için elde jeton var mı.</summary>
+    [JsonIgnore]
+    public bool CanDelete => !string.IsNullOrEmpty(OwnerToken);
 }
 
 /// <summary>Yükleme ilerlemesi. Arayüz bunu bir çubuğa bağlar.</summary>
@@ -77,7 +93,8 @@ public sealed record UploadProgress(long BytesSent, long TotalBytes)
 
 /// <summary>
 /// Bir paylaşım adımının sonucu. Başarıda <see cref="Link"/> doludur; başarısızlıkta
-/// <see cref="Failure"/> hangi durum olduğunu, <see cref="Detail"/> sunucunun kendi metnini verir.
+/// <see cref="Failure"/> hangi durum olduğunu, <see cref="Message"/> kullanıcının
+/// yapabileceği şeyi, <see cref="Detail"/> sunucunun kendi metnini verir.
 /// </summary>
 public sealed record ShareResult
 {
@@ -87,30 +104,36 @@ public sealed record ShareResult
 
     public ShareFailure Failure { get; private init; } = ShareFailure.None;
 
-    /// <summary>Sunucudan gelen ham açıklama. Kota hatasında olduğu gibi aynen gösterilebilir.</summary>
+    /// <summary>Sunucudan gelen ham açıklama. Tanı kurulamadığında olduğu gibi gösterilebilir.</summary>
     public string Detail { get; private init; } = string.Empty;
+
+    /// <summary>Kullanıcının yapabileceği bir şeye çevrilmiş cümle. Başarıda boştur.</summary>
+    public string Message { get; private init; } = string.Empty;
+
+    /// <summary>Yeniden denemeden önce beklenecek süre. Sunucu söylemediyse boştur.</summary>
+    public TimeSpan? RetryAfter { get; private init; }
+
+    /// <summary>Bu hata için önerilen başka hedef (örneğin tavanı yeten). Yoksa boştur.</summary>
+    public string? SuggestedTargetId { get; private init; }
 
     public ShareLink? Link { get; private init; }
 
-    /// <summary>Yükleme yarıda kaldıysa devam adresi. Boşsa devam edilemez.</summary>
-    public string? ResumeUri { get; private init; }
-
-    /// <summary>Yarıda kalan yüklemede sunucunun onayladığı bayt sayısı.</summary>
-    public long BytesSent { get; private init; }
-
     public static ShareResult Success(ShareLink link) => new() { Link = link };
 
-    public static ShareResult Failed(ShareFailure failure, string detail) =>
-        new() { Failure = failure, Detail = detail };
-
-    /// <summary>Yükleme kesildi ama sürdürülebilir: devam adresi ve onaylanmış bayt taşınır.</summary>
-    public static ShareResult Interrupted(ShareFailure failure, string detail, string? resumeUri, long bytesSent) =>
-        new() { Failure = failure, Detail = detail, ResumeUri = resumeUri, BytesSent = bytesSent };
+    public static ShareResult Failed(ShareDiagnosis diagnosis) => new()
+    {
+        Failure = diagnosis.Failure,
+        Detail = diagnosis.Detail,
+        Message = diagnosis.Message,
+        RetryAfter = diagnosis.RetryAfter,
+        SuggestedTargetId = diagnosis.SuggestedTargetId
+    };
 }
 
 /// <summary>
-/// Paylaşılmış dosyaların kaydı. Gizli bilgi taşımaz (jeton burada durmaz), bu yüzden düz JSON.
-/// Amaç tek: kullanıcı uygulamayı kapatıp açtıktan sonra da yayını kapatabilsin.
+/// Paylaşılmış dosyaların kaydı. Amaç tek: kullanıcı uygulamayı kapatıp açtıktan sonra da
+/// yayını kapatabilsin. Bu yüzden silme jetonu da burada durur — ayrıntı
+/// <see cref="ShareLink.OwnerToken"/> açıklamasında.
 /// </summary>
 public sealed class ShareLedger
 {
