@@ -590,7 +590,7 @@
   "docs/KONSEY-karsilastirma-paneli.md": {
     "model": "claude-opus-5",
     "effort": "high",
-    "t": "2026-08-23 22:46:57",
+    "t": "2026-08-24 00:44:33",
     "ajan": "ana oturum"
   },
   "docs/taramalar/streamable.md": {
@@ -634,5 +634,17 @@
     "effort": "high",
     "t": "2026-08-24 00:26:55",
     "ajan": "scout"
+  },
+  "docs/PLAN-karsilastirma-oynatici.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 00:46:04",
+    "ajan": "ana oturum"
+  },
+  ".claude/relay/live/DURUM.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 01:01:53",
+    "ajan": "ana oturum"
   }
 }
