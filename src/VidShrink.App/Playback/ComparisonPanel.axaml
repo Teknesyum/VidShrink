@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:playback="using:VidShrink.App.Playback"
+             x:Class="VidShrink.App.Playback.ComparisonPanel">
+
+  <!--
+    Kök ızgara iki şey taşır: terfi sırasında bandında kalan yer tutucu ve panelin
+    kendisi. Terfi edince Shell bu ızgaradan çıkıp kök katmana taşınır, yer tutucu
+    aynı boyutta görünür kalır — altındaki düzen zıplamaz (K4).
+  -->
+  <Grid x:Name="Root">
+
+    <Border x:Name="Placeholder"
+            Theme="{StaticResource PlaybackPlaceholder}"
+            IsVisible="False">
+      <TextBlock x:Name="PlaceholderText"
+                 Theme="{StaticResource Hint}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"/>
+    </Border>
+
+    <Border x:Name="Shell"
+            Theme="{StaticResource Panel}"
+            Padding="0"
+            ClipToBounds="True"
+            Focusable="True"
+            MinHeight="{StaticResource PlaybackStageMinHeight}">
+
+      <Grid x:Name="Stage"
+            Background="{StaticResource AppBg}"
+            ClipToBounds="True">
+
+        <playback:ComparisonSurface x:Name="Surface"/>
+
+        <!-- K1: hiç kare yokken boş durum. İki dilde, dil geçidi kod tarafında. -->
+        <StackPanel x:Name="EmptyState"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+          <TextBlock x:Name="EmptyTitle"
+                     Theme="{StaticResource Label}"
+                     HorizontalAlignment="Center"/>
+          <TextBlock x:Name="EmptyHint"
+                     Theme="{StaticResource Hint}"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Solda orijinal, sağda işlenmiş. Etiket yonganın içinde, çerçevesi neon. -->
+        <Border x:Name="LeftBadge"
+                Theme="{StaticResource PlaybackBadge}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="{StaticResource PlaybackBadgeMargin}">
+          <TextBlock x:Name="LeftBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+        </Border>
+
+        <Border x:Name="RightBadge"
+                Theme="{StaticResource PlaybackBadge}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="{StaticResource PlaybackBadgeMargin}">
+          <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+        </Border>
+
+        <Border x:Name="ZoomBadge"
+                Theme="{StaticResource PlaybackBadge}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="{StaticResource PlaybackBadgeMargin}">
+          <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
+        </Border>
+
+        <!--
+          K2: ayırıcı. Tutma şeridi çizgiden geniştir ki fare ile yakalamak kolay olsun;
+          görünen çizgi tutamacın ortasındadır. Şerit odaklanabilir — sol/sağ ok küçük
+          adım, Home/End uçlar.
+        -->
+        <Border x:Name="SeparatorGrip"
+                Width="{StaticResource PlaybackHandleWidth}"
+                Background="Transparent"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Stretch"
+                Focusable="True"
+                Cursor="SizeWestEast">
+          <Grid>
+            <Border x:Name="SeparatorLine"
+                    Theme="{StaticResource PlaybackSeparator}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Stretch"/>
+            <Border x:Name="SeparatorHandle"
+                    Theme="{StaticResource PlaybackHandle}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+          </Grid>
+        </Border>
+
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

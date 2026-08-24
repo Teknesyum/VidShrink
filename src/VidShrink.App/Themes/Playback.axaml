@@ -1,0 +1,92 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    K6: burada tanımlanan her belirteç Theme.axaml'daki bir belirtecin değerini alır.
+    Yeni ölçü ya da yeni renk üretilmiyor; yalnız oynatıcıya ait ad veriliyor.
+
+      PlaybackSeparatorWidth   <- FocusRingThickness (2)
+      PlaybackHandleWidth      <- TargetMinSize (24)
+      PlaybackHandleHeight     <- DropIconSize (48)
+      PlaybackStageMinHeight   <- PanelMinHeight (256)
+      PlaybackBadgeMargin      <- SpaceMd (12)
+      PlaybackScrimColor       <- AppBgColor (#050507), %80 örtücülük
+      PlaybackMaxContentZoom   <- ölçü değil, jest aralığı; ZoomGesture ile aynı sayı
+  -->
+
+  <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
+  <x:Double x:Key="PlaybackHandleWidth">24</x:Double>
+  <x:Double x:Key="PlaybackHandleHeight">48</x:Double>
+  <x:Double x:Key="PlaybackStageMinHeight">256</x:Double>
+  <Thickness x:Key="PlaybackBadgeMargin">12</Thickness>
+  <x:Double x:Key="PlaybackMaxContentZoom">4</x:Double>
+
+  <Color x:Key="PlaybackScrimColor">#CC050507</Color>
+  <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
+
+  <!--
+    Ayırıcı. Çizginin kendisi hep görünür; tutamaç fare üstüne gelince ya da odak
+    ayırıcıdayken belirginleşir. Sürükleme kare istemez — bu tema yalnız görünüştür.
+  -->
+  <ControlTheme x:Key="PlaybackSeparator" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource NeonBlue}"/>
+    <Setter Property="Width" Value="{StaticResource PlaybackSeparatorWidth}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BoxShadowsTransition Property="BoxShadow" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+      </Transitions>
+    </Setter>
+    <Style Selector="^.lit">
+      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackHandle" TargetType="Border">
+    <Setter Property="Width" Value="{StaticResource PlaybackHandleWidth}"/>
+    <Setter Property="Height" Value="{StaticResource PlaybackHandleHeight}"/>
+    <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+    <Setter Property="Cursor" Value="SizeWestEast"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+        <BoxShadowsTransition Property="BoxShadow" Duration="{StaticResource MotionInstant}" Easing="CubicEaseOut"/>
+      </Transitions>
+    </Setter>
+    <Style Selector="^.lit">
+      <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    </Style>
+  </ControlTheme>
+
+  <!-- Yan etiketi ve yakınlaştırma okumasını taşıyan yonga. Sayı mono, çerçevesi neon. -->
+  <ControlTheme x:Key="PlaybackBadge" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackBadgeText" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+  </ControlTheme>
+
+  <!-- Terfi ederken bandında kalan yer tutucu: aynı boyut, aynı yarıçap, boş yüzey. -->
+  <ControlTheme x:Key="PlaybackPlaceholder" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource Surface}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonPurpleBorder}"/>
+    <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPanel}"/>
+  </ControlTheme>
+
+</ResourceDictionary>
