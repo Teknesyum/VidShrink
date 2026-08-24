@@ -319,7 +319,7 @@
                         </StackPanel>
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp allows 16 MB for media sent in chat and 2 GB for a document, and it publishes no limit between the two.&#10;• 180 MB is therefore past the in-chat ceiling: the file goes through only when it is sent as a document.&#10;• Sent that way nothing is re-encoded, but the other side opens a file instead of playing a video."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp allows 16 MB for media sent in chat and 2 GB for a document, and publishes no limit in between.&#10;• 180 MB is therefore past the in-chat ceiling: the file goes through only when it is sent as a document.&#10;• Sent that way nothing is re-encoded, but the other side opens a file instead of playing a video."/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -787,7 +787,7 @@
                     <TextBlock Text="Share target" Theme="{StaticResource H2}"/>
                     <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Share target">
                       <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" Text="• The share target is the service a finished file is uploaded to.&#10;• storage.to carries up to 25 GB and lets VidShrink delete the file again, so a link can be closed early.&#10;• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early."/>
+                        <TextBlock Theme="{StaticResource TipText}" Text="• The share target is the service a finished file is uploaded to.&#10;• storage.to carries up to 25 GiB and lets VidShrink delete the file again, so a link can be closed early.&#10;• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early."/>
                       </ToolTip.Tip>
                     </Button>
                   </StackPanel>
