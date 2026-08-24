@@ -1,110 +1,106 @@
-# Durum — 24.08.2026, duruş noktası
+# Devir notu — 24.08.2026
 
-Kullanıcı "müsait zamanda duralım" dedi. Üç ajan kayıt noktasında durduruldu, hiçbiri
-mühürlenmedi. Bu dosya devam eden oturumun ilk okuyacağı yer.
+Oturum masaüstüne devrediliyor. Bu dosya devralan oturumun ilk okuyacağı yer.
 
-## Bu oturumda kapanan işler
+**Depo durumu:** main temiz, her şey push'lu. `dotnet test` → **333 başarılı, 0 başarısız,
+6 atlanan.** `dotnet build -c Release` 0 uyarı.
 
-- **T32 — kare servisi.** `submitted`, main'e birleşti (`53d1564`). 256 test yeşil.
-  Bulgusu sonraki her şeyi etkiliyor: p95 kuyruğu (692-800 ms) **anahtar kare uzaklığı
-  değil süreç açılışı**. Hiç kare çözmeyen `ffprobe -show_format` bile aynı kuyruğu
-  gösteriyor. Yani maliyet süreç başına, kare başına değil — özelliği daraltmak bunu
-  düşürmez, kalıcı süreç düşürür.
-- **Paylaşım hedefi kararı.** storage.to birincil, uguu.se ikincil. Google Drive iptal.
-- **Oynatıcı planı.** `docs/PLAN-karsilastirma-oynatici.md`.
-- **Konsey §2 hükümsüz.** "Duran kare, oynatma yok" maddesi kullanıcı talebiyle geçersiz.
+---
 
-## Koşan üç sözleşme — hepsi `open`, hiçbiri mühürlü değil
+## 1. İlk iş — devralan oturum buradan başlasın
 
-| # | İş | Nerede kaldı |
-|---|---|---|
-| **T33** | oynatma mimarisi ölçüm kapısı | **main'e birleşti** (`621d41e`), `status: active`, mühürsüz. Boru: **G1 geçti** (2×960×540'ta 309 fps, p99 5,02 ms), **G2 kaldı** (2×1080p'de 37,5 fps, p99 30,5 ms), G3 karara bağlanmadı (ön sonuç %36-84). **libmpv hiç ölçülmedi** |
-| ~~T35~~ | storage.to + uguu.se sağlayıcıları | **main'e birleşti** (`4e0805f`). 296 test yeşil, canlı ağ denemesi iki sağlayıcıda da geçti, Drive'ın yedi dosyası silindi, `t31-drive` etiketi atıldı |
-| **T36** | ayarlar sekmesi + kalite panelleri | **main'e birleşti** (`b34f3ba`), `status: open`, tur 1. Build 0 uyarı, 343 test yeşil. Kalan: `paylasim-hedefleri.json` ile gerçek okuma denemesi ve pencereyi açıp yerleşim ölçümü |
+**libmpv hiç ölçülmedi ve karar ona bağlı.**
 
-Üçü de kendi worktree'sinde. Devam ederken **worktree'leri main'e birleştir**, yeni ajan
-açma — işleri yarım ve bağlamları kendi transcript'lerinde.
+T33 boru yaklaşımını ölçtü: 2×960×540'ta 309 fps (G1 geçti), 2×1920×1080'de 37,5 fps
+(G2 kaldı). Kullanıcının açıkça istediği **60+ fps 1080p'de boruyla karşılanamıyor.**
+Verebilecek tek aday libmpv ve sırası hiç gelmedi.
 
-## Kullanıcıya sorulacak tek açık soru
+Ondan önce **iki ucuz şey denenmeli** — T33 ikisini de denemediğini yazdı ve ikisi de
+duvarı kaldırabilir:
 
-**180 MB'ın kaynağı yok.** Kullanıcı üç etiket istedi: 16 → WhatsApp için önerilen,
-128 → paylaşım için en fazla, 180 → WhatsApp için en fazla.
+1. **Paylaşımlı bellek** (boru yerine)
+2. **Daha büyük boru tamponu**
 
-16 ve 128 ölçülmüş sayılar (128 = uguu.se'nin ölçülmüş tavanı). **180 doğrulanmadı.**
-T36'ya WhatsApp'ın kendi yardım sayfasından okumasını ve okuyamazsa bildirmesini söyledim;
-cevabı raporunda. `RULES.md` ölçü uydurmayı yasaklıyor ve ipucu metni olgusal bir iddia —
-yanlışsa kullanıcıya yalan söylemiş oluruz.
+Ucuzsa boru yolu 1080p'de kurtarılır ve libmpv'nin +60-100 MB'ı, karışık GPLv2+/LGPL
+lisansı ve süreç içi çökme riski hiç ödenmez. Pahalıysa libmpv ölçülür.
 
-## Ölçülmüş, tekrar ölçülmeyecek
+Sözleşme: `.claude/relay/contracts/T33.md` (`status: active`, mühürsüz).
+Ölçüm: `docs/olcumler/T33-oynatma-olcumleri.md`.
 
-Bu oturumda bu makineden gerçek dosyayla ölçüldü (ayrıntı:
-`docs/taramalar/anonim-kisa-omurlu-video.md`):
+## 2. Kullanıcıya sorulacak tek şey
 
-- **Türkiye'de engelli:** 0x0.st ve bashupload.com (`88.255.216.16` sinkhole),
-  litterbox'ın sunum alan adı `litter.catbox.moe` (`195.175.254.2`, sahte sertifika
-  `CN=localhost.localdomain`), qu.ax ve transfer.sh (bağlantı sıfırlanıyor).
-- **litterbox tuzağı:** API çalışıyor ve bağlantı dönüyor, engel yalnız indirme alan
-  adında. Ana sayfanın açılması dosya bağlantısının açıldığı anlamına gelmiyor —
-  yeni bir aday değerlendirilirken **sunum alan adı ayrıca sınanacak**.
+**180 MB'ın kaynağı yok.**
+
+Kullanıcı üç etiket istedi: 16 → WhatsApp için önerilen, 128 → paylaşım için en fazla,
+180 → WhatsApp için en fazla. İlk ikisi ölçülmüş sayılar (128 = uguu.se'nin ölçülmüş
+tavanı). **180'i destekleyen hiçbir kaynak bulunamadı.**
+
+T36 WhatsApp'ın yardım sayfasını okumayı denedi ve okuyamadı: `faq.whatsapp.com` sayfaları
+JavaScript ile kuruluyor, dört makale çekildi, üçü "Sayfa bulunamadı" döndü. Doğrulanabilen
+tek iki sayı: **sohbet içi medya 16 MB, belge 2 GB.**
+
+T36'nın kararı doğruydu: yongayı ekledi ama etiketi "WhatsApp için en fazla" değil
+**"Yalnız belge olarak"** yaptı, doğrulanmış 16 MB tavanından kurdu.
+
+**Soru:** 180 nereden geliyordu? Kaynağı yoksa etiket böyle mi kalsın?
+
+## 3. Bu oturumda kapananlar
+
+| İş | Sonuç |
+|---|---|
+| **T32** kare servisi | main'de (`53d1564`). p95 kuyruğu **süreç açılışı** çıktı, anahtar kare uzaklığı değil |
+| **T35** paylaşım sağlayıcıları | main'de (`4e0805f`). storage.to + uguu.se, Drive silindi, `t31-drive` etiketi atıldı |
+| **T36** ayarlar sekmesi | main'de (`b34f3ba`). Sekme, yedi yonga, kalite panelleri, güncelleme ayarı taşındı |
+| **T33** oynatma ölçümü | main'de (`621d41e`). G1 geçti, G2 kaldı, libmpv ölçülmedi |
+| Oynatıcı planı | `docs/PLAN-karsilastirma-oynatici.md` |
+| Paylaşım taraması | `docs/taramalar/anonim-kisa-omurlu-video.md` |
+
+Dördü de **mühürsüz** — hiçbiri denetlenmedi. Denetlenmemiş `submitted` sözleşmeler de
+birikti; bir denetim turu gerekiyor.
+
+## 4. Ölçülmüş — tekrar ölçme
+
+### Türkiye engeli (bu makineden, gerçek dosyayla)
+
+- **Engelli:** 0x0.st ve bashupload.com (`88.255.216.16` sinkhole), litterbox'ın sunum
+  alan adı `litter.catbox.moe` (`195.175.254.2`, sahte sertifika `CN=localhost.localdomain`),
+  qu.ax ve transfer.sh (bağlantı sıfırlanıyor).
+- **litterbox tuzağı — kalıcı kural:** API çalışıyor, dosya yükleniyor, bağlantı dönüyor;
+  engel yalnız indirme alan adında. **Ana sayfanın açılması dosya bağlantısının açıldığı
+  anlamına gelmiyor.** Yeni bir aday değerlendirilirken sunum alan adı ayrıca sınanacak.
+
+### Sağlayıcılar
+
 - **storage.to:** üç adımlı anonim akış çalışıyor, `owner_token` ile silme çalışıyor
-  (410 Gone), CDN `video/mp4` + `Accept-Ranges` + `206`, ömür 1-7 gün seçilebiliyor.
-  Paylaşılacak bağlantı `file.url`, CDN URL'i **değil** (o ~30 dakikada sona eriyor).
+  (410 Gone), CDN `video/mp4` + `Accept-Ranges` + `206`, ömür 1-7 gün seçilebiliyor,
+  tavan 25 GB. Paylaşılacak bağlantı **`file.url`**, CDN URL'i değil (o ~30 dk'da ölüyor).
+  Paylaşım sayfasında `<video controls playsInline>` var — **doğrulandı**, T35'in
+  "teyit edilmedi" notu `HttpClient`'a çıkan Cloudflare 403'ünden, tarayıcıda sorun yok.
 - **uguu.se:** 3 saat, 128 MiB, `video/mp4` + `206`, **silme jetonu yok**.
-- **pixeldrain:** anonim yükleme kapalı (`401 authentication_required`).
-- **catbox:** kalıcı ve anonim yükleme silinemiyor (`No userhash provided!`).
+- **pixeldrain:** anonim yükleme kapalı (`401`). **catbox:** kalıcı ve silinemiyor.
 
-## Sonraki adımlar
+### Oynatma
 
-1. Üç worktree'yi main'e birleştir, raporlarını oku.
-2. 180 sorusunu kullanıcıya sor.
-3. T33 biterse kazanan mimariye göre **T38'i yaz** (kare kaynağı) — plan §7'de sıra var.
-4. Denetlenmemiş `submitted` sözleşmeler birikti; bir denetim turu gerekiyor.
+- Boru duvarı: 2×1080p'de ffmpeg 172 fps üretiyor, boru 37 teslim ediyor — **%78 taşımada
+  kayboluyor.** Duvar boru, kod çözme değil.
+- Boru yolunda 2×1080p'nin pratik tavanı **30 fps**.
+- **fps düşer, çözünürlük düşmez** kararı ölçümle desteklendi.
 
-## Açık kalan eski işler
+## 5. T35 ve T36'nın bıraktıkları
+
+- Sağlayıcılar **arayüze bağlanmadı** — `paylasim-hedefleri.json` ile gerçek okuma denemesi
+  ve pencereyi açıp ayarlar sekmesinin yerleşim ölçümü yapılmadı.
+- Sürdürülebilir (resumable) yükleme yok — büyük dosyada kopan bağlantı baştan başlar.
+
+## 6. Açık kalan eski işler
 
 T20 (donanım ilk deneme aşımı), T28 (ilk kurulumda GPU teşhisi), T4, T5, T9.
 
-## T35'in bıraktıkları — devam eden oturuma
+## 7. Bu oturumda tekrarlayan bir sorun
 
-- Sağlayıcılar **arayüze bağlanmadı**. `paylasim-hedefleri.json` şemaya göre yazıldı ama
-  T36'nın arayüzüyle birlikte görülmedi; son hâli sayılmamalı.
-- Sürdürülebilir (resumable) yükleme yok — büyük dosyada kopan bağlantı baştan başlar.
-- T35 "storage.to paylaşım sayfasının tarayıcıda oynadığı teyit edilmedi" diye yazdı,
-  sebebi `HttpClient`'a dönen Cloudflare 403'ü. **Bu zaten doğrulandı** — T0 aynı oturumda
-  sayfayı çekti, içinde `<video controls playsInline preload="metadata">` ve imzalı CDN
-  kaynağı var, CDN başlıkları da ölçüldü (`video/mp4`, `Accept-Ranges`, `206`).
-  Tekrar ölçmeye gerek yok; 403 tarayıcı olmayan istemciye çıkan bot koruması.
+**Dört ajan işi commit etmeden durdu**, biri worktree'si temizlenirken işini neredeyse
+kaybetti, ikisi sözleşme dosyası commit'li olmadığı için hiç başlayamadı.
 
-## T33'ün en önemli bulgusu — sonraki kararı bu belirliyor
-
-**Duvar borunun kendisi, kod çözme değil.** 2×1080p'de ffmpeg 172 fps üretebiliyor ama
-boru 37 teslim ediyor; kapasitenin %78'i taşımada kayboluyor. Kanıt CPU sütununda:
-çözünürlük yükseldikçe ffmpeg'in CPU'su **düşüyor** (%638 → %137) — süreç kareyi
-hesaplamakla değil boruya yazmakla meşgul.
-
-Sonucu: **boru yolunda 2×1080p'nin pratik tavanı 30 fps.** Kullanıcının açıkça istediği
-60+ fps 1080p'de boruyla karşılanamıyor. 2×1280×720'de (153 fps) ve 2×960×540'ta
-(309 fps) rahat karşılanıyor.
-
-**60+ fps'i 1080p'de verebilecek tek aday libmpv ve o hiç ölçülmedi.** Devam eden oturumun
-ilk işi Ö7 olmalı — karar kuralı onsuz işletilemiyor.
-
-T33 iki şeyin de denenmediğini yazdı ve ikisi duvarı kaldırabilir: **paylaşımlı bellek**
-ve **daha büyük boru tamponu**. Ö7'den önce bunlar denenmeli; ucuzsa boru yolu 1080p'de
-kurtarılabilir.
-
-## 180 sorusunun cevabı geldi — karar kullanıcıda
-
-T36 WhatsApp'ın yardım sayfasını okumayı denedi ve **okuyamadı**: `faq.whatsapp.com`
-sayfaları JavaScript ile kuruluyor, dört makale çekildi, üçü "Sayfa bulunamadı" döndü,
-biri kırpılmış geldi ve hiçbirinde sayı yoktu.
-
-WhatsApp'ın kendi SSS metninden alıntılanmış hâlde doğrulanabilen iki sayı var:
-**sohbet içi medya 16 MB, belge 2 GB.** 180 MB'ı destekleyen hiçbir kaynak bulunamadı.
-
-T36'nın kararı: yonga eklendi (kullanıcı istedi) ama etiketi **"WhatsApp için en fazla"
-değil, "Yalnız belge olarak"** — doğrulanmış 16 MB tavanından kuruldu. Doğru davranış:
-yongayı atmadı, uydurma da yapmadı.
-
-**Kullanıcıya sorulacak:** 180 nereden geliyor? Kaynağı yoksa etiket "Yalnız belge olarak"
-kalsın mı, yoksa yonga sayısız mı bırakılsın?
+Sözleşmelere "her adımdan sonra commit at" maddesini yazmak yetmedi — ajanlar duraklarken
+uygulamıyor. Devralan oturum ajan açarken **sözleşmeyi önce commit etsin** ve ajan
+durduğunda worktree'yi kendi kontrol etsin.

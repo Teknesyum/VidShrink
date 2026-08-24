@@ -646,5 +646,11 @@
     "effort": "high",
     "t": "2026-08-24 01:01:53",
     "ajan": "ana oturum"
+  },
+  ".claude/relay/DURUM.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-24 08:41:51",
+    "ajan": "ana oturum"
   }
 }
