@@ -25,24 +25,23 @@ public sealed class BulletPaintingTests
     /// <summary>Madde listesi taşıyabilen temalar.</summary>
     private static readonly string[] BulletThemes = ["TipText", "BulletText"];
 
-    private static Styles LoadControls()
+    private static Styles LoadControls() => AppHost.Run(() =>
     {
-        AppHost.Ensure();
         var include = new StyleInclude(new Uri("avares://VidShrink.App/"))
         {
             Source = new Uri("avares://VidShrink.App/Themes/Controls.axaml")
         };
 
         return (Styles)include.Loaded;
-    }
+    });
 
-    private static object Resource(string key)
+    private static object Resource(string key) => AppHost.Run<object>(() =>
     {
         Assert.True(
             Controls.TryGetResource(key, ThemeVariant.Dark, out var value) && value is not null,
             $"Controls.axaml kaynak ağacında {key} yok.");
         return value!;
-    }
+    });
 
     /// <summary>
     /// Vurgu fırçası blokun kendi kaynağına konur: boyayıcı onu anahtarla arar, yani ekranda
@@ -58,7 +57,7 @@ public sealed class BulletPaintingTests
     [Theory]
     [InlineData("TipText")]
     [InlineData("BulletText")]
-    public void BulletRunCarriesTheAccentBrush(string themeKey)
+    public void BulletRunCarriesTheAccentBrush(string themeKey) => AppHost.Run(() =>
     {
         var block = Block(themeKey);
         var accent = (IBrush)Resource("NeonBlue");
@@ -73,12 +72,12 @@ public sealed class BulletPaintingTests
         Assert.All(bullets, run => Assert.Same(accent, run.Foreground));
         Assert.All(bodies, run => Assert.NotSame(accent, run.Foreground));
         Assert.Equal("• First line.\n• Second line.", block.Tag);
-    }
+    });
 
     [Theory]
     [InlineData("TipText")]
     [InlineData("BulletText")]
-    public void BulletThemeSpacesTheLines(string themeKey)
+    public void BulletThemeSpacesTheLines(string themeKey) => AppHost.Run(() =>
     {
         var theme = (ControlTheme)Resource(themeKey);
         var step = (double)Resource("SpaceXs");
@@ -92,7 +91,7 @@ public sealed class BulletPaintingTests
         Assert.Single(spacing);
         Assert.Equal(step, Assert.IsType<double>(spacing[0]));
         Assert.True(step > 0);
-    }
+    });
 
     /// <summary>
     /// Ekranda madde taşıyan her blok boyanan temalardan birini kullanacak. Hakkında
