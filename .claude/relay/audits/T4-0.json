@@ -1,0 +1,20 @@
+{
+  "contractId": "T4",
+  "auditorRunId": "a3707154af2a0a912",
+  "headSha": "616a6672c4211105246a630b4198cdcc9cda7a5e",
+  "diffHash": "3ca21cdff42a54391bc768190527ed5fe82d1419e514c1447b25129120de5b08",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/CompressionStrategy.cs",
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/ComplexityProfile.cs",
+    "src/VidShrink.Ffmpeg/ComplexityProbe.cs",
+    "tests/VidShrink.Tests/ExtremeCompressionTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 417 basarili, 0 basarisiz, 12 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T19:26:54.280Z"
+}
