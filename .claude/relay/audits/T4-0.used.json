@@ -1,7 +1,7 @@
 {
   "contractId": "T4",
   "auditorRunId": "a3707154af2a0a912",
-  "headSha": "616a6672c4211105246a630b4198cdcc9cda7a5e",
+  "headSha": "24da80df1690c491082eb1debcb45166791f1f0d",
   "diffHash": "3ca21cdff42a54391bc768190527ed5fe82d1419e514c1447b25129120de5b08",
   "owns": [
     "src/VidShrink.Core/PlanCalculator.cs",
@@ -16,5 +16,7 @@
     "dotnet test: 417 basarili, 0 basarisiz, 12 atlanan"
   ],
   "result": "GECTI",
-  "createdAt": "2026-08-25T19:26:54.280Z"
+  "createdAt": "2026-08-25T19:28:11.970Z",
+  "usedAt": "2026-08-25T19:28:12.523Z",
+  "completedSha": "24da80df1690c491082eb1debcb45166791f1f0d"
 }
