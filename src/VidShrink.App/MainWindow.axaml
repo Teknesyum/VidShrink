@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -98,49 +98,81 @@
         </Grid>
       </Border>
 
-      <Border x:Name="UpdateNotice"
-              Grid.Row="1"
-              Margin="24,12,24,0"
-              IsVisible="False"
-              Background="{StaticResource Surface}"
-              BorderBrush="{StaticResource NeonPurpleBorder}"
-              BorderThickness="{StaticResource BorderThin}"
-              CornerRadius="{StaticResource RadiusControl}"
-              BoxShadow="{StaticResource GlowPurple}"
-              Padding="{StaticResource ButtonPaddingSm}">
-        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-          <TextBlock Grid.Column="0"
-                     x:Name="TxtNoticeLead"
-                     Text="A new version is available"
-                     Theme="{StaticResource Body}"
+      <StackPanel Grid.Row="1">
+        <Border x:Name="AppliedNotice"
+                Margin="24,12,24,0"
+                IsVisible="False"
+                Background="{StaticResource Surface}"
+                BorderBrush="{StaticResource NeonBlueBorder}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusControl}"
+                BoxShadow="{StaticResource GlowBlue}"
+                Padding="{StaticResource ButtonPaddingSm}">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+            <TextBlock Grid.Column="0"
+                       x:Name="TxtAppliedLead"
+                       Text="Updated to a new version"
+                       Theme="{StaticResource Body}"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="1"
+                       x:Name="TxtAppliedVersion"
+                       Theme="{StaticResource MonoValue}"
+                       Foreground="{StaticResource NeonBlue}"
+                       VerticalAlignment="Center"/>
+            <Button Grid.Column="3"
+                    x:Name="BtnAppliedDismiss"
+                    Content="×"
+                    Theme="{StaticResource GhostButton}"
+                    FontFamily="{StaticResource FontMono}"
+                    VerticalAlignment="Center"
+                    auto:AutomationProperties.Name="Close"
+                    Click="OnDismissAppliedNotice"/>
+          </Grid>
+        </Border>
+
+        <Border x:Name="UpdateNotice"
+                Margin="24,12,24,0"
+                IsVisible="False"
+                Background="{StaticResource Surface}"
+                BorderBrush="{StaticResource NeonPurpleBorder}"
+                BorderThickness="{StaticResource BorderThin}"
+                CornerRadius="{StaticResource RadiusControl}"
+                BoxShadow="{StaticResource GlowPurple}"
+                Padding="{StaticResource ButtonPaddingSm}">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+            <TextBlock Grid.Column="0"
+                       x:Name="TxtNoticeLead"
+                       Text="A new version is available"
+                       Theme="{StaticResource Body}"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="1"
+                       x:Name="TxtNoticeVersion"
+                       Theme="{StaticResource MonoValue}"
+                       Foreground="{StaticResource NeonPurple}"
+                       VerticalAlignment="Center"/>
+            <TextBox Grid.Column="2"
+                     x:Name="TxtNoticeCommand"
+                     IsReadOnly="True"
+                     MaxLines="1"
+                     FontFamily="{StaticResource FontMono}"
                      VerticalAlignment="Center"/>
-          <TextBlock Grid.Column="1"
-                     x:Name="TxtNoticeVersion"
-                     Theme="{StaticResource MonoValue}"
-                     Foreground="{StaticResource NeonPurple}"
-                     VerticalAlignment="Center"/>
-          <TextBox Grid.Column="2"
-                   x:Name="TxtNoticeCommand"
-                   IsReadOnly="True"
-                   MaxLines="1"
-                   FontFamily="{StaticResource FontMono}"
-                   VerticalAlignment="Center"/>
-          <Button Grid.Column="3"
-                  x:Name="BtnNoticeCopy"
-                  Content="Copy"
-                  Theme="{StaticResource GhostButton}"
-                  VerticalAlignment="Center"
-                  Click="OnCopyUpdateCommand"/>
-          <Button Grid.Column="4"
-                  x:Name="BtnNoticeDismiss"
-                  Content="×"
-                  Theme="{StaticResource GhostButton}"
-                  FontFamily="{StaticResource FontMono}"
-                  VerticalAlignment="Center"
-                  auto:AutomationProperties.Name="Close"
-                  Click="OnDismissUpdateNotice"/>
-        </Grid>
-      </Border>
+            <Button Grid.Column="3"
+                    x:Name="BtnNoticeCopy"
+                    Content="Copy"
+                    Theme="{StaticResource GhostButton}"
+                    VerticalAlignment="Center"
+                    Click="OnCopyUpdateCommand"/>
+            <Button Grid.Column="4"
+                    x:Name="BtnNoticeDismiss"
+                    Content="×"
+                    Theme="{StaticResource GhostButton}"
+                    FontFamily="{StaticResource FontMono}"
+                    VerticalAlignment="Center"
+                    auto:AutomationProperties.Name="Close"
+                    Click="OnDismissUpdateNotice"/>
+          </Grid>
+        </Border>
+      </StackPanel>
 
       <Grid Grid.Row="2" Margin="24,12,24,12">
         <StackPanel x:Name="LangSwitch"

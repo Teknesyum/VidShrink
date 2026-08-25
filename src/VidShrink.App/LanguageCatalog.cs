@@ -275,6 +275,7 @@ internal static class LanguageCatalog
         ["When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."] = "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
         ["VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it."] = "VidShrink bu sistemde kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
         ["A new version is available"] = "Yeni bir sürüm var",
+        ["Updated to a new version"] = "Yeni sürüme geçildi",
         ["Over the target"] = "Hedefin üzerinde",
         ["Try again"] = "Tekrar dene",
         ["Leave it as is"] = "Bu haliyle bırak",

@@ -14,4 +14,5 @@
 - [Geçiş anı ekran görüntüsü](avalonia-gecis-anli-ekran-goruntusu.md) — geçişli özelliği değiştirdikten hemen sonra çizme ve okuma; gizli-ama-odaklanabilir kalıbı
 - [Görüntü üstünde kontrast](goruntu-ustunde-kontrast.md) — kare üstündeki metni beyaz kareye göre hesapla; neon metin tek perdede AA'yı geçmiyor
 - [Kaynak kapatma kilidi](vidshrink-kaynak-kapatma-kilidi.md) — Dispose'u arayüz kuyruğunda bekletme; Task.Run'a al, kurulumları zincirle
+- [Probe klasörü kirlenmesi](vidshrink-probe-klasoru-kirlenmesi.md) — eski .axaml artığı probe'da ikinci MainWindow üretir; hata sürüm uyuşmazlığı gibi okunur
 - [Ekran dışı koşu](vidshrink-ekran-disi-kosu.md) — gerçek MainWindow'u ekran dışında sürme; SetupWithLifetime, bekçi thread, hstack'li ffmpeg sayımı

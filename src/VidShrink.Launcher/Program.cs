@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using VidShrink.Core;
 
@@ -17,9 +17,6 @@ internal static class Program
 
     /// <summary>İndirilenlerin toplandığı klasör; Updater ile aynı ad.</summary>
     private const string StageDirectoryName = "update-stage";
-
-    /// <summary>Uygulamanın "hangi sürüme geçildi" satırı için okuduğu işaret.</summary>
-    public const string AppliedMarkerName = ".update-applied";
 
     [STAThread]
     private static int Main(string[] args)
@@ -94,7 +91,7 @@ internal static class Program
     {
         var current = UpdateCheck.ReadVersionMarker(appDirectory);
         if (previousVersion is null || current is null || current == previousVersion) return;
-        File.WriteAllText(Path.Combine(appDirectory, AppliedMarkerName), current);
+        AppliedUpdateNotice.Write(appDirectory, current);
     }
 
     /// <summary>
