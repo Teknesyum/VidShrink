@@ -1,0 +1,22 @@
+{
+  "contractId": "T22",
+  "auditorRunId": "a78c5049fdfe8a38c",
+  "headSha": "a2c87f123d695e5fce2d66789cef7ec899d298d2",
+  "diffHash": "92d33541a0aeec047e35a341b3d35d0ca5931a3b29f687a144da5ee7725efee3",
+  "owns": [
+    "src/VidShrink.Launcher/Splash.cs",
+    "src/VidShrink.Launcher/Program.cs",
+    "src/VidShrink.Launcher/VidShrink.Launcher.csproj",
+    "tools/VidShrink.SplashGen/Program.cs",
+    "tools/VidShrink.SplashGen/VidShrink.SplashGen.csproj",
+    "tests/VidShrink.Tests/SplashTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:56:36.386Z",
+  "usedAt": "2026-08-25T18:56:36.479Z",
+  "completedSha": "a2c87f123d695e5fce2d66789cef7ec899d298d2"
+}

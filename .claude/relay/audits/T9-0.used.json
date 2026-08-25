@@ -1,0 +1,21 @@
+{
+  "contractId": "T9",
+  "auditorRunId": "abcb58cf07cfd4c83",
+  "headSha": "c8cbb723d3bcb06062afad2473f71912a9bc11ae",
+  "diffHash": "2087e1019cb16fc013f2e13557ec1a0fd26e644255af62704f50f434498102c6",
+  "owns": [
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Ffmpeg/FfmpegArguments.cs",
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/HardwareFlagTests.cs",
+    "src/VidShrink.App/MainWindow.xaml.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 405 basarili, 0 basarisiz, 9 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T19:12:05.185Z",
+  "usedAt": "2026-08-25T19:12:21.979Z",
+  "completedSha": "c8cbb723d3bcb06062afad2473f71912a9bc11ae"
+}

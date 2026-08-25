@@ -1,0 +1,21 @@
+{
+  "contractId": "T35",
+  "auditorRunId": "a6fde4b0dd095431e",
+  "headSha": "a2c87f123d695e5fce2d66789cef7ec899d298d2",
+  "diffHash": "7121368e039c280db6306b648a22699a6dd28f0b549c087ccb21f857f95fe146",
+  "owns": [
+    "src/VidShrink.Core/Share/",
+    "tests/VidShrink.Tests/ShareProviderTests.cs",
+    "tests/VidShrink.Tests/DriveShareTests.cs",
+    "tests/VidShrink.Tests/DriveRetentionTests.cs",
+    "paylasim-hedefleri.json"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:57:31.138Z",
+  "usedAt": "2026-08-25T18:57:31.240Z",
+  "completedSha": "a2c87f123d695e5fce2d66789cef7ec899d298d2"
+}
