@@ -1,0 +1,20 @@
+{
+  "contractId": "T10",
+  "auditorRunId": "a0129975597704a05",
+  "headSha": "1ca0c53f01e5c3db865bac6c1796691585084e13",
+  "diffHash": "636e05f615e25a44ead58f433894226987a29b18479d84f7003a7ba6d4d904e3",
+  "owns": [
+    "src/VidShrink.Ffmpeg/CalibrationProbe.cs",
+    "src/VidShrink.Ffmpeg/ComplexityProbe.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/CalibrationProbeTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:29:06.072Z",
+  "usedAt": "2026-08-25T18:29:24.760Z",
+  "completedSha": "1ca0c53f01e5c3db865bac6c1796691585084e13"
+}

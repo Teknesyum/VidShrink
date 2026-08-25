@@ -1,0 +1,23 @@
+{
+  "contractId": "T3",
+  "auditorRunId": "a6058fe2e24f74c79",
+  "headSha": "1ca0c53f01e5c3db865bac6c1796691585084e13",
+  "diffHash": "2b89a4a8898cbd1467117e015572d1343d1d7921017be45060903e2a45731475",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/EncodePlan.cs",
+    "src/VidShrink.Core/ComplexityProfile.cs",
+    "src/VidShrink.Ffmpeg/EncodeRunner.cs",
+    "tests/VidShrink.Tests/FillBandTests.cs",
+    "tests/VidShrink.Tests/SpeedModeTests.cs",
+    "tests/VidShrink.Tests/PlanCalculatorTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:29:06.071Z",
+  "usedAt": "2026-08-25T18:29:24.693Z",
+  "completedSha": "1ca0c53f01e5c3db865bac6c1796691585084e13"
+}

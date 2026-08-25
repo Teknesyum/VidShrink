@@ -1,0 +1,22 @@
+{
+  "contractId": "T17",
+  "auditorRunId": "a06d34a738d9b475d",
+  "headSha": "1ca0c53f01e5c3db865bac6c1796691585084e13",
+  "diffHash": "eedf4e7fd54783e92cbfc0e0d3d0a5cd2c16bf108086a1fe9aa3f57251288aa6",
+  "owns": [
+    ".github/workflows/release.yml",
+    ".github/workflows/manifest.md",
+    "Directory.Build.props",
+    "tools/VidShrink.Manifest/Program.cs",
+    "tools/VidShrink.Manifest/VidShrink.Manifest.csproj",
+    "VidShrink.sln"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:29:06.075Z",
+  "usedAt": "2026-08-25T18:29:24.905Z",
+  "completedSha": "1ca0c53f01e5c3db865bac6c1796691585084e13"
+}

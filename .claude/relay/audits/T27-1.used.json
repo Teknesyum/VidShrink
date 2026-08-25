@@ -1,0 +1,19 @@
+{
+  "contractId": "T27",
+  "auditorRunId": "a966d818f9f07596d",
+  "headSha": "1ca0c53f01e5c3db865bac6c1796691585084e13",
+  "diffHash": "48dc9bab2d643f98522da0c48c720a6c3b8bd20bdf2ba33882716a806b1250ae",
+  "owns": [
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:30:17.523Z",
+  "usedAt": "2026-08-25T18:30:17.796Z",
+  "completedSha": "1ca0c53f01e5c3db865bac6c1796691585084e13"
+}

@@ -1,0 +1,18 @@
+{
+  "contractId": "T30",
+  "auditorRunId": "a2da8cfb189ca4625",
+  "headSha": "1ca0c53f01e5c3db865bac6c1796691585084e13",
+  "diffHash": "686613d769ebb088fb8ef80eca2e3d3359b36fc01bab71fe1ba86b626ed8d636",
+  "owns": [
+    "tools/VidShrink.Bench/Program.cs",
+    "docs/olcumler/T30-panel-olcumleri.md"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:29:06.078Z",
+  "usedAt": "2026-08-25T18:29:25.234Z",
+  "completedSha": "1ca0c53f01e5c3db865bac6c1796691585084e13"
+}
