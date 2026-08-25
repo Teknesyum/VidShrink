@@ -39,6 +39,9 @@ internal partial class ControlStrip : UserControl
     private TimeSpan? _duration;
     private TimeSpan _position;
     private double _encodeFraction = -1;
+    private int _encodePass;
+    private int _encodePassCount;
+    private int _encodeAttempt;
 
     public ControlStrip()
     {
@@ -168,6 +171,9 @@ internal partial class ControlStrip : UserControl
         }
 
         _encodeFraction = fraction;
+        _encodePass = pass;
+        _encodePassCount = passCount;
+        _encodeAttempt = attempt;
         EncodeText.Text = LanguageCatalog.EncodeMarker(_turkish, pass, passCount, attempt);
         Refresh();
     }
@@ -196,7 +202,7 @@ internal partial class ControlStrip : UserControl
         AutomationProperties.SetName(Bar, Say("Denetim şeridi", "Control strip"));
 
         if (_encodeFraction >= 0)
-            EncodeText.Text = LanguageCatalog.EncodeMarker(turkish, DemoPass, DemoPassCount, DemoAttempt);
+            EncodeText.Text = LanguageCatalog.EncodeMarker(turkish, _encodePass, _encodePassCount, _encodeAttempt);
 
         Refresh();
     }
@@ -349,6 +355,7 @@ internal partial class ControlStrip : UserControl
     private const int DemoPass = 1;
     private const int DemoPassCount = 2;
     private const int DemoAttempt = 2;
+    private const double DemoEncodeFraction = 0.22;
 
     /// <summary>
     /// Kare kaynağı da kodlama da bağlı değilken şeridi denenebilir tutan sahte saat.
@@ -360,6 +367,7 @@ internal partial class ControlStrip : UserControl
 
         Duration = TimeSpan.FromSeconds(90);
         IsPlaying = true;
+        SetEncodeProgress(DemoEncodeFraction, DemoPass, DemoPassCount, DemoAttempt);
 
         _demoClock = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _demoClock.Tick += (_, _) =>
