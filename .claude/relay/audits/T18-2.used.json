@@ -1,0 +1,24 @@
+{
+  "contractId": "T18",
+  "auditorRunId": "af472e849f5fb5e4b",
+  "headSha": "9fa55ace149e9b5f7b0c6fcd1ca01ae0588c78b7",
+  "diffHash": "3891c6a1a115fbea9d97c6617bc55f0f24972d5ec6748f478883cc8faff4d197",
+  "owns": [
+    "src/VidShrink.Launcher/Program.cs",
+    "src/VidShrink.Launcher/Updater.cs",
+    "src/VidShrink.Launcher/VidShrink.Launcher.csproj",
+    "src/VidShrink.Core/UpdateCheck.cs",
+    "tests/VidShrink.Tests/UpdaterTests.cs",
+    "Install-VidShrink.ps1",
+    "install-vidshrink.sh",
+    "README.md"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T18:37:36.858Z",
+  "usedAt": "2026-08-25T18:37:36.950Z",
+  "completedSha": "9fa55ace149e9b5f7b0c6fcd1ca01ae0588c78b7"
+}
