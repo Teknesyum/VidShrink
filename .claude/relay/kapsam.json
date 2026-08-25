@@ -838,5 +838,41 @@
     "effort": "medium",
     "t": "2026-08-25 18:52:31",
     "ajan": "builder"
+  },
+  "tests/VidShrink.Tests/AppHost.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-25 19:56:12",
+    "ajan": "ana oturum"
+  },
+  "tests/VidShrink.Tests/CasingTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-25 20:18:02",
+    "ajan": "ana oturum"
+  },
+  "AGENTS.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-25 20:27:34",
+    "ajan": "ana oturum"
+  },
+  ".calisma/EkranSonda/EkranSonda.csproj": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-25 20:33:04",
+    "ajan": "ana oturum"
+  },
+  ".calisma/EkranSonda/Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-25 20:35:28",
+    "ajan": "ana oturum"
+  },
+  "tests/VidShrink.Tests/WindowLayoutTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-25 20:36:22",
+    "ajan": "ana oturum"
   }
 }

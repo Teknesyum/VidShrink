@@ -1,0 +1,18 @@
+{
+  "contractId": "T33",
+  "auditorRunId": "aaf86cfa6ff598742",
+  "headSha": "cfa5d54f5a92a399e34b4da75521c02fc28f8ff5",
+  "diffHash": "dd4b808e41ec931d0cbaad708d0e66a4f31b021fb11b8349fbe159fae248a8d4",
+  "owns": [
+    "tools/VidShrink.Bench/Program.cs",
+    "docs/olcumler/T33-oynatma-olcumleri.md"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 417 basarili, 0 basarisiz, 12 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T19:31:49.356Z",
+  "usedAt": "2026-08-25T19:31:49.575Z",
+  "completedSha": "cfa5d54f5a92a399e34b4da75521c02fc28f8ff5"
+}

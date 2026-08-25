@@ -33,6 +33,37 @@ public static class FfmpegArguments
         _ => "slow"
     };
 
+    // Peak rate headroom. WidePeakFactor is the historical 1.5x and stays in force for the
+    // processor encoders, which hit a two-pass target regardless of the peak. Hardware VBR does
+    // not, and the peak is what caps the overspend. Measured on this machine with av1_nvenc
+    // (-rc vbr -multipass fullres, preset p5) over a 400 s 1080p60 source, delivered over
+    // requested bitrate:
+    //   requested 2088k: peak 1.50 -> 1.098   peak 1.20 -> 1.093   peak 1.10 -> 1.084   peak 1.05 -> 1.034
+    //   requested 1044k: peak 1.50 -> 1.218   peak 1.20 -> 1.186   peak 1.10 -> 1.085   peak 1.05 -> 1.042
+    // The overspend grows as the average falls and follows the peak once the peak binds, so the
+    // peak has to be tight where the encoder overshoots and may stay wide where it does not.
+    // A line through the two 1.50 points reaches 1.000 at 2941 kbit/s, so PeakScaleBitrateK is
+    // that crossing: at or below it the peak sits at TightPeakFactor, above it it opens back up
+    // to WidePeakFactor over the same span.
+    // TightPeakFactor is the tightest peak that still lands under the request, measured at the
+    // shape the plan actually picks for this source (1266x712@60, av1_nvenc p5):
+    //   requested  902k: peak 1.00 -> 0.978   peak 1.02 -> 0.995   peak 1.03 -> 1.013   peak 1.05 -> 1.028
+    //   requested 1930k: peak 1.00 -> 0.986   peak 1.02 -> 1.009
+    // 1.02 is the last peak on both rows that leaves the delivered size at or under the aim, and
+    // the aim is the band centre, so 1.009 of it is still inside the band.
+    public const double WidePeakFactor = 1.5;
+    public const double TightPeakFactor = 1.02;
+    public const int PeakScaleBitrateK = 2941;
+
+    public static double PeakRateFactor(string codec, int videoBitrateK)
+    {
+        if (!CodecModel.IsHardware(codec)) return WidePeakFactor;
+        var above = (double)videoBitrateK / PeakScaleBitrateK - 1.0;
+        return Math.Clamp(TightPeakFactor + (WidePeakFactor - TightPeakFactor) * above, TightPeakFactor, WidePeakFactor);
+    }
+
+    public static double BufferFactor(double peakFactor) => 1.0 + 2.0 * (peakFactor - 1.0);
+
     public static bool SupportsRateLimits(string codec)
         => !string.Equals(codec, "libsvtav1", StringComparison.OrdinalIgnoreCase);
 
@@ -69,7 +100,10 @@ public static class FfmpegArguments
         {
             a.AddRange(new[] { "-b:v", $"{plan.VideoBitrateK}k" });
             if (SupportsRateLimits(plan.Codec))
-                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * 1.5)}k", "-bufsize", $"{plan.VideoBitrateK * 2}k" });
+            {
+                var peak = PeakRateFactor(plan.Codec, plan.VideoBitrateK);
+                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * peak)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * BufferFactor(peak))}k" });
+            }
             if (CodecModel.IsHardware(plan.Codec))
                 a.AddRange(CodecModel.BitrateRateControlArgs(plan.Codec));
             else if (pass > 0)

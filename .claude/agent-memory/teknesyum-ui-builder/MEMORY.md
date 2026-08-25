@@ -18,3 +18,5 @@
 - [Ekran dışı koşu](vidshrink-ekran-disi-kosu.md) — gerçek MainWindow'u ekran dışında sürme; SetupWithLifetime, bekçi thread, hstack'li ffmpeg sayımı
 - [Tema ölçümü](vidshrink-tema-olcumu.md) — temayı ve boyayıcıyı pencere açmadan sınama; StyleInclude.Loaded, XDocument taraması
 - [Marka adı çevrilmez](vidshrink-marka-adi-cevrilmez.md) — "Buy me a coffee" ve "Teknesyum" LanguageCatalog'a çeviri girdisi almaz
+- [Bullet testi kararsiz](vidshrink-bullet-testi-kararsiz.md) — BulletPaintingTests ara sıra iş parçacığı hatasıyla düşer, ikinci koşuda geçer
+- [Maximized ölçüm tuzağı](vidshrink-maximized-olcum.md) — pencere Maximized; Measure boyutu geçer, Arrange çalışma alanına sabitlenir, taşma boyuttan bağımsız çıkar

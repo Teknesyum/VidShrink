@@ -66,7 +66,7 @@
             <TextBlock x:Name="TaglineConverter" Text="Media converter" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy me a coffee" Click="OnOpenSponsor">
+            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <!-- The two empty MoveTo commands pin the icon's own 24x24 design box, so Uniform
                      scales that box instead of the ink. Without them the stretch centres the ink,
@@ -76,7 +76,7 @@
                       Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.5"
                       StrokeLineCap="Round" StrokeJoin="Round"
                       Data="M 0 0 M 24 24 M 5 6.5 L 5 14.5 A 3 3 0 0 0 8 17.5 L 13 17.5 A 3 3 0 0 0 16 14.5 L 16 6.5 Z M 16 8.5 L 18 8.5 A 2.5 2.5 0 0 1 18 13.5 L 16 13.5 M 8 0.5 L 8 3.5 M 12 0.5 L 12 3.5"/>
-                <TextBlock x:Name="TxtSponsor" Text="Buy me a coffee" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TxtSponsor" Text="Buy Me a Coffee" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
             <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
@@ -211,7 +211,7 @@
                           </Transitions>
                         </Rectangle.Transitions>
                       </Rectangle>
-                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpaceSm}" Margin="{StaticResource PanelPadding}">
+                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpaceSm}" Margin="{StaticResource DropZonePadding}">
                         <Path x:Name="DropIcon"
                               Width="{StaticResource DropIconSize}"
                               Height="{StaticResource DropIconSize}"
@@ -347,12 +347,12 @@
                       </Button>
                       <Button x:Name="Chip180" Tag="180" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <StackPanel>
-                          <TextBlock Text="Document only" Theme="{StaticResource Label}" Margin="0"/>
+                          <TextBlock Text="WhatsApp Web maximum" Theme="{StaticResource Label}" Margin="0"/>
                           <TextBlock Text="180"/>
                         </StackPanel>
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp allows 16 MB for media sent in chat and 2 GB for a document, and publishes no limit in between.&#10;• 180 MB is therefore past the in-chat ceiling: the file goes through only when it is sent as a document.&#10;• Sent that way nothing is re-encoded, but the other side opens a file instead of playing a video."/>
+                            <TextBlock Theme="{StaticResource TipText}" Text="• On the phone: 16 MB in chat, 2 GB as a document.&#10;• WhatsApp Web takes 180 MB per file. The user reports this, WhatsApp does not publish it.&#10;• So a file of 180 MB or less goes through the web side as it is."/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
