@@ -324,13 +324,6 @@ internal static class LanguageCatalog
         return turkish && EnglishToTurkish.TryGetValue(titled, out var found) ? found : titled;
     }
 
-    /// <summary>
-    /// Upper case in the running language. The invariant culture writes "ISLENMIS" where
-    /// "İŞLENMİŞ" belongs, so Turkish goes through its own culture.
-    /// </summary>
-    internal static string Upper(string text, bool turkish)
-        => text.ToUpper(turkish ? TurkishCulture : CultureInfo.InvariantCulture);
-
     private static readonly IReadOnlyDictionary<string, string> ValidationTurkish = new Dictionary<string, string>
     {
         ["Trim times must use HH:MM:SS format."] = "Kırpma zamanları SS:DD:SS biçiminde yazılmalı.",

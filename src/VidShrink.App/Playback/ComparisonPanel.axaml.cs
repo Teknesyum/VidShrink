@@ -188,8 +188,8 @@ internal partial class ComparisonPanel : UserControl
         EmptyTitle.Text = Say("Comparison panel");
         EmptyHint.Text = Say(_notice ?? "Load a file to see the two sides");
         PlaceholderText.Text = Say("The panel moved to the front");
-        LeftBadgeText.Text = LanguageCatalog.Upper(Say("Original"), _turkish);
-        RightBadgeText.Text = LanguageCatalog.Upper(Say("Processed"), _turkish);
+        LeftBadgeText.Text = LanguageCatalog.Title(Say("Original"), _turkish);
+        RightBadgeText.Text = LanguageCatalog.Title(Say("Processed"), _turkish);
         RightCurtainText.Text = _rightNotice is null ? string.Empty : Say(_rightNotice);
     }
 
