@@ -211,7 +211,7 @@
                           </Transitions>
                         </Rectangle.Transitions>
                       </Rectangle>
-                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpaceSm}" Margin="{StaticResource PanelPadding}">
+                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="{StaticResource SpaceSm}" Margin="{StaticResource DropZonePadding}">
                         <Path x:Name="DropIcon"
                               Width="{StaticResource DropIconSize}"
                               Height="{StaticResource DropIconSize}"

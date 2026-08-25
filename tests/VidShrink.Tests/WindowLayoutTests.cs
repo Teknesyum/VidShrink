@@ -45,6 +45,18 @@ public sealed class WindowLayoutTests
         });
 
     [Fact]
+    public void TheEmptyWindowDoesNotScrollAtItsStartingSize()
+    {
+        var overflowing = LayOut(1560, 1060);
+
+        Assert.True(
+            overflowing.Count == 0,
+            "Açılış boyutunda taşan taşıyıcı var:"
+            + Environment.NewLine
+            + string.Join(Environment.NewLine, overflowing));
+    }
+
+    [Fact]
     public void NoTextIsClippedAtTheSmallestSize()
     {
         var clipped = AppHost.Run(() =>
