@@ -7,8 +7,10 @@ metadata:
 
 VidShrink (Avalonia 11 + .NET 8; arayuz dosyalari `.axaml` / `.axaml.cs`):
 `dotnet build VidShrink.sln -c Release` ve `dotnet test VidShrink.sln` kok dizinden calisir.
-PATH'teki `dotnet` 3.1.201 ve MSB3644 ile duser; `$env:DOTNET_ROOT = "$env:LOCALAPPDATA\Microsoft\dotnet"`
-kurup `& "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe"` cagir. Derlemeden once
+PATH'teki `dotnet` **9.0.316** (25.08.2026 itibariyle) ve net8.0 hedeflerini sorunsuz derliyor;
+dogrudan `dotnet build ...` cagir. `%LOCALAPPDATA%\Microsoft\dotnet\dotnet.exe` bu makinede
+**artik yok** - eski sozlesmelerin "PATH'teki dotnet 3.1.201, MSB3644 ile duser" ortam notu
+gecersiz. Once `dotnet --version` ile bak, sozlesmenin ortam notuna guvenme. Derlemeden once
 `Get-Process VidShrink.App | Stop-Process -Force`, yoksa App.dll kilitli kalir.
 
 **Why:** Ayni anda baska sozlesme kosarken bin/ kilidi cakisiyor; ikinci deneme genelde geciyor.
@@ -136,3 +138,21 @@ kurup `& "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe"` cagir. Derlemeden once
   hiziyla yoklarsa (60 Hz vs 60 fps) faz kilidi olmadigi icin kareler %25'e varan oranda
   bayatlayip duser; 180 Hz'de %1,3'e iner. Kare kaynagi olcerken tuketici hizini **besleme
   hizinin ustunde** tut, yoksa halka tasarimini haksiz yere sucluyorsun.
+
+- **Boruyu kare boyutunda tek `read` ile okuma.** Windows anonim borusunun ic tamponu kucuk;
+  15,8 MB'lik tek okuma istegi tamami gelene kadar bloklayip ureticiyle tuketiciyi siraya
+  sokuyor. 2x1920x1080 BGRA'da tek okuma 70,9 fps, ayni kareyi 64 KB parcalarla toplamak
+  148 fps veriyor; blok buyudukce kotulesiyor (2 kare 41,8 / 4 kare 22,6). 64 KB ile 256 KB
+  arasi fark yok, 1 MB biraz kotu. Parcali okuyan tam yol (aralik istatistigiyle) bu makinede
+  108-117 fps surduruyor.
+- Bir boru olcumunde `-re` kipinin p95/p99'una **aralik kapisi kurma**: ffmpeg'in gercek
+  zamanli hiz sinirlayicisi kareleri ikiserli salvolar halinde veriyor, p95 her panel
+  boyutunda ~30 ms (iki kare periyodu) cikiyor - boru hedefin bes kati hizli olsa bile.
+  O sayi ffmpeg'in temposu, borunun gecikmesi degil. Kapasite kapisi "azami hiz"
+  (`-re` yok) satirlarindan okunur.
+- Aralik/gecikme listesini `new List<double>(maxFrames)` ile boyutlandirma: donguluk boru
+  olcumlerinde `maxFrames` `int.MaxValue` geciliyor ve calisma "Array dimensions exceeded
+  supported range" ile hicbir sey yazmadan duser. `Math.Min(maxFrames, 1 << 16)` kullan.
+- Sinirli `Channel` ile ureticili tuketici yazarken **yazma tarafina iptal jetonu ver**:
+  tuketici hedef kare sayisina ulasip donguden cikinca uretici `WriteAsync` uzerinde
+  sonsuza kilitleniyor ve `await reader` hic donmuyor. Olcum sessizce asilir.
