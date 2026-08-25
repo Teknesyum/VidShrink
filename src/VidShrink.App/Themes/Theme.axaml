@@ -86,6 +86,7 @@
   <x:Double x:Key="SpaceXl">24</x:Double>
 
   <Thickness x:Key="PanelPadding">24</Thickness>
+  <Thickness x:Key="DropZonePadding">12</Thickness>
   <Thickness x:Key="ButtonPadding">24,12</Thickness>
   <Thickness x:Key="ButtonPaddingSm">16,8</Thickness>
   <Thickness x:Key="ChipPadding">12,4</Thickness>
