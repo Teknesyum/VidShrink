@@ -1,0 +1,24 @@
+{
+  "contractId": "T38",
+  "auditorRunId": "ac268f772e0dc56f9",
+  "headSha": "73e19b9ba111078edb85e5fafdff2d6c4865cc92",
+  "diffHash": "0dc0b291fb00cbe0c9345ad33ecee48bb8090d254c6904c27716b541fb272e2f",
+  "owns": [
+    "src/VidShrink.Core/Playback/IComparisonFrameSource.cs",
+    "src/VidShrink.Core/Playback/ComparisonFrameRequest.cs",
+    "src/VidShrink.Core/Playback/PlaybackFrame.cs",
+    "src/VidShrink.Core/Playback/FrameRing.cs",
+    "src/VidShrink.Core/Playback/FramePool.cs",
+    "src/VidShrink.Ffmpeg/Playback/PipeComparisonFrameSource.cs",
+    "src/VidShrink.Ffmpeg/Playback/ComparisonGraph.cs",
+    "tests/VidShrink.Tests/PlaybackFrameSourceTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release VidShrink.sln: 0 uyari 0 hata",
+    "dotnet test VidShrink.sln -c Release: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T17:49:10.981Z",
+  "usedAt": "2026-08-25T17:49:17.479Z",
+  "completedSha": "73e19b9ba111078edb85e5fafdff2d6c4865cc92"
+}

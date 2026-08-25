@@ -1,0 +1,20 @@
+{
+  "contractId": "T40",
+  "auditorRunId": "a67a5d72534229d4b",
+  "headSha": "73e19b9ba111078edb85e5fafdff2d6c4865cc92",
+  "diffHash": "87c82ff2689d03f97dddddbe804c070281867dd196c4b1656c030a161ad00a1d",
+  "owns": [
+    "src/VidShrink.App/Playback/ControlStrip.axaml",
+    "src/VidShrink.App/Playback/ControlStrip.axaml.cs",
+    "src/VidShrink.App/Playback/HoverZone.cs",
+    "src/VidShrink.App/LanguageCatalog.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release VidShrink.sln: 0 uyari 0 hata",
+    "dotnet test VidShrink.sln -c Release: 369 basarili, 0 basarisiz, 8 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-25T17:49:10.984Z",
+  "usedAt": "2026-08-25T17:49:17.709Z",
+  "completedSha": "73e19b9ba111078edb85e5fafdff2d6c4865cc92"
+}
