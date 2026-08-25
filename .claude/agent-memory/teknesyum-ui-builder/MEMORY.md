@@ -15,3 +15,4 @@
 - [Görüntü üstünde kontrast](goruntu-ustunde-kontrast.md) — kare üstündeki metni beyaz kareye göre hesapla; neon metin tek perdede AA'yı geçmiyor
 - [Kaynak kapatma kilidi](vidshrink-kaynak-kapatma-kilidi.md) — Dispose'u arayüz kuyruğunda bekletme; Task.Run'a al, kurulumları zincirle
 - [Ekran dışı koşu](vidshrink-ekran-disi-kosu.md) — gerçek MainWindow'u ekran dışında sürme; SetupWithLifetime, bekçi thread, hstack'li ffmpeg sayımı
+- [Tema ölçümü](vidshrink-tema-olcumu.md) — temayı ve boyayıcıyı pencere açmadan sınama; StyleInclude.Loaded, XDocument taraması
