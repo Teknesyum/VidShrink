@@ -195,7 +195,7 @@ public sealed class QualityHintTests
     [Theory]
     [InlineData("WhatsApp recommended", "WhatsApp için önerilen")]
     [InlineData("Sharing maximum", "Paylaşım için en fazla")]
-    [InlineData("Document only", "Yalnız belge olarak")]
+    [InlineData("WhatsApp Web maximum", "WhatsApp Web için en fazla")]
     [InlineData("Ceiling", "Tavan")]
     [InlineData("Lifetime", "Ömür")]
     [InlineData("Deletion", "Silme")]

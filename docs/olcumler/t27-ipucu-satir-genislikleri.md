@@ -10,7 +10,7 @@ dotnet test VidShrink.sln -c Release --filter TipOverflowTests
 16 px). Tavan `Themes/Theme.axaml` belirteçlerinden
 hesaplanır: `TooltipMaxWidth` eksi iki yanın dolgusu ve kenarlığı = **426 px**.
 
-Ölçülen satır: **210** · tavanı aşan: **140** ·
+Ölçülen satır: **210** · tavanı aşan: **138** ·
 tek kelimeyle aşan: **0**
 
 | Dil | İpucu | Satır | Genişlik | Taşma | Görsel satır | Alt satır | Tek kelime |
@@ -41,12 +41,10 @@ tek kelimeyle aşan: **0**
 | TR | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 0 | 600 | 174 | 2 | uguu.se'nin Ölçülmüş Tavanıdır. |  |
 | TR | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 1 | 637 | 211 | 2 | de Geri Çevrilmeden Verilebilir. |  |
 | TR | MainWindow.axaml · 128 MiB is the measured ceiling of uguu.se,… | 2 | 694 | 268 | 2 | Bu Yonga İkisi İçin de Güvenli Sayıdır. |  |
-| EN | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 0 | 797 | 371 | 2 | For A Document, And Publishes No Limit In Between. |  |
-| EN | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 1 | 763 | 337 | 2 | Goes Through Only When It Is Sent As A Document. |  |
-| EN | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 2 | 711 | 285 | 2 | Opens A File Instead Of Playing A Video. |  |
-| TR | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 0 | 810 | 384 | 2 | GB İzin Verir ve İkisinin Arasında Bir Sınır Yayımlamaz. |  |
-| TR | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 1 | 710 | 284 | 2 | Yalnız Belge Olarak Gönderildiğinde Geçer. |  |
-| TR | MainWindow.axaml · WhatsApp allows 16 MB for media sent in chat… | 2 | 727 | 301 | 2 | Karşı Taraf Video Oynatmak Yerine Dosya Açar. |  |
+| EN | MainWindow.axaml · On the phone: 16 MB in chat, 2 GB as a docum… | 1 | 666 | 240 | 2 | This, WhatsApp Does Not Publish It. |  |
+| EN | MainWindow.axaml · On the phone: 16 MB in chat, 2 GB as a docum… | 2 | 475 | 49 | 2 | As It Is. |  |
+| TR | MainWindow.axaml · On the phone: 16 MB in chat, 2 GB as a docum… | 1 | 619 | 193 | 2 | Bildirimi, WhatsApp Yayımlamıyor. |  |
+| TR | MainWindow.axaml · On the phone: 16 MB in chat, 2 GB as a docum… | 2 | 488 | 62 | 2 | Gibi Geçer. |  |
 | EN | MainWindow.axaml · Half of the source size. | 1 | 621 | 195 | 2 | Resolution And Frame Rate. |  |
 | TR | MainWindow.axaml · Half of the source size. | 1 | 632 | 206 | 2 | Çözünürlüğü ve Kare Hızını Korur. |  |
 | EN | MainWindow.axaml · Intent sets how early the engine stops spend… | 1 | 660 | 234 | 2 | Leave A Lot Of The Target Unused. |  |

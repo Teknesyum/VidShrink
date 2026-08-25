@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using VidShrink.App;
 
@@ -69,47 +70,86 @@ public sealed class SettingsTabTests
         Assert.Contains("CmbShareTarget.ItemsSource", WindowCode(), StringComparison.Ordinal);
     }
 
+    /// <summary>Depo kökündeki gerçek <c>paylasim-hedefleri.json</c>.</summary>
+    private static string RealFilePath => Path.Combine(TipSources.Root, ShareTargetTable.FileName);
+
     /// <summary>
-    /// K: JSON'a üçüncü bir hedef eklenince arayüzde görünüyor. Arayüz listeyi
-    /// <see cref="ShareTargetTable"/>'dan alıyor, bu yüzden ölçüm oradan yapılıyor:
-    /// üçüncü hedef okunuyorsa açılır kutuda da belirir.
+    /// K: hedef listesi gerçekten dosyadan geliyor. T35 dosyayı yazdı; ölçüm şema
+    /// varsayılanlarını değil o dosyayı okuyor ve <see cref="ShareTargetTable.Fallback"/>
+    /// ile aynı nesne olmadığını görüyor.
+    /// </summary>
+    [Fact]
+    public void TheRealFileIsTheOneThatFillsTheList()
+    {
+        Assert.True(File.Exists(RealFilePath), $"{RealFilePath} yok.");
+        Assert.Equal(RealFilePath, ShareTargetTable.Locate(TipSources.Root));
+
+        var table = ShareTargetTable.Parse(File.ReadAllText(RealFilePath));
+
+        Assert.NotSame(ShareTargetTable.Fallback, table);
+        Assert.Equal("storage.to", table.Default.Id);
+        Assert.Equal(new[] { "storage.to", "uguu.se" }, table.Targets.Select(target => target.Id));
+
+        var storage = table.Targets[0];
+        Assert.Equal(26_843_545_600L, storage.MaxBytes);
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7 }, storage.RetentionDays);
+        Assert.Equal(3, storage.DefaultRetentionDays);
+        Assert.True(storage.CanDelete);
+
+        var uguu = table.Targets[1];
+        Assert.Equal(134_217_728L, uguu.MaxBytes);
+        Assert.Empty(uguu.RetentionDays);
+        Assert.Equal(3, uguu.FixedRetentionHours);
+        Assert.False(uguu.CanDelete);
+
+        var loaded = ShareTargetTable.Load();
+        Assert.NotSame(ShareTargetTable.Fallback, loaded);
+        Assert.Equal(table.Targets.Select(target => target.Id), loaded.Targets.Select(target => target.Id));
+    }
+
+    /// <summary>
+    /// K: JSON'a üçüncü bir hedef eklenince arayüzde görünüyor. Ölçüm uydurma bir şemayla
+    /// değil, depodaki gerçek dosyanın kendisiyle koşuyor: dosya okunuyor, üçüncü hedef
+    /// ekleniyor, sonuç geçici bir dizine yazılıp <see cref="ShareTargetTable.Load"/>'un
+    /// kullandığı yol — <c>Locate</c> ve <c>Parse</c> — üstünden geri okunuyor.
     /// </summary>
     [Fact]
     public void AThirdTargetAddedToTheFileShowsUpWithoutACodeChange()
     {
-        const string json = """
+        var document = JsonNode.Parse(File.ReadAllText(RealFilePath))!.AsObject();
+        document["targets"]!.AsArray().Add(JsonNode.Parse("""
+        { "id": "yeni.example", "displayName": "yeni.example", "maxBytes": 1073741824,
+          "retentionDays": [1,2], "defaultRetentionDays": 2,
+          "canDelete": true, "playsInBrowser": false,
+          "endpoints": { "upload": "https://yeni.example/upload" } }
+        """));
+
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
         {
-          "version": 1,
-          "default": "storage.to",
-          "targets": [
-            { "id": "storage.to", "displayName": "storage.to", "maxBytes": 26843545600,
-              "retentionDays": [1,2,3,4,5,6,7], "defaultRetentionDays": 3,
-              "canDelete": true, "playsInBrowser": true,
-              "endpoints": { "init": "https://storage.to/api/upload/init" } },
-            { "id": "uguu.se", "displayName": "uguu.se", "maxBytes": 134217728,
-              "retentionDays": [], "fixedRetentionHours": 3,
-              "canDelete": false, "playsInBrowser": true,
-              "endpoints": { "upload": "https://uguu.se/upload?output=text" } },
-            { "id": "yeni.example", "displayName": "yeni.example", "maxBytes": 1073741824,
-              "retentionDays": [1,2], "defaultRetentionDays": 2,
-              "canDelete": true, "playsInBrowser": false,
-              "endpoints": { "upload": "https://yeni.example/upload" } }
-          ]
+            File.WriteAllText(Path.Combine(directory, ShareTargetTable.FileName), document.ToJsonString());
+
+            var found = ShareTargetTable.Locate(directory);
+            Assert.NotNull(found);
+
+            var table = ShareTargetTable.Parse(File.ReadAllText(found!));
+
+            Assert.Equal(3, table.Targets.Count);
+            Assert.Equal(new[] { "storage.to", "uguu.se", "yeni.example" }, table.Targets.Select(target => target.Id));
+
+            var third = table.Targets[2];
+            Assert.Equal("yeni.example", third.DisplayName);
+            Assert.Equal(1_073_741_824, third.MaxBytes);
+            Assert.Equal(new[] { 1, 2 }, third.RetentionDays);
+            Assert.Equal(2, third.DefaultRetentionDays);
+            Assert.True(third.CanDelete);
+            Assert.False(third.PlaysInBrowser);
         }
-        """;
-
-        var table = ShareTargetTable.Parse(json);
-
-        Assert.Equal(3, table.Targets.Count);
-        Assert.Equal(new[] { "storage.to", "uguu.se", "yeni.example" }, table.Targets.Select(target => target.Id));
-
-        var third = table.Targets[2];
-        Assert.Equal("yeni.example", third.DisplayName);
-        Assert.Equal(1_073_741_824, third.MaxBytes);
-        Assert.Equal(new[] { 1, 2 }, third.RetentionDays);
-        Assert.Equal(2, third.DefaultRetentionDays);
-        Assert.True(third.CanDelete);
-        Assert.False(third.PlaysInBrowser);
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
     }
 
     /// <summary>
@@ -170,4 +210,42 @@ public sealed class SettingsTabTests
     [InlineData(1_073_741_824L, "1 GiB")]
     public void TheCeilingIsWrittenInTheUnitTheByteCountActuallyIs(long bytes, string expected)
         => Assert.Equal(expected, MainWindow.DescribeBytes(bytes));
+}
+
+/// <summary>
+/// Marka yazımı. Büyük harf geçidi her sözcüğü büyütüyor ve "Buy Me A Coffee" yazıyordu;
+/// markanın kendi yazımı "Buy Me a Coffee". Yazım <see cref="LanguageCatalog.Brands"/>'te
+/// sabit, çeviri girdisi değil: Türkçede de aynı kalır.
+/// </summary>
+public sealed class BrandSpellingTests
+{
+    private const string Sponsor = "Buy Me a Coffee";
+
+    [Theory]
+    [InlineData("Buy me a coffee")]
+    [InlineData("Buy Me a Coffee")]
+    [InlineData("BUY ME A COFFEE")]
+    public void TheSponsorBrandKeepsItsOwnSpelling(string written)
+    {
+        Assert.Equal(Sponsor, LanguageCatalog.Title(written, false));
+        Assert.Equal(Sponsor, LanguageCatalog.Title(written, true));
+        Assert.Equal(Sponsor, LanguageCatalog.Localize(written, true));
+    }
+
+    /// <summary>Görünen metin ile erişilebilir ad aynı dizge olacak.</summary>
+    [Fact]
+    public void TheButtonAndItsAccessibleNameCarryTheSameString()
+    {
+        var xaml = File.ReadAllText(TipSources.WindowXamlPath);
+
+        Assert.Contains($"""auto:AutomationProperties.Name="{Sponsor}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.Contains($"""<TextBlock x:Name="TxtSponsor" Text="{Sponsor}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Buy me a coffee", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Buy Me A Coffee", xaml, StringComparison.Ordinal);
+    }
+
+    /// <summary>Marka çevrilmez: sözlükte girdisi olmayacak.</summary>
+    [Fact]
+    public void TheBrandIsNotATranslationEntry()
+        => Assert.False(LanguageCatalog.EnglishToTurkish.ContainsKey(Sponsor));
 }
