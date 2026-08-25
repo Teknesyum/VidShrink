@@ -63,6 +63,17 @@ internal static class LanguageCatalog
         };
 
     /// <summary>
+    /// Marka yazımları. Tek sözcük kuralı bunları bozar — "Buy me a coffee" sözcük sözcük
+    /// büyütülünce "Buy Me A Coffee" olur, oysa markanın kendi yazımı "Buy Me a Coffee".
+    /// Bütün dizge eşleşince yazım olduğu gibi döner; bu bir çeviri değil, sabit yazımdır.
+    /// </summary>
+    internal static readonly IReadOnlyDictionary<string, string> Brands =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Buy me a coffee"] = "Buy Me a Coffee",
+        };
+
+    /// <summary>
     /// Capitalises the first letter of every word. Words that already carry a capital anywhere
     /// (MP4, GPU, H.264, WhatsApp, FFmpeg, VidShrink) and words that do not start with a letter
     /// (8, 1280x720, 00:01:30) are handed back untouched, so nothing is invented and nothing is
@@ -71,6 +82,7 @@ internal static class LanguageCatalog
     internal static string Title(string text, bool turkish)
     {
         if (string.IsNullOrEmpty(text)) return text;
+        if (Brands.TryGetValue(text, out var brand)) return brand;
         var culture = turkish ? TurkishCulture : CultureInfo.InvariantCulture;
         var builder = new StringBuilder(text.Length);
         var index = 0;
@@ -263,9 +275,9 @@ internal static class LanguageCatalog
         ["Delete the shared file"] = "Paylaşılan dosyayı sil",
         ["WhatsApp recommended"] = "WhatsApp için önerilen",
         ["Sharing maximum"] = "Paylaşım için en fazla",
-        ["Document only"] = "Yalnız belge olarak",
+        ["WhatsApp Web maximum"] = "WhatsApp Web için en fazla",
         ["• 128 MiB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit.\n• A file at or under this size can be handed to either share target without being refused.\n• The other target, storage.to, carries far more, so this chip is the safe number for both."] = "• 128 MiB, en dar sınırı olan anonim paylaşım hedefi uguu.se'nin ölçülmüş tavanıdır.\n• Bu boyutta ya da altında bir dosya iki paylaşım hedefine de geri çevrilmeden verilebilir.\n• Öteki hedef storage.to çok daha fazlasını taşır, bu yüzden bu yonga ikisi için de güvenli sayıdır.",
-        ["• WhatsApp allows 16 MB for media sent in chat and 2 GB for a document, and publishes no limit in between.\n• 180 MB is therefore past the in-chat ceiling: the file goes through only when it is sent as a document.\n• Sent that way nothing is re-encoded, but the other side opens a file instead of playing a video."] = "• WhatsApp sohbette gönderilen medyaya 16 MB, belgeye 2 GB izin verir ve ikisinin arasında bir sınır yayımlamaz.\n• 180 MB bu yüzden sohbet tavanının ötesindedir: dosya yalnız belge olarak gönderildiğinde geçer.\n• Öyle gönderilince hiçbir şey yeniden kodlanmaz, ama karşı taraf video oynatmak yerine dosya açar.",
+        ["• On the phone: 16 MB in chat, 2 GB as a document.\n• WhatsApp Web takes 180 MB per file. The user reports this, WhatsApp does not publish it.\n• So a file of 180 MB or less goes through the web side as it is."] = "• Telefonda: sohbette 16 MB, belge olarak 2 GB.\n• Dosya başına 180 MB'ı web tarafı alır. Sayı kullanıcı bildirimi, WhatsApp yayımlamıyor.\n• 180 MB ve altı dosya bu yüzden web tarafından olduğu gibi geçer.",
         ["Updates"] = "Güncelleme",
         ["Update automatically"] = "Kendiliğinden güncelle",
         ["When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."] = "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
