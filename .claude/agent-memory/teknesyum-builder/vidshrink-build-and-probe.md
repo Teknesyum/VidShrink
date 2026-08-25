@@ -11,6 +11,10 @@ VidShrink (Avalonia 11 + .NET 8; arayuz dosyalari `.axaml` / `.axaml.cs`):
 `C:\Program Files\dotnet\dotnet.exe` (SDK 8.0.423 + 9.0.316) ve PATH'teki `dotnet` bu.
 Eski sozlesmelerin "PATH'teki dotnet 3.1.201, LOCALAPPDATA'yi kullan" notu artik yanlis —
 komutu kosturmadan once `(Get-Command dotnet).Source` ile bak. Derlemeden once
+PATH'teki `dotnet` **9.0.316** (25.08.2026 itibariyle) ve net8.0 hedeflerini sorunsuz derliyor;
+dogrudan `dotnet build ...` cagir. `%LOCALAPPDATA%\Microsoft\dotnet\dotnet.exe` bu makinede
+**artik yok** - eski sozlesmelerin "PATH'teki dotnet 3.1.201, MSB3644 ile duser" ortam notu
+gecersiz. Once `dotnet --version` ile bak, sozlesmenin ortam notuna guvenme. Derlemeden once
 `Get-Process VidShrink.App | Stop-Process -Force`, yoksa App.dll kilitli kalir.
 
 **Why:** Ayni anda baska sozlesme kosarken bin/ kilidi cakisiyor; ikinci deneme genelde geciyor.
@@ -138,3 +142,39 @@ komutu kosturmadan once `(Get-Command dotnet).Source` ile bak. Derlemeden once
   hiziyla yoklarsa (60 Hz vs 60 fps) faz kilidi olmadigi icin kareler %25'e varan oranda
   bayatlayip duser; 180 Hz'de %1,3'e iner. Kare kaynagi olcerken tuketici hizini **besleme
   hizinin ustunde** tut, yoksa halka tasarimini haksiz yere sucluyorsun.
+
+- Tam takim testi kosarken **ayni anda build kosturma**: `BulletPaintingTests` gibi Avalonia
+  basliksiz-uygulama testleri o zaman 5 tanesi birden FAIL veriyor, tek basina filtreyle
+  kosunca hepsi yesil. Basarisizligi koda baglamadan once takimi tek basina bir kez daha kos.
+- Zamansal karmasikligi olcmek ucuz ve sonuc sezgiye ters cikabiliyor: ayni 2 sn'lik pencereyi
+  bir de `-vf fps=<kaynak/2>` ile kodlayip kare basina biti kiyaslamak yetiyor, maliyeti 1,5 sn
+  (pencere ornekleriyle **es zamanli** baslatirsan). gothic oyun kaydinda oran 1,76 cikti, yani
+  `log2(1,76)=0,79`: fps'i yariya indirmek bitlerin yalniz %13'unu kazandiriyor. Modeldeki
+  `FpsBitrateExponent = 0,75` (0,25'lik hareket ussu karsiligi) bu tur icerikte fps dusurmeyi
+  **fazla ucuz** gosteriyor. "Asiri sikistirmada fps kesilmeli" sezgisi olcumle dogrulanmadan
+  kodlanmamali.
+- Kalite/bit-yogunlugu egrisinde **diz yok**: 640x360@24 libx264'te VMAF bppf 0,010'da 21,4,
+  0,035'te 47,3, 0,090'da 74,7 - ikiye katlama basina kabaca +11 puan, duz. Bir "taban bppf"
+  koyacaksan bunun olculmus cokme noktasi degil secilmis politika cizgisi oldugunu yaz.
+  `ffmpeg` bu makinede `libvmaf` ve `xpsnr` suzgeclerini tasiyor, `QualityMeter.MeasureAsync`
+  dogrudan kullanilabiliyor (8 sn'lik kesitte 9 nokta 53 sn).
+- Altin-veri (golden master) testi `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched`:
+  500 MB/120 sn kaynakta 180 MB Balanced, 25 MB Aggressive, 8 MB Extreme rejimine dusuyor.
+  Plan motorunda rejime bagli bir sey degistirdiysen bu dosya kirmizi olur ve `owns` disindadir.
+- **Boruyu kare boyutunda tek `read` ile okuma.** Windows anonim borusunun ic tamponu kucuk;
+  15,8 MB'lik tek okuma istegi tamami gelene kadar bloklayip ureticiyle tuketiciyi siraya
+  sokuyor. 2x1920x1080 BGRA'da tek okuma 70,9 fps, ayni kareyi 64 KB parcalarla toplamak
+  148 fps veriyor; blok buyudukce kotulesiyor (2 kare 41,8 / 4 kare 22,6). 64 KB ile 256 KB
+  arasi fark yok, 1 MB biraz kotu. Parcali okuyan tam yol (aralik istatistigiyle) bu makinede
+  108-117 fps surduruyor.
+- Bir boru olcumunde `-re` kipinin p95/p99'una **aralik kapisi kurma**: ffmpeg'in gercek
+  zamanli hiz sinirlayicisi kareleri ikiserli salvolar halinde veriyor, p95 her panel
+  boyutunda ~30 ms (iki kare periyodu) cikiyor - boru hedefin bes kati hizli olsa bile.
+  O sayi ffmpeg'in temposu, borunun gecikmesi degil. Kapasite kapisi "azami hiz"
+  (`-re` yok) satirlarindan okunur.
+- Aralik/gecikme listesini `new List<double>(maxFrames)` ile boyutlandirma: donguluk boru
+  olcumlerinde `maxFrames` `int.MaxValue` geciliyor ve calisma "Array dimensions exceeded
+  supported range" ile hicbir sey yazmadan duser. `Math.Min(maxFrames, 1 << 16)` kullan.
+- Sinirli `Channel` ile ureticili tuketici yazarken **yazma tarafina iptal jetonu ver**:
+  tuketici hedef kare sayisina ulasip donguden cikinca uretici `WriteAsync` uzerinde
+  sonsuza kilitleniyor ve `await reader` hic donmuyor. Olcum sessizce asilir.
