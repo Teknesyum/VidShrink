@@ -13,6 +13,15 @@
         <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
       </ControlTheme>
 
+      <!--
+        T29 Tur 2: açıklama metinleri de madde listesi. İpucu balonundan tek farkı balon
+        tavanının olmaması; madde aralığı (`SpaceXs`) ve sarma aynı.
+      -->
+      <ControlTheme x:Key="BulletText" TargetType="TextBlock" BasedOn="{StaticResource Body}">
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="LineSpacing" Value="{StaticResource SpaceXs}"/>
+      </ControlTheme>
+
       <ControlTheme x:Key="Hint" TargetType="TextBlock" BasedOn="{StaticResource Body}">
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
       </ControlTheme>
