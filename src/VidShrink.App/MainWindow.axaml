@@ -477,7 +477,8 @@
                       Grid.Row="1"
                       Theme="{StaticResource Panel}"
                       VerticalAlignment="Stretch"
-                      MinHeight="{StaticResource PlanPanelMinHeight}">
+                      MinHeight="{StaticResource PlanPanelMinHeight}"
+                      MaxHeight="{StaticResource PlanPanelMaxHeight}">
                 <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
                   <TextBlock Grid.Row="0" Text="What it will do" Theme="{StaticResource H2}"/>
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
