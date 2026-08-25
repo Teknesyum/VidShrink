@@ -100,6 +100,8 @@ public partial class MainWindow : Window
     private bool _controlsReady;
     private bool _updateUiSyncing;
     private string? _noticeVersion;
+    private AppliedUpdateNotice? _appliedNotice;
+    private readonly StatusBoard _status = new();
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
     private PanelHost? _preview;
 
@@ -580,15 +582,15 @@ public partial class MainWindow : Window
             var message = T(
                 $"{missing} bulunamadı. VidShrink'in yanındaki tools/ffmpeg klasörüne koyun veya PATH'e kurun.",
                 $"{missing} not found. Put it in tools/ffmpeg next to VidShrink, or install it on PATH.");
-            TxtSystemStatus.Text = message;
+            TxtSystemStatus.Text = _status.ReportTools(message);
             return;
         }
 
-        TxtSystemStatus.Text = string.Join("\n",
+        TxtSystemStatus.Text = _status.ReportTools(string.Join("\n",
             $"FFmpeg: {ToolLocator.Ffmpeg}",
             $"{T("Sürüm", "Version")}: {_ffmpegVersion ?? T("okunuyor...", "reading...")}",
             $".NET: {Environment.Version}",
-            $"VidShrink: {AppVersion()}");
+            $"VidShrink: {AppVersion()}"));
     }
 
     /// <summary>
@@ -609,27 +611,26 @@ public partial class MainWindow : Window
         ReportAppliedUpdate();
     }
 
-    // The launcher writes this file after it has swapped a new version into app\, whether or
-    // not the splash was on screen long enough to be seen. Reading it here is how someone who
-    // saw nothing still finds out what happened. It is deleted straight away so the line shows
-    // once; UpdateNotice is a different message and says a new version is waiting, not applied.
     private void ReportAppliedUpdate()
     {
-        var marker = Path.Combine(AppContext.BaseDirectory, ".update-applied");
-        string version;
-        try
-        {
-            if (!File.Exists(marker)) return;
-            version = File.ReadAllText(marker).Trim();
-            File.Delete(marker);
-        }
-        catch
-        {
-            return;
-        }
+        _appliedNotice = new AppliedUpdateNotice(AppContext.BaseDirectory);
+        if (!_appliedNotice.Load()) return;
 
-        if (version.Length == 0) return;
-        TxtSystemStatus.Text = T($"Yeni sürüme geçildi: {version}", $"Updated to {version}");
+        TxtAppliedVersion.Text = _status.ReportApplied(_appliedNotice.Version!);
+        AppliedNotice.IsVisible = true;
+        Dispatcher.UIThread.Post(ClearAppliedMarker, DispatcherPriority.Background);
+    }
+
+    private void ClearAppliedMarker()
+    {
+        if (AppliedNotice.IsVisible) _appliedNotice?.Shown();
+    }
+
+    private void OnDismissAppliedNotice(object? sender, RoutedEventArgs e)
+    {
+        _appliedNotice?.Shown();
+        _status.ClearApplied();
+        AppliedNotice.IsVisible = false;
     }
 
     private void RefreshUpdateTexts()
