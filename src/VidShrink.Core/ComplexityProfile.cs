@@ -57,6 +57,13 @@ public sealed record ComplexityProfile
     private const double LowScaleDamping = 0.3;
     private const double DetailExponentMin = -0.2;
     private const double DetailExponentMax = 1.4;
+    public const double DefaultMotionExponent = 1.0 - CodecModel.FpsBitrateExponent;
+    private const double MotionExponentMin = 0.0;
+    private const double MotionExponentMax = 1.0;
+    public const double FloorComplexityAnchor = 0.1264;
+    private const double FloorAdaptExponent = 0.5;
+    private const double FloorAdaptMin = 0.6;
+    private const double FloorAdaptMax = 1.6;
     private const double HalvingStepMin = 3.0;
     private const double HalvingStepMax = 12.0;
     private const double LevelFactorMin = 0.1;
@@ -76,6 +83,8 @@ public sealed record ComplexityProfile
     public required double ReferenceBppf { get; init; }
     public required bool Measured { get; init; }
     public double DetailExponent { get; init; } = DefaultDetailExponent;
+    public double MotionExponent { get; init; } = DefaultMotionExponent;
+    public bool MotionMeasured { get; init; }
     public double SampledSeconds { get; init; }
     public long SampledFrames { get; init; }
     public double LevelFactor { get; init; } = 1.0;
@@ -113,16 +122,22 @@ public sealed record ComplexityProfile
             ReferenceBppf = Math.Clamp(x264Equivalent, 0.004, 1.5),
             Measured = false,
             DetailExponent = DefaultDetailExponent,
+            MotionExponent = DefaultMotionExponent,
             WindowBias = 0.0,
             BiasSource = WindowBiasSource.None
         };
     }
 
-    public static ComplexityProfile FromProbe(double fullScaleBppf, double halfScaleBppf, double sampledSeconds, long sampledFrames, double windowBias = 0, WindowBiasSource biasSource = WindowBiasSource.Scan)
+    public static ComplexityProfile FromProbe(double fullScaleBppf, double halfScaleBppf, double sampledSeconds, long sampledFrames, double windowBias = 0, WindowBiasSource biasSource = WindowBiasSource.Scan, double halfFpsBppf = 0)
     {
         var exponent = DefaultDetailExponent;
         if (fullScaleBppf > 0 && halfScaleBppf > 0)
             exponent = Math.Clamp(Math.Log(halfScaleBppf / fullScaleBppf) / Math.Log(ProbeScale), DetailExponentMin, DetailExponentMax);
+
+        var motionMeasured = fullScaleBppf > 0 && halfFpsBppf > 0;
+        var motion = motionMeasured
+            ? Math.Clamp(Math.Log2(halfFpsBppf / fullScaleBppf), MotionExponentMin, MotionExponentMax)
+            : DefaultMotionExponent;
 
         var bias = IsTrustedBias(windowBias) ? windowBias : 0.0;
         var corrected = bias > 0 ? fullScaleBppf / bias : fullScaleBppf;
@@ -132,6 +147,8 @@ public sealed record ComplexityProfile
             ReferenceBppf = Math.Clamp(corrected, 0.002, 2.0),
             Measured = true,
             DetailExponent = exponent,
+            MotionExponent = motion,
+            MotionMeasured = motionMeasured,
             SampledSeconds = sampledSeconds,
             SampledFrames = sampledFrames,
             WindowBias = bias,
@@ -156,9 +173,19 @@ public sealed record ComplexityProfile
     public double RequiredBppf(string codec, double scale, double fps, double sourceFps)
     {
         var detail = ScaleFactor(scale);
-        var temporal = Math.Pow(Math.Max(fps / Math.Max(sourceFps, 0.1), 0.05), CodecModel.FpsBitrateExponent - 1.0);
-        return ReferenceBppf * CodecModel.RelativeBitrateNeed(codec) * detail * temporal;
+        return ReferenceBppf * CodecModel.RelativeBitrateNeed(codec) * detail * TemporalFactor(fps, sourceFps);
     }
+
+    public double TemporalFactor(double fps, double sourceFps)
+        => Math.Pow(Math.Max(fps / Math.Max(sourceFps, 0.1), 0.05), -MotionExponent);
+
+    public double FloorBppf(string codec, double fps, double sourceFps)
+        => CodecModel.FloorBppf(codec) * FloorAdaptation * TemporalFactor(fps, sourceFps);
+
+    public double FloorAdaptation
+        => Measured && ReferenceBppf > 0
+            ? Math.Clamp(Math.Pow(ReferenceBppf / FloorComplexityAnchor, FloorAdaptExponent), FloorAdaptMin, FloorAdaptMax)
+            : 1.0;
 
     public double BppfAtCrf(string codec, double crf, double scale, double fps, double sourceFps)
     {

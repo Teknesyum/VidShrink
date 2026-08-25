@@ -138,3 +138,22 @@ komutu kosturmadan once `(Get-Command dotnet).Source` ile bak. Derlemeden once
   hiziyla yoklarsa (60 Hz vs 60 fps) faz kilidi olmadigi icin kareler %25'e varan oranda
   bayatlayip duser; 180 Hz'de %1,3'e iner. Kare kaynagi olcerken tuketici hizini **besleme
   hizinin ustunde** tut, yoksa halka tasarimini haksiz yere sucluyorsun.
+
+- Tam takim testi kosarken **ayni anda build kosturma**: `BulletPaintingTests` gibi Avalonia
+  basliksiz-uygulama testleri o zaman 5 tanesi birden FAIL veriyor, tek basina filtreyle
+  kosunca hepsi yesil. Basarisizligi koda baglamadan once takimi tek basina bir kez daha kos.
+- Zamansal karmasikligi olcmek ucuz ve sonuc sezgiye ters cikabiliyor: ayni 2 sn'lik pencereyi
+  bir de `-vf fps=<kaynak/2>` ile kodlayip kare basina biti kiyaslamak yetiyor, maliyeti 1,5 sn
+  (pencere ornekleriyle **es zamanli** baslatirsan). gothic oyun kaydinda oran 1,76 cikti, yani
+  `log2(1,76)=0,79`: fps'i yariya indirmek bitlerin yalniz %13'unu kazandiriyor. Modeldeki
+  `FpsBitrateExponent = 0,75` (0,25'lik hareket ussu karsiligi) bu tur icerikte fps dusurmeyi
+  **fazla ucuz** gosteriyor. "Asiri sikistirmada fps kesilmeli" sezgisi olcumle dogrulanmadan
+  kodlanmamali.
+- Kalite/bit-yogunlugu egrisinde **diz yok**: 640x360@24 libx264'te VMAF bppf 0,010'da 21,4,
+  0,035'te 47,3, 0,090'da 74,7 - ikiye katlama basina kabaca +11 puan, duz. Bir "taban bppf"
+  koyacaksan bunun olculmus cokme noktasi degil secilmis politika cizgisi oldugunu yaz.
+  `ffmpeg` bu makinede `libvmaf` ve `xpsnr` suzgeclerini tasiyor, `QualityMeter.MeasureAsync`
+  dogrudan kullanilabiliyor (8 sn'lik kesitte 9 nokta 53 sn).
+- Altin-veri (golden master) testi `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched`:
+  500 MB/120 sn kaynakta 180 MB Balanced, 25 MB Aggressive, 8 MB Extreme rejimine dusuyor.
+  Plan motorunda rejime bagli bir sey degistirdiysen bu dosya kirmizi olur ve `owns` disindadir.

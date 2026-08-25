@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -17,6 +17,18 @@ public static class CodecModel
     public const double HardwareQualityCeiling = 96.0;
     public const double HardwareAv1QualityCeiling = 98.0;
     public const double HardwareBitrateYield = 0.877;
+    public const double HardwareFloorFactor = 1.25;
+
+    public static double FloorBppf(string codec)
+    {
+        var baseFloor = Family(codec) switch
+        {
+            "av1" => 0.020,
+            "hevc" => 0.025,
+            _ => 0.035
+        };
+        return IsHardware(codec) ? baseFloor * HardwareFloorFactor : baseFloor;
+    }
 
     public static double ReferenceCrf(string codec) => Family(codec) switch
     {

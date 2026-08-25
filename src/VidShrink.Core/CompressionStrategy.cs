@@ -21,9 +21,17 @@ public enum AdviceCode
     ContentIsComplex,
     ScaleSavesLittle,
     ScaleSavesMuch,
+    TargetBelowCodecFloor,
+    FrameRateCutForFloor,
+    MotionCutIsCheap,
+    MotionCutIsExpensive,
     EncoderFallback,
     HdrTonemapped
 }
+
+public readonly record struct PenaltyWeights(double Scale, double Fps, bool LowFpsSurcharge);
+
+public readonly record struct RegimeFloors(double MinScale, int MinHeight, double MinFps);
 
 public sealed record StrategyAdvice(
     CompressionRegime Regime,
@@ -65,6 +73,20 @@ public static class CompressionStrategy
         CompressionRegime.Balanced => 0.25,
         CompressionRegime.Aggressive => 0.18,
         _ => 0.12
+    };
+
+    public static PenaltyWeights PenaltyWeights(CompressionRegime regime) => regime switch
+    {
+        CompressionRegime.Aggressive => new PenaltyWeights(0.70, 0.70, true),
+        CompressionRegime.Extreme => new PenaltyWeights(0.45, 0.35, false),
+        _ => new PenaltyWeights(1.0, 1.0, true)
+    };
+
+    public static RegimeFloors FloorsFor(CompressionRegime regime) => regime switch
+    {
+        CompressionRegime.Aggressive => new RegimeFloors(0.20, 180, 10.0),
+        CompressionRegime.Extreme => new RegimeFloors(0.12, 120, 6.0),
+        _ => new RegimeFloors(0.25, 240, 12.0)
     };
 
     public static double TransparencyOffset(Intent intent) => intent switch

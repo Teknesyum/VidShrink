@@ -10,6 +10,8 @@ public readonly record struct PacketSample(double PtsSeconds, long Size);
 public static class ComplexityProbe
 {
     private const double WindowSeconds = 2.0;
+    private const double MotionProbeMinSourceFps = 10.0;
+    public const double MotionProbeFpsRatio = 0.5;
     private const int MaxWindows = 3;
     private const int MinProfileSeconds = 4;
 
@@ -44,10 +46,15 @@ public static class ComplexityProbe
             var canProbeHalf = halfWidth >= 64 && halfHeight >= 64;
             var preset = speed == SpeedMode.Fast ? FastProbePreset : ComplexityProfile.ProbePreset;
 
-            var pending = Windows(info.DurationSeconds)
+            var windows = Windows(info.DurationSeconds).ToArray();
+            var motionIndex = windows.Length / 2;
+            var motionTask = MotionSampleAsync(info, windows, motionIndex, preset, speed, ct);
+
+            var pending = windows
                 .Select(start => SampleWindowAsync(info.FilePath, start, canProbeHalf ? (halfWidth, halfHeight) : null, preset, speed, ct))
                 .ToArray();
             var windowSamples = await Task.WhenAll(pending);
+            var motion = await motionTask;
 
             foreach (var sample in windowSamples)
             {
@@ -69,9 +76,11 @@ public static class ComplexityProbe
                 ? halfBytes * 8.0 / ((double)halfWidth * halfHeight * halfFrames)
                 : 0.0;
 
+            var halfFpsBppf = MotionBppf(fullBppf, motion, windowSamples, motionIndex);
+
             var (bias, source) = await MeasureWindowBiasAsync(info, speed, ct);
 
-            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source);
+            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -81,6 +90,26 @@ public static class ComplexityProbe
         {
             return ComplexityProfile.FromSourceBitrate(info);
         }
+    }
+
+    private static Task<(long Bytes, long Frames)> MotionSampleAsync(MediaInfo info, IReadOnlyList<double> windows, int index, string preset, SpeedMode speed, CancellationToken ct)
+    {
+        if (windows.Count == 0 || info.Fps < MotionProbeMinSourceFps) return Task.FromResult((0L, 0L));
+
+        var fps = info.Fps * MotionProbeFpsRatio;
+        var filter = "fps=" + fps.ToString("0.###", CultureInfo.InvariantCulture);
+        return SampleAsync(info.FilePath, windows[index], WindowSeconds, filter, preset, speed, ct);
+    }
+
+    private static double MotionBppf(double fullBppf, (long Bytes, long Frames) motion, IReadOnlyList<WindowSample> windowSamples, int index)
+    {
+        if (motion.Frames <= 0 || motion.Bytes <= 0 || index >= windowSamples.Count) return 0.0;
+
+        var reference = windowSamples[index];
+        if (reference.FullFrames <= 0 || reference.FullBytes <= 0) return 0.0;
+
+        var ratio = motion.Bytes / (double)motion.Frames / (reference.FullBytes / (double)reference.FullFrames);
+        return double.IsFinite(ratio) && ratio > 0 ? fullBppf * ratio : 0.0;
     }
 
     public static IEnumerable<double> Windows(double duration)
