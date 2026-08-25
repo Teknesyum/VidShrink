@@ -34,7 +34,7 @@ internal static class AppHost
             var thread = new Thread(() =>
             {
                 if (Application.Current is null)
-                    AppBuilder.Configure<Application>().UseSkia().UseWin32().SetupWithoutStarting();
+                    AppBuilder.Configure<VidShrink.App.App>().UseSkia().UseWin32().SetupWithoutStarting();
 
                 started.Set();
 
