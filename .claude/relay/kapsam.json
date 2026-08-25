@@ -384,22 +384,22 @@
     "ajan": "builder"
   },
   "src/VidShrink.App/MainWindow.axaml": {
-    "model": "claude-opus-5",
+    "model": "claude-fable-5",
     "effort": "medium",
-    "t": "2026-08-23 15:26:42",
+    "t": "2026-08-25 17:13:32",
     "ajan": "ui-builder"
   },
   "src/VidShrink.App/MainWindow.axaml.cs": {
-    "model": "claude-opus-5",
-    "effort": "high",
-    "t": "2026-08-23 18:57:03",
-    "ajan": "ana oturum"
+    "model": "claude-fable-5",
+    "effort": "medium",
+    "t": "2026-08-25 17:13:32",
+    "ajan": "ui-builder"
   },
   "src/VidShrink.App/LanguageCatalog.cs": {
-    "model": "claude-opus-5",
-    "effort": "xhigh",
-    "t": "2026-08-22 21:03:15",
-    "ajan": "builder"
+    "model": "claude-fable-5",
+    "effort": "medium",
+    "t": "2026-08-25 17:13:32",
+    "ajan": "ui-builder"
   },
   "check.py": {
     "model": "claude-opus-5",
@@ -540,9 +540,9 @@
     "ajan": "builder"
   },
   "Program.cs": {
-    "model": "claude-opus-5",
+    "model": "claude-fable-5",
     "effort": "medium",
-    "t": "2026-08-24 20:39:55",
+    "t": "2026-08-25 17:13:32",
     "ajan": "ui-builder"
   },
   "tests/VidShrink.Tests/FillBandTests.cs": {
@@ -744,15 +744,15 @@
     "ajan": "ui-builder"
   },
   "src/VidShrink.App/Playback/ComparisonPanel.axaml": {
-    "model": "claude-opus-5",
+    "model": "claude-fable-5",
     "effort": "medium",
-    "t": "2026-08-24 20:08:18",
+    "t": "2026-08-25 17:13:32",
     "ajan": "ui-builder"
   },
   "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs": {
-    "model": "claude-opus-5",
+    "model": "claude-fable-5",
     "effort": "medium",
-    "t": "2026-08-24 20:08:18",
+    "t": "2026-08-25 17:13:32",
     "ajan": "ui-builder"
   },
   "tests/VidShrink.Tests/ZoomGestureTests.cs": {
@@ -801,6 +801,24 @@
     "model": "claude-opus-5",
     "effort": "medium",
     "t": "2026-08-24 20:39:55",
+    "ajan": "ui-builder"
+  },
+  "src/VidShrink.App/Playback/PanelHost.cs": {
+    "model": "claude-fable-5",
+    "effort": "medium",
+    "t": "2026-08-25 17:13:32",
+    "ajan": "ui-builder"
+  },
+  ".claude/agent-memory/teknesyum-ui-builder/vidshrink-kaynak-kapatma-kilidi.md": {
+    "model": "claude-fable-5",
+    "effort": "medium",
+    "t": "2026-08-25 17:13:32",
+    "ajan": "ui-builder"
+  },
+  ".claude/agent-memory/teknesyum-ui-builder/vidshrink-ekran-disi-koşu.md": {
+    "model": "claude-fable-5",
+    "effort": "medium",
+    "t": "2026-08-25 17:13:32",
     "ajan": "ui-builder"
   }
 }

@@ -22,8 +22,10 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
+using VidShrink.Ffmpeg.Playback;
 
 namespace VidShrink.App;
 
@@ -99,6 +101,7 @@ public partial class MainWindow : Window
     private bool _updateUiSyncing;
     private string? _noticeVersion;
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
+    private PanelHost? _preview;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
@@ -106,6 +109,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _controlsReady = true;
+
+        // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
+        // panel hangi motorun kare ürettiğini bilmez.
+        _preview = new PanelHost(Preview, () => new PipeComparisonFrameSource());
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 
@@ -364,6 +371,8 @@ public partial class MainWindow : Window
     {
         _probeCts?.Cancel();
         _cts?.Cancel();
+        // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
+        _preview?.Dispose();
         base.OnClosing(e);
     }
 
@@ -443,6 +452,10 @@ public partial class MainWindow : Window
         BtnTr.Classes.Set("selected", turkish);
         BtnEn.Classes.Set("selected", !turkish);
         ApplyFastGpuTip();
+        // Ağaç yürüyüşü panelin metnini de çevirir; panel kendi geçidinden geçirdiği son
+        // hâli sonra yazar, bu yüzden çağrı yürüyüşten sonradır.
+        _preview?.SetLanguage(turkish);
+        RefreshPreviewButton();
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshShareTarget();
@@ -995,6 +1008,7 @@ public partial class MainWindow : Window
         SetAiDetails(false);
         TxtConvertSource.Text = Path.GetFileName(path);
         ShowInfo(_info);
+        RefreshPreviewSource();
 
         _syncing = true;
         var suggested = _info.FileSizeMb > WhatsAppTargetMb
@@ -1078,6 +1092,37 @@ public partial class MainWindow : Window
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
         TxtHdr.Text = info.IsHdr ? T("Evet", "Yes") : T("Hayır", "No");
         Fade(HdrPolicyPanel, info.IsHdr);
+    }
+
+    /// <summary>
+    /// Panelin süreceği dosyaları tazeler. Sağ taraf yalnız gerçekten üretilmiş bir dosya
+    /// varken doludur; yoksa panel o tarafta sahte çıktı sunmaz (PLAN §6).
+    /// </summary>
+    private void RefreshPreviewSource()
+    {
+        if (_preview is null || _info is null) return;
+        var aspect = _info.Height > 0 ? _info.Width / (double)_info.Height : 16.0 / 9.0;
+        _preview.SetFiles(
+            _info.FilePath,
+            _lastOutput,
+            aspect,
+            TimeSpan.FromSeconds(_info.DurationSeconds),
+            _info.Fps);
+        if (!_preview.IsOpen) _preview.Open();
+        RefreshPreviewButton();
+    }
+
+    private void OnTogglePreview(object? sender, RoutedEventArgs e)
+    {
+        _preview?.Toggle();
+        RefreshPreviewButton();
+    }
+
+    private void RefreshPreviewButton()
+    {
+        if (_preview is null) return;
+        BtnPreview.Content = Localize(_preview.IsOpen ? "Close preview" : "Open preview");
+        BtnPreview.IsEnabled = _info is not null;
     }
 
     private static CodecPreference CodecFromIndex(int index) => index switch
@@ -1607,6 +1652,7 @@ public partial class MainWindow : Window
 
             var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync);
             _lastOutput = result.OutputPath;
+            RefreshPreviewSource();
 
             if (result.Success)
             {
@@ -1855,6 +1901,7 @@ public partial class MainWindow : Window
 
             var result = await new EncodeRunner().ConvertAsync(_info, plan, output, progress, cts.Token);
             _lastOutput = result.OutputPath;
+            RefreshPreviewSource();
             TxtConvertResult.Text = $"{T("Tamamlandı", "Done")}. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB.";
             BtnConvertReveal.IsVisible = true;
         }

@@ -120,3 +120,19 @@ kurup `& "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe"` cagir. Derlemeden once
   `-display_rotation 90 -i giris -c copy cikis` calisiyor; `-metadata:s:v rotate=90`
   artik yazmiyor.
 
+- Scratchpad console harness'ini **`.exe` olarak calistirma**: ekran kapisi hook'u
+  (`hooks/ekran-kapisi.js`) exe cagrisini "masaustu penceresi aciyor" diye engelliyor.
+  Konsol uygulamasi olsa bile engellenir. Calisan yol: `dotnet exec <yol>\bin\Release\net8.0\ad.dll args`
+  (veya olcumu `VIDSHRINK_LIVE_SOURCE` kapili bir xunit testine koyup `dotnet test` ile kos —
+  test komutlari hic engellenmiyor).
+- Paralel kosan baska bir sozlesme `VidShrink.App` altina yarim `.axaml` birakirsa tum
+  cozum AXN0001 ile duser ve `dotnet test` kosturulamaz. Cozum: kendi projeni ayri derle
+  (`dotnet build src/VidShrink.Ffmpeg/...`) ve testleri scratchpad'de Core+Ffmpeg'e
+  ProjectReference veren gecici bir xunit projesiyle kos — `<Compile Include="<mutlak yol>" />`
+  ile gercek test dosyasini iceri al, `EnableDefaultCompileItems=false` **yazma** yoksa
+  `GlobalUsings.cs` derlenmez ve `Fact` bulunamaz.
+- Windows anonim borusundan kare okurken makinenin ffmpeg besleme tavani 2x1920x1080'de
+  ~123 fps (`-re` yokken), `-re` ile hedef 60 fps sasmadan tutuluyor. Tuketici tam besleme
+  hiziyla yoklarsa (60 Hz vs 60 fps) faz kilidi olmadigi icin kareler %25'e varan oranda
+  bayatlayip duser; 180 Hz'de %1,3'e iner. Kare kaynagi olcerken tuketici hizini **besleme
+  hizinin ustunde** tut, yoksa halka tasarimini haksiz yere sucluyorsun.

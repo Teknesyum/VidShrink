@@ -42,6 +42,8 @@ internal partial class ComparisonPanel : UserControl
     private DispatcherTimer? _landing;
 
     private bool _turkish;
+    private string? _notice;
+    private string? _rightNotice;
     private bool _motionReduced;
     private bool _promoted;
     private bool _draggingSeparator;
@@ -106,6 +108,39 @@ internal partial class ComparisonPanel : UserControl
 
     internal ComparisonSurface Frames => Surface;
 
+    /// <summary>Denetim şeridi. Kareyi süren taraf oynat/duraklat/atla isteklerini buradan alır.</summary>
+    internal ControlStrip Controls => Strip;
+
+    /// <summary>
+    /// Kapalı panel bandını daraltır. İki ölçü de temadan gelir: açıkken sahne en az
+    /// <c>PlaybackStageMinHeight</c>, kapalıyken bırakma alanı kadar (<c>DropZoneMinHeight</c>).
+    /// </summary>
+    internal void SetCompact(bool compact)
+        => Shell.MinHeight = Scalar(compact ? "DropZoneMinHeight" : "PlaybackStageMinHeight", compact ? 144 : 256);
+
+    /// <summary>
+    /// Boş durumun ikinci satırı. Kare kaynağı bir sebep bildirdiğinde (motor yok, akış
+    /// açılamadı) o sebep buraya yazılır; boş bırakılınca panel kendi varsayılanına döner.
+    /// Metin İngilizce verilir, ekrana çalışan dilde çıkar.
+    /// </summary>
+    internal void SetNotice(string? english)
+    {
+        _notice = string.IsNullOrWhiteSpace(english) ? null : english;
+        RefreshTexts();
+    }
+
+    /// <summary>
+    /// Sağ tarafın perdesi. İşlenmiş dosya yokken görüntü değil sebep gösterilir —
+    /// planın §6 dürüstlük kuralı. Boş bırakılınca perde kalkar.
+    /// </summary>
+    internal void SetRightNotice(string? english)
+    {
+        _rightNotice = string.IsNullOrWhiteSpace(english) ? null : english;
+        RefreshTexts();
+        RefreshEmptyState();
+        ApplySplit();
+    }
+
     /// <summary>
     /// K7: kare kaynağı bağlanmadan panel denenebilsin diye sentetik üreteci başlatır.
     /// Renkler temadan çözülüyor; üreteç kendi rengini uydurmuyor.
@@ -139,19 +174,26 @@ internal partial class ComparisonPanel : UserControl
     internal void SetLanguage(bool turkish)
     {
         _turkish = turkish;
-
-        EmptyTitle.Text = Say("Karşılaştırma paneli", "Comparison panel");
-        EmptyHint.Text = Say("Kare kaynağı bağlı değil", "No frame source is connected");
-        PlaceholderText.Text = Say("Panel üste alındı", "The panel moved to the front");
-        LeftBadgeText.Text = turkish ? "ORİJİNAL" : "ORIGINAL";
-        RightBadgeText.Text = turkish ? "İŞLENMİŞ" : "PROCESSED";
+        RefreshTexts();
         Strip.SetLanguage(turkish);
-
         RefreshReadout();
     }
 
-    private string Say(string turkish, string english)
-        => LanguageCatalog.Title(_turkish ? turkish : english, _turkish);
+    /// <summary>
+    /// Panelin bütün metinleri tek geçitten. Kaynak dizge İngilizce, Türkçesi sözlükte;
+    /// panel ikinci bir kopya taşımaz (K5).
+    /// </summary>
+    private void RefreshTexts()
+    {
+        EmptyTitle.Text = Say("Comparison panel");
+        EmptyHint.Text = Say(_notice ?? "Load a file to see the two sides");
+        PlaceholderText.Text = Say("The panel moved to the front");
+        LeftBadgeText.Text = LanguageCatalog.Upper(Say("Original"), _turkish);
+        RightBadgeText.Text = LanguageCatalog.Upper(Say("Processed"), _turkish);
+        RightCurtainText.Text = _rightNotice is null ? string.Empty : Say(_rightNotice);
+    }
+
+    private string Say(string english) => LanguageCatalog.Localize(english, _turkish);
 
     // ---- ayırıcı (K2) -------------------------------------------------------------
 
@@ -159,7 +201,13 @@ internal partial class ComparisonPanel : UserControl
     {
         Surface.Split = _split;
         var width = Stage.Bounds.Width;
-        if (width > 0) _separatorAt.X = _split * width - SeparatorGrip.Width / 2;
+        if (width > 0)
+        {
+            _separatorAt.X = _split * width - SeparatorGrip.Width / 2;
+            // Perde ayırıcıdan sağa uzanır. Genişlik panonun kendi ölçüsünden türüyor,
+            // bu yüzden istenen genişlik hiçbir zaman panodan büyük olmaz.
+            RightCurtain.Width = Math.Max(0, width - Math.Clamp(_split, 0, 1) * width);
+        }
         // Sürükleme kare istemez: yalnız yeniden çizim, kopyalama yok, kod çözme yok.
         Surface.InvalidateVisual();
     }
@@ -269,12 +317,15 @@ internal partial class ComparisonPanel : UserControl
         ZoomText.Text = _turkish ? $"%{percent:0}" : $"{percent:0}%";
     }
 
-    private void RefreshEmptyState()
+    internal void RefreshEmptyState()
     {
         var empty = !Surface.HasFrame;
         EmptyState.IsVisible = empty;
         LeftBadge.IsVisible = !empty;
-        RightBadge.IsVisible = !empty;
+        // Perde varken sağ tarafta "işlenmiş" diye bir şey yok; yonga da sebebi söyleyen
+        // perdenin üstünde durmaz.
+        RightCurtain.IsVisible = !empty && _rightNotice is not null;
+        RightBadge.IsVisible = !empty && _rightNotice is null;
         ZoomBadge.IsVisible = !empty;
         SeparatorGrip.IsVisible = !empty;
         Strip.IsVisible = !empty;
@@ -436,6 +487,9 @@ internal partial class ComparisonPanel : UserControl
     }
 
     // ---- tema ve ortam ------------------------------------------------------------
+
+    private double Scalar(string key, double fallback)
+        => this.TryFindResource(key, out var value) && value is double number ? number : fallback;
 
     private TimeSpan Motion(string key, double fallbackMs)
         => this.TryFindResource(key, out var value) && value is TimeSpan span

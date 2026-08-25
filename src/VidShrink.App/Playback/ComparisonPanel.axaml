@@ -32,6 +32,26 @@
 
         <playback:ComparisonSurface x:Name="Surface"/>
 
+        <!--
+          K2 dürüstlük perdesi: işlenmiş dosya yokken sağ taraf gerçek bir çıktı değildir,
+          bu yüzden görüntü hiç gösterilmez — perde ayırıcıdan sağa uzanır ve sebebini
+          söyler. Genişlik kod tarafında ayırıcının konumundan gelir; Margin kullanılmaz,
+          Margin ölçüme girip panoyu şişirir.
+        -->
+        <Border x:Name="RightCurtain"
+                Background="{StaticResource AppBg}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                IsVisible="False">
+          <TextBlock x:Name="RightCurtainText"
+                     Theme="{StaticResource Hint}"
+                     TextWrapping="Wrap"
+                     TextAlignment="Center"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Margin="{StaticResource PlaybackBadgeMargin}"/>
+        </Border>
+
         <!-- K1: hiç kare yokken boş durum. İki dilde, dil geçidi kod tarafında. -->
         <StackPanel x:Name="EmptyState"
                     HorizontalAlignment="Center"

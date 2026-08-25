@@ -9,3 +9,9 @@
 - [Pencere içi ölçüm](vidshrink-pencere-ici-olcum.md) — düzen ve tıklama kanıtı için gerçek pencereyi süreç içinde açan geçici exe; UIA'ya gerek yok
 - [Owns listesi daraltıyor](vidshrink-owns-listesi-daraltiyor.md) — Controls.axaml ve csproj owns dışında; yeni tema anahtarı yok, Headless yok, kural veri katmanında ölçülür
 - [Büyük harf ve servis adları](vidshrink-buyuk-harf-servis-adlari.md) — Title() "storage.to"yu bozar; Names anahtarı tam ad değil, nokta öncesi ilk sözcük
+- [Ölçüme giren konumlandırma](avalonia-olcume-giren-konumlandirma.md) — Margin ile kaydırma kabı şişirir ve kaydırma çubuğu çıkarır; RenderTransform kullan
+- [Panel terfi deseni](vidshrink-panel-terfi-deseni.md) — paneli MainWindow'a dokunmadan üste almak: OverlayLayer + aynı boyutta yer tutucu
+- [Geçiş anı ekran görüntüsü](avalonia-gecis-anli-ekran-goruntusu.md) — geçişli özelliği değiştirdikten hemen sonra çizme ve okuma; gizli-ama-odaklanabilir kalıbı
+- [Görüntü üstünde kontrast](goruntu-ustunde-kontrast.md) — kare üstündeki metni beyaz kareye göre hesapla; neon metin tek perdede AA'yı geçmiyor
+- [Kaynak kapatma kilidi](vidshrink-kaynak-kapatma-kilidi.md) — Dispose'u arayüz kuyruğunda bekletme; Task.Run'a al, kurulumları zincirle
+- [Ekran dışı koşu](vidshrink-ekran-disi-kosu.md) — gerçek MainWindow'u ekran dışında sürme; SetupWithLifetime, bekçi thread, hstack'li ffmpeg sayımı

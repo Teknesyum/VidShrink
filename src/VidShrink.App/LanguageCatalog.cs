@@ -277,7 +277,20 @@ internal static class LanguageCatalog
         ["A new version is available"] = "Yeni bir sürüm var",
         ["Over the target"] = "Hedefin üzerinde",
         ["Try again"] = "Tekrar dene",
-        ["Leave it as is"] = "Bu haliyle bırak"
+        ["Leave it as is"] = "Bu haliyle bırak",
+        ["Preview"] = "Önizleme",
+        ["Open preview"] = "Önizlemeyi aç",
+        ["Close preview"] = "Önizlemeyi kapat",
+        ["Comparison panel"] = "Karşılaştırma paneli",
+        ["Load a file to see the two sides"] = "İki tarafı görmek için bir dosya yükleyin",
+        ["Open the preview to play the file"] = "Dosyayı oynatmak için önizlemeyi açın",
+        ["The first frame is on its way"] = "İlk kare yolda",
+        ["The panel moved to the front"] = "Panel üste alındı",
+        ["Original"] = "Orijinal",
+        ["Processed"] = "İşlenmiş",
+        ["This part will be processed"] = "Bu kısım işleme sokulacak",
+        ["There is no processed file yet, so this side stays empty"] = "Henüz işlenmiş bir dosya yok, bu yüzden bu taraf boş kalıyor",
+        ["The comparison player could not start"] = "Karşılaştırma oynatıcısı başlayamadı"
     };
 
     /// <summary>
@@ -289,6 +302,25 @@ internal static class LanguageCatalog
 
     internal static readonly IReadOnlyDictionary<string, string> TurkishToEnglish =
         EnglishToTurkish.ToDictionary(item => item.Value, item => item.Key);
+
+    /// <summary>
+    /// Puts an English source string into the wanted language. A miss is not a failure: the
+    /// English text stays and only its casing is fixed, exactly like the window's own walk.
+    /// Controls that write their text from code call this instead of carrying a second copy
+    /// of the Turkish wording.
+    /// </summary>
+    internal static string Localize(string english, bool turkish)
+    {
+        var titled = Title(english, false);
+        return turkish && EnglishToTurkish.TryGetValue(titled, out var found) ? found : titled;
+    }
+
+    /// <summary>
+    /// Upper case in the running language. The invariant culture writes "ISLENMIS" where
+    /// "İŞLENMİŞ" belongs, so Turkish goes through its own culture.
+    /// </summary>
+    internal static string Upper(string text, bool turkish)
+        => text.ToUpper(turkish ? TurkishCulture : CultureInfo.InvariantCulture);
 
     private static readonly IReadOnlyDictionary<string, string> ValidationTurkish = new Dictionary<string, string>
     {

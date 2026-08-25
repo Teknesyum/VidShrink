@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
+        xmlns:playback="using:VidShrink.App.Playback"
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
         Width="1560" Height="1060" MinWidth="1040" MinHeight="720"
@@ -420,8 +421,28 @@
 
               </StackPanel>
 
+              <!--
+                Orta sütun iki katmandır: üstte karşılaştırma paneli, altında yapılacak
+                işlem paneli. Üç sütunlu düzen bozulmuyor — panel kendi sütununu almıyor,
+                ortadaki sütunun başına giriyor (T43/K1).
+              -->
+              <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceLg}">
+
+                <StackPanel Grid.Row="0" Spacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Preview" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            x:Name="BtnPreview"
+                            Content="Open preview"
+                            Theme="{StaticResource GhostButton}"
+                            auto:AutomationProperties.Name="Preview"
+                            Click="OnTogglePreview"/>
+                  </Grid>
+                  <playback:ComparisonPanel x:Name="Preview"/>
+                </StackPanel>
+
               <Border x:Name="PlanPanel"
-                      Grid.Column="1"
+                      Grid.Row="1"
                       Theme="{StaticResource Panel}"
                       VerticalAlignment="Stretch"
                       MinHeight="{StaticResource PlanPanelMinHeight}">
@@ -437,6 +458,8 @@
                   </ScrollViewer>
                 </Grid>
               </Border>
+
+              </Grid>
 
               <StackPanel Grid.Column="2" Spacing="{StaticResource SpaceLg}">
 
