@@ -1,4 +1,8 @@
+using System.Globalization;
+
 namespace VidShrink.Core;
+
+public enum EncoderVendor { Software, Nvenc, Qsv, Amf }
 
 public static class CodecModel
 {
@@ -9,6 +13,10 @@ public static class CodecModel
     public const double ScalePenaltyScale = 10.0;
     public const double ScalePenaltyExponent = 1.1;
     public const double FpsPenaltyPerHalving = 5.0;
+    public const double SoftwareQualityCeiling = 99.0;
+    public const double HardwareQualityCeiling = 96.0;
+    public const double HardwareAv1QualityCeiling = 98.0;
+    public const double HardwareBitrateYield = 0.877;
 
     public static double ReferenceCrf(string codec) => Family(codec) switch
     {
@@ -41,17 +49,52 @@ public static class CodecModel
 
     public static double QualityLimit(string codec)
     {
-        if (!IsHardware(codec)) return 99.0;
-        return codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase) ? 98.0 : 96.0;
+        if (!IsHardware(codec)) return SoftwareQualityCeiling;
+        return codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
+            ? HardwareAv1QualityCeiling
+            : HardwareQualityCeiling;
     }
 
-    public static bool IsHardware(string codec)
+    public static EncoderVendor Vendor(string codec)
     {
         var c = codec.ToLowerInvariant();
-        return c.Contains("nvenc") || c.Contains("qsv") || c.Contains("amf");
+        if (c.Contains("nvenc")) return EncoderVendor.Nvenc;
+        if (c.Contains("qsv")) return EncoderVendor.Qsv;
+        if (c.Contains("amf")) return EncoderVendor.Amf;
+        return EncoderVendor.Software;
     }
 
-    public static bool UsesCq(string codec) => IsHardware(codec);
+    public static bool IsHardware(string codec) => Vendor(codec) != EncoderVendor.Software;
+
+    public static bool CostsQualityInHardware(string codec)
+        => IsHardware(codec)
+           && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
+           && !codec.Equals("av1_qsv", StringComparison.OrdinalIgnoreCase);
+
+    public static IReadOnlyList<string> QualityArgs(string codec, double quality)
+    {
+        var exact = quality.ToString("0.#", CultureInfo.InvariantCulture);
+        var whole = Math.Round(quality).ToString("0", CultureInfo.InvariantCulture);
+        return Vendor(codec) switch
+        {
+            EncoderVendor.Nvenc => new[] { "-rc", "vbr", "-multipass", "fullres", "-cq", exact },
+            EncoderVendor.Qsv => codec.Equals("h264_qsv", StringComparison.OrdinalIgnoreCase)
+                ? new[] { "-global_quality", whole, "-look_ahead", "1" }
+                : new[] { "-global_quality", whole },
+            EncoderVendor.Amf => new[] { "-rc", "cqp", "-qp_i", whole, "-qp_p", whole, "-qp_b", whole },
+            _ => new[] { "-crf", exact }
+        };
+    }
+
+    public static IReadOnlyList<string> BitrateRateControlArgs(string codec) => Vendor(codec) switch
+    {
+        EncoderVendor.Nvenc => new[] { "-rc", "vbr", "-multipass", "fullres" },
+        EncoderVendor.Amf => new[] { "-rc", "vbr_peak" },
+        EncoderVendor.Qsv => codec.Equals("h264_qsv", StringComparison.OrdinalIgnoreCase)
+            ? new[] { "-look_ahead", "1" }
+            : Array.Empty<string>(),
+        _ => Array.Empty<string>()
+    };
 
     public static (int Min, int Max) CrfRange(string codec) => Family(codec) switch
     {

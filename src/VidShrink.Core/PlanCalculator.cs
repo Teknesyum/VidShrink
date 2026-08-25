@@ -45,7 +45,6 @@ public static class PlanCalculator
     private const int MinHeight = 240;
     private const double MinFps = 12.0;
     private const int MinVideoBitrateK = 48;
-    private const double HardwareUncalibratedBias = 1.06;
     private const double SourceQualityScore = 100.0;
 
     private static readonly string[] FastHardwareOrder =
@@ -104,7 +103,7 @@ public static class PlanCalculator
 
         if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
             notes.Add(AdviceCode.CodecUpgradeRecommended);
-        if (CostsQualityInHardware(codec) && regime is CompressionRegime.Aggressive or CompressionRegime.Extreme)
+        if (CodecModel.CostsQualityInHardware(codec) && regime is CompressionRegime.Aggressive or CompressionRegime.Extreme)
             notes.Add(AdviceCode.HardwareCodecCostsQuality);
         if (regime == CompressionRegime.Extreme)
             notes.Add(AdviceCode.ExtremeRatioWarning);
@@ -206,15 +205,13 @@ public static class PlanCalculator
                 {
                     plan.Mode = "2pass";
                     plan.Crf = null;
-                    var fillBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
-                    plan.BitrateBias = fillBias;
-                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK * fillBias, MinVideoBitrateK));
+                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
                     reason.Add(gridIsCoarserThanBand
                         ? $"one CRF step moves the file by {crfStep * 100:0.#}%, wider than the {band.RelativeWidth * 100:0.#}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {aimMb:0.0} MB directly"
                         : $"CRF floor {minCrf} was reached before the fill band, so two-pass VBR targets the {aimMb:0.0} MB band center directly");
                     reasonCodes.Add(new ReasonNote(gridIsCoarserThanBand ? ReasonCode.FillTwoPassBandTooNarrowForCrf : ReasonCode.FillTwoPassBandCenter,
                         Crf: minCrf, Mb: aimMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb, Factor: crfStep));
-                    AddHardwareBiasNote(codec, fillBias, reason, reasonCodes);
+                    AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
                 }
             }
         }
@@ -225,10 +222,8 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: effectiveTargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "2pass";
-            var enforcedBias = HardwareBitrateBias(codec, complexity, best.Scale, best.Fps);
-            plan.BitrateBias = enforcedBias;
-            plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK * enforcedBias, MinVideoBitrateK));
-            AddHardwareBiasNote(codec, enforcedBias, reason, reasonCodes);
+            plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK, MinVideoBitrateK));
+            AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
         }
 
         reason.Add($"predicted quality {best.Score:0.#}/100{(complexity.Measured ? $" from a measured sample (bppf {complexity.ReferenceBppf:0.0000}, detail falloff {complexity.DetailExponent:0.00})" : " estimated from the source bitrate")}");
@@ -301,14 +296,16 @@ public static class PlanCalculator
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return new SizeEstimate(info.FileSizeMb, info.FileSizeMb, info.FileSizeMb, complexity.Measured, true);
 
+        var scale = info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
+
         if (plan.ModeEnum == EncodeMode.TwoPass)
         {
-            var requestedK = plan.VideoBitrateK / Math.Max(plan.BitrateBias, 0.01);
-            var expected = SizeMb(requestedK, plan.AudioBitrateK, info.DurationSeconds);
-            return new SizeEstimate(expected, expected * (1 - TwoPassUncertainty), expected * (1 + TwoPassUncertainty), complexity.Measured, true);
+            var expected = SizeMb(plan.VideoBitrateK, plan.AudioBitrateK, info.DurationSeconds);
+            var yield = HardwareBitrateYield(plan.Codec, complexity, scale, plan.Fps);
+            var low = Math.Min(expected * (1 - TwoPassUncertainty), expected * yield);
+            return new SizeEstimate(expected, low, expected * (1 + TwoPassUncertainty), complexity.Measured, true);
         }
 
-        var scale = info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;
         var bppf = complexity.BppfAtCrf(plan.Codec, plan.Crf ?? CodecModel.ReferenceCrf(plan.Codec), scale, plan.Fps, info.Fps);
         var videoK = VideoBitrateK(bppf, plan.Width, plan.Height, plan.Fps);
         var expectedMb = SizeMb(videoK, plan.AudioBitrateK, info.DurationSeconds);
@@ -561,21 +558,17 @@ public static class PlanCalculator
         return FallbackCodecFor(pref);
     }
 
-    private static bool CostsQualityInHardware(string codec)
-        => CodecModel.IsHardware(codec)
-           && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
-           && !codec.Equals("av1_qsv", StringComparison.OrdinalIgnoreCase);
-
-    private static double HardwareBitrateBias(string codec, ComplexityProfile complexity, double scale, double fps)
+    public static double HardwareBitrateYield(string codec, ComplexityProfile complexity, double scale, double fps)
         => CodecModel.IsHardware(codec) && !complexity.AppliesTo(codec, scale, fps)
-            ? HardwareUncalibratedBias
+            ? CodecModel.HardwareBitrateYield
             : 1.0;
 
-    private static void AddHardwareBiasNote(string codec, double bias, List<string> reason, List<ReasonNote> reasonCodes)
+    private static void AddHardwareYieldNote(string codec, ComplexityProfile complexity, Layout best, List<string> reason, List<ReasonNote> reasonCodes)
     {
-        if (bias <= 1.0) return;
-        reason.Add($"{codec} was not calibrated on this source, and hardware encoders land below a requested bitrate, so the two-pass target was raised by {(bias - 1) * 100:0.#}%");
-        reasonCodes.Add(new ReasonNote(ReasonCode.HardwareBitrateBias, Factor: bias, FallbackCodec: codec));
+        var yield = HardwareBitrateYield(codec, complexity, best.Scale, best.Fps);
+        if (yield >= 1.0) return;
+        reason.Add($"{codec} was not calibrated on this source, and a hardware encoder can land up to {(1 - yield) * 100:0.#}% below the bitrate it is given, so the estimate carries that much room underneath while the requested bitrate stays on the target");
+        reasonCodes.Add(new ReasonNote(ReasonCode.HardwareBitrateBias, Factor: yield, FallbackCodec: codec));
     }
 
     private static string PickAudioCodec() => "aac";

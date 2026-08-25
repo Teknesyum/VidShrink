@@ -61,9 +61,8 @@ public static class FfmpegArguments
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
-            var qualityFlag = CodecModel.UsesCq(plan.Codec) ? "-cq" : "-crf";
-            a.AddRange(new[] { qualityFlag, plan.Crf!.Value.ToString(CultureInfo.InvariantCulture) });
-            if (SupportsRateLimits(plan.Codec))
+            a.AddRange(CodecModel.QualityArgs(plan.Codec, plan.Crf!.Value));
+            if (SupportsRateLimits(plan.Codec) && !CodecModel.IsHardware(plan.Codec))
                 a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK * 2}k", "-bufsize", $"{plan.VideoBitrateK * 4}k" });
         }
         else
@@ -72,7 +71,7 @@ public static class FfmpegArguments
             if (SupportsRateLimits(plan.Codec))
                 a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * 1.5)}k", "-bufsize", $"{plan.VideoBitrateK * 2}k" });
             if (CodecModel.IsHardware(plan.Codec))
-                a.AddRange(HardwareRateControl(plan.Codec));
+                a.AddRange(CodecModel.BitrateRateControlArgs(plan.Codec));
             else if (pass > 0)
             {
                 a.AddRange(new[] { "-pass", pass.ToString(CultureInfo.InvariantCulture) });
@@ -107,15 +106,6 @@ public static class FfmpegArguments
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
         return a;
-    }
-
-    private static IReadOnlyList<string> HardwareRateControl(string codec)
-    {
-        var c = codec.ToLowerInvariant();
-        if (c.Contains("nvenc")) return new[] { "-rc", "vbr", "-multipass", "fullres" };
-        if (c.Contains("amf")) return new[] { "-rc", "vbr_peak" };
-        if (c.Equals("h264_qsv")) return new[] { "-look_ahead", "1" };
-        return Array.Empty<string>();
     }
 
     public static string ToCommandLine(IEnumerable<string> args)
