@@ -24,6 +24,9 @@ internal sealed class PanelHost : IDisposable
 
     private const int MaxFps = 60;
 
+    /// <summary>Bir sunum turunda en çok kaç kare atlanabileceği — yetişme sınırlı kalsın.</summary>
+    private const int CatchUpCeiling = 8;
+
     private readonly ComparisonPanel _panel;
     private readonly Func<IComparisonFrameSource> _factory;
     private readonly DispatcherTimer _settle;
@@ -258,7 +261,7 @@ internal sealed class PanelHost : IDisposable
     {
         var source = _source;
         if (source is null) return;
-        if (!source.TryTake(out var frame)) return;
+        if (!TakeNewestReady(source, out var frame)) return;
 
         var expected = _panel.Frames.FrameSize;
         var position = frame.Presentation;
@@ -292,6 +295,32 @@ internal sealed class PanelHost : IDisposable
             _panel.RefreshEmptyState();
         }
         SampleRate();
+    }
+
+    /// <summary>
+    /// Bir sunum turunda kaynaktan yalnız bir kare çekmek, tur hızı besleme hızının altına
+    /// düştüğü anda kalıcı geri kalma üretiyordu: halka her turda taşıyor, ekrana konan kare
+    /// giderek gerçek zamandan geriye kayıyordu. Burada tur başına kuyruk boşaltılıyor ve
+    /// yalnız sonuncusu sunuluyor — atlananlar ekrana konmadan havuza iade ediliyor.
+    ///
+    /// Yetişiliyorken davranış değişmiyor: sırada tek kare varsa ikinci <c>TryTake</c> boş
+    /// döner ve o tek kare sunulur. Atlama yalnız gerçekten geride kalınca oluyor.
+    /// </summary>
+    private static bool TakeNewestReady(IComparisonFrameSource source, out PlaybackFrame frame)
+    {
+        frame = null!;
+        var skipped = 0;
+        while (source.TryTake(out var next))
+        {
+            if (frame is not null)
+            {
+                source.Return(frame);
+                skipped++;
+            }
+            frame = next;
+            if (skipped >= CatchUpCeiling) break;
+        }
+        return frame is not null;
     }
 
     private void SampleRate()

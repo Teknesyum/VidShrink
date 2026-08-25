@@ -99,12 +99,20 @@ public sealed class PipeComparisonFrameSource : IComparisonFrameSource
             return;
         }
 
-        var works = await Task.Run(ComparisonGraph.HstackWorks, ct);
-        if (!works)
+        var outcome = await Task.Run(ComparisonGraph.ProbeHstack, ct);
+        if (outcome == ComparisonGraph.ProbeOutcome.Calismiyor)
         {
             SetUnavailable(
                 "Bu ffmpeg yapisinda hstack filtresi calismiyor; karsilastirma oynaticisi acilamaz.",
                 "The hstack filter does not work in this ffmpeg build, so the comparison player cannot open.");
+            return;
+        }
+
+        if (outcome == ComparisonGraph.ProbeOutcome.Belirsiz)
+        {
+            SetUnavailable(
+                "Kontrol tamamlanamadi, makine mesgul olabilir; oynaticiyi yeniden acmayi deneyin.",
+                "The check could not finish, the machine may be busy; try opening the player again.");
             return;
         }
 

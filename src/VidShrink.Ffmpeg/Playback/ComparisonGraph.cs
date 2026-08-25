@@ -18,6 +18,12 @@ public static class ComparisonGraph
     private static readonly object ProbeGate = new();
     private static bool? _hstackWorks;
 
+    /// <summary>
+    /// Sonda suresi. Eski 6 sn makine yukluyken yetmiyordu; T32 surec acilisini tek basina
+    /// 692-800 ms p95 olcmustu, dort ffmpeg birden kosarken bu kuyruk cok daha uzun.
+    /// </summary>
+    private const int ProbeTimeoutMs = 20000;
+
     public const string OutputLabel = "[v]";
 
     /// <summary>Filtre metni. Icinde yalniz etiket ve sayi vardir, kullanici verisi yoktur.</summary>
@@ -89,20 +95,40 @@ public static class ComparisonGraph
         args.Add(path);
     }
 
+    /// <summary>Sondanin verdigi cevap. <see cref="Belirsiz"/> bir yetenek cevabi degildir.</summary>
+    public enum ProbeOutcome
+    {
+        Calisiyor,
+        Calismiyor,
+
+        /// <summary>Sonda tamamlanamadi — sure doldu ya da ffmpeg hic kosmadi.</summary>
+        Belirsiz
+    }
+
     /// <summary>
     /// <c>hstack</c> bu ffmpeg yapisinda gercekten calisiyor mu. Liste sorgusu degil, kucuk
     /// bir sentetik kosu — T33/K2 liste sorgusunun sahte negatif verdigini olctu.
     /// </summary>
-    public static bool HstackWorks()
+    /// <remarks>
+    /// Yalnizca <b>kesin</b> cevaplar onbellege girer. Sure dolmasi bir yetenek cevabi degil:
+    /// makine yukluyken sonda gec kaliyordu ve onbellek o gecikmeyi "bu yapida hstack yok"
+    /// diye oturum boyu kalici hale getiriyordu. Olculdu: dort kosudan biri boyle dustu,
+    /// ayni makinede ayni ffmpeg ile digerleri calisti.
+    /// </remarks>
+    public static ProbeOutcome ProbeHstack()
     {
         lock (ProbeGate)
         {
-            if (_hstackWorks is { } cached) return cached;
-            var works = Probe();
-            _hstackWorks = works;
-            return works;
+            if (_hstackWorks is { } cached) return cached ? ProbeOutcome.Calisiyor : ProbeOutcome.Calismiyor;
+
+            var outcome = Probe();
+            if (outcome == ProbeOutcome.Belirsiz) outcome = Probe();
+            if (outcome != ProbeOutcome.Belirsiz) _hstackWorks = outcome == ProbeOutcome.Calisiyor;
+            return outcome;
         }
     }
+
+    public static bool HstackWorks() => ProbeHstack() == ProbeOutcome.Calisiyor;
 
     /// <summary>Onbellegi bosaltir. Testler icin.</summary>
     public static void ResetProbeCache()
@@ -110,7 +136,7 @@ public static class ComparisonGraph
         lock (ProbeGate) _hstackWorks = null;
     }
 
-    private static bool Probe()
+    private static ProbeOutcome Probe()
     {
         try
         {
@@ -128,17 +154,17 @@ public static class ComparisonGraph
             process.Start();
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
-            if (!process.WaitForExit(6000))
+            if (!process.WaitForExit(ProbeTimeoutMs))
             {
                 try { process.Kill(true); } catch { }
-                return false;
+                return ProbeOutcome.Belirsiz;
             }
             Task.WaitAll(new Task[] { output, error }, 1000);
-            return process.ExitCode == 0;
+            return process.ExitCode == 0 ? ProbeOutcome.Calisiyor : ProbeOutcome.Calismiyor;
         }
         catch
         {
-            return false;
+            return ProbeOutcome.Belirsiz;
         }
     }
 }

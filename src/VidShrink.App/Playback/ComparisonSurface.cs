@@ -153,7 +153,15 @@ internal sealed class ComparisonSurface : Control
             // zamanda tempolu olduğu için kuyruktaki kare bayat değil, kendi anını
             // bekliyor; "en yenisi kazanır" karelerin dörtte birini çöpe atıyordu.
             // Gecikme yine sınırlı, çünkü halka dolduğunda Submit en eskisini düşürür.
-            if (_ring.Count > 0) buffer = _ring.Dequeue();
+            //
+            // Ama tur başına tek kare almak, tur hızı besleme hızının altına düştüğünde
+            // kalıcı geri kalma üretiyor. Kuyrukta birden çok kare biriktiyse geride
+            // kalınmış demektir: sonuncusuna atlanıp aradakiler çizilmeden havuza döner.
+            while (_ring.Count > 0)
+            {
+                if (buffer is not null) _pool.Push(buffer);
+                buffer = _ring.Dequeue();
+            }
         }
 
         if (buffer is null)
