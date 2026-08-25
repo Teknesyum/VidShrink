@@ -7,8 +7,10 @@ metadata:
 
 VidShrink (Avalonia 11 + .NET 8; arayuz dosyalari `.axaml` / `.axaml.cs`):
 `dotnet build VidShrink.sln -c Release` ve `dotnet test VidShrink.sln` kok dizinden calisir.
-PATH'teki `dotnet` 3.1.201 ve MSB3644 ile duser; `$env:DOTNET_ROOT = "$env:LOCALAPPDATA\Microsoft\dotnet"`
-kurup `& "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe"` cagir. Derlemeden once
+**25.08.2026 itibariyle** `%LOCALAPPDATA%\Microsoft\dotnet` klasoru YOK; kurulum
+`C:\Program Files\dotnet\dotnet.exe` (SDK 8.0.423 + 9.0.316) ve PATH'teki `dotnet` bu.
+Eski sozlesmelerin "PATH'teki dotnet 3.1.201, LOCALAPPDATA'yi kullan" notu artik yanlis —
+komutu kosturmadan once `(Get-Command dotnet).Source` ile bak. Derlemeden once
 `Get-Process VidShrink.App | Stop-Process -Force`, yoksa App.dll kilitli kalir.
 
 **Why:** Ayni anda baska sozlesme kosarken bin/ kilidi cakisiyor; ikinci deneme genelde geciyor.
