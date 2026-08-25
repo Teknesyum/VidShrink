@@ -33,7 +33,7 @@ static void PrintUsage()
 {
     Console.WriteLine("Usage:");
     Console.WriteLine("  bench measure <referans> <test>");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor>");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p2,p3,p5,p6,p8,p9,p10 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
@@ -74,8 +74,27 @@ static async Task<int> ShrinkAsync(string[] args)
         .ToList();
 
     string? outDir = null;
+    string? resultsPath = null;
+    var fillPolicy = FillPolicy.FillTarget;
     for (var i = 3; i < args.Length; i++)
-        if (args[i] == "--out" && i + 1 < args.Length) outDir = args[++i];
+    {
+        switch (args[i])
+        {
+            case "--out" when i + 1 < args.Length:
+                outDir = args[++i];
+                break;
+            case "--results" when i + 1 < args.Length:
+                resultsPath = args[++i];
+                break;
+            case "--fill" when i + 1 < args.Length:
+                fillPolicy = args[++i].Trim().ToLowerInvariant() switch
+                {
+                    "qualityceiling" or "ceiling" => FillPolicy.QualityCeiling,
+                    _ => FillPolicy.FillTarget
+                };
+                break;
+        }
+    }
 
     if (outDir is null)
     {
@@ -86,26 +105,42 @@ static async Task<int> ShrinkAsync(string[] args)
     Directory.CreateDirectory(outDir);
 
     var info = await FfprobeClient.ProbeAsync(source);
+    var probeWatch = Stopwatch.StartNew();
     var complexity = await ComplexityProbe.RunAsync(info, SpeedMode.Quality);
+    probeWatch.Stop();
     var results = new List<BenchResult>();
+    var label = Path.GetFileNameWithoutExtension(source);
+    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | kalibre={complexity.Calibrated}");
 
     foreach (var targetMb in targets)
     {
-        var options = new PlanOptions { TargetMb = targetMb };
+        var options = new PlanOptions { TargetMb = targetMb, FillPolicy = fillPolicy };
+        var planWatch = Stopwatch.StartNew();
         var planResult = PlanCalculator.BuildDetailed(info, options, complexity, EncoderCapabilities.Instance);
+        planWatch.Stop();
         var plan = planResult.Plan;
+        var band = FillBand.For(targetMb);
 
-        var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
+        var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
         var stopwatch = Stopwatch.StartNew();
-        var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None);
+        var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, fillPolicy);
         stopwatch.Stop();
 
         var score = await QualityMeter.MeasureAsync(source, outputPath, CancellationToken.None);
+        var planes = await XpsnrPlanesAsync(source, outputPath, info.Width, info.Height);
 
+        var actual = encodeResult.OutputMb;
         var result = new BenchResult(
+            label,
+            fillPolicy.ToString(),
             targetMb,
-            encodeResult.OutputMb,
-            encodeResult.OutputMb / targetMb * 100.0,
+            actual,
+            actual / targetMb * 100.0,
+            band.LowerMb,
+            band.HardFloorMb,
+            actual <= targetMb && actual >= band.LowerMb,
+            actual > targetMb,
+            actual < band.HardFloorMb,
             plan.Width,
             plan.Height,
             plan.Fps,
@@ -113,21 +148,76 @@ static async Task<int> ShrinkAsync(string[] args)
             plan.Mode,
             plan.ModeEnum == EncodeMode.Crf ? $"crf {plan.Crf}" : $"{plan.VideoBitrateK}k",
             stopwatch.Elapsed.TotalSeconds,
+            planWatch.Elapsed.TotalSeconds,
+            probeWatch.Elapsed.TotalSeconds,
             score.VmafNegHarmonic,
             score.VmafNegP10,
-            score.Xpsnr);
+            score.Xpsnr,
+            planes.Y,
+            planes.U,
+            planes.V);
         results.Add(result);
 
         Console.WriteLine(
             $"{result.TargetMb:0.##} MB -> {result.ActualMb:0.##} MB ({result.FillPercent:0.#}%), " +
-            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, " +
-            $"VMAF-NEG harm={Fmt(result.VmafNegHarmonic)} p10={Fmt(result.VmafNegP10)}, XPSNR={Fmt(result.Xpsnr)}");
+            $"bant={(result.InBand ? "ic" : "dis")} tasma={(result.OverTarget ? "VAR" : "yok")} taban={(result.BelowHardFloor ? "IHLAL" : "ok")}, " +
+            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, " +
+            $"sure={result.EncodeSeconds:0.#}s, " +
+            $"VMAF-NEG harm={Fmt(result.VmafNegHarmonic)} p10={Fmt(result.VmafNegP10)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
+
+        await WriteResultsAsync(results, outDir, resultsPath);
     }
 
-    var resultsPath = Path.Combine(outDir, $"results-{DateTime.Now:yyyyMMdd-HHmmss}.json");
-    await File.WriteAllTextAsync(resultsPath, JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
-    Console.WriteLine($"sonuclar: {resultsPath}");
+    var finalPath = await WriteResultsAsync(results, outDir, resultsPath);
+    Console.WriteLine($"sonuclar: {finalPath}");
     return 0;
+}
+
+static async Task<string> WriteResultsAsync(List<BenchResult> results, string outDir, string? resultsPath)
+{
+    var path = resultsPath ?? Path.Combine(outDir, "results.json");
+    var dir = Path.GetDirectoryName(Path.GetFullPath(path));
+    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+    await File.WriteAllTextAsync(path, JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
+    return path;
+}
+
+static async Task<(double? Y, double? U, double? V)> XpsnrPlanesAsync(string referencePath, string testPath, int width, int height)
+{
+    var psi = new ProcessStartInfo
+    {
+        FileName = ToolLocator.Ffmpeg,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var arg in new[]
+             {
+                 "-hide_banner", "-nostdin",
+                 "-i", testPath,
+                 "-i", referencePath,
+                 "-lavfi", $"[0:v]zscale=w={width}:h={height}[t];[t][1:v]xpsnr",
+                 "-f", "null", "-"
+             })
+        psi.ArgumentList.Add(arg);
+
+    using var process = new Process { StartInfo = psi };
+    process.Start();
+    var stdoutTask = process.StandardOutput.ReadToEndAsync();
+    var stderrTask = process.StandardError.ReadToEndAsync();
+    await Task.WhenAll(stdoutTask, stderrTask);
+    var stderr = await stderrTask;
+    await process.WaitForExitAsync();
+
+    var match = System.Text.RegularExpressions.Regex.Match(
+        stderr, @"XPSNR\s+y:\s*([\d.]+)\s*u:\s*([\d.]+)\s*v:\s*([\d.]+)",
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    if (!match.Success) return (null, null, null);
+
+    return (double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
+        double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture),
+        double.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture));
 }
 
 static int Compare(string[] args)
@@ -152,9 +242,13 @@ static int Compare(string[] args)
             continue;
         }
 
-        Console.WriteLine($"[{i}] hedef {ar.TargetMb:0.##}MB -> {br.TargetMb:0.##}MB");
+        Console.WriteLine($"[{i}] {ar.Source} hedef {ar.TargetMb:0.##}MB -> {br.TargetMb:0.##}MB");
+        Console.WriteLine($"  fill mod   {ar.FillPolicy} -> {br.FillPolicy}");
         Console.WriteLine($"  gercekMb   {ar.ActualMb:0.##} -> {br.ActualMb:0.##}");
         Console.WriteLine($"  doluluk%   {ar.FillPercent:0.#} -> {br.FillPercent:0.#}");
+        Console.WriteLine($"  bant ici   {ar.InBand} -> {br.InBand}");
+        Console.WriteLine($"  tasma      {ar.OverTarget} -> {br.OverTarget}");
+        Console.WriteLine($"  taban ihl. {ar.BelowHardFloor} -> {br.BelowHardFloor}");
         Console.WriteLine($"  cozunurluk {ar.Width}x{ar.Height} -> {br.Width}x{br.Height}");
         Console.WriteLine($"  fps        {ar.Fps:0.##} -> {br.Fps:0.##}");
         Console.WriteLine($"  codec/mod  {ar.Codec}/{ar.Mode} -> {br.Codec}/{br.Mode}");
@@ -163,6 +257,9 @@ static int Compare(string[] args)
         Console.WriteLine($"  vmaf harm  {Fmt(ar.VmafNegHarmonic)} -> {Fmt(br.VmafNegHarmonic)}");
         Console.WriteLine($"  vmaf p10   {Fmt(ar.VmafNegP10)} -> {Fmt(br.VmafNegP10)}");
         Console.WriteLine($"  xpsnr      {Fmt(ar.Xpsnr)} -> {Fmt(br.Xpsnr)}");
+        Console.WriteLine($"  xpsnr yuv  {Fmt(ar.XpsnrY)}/{Fmt(ar.XpsnrU)}/{Fmt(ar.XpsnrV)} -> {Fmt(br.XpsnrY)}/{Fmt(br.XpsnrU)}/{Fmt(br.XpsnrV)}");
+        Console.WriteLine($"  plan(s)    {ar.PlanSeconds:0.##} -> {br.PlanSeconds:0.##}");
+        Console.WriteLine($"  prob(s)    {ar.ProbeSeconds:0.##} -> {br.ProbeSeconds:0.##}");
     }
 
     return 0;
@@ -1507,9 +1604,16 @@ sealed record PipeStats(
     string Error);
 
 sealed record BenchResult(
+    string Source,
+    string FillPolicy,
     double TargetMb,
     double ActualMb,
     double FillPercent,
+    double BandLowerMb,
+    double HardFloorMb,
+    bool InBand,
+    bool OverTarget,
+    bool BelowHardFloor,
     int Width,
     int Height,
     double Fps,
@@ -1517,7 +1621,12 @@ sealed record BenchResult(
     string Mode,
     string CrfOrBitrate,
     double EncodeSeconds,
+    double PlanSeconds,
+    double ProbeSeconds,
     double? VmafNegHarmonic,
     double? VmafNegP10,
-    double? Xpsnr);
+    double? Xpsnr,
+    double? XpsnrY,
+    double? XpsnrU,
+    double? XpsnrV);
 
