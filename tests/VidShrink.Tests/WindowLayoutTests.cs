@@ -29,6 +29,12 @@ public sealed class WindowLayoutTests
         {
             var window = new MainWindow();
 
+            // Pencerenin kendi Width/Height degerleri ArrangeCore icindeki
+            // ApplyLayoutConstraints tarafindan olcum argumanina uygulanir ve argumani
+            // yutar; temizlenmezse her boyut ayni yerlesimi olcer.
+            window.Width = double.NaN;
+            window.Height = double.NaN;
+
             window.Measure(new Size(width, height));
             window.Arrange(new Rect(0, 0, width, height));
             window.UpdateLayout();
@@ -44,16 +50,36 @@ public sealed class WindowLayoutTests
                 .ToList();
         });
 
-    [Fact]
-    public void TheEmptyWindowDoesNotScrollAtItsStartingSize()
+    /// <summary>
+    /// Pencere <c>WindowState="Maximized"</c> ile aciliyor, yani gercek acilis boyutu
+    /// bildirilen 1560x1060 degil ekranin calisma alani. Iki boyut da olculuyor.
+    /// </summary>
+    [Theory]
+    [InlineData(1560, 1060)]
+    [InlineData(1920, 1032)]
+    public void TheEmptyWindowDoesNotScrollAtItsStartingSize(double width, double height)
     {
-        var overflowing = LayOut(1560, 1060);
+        var overflowing = LayOut(width, height);
 
         Assert.True(
             overflowing.Count == 0,
-            "Açılış boyutunda taşan taşıyıcı var:"
+            $"{width}x{height} boyutunda tasan tasiyici var:"
             + Environment.NewLine
             + string.Join(Environment.NewLine, overflowing));
+    }
+
+    /// <summary>
+    /// T23 K7: en kucuk boyutta kaydirma <b>beklenen</b> davranis — icerik gercekten
+    /// sigmiyor. Olcum bunu kaydediyor ki bir gun sigdigi zaman kimse fark etmeden
+    /// gecmesin; taban degistiginde test kirmiziya duser ve sayi yeniden konusulur.
+    /// </summary>
+    [Fact]
+    public void TheSmallestSizeStillScrolls()
+    {
+        var overflowing = LayOut(1040, 720);
+
+        Assert.Single(overflowing);
+        Assert.InRange(overflowing[0].Vertical, 100, 150);
     }
 
     [Fact]
@@ -62,9 +88,12 @@ public sealed class WindowLayoutTests
         var clipped = AppHost.Run(() =>
         {
             var window = new MainWindow();
+            var size = new Size(window.MinWidth, window.MinHeight);
 
-            window.Measure(new Size(window.MinWidth, window.MinHeight));
-            window.Arrange(new Rect(0, 0, window.MinWidth, window.MinHeight));
+            window.Width = double.NaN;
+            window.Height = double.NaN;
+            window.Measure(size);
+            window.Arrange(new Rect(size));
             window.UpdateLayout();
 
             return window.GetVisualDescendants()
