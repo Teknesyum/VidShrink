@@ -40,10 +40,10 @@ public static class PlanCalculator
     private const double KbitPerMib = 8388.608;
     public const double TwoPassUncertainty = 0.012;
     public const double SourceSizeCap = 0.95;
-    private const double MinScale = 0.25;
     private const double ScaleStep = 0.02;
-    private const int MinHeight = 240;
-    private const double MinFps = 12.0;
+    private const double LowFpsSurcharge = 12.0;
+    private const double LowFpsThreshold = 20.0;
+    private const double MotionCutIsExpensiveAbove = 0.5;
     private const int MinVideoBitrateK = 48;
     private const double SourceQualityScore = 100.0;
 
@@ -122,7 +122,7 @@ public static class PlanCalculator
             SpeedMode = options.SpeedMode
         };
 
-        var best = SearchLayout(info, effective, complexity, codec, videoK);
+        var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);
 
         if (complexity.Measured)
         {
@@ -133,6 +133,32 @@ public static class PlanCalculator
             }
             if (complexity.ReferenceBppf <= 0.02) notes.Add(AdviceCode.ContentIsSimple);
             else if (complexity.ReferenceBppf >= 0.25) notes.Add(AdviceCode.ContentIsComplex);
+        }
+
+        if (complexity.MotionMeasured && effective.AllowFpsDrop)
+        {
+            var halvingSaving = (1 - Math.Pow(2, complexity.MotionExponent - 1)) * 100;
+            if (complexity.MotionExponent <= ComplexityProfile.DefaultMotionExponent)
+            {
+                notes.Add(AdviceCode.MotionCutIsCheap);
+                reason.Add($"the motion measurement puts this title's frame rate exponent at {complexity.MotionExponent:0.00}, so halving the frame rate saves {halvingSaving:0.#}% of the bits and dropping frames is cheap here");
+            }
+            else if (complexity.MotionExponent >= MotionCutIsExpensiveAbove)
+            {
+                notes.Add(AdviceCode.MotionCutIsExpensive);
+                reason.Add($"the motion measurement puts this title's frame rate exponent at {complexity.MotionExponent:0.00}, so halving the frame rate saves only {halvingSaving:0.#}% of the bits and resolution is cut before frames are");
+            }
+        }
+
+        if (!best.MeetsFloor)
+        {
+            notes.Add(AdviceCode.TargetBelowCodecFloor);
+            reason.Add($"no layout reaches the {complexity.FloorBppf(codec, best.Fps, info.Fps):0.0000} bits per pixel per frame that {codec} needs for a meaningful picture; the densest layout ({best.Bppf:0.0000}) was taken, but this target is genuinely too small for this source");
+        }
+        else if (best.Fps < info.Fps - 0.01 && !sourceFpsViable)
+        {
+            notes.Add(AdviceCode.FrameRateCutForFloor);
+            reason.Add($"at {info.Fps:0.##} fps every frame would fall below the {complexity.FloorBppf(codec, info.Fps, info.Fps):0.0000} bits per pixel per frame that {codec} needs, so the frame rate was cut to {best.Fps:0.##} and the freed bits went to the frames that remain");
         }
 
         if (best.Width != info.Width || best.Height != info.Height)
@@ -159,7 +185,7 @@ public static class PlanCalculator
 
         if (budgetCrf <= ceilingCrf && ceilingSizeMb < band.LowerMb)
         {
-            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, band.LowerMb);
+            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, band.LowerMb, regime);
             if (recovered.Scale > best.Scale + 1e-6 || recovered.Fps > best.Fps + 0.01)
             {
                 reason.Add($"the ceiling left budget unused, so resolution was restored to {recovered.Width}x{recovered.Height}@{recovered.Fps:0.##} — the largest layout that still fits the target at CRF {ceilingCrf:0}");
@@ -168,6 +194,7 @@ public static class PlanCalculator
                 notes.Remove(AdviceCode.ResolutionReduced);
                 notes.Remove(AdviceCode.FrameRateReduced);
                 reasonCodes.RemoveAll(n => n.Code is ReasonCode.ResolutionScaled or ReasonCode.FrameRateReduced);
+                notes.Remove(AdviceCode.FrameRateCutForFloor);
                 if (best.Width != info.Width || best.Height != info.Height) notes.Add(AdviceCode.ResolutionReduced);
                 if (best.Fps < info.Fps - 0.01) notes.Add(AdviceCode.FrameRateReduced);
                 ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
@@ -376,19 +403,20 @@ public static class PlanCalculator
     private static double SizeMb(double videoK, double audioK, double durationSeconds)
         => (videoK + audioK) * durationSeconds / KbitPerMib / ContainerOverhead;
 
-    private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score);
+    private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true);
 
-    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb)
+    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb, CompressionRegime regime)
     {
         Layout? best = null;
+        var floors = CompressionStrategy.FloorsFor(regime);
 
-        foreach (var fps in FpsCandidates(info, options))
-        foreach (var scale in ScaleCandidates(options))
+        foreach (var fps in FpsCandidates(info, options, regime))
+        foreach (var scale in ScaleCandidates(options, regime))
         {
             if (scale < fallback.Scale - 1e-6) continue;
 
             var (width, height) = Dimensions(info, scale);
-            if (height < MinHeight && height < info.Height) continue;
+            if (height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
 
             var effectiveScale = (double)height / Math.Max(1, info.Height);
@@ -397,69 +425,86 @@ public static class PlanCalculator
             if (SizeMb(videoK, audioK, info.DurationSeconds) >= capMb) continue;
 
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
-            var score = LayoutScore(codec, required, bppf, effectiveScale, fps, info.Fps);
+            var score = LayoutScore(codec, required, bppf, effectiveScale, fps, info.Fps, regime);
             if (best is null || score > best.Score)
-                best = new Layout(width, height, fps, effectiveScale, score);
+                best = new Layout(width, height, fps, effectiveScale, score, bppf);
         }
 
         return best ?? fallback;
     }
 
-    private static double LayoutScore(string codec, double required, double provided, double scale, double fps, double sourceFps)
+    private static double LayoutScore(string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
     {
+        var weights = CompressionStrategy.PenaltyWeights(regime);
         var rate = CodecModel.QualityAtReference - CodecModel.QualityPerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
         rate = Math.Min(rate, CodecModel.QualityLimit(codec));
-        return rate - ScalePenalty(scale) - FpsPenalty(fps, sourceFps);
+        return rate - ScalePenalty(scale, weights) - FpsPenalty(fps, sourceFps, weights);
     }
 
-    private static Layout SearchLayout(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, double videoK)
+    private static (Layout Best, bool SourceFpsViable) SearchLayout(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, double videoK, CompressionRegime regime)
     {
         Layout? best = null;
+        Layout? densest = null;
+        var sourceFpsViable = false;
+        var floors = CompressionStrategy.FloorsFor(regime);
 
-        foreach (var fps in FpsCandidates(info, options))
-        foreach (var scale in ScaleCandidates(options))
+        foreach (var fps in FpsCandidates(info, options, regime))
+        foreach (var scale in ScaleCandidates(options, regime))
         {
             var (width, height) = Dimensions(info, scale);
-            if (height < MinHeight && height < info.Height) continue;
+            if (height < floors.MinHeight && height < info.Height) continue;
             if (width < 2 || height < 2) continue;
 
             var effectiveScale = (double)height / Math.Max(1, info.Height);
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
             var provided = BitsPerPixel(videoK, width, height, fps);
+            var score = LayoutScore(codec, required, provided, effectiveScale, fps, info.Fps, regime);
 
-            var score = LayoutScore(codec, required, provided, effectiveScale, fps, info.Fps);
-
-            if (best is null || score > best.Score)
-                best = new Layout(width, height, fps, effectiveScale, score);
+            if (provided >= complexity.FloorBppf(codec, fps, info.Fps))
+            {
+                if (fps >= info.Fps - 0.01) sourceFpsViable = true;
+                if (best is null || score > best.Score)
+                    best = new Layout(width, height, fps, effectiveScale, score, provided);
+            }
+            else if (densest is null || provided > densest.Bppf)
+                densest = new Layout(width, height, fps, effectiveScale, score, provided, false);
         }
 
-        if (best is not null) return best;
+        if (best is not null) return (best, sourceFpsViable);
+        if (densest is not null) return (densest, false);
 
         var (fallbackWidth, fallbackHeight) = Dimensions(info, 1.0);
-        return new Layout(fallbackWidth, fallbackHeight, info.Fps, 1.0, 0);
+        return (new Layout(fallbackWidth, fallbackHeight, info.Fps, 1.0, 0), true);
     }
 
-    private static IEnumerable<double> ScaleCandidates(PlanOptions options)
+    public static IEnumerable<double> ScaleCandidates(PlanOptions options, CompressionRegime regime)
     {
         if (!options.AllowResolutionDrop)
         {
             yield return 1.0;
             yield break;
         }
-        for (var scale = 1.0; scale >= MinScale - 1e-9; scale -= ScaleStep)
+        var floors = CompressionStrategy.FloorsFor(regime);
+        for (var scale = 1.0; scale >= floors.MinScale - 1e-9; scale -= ScaleStep)
             yield return Math.Round(scale, 4);
     }
 
-    private static IEnumerable<double> FpsCandidates(MediaInfo info, PlanOptions options)
+    public static IEnumerable<double> FpsCandidates(MediaInfo info, PlanOptions options, CompressionRegime regime)
     {
+        var floors = CompressionStrategy.FloorsFor(regime);
         var source = info.Fps <= 0 ? 30 : info.Fps;
         yield return source;
         if (!options.AllowFpsDrop) yield break;
 
         var seen = new HashSet<double> { Math.Round(source, 3) };
-        foreach (var candidate in new[] { source / 2.0, source / 2.5, source / 3.0, 30.0, 25.0, 24.0 })
+        var candidates = new[]
         {
-            if (candidate >= source - 0.01 || candidate < MinFps) continue;
+            source / 1.5, source / 2.0, source / 2.5, source / 3.0, source / 4.0, source / 5.0, source / 6.0,
+            30.0, 25.0, 24.0, 20.0, 15.0, 12.0, 10.0, 8.0, 6.0
+        };
+        foreach (var candidate in candidates)
+        {
+            if (candidate >= source - 0.01 || candidate < floors.MinFps) continue;
             if (!seen.Add(Math.Round(candidate, 3))) continue;
             yield return candidate;
         }
@@ -473,18 +518,19 @@ public static class PlanCalculator
 
     private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
-    private static double ScalePenalty(double scale)
+    private static double ScalePenalty(double scale, PenaltyWeights weights)
     {
         if (scale >= 0.999) return 0;
-        return CodecModel.ScalePenaltyScale * Math.Pow(1.0 / Math.Max(scale, 0.05) - 1.0, CodecModel.ScalePenaltyExponent);
+        return CodecModel.ScalePenaltyScale * Math.Pow(1.0 / Math.Max(scale, 0.05) - 1.0, CodecModel.ScalePenaltyExponent) * weights.Scale;
     }
 
-    private static double FpsPenalty(double fps, double sourceFps)
+    private static double FpsPenalty(double fps, double sourceFps, PenaltyWeights weights)
     {
         if (fps >= sourceFps - 0.01) return 0;
         var penalty = CodecModel.FpsPenaltyPerHalving * Math.Log2(sourceFps / Math.Max(fps, 1.0));
-        if (fps < 20) penalty += 12.0 * (20.0 - fps) / 8.0;
-        return penalty;
+        if (weights.LowFpsSurcharge && fps < LowFpsThreshold)
+            penalty += LowFpsSurcharge * (LowFpsThreshold - fps) / 8.0;
+        return penalty * weights.Fps;
     }
 
     private static double TransparencyCrf(string codec, Intent intent)
