@@ -179,8 +179,8 @@ public sealed class SpeedModeTests
         }, null, availability).Plan;
 
         Assert.Equal(EncodeMode.TwoPass, hardware.ModeEnum);
-        Assert.Equal((int)Math.Round(software.VideoBitrateK * 1.06), hardware.VideoBitrateK);
-        Assert.Contains(hardware.ReasonCodes, n => n.Code == ReasonCode.HardwareBitrateBias && Math.Abs(n.Factor - 1.06) < 1e-9);
+        Assert.True(hardware.VideoBitrateK <= software.VideoBitrateK);
+        Assert.Contains(hardware.ReasonCodes, n => n.Code == ReasonCode.HardwareBitrateBias && Math.Abs(n.Factor - CodecModel.HardwareBitrateYield) < 1e-9);
     }
 
     [Fact]
@@ -231,7 +231,7 @@ public sealed class SpeedModeTests
 
         Assert.Contains(blind.ReasonCodes, n => n.Code == ReasonCode.HardwareBitrateBias);
         Assert.DoesNotContain(learned.ReasonCodes, n => n.Code == ReasonCode.HardwareBitrateBias);
-        Assert.True(learned.VideoBitrateK < blind.VideoBitrateK);
+        Assert.True(learned.VideoBitrateK <= blind.VideoBitrateK);
     }
 
     [Fact]

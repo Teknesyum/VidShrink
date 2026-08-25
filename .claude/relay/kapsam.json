@@ -832,5 +832,11 @@
     "effort": "high",
     "t": "2026-08-25 17:47:35",
     "ajan": "ana oturum"
+  },
+  "tests/VidShrink.Tests/HardwareFlagTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-25 18:52:31",
+    "ajan": "builder"
   }
 }

@@ -84,7 +84,7 @@ public static class ConversionArguments
 
             a.AddRange(new[] { "-c:v", plan.VideoCodec, "-preset", FfmpegArguments.DefaultPreset(plan.VideoCodec) });
             a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
-                ? new[] { CodecModel.UsesCq(plan.VideoCodec) ? "-cq" : "-crf", plan.Crf.ToString(CultureInfo.InvariantCulture) }
+                ? CodecModel.QualityArgs(plan.VideoCodec, plan.Crf)
                 : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
             a.AddRange(new[] { "-pix_fmt", hdr.PixelFormat });
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);

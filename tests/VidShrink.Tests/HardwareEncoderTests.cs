@@ -134,7 +134,7 @@ public sealed class HardwareEncoderTests
         foreach (var codec in HardwareCodecs)
         {
             Assert.True(CodecModel.IsHardware(codec), codec);
-            Assert.True(CodecModel.UsesCq(codec), codec);
+            Assert.NotEqual(EncoderVendor.Software, CodecModel.Vendor(codec));
         }
         foreach (var codec in SoftwareCodecs)
             Assert.False(CodecModel.IsHardware(codec), codec);
