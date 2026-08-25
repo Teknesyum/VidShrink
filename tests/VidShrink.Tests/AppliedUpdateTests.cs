@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -80,41 +81,31 @@ public sealed class AppliedUpdateTests : IDisposable
     }
 
     [Fact]
-    public void ToolStatusArrivingLaterDoesNotOverwriteTheAppliedLine()
+    public void TheToolStatusAndTheAppliedLineAreTwoSeparateControls()
     {
-        var board = new StatusBoard();
-        board.ReportApplied("1.5.0");
+        var xaml = File.ReadAllText(TipSources.WindowXamlPath);
 
-        board.ReportTools("FFmpeg: C:\\tools\\ffmpeg.exe\nVersion: reading...");
-        board.ReportTools("FFmpeg: C:\\tools\\ffmpeg.exe\nVersion: 7.1");
-
-        Assert.Equal("1.5.0", board.Applied);
-        Assert.DoesNotContain("1.5.0", board.Tools);
+        Assert.Contains("x:Name=\"TxtSystemStatus\"", xaml);
+        Assert.Contains("x:Name=\"TxtAppliedVersion\"", xaml);
+        Assert.Single(Regex.Matches(xaml, "x:Name=\"TxtSystemStatus\""));
+        Assert.Single(Regex.Matches(xaml, "x:Name=\"TxtAppliedVersion\""));
     }
 
     [Fact]
-    public void AnAppliedLineArrivingLaterDoesNotOverwriteTheToolStatus()
+    public void NeitherLineIsWrittenFromTheOthersSource()
     {
-        var board = new StatusBoard();
-        board.ReportTools("FFmpeg: C:\\tools\\ffmpeg.exe");
+        var code = File.ReadAllText(TipSources.WindowCodePath);
 
-        board.ReportApplied("1.5.0");
+        foreach (var line in Writes(code, "TxtSystemStatus"))
+            Assert.DoesNotContain("_appliedNotice", line);
 
-        Assert.Equal("FFmpeg: C:\\tools\\ffmpeg.exe", board.Tools);
+        var applied = Writes(code, "TxtAppliedVersion").ToList();
+        Assert.NotEmpty(applied);
+        Assert.All(applied, line => Assert.Contains("_appliedNotice", line));
     }
 
-    [Fact]
-    public void DismissingTheAppliedLineLeavesTheToolStatusStanding()
-    {
-        var board = new StatusBoard();
-        board.ReportTools("FFmpeg: C:\\tools\\ffmpeg.exe");
-        board.ReportApplied("1.5.0");
-
-        board.ClearApplied();
-
-        Assert.Null(board.Applied);
-        Assert.Equal("FFmpeg: C:\\tools\\ffmpeg.exe", board.Tools);
-    }
+    private static IEnumerable<string> Writes(string code, string control) =>
+        code.ReplaceLineEndings("\n").Split('\n').Where(l => l.Contains(control + ".Text ="));
 
     [Fact]
     public void TheAppliedLineIsTranslated()

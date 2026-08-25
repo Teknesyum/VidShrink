@@ -101,7 +101,6 @@ public partial class MainWindow : Window
     private bool _updateUiSyncing;
     private string? _noticeVersion;
     private AppliedUpdateNotice? _appliedNotice;
-    private readonly StatusBoard _status = new();
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
     private PanelHost? _preview;
 
@@ -582,15 +581,15 @@ public partial class MainWindow : Window
             var message = T(
                 $"{missing} bulunamadı. VidShrink'in yanındaki tools/ffmpeg klasörüne koyun veya PATH'e kurun.",
                 $"{missing} not found. Put it in tools/ffmpeg next to VidShrink, or install it on PATH.");
-            TxtSystemStatus.Text = _status.ReportTools(message);
+            TxtSystemStatus.Text = message;
             return;
         }
 
-        TxtSystemStatus.Text = _status.ReportTools(string.Join("\n",
+        TxtSystemStatus.Text = string.Join("\n",
             $"FFmpeg: {ToolLocator.Ffmpeg}",
             $"{T("Sürüm", "Version")}: {_ffmpegVersion ?? T("okunuyor...", "reading...")}",
             $".NET: {Environment.Version}",
-            $"VidShrink: {AppVersion()}"));
+            $"VidShrink: {AppVersion()}");
     }
 
     /// <summary>
@@ -616,7 +615,7 @@ public partial class MainWindow : Window
         _appliedNotice = new AppliedUpdateNotice(AppContext.BaseDirectory);
         if (!_appliedNotice.Load()) return;
 
-        TxtAppliedVersion.Text = _status.ReportApplied(_appliedNotice.Version!);
+        TxtAppliedVersion.Text = _appliedNotice.Version!;
         AppliedNotice.IsVisible = true;
         Dispatcher.UIThread.Post(ClearAppliedMarker, DispatcherPriority.Background);
     }
@@ -629,7 +628,6 @@ public partial class MainWindow : Window
     private void OnDismissAppliedNotice(object? sender, RoutedEventArgs e)
     {
         _appliedNotice?.Shown();
-        _status.ClearApplied();
         AppliedNotice.IsVisible = false;
     }
 
