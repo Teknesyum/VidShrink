@@ -381,7 +381,7 @@ public static class PlanCalculator
 
         corrected.Mode = "2pass";
         corrected.Crf = null;
-        corrected.BitrateBias = 1.0;
+        corrected.BitrateBias = HardwareDeliveryBias(efficiency);
         corrected.VideoBitrateK = Math.Max(MinVideoBitrateK, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
 
         corrected.Reason = fillUnderBand
@@ -608,6 +608,16 @@ public static class PlanCalculator
         => CodecModel.IsHardware(codec) && !complexity.AppliesTo(codec, scale, fps)
             ? CodecModel.HardwareBitrateYield
             : 1.0;
+
+    // The bias points both ways. Above 1 it aims high for an encoder that lands short; below 1 it
+    // trims the request for one that overspends. A measured yield above 1 means the attempt spent
+    // past the request, so the next request is divided by it. The trim is bounded by the same
+    // CodecModel.HardwareBitrateYield the upward direction uses, so both carry equal weight.
+    public static double HardwareDeliveryBias(double? measuredEfficiency)
+    {
+        if (measuredEfficiency is not double yield || !double.IsFinite(yield) || yield <= 0) return 1.0;
+        return Math.Clamp(1.0 / yield, CodecModel.HardwareBitrateYield, 1.0 / CodecModel.HardwareBitrateYield);
+    }
 
     private static void AddHardwareYieldNote(string codec, ComplexityProfile complexity, Layout best, List<string> reason, List<ReasonNote> reasonCodes)
     {
