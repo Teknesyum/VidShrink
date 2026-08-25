@@ -17,3 +17,4 @@
 - [Probe klasörü kirlenmesi](vidshrink-probe-klasoru-kirlenmesi.md) — eski .axaml artığı probe'da ikinci MainWindow üretir; hata sürüm uyuşmazlığı gibi okunur
 - [Ekran dışı koşu](vidshrink-ekran-disi-kosu.md) — gerçek MainWindow'u ekran dışında sürme; SetupWithLifetime, bekçi thread, hstack'li ffmpeg sayımı
 - [Tema ölçümü](vidshrink-tema-olcumu.md) — temayı ve boyayıcıyı pencere açmadan sınama; StyleInclude.Loaded, XDocument taraması
+- [Marka adı çevrilmez](vidshrink-marka-adi-cevrilmez.md) — "Buy me a coffee" ve "Teknesyum" LanguageCatalog'a çeviri girdisi almaz
