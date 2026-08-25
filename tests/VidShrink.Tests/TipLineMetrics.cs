@@ -20,8 +20,6 @@ namespace VidShrink.Tests;
 /// </summary>
 internal static class TipLineMetrics
 {
-    private static readonly object Gate = new();
-    private static bool _ready;
 
     /// <summary>Satırdaki kelimeler; noktalama kelimeye yapışık sayılır.</summary>
     private static readonly Regex Word = new(@"\S+", RegexOptions.Compiled);
@@ -82,15 +80,7 @@ internal static class TipLineMetrics
     /// <summary>Gömülü yazı tipini yükler. Süreç başına bir kez kurulur.</summary>
     private static Typeface Prepare()
     {
-        lock (Gate)
-        {
-            if (!_ready)
-            {
-                if (Application.Current is null)
-                    AppBuilder.Configure<Application>().UseSkia().UseWin32().SetupWithoutStarting();
-                _ready = true;
-            }
-        }
+        AppHost.Ensure();
 
         return new Typeface(new FontFamily(
             "avares://VidShrink.App/Fonts#Atkinson Hyperlegible Next"));

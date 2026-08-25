@@ -480,7 +480,13 @@ public partial class MainWindow : Window
     private void ApplyTextCase()
         => WalkText(this, value => LanguageCatalog.Title(value, _turkish), new HashSet<StyledElement>());
 
-    private bool IsTipBody(TextBlock block) => block.Theme is { } theme && ReferenceEquals(theme, Look("TipText"));
+    /// <summary>
+    /// Madde listesi taşıyan iki tema: balon gövdesi (<c>TipText</c>) ve Hakkında sekmesindeki
+    /// açıklama metinleri (<c>BulletText</c>). İkisi de aynı boyayıcıdan geçer.
+    /// </summary>
+    private bool IsTipBody(TextBlock block)
+        => block.Theme is { } theme
+           && (ReferenceEquals(theme, Look("TipText")) || ReferenceEquals(theme, Look("BulletText")));
 
     /// <summary>
     /// K6: madde işaretini gövde metninden ayırır. Yuvarlak işaret neon mavisi bir koşu olur,
@@ -489,13 +495,13 @@ public partial class MainWindow : Window
     /// <see cref="TextBlock"/> artık <c>Text</c> üzerinden okunup yazılamaz ve dil geçidi ile
     /// büyük harf geçidi kaynak metni oradan alır.
     /// </summary>
-    private void PaintTip(TextBlock block, string plain)
+    public static void PaintBullets(TextBlock block, string plain)
     {
         block.Tag = plain;
         if (block.Inlines is not { } inlines) { block.Text = plain; return; }
 
         inlines.Clear();
-        var bullet = Paint("NeonBlue");
+        var bullet = block.TryFindResource("NeonBlue", out var value) ? value as IBrush : null;
         var lines = plain.Split('\n');
         for (var index = 0; index < lines.Length; index++)
         {
@@ -519,7 +525,7 @@ public partial class MainWindow : Window
             // İpucu gövdesi renkli koşulardan kuruluyor, bu yüzden düz metni artık Text
             // taşımıyor; kaynak metin Tag'da duruyor ve dil değişiminde oradan okunuyor.
             case TextBlock tip when IsTipBody(tip):
-                PaintTip(tip, map(tip.Tag as string ?? tip.Text ?? string.Empty));
+                PaintBullets(tip, map(tip.Tag as string ?? tip.Text ?? string.Empty));
                 break;
             // A TextBlock built from runs carries its own colouring; writing Text would erase it.
             case TextBlock text when text.Inlines is not { Count: > 0 } && text.Text is { } value:
@@ -557,7 +563,7 @@ public partial class MainWindow : Window
 
     private void ApplyFastGpuTip()
         // Text yazmak koşuları silerdi: ipucu gövdesi aynı boyayıcıdan geçmeli.
-        => PaintTip(TipFastGpu, Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish));
+        => PaintBullets(TipFastGpu, Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish));
 
     private async Task LoadFfmpegVersionAsync()
     {
