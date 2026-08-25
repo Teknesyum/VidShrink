@@ -161,9 +161,31 @@ public sealed class ShareLedger
             var json = File.ReadAllText(_path);
             return JsonSerializer.Deserialize<List<ShareLink>>(json, Options) ?? new List<ShareLink>();
         }
-        catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
+        catch (JsonException)
+        {
+            Quarantine();
+            return Array.Empty<ShareLink>();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             return Array.Empty<ShareLink>();
+        }
+    }
+
+    /// <summary>
+    /// Bozuk kayıt dosyasının bir kopyasını yanına <c>.bozuk-<i>zaman</i></c> adıyla bırakır.
+    /// Üstüne yazılırsa eski <see cref="ShareLink.OwnerToken"/> değerleri kalıcı olarak gider
+    /// ve o yayınlar bir daha kapatılamaz.
+    /// </summary>
+    private void Quarantine()
+    {
+        try
+        {
+            var backup = $"{_path}.bozuk-{DateTimeOffset.UtcNow:yyyyMMddHHmmssfff}";
+            File.Copy(_path, backup, overwrite: true);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
         }
     }
 

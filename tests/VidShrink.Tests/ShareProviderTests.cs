@@ -524,6 +524,104 @@ public sealed class ShareProviderTests
         }
     }
 
+    /// <summary>
+    /// Üretimde koşan yol: tabloyu elle geçiren çağrı değil, sağlayıcının kendi
+    /// <c>UploadAsync</c>'i. Tavan aşımında kullanıcıya sığan hedefin adı söylenmeli;
+    /// "hiçbir hedef yetmiyor" cümlesi elinin altında duran çözümü gizler.
+    /// </summary>
+    [Fact]
+    public async Task OversizeOnTheProviderPathNamesTheTargetThatFits()
+    {
+        var table = RealTable();
+        using var clip = TempFile.OfLength(200L * 1024 * 1024);
+        var transport = new FakeTransport();
+        var provider = ShareProviderFactory.Create(table.Find("uguu.se")!, transport, table);
+
+        var result = await provider.UploadAsync(clip.Path);
+
+        Assert.Equal(ShareFailure.FileTooLarge, result.Failure);
+        Assert.Equal("storage.to", result.SuggestedTargetId);
+        Assert.Contains("128 MB", result.Message);
+        Assert.Contains("storage.to", result.Message);
+        Assert.DoesNotContain("hiçbir hedefin", result.Message);
+        Assert.Empty(transport.Requests);
+    }
+
+    /// <summary>Tabloyla kurulan her sağlayıcı aynı yoldan geçer; <c>CreateAll</c> da tabloyu taşır.</summary>
+    [Fact]
+    public async Task ProvidersBuiltByCreateAllCarryTheTableIntoTheSizeCheck()
+    {
+        var table = RealTable();
+        using var clip = TempFile.OfLength(200L * 1024 * 1024);
+
+        var refused = new List<ShareResult>();
+        foreach (var provider in ShareProviderFactory.CreateAll(table, new FakeTransport()))
+        {
+            var result = await provider.UploadAsync(clip.Path);
+            if (result.Failure == ShareFailure.FileTooLarge) refused.Add(result);
+        }
+
+        var only = Assert.Single(refused);
+        Assert.Equal("storage.to", only.SuggestedTargetId);
+    }
+
+    /// <summary>Aynı yol üç adımlı sağlayıcıda da koşar: tablo oradan da geçiyor.</summary>
+    [Fact]
+    public async Task OversizeOnThePresignedProviderPathAlsoNamesTheTargetThatFits()
+    {
+        var table = ShareTargetTable.Parse("""
+        {
+          "version": 1,
+          "default": "storage.to",
+          "targets": [
+            { "id": "storage.to", "displayName": "storage.to", "maxBytes": 100,
+              "retentionDays": [1,2,3], "defaultRetentionDays": 3, "canDelete": true,
+              "endpoints": { "init": "https://storage.to/api/upload/init",
+                             "confirm": "https://storage.to/api/upload/confirm",
+                             "delete": "https://storage.to/api/file/{id}" } },
+            { "id": "uguu.se", "displayName": "uguu.se", "maxBytes": 1000000,
+              "retentionDays": [], "fixedRetentionHours": 3, "canDelete": false,
+              "endpoints": { "upload": "https://uguu.se/upload?output=text" } }
+          ]
+        }
+        """);
+
+        using var clip = new TempFile(4096);
+        var transport = new FakeTransport();
+        var provider = ShareProviderFactory.Create(table.Find("storage.to")!, transport, table);
+
+        var result = await provider.UploadAsync(clip.Path);
+
+        Assert.IsType<PresignedUploadProvider>(provider);
+        Assert.Equal(ShareFailure.FileTooLarge, result.Failure);
+        Assert.Equal("uguu.se", result.SuggestedTargetId);
+        Assert.Empty(transport.Requests);
+    }
+
+    /// <summary>Önerilen hedef sığanların en küçüğü olsun; gereğinden büyük servise yollamayalım.</summary>
+    [Fact]
+    public void TheSuggestedTargetIsTheSmallestOneThatFits()
+    {
+        var table = ShareTargetTable.Parse("""
+        {
+          "version": 1,
+          "default": "kucuk",
+          "targets": [
+            { "id": "dev", "displayName": "dev", "maxBytes": 1000000,
+              "endpoints": { "upload": "https://dev.example/upload" } },
+            { "id": "orta", "displayName": "orta", "maxBytes": 4000,
+              "endpoints": { "upload": "https://orta.example/upload" } },
+            { "id": "kucuk", "displayName": "kucuk", "maxBytes": 100,
+              "endpoints": { "upload": "https://kucuk.example/upload" } }
+          ]
+        }
+        """);
+
+        var diagnosis = ShareErrorClassifier.CheckSize(table.Find("kucuk")!, 2000, table);
+
+        Assert.Equal("orta", diagnosis!.SuggestedTargetId);
+    }
+
     // ---- Kayıt defteri --------------------------------------------------------------------
 
     [Fact]
@@ -549,6 +647,36 @@ public sealed class ShareProviderTests
         finally
         {
             if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    /// <summary>
+    /// Bozuk kayıt dosyası sessizce yutulup üstüne yazılmasın: eski silme jetonları giderse
+    /// o yayınlar bir daha kapatılamaz. En azından bir kopyası yanında kalmalı.
+    /// </summary>
+    [Fact]
+    public void ACorruptLedgerIsBackedUpBeforeItIsOverwritten()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), $"vidshrink-ledger-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(folder);
+        var path = Path.Combine(folder, "paylasimlar.json");
+        try
+        {
+            File.WriteAllText(path, "{ yarim dosya");
+            var ledger = new ShareLedger(path);
+
+            Assert.Empty(ledger.Load());
+
+            var backup = Assert.Single(Directory.GetFiles(folder, "paylasimlar.json.bozuk-*"));
+            Assert.Equal("{ yarim dosya", File.ReadAllText(backup));
+
+            ledger.Add(new ShareLink("storage.to", "abc", "https://storage.to/abc", "klip.mp4",
+                DateTimeOffset.UtcNow, null, "owner-abc"));
+            Assert.Single(new ShareLedger(path).Load());
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
         }
     }
 
@@ -593,10 +721,22 @@ public sealed class ShareProviderTests
     {
         public TempFile(int bytes)
         {
-            Path = System.IO.Path.Combine(
-                System.IO.Path.GetTempPath(), $"vidshrink-share-{Guid.NewGuid():N}.mp4");
+            Path = NewPath();
             File.WriteAllBytes(Path, Enumerable.Range(0, bytes).Select(i => (byte)(i % 251)).ToArray());
         }
+
+        private TempFile(long bytes)
+        {
+            Path = NewPath();
+            using var stream = new FileStream(Path, FileMode.CreateNew, FileAccess.Write);
+            stream.SetLength(bytes);
+        }
+
+        /// <summary>Verilen uzunlukta, içeriği yazılmamış dosya. Tavan sınamaları içindir.</summary>
+        public static TempFile OfLength(long bytes) => new(bytes);
+
+        private static string NewPath() => System.IO.Path.Combine(
+            System.IO.Path.GetTempPath(), $"vidshrink-share-{Guid.NewGuid():N}.mp4");
 
         public string Path { get; }
 

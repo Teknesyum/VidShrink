@@ -22,12 +22,18 @@ public sealed class PresignedUploadProvider : IShareProvider
 {
     private readonly IHttpTransport _transport;
     private readonly string _visitorToken;
+    private readonly ShareTargetTable? _table;
 
-    public PresignedUploadProvider(ShareTarget target, IHttpTransport transport, string? visitorToken = null)
+    public PresignedUploadProvider(
+        ShareTarget target,
+        IHttpTransport transport,
+        string? visitorToken = null,
+        ShareTargetTable? table = null)
     {
         Target = target ?? throw new ArgumentNullException(nameof(target));
         _transport = transport ?? throw new ArgumentNullException(nameof(transport));
         _visitorToken = visitorToken ?? NewVisitorToken();
+        _table = table;
     }
 
     public ShareTarget Target { get; }
@@ -53,7 +59,7 @@ public sealed class PresignedUploadProvider : IShareProvider
                 return ShareResult.Failed(ShareErrorClassifier.FromException(
                     Target, new FileNotFoundException("Yüklenecek dosya yok.", filePath), step));
 
-            if (ShareErrorClassifier.CheckSize(Target, info.Length) is { } tooLarge)
+            if (ShareErrorClassifier.CheckSize(Target, info.Length, _table) is { } tooLarge)
                 return ShareResult.Failed(tooLarge);
 
             var name = info.Name;

@@ -58,7 +58,7 @@ public static class ShareErrorClassifier
     {
         if (target.Accepts(bytes)) return null;
 
-        var bigger = table?.Accepting(bytes).FirstOrDefault(t => t.Id != target.Id);
+        var bigger = table?.SmallestAccepting(bytes, target.Id);
         var message =
             $"Dosya {Size(bytes)}, {target.DisplayName} en fazla {Size(target.MaxBytes)} kabul ediyor." +
             (bigger is null

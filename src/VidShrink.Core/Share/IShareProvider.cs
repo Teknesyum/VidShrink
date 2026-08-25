@@ -59,16 +59,20 @@ public interface IShareProvider
 /// </remarks>
 public static class ShareProviderFactory
 {
-    public static IShareProvider Create(ShareTarget target, IHttpTransport transport)
+    /// <param name="table">
+    /// Sağlayıcının bağlı olduğu tablo. Tavan aşımında "hangi hedef yeter" sorusunun cevabı
+    /// buradan çıkar; verilmezse kullanıcıya yalnız aşılan tavan söylenebilir.
+    /// </param>
+    public static IShareProvider Create(ShareTarget target, IHttpTransport transport, ShareTargetTable? table = null)
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(transport);
 
         if (target.Endpoint("init") is not null && target.Endpoint("confirm") is not null)
-            return new PresignedUploadProvider(target, transport);
+            return new PresignedUploadProvider(target, transport, table: table);
 
         if (target.Endpoint("upload") is not null)
-            return new MultipartUploadProvider(target, transport);
+            return new MultipartUploadProvider(target, transport, table);
 
         throw new InvalidOperationException(
             $"'{target.Id}' hedefinde tanınan bir uç nokta takımı yok: üç adımlı protokol için " +
@@ -77,5 +81,5 @@ public static class ShareProviderFactory
 
     /// <summary>Tablodaki her hedef için bir sağlayıcı kurar.</summary>
     public static IReadOnlyList<IShareProvider> CreateAll(ShareTargetTable table, IHttpTransport transport) =>
-        table.Targets.Select(t => Create(t, transport)).ToList();
+        table.Targets.Select(t => Create(t, transport, table)).ToList();
 }
