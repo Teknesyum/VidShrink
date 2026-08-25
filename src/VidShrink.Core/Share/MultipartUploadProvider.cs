@@ -17,11 +17,13 @@ public sealed class MultipartUploadProvider : IShareProvider
     private const string FieldName = "files[]";
 
     private readonly IHttpTransport _transport;
+    private readonly ShareTargetTable? _table;
 
-    public MultipartUploadProvider(ShareTarget target, IHttpTransport transport)
+    public MultipartUploadProvider(ShareTarget target, IHttpTransport transport, ShareTargetTable? table = null)
     {
         Target = target ?? throw new ArgumentNullException(nameof(target));
         _transport = transport ?? throw new ArgumentNullException(nameof(transport));
+        _table = table;
     }
 
     public ShareTarget Target { get; }
@@ -42,7 +44,7 @@ public sealed class MultipartUploadProvider : IShareProvider
                 return ShareResult.Failed(ShareErrorClassifier.FromException(
                     Target, new FileNotFoundException("Yüklenecek dosya yok.", filePath), step));
 
-            if (ShareErrorClassifier.CheckSize(Target, info.Length) is { } tooLarge)
+            if (ShareErrorClassifier.CheckSize(Target, info.Length, _table) is { } tooLarge)
                 return ShareResult.Failed(tooLarge);
 
             // retentionDays yok sayılır: bu hedefte ömür sabittir, sunucuya söylenemez.

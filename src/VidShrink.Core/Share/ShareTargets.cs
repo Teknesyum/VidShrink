@@ -98,6 +98,17 @@ public sealed record ShareTargetTable
     /// </summary>
     public IEnumerable<ShareTarget> Accepting(long bytes) => Targets.Where(t => t.Accepts(bytes));
 
+    /// <summary>
+    /// Verilen boyutu kabul eden en küçük tavanlı hedef. Sığmayan bir hedef yerine bunu
+    /// öneririz: gereğinden büyük bir servise yollamak yerine işi görecek olanı seçeriz.
+    /// Tavanı <c>0</c> olan hedef sınırsızdır ve en sona düşer.
+    /// </summary>
+    public ShareTarget? SmallestAccepting(long bytes, string? excludeId = null) =>
+        Accepting(bytes)
+            .Where(t => excludeId is null || !string.Equals(t.Id, excludeId, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(t => t.MaxBytes <= 0 ? long.MaxValue : t.MaxBytes)
+            .FirstOrDefault();
+
     public static ShareTargetTable Parse(string json) =>
         JsonSerializer.Deserialize<ShareTargetTable>(json, Options) ?? new ShareTargetTable();
 
