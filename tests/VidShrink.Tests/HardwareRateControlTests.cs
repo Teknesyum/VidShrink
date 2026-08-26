@@ -90,6 +90,24 @@ public sealed class HardwareRateControlTests
         };
     }
 
+    /// <summary>
+    /// Every number that came out of a measurement is pinned here as a plain literal, so moving a
+    /// constant moves this test with it instead of sliding through it.
+    /// </summary>
+    [Fact]
+    public void TheMeasuredConstantsArePinnedToTheirMeasurements()
+    {
+        Assert.Equal(1.5, FfmpegArguments.WidePeakFactor, 4);
+        Assert.Equal(1.02, FfmpegArguments.TightPeakFactor, 4);
+        Assert.Equal(2941, FfmpegArguments.PeakScaleBitrateK);
+        Assert.Equal(0.00429, CodecModel.HardwareMinBitratePerPixelFrame, 6);
+        Assert.Equal(0.0756, CodecModel.HardwareMinBitratePerPixelSecond, 6);
+        Assert.Equal(1.15, CodecModel.HardwareMinBitrateMargin, 4);
+        Assert.Equal(2.0, CodecModel.HardwareMinBitrateHeadroom, 4);
+        Assert.Equal(39, CodecModel.HardwareMinBitrateFloorK);
+        Assert.Equal(11, PlanCalculator.HardwareDeliveryReserveK);
+    }
+
     [Theory]
     [InlineData("av1_nvenc")]
     [InlineData("hevc_nvenc")]
@@ -97,17 +115,12 @@ public sealed class HardwareRateControlTests
     [InlineData("hevc_qsv")]
     public void ThePeakFactorFallsWithTheRequestedBitrate(string codec)
     {
-        var knee = FfmpegArguments.PeakScaleBitrateK;
-        var far = FfmpegArguments.PeakRateFactor(codec, knee * 4);
-        var midway = FfmpegArguments.PeakRateFactor(codec, (int)(knee * 1.5));
-        var atKnee = FfmpegArguments.PeakRateFactor(codec, knee);
-        var low = FfmpegArguments.PeakRateFactor(codec, knee / 6);
-
-        Assert.Equal(FfmpegArguments.WidePeakFactor, far, 4);
-        Assert.Equal(FfmpegArguments.TightPeakFactor, atKnee, 4);
-        Assert.Equal(FfmpegArguments.TightPeakFactor, low, 4);
-        Assert.True(midway > atKnee && midway < far, "Between the knee and the wide end the peak has to open up gradually.");
-        Assert.True(FfmpegArguments.PeakRateFactor(codec, knee * 2) > midway, "The peak has to keep opening with the bitrate.");
+        Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, 11764), 4);
+        Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, 5882), 4);
+        Assert.Equal(1.26, FfmpegArguments.PeakRateFactor(codec, 4412), 2);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, 2941), 4);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, 490), 4);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, 131), 4);
     }
 
     [Theory]
@@ -117,15 +130,148 @@ public sealed class HardwareRateControlTests
     public void TheProcessorPathKeepsTheWidePeak(string codec)
     {
         foreach (var bitrateK in new[] { 174, 522, 2088, 8000 })
-            Assert.Equal(FfmpegArguments.WidePeakFactor, FfmpegArguments.PeakRateFactor(codec, bitrateK), 4);
+            Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, bitrateK), 4);
     }
 
     [Fact]
     public void TheBufferFollowsThePeakAndKeepsTheOldValueAtTheWidePeak()
     {
-        Assert.Equal(2.0, FfmpegArguments.BufferFactor(FfmpegArguments.WidePeakFactor), 4);
-        Assert.True(FfmpegArguments.BufferFactor(1.2) < 2.0);
-        Assert.True(FfmpegArguments.BufferFactor(FfmpegArguments.TightPeakFactor) > 1.0);
+        Assert.Equal(2.0, FfmpegArguments.BufferFactor(1.5), 4);
+        Assert.Equal(1.4, FfmpegArguments.BufferFactor(1.2), 4);
+        Assert.Equal(1.04, FfmpegArguments.BufferFactor(1.02), 4);
+    }
+
+    /// <summary>
+    /// The floor line is what av1_nvenc actually delivers when it is asked for 32k and told to peak
+    /// at 33k. Nine layouts, 20 s each, measured on this machine. The model has to sit above every
+    /// one of them - a floor that reads low lets the layout search pick a shape the encoder cannot
+    /// reach - and not so far above that usable layouts are thrown away.
+    /// </summary>
+    [Theory]
+    [InlineData(1920, 1080, 60, 691)]
+    [InlineData(1920, 1080, 30, 424)]
+    [InlineData(1280, 720, 60, 341)]
+    [InlineData(1280, 720, 30, 211)]
+    [InlineData(854, 480, 60, 145)]
+    [InlineData(854, 480, 30, 95)]
+    [InlineData(640, 360, 60, 72)]
+    [InlineData(640, 360, 15, 38)]
+    [InlineData(426, 240, 30, 39)]
+    public void TheEncoderFloorCoversWhatTheEncoderActuallyDelivered(int width, int height, double fps, int measuredK)
+    {
+        var modelled = CodecModel.MinBitrateK("av1_nvenc", width, height, fps);
+
+        _output.WriteLine($"{width}x{height}@{fps:0.##}: measured {measuredK}k, model {modelled}k ({modelled / (double)measuredK:0.000}x)");
+        Assert.True(modelled >= measuredK, $"The model puts the floor at {modelled}k but the encoder delivered {measuredK}k.");
+        Assert.True(modelled <= measuredK * 1.45, $"The model puts the floor at {modelled}k, far above the {measuredK}k measured.");
+    }
+
+    [Fact]
+    public void TheFloorIsPinnedAtTheShapesTheContractMeasured()
+    {
+        Assert.Equal(795, CodecModel.MinBitrateK("av1_nvenc", 1920, 1080, 60));
+        Assert.Equal(1590, CodecModel.UsableBitrateK("av1_nvenc", 1920, 1080, 60));
+        Assert.Equal(346, CodecModel.MinBitrateK("av1_nvenc", 1266, 712, 60));
+        Assert.Equal(692, CodecModel.UsableBitrateK("av1_nvenc", 1266, 712, 60));
+    }
+
+    [Theory]
+    [InlineData("libx264")]
+    [InlineData("libx265")]
+    [InlineData("libsvtav1")]
+    public void TheProcessorEncodersHaveNoFloor(string codec)
+    {
+        Assert.Equal(0, CodecModel.MinBitrateK(codec, 1920, 1080, 60));
+        Assert.Equal(0, CodecModel.UsableBitrateK(codec, 1920, 1080, 60));
+    }
+
+    /// <summary>
+    /// The shape the plan settles on has to be one the encoder can actually hit at the bitrate the
+    /// plan asks for. This is what failed on the 8 MB target: the search picked 1266x712@60 and
+    /// asked for 131k, a fifth of what av1_nvenc delivers at that shape.
+    /// </summary>
+    [Theory]
+    [InlineData(4.0)]
+    [InlineData(8.0)]
+    [InlineData(16.0)]
+    [InlineData(25.0)]
+    [InlineData(50.0)]
+    [InlineData(100.0)]
+    public void EveryHardwarePlanAsksForABitrateTheEncoderCanDeliver(double targetMb)
+    {
+        var info = SourceInfo();
+        foreach (var detail in new[] { -0.2, 0.2, 0.55, 0.9, 1.4 })
+        foreach (var motion in new[] { 0.0, 0.25, 0.6, 1.0 })
+        {
+            var options = new PlanOptions { TargetMb = targetMb, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+            var profile = ComplexityProfile.FromSourceBitrate(info) with
+            {
+                Measured = true,
+                MotionMeasured = true,
+                DetailExponent = detail,
+                MotionExponent = motion
+            };
+            var plan = PlanCalculator.BuildDetailed(info, options, profile, new FixedAvailability("av1_nvenc")).Plan;
+            if (plan.ModeEnum != EncodeMode.TwoPass) continue;
+
+            var usable = CodecModel.UsableBitrateK(plan.Codec, plan.Width, plan.Height, plan.Fps);
+            if (plan.VideoBitrateK >= usable) continue;
+
+            // Nothing reachable is a legitimate answer - the encoder has an absolute floor that no
+            // layout gets under - but only when no candidate layout would have been reachable.
+            var reachableExists = SmallestUsableK(info, options, plan.Codec) <= plan.VideoBitrateK;
+            Assert.False(reachableExists,
+                $"{targetMb:0.#} MB, detail {detail:0.00}, motion {motion:0.00}: the plan asks {plan.VideoBitrateK}k at {plan.Width}x{plan.Height}@{plan.Fps:0.##}, where the encoder does not follow the request below {usable}k, and a reachable layout existed.");
+        }
+    }
+
+    private static int SmallestUsableK(MediaInfo info, PlanOptions options, string codec)
+    {
+        var regime = CompressionStrategy.RegimeFor(info.FileSizeMb, options.TargetMb);
+        var effective = new PlanOptions
+        {
+            TargetMb = options.TargetMb,
+            AllowResolutionDrop = options.AllowResolutionDrop && CompressionStrategy.AllowsResolutionDrop(regime),
+            AllowFpsDrop = options.AllowFpsDrop && CompressionStrategy.AllowsFpsDrop(regime),
+            SpeedMode = options.SpeedMode
+        };
+        var floors = CompressionStrategy.FloorsFor(regime);
+        var smallest = int.MaxValue;
+
+        foreach (var fps in PlanCalculator.FpsCandidates(info, effective, regime))
+        foreach (var scale in PlanCalculator.ScaleCandidates(effective, regime))
+        {
+            var width = EvenDown((int)Math.Round(info.Width * scale));
+            var height = EvenDown((int)Math.Round(info.Height * scale));
+            if (height < floors.MinHeight && height < info.Height) continue;
+            if (width < 2 || height < 2) continue;
+            smallest = Math.Min(smallest, CodecModel.UsableBitrateK(codec, width, height, fps));
+        }
+
+        return smallest;
+    }
+
+    private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
+
+    /// <summary>
+    /// A delivered file costs more than the plan asks for - the container is 9 kbit/s at every
+    /// target and the encoder spends a few more past the request - so the hardware request holds
+    /// that back. The processor path was not measured and keeps the bitrates it had.
+    /// </summary>
+    [Fact]
+    public void TheHardwareRequestHoldsBackTheDeliveryReserve()
+    {
+        var info = SourceInfo();
+        var options = new PlanOptions { TargetMb = 8, FillPolicy = FillPolicy.FillTarget, SpeedMode = SpeedMode.Fast };
+
+        var hardware = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("av1_nvenc")).Plan;
+        var processor = PlanCalculator.BuildDetailed(info, options, null, new FixedAvailability("libx264")).Plan;
+
+        var hardwareTotalK = hardware.VideoBitrateK + hardware.AudioBitrateK;
+        var processorTotalK = processor.VideoBitrateK + processor.AudioBitrateK;
+
+        _output.WriteLine($"hardware {hardware.VideoBitrateK}k + {hardware.AudioBitrateK}k audio, processor {processor.VideoBitrateK}k + {processor.AudioBitrateK}k audio");
+        Assert.Equal(11, processorTotalK - hardwareTotalK);
     }
 
     [Fact]
@@ -142,8 +288,8 @@ public sealed class HardwareRateControlTests
 
         _output.WriteLine($"{BigK}k -> maxrate {FlagValueK(big, "-maxrate")}k ({bigShare:0.000}x), {SmallK}k -> maxrate {FlagValueK(small, "-maxrate")}k ({smallShare:0.000}x)");
         Assert.True(smallShare < bigShare, "The small target may not carry the same peak share as the large one.");
-        Assert.Equal(FfmpegArguments.WidePeakFactor, bigShare, 2);
-        Assert.Equal(FfmpegArguments.TightPeakFactor, smallShare, 2);
+        Assert.Equal(1.5, bigShare, 2);
+        Assert.Equal(1.02, smallShare, 2);
         Assert.True(FlagValueK(small, "-bufsize") / (double)SmallK < FlagValueK(big, "-bufsize") / (double)BigK,
             "The buffer has to tighten along with the peak.");
     }

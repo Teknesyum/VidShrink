@@ -19,6 +19,38 @@ public static class CodecModel
     public const double HardwareBitrateYield = 0.877;
     public const double HardwareFloorFactor = 1.25;
 
+    // A hardware encoder refuses to go below a floor of its own and ignores -b:v and -maxrate
+    // under it. Measured on av1_nvenc (-rc vbr -multipass fullres) with -b:v 32k -maxrate 33k,
+    // 20 s of a 1080p60 screen recording, nine layouts:
+    //   1920x1080@60 690,9k  1920x1080@30 423,9k  1280x720@60 341,3k  1280x720@30 211,3k
+    //    854x480@60  145,0k   854x480@30   95,3k   640x360@60  71,8k   640x360@15  37,5k
+    //    426x240@30   38,9k
+    // Per megapixel the floor is a straight line in fps: kbit/s / Mpx = 4,29 * fps + 75,6.
+    // That is 4,29e-3 bits per pixel per frame plus 0,0756 bits per pixel per second of
+    // stream overhead that does not shrink with the frame rate.
+    public const double HardwareMinBitratePerPixelFrame = 4.29e-3;
+    public const double HardwareMinBitratePerPixelSecond = 0.0756;
+
+    // The worst residual of that fit is 1280x720@60, where the encoder delivered 11% above the
+    // line. The floor has to be an upper bound - a layout the encoder cannot actually reach
+    // overshoots the target - so the fit is carried 15% high.
+    public const double HardwareMinBitrateMargin = 1.15;
+
+    // The line runs out at the small end: at 640x360@15 and 426x240@30 the encoder delivered
+    // 37,5k and 38,9k where the line predicts 32k and 21k. Below roughly a tenth of a megapixel
+    // the stream carries a cost that no longer shrinks with the picture, so the floor stops
+    // falling at the lowest rate that was ever measured.
+    public const int HardwareMinBitrateFloorK = 39;
+
+    // At the floor itself the encoder does not merely refuse to go lower, it stops following the
+    // request at all. av1_nvenc on a 400 s 1080p60 clip, delivered / requested against the
+    // headroom (request divided by the floor above):
+    //   0,38x -> 5,7x   1,01x -> 1,091   1,04x -> 1,171   1,30x -> 1,171   1,45x -> 1,091
+    //   1,95x -> 0,994  2,17x -> 1,071   2,61x -> 0,995   2,85x -> 1,050   6,52x -> 1,013
+    // Below twice the floor the encoder overspends by 9% to 17% and at 0,38x by a factor of five.
+    // From twice the floor up it tracks the request. A layout is only usable above that line.
+    public const double HardwareMinBitrateHeadroom = 2.0;
+
     public static double FloorBppf(string codec)
     {
         var baseFloor = Family(codec) switch
@@ -29,6 +61,26 @@ public static class CodecModel
         };
         return IsHardware(codec) ? baseFloor * HardwareFloorFactor : baseFloor;
     }
+
+    /// <summary>
+    /// The lowest video bitrate the encoder will actually deliver at this layout, in kbit/s.
+    /// Zero for software encoders: libx264 and its siblings follow -b:v all the way down.
+    /// Only av1_nvenc was measured; QSV and AMF carry the same line, which is not measured.
+    /// </summary>
+    public static int MinBitrateK(string codec, int width, int height, double fps)
+    {
+        if (!IsHardware(codec)) return 0;
+        var pixels = (double)Math.Max(width, 2) * Math.Max(height, 2);
+        var bps = pixels * (HardwareMinBitratePerPixelFrame * Math.Max(fps, 1.0) + HardwareMinBitratePerPixelSecond);
+        return Math.Max(HardwareMinBitrateFloorK, (int)Math.Ceiling(bps * HardwareMinBitrateMargin / 1000.0));
+    }
+
+    /// <summary>
+    /// The lowest video bitrate at which the encoder still follows the request at this layout.
+    /// Above it the delivered bitrate tracks what was asked for; below it the encoder overspends.
+    /// </summary>
+    public static int UsableBitrateK(string codec, int width, int height, double fps)
+        => (int)Math.Ceiling(MinBitrateK(codec, width, height, fps) * HardwareMinBitrateHeadroom);
 
     public static double ReferenceCrf(string codec) => Family(codec) switch
     {

@@ -178,3 +178,27 @@ gecersiz. Once `dotnet --version` ile bak, sozlesmenin ortam notuna guvenme. Der
 - Sinirli `Channel` ile ureticili tuketici yazarken **yazma tarafina iptal jetonu ver**:
   tuketici hedef kare sayisina ulasip donguden cikinca uretici `WriteAsync` uzerinde
   sonsuza kilitleniyor ve `await reader` hic donmuyor. Olcum sessizce asilir.
+- Donanim kodlayicisinin **kendi bir alt bit hizi var** ve altinda `-b:v`/`-maxrate` bosa
+  gidiyor. `av1_nvenc`te olcum: megapiksel basina kbit/s = `4,29 * fps + 75,6`, arti hicbir
+  duzende inmedigi mutlak bir taban (~39 kbit/s). Istenen bit hizi bu tabanin **iki katinin
+  altina** dusunce teslim %9-%17 tasiyor, 0,4 katta bes kat tasiyor; iki katin ustunde
+  istegi takip ediyor. Kucuk hedefte plan ulasilamayan bir duzen seciyorsa once buraya bak
+  (`CodecModel.MinBitrateK` / `UsableBitrateK`).
+- Teslim edilen dosyanin plani asan maliyeti **yuzde degil sabit hiz**: mp4 kapsayicisi
+  hedeften bagimsiz 9,0 kbit/s yiyor (100/50/25/8 MB'da ffprobe ile ayni sayi). 100 MB'da
+  butcenin %0,7'si, 8 MB'da %9'u - kucuk hedeflerin tasmasinin asil sebebi bu, hiz kontrolu
+  degil. `ContainerOverhead` (0,995) bunu modellemiyor.
+- Kalibrasyon dongusu iki duzen arasinda sonsuza kadar salinabiliyor: A'da kalibre edilince
+  B kazaniyor, B'de kalibre edilince A. Skorlar kil payi esit oldugunda oluyor ve bit hizi
+  birkac kbit/s oynayinca ortaya cikiyor. Cozum `PlanCalculator.CalibratedShapeHysteresis`:
+  profilin olculdugu sekle kucuk bir puan bonusu.
+- `ffmpeg failed (-1)` bir kodlama hatasi **degil**. ffmpeg kendi hatalarinda pozitif kod
+  dondurur; -1 ya `Process.Kill` (Windows'ta -1 birakir, `EncodeRunner.cs` TryKill) ya da
+  gercek `AVERROR(EPERM)` = -1, yani cikti veya iki gecis gunlugu dosyasi acilamadi. Iki
+  gecis gunlugu sistem `%TEMP%`'inde duruyor (`EncodeRunner.cs:63`), `.calisma/` altinda degil.
+- Canli olcum kalibi: 400 sn 1080p60 kaynagi `-stream_loop` ile gercek bir ekran kaydindan
+  uret, `VIDSHRINK_LIVE_SOURCE` + `VIDSHRINK_LIVE_OUT` ver, `dotnet test --filter
+  "FullyQualifiedName~HardwareRateControlTests.Live" -l "console;verbosity=detailed"`.
+  Donanim yari 4 dakika, islemci yarisi 15 dakika suruyor. Teslim edilen dosyanin akis
+  kirilimini `ffprobe -select_streams v:0/a:0 -show_entries stream=bit_rate` ile al -
+  toplamdan cikarinca kapsayici payi cikiyor.
