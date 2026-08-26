@@ -1,0 +1,26 @@
+{
+  "contractId": "T44",
+  "auditorRunId": "a8826ff0441cd7821",
+  "headSha": "c4e82f6adad3d53bb93a9ab49fd46c754fe7a0a4",
+  "diffHash": "a96e041317d79b8ecc02040782eeb2e9cd347c06626a775f15b9bd45bfac2bab",
+  "owns": [
+    "src/VidShrink.App/Playback/ZoomGesture.cs",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Playback/HoverZone.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ZoomGestureTests.cs",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 uyari 0 hata",
+    "dotnet test basarisiz 0, basarili 553, atlanan 16, toplam 569",
+    "uc kademe olculdu band 610x144, orta 1713,6x891, tam 1904x990, yer tutucu uc kademede de 144px",
+    "kose kesme 608x142 yaricap 16, (1,1) kesmenin disinda",
+    "fare pencereden cikinca inis sayaci kuruluyor, terfi kalkinca dinleyici sokuluyor"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-26T19:42:05.806Z",
+  "usedAt": "2026-08-26T19:42:05.884Z",
+  "completedSha": "c4e82f6adad3d53bb93a9ab49fd46c754fe7a0a4"
+}
