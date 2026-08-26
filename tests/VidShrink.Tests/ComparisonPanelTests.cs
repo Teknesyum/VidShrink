@@ -1,6 +1,8 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Input.Raw;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -214,6 +216,87 @@ public sealed class ComparisonPanelTests
         Assert.Equal(0, t, 9);
         Assert.Equal(ShelterStage.Band, stage);
         Assert.Equal(ShelterStage.Band, afterOneNotch);
+    }
+
+    [Fact]
+    public void Fare_pencereden_cikinca_inis_sayaci_kurulur()
+    {
+        var (armed, decides, stage) = Read((host, panel) =>
+        {
+            WheelTo(host, panel, ShelterStage.Full);
+
+            // Fare önce panelin üstünde: sayaç tutuluyor, iniş kararı yok.
+            panel.TrackPointer(panel.StageTarget.Center);
+            var before = panel.Descent.Generation;
+            Assert.False(panel.Descent.ShouldHide(before));
+
+            // Pencerenin kendi çıkış olayı. Kaynak pencerenin kendisi, yani gerçek terk.
+            host.RaiseEvent(new PointerEventArgs(
+                InputElement.PointerExitedEvent,
+                host,
+                new Pointer(0, PointerType.Mouse, true),
+                host,
+                new Point(-1, -1),
+                0,
+                new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
+                KeyModifiers.None));
+
+            var after = panel.Descent.Generation;
+            return (after > before, panel.Descent.ShouldHide(after), panel.Shelter);
+        });
+
+        Assert.True(armed, "çıkış olayı sayacı kurmadı");
+        Assert.True(decides, "bekleyen tik inişe karar vermiyor");
+        Assert.Equal(ShelterStage.Full, stage);
+    }
+
+    [Fact]
+    public void Pencere_disina_cikis_hedef_sinira_gore_kararlidir()
+    {
+        var (afterExit, afterReturn) = Read((host, panel) =>
+        {
+            WheelTo(host, panel, ShelterStage.Mid);
+
+            panel.TrackPointer(panel.StageTarget.Center);
+            panel.PointerLeftWindow();
+            var pending = panel.Descent.Generation;
+            var leaves = panel.Descent.ShouldHide(pending);
+
+            // Fare geri hedefin içine girdi: eski tik kuşağını kaybetti, panel inmez.
+            panel.TrackPointer(panel.StageTarget.Center);
+            return (leaves, panel.Descent.ShouldHide(pending));
+        });
+
+        Assert.True(afterExit);
+        Assert.False(afterReturn);
+    }
+
+    [Fact]
+    public void Terfi_kalkinca_pencere_dinleyicileri_sokulur()
+    {
+        var (before, after) = Read((host, panel) =>
+        {
+            WheelTo(host, panel, ShelterStage.Full);
+            panel.Descend();
+            Settle(host);
+
+            // Panel bandına indi. Dinleyici sökülmediyse bu çıkış olayı hâlâ sayacı
+            // oynatırdı; kuşak sabit kalıyorsa pencereden gerçekten ayrılmış demektir.
+            var stale = panel.Descent.Generation;
+            host.RaiseEvent(new PointerEventArgs(
+                InputElement.PointerExitedEvent,
+                host,
+                new Pointer(0, PointerType.Mouse, true),
+                host,
+                new Point(-1, -1),
+                0,
+                new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
+                KeyModifiers.None));
+
+            return (stale, panel.Descent.Generation);
+        });
+
+        Assert.Equal(before, after);
     }
 
     [Fact]

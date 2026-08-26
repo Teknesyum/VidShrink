@@ -455,6 +455,7 @@ internal partial class ComparisonPanel : UserControl
         {
             top.AddHandler(KeyDownEvent, OnTopLevelKey, RoutingStrategies.Tunnel);
             top.AddHandler(PointerMovedEvent, OnGlobalPointerMoved, RoutingStrategies.Tunnel);
+            top.AddHandler(PointerExitedEvent, OnGlobalPointerExited, RoutingStrategies.Tunnel | RoutingStrategies.Bubble | RoutingStrategies.Direct);
         }
 
         // K5: geçiş kabuğa uygulanıyor, görüntüye değil. Yüzey kendi turunda çizmeye
@@ -532,6 +533,29 @@ internal partial class ComparisonPanel : UserControl
     }
 
     /// <summary>
+    /// Fare pencerenin dışına çıktı. Hareket olayı bunu söyleyemez — pencere dışında
+    /// <c>PointerMoved</c> hiç atmaz, dolayısıyla yalnız ona bakan sayaç "fare içeride"
+    /// hâlinde takılı kalır ve tam kademede panel kendi kendine hiç inemez. Çıkışı
+    /// pencerenin kendisinden dinlemek bu boşluğu kapatan en kısa yol; kabuğun kendi
+    /// çıkışını dinlemek yetmezdi, çünkü tam kademede kabuk zaten bütün pencereyi kaplar.
+    ///
+    /// Kaynak denetimi çocuktan kabaran çıkışları eler: fare panelin içindeki bir öğeden
+    /// diğerine geçerken pencereyi terk etmiş sayılmaz.
+    /// </summary>
+    private void OnGlobalPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (_overlay is null) return;
+        if (!ReferenceEquals(e.Source, sender)) return;
+        PointerLeftWindow();
+    }
+
+    /// <summary>
+    /// Fare pencereyi terk etti: hedef kademenin dışındadır, iniş sayacı kurulur.
+    /// Karar yine hedef sınıra göre — pencerenin dışı her kademenin de dışıdır.
+    /// </summary>
+    internal void PointerLeftWindow() => _descent.PointerWithin(false);
+
+    /// <summary>
     /// İnişi engelleyen sebepler: kullanıcı ayırıcıyı ya da panoyu sürüklüyor, klavye odağı
     /// panelin içindeki bir öğede. Kabuğun kendisi sayılmaz — odağı oraya terfi anında
     /// panelin kendisi taşıyor, o odak kullanıcının bir işi değil.
@@ -586,6 +610,7 @@ internal partial class ComparisonPanel : UserControl
         {
             top.RemoveHandler(KeyDownEvent, OnTopLevelKey);
             top.RemoveHandler(PointerMovedEvent, OnGlobalPointerMoved);
+            top.RemoveHandler(PointerExitedEvent, OnGlobalPointerExited);
         }
 
         Shell.Transitions = null;
