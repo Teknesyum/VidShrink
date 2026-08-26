@@ -47,6 +47,32 @@ public static class PlanCalculator
     private const int MinVideoBitrateK = 48;
     private const double SourceQualityScore = 100.0;
 
+    // ContainerOverhead is a percentage, but what a delivered file costs over the plan is close to
+    // a fixed rate. Four live av1_nvenc runs on a 400 s 1080p60 clip, measured on the delivered
+    // files (ffprobe per stream, kbit/s):
+    //   target  request  video   audio   mux   over plan
+    //   100 MB     1923   1930   125,6   9,0        15,0
+    //    50 MB      895    895   125,6   9,0         8,1
+    //    25 MB      410    420    91,0   9,0        18,0
+    //     8 MB      113    119    29,0   9,0        15,0
+    // The container cost is 9,0 kbit/s at every target, and the encoder spends a few kbit/s past
+    // the request on top. Together that is 8 to 18 kbit/s no matter how big the target is - 0,7%
+    // of a 100 MB budget and 9% of an 8 MB one, which is why only the small targets overshot.
+    // Eleven is held back for it. Fifteen was tried first and cost the 50 MB target its single
+    // attempt: it delivered 48,50 MB against a 48,60 MB lower edge. That band is only 2,8% wide
+    // and it is the binding one, so the reserve sits just above the smallest excess of the four
+    // rather than near their mean, and covers the container's fixed 9,0 kbit/s.
+    public const int HardwareDeliveryReserveK = 11;
+
+    // Two layouts can score within a hair of each other and each win once the profile is
+    // calibrated at the other, so the calibration loop flips between them forever. The shape the
+    // profile was actually measured at gets a small bonus to break the tie in its own favour.
+    private const double CalibratedShapeHysteresis = 0.25;
+
+    // Only the hardware path was measured, so only the hardware path reserves it; the processor
+    // path keeps the bitrates it has today.
+    private static int DeliveryReserveK(string codec) => CodecModel.IsHardware(codec) ? HardwareDeliveryReserveK : 0;
+
     private static readonly string[] FastHardwareOrder =
     {
         "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
@@ -110,7 +136,7 @@ public static class PlanCalculator
 
         var totalK = aimMb * KbitPerMib / Math.Max(info.DurationSeconds, 0.1);
         var (audioK, audioChannels) = PickAudio(info, options, regime, totalK, notes);
-        var videoK = Math.Max(MinVideoBitrateK, totalK * ContainerOverhead - audioK);
+        var videoK = Math.Max(MinVideoBitrateK, totalK * ContainerOverhead - audioK - DeliveryReserveK(codec));
 
         var effective = new PlanOptions
         {
@@ -185,7 +211,7 @@ public static class PlanCalculator
 
         if (budgetCrf <= ceilingCrf && ceilingSizeMb < band.LowerMb)
         {
-            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, band.LowerMb, regime);
+            var recovered = RecoverLayoutAtCeiling(info, effective, complexity, codec, best, ceilingCrf, audioK, band.LowerMb, videoK, regime);
             if (recovered.Scale > best.Scale + 1e-6 || recovered.Fps > best.Fps + 0.01)
             {
                 reason.Add($"the ceiling left budget unused, so resolution was restored to {recovered.Width}x{recovered.Height}@{recovered.Fps:0.##} — the largest layout that still fits the target at CRF {ceilingCrf:0}");
@@ -215,7 +241,7 @@ public static class PlanCalculator
             {
                 var (minCrf, _) = CodecModel.CrfRange(codec);
                 var totalBudgetK = aimMb * KbitPerMib * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
-                var desiredVideoK = Math.Max(MinVideoBitrateK, totalBudgetK - audioK);
+                var desiredVideoK = Math.Max(MinVideoBitrateK, totalBudgetK - audioK - DeliveryReserveK(codec));
                 var desiredBppf = BitsPerPixel(desiredVideoK, best.Width, best.Height, best.Fps);
                 var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
                 var crfStep = complexity.CrfStepSizeEffect(codec, best.Scale, best.Fps);
@@ -405,7 +431,7 @@ public static class PlanCalculator
 
     private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true);
 
-    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb, CompressionRegime regime)
+    private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb, double budgetVideoK, CompressionRegime regime)
     {
         Layout? best = null;
         var floors = CompressionStrategy.FloorsFor(regime);
@@ -423,6 +449,7 @@ public static class PlanCalculator
             var bppf = complexity.BppfAtCrf(codec, ceilingCrf, effectiveScale, fps, info.Fps);
             var videoK = VideoBitrateK(bppf, width, height, fps);
             if (SizeMb(videoK, audioK, info.DurationSeconds) >= capMb) continue;
+            if (budgetVideoK < CodecModel.UsableBitrateK(codec, width, height, fps)) continue;
 
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
             var score = LayoutScore(codec, required, bppf, effectiveScale, fps, info.Fps, regime);
@@ -459,8 +486,10 @@ public static class PlanCalculator
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
             var provided = BitsPerPixel(videoK, width, height, fps);
             var score = LayoutScore(codec, required, provided, effectiveScale, fps, info.Fps, regime);
+            if (complexity.AppliesTo(codec, effectiveScale, fps)) score += CalibratedShapeHysteresis;
+            var deliverable = videoK >= CodecModel.UsableBitrateK(codec, width, height, fps);
 
-            if (provided >= complexity.FloorBppf(codec, fps, info.Fps))
+            if (deliverable && provided >= complexity.FloorBppf(codec, fps, info.Fps))
             {
                 if (fps >= info.Fps - 0.01) sourceFpsViable = true;
                 if (best is null || score > best.Score)
