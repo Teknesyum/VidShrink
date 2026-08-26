@@ -199,7 +199,7 @@ public sealed class WindowLayoutTests
     [Fact]
     public void TheWindowAsksForTheSizeItsTokensName()
     {
-        var markup = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml"));
+        var markup = File.ReadAllText(TipSources.WindowXamlPath);
         var declared = Regex.Match(markup, @"Width=""(?<w>\d+)""\s+Height=""(?<h>\d+)""");
         Assert.True(declared.Success, "Biçimlemede açılış boyutu bulunamadı.");
 
