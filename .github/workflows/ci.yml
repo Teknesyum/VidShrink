@@ -1,0 +1,27 @@
+name: ci
+
+# Build and test on every push to main and on every pull request. The release workflow
+# runs the same gate, but only when a tag is pushed; without this one a break reaches
+# main and is not seen until release day.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+
+jobs:
+  test:
+    # Same reason as the release gate: the measurement suite opens real Avalonia windows.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet build VidShrink.sln -c Release -warnaserror
+      - run: dotnet test VidShrink.sln -c Release

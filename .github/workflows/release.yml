@@ -58,7 +58,12 @@ jobs:
 
   test:
     needs: version
-    runs-on: ubuntu-latest
+    # Windows, not Linux. The measurement suite builds real Avalonia windows through
+    # AppHost, which sets the platform up with UseWin32(); on a Linux runner that kills
+    # the test host with a missing kernel32.dll and the whole run aborts. Running the
+    # gate where the windows can actually open also means the release is checked against
+    # the same suite the developer sees, not a subset of it.
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
