@@ -1,2 +1,3 @@
 - [VidShrink build ve prob](vidshrink-build-and-probe.md) — calisan build/test komutlari, ffmpeg pipe tuzagi, scratchpad harness kalibi, olcum bulgulari
 - [VidShrink doğrulama](vidshrink-dogrulama.md) — tahmin/gerçek ölçümü için scratchpad harness gerekir, bench aracı kalibrasyonu atlıyor
+- [PowerShell UTF-8 tuzağı](powershell-utf8-tuzagi.md) — PS 5.1 BOM'suz Türkçe dosyayı bozar; sözleşme/rapor/LOG düzenlemeleri Bash cat+sed ile
