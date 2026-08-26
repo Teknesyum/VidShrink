@@ -237,6 +237,98 @@ public class HardwareVerdictTests
         }
     }
 
+    // --- K4: ipucunun son satırı ---
+
+    private static HardwareVerdict Closed(HardwareVerdictReason reason) => reason switch
+    {
+        HardwareVerdictReason.ProbeFailed => HardwareVerdict.Decide(new EncoderProbeResult("av1_nvenc", false, 0), 1074, 882, 496, 20),
+        HardwareVerdictReason.ProbeSlow => HardwareVerdict.Decide(Passed("av1_nvenc", HardwareVerdict.ProbeBudgetMs + 1), 1074, 882, 496, 20),
+        _ => HardwareVerdict.Decide(Passed("av1_nvenc"), CodecModel.UsableBitrateK("av1_nvenc", 1920, 1080, 30) - 1, 1920, 1080, 30)
+    };
+
+    [Fact]
+    public void WithoutAProbeThereIsNoVerdictLine()
+    {
+        Assert.Null(MainWindow.FastGpuVerdictLine(HardwareVerdict.NotProbed, false, true));
+    }
+
+    /// <summary>Gövde zaten donanım bulunamadığını yazıyor; ikinci kez yazılmaz.</summary>
+    [Fact]
+    public void WithoutHardwareTheBodyAlreadySaysIt()
+    {
+        var verdict = HardwareVerdict.Decide(Passed("libx264"), 1074, 882, 496, 20);
+
+        Assert.Null(MainWindow.FastGpuVerdictLine(verdict, false, true));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AnOpenedBoxIsAnnouncedWithItsMeasurement(bool turkish)
+    {
+        var verdict = HardwareVerdict.Decide(Passed("av1_nvenc", 193), 1074, 882, 496, 20);
+        var line = MainWindow.FastGpuVerdictLine(verdict, true, turkish);
+
+        Assert.NotNull(line);
+        Assert.Contains("193", line!, StringComparison.Ordinal);
+        Assert.Contains("1074", line, StringComparison.Ordinal);
+        Assert.Contains(verdict.UsableBitrateK.ToString(), line, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// K4: ölçüm kapalı önerdiği hâlde kullanıcı kutuyu elle açtıysa satır "kapalı kaldı"
+    /// diyemez. Üç kapalı dalın üçü de kutunun gerçek durumunu okumalı.
+    /// </summary>
+    [Theory]
+    [InlineData(HardwareVerdictReason.ProbeFailed)]
+    [InlineData(HardwareVerdictReason.ProbeSlow)]
+    [InlineData(HardwareVerdictReason.BitrateFloorTooHigh)]
+    public void AClosedVerdictDoesNotClaimTheBoxIsOffWhenItIsOn(HardwareVerdictReason reason)
+    {
+        var verdict = Closed(reason);
+        Assert.Equal(reason, verdict.Reason);
+        Assert.False(verdict.EnableFastMode);
+
+        var off = MainWindow.FastGpuVerdictLine(verdict, false, true);
+        var on = MainWindow.FastGpuVerdictLine(verdict, true, true);
+
+        Assert.NotNull(off);
+        Assert.NotNull(on);
+        Assert.Contains("kapalı kaldı", off!, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("kapalı kaldı", on!, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("elle açıldı", on, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData(HardwareVerdictReason.ProbeFailed)]
+    [InlineData(HardwareVerdictReason.ProbeSlow)]
+    [InlineData(HardwareVerdictReason.BitrateFloorTooHigh)]
+    public void AClosedVerdictKeepsItsMeasurementInBothStates(HardwareVerdictReason reason)
+    {
+        var verdict = Closed(reason);
+
+        foreach (var turkish in new[] { true, false })
+        foreach (var on in new[] { true, false })
+        {
+            var line = MainWindow.FastGpuVerdictLine(verdict, on, turkish);
+
+            Assert.NotNull(line);
+            Assert.StartsWith("•", line!, StringComparison.Ordinal);
+            Assert.Contains("nvenc", line, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>Yoklaması hiç bulunamayan kodlayıcı için "bulundu ama" denmemeli.</summary>
+    [Fact]
+    public void AMissingEncoderIsNotDescribedAsPresent()
+    {
+        var verdict = HardwareVerdict.Decide(EncoderProbeResult.Missing("av1_nvenc"), 1074, 882, 496, 20);
+        var line = MainWindow.FastGpuVerdictLine(verdict, false, true);
+
+        Assert.NotNull(line);
+        Assert.DoesNotContain("bulundu", line!, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>
     /// K5: yoklama açılışı bekletmemeli. Pencere test projesinde açılamadığı için kural
     /// kaynaktan ölçülüyor — yoklama gövdesi <c>Task.Run</c> içinde kalmalı.
@@ -348,7 +440,16 @@ public class HardwareVerdictTests
             _output.WriteLine($"first layout without probe: {string.Join(" / ", withoutProbe.Select(v => v.ToString("0.0")))} ms");
             _output.WriteLine($"first layout with probe:    {string.Join(" / ", withProbe.Select(v => v.ToString("0.0")))} ms");
             _output.WriteLine($"median without={Median(withoutProbe):0.0}ms with={Median(withProbe):0.0}ms difference={Median(withProbe) - Median(withoutProbe):0.0}ms");
-            _output.WriteLine($"spread of the probe-free runs={withoutProbe.Max() - withoutProbe.Min():0.0}ms");
+            var spread = withoutProbe.Max() - withoutProbe.Min();
+            var difference = Median(withProbe) - Median(withoutProbe);
+            _output.WriteLine($"spread of the probe-free runs={spread:0.0}ms");
+
+            // Yoklama yerleşimi bekletseydi fark yoklamanın kendi süresi kadar (185-209 ms)
+            // olurdu. Ölçünün hassasiyeti yoklamasız turların kendi yayılımı; fark onun
+            // altında kaldığı sürece yoklamanın açılışta ölçülebilir bir maliyeti yok.
+            Assert.True(
+                difference < spread,
+                $"Yoklama ilk yerleşimi {difference:0.0} ms geciktirdi, yoklamasız turların yayılımı {spread:0.0} ms.");
         }
         finally
         {

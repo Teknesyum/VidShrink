@@ -579,39 +579,53 @@ public partial class MainWindow : Window
     {
         // Text yazmak koşuları silerdi: ipucu gövdesi aynı boyayıcıdan geçmeli.
         var body = Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish);
-        var verdict = FastGpuVerdictLine();
+        var verdict = FastGpuVerdictLine(_hardwareVerdict, ChkFastGpu.IsChecked == true, _turkish);
         PaintBullets(TipFastGpu, verdict is null ? body : $"{body}\n{verdict}");
     }
 
     /// <summary>
     /// Kutunun neden açıldığı ya da neden kapalı kaldığı. Ayrı bir pencere açılmaz; ölçüm
     /// ipucunun son satırı olarak durur.
+    ///
+    /// Kutunun gerçek durumu <paramref name="fastGpuOn"/> ile geliyor: ölçüm kapalı
+    /// önerdiği hâlde kullanıcı kutuyu elle açmış olabilir ve satır o zaman "kapalı kaldı"
+    /// diyemez.
     /// </summary>
-    private string? FastGpuVerdictLine()
+    internal static string? FastGpuVerdictLine(HardwareVerdict verdict, bool fastGpuOn, bool turkish)
     {
-        var v = _hardwareVerdict;
-        switch (v.Reason)
+        string T(string tr, string en) => LanguageCatalog.Title(turkish ? tr : en, turkish);
+
+        var v = verdict;
+
+        // Gövdenin kendisi zaten donanım bulunamadığını yazıyor.
+        if (v.Reason is HardwareVerdictReason.NotProbed or HardwareVerdictReason.NoHardwareEncoder)
+            return null;
+
+        if (v.Reason == HardwareVerdictReason.Usable)
+            return fastGpuOn
+                ? T($"• Hızlı düşür kendiliğinden açıldı: {v.Codec} yoklamayı {v.ElapsedMs} ms'de geçti ve istenen {v.RequestedBitrateK} kbit/s takip edebildiği {v.UsableBitrateK} kbit/s sınırının üstünde.",
+                    $"• Fast shrink turned itself on: {v.Codec} passed the probe in {v.ElapsedMs} ms and the requested {v.RequestedBitrateK} kbit/s sits above the {v.UsableBitrateK} kbit/s it can follow.")
+                : T($"• {v.Codec} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.",
+                    $"• {v.Codec} passed the measurement; the box stays off because it was turned off by hand.");
+
+        var measurement = v.Reason switch
         {
-            // Gövdenin kendisi zaten donanım bulunamadığını yazıyor.
-            case HardwareVerdictReason.NotProbed:
-            case HardwareVerdictReason.NoHardwareEncoder:
-                return null;
-            case HardwareVerdictReason.ProbeFailed:
-                return T($"• {v.Codec} bulundu ama yoklama kodlaması geçmedi, hızlı düşür kapalı kaldı.",
-                         $"• {v.Codec} is present but the probe encode did not pass, so fast shrink stayed off.");
-            case HardwareVerdictReason.ProbeSlow:
-                return T($"• {v.Codec} yoklaması {v.ElapsedMs} ms sürdü, {HardwareVerdict.ProbeBudgetMs} ms bütçesinin üstünde; hızlı düşür kapalı kaldı.",
-                         $"• The {v.Codec} probe took {v.ElapsedMs} ms, past the {HardwareVerdict.ProbeBudgetMs} ms budget, so fast shrink stayed off.");
-            case HardwareVerdictReason.BitrateFloorTooHigh:
-                return T($"• {v.Codec} ancak {v.UsableBitrateK} kbit/s ve üstünü takip ediyor, plan {v.RequestedBitrateK} kbit/s istiyor; hızlı düşür kapalı kaldı.",
-                         $"• {v.Codec} only follows {v.UsableBitrateK} kbit/s and above while the plan asks for {v.RequestedBitrateK} kbit/s, so fast shrink stayed off.");
-            default:
-                return ChkFastGpu.IsChecked == true
-                    ? T($"• Hızlı düşür kendiliğinden açıldı: {v.Codec} yoklamayı {v.ElapsedMs} ms'de geçti ve istenen {v.RequestedBitrateK} kbit/s takip edebildiği {v.UsableBitrateK} kbit/s sınırının üstünde.",
-                        $"• Fast shrink turned itself on: {v.Codec} passed the probe in {v.ElapsedMs} ms and the requested {v.RequestedBitrateK} kbit/s sits above the {v.UsableBitrateK} kbit/s it can follow.")
-                    : T($"• {v.Codec} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.",
-                        $"• {v.Codec} passed the measurement; the box stays off because it was turned off by hand.");
-        }
+            HardwareVerdictReason.ProbeFailed =>
+                T($"{v.Codec} yoklaması geçmedi",
+                  $"the {v.Codec} probe did not pass"),
+            HardwareVerdictReason.ProbeSlow =>
+                T($"{v.Codec} yoklaması {v.ElapsedMs} ms sürdü, {HardwareVerdict.ProbeBudgetMs} ms bütçesinin üstünde",
+                  $"the {v.Codec} probe took {v.ElapsedMs} ms, past the {HardwareVerdict.ProbeBudgetMs} ms budget"),
+            _ =>
+                T($"{v.Codec} ancak {v.UsableBitrateK} kbit/s ve üstünü takip ediyor, plan {v.RequestedBitrateK} kbit/s istiyor",
+                  $"{v.Codec} only follows {v.UsableBitrateK} kbit/s and above while the plan asks for {v.RequestedBitrateK} kbit/s")
+        };
+
+        return fastGpuOn
+            ? T($"• {measurement}; ölçüm kapalı öneriyordu, kutu elle açıldı.",
+                $"• {measurement}; the measurement advised leaving it off, but the box was turned on by hand.")
+            : T($"• {measurement}, hızlı düşür kapalı kaldı.",
+                $"• {measurement}, so fast shrink stayed off.");
     }
 
     private async Task LoadFfmpegVersionAsync()

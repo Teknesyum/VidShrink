@@ -46,7 +46,7 @@ public sealed record HardwareVerdict(
 {
     /// <summary>
     /// Yoklamanın sağlıklı sayıldığı üst süre. Yoklamanın kendi zaman aşımı 4000 ms; bu
-    /// makinede av1_nvenc yoklaması 195-236 ms sürüyor. Bütçe ikisinin arasına, ölçülen
+    /// makinede av1_nvenc yoklaması 185-209 ms sürüyor. Bütçe ikisinin arasına, ölçülen
     /// sürenin kabaca altı katına konuldu: sürücü içinde geri düşe düşe zar zor tamamlanan
     /// bir yol "çalışıyor" sayılmasın, ölçüm gürültüsü de kararı çevirmesin.
     /// </summary>
