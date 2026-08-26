@@ -22,9 +22,11 @@ Open PowerShell and run:
 irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
 ```
 
-The installer needs no administrator rights. It reuses an installed .NET 8 SDK when it finds one and otherwise bootstraps it with Microsoft's own `dotnet-install.ps1` into `%LOCALAPPDATA%\Microsoft\dotnet`; FFmpeg and FFprobe come from WinGet. It then downloads the latest `main` source, publishes a self-contained Release build for the machine's own architecture, installs it under `%LOCALAPPDATA%\Programs\VidShrink`, and creates Desktop and Start Menu shortcuts. Running the same command again replaces the installed app with the newest version.
+The installer needs no administrator rights and no .NET SDK. It asks GitHub for the latest release, downloads the `win-x64` archive and the launcher beside it, checks both against the release's own SHA-256 list and refuses to continue if either digest differs. What lands on your machine is the same binary the release pipeline tested — nothing is compiled here. It installs under `%LOCALAPPDATA%\Programs\VidShrink`, fetches FFmpeg and FFprobe from WinGet, and creates Desktop and Start Menu shortcuts pointing at the launcher. Running the same command again replaces the installed app with the newest release.
 
-The command needs no change to your execution policy. `irm | iex` runs the installer from memory rather than from a file, and the installer runs Microsoft's `dotnet-install.ps1` the same way, so Windows' default `Restricted` policy blocks neither of them. If a stricter organizational policy blocks the command outright, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session with the command below. Read the file explicitly as UTF-8 rather than passing `-File`: the script is stored as UTF-8 without a byte order mark, and Windows PowerShell 5.1 reads a mark-less script file in the system ANSI code page, which turns every non-ASCII character in the installer's messages into mojibake.
+Only `win-x64` is published. On an ARM64 or 32-bit machine the installer stops with that message rather than installing an architecture whose updates would never be found.
+
+The command needs no change to your execution policy. `irm | iex` runs the installer from memory rather than from a file, so Windows' default `Restricted` policy does not block it. If a stricter organizational policy blocks the command outright, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session with the command below. Read the file explicitly as UTF-8 rather than passing `-File`: the script is stored as UTF-8 without a byte order mark, and Windows PowerShell 5.1 reads a mark-less script file in the system ANSI code page, which turns every non-ASCII character in the installer's messages into mojibake.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllText('C:\path\to\Install-VidShrink.ps1',[Text.Encoding]::UTF8))"
@@ -38,7 +40,7 @@ Open a terminal and run:
 curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
 ```
 
-The installer needs no root. It reuses an installed .NET 8 SDK when it finds one and otherwise bootstraps it with Microsoft's own `dotnet-install.sh` into `~/.dotnet`. It then downloads the latest `main` source, publishes a self-contained Release build for the machine's own architecture — `osx-arm64`, `osx-x64`, `linux-x64` or `linux-arm64`, decided from `uname` — installs it under `~/.local/share/vidshrink`, and links it as `~/.local/bin/vidshrink`. Running the same command again replaces the installed app with the newest version.
+The installer needs no root and no .NET SDK. It asks GitHub for the latest release, picks the target from `uname` — `osx-arm64`, `osx-x64` or `linux-x64` — downloads that archive, verifies its SHA-256 against the release's own checksum list, installs it under `~/.local/share/vidshrink`, and links it as `~/.local/bin/vidshrink`. Running the same command again replaces the installed app with the newest release. Any other architecture stops the installer with a message; nothing else is published.
 
 FFmpeg is the one thing this installer will not put on your machine for you. If `ffmpeg` or `ffprobe` is missing it prints the command for your package manager — `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading anything else.
 
@@ -184,7 +186,7 @@ Scrollbars on both boxes appear only while the pointer is over them.
 
 - Windows 10 or 11, macOS 12 or newer, or a Linux desktop running X11 or Wayland
 - `ffmpeg` and `ffprobe` in a `tools/ffmpeg` folder beside the application, or on `PATH`
-- No .NET runtime. Both installers publish a self-contained build, so the runtime travels inside the installed application
+- No .NET runtime and no .NET SDK. Releases are self-contained, so the runtime travels inside the downloaded application and the installers compile nothing
 
 Building from a clone needs the .NET 8 SDK:
 

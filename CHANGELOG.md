@@ -7,6 +7,34 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Changed
+
+- Both installers download the published release instead of building it. They ask GitHub
+  for the latest release, fetch the archive for the machine's target, verify its SHA-256
+  against the release's own `checksums-<rid>.txt` and stop if the digest differs. The .NET
+  SDK bootstrap is gone from both: `Find-DotNetSdk8`, `Install-DotNetSdk8`, the
+  `dotnet publish` calls and the `main` source download no longer exist. Installing took
+  minutes, left an SDK on the machine and produced a binary nobody had tested; it now
+  installs the same binary the release pipeline tested.
+- The installers write `.update-version` into the installed application folder. Without
+  that marker the first launch after a fresh install compared the installed folder against
+  the release file by file and downloaded almost the whole archive again — 191 of 220 files
+  differ between a local build and the CI build, because the build is not deterministic.
+- The installers stop on an architecture that has no release rather than installing a
+  different one. Only `win-x64`, `osx-arm64`, `osx-x64` and `linux-x64` are published; on
+  anything else the update check would look for an asset that does not exist and would
+  silently never find an update.
+- The Windows installer stops when the release does not carry the launcher, instead of
+  leaving an installation whose shortcuts have nothing to point at.
+
+### Added
+
+- The release workflow publishes the launcher for `win-x64` as
+  `vidshrink-launcher-win-x64.zip` and lists it in `checksums-win-x64.txt`. The launcher is
+  what the shortcuts point at and what applies an update before the application is loaded;
+  releases carried the application only, so an installer that stops compiling had nowhere
+  to get it from.
+
 ## [0.1.0] - 2026-08-26
 
 ### Changed
