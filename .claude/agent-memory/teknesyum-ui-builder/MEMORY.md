@@ -20,3 +20,6 @@
 - [Marka adı çevrilmez](vidshrink-marka-adi-cevrilmez.md) — "Buy me a coffee" ve "Teknesyum" LanguageCatalog'a çeviri girdisi almaz
 - [Bullet testi kararsiz](vidshrink-bullet-testi-kararsiz.md) — BulletPaintingTests ara sıra iş parçacığı hatasıyla düşer, ikinci koşuda geçer
 - [Maximized ölçüm tuzağı](vidshrink-maximized-olcum.md) — pencere Maximized; Measure boyutu geçer, Arrange çalışma alanına sabitlenir, taşma boyuttan bağımsız çıkar
+- [Başsız yerleşim ölçümü](avalonia-bassiz-yerlesim-olcumu.md) — zamanlayıcı koşmaz, DesiredSize boşluğu içerir, seçili olmayan sekme ağaçta yok
+- [Thickness belirteci](avalonia-thickness-belirteci.md) — Thickness'ı x:Double'dan türetemezsin; derleme geçer, çalışma zamanı düşer
+- [Bu makinenin ekranı](vidshrink-makine-ekrani.md) — 1024x768; başka makinede pinlenen yerleşim sayıları burada kırmızı
