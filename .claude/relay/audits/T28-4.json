@@ -1,7 +1,7 @@
 {
   "contractId": "T28",
   "auditorRunId": "a27c6b1b659276110",
-  "headSha": "ba3de2ffd26888f9dc0a71c0737b8c8a0afa5131",
+  "headSha": "e634bda3e7512800e145c9d590eac88e3acb32ec",
   "diffHash": "02df2c325eeae4fed64d4ab73e3e07ad77ad1fa5e00884670f9767ef0f403084",
   "owns": [
     "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
@@ -18,5 +18,5 @@
     "dotnet test: 446 basarili, 0 basarisiz, 14 atlanan"
   ],
   "result": "GECTI",
-  "createdAt": "2026-08-26T08:33:58.354Z"
+  "createdAt": "2026-08-26T08:34:04.871Z"
 }
