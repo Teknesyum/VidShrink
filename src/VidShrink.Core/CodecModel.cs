@@ -47,8 +47,12 @@ public static class CodecModel
     // headroom (request divided by the floor above):
     //   0,38x -> 5,7x   1,01x -> 1,091   1,04x -> 1,171   1,30x -> 1,171   1,45x -> 1,091
     //   1,95x -> 0,994  2,17x -> 1,071   2,61x -> 0,995   2,85x -> 1,050   6,52x -> 1,013
-    // Below twice the floor the encoder overspends by 9% to 17% and at 0,38x by a factor of five.
-    // From twice the floor up it tracks the request. A layout is only usable above that line.
+    // Under 1,5x the floor the encoder overspends by 9% to 17%, and at 0,38x by a factor of five.
+    // From there up the request is followed within a few per cent, but not cleanly: 1,95x and
+    // 2,61x land on it (0,994 and 0,995) while 2,17x and 2,85x still spend 5% to 7% past it. The
+    // scatter above the line is small enough for the retry to absorb, the overspend below it is
+    // not, so the usable line is drawn at twice the floor - past the last point that overspends
+    // systematically, and conservative rather than exact.
     public const double HardwareMinBitrateHeadroom = 2.0;
 
     public static double FloorBppf(string codec)
