@@ -926,6 +926,21 @@ public partial class MainWindow : Window
             TxtSystemStatus.Text = $"{T("Donanım kodlayıcı yoklaması başarısız", "The hardware encoder probe failed")}: {ex.Message}";
         }
 
+        ApplyHardwareVerdict(encoders, available, verdict);
+    }
+
+    /// <summary>
+    /// Hızlı mod kararının yazıldığı ayar dosyası. Boşken <see cref="UpdateSettings.DefaultPath"/>
+    /// kullanılır; ölçüm süreç genelindeki ortam değişkenine dokunmadan kendi dosyasını verir.
+    /// </summary>
+    internal string? SettingsPathOverride { get; set; }
+
+    /// <summary>
+    /// Yoklamanın sonucunu arayüze ve ayara bağlar. Yoklamadan ayrı durur ki açılış yolu
+    /// ffmpeg çağrılmadan da sınanabilsin.
+    /// </summary>
+    internal void ApplyHardwareVerdict(IEncoderAvailability? encoders, bool available, HardwareVerdict verdict)
+    {
         _encoders = encoders;
         _hardwareProbed = true;
         _hardwareEncoderAvailable = available;
@@ -949,9 +964,9 @@ public partial class MainWindow : Window
     {
         try
         {
-            var settings = UpdateSettings.Load();
+            var settings = UpdateSettings.Load(SettingsPathOverride);
             if (HardwareVerdict.ReprobeRequested()) settings.FastGpu = null;
-            if (verdict.ApplyTo(settings)) settings.Save();
+            if (verdict.ApplyTo(settings)) settings.Save(SettingsPathOverride);
             return settings.FastGpu == true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -966,11 +981,11 @@ public partial class MainWindow : Window
         if (_syncing) return;
         try
         {
-            var settings = UpdateSettings.Load();
+            var settings = UpdateSettings.Load(SettingsPathOverride);
             var enabled = ChkFastGpu.IsChecked == true;
             if (settings.FastGpu == enabled) return;
             settings.FastGpu = enabled;
-            settings.Save();
+            settings.Save(SettingsPathOverride);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

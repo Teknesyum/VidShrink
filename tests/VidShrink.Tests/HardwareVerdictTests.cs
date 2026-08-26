@@ -31,6 +31,19 @@ public class HardwareVerdictTests
 
     public HardwareVerdictTests(ITestOutputHelper output) => _output = output;
 
+    /// <summary>Uygulamanın yoklama için kullandığı temsili kaynak (MainWindow.HardwareProbeSource).</summary>
+    private static MediaInfo ProbeSource() => new()
+    {
+        FilePath = "hardware-probe.mp4",
+        FileSizeBytes = 200L * 1024 * 1024,
+        DurationSeconds = 120,
+        Width = 1920,
+        Height = 1080,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 14_000_000
+    };
+
     private static EncoderProbeResult Passed(string codec, long ms = 200) => new(codec, true, ms);
 
     [Fact]
@@ -237,6 +250,116 @@ public class HardwareVerdictTests
         }
     }
 
+    // --- K3: kullanıcının gördüğü yol, uçtan uca ---
+
+    /// <summary>
+    /// Pencere + ayar dosyası + kutu, gerçek ffmpeg'e gitmeden. Yoklamanın sonucu
+    /// <see cref="MainWindow.ApplyHardwareVerdict"/> ile besleniyor; geri kalan yol
+    /// (<c>ResolveFastGpuSetting</c>, <c>_syncing</c> kapısı, <c>OnFastGpuChanged</c>)
+    /// uygulamadaki hâliyle koşuyor.
+    /// </summary>
+    private static T WithSettingsFile<T>(Func<string, T> work)
+    {
+        // Ortam değişkeni süreç geneli ve başka bir ölçüm sınıfı onu paralelde sıfırlıyor;
+        // pencere yolunu sınayan ölçümler dosyayı MainWindow'a doğrudan veriyor.
+        var file = Path.Combine(Path.GetTempPath(), $"vidshrink-fastgpu-{Guid.NewGuid():N}.json");
+        try
+        {
+            return work(file);
+        }
+        finally
+        {
+            if (File.Exists(file)) File.Delete(file);
+        }
+    }
+
+    private static readonly HardwareVerdict UsableVerdict =
+        HardwareVerdict.Decide(Passed("av1_nvenc", 193), 1074, 882, 496, 20);
+
+    private static readonly HardwareVerdict ClosedVerdict =
+        HardwareVerdict.Decide(Passed("av1_nvenc"), CodecModel.UsableBitrateK("av1_nvenc", 1920, 1080, 30) - 1, 1920, 1080, 30);
+
+    /// <summary>Açılışı taklit eder: pencere kurulur ve yoklamanın sonucu bağlanır.</summary>
+    private static bool Launch(string settingsFile, HardwareVerdict verdict)
+    {
+        var window = new MainWindow { SettingsPathOverride = settingsFile };
+        window.ApplyHardwareVerdict(null, true, verdict);
+        return window.ChkFastGpu.IsChecked == true;
+    }
+
+    /// <summary>Kullanıcının kutuyu elle değiştirmesi — programın yazdığı yoldan geçmez.</summary>
+    private static void ToggleByHand(MainWindow window, bool on) => window.ChkFastGpu.IsChecked = on;
+
+    [Fact]
+    public void TheBoxTheUserTurnedOffStaysOffOnTheNextLaunch()
+    {
+        WithSettingsFile<object?>(file => AppHost.Run<object?>(() =>
+        {
+            Assert.True(UsableVerdict.EnableFastMode);
+
+            // 1. İlk açılış: karar kutuyu kendiliğinden açar ve dosyaya yazar.
+            var first = new MainWindow { SettingsPathOverride = file };
+            first.ApplyHardwareVerdict(null, true, UsableVerdict);
+            Assert.True(first.ChkFastGpu.IsChecked);
+            Assert.True(UpdateSettings.Load(file).FastGpu);
+
+            // 2. Kullanıcı kutuyu elle kapatır.
+            ToggleByHand(first, false);
+            Assert.False(UpdateSettings.Load(file).FastGpu);
+
+            // 3. Sonraki açılış: karar yine açık öneriyor ama dosya ezilmiyor.
+            Assert.False(Launch(file, UsableVerdict));
+            Assert.False(UpdateSettings.Load(file).FastGpu);
+
+            return null;
+        }));
+    }
+
+    [Fact]
+    public void TheBoxTheUserTurnedOnStaysOnOnTheNextLaunch()
+    {
+        WithSettingsFile<object?>(file => AppHost.Run<object?>(() =>
+        {
+            Assert.False(ClosedVerdict.EnableFastMode);
+
+            // 1. İlk açılış: karar kapalı öneriyor, dosyaya false yazılıyor.
+            var first = new MainWindow { SettingsPathOverride = file };
+            first.ApplyHardwareVerdict(null, true, ClosedVerdict);
+            Assert.False(first.ChkFastGpu.IsChecked);
+            Assert.False(UpdateSettings.Load(file).FastGpu);
+
+            // 2. Kullanıcı kutuyu elle açar.
+            ToggleByHand(first, true);
+            Assert.True(UpdateSettings.Load(file).FastGpu);
+
+            // 3. Sonraki açılış: karar yine kapalı öneriyor ama kutu açık kalıyor.
+            Assert.True(Launch(file, ClosedVerdict));
+            Assert.True(UpdateSettings.Load(file).FastGpu);
+
+            return null;
+        }));
+    }
+
+    /// <summary>
+    /// Elle açılan kutunun ipucu satırı da doğruyu söylemeli — K4'ün uçtan uca hâli.
+    /// </summary>
+    [Fact]
+    public void TheTipFollowsTheBoxTheUserOpened()
+    {
+        WithSettingsFile<object?>(file => AppHost.Run<object?>(() =>
+        {
+            var window = new MainWindow { SettingsPathOverride = file };
+            window.ApplyHardwareVerdict(null, true, ClosedVerdict);
+            ToggleByHand(window, true);
+
+            var line = MainWindow.FastGpuVerdictLine(ClosedVerdict, window.ChkFastGpu.IsChecked == true, true);
+
+            Assert.NotNull(line);
+            Assert.DoesNotContain("kapalı kaldı", line!, StringComparison.OrdinalIgnoreCase);
+            return null;
+        }));
+    }
+
     // --- K4: ipucunun son satırı ---
 
     private static HardwareVerdict Closed(HardwareVerdictReason reason) => reason switch
@@ -356,21 +479,9 @@ public class HardwareVerdictTests
     [LiveProbeFact]
     public void LiveProbeDecidesOnThisMachine()
     {
-        var source = new MediaInfo
-        {
-            FilePath = "hardware-probe.mp4",
-            FileSizeBytes = 200L * 1024 * 1024,
-            DurationSeconds = 120,
-            Width = 1920,
-            Height = 1080,
-            Fps = 30,
-            VideoCodec = "h264",
-            TotalBitrateBps = 14_000_000
-        };
-
         var capabilities = EncoderCapabilities.Instance;
         var plan = PlanCalculator.Build(
-            source,
+            ProbeSource(),
             new PlanOptions { TargetMb = 16, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast },
             capabilities);
         var probe = capabilities.Probe(plan.Codec);
@@ -418,14 +529,10 @@ public class HardwareVerdictTests
     [LiveProbeFact]
     public void TheFirstLayoutDoesNotWaitForTheProbe()
     {
-        var file = Path.Combine(Path.GetTempPath(), $"vidshrink-fastgpu-{Guid.NewGuid():N}.json");
-        var previous = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
-        try
+        WithSettingsFile<object?>(file =>
         {
-            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", file);
-
             // İlk pencere JIT ve kaynak sözlüğü maliyetini yutar; ölçülen hepsi sıcak.
-            AppHost.Run(() => LayOutFirstWindow(false));
+            AppHost.Run(() => LayOutFirstWindow(file, false));
 
             // İlk yoklamalı tur ffmpeg'i gerçekten çağırır, sonrakiler _probed önbelleğini
             // bulur — gerçek uygulamada da süreç başına tek yoklama var.
@@ -433,8 +540,8 @@ public class HardwareVerdictTests
             var withoutProbe = new List<double>();
             for (var round = 0; round < 5; round++)
             {
-                withoutProbe.Add(AppHost.Run(() => LayOutFirstWindow(false)));
-                withProbe.Add(AppHost.Run(() => LayOutFirstWindow(true)));
+                withoutProbe.Add(AppHost.Run(() => LayOutFirstWindow(file, false)));
+                withProbe.Add(AppHost.Run(() => LayOutFirstWindow(file, true)));
             }
 
             _output.WriteLine($"first layout without probe: {string.Join(" / ", withoutProbe.Select(v => v.ToString("0.0")))} ms");
@@ -444,18 +551,28 @@ public class HardwareVerdictTests
             var difference = Median(withProbe) - Median(withoutProbe);
             _output.WriteLine($"spread of the probe-free runs={spread:0.0}ms");
 
-            // Yoklama yerleşimi bekletseydi fark yoklamanın kendi süresi kadar (185-209 ms)
-            // olurdu. Ölçünün hassasiyeti yoklamasız turların kendi yayılımı; fark onun
-            // altında kaldığı sürece yoklamanın açılışta ölçülebilir bir maliyeti yok.
+            // Yoklama yerleşimi bekletseydi fark yoklamanın kendi süresi kadar olurdu.
+            // Kapı o sürenin yarısına konuldu: ölçüm gürültüsü (yoklamasız turların kendi
+            // yayılımı) kararı çevirmesin, gerçek bir serileşme de gözden kaçmasın.
+            var probeMs = ProbeMillisecondsOfThisMachine();
+            _output.WriteLine($"probe itself={probeMs}ms, gate={probeMs / 2.0:0.0}ms");
             Assert.True(
-                difference < spread,
-                $"Yoklama ilk yerleşimi {difference:0.0} ms geciktirdi, yoklamasız turların yayılımı {spread:0.0} ms.");
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", previous);
-            if (File.Exists(file)) File.Delete(file);
-        }
+                difference < probeMs / 2.0,
+                $"Yoklama ilk yerleşimi {difference:0.0} ms geciktirdi; yoklamanın kendisi {probeMs} ms sürüyor.");
+
+            return null;
+        });
+    }
+
+    /// <summary>Bu makinede seçilen kodlayıcının yoklama süresi; süreç başına önbellekli.</summary>
+    private static long ProbeMillisecondsOfThisMachine()
+    {
+        var capabilities = EncoderCapabilities.Instance;
+        var plan = PlanCalculator.Build(
+            ProbeSource(),
+            new PlanOptions { TargetMb = 16, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast },
+            capabilities);
+        return capabilities.Probe(plan.Codec).ElapsedMs;
     }
 
     private static double Median(List<double> values)
@@ -467,11 +584,11 @@ public class HardwareVerdictTests
     }
 
     /// <summary>Pencereyi kurup ilk yerleşimi tamamlar, geçen duvar saatini ms olarak döndürür.</summary>
-    private static double LayOutFirstWindow(bool probe)
+    private static double LayOutFirstWindow(string settingsFile, bool probe)
     {
         var clock = Stopwatch.StartNew();
 
-        var window = new MainWindow();
+        var window = new MainWindow { SettingsPathOverride = settingsFile };
         var probing = probe ? window.ProbeForMeasurement() : null;
 
         Assert.True(window.TryFindResource("WindowPreferredWidth", out var width));
