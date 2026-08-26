@@ -49,7 +49,7 @@
           işaretçiyle vurulması en kolay hedeftir ve fare orada durur; araya konan her piksel
           o kazancı siler. Soldaki 16 px başlık için duruyor.
         -->
-        <Grid x:Name="TitleBarContent" Margin="16,0,0,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
+        <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
           <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
             <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
@@ -100,7 +100,7 @@
 
       <StackPanel Grid.Row="1">
         <Border x:Name="AppliedNotice"
-                Margin="24,12,24,0"
+                Margin="{StaticResource NoticeMargin}"
                 IsVisible="False"
                 Background="{StaticResource Surface}"
                 BorderBrush="{StaticResource NeonBlueBorder}"
@@ -131,7 +131,7 @@
         </Border>
 
         <Border x:Name="UpdateNotice"
-                Margin="24,12,24,0"
+                Margin="{StaticResource NoticeMargin}"
                 IsVisible="False"
                 Background="{StaticResource Surface}"
                 BorderBrush="{StaticResource NeonPurpleBorder}"
@@ -174,7 +174,7 @@
         </Border>
       </StackPanel>
 
-      <Grid Grid.Row="2" Margin="24,12,24,12">
+      <Grid Grid.Row="2" Margin="{StaticResource WorkspaceMargin}">
         <StackPanel x:Name="LangSwitch"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
@@ -184,10 +184,10 @@
           <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="EN" Click="OnEnglish"/>
         </StackPanel>
 
-        <TabControl Theme="{StaticResource NeonTabControl}">
+        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}">
 
         <TabItem Header="Shrink" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
               <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceLg}">
@@ -599,7 +599,7 @@
         </TabItem>
 
         <TabItem Header="Convert" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
 
               <Border Grid.Column="0" Theme="{StaticResource Panel}" VerticalAlignment="Top">
@@ -834,7 +834,7 @@
         </TabItem>
 
         <TabItem Header="Settings" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="SharePanel" Theme="{StaticResource Panel}">
@@ -894,7 +894,7 @@
         </TabItem>
 
         <TabItem Header="About" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageAbout" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Border Theme="{StaticResource Panel}" Margin="{StaticResource SectionMargin}">
               <StackPanel Spacing="{StaticResource SpaceMd}">
                 <TextBlock Text="About VidShrink" Theme="{StaticResource H2}"/>
@@ -919,7 +919,7 @@
         </TabItem>
 
           <TabItem Header="Advanced" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">

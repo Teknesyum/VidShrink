@@ -232,6 +232,13 @@ public partial class MainWindow : Window
     }
 
     private readonly Dictionary<Control, int> _fadeGeneration = new();
+    private readonly HashSet<Control> _fadingOut = new();
+
+    internal void SettleFades()
+    {
+        foreach (var control in _fadingOut) control.IsVisible = false;
+        _fadingOut.Clear();
+    }
 
     private void ShowScrollOnlyOnHover(params TextBox[] boxes)
     {
@@ -268,6 +275,7 @@ public partial class MainWindow : Window
         if (visible)
         {
             _fadeGeneration[control] = NextFadeGeneration(control);
+            _fadingOut.Remove(control);
             if (control.IsVisible && control.Opacity > 0.99) return;
             control.Opacity = 0;
             control.IsVisible = true;
@@ -277,10 +285,13 @@ public partial class MainWindow : Window
 
         if (!control.IsVisible) return;
         var generation = _fadeGeneration[control] = NextFadeGeneration(control);
+        _fadingOut.Add(control);
         control.Opacity = 0;
         DispatcherTimer.RunOnce(() =>
         {
-            if (_fadeGeneration.TryGetValue(control, out var current) && current == generation) control.IsVisible = false;
+            if (_fadeGeneration.TryGetValue(control, out var current) && current != generation) return;
+            _fadingOut.Remove(control);
+            control.IsVisible = false;
         }, Motion("MotionBase", 240));
     }
 
@@ -991,7 +1002,8 @@ public partial class MainWindow : Window
         Fade(SourceCard, true);
         ClearSourceError();
 
-        try { _info = await FfprobeClient.ProbeAsync(path); }
+        MediaInfo probed;
+        try { probed = await FfprobeClient.ProbeAsync(path); }
         catch (Exception ex)
         {
             _info = null;
@@ -1004,6 +1016,22 @@ public partial class MainWindow : Window
             return;
         }
 
+        ApplyLoaded(path, probed);
+        await MeasureComplexityAsync(probed);
+    }
+
+    internal void LoadWithoutProbing(string path, MediaInfo info)
+    {
+        TxtFileName.Text = Path.GetFileName(path);
+        Fade(SourceCard, true);
+        ClearSourceError();
+        ApplyLoaded(path, info);
+    }
+
+    private void ApplyLoaded(string path, MediaInfo info)
+    {
+        _info = info;
+
         Fade(DropZone, false);
 
         _aiPlan = null;
@@ -1012,13 +1040,13 @@ public partial class MainWindow : Window
         TxtAiStatus.Text = "";
         SetAiDetails(false);
         TxtConvertSource.Text = Path.GetFileName(path);
-        ShowInfo(_info);
+        ShowInfo(info);
         RefreshPreviewSource();
 
         _syncing = true;
-        var suggested = _info.FileSizeMb > WhatsAppTargetMb
+        var suggested = info.FileSizeMb > WhatsAppTargetMb
             ? WhatsAppTargetMb
-            : Math.Max(1, Math.Round(_info.FileSizeMb / 2));
+            : Math.Max(1, Math.Round(info.FileSizeMb / 2));
         SliderTarget.Maximum = Math.Max(SliderTarget.Maximum, Math.Ceiling(suggested));
         SliderTarget.Value = suggested;
         TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
@@ -1027,7 +1055,6 @@ public partial class MainWindow : Window
         UpdateToolStatus();
         Recalculate();
         RefreshConversion();
-        await MeasureComplexityAsync(_info);
     }
 
     private async Task MeasureComplexityAsync(MediaInfo info)
