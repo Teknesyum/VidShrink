@@ -1,10 +1,13 @@
 # Changelog
 
 All notable changes to VidShrink are recorded here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project has no version
-tags yet, so releases are grouped by the day their work landed on `main`.
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `0.1.0` is the first tagged
+release; the dated sections below it are the development record that led up to it and
+ship as part of it.
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-08-26
 
 ### Changed
 
@@ -40,6 +43,16 @@ tags yet, so releases are grouped by the day their work landed on `main`.
 
 ### Added
 
+- Fast shrink (GPU) turns itself on when the machine can carry it. The probe no longer
+  only reports that an encoder exists; it decides whether the encoder is good enough,
+  from four measured facts - is the chosen encoder hardware, did the probe encode pass,
+  how long did it take, and does the bitrate the plan asks for sit above the floor that
+  encoder can actually follow. There is no list of graphics card model names, because
+  such a list goes stale on the first card that ships after it. When anything is
+  uncertain the box stays off, which is the behaviour that already worked. The decision
+  is written once next to the settings file and a choice made by hand is never
+  overwritten; the tip beside the box says why it opened or why it stayed shut. On the
+  machine it was measured on: `av1_nvenc`, probe passed in 193 ms, box opened.
 - `install-vidshrink.sh`, a one-command installer for macOS and Linux. It bootstraps the
   .NET 8 SDK into `~/.dotnet` when the machine has none, reads the runtime identifier
   from `uname`, publishes a self-contained build into `~/.local/share/vidshrink` and
@@ -82,11 +95,28 @@ tags yet, so releases are grouped by the day their work landed on `main`.
 - The published build uses the host's runtime identifier instead of a fixed `win-x64`,
   so ARM64 machines get a native build.
 
+- Every target now lands inside the fill band on the first attempt, on the graphics
+  card as well as the processor. The cause was the peak rate, not the size estimate: a
+  peak pinned close to the request stops the encoder overshooting but also stops it
+  filling the stretches it could have filled, and the further the request sits above the
+  encoder's own floor the more of the clip saturates. The peak is now derived from that
+  ratio rather than from an absolute knee. Measured end to end on a 400 s 1920x1080@60
+  source: on `av1_nvenc` 180, 100, 50, 25 and 8 MB, on `libx264` 180, 100, 25 and 8 MB -
+  nine targets, nine first attempts, no ceiling crossed.
+- What the encoder can actually deliver is now measured rather than assumed.
+  `CodecModel.MinBitrateK` comes from nine layouts encoded at the hardware floor; the
+  fit `kbit/s per Mpx = 4.29 x fps + 75.6` is carried 15 percent high because the worst
+  residual was 11 percent. The layout search skips any shape the request cannot clear by
+  twice that floor, so a plan is never built on a bitrate the card would ignore.
+- The mp4 container costs a flat 9.0 kbit/s at every target, not a percentage. That is
+  0.7 percent of a 100 MB budget and 9 percent of an 8 MB one, and it is now held back
+  on the hardware path instead of being absorbed by the video stream.
+
 ### Known gaps
 
-- Hardware VBR delivery is not measured yet. `av1_nvenc` overshoots its request on the
-  first two-pass attempt, and the 1.06 correction factor only engages when calibration
-  is unavailable.
+- The encoder floor is measured for `av1_nvenc` only. AMF and QSV fall over on the
+  machine the measurements were taken on (`AMFQueryVersion failed with error 1`), so
+  their floor is the NVENC fit until someone measures them.
 
 ## 2026-08-22 — Fast Shrink (GPU)
 
