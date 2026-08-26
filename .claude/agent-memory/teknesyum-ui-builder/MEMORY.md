@@ -23,3 +23,5 @@
 - [Başsız yerleşim ölçümü](avalonia-bassiz-yerlesim-olcumu.md) — zamanlayıcı koşmaz, DesiredSize boşluğu içerir, seçili olmayan sekme ağaçta yok
 - [Thickness belirteci](avalonia-thickness-belirteci.md) — Thickness'ı x:Double'dan türetemezsin; derleme geçer, çalışma zamanı düşer
 - [Bu makinenin ekranı](vidshrink-makine-ekrani.md) — 1024x768; başka makinede pinlenen yerleşim sayıları burada kırmızı
+- [Kök katman ölçüsü](avalonia-kok-katman-olcusu.md) — OverlayLayer başsız ölçümde 0x0; ölçüyü katman yöneticisinden oku
+- [Zamanlayıcı ölçümü](avalonia-zamanlayici-olcumu.md) — DispatcherTimer testte tik atmaz; karar kapısı ile çağrılan yolu ayrı ölç

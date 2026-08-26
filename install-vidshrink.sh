@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 
+repository='Teknesyum/VidShrink'
 install_root=${VIDSHRINK_INSTALL_ROOT:-"$HOME/.local/share/vidshrink"}
 bin_directory="$HOME/.local/bin"
 
@@ -17,20 +18,22 @@ require_command() {
     command -v "$1" >/dev/null 2>&1 || fail "$1 bulunamadı. Kurulum için gereklidir."
 }
 
+# Yayında dört hedef var: win-x64, osx-arm64, osx-x64, linux-x64. Başka bir mimaride
+# yanlış arşivi sessizce kurmak yerine burada duruluyor.
 runtime_identifier() {
     machine=$(uname -m)
     case $(uname -s) in
         Darwin)
             case "$machine" in
                 arm64|aarch64) printf 'osx-arm64\n' ;;
-                *) printf 'osx-x64\n' ;;
+                x86_64) printf 'osx-x64\n' ;;
+                *) fail "Bu mimari için yayın yok: $machine. macOS'ta yalnız osx-arm64 ve osx-x64 yayımlanıyor." ;;
             esac
             ;;
         Linux)
             case "$machine" in
-                aarch64|arm64) printf 'linux-arm64\n' ;;
-                armv7l|armv7) printf 'linux-arm\n' ;;
-                *) printf 'linux-x64\n' ;;
+                x86_64) printf 'linux-x64\n' ;;
+                *) fail "Bu mimari için yayın yok: $machine. Linux'ta yalnız linux-x64 yayımlanıyor." ;;
             esac
             ;;
         *)
@@ -71,46 +74,41 @@ require_ffmpeg() {
     exit 1
 }
 
-find_dotnet_sdk8() {
-    for candidate in "$(command -v dotnet || true)" "$HOME/.dotnet/dotnet" '/usr/local/share/dotnet/dotnet' '/usr/share/dotnet/dotnet'; do
-        [ -n "$candidate" ] || continue
-        [ -x "$candidate" ] || continue
-        if "$candidate" --list-sdks 2>/dev/null | grep -q '^8\.'; then
-            printf '%s\n' "$candidate"
-            return 0
-        fi
-    done
-    return 1
-}
-
-# `dotnet` bir sembolik bag olabilir: /usr/bin/dotnet -> /usr/share/dotnet/dotnet.
-# O durumda dirname yanlis kok verir. Koku ikilinin yolundan degil, dotnet'in kendi
-# bildirdigi SDK klasorunden turet: "8.0.424 [/usr/share/dotnet/sdk]" -> /usr/share/dotnet
-dotnet_root_of() {
-    sdk_dir=$("$1" --list-sdks 2>/dev/null | sed -n 's/.*\[\(.*\)\]$/\1/p' | head -n 1)
-    if [ -n "$sdk_dir" ]; then
-        dirname "$sdk_dir"
+sha256_of() {
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$1" | cut -d' ' -f1
     else
-        dirname "$1"
+        shasum -a 256 "$1" | cut -d' ' -f1
     fi
 }
 
-install_dotnet_sdk8() {
-    install_directory="$HOME/.dotnet"
-    bootstrapper="$work_root/dotnet-install.sh"
-    curl -fsSL 'https://dot.net/v1/dotnet-install.sh' -o "$bootstrapper"
-    sh "$bootstrapper" --channel '8.0' --install-dir "$install_directory" --no-path >&2
+# checksums-<rid>.txt sha256sum biçimindedir: özet, iki boşluk, varlık adı.
+expected_sha256() {
+    awk -v name="$2" '$NF == name || $NF == "*" name { print $1; exit }' "$1"
+}
 
-    executable="$install_directory/dotnet"
-    [ -x "$executable" ] || fail '.NET 8 SDK kurulumdan sonra bulunamadı.'
-    printf '%s\n' "$executable"
+assert_checksum() {
+    expected=$(expected_sha256 "$checksums_file" "$1")
+    [ -n "$expected" ] || fail "Sağlama listesinde $1 yok; indirilen dosya doğrulanamıyor."
+    actual=$(sha256_of "$2")
+    [ "$expected" = "$actual" ] || \
+        fail "$1 sağlaması tutmuyor. Beklenen $expected, bulunan $actual. Kurulum durduruldu."
+}
+
+download_asset() {
+    curl -fsSL "https://github.com/$repository/releases/download/$tag/$1" -o "$2" || \
+        fail "Yayın varlığı indirilemedi: $1"
 }
 
 require_command uname
 require_command curl
-require_command tar
+require_command unzip
+require_command awk
+require_command sed
 
 runtime=$(runtime_identifier)
+archive_name="vidshrink-$runtime.zip"
+checksums_name="checksums-$runtime.txt"
 
 case "$install_root" in
     "$HOME/.local/share"/?*) : ;;
@@ -123,49 +121,53 @@ require_ffmpeg
 work_root=$(mktemp -d 2>/dev/null || mktemp -d -t vidshrink-install)
 trap 'rm -rf "$work_root"' EXIT INT TERM
 
-extract_root="$work_root/source"
-publish_root="$work_root/publish"
-mkdir -p "$extract_root" "$publish_root"
+stage_root="$work_root/stage"
+mkdir -p "$stage_root"
 
-if dotnet=$(find_dotnet_sdk8); then
-    :
-else
-    say '.NET 8 SDK yükleniyor (kullanıcı dizini, yönetici gerekmez)...'
-    dotnet=$(install_dotnet_sdk8)
-fi
-DOTNET_ROOT=$(dotnet_root_of "$dotnet")
-export DOTNET_ROOT
-export DOTNET_CLI_TELEMETRY_OPTOUT=1
-export DOTNET_NOLOGO=1
+say 'Son yayın aranıyor...'
+release_json="$work_root/release.json"
+curl -fsSL -H 'Accept: application/vnd.github+json' -H 'User-Agent: VidShrink-Installer' \
+    "https://api.github.com/repos/$repository/releases/latest" -o "$release_json" || \
+    fail 'Yayın bilgisi alınamadı.'
 
-say 'Güncel VidShrink kaynakları indiriliyor...'
-curl -fsSL 'https://github.com/Teknesyum/VidShrink/archive/refs/heads/main.tar.gz' -o "$work_root/source.tar.gz"
-tar -xzf "$work_root/source.tar.gz" -C "$extract_root"
+tag=$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$release_json" | head -n 1)
+[ -n "$tag" ] || fail 'Yayın bilgisi okunamadı: etiket adı yok.'
+version=${tag#v}
+say "Kurulacak sürüm: $version"
 
-source_root=''
-for directory in "$extract_root"/*/; do
-    [ -d "$directory" ] || continue
-    source_root=${directory%/}
-    break
+for required in "$archive_name" "$checksums_name"; do
+    grep -q "\"name\"[[:space:]]*:[[:space:]]*\"$required\"" "$release_json" || \
+        fail "Yayın $tag bu varlığı taşımıyor: $required. Kurulum yapılmadı."
 done
-[ -n "$source_root" ] || fail 'İndirilen kaynak paketi açılamadı.'
 
-say "VidShrink Release sürümü yayımlanıyor ($runtime)..."
-"$dotnet" publish "$source_root/src/VidShrink.App/VidShrink.App.csproj" \
-    --configuration Release --runtime "$runtime" --self-contained true \
-    -p:PublishSingleFile=false --output "$publish_root" \
-    || fail 'VidShrink derlenemedi.'
+archive_file="$work_root/$archive_name"
+checksums_file="$work_root/$checksums_name"
+
+say 'Yayın paketi indiriliyor...'
+download_asset "$checksums_name" "$checksums_file"
+download_asset "$archive_name" "$archive_file"
+
+say 'İndirilenler doğrulanıyor...'
+assert_checksum "$archive_name" "$archive_file"
+
+unzip -qo "$archive_file" -d "$stage_root"
+
+# Kurulan sürümün işareti. Windows'ta güncelleyici bunu okuyup arşivin tamamını yeniden
+# indirmekten kurtuluyor; burada uygulamanın kurulu sürümü bildirmesi için duruyor.
+printf '%s' "$version" > "$stage_root/.update-version"
 
 rm -rf "$install_root"
 mkdir -p "$install_root" "$bin_directory"
-cp -R "$publish_root/." "$install_root/"
+cp -R "$stage_root/." "$install_root/"
 
+# Burada başlatıcı yok: kendini güncelleme yalnız Windows'ta açık, kısayol doğrudan
+# uygulamayı gösterir.
 installed_executable="$install_root/VidShrink.App"
 [ -f "$installed_executable" ] || fail 'Kurulan VidShrink.App bulunamadı.'
 chmod +x "$installed_executable"
 ln -sf "$installed_executable" "$bin_directory/vidshrink"
 
-say "VidShrink kuruldu: $install_root"
+say "VidShrink $version kuruldu: $install_root"
 # macOS ve Linux'ta uygulama kendini güncellemez: paket içindeki bir dosya değişince
 # Gatekeeper imzası bozulur ve uygulama hiç açılmaz. Güncelleme bu betiği yeniden
 # çalıştırmakla olur.
