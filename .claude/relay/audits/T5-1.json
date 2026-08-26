@@ -1,0 +1,18 @@
+{
+  "contractId": "T5",
+  "auditorRunId": "af79774d438479368",
+  "headSha": "3539833cb57797677b08eae2bfd892f4dc3c5df5",
+  "diffHash": "ea2a2ae69d565778799544ebd9fdb489d77d3a3475f7cbaa844540c611a0ec7e",
+  "owns": [
+    "tools/VidShrink.Bench/Program.cs",
+    "docs/motor-dogrulama-raporu.md",
+    "bench/results/baseline.json",
+    "bench/results/after.json"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 446 basarili, 0 basarisiz, 14 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-26T05:14:29.441Z"
+}
