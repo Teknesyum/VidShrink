@@ -202,3 +202,7 @@ gecersiz. Once `dotnet --version` ile bak, sozlesmenin ortam notuna guvenme. Der
   Donanim yari 4 dakika, islemci yarisi 15 dakika suruyor. Teslim edilen dosyanin akis
   kirilimini `ffprobe -select_streams v:0/a:0 -show_entries stream=bit_rate` ile al -
   toplamdan cikarinca kapsayici payi cikiyor.
+- `.calisma/` altindaki gecici klasoru **silemiyorsun**: `rm -rf` ve `Remove-Item -Recurse`
+  izin katmaninda reddediliyor (Bash ve PowerShell ikisi de). Klasor `.gitignore`'da oldugu
+  icin git'e sizmiyor; kesif harness'ini bastan `.calisma/` altina ac ve raporda
+  "silinemedi" diye yaz, silmeyi denemek icin tur harcama.
