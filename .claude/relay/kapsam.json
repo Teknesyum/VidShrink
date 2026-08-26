@@ -392,7 +392,7 @@
   "src/VidShrink.App/MainWindow.axaml.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   },
   "src/VidShrink.App/LanguageCatalog.cs": {
@@ -878,37 +878,37 @@
   ".calisma/probeplan/probeplan.csproj": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   },
   ".calisma/probeplan/Program.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   },
   "src/VidShrink.Core/HardwareVerdict.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   },
   "src/VidShrink.Core/UpdateCheck.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   },
   "src/VidShrink.Ffmpeg/EncoderCapabilities.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   },
   "tests/VidShrink.Tests/HardwareVerdictTests.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-26 08:06:09",
+    "t": "2026-08-26 08:18:30",
     "ajan": "builder"
   }
 }
