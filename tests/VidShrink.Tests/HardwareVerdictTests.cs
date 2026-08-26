@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -209,24 +209,26 @@ public class HardwareVerdictTests
         }
     }
 
+    /// <summary>
+    /// Ölçüm kullanıcının gerçek ayar dosyasına dokunmaz. Yol pencereye doğrudan verilir;
+    /// VIDSHRINK_SETTINGS_PATH süreç geneli olduğu ve başka bir ölçüm sınıfı onu paralelde
+    /// sıfırladığı için buradan kullanılmıyor — o yarışta yazma isteği kullanıcının
+    /// %APPDATA% altındaki dosyasına düşerdi.
+    /// </summary>
     [Fact]
     public void TheSettingsPathOverrideKeepsTheTestOutOfAppData()
     {
-        var file = Path.Combine(Path.GetTempPath(), $"vidshrink-fastgpu-{Guid.NewGuid():N}.json");
-        var previous = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
-        try
+        WithSettingsFile<object?>(file => AppHost.Run<object?>(() =>
         {
-            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", file);
-            Assert.Equal(file, UpdateSettings.DefaultPath);
+            Assert.NotEqual(file, UpdateSettings.DefaultPath);
 
-            new UpdateSettings { FastGpu = true }.Save();
-            Assert.True(UpdateSettings.Load().FastGpu);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", previous);
-            if (File.Exists(file)) File.Delete(file);
-        }
+            var window = new MainWindow { SettingsPathOverride = file };
+            window.ApplyHardwareVerdict(null, true, UsableVerdict);
+
+            Assert.True(File.Exists(file));
+            Assert.True(UpdateSettings.Load(file).FastGpu);
+            return null;
+        }));
     }
 
     [Fact]
