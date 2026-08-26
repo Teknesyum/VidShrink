@@ -1,0 +1,22 @@
+{
+  "contractId": "T28",
+  "auditorRunId": "a27c6b1b659276110",
+  "headSha": "ba3de2ffd26888f9dc0a71c0737b8c8a0afa5131",
+  "diffHash": "02df2c325eeae4fed64d4ab73e3e07ad77ad1fa5e00884670f9767ef0f403084",
+  "owns": [
+    "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
+    "src/VidShrink.Core/HardwareVerdict.cs",
+    "src/VidShrink.Core/UpdateCheck.cs",
+    "src/VidShrink.App/FirstRun.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "tests/VidShrink.Tests/HardwareVerdictTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 446 basarili, 0 basarisiz, 14 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-26T08:33:58.354Z"
+}
