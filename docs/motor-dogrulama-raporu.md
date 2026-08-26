@@ -31,7 +31,10 @@ kullanılmadı. İki motor **aynı** bench kaynağıyla derlendi, yani ölçüm 
   spesifikasyonunda birebir böyle tanımlandığı doğrulanamadı. Tablolarda y/u/v ayrı ayrı da
   veriliyor ki okuyan kendi ağırlığını uygulayabilsin.
 - Ölçüm kodu bench içine alındı. `QualityMeter` ile aynı sayıyı verdiği doğrulandı:
-  k4-ekrankaydi / 8 MB vakasında iki yol da VMAF-NEG harmonik 96,75 ve XPSNR 60,02 dedi.
+  k4-ekrankaydi / 8 MB vakasında iki yol da VMAF-NEG harmonik 96,75 dedi. XPSNR'de teslim
+  edilen veri 60,054 (eski) ve 60,059 (yeni) — karşılaştırmanın yapıldığı andaki 60,02
+  değeri kayıt altına alınmadı, o yüzden "birebir aynı" iddiası teslim edilen veriyle
+  kapatılamıyor. Fark 0,04 dB ve hiçbir kapı kararına girmiyor.
 
 ## Harness'ta kapatılan boşluklar
 
@@ -98,7 +101,7 @@ sonsuz basıyor ve sayı olarak okunamıyor. Ölçülemedi, tahmin yazılmadı.
 |---|---|---|---|---|
 | Hedef aşımı | 0 vaka | 0 / 35 | 0 / 35 | **geçti** |
 | Sert taban ihlali | 0 vaka | 0 / 30 gerçek vaka | 0 / 30 gerçek vaka | **geçti** |
-| ≥50 MB bant içi | tüm vakalar | 7 / 7 | 7 / 7 | **geçti** |
+| ≥50 MB bant içi | tüm vakalar | 6 / 6 | 6 / 6 | **geçti** |
 | 1 MB'de VMAF NEG harmonik | yeni > eski | — | 5 klipten 2'sinde | **kaldı** |
 | Toplam ek süre | ≤ %25 | 1431,9 s | 1255,8 s (**%12,3 daha hızlı**) | **geçti** |
 
@@ -107,9 +110,10 @@ k4/100. Üçü de passthrough; hedef kaynaktan büyük olduğu için dosya doğa
 altında kalıyor. Motorun kararı doğru, ölçüt uygulanamaz. Passthrough dışındaki 30 vakada
 her iki motorda da hedef aşımı ve sert taban ihlali **sıfır**.
 
-≥50 MB hedeflerde passthrough dışında 7 vaka var (gothic 180/100, k1 100, k2 100,
-k3 180/100 ve k1 180 — sonuncusu passthrough, sayımdan düştü). Hepsi bant içinde,
-doluluk %97,5-%99,2 aralığında. Bant %2,8 genişliğinde ve iki motor da tutturuyor.
+≥50 MB hedefte 10 vaka var; dördü passthrough (k1 180, k2 180, k4 180, k4 100) ve
+sayımdan düşüyor. Kalan **6** gerçek vaka: gothic 180/100, k1 100, k2 100, k3 180/100.
+Altısı da her iki motorda bant içinde, doluluk %97,5-%99,2 aralığında. Bant %2,8
+genişliğinde ve iki motor da tutturuyor.
 
 ## 1 MB vakası — kapının kaldığı yer
 
@@ -127,8 +131,16 @@ kırpıp kare hızını 48'de tutuyordu, yeni motor kare hızını da ölçüp k
 Kapı beş klipte de yeninin yüksek olmasını istiyordu; iki klipte oldu, üçünde olmadı.
 **Kapı kaldı ve bu rapor bunu gizlemiyor.**
 
-İki metrik aynı yönü gösteriyor, yani sonuç metrik seçiminden gelmiyor: gothic ve k3'te yeni
-motor hem VMAF hem XPSNR'de kazanıyor, k1/k2/k4'te ikisinde de kaybediyor. Ayrım içerik
+İki metrik beş klipten **üçünde** aynı yönü gösteriyor: k3'te ikisi de kazanıyor, k2 ve
+k4'te ikisi de kaybediyor. **İkisinde ters düşüyorlar** — gothic'te VMAF kaybederken XPSNR
+kazanıyor (-0,22 / +3,20), k1'de VMAF kazanırken XPSNR kaybediyor (+1,12 / -4,32).
+
+Bu yüzden kapının kaldığı **metrik seçiminden bağımsız değil**: VMAF'e göre kazanan ikili
+k1+k3, XPSNR'e göre gothic+k3. İki metrik de 5'te 2 veriyor, yani kapı hangi metrikle
+okunursa okunsun kalıyor — ama kaybeden klipler aynı klipler değil.
+
+Kapının kalmasını taşıyan asıl vaka her iki metrikte de aynı yönde: k4-ekrankaydi VMAF'te
+20,8, XPSNR'de 4,4 puan kaybediyor. **En büyük kayıp metrik artefaktı değil.** Ayrım içerik
 zorluğunda: karmaşık kaynakta (gerçek oyun görüntüsü, saf gürültü) sert kesme işe yarıyor,
 kolay kaynakta (gradyan, test deseni, durağan ekran kaydı) fazla kesiyor. En büyük kayıp
 k4-ekrankaydi'nde: 1 MB bütçesi zaten yetiyorken kare hızı 48'den 32'ye, çözünürlük
@@ -228,8 +240,11 @@ Açıkça yazılıyor ki rapor eksiğini gizlemesin.
 Kullanıcının gözle bakabilmesi için bütün çıktılar masaüstünde:
 
 - `C:\Users\Administrator\Desktop\VidShrink-T5\eski\` — eski motor, 35 dosya
-- `C:\Users\Administrator\Desktop\VidShrink-T5\yeni\` — yeni motor, 35 dosya
+- `C:\Users\Administrator\Desktop\VidShrink-T5\yeni\` — yeni motor, 35 dosya artı yarım
+  kalmış bir `vidshrink_partial_*.mp4`; ölçüme girmedi, silinecek
 - `C:\Users\Administrator\Desktop\VidShrink-T5\yeni-tavan\` — QualityCeiling, 7 dosya
+- `C:\Users\Administrator\Desktop\VidShrink-T5\deneme\` — tek dosyalık deneme artığı;
+  ölçüme girmedi, silinecek
 
 Dosya adları `<klip>_<hedef>mb.mp4` kalıbında. Şikâyet edilen vaka için doğrudan
 karşılaştırma: `gothic2026-08-15 14-01-29_1mb.mp4` — eski klasörde 1190x670@48,

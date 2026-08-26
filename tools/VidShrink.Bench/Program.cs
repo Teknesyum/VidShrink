@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO.MemoryMappedFiles;
 using System.Threading.Channels;
@@ -64,7 +64,7 @@ static async Task<int> ShrinkAsync(string[] args)
 {
     if (args.Length < 3)
     {
-        Console.Error.WriteLine("usage: bench shrink <kaynak> <hedefMb,...> --out <klasor>");
+        Console.Error.WriteLine("usage: bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--no-calibrate] [--results <yol>]");
         return 1;
     }
 
