@@ -51,12 +51,14 @@ public static class PlanCalculator
     // a fixed rate. Four live av1_nvenc runs on a 400 s 1080p60 clip, measured on the delivered
     // files (ffprobe per stream, kbit/s):
     //   target  request  video   audio   mux   over plan
-    //   100 MB     1923   1930   125,6   9,0        15,0
-    //    50 MB      895    895   125,6   9,0         8,1
-    //    25 MB      410    420    91,0   9,0        18,0
+    //   100 MB     1923   1930   125,6   9,0        16,0
+    //    50 MB      895    895   125,6   9,0         9,0
+    //    25 MB      410    420    91,0   9,0        19,0
     //     8 MB      113    119    29,0   9,0        15,0
+    // "Over plan" is video plus mux less the request; the columns are rounded to whole kbit/s, so
+    // reading it off them is good to about a kbit/s.
     // The container cost is 9,0 kbit/s at every target, and the encoder spends a few kbit/s past
-    // the request on top. Together that is 8 to 18 kbit/s no matter how big the target is - 0,7%
+    // the request on top. Together that is 9 to 19 kbit/s no matter how big the target is - 0,7%
     // of a 100 MB budget and 9% of an 8 MB one, which is why only the small targets overshot.
     // Eleven is held back for it. Fifteen was tried first and cost the 50 MB target its single
     // attempt: it delivered 48,50 MB against a 48,60 MB lower edge. That band is only 2,8% wide
@@ -178,8 +180,13 @@ public static class PlanCalculator
 
         if (!best.MeetsFloor)
         {
+            // Two different walls end up here and the user is owed the one that was actually hit:
+            // either no layout carries enough bits per pixel for a meaningful picture, or the
+            // encoder itself will not deliver a bitrate this low whatever the layout.
             notes.Add(AdviceCode.TargetBelowCodecFloor);
-            reason.Add($"no layout reaches the {complexity.FloorBppf(codec, best.Fps, info.Fps):0.0000} bits per pixel per frame that {codec} needs for a meaningful picture; the densest layout ({best.Bppf:0.0000}) was taken, but this target is genuinely too small for this source");
+            reason.Add(best.Deliverable
+                ? $"no layout reaches the {complexity.FloorBppf(codec, best.Fps, info.Fps):0.0000} bits per pixel per frame that {codec} needs for a meaningful picture; the densest layout ({best.Bppf:0.0000}) was taken, but this target is genuinely too small for this source"
+                : $"the budget leaves {videoK:0}k for video, below the {CodecModel.UsableBitrateK(codec, best.Width, best.Height, best.Fps)}k the {codec} hardware encoder still follows at {best.Width}x{best.Height}@{best.Fps:0.##}, and no smaller layout gets under its floor either; the densest layout was taken, but this encoder cannot deliver a file this small from this source");
         }
         else if (best.Fps < info.Fps - 0.01 && !sourceFpsViable)
         {
@@ -429,7 +436,7 @@ public static class PlanCalculator
     private static double SizeMb(double videoK, double audioK, double durationSeconds)
         => (videoK + audioK) * durationSeconds / KbitPerMib / ContainerOverhead;
 
-    private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true);
+    private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true, bool Deliverable = true);
 
     private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb, double budgetVideoK, CompressionRegime regime)
     {
@@ -496,7 +503,7 @@ public static class PlanCalculator
                     best = new Layout(width, height, fps, effectiveScale, score, provided);
             }
             else if (densest is null || provided > densest.Bppf)
-                densest = new Layout(width, height, fps, effectiveScale, score, provided, false);
+                densest = new Layout(width, height, fps, effectiveScale, score, provided, false, deliverable);
         }
 
         if (best is not null) return (best, sourceFpsViable);

@@ -42,24 +42,46 @@ public static class FfmpegArguments
     //   requested 1044k: peak 1.50 -> 1.218   peak 1.20 -> 1.186   peak 1.10 -> 1.085   peak 1.05 -> 1.042
     // The overspend grows as the average falls and follows the peak once the peak binds, so the
     // peak has to be tight where the encoder overshoots and may stay wide where it does not.
-    // A line through the two 1.50 points reaches 1.000 at 2941 kbit/s, so PeakScaleBitrateK is
-    // that crossing: at or below it the peak sits at TightPeakFactor, above it it opens back up
-    // to WidePeakFactor over the same span.
     // TightPeakFactor is the tightest peak that still lands under the request, measured at the
     // shape the plan actually picks for this source (1266x712@60, av1_nvenc p5):
     //   requested  902k: peak 1.00 -> 0.978   peak 1.02 -> 0.995   peak 1.03 -> 1.013   peak 1.05 -> 1.028
     //   requested 1930k: peak 1.00 -> 0.986   peak 1.02 -> 1.009
-    // 1.02 is the last peak on both rows that leaves the delivered size at or under the aim, and
-    // the aim is the band centre, so 1.009 of it is still inside the band.
+    //
+    // What decides how tight the peak may be is not the absolute bitrate but how far the request
+    // sits above the encoder floor of the layout (CodecModel.MinBitrateK). A tight peak stops the
+    // encoder from spending past the request, but it also stops it from making up for the easy
+    // stretches it cannot fill: the further above its floor the request is, the more of the clip
+    // saturates and the further under the request the file lands. Measured on av1_nvenc p5 over a
+    // 400 s 1080p60 source, delivered video over requested video:
+    //   1266x712@60, floor 346k:  902k = 2,6x floor, peak 1.02 -> 0.995
+    //                            1930k = 5,6x floor, peak 1.02 -> 1.009
+    //    882x496@60, floor 168k:  890k = 5,3x floor, peak 1.02 -> 1.007
+    //                            1750k = 10,4x floor, peak 1.02 -> 0.997
+    //                            1850k = 11,0x floor, peak 1.02 -> 0.991
+    //                            1918k = 11,4x floor, peak 1.02 -> 0.973, 1.10 -> 1.008, 1.50 -> 1.056
+    //                            1956k = 11,6x floor, peak 1.02 -> 0.989
+    //                            1994k = 11,9x floor, peak 1.02 -> 0.992
+    //                            2100k = 12,5x floor, peak 1.02 -> 0.991
+    // Up to 5,6x the floor the tight peak lands on the request. At 11,4x it costs 2,7% and 1.10
+    // puts the file back on the request, while 1.50 overshoots by 5,6%. So the peak holds at
+    // TightPeakFactor up to PeakOpensAtFloorRatio and opens to HardwarePeakCeiling at
+    // PeakWidestAtFloorRatio, the ratio where 1.10 was measured. The knee sits between the
+    // highest ratio where the tight peak was still right (5,6x) and the lowest where it was not.
+    // Above the widest ratio nothing was measured, so the peak stays at the widest value that was:
+    // 1.50 is known to overshoot there and the ceiling is the guarantee this may not break.
     public const double WidePeakFactor = 1.5;
     public const double TightPeakFactor = 1.02;
-    public const int PeakScaleBitrateK = 2941;
+    public const double HardwarePeakCeiling = 1.10;
+    public const double PeakOpensAtFloorRatio = 6.0;
+    public const double PeakWidestAtFloorRatio = 11.4;
 
-    public static double PeakRateFactor(string codec, int videoBitrateK)
+    public static double PeakRateFactor(string codec, int videoBitrateK, int width, int height, double fps)
     {
         if (!CodecModel.IsHardware(codec)) return WidePeakFactor;
-        var above = (double)videoBitrateK / PeakScaleBitrateK - 1.0;
-        return Math.Clamp(TightPeakFactor + (WidePeakFactor - TightPeakFactor) * above, TightPeakFactor, WidePeakFactor);
+        var floorK = CodecModel.MinBitrateK(codec, width, height, fps);
+        if (floorK <= 0) return TightPeakFactor;
+        var opening = ((double)videoBitrateK / floorK - PeakOpensAtFloorRatio) / (PeakWidestAtFloorRatio - PeakOpensAtFloorRatio);
+        return Math.Clamp(TightPeakFactor + (HardwarePeakCeiling - TightPeakFactor) * opening, TightPeakFactor, HardwarePeakCeiling);
     }
 
     public static double BufferFactor(double peakFactor) => 1.0 + 2.0 * (peakFactor - 1.0);
@@ -101,7 +123,7 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-b:v", $"{plan.VideoBitrateK}k" });
             if (SupportsRateLimits(plan.Codec))
             {
-                var peak = PeakRateFactor(plan.Codec, plan.VideoBitrateK);
+                var peak = PeakRateFactor(plan.Codec, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
                 a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * peak)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * BufferFactor(peak))}k" });
             }
             if (CodecModel.IsHardware(plan.Codec))

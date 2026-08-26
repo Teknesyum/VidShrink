@@ -99,7 +99,9 @@ public sealed class HardwareRateControlTests
     {
         Assert.Equal(1.5, FfmpegArguments.WidePeakFactor, 4);
         Assert.Equal(1.02, FfmpegArguments.TightPeakFactor, 4);
-        Assert.Equal(2941, FfmpegArguments.PeakScaleBitrateK);
+        Assert.Equal(1.10, FfmpegArguments.HardwarePeakCeiling, 4);
+        Assert.Equal(6.0, FfmpegArguments.PeakOpensAtFloorRatio, 4);
+        Assert.Equal(11.4, FfmpegArguments.PeakWidestAtFloorRatio, 4);
         Assert.Equal(0.00429, CodecModel.HardwareMinBitratePerPixelFrame, 6);
         Assert.Equal(0.0756, CodecModel.HardwareMinBitratePerPixelSecond, 6);
         Assert.Equal(1.15, CodecModel.HardwareMinBitrateMargin, 4);
@@ -113,14 +115,30 @@ public sealed class HardwareRateControlTests
     [InlineData("hevc_nvenc")]
     [InlineData("av1_amf")]
     [InlineData("hevc_qsv")]
-    public void ThePeakFactorFallsWithTheRequestedBitrate(string codec)
+    public void ThePeakFactorOpensWithTheHeadroomOverTheEncoderFloor(string codec)
     {
-        Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, 11764), 4);
-        Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, 5882), 4);
-        Assert.Equal(1.26, FfmpegArguments.PeakRateFactor(codec, 4412), 2);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, 2941), 4);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, 490), 4);
-        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, 131), 4);
+        var floorK = CodecModel.MinBitrateK(codec, 882, 496, 60);
+
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, (int)(floorK * 2.0), 882, 496, 60), 4);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor(codec, (int)(floorK * 6.0), 882, 496, 60), 4);
+        Assert.Equal(1.06, FfmpegArguments.PeakRateFactor(codec, (int)(floorK * 8.7), 882, 496, 60), 2);
+        Assert.Equal(1.10, FfmpegArguments.PeakRateFactor(codec, (int)(floorK * 11.4), 882, 496, 60), 2);
+        Assert.Equal(1.10, FfmpegArguments.PeakRateFactor(codec, (int)(floorK * 40.0), 882, 496, 60), 4);
+    }
+
+    /// <summary>
+    /// The peak at the shapes and bitrates that were measured live. 1918k at 882x496@60 is the
+    /// 100 MB plan for the contract's source: at 1.02 it delivered 0.973 of the request and fell
+    /// out of the band, at 1.10 it delivered 1.008 and landed inside it.
+    /// </summary>
+    [Fact]
+    public void ThePeakIsPinnedAtTheShapesThatWereMeasuredLive()
+    {
+        Assert.Equal(1.10, FfmpegArguments.PeakRateFactor("av1_nvenc", 1918, 882, 496, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 890, 882, 496, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 1930, 1266, 712, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 437, 614, 346, 60), 3);
+        Assert.Equal(1.02, FfmpegArguments.PeakRateFactor("av1_nvenc", 125, 422, 238, 60), 3);
     }
 
     [Theory]
@@ -130,7 +148,7 @@ public sealed class HardwareRateControlTests
     public void TheProcessorPathKeepsTheWidePeak(string codec)
     {
         foreach (var bitrateK in new[] { 174, 522, 2088, 8000 })
-            Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, bitrateK), 4);
+            Assert.Equal(1.5, FfmpegArguments.PeakRateFactor(codec, bitrateK, 1920, 1080, 60), 4);
     }
 
     [Fact]
@@ -163,7 +181,10 @@ public sealed class HardwareRateControlTests
 
         _output.WriteLine($"{width}x{height}@{fps:0.##}: measured {measuredK}k, model {modelled}k ({modelled / (double)measuredK:0.000}x)");
         Assert.True(modelled >= measuredK, $"The model puts the floor at {modelled}k but the encoder delivered {measuredK}k.");
-        Assert.True(modelled <= measuredK * 1.45, $"The model puts the floor at {modelled}k, far above the {measuredK}k measured.");
+        // The widest the model sits over what was measured is 1,236x, at 640x360@60; the fit's own
+        // worst residual is 1,11x and the 15% margin is carried on top of it. The bound is that
+        // measured worst case plus a hair, not a round number chosen for comfort.
+        Assert.True(modelled <= measuredK * 1.25, $"The model puts the floor at {modelled}k, far above the {measuredK}k measured.");
     }
 
     [Fact]
@@ -288,7 +309,7 @@ public sealed class HardwareRateControlTests
 
         _output.WriteLine($"{BigK}k -> maxrate {FlagValueK(big, "-maxrate")}k ({bigShare:0.000}x), {SmallK}k -> maxrate {FlagValueK(small, "-maxrate")}k ({smallShare:0.000}x)");
         Assert.True(smallShare < bigShare, "The small target may not carry the same peak share as the large one.");
-        Assert.Equal(1.5, bigShare, 2);
+        Assert.Equal(1.10, bigShare, 2);
         Assert.Equal(1.02, smallShare, 2);
         Assert.True(FlagValueK(small, "-bufsize") / (double)SmallK < FlagValueK(big, "-bufsize") / (double)BigK,
             "The buffer has to tighten along with the peak.");
@@ -318,8 +339,14 @@ public sealed class HardwareRateControlTests
 
         Assert.True(overspent < 1.0, "An attempt that spent past the request has to pull the next one down.");
         Assert.True(overspentMore < overspent, "A bigger overspend has to pull down harder.");
-        Assert.True(overspentMore >= CodecModel.HardwareBitrateYield, "The downward correction stays inside the measured hardware yield.");
         Assert.True(landedShort > 1.0, "An attempt that landed short still has to pull the next one up.");
+
+        // Both directions are bounded, and by the same amount: whatever the clamp is set to, a
+        // runaway overspend and a runaway shortfall have to meet back at 1.
+        var runawayOverspend = PlanCalculator.HardwareDeliveryBias(4.0);
+        var runawayShortfall = PlanCalculator.HardwareDeliveryBias(0.25);
+        Assert.True(runawayOverspend > 0.5, "The downward correction has to stay bounded.");
+        Assert.Equal(1.0, runawayOverspend * runawayShortfall, 4);
     }
 
     [Fact]
@@ -465,7 +492,8 @@ public sealed class HardwareRateControlTests
 
         _output.WriteLine($"{speed} {targetMb:0.#} MB | {plan.Codec} {plan.Preset} {plan.Width}x{plan.Height}@{plan.Fps:0.##} {plan.Mode} {plan.VideoBitrateK}k");
         _output.WriteLine($"  calibrated {calibrated.Calibrated} appliesToPlan {calibrated.AppliesTo(plan.Codec, scale, plan.Fps)} rounds {rounds} bias {plan.BitrateBias:0.###}");
-        _output.WriteLine($"  peak factor {FfmpegArguments.PeakRateFactor(plan.Codec, plan.VideoBitrateK):0.000} maxrate {(int)(plan.VideoBitrateK * FfmpegArguments.PeakRateFactor(plan.Codec, plan.VideoBitrateK))}k");
+        var peakFactor = FfmpegArguments.PeakRateFactor(plan.Codec, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
+        _output.WriteLine($"  floor {CodecModel.MinBitrateK(plan.Codec, plan.Width, plan.Height, plan.Fps)}k peak factor {peakFactor:0.000} maxrate {(int)(plan.VideoBitrateK * peakFactor)}k");
         _output.WriteLine($"  band {band.LowerMb:0.00}-{band.UpperMb:0.00} MB");
         _output.WriteLine($"  result {result.OutputMb:0.00} MB attempts {result.Attempts} success {result.Success} underBand {result.UnderBand} in {clock.Elapsed.TotalSeconds:0.0}s");
         foreach (var attempt in result.Trace ?? Array.Empty<EncodeAttempt>())
