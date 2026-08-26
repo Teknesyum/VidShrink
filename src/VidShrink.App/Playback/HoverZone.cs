@@ -12,6 +12,10 @@ namespace VidShrink.App.Playback;
 /// Kaybolma gecikmesi bir kuşak sayacıyla korunuyor. Zamanlayıcı tik attığında kendi
 /// kuşağını taşıyıp taşımadığına bakıyor; araya yeni bir gösterme girdiyse eski tik
 /// kararını uygulamıyor. Opaklık okuyup karar veren kalıp bu yarışı kaybediyordu.
+///
+/// T44: aynı kuşak koruması karşılaştırma panelinin gecikmeli inişini de sürüyor. Orada
+/// bölge oranı değil, hedef kademenin sınırı karar veriyor; sınır dışarıdan
+/// <see cref="PointerWithin"/> ile bildiriliyor.
 /// </summary>
 internal sealed class HoverZone
 {
@@ -54,6 +58,37 @@ internal sealed class HoverZone
     internal void PointerAt(double y, double panelHeight) => SetPointer(Covers(y, panelHeight));
 
     internal void PointerGone() => SetPointer(false);
+
+    /// <summary>
+    /// Bölgesi oranla değil, dışarıdan verilen bir sınırla belirlenen kullanıcılar için.
+    /// Karşılaştırma paneli bunu hedef kademenin sınırına göre çağırır.
+    /// </summary>
+    internal void PointerWithin(bool inside) => SetPointer(inside);
+
+    /// <summary>
+    /// Sayacı sıfırdan kurar. Bekleyen tik kuşağını kaybettiği için kararını uygulamaz;
+    /// tutma sebepleri ve fare durumu temizlenir, <paramref name="visible"/> yeni başlangıç
+    /// hâlidir. <see cref="_apply"/> çağrılmaz — durum değişimi çağıranın kendi elinde.
+    /// </summary>
+    internal void Reset(bool visible)
+    {
+        _generation++;
+        _timer?.Stop();
+        _timer = null;
+        _pointerInside = false;
+        _held = false;
+        _visible = visible;
+    }
+
+    /// <summary>
+    /// Bekleyen bir tikin kararını uygulayıp uygulamayacağı. Zamanlayıcı tam bunu soruyor;
+    /// ölçüm de aynı soruyu sorabilsin diye ayrı bir kapı.
+    /// </summary>
+    internal bool ShouldHide(int generation)
+        => generation == _generation && !_pointerInside && !_held;
+
+    /// <summary>Bekleyen tikin taşıdığı kuşak. Ölçüm bunu okuyup eskisiyle karşılaştırır.</summary>
+    internal int Generation => _generation;
 
     /// <summary>
     /// Şeridi açık tutan sebepler: fare şeridin üstünde, klavye odağı şeritte, oynatma
@@ -100,8 +135,7 @@ internal sealed class HoverZone
         {
             _timer?.Stop();
             _timer = null;
-            if (mine != _generation) return;
-            if (_pointerInside || _held) return;
+            if (!ShouldHide(mine)) return;
             _visible = false;
             _apply(false);
         };

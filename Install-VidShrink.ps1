@@ -8,6 +8,8 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$repository = 'Teknesyum/VidShrink'
+
 function Refresh-ProcessPath {
     $machine = [Environment]::GetEnvironmentVariable('Path', 'Machine')
     $user = [Environment]::GetEnvironmentVariable('Path', 'User')
@@ -32,46 +34,16 @@ function Install-WinGetPackage([string]$Id) {
     Refresh-ProcessPath
 }
 
+# Yayında yalnız win-x64 var. arm64 ya da x86 makinede x64 arşivini sessizce kurmak
+# çalışan ama güncellenmeyen bir kurulum bırakır: güncelleyici kendi mimarisinin
+# adını arar (UpdateCheck.Rid) ve o varlık yayında olmadığı için hiç güncelleme
+# bulamaz. Onun yerine burada duruluyor.
 function Get-RuntimeIdentifier {
-    switch ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
-        'Arm64' { return 'win-arm64' }
-        'X86'   { return 'win-x86' }
-        default { return 'win-x64' }
+    $architecture = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+    if ($architecture -ne [Runtime.InteropServices.Architecture]::X64) {
+        throw "Bu mimari için yayın yok: $architecture. VidShrink şu an yalnız win-x64 için yayımlanıyor."
     }
-}
-
-function Find-DotNetSdk8 {
-    $candidates = New-Object System.Collections.Generic.List[string]
-    $command = Get-Command dotnet.exe -ErrorAction SilentlyContinue
-    if ($command) { $candidates.Add($command.Source) }
-    $candidates.Add((Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet\dotnet.exe'))
-    if ($env:ProgramFiles) { $candidates.Add((Join-Path $env:ProgramFiles 'dotnet\dotnet.exe')) }
-
-    foreach ($candidate in $candidates) {
-        if (-not (Test-Path -LiteralPath $candidate)) { continue }
-        $sdks = & $candidate --list-sdks 2>$null
-        if ($LASTEXITCODE -eq 0 -and ($sdks | Select-String -Pattern '^8\.' -Quiet)) { return $candidate }
-    }
-    return $null
-}
-
-function Install-DotNetSdk8 {
-    $installDirectory = Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet'
-
-    # Bootstrapper'ı diske yazıp dosya olarak çalıştırmak, varsayılan Restricted
-    # execution policy altında engellenir. İçeriği bellekte scriptblock olarak
-    # çalıştırdığımız için kullanıcının policy değiştirmesine gerek kalmıyor.
-    $bootstrapperSource = (Invoke-WebRequest -UseBasicParsing -Uri 'https://dot.net/v1/dotnet-install.ps1').Content
-    # Windows PowerShell 5.1 metin olmayan Content-Type için Content'i byte[] döndürür.
-    if ($bootstrapperSource -is [byte[]]) {
-        $bootstrapperSource = [Text.Encoding]::UTF8.GetString($bootstrapperSource)
-    }
-    $bootstrapper = [scriptblock]::Create(([string]$bootstrapperSource).TrimStart([char]0xFEFF))
-    & $bootstrapper -Channel '8.0' -InstallDir $installDirectory -NoPath
-
-    $executable = Join-Path $installDirectory 'dotnet.exe'
-    if (-not (Test-Path -LiteralPath $executable)) { throw '.NET 8 SDK kurulumdan sonra bulunamadı.' }
-    return $executable
+    return 'win-x64'
 }
 
 function Find-Tool([string]$Name) {
@@ -83,16 +55,45 @@ function Find-Tool([string]$Name) {
     return $null
 }
 
+function Get-LatestRelease {
+    $headers = @{ 'User-Agent' = 'VidShrink-Installer'; 'Accept' = 'application/vnd.github+json' }
+    $response = Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri "https://api.github.com/repos/$repository/releases/latest"
+    $release = ConvertFrom-Json ([string]$response.Content)
+    if (-not $release.tag_name) { throw 'Yayın bilgisi okunamadı: etiket adı yok.' }
+    return $release
+}
+
+function Get-ReleaseAsset([string]$Tag, [string]$Name, [string]$Destination) {
+    $uri = "https://github.com/$repository/releases/download/$Tag/$Name"
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $uri -OutFile $Destination
+    }
+    catch {
+        throw "Yayın varlığı indirilemedi: $Name ($uri)"
+    }
+}
+
+# checksums-<rid>.txt sha256sum biçimindedir: özet, iki boşluk, varlık adı.
+function Read-Checksums([string]$Path) {
+    $table = @{}
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        $match = [regex]::Match($line, '^([0-9a-fA-F]{64})\s+\*?(.+?)\s*$')
+        if ($match.Success) { $table[$match.Groups[2].Value] = $match.Groups[1].Value.ToLowerInvariant() }
+    }
+    return $table
+}
+
+function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
+    if (-not $Table.ContainsKey($Name)) { throw "Sağlama listesinde $Name yok; indirilen dosya doğrulanamıyor." }
+    $actual = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actual -ne $Table[$Name]) {
+        throw "$Name sağlaması tutmuyor. Beklenen $($Table[$Name]), bulunan $actual. Kurulum durduruldu."
+    }
+}
+
 Write-Host 'VidShrink kurulumu hazırlanıyor...' -ForegroundColor Cyan
 
-$dotnet = Find-DotNetSdk8
-if (-not $dotnet) {
-    Write-Host '.NET 8 SDK yükleniyor (kullanıcı kapsamı, yönetici gerekmez)...' -ForegroundColor Cyan
-    $dotnet = Install-DotNetSdk8
-}
-$env:DOTNET_ROOT = Split-Path -Parent $dotnet
-$env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-$env:DOTNET_NOLOGO = '1'
+$runtimeIdentifier = Get-RuntimeIdentifier
 
 $ffmpeg = Find-Tool 'ffmpeg'
 $ffprobe = Find-Tool 'ffprobe'
@@ -111,39 +112,57 @@ if ($resolvedInstallRoot -eq $programsRoot -or
     throw "Güvenlik nedeniyle kurulum yolu LocalAppData\Programs altında olmalıdır: $resolvedInstallRoot"
 }
 
+$archiveName = "vidshrink-$runtimeIdentifier.zip"
+$launcherArchiveName = "vidshrink-launcher-$runtimeIdentifier.zip"
+$checksumsName = "checksums-$runtimeIdentifier.txt"
+
 $workRoot = Join-Path ([IO.Path]::GetTempPath()) ("vidshrink-install-" + [Guid]::NewGuid().ToString('N'))
-$zipPath = Join-Path $workRoot 'source.zip'
-$extractRoot = Join-Path $workRoot 'source'
-$publishRoot = Join-Path $workRoot 'publish'
+$stageRoot = Join-Path $workRoot 'stage'
 
 try {
-    New-Item -ItemType Directory -Path $workRoot, $extractRoot, $publishRoot -Force | Out-Null
-    Write-Host 'Güncel VidShrink kaynakları indiriliyor...' -ForegroundColor Cyan
-    Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/Teknesyum/VidShrink/archive/refs/heads/main.zip' -OutFile $zipPath
-    Expand-Archive -LiteralPath $zipPath -DestinationPath $extractRoot -Force
+    New-Item -ItemType Directory -Path $workRoot, $stageRoot -Force | Out-Null
 
-    $sourceRoot = Get-ChildItem -LiteralPath $extractRoot -Directory | Select-Object -First 1
-    if (-not $sourceRoot) { throw 'İndirilen kaynak paketi açılamadı.' }
+    Write-Host 'Son yayın aranıyor...' -ForegroundColor Cyan
+    $release = Get-LatestRelease
+    $tag = [string]$release.tag_name
+    $version = $tag.TrimStart('v')
+    Write-Host "Kurulacak sürüm: $version" -ForegroundColor Cyan
 
-    $runtimeIdentifier = Get-RuntimeIdentifier
+    # Başlatıcı yayında yoksa kurulum yarım kalır: kısayolun göstereceği program olmaz
+    # ve otogüncelleme hiç çalışmaz. Kaynaktan derlemeye düşmek yerine burada durulur.
+    $assetNames = @($release.assets | ForEach-Object { [string]$_.name })
+    foreach ($required in $archiveName, $launcherArchiveName, $checksumsName) {
+        if ($assetNames -notcontains $required) {
+            throw "Yayın $tag bu varlığı taşımıyor: $required. Başlatıcısız kurulum yapılmaz; başlatıcıyı da içeren bir yayın çıkana kadar bekleyin."
+        }
+    }
+
+    $archivePath = Join-Path $workRoot $archiveName
+    $launcherArchivePath = Join-Path $workRoot $launcherArchiveName
+    $checksumsPath = Join-Path $workRoot $checksumsName
+
+    Write-Host 'Yayın paketi indiriliyor...' -ForegroundColor Cyan
+    Get-ReleaseAsset $tag $checksumsName $checksumsPath
+    Get-ReleaseAsset $tag $archiveName $archivePath
+    Get-ReleaseAsset $tag $launcherArchiveName $launcherArchivePath
+
+    Write-Host 'İndirilenler doğrulanıyor...' -ForegroundColor Cyan
+    $checksums = Read-Checksums $checksumsPath
+    Assert-Checksum $checksums $archiveName $archivePath
+    Assert-Checksum $checksums $launcherArchiveName $launcherArchivePath
 
     # Kurulum düzeni: kökte başlatıcı ve ffmpeg, app\ altında güncellenen uygulama.
     # Çalışan bir exe ve yüklü dll'ler üzerine yazılamadığı için güncelleme, uygulama
     # yüklenmeden önce başlatıcı tarafından app\ klasörüne uygulanır.
-    $appPublishRoot = Join-Path $publishRoot 'app'
-    Write-Host "VidShrink Release sürümü yayımlanıyor ($runtimeIdentifier)..." -ForegroundColor Cyan
-    & $dotnet publish (Join-Path $sourceRoot.FullName 'src\VidShrink.App\VidShrink.App.csproj') `
-        --configuration Release --runtime $runtimeIdentifier --self-contained true `
-        -p:PublishSingleFile=false --output $appPublishRoot
-    if ($LASTEXITCODE -ne 0) { throw "VidShrink derlenemedi. dotnet çıkış kodu: $LASTEXITCODE" }
+    $appStageRoot = Join-Path $stageRoot 'app'
+    Expand-Archive -LiteralPath $archivePath -DestinationPath $appStageRoot -Force
+    Expand-Archive -LiteralPath $launcherArchivePath -DestinationPath $stageRoot -Force
 
-    Write-Host 'Başlatıcı yayımlanıyor...' -ForegroundColor Cyan
-    & $dotnet publish (Join-Path $sourceRoot.FullName 'src\VidShrink.Launcher\VidShrink.Launcher.csproj') `
-        --configuration Release --runtime $runtimeIdentifier --self-contained true `
-        -p:PublishSingleFile=true --output $publishRoot
-    if ($LASTEXITCODE -ne 0) { throw "Başlatıcı derlenemedi. dotnet çıkış kodu: $LASTEXITCODE" }
+    # Kurulan sürümün işareti. Bu dosya olmadan ilk açılışta güncelleyici kurulu klasörü
+    # yayınla dosya dosya karşılaştırır ve arşivin neredeyse tamamını yeniden indirir.
+    Set-Content -LiteralPath (Join-Path $appStageRoot '.update-version') -Value $version -Encoding UTF8 -NoNewline
 
-    $toolsRoot = Join-Path $publishRoot 'tools\ffmpeg'
+    $toolsRoot = Join-Path $stageRoot 'tools\ffmpeg'
     New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null
     Copy-Item -LiteralPath $ffmpeg -Destination (Join-Path $toolsRoot 'ffmpeg.exe') -Force
     Copy-Item -LiteralPath $ffprobe -Destination (Join-Path $toolsRoot 'ffprobe.exe') -Force
@@ -158,7 +177,7 @@ try {
         Remove-Item -LiteralPath $resolvedInstallRoot -Recurse -Force
     }
     New-Item -ItemType Directory -Path $resolvedInstallRoot -Force | Out-Null
-    Copy-Item -Path (Join-Path $publishRoot '*') -Destination $resolvedInstallRoot -Recurse -Force
+    Copy-Item -Path (Join-Path $stageRoot '*') -Destination $resolvedInstallRoot -Recurse -Force
 
     # Kısayollar başlatıcıyı gösterir; uygulamayı doğrudan gösterirlerse güncelleme hiç çalışmaz.
     $installedExe = Join-Path $resolvedInstallRoot 'VidShrink.exe'
@@ -184,7 +203,7 @@ try {
         $startMenuShortcut.Save()
     }
 
-    Write-Host "VidShrink kuruldu: $resolvedInstallRoot" -ForegroundColor Green
+    Write-Host "VidShrink $version kuruldu: $resolvedInstallRoot" -ForegroundColor Green
     if (-not $NoLaunch) { Start-Process -FilePath $installedExe }
 }
 finally {

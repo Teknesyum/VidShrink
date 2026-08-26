@@ -2,7 +2,9 @@ name: release
 
 # Runs when a version tag is pushed. Publishes VidShrink self-contained for the four
 # supported targets, writes a per-file manifest next to each archive, and collects
-# everything into a draft GitHub Release.
+# everything into a draft GitHub Release. win-x64 additionally carries the launcher as
+# vidshrink-launcher-win-x64.zip, which is what the installer puts at the install root
+# and what the shortcuts point at.
 #
 # ffmpeg is not part of any archive. It is GPLv3 and VidShrink is MIT; the installer
 # fetches it onto the user's machine under its own licence. See README.
@@ -95,6 +97,18 @@ jobs:
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish/${{ matrix.rid }}
 
+      - name: Publish the launcher
+        # Windows only. The launcher is what the shortcuts point at and what applies an
+        # update before the application is loaded; without it in the release the installer
+        # has nowhere to get it from. Its runtime identifier is fixed in the csproj.
+        if: matrix.rid == 'win-x64'
+        run: |
+          dotnet publish src/VidShrink.Launcher/VidShrink.Launcher.csproj \
+            -c Release \
+            -p:Version=${{ needs.version.outputs.version }} \
+            -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
+            -o publish-launcher
+
       - name: Write manifest.json
         # The manifest tool is a CI helper and is not in VidShrink.sln, so it is built
         # from its own project file.
@@ -115,8 +129,17 @@ jobs:
           # The same bytes ship twice: inside the archive as manifest.json, and beside it
           # as a standalone asset the updater can fetch without downloading the archive.
           cp publish/${{ matrix.rid }}/manifest.json assets/manifest-${{ matrix.rid }}.json
-          ( cd assets && sha256sum "vidshrink-${{ matrix.rid }}.zip" "manifest-${{ matrix.rid }}.json" \
-              > "checksums-${{ matrix.rid }}.txt" )
+
+          checksummed="vidshrink-${{ matrix.rid }}.zip manifest-${{ matrix.rid }}.json"
+          # The launcher travels as its own archive rather than inside the application
+          # archive: the archive is what the updater unpacks over app/, and the launcher
+          # does not live there. It is not in the manifest either, because it never
+          # updates itself.
+          if [ -d publish-launcher ]; then
+            ( cd publish-launcher && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-launcher-${{ matrix.rid }}.zip" . )
+            checksummed="$checksummed vidshrink-launcher-${{ matrix.rid }}.zip"
+          fi
+          ( cd assets && sha256sum $checksummed > "checksums-${{ matrix.rid }}.txt" )
           cat assets/checksums-${{ matrix.rid }}.txt
 
       - uses: actions/upload-artifact@v4

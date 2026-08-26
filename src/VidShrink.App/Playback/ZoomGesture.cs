@@ -1,8 +1,28 @@
 namespace VidShrink.App.Playback;
 
 /// <summary>
-/// K3: tek jest parametresi. Tekerlek <see cref="T"/> değerini oynatır; panelin boyu da,
+/// Panelin boy kademesi. Üç durum var ve üçü de tek jest parametresinden
+/// (<see cref="ZoomGesture.T"/>) türer; ikinci bir sayaç yoktur.
+/// </summary>
+internal enum ShelterStage
+{
+    /// <summary>Bandında: ortadaki sütunun içinde, düzenin bir parçası.</summary>
+    Band = 0,
+
+    /// <summary>Orta boy: kök katmanda, yan sütunların üstüne taşar ama pencereyi kaplamaz.</summary>
+    Mid = 1,
+
+    /// <summary>Tam pencere.</summary>
+    Full = 2
+}
+
+/// <summary>
+/// K3: tek jest parametresi. Tekerlek <see cref="T"/> değerini oynatır; panelin kademesi de,
 /// görüntünün yakınlaştırması da o tek sayıdan türer. İki ayrı sayaç yok.
+///
+/// T44: kademe ikiden üçe çıktı. Görüntü yakınlaştırması eskisi gibi sürekli
+/// (<see cref="ContentZoom"/> parametreyle doğrusal); kademelenen yalnız panelin boyu.
+/// Her geçişin çıkış ve iniş eşiği ayrıdır — titrek tekerlek kademeler arasında çırpınmaz.
 ///
 /// Sınıf bilerek saf: hiçbir Avalonia türü kullanmıyor, bu yüzden test etmek pencere
 /// açmayı gerektirmiyor. Bütün ölçüler kullanıcı arayüzü birimidir (DIP) ve dışarıdan
@@ -10,23 +30,35 @@ namespace VidShrink.App.Playback;
 /// </summary>
 internal sealed class ZoomGesture
 {
-    /// <summary>Terfi eşiği. Plan §2, kapanmış tartışma.</summary>
-    internal const double PromoteAt = 1.00;
+    /// <summary>Tam pencereye çıkış eşiği. Plan §2, kapanmış tartışma.</summary>
+    internal const double FullAt = 1.00;
 
-    /// <summary>İniş eşiği. Histerezis bandı burada başlar.</summary>
-    internal const double DemoteAt = 0.92;
+    /// <summary>Tam pencereden iniş eşiği. Histerezis bandı burada başlar.</summary>
+    internal const double FullDropAt = 0.92;
 
     internal const double Floor = 0.00;
 
     /// <summary>Tavan. Buraya varınca tekerlek durur, panel daha büyümez.</summary>
-    internal const double Ceiling = PromoteAt;
+    internal const double Ceiling = FullAt;
 
     /// <summary>
     /// Bir tekerlek çentiğinin adımı. Uydurulmuş bir sayı değil: histerezis bandının
     /// genişliği (1.00 - 0.92). Böylece tavandaki tek çentik geri iniş eşiğine değer,
     /// bir fazlası inişi tetikler; band tam bir çentiktir.
     /// </summary>
-    internal const double NotchStep = Ceiling - DemoteAt;
+    internal const double NotchStep = Ceiling - FullDropAt;
+
+    /// <summary>
+    /// Orta boya çıkış eşiği: aralığın tam ortası. Uydurulmuş bir sayı değil,
+    /// <see cref="Floor"/> ile <see cref="Ceiling"/> arasının yarısı.
+    /// </summary>
+    internal const double MidAt = (Floor + Ceiling) / 2.0;
+
+    /// <summary>
+    /// Orta boydan banda iniş eşiği. Tam penceredeki ilişkinin aynısı: histerezis bandı
+    /// tam bir tekerlek çentiği genişliğinde.
+    /// </summary>
+    internal const double MidDropAt = MidAt - NotchStep;
 
     private const double Epsilon = 1e-9;
 
@@ -40,8 +72,14 @@ internal sealed class ZoomGesture
 
     internal double T { get; private set; }
 
-    /// <summary>Terfi hâli. Histerezisli: eşikler farklıdır, bu yüzden titrek tekerlek çırpınmaz.</summary>
-    internal bool Promoted { get; private set; }
+    /// <summary>
+    /// Boy kademesi. Histerezisli: her geçişin çıkış ve iniş eşiği farklıdır, bu yüzden
+    /// titrek tekerlek çırpınmaz.
+    /// </summary>
+    internal ShelterStage Shelter { get; private set; } = ShelterStage.Band;
+
+    /// <summary>Panel bandından çıkmış mı — yani kök katmanda mı çiziliyor.</summary>
+    internal bool Promoted => Shelter != ShelterStage.Band;
 
     internal double ViewportWidth { get; private set; }
     internal double ViewportHeight { get; private set; }
@@ -53,7 +91,7 @@ internal sealed class ZoomGesture
 
     internal double OffsetY { get; private set; }
 
-    /// <summary>t=0'da 1, t=1'de tavan. Görüntü yakınlaştırması.</summary>
+    /// <summary>t=0 değerinde 1, tavanda ise en büyük değer. Görüntü yakınlaştırması.</summary>
     internal double ContentZoom => 1.0 + T * (_maxContentZoom - 1.0);
 
     /// <summary>Kaynağı panoya sığdıran ölçek. Yakınlaştırma bunun üstüne biner.</summary>
@@ -132,7 +170,7 @@ internal sealed class ZoomGesture
     /// <summary>Görüntü panoya sığmıyorsa sürüklenebilir; sığıyorsa sürüklenecek yer yoktur.</summary>
     internal bool CanPan => ContentWidth > ViewportWidth + Epsilon || ContentHeight > ViewportHeight + Epsilon;
 
-    /// <summary>Düğmeyle terfi: parametreyi tavana taşır.</summary>
+    /// <summary>Düğmeyle terfi: parametreyi tavana taşır, yani doğrudan tam pencereye.</summary>
     internal void Promote()
     {
         T = Ceiling;
@@ -141,8 +179,10 @@ internal sealed class ZoomGesture
     }
 
     /// <summary>
-    /// <c>Esc</c> ile iniş. Parametre tabana döner, pano ortalanır — inen panel
-    /// yakınlaştırılmış bir köşede kalmaz.
+    /// Esc ile ve iniş sayacının zaman aşımıyla kullanılan tek yol. Parametre tabana döner,
+    /// pano ortalanır, kademe banda iner. Zaman aşımı da buradan geçtiği için panel
+    /// küçülürken parametre tavanda kalmaz ve sonraki tek tekerlek dokunuşu paneli tam
+    /// pencereye fırlatmaz (T44/K2).
     /// </summary>
     internal void Demote()
     {
@@ -155,17 +195,24 @@ internal sealed class ZoomGesture
 
     internal void Reset() => Demote();
 
-    private void UpdateShelter()
+    /// <summary>
+    /// Kademe kararı. Yükseliş eşikleri <see cref="MidAt"/> ve <see cref="FullAt"/>, iniş
+    /// eşikleri <see cref="MidDropAt"/> ve <see cref="FullDropAt"/>; aradaki band bir
+    /// tekerlek çentiği genişliğinde. İki yükseliş eşiği arasındaki mesafe bir çentikten
+    /// büyük olduğu için hiçbir kademe tek çentikle atlanamaz.
+    /// </summary>
+    private void UpdateShelter() => Shelter = Shelter switch
     {
-        if (!Promoted)
-        {
-            if (T >= PromoteAt - Epsilon) Promoted = true;
-        }
-        else if (T < DemoteAt - Epsilon)
-        {
-            Promoted = false;
-        }
-    }
+        ShelterStage.Band => T >= FullAt - Epsilon ? ShelterStage.Full
+            : T >= MidAt - Epsilon ? ShelterStage.Mid
+            : ShelterStage.Band,
+        ShelterStage.Mid => T >= FullAt - Epsilon ? ShelterStage.Full
+            : T < MidDropAt - Epsilon ? ShelterStage.Band
+            : ShelterStage.Mid,
+        _ => T < MidDropAt - Epsilon ? ShelterStage.Band
+            : T < FullDropAt - Epsilon ? ShelterStage.Mid
+            : ShelterStage.Full
+    };
 
     private void ClampOffset()
     {

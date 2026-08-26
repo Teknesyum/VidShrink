@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace VidShrink.App.Playback;
 
@@ -41,6 +42,13 @@ internal partial class ComparisonPanel : UserControl
     private OverlayLayer? _overlay;
     private DispatcherTimer? _landing;
 
+    // T44/K2: gecikmeli iniş. Kuşak koruması HoverZone'da zaten var, ikinci kopya yazılmadı.
+    // Bölge oranı burada anlamsız (panelin tamamı), sınır kararını hedef kademe veriyor.
+    private readonly HoverZone _descent;
+
+    private ShelterStage _stage = ShelterStage.Band;
+    private Rect _target;
+
     private bool _turkish;
     private string? _notice;
     private string? _rightNotice;
@@ -57,6 +65,11 @@ internal partial class ComparisonPanel : UserControl
 
         // K5: azaltılmış hareket ayarını okuyan tek yer HoverZone. İkinci kopya yok.
         _motionReduced = HoverZone.MotionReduced;
+        _descent = new HoverZone(1.0, () => Motion("PlaybackDescendDelay", 2000), open =>
+        {
+            if (!open) Descend();
+        });
+
         Surface.Gesture = _gesture;
         SeparatorGrip.RenderTransform = _separatorAt;
 
@@ -76,11 +89,19 @@ internal partial class ComparisonPanel : UserControl
         SeparatorGrip.LostFocus += (_, _) => LightSeparator(_draggingSeparator);
         SeparatorGrip.KeyDown += OnSeparatorKey;
 
-        Stage.SizeChanged += (_, _) => ApplySplit();
+        Shell.GotFocus += (_, _) => RefreshDescentHold();
+        Shell.LostFocus += (_, _) => RefreshDescentHold();
+
+        Stage.SizeChanged += (_, _) =>
+        {
+            ApplySplit();
+            ClipStage();
+        };
         Stage.PointerExited += (_, _) => Strip.PointerGone();
 
         SetLanguage(false);
         ApplySplit();
+        ClipStage();
         RefreshReadout();
         RefreshEmptyState();
 
@@ -89,6 +110,18 @@ internal partial class ComparisonPanel : UserControl
 
     /// <summary>Terfi hâli. Panel kök katmandaysa doğrudur.</summary>
     internal bool IsPromoted => _promoted;
+
+    /// <summary>Panelin uygulanmış boy kademesi. Ad çakışmasın diye pano <c>Stage</c> kaldı.</summary>
+    internal ShelterStage Shelter => _stage;
+
+    /// <summary>
+    /// Hedef kademenin kök katmandaki sınırı. Fare testi buna karşı yapılır, panelin
+    /// animasyon sırasındaki anlık sınırına karşı değil (T44/K2, ikinci tuzak).
+    /// </summary>
+    internal Rect StageTarget => _target;
+
+    /// <summary>Gecikmeli iniş sayacı. Kuşak koruması ölçümden okunabilsin diye açık.</summary>
+    internal HoverZone Descent => _descent;
 
     /// <summary>Ayırıcının konumu, sıfır ile bir arası. Uçlar geçerlidir.</summary>
     internal double Split
@@ -212,6 +245,26 @@ internal partial class ComparisonPanel : UserControl
         Surface.InvalidateVisual();
     }
 
+    /// <summary>
+    /// K3 (T44): kabuk yuvarlak köşeli bir Border, ama içindeki kare arka plan ve kare
+    /// çizilen yüzey dört köşeyi örtüyordu — kenarlık çiziliyor, köşede görünmüyordu.
+    /// Pano aynı yarıçapla kesilince köşeler açılıyor; kesme panonun bütün çocuklarını
+    /// kapsadığı için sağ perde de aynı köşeyi taşıyor. Yarıçap uydurulmuyor,
+    /// <c>RadiusPanelScalar</c> belirtecinden geliyor.
+    /// </summary>
+    private void ClipStage()
+    {
+        var size = Stage.Bounds.Size;
+        if (size.Width <= 0 || size.Height <= 0)
+        {
+            Stage.Clip = null;
+            return;
+        }
+
+        var radius = Scalar("RadiusPanelScalar", 16);
+        Stage.Clip = new RectangleGeometry(new Rect(size)) { RadiusX = radius, RadiusY = radius };
+    }
+
     private void LightSeparator(bool lit)
     {
         SeparatorLine.Classes.Set("lit", lit);
@@ -222,6 +275,7 @@ internal partial class ComparisonPanel : UserControl
     {
         if (!e.GetCurrentPoint(Stage).Properties.IsLeftButtonPressed) return;
         _draggingSeparator = true;
+        RefreshDescentHold();
         LightSeparator(true);
         e.Pointer.Capture(SeparatorGrip);
         SeparatorGrip.Focus();
@@ -241,6 +295,7 @@ internal partial class ComparisonPanel : UserControl
     {
         if (!_draggingSeparator) return;
         _draggingSeparator = false;
+        RefreshDescentHold();
         e.Pointer.Capture(null);
         LightSeparator(SeparatorGrip.IsFocused || SeparatorGrip.IsPointerOver);
         e.Handled = true;
@@ -286,6 +341,7 @@ internal partial class ComparisonPanel : UserControl
         if (!e.GetCurrentPoint(Stage).Properties.IsLeftButtonPressed) return;
         if (!_gesture.CanPan) return;
         _panning = true;
+        RefreshDescentHold();
         _panFrom = e.GetPosition(Stage);
         e.Pointer.Capture(Stage);
         Stage.Cursor = new Cursor(StandardCursorType.SizeAll);
@@ -307,6 +363,7 @@ internal partial class ComparisonPanel : UserControl
     {
         if (!_panning) return;
         _panning = false;
+        RefreshDescentHold();
         e.Pointer.Capture(null);
         Stage.Cursor = Cursor.Default;
     }
@@ -333,13 +390,39 @@ internal partial class ComparisonPanel : UserControl
 
     // ---- terfi ve yer tutucu (K4, K5) ---------------------------------------------
 
+    /// <summary>
+    /// Jest hangi kademeyi söylüyorsa panel oraya gider. Üç kademe de tek parametreden
+    /// türüyor; panel kendi başına kademe kararı vermiyor (T44/K1).
+    /// </summary>
     private void SyncShelter()
     {
-        if (_gesture.Promoted && !_promoted) Promote();
-        else if (!_gesture.Promoted && _promoted) Land();
+        var stage = _gesture.Shelter;
+        if (stage == _stage) return;
+
+        if (stage == ShelterStage.Band)
+        {
+            Land();
+            return;
+        }
+
+        if (!_promoted)
+        {
+            Promote(stage);
+            return;
+        }
+
+        // İniş başlamış ama daha oturmamışken tekerlek geri yukarı çevrilebilir. Bekleyen
+        // iniş iptal edilmezse panel az sonra kendiliğinden bandına düşerdi.
+        _landing?.Stop();
+        _landing = null;
+
+        _stage = stage;
+        _descent.Reset(true);
+        RefreshDescentHold();
+        ApplyStage();
     }
 
-    private void Promote()
+    private void Promote(ShelterStage stage)
     {
         var overlay = OverlayLayer.GetOverlayLayer(this);
         if (overlay is null) return;
@@ -348,6 +431,7 @@ internal partial class ComparisonPanel : UserControl
         var band = new Rect(origin, Shell.Bounds.Size);
 
         // Yer tutucu terfi anında bandını aynı boyutta tutar: altındaki düzen zıplamaz.
+        // Kademe değişimlerinde bu boy bir daha yazılmaz — yer tutucu hep bandındadır.
         Placeholder.Height = band.Height;
         Placeholder.IsVisible = true;
 
@@ -360,33 +444,100 @@ internal partial class ComparisonPanel : UserControl
 
         _overlay = overlay;
         _promoted = true;
+        _stage = stage;
+        _target = band;
         overlay.SizeChanged += OnOverlayResized;
 
+        _descent.Reset(true);
+        RefreshDescentHold();
+
         if (TopLevel.GetTopLevel(this) is { } top)
+        {
             top.AddHandler(KeyDownEvent, OnTopLevelKey, RoutingStrategies.Tunnel);
+            top.AddHandler(PointerMovedEvent, OnGlobalPointerMoved, RoutingStrategies.Tunnel);
+        }
 
         // K5: geçiş kabuğa uygulanıyor, görüntüye değil. Yüzey kendi turunda çizmeye
         // devam eder; geçişin kare hızıyla ilgisi yoktur.
         Shell.Transitions = _motionReduced ? null : ShellTransitions();
-        if (_motionReduced) Fill();
-        else Dispatcher.UIThread.Post(Fill, DispatcherPriority.Render);
+        if (_motionReduced) ApplyStage();
+        else Dispatcher.UIThread.Post(ApplyStage, DispatcherPriority.Render);
 
         Shell.Focus();
     }
 
-    private void Fill()
+    /// <summary>
+    /// Kademenin kök katmandaki sınırı. Orta boyun oranı temadan gelir; taban değeri
+    /// bandın kendi boyudur, yani orta kademe hiçbir zaman bandından küçük olmaz.
+    /// </summary>
+    private Rect StageBounds(ShelterStage stage)
+    {
+        if (_overlay is null) return _target;
+
+        var area = OverlayArea();
+        var width = area.Width;
+        var height = area.Height;
+        if (stage != ShelterStage.Mid) return new Rect(0, 0, width, height);
+
+        var share = Scalar("PlaybackMidShare", 0.9);
+        var midWidth = Math.Max(width * share, Math.Min(width, Placeholder.Bounds.Width));
+        var midHeight = Math.Max(height * share, Math.Min(height, Placeholder.Bounds.Height));
+        return new Rect((width - midWidth) / 2, (height - midHeight) / 2, midWidth, midHeight);
+    }
+
+    /// <summary>
+    /// Kök katmanın kapladığı alan. Katmanın kendisi bir <see cref="Canvas"/> ve ölçüsünü
+    /// çocuklarından almaz; yerleşim turu ona boy vermediğinde ölçü katman yöneticisinden
+    /// okunur. Yöneticinin sınırı pencerenin içerik alanıdır ve katman onun başlangıcında
+    /// durur, bu yüzden iki koordinat çakışır.
+    /// </summary>
+    private Size OverlayArea()
+    {
+        if (_overlay is null) return default;
+
+        var area = _overlay.Bounds.Size;
+        if (area.Width > 0 && area.Height > 0) return area;
+        return (_overlay.GetVisualParent() as Visual)?.Bounds.Size ?? area;
+    }
+
+    private void ApplyStage()
     {
         if (_overlay is null) return;
-        Canvas.SetLeft(Shell, 0);
-        Canvas.SetTop(Shell, 0);
-        Shell.Width = _overlay.Bounds.Width;
-        Shell.Height = _overlay.Bounds.Height;
+
+        _target = StageBounds(_stage);
+        Canvas.SetLeft(Shell, _target.X);
+        Canvas.SetTop(Shell, _target.Y);
+        Shell.Width = _target.Width;
+        Shell.Height = _target.Height;
     }
 
     private void OnOverlayResized(object? sender, SizeChangedEventArgs e)
     {
-        if (_promoted) Fill();
+        if (_promoted) ApplyStage();
     }
+
+    /// <summary>
+    /// Fare hedef kademenin içinde mi. Panel farenin altına doğru büyüyüp küçülürken
+    /// kabuğun anlık sınırı yanıltıcıdır; karar hedefe göre verilir (T44/K2).
+    /// </summary>
+    internal bool TargetCovers(Point overlayPoint) => _target.Contains(overlayPoint);
+
+    /// <summary>Fare konumunu iniş sayacına bildirir. Nokta kök katmanın koordinatındadır.</summary>
+    internal void TrackPointer(Point overlayPoint) => _descent.PointerWithin(TargetCovers(overlayPoint));
+
+    private void OnGlobalPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_overlay is null) return;
+        TrackPointer(e.GetPosition(_overlay));
+    }
+
+    /// <summary>
+    /// İnişi engelleyen sebepler: kullanıcı ayırıcıyı ya da panoyu sürüklüyor, klavye odağı
+    /// panelin içindeki bir öğede. Kabuğun kendisi sayılmaz — odağı oraya terfi anında
+    /// panelin kendisi taşıyor, o odak kullanıcının bir işi değil.
+    /// </summary>
+    private void RefreshDescentHold()
+        => _descent.Hold(_draggingSeparator || _panning || (Shell.IsKeyboardFocusWithin && !Shell.IsFocused));
 
     private void Land()
     {
@@ -395,6 +546,10 @@ internal partial class ComparisonPanel : UserControl
 
         var origin = Placeholder.TranslatePoint(new Point(0, 0), overlay) ?? new Point(0, 0);
         var band = new Rect(origin, Placeholder.Bounds.Size);
+
+        _stage = ShelterStage.Band;
+        _target = band;
+        _descent.Reset(false);
 
         if (_motionReduced)
         {
@@ -425,9 +580,13 @@ internal partial class ComparisonPanel : UserControl
         _overlay.Children.Remove(Shell);
         _overlay = null;
         _promoted = false;
+        _stage = ShelterStage.Band;
 
         if (TopLevel.GetTopLevel(this) is { } top)
+        {
             top.RemoveHandler(KeyDownEvent, OnTopLevelKey);
+            top.RemoveHandler(PointerMovedEvent, OnGlobalPointerMoved);
+        }
 
         Shell.Transitions = null;
         Shell.ClearValue(WidthProperty);

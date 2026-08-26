@@ -1,4 +1,4 @@
-using VidShrink.App.Playback;
+﻿using VidShrink.App.Playback;
 
 namespace VidShrink.Tests;
 
@@ -22,6 +22,7 @@ public class ZoomGestureTests
         var gesture = Fitted();
 
         Assert.Equal(0, gesture.T);
+        Assert.Equal(ShelterStage.Band, gesture.Shelter);
         Assert.False(gesture.Promoted);
         Assert.True(gesture.AtFloor);
         Assert.Equal(1.0, gesture.ContentZoom, 9);
@@ -56,14 +57,66 @@ public class ZoomGestureTests
     }
 
     [Fact]
-    public void Terfi_esigi_bir_nokta_sifirdir()
+    public void Tam_pencere_esigi_bir_nokta_sifirdir()
     {
         var gesture = Fitted();
 
         while (gesture.Wheel(1, 400, 225)) { }
 
-        Assert.Equal(ZoomGesture.PromoteAt, gesture.T, 9);
+        Assert.Equal(ZoomGesture.FullAt, gesture.T, 9);
+        Assert.Equal(ShelterStage.Full, gesture.Shelter);
         Assert.True(gesture.Promoted);
+    }
+
+    [Fact]
+    public void Uc_kademe_de_tek_parametreden_cikar()
+    {
+        var gesture = Fitted();
+
+        Assert.Equal(ShelterStage.Band, gesture.Shelter);
+
+        while (gesture.T < ZoomGesture.MidAt && gesture.Wheel(1, 400, 225)) { }
+        Assert.Equal(ShelterStage.Mid, gesture.Shelter);
+        Assert.True(gesture.T < ZoomGesture.FullAt);
+
+        while (gesture.Wheel(1, 400, 225)) { }
+        Assert.Equal(ShelterStage.Full, gesture.Shelter);
+    }
+
+    [Fact]
+    public void Orta_kademe_yan_sutunlara_tasarken_pencereyi_kaplamaz()
+    {
+        var gesture = Fitted();
+
+        // Orta kademeye ilk varılan nokta: eşiğin üstündeki ilk çentik.
+        while (gesture.Shelter == ShelterStage.Band) gesture.Wheel(1, 400, 225);
+
+        Assert.Equal(ShelterStage.Mid, gesture.Shelter);
+        Assert.True(gesture.Promoted);
+        Assert.False(gesture.AtCeiling);
+    }
+
+    [Fact]
+    public void Hicbir_kademe_tek_centikle_atlanmaz()
+    {
+        var up = Fitted();
+        var previous = (int)up.Shelter;
+        while (up.Wheel(1, 400, 225))
+        {
+            var now = (int)up.Shelter;
+            Assert.True(now - previous <= 1, $"t={up.T:0.###} kademesi {previous} -> {now}");
+            previous = now;
+        }
+
+        var down = Fitted();
+        while (down.Wheel(1, 400, 225)) { }
+        previous = (int)down.Shelter;
+        while (down.Wheel(-1, 400, 225))
+        {
+            var now = (int)down.Shelter;
+            Assert.True(previous - now <= 1, $"t={down.T:0.###} kademesi {previous} -> {now}");
+            previous = now;
+        }
     }
 
     [Fact]
@@ -72,39 +125,86 @@ public class ZoomGestureTests
         var gesture = Fitted();
         while (gesture.Wheel(1, 400, 225)) { }
 
-        // Bir çentik geri: t iniş eşiğine değer ama altına inmez, panel terfide kalır.
+        // Bir çentik geri: t iniş eşiğine değer ama altına inmez, panel tam penceredir.
         gesture.Wheel(-1, 400, 225);
 
-        Assert.Equal(ZoomGesture.DemoteAt, gesture.T, 9);
-        Assert.True(gesture.Promoted);
+        Assert.Equal(ZoomGesture.FullDropAt, gesture.T, 9);
+        Assert.Equal(ShelterStage.Full, gesture.Shelter);
     }
 
     [Fact]
-    public void Histerezis_esigin_altinda_indirir()
+    public void Histerezis_esigin_altinda_bir_kademe_indirir()
     {
         var gesture = Fitted();
         while (gesture.Wheel(1, 400, 225)) { }
 
         gesture.Wheel(-2, 400, 225);
 
-        Assert.True(gesture.T < ZoomGesture.DemoteAt);
-        Assert.False(gesture.Promoted);
+        Assert.True(gesture.T < ZoomGesture.FullDropAt);
+        Assert.Equal(ShelterStage.Mid, gesture.Shelter);
+        Assert.True(gesture.Promoted);
     }
 
     [Fact]
-    public void Titrek_tekerlek_bantta_cirpinmaz()
+    public void Orta_kademenin_kendi_histerezisi_var()
+    {
+        var gesture = Fitted();
+        while (gesture.Shelter == ShelterStage.Band) gesture.Wheel(1, 400, 225);
+
+        // Çıkış eşiğinin altına inildi ama iniş eşiğinin üstünde kalındı: kademe durur.
+        gesture.Wheel(-1, 400, 225);
+        Assert.True(gesture.T < ZoomGesture.MidAt);
+        Assert.True(gesture.T >= ZoomGesture.MidDropAt);
+        Assert.Equal(ShelterStage.Mid, gesture.Shelter);
+
+        gesture.Wheel(-1, 400, 225);
+        Assert.True(gesture.T < ZoomGesture.MidDropAt);
+        Assert.Equal(ShelterStage.Band, gesture.Shelter);
+    }
+
+    [Fact]
+    public void Titrek_tekerlek_kademeler_arasinda_cirpinmaz()
+    {
+        var full = Fitted();
+        while (full.Wheel(1, 400, 225)) { }
+
+        for (var i = 0; i < 20; i++)
+        {
+            full.Wheel(-1, 400, 225);
+            Assert.Equal(ShelterStage.Full, full.Shelter);
+            full.Wheel(1, 400, 225);
+            Assert.Equal(ShelterStage.Full, full.Shelter);
+        }
+
+        var mid = Fitted();
+        while (mid.Shelter == ShelterStage.Band) mid.Wheel(1, 400, 225);
+
+        for (var i = 0; i < 20; i++)
+        {
+            mid.Wheel(-1, 400, 225);
+            Assert.Equal(ShelterStage.Mid, mid.Shelter);
+            mid.Wheel(1, 400, 225);
+            Assert.Equal(ShelterStage.Mid, mid.Shelter);
+        }
+    }
+
+    [Fact]
+    public void Zaman_asimi_parametreyi_de_tabana_indirir()
     {
         var gesture = Fitted();
         while (gesture.Wheel(1, 400, 225)) { }
+        Assert.Equal(ShelterStage.Full, gesture.Shelter);
 
-        // Bir aşağı bir yukarı: eşikler ayrı olduğu için terfi hâli hiç değişmemeli.
-        for (var i = 0; i < 20; i++)
-        {
-            gesture.Wheel(-1, 400, 225);
-            Assert.True(gesture.Promoted);
-            gesture.Wheel(1, 400, 225);
-            Assert.True(gesture.Promoted);
-        }
+        // İniş sayacının zaman aşımı bu yoldan geçer (ComparisonPanel.Descend).
+        gesture.Demote();
+
+        Assert.Equal(0, gesture.T, 9);
+        Assert.Equal(ShelterStage.Band, gesture.Shelter);
+
+        // Tuzak 1: parametre tavanda kalsaydı bu tek dokunuş paneli tam pencereye atardı.
+        gesture.Wheel(1, 400, 225);
+        Assert.Equal(ZoomGesture.NotchStep, gesture.T, 9);
+        Assert.Equal(ShelterStage.Band, gesture.Shelter);
     }
 
     [Fact]
@@ -181,7 +281,7 @@ public class ZoomGestureTests
         gesture.Demote();
 
         Assert.Equal(0, gesture.T, 9);
-        Assert.False(gesture.Promoted);
+        Assert.Equal(ShelterStage.Band, gesture.Shelter);
         Assert.Equal(0, gesture.OffsetX, 6);
         Assert.Equal(0, gesture.OffsetY, 6);
     }
@@ -194,7 +294,7 @@ public class ZoomGestureTests
         gesture.Promote();
 
         Assert.True(gesture.AtCeiling);
-        Assert.True(gesture.Promoted);
+        Assert.Equal(ShelterStage.Full, gesture.Shelter);
         Assert.False(gesture.Wheel(1, 400, 225));
     }
 
