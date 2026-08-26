@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -157,9 +159,18 @@ public sealed class WindowLayoutTests
 
     /// <summary>
     /// Açılış boyutu — ekranın çalışma alanı. Tasarım boyutunu karşılayan bir ekranda
-    /// dolu sayfa kaymayacak. Ekran ondan küçükse pencere kendi tabanının altında kalıyor
-    /// demektir; orada kaydırma beklenen davranış ve ölçüm tek bir dış taşıyıcının
-    /// kaydığını söylüyor. İki dal da ölçtüğü sayıyı hata iletisine yazıyor.
+    /// dolu sayfa kaymayacak.
+    ///
+    /// <para>Ekran daha küçükse kayma <b>kabul edilir, zorunlu değil</b>. Zorunlu
+    /// kılınırsa ölçüm ters döner: 1920x1080 + görev çubuğu makinesinin çalışma alanı
+    /// 1920x1032'dir ve yükseklik tasarım boyutunun (1060) altında kalır, ama dolu sayfa
+    /// o genişlikte zaten sığar — yani sayfa doğru davrandığı için ölçüm kırmızıya
+    /// düşerdi. Sığdığında geçmeli, sığmadığında da tek bir dış taşıyıcıdan fazlası
+    /// kaymamalı.</para>
+    ///
+    /// <para>Pencerenin tabanı burada değil: <c>MinWidth</c>/<c>MinHeight</c> 1040x720,
+    /// tasarım boyutu yalnız tercih edilen boyut. İkisinin arasındaki her ekranda pencere
+    /// tabanının üstündedir.</para>
     /// </summary>
     [Fact]
     public void TheLoadedPageDoesNotScrollAtTheStartingSize()
@@ -175,10 +186,27 @@ public sealed class WindowLayoutTests
         }
 
         Assert.True(
-            overflowing.Count == 1,
+            overflowing.Count <= 1,
             $"Ekranın çalışma alanı ({size.Width:0}x{size.Height:0}) tasarım boyutunun "
-            + $"({design.Width:0}x{design.Height:0}) altında; tek bir dış kaydırma bekleniyordu. "
-            + Describe(size, loaded: true, overflowing));
+            + $"({design.Width:0}x{design.Height:0}) altında; en çok tek bir dış kaydırma "
+            + "kabul ediliyor. " + Describe(size, loaded: true, overflowing));
+    }
+
+    /// <summary>
+    /// Biçimlemedeki açılış boyutu ile belirteç aynı sayıyı iki yerde tutuyor; ölçüm
+    /// yalnız belirteci okuduğu için ayrışma sessiz kalırdı.
+    /// </summary>
+    [Fact]
+    public void TheWindowAsksForTheSizeItsTokensName()
+    {
+        var markup = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.axaml"));
+        var declared = Regex.Match(markup, @"Width=""(?<w>\d+)""\s+Height=""(?<h>\d+)""");
+        Assert.True(declared.Success, "Biçimlemede açılış boyutu bulunamadı.");
+
+        var design = DesignSize();
+
+        Assert.Equal(design.Width, double.Parse(declared.Groups["w"].Value, CultureInfo.InvariantCulture));
+        Assert.Equal(design.Height, double.Parse(declared.Groups["h"].Value, CultureInfo.InvariantCulture));
     }
 
     /// <summary>
