@@ -1105,6 +1105,12 @@ public partial class MainWindow : Window
         await MeasureComplexityAsync(probed);
     }
 
+    /// <summary>
+    /// Açılış ölçümü için yoklamayı elle başlatır. <c>OnWindowLoaded</c> yalnız gerçek
+    /// pencere gösterildiğinde ateşlendiği için başsız ölçüm aynı yolu buradan çağırır.
+    /// </summary>
+    internal Task ProbeForMeasurement() => ProbeHardwareEncodersAsync();
+
     internal void LoadWithoutProbing(string path, MediaInfo info)
     {
         TxtFileName.Text = Path.GetFileName(path);

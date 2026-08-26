@@ -1,9 +1,29 @@
+using System.Diagnostics;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Threading;
+using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
+
+/// <summary>
+/// Gerçek ffmpeg yoklaması koşturan ölçümler. Anahtar yoksa test <b>atlanır</b>, sessizce
+/// geçmez — hiçbir şey sınamayan yeşil bırakmamak için.
+/// </summary>
+public sealed class LiveProbeFactAttribute : FactAttribute
+{
+    public LiveProbeFactAttribute()
+    {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_PROBE")))
+            Skip = "VIDSHRINK_LIVE_PROBE verilmedi, gerçek donanım yoklaması koşturulmadı.";
+        else if (!ToolLocator.IsAvailable(out _))
+            Skip = "ffmpeg bulunamadı, gerçek donanım yoklaması koşturulmadı.";
+    }
+}
 
 public class HardwareVerdictTests
 {
@@ -241,11 +261,9 @@ public class HardwareVerdictTests
     /// Bu makinenin gerçek kararı. VIDSHRINK_LIVE_PROBE verilmeden koşmaz; ffmpeg'i
     /// gerçekten çağırdığı için normal takımda sessizce döner.
     /// </summary>
-    [Fact]
+    [LiveProbeFact]
     public void LiveProbeDecidesOnThisMachine()
     {
-        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_PROBE"))) return;
-
         var source = new MediaInfo
         {
             FilePath = "hardware-probe.mp4",
@@ -297,5 +315,90 @@ public class HardwareVerdictTests
         {
             if (File.Exists(file)) File.Delete(file);
         }
+    }
+
+    /// <summary>
+    /// Pencereyi kurup ilk yerleşimi tamamlamak ne kadar sürüyor — bir kez yoklama koşarken,
+    /// bir kez yoklama hiç başlatılmadan. Ölçülen şey arayüzün beklediği süre, yoklamanın
+    /// süresi değil. Pencere gösterilmiyor; <see cref="AppHost"/> Avalonia'yı kendi
+    /// iş parçacığında kuruyor.
+    /// </summary>
+    [LiveProbeFact]
+    public void TheFirstLayoutDoesNotWaitForTheProbe()
+    {
+        var file = Path.Combine(Path.GetTempPath(), $"vidshrink-fastgpu-{Guid.NewGuid():N}.json");
+        var previous = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+        try
+        {
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", file);
+
+            // İlk pencere JIT ve kaynak sözlüğü maliyetini yutar; ölçülen hepsi sıcak.
+            AppHost.Run(() => LayOutFirstWindow(false));
+
+            // İlk yoklamalı tur ffmpeg'i gerçekten çağırır, sonrakiler _probed önbelleğini
+            // bulur — gerçek uygulamada da süreç başına tek yoklama var.
+            var withProbe = new List<double>();
+            var withoutProbe = new List<double>();
+            for (var round = 0; round < 5; round++)
+            {
+                withoutProbe.Add(AppHost.Run(() => LayOutFirstWindow(false)));
+                withProbe.Add(AppHost.Run(() => LayOutFirstWindow(true)));
+            }
+
+            _output.WriteLine($"first layout without probe: {string.Join(" / ", withoutProbe.Select(v => v.ToString("0.0")))} ms");
+            _output.WriteLine($"first layout with probe:    {string.Join(" / ", withProbe.Select(v => v.ToString("0.0")))} ms");
+            _output.WriteLine($"median without={Median(withoutProbe):0.0}ms with={Median(withProbe):0.0}ms difference={Median(withProbe) - Median(withoutProbe):0.0}ms");
+            _output.WriteLine($"spread of the probe-free runs={withoutProbe.Max() - withoutProbe.Min():0.0}ms");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", previous);
+            if (File.Exists(file)) File.Delete(file);
+        }
+    }
+
+    private static double Median(List<double> values)
+    {
+        var sorted = values.OrderBy(v => v).ToList();
+        return sorted.Count % 2 == 1
+            ? sorted[sorted.Count / 2]
+            : (sorted[sorted.Count / 2 - 1] + sorted[sorted.Count / 2]) / 2;
+    }
+
+    /// <summary>Pencereyi kurup ilk yerleşimi tamamlar, geçen duvar saatini ms olarak döndürür.</summary>
+    private static double LayOutFirstWindow(bool probe)
+    {
+        var clock = Stopwatch.StartNew();
+
+        var window = new MainWindow();
+        var probing = probe ? window.ProbeForMeasurement() : null;
+
+        Assert.True(window.TryFindResource("WindowPreferredWidth", out var width));
+        Assert.True(window.TryFindResource("WindowPreferredHeight", out var height));
+        var size = new Size((double)width!, (double)height!);
+
+        // Pencerenin kendi Width/Height değerleri ölçüm argümanını yutar.
+        window.Width = double.NaN;
+        window.Height = double.NaN;
+
+        window.Measure(size);
+        window.Arrange(new Rect(size));
+        window.UpdateLayout();
+
+        clock.Stop();
+
+        if (probing is not null)
+        {
+            // Yoklamanın arayüz iş parçacığına dönen kuyruğu ölçümden sonra boşaltılıyor;
+            // pencere gösterilmediği için işleri yürüten bir döngü yok.
+            var deadline = DateTime.UtcNow.AddSeconds(15);
+            while (!probing.IsCompleted && DateTime.UtcNow < deadline)
+            {
+                Dispatcher.UIThread.RunJobs();
+                Thread.Sleep(5);
+            }
+        }
+
+        return clock.Elapsed.TotalMilliseconds;
     }
 }
