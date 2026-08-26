@@ -25,3 +25,5 @@
 - [Bu makinenin ekranı](vidshrink-makine-ekrani.md) — 1024x768; başka makinede pinlenen yerleşim sayıları burada kırmızı
 - [Kök katman ölçüsü](avalonia-kok-katman-olcusu.md) — OverlayLayer başsız ölçümde 0x0; ölçüyü katman yöneticisinden oku
 - [Zamanlayıcı ölçümü](avalonia-zamanlayici-olcumu.md) — DispatcherTimer testte tik atmaz; karar kapısı ile çağrılan yolu ayrı ölç
+- [git add açık yolla](git-add-acik-yolla.md) — paralel ajanlar aynı indeksi paylaşıyor; -A başkasının dosyasını süpürür
+- [Pencere dışı fare](avalonia-pencere-disi-fare.md) — PointerMoved pencere dışında atmaz; çıkışı TopLevel'dan dinle
