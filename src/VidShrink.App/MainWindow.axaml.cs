@@ -93,6 +93,7 @@ public partial class MainWindow : Window
     private bool _languageApplied;
     private bool _hardwareProbed;
     private bool _hardwareEncoderAvailable;
+    private HardwareVerdict _hardwareVerdict = HardwareVerdict.NotProbed;
     private bool _motionReduced;
     private DropVisual _dropVisual = DropVisual.Idle;
     private DispatcherTimer? _recalculateTimer;
@@ -142,6 +143,7 @@ public partial class MainWindow : Window
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
         foreach (var check in new[] { ChkResolution, ChkFps, ChkFastGpu })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
@@ -574,8 +576,43 @@ public partial class MainWindow : Window
     }
 
     private void ApplyFastGpuTip()
+    {
         // Text yazmak koşuları silerdi: ipucu gövdesi aynı boyayıcıdan geçmeli.
-        => PaintBullets(TipFastGpu, Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish));
+        var body = Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish);
+        var verdict = FastGpuVerdictLine();
+        PaintBullets(TipFastGpu, verdict is null ? body : $"{body}\n{verdict}");
+    }
+
+    /// <summary>
+    /// Kutunun neden açıldığı ya da neden kapalı kaldığı. Ayrı bir pencere açılmaz; ölçüm
+    /// ipucunun son satırı olarak durur.
+    /// </summary>
+    private string? FastGpuVerdictLine()
+    {
+        var v = _hardwareVerdict;
+        switch (v.Reason)
+        {
+            // Gövdenin kendisi zaten donanım bulunamadığını yazıyor.
+            case HardwareVerdictReason.NotProbed:
+            case HardwareVerdictReason.NoHardwareEncoder:
+                return null;
+            case HardwareVerdictReason.ProbeFailed:
+                return T($"• {v.Codec} bulundu ama yoklama kodlaması geçmedi, hızlı düşür kapalı kaldı.",
+                         $"• {v.Codec} is present but the probe encode did not pass, so fast shrink stayed off.");
+            case HardwareVerdictReason.ProbeSlow:
+                return T($"• {v.Codec} yoklaması {v.ElapsedMs} ms sürdü, {HardwareVerdict.ProbeBudgetMs} ms bütçesinin üstünde; hızlı düşür kapalı kaldı.",
+                         $"• The {v.Codec} probe took {v.ElapsedMs} ms, past the {HardwareVerdict.ProbeBudgetMs} ms budget, so fast shrink stayed off.");
+            case HardwareVerdictReason.BitrateFloorTooHigh:
+                return T($"• {v.Codec} ancak {v.UsableBitrateK} kbit/s ve üstünü takip ediyor, plan {v.RequestedBitrateK} kbit/s istiyor; hızlı düşür kapalı kaldı.",
+                         $"• {v.Codec} only follows {v.UsableBitrateK} kbit/s and above while the plan asks for {v.RequestedBitrateK} kbit/s, so fast shrink stayed off.");
+            default:
+                return ChkFastGpu.IsChecked == true
+                    ? T($"• Hızlı düşür kendiliğinden açıldı: {v.Codec} yoklamayı {v.ElapsedMs} ms'de geçti ve istenen {v.RequestedBitrateK} kbit/s takip edebildiği {v.UsableBitrateK} kbit/s sınırının üstünde.",
+                        $"• Fast shrink turned itself on: {v.Codec} passed the probe in {v.ElapsedMs} ms and the requested {v.RequestedBitrateK} kbit/s sits above the {v.UsableBitrateK} kbit/s it can follow.")
+                    : T($"• {v.Codec} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.",
+                        $"• {v.Codec} passed the measurement; the box stays off because it was turned off by hand.");
+        }
+    }
 
     private async Task LoadFfmpegVersionAsync()
     {
@@ -853,31 +890,79 @@ public partial class MainWindow : Window
     {
         var available = false;
         IEncoderAvailability? encoders = null;
+        var verdict = HardwareVerdict.NotProbed;
 
         try
         {
-            (encoders, available) = await Task.Run(() =>
+            (encoders, available, verdict) = await Task.Run(() =>
             {
                 var capabilities = EncoderCapabilities.Instance;
                 var options = new PlanOptions { TargetMb = WhatsAppTargetMb, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
                 var plan = PlanCalculator.Build(HardwareProbeSource, options, capabilities);
-                return ((IEncoderAvailability?)capabilities, CodecModel.IsHardware(plan.Codec));
+                var probe = capabilities.Probe(plan.Codec);
+                var decision = HardwareVerdict.Decide(probe, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
+                return ((IEncoderAvailability?)capabilities, CodecModel.IsHardware(plan.Codec), decision);
             });
         }
         catch (Exception ex)
         {
             encoders = null;
             available = false;
+            verdict = HardwareVerdict.NotProbed;
             TxtSystemStatus.Text = $"{T("Donanım kodlayıcı yoklaması başarısız", "The hardware encoder probe failed")}: {ex.Message}";
         }
 
         _encoders = encoders;
         _hardwareProbed = true;
         _hardwareEncoderAvailable = available;
+        _hardwareVerdict = verdict;
+
+        var wasSyncing = _syncing;
+        _syncing = true;
         ChkFastGpu.IsEnabled = available;
-        if (!available) ChkFastGpu.IsChecked = false;
+        ChkFastGpu.IsChecked = available && ResolveFastGpuSetting(verdict);
+        _syncing = wasSyncing;
+
         ApplyFastGpuTip();
         Recalculate();
+    }
+
+    /// <summary>
+    /// Kararı ayar dosyasıyla buluşturur. Dosyada değer varsa yoklama onu ezmez; yoksa
+    /// bu açılışta bir kez yazılır ve bir daha yoklamaya sorulmaz.
+    /// </summary>
+    private bool ResolveFastGpuSetting(HardwareVerdict verdict)
+    {
+        try
+        {
+            var settings = UpdateSettings.Load();
+            if (HardwareVerdict.ReprobeRequested()) settings.FastGpu = null;
+            if (verdict.ApplyTo(settings)) settings.Save();
+            return settings.FastGpu == true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+            return false;
+        }
+    }
+
+    private void OnFastGpuChanged()
+    {
+        if (_syncing) return;
+        try
+        {
+            var settings = UpdateSettings.Load();
+            var enabled = ChkFastGpu.IsChecked == true;
+            if (settings.FastGpu == enabled) return;
+            settings.FastGpu = enabled;
+            settings.Save();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+        }
+        ApplyFastGpuTip();
     }
 
     private PlanOptions CurrentOptions() => new()

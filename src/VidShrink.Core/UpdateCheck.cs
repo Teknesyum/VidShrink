@@ -223,6 +223,13 @@ public sealed class UpdateSettings
     /// <summary>Windows'ta varsayılan açık. Kapalıyken uygulama yalnız haber verir.</summary>
     public bool AutoUpdate { get; set; } = true;
 
+    /// <summary>
+    /// Hızlı düşür (GPU) kutusunun durumu. Alan yoksa karar henüz verilmemiştir; ilk
+    /// açılışta donanım yoklaması karar verir ve buraya yazar. Değer bir kez yazıldıktan
+    /// sonra program üstüne yazmaz — kullanıcı kutuyu elle değiştirdiyse o karar kalır.
+    /// </summary>
+    public bool? FastGpu { get; set; }
+
     /// <summary>VIDSHRINK_SETTINGS_PATH yalnız ölçüm ve deneme için ayarı başka yere alır.</summary>
     public static string DefaultPath
     {
@@ -250,6 +257,11 @@ public sealed class UpdateSettings
             {
                 settings.AutoUpdate = value.GetBoolean();
             }
+            if (document.RootElement.TryGetProperty("fastGpu", out var fastGpu) &&
+                (fastGpu.ValueKind == JsonValueKind.True || fastGpu.ValueKind == JsonValueKind.False))
+            {
+                settings.FastGpu = fastGpu.GetBoolean();
+            }
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
@@ -268,6 +280,7 @@ public sealed class UpdateSettings
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
         writer.WriteStartObject();
         writer.WriteBoolean("autoUpdate", AutoUpdate);
+        if (FastGpu.HasValue) writer.WriteBoolean("fastGpu", FastGpu.Value);
         writer.WriteEndObject();
         writer.Flush();
     }

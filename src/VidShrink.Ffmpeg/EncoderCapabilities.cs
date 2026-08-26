@@ -9,7 +9,7 @@ public sealed class EncoderCapabilities : IEncoderAvailability
 
     public static EncoderCapabilities Instance => LazyInstance.Value;
 
-    private readonly Dictionary<string, bool> _probed = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, EncoderProbeResult> _probed = new(StringComparer.OrdinalIgnoreCase);
 
     public IReadOnlySet<string> Encoders { get; }
     public IReadOnlySet<string> Filters { get; }
@@ -25,18 +25,33 @@ public sealed class EncoderCapabilities : IEncoderAvailability
     public bool HasEncoder(string name) => Encoders.Contains(name);
     public bool HasFilter(string name) => Filters.Contains(name);
 
-    public bool WorksAsEncoder(string codec)
+    public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
+
+    /// <summary>
+    /// Yoklamanın sonucu ve süresi. Süre karar için gerekli: yoklama geçse bile sürücü
+    /// içinde geri düşe düşe tamamlanan bir yol hızlı sayılmaz. Sonuç önbelleğe alınır,
+    /// bir kodlayıcı süreç ömrü boyunca bir kez yoklanır.
+    /// </summary>
+    public EncoderProbeResult Probe(string codec)
     {
         lock (_probed)
         {
             if (_probed.TryGetValue(codec, out var cached)) return cached;
-            var works = HasEncoder(codec) && ProbeEncoder(codec);
-            _probed[codec] = works;
-            return works;
+            var result = HasEncoder(codec) ? ProbeEncoder(codec) : EncoderProbeResult.Missing(codec);
+            _probed[codec] = result;
+            return result;
         }
     }
 
-    private static bool ProbeEncoder(string codec)
+    private static EncoderProbeResult ProbeEncoder(string codec)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var succeeded = RunProbe(codec);
+        stopwatch.Stop();
+        return new EncoderProbeResult(codec, succeeded, stopwatch.ElapsedMilliseconds);
+    }
+
+    private static bool RunProbe(string codec)
     {
         try
         {
