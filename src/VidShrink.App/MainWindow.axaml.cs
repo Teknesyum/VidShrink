@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -1488,33 +1488,46 @@ public partial class MainWindow : Window
 
         foreach (var note in advice.Notes.Distinct())
         {
-            var text = note switch
-            {
-                AdviceCode.BudgetIsGenerous => T("Hedef bu kaynak için bol; motor bütçeyi zorlanmadan karşılıyor.", "The target is generous for this source, so the engine meets it without strain."),
-                AdviceCode.CodecUpgradeRecommended => T("Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya H.265 yapmayı düşün.", "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or H.265."),
-                AdviceCode.HardwareCodecCostsQuality => T("Donanım kodlayıcısı hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; hızlı düşür (GPU) kapalıyken sonuç daha iyi görünür.", "The hardware encoder is fast but loses noticeable quality per megabyte at a target this tight; the result looks better with fast shrink (GPU) turned off."),
-                AdviceCode.ExtremeRatioWarning => T("Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.", "Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable."),
-                AdviceCode.ContentIsSimple => T("İçerik sade ölçüldü; hedefin altında rahat kalınıyor.", "The content measured as simple, so the target is met with room to spare."),
-                AdviceCode.ContentIsComplex => T("İçerik yoğun ölçüldü; bit bütçesi bu yüzden zorlanıyor.", "The content measured as detail-heavy, which is why the bit budget is tight."),
-                AdviceCode.ScaleSavesMuch => T("Bu klipte çözünürlük düşürmek çok bit kazandırıyor.", "Scaling down frees a lot of bits on this particular clip."),
-                AdviceCode.ScaleSavesLittle => T("Bu klipte çözünürlük düşürmek az kazandırıyor; çözünürlük korunuyor.", "Scaling down frees little on this clip, so resolution is preserved."),
-                AdviceCode.ResolutionReduced => T("Bütçeye sığmak için çözünürlük düşürüldü.", "Resolution was lowered so the picture fits the budget."),
-                AdviceCode.FrameRateReduced => T("Kalan karelere bit kazandırmak için kare hızı düşürüldü.", "Frame rate was lowered to free bits for the frames that remain."),
-                AdviceCode.TargetEnforcedTwoPass => T("Hedef boyutu tutturmak için iki geçişli kodlama kullanılıyor.", "Two-pass encoding is used so the target size is actually hit."),
-                AdviceCode.QualityCeilingReached => T("Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.", "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see."),
-                AdviceCode.AudioReduced => T("Görüntüye bit kalsın diye ses bit hızı düşürüldü.", "The audio bitrate was lowered so more bits are left for the picture."),
-                AdviceCode.AudioMono => T("Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.", "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture."),
-                AdviceCode.AudioDropped => T("Bu boyutta ses tutulamıyor, çıkarıldı.", "Audio cannot fit at this size and was removed."),
-                AdviceCode.EncoderFallback => ChkFastGpu.IsChecked == true
-                    ? T("Hızlı düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.", "Fast shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.")
-                    : T("Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.", "The preferred encoder is not available on this ffmpeg build; falling back to a software encoder."),
-                AdviceCode.HdrTonemapped => T("Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.", "The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709."),
-                _ => null
-            };
+            var text = AdviceLine(note, _turkish, ChkFastGpu.IsChecked == true);
             if (text is not null) lines.Add(text);
         }
 
         return lines;
+    }
+
+    internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
+
+    internal static string? AdviceLine(AdviceCode note, bool turkish, bool fastGpu)
+    {
+        string T(string tr, string en) => LanguageCatalog.Title(turkish ? tr : en, turkish);
+
+        return note switch
+        {
+            AdviceCode.BudgetIsGenerous => T("Hedef bu kaynak için bol; motor bütçeyi zorlanmadan karşılıyor.", "The target is generous for this source, so the engine meets it without strain."),
+            AdviceCode.CodecUpgradeRecommended => T("Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya H.265 yapmayı düşün.", "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or H.265."),
+            AdviceCode.HardwareCodecCostsQuality => T("Donanım kodlayıcısı hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; hızlı düşür (GPU) kapalıyken sonuç daha iyi görünür.", "The hardware encoder is fast but loses noticeable quality per megabyte at a target this tight; the result looks better with fast shrink (GPU) turned off."),
+            AdviceCode.ExtremeRatioWarning => T("Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.", "Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable."),
+            AdviceCode.TargetBelowCodecFloor => T("Bu hedef bu kaynak için gerçekten çok küçük: hiçbir düzen kodlayıcının anlamlı bir görüntü için gereken piksel başına bit yoğunluğuna ulaşmıyor. En yoğun düzen seçildi ama sonuç belirgin şekilde bozuk çıkacak; hedefi büyütmek tek gerçek çare.", "This target is genuinely too small for this source: no layout reaches the bits per pixel the encoder needs for a meaningful picture. The densest layout was taken, but the result will look visibly broken; raising the target is the only real fix."),
+            AdviceCode.FrameRateCutForFloor => T("Kaynak kare hızında her kare kodlayıcının taban yoğunluğunun altına düşerdi; kare hızı düşürüldü ve kazanılan bitler kalan karelere gitti.", "At the source frame rate every frame would fall below the density the encoder needs, so the frame rate was cut and the freed bits went to the frames that remain."),
+            AdviceCode.MotionCutIsCheap => T("Ölçüm bu klipte hareketin az olduğunu söylüyor; kare hızını düşürmek çok bit kazandırıyor ve kayıp zor fark ediliyor.", "The measurement shows little motion in this clip, so cutting the frame rate frees a lot of bits and the loss is hard to notice."),
+            AdviceCode.MotionCutIsExpensive => T("Ölçüm bu klipte hareketin yoğun olduğunu söylüyor; kare düşürmek az kazandırdığı için önce çözünürlükten kısılıyor.", "The measurement shows heavy motion in this clip, so dropping frames buys little and resolution is cut before the frame rate is."),
+            AdviceCode.ContentIsSimple => T("İçerik sade ölçüldü; hedefin altında rahat kalınıyor.", "The content measured as simple, so the target is met with room to spare."),
+            AdviceCode.ContentIsComplex => T("İçerik yoğun ölçüldü; bit bütçesi bu yüzden zorlanıyor.", "The content measured as detail-heavy, which is why the bit budget is tight."),
+            AdviceCode.ScaleSavesMuch => T("Bu klipte çözünürlük düşürmek çok bit kazandırıyor.", "Scaling down frees a lot of bits on this particular clip."),
+            AdviceCode.ScaleSavesLittle => T("Bu klipte çözünürlük düşürmek az kazandırıyor; çözünürlük korunuyor.", "Scaling down frees little on this clip, so resolution is preserved."),
+            AdviceCode.ResolutionReduced => T("Bütçeye sığmak için çözünürlük düşürüldü.", "Resolution was lowered so the picture fits the budget."),
+            AdviceCode.FrameRateReduced => T("Kalan karelere bit kazandırmak için kare hızı düşürüldü.", "Frame rate was lowered to free bits for the frames that remain."),
+            AdviceCode.TargetEnforcedTwoPass => T("Hedef boyutu tutturmak için iki geçişli kodlama kullanılıyor.", "Two-pass encoding is used so the target size is actually hit."),
+            AdviceCode.QualityCeilingReached => T("Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.", "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see."),
+            AdviceCode.AudioReduced => T("Görüntüye bit kalsın diye ses bit hızı düşürüldü.", "The audio bitrate was lowered so more bits are left for the picture."),
+            AdviceCode.AudioMono => T("Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.", "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture."),
+            AdviceCode.AudioDropped => T("Bu boyutta ses tutulamıyor, çıkarıldı.", "Audio cannot fit at this size and was removed."),
+            AdviceCode.EncoderFallback => fastGpu
+                ? T("Hızlı düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.", "Fast shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.")
+                : T("Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.", "The preferred encoder is not available on this ffmpeg build; falling back to a software encoder."),
+            AdviceCode.HdrTonemapped => T("Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.", "The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709."),
+            _ => null
+        };
     }
 
     private static string BuildUniqueOutputPath(string inputPath, string suffix, string extension)
