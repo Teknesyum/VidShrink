@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using Xunit.Abstractions;
@@ -457,8 +457,7 @@ public sealed class HardwareRateControlTests
     private async Task RunLiveTargetAsync(double targetMb, SpeedMode speed)
     {
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
-        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
+        var outDir = TestPaths.LiveOut("canli");
         Directory.CreateDirectory(outDir);
         var outputPath = Path.Combine(outDir, $"rate_{speed}_{targetMb:0.#}mb.mp4");
 

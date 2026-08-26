@@ -358,8 +358,7 @@ public sealed class CalibrationProbeTests
     public async Task LiveEncodeTimeMatchesTheMeasuredEstimate(double targetMb)
     {
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
-        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
+        var outDir = TestPaths.LiveOut("canli");
         Directory.CreateDirectory(outDir);
         var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_time_{targetMb:0.#}mb.mp4");
 
@@ -416,8 +415,7 @@ public sealed class CalibrationProbeTests
     public async Task LiveFastModeLandsInsideTheBandOnTheFirstAttempt(double targetMb)
     {
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
-        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
+        var outDir = TestPaths.LiveOut("canli");
         Directory.CreateDirectory(outDir);
         var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_fast_{targetMb:0.#}mb.mp4");
 

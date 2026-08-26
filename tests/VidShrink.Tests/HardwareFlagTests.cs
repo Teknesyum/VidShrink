@@ -1,4 +1,4 @@
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -181,8 +181,7 @@ public sealed class HardwareFlagTests
     public async Task LiveFastRunDoesNotSpendEveryAttempt(double targetMb)
     {
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
-        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
+        var outDir = TestPaths.LiveOut("canli");
         Directory.CreateDirectory(outDir);
         var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_fastflag_{targetMb:0.#}mb.mp4");
 

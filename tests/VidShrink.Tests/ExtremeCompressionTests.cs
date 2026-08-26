@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -240,8 +240,7 @@ public sealed class ExtremeCompressionTests
     public async Task LiveExtremeTargetsProduceAPlayablePicture(double targetMb)
     {
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
-        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_extreme");
+        var outDir = TestPaths.LiveOut("asiri-sikistirma");
         Directory.CreateDirectory(outDir);
         var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_{targetMb:0.#}mb.mp4");
 

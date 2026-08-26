@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
+
 using Xunit.Sdk;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -475,8 +476,7 @@ public sealed class FillBandTests
     {
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
 
-        var outDir = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_OUT")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "vidshrink_live");
+        var outDir = TestPaths.LiveOut("canli");
         Directory.CreateDirectory(outDir);
         var outputPath = Path.Combine(outDir, $"{Path.GetFileNameWithoutExtension(source)}_fill_{targetMb:0.#}mb.mp4");
 
