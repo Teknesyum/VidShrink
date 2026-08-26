@@ -1,0 +1,26 @@
+{
+  "contractId": "T45",
+  "auditorRunId": "a0745f085e9f00cfc",
+  "headSha": "0b734eab931220669e4c5be0c6e040752d7665ae",
+  "diffHash": "f07e421afa37665026eff6502063747b5e1e8e3b8b29fa236de9bba3ce3a9fa5",
+  "owns": [
+    "Install-VidShrink.ps1",
+    "install-vidshrink.sh",
+    ".github/workflows/release.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "tests/VidShrink.Tests/InstallerTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 uyari 0 hata",
+    "dotnet test basarisiz 0, basarili 553, atlanan 16, toplam 569",
+    "InstallerTests 15 olcum yesil, 9 Fact + 1 Theory, sessiz yesil yok",
+    "yasakli iz sayimi 0: dotnet publish, dotnet-install, Find-DotNetSdk8, Install-DotNetSdk8, archive/refs/heads/main, win-arm64, win-x86",
+    "sira dogrulandi indir 145-147, sagla 150-152, ac 158-159, update-version 163, duzen denetimi 184-186",
+    "KOSTURULMADI: betikler calistirilmadi, release.yml etiket olmadan kosturulamadi, basaltici Linux caprazi olculmedi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-26T19:43:47.181Z",
+  "usedAt": "2026-08-26T19:43:47.249Z",
+  "completedSha": "0b734eab931220669e4c5be0c6e040752d7665ae"
+}
