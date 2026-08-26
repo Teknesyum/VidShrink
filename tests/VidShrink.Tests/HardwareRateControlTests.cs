@@ -438,6 +438,7 @@ public sealed class HardwareRateControlTests
     /// already do. Runs the measuring round the way the window runs it and encodes for real.
     /// </summary>
     [LiveSourceTheory]
+    [InlineData(180.0)]
     [InlineData(100.0)]
     [InlineData(50.0)]
     [InlineData(25.0)]

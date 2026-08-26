@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 
 namespace VidShrink.Core;
@@ -79,7 +79,6 @@ public static class FfmpegArguments
     {
         if (!CodecModel.IsHardware(codec)) return WidePeakFactor;
         var floorK = CodecModel.MinBitrateK(codec, width, height, fps);
-        if (floorK <= 0) return TightPeakFactor;
         var opening = ((double)videoBitrateK / floorK - PeakOpensAtFloorRatio) / (PeakWidestAtFloorRatio - PeakOpensAtFloorRatio);
         return Math.Clamp(TightPeakFactor + (HardwarePeakCeiling - TightPeakFactor) * opening, TightPeakFactor, HardwarePeakCeiling);
     }
