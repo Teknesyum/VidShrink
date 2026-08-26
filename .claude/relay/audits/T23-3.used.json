@@ -1,7 +1,7 @@
 {
   "contractId": "T23",
   "auditorRunId": "aacc357a81a8cd1df",
-  "headSha": "1c5556623a018b88f55e2a58ad86e9ced0bf784b",
+  "headSha": "e69160595071ad06dec550bff7da2444d58e6407",
   "diffHash": "826c5619687b2c6dc7cd2b0e2683d8891c69eab8196cc8c52c71f177096cb88f",
   "owns": [
     "src/VidShrink.App/MainWindow.axaml",
@@ -16,5 +16,7 @@
     "dotnet test: 446 basarili, 0 basarisiz, 14 atlanan"
   ],
   "result": "GECTI",
-  "createdAt": "2026-08-26T05:52:30.466Z"
+  "createdAt": "2026-08-26T05:52:30.675Z",
+  "usedAt": "2026-08-26T05:52:30.756Z",
+  "completedSha": "e69160595071ad06dec550bff7da2444d58e6407"
 }
