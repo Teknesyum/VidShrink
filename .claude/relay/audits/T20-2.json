@@ -1,0 +1,18 @@
+{
+  "contractId": "T20",
+  "auditorRunId": "abd03523831b5845b",
+  "headSha": "92a3c0be212924eb51a96a4265b4d3e4acbf76b5",
+  "diffHash": "65a3aa6a122a146792859594340f991eb41cbda5d4122f0676e6d14a015af2db",
+  "owns": [
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/HardwareRateControlTests.cs",
+    "src/VidShrink.Core/CodecModel.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release: 0 uyari 0 hata",
+    "dotnet test: 446 basarili, 0 basarisiz, 14 atlanan"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-26T07:40:54.925Z"
+}
