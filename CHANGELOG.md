@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-26
+
 ### Changed
 
 - Both installers download the published release instead of building it. They ask GitHub
@@ -34,6 +36,21 @@ ship as part of it.
   what the shortcuts point at and what applies an update before the application is loaded;
   releases carried the application only, so an installer that stops compiling had nowhere
   to get it from.
+- The preview panel grows in three steps instead of two. Zooming used to enlarge the video
+  inside a panel that kept its band height until the video hit maximum, at which point the
+  panel jumped over the others. There is now a middle step at 90% of the window between the
+  two, with hysteresis on both descents so a notch of scroll cannot make the panel flicker
+  between steps.
+- The preview panel returns to its band on its own. Two seconds after the pointer leaves
+  it — including when the pointer leaves the window entirely — it descends to the size it
+  opened at. Dragging the separator, panning, and keyboard focus inside the panel hold the
+  countdown.
+
+### Fixed
+
+- The blue outline is visible at the preview panel's corners while it is collapsed. The
+  stage behind it painted a square background over the rounded border; the stage is now
+  clipped to the same 16px radius, which covers its children as well.
 
 ## [0.1.0] - 2026-08-26
 
