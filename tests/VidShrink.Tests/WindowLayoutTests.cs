@@ -428,53 +428,125 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Plan paneli tavanı devrede — <b>satırın izin verdiği yerde</b>.
+    /// Plan paneli <b>içeriği kadar</b>; tabanı ile tavanı arasında.
     ///
-    /// <para>T51/K3: ölçümün önceki hâli tavanın dolu sayfada da bağlayıcı olmasını
-    /// bekliyordu ve 512 yerine 492 ölçtü. Yirmi pikselin nereye gittiği ölçüldü ve
-    /// <b>rozetle ilgisi yok</b>: önizleme bloğu iki durumda da 294 piksel. Fark sol ayar
-    /// sütununda — bırakma alanı dosya yüklenince kalktığı için sol sütun 834'ten 802'ye
-    /// iniyor. Üç sütunlu ızgara bütün sütunları en uzununa göre geriyor, dolayısıyla
-    /// orta sütun da 32 piksel kısalıyor ve plan satırına panele bırakacak 518 değil 492
-    /// piksel kalıyor. Tavan bağlayıcı olmaktan çıkıyor, paneli satırın kendisi tutuyor.</para>
+    /// <para>T54/K4 düzeni bunu tersine çevirdi. Eskiden orta sütunun esneyen satırı plan
+    /// panelindeydi: panel satırın bıraktığı yere geriliyor, önizleme <c>Auto</c> satırda
+    /// yalnız istediğini alıyordu ve ikisinin arasında kimseye gitmeyen boşluk kalıyordu.
+    /// Bugün esneyen satır önizlemenin, plan paneli <c>Auto</c> satırda ve boyu kendi
+    /// içeriğinden geliyor.</para>
     ///
-    /// <para>Ölçüm bunu olduğu gibi söylüyor: panelin boyu her durumda <b>satırın bıraktığı
-    /// yer ile tavanın küçüğü</b>. Tavanın kaldırıldığı bir kurulumda boş sayfadaki panel
-    /// 518'e uzar ve ölçüm kırmızıya düşer — yani tavanın nöbeti duruyor.</para>
+    /// <para>Ölçülen (tasarım boyutunda): boş sayfada panel 320 — içerik 31 piksel, paneli
+    /// tutan şey <c>PlanPanelMinHeight</c>. Dolu sayfada panel 366, içerik 278; taban da
+    /// tavan da bağlamıyor, boyu içerik veriyor. İki durumda da içerik panele sığıyor,
+    /// <c>PlanScroll</c> kaymıyor.</para>
+    ///
+    /// <para><b>Bu ölçü neyi koruyor:</b> panelin artan yeri yutmamasını. <b>Bozulursa
+    /// kullanıcı ne görür:</b> panel yeniden gerilirse önizleme <c>Auto</c> satıra düşer,
+    /// küçük kalır ve plan panelinin altında kullanılmayan boşluk belirir — kullanıcının
+    /// şikâyeti buydu.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void ThePlanPanelTakesTheSmallerOfTheCeilingAndItsRow(bool loaded)
+    public void ThePlanPanelIsSizedByItsContentBetweenItsFloorAndItsCeiling(bool loaded)
     {
-        var (ceiling, panelHeight, roomInRow, content) = PlanPanelLayout(loaded);
+        var layout = PlanPanelLayout(loaded, reasons: false);
 
-        Assert.Equal(Math.Min(roomInRow, ceiling), panelHeight, 1);
+        Assert.InRange(layout.PanelHeight, layout.Floor, layout.Ceiling);
         Assert.True(
-            content < panelHeight,
-            $"Plan içeriği ({content:0.#}) panelin boyunu ({panelHeight:0.#}) aştı; taşma PlanScroll'a düşüyor.");
+            layout.ScrollExtent <= layout.ScrollViewport + 0.5,
+            $"Plan içeriği ({layout.ScrollExtent:0.#}) görüş alanını ({layout.ScrollViewport:0.#}) aştı; "
+            + "katlı hâlde taşma beklenmiyor.");
+
+        if (!loaded)
+        {
+            // İçerik 31 piksel; paneli tutan tek şey taban.
+            Assert.Equal(layout.Floor, layout.PanelHeight, 1);
+            return;
+        }
+
+        Assert.True(
+            layout.PanelHeight > layout.Floor && layout.PanelHeight < layout.Ceiling,
+            $"Dolu sayfada panel {layout.PanelHeight:0.#}; taban {layout.Floor:0} ile tavan "
+            + $"{layout.Ceiling:0} arasında, içeriğinin belirlediği bir boy bekleniyordu. Panel "
+            + "tavana oturuyorsa satır yeniden geriliyor demektir.");
     }
 
-    // T52: burada "plan paneli tavanı en az bir durumda bağlayıcıdır" diyen bir ölçü
-    // vardı (ThePlanPanelCeilingIsEngagedWhereTheRowIsTallEnough) ve silindi. İddiası
-    // bugün yanlış: oynatma panelinin taban boyu ikiye katlanınca satır plan paneline boş
-    // sayfada 375, dolu sayfada daha az yer bırakıyor, yani PlanPanelMaxHeight (512)
-    // hiçbir durumda bağlamıyor. Ölçü bir şeyi korumuyordu; tavanın davranışı zaten
-    // ThePlanPanelTakesTheSmallerOfTheCeilingAndItsRow ile korunuyor — panel her zaman
-    // satırın bıraktığı yer ile tavanın küçüğü kadar. Tavan bağlayıcı olmaya dönerse o
-    // ölçü bunu yakalar. Belirtecin ölü kalıp kalmayacağı orta sütun düzeninin işi (T54).
+    /// <summary>
+    /// Uzun plan tavanda durur ve taşmayı kendi kaydırıcısına verir.
+    ///
+    /// <para>T52 <c>PlanPanelMaxHeight</c>'ın hiçbir yerleşimde bağlamadığını ölçtü ve
+    /// belirtecin ölü kalıp kalmayacağı kararını orta sütun düzenine (T54) bıraktı. Karar:
+    /// <b>belirteç kalıyor ve bu ölçüyle nöbete bağlanıyor.</b> Yeni düzende plan paneli
+    /// içeriği kadar uzadığı için tavan gerçek bir iş yapıyor — gerekçeler açıldığında
+    /// içerik 738 piksel istiyor, panel 512'de duruyor ve fark <c>PlanScroll</c>'a düşüyor.
+    /// Tavan olmasaydı panel yedi yüz pikselin üstüne çıkar, esneyen satırdaki önizlemeyi
+    /// kendi tabanının altına iterdi.</para>
+    ///
+    /// <para><b>Bu ölçü neyi koruyor:</b> uzun planın önizlemeyi ezmemesini.
+    /// <b>Bozulursa kullanıcı ne görür:</b> gerekçeleri açtığı anda önizleme küçülür ya da
+    /// sayfa kaymaya başlar; ikisi de bugün olmuyor.</para>
+    /// </summary>
+    [Fact]
+    public void TheCeilingStopsALongPlanAndHandsTheOverflowToItsOwnScroller()
+    {
+        var layout = PlanPanelLayout(loaded: true, reasons: true);
 
-    private static (double Ceiling, double PanelHeight, double RoomInRow, double Content) PlanPanelLayout(bool loaded) =>
-        Read(DesignSize(), loaded, window =>
+        Assert.Equal(layout.Ceiling, layout.PanelHeight, 1);
+        Assert.True(
+            layout.ScrollExtent > layout.ScrollViewport + 0.5,
+            $"Gerekçeler açıkken içerik ({layout.ScrollExtent:0.#}) görüş alanına "
+            + $"({layout.ScrollViewport:0.#}) sığdı; tavan bu hâlde de bağlamıyorsa ölçü bir şey "
+            + "korumuyor demektir.");
+        Assert.True(
+            layout.PreviewHeight >= layout.PreviewFloor - 0.5,
+            $"Önizleme {layout.PreviewHeight:0.#}; kendi tabanının ({layout.PreviewFloor:0}) altına "
+            + "indi, yani uzun plan onu ezdi.");
+    }
+
+    private readonly record struct PlanLayout(
+        double Floor,
+        double Ceiling,
+        double PanelHeight,
+        double ScrollViewport,
+        double ScrollExtent,
+        double PreviewHeight,
+        double PreviewFloor);
+
+    /// <summary>
+    /// Plan paneli ile önizlemenin tasarım boyutundaki ölçüleri. Hiçbir sayı buraya elle
+    /// yazılmıyor; taban, tavan ve önizleme tabanı <c>Theme</c> belirteçlerinden okunuyor.
+    /// </summary>
+    private static PlanLayout PlanPanelLayout(bool loaded, bool reasons) =>
+        AppHost.Run(() =>
         {
-            var panel = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
-            var body = window.GetVisualDescendants().OfType<StackPanel>().Single(b => b.Name == "PlanBody");
-            var column = panel.GetVisualAncestors().OfType<Grid>().First(g => g.RowDefinitions.Count == 2);
-            window.TryFindResource("PlanPanelMaxHeight", out var value);
+            var window = new MainWindow();
+            if (loaded)
+            {
+                window.LoadWithoutProbing(SamplePath, Sample());
+                window.SettleFades();
+            }
 
-            // Satırın panele bıraktığı yer: sütunun boyundan panelin sütun içindeki
-            // başlangıcı düşülür. Üstünde önizleme paneli ve başlığı duruyor.
-            return ((double)value!, panel.Bounds.Height, column.Bounds.Height - panel.Bounds.Y, body.DesiredSize.Height);
+            if (reasons) window.ExpandPlanReasons();
+            LayOutAt(window, DesignSize());
+
+            var panel = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
+            var scroll = window.GetVisualDescendants().OfType<ScrollViewer>().Single(v => v.Name == "PlanScroll");
+            var preview = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "Shell");
+
+            window.TryFindResource("PlanPanelMinHeight", out var floor);
+            window.TryFindResource("PlanPanelMaxHeight", out var ceiling);
+            window.TryFindResource(loaded ? "PlaybackStageMinHeight" : "PlaybackIdleMinHeight", out var previewFloor);
+
+            return new PlanLayout(
+                (double)floor!,
+                (double)ceiling!,
+                panel.Bounds.Height,
+                scroll.Viewport.Height,
+                scroll.Extent.Height,
+                preview.Bounds.Height,
+                (double)previewFloor!);
         });
 
     /// <summary>

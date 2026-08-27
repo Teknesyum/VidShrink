@@ -6,3 +6,5 @@
 - [Kalite/boyut tekduze degil](kalite-boyut-tekduze-degil.md) — PredictedQuality hedef MB ile ters donuyor; arama kalibi ve surekli kirmizi WindowLayoutTests tabani
 - [Worktree Bash kısıtı](worktree-bash-kisiti.md) — izole ajanda bileşik Bash komutu reddedilir; betiği worktree içine yaz, tek satır koştur
 - [Worktree sözleşme yazma](worktree-sozlesme-yazma.md) — sözleşme ana checkout'ta kalır; Edit ve heredoc reddedilir, Write + cat >> tek yol
+- [Pencere testleri kaynak metinden](vidshrink-pencere-testleri-kaynak-metinden.md) — MainWindow acilamiyor; is mantigini Avalonia'siz internal sinifa cikar, bagliligi metinden olc
+- [Ikiz Share turleri](vidshrink-app-ikiz-share-turleri.md) — App ve Core ayni adla iki ShareTarget tasiyor; test tarafinda alias sart

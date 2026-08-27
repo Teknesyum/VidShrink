@@ -152,12 +152,25 @@ public sealed class ChipTests
         window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == name);
 
     /// <summary>
-    /// T46/K2: önizleme yokken panel bırakma alanı ölçüsünde değil, panel tabanında.
-    /// T52/K3: o taban panel tabanının iki katına çıktı (144 → 256 → 512). Sayı testte
-    /// sabitlenmiyor, <c>PanelMinHeight</c>'tan türetiliyor; kat değişirse test de kayar.
+    /// Boş önizleme paneli tabanının <b>altına inmez</b> ve tasarım boyutunda artan yeri
+    /// alır.
+    ///
+    /// <para>T46/K2 bu ölçüyü "panel bırakma alanı ölçüsünde değil, panel tabanında" diye
+    /// kurdu; T52 tabanı 144 → 256 → 512 diye iki katına çıkardı. T54/K4 orta sütunun
+    /// esneyen satırını plan panelinden önizlemeye aldı, dolayısıyla panel artık tabanına
+    /// <b>oturmuyor</b>, tabanının üstünde artan yer kadar uzuyor: ölçülen 603, taban 512.</para>
+    ///
+    /// <para><b>Bu ölçü neyi koruyor:</b> iki yönü birden. Aşağı yönü — panel hiçbir
+    /// durumda tabanının altına inmez, yani bırakma alanı kalkınca eskisi gibi çökmez.
+    /// Yukarı yönü — sütunda artan yer varken panel onu alır. <b>Bozulursa kullanıcı ne
+    /// görür:</b> taban kırılırsa boş önizleme yeniden bir şerit kadar kalır; esneme
+    /// kırılırsa panel tam tabanında durur ve altında kullanılmayan boşluk belirir.</para>
+    ///
+    /// <para>Sayı testte sabitlenmiyor: taban <c>PanelMinHeight</c>'tan türetiliyor, kat
+    /// değişirse ölçü de kayar.</para>
     /// </summary>
     [Fact]
-    public void BosPanelPanelTabaninaOturur()
+    public void BosPanelTabaninaOturmazAmaAltinaDaInmez()
     {
         var (height, token, basis) = Read(window =>
         {
@@ -168,7 +181,10 @@ public sealed class ChipTests
         });
 
         Assert.Equal(basis * 2, token);
-        Assert.Equal(token, height);
+        Assert.True(
+            height > token,
+            $"Boş önizleme paneli {height:0.#}; tabanı ({token:0}) aşmadı. Orta sütunun esneyen "
+            + "satırı önizlemede değilse panel tam tabanında durur ve altında ölü boşluk kalır.");
     }
 
     // T52: burada "boş panel yükselirken plan paneli daralmadı" diyen bir ölçü vardı

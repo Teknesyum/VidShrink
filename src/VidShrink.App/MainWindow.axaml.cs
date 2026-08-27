@@ -24,6 +24,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using VidShrink.App.Playback;
 using VidShrink.Core;
+using CoreShare = VidShrink.Core.Share;
 using VidShrink.Ffmpeg;
 using VidShrink.Ffmpeg.Playback;
 
@@ -109,6 +110,9 @@ public partial class MainWindow : Window
     private string? _noticeVersion;
     private AppliedUpdateNotice? _appliedNotice;
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
+    private CoreShare.ShareTargetTable? _shareEndpoints;
+    private CoreShare.IHttpTransport? _shareTransport;
+    private ShareFlow? _shareFlow;
     private PanelHost? _preview;
 
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
@@ -680,6 +684,12 @@ public partial class MainWindow : Window
         ReportAppliedUpdate();
     }
 
+    /// <summary>
+    /// Kendini güncelleyen uygulama yeniden başlar, bu yüzden "geçildi" bilgisi bellekte
+    /// tutulamaz: başlatıcının bıraktığı işaret dosyası okunur. İşaret <b>yalnız kullanıcı
+    /// şeridi kapatınca</b> silinir; şerit görüldüğü anda silinseydi, kullanıcı okumadan
+    /// pencereyi kapattığında bilgi bir daha hiç görünmezdi.
+    /// </summary>
     private void ReportAppliedUpdate()
     {
         _appliedNotice = new AppliedUpdateNotice(AppContext.BaseDirectory);
@@ -687,12 +697,6 @@ public partial class MainWindow : Window
 
         TxtAppliedVersion.Text = _appliedNotice.Version!;
         AppliedNotice.IsVisible = true;
-        Dispatcher.UIThread.Post(ClearAppliedMarker, DispatcherPriority.Background);
-    }
-
-    private void ClearAppliedMarker()
-    {
-        if (AppliedNotice.IsVisible) _appliedNotice?.Shown();
     }
 
     private void OnDismissAppliedNotice(object? sender, RoutedEventArgs e)
@@ -782,6 +786,144 @@ public partial class MainWindow : Window
                 : T(
                     $"{target.DisplayName} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz.",
                     $"{target.DisplayName} hands out no delete token, so neither you nor VidShrink can close the link early.");
+    }
+
+    /// <summary>
+    /// Yüklemenin konuştuğu hedef satırı. Ayarlardaki liste yalnız görüneni okuyor, uç
+    /// noktalar motorun tablosunda duruyor; ikisi aynı dosyadan gelir ve kimlikle eşlenir.
+    /// Tablo bulunamazsa paylaşım yapılamaz, çünkü adres koda gömülü değildir.
+    /// </summary>
+    private CoreShare.ShareTarget? SelectedShareEndpoint()
+    {
+        try { _shareEndpoints ??= CoreShare.ShareTargetTable.Load(); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException) { return null; }
+        return _shareEndpoints.Find(SelectedShareTarget().Id);
+    }
+
+    private ShareFlow Share() => _shareFlow ??= new ShareFlow(target =>
+        CoreShare.ShareProviderFactory.Create(
+            target,
+            _shareTransport ??= new CoreShare.HttpClientTransport(),
+            _shareEndpoints));
+
+    /// <summary>Seçili ömür, gün. Hedef ömür seçtirmiyorsa boş.</summary>
+    private int? SelectedRetentionDays()
+    {
+        var target = SelectedShareTarget();
+        if (target.RetentionDays.Count == 0) return null;
+        var index = CmbShareRetention.SelectedIndex;
+        return index >= 0 && index < target.RetentionDays.Count ? target.RetentionDays[index] : target.DefaultRetentionDays;
+    }
+
+    /// <summary>
+    /// Paylaş düğmesi yalnız teslim edilmiş bir dosya varken görünür. Yeni bir kodlama
+    /// başladığında önceki bağlantı da düşer: gösterilen adres artık yeni dosyayı göstermez.
+    /// </summary>
+    private void ResetShare(bool fileReady)
+    {
+        BtnShare.IsVisible = fileReady;
+        BtnShare.IsEnabled = fileReady;
+        BtnShareCancel.IsVisible = false;
+        ShareProgress.IsVisible = false;
+        ShareProgress.Value = 0;
+        ShareLinkRow.IsVisible = false;
+        TxtShareLink.Text = "";
+        TxtShareStatus.Text = "";
+        BtnShareDelete.IsEnabled = false;
+    }
+
+    private void SetSharing(bool sharing)
+    {
+        BtnShare.IsEnabled = !sharing;
+        BtnShareCancel.IsVisible = sharing;
+        ShareProgress.IsVisible = sharing;
+        if (sharing) ShareProgress.Value = 0;
+    }
+
+    private async void OnShare(object? sender, RoutedEventArgs e)
+    {
+        if (_lastOutput is null || !File.Exists(_lastOutput))
+        {
+            TxtShareStatus.Text = T("Paylaşılacak bir dosya yok.", "There is no file to share.");
+            return;
+        }
+
+        if (SelectedShareEndpoint() is not { } target)
+        {
+            TxtShareStatus.Text = T(
+                $"Paylaşım hedefleri okunamadı; {CoreShare.ShareTargetTable.FileName} bulunamadı.",
+                $"The share targets could not be read; {CoreShare.ShareTargetTable.FileName} was not found.");
+            return;
+        }
+
+        var flow = Share();
+        if (flow.Running) return;
+
+        SetSharing(true);
+        TxtShareStatus.Text = T("Yükleniyor...", "Uploading...");
+        ShareLinkRow.IsVisible = false;
+
+        var progress = new Progress<CoreShare.UploadProgress>(step => ShareProgress.Value = step.Fraction);
+        var result = await flow.ShareAsync(target, _lastOutput, SelectedRetentionDays(), progress);
+
+        SetSharing(false);
+        ShowShareResult(result, flow);
+    }
+
+    private void ShowShareResult(CoreShare.ShareResult result, ShareFlow flow)
+    {
+        if (result.Ok && result.Link is { } link)
+        {
+            TxtShareLink.Text = link.Url;
+            ShareLinkRow.IsVisible = true;
+            BtnShareDelete.IsEnabled = flow.CanDelete;
+            TxtShareStatus.Text = link.ExpiresAt is { } expires
+                ? T($"Paylaşıldı. Bağlantı {expires.ToLocalTime():d MMMM HH:mm} tarihine kadar açık.",
+                    $"Shared. The link stays open until {expires.ToLocalTime():d MMMM HH:mm}.")
+                : T("Paylaşıldı.", "Shared.");
+            return;
+        }
+
+        ShareLinkRow.IsVisible = false;
+        BtnShareDelete.IsEnabled = flow.CanDelete;
+        TxtShareStatus.Text = result.Failure == CoreShare.ShareFailure.Cancelled
+            ? T("İptal edildi.", "Cancelled.")
+            : $"{T("Paylaşılamadı", "The file could not be shared")}: {result.Message}";
+    }
+
+    private void OnShareCancel(object? sender, RoutedEventArgs e) => _shareFlow?.Cancel();
+
+    private async void OnCopyShareLink(object? sender, RoutedEventArgs e)
+    {
+        // Pano yoksa adres yine okunabilir ve seçilebilir kalır; kullanıcıya hata basılmaz.
+        try
+        {
+            if (Clipboard is null) return;
+            await Clipboard.SetTextAsync(TxtShareLink.Text ?? "");
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private async void OnShareDelete(object? sender, RoutedEventArgs e)
+    {
+        var flow = Share();
+        if (flow.Link is null) return;
+        if (SelectedShareEndpoint() is not { } target) return;
+
+        BtnShareDelete.IsEnabled = false;
+        var result = await flow.DeleteAsync(target);
+        if (result.Ok)
+        {
+            ShareLinkRow.IsVisible = false;
+            TxtShareLink.Text = "";
+            TxtShareStatus.Text = T("Paylaşım kapatıldı.", "The share was closed.");
+            return;
+        }
+
+        BtnShareDelete.IsEnabled = flow.CanDelete;
+        TxtShareStatus.Text = $"{T("Paylaşım kapatılamadı", "The share could not be closed")}: {result.Message}";
     }
 
     /// <summary>
@@ -1850,6 +1992,12 @@ public partial class MainWindow : Window
     private void OnTogglePlanReasons(object? sender, RoutedEventArgs e) => SetPlanReasonsExpanded(!_reasonsExpanded);
 
     /// <summary>
+    /// Gerekçelerin açık olduğu hâli ölçüme açar. Plan panelinin tavanı yalnız bu hâlde
+    /// bağlayıcı oluyor ve düğmeye basmadan o hâl kurulamıyor.
+    /// </summary>
+    internal void ExpandPlanReasons() => SetPlanReasonsExpanded(true);
+
+    /// <summary>
     /// K6: gerekçeler katlanır. Kapalıyken plan paneli olguların net özetidir ve kaymaz;
     /// açıkken listenin tamamı görünür ve taşma <c>PlanScroll</c>'a düşer. Metin hiçbir
     /// durumda kısaltılmıyor.
@@ -1948,6 +2096,7 @@ public partial class MainWindow : Window
             SetRunning(true);
             TxtResult.Text = "";
             BtnReveal.IsVisible = false;
+            ResetShare(false);
             HideRetryAsk();
             var progress = new Progress<EncodeProgress>(p =>
             {
@@ -1983,6 +2132,7 @@ public partial class MainWindow : Window
             }
 
             BtnReveal.IsVisible = result.Success;
+            ResetShare(result.Success);
         }
         catch (OperationCanceledException)
         {
@@ -2489,5 +2639,105 @@ internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTar
             fixedHours,
             item.TryGetProperty("canDelete", out var canDelete) && canDelete.ValueKind == JsonValueKind.True,
             item.TryGetProperty("playsInBrowser", out var plays) && plays.ValueKind == JsonValueKind.True);
+    }
+}
+
+/// <summary>
+/// Paylaş düğmesinin arkasındaki iş: yükle, kaydı tut, iptal et, yayını kapat. Pencere
+/// yalnız ilerlemeyi ve sonucu çizer.
+/// </summary>
+/// <remarks>
+/// Sağlayıcı dışarıdan veriliyor, çünkü ölçüm ağa çıkmadan koşmalı: sahte taşıyıcıya bağlı
+/// gerçek sağlayıcı verilir ve tavan denetimi, iptal, hata sınıflandırması aynı kodla ölçülür.
+/// Tavanı aşan dosyayı sağlayıcı zaten yüklemeye kalkışmadan reddeder; burada ikinci bir
+/// denetim yok, tek karar yeri <c>ShareErrorClassifier.CheckSize</c>.
+/// </remarks>
+internal sealed class ShareFlow
+{
+    private readonly Func<CoreShare.ShareTarget, CoreShare.IShareProvider> _provider;
+    private readonly CoreShare.ShareLedger _ledger;
+    private CancellationTokenSource? _upload;
+
+    internal ShareFlow(
+        Func<CoreShare.ShareTarget, CoreShare.IShareProvider> provider,
+        CoreShare.ShareLedger? ledger = null)
+    {
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+        _ledger = ledger ?? new CoreShare.ShareLedger();
+    }
+
+    /// <summary>Açık olan son paylaşım. Kapatıldığında ya da hiç yapılmadığında boştur.</summary>
+    internal CoreShare.ShareLink? Link { get; private set; }
+
+    internal bool Running => _upload is not null;
+
+    /// <summary>Elde silme jetonu var mı; silme düğmesi buna bakar.</summary>
+    internal bool CanDelete => Link is { CanDelete: true };
+
+    internal void Cancel() => _upload?.Cancel();
+
+    internal async Task<CoreShare.ShareResult> ShareAsync(
+        CoreShare.ShareTarget target,
+        string filePath,
+        int? retentionDays = null,
+        IProgress<CoreShare.UploadProgress>? progress = null)
+    {
+        if (_upload is not null)
+            return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
+                CoreShare.ShareFailure.Unknown,
+                "Bir yükleme zaten sürüyor; bitmesini bekleyin ya da iptal edin."));
+
+        var cts = new CancellationTokenSource();
+        _upload = cts;
+        try
+        {
+            var result = await _provider(target).UploadAsync(filePath, retentionDays, progress, cts.Token);
+            if (result.Ok && result.Link is { } link)
+            {
+                Link = link;
+                TryRecord(link);
+            }
+
+            return result;
+        }
+        finally
+        {
+            _upload = null;
+            cts.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Yayını kapatır. Jeton geçersizse silinecek bir şey kalmamıştır; kayıt yine düşürülür,
+    /// yoksa kapatılamayan bir satır orada kalırdı.
+    /// </summary>
+    internal async Task<CoreShare.ShareResult> DeleteAsync(
+        CoreShare.ShareTarget target,
+        CancellationToken cancellationToken = default)
+    {
+        if (Link is not { } link)
+            return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
+                CoreShare.ShareFailure.Unknown, "Kapatılacak bir paylaşım yok."));
+
+        var result = await _provider(target).DeleteAsync(link, cancellationToken);
+        if (!result.Ok && result.Failure != CoreShare.ShareFailure.TokenExpired) return result;
+
+        TryForget(link.FileId);
+        Link = null;
+        return result;
+    }
+
+    // Kayıt defteri yazılamazsa paylaşım yine de başarılıdır; kaybedilen tek şey uygulama
+    // kapanıp açıldıktan sonra yayını kapatabilme imkânı.
+    private void TryRecord(CoreShare.ShareLink link)
+    {
+        try { _ledger.Add(link); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+    }
+
+    private void TryForget(string fileId)
+    {
+        try { _ledger.Remove(fileId); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
     }
 }

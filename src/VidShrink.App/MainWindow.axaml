@@ -466,17 +466,21 @@
                 işlem paneli. Üç sütunlu düzen bozulmuyor — panel kendi sütununu almıyor,
                 ortadaki sütunun başına giriyor (T43/K1).
               -->
-              <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceLg}">
+              <!--
+                T54/K4: artan yer önizlemeye gider. Başlık kendi Auto satırındadır, panel
+                esneyen satırdadır: ikisi tek satırı paylaşmadığı için başlık artık
+                önizlemenin boyundan çalmıyor. Plan paneli de Auto satıra indi — istediği
+                kadarını alır, kalanını önizlemeye bırakır. Eski düzende esneyen satır
+                MaxHeight'lı plan panelindeydi ve artan yer kimseye gitmiyordu.
+              -->
+              <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" RowSpacing="{StaticResource SpaceMd}">
 
-                <StackPanel Grid.Row="0" Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="Preview" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                  <playback:ComparisonPanel x:Name="Preview"/>
-                </StackPanel>
+                <TextBlock Grid.Row="0" Text="Preview" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                <playback:ComparisonPanel Grid.Row="1" x:Name="Preview" VerticalAlignment="Stretch"/>
 
               <Border x:Name="PlanPanel"
-                      Grid.Row="1"
+                      Grid.Row="2"
                       Theme="{StaticResource Panel}"
-                      VerticalAlignment="Stretch"
                       MinHeight="{StaticResource PlanPanelMinHeight}"
                       MaxHeight="{StaticResource PlanPanelMaxHeight}">
                 <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
@@ -606,7 +610,32 @@
                         </WrapPanel>
                       </StackPanel>
                     </Border>
-                    <Button x:Name="BtnReveal" Content="Show in folder" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
+                    <StackPanel Spacing="{StaticResource SpaceSm}">
+                      <WrapPanel>
+                        <Button x:Name="BtnReveal" Content="Show in folder" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
+                        <Button x:Name="BtnShare" Content="Share the file" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
+                        <Button x:Name="BtnShareCancel" Content="Cancel the upload" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
+                      </WrapPanel>
+                      <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
+                      <Grid x:Name="ShareLinkRow"
+                            IsVisible="False"
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="{StaticResource SpaceMd}">
+                        <TextBox Grid.Column="0"
+                                 x:Name="TxtShareLink"
+                                 IsReadOnly="True"
+                                 MaxLines="1"
+                                 FontFamily="{StaticResource FontMono}"
+                                 VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                x:Name="BtnShareCopy"
+                                Content="Copy"
+                                Theme="{StaticResource GhostButton}"
+                                VerticalAlignment="Center"
+                                Click="OnCopyShareLink"/>
+                      </Grid>
+                      <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    </StackPanel>
                   </StackPanel>
                 </Border>
 
@@ -892,7 +921,8 @@
                               Content="Delete the shared file"
                               Theme="{StaticResource GhostButton}"
                               HorizontalAlignment="Left"
-                              IsEnabled="False"/>
+                              IsEnabled="False"
+                              Click="OnShareDelete"/>
                       <TextBlock x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>
                   </Grid>

@@ -273,6 +273,8 @@ internal static class LanguageCatalog
         ["Lifetime"] = "Ömür",
         ["Deletion"] = "Silme",
         ["Delete the shared file"] = "Paylaşılan dosyayı sil",
+        ["Share the file"] = "Dosyayı paylaş",
+        ["Cancel the upload"] = "Yüklemeyi iptal et",
         ["WhatsApp recommended"] = "WhatsApp için önerilen",
         ["Sharing maximum"] = "Paylaşım için en fazla",
         ["WhatsApp Web maximum"] = "WhatsApp Web için en fazla",
