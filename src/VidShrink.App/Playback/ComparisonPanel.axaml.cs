@@ -287,8 +287,6 @@ internal partial class ComparisonPanel : UserControl
             // istediği genişliği büyütmez.
             ApproxBadge.MaxWidth = Math.Max(0, right - Inset("PlaybackBadgeMargin", 24));
         }
-        // Sürükleme kare istemez: yalnız yeniden çizim, kopyalama yok, kod çözme yok.
-        Surface.InvalidateVisual();
     }
 
     /// <summary>
