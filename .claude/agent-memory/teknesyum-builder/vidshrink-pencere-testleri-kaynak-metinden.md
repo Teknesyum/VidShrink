@@ -19,3 +19,8 @@ Avalonia turu gecmeyen ayri bir `internal` sinifa cikar (ornek: `ShareFlow`,
 `QualityHint`, `ShareTargetTable`) - o sinif dogrudan olculebilir. Dugmenin gercekten
 bagli oldugu ise XAML/kod metninde `Click="OnX"` arayarak sabitlenir.
 Bkz. [[vidshrink-app-ikiz-share-turleri]].
+
+**Yan etki - siniftaki yer onemli:** bu testlerin bazisi dosyayi iki isaret arasindan
+dilimler (`QualityHintTests.TheScorePathStartsNoProcess`, `QualityHint` ile `ShareTarget`
+arasi). Iki isaretin arasina yeni bir sinif koyarsan o testi kirarsin, testin iddiasi
+dogru kalsa bile. Yeni tur eklerken **dosyanin sonuna** koy.

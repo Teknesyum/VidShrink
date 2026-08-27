@@ -1992,6 +1992,12 @@ public partial class MainWindow : Window
     private void OnTogglePlanReasons(object? sender, RoutedEventArgs e) => SetPlanReasonsExpanded(!_reasonsExpanded);
 
     /// <summary>
+    /// Gerekçelerin açık olduğu hâli ölçüme açar. Plan panelinin tavanı yalnız bu hâlde
+    /// bağlayıcı oluyor ve düğmeye basmadan o hâl kurulamıyor.
+    /// </summary>
+    internal void ExpandPlanReasons() => SetPlanReasonsExpanded(true);
+
+    /// <summary>
     /// K6: gerekçeler katlanır. Kapalıyken plan paneli olguların net özetidir ve kaymaz;
     /// açıkken listenin tamamı görünür ve taşma <c>PlanScroll</c>'a düşer. Metin hiçbir
     /// durumda kısaltılmıyor.
@@ -2507,106 +2513,6 @@ internal readonly record struct QualityHint(double? TargetMb, double? Score, Qua
 }
 
 /// <summary>
-/// Paylaş düğmesinin arkasındaki iş: yükle, kaydı tut, iptal et, yayını kapat. Pencere
-/// yalnız ilerlemeyi ve sonucu çizer.
-/// </summary>
-/// <remarks>
-/// Sağlayıcı dışarıdan veriliyor, çünkü ölçüm ağa çıkmadan koşmalı: sahte taşıyıcıya bağlı
-/// gerçek sağlayıcı verilir ve tavan denetimi, iptal, hata sınıflandırması aynı kodla ölçülür.
-/// Tavanı aşan dosyayı sağlayıcı zaten yüklemeye kalkışmadan reddeder; burada ikinci bir
-/// denetim yok, tek karar yeri <c>ShareErrorClassifier.CheckSize</c>.
-/// </remarks>
-internal sealed class ShareFlow
-{
-    private readonly Func<CoreShare.ShareTarget, CoreShare.IShareProvider> _provider;
-    private readonly CoreShare.ShareLedger _ledger;
-    private CancellationTokenSource? _upload;
-
-    internal ShareFlow(
-        Func<CoreShare.ShareTarget, CoreShare.IShareProvider> provider,
-        CoreShare.ShareLedger? ledger = null)
-    {
-        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        _ledger = ledger ?? new CoreShare.ShareLedger();
-    }
-
-    /// <summary>Açık olan son paylaşım. Kapatıldığında ya da hiç yapılmadığında boştur.</summary>
-    internal CoreShare.ShareLink? Link { get; private set; }
-
-    internal bool Running => _upload is not null;
-
-    /// <summary>Elde silme jetonu var mı; silme düğmesi buna bakar.</summary>
-    internal bool CanDelete => Link is { CanDelete: true };
-
-    internal void Cancel() => _upload?.Cancel();
-
-    internal async Task<CoreShare.ShareResult> ShareAsync(
-        CoreShare.ShareTarget target,
-        string filePath,
-        int? retentionDays = null,
-        IProgress<CoreShare.UploadProgress>? progress = null)
-    {
-        if (_upload is not null)
-            return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
-                CoreShare.ShareFailure.Unknown,
-                "Bir yükleme zaten sürüyor; bitmesini bekleyin ya da iptal edin."));
-
-        var cts = new CancellationTokenSource();
-        _upload = cts;
-        try
-        {
-            var result = await _provider(target).UploadAsync(filePath, retentionDays, progress, cts.Token);
-            if (result.Ok && result.Link is { } link)
-            {
-                Link = link;
-                TryRecord(link);
-            }
-
-            return result;
-        }
-        finally
-        {
-            _upload = null;
-            cts.Dispose();
-        }
-    }
-
-    /// <summary>
-    /// Yayını kapatır. Jeton geçersizse silinecek bir şey kalmamıştır; kayıt yine düşürülür,
-    /// yoksa kapatılamayan bir satır orada kalırdı.
-    /// </summary>
-    internal async Task<CoreShare.ShareResult> DeleteAsync(
-        CoreShare.ShareTarget target,
-        CancellationToken cancellationToken = default)
-    {
-        if (Link is not { } link)
-            return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
-                CoreShare.ShareFailure.Unknown, "Kapatılacak bir paylaşım yok."));
-
-        var result = await _provider(target).DeleteAsync(link, cancellationToken);
-        if (!result.Ok && result.Failure != CoreShare.ShareFailure.TokenExpired) return result;
-
-        TryForget(link.FileId);
-        Link = null;
-        return result;
-    }
-
-    // Kayıt defteri yazılamazsa paylaşım yine de başarılıdır; kaybedilen tek şey uygulama
-    // kapanıp açıldıktan sonra yayını kapatabilme imkânı.
-    private void TryRecord(CoreShare.ShareLink link)
-    {
-        try { _ledger.Add(link); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-    }
-
-    private void TryForget(string fileId)
-    {
-        try { _ledger.Remove(fileId); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-    }
-}
-
-/// <summary>
 /// Tek bir paylaşım hedefi. Alan adları <c>paylasim-hedefleri.json</c> şemasıyla birebir
 /// aynı; şema T35'te sabitlendi ve iki taraf da onu okuyor.
 /// </summary>
@@ -2733,5 +2639,105 @@ internal sealed record ShareTargetTable(string DefaultId, IReadOnlyList<ShareTar
             fixedHours,
             item.TryGetProperty("canDelete", out var canDelete) && canDelete.ValueKind == JsonValueKind.True,
             item.TryGetProperty("playsInBrowser", out var plays) && plays.ValueKind == JsonValueKind.True);
+    }
+}
+
+/// <summary>
+/// Paylaş düğmesinin arkasındaki iş: yükle, kaydı tut, iptal et, yayını kapat. Pencere
+/// yalnız ilerlemeyi ve sonucu çizer.
+/// </summary>
+/// <remarks>
+/// Sağlayıcı dışarıdan veriliyor, çünkü ölçüm ağa çıkmadan koşmalı: sahte taşıyıcıya bağlı
+/// gerçek sağlayıcı verilir ve tavan denetimi, iptal, hata sınıflandırması aynı kodla ölçülür.
+/// Tavanı aşan dosyayı sağlayıcı zaten yüklemeye kalkışmadan reddeder; burada ikinci bir
+/// denetim yok, tek karar yeri <c>ShareErrorClassifier.CheckSize</c>.
+/// </remarks>
+internal sealed class ShareFlow
+{
+    private readonly Func<CoreShare.ShareTarget, CoreShare.IShareProvider> _provider;
+    private readonly CoreShare.ShareLedger _ledger;
+    private CancellationTokenSource? _upload;
+
+    internal ShareFlow(
+        Func<CoreShare.ShareTarget, CoreShare.IShareProvider> provider,
+        CoreShare.ShareLedger? ledger = null)
+    {
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+        _ledger = ledger ?? new CoreShare.ShareLedger();
+    }
+
+    /// <summary>Açık olan son paylaşım. Kapatıldığında ya da hiç yapılmadığında boştur.</summary>
+    internal CoreShare.ShareLink? Link { get; private set; }
+
+    internal bool Running => _upload is not null;
+
+    /// <summary>Elde silme jetonu var mı; silme düğmesi buna bakar.</summary>
+    internal bool CanDelete => Link is { CanDelete: true };
+
+    internal void Cancel() => _upload?.Cancel();
+
+    internal async Task<CoreShare.ShareResult> ShareAsync(
+        CoreShare.ShareTarget target,
+        string filePath,
+        int? retentionDays = null,
+        IProgress<CoreShare.UploadProgress>? progress = null)
+    {
+        if (_upload is not null)
+            return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
+                CoreShare.ShareFailure.Unknown,
+                "Bir yükleme zaten sürüyor; bitmesini bekleyin ya da iptal edin."));
+
+        var cts = new CancellationTokenSource();
+        _upload = cts;
+        try
+        {
+            var result = await _provider(target).UploadAsync(filePath, retentionDays, progress, cts.Token);
+            if (result.Ok && result.Link is { } link)
+            {
+                Link = link;
+                TryRecord(link);
+            }
+
+            return result;
+        }
+        finally
+        {
+            _upload = null;
+            cts.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Yayını kapatır. Jeton geçersizse silinecek bir şey kalmamıştır; kayıt yine düşürülür,
+    /// yoksa kapatılamayan bir satır orada kalırdı.
+    /// </summary>
+    internal async Task<CoreShare.ShareResult> DeleteAsync(
+        CoreShare.ShareTarget target,
+        CancellationToken cancellationToken = default)
+    {
+        if (Link is not { } link)
+            return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
+                CoreShare.ShareFailure.Unknown, "Kapatılacak bir paylaşım yok."));
+
+        var result = await _provider(target).DeleteAsync(link, cancellationToken);
+        if (!result.Ok && result.Failure != CoreShare.ShareFailure.TokenExpired) return result;
+
+        TryForget(link.FileId);
+        Link = null;
+        return result;
+    }
+
+    // Kayıt defteri yazılamazsa paylaşım yine de başarılıdır; kaybedilen tek şey uygulama
+    // kapanıp açıldıktan sonra yayını kapatabilme imkânı.
+    private void TryRecord(CoreShare.ShareLink link)
+    {
+        try { _ledger.Add(link); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+    }
+
+    private void TryForget(string fileId)
+    {
+        try { _ledger.Remove(fileId); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
     }
 }
