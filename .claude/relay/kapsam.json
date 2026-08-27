@@ -1006,5 +1006,17 @@
     "effort": "high",
     "t": "2026-08-26 19:40:29",
     "ajan": "ana oturum"
+  },
+  "docs/surum-dogrulama-v0.1.1.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-27 06:47:32",
+    "ajan": "ana oturum"
+  },
+  "tools/temizle.js": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-27 07:26:50",
+    "ajan": "ana oturum"
   }
 }
