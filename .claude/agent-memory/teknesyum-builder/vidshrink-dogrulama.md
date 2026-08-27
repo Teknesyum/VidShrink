@@ -25,3 +25,18 @@ denemede tutturmak encoder'in kendi isabetiyle mumkun degil — assert yazarken
 tavan ve sert taban iddia et, bant uyelugini logla.
 
 Ilgili: [[vidshrink-build-and-probe]]
+
+## Gecikme olcumunde alet secimi
+
+Iki sayiyi (oncesi/sonrasi) karsilastiracaksan **ayni testte, ayni kosumda ve ayni
+yoklama araligiyla** olc. Ayri testlerden alinan iki sayi bu projede karsilastirilamaz.
+
+Yoklama araligi sonucu belirliyor: `await Task.Delay(1)` Windows'ta ~15 ms uyuyor ve
+olcuyu kendi granulasyonuna yuvarliyor; `await Task.Yield()` dongusu ise bir cekirdegi
+doldurup **olculen ffmpeg surecini ac birakiyor** ve sayiyi buyutuyor (ayni devir olcumu
+78 ms yerine 102 ms verdi). Ikisi de bozuyor, farkli yonlerde. Birini sec, iki tarafta da
+onu kullan ve raporda hangisini kullandigini yaz.
+
+Ayrica: tam `dotnet test` paralel kosuyor, gecikme sayilari yuk altinda basiliyor.
+Yalniz o testi kosturmakla tam takim icinde kosturmak farkli sayi veriyor (126 vs 110).
+Ikisini de yaz, hangisinin rapora girdigini soyle.
