@@ -19,6 +19,14 @@
   <Color x:Key="NeonPinkFillColor">#1AFF00EA</Color>
   <Color x:Key="NeonPurpleBorderColor">#80B026FF</Color>
 
+  <Color x:Key="NeonEmberColor">#FFFF0033</Color>
+  <Color x:Key="EmberDeepColor">#FF070306</Color>
+  <Color x:Key="EmberMidColor">#FF080407</Color>
+  <Color x:Key="EmberEdgeColor">#FF0B0407</Color>
+  <Color x:Key="EmberBarDeepColor">#FF130D10</Color>
+  <Color x:Key="EmberBarMidColor">#FF150E11</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF170F12</Color>
+
   <SolidColorBrush x:Key="NeonBlue" Color="{StaticResource NeonBlueColor}"/>
   <SolidColorBrush x:Key="NeonPink" Color="{StaticResource NeonPinkColor}"/>
   <SolidColorBrush x:Key="NeonPurple" Color="{StaticResource NeonPurpleColor}"/>
@@ -36,34 +44,52 @@
   <SolidColorBrush x:Key="NeonPinkFill" Color="{StaticResource NeonPinkFillColor}"/>
   <SolidColorBrush x:Key="NeonPurpleBorder" Color="{StaticResource NeonPurpleBorderColor}"/>
   <SolidColorBrush x:Key="OnNeon" Color="#FF000000"/>
+  <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
+
+  <x:Double x:Key="PhoenixOpacity">0.06</x:Double>
 
   <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0%,50%" EndPoint="100%,50%">
-    <GradientStop Color="#FF101217" Offset="0"/>
-    <GradientStop Color="#FF101217" Offset="0.1"/>
-    <GradientStop Color="#FF111217" Offset="0.2"/>
-    <GradientStop Color="#FF111217" Offset="0.3"/>
-    <GradientStop Color="#FF121217" Offset="0.4"/>
-    <GradientStop Color="{StaticResource SurfaceToneColor}" Offset="0.5"/>
-    <GradientStop Color="#FF121117" Offset="0.6"/>
-    <GradientStop Color="#FF131117" Offset="0.7"/>
-    <GradientStop Color="#FF131117" Offset="0.8"/>
-    <GradientStop Color="#FF141117" Offset="0.9"/>
-    <GradientStop Color="#FF141117" Offset="1"/>
+    <GradientStop Color="{StaticResource EmberBarDeepColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource EmberBarDeepColor}" Offset="0.2"/>
+    <GradientStop Color="{StaticResource EmberBarMidColor}" Offset="0.4"/>
+    <GradientStop Color="{StaticResource EmberBarMidColor}" Offset="0.6"/>
+    <GradientStop Color="{StaticResource EmberBarEdgeColor}" Offset="0.8"/>
+    <GradientStop Color="{StaticResource EmberBarEdgeColor}" Offset="1"/>
   </LinearGradientBrush>
 
-  <LinearGradientBrush x:Key="WorkspaceBackground" StartPoint="0%,0%" EndPoint="100%,100%">
-    <GradientStop Color="#FF08090D" Offset="0"/>
-    <GradientStop Color="#FF08090D" Offset="0.1"/>
-    <GradientStop Color="#FF09090E" Offset="0.2"/>
-    <GradientStop Color="#FF09090E" Offset="0.3"/>
-    <GradientStop Color="#FF0A090F" Offset="0.4"/>
-    <GradientStop Color="#FF0A090F" Offset="0.5"/>
-    <GradientStop Color="#FF0B0910" Offset="0.6"/>
-    <GradientStop Color="#FF0B0910" Offset="0.7"/>
-    <GradientStop Color="#FF0C0A11" Offset="0.8"/>
-    <GradientStop Color="#FF0C0A11" Offset="0.9"/>
-    <GradientStop Color="#FF0D0A12" Offset="1"/>
+  <LinearGradientBrush x:Key="WorkspaceGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+    <GradientStop Color="{StaticResource EmberDeepColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource EmberDeepColor}" Offset="0.25"/>
+    <GradientStop Color="{StaticResource EmberMidColor}" Offset="0.5"/>
+    <GradientStop Color="{StaticResource EmberMidColor}" Offset="0.75"/>
+    <GradientStop Color="{StaticResource EmberEdgeColor}" Offset="1"/>
   </LinearGradientBrush>
+
+  <DrawingBrush x:Key="WorkspaceBackground"
+                Stretch="UniformToFill"
+                AlignmentX="Center"
+                AlignmentY="Center">
+    <DrawingBrush.Drawing>
+    <DrawingGroup>
+      <DrawingGroup.Children>
+      <GeometryDrawing Brush="{StaticResource WorkspaceGradient}"
+                       Geometry="M 0,0 L 1600,0 L 1600,1000 L 0,1000 Z"/>
+      <DrawingGroup Opacity="{StaticResource PhoenixOpacity}">
+        <DrawingGroup.Children>
+        <GeometryDrawing Brush="{StaticResource NeonEmber}"
+                         Geometry="M 800,168 C 838,180 856,214 852,252 C 848,290 838,308 834,330 C 880,380 900,432 898,500 C 894,570 872,640 848,700 C 872,760 880,820 868,884 C 848,838 836,796 826,752 C 822,806 814,846 800,890 C 786,846 778,806 774,752 C 764,796 752,838 732,884 C 720,820 728,760 752,700 C 728,640 706,570 702,500 C 700,432 720,380 766,330 C 762,308 752,290 748,252 C 744,214 762,180 800,168 Z"/>
+        <GeometryDrawing Brush="{StaticResource NeonEmber}"
+                         Geometry="M 750,440 C 610,306 424,196 240,130 C 288,222 316,290 344,352 C 372,364 402,420 434,486 C 462,498 496,548 534,600 C 566,614 604,650 646,684 C 690,700 726,702 754,694 C 762,610 758,520 750,440 Z"/>
+        <GeometryDrawing Brush="{StaticResource NeonEmber}"
+                         Geometry="M 850,440 C 990,306 1176,196 1360,130 C 1312,222 1284,290 1256,352 C 1228,364 1198,420 1166,486 C 1138,498 1104,548 1066,600 C 1034,614 996,650 954,684 C 910,700 874,702 846,694 C 838,610 842,520 850,440 Z"/>
+        <GeometryDrawing Brush="{StaticResource NeonEmber}"
+                         Geometry="M 800,166 C 812,118 838,82 872,50 C 862,102 846,138 826,174 Z M 330,192 C 306,132 296,86 300,36 C 328,90 348,140 360,190 Z M 470,246 C 452,196 448,158 456,116 C 478,164 492,206 500,246 Z M 1270,192 C 1294,132 1304,86 1300,36 C 1272,90 1252,140 1240,190 Z M 1130,246 C 1148,196 1152,158 1144,116 C 1122,164 1108,206 1100,246 Z"/>
+        </DrawingGroup.Children>
+      </DrawingGroup>
+      </DrawingGroup.Children>
+    </DrawingGroup>
+    </DrawingBrush.Drawing>
+  </DrawingBrush>
 
   <FontFamily x:Key="FontSans">avares://VidShrink.App/Fonts#Atkinson Hyperlegible Next</FontFamily>
   <FontFamily x:Key="FontMono">Consolas,Cascadia Mono,Menlo,DejaVu Sans Mono,Liberation Mono,Courier New</FontFamily>
