@@ -5,3 +5,4 @@
 - [--no-build bayat derleme](no-build-bayat-derleme.md) — kabul kriterini --no-build ile dogrulama; Avalonia Measure argumaninin yutulmasi
 - [Kalite/boyut tekduze degil](kalite-boyut-tekduze-degil.md) — PredictedQuality hedef MB ile ters donuyor; arama kalibi ve surekli kirmizi WindowLayoutTests tabani
 - [Worktree Bash kısıtı](worktree-bash-kisiti.md) — izole ajanda bileşik Bash komutu reddedilir; betiği worktree içine yaz, tek satır koştur
+- [Worktree sözleşme yazma](worktree-sozlesme-yazma.md) — sözleşme ana checkout'ta kalır; Edit ve heredoc reddedilir, Write + cat >> tek yol
