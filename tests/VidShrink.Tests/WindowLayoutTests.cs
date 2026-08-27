@@ -248,12 +248,21 @@ public sealed class WindowLayoutTests
     /// <see cref="ThePageStopsScrollingAtThisHeight"/> ölçümlerine bırakıldı; burada
     /// yalnız içeriğin boyu pinleniyor. <b>Aralıklar değiştirilmedi</b> — dört ölçülen
     /// değer de zaten eski aralıkların içindeydi.</para>
+    ///
+    /// <para>T52: dolu sayfanın iki aralığı yeniden temellendirildi. Oynatma panelinin
+    /// taban boyu <c>PanelMinHeight</c>'ın iki katına çıktı (256 → 512), sayfa içeriği de
+    /// onunla birlikte uzadı: tasarım boyunda 830 civarından 956'ya, taban boyunda 975'e.
+    /// Boş sayfanın iki aralığı <b>değişmedi</b> — orada sayfayı hâlâ sol ayar sütunu
+    /// tutuyor, oynatma paneli onun altında kalıyor.
+    /// <b>Bu sayı neyi koruyor:</b> sayfanın kendi boyunu. Bir daha şişerse ölçüm kırmızıya
+    /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
+    /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
     /// </summary>
     [Theory]
     [InlineData(false, false, 810, 910)]
     [InlineData(false, true, 810, 910)]
-    [InlineData(true, false, 780, 880)]
-    [InlineData(true, true, 815, 915)]
+    [InlineData(true, false, 906, 1006)]
+    [InlineData(true, true, 925, 1025)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -307,10 +316,18 @@ public sealed class WindowLayoutTests
     /// <see cref="TheMeasurementRigCarriesTheHeightItIsGiven"/>). Düzenek argümanı
     /// taşıdığında tarama anlamlı: boş sayfa 953, dolu sayfa 921 pikselde sığıyor —
     /// ikisi de kendi içerik boyuna pencere süsünün 95 pikselini eklemekle aynı sayı.</para>
+    ///
+    /// <para>T52: iki eşik de yükseldi — boş sayfa 1008, dolu sayfa 1052. Sebep oynatma
+    /// panelinin taban boyunun iki katına çıkması; kural aynı kaldı, sığma yüksekliği yine
+    /// içerik boyu artı pencere süsünün 95 pikseli. Aralıkların genişliği (±45)
+    /// değiştirilmedi. <b>Bu sayı neyi koruyor:</b> pencerenin hangi boydan sonra kaymayı
+    /// bıraktığını. <b>Bozulursa kullanıcı ne görür:</b> daha uzun pencerelerde bile
+    /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
+    /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 910, 1000)]
-    [InlineData(true, 880, 970)]
+    [InlineData(false, 963, 1053)]
+    [InlineData(true, 1007, 1097)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;
@@ -330,21 +347,28 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Dolu sayfanın boyunu ne tutuyor: <b>sol ayar sütunu</b>.
+    /// Sayfanın boyunu ne tutuyor: <b>orta sütun</b> — önizleme ve plan.
     ///
-    /// <para>Bu ölçüm T46/K7'de yeniden kuruldu. Önceki hâli "sayfayı tutan şey plan
-    /// paneli tavanıdır" diyordu ve K6 gerekçeleri katlayınca yanlış hale geldi — plan
-    /// içeriği 681'den 278'e indi, tavana (512) artık dayanmıyor. Ölçülen yeni durum:
-    /// sol sütun 802, orta sütun 676, sağ sütun 473. Sayfa içeriği (826) sol sütunun
-    /// çalışma alanı kenar boşluğuyla toplamıdır.</para>
+    /// <para>Bu ölçüm iki kez yer değiştirdi. T46/K7'de "plan paneli tavanı" iddiası
+    /// düşüp yerini sol ayar sütununa bıraktı (sol 802, orta 676, sağ 473). T52'de
+    /// oynatma panelinin taban boyu ikiye katlanınca (256 → 512) orta sütun sol sütunu
+    /// geçti: dolu sayfada sol 802 / orta 932 / sağ 473, boş sayfada sol 834 / orta 886 /
+    /// sağ 437.</para>
     ///
-    /// <para>Yani sayfayı kısaltmak isteyen iş orta sütuna değil sol sütuna bakmalı;
-    /// orta sütun 126 piksel geride.</para>
+    /// <para>Yani sayfayı kısaltmak isteyen iş artık orta sütuna bakmalı; sol sütun dolu
+    /// sayfada 130, boş sayfada 52 piksel geride. Korunan ilişki değişmedi: sayfa içeriği
+    /// <b>en uzun sütun ile çalışma alanı kenar boşluğunun toplamıdır</b>.</para>
+    ///
+    /// <para><b>Bu sayı neyi koruyor:</b> sayfayı hangi sütunun gerdiğini — kısaltma işi
+    /// yanlış sütuna harcanmasın diye. <b>Bozulursa kullanıcı ne görür:</b> doğrudan bir
+    /// şey görmez; bu bir yön tabelasıdır, yanlış olduğunda sonraki düzen işi boşa gider.
+    /// Orta sütun küçülüp sayfayı tutmayı bırakırsa ölçüm kırmızıya düşer ve tabela
+    /// yenilenir.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void TheSettingsColumnIsWhatHoldsThePage(bool loaded)
+    public void ThePreviewColumnIsWhatHoldsThePage(bool loaded)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>
         {
@@ -361,7 +385,7 @@ public sealed class WindowLayoutTests
 
         Assert.Equal(3, columns.Count);
         Assert.True(
-            columns[0] > columns[1] && columns[0] > columns[2],
+            columns[1] > columns[0] && columns[1] > columns[2],
             $"Sayfayı tutan sütun değişmiş: sol {columns[0]:0.#}, orta {columns[1]:0.#}, sağ {columns[2]:0.#}.");
 
         // Sayfa içeriği en uzun sütun ile çalışma alanı kenar boşluğunun toplamı.
@@ -370,7 +394,7 @@ public sealed class WindowLayoutTests
                 ? pad.Top + pad.Bottom
                 : double.NaN);
 
-        Assert.Equal(columns[0] + margin, content, 1);
+        Assert.Equal(columns.Max() + margin, content, 1);
     }
 
     /// <summary>
@@ -401,21 +425,14 @@ public sealed class WindowLayoutTests
             $"Plan içeriği ({content:0.#}) panelin boyunu ({panelHeight:0.#}) aştı; taşma PlanScroll'a düşüyor.");
     }
 
-    /// <summary>
-    /// Tavan hiç bağlanmıyorsa gereksizdir. Boş sayfada satır panele tavandan fazla yer
-    /// bırakıyor ve panel tam tavanda duruyor — tavanın devrede olduğunu söyleyen ölçüm bu.
-    /// </summary>
-    [Fact]
-    public void ThePlanPanelCeilingIsEngagedWhereTheRowIsTallEnough()
-    {
-        var (ceiling, panelHeight, roomInRow, _) = PlanPanelLayout(loaded: false);
-
-        Assert.True(
-            roomInRow > ceiling,
-            $"Satır panele tavandan ({ceiling:0}) az yer bırakıyor ({roomInRow:0.#}); tavan hiçbir "
-            + "durumda devrede değil, paneli tutan şey satırın kendisi.");
-        Assert.Equal(ceiling, panelHeight, 1);
-    }
+    // T52: burada "plan paneli tavanı en az bir durumda bağlayıcıdır" diyen bir ölçü
+    // vardı (ThePlanPanelCeilingIsEngagedWhereTheRowIsTallEnough) ve silindi. İddiası
+    // bugün yanlış: oynatma panelinin taban boyu ikiye katlanınca satır plan paneline boş
+    // sayfada 375, dolu sayfada daha az yer bırakıyor, yani PlanPanelMaxHeight (512)
+    // hiçbir durumda bağlamıyor. Ölçü bir şeyi korumuyordu; tavanın davranışı zaten
+    // ThePlanPanelTakesTheSmallerOfTheCeilingAndItsRow ile korunuyor — panel her zaman
+    // satırın bıraktığı yer ile tavanın küçüğü kadar. Tavan bağlayıcı olmaya dönerse o
+    // ölçü bunu yakalar. Belirtecin ölü kalıp kalmayacağı orta sütun düzeninin işi (T54).
 
     private static (double Ceiling, double PanelHeight, double RoomInRow, double Content) PlanPanelLayout(bool loaded) =>
         Read(DesignSize(), loaded, window =>

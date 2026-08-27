@@ -448,35 +448,36 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// T46/K5: fare panele girince yakinlastirma dogrudan tema belirtecinin soyledigi kata
-    /// cikar, cikinca tabana doner. Gir-cik-gir dizisi kararli: her turda ayni iki deger,
-    /// kademe hep bandinda, yani inis sayaciyla salinim yok.
+    /// T52/K2: fare panele girince <b>panel</b> tema belirtecinin soyledigi kata cikar.
+    /// Iki kat panel bandina sigmadigi icin panel ayni anda kok katmana terfi eder.
+    /// Fare cikinca olcek hemen dusmez: inis kararini gecikmeli inis sayaci verir, sayac
+    /// isini bitirince (Descend) panel taban boya doner.
     /// </summary>
     [Fact]
-    public void GirisYakinlastirmasiKararli()
+    public void GirisOlceklemesiPaneliIkiKatinaCikarir()
     {
-        var (wanted, readings, stages) = Read((window, panel) =>
+        var (wanted, scale, stage, held, afterDescent) = Read((window, panel) =>
         {
             panel.Descend();
             window.TryFindResource("PlaybackHoverZoom", out var token);
 
-            var seen = new List<double>();
-            var shelters = new List<ShelterStage>();
-            for (var i = 0; i < 3; i++)
-            {
-                panel.HoverZoom(true);
-                seen.Add(Math.Round(panel.Gesture.ContentZoom, 9));
-                shelters.Add(panel.Shelter);
-                panel.HoverZoom(false);
-                seen.Add(Math.Round(panel.Gesture.ContentZoom, 9));
-                shelters.Add(panel.Shelter);
-            }
+            panel.HoverZoom(true);
+            Settle(window);
+            var entered = Math.Round(panel.Gesture.PanelScale, 9);
+            var shelter = panel.Shelter;
 
-            return ((double)token!, seen, shelters);
+            // Fare cikti ama inis sayaci daha karar vermedi: olcek yerinde durur.
+            panel.HoverZoom(false);
+            var stillUp = Math.Round(panel.Gesture.PanelScale, 9);
+
+            panel.Descend();
+            return ((double)token!, entered, shelter, stillUp, Math.Round(panel.Gesture.PanelScale, 9));
         });
 
-        Assert.Equal(new[] { wanted, 1.0, wanted, 1.0, wanted, 1.0 }, readings);
-        Assert.All(stages, stage => Assert.Equal(ShelterStage.Band, stage));
+        Assert.Equal(wanted, scale);
+        Assert.Equal(ShelterStage.Mid, stage);
+        Assert.Equal(wanted, held);
+        Assert.Equal(1.0, afterDescent);
     }
 
     /// <summary>

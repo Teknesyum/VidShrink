@@ -1,16 +1,21 @@
-﻿using VidShrink.App.Playback;
+﻿using Avalonia.Controls;
+using VidShrink.App;
+using VidShrink.App.Playback;
 
 namespace VidShrink.Tests;
 
 /// <summary>
 /// K3: jest matematiği saf bir sınıf ve burada sınanıyor. Hiçbir testte pencere açılmıyor,
 /// çünkü <see cref="ZoomGesture"/> tek bir Avalonia türü kullanmıyor.
+///
+/// T52: ölçülen büyüklük panelin boy ölçeğidir. Görüntü panelin içinde sığdırma ölçeğinde
+/// durur ve jestle büyümez; jestin büyüttüğü şey panelin kendisidir.
 /// </summary>
 public class ZoomGestureTests
 {
-    private static ZoomGesture Fitted(double zoomCeiling = 4.0)
+    private static ZoomGesture Fitted(double scaleCeiling = 4.0)
     {
-        var gesture = new ZoomGesture(zoomCeiling);
+        var gesture = new ZoomGesture(scaleCeiling);
         gesture.SetViewport(800, 450);
         gesture.SetSource(1600, 900);
         return gesture;
@@ -25,7 +30,7 @@ public class ZoomGestureTests
         Assert.Equal(ShelterStage.Band, gesture.Shelter);
         Assert.False(gesture.Promoted);
         Assert.True(gesture.AtFloor);
-        Assert.Equal(1.0, gesture.ContentZoom, 9);
+        Assert.Equal(1.0, gesture.PanelScale, 9);
     }
 
     [Fact]
@@ -75,7 +80,7 @@ public class ZoomGestureTests
 
         Assert.Equal(ShelterStage.Band, gesture.Shelter);
 
-        while (gesture.T < ZoomGesture.MidAt && gesture.Wheel(1, 400, 225)) { }
+        while (gesture.T < gesture.MidAt && gesture.Wheel(1, 400, 225)) { }
         Assert.Equal(ShelterStage.Mid, gesture.Shelter);
         Assert.True(gesture.T < ZoomGesture.FullAt);
 
@@ -153,12 +158,12 @@ public class ZoomGestureTests
 
         // Çıkış eşiğinin altına inildi ama iniş eşiğinin üstünde kalındı: kademe durur.
         gesture.Wheel(-1, 400, 225);
-        Assert.True(gesture.T < ZoomGesture.MidAt);
-        Assert.True(gesture.T >= ZoomGesture.MidDropAt);
+        Assert.True(gesture.T < gesture.MidAt);
+        Assert.True(gesture.T >= gesture.MidDropAt);
         Assert.Equal(ShelterStage.Mid, gesture.Shelter);
 
         gesture.Wheel(-1, 400, 225);
-        Assert.True(gesture.T < ZoomGesture.MidDropAt);
+        Assert.True(gesture.T < gesture.MidDropAt);
         Assert.Equal(ShelterStage.Band, gesture.Shelter);
     }
 
@@ -207,24 +212,12 @@ public class ZoomGestureTests
         Assert.Equal(ShelterStage.Band, gesture.Shelter);
     }
 
+    /// <summary>
+    /// T52: çıpanın yeri artık sonucu değiştirmez. Görüntü ölçeklenmediği için imlecin
+    /// altındaki nokta zaten sabittir ve pano hep ortalı kalır.
+    /// </summary>
     [Fact]
-    public void Imlecin_altindaki_nokta_sabit_kalir()
-    {
-        var gesture = Fitted();
-        const double anchorX = 640;
-        const double anchorY = 300;
-
-        var before = SourceAt(gesture, anchorX, anchorY);
-        gesture.Wheel(3, anchorX, anchorY);
-        var after = SourceAt(gesture, anchorX, anchorY);
-
-        Assert.Equal(before.X, after.X, 6);
-        Assert.Equal(before.Y, after.Y, 6);
-        Assert.True(gesture.T > 0);
-    }
-
-    [Fact]
-    public void Yakinlasma_panonun_ortasina_degil_imlece_gider()
+    public void Cipa_nerede_olursa_olsun_sonuc_aynidir()
     {
         var corner = Fitted();
         var centre = Fitted();
@@ -233,42 +226,27 @@ public class ZoomGestureTests
         centre.Wheel(2, 400, 225);
 
         Assert.Equal(corner.T, centre.T, 9);
-        Assert.NotEqual(corner.OffsetX, centre.OffsetX, 6);
+        Assert.Equal(corner.OffsetX, centre.OffsetX, 6);
+        Assert.Equal(corner.OffsetY, centre.OffsetY, 6);
     }
 
+    /// <summary>
+    /// T52/K1: jest görüntüyü büyütmez. Panel ölçeği tavana çıksa da görüntü panoya sığmış
+    /// hâlde kalır, bu yüzden sürüklenecek bir yer de oluşmaz.
+    /// </summary>
     [Fact]
-    public void Pano_kaynagin_disina_cikamaz()
+    public void Olcek_buyurken_goruntu_panoya_sigmis_kalir()
     {
         var gesture = Fitted();
         while (gesture.Wheel(1, 400, 225)) { }
 
-        gesture.Drag(100000, 100000);
-        Assert.Equal(0, gesture.OffsetX, 6);
-        Assert.Equal(0, gesture.OffsetY, 6);
-
-        gesture.Drag(-100000, -100000);
-        Assert.Equal(800 - gesture.ContentWidth, gesture.OffsetX, 6);
-        Assert.Equal(450 - gesture.ContentHeight, gesture.OffsetY, 6);
-    }
-
-    [Fact]
-    public void Sigiyorken_surukleme_bir_sey_yapmaz()
-    {
-        var gesture = Fitted();
-
+        Assert.True(gesture.AtCeiling);
+        Assert.Equal(800, gesture.ContentWidth, 6);
+        Assert.Equal(450, gesture.ContentHeight, 6);
         Assert.False(gesture.CanPan);
         Assert.False(gesture.Drag(50, 50));
         Assert.Equal(0, gesture.OffsetX, 6);
-    }
-
-    [Fact]
-    public void Yakinlasinca_suruklenebilir()
-    {
-        var gesture = Fitted();
-        gesture.Wheel(4, 400, 225);
-
-        Assert.True(gesture.CanPan);
-        Assert.True(gesture.Drag(-10, 0));
+        Assert.Equal(0, gesture.OffsetY, 6);
     }
 
     [Fact]
@@ -298,19 +276,20 @@ public class ZoomGestureTests
         Assert.False(gesture.Wheel(1, 400, 225));
     }
 
+    /// <summary>T52/K1: tek parametre hem panelin boyunu hem kademesini sürer.</summary>
     [Fact]
-    public void Tek_parametre_hem_paneli_hem_goruntuyu_surer()
+    public void Tek_parametre_hem_olcegi_hem_kademeyi_surer()
     {
-        var gesture = Fitted(zoomCeiling: 4.0);
+        var gesture = Fitted(scaleCeiling: 4.0);
 
         gesture.Wheel(1, 400, 225);
-        var quarter = gesture.ContentZoom;
+        var first = gesture.PanelScale;
         gesture.Wheel(1, 400, 225);
-        var half = gesture.ContentZoom;
+        var second = gesture.PanelScale;
 
-        // İki ayrı sayaç yok: yakınlaştırma t ile doğrusal, terfi de aynı t ile karar veriliyor.
-        Assert.True(half > quarter);
-        Assert.Equal(1.0 + gesture.T * 3.0, gesture.ContentZoom, 9);
+        // İki ayrı sayaç yok: ölçek t ile doğrusal, terfi de aynı t ile karar veriliyor.
+        Assert.True(second > first);
+        Assert.Equal(1.0 + gesture.T * 3.0, gesture.PanelScale, 9);
     }
 
     [Fact]
@@ -334,49 +313,70 @@ public class ZoomGestureTests
 
 
     /// <summary>
-    /// T46/K5: dogrudan yakinlastirma. Hedef parametre tavandan turer - 4x tavanda 2x,
+    /// T52: dogrudan panel olcegi. Hedef parametre tavandan turer - 4x tavanda 2x,
     /// araligin ucte biridir. Sayi testte de uydurulmuyor, tavandan hesaplaniyor.
     /// </summary>
     [Theory]
     [InlineData(4.0, 2.0)]
     [InlineData(4.0, 3.0)]
     [InlineData(8.0, 2.0)]
-    public void ZoomToTavandanTuretir(double ceiling, double wanted)
+    public void ScaleToTavandanTuretir(double ceiling, double wanted)
     {
         var gesture = new ZoomGesture(ceiling);
-        Assert.True(gesture.ZoomTo(wanted, 0, 0));
-        Assert.Equal(wanted, gesture.ContentZoom, 9);
+        Assert.True(gesture.ScaleTo(wanted, 0, 0));
+        Assert.Equal(wanted, gesture.PanelScale, 9);
         Assert.Equal((wanted - 1.0) / (ceiling - 1.0), gesture.T, 9);
     }
 
     /// <summary>Bire donmek tabana donmektir; iki yol da tek parametreye yaziyor.</summary>
     [Fact]
-    public void ZoomToBirTabanaDoner()
+    public void ScaleToBirTabanaDoner()
     {
         var gesture = new ZoomGesture();
-        gesture.ZoomTo(2.0, 0, 0);
+        gesture.ScaleTo(2.0, 0, 0);
         Assert.False(gesture.AtFloor);
-        Assert.True(gesture.ZoomTo(1.0, 0, 0));
+        Assert.True(gesture.ScaleTo(1.0, 0, 0));
         Assert.True(gesture.AtFloor);
     }
 
     /// <summary>
-    /// T46/K5, ikinci tuzak: 2x'in parametresi orta kademe esiginin altinda kalir, yani
-    /// giris yakinlastirmasi paneli terfi ettirmez ve inis sayaciyla salinmaz.
+    /// T52/K2: fare panele girince panel iki katina cikar. Iki kat panel bandina sigmayan
+    /// ilk boy oldugu icin bu ayni zamanda orta kademenin esigidir - panel kok katmana
+    /// terfi eder. Tabana donmek kademeyi de bandina indirir.
     /// </summary>
     [Fact]
-    public void GirisYakinlastirmasiKademeyiOynatmaz()
+    public void GirisOlceklemesiPaneliOrtaKademeyeCikarir()
     {
         var gesture = new ZoomGesture();
         for (var i = 0; i < 5; i++)
         {
-            gesture.ZoomTo(2.0, 0, 0);
-            Assert.Equal(ShelterStage.Band, gesture.Shelter);
-            gesture.ZoomTo(1.0, 0, 0);
+            gesture.ScaleTo(gesture.PromoteScale, 0, 0);
+            Assert.Equal(ShelterStage.Mid, gesture.Shelter);
+            Assert.Equal(gesture.PromoteScale, gesture.PanelScale, 9);
+
+            gesture.ScaleTo(1.0, 0, 0);
             Assert.Equal(ShelterStage.Band, gesture.Shelter);
         }
 
         Assert.True(gesture.AtFloor);
+    }
+
+    /// <summary>
+    /// T52/K5: orta kademenin esigi uydurulmus bir sayi degil, terfi olceginin parametre
+    /// karsiligi. Tavan degisince esik de kendiliginden kayar.
+    /// </summary>
+    [Theory]
+    [InlineData(4.0, 2.0)]
+    [InlineData(8.0, 2.0)]
+    [InlineData(4.0, 3.0)]
+    public void OrtaKademeEsigiTerfiOlcegindenTurer(double ceiling, double promote)
+    {
+        var gesture = new ZoomGesture(ceiling, promote);
+
+        Assert.Equal((promote - 1.0) / (ceiling - 1.0), gesture.MidAt, 9);
+        Assert.True(gesture.MidDropAt > ZoomGesture.Floor);
+        Assert.True(gesture.MidDropAt < gesture.MidAt);
+        Assert.True(gesture.MidAt < ZoomGesture.FullAt);
     }
 
     /// <summary>Wheel centik centik ilerler ve geri alir; dugme yolunun kaniti ComparisonPanelTests'te.</summary>
@@ -391,7 +391,45 @@ public class ZoomGestureTests
         gesture.Wheel(-1, 0, 0);
         Assert.Equal(ZoomGesture.NotchStep, gesture.T, 9);
     }
+}
 
-    private static (double X, double Y) SourceAt(ZoomGesture gesture, double x, double y)
-        => ((x - gesture.OffsetX) / gesture.Scale, (y - gesture.OffsetY) / gesture.Scale);
+/// <summary>
+/// T52/K3: panelin taban boyu. İki belirteç de panel tabanının iki katı olacak; sayı
+/// testte de uydurulmuyor, <c>PanelMinHeight</c>'tan çarpılarak türetiliyor.
+/// </summary>
+public class PlaybackBaseHeightTests
+{
+    /// <summary>Kullanıcının istediği kat: taban boy iki katına çıktı.</summary>
+    private const double BaseFactor = 2.0;
+
+    [Theory]
+    [InlineData("PlaybackStageMinHeight")]
+    [InlineData("PlaybackIdleMinHeight")]
+    public void Taban_boy_panel_tabaninin_iki_kati(string key)
+    {
+        var (panelBase, playback) = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            window.TryFindResource("PanelMinHeight", out var basis);
+            window.TryFindResource(key, out var value);
+            return ((double)basis!, (double)value!);
+        });
+
+        Assert.Equal(panelBase * BaseFactor, playback, 6);
+    }
+
+    /// <summary>Önizleme olsun olmasın panel aynı boyda durur.</summary>
+    [Fact]
+    public void Bos_panel_de_sahne_de_ayni_tabana_oturur()
+    {
+        var (stage, idle) = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            window.TryFindResource("PlaybackStageMinHeight", out var a);
+            window.TryFindResource("PlaybackIdleMinHeight", out var b);
+            return ((double)a!, (double)b!);
+        });
+
+        Assert.Equal(stage, idle, 6);
+    }
 }

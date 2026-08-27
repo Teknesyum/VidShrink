@@ -32,7 +32,7 @@ internal partial class ComparisonPanel : UserControl
     /// </summary>
     private static readonly PixelSize DemoFrame = new(2560, 720);
 
-    private readonly ZoomGesture _gesture = new();
+    private readonly ZoomGesture _gesture;
 
     // Ayırıcı Margin ile değil, dönüşümle taşınıyor: Margin ölçüme girer ve uçlarda
     // ızgaranın istediği genişliği şişirip pencereye yatay kaydırma çubuğu getirir.
@@ -48,6 +48,11 @@ internal partial class ComparisonPanel : UserControl
 
     private ShelterStage _stage = ShelterStage.Band;
     private Rect _target;
+
+    // T52: terfi anındaki band ölçüsü. Orta kademenin boyu bunun ölçekli katı olduğu için
+    // saklanıyor: yer tutucunun sınırı terfi turunda henüz yerleşmemiş olabilir, _target ise
+    // ilk kademe uygulandığı anda üstüne yazılır.
+    private Size _band;
 
     private bool _turkish;
     private string? _notice;
@@ -65,6 +70,10 @@ internal partial class ComparisonPanel : UserControl
     public ComparisonPanel()
     {
         InitializeComponent();
+
+        // T52: jestin aralığı da bandından çıkış eşiği de temadan gelir; sınıf hiçbir
+        // sayı uydurmaz, buradaki yedekler belirteçlerle birebir aynı değerlerdir.
+        _gesture = new ZoomGesture(Scalar("PlaybackMaxPanelScale", 4), Scalar("PlaybackHoverZoom", 2));
 
         // K5: azaltılmış hareket ayarını okuyan tek yer HoverZone. İkinci kopya yok.
         _motionReduced = HoverZone.MotionReduced;
@@ -278,8 +287,6 @@ internal partial class ComparisonPanel : UserControl
             // istediği genişliği büyütmez.
             ApproxBadge.MaxWidth = Math.Max(0, right - Inset("PlaybackBadgeMargin", 24));
         }
-        // Sürükleme kare istemez: yalnız yeniden çizim, kopyalama yok, kod çözme yok.
-        Surface.InvalidateVisual();
     }
 
     /// <summary>
@@ -395,12 +402,14 @@ internal partial class ComparisonPanel : UserControl
     }
 
     /// <summary>
-    /// K5: fare panele girince yakınlaştırma doğrudan <c>PlaybackHoverZoom</c> katına
-    /// çıkar. İki koruma var. Kullanıcının seçimi ezilmiyor: giriş yakınlaştırması yalnız
-    /// panel taban durumundayken uygulanır, ve fare çıkarken yalnız değer hâlâ bizim
-    /// koyduğumuzsa geri alınır — arada tekerlek ya da düğme dokunulduysa sahiplik düşmüş
-    /// olur. T44'ün iniş sayacıyla çakışma yok: 2x'in jest parametresi orta kademe
-    /// eşiğinin altında kaldığı için panel terfi etmez, iniş sayacı hiç kurulmaz.
+    /// T52/K2: fare panele girince <b>panel</b> doğrudan <c>PlaybackHoverZoom</c> katına
+    /// çıkar; büyüyen şey panelin boyu, görüntünün içi değil. İki kat panel bandına
+    /// sığmadığı için bu aynı zamanda orta kademenin eşiğidir: panel kök katmana terfi eder.
+    ///
+    /// Kullanıcının seçimi ezilmiyor: giriş ölçeklemesi yalnız panel taban durumundayken
+    /// uygulanır. Fare çıkışında panel terfi etmişse iniş kararı buraya değil T44'ün
+    /// gecikmeli iniş sayacına aittir (<c>PlaybackDescendDelay</c>) — titrek fare paneli
+    /// çırpındırmasın diye. Terfi olmadıysa (kök katman yoksa) değer hâlâ bizimse geri alınır.
     /// </summary>
     internal void HoverZoom(bool entering)
     {
@@ -410,7 +419,7 @@ internal partial class ComparisonPanel : UserControl
         if (entering)
         {
             if (!_gesture.AtFloor) return;
-            if (!_gesture.ZoomTo(Scalar("PlaybackHoverZoom", 2), centre.X, centre.Y)) return;
+            if (!_gesture.ScaleTo(Scalar("PlaybackHoverZoom", 2), centre.X, centre.Y)) return;
             _hoverZoomMine = true;
             AfterZoom();
             return;
@@ -418,7 +427,7 @@ internal partial class ComparisonPanel : UserControl
 
         if (!_hoverZoomMine) return;
         _hoverZoomMine = false;
-        if (_gesture.ZoomTo(1, centre.X, centre.Y)) AfterZoom();
+        if (_gesture.ScaleTo(1, centre.X, centre.Y)) AfterZoom();
     }
 
     private void OnStagePressed(object? sender, PointerPressedEventArgs e)
@@ -455,7 +464,8 @@ internal partial class ComparisonPanel : UserControl
 
     private void RefreshReadout()
     {
-        var percent = _gesture.ContentZoom * 100.0;
+        // T52: okunan yüzde panelin boy ölçeği. %100 taban boy, %200 iki katı.
+        var percent = _gesture.PanelScale * 100.0;
         ZoomText.Text = _turkish ? $"%{percent:0}" : $"{percent:0}%";
         BtnZoomIn.IsEnabled = !_gesture.AtCeiling;
         BtnZoomOut.IsEnabled = !_gesture.AtFloor;
@@ -487,7 +497,13 @@ internal partial class ComparisonPanel : UserControl
     private void SyncShelter()
     {
         var stage = _gesture.Shelter;
-        if (stage == _stage) return;
+        if (stage == _stage)
+        {
+            // T52: kademe aynı kalsa da ölçek değişmiş olabilir; orta kademenin boyu
+            // sabit bir oran değil, jestin söylediği ölçektir.
+            if (_promoted) ApplyStage();
+            return;
+        }
 
         if (stage == ShelterStage.Band)
         {
@@ -536,6 +552,7 @@ internal partial class ComparisonPanel : UserControl
         _promoted = true;
         _stage = stage;
         _target = band;
+        _band = band.Size;
         overlay.SizeChanged += OnOverlayResized;
 
         _descent.Reset(true);
@@ -558,8 +575,10 @@ internal partial class ComparisonPanel : UserControl
     }
 
     /// <summary>
-    /// Kademenin kök katmandaki sınırı. Orta boyun oranı temadan gelir; taban değeri
-    /// bandın kendi boyudur, yani orta kademe hiçbir zaman bandından küçük olmaz.
+    /// Kademenin kök katmandaki sınırı. T52: orta kademenin boyu artık sabit bir oran değil,
+    /// jestin söylediği ölçek — bandın boyu çarpı <c>PanelScale</c>. Taban değeri bandın
+    /// kendi boyudur (ölçek 1'den küçük olamaz), tavanı <c>PlaybackMidShare</c>: panel
+    /// pencereyi kaplamaz, kenarı bırakır. Tam kademe kök katmanın tamamıdır.
     /// </summary>
     private Rect StageBounds(ShelterStage stage)
     {
@@ -571,8 +590,11 @@ internal partial class ComparisonPanel : UserControl
         if (stage != ShelterStage.Mid) return new Rect(0, 0, width, height);
 
         var share = Scalar("PlaybackMidShare", 0.9);
-        var midWidth = Math.Max(width * share, Math.Min(width, Placeholder.Bounds.Width));
-        var midHeight = Math.Max(height * share, Math.Min(height, Placeholder.Bounds.Height));
+        var scale = _gesture.PanelScale;
+        var bandWidth = Math.Min(width, _band.Width);
+        var bandHeight = Math.Min(height, _band.Height);
+        var midWidth = Math.Min(bandWidth * scale, Math.Max(width * share, bandWidth));
+        var midHeight = Math.Min(bandHeight * scale, Math.Max(height * share, bandHeight));
         return new Rect((width - midWidth) / 2, (height - midHeight) / 2, midWidth, midHeight);
     }
 

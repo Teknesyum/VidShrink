@@ -31,3 +31,5 @@ beklenen imzalari blok halinde yaz — T0 birlestirirken onu okuyor. Ayrica
 
 **Sozlesme dosyasinin kendisi worktree'de olmayabilir** (paylasilan checkout'ta henuz
 izlenmiyorsa). Kopyala, `status`/`round`/Rapor'u worktree kopyasina isle, onunla commit et.
+
+**`depends:` bos olmasi bagimlilik yok demek degil.** T52de sozlesmenin `depends` alani bostu ve T0 "T53un satirini simdi sil, yapilabilir" dedi; oysa T53un commiti ne `main`de ne benim dalimdaydi ve o satiri tek basina silmek ozelligi bozuyordu. Bir sozlesme baska bir sozlesmenin kodunu sart kosuyorsa, uygulamadan once gite sor: `git merge-base --is-ancestor <commit> main` ve `... HEAD`. Koordinatorun "simdi yapilabilir" demesi kanit degil; iki satirlik kontrol kanittir.

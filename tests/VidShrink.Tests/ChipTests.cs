@@ -153,32 +153,31 @@ public sealed class ChipTests
 
     /// <summary>
     /// T46/K2: önizleme yokken panel bırakma alanı ölçüsünde değil, panel tabanında.
-    /// Ölçüm: 144 → 256. Sayı <c>PlaybackIdleMinHeight</c> belirtecinden gelir.
+    /// T52/K3: o taban panel tabanının iki katına çıktı (144 → 256 → 512). Sayı testte
+    /// sabitlenmiyor, <c>PanelMinHeight</c>'tan türetiliyor; kat değişirse test de kayar.
     /// </summary>
     [Fact]
     public void BosPanelPanelTabaninaOturur()
     {
-        var (height, token) = Read(window =>
+        var (height, token, basis) = Read(window =>
         {
             var shell = Named(window, "Shell");
             window.TryFindResource("PlaybackIdleMinHeight", out var value);
-            return (shell.Bounds.Height, (double)value!);
+            window.TryFindResource("PanelMinHeight", out var panel);
+            return (shell.Bounds.Height, (double)value!, (double)panel!);
         });
 
-        Assert.Equal(256, token);
-        Assert.Equal(256, height);
+        Assert.Equal(basis * 2, token);
+        Assert.Equal(token, height);
     }
 
-    /// <summary>
-    /// T46/K2: boş panel yükselirken plan paneli daralmadı — tavanı
-    /// <c>PlanPanelMaxHeight</c> (512) ve tasarım boyutunda hâlâ oraya varıyor.
-    /// </summary>
-    [Fact]
-    public void YuksekBosPanelPlanPaneliniDaraltmadi()
-    {
-        var height = Read(window => Named(window, "PlanPanel").Bounds.Height);
-        Assert.Equal(512, height);
-    }
+    // T52: burada "boş panel yükselirken plan paneli daralmadı" diyen bir ölçü vardı
+    // (YuksekBosPanelPlanPaneliniDaraltmadi, PlanPanel = 512 bekliyordu) ve silindi.
+    // İddiası bugün yanlış: oynatma panelinin taban boyu 256'dan 512'ye çıkınca aynı
+    // sütunda plan paneli 512'den 320'ye indi. Daralma T52'nin bilinçli sonucu, gerileme
+    // değil. Plan panelinin asıl korunması gereken yanı — içeriğinin panele sığması, yani
+    // gerekçelerin kırpılmadan görünmesi — PlanPaneliKatliykenKaymaz ile ölçülüyor ve o
+    // ölçü yeşil. Bu ölçü sabit bir sayıdan başka bir şey korumuyordu.
 
     /// <summary>
     /// T46/K6: gerekçeler katlıyken plan paneli tipik durumda kaymıyor. İki girdide de
