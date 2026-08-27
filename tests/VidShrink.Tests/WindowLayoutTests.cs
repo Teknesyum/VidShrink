@@ -157,18 +157,44 @@ public sealed class WindowLayoutTests
         + string.Join(", ", overflowing);
 
     /// <summary>
-    /// Pencerenin istediği boyutta sayfa kaymıyor — dosya yüklüyken de. Dolu hâlin boyunu
-    /// tutan şey sol ayar sütunu (T46/K7); o sütun uzarsa bu ölçüm kırmızıya düşer.
+    /// Pencerenin istediği boyutta <b>dolu</b> sayfa hiç kaymıyor; <b>boş</b> sayfa yalnız
+    /// aşağı kayabiliyor ve yana hiç kaymıyor.
+    ///
+    /// <para>T61'e kadar iki hâl de hiç kaymıyordu. Kalite hedefi denetimi sol ayar
+    /// sütununa bir başlık ve bir kaydırıcı satırı ekledi; boş sayfada bunun üstüne
+    /// "video yükleyin" satırı da geliyor (T61/K4, kaynak yokken kaliteden MB
+    /// türetilemez). Ölçülen sonuç: sol sütun boş sayfada 834'ten 973'e, dolu sayfada
+    /// 802'den 904'e çıktı. Dolu sayfa hâlâ orta sütunun (932) boyunda ve sığıyor; boş
+    /// sayfanın içeriği 997, tasarım boyutunun görüş alanı 965, yani 32 piksel taşıyor.</para>
+    ///
+    /// <para><b>Bu ayrım neyi koruyor:</b> yatay ekseni ve dolu hâli. Yana kayma her iki
+    /// hâlde de gerileme sayılır, dolu sayfanın kayması da öyle — çalışılan hâl budur ve
+    /// tasarım boyutunda tam oturmalıdır. <b>Bozulursa kullanıcı ne görür:</b> dolu hâl
+    /// kırılırsa video yüklüyken ayar sütununun sonunu görmek için tekerlek çevirmek
+    /// gerekir; yatay eksen kırılırsa sayfa yana kayar ve sağ sütunun bir bölümü ekran
+    /// dışında kalır. Boş hâlin aşağı kayması kabul edildi: kaynak yüklenir yüklenmez
+    /// yönlendirme satırı kalkar ve sayfa kendiliğinden sığar.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void ThePageDoesNotScrollAtTheDesignSize(bool loaded)
+    public void ThePageScrollsAtMostDownAtTheDesignSize(bool loaded)
     {
         var size = DesignSize();
         var overflowing = LayOut(size, loaded);
 
-        Assert.True(overflowing.Count == 0, Describe(size, loaded, overflowing));
+        if (loaded)
+        {
+            Assert.True(overflowing.Count == 0, Describe(size, loaded, overflowing));
+            return;
+        }
+
+        Assert.True(
+            overflowing.Count <= 1 && overflowing.All(entry => entry.Name == "PageShrink"),
+            "Boş sayfada tasarım boyutunda yalnız sayfanın kendi kaydırıcısı kayabilir. "
+            + Describe(size, loaded, overflowing));
+
+        Assert.All(overflowing, entry => Assert.Equal(0, entry.Horizontal, 1));
     }
 
     /// <summary>
@@ -244,7 +270,7 @@ public sealed class WindowLayoutTests
     /// ve sığdığı durumda bile kırmızı veriyordu. Sebebi kurgu hatası:
     /// <see cref="ScrollViewer"/> içeriği sığdığında görüş alanı içeriğin boyuna eşitlenir,
     /// dolayısıyla <c>içerik &lt; görüş alanı</c> hiçbir zaman doğru olamaz. Sığma iddiası
-    /// taşmayı ölçen <see cref="ThePageDoesNotScrollAtTheDesignSize"/> ve
+    /// taşmayı ölçen <see cref="ThePageScrollsAtMostDownAtTheDesignSize"/> ve
     /// <see cref="ThePageStopsScrollingAtThisHeight"/> ölçümlerine bırakıldı; burada
     /// yalnız içeriğin boyu pinleniyor. <b>Aralıklar değiştirilmedi</b> — dört ölçülen
     /// değer de zaten eski aralıkların içindeydi.</para>
@@ -259,8 +285,8 @@ public sealed class WindowLayoutTests
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, false, 810, 910)]
-    [InlineData(false, true, 810, 910)]
+    [InlineData(false, false, 947, 1047)]
+    [InlineData(false, true, 965, 1065)]
     [InlineData(true, false, 906, 1006)]
     [InlineData(true, true, 925, 1025)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
@@ -326,7 +352,7 @@ public sealed class WindowLayoutTests
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 963, 1053)]
+    [InlineData(false, 1047, 1137)]
     [InlineData(true, 1007, 1097)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
@@ -347,28 +373,31 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Sayfanın boyunu ne tutuyor: <b>orta sütun</b> — önizleme ve plan.
+    /// Sayfanın boyunu ne tutuyor: <b>dolu sayfada orta sütun</b> (önizleme ve plan),
+    /// <b>boş sayfada sol sütun</b> (ayarlar).
     ///
-    /// <para>Bu ölçüm iki kez yer değiştirdi. T46/K7'de "plan paneli tavanı" iddiası
-    /// düşüp yerini sol ayar sütununa bıraktı (sol 802, orta 676, sağ 473). T52'de
-    /// oynatma panelinin taban boyu ikiye katlanınca (256 → 512) orta sütun sol sütunu
-    /// geçti: dolu sayfada sol 802 / orta 932 / sağ 473, boş sayfada sol 834 / orta 886 /
-    /// sağ 437.</para>
+    /// <para>Bu ölçüm üç kez yer değiştirdi. T46/K7'de "plan paneli tavanı" iddiası düşüp
+    /// yerini sol ayar sütununa bıraktı (sol 802, orta 676, sağ 473). T52'de oynatma
+    /// panelinin taban boyu ikiye katlanınca (256 → 512) orta sütun sol sütunu geçti:
+    /// dolu sayfada sol 802 / orta 932 / sağ 473, boş sayfada sol 834 / orta 886 / sağ
+    /// 437. T61 kalite hedefi denetimini sol sütuna ekleyince tabela ikiye ayrıldı: dolu
+    /// sayfada sol 904 / orta 932 / sağ 473 — orta hâlâ önde, ama payı 130'dan 28 piksele
+    /// indi; boş sayfada sol 973 / orta 886 / sağ 437 — sol sütun öne geçti, çünkü kaynak
+    /// yokken kalite denetiminin altına yönlendirme satırı çıkıyor (T61/K4).</para>
     ///
-    /// <para>Yani sayfayı kısaltmak isteyen iş artık orta sütuna bakmalı; sol sütun dolu
-    /// sayfada 130, boş sayfada 52 piksel geride. Korunan ilişki değişmedi: sayfa içeriği
-    /// <b>en uzun sütun ile çalışma alanı kenar boşluğunun toplamıdır</b>.</para>
+    /// <para>Yani sayfayı kısaltmak isteyen iş hangi hâli kısaltmak istediğine bakmalı.
+    /// Korunan ilişki değişmedi: sayfa içeriği <b>en uzun sütun ile çalışma alanı kenar
+    /// boşluğunun toplamıdır</b>.</para>
     ///
     /// <para><b>Bu sayı neyi koruyor:</b> sayfayı hangi sütunun gerdiğini — kısaltma işi
     /// yanlış sütuna harcanmasın diye. <b>Bozulursa kullanıcı ne görür:</b> doğrudan bir
     /// şey görmez; bu bir yön tabelasıdır, yanlış olduğunda sonraki düzen işi boşa gider.
-    /// Orta sütun küçülüp sayfayı tutmayı bırakırsa ölçüm kırmızıya düşer ve tabela
-    /// yenilenir.</para>
+    /// Tutan sütun değişirse ölçüm kırmızıya düşer ve tabela yenilenir.</para>
     /// </summary>
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void ThePreviewColumnIsWhatHoldsThePage(bool loaded)
+    [InlineData(false, 0)]
+    [InlineData(true, 1)]
+    public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>
         {
@@ -385,8 +414,9 @@ public sealed class WindowLayoutTests
 
         Assert.Equal(3, columns.Count);
         Assert.True(
-            columns[1] > columns[0] && columns[1] > columns[2],
-            $"Sayfayı tutan sütun değişmiş: sol {columns[0]:0.#}, orta {columns[1]:0.#}, sağ {columns[2]:0.#}.");
+            columns.ToList().IndexOf(columns.Max()) == holder,
+            $"{(loaded ? "Dolu" : "Boş")} sayfayı tutan sütun değişmiş: sol {columns[0]:0.#}, "
+            + $"orta {columns[1]:0.#}, sağ {columns[2]:0.#}; beklenen {holder}. numarali sutun.");
 
         // Sayfa içeriği en uzun sütun ile çalışma alanı kenar boşluğunun toplamı.
         var margin = Read(DesignSize(), loaded, window =>
