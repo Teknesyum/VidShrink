@@ -183,6 +183,113 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         AppHost.Run(host.Dispose);
     }
 
+    /// <summary>
+    /// T50/K1: rozet uc durumda da panele gercekten geciyor. Parca modunda dolu, tam cikti
+    /// modunda ve perde durumunda bos.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Rozet_panele_gecer()
+    {
+        Assert.True(_clips.Ready);
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var panel = AppHost.Run(() => new ComparisonPanel());
+        var host = AppHost.Run(() => new PanelHost(panel, () => new SessizKaynak(), encoder));
+
+        // Perde: parca da tam cikti da yok.
+        AppHost.Run(() =>
+        {
+            host.SetFiles(_clips.Kaynak, null, 16.0 / 9, TimeSpan.FromSeconds(12), 30);
+            host.SetLanguage(false);
+            host.Open();
+        });
+        Assert.True(string.IsNullOrEmpty(Rozet(panel)));
+
+        // Parca: rozet dolu ve panele gecmis.
+        AppHost.Run(() => host.SetPlan(Source(_clips.Kaynak), TwoPassPlan(), null));
+        await host.LoadClipAsync(4);
+        AppHost.Run(() => host.SetLanguage(false));
+        Assert.Equal(host.ApproximateBadge, Rozet(panel));
+        Assert.False(string.IsNullOrWhiteSpace(Rozet(panel)));
+        var ingilizce = Rozet(panel)!;
+
+        // Dil degisince metin de degisir: birlesik dizgeyi panel kendi ceviremez.
+        AppHost.Run(() => host.SetLanguage(true));
+        Assert.NotEqual(ingilizce, Rozet(panel));
+        Assert.Equal(host.ApproximateBadge, Rozet(panel));
+
+        // Tam cikti: rozet kalkar.
+        AppHost.Run(() => host.SetFiles(_clips.Kaynak, _clips.Buyuk, 16.0 / 9, TimeSpan.FromSeconds(12), 30));
+        Assert.Null(host.ApproximateBadge);
+        Assert.True(string.IsNullOrEmpty(Rozet(panel)));
+        AppHost.Run(host.Dispose);
+    }
+
+    private static string? Rozet(ComparisonPanel panel) => AppHost.Run(() => panel.ApproxBadgeText.Text);
+
+    /// <summary>
+    /// T50/K3: plan ve pencere aynıysa arka arkaya gelen SetPlan cagrilari kodlama
+    /// siraya koymaz. Ham sayi: bes cagri sonrasi kac kodlama siraya kondu.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Ayni_planla_yeniden_kodlanmaz()
+    {
+        Assert.True(_clips.Ready);
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var host = Host(encoder);
+        var info = Source(_clips.Kaynak);
+        AppHost.Run(() =>
+        {
+            host.SetFiles(_clips.Kaynak, null, 16.0 / 9, TimeSpan.FromSeconds(12), 30);
+            host.SetPlan(info, TwoPassPlan(), null);
+        });
+
+        await host.LoadClipAsync(4);
+        Assert.NotNull(host.ActiveClip);
+
+        var oncesi = host.ScheduledEncodes;
+        for (var i = 0; i < 5; i++) AppHost.Run(() => host.SetPlan(info, TwoPassPlan(), null));
+        var ayniPlan = host.ScheduledEncodes - oncesi;
+
+        // Plan gercekten degisirse kodlama yine siraya girer.
+        var baska = TwoPassPlan();
+        baska.VideoBitrateK = 900;
+        AppHost.Run(() => host.SetPlan(info, baska, null));
+        var degisenPlan = host.ScheduledEncodes - oncesi - ayniPlan;
+
+        Record50($"T50 K3 ayni planla bes SetPlan -> siraya konan kodlama: {ayniPlan}; plan degisince: {degisenPlan}");
+        Assert.Equal(0, ayniPlan);
+        Assert.Equal(1, degisenPlan);
+        AppHost.Run(host.Dispose);
+    }
+
+    /// <summary>
+    /// T50/K4: perde durumunda sag girdi kaynagin kendisidir ve bu kasitlidir. hstack iki
+    /// girdi istiyor; sag girdi bos birakilirsa istek reddedilir ve sol yari da akmaz.
+    /// Kullanici o goruntuyu gormez, cunku ayni durumda perde sag yariyi kapatiyor.
+    /// </summary>
+    [Fact]
+    public void Perde_durumunda_sag_girdi_kaynaktir()
+    {
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var host = Host(encoder);
+        AppHost.Run(() => host.SetFiles(_clips.Kaynak, null, 16.0 / 9, TimeSpan.FromSeconds(12), 30));
+
+        var istek = AppHost.Run(() => host.BuildRequest(new Avalonia.PixelSize(640, 360)));
+
+        Assert.Equal(_clips.Kaynak, istek.LeftPath);
+        Assert.Equal(_clips.Kaynak, istek.RightPath);
+        istek.Validate();
+
+        // Tam cikti gelince sag girdi gercek ciktidir.
+        AppHost.Run(() => host.SetFiles(_clips.Kaynak, _clips.Buyuk, 16.0 / 9, TimeSpan.FromSeconds(12), 30));
+        var tam = AppHost.Run(() => host.BuildRequest(new Avalonia.PixelSize(640, 360)));
+        Assert.Equal(_clips.Buyuk, tam.RightPath);
+        AppHost.Run(host.Dispose);
+    }
+
     /// <summary>K6: bozuk kaynak cokme uretmez, hata kaydedilir, sag yari bos kalir.</summary>
     [FfmpegFact]
     public async Task Bozuk_kaynakta_panel_cokmez()
@@ -258,6 +365,138 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         Record($"K9 pencere sinirinda boru yeniden kurulmasi ({etiket}), ms: "
             + string.Join(" ", bosluklar.Select(ms => ms.ToString("0"))));
         Assert.All(bosluklar, ms => Assert.True(ms > 0));
+    }
+
+    /// <summary>
+    /// T50/K2 hazirlik olcumu: 127 ms'in nereye gittigini ayirir. Eski surecin oldurulmesi,
+    /// yeni surecin acilmasi ve ilk karenin gelmesi ayri ayri sayilir; hangisinin
+    /// kaldirilabilecegi buna bakilarak secilir.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Sinir_maliyeti_parcalara_ayrilir()
+    {
+        Assert.True(_clips.Ready);
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var info = Source(_clips.Kaynak);
+        var once = await encoder.RequestAsync(info, TwoPassPlan(), 4);
+        var sonra = await encoder.RequestAsync(info, TwoPassPlan(), 6);
+        Assert.NotNull(once);
+        Assert.NotNull(sonra);
+
+        var olum = new List<double>();
+        var acilis = new List<double>();
+        var ilk = new List<double>();
+        for (var tur = 0; tur < 5; tur++)
+        {
+            var eski = Pipe(once!);
+            await eski.StartAsync(Istek(once!));
+            Assert.True(await IlkKare(eski), "ilk pencere kare vermedi");
+
+            var saat = System.Diagnostics.Stopwatch.StartNew();
+            await Task.Run(eski.Dispose);
+            olum.Add(saat.Elapsed.TotalMilliseconds);
+
+            saat.Restart();
+            var yeni = Pipe(sonra!);
+            await yeni.StartAsync(Istek(sonra!));
+            acilis.Add(saat.Elapsed.TotalMilliseconds);
+
+            saat.Restart();
+            Assert.True(await IlkKare(yeni), "ikinci pencere kare vermedi");
+            ilk.Add(saat.Elapsed.TotalMilliseconds);
+            yeni.Dispose();
+        }
+
+        Record50("T50 sinir maliyeti, eski surecin olumu ms: " + Birlestir(olum));
+        Record50("T50 sinir maliyeti, yeni surecin acilisi ms: " + Birlestir(acilis));
+        Record50("T50 sinir maliyeti, ilk karenin beklenmesi ms: " + Birlestir(ilk));
+    }
+
+    /// <summary>
+    /// T50/K2 sonrasi olcumu. Devir: yeni boru <b>eski oldurulmeden</b> aciliyor, eski boru
+    /// bu sirada kare vermeye devam ediyor, degisim ilk yeni kare hazir olunca yapiliyor.
+    /// Olculen sey kullanicinin gordugu sey: ekrana konan son eski kare ile ilk yeni kare
+    /// arasindaki sure. Yaninda ilk yeni karenin sunum damgasi da yaziliyor - donma
+    /// kapanirken icerik atlanmadigini ancak o sayi gosterir.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Devir_sinirindaki_bosluk_olculur()
+    {
+        Assert.True(_clips.Ready);
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var info = Source(_clips.Kaynak);
+        var once = await encoder.RequestAsync(info, TwoPassPlan(), 4);
+        var sonra = await encoder.RequestAsync(info, TwoPassPlan(), 6);
+        Assert.NotNull(once);
+        Assert.NotNull(sonra);
+        await Devri(once!, sonra!, "640x360 kaynak");
+
+        var buyuk = Source(_clips.Buyuk);
+        var buyukOnce = await encoder.RequestAsync(buyuk, TwoPassPlan(), 4);
+        var buyukSonra = await encoder.RequestAsync(buyuk, TwoPassPlan(), 6);
+        Assert.NotNull(buyukOnce);
+        Assert.NotNull(buyukSonra);
+        await Devri(buyukOnce!, buyukSonra!, "1080p kaynak");
+    }
+
+    private static async Task Devri(PreviewClip once, PreviewClip sonra, string etiket)
+    {
+        var bosluklar = new List<double>();
+        var damgalar = new List<double>();
+        for (var tur = 0; tur < 5; tur++)
+        {
+            var eski = Pipe(once);
+            await eski.StartAsync(Istek(once));
+            Assert.True(await IlkKare(eski), "ilk pencere kare vermedi");
+
+            // Devir baslar: yeni boru aciliyor, eski hala ayakta ve kare veriyor.
+            var yeni = Pipe(sonra);
+            var acilis = yeni.StartAsync(Istek(sonra));
+
+            var sonEski = System.Diagnostics.Stopwatch.StartNew();
+            var son = DateTime.UtcNow.AddSeconds(10);
+            while (yeni.Status.ProducedFrames == 0 && DateTime.UtcNow < son)
+            {
+                if (eski.TryTake(out var kare)) { eski.Return(kare); sonEski.Restart(); }
+                await Task.Delay(1);
+            }
+            await acilis;
+
+            PlaybackFrame? ilk = null;
+            while (ilk is null && DateTime.UtcNow < son)
+            {
+                if (yeni.TryTake(out var kare)) ilk = kare;
+                else await Task.Delay(1);
+            }
+            sonEski.Stop();
+            Assert.NotNull(ilk);
+            damgalar.Add(ilk!.Presentation.TotalMilliseconds);
+            yeni.Return(ilk);
+
+            bosluklar.Add(sonEski.Elapsed.TotalMilliseconds);
+            _ = Task.Run(eski.Dispose);
+            yeni.Dispose();
+        }
+
+        Record50($"T50 devirle sinir boslugu ({etiket}), ms: " + Birlestir(bosluklar));
+        Record50($"T50 devirde ilk yeni karenin damgasi ({etiket}), ms: " + Birlestir(damgalar));
+    }
+
+    private static string Birlestir(IEnumerable<double> degerler)
+        => string.Join(" ", degerler.Select(ms => ms.ToString("0")));
+
+    /// <summary>T50 olcumleri kendi klasorune iner; T48'in dosyasina dokunulmaz.</summary>
+    private static void Record50(string line)
+    {
+        try
+        {
+            var dir = TestPaths.LiveOut("t50");
+            Directory.CreateDirectory(dir);
+            File.AppendAllText(Path.Combine(dir, "olcum.txt"), line + Environment.NewLine);
+        }
+        catch { }
     }
 
     private const int OlcumPanelWidth = 640;

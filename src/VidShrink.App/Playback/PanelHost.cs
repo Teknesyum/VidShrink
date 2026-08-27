@@ -36,8 +36,24 @@ internal sealed class PanelHost : IDisposable
     /// <summary>Pencerenin bu kadarı oynadığında sonraki pencere kodlanmaya başlar (K3).</summary>
     private const double PrefetchAtFraction = 0.5;
 
-    /// <summary>Pencerenin sonuna bu kadar kalınca sonraki pencereye geçilir.</summary>
-    private const double AdvanceTailSeconds = 0.08;
+    /// <summary>
+    /// Pencerenin sonuna bu kadar kalınca <b>sonraki pencerenin borusu açılır</b> — geçiş
+    /// değil, hazırlık. Ölçüldü (T50): ffmpeg süreç açılışından ilk kareye 110 ms geçiyor,
+    /// bunun 32 ms'i sürecin kendisi. Öndeki pay bu ölçünün üstünde tutuluyor.
+    ///
+    /// Eski sabit <c>AdvanceTailSeconds</c> bunun yerine <b>geçişi</b> tetikliyordu: boru
+    /// sınırda öldürülüp yeniden kurulduğu için pencerenin son 80 ms'i hiç gösterilmiyordu.
+    /// Devirle o gerekçe kalktı; eski boru yeni boru ilk kareyi verene kadar oynamaya devam
+    /// ediyor, yani öndeki pay artık içerik atlamıyor.
+    /// </summary>
+    private const double HandoverLeadSeconds = 0.16;
+
+    /// <summary>
+    /// Devirden sonra kaç sunum turu <b>sırayla</b> tüketilir. Yeni boru açılış gecikmesini
+    /// kapatmak için ilk kareleri topluca veriyor; o turlarda en yenisini almak o kareleri
+    /// atlardı. Halka dört gözlü, 60 Hz'de sekiz tur birikimi eritmeye yeter.
+    /// </summary>
+    private const int OrderedTicksAfterHandover = 8;
 
     private readonly ComparisonPanel _panel;
     private readonly Func<IComparisonFrameSource> _factory;
@@ -74,6 +90,14 @@ internal sealed class PanelHost : IDisposable
     private bool _clipRunning;
     private bool _aheadRunning;
     private string? _clipError;
+    private string? _clipSignature;
+    private string? _pendingSignature;
+    private int _scheduled;
+    private IComparisonFrameSource? _standby;
+    private PreviewClip? _standbyClip;
+    private bool _standbyOpening;
+    private int _orderedTicks;
+    private int _handovers;
 
     internal PanelHost(ComparisonPanel panel, Func<IComparisonFrameSource> factory, SegmentEncoder? segments = null)
     {
@@ -114,6 +138,15 @@ internal sealed class PanelHost : IDisposable
 
     /// <summary>Önden hazırlanmış bir sonraki pencere (K3).</summary>
     internal PreviewClip? PreparedClip => _ahead;
+
+    /// <summary>Kaç kez sınırda devir yapıldı — boru öldürülmeden yüzey değiştirildi.</summary>
+    internal int Handovers => _handovers;
+
+    /// <summary>Bekleyen boru ayakta mı.</summary>
+    internal bool HasStandby => _standby is not null;
+
+    /// <summary>Kaç kez kodlama sıraya kondu — T50/K3 ölçümü bunu okur.</summary>
+    internal int ScheduledEncodes => _scheduled;
 
     /// <summary>Kısa parça kodlayıcısı — ölçüm iptal ve geçici dosya sayımını buradan okur.</summary>
     internal SegmentEncoder Segments => _segments;
@@ -159,8 +192,49 @@ internal sealed class PanelHost : IDisposable
         // Tam çıktı varken parça üretilmez: sağ yarı zaten gerçek çıktıyı gösteriyor.
         if (_right is not null) { _segmentDelay.Stop(); _segments.Cancel(); return; }
 
+        // T50/K3: plan da pencere de aynıysa kodlama başlatılmaz. Dil düğmesi de, hedef
+        // tuşu da Recalculate üzerinden buraya düşüyor ve çoğu zaman planı değiştirmiyor;
+        // eskiden her çağrı iki dosyalık kodlama ve boru yeniden kurulumu ödetiyordu.
+        if (ClipSignature(info, plan, _clipStart) is { } signature && signature == TargetSignature)
+            return;
+
         ScheduleClip(_clipStart);
     }
+
+    /// <summary>
+    /// Bir pencerenin "aynı" olmasının ölçüsü: <b>o pencere için ffmpeg'e geçecek argüman
+    /// dizisinin kendisi</b>. Alan alan karşılaştırma yerine bu seçildi çünkü kodlamanın
+    /// çıktısını gerçekten belirleyen şey argümanlardır; plana yeni bir alan eklendiğinde
+    /// karşılaştırma kendiliğinden onu da kapsar, güncellenmesi unutulan bir liste kalmaz.
+    /// Kaynak yolu, başlangıç anı, süre, kodlayıcı, ölçü, kare hızı, kalite değeri ve ön
+    /// ayar — hepsi argümanların içinde.
+    ///
+    /// Çıktı yolu iki tarafta da aynı yer tutucudur, yani karşılaştırmaya girmez. Pencere
+    /// kaynağın dışına düşerse <c>null</c> döner ve çağıran "değişti" varsayar.
+    /// </summary>
+    private string? ClipSignature(MediaInfo info, EncodePlan plan, double startSeconds)
+    {
+        try
+        {
+            var segment = PreviewSegment.For(info, plan, Math.Max(0, startSeconds), SignatureOutput, complexity: _profile);
+            return string.Join('', segment.Arguments);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>İmza hesabında kullanılan yer tutucu çıktı yolu; diske hiç dokunulmaz.</summary>
+    private const string SignatureOutput = "<signature>";
+
+    /// <summary>
+    /// Sağ yarının <b>şu an hedeflediği</b> pencere. Bir kodlama bekliyor ya da koşuyorsa
+    /// hedef odur; hiçbiri yoksa hedef ekrandaki parçadır. Yeni istek bununla karşılaştırılır:
+    /// aynıysa yapılacak iş yok.
+    /// </summary>
+    private string? TargetSignature
+        => _segmentDelay.IsEnabled || _clipRunning ? _pendingSignature : _clipSignature;
 
     /// <summary>
     /// Panelin süreceği dosyalar. Sağ taraf için işlenmiş dosya yoksa <c>null</c> geçilir —
@@ -183,7 +257,9 @@ internal sealed class PanelHost : IDisposable
             _segments.Cancel();
             _clip = null;
             _ahead = null;
+            _ = DropStandby();
             _clipError = null;
+            _clipSignature = null;
             if (left != _left) _clipStart = 0;
         }
 
@@ -194,7 +270,7 @@ internal sealed class PanelHost : IDisposable
         _fps = (int)Math.Clamp(Math.Round(sourceFps <= 0 ? 30 : sourceFps), 1, MaxFps);
 
         if (_left is null) { Close(); return; }
-        if (_open) Restart();
+        if (_open) { RefreshRight(); Restart(); }
         if (_right is null) ScheduleClip(_clipStart);
     }
 
@@ -215,6 +291,7 @@ internal sealed class PanelHost : IDisposable
         _open = false;
         _panel.SetCompact(true);
         _panel.SetRightNotice(null);
+        _panel.SetRightBadge(null);
         _panel.SetNotice(null);
         // Configure panoyu boşaltır: kapalı panel son kareyi donuk göstermez, boş duruma döner.
         if (_panelSize.Width > 0) _panel.Frames.Configure(new PixelSize(_panelSize.Width * 2, _panelSize.Height));
@@ -222,10 +299,15 @@ internal sealed class PanelHost : IDisposable
         _panel.RefreshEmptyState();
     }
 
+    /// <summary>
+    /// Dil değişimi. Rozet metni burada yeniden sürülür: panel rozeti olduğu gibi gösteriyor,
+    /// birleşik dizgenin sözlükte karşılığı yok, yani çeviriyi barındıran taraf yapmalı.
+    /// </summary>
     internal void SetLanguage(bool turkish)
     {
         _turkish = turkish;
         _panel.SetLanguage(turkish);
+        _panel.SetRightBadge(ApproximateBadge);
     }
 
     /// <summary>
@@ -259,7 +341,7 @@ internal sealed class PanelHost : IDisposable
         _panelSize = size;
 
         _panel.Frames.Configure(new PixelSize(size.Width * 2, size.Height));
-        _panel.SetRightNotice(RightCurtain());
+        RefreshRight();
         _panel.SetNotice("The first frame is on its way");
         _panel.Controls.Duration = _duration > TimeSpan.Zero ? _duration : null;
         _panel.Controls.IsPlaying = true;
@@ -271,17 +353,7 @@ internal sealed class PanelHost : IDisposable
         // Parça modunda iki girdi de aynı pencereye kesilmiş dosyalardır: ikisi de kendi
         // ekseninde sıfırdan akar, hstack hizayı kendiliğinden tutturur. Pencere kısa olduğu
         // için tekrar kapalı — dolduğunda başa sarmak yerine sonraki pencereye geçilir.
-        var clip = ActiveClip;
-        var request = new ComparisonFrameRequest
-        {
-            LeftPath = clip?.SourcePath ?? _left,
-            RightPath = clip?.EncodedPath ?? _right ?? _left,
-            PanelWidth = size.Width,
-            PanelHeight = size.Height,
-            Fps = _fps,
-            Realtime = true,
-            Loop = clip is null
-        };
+        var request = BuildRequest(size);
 
         try
         {
@@ -301,6 +373,34 @@ internal sealed class PanelHost : IDisposable
         _windowStart = Environment.TickCount64;
         Report(source.Status);
         Pump(generation);
+    }
+
+    /// <summary>
+    /// Boruya verilecek istek. Sağ yarının üç durumu buradaki iki <c>??</c> dalıdır ve
+    /// üçüncü dal — <c>_left</c> — <b>kasıtlı olarak duruyor</b> (T50/K4).
+    ///
+    /// Perde durumunda ne parça ne tam çıktı vardır, ama boru <c>hstack</c> ile tek süreçte
+    /// iki girdi birleştiriyor: sağ girdi boş bırakılırsa
+    /// <see cref="ComparisonFrameRequest.Validate"/> isteği reddeder ve <b>sol yarı da</b>
+    /// akmaz. Bu yüzden sağ girdiye kaynağın kendisi konur; kullanıcı onu hiç görmez, çünkü
+    /// aynı durumda <see cref="RightCurtain"/> sağ yarıyı zaten kapatıyor. Dalın kaldırılması
+    /// perde durumunda paneli tümden karartır — bunu <c>Perde_durumunda_sag_girdi_kaynaktir</c>
+    /// testi tutuyor.
+    /// </summary>
+    internal ComparisonFrameRequest BuildRequest(PixelSize size)
+    {
+        var clip = ActiveClip;
+        var left = clip?.SourcePath ?? _left ?? throw new InvalidOperationException("Sol girdi yok; akış kurulamaz.");
+        return new ComparisonFrameRequest
+        {
+            LeftPath = left,
+            RightPath = clip?.EncodedPath ?? _right ?? left,
+            PanelWidth = size.Width,
+            PanelHeight = size.Height,
+            Fps = _fps,
+            Realtime = true,
+            Loop = clip is null
+        };
     }
 
     /// <summary>
@@ -353,11 +453,26 @@ internal sealed class PanelHost : IDisposable
             : $"{LanguageCatalog.Localize("The preview sample could not be encoded", _turkish)}: {_clipError}";
     }
 
+    /// <summary>
+    /// Sag yarinin iki metnini birlikte tazeler: perde ve rozet ayni duruma bakiyor, ayri
+    /// tazelenirse biri otekinden geride kalir.
+    /// </summary>
+    private void RefreshRight()
+    {
+        // Kodlama arayuz kuyrugunun disinda bitiyor; panel ozellikleri yalniz kendi
+        // kuyrugundan yazilabilir.
+        if (!Dispatcher.UIThread.CheckAccess()) { Dispatcher.UIThread.Post(RefreshRight); return; }
+        _panel.SetRightNotice(RightCurtain());
+        _panel.SetRightBadge(ApproximateBadge);
+    }
+
     /// <summary>Gecikmeyi kurar. Arka arkaya gelen istekler tek kodlamaya iner (K1).</summary>
     private void ScheduleClip(double startSeconds)
     {
         if (_disposed || _right is not null || _info is null || _plan is null || _left is null) return;
         _clipStart = Math.Max(0, startSeconds);
+        _pendingSignature = _info is { } media && _plan is { } current ? ClipSignature(media, current, _clipStart) : null;
+        _scheduled++;
         _segmentDelay.Stop();
         _segmentDelay.Start();
     }
@@ -372,7 +487,11 @@ internal sealed class PanelHost : IDisposable
         var plan = _plan;
         if (_disposed || info is null || plan is null || _left is null || _right is not null) return;
 
+        // Gecikme bu işin kendisi için kuruluyordu; iş elden başlatıldığında sayaç durur.
+        _segmentDelay.Stop();
+        _pendingSignature = ClipSignature(info, plan, Math.Max(0, startSeconds));
         _ahead = null;
+        _ = DropStandby();
         _clipRunning = true;
         try
         {
@@ -384,19 +503,22 @@ internal sealed class PanelHost : IDisposable
                 if (_segments.LastError is null) return;
                 _clipError = _segments.LastError;
                 _clip = null;
-                if (_open) _panel.SetRightNotice(RightCurtain());
+                _clipSignature = null;
+                if (_open) RefreshRight();
                 return;
             }
 
             _clipError = null;
             _clip = clip;
             _clipStart = clip.StartSeconds;
-            if (_open) Restart();
+            _clipSignature = ClipSignature(info, plan, clip.StartSeconds);
+            _pendingSignature = null;
+            if (_open) { RefreshRight(); Restart(); }
         }
         catch (Exception ex)
         {
             _clipError = ex.Message;
-            if (_open) _panel.SetRightNotice(RightCurtain());
+            if (_open) RefreshRight();
         }
         finally
         {
@@ -449,6 +571,7 @@ internal sealed class PanelHost : IDisposable
             _ahead = null;
             _clip = ready;
             _clipStart = ready.StartSeconds;
+            _clipSignature = _info is { } media && _plan is { } current ? ClipSignature(media, current, ready.StartSeconds) : null;
             if (_open) Restart();
             return;
         }
@@ -478,7 +601,14 @@ internal sealed class PanelHost : IDisposable
     {
         var source = _source;
         if (source is null) return;
-        if (!TakeNewestReady(source, out var frame)) return;
+
+        PlaybackFrame frame;
+        if (_orderedTicks > 0)
+        {
+            _orderedTicks--;
+            if (!source.TryTake(out frame)) return;
+        }
+        else if (!TakeNewestReady(source, out frame)) return;
 
         var expected = _panel.Frames.FrameSize;
         var position = frame.Presentation;
@@ -528,8 +658,107 @@ internal sealed class PanelHost : IDisposable
     {
         if (!_panel.Controls.IsPlaying) return;
         var played = position.TotalSeconds;
-        if (played >= clip.DurationSeconds - AdvanceTailSeconds) { AdvanceClip(); return; }
+
         if (played >= clip.DurationSeconds * PrefetchAtFraction) _ = PrepareAheadAsync();
+        if (played >= clip.DurationSeconds - HandoverLeadSeconds) BeginHandover();
+
+        // Devir: yeni boru kare vermeye başladıysa yüzey orada değiştirilir. Başlamadıysa
+        // eski boru pencerenin sonuna kadar oynamaya devam eder — donmuş kare yerine
+        // gerçek içerik.
+        if (_standby is { } standby && standby.Status.ProducedFrames > 0) { SwapToStandby(); return; }
+        if (played >= clip.DurationSeconds) AdvanceClip();
+    }
+
+    /// <summary>
+    /// Sonraki pencerenin borusunu eski boru ayaktayken açar. Süreç açılışının 110 ms'i
+    /// burada, oynatma sürerken ödenir; sınırda ödenmez.
+    /// </summary>
+    private void BeginHandover()
+    {
+        if (_standby is not null || _standbyOpening) return;
+        if (_ahead is not { } next) return;
+        if (_panelSize.Width < MinPanelEdge || _panelSize.Height < MinPanelEdge) return;
+        if (_disposed || !_open) return;
+
+        _standbyOpening = true;
+        _standbyClip = next;
+        _ = OpenStandbyAsync(next, _panelSize);
+    }
+
+    private async Task OpenStandbyAsync(PreviewClip next, PixelSize size)
+    {
+        var source = _factory();
+        try
+        {
+            await source.StartAsync(new ComparisonFrameRequest
+            {
+                LeftPath = next.SourcePath,
+                RightPath = next.EncodedPath,
+                PanelWidth = size.Width,
+                PanelHeight = size.Height,
+                Fps = _fps,
+                Realtime = true,
+                Loop = false
+            });
+        }
+        catch
+        {
+            // Devir açılamadıysa sessizce eski yola dönülür: pencere sonunda boru yeniden
+            // kurulur. Kullanıcıya söylenecek yeni bir şey yok, gösterilen görüntü aynı.
+            Abandon(source);
+            return;
+        }
+
+        if (_disposed || !_open || !ReferenceEquals(_standbyClip, next)) { Abandon(source); return; }
+
+        _standby = source;
+        _standbyOpening = false;
+    }
+
+    private void Abandon(IComparisonFrameSource source)
+    {
+        _standbyOpening = false;
+        _standbyClip = null;
+        _ = Task.Run(source.Dispose);
+    }
+
+    /// <summary>
+    /// Yüzeyi bekleyen boruya çevirir ve eskisini <b>arkada</b> öldürür. Sunum döngüsü
+    /// kaynağı her turda okuduğu için döngü yeniden kurulmaz; kullanıcı bir kare bile
+    /// donmuş görmez.
+    /// </summary>
+    private void SwapToStandby()
+    {
+        if (_standby is not { } next || _standbyClip is not { } clip) return;
+        _standby = null;
+        _standbyClip = null;
+        if (ReferenceEquals(_ahead, clip)) _ahead = null;
+
+        var old = _source;
+        if (old is not null) old.StatusChanged -= OnStatusChanged;
+        next.StatusChanged += OnStatusChanged;
+
+        _clip = clip;
+        _clipStart = clip.StartSeconds;
+        _clipSignature = _info is { } media && _plan is { } current ? ClipSignature(media, current, clip.StartSeconds) : null;
+        _source = next;
+        _orderedTicks = OrderedTicksAfterHandover;
+        _handovers++;
+
+        if (old is not null) _ = Task.Run(old.Dispose);
+        RefreshRight();
+        Report(next.Status);
+    }
+
+    /// <summary>Bekleyen boruyu bırakır. Pencere, dosya ya da konum değiştiğinde çağrılır.</summary>
+    private Task DropStandby()
+    {
+        var standby = _standby;
+        _standby = null;
+        _standbyClip = null;
+        _standbyOpening = false;
+        _orderedTicks = 0;
+        return standby is null ? Task.CompletedTask : Task.Run(standby.Dispose);
     }
 
     /// <summary>
@@ -614,6 +843,7 @@ internal sealed class PanelHost : IDisposable
         if (ActiveClip is not null || (_right is null && _info is not null && _plan is not null))
         {
             _ahead = null;
+            _ = DropStandby();
             ScheduleClip(position.TotalSeconds);
             return;
         }
@@ -634,6 +864,7 @@ internal sealed class PanelHost : IDisposable
     /// </summary>
     private Task Teardown()
     {
+        _ = DropStandby();
         var source = _source;
         _source = null;
         _generation++;
@@ -654,6 +885,8 @@ internal sealed class PanelHost : IDisposable
         _disposed = true;
         _settle.Stop();
         _segmentDelay.Stop();
+        // Bekleyen boru da bir ffmpeg surecidir; gercekten olene kadar beklenir.
+        DropStandby().Wait(TimeSpan.FromSeconds(3));
         // Uygulama kapanıyor: kalan parça dosyaları burada silinir (K5).
         _segments.Dispose();
         // Pencere kapanıyor: süreç gerçekten ölene kadar beklenir, öksüz ffmpeg kalmaz.
