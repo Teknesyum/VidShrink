@@ -1,0 +1,28 @@
+{
+  "contractId": "T46",
+  "auditorRunId": "a71d0ddce1e6a1dbf",
+  "headSha": "962c6c274d43c0c3e9dcdcecdfa1004481ee29f6",
+  "diffHash": "ef5480356eba9499504250303cf58de6840009ac8c9739ae02dac436b58b2bb4",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Playback/ZoomGesture.cs",
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs",
+    "tests/VidShrink.Tests/ZoomGestureTests.cs",
+    "tests/VidShrink.Tests/ChipTests.cs",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 uyari 0 hata",
+    "dotnet test 605 basarili 0 basarisiz 16 atlanan 621 toplam"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T09:37:45.254Z",
+  "usedAt": "2026-08-27T09:37:45.313Z",
+  "completedSha": "962c6c274d43c0c3e9dcdcecdfa1004481ee29f6"
+}
