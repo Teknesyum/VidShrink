@@ -2,3 +2,4 @@
 - [VidShrink doğrulama](vidshrink-dogrulama.md) — tahmin/gerçek ölçümü için scratchpad harness gerekir, bench aracı kalibrasyonu atlıyor
 - [PowerShell UTF-8 tuzağı](powershell-utf8-tuzagi.md) — PS 5.1 BOM'suz Türkçe dosyayı bozar; sözleşme/rapor/LOG düzenlemeleri Bash cat+sed ile
 - [Ölçüm dosyası büyür](olcum-dosyasi-buyur.md) — her dotnet test kosumu olcum.txt sonuna ekliyor; raporu son kosumdan sonra yaz
+- [--no-build bayat derleme](no-build-bayat-derleme.md) — kabul kriterini --no-build ile dogrulama; Avalonia Measure argumaninin yutulmasi

@@ -6,3 +6,4 @@ tools/ffmpeg/*.exe
 .claude/relay/live/
 .claude/worktrees/
 .calisma/
+TestResults/
