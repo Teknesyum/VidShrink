@@ -1,0 +1,19 @@
+{
+  "contractId": "T51",
+  "auditorRunId": "a803ec2fbf718c75f",
+  "headSha": "e709840a88a32b1b29b7a4626e579d13ee7f4273",
+  "diffHash": "48f0aad6fde5c244b310ccaa1993bdf607dd3cec4103a15dc779a154276d78e4",
+  "owns": [
+    "tests/VidShrink.Tests/WindowLayoutTests.cs",
+    "tests/VidShrink.Tests/AppHost.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 hata",
+    "dotnet test -c Release 637 basarili 0 basarisiz 16 atlanan 653 toplam",
+    "sifirdan worktree ayni sayilari verdi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T11:23:49.635Z",
+  "usedAt": "2026-08-27T11:23:52.891Z",
+  "completedSha": "e709840a88a32b1b29b7a4626e579d13ee7f4273"
+}
