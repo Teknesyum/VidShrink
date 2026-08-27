@@ -1,8 +1,9 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.Core;
@@ -143,8 +144,8 @@ public sealed class WindowLayoutTests
         + string.Join(", ", overflowing);
 
     /// <summary>
-    /// Pencerenin istediği boyutta sayfa kaymıyor — dosya yüklüyken de. Dolu hâli ayakta
-    /// tutan şey plan panelinin tavanı; tavan kalkarsa bu ölçüm de kırmızıya düşer.
+    /// Pencerenin istediği boyutta sayfa kaymıyor — dosya yüklüyken de. Dolu hâlin boyunu
+    /// tutan şey sol ayar sütunu (T46/K7); o sütun uzarsa bu ölçüm kırmızıya düşer.
     /// </summary>
     [Theory]
     [InlineData(false)]
@@ -210,72 +211,148 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Sayfanın kaymayı bıraktığı yükseklik, tasarım genişliğinde. Sayı pinli: yerleşim
-    /// şiştiğinde ölçüm kırmızıya düşer ve yeniden konuşulur. Dolu sayfa boş sayfadan
-    /// daha erken sığıyor, çünkü bırakma alanı dosya yüklenince kalkıyor.
+    /// Sayfanın içeriği açılış görüş alanına sığıyor mu — ve ne kadar boşlukla.
     ///
-    /// <para>Aralık dar tutulmadı: panel yükseklikleri kullanılabilir kodlayıcı kümesine
-    /// göre makineden makineye oynuyor. Plan paneli tavanının nöbetini bu ölçüm değil,
-    /// tasarım boyutu ölçümü ile tavan ölçümü tutuyor.</para>
+    /// <para>Buradaki ölçüm <b>yükseklik taraması değil</b>. T46/K7'de tarama denendi ve
+    /// bu koşumda anlamsız çıktığı ölçüldü: <c>Measure</c>'a verilen yükseklik yerleşime
+    /// ulaşmıyor, görüş alanı her zaman başsız çalışma alanından geliyor. 200, 400, 600,
+    /// 900 ve 1060 piksel istendiğinde <c>PageShrink</c> beşinde de aynı sayıyı verdi
+    /// (uzam 895, görüş alanı 895). "Sayfa şu yükseklikte kaymayı keser" cümlesi bu
+    /// koşumda <b>ölçülemiyor</b>; ölçülebilen şey içeriğin kendi boyu.</para>
+    ///
+    /// <para>Sayılar pinli: yerleşim şiştiğinde ölçüm kırmızıya düşer ve yeniden
+    /// konuşulur. Aralık dar tutulmadı, panel yükseklikleri kullanılabilir kodlayıcı
+    /// kümesine göre makineden makineye oynuyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 950, 1150)]
-    [InlineData(true, 900, 1100)]
-    public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
+    [InlineData(false, false, 810, 910)]
+    [InlineData(false, true, 810, 910)]
+    [InlineData(true, false, 780, 880)]
+    [InlineData(true, true, 815, 915)]
+    public void ThePageContentFitsTheStartingViewport(bool loaded, bool narrow, double least, double most)
     {
-        var width = DesignSize().Width;
-        var fitting = double.NaN;
+        var size = narrow ? MinimumSize() : DesignSize();
 
-        for (var height = 600.0; height <= 1600.0; height += 4)
+        var (content, viewport) = Read(size, loaded, window =>
         {
-            if (LayOut(new Size(width, height), loaded).Count != 0) continue;
-            fitting = height;
-            break;
-        }
-
-        Assert.True(
-            !double.IsNaN(fitting),
-            $"{(loaded ? "Dolu" : "Boş")} sayfa 1600 piksele kadar hiçbir yükseklikte sığmadı.");
-        Assert.InRange(fitting, least, most);
-    }
-
-    /// <summary>
-    /// Dolu sayfayı kaymaktan alıkoyan şey plan panelinin tavanı. Tavan kaldırılırsa panel
-    /// içeriği kadar uzar; ölçüm hem burada hem tasarım boyutu ölçümünde kırmızıya düşer.
-    /// Tavanın <b>değeri</b> ölçülmüyor, devrede olduğu ölçülüyor.
-    /// </summary>
-    [Fact]
-    public void ThePlanPanelCeilingIsWhatHoldsTheLoadedPage()
-    {
-        var (ceiling, panelHeight, contentHeight) = Read(DesignSize(), loaded: true, window =>
-        {
-            var panel = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
-            var body = window.GetVisualDescendants().OfType<StackPanel>().Single(b => b.Name == "PlanBody");
-            window.TryFindResource("PlanPanelMaxHeight", out var value);
-            return ((double)value!, panel.Bounds.Height, body.DesiredSize.Height);
+            var page = window.GetVisualDescendants().OfType<ScrollViewer>().Single(v => v.Name == "PageShrink");
+            return (((Control)page.Content!).DesiredSize.Height, page.Viewport.Height);
         });
 
-        Assert.Equal(ceiling, panelHeight, 1);
         Assert.True(
-            contentHeight > ceiling,
-            $"Plan içeriği ({contentHeight:0.#}) tavanın ({ceiling:0}) altında kaldı; tavan devrede değil.");
+            content < viewport,
+            $"{(loaded ? "Dolu" : "Boş")} sayfa {size.Width:0} genişlikte görüş alanına sığmadı: "
+            + $"içerik {content:0.#}, görüş alanı {viewport:0.#}.");
+        Assert.InRange(content, least, most);
     }
 
     /// <summary>
-    /// Taban boyutta kaydırma <b>beklenen</b> davranış — içerik gerçekten sığmıyor. Ölçüm
-    /// bunu kaydediyor ki bir gün sığdığı zaman kimse fark etmeden geçmesin.
+    /// Dolu sayfanın boyunu ne tutuyor: <b>sol ayar sütunu</b>.
+    ///
+    /// <para>Bu ölçüm T46/K7'de yeniden kuruldu. Önceki hâli "sayfayı tutan şey plan
+    /// paneli tavanıdır" diyordu ve K6 gerekçeleri katlayınca yanlış hale geldi — plan
+    /// içeriği 681'den 278'e indi, tavana (512) artık dayanmıyor. Ölçülen yeni durum:
+    /// sol sütun 802, orta sütun 676, sağ sütun 473. Sayfa içeriği (826) sol sütunun
+    /// çalışma alanı kenar boşluğuyla toplamıdır.</para>
+    ///
+    /// <para>Yani sayfayı kısaltmak isteyen iş orta sütuna değil sol sütuna bakmalı;
+    /// orta sütun 126 piksel geride.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void TheSmallestSizeStillScrolls(bool loaded)
+    public void TheSettingsColumnIsWhatHoldsThePage(bool loaded)
+    {
+        var (columns, content) = Read(DesignSize(), loaded, window =>
+        {
+            var plan = window.GetVisualDescendants().OfType<Control>().First(c => c.Name == "PlanPanel");
+            var grid = plan.GetVisualAncestors().OfType<Grid>().First(g => g.ColumnDefinitions.Count == 3);
+            var heights = grid.Children.OfType<Control>()
+                .OrderBy(Grid.GetColumn)
+                .Select(c => c.DesiredSize.Height)
+                .ToList();
+
+            var page = window.GetVisualDescendants().OfType<ScrollViewer>().Single(v => v.Name == "PageShrink");
+            return ((IReadOnlyList<double>)heights, ((Control)page.Content!).DesiredSize.Height);
+        });
+
+        Assert.Equal(3, columns.Count);
+        Assert.True(
+            columns[0] > columns[1] && columns[0] > columns[2],
+            $"Sayfayı tutan sütun değişmiş: sol {columns[0]:0.#}, orta {columns[1]:0.#}, sağ {columns[2]:0.#}.");
+
+        // Sayfa içeriği en uzun sütun ile çalışma alanı kenar boşluğunun toplamı.
+        var margin = Read(DesignSize(), loaded, window =>
+            window.TryFindResource("WorkspaceMargin", out var value) && value is Thickness pad
+                ? pad.Top + pad.Bottom
+                : double.NaN);
+
+        Assert.Equal(columns[0] + margin, content, 1);
+    }
+
+    /// <summary>
+    /// Plan paneli tavanı hâlâ devrede. K6 onu gereksiz kılmadı: satırı tavan tutmasa
+    /// panel kendisine ayrılan yerin tamamına uzardı. Ölçüm bunu iki sayıyla söylüyor —
+    /// satırın panele bıraktığı yer tavandan büyük, panelin boyu ise tam tavan.
+    ///
+    /// <para>Tavanın <b>değeri</b> ölçülmüyor, devrede olduğu ölçülüyor.</para>
+    ///
+    /// <para>T46/K7 notu: "katlı gerekçeler açılınca içerik taşar" iddiası bu koşumda
+    /// <b>ölçülemedi</b>. Katlanan bölüm açıldıktan sonra ikinci bir yerleşim turu
+    /// koşturulamıyor — <c>PlanReasons</c> görünür oluyor (dokuz çocuk) ama çocukların
+    /// <see cref="Layoutable.DesiredSize"/> değeri sıfır kalıyor, yani hiç ölçülmüyorlar.
+    /// Tahmin yazmamak için o iddia teste konmadı.</para>
+    /// </summary>
+    [Fact]
+    public void ThePlanPanelCeilingCapsTheRowItIsGiven()
+    {
+        var (ceiling, panelHeight, roomInRow, content) = Read(DesignSize(), loaded: true, window =>
+        {
+            var panel = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
+            var body = window.GetVisualDescendants().OfType<StackPanel>().Single(b => b.Name == "PlanBody");
+            var column = panel.GetVisualAncestors().OfType<Grid>().First(g => g.RowDefinitions.Count == 2);
+            window.TryFindResource("PlanPanelMaxHeight", out var value);
+
+            // Satırın panele bıraktığı yer: sütunun boyundan panelin sütun içindeki
+            // başlangıcı düşülür. Üstünde önizleme paneli ve başlığı duruyor.
+            return ((double)value!, panel.Bounds.Height, column.Bounds.Height - panel.Bounds.Y, body.DesiredSize.Height);
+        });
+
+        Assert.Equal(ceiling, panelHeight, 1);
+        Assert.True(
+            roomInRow > ceiling,
+            $"Satır panele tavandan ({ceiling:0}) az yer bırakıyor ({roomInRow:0.#}); tavan devrede değil, "
+            + "paneli tutan şey satırın kendisi.");
+        Assert.True(
+            content < panelHeight,
+            $"Plan içeriği ({content:0.#}) panelin boyunu ({panelHeight:0.#}) aştı; taşma PlanScroll'a düşüyor.");
+    }
+
+    /// <summary>
+    /// Taban boyutta sayfa artık kaymıyor — kayarsa bu bir gerileme.
+    ///
+    /// <para>İddia T46/K7'de tersine çevrildi. Eskiden taban boyutta (1040x720) tek bir
+    /// dış kaydırma bekleniyordu; K1 yonga şeridini üç satırdan ikiye indirdikten ve K6
+    /// plan gerekçelerini katladıktan sonra içerik sığıyor.</para>
+    ///
+    /// <para>Ölçümün gerçekte sınadığı eksen <b>genişlik</b>. Verilen yükseklik bu
+    /// koşumda yerleşime ulaşmıyor (bkz. <see cref="ThePageContentFitsTheStartingViewport"/>),
+    /// bu yüzden "şu yüksekliğin altında kaymaya başlıyor" cümlesi ölçülemedi ve
+    /// yazılmadı. Genişlik ekseni ölçüldü: tasarım genişliğinden 700 piksele kadar on
+    /// piksel adımlarla tarandı, dolu ve boş sayfanın ikisi de hiçbir genişlikte
+    /// taşmadı.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void TheSmallestSizeNoLongerScrolls(bool loaded)
     {
         var size = MinimumSize();
         var overflowing = LayOut(size, loaded);
 
         Assert.True(
-            overflowing.Count == 1,
-            $"Taban boyutta ({size.Width:0}x{size.Height:0}) tek bir dış kaydırma bekleniyordu. "
+            overflowing.Count == 0,
+            $"Taban boyutta ({size.Width:0}x{size.Height:0}) sayfa artık kaymamalı. "
             + Describe(size, loaded, overflowing));
     }
 
