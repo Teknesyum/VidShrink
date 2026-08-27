@@ -433,57 +433,142 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         var sonra = await encoder.RequestAsync(info, TwoPassPlan(), 6);
         Assert.NotNull(once);
         Assert.NotNull(sonra);
+        await EskiYolu(once!, sonra!, "640x360 kaynak");
         await Devri(once!, sonra!, "640x360 kaynak");
+        if (Environment.GetEnvironmentVariable("VIDSHRINK_PAY_TARAMASI") is not null)
+            foreach (var pay in new[] { 0.24, 0.32, 0.40 })
+                await Devri(once!, sonra!, "640x360 kaynak", pay);
 
         var buyuk = Source(_clips.Buyuk);
         var buyukOnce = await encoder.RequestAsync(buyuk, TwoPassPlan(), 4);
         var buyukSonra = await encoder.RequestAsync(buyuk, TwoPassPlan(), 6);
         Assert.NotNull(buyukOnce);
         Assert.NotNull(buyukSonra);
+        await EskiYolu(buyukOnce!, buyukSonra!, "1080p kaynak");
         await Devri(buyukOnce!, buyukSonra!, "1080p kaynak");
     }
 
-    private static async Task Devri(PreviewClip once, PreviewClip sonra, string etiket)
+    /// <summary>
+    /// Devri <see cref="PanelHost.Follow"/>'un kuralini birebir izleyerek kosturur ve iki
+    /// sayiyi ayri ayri verir:
+    ///
+    /// <list type="bullet">
+    /// <item><b>bosluk</b> — ekrana konan son eski kare ile ilk yeni kare arasindaki sure.
+    /// Kullanicinin gordugu donma budur.</item>
+    /// <item><b>atlanan icerik</b> — eski pencerenin gosterilmeden kalan kuyrugu arti yeni
+    /// pencerenin atlanan basi. Onceki tur yalnizca yeni karenin damgasina bakiyordu; her
+    /// yeni boru kendi penceresinin basindan aktigi icin o sayi zaten hep sifirdi ve
+    /// atlanan icerigi olcemezdi.</item>
+    /// </list>
+    ///
+    /// Esikler <see cref="PanelHost.HandoverLead"/> ve <see cref="PanelHost.SwapAt"/>'ten
+    /// okunuyor, kopyalanmiyor; kod esigi degistirirse olcum onu izler.
+    /// </summary>
+    private static async Task Devri(PreviewClip once, PreviewClip sonra, string etiket, double? pay = null)
     {
+        const int Fps = 30;
         var bosluklar = new List<double>();
-        var damgalar = new List<double>();
+        var atlananlar = new List<double>();
+
         for (var tur = 0; tur < 5; tur++)
         {
             var eski = Pipe(once);
             await eski.StartAsync(Istek(once));
             Assert.True(await IlkKare(eski), "ilk pencere kare vermedi");
 
-            // Devir baslar: yeni boru aciliyor, eski hala ayakta ve kare veriyor.
-            var yeni = Pipe(sonra);
-            var acilis = yeni.StartAsync(Istek(sonra));
+            var gecis = PanelHost.SwapAt(once.DurationSeconds, Fps);
+            var hazirlik = once.DurationSeconds - (pay ?? PanelHost.HandoverLead);
 
+            PipeComparisonFrameSource? yeni = null;
+            Task? acilis = null;
+            var oynanan = 0.0;
             var sonEski = System.Diagnostics.Stopwatch.StartNew();
-            var son = DateTime.UtcNow.AddSeconds(10);
-            while (yeni.Status.ProducedFrames == 0 && DateTime.UtcNow < son)
+            var son = DateTime.UtcNow.AddSeconds(30);
+
+            // Sunum turu: eski borudan kare cek, PanelHost'un iki esigini uygula.
+            while (DateTime.UtcNow < son)
             {
-                if (eski.TryTake(out var kare)) { eski.Return(kare); sonEski.Restart(); }
+                if (eski.TryTake(out var kare))
+                {
+                    oynanan = kare.Presentation.TotalSeconds;
+                    eski.Return(kare);
+                    sonEski.Restart();
+                }
+
+                if (yeni is null && oynanan >= hazirlik)
+                {
+                    yeni = Pipe(sonra);
+                    acilis = yeni.StartAsync(Istek(sonra));
+                }
+
+                if (oynanan >= gecis && yeni is not null && yeni.Status.ProducedFrames > 0) break;
                 await Task.Delay(1);
             }
-            await acilis;
 
+            Assert.NotNull(yeni);
+            Assert.NotNull(acilis);
+            await acilis!;
+
+            PlaybackFrame? ilk = null;
+            while (ilk is null && DateTime.UtcNow < son)
+            {
+                if (yeni!.TryTake(out var kare)) ilk = kare;
+                else await Task.Delay(1);
+            }
+            sonEski.Stop();
+            Assert.NotNull(ilk);
+
+            // Eski pencerenin gosterilmeden kalan kuyrugu: son kareden sonra kac saniyelik
+            // kaynak vardi. Bir kare payi normaldir, son kare de bir kare suruyor.
+            var kuyruk = Math.Max(0, once.DurationSeconds - oynanan - 1.0 / Fps);
+            var yeniBas = ilk!.Presentation.TotalSeconds;
+            atlananlar.Add((kuyruk + yeniBas) * 1000.0);
+            bosluklar.Add(sonEski.Elapsed.TotalMilliseconds);
+
+            yeni!.Return(ilk);
+            _ = Task.Run(eski.Dispose);
+            yeni.Dispose();
+        }
+
+        Record50($"T50 devirle sinir boslugu ({etiket}, pay {(pay ?? PanelHost.HandoverLead):0.00} sn), ms: " + Birlestir(bosluklar));
+        Record50($"T50 devirde atlanan icerik ({etiket}, pay {(pay ?? PanelHost.HandoverLead):0.00} sn), ms: " + Birlestir(atlananlar));
+    }
+
+    /// <summary>
+    /// Eski yol, <b>devir olcumuyle ayni aletle</b>: boru oldurulur, yenisi kurulur, ilk
+    /// kare beklenir. Ayni yoklama araligi kullaniliyor (<c>Task.Delay(1)</c>, Windows'ta
+    /// ~15 ms): oncesi ve sonrasi ayni aletle ve ayni kosumda olculmezse sayilar
+    /// karsilastirilamaz. Siki yoklama denendi ve birakildi - <c>Task.Yield()</c> dongusu
+    /// bir cekirdegi doldurup olculen ffmpeg'i ac birakiyor.
+    /// </summary>
+    private static async Task EskiYolu(PreviewClip once, PreviewClip sonra, string etiket)
+    {
+        var bosluklar = new List<double>();
+        for (var tur = 0; tur < 5; tur++)
+        {
+            var eski = Pipe(once);
+            await eski.StartAsync(Istek(once));
+            Assert.True(await IlkKare(eski), "ilk pencere kare vermedi");
+
+            var saat = System.Diagnostics.Stopwatch.StartNew();
+            await Task.Run(eski.Dispose);
+            var yeni = Pipe(sonra);
+            await yeni.StartAsync(Istek(sonra));
+            var son = DateTime.UtcNow.AddSeconds(10);
             PlaybackFrame? ilk = null;
             while (ilk is null && DateTime.UtcNow < son)
             {
                 if (yeni.TryTake(out var kare)) ilk = kare;
                 else await Task.Delay(1);
             }
-            sonEski.Stop();
+            saat.Stop();
             Assert.NotNull(ilk);
-            damgalar.Add(ilk!.Presentation.TotalMilliseconds);
-            yeni.Return(ilk);
-
-            bosluklar.Add(sonEski.Elapsed.TotalMilliseconds);
-            _ = Task.Run(eski.Dispose);
+            yeni.Return(ilk!);
             yeni.Dispose();
+            bosluklar.Add(saat.Elapsed.TotalMilliseconds);
         }
 
-        Record50($"T50 devirle sinir boslugu ({etiket}), ms: " + Birlestir(bosluklar));
-        Record50($"T50 devirde ilk yeni karenin damgasi ({etiket}), ms: " + Birlestir(damgalar));
+        Record50($"T50 ESKI YOL boru yeniden kurulmasi ({etiket}), ms: " + Birlestir(bosluklar));
     }
 
     private static string Birlestir(IEnumerable<double> degerler)

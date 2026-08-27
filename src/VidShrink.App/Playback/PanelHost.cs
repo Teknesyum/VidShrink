@@ -38,13 +38,17 @@ internal sealed class PanelHost : IDisposable
 
     /// <summary>
     /// Pencerenin sonuna bu kadar kalınca <b>sonraki pencerenin borusu açılır</b> — geçiş
-    /// değil, hazırlık. Ölçüldü (T50): ffmpeg süreç açılışından ilk kareye 110 ms geçiyor,
-    /// bunun 32 ms'i sürecin kendisi. Öndeki pay bu ölçünün üstünde tutuluyor.
+    /// değil, yalnızca hazırlık. Ölçüldü (T50): ffmpeg süreç açılışından ilk kareye ~105 ms
+    /// geçiyor, bunun ~32 ms'i sürecin kendisi. Öndeki pay bu ölçünün üstünde tutuluyor.
     ///
-    /// Eski sabit <c>AdvanceTailSeconds</c> bunun yerine <b>geçişi</b> tetikliyordu: boru
-    /// sınırda öldürülüp yeniden kurulduğu için pencerenin son 80 ms'i hiç gösterilmiyordu.
-    /// Devirle o gerekçe kalktı; eski boru yeni boru ilk kareyi verene kadar oynamaya devam
-    /// ediyor, yani öndeki pay artık içerik atlamıyor.
+    /// <b>Bu pay içerik atlamaz</b>, çünkü geçişi tetikleyen şey o değil: boru burada
+    /// açılıyor ama yüzey <see cref="SwapAt"/>'e, yani pencerenin son karesine kadar eski
+    /// boruda kalıyor. Eski sabit <c>AdvanceTailSeconds = 0.08</c> ise doğrudan
+    /// <b>geçişi</b> tetikliyordu ve pencerenin son 80 ms'i hiç gösterilmiyordu.
+    ///
+    /// T50 turu 2'de düzeltildi: geçiş bir ara "bekleyen boru ilk kareyi verir vermez"
+    /// yapılıyordu ve bu, payın ortasında bir yere düşüyordu — ölçülen ~52 ms'lik yeni bir
+    /// atlama. Şimdi hazırlık ile geçiş ayrı iki eşik.
     /// </summary>
     private const double HandoverLeadSeconds = 0.16;
 
@@ -658,16 +662,36 @@ internal sealed class PanelHost : IDisposable
     {
         if (!_panel.Controls.IsPlaying) return;
         var played = position.TotalSeconds;
+        var swapAt = SwapAt(clip.DurationSeconds, _fps);
 
         if (played >= clip.DurationSeconds * PrefetchAtFraction) _ = PrepareAheadAsync();
         if (played >= clip.DurationSeconds - HandoverLeadSeconds) BeginHandover();
+        if (played < swapAt) return;
 
-        // Devir: yeni boru kare vermeye başladıysa yüzey orada değiştirilir. Başlamadıysa
-        // eski boru pencerenin sonuna kadar oynamaya devam eder — donmuş kare yerine
-        // gerçek içerik.
+        // Pencerenin son karesi ekrana kondu. Bekleyen boru hazırsa yüzey orada değişir;
+        // hazır değilse eski yola düşülür ve boru yeniden kurulur.
         if (_standby is { } standby && standby.Status.ProducedFrames > 0) { SwapToStandby(); return; }
-        if (played >= clip.DurationSeconds) AdvanceClip();
+        AdvanceClip();
     }
+
+    /// <summary>
+    /// Yüzeyin değiştirileceği an: pencerenin <b>son karesi</b>. Boru pencereyi son kareye
+    /// kadar akıtıyor ve son karenin damgası <c>süre - 1/fps</c>'tir — <c>süre</c>'nin
+    /// kendisi hiç gelmez, o eşiğe bakan bir kural hiç tetiklenmez.
+    ///
+    /// Eşik tam <c>süre - 1/fps</c> değil, bir buçuk kare geride: damga
+    /// <see cref=TimeSpan/> üzerinden 100 ns'e yuvarlanıyor ve son kare tam eşiğin
+    /// milyarda bir kadar altına düşebiliyor. Bir buçuk kare, son kareyi geçirir ve
+    /// sondan ikinciyi geçirmez.
+    ///
+    /// Geçişin daha erken yapılması pencerenin kuyruğunu atlar: T50 turu 1'de geçiş
+    /// bekleyen borunun ilk karesine bağlıydı ve kaynağın ~52 ms'i hiç gösterilmiyordu.
+    /// </summary>
+    internal static double SwapAt(double durationSeconds, int fps)
+        => Math.Max(0, durationSeconds - 1.5 / Math.Max(1, fps));
+
+    /// <summary>Bekleyen borunun kaç saniye önceden açıldığı. Ölçüm aynı eşiği kullanır.</summary>
+    internal static double HandoverLead => HandoverLeadSeconds;
 
     /// <summary>
     /// Sonraki pencerenin borusunu eski boru ayaktayken açar. Süreç açılışının 110 ms'i
