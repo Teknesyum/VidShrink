@@ -1,7 +1,7 @@
 namespace VidShrink.Core;
 
 /// <summary>
-/// Panelin bes durumu. Sag tarafin etiketi bu durumdan turer; arayuzde dogaclanmaz.
+/// Panelin durumlari. Sag tarafin etiketi bu durumdan turer; arayuzde dogaclanmaz.
 /// </summary>
 public enum PreviewState
 {
@@ -11,8 +11,14 @@ public enum PreviewState
     /// <summary>Dosya var, plan yok. Sagda gosterilecek bir sey yok.</summary>
     YalnizKaynak,
 
+    /// <summary>Kisa ornek kodlaniyor. Sag yari henuz yok; son onbellekli cift gosterilir.</summary>
+    OrnekKodlaniyor,
+
     /// <summary>Sagdaki kare plandan uretilmis kisa bir ornek kodlamadan geliyor.</summary>
     OrnekKodlama,
+
+    /// <summary>Tam kodlama suruyor. Cikti dosyasi bitmeden sag yari gosterilemez.</summary>
+    TamKodlama,
 
     /// <summary>Sagdaki kare tamamlanmis gercek ciktidan geliyor.</summary>
     GercekCikti,
@@ -42,13 +48,24 @@ public static class PreviewStatus
     /// <summary>
     /// Durumu tek yerden turetir. Arayuz kendi kosullarindan durum uydurmaz, bunu cagirir.
     /// </summary>
-    public static PreviewState Derive(bool hasSource, bool hasPlan, bool isEncoding, bool hasRealOutput, bool grabFailed)
+    /// <param name="sampleEncoding">Kisa ornek parca su anda kodlaniyor.</param>
+    /// <param name="hasSample">Kisa ornek parca bitti ve sag yari ondan besleniyor.</param>
+    public static PreviewState Derive(
+        bool hasSource,
+        bool hasPlan,
+        bool isEncoding,
+        bool hasRealOutput,
+        bool grabFailed,
+        bool sampleEncoding = false,
+        bool hasSample = false)
     {
         if (!hasSource) return PreviewState.KaynakYok;
         if (grabFailed) return PreviewState.Olculemedi;
-        if (isEncoding) return PreviewState.OrnekKodlama;
+        if (isEncoding) return PreviewState.TamKodlama;
         if (hasRealOutput) return PreviewState.GercekCikti;
         if (!hasPlan) return PreviewState.YalnizKaynak;
+        if (sampleEncoding) return PreviewState.OrnekKodlaniyor;
+        if (hasSample) return PreviewState.OrnekKodlama;
         return PreviewState.YalnizKaynak;
     }
 }

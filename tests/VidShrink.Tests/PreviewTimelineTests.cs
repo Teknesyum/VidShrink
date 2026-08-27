@@ -128,17 +128,41 @@ public sealed class PreviewTimelineTests
     [Theory]
     [InlineData(false, false, false, false, false, PreviewState.KaynakYok)]
     [InlineData(true, false, false, false, false, PreviewState.YalnizKaynak)]
-    [InlineData(true, true, true, false, false, PreviewState.OrnekKodlama)]
+    [InlineData(true, true, true, false, false, PreviewState.TamKodlama)]
     [InlineData(true, true, false, true, false, PreviewState.GercekCikti)]
     [InlineData(true, true, false, true, true, PreviewState.Olculemedi)]
     public void Durum_tek_yerden_turetilir(bool hasSource, bool hasPlan, bool isEncoding, bool hasRealOutput, bool grabFailed, PreviewState expected)
         => Assert.Equal(expected, PreviewStatus.Derive(hasSource, hasPlan, isEncoding, hasRealOutput, grabFailed));
 
     [Fact]
+    public void Ornek_kodlama_baslayinca_durum_ornek_kodlaniyor()
+    {
+        var state = PreviewStatus.Derive(true, true, false, false, false, sampleEncoding: true);
+
+        Assert.Equal(PreviewState.OrnekKodlaniyor, state);
+        Assert.False(PreviewStatus.HasRightHalf(state));
+    }
+
+    [Fact]
+    public void Ornek_kodlama_bitince_sag_yari_dolar()
+    {
+        var state = PreviewStatus.Derive(true, true, false, false, false, sampleEncoding: false, hasSample: true);
+
+        Assert.Equal(PreviewState.OrnekKodlama, state);
+        Assert.True(PreviewStatus.HasRightHalf(state));
+    }
+
+    [Fact]
+    public void Plan_yokken_ornek_kodlama_durumu_dogmaz()
+        => Assert.Equal(PreviewState.YalnizKaynak, PreviewStatus.Derive(true, false, false, false, false, sampleEncoding: true, hasSample: true));
+
+    [Fact]
     public void Kodlama_surerken_kare_cekimi_kapali()
     {
         // T30/O2: kodlama yavaslamasi %17,8-28,4, konseyin %5 kurali asildi.
         Assert.False(PreviewStatus.AllowsFrameGrab(PreviewState.OrnekKodlama));
+        Assert.False(PreviewStatus.AllowsFrameGrab(PreviewState.OrnekKodlaniyor));
+        Assert.False(PreviewStatus.AllowsFrameGrab(PreviewState.TamKodlama));
         Assert.True(PreviewStatus.AllowsFrameGrab(PreviewState.GercekCikti));
         Assert.True(PreviewStatus.AllowsFrameGrab(PreviewState.YalnizKaynak));
         Assert.False(PreviewStatus.AllowsFrameGrab(PreviewState.KaynakYok));
@@ -150,6 +174,8 @@ public sealed class PreviewTimelineTests
     {
         Assert.True(PreviewStatus.HasRightHalf(PreviewState.OrnekKodlama));
         Assert.True(PreviewStatus.HasRightHalf(PreviewState.GercekCikti));
+        Assert.False(PreviewStatus.HasRightHalf(PreviewState.OrnekKodlaniyor));
+        Assert.False(PreviewStatus.HasRightHalf(PreviewState.TamKodlama));
         Assert.False(PreviewStatus.HasRightHalf(PreviewState.YalnizKaynak));
     }
 }

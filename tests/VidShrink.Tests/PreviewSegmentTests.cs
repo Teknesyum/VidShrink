@@ -1,0 +1,193 @@
+using System.Text.RegularExpressions;
+using VidShrink.Core;
+
+namespace VidShrink.Tests;
+
+public sealed class PreviewSegmentTests
+{
+    private static MediaInfo Source(double durationSeconds = 60, double fps = 60, int width = 1920, int height = 1080) => new()
+    {
+        FilePath = "kaynak.mp4",
+        FileSizeBytes = 40_000_000,
+        DurationSeconds = durationSeconds,
+        Width = width,
+        Height = height,
+        Fps = fps,
+        VideoCodec = "h264",
+        TotalBitrateBps = 5_700_000
+    };
+
+    private static EncodePlan TwoPassPlan(string codec = "libx264", int videoK = 1200) => new()
+    {
+        Codec = codec,
+        Mode = "2pass",
+        VideoBitrateK = videoK,
+        Width = 1280,
+        Height = 720,
+        Fps = 30,
+        Preset = "slow",
+        PixelFormat = "yuv420p",
+        AudioCodec = "aac",
+        AudioBitrateK = 128
+    };
+
+    private static EncodePlan CrfPlan(int crf = 24)
+    {
+        var plan = TwoPassPlan();
+        plan.Mode = "crf";
+        plan.Crf = crf;
+        return plan;
+    }
+
+    [Fact]
+    public void Varsayilan_sure_pencere_tavani_kadar()
+    {
+        var segment = PreviewSegment.For(Source(), TwoPassPlan(), 10, "ornek.mp4");
+
+        Assert.Equal(PreviewSegment.WindowSeconds, segment.DurationSeconds, 6);
+        Assert.False(segment.WasClamped);
+    }
+
+    [Fact]
+    public void Kaynagin_sonunda_sure_kirpilir_ve_kirpma_gorunur()
+    {
+        var segment = PreviewSegment.For(Source(durationSeconds: 60), TwoPassPlan(), 59.4, "ornek.mp4");
+
+        Assert.Equal(0.6, segment.DurationSeconds, 6);
+        Assert.Equal(PreviewSegment.WindowSeconds, segment.RequestedDurationSeconds, 6);
+        Assert.True(segment.WasClamped);
+    }
+
+    [Fact]
+    public void Negatif_baslangic_reddedilir()
+        => Assert.Throws<ArgumentOutOfRangeException>(() => PreviewSegment.For(Source(), TwoPassPlan(), -0.5, "ornek.mp4"));
+
+    [Fact]
+    public void Sifir_sure_reddedilir()
+        => Assert.Throws<ArgumentOutOfRangeException>(() => PreviewSegment.For(Source(), TwoPassPlan(), 1, "ornek.mp4", durationSeconds: 0));
+
+    [Fact]
+    public void Kaynagin_disinda_baslangic_reddedilir()
+        => Assert.Throws<ArgumentOutOfRangeException>(() => PreviewSegment.For(Source(durationSeconds: 60), TwoPassPlan(), 60, "ornek.mp4"));
+
+    [Fact]
+    public void Iki_gecisli_plan_bitrate_yerine_kalite_degeri_alir()
+    {
+        var segment = PreviewSegment.For(Source(), TwoPassPlan(), 10, "ornek.mp4");
+
+        Assert.Equal(PreviewQuality.Yaklasik, segment.Quality.Kind);
+        Assert.NotNull(segment.Quality.Crf);
+        Assert.True(segment.IsApproximate);
+        Assert.Equal(EncodeMode.Crf, segment.Plan.ModeEnum);
+    }
+
+    [Fact]
+    public void Crf_plani_ayni_degerle_kodlanir_ve_kesin_sayilir()
+    {
+        var segment = PreviewSegment.For(Source(), CrfPlan(24), 10, "ornek.mp4");
+
+        Assert.Equal(PreviewQuality.Kesin, segment.Quality.Kind);
+        Assert.Equal(24, segment.Quality.Crf);
+        Assert.False(segment.DroppedSecondPass);
+        Assert.False(segment.IsApproximate);
+    }
+
+    [Fact]
+    public void Modellenmemis_kodlayici_acikca_desteklenmiyor_der()
+    {
+        var plan = TwoPassPlan(codec: "libvpx-vp9");
+
+        var segment = PreviewSegment.For(Source(), plan, 10, "ornek.mp4");
+
+        Assert.Equal(PreviewQuality.Desteklenmiyor, segment.Quality.Kind);
+        Assert.Null(segment.Quality.Crf);
+        Assert.DoesNotContain("-crf", segment.Arguments);
+    }
+
+    [Theory]
+    [InlineData("libx264")]
+    [InlineData("libx265")]
+    [InlineData("libsvtav1")]
+    [InlineData("h264_nvenc")]
+    [InlineData("hevc_nvenc")]
+    [InlineData("av1_nvenc")]
+    [InlineData("h264_qsv")]
+    [InlineData("hevc_qsv")]
+    [InlineData("av1_qsv")]
+    [InlineData("h264_amf")]
+    [InlineData("hevc_amf")]
+    [InlineData("av1_amf")]
+    public void Desteklenen_her_kodlayici_kendi_araliginda_deger_verir(string codec)
+    {
+        var choice = PreviewSegment.QualityFor(Source(), TwoPassPlan(codec));
+
+        Assert.Equal(PreviewQuality.Yaklasik, choice.Kind);
+        var (min, max) = CodecModel.CrfRange(codec);
+        Assert.InRange(choice.Crf!.Value, min, max);
+    }
+
+    [Fact]
+    public void Daha_yuksek_bitrate_daha_dusuk_crf_verir()
+    {
+        var dusuk = PreviewSegment.QualityFor(Source(), TwoPassPlan(videoK: 600)).Crf!.Value;
+        var yuksek = PreviewSegment.QualityFor(Source(), TwoPassPlan(videoK: 4800)).Crf!.Value;
+
+        Assert.True(yuksek < dusuk, $"4800k icin {yuksek}, 600k icin {dusuk}");
+    }
+
+    [Fact]
+    public void Sonuc_kodlayicinin_araligina_kelepcelenir()
+    {
+        var (min, max) = CodecModel.CrfRange("libx264");
+
+        Assert.Equal(min, PreviewSegment.QualityFor(Source(), TwoPassPlan(videoK: 500_000)).Crf!.Value, 6);
+        Assert.Equal(max, PreviewSegment.QualityFor(Source(), TwoPassPlan(videoK: 1)).Crf!.Value, 6);
+    }
+
+    [Fact]
+    public void Karsilik_projenin_kendi_bagintisindan_gelir()
+    {
+        var info = Source();
+        var plan = TwoPassPlan();
+        var profile = ComplexityProfile.FromSourceBitrate(info);
+
+        var bppf = PlanCalculator.BitsPerPixel(plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
+        var beklenen = profile.CrfForBppf(plan.Codec, bppf, (double)plan.Width / info.Width, plan.Fps, info.Fps);
+        var (min, max) = CodecModel.CrfRange(plan.Codec);
+
+        Assert.Equal(Math.Clamp(beklenen, min, max), PreviewSegment.QualityFor(info, plan).Crf!.Value, 6);
+    }
+
+    [Fact]
+    public void Iki_gecis_dusurulur_ve_sapma_gorunur()
+    {
+        var segment = PreviewSegment.For(Source(), TwoPassPlan(), 10, "ornek.mp4");
+
+        Assert.True(segment.DroppedSecondPass);
+        Assert.DoesNotContain("-pass", segment.Arguments);
+        Assert.DoesNotContain("-passlogfile", segment.Arguments);
+    }
+
+    [Fact]
+    public void Donanim_kodlayicisinda_ikinci_gecis_zaten_yok()
+    {
+        var segment = PreviewSegment.For(Source(), TwoPassPlan(codec: "av1_nvenc"), 10, "ornek.mp4");
+
+        Assert.False(segment.DroppedSecondPass);
+        Assert.True(segment.IsApproximate);
+    }
+
+    [Fact]
+    public void Cekirdek_dosyalari_surec_ve_dosya_cagrisi_tasimaz()
+    {
+        var yasak = new Regex(@"\b(Process|File|Directory)\s*\.|using\s+Avalonia");
+
+        foreach (var name in new[] { "PreviewSegment.cs", "PreviewTimeline.cs", "FfmpegArguments.cs" })
+        {
+            var path = Path.Combine(TipSources.Root, "src", "VidShrink.Core", name);
+            var source = File.ReadAllText(path);
+            var hit = yasak.Match(source);
+            Assert.False(hit.Success, $"{name}: {hit.Value}");
+        }
+    }
+}

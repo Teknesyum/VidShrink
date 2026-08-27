@@ -163,6 +163,23 @@ public static class FfmpegArguments
         return a;
     }
 
+    /// <summary>
+    /// Kisa bir parcanin argumanlari. Tam kodlamanin argumanlarindan yalnizca zaman
+    /// penceresiyle ayrilir; olceklemeyi, fps'i, sesi, on ayari ve piksel bicimini oldugu gibi
+    /// tasir. <c>-ss</c> girdiden <b>once</b> gelir: sonra gelirse ffmpeg dosyayi bastan
+    /// cozer ve 2 sn'lik bir parca saniyeler surer. Ikinci gecis uretilmez.
+    /// </summary>
+    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath)
+    {
+        var a = new List<string>(Build(info, plan, outputPath, 0, null));
+        var input = a.IndexOf("-i");
+        if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");
+
+        a.InsertRange(input, new[] { "-ss", startSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        a.InsertRange(input + 4, new[] { "-t", durationSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        return a;
+    }
+
     public static string ToCommandLine(IEnumerable<string> args)
     {
         var sb = new StringBuilder("ffmpeg");
