@@ -29,3 +29,5 @@
 - [Pencere dışı fare](avalonia-pencere-disi-fare.md) — PointerMoved pencere dışında atmaz; çıkışı TopLevel'dan dinle
 - [Buton teması ve parıltı](avalonia-buton-temasi-parilti.md) — Button'da BoxShadow yok; parıltı /template/ Border#Root'a, gövde BasedOn ile GhostButton'dan
 - [WindowLayoutTests sabit sayılar](windowlayouttests-sabit-sayilar.md) — yükseklik taraması degenerate, genişlik ekseni gerçek; sayfayı tutan şey sol ayar sütunu
+- [Ikinci yerlesim turu](avalonia-ikinci-yerlesim-turu.md) — ilk turdan sonra UpdateLayout yeni tur acmaz; gorunmez olan oge DesiredSize 0 ile kalir
+- [Isabet testi penceresiz](avalonia-isabet-testi-penceresiz.md) — InputHitTest her yerde null; saydamligi ozellik + olay yoluyla olc
