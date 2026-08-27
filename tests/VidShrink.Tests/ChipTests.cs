@@ -94,8 +94,13 @@ public sealed class ChipTests
         Assert.Equal(label, first);
     }
 
-    private const string SamplePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";
+    private const string SamplePath = @"C:\Kayitlar	atil-cekimi-2160p60.mkv";
 
+    /// <summary>
+    /// Plan panelini en çok zorlayan gerçekçi hâl: 4K/60, uzun süre, büyük dosya.
+    /// <c>WindowLayoutTests</c> ile aynı örnek; yoklama çağrılmıyor, ölçüm ffmpeg'e ve
+    /// diskteki bir dosyaya bağlı değil.
+    /// </summary>
     private static VidShrink.Core.MediaInfo Sample() => new()
     {
         FilePath = SamplePath,
@@ -112,9 +117,10 @@ public sealed class ChipTests
         PixelFormat = "yuv420p"
     };
 
+    /// <summary>Sıradan bir kayıt: 1080p30, bir dakika. Gerekçe listesi kısa olan hâl.</summary>
     private static VidShrink.Core.MediaInfo Modest() => new()
     {
-        FilePath = @"C:\Kayitlar\telefon-kaydi-1080p30.mp4",
+        FilePath = @"C:\Kayitlar	elefon-kaydi-1080p30.mp4",
         FileSizeBytes = 90L * 1024 * 1024,
         DurationSeconds = 62.0,
         Width = 1920,
@@ -128,11 +134,8 @@ public sealed class ChipTests
         PixelFormat = "yuv420p"
     };
 
-    [Fact]
-    public void PlanOlcumModestYazdir()
-    {
-        var info = Modest();
-        var report = AppHost.Run(() =>
+    private static T Loaded<T>(VidShrink.Core.MediaInfo info, Func<MainWindow, T> read) =>
+        AppHost.Run(() =>
         {
             var window = new MainWindow();
             window.LoadWithoutProbing(info.FilePath, info);
@@ -142,52 +145,69 @@ public sealed class ChipTests
             window.Measure(WindowSize);
             window.Arrange(new Rect(WindowSize));
             window.UpdateLayout();
-
-            var scroll = window.GetVisualDescendants().OfType<ScrollViewer>().Single(s => s.Name == "PlanScroll");
-            var reasons = window.GetVisualDescendants().OfType<StackPanel>().Single(s => s.Name == "PlanReasons");
-            var facts = window.GetVisualDescendants().OfType<Grid>().Single(g => g.Name == "PlanFacts");
-            var plan = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
-            return $"MODEST PlanScroll icerik={scroll.Extent.Height:0.##} gorunur={scroll.Viewport.Height:0.##} tasma={scroll.Extent.Height - scroll.Viewport.Height:0.##} | PlanPanel g={plan.Bounds.Width:0.##} y={plan.Bounds.Height:0.##} | PlanFacts satir={facts.RowDefinitions.Count} y={facts.Bounds.Height:0.##} g={facts.Bounds.Width:0.##} | PlanReasons adet={reasons.Children.Count} y={reasons.Bounds.Height:0.##}";
+            return read(window);
         });
 
-        Assert.True(false, report);
+    private static Control Named(MainWindow window, string name) =>
+        window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == name);
+
+    /// <summary>
+    /// T46/K2: önizleme yokken panel bırakma alanı ölçüsünde değil, panel tabanında.
+    /// Ölçüm: 144 → 256. Sayı <c>PlaybackIdleMinHeight</c> belirtecinden gelir.
+    /// </summary>
+    [Fact]
+    public void BosPanelPanelTabaninaOturur()
+    {
+        var (height, token) = Read(window =>
+        {
+            var shell = Named(window, "Shell");
+            window.TryFindResource("PlaybackIdleMinHeight", out var value);
+            return (shell.Bounds.Height, (double)value!);
+        });
+
+        Assert.Equal(256, token);
+        Assert.Equal(256, height);
     }
 
+    /// <summary>
+    /// T46/K2: boş panel yükselirken plan paneli daralmadı — tavanı
+    /// <c>PlanPanelMaxHeight</c> (512) ve tasarım boyutunda hâlâ oraya varıyor.
+    /// </summary>
     [Fact]
-    public void PlanOlcumYazdir()
+    public void YuksekBosPanelPlanPaneliniDaraltmadi()
     {
-        var report = AppHost.Run(() =>
-        {
-            var window = new MainWindow();
-            window.LoadWithoutProbing(SamplePath, Sample());
-            window.SettleFades();
-            window.Width = double.NaN;
-            window.Height = double.NaN;
-            window.Measure(WindowSize);
-            window.Arrange(new Rect(WindowSize));
-            window.UpdateLayout();
-
-            var scroll = window.GetVisualDescendants().OfType<ScrollViewer>().Single(s => s.Name == "PlanScroll");
-            var plan = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
-            var shell = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "Shell");
-            var reasons = window.GetVisualDescendants().OfType<StackPanel>().Single(s => s.Name == "PlanReasons");
-            var facts = window.GetVisualDescendants().OfType<Grid>().Single(g => g.Name == "PlanFacts");
-            return $"PlanScroll icerik={scroll.Extent.Height:0.##} gorunur={scroll.Viewport.Height:0.##} tasma={scroll.Extent.Height - scroll.Viewport.Height:0.##} | PlanPanel={plan.Bounds.Height:0.##} | Shell={shell.Bounds.Height:0.##} | PlanFacts satir={facts.RowDefinitions.Count} y={facts.Bounds.Height:0.##} | PlanReasons adet={reasons.Children.Count} y={reasons.Bounds.Height:0.##}";
-        });
-
-        Assert.True(false, report);
+        var height = Read(window => Named(window, "PlanPanel").Bounds.Height);
+        Assert.Equal(512, height);
     }
 
-    [Fact]
-    public void BosPanelOlcumYazdir()
+    /// <summary>
+    /// T46/K6: gerekçeler katlıyken plan paneli tipik durumda kaymıyor. İki girdide de
+    /// ölçüldü — 4K/60 (dokuz gerekçe) ve 1080p30 (altı gerekçe). Metin kısaltılmadı,
+    /// yalnız katlandı; <c>PlanScroll</c> uzun listede taşma supabı olarak duruyor.
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PlanPaneliKatliykenKaymaz(bool modest)
     {
-        var report = Read(window =>
+        var (content, viewport) = Loaded(modest ? Modest() : Sample(), window =>
         {
-            var shell = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "Shell");
-            var plan = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
-            return $"BosShell={shell.Bounds.Height:0.##} MinHeight={shell.MinHeight:0.##} | BosPlanPanel={plan.Bounds.Height:0.##}";
+            var scroll = (ScrollViewer)Named(window, "PlanScroll");
+            var body = (StackPanel)Named(window, "PlanBody");
+            return (body.DesiredSize.Height, scroll.Viewport.Height);
         });
 
-        Assert.True(false, report);
+        Assert.True(content <= viewport, $"icerik={content:0.##} gorunur={viewport:0.##}");
+    }
+
+    /// <summary>Katlıyken gerekçe listesi görünmez, başlığı sayıyı söyler.</summary>
+    [Fact]
+    public void KatliGerekceBasligiSayiyiSoyler()
+    {
+        var (visible, head) = Loaded(Sample(), window =>
+            (Named(window, "PlanReasons").IsVisible, ((TextBlock)Named(window, "TxtPlanReasonsHead")).Text));
+
+        Assert.False(visible);
+        Assert.Equal("Why These Choices · 9", head);
     }
 }

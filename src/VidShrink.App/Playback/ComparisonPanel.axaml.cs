@@ -146,10 +146,11 @@ internal partial class ComparisonPanel : UserControl
 
     /// <summary>
     /// Kapalı panel bandını daraltır. İki ölçü de temadan gelir: açıkken sahne en az
-    /// <c>PlaybackStageMinHeight</c>, kapalıyken bırakma alanı kadar (<c>DropZoneMinHeight</c>).
+    /// <c>PlaybackStageMinHeight</c>, önizleme yokken <c>PlaybackIdleMinHeight</c>
+    /// (T46/K2 — boş panel artık bırakma alanı ölçüsünde değil, panel tabanında).
     /// </summary>
     internal void SetCompact(bool compact)
-        => Shell.MinHeight = Scalar(compact ? "DropZoneMinHeight" : "PlaybackStageMinHeight", compact ? 144 : 256);
+        => Shell.MinHeight = Scalar(compact ? "PlaybackIdleMinHeight" : "PlaybackStageMinHeight", 256);
 
     /// <summary>
     /// Boş durumun ikinci satırı. Kare kaynağı bir sebep bildirdiğinde (motor yok, akış

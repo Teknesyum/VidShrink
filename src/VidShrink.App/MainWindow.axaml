@@ -475,7 +475,30 @@
                       <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="Load a file and every decision the engine makes is listed here."/>
                       <Grid x:Name="PlanFacts" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
                       <Border x:Name="PlanRule" Theme="{StaticResource PanelRule}" IsVisible="False"/>
-                      <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}"/>
+                      <!--
+                        T46/K6: gerekçeler katlanır. Metin kısalmıyor, yalnız katlanıyor —
+                        panelin varsayılan hâli planın net özeti (olgular), gerekçeler bir
+                        tıkla açılıyor. Ölçüm: gerekçeler açıkken içerik görüş alanını
+                        aşıyordu, katlıyken sığıyor.
+                      -->
+                      <Grid x:Name="PlanReasonsHead"
+                            ColumnDefinitions="*,Auto"
+                            ColumnSpacing="{StaticResource SpaceMd}"
+                            IsVisible="False">
+                        <TextBlock Grid.Column="0"
+                                   x:Name="TxtPlanReasonsHead"
+                                   Theme="{StaticResource H3}"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                x:Name="BtnPlanReasons"
+                                Content="▾"
+                                Theme="{StaticResource GhostButton}"
+                                FontFamily="{StaticResource FontMono}"
+                                VerticalAlignment="Center"
+                                auto:AutomationProperties.Name="Why these choices"
+                                Click="OnTogglePlanReasons"/>
+                      </Grid>
+                      <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
                     </StackPanel>
                   </ScrollViewer>
                 </Grid>

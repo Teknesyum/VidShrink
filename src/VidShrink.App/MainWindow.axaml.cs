@@ -1457,7 +1457,12 @@ public partial class MainWindow : Window
 
         foreach (var line in StrategyLines()) AddPlanReason(line);
         foreach (var line in ReasonLines(plan)) AddPlanReason(line);
-        PlanRule.IsVisible = PlanReasons.Children.Count > 0;
+
+        var reasons = PlanReasons.Children.Count;
+        PlanRule.IsVisible = reasons > 0;
+        PlanReasonsHead.IsVisible = reasons > 0;
+        TxtPlanReasonsHead.Text = $"{T("Neden böyle", "Why these choices")} · {reasons}";
+        SetPlanReasonsExpanded(_reasonsExpanded);
 
         RefreshEstimateView();
         RefreshDurationView();
@@ -1702,6 +1707,22 @@ public partial class MainWindow : Window
         TxtCommand.MaxLines = expanded ? 8 : 1;
         BtnCommandExpand.Content = expanded ? "▴" : "▾";
         ApplyScrollAffordance(TxtCommand, TxtCommand.IsPointerOver);
+    }
+
+    private bool _reasonsExpanded;
+
+    private void OnTogglePlanReasons(object? sender, RoutedEventArgs e) => SetPlanReasonsExpanded(!_reasonsExpanded);
+
+    /// <summary>
+    /// K6: gerekçeler katlanır. Kapalıyken plan paneli olguların net özetidir ve kaymaz;
+    /// açıkken listenin tamamı görünür ve taşma <c>PlanScroll</c>'a düşer. Metin hiçbir
+    /// durumda kısaltılmıyor.
+    /// </summary>
+    private void SetPlanReasonsExpanded(bool expanded)
+    {
+        _reasonsExpanded = expanded;
+        PlanReasons.IsVisible = expanded && PlanReasons.Children.Count > 0;
+        BtnPlanReasons.Content = expanded ? "▴" : "▾";
     }
 
     private void OnToggleAiDetails(object? sender, RoutedEventArgs e) => SetAiDetails(!AiDetails.IsVisible);

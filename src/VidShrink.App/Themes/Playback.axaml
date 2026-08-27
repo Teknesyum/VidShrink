@@ -34,6 +34,21 @@
       PlaybackDescendDelay     <- ölçü değil, kullanıcının söylediği süre: 2 saniye.
                                   Hareket ölçeğindeki (MotionSlow 360 ms) bir değer değil,
                                   çünkü bu bir geçiş süresi değil bekleme süresi.
+
+    T46 — boş panel ve tıkla yakınlaştırma:
+
+      PlaybackIdleMinHeight    <- PanelMinHeight (256). Önizleme yokken panel eskiden
+                                  DropZoneMinHeight (144) kadardı, yani programdaki tek
+                                  panel taban ölçüsünün altındaydı. Artık diğer panellerle
+                                  aynı tabana oturuyor; uydurulmuş bir sayı değil, zaten
+                                  panel tabanı olan ölçü.
+      PlaybackZoomButtonSize   <- TargetMinSize (24), dokunma hedefi. Şeritteki zaman
+                                  çizgisiyle aynı ölçü.
+      PlaybackZoomButtonGap    <- SpaceSm (8), iki düğme arası.
+      PlaybackHoverZoom        <- ölçü değil, kullanıcının söylediği kat: 2x. Jest
+                                  parametresi buradan türer, ters yönden değil; tavan
+                                  (PlaybackMaxContentZoom) değişirse hesap kendiliğinden
+                                  düzelir.
   -->
 
   <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
@@ -55,6 +70,11 @@
 
   <x:Double x:Key="PlaybackMidShare">0.9</x:Double>
   <sys:TimeSpan x:Key="PlaybackDescendDelay">00:00:02</sys:TimeSpan>
+
+  <x:Double x:Key="PlaybackIdleMinHeight">256</x:Double>
+  <x:Double x:Key="PlaybackZoomButtonSize">24</x:Double>
+  <x:Double x:Key="PlaybackZoomButtonGap">8</x:Double>
+  <x:Double x:Key="PlaybackHoverZoom">2</x:Double>
 
   <Color x:Key="PlaybackScrimColor">#CC050507</Color>
   <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
