@@ -271,7 +271,7 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
     /// girdi istiyor; sag girdi bos birakilirsa istek reddedilir ve sol yari da akmaz.
     /// Kullanici o goruntuyu gormez, cunku ayni durumda perde sag yariyi kapatiyor.
     /// </summary>
-    [Fact]
+    [FfmpegFact]
     public void Perde_durumunda_sag_girdi_kaynaktir()
     {
         var dir = Temp();
