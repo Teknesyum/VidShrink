@@ -21,3 +21,8 @@ submitted/' hedef.md`. Uzun metni önce scratchpad'e `Write` ile yaz, sonra `cat
 ekle; heredoc'lar bu ortamda kırılabiliyor. PowerShell yalnız gerçekten PowerShell
 gereken iş için: `Parser::ParseFile` ile `.ps1` sözdizimi denetimi gibi. Yazdıktan sonra
 `grep -c 'Ã\|Ä\|Å' <dosya>` ile doğrula — 0 dönmeli.
+
+Çok satırlı commit mesajı için `git commit -m @'...'@` **yazma**: PowerShell here-string
+sözdizimi Bash'te düz metindir, `@` işaretleri mesajın ilk ve son satırı olarak commit'e
+girer ve konu satırı `@` olur. Mesajı scratchpad'e `Write` ile yazıp
+`git commit -F <dosya>` kullan.
