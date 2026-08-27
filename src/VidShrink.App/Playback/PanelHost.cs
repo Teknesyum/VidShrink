@@ -88,7 +88,7 @@ internal sealed class PanelHost : IDisposable
         // K1: ayar değişimi ile kodlamanın başlaması arasındaki gecikme. Recalculate'in kendi
         // 160 ms'i kodlamadan kısa; kaydırıcı sürüklenirken her ara değer bir ffmpeg açardı.
         _segmentDelay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(SegmentEncoder.DebounceMilliseconds) };
-        _segmentDelay.Tick += (_, _) => { _segmentDelay.Stop(); BeginClip(_clipStart); };
+        _segmentDelay.Tick += (_, _) => { _segmentDelay.Stop(); _ = LoadClipAsync(_clipStart); };
 
         _panel.Frames.SizeChanged += (_, _) => OnResized();
         _panel.Controls.PlayPauseRequested += (_, _) => ApplyPlayState();
@@ -362,8 +362,11 @@ internal sealed class PanelHost : IDisposable
         _segmentDelay.Start();
     }
 
-    /// <summary>Gösterilecek pencereyi kodlar; biterse akışı o çiftle yeniden kurar.</summary>
-    private async void BeginClip(double startSeconds)
+    /// <summary>
+    /// Gösterilecek pencereyi kodlar; biterse akışı o çiftle yeniden kurar. Gecikme dolunca
+    /// çağrılan iş budur — bekleyebilmek için <c>Task</c> döner.
+    /// </summary>
+    internal async Task LoadClipAsync(double startSeconds)
     {
         var info = _info;
         var plan = _plan;
@@ -381,7 +384,7 @@ internal sealed class PanelHost : IDisposable
                 if (_segments.LastError is null) return;
                 _clipError = _segments.LastError;
                 _clip = null;
-                _panel.SetRightNotice(RightCurtain());
+                if (_open) _panel.SetRightNotice(RightCurtain());
                 return;
             }
 
@@ -393,7 +396,7 @@ internal sealed class PanelHost : IDisposable
         catch (Exception ex)
         {
             _clipError = ex.Message;
-            _panel.SetRightNotice(RightCurtain());
+            if (_open) _panel.SetRightNotice(RightCurtain());
         }
         finally
         {
@@ -405,7 +408,7 @@ internal sealed class PanelHost : IDisposable
     /// Bir sonraki pencereyi oynatma sürerken kodlar. En çok bir pencere ileriye bakılır;
     /// kuyruk kurulmaz.
     /// </summary>
-    private async void PrepareAhead()
+    private async Task PrepareAheadAsync()
     {
         var info = _info;
         var plan = _plan;
@@ -453,7 +456,7 @@ internal sealed class PanelHost : IDisposable
         if (_clipRunning) return;
         // Kaynağın sonundaki pencere: ilerlenecek yer yok, son kare donuk kalır.
         if (_info is { DurationSeconds: > 0 } info && clip.EndSeconds >= info.DurationSeconds - 0.05) return;
-        BeginClip(clip.EndSeconds);
+        _ = LoadClipAsync(clip.EndSeconds);
     }
 
     private void Pump(int generation)
@@ -526,7 +529,7 @@ internal sealed class PanelHost : IDisposable
         if (!_panel.Controls.IsPlaying) return;
         var played = position.TotalSeconds;
         if (played >= clip.DurationSeconds - AdvanceTailSeconds) { AdvanceClip(); return; }
-        if (played >= clip.DurationSeconds * PrefetchAtFraction) PrepareAhead();
+        if (played >= clip.DurationSeconds * PrefetchAtFraction) _ = PrepareAheadAsync();
     }
 
     /// <summary>
