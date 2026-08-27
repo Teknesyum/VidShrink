@@ -1,0 +1,23 @@
+{
+  "contractId": "T56",
+  "auditorRunId": "a247be7e14bfb0a41",
+  "headSha": "c7bbd418cbb73a701db7dc9b6a75c569b47c75d9",
+  "diffHash": "c5193b7f33a26ca333d4d85567d37e567e6ae0c0d1be4ef858a4e759701fe4d9",
+  "owns": [
+    "Install-VidShrink.ps1",
+    "install-vidshrink.sh",
+    "README.md",
+    "src/VidShrink.Core/UpdateCheck.cs",
+    "tests/VidShrink.Tests/InstallerTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 hata",
+    "dotnet test -c Release 654 basarili 5 basarisiz 16 atlanan 675 toplam",
+    "kirmizi bes taban listeyle ad ad ayni, yeni kirmizi yok",
+    "owns birebir"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T20:56:48.152Z",
+  "usedAt": "2026-08-27T20:56:48.220Z",
+  "completedSha": "c7bbd418cbb73a701db7dc9b6a75c569b47c75d9"
+}
