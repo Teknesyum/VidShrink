@@ -1,0 +1,19 @@
+{
+  "contractId": "T59",
+  "auditorRunId": "ae0c234bdf4d1d7cd",
+  "headSha": "d87ad2c2bcaa3e6086c717a1d4266a83856c101e",
+  "diffHash": "30e7ebda69dc7a460c465e37e772ba9975388af394407143dcfc12a6a02df55c",
+  "owns": [
+    "tests/VidShrink.Tests/WindowLayoutTests.cs",
+    "tests/VidShrink.Tests/AppHost.cs"
+  ],
+  "verification": [
+    "birlestirme sonrasi ana agac: dotnet build -c Release 0 hata",
+    "dotnet test -c Release 661 basarili 0 basarisiz 16 atlanan 677 toplam",
+    "taban listedeki bes kirmizi kapandi, yeni kirmizi yok"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T21:01:16.822Z",
+  "usedAt": "2026-08-27T21:01:16.886Z",
+  "completedSha": "d87ad2c2bcaa3e6086c717a1d4266a83856c101e"
+}
