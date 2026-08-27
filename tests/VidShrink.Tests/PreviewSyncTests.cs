@@ -151,19 +151,20 @@ public sealed class PreviewSyncTests : IClassFixture<SyncRamp>
     public PreviewSyncTests(SyncRamp ramp) => _ramp = ramp;
 
     /// <summary>
-    /// Kabul edilen kayma. Fiziksel taban <c>1/plan.Fps</c>: sag yarinin elinde iki cikti
-    /// karesi arasinda daha yakin bir kare yoktur ve panel o bosluk boyunca ayni kareyi
-    /// tutar — 15 fps'lik planda <b>2 kaynak karesi</b>. Olculen sabit kayma ise 3,5 kaynak
-    /// karesi; aradaki 1,5 kare <c>FfmpegArguments.Build</c>'in fps dususunu <c>-r</c> ile
-    /// yapmasindan geliyor (ayni kodlama <c>-vf fps=</c> ile yapilinca medyan kayma 0).
-    /// O dosya bu sozlesmenin <c>owns</c> listesinde degil, bu yuzden tavan bugunku
-    /// kodlayicinin tutabildigi yerde: 4 kaynak karesi, 0,133 sn. <c>-r</c> degistigi gun
-    /// tavan 2'ye iner ve <see cref="Fps_dusuren_cikti_kaynaktan_uzun"/> o gunu haber verir.
+    /// Kabul edilen kayma, kare izgarasindan turetildi: <c>1/plan.Fps</c>. Plan fps'i
+    /// dusurdugunde sag yarinin elinde iki cikti karesi arasinda daha yakin bir kare yoktur
+    /// ve panel o bosluk boyunca ayni kareyi tutar — 15 fps'lik planda <b>2 kaynak
+    /// karesi</b>. Tavan bu; olculen sayiya gore ayarlanmadi (bugun olculen 0 ile 0,5 kare
+    /// arasinda, yani tavanin epey altinda).
     ///
-    /// Asil olcu buyukluk degil <b>karakter</b>: kayma sabit kalmali. Buyuyen kaymanin
-    /// tavani yoktur ve kullanicinin gordugu de oydu.
+    /// <b>Bu sayi neyi koruyor:</b> iki yarinin ayni kaynak anini gostermesini.
+    /// <b>Bozulursa kullanici ne gorur:</b> hareketli sahnede iki yari arasindaki dikis
+    /// kopuk gorunur — sag yari solun gosterdigi anin gerisinde kalir.
+    ///
+    /// Asil olcu yine de buyukluk degil <b>karakter</b>: kayma sabit kalmali. Buyuyen
+    /// kaymanin tavani yoktur ve kullanicinin gordugu de oydu.
     /// </summary>
-    private const int AcceptedDriftFrames = 4;
+    private const int AcceptedDriftFrames = 2;
 
     private const int PlanFps = 15;
 
@@ -249,13 +250,14 @@ public sealed class PreviewSyncTests : IClassFixture<SyncRamp>
     }
 
     /// <summary>
-    /// K1/K2/K3'un olcumu. Iki yarinin gosterdigi kaynak karesi butun oynatma boyunca
-    /// okunur; kaymanin ilk ve son bolumu karsilastirilir. Sabit kayma ikisinde de aynidir,
-    /// buyuyen kayma degildir.
+    /// Iki yarinin gosterdigi kaynak karesi butun oynatma boyunca okunur; kaymanin basi ile
+    /// sonu karsilastirilir. Aranan iki sey var: kayma <b>tavanin altinda</b> ve
+    /// <b>sabit</b> — yani izleme uzadikca buyumuyor.
     ///
-    /// Olcum iki kez kosar: bir kez panelin bugunku kararyla
-    /// (<see cref="PanelHost.ShouldLoop"/>), bir kez de basa sarma zorla acikken. Ikincisi
-    /// hatanin kendisini gosteriyor ve rapora ham haliyle giriyor.
+    /// <b>Ne koruyor:</b> panelin iki yarisinin ayni ani gostermesini, oynatmanin
+    /// besinci turunda da. <b>Bozulursa kullanici ne gorur:</b> onizleme ile orijinal
+    /// birbirinden ayrilir; sabit bir sapmada dikis hep kopuk durur, buyuyen sapmada
+    /// izledikce daha da acilir.
     /// </summary>
     [FfmpegFact]
     public void Iki_yari_uzun_oynatmada_da_ayni_ani_gosterir()
@@ -269,41 +271,82 @@ public sealed class PreviewSyncTests : IClassFixture<SyncRamp>
         var panelFps = SyncRamp.SourceFps;
         var pencere = (int)(SyncRamp.SourceDurationSeconds * panelFps);
 
-        // Bes tur: buyuyen kayma ancak tekrar edince gorunur.
-        var sarmali = Drift(_ramp.Kaynak, cikti, panelFps, pencere * 5, loop: true);
-        var sarmaliIlk = MedianBetween(sarmali, panelFps, pencere - 5);
-        var sarmaliSon = MedianBetween(sarmali, pencere * 4 + panelFps, pencere * 5 - 5);
-
-        // Panelin kendi karari. Ayni bes turluk kare sayisi istenir: basa sarma kapaliysa
-        // boru tek turdan sonra biter ve kuyruk ilk turun icinde kalir; acilirsa kuyruk
-        // besinci tura kayar ve buyume oradan gorunur.
-        var sarmasiz = Drift(_ramp.Kaynak, cikti, panelFps, pencere * 5,
+        // Bes turluk kare istenir. Panel basa sarmadigi icin boru tek turdan sonra biter ve
+        // kuyruk ilk turun icinde kalir; karar basa sarmaya donerse kuyruk besinci tura
+        // kayar ve orada birikmis kayma gorunur.
+        var olcum = Drift(_ramp.Kaynak, cikti, panelFps, pencere * 5,
             loop: PanelHost.ShouldLoop(_ramp.Kaynak, cikti));
-        var ilk = MedianBetween(sarmasiz, panelFps, pencere / 2);
-        var son = MedianOfLast(sarmasiz, panelFps);
+        var bas = MedianBetween(olcum, panelFps, pencere / 2);
+        var son = MedianOfLast(olcum, panelFps);
 
-        Record($"K1 basa-sarma-acik   kare={sarmali.Count} ilk-tur-medyan={sarmaliIlk:0.0} " +
-               $"son-tur-medyan={sarmaliSon:0.0} buyume={Math.Abs(sarmaliSon - sarmaliIlk):0.0} kaynak karesi");
-        Record($"K1 basa-sarma-kapali kare={sarmasiz.Count} bas-medyan={ilk:0.0} " +
-               $"son-medyan={son:0.0} buyume={Math.Abs(son - ilk):0.0} kaynak karesi");
+        Record($"K1 panel-karari kare={olcum.Count} bas-medyan={bas:0.0} son-medyan={son:0.0} " +
+               $"buyume={Math.Abs(son - bas):0.0} kaynak karesi (tavan={AcceptedDriftFrames})");
 
-        // Hata gercekten var: basa sararken kayma turdan ture buyuyor.
-        Assert.True(Math.Abs(sarmaliSon - sarmaliIlk) > AcceptedDriftFrames,
-            $"basa sarmada buyume beklenirdi: ilk={sarmaliIlk:0.0} son={sarmaliSon:0.0}");
-
-        // Duzeltmeden sonra kayma sabit ve tavanin altinda.
-        Assert.True(Math.Abs(son - ilk) <= 1, $"kayma buyuyor: bas={ilk:0.0} son={son:0.0}");
-        Assert.True(Math.Abs(ilk) <= AcceptedDriftFrames && Math.Abs(son) <= AcceptedDriftFrames,
-            $"kayma tavani asiyor: bas={ilk:0.0} son={son:0.0} tavan={AcceptedDriftFrames}");
+        Assert.True(Math.Abs(son - bas) <= 1, $"kayma buyuyor: bas={bas:0.0} son={son:0.0}");
+        Assert.True(Math.Abs(bas) <= AcceptedDriftFrames && Math.Abs(son) <= AcceptedDriftFrames,
+            $"kayma tavani asiyor: bas={bas:0.0} son={son:0.0} tavan={AcceptedDriftFrames}");
     }
 
     /// <summary>
-    /// Kaymanin sebebi: <c>-r</c> ile fps dusuren kodlama kaynaktan <b>uzun</b> bir dosya
-    /// uretiyor ve fark her basa sarmada birikiyor. Sure farkinin sifir olmadigini olcu
-    /// olarak tutuyoruz — sifirlandigi gun bu test duser ve panel yeniden basa sarabilir.
+    /// <see cref="PanelHost.ShouldLoop"/>'un korudugu tehlike, olculerek. Sag girdi kaynaktan
+    /// kisa oldugunda basa sarma kaymayi tur basina buyutuyor; panel de tam bu yuzden ayri
+    /// dosyalari sarmiyor.
+    ///
+    /// Kisa dosya burada <b>bilerek</b> uretiliyor. Onceden bu farki kodlayicinin kendi
+    /// kusuru (fps dususunun <c>-r</c> ile yapilmasi) yaratiyordu; T60 onu kapatti ama
+    /// tehlike kapanmadi: kirpma, kare izgarasina oturmayan sure, degisken kare hizi ayni
+    /// esitsizligi uretebilir.
+    ///
+    /// <b>Ne koruyor:</b> esit olmayan iki girdinin ayri ayri basa sarmamasini.
+    /// <b>Bozulursa kullanici ne gorur:</b> uzun izlemede iki yari giderek acilir.
     /// </summary>
     [FfmpegFact]
-    public void Fps_dusuren_cikti_kaynaktan_uzun()
+    public void Esit_olmayan_girdiler_basa_sarilirsa_kayma_buyur()
+    {
+        Assert.True(_ramp.Ready);
+        var kisa = Path.Combine(_ramp.Directory, "kisa.mp4");
+        var kirpik = (SyncRamp.SourceDurationSeconds - 0.2).ToString("0.###", CultureInfo.InvariantCulture);
+        Assert.Equal(0, SyncRamp.Run(ToolLocator.Ffmpeg, new[]
+        {
+            "-y", "-hide_banner", "-loglevel", "error", "-i", _ramp.Kaynak, "-t", kirpik,
+            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-pix_fmt", "yuv420p",
+            "-an", kisa
+        }, out _));
+
+        var panelFps = SyncRamp.SourceFps;
+        var pencere = (int)(SyncRamp.SourceDurationSeconds * panelFps);
+
+        var sarmali = Drift(_ramp.Kaynak, kisa, panelFps, pencere * 5, loop: true);
+        var ilkTur = MedianBetween(sarmali, panelFps, pencere - 5);
+        var sonTur = MedianBetween(sarmali, pencere * 4 + panelFps, pencere * 5 - 5);
+
+        Record($"K3 esitsiz-girdi kaynak={DurationOf(_ramp.Kaynak):0.000} kisa={DurationOf(kisa):0.000} " +
+               $"ilk-tur-medyan={ilkTur:0.0} son-tur-medyan={sonTur:0.0} " +
+               $"buyume={Math.Abs(sonTur - ilkTur):0.0} kaynak karesi");
+
+        Assert.False(PanelHost.ShouldLoop(_ramp.Kaynak, kisa));
+        Assert.True(Math.Abs(sonTur - ilkTur) > AcceptedDriftFrames,
+            $"esitsiz girdide buyume beklenirdi: ilk={ilkTur:0.0} son={sonTur:0.0}");
+    }
+
+    /// <summary>
+    /// Fps dusuren kodlama kaynakla <b>ayni</b> sureyi tutmali. Bu olcu once kusuru
+    /// belgeliyordu — <c>-r</c> ile dusurulen kare hizi cikti sureyi uzatiyordu, 4 sn'lik
+    /// kaynak 15 fps'te 62 kare / 4,133 sn cikiyordu. T60 fps dususunu <c>fps=</c> filtresine
+    /// tasidi ve fark sifirlandi; olcu de yonunu cevirdi: artik o kusurun geri gelmesini
+    /// yakaliyor.
+    ///
+    /// Tolerans kare izgarasindan: bir cikti karesi, <c>1/plan.Fps</c>. Kare hizi degisimi
+    /// son karenin bitisini bir kareden az oynatabilir, daha fazlasini oynatamaz. Olculen
+    /// sayiya uydurulmadi — bugun fark tam 0, bilinen gerileme ise 0,133 sn, yani iki cikti
+    /// karesi ve toleransin rahatca disinda.
+    ///
+    /// <b>Ne koruyor:</b> cikti ile kaynagin ayni uzunlukta kalmasini.
+    /// <b>Bozulursa kullanici ne gorur:</b> teslim edilen dosya kaynaktan uzun olur ve
+    /// karsilastirma panelinde iki yari her basa sarmada biraz daha acilir.
+    /// </summary>
+    [FfmpegFact]
+    public void Fps_dusuren_cikti_kaynakla_ayni_sureyi_tutar()
     {
         Assert.True(_ramp.Ready);
         var cikti = Path.Combine(_ramp.Directory, "uzunluk.mp4");
@@ -312,10 +355,13 @@ public sealed class PreviewSyncTests : IClassFixture<SyncRamp>
 
         var kaynakSure = DurationOf(_ramp.Kaynak);
         var ciktiSure = DurationOf(cikti);
+        var tolerans = 1.0 / PlanFps;
 
-        Record($"K2 sure kaynak={kaynakSure:0.000} cikti={ciktiSure:0.000} fark={ciktiSure - kaynakSure:0.000} sn");
-        Assert.True(ciktiSure - kaynakSure > 0.05,
-            $"sure farki beklenirdi: kaynak={kaynakSure:0.000} cikti={ciktiSure:0.000}");
+        Record($"K2 sure kaynak={kaynakSure:0.000} cikti={ciktiSure:0.000} " +
+               $"fark={ciktiSure - kaynakSure:0.000} sn (tolerans={tolerans:0.000})");
+        Assert.True(Math.Abs(ciktiSure - kaynakSure) < tolerans,
+            $"cikti kaynakla ayni sureyi tutmali: kaynak={kaynakSure:0.000} cikti={ciktiSure:0.000} " +
+            $"tolerans={tolerans:0.000}");
     }
 
     private static double DurationOf(string path)

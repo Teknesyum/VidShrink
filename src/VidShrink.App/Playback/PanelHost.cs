@@ -411,9 +411,14 @@ internal sealed class PanelHost : IDisposable
     /// Boru başa sarabilir mi. <c>ComparisonGraph</c> <c>-stream_loop -1</c> bayrağını
     /// <b>iki girdiye ayrı ayrı</b> veriyor, yani her girdi kendi uzunluğunda başa sarıyor.
     /// İki dosyanın süresi eşit değilse aradaki fark her turda birikir ve iki yarı
-    /// birbirinden uzaklaşır: 15 fps'e düşen bir planda çıktı kaynaktan 0,133 sn uzun
-    /// çıkıyor ve kayma 4 sn'lik bir kaynakta tur başına 4 kaynak karesi büyüyor —
-    /// 20 sn sonra 0,65 sn, üstelik sınırsız.
+    /// birbirinden uzaklaşır — kayma sınırsızdır, izleme uzadıkça büyür. Ölçüldü: 4 sn'lik
+    /// kaynağın karşısına 3,8 sn'lik bir çıktı konduğunda kayma tur başına 6 kaynak karesi
+    /// artıyor.
+    ///
+    /// Süre farkının tek bir sebebi yok, o yüzden kural sebebe değil <b>duruma</b> bakıyor:
+    /// kırpma, kaynağın süresinin kare ızgarasına tam oturmaması, değişken kare hızı,
+    /// kabın sesi videodan uzun taşıması. (T58'de görülen fazladan kare hızı sapması
+    /// T60'ta kapandı; kural onun için değil, sınıfın tamamı için duruyor.)
     ///
     /// Bu yüzden başa sarma yalnız <b>aynı dosya</b> iki girdiye de konduğunda açılır;
     /// perde durumunun kendisi budur ve orada iki yarı tanım gereği aynı uzunluktadır.
