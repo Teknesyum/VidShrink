@@ -1,0 +1,23 @@
+{
+  "contractId": "T62",
+  "auditorRunId": "ad18f25c4d6278309",
+  "headSha": "409ce47d938d563cd749b1ad9acd8a9903637f05",
+  "diffHash": "53cc22aa3558c7ee4ab1e1cfee9f04393a5f6e732002e32b2203cfd82cd41308",
+  "owns": [
+    "src/VidShrink.Ffmpeg/TempCleanup.cs",
+    "tests/VidShrink.Tests/AppHost.cs",
+    "tests/VidShrink.Tests/TempCleanupTests.cs",
+    "tests/VidShrink.Tests/FpsDropTests.cs",
+    "tools/kararsiz.js"
+  ],
+  "verification": [
+    "dotnet build -c Release + dotnet test -c Release (732 gecti, 0 kaldi, 16 atlandi, toplam 748)",
+    "409ce47 birlesik ana dal",
+    ".calisma/dogrulama worktree",
+    "K5: rebase sonrasi 10 kosum 0 kirmizi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T23:50:30.815Z",
+  "usedAt": "2026-08-27T23:50:30.874Z",
+  "completedSha": "409ce47d938d563cd749b1ad9acd8a9903637f05"
+}
