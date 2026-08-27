@@ -34,6 +34,19 @@ public readonly record struct FillBand(double LowerMb, double HardFloorMb, doubl
 
 public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice);
 
+public enum QualityTargetBound { Matched, AboveSourceCeiling, BelowFloor }
+
+public sealed record QualityTargetResult(
+    double TargetMb,
+    double PredictedQuality,
+    double RequestedQuality,
+    QualityTargetBound Bound,
+    int Evaluations,
+    PlanResult Plan)
+{
+    public double QualityError => PredictedQuality - RequestedQuality;
+}
+
 public static class PlanCalculator
 {
     private const double ContainerOverhead = 0.995;
@@ -385,6 +398,106 @@ public static class PlanCalculator
 
     public static double EffectiveTargetMb(double targetMb, double sourceMb)
         => sourceMb > 0 ? Math.Min(targetMb, sourceMb * SourceSizeCap) : targetMb;
+
+    // The quality scale is the one BuildDetailed already returns; the search below only runs it
+    // backwards. It cannot assume the relation is monotone - it is not, and that was measured
+    // rather than reasoned about. Sweeping the target across its whole range on three synthetic
+    // sources at two intents (1206 samples) the predicted quality falls back 42 times and the
+    // largest fall is 16,8 points; on two ffmpeg-made clips with a measured complexity profile
+    // (242 samples) it falls back 12 times, worst 7,9. The cause is that the layout search, the
+    // regime thresholds and the audio budget all step: a bigger target can buy a layout that
+    // scores worse, so the reachable qualities form a chain of peaks rather than one rising line.
+    //
+    // The inverse is therefore defined as the smallest target that reaches the requested quality,
+    // and finding it means not stepping over a peak. A coarse grid does exactly that: measured
+    // against a 0,15%-grid ground truth, a grid of 31% steps answers up to 3,83x too large, 10%
+    // and 5% up to 1,245x, 2% up to 1,112x. The scan therefore walks 0,5% steps from the floor
+    // and stops at the first crossing - 1,000x against the same ground truth, at 1125 calls
+    // worst case. 1% steps would cost half that and answer 1,002x; the cheaper grid was not
+    // taken because K5 asks for expensive and right over cheap and wrong.
+    // ScanResolutionIsChosenByConvergence in QualityTargetTests is that measurement.
+    private const double QualityScanStep = 1.005;
+    private const int QualityBisectionMaxSteps = 4;
+    private const double QualityBisectionResolution = 0.20;
+
+    public static double QualityFloorTargetMb(MediaInfo info)
+        => Math.Max(0.02, SizeMb(MinVideoBitrateK, 0, Math.Max(info.DurationSeconds, 0.1)));
+
+    public static double QualityCeilingTargetMb(MediaInfo info)
+    {
+        var cap = info.FileSizeMb > 0 ? info.FileSizeMb * SourceSizeCap : QualityFloorTargetMb(info) * 4096;
+        return Math.Max(cap, QualityFloorTargetMb(info) * 1.01);
+    }
+
+    public static QualityTargetResult TargetMbForQuality(MediaInfo info, PlanOptions options, double requestedQuality,
+        ComplexityProfile? profile = null, IEncoderAvailability? availability = null)
+    {
+        var evaluations = 0;
+        PlanResult At(double mb)
+        {
+            evaluations++;
+            return BuildDetailed(info, WithTarget(options, mb), profile, availability);
+        }
+
+        var floorMb = QualityFloorTargetMb(info);
+        var ceilingMb = QualityCeilingTargetMb(info);
+
+        var low = At(floorMb);
+        if (low.PredictedQuality >= requestedQuality)
+            return new QualityTargetResult(floorMb, low.PredictedQuality, requestedQuality,
+                low.PredictedQuality > requestedQuality + QualityBisectionResolution ? QualityTargetBound.BelowFloor : QualityTargetBound.Matched,
+                evaluations, low);
+
+        var ceiling = At(ceilingMb);
+        if (ceiling.PredictedQuality < requestedQuality)
+            return new QualityTargetResult(ceilingMb, ceiling.PredictedQuality, requestedQuality,
+                QualityTargetBound.AboveSourceCeiling, evaluations, ceiling);
+
+        var span = ceilingMb / floorMb;
+        var steps = Math.Max(1, (int)Math.Ceiling(Math.Log(span) / Math.Log(QualityScanStep)));
+        var lowMb = floorMb;
+        var bestMb = ceilingMb;
+        var best = ceiling;
+        for (var i = 1; i < steps; i++)
+        {
+            var mb = floorMb * Math.Pow(span, (double)i / steps);
+            var probe = At(mb);
+            if (probe.PredictedQuality >= requestedQuality)
+            {
+                bestMb = mb;
+                best = probe;
+                break;
+            }
+            lowMb = mb;
+        }
+
+        for (var step = 0; step < QualityBisectionMaxSteps; step++)
+        {
+            var midMb = Math.Sqrt(lowMb * bestMb);
+            if (midMb <= lowMb * 1.000001 || midMb >= bestMb * 0.999999) break;
+            var mid = At(midMb);
+            if (mid.PredictedQuality >= requestedQuality)
+            {
+                best = mid;
+                bestMb = midMb;
+            }
+            else lowMb = midMb;
+        }
+
+        return new QualityTargetResult(bestMb, best.PredictedQuality, requestedQuality, QualityTargetBound.Matched, evaluations, best);
+    }
+
+    private static PlanOptions WithTarget(PlanOptions options, double targetMb) => new()
+    {
+        TargetMb = targetMb,
+        Intent = options.Intent,
+        Codec = options.Codec,
+        AllowResolutionDrop = options.AllowResolutionDrop,
+        AllowFpsDrop = options.AllowFpsDrop,
+        HdrPolicy = options.HdrPolicy,
+        FillPolicy = options.FillPolicy,
+        SpeedMode = options.SpeedMode
+    };
 
     public static double RetryAimMb(double targetMb, double? measuredEfficiency)
     {
