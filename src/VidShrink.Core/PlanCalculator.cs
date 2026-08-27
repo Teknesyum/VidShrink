@@ -404,15 +404,20 @@ public static class PlanCalculator
     // rather than reasoned about. Sweeping the target across its whole range on three synthetic
     // sources at two intents (1206 samples) the predicted quality falls back 42 times and the
     // largest fall is 16,8 points; on two ffmpeg-made clips with a measured complexity profile
-    // (242 samples) it falls back 12 times, worst 7,9. Both sweeps live in QualityTargetTests and
-    // write to .calisma/t57/olcum.txt. The cause is that the layout search, the regime thresholds
-    // and the audio budget all step: a bigger target can buy a layout that scores worse.
-    // So the inverse is defined as the smallest target that reaches the requested quality, found
-    // by a coarse log-spaced scan that brackets the first crossing and a bisection inside that
-    // bracket. A plain bisection over the whole range would walk into one of those cliffs and
-    // answer from the wrong side of it.
-    private const int QualityScanSteps = 24;
-    private const int QualityBisectionMaxSteps = 10;
+    // (242 samples) it falls back 12 times, worst 7,9. The cause is that the layout search, the
+    // regime thresholds and the audio budget all step: a bigger target can buy a layout that
+    // scores worse, so the reachable qualities form a chain of peaks rather than one rising line.
+    //
+    // The inverse is therefore defined as the smallest target that reaches the requested quality,
+    // and finding it means not stepping over a peak. A coarse grid does exactly that: measured
+    // against a 0,15%-grid ground truth, a grid of 31% steps answers up to 3,83x too large, 10%
+    // and 5% up to 1,245x, 2% up to 1,112x. The scan therefore walks 0,5% steps from the floor
+    // and stops at the first crossing - 1,000x against the same ground truth, at 1125 calls
+    // worst case. 1% steps would cost half that and answer 1,002x; the cheaper grid was not
+    // taken because K5 asks for expensive and right over cheap and wrong.
+    // ScanResolutionIsChosenByConvergence in QualityTargetTests is that measurement.
+    private const double QualityScanStep = 1.005;
+    private const int QualityBisectionMaxSteps = 4;
     private const double QualityBisectionResolution = 0.20;
 
     public static double QualityFloorTargetMb(MediaInfo info)
@@ -436,42 +441,38 @@ public static class PlanCalculator
 
         var floorMb = QualityFloorTargetMb(info);
         var ceilingMb = QualityCeilingTargetMb(info);
-        var span = ceilingMb / floorMb;
 
-        var lowMb = floorMb;
-        var low = At(lowMb);
+        var low = At(floorMb);
         if (low.PredictedQuality >= requestedQuality)
-            return new QualityTargetResult(lowMb, low.PredictedQuality, requestedQuality,
+            return new QualityTargetResult(floorMb, low.PredictedQuality, requestedQuality,
                 low.PredictedQuality > requestedQuality + QualityBisectionResolution ? QualityTargetBound.BelowFloor : QualityTargetBound.Matched,
                 evaluations, low);
 
-        double? hitMb = null;
-        PlanResult? hit = null;
-        for (var i = 1; i <= QualityScanSteps; i++)
+        var ceiling = At(ceilingMb);
+        if (ceiling.PredictedQuality < requestedQuality)
+            return new QualityTargetResult(ceilingMb, ceiling.PredictedQuality, requestedQuality,
+                QualityTargetBound.AboveSourceCeiling, evaluations, ceiling);
+
+        var span = ceilingMb / floorMb;
+        var steps = Math.Max(1, (int)Math.Ceiling(Math.Log(span) / Math.Log(QualityScanStep)));
+        var lowMb = floorMb;
+        var bestMb = ceilingMb;
+        var best = ceiling;
+        for (var i = 1; i < steps; i++)
         {
-            var mb = i == QualityScanSteps ? ceilingMb : floorMb * Math.Pow(span, (double)i / QualityScanSteps);
+            var mb = floorMb * Math.Pow(span, (double)i / steps);
             var probe = At(mb);
             if (probe.PredictedQuality >= requestedQuality)
             {
-                hitMb = mb;
-                hit = probe;
+                bestMb = mb;
+                best = probe;
                 break;
             }
             lowMb = mb;
         }
 
-        if (hit is null || hitMb is not double bracketMb)
-        {
-            var ceiling = At(ceilingMb);
-            return new QualityTargetResult(ceilingMb, ceiling.PredictedQuality, requestedQuality,
-                QualityTargetBound.AboveSourceCeiling, evaluations, ceiling);
-        }
-
-        var best = hit;
-        var bestMb = bracketMb;
         for (var step = 0; step < QualityBisectionMaxSteps; step++)
         {
-            if (best.PredictedQuality - requestedQuality <= QualityBisectionResolution) break;
             var midMb = Math.Sqrt(lowMb * bestMb);
             if (midMb <= lowMb * 1.000001 || midMb >= bestMb * 0.999999) break;
             var mid = At(midMb);

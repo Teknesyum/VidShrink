@@ -3,3 +3,4 @@
 - [PowerShell UTF-8 tuzağı](powershell-utf8-tuzagi.md) — PS 5.1 BOM'suz Türkçe dosyayı bozar; sözleşme/rapor/LOG düzenlemeleri Bash cat+sed ile
 - [Ölçüm dosyası büyür](olcum-dosyasi-buyur.md) — her dotnet test kosumu olcum.txt sonuna ekliyor; raporu son kosumdan sonra yaz
 - [--no-build bayat derleme](no-build-bayat-derleme.md) — kabul kriterini --no-build ile dogrulama; Avalonia Measure argumaninin yutulmasi
+- [Kalite/boyut tekduze degil](kalite-boyut-tekduze-degil.md) — PredictedQuality hedef MB ile ters donuyor; arama kalibi ve surekli kirmizi WindowLayoutTests tabani

@@ -163,13 +163,13 @@ public sealed class QualityTargetTests
         // lands under it - the undershoot count is asserted at zero rather than tolerated.
         Assert.Equal(0, undershoots);
 
-        // The overshoot is not free choice: where the quality curve steps, the first target that
-        // clears the request clears it by the whole height of that step. The sweep above walks
-        // 0,5-point requests from 20 to 95 on three sources at two intents and measures 2,78
-        // points at worst (sample.mp4 Sharing, request 82 -> 58,81 MB / 84,78), so the gate is
-        // 3,0 - the measured maximum rounded up, not a guess. A tighter gate could only be met by
-        // returning a target that does not reach the requested quality.
-        Assert.True(worst <= 3.0, $"En kotu sapma {worst:0.###} puan: {worstCase}");
+        // The overshoot is what the curve gives at the first target that clears the request. Round
+        // one blamed it on step height and gated at 3,0; that reading was wrong - the 2,78 points
+        // it measured came from the coarse grid stepping over a peak, not from the curve. With the
+        // 0,5% scan the same sweep (0,5-point requests from 20 to 95, three sources, two intents)
+        // measures 0,833 points at worst (phone.mp4 Sharing, request 80 -> 2,498 MB / 80,83), so
+        // the gate is 1,0 - the measured maximum rounded up.
+        Assert.True(worst <= 1.0, $"En kotu sapma {worst:0.###} puan: {worstCase}");
     }
 
     [Fact]
@@ -205,20 +205,42 @@ public sealed class QualityTargetTests
     [Fact]
     public void SearchCostIsBoundedAndCounted()
     {
-        var worst = 0;
+        var report = new StringBuilder();
+        report.AppendLine("# T57 arama maliyeti - tam supurme, sabit vaka listesi degil");
+        var worstOverall = 0;
+        var worstOverallCase = "";
+        var worstByBound = new Dictionary<QualityTargetBound, int>();
+
         foreach (var info in Sources())
-        foreach (var quality in new[] { 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 })
+        foreach (var intent in new[] { Intent.Sharing, Intent.Archive })
+        for (var quality = 20.0; quality <= 95.0; quality += 0.5)
         {
-            var result = PlanCalculator.TargetMbForQuality(info, new PlanOptions(), quality);
-            worst = Math.Max(worst, result.Evaluations);
-            _output.WriteLine(FormattableString.Invariant(
-                $"{Path.GetFileName(info.FilePath)} istenen {quality:0}: {result.Evaluations} cagri, {result.Bound}"));
+            var result = PlanCalculator.TargetMbForQuality(info, new PlanOptions { Intent = intent }, quality);
+            worstByBound.TryGetValue(result.Bound, out var soFar);
+            worstByBound[result.Bound] = Math.Max(soFar, result.Evaluations);
+            if (result.Evaluations > worstOverall)
+            {
+                worstOverall = result.Evaluations;
+                worstOverallCase = FormattableString.Invariant(
+                    $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0} ({result.Bound})");
+            }
         }
 
-        // Measured: 1 call when the request falls outside the reachable range, 5-25 when it is
-        // inside. The gate is the measured worst case (25) plus the two coarse-scan steps that a
-        // slightly different source shape could add.
-        Assert.True(worst <= 27, $"En pahali arama {worst} BuildDetailed cagrisi surdu.");
+        foreach (var pair in worstByBound.OrderBy(p => p.Key.ToString(), StringComparer.Ordinal))
+            report.AppendLine(FormattableString.Invariant($"{pair.Key}: en pahali {pair.Value} cagri"));
+        report.AppendLine(FormattableString.Invariant($"tumunde en pahali {worstOverall} cagri ({worstOverallCase})"));
+        _output.WriteLine(report.ToString());
+        Write(report.ToString());
+
+        // Measured over the whole 0,5-point request sweep on every source and intent, not over a
+        // hand-picked list - that is what let round 1 publish a wrong number. BelowFloor costs one
+        // call and AboveSourceCeiling two; a Matched request costs the 0,5% scan walking from the
+        // floor to the answer, and the gate below is the measured worst of that sweep: 1315 calls
+        // (sample.mp4 Sharing, request 94 - the answer sits just under the ceiling, so the scan
+        // walks nearly the whole range), about 240 ms at ~0,18 ms a call.
+        Assert.Equal(1, worstByBound[QualityTargetBound.BelowFloor]);
+        Assert.Equal(2, worstByBound[QualityTargetBound.AboveSourceCeiling]);
+        Assert.True(worstOverall <= 1320, $"En pahali arama {worstOverall} BuildDetailed cagrisi surdu: {worstOverallCase}");
     }
 
     [Fact]
@@ -232,6 +254,112 @@ public sealed class QualityTargetTests
         Assert.Equal(25, options.TargetMb);
         Assert.True(direct.PredictedQuality > 0);
         Assert.NotEmpty(direct.Plan.ReasonCodes);
+    }
+
+    private static double ScanAnswer(MediaInfo info, PlanOptions options, double quality, double step, ComplexityProfile? profile, ref int calls)
+    {
+        var floor = PlanCalculator.QualityFloorTargetMb(info);
+        var ceiling = PlanCalculator.QualityCeilingTargetMb(info);
+        var span = ceiling / floor;
+        var steps = Math.Max(1, (int)Math.Ceiling(Math.Log(span) / Math.Log(step)));
+        var low = floor;
+        var hit = ceiling;
+        for (var i = 1; i < steps; i++)
+        {
+            var mb = floor * Math.Pow(span, (double)i / steps);
+            calls++;
+            if (QualityAt(info, options, mb, profile) >= quality) { hit = mb; break; }
+            low = mb;
+        }
+        for (var i = 0; i < 10; i++)
+        {
+            var mid = Math.Sqrt(low * hit);
+            if (mid <= low * 1.000001 || mid >= hit * 0.999999) break;
+            calls++;
+            if (QualityAt(info, options, mid, profile) >= quality) hit = mid; else low = mid;
+        }
+        return hit;
+    }
+
+    [Fact]
+    public void SearchReturnsTheSmallestTargetThatReachesTheRequest()
+    {
+        var report = new StringBuilder();
+        report.AppendLine("# T57 uretim aramasi vs 0,15% izgara gercegi");
+        var worst = 1.0;
+        var worstCase = "";
+
+        foreach (var info in Sources())
+        foreach (var intent in new[] { Intent.Sharing, Intent.Archive })
+        foreach (var quality in new[] { 76.0, 78.0, 80.0, 82.0, 84.0, 86.0, 88.0, 90.0 })
+        {
+            var options = new PlanOptions { Intent = intent };
+            var result = PlanCalculator.TargetMbForQuality(info, options, quality);
+            if (result.Bound != QualityTargetBound.Matched) continue;
+
+            var truthCalls = 0;
+            var truth = ScanAnswer(info, options, quality, 1.0015, null, ref truthCalls);
+            var ratio = result.TargetMb / truth;
+            report.AppendLine(FormattableString.Invariant(
+                $"{Path.GetFileName(info.FilePath)} {intent} {quality:0}: uretim {result.TargetMb:0.####} MB, gercek {truth:0.####} MB, oran x{ratio:0.0000}, {result.Evaluations} cagri"));
+            if (ratio > worst)
+            {
+                worst = ratio;
+                worstCase = FormattableString.Invariant(
+                    $"{Path.GetFileName(info.FilePath)} {intent} {quality:0}: {result.TargetMb:0.####} MB vs {truth:0.####} MB");
+            }
+        }
+
+        report.AppendLine(FormattableString.Invariant($"en kotu fazlalik x{worst:0.0000} ({worstCase})"));
+        _output.WriteLine(report.ToString());
+        Write(report.ToString());
+
+        // The gate that the round-1 search failed. A 31% grid answered up to 3,83x too large
+        // because it stepped over a peak; the 0,5% scan is measured at x1,0000 against a 0,15%
+        // grid, so the gate is 1,01 - room for the scan's own step, nothing like a missed peak.
+        Assert.True(worst <= 1.01, $"Arama gercegin x{worst:0.0000} kati buyuk bir hedef verdi: {worstCase}");
+    }
+
+    [Fact]
+    public void ScanResolutionIsChosenByConvergence()
+    {
+        var report = new StringBuilder();
+        report.AppendLine("# T57 tarama cozunurlugu yakinsamasi");
+        var steps = new[] { 1.31, 1.10, 1.05, 1.02, 1.01, 1.005 };
+        var worst = new Dictionary<double, double>();
+        var cost = new Dictionary<double, int>();
+        foreach (var st in steps) { worst[st] = 1.0; cost[st] = 0; }
+
+        foreach (var info in Sources())
+        foreach (var intent in new[] { Intent.Sharing, Intent.Archive })
+        foreach (var quality in new[] { 76.0, 78.0, 80.0, 82.0, 84.0, 86.0, 88.0, 90.0 })
+        {
+            var options = new PlanOptions { Intent = intent };
+            var floor = PlanCalculator.QualityFloorTargetMb(info);
+            var ceiling = PlanCalculator.QualityCeilingTargetMb(info);
+            if (QualityAt(info, options, floor) >= quality) continue;
+            if (QualityAt(info, options, ceiling) < quality) continue;
+
+            var truthCalls = 0;
+            var truth = ScanAnswer(info, options, quality, 1.0015, null, ref truthCalls);
+            var line = FormattableString.Invariant($"{Path.GetFileName(info.FilePath)} {intent} {quality:0}: gercek {truth:0.####} MB ({truthCalls} cagri)");
+            foreach (var st in steps)
+            {
+                var calls = 0;
+                var answer = ScanAnswer(info, options, quality, st, null, ref calls);
+                var ratio = answer / truth;
+                worst[st] = Math.Max(worst[st], ratio);
+                cost[st] = Math.Max(cost[st], calls);
+                line += FormattableString.Invariant($" | {st:0.000}: {answer:0.####} x{ratio:0.000} ({calls})");
+            }
+            report.AppendLine(line);
+        }
+
+        foreach (var st in steps)
+            report.AppendLine(FormattableString.Invariant($"adim {st:0.000} -> en kotu fazlalik x{worst[st]:0.000}, en pahali {cost[st]} cagri"));
+        _output.WriteLine(report.ToString());
+        Write(report.ToString());
+        Assert.True(worst[1.005] < 2.0);
     }
 
     // K3: the inversion assumes quality rises with the target. That assumption is measured
