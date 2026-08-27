@@ -37,6 +37,11 @@ public static class PreviewStatus
     /// Bu durumda yeni kare cekilebilir mi? Kodlama surerken cekilemez: T30/O2 kodlama
     /// yavaslamasini %17,8-28,4 olctu, konseyin %5 kurali asildi. O sirada son onbellekli
     /// cift gosterilir.
+    ///
+    /// <see cref="PreviewState.OrnekKodlama"/> burada yok ama
+    /// <see cref="HasRightHalf"/> icinde var; bu bir celiski degil, iki ayri soru.
+    /// O durumda sag yaride gosterilecek bir kare <b>vardir</b> — kisa ornek parcadan
+    /// gelir — ama <b>yeni</b> bir kare cekilecek bir tam cikti dosyasi yoktur.
     /// </summary>
     public static bool AllowsFrameGrab(PreviewState state)
         => state is PreviewState.YalnizKaynak or PreviewState.GercekCikti;

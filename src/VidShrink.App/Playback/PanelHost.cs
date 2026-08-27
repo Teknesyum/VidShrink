@@ -403,9 +403,25 @@ internal sealed class PanelHost : IDisposable
             PanelHeight = size.Height,
             Fps = _fps,
             Realtime = true,
-            Loop = clip is null
+            Loop = ShouldLoop(left, clip?.EncodedPath ?? _right ?? left)
         };
     }
+
+    /// <summary>
+    /// Boru başa sarabilir mi. <c>ComparisonGraph</c> <c>-stream_loop -1</c> bayrağını
+    /// <b>iki girdiye ayrı ayrı</b> veriyor, yani her girdi kendi uzunluğunda başa sarıyor.
+    /// İki dosyanın süresi eşit değilse aradaki fark her turda birikir ve iki yarı
+    /// birbirinden uzaklaşır: 15 fps'e düşen bir planda çıktı kaynaktan 0,133 sn uzun
+    /// çıkıyor ve kayma 4 sn'lik bir kaynakta tur başına 4 kaynak karesi büyüyor —
+    /// 20 sn sonra 0,65 sn, üstelik sınırsız.
+    ///
+    /// Bu yüzden başa sarma yalnız <b>aynı dosya</b> iki girdiye de konduğunda açılır;
+    /// perde durumunun kendisi budur ve orada iki yarı tanım gereği aynı uzunluktadır.
+    /// Ayrı dosyalarda boru sonuncu karede biter ve o kare durur; kullanıcı baştan
+    /// başlatmak isterse şeridin kendi düğmesi zaten var.
+    /// </summary>
+    internal static bool ShouldLoop(string leftPath, string rightPath)
+        => string.Equals(leftPath, rightPath, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Panonun ölçüsünden kare ölçüsü. Kaynağın oranı panoya sığdırılır (ZoomGesture de
@@ -543,7 +559,7 @@ internal sealed class PanelHost : IDisposable
         if (_aheadRunning || _clipRunning || _ahead is not null) return;
 
         var next = clip.EndSeconds;
-        if (info.DurationSeconds > 0 && next >= info.DurationSeconds - 0.05) return;
+        if (FreezesAtWindowEnd) return;
 
         _aheadRunning = true;
         try
@@ -581,10 +597,25 @@ internal sealed class PanelHost : IDisposable
         }
 
         if (_clipRunning) return;
-        // Kaynağın sonundaki pencere: ilerlenecek yer yok, son kare donuk kalır.
-        if (_info is { DurationSeconds: > 0 } info && clip.EndSeconds >= info.DurationSeconds - 0.05) return;
+        if (FreezesAtWindowEnd) return;
         _ = LoadClipAsync(clip.EndSeconds);
     }
+
+    /// <summary>
+    /// Örnek penceresi dolduğunda sağ yarının ne yaptığı, tek yerden. Kaynağın sonunda
+    /// değilsek pencere biter bitmez bir sonrakine geçilir — kullanıcı iki yarının da
+    /// akmaya devam ettiğini görür, donma yoktur (<see cref="SwapToStandby"/> bekleyen
+    /// boruyu hazır tutuyor).
+    ///
+    /// Kaynağın son penceresindeysek ilerlenecek yer yoktur: boru biter ve <b>iki yarı da
+    /// son karesinde donar</b>. Başa sarmak bilerek yapılmıyor; sol ve sağ dosya ayrı ayrı
+    /// başa sardığında hiza kaybolur (bkz. <see cref="ShouldLoop"/>). Baştan başlatmak
+    /// şeridin kendi düğmesinde.
+    /// </summary>
+    internal bool FreezesAtWindowEnd
+        => ActiveClip is { } window
+           && _info is { DurationSeconds: > 0 } info
+           && window.EndSeconds >= info.DurationSeconds - 0.05;
 
     private void Pump(int generation)
     {
