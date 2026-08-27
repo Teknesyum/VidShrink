@@ -1,0 +1,21 @@
+{
+  "contractId": "T53",
+  "auditorRunId": "a7e0898a00d3d689c",
+  "headSha": "b70daa2c415aecfabb01362e94971bf746af1e63",
+  "diffHash": "6585ad679b42c76db4e84b3aaba9b1f230f8dff7fdf45c4fe135b422aa268643",
+  "owns": [
+    "src/VidShrink.App/Playback/ComparisonSurface.cs",
+    "src/VidShrink.Ffmpeg/Playback/PipeComparisonFrameSource.cs",
+    "src/VidShrink.Ffmpeg/Playback/ComparisonGraph.cs",
+    "tests/VidShrink.Tests/SplitDragTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release + dotnet test -c Release (666 gecti, 0 kaldi, 16 atlandi, toplam 682)",
+    "b70daa2 birlesik ana dal",
+    ".calisma/dogrulama worktree"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T21:13:32.412Z",
+  "usedAt": "2026-08-27T21:13:35.935Z",
+  "completedSha": "b70daa2c415aecfabb01362e94971bf746af1e63"
+}
