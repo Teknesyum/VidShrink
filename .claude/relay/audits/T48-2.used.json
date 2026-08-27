@@ -1,0 +1,22 @@
+{
+  "contractId": "T48",
+  "auditorRunId": "af2e48df295d61711",
+  "headSha": "c434c195c96e638a56c16480d00f93f2df93cfe2",
+  "diffHash": "0466ef495a39925800e4493cd797cf91ca2cc0ee0290b8ea3aeaaa458ae19f54",
+  "owns": [
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "src/VidShrink.App/Playback/SegmentEncoder.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.Ffmpeg/FfmpegRunner.cs",
+    "tests/VidShrink.Tests/SegmentEncoderTests.cs",
+    "tests/VidShrink.Tests/PanelHostTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 hata",
+    "dotnet test 621 basarili 0 basarisiz 16 atlanan 637 toplam"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T10:19:39.467Z",
+  "usedAt": "2026-08-27T10:19:39.524Z",
+  "completedSha": "c434c195c96e638a56c16480d00f93f2df93cfe2"
+}
