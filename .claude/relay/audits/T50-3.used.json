@@ -1,0 +1,23 @@
+{
+  "contractId": "T50",
+  "auditorRunId": "a287d1b52921cc38f",
+  "headSha": "b04bb131f3a59e9884ffa3de12f496ca44d48712",
+  "diffHash": "f755c43a9923745c15dc32558b367208e385ac09b8ca3757af1ab1e9931c0d43",
+  "owns": [
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "src/VidShrink.App/Playback/SegmentEncoder.cs",
+    "src/VidShrink.App/Playback/PipeComparisonFrameSource.cs",
+    "src/VidShrink.App/Playback/ComparisonGraph.cs",
+    "tests/VidShrink.Tests/PanelHostTests.cs",
+    "tests/VidShrink.Tests/SegmentEncoderTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release 0 hata",
+    "dotnet test -c Release 637 basarili 0 basarisiz 16 atlanan 653 toplam",
+    "tur 3 denetimi GECTI, 8 borc muhur notunda"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T11:46:02.741Z",
+  "usedAt": "2026-08-27T11:46:05.570Z",
+  "completedSha": "b04bb131f3a59e9884ffa3de12f496ca44d48712"
+}

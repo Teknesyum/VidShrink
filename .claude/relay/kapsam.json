@@ -806,7 +806,7 @@
   "src/VidShrink.App/Playback/PanelHost.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   ".claude/agent-memory/teknesyum-ui-builder/vidshrink-kaynak-kapatma-kilidi.md": {
@@ -1166,37 +1166,37 @@
   "k2.py": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   "tests.py": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   "k3fix.py": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   "rapor.py": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   "sonkosum.py": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   ".claude/agent-memory/teknesyum-builder/olcum-dosyasi-buyur.md": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:49:43",
+    "t": "2026-08-27 11:43:24",
     "ajan": "builder"
   },
   ".claude/agent-memory/teknesyum-builder/no-build-bayat-derleme.md": {
@@ -1210,5 +1210,41 @@
     "effort": "high",
     "t": "2026-08-27 11:11:13",
     "ajan": "ana oturum"
+  },
+  "d2.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 11:43:24",
+    "ajan": "builder"
+  },
+  "d2test.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 11:43:24",
+    "ajan": "builder"
+  },
+  "eskiyol.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 11:43:24",
+    "ajan": "builder"
+  },
+  "rapor2.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 11:43:24",
+    "ajan": "builder"
+  },
+  "rapor3.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 11:43:24",
+    "ajan": "builder"
+  },
+  "tur3.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 11:43:24",
+    "ajan": "builder"
   }
 }
