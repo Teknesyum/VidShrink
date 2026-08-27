@@ -111,7 +111,9 @@ function Resolve-Architecture {
     }
 }
 
-# Yayında yalnız win-x64 var. arm64 ya da x86 olduğu KESİN anlaşılırsa burada duruluyor:
+# Windows tarafında yayımlanan tek hedef win-x64; arm64 ve x86 için Windows yayını yok. Yayının
+# kendisi dört hedef taşıyor (osx-arm64, osx-x64, linux-x64 de var) ama onlar bu betiğin
+# işi değil. arm64 ya da x86 olduğu KESİN anlaşılırsa burada duruluyor:
 # x64 arşivini oraya sessizce kurmak çalışan ama güncellenmeyen bir kurulum bırakır, çünkü
 # güncelleyici kendi mimarisinin adını arar (UpdateCheck.Rid) ve o varlık yayında yoktur.
 # Mimari okunamadıysa durulmuyor — bilinmeyen ile desteklenmeyen aynı şey değil.
@@ -120,9 +122,9 @@ function Get-RuntimeIdentifier {
 
     if ($decision.Architecture -ne 'x64') {
         if ($decision.Outcome -eq 'Read') {
-            throw "Bu mimari için yayın yok: $($decision.Architecture). VidShrink şu an yalnız win-x64 için yayımlanıyor."
+            throw "Bu mimari için yayın yok: $($decision.Architecture). VidShrink Windows'ta şu an yalnız win-x64 için yayımlanıyor."
         }
-        throw 'Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink şu an yalnız win-x64 için yayımlanıyor.'
+        throw 'Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink Windows''ta şu an yalnız win-x64 için yayımlanıyor.'
     }
 
     if ($decision.Note) { Write-Host $decision.Note -ForegroundColor Yellow }
