@@ -52,6 +52,7 @@ internal partial class ComparisonPanel : UserControl
     private bool _turkish;
     private string? _notice;
     private string? _rightNotice;
+    private string? _rightBadge;
     private bool _motionReduced;
     private bool _promoted;
     private bool _draggingSeparator;
@@ -188,6 +189,26 @@ internal partial class ComparisonPanel : UserControl
     }
 
     /// <summary>
+    /// T49/K1: sağ yarının yaklaşıklık rozeti. Barındıran taraf metni çalışan dilde verir
+    /// ve panel onu olduğu gibi gösterir — sayı burada üretilmez, çeviri ikinci kez
+    /// uygulanmaz (metin "Yaklaşık önizleme · CRF 21" gibi birleşik olduğu için sözlükte
+    /// karşılığı yoktur). Boş bırakılınca rozet kalkar.
+    ///
+    /// Dil değiştiğinde metnin de değişmesi barındıran tarafın işidir: panel neyi
+    /// gösterdiğini bilir, neyin çevirisi olduğunu bilmez.
+    /// </summary>
+    internal void SetRightBadge(string? text)
+    {
+        _rightBadge = string.IsNullOrWhiteSpace(text) ? null : text;
+        ApproxBadgeText.Text = _rightBadge ?? string.Empty;
+        RefreshEmptyState();
+        ApplySplit();
+    }
+
+    /// <summary>Rozetin gösterdiği metin; rozet yokken <c>null</c>. Ölçüm buradan okur.</summary>
+    internal string? ApproximateNotice => _rightBadge;
+
+    /// <summary>
     /// K7: kare kaynağı bağlanmadan panel denenebilsin diye sentetik üreteci başlatır.
     /// Renkler temadan çözülüyor; üreteç kendi rengini uydurmuyor.
     /// </summary>
@@ -252,7 +273,13 @@ internal partial class ComparisonPanel : UserControl
             _separatorAt.X = _split * width - SeparatorGrip.Width / 2;
             // Perde ayırıcıdan sağa uzanır. Genişlik panonun kendi ölçüsünden türüyor,
             // bu yüzden istenen genişlik hiçbir zaman panodan büyük olmaz.
-            RightCurtain.Width = Math.Max(0, width - Math.Clamp(_split, 0, 1) * width);
+            var right = Math.Max(0, width - Math.Clamp(_split, 0, 1) * width);
+            RightCurtain.Width = right;
+
+            // T49/K4: rozetin tavanı sağ yarının kendi genişliği eksi kenar boşluğu.
+            // Uydurulmuş sayı yok; sığmayan metin üç noktayla kırpılır ve panelin
+            // istediği genişliği büyütmez.
+            ApproxBadge.MaxWidth = Math.Max(0, right - Inset("PlaybackBadgeMargin", 24));
         }
         // Sürükleme kare istemez: yalnız yeniden çizim, kopyalama yok, kod çözme yok.
         Surface.InvalidateVisual();
@@ -446,6 +473,9 @@ internal partial class ComparisonPanel : UserControl
         // perdenin üstünde durmaz.
         RightCurtain.IsVisible = !empty && _rightNotice is not null;
         RightBadge.IsVisible = !empty && _rightNotice is null;
+        // Rozet yalnız gerçekten yaklaşık bir parça gösterilirken var: tam çıktıda
+        // metin gelmez, perde inmişken sağ tarafta işaret edilecek bir görüntü yoktur.
+        ApproxBadge.IsVisible = !empty && _rightNotice is null && _rightBadge is not null;
         ZoomRow.IsVisible = !empty;
         SeparatorGrip.IsVisible = !empty;
         Strip.IsVisible = !empty;
@@ -738,6 +768,9 @@ internal partial class ComparisonPanel : UserControl
 
     private double Scalar(string key, double fallback)
         => this.TryFindResource(key, out var value) && value is double number ? number : fallback;
+
+    private double Inset(string key, double fallback)
+        => this.TryFindResource(key, out var value) && value is Thickness edge ? edge.Left + edge.Right : fallback;
 
     private TimeSpan Motion(string key, double fallbackMs)
         => this.TryFindResource(key, out var value) && value is TimeSpan span

@@ -296,7 +296,9 @@ internal static class LanguageCatalog
         ["Processed"] = "İşlenmiş",
         ["This part will be processed"] = "Bu kısım işleme sokulacak",
         ["There is no processed file yet, so this side stays empty"] = "Henüz işlenmiş bir dosya yok, bu yüzden bu taraf boş kalıyor",
-        ["The comparison player could not start"] = "Karşılaştırma oynatıcısı başlayamadı"
+        ["The comparison player could not start"] = "Karşılaştırma oynatıcısı başlayamadı",
+        ["Approximate preview"] = "Yaklaşık önizleme",
+        ["The preview sample could not be encoded"] = "Önizleme örneği kodlanamadı"
     };
 
     /// <summary>

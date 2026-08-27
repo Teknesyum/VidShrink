@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -499,5 +500,183 @@ public sealed class ComparisonPanelTests
         Assert.Equal(2 * ZoomGesture.NotchStep, chosen, 9);
         Assert.Equal(chosen, afterEnter, 9);
         Assert.Equal(chosen, afterExit, 9);
+    }
+
+    // ---- T49: yaklasik onizleme rozeti ----------------------------------------------
+
+    /// <summary>
+    /// Ikinci bir yerlesim turu. Pencere gosterilmedigi icin <c>UpdateLayout</c> tek
+    /// basina yeni tur acmiyor: ilk turdan sonra degisen gorunurluk ve metin ancak olcum
+    /// elle yeniden kosturuldugunda desired/bounds degerlerine yansiyor.
+    /// </summary>
+    private static void Relayout(MainWindow window)
+    {
+        window.InvalidateMeasure();
+        foreach (var part in window.GetVisualDescendants().OfType<Layoutable>()) part.InvalidateMeasure();
+        window.Measure(WindowSize);
+        window.Arrange(new Rect(WindowSize));
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
+    /// Panelin bos durumu kare varligina bakiyor; kare yolu gercek cizim turunda aciliyor
+    /// ve olcumde cizim turu yok. Bu yuzden kapi dogrudan aciliyor: yuzeyin kendisi
+    /// olcumun sahibi degil, burada yalniz "elimde kare var" hali kuruluyor.
+    /// </summary>
+    private static void FakeFrame(ComparisonPanel panel)
+    {
+        panel.Frames.Configure(new PixelSize(2560, 720));
+        typeof(ComparisonSurface)
+            .GetField("_hasFrame", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(panel.Frames, true);
+        panel.RefreshEmptyState();
+    }
+
+    private const string BadgeText = "Approximate preview \u00b7 CRF 21";
+
+    [Fact]
+    public void Rozet_yalniz_yaklasik_parcada_gorunur()
+    {
+        var (clip, full, curtain) = Read((window, panel) =>
+        {
+            FakeFrame(panel);
+
+            panel.SetRightBadge(BadgeText);
+            Relayout(window);
+            var onClip = panel.ApproxBadge.IsVisible;
+
+            panel.SetRightBadge(null);
+            var onFull = panel.ApproxBadge.IsVisible;
+
+            panel.SetRightBadge(BadgeText);
+            panel.SetRightNotice("This part will be processed");
+            var onCurtain = panel.ApproxBadge.IsVisible;
+
+            return (onClip, onFull, onCurtain);
+        });
+
+        Assert.True(clip, "parca gosterilirken rozet yok");
+        Assert.False(full, "tam ciktida rozet duruyor");
+        Assert.False(curtain, "perde inmisken rozet duruyor");
+    }
+
+    [Fact]
+    public void Rozet_panelin_sag_yarisindadir()
+    {
+        var (badgeLeft, half, stageWidth) = Read((window, panel) =>
+        {
+            FakeFrame(panel);
+            panel.SetRightBadge(BadgeText);
+            Relayout(window);
+
+            var origin = panel.ApproxBadge.TranslatePoint(new Point(0, 0), panel.Stage) ?? default;
+            return (origin.X, panel.Stage.Bounds.Width / 2, panel.ApproxBadge.Bounds.Width);
+        });
+
+        Assert.True(stageWidth > 0, $"rozet olculmedi: {stageWidth:0.#}");
+        Assert.True(badgeLeft > half, $"rozetin sol kenari {badgeLeft:0.#}, panonun ortasi {half:0.#}");
+    }
+
+    /// <summary>
+    /// T49/K2: metin panelde uretilmiyor. Barindiran taraf ne verirse ekranda o duruyor;
+    /// panel sayiyi yeniden bicimlendirmiyor, ceviriyi ikinci kez uygulamiyor.
+    /// </summary>
+    [Fact]
+    public void Rozet_metni_verildigi_gibi_gorunur()
+    {
+        var (english, turkish) = Read((window, panel) =>
+        {
+            FakeFrame(panel);
+            panel.SetRightBadge(BadgeText);
+            var en = panel.ApproxBadgeText.Text;
+
+            panel.SetLanguage(true);
+            panel.SetRightBadge("Yakla\u015f\u0131k \u00d6nizleme \u00b7 CRF 21");
+            return (en, panel.ApproxBadgeText.Text);
+        });
+
+        Assert.Equal(BadgeText, english);
+        Assert.Equal("Yakla\u015f\u0131k \u00d6nizleme \u00b7 CRF 21", turkish);
+    }
+
+    [Fact]
+    public void Rozetin_iki_anahtari_sozlukte()
+    {
+        Assert.Equal("Yakla\u015f\u0131k \u00d6nizleme", LanguageCatalog.Localize("Approximate preview", true));
+        Assert.Equal(
+            "\u00d6nizleme \u00d6rne\u011fi Kodlanamad\u0131",
+            LanguageCatalog.Localize("The preview sample could not be encoded", true));
+    }
+
+    /// <summary>
+    /// T49/K3 tuzagi: rozet fare olaylarini yutarsa panel kullanici rozetin ustunden
+    /// gecerken inmez. Uc olcum: rozet ve metni isabet testine kapali, rozetten kalkan
+    /// bir fare olayi panonun kendi isleyicisine ulasiyor, ve rozet gosterilirken inis
+    /// sayaci hala karar verebiliyor.
+    ///
+    /// Gercek isabet testi burada olculemez: <c>InputHitTest</c> penceresiz kosuda
+    /// panonun ortasinda bile <c>null</c> donuyor, yani cizim yuzeyi olmadan calismiyor.
+    /// Olculen sey isabet testini surukleyen ozelligin kendisi ve olay yolu.
+    /// </summary>
+    [Fact]
+    public void Rozet_fare_olaylarina_saydamdir()
+    {
+        var (badgeOpen, textOpen, reached, descends) = Read((window, panel) =>
+        {
+            FakeFrame(panel);
+            panel.SetRightBadge(BadgeText);
+            Relayout(window);
+
+            var seen = 0;
+            void Spy(object? sender, PointerEventArgs e) => seen++;
+            panel.Stage.PointerMoved += Spy;
+            panel.ApproxBadge.RaiseEvent(PointerCrossing(panel.ApproxBadge, InputElement.PointerMovedEvent));
+            panel.Stage.PointerMoved -= Spy;
+
+            WheelTo(window, panel, ShelterStage.Full);
+            Settle(window);
+            panel.PointerLeftWindow();
+            var generation = panel.Descent.Generation;
+
+            return (panel.ApproxBadge.IsHitTestVisible, panel.ApproxBadgeText.IsHitTestVisible,
+                seen, panel.Descent.ShouldHide(generation));
+        });
+
+        Assert.False(badgeOpen, "rozet isabet testine acik");
+        Assert.False(textOpen, "rozet metni isabet testine acik");
+        Assert.Equal(1, reached);
+        Assert.True(descends, "rozet gosterilirken inis sayaci karar veremedi");
+    }
+
+    /// <summary>
+    /// T49/K4: secilen davranis kirpma. Rozet sarmiyor, paneli genisletmiyor; sigmayan
+    /// metin uc noktayla kesiliyor. Tavan sag yarinin kendi genisliginden geliyor.
+    /// </summary>
+    [Fact]
+    public void Uzun_rozet_metni_paneli_genisletmez()
+    {
+        var (shortPanel, longPanel, shortDesired, longDesired, badgeWidth, cap, half) =
+            Read((window, panel) =>
+            {
+                FakeFrame(panel);
+
+                panel.SetRightBadge(BadgeText);
+                panel.InvalidateMeasure();
+                Relayout(window);
+                var narrowPanel = panel.Bounds.Width;
+                var narrowDesired = panel.DesiredSize.Width;
+
+                panel.SetRightBadge(new string('W', 400));
+                panel.InvalidateMeasure();
+                Relayout(window);
+
+                return (narrowPanel, panel.Bounds.Width, narrowDesired, panel.DesiredSize.Width,
+                    panel.ApproxBadge.Bounds.Width, panel.ApproxBadge.MaxWidth, panel.Stage.Bounds.Width / 2);
+            });
+
+        Assert.Equal(shortPanel, longPanel, 3);
+        Assert.Equal(shortDesired, longDesired, 3);
+        Assert.True(cap > 0 && cap < half, $"tavan {cap:0.#}, sag yari {half:0.#}");
+        Assert.True(badgeWidth <= cap + 0.5, $"rozet {badgeWidth:0.#} > tavan {cap:0.#}");
     }
 }

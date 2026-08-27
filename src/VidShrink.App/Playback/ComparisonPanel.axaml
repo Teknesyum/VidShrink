@@ -73,13 +73,40 @@
           <TextBlock x:Name="LeftBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
         </Border>
 
-        <Border x:Name="RightBadge"
-                Theme="{StaticResource PlaybackBadge}"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="{StaticResource PlaybackBadgeMargin}">
-          <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
-        </Border>
+        <!--
+          T49: sağ yarının iki işareti alt alta. Üstteki taraf etiketi, altındaki
+          yaklaşıklık rozeti — ikisi de sağ üstte, yani işaret ettikleri şey sağ yarı.
+          Rozet ikinci bir tasarım değil, yan etiketle aynı yonga.
+        -->
+        <StackPanel x:Name="RightBadges"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Spacing="{StaticResource PlaybackBadgeGap}"
+                    Margin="{StaticResource PlaybackBadgeMargin}">
+
+          <Border x:Name="RightBadge"
+                  Theme="{StaticResource PlaybackBadge}"
+                  HorizontalAlignment="Right">
+            <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+          </Border>
+
+          <!--
+            T49/K3: rozet tıklanabilir değil. Fare olaylarına saydam olmazsa panelin
+            kendiliğinden inişi kullanıcı rozetin üstünden geçerken dururdu.
+            T49/K4: sığmayan metin üç noktayla kırpılır; genişlik tavanı sağ yarının
+            kendi ölçüsünden geliyor ve kod tarafında yazılıyor.
+          -->
+          <Border x:Name="ApproxBadge"
+                  Theme="{StaticResource PlaybackBadge}"
+                  HorizontalAlignment="Right"
+                  IsHitTestVisible="False"
+                  IsVisible="False">
+            <TextBlock x:Name="ApproxBadgeText"
+                       Theme="{StaticResource PlaybackBadgeText}"
+                       IsHitTestVisible="False"
+                       TextTrimming="CharacterEllipsis"/>
+          </Border>
+        </StackPanel>
 
 <!--
           T40: yakınlaştırma okuması ile denetim şeridi alt kenarı paylaşıyor. Yığın
