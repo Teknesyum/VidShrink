@@ -6,22 +6,29 @@
 /// </summary>
 internal enum ShelterStage
 {
-    /// <summary>Bandında: ortadaki sütunun içinde, düzenin bir parçası.</summary>
+    /// <summary>Taban boyunda: ortadaki sütunun içinde, düzenin bir parçası.</summary>
     Band = 0,
 
-    /// <summary>Orta boy: kök katmanda, yan sütunların üstüne taşar ama pencereyi kaplamaz.</summary>
+    /// <summary>Taban boyundan büyük: kök katmanda, yan sütunların üstüne taşar ama pencereyi kaplamaz.</summary>
     Mid = 1,
 
-    /// <summary>Tam pencere.</summary>
+    /// <summary>Tam pencere. Panel ölçeğinin tavanı.</summary>
     Full = 2
 }
 
 /// <summary>
-/// K3: tek jest parametresi. Tekerlek <see cref="T"/> değerini oynatır; panelin kademesi de,
-/// görüntünün yakınlaştırması da o tek sayıdan türer. İki ayrı sayaç yok.
+/// K3: tek jest parametresi. Tekerlek <see cref="T"/> değerini oynatır; panelin kademesi de
+/// boy ölçeği de o tek sayıdan türer. İki ayrı sayaç yok.
 ///
-/// T44: kademe ikiden üçe çıktı. Görüntü yakınlaştırması eskisi gibi sürekli
-/// (<see cref="ContentZoom"/> parametreyle doğrusal); kademelenen yalnız panelin boyu.
+/// T52: yakınlaştırmanın anlamı değişti. Ölçeklenen şey <b>panelin boyu</b>; görüntü panelin
+/// içinde kendi en-boy oranını koruyarak sığar ve ayrıca yakınlaştırılmaz. Ekranda okunan
+/// yüzde <see cref="PanelScale"/>'dir: %100 panelin taban boyu, %200 iki katı.
+///
+/// Kademe eşikleri ölçek cinsinden okunur ve hiçbiri uydurulmaz:
+///   Band  — ölçek 1x, panel bandında.
+///   Mid   — ölçek <see cref="PromoteScale"/> (varsayılan 2x, <c>PlaybackHoverZoom</c>) ile
+///           tavanın arası. Panel bandına sığmaz, kök katmana çıkar.
+///   Full  — ölçek tavanda (<c>PlaybackMaxPanelScale</c>), panel pencereyi kaplar.
 /// Her geçişin çıkış ve iniş eşiği ayrıdır — titrek tekerlek kademeler arasında çırpınmaz.
 ///
 /// Sınıf bilerek saf: hiçbir Avalonia türü kullanmıyor, bu yüzden test etmek pencere
@@ -48,27 +55,43 @@ internal sealed class ZoomGesture
     /// </summary>
     internal const double NotchStep = Ceiling - FullDropAt;
 
-    /// <summary>
-    /// Orta boya çıkış eşiği: aralığın tam ortası. Uydurulmuş bir sayı değil,
-    /// <see cref="Floor"/> ile <see cref="Ceiling"/> arasının yarısı.
-    /// </summary>
-    internal const double MidAt = (Floor + Ceiling) / 2.0;
-
-    /// <summary>
-    /// Orta boydan banda iniş eşiği. Tam penceredeki ilişkinin aynısı: histerezis bandı
-    /// tam bir tekerlek çentiği genişliğinde.
-    /// </summary>
-    internal const double MidDropAt = MidAt - NotchStep;
-
     private const double Epsilon = 1e-9;
 
-    private readonly double _maxContentZoom;
+    private readonly double _maxPanelScale;
 
-    internal ZoomGesture(double maxContentZoom = 4.0)
+    /// <param name="maxPanelScale">
+    /// Panel boyunun tavanı, taban boyun katı olarak. <c>PlaybackMaxPanelScale</c>.
+    /// </param>
+    /// <param name="promoteScale">
+    /// Panelin bandından çıktığı ölçek. <c>PlaybackHoverZoom</c> ile aynı sayı: kullanıcı
+    /// "fare üstüne gelince iki kat" dedi, iki kat panel bandına sığmayan ilk boydur.
+    /// </param>
+    internal ZoomGesture(double maxPanelScale = 4.0, double promoteScale = 2.0)
     {
-        if (maxContentZoom < 1.0) throw new ArgumentOutOfRangeException(nameof(maxContentZoom));
-        _maxContentZoom = maxContentZoom;
+        if (maxPanelScale < 1.0) throw new ArgumentOutOfRangeException(nameof(maxPanelScale));
+        if (promoteScale < 1.0 || promoteScale > maxPanelScale) throw new ArgumentOutOfRangeException(nameof(promoteScale));
+
+        _maxPanelScale = maxPanelScale;
+        PromoteScale = promoteScale;
+        MidAt = ParameterFor(promoteScale);
+
+        // Histerezis bandı bir tekerlek çentiği genişliğinde; çıkış eşiği bir çentikten
+        // alçaksa band eşiğin yarısı kadar olur, yoksa iniş eşiği tabana yapışır ve panel
+        // bir daha bandına inemezdi.
+        MidDropAt = MidAt - Math.Min(NotchStep, MidAt / 2.0);
     }
+
+    /// <summary>Panelin bandından çıktığı boy ölçeği. Yapıcıdan gelir, burada üretilmez.</summary>
+    internal double PromoteScale { get; }
+
+    /// <summary>
+    /// Orta kademeye çıkış eşiği. Uydurulmuş bir sayı değil: <see cref="PromoteScale"/>
+    /// ölçeğinin parametre karşılığı. Tavan değişirse hesap kendiliğinden düzelir.
+    /// </summary>
+    internal double MidAt { get; }
+
+    /// <summary>Orta kademeden banda iniş eşiği. Histerezis bandı bir tekerlek çentiği.</summary>
+    internal double MidDropAt { get; }
 
     internal double T { get; private set; }
 
@@ -91,10 +114,13 @@ internal sealed class ZoomGesture
 
     internal double OffsetY { get; private set; }
 
-    /// <summary>t=0 değerinde 1, tavanda ise en büyük değer. Görüntü yakınlaştırması.</summary>
-    internal double ContentZoom => 1.0 + T * (_maxContentZoom - 1.0);
+    /// <summary>
+    /// T52: panelin boy ölçeği. Taban boyda 1, tavanda <c>PlaybackMaxPanelScale</c>.
+    /// Ekranda okunan yüzde budur; görüntünün kendi ölçeği değil.
+    /// </summary>
+    internal double PanelScale => 1.0 + T * (_maxPanelScale - 1.0);
 
-    /// <summary>Kaynağı panoya sığdıran ölçek. Yakınlaştırma bunun üstüne biner.</summary>
+    /// <summary>Kaynağı panoya sığdıran ölçek. T52'den beri görüntünün tek ölçeği bu.</summary>
     internal double FitScale
     {
         get
@@ -105,7 +131,11 @@ internal sealed class ZoomGesture
         }
     }
 
-    internal double Scale => FitScale * ContentZoom;
+    /// <summary>
+    /// Görüntünün çizim ölçeği. Yakınlaştırma paneli büyüttüğü için görüntü hep sığdırma
+    /// ölçeğinde durur: panel büyüyünce pano da büyür, görüntü onunla birlikte büyür.
+    /// </summary>
+    internal double Scale => FitScale;
 
     internal double ContentWidth => SourceWidth * Scale;
 
@@ -132,26 +162,28 @@ internal sealed class ZoomGesture
     }
 
     /// <summary>
-    /// Tekerlek. <paramref name="notches"/> pozitifse yakınlaşır. İmlecin altındaki kaynak
-    /// noktası sabit kalır: panonun ortasına değil, farenin gösterdiği yere yakınlaşır.
-    /// Tavanda ya da tabanda hiçbir şey değişmiyorsa <c>false</c> döner — tekerlek durur.
+    /// Tekerlek. <paramref name="notches"/> pozitifse panel büyür. Tavanda ya da tabanda
+    /// hiçbir şey değişmiyorsa <c>false</c> döner — tekerlek durur.
     /// </summary>
     internal bool Wheel(double notches, double anchorX, double anchorY)
         => Apply(T + notches * NotchStep, anchorX, anchorY);
 
     /// <summary>
-    /// T46/K5: doğrudan bir görüntü yakınlaştırmasına gider. Hedef parametre
-    /// <see cref="ContentZoom"/>'un tersinden türer, yani tavan değişirse hesap
-    /// kendiliğinden düzelir; çağıran taraf hiçbir sayı uydurmaz.
+    /// T52: doğrudan bir panel ölçeğine gider. Hedef parametre <see cref="PanelScale"/>'in
+    /// tersinden türer, yani tavan değişirse hesap kendiliğinden düzelir; çağıran taraf
+    /// hiçbir sayı uydurmaz.
     /// </summary>
-    internal bool ZoomTo(double contentZoom, double anchorX, double anchorY)
+    internal bool ScaleTo(double panelScale, double anchorX, double anchorY)
     {
-        if (_maxContentZoom <= 1.0 + Epsilon) return false;
-        return Apply((contentZoom - 1.0) / (_maxContentZoom - 1.0), anchorX, anchorY);
+        if (_maxPanelScale <= 1.0 + Epsilon) return false;
+        return Apply(ParameterFor(panelScale), anchorX, anchorY);
     }
 
+    private double ParameterFor(double panelScale)
+        => _maxPanelScale <= 1.0 + Epsilon ? Floor : (panelScale - 1.0) / (_maxPanelScale - 1.0);
+
     /// <summary>
-    /// Parametreyi taşıyan tek yol. Tekerlek de, doğrudan yakınlaştırma da buradan geçer;
+    /// Parametreyi taşıyan tek yol. Tekerlek de, doğrudan ölçek de buradan geçer;
     /// iki giriş tek kaynağa yazsın diye ayrı bir gövde yok.
     /// </summary>
     private bool Apply(double value, double anchorX, double anchorY)

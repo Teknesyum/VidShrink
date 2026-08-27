@@ -9,10 +9,13 @@
       PlaybackSeparatorWidth   <- FocusRingThickness (2)
       PlaybackHandleWidth      <- TargetMinSize (24)
       PlaybackHandleHeight     <- DropIconSize (48)
-      PlaybackStageMinHeight   <- PanelMinHeight (256)
+      PlaybackStageMinHeight   <- PanelMinHeight (256) x 2 = 512. T52: kullanıcının
+                                  istediği taban boy panel tabanının iki katı. Sayı
+                                  uydurulmadı; programdaki tek panel taban ölçüsünün katı.
       PlaybackBadgeMargin      <- SpaceMd (12)
       PlaybackScrimColor       <- AppBgColor (#050507), %80 örtücülük
-      PlaybackMaxContentZoom   <- ölçü değil, jest aralığı; ZoomGesture ile aynı sayı
+      PlaybackMaxPanelScale    <- ölçü değil, jest aralığı: panel boyunun tavanı, taban
+                                  boyun katı olarak. ZoomGesture ile aynı sayı.
 
     T40 — denetim şeridi:
 
@@ -28,7 +31,8 @@
 
     T44 — orta kademe ve gecikmeli iniş:
 
-      PlaybackMidShare         <- WindowWorkAreaShare (0,9); pencerenin bu oranı. Aynı
+      PlaybackMidShare         <- WindowWorkAreaShare (0,9); orta kademenin tavanı, yani
+                                  ölçekli boy pencerenin bu oranını geçemez. Aynı
                                   belirteç pencerenin çalışma alanına oturmasını da
                                   sürüyor: "kapla ama kenarı bırak" ölçüsü tektir.
       PlaybackDescendDelay     <- ölçü değil, kullanıcının söylediği süre: 2 saniye.
@@ -37,29 +41,30 @@
 
     T46 — boş panel ve tıkla yakınlaştırma:
 
-      PlaybackIdleMinHeight    <- PanelMinHeight (256). Önizleme yokken panel eskiden
-                                  DropZoneMinHeight (144) kadardı, yani programdaki tek
-                                  panel taban ölçüsünün altındaydı. Artık diğer panellerle
-                                  aynı tabana oturuyor; uydurulmuş bir sayı değil, zaten
-                                  panel tabanı olan ölçü.
+      PlaybackIdleMinHeight    <- PanelMinHeight (256) x 2 = 512. Sahne tabanıyla aynı:
+                                  panel önizleme olsun olmasın aynı boyda durur, ve o boy
+                                  panel tabanının iki katıdır (T52/K3).
       PlaybackZoomButtonSize   <- TargetMinSize (24), dokunma hedefi. Şeritteki zaman
                                   çizgisiyle aynı ölçü.
       PlaybackZoomButtonGap    <- SpaceSm (8), iki düğme arası.
       PlaybackBadgeGap         <- SpaceSm (8), sağ üstte alt alta duran iki yonganın arası.
                                   Yakınlaştırma düğmelerinin arasıyla aynı sayı; ikisi de
                                   yan yana/alt alta duran küçük yongaların boşluğu.
-      PlaybackHoverZoom        <- ölçü değil, kullanıcının söylediği kat: 2x. Jest
-                                  parametresi buradan türer, ters yönden değil; tavan
-                                  (PlaybackMaxContentZoom) değişirse hesap kendiliğinden
+      PlaybackHoverZoom        <- ölçü değil, kullanıcının söylediği kat: 2x. T52'den beri
+                                  bu kat panelin boy ölçeği. Aynı sayı orta kademenin çıkış
+                                  eşiğidir: iki kat panel bandına sığmayan ilk boydur, o
+                                  yüzden panel orada kök katmana çıkar. Jest parametresi
+                                  buradan türer, ters yönden değil; tavan
+                                  (PlaybackMaxPanelScale) değişirse hesap kendiliğinden
                                   düzelir.
   -->
 
   <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
   <x:Double x:Key="PlaybackHandleWidth">24</x:Double>
   <x:Double x:Key="PlaybackHandleHeight">48</x:Double>
-  <x:Double x:Key="PlaybackStageMinHeight">256</x:Double>
+  <x:Double x:Key="PlaybackStageMinHeight">512</x:Double>
   <Thickness x:Key="PlaybackBadgeMargin">12</Thickness>
-  <x:Double x:Key="PlaybackMaxContentZoom">4</x:Double>
+  <x:Double x:Key="PlaybackMaxPanelScale">4</x:Double>
 
   <Thickness x:Key="PlaybackStripPadding">16,12</Thickness>
   <Thickness x:Key="PlaybackStripMargin">12</Thickness>
@@ -74,7 +79,7 @@
   <x:Double x:Key="PlaybackMidShare">0.9</x:Double>
   <sys:TimeSpan x:Key="PlaybackDescendDelay">00:00:02</sys:TimeSpan>
 
-  <x:Double x:Key="PlaybackIdleMinHeight">256</x:Double>
+  <x:Double x:Key="PlaybackIdleMinHeight">512</x:Double>
   <x:Double x:Key="PlaybackZoomButtonSize">24</x:Double>
   <x:Double x:Key="PlaybackZoomButtonGap">8</x:Double>
   <x:Double x:Key="PlaybackBadgeGap">8</x:Double>

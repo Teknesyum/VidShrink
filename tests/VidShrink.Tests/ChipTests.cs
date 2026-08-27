@@ -153,20 +153,22 @@ public sealed class ChipTests
 
     /// <summary>
     /// T46/K2: önizleme yokken panel bırakma alanı ölçüsünde değil, panel tabanında.
-    /// Ölçüm: 144 → 256. Sayı <c>PlaybackIdleMinHeight</c> belirtecinden gelir.
+    /// T52/K3: o taban panel tabanının iki katına çıktı (144 → 256 → 512). Sayı testte
+    /// sabitlenmiyor, <c>PanelMinHeight</c>'tan türetiliyor; kat değişirse test de kayar.
     /// </summary>
     [Fact]
     public void BosPanelPanelTabaninaOturur()
     {
-        var (height, token) = Read(window =>
+        var (height, token, basis) = Read(window =>
         {
             var shell = Named(window, "Shell");
             window.TryFindResource("PlaybackIdleMinHeight", out var value);
-            return (shell.Bounds.Height, (double)value!);
+            window.TryFindResource("PanelMinHeight", out var panel);
+            return (shell.Bounds.Height, (double)value!, (double)panel!);
         });
 
-        Assert.Equal(256, token);
-        Assert.Equal(256, height);
+        Assert.Equal(basis * 2, token);
+        Assert.Equal(token, height);
     }
 
     /// <summary>
