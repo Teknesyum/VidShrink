@@ -1,0 +1,24 @@
+{
+  "contractId": "T54",
+  "auditorRunId": "a18220685450debbf",
+  "headSha": "9e050731616358308ddc8d87326cc1f8707bfbbe",
+  "diffHash": "72b1b9cf5726e58acc85079082b01bb1fd421568cec10a8fef84160c6b28f510",
+  "owns": [
+    "tests/VidShrink.Tests/WindowLayoutTests.cs",
+    "tests/VidShrink.Tests/ChipTests.cs",
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "Directory.Build.props",
+    "tests/VidShrink.Tests/ShareFlowTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release + dotnet test -c Release (728 gecti, 0 kaldi, 16 atlandi, toplam 744)",
+    "9e05073 birlesik ana dal",
+    ".calisma/dogrulama worktree"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T23:08:08.767Z",
+  "usedAt": "2026-08-27T23:08:08.825Z",
+  "completedSha": "9e050731616358308ddc8d87326cc1f8707bfbbe"
+}
