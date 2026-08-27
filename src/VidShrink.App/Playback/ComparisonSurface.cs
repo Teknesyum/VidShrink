@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -23,6 +24,12 @@ internal sealed class ComparisonSurface : Control
 {
     private const int RingCapacity = 3;
 
+    /// <summary>Ayırıcının kendi başına açabileceği çizimler arasındaki en kısa süre.</summary>
+    private static readonly TimeSpan SplitPaintInterval = TimeSpan.FromSeconds(1.0 / 60);
+
+    /// <summary>Bu kadar süredir kare gelmiyorsa akış durmuş sayılır ve ayırıcı kendi çizimini açar.</summary>
+    private static readonly TimeSpan Stalled = TimeSpan.FromMilliseconds(100);
+
     private readonly object _gate = new();
     private readonly Stack<byte[]> _pool = new();
     private readonly Queue<byte[]> _ring = new();
@@ -36,6 +43,12 @@ internal sealed class ComparisonSurface : Control
 
     private long _presented;
     private long _idleRounds;
+    private long _repaints;
+
+    private double _split = 0.5;
+    private bool _splitMoved;
+    private long _lastSplitPaintTicks;
+    private long _lastPresentTicks = Stopwatch.GetTimestamp();
 
     public ComparisonSurface()
     {
@@ -45,8 +58,36 @@ internal sealed class ComparisonSurface : Control
 
     internal ZoomGesture Gesture { get; set; } = new();
 
-    /// <summary>Ayırıcının pano genişliğine oranı. Sıfır ve bir geçerli konumlardır.</summary>
-    internal double Split { get; set; } = 0.5;
+    /// <summary>
+    /// Ayırıcının pano genişliğine oranı. Sıfır ve bir geçerli konumlardır.
+    ///
+    /// T53: bu değer farenin hızında yazılıyor, saniyede yüzlerce kez. Her yazışta yüzeyi
+    /// geçersiz kılmak sunum döngüsünü ekranın değil farenin hızına bağlıyordu — gerçek
+    /// pencerede tur sayısı 142/sn'den 700/sn'ye çıkıyor ve her tur tam boy yüzeyi baştan
+    /// boyuyor (1902x988'de 3,16 ms). Yazış artık boyamıyor, yalnız işaretliyor; boyama
+    /// bir sonraki sunum turunda bir kez yapılıyor. Sınırı aynı piksele düşüren yazış
+    /// hiç işaretlenmiyor.
+    /// </summary>
+    internal double Split
+    {
+        get => _split;
+        set
+        {
+            var next = Math.Clamp(value, 0, 1);
+            if (next == _split) return;
+
+            // Yarım pikselden az kayan sınır aynı pikselde çizilir. Yazış yutulmuyor,
+            // biriktiriliyor: karşılaştırma son işaretlenen değerle yapılıyor.
+            var width = Bounds.Width;
+            if (width > 0 && Math.Abs(next - _split) * width < 0.5) return;
+
+            _split = next;
+            _splitMoved = true;
+        }
+    }
+
+    /// <summary>Kaç kez yeniden çizim istendi — ayırıcı ölçümünün saydığı sayı.</summary>
+    internal long Repaints => Interlocked.Read(ref _repaints);
 
     internal bool HasFrame
     {
@@ -83,7 +124,7 @@ internal sealed class ComparisonSurface : Control
         }
 
         Gesture.SetSource(SideSize.Width, SideSize.Height);
-        InvalidateVisual();
+        Repaint();
     }
 
     internal byte[] Rent()
@@ -167,6 +208,19 @@ internal sealed class ComparisonSurface : Control
         if (buffer is null)
         {
             Interlocked.Increment(ref _idleRounds);
+            // Akarken ayırıcı kendi çizimini hiç açmıyor: her sunulan kare zaten yüzeyi
+            // yeniden çiziyor ve sınır o çizimde yerine oturuyor. Sürükleme böylece
+            // ekrana tek bir fazladan çizim eklemiyor. Ölçüm bunu istedi — tur başına
+            // bir çizim yetmiyordu, çünkü sunum turu kendini yeniden sıraya koyuyor ve
+            // boşta bile 217 tur/sn dönüyor. Kare akmıyorsa (duraklatılmış, boru tıkalı)
+            // sınırın takılı kalmaması için çizim açılır, en fazla 60 Hz.
+            if (_splitMoved &&
+                Stopwatch.GetElapsedTime(_lastPresentTicks) >= Stalled &&
+                Stopwatch.GetElapsedTime(_lastSplitPaintTicks) >= SplitPaintInterval)
+            {
+                _splitMoved = false;
+                Repaint();
+            }
         }
         else
         {
@@ -177,10 +231,19 @@ internal sealed class ComparisonSurface : Control
                 _hasFrame = true;
             }
             Interlocked.Increment(ref _presented);
-            InvalidateVisual();
+            _lastPresentTicks = Stopwatch.GetTimestamp();
+            _splitMoved = false;
+            Repaint();
         }
 
         _top?.RequestAnimationFrame(Round);
+    }
+
+    private void Repaint()
+    {
+        _lastSplitPaintTicks = Stopwatch.GetTimestamp();
+        Interlocked.Increment(ref _repaints);
+        InvalidateVisual();
     }
 
     private void Blit(byte[] source)
