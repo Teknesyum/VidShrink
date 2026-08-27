@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.Core;
@@ -65,6 +66,42 @@ public sealed class WindowLayoutTests
     private static bool IsPageLevel(ScrollViewer viewer)
         => viewer.Name != "PlanScroll" && viewer.FindAncestorOfType<TextBox>() is null;
 
+    /// <summary>
+    /// Yerleşimi <paramref name="size"/> görüş alanında koşturur — <b>ekrandan bağımsız</b>.
+    ///
+    /// <para>T59: pencerenin kendisine <see cref="Layoutable.Arrange"/> çağırmak boyutu
+    /// taşımıyor. <c>Window.ArrangeSetBounds</c> verilen boyutu değil <c>ClientSize</c>'ı
+    /// döndürür, yani pencerenin sınırları her zaman <b>platform penceresinden</b> gelir.
+    /// Pencere <c>WindowState="Maximized"</c> açıldığı için o platform penceresi makinenin
+    /// ekranına göre kuruluyor: bu makinede 1904x990, dolayısıyla hangi boyut verilirse
+    /// verilsin sayfanın görüş alanı 895 ölçülüyordu. Ölçüm argümanı geçiyor (pencerenin
+    /// istediği boyut doğru çıkıyor), yutulan şey <b>yerleştirme</b>.</para>
+    ///
+    /// <para>Bu yüzden yerleşim pencereye değil pencerenin kök görsel çocuğuna verilir.
+    /// O kök, pencere süsünü de içeren taşıyıcıdır — sayfanın görüş alanı verilen
+    /// yükseklikten süsün 95 pikseli düşülmüş hâlidir ve üç çözünürlükte de aynı sayı
+    /// çıkar. İlk pencere geçişi yalnız biçimin uygulanması için var; kök ondan sonra
+    /// istenen boyutla yeniden ölçülüp yerleştiriliyor.</para>
+    ///
+    /// <para>Kök geçişinden <b>sonra</b> <see cref="TopLevel.UpdateLayout"/> çağrılmamalı;
+    /// pencerenin kendi geçişi yerleşimi yine <c>ClientSize</c>'a döndürür.</para>
+    /// </summary>
+    private static void LayOutAt(MainWindow window, Size size)
+    {
+        // Pencerenin kendi Width/Height degerleri ApplyLayoutConstraints tarafindan olcum
+        // argumaninin yerine konur; temizlenmezse pencere her boyutta ayni seyi olcer.
+        window.Width = double.NaN;
+        window.Height = double.NaN;
+
+        window.Measure(size);
+        window.Arrange(new Rect(size));
+        window.UpdateLayout();
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.Measure(size);
+        root.Arrange(new Rect(size));
+    }
+
     private static T Read<T>(Size size, bool loaded, Func<MainWindow, T> read) =>
         AppHost.Run(() =>
         {
@@ -81,15 +118,7 @@ public sealed class WindowLayoutTests
                 window.SettleFades();
             }
 
-            // Pencerenin kendi Width/Height degerleri ArrangeCore icindeki
-            // ApplyLayoutConstraints tarafindan olcum argumanina uygulanir ve argumani
-            // yutar; temizlenmezse her boyut ayni yerlesimi olcer.
-            window.Width = double.NaN;
-            window.Height = double.NaN;
-
-            window.Measure(size);
-            window.Arrange(new Rect(size));
-            window.UpdateLayout();
+            LayOutAt(window, size);
 
             return read(window);
         });
@@ -123,22 +152,6 @@ public sealed class WindowLayoutTests
             return new Size(window.MinWidth, window.MinHeight);
         });
 
-    /// <summary>
-    /// Pencere <c>WindowState="Maximized"</c> ile açılıyor, yani gerçek açılış boyutu
-    /// biçimlemede yazan değil ekranın çalışma alanı. Ölçüm o alanı bu makinenin görev
-    /// çubuğuna göre elle yazmıyor, <see cref="Screens"/>'den türetiyor.
-    /// </summary>
-    private static Size WorkingArea() =>
-        AppHost.Run(() =>
-        {
-            var window = new MainWindow();
-            var screen = window.Screens.Primary ?? window.Screens.All.FirstOrDefault();
-            Assert.True(screen is not null, "Ekran bulunamadı; açılış boyutu türetilemiyor.");
-
-            var scaling = screen!.Scaling <= 0 ? 1 : screen.Scaling;
-            return new Size(screen.WorkingArea.Width / scaling, screen.WorkingArea.Height / scaling);
-        });
-
     private static string Describe(Size size, bool loaded, IEnumerable<Overflow> overflowing) =>
         $"{(loaded ? "Dolu" : "Boş")} pencerede {size.Width:0}x{size.Height:0}: "
         + string.Join(", ", overflowing);
@@ -159,24 +172,32 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Açılış boyutu — ekranın çalışma alanı. Tasarım boyutunu karşılayan bir ekranda
-    /// dolu sayfa kaymayacak.
+    /// Açılış boyutu — pencere <c>WindowState="Maximized"</c> açıldığı için ekranın
+    /// çalışma alanı. Tasarım boyutunu karşılayan bir alanda dolu sayfa kaymayacak.
     ///
-    /// <para>Ekran daha küçükse kayma <b>kabul edilir, zorunlu değil</b>. Zorunlu
-    /// kılınırsa ölçüm ters döner: 1920x1080 + görev çubuğu makinesinin çalışma alanı
-    /// 1920x1032'dir ve yükseklik tasarım boyutunun (1060) altında kalır, ama dolu sayfa
-    /// o genişlikte zaten sığar — yani sayfa doğru davrandığı için ölçüm kırmızıya
-    /// düşerdi. Sığdığında geçmeli, sığmadığında da tek bir dış taşıyıcıdan fazlası
-    /// kaymamalı.</para>
+    /// <para>Alan daha küçükse kayma <b>kabul edilir, zorunlu değil</b>: 1920x1080 +
+    /// görev çubuğu makinesinin çalışma alanı 1920x1032'dir, yükseklik tasarım boyutunun
+    /// (1060) altında kalır ama dolu sayfa o genişlikte zaten sığar — zorunlu kılınsa
+    /// sayfa doğru davrandığı için ölçüm kırmızıya düşerdi. Sığdığında geçmeli,
+    /// sığmadığında da tek bir dış taşıyıcıdan fazlası kaymamalı.</para>
+    ///
+    /// <para>T59: bu ölçümün önceki hâli alanı <see cref="Screens"/>'den, yani <b>ölçümü
+    /// koşturan makinenin ekranından</b> alıyordu. Aynı commit farklı çözünürlükte farklı
+    /// karar veriyordu; verdiği yeşil de kırmızı da kanıt değildi. Alanlar artık burada
+    /// yazılı: bugünün ekranı, yaygın 1080p çalışma alanı ve tasarım boyutu. Hiçbiri
+    /// çalıştığı makineyi okumuyor.</para>
     ///
     /// <para>Pencerenin tabanı burada değil: <c>MinWidth</c>/<c>MinHeight</c> 1040x720,
-    /// tasarım boyutu yalnız tercih edilen boyut. İkisinin arasındaki her ekranda pencere
+    /// tasarım boyutu yalnız tercih edilen boyut. İkisinin arasındaki her alanda pencere
     /// tabanının üstündedir.</para>
     /// </summary>
-    [Fact]
-    public void TheLoadedPageDoesNotScrollAtTheStartingSize()
+    [Theory]
+    [InlineData(2560, 1400)]
+    [InlineData(1920, 1032)]
+    [InlineData(1600, 900)]
+    public void TheLoadedPageDoesNotScrollAtTheStartingSize(double width, double height)
     {
-        var size = WorkingArea();
+        var size = new Size(width, height);
         var design = DesignSize();
         var overflowing = LayOut(size, loaded: true);
 
@@ -188,7 +209,7 @@ public sealed class WindowLayoutTests
 
         Assert.True(
             overflowing.Count <= 1,
-            $"Ekranın çalışma alanı ({size.Width:0}x{size.Height:0}) tasarım boyutunun "
+            $"Açılış alanı ({size.Width:0}x{size.Height:0}) tasarım boyutunun "
             + $"({design.Width:0}x{design.Height:0}) altında; en çok tek bir dış kaydırma "
             + "kabul ediliyor. " + Describe(size, loaded: true, overflowing));
     }
@@ -245,23 +266,37 @@ public sealed class WindowLayoutTests
     /// Ölçüm düzeneği <see cref="Layoutable.Measure"/>'a verilen yüksekliği gerçekten
     /// yerleşime taşıyor mu — T51/K1'in nöbetçisi.
     ///
-    /// <para>Pencerenin kendi <see cref="Layoutable.Height"/> değeri temizlenmezse
-    /// <c>ApplyLayoutConstraints</c> onu ölçüm argümanının yerine koyar ve <b>her</b>
-    /// yükseklik aynı yerleşimi ölçer. O hâlde ölçüm sessizce sabit bir sayı üretir;
-    /// T46 tam bunu yaşadı ve "yükseklik yerleşime ulaşmıyor" sonucuna vardı. Argüman
-    /// yutulursa aşağıdaki iki görüş alanı eşitlenir ve ölçüm kırmızıya düşer.</para>
+    /// <para>Yükseklik iki yerde yutulabiliyor. Pencerenin kendi
+    /// <see cref="Layoutable.Height"/> değeri temizlenmezse <c>ApplyLayoutConstraints</c>
+    /// onu ölçüm argümanının yerine koyar. İkincisi T59'da ölçüldü:
+    /// <c>Window.ArrangeSetBounds</c> verilen boyutu değil <c>ClientSize</c>'ı döndürdüğü
+    /// için pencereye yapılan yerleştirme <b>hiçbir</b> boyutu taşımaz ve yerleşim
+    /// platform penceresinin — yani ekranın — boyunda kalır. İkisinden biri devredeyse
+    /// aşağıdaki üç görüş alanı aynı sayıyı verir ve ölçüm kırmızıya düşer.</para>
+    ///
+    /// <para>Üç yükseklik kasten farklı çözünürlük sınıfından: pencerenin kendi tabanı,
+    /// tasarım boyu ve bugünün 2560x1440 ekranının çalışma alanı. Sayı hep aynı kuralla
+    /// çıkıyor: görüş alanı = verilen yükseklik − pencere süsünün 95 pikseli.</para>
     /// </summary>
     [Fact]
     public void TheMeasurementRigCarriesTheHeightItIsGiven()
     {
         var width = DesignSize().Width;
-        var atFloor = Read(new Size(width, MinimumSize().Height), loaded: false, w => Page(w).Viewport.Height);
-        var atDesign = Read(new Size(width, DesignSize().Height), loaded: false, w => Page(w).Viewport.Height);
+        var heights = new[] { MinimumSize().Height, DesignSize().Height, 1400.0 };
+        var viewports = heights
+            .Select(height => Read(new Size(width, height), loaded: false, w => Page(w).Viewport.Height))
+            .ToList();
 
-        Assert.True(
-            atDesign > atFloor + 0.5,
-            $"Verilen yükseklik yerleşime ulaşmıyor: taban {atFloor:0.#}, tasarım {atDesign:0.#} "
-            + "— ikisi aynıysa argüman pencerenin kendi Height değerine yutuluyor.");
+        var trail = string.Join(", ", heights.Zip(viewports, (h, v) => $"{h:0}→{v:0.#}"));
+
+        for (var index = 1; index < viewports.Count; index++)
+            Assert.True(
+                viewports[index] > viewports[index - 1] + 0.5,
+                $"Verilen yükseklik yerleşime ulaşmıyor ({trail}) — ardışık ikisi aynıysa "
+                + "argüman ya pencerenin kendi Height değerine ya da ClientSize'a yutuluyor.");
+
+        var chrome = heights.Zip(viewports, (h, v) => h - v).ToList();
+        Assert.All(chrome, gap => Assert.Equal(chrome[0], gap, 1));
     }
 
     /// <summary>
@@ -450,11 +485,7 @@ public sealed class WindowLayoutTests
                 window.SettleFades();
             }
 
-            window.Width = double.NaN;
-            window.Height = double.NaN;
-            window.Measure(size);
-            window.Arrange(new Rect(size));
-            window.UpdateLayout();
+            LayOutAt(window, size);
 
             var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
             var found = new List<string>();
@@ -462,9 +493,7 @@ public sealed class WindowLayoutTests
             for (var index = 0; index < tabs.ItemCount; index++)
             {
                 tabs.SelectedIndex = index;
-                window.Measure(size);
-                window.Arrange(new Rect(size));
-                window.UpdateLayout();
+                LayOutAt(window, size);
 
                 var header = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
 
