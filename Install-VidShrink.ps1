@@ -34,15 +34,98 @@ function Install-WinGetPackage([string]$Id) {
     Refresh-ProcessPath
 }
 
-# Yayında yalnız win-x64 var. arm64 ya da x86 makinede x64 arşivini sessizce kurmak
-# çalışan ama güncellenmeyen bir kurulum bırakır: güncelleyici kendi mimarisinin
-# adını arar (UpdateCheck.Rid) ve o varlık yayında olmadığı için hiç güncelleme
-# bulamaz. Onun yerine burada duruluyor.
-function Get-RuntimeIdentifier {
-    $architecture = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-    if ($architecture -ne [Runtime.InteropServices.Architecture]::X64) {
-        throw "Bu mimari için yayın yok: $architecture. VidShrink şu an yalnız win-x64 için yayımlanıyor."
+# Aynı mimari adı kaynağa göre başka yazılıyor: .NET 'X64' der, PROCESSOR_ARCHITECTURE
+# 'AMD64'. Tanınmayan ad null döner; tanınmamak reddedilmek değildir.
+# Bu tablonun eşi UpdateCheck.cs içindeki ArchitectureChoice.Recognize.
+function ConvertTo-ArchitectureName([string]$Value) {
+    if ([string]::IsNullOrWhiteSpace($Value)) { return $null }
+    switch ($Value.Trim().ToUpperInvariant()) {
+        'X64' { return 'x64' }
+        'AMD64' { return 'x64' }
+        'X86_64' { return 'x64' }
+        'EM64T' { return 'x64' }
+        'ARM64' { return 'arm64' }
+        'AARCH64' { return 'arm64' }
+        'X86' { return 'x86' }
+        'I386' { return 'x86' }
+        'I486' { return 'x86' }
+        'I586' { return 'x86' }
+        'I686' { return 'x86' }
+        'ARM' { return 'arm' }
+        'ARMV6L' { return 'arm' }
+        'ARMV7L' { return 'arm' }
     }
+    return $null
+}
+
+# Mimari tek bir okumaya bırakılmıyor. Sıra ve gerekçesi:
+# 1. RuntimeInformation.OSArchitecture — işletim sisteminin kendi mimarisi; 64 bit
+#    Windows'ta koşan 32 bit bir süreçte bile doğrusunu verir, o yüzden ilk sırada.
+#    Ama her makinede okunamıyor: Windows PowerShell 5.1'in altındaki .NET Framework
+#    4.7.1'den eskiyse bu tip hiç yoktur, kısıtlı dil kipinde (ConstrainedLanguage,
+#    AppLocker/WDAC) statik üyeye erişilemez. İkisinde de elde boş kalır ve kurulumu
+#    düşüren okuma buydu.
+# 2. PROCESSOR_ARCHITEW6432 — yalnız WOW64 altında dolu ve işletim sisteminin mimarisini
+#    söyler. Doluysa bir alttakinden daha doğrudur, o yüzden ondan önce.
+# 3. PROCESSOR_ARCHITECTURE — sürecin mimarisi. WOW64 altında 'x86' der, yani tek başına
+#    yanıltır; ancak yukarıdaki ikisi susunca kullanılıyor.
+# 4. Hiçbiri ad vermezse geriye bit genişliği kalıyor. Bu bir okuma değil varsayım, ve
+#    varsayıldığı kullanıcıya söyleniyor.
+function Resolve-Architecture {
+    $candidates = @()
+
+    try {
+        $runtime = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        if ($null -ne $runtime) { $candidates += [string]$runtime }
+    }
+    catch { }
+
+    $candidates += $env:PROCESSOR_ARCHITEW6432
+    $candidates += $env:PROCESSOR_ARCHITECTURE
+
+    foreach ($candidate in $candidates) {
+        $name = ConvertTo-ArchitectureName $candidate
+        if ($name) {
+            return @{ Outcome = 'Read'; Architecture = $name; Note = '' }
+        }
+    }
+
+    # Bu okuma da engellenebilir. Engellenirse 64 bit varsayılıyor: 32 bit Windows artık
+    # yok denecek kadar az ve K3'ün istediği, bilinmeyende durmak değil devam etmek.
+    $is64Bit = $true
+    try { $is64Bit = [Environment]::Is64BitOperatingSystem }
+    catch { }
+
+    if ($is64Bit) {
+        return @{
+            Outcome = 'Assumed'
+            Architecture = 'x64'
+            Note = 'Mimari okunamadı; işletim sistemi 64 bit olduğu için x64 varsayıldı.'
+        }
+    }
+
+    return @{
+        Outcome = 'Assumed'
+        Architecture = 'x86'
+        Note = 'Mimari okunamadı; işletim sistemi 32 bit olduğu için x86 kabul edildi.'
+    }
+}
+
+# Yayında yalnız win-x64 var. arm64 ya da x86 olduğu KESİN anlaşılırsa burada duruluyor:
+# x64 arşivini oraya sessizce kurmak çalışan ama güncellenmeyen bir kurulum bırakır, çünkü
+# güncelleyici kendi mimarisinin adını arar (UpdateCheck.Rid) ve o varlık yayında yoktur.
+# Mimari okunamadıysa durulmuyor — bilinmeyen ile desteklenmeyen aynı şey değil.
+function Get-RuntimeIdentifier {
+    $decision = Resolve-Architecture
+
+    if ($decision.Architecture -ne 'x64') {
+        if ($decision.Outcome -eq 'Read') {
+            throw "Bu mimari için yayın yok: $($decision.Architecture). VidShrink şu an yalnız win-x64 için yayımlanıyor."
+        }
+        throw 'Mimari okunamadı ve işletim sistemi 32 bit görünüyor: win-x64 yayını bu makinede çalışmaz. VidShrink şu an yalnız win-x64 için yayımlanıyor.'
+    }
+
+    if ($decision.Note) { Write-Host $decision.Note -ForegroundColor Yellow }
     return 'win-x64'
 }
 

@@ -20,6 +20,94 @@ public sealed record ReleaseManifest(
     string Rid,
     IReadOnlyList<ManifestFile> Files);
 
+/// <summary>Mimarinin nasıl belirlendiği. Kullanıcıya ne söyleneceğini bu ayırıyor.</summary>
+public enum ArchitectureOutcome
+{
+    /// <summary>Bir kaynak tanınan bir mimari adı verdi.</summary>
+    Read,
+
+    /// <summary>Hiçbir kaynak ad vermedi; mimari işletim sisteminin bit genişliğinden varsayıldı.</summary>
+    Assumed
+}
+
+/// <summary>
+/// Mimari kararı. <c>Architecture</c> hiçbir zaman boş değil — okunamayan bir değer kullanıcıya
+/// boş basılmasın diye. <c>Note</c> yalnız varsayım yapıldığında dolu.
+/// </summary>
+public sealed record ArchitectureDecision(ArchitectureOutcome Outcome, string Architecture, string Note);
+
+/// <summary>
+/// Mimari tek bir kuralla belirleniyor ve iki taraf da bu kuralı izliyor: <see cref="UpdateCheck.Rid"/>
+/// ile <c>Install-VidShrink.ps1</c>. Ayrıştıkları sürüm bir kullanıcının kurulumunu düşürdü —
+/// kurucu boş okumayı "desteklenmeyen mimari" sayıp reddederken güncelleyici aynı boşluğu
+/// sessizce x64 kabul ediyordu.
+/// </summary>
+public static class ArchitectureChoice
+{
+    /// <summary>
+    /// Tanınan adlar. Aynı mimari kaynağa göre başka yazılıyor: .NET "X64" der,
+    /// <c>PROCESSOR_ARCHITECTURE</c> "AMD64", <c>uname -m</c> "x86_64". Tanınmayan ad
+    /// <c>null</c> döner; tanınmamak reddedilmek değildir.
+    /// </summary>
+    public static string? Recognize(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        return value.Trim().ToUpperInvariant() switch
+        {
+            "X64" or "AMD64" or "X86_64" or "EM64T" => "x64",
+            "ARM64" or "AARCH64" => "arm64",
+            "X86" or "I386" or "I486" or "I586" or "I686" => "x86",
+            "ARM" or "ARMV6L" or "ARMV7L" => "arm",
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Kaynaklar sırayla deneniyor. Sıranın gerekçesi:
+    /// <list type="number">
+    /// <item><c>RuntimeInformation.OSArchitecture</c> — işletim sisteminin kendi mimarisi;
+    /// 64 bit Windows üzerinde koşan 32 bit bir süreçte bile doğrusunu verir. Ama her yerde
+    /// okunamıyor: Windows PowerShell 5.1'in altındaki .NET Framework 4.7.1'den eskiyse tip
+    /// hiç yoktur, kısıtlı dil kipinde de statik üyeye erişilemez. İkisinde de elde boş kalır.</item>
+    /// <item><c>PROCESSOR_ARCHITEW6432</c> — yalnız WOW64 altında dolu ve işletim sisteminin
+    /// mimarisini söyler; doluysa bir alttakinden daha doğrudur.</item>
+    /// <item><c>PROCESSOR_ARCHITECTURE</c> — sürecin mimarisi. WOW64 altında "x86" der, bu
+    /// yüzden ancak yukarıdaki ikisi susunca kullanılıyor.</item>
+    /// <item>Hiçbiri ad vermezse geriye bit genişliği kalıyor. Bu bir okuma değil varsayım,
+    /// ve varsayıldığı söyleniyor.</item>
+    /// </list>
+    /// </summary>
+    public static ArchitectureDecision Decide(
+        string? runtimeArchitecture,
+        string? processorArchitew6432,
+        string? processorArchitecture,
+        bool is64BitOperatingSystem)
+    {
+        foreach (var candidate in new[] { runtimeArchitecture, processorArchitew6432, processorArchitecture })
+        {
+            var name = Recognize(candidate);
+            if (name is not null) return new ArchitectureDecision(ArchitectureOutcome.Read, name, string.Empty);
+        }
+
+        if (is64BitOperatingSystem)
+            return new ArchitectureDecision(
+                ArchitectureOutcome.Assumed,
+                "x64",
+                "Mimari okunamadı; işletim sistemi 64 bit olduğu için x64 varsayıldı.");
+
+        return new ArchitectureDecision(
+            ArchitectureOutcome.Assumed,
+            "x86",
+            "Mimari okunamadı; işletim sistemi 32 bit olduğu için x86 kabul edildi.");
+    }
+
+    public static ArchitectureDecision Decide() => Decide(
+        RuntimeInformation.OSArchitecture.ToString(),
+        Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432"),
+        Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE"),
+        Environment.Is64BitOperatingSystem);
+}
+
 /// <summary>
 /// Sürüm karşılaştırması, manifest okuma ve fark hesabı. Platformdan bağımsız; indirme ve
 /// dosya değiştirme burada değil, başlatıcıda ve yalnız Windows'ta yaşıyor.
@@ -38,16 +126,17 @@ public static class UpdateCheck
     public static bool AutoUpdateEnabled(UpdateSettings? settings = null) =>
         CanSelfUpdate && (settings ?? UpdateSettings.Load()).AutoUpdate;
 
+    /// <summary>
+    /// Çalışılan platformun yayın kimliği. Mimari kararı <see cref="ArchitectureChoice"/>'da:
+    /// okunamayan mimaride 64 bitlik sistemde x64 varsayılıyor. Eskiden bu varsayım burada
+    /// tanımsız bir <c>_ =&gt; "x64"</c> dalıydı ve kurucu aynı durumu reddediyordu; artık ikisi
+    /// de aynı kuralı okuyor, çünkü ayrıştıklarında biri kuruluyor öteki hiç güncelleme bulamıyor.
+    /// </summary>
     public static string Rid
     {
         get
         {
-            var arch = RuntimeInformation.OSArchitecture switch
-            {
-                Architecture.Arm64 => "arm64",
-                Architecture.X86 => "x86",
-                _ => "x64"
-            };
+            var arch = ArchitectureChoice.Decide().Architecture;
             if (OperatingSystem.IsWindows()) return "win-" + arch;
             if (OperatingSystem.IsMacOS()) return "osx-" + arch;
             return "linux-" + arch;
