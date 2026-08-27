@@ -297,19 +297,18 @@
                       <TextBlock Grid.Column="2" Text="MB" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     </Grid>
                     <!--
-                      Etiket yonganın parçası: ipucu değil, kapalı balonla da okunan görünür
-                      metin. Etiketsiz yongalar aynı satırda aynı yüksekliği alır, çünkü
-                      WrapPanel çocuklarını satır yüksekliğine gerer.
+                      T46/K1: yonga yalnız sayıyı gösterir. Açıklamanın tek yeri balondur ve
+                      balonun ilk satırı yonganın eski etiketidir — etiket ekrandan kalktı,
+                      bilgi kalkmadı.
                     -->
                     <WrapPanel>
-                      <Button x:Name="ChipWhatsApp" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
-                        <StackPanel>
-                          <TextBlock Text="WhatsApp recommended" Theme="{StaticResource Label}" Margin="0"/>
-                          <TextBlock Text="WhatsApp 16"/>
-                        </StackPanel>
+                      <Button x:Name="ChipWhatsApp" Content="16" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <StackPanel Spacing="{StaticResource SpaceSm}">
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="WhatsApp recommended"/>
                             <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp re-encodes in-chat video with its own low-bitrate encoder.&#10;• Under 16 MB it usually passes your file through with far less damage, so what the other side sees is VidShrink's quality, not WhatsApp's.&#10;• To bypass re-encoding entirely, send the result as a document instead of as a video."/>
+                            </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -334,25 +333,23 @@
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button x:Name="Chip128" Tag="128" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
-                        <StackPanel>
-                          <TextBlock Text="Sharing maximum" Theme="{StaticResource Label}" Margin="0"/>
-                          <TextBlock Text="128"/>
-                        </StackPanel>
+                      <Button x:Name="Chip128" Content="128" Tag="128" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <StackPanel Spacing="{StaticResource SpaceSm}">
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="Sharing maximum"/>
                             <TextBlock Theme="{StaticResource TipText}" Text="• 128 MiB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit.&#10;• A file at or under this size can be handed to either share target without being refused.&#10;• The other target, storage.to, carries far more, so this chip is the safe number for both."/>
+                            </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button x:Name="Chip180" Tag="180" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
-                        <StackPanel>
-                          <TextBlock Text="WhatsApp Web maximum" Theme="{StaticResource Label}" Margin="0"/>
-                          <TextBlock Text="180"/>
-                        </StackPanel>
+                      <Button x:Name="Chip180" Content="180" Tag="180" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <StackPanel Spacing="{StaticResource SpaceSm}">
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="WhatsApp Web maximum"/>
                             <TextBlock Theme="{StaticResource TipText}" Text="• On the phone: 16 MB in chat, 2 GB as a document.&#10;• WhatsApp Web takes 180 MB per file. The user reports this, WhatsApp does not publish it.&#10;• So a file of 180 MB or less goes through the web side as it is."/>
+                            </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
