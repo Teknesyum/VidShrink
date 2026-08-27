@@ -183,6 +183,7 @@ public sealed class SegmentEncoderTests : IClassFixture<SegmentClips>
                 await encoder.RequestAsync(info, Plan(videoK: 200 + i * 25), 4);
 
             var live = Directory.GetFiles(dir, SegmentEncoder.TempPrefix + "*");
+            Record($"K5 20 istek sonrasi kalan dosya: {live.Length}");
             Assert.True(live.Length <= SegmentEncoder.KeepClips * 2, $"kalan dosya: {live.Length}");
         }
 
