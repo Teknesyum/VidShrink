@@ -27,7 +27,8 @@ T52'de sekiz yerlesim testi kırmızıydı ama **tek sebep yoktu**: beşi ölç�
 512'lik tabandan. Ayrımı yapmadan "hepsi benim değişikliğim" ya da "hepsi düzenek" deme —
 değişiklik olmadan bir taban koşumu al.
 
-T0'ın kararı: ne `WindowLayoutTests` eşikleri ne `PlanPanelMaxHeight` oynatılacak. Çözüm
-T54'ün orta sütun satır düzeninde — önizleme esneyen satıra, plan paneli kendi içeriğine.
-Düzeneği T59 onarıyor. İkisi birleşince ölçüm yeniden koşturulacak.
+T52 tur 3'te kapandı: T59 düzeneği onardıktan sonra beklentiler 512'lik tabana yeniden
+temellendirildi. Sayfayı tutan sütun artık **orta sütun** (dolu sayfada sol 802 / orta 932),
+sayfanın kaymayı bıraktığı yükseklik 1008 (boş) ve 1052 (dolu). `PlanPanelMaxHeight` (512)
+hiçbir yerleşimde bağlamıyor — plan panelini satırın kendisi tutuyor, T54'ün işi.
 [[windowlayouttests-sabit-sayilar]] ile birlikte oku.
