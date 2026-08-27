@@ -28,4 +28,4 @@
 - [git add açık yolla](git-add-acik-yolla.md) — paralel ajanlar aynı indeksi paylaşıyor; -A başkasının dosyasını süpürür
 - [Pencere dışı fare](avalonia-pencere-disi-fare.md) — PointerMoved pencere dışında atmaz; çıkışı TopLevel'dan dinle
 - [Buton teması ve parıltı](avalonia-buton-temasi-parilti.md) — Button'da BoxShadow yok; parıltı /template/ Border#Root'a, gövde BasedOn ile GhostButton'dan
-- [WindowLayoutTests sabit sayılar](windowlayouttests-sabit-sayilar.md) — yerleşimi küçülten her iş beş ölçümü kırar; dosya çoğu sözleşmenin owns'ı dışında
+- [WindowLayoutTests sabit sayılar](windowlayouttests-sabit-sayilar.md) — yükseklik taraması degenerate, genişlik ekseni gerçek; sayfayı tutan şey sol ayar sütunu
