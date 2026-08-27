@@ -87,6 +87,12 @@ public partial class MainWindow : Window
     private string? _lastOutput;
     private string? _ffmpegVersion;
     private bool _syncing;
+
+    // T61/K1: iki denetim birbirini sürüyor. Bayrak "bu değeri kullanıcı değil program
+    // yazıyor" demektir; yazılan tarafın işleyicisi o turda hiçbir şey türetmez, böylece
+    // döngü tek turda kapanır. İki bayrak var çünkü iki yön ayrı ayrı bastırılıyor.
+    private bool _targetIsDerived;
+    private bool _qualityIsDerived;
     private bool _turkish;
     private TaskCompletionSource<bool>? _retryDecision;
     private RetryPrompt? _activeRetryPrompt;
@@ -139,6 +145,8 @@ public partial class MainWindow : Window
 
         Watch(SliderTarget, RangeBase.ValueProperty, OnTargetSliderChanged);
         Watch(TxtTarget, TextBox.TextProperty, OnTargetTextChanged);
+        Watch(SliderQualityTarget, RangeBase.ValueProperty, OnQualityTargetSliderChanged);
+        Watch(TxtQualityTarget, TextBox.TextProperty, OnQualityTargetTextChanged);
         foreach (var box in new[] { CmbIntent, CmbCodec, CmbFillPolicy, CmbHdrPolicy })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
         foreach (var check in new[] { ChkResolution, ChkFps, ChkFastGpu })
@@ -157,6 +165,7 @@ public partial class MainWindow : Window
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
 
+        RefreshQualityTargetAvailability();
         ApplyTextCase();
         BtnEn.Classes.Set("selected", true);
         Loaded += OnWindowLoaded;
@@ -1125,6 +1134,7 @@ public partial class MainWindow : Window
             Fade(DropZone, true);
             ResetPlanView();
             RefreshQualityPanels();
+            RefreshQualityTargetAvailability();
             ReportSourceError($"{T("Bu dosya kullanılamıyor", "This file cannot be used")}: {DescribeFailure(ex)}");
             return;
         }
@@ -1173,6 +1183,8 @@ public partial class MainWindow : Window
 
         UpdateToolStatus();
         Recalculate();
+        RefreshQualityTargetAvailability();
+        DeriveQualityFromTarget();
         RefreshConversion();
     }
 
@@ -1665,6 +1677,7 @@ public partial class MainWindow : Window
         _syncing = true;
         TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
+        if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
     }
 
@@ -1676,8 +1689,128 @@ public partial class MainWindow : Window
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
         _syncing = false;
+        if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
     }
+
+    private void OnQualityTargetSliderChanged()
+    {
+        if (_syncing || _qualityIsDerived) return;
+        _qualityIsDerived = true;
+        TxtQualityTarget.Text = Math.Round(SliderQualityTarget.Value).ToString("0.##", CultureInfo.InvariantCulture);
+        _qualityIsDerived = false;
+        DeriveTargetFromQuality();
+    }
+
+    private void OnQualityTargetTextChanged()
+    {
+        if (_syncing || _qualityIsDerived) return;
+
+        // T61/K2: kutuya yazılan sayı geri yazılmaz. Kaydırıcı yazılan değere gider ama
+        // kutu olduğu gibi kalır; gidiş dönüş tam olarak aynı sayıya dönmediği için
+        // kullanıcının 60'ı 59,2 diye düzeltilirdi.
+        _qualityIsDerived = true;
+        SliderQualityTarget.Value = ParseQualityTarget();
+        _qualityIsDerived = false;
+        DeriveTargetFromQuality();
+    }
+
+    /// <summary>Kutudaki kalite skoru. Okunamayan metin kaydırıcının o anki değeridir.</summary>
+    private double ParseQualityTarget()
+    {
+        var value = double.TryParse(TxtQualityTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var score)
+            ? score
+            : SliderQualityTarget.Value;
+        return Math.Clamp(value, SliderQualityTarget.Minimum, SliderQualityTarget.Maximum);
+    }
+
+    /// <summary>
+    /// Kaliteden hedef MB türetir. Kullanıcının ellediği taraf kalite olduğu için kalite
+    /// kutusuna dokunulmaz; yalnız hedef yazılır ve sınır durumu ekrana basılır.
+    /// </summary>
+    private void DeriveTargetFromQuality()
+    {
+        if (_info is null) { RefreshQualityTargetAvailability(); return; }
+
+        QualityDerivedTargets++;
+        var result = PlanCalculator.TargetMbForQuality(_info, CurrentOptions(), ParseQualityTarget(), _profile, _encoders);
+        var mb = Math.Round(result.TargetMb, 1);
+
+        _targetIsDerived = true;
+        if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
+        SliderTarget.Value = mb;
+        TxtTarget.Text = mb.ToString("0.##", CultureInfo.InvariantCulture);
+        _targetIsDerived = false;
+
+        ShowQualityTargetBound(result, mb);
+        ScheduleRecalculate();
+    }
+
+    /// <summary>
+    /// Hedef MB'dan kalite türetir. Bu yön kullanıcının MB'ı ellediği yön olduğu için MB
+    /// kutusuna dokunulmaz.
+    /// </summary>
+    private void DeriveQualityFromTarget()
+    {
+        if (_info is null) { RefreshQualityTargetAvailability(); return; }
+
+        var hint = QualityHint.For(_info, CurrentOptions(), ParseTargetMb(), _profile, _encoders);
+        if (hint.Score is not { } score) return;
+
+        TargetDerivedQualities++;
+        _qualityIsDerived = true;
+        SliderQualityTarget.Value = Math.Clamp(score, SliderQualityTarget.Minimum, SliderQualityTarget.Maximum);
+        TxtQualityTarget.Text = Math.Round(score, 1).ToString("0.##", CultureInfo.InvariantCulture);
+        _qualityIsDerived = false;
+
+        SetQualityTargetNotice("");
+    }
+
+    /// <summary>
+    /// T61/K3: iki sınır sessizce kırpılmaz. Kullanıcı kaydırıcıyı sürüklerken ne olduğunu
+    /// ve nedenini denetimin hemen altında okur; balonda saklanmaz.
+    /// </summary>
+    private void ShowQualityTargetBound(QualityTargetResult result, double mb)
+    {
+        var target = mb.ToString("0.##", CultureInfo.InvariantCulture);
+        var reached = result.PredictedQuality.ToString("0.#", CultureInfo.InvariantCulture);
+
+        SetQualityTargetNotice(result.Bound switch
+        {
+            QualityTargetBound.BelowFloor => T(
+                $"İstenen kalite tabanın altında: {target} MB'dan küçük bir hedef üretilmiyor, o hedef zaten {reached}/100 veriyor.",
+                $"The requested quality is below the floor: no target smaller than {target} MB is produced, and that target already reaches {reached}/100."),
+            QualityTargetBound.AboveSourceCeiling => T(
+                $"İstenen kalite kaynağın kendisinden iyi: tavan {target} MB ve orada ulaşılan kalite {reached}/100.",
+                $"The requested quality is better than the source itself: the ceiling is {target} MB and the quality reached there is {reached}/100."),
+            _ => ""
+        });
+    }
+
+    private void SetQualityTargetNotice(string text)
+    {
+        TxtQualityTargetNotice.Text = text;
+        TxtQualityTargetNotice.IsVisible = text.Length > 0;
+    }
+
+    /// <summary>
+    /// T61/K4: kaynak yokken kaliteden MB türetilemez. Denetim kapanır ve neden kapalı
+    /// olduğu tek satırla yazılır; sayı uydurulmaz.
+    /// </summary>
+    private void RefreshQualityTargetAvailability()
+    {
+        var ready = _info is not null;
+        SliderQualityTarget.IsEnabled = TxtQualityTarget.IsEnabled = ready;
+        if (ready) SetQualityTargetNotice("");
+        else SetQualityTargetNotice(T(
+            "Bir video yükleyin; kalite hedefi ancak kaynak bilinince hedef MB'a çevrilebilir.",
+            "Load a video; a quality target can only be turned into a target size once the source is known."));
+    }
+
+    /// <summary>Ölçüm için tur sayacı: her yönde kaç türetme yapıldı.</summary>
+    internal int QualityDerivedTargets { get; private set; }
+
+    internal int TargetDerivedQualities { get; private set; }
 
     private void OnPreset(object? sender, RoutedEventArgs e)
     {
