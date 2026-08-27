@@ -12,10 +12,25 @@
     <Product>VidShrink</Product>
     <Authors>Teknesyum</Authors>
     <Copyright>Copyright (c) Teknesyum</Copyright>
-    <!-- CI passes -p:SourceRevisionId=<short sha>, which the SDK appends to
-         AssemblyInformationalVersion as "1.0.0+abc1234". A local build leaves it empty
-         and the informational version stays "1.0.0". -->
+    <!-- The SDK appends $(SourceRevisionId) to AssemblyInformationalVersion. The release
+         workflow passes a seven-character sha; a local build does not leave it empty, source
+         control information fills it with the full forty-character commit id. That full id
+         reached the About box and was unreadable, so ShortenSourceRevisionId below trims
+         any id to seven characters and both builds now read "0.1.1+abc1234". -->
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+    <SourceRevisionLength>7</SourceRevisionLength>
   </PropertyGroup>
+
+  <!-- Runs before the SDK folds the revision into the informational version, so the length
+       is decided in one place. Source control fills SourceRevisionId in the target this one
+       depends on; without that dependency the trim would read an empty property. -->
+  <Target Name="ShortenSourceRevisionId"
+          DependsOnTargets="InitializeSourceControlInformation"
+          BeforeTargets="AddSourceRevisionToInformationalVersion"
+          Condition="'$(IncludeSourceRevisionInInformationalVersion)' == 'true'">
+    <PropertyGroup Condition="'$(SourceRevisionId)' != '' And $(SourceRevisionId.Length) &gt; $(SourceRevisionLength)">
+      <SourceRevisionId>$(SourceRevisionId.Substring(0, $(SourceRevisionLength)))</SourceRevisionId>
+    </PropertyGroup>
+  </Target>
 
 </Project>
