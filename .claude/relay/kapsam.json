@@ -392,8 +392,8 @@
   "src/VidShrink.App/MainWindow.axaml.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 09:29:11",
-    "ajan": "ui-builder"
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
   },
   "src/VidShrink.App/LanguageCatalog.cs": {
     "model": "claude-fable-5",
@@ -805,9 +805,9 @@
   },
   "src/VidShrink.App/Playback/PanelHost.cs": {
     "model": "claude-opus-5",
-    "effort": "high",
-    "t": "2026-08-25 17:22:33",
-    "ajan": "ana oturum"
+    "effort": "medium",
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
   },
   ".claude/agent-memory/teknesyum-ui-builder/vidshrink-kaynak-kapatma-kilidi.md": {
     "model": "claude-fable-5",
@@ -1132,5 +1132,35 @@
     "effort": "medium",
     "t": "2026-08-27 09:29:11",
     "ajan": "ui-builder"
+  },
+  "src/VidShrink.Ffmpeg/FfmpegRunner.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
+  },
+  "src/VidShrink.App/Playback/SegmentEncoder.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
+  },
+  "tests/VidShrink.Tests/SegmentEncoderTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
+  },
+  "t48-rapor.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
+  },
+  "t48-k9.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
   }
 }
