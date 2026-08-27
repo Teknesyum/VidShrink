@@ -212,9 +212,11 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         Assert.Equal(host.ApproximateBadge, Rozet(panel));
         Assert.False(string.IsNullOrWhiteSpace(Rozet(panel)));
         var ingilizce = Rozet(panel)!;
+        Record50($"T50 K1 rozet: parca=[{ingilizce}]");
 
         // Dil degisince metin de degisir: birlesik dizgeyi panel kendi ceviremez.
         AppHost.Run(() => host.SetLanguage(true));
+        Record50($"T50 K1 rozet: dil degisince=[{Rozet(panel)}]");
         Assert.NotEqual(ingilizce, Rozet(panel));
         Assert.Equal(host.ApproximateBadge, Rozet(panel));
 
