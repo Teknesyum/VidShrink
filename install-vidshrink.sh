@@ -14,30 +14,55 @@ fail() {
     exit 1
 }
 
+# Kullanıcıya söylenen ama çıktıya karışmaması gereken satırlar. runtime_identifier'ın
+# stdout'u bir değişkene okunuyor; not oraya düşerse mimari adının parçası olur.
+note() {
+    printf '%s\n' "$1" >&2
+}
+
 require_command() {
     command -v "$1" >/dev/null 2>&1 || fail "$1 bulunamadı. Kurulum için gereklidir."
 }
 
 # Yayında dört hedef var: win-x64, osx-arm64, osx-x64, linux-x64. Başka bir mimaride
 # yanlış arşivi sessizce kurmak yerine burada duruluyor.
+#
+# Boş okuma bundan ayrı bir durum. uname boş dönerse eski hâli boş değeri
+# "desteklenmeyen mimari" sayıp reddediyordu — Windows kurucusunu düşüren tuzağın aynısı.
+# Boş bir değer artık kullanıcıya basılmıyor, okunamadığı söyleniyor. Linux'ta yayın tek:
+# okunamayan mimaride durmak yerine linux-x64 varsayılıp varsayıldığı söyleniyor. macOS'ta
+# iki yayın var, arm64 ile x64 arasında varsayım yapılamaz; orada kurulum duruyor.
 runtime_identifier() {
-    machine=$(uname -m)
-    case $(uname -s) in
+    system=$(uname -s 2>/dev/null || true)
+    machine=$(uname -m 2>/dev/null || true)
+    if [ -z "$machine" ]; then
+        machine=$(uname -p 2>/dev/null || true)
+    fi
+
+    case "$system" in
         Darwin)
             case "$machine" in
                 arm64|aarch64) printf 'osx-arm64\n' ;;
-                x86_64) printf 'osx-x64\n' ;;
+                x86_64|amd64) printf 'osx-x64\n' ;;
+                "") fail "Mimari okunamadı: uname -m ve uname -p boş döndü. macOS'ta osx-arm64 ile osx-x64 arasında varsayım yapılamıyor; doğru arşivi https://github.com/Teknesyum/VidShrink/releases adresinden elle indirin." ;;
                 *) fail "Bu mimari için yayın yok: $machine. macOS'ta yalnız osx-arm64 ve osx-x64 yayımlanıyor." ;;
             esac
             ;;
         Linux)
             case "$machine" in
-                x86_64) printf 'linux-x64\n' ;;
+                x86_64|amd64) printf 'linux-x64\n' ;;
+                "")
+                    note 'Mimari okunamadı; Linux tarafında yalnız linux-x64 yayımlandığı için linux-x64 varsayıldı.'
+                    printf 'linux-x64\n'
+                    ;;
                 *) fail "Bu mimari için yayın yok: $machine. Linux'ta yalnız linux-x64 yayımlanıyor." ;;
             esac
             ;;
+        "")
+            fail 'İşletim sistemi okunamadı: uname -s boş döndü. Windows için Install-VidShrink.ps1 kullanın.'
+            ;;
         *)
-            fail "Desteklenmeyen işletim sistemi: $(uname -s). Windows için Install-VidShrink.ps1 kullanın."
+            fail "Desteklenmeyen işletim sistemi: $system. Windows için Install-VidShrink.ps1 kullanın."
             ;;
     esac
 }
