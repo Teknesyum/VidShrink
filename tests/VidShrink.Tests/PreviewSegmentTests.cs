@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 
@@ -104,26 +105,42 @@ public sealed class PreviewSegmentTests
         Assert.DoesNotContain("-crf", segment.Arguments);
     }
 
-    [Theory]
-    [InlineData("libx264")]
-    [InlineData("libx265")]
-    [InlineData("libsvtav1")]
-    [InlineData("h264_nvenc")]
-    [InlineData("hevc_nvenc")]
-    [InlineData("av1_nvenc")]
-    [InlineData("h264_qsv")]
-    [InlineData("hevc_qsv")]
-    [InlineData("av1_qsv")]
-    [InlineData("h264_amf")]
-    [InlineData("hevc_amf")]
-    [InlineData("av1_amf")]
-    public void Desteklenen_her_kodlayici_kendi_araliginda_deger_verir(string codec)
+    /// <summary>
+    /// Planlayicinin kabul ettigi kodlayici listesini kaynaktan okur. Liste buraya
+    /// kopyalanmaz: kopyalanirsa surukleme de kopyalanir ve olcum hicbir sey korumaz.
+    /// </summary>
+    private static IReadOnlyList<string> AllowedCodecs()
     {
-        var choice = PreviewSegment.QualityFor(Source(), TwoPassPlan(codec));
+        var field = typeof(PlanParser).GetField("AllowedCodecs", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(field);
+        var codecs = (string[])field!.GetValue(null)!;
+        Assert.NotEmpty(codecs);
+        return codecs;
+    }
 
-        Assert.Equal(PreviewQuality.Yaklasik, choice.Kind);
-        var (min, max) = CodecModel.CrfRange(codec);
-        Assert.InRange(choice.Crf!.Value, min, max);
+    [Fact]
+    public void Planlayicinin_kabul_ettigi_her_kodlayici_siniflandirilmis()
+    {
+        var siniflandirilmamis = new List<string>();
+
+        foreach (var codec in AllowedCodecs())
+        {
+            var choice = PreviewSegment.QualityFor(Source(), TwoPassPlan(codec));
+            if (choice.Kind == PreviewQuality.Desteklenmiyor || choice.Crf is null)
+            {
+                siniflandirilmamis.Add(codec);
+                continue;
+            }
+
+            var (min, max) = CodecModel.CrfRange(codec);
+            Assert.InRange(choice.Crf.Value, min, max);
+            Assert.Equal(PreviewQuality.Yaklasik, choice.Kind);
+        }
+
+        Assert.True(
+            siniflandirilmamis.Count == 0,
+            "PlanParser.AllowedCodecs'te olup PreviewSegment'in kalite olcegini bilmedigi kodlayici: "
+                + string.Join(", ", siniflandirilmamis));
     }
 
     [Fact]
