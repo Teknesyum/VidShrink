@@ -31,3 +31,4 @@
 - [WindowLayoutTests sabit sayılar](windowlayouttests-sabit-sayilar.md) — yükseklik taraması degenerate, genişlik ekseni gerçek; sayfayı tutan şey sol ayar sütunu
 - [Ikinci yerlesim turu](avalonia-ikinci-yerlesim-turu.md) — ilk turdan sonra UpdateLayout yeni tur acmaz; gorunmez olan oge DesiredSize 0 ile kalir
 - [Isabet testi penceresiz](avalonia-isabet-testi-penceresiz.md) — InputHitTest her yerde null; saydamligi ozellik + olay yoluyla olc
+- [Panel ölçek anlamı](vidshrink-panel-olcek-anlami.md) — yakınlaştırma panelin boyunu ölçekler; taban boy 512 ve sayfayı kaydırıyor
