@@ -102,11 +102,10 @@ public static class FfmpegArguments
             filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
         if (!string.IsNullOrEmpty(plan.HdrVideoFilter))
             filters.Add(plan.HdrVideoFilter);
+        if (plan.Fps < info.Fps - 0.01)
+            filters.Add($"fps={plan.Fps.ToString("0.###", CultureInfo.InvariantCulture)}");
         if (filters.Count > 0)
             a.AddRange(new[] { "-vf", string.Join(',', filters) });
-
-        if (plan.Fps < info.Fps - 0.01)
-            a.AddRange(new[] { "-r", plan.Fps.ToString("0.###", CultureInfo.InvariantCulture) });
 
         a.AddRange(new[] { "-c:v", plan.Codec });
         a.AddRange(new[] { "-preset", plan.Preset });

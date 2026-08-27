@@ -1,4 +1,4 @@
-using VidShrink.Core;
+﻿using VidShrink.Core;
 
 namespace VidShrink.Tests;
 
@@ -96,8 +96,12 @@ public sealed class FfmpegArgumentsTests
 
         Assert.True(disarida.Count == 0, "izinsiz fark: " + string.Join(", ", disarida));
 
-        Assert.Contains("-vf scale=1280:720:flags=lanczos", part);
-        Assert.Contains("-r 30", part);
+        var zincir = part.Single(p => FlagOf(p) == "-vf")["-vf ".Length..].Split(',');
+        Assert.Contains("scale=1280:720:flags=lanczos", zincir);
+        Assert.Equal("fps=30", zincir[^1]);
+        Assert.True(Array.IndexOf(zincir, "scale=1280:720:flags=lanczos") < zincir.Length - 1,
+            "olcekleme kare dusurmeden sonra geliyor: " + string.Join(',', zincir));
+        Assert.DoesNotContain("-r", part.Select(FlagOf));
         Assert.Contains("-preset slow", part);
         Assert.Contains("-pix_fmt yuv420p", part);
         Assert.Contains("-c:a aac", part);
