@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -357,5 +358,146 @@ public sealed class ComparisonPanelTests
 
         Assert.False(corner);
         Assert.True(centre);
+    }
+
+    private static Button ZoomButton(MainWindow window, string name) =>
+        window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == name);
+
+    private static PointerEventArgs PointerCrossing(Control source, RoutedEvent<PointerEventArgs> which) =>
+        new(which, source, new Pointer(0, PointerType.Mouse, true), source, default,
+            0, new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
+            KeyModifiers.None);
+
+    /// <summary>
+    /// T46/K3: dugmeler tek jest parametresini centik centik surer. Ayri bir yakinlastirma
+    /// durumu yok - tekerlekle dugme ayni sayiya yaziyor.
+    /// </summary>
+    [Fact]
+    public void TiklamaDugmeleriTekParametreyiSurer()
+    {
+        var (afterIn, afterTwo, afterOut, afterWheelThenOut) = Read((window, panel) =>
+        {
+            var zoomIn = ZoomButton(window, "BtnZoomIn");
+            var zoomOut = ZoomButton(window, "BtnZoomOut");
+
+            panel.Descend();
+            zoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            var one = panel.Gesture.T;
+            zoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            var two = panel.Gesture.T;
+            zoomOut.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            var back = panel.Gesture.T;
+            panel.Zoom(1, new Point(0, 0));
+            zoomOut.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            return (one, two, back, panel.Gesture.T);
+        });
+
+        Assert.Equal(ZoomGesture.NotchStep, afterIn, 9);
+        Assert.Equal(2 * ZoomGesture.NotchStep, afterTwo, 9);
+        Assert.Equal(ZoomGesture.NotchStep, afterOut, 9);
+        Assert.Equal(ZoomGesture.NotchStep, afterWheelThenOut, 9);
+    }
+
+    /// <summary>T46/K3: uclarda dugmeler devre disi - tavanda arti, tabanda eksi.</summary>
+    [Fact]
+    public void UclardaDugmelerDevreDisi()
+    {
+        var (floorIn, floorOut, ceilingIn, ceilingOut) = Read((window, panel) =>
+        {
+            var zoomIn = ZoomButton(window, "BtnZoomIn");
+            var zoomOut = ZoomButton(window, "BtnZoomOut");
+
+            panel.Descend();
+            var atFloorIn = zoomIn.IsEnabled;
+            var atFloorOut = zoomOut.IsEnabled;
+            WheelTo(window, panel, ShelterStage.Full);
+            return (atFloorIn, atFloorOut, zoomIn.IsEnabled, zoomOut.IsEnabled);
+        });
+
+        Assert.True(floorIn);
+        Assert.False(floorOut);
+        Assert.False(ceilingIn);
+        Assert.True(ceilingOut);
+    }
+
+    /// <summary>
+    /// T46/K3: fare dugmelerin ustundeyken inis sayaci durur. Dugmeler kabugun icinde
+    /// oldugu icin, tutma olmadan kullanici yakinlastirmaya calisirken panel inerdi.
+    /// </summary>
+    [Fact]
+    public void DugmeUstundeInisSayaciDurur()
+    {
+        var (heldWhileOver, releasedAfter) = Read((window, panel) =>
+        {
+            WheelTo(window, panel, ShelterStage.Full);
+            var zoomIn = ZoomButton(window, "BtnZoomIn");
+
+            zoomIn.RaiseEvent(PointerCrossing(zoomIn, InputElement.PointerEnteredEvent));
+            panel.PointerLeftWindow();
+            var pending = panel.Descent.Generation;
+            var held = !panel.Descent.ShouldHide(pending);
+
+            zoomIn.RaiseEvent(PointerCrossing(zoomIn, InputElement.PointerExitedEvent));
+            var next = panel.Descent.Generation;
+            return (held, panel.Descent.ShouldHide(next));
+        });
+
+        Assert.True(heldWhileOver);
+        Assert.True(releasedAfter);
+    }
+
+    /// <summary>
+    /// T46/K5: fare panele girince yakinlastirma dogrudan tema belirtecinin soyledigi kata
+    /// cikar, cikinca tabana doner. Gir-cik-gir dizisi kararli: her turda ayni iki deger,
+    /// kademe hep bandinda, yani inis sayaciyla salinim yok.
+    /// </summary>
+    [Fact]
+    public void GirisYakinlastirmasiKararli()
+    {
+        var (wanted, readings, stages) = Read((window, panel) =>
+        {
+            panel.Descend();
+            window.TryFindResource("PlaybackHoverZoom", out var token);
+
+            var seen = new List<double>();
+            var shelters = new List<ShelterStage>();
+            for (var i = 0; i < 3; i++)
+            {
+                panel.HoverZoom(true);
+                seen.Add(Math.Round(panel.Gesture.ContentZoom, 9));
+                shelters.Add(panel.Shelter);
+                panel.HoverZoom(false);
+                seen.Add(Math.Round(panel.Gesture.ContentZoom, 9));
+                shelters.Add(panel.Shelter);
+            }
+
+            return ((double)token!, seen, shelters);
+        });
+
+        Assert.Equal(new[] { wanted, 1.0, wanted, 1.0, wanted, 1.0 }, readings);
+        Assert.All(stages, stage => Assert.Equal(ShelterStage.Band, stage));
+    }
+
+    /// <summary>
+    /// T46/K5, birinci tuzak: kullanicinin kendi secimi ezilmiyor. Tekerlekle bir deger
+    /// secildikten sonra fare girip cikmak o degeri ne 2x'e ziplatir ne de sifirlar.
+    /// </summary>
+    [Fact]
+    public void GirisYakinlastirmasiKullaniciSeciminiEzmez()
+    {
+        var (chosen, afterEnter, afterExit) = Read((window, panel) =>
+        {
+            panel.Descend();
+            panel.Zoom(2, new Point(0, 0));
+            var picked = panel.Gesture.T;
+            panel.HoverZoom(true);
+            var entered = panel.Gesture.T;
+            panel.HoverZoom(false);
+            return (picked, entered, panel.Gesture.T);
+        });
+
+        Assert.Equal(2 * ZoomGesture.NotchStep, chosen, 9);
+        Assert.Equal(chosen, afterEnter, 9);
+        Assert.Equal(chosen, afterExit, 9);
     }
 }

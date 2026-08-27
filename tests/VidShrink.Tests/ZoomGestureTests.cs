@@ -332,6 +332,66 @@ public class ZoomGestureTests
         Assert.Equal((1000 - gesture.ContentWidth) / 2, gesture.OffsetX, 6);
     }
 
+
+    /// <summary>
+    /// T46/K5: dogrudan yakinlastirma. Hedef parametre tavandan turer - 4x tavanda 2x,
+    /// araligin ucte biridir. Sayi testte de uydurulmuyor, tavandan hesaplaniyor.
+    /// </summary>
+    [Theory]
+    [InlineData(4.0, 2.0)]
+    [InlineData(4.0, 3.0)]
+    [InlineData(8.0, 2.0)]
+    public void ZoomToTavandanTuretir(double ceiling, double wanted)
+    {
+        var gesture = new ZoomGesture(ceiling);
+        Assert.True(gesture.ZoomTo(wanted, 0, 0));
+        Assert.Equal(wanted, gesture.ContentZoom, 9);
+        Assert.Equal((wanted - 1.0) / (ceiling - 1.0), gesture.T, 9);
+    }
+
+    /// <summary>Bire donmek tabana donmektir; iki yol da tek parametreye yaziyor.</summary>
+    [Fact]
+    public void ZoomToBirTabanaDoner()
+    {
+        var gesture = new ZoomGesture();
+        gesture.ZoomTo(2.0, 0, 0);
+        Assert.False(gesture.AtFloor);
+        Assert.True(gesture.ZoomTo(1.0, 0, 0));
+        Assert.True(gesture.AtFloor);
+    }
+
+    /// <summary>
+    /// T46/K5, ikinci tuzak: 2x'in parametresi orta kademe esiginin altinda kalir, yani
+    /// giris yakinlastirmasi paneli terfi ettirmez ve inis sayaciyla salinmaz.
+    /// </summary>
+    [Fact]
+    public void GirisYakinlastirmasiKademeyiOynatmaz()
+    {
+        var gesture = new ZoomGesture();
+        for (var i = 0; i < 5; i++)
+        {
+            gesture.ZoomTo(2.0, 0, 0);
+            Assert.Equal(ShelterStage.Band, gesture.Shelter);
+            gesture.ZoomTo(1.0, 0, 0);
+            Assert.Equal(ShelterStage.Band, gesture.Shelter);
+        }
+
+        Assert.True(gesture.AtFloor);
+    }
+
+    /// <summary>Dugme yolu tekerlekle ayni centigi kullanir ve ayni parametreye yazar.</summary>
+    [Fact]
+    public void TiklamaVeTekerlekAyniParametre()
+    {
+        var gesture = new ZoomGesture();
+        gesture.Wheel(1, 0, 0);
+        Assert.Equal(ZoomGesture.NotchStep, gesture.T, 9);
+        gesture.Wheel(1, 0, 0);
+        Assert.Equal(2 * ZoomGesture.NotchStep, gesture.T, 9);
+        gesture.Wheel(-1, 0, 0);
+        Assert.Equal(ZoomGesture.NotchStep, gesture.T, 9);
+    }
+
     private static (double X, double Y) SourceAt(ZoomGesture gesture, double x, double y)
         => ((x - gesture.OffsetX) / gesture.Scale, (y - gesture.OffsetY) / gesture.Scale);
 }

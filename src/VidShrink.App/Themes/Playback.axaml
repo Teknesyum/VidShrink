@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=netstandard">
 
@@ -127,6 +127,39 @@
     <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
     <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
     <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+  </ControlTheme>
+
+  <!--
+    T46/K3: tıkla yakınlaştırma düğmeleri. Gövdesi GhostButton'dan geliyor — yeni bir
+    şablon yazılmadı; değişen yalnız oynatıcıya ait yüzey: perde zemin, mavi neon çerçeve
+    ve kare bir dokunma hedefi. Uçlarda düğme devre dışıdır ve sönük durur.
+  -->
+  <ControlTheme x:Key="PlaybackZoomButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+    <Setter Property="Width" Value="{StaticResource PlaybackZoomButtonSize}"/>
+    <Setter Property="Height" Value="{StaticResource PlaybackZoomButtonSize}"/>
+    <Setter Property="MinHeight" Value="{StaticResource PlaybackZoomButtonSize}"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+    <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+    <!-- Parıltı düğmenin kendisinde değil şablonunun gövdesinde: Button'da BoxShadow yok. -->
+    <Style Selector="^ /template/ Border#Root">
+      <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    </Style>
+    <Style Selector="^:disabled /template/ Border#Root">
+      <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+    </Style>
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{StaticResource NeonBlueHover}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{StaticResource TextDisabled}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource TextDisabled}"/>
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="PlaybackBadgeText" TargetType="TextBlock">

@@ -56,6 +56,8 @@ internal partial class ComparisonPanel : UserControl
     private bool _promoted;
     private bool _draggingSeparator;
     private bool _panning;
+    private bool _overZoomButtons;
+    private bool _hoverZoomMine;
     private Point _panFrom;
     private double _split = 0.5;
 
@@ -75,6 +77,16 @@ internal partial class ComparisonPanel : UserControl
 
         Shell.PointerWheelChanged += OnWheel;
         Shell.KeyDown += OnShellKey;
+        Shell.PointerEntered += (_, _) => HoverZoom(true);
+        Shell.PointerExited += (_, _) => HoverZoom(false);
+
+        BtnZoomIn.Click += (_, _) => Zoom(1, StageCentre());
+        BtnZoomOut.Click += (_, _) => Zoom(-1, StageCentre());
+        foreach (var button in new[] { BtnZoomIn, BtnZoomOut })
+        {
+            button.PointerEntered += (_, _) => SetZoomButtonHover(true);
+            button.PointerExited += (_, _) => SetZoomButtonHover(false);
+        }
 
         Stage.PointerPressed += OnStagePressed;
         Stage.PointerMoved += OnStageMoved;
@@ -331,10 +343,58 @@ internal partial class ComparisonPanel : UserControl
     {
         if (!_gesture.Wheel(notches, anchor.X, anchor.Y)) return false;
 
+        // Kullanıcı kendi değerini seçti: giriş yakınlaştırmasının sahipliği düşer,
+        // fare çıkarken bu değer silinmez (T46/K5, birinci tuzak).
+        _hoverZoomMine = false;
+        AfterZoom();
+        return true;
+    }
+
+    /// <summary>Panonun ortası. Düğmeyle yakınlaştırmanın çıpası — fare imleci yok.</summary>
+    private Point StageCentre() => new(Surface.Bounds.Width / 2, Surface.Bounds.Height / 2);
+
+    private void AfterZoom()
+    {
         SyncShelter();
         Surface.InvalidateVisual();
         RefreshReadout();
-        return true;
+    }
+
+    /// <summary>
+    /// K3: düğmelerin üstündeyken iniş sayacı durur. Düğmeler kabuğun içinde olduğu için
+    /// kullanıcı yakınlaştırmaya çalışırken panel altından inmemeli.
+    /// </summary>
+    private void SetZoomButtonHover(bool over)
+    {
+        _overZoomButtons = over;
+        RefreshDescentHold();
+    }
+
+    /// <summary>
+    /// K5: fare panele girince yakınlaştırma doğrudan <c>PlaybackHoverZoom</c> katına
+    /// çıkar. İki koruma var. Kullanıcının seçimi ezilmiyor: giriş yakınlaştırması yalnız
+    /// panel taban durumundayken uygulanır, ve fare çıkarken yalnız değer hâlâ bizim
+    /// koyduğumuzsa geri alınır — arada tekerlek ya da düğme dokunulduysa sahiplik düşmüş
+    /// olur. T44'ün iniş sayacıyla çakışma yok: 2x'in jest parametresi orta kademe
+    /// eşiğinin altında kaldığı için panel terfi etmez, iniş sayacı hiç kurulmaz.
+    /// </summary>
+    internal void HoverZoom(bool entering)
+    {
+        if (_promoted) return;
+        var centre = StageCentre();
+
+        if (entering)
+        {
+            if (!_gesture.AtFloor) return;
+            if (!_gesture.ZoomTo(Scalar("PlaybackHoverZoom", 2), centre.X, centre.Y)) return;
+            _hoverZoomMine = true;
+            AfterZoom();
+            return;
+        }
+
+        if (!_hoverZoomMine) return;
+        _hoverZoomMine = false;
+        if (_gesture.ZoomTo(1, centre.X, centre.Y)) AfterZoom();
     }
 
     private void OnStagePressed(object? sender, PointerPressedEventArgs e)
@@ -373,6 +433,8 @@ internal partial class ComparisonPanel : UserControl
     {
         var percent = _gesture.ContentZoom * 100.0;
         ZoomText.Text = _turkish ? $"%{percent:0}" : $"{percent:0}%";
+        BtnZoomIn.IsEnabled = !_gesture.AtCeiling;
+        BtnZoomOut.IsEnabled = !_gesture.AtFloor;
     }
 
     internal void RefreshEmptyState()
@@ -384,7 +446,7 @@ internal partial class ComparisonPanel : UserControl
         // perdenin üstünde durmaz.
         RightCurtain.IsVisible = !empty && _rightNotice is not null;
         RightBadge.IsVisible = !empty && _rightNotice is null;
-        ZoomBadge.IsVisible = !empty;
+        ZoomRow.IsVisible = !empty;
         SeparatorGrip.IsVisible = !empty;
         Strip.IsVisible = !empty;
     }
@@ -562,7 +624,7 @@ internal partial class ComparisonPanel : UserControl
     /// panelin kendisi taşıyor, o odak kullanıcının bir işi değil.
     /// </summary>
     private void RefreshDescentHold()
-        => _descent.Hold(_draggingSeparator || _panning || (Shell.IsKeyboardFocusWithin && !Shell.IsFocused));
+        => _descent.Hold(_draggingSeparator || _panning || _overZoomButtons || (Shell.IsKeyboardFocusWithin && !Shell.IsFocused));
 
     private void Land()
     {
@@ -665,6 +727,7 @@ internal partial class ComparisonPanel : UserControl
     /// <summary>Esc: jest parametresi tabana iner, panel bandına döner.</summary>
     internal void Descend()
     {
+        _hoverZoomMine = false;
         _gesture.Demote();
         Land();
         Surface.InvalidateVisual();

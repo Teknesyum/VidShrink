@@ -1,4 +1,4 @@
-namespace VidShrink.App.Playback;
+﻿namespace VidShrink.App.Playback;
 
 /// <summary>
 /// Panelin boy kademesi. Üç durum var ve üçü de tek jest parametresinden
@@ -137,8 +137,26 @@ internal sealed class ZoomGesture
     /// Tavanda ya da tabanda hiçbir şey değişmiyorsa <c>false</c> döner — tekerlek durur.
     /// </summary>
     internal bool Wheel(double notches, double anchorX, double anchorY)
+        => Apply(T + notches * NotchStep, anchorX, anchorY);
+
+    /// <summary>
+    /// T46/K5: doğrudan bir görüntü yakınlaştırmasına gider. Hedef parametre
+    /// <see cref="ContentZoom"/>'un tersinden türer, yani tavan değişirse hesap
+    /// kendiliğinden düzelir; çağıran taraf hiçbir sayı uydurmaz.
+    /// </summary>
+    internal bool ZoomTo(double contentZoom, double anchorX, double anchorY)
     {
-        var target = Clamp(T + notches * NotchStep, Floor, Ceiling);
+        if (_maxContentZoom <= 1.0 + Epsilon) return false;
+        return Apply((contentZoom - 1.0) / (_maxContentZoom - 1.0), anchorX, anchorY);
+    }
+
+    /// <summary>
+    /// Parametreyi taşıyan tek yol. Tekerlek de, doğrudan yakınlaştırma da buradan geçer;
+    /// iki giriş tek kaynağa yazsın diye ayrı bir gövde yok.
+    /// </summary>
+    private bool Apply(double value, double anchorX, double anchorY)
+    {
+        var target = Clamp(value, Floor, Ceiling);
         if (Same(target, T)) return false;
 
         var before = Scale;

@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:playback="using:VidShrink.App.Playback"
              x:Class="VidShrink.App.Playback.ComparisonPanel">
@@ -86,12 +86,23 @@
           ikisini üst üste değil alt alta koyar — şerit belirdiğinde okuma kaybolmaz.
         -->
         <StackPanel VerticalAlignment="Bottom">
-          <Border x:Name="ZoomBadge"
-                  Theme="{StaticResource PlaybackBadge}"
-                  HorizontalAlignment="Right"
-                  Margin="{StaticResource PlaybackBadgeMargin}">
-            <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
-          </Border>
+          <!--
+            T46/K3: yakınlaştırma okumasının yanında iki tıklama düğmesi. İkisi de
+            tekerleğin sürdüğü tek jest parametresini bir çentik oynatır; ayrı bir
+            yakınlaştırma durumu yoktur.
+          -->
+          <StackPanel x:Name="ZoomRow"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Spacing="{StaticResource PlaybackZoomButtonGap}"
+                      Margin="{StaticResource PlaybackBadgeMargin}">
+            <Button x:Name="BtnZoomOut" Content="-" Theme="{StaticResource PlaybackZoomButton}"/>
+            <Button x:Name="BtnZoomIn" Content="+" Theme="{StaticResource PlaybackZoomButton}"/>
+            <Border x:Name="ZoomBadge" Theme="{StaticResource PlaybackBadge}" VerticalAlignment="Center">
+              <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
+            </Border>
+          </StackPanel>
 
           <!-- Denetim şeridi. Yüzeyin üstünde, panelin alt kenarında durur. -->
           <playback:ControlStrip x:Name="Strip"/>
