@@ -1293,6 +1293,9 @@ public partial class MainWindow : Window
         RefreshPlanView();
         RefreshQualityPanels();
         BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
+
+        // T48/K1: plan tazelendi. Panel gecikmesini kendi kurar; burası yalnız haber verir.
+        _preview?.SetPlan(_info, ActivePlan, _profile);
     }
 
     /// <summary>
