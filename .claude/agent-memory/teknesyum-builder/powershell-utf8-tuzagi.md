@@ -17,8 +17,12 @@ Aynı tuzak `Out-File`, `>` ve `>>` için de geçerli.
 
 **How to apply:** Rapor eklemek, frontmatter alanı değiştirmek, `LOG.md`'ye satır atmak —
 hepsi Bash tarafından: `cat parca.md >> hedef.md`, `sed -i 's/^status: active$/status:
-submitted/' hedef.md`. Uzun metni önce scratchpad'e `Write` ile yaz, sonra `cat` ile
-ekle; heredoc'lar bu ortamda kırılabiliyor. PowerShell yalnız gerçekten PowerShell
+submitted/' hedef.md`. Heredoc **kullanma** — `bash <<'PY'` bu ortamda Türkçe metinde
+düzenli olarak `unexpected EOF` veriyor ve komut hiç çalışmıyor. Çok satırlı her
+düzenleme için: metni/betiği scratchpad'e `Write` ile yaz, sonra `python <betik.py>`
+ya da `cat parca.md >> hedef.md` ile uygula. Python betiğinde dosyayı
+`io.open(p, encoding='utf-8-sig')` ile aç, aynı kodlamayla geri yaz — kaynak dosyalarda
+BOM var, sözleşme ve LOG'da yok. PowerShell yalnız gerçekten PowerShell
 gereken iş için: `Parser::ParseFile` ile `.ps1` sözdizimi denetimi gibi. Yazdıktan sonra
 `grep -c 'Ã\|Ä\|Å' <dosya>` ile doğrula — 0 dönmeli.
 
