@@ -2,6 +2,7 @@ using VidShrink.App;
 using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Core.Playback;
+using VidShrink.Ffmpeg.Playback;
 
 namespace VidShrink.Tests;
 
@@ -200,6 +201,107 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         Assert.Null(host.ActiveClip);
         Assert.False(string.IsNullOrWhiteSpace(encoder.LastError));
         AppHost.Run(host.Dispose);
+    }
+
+    /// <summary>
+    /// K9: pencere sinirindaki oynatma boslugu. Panel bir pencereden otekine gecerken
+    /// <c>RestartCore</c> boruyu YENIDEN KURUYOR - eski surec olduruluyor, yenisi aciliyor,
+    /// ilk kare bekleniyor. Olcum tam bu ucunu kapsiyor ve ayni sirayla kosuyor; pencere
+    /// acilmiyor, kareler borudan dogrudan cekiliyor.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Pencere_sinirindaki_oynatma_boslugu_olculur()
+    {
+        Assert.True(_clips.Ready);
+        var dir = Temp();
+        using var encoder = new SegmentEncoder(dir);
+        var info = Source(_clips.Kaynak);
+
+        var once = await encoder.RequestAsync(info, TwoPassPlan(), 4);
+        var sonra = await encoder.RequestAsync(info, TwoPassPlan(), 6);
+        Assert.NotNull(once);
+        Assert.NotNull(sonra);
+        await Boslugu(once!, sonra!, "640x360 kaynak");
+
+        // 1080p kaynakta sol kesit kayipsiz ve cok daha buyuk; borunun acilisi da oyle olabilir.
+        var buyuk = Source(_clips.Buyuk);
+        var buyukOnce = await encoder.RequestAsync(buyuk, TwoPassPlan(), 4);
+        var buyukSonra = await encoder.RequestAsync(buyuk, TwoPassPlan(), 6);
+        Assert.NotNull(buyukOnce);
+        Assert.NotNull(buyukSonra);
+        await Boslugu(buyukOnce!, buyukSonra!, "1080p kaynak");
+    }
+
+    private static async Task Boslugu(PreviewClip once, PreviewClip sonra, string etiket)
+    {
+        var bosluklar = new List<double>();
+        for (var tur = 0; tur < 5; tur++)
+        {
+            var eski = Pipe(once);
+            await eski.StartAsync(Istek(once));
+            Assert.True(await IlkKare(eski), "ilk pencere kare vermedi");
+
+            // Panelin sinirda yaptigi is, ayni sirayla: Teardown -> yeni kaynak -> StartAsync
+            // -> ilk kare. Sayac kullanicinin gordugu son kareden baslar.
+            var saat = System.Diagnostics.Stopwatch.StartNew();
+            await Task.Run(eski.Dispose);
+            var yeni = Pipe(sonra);
+            await yeni.StartAsync(Istek(sonra));
+            var geldi = await IlkKare(yeni);
+            saat.Stop();
+            yeni.Dispose();
+
+            Assert.True(geldi, "ikinci pencere kare vermedi");
+            bosluklar.Add(saat.Elapsed.TotalMilliseconds);
+        }
+
+        Record($"K9 pencere sinirinda boru yeniden kurulmasi ({etiket}), ms: "
+            + string.Join(" ", bosluklar.Select(ms => ms.ToString("0"))));
+        Assert.All(bosluklar, ms => Assert.True(ms > 0));
+    }
+
+    private const int OlcumPanelWidth = 640;
+    private const int OlcumPanelHeight = 360;
+
+    private static PipeComparisonFrameSource Pipe(PreviewClip clip)
+    {
+        _ = clip;
+        return new PipeComparisonFrameSource();
+    }
+
+    private static ComparisonFrameRequest Istek(PreviewClip clip) => new()
+    {
+        LeftPath = clip.SourcePath,
+        RightPath = clip.EncodedPath,
+        PanelWidth = OlcumPanelWidth,
+        PanelHeight = OlcumPanelHeight,
+        Fps = 30,
+        Realtime = true,
+        Loop = false
+    };
+
+    /// <summary>Ilk kare gelene kadar bekler; kare iade edilir, havuz kurumaz.</summary>
+    private static async Task<bool> IlkKare(IComparisonFrameSource source)
+    {
+        var son = DateTime.UtcNow.AddSeconds(10);
+        while (DateTime.UtcNow < son)
+        {
+            if (source.TryTake(out var frame)) { source.Return(frame); return true; }
+            await Task.Delay(1);
+        }
+        return false;
+    }
+
+    /// <summary>Olcum ciktisi projenin kendi calisma klasorune iner; git'e sizmaz.</summary>
+    private static void Record(string line)
+    {
+        try
+        {
+            var dir = TestPaths.LiveOut("t48");
+            Directory.CreateDirectory(dir);
+            File.AppendAllText(Path.Combine(dir, "olcum.txt"), line + Environment.NewLine);
+        }
+        catch { }
     }
 
     /// <summary>K5: panel kapaninca gecici dosya kalmaz.</summary>
