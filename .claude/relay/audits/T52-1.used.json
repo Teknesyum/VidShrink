@@ -1,0 +1,25 @@
+{
+  "contractId": "T52",
+  "auditorRunId": "afbec09d7a88e9657",
+  "headSha": "3b425bf5bfb45980fb0846eaaad92dbe19a1d955",
+  "diffHash": "942b97cb4d80b6b6f1594f1ce8e942fcf534daef5f66db2185c520edbe6de0d2",
+  "owns": [
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs",
+    "tests/VidShrink.Tests/ChipTests.cs",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs",
+    "src/VidShrink.App/Playback/ZoomGesture.cs",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ZoomGestureTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release + dotnet test -c Release (696 gecti, 0 kaldi, 16 atlandi, toplam 712)",
+    "3b425bf birlesik ana dal",
+    ".calisma/dogrulama worktree"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T22:12:33.401Z",
+  "usedAt": "2026-08-27T22:12:33.461Z",
+  "completedSha": "3b425bf5bfb45980fb0846eaaad92dbe19a1d955"
+}
