@@ -171,16 +171,13 @@ public sealed class ChipTests
         Assert.Equal(token, height);
     }
 
-    /// <summary>
-    /// T46/K2: boş panel yükselirken plan paneli daralmadı — tavanı
-    /// <c>PlanPanelMaxHeight</c> (512) ve tasarım boyutunda hâlâ oraya varıyor.
-    /// </summary>
-    [Fact]
-    public void YuksekBosPanelPlanPaneliniDaraltmadi()
-    {
-        var height = Read(window => Named(window, "PlanPanel").Bounds.Height);
-        Assert.Equal(512, height);
-    }
+    // T52: burada "boş panel yükselirken plan paneli daralmadı" diyen bir ölçü vardı
+    // (YuksekBosPanelPlanPaneliniDaraltmadi, PlanPanel = 512 bekliyordu) ve silindi.
+    // İddiası bugün yanlış: oynatma panelinin taban boyu 256'dan 512'ye çıkınca aynı
+    // sütunda plan paneli 512'den 320'ye indi. Daralma T52'nin bilinçli sonucu, gerileme
+    // değil. Plan panelinin asıl korunması gereken yanı — içeriğinin panele sığması, yani
+    // gerekçelerin kırpılmadan görünmesi — PlanPaneliKatliykenKaymaz ile ölçülüyor ve o
+    // ölçü yeşil. Bu ölçü sabit bir sayıdan başka bir şey korumuyordu.
 
     /// <summary>
     /// T46/K6: gerekçeler katlıyken plan paneli tipik durumda kaymıyor. İki girdide de
