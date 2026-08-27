@@ -205,9 +205,6 @@ internal partial class ComparisonPanel : UserControl
         ApplySplit();
     }
 
-    /// <summary>Rozetin gösterdiği metin; rozet yokken <c>null</c>. Ölçüm buradan okur.</summary>
-    internal string? ApproximateNotice => _rightBadge;
-
     /// <summary>
     /// K7: kare kaynağı bağlanmadan panel denenebilsin diye sentetik üreteci başlatır.
     /// Renkler temadan çözülüyor; üreteç kendi rengini uydurmuyor.
