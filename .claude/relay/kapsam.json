@@ -806,7 +806,7 @@
   "src/VidShrink.App/Playback/PanelHost.cs": {
     "model": "claude-opus-5",
     "effort": "medium",
-    "t": "2026-08-27 10:09:00",
+    "t": "2026-08-27 10:49:43",
     "ajan": "builder"
   },
   ".claude/agent-memory/teknesyum-ui-builder/vidshrink-kaynak-kapatma-kilidi.md": {
@@ -1161,6 +1161,42 @@
     "model": "claude-opus-5",
     "effort": "medium",
     "t": "2026-08-27 10:09:00",
+    "ajan": "builder"
+  },
+  "k2.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:49:43",
+    "ajan": "builder"
+  },
+  "tests.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:49:43",
+    "ajan": "builder"
+  },
+  "k3fix.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:49:43",
+    "ajan": "builder"
+  },
+  "rapor.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:49:43",
+    "ajan": "builder"
+  },
+  "sonkosum.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:49:43",
+    "ajan": "builder"
+  },
+  ".claude/agent-memory/teknesyum-builder/olcum-dosyasi-buyur.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-27 10:49:43",
     "ajan": "builder"
   }
 }
