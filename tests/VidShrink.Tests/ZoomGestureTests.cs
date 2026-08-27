@@ -379,9 +379,9 @@ public class ZoomGestureTests
         Assert.True(gesture.AtFloor);
     }
 
-    /// <summary>Dugme yolu tekerlekle ayni centigi kullanir ve ayni parametreye yazar.</summary>
+    /// <summary>Wheel centik centik ilerler ve geri alir; dugme yolunun kaniti ComparisonPanelTests'te.</summary>
     [Fact]
-    public void TiklamaVeTekerlekAyniParametre()
+    public void WheelCentikCentikIlerlerVeGeriAlir()
     {
         var gesture = new ZoomGesture();
         gesture.Wheel(1, 0, 0);

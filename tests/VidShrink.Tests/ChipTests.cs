@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
@@ -94,7 +94,7 @@ public sealed class ChipTests
         Assert.Equal(label, first);
     }
 
-    private const string SamplePath = @"C:\Kayitlar	atil-cekimi-2160p60.mkv";
+    private const string SamplePath = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";
 
     /// <summary>
     /// Plan panelini en çok zorlayan gerçekçi hâl: 4K/60, uzun süre, büyük dosya.
@@ -120,7 +120,7 @@ public sealed class ChipTests
     /// <summary>Sıradan bir kayıt: 1080p30, bir dakika. Gerekçe listesi kısa olan hâl.</summary>
     private static VidShrink.Core.MediaInfo Modest() => new()
     {
-        FilePath = @"C:\Kayitlar	elefon-kaydi-1080p30.mp4",
+        FilePath = @"C:\Kayitlar\telefon-kaydi-1080p30.mp4",
         FileSizeBytes = 90L * 1024 * 1024,
         DurationSeconds = 62.0,
         Width = 1920,
