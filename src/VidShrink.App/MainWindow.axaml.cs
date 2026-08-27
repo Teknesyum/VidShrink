@@ -469,7 +469,6 @@ public partial class MainWindow : Window
         // Ağaç yürüyüşü panelin metnini de çevirir; panel kendi geçidinden geçirdiği son
         // hâli sonra yazar, bu yüzden çağrı yürüyüşten sonradır.
         _preview?.SetLanguage(turkish);
-        RefreshPreviewButton();
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshShareTarget();
@@ -1261,20 +1260,6 @@ public partial class MainWindow : Window
             TimeSpan.FromSeconds(_info.DurationSeconds),
             _info.Fps);
         if (!_preview.IsOpen) _preview.Open();
-        RefreshPreviewButton();
-    }
-
-    private void OnTogglePreview(object? sender, RoutedEventArgs e)
-    {
-        _preview?.Toggle();
-        RefreshPreviewButton();
-    }
-
-    private void RefreshPreviewButton()
-    {
-        if (_preview is null) return;
-        BtnPreview.Content = Localize(_preview.IsOpen ? "Close preview" : "Open preview");
-        BtnPreview.IsEnabled = _info is not null;
     }
 
     private static CodecPreference CodecFromIndex(int index) => index switch

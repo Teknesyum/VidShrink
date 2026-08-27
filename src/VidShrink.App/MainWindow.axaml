@@ -458,15 +458,7 @@
               <Grid Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceLg}">
 
                 <StackPanel Grid.Row="0" Spacing="{StaticResource SpaceMd}">
-                  <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="Preview" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                    <Button Grid.Column="1"
-                            x:Name="BtnPreview"
-                            Content="Open preview"
-                            Theme="{StaticResource GhostButton}"
-                            auto:AutomationProperties.Name="Preview"
-                            Click="OnTogglePreview"/>
-                  </Grid>
+                  <TextBlock Text="Preview" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                   <playback:ComparisonPanel x:Name="Preview"/>
                 </StackPanel>
 

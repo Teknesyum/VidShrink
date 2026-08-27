@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using VidShrink.Core.Playback;
@@ -117,16 +117,11 @@ internal sealed class PanelHost : IDisposable
         _open = false;
         _panel.SetCompact(true);
         _panel.SetRightNotice(null);
-        _panel.SetNotice(_left is null ? null : "Open the preview to play the file");
+        _panel.SetNotice(null);
         // Configure panoyu boşaltır: kapalı panel son kareyi donuk göstermez, boş duruma döner.
         if (_panelSize.Width > 0) _panel.Frames.Configure(new PixelSize(_panelSize.Width * 2, _panelSize.Height));
         _panel.Controls.IsPlaying = false;
         _panel.RefreshEmptyState();
-    }
-
-    internal void Toggle()
-    {
-        if (_open) Close(); else Open();
     }
 
     internal void SetLanguage(bool turkish)
