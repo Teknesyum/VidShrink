@@ -1,0 +1,19 @@
+{
+  "contractId": "T57",
+  "auditorRunId": "af88fc5e034866342",
+  "headSha": "5da42f8cce3cf2ba4df1b0c909866543cb6c6d7f",
+  "diffHash": "7ac091efb5a224b93d1f177538c5f58f4d238745d404a90a126761a9bcda1c7e",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/QualityTargetTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release + dotnet test -c Release (677 gecti, 0 kaldi, 16 atlandi, toplam 693)",
+    "5da42f8 birlesik ana dal",
+    ".calisma/dogrulama worktree"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T21:36:45.574Z",
+  "usedAt": "2026-08-27T21:36:45.633Z",
+  "completedSha": "5da42f8cce3cf2ba4df1b0c909866543cb6c6d7f"
+}
