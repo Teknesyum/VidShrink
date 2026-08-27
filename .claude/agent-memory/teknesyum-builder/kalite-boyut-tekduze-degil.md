@@ -15,9 +15,12 @@ ve `PickAudio` ses butcesi basamakli. Daha buyuk hedef, daha kotu puanlayan bir 
 satin alabiliyor.
 
 **How to apply:** Bu egri uzerinde arama yazarken duz ikiye bolme kullanma - ucurumun
-yanlis tarafindan cevap verir. Calisan kalip (T57, `TargetMbForQuality`): logaritmik
-kaba tarama ilk gecisi kusatir, ikiye bolme yalniz kusak icinde kosar. `BuildDetailed`
-bu makinede ~0,18 ms, 25 cagri ~4,5 ms - kaydiricida her adimda kosturulabilir.
+yanlis tarafindan cevap verir. Ama **kaba izgara da yetmiyor**: tepe iki izgara noktasi
+arasinda kalirsa tarama onu atlar ve bir sonraki kusaktan cevap verir. T57 tur 1'de tam
+bu oldu, denetim kaldirdi. Izgara adimini olcerek sec - ince izgarayla (0,15%) bulunan
+gercege karsi: 31% adim x3,833, 10% ve 5% x1,245, 2% x1,112, 1% x1,002, 0,5% x1,000.
+Calisan kalip: tabandan 0,5% adimlarla yuru, ilk geciste dur. `BuildDetailed` ~0,18 ms,
+en kotu 1315 cagri ~240 ms.
 Kalite tabani `MinVideoBitrateK`*sure, tavani kaynak*`SourceSizeCap`; kisa kliplerde
 taban zaten 70+ puan veriyor, yani 60/100 istegi cogu kaynakta ulasilamaz ve bunu
 sessizce kirpmak yerine bildirmek gerekiyor.
