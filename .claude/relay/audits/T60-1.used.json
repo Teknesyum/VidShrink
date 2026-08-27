@@ -1,0 +1,20 @@
+{
+  "contractId": "T60",
+  "auditorRunId": "a7fe18f9f89618e81",
+  "headSha": "83e62638f46e7b01c927c4b81e7f9aee3297527e",
+  "diffHash": "19b9e7e3b877b6acaee66365c35c0a01fb6c6cd0e7cfbc90c4727efcf4e77e36",
+  "owns": [
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "tests/VidShrink.Tests/FpsDropTests.cs",
+    "tests/VidShrink.Tests/FfmpegArgumentsTests.cs"
+  ],
+  "verification": [
+    "dotnet build -c Release + dotnet test -c Release (695 gecti, 0 kaldi, 16 atlandi, toplam 711)",
+    "83e6263 birlesik ana dal",
+    ".calisma/dogrulama worktree"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-27T21:57:24.584Z",
+  "usedAt": "2026-08-27T21:57:24.645Z",
+  "completedSha": "83e62638f46e7b01c927c4b81e7f9aee3297527e"
+}
