@@ -871,9 +871,9 @@
   },
   "tests/VidShrink.Tests/WindowLayoutTests.cs": {
     "model": "claude-opus-5",
-    "effort": "medium",
-    "t": "2026-08-27 22:21:57",
-    "ajan": "ui-builder"
+    "effort": "high",
+    "t": "2026-08-25 20:36:22",
+    "ajan": "ana oturum"
   },
   ".calisma/probeplan/probeplan.csproj": {
     "model": "claude-opus-5",
@@ -1257,6 +1257,120 @@
     "model": "claude-opus-5",
     "effort": "medium",
     "t": "2026-08-27 20:49:49",
+    "ajan": "builder"
+  },
+  "src/VidShrink.Core/PerformanceCheck.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  "src/VidShrink.Ffmpeg/PerformanceProbe.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  "tests/VidShrink.Tests/PerformanceCheckTests.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/olc.ps1": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/olc2.ps1": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/harness/harness.csproj": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/harness/Program.cs": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/rapor-ek.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/log-satiri.txt": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/sorun-satiri.txt": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".claude/agent-memory/teknesyum-builder/islemci-zamani-sayaci-bozuk.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".claude/agent-memory/teknesyum-builder/worktree-silme-ve-dotnet-run-engeli.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/yeni-saf-testler.txt": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/yamala.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/yamala2.py": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/rapor2.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/log2.txt": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".calisma/t63/sorun2.txt": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
+    "ajan": "builder"
+  },
+  ".claude/agent-memory/teknesyum-builder/silinen-tani-kosumu-kanit-degil.md": {
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "t": "2026-08-28 09:08:15",
     "ajan": "builder"
   },
   "pin-degisti-docstring-degismedi.md": {
