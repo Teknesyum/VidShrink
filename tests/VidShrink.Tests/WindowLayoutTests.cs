@@ -164,7 +164,7 @@ public sealed class WindowLayoutTests
                 blocks.Count(InPerformancePanel),
                 blocks
                     .Where(Clips)
-                    .Select(block => $"{header}: {(block.Text ?? "(boş)").Split('\n')[0]}")
+                    .Select(block => $"{header}: {(block.Text ?? "(boş)").Split('\n')[0]} :: {Trace(block)}")
                     .ToList()));
         }
 
@@ -172,21 +172,42 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Metin, istediği genişlikten dar yerleştirildiyse kırpılmıştır.
-    /// <see cref="Layoutable.DesiredSize"/> kenar boşluğunu içeriyor,
-    /// <see cref="Visual.Bounds"/> içermiyor; karşılaştırmadan önce boşluk düşülüyor, yoksa
-    /// yanı boşluklu her denetim kırpılmış görünür.
+    /// Bir metin bloğu, ait olduğu kaydırma taşıyıcısının görüş alanının dışına taşıyorsa
+    /// kırpılmıştır. Sayfa taşıyıcılarında yatay kaydırma kapalı; görüş alanının dışında
+    /// kalan piksel kaydırılarak da getirilemez, kesilir.
     ///
-    /// <para>T65'te ölçüldü ve <b>ölçüt kırmızıya dönmüyor</b>: Avalonia bir denetimi
-    /// istediğinden dar yerleştirmiyor, sarmayan uzun metnin isteği de ölçüm sırasında
-    /// verilen genişliğe kırpılıyor — iki sayı taşan metinde bile eşit çıkıyor. Yerine
-    /// konacak ölçüt, bloğun sağ kenarını sayfa taşıyıcısının görüş alanıyla karşılaştıran
-    /// ölçüttür; o ölçüt denendiğinde ipucu düğmesinin kaydırma çubuğu genişliği kadar
-    /// dışarı taştığı görüldü ve düzeltmesi <c>MainWindow.axaml</c>'e düşüyor — bu
-    /// sözleşmenin kapsamı dışında. Ayrıntı T65 raporunda.</para>
+    /// <para>Ölçüt bloğun sağ kenarını taşıyıcının uzayına çevirip
+    /// <see cref="ScrollViewer.Viewport"/> genişliğiyle karşılaştırıyor. Bunun yerine
+    /// <see cref="Layoutable.DesiredSize"/> ile <see cref="Visual.Bounds"/> genişliğini
+    /// karşılaştırmak <b>işe yaramaz</b> ve bir daha denenmemeli: Avalonia bir denetimi
+    /// istediğinden dar yerleştirmiyor, <c>Bounds</c> en az <c>DesiredSize</c> kadar
+    /// oluyor; sarmayan uzun metnin isteği de ölçüm sırasında verilen genişliğe kırpılıyor.
+    /// İki sayı kasten taşırılmış metinde bile eşit çıkar, ölçü hep yeşil kalır. T65'te
+    /// ölçüldü, ayrıntı raporda.</para>
     /// </summary>
     private static bool Clips(TextBlock block)
-        => block.DesiredSize.Width - block.Margin.Left - block.Margin.Right > block.Bounds.Width + 0.5;
+    {
+        if (block.FindAncestorOfType<ScrollViewer>() is not { } viewer) return false;
+        if (block.TranslatePoint(new Point(block.Bounds.Width, 0), viewer) is not { } right) return false;
+
+        return right.X > viewer.Viewport.Width + 0.5;
+    }
+
+    /// <summary>
+    /// Kırpılan bloğun nerede taştığını gösterir: sağ kenarı, taşıyıcının görüş alanı ve
+    /// bloktan taşıyıcıya kadar olan denetim zinciri genişlikleriyle. Kırmızı bir ölçüm
+    /// bu satır olmadan hangi kutunun taştığını söylemiyor.
+    /// </summary>
+    private static string Trace(TextBlock block)
+    {
+        var viewer = block.FindAncestorOfType<ScrollViewer>()!;
+        var right = block.TranslatePoint(new Point(block.Bounds.Width, 0), viewer)!.Value;
+        var chain = block.GetVisualAncestors().OfType<Control>().TakeWhile(node => node != viewer)
+            .Select(node => $"{node.GetType().Name}{(string.IsNullOrEmpty(node.Name) ? string.Empty : "#" + node.Name)}[{node.Bounds.Width:0}]");
+
+        return $"sağ kenar {right.X:0.#}, görüş alanı {viewer.Viewport.Width:0.#} | "
+             + string.Join(" < ", chain);
+    }
 
     private static bool InPerformancePanel(TextBlock block)
         => block.GetVisualAncestors().OfType<Border>().Any(border => border.Name == "PerformancePanel");
