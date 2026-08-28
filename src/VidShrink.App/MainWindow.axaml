@@ -187,7 +187,7 @@
         <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}">
 
         <TabItem Header="Shrink" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
               <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceLg}">
@@ -485,7 +485,7 @@
                       MaxHeight="{StaticResource PlanPanelMaxHeight}">
                 <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
                   <TextBlock Grid.Row="0" Text="What it will do" Theme="{StaticResource H2}"/>
-                  <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                  <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
                     <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
                       <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="Load a file and every decision the engine makes is listed here."/>
                       <Grid x:Name="PlanFacts" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
@@ -554,14 +554,14 @@
                       </StackPanel>
 
                       <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
-                        <StackPanel Orientation="Horizontal">
-                          <TextBlock x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource OutFactLabel}"/>
-                          <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated time">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Grid.Column="0" x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="Estimated time">
                             <ToolTip.Tip>
                               <TextBlock Theme="{StaticResource TipText}" Text="• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.&#10;• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.&#10;• When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."/>
                             </ToolTip.Tip>
                           </Button>
-                        </StackPanel>
+                        </Grid>
                         <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource OutFactValue}">
                           <TextBlock.Transitions>
                             <Transitions>
@@ -573,14 +573,14 @@
                       </StackPanel>
 
                       <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceXs}">
-                        <StackPanel Orientation="Horizontal">
-                          <TextBlock x:Name="LblEstimate" Text="Estimated output" Theme="{StaticResource OutFactLabel}"/>
-                          <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Estimated output">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="Estimated output" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="Estimated output">
                             <ToolTip.Tip>
                               <TextBlock Theme="{StaticResource TipText}" Text="• Before planning, VidShrink encodes short samples of this clip at two resolutions and measures how many bits it needs — it does not guess from the source bitrate.&#10;• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.&#10;• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see."/>
                             </ToolTip.Tip>
                           </Button>
-                        </StackPanel>
+                        </Grid>
                         <TextBlock x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource OutFactValue}">
                           <TextBlock.Transitions>
                             <Transitions>
@@ -651,7 +651,7 @@
         </TabItem>
 
         <TabItem Header="Convert" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
 
               <Border Grid.Column="0" Theme="{StaticResource Panel}" VerticalAlignment="Top">
@@ -886,7 +886,7 @@
         </TabItem>
 
         <TabItem Header="Settings" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="SharePanel" Theme="{StaticResource Panel}">
@@ -947,7 +947,7 @@
         </TabItem>
 
         <TabItem Header="About" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer x:Name="PageAbout" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageAbout" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Border Theme="{StaticResource Panel}" Margin="{StaticResource SectionMargin}">
               <StackPanel Spacing="{StaticResource SpaceMd}">
                 <TextBlock Text="About VidShrink" Theme="{StaticResource H2}"/>
@@ -972,7 +972,7 @@
         </TabItem>
 
           <TabItem Header="Advanced" Theme="{StaticResource NeonTabItem}">
-          <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
