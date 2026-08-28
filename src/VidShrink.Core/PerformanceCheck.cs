@@ -10,9 +10,10 @@ namespace VidShrink.Core;
 ///
 /// <paramref name="CpuMs"/> işletim sisteminin sürece yazdığı işlemci zamanı
 /// (<c>TotalProcessorTime</c>). Kayıt olarak duruyor, karar buna bağlı değil: bu sayaç
-/// her makinede doğru okumuyor, bu makinede ölçüldü ve gerçeğin 1/2,7 ile 1/12'si
-/// arasında değişen bir kısmını yazıyor.
-/// <see cref="PerformanceCheckResult.CpuAccountingFactor"/> o sapmayı taşır.
+/// her makinede doğru okumuyor. Sapma her koşuda yeniden ölçülür ve
+/// <see cref="PerformanceCheckResult.CpuAccountingFactor"/> ile taşınır; bu makinede
+/// ölçülen düzeltme katsayıları 3,2x ile 24x arasında çıktı
+/// (<c>.calisma/t63/olcum.txt</c> satır 1, 13-15, 19, 27, 39-41, 45).
 /// </summary>
 public sealed record EncoderCost(
     string Codec,
@@ -215,10 +216,22 @@ public static class PerformanceCheck
         var hwSingle = Usable(hardwareSingleThread);
         var hwFree = Usable(hardwareFreeThreads);
 
-        if (sw is null && hwSingle is null)
-            return PerformanceCheckResult.NotMeasured;
-
         var cores = Math.Max(1, logicalCores);
+        var budgetSpent = budgetMs > 0 && elapsedMs > budgetMs;
+
+        // Hicbir bacak olculemediyse karar yok, ama sebebi var: butce dolduysa
+        // kullanici sebepsiz "olculemedi" gormemeli, bunu bilmeli.
+        if (sw is null && hwSingle is null)
+        {
+            var bos = new List<PerformanceFinding> { new(PerformanceFindingCode.NotMeasured) };
+            if (budgetSpent)
+                bos.Add(new PerformanceFinding(
+                    PerformanceFindingCode.BudgetExhausted, WallMs: elapsedMs, BudgetMs: budgetMs));
+            return new PerformanceCheckResult(
+                RecordingImpact.Unknown, string.Empty, string.Empty, 0, 0, cores, elapsedMs,
+                cpuAccountingFactor, bos);
+        }
+
         var findings = new List<PerformanceFinding>();
 
         var notCpuBound = false;
@@ -292,7 +305,7 @@ public static class PerformanceCheck
                 PerformanceFindingCode.CpuAccountingUnreliable,
                 Factor: cpuAccountingFactor));
 
-        if (budgetMs > 0 && elapsedMs > budgetMs)
+        if (budgetSpent)
             findings.Add(new PerformanceFinding(
                 PerformanceFindingCode.BudgetExhausted,
                 WallMs: elapsedMs,

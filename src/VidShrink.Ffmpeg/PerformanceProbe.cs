@@ -15,10 +15,10 @@ namespace VidShrink.Ffmpeg;
 /// değişmez.
 ///
 /// Süreç işlemci zamanı (<c>TotalProcessorTime</c>) da okunur ve sonuca yazılır, ama
-/// karar ona bağlı değil: bu sayaç her makinede doğru değil. Ölçüldü — bu makinede
-/// iki saniye boyunca tek bir çekirdeği doldurmuş bir iş parçacığına 0,34 saniye
-/// yazıyor, yani gerçeğin kabaca altıda birini. Sapma <see cref="CalibrateCpuClock"/>
-/// ile her koşuda yeniden ölçülür ve sonuçla birlikte bildirilir.
+/// karar ona bağlı değil: bu sayaç her makinede doğru değil. Sapma
+/// <see cref="CalibrateCpuClock"/> ile her koşuda yeniden ölçülür ve sonuçla birlikte
+/// bildirilir; bu makinede ölçülen on okumanın hepsi sayacın eksik okuduğunu gösterdi
+/// (<c>.calisma/t63/olcum.txt</c> satır 1, 13-15, 19, 27, 39-41, 45).
 /// </summary>
 public static class PerformanceProbe
 {
@@ -92,11 +92,11 @@ public static class PerformanceProbe
             Directory.CreateDirectory(directory);
             var sample = Path.Combine(directory, "ornek.mp4");
             if (!await GenerateSampleAsync(sample, Remaining(total, budgetMs), ct).ConfigureAwait(false))
-                return PerformanceCheckResult.NotMeasured;
+                return Incomplete(logicalCores, total, budgetMs, hardwareCodec, cpuFactor);
 
             var baseline = await MeasureAsync(sample, null, true, Remaining(total, budgetMs), ct).ConfigureAwait(false);
             if (!baseline.Succeeded)
-                return PerformanceCheckResult.NotMeasured;
+                return Incomplete(logicalCores, total, budgetMs, hardwareCodec, cpuFactor);
 
             if (hardwareCodec is not null && Remaining(total, budgetMs) > 0)
             {
@@ -117,11 +117,11 @@ public static class PerformanceProbe
         }
         catch (OperationCanceledException)
         {
-            return PerformanceCheckResult.NotMeasured;
+            return Incomplete(logicalCores, total, budgetMs, hardwareCodec, cpuFactor);
         }
         catch
         {
-            return PerformanceCheckResult.NotMeasured;
+            return Incomplete(logicalCores, total, budgetMs, hardwareCodec, cpuFactor);
         }
         finally
         {
@@ -133,6 +133,18 @@ public static class PerformanceProbe
             software, hardwareSingle, hardwareFree,
             logicalCores, total.ElapsedMilliseconds, budgetMs, hardwareCodec is not null, cpuFactor);
     }
+
+    /// <summary>
+    /// Ölçüm yarıda kaldı. Kararı yine <see cref="PerformanceCheck.Evaluate"/> üretir,
+    /// çünkü sebebi o biliyor: bütçe dolduysa sonuç
+    /// <see cref="PerformanceFindingCode.BudgetExhausted"/> taşır ve kullanıcı
+    /// sebepsiz "ölçülemedi" görmez.
+    /// </summary>
+    private static PerformanceCheckResult Incomplete(
+        int logicalCores, Stopwatch total, long budgetMs, string? hardwareCodec, double cpuFactor)
+        => PerformanceCheck.Evaluate(
+            null, null, null, logicalCores, total.ElapsedMilliseconds, budgetMs,
+            hardwareCodec is not null, cpuFactor);
 
     /// <summary>
     /// Kodlayıcı geçişinden taban çözme geçişini düşer. Her iki geçiş de aynı klibi

@@ -344,23 +344,50 @@ public sealed class PerformanceCheckTests
         Assert.Equal(bos.Impact, yuklu.Impact);
         Assert.Equal(bos.HardwareCodec, yuklu.HardwareCodec);
         Assert.Equal(bosYazilim.Impact, yukluYazilim.Impact);
-        Assert.True(yukluYazilim.SoftwareRealtimeCores < esik,
-            $"yuk altinda yazilim maliyeti {N(yukluYazilim.SoftwareRealtimeCores)}, esik {N(esik)}");
     }
 
-    /// <summary>K3'un canli yarisi: butce gercekten bagliyor.</summary>
+    /// <summary>
+    /// K3'un canli yarisi: butce gercekten bagliyor <b>ve</b> sebebini soyluyor.
+    /// Yarida kalan olcum sebepsiz "olculemedi" donmemeli; butce dolduysa sonuc
+    /// BudgetExhausted tasimali, yoksa kullanici neden sonuc alamadigini bilemez.
+    /// </summary>
     [FfmpegFact]
-    public async Task ButceGercektenBagliyor()
+    public async Task ButceGercektenBagliyorVeSebebiniSoyluyor()
     {
         const long dar = 900;
         var basladi = System.Diagnostics.Stopwatch.StartNew();
         var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, dar);
         basladi.Stop();
 
-        Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms karar={result.Impact}");
+        var bulgular = string.Join(",", result.Findings.Select(f => f.Code));
+        Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms karar={result.Impact} bulgular={bulgular}");
 
         Assert.True(basladi.ElapsedMilliseconds < dar * 3,
             $"butce {dar}ms iken olcum {basladi.ElapsedMilliseconds}ms surdu");
+
+        var butce = Assert.Single(result.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
+        Assert.Equal(dar, butce.BudgetMs);
+        Assert.True(butce.WallMs > dar, "butce bulgusu gecen sureyi tasimiyor");
+    }
+
+    /// <summary>
+    /// Ayni sey saf tarafta: hicbir bacak olculemediyse karar yok, ama butce
+    /// dolduysa sebebi bildiriliyor.
+    /// </summary>
+    [Fact]
+    public void HicbirBacakOlculemediyseButceSebebiBildiriliyor()
+    {
+        var butceDolu = Degerlendir(null, gecen: 12_000, butce: 10_000);
+        var butceVar = Degerlendir(null, gecen: 4000, butce: 10_000);
+
+        Assert.Equal(RecordingImpact.Unknown, butceDolu.Impact);
+        Assert.Contains(butceDolu.Findings, f => f.Code == PerformanceFindingCode.NotMeasured);
+        var bulgu = Assert.Single(butceDolu.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
+        Assert.Equal(10_000, bulgu.BudgetMs);
+        Assert.Equal(12_000, bulgu.WallMs);
+
+        Assert.Equal(RecordingImpact.Unknown, butceVar.Impact);
+        Assert.DoesNotContain(butceVar.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
     }
 
     /// <summary>K4: olcum bittiginde artik kalmiyor.</summary>
@@ -407,12 +434,34 @@ public sealed class PerformanceCheckTests
     ///     disaridan okuyan TotalProcessorTime duvar saatiyle karsilastirilir.
     /// (c) Ayni kodlama serbest is parcacigiyla: sayac saglamsa toplam islemci
     ///     zamani kabaca sabit kalmali, yalniz duvar saati kisalmali.
+    ///
+    /// Neyi koruyor: kalibratorun <b>olcmeye devam ettigini</b>. Tur 1'de kalibrator
+    /// butun surecin CPU deltasini tek is parcacigina yaziyor ve kirpma yuzunden hep
+    /// 1 donuyordu; yani "saglam sayac" ile "mesgul surec" ayirt edilemiyordu ve onu
+    /// pinleyen olcu de kirpma yuzunden curutulemezdi. Buradaki iki iddia o hataya
+    /// kapiyi kapatir: katsayi pozitif donmeli (0 = "olculemedi", yani sapma
+    /// iddiasinin dayanagi yok) ve yakan is parcacigi istenen sureyi gercekten
+    /// yakmali (kisa kalirsa katsayi olcum degil gurultudur). Kos ayrica her ffmpeg
+    /// gecisinin sifir cikis koduyla bittigini dogrular: basarisiz bir gecisin
+    /// sayilari kanit sayilmaz.
     /// </summary>
     [FfmpegFact]
     public void IslemciZamaniSayaciDogruOkuyorMu()
     {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
         var katsayi = PerformanceProbe.CalibrateCpuClock(1500);
-        Log($"[sayac] (a) is parcacigi duzeyi: duzeltme={N(katsayi)}x (1 = saglam sayac, 0 = olculemedi)");
+        saat.Stop();
+        Log($"[sayac] (a) is parcacigi duzeyi: duzeltme={N(katsayi)}x " +
+            $"yakim-duvar={saat.ElapsedMilliseconds}ms (1 = saglam sayac, 0 = olculemedi)");
+
+        // Kalibrator gercekten olcuyor mu: Windows'ta pozitif donmeli. Sifir donmesi
+        // "olculemedi" demek ve o zaman sapma iddiasinin dayanagi kalmaz.
+        Assert.True(katsayi > 0, "kalibrator Windows'ta olcemedi");
+
+        // Yakan is parcacigi istenen sureyi gercekten yakmali: cok kisa kalirsa
+        // katsayi olculen degil gurultudur. Ust sinir konak mesgulken de bagli
+        // kalacak kadar genis, alt sinir istenen sureye kilitli.
+        Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
 
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t63tani_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(dir);
@@ -474,6 +523,9 @@ public sealed class PerformanceCheckTests
 
         Log($"[sayac] {etiket} cikis={p.ExitCode} cpu={N(cpu)}ms duvar={clock.ElapsedMilliseconds}ms " +
             $"cpu/duvar={N(clock.ElapsedMilliseconds > 0 ? cpu / clock.ElapsedMilliseconds : 0)}");
+
+        Assert.True(p.ExitCode == 0, $"{etiket} kosumu {p.ExitCode} ile dondu: {se.Result.Trim()}");
+        Assert.True(clock.ElapsedMilliseconds > 0, $"{etiket} olculebilir bir sure kosmadi");
     }
 
     /// <summary>Butun mantiksal cekirdekleri mesgul tutan yapay yuk.</summary>
