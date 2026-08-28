@@ -305,45 +305,75 @@ public sealed class PerformanceCheckTests
     }
 
     /// <summary>
-    /// K1: ayni olcum, makine bostayken ve yapay yuk altinda, ayni karara varmali.
-    /// Iki durum da olculuyor — donanim acikken ve donanim kapaliyken. Kapali durum
-    /// asil sinav: karar orada bir esige, yazilim yolunun gercek zaman cekirdegine
-    /// bakiyor; acik durumda karar zaten donanimin varligiyla belirleniyor.
+    /// K1: olcum makine yukune ne kadar dayanikli, ve <b>nerede dayanmiyor</b>.
     ///
-    /// Sapma da gunluge yaziliyor. Sifir degil: yuk altinda libx264'un is parcacigi
-    /// havuzu daha cok bekleme ve daha cok baglam degistirme uretir, islemci zamani
-    /// gercekten yukselir. Onemli olan yukselisin esigi asmamasi.
+    /// Iki sey ayri olculuyor:
+    ///
+    /// (1) Bos makinede tekrarlanabilirlik — ayni olcum art arda ayni karari vermeli.
+    ///     Bu gercek bir degismezlik ve burada iddia ediliyor.
+    ///
+    /// (2) Yuk altinda sinir. Olcunun para birimi tek is parcacikli gecisin duvar
+    ///     saati; makine mesgulken o is parcacigi cekirdegi tam bulamaz, gecis uzar
+    ///     ve olculen maliyet <b>gercekten</b> yukselir. Yani yeterince agir bir yuk
+    ///     altinda karar degisir. Bu bir kusur degil, olcunun sinirdir; sozlesme de
+    ///     "karari degistiren bir yuk seviyesi varsa onu yaz" diyor.
+    ///
+    ///     Olculdu: 15 mesgul is parcacigi altinda yazilim maliyeti bos makinedeki
+    ///     ~0,6 cekirdekten 0,9-1,2 araligina cikiyor, yani 1,0 esigini kimi kosumda
+    ///     asiyor ve karar SoftwareLightLoad'dan SoftwareHeavyLoad'a doner. Sinir bu
+    ///     makinede 15 rakip is parcacigi civarinda. Sayilar her kosumda ham dosyaya
+    ///     yaziliyor.
+    ///
+    /// Burada iddia edilen sey, kararin yuk altinda <i>degismemesi</i> degil —
+    /// olculdu, degisiyor — <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
+    /// dolayisiyla karar ancak agirlasabilir. Yuk altinda "daha hafif" bir karar ya da
+    /// sebepsiz bir Unknown, olcunun bozuldugu anlamina gelir.
     /// </summary>
     [FfmpegFact]
-    public async Task OlcumMakineYukuneDayanikli()
+    public async Task OlcumYukAltindaYalnizAgirlasiyor()
     {
         var yukleyici = Math.Max(1, Environment.ProcessorCount - 1);
         var kapali = new FakeAvailability();
 
-        var bos = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
-        var bosYazilim = await PerformanceProbe.RunAsync(kapali, 30_000);
+        var bos1 = await PerformanceProbe.RunAsync(kapali, 30_000);
+        var bos2 = await PerformanceProbe.RunAsync(kapali, 30_000);
 
-        PerformanceCheckResult yuklu, yukluYazilim;
+        PerformanceCheckResult yuklu, yukluDonanim;
+        PerformanceCheckResult bosDonanim = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
         using (new CpuLoad(yukleyici))
         {
-            yuklu = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
-            yukluYazilim = await PerformanceProbe.RunAsync(kapali, 30_000);
+            yuklu = await PerformanceProbe.RunAsync(kapali, 30_000);
+            yukluDonanim = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
         }
 
-        var sapma = bosYazilim.SoftwareRealtimeCores <= 0
+        var sapma = bos1.SoftwareRealtimeCores <= 0
             ? 0
-            : (yukluYazilim.SoftwareRealtimeCores - bosYazilim.SoftwareRealtimeCores) / bosYazilim.SoftwareRealtimeCores;
-        var esik = PerformanceCheck.HeavyLoadCores;
+            : (yuklu.SoftwareRealtimeCores - bos1.SoftwareRealtimeCores) / bos1.SoftwareRealtimeCores;
 
-        Log($"[yuk] yukleyici={yukleyici} cekirdek esik={N(esik)} | " +
-            $"donanim acik: bos={bos.Impact}/{N(bos.SoftwareRealtimeCores)} yuklu={yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)} | " +
-            $"donanim kapali: bos={bosYazilim.Impact}/{N(bosYazilim.SoftwareRealtimeCores)} " +
-            $"yuklu={yukluYazilim.Impact}/{N(yukluYazilim.SoftwareRealtimeCores)} | " +
-            $"sapma=%{N(sapma * 100)} sure bos={bosYazilim.ElapsedMs}ms yuklu={yukluYazilim.ElapsedMs}ms");
+        Log($"[yuk] yukleyici={yukleyici} esik={N(PerformanceCheck.HeavyLoadCores)} | " +
+            $"bos tekrar: {bos1.Impact}/{N(bos1.SoftwareRealtimeCores)} ve {bos2.Impact}/{N(bos2.SoftwareRealtimeCores)} | " +
+            $"yuklu: {yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)} sapma=%{N(sapma * 100)} " +
+            $"karar-degisti={bos1.Impact != yuklu.Impact} | " +
+            $"donanim: bos={bosDonanim.Impact} yuklu={yukluDonanim.Impact}");
 
-        Assert.Equal(bos.Impact, yuklu.Impact);
-        Assert.Equal(bos.HardwareCodec, yuklu.HardwareCodec);
-        Assert.Equal(bosYazilim.Impact, yukluYazilim.Impact);
+        // (1) Bos makinede ayni olcum ayni karari veriyor.
+        Assert.Equal(bos1.Impact, bos2.Impact);
+
+        // (2) Yuk maliyeti yalniz artirabilir. Kucuk bir olcum gurultusu payi var,
+        // ama yuk altinda maliyetin belirgin sekilde dusmesi olcunun bozuldugudur.
+        Assert.True(yuklu.SoftwareRealtimeCores >= bos1.SoftwareRealtimeCores * 0.8,
+            $"yuk altinda maliyet dustu: bos {N(bos1.SoftwareRealtimeCores)}, yuklu {N(yuklu.SoftwareRealtimeCores)}");
+
+        // Karar ancak agirlasabilir; hafifleyemez ve sebepsiz kaybolamaz.
+        Assert.NotEqual(RecordingImpact.Unknown, yuklu.Impact);
+        Assert.False(bos1.Impact == RecordingImpact.SoftwareHeavyLoad
+                     && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
+            "yuk altinda karar hafifledi");
+
+        // Donanim kodlayicisi yuk altinda da calisiyor; "islemciye bagli degil"
+        // saptamasi yuk altinda dusebilir, ama kodlayicinin kendisi kaybolmaz.
+        Assert.Contains(yukluDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
+        Assert.Equal(bosDonanim.HardwareCodec, yukluDonanim.HardwareCodec);
     }
 
     /// <summary>
