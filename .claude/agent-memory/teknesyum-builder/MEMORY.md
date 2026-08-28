@@ -11,3 +11,4 @@
 - [Islemci zamani sayaci bozuk](islemci-zamani-sayaci-bozuk.md) — TotalProcessorTime 3-7 kat eksik okuyor; kalibrasyonu is parcacigi duzeyinde al
 - [Worktree silme ve dotnet run engeli](worktree-silme-ve-dotnet-run-engeli.md) — dotnet run ekran kapisina takilir, rm -rf reddedilir; tani duzenegini gecici teste koy
 - [Silinen tani kosumu kanit degil](silinen-tani-kosumu-kanit-degil.md) — zorunlu olcuyu terk ediyorsan gerekce ham dosyada dursun; iskeleyi silme, kalici olcuye cevir
+- [Avalonia kırpılma ölçütü](avalonia-kirpilma-olcutu.md) — DesiredSize>Bounds ölçütü hiç kırmızıya dönmez; sekme değişince RelayoutAt şart
