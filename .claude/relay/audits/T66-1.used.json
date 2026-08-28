@@ -1,0 +1,21 @@
+{
+  "contractId": "T66",
+  "auditorRunId": "a14b84776fd8fd5de",
+  "headSha": "aed7ee0b5293d77e05f2d81effba3bd4e5743763",
+  "diffHash": "8b6ee6c1298b33db7f9874abe2199e29cda05b5c74e2fed80a2a8f0234e08324",
+  "owns": [
+    "src/VidShrink.App/Playback/ZoomGesture.cs",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs"
+  ],
+  "verification": [
+    "dogrulama agacinda aed7ee0: build 0 hata 0 uyari",
+    "dotnet test 779 gecti / 0 kaldi / 16 atlandi / 795 toplam",
+    "T0 ayrica tools/ci-gibi-kos.sh kostu: 724/0/71/795, CI ile birebir"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-28T12:23:14.007Z",
+  "usedAt": "2026-08-28T12:23:22.288Z",
+  "completedSha": "aed7ee0b5293d77e05f2d81effba3bd4e5743763"
+}
