@@ -17,8 +17,7 @@ namespace VidShrink.Ffmpeg;
 /// Süreç işlemci zamanı (<c>TotalProcessorTime</c>) da okunur ve sonuca yazılır, ama
 /// karar ona bağlı değil: bu sayaç her makinede doğru değil. Sapma
 /// <see cref="CalibrateCpuClock"/> ile her koşuda yeniden ölçülür ve sonuçla birlikte
-/// bildirilir; bu makinede ölçülen on okumanın hepsi sayacın eksik okuduğunu gösterdi
-/// (<c>.calisma/t63/olcum.txt</c> satır 1, 13-15, 19, 27, 39-41, 45).
+/// bildirilir. Ölçülen değerler burada değil, o koşumun ham günlüğünde durur.
 /// </summary>
 public static class PerformanceProbe
 {

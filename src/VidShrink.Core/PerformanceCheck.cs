@@ -11,9 +11,8 @@ namespace VidShrink.Core;
 /// <paramref name="CpuMs"/> işletim sisteminin sürece yazdığı işlemci zamanı
 /// (<c>TotalProcessorTime</c>). Kayıt olarak duruyor, karar buna bağlı değil: bu sayaç
 /// her makinede doğru okumuyor. Sapma her koşuda yeniden ölçülür ve
-/// <see cref="PerformanceCheckResult.CpuAccountingFactor"/> ile taşınır; bu makinede
-/// ölçülen düzeltme katsayıları 3,2x ile 24x arasında çıktı
-/// (<c>.calisma/t63/olcum.txt</c> satır 1, 13-15, 19, 27, 39-41, 45).
+/// <see cref="PerformanceCheckResult.CpuAccountingFactor"/> ile taşınır. Ölçülen
+/// değerler burada değil, o koşumun ham günlüğünde durur.
 /// </summary>
 public sealed record EncoderCost(
     string Codec,

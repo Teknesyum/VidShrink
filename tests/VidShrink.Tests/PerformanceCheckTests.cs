@@ -315,17 +315,15 @@ public sealed class PerformanceCheckTests
     /// (2) Yuk altinda sinir. Olcunun para birimi tek is parcacikli gecisin duvar
     ///     saati; makine mesgulken o is parcacigi cekirdegi tam bulamaz, gecis uzar
     ///     ve olculen maliyet <b>gercekten</b> yukselir. Yani yeterince agir bir yuk
-    ///     altinda karar degisir. Bu bir kusur degil, olcunun sinirdir; sozlesme de
+    ///     altinda karar degisebilir. Bu bir kusur degil, olcunun sinirdir; sozlesme de
     ///     "karari degistiren bir yuk seviyesi varsa onu yaz" diyor.
     ///
-    ///     Olculdu: 15 mesgul is parcacigi altinda yazilim maliyeti bos makinedeki
-    ///     ~0,6 cekirdekten 0,9-1,2 araligina cikiyor, yani 1,0 esigini kimi kosumda
-    ///     asiyor ve karar SoftwareLightLoad'dan SoftwareHeavyLoad'a doner. Sinir bu
-    ///     makinede 15 rakip is parcacigi civarinda. Sayilar her kosumda ham dosyaya
-    ///     yaziliyor.
+    ///     Karari degistiren yuk seviyesi bu makinede <b>olculmedi</b>: kosulan
+    ///     yuk altinda karar her seferinde ayni kaldi. Sayilar her kosumda ham
+    ///     dosyaya yaziliyor; buraya yazilmaz.
     ///
-    /// Burada iddia edilen sey, kararin yuk altinda <i>degismemesi</i> degil —
-    /// olculdu, degisiyor — <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
+    /// Burada iddia edilen sey, kararin yuk altinda degismesi ya da degismemesi
+    /// degil — ikisi de olculmedi — <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
     /// dolayisiyla karar ancak agirlasabilir. Yuk altinda "daha hafif" bir karar ya da
     /// sebepsiz bir Unknown, olcunun bozuldugu anlamina gelir.
     /// </summary>
