@@ -1,0 +1,20 @@
+{
+  "contractId": "T63",
+  "auditorRunId": "a4c8b3e79e2a60e02",
+  "headSha": "61aff3ef23defa44951ab2fbb23a3fd3c86f6987",
+  "diffHash": "2fb204bb9745690dcd0e85d7c8efca0b40a0adfb483fd48594776af8ff882223",
+  "owns": [
+    "src/VidShrink.Core/PerformanceCheck.cs",
+    "src/VidShrink.Ffmpeg/PerformanceProbe.cs",
+    "tests/VidShrink.Tests/PerformanceCheckTests.cs"
+  ],
+  "verification": [
+    "dogrulama agacinda 61aff3e: build 0 hata 0 uyari",
+    "dotnet test 751 gecti / 0 kaldi / 16 atlandi / 767 toplam",
+    "T0 ayrica iki kez daha kosturdu"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-28T10:25:36.051Z",
+  "usedAt": "2026-08-28T10:25:39.236Z",
+  "completedSha": "61aff3ef23defa44951ab2fbb23a3fd3c86f6987"
+}
