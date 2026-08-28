@@ -22,6 +22,7 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using VidShrink.App.Performance;
 using VidShrink.App.Playback;
 using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
@@ -170,6 +171,8 @@ public partial class MainWindow : Window
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
 
         RefreshQualityTargetAvailability();
+        // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
+        ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         ApplyTextCase();
         BtnEn.Classes.Set("selected", true);
         Loaded += OnWindowLoaded;
@@ -2007,6 +2010,98 @@ public partial class MainWindow : Window
         _reasonsExpanded = expanded;
         PlanReasons.IsVisible = expanded && PlanReasons.Children.Count > 0;
         BtnPlanReasons.Content = expanded ? "▴" : "▾";
+    }
+
+    private void OnTogglePerformance(object? sender, RoutedEventArgs e) => SetPerformanceDetails(!PerformanceDetails.IsVisible);
+
+    private void SetPerformanceDetails(bool visible)
+    {
+        PerformanceDetails.IsVisible = visible;
+        BtnPerformanceExpand.Content = visible ? "▴" : "▾";
+    }
+
+    /// <summary>
+    /// Açık hâli ölçüme açar. Panelin yerleşimi yalnız bu hâlde bağlayıcı ve düğmeye
+    /// basmadan o hâl kurulamıyor.
+    /// </summary>
+    internal void ExpandPerformanceCheck() => SetPerformanceDetails(true);
+
+    /// <summary>
+    /// Ölçümü başlatan çağrı. Alan olarak duruyor ki ölçüm sondayı sahtesiyle
+    /// değiştirebilsin; gerçek sonda yalnız buradan çağrılır ve kendiliğinden hiç
+    /// koşmaz — ne açılışta, ne sekme açılırken, ne dosya yüklenince.
+    /// </summary>
+    internal Func<CancellationToken, Task<PerformanceCheckResult>> PerformanceProbeRunner { get; set; }
+        = token => PerformanceProbe.RunAsync(ct: token);
+
+    private bool _performanceRunning;
+
+    private async void OnRunPerformanceCheck(object? sender, RoutedEventArgs e) => await RunPerformanceCheckAsync();
+
+    internal async Task RunPerformanceCheckAsync()
+    {
+        if (_performanceRunning) return;
+
+        _performanceRunning = true;
+        BtnPerformanceRun.IsEnabled = false;
+        TxtPerformanceStatus.Text = T(
+            "Ölçülüyor — birkaç kısa kodlama koşuyor, en çok yirmi saniye sürer.",
+            "Measuring — this runs a few short encodes and takes up to twenty seconds.");
+
+        try
+        {
+            ShowPerformanceResult(await PerformanceProbeRunner(CancellationToken.None));
+        }
+        catch (Exception ex)
+        {
+            TxtPerformanceStatus.Text = $"{T("Ölçüm tamamlanamadı", "The check could not finish")}: {ex.Message}";
+        }
+        finally
+        {
+            _performanceRunning = false;
+            BtnPerformanceRun.IsEnabled = true;
+        }
+    }
+
+    /// <summary>
+    /// Sonucu ekrana yazar. Manşet <see cref="PerformanceCheckResult.Impact"/> alanından
+    /// değil bulgulardan kurulur; gerekçesi <see cref="PerformanceReportText"/> içinde.
+    /// </summary>
+    internal void ShowPerformanceResult(PerformanceCheckResult result)
+    {
+        TxtPerformanceStatus.Text = string.Empty;
+
+        PerformanceFacts.Children.Clear();
+        foreach (var fact in PerformanceReportText.Facts(result))
+        {
+            var row = new TextBlock
+            {
+                Theme = Look("MonoValue"),
+                FontWeight = FontWeight.Normal,
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            // Koşulardan kurulu bir TextBlock büyük harf geçidine uğramıyor. Kodlayıcı adı
+            // ve birim ölçüldüğü yazımla kalsın diye satır burada kuruluyor: "libx264"
+            // sözcük kuralından geçseydi "Libx264", "ms" ise "Ms" olurdu.
+            if (row.Inlines is { } inlines)
+            {
+                inlines.Add(new Run(Localize(fact.Label) + ": "));
+                inlines.Add(new Run(fact.Value));
+            }
+            else row.Text = $"{fact.Label}: {fact.Value}";
+
+            PerformanceFacts.Children.Add(row);
+        }
+
+        PerformanceLines.Children.Clear();
+        foreach (var line in PerformanceReportText.Describe(result))
+            PerformanceLines.Children.Add(new TextBlock
+            {
+                Text = Localize(line),
+                Theme = Look("Hint"),
+                TextWrapping = TextWrapping.Wrap
+            });
     }
 
     private void OnToggleAiDetails(object? sender, RoutedEventArgs e) => SetAiDetails(!AiDetails.IsVisible);

@@ -1028,6 +1028,34 @@
                 </StackPanel>
               </Border>
 
+              <Border x:Name="PerformancePanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <TextBlock Grid.Column="0" Text="Performance check" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            x:Name="BtnPerformanceExpand"
+                            Content="▾"
+                            Theme="{StaticResource GhostButton}"
+                            FontFamily="{StaticResource FontMono}"
+                            VerticalAlignment="Center"
+                            auto:AutomationProperties.Name="Performance check"
+                            Click="OnTogglePerformance"/>
+                  </Grid>
+                  <StackPanel x:Name="PerformanceDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                    <WrapPanel>
+                      <Button x:Name="BtnPerformanceRun"
+                              Content="Run the check"
+                              Theme="{StaticResource GhostButton}"
+                              Margin="{StaticResource WrapItemMargin}"
+                              Click="OnRunPerformanceCheck"/>
+                    </WrapPanel>
+                    <TextBlock x:Name="TxtPerformanceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <StackPanel x:Name="PerformanceFacts" Spacing="{StaticResource SpaceMd}"/>
+                    <StackPanel x:Name="PerformanceLines" Spacing="{StaticResource SpaceMd}"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
             </StackPanel>
           </ScrollViewer>
         </TabItem>
