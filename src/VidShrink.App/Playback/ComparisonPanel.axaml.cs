@@ -576,9 +576,16 @@ internal partial class ComparisonPanel : UserControl
 
     /// <summary>
     /// Kademenin kök katmandaki sınırı. T52: orta kademenin boyu artık sabit bir oran değil,
-    /// jestin söylediği ölçek — bandın boyu çarpı <c>PanelScale</c>. Taban değeri bandın
-    /// kendi boyudur (ölçek 1'den küçük olamaz), tavanı <c>PlaybackMidShare</c>: panel
-    /// pencereyi kaplamaz, kenarı bırakır. Tam kademe kök katmanın tamamıdır.
+    /// jestin söylediği ölçek — bandın boyu çarpı <c>PanelScale</c>. Tavanı
+    /// <c>PlaybackMidShare</c>: panel pencereyi kaplamaz, kenarı bırakır. Tam kademe kök
+    /// katmanın tamamıdır.
+    ///
+    /// T66: tavan istisnasızdır. Eskiden band pencerenin payından genişse tavan bandın
+    /// kendisi oluyordu; kısa pencerede band pencereden uzun olduğu için orta kademe
+    /// pencereye eşitleniyor ve tam kademeden ayırt edilemez hale geliyordu — üç kademe
+    /// ikiye düşüyordu. Pay her boyutta uygulanınca orta kademenin çevresinde ölçülebilir
+    /// bir kenar hep kalır. Bandın pencereye sığmadığı durumda orta kademe bandından kısa
+    /// olabilir; terfi etmiş panel kök katmandan taşamaz, band ise kaydırılan sayfada durur.
     /// </summary>
     private Rect StageBounds(ShelterStage stage)
     {
@@ -591,10 +598,8 @@ internal partial class ComparisonPanel : UserControl
 
         var share = Scalar("PlaybackMidShare", 0.9);
         var scale = _gesture.PanelScale;
-        var bandWidth = Math.Min(width, _band.Width);
-        var bandHeight = Math.Min(height, _band.Height);
-        var midWidth = Math.Min(bandWidth * scale, Math.Max(width * share, bandWidth));
-        var midHeight = Math.Min(bandHeight * scale, Math.Max(height * share, bandHeight));
+        var midWidth = Math.Min(_band.Width * scale, width * share);
+        var midHeight = Math.Min(_band.Height * scale, height * share);
         return new Rect((width - midWidth) / 2, (height - midHeight) / 2, midWidth, midHeight);
     }
 

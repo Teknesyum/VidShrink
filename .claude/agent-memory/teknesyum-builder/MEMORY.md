@@ -12,3 +12,5 @@
 - [Worktree silme ve dotnet run engeli](worktree-silme-ve-dotnet-run-engeli.md) — dotnet run ekran kapisina takilir, rm -rf reddedilir; tani duzenegini gecici teste koy
 - [Silinen tani kosumu kanit degil](silinen-tani-kosumu-kanit-degil.md) — zorunlu olcuyu terk ediyorsan gerekce ham dosyada dursun; iskeleyi silme, kalici olcuye cevir
 - [Avalonia kırpılma ölçütü](avalonia-kirpilma-olcutu.md) — DesiredSize>Bounds ölçütü hiç kırmızıya dönmez; sekme değişince RelayoutAt şart
+- [CI farkını yerelde koşma](ci-farkini-yerelde-kosma.md) — ffmpeg'i PATH'ten çıkar; başsız pencere boyutu kök görsel çocuğa verilir
+- [owns dışına yazmadan önce sor](owns-disina-yazmadan-once-sor.md) — kanıt kapalı dosyayı gösterdiğinde iş durur, kapsamı T0 genişletir
