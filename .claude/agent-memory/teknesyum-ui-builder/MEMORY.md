@@ -34,3 +34,5 @@
 - [DrawingBrush içerik etiketi](avalonia-drawingbrush-icerik-etiketi.md) — DrawingBrush.Drawing ve DrawingGroup.Children açık yazılmazsa AVLN2000
 - [Kontrast tavanı](vidshrink-kontrast-tavani.md) — koyu zemine katman eklemeden önce durakları karart; silüet opaklığı 0.06 tavanı
 - [Panel ölçek anlamı](vidshrink-panel-olcek-anlami.md) — yakınlaştırma panelin boyunu ölçekler; taban boy 512 ve sayfayı kaydırıyor
+- [Sekme değişince ölçüm](avalonia-sekme-degisince-olcum.md) — LayOutAt yeni sekmeyi ölçmez; ağacı geçersizleştirip yalnız kökü ölç
+- [Büyük harf kaçış yolu](vidshrink-buyuk-harf-kacis-yolu.md) — Run'lardan kurulu TextBlock geçide uğramaz; kodlayıcı adı ve birim bozulmaz
