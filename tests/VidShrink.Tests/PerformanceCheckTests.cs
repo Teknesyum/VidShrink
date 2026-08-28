@@ -71,7 +71,6 @@ public sealed class PerformanceCheckTests
         => PerformanceCheck.Evaluate(yazilim, donanimTek, donanimSerbest, cekirdek, gecen, butce,
             donanimVar, sayacKatsayisi);
 
-    // --- K5: her cumle bir sayiya bagli, karar veriden turuyor ---
 
     [Fact]
     public void OlcumYoksaKararYok()
@@ -136,7 +135,6 @@ public sealed class PerformanceCheckTests
         Assert.True(eksik.Length == 0, "hic uretilmeyen bulgu kodu: " + string.Join(", ", eksik));
     }
 
-    // --- K2: donanim yoksa arac "sorun yok" demiyor ---
 
     [Fact]
     public void DonanimYokVeYazilimBirCekirdekIstiyorsaAgirYukDeniyor()
@@ -186,7 +184,6 @@ public sealed class PerformanceCheckTests
         Assert.Equal(RecordingImpact.SoftwareHeavyLoad, result.Impact);
     }
 
-    // --- D4: donanim yolunun maliyeti olculdugu kadariyla soyleniyor ---
 
     /// <summary>
     /// Donanim gecisi is parcacigi sayisindan etkilenmiyorsa is islemcide degildir;
@@ -226,7 +223,6 @@ public sealed class PerformanceCheckTests
         Assert.DoesNotContain(result.Findings, f => f.Code == PerformanceFindingCode.HardwareCpuCostNotMeasured);
     }
 
-    // --- K1: karar olcumun kendi suresine bagli degil ---
 
     [Fact]
     public void OlcumunToplamSuresiKarariDegistirmiyor()
@@ -266,7 +262,6 @@ public sealed class PerformanceCheckTests
         Assert.Contains(olculemedi.Findings, f => f.Code == PerformanceFindingCode.CpuAccountingUnreliable);
     }
 
-    // --- K3: butce ---
 
     [Fact]
     public void ButceAsilirsaBildiriliyor()
@@ -292,7 +287,6 @@ public sealed class PerformanceCheckTests
         Assert.Equal("libx264", net.Codec);
     }
 
-    // --- Canli olcumler ---
 
     /// <summary>
     /// Bu makinede kodlamanin gercek maliyeti. Sayilar <c>.calisma/t63/olcum.txt</c>'ye
@@ -367,22 +361,16 @@ public sealed class PerformanceCheckTests
             $"karar-degisti={bos1.Impact != yuklu.Impact} | " +
             $"donanim: bos={bosDonanim.Impact} yuklu={yukluDonanim.Impact}");
 
-        // (1) Bos makinede ayni olcum ayni karari veriyor.
         Assert.Equal(bos1.Impact, bos2.Impact);
 
-        // (2) Yuk maliyeti yalniz artirabilir. Kucuk bir olcum gurultusu payi var,
-        // ama yuk altinda maliyetin belirgin sekilde dusmesi olcunun bozuldugudur.
         Assert.True(yuklu.SoftwareRealtimeCores >= bos1.SoftwareRealtimeCores * 0.8,
             $"yuk altinda maliyet dustu: bos {N(bos1.SoftwareRealtimeCores)}, yuklu {N(yuklu.SoftwareRealtimeCores)}");
 
-        // Karar ancak agirlasabilir; hafifleyemez ve sebepsiz kaybolamaz.
         Assert.NotEqual(RecordingImpact.Unknown, yuklu.Impact);
         Assert.False(bos1.Impact == RecordingImpact.SoftwareHeavyLoad
                      && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
             "yuk altinda karar hafifledi");
 
-        // Donanim kodlayicisi yuk altinda da calisiyor; "islemciye bagli degil"
-        // saptamasi yuk altinda dusebilir, ama kodlayicinin kendisi kaybolmaz.
         Assert.Contains(yukluDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
         Assert.Equal(bosDonanim.HardwareCodec, yukluDonanim.HardwareCodec);
     }
@@ -495,13 +483,8 @@ public sealed class PerformanceCheckTests
         Log($"[sayac] (a) is parcacigi duzeyi: duzeltme={N(katsayi)}x " +
             $"yakim-duvar={saat.ElapsedMilliseconds}ms (1 = saglam sayac, 0 = olculemedi)");
 
-        // Kalibrator gercekten olcuyor mu: Windows'ta pozitif donmeli. Sifir donmesi
-        // "olculemedi" demek ve o zaman sapma iddiasinin dayanagi kalmaz.
         Assert.True(katsayi > 0, "kalibrator Windows'ta olcemedi");
 
-        // Yakan is parcacigi istenen sureyi gercekten yakmali: cok kisa kalirsa
-        // katsayi olculen degil gurultudur. Ust sinir konak mesgulken de bagli
-        // kalacak kadar genis, alt sinir istenen sureye kilitli.
         Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
 
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t63tani_" + Guid.NewGuid().ToString("N")[..8]);

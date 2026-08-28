@@ -34,12 +34,12 @@ public static class PerformanceProbe
 
     /// <summary>
     /// Bütün ölçümün duvar saati üst sınırı. <see cref="HardwareVerdict.ProbeBudgetMs"/>
-    /// (1500 ms) tek karelik bir varlık yoklamasının bütçesi; burada altı geçiş var —
-    /// sayaç kalibrasyonu, örnek klip üretimi, taban çözme, donanım kodlamasının iki
-    /// geçişi (tek iş parçacıklı ve serbest) ve yazılım kodlaması — ve kodlama geçişleri tek iş parçacığıyla altı saniyelik 1080p60
-    /// görüntü işliyor. Bu makinede toplam ölçülen süre 6-7 saniye; sınır kullanıcının
-    /// düğmeye basıp bekleyebileceği yerde, onun kabaca üç katında tutuldu: yirmi
-    /// saniye. Aşılırsa ölçüm yarıda kesilir ve eksik bacak
+    /// tek karelik bir varlık yoklamasının bütçesi; burada altı geçiş var — sayaç
+    /// kalibrasyonu, örnek klip üretimi, taban çözme, donanım kodlamasının iki geçişi
+    /// (tek iş parçacıklı ve serbest) ve yazılım kodlaması — ve kodlama geçişleri tek
+    /// iş parçacığıyla örnek klibin tamamını işliyor. Sınır, ölçülen sürenin birkaç
+    /// katında tutuldu ki makine meşgulken de yetsin; gerçekleşen süre her koşumda
+    /// ham günlüğe yazılır. Aşılırsa ölçüm yarıda kesilir ve eksik bacak
     /// <see cref="PerformanceFindingCode.BudgetExhausted"/> ile bildirilir.
     /// </summary>
     public const long BudgetMs = 20_000;
