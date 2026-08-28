@@ -5,11 +5,24 @@ using VidShrink.Ffmpeg;
 namespace VidShrink.Tests;
 
 /// <summary>
+/// Gercek kodlama kosturan olculerin koleksiyonu; paralellestirme kapali. Bu olculer
+/// duvar saati okuyor: oteki olculerle ayni anda kosarsa onlarin yukunu kendi sonucuna
+/// yaziyor ve ayni makinede ard arda iki okuma esigin iki yanina dusebiliyor. Olcen
+/// sey olctugu ortami kirletmesin diye koleksiyon tek basina kosar.
+/// </summary>
+[CollectionDefinition(BasarimOlculeri.Ad, DisableParallelization = true)]
+public sealed class BasarimOlculeri
+{
+    public const string Ad = "basarim-olculeri";
+}
+
+/// <summary>
 /// Basarim denetcisinin olculeri. VidShrink kayit yapmaz; burada olculen sey kayit
 /// araci degil, bu makinede kodlamanin nereye dustugu ve maliyeti. Saf karar olculeri
 /// <c>[Fact]</c>, gercek kodlama kosturanlar <c>[FfmpegFact]</c>: CI makinesinde ne
 /// ffmpeg ne de donanim kodlayicisi var.
 /// </summary>
+[Collection(BasarimOlculeri.Ad)]
 public sealed class PerformanceCheckTests
 {
     private static readonly string MeasurementLog =
