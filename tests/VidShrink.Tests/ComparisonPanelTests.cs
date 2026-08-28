@@ -27,15 +27,36 @@ public sealed class ComparisonPanelTests
 {
     private static readonly Size WindowSize = new(1560, 1060);
 
-    private static T Read<T>(Func<MainWindow, ComparisonPanel, T> read) =>
+    /// <summary>
+    /// T66/K4: yerleşimi verilen görüş alanında koşturur — konağın penceresinden bağımsız.
+    /// Pencerenin kendisine <see cref="Layoutable.Arrange"/> çağırmak boyutu taşımıyor;
+    /// <c>Window.ArrangeSetBounds</c> verilen boyutu değil <c>ClientSize</c>'ı döndürür, yani
+    /// sınırlar platform penceresinden gelir. Bu yüzden istenen boyut pencerenin kök görsel
+    /// çocuğuna veriliyor — <see cref="WindowLayoutTests"/> ile aynı yol (T59). O kök aynı
+    /// zamanda panelin terfi ettiği katmanın taşıyıcısıdır, dolayısıyla kök kademelerin
+    /// ölçüldüğü alan da buradan gelir.
+    /// </summary>
+    private static void LayOutAt(MainWindow window, Size size)
+    {
+        window.Width = double.NaN;
+        window.Height = double.NaN;
+
+        window.Measure(size);
+        window.Arrange(new Rect(size));
+        window.UpdateLayout();
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.Measure(size);
+        root.Arrange(new Rect(size));
+    }
+
+    private static T Read<T>(Func<MainWindow, ComparisonPanel, T> read) => Read(WindowSize, read);
+
+    private static T Read<T>(Size size, Func<MainWindow, ComparisonPanel, T> read) =>
         AppHost.Run(() =>
         {
             var window = new MainWindow();
-            window.Width = double.NaN;
-            window.Height = double.NaN;
-            window.Measure(WindowSize);
-            window.Arrange(new Rect(WindowSize));
-            window.UpdateLayout();
+            LayOutAt(window, size);
 
             var panel = window.GetVisualDescendants().OfType<ComparisonPanel>().Single();
             return read(window, panel);
@@ -72,10 +93,22 @@ public sealed class ComparisonPanelTests
 
     // ---- K1: üç kademe --------------------------------------------------------------
 
-    [Fact]
-    public void Orta_kademe_bandindan_buyuk_pencereden_kucuktur()
+    /// <summary>
+    /// Ölçülen pencere boyutları. Tasarım boyutu, pencerenin kendi tabanı ve tabanın
+    /// altında kalan bir başsız konak boyutu — sonuncusu CI'ın koştuğu haldir (T66).
+    /// </summary>
+    public static TheoryData<double, double> WindowSizes() => new()
     {
-        var (band, mid, window) = Read((host, panel) =>
+        { 1560, 1060 },
+        { 1040, 720 },
+        { 480, 326 }
+    };
+
+    [Theory]
+    [MemberData(nameof(WindowSizes))]
+    public void Orta_kademe_bandindan_buyuk_pencereden_kucuktur(double width, double height)
+    {
+        var (band, mid, window) = Read(new Size(width, height), (host, panel) =>
         {
             var bandWidth = panel.Bounds.Width;
             WheelTo(host, panel, ShelterStage.Mid);
@@ -85,13 +118,14 @@ public sealed class ComparisonPanelTests
         Assert.True(mid.Width > band, $"orta {mid.Width:0.#} <= band {band:0.#}");
         Assert.True(mid.Width < window.Width, $"orta {mid.Width:0.#} >= pencere {window.Width:0.#}");
         Assert.True(mid.Height < window.Height, $"orta {mid.Height:0.#} >= pencere {window.Height:0.#}");
-        Assert.True(mid.X > 0 && mid.Y > 0);
+        Assert.True(mid.X > 0 && mid.Y > 0, $"orta kademe kenara yapıştı: {mid.X:0.#},{mid.Y:0.#}");
     }
 
-    [Fact]
-    public void Tam_kademe_pencerenin_tamamini_kaplar()
+    [Theory]
+    [MemberData(nameof(WindowSizes))]
+    public void Tam_kademe_pencerenin_tamamini_kaplar(double width, double height)
     {
-        var (full, window) = Read((host, panel) =>
+        var (full, window) = Read(new Size(width, height), (host, panel) =>
         {
             WheelTo(host, panel, ShelterStage.Full);
             return (panel.StageTarget, OverlayBounds(panel));
@@ -101,6 +135,30 @@ public sealed class ComparisonPanelTests
         Assert.Equal(0, full.Y, 6);
         Assert.Equal(window.Width, full.Width, 6);
         Assert.Equal(window.Height, full.Height, 6);
+    }
+
+    /// <summary>
+    /// T66/K3: kullanıcı tekerleği çevirdiğinde üç kademe görür, pencere ne kadar küçük
+    /// olursa olsun. Orta kademe tam kademeye eşitlenirse üç kademe ikiye düşer — bu bir
+    /// ürün kusurudur, ölçü kusuru değil. Ölçülen şey her iki eksende de ölçülebilir bir
+    /// pay: orta kademe hem bandından büyük hem tam kademeden küçüktür.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(WindowSizes))]
+    public void Uc_kademe_her_pencere_boyutunda_uc_ayri_boydur(double width, double height)
+    {
+        var (band, mid, full) = Read(new Size(width, height), (host, panel) =>
+        {
+            var bandSize = panel.Bounds.Size;
+            WheelTo(host, panel, ShelterStage.Mid);
+            var midTarget = panel.StageTarget;
+            WheelTo(host, panel, ShelterStage.Full);
+            return (bandSize, midTarget, panel.StageTarget);
+        });
+
+        Assert.True(mid.Width > band.Width, $"orta {mid.Width:0.#} <= band {band.Width:0.#}");
+        Assert.True(mid.Width < full.Width, $"orta {mid.Width:0.#} >= tam {full.Width:0.#}");
+        Assert.True(mid.Height < full.Height, $"orta {mid.Height:0.#} >= tam {full.Height:0.#}");
     }
 
     [Fact]
@@ -514,8 +572,10 @@ public sealed class ComparisonPanelTests
     {
         window.InvalidateMeasure();
         foreach (var part in window.GetVisualDescendants().OfType<Layoutable>()) part.InvalidateMeasure();
-        window.Measure(WindowSize);
-        window.Arrange(new Rect(WindowSize));
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.Measure(WindowSize);
+        root.Arrange(new Rect(WindowSize));
         Dispatcher.UIThread.RunJobs();
     }
 
