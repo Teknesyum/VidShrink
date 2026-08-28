@@ -1,0 +1,20 @@
+{
+  "contractId": "T65",
+  "auditorRunId": "a1f95067982fd0c22",
+  "headSha": "e1cc82b314b7f4db6c1a749a1a2642fb1b5953c5",
+  "diffHash": "e26e23687316036e737d2fa1b10451a95b7127ada9980db23d3c4f41cb9643f2",
+  "owns": [
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "src/VidShrink.App/MainWindow.axaml",
+    "tests/VidShrink.Tests/CasingTests.cs",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs"
+  ],
+  "verification": [
+    "dogrulama agacinda e1cc82b: build 0 hata 0 uyari",
+    "dotnet test 772 gecti / 0 kaldi / 16 atlandi / 788 toplam"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-28T11:52:13.042Z",
+  "usedAt": "2026-08-28T11:52:19.727Z",
+  "completedSha": "e1cc82b314b7f4db6c1a749a1a2642fb1b5953c5"
+}
