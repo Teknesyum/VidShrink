@@ -219,8 +219,6 @@ public static class PerformanceCheck
         var cores = Math.Max(1, logicalCores);
         var budgetSpent = budgetMs > 0 && elapsedMs > budgetMs;
 
-        // Hicbir bacak olculemediyse karar yok, ama sebebi var: butce dolduysa
-        // kullanici sebepsiz "olculemedi" gormemeli, bunu bilmeli.
         if (sw is null && hwSingle is null)
         {
             var bos = new List<PerformanceFinding> { new(PerformanceFindingCode.NotMeasured) };
