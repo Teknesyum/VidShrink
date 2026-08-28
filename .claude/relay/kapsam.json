@@ -871,9 +871,9 @@
   },
   "tests/VidShrink.Tests/WindowLayoutTests.cs": {
     "model": "claude-opus-5",
-    "effort": "high",
-    "t": "2026-08-25 20:36:22",
-    "ajan": "ana oturum"
+    "effort": "medium",
+    "t": "2026-08-27 22:21:57",
+    "ajan": "ui-builder"
   },
   ".calisma/probeplan/probeplan.csproj": {
     "model": "claude-opus-5",
@@ -1258,5 +1258,11 @@
     "effort": "medium",
     "t": "2026-08-27 20:49:49",
     "ajan": "builder"
+  },
+  "pin-degisti-docstring-degismedi.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-08-27 22:41:32",
+    "ajan": "ana oturum"
   }
 }
