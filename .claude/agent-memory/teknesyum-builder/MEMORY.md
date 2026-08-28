@@ -8,3 +8,5 @@
 - [Worktree sözleşme yazma](worktree-sozlesme-yazma.md) — sözleşme ana checkout'ta kalır; Edit ve heredoc reddedilir, Write + cat >> tek yol
 - [Pencere testleri kaynak metinden](vidshrink-pencere-testleri-kaynak-metinden.md) — MainWindow acilamiyor; is mantigini Avalonia'siz internal sinifa cikar, bagliligi metinden olc
 - [Ikiz Share turleri](vidshrink-app-ikiz-share-turleri.md) — App ve Core ayni adla iki ShareTarget tasiyor; test tarafinda alias sart
+- [Islemci zamani sayaci bozuk](islemci-zamani-sayaci-bozuk.md) — TotalProcessorTime gercegin ~1/5i kadar; olcuyu -threads 1 duvar saatine cevir
+- [Worktree silme ve dotnet run engeli](worktree-silme-ve-dotnet-run-engeli.md) — dotnet run ekran kapisina takilir, rm -rf reddedilir; tani duzenegini gecici teste koy
