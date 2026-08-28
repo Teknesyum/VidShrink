@@ -12,8 +12,13 @@ sessizce yesildir. Avalonia bir denetimi istediginden dar yerlestirmiyor (`Bound
 `DesiredSize` kadar), sarmayan uzun metnin istegi de olcum sirasinda verilen genislige
 kirpiliyor. `MinWidth` hem olcumu hem yerlestirmeyi yukseltiyor, `WrapPanel` tasan cocugu
 istedigi genislikte yerlestiriyor — dort tasma denemesinin dordunde de iki sayi esit.
-Gercek tasma taşiyicinin gorus alaninda gorunur: blogun sag kenarini `TranslatePoint` ile
-sayfa `ScrollViewer` uzayina cevirip `Viewport.Width` ile karsilastir.
+Gercek tasma tasiyicinin gorus alaninda gorunur: blogun sag kenarini `TranslatePoint` ile
+sayfa `ScrollViewer` uzayina cevirip `Viewport.Width` ile karsilastir. T65 tur 2 bunu
+yerine koydu ve iki gercek kusur buldu: `AllowAutoHide` acikken dikey cubuk yerlesimde
+yer kaplamiyor, icerigin sag seridini ortuyor; ve etiket+ipucu dugmesini tasiyan yatay
+`StackPanel` cocuklarini sonsuz genislikte olcup istedikleri genislikte yerlestirdigi
+icin kendi hucresini asiyor. Ikisinin de cozumu yerlesimde: `AllowAutoHide="False"` ve
+yatay yigin yerine `Grid ColumnDefinitions="*,Auto"`.
 
 **Sekme degisince tek olcum yetmiyor.** `tabs.SelectedIndex = index` sonrasi
 `window.UpdateLayout()` yeni sekmeyi pencerenin `ClientSize`'i (bassiz kosumda sifir) ile
