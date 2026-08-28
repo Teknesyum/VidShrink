@@ -45,96 +45,183 @@ public sealed class PerformanceCheckTests
     private static EncoderCost Cost(string codec, double cores, double cpuMs = 100)
         => new(codec, true, cpuMs, (long)(cores * VideoMs), VideoMs);
 
+    /// <summary>Saglam sayacli, butcesi asilmamis bir kosum — gurultusuz taban.</summary>
+    private static PerformanceCheckResult Degerlendir(
+        EncoderCost? yazilim,
+        EncoderCost? donanimTek = null,
+        EncoderCost? donanimSerbest = null,
+        int cekirdek = 8,
+        bool donanimVar = false,
+        long gecen = 4000,
+        long butce = 30_000,
+        double sayacKatsayisi = 1)
+        => PerformanceCheck.Evaluate(yazilim, donanimTek, donanimSerbest, cekirdek, gecen, butce,
+            donanimVar, sayacKatsayisi);
+
     // --- K5: her cumle bir sayiya bagli, karar veriden turuyor ---
 
     [Fact]
     public void OlcumYoksaKararYok()
     {
-        var result = PerformanceCheck.Evaluate(Array.Empty<EncoderCost>(), 8, 0, 10_000, false);
+        var result = Degerlendir(null);
 
         Assert.Equal(RecordingImpact.Unknown, result.Impact);
         Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.NotMeasured);
     }
 
+    /// <summary>
+    /// Her bulgu kodu ya sayisiz sayilir ya da tasimasi gereken sayi adiyla
+    /// listelenir; listelenmemis bir kod eklenirse bu olcu kirmizi doner. Kodlarin
+    /// hepsinin gercekten uretildigi de olculuyor, yani kapsam tam.
+    /// </summary>
     [Fact]
-    public void SayiTasiyanHerBulgununSayisiVar()
+    public void HerBulguTasimasiGerekenSayiyiTasiyor()
     {
-        var result = PerformanceCheck.Evaluate(
-            new[] { Cost("h264_nvenc", 0.06), Cost("libx264", 0.9) }, 8, 4000, 10_000, true);
-
-        foreach (var finding in result.Findings)
+        var sayisiz = new[]
         {
-            var magnitude = finding.Code switch
+            PerformanceFindingCode.NotMeasured,
+            PerformanceFindingCode.NoHardwareEncoder,
+            PerformanceFindingCode.HardwareEncoderFailed,
+            PerformanceFindingCode.HardwarePathWorks,
+            PerformanceFindingCode.HardwareCpuCostNotMeasured
+        };
+
+        static double Buyukluk(PerformanceFinding f) => f.Code switch
+        {
+            PerformanceFindingCode.HardwareNotCpuBound => f.Factor,
+            PerformanceFindingCode.HardwarePipelineHeadroom => f.RealtimeFactor,
+            PerformanceFindingCode.SoftwareRealtimeCost => f.RealtimeCores,
+            PerformanceFindingCode.SoftwareCostsCores => f.RealtimeCores,
+            PerformanceFindingCode.SoftwareCostIsSmall => f.RealtimeCores,
+            PerformanceFindingCode.CpuAccountingUnreliable => 1,
+            PerformanceFindingCode.BudgetExhausted => f.BudgetMs,
+            _ => throw new Xunit.Sdk.XunitException($"{f.Code} ne sayisiz listesinde ne de sayi listesinde")
+        };
+
+        var senaryolar = new[]
+        {
+            Degerlendir(null),
+            Degerlendir(Cost("libx264", 0.4)),
+            Degerlendir(Cost("libx264", 2.0)),
+            Degerlendir(Cost("libx264", 0.4), Cost("h264_nvenc", 0.14), Cost("h264_nvenc", 0.13), donanimVar: true),
+            Degerlendir(Cost("libx264", 0.4), Cost("h264_nvenc", 0.9), Cost("h264_nvenc", 0.2), donanimVar: true),
+            Degerlendir(Cost("libx264", 0.4), new EncoderCost("h264_qsv", false, 0, 0, VideoMs), donanimVar: true),
+            Degerlendir(Cost("libx264", 0.4), gecen: 40_000),
+            Degerlendir(Cost("libx264", 0.4), sayacKatsayisi: 5.8)
+        };
+
+        var gorulen = new HashSet<PerformanceFindingCode>();
+        foreach (var senaryo in senaryolar)
+            foreach (var bulgu in senaryo.Findings)
             {
-                PerformanceFindingCode.HardwareRealtimeCost => finding.RealtimeCores,
-                PerformanceFindingCode.SoftwareRealtimeCost => finding.RealtimeCores,
-                PerformanceFindingCode.HardwareSavesCpu => finding.Factor,
-                PerformanceFindingCode.SoftwareCostsCores => finding.RealtimeCores,
-                PerformanceFindingCode.SoftwareCostIsSmall => finding.RealtimeCores,
-                PerformanceFindingCode.BudgetExhausted => finding.BudgetMs,
-                PerformanceFindingCode.CpuAccountingUnreliable => finding.Factor,
-                _ => 1
-            };
-            Assert.True(magnitude > 0, $"{finding.Code} sayisiz kaldi");
-        }
+                gorulen.Add(bulgu.Code);
+                if (sayisiz.Contains(bulgu.Code)) continue;
+                Assert.True(Buyukluk(bulgu) > 0, $"{bulgu.Code} sayisiz kaldi");
+            }
+
+        var eksik = Enum.GetValues<PerformanceFindingCode>().Except(gorulen).ToArray();
+        Assert.True(eksik.Length == 0, "hic uretilmeyen bulgu kodu: " + string.Join(", ", eksik));
     }
 
     // --- K2: donanim yoksa arac "sorun yok" demiyor ---
 
     [Fact]
-    public void DonanimYokVeYazilimPahaliysaAgirYukDeniyor()
+    public void DonanimYokVeYazilimBirCekirdekIstiyorsaAgirYukDeniyor()
     {
-        var result = PerformanceCheck.Evaluate(
-            new[] { Cost("libx264", 3.0) }, 8, 4000, 10_000, hardwareEncoderPresent: false);
+        var result = Degerlendir(Cost("libx264", 1.4));
 
         Assert.Equal(RecordingImpact.SoftwareHeavyLoad, result.Impact);
         Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.NoHardwareEncoder);
         Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.SoftwareCostsCores);
         Assert.DoesNotContain(result.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
-        Assert.Equal(3.0, result.SoftwareRealtimeCores, 3);
+        Assert.Equal(1.4, result.SoftwareRealtimeCores, 3);
     }
 
     [Fact]
     public void DonanimYokAmaYazilimUcuzsaSuclanmiyor()
     {
-        var result = PerformanceCheck.Evaluate(
-            new[] { Cost("libx264", 0.4) }, 8, 4000, 10_000, hardwareEncoderPresent: false);
+        var result = Degerlendir(Cost("libx264", 0.4));
 
         Assert.Equal(RecordingImpact.SoftwareLightLoad, result.Impact);
         Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.SoftwareCostIsSmall);
     }
 
+    /// <summary>
+    /// Esik mutlak, cekirdek sayisinin orani degil: ayni maliyet 4 cekirdekli ve
+    /// 64 cekirdekli makinede ayni karari vermeli. Oransal esikte 64 cekirdekte
+    /// esik 16'ya cikiyor ve bir cekirdegi tam yiyen kodlayici "hafif" sayiliyordu.
+    /// </summary>
+    [Fact]
+    public void EsikCekirdekSayisiylaGevsemiyor()
+    {
+        var maliyet = Cost("libx264", 1.2);
+
+        Assert.Equal(RecordingImpact.SoftwareHeavyLoad, Degerlendir(maliyet, cekirdek: 4).Impact);
+        Assert.Equal(RecordingImpact.SoftwareHeavyLoad, Degerlendir(maliyet, cekirdek: 64).Impact);
+    }
+
     [Fact]
     public void KodlayiciListedeVarAmaKodlamiyorsaYoklukTanBaskaSoyleniyor()
     {
-        var costs = new[] { new EncoderCost("h264_qsv", false, 0, 0, VideoMs), Cost("libx264", 3.0) };
-        var result = PerformanceCheck.Evaluate(costs, 8, 4000, 10_000, hardwareEncoderPresent: true);
+        var result = Degerlendir(
+            Cost("libx264", 1.4),
+            new EncoderCost("h264_qsv", false, 0, 0, VideoMs),
+            donanimVar: true);
 
         Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.HardwareEncoderFailed);
         Assert.DoesNotContain(result.Findings, f => f.Code == PerformanceFindingCode.NoHardwareEncoder);
         Assert.Equal(RecordingImpact.SoftwareHeavyLoad, result.Impact);
     }
 
+    // --- D4: donanim yolunun maliyeti olculdugu kadariyla soyleniyor ---
+
+    /// <summary>
+    /// Donanim gecisi is parcacigi sayisindan etkilenmiyorsa is islemcide degildir;
+    /// karar HardwareOffload olur ama islemci maliyeti icin sayi <b>uretilmez</b>.
+    /// </summary>
     [Fact]
-    public void DonanimCalisiyorsaKodlamaIslemcininDisindaSayiliyor()
+    public void DonanimIslemciyeBagliDegilseMaliyetiUydurulmuyor()
     {
-        var result = PerformanceCheck.Evaluate(
-            new[] { Cost("h264_nvenc", 0.06), Cost("libx264", 0.9) }, 8, 4000, 10_000, true);
+        var result = Degerlendir(
+            Cost("libx264", 0.5),
+            Cost("h264_nvenc", 0.14),
+            Cost("h264_nvenc", 0.135),
+            donanimVar: true);
 
         Assert.Equal(RecordingImpact.HardwareOffload, result.Impact);
-        Assert.Equal("h264_nvenc", result.HardwareCodec);
-        Assert.Equal(15.0, result.CpuSavingFactor, 3);
+        Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.HardwareNotCpuBound);
+        Assert.Contains(result.Findings, f => f.Code == PerformanceFindingCode.HardwareCpuCostNotMeasured);
+        Assert.DoesNotContain(result.Findings,
+            f => f.Code == PerformanceFindingCode.HardwareCpuCostNotMeasured && f.RealtimeCores > 0);
     }
 
-    // --- K1: karar makine yukune dayanikli, cunku duvar saatine bagli degil ---
+    /// <summary>
+    /// Donanim gecisi is parcacigi sayisiyla hizlaniyorsa is islemcidedir: o zaman
+    /// "kodlama islemcinin disinda" denemez, karar yazilim olcusune duser.
+    /// </summary>
+    [Fact]
+    public void DonanimIslemciyeBagliCiktiysaOffloadDenmiyor()
+    {
+        var result = Degerlendir(
+            Cost("libx264", 0.5),
+            Cost("h264_nvenc", 0.9),
+            Cost("h264_nvenc", 0.2),
+            donanimVar: true);
+
+        Assert.NotEqual(RecordingImpact.HardwareOffload, result.Impact);
+        Assert.DoesNotContain(result.Findings, f => f.Code == PerformanceFindingCode.HardwareNotCpuBound);
+        Assert.DoesNotContain(result.Findings, f => f.Code == PerformanceFindingCode.HardwareCpuCostNotMeasured);
+    }
+
+    // --- K1: karar olcumun kendi suresine bagli degil ---
 
     [Fact]
     public void OlcumunToplamSuresiKarariDegistirmiyor()
     {
-        var maliyet = new[] { Cost("libx264", 3.0) };
+        var maliyet = Cost("libx264", 1.4);
 
-        var cabuk = PerformanceCheck.Evaluate(maliyet, 8, 4000, 30_000, false);
-        var yavas = PerformanceCheck.Evaluate(maliyet, 8, 20_000, 30_000, false);
+        var cabuk = Degerlendir(maliyet, gecen: 4000);
+        var yavas = Degerlendir(maliyet, gecen: 20_000);
 
         Assert.Equal(cabuk.Impact, yavas.Impact);
         Assert.Equal(cabuk.SoftwareRealtimeCores, yavas.SoftwareRealtimeCores, 6);
@@ -142,20 +229,28 @@ public sealed class PerformanceCheckTests
 
     /// <summary>
     /// Islemci zamani sayaci bozuksa karar degismez — karar sayaca bakmiyor — ama
-    /// sapma kullaniciya bildirilir.
+    /// sapma kullaniciya bildirilir. Olculemeyen sayac da (0) guvenilmez sayilir.
     /// </summary>
     [Fact]
     public void BozukIslemciSayaciKarariDegistirmiyorAmaBildiriliyor()
     {
-        var maliyet = new[] { Cost("libx264", 3.0) };
+        var maliyet = Cost("libx264", 1.4);
 
-        var saglam = PerformanceCheck.Evaluate(maliyet, 8, 4000, 30_000, false, cpuAccountingFactor: 1);
-        var bozuk = PerformanceCheck.Evaluate(maliyet, 8, 4000, 30_000, false, cpuAccountingFactor: 5.8);
+        var saglam = Degerlendir(maliyet, sayacKatsayisi: 1);
+        var bozuk = Degerlendir(maliyet, sayacKatsayisi: 5.8);
+        var olculemedi = Degerlendir(maliyet, sayacKatsayisi: 0);
 
         Assert.Equal(saglam.Impact, bozuk.Impact);
+        Assert.Equal(saglam.Impact, olculemedi.Impact);
+
+        Assert.True(saglam.CpuAccountingTrustworthy);
+        Assert.False(bozuk.CpuAccountingTrustworthy);
+        Assert.False(olculemedi.CpuAccountingTrustworthy);
+
         Assert.DoesNotContain(saglam.Findings, f => f.Code == PerformanceFindingCode.CpuAccountingUnreliable);
         var bulgu = Assert.Single(bozuk.Findings, f => f.Code == PerformanceFindingCode.CpuAccountingUnreliable);
         Assert.Equal(5.8, bulgu.Factor, 3);
+        Assert.Contains(olculemedi.Findings, f => f.Code == PerformanceFindingCode.CpuAccountingUnreliable);
     }
 
     // --- K3: butce ---
@@ -163,8 +258,7 @@ public sealed class PerformanceCheckTests
     [Fact]
     public void ButceAsilirsaBildiriliyor()
     {
-        var result = PerformanceCheck.Evaluate(
-            new[] { Cost("libx264", 3.0) }, 8, 12_000, 10_000, false);
+        var result = Degerlendir(Cost("libx264", 1.4), gecen: 12_000, butce: 10_000);
 
         var finding = Assert.Single(result.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
         Assert.Equal(10_000, finding.BudgetMs);
@@ -197,14 +291,14 @@ public sealed class PerformanceCheckTests
         var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
 
         Log($"[gercek] cekirdek={result.LogicalCores} karar={result.Impact} " +
-            $"donanim={result.HardwareCodec}:{N(result.HardwareRealtimeCores)} " +
-            $"yazilim={result.SoftwareCodec}:{N(result.SoftwareRealtimeCores)} " +
-            $"kazanc={N(result.CpuSavingFactor)}x sure={result.ElapsedMs}ms " +
-            $"sayac-duzeltmesi={N(result.CpuAccountingFactor)}x");
+            $"yazilim={result.SoftwareCodec}:{N(result.SoftwareRealtimeCores)} cekirdek " +
+            $"donanim={result.HardwareCodec}:{N(result.HardwarePipelineRealtimeFactor)}x gercek zaman " +
+            $"sure={result.ElapsedMs}ms sayac={N(result.CpuAccountingFactor)}x " +
+            $"sayac-guvenilir={result.CpuAccountingTrustworthy}");
 
-        foreach (var f in result.Findings.Where(f => f.CpuMs > 0 || f.WallMs > 0))
-            Log($"[ham] {f.Code} {f.Codec} cpu={N(f.CpuMs)}ms duvar={f.WallMs}ms " +
-                $"paralellik={N(f.WallMs <= 0 ? 0 : f.CpuMs / f.WallMs)}");
+        foreach (var f in result.Findings)
+            Log($"[bulgu] {f.Code} {f.Codec} cekirdek={N(f.RealtimeCores)} gercekzaman={N(f.RealtimeFactor)}x " +
+                $"katsayi={N(f.Factor)} cpu={N(f.CpuMs)}ms duvar={f.WallMs}ms");
 
         Assert.NotEqual(RecordingImpact.Unknown, result.Impact);
         Assert.True(result.SoftwareRealtimeCores > 0, "yazilim yolu olculemedi");
@@ -239,7 +333,7 @@ public sealed class PerformanceCheckTests
         var sapma = bosYazilim.SoftwareRealtimeCores <= 0
             ? 0
             : (yukluYazilim.SoftwareRealtimeCores - bosYazilim.SoftwareRealtimeCores) / bosYazilim.SoftwareRealtimeCores;
-        var esik = bosYazilim.LogicalCores * PerformanceCheck.HeavyLoadCoreFraction;
+        var esik = PerformanceCheck.HeavyLoadCores;
 
         Log($"[yuk] yukleyici={yukleyici} cekirdek esik={N(esik)} | " +
             $"donanim acik: bos={bos.Impact}/{N(bos.SoftwareRealtimeCores)} yuklu={yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)} | " +
@@ -294,7 +388,8 @@ public sealed class PerformanceCheckTests
         var kapali = await PerformanceProbe.RunAsync(new FakeAvailability(), 30_000);
 
         Log($"[mutasyon] acik={acik.Impact}/{acik.HardwareCodec} kapali={kapali.Impact}/{kapali.HardwareCodec} " +
-            $"yazilim acik={N(acik.SoftwareRealtimeCores)} kapali={N(kapali.SoftwareRealtimeCores)}");
+            $"yazilim acik={N(acik.SoftwareRealtimeCores)} kapali={N(kapali.SoftwareRealtimeCores)} " +
+            $"donanim-gercekzaman acik={N(acik.HardwarePipelineRealtimeFactor)}x");
 
         Assert.NotEqual(RecordingImpact.HardwareOffload, kapali.Impact);
         Assert.Equal(string.Empty, kapali.HardwareCodec);
@@ -302,21 +397,83 @@ public sealed class PerformanceCheckTests
     }
 
     /// <summary>
-    /// Bu olcunun neden duvar saatine dayandigini kayit altina alir: tek bir is
-    /// parcacigi bilinen bir sure boyunca bir cekirdegi doldurur ve isletim
-    /// sisteminin surece yazdigi islemci zamani okunur. Saglam bir makinede oran
-    /// 1'e yakindir; bu makinede 0,2 civari cikiyor, yani sayac gercegin kabaca
-    /// besde birini gosteriyor. Karar bu yuzden <c>TotalProcessorTime</c>'a degil,
-    /// tek is parcacikli gecisin duvar saatine bakiyor.
+    /// D1/D2'nin cevabini uretir ve ham dosyaya yazar: bu makinenin islemci zamani
+    /// sayaci dogru mu okuyor. Uc bagimsiz kanit alinir ve hepsi kaydedilir.
+    ///
+    /// (a) Bilinen yuk: tek bir is parcacigi olculen bir sure boyunca cekirdegi
+    ///     doldurur, cekirdegin o is parcacigina yazdigi sure okunur. Oran 1'e
+    ///     yakinsa sayac saglamdir.
+    /// (b) Ayni yuk bir cocuk surecte (ffmpeg, tek is parcacikli kodlama): sureci
+    ///     disaridan okuyan TotalProcessorTime duvar saatiyle karsilastirilir.
+    /// (c) Ayni kodlama serbest is parcacigiyla: sayac saglamsa toplam islemci
+    ///     zamani kabaca sabit kalmali, yalniz duvar saati kisalmali.
     /// </summary>
-    [Fact]
-    public void IslemciZamaniSayacininSapmasiOlculuyor()
+    [FfmpegFact]
+    public void IslemciZamaniSayaciDogruOkuyorMu()
     {
-        var katsayi = PerformanceProbe.CalibrateCpuClock(600);
-        Log($"[sayac] duzeltme={N(katsayi)}x (1 = saglam sayac)");
+        var katsayi = PerformanceProbe.CalibrateCpuClock(1500);
+        Log($"[sayac] (a) is parcacigi duzeyi: duzeltme={N(katsayi)}x (1 = saglam sayac, 0 = olculemedi)");
 
-        Assert.True(katsayi >= 1, "duzeltme katsayisi 1'in altina dusemez");
-        Assert.True(double.IsFinite(katsayi));
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t63tani_" + Guid.NewGuid().ToString("N")[..8]);
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var sample = Path.Combine(dir, "ornek.mp4");
+            Kos("uretim", new[] { "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i",
+                $"testsrc2=size={PerformanceProbe.SampleWidth}x{PerformanceProbe.SampleHeight}:rate=60:duration=6",
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-pix_fmt", "yuv420p", sample });
+
+            for (var i = 0; i < 2; i++)
+                Kos($"(b) x264 -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
+                    "-an", "-c:v", "libx264", "-threads", "1", "-preset", "veryfast", "-f", "null", "-" });
+            for (var i = 0; i < 2; i++)
+                Kos($"(c) x264 serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
+                    "-an", "-c:v", "libx264", "-preset", "veryfast", "-f", "null", "-" });
+            for (var i = 0; i < 2; i++)
+                Kos($"(d) nvenc -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
+                    "-an", "-c:v", "h264_nvenc", "-threads", "1", "-f", "null", "-" });
+            for (var i = 0; i < 2; i++)
+                Kos($"(e) nvenc serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
+                    "-an", "-c:v", "h264_nvenc", "-f", "null", "-" });
+            for (var i = 0; i < 2; i++)
+                Kos($"(f) taban -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample, "-f", "null", "-" });
+
+            for (var i = 0; i < 3; i++)
+                Log($"[sayac] (g) tekrar {i}: is parcacigi duzeltmesi={N(PerformanceProbe.CalibrateCpuClock(1500))}x");
+        }
+        finally
+        {
+            try { Directory.Delete(dir, true); } catch { }
+        }
+    }
+
+    private static void Kos(string etiket, string[] args)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = ToolLocator.Ffmpeg,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var a in args) psi.ArgumentList.Add(a);
+
+        using var p = new System.Diagnostics.Process { StartInfo = psi };
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        p.Start();
+        var so = p.StandardOutput.ReadToEndAsync();
+        var se = p.StandardError.ReadToEndAsync();
+        Task.WaitAll(so, se);
+        p.WaitForExit();
+        clock.Stop();
+
+        double cpu;
+        try { cpu = p.TotalProcessorTime.TotalMilliseconds; }
+        catch { cpu = -1; }
+
+        Log($"[sayac] {etiket} cikis={p.ExitCode} cpu={N(cpu)}ms duvar={clock.ElapsedMilliseconds}ms " +
+            $"cpu/duvar={N(clock.ElapsedMilliseconds > 0 ? cpu / clock.ElapsedMilliseconds : 0)}");
     }
 
     /// <summary>Butun mantiksal cekirdekleri mesgul tutan yapay yuk.</summary>

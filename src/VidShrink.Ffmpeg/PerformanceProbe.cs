@@ -35,9 +35,9 @@ public static class PerformanceProbe
 
     /// <summary>
     /// Bütün ölçümün duvar saati üst sınırı. <see cref="HardwareVerdict.ProbeBudgetMs"/>
-    /// (1500 ms) tek karelik bir varlık yoklamasının bütçesi; burada beş geçiş var —
-    /// sayaç kalibrasyonu, örnek klip üretimi, taban çözme, donanım kodlaması, yazılım
-    /// kodlaması — ve kodlama geçişleri tek iş parçacığıyla altı saniyelik 1080p60
+    /// (1500 ms) tek karelik bir varlık yoklamasının bütçesi; burada altı geçiş var —
+    /// sayaç kalibrasyonu, örnek klip üretimi, taban çözme, donanım kodlamasının iki
+    /// geçişi (tek iş parçacıklı ve serbest) ve yazılım kodlaması — ve kodlama geçişleri tek iş parçacığıyla altı saniyelik 1080p60
     /// görüntü işliyor. Bu makinede toplam ölçülen süre 6-7 saniye; sınır kullanıcının
     /// düğmeye basıp bekleyebileceği yerde, onun kabaca üç katında tutuldu: yirmi
     /// saniye. Aşılırsa ölçüm yarıda kesilir ve eksik bacak
@@ -82,8 +82,8 @@ public static class PerformanceProbe
         var hardwareCodec = HardwareCandidates.FirstOrDefault(availability.HasEncoder);
         var directory = Path.Combine(Path.GetTempPath(), TempPrefix + Guid.NewGuid().ToString("N"));
         var total = Stopwatch.StartNew();
-        var costs = new List<EncoderCost>();
-        var cpuFactor = 1.0;
+        EncoderCost? software = null, hardwareSingle = null, hardwareFree = null;
+        var cpuFactor = 0.0;
 
         try
         {
@@ -94,15 +94,26 @@ public static class PerformanceProbe
             if (!await GenerateSampleAsync(sample, Remaining(total, budgetMs), ct).ConfigureAwait(false))
                 return PerformanceCheckResult.NotMeasured;
 
-            var baseline = await MeasureAsync(sample, null, Remaining(total, budgetMs), ct).ConfigureAwait(false);
+            var baseline = await MeasureAsync(sample, null, true, Remaining(total, budgetMs), ct).ConfigureAwait(false);
             if (!baseline.Succeeded)
                 return PerformanceCheckResult.NotMeasured;
 
             if (hardwareCodec is not null && Remaining(total, budgetMs) > 0)
-                costs.Add(Subtract(await MeasureAsync(sample, hardwareCodec, Remaining(total, budgetMs), ct).ConfigureAwait(false), baseline));
+            {
+                hardwareSingle = Subtract(
+                    await MeasureAsync(sample, hardwareCodec, true, Remaining(total, budgetMs), ct).ConfigureAwait(false),
+                    baseline);
+
+                if (Remaining(total, budgetMs) > 0)
+                    hardwareFree = Subtract(
+                        await MeasureAsync(sample, hardwareCodec, false, Remaining(total, budgetMs), ct).ConfigureAwait(false),
+                        baseline);
+            }
 
             if (Remaining(total, budgetMs) > 0)
-                costs.Add(Subtract(await MeasureAsync(sample, SoftwareCodec, Remaining(total, budgetMs), ct).ConfigureAwait(false), baseline));
+                software = Subtract(
+                    await MeasureAsync(sample, SoftwareCodec, true, Remaining(total, budgetMs), ct).ConfigureAwait(false),
+                    baseline);
         }
         catch (OperationCanceledException)
         {
@@ -119,7 +130,8 @@ public static class PerformanceProbe
         }
 
         return PerformanceCheck.Evaluate(
-            costs, logicalCores, total.ElapsedMilliseconds, budgetMs, hardwareCodec is not null, cpuFactor);
+            software, hardwareSingle, hardwareFree,
+            logicalCores, total.ElapsedMilliseconds, budgetMs, hardwareCodec is not null, cpuFactor);
     }
 
     /// <summary>
@@ -136,34 +148,57 @@ public static class PerformanceProbe
 
     /// <summary>
     /// Makinenin işlemci zamanı sayacının kaç kat eksik okuduğunu ölçer: tek bir iş
-    /// parçacığı belirli bir süre çekirdeği doldurur, sayacın ona yazdığı süre duvar
-    /// saatiyle karşılaştırılır. Sağlam bir makinede oran 1'e yakındır. Sayaç bozuksa
-    /// karar değişmez — karar zaten sayaca bakmıyor — ama kullanıcıya gösterilen
-    /// işlemci zamanının ne kadar eksik olduğu bilinir.
+    /// parçacığı belirli bir süre çekirdeği doldurur, çekirdeğin <b>o iş parçacığına</b>
+    /// yazdığı süre duvar saatiyle karşılaştırılır. Sağlam bir sayaçta oran 1'e yakındır;
+    /// 1'in üstü sayacın o kat kadar eksik okuduğu anlamına gelir.
+    ///
+    /// Ölçü iş parçacığı düzeyinde (<c>GetThreadTimes</c>) alınıyor, süreç düzeyinde
+    /// değil. Süreç düzeyinde alındığında ölçüm yapısal olarak çalışmıyordu: paralel
+    /// koşan bir test konağında aynı anda başka iş parçacıkları da işlemci yakıyor,
+    /// süreç deltası yakım süresinden büyük çıkıyor ve oran her zaman 1'e kırpılıyordu —
+    /// yani "sağlam sayaç" ile "meşgul süreç" ayırt edilemiyordu.
+    ///
+    /// Windows dışında iş parçacığı sayacı okunamıyor; orada 0 döner, yani "ölçülemedi".
     /// </summary>
     internal static double CalibrateCpuClock(int durationMs = CpuCalibrationMs)
     {
-        var self = Process.GetCurrentProcess();
-        var before = self.TotalProcessorTime;
-        var clock = Stopwatch.StartNew();
+        if (!OperatingSystem.IsWindows()) return 0;
+
+        double charged = 0;
+        long wall = 0;
 
         var burner = new Thread(() =>
         {
+            var clock = Stopwatch.StartNew();
+            var before = ThreadCpuMs();
             var x = 1.0;
             while (clock.ElapsedMilliseconds < durationMs) x = Math.Sqrt(x + 1.0) * 1.000001;
             GC.KeepAlive(x);
-        }) { IsBackground = true, Priority = ThreadPriority.Normal };
+            clock.Stop();
+            charged = ThreadCpuMs() - before;
+            wall = clock.ElapsedMilliseconds;
+        }) { IsBackground = true };
 
         burner.Start();
         burner.Join();
-        clock.Stop();
 
-        self.Refresh();
-        var charged = (self.TotalProcessorTime - before).TotalMilliseconds;
-        if (charged <= 0 || clock.ElapsedMilliseconds <= 0) return 1;
-
-        return Math.Clamp(clock.ElapsedMilliseconds / charged, 1, 64);
+        if (charged <= 0 || wall <= 0) return 0;
+        return wall / charged;
     }
+
+    /// <summary>Çağıran iş parçacığına yazılmış çekirdek + kullanıcı süresi, ms.</summary>
+    private static double ThreadCpuMs()
+    {
+        if (!GetThreadTimes(GetCurrentThread(), out _, out _, out var kernel, out var user)) return 0;
+        return (kernel + user) / 10_000.0;
+    }
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+    private static extern IntPtr GetCurrentThread();
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+    [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+    private static extern bool GetThreadTimes(IntPtr thread, out long creation, out long exit, out long kernel, out long user);
 
     private static long Remaining(Stopwatch total, long budgetMs)
         => budgetMs <= 0 ? int.MaxValue : Math.Max(0, budgetMs - total.ElapsedMilliseconds);
@@ -188,15 +223,19 @@ public static class PerformanceProbe
     /// <paramref name="codec"/> null ise klip yalnız çözülür — taban geçiş.
     /// Çıkış her zaman <c>null</c> muxer'ıdır: diske yazma maliyeti ölçüme karışmasın.
     /// </summary>
-    private static async Task<EncoderCost> MeasureAsync(string sample, string? codec, long timeoutMs, CancellationToken ct)
+    private static async Task<EncoderCost> MeasureAsync(
+        string sample, string? codec, bool singleThread, long timeoutMs, CancellationToken ct)
     {
         var name = codec ?? "taban";
         if (timeoutMs <= 0) return EncoderCost.Missing(name);
 
-        var args = new List<string> { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample };
+        var args = new List<string> { "-hide_banner", "-loglevel", "error" };
+        if (singleThread) args.AddRange(new[] { "-threads", "1" });
+        args.AddRange(new[] { "-i", sample });
         if (codec is not null)
         {
-            args.AddRange(new[] { "-an", "-c:v", codec, "-threads", "1" });
+            args.AddRange(new[] { "-an", "-c:v", codec });
+            if (singleThread) args.AddRange(new[] { "-threads", "1" });
             if (!CodecModel.IsHardware(codec))
             {
                 args.Add("-preset");
