@@ -39,9 +39,7 @@ internal static class LanguageCatalog
             ["avi"] = "AVI",
             ["gif"] = "GIF",
             ["webm"] = "WebM",
-            ["aac"] = "AAC",
             ["pcm"] = "PCM",
-            ["opus"] = "Opus",
             ["crf"] = "CRF",
             ["json"] = "JSON",
             ["gpu"] = "GPU",
@@ -52,14 +50,34 @@ internal static class LanguageCatalog
             ["api"] = "API",
             ["hdr"] = "HDR",
             ["sdr"] = "SDR",
-            ["fps"] = "FPS",
-            ["kbps"] = "kbps",
             ["av1"] = "AV1",
             ["vp9"] = "VP9",
             ["whatsapp"] = "WhatsApp",
             ["vidshrink"] = "VidShrink",
             ["teknesyum"] = "Teknesyum",
             ["windows"] = "Windows",
+        };
+
+    /// <summary>
+    /// Yazıldığı gibi kalan sözcükler: ölçü birimleri ve ffmpeg kodlayıcı/kodek
+    /// tanımlayıcıları. Büyük harf kuralı ikisini de bozuyor — <c>ms</c> SI'da megasaniye
+    /// olan <c>Ms</c>'e, <c>libx264</c> ffmpeg'in tanımadığı <c>Libx264</c>'e dönerdi.
+    /// Kullanıcı kodlayıcı adını kaydedicisinin ayarlarında arıyor; yazımı değişirse
+    /// bulamaz.
+    ///
+    /// <para>Zaten büyük harf taşıyan birimler (<c>MB</c>, <c>Hz</c>, <c>dB</c>) kuraldan
+    /// halihazırda muaf; kendi yazımlarını burada da bildirmek listenin birim tarafını
+    /// eksiksiz tutuyor. Liste tek yerde durur: ikiye bölünürse bir süre sonra ayrışır.</para>
+    /// </summary>
+    private static readonly HashSet<string> Verbatim =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            "ms", "kB", "MB", "GB", "kbps", "Mbps", "fps", "Hz", "kHz", "dB", "px",
+            "libx264", "libx265", "libsvtav1", "libvpx", "libopus", "libmp3lame", "libvmaf",
+            "h264_nvenc", "hevc_nvenc", "av1_nvenc",
+            "h264_qsv", "hevc_qsv", "av1_qsv",
+            "h264_amf", "hevc_amf", "av1_amf",
+            "aac", "opus"
         };
 
     /// <summary>
@@ -125,6 +143,8 @@ internal static class LanguageCatalog
         var bare = new string(body.TakeWhile(char.IsLetter).ToArray());
         var token = new string(body.TakeWhile(char.IsLetterOrDigit).ToArray());
 
+        var identifier = new string(body.TakeWhile(letter => char.IsLetterOrDigit(letter) || letter == '_').ToArray());
+        if (Verbatim.Contains(identifier) || Verbatim.Contains(token) || Verbatim.Contains(bare)) return word;
         if (Names.TryGetValue(token, out var known))
             return string.Concat(word.AsSpan(0, offset), known, body.AsSpan(token.Length));
         if (Names.TryGetValue(bare, out var name))

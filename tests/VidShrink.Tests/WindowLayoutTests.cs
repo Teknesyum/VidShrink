@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.Core;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
@@ -28,6 +29,10 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class WindowLayoutTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public WindowLayoutTests(ITestOutputHelper output) => _output = output;
+
     /// <summary>Bir taşıyıcının taştığı miktar; sıfırın üstündeyse çubuk görünür.</summary>
     private readonly record struct Overflow(string Name, double Vertical, double Horizontal)
     {
@@ -101,6 +106,90 @@ public sealed class WindowLayoutTests
         root.Measure(size);
         root.Arrange(new Rect(size));
     }
+
+    /// <summary>
+    /// Sekme seçimi değiştikten sonraki geçiş. <see cref="LayOutAt"/> burada yetmiyor:
+    /// yeni sekmenin içeriği ilk kez ölçülüyor ve <see cref="TopLevel.UpdateLayout"/> onu
+    /// pencerenin kendi <c>ClientSize</c>'ı ile — başsız koşumda sıfır — ölçüp temiz
+    /// işaretliyor; ardından gelen kök geçişi artık ona uğramıyor. Sekme ağaçta durur ama
+    /// blok sınırları sıfır kalır ve sınıra bakan her süzgeç sekmeyi sessizce eler.
+    /// Bu geçiş o yüzden pencereyi hiç sürmez: ağacın tamamı geçersizleştirilip yalnız
+    /// kök ölçülür. <see cref="PerformanceCheckUiTests"/> aynı yolu kullanıyor.
+    /// </summary>
+    private static void RelayoutAt(MainWindow window, Size size)
+    {
+        foreach (var node in window.GetVisualDescendants().OfType<Layoutable>()) node.InvalidateMeasure();
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.InvalidateMeasure();
+        root.Measure(size);
+        root.Arrange(new Rect(size));
+    }
+
+    /// <summary>Bir sekmenin ölçülmüş metin blokları; kırpılanlar ayrı sayılır.</summary>
+    private readonly record struct TabScan(
+        string Header,
+        int Measured,
+        int InPerformancePanel,
+        IReadOnlyList<string> Clipped);
+
+    /// <summary>
+    /// Avalonia seçili olmayan sekmenin içeriğini görsel ağaca almıyor, dolayısıyla tek bir
+    /// ölçüm yalnız açık sekmeyi görür. Bu yürüyüş her sekmeyi sırayla seçip
+    /// <paramref name="size"/> görüş alanında yeniden ölçer. Kırpma ölçütü
+    /// <see cref="Clips"/> içinde.
+    /// </summary>
+    private static List<TabScan> ScanTabs(MainWindow window, Size size)
+    {
+        LayOutAt(window, size);
+
+        var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
+        var scans = new List<TabScan>();
+
+        for (var index = 0; index < tabs.ItemCount; index++)
+        {
+            tabs.SelectedIndex = index;
+            RelayoutAt(window, size);
+
+            var header = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
+
+            var blocks = window.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Where(block => block.IsEffectivelyVisible && block.Bounds.Width > 0)
+                .ToList();
+
+            scans.Add(new TabScan(
+                header,
+                blocks.Count,
+                blocks.Count(InPerformancePanel),
+                blocks
+                    .Where(Clips)
+                    .Select(block => $"{header}: {(block.Text ?? "(boş)").Split('\n')[0]}")
+                    .ToList()));
+        }
+
+        return scans;
+    }
+
+    /// <summary>
+    /// Metin, istediği genişlikten dar yerleştirildiyse kırpılmıştır.
+    /// <see cref="Layoutable.DesiredSize"/> kenar boşluğunu içeriyor,
+    /// <see cref="Visual.Bounds"/> içermiyor; karşılaştırmadan önce boşluk düşülüyor, yoksa
+    /// yanı boşluklu her denetim kırpılmış görünür.
+    ///
+    /// <para>T65'te ölçüldü ve <b>ölçüt kırmızıya dönmüyor</b>: Avalonia bir denetimi
+    /// istediğinden dar yerleştirmiyor, sarmayan uzun metnin isteği de ölçüm sırasında
+    /// verilen genişliğe kırpılıyor — iki sayı taşan metinde bile eşit çıkıyor. Yerine
+    /// konacak ölçüt, bloğun sağ kenarını sayfa taşıyıcısının görüş alanıyla karşılaştıran
+    /// ölçüttür; o ölçüt denendiğinde ipucu düğmesinin kaydırma çubuğu genişliği kadar
+    /// dışarı taştığı görüldü ve düzeltmesi <c>MainWindow.axaml</c>'e düşüyor — bu
+    /// sözleşmenin kapsamı dışında. Ayrıntı T65 raporunda.</para>
+    /// </summary>
+    private static bool Clips(TextBlock block)
+        => block.DesiredSize.Width - block.Margin.Left - block.Margin.Right > block.Bounds.Width + 0.5;
+
+    private static bool InPerformancePanel(TextBlock block)
+        => block.GetVisualAncestors().OfType<Border>().Any(border => border.Name == "PerformancePanel");
 
     private static T Read<T>(Size size, bool loaded, Func<MainWindow, T> read) =>
         AppHost.Run(() =>
@@ -581,12 +670,8 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
-    /// Avalonia seçili olmayan sekmenin içeriğini görsel ağaca almıyor, dolayısıyla tek
-    /// bir ölçüm yalnız açık sekmeyi görür. Ölçüm bütün sekmeleri dolaşıyor.
-    ///
-    /// <para><see cref="Layoutable.DesiredSize"/> kenar boşluğunu içeriyor,
-    /// <see cref="Visual.Bounds"/> içermiyor; karşılaştırmadan önce boşluk düşülüyor,
-    /// yoksa yanı boşluklu her denetim kırpılmış görünür.</para>
+    /// Taban boyutta hiçbir sekmede metin kırpılmıyor. Yürüyüş ve kırpma ölçütü
+    /// <see cref="ScanTabs"/> içinde.
     /// </summary>
     [Theory]
     [InlineData(false)]
@@ -594,8 +679,49 @@ public sealed class WindowLayoutTests
     public void NoTextIsClippedAtTheSmallestSize(bool loaded)
     {
         var size = MinimumSize();
+        var scans = Scan(size, loaded);
+        var clipped = scans.SelectMany(scan => scan.Clipped).ToList();
 
-        var clipped = AppHost.Run(() =>
+        _output.WriteLine(Counts(size, loaded, scans));
+
+        Assert.True(
+            clipped.Count == 0,
+            $"En küçük boyutta ({size.Width:0}x{size.Height:0}) kırpılan metin var:"
+            + Environment.NewLine
+            + string.Join(Environment.NewLine, clipped));
+    }
+
+    /// <summary>
+    /// Kırpılma ölçüsünün gerçekten baktığı yer: her sekmede ölçülmüş blok var mı.
+    ///
+    /// <para>T65'te ölçüldü: sekme seçimi değiştikten sonra yeni sekmenin içeriği
+    /// ölçülmeden kalıyordu, sınırları sıfır çıkıyordu ve
+    /// <see cref="NoTextIsClippedAtTheSmallestSize"/> ilk sekme dışında hiçbir şeyi
+    /// denetlemiyordu — süzgeç bütün blokları eliyordu. Sıfır blok gören bir sekme,
+    /// kırpılma ölçüsünün o sekme için ölü olduğu anlamına gelir; bu ölçü onu yakalar.</para>
+    ///
+    /// <para>Gelişmiş sekmesindeki başarım paneli ayrıca sayılıyor: sekmenin toplamı
+    /// sıfırdan büyükken panelin kendisi ağaca hiç girmemiş olabilir.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EveryTabIsMeasuredAtTheSmallestSize(bool loaded)
+    {
+        var size = MinimumSize();
+        var scans = Scan(size, loaded);
+        var report = Counts(size, loaded, scans);
+
+        _output.WriteLine(report);
+
+        Assert.All(scans, scan => Assert.True(scan.Measured > 0, $"{scan.Header} sekmesi hiç ölçülmedi. {report}"));
+
+        var advanced = scans.Single(scan => scan.Header == "Advanced");
+        Assert.True(advanced.InPerformancePanel > 0, $"Başarım paneli ölçülmedi. {report}");
+    }
+
+    private static List<TabScan> Scan(Size size, bool loaded) =>
+        AppHost.Run(() =>
         {
             var window = new MainWindow();
             if (loaded)
@@ -604,36 +730,14 @@ public sealed class WindowLayoutTests
                 window.SettleFades();
             }
 
-            LayOutAt(window, size);
-
-            var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
-            var found = new List<string>();
-
-            for (var index = 0; index < tabs.ItemCount; index++)
-            {
-                tabs.SelectedIndex = index;
-                LayOutAt(window, size);
-
-                var header = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
-
-                found.AddRange(window.GetVisualDescendants()
-                    .OfType<TextBlock>()
-                    .Where(block => block.IsEffectivelyVisible
-                                 && block.Bounds.Width > 0
-                                 && block.DesiredSize.Width - block.Margin.Left - block.Margin.Right
-                                    > block.Bounds.Width + 0.5)
-                    .Select(block => $"{header}: {(block.Text ?? "(boş)").Split('\n')[0]}"));
-            }
-
-            return found;
+            return ScanTabs(window, size);
         });
 
-        Assert.True(
-            clipped.Count == 0,
-            $"En küçük boyutta ({size.Width:0}x{size.Height:0}) kırpılan metin var:"
-            + Environment.NewLine
-            + string.Join(Environment.NewLine, clipped));
-    }
+    private static string Counts(Size size, bool loaded, IEnumerable<TabScan> scans) =>
+        $"{(loaded ? "Dolu" : "Boş")} pencerede {size.Width:0}x{size.Height:0} ölçülen blok: "
+        + string.Join(", ", scans.Select(scan =>
+            $"{scan.Header}={scan.Measured}"
+            + (scan.InPerformancePanel > 0 ? $" (başarım paneli {scan.InPerformancePanel})" : string.Empty)));
 
     /// <summary>
     /// <c>DropZonePadding</c> aralık ölçeğindeki <c>SpaceMd</c> ile aynı sayıyı taşıyor.
