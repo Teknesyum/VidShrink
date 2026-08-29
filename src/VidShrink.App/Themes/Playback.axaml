@@ -14,6 +14,15 @@
                                   uydurulmadı; programdaki tek panel taban ölçüsünün katı.
       PlaybackBadgeMargin      <- SpaceMd (12)
       PlaybackScrimColor       <- AppBgColor (#050507), %80 örtücülük
+      PlaybackScrimEdgeColor   <- aynı renk, sıfır örtücülük: paravanın sönen ucu.
+      PlaybackScrimEdge        <- PlaybackHoverZoneShare (SpaceXs / SpaceLg = 0,25).
+                                  T79: paravan artık düz bir örtü değil — alt kenarından
+                                  yukarı doğru son çeyreğinde sönüyor. Yeni bir oran
+                                  uydurulmadı; panelin tek "band payı" oranı kullanıldı.
+      PlaybackIdleVeilOpacity  <- PhoenixOpacity (0,30). T79: kaynak yüklenmemişken
+                                  panonun zemini bu opaklıkta durur, yani arkadaki anka
+                                  çizildiği güçle panelin içinden görünür. İki yerde iki
+                                  ayrı sayı olmasın diye ankanın kendi belirtecinin değeri.
       PlaybackMaxPanelScale    <- ölçü değil, jest aralığı: panel boyunun tavanı, taban
                                   boyun katı olarak. ZoomGesture ile aynı sayı.
 
@@ -36,13 +45,10 @@
                                   ölçekli boy pencerenin bu oranını geçemez. Aynı
                                   belirteç pencerenin çalışma alanına oturmasını da
                                   sürüyor: "kapla ama kenarı bırak" ölçüsü tektir.
-      PlaybackPanelRiseDelay   <- ölçü değil, kullanıcının söylediği süre: 2 saniye.
-                                  Hareket ölçeğindeki (MotionSlow 360 ms) bir değer değil,
-                                  çünkü bu bir geçiş süresi değil bekleme süresi. T70: süre
-                                  farenin panel üstünde durduğu zamanı ölçer — panel bu
-                                  kadar beklemeden büyümez.
-      PlaybackPanelFallDelay   <- ölçü değil: fare çekilince panel beklemeden küçülür,
-                                  yani sıfır. İki yön ayrı belirteç çünkü ayrı kararlar.
+      T79: panelin iki bekleme süresi (PlaybackPanelRiseDelay, PlaybackPanelFallDelay)
+      buradan tamamen kalktı. Panel fareye anında yanıt veriyor; sıfır yazılı bir
+      belirteç bırakmak "burada ayarlanabilir bir süre var" derdi, oysa yok. Şeridin
+      kendi iki süresi (PlaybackStripShowDelay/HideDelay) duruyor — onlar başka karar.
 
     T46 — boş panel ve tıkla yakınlaştırma:
 
@@ -65,17 +71,8 @@
                                   panelin fareyle çıktığı boy pencereden hesaplanıyor, bu
                                   sayı da orta kademenin eşiği olarak altına inilemeyen sınır.
 
-    T73 — yuvarlak geri sayım:
-
-      PlaybackCountdownSize    <- DropIconSize (48). Programdaki tek büyük simge ölçüsü.
-      PlaybackCountdownRadius  <- PlaybackCountdownSize / 2 = 24. Daire; teknesyum-ui'nin
-                                  tek yarıçap kuralının "daire biçimli işlevsel öğe"
-                                  istisnası. Uydurulmuş sayı değil, ölçünün yarısı.
-      PlaybackCountdownStroke  <- DropOutlineThickness (2), kodlama imleciyle aynı kalınlık.
-
-      Geri sayımın süresi burada yok ve olmayacak: gösterge süreyi bekleme sayacından alır
-      (HoverZone.ShowCountdown). Buraya ikinci bir süre yazılırsa belirteç değiştiğinde
-      gösterge ile sayaç ayrışır.
+    T79: yuvarlak geri sayımın üç belirteci de (PlaybackCountdownSize/Radius/Stroke) ve
+    perdesi kalktı. Bekleme olmayınca sayan bir gösterge de yok.
   -->
 
   <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
@@ -97,8 +94,6 @@
   <x:Double x:Key="PlaybackCursorWidth">2</x:Double>
 
   <x:Double x:Key="PlaybackMidShare">0.9</x:Double>
-  <sys:TimeSpan x:Key="PlaybackPanelRiseDelay">00:00:02</sys:TimeSpan>
-  <sys:TimeSpan x:Key="PlaybackPanelFallDelay">00:00:00</sys:TimeSpan>
 
   <x:Double x:Key="PlaybackIdleMinHeight">512</x:Double>
   <x:Double x:Key="PlaybackZoomButtonSize">24</x:Double>
@@ -106,12 +101,40 @@
   <x:Double x:Key="PlaybackBadgeGap">8</x:Double>
   <x:Double x:Key="PlaybackHoverZoom">2</x:Double>
 
-  <x:Double x:Key="PlaybackCountdownSize">48</x:Double>
-  <CornerRadius x:Key="PlaybackCountdownRadius">24</CornerRadius>
-  <x:Double x:Key="PlaybackCountdownStroke">2</x:Double>
+  <x:Double x:Key="PlaybackIdleVeilOpacity">0.30</x:Double>
+
+  <!--
+    T79/K4: panonun iki zemini. Kare varken örtücü olanı (PlaybackStageFill), kaynak
+    yüklenmemişken saydam olanı (PlaybackIdleVeil) duruyor. İkisi aynı renk; aralarındaki
+    tek fark opaklık ve o da belirteçten geliyor.
+
+    Panelin kendi yüzeyi de kalkmak zorunda: kabuk %90 örtücü bir zemin çiziyor ve tek
+    başına pano saydamlaşırsa ankaya kalan pay yaklaşık yüzde yedi olurdu. Boş panelin
+    kabuğu bu yüzden hiç mürekkep koymuyor — renk değil, mürekkebin yokluğu.
+  -->
+  <SolidColorBrush x:Key="PlaybackStageFill" Color="{StaticResource AppBgColor}"/>
+  <SolidColorBrush x:Key="PlaybackIdleVeil"
+                   Color="{StaticResource AppBgColor}"
+                   Opacity="{StaticResource PlaybackIdleVeilOpacity}"/>
+  <SolidColorBrush x:Key="PlaybackIdleShell" Color="Transparent"/>
 
   <Color x:Key="PlaybackScrimColor">#CC050507</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#00050507</Color>
+  <x:Double x:Key="PlaybackScrimEdge">0.25</x:Double>
   <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
+
+  <!--
+    T79/K5: paravanın biçimi. Yonga ve düğme düz perdede kalıyor — oradaki kontrast oranı
+    ölçülmüş bir sayı ve zemin sabit olmalı. Büyük yüzey, yani şeridin kendi örtüsü,
+    artık üst kenarına doğru sönüyor: altından yukarı doğru son çeyreğinde (PlaybackScrimEdge)
+    aynı rengin sıfır örtücülüklü haline geçiyor. Metin şeridin altında, yani perdenin
+    tam örtücü yarısında duruyor; sönen çeyrek üstteki boş kenar.
+  -->
+  <LinearGradientBrush x:Key="PlaybackScrimVeil" StartPoint="50%,100%" EndPoint="50%,0%">
+    <GradientStop Offset="0" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.75" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="1" Color="{StaticResource PlaybackScrimEdgeColor}"/>
+  </LinearGradientBrush>
 
   <!--
     Ayırıcı. Çizginin kendisi hep görünür; tutamaç fare üstüne gelince ya da odak
@@ -203,19 +226,6 @@
     <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
   </ControlTheme>
 
-  <!--
-    T73: bekleme göstergesinin perdesi. Yuvarlak, çünkü içindeki halka yuvarlak; renk ve
-    parıltı yonganınkiyle aynı, panelde ikinci bir görsel dil açılmıyor.
-  -->
-  <ControlTheme x:Key="PlaybackCountdown" TargetType="Border">
-    <Setter Property="Width" Value="{StaticResource PlaybackCountdownSize}"/>
-    <Setter Property="Height" Value="{StaticResource PlaybackCountdownSize}"/>
-    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource PlaybackCountdownRadius}"/>
-    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
-    <Setter Property="IsHitTestVisible" Value="False"/>
-  </ControlTheme>
-
   <!-- Terfi ederken bandında kalan yer tutucu: aynı boyut, aynı yarıçap, boş yüzey. -->
   <ControlTheme x:Key="PlaybackPlaceholder" TargetType="Border">
     <Setter Property="Background" Value="{StaticResource Surface}"/>
@@ -228,9 +238,11 @@
     T40 — denetim şeridi. Normalde saydam (Opacity 0), fare panelin alt çeyreğine girince
     ya da klavye odağı içine düşünce belirir. Okunabilirliği arka planı değil kontrastı
     taşır: örtücü perde görüntünün üstünde durur ve metin beyaz mono kalır.
+    T79/K5: perde artık düz değil — üst kenarına doğru sönen paravanı (PlaybackScrimVeil)
+    kullanıyor, yani şeridin üst kenarı görüntüye keskin bir çizgiyle oturmuyor.
   -->
   <ControlTheme x:Key="PlaybackStrip" TargetType="Border">
-    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="Background" Value="{StaticResource PlaybackScrimVeil}"/>
     <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
     <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
     <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>

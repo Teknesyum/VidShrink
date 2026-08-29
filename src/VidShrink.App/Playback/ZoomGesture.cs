@@ -118,7 +118,14 @@ internal sealed class ZoomGesture
     /// T52: panelin boy ölçeği. Taban boyda 1, tavanda <c>PlaybackMaxPanelScale</c>.
     /// Ekranda okunan yüzde budur; görüntünün kendi ölçeği değil.
     /// </summary>
-    internal double PanelScale => 1.0 + T * (_maxPanelScale - 1.0);
+    internal double PanelScale => ScaleAt(T);
+
+    /// <summary>
+    /// T79: verilen jest parametresinin boy ölçeği. Formülün tek yeri burası — dışarıdan
+    /// bir eşiğin (örneğin <see cref="FullDropAt"/>) ölçek karşılığı sorulduğunda çağıran
+    /// taraf aynı çarpımı ikinci kez yazmaz. <see cref="ParameterFor"/> bunun tersidir.
+    /// </summary>
+    internal double ScaleAt(double parameter) => 1.0 + parameter * (_maxPanelScale - 1.0);
 
     /// <summary>Kaynağı panoya sığdıran ölçek. T52'den beri görüntünün tek ölçeği bu.</summary>
     internal double FitScale
