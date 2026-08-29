@@ -4,6 +4,42 @@ using Avalonia.Threading;
 namespace VidShrink.App.Playback;
 
 /// <summary>
+/// Gecikmeyi işleten saat. Tek uygulaması <see cref="DispatcherHoverClock"/>; ölçüm
+/// yerine sahtesini takıp bekleme süresini duvar saati olmadan sürer (T70/K7).
+/// </summary>
+internal interface IHoverClock
+{
+    void Start(TimeSpan delay, Action fire);
+
+    void Stop();
+}
+
+/// <summary>Gerçek saat: arayüz iş parçacığının zamanlayıcısı.</summary>
+internal sealed class DispatcherHoverClock : IHoverClock
+{
+    private DispatcherTimer? _timer;
+
+    public void Start(TimeSpan delay, Action fire)
+    {
+        Stop();
+        var timer = new DispatcherTimer { Interval = delay };
+        _timer = timer;
+        timer.Tick += (_, _) =>
+        {
+            Stop();
+            fire();
+        };
+        timer.Start();
+    }
+
+    public void Stop()
+    {
+        _timer?.Stop();
+        _timer = null;
+    }
+}
+
+/// <summary>
 /// Panelin alt bölgesindeki fare durumunu ve şeridin görünürlüğünü tutar.
 ///
 /// Bölge yüksekliği piksel değil oran: <see cref="Share"/> panelin yüksekliğiyle çarpılır,
@@ -16,6 +52,10 @@ namespace VidShrink.App.Playback;
 /// T44: aynı kuşak koruması karşılaştırma panelinin gecikmeli inişini de sürüyor. Orada
 /// bölge oranı değil, hedef kademenin sınırı karar veriyor; sınır dışarıdan
 /// <see cref="PointerWithin"/> ile bildiriliyor.
+///
+/// T70: iki yön iki ayrı gecikme taşıyor. Gösterme gecikmesi farenin üstünde <i>durduğu</i>
+/// süreyi ölçer — süre dolmadan fare çıkarsa kuşak ilerler ve bekleyen tik kararını
+/// uygulamaz. Gecikmesi sıfır olan yön beklemeden uygulanır; zamanlayıcı hiç kurulmaz.
 /// </summary>
 internal sealed class HoverZone
 {
@@ -23,21 +63,34 @@ internal sealed class HoverZone
 
     private static bool? _motionReduced;
 
+    private readonly Func<TimeSpan> _showDelay;
     private readonly Func<TimeSpan> _hideDelay;
     private readonly Action<bool> _apply;
     private readonly double _share;
 
-    private DispatcherTimer? _timer;
+    private IHoverClock _clock = new DispatcherHoverClock();
     private int _generation;
     private bool _pointerInside;
     private bool _held;
     private bool _visible;
 
-    internal HoverZone(double share, Func<TimeSpan> hideDelay, Action<bool> apply)
+    internal HoverZone(double share, Func<TimeSpan> showDelay, Func<TimeSpan> hideDelay, Action<bool> apply)
     {
         _share = Math.Clamp(share, 0, 1);
+        _showDelay = showDelay;
         _hideDelay = hideDelay;
         _apply = apply;
+    }
+
+    /// <summary>Gecikmeyi işleten saat. Ölçüm sahtesini takar; bekleyen iş devralınmaz.</summary>
+    internal IHoverClock Clock
+    {
+        get => _clock;
+        set
+        {
+            _clock.Stop();
+            _clock = value;
+        }
     }
 
     /// <summary>
@@ -67,15 +120,17 @@ internal sealed class HoverZone
 
     /// <summary>
     /// Sayacı sıfırdan kurar. Bekleyen tik kuşağını kaybettiği için kararını uygulamaz;
-    /// tutma sebepleri ve fare durumu temizlenir, <paramref name="visible"/> yeni başlangıç
-    /// hâlidir. <see cref="_apply"/> çağrılmaz — durum değişimi çağıranın kendi elinde.
+    /// tutma sebepleri temizlenir, <paramref name="visible"/> yeni başlangıç hâlidir.
+    /// <see cref="_apply"/> çağrılmaz — durum değişimi çağıranın kendi elinde.
+    ///
+    /// <paramref name="pointerInside"/> çağıranın bildiği fare durumudur: terfi eden panel
+    /// bunu verirse fare hiç kıpırdamadan çıktığında da sayaç çıkışı görür.
     /// </summary>
-    internal void Reset(bool visible)
+    internal void Reset(bool visible, bool pointerInside = false)
     {
         _generation++;
-        _timer?.Stop();
-        _timer = null;
-        _pointerInside = false;
+        _clock.Stop();
+        _pointerInside = pointerInside;
         _held = false;
         _visible = visible;
     }
@@ -86,6 +141,10 @@ internal sealed class HoverZone
     /// </summary>
     internal bool ShouldHide(int generation)
         => generation == _generation && !_pointerInside && !_held;
+
+    /// <summary>Bekleyen gösterme tikinin kararını uygulayıp uygulamayacağı.</summary>
+    internal bool ShouldShow(int generation)
+        => generation == _generation && (_pointerInside || _held);
 
     /// <summary>Bekleyen tikin taşıdığı kuşak. Ölçüm bunu okuyup eskisiyle karşılaştırır.</summary>
     internal int Generation => _generation;
@@ -110,36 +169,70 @@ internal sealed class HoverZone
 
     private void Evaluate()
     {
-        if (_pointerInside || _held) Show();
+        if (_pointerInside || _held) ScheduleShow();
         else ScheduleHide();
     }
 
-    private void Show()
+    private void ScheduleShow()
     {
-        _generation++;
-        _timer?.Stop();
-        _timer = null;
-        if (_visible) return;
-        _visible = true;
-        _apply(true);
+        if (_visible)
+        {
+            Cancel();
+            return;
+        }
+
+        var delay = _showDelay();
+        if (delay <= TimeSpan.Zero)
+        {
+            Cancel();
+            Apply(true);
+            return;
+        }
+
+        var mine = Cancel();
+        _clock.Start(delay, () =>
+        {
+            if (!ShouldShow(mine)) return;
+            Apply(true);
+        });
     }
 
     private void ScheduleHide()
     {
-        if (!_visible) return;
-
-        var mine = ++_generation;
-        _timer?.Stop();
-        _timer = new DispatcherTimer { Interval = _hideDelay() };
-        _timer.Tick += (_, _) =>
+        if (!_visible)
         {
-            _timer?.Stop();
-            _timer = null;
+            Cancel();
+            return;
+        }
+
+        var delay = _hideDelay();
+        if (delay <= TimeSpan.Zero)
+        {
+            Cancel();
+            Apply(false);
+            return;
+        }
+
+        var mine = Cancel();
+        _clock.Start(delay, () =>
+        {
             if (!ShouldHide(mine)) return;
-            _visible = false;
-            _apply(false);
-        };
-        _timer.Start();
+            Apply(false);
+        });
+    }
+
+    /// <summary>Bekleyen tiki geçersizler ve yeni kuşağı döndürür.</summary>
+    private int Cancel()
+    {
+        _generation++;
+        _clock.Stop();
+        return _generation;
+    }
+
+    private void Apply(bool visible)
+    {
+        _visible = visible;
+        _apply(visible);
     }
 
     [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]

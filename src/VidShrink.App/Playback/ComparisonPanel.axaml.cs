@@ -42,8 +42,9 @@ internal partial class ComparisonPanel : UserControl
     private OverlayLayer? _overlay;
     private DispatcherTimer? _landing;
 
-    // T44/K2: gecikmeli iniş. Kuşak koruması HoverZone'da zaten var, ikinci kopya yazılmadı.
+    // T44/K2 + T70: panelin büyüme/küçülme sayacı. Kuşak koruması HoverZone'da zaten var.
     // Bölge oranı burada anlamsız (panelin tamamı), sınır kararını hedef kademe veriyor.
+    // Büyüme gecikmeli, küçülme anında: iki yön de temadan okunan ayrı belirteçler.
     private readonly HoverZone _descent;
 
     private ShelterStage _stage = ShelterStage.Band;
@@ -77,18 +78,27 @@ internal partial class ComparisonPanel : UserControl
 
         // K5: azaltılmış hareket ayarını okuyan tek yer HoverZone. İkinci kopya yok.
         _motionReduced = HoverZone.MotionReduced;
-        _descent = new HoverZone(1.0, () => Motion("PlaybackDescendDelay", 2000), open =>
-        {
-            if (!open) Descend();
-        });
+        _descent = new HoverZone(
+            share: 1.0,
+            showDelay: () => Delay("PlaybackPanelRiseDelay"),
+            hideDelay: () => Delay("PlaybackPanelFallDelay"),
+            apply: open =>
+            {
+                if (open) HoverZoom(true);
+                else if (_promoted) Descend();
+                else HoverZoom(false);
+            });
 
         Surface.Gesture = _gesture;
         SeparatorGrip.RenderTransform = _separatorAt;
 
         Shell.PointerWheelChanged += OnWheel;
         Shell.KeyDown += OnShellKey;
-        Shell.PointerEntered += (_, _) => HoverZoom(true);
-        Shell.PointerExited += (_, _) => HoverZoom(false);
+        Shell.PointerEntered += (_, _) => HoverPanel(true);
+        Shell.PointerExited += (_, _) =>
+        {
+            if (!Shell.IsPointerOver) HoverPanel(false);
+        };
 
         BtnZoomIn.Click += (_, _) => Zoom(1, StageCentre());
         BtnZoomOut.Click += (_, _) => Zoom(-1, StageCentre());
@@ -402,14 +412,16 @@ internal partial class ComparisonPanel : UserControl
     }
 
     /// <summary>
-    /// T52/K2: fare panele girince <b>panel</b> doğrudan <c>PlaybackHoverZoom</c> katına
-    /// çıkar; büyüyen şey panelin boyu, görüntünün içi değil. İki kat panel bandına
-    /// sığmadığı için bu aynı zamanda orta kademenin eşiğidir: panel kök katmana terfi eder.
+    /// T52/K2: panel <c>PlaybackHoverZoom</c> katına çıkar; büyüyen şey panelin boyu,
+    /// görüntünün içi değil. İki kat panel bandına sığmadığı için bu aynı zamanda orta
+    /// kademenin eşiğidir: panel kök katmana terfi eder.
+    ///
+    /// T70: bu yolu artık fare girişi doğrudan çağırmıyor. Çağıran <see cref="_descent"/>;
+    /// giriş yalnız sayacı kurar, büyüme <c>PlaybackPanelRiseDelay</c> dolduğunda uygulanır.
     ///
     /// Kullanıcının seçimi ezilmiyor: giriş ölçeklemesi yalnız panel taban durumundayken
-    /// uygulanır. Fare çıkışında panel terfi etmişse iniş kararı buraya değil T44'ün
-    /// gecikmeli iniş sayacına aittir (<c>PlaybackDescendDelay</c>) — titrek fare paneli
-    /// çırpındırmasın diye. Terfi olmadıysa (kök katman yoksa) değer hâlâ bizimse geri alınır.
+    /// uygulanır. Fare çıkışında panel terfi etmişse karar buraya değil
+    /// <see cref="Descend"/>'e aittir; terfi olmadıysa değer hâlâ bizimse geri alınır.
     /// </summary>
     internal void HoverZoom(bool entering)
     {
@@ -523,7 +535,7 @@ internal partial class ComparisonPanel : UserControl
         _landing = null;
 
         _stage = stage;
-        _descent.Reset(true);
+        _descent.Reset(true, Shell.IsPointerOver);
         RefreshDescentHold();
         ApplyStage();
     }
@@ -555,7 +567,7 @@ internal partial class ComparisonPanel : UserControl
         _band = band.Size;
         overlay.SizeChanged += OnOverlayResized;
 
-        _descent.Reset(true);
+        _descent.Reset(true, Shell.IsPointerOver);
         RefreshDescentHold();
 
         if (TopLevel.GetTopLevel(this) is { } top)
@@ -642,6 +654,12 @@ internal partial class ComparisonPanel : UserControl
 
     /// <summary>Fare konumunu iniş sayacına bildirir. Nokta kök katmanın koordinatındadır.</summary>
     internal void TrackPointer(Point overlayPoint) => _descent.PointerWithin(TargetCovers(overlayPoint));
+
+    /// <summary>
+    /// T70: fare panelin kabuğuna girdi ya da çıktı. Panel bandındayken hedef kademe sınırı
+    /// yok, karar kabuğun kendi giriş/çıkışına dayanıyor; büyüme kararını sayaç veriyor.
+    /// </summary>
+    internal void HoverPanel(bool inside) => _descent.PointerWithin(inside);
 
     private void OnGlobalPointerMoved(object? sender, PointerEventArgs e)
     {
@@ -795,6 +813,13 @@ internal partial class ComparisonPanel : UserControl
 
     private double Inset(string key, double fallback)
         => this.TryFindResource(key, out var value) && value is Thickness edge ? edge.Left + edge.Right : fallback;
+
+    /// <summary>
+    /// T70: bekleme süresi. Ölçü değil süre olduğu için yedeği sıfırdır — belirteç yoksa
+    /// kod bir sayı uydurmaz, gecikmesiz davranır.
+    /// </summary>
+    private TimeSpan Delay(string key)
+        => this.TryFindResource(key, out var value) && value is TimeSpan span ? span : TimeSpan.Zero;
 
     private TimeSpan Motion(string key, double fallbackMs)
         => this.TryFindResource(key, out var value) && value is TimeSpan span
