@@ -11,8 +11,11 @@ namespace VidShrink.Launcher;
 ///
 /// Manifestin <c>launcher</c> alanı kurulum kökündeki başlatıcıyı da sayar; o satırlar
 /// kendi arşivinden inip <see cref="LauncherUpdate"/> üzerinden yerine geçer. Uygulama
-/// dosyaları önce yerleşir, başlatıcı en son değişir: sıra tersine dönerse yeni başlatıcı
-/// eski uygulamayı açar.
+/// dosyaları önce yerleşir, başlatıcı en son kurulur: sıra tersine dönerse yeni başlatıcı
+/// eski uygulamayı açar. Sıranın kendisi <see cref="UpdateRollout"/> içinde.
+///
+/// Başlatıcı geçişi burada yapılmaz, yalnız kurulur. Geçişi çıkışta yerine geçecek ikili
+/// yapar; döndürülen değer o çağrının gerekip gerekmediğidir.
 /// </summary>
 internal static class Updater
 {
@@ -22,32 +25,32 @@ internal static class Updater
     private const string StageDirectoryName = "update-stage";
     private const string HashCacheName = ".update-hashes.json";
 
-    public static void Run(string baseDirectory, string appDirectory)
+    public static bool Run(string baseDirectory, string appDirectory)
     {
         // Ayar kapalıyken manifest bile çekilmez: kapatan kullanıcı ağ turunu da istemiyor.
-        if (!UpdateCheck.AutoUpdateEnabled()) return;
-        if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return;
+        if (!UpdateCheck.AutoUpdateEnabled()) return false;
+        if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return false;
 
         using var cancellation = new CancellationTokenSource(Budget);
-        try { RunAsync(baseDirectory, appDirectory, cancellation.Token).GetAwaiter().GetResult(); }
-        catch (Exception) { }
+        try { return RunAsync(baseDirectory, appDirectory, cancellation.Token).GetAwaiter().GetResult(); }
+        catch (Exception) { return false; }
     }
 
-    private static async Task RunAsync(string baseDirectory, string appDirectory, CancellationToken cancellationToken)
+    private static async Task<bool> RunAsync(string baseDirectory, string appDirectory, CancellationToken cancellationToken)
     {
         var stage = Path.Combine(baseDirectory, StageDirectoryName);
         var rid = UpdateCheck.Rid;
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
 
         var json = await FetchManifestAsync(rid, source, cancellationToken);
-        if (json is null) return;
+        if (json is null) return false;
 
         var manifest = UpdateCheck.ParseManifest(json);
-        if (manifest.Files.Count == 0) return;
+        if (manifest.Files.Count == 0) return false;
 
         // Aynı sürüm zaten uygulanmışsa hiçbir dosya özetlenmez. Kapı başlatıcının
         // sürümüne de bakıyor; yoksa geride kalan bir başlatıcı hiç fark edilmiyor.
-        if (UpdateCheck.AlreadyCurrent(baseDirectory, appDirectory, manifest)) return;
+        if (UpdateCheck.AlreadyCurrent(baseDirectory, appDirectory, manifest)) return false;
 
         var cache = new HashCache(Path.Combine(appDirectory, HashCacheName));
         var changed = UpdateCheck.Diff(appDirectory, manifest, cache);
@@ -56,8 +59,8 @@ internal static class Updater
         if (changed.Count == 0 && launcherChanged.Count == 0)
         {
             UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
-            LauncherUpdate.WriteVersionMarker(baseDirectory, manifest.Version);
-            return;
+            LauncherUpdate.MarkVerified(baseDirectory, manifest);
+            return false;
         }
 
         UpdateStage.Discard(stage);
@@ -88,12 +91,7 @@ internal static class Updater
             throw;
         }
 
-        if (changed.Count > 0) UpdateStage.Apply(stage, appDirectory, changed);
-        else UpdateStage.Discard(stage);
-        UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
-
-        if (launcherChanged.Count > 0) LauncherUpdate.Apply(baseDirectory, launcherChanged, manifest.Version);
-        else LauncherUpdate.WriteVersionMarker(baseDirectory, manifest.Version);
+        return UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest);
     }
 
     private static async Task StageFileAsync(RemoteZip archive, ManifestFile file, string target, CancellationToken cancellationToken)
