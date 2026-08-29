@@ -1,0 +1,30 @@
+{
+  "contractId": "T77",
+  "auditorRunId": "af25fda0b03f51500",
+  "headSha": "ff3101e9da486eb686610d14f8fede835b849e1a",
+  "diffHash": "bf13dbcde9daf397c98bca4ea70dfdbc4f382f260247f1c01cada57d9de2875b",
+  "owns": [
+    "Install-VidShrink.ps1",
+    "src/VidShrink.Launcher/Program.cs",
+    "src/VidShrink.Core/UpdateCheck.cs",
+    "tests/VidShrink.Tests/UpdaterTests.cs",
+    ".github/workflows/manifest.md"
+  ],
+  "verification": [
+    "dotnet test -c Release --filter \"UpdaterTests|AppliedUpdateTests|ShellMenuTests\" -> 0 basarisiz, 67 basarili, 3 atlandi (28 s), --no-build kullanilmadi",
+    "TheDeletionStepWaitsOutATransientLock cikis 0 / 1192 ms; TheDeletionStepGivesUpWithAMessageThatSaysWhatHappened cikis 3 / 7200 ms (console;verbosity=detailed ile okundu)",
+    "Silme yordamini betigin gercek metninden bagimsiz olarak cikarip kosturdum (.calisma/denetim-t77, sonra silindi): kalici kilit -> 6 deneme, 6200 ms, cikis 3, aciklayici mesaj; gecici kilit (1,5 s) -> 5. denemede basarili, 3164 ms, cikis 0",
+    "Gercek surec ayrimi: kurulum kokunde VidShrink adli calisan bir surecle kosuldu -> 275 ms icinde 'VidShrink hala acik - VidShrink (PID ...)' mesaji, cikis 3",
+    "Cikarma metne bagli: Remove-InstallRoot govdesine satir eklenmis bir kopyadan cikarilan blok 48->49 satir; suslu parantezli dize eklenince cikarma sessizce degil InvalidDataException ile kopuyor",
+    "TipSources.Root VidShrink.sln'e kadar yurur ve tests csproj Install-VidShrink.ps1'i cikti klasorune kopyalamiyor -> olcu depo kokundeki gercek betigi okuyor",
+    "Install-VidShrink.ps1 BOM tasimiyor (ilk 3 bayt 70 61 72); sonda betigi BOM'lu yaziliyor ama yalniz gecici klasorde",
+    "Program.cs:99 StartCommitter(baseDirectory); tek cagri; cagri silinirse TheLauncherStartsTheCommitterOnTheWayOut IndexOf -1 verip kirmiziya doner",
+    "Kriter 3/4/5 olculeri metin degil davranis: Commit/Armed/AlreadyCurrent/Stage/Apply dogrudan cagriliyor ve dosya icerikleri dogrulaniyor",
+    "Kriter 5: LauncherUpdate.Stage artik atmiyor, Updater.cs:88 try/catch'i o yoldan hic tetiklenmiyor - kalmasi zarar vermiyor",
+    "manifest.md kodla hizali: release.yml jq ile .launcher = VidShrink.exe, ReadFileList(root,\"launcher\") alan yoksa bos dizi donduruyor, MarkVerified Launcher.Count==0 iken isaret yazmiyor"
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-29T18:20:33.039Z",
+  "usedAt": "2026-08-29T18:21:57.986Z",
+  "completedSha": "ff3101e9da486eb686610d14f8fede835b849e1a"
+}
