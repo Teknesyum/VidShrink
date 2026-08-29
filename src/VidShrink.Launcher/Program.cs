@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using VidShrink.Core;
 
@@ -10,9 +11,11 @@ namespace VidShrink.Launcher;
 /// sözleşme yürütülür: yarım kalan başlatıcı değişimini topla, manifesti çek, farkı app
 /// klasörüne uygula, gerekiyorsa başlatıcının kendisini değiştir, uygulamayı başlat, çık.
 ///
-/// Başlatıcı kendini de günceller. Kendi dosyasının üstüne yazamaz — çalışan görüntüdür —
-/// ama adını değiştirebilir; değişimin adımları ve yarım kalma halleri
-/// <see cref="LauncherUpdate"/> içinde.
+/// Başlatıcı kendini de günceller ama kendi dosyasını kendisi değiştirmez: çalışırken o adı
+/// tutan süreç odur. Yeni ikili yan ada iner, günlük yazılır, uygulama başlatılır ve geçişi
+/// yapması için yeni ikili <see cref="LauncherUpdate.CommitArgument"/> ile açılır. O süreç
+/// başlatıcının çıkmasını bekler, sonra tek bir üstüne-yazan yeniden adlandırma yapar; hedef
+/// ad hiçbir an boşalmaz. Adımlar ve yarım kalma halleri <see cref="LauncherUpdate"/> içinde.
 /// </summary>
 internal static class Program
 {
@@ -29,6 +32,10 @@ internal static class Program
         var appDirectory = Path.Combine(baseDirectory, "app");
         var executable = Path.Combine(appDirectory, AppExecutableName);
 
+        // Geçiş kipi: bu süreç yerine geçecek ikilinin kendisidir, uygulamayı açmaz.
+        if (args.Length > 0 && args[0] == LauncherUpdate.CommitArgument)
+            return LauncherUpdate.Commit(baseDirectory, ParentProcessId(args)) ? 0 : 3;
+
         if (!File.Exists(executable))
         {
             Alert($"VidShrink uygulaması bulunamadı:{Environment.NewLine}{executable}{Environment.NewLine}{Environment.NewLine}" +
@@ -40,12 +47,13 @@ internal static class Program
 
         // Panel ancak eşik dolarsa çizilir; hızlı turda hiç oluşturulmaz. Bloktan çıkış
         // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
+        var pendingSwap = false;
         using (SplashGate.Arm(() => Status(baseDirectory)))
         {
-            // Başlatıcının kendi değişimi yarım kaldıysa önce o toplanır: ayar kapalı olsa
+            // Başlatıcının kendi değişimi yarım kaldıysa önce o okunur: ayar kapalı olsa
             // bile, çünkü burada eksik kalan şey kısayolun gösterdiği dosyanın kendisi.
-            // Artık .old adı da burada silinir.
-            try { LauncherUpdate.Repair(baseDirectory); }
+            // Bu çağrı hedef dosyaya dokunmaz, artıkları siler ve bekleyeni bildirir.
+            try { pendingSwap = LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
             catch (Exception) { }
 
             // Kurulumdan sonraki ilk açılış: kurulu başlatıcının sürümü çalışan ikiliden
@@ -58,7 +66,7 @@ internal static class Program
             catch (Exception) { }
 
             // Ağ yok, manifest bozuk, disk dolu: hepsinde sessizce vazgeçilir.
-            try { Updater.Run(baseDirectory, appDirectory); }
+            try { pendingSwap |= Updater.Run(baseDirectory, appDirectory); }
             catch (Exception) { }
         }
 
@@ -84,8 +92,43 @@ internal static class Program
             Path.Combine(baseDirectory, "tools", "ffmpeg") + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
         foreach (var argument in args) start.ArgumentList.Add(argument);
         Process.Start(start);
+
+        // Geçiş en sonda kurulur, çünkü bu sürecin çıkmasını bekliyor.
+        if (pendingSwap)
+        {
+            try { StartCommitter(baseDirectory); }
+            catch (Exception) { }
+        }
+
         return 0;
     }
+
+    /// <summary>
+    /// Bekleyen başlatıcı geçişini yapacak süreci açar. Açılan dosya geçirilecek ikilinin
+    /// kendisidir: kendi adını değiştirmek Windows'ta serbesttir, hedefi silmek ise ancak
+    /// bu süreç çıktıktan sonra mümkün. Kurulamazsa hiçbir şey bozulmaz; hedefte eski ikili
+    /// durur ve bir sonraki açılış aynı geçişi yeniden kurar.
+    /// </summary>
+    private static void StartCommitter(string baseDirectory)
+    {
+        var incoming = LauncherUpdate.Incoming(baseDirectory, LauncherUpdate.ExecutableName);
+        if (!File.Exists(incoming)) return;
+
+        var start = new ProcessStartInfo
+        {
+            FileName = incoming,
+            WorkingDirectory = baseDirectory,
+            UseShellExecute = false
+        };
+        start.ArgumentList.Add(LauncherUpdate.CommitArgument);
+        start.ArgumentList.Add(Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
+        Process.Start(start);
+    }
+
+    private static int? ParentProcessId(string[] args) =>
+        args.Length > 1 && int.TryParse(args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)
+            ? id
+            : null;
 
     /// <summary>
     /// Panelin iki durumu. İndirilenlerin toplandığı klasör görünmüşse iş artık ağ

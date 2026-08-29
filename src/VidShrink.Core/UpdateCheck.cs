@@ -1,4 +1,5 @@
 ﻿using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
 using System.Reflection;
@@ -670,25 +671,45 @@ public sealed record LauncherSkew(string? Launcher, string? App)
 }
 
 /// <summary>
-/// Başlatıcının kendini değiştirmesi. Windows çalışan bir <c>.exe</c>'nin üstüne
-/// yazdırmaz ama adını değiştirmeye izin verir: yeni ikili yan dosyaya iner, eski ikili
-/// <c>.old</c> adına alınır, yeni ikili boşalan ada geçer, eski ad bir sonraki açılışta
-/// silinir. Hiçbir adımda hedefe yazılmaz; yalnız yeniden adlandırılır.
+/// Değişimin bekleyen hali: hangi dosyaların hangi özete gitmesi gerektiği ve varılacak
+/// sürüm. Günlükten okunur; çalışan başlatıcı da yerine geçecek ikili de aynı kaydı görür.
+/// </summary>
+public sealed record PendingLauncherSwap(string Version, IReadOnlyList<ManifestFile> Files);
+
+/// <summary>
+/// Başlatıcının kendini değiştirmesi. Windows çalışan bir <c>.exe</c>'nin ne üstüne
+/// yazdırır ne de sildirir; bu yüzden değişimi çalışan başlatıcı yapmaz. Çalışan başlatıcı
+/// yalnız <em>kurar</em>: yeni ikili <c>VidShrink.new.exe</c> adına iner ve günlük yazılır.
+/// Geçişi, başlatıcı çıktıktan sonra yerine geçecek ikilinin kendisi yapar
+/// (<see cref="CommitArgument"/> ile açılır) — o an hedef adı kimse tutmadığı için tek bir
+/// yeniden adlandırma yeter.
 ///
-/// Adımların arasında süreç ölürse <see cref="Repair"/> kalan durumu toplar. Günlük
-/// dosyası hangi dosyanın hangi özete gitmesi gerektiğini söylediği için ileri
-/// tamamlamak da geri almak da mümkün; her iki uçta da çalışabilir bir başlatıcı kalır.
+/// Kazanılan şey şu: hedef ad <b>hiçbir adımda</b> boşalmaz. Eski yordam önce eski ikiliyi
+/// yana alıp sonra yenisini geçiriyordu; o iki çağrı arasında kurulum kökünde açılabilecek
+/// bir <c>VidShrink.exe</c> yoktu ve tam orada kesilen bir kurulum kendini toparlayamıyordu.
+/// Burada tek çağrı var: üstüne yazma kipindeki yeniden adlandırma aynı bölümde atomiktir,
+/// ad ya eskiyi ya yeniyi gösterir.
+///
+/// <see cref="Repair"/> hedefe hiç dokunmaz; yalnız yarım kalmış bir değişimi okur ve
+/// bekleyen geçişi bildirir. Geçiş her turda yeniden denenebilir, denenmediği turda da
+/// kurulum açılabilir kalır.
 /// </summary>
 public static class LauncherUpdate
 {
     /// <summary>Kurulum kökündeki başlatıcı; kısayolların gösterdiği dosya.</summary>
     public const string ExecutableName = "VidShrink.exe";
 
-    /// <summary>Yerini bırakan eski ikilinin aldığı ad.</summary>
+    /// <summary>Yerini bırakmış eski ikilinin, eski yapılardan kalmışsa, aldığı ad.</summary>
     public const string RetiredSuffix = ".old";
 
     /// <summary>Yerine geçmeyi bekleyen yeni ikilinin aldığı ad.</summary>
     public const string IncomingSuffix = ".new";
+
+    /// <summary>
+    /// Bekleyen geçişi yapan kip. Bu argümanla açılan ikili uygulamayı başlatmaz; eski
+    /// başlatıcının çıkmasını bekler, geçişi yapar ve çıkar.
+    /// </summary>
+    public const string CommitArgument = "--commit-launcher";
 
     public const string JournalName = ".launcher-pending.json";
 
@@ -698,8 +719,29 @@ public static class LauncherUpdate
     /// <summary>İnen başlatıcının uygulama dosyalarına karışmadığı yan klasör.</summary>
     public const string StageFolderName = "launcher";
 
+    /// <summary>Eski başlatıcının çıkması ve geçişin oturması için tanınan süre.</summary>
+    public static readonly TimeSpan CommitWindow = TimeSpan.FromSeconds(30);
+
     public static string Target(string baseDirectory, string relativePath) =>
         UpdateCheck.LocalPath(baseDirectory, relativePath);
+
+    /// <summary>
+    /// Yan adlar uzantıdan <em>önce</em> işaretlenir: <c>VidShrink.new.exe</c>. Adın hâlâ
+    /// bir <c>.exe</c> olması gerekiyor, çünkü geçişi yapan süreç bu dosyanın kendisidir.
+    /// </summary>
+    public static string Incoming(string baseDirectory, string relativePath) =>
+        Mark(Target(baseDirectory, relativePath), IncomingSuffix);
+
+    public static string Retired(string baseDirectory, string relativePath) =>
+        Mark(Target(baseDirectory, relativePath), RetiredSuffix);
+
+    private static string Mark(string path, string marker)
+    {
+        var extension = Path.GetExtension(path);
+        return extension.Length == 0
+            ? path + marker
+            : path[..^extension.Length] + marker + extension;
+    }
 
     public static string StagePath(string stageDirectory, string relativePath) =>
         UpdateCheck.LocalPath(Path.Combine(stageDirectory, StageFolderName), relativePath);
@@ -723,6 +765,18 @@ public static class LauncherUpdate
 
     public static void WriteVersionMarker(string baseDirectory, string version) =>
         File.WriteAllText(Path.Combine(baseDirectory, VersionMarkerName), NormalizeVersion(version));
+
+    /// <summary>
+    /// Manifest başlatıcıyı gerçekten sayıyorsa sürüm işaretini yazar. Saymayan bir
+    /// manifest için işaret yazmak hiç doğrulanmamış bir sürümü iddia etmektir: o manifeste
+    /// bakarak kurulu başlatıcının o sürüm olduğu bilinemez.
+    /// </summary>
+    public static bool MarkVerified(string baseDirectory, ReleaseManifest manifest)
+    {
+        if (manifest.Launcher.Count == 0) return false;
+        WriteVersionMarker(baseDirectory, manifest.Version);
+        return true;
+    }
 
     /// <summary>
     /// İşaret yoksa çalışan ikilinin kendi sürümüyle doldurur. Kurulumdan sonraki ilk
@@ -749,7 +803,7 @@ public static class LauncherUpdate
             if (!Matches(staged, file))
                 throw new InvalidDataException($"İnen başlatıcının özeti tutmadı: {file.Path}");
 
-            var incoming = Target(baseDirectory, file.Path) + IncomingSuffix;
+            var incoming = Incoming(baseDirectory, file.Path);
             var folder = Path.GetDirectoryName(incoming);
             if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
             File.Move(staged, incoming, overwrite: true);
@@ -757,38 +811,95 @@ public static class LauncherUpdate
     }
 
     /// <summary>
-    /// Yan adda bekleyen ikiliyi yerine geçirir. Günlük önce yazılır: bu satırdan sonra
-    /// kesinti olursa <see cref="Repair"/> nereye varılmak istendiğini bilir.
+    /// Değişimi kurar: yan adda bekleyen ikili doğrulanır ve günlük yazılır. Hedef dosyaya
+    /// dokunulmaz — bu satırları çalıştıran süreç odur. Döndürdüğü değer, çıkışta geçişi
+    /// yapacak ikilinin çağrılması gerektiğidir.
     /// </summary>
-    public static void Apply(string baseDirectory, IReadOnlyList<ManifestFile> files, string version)
+    public static bool Arm(string baseDirectory, IReadOnlyList<ManifestFile> files, string version)
     {
-        if (files.Count == 0) return;
+        if (files.Count == 0) return false;
 
         foreach (var file in files)
         {
-            var incoming = Target(baseDirectory, file.Path) + IncomingSuffix;
-            if (!Matches(incoming, file))
+            if (!Matches(Incoming(baseDirectory, file.Path), file))
                 throw new InvalidDataException($"Yerine geçecek başlatıcının özeti tutmadı: {file.Path}");
         }
 
         WriteJournal(baseDirectory, files, version);
-        foreach (var file in files) Swap(baseDirectory, file);
-        ClearJournal(baseDirectory);
-        WriteVersionMarker(baseDirectory, version);
-        Sweep(baseDirectory, files);
+        return true;
     }
 
     /// <summary>
-    /// Yarım kalmış bir değişimi toplar. Yeni ikili elde varsa ileri tamamlanır, yoksa
-    /// eski ad geri alınır. Döndürdüğü değer, hedefin istenen özete oturduğudur.
+    /// Geçişi yapan adım; yerine geçecek ikili kendi süreci içinde çağırır. Önce eski
+    /// başlatıcının çıkması beklenir, sonra her dosya tek bir üstüne-yazan yeniden
+    /// adlandırmayla yerine geçer. Bu çağrı ya olur ya olmaz: olmadığında hedefte eski
+    /// ikili durur, günlük kalır ve bir sonraki açılış aynı geçişi yeniden kurar.
     /// </summary>
-    public static bool Repair(string baseDirectory)
+    public static bool Commit(string baseDirectory, int? launcherProcessId = null, TimeSpan? window = null)
+    {
+        var pending = Pending(baseDirectory);
+        if (pending is null) return false;
+
+        var deadline = DateTime.UtcNow + (window ?? CommitWindow);
+        if (launcherProcessId is int id) WaitForExit(id, deadline);
+
+        foreach (var file in pending.Files)
+        {
+            var target = Target(baseDirectory, file.Path);
+            if (Matches(target, file)) continue;
+            if (!Replace(Incoming(baseDirectory, file.Path), target, deadline)) return false;
+        }
+
+        ClearJournal(baseDirectory);
+        WriteVersionMarker(baseDirectory, pending.Version);
+        Sweep(baseDirectory, pending.Files);
+        return true;
+    }
+
+    /// <summary>
+    /// Açılışta koşar ve <b>hedefe hiç dokunmaz</b>: kısayolun gösterdiği dosya bu sürecin
+    /// kendi görüntüsüdür. Geçiş zaten olmuşsa işaret yazılıp günlük kapanır; olmamışsa
+    /// bekleyen geçiş bildirilir, geçişi çıkışta yerine geçecek ikili yapar. Elde sağlam
+    /// bir yeni ikili yoksa artıklar süpürülür ve kurulum eski ikiliyle açılabilir kalır.
+    ///
+    /// <paramref name="runningVersion"/> verilirse bekleyen geçiş onunla karşılaştırılır:
+    /// aradan kurulum betiği geçip başlatıcıyı elle yenilemiş olabilir ve o hâlde bekleyen
+    /// kayıt artık bir güncelleme değil, geri alma olurdu.
+    /// </summary>
+    public static bool Repair(string baseDirectory, string? runningVersion = null)
+    {
+        var pending = Pending(baseDirectory);
+        if (pending is null) return false;
+
+        if (pending.Files.All(file => Matches(Target(baseDirectory, file.Path), file)))
+        {
+            ClearJournal(baseDirectory);
+            WriteVersionMarker(baseDirectory, pending.Version);
+            Sweep(baseDirectory, pending.Files);
+            return false;
+        }
+
+        if (runningVersion is not null && !UpdateCheck.IsNewer(pending.Version, NormalizeVersion(runningVersion)))
+        {
+            ClearJournal(baseDirectory);
+            Sweep(baseDirectory, pending.Files);
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Günlükte bekleyen geçiş. Günlük yoksa, okunamıyorsa ya da elde geçirilecek sağlam
+    /// bir ikili kalmamışsa kayıt kapatılır ve artıklar süpürülür — hedefe dokunmadan.
+    /// </summary>
+    public static PendingLauncherSwap? Pending(string baseDirectory)
     {
         var journal = Path.Combine(baseDirectory, JournalName);
         if (!File.Exists(journal))
         {
             Sweep(baseDirectory);
-            return false;
+            return null;
         }
 
         string version;
@@ -810,63 +921,64 @@ public static class LauncherUpdate
         {
             ClearJournal(baseDirectory);
             Sweep(baseDirectory);
-            return false;
+            return null;
         }
 
-        var settled = true;
-        foreach (var file in files) settled &= Settle(baseDirectory, file);
-
-        ClearJournal(baseDirectory);
-        if (settled && version.Length > 0) WriteVersionMarker(baseDirectory, version);
-        Sweep(baseDirectory, files);
-        return settled;
-    }
-
-    /// <summary>Tek bir dosyayı çalışabilir bir hale getirir; vardığı hal istenen hal mi, onu döndürür.</summary>
-    private static bool Settle(string baseDirectory, ManifestFile file)
-    {
-        var target = Target(baseDirectory, file.Path);
-        var retired = target + RetiredSuffix;
-        var incoming = target + IncomingSuffix;
-
-        // Değişim tamamlanmış: yeni ikili yerinde.
-        if (Matches(target, file)) return true;
-
-        // Yeni ikili elde: ister hedef hiç boşalmamış olsun ister boşalmış olsun, ileri gidilir.
-        if (Matches(incoming, file))
+        if (files.Count == 0 || version.Length == 0)
         {
-            if (File.Exists(target)) Retire(target, retired);
-            File.Move(incoming, target);
-            return true;
+            ClearJournal(baseDirectory);
+            Sweep(baseDirectory);
+            return null;
         }
 
-        // Hedef boşalmış ve elde yeni ikili yok: eski ad geri alınır, kurulum açılabilir kalır.
-        if (!File.Exists(target) && File.Exists(retired))
+        var swap = new PendingLauncherSwap(NormalizeVersion(version), files);
+
+        // Geçiş oturmuşsa yan ad artık yok; bu hâl de okunabilmeli, elenmez.
+        if (files.All(file => Matches(Target(baseDirectory, file.Path), file))) return swap;
+
+        if (files.Any(file => !Matches(Incoming(baseDirectory, file.Path), file)))
         {
-            File.Move(retired, target);
-            return false;
+            ClearJournal(baseDirectory);
+            Sweep(baseDirectory, files);
+            return null;
         }
 
-        // Hedef duruyor ama istenen özette değil: dokunulmaz, bir sonraki tur yeniden dener.
-        return false;
-    }
-
-    private static void Swap(string baseDirectory, ManifestFile file)
-    {
-        var target = Target(baseDirectory, file.Path);
-        var incoming = target + IncomingSuffix;
-        if (File.Exists(target)) Retire(target, target + RetiredSuffix);
-        File.Move(incoming, target);
+        return swap;
     }
 
     /// <summary>
-    /// Çalışan ikilinin adı değiştirilir, üstüne yazılmaz. Windows açık bir görüntü
-    /// dosyasının adını değiştirmeye izin verir; silmeye ve üstüne yazmaya izin vermez.
+    /// Tek atomik adım. Üstüne yazma kipindeki yeniden adlandırma aynı bölümde bölünmez:
+    /// ad her an ya eski ikiliyi ya yeni ikiliyi gösterir, hiç boş kalmaz. Başarısızlıkta
+    /// hiçbir şey değişmez — eski ikili yerinde durur.
     /// </summary>
-    private static void Retire(string target, string retired)
+    private static bool Replace(string incoming, string target, DateTime deadline)
     {
-        TryDelete(retired);
-        File.Move(target, retired, overwrite: true);
+        while (true)
+        {
+            try
+            {
+                File.Move(incoming, target, overwrite: true);
+                return true;
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                if (DateTime.UtcNow >= deadline) return false;
+                Thread.Sleep(100);
+            }
+        }
+    }
+
+    private static void WaitForExit(int processId, DateTime deadline)
+    {
+        try
+        {
+            using var process = Process.GetProcessById(processId);
+            var remaining = deadline - DateTime.UtcNow;
+            if (remaining > TimeSpan.Zero) process.WaitForExit((int)remaining.TotalMilliseconds);
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        {
+        }
     }
 
     public static bool Matches(string path, ManifestFile file)
@@ -882,7 +994,7 @@ public static class LauncherUpdate
     }
 
     /// <summary>
-    /// Artık adlar. Yeni geçen ikili henüz çalışırken eski ad silinemez — o dosya bu
+    /// Artık adlar. Yeni geçen ikili henüz çalışırken kendi eski adı silinemez — o dosya bu
     /// sürecin kendi görüntüsüdür. Başarısızlık yutulur, iş bir sonraki açılışa kalır.
     /// </summary>
     public static void Sweep(string baseDirectory, IReadOnlyList<ManifestFile>? files = null)
@@ -893,9 +1005,8 @@ public static class LauncherUpdate
 
         foreach (var name in names)
         {
-            var target = Target(baseDirectory, name);
-            TryDelete(target + RetiredSuffix);
-            TryDelete(target + IncomingSuffix);
+            TryDelete(Retired(baseDirectory, name));
+            TryDelete(Incoming(baseDirectory, name));
         }
     }
 
@@ -929,6 +1040,35 @@ public static class LauncherUpdate
 
     private static void ClearJournal(string baseDirectory) =>
         TryDelete(Path.Combine(baseDirectory, JournalName));
+}
+
+/// <summary>
+/// Bir güncellemenin diske inen kısmının sırası. Sıra kararı burada duruyor ki ölçülebilsin:
+/// uygulama dosyaları önce yerleşir, başlatıcı ancak ondan sonra kurulur. Ters sırada yeni
+/// bir başlatıcı eski bir uygulamayı açardı; uygulama adımı düşerse başlatıcı hiç kurulmaz.
+/// </summary>
+public static class UpdateRollout
+{
+    /// <summary>
+    /// Döndürdüğü değer, çıkışta başlatıcı geçişinin çağrılması gerektiğidir.
+    /// </summary>
+    public static bool Apply(
+        string stageDirectory,
+        string baseDirectory,
+        string appDirectory,
+        IReadOnlyList<ManifestFile> appFiles,
+        IReadOnlyList<ManifestFile> launcherFiles,
+        ReleaseManifest manifest)
+    {
+        if (appFiles.Count > 0) UpdateStage.Apply(stageDirectory, appDirectory, appFiles);
+        else UpdateStage.Discard(stageDirectory);
+        UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
+
+        if (launcherFiles.Count > 0) return LauncherUpdate.Arm(baseDirectory, launcherFiles, manifest.Version);
+
+        LauncherUpdate.MarkVerified(baseDirectory, manifest);
+        return false;
+    }
 }
 
 /// <summary>Bir arşivin istenen bayt aralığını veren kaynak.</summary>
