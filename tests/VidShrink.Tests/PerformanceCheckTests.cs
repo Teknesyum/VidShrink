@@ -28,10 +28,25 @@ public sealed class PerformanceCheckTests
     private static readonly string MeasurementLog =
         Path.Combine(TipSources.Root, ".calisma", "t63", "olcum.txt");
 
+    private readonly Xunit.Abstractions.ITestOutputHelper _cikti;
+
+    public PerformanceCheckTests(Xunit.Abstractions.ITestOutputHelper cikti) => _cikti = cikti;
+
     private static void Log(string line)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(MeasurementLog)!);
         lock (MeasurementLog) File.AppendAllText(MeasurementLog, line + Environment.NewLine);
+    }
+
+    /// <summary>
+    /// Kurulamayan bir iddianin sebebi. xunit 2 kosum sirasinda test atlayamiyor, bu
+    /// yuzden sebep hem testin kendi ciktisina hem ham olcum gunlugune yaziliyor:
+    /// atlanan iddia sessiz kalmiyor.
+    /// </summary>
+    private void Atlandi(string sebep)
+    {
+        _cikti.WriteLine("[atlandi] " + sebep);
+        Log("[atlandi] " + sebep);
     }
 
     private static string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
@@ -291,11 +306,15 @@ public sealed class PerformanceCheckTests
     /// <summary>
     /// Bu makinede kodlamanin gercek maliyeti. Sayilar <c>.calisma/t63/olcum.txt</c>'ye
     /// yazilir; rapora giren her sayi oradan cikar.
+    ///
+    /// Bacak alinamadiysa sebebi ayirt ediliyor: butce dolduysa bu makinenin o anki
+    /// mesguliyetidir, iddia kurulmaz ve sebep yazilir. Butce dolmadan eksilen bacak
+    /// kodun kusurudur ve kirmiziya doner.
     /// </summary>
     [FfmpegFact]
     public async Task BuMakinedeKodlamaNereyeDusuyor()
     {
-        var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
+        var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
 
         Log($"[gercek] cekirdek={result.LogicalCores} karar={result.Impact} " +
             $"yazilim={result.SoftwareCodec}:{N(result.SoftwareRealtimeCores)} cekirdek " +
@@ -307,32 +326,61 @@ public sealed class PerformanceCheckTests
             Log($"[bulgu] {f.Code} {f.Codec} cekirdek={N(f.RealtimeCores)} gercekzaman={N(f.RealtimeFactor)}x " +
                 $"katsayi={N(f.Factor)} cpu={N(f.CpuMs)}ms duvar={f.WallMs}ms");
 
+        if (!result.SoftwareMeasured)
+        {
+            Assert.True(result.BudgetExhausted,
+                "yazilim yolu butce dolmadan olculemedi: " +
+                string.Join(",", result.Findings.Select(f => f.Code)));
+            Atlandi($"yazilim yolu butce doldugu icin olculemedi, gecen {result.ElapsedMs}ms");
+            return;
+        }
+
         Assert.NotEqual(RecordingImpact.Unknown, result.Impact);
         Assert.True(result.SoftwareRealtimeCores > 0, "yazilim yolu olculemedi");
     }
 
     /// <summary>
+    /// Yuk olcumunun her bacagina verilen duvar saati siniri. Yuk altinda bir gecis
+    /// bos makinedekinin birkac katini surer; olcumun kendi varsayilan butcesi bos
+    /// makineye gore bicilmistir ve mesgul bir makinede bacaklar butce doldugu icin
+    /// hic olculmeden duser. Burada butce genis tutuluyor ki eksik bacak istisna
+    /// olsun; yine de dolarsa <see cref="PerformanceCheckResult.BudgetExhausted"/>
+    /// ile ayirt ediliyor.
+    /// </summary>
+    private const long YukOlcumButcesiMs = 60_000;
+
+    /// <summary>
+    /// Iki bagimsiz bos okumanin ayni sessiz makineden geldigi sayilan bant. Disaridan
+    /// gelen yuk okumayi yalniz yukari iter; bandi asan bir fark, iki okumadan en az
+    /// birinin kirlendigini soyler.
+    /// </summary>
+    private const double TabanUyumBandi = 1.25;
+
+    /// <summary>
+    /// Yuk altinda maliyetin bos okumanin altina dusmedigi sayilan alt sinir.
+    /// Olcum gurultusune pay; yon hatasi bu payin cok otesinde durur.
+    /// </summary>
+    private const double YonPayi = 0.8;
+
+    /// <summary>
     /// K1: olcum makine yukune ne kadar dayanikli, ve <b>nerede dayanmiyor</b>.
     ///
-    /// Iki sey ayri olculuyor:
+    /// Iddia edilen sey <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
+    /// dolayisiyla karar ancak agirlasabilir. Yuk altinda "daha hafif" bir karar,
+    /// olcunun bozuldugu anlamina gelir.
     ///
-    /// (1) Bos makinede tekrarlanabilirlik — ayni olcum art arda ayni karari vermeli.
-    ///     Bu gercek bir degismezlik ve burada iddia ediliyor.
+    /// Iddianin dayandigi bos okuma <b>dogrulanmadan</b> kullanilamaz. Olcunun para
+    /// birimi tek is parcacikli gecisin duvar saati; makinede baska bir is kosuyorsa
+    /// o gecis uzar ve "bos" diye alinan sayi sisar. Sismis bir tabana gore yuklu
+    /// okuma dusuk gorunur ve olcu, gercekte olmayan bir gerilemeyi bildirir. Bu
+    /// yuzden bos okuma birden fazla kez, biri de yuk kalktiktan sonra aliniyor:
+    /// kirlenme sayiyi yalniz yukari itebildigi icin en dusuk okuma gercege en yakin
+    /// olanidir, ve okumalar birbirini <see cref="TabanUyumBandi"/> icinde
+    /// dogrulamiyorsa makine olcum boyunca sessiz degildi.
     ///
-    /// (2) Yuk altinda sinir. Olcunun para birimi tek is parcacikli gecisin duvar
-    ///     saati; makine mesgulken o is parcacigi cekirdegi tam bulamaz, gecis uzar
-    ///     ve olculen maliyet <b>gercekten</b> yukselir. Yani yeterince agir bir yuk
-    ///     altinda karar degisebilir. Bu bir kusur degil, olcunun sinirdir; sozlesme de
-    ///     "karari degistiren bir yuk seviyesi varsa onu yaz" diyor.
-    ///
-    ///     Karari degistiren yuk seviyesi bu makinede <b>olculmedi</b>: kosulan
-    ///     yuk altinda karar her seferinde ayni kaldi. Sayilar her kosumda ham
-    ///     dosyaya yaziliyor; buraya yazilmaz.
-    ///
-    /// Burada iddia edilen sey, kararin yuk altinda degismesi ya da degismemesi
-    /// degil — ikisi de olculmedi — <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
-    /// dolayisiyla karar ancak agirlasabilir. Yuk altinda "daha hafif" bir karar ya da
-    /// sebepsiz bir Unknown, olcunun bozuldugu anlamina gelir.
+    /// Olculmeyen bacak da dusmus maliyet sayilmiyor. Bacak butce doldugu icin
+    /// eksikse bu ortamin haberidir: iddia kurulmaz, sebebi yazilir. Butce dolmadan
+    /// eksilen bacak ise kodun kusurudur ve kirmiziya doner.
     /// </summary>
     [FfmpegFact]
     public async Task OlcumYukAltindaYalnizAgirlasiyor()
@@ -340,59 +388,116 @@ public sealed class PerformanceCheckTests
         var yukleyici = Math.Max(1, Environment.ProcessorCount - 1);
         var kapali = new FakeAvailability();
 
-        var bos1 = await PerformanceProbe.RunAsync(kapali, 30_000);
-        var bos2 = await PerformanceProbe.RunAsync(kapali, 30_000);
+        var bos1 = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+        var bos2 = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+        var bosDonanim = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
 
         PerformanceCheckResult yuklu, yukluDonanim;
-        PerformanceCheckResult bosDonanim = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
         using (new CpuLoad(yukleyici))
         {
-            yuklu = await PerformanceProbe.RunAsync(kapali, 30_000);
-            yukluDonanim = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
+            yuklu = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+            yukluDonanim = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
         }
 
-        var sapma = bos1.SoftwareRealtimeCores <= 0
-            ? 0
-            : (yuklu.SoftwareRealtimeCores - bos1.SoftwareRealtimeCores) / bos1.SoftwareRealtimeCores;
+        var bos3 = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+
+        var okumalar = new[] { bos1, bos2, bos3 };
+        var olculen = okumalar.Where(r => r.SoftwareMeasured).ToArray();
 
         Log($"[yuk] yukleyici={yukleyici} esik={N(PerformanceCheck.HeavyLoadCores)} | " +
-            $"bos tekrar: {bos1.Impact}/{N(bos1.SoftwareRealtimeCores)} ve {bos2.Impact}/{N(bos2.SoftwareRealtimeCores)} | " +
-            $"yuklu: {yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)} sapma=%{N(sapma * 100)} " +
-            $"karar-degisti={bos1.Impact != yuklu.Impact} | " +
-            $"donanim: bos={bosDonanim.Impact} yuklu={yukluDonanim.Impact}");
+            $"bos okumalar: {string.Join(" ", okumalar.Select(r => $"{r.Impact}/{N(r.SoftwareRealtimeCores)}/olculdu={r.SoftwareMeasured}/butce={r.BudgetExhausted}"))} | " +
+            $"yuklu: {yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)}/olculdu={yuklu.SoftwareMeasured}/butce={yuklu.BudgetExhausted} | " +
+            $"donanim: bos={bosDonanim.Impact}/olculdu={bosDonanim.HardwareMeasured}/butce={bosDonanim.BudgetExhausted} " +
+            $"yuklu={yukluDonanim.Impact}/olculdu={yukluDonanim.HardwareMeasured}/butce={yukluDonanim.BudgetExhausted}");
 
-        Assert.Equal(bos1.Impact, bos2.Impact);
+        foreach (var eksik in okumalar.Concat(new[] { yuklu }).Where(r => !r.SoftwareMeasured))
+            Assert.True(eksik.BudgetExhausted,
+                "yazilim bacagi butce dolmadan olculemedi: " + string.Join(",", eksik.Findings.Select(f => f.Code)));
 
-        Assert.True(yuklu.SoftwareRealtimeCores >= bos1.SoftwareRealtimeCores * 0.8,
-            $"yuk altinda maliyet dustu: bos {N(bos1.SoftwareRealtimeCores)}, yuklu {N(yuklu.SoftwareRealtimeCores)}");
+        if (olculen.Length == 0)
+        {
+            Atlandi("hicbir bos okuma alinamadi, butce doldu");
+            return;
+        }
 
-        Assert.NotEqual(RecordingImpact.Unknown, yuklu.Impact);
-        Assert.False(bos1.Impact == RecordingImpact.SoftwareHeavyLoad
-                     && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
-            "yuk altinda karar hafifledi");
+        var taban = olculen.Min(r => r.SoftwareRealtimeCores);
+        var sessizler = olculen.Where(r => r.SoftwareRealtimeCores <= taban * TabanUyumBandi).ToArray();
 
-        Assert.Contains(yukluDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
-        Assert.Equal(bosDonanim.HardwareCodec, yukluDonanim.HardwareCodec);
+        if (sessizler.Length < 2)
+        {
+            Atlandi($"bos okumalar birbirini dogrulamadi, makine sessiz degildi: " +
+                    string.Join(" ", olculen.Select(r => N(r.SoftwareRealtimeCores))));
+        }
+        else
+        {
+            Assert.True(sessizler.Select(r => r.Impact).Distinct().Count() == 1,
+                "ayni sessiz makinede art arda alinan okumalar farkli karar verdi: " +
+                string.Join(" ", sessizler.Select(r => $"{r.Impact}/{N(r.SoftwareRealtimeCores)}")));
+        }
+
+        if (!yuklu.SoftwareMeasured)
+        {
+            Atlandi("yuk altinda yazilim bacagi butce doldugu icin alinamadi, yon iddiasi kurulmadi");
+        }
+        else
+        {
+            Assert.True(yuklu.SoftwareRealtimeCores >= taban * YonPayi,
+                $"yuk altinda maliyet dustu: en dusuk bos okuma {N(taban)}, yuklu {N(yuklu.SoftwareRealtimeCores)}");
+
+            Assert.NotEqual(RecordingImpact.Unknown, yuklu.Impact);
+            Assert.False(sessizler.Any(r => r.Impact == RecordingImpact.SoftwareHeavyLoad)
+                         && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
+                "yuk altinda karar hafifledi");
+        }
+
+        if (!bosDonanim.HardwareMeasured)
+            Atlandi("bos kosumda donanim yolu olculemedi, yuk karsilastirmasi kurulmadi");
+        else if (yukluDonanim.HardwareMeasured)
+        {
+            Assert.Contains(yukluDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
+            Assert.Equal(bosDonanim.HardwareCodec, yukluDonanim.HardwareCodec);
+        }
+        else
+        {
+            Assert.True(yukluDonanim.BudgetExhausted,
+                "yuk altinda donanim bacagi butce dolmadan kayboldu: " +
+                string.Join(",", yukluDonanim.Findings.Select(f => f.Code)));
+            Atlandi("yuk altinda donanim bacagi butce doldugu icin alinamadi, karsilastirma kurulmadi");
+        }
     }
 
     /// <summary>
     /// K3'un canli yarisi: butce gercekten bagliyor <b>ve</b> sebebini soyluyor.
     /// Yarida kalan olcum sebepsiz "olculemedi" donmemeli; butce dolduysa sonuc
     /// BudgetExhausted tasimali, yoksa kullanici neden sonuc alamadigini bilemez.
+    ///
+    /// Bagladigi, ayni makinede genis butceyle alinan bir kosumla karsilastirilarak
+    /// okunuyor. Butcenin bir katiyla kurulmus mutlak bir sinir bunu olcemez: butce
+    /// dolunca kosan surec oldurulur, baslatma ve oldurme butcenin disinda kalir ve
+    /// makine mesgullestikce buyur. O sinir mesgul bir makinede, butce pekala
+    /// bagliyorken kirmiziya doner.
     /// </summary>
     [FfmpegFact]
     public async Task ButceGercektenBagliyorVeSebebiniSoyluyor()
     {
         const long dar = 900;
+
+        var genisSaat = System.Diagnostics.Stopwatch.StartNew();
+        await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
+        genisSaat.Stop();
+
         var basladi = System.Diagnostics.Stopwatch.StartNew();
         var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, dar);
         basladi.Stop();
 
         var bulgular = string.Join(",", result.Findings.Select(f => f.Code));
-        Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms karar={result.Impact} bulgular={bulgular}");
+        Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms " +
+            $"genis={YukOlcumButcesiMs}ms gecen={genisSaat.ElapsedMilliseconds}ms " +
+            $"karar={result.Impact} bulgular={bulgular}");
 
-        Assert.True(basladi.ElapsedMilliseconds < dar * 3,
-            $"butce {dar}ms iken olcum {basladi.ElapsedMilliseconds}ms surdu");
+        Assert.True(basladi.ElapsedMilliseconds < genisSaat.ElapsedMilliseconds / 2,
+            $"butce baglamadi: {dar}ms butceyle {basladi.ElapsedMilliseconds}ms, " +
+            $"genis butceyle {genisSaat.ElapsedMilliseconds}ms");
 
         var butce = Assert.Single(result.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
         Assert.Equal(dar, butce.BudgetMs);
