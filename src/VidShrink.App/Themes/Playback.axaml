@@ -23,6 +23,7 @@
       PlaybackStripMargin      <- SpaceMd (12), rozet kenar boşluğuyla aynı
       PlaybackStripGap         <- SpaceMd (12), şerit içindeki sütun arası
       PlaybackStripHideDelay   <- MotionSlow (360 ms)
+      PlaybackStripShowDelay   <- ölçü değil: şerit beklemeden belirir (T70/K5).
       PlaybackHoverZoneShare   <- SpaceXs / SpaceLg (4/16 = 0,25); oran, piksel değil
       PlaybackTimelineHeight   <- TargetMinSize (24), dokunma hedefi
       PlaybackTrackHeight      <- ProgressBarHeight (8)
@@ -35,9 +36,13 @@
                                   ölçekli boy pencerenin bu oranını geçemez. Aynı
                                   belirteç pencerenin çalışma alanına oturmasını da
                                   sürüyor: "kapla ama kenarı bırak" ölçüsü tektir.
-      PlaybackDescendDelay     <- ölçü değil, kullanıcının söylediği süre: 2 saniye.
+      PlaybackPanelRiseDelay   <- ölçü değil, kullanıcının söylediği süre: 2 saniye.
                                   Hareket ölçeğindeki (MotionSlow 360 ms) bir değer değil,
-                                  çünkü bu bir geçiş süresi değil bekleme süresi.
+                                  çünkü bu bir geçiş süresi değil bekleme süresi. T70: süre
+                                  farenin panel üstünde durduğu zamanı ölçer — panel bu
+                                  kadar beklemeden büyümez.
+      PlaybackPanelFallDelay   <- ölçü değil: fare çekilince panel beklemeden küçülür,
+                                  yani sıfır. İki yön ayrı belirteç çünkü ayrı kararlar.
 
     T46 — boş panel ve tıkla yakınlaştırma:
 
@@ -70,6 +75,7 @@
   <Thickness x:Key="PlaybackStripMargin">12</Thickness>
   <Thickness x:Key="PlaybackStripGap">0,0,12,0</Thickness>
   <sys:TimeSpan x:Key="PlaybackStripHideDelay">00:00:00.3600000</sys:TimeSpan>
+  <sys:TimeSpan x:Key="PlaybackStripShowDelay">00:00:00</sys:TimeSpan>
   <x:Double x:Key="PlaybackHoverZoneShare">0.25</x:Double>
   <x:Double x:Key="PlaybackTimelineHeight">24</x:Double>
   <x:Double x:Key="PlaybackTrackHeight">8</x:Double>
@@ -77,7 +83,8 @@
   <x:Double x:Key="PlaybackCursorWidth">2</x:Double>
 
   <x:Double x:Key="PlaybackMidShare">0.9</x:Double>
-  <sys:TimeSpan x:Key="PlaybackDescendDelay">00:00:02</sys:TimeSpan>
+  <sys:TimeSpan x:Key="PlaybackPanelRiseDelay">00:00:02</sys:TimeSpan>
+  <sys:TimeSpan x:Key="PlaybackPanelFallDelay">00:00:00</sys:TimeSpan>
 
   <x:Double x:Key="PlaybackIdleMinHeight">512</x:Double>
   <x:Double x:Key="PlaybackZoomButtonSize">24</x:Double>

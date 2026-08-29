@@ -49,6 +49,7 @@ internal partial class ControlStrip : UserControl
 
         _zone = new HoverZone(
             share: Scalar("PlaybackHoverZoneShare", 0.25),
+            showDelay: () => Delay("PlaybackStripShowDelay"),
             hideDelay: () => Motion("PlaybackStripHideDelay", 360),
             apply: Reveal);
 
@@ -397,4 +398,8 @@ internal partial class ControlStrip : UserControl
         => this.TryFindResource(key, out var value) && value is TimeSpan span
             ? span
             : TimeSpan.FromMilliseconds(fallbackMs);
+
+    /// <summary>Bekleme süresi. Belirteç yoksa gecikme yoktur; kod sayı uydurmaz.</summary>
+    private TimeSpan Delay(string key)
+        => this.TryFindResource(key, out var value) && value is TimeSpan span ? span : TimeSpan.Zero;
 }
