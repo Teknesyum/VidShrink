@@ -1,5 +1,6 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.IO.Compression;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -149,6 +150,33 @@ public static class UpdateCheck
 
     public static string LatestAssetUrl(string asset) =>
         $"https://github.com/Teknesyum/VidShrink/releases/latest/download/{asset}";
+
+    /// <summary>Manifest çekmenin zaman aşımı; açılışın gecikebileceği en uzun süre budur.</summary>
+    public static readonly TimeSpan ManifestTimeout = TimeSpan.FromMilliseconds(800);
+
+    public static async Task<string?> FetchManifestAsync(string url, CancellationToken cancellationToken)
+    {
+        using var client = new HttpClient { Timeout = ManifestTimeout };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("VidShrink-Launcher");
+        try
+        {
+            using var response = await client.GetAsync(url, cancellationToken);
+            if (response.StatusCode == HttpStatusCode.NotFound) return null;
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync(cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+    }
+
+    public static bool AlreadyCurrent(string appDirectory, ReleaseManifest manifest) =>
+        ReadVersionMarker(appDirectory) == manifest.Version;
 
     /// <summary>Kendini güncelleyemeyen platformlarda kullanıcıya gösterilecek komut.</summary>
     public static string UpdateInstruction()
@@ -372,82 +400,6 @@ public sealed class UpdateSettings
         if (FastGpu.HasValue) writer.WriteBoolean("fastGpu", FastGpu.Value);
         writer.WriteEndObject();
         writer.Flush();
-    }
-}
-
-/// <summary>
-/// Güncelleme denetiminin sıklığı. Ağsız çalışan biri her açılışta zaman aşımı kadar
-/// beklemesin diye denetim günde en çok bir kez yapılır; ara açılışlarda ağa hiç
-/// çıkılmaz.
-/// </summary>
-public static class UpdateSchedule
-{
-    public static readonly TimeSpan Interval = TimeSpan.FromHours(24);
-
-    public const string FileName = "last-check.json";
-
-    public static string DefaultPath
-    {
-        get
-        {
-            var folder = Path.GetDirectoryName(UpdateSettings.DefaultPath);
-            return string.IsNullOrEmpty(folder) ? FileName : Path.Combine(folder, FileName);
-        }
-    }
-
-    /// <summary>Son denetimden bu yana 24 saat geçtiyse ağa çıkılır.</summary>
-    public static bool DueNow(DateTimeOffset now, string? path = null)
-    {
-        var last = ReadLastCheck(path);
-        if (last is null) return true;
-
-        // Saat geriye alınmışsa kayıt gelecekte kalır; o durumda beklemek yerine denetle.
-        if (last > now) return true;
-        return now - last >= Interval;
-    }
-
-    public static DateTimeOffset? ReadLastCheck(string? path = null)
-    {
-        var file = path ?? DefaultPath;
-        try
-        {
-            if (!File.Exists(file)) return null;
-            using var document = JsonDocument.Parse(File.ReadAllText(file));
-            if (!document.RootElement.TryGetProperty("lastCheck", out var value)) return null;
-            var text = value.GetString();
-            return string.IsNullOrWhiteSpace(text)
-                ? null
-                : DateTimeOffset.Parse(text!, null, System.Globalization.DateTimeStyles.RoundtripKind);
-        }
-        catch (Exception exception) when (exception is JsonException or IOException or FormatException or UnauthorizedAccessException)
-        {
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Denetim denemesini işaretler. Sonucu değil denemeyi yazar: ağ yokken de tur
-    /// harcandı sayılır, yoksa ağsız makine her açılışta yeniden bekler.
-    /// </summary>
-    public static void Record(DateTimeOffset now, string? path = null)
-    {
-        var file = path ?? DefaultPath;
-        try
-        {
-            var folder = Path.GetDirectoryName(file);
-            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-
-            using var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None);
-            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
-            writer.WriteStartObject();
-            writer.WriteString("lastCheck", now.ToString("o"));
-            writer.WriteEndObject();
-            writer.Flush();
-        }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-        {
-            // Yazılamazsa en fazla bir sonraki açılışta yeniden denetlenir; açılış durmaz.
-        }
     }
 }
 

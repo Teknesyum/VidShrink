@@ -294,50 +294,63 @@ public sealed class UpdaterTests : IDisposable
     }
 
     [Fact]
-    public void FirstLaunchChecksAndTheNextOnesWithinADayDoNot()
+    public async Task AnUnreachableSourceIsGivenUpWithinTheManifestTimeout()
     {
-        var file = Path.Combine(_root, "last-check.json");
-        var now = DateTimeOffset.UtcNow;
+        const string unreachable = "http://10.255.255.1/vidshrink/manifest-win-x64.json";
+        var ceiling = UpdateCheck.ManifestTimeout + TimeSpan.FromMilliseconds(500);
 
-        Assert.True(UpdateSchedule.DueNow(now, file));
+        await UpdateCheck.FetchManifestAsync(unreachable, CancellationToken.None);
 
-        UpdateSchedule.Record(now, file);
-        Assert.False(UpdateSchedule.DueNow(now, file));
-        Assert.False(UpdateSchedule.DueNow(now.AddHours(23), file));
-        Assert.True(UpdateSchedule.DueNow(now.AddHours(24), file));
-        Assert.Equal(now, UpdateSchedule.ReadLastCheck(file)!.Value, TimeSpan.FromSeconds(1));
+        var stopwatch = Stopwatch.StartNew();
+        var json = await UpdateCheck.FetchManifestAsync(unreachable, CancellationToken.None);
+        stopwatch.Stop();
+
+        _output.WriteLine(
+            $"ağsız manifest denemesi: {stopwatch.Elapsed.TotalMilliseconds:F0} ms " +
+            $"(zaman aşımı {UpdateCheck.ManifestTimeout.TotalMilliseconds:F0} ms, " +
+            $"tavan {ceiling.TotalMilliseconds:F0} ms)");
+
+        Assert.Null(json);
+        Assert.True(stopwatch.Elapsed < ceiling,
+            $"ağsız açılış zaman aşımını aştı: {stopwatch.Elapsed.TotalMilliseconds:F0} ms > {ceiling.TotalMilliseconds:F0} ms");
     }
 
     [Fact]
-    public void MissingOrBrokenOrFutureDatedRecordMeansCheckNow()
+    public void TheSameVersionIsNotDownloadedASecondTime()
     {
-        var file = Path.Combine(_root, "last-check.json");
-        var now = DateTimeOffset.UtcNow;
-
-        Assert.True(UpdateSchedule.DueNow(now, file));
-
-        File.WriteAllText(file, "{ bozuk");
-        Assert.True(UpdateSchedule.DueNow(now, file));
-
-        // Saat geriye alınmış: kayıt gelecekte kalır, beklemek yerine denetlenir.
-        UpdateSchedule.Record(now.AddDays(3), file);
-        Assert.True(UpdateSchedule.DueNow(now, file));
-    }
-
-    [Fact]
-    public void ScheduleFileSitsNextToTheSettingsFile()
-    {
-        var settings = Path.Combine(_root, "appdata", "settings.json");
-        Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", settings);
-        try
+        var app = Folder("app");
+        Write(app, "VidShrink.App.dll", "kurulu");
+        var manifest = new ReleaseManifest("1.4.0", "abc", DateTimeOffset.UtcNow, "win-x64", new[]
         {
-            Assert.Equal(Path.Combine(_root, "appdata", UpdateSchedule.FileName), UpdateSchedule.DefaultPath);
-        }
-        finally { Environment.SetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH", null); }
+            Describe(app, "VidShrink.App.dll") with { Sha256 = new string('0', 64) }
+        });
+
+        Assert.NotEmpty(UpdateCheck.Diff(app, manifest));
+        Assert.False(UpdateCheck.AlreadyCurrent(app, manifest));
+
+        UpdateCheck.WriteVersionMarker(app, "1.4.0");
+        Assert.True(UpdateCheck.AlreadyCurrent(app, manifest));
+
+        UpdateCheck.WriteVersionMarker(app, "1.3.0");
+        Assert.False(UpdateCheck.AlreadyCurrent(app, manifest));
     }
 
     [Fact]
-    public void PendingUpdateIsSeenSoTheDailyLimitCanBeSkipped()
+    public void TheVersionGuardComesBeforeAnythingIsDownloaded()
+    {
+        var code = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+
+        var guard = code.IndexOf("UpdateCheck.AlreadyCurrent", StringComparison.Ordinal);
+        var download = code.IndexOf("RemoteZip.OpenAsync", StringComparison.Ordinal);
+
+        Assert.True(guard >= 0, "sürüm kapısı Updater.cs içinde yok");
+        Assert.True(download > guard, "arşiv sürüm kapısından önce açılıyor");
+        Assert.DoesNotContain("UpdateSchedule", code);
+    }
+
+    [Fact]
+    public void PendingUpdateIsSeenOnTheNextLaunch()
     {
         var app = Folder("app");
         Assert.False(UpdateStage.HasPending(app));
@@ -347,7 +360,7 @@ public sealed class UpdaterTests : IDisposable
     }
 
     [LiveLauncherFact]
-    public void LauncherStartsTheAppWithinTheTimeoutWithAndWithoutNetwork()
+    public void EveryLaunchChecksAndStaysWithinTheTimeout()
     {
         var exe = Environment.GetEnvironmentVariable("VIDSHRINK_LAUNCHER_EXE")!;
         var settings = Path.Combine(_root, "settings.json");
@@ -355,15 +368,14 @@ public sealed class UpdaterTests : IDisposable
 
         // 10.255.255.1 yönlendirilemeyen adres: ağ yokmuş gibi davranır.
         var offlineFirst = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink");
-        // Aynı gün içindeki ikinci açılış: denetim yapılmaz, ağa hiç çıkılmaz.
-        var offlineSameDay = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink", resetSchedule: false);
+        var offlineSecond = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink");
         var online = MeasureLaunch(exe, settings, null);
 
-        _output.WriteLine($"ağsız ilk açılış (denetim günü): {offlineFirst.TotalMilliseconds:F0} ms");
-        _output.WriteLine($"ağsız aynı gün ikinci açılış: {offlineSameDay.TotalMilliseconds:F0} ms");
+        _output.WriteLine($"ağsız ilk açılış: {offlineFirst.TotalMilliseconds:F0} ms");
+        _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
         Assert.True(offlineFirst < TimeSpan.FromSeconds(3), $"ağsız açılış çok uzun: {offlineFirst}");
-        Assert.True(offlineSameDay < offlineFirst, "günlük kısıt ikinci açılışı hızlandırmadı");
+        Assert.True(offlineSecond < TimeSpan.FromSeconds(3), $"ağsız ikinci açılış çok uzun: {offlineSecond}");
     }
 
     [LiveLauncherFact]
@@ -389,11 +401,8 @@ public sealed class UpdaterTests : IDisposable
         Assert.True(requestsWhileOn > 0, "ayar açıkken manifest hiç istenmedi");
     }
 
-    private static TimeSpan MeasureLaunch(string exe, string settingsPath, string? baseUrl, bool resetSchedule = true)
+    private static TimeSpan MeasureLaunch(string exe, string settingsPath, string? baseUrl)
     {
-        var schedule = Path.Combine(Path.GetDirectoryName(settingsPath)!, UpdateSchedule.FileName);
-        if (resetSchedule && File.Exists(schedule)) File.Delete(schedule);
-
         var start = new ProcessStartInfo { FileName = exe, UseShellExecute = false };
         start.Environment["VIDSHRINK_SETTINGS_PATH"] = settingsPath;
         if (baseUrl is not null) start.Environment["VIDSHRINK_UPDATE_BASE_URL"] = baseUrl;
