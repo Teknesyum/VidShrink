@@ -1,0 +1,17 @@
+{
+  "contractId": "T71",
+  "auditorRunId": "abaa0d8eacd4ebf59",
+  "headSha": "8c2fad5d4cb4d2cc5dddb342aff3478fcb435efd",
+  "diffHash": "95e4ac96a8d1852055aed268bb021e96d04b73c7b1cf387376742419f9445532",
+  "owns": [
+    "src/VidShrink.App/Themes/Theme.axaml",
+    "tests/VidShrink.Tests/ThemeTokenTests.cs",
+    "tests/VidShrink.Tests/ThemeBackdropTests.cs"
+  ],
+  "verification": [
+    "denetci main 8c2fad5: dotnet test -c Release 805 gecti / 0 kaldi / 16 atlandi / 821 toplam",
+    "HSL turetmesi ve 8.4104:1 kontrast denetci tarafindan bagimsiz hesaplandi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-29T14:43:32.752Z"
+}

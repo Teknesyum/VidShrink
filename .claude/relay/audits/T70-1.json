@@ -1,0 +1,20 @@
+{
+  "contractId": "T70",
+  "auditorRunId": "abaa0d8eacd4ebf59",
+  "headSha": "8c2fad5d4cb4d2cc5dddb342aff3478fcb435efd",
+  "diffHash": "b89290e66f8c690aa8bf7bee011aacc7bb6273c2f364b39f94f34dc03ec714d1",
+  "owns": [
+    "src/VidShrink.App/Playback/HoverZone.cs",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Playback/ControlStrip.axaml.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs"
+  ],
+  "verification": [
+    "denetci main 8c2fad5: dotnet test -c Release 805 gecti / 0 kaldi / 16 atlandi / 821 toplam",
+    "build -warnaserror 0 uyari 0 hata",
+    "mutasyon iki yonde de kirmizi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-29T14:43:32.750Z"
+}
