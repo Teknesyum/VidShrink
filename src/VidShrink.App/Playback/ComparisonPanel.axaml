@@ -136,6 +136,24 @@
         </StackPanel>
 
         <!--
+          T73: bekleme göstergesi. Fare panele girince belirir, halkası PlaybackPanelRiseDelay
+          boyunca kapanır, süre dolunca kaybolur ve panel büyür. Üstte ve ortada: yonganın
+          hizasında ama ayırıcı tutamacının üstünde değil. Isabet testine kapalı — göstergenin
+          kendisi farenin panelde durmasını bozarsa saydığı şeyi bozmuş olurdu.
+        -->
+        <Border x:Name="RiseCountdown"
+                Theme="{StaticResource PlaybackCountdown}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="{StaticResource PlaybackBadgeMargin}"
+                IsVisible="False">
+          <playback:CountdownRing x:Name="RiseRing"
+                                  Thickness="{StaticResource PlaybackCountdownStroke}"
+                                  Track="{StaticResource NeonBlueBorder}"
+                                  Stroke="{StaticResource NeonBlue}"/>
+        </Border>
+
+        <!--
           K2: ayırıcı. Tutma şeridi çizgiden geniştir ki fare ile yakalamak kolay olsun;
           görünen çizgi tutamacın ortasındadır. Şerit odaklanabilir — sol/sağ ok küçük
           adım, Home/End uçlar.

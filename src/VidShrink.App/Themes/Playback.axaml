@@ -61,7 +61,21 @@
                                   yüzden panel orada kök katmana çıkar. Jest parametresi
                                   buradan türer, ters yönden değil; tavan
                                   (PlaybackMaxPanelScale) değişirse hesap kendiliğinden
-                                  düzelir.
+                                  düzelir. T73: bu kat artık büyümenin tavanı değil tabanı —
+                                  panelin fareyle çıktığı boy pencereden hesaplanıyor, bu
+                                  sayı da orta kademenin eşiği olarak altına inilemeyen sınır.
+
+    T73 — yuvarlak geri sayım:
+
+      PlaybackCountdownSize    <- DropIconSize (48). Programdaki tek büyük simge ölçüsü.
+      PlaybackCountdownRadius  <- PlaybackCountdownSize / 2 = 24. Daire; teknesyum-ui'nin
+                                  tek yarıçap kuralının "daire biçimli işlevsel öğe"
+                                  istisnası. Uydurulmuş sayı değil, ölçünün yarısı.
+      PlaybackCountdownStroke  <- DropOutlineThickness (2), kodlama imleciyle aynı kalınlık.
+
+      Geri sayımın süresi burada yok ve olmayacak: gösterge süreyi bekleme sayacından alır
+      (HoverZone.ShowCountdown). Buraya ikinci bir süre yazılırsa belirteç değiştiğinde
+      gösterge ile sayaç ayrışır.
   -->
 
   <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
@@ -91,6 +105,10 @@
   <x:Double x:Key="PlaybackZoomButtonGap">8</x:Double>
   <x:Double x:Key="PlaybackBadgeGap">8</x:Double>
   <x:Double x:Key="PlaybackHoverZoom">2</x:Double>
+
+  <x:Double x:Key="PlaybackCountdownSize">48</x:Double>
+  <CornerRadius x:Key="PlaybackCountdownRadius">24</CornerRadius>
+  <x:Double x:Key="PlaybackCountdownStroke">2</x:Double>
 
   <Color x:Key="PlaybackScrimColor">#CC050507</Color>
   <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
@@ -183,6 +201,19 @@
     <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
     <Setter Property="FontWeight" Value="Bold"/>
     <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+  </ControlTheme>
+
+  <!--
+    T73: bekleme göstergesinin perdesi. Yuvarlak, çünkü içindeki halka yuvarlak; renk ve
+    parıltı yonganınkiyle aynı, panelde ikinci bir görsel dil açılmıyor.
+  -->
+  <ControlTheme x:Key="PlaybackCountdown" TargetType="Border">
+    <Setter Property="Width" Value="{StaticResource PlaybackCountdownSize}"/>
+    <Setter Property="Height" Value="{StaticResource PlaybackCountdownSize}"/>
+    <Setter Property="Background" Value="{StaticResource PlaybackScrim}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource PlaybackCountdownRadius}"/>
+    <Setter Property="BoxShadow" Value="{StaticResource GlowBlue}"/>
+    <Setter Property="IsHitTestVisible" Value="False"/>
   </ControlTheme>
 
   <!-- Terfi ederken bandında kalan yer tutucu: aynı boyut, aynı yarıçap, boş yüzey. -->

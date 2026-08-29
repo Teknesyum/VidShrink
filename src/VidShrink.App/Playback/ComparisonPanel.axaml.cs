@@ -13,6 +13,147 @@ using Avalonia.VisualTree;
 namespace VidShrink.App.Playback;
 
 /// <summary>
+/// T73: bekleme göstergesinin halkası. Boş başlar, süre dolarken saat yönünde kapanır ve
+/// tam kapandığı an panel büyür.
+///
+/// Süreyi kendi belirtecinden okumaz — <see cref="Run"/>'a dışarıdan verilir. Tek kaynak
+/// bekleme sayacıdır (<see cref="HoverZone.ShowCountdown"/>); halka o sürenin ne olduğunu
+/// bilmez, yalnız uygular.
+///
+/// Kapanma bir geçiştir, kare döngüsü değil: hareket azaltma açıkken geçiş hiç kurulmaz ve
+/// halka kapalı hâlde durur — gösterge görünür, canlanmaz (K4). Panelin terfi geçişinde
+/// kullanılan kalıbın aynısı.
+/// </summary>
+internal sealed class CountdownRing : Control
+{
+    /// <summary>Kapanmış halka. Derece; daire tanımının kendisi, uydurulmuş sayı değil.</summary>
+    internal const double FullTurn = 360;
+
+    internal static readonly StyledProperty<double> SweepProperty =
+        AvaloniaProperty.Register<CountdownRing, double>(nameof(Sweep));
+
+    internal static readonly StyledProperty<IBrush?> StrokeProperty =
+        AvaloniaProperty.Register<CountdownRing, IBrush?>(nameof(Stroke));
+
+    internal static readonly StyledProperty<IBrush?> TrackProperty =
+        AvaloniaProperty.Register<CountdownRing, IBrush?>(nameof(Track));
+
+    internal static readonly StyledProperty<double> ThicknessProperty =
+        AvaloniaProperty.Register<CountdownRing, double>(nameof(Thickness));
+
+    static CountdownRing()
+        => AffectsRender<CountdownRing>(SweepProperty, StrokeProperty, TrackProperty, ThicknessProperty);
+
+    /// <summary>Kapanan yayın açısı, derece. Sıfırda halka boş, <see cref="FullTurn"/>'de kapalı.</summary>
+    internal double Sweep
+    {
+        get => GetValue(SweepProperty);
+        set => SetValue(SweepProperty, value);
+    }
+
+    internal IBrush? Stroke
+    {
+        get => GetValue(StrokeProperty);
+        set => SetValue(StrokeProperty, value);
+    }
+
+    /// <summary>Halkanın altındaki soluk tam daire: ne kadarının kaldığını gösterir.</summary>
+    internal IBrush? Track
+    {
+        get => GetValue(TrackProperty);
+        set => SetValue(TrackProperty, value);
+    }
+
+    internal double Thickness
+    {
+        get => GetValue(ThicknessProperty);
+        set => SetValue(ThicknessProperty, value);
+    }
+
+    /// <summary>Son kurulan kapanma süresi. Sayaçtan geldiği ölçümde okunabilsin diye açık.</summary>
+    internal TimeSpan Duration { get; private set; }
+
+    /// <summary>Halka canlanıyor mu. Hareket azaltma açıkken yanlış (K4).</summary>
+    internal bool Animating => Transitions is { Count: > 0 };
+
+    /// <summary>
+    /// Geri sayımı baştan kurar. <paramref name="span"/> bekleme sayacının kurduğu sürenin
+    /// kendisidir; <paramref name="still"/> doğruysa halka canlanmadan kapalı çizilir.
+    /// </summary>
+    internal void Run(TimeSpan span, bool still)
+    {
+        Transitions = null;
+        Duration = span;
+
+        if (still || span <= TimeSpan.Zero)
+        {
+            Sweep = FullTurn;
+            return;
+        }
+
+        Sweep = 0;
+        Transitions = new Transitions
+        {
+            new DoubleTransition { Property = SweepProperty, Duration = span, Easing = new LinearEasing() }
+        };
+        Sweep = FullTurn;
+    }
+
+    /// <summary>Geri sayım kesildi: halka boşalır ve geçiş sökülür.</summary>
+    internal void Stop()
+    {
+        Transitions = null;
+        Duration = TimeSpan.Zero;
+        Sweep = 0;
+    }
+
+    public override void Render(DrawingContext context)
+    {
+        var size = Bounds.Size;
+        var radius = Math.Min(size.Width, size.Height) / 2 - Thickness / 2;
+        if (radius <= 0 || Thickness <= 0) return;
+
+        var centre = new Point(size.Width / 2, size.Height / 2);
+        if (Track is { } track) context.DrawEllipse(null, new Pen(track, Thickness), centre, radius, radius);
+
+        var sweep = Math.Clamp(Sweep, 0, FullTurn);
+        if (Stroke is not { } stroke || sweep <= 0) return;
+
+        var pen = new Pen(stroke, Thickness) { LineCap = PenLineCap.Round };
+        if (sweep >= FullTurn)
+        {
+            context.DrawEllipse(null, pen, centre, radius, radius);
+            return;
+        }
+
+        var figure = new PathFigure
+        {
+            StartPoint = OnRing(centre, radius, 0),
+            IsClosed = false,
+            IsFilled = false
+        };
+        figure.Segments!.Add(new ArcSegment
+        {
+            Point = OnRing(centre, radius, sweep),
+            Size = new Size(radius, radius),
+            SweepDirection = SweepDirection.Clockwise,
+            IsLargeArc = sweep > FullTurn / 2
+        });
+
+        var path = new PathGeometry();
+        path.Figures!.Add(figure);
+        context.DrawGeometry(null, pen, path);
+    }
+
+    /// <summary>Halkanın üstündeki nokta. Sıfır derece tepe; saat yönünde artar.</summary>
+    private static Point OnRing(Point centre, double radius, double degrees)
+    {
+        var radians = (degrees - FullTurn / 4) * Math.PI / (FullTurn / 2);
+        return new Point(centre.X + radius * Math.Cos(radians), centre.Y + radius * Math.Sin(radians));
+    }
+}
+
+/// <summary>
 /// Karşılaştırma paneli: sunum yüzeyi, ayırıcı, yakınlaştırma ve terfi.
 ///
 /// Denetim şeridi T40'ta eklendi ve <see cref="ControlStrip"/> içinde yaşıyor; panel
@@ -89,6 +230,11 @@ internal partial class ComparisonPanel : UserControl
                 else HoverZoom(false);
             });
 
+        // T73/K3: göstergenin süresi sayacın kendisinden geliyor. Panel burada
+        // PlaybackPanelRiseDelay'i ikinci kez okumuyor — okusaydı belirteç değiştiğinde
+        // iki süre ayrışır ve halka yanlış hızda kapanırdı.
+        _descent.ShowCountdown = ShowCountdown;
+
         Surface.Gesture = _gesture;
         SeparatorGrip.RenderTransform = _separatorAt;
 
@@ -154,6 +300,16 @@ internal partial class ComparisonPanel : UserControl
 
     /// <summary>Gecikmeli iniş sayacı. Kuşak koruması ölçümden okunabilsin diye açık.</summary>
     internal HoverZone Descent => _descent;
+
+    /// <summary>
+    /// Hareket azaltma ayarı. Değeri <see cref="HoverZone.MotionReduced"/> veriyor; ölçüm
+    /// işletim sistemi ayarını değiştiremediği için açık kapı (K4).
+    /// </summary>
+    internal bool MotionReduced
+    {
+        get => _motionReduced;
+        set => _motionReduced = value;
+    }
 
     /// <summary>Ayırıcının konumu, sıfır ile bir arası. Uçlar geçerlidir.</summary>
     internal double Split
@@ -423,6 +579,25 @@ internal partial class ComparisonPanel : UserControl
     /// uygulanır. Fare çıkışında panel terfi etmişse karar buraya değil
     /// <see cref="Descend"/>'e aittir; terfi olmadıysa değer hâlâ bizimse geri alınır.
     /// </summary>
+    /// <summary>
+    /// T73/K1, K2: bekleme göstergesi. Sayaç kurulunca süresiyle birlikte çağrılır ve halka
+    /// o sürede kapanır; sayaç bittiğinde ya da kesildiğinde <c>null</c> gelir ve gösterge
+    /// kaybolur. Fare erken çıkarsa yol yine buradan geçer — kesilen geri sayım ekranda
+    /// donmuş bir halka bırakmaz.
+    /// </summary>
+    private void ShowCountdown(TimeSpan? span)
+    {
+        if (span is not { } left || left <= TimeSpan.Zero)
+        {
+            RiseRing.Stop();
+            RiseCountdown.IsVisible = false;
+            return;
+        }
+
+        RiseCountdown.IsVisible = true;
+        RiseRing.Run(left, _motionReduced);
+    }
+
     internal void HoverZoom(bool entering)
     {
         if (_promoted) return;
