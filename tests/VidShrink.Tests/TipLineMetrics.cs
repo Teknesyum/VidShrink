@@ -77,7 +77,14 @@ internal static class TipLineMetrics
         return maxWidth - (2 * horizontalPadding) - (2 * border);
     }
 
-    /// <summary>Gömülü yazı tipini yükler. Süreç başına bir kez kurulur.</summary>
+    /// <summary>
+    /// Gömülü yazı tipini yükler. Süreç başına bir kez kurulur.
+    ///
+    /// Çağıran <see cref="AppHost"/> iş parçacığında olmak zorunda: <c>avares://</c>
+    /// yazı tipinin çözümü yazı tipi yöneticisine dokunuyor ve havuz iş parçacığında
+    /// "Could not create glyphTypeface" ile düşüyor. Giriş kapısı
+    /// <see cref="MeasureAll"/>, oradan geçmeyen çağrı bu tuzağa düşer.
+    /// </summary>
     private static Typeface Prepare()
     {
         AppHost.Ensure();
@@ -122,7 +129,7 @@ internal static class TipLineMetrics
     }
 
     /// <summary>İngilizce ve Türkçe bütün ipucu satırları.</summary>
-    internal static IReadOnlyList<LineMeasurement> MeasureAll()
+    internal static IReadOnlyList<LineMeasurement> MeasureAll() => AppHost.Run(() =>
     {
         var catalogue = TipSources.ReadCatalogue();
         var all = new List<LineMeasurement>();
@@ -135,8 +142,8 @@ internal static class TipLineMetrics
                 all.AddRange(Measure(label, "TR", translated, turkish: true));
         }
 
-        return all;
-    }
+        return (IReadOnlyList<LineMeasurement>)all;
+    });
 
     /// <summary>Raporda ipucunu tanıtan kısa etiket: kaynak dosya ve ilk maddenin başı.</summary>
     private static string Label(TipSources.Tip tip)
