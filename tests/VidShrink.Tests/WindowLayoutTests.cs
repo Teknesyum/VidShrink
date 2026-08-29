@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.Core;
@@ -780,5 +781,156 @@ public sealed class WindowLayoutTests
 
         Assert.Equal(new Thickness(Token("SpaceMd")), inset);
     }
+
+
+    /// <summary>Bir kutunun yazısı: ekranda görünen metin, ölçüsü ve ona kalan yer.</summary>
+    private readonly record struct BoxLabel(string Tab, string Control, string Text, double Needed, double Room)
+    {
+        internal double Overflow => Needed - Room;
+
+        public override string ToString() =>
+            $"{Tab} · {Control} [{Text}]: gereken {Needed:0.#}, kalan yer {Room:0.#}";
+    }
+
+    /// <summary>
+    /// Bir metin bloğunun <b>gerçek yazı tipiyle</b> istediği genişlik. Yazı tipi, boyut,
+    /// kalınlık ve yatıklık bloğun kendisinden okunuyor; ölçü hiçbir değeri varsaymıyor.
+    ///
+    /// <para><c>Contains</c> ile metin karşılaştırmak bu kusuru göremez: kırpılan metin
+    /// ağaçta tam hâliyle durur, kesilen şey çizimdir. <see cref="Visual.Bounds"/> ile
+    /// <see cref="Layoutable.DesiredSize"/> karşılaştırması da göremez (bkz.
+    /// <see cref="Clips"/>) — ikisi de yerleşimin verdiği genişliğe kırpılır. Kırpılmayan tek
+    /// sayı, metnin dizgiden çıkan kendi genişliğidir.</para>
+    /// </summary>
+    private static double NeededWidth(TextBlock face, string text) =>
+        new FormattedText(
+            text,
+            CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight,
+            new Typeface(face.FontFamily, face.FontStyle, face.FontWeight),
+            face.FontSize,
+            Brushes.Black).Width;
+
+    /// <summary>
+    /// Bir açılır kutunun yazısına kalan yer. Kutunun kendi genişliği değil: şablondaki
+    /// ızgaranın metin sütunundan seçim kutusunun kenar boşluğu düşülmüş hâli. Hiçbir sayı
+    /// buraya yazılmıyor — ok sütununun genişliği de dolgu da ağaçtan okunuyor.
+    ///
+    /// <para>Görünen metin bloğunun <see cref="Visual.Bounds"/> genişliği bu iş için
+    /// <b>yetmez</b>: blok o anda yazılı metnin boyunda duruyor, bir seçenek daha uzun
+    /// olduğunda ne olacağını söylemiyor.</para>
+    /// </summary>
+    private static double SelectionRoom(ComboBox box)
+    {
+        var frame = box.GetVisualDescendants().OfType<Grid>().FirstOrDefault(g => g.ColumnDefinitions.Count == 2);
+        var selection = box.GetVisualDescendants().OfType<ContentControl>().FirstOrDefault(c => c.Name == "SelectionBox");
+        if (frame is null || selection is null) return double.NaN;
+
+        return frame.ColumnDefinitions[0].ActualWidth - selection.Margin.Left - selection.Margin.Right;
+    }
+
+    /// <summary>
+    /// Türkçe pencerede her <see cref="ComboBox"/> ve <see cref="Button"/> yazısı kendi
+    /// kutusuna sığar — <b>seçili olan da, kutunun her seçeneği de</b>.
+    ///
+    /// <para>Şikâyet doldurma politikası kutusundaydı: Türkçede "Hedefi Doldur" yazıyor,
+    /// kullanıcı "Hedefi Do" görüyordu. Kutu ölçülebilir bir şey: seçim kutusu şablonda sola
+    /// yaslı duruyor ve kırpma yapmıyor, yani metnin dizgiden çıkan genişliği ona kalan
+    /// yerden büyükse kalanı çizilmez.</para>
+    ///
+    /// <para>Ölçü seçili seçenekle yetinmiyor: kullanıcı listeyi açıp en uzun seçeneği
+    /// seçebilir; o zaman kutunun içeriği değişir, genişliği değişmez. Her seçenek aynı yere
+    /// sığmak zorunda.</para>
+    ///
+    /// <para>Pencere <b>Türkçe</b> ölçülüyor. Uygulama açılışta Türkçe koşuyor
+    /// (<c>OnWindowLoaded</c> içinde <c>SetLanguage(true)</c>); başsız ölçümde o olay
+    /// ateşlenmediği için bu dosyadaki öteki ölçüler İngilizce pencereyi görüyor — kırpılma
+    /// ise tam Türkçe karşılıkların uzunluğundan doğuyor.</para>
+    ///
+    /// <para><b>Bu ölçü neyi koruyor:</b> Türkçe metnin kutusuna sığmasını.
+    /// <b>Bozulursa kullanıcı ne görür:</b> yarısı kesilmiş bir etiket — hangi seçeneğin
+    /// açık olduğu okunamaz.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void NoTurkishBoxLabelIsClipped(bool loaded, bool narrow)
+    {
+        var size = narrow ? MinimumSize() : DesignSize();
+        var labels = MeasureTurkishBoxes(size, loaded);
+        var clipped = labels.Where(label => label.Overflow > 0.5).ToList();
+
+        _output.WriteLine(
+            $"{(loaded ? "Dolu" : "Boş")} Türkçe pencerede {size.Width:0}x{size.Height:0} ölçülen "
+            + $"kutu yazısı {labels.Count}; payı en dar üçü: "
+            + string.Join(" | ", labels.OrderBy(label => label.Room - label.Needed).Take(3)));
+
+        Assert.Contains(labels, label => label.Control.StartsWith("CmbFillPolicy", StringComparison.Ordinal));
+
+        Assert.True(
+            clipped.Count == 0,
+            $"Türkçe pencerede ({size.Width:0}x{size.Height:0}) kutusuna sığmayan yazı var:"
+            + Environment.NewLine + string.Join(Environment.NewLine, clipped));
+    }
+
+    /// <summary>
+    /// Türkçe pencerede her sekmedeki her <see cref="ComboBox"/> ve <see cref="Button"/>
+    /// yazısının ölçüsü. Sekme yürüyüşü <see cref="ScanTabs"/> ile aynı gerekçeyle sekme
+    /// sekme koşuyor: seçili olmayan sekmenin içeriği görsel ağaca hiç girmiyor.
+    /// </summary>
+    private static IReadOnlyList<BoxLabel> MeasureTurkishBoxes(Size size, bool loaded) =>
+        AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            window.UseTurkish();
+            if (loaded)
+            {
+                window.LoadWithoutProbing(SamplePath, Sample());
+                window.SettleFades();
+            }
+
+            LayOutAt(window, size);
+
+            var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
+            var labels = new List<BoxLabel>();
+
+            for (var index = 0; index < tabs.ItemCount; index++)
+            {
+                tabs.SelectedIndex = index;
+                RelayoutAt(window, size);
+
+                var tab = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
+
+                foreach (var box in window.GetVisualDescendants().OfType<ComboBox>().Where(b => b.IsEffectivelyVisible))
+                {
+                    if (box.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault() is not { } shown) continue;
+
+                    var room = SelectionRoom(box);
+                    if (double.IsNaN(room)) continue;
+
+                    var name = string.IsNullOrEmpty(box.Name) ? nameof(ComboBox) : box.Name!;
+                    labels.Add(new BoxLabel(tab, name, shown.Text ?? string.Empty, NeededWidth(shown, shown.Text ?? string.Empty), room));
+
+                    foreach (var option in box.Items.OfType<ComboBoxItem>()
+                                 .Select(item => item.Content?.ToString())
+                                 .Where(text => !string.IsNullOrWhiteSpace(text)))
+                        labels.Add(new BoxLabel(tab, $"{name} · seçenek", option!, NeededWidth(shown, option!), room));
+                }
+
+                foreach (var button in window.GetVisualDescendants().OfType<Button>().Where(b => b.IsEffectivelyVisible))
+                {
+                    if (button.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault() is not { } shown) continue;
+                    if (string.IsNullOrWhiteSpace(shown.Text)) continue;
+                    if (shown.TextWrapping != TextWrapping.NoWrap) continue;
+
+                    var name = string.IsNullOrEmpty(button.Name) ? $"{nameof(Button)}[{shown.Text}]" : button.Name!;
+                    labels.Add(new BoxLabel(tab, name, shown.Text!, NeededWidth(shown, shown.Text!), shown.Bounds.Width));
+                }
+            }
+
+            return (IReadOnlyList<BoxLabel>)labels;
+        });
 
 }
