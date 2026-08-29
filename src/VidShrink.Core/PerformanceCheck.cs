@@ -147,6 +147,24 @@ public sealed record PerformanceCheckResult(
     /// <summary>Makinenin işlemci zamanı sayacı karar verilebilecek kadar sağlam mı.</summary>
     public bool CpuAccountingTrustworthy =>
         CpuAccountingFactor > 0 && CpuAccountingFactor <= PerformanceCheck.CpuAccountingTolerance;
+
+    /// <summary>
+    /// Yazılım bacağı gerçekten koştu mu. <see cref="SoftwareRealtimeCores"/> ölçülmeyen
+    /// bacakta da sıfırdır, yani tek başına okunduğunda "maliyet yok" ile "ölçüm yok"
+    /// aynı görünür. Karşılaştırma yapan taraf önce buraya bakmalı: ölçülmemiş bir
+    /// bacağı düşmüş maliyet sanmak, olmayan bir gerilemeyi bildirir.
+    /// </summary>
+    public bool SoftwareMeasured => SoftwareCodec.Length > 0;
+
+    /// <summary>Donanım bacağı gerçekten koştu mu. Aynı ayrım donanım tarafında.</summary>
+    public bool HardwareMeasured => HardwareCodec.Length > 0;
+
+    /// <summary>
+    /// Eksik bacağın sebebi bütçenin dolması mı. Bütçe dolduysa eksiklik ortamın
+    /// haberidir; dolmadan eksilen bacak kodun kusurudur ve ikisi ayrı ele alınır.
+    /// </summary>
+    public bool BudgetExhausted =>
+        Findings.Any(f => f.Code == PerformanceFindingCode.BudgetExhausted);
 }
 
 /// <summary>
