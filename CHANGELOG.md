@@ -5,10 +5,17 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
-## [Unreleased]
+## [0.2.0] - 2026-08-29
 
 ### Added
 
+- A **performance check** in the Advanced section answers one question with measurement
+  rather than guesswork: what does encoding cost this machine, and would recording a game
+  cost it frames. It runs six passes - counter calibration, sample clip, baseline decode,
+  two hardware encoder passes and a software pass - reports what each leg actually cost,
+  and says plainly when a leg could not be measured instead of reporting a silent zero.
+  The panel's headline is built from the findings, never from the summary verdict, because
+  the verdict can read "no hardware" while a hardware encoder is running.
 - Right-click a video in Explorer and **Open this video with VidShrink** is there, on the
   same 24 extensions the application itself opens. The Windows installer writes the entry
   under `HKCU\Software\Classes\SystemFileAssociations`, so it needs no administrator rights
@@ -19,6 +26,33 @@ ship as part of it.
   `-MenuLanguage tr|en` forces it. `-RemoveShellMenu` clears every entry in one step,
   `-ShellMenuOnly` rewrites them without reinstalling, and `-SkipShortcuts` now means the
   shell is not touched at all.
+- A file path handed to VidShrink on the command line - by the shell menu, a shortcut or a
+  drag onto the executable - now loads through the same path a dropped file takes. A path
+  broken into pieces on its spaces resolves too, which the old single-argument lookup could
+  not do. The list of media extensions moved to `VidShrink.Core` so the file picker and the
+  installer's registry entries read one list instead of two copies.
+
+### Changed
+
+- The background phoenix burns. Its fill went from one flat red at 6% opacity to four
+  gradients running yellow to orange to red and out to transparent, at 30% opacity. The two
+  new warm tones are derived from the existing ember red rather than invented: same
+  saturation, same lightness, hue stepped evenly toward yellow. Body text keeps 8.41:1
+  contrast over the brightest flame pixel - above the AAA threshold, not just AA.
+- The comparison panel now shrinks the moment the pointer leaves and waits two seconds
+  before growing. Leaving before the two seconds are up cancels the pending growth
+  entirely. The playback control strip is unchanged.
+
+### Fixed
+
+- The mouse wheel's three zoom stages collapsed to two on short windows: the middle stage's
+  ceiling rose to the band itself when the band was taller than the window's share, so the
+  middle stage matched the full stage exactly. The share cap is now unconditional.
+- Unit and codec names are no longer rewritten by the display-casing pass. The token that
+  matched identifiers stopped at the underscore, so `h264_nvenc` was being read as `h264`.
+- The smallest-size clipping measure never protected anything: it compared a control's
+  desired size against its bounds, and in Avalonia bounds are never smaller than desired.
+  The working criterion exposed a real 15px overflow of a hint button, now fixed.
 
 ## [0.1.1] - 2026-08-26
 
