@@ -5,6 +5,34 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.2.1] - 2026-08-29
+
+### Added
+
+- The comparison panel now shows a **countdown ring** while the pointer rests on it. The
+  ring closes clockwise over the two seconds before the panel grows, so the wait is
+  visible instead of feeling like a stall. It clears the moment the pointer leaves.
+
+### Changed
+
+- The **phoenix behind the workspace** was redrawn from scratch. It is built from
+  twenty-four separate feather paths rather than four filled plates: the near wing carries
+  eight feathers, the far wing six and shorter, the tail five at different depths. Each
+  feather burns from its own root to its own tip, so the fire reads as one rising bird
+  instead of a symmetric silhouette.
+- Panels are now slightly translucent, letting the phoenix show through without costing
+  legibility: body text over the brightest flame measures 17.77:1 against a 4.5:1 floor.
+- **The launcher checks for a new version on every start.** It used to check once a day,
+  which meant a freshly published release could stay unseen for up to twenty-four hours.
+  An unreachable network still costs a start no more than the manifest timeout - measured
+  at 810 ms against an 800 ms budget.
+- Hovering the comparison panel grows it to the tallest size the window can hold, worked
+  out from the window rather than from a fixed multiplier, and stops one notch short of
+  the full stage so hovering can never take over the whole workspace.
+- The redundant **Preview** heading is gone and the three columns now start at the same
+  top edge; the gap between the tab row and the panels was narrowed by one step on the
+  spacing scale.
+
 ## [0.2.0] - 2026-08-29
 
 ### Added

@@ -44,7 +44,7 @@ public partial class MainWindow : Window
     // pencere zaten açılmış olur.
     private static readonly TimeSpan UpdateProbeTimeout = TimeSpan.FromSeconds(8);
 
-    // Şeridin kapatıldığı sürüm. Ayar dosyası değil, T18'in last-check.json'u gibi bir
+    // Şeridin kapatıldığı sürüm. Ayar dosyası değil, yanına konan bir
     // işaret dosyası; UpdateSettings'e ait olduğu için oraya yazılmaz.
     private const string DismissedNoticeFileName = "dismissed-update.txt";
 
