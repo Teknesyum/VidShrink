@@ -6,13 +6,15 @@ namespace VidShrink.Tests;
 
 /// <summary>
 /// T71: anka artık düz tek renk değil, kırmızıdan sarıya giden bir alev rampasıyla
-/// doluyor. Ölçülen şey renk zevki değil: iki yeni tonun mevcut kırmızıdan türediği,
-/// rampanın yönü, ve en parlak alev noktasının üstünde gövde metninin kontrast oranı.
+/// doluyor. Burada ölçülen şey rampanın kendisi: iki yeni tonun mevcut kırmızıdan
+/// türediği, durakların sıcaktan soğuğa sıralandığı, uçların saydama gittiği.
+/// <para>
+/// Alevin metin okunabilirliğine bedeli burada değil, <see cref="ThemeBackdropTests"/>
+/// içinde ölçülür — kontrast zeminin işidir, paletin değil.
+/// </para>
 /// </summary>
 public sealed class ThemeTokenTests
 {
-    private const double BodyTextAaThreshold = 4.5;
-
     private const double BaselinePhoenixOpacity = 0.06;
 
     private static readonly XNamespace Ui = "https://github.com/avaloniaui";
@@ -38,33 +40,6 @@ public sealed class ThemeTokenTests
     {
         var value = uint.Parse(argb.TrimStart('#'), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         return (((value >> 16) & 0xFF) / 255.0, ((value >> 8) & 0xFF) / 255.0, (value & 0xFF) / 255.0);
-    }
-
-    private static double Linear(double channel) =>
-        channel <= 0.04045 ? channel / 12.92 : Math.Pow((channel + 0.055) / 1.055, 2.4);
-
-    private static double Luminance(string argb)
-    {
-        var (r, g, b) = Channels(argb);
-        return (0.2126 * Linear(r)) + (0.7152 * Linear(g)) + (0.0722 * Linear(b));
-    }
-
-    private static double Contrast(string over, string under)
-    {
-        var a = Luminance(over);
-        var b = Luminance(under);
-        var (light, dark) = a >= b ? (a, b) : (b, a);
-        return (light + 0.05) / (dark + 0.05);
-    }
-
-    private static string Blend(string over, string under, double alpha)
-    {
-        var (or, og, ob) = Channels(over);
-        var (ur, ug, ub) = Channels(under);
-        var r = (int)Math.Round(255 * ((or * alpha) + (ur * (1 - alpha))));
-        var g = (int)Math.Round(255 * ((og * alpha) + (ug * (1 - alpha))));
-        var b = (int)Math.Round(255 * ((ob * alpha) + (ub * (1 - alpha))));
-        return $"#FF{r:X2}{g:X2}{b:X2}";
     }
 
     /// <summary>HSL: ton derece, doygunluk ve parlaklık 0..1.</summary>
@@ -218,35 +193,6 @@ public sealed class ThemeTokenTests
         Assert.True(Opacity() > BaselinePhoenixOpacity,
             $"Anka aydınlanmamış: opaklık {BaselinePhoenixOpacity} → {Opacity()}.");
         Assert.InRange(Opacity(), 0.0, 1.0);
-    }
-
-    /// <summary>
-    /// K4: kontrast ortalamada değil, en parlak alev noktasında ölçülüyor. O nokta
-    /// rampanın en açık durağının, çalışma alanının en açık durağı üstüne
-    /// <c>PhoenixOpacity</c> ile düştüğü piksel. Gövde metni orada da WCAG AA'yı geçmeli.
-    /// </summary>
-    [Fact]
-    public void BodyTextClearsAaOverTheBrightestFlamePixel()
-    {
-        var body = Token("TextBodyColor");
-
-        var workspaceLightest = Resource("WorkspaceGradient")
-            .Elements(Ui + "GradientStop")
-            .Select(StopColour)
-            .MaxBy(Luminance)!;
-
-        var flameLightest = FlameBrushKeys
-            .SelectMany(FlameStops)
-            .Select(StopColour)
-            .Where(colour => colour.StartsWith('#'))
-            .MaxBy(Luminance)!;
-
-        var brightest = Blend(flameLightest, workspaceLightest, Opacity());
-        var ratio = Contrast(body, brightest);
-
-        Assert.True(ratio >= BodyTextAaThreshold,
-            $"En parlak alev noktası {brightest} üstünde kontrast {ratio:F2}:1, "
-            + $"AA eşiği {BodyTextAaThreshold}:1.");
     }
 
     /// <summary>K5: anka çiziminde ve alev rampalarında çıplak onaltılık renk yok.</summary>
