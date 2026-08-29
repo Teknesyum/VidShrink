@@ -161,7 +161,14 @@ public sealed class ThemeTokenTests
         Assert.Equal(FlameBrushKeys.OrderBy(key => key), brushes.Distinct().OrderBy(key => key));
 
         foreach (var key in FlameBrushKeys)
-            Assert.Equal("LinearGradientBrush", Resource(key).Name.LocalName);
+        {
+            var kind = Resource(key).Name.LocalName;
+            var expected = key.StartsWith("PhoenixGlow", StringComparison.Ordinal)
+                ? "RadialGradientBrush"
+                : "LinearGradientBrush";
+
+            Assert.True(kind == expected, $"{key} {kind} ile boyanmış, beklenen {expected}.");
+        }
     }
 
     /// <summary>
