@@ -20,6 +20,8 @@
   <Color x:Key="NeonPurpleBorderColor">#80B026FF</Color>
 
   <Color x:Key="NeonEmberColor">#FFFF0033</Color>
+  <Color x:Key="EmberFlameColor">#FFFF6600</Color>
+  <Color x:Key="EmberBlazeColor">#FFFFFF00</Color>
   <Color x:Key="EmberDeepColor">#FF070306</Color>
   <Color x:Key="EmberMidColor">#FF080407</Color>
   <Color x:Key="EmberEdgeColor">#FF0B0407</Color>
