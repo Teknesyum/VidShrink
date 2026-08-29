@@ -175,6 +175,236 @@ public sealed class ThemeBackdropTests
         .Select(drawing => (string)drawing.Attribute("Geometry")!)
         .ToList();
 
+    // ---- T78: açılmış siluet, kılcal tüy ucu, kor parçacıkları, katmanlı parlama ----
+
+    /// <summary>Kanat, kuyruk ve tepelik tüyleri — ankanın birincil tüyleri.</summary>
+    private static readonly string[] FeatherBrushKeys =
+    {
+        "PhoenixWingFlameNear", "PhoenixWingFlameFar", "PhoenixTailFlame", "PhoenixCrestFlame"
+    };
+
+    private static readonly string[] GlowBrushKeys =
+    {
+        "PhoenixGlowOuter", "PhoenixGlowMid", "PhoenixGlowInner"
+    };
+
+    private const string SparkBrushKey = "PhoenixEmberSpark";
+
+    /// <summary>Bir tüyden okunan iki sayı: ucundaki kılcal sayısı ve orta yerindeki en geniş yaprak.</summary>
+    private sealed record FeatherProbe(string Brush, int Capillaries, double Vane);
+
+    private static readonly Lazy<IReadOnlyList<FeatherProbe>> FeatherProbes = new(MeasureFeathers);
+
+    /// <summary>Bütün yolların ortak sınır kutusu.</summary>
+    private static Rect BoundsOf(IEnumerable<string> paths)
+    {
+        var boxes = paths.Select(path => Geometry.Parse(path).Bounds).ToList();
+        return new Rect(
+            boxes.Min(box => box.X),
+            boxes.Min(box => box.Y),
+            boxes.Max(box => box.Right) - boxes.Min(box => box.X),
+            boxes.Max(box => box.Bottom) - boxes.Min(box => box.Y));
+    }
+
+    /// <summary>
+    /// Her birincil tüyü kendi ekseninde tarar.
+    /// <para>
+    /// Eksen, tüyün gövde merkezine en yakın dolu noktasından (kök) en uzak dolu
+    /// noktasına (uç) çizilir. <b>Kılcal ölçütü:</b> eksenin dış bölgesinde — kök-uç
+    /// mesafesinin %78 ile %98'i arasında — eksene dik bir tarama çizgisinin kestiği
+    /// <b>ayrı dolu aralık sayısı</b>; ucu üç ayrı aralığa bölünen tüy üç kılcal taşıyor
+    /// demektir. <b>Yaprak genişliği:</b> aynı taramanın tüyün orta yerindeki (%45)
+    /// en uzun kesintisiz dolu aralığı.
+    /// </para>
+    /// </summary>
+    private static IReadOnlyList<FeatherProbe> MeasureFeathers() => AppHost.Run(() =>
+    {
+        var centre = Geometry.Parse(PartGeometries("PhoenixBodyFlame").Single()).Bounds.Center;
+        var probes = new List<FeatherProbe>();
+
+        foreach (var key in FeatherBrushKeys)
+            foreach (var path in PartGeometries(key))
+            {
+                var shape = Geometry.Parse(path);
+                var box = shape.Bounds;
+
+                Point tip = default, root = default;
+                double far = -1, near = double.MaxValue;
+
+                for (var y = box.Y; y <= box.Bottom; y += 3)
+                    for (var x = box.X; x <= box.Right; x += 3)
+                    {
+                        var point = new Point(x, y);
+                        if (!shape.FillContains(point)) continue;
+
+                        var span = Math.Sqrt(((x - centre.X) * (x - centre.X))
+                            + ((y - centre.Y) * (y - centre.Y)));
+                        if (span > far) { far = span; tip = point; }
+                        if (span < near) { near = span; root = point; }
+                    }
+
+                var length = Math.Sqrt(((tip.X - root.X) * (tip.X - root.X))
+                    + ((tip.Y - root.Y) * (tip.Y - root.Y)));
+                var ux = (tip.X - root.X) / length;
+                var uy = (tip.Y - root.Y) / length;
+
+                (int Runs, double Longest) Scan(double share)
+                {
+                    var ax = root.X + (ux * length * share);
+                    var ay = root.Y + (uy * length * share);
+                    var runs = 0;
+                    double longest = 0, current = 0;
+                    var inside = false;
+
+                    for (var offset = -110.0; offset <= 110.0; offset += 1)
+                    {
+                        var on = shape.FillContains(new Point(ax - (uy * offset), ay + (ux * offset)));
+                        if (on)
+                        {
+                            if (!inside) runs++;
+                            current++;
+                            if (current > longest) longest = current;
+                        }
+                        else current = 0;
+
+                        inside = on;
+                    }
+
+                    return (runs, longest);
+                }
+
+                var capillaries = 0;
+                for (var share = 0.78; share <= 0.98; share += 0.01)
+                    capillaries = Math.Max(capillaries, Scan(share).Runs);
+
+                probes.Add(new FeatherProbe(key, capillaries, Scan(0.45).Longest));
+            }
+
+        return (IReadOnlyList<FeatherProbe>)probes;
+    });
+
+    /// <summary>
+    /// K1: figür açılmış kanat okuyor, duran kuş değil. Kanat ucundan kanat ucuna
+    /// genişlik gövdenin boyunu 1,6 kattan fazla aşıyor; çizimin tamamının sınır kutusu
+    /// da aynı oranı tutuyor — T72'de o kutu 987×948, yani 1,04'tü.
+    /// </summary>
+    [Fact]
+    public void TheWingspanDominatesTheBody()
+    {
+        var (spread, figure, body) = AppHost.Run(() =>
+        {
+            var wings = BoundsOf(PartGeometries("PhoenixWingFlameNear")
+                .Concat(PartGeometries("PhoenixWingFlameFar")));
+            return (wings, BoundsOf(PhoenixGeometries()),
+                Geometry.Parse(PartGeometries("PhoenixBodyFlame").Single()).Bounds);
+        });
+
+        Assert.True(spread.Width >= body.Height * 1.6,
+            $"Kanat açıklığı {spread.Width:F0}, gövde boyu {body.Height:F0}; "
+            + $"oran {spread.Width / body.Height:F2}, eşik 1,60.");
+
+        Assert.True(figure.Width >= figure.Height * 1.6,
+            $"Çizimin kutusu {figure.Width:F0}×{figure.Height:F0}; "
+            + $"oran {figure.Width / figure.Height:F2}, eşik 1,60.");
+    }
+
+    /// <summary>
+    /// K2: her birincil tüy ucunda kılcallara ayrılıyor — tek kapalı dilim değil.
+    /// Sayılan şey <see cref="MeasureFeathers"/>'ın tarif ettiği ölçü: tüyün uç
+    /// bölgesinde eksene dik taramanın kestiği ayrı dolu aralık sayısı.
+    /// </summary>
+    [Fact]
+    public void EveryPrimaryFeatherFraysIntoCapillaries()
+    {
+        var probes = FeatherProbes.Value;
+        Assert.True(probes.Count >= 24, $"Birincil tüy sayısı {probes.Count}.");
+
+        var blunt = probes.Where(probe => probe.Capillaries < 3).ToList();
+        Assert.True(blunt.Count == 0,
+            $"{blunt.Count} tüyün ucu ayrılmıyor: "
+            + string.Join(", ", blunt.Select(probe => $"{probe.Brush} {probe.Capillaries} kılcal")));
+
+        foreach (var key in FeatherBrushKeys)
+            Assert.Contains(probes, probe => probe.Brush == key);
+    }
+
+    /// <summary>
+    /// K3: gövdeden dağılan kor parçacıkları. En az on iki ayrı şekil, boyutları tek tip
+    /// değil ve konumları hizaya dizilmiyor — dörtten fazlası aynı x ya da aynı y'de değil.
+    /// </summary>
+    [Fact]
+    public void EmbersDriftInVariedSizesAndScatteredPlaces()
+    {
+        var boxes = AppHost.Run(() => PartGeometries(SparkBrushKey)
+            .Select(path => Geometry.Parse(path).Bounds)
+            .ToList());
+
+        Assert.True(boxes.Count >= 12, $"Kor parçacığı {boxes.Count} tane.");
+
+        var sizes = boxes.Select(box => Math.Max(box.Width, box.Height)).ToList();
+        var ratio = sizes.Max() / sizes.Min();
+        Assert.True(ratio >= 3.0,
+            $"En büyük kor {sizes.Max():F1}, en küçük {sizes.Min():F1}; fark {ratio:F2} kat, eşik 3.");
+
+        var body = AppHost.Run(() => Geometry.Parse(PartGeometries("PhoenixBodyFlame").Single()).Bounds);
+        Assert.True(boxes.Min(box => box.Center.Y) < body.Center.Y,
+            "Korların hiçbiri gövdenin üstüne çıkmıyor; yukarı dağılmıyorlar.");
+
+        var lanes = boxes.GroupBy(box => Math.Round(box.Center.X)).Max(lane => lane.Count());
+        var rows = boxes.GroupBy(box => Math.Round(box.Center.Y)).Max(row => row.Count());
+
+        Assert.True(lanes <= 4, $"{lanes} kor aynı x'te dizilmiş.");
+        Assert.True(rows <= 4, $"{rows} kor aynı y'de dizilmiş.");
+    }
+
+    /// <summary>
+    /// K4: gövdenin ardında katmanlı bir parlama var. Üç ölçü: parlama tüylerden
+    /// <b>geniş</b> — en dar parlama katmanının kısa kenarı, en geniş tüy yaprağından
+    /// büyük; <b>yumuşak</b> — parlama fırçaları bir opaklık taşıyor, alev tüyleri
+    /// taşımıyor; <b>arkada</b> — üç katman da çizim sırasında bütün tüylerden önce geliyor.
+    /// </summary>
+    [Fact]
+    public void TheGlowLayersSitBehindTheFeathersBroaderAndSofter()
+    {
+        var order = PhoenixDrawings()
+            .Select((drawing, index) => (Index: index,
+                Brush: ((string)drawing.Attribute("Brush")!).Trim()
+                    .Replace("{StaticResource", string.Empty).Trim(' ', '}')))
+            .ToList();
+
+        var glow = order.Where(item => GlowBrushKeys.Contains(item.Brush)).ToList();
+        var feathers = order.Where(item => FeatherBrushKeys.Contains(item.Brush)).ToList();
+
+        Assert.Equal(GlowBrushKeys.Length, glow.Select(item => item.Brush).Distinct().Count());
+        Assert.True(glow.Max(item => item.Index) < feathers.Min(item => item.Index),
+            "Parlama katmanı alev tüylerinin önüne geçmiş.");
+
+        var body = AppHost.Run(() => Geometry.Parse(PartGeometries("PhoenixBodyFlame").Single()).Bounds);
+        var narrowest = AppHost.Run(() => GlowBrushKeys
+            .SelectMany(PartGeometries)
+            .Select(path => Geometry.Parse(path).Bounds)
+            .Min(box => Math.Min(box.Width, box.Height)));
+
+        var widestVane = FeatherProbes.Value.Max(probe => probe.Vane);
+
+        Assert.True(narrowest > widestVane,
+            $"En dar parlama katmanı {narrowest:F0}, en geniş tüy yaprağı {widestVane:F0}; "
+            + "parlama tüyden geniş değil.");
+
+        foreach (var key in GlowBrushKeys)
+        {
+            var box = AppHost.Run(() => BoundsOf(PartGeometries(key)));
+            Assert.True(Math.Min(box.Width, box.Height) > body.Width,
+                $"{key} gövdenin genişliğinden ({body.Width:F0}) dar: {box.Width:F0}×{box.Height:F0}.");
+            Assert.True(box.Contains(body.Center), $"{key} gövdenin ardında durmuyor.");
+
+            Assert.NotNull(Resource(key).Attribute("Opacity"));
+        }
+
+        foreach (var key in FeatherBrushKeys)
+            Assert.Null(Resource(key).Attribute("Opacity"));
+    }
+
     /// <summary>K1: çalışma alanının en açık noktası bile bugünkünden daha okunaklı.</summary>
     [Fact]
     public void WarmingTheWorkspaceDoesNotCostBodyTextContrast()

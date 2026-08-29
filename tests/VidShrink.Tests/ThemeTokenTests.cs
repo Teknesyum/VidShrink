@@ -24,7 +24,15 @@ public sealed class ThemeTokenTests
     private static readonly string[] FlameBrushKeys =
     {
         "PhoenixBodyFlame", "PhoenixTailFlame",
-        "PhoenixWingFlameNear", "PhoenixWingFlameFar", "PhoenixCrestFlame"
+        "PhoenixWingFlameNear", "PhoenixWingFlameFar", "PhoenixCrestFlame",
+        "PhoenixGlowInner", "PhoenixGlowMid", "PhoenixGlowOuter", "PhoenixEmberSpark"
+    };
+
+    /// <summary>T78: parlama ve kor katmanlarını kuran rampalar. Yeni ton değil, aynı
+    /// belirteçlerin opaklık varyasyonu.</summary>
+    private static readonly string[] WashBrushKeys =
+    {
+        "PhoenixGlowInner", "PhoenixGlowMid", "PhoenixGlowOuter", "PhoenixEmberSpark"
     };
 
     private static XElement Theme() => XDocument.Load(TipSources.ThemePath).Root!;
@@ -199,6 +207,36 @@ public sealed class ThemeTokenTests
         Assert.True(Opacity() > BaselinePhoenixOpacity,
             $"Anka aydınlanmamış: opaklık {BaselinePhoenixOpacity} → {Opacity()}.");
         Assert.InRange(Opacity(), 0.0, 1.0);
+    }
+
+    /// <summary>
+    /// T78 K6: parlama ve kor katmanları palete renk eklemeden kuruldu. Her ikisi de
+    /// yalnızca mevcut <c>Ember</c> belirteçlerini kullanıyor ve alev tüylerinden farkları
+    /// bir opaklık değeri — kendi tonları değil.
+    /// </summary>
+    [Fact]
+    public void TheGlowAndTheEmbersAreOpacityVariantsOfTheSameRamp()
+    {
+        var allowed = new[] { "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor" };
+
+        foreach (var key in WashBrushKeys)
+        {
+            var opacity = (string?)Resource(key).Attribute("Opacity");
+            Assert.True(opacity is not null, $"{key} bir opaklık taşımıyor; alev tüyünden ayrışmıyor.");
+            Assert.InRange(double.Parse(opacity!, CultureInfo.InvariantCulture), 0.0, 1.0);
+
+            foreach (var stop in FlameStops(key))
+            {
+                var raw = ((string)stop.Attribute("Color")!).Trim();
+                if (raw == "Transparent") continue;
+
+                Assert.StartsWith("{StaticResource", raw);
+                Assert.Contains(raw.Replace("{StaticResource", string.Empty).Trim(' ', '}'), allowed);
+            }
+        }
+
+        foreach (var key in FlameBrushKeys.Except(WashBrushKeys))
+            Assert.Null(Resource(key).Attribute("Opacity"));
     }
 
     /// <summary>K5: anka çiziminde ve alev rampalarında çıplak onaltılık renk yok.</summary>
