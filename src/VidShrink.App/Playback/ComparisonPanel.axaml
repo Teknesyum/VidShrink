@@ -138,7 +138,7 @@
         <!--
           T73: bekleme göstergesi. Fare panele girince belirir, halkası PlaybackPanelRiseDelay
           boyunca kapanır, süre dolunca kaybolur ve panel büyür. Üstte ve ortada: yonganın
-          hizasında ama ayırıcı tutamacının üstünde değil. Isabet testine kapalı — göstergenin
+          hizasında ama ayırıcı tutamacının üstünde değil. İsabet testine kapalı — göstergenin
           kendisi farenin panelde durmasını bozarsa saydığı şeyi bozmuş olurdu.
         -->
         <Border x:Name="RiseCountdown"

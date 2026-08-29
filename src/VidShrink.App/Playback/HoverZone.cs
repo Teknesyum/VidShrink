@@ -236,7 +236,8 @@ internal sealed class HoverZone
 
     /// <summary>
     /// Bekleyen tiki geçersizler ve yeni kuşağı döndürür. Bekleme kesildiği için geri sayım
-    /// da biter: göstergenin kaybolduğu tek yer burasıdır, iptal hangi yönden gelirse gelsin.
+    /// da biter — iptal hangi yönden gelirse gelsin gösterge burada kapanır. Süre dolarak
+    /// biten geri sayım buradan geçmez; onu tikin kendisi bildirir.
     /// </summary>
     private int Cancel()
     {
