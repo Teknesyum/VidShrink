@@ -1,0 +1,18 @@
+{
+  "contractId": "T69",
+  "auditorRunId": "acb2fc3b7e9ccae85",
+  "headSha": "5581a0801c2d0ff930c62065ab2ad3e3fe610941",
+  "diffHash": "79569d921c14962d005619b8edc2fa1e13868e48397b32b0c9bd9e079cd50754",
+  "owns": [
+    "tests/VidShrink.Tests/PerformanceCheckTests.cs",
+    "src/VidShrink.Core/PerformanceCheck.cs",
+    "src/VidShrink.Ffmpeg/PerformanceProbe.cs"
+  ],
+  "verification": [
+    "dogrulama agacinda 5581a08: dotnet test -c Release 796 gecti / 0 kaldi / 16 atlandi / 812 toplam",
+    "ajan ci-gibi-kos.sh 741/0/71/812",
+    "mutasyon denetimi iki iddiada da kirmiziya dondu"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-29T13:14:28.211Z"
+}

@@ -1,0 +1,20 @@
+{
+  "contractId": "T67",
+  "auditorRunId": "a509d069918af5a73",
+  "headSha": "5581a0801c2d0ff930c62065ab2ad3e3fe610941",
+  "diffHash": "21a5910e1f35adb8ec8fb49fdd7b02a42caabf9d66497f9b1aa1b4d6bf945762",
+  "owns": [
+    "src/VidShrink.Core/ShellIntegration.cs",
+    "src/VidShrink.App/Program.cs",
+    "src/VidShrink.App/App.axaml.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/ShellIntegrationTests.cs"
+  ],
+  "verification": [
+    "dogrulama agacinda 5581a08: dotnet test -c Release 796 gecti / 0 kaldi / 16 atlandi / 812 toplam",
+    "denetci build -warnaserror 0 uyari 0 hata",
+    "denetci hicbir dosyaya yazmadi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-29T13:14:28.208Z"
+}

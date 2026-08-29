@@ -1,0 +1,19 @@
+{
+  "contractId": "T68",
+  "auditorRunId": "a509d069918af5a73",
+  "headSha": "5581a0801c2d0ff930c62065ab2ad3e3fe610941",
+  "diffHash": "894c1dc699d966e39a2c4bd36b8a9bf9be1c784dd281ffba4d4ceb21ed3f1fe9",
+  "owns": [
+    "Install-VidShrink.ps1",
+    "install-vidshrink.sh",
+    "tests/VidShrink.Tests/ShellMenuTests.cs",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "verification": [
+    "dogrulama agacinda 5581a08: dotnet test -c Release 796 gecti / 0 kaldi / 16 atlandi / 812 toplam",
+    "kayit defteri gecici kokte yazilip okundu, kaldirma baska programin girdisine dokunmadi"
+  ],
+  "result": "GECTI",
+  "createdAt": "2026-08-29T13:14:28.210Z"
+}
