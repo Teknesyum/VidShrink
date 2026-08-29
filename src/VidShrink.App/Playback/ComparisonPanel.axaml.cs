@@ -13,6 +13,147 @@ using Avalonia.VisualTree;
 namespace VidShrink.App.Playback;
 
 /// <summary>
+/// T73: bekleme göstergesinin halkası. Boş başlar, süre dolarken saat yönünde kapanır ve
+/// tam kapandığı an panel büyür.
+///
+/// Süreyi kendi belirtecinden okumaz — <see cref="Run"/>'a dışarıdan verilir. Tek kaynak
+/// bekleme sayacıdır (<see cref="HoverZone.ShowCountdown"/>); halka o sürenin ne olduğunu
+/// bilmez, yalnız uygular.
+///
+/// Kapanma bir geçiştir, kare döngüsü değil: hareket azaltma açıkken geçiş hiç kurulmaz ve
+/// halka kapalı hâlde durur — gösterge görünür, canlanmaz (K4). Panelin terfi geçişinde
+/// kullanılan kalıbın aynısı.
+/// </summary>
+internal sealed class CountdownRing : Control
+{
+    /// <summary>Kapanmış halka. Derece; daire tanımının kendisi, uydurulmuş sayı değil.</summary>
+    internal const double FullTurn = 360;
+
+    internal static readonly StyledProperty<double> SweepProperty =
+        AvaloniaProperty.Register<CountdownRing, double>(nameof(Sweep));
+
+    internal static readonly StyledProperty<IBrush?> StrokeProperty =
+        AvaloniaProperty.Register<CountdownRing, IBrush?>(nameof(Stroke));
+
+    internal static readonly StyledProperty<IBrush?> TrackProperty =
+        AvaloniaProperty.Register<CountdownRing, IBrush?>(nameof(Track));
+
+    internal static readonly StyledProperty<double> ThicknessProperty =
+        AvaloniaProperty.Register<CountdownRing, double>(nameof(Thickness));
+
+    static CountdownRing()
+        => AffectsRender<CountdownRing>(SweepProperty, StrokeProperty, TrackProperty, ThicknessProperty);
+
+    /// <summary>Kapanan yayın açısı, derece. Sıfırda halka boş, <see cref="FullTurn"/>'de kapalı.</summary>
+    internal double Sweep
+    {
+        get => GetValue(SweepProperty);
+        set => SetValue(SweepProperty, value);
+    }
+
+    internal IBrush? Stroke
+    {
+        get => GetValue(StrokeProperty);
+        set => SetValue(StrokeProperty, value);
+    }
+
+    /// <summary>Halkanın altındaki soluk tam daire: ne kadarının kaldığını gösterir.</summary>
+    internal IBrush? Track
+    {
+        get => GetValue(TrackProperty);
+        set => SetValue(TrackProperty, value);
+    }
+
+    internal double Thickness
+    {
+        get => GetValue(ThicknessProperty);
+        set => SetValue(ThicknessProperty, value);
+    }
+
+    /// <summary>Son kurulan kapanma süresi. Sayaçtan geldiği ölçümde okunabilsin diye açık.</summary>
+    internal TimeSpan Duration { get; private set; }
+
+    /// <summary>Halka canlanıyor mu. Hareket azaltma açıkken yanlış (K4).</summary>
+    internal bool Animating => Transitions is { Count: > 0 };
+
+    /// <summary>
+    /// Geri sayımı baştan kurar. <paramref name="span"/> bekleme sayacının kurduğu sürenin
+    /// kendisidir; <paramref name="still"/> doğruysa halka canlanmadan kapalı çizilir.
+    /// </summary>
+    internal void Run(TimeSpan span, bool still)
+    {
+        Transitions = null;
+        Duration = span;
+
+        if (still || span <= TimeSpan.Zero)
+        {
+            Sweep = FullTurn;
+            return;
+        }
+
+        Sweep = 0;
+        Transitions = new Transitions
+        {
+            new DoubleTransition { Property = SweepProperty, Duration = span, Easing = new LinearEasing() }
+        };
+        Sweep = FullTurn;
+    }
+
+    /// <summary>Geri sayım kesildi: halka boşalır ve geçiş sökülür.</summary>
+    internal void Stop()
+    {
+        Transitions = null;
+        Duration = TimeSpan.Zero;
+        Sweep = 0;
+    }
+
+    public override void Render(DrawingContext context)
+    {
+        var size = Bounds.Size;
+        var radius = Math.Min(size.Width, size.Height) / 2 - Thickness / 2;
+        if (radius <= 0 || Thickness <= 0) return;
+
+        var centre = new Point(size.Width / 2, size.Height / 2);
+        if (Track is { } track) context.DrawEllipse(null, new Pen(track, Thickness), centre, radius, radius);
+
+        var sweep = Math.Clamp(Sweep, 0, FullTurn);
+        if (Stroke is not { } stroke || sweep <= 0) return;
+
+        var pen = new Pen(stroke, Thickness) { LineCap = PenLineCap.Round };
+        if (sweep >= FullTurn)
+        {
+            context.DrawEllipse(null, pen, centre, radius, radius);
+            return;
+        }
+
+        var figure = new PathFigure
+        {
+            StartPoint = OnRing(centre, radius, 0),
+            IsClosed = false,
+            IsFilled = false
+        };
+        figure.Segments!.Add(new ArcSegment
+        {
+            Point = OnRing(centre, radius, sweep),
+            Size = new Size(radius, radius),
+            SweepDirection = SweepDirection.Clockwise,
+            IsLargeArc = sweep > FullTurn / 2
+        });
+
+        var path = new PathGeometry();
+        path.Figures!.Add(figure);
+        context.DrawGeometry(null, pen, path);
+    }
+
+    /// <summary>Halkanın üstündeki nokta. Sıfır derece tepe; saat yönünde artar.</summary>
+    private static Point OnRing(Point centre, double radius, double degrees)
+    {
+        var radians = (degrees - FullTurn / 4) * Math.PI / (FullTurn / 2);
+        return new Point(centre.X + radius * Math.Cos(radians), centre.Y + radius * Math.Sin(radians));
+    }
+}
+
+/// <summary>
 /// Karşılaştırma paneli: sunum yüzeyi, ayırıcı, yakınlaştırma ve terfi.
 ///
 /// Denetim şeridi T40'ta eklendi ve <see cref="ControlStrip"/> içinde yaşıyor; panel
@@ -89,6 +230,11 @@ internal partial class ComparisonPanel : UserControl
                 else HoverZoom(false);
             });
 
+        // T73/K3: göstergenin süresi sayacın kendisinden geliyor. Panel burada
+        // PlaybackPanelRiseDelay'i ikinci kez okumuyor — okusaydı belirteç değiştiğinde
+        // iki süre ayrışır ve halka yanlış hızda kapanırdı.
+        _descent.ShowCountdown = ShowCountdown;
+
         Surface.Gesture = _gesture;
         SeparatorGrip.RenderTransform = _separatorAt;
 
@@ -154,6 +300,16 @@ internal partial class ComparisonPanel : UserControl
 
     /// <summary>Gecikmeli iniş sayacı. Kuşak koruması ölçümden okunabilsin diye açık.</summary>
     internal HoverZone Descent => _descent;
+
+    /// <summary>
+    /// Hareket azaltma ayarı. Değeri <see cref="HoverZone.MotionReduced"/> veriyor; ölçüm
+    /// işletim sistemi ayarını değiştiremediği için açık kapı (K4).
+    /// </summary>
+    internal bool MotionReduced
+    {
+        get => _motionReduced;
+        set => _motionReduced = value;
+    }
 
     /// <summary>Ayırıcının konumu, sıfır ile bir arası. Uçlar geçerlidir.</summary>
     internal double Split
@@ -423,6 +579,25 @@ internal partial class ComparisonPanel : UserControl
     /// uygulanır. Fare çıkışında panel terfi etmişse karar buraya değil
     /// <see cref="Descend"/>'e aittir; terfi olmadıysa değer hâlâ bizimse geri alınır.
     /// </summary>
+    /// <summary>
+    /// T73/K1, K2: bekleme göstergesi. Sayaç kurulunca süresiyle birlikte çağrılır ve halka
+    /// o sürede kapanır; sayaç bittiğinde ya da kesildiğinde <c>null</c> gelir ve gösterge
+    /// kaybolur. Fare erken çıkarsa yol yine buradan geçer — kesilen geri sayım ekranda
+    /// donmuş bir halka bırakmaz.
+    /// </summary>
+    private void ShowCountdown(TimeSpan? span)
+    {
+        if (span is not { } left || left <= TimeSpan.Zero)
+        {
+            RiseRing.Stop();
+            RiseCountdown.IsVisible = false;
+            return;
+        }
+
+        RiseCountdown.IsVisible = true;
+        RiseRing.Run(left, _motionReduced);
+    }
+
     internal void HoverZoom(bool entering)
     {
         if (_promoted) return;
@@ -431,7 +606,7 @@ internal partial class ComparisonPanel : UserControl
         if (entering)
         {
             if (!_gesture.AtFloor) return;
-            if (!_gesture.ScaleTo(Scalar("PlaybackHoverZoom", 2), centre.X, centre.Y)) return;
+            if (!_gesture.ScaleTo(RiseScale(), centre.X, centre.Y)) return;
             _hoverZoomMine = true;
             AfterZoom();
             return;
@@ -598,6 +773,11 @@ internal partial class ComparisonPanel : UserControl
     /// ikiye düşüyordu. Pay her boyutta uygulanınca orta kademenin çevresinde ölçülebilir
     /// bir kenar hep kalır. Bandın pencereye sığmadığı durumda orta kademe bandından kısa
     /// olabilir; terfi etmiş panel kök katmandan taşamaz, band ise kaydırılan sayfada durur.
+    ///
+    /// T73: fareyle büyüyen panelin ölçeği artık bu paya oturacak şekilde seçiliyor
+    /// (<see cref="RiseScale"/>), yani buradaki <c>Math.Min</c> o yolda tam olarak
+    /// <c>height * share</c>'i veriyor. Pay hâlâ tek belirteç; tavanı iki yerde ayrı ayrı
+    /// yazmak orta kademeyi yine tam kademeye doğru kaydırırdı.
     /// </summary>
     private Rect StageBounds(ShelterStage stage)
     {
@@ -623,11 +803,44 @@ internal partial class ComparisonPanel : UserControl
     /// </summary>
     private Size OverlayArea()
     {
-        if (_overlay is null) return default;
+        // T73: terfiden önce de sorulabiliyor — büyüme ölçeği pencereden hesaplandığı için
+        // panel daha kök katmana çıkmadan alanın bilinmesi gerekiyor. Katman görsel ağaçta
+        // panelden bağımsız durur, terfi onu yaratmaz.
+        var overlay = _overlay ?? OverlayLayer.GetOverlayLayer(this);
+        if (overlay is null) return default;
 
-        var area = _overlay.Bounds.Size;
+        var area = overlay.Bounds.Size;
         if (area.Width > 0 && area.Height > 0) return area;
-        return (_overlay.GetVisualParent() as Visual)?.Bounds.Size ?? area;
+        return (overlay.GetVisualParent() as Visual)?.Bounds.Size ?? area;
+    }
+
+    /// <summary>Panelin taban boyu. Terfi ettikten sonra kabuk büyümüş olur; band saklanandır.</summary>
+    private double BandHeight() => _promoted ? _band.Height : Shell.Bounds.Height;
+
+    /// <summary>
+    /// T73/K5: fare beklemesi dolduğunda panelin çıkacağı boy ölçeği. Sabit bir çarpan değil:
+    /// pencerenin payına sığan en büyük boy taban boya bölünüyor, yani panel pencere
+    /// kısaldığında taşmıyor, uzadığında boşa yer bırakmıyor. Tavan
+    /// <see cref="StageBounds"/> ile aynı belirteçten (<c>PlaybackMidShare</c>) geliyor;
+    /// iki hesap aynı payı kullanmasa panel kendi tavanına çarpardı.
+    ///
+    /// İki uç bilerek kapalı ve ikisi de T66 kusurunun aynısını üretmemek için:
+    ///   Taban <c>PlaybackHoverZoom</c> — orta kademenin eşiği odur, altına inen bir ölçek
+    ///   paneli hiç terfi ettirmez ve fare beklemesi görünür bir şey yapmaz.
+    ///   Tavan tam kademe eşiğinin bir tekerlek çentiği altı. Ölçek tavana değseydi fareyle
+    ///   beklemek paneli doğrudan tam kademeye çıkarır, orta kademe tam kademeden ayırt
+    ///   edilemez olurdu — T66'da kapatılan kusurun ikinci kapısı.
+    /// </summary>
+    private double RiseScale()
+    {
+        var floor = _gesture.PromoteScale;
+        var band = BandHeight();
+        var area = OverlayArea().Height;
+        if (band <= 0 || area <= 0) return floor;
+
+        var top = 1 + ZoomGesture.FullDropAt * (Scalar("PlaybackMaxPanelScale", 4) - 1);
+        var fit = area * Scalar("PlaybackMidShare", 0.9) / band;
+        return Math.Clamp(fit, floor, Math.Max(floor, top));
     }
 
     private void ApplyStage()
@@ -641,9 +854,27 @@ internal partial class ComparisonPanel : UserControl
         Shell.Height = _target.Height;
     }
 
+    /// <summary>
+    /// Pencere boyu değişti. T73: panel fareyle büyüdüyse ölçek yeni pencereye göre baştan
+    /// hesaplanır — tavan pencereden geldiği için pencere uzayınca panel de uzar. Kullanıcı
+    /// tekerleği çevirmişse sahiplik düşmüştür (<see cref="Zoom"/>) ve seçtiği ölçek durur;
+    /// taşma zaten <see cref="StageBounds"/>'un payıyla engelleniyor.
+    /// </summary>
     private void OnOverlayResized(object? sender, SizeChangedEventArgs e)
     {
-        if (_promoted) ApplyStage();
+        if (!_promoted) return;
+
+        if (_hoverZoomMine)
+        {
+            var centre = StageCentre();
+            if (_gesture.ScaleTo(RiseScale(), centre.X, centre.Y))
+            {
+                AfterZoom();
+                return;
+            }
+        }
+
+        ApplyStage();
     }
 
     /// <summary>

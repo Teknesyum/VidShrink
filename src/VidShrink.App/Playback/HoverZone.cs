@@ -82,6 +82,16 @@ internal sealed class HoverZone
         _apply = apply;
     }
 
+    /// <summary>
+    /// T73: gösterme beklemesinin dışarıya açılan yüzü. Sayaç kurulduğunda kurulan süreyle,
+    /// bittiğinde ya da iptal edildiğinde <c>null</c> ile çağrılır.
+    ///
+    /// Süre burada verilmese gösterge belirteci ikinci kez okumak zorunda kalırdı; o zaman
+    /// belirteç değiştiğinde gösterge ile sayaç ayrı sürelere bakar ve gösterge yalan söyler.
+    /// Verilen değer <see cref="_showDelay"/>'in bu turda döndürdüğü sayının kendisidir.
+    /// </summary>
+    internal Action<TimeSpan?>? ShowCountdown { get; set; }
+
     /// <summary>Gecikmeyi işleten saat. Ölçüm sahtesini takar; bekleyen iş devralınmaz.</summary>
     internal IHoverClock Clock
     {
@@ -130,6 +140,7 @@ internal sealed class HoverZone
     {
         _generation++;
         _clock.Stop();
+        ShowCountdown?.Invoke(null);
         _pointerInside = pointerInside;
         _held = false;
         _visible = visible;
@@ -190,9 +201,11 @@ internal sealed class HoverZone
         }
 
         var mine = Cancel();
+        ShowCountdown?.Invoke(delay);
         _clock.Start(delay, () =>
         {
             if (!ShouldShow(mine)) return;
+            ShowCountdown?.Invoke(null);
             Apply(true);
         });
     }
@@ -221,11 +234,16 @@ internal sealed class HoverZone
         });
     }
 
-    /// <summary>Bekleyen tiki geçersizler ve yeni kuşağı döndürür.</summary>
+    /// <summary>
+    /// Bekleyen tiki geçersizler ve yeni kuşağı döndürür. Bekleme kesildiği için geri sayım
+    /// da biter — iptal hangi yönden gelirse gelsin gösterge burada kapanır. Süre dolarak
+    /// biten geri sayım buradan geçmez; onu tikin kendisi bildirir.
+    /// </summary>
     private int Cancel()
     {
         _generation++;
         _clock.Stop();
+        ShowCountdown?.Invoke(null);
         return _generation;
     }
 

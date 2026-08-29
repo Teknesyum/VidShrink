@@ -410,6 +410,268 @@ public sealed class ComparisonPanelTests
         Assert.False(hidden, "şerit gecikme dolunca gizlenmedi");
     }
 
+    // ---- T73/K1-K4: yuvarlak geri sayım ---------------------------------------------
+
+    /// <summary>
+    /// K1: fare panele girince gösterge belirir, süre dolunca kaybolur ve panel büyür.
+    /// Süre sahte saatle sürülüyor; duvar saati beklenmiyor.
+    /// </summary>
+    [Fact]
+    public void Geri_sayim_belirir_sure_dolunca_kaybolur_ve_panel_buyur()
+    {
+        var (armed, closing, afterwards, stage) = Read((host, panel) =>
+        {
+            var clock = AtBand(host, panel);
+
+            panel.HoverPanel(true);
+            var shown = panel.RiseCountdown.IsVisible;
+            var animating = panel.RiseRing.Animating;
+
+            clock.Advance(clock.Delay);
+            Settle(host);
+
+            return (shown, animating, panel.RiseCountdown.IsVisible, panel.Shelter);
+        });
+
+        Assert.True(armed, "fare girince gösterge belirmedi");
+        Assert.True(closing, "halka kapanmaya başlamadı");
+        Assert.False(afterwards, "süre dolunca gösterge kaybolmadı");
+        Assert.Equal(ShelterStage.Mid, stage);
+    }
+
+    /// <summary>
+    /// K2: fare süre dolmadan çıkarsa gösterge kaybolur ve panel büyümez. Kesilen geri sayım
+    /// ekranda donmuş bir halka bırakmıyor — halka da sıfıra dönüyor.
+    /// </summary>
+    [Fact]
+    public void Erken_cikan_fare_geri_sayimi_da_paneli_de_iptal_eder()
+    {
+        var (shown, afterExit, sweep, stage) = Read((host, panel) =>
+        {
+            var clock = AtBand(host, panel);
+
+            panel.HoverPanel(true);
+            var armed = panel.RiseCountdown.IsVisible;
+
+            clock.Advance(TimeSpan.FromMilliseconds(1900));
+            panel.HoverPanel(false);
+            clock.Advance(TimeSpan.FromSeconds(5));
+            Settle(host);
+
+            return (armed, panel.RiseCountdown.IsVisible, panel.RiseRing.Sweep, panel.Shelter);
+        });
+
+        Assert.True(shown);
+        Assert.False(afterExit, "erken çıkışta gösterge ekranda kaldı");
+        Assert.Equal(0, sweep, 6);
+        Assert.Equal(ShelterStage.Band, stage);
+    }
+
+    /// <summary>
+    /// K3: göstergenin süresi ile sayacın süresi tek kaynaktan. Ölçüm üç değeri aynı turda
+    /// karşılaştırıyor: belirteç, sayacın saate kurduğu süre ve halkanın kapanma süresi.
+    /// Panel belirteci ikinci kez okusaydı bu üçlü yine tutardı; tutmayacağı yer belirtecin
+    /// değiştiği andır, o yüzden ölçüm belirteci de değiştirip aynı zinciri tekrar okuyor.
+    /// </summary>
+    [Fact]
+    public void Gosterge_ile_sayac_ayni_kaynaktan_besleniyor()
+    {
+        var (token, asked, ring, changedAsked, changedRing) = Read((host, panel) =>
+        {
+            var clock = AtBand(host, panel);
+            host.TryFindResource("PlaybackPanelRiseDelay", out var value);
+
+            panel.HoverPanel(true);
+            var first = (clock.Delay, panel.RiseRing.Duration);
+
+            // Belirteç değişti: iki süre ayrı yerden okunsaydı biri eski değerde kalırdı.
+            panel.HoverPanel(false);
+            var moved = TimeSpan.FromSeconds(5);
+            panel.Resources["PlaybackPanelRiseDelay"] = moved;
+            panel.HoverPanel(true);
+
+            return ((TimeSpan)value!, first.Delay, first.Duration, clock.Delay, panel.RiseRing.Duration);
+        });
+
+        Assert.Equal(token, asked);
+        Assert.Equal(asked, ring);
+        Assert.Equal(TimeSpan.FromSeconds(5), changedAsked);
+        Assert.Equal(changedAsked, changedRing);
+    }
+
+    /// <summary>
+    /// K4: hareket azaltma açıkken halka canlanmıyor. Gösterge yine beliriyor — kullanıcı
+    /// beklendiğini görüyor — ama kapanma geçişi hiç kurulmuyor, halka kapalı duruyor.
+    /// </summary>
+    [Fact]
+    public void Hareket_azaltma_acikken_halka_canlanmaz()
+    {
+        var (shown, animating, sweep) = Read((host, panel) =>
+        {
+            AtBand(host, panel);
+            panel.MotionReduced = true;
+
+            panel.HoverPanel(true);
+            return (panel.RiseCountdown.IsVisible, panel.RiseRing.Animating, panel.RiseRing.Sweep);
+        });
+
+        Assert.True(shown, "hareket azaltma göstergeyi de sildi");
+        Assert.False(animating, "halka hareket azaltma açıkken canlandı");
+        Assert.Equal(CountdownRing.FullTurn, sweep, 6);
+    }
+
+    // ---- T73/K5: büyümüş panel pencereye sığar --------------------------------------
+
+    /// <summary>Fareyi panele sokup bekleme süresini doldurur; panel fareyle büyümüş olur.</summary>
+    private static void HoverUntilRise(MainWindow window, ComparisonPanel panel)
+    {
+        var clock = AtBand(window, panel);
+        panel.HoverPanel(true);
+        clock.Advance(clock.Delay);
+        Settle(window);
+        Assert.Equal(ShelterStage.Mid, panel.Shelter);
+    }
+
+    public static TheoryData<double, double> RiseWindows() => new()
+    {
+        { 1560, 1060 },
+        { 2560, 1440 }
+    };
+
+    /// <summary>
+    /// K5: büyümüş panelin boyu pencereden hesaplanıyor. Beklenen sayı ölçümde uydurulmuyor,
+    /// kök katmanın kendi boyu ile <c>PlaybackMidShare</c> belirtecinden çıkıyor — sabit
+    /// çarpan kalsaydı uzun pencerede panel bu boyun altında kalırdı.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(RiseWindows))]
+    public void Fareyle_buyuyen_panel_pencereye_sigan_en_buyuk_boyu_alir(double width, double height)
+    {
+        var (grown, area, share) = Read(new Size(width, height), (host, panel) =>
+        {
+            HoverUntilRise(host, panel);
+            host.TryFindResource("PlaybackMidShare", out var value);
+            return (panel.StageTarget, OverlayBounds(panel), (double)value!);
+        });
+
+        Assert.Equal(area.Height * share, grown.Height, 3);
+        Assert.True(grown.Height < area.Height, $"panel {grown.Height:0.#} >= pencere {area.Height:0.#}");
+        Assert.True(grown.Y > 0, $"panel üst kenara yapıştı: {grown.Y:0.#}");
+    }
+
+    /// <summary>Yerleşimi verilen boyda yeniden koşturur; ölçüm arada bir ölçü değiştirdiyse.</summary>
+    private static void ReLayOut(MainWindow window, Size size)
+    {
+        window.InvalidateMeasure();
+        foreach (var part in window.GetVisualDescendants().OfType<Layoutable>()) part.InvalidateMeasure();
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.Measure(size);
+        root.Arrange(new Rect(size));
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
+    /// K5'in asıl ölçüsü: taban boy küçükken de panel pencereyi dolduruyor.
+    ///
+    /// Bu ayrımı ölçmek için band bilerek kısaltılıyor. Sebebi şu: bu düzende panel bandı
+    /// pencereyle birlikte uzuyor, dolayısıyla eski sabit çarpan (2x) her erişilebilir
+    /// pencere boyunda tavanı zaten aşıyor ve fark görünmüyor. Band kısaldığı anda —
+    /// önizleme sütununa başka bir şey girdiğinde olacağı gibi — sabit çarpan pencerenin
+    /// altında kalır: 300'ün iki katı 600, pencerenin payı ise 954. Ölçek pencereden
+    /// hesaplandığında panel o 954'ü alıyor.
+    ///
+    /// Tavan ölçüldükten sonra kaldırılıyor: kısaltma bandı kurmak içindi, büyümüş paneli
+    /// kısıtlamak için değil. Ölçüm hem hedefi hem kabuğun gerçekten yerleştiği boyu okuyor.
+    /// </summary>
+    /// <summary>
+    /// Ölçümün kısalttığı band. Pencerenin payının (1060 x 0,9 = 954) yarısından küçük
+    /// olmak zorunda: büyüğü sabit çarpanla da tavanı aşar ve iki hesap ayırt edilemez.
+    /// </summary>
+    private const double ShortBand = 300;
+
+    [Fact]
+    public void Kisa_bandli_panel_de_pencereyi_dolduruyor()
+    {
+        var (band, target, settled, area, share, scale, fixedFactor) = Read((host, panel) =>
+        {
+            // Kabuğun gerçekten yerleştiği boy okunacak: geçiş açıkken boy bir animasyon
+            // değeridir ve bu koşuda saat tik atmaz, kabuk terfi anındaki boyunda kalır.
+            // Hareket azaltma yolu boyu doğrudan uygular, ölçülen sayı da gerçek olur.
+            panel.MotionReduced = true;
+            panel.Descend();
+            panel.Shell.MinHeight = ShortBand;
+            panel.Shell.MaxHeight = ShortBand;
+            ReLayOut(host, WindowSize);
+            var shortBand = panel.Shell.Bounds.Height;
+
+            HoverUntilRise(host, panel);
+            var grown = panel.StageTarget;
+            var reach = panel.Gesture.PanelScale;
+
+            panel.Shell.ClearValue(Layoutable.MaxHeightProperty);
+            panel.Shell.ClearValue(Layoutable.MinHeightProperty);
+            ReLayOut(host, WindowSize);
+
+            host.TryFindResource("PlaybackMidShare", out var midShare);
+            host.TryFindResource("PlaybackHoverZoom", out var hoverZoom);
+            return (shortBand, grown, panel.Shell.Bounds.Height, OverlayBounds(panel),
+                (double)midShare!, reach, (double)hoverZoom!);
+        });
+
+        Assert.Equal(ShortBand, band, 3);
+        Assert.Equal(area.Height * share, target.Height, 3);
+        Assert.Equal(area.Height * share, settled, 3);
+        Assert.True(scale > fixedFactor,
+            $"ölçek {scale:0.###} sabit çarpanda ({fixedFactor:0.###}) kaldı, band {band:0.#}");
+    }
+
+    /// <summary>
+    /// K5 ikinci yarısı: iki farklı pencere boyu iki farklı boy veriyor. Sabit çarpan tek
+    /// sayı üretirdi; ölçülen şey tam olarak bu farktır.
+    /// </summary>
+    [Fact]
+    public void Iki_pencere_boyu_iki_ayri_buyume_boyu_verir()
+    {
+        double Grown(double width, double height) =>
+            Read(new Size(width, height), (host, panel) =>
+            {
+                HoverUntilRise(host, panel);
+                return panel.StageTarget.Height;
+            });
+
+        var shortWindow = Grown(1560, 1060);
+        var tallWindow = Grown(1560, 1600);
+
+        Assert.True(tallWindow > shortWindow + 1,
+            $"uzun pencere {tallWindow:0.#}, kısa pencere {shortWindow:0.#}");
+    }
+
+    /// <summary>
+    /// K6 ikinci kapı: fareyle büyümek paneli tam kademeye çıkarmıyor. T66'da orta kademe
+    /// pencereye eşitlenerek üç kademeyi ikiye düşürmüştü; aynı sonuç bu kez ölçeği
+    /// tavana dayamakla doğardı. Uzun pencerede bile kademe orta kalıyor ve tekerlekle
+    /// çıkılan tam kademe bundan ölçülebilir biçimde büyük.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(RiseWindows))]
+    public void Fareyle_buyume_tam_kademeye_esitlenmez(double width, double height)
+    {
+        var (stage, grown, full) = Read(new Size(width, height), (host, panel) =>
+        {
+            HoverUntilRise(host, panel);
+            var mid = (panel.Shelter, panel.StageTarget);
+
+            WheelTo(host, panel, ShelterStage.Full);
+            return (mid.Shelter, mid.StageTarget, panel.StageTarget);
+        });
+
+        Assert.Equal(ShelterStage.Mid, stage);
+        Assert.True(grown.Height < full.Height, $"fareyle büyüyen {grown.Height:0.#} >= tam {full.Height:0.#}");
+        Assert.True(grown.Width < full.Width, $"fareyle büyüyen {grown.Width:0.#} >= tam {full.Width:0.#}");
+    }
+
+
     [Fact]
     public void Zaman_asimi_parametreyi_de_tabana_indirir()
     {
