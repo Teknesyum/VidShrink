@@ -496,6 +496,10 @@ public sealed class WindowLayoutTests
     /// indi; boş sayfada sol 973 / orta 886 / sağ 437 — sol sütun öne geçti, çünkü kaynak
     /// yokken kalite denetiminin altına yönlendirme satırı çıkıyor (T61/K4).</para>
     ///
+    /// <para>T74/K1 "Preview" başlığını ve onu taşıyan satırı orta sütundan kaldırdı; orta
+    /// sütun 932'den 882'ye indi ve dolu sayfada sol sütun (904) öne geçti. Tabela bu yüzden
+    /// iki hâlde de <b>sol sütunu</b> gösteriyor.</para>
+    ///
     /// <para>Yani sayfayı kısaltmak isteyen iş hangi hâli kısaltmak istediğine bakmalı.
     /// Korunan ilişki değişmedi: sayfa içeriği <b>en uzun sütun ile çalışma alanı kenar
     /// boşluğunun toplamıdır</b>.</para>
@@ -507,7 +511,7 @@ public sealed class WindowLayoutTests
     /// </summary>
     [Theory]
     [InlineData(false, 0)]
-    [InlineData(true, 1)]
+    [InlineData(true, 0)]
     public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>
@@ -782,6 +786,95 @@ public sealed class WindowLayoutTests
         Assert.Equal(new Thickness(Token("SpaceMd")), inset);
     }
 
+
+    /// <summary>
+    /// Bir denetimin yerleşimdeki tepesi. <see cref="Visual.Bounds"/> yerleşim yuvasıdır ve
+    /// çizim dönüşümü taşımaz; <see cref="Visual.TranslatePoint"/> burada <b>kullanılamaz</b>
+    /// ve bir daha denenmemeli: <c>Panel</c> teması giriş sırasında panellere
+    /// <c>translateY(10px)</c> uyguluyor (<c>^.enter</c>), sınıfı kaldıran
+    /// <c>PlayPanelEntrance</c> ise başsız koşumda hiç çağrılmıyor. O yolla ölçülen tepe,
+    /// giriş canlandırmasının yarısını hizasızlık diye rapor eder.
+    /// </summary>
+    private static double LayoutTop(Visual node, Visual root)
+    {
+        var top = 0.0;
+        for (var walk = node; walk is not null && walk != root; walk = walk.GetVisualParent()) top += walk.Bounds.Y;
+        return top;
+    }
+
+    /// <summary>
+    /// T74/K1-K2: üç sütun da aynı tepeden başlar ve orta sütunda başlık satırı kalmamıştır.
+    ///
+    /// <para>Şikâyet buydu: "Source" ve "Target" başlıkları panelin <b>içinde</b>, "Preview"
+    /// ise panelin <b>dışında</b> duruyordu, dolayısıyla orta sütunun paneli yan
+    /// sütunlardakinden bir başlık boyu aşağıda başlıyordu. Başlık kalkınca orta sütunun
+    /// satır sayısı da üçten ikiye indi; inmeseydi yerinde boş bir <c>Auto</c> satır
+    /// kalırdı.</para>
+    ///
+    /// <para><b>Bu ölçü neyi koruyor:</b> üç panelin aynı yatay çizgiden başlamasını.
+    /// <b>Bozulursa kullanıcı ne görür:</b> orta sütun yeniden aşağı kayar ve sayfanın
+    /// üst kenarı basamaklanır.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void TheThreeColumnsStartAtTheSameTop(bool loaded, bool narrow)
+    {
+        var size = narrow ? MinimumSize() : DesignSize();
+        var (tops, rows) = Read(size, loaded, window =>
+        {
+            var plan = window.GetVisualDescendants().OfType<Control>().First(c => c.Name == "PlanPanel");
+            var grid = plan.GetVisualAncestors().OfType<Grid>().First(g => g.ColumnDefinitions.Count == 3);
+            var middle = (Grid)grid.Children.OfType<Control>().Single(c => Grid.GetColumn(c) == 1);
+
+            var measured = new[] { "SourcePanel", "Shell", "OutputPanel" }
+                .Select(name =>
+                {
+                    var node = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == name);
+                    return (Name: name, Top: LayoutTop(node, grid));
+                })
+                .ToList();
+
+            return ((IReadOnlyList<(string Name, double Top)>)measured, middle.RowDefinitions.Count);
+        });
+
+        Assert.Equal(2, rows);
+        Assert.All(tops, entry => Assert.True(
+            Math.Abs(entry.Top) < 0.5,
+            $"{entry.Name} sütununun tepesi {entry.Top:0.##}; üç sütun da ızgaranın tepesinden "
+            + "başlamalı. " + string.Join(", ", tops.Select(t => $"{t.Name}={t.Top:0.##}"))));
+    }
+
+    /// <summary>
+    /// T74/K1: önizleme başlığı ekranda yok — ne İngilizcesi ne Türkçesi. İddia biçimleme
+    /// dosyasında metin aramıyor, <b>ölçülmüş ağaçta</b> arıyor: kaynakta arayan bir ölçü
+    /// başlığı anlatan bir yorum satırına takılır ve yanlış kırmızı verir.
+    ///
+    /// <para>Sözlükteki karşılık da gitti; kalsaydı ekranda olmayan bir başlığın çevirisi
+    /// bakımda duruyor olurdu.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ThePreviewHeadingIsGone(bool turkish)
+    {
+        var headings = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            if (turkish) window.UseTurkish();
+            LayOutAt(window, DesignSize());
+
+            return (IReadOnlyList<string>)window.GetVisualDescendants().OfType<TextBlock>()
+                .Select(block => block.Text ?? string.Empty)
+                .Where(text => text is "Preview" or "Önizleme")
+                .ToList();
+        });
+
+        Assert.Empty(headings);
+        Assert.False(VidShrink.App.LanguageCatalog.EnglishToTurkish.ContainsKey("Preview"));
+    }
 
     /// <summary>Bir kutunun yazısı: ekranda görünen metin, ölçüsü ve ona kalan yer.</summary>
     private readonly record struct BoxLabel(string Tab, string Control, string Text, double Needed, double Room)

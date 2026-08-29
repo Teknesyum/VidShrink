@@ -467,19 +467,21 @@
                 ortadaki sütunun başına giriyor (T43/K1).
               -->
               <!--
-                T54/K4: artan yer önizlemeye gider. Başlık kendi Auto satırındadır, panel
-                esneyen satırdadır: ikisi tek satırı paylaşmadığı için başlık artık
-                önizlemenin boyundan çalmıyor. Plan paneli de Auto satıra indi — istediği
-                kadarını alır, kalanını önizlemeye bırakır. Eski düzende esneyen satır
-                MaxHeight'lı plan panelindeydi ve artan yer kimseye gitmiyordu.
-              -->
-              <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" RowSpacing="{StaticResource SpaceMd}">
+                T54/K4: artan yer önizlemeye gider. Önizleme esneyen satırdadır, plan
+                paneli Auto satırda — istediği kadarını alır, kalanını önizlemeye bırakır.
+                Eski düzende esneyen satır MaxHeight'lı plan panelindeydi ve artan yer
+                kimseye gitmiyordu.
 
-                <TextBlock Grid.Row="0" Text="Preview" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                <playback:ComparisonPanel Grid.Row="1" x:Name="Preview" VerticalAlignment="Stretch"/>
+                T74/K1: "Preview" başlığı ve onu taşıyan Auto satır kaldırıldı. Yan
+                sütunlar panelle başlıyor, orta sütun başlıkla başlıyordu; başlık gidince
+                üç sütunun tepesi de aynı hizaya oturuyor.
+              -->
+              <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="{StaticResource SpaceMd}">
+
+                <playback:ComparisonPanel Grid.Row="0" x:Name="Preview" VerticalAlignment="Stretch"/>
 
               <Border x:Name="PlanPanel"
-                      Grid.Row="2"
+                      Grid.Row="1"
                       Theme="{StaticResource Panel}"
                       MinHeight="{StaticResource PlanPanelMinHeight}"
                       MaxHeight="{StaticResource PlanPanelMaxHeight}">

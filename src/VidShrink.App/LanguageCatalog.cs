@@ -309,7 +309,6 @@ internal static class LanguageCatalog
         ["Over the target"] = "Hedefin üzerinde",
         ["Try again"] = "Tekrar dene",
         ["Leave it as is"] = "Bu haliyle bırak",
-        ["Preview"] = "Önizleme",
         ["Comparison panel"] = "Karşılaştırma paneli",
         ["Load a file to see the two sides"] = "İki tarafı görmek için bir dosya yükleyin",
         ["The first frame is on its way"] = "İlk kare yolda",
