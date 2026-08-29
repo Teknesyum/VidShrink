@@ -15,6 +15,9 @@ $ProgressPreference = 'SilentlyContinue'
 
 $repository = 'Teknesyum/VidShrink'
 
+$script:RemoveAttempts = 6
+$script:RemoveFirstDelayMilliseconds = 200
+
 function Refresh-ProcessPath {
     $machine = [Environment]::GetEnvironmentVariable('Path', 'Machine')
     $user = [Environment]::GetEnvironmentVariable('Path', 'User')
@@ -246,6 +249,52 @@ function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language)
     Write-Host "Sağ tık menüsü $written uzantıya yazıldı." -ForegroundColor Green
 }
 
+function Get-InstallRootHolder([string]$Root) {
+    $holders = @()
+    foreach ($processName in 'VidShrink.App', 'VidShrink') {
+        $holders += @(Get-Process $processName -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -and $_.Path.StartsWith($Root, [StringComparison]::OrdinalIgnoreCase) })
+    }
+    return $holders
+}
+
+function Remove-InstallRoot([string]$Root) {
+    if (-not (Test-Path -LiteralPath $Root)) { return }
+
+    $delay = $script:RemoveFirstDelayMilliseconds
+    $waited = 0
+    $lastMessage = ''
+    $holderRounds = 0
+
+    for ($attempt = 1; $attempt -le $script:RemoveAttempts; $attempt++) {
+        try {
+            Remove-Item -LiteralPath $Root -Recurse -Force -ErrorAction Stop
+            return
+        }
+        catch {
+            $lastMessage = $_.Exception.Message
+        }
+
+        $holders = @(Get-InstallRootHolder $Root)
+        if ($holders.Count -gt 0) { $holderRounds++ } else { $holderRounds = 0 }
+        if ($holderRounds -ge 2) {
+            $names = ($holders | ForEach-Object { "$($_.ProcessName) (PID $($_.Id))" }) -join ', '
+            throw "Kurulum klasörü silinemedi: VidShrink hâlâ açık - $names. Programı kapatıp komutu yeniden çalıştırın. Klasör: $Root"
+        }
+
+        if ($attempt -lt $script:RemoveAttempts) {
+            Write-Host "Kurulum klasörü kilitli, $delay ms sonra yeniden denenecek ($attempt/$script:RemoveAttempts)..." -ForegroundColor Yellow
+            Start-Sleep -Milliseconds $delay
+            $waited += $delay
+            $delay = $delay * 2
+        }
+    }
+
+    throw ("Kurulum klasörü $script:RemoveAttempts denemede ve $waited ms beklemede silinemedi: $Root. " +
+        'Bir dosya başka bir süreçte açık - genellikle virüs taraması ya da Gezgin önizlemesi; ' +
+        "birkaç saniye sonra komutu yeniden çalıştırın. Son hata: $lastMessage")
+}
+
 if ($RemoveShellMenu) {
     $cleared = Remove-ShellMenu $RegistryRoot
     Write-Host "Sağ tık menüsü kaldırıldı: $cleared uzantı." -ForegroundColor Green
@@ -335,6 +384,7 @@ try {
     # Kurulan sürümün işareti. Bu dosya olmadan ilk açılışta güncelleyici kurulu klasörü
     # yayınla dosya dosya karşılaştırır ve arşivin neredeyse tamamını yeniden indirir.
     Set-Content -LiteralPath (Join-Path $appStageRoot '.update-version') -Value $version -Encoding UTF8 -NoNewline
+    Set-Content -LiteralPath (Join-Path $stageRoot '.launcher-version') -Value $version -Encoding UTF8 -NoNewline
 
     $toolsRoot = Join-Path $stageRoot 'tools\ffmpeg'
     New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null
@@ -347,9 +397,7 @@ try {
             Stop-Process -Force
     }
 
-    if (Test-Path -LiteralPath $resolvedInstallRoot) {
-        Remove-Item -LiteralPath $resolvedInstallRoot -Recurse -Force
-    }
+    Remove-InstallRoot $resolvedInstallRoot
     New-Item -ItemType Directory -Path $resolvedInstallRoot -Force | Out-Null
     Copy-Item -Path (Join-Path $stageRoot '*') -Destination $resolvedInstallRoot -Recurse -Force
 

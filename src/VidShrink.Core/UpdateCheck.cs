@@ -199,10 +199,16 @@ public static class UpdateCheck
     /// Aynı kapı, başlatıcıyı da sayarak. Tek işarete bakan sürüm, uygulama yeni sürüme
     /// geçtikten sonra başlatıcı eski kalsa bile "zaten güncel" diyor ve o farkı bir daha
     /// hiç görmüyordu; kurulu başlatıcıların düzeltme alamamasının sebebi buydu.
+    ///
+    /// İnen başlatıcı yan adda bekliyorsa da güncel sayılır (<see cref="LauncherUpdate.Armed"/>):
+    /// sürüm işaretini ancak geçişin oturması yazıyor, o yüzden yalnız işarete bakmak
+    /// bekleyen geçiş boyunca her açılışta aynı arşivi yeniden indirmek demekti.
     /// </summary>
     public static bool AlreadyCurrent(string baseDirectory, string appDirectory, ReleaseManifest manifest) =>
         ReadVersionMarker(appDirectory) == manifest.Version
-        && (manifest.Launcher.Count == 0 || LauncherUpdate.ReadVersionMarker(baseDirectory) == manifest.Version);
+        && (manifest.Launcher.Count == 0
+            || LauncherUpdate.ReadVersionMarker(baseDirectory) == manifest.Version
+            || LauncherUpdate.Armed(baseDirectory, manifest));
 
     /// <summary>Kendini güncelleyemeyen platformlarda kullanıcıya gösterilecek komut.</summary>
     public static string UpdateInstruction()
@@ -789,25 +795,53 @@ public static class LauncherUpdate
     }
 
     /// <summary>
+    /// Manifestin saydığı başlatıcı diskte hazır mı: ya hedefte oturmuş ya da yan adda
+    /// bekliyor ve günlüğü yazılmış. Sürüm işareti ancak geçiş oturunca yazıldığı için,
+    /// yalnız işarete bakan bir kapı bekleyen geçiş boyunca her açılışta aynı arşivi
+    /// yeniden indiriyordu.
+    /// </summary>
+    public static bool Armed(string baseDirectory, ReleaseManifest manifest)
+    {
+        if (manifest.Launcher.Count == 0) return false;
+        if (!File.Exists(Path.Combine(baseDirectory, JournalName))) return false;
+        return manifest.Launcher.All(file =>
+            Matches(Target(baseDirectory, file.Path), file) || Matches(Incoming(baseDirectory, file.Path), file));
+    }
+
+    /// <summary>
     /// Kabul kriteri 4'ün kapısı: uygulama yeni, başlatıcı eski kaldıysa burada görünür.
     /// </summary>
     public static LauncherSkew Inspect(string baseDirectory, string appDirectory) =>
         new(ReadVersionMarker(baseDirectory), UpdateCheck.ReadVersionMarker(appDirectory));
 
-    /// <summary>İnen ve doğrulanan başlatıcıyı kurulum kökünde yan ada taşır.</summary>
-    public static void Stage(string stageDirectory, string baseDirectory, IReadOnlyList<ManifestFile> files)
+    /// <summary>
+    /// İnen ve doğrulanan başlatıcıyı kurulum kökünde yan ada taşır. Yerine geçen dosyaların
+    /// listesini döndürür ve <b>hiçbir hâlde atmaz</b>: önceki turdan takılı kalmış bir
+    /// <c>VidShrink.new.exe</c> taşımayı düşürdüğünde atılan istisna uygulama adımını da
+    /// iptal ettiriyordu. Başlatıcı adımı düşse de uygulama dosyaları yerleşmelidir; oturmamış
+    /// dosya listeden düşer ve o tur başlatıcı hiç kurulmaz.
+    /// </summary>
+    public static IReadOnlyList<ManifestFile> Stage(string stageDirectory, string baseDirectory, IReadOnlyList<ManifestFile> files)
     {
+        var moved = new List<ManifestFile>();
         foreach (var file in files)
         {
             var staged = StagePath(stageDirectory, file.Path);
-            if (!Matches(staged, file))
-                throw new InvalidDataException($"İnen başlatıcının özeti tutmadı: {file.Path}");
+            if (!Matches(staged, file)) continue;
 
             var incoming = Incoming(baseDirectory, file.Path);
             var folder = Path.GetDirectoryName(incoming);
-            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-            File.Move(staged, incoming, overwrite: true);
+            try
+            {
+                if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+                File.Move(staged, incoming, overwrite: true);
+                moved.Add(file);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+            }
         }
+        return moved;
     }
 
     /// <summary>
@@ -834,11 +868,24 @@ public static class LauncherUpdate
     /// başlatıcının çıkması beklenir, sonra her dosya tek bir üstüne-yazan yeniden
     /// adlandırmayla yerine geçer. Bu çağrı ya olur ya olmaz: olmadığında hedefte eski
     /// ikili durur, günlük kalır ve bir sonraki açılış aynı geçişi yeniden kurar.
+    ///
+    /// <see cref="Repair"/>'deki sürüm kapısının eşi burada da var: bekleyen geçiş kurulu
+    /// başlatıcının sürümünden yeni değilse geçiş yapılmaz. Kurulum betiği bu pencerede
+    /// başlatıcıyı ileri taşımış olabilir ve o hâlde geçiş bir güncelleme değil, geri alma
+    /// olurdu.
     /// </summary>
     public static bool Commit(string baseDirectory, int? launcherProcessId = null, TimeSpan? window = null)
     {
         var pending = Pending(baseDirectory);
         if (pending is null) return false;
+
+        var installed = ReadVersionMarker(baseDirectory);
+        if (installed is not null && !UpdateCheck.IsNewer(pending.Version, NormalizeVersion(installed)))
+        {
+            ClearJournal(baseDirectory);
+            Sweep(baseDirectory, pending.Files);
+            return false;
+        }
 
         var deadline = DateTime.UtcNow + (window ?? CommitWindow);
         if (launcherProcessId is int id) WaitForExit(id, deadline);
@@ -1046,6 +1093,8 @@ public static class LauncherUpdate
 /// Bir güncellemenin diske inen kısmının sırası. Sıra kararı burada duruyor ki ölçülebilsin:
 /// uygulama dosyaları önce yerleşir, başlatıcı ancak ondan sonra kurulur. Ters sırada yeni
 /// bir başlatıcı eski bir uygulamayı açardı; uygulama adımı düşerse başlatıcı hiç kurulmaz.
+/// Tersi geçerli değil: başlatıcı adımı düşse de uygulama dosyaları yerleşir, yalnız o tur
+/// günlük yazılmaz.
 /// </summary>
 public static class UpdateRollout
 {
@@ -1064,7 +1113,12 @@ public static class UpdateRollout
         else UpdateStage.Discard(stageDirectory);
         UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
 
-        if (launcherFiles.Count > 0) return LauncherUpdate.Arm(baseDirectory, launcherFiles, manifest.Version);
+        if (launcherFiles.Count > 0)
+        {
+            return launcherFiles.All(file =>
+                       LauncherUpdate.Matches(LauncherUpdate.Incoming(baseDirectory, file.Path), file))
+                   && LauncherUpdate.Arm(baseDirectory, launcherFiles, manifest.Version);
+        }
 
         LauncherUpdate.MarkVerified(baseDirectory, manifest);
         return false;

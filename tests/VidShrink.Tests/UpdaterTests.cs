@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO.Compression;
 using System.Net;
+using System.Text;
 using VidShrink.Core;
 using Xunit.Abstractions;
 
@@ -953,6 +955,271 @@ public sealed class UpdaterTests : IDisposable
         public int Requests => Volatile.Read(ref _requests);
 
         public void Dispose() => _listener.Close();
+    }
+
+    /// <summary>
+    /// T77-1: kurulum betiğinin silme yordamı, betiğin kendi metninden çıkarılıp koşturulur.
+    /// Kilit gerçek: dosya <c>FileShare.None</c> ile açık tutulur, tıpkı iki kurulumu düşüren
+    /// <c>app\Avalonia.Base.dll</c> hâlindeki gibi. Betiğin tamamı koşturulmuyor — koştuğu anda
+    /// bu makinedeki kurulumu siler.
+    /// </summary>
+    private const string RemovalProbe = @"param([string]$Root, [string]$Out)
+$ErrorActionPreference = 'Stop'
+
+{0}
+
+Set-Content -LiteralPath ($Out + '.basladi') -Value 'basladi' -Encoding UTF8
+
+$log = @()
+$code = 0
+try {{
+    $notes = Remove-InstallRoot $Root 6>&1 | ForEach-Object {{ [string]$_ }}
+    $log += 'BITTI'
+    if ($notes) {{ $log += $notes }}
+}}
+catch {{
+    $log += 'HATA'
+    $log += [string]$_.Exception.Message
+    $code = 3
+}}
+Set-Content -LiteralPath $Out -Value ($log -join ""`n"") -Encoding UTF8
+exit $code
+";
+
+    private static string InstallerBlock(string script, string header)
+    {
+        var start = script.IndexOf(header, StringComparison.Ordinal);
+        Assert.True(start >= 0, $"kurulum betiğinde yok: {header}");
+
+        var depth = 0;
+        for (var index = script.IndexOf('{', start); index >= 0 && index < script.Length; index++)
+        {
+            if (script[index] == '{') depth++;
+            else if (script[index] == '}' && --depth == 0) return script[start..(index + 1)];
+        }
+
+        throw new InvalidDataException($"kurulum betiğinde kapanmıyor: {header}");
+    }
+
+    private string WriteRemovalProbe(string folder)
+    {
+        var script = File.ReadAllText(Path.Combine(TipSources.Root, "Install-VidShrink.ps1"))
+            .Replace("\r\n", "\n", StringComparison.Ordinal);
+
+        var knobs = script.Split('\n')
+            .Where(line => line.StartsWith("$script:Remove", StringComparison.Ordinal))
+            .ToArray();
+        Assert.Equal(2, knobs.Length);
+
+        var routine = string.Join("\n", knobs) + "\n\n"
+            + InstallerBlock(script, "function Get-InstallRootHolder") + "\n\n"
+            + InstallerBlock(script, "function Remove-InstallRoot");
+
+        var path = Path.Combine(folder, "silme.ps1");
+        File.WriteAllText(
+            path,
+            string.Format(CultureInfo.InvariantCulture, RemovalProbe, routine),
+            new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+        return path;
+    }
+
+    private static (int Code, string Log) RunRemovalProbe(string probe, string installRoot, string logPath)
+    {
+        var info = new ProcessStartInfo("powershell.exe")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var argument in new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", probe, "-Root", installRoot, "-Out", logPath })
+            info.ArgumentList.Add(argument);
+
+        using var process = Process.Start(info)!;
+        var noise = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
+        var log = File.Exists(logPath) ? File.ReadAllText(logPath) : noise;
+        return (process.ExitCode, log);
+    }
+
+    private (string InstallRoot, string Locked, string Probe, string Log) LockedInstall(string name)
+    {
+        var work = Folder(name);
+        var installRoot = Path.Combine(work, "kurulum");
+        var locked = UpdateCheck.LocalPath(installRoot, "app/Avalonia.Base.dll");
+        Directory.CreateDirectory(Path.GetDirectoryName(locked)!);
+        File.WriteAllText(locked, "kilitli dosya");
+        File.WriteAllText(Path.Combine(installRoot, LauncherUpdate.ExecutableName), OldLauncher);
+        return (installRoot, locked, WriteRemovalProbe(work), Path.Combine(work, "gunluk.txt"));
+    }
+
+    [Fact]
+    public async Task TheDeletionStepWaitsOutATransientLock()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var (installRoot, locked, probe, logPath) = LockedInstall("silme-gecici");
+        var stream = new FileStream(locked, FileMode.Open, FileAccess.Read, FileShare.None);
+        var release = Task.Run(async () =>
+        {
+            var started = logPath + ".basladi";
+            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+            while (!File.Exists(started) && DateTime.UtcNow < deadline) await Task.Delay(20);
+            await Task.Delay(300);
+            await stream.DisposeAsync();
+        });
+
+        var stopwatch = Stopwatch.StartNew();
+        var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
+        stopwatch.Stop();
+        await release;
+
+        _output.WriteLine($"geçici kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
+        _output.WriteLine(log.Trim());
+
+        Assert.Equal(0, code);
+        Assert.Contains("BITTI", log, StringComparison.Ordinal);
+        Assert.Contains("yeniden denenecek", log, StringComparison.Ordinal);
+        Assert.False(Directory.Exists(installRoot), "kurulum kökü silinmedi");
+    }
+
+    [Fact]
+    public void TheDeletionStepGivesUpWithAMessageThatSaysWhatHappened()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var (installRoot, locked, probe, logPath) = LockedInstall("silme-tukendi");
+        using var stream = new FileStream(locked, FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var stopwatch = Stopwatch.StartNew();
+        var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
+        stopwatch.Stop();
+
+        _output.WriteLine($"kalıcı kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
+        _output.WriteLine(log.Trim());
+
+        Assert.Equal(3, code);
+        Assert.Contains("HATA", log, StringComparison.Ordinal);
+        Assert.Contains("başka bir süreçte açık", log, StringComparison.Ordinal);
+        Assert.Contains(installRoot, log, StringComparison.Ordinal);
+        Assert.True(File.Exists(locked), "kilitli dosya silinmiş görünüyor");
+        Assert.True(stopwatch.Elapsed > TimeSpan.FromSeconds(1), $"hiç beklenmedi: {stopwatch.Elapsed}");
+    }
+
+    /// <summary>
+    /// T77-2: <c>Program.cs</c>'te bekleyen geçişi başlatan çağrıyı tutan ölçü. Çağrı
+    /// silinirse burası kırmızıya döner; kablo yalnız kaynak metinde tutulabiliyor, çünkü
+    /// <c>Main</c> ölçüden çağrılamaz.
+    /// </summary>
+    [Fact]
+    public void TheLauncherStartsTheCommitterOnTheWayOut()
+    {
+        var code = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Program.cs"));
+
+        var launch = code.IndexOf("Process.Start(start);", StringComparison.Ordinal);
+        var gate = code.IndexOf("if (pendingSwap)", StringComparison.Ordinal);
+        var call = code.IndexOf("StartCommitter(baseDirectory);", StringComparison.Ordinal);
+
+        Assert.True(call >= 0, "Program.cs bekleyen geçişi başlatan çağrıyı taşımıyor");
+        Assert.True(gate >= 0 && gate < call, "geçiş çağrısı bekleyen geçiş kapısının içinde değil");
+        Assert.True(launch >= 0 && launch < call, "geçiş, uygulama başlatılmadan önce kuruluyor");
+        Assert.Contains("private static void StartCommitter(string baseDirectory)", code, StringComparison.Ordinal);
+        Assert.Contains("LauncherUpdate.Commit(baseDirectory, ParentProcessId(args))", code, StringComparison.Ordinal);
+    }
+
+    /// <summary>T77-3: <c>Repair</c>'deki sürüm kapısının <c>Commit</c>'teki eşi.</summary>
+    [Fact]
+    public void TheSwapIsNotCommittedOntoANewerInstalledLauncher()
+    {
+        var root = Folder("surumkapisi");
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+        File.WriteAllText(target, OldLauncher);
+        ArmedSwap(root);
+
+        LauncherUpdate.WriteVersionMarker(root, "0.2.3");
+
+        Assert.False(LauncherUpdate.Commit(root));
+        Assert.Equal(OldLauncher, File.ReadAllText(target));
+        Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
+        Assert.False(File.Exists(LauncherUpdate.Incoming(root, LauncherUpdate.ExecutableName)));
+        Assert.Equal("0.2.3", LauncherUpdate.ReadVersionMarker(root));
+    }
+
+    [Fact]
+    public void TheSwapIsStillCommittedOverAnOlderInstalledLauncher()
+    {
+        var root = Folder("surumkapisi-eski");
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+        File.WriteAllText(target, OldLauncher);
+        ArmedSwap(root);
+
+        LauncherUpdate.WriteVersionMarker(root, "0.2.1");
+
+        Assert.True(LauncherUpdate.Commit(root));
+        Assert.Equal(NewLauncher, File.ReadAllText(target));
+        Assert.Equal("0.2.2", LauncherUpdate.ReadVersionMarker(root));
+    }
+
+    /// <summary>T77-4: inen ikili diskte dururken aynı arşiv bir daha istenmez.</summary>
+    [Fact]
+    public void TheLauncherArchiveIsNotFetchedAgainWhileTheSwapWaits()
+    {
+        var root = Folder("bosainen");
+        var app = Folder(Path.Combine("bosainen", "app"));
+        Write(app, "VidShrink.App.dll", "uygulama");
+        File.WriteAllText(Path.Combine(root, LauncherUpdate.ExecutableName), OldLauncher);
+
+        var launcherFile = ArmedSwap(root);
+        UpdateCheck.WriteVersionMarker(app, "0.2.2");
+
+        var manifest = new ReleaseManifest("0.2.2", "abc", DateTimeOffset.UtcNow, "win-x64",
+            new[] { Describe(app, "VidShrink.App.dll") })
+        {
+            Launcher = new[] { launcherFile }
+        };
+
+        Assert.Null(LauncherUpdate.ReadVersionMarker(root));
+        Assert.True(LauncherUpdate.Armed(root, manifest));
+        Assert.True(UpdateCheck.AlreadyCurrent(root, app, manifest), "bekleyen geçiş varken arşiv yeniden isteniyor");
+
+        LauncherUpdate.Sweep(root, manifest.Launcher);
+        Assert.False(LauncherUpdate.Armed(root, manifest));
+        Assert.False(UpdateCheck.AlreadyCurrent(root, app, manifest), "inen ikili yokken kapı hâlâ kapalı");
+    }
+
+    /// <summary>T77-5: başlatıcı adımının düşmesi uygulama adımını iptal etmez.</summary>
+    [Fact]
+    public void AStuckIncomingLauncherDoesNotCancelTheApplicationUpdate()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var root = Folder("takili");
+        var app = Folder(Path.Combine("takili", "app"));
+        var stage = Path.Combine(root, "update-stage");
+        Write(app, "VidShrink.App.dll", "eski uygulama");
+        Write(stage, "VidShrink.App.dll", "yeni uygulama");
+        File.WriteAllText(Path.Combine(root, LauncherUpdate.ExecutableName), OldLauncher);
+
+        var appFile = Describe(stage, "VidShrink.App.dll");
+        var launcherFile = Describe(WriteStagedLauncher(stage));
+
+        var incoming = LauncherUpdate.Incoming(root, LauncherUpdate.ExecutableName);
+        File.WriteAllText(incoming, "önceki turdan takılı kalmış");
+        using var stuck = new FileStream(incoming, FileMode.Open, FileAccess.Read, FileShare.None);
+
+        var manifest = new ReleaseManifest("0.2.2", "abc", DateTimeOffset.UtcNow, "win-x64", new[] { appFile })
+        {
+            Launcher = new[] { launcherFile }
+        };
+
+        Assert.Empty(LauncherUpdate.Stage(stage, root, new[] { launcherFile }));
+        Assert.False(UpdateRollout.Apply(stage, root, app, new[] { appFile }, new[] { launcherFile }, manifest));
+
+        Assert.Equal("yeni uygulama", File.ReadAllText(UpdateCheck.LocalPath(app, "VidShrink.App.dll")));
+        Assert.Equal("0.2.2", UpdateCheck.ReadVersionMarker(app));
+        Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
+        Assert.Equal(OldLauncher, File.ReadAllText(Path.Combine(root, LauncherUpdate.ExecutableName)));
     }
 
     private static void WriteJournalLikeApply(string appDirectory, string stageDirectory, IReadOnlyList<ManifestFile> files)
