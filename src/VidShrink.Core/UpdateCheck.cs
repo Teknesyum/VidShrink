@@ -19,7 +19,16 @@ public sealed record ReleaseManifest(
     string Commit,
     DateTimeOffset Built,
     string Rid,
-    IReadOnlyList<ManifestFile> Files);
+    IReadOnlyList<ManifestFile> Files)
+{
+    /// <summary>
+    /// Başlatıcının dosyaları. <see cref="Files"/> uygulama klasörüne göreli, bu liste
+    /// kurulum köküne göreli; ikisi ayrı alanda çünkü ayrı arşivlerden iniyorlar ve ayrı
+    /// yerlere yazılıyorlar. Alanı tanımayan eski bir güncelleyici burayı hiç görmez ve
+    /// eskisi gibi yalnız <c>app/</c> klasörünü günceller.
+    /// </summary>
+    public IReadOnlyList<ManifestFile> Launcher { get; init; } = Array.Empty<ManifestFile>();
+}
 
 /// <summary>Mimarinin nasıl belirlendiği. Kullanıcıya ne söyleneceğini bu ayırıyor.</summary>
 public enum ArchitectureOutcome
@@ -148,6 +157,13 @@ public static class UpdateCheck
 
     public static string ArchiveAssetName(string rid) => $"vidshrink-{rid}.zip";
 
+    /// <summary>
+    /// Başlatıcı uygulama arşivinin içinde değil, kendi arşivinde. Kurulum betiği zaten bu
+    /// varlığı indiriyordu; güncelleyici de aynı adı kullanıyor ki yayında ikinci bir kopya
+    /// taşınmasın.
+    /// </summary>
+    public static string LauncherArchiveAssetName(string rid) => $"vidshrink-launcher-{rid}.zip";
+
     public static string LatestAssetUrl(string asset) =>
         $"https://github.com/Teknesyum/VidShrink/releases/latest/download/{asset}";
 
@@ -177,6 +193,15 @@ public static class UpdateCheck
 
     public static bool AlreadyCurrent(string appDirectory, ReleaseManifest manifest) =>
         ReadVersionMarker(appDirectory) == manifest.Version;
+
+    /// <summary>
+    /// Aynı kapı, başlatıcıyı da sayarak. Tek işarete bakan sürüm, uygulama yeni sürüme
+    /// geçtikten sonra başlatıcı eski kalsa bile "zaten güncel" diyor ve o farkı bir daha
+    /// hiç görmüyordu; kurulu başlatıcıların düzeltme alamamasının sebebi buydu.
+    /// </summary>
+    public static bool AlreadyCurrent(string baseDirectory, string appDirectory, ReleaseManifest manifest) =>
+        ReadVersionMarker(appDirectory) == manifest.Version
+        && (manifest.Launcher.Count == 0 || LauncherUpdate.ReadVersionMarker(baseDirectory) == manifest.Version);
 
     /// <summary>Kendini güncelleyemeyen platformlarda kullanıcıya gösterilecek komut.</summary>
     public static string UpdateInstruction()
@@ -248,19 +273,6 @@ public static class UpdateCheck
         {
             using var document = JsonDocument.Parse(json);
             var root = document.RootElement;
-            var files = new List<ManifestFile>();
-            if (root.TryGetProperty("files", out var fileArray) && fileArray.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var element in fileArray.EnumerateArray())
-                {
-                    var path = element.GetProperty("path").GetString();
-                    var sha = element.GetProperty("sha256").GetString();
-                    var size = element.GetProperty("size").GetInt64();
-                    if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(sha))
-                        throw new InvalidDataException("Manifestte path veya sha256 boş.");
-                    files.Add(new ManifestFile(path!.Replace('\\', '/'), sha!.ToLowerInvariant(), size));
-                }
-            }
 
             var built = root.TryGetProperty("built", out var builtElement) && builtElement.ValueKind == JsonValueKind.String
                 ? DateTimeOffset.Parse(builtElement.GetString()!, null, System.Globalization.DateTimeStyles.RoundtripKind)
@@ -271,12 +283,33 @@ public static class UpdateCheck
                 root.TryGetProperty("commit", out var commit) ? commit.GetString() ?? "" : "",
                 built,
                 root.TryGetProperty("rid", out var rid) ? rid.GetString() ?? "" : "",
-                files);
+                ReadFileList(root, "files"))
+            {
+                Launcher = ReadFileList(root, "launcher")
+            };
         }
         catch (Exception exception) when (exception is JsonException or KeyNotFoundException or FormatException or InvalidOperationException)
         {
             throw new InvalidDataException("Manifest çözümlenemedi.", exception);
         }
+    }
+
+    private static IReadOnlyList<ManifestFile> ReadFileList(JsonElement root, string property)
+    {
+        if (!root.TryGetProperty(property, out var array) || array.ValueKind != JsonValueKind.Array)
+            return Array.Empty<ManifestFile>();
+
+        var files = new List<ManifestFile>();
+        foreach (var element in array.EnumerateArray())
+        {
+            var path = element.GetProperty("path").GetString();
+            var sha = element.GetProperty("sha256").GetString();
+            var size = element.GetProperty("size").GetInt64();
+            if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(sha))
+                throw new InvalidDataException("Manifestte path veya sha256 boş.");
+            files.Add(new ManifestFile(path!.Replace('\\', '/'), sha!.ToLowerInvariant(), size));
+        }
+        return files;
     }
 
     public static string HashFile(string path)
@@ -295,12 +328,19 @@ public static class UpdateCheck
         Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 
     /// <summary>Yereldeki klasörle manifesti karşılaştırır; indirilmesi gereken dosyaları döndürür.</summary>
-    public static IReadOnlyList<ManifestFile> Diff(string appDirectory, ReleaseManifest manifest, HashCache? cache = null)
+    public static IReadOnlyList<ManifestFile> Diff(string appDirectory, ReleaseManifest manifest, HashCache? cache = null) =>
+        Diff(appDirectory, manifest.Files, cache);
+
+    /// <summary>
+    /// Aynı karşılaştırma, listesi dışarıdan verilerek. Başlatıcının satırları kurulum
+    /// köküne göreli olduğu için uygulama klasörüyle aynı kapıdan geçemiyor.
+    /// </summary>
+    public static IReadOnlyList<ManifestFile> Diff(string directory, IReadOnlyList<ManifestFile> files, HashCache? cache = null)
     {
         var changed = new List<ManifestFile>();
-        foreach (var file in manifest.Files)
+        foreach (var file in files)
         {
-            var local = LocalPath(appDirectory, file.Path);
+            var local = LocalPath(directory, file.Path);
             var info = new FileInfo(local);
             if (!info.Exists || info.Length != file.Size)
             {
@@ -620,6 +660,275 @@ public static class UpdateStage
         try { if (File.Exists(journal)) File.Delete(journal); }
         catch (IOException) { }
     }
+}
+
+/// <summary>Kurulu başlatıcı ile kurulu uygulamanın sürümleri.</summary>
+public sealed record LauncherSkew(string? Launcher, string? App)
+{
+    /// <summary>İkisi ayrıysa başlatıcı geride kalmıştır ve güncellenmelidir.</summary>
+    public bool Mismatched => Launcher != App;
+}
+
+/// <summary>
+/// Başlatıcının kendini değiştirmesi. Windows çalışan bir <c>.exe</c>'nin üstüne
+/// yazdırmaz ama adını değiştirmeye izin verir: yeni ikili yan dosyaya iner, eski ikili
+/// <c>.old</c> adına alınır, yeni ikili boşalan ada geçer, eski ad bir sonraki açılışta
+/// silinir. Hiçbir adımda hedefe yazılmaz; yalnız yeniden adlandırılır.
+///
+/// Adımların arasında süreç ölürse <see cref="Repair"/> kalan durumu toplar. Günlük
+/// dosyası hangi dosyanın hangi özete gitmesi gerektiğini söylediği için ileri
+/// tamamlamak da geri almak da mümkün; her iki uçta da çalışabilir bir başlatıcı kalır.
+/// </summary>
+public static class LauncherUpdate
+{
+    /// <summary>Kurulum kökündeki başlatıcı; kısayolların gösterdiği dosya.</summary>
+    public const string ExecutableName = "VidShrink.exe";
+
+    /// <summary>Yerini bırakan eski ikilinin aldığı ad.</summary>
+    public const string RetiredSuffix = ".old";
+
+    /// <summary>Yerine geçmeyi bekleyen yeni ikilinin aldığı ad.</summary>
+    public const string IncomingSuffix = ".new";
+
+    public const string JournalName = ".launcher-pending.json";
+
+    /// <summary>Kurulu başlatıcının sürümü; uygulamanınki app klasöründe ayrı durur.</summary>
+    public const string VersionMarkerName = ".launcher-version";
+
+    /// <summary>İnen başlatıcının uygulama dosyalarına karışmadığı yan klasör.</summary>
+    public const string StageFolderName = "launcher";
+
+    public static string Target(string baseDirectory, string relativePath) =>
+        UpdateCheck.LocalPath(baseDirectory, relativePath);
+
+    public static string StagePath(string stageDirectory, string relativePath) =>
+        UpdateCheck.LocalPath(Path.Combine(stageDirectory, StageFolderName), relativePath);
+
+    /// <summary>
+    /// <c>0.2.1+abc1234</c> gibi bir yapı sürümünden manifestteki <c>0.2.1</c>'i çıkarır.
+    /// Karşılaştırılan iki değer aynı biçimde olmazsa kapı her açılışta yanlış çalar.
+    /// </summary>
+    public static string NormalizeVersion(string version)
+    {
+        var plus = version.IndexOf('+');
+        return (plus < 0 ? version : version[..plus]).Trim();
+    }
+
+    public static string? ReadVersionMarker(string baseDirectory)
+    {
+        var marker = Path.Combine(baseDirectory, VersionMarkerName);
+        try { return File.Exists(marker) ? File.ReadAllText(marker).Trim() : null; }
+        catch (IOException) { return null; }
+    }
+
+    public static void WriteVersionMarker(string baseDirectory, string version) =>
+        File.WriteAllText(Path.Combine(baseDirectory, VersionMarkerName), NormalizeVersion(version));
+
+    /// <summary>
+    /// İşaret yoksa çalışan ikilinin kendi sürümüyle doldurur. Kurulumdan sonraki ilk
+    /// açılışta bu olur; sonrasında işareti değişimin kendisi yazar.
+    /// </summary>
+    public static void SeedVersionMarker(string baseDirectory, string version)
+    {
+        if (ReadVersionMarker(baseDirectory) is not null) return;
+        WriteVersionMarker(baseDirectory, version);
+    }
+
+    /// <summary>
+    /// Kabul kriteri 4'ün kapısı: uygulama yeni, başlatıcı eski kaldıysa burada görünür.
+    /// </summary>
+    public static LauncherSkew Inspect(string baseDirectory, string appDirectory) =>
+        new(ReadVersionMarker(baseDirectory), UpdateCheck.ReadVersionMarker(appDirectory));
+
+    /// <summary>İnen ve doğrulanan başlatıcıyı kurulum kökünde yan ada taşır.</summary>
+    public static void Stage(string stageDirectory, string baseDirectory, IReadOnlyList<ManifestFile> files)
+    {
+        foreach (var file in files)
+        {
+            var staged = StagePath(stageDirectory, file.Path);
+            if (!Matches(staged, file))
+                throw new InvalidDataException($"İnen başlatıcının özeti tutmadı: {file.Path}");
+
+            var incoming = Target(baseDirectory, file.Path) + IncomingSuffix;
+            var folder = Path.GetDirectoryName(incoming);
+            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+            File.Move(staged, incoming, overwrite: true);
+        }
+    }
+
+    /// <summary>
+    /// Yan adda bekleyen ikiliyi yerine geçirir. Günlük önce yazılır: bu satırdan sonra
+    /// kesinti olursa <see cref="Repair"/> nereye varılmak istendiğini bilir.
+    /// </summary>
+    public static void Apply(string baseDirectory, IReadOnlyList<ManifestFile> files, string version)
+    {
+        if (files.Count == 0) return;
+
+        foreach (var file in files)
+        {
+            var incoming = Target(baseDirectory, file.Path) + IncomingSuffix;
+            if (!Matches(incoming, file))
+                throw new InvalidDataException($"Yerine geçecek başlatıcının özeti tutmadı: {file.Path}");
+        }
+
+        WriteJournal(baseDirectory, files, version);
+        foreach (var file in files) Swap(baseDirectory, file);
+        ClearJournal(baseDirectory);
+        WriteVersionMarker(baseDirectory, version);
+        Sweep(baseDirectory, files);
+    }
+
+    /// <summary>
+    /// Yarım kalmış bir değişimi toplar. Yeni ikili elde varsa ileri tamamlanır, yoksa
+    /// eski ad geri alınır. Döndürdüğü değer, hedefin istenen özete oturduğudur.
+    /// </summary>
+    public static bool Repair(string baseDirectory)
+    {
+        var journal = Path.Combine(baseDirectory, JournalName);
+        if (!File.Exists(journal))
+        {
+            Sweep(baseDirectory);
+            return false;
+        }
+
+        string version;
+        List<ManifestFile> files;
+        try
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(journal));
+            version = document.RootElement.GetProperty("version").GetString() ?? "";
+            files = new List<ManifestFile>();
+            foreach (var element in document.RootElement.GetProperty("files").EnumerateArray())
+            {
+                files.Add(new ManifestFile(
+                    element.GetProperty("path").GetString()!,
+                    element.GetProperty("sha256").GetString()!,
+                    element.GetProperty("size").GetInt64()));
+            }
+        }
+        catch (Exception exception) when (exception is JsonException or KeyNotFoundException or IOException)
+        {
+            ClearJournal(baseDirectory);
+            Sweep(baseDirectory);
+            return false;
+        }
+
+        var settled = true;
+        foreach (var file in files) settled &= Settle(baseDirectory, file);
+
+        ClearJournal(baseDirectory);
+        if (settled && version.Length > 0) WriteVersionMarker(baseDirectory, version);
+        Sweep(baseDirectory, files);
+        return settled;
+    }
+
+    /// <summary>Tek bir dosyayı çalışabilir bir hale getirir; vardığı hal istenen hal mi, onu döndürür.</summary>
+    private static bool Settle(string baseDirectory, ManifestFile file)
+    {
+        var target = Target(baseDirectory, file.Path);
+        var retired = target + RetiredSuffix;
+        var incoming = target + IncomingSuffix;
+
+        // Değişim tamamlanmış: yeni ikili yerinde.
+        if (Matches(target, file)) return true;
+
+        // Yeni ikili elde: ister hedef hiç boşalmamış olsun ister boşalmış olsun, ileri gidilir.
+        if (Matches(incoming, file))
+        {
+            if (File.Exists(target)) Retire(target, retired);
+            File.Move(incoming, target);
+            return true;
+        }
+
+        // Hedef boşalmış ve elde yeni ikili yok: eski ad geri alınır, kurulum açılabilir kalır.
+        if (!File.Exists(target) && File.Exists(retired))
+        {
+            File.Move(retired, target);
+            return false;
+        }
+
+        // Hedef duruyor ama istenen özette değil: dokunulmaz, bir sonraki tur yeniden dener.
+        return false;
+    }
+
+    private static void Swap(string baseDirectory, ManifestFile file)
+    {
+        var target = Target(baseDirectory, file.Path);
+        var incoming = target + IncomingSuffix;
+        if (File.Exists(target)) Retire(target, target + RetiredSuffix);
+        File.Move(incoming, target);
+    }
+
+    /// <summary>
+    /// Çalışan ikilinin adı değiştirilir, üstüne yazılmaz. Windows açık bir görüntü
+    /// dosyasının adını değiştirmeye izin verir; silmeye ve üstüne yazmaya izin vermez.
+    /// </summary>
+    private static void Retire(string target, string retired)
+    {
+        TryDelete(retired);
+        File.Move(target, retired, overwrite: true);
+    }
+
+    public static bool Matches(string path, ManifestFile file)
+    {
+        try
+        {
+            var info = new FileInfo(path);
+            if (!info.Exists || info.Length != file.Size) return false;
+            return string.Equals(UpdateCheck.HashFile(path), file.Sha256, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
+    }
+
+    /// <summary>
+    /// Artık adlar. Yeni geçen ikili henüz çalışırken eski ad silinemez — o dosya bu
+    /// sürecin kendi görüntüsüdür. Başarısızlık yutulur, iş bir sonraki açılışa kalır.
+    /// </summary>
+    public static void Sweep(string baseDirectory, IReadOnlyList<ManifestFile>? files = null)
+    {
+        var names = files is null || files.Count == 0
+            ? new[] { ExecutableName }
+            : files.Select(file => file.Path).ToArray();
+
+        foreach (var name in names)
+        {
+            var target = Target(baseDirectory, name);
+            TryDelete(target + RetiredSuffix);
+            TryDelete(target + IncomingSuffix);
+        }
+    }
+
+    private static void TryDelete(string path)
+    {
+        try { if (File.Exists(path)) File.Delete(path); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+    }
+
+    private static void WriteJournal(string baseDirectory, IReadOnlyList<ManifestFile> files, string version)
+    {
+        Directory.CreateDirectory(baseDirectory);
+        using var stream = new FileStream(Path.Combine(baseDirectory, JournalName), FileMode.Create, FileAccess.Write, FileShare.None);
+        using var writer = new Utf8JsonWriter(stream);
+        writer.WriteStartObject();
+        writer.WriteString("version", NormalizeVersion(version));
+        writer.WriteStartArray("files");
+        foreach (var file in files)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("path", file.Path);
+            writer.WriteString("sha256", file.Sha256);
+            writer.WriteNumber("size", file.Size);
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
+        writer.WriteEndObject();
+        writer.Flush();
+    }
+
+    private static void ClearJournal(string baseDirectory) =>
+        TryDelete(Path.Combine(baseDirectory, JournalName));
 }
 
 /// <summary>Bir arşivin istenen bayt aralığını veren kaynak.</summary>

@@ -359,6 +359,273 @@ public sealed class UpdaterTests : IDisposable
         Assert.True(UpdateStage.HasPending(app));
     }
 
+    private const string OldLauncher = "eski başlatıcı";
+    private const string NewLauncher = "yeni başlatıcı, daha uzun";
+
+    [Fact]
+    public void TheManifestCountsTheLauncherInItsOwnField()
+    {
+        const string json = """
+        {
+          "version": "0.2.2",
+          "commit": "abc1234",
+          "built": "2026-08-23T18:00:00Z",
+          "rid": "win-x64",
+          "files": [
+            { "path": "VidShrink.App.dll", "sha256": "e3b0c442", "size": 123456 }
+          ],
+          "launcher": [
+            { "path": "VidShrink.exe", "sha256": "AB12", "size": 7788 }
+          ]
+        }
+        """;
+
+        var manifest = UpdateCheck.ParseManifest(json);
+
+        Assert.Single(manifest.Launcher);
+        Assert.Equal(LauncherUpdate.ExecutableName, manifest.Launcher[0].Path);
+        Assert.Equal("ab12", manifest.Launcher[0].Sha256);
+        Assert.Equal(7788, manifest.Launcher[0].Size);
+
+        // Ayrı alan olmasının sebebi: files listesine önekli bir satır girseydi kurulu her
+        // eski başlatıcı o satırı uygulama arşivinde arar, bulamaz ve güncellemenin
+        // tamamından vazgeçerdi. Bilinmeyen bir üst alan ise sessizce görünmez.
+        Assert.Single(manifest.Files);
+        Assert.DoesNotContain(manifest.Files, file => file.Path.Contains("VidShrink.exe", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AManifestWithoutALauncherFieldIsStillRead()
+    {
+        var manifest = UpdateCheck.ParseManifest("""
+        { "version": "0.2.0", "rid": "win-x64", "files": [ { "path": "a.dll", "sha256": "aa", "size": 1 } ] }
+        """);
+
+        Assert.Empty(manifest.Launcher);
+        Assert.Single(manifest.Files);
+    }
+
+    [Fact]
+    public void TheWorkflowFoldsTheLauncherIntoTheManifest()
+    {
+        var workflow = File.ReadAllText(
+            Path.Combine(TipSources.Root, ".github", "workflows", "release.yml"));
+
+        // Başlatıcının kendi yayın klasörü ayrıca özetleniyor ve aynı manifestin
+        // launcher alanına katlanıyor.
+        Assert.Contains("write publish-launcher", workflow, StringComparison.Ordinal);
+        Assert.Contains(".launcher = (", workflow, StringComparison.Ordinal);
+        Assert.Contains($"select(.path == \"{LauncherUpdate.ExecutableName}\")", workflow, StringComparison.Ordinal);
+
+        // Katlama arşivlemeden önce olmalı: manifest hem arşivin içine hem yanına gidiyor.
+        var merge = workflow.IndexOf("merged-manifest.json", StringComparison.Ordinal);
+        var archive = workflow.IndexOf("Archive, copy the manifest out", StringComparison.Ordinal);
+        Assert.True(merge >= 0, "manifest katlama adımı release.yml'de yok");
+        Assert.True(archive > merge, "manifest arşivlendikten sonra katlanıyor");
+    }
+
+    [Fact]
+    public void TheLauncherComesOutOfTheArchiveTheReleaseAlreadyCarries()
+    {
+        Assert.Equal("vidshrink-launcher-win-x64.zip", UpdateCheck.LauncherArchiveAssetName("win-x64"));
+
+        var workflow = File.ReadAllText(
+            Path.Combine(TipSources.Root, ".github", "workflows", "release.yml"));
+        Assert.Contains("vidshrink-launcher-${{ matrix.rid }}.zip", workflow, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheRunningBinaryIsRenamedAsideInsteadOfOverwritten()
+    {
+        var root = Folder("running");
+        var stage = Path.Combine(root, "update-stage");
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+        File.WriteAllText(target, OldLauncher);
+
+        var staged = LauncherUpdate.StagePath(stage, LauncherUpdate.ExecutableName);
+        Directory.CreateDirectory(Path.GetDirectoryName(staged)!);
+        File.WriteAllText(staged, NewLauncher);
+        var incoming = new ManifestFile(
+            LauncherUpdate.ExecutableName, UpdateCheck.HashFile(staged), new FileInfo(staged).Length);
+
+        // Çalışan bir görüntü dosyasının paylaşım kipi: okunabilir ve adı değiştirilebilir,
+        // üstüne yazılamaz. Değişimin bu kipte de yürümesi gereken tek koşul bu.
+        using (new FileStream(target, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete))
+        {
+            if (OperatingSystem.IsWindows())
+                Assert.ThrowsAny<IOException>(() => File.Copy(staged, target, overwrite: true));
+
+            LauncherUpdate.Stage(stage, root, new[] { incoming });
+            Assert.Equal(NewLauncher, File.ReadAllText(target + LauncherUpdate.IncomingSuffix));
+
+            LauncherUpdate.Apply(root, new[] { incoming }, "0.2.2+abc1234");
+        }
+
+        Assert.Equal(NewLauncher, File.ReadAllText(target));
+        Assert.Equal("0.2.2", LauncherUpdate.ReadVersionMarker(root));
+        Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
+    }
+
+    [Fact]
+    public void TheRetiredNameIsDeletedOnTheNextLaunch()
+    {
+        var root = Folder("retired");
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+        File.WriteAllText(target, NewLauncher);
+        File.WriteAllText(target + LauncherUpdate.RetiredSuffix, OldLauncher);
+
+        LauncherUpdate.Repair(root);
+
+        Assert.False(File.Exists(target + LauncherUpdate.RetiredSuffix));
+        Assert.Equal(NewLauncher, File.ReadAllText(target));
+    }
+
+    [Theory]
+    [InlineData(1, OldLauncher)]
+    [InlineData(2, NewLauncher)]
+    [InlineData(3, NewLauncher)]
+    [InlineData(4, NewLauncher)]
+    [InlineData(5, NewLauncher)]
+    public void AnInterruptionAtAnyStepLeavesARunnableLauncher(int completedSteps, string expected)
+    {
+        var (root, _) = HalfDoneSwap("kesinti" + completedSteps, completedSteps);
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+
+        LauncherUpdate.Repair(root);
+
+        Assert.True(File.Exists(target), $"{completedSteps}. adımdan sonra başlatıcı ortada yok");
+        Assert.Equal(expected, File.ReadAllText(target));
+        Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
+        Assert.False(File.Exists(target + LauncherUpdate.RetiredSuffix));
+        Assert.False(File.Exists(target + LauncherUpdate.IncomingSuffix));
+        _output.WriteLine($"{completedSteps} adım tamamlandı, kalan başlatıcı: {File.ReadAllText(target)}");
+    }
+
+    [Fact]
+    public void TheOneStepThatEmptiesTheTargetIsRolledBackWhenTheNewBinaryIsGone()
+    {
+        // Hedefin boş kaldığı tek an: eski ad alındı, yeni ikili henüz geçmedi. Yeni ikili
+        // de elde yoksa eski ad geri alınır; kurulum açılabilir kalır, sürüm işareti
+        // ilerlemez ve bir sonraki tur aynı güncellemeyi yeniden dener.
+        var (root, _) = HalfDoneSwap("gerial", completedSteps: 3, loseIncoming: true);
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+
+        Assert.False(File.Exists(target));
+
+        Assert.False(LauncherUpdate.Repair(root));
+
+        Assert.Equal(OldLauncher, File.ReadAllText(target));
+        Assert.Null(LauncherUpdate.ReadVersionMarker(root));
+        Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
+    }
+
+    [Fact]
+    public void TheVersionMarkerIsOnlyMovedForwardWhenTheSwapReallyLanded()
+    {
+        var (settled, _) = HalfDoneSwap("isaret", completedSteps: 3);
+        Assert.True(LauncherUpdate.Repair(settled));
+        Assert.Equal("0.2.2", LauncherUpdate.ReadVersionMarker(settled));
+    }
+
+    [Fact]
+    public void TheVersionGateSeesALauncherLeftBehindByAnAppUpdate()
+    {
+        var root = Folder("kapi");
+        var app = Folder(Path.Combine("kapi", "app"));
+        Write(app, "VidShrink.App.dll", "0.2.1 uygulaması");
+
+        UpdateCheck.WriteVersionMarker(app, "0.2.1");
+        LauncherUpdate.WriteVersionMarker(root, "0.2.0");
+
+        var skew = LauncherUpdate.Inspect(root, app);
+        Assert.True(skew.Mismatched);
+        Assert.Equal("0.2.0", skew.Launcher);
+        Assert.Equal("0.2.1", skew.App);
+
+        var manifest = new ReleaseManifest("0.2.1", "abc", DateTimeOffset.UtcNow, "win-x64",
+            new[] { Describe(app, "VidShrink.App.dll") })
+        {
+            Launcher = new[] { new ManifestFile(LauncherUpdate.ExecutableName, new string('0', 64), 10) }
+        };
+
+        // Bugüne kadarki kapı yalnız app işaretine bakıyordu ve bu farkı hiç görmüyordu.
+        Assert.True(UpdateCheck.AlreadyCurrent(app, manifest));
+        Assert.False(UpdateCheck.AlreadyCurrent(root, app, manifest));
+
+        LauncherUpdate.WriteVersionMarker(root, "0.2.1");
+        Assert.False(LauncherUpdate.Inspect(root, app).Mismatched);
+        Assert.True(UpdateCheck.AlreadyCurrent(root, app, manifest));
+    }
+
+    [Fact]
+    public void TheMarkerIsSeededFromTheRunningBinaryAndThenLeftAlone()
+    {
+        var root = Folder("tohum");
+
+        LauncherUpdate.SeedVersionMarker(root, "0.2.0+abc1234");
+        Assert.Equal("0.2.0", LauncherUpdate.ReadVersionMarker(root));
+
+        LauncherUpdate.SeedVersionMarker(root, "0.1.0");
+        Assert.Equal("0.2.0", LauncherUpdate.ReadVersionMarker(root));
+    }
+
+    [Fact]
+    public void TheLauncherIsSwappedAfterTheApplicationFilesAreInPlace()
+    {
+        var code = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+
+        var appApply = code.IndexOf("UpdateStage.Apply", StringComparison.Ordinal);
+        var launcherApply = code.IndexOf("LauncherUpdate.Apply", StringComparison.Ordinal);
+
+        Assert.True(appApply >= 0 && launcherApply > appApply,
+            "başlatıcı uygulama dosyalarından önce değişiyor");
+
+        var program = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Program.cs"));
+        Assert.Contains("LauncherUpdate.Repair(baseDirectory)", program, StringComparison.Ordinal);
+        Assert.True(
+            program.IndexOf("LauncherUpdate.Repair", StringComparison.Ordinal)
+                < program.IndexOf("Updater.Run", StringComparison.Ordinal),
+            "yarım kalan değişim güncellemeden sonra toplanıyor");
+    }
+
+    /// <summary>
+    /// Değişimin beş adımının ilk <paramref name="completedSteps"/> tanesini uygulayıp
+    /// süreç orada ölmüş gibi bırakır. Adımlar sırayla: yan dosyaya iniş, günlük,
+    /// eski adın alınması, yeni ikilinin geçmesi, günlüğün silinmesi.
+    /// </summary>
+    private (string Root, ManifestFile File) HalfDoneSwap(string name, int completedSteps, bool loseIncoming = false)
+    {
+        var root = Folder(name);
+        var target = Path.Combine(root, LauncherUpdate.ExecutableName);
+        File.WriteAllText(target, OldLauncher);
+
+        var side = Folder(Path.Combine(name, "yan"));
+        var sideFile = Path.Combine(side, LauncherUpdate.ExecutableName);
+        File.WriteAllText(sideFile, NewLauncher);
+        var file = new ManifestFile(
+            LauncherUpdate.ExecutableName, UpdateCheck.HashFile(sideFile), new FileInfo(sideFile).Length);
+
+        var incoming = target + LauncherUpdate.IncomingSuffix;
+        var retired = target + LauncherUpdate.RetiredSuffix;
+
+        if (completedSteps >= 1) File.Move(sideFile, incoming);
+        if (completedSteps >= 2) WriteLauncherJournal(root, file, "0.2.2");
+        if (completedSteps >= 3) File.Move(target, retired);
+        if (completedSteps >= 4) File.Move(incoming, target);
+        if (completedSteps >= 5) File.Delete(Path.Combine(root, LauncherUpdate.JournalName));
+        if (loseIncoming && File.Exists(incoming)) File.Delete(incoming);
+
+        return (root, file);
+    }
+
+    private static void WriteLauncherJournal(string baseDirectory, ManifestFile file, string version) =>
+        File.WriteAllText(
+            Path.Combine(baseDirectory, LauncherUpdate.JournalName),
+            $"{{\"version\":\"{version}\",\"files\":[{{\"path\":\"{file.Path}\"," +
+            $"\"sha256\":\"{file.Sha256}\",\"size\":{file.Size}}}]}}");
+
     [LiveLauncherFact]
     public void EveryLaunchChecksAndStaysWithinTheTimeout()
     {

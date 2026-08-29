@@ -4,7 +4,8 @@ name: release
 # supported targets, writes a per-file manifest next to each archive, and collects
 # everything into a draft GitHub Release. win-x64 additionally carries the launcher as
 # vidshrink-launcher-win-x64.zip, which is what the installer puts at the install root
-# and what the shortcuts point at.
+# and what the shortcuts point at. That archive is also what the manifest's "launcher"
+# array points at, so an installed launcher can replace itself.
 #
 # ffmpeg is not part of any archive. It is GPLv3 and VidShrink is MIT; the installer
 # fetches it onto the user's machine under its own licence. See README.
@@ -113,13 +114,40 @@ jobs:
         # The manifest tool is a CI helper and is not in VidShrink.sln, so it is built
         # from its own project file.
         run: |
+          set -euo pipefail
           dotnet build tools/VidShrink.Manifest/VidShrink.Manifest.csproj -c Release
-          dotnet tools/VidShrink.Manifest/bin/Release/net8.0/vidshrink-manifest.dll write \
+          tool=tools/VidShrink.Manifest/bin/Release/net8.0/vidshrink-manifest.dll
+          dotnet $tool write \
             publish/${{ matrix.rid }} \
             --version ${{ needs.version.outputs.version }} \
             --rid ${{ matrix.rid }} \
             --commit ${{ needs.version.outputs.commit }} \
             --built ${{ needs.version.outputs.built }}
+
+          # The launcher is counted by the same manifest, in its own top-level "launcher"
+          # array rather than among "files". Two reasons for a separate field over a path
+          # prefix inside "files": the rows are rooted at the install root, not at app/,
+          # and every launcher already installed would look for a prefixed path inside
+          # vidshrink-<rid>.zip, not find it, and give up on the whole update. An unknown
+          # top-level field is simply ignored by those older clients, so they keep
+          # updating app/ exactly as before.
+          #
+          # Only VidShrink.exe is listed. The .pdb beside it is in the archive but is not
+          # part of the swap, and the name is pinned by a test against
+          # LauncherUpdate.ExecutableName.
+          if [ -d publish-launcher ]; then
+            dotnet $tool write publish-launcher \
+              --version ${{ needs.version.outputs.version }} \
+              --rid ${{ matrix.rid }} \
+              --commit ${{ needs.version.outputs.commit }} \
+              --built ${{ needs.version.outputs.built }} \
+              --out launcher-manifest.json
+            jq --slurpfile launcher launcher-manifest.json \
+              '.launcher = ($launcher[0].files | map(select(.path == "VidShrink.exe")))' \
+              publish/${{ matrix.rid }}/manifest.json > merged-manifest.json
+            mv merged-manifest.json publish/${{ matrix.rid }}/manifest.json
+            jq -r '.launcher[] | "manifest launcher: \(.path) \(.size)"' publish/${{ matrix.rid }}/manifest.json
+          fi
 
       - name: Archive, copy the manifest out, checksum both
         run: |
@@ -133,8 +161,9 @@ jobs:
           checksummed="vidshrink-${{ matrix.rid }}.zip manifest-${{ matrix.rid }}.json"
           # The launcher travels as its own archive rather than inside the application
           # archive: the archive is what the updater unpacks over app/, and the launcher
-          # does not live there. It is not in the manifest either, because it never
-          # updates itself.
+          # does not live there. The manifest's "launcher" array points at this archive,
+          # so the updater range-fetches VidShrink.exe out of it without the application
+          # archive having to carry a second copy of the binary.
           if [ -d publish-launcher ]; then
             ( cd publish-launcher && zip -qr "$GITHUB_WORKSPACE/assets/vidshrink-launcher-${{ matrix.rid }}.zip" . )
             checksummed="$checksummed vidshrink-launcher-${{ matrix.rid }}.zip"
