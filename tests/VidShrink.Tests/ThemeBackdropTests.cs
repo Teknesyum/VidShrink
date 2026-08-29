@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Xml.Linq;
 using Avalonia;
 using Avalonia.Media;
@@ -59,7 +59,6 @@ public sealed class ThemeBackdropTests
 
     private static double PanelOpacity() =>
         double.Parse(Token("PanelSurfaceOpacity"), CultureInfo.InvariantCulture);
-
 
     private static XElement Resource(string key) => Theme()
         .Elements()
