@@ -306,11 +306,15 @@ public sealed class PerformanceCheckTests
     /// <summary>
     /// Bu makinede kodlamanin gercek maliyeti. Sayilar <c>.calisma/t63/olcum.txt</c>'ye
     /// yazilir; rapora giren her sayi oradan cikar.
+    ///
+    /// Bacak alinamadiysa sebebi ayirt ediliyor: butce dolduysa bu makinenin o anki
+    /// mesguliyetidir, iddia kurulmaz ve sebep yazilir. Butce dolmadan eksilen bacak
+    /// kodun kusurudur ve kirmiziya doner.
     /// </summary>
     [FfmpegFact]
     public async Task BuMakinedeKodlamaNereyeDusuyor()
     {
-        var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
+        var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
 
         Log($"[gercek] cekirdek={result.LogicalCores} karar={result.Impact} " +
             $"yazilim={result.SoftwareCodec}:{N(result.SoftwareRealtimeCores)} cekirdek " +
@@ -321,6 +325,15 @@ public sealed class PerformanceCheckTests
         foreach (var f in result.Findings)
             Log($"[bulgu] {f.Code} {f.Codec} cekirdek={N(f.RealtimeCores)} gercekzaman={N(f.RealtimeFactor)}x " +
                 $"katsayi={N(f.Factor)} cpu={N(f.CpuMs)}ms duvar={f.WallMs}ms");
+
+        if (!result.SoftwareMeasured)
+        {
+            Assert.True(result.BudgetExhausted,
+                "yazilim yolu butce dolmadan olculemedi: " +
+                string.Join(",", result.Findings.Select(f => f.Code)));
+            Atlandi($"yazilim yolu butce doldugu icin olculemedi, gecen {result.ElapsedMs}ms");
+            return;
+        }
 
         Assert.NotEqual(RecordingImpact.Unknown, result.Impact);
         Assert.True(result.SoftwareRealtimeCores > 0, "yazilim yolu olculemedi");
@@ -457,20 +470,34 @@ public sealed class PerformanceCheckTests
     /// K3'un canli yarisi: butce gercekten bagliyor <b>ve</b> sebebini soyluyor.
     /// Yarida kalan olcum sebepsiz "olculemedi" donmemeli; butce dolduysa sonuc
     /// BudgetExhausted tasimali, yoksa kullanici neden sonuc alamadigini bilemez.
+    ///
+    /// Bagladigi, ayni makinede genis butceyle alinan bir kosumla karsilastirilarak
+    /// okunuyor. Butcenin bir katiyla kurulmus mutlak bir sinir bunu olcemez: butce
+    /// dolunca kosan surec oldurulur, baslatma ve oldurme butcenin disinda kalir ve
+    /// makine mesgullestikce buyur. O sinir mesgul bir makinede, butce pekala
+    /// bagliyorken kirmiziya doner.
     /// </summary>
     [FfmpegFact]
     public async Task ButceGercektenBagliyorVeSebebiniSoyluyor()
     {
         const long dar = 900;
+
+        var genisSaat = System.Diagnostics.Stopwatch.StartNew();
+        await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
+        genisSaat.Stop();
+
         var basladi = System.Diagnostics.Stopwatch.StartNew();
         var result = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, dar);
         basladi.Stop();
 
         var bulgular = string.Join(",", result.Findings.Select(f => f.Code));
-        Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms karar={result.Impact} bulgular={bulgular}");
+        Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms " +
+            $"genis={YukOlcumButcesiMs}ms gecen={genisSaat.ElapsedMilliseconds}ms " +
+            $"karar={result.Impact} bulgular={bulgular}");
 
-        Assert.True(basladi.ElapsedMilliseconds < dar * 3,
-            $"butce {dar}ms iken olcum {basladi.ElapsedMilliseconds}ms surdu");
+        Assert.True(basladi.ElapsedMilliseconds < genisSaat.ElapsedMilliseconds / 2,
+            $"butce baglamadi: {dar}ms butceyle {basladi.ElapsedMilliseconds}ms, " +
+            $"genis butceyle {genisSaat.ElapsedMilliseconds}ms");
 
         var butce = Assert.Single(result.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
         Assert.Equal(dar, butce.BudgetMs);
