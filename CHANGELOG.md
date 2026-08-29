@@ -7,6 +7,19 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Right-click a video in Explorer and **Open this video with VidShrink** is there, on the
+  same 24 extensions the application itself opens. The Windows installer writes the entry
+  under `HKCU\Software\Classes\SystemFileAssociations`, so it needs no administrator rights
+  and does not take over the default player - it adds a line to the menu and leaves the
+  file association alone. The entry points at `VidShrink.exe`, the launcher, for the reason
+  the shortcuts do: an entry aimed straight at the application would never update.
+  The label follows the system interface language, Turkish or English, and
+  `-MenuLanguage tr|en` forces it. `-RemoveShellMenu` clears every entry in one step,
+  `-ShellMenuOnly` rewrites them without reinstalling, and `-SkipShortcuts` now means the
+  shell is not touched at all.
+
 ## [0.1.1] - 2026-08-26
 
 ### Changed
