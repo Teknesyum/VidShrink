@@ -13,8 +13,9 @@ kullanılamaz. Bu yüzden her varlık adı hedef `rid` ile biter. Dört `rid` va
 | Varlık | Ad | İçerik |
 |---|---|---|
 | Arşiv | `vidshrink-<rid>.zip` | Yayın klasörünün tamamı, `manifest.json` dahil |
+| Başlatıcı arşivi | `vidshrink-launcher-<rid>.zip` | Yalnız `win-x64`; kurulum kökündeki `VidShrink.exe` |
 | Manifest | `manifest-<rid>.json` | Arşivin kökündeki `manifest.json` ile **birebir aynı baytlar** |
-| Sağlama | `checksums-<rid>.txt` | Yukarıdaki iki varlığın SHA-256'sı |
+| Sağlama | `checksums-<rid>.txt` | Yukarıdaki varlıkların SHA-256'sı |
 
 Manifest hem arşivin içinde hem de ayrı bir varlık olarak durur. Güncelleyici, hangi
 dosyaların değiştiğine karar vermek için 95 MB'lık arşivi indirmeden yalnız
@@ -25,6 +26,7 @@ dosyaların değiştiğine karar vermek için 95 MB'lık arşivi indirmeden yaln
 ```
 https://github.com/Teknesyum/VidShrink/releases/download/<tag>/manifest-<rid>.json
 https://github.com/Teknesyum/VidShrink/releases/download/<tag>/vidshrink-<rid>.zip
+https://github.com/Teknesyum/VidShrink/releases/download/<tag>/vidshrink-launcher-<rid>.zip
 https://github.com/Teknesyum/VidShrink/releases/download/<tag>/checksums-<rid>.txt
 ```
 
@@ -55,6 +57,9 @@ UTF-8, BOM yok, iki boşluk girintili, sonunda tek satır sonu var.
   "rid": "win-x64",
   "files": [
     { "path": "VidShrink.App.dll", "sha256": "e3b0c442...", "size": 123456 }
+  ],
+  "launcher": [
+    { "path": "VidShrink.exe", "sha256": "7d865e95...", "size": 145408 }
   ]
 }
 ```
@@ -66,6 +71,7 @@ UTF-8, BOM yok, iki boşluk girintili, sonunda tek satır sonu var.
 | `built` | metin | Yapı zamanı, UTC, `yyyy-MM-ddTHH:mm:ssZ` |
 | `rid` | metin | `win-x64`, `osx-arm64`, `osx-x64`, `linux-x64` |
 | `files` | dizi | Yayın klasöründeki her dosya için bir nesne |
+| `launcher` | dizi | Kurulum kökündeki başlatıcı için bir nesne. İsteğe bağlı; yalnız `win-x64` taşır |
 
 `files` içindeki her nesnenin üç alanı vardır, hepsi zorunludur:
 
@@ -84,6 +90,36 @@ Kurallar:
 - `files`, `path` alanına göre **sıralı**dır. Sıralama ordinal'dır (bayt değerine göre,
   kültüre bağlı değil). Böylece iki yapının manifesti satır satır karşılaştırılabilir.
 - Karşılaştırma büyük/küçük harfe duyarlıdır; `path` alanları olduğu gibi eşleşmelidir.
+
+## launcher dizisi
+
+Kurulum iki katmanlıdır: kurulum kökünde kısayolun gösterdiği `VidShrink.exe` durur,
+uygulamanın kendisi onun altındaki `app\` klasöründedir. Güncellemeyi uygulayan da o
+başlatıcıdır, çünkü Windows çalışan bir `.exe`'nin üstüne yazdırmaz. Başlatıcının kendisi
+de güncellenmelidir ve `app\` klasörüne ait olmadığı için `files` içinde yeri yoktur;
+`launcher` bu yüzden ayrı bir üst düzey dizidir.
+
+Nesnelerin alanları `files` ile aynıdır (`path`, `sha256`, `size`) ve aynı kurallara
+uyarlar. Ayrıldıkları üç nokta:
+
+- **Yollar kurulum köküne görelidir**, yayın klasörüne değil. `files` içindeki
+  `VidShrink.App.dll` kurulu düzende `app\VidShrink.App.dll` olur; `launcher` içindeki
+  `VidShrink.exe` doğrudan kurulum kökündeki `VidShrink.exe`'dir. İki dizi aynı adı
+  taşıyabilir ve aynı dosyayı göstermez.
+- **Satırlar `vidshrink-launcher-<rid>.zip` arşivinden iner**, `vidshrink-<rid>.zip`
+  arşivinden değil. Güncelleyici `files` farkını uygulama arşivinden, `launcher` farkını
+  başlatıcı arşivinden çeker; ikisi ayrı varlıklardır ve ayrı aralık istekleriyle inerler.
+  Başlatıcı uygulama arşivinin içinde taşınamaz: o arşiv `app\` klasörünün üstüne açılıyor.
+- **Eski istemciler alanı görmezden gelir.** `launcher` alanını tanımayan bir güncelleyici
+  bu diziyi hiç okumaz, yalnız `files` ile `app\` klasörünü günceller ve kurulu başlatıcı
+  olduğu sürümde kalır. Alan bu yüzden isteğe bağlıdır: yokken de, boş diziyken de manifest
+  geçerlidir. `win-x64` dışındaki `rid`'ler başlatıcı taşımaz ve alanı hiç yazmaz.
+
+Kurulu başlatıcının sürümü kurulum kökündeki `.launcher-version` dosyasında durur;
+uygulamanınki `app\.update-version` dosyasındadır. İkisi ayrı olduğu için, uygulama yeni
+sürüme geçtikten sonra geride kalan bir başlatıcı fark edilebilir. `launcher` dizisi boş
+olan bir manifest için `.launcher-version` yazılmaz: o manifeste bakarak kurulu
+başlatıcının hangi sürüm olduğu bilinemez.
 
 ## Manifestte olmayanlar
 
