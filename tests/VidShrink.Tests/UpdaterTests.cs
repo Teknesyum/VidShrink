@@ -1055,25 +1055,26 @@ exit $code
     }
 
     [Fact]
-    public async Task TheDeletionStepWaitsOutATransientLock()
+    public void TheDeletionStepWaitsOutATransientLock()
     {
         if (!OperatingSystem.IsWindows()) return;
 
         var (installRoot, locked, probe, logPath) = LockedInstall("silme-gecici");
         var stream = new FileStream(locked, FileMode.Open, FileAccess.Read, FileShare.None);
-        var release = Task.Run(async () =>
+        var release = new Thread(() =>
         {
             var started = logPath + ".basladi";
             var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
-            while (!File.Exists(started) && DateTime.UtcNow < deadline) await Task.Delay(20);
-            await Task.Delay(300);
-            await stream.DisposeAsync();
-        });
+            while (!File.Exists(started) && DateTime.UtcNow < deadline) Thread.Sleep(20);
+            Thread.Sleep(300);
+            stream.Dispose();
+        }) { IsBackground = true };
+        release.Start();
 
         var stopwatch = Stopwatch.StartNew();
         var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
         stopwatch.Stop();
-        await release;
+        release.Join(TimeSpan.FromSeconds(5));
 
         _output.WriteLine($"geçici kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
         _output.WriteLine(log.Trim());
