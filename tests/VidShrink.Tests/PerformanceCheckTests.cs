@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -423,7 +423,8 @@ public sealed class PerformanceCheckTests
 
         if (olculen.Length == 0)
         {
-            Atlandi("hicbir bos okuma alinamadi, butce doldu");
+            Atlandi("hicbir bos okuma alinamadi, ucunde de butce doldu: gecen " +
+                    string.Join(" ", okumalar.Select(r => r.ElapsedMs + "ms")));
             return;
         }
 
@@ -444,7 +445,8 @@ public sealed class PerformanceCheckTests
 
         if (!yuklu.SoftwareMeasured)
         {
-            Atlandi("yuk altinda yazilim bacagi butce doldugu icin alinamadi, yon iddiasi kurulmadi");
+            Atlandi($"yuk altinda yazilim bacagi butce doldugu icin alinamadi (gecen {yuklu.ElapsedMs}ms), " +
+                    "yon iddiasi kurulmadi");
         }
         else
         {
