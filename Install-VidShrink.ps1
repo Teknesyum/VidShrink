@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'Programs\VidShrink'),
     [switch]$NoLaunch,
     [switch]$SkipShortcuts,
@@ -195,7 +195,7 @@ function Get-ShellMenuLabel([string]$Language) {
         try { $interface = (Get-UICulture).TwoLetterISOLanguageName } catch { }
         if ($interface -eq 'tr') { $choice = 'tr' } else { $choice = 'en' }
     }
-    if ($choice -eq 'tr') { return 'Bu Videoyu VidShrink ile Aç' }
+    if ($choice -eq 'tr') { return 'Bu Videoyu VidShrink ile A' + [char]0x00E7 }
     return 'Open this video with VidShrink'
 }
 
