@@ -253,6 +253,13 @@ public partial class MainWindow : Window
     private readonly Dictionary<Control, int> _fadeGeneration = new();
     private readonly HashSet<Control> _fadingOut = new();
 
+    /// <summary>
+    /// Uygulama açılışta Türkçe koşuyor (<c>OnWindowLoaded</c>). Ölçüm başsız koştuğu için
+    /// o olay ateşlenmiyor ve pencere İngilizce ölçülüyordu; Türkçe karşılıkların
+    /// kutulara sığıp sığmadığı bu kapıdan geçmeden ölçülemez.
+    /// </summary>
+    internal void UseTurkish() => SetLanguage(true);
+
     internal void SettleFades()
     {
         foreach (var control in _fadingOut) control.IsVisible = false;
