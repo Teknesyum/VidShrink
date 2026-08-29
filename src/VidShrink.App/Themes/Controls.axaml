@@ -161,7 +161,7 @@
       </ControlTheme>
 
       <ControlTheme x:Key="Panel" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource Surface}"/>
+        <Setter Property="Background" Value="{StaticResource PanelSurface}"/>
         <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorder}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusPanel}"/>

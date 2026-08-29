@@ -6,7 +6,8 @@ namespace VidShrink.Tests;
 
 /// <summary>
 /// T71: anka artık düz tek renk değil, kırmızıdan sarıya giden bir alev rampasıyla
-/// doluyor. Burada ölçülen şey rampanın kendisi: iki yeni tonun mevcut kırmızıdan
+/// doluyor. T72 rampayı beşe çıkardı — gövde, kuyruk, iki kanat ve tepelik ayrı yönlerde
+/// yanıyor; ölçülen şey rampaların kendisi. Burada ölçülen şey rampanın kendisi: iki yeni tonun mevcut kırmızıdan
 /// türediği, durakların sıcaktan soğuğa sıralandığı, uçların saydama gittiği.
 /// <para>
 /// Alevin metin okunabilirliğine bedeli burada değil, <see cref="ThemeBackdropTests"/>
@@ -22,7 +23,8 @@ public sealed class ThemeTokenTests
 
     private static readonly string[] FlameBrushKeys =
     {
-        "PhoenixBodyFlame", "PhoenixWingFlameLeft", "PhoenixWingFlameRight", "PhoenixCrestFlame"
+        "PhoenixBodyFlame", "PhoenixTailFlame",
+        "PhoenixWingFlameNear", "PhoenixWingFlameFar", "PhoenixCrestFlame"
     };
 
     private static XElement Theme() => XDocument.Load(TipSources.ThemePath).Root!;
@@ -134,17 +136,21 @@ public sealed class ThemeTokenTests
         Assert.Equal(60.0, blaze.Hue, 3);
     }
 
-    /// <summary>K2: anka artık düz dolguyla değil, dört alev gradyanıyla boyanıyor.</summary>
+    /// <summary>
+    /// K2: anka düz dolguyla değil alev gradyanlarıyla boyanıyor. Çizim artık çok parçalı;
+    /// ölçülen şey her parçanın bu beş rampadan birini kullandığı ve beş rampanın hepsinin
+    /// işini gördüğü.
+    /// </summary>
     [Fact]
     public void ThePhoenixIsPaintedWithGradientsNotAFlatFill()
     {
         var brushes = PhoenixDrawings()
             .Select(drawing => ((string)drawing.Attribute("Brush")!).Trim())
+            .Select(brush => brush.Replace("{StaticResource", string.Empty).Trim(' ', '}'))
             .ToList();
 
-        Assert.Equal(FlameBrushKeys.Length, brushes.Count);
-        foreach (var key in FlameBrushKeys)
-            Assert.Contains($"{{StaticResource {key}}}", brushes);
+        Assert.True(brushes.Count >= 20, $"Anka {brushes.Count} parça; tek kütle kalmış.");
+        Assert.Equal(FlameBrushKeys.OrderBy(key => key), brushes.Distinct().OrderBy(key => key));
 
         foreach (var key in FlameBrushKeys)
             Assert.Equal("LinearGradientBrush", Resource(key).Name.LocalName);
