@@ -19,11 +19,11 @@ namespace VidShrink.Tests;
 /// yerleşimi elle koşturuyor. Ekranda hiçbir şey açılmıyor.
 ///
 /// Zamanlayıcılar burada tik atmaz: bu iş parçacığında ileti döngüsü yok, dolayısıyla
-/// <see cref="DispatcherTimer"/> ateşlenmez. Bu yüzden bekleme duvar saatiyle değil,
-/// <see cref="HoverZone.Clock"/> yerine takılan sahte saatle (<see cref="FakeClock"/>)
-/// sürülüyor; sayacın kendi karar kapıları (<see cref="HoverZone.ShouldHide"/>,
-/// <see cref="HoverZone.ShouldShow"/>) de doğrudan okunabiliyor. Hiçbir ölçümde
-/// <c>Thread.Sleep</c> yok (T70/K7).
+/// <see cref="DispatcherTimer"/> ateşlenmez. Sahte saat (<see cref="FakeClock"/>) yine de
+/// <see cref="HoverZone.Clock"/> yerine takılıyor: T79'dan beri panel beklemediği için
+/// ölçülen şey sürenin dolması değil, <b>hiç tik kurulmamış olması</b>. Sayacın kendi karar
+/// kapıları (<see cref="HoverZone.ShouldHide"/>, <see cref="HoverZone.ShouldShow"/>) de
+/// doğrudan okunabiliyor. Hiçbir ölçümde <c>Thread.Sleep</c> yok (T70/K7).
 /// </summary>
 public sealed class ComparisonPanelTests
 {
@@ -288,92 +288,29 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// T70/K2: süre dolmadan çıkan fare paneli hiç büyütmez. Giriş sayacı kurar, çıkış onu
-    /// iptal eder; saat sonuna kadar ilerletilse de bekleyen tik kalmamıştır.
+    /// T79/K1: bekleme kalktı. Fare panele girdiği turda panel büyür — sahte saat hiç
+    /// ilerletilmiyor, üstelik büyüme için bir tik bile kurulmuyor. T73'ün iki saniyelik
+    /// ölçüsünün yerini bu alıyor: eski ölçü sürenin dolmasını şart koşuyordu.
     /// </summary>
     [Fact]
-    public void Sure_dolmadan_cikan_fare_paneli_buyutmez()
+    public void Fare_girer_girmez_panel_buyur()
     {
-        var (armed, asked, stage, scale, promoted) = Read((host, panel) =>
-        {
-            var clock = AtBand(host, panel);
-
-            panel.HoverPanel(true);
-            var wasArmed = clock.Pending;
-            var delay = clock.Delay;
-
-            clock.Advance(TimeSpan.FromMilliseconds(1900));
-            panel.HoverPanel(false);
-            clock.Advance(TimeSpan.FromSeconds(5));
-            Settle(host);
-
-            return (wasArmed, delay, panel.Shelter, PanelScale(panel), panel.IsPromoted);
-        });
-
-        Assert.True(armed, "giriş büyüme sayacını kurmadı");
-        Assert.Equal(TimeSpan.FromSeconds(2), asked);
-        Assert.Equal(ShelterStage.Band, stage);
-        Assert.Equal(1.0, scale);
-        Assert.False(promoted, "süre dolmadan panel terfi etti");
-    }
-
-    /// <summary>
-    /// T70/K3: fare iki saniye üstünde kalırsa panel büyür. Son milisaniyeden önce ölçek
-    /// tabandadır; süre dolunca panel belirtecin söylediği kata çıkar ve terfi eder.
-    /// </summary>
-    [Fact]
-    public void Fare_iki_saniye_kalirsa_panel_buyur()
-    {
-        var (wanted, early, grown, stage) = Read((host, panel) =>
+        var (floor, wanted, grown, stage, pending) = Read((host, panel) =>
         {
             var clock = AtBand(host, panel);
             host.TryFindResource("PlaybackHoverZoom", out var token);
+            var before = PanelScale(panel);
 
             panel.HoverPanel(true);
-            clock.Advance(TimeSpan.FromMilliseconds(1999));
-            var beforeDeadline = PanelScale(panel);
-
-            clock.Advance(TimeSpan.FromMilliseconds(1));
             Settle(host);
 
-            return ((double)token!, beforeDeadline, PanelScale(panel), panel.Shelter);
+            return (before, (double)token!, PanelScale(panel), panel.Shelter, clock.Pending);
         });
 
-        Assert.Equal(1.0, early);
-        Assert.Equal(wanted, grown);
+        Assert.Equal(1.0, floor);
+        Assert.True(grown >= wanted, $"ölçek {grown:0.###}, eşik {wanted:0.###}");
         Assert.Equal(ShelterStage.Mid, stage);
-    }
-
-    /// <summary>
-    /// T70/K4: çıkıp geri giren fare sayacı baştan başlatır. İlk turdan 1,5 saniye artık
-    /// kalsaydı ikinci turun 1,5 saniyesi paneli büyütürdü; büyümüyor, kalan yarım saniye
-    /// dolunca büyüyor.
-    /// </summary>
-    [Fact]
-    public void Cikip_geri_giren_fare_sayaci_bastan_baslatir()
-    {
-        var (halfway, restarted, grown) = Read((host, panel) =>
-        {
-            var clock = AtBand(host, panel);
-
-            panel.HoverPanel(true);
-            clock.Advance(TimeSpan.FromMilliseconds(1500));
-            panel.HoverPanel(false);
-
-            panel.HoverPanel(true);
-            var asked = clock.Delay;
-            clock.Advance(TimeSpan.FromMilliseconds(1500));
-            var stillDown = panel.Shelter;
-
-            clock.Advance(TimeSpan.FromMilliseconds(500));
-            Settle(host);
-
-            return (stillDown, asked, panel.Shelter);
-        });
-
-        Assert.Equal(ShelterStage.Band, halfway);
-        Assert.Equal(TimeSpan.FromSeconds(2), restarted);
-        Assert.Equal(ShelterStage.Mid, grown);
+        Assert.False(pending, "büyüme için bekleme sayacı kuruldu");
     }
 
     /// <summary>
@@ -410,125 +347,13 @@ public sealed class ComparisonPanelTests
         Assert.False(hidden, "şerit gecikme dolunca gizlenmedi");
     }
 
-    // ---- T73/K1-K4: yuvarlak geri sayım ---------------------------------------------
-
-    /// <summary>
-    /// K1: fare panele girince gösterge belirir, süre dolunca kaybolur ve panel büyür.
-    /// Süre sahte saatle sürülüyor; duvar saati beklenmiyor.
-    /// </summary>
-    [Fact]
-    public void Geri_sayim_belirir_sure_dolunca_kaybolur_ve_panel_buyur()
-    {
-        var (armed, closing, afterwards, stage) = Read((host, panel) =>
-        {
-            var clock = AtBand(host, panel);
-            panel.MotionReduced = false;
-
-            panel.HoverPanel(true);
-            var shown = panel.RiseCountdown.IsVisible;
-            var animating = panel.RiseRing.Animating;
-
-            clock.Advance(clock.Delay);
-            Settle(host);
-
-            return (shown, animating, panel.RiseCountdown.IsVisible, panel.Shelter);
-        });
-
-        Assert.True(armed, "fare girince gösterge belirmedi");
-        Assert.True(closing, "halka kapanmaya başlamadı");
-        Assert.False(afterwards, "süre dolunca gösterge kaybolmadı");
-        Assert.Equal(ShelterStage.Mid, stage);
-    }
-
-    /// <summary>
-    /// K2: fare süre dolmadan çıkarsa gösterge kaybolur ve panel büyümez. Kesilen geri sayım
-    /// ekranda donmuş bir halka bırakmıyor — halka da sıfıra dönüyor.
-    /// </summary>
-    [Fact]
-    public void Erken_cikan_fare_geri_sayimi_da_paneli_de_iptal_eder()
-    {
-        var (shown, afterExit, sweep, stage) = Read((host, panel) =>
-        {
-            var clock = AtBand(host, panel);
-
-            panel.HoverPanel(true);
-            var armed = panel.RiseCountdown.IsVisible;
-
-            clock.Advance(TimeSpan.FromMilliseconds(1900));
-            panel.HoverPanel(false);
-            clock.Advance(TimeSpan.FromSeconds(5));
-            Settle(host);
-
-            return (armed, panel.RiseCountdown.IsVisible, panel.RiseRing.Sweep, panel.Shelter);
-        });
-
-        Assert.True(shown);
-        Assert.False(afterExit, "erken çıkışta gösterge ekranda kaldı");
-        Assert.Equal(0, sweep, 6);
-        Assert.Equal(ShelterStage.Band, stage);
-    }
-
-    /// <summary>
-    /// K3: göstergenin süresi ile sayacın süresi tek kaynaktan. Ölçüm üç değeri aynı turda
-    /// karşılaştırıyor: belirteç, sayacın saate kurduğu süre ve halkanın kapanma süresi.
-    /// Panel belirteci ikinci kez okusaydı bu üçlü yine tutardı; tutmayacağı yer belirtecin
-    /// değiştiği andır, o yüzden ölçüm belirteci de değiştirip aynı zinciri tekrar okuyor.
-    /// </summary>
-    [Fact]
-    public void Gosterge_ile_sayac_ayni_kaynaktan_besleniyor()
-    {
-        var (token, asked, ring, changedAsked, changedRing) = Read((host, panel) =>
-        {
-            var clock = AtBand(host, panel);
-            host.TryFindResource("PlaybackPanelRiseDelay", out var value);
-
-            panel.HoverPanel(true);
-            var first = (clock.Delay, panel.RiseRing.Duration);
-
-            // Belirteç değişti: iki süre ayrı yerden okunsaydı biri eski değerde kalırdı.
-            panel.HoverPanel(false);
-            var moved = TimeSpan.FromSeconds(5);
-            panel.Resources["PlaybackPanelRiseDelay"] = moved;
-            panel.HoverPanel(true);
-
-            return ((TimeSpan)value!, first.Delay, first.Duration, clock.Delay, panel.RiseRing.Duration);
-        });
-
-        Assert.Equal(token, asked);
-        Assert.Equal(asked, ring);
-        Assert.Equal(TimeSpan.FromSeconds(5), changedAsked);
-        Assert.Equal(changedAsked, changedRing);
-    }
-
-    /// <summary>
-    /// K4: hareket azaltma açıkken halka canlanmıyor. Gösterge yine beliriyor — kullanıcı
-    /// beklendiğini görüyor — ama kapanma geçişi hiç kurulmuyor, halka kapalı duruyor.
-    /// </summary>
-    [Fact]
-    public void Hareket_azaltma_acikken_halka_canlanmaz()
-    {
-        var (shown, animating, sweep) = Read((host, panel) =>
-        {
-            AtBand(host, panel);
-            panel.MotionReduced = true;
-
-            panel.HoverPanel(true);
-            return (panel.RiseCountdown.IsVisible, panel.RiseRing.Animating, panel.RiseRing.Sweep);
-        });
-
-        Assert.True(shown, "hareket azaltma göstergeyi de sildi");
-        Assert.False(animating, "halka hareket azaltma açıkken canlandı");
-        Assert.Equal(CountdownRing.FullTurn, sweep, 6);
-    }
-
     // ---- T73/K5: büyümüş panel pencereye sığar --------------------------------------
 
-    /// <summary>Fareyi panele sokup bekleme süresini doldurur; panel fareyle büyümüş olur.</summary>
+    /// <summary>Fareyi panele sokar; T79'dan beri büyüme aynı turda uygulanır.</summary>
     private static void HoverUntilRise(MainWindow window, ComparisonPanel panel)
     {
-        var clock = AtBand(window, panel);
+        AtBand(window, panel);
         panel.HoverPanel(true);
-        clock.Advance(clock.Delay);
         Settle(window);
         Assert.Equal(ShelterStage.Mid, panel.Shelter);
     }
@@ -809,27 +634,30 @@ public sealed class ComparisonPanelTests
         => window.TryFindResource(key, out var value) && value is TimeSpan span ? span : null;
 
     /// <summary>
-    /// T70/K6: dört gecikme de temadan geliyor, kodda çıplak sayı yok. Eski
-    /// <c>PlaybackDescendDelay</c> adı kaldırıldı — artık ne yaptığını söylemiyordu.
+    /// T79/K1, K2: panelin iki bekleme belirteci de temadan kalktı — sıfırlanmadı, silindi.
+    /// Geri sayımın üç ölçüsü de yok. Şeridin kendi iki süresi duruyor: onlar başka bir
+    /// kararın ölçüsü ve bu sözleşme onlara dokunmuyor.
     /// </summary>
     [Fact]
-    public void Gecikme_sureleri_temadan_gelir()
+    public void Kalkan_belirtecler_temada_yok()
     {
-        var (rise, fall, stripShow, stripHide, oldKey) = AppHost.Run(() =>
+        var (gone, stripShow, stripHide) = AppHost.Run(() =>
         {
             var window = new MainWindow();
-            return (Span(window, "PlaybackPanelRiseDelay"),
-                    Span(window, "PlaybackPanelFallDelay"),
+            var dead = new[]
+            {
+                "PlaybackPanelRiseDelay", "PlaybackPanelFallDelay", "PlaybackDescendDelay",
+                "PlaybackCountdownSize", "PlaybackCountdownRadius", "PlaybackCountdownStroke",
+                "PlaybackCountdown"
+            };
+            return (dead.Where(key => window.TryFindResource(key, out _)).ToArray(),
                     Span(window, "PlaybackStripShowDelay"),
-                    Span(window, "PlaybackStripHideDelay"),
-                    window.TryFindResource("PlaybackDescendDelay", out _));
+                    Span(window, "PlaybackStripHideDelay"));
         });
 
-        Assert.Equal(TimeSpan.FromSeconds(2), rise);
-        Assert.Equal(TimeSpan.Zero, fall);
+        Assert.Empty(gone);
         Assert.Equal(TimeSpan.Zero, stripShow);
         Assert.Equal(TimeSpan.FromMilliseconds(360), stripHide);
-        Assert.False(oldKey, "eski PlaybackDescendDelay adı hâlâ temada");
     }
 
     // ---- K3: köşe yarıçapı ----------------------------------------------------------
@@ -1001,6 +829,201 @@ public sealed class ComparisonPanelTests
         Assert.Equal(2 * ZoomGesture.NotchStep, chosen, 9);
         Assert.Equal(chosen, afterEnter, 9);
         Assert.Equal(chosen, afterExit, 9);
+    }
+
+    // ---- T79/K3: yakinlastirma dugmeleri paneli gercekten buyutur --------------------
+
+    /// <summary>
+    /// K3, asıl şikâyet. Düğmeye basmak için fare panelin üstünde olmak zorunda, yani panel
+    /// zaten fareyle büyümüş ve orta kademenin payına dayanmış durumda. Eskiden artı tuşu
+    /// bu noktada panelin boyunu değil yalnız yüzde okumasını oynatıyordu.
+    ///
+    /// Ölçü kademenin sınırını da pinliyor: yükseklik payda (<c>PlaybackMidShare</c>) asılı
+    /// duruyor — panel o eksende zaten tavanda — ama panel yine de büyüyor. Eksi aynı yoldan
+    /// geri getiriyor.
+    /// </summary>
+    [Fact]
+    public void Yakinlastirma_dugmesi_buyumus_paneli_de_buyutur()
+    {
+        var (risen, afterIn, afterOut, area, share) = Read((window, panel) =>
+        {
+            HoverUntilRise(window, panel);
+            var grown = panel.StageTarget;
+
+            var zoomIn = ZoomButton(window, "BtnZoomIn");
+            zoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Settle(window);
+            var bigger = panel.StageTarget;
+
+            var zoomOut = ZoomButton(window, "BtnZoomOut");
+            zoomOut.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Settle(window);
+
+            window.TryFindResource("PlaybackMidShare", out var value);
+            return (grown, bigger, panel.StageTarget, OverlayBounds(panel), (double)value!);
+        });
+
+        Assert.True(afterIn.Width > risen.Width + 1,
+            $"artı yutuldu: {risen.Width:0.#} -> {afterIn.Width:0.#}");
+        Assert.Equal(area.Height * share, risen.Height, 3);
+        Assert.Equal(risen.Height, afterIn.Height, 3);
+
+        Assert.True(afterOut.Width < afterIn.Width - 1,
+            $"eksi yutuldu: {afterIn.Width:0.#} -> {afterOut.Width:0.#}");
+        Assert.Equal(risen.Width, afterOut.Width, 3);
+    }
+
+    /// <summary>
+    /// K3'ün sınır yarısı: hiçbir dokunuş sessizce yutulmuyor. Panel fareyle büyümüş
+    /// hâlden başlayıp artı tuşuna tam kademeye varana kadar basılıyor ve <b>her</b> dokunuşun
+    /// boyu değiştirmesi şart koşuluyor.
+    ///
+    /// Düzeltmeden önce bu dizinin ortası dümdüzdü: iki eksen de paya dayandıktan sonra beş
+    /// dokunuş üst üste hiçbir şey yapmıyor, panel ancak onuncu dokunuşta tam kademeye
+    /// çıkıyordu. Dizinin son halkası pencerenin kendisi: kademe sınırı tuşu yutmuyor, geçiriyor.
+    /// </summary>
+    [Fact]
+    public void Hicbir_yakinlastirma_dokunusu_yutulmaz()
+    {
+        var (steps, stage, area) = Read((window, panel) =>
+        {
+            HoverUntilRise(window, panel);
+
+            var zoomIn = ZoomButton(window, "BtnZoomIn");
+            var seen = new List<Rect> { panel.StageTarget };
+
+            for (var i = 0; i < 12 && panel.Shelter != ShelterStage.Full; i++)
+            {
+                zoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Settle(window);
+                seen.Add(panel.StageTarget);
+            }
+
+            return (seen.ToArray(), panel.Shelter, OverlayBounds(panel));
+        });
+
+        for (var i = 1; i < steps.Length; i++)
+            Assert.True(steps[i].Width > steps[i - 1].Width + 1 || steps[i].Height > steps[i - 1].Height + 1,
+                $"{i}. dokunuş yutuldu: {steps[i - 1].Width:0.#}x{steps[i - 1].Height:0.#} -> " +
+                $"{steps[i].Width:0.#}x{steps[i].Height:0.#}");
+
+        Assert.Equal(ShelterStage.Full, stage);
+        Assert.Equal(area.Width, steps[^1].Width, 3);
+        Assert.Equal(area.Height, steps[^1].Height, 3);
+    }
+
+    /// <summary>
+    /// K3'ün üçüncü yarısı: düzeltme "her artı tam kademeye fırlatır" demiyor. Tam kademeden
+    /// bir eksi panel bandına değil orta kademeye iner ve panel pencereyi kaplamayı bırakır —
+    /// eskiden ilk eksi histerezis bandına düşüp hiçbir şey yapmıyordu.
+    /// </summary>
+    [Fact]
+    public void Tam_kademeden_bir_eksi_paneli_kucultur()
+    {
+        var (full, after, stage) = Read((window, panel) =>
+        {
+            WheelTo(window, panel, ShelterStage.Full);
+            var covered = panel.StageTarget;
+
+            var zoomOut = ZoomButton(window, "BtnZoomOut");
+            zoomOut.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Settle(window);
+
+            return (covered, panel.StageTarget, panel.Shelter);
+        });
+
+        Assert.Equal(ShelterStage.Mid, stage);
+        Assert.True(after.Height < full.Height - 1,
+            $"eksi yutuldu: {full.Height:0.#} -> {after.Height:0.#}");
+    }
+
+    // ---- T79/K4: bos onizlemenin arkasi saydam ---------------------------------------
+
+    /// <summary>
+    /// K4: kaynak yüklü değilken panonun zemini arkayı gösterir. Saydamlık kodda yazılmış
+    /// bir sayı değil: perdenin opaklığı <c>PlaybackIdleVeilOpacity</c> belirtecinin kendisi
+    /// ve o belirteç de ankanın çizildiği opaklıkla aynı kaynaktan geliyor. Kare geldiğinde
+    /// zemin yine örtücüdür; iki fırça aynı renk, tek fark opaklık.
+    ///
+    /// Örtü iki kat olduğu için ikisi de ölçülüyor: pano perdesi ile panelin kendi yüzeyi.
+    /// Yalnız pano saydamlaşsaydı kabuğun %90 örtücü zemini ankanın önünde kalırdı.
+    ///
+    /// Fırçaların kendisi dışarı taşınmıyor: Avalonia nesnelerinin özellikleri yalnız kendi iş
+    /// parçacığında okunabiliyor, bu yüzden karşılaştırma konakta yapılıp sayı dönüyor.
+    /// </summary>
+    [Fact]
+    public void Bos_onizlemenin_zemini_arkayi_gosterir()
+    {
+        var (idle, filled, veil, phoenix, sameColour, bareShell, filledShell) = Read((window, panel) =>
+        {
+            var empty = (ISolidColorBrush)panel.Stage.Background!;
+            var emptyOpacity = empty.Opacity;
+            var shellInk = ((ISolidColorBrush)panel.Shell.Background!).Color.A;
+
+            FakeFrame(panel);
+            var loaded = (ISolidColorBrush)panel.Stage.Background!;
+
+            window.TryFindResource("PlaybackIdleVeilOpacity", out var token);
+            window.TryFindResource("PhoenixOpacity", out var anka);
+            return (emptyOpacity, loaded.Opacity, (double)token!, (double)anka!, empty.Color == loaded.Color,
+                shellInk, ((ISolidColorBrush)panel.Shell.Background!).Color.A);
+        });
+
+        Assert.Equal(veil, idle, 6);
+        Assert.True(veil < 1, $"boş önizlemenin perdesi örtücü: {veil:0.###}");
+        Assert.Equal(phoenix, veil, 6);
+        Assert.Equal(1.0, filled, 6);
+        Assert.True(sameColour, "iki zemin aynı renk değil");
+
+        Assert.Equal(0, bareShell);
+        Assert.Equal(byte.MaxValue, filledShell);
+    }
+
+    // ---- T79/K5: paravan sekilleniyor ------------------------------------------------
+
+    /// <summary>
+    /// K5: paravan artık düz bir örtü değil. Seçilen biçim kenar sönümü: örtü altından
+    /// yukarı doğru son çeyreğinde aynı rengin sıfır örtücülüklü haline geçiyor. Ölçü
+    /// biçimin sayısını pinliyor: sönen çeyreğin başladığı durak <c>1 - PlaybackScrimEdge</c>,
+    /// ve o oran panelin tek band payı oranıyla (<c>PlaybackHoverZoneShare</c>) aynı saydır —
+    /// yeni bir oran uydurulmadı. Biçimin yüzeye gerçekten geçtiği de ölçülüyor: şeridin
+    /// örtüsü bu fırçanın kendisidir.
+    /// </summary>
+    [Fact]
+    public void Paravanin_kenari_soner()
+    {
+        var (onStrip, start, end, offsets, colours, edge, zone, solid) = Read((window, panel) =>
+        {
+            var brush = (LinearGradientBrush)window.FindResource("PlaybackScrimVeil")!;
+            window.TryFindResource("PlaybackScrimEdge", out var share);
+            window.TryFindResource("PlaybackHoverZoneShare", out var band);
+            window.TryFindResource("PlaybackScrimColor", out var opaque);
+
+            return (ReferenceEquals(brush, panel.Controls.Bar.Background),
+                brush.StartPoint,
+                brush.EndPoint,
+                brush.GradientStops.Select(stop => stop.Offset).ToArray(),
+                brush.GradientStops.Select(stop => stop.Color).ToArray(),
+                (double)share!,
+                (double)band!,
+                (Color)opaque!);
+        });
+
+        Assert.True(onStrip, "şeridin örtüsü biçimli paravan değil");
+
+        // Aşağıdan yukarı: örtücü taban şeridin metninin altında, sönen uç üst kenarda.
+        Assert.Equal(new RelativePoint(0.5, 1, RelativeUnit.Relative), start);
+        Assert.Equal(new RelativePoint(0.5, 0, RelativeUnit.Relative), end);
+
+        Assert.Equal(new[] { 0, 1 - edge, 1 }, offsets);
+        Assert.Equal(edge, zone, 6);
+
+        Assert.Equal(solid, colours[0]);
+        Assert.Equal(solid, colours[1]);
+
+        // Sönen uç aynı renk: değişen tek şey örtücülük, kenarda ikinci bir renk yok.
+        Assert.Equal(0, colours[2].A);
+        Assert.Equal((solid.R, solid.G, solid.B), (colours[2].R, colours[2].G, colours[2].B));
     }
 
     // ---- T49: yaklasik onizleme rozeti ----------------------------------------------
