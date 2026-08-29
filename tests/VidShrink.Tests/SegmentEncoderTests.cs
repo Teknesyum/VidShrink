@@ -230,7 +230,7 @@ public sealed class SegmentEncoderTests : IClassFixture<SegmentClips>
     }
 
     /// <summary>
-    /// K1 sure olcumu: 1080p kaynakta 2 sn'lik pencerenin iki dosyasi kac ms'te cikiyor.
+    /// K1 sure olcumu: 1080p kaynakta 5 sn'lik pencerenin iki dosyasi kac ms'te cikiyor.
     /// Sayi rapora ham haliyle giriyor, bu yuzden olcum dosyaya da yazilir.
     /// </summary>
     [FfmpegFact]
@@ -249,7 +249,7 @@ public sealed class SegmentEncoderTests : IClassFixture<SegmentClips>
             runs.Add(clip!.Elapsed.TotalMilliseconds);
         }
 
-        Record("K1 1080p 2 sn pencere, ms: " + string.Join(" ", runs.Select(ms => ms.ToString("0"))));
+        Record("K1 1080p 5 sn pencere, ms: " + string.Join(" ", runs.Select(ms => ms.ToString("0"))));
         Assert.All(runs, ms => Assert.True(ms > 0));
     }
 

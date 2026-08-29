@@ -35,10 +35,10 @@ public sealed record PreviewQualityChoice(PreviewQuality Kind, double? Crf);
 public sealed record PreviewSegment
 {
     /// <summary>
-    /// Parcanin sure tavani. Prob pencereleriyle ayni uzunluk: 2 sn'lik pencere hem sahneyi
-    /// temsil edecek kadar uzun hem de kullaniciyi bekletmeyecek kadar kisa.
+    /// Parcanin sure tavani. Prob pencerelerinden uzun: 5 sn'lik pencere kullaniciya sahnenin
+    /// devamini gosterir, 2 sn'lik pencere karsilastirma icin yeterli gelmiyordu.
     /// </summary>
-    public const double WindowSeconds = 2.0;
+    public const double WindowSeconds = 5.0;
 
     /// <summary>
     /// Kalite olcegi modellenen kodlayicilar. <see cref="CodecModel.ReferenceCrf"/> ve

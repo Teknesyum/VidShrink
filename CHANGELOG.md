@@ -5,6 +5,30 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.2.4] - 2026-08-30
+
+### Changed
+
+- **The phoenix behind the workspace was redrawn.** It used to be a handful of flat
+  slices; it is now built from layered feathers whose edges undulate along their length
+  and split into uneven fringes at the tip, with irregular embers drifting up from the
+  body and a soft radial glow that no longer shows a hard rim. The wings are spread
+  rather than folded, and the two sides are no longer mirror images of each other. The
+  palette did not grow: the glow and the embers are opacity variations of the nine
+  existing ember tokens, and the worst-case body-text contrast stays above 4.5:1.
+- **The preview now runs five seconds ahead instead of two.** Two seconds was too short
+  to judge a scene against its compressed twin.
+- **Hovering the preview panel grows it immediately and shrinks it as soon as the pointer
+  leaves.** The two-second delay and the circular countdown that visualised it are gone.
+- **The zoom buttons always change the panel size.** On a panel already grown by hover,
+  the height had been pinned at its ceiling from the first moment, so presses past a
+  certain point changed nothing at all. A notch on a promoted panel now always moves.
+- **An empty preview panel is transparent.** Both of the veils that used to sit over the
+  backdrop while no frame was present are lifted, so the phoenix shows through; they come
+  back the moment a frame arrives.
+- The scrim inside the panel fades out towards its top edge instead of ending in a
+  straight line.
+
 ## [0.2.3] - 2026-08-29
 
 ### Fixed

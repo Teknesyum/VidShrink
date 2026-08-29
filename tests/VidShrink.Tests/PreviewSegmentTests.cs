@@ -41,6 +41,24 @@ public sealed class PreviewSegmentTests
     }
 
     [Fact]
+    public void Pencere_en_az_bes_saniye_ilerisini_gosterir()
+    {
+        Assert.True(
+            PreviewSegment.WindowSeconds >= 5.0,
+            $"Onizleme penceresi {PreviewSegment.WindowSeconds:0.###} sn; en az 5 sn olmali.");
+
+        var segment = PreviewSegment.For(Source(durationSeconds: 60), TwoPassPlan(), 10, "ornek.mp4");
+
+        Assert.True(
+            segment.DurationSeconds >= 5.0,
+            $"Parca {segment.DurationSeconds:0.###} sn kodlaniyor.");
+        Assert.Contains("-t", segment.Arguments);
+        Assert.Contains(
+            PreviewSegment.WindowSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture),
+            segment.Arguments);
+    }
+
+    [Fact]
     public void Varsayilan_sure_pencere_tavani_kadar()
     {
         var segment = PreviewSegment.For(Source(), TwoPassPlan(), 10, "ornek.mp4");

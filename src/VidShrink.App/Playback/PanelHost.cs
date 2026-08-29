@@ -674,7 +674,7 @@ internal sealed class PanelHost : IDisposable
         _submitted++;
         var clip = ActiveClip;
         // Parça modunda boru penceresinin sıfırından akıyor; şerit kaynağın kendi eksenini
-        // gösterir, yoksa 2 sn'lik pencere bütün videoymuş gibi görünürdü.
+        // gösterir, yoksa 5 sn'lik pencere bütün videoymuş gibi görünürdü.
         _panel.Controls.Position = clip is null
             ? position
             : position + TimeSpan.FromSeconds(clip.StartSeconds);
