@@ -15,6 +15,9 @@ public sealed class ThemeBackdropTests
 {
     private const double Canvas = 1600.0 * 1000.0;
 
+    /// <summary>WCAG AA'nın gövde metni için istediği en düşük kontrast oranı.</summary>
+    private const double BodyTextAaThreshold = 4.5;
+
     private static readonly XNamespace Ui = "https://github.com/avaloniaui";
     private static readonly XNamespace X = "http://schemas.microsoft.com/winfx/2006/xaml";
 
@@ -96,10 +99,29 @@ public sealed class ThemeBackdropTests
         return stops.Min(stop => Contrast(body, stop));
     }
 
-    private static IReadOnlyList<string> PhoenixGeometries() => Resource("WorkspaceBackground")
+    private static IEnumerable<XElement> PhoenixDrawings() => Resource("WorkspaceBackground")
         .Descendants(Ui + "DrawingGroup")
         .Single(group => group.Attribute("Opacity") is not null)
-        .Descendants(Ui + "GeometryDrawing")
+        .Descendants(Ui + "GeometryDrawing");
+
+    /// <summary>Ankayı boyayan fırçaların anahtarları; liste çizimden okunur, elle sayılmaz.</summary>
+    private static IReadOnlyList<string> PhoenixBrushKeys() => PhoenixDrawings()
+        .Select(drawing => ((string)drawing.Attribute("Brush")!).Trim())
+        .Select(brush => brush.Replace("{StaticResource", string.Empty).Trim(' ', '}'))
+        .Distinct()
+        .ToList();
+
+    /// <summary>
+    /// Alev rampasının belirteçten gelen durakları. Saydama giden son duraklar
+    /// atlanır: onlar zemini açmaz, kapatır.
+    /// </summary>
+    private static IEnumerable<string> PhoenixFlameColours() => PhoenixBrushKeys()
+        .SelectMany(key => Resource(key).Elements(Ui + "GradientStop"))
+        .Select(stop => ((string)stop.Attribute("Color")!).Trim())
+        .Where(colour => colour.StartsWith("{StaticResource", StringComparison.Ordinal))
+        .Select(colour => Token(colour.Replace("{StaticResource", string.Empty).Trim(' ', '}')));
+
+    private static IReadOnlyList<string> PhoenixGeometries() => PhoenixDrawings()
         .Select(drawing => (string)drawing.Attribute("Geometry")!)
         .ToList();
 
@@ -178,24 +200,30 @@ public sealed class ThemeBackdropTests
     }
 
     /// <summary>
-    /// K1+K3: silüetin üstünde de kontrast korunuyor. En kötü hâl, silüetin çalışma
-    /// alanının en açık durağı üzerine düştüğü nokta.
+    /// K1+K3: silüetin üstünde de kontrast korunuyor. En kötü hâl, alev rampasının
+    /// en parlak durağının çalışma alanının en açık durağı üzerine düştüğü nokta.
+    /// <para>
+    /// Eşik artık T55'ten kalan arka plan tabanı değil, WCAG AA gövde metni eşiği.
+    /// O taban bir okunabilirlik kararı değildi; ısıtmadan önceki arka planın
+    /// rastgele kalmış hâliydi ve ankayı görünür kılan her ayarı, metin fazlasıyla
+    /// okunaklı kalsa bile reddediyordu.
+    /// </para>
     /// </summary>
     [Fact]
     public void BodyTextStaysReadableOverThePhoenix()
     {
         var opacity = double.Parse(Token("PhoenixOpacity"), CultureInfo.InvariantCulture);
-        var ember = Token("NeonEmberColor");
         var body = Token("TextBodyColor");
 
-        var lightest = StopColours("WorkspaceGradient").MaxBy(Luminance)!;
-        var over = Blend(ember, lightest, opacity);
+        var lightestFlame = PhoenixFlameColours().MaxBy(Luminance)!;
+        var lightestGround = StopColours("WorkspaceGradient").MaxBy(Luminance)!;
+        var over = Blend(lightestFlame, lightestGround, opacity);
 
-        var before = WorstContrast(BaselineWorkspaceStops);
-        var after = Contrast(body, over);
+        var ratio = Contrast(body, over);
 
-        Assert.True(after >= before,
-            $"Silüetin üstünde kontrast {before:F2} → {after:F2} düştü ({over}).");
+        Assert.True(ratio >= BodyTextAaThreshold,
+            $"Alevin en parlak noktası {over} üstünde kontrast {ratio:F2}:1, "
+            + $"WCAG AA eşiği {BodyTextAaThreshold}:1.");
     }
 
     /// <summary>
