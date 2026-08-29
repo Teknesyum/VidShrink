@@ -8,6 +8,11 @@ namespace VidShrink.Launcher;
 /// Sessiz fark güncellemesi. Manifest tek başına çekilir, yalnız özeti tutmayan dosyalar
 /// arşivden aralık isteğiyle indirilir, hepsi doğrulandıktan sonra uygulama klasörüne
 /// geçer. Hiçbir hata açılışı engellemez.
+///
+/// Manifestin <c>launcher</c> alanı kurulum kökündeki başlatıcıyı da sayar; o satırlar
+/// kendi arşivinden inip <see cref="LauncherUpdate"/> üzerinden yerine geçer. Uygulama
+/// dosyaları önce yerleşir, başlatıcı en son değişir: sıra tersine dönerse yeni başlatıcı
+/// eski uygulamayı açar.
 /// </summary>
 internal static class Updater
 {
@@ -40,15 +45,18 @@ internal static class Updater
         var manifest = UpdateCheck.ParseManifest(json);
         if (manifest.Files.Count == 0) return;
 
-        // Aynı sürüm zaten uygulanmışsa hiçbir dosya özetlenmez.
-        if (UpdateCheck.AlreadyCurrent(appDirectory, manifest)) return;
+        // Aynı sürüm zaten uygulanmışsa hiçbir dosya özetlenmez. Kapı başlatıcının
+        // sürümüne de bakıyor; yoksa geride kalan bir başlatıcı hiç fark edilmiyor.
+        if (UpdateCheck.AlreadyCurrent(baseDirectory, appDirectory, manifest)) return;
 
         var cache = new HashCache(Path.Combine(appDirectory, HashCacheName));
         var changed = UpdateCheck.Diff(appDirectory, manifest, cache);
+        var launcherChanged = UpdateCheck.Diff(baseDirectory, manifest.Launcher, cache);
         cache.Save();
-        if (changed.Count == 0)
+        if (changed.Count == 0 && launcherChanged.Count == 0)
         {
             UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
+            LauncherUpdate.WriteVersionMarker(baseDirectory, manifest.Version);
             return;
         }
 
@@ -57,22 +65,22 @@ internal static class Updater
 
         try
         {
-            var archive = await RemoteZip.OpenAsync(ArchiveSource(rid, source), cancellationToken);
-            foreach (var file in changed)
+            if (changed.Count > 0)
             {
-                var entry = archive.Resolve(file.Path)
-                    ?? throw new FileNotFoundException($"Arşivde yok: {file.Path}");
-                var bytes = await archive.ExtractAsync(entry, cancellationToken);
-
-                // İnen her dosyanın özeti manifesttekiyle karşılaştırılır; tutmayan atılır.
-                if (!string.Equals(UpdateCheck.HashBytes(bytes), file.Sha256, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidDataException($"İnen dosyanın özeti tutmadı: {file.Path}");
-
-                var target = UpdateCheck.LocalPath(stage, file.Path);
-                var folder = Path.GetDirectoryName(target);
-                if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-                await File.WriteAllBytesAsync(target, bytes, cancellationToken);
+                var archive = await RemoteZip.OpenAsync(ArchiveSource(rid, source), cancellationToken);
+                foreach (var file in changed)
+                    await StageFileAsync(archive, file, UpdateCheck.LocalPath(stage, file.Path), cancellationToken);
             }
+
+            if (launcherChanged.Count > 0)
+            {
+                var archive = await RemoteZip.OpenAsync(LauncherArchiveSource(rid, source), cancellationToken);
+                foreach (var file in launcherChanged)
+                    await StageFileAsync(archive, file, LauncherUpdate.StagePath(stage, file.Path), cancellationToken);
+            }
+
+            // Başlatıcı yan klasörden çıkarılıyor: bir alttaki Apply yan klasörü siliyor.
+            LauncherUpdate.Stage(stage, baseDirectory, launcherChanged);
         }
         catch (Exception)
         {
@@ -80,8 +88,27 @@ internal static class Updater
             throw;
         }
 
-        UpdateStage.Apply(stage, appDirectory, changed);
+        if (changed.Count > 0) UpdateStage.Apply(stage, appDirectory, changed);
+        else UpdateStage.Discard(stage);
         UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
+
+        if (launcherChanged.Count > 0) LauncherUpdate.Apply(baseDirectory, launcherChanged, manifest.Version);
+        else LauncherUpdate.WriteVersionMarker(baseDirectory, manifest.Version);
+    }
+
+    private static async Task StageFileAsync(RemoteZip archive, ManifestFile file, string target, CancellationToken cancellationToken)
+    {
+        var entry = archive.Resolve(file.Path)
+            ?? throw new FileNotFoundException($"Arşivde yok: {file.Path}");
+        var bytes = await archive.ExtractAsync(entry, cancellationToken);
+
+        // İnen her dosyanın özeti manifesttekiyle karşılaştırılır; tutmayan atılır.
+        if (!string.Equals(UpdateCheck.HashBytes(bytes), file.Sha256, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException($"İnen dosyanın özeti tutmadı: {file.Path}");
+
+        var folder = Path.GetDirectoryName(target);
+        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+        await File.WriteAllBytesAsync(target, bytes, cancellationToken);
     }
 
     private static async Task<string?> FetchManifestAsync(string rid, string? source, CancellationToken cancellationToken)
@@ -96,9 +123,14 @@ internal static class Updater
         return await UpdateCheck.FetchManifestAsync(AssetUrl(asset), cancellationToken);
     }
 
-    private static IRangeSource ArchiveSource(string rid, string? source)
+    private static IRangeSource ArchiveSource(string rid, string? source) =>
+        Source(UpdateCheck.ArchiveAssetName(rid), source);
+
+    private static IRangeSource LauncherArchiveSource(string rid, string? source) =>
+        Source(UpdateCheck.LauncherArchiveAssetName(rid), source);
+
+    private static IRangeSource Source(string asset, string? source)
     {
-        var asset = UpdateCheck.ArchiveAssetName(rid);
         if (source is not null) return new FileRangeSource(Path.Combine(source, asset));
         return new HttpRangeSource(AssetUrl(asset));
     }

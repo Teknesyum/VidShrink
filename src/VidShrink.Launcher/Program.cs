@@ -6,9 +6,13 @@ namespace VidShrink.Launcher;
 
 /// <summary>
 /// Kısayolun gösterdiği program. Windows'ta çalışan bir exe ve yüklü dll'ler üzerine
-/// yazılamadığı için güncelleme, uygulama yüklenmeden önce burada uygulanır.
-/// Başlatıcı kendini asla güncellemez ve sabit bir sözleşmeyi yürütür: manifesti çek,
-/// farkı app klasörüne uygula, uygulamayı başlat, çık.
+/// yazılamadığı için güncelleme, uygulama yüklenmeden önce burada uygulanır. Sabit bir
+/// sözleşme yürütülür: yarım kalan başlatıcı değişimini topla, manifesti çek, farkı app
+/// klasörüne uygula, gerekiyorsa başlatıcının kendisini değiştir, uygulamayı başlat, çık.
+///
+/// Başlatıcı kendini de günceller. Kendi dosyasının üstüne yazamaz — çalışan görüntüdür —
+/// ama adını değiştirebilir; değişimin adımları ve yarım kalma halleri
+/// <see cref="LauncherUpdate"/> içinde.
 /// </summary>
 internal static class Program
 {
@@ -38,6 +42,17 @@ internal static class Program
         // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
         using (SplashGate.Arm(() => Status(baseDirectory)))
         {
+            // Başlatıcının kendi değişimi yarım kaldıysa önce o toplanır: ayar kapalı olsa
+            // bile, çünkü burada eksik kalan şey kısayolun gösterdiği dosyanın kendisi.
+            // Artık .old adı da burada silinir.
+            try { LauncherUpdate.Repair(baseDirectory); }
+            catch (Exception) { }
+
+            // Kurulumdan sonraki ilk açılış: kurulu başlatıcının sürümü çalışan ikiliden
+            // okunur, sonraki turlarda işareti değişimin kendisi yazar.
+            try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
+            catch (Exception) { }
+
             // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
             try { UpdateStage.ResumePending(appDirectory); }
             catch (Exception) { }
