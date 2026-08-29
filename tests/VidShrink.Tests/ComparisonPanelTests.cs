@@ -422,6 +422,7 @@ public sealed class ComparisonPanelTests
         var (armed, closing, afterwards, stage) = Read((host, panel) =>
         {
             var clock = AtBand(host, panel);
+            panel.MotionReduced = false;
 
             panel.HoverPanel(true);
             var shown = panel.RiseCountdown.IsVisible;
