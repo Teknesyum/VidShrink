@@ -1,7 +1,31 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const D = require('C:/Users/Administrator/.claude/plugins/marketplaces/teknesyum/teknesyum/hooks/denetim-kaydi.js');
+const D = require(cozumle('denetim-kaydi.js'));
+
+function cozumle(ad) {
+  const kokler = [
+    path.join(process.env.USERPROFILE || process.env.HOME, '.claude', 'plugins', 'cache', 'teknesyum', 'teknesyum'),
+    path.join(process.env.USERPROFILE || process.env.HOME, '.claude', 'plugins', 'marketplaces', 'teknesyum', 'teknesyum')
+  ];
+  for (const kok of kokler) {
+    if (!fs.existsSync(kok)) continue;
+    const dogrudan = path.join(kok, 'hooks', ad);
+    if (fs.existsSync(dogrudan)) return dogrudan;
+    const surumler = fs.readdirSync(kok).filter(s => /^\d+\.\d+\.\d+$/.test(s)).sort(karsilastir).reverse();
+    for (const surum of surumler) {
+      const aday = path.join(kok, surum, 'hooks', ad);
+      if (fs.existsSync(aday)) return aday;
+    }
+  }
+  throw new Error(ad + ' bulunamadi: teknesyum eklentisi kurulu mu?');
+}
+
+function karsilastir(a, b) {
+  const x = a.split('.').map(Number), y = b.split('.').map(Number);
+  for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] - y[i];
+  return 0;
+}
 
 const kok = process.cwd();
 const relay = path.join(kok, '.claude', 'relay');
