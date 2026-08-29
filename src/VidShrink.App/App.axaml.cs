@@ -11,6 +11,14 @@ namespace VidShrink.App;
 
 public partial class App : Application
 {
+    private readonly string? _startupFile;
+
+    public App() : this(null)
+    {
+    }
+
+    public App(string? startupFile) => _startupFile = startupFile;
+
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
@@ -19,7 +27,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var window = new MainWindow { Icon = LoadAppIcon() };
+            var window = new MainWindow(_startupFile) { Icon = LoadAppIcon() };
             desktop.MainWindow = window;
         }
 

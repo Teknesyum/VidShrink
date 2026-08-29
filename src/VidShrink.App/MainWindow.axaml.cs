@@ -56,12 +56,6 @@ public partial class MainWindow : Window
     private const string HardwareTipEnglish = "• Graphics cards encode many times faster than the CPU.\n• VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.";
     private const string NoHardwareTipEnglish = "• No usable hardware encoder was found on this computer, so fast shrink is unavailable.\n• The graphics card would normally encode many times faster than the CPU.";
 
-    private static readonly string[] MediaExtensions =
-    {
-        "mp4", "mkv", "mov", "avi", "webm", "wmv", "flv", "m4v", "mpg", "mpeg", "ts", "m2ts",
-        "3gp", "ogv", "vob", "asf", "rm", "rmvb", "divx", "mxf", "f4v", "mts", "dav", "gif"
-    };
-
     private static readonly ConversionPlan ConversionDefaults = new();
 
     private static readonly MediaInfo HardwareProbeSource = new()
@@ -116,10 +110,17 @@ public partial class MainWindow : Window
     private ShareFlow? _shareFlow;
     private PanelHost? _preview;
 
+    private readonly string? _startupFile;
+
     private EncodePlan? ActivePlan => _aiPlan ?? _autoPlan;
 
-    public MainWindow()
+    public MainWindow() : this(null)
     {
+    }
+
+    public MainWindow(string? startupFile)
+    {
+        _startupFile = startupFile;
         InitializeComponent();
         _controlsReady = true;
 
@@ -378,8 +379,7 @@ public partial class MainWindow : Window
             InitializeUpdateUi();
             _ = CheckForUpdateAsync();
             PlayPanelEntrance();
-            var startupFile = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(File.Exists);
-            if (startupFile is not null) await LoadAsync(startupFile);
+            await LoadStartupFileAsync();
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }
@@ -1175,7 +1175,7 @@ public partial class MainWindow : Window
                 AllowMultiple = false,
                 FileTypeFilter = new[]
                 {
-                    new FilePickerFileType("Media") { Patterns = MediaExtensions.Select(extension => "*." + extension).ToArray() },
+                    new FilePickerFileType("Media") { Patterns = ShellIntegration.MediaExtensions.Select(extension => "*." + extension).ToArray() },
                     FilePickerFileTypes.All
                 }
             });
@@ -1287,6 +1287,13 @@ public partial class MainWindow : Window
         ApplyLoaded(path, probed);
         await MeasureComplexityAsync(probed);
     }
+
+    /// <summary>
+    /// Komut satırından gelen yolu, sürükle-bırakın kullandığı yükleyiciden geçirir.
+    /// Yol yoksa hiçbir şey yapmaz; kötü dosyanın hatasını o yükleyici bildirir.
+    /// </summary>
+    internal Task LoadStartupFileAsync()
+        => _startupFile is null ? Task.CompletedTask : LoadAsync(_startupFile);
 
     /// <summary>
     /// Açılış ölçümü için yoklamayı elle başlatır. <c>OnWindowLoaded</c> yalnız gerçek
