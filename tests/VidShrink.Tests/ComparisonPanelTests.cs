@@ -19,9 +19,11 @@ namespace VidShrink.Tests;
 /// yerleşimi elle koşturuyor. Ekranda hiçbir şey açılmıyor.
 ///
 /// Zamanlayıcılar burada tik atmaz: bu iş parçacığında ileti döngüsü yok, dolayısıyla
-/// <see cref="DispatcherTimer"/> ateşlenmez. Bu yüzden iki saniyelik bekleme duvar
-/// saatiyle değil, sayacın kendi karar kapısı (<see cref="HoverZone.ShouldHide"/>) ve
-/// zaman aşımının çağırdığı yol (<see cref="ComparisonPanel.Descend"/>) üstünden ölçülüyor.
+/// <see cref="DispatcherTimer"/> ateşlenmez. Bu yüzden bekleme duvar saatiyle değil,
+/// <see cref="HoverZone.Clock"/> yerine takılan sahte saatle (<see cref="FakeClock"/>)
+/// sürülüyor; sayacın kendi karar kapıları (<see cref="HoverZone.ShouldHide"/>,
+/// <see cref="HoverZone.ShouldShow"/>) de doğrudan okunabiliyor. Hiçbir ölçümde
+/// <c>Thread.Sleep</c> yok (T70/K7).
 /// </summary>
 public sealed class ComparisonPanelTests
 {
@@ -210,48 +212,202 @@ public sealed class ComparisonPanelTests
         Assert.True(window.Width > 0);
     }
 
-    [Fact]
-    public void Cik_gir_cik_dizisinde_panel_inip_kalkmaz()
+    /// <summary>
+    /// T70/K7: bekleme süresini duvar saati olmadan süren sahte saat. Gerçek zamanlayıcı bu
+    /// iş parçacığında zaten tik atmaz (ileti döngüsü yok); ölçüm süreyi kendi ilerletir,
+    /// yani hiçbir ölçüm <c>Thread.Sleep</c> beklemiyor.
+    /// </summary>
+    private sealed class FakeClock : IHoverClock
     {
-        var (stale, current, staleDecides, currentDecides, stage) = Read((host, panel) =>
+        private Action? _fire;
+
+        /// <summary>Sayaca sorulan süre. Belirtecin koda ulaştığını bu gösterir.</summary>
+        public TimeSpan Delay { get; private set; }
+
+        public TimeSpan Remaining { get; private set; }
+
+        /// <summary>Bekleyen bir tik var mı. Yoksa karar beklemeden verilmiştir.</summary>
+        public bool Pending => _fire is not null;
+
+        public void Start(TimeSpan delay, Action fire)
+        {
+            Delay = delay;
+            Remaining = delay;
+            _fire = fire;
+        }
+
+        public void Stop() => _fire = null;
+
+        public void Advance(TimeSpan step)
+        {
+            if (_fire is null) return;
+            Remaining -= step;
+            if (Remaining > TimeSpan.Zero) return;
+            var fire = _fire;
+            _fire = null;
+            fire();
+        }
+    }
+
+    /// <summary>Paneli tabana indirir ve büyüme sayacına sahte saat takar.</summary>
+    private static FakeClock AtBand(MainWindow window, ComparisonPanel panel)
+    {
+        panel.Descend();
+        Settle(window);
+
+        var clock = new FakeClock();
+        panel.Descent.Clock = clock;
+        return clock;
+    }
+
+    private static double PanelScale(ComparisonPanel panel) => Math.Round(panel.Gesture.PanelScale, 9);
+
+    /// <summary>
+    /// T70/K1: fare çekildiği an panel küçülür. Sahte saat hiç ilerletilmiyor ve panel yine
+    /// de bandına dönüyor; üstelik küçültme için bir tik bile kurulmuyor.
+    /// </summary>
+    [Fact]
+    public void Fare_cekilince_panel_beklemeden_kuculur()
+    {
+        var (stage, scale, pending) = Read((host, panel) =>
         {
             WheelTo(host, panel, ShelterStage.Mid);
-            var target = panel.StageTarget;
-            var outside = new Point(target.X / 2, target.Y / 2);
 
-            panel.TrackPointer(outside);
-            var first = panel.Descent.Generation;
+            var clock = new FakeClock();
+            panel.Descent.Clock = clock;
 
-            panel.TrackPointer(target.Center);
-            panel.TrackPointer(outside);
-            var second = panel.Descent.Generation;
+            panel.TrackPointer(panel.StageTarget.Center);
+            panel.PointerLeftWindow();
 
-            return (first, second, panel.Descent.ShouldHide(first), panel.Descent.ShouldHide(second), panel.Shelter);
+            return (panel.Shelter, PanelScale(panel), clock.Pending);
         });
 
-        Assert.True(current > stale, $"kuşak ilerlemedi: {stale} -> {current}");
-        Assert.False(staleDecides);
-        Assert.True(currentDecides);
+        Assert.Equal(ShelterStage.Band, stage);
+        Assert.Equal(1.0, scale);
+        Assert.False(pending, "küçülme için bekleme sayacı kuruldu");
+    }
+
+    /// <summary>
+    /// T70/K2: süre dolmadan çıkan fare paneli hiç büyütmez. Giriş sayacı kurar, çıkış onu
+    /// iptal eder; saat sonuna kadar ilerletilse de bekleyen tik kalmamıştır.
+    /// </summary>
+    [Fact]
+    public void Sure_dolmadan_cikan_fare_paneli_buyutmez()
+    {
+        var (armed, asked, stage, scale, promoted) = Read((host, panel) =>
+        {
+            var clock = AtBand(host, panel);
+
+            panel.HoverPanel(true);
+            var wasArmed = clock.Pending;
+            var delay = clock.Delay;
+
+            clock.Advance(TimeSpan.FromMilliseconds(1900));
+            panel.HoverPanel(false);
+            clock.Advance(TimeSpan.FromSeconds(5));
+            Settle(host);
+
+            return (wasArmed, delay, panel.Shelter, PanelScale(panel), panel.IsPromoted);
+        });
+
+        Assert.True(armed, "giriş büyüme sayacını kurmadı");
+        Assert.Equal(TimeSpan.FromSeconds(2), asked);
+        Assert.Equal(ShelterStage.Band, stage);
+        Assert.Equal(1.0, scale);
+        Assert.False(promoted, "süre dolmadan panel terfi etti");
+    }
+
+    /// <summary>
+    /// T70/K3: fare iki saniye üstünde kalırsa panel büyür. Son milisaniyeden önce ölçek
+    /// tabandadır; süre dolunca panel belirtecin söylediği kata çıkar ve terfi eder.
+    /// </summary>
+    [Fact]
+    public void Fare_iki_saniye_kalirsa_panel_buyur()
+    {
+        var (wanted, early, grown, stage) = Read((host, panel) =>
+        {
+            var clock = AtBand(host, panel);
+            host.TryFindResource("PlaybackHoverZoom", out var token);
+
+            panel.HoverPanel(true);
+            clock.Advance(TimeSpan.FromMilliseconds(1999));
+            var beforeDeadline = PanelScale(panel);
+
+            clock.Advance(TimeSpan.FromMilliseconds(1));
+            Settle(host);
+
+            return ((double)token!, beforeDeadline, PanelScale(panel), panel.Shelter);
+        });
+
+        Assert.Equal(1.0, early);
+        Assert.Equal(wanted, grown);
         Assert.Equal(ShelterStage.Mid, stage);
     }
 
+    /// <summary>
+    /// T70/K4: çıkıp geri giren fare sayacı baştan başlatır. İlk turdan 1,5 saniye artık
+    /// kalsaydı ikinci turun 1,5 saniyesi paneli büyütürdü; büyümüyor, kalan yarım saniye
+    /// dolunca büyüyor.
+    /// </summary>
     [Fact]
-    public void Fare_geri_girince_bekleyen_inis_kararini_uygulamaz()
+    public void Cikip_geri_giren_fare_sayaci_bastan_baslatir()
     {
-        var (stale, holds) = Read((host, panel) =>
+        var (halfway, restarted, grown) = Read((host, panel) =>
         {
-            WheelTo(host, panel, ShelterStage.Mid);
-            var target = panel.StageTarget;
+            var clock = AtBand(host, panel);
 
-            panel.TrackPointer(new Point(target.X / 2, target.Y / 2));
-            var pending = panel.Descent.Generation;
+            panel.HoverPanel(true);
+            clock.Advance(TimeSpan.FromMilliseconds(1500));
+            panel.HoverPanel(false);
 
-            panel.TrackPointer(target.Center);
-            return (panel.Descent.ShouldHide(pending), panel.Shelter == ShelterStage.Mid);
+            panel.HoverPanel(true);
+            var asked = clock.Delay;
+            clock.Advance(TimeSpan.FromMilliseconds(1500));
+            var stillDown = panel.Shelter;
+
+            clock.Advance(TimeSpan.FromMilliseconds(500));
+            Settle(host);
+
+            return (stillDown, asked, panel.Shelter);
         });
 
-        Assert.False(stale);
-        Assert.True(holds);
+        Assert.Equal(ShelterStage.Band, halfway);
+        Assert.Equal(TimeSpan.FromSeconds(2), restarted);
+        Assert.Equal(ShelterStage.Mid, grown);
+    }
+
+    /// <summary>
+    /// T70/K5: denetim şeridi değişmedi. Gösterme beklemez — sayaç kurulmadan şerit açılır;
+    /// gizleme kendi belirtecinin söylediği 360 ms'yi bekler.
+    /// </summary>
+    [Fact]
+    public void Serit_gostermede_beklemez_gizlemede_bekler()
+    {
+        var (shown, armedOnShow, heldOpen, hideDelay, hidden) = Read((host, panel) =>
+        {
+            var zone = panel.Controls.Zone;
+            zone.Reset(false);
+
+            var clock = new FakeClock();
+            zone.Clock = clock;
+
+            zone.PointerWithin(true);
+            var open = zone.IsVisible;
+            var pendingOnShow = clock.Pending;
+
+            zone.PointerWithin(false);
+            var stillOpen = zone.IsVisible;
+            var asked = clock.Delay;
+
+            clock.Advance(asked);
+            return (open, pendingOnShow, stillOpen, asked, zone.IsVisible);
+        });
+
+        Assert.True(shown, "şerit gösterme için bekledi");
+        Assert.False(armedOnShow, "gösterme sayaç kurdu");
+        Assert.True(heldOpen, "şerit beklemeden gizlendi");
+        Assert.Equal(TimeSpan.FromMilliseconds(360), hideDelay);
+        Assert.False(hidden, "şerit gecikme dolunca gizlenmedi");
     }
 
     [Fact]
@@ -278,8 +434,12 @@ public sealed class ComparisonPanelTests
         Assert.Equal(ShelterStage.Band, afterOneNotch);
     }
 
+    /// <summary>
+    /// T70: pencerenin kendi çıkış olayı paneli indirir. Eskiden bu olay yalnız sayacı
+    /// kurardı; küçülme artık beklemesiz olduğu için panel aynı turda bandına döner.
+    /// </summary>
     [Fact]
-    public void Fare_pencereden_cikinca_inis_sayaci_kurulur()
+    public void Fare_pencereden_cikinca_panel_iner()
     {
         var (armed, decides, stage) = Read((host, panel) =>
         {
@@ -305,28 +465,34 @@ public sealed class ComparisonPanelTests
             return (after > before, panel.Descent.ShouldHide(after), panel.Shelter);
         });
 
-        Assert.True(armed, "çıkış olayı sayacı kurmadı");
-        Assert.True(decides, "bekleyen tik inişe karar vermiyor");
-        Assert.Equal(ShelterStage.Full, stage);
+        Assert.True(armed, "çıkış olayı sayacı ilerletmedi");
+        Assert.True(decides, "sayaç iniş kararını taşımıyor");
+        Assert.Equal(ShelterStage.Band, stage);
     }
 
+    /// <summary>
+    /// T70: fare pencereden çıkınca panel iner; geri girince büyüme sayacı kurulur ve eski
+    /// kuşak düşer. İki yön de aynı sayaçta yaşıyor, kuşak koruması ikisini karıştırmıyor.
+    /// </summary>
     [Fact]
-    public void Pencere_disina_cikis_hedef_sinira_gore_kararlidir()
+    public void Pencere_disina_cikis_paneli_indirir_geri_giris_sayaci_kurar()
     {
-        var (afterExit, afterReturn) = Read((host, panel) =>
+        var (stage, afterExit, afterReturn) = Read((host, panel) =>
         {
             WheelTo(host, panel, ShelterStage.Mid);
 
             panel.TrackPointer(panel.StageTarget.Center);
             panel.PointerLeftWindow();
+            var landed = panel.Shelter;
             var pending = panel.Descent.Generation;
             var leaves = panel.Descent.ShouldHide(pending);
 
-            // Fare geri hedefin içine girdi: eski tik kuşağını kaybetti, panel inmez.
-            panel.TrackPointer(panel.StageTarget.Center);
-            return (leaves, panel.Descent.ShouldHide(pending));
+            // Fare geri girdi: eski kuşak düştü, bekleyen karar artık uygulanmaz.
+            panel.HoverPanel(true);
+            return (landed, leaves, panel.Descent.ShouldHide(pending));
         });
 
+        Assert.Equal(ShelterStage.Band, stage);
         Assert.True(afterExit);
         Assert.False(afterReturn);
     }
@@ -376,18 +542,31 @@ public sealed class ComparisonPanelTests
         Assert.True(promoted);
     }
 
+    private static TimeSpan? Span(MainWindow window, string key)
+        => window.TryFindResource(key, out var value) && value is TimeSpan span ? span : null;
+
+    /// <summary>
+    /// T70/K6: dört gecikme de temadan geliyor, kodda çıplak sayı yok. Eski
+    /// <c>PlaybackDescendDelay</c> adı kaldırıldı — artık ne yaptığını söylemiyordu.
+    /// </summary>
     [Fact]
-    public void Inis_suresi_temadan_gelir()
+    public void Gecikme_sureleri_temadan_gelir()
     {
-        var delay = AppHost.Run(() =>
+        var (rise, fall, stripShow, stripHide, oldKey) = AppHost.Run(() =>
         {
             var window = new MainWindow();
-            return window.TryFindResource("PlaybackDescendDelay", out var value) && value is TimeSpan span
-                ? span
-                : TimeSpan.Zero;
+            return (Span(window, "PlaybackPanelRiseDelay"),
+                    Span(window, "PlaybackPanelFallDelay"),
+                    Span(window, "PlaybackStripShowDelay"),
+                    Span(window, "PlaybackStripHideDelay"),
+                    window.TryFindResource("PlaybackDescendDelay", out _));
         });
 
-        Assert.Equal(TimeSpan.FromSeconds(2), delay);
+        Assert.Equal(TimeSpan.FromSeconds(2), rise);
+        Assert.Equal(TimeSpan.Zero, fall);
+        Assert.Equal(TimeSpan.Zero, stripShow);
+        Assert.Equal(TimeSpan.FromMilliseconds(360), stripHide);
+        Assert.False(oldKey, "eski PlaybackDescendDelay adı hâlâ temada");
     }
 
     // ---- K3: köşe yarıçapı ----------------------------------------------------------
@@ -506,10 +685,10 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// T52/K2: fare panele girince <b>panel</b> tema belirtecinin soyledigi kata cikar.
-    /// Iki kat panel bandina sigmadigi icin panel ayni anda kok katmana terfi eder.
-    /// Fare cikinca olcek hemen dusmez: inis kararini gecikmeli inis sayaci verir, sayac
-    /// isini bitirince (Descend) panel taban boya doner.
+    /// T52/K2: buyume yolu tema belirtecinin soyledigi kata cikar. Iki kat panel bandina
+    /// sigmadigi icin panel ayni anda kok katmana terfi eder. T70: bu yolu artik fare
+    /// girisi degil, bekleme suresi dolan sayac cagiriyor; olcum yolu dogrudan suruyor.
+    /// Terfi ettikten sonra HoverZoom(false) olcegi dusurmez — inis Descend'in isidir.
     /// </summary>
     [Fact]
     public void GirisOlceklemesiPaneliIkiKatinaCikarir()
