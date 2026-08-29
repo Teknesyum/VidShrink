@@ -5,6 +5,22 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.2.3] - 2026-08-29
+
+### Fixed
+
+- **Re-running the installer no longer fails on a file that is only briefly locked.** The
+  step that clears the install folder used to give up on the first refusal, which put a
+  raw .NET exception on screen twice in a row over a DLL that a background scanner was
+  still reading. It now retries six times over 6.2 seconds with a doubling wait, and if
+  the lock outlives that it says what happened instead of printing the exception. A lock
+  held by a genuinely running VidShrink is reported separately, by name and process id.
+- A staged launcher that cannot be replaced no longer cancels the application update
+  along with it: the application files land, and only the launcher step stands down.
+- The launcher archive is no longer downloaded again on every start while a swap is
+  waiting to be committed.
+- A pending launcher swap is not committed over an installation that is already newer.
+
 ## [0.2.2] - 2026-08-29
 
 ### Fixed
