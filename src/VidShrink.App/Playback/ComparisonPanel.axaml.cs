@@ -606,7 +606,7 @@ internal partial class ComparisonPanel : UserControl
         if (entering)
         {
             if (!_gesture.AtFloor) return;
-            if (!_gesture.ScaleTo(Scalar("PlaybackHoverZoom", 2), centre.X, centre.Y)) return;
+            if (!_gesture.ScaleTo(RiseScale(), centre.X, centre.Y)) return;
             _hoverZoomMine = true;
             AfterZoom();
             return;
@@ -773,6 +773,11 @@ internal partial class ComparisonPanel : UserControl
     /// ikiye düşüyordu. Pay her boyutta uygulanınca orta kademenin çevresinde ölçülebilir
     /// bir kenar hep kalır. Bandın pencereye sığmadığı durumda orta kademe bandından kısa
     /// olabilir; terfi etmiş panel kök katmandan taşamaz, band ise kaydırılan sayfada durur.
+    ///
+    /// T73: fareyle büyüyen panelin ölçeği artık bu paya oturacak şekilde seçiliyor
+    /// (<see cref="RiseScale"/>), yani buradaki <c>Math.Min</c> o yolda tam olarak
+    /// <c>height * share</c>'i veriyor. Pay hâlâ tek belirteç; tavanı iki yerde ayrı ayrı
+    /// yazmak orta kademeyi yine tam kademeye doğru kaydırırdı.
     /// </summary>
     private Rect StageBounds(ShelterStage stage)
     {
@@ -798,11 +803,44 @@ internal partial class ComparisonPanel : UserControl
     /// </summary>
     private Size OverlayArea()
     {
-        if (_overlay is null) return default;
+        // T73: terfiden önce de sorulabiliyor — büyüme ölçeği pencereden hesaplandığı için
+        // panel daha kök katmana çıkmadan alanın bilinmesi gerekiyor. Katman görsel ağaçta
+        // panelden bağımsız durur, terfi onu yaratmaz.
+        var overlay = _overlay ?? OverlayLayer.GetOverlayLayer(this);
+        if (overlay is null) return default;
 
-        var area = _overlay.Bounds.Size;
+        var area = overlay.Bounds.Size;
         if (area.Width > 0 && area.Height > 0) return area;
-        return (_overlay.GetVisualParent() as Visual)?.Bounds.Size ?? area;
+        return (overlay.GetVisualParent() as Visual)?.Bounds.Size ?? area;
+    }
+
+    /// <summary>Panelin taban boyu. Terfi ettikten sonra kabuk büyümüş olur; band saklanandır.</summary>
+    private double BandHeight() => _promoted ? _band.Height : Shell.Bounds.Height;
+
+    /// <summary>
+    /// T73/K5: fare beklemesi dolduğunda panelin çıkacağı boy ölçeği. Sabit bir çarpan değil:
+    /// pencerenin payına sığan en büyük boy taban boya bölünüyor, yani panel pencere
+    /// kısaldığında taşmıyor, uzadığında boşa yer bırakmıyor. Tavan
+    /// <see cref="StageBounds"/> ile aynı belirteçten (<c>PlaybackMidShare</c>) geliyor;
+    /// iki hesap aynı payı kullanmasa panel kendi tavanına çarpardı.
+    ///
+    /// İki uç bilerek kapalı ve ikisi de T66 kusurunun aynısını üretmemek için:
+    ///   Taban <c>PlaybackHoverZoom</c> — orta kademenin eşiği odur, altına inen bir ölçek
+    ///   paneli hiç terfi ettirmez ve fare beklemesi görünür bir şey yapmaz.
+    ///   Tavan tam kademe eşiğinin bir tekerlek çentiği altı. Ölçek tavana değseydi fareyle
+    ///   beklemek paneli doğrudan tam kademeye çıkarır, orta kademe tam kademeden ayırt
+    ///   edilemez olurdu — T66'da kapatılan kusurun ikinci kapısı.
+    /// </summary>
+    private double RiseScale()
+    {
+        var floor = _gesture.PromoteScale;
+        var band = BandHeight();
+        var area = OverlayArea().Height;
+        if (band <= 0 || area <= 0) return floor;
+
+        var top = 1 + ZoomGesture.FullDropAt * (Scalar("PlaybackMaxPanelScale", 4) - 1);
+        var fit = area * Scalar("PlaybackMidShare", 0.9) / band;
+        return Math.Clamp(fit, floor, Math.Max(floor, top));
     }
 
     private void ApplyStage()
@@ -816,9 +854,27 @@ internal partial class ComparisonPanel : UserControl
         Shell.Height = _target.Height;
     }
 
+    /// <summary>
+    /// Pencere boyu değişti. T73: panel fareyle büyüdüyse ölçek yeni pencereye göre baştan
+    /// hesaplanır — tavan pencereden geldiği için pencere uzayınca panel de uzar. Kullanıcı
+    /// tekerleği çevirmişse sahiplik düşmüştür (<see cref="Zoom"/>) ve seçtiği ölçek durur;
+    /// taşma zaten <see cref="StageBounds"/>'un payıyla engelleniyor.
+    /// </summary>
     private void OnOverlayResized(object? sender, SizeChangedEventArgs e)
     {
-        if (_promoted) ApplyStage();
+        if (!_promoted) return;
+
+        if (_hoverZoomMine)
+        {
+            var centre = StageCentre();
+            if (_gesture.ScaleTo(RiseScale(), centre.X, centre.Y))
+            {
+                AfterZoom();
+                return;
+            }
+        }
+
+        ApplyStage();
     }
 
     /// <summary>
