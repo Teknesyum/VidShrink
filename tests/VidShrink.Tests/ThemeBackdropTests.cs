@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Avalonia;
 using Avalonia.Media;
@@ -59,6 +60,32 @@ public sealed class ThemeBackdropTests
 
     private static double PanelOpacity() =>
         double.Parse(Token("PanelSurfaceOpacity"), CultureInfo.InvariantCulture);
+
+    /// <summary>Bir fircayla boyanan cizimlerin yollari.</summary>
+    private static IReadOnlyList<string> PartGeometries(string brushKey) => PhoenixDrawings()
+        .Where(drawing => ((string)drawing.Attribute("Brush")!).Trim() == $"{{StaticResource {brushKey}}}")
+        .Select(drawing => (string)drawing.Attribute("Geometry")!)
+        .ToList();
+
+    /// <summary>Bir fircayla boyanan butun yollarin ortak sinir kutusu.</summary>
+    private static Rect PartBounds(string brushKey) => AppHost.Run(() =>
+    {
+        var boxes = PartGeometries(brushKey).Select(path => Geometry.Parse(path).Bounds).ToList();
+        return new Rect(
+            boxes.Min(box => box.X),
+            boxes.Min(box => box.Y),
+            boxes.Max(box => box.Right) - boxes.Min(box => box.X),
+            boxes.Max(box => box.Bottom) - boxes.Min(box => box.Y));
+    });
+
+    /// <summary>Yolu x=800 ekseninde aynalar.</summary>
+    private static string Mirror(string geometry) => MirrorPoint.Replace(geometry, match =>
+    {
+        var x = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+        return $"{Math.Round(1600 - x, 1).ToString(CultureInfo.InvariantCulture)},{match.Groups[2].Value}";
+    });
+
+    private static readonly Regex MirrorPoint = new(@"(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)");
 
     private static XElement Resource(string key) => Theme()
         .Elements()
@@ -205,7 +232,7 @@ public sealed class ThemeBackdropTests
         Assert.DoesNotContain("ImageDrawing", backdrop, StringComparison.Ordinal);
         Assert.NotEmpty(PhoenixGeometries());
         foreach (var geometry in PhoenixGeometries())
-            Assert.StartsWith("F1 M ", geometry);
+            Assert.Matches("^(F1 )?M ", geometry);
     }
 
     /// <summary>K4: görünürlük tek belirteçten sürülüyor.</summary>
@@ -306,20 +333,132 @@ public sealed class ThemeBackdropTests
     }
 
     /// <summary>
-    /// K1: yollar cakisan alt yollar tasiyor - kuyruk tuyleri govdeye, alev dilleri kanada
-    /// giriyor. Avalonia'nin ontanimli dolgu kurali tek-cift oldugu icin cakismalar delik
-    /// acardi; her yol <c>F1</c> ile sifirdan-farkli kurali bildiriyor. Tarayicidaki
-    /// onizlemenin ontanimlisi da budur, ikisi ayni seyi gosteriyor.
+    /// K1: kus tek kutle degil. Ayri tuylerden kuruluyor ve toplam yol sayisi sozlesmenin
+    /// verdigi aralikta kaliyor.
     /// </summary>
     [Fact]
-    public void EveryPhoenixPathDeclaresTheNonZeroFillRule()
+    public void ThePhoenixIsBuiltFromManySeparatePaths()
+    {
+        Assert.InRange(PhoenixGeometries().Count, 20, 60);
+    }
+
+    /// <summary>
+    /// K1: birden fazla alt yol tasiyan tek cizim var - govde, gozu delik olarak tasiyor.
+    /// Avalonia'nin ontanimli dolgu kurali tek-cift oldugu icin o cizim <c>F1</c> ile
+    /// sifirdan-farkli kurali bildirmek zorunda; tarayicidaki onizlemenin ontanimlisi da
+    /// budur, ikisi ayni seyi gosteriyor. Tek parcali yollarin boyle bir bildirimi yok.
+    /// </summary>
+    [Fact]
+    public void OnlyMultiPartPathsDeclareTheFillRule()
     {
         foreach (var geometry in PhoenixGeometries())
         {
-            Assert.StartsWith("F1 ", geometry);
-            Assert.True(geometry.Split('M').Length > 2,
-                "Yol tek parca; dolgu kuralinin bir hukmu kalmiyor.");
+            var parts = geometry.Split('M').Length - 1;
+            if (parts > 1) Assert.StartsWith("F1 ", geometry);
+            else Assert.StartsWith("M ", geometry);
         }
+
+        Assert.Contains(PhoenixGeometries(), geometry => geometry.StartsWith("F1 ", StringComparison.Ordinal));
+    }
+
+    /// <summary>K1: her kanat ayri tuylerden kuruluyor, tek dolgu levha degil.</summary>
+    [Fact]
+    public void EachWingIsBuiltFromSeparateFeathers()
+    {
+        Assert.True(PartGeometries("PhoenixWingFlameNear").Count >= 6,
+            $"Yakin kanat {PartGeometries("PhoenixWingFlameNear").Count} tuy.");
+        Assert.True(PartGeometries("PhoenixWingFlameFar").Count >= 6,
+            $"Uzak kanat {PartGeometries("PhoenixWingFlameFar").Count} tuy.");
+
+        foreach (var geometry in PartGeometries("PhoenixWingFlameNear").Concat(PartGeometries("PhoenixWingFlameFar")))
+            Assert.Equal(1, geometry.Split('M').Length - 1);
+    }
+
+    /// <summary>
+    /// K1: profilden bakilan kusta uzak kanat kisalir. Iki kanat ayni yol degil ve uzak
+    /// kanadin genisligi yakin kanadin en cok yuzde yetmisi.
+    /// </summary>
+    [Fact]
+    public void TheFarWingIsShorterThanTheNearWingAndNotItsMirror()
+    {
+        var near = PartBounds("PhoenixWingFlameNear");
+        var far = PartBounds("PhoenixWingFlameFar");
+
+        Assert.True(far.Width <= near.Width * 0.70,
+            $"Uzak kanat {far.Width:F0}, yakin kanat {near.Width:F0}; oran {far.Width / near.Width:F2}.");
+
+        var mirrored = PartGeometries("PhoenixWingFlameFar").Select(Mirror).ToList();
+        foreach (var geometry in PartGeometries("PhoenixWingFlameNear"))
+            Assert.DoesNotContain(geometry, mirrored);
+    }
+
+    /// <summary>K2: kuyruk tek kutle degil; en az bes tuy ve uclari farkli boyda.</summary>
+    [Fact]
+    public void TheTailIsSeparateFeathersOfDifferentLength()
+    {
+        var tail = PartGeometries("PhoenixTailFlame");
+        Assert.True(tail.Count >= 5, $"Kuyruk {tail.Count} tuy.");
+
+        var tips = AppHost.Run(() => tail
+            .Select(path => Math.Round(Geometry.Parse(path).Bounds.Bottom))
+            .Distinct()
+            .Count());
+
+        Assert.True(tips >= 5, $"Kuyruk tuylerinin ucu {tips} ayri derinlikte; hepsi ayni boyda.");
+    }
+
+    /// <summary>K5: tepelik tuyleri ayri yollar ve kokleri kafada tek noktada bulusuyor.</summary>
+    [Fact]
+    public void TheCrestFeathersShareOneRoot()
+    {
+        var crest = PartGeometries("PhoenixCrestFlame");
+        Assert.True(crest.Count >= 3, $"Tepelik {crest.Count} tuy.");
+
+        var root = AppHost.Run(() =>
+        {
+            var shapes = crest.Select(Geometry.Parse).ToList();
+            var box = shapes[0].Bounds;
+            foreach (var shape in shapes) box = box.Union(shape.Bounds);
+
+            for (var y = box.Y; y < box.Bottom; y += 2)
+                for (var x = box.X; x < box.Right; x += 2)
+                {
+                    var point = new Point(x, y);
+                    if (shapes.All(shape => shape.FillContains(point))) return (Point?)point;
+                }
+
+            return null;
+        });
+
+        Assert.True(root is not null, "Tepelik tuylerinin ortak bir kokü yok; dallanan sap gibi duruyorlar.");
+    }
+
+    /// <summary>
+    /// K4: govde sabit kalinlikta boru degil. Gogus en genis; boyun ve bel ondan dar.
+    /// Genislikler cizimden, govdenin kendi kutusundan orneklenerek olculuyor.
+    /// </summary>
+    [Fact]
+    public void TheBodyNarrowsAtTheNeckAndTheWaist()
+    {
+        var (neck, chest, waist) = AppHost.Run(() =>
+        {
+            var shape = Geometry.Parse(PartGeometries("PhoenixBodyFlame").Single());
+            var box = shape.Bounds;
+
+            double Width(double share)
+            {
+                var y = box.Y + (box.Height * share);
+                var hits = 0;
+                for (var x = box.X; x < box.Right; x += 1)
+                    if (shape.FillContains(new Point(x, y))) hits++;
+                return hits;
+            }
+
+            return (Width(0.30), Width(0.55), Width(0.82));
+        });
+
+        Assert.True(chest > neck * 1.5, $"Boyun {neck:F0}, gogus {chest:F0}: govde boyunda daralmiyor.");
+        Assert.True(chest > waist * 1.2, $"Bel {waist:F0}, gogus {chest:F0}: govde belde daralmiyor.");
     }
 
     /// <summary>
