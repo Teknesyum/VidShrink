@@ -11,9 +11,6 @@ namespace VidShrink.Launcher;
 /// </summary>
 internal static class Updater
 {
-    /// <summary>Manifest çekmenin zaman aşımı; açılışın gecikebileceği en uzun süre budur.</summary>
-    private static readonly TimeSpan ManifestTimeout = TimeSpan.FromMilliseconds(800);
-
     /// <summary>İndirme dahil tüm güncellemenin üst sınırı.</summary>
     private static readonly TimeSpan Budget = TimeSpan.FromSeconds(90);
 
@@ -33,19 +30,9 @@ internal static class Updater
 
     private static async Task RunAsync(string baseDirectory, string appDirectory, CancellationToken cancellationToken)
     {
-        // Denetim günde en çok bir kez: ağsız çalışan biri her açılışta zaman aşımı kadar
-        // beklemesin diye ara açılışlarda ağa hiç çıkılmaz. Yarım kalmış bir güncelleme
-        // bu kısıttan muaf; iki hali var, kopyalama günlüğü ve yarıda kesilmiş bir
-        // indirmeden kalan yan klasör.
         var stage = Path.Combine(baseDirectory, StageDirectoryName);
-        var pending = UpdateStage.HasPending(appDirectory) || Directory.Exists(stage);
-        if (!pending && !UpdateSchedule.DueNow(DateTimeOffset.UtcNow)) return;
-
         var rid = UpdateCheck.Rid;
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
-
-        // Sonucu değil denemeyi işaretle: ağ yokken de tur harcandı sayılır.
-        if (!pending) UpdateSchedule.Record(DateTimeOffset.UtcNow);
 
         var json = await FetchManifestAsync(rid, source, cancellationToken);
         if (json is null) return;
@@ -54,7 +41,7 @@ internal static class Updater
         if (manifest.Files.Count == 0) return;
 
         // Aynı sürüm zaten uygulanmışsa hiçbir dosya özetlenmez.
-        if (UpdateCheck.ReadVersionMarker(appDirectory) == manifest.Version) return;
+        if (UpdateCheck.AlreadyCurrent(appDirectory, manifest)) return;
 
         var cache = new HashCache(Path.Combine(appDirectory, HashCacheName));
         var changed = UpdateCheck.Diff(appDirectory, manifest, cache);
@@ -106,13 +93,7 @@ internal static class Updater
             return File.Exists(local) ? await File.ReadAllTextAsync(local, cancellationToken) : null;
         }
 
-        using var client = new HttpClient { Timeout = ManifestTimeout };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("VidShrink-Launcher");
-
-        using var response = await client.GetAsync(AssetUrl(asset), cancellationToken);
-        if (response.StatusCode == HttpStatusCode.NotFound) return null;
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync(cancellationToken);
+        return await UpdateCheck.FetchManifestAsync(AssetUrl(asset), cancellationToken);
     }
 
     private static IRangeSource ArchiveSource(string rid, string? source)
