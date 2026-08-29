@@ -22,7 +22,7 @@ Open PowerShell and run:
 irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
 ```
 
-The installer needs no administrator rights and no .NET SDK. It asks GitHub for the latest release, downloads the `win-x64` archive and the launcher beside it, checks both against the release's own SHA-256 list and refuses to continue if either digest differs. What lands on your machine is the same binary the release pipeline tested — nothing is compiled here. It installs under `%LOCALAPPDATA%\Programs\VidShrink`, fetches FFmpeg and FFprobe from WinGet, and creates Desktop and Start Menu shortcuts pointing at the launcher. Running the same command again replaces the installed app with the newest release.
+The installer needs no administrator rights and no .NET SDK. It asks GitHub for the latest release, downloads the `win-x64` archive and the launcher beside it, checks both against the release's own SHA-256 list and refuses to continue if either digest differs. What lands on your machine is the same binary the release pipeline tested — nothing is compiled here. It installs under `%LOCALAPPDATA%\Programs\VidShrink`, fetches FFmpeg and FFprobe from WinGet, creates Desktop and Start Menu shortcuts pointing at the launcher, and adds the right-click menu entry described below. Running the same command again replaces the installed app with the newest release.
 
 Only `win-x64` is published for Windows. If your machine is positively identified as ARM64 or 32-bit, the installer stops and says so, rather than installing an architecture whose updates would never be found — the launcher looks for a release asset named after its own architecture, and there is none. Download an `x64` build from the [releases page](https://github.com/Teknesyum/VidShrink/releases) only if you know your machine can run it.
 
@@ -33,6 +33,24 @@ The command needs no change to your execution policy. `irm | iex` runs the insta
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllText('C:\path\to\Install-VidShrink.ps1',[Text.Encoding]::UTF8))"
 ```
+
+### The right-click menu
+
+Right-click a video in Explorer and **Open this video with VidShrink** is in the menu. It appears on the same 24 extensions the application itself opens — the list lives once, in `VidShrink.Core.ShellIntegration.MediaExtensions`, and a test fails if the installer and the application ever disagree about it. Choosing it starts VidShrink with that file already loaded.
+
+The entry is written per user, under `HKCU\Software\Classes\SystemFileAssociations`, so it needs no administrator rights. It does **not** change your file associations: your default player stays your default player, and double-clicking a video does what it did before. What it points at is `VidShrink.exe`, the launcher, for the same reason the shortcuts do — an entry aimed straight at the application would leave a copy that never updates.
+
+The label follows the system interface language, Turkish on a Turkish Windows and English everywhere else. There is no third language. Pass `-MenuLanguage tr` or `-MenuLanguage en` to force one.
+
+Two switches control the menu on its own, without reinstalling:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\path\to\Install-VidShrink.ps1 -RemoveShellMenu
+```
+
+`-RemoveShellMenu` deletes every VidShrink entry in one pass, including entries from an older release whose extension list was longer. `-ShellMenuOnly` rewrites the entries against the installed launcher and touches nothing else. `-SkipShortcuts` means the shell is not touched at all: no shortcuts, no menu entry.
+
+The menu is Windows only. Nothing equivalent is installed on macOS or Linux.
 
 ### macOS and Linux
 

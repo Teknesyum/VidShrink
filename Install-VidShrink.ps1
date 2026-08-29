@@ -1,7 +1,12 @@
 param(
     [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'Programs\VidShrink'),
     [switch]$NoLaunch,
-    [switch]$SkipShortcuts
+    [switch]$SkipShortcuts,
+    [switch]$ShellMenuOnly,
+    [switch]$RemoveShellMenu,
+    [ValidateSet('auto', 'tr', 'en')]
+    [string]$MenuLanguage = 'auto',
+    [string]$RegistryRoot = 'HKCU:\Software\Classes'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -176,6 +181,90 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
     }
 }
 
+$shellMenuKeyName = 'VidShrink'
+
+$shellMenuExtensions = @(
+    'mp4', 'mkv', 'mov', 'avi', 'webm', 'wmv', 'flv', 'm4v', 'mpg', 'mpeg', 'ts', 'm2ts',
+    '3gp', 'ogv', 'vob', 'asf', 'rm', 'rmvb', 'divx', 'mxf', 'f4v', 'mts', 'dav', 'gif'
+)
+
+function Get-ShellMenuLabel([string]$Language) {
+    $choice = $Language
+    if ($choice -eq 'auto') {
+        $interface = ''
+        try { $interface = (Get-UICulture).TwoLetterISOLanguageName } catch { }
+        if ($interface -eq 'tr') { $choice = 'tr' } else { $choice = 'en' }
+    }
+    if ($choice -eq 'tr') { return 'Bu Videoyu VidShrink ile A' + [char]0x00E7 }
+    return 'Open this video with VidShrink'
+}
+
+function Get-ShellMenuAssociationRoot([string]$Root) {
+    return (Join-Path $Root 'SystemFileAssociations')
+}
+
+function Remove-ShellMenu([string]$Root) {
+    $associations = Get-ShellMenuAssociationRoot $Root
+    if (-not (Test-Path -LiteralPath $associations)) { return 0 }
+
+    $removed = 0
+    foreach ($association in Get-ChildItem -LiteralPath $associations) {
+        $shell = Join-Path $association.PSPath 'shell'
+        $key = Join-Path $shell $shellMenuKeyName
+        if (-not (Test-Path -LiteralPath $key)) { continue }
+
+        Remove-Item -LiteralPath $key -Recurse -Force
+        $removed++
+
+        foreach ($parent in $shell, $association.PSPath) {
+            if (-not (Test-Path -LiteralPath $parent)) { break }
+            $item = Get-Item -LiteralPath $parent
+            if ($item.SubKeyCount -gt 0 -or $item.ValueCount -gt 0) { break }
+            Remove-Item -LiteralPath $parent -Force
+        }
+    }
+    return $removed
+}
+
+function Write-ShellMenu([string]$Root, [string]$Executable, [string]$Label) {
+    foreach ($extension in $shellMenuExtensions) {
+        $key = Join-Path (Get-ShellMenuAssociationRoot $Root) ".$extension\shell\$shellMenuKeyName"
+        New-Item -Path $key -Force | Out-Null
+        Set-ItemProperty -LiteralPath $key -Name 'MUIVerb' -Value $Label -Type String
+        Set-ItemProperty -LiteralPath $key -Name 'Icon' -Value $Executable -Type String
+
+        $command = Join-Path $key 'command'
+        New-Item -Path $command -Force | Out-Null
+        Set-Item -LiteralPath $command -Value ('"{0}" "%1"' -f $Executable)
+    }
+    return $shellMenuExtensions.Count
+}
+
+function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language) {
+    Remove-ShellMenu $Root | Out-Null
+    $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $Language)
+    Write-Host "Sağ tık menüsü $written uzantıya yazıldı." -ForegroundColor Green
+}
+
+if ($RemoveShellMenu) {
+    $cleared = Remove-ShellMenu $RegistryRoot
+    Write-Host "Sağ tık menüsü kaldırıldı: $cleared uzantı." -ForegroundColor Green
+    return
+}
+
+if ($ShellMenuOnly) {
+    if ($SkipShortcuts) {
+        Write-Host 'SkipShortcuts verildi; kabuğa dokunulmadı.' -ForegroundColor Yellow
+        return
+    }
+    $shellMenuExecutable = Join-Path $InstallRoot 'VidShrink.exe'
+    if (-not (Test-Path -LiteralPath $shellMenuExecutable)) {
+        throw "Kurulu VidShrink.exe bulunamadı: $shellMenuExecutable. Önce kurulumu çalıştırın."
+    }
+    Update-ShellMenu $RegistryRoot $shellMenuExecutable $MenuLanguage
+    return
+}
+
 Write-Host 'VidShrink kurulumu hazırlanıyor...' -ForegroundColor Cyan
 
 $runtimeIdentifier = Get-RuntimeIdentifier
@@ -286,6 +375,8 @@ try {
         $startMenuShortcut.WorkingDirectory = $resolvedInstallRoot
         $startMenuShortcut.IconLocation = "$installedExe,0"
         $startMenuShortcut.Save()
+
+        Update-ShellMenu $RegistryRoot $installedExe $MenuLanguage
     }
 
     Write-Host "VidShrink $version kuruldu: $resolvedInstallRoot" -ForegroundColor Green
