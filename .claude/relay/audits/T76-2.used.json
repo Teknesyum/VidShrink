@@ -1,0 +1,29 @@
+{
+  "contractId": "T76",
+  "auditorRunId": "ae4402a38e5de3a82",
+  "headSha": "3f91c70a616734c881be68d5b3eb89dc22d6671c",
+  "diffHash": "f22fcfad0d381a25b0a01d75e59b7dcc45ac0159870b88506313e0bead97a82f",
+  "owns": [
+    "src/VidShrink.Launcher/Updater.cs",
+    "src/VidShrink.Launcher/Program.cs",
+    "src/VidShrink.Core/UpdateCheck.cs",
+    "tests/VidShrink.Tests/UpdaterTests.cs",
+    ".github/workflows/release.yml"
+  ],
+  "verification": [
+    "dotnet test -c Release --filter \"UpdaterTests|AppliedUpdateTests\" -> 52 gecti, 3 atlandi, 0 kaldi",
+    "TheTargetNameNeverEmptiesAtAnyStepOfTheSwap(0..3): Stage/Arm/Commit uretim cagrilarini kosturuyor, Repair cagrilmiyor; her adim sonrasi kok listesi VidShrink.exe iceriyor",
+    "TheNameIsNeverAbsentWhileTheSwapItselfRuns -> 120 tur, 91768 yoklama, 0 kez ad yok (Repair'siz)",
+    "TheProbeCatchesATwoStepSwapSoTheMeasureHasTeeth -> 120 tur, 2547 yoklama, 845 kez ad yok; taklit, a688ab5:UpdateCheck.cs Swap() ile ayni iki File.Move dizisi",
+    "canli olcu: dotnet publish ile gercek self-contained single-file baslatici uretilip VIDSHRINK_LAUNCHER_EXE ile TheIncomingBinaryRenamesItselfOntoTheTargetName kosturuldu -> cikis kodu 0, kokte .launcher-version + VidShrink.exe; calisan gorunt dosyasinin kendi adini hedefin ustune almasi gercek ikilide dogrulandi",
+    "Program.cs:36-37 --commit-launcher ayristirmasi; WaitForExit ve Replace ayni 30 sn deadline'a bagli, sonsuz bekleme yok; committer olurse hedefte eski ikili durur, sonraki acilis yeniden kurar",
+    "Updater.cs: iki WriteVersionMarker(baseDirectory) cagrisi MarkVerified ile degisti; manifest.Launcher.Count==0 iken .launcher-version yazilmiyor (AnUnverifiedLauncherVersionIsNeverClaimed)",
+    "sira olcusu artik kaynak metni okumuyor: UpdateRollout.Apply davranisi olculuyor (TheLauncherIsNotArmedWhenTheApplicationFilesFailToLand)",
+    "T75 korunuyor: ManifestTimeout 800 ms duruyor, Program.cs her acilista Updater.Run cagiriyor, gunluk kapi yok",
+    "git diff a688ab5 3f91c70 -> yalnizca owns icindeki 4 dosya; git status temiz"
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-29T17:36:58.211Z",
+  "usedAt": "2026-08-29T17:38:00.519Z",
+  "completedSha": "3f91c70a616734c881be68d5b3eb89dc22d6671c"
+}

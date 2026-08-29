@@ -72,3 +72,4 @@
 {"id":"T73","round":"1","risk":"low","verify":["dotnet test -c Release --filter ComparisonPanelTests"],"auditorRunId":null,"headSha":"45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf","at":"2026-08-29T16:10:59.391Z"}
 {"id":"T74","round":"1","risk":"low","verify":["dotnet test -c Release --filter WindowLayoutTests"],"auditorRunId":null,"headSha":"45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf","at":"2026-08-29T16:11:14.986Z"}
 {"id":"T75","round":"1","risk":"low","verify":["dotnet test -c Release --filter \"UpdaterTests|AppliedUpdateTests"],"auditorRunId":null,"headSha":"a88c7fd8fc1a85fa8f532cb70a2302fa12620b70","at":"2026-08-29T16:28:29.753Z"}
+{"id":"T76","round":"2","risk":"high","verify":["dotnet test -c Release --filter \"UpdaterTests|AppliedUpdateTests"],"auditorRunId":"ae4402a38e5de3a82","headSha":"3f91c70a616734c881be68d5b3eb89dc22d6671c","at":"2026-08-29T17:38:00.520Z"}
