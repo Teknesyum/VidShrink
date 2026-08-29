@@ -49,6 +49,11 @@
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
 
   <x:Double x:Key="PhoenixOpacity">0.30</x:Double>
+  <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
+
+  <SolidColorBrush x:Key="PanelSurface"
+                   Color="{StaticResource SurfaceToneColor}"
+                   Opacity="{StaticResource PanelSurfaceOpacity}"/>
   <LinearGradientBrush x:Key="PhoenixBodyFlame" StartPoint="50%,100%" EndPoint="50%,0%">
     <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.3"/>
