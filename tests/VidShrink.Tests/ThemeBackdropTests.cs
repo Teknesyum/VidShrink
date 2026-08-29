@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Xml.Linq;
 using Avalonia;
 using Avalonia.Media;
@@ -35,7 +35,31 @@ public sealed class ThemeBackdropTests
         "#FF101217", "#FF111217", "#FF121217", "#FF121216", "#FF121117", "#FF131117", "#FF141117"
     };
 
+    /// <summary>T72 oncesi ankayi cizen dort yol.</summary>
+    private static readonly string[] BaselinePhoenixGeometries =
+    {
+        "M 800,168 C 838,180 856,214 852,252 C 848,290 838,308 834,330 C 880,380 900,432 898,500 C 894,570 872,640 848,700 C 872,760 880,820 868,884 C 848,838 836,796 826,752 C 822,806 814,846 800,890 C 786,846 778,806 774,752 C 764,796 752,838 732,884 C 720,820 728,760 752,700 C 728,640 706,570 702,500 C 700,432 720,380 766,330 C 762,308 752,290 748,252 C 744,214 762,180 800,168 Z",
+        "M 750,440 C 610,306 424,196 240,130 C 288,222 316,290 344,352 C 372,364 402,420 434,486 C 462,498 496,548 534,600 C 566,614 604,650 646,684 C 690,700 726,702 754,694 C 762,610 758,520 750,440 Z",
+        "M 850,440 C 990,306 1176,196 1360,130 C 1312,222 1284,290 1256,352 C 1228,364 1198,420 1166,486 C 1138,498 1104,548 1066,600 C 1034,614 996,650 954,684 C 910,700 874,702 846,694 C 838,610 842,520 850,440 Z",
+        "M 800,166 C 812,118 838,82 872,50 C 862,102 846,138 826,174 Z M 330,192 C 306,132 296,86 300,36 C 328,90 348,140 360,190 Z M 470,246 C 452,196 448,158 456,116 C 478,164 492,206 500,246 Z M 1270,192 C 1294,132 1304,86 1300,36 C 1272,90 1252,140 1240,190 Z M 1130,246 C 1148,196 1152,158 1144,116 C 1122,164 1108,206 1100,246 Z"
+    };
+
     private static XElement Theme() => XDocument.Load(ThemePath).Root!;
+
+    private static readonly string ControlsPath =
+        Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Controls.axaml");
+
+    /// <summary><c>Controls.axaml</c> icindeki bir denetim temasinin bir kurucusu.</summary>
+    private static string ControlSetter(string themeKey, string property) =>
+        XDocument.Load(ControlsPath).Descendants(Ui + "ControlTheme")
+            .Single(theme => (string?)theme.Attribute(X + "Key") == themeKey)
+            .Elements(Ui + "Setter")
+            .Single(setter => (string?)setter.Attribute("Property") == property)
+            .Attribute("Value")!.Value.Trim();
+
+    private static double PanelOpacity() =>
+        double.Parse(Token("PanelSurfaceOpacity"), CultureInfo.InvariantCulture);
+
 
     private static XElement Resource(string key) => Theme()
         .Elements()
@@ -182,7 +206,7 @@ public sealed class ThemeBackdropTests
         Assert.DoesNotContain("ImageDrawing", backdrop, StringComparison.Ordinal);
         Assert.NotEmpty(PhoenixGeometries());
         foreach (var geometry in PhoenixGeometries())
-            Assert.StartsWith("M ", geometry);
+            Assert.StartsWith("F1 M ", geometry);
     }
 
     /// <summary>K4: görünürlük tek belirteçten sürülüyor.</summary>
@@ -270,5 +294,73 @@ public sealed class ThemeBackdropTests
         Assert.True(bounds.X >= 0 && bounds.Y >= 0, $"Silüet tuvalin dışına çıkıyor: {bounds}");
         Assert.True(bounds.Right <= 1600 && bounds.Bottom <= 1000, $"Silüet tuvalin dışına çıkıyor: {bounds}");
         Assert.True(bounds.Width * bounds.Height < Canvas, "Silüetin kutusu tuvalin tamamı.");
+    }
+
+    /// <summary>
+    /// K1: eski dort yoldan hicbiri oldugu gibi durmuyor. Anka yamanmadi, bastan cizildi.
+    /// </summary>
+    [Fact]
+    public void NoneOfTheOldPhoenixPathsSurvived()
+    {
+        foreach (var geometry in PhoenixGeometries())
+            Assert.DoesNotContain(geometry.Replace("F1 ", string.Empty), BaselinePhoenixGeometries);
+    }
+
+    /// <summary>
+    /// K1: yollar cakisan alt yollar tasiyor - kuyruk tuyleri govdeye, alev dilleri kanada
+    /// giriyor. Avalonia'nin ontanimli dolgu kurali tek-cift oldugu icin cakismalar delik
+    /// acardi; her yol <c>F1</c> ile sifirdan-farkli kurali bildiriyor. Tarayicidaki
+    /// onizlemenin ontanimlisi da budur, ikisi ayni seyi gosteriyor.
+    /// </summary>
+    [Fact]
+    public void EveryPhoenixPathDeclaresTheNonZeroFillRule()
+    {
+        foreach (var geometry in PhoenixGeometries())
+        {
+            Assert.StartsWith("F1 ", geometry);
+            Assert.True(geometry.Split('M').Length > 2,
+                "Yol tek parca; dolgu kuralinin bir hukmu kalmiyor.");
+        }
+    }
+
+    /// <summary>
+    /// K3: panel zemini artik donuk degil. Saydamlik bir opaklik belirtecinden geliyor,
+    /// <c>Panel</c> temasi o belirteci tasiyan fircayi okuyor ve palete renk eklenmedi:
+    /// fircanin rengi mevcut <c>SurfaceToneColor</c>.
+    /// </summary>
+    [Fact]
+    public void ThePanelBackgroundIsDrivenByAnOpacityToken()
+    {
+        Assert.Equal("{StaticResource PanelSurface}", ControlSetter("Panel", "Background"));
+
+        var brush = Resource("PanelSurface");
+        Assert.Equal("SolidColorBrush", brush.Name.LocalName);
+        Assert.Equal("{StaticResource SurfaceToneColor}", ((string)brush.Attribute("Color")!).Trim());
+        Assert.Equal("{StaticResource PanelSurfaceOpacity}", ((string)brush.Attribute("Opacity")!).Trim());
+
+        Assert.InRange(PanelOpacity(), 0.75, 1.0);
+        Assert.True(PanelOpacity() < 1.0, "Panel hala donuk; arkadaki anka gorunmuyor.");
+    }
+
+    /// <summary>
+    /// K4: en kotu hal. Alev rampasinin en parlak duragi, calisma alaninin en acik duragi
+    /// uzerinde ankanin opakligiyla duruyor; panelin saydam zemini onun ustune biniyor ve
+    /// govde metni de panelin ustunde. Olculen renklerin hepsi cizimden okunuyor.
+    /// </summary>
+    [Fact]
+    public void BodyTextStaysReadableOverThePanelThatShowsTheFlame()
+    {
+        var lightestFlame = PhoenixFlameColours().MaxBy(Luminance)!;
+        var lightestGround = StopColours("WorkspaceGradient").MaxBy(Luminance)!;
+
+        var backdrop = Blend(lightestFlame, lightestGround,
+            double.Parse(Token("PhoenixOpacity"), CultureInfo.InvariantCulture));
+        var panel = Blend(Token("SurfaceToneColor"), backdrop, PanelOpacity());
+
+        var ratio = Contrast(Token("TextBodyColor"), panel);
+
+        Assert.True(ratio >= BodyTextAaThreshold,
+            $"Alevin en parlak noktasini gosteren panel zemini {panel} ustunde kontrast "
+            + $"{ratio:F2}:1, WCAG AA esigi {BodyTextAaThreshold}:1.");
     }
 }
