@@ -1,0 +1,29 @@
+{
+  "contractId": "T79",
+  "auditorRunId": "ae67813330db124da",
+  "headSha": "a13d65520699f1fc391ee077140ebb19893aad8d",
+  "diffHash": "8a8a1c08f74dbe8bb3e530ab0a826f414f6e124629c700574fb1689653016e1d",
+  "owns": [
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Playback/HoverZone.cs",
+    "src/VidShrink.App/Playback/ZoomGesture.cs",
+    "src/VidShrink.App/Playback/ControlStrip.axaml.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs"
+  ],
+  "verification": [
+    "dotnet test -c Release --filter ComparisonPanelTests -> 45/45 gecti, 0 kaldi (build Release, --no-build yok)",
+    "dotnet test -c Release --filter ThemeToken|ThemeBackdrop|ZoomGestureTests -> 54/54 gecti",
+    "Zoom dongusu sonlu: ComparisonPanel.axaml.cs:424 her turda T'yi +-NotchStep(0.08) tasiyor, ZoomGesture.Apply Clamp[0,1] + Same() ile tavanda/tabanda false donuyor; Band dalinda ilk turda break; en fazla ~13 tur",
+    "Olculer gercek boyu pinliyor: panel.StageTarget = _target, ApplyStage() Shell.Width/Height'a yazilan Rect (ComparisonPanel.axaml.cs:754-758); yuzde okumasi veya T degil",
+    "Mutasyon iddiasi yapisal olarak dogru: eski Zoom tek Wheel cagrisiydi, StageSize her iki ekseni PlaybackMidShare'e kirpiyor; iki eksen kirpildiktan sonra T=1.0'a kadar boy degismez -> Hicbir_yakinlastirma_dokunusu_yutulmaz saglanamaz. Tam kademede -1: T=1.00->0.92=FullDropAt, UpdateShelter T<FullDropAt-eps istiyor, kademe Full kalir -> Tam_kademeden_bir_eksi_paneli_kucultur saglanamaz",
+    "Olu kod/belirtec: grep CountdownRing|ShowCountdown|PlaybackCountdown|RiseRing|RiseCountdown|PlaybackPanelRiseDelay|PlaybackPanelFallDelay -> src/tests'te yalniz tarih notu yorumlari ve olcunun kendi listesi; Kalkan_belirtecler_temada_yok 7 ad kapsiyor (sayildi)",
+    "K4: RefreshEmptyState ComparisonPanel.axaml.cs:564-567 dolu karede PlaybackStageFill + Shell.ClearValue(Border.BackgroundProperty); OnAttachedToVisualTree'deki ikinci uygulama dolu karede de dogru dali kosuyor, ortuyu kaldirmiyor",
+    "K5: PlaybackScrimEdge 0.25 == PlaybackHoverZoneShare 0.25 (Playback.axaml:90,131); yonga/dugme (PlaybackBadge, PlaybackZoomButton, PlaybackEncodeChip) hala duz PlaybackScrim uzerinde, 5.87:1 metin kontrasti degismedi",
+    "K6/K7: Kisa_bandli_panel_de_pencereyi_dolduruyor ve Fareyle_buyume_tam_kademeye_esitlenmez degistirilmeden yesil; RiseScale artik _gesture.ScaleAt(FullDropAt) cagiriyor, formul tekrari kalkti (grep MaxPanelScale tek yer)",
+    "owns disi dosya yok: git show --stat 2b5be0d -> 6 dosya, hepsi owns listesinde"
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-29T21:36:04.552Z"
+}
