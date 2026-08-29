@@ -501,8 +501,10 @@ public sealed class WindowLayoutTests
     /// iki hâlde de <b>sol sütunu</b> gösteriyor.</para>
     ///
     /// <para>Yani sayfayı kısaltmak isteyen iş hangi hâli kısaltmak istediğine bakmalı.
-    /// Korunan ilişki değişmedi: sayfa içeriği <b>en uzun sütun ile çalışma alanı kenar
-    /// boşluğunun toplamıdır</b>.</para>
+    /// Korunan ilişki değişmedi, yalnız doğru adıyla yazıldı: sayfa içeriği <b>en uzun sütun
+    /// ile sekme şeridinden düşen <c>SectionMargin</c> boşluğunun toplamıdır</b>. Eskiden
+    /// burada <c>WorkspaceMargin</c> okunuyordu; iki belirteç aynı sayıyı (24) taşıdığı için
+    /// eşitlik tutuyordu, T74/K5 <c>SectionMargin</c>'i 16'ya indirince ayrıştılar.</para>
     ///
     /// <para><b>Bu sayı neyi koruyor:</b> sayfayı hangi sütunun gerdiğini — kısaltma işi
     /// yanlış sütuna harcanmasın diye. <b>Bozulursa kullanıcı ne görür:</b> doğrudan bir
@@ -533,9 +535,9 @@ public sealed class WindowLayoutTests
             $"{(loaded ? "Dolu" : "Boş")} sayfayı tutan sütun değişmiş: sol {columns[0]:0.#}, "
             + $"orta {columns[1]:0.#}, sağ {columns[2]:0.#}; beklenen {holder}. numarali sutun.");
 
-        // Sayfa içeriği en uzun sütun ile çalışma alanı kenar boşluğunun toplamı.
+        // Sayfa içeriği en uzun sütun ile sekme boşluğunun toplamı.
         var margin = Read(DesignSize(), loaded, window =>
-            window.TryFindResource("WorkspaceMargin", out var value) && value is Thickness pad
+            window.TryFindResource("SectionMargin", out var value) && value is Thickness pad
                 ? pad.Top + pad.Bottom
                 : double.NaN);
 
@@ -874,6 +876,24 @@ public sealed class WindowLayoutTests
 
         Assert.Empty(headings);
         Assert.False(VidShrink.App.LanguageCatalog.EnglishToTurkish.ContainsKey("Preview"));
+    }
+
+    /// <summary>
+    /// T74/K5: sekme şeridi ile panellerin arası <c>SectionMargin</c>'den geliyor ve o boşluk
+    /// aralık ölçeğinin bir basamağıdır. 24 (<c>SpaceXl</c>) fazla bulundu, bir basamak
+    /// inildi. Çıplak sayı yazılmasın diye ölçü basamağı belirteçten okuyor.
+    /// </summary>
+    [Fact]
+    public void TheSectionInsetStaysOnTheSpacingScale()
+    {
+        var inset = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            window.TryFindResource("SectionMargin", out var margin);
+            return (Thickness)margin!;
+        });
+
+        Assert.Equal(new Thickness(0, Token("SpaceLg"), 0, 0), inset);
     }
 
     /// <summary>Bir kutunun yazısı: ekranda görünen metin, ölçüsü ve ona kalan yer.</summary>
