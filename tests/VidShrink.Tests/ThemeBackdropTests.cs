@@ -175,8 +175,6 @@ public sealed class ThemeBackdropTests
         .Select(drawing => (string)drawing.Attribute("Geometry")!)
         .ToList();
 
-    // ---- T78: açılmış siluet, dalgalı tüy kenarı, eşit olmayan saçak, kor, katmanlı parlama ----
-
     /// <summary>Kanat, kuyruk ve tepelik tüyleri — ankanın birincil tüyleri.</summary>
     private static readonly string[] FeatherBrushKeys =
     {
