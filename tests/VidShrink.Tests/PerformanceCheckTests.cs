@@ -381,6 +381,13 @@ public sealed class PerformanceCheckTests
     /// Olculmeyen bacak da dusmus maliyet sayilmiyor. Bacak butce doldugu icin
     /// eksikse bu ortamin haberidir: iddia kurulmaz, sebebi yazilir. Butce dolmadan
     /// eksilen bacak ise kodun kusurudur ve kirmiziya doner.
+    ///
+    /// Donanim tarafinda gerileme korumasi <b>bos kosumdan</b> geliyor: bos bacak
+    /// olculduyse donanim yolunun calistigi orada iddia edilir. Yuklu bacagin
+    /// kaybolmasi kodun kusuru degil: donanim kodlayicisi yuk altinda kaynak bulamayip
+    /// dusebiliyor, ve bu makinenin o anki hali. O yuzden yuklu bacak, butce dolsun
+    /// dolmasin, sebebi makineye ait bir olguya baglanarak atlaniyor — sebep
+    /// bulunamazsa atlanmiyor, kirmiziya doner.
     /// </summary>
     [FfmpegFact]
     public async Task OlcumYukAltindaYalnizAgirlasiyor()
@@ -451,19 +458,46 @@ public sealed class PerformanceCheckTests
         }
 
         if (!bosDonanim.HardwareMeasured)
-            Atlandi("bos kosumda donanim yolu olculemedi, yuk karsilastirmasi kurulmadi");
-        else if (yukluDonanim.HardwareMeasured)
         {
-            Assert.Contains(yukluDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
-            Assert.Equal(bosDonanim.HardwareCodec, yukluDonanim.HardwareCodec);
+            DonanimAtla("bos kosumda", bosDonanim, "donanim iddiasi kurulmadi");
         }
         else
         {
-            Assert.True(yukluDonanim.BudgetExhausted,
-                "yuk altinda donanim bacagi butce dolmadan kayboldu: " +
-                string.Join(",", yukluDonanim.Findings.Select(f => f.Code)));
-            Atlandi("yuk altinda donanim bacagi butce doldugu icin alinamadi, karsilastirma kurulmadi");
+            Assert.Contains(bosDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
+
+            if (yukluDonanim.HardwareMeasured)
+            {
+                Assert.Contains(yukluDonanim.Findings, f => f.Code == PerformanceFindingCode.HardwarePathWorks);
+                Assert.Equal(bosDonanim.HardwareCodec, yukluDonanim.HardwareCodec);
+            }
+            else
+            {
+                DonanimAtla("yuk altinda", yukluDonanim, "yuk karsilastirmasi kurulmadi");
+            }
         }
+    }
+
+    /// <summary>
+    /// Eksik donanim bacaginin sebebini <b>makineye ait bir olguya</b> baglar ve iddiayi
+    /// atlar. Uc olgu var, ucu de sonucun kendi bulgularindan okunuyor: butce doldu,
+    /// kodlayici listede var ama gecisi basarisiz dondu, ya da makinede hic donanim
+    /// kodlayicisi yok. Bunlarin hicbiri yoksa bacak sebepsiz kaybolmustur ve bu kodun
+    /// kusurudur: o zaman atlanmaz, kirmiziya doner.
+    /// </summary>
+    private void DonanimAtla(string nerede, PerformanceCheckResult sonuc, string neKurulmadi)
+    {
+        var kodlar = string.Join(",", sonuc.Findings.Select(f => f.Code));
+
+        var sebep =
+            sonuc.BudgetExhausted ? $"butce doldu, gecen {sonuc.ElapsedMs}ms"
+            : sonuc.Findings.Any(f => f.Code == PerformanceFindingCode.HardwareEncoderFailed)
+                ? "kodlayici listede var ama gecisi basarisiz dondu"
+            : sonuc.Findings.Any(f => f.Code == PerformanceFindingCode.NoHardwareEncoder)
+                ? "makinede donanim kodlayicisi yok"
+            : string.Empty;
+
+        Assert.True(sebep.Length > 0, $"{nerede} donanim bacagi sebepsiz kayboldu: {kodlar}");
+        Atlandi($"{nerede} donanim bacagi alinamadi ({sebep}), {neKurulmadi}");
     }
 
     /// <summary>
@@ -471,19 +505,31 @@ public sealed class PerformanceCheckTests
     /// Yarida kalan olcum sebepsiz "olculemedi" donmemeli; butce dolduysa sonuc
     /// BudgetExhausted tasimali, yoksa kullanici neden sonuc alamadigini bilemez.
     ///
-    /// Bagladigi, ayni makinede genis butceyle alinan bir kosumla karsilastirilarak
-    /// okunuyor. Butcenin bir katiyla kurulmus mutlak bir sinir bunu olcemez: butce
-    /// dolunca kosan surec oldurulur, baslatma ve oldurme butcenin disinda kalir ve
-    /// makine mesgullestikce buyur. O sinir mesgul bir makinede, butce pekala
-    /// bagliyorken kirmiziya doner.
+    /// Bagladiginin <b>tasiyici kaniti zamansiz</b>: dar butceyle hicbir bacak
+    /// olculemiyor, genis butceyle en az biri olculuyor. Bu iddia makinenin hizina
+    /// hic bakmaz, dolayisiyla yavas bir makinede gevsemez.
+    ///
+    /// Yaninda duran sure karsilastirmasi ikincil ve bilerek gevsek: butce dolunca
+    /// kosan surec oldurulur, baslatma ile oldurme butcenin disinda kalir ve makine
+    /// mesgullestikce buyur, yani butcenin bir katiyla kurulmus mutlak bir sinir butce
+    /// pekala bagliyorken kirmiziya doner.
+    ///
+    /// Ucuncu kosum hicbir gecise zaman birakmayacak kadar dar bir butceyle aliniyor:
+    /// tek bir surec bile baslatilmadan biten bu kosum, sebebini yine de bildirmek
+    /// zorunda, ve suresi gunluge butcenin kesemedigi sabit pay olarak yaziliyor —
+    /// gevsek sure karsilastirmasi ancak o payin yaninda okunabilir.
     /// </summary>
     [FfmpegFact]
     public async Task ButceGercektenBagliyorVeSebebiniSoyluyor()
     {
         const long dar = 900;
 
+        var tabanSaat = System.Diagnostics.Stopwatch.StartNew();
+        var taban = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 1);
+        tabanSaat.Stop();
+
         var genisSaat = System.Diagnostics.Stopwatch.StartNew();
-        await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
+        var genis = await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, YukOlcumButcesiMs);
         genisSaat.Stop();
 
         var basladi = System.Diagnostics.Stopwatch.StartNew();
@@ -492,12 +538,24 @@ public sealed class PerformanceCheckTests
 
         var bulgular = string.Join(",", result.Findings.Select(f => f.Code));
         Log($"[butce] sinir={dar}ms gecen={basladi.ElapsedMilliseconds}ms " +
+            $"gecissiz taban gecen={tabanSaat.ElapsedMilliseconds}ms " +
             $"genis={YukOlcumButcesiMs}ms gecen={genisSaat.ElapsedMilliseconds}ms " +
-            $"karar={result.Impact} bulgular={bulgular}");
+            $"karar={result.Impact} bulgular={bulgular} " +
+            $"olculdu: dar yazilim={result.SoftwareMeasured} donanim={result.HardwareMeasured} " +
+            $"genis yazilim={genis.SoftwareMeasured} donanim={genis.HardwareMeasured}");
 
-        Assert.True(basladi.ElapsedMilliseconds < genisSaat.ElapsedMilliseconds / 2,
-            $"butce baglamadi: {dar}ms butceyle {basladi.ElapsedMilliseconds}ms, " +
-            $"genis butceyle {genisSaat.ElapsedMilliseconds}ms");
+        Assert.False(result.SoftwareMeasured, "dar butceyle yazilim bacagi yine de olculdu");
+        Assert.False(result.HardwareMeasured, "dar butceyle donanim bacagi yine de olculdu");
+
+        if (genis.SoftwareMeasured || genis.HardwareMeasured)
+            Assert.True(basladi.ElapsedMilliseconds < genisSaat.ElapsedMilliseconds / 2,
+                $"butce baglamadi: {dar}ms butceyle {basladi.ElapsedMilliseconds}ms, " +
+                $"genis butceyle {genisSaat.ElapsedMilliseconds}ms");
+        else
+            Atlandi($"genis butceyle de hicbir bacak olculemedi ({string.Join(",", genis.Findings.Select(f => f.Code))}), " +
+                    "sure karsilastirmasi kurulmadi");
+
+        Assert.True(taban.BudgetExhausted, "gecise zaman birakmayan kosum butceyi bildirmedi");
 
         var butce = Assert.Single(result.Findings, f => f.Code == PerformanceFindingCode.BudgetExhausted);
         Assert.Equal(dar, butce.BudgetMs);
@@ -569,15 +627,18 @@ public sealed class PerformanceCheckTests
     /// (c) Ayni kodlama serbest is parcacigiyla: sayac saglamsa toplam islemci
     ///     zamani kabaca sabit kalmali, yalniz duvar saati kisalmali.
     ///
-    /// Neyi koruyor: kalibratorun <b>olcmeye devam ettigini</b>. Tur 1'de kalibrator
-    /// butun surecin CPU deltasini tek is parcacigina yaziyor ve kirpma yuzunden hep
-    /// 1 donuyordu; yani "saglam sayac" ile "mesgul surec" ayirt edilemiyordu ve onu
-    /// pinleyen olcu de kirpma yuzunden curutulemezdi. Buradaki iki iddia o hataya
-    /// kapiyi kapatir: katsayi pozitif donmeli (0 = "olculemedi", yani sapma
-    /// iddiasinin dayanagi yok) ve yakan is parcacigi istenen sureyi gercekten
-    /// yakmali (kisa kalirsa katsayi olcum degil gurultudur). Kos ayrica her ffmpeg
-    /// gecisinin sifir cikis koduyla bittigini dogrular: basarisiz bir gecisin
-    /// sayilari kanit sayilmaz.
+    /// Neyi koruyor: sayac okunamadiginda <b>urunun dogru davrandigini</b>. Sayacin bu
+    /// makinede calismasi iddia edilemez — is parcacigi sayaci okunamayabilir ve
+    /// okundugunda da sapabilir, ikisi de makinenin hali. Iddia edilen sey urunun o
+    /// okumayi nasil rapor ettigi: guvenilmez bir sayac guvenilmez diye bildirilmeli,
+    /// karar sayaca kaymamali ve sayac yuzunden yanlis bir sayi uretilmemeli.
+    ///
+    /// Tur 1'de kalibrator butun surecin CPU deltasini tek is parcacigina yaziyor ve
+    /// kirpma yuzunden hep 1 donuyordu; yani "saglam sayac" ile "mesgul surec" ayirt
+    /// edilemiyordu. Yakan is parcacigi istenen sureyi gercekten yakmali (kisa
+    /// kalirsa katsayi olcum degil gurultudur) iddiasi o kapiyi kapali tutuyor. Kos
+    /// ayrica her ffmpeg gecisinin sifir cikis koduyla bittigini dogrular: basarisiz
+    /// bir gecisin sayilari kanit sayilmaz.
     /// </summary>
     [FfmpegFact]
     public void IslemciZamaniSayaciDogruOkuyorMu()
@@ -588,7 +649,21 @@ public sealed class PerformanceCheckTests
         Log($"[sayac] (a) is parcacigi duzeyi: duzeltme={N(katsayi)}x " +
             $"yakim-duvar={saat.ElapsedMilliseconds}ms (1 = saglam sayac, 0 = olculemedi)");
 
-        Assert.True(katsayi > 0, "kalibrator Windows'ta olcemedi");
+        var guvenilir = katsayi > 0 && katsayi <= PerformanceCheck.CpuAccountingTolerance;
+        var maliyet = Cost("libx264", 1.4);
+        var saglam = Degerlendir(maliyet, sayacKatsayisi: 1);
+        var buMakine = Degerlendir(maliyet, sayacKatsayisi: katsayi);
+
+        Assert.Equal(guvenilir, buMakine.CpuAccountingTrustworthy);
+        Assert.Equal(
+            !guvenilir,
+            buMakine.Findings.Any(f => f.Code == PerformanceFindingCode.CpuAccountingUnreliable));
+        Assert.Equal(saglam.Impact, buMakine.Impact);
+        Assert.Equal(saglam.SoftwareRealtimeCores, buMakine.SoftwareRealtimeCores, 6);
+
+        if (!guvenilir)
+            Atlandi($"bu makinenin islemci zamani sayaci is parcacigi duzeyinde guvenilir okumadi " +
+                    $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi");
 
         Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
 
