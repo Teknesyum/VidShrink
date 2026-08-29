@@ -5,6 +5,24 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.2.2] - 2026-08-29
+
+### Fixed
+
+- **The launcher can now update itself.** Until this release the self-update replaced only
+  the application folder: the launcher binary sat outside it and was never listed in the
+  manifest, so any fix to the update logic itself could only reach an installation by
+  re-running the installer by hand. The manifest now carries the launcher in its own
+  top-level field, which older clients ignore, so installations on 0.2.0 and 0.2.1 keep
+  updating exactly as before.
+- The swap never leaves the launcher name absent. The incoming binary lands beside the
+  target, the running launcher starts the application and exits, and the new binary then
+  renames itself onto the target name in one atomic move. A probe that scans the folder
+  throughout the swap saw the name present in all 91,768 samples; the same probe run
+  against the previous two-step procedure missed it 845 times.
+- A launcher version marker is no longer written for a launcher that was never verified,
+  and a pending swap is dropped when the installer has already moved the launcher forward.
+
 ## [0.2.1] - 2026-08-29
 
 ### Added
