@@ -68,3 +68,6 @@
 {"id":"T69","round":"2","risk":"low","verify":["dotnet test -c Release --filter PerformanceCheckTests"],"auditorRunId":null,"headSha":"5581a0801c2d0ff930c62065ab2ad3e3fe610941","at":"2026-08-29T13:17:12.758Z"}
 {"id":"T70","round":"1","risk":"low","verify":["dotnet test -c Release --filter ComparisonPanelTests"],"auditorRunId":null,"headSha":"8c2fad5d4cb4d2cc5dddb342aff3478fcb435efd","at":"2026-08-29T14:43:42.326Z"}
 {"id":"T71","round":"2","risk":"low","verify":["dotnet test -c Release --filter TipOverflowTests"],"auditorRunId":null,"headSha":"8c2fad5d4cb4d2cc5dddb342aff3478fcb435efd","at":"2026-08-29T14:43:45.100Z"}
+{"id":"T72","round":"2","risk":"low","verify":["dotnet test -c Release --filter \"ThemeTokenTests|ThemeBackdropTests"],"auditorRunId":null,"headSha":"45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf","at":"2026-08-29T16:10:51.371Z"}
+{"id":"T73","round":"1","risk":"low","verify":["dotnet test -c Release --filter ComparisonPanelTests"],"auditorRunId":null,"headSha":"45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf","at":"2026-08-29T16:10:59.391Z"}
+{"id":"T74","round":"1","risk":"low","verify":["dotnet test -c Release --filter WindowLayoutTests"],"auditorRunId":null,"headSha":"45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf","at":"2026-08-29T16:11:14.986Z"}

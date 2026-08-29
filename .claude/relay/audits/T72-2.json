@@ -1,0 +1,23 @@
+{
+  "contractId": "T72",
+  "auditorRunId": "ade98870601b13b20",
+  "headSha": "45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf",
+  "diffHash": "071cbc6b2f730eafb8b5f6102712faf6211838f6615bdffdd2a351c25e8e874b",
+  "owns": [
+    "src/VidShrink.App/Themes/Theme.axaml",
+    "src/VidShrink.App/Themes/Controls.axaml",
+    "tests/VidShrink.Tests/ThemeTokenTests.cs",
+    "tests/VidShrink.Tests/ThemeBackdropTests.cs"
+  ],
+  "verification": [
+    "dotnet test -c Release (tam suit, tek kosum) -> 836 gecti, 0 kaldi, 16 atlandi, 852 toplam, 2 dk 47 sn, exit 0",
+    "Theme.axaml: Ember ailesi 9 renk belirteci (NeonEmberColor + Ember*8); git show 1eb8cdd^ ile ayni liste, palet buyumemis",
+    "Theme.axaml WorkspaceBackground: 24 anka yolu elle sayildi - WingNear 8, WingFar 6, Tail 5, Crest 4, Body 1; bes gradyan rampasi (Body/Tail/WingNear/WingFar/Crest)",
+    "PanelSurfaceOpacity=0.90, PanelSurface fircasi SurfaceToneColor + o opaklik, Controls.axaml Panel temasi {StaticResource PanelSurface} okuyor",
+    "En kotu hal kontrasti elle yeniden hesaplandi: Blend(#FFFF00,#0B0407,0.30)=#544F05, Blend(#121216,#544F05,0.90)=#191814, kontrast 17.77:1 (iddia ile ayni), WCAG AA 4.5 esiginin ustunde",
+    "ThemeBackdropTests sayilari cizimden okuyor: PhoenixDrawings() XML'i ayristiriyor, PartGeometries/PartBounds Geometry.Parse ile olcuyor; elle yazili sabit yalnizca T72 oncesi dort taban yol ve WCAG esigi",
+    ".calisma/anka-onizleme.svg bulundu (.claude/worktrees/agent-a5e04d34086899326/.calisma/); 24 path d degeri Theme.axaml geometrileriyle birebir ayni (diff bos), gradyan duraklari ayni"
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-29T16:09:06.896Z"
+}

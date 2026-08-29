@@ -1,0 +1,24 @@
+{
+  "contractId": "T73",
+  "auditorRunId": "ade98870601b13b20",
+  "headSha": "45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf",
+  "diffHash": "89b84f65bd27e1145bda742ece510087022afb93b8b08eb30d82a05b618983f0",
+  "owns": [
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Playback/HoverZone.cs",
+    "src/VidShrink.App/Playback/ControlStrip.axaml.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs"
+  ],
+  "verification": [
+    "dotnet test -c Release (tam suit, tek kosum) -> 836 gecti, 0 kaldi, 16 atlandi, exit 0",
+    "dotnet test -c Release --filter Kisa_bandli_panel_de_pencereyi_dolduruyor|Fareyle_buyume_tam_kademeye_esitlenmez -> 3/3 yesil",
+    "grep -rn PlaybackPanelRiseDelay src tests: kodda tek okuma ComparisonPanel.axaml.cs:224 (showDelay); geri kalan belirtec tanimi (Playback.axaml:100), yorum ve olcum",
+    "HoverZone.cs:204-205: ShowCountdown?.Invoke(delay) ile _clock.Start(delay,...) ayni yerel degiskeni kullaniyor; ComparisonPanel.axaml.cs:598 RiseRing.Run(left,_motionReduced) - halka sureyi zamanlayicidan aliyor, belirteci ikinci kez okumuyor",
+    "RiseScale (ComparisonPanel.axaml.cs:834-844): tavan 1+FullDropAt*(max-1) -> T=0.92; ZoomGesture.UpdateShelter Mid->Full gecisi T>=FullAt(1.00) istiyor, yani fareyle buyume tam kademeye ulasmiyor; 0.92 = FullAt - NotchStep, tam bir tekerlek centigi alti",
+    "Negatif kontrol kaynak degistirmeden ispatlandi (denetci rolu yazma yasagi): band=300, area*share=954 iken sabit carpanla StageBounds min(300*2,954)=600 doner; test Assert.Equal(954,target.Height,3) ve Assert.True(scale>fixedFactor) ile 2>2 kirilir - iki esik de belirtecten okundugu icin eski sabitle gecemez. Calisma agaci degistirilmedi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-29T16:09:22.445Z"
+}

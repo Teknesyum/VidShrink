@@ -1,0 +1,22 @@
+{
+  "contractId": "T74",
+  "auditorRunId": "ade98870601b13b20",
+  "headSha": "45d2db5f14cfbb54dab9e67fd82b43b78ee6dfbf",
+  "diffHash": "84f548047e49994b017857af9d0483a15a54bbf7d6c1430820e7ee875b901747",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "src/VidShrink.App/Themes/Theme.axaml",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs"
+  ],
+  "verification": [
+    "dotnet test -c Release (tam suit, tek kosum) -> 836 gecti, 0 kaldi, 16 atlandi, exit 0",
+    "dotnet test -c Release --filter TheThreeColumnsStartAtTheSameTop|ThePreviewHeadingIsGone|NoTurkishBoxLabelIsClipped -> 10/10 yesil; uc sutunun tepesi dort halde de 0 (LayoutTop Bounds ile yuruyor, TranslatePoint yok)",
+    "MainWindow.axaml:480 orta sutun RowDefinitions=*,Auto; Preview basligi yok, LanguageCatalog'da [Preview] girdisi yok (grep)",
+    "Theme.axaml:209 SectionMargin=0,16,0,0; T74'un uc commitinin (b0575ab,58e8443,4d2a2ec) name-only ciktisi Theme.axaml'de yalnizca o satiri degistirdigini gosteriyor, owns disina cikilmamis",
+    "CmbFillPolicy Turkce pencerede olculdu: dort halde de kirpilma yok. Olcum ciktisi - Bos 1560x1060: 217 yazi; Dolu: 219; Bos/Dolu 1040x720: 217/219. Payi en dar uc yazi dort halde de BtnSponsor 'Buy Me a Coffee': gereken 107,9 kalan yer 108 (pay 0,1 px). CmbFillPolicy bu listeye girmiyor, yani payi 0,1'den genis; testin esigi Overflow>0.5"
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-29T16:09:36.029Z"
+}
