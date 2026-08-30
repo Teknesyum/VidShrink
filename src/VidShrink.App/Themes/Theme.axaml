@@ -391,8 +391,6 @@
   <BoxShadows x:Key="GlowPurple">0 0 20 0 #40B026FF</BoxShadows>
   <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
 
-  <x:String x:Key="AiHintText">• This step is optional.&#10;• Copy a prompt to any chat AI, then paste and validate its JSON answer.</x:String>
-
   <x:String x:Key="LinkGitHub">https://github.com/Teknesyum</x:String>
   <x:String x:Key="LinkRepo">https://github.com/Teknesyum/vidshrink</x:String>
   <x:String x:Key="LinkSponsor">https://github.com/sponsors/Teknesyum</x:String>

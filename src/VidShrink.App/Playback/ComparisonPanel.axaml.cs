@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
 
@@ -255,15 +256,18 @@ internal partial class ComparisonPanel : UserControl
     /// </summary>
     private void RefreshTexts()
     {
-        EmptyTitle.Text = Say("Comparison panel");
-        EmptyHint.Text = Say(_notice ?? "Load a file to see the two sides");
-        PlaceholderText.Text = Say("The panel moved to the front");
-        LeftBadgeText.Text = LanguageCatalog.Title(Say("Original"), _turkish);
-        RightBadgeText.Text = LanguageCatalog.Title(Say("Processed"), _turkish);
+        EmptyTitle.Text = Say("playback.panel.title");
+        EmptyHint.Text = Say(_notice ?? "playback.panel.hint");
+        PlaceholderText.Text = Say("playback.panel.moved");
+        LeftBadgeText.Text = Say("playback.badge.original");
+        RightBadgeText.Text = Say("playback.badge.processed");
         RightCurtainText.Text = _rightNotice is null ? string.Empty : Say(_rightNotice);
     }
 
-    private string Say(string english) => LanguageCatalog.Localize(english, _turkish);
+    private static string Say(string key)
+        => key.StartsWith("playback.", StringComparison.Ordinal)
+            ? LanguageCatalog.Display(Strings.Get(key))
+            : key;
 
     // ---- ayırıcı (K2) -------------------------------------------------------------
 

@@ -1,1 +1,36 @@
-{}
+{
+  "performance.title": "Başarım ölçümü",
+  "performance.run": "Ölçümü koştur",
+  "performance.running": "Ölçülüyor — birkaç kısa kodlama koşuyor, en çok yirmi saniye sürer.",
+  "performance.failed": "Ölçüm tamamlanamadı",
+
+  "performance.headline.hardware-offloaded": "Bu makinede çalışan bir donanım kodlayıcısı var ve o geçiş işlemciye yaslanmıyor.",
+  "performance.headline.hardware": "Bu makinede çalışan bir donanım kodlayıcısı var, ancak o geçişi işlemcinin taşıyıp taşımadığı burada ölçülmedi.",
+  "performance.headline.software-heavy": "Çalışan bir donanım kodlayıcısı bulunamadı ve yazılım kodlaması gerçek zamana yetişmek için bir işlemci çekirdeğinin tamamını istiyor.",
+  "performance.headline.software-light": "Çalışan bir donanım kodlayıcısı bulunamadı, ama yazılım kodlaması gerçek zamanda tek çekirdeğin altında kalıyor.",
+  "performance.headline.not-enough": "Soruyu yanıtlayacak kadarı burada ölçülmedi.",
+
+  "performance.line.not-measured": "Bu makinede henüz hiçbir şey ölçülmedi.",
+  "performance.line.no-hardware": "Burada kullanılabilir bir donanım video kodlayıcısı yok, bu yüzden kodlama işlemcide koşuyor.",
+  "performance.line.hardware-failed": "Bu makinede bir donanım kodlayıcısı listeleniyor, ancak deneme kodlaması başarısız oldu.",
+  "performance.line.hardware-works": "Bu makinede donanım kodlaması çalışıyor.",
+  "performance.line.hardware-not-cpu-bound": "Donanım geçişi işlemciye yaslanmıyor: ona tek iş parçacığı vermek ile iş parçacıklarını serbest bırakmak {0}× farkla aynı süreyi aldı.",
+  "performance.line.hardware-cost-unknown": "Donanım geçişinin işlemci maliyeti ölçülmedi, bu yüzden bedava sayılmamalı.",
+  "performance.line.hardware-headroom": "Donanım geçişi gerçek zamanın {0}× hızında koştu.",
+  "performance.line.software-realtime": "Yazılım kodlaması gerçek zamana yetişmek için {0} çekirdek istiyor; makinede {1} mantıksal çekirdek var.",
+  "performance.line.software-costs-cores": "Bu bir çekirdek ya da fazlası ({0} çekirdek), yani yazılım kodlaması koştuğu sürece bir çekirdeği kendine ayırır.",
+  "performance.line.software-small": "Bu tek çekirdeğin altında kalıyor ({0} çekirdek), yani başka işlerin bıraktığı boşluklara yayılabilir.",
+  "performance.line.cpu-unreliable": "Bu makinedeki işlemci zamanı sayacı güvenilir değil (duvar saatine karşı {0}×), bu yüzden işlemci süreleri gösteriliyor ama onlardan bir karar çıkarılmıyor.",
+  "performance.line.budget-exhausted": "Ölçüm bütçesi tükendi ({1} ms bütçenin {0} ms'i), bu yüzden ölçümün bir ayağı eksik.",
+  "performance.boundary": "VidShrink video kaydı yapmaz. Burada ölçülen şey, bu makinede kodlamanın maliyetidir; bir kayıt aracının onunla ne yaptığı değil — ilk bakılacak yer o aracın kendi kodlayıcı ayarıdır.",
+
+  "performance.fact.hardware-encoder": "Donanım kodlayıcısı",
+  "performance.fact.hardware-pipeline": "Donanım borusu",
+  "performance.fact.software-encoder": "Yazılım kodlayıcısı",
+  "performance.fact.software-cost": "Yazılım maliyeti",
+  "performance.fact.logical-cores": "Mantıksal çekirdek",
+  "performance.fact.measured-in": "Ölçüm süresi",
+  "performance.value.realtime": "{0}× gerçek zaman",
+  "performance.value.cores": "{0} çekirdek",
+  "performance.value.ms": "{0} ms"
+}

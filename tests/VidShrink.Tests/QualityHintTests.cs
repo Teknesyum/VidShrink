@@ -122,11 +122,13 @@ public sealed class QualityHintTests
         Assert.Equal(QualityBasis.Estimated, QualityHint.For(SampleInfo(), Options(), 16, null, null).Basis);
         Assert.Equal(QualityBasis.Measured, QualityHint.For(SampleInfo(), Options(), 16, MeasuredProfile(), null).Basis);
 
-        var code = File.ReadAllText(TipSources.WindowCodePath);
-        Assert.Contains("Kaynak bit hızından tahmin edildi", code, StringComparison.Ordinal);
-        Assert.Contains("Estimated from the source bitrate", code, StringComparison.Ordinal);
-        Assert.Contains("Bu klipten kodlanan örnekle ölçüldü", code, StringComparison.Ordinal);
-        Assert.Contains("Measured from a sample encoded from this clip", code, StringComparison.Ordinal);
+        var english = Locales.Values("en");
+        var turkish = Locales.Values("tr");
+
+        Assert.Equal("Estimated from the source bitrate", english["main.quality.basis.estimated"]);
+        Assert.Equal("Kaynak bit hızından tahmin edildi", turkish["main.quality.basis.estimated"]);
+        Assert.Equal("Measured from a sample encoded from this clip", english["main.quality.basis.measured"]);
+        Assert.Equal("Bu klipten kodlanan örnekle ölçüldü", turkish["main.quality.basis.measured"]);
     }
 
     /// <summary>
@@ -202,10 +204,7 @@ public sealed class QualityHintTests
     [InlineData("Delete the shared file", "Paylaşılan dosyayı sil")]
     public void EveryNewLabelHasBothLanguages(string english, string turkish)
     {
-        var titled = LanguageCatalog.Title(english, false);
-
-        Assert.True(LanguageCatalog.EnglishToTurkish.TryGetValue(titled, out var found), $"{english} sözlükte yok.");
-        Assert.Equal(LanguageCatalog.Title(turkish, true), found);
+        Assert.Equal(turkish, Locales.TurkishFor(english));
     }
 
     /// <summary>
@@ -219,8 +218,6 @@ public sealed class QualityHintTests
     [InlineData("Bir video yükleyin; bu hedefin tahmini kalite skoru burada çıkar.", "Load a video and this target's predicted quality score appears here.")]
     public void EveryPanelLineIsWrittenInBothLanguages(string turkish, string english)
     {
-        var code = File.ReadAllText(TipSources.WindowCodePath);
-        Assert.Contains($"\"{turkish}\"", code, StringComparison.Ordinal);
-        Assert.Contains($"\"{english}\"", code, StringComparison.Ordinal);
+        Assert.Equal(turkish, Locales.TurkishFor(english));
     }
 }

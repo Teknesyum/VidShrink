@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 using VidShrink.Core.Playback;
 
@@ -170,7 +171,7 @@ internal sealed class PanelHost : IDisposable
         {
             var clip = ActiveClip;
             if (clip is null || !clip.IsApproximate) return null;
-            var text = LanguageCatalog.Localize("Approximate preview", _turkish);
+            var text = LanguageCatalog.Display(Strings.Get("playback.approximate-preview"));
             return clip.Crf is { } crf ? $"{text} · CRF {crf}" : text;
         }
     }
@@ -346,7 +347,7 @@ internal sealed class PanelHost : IDisposable
 
         _panel.Frames.Configure(new PixelSize(size.Width * 2, size.Height));
         RefreshRight();
-        _panel.SetNotice("The first frame is on its way");
+        _panel.SetNotice("playback.panel.first-frame");
         _panel.Controls.Duration = _duration > TimeSpan.Zero ? _duration : null;
         _panel.Controls.IsPlaying = true;
 
@@ -365,7 +366,7 @@ internal sealed class PanelHost : IDisposable
         }
         catch (Exception ex)
         {
-            if (generation == _generation) _panel.SetNotice($"{LanguageCatalog.Localize("The comparison player could not start", _turkish)}: {ex.Message}");
+            if (generation == _generation) _panel.SetNotice($"{LanguageCatalog.Display(Strings.Get("playback.player-failed"))}: {ex.Message}");
             return;
         }
 
@@ -474,8 +475,8 @@ internal sealed class PanelHost : IDisposable
     {
         if (_right is not null || ActiveClip is not null) return null;
         return _clipError is null
-            ? "This part will be processed"
-            : $"{LanguageCatalog.Localize("The preview sample could not be encoded", _turkish)}: {_clipError}";
+            ? "playback.panel.pending"
+            : $"{LanguageCatalog.Display(Strings.Get("playback.sample-failed"))}: {_clipError}";
     }
 
     /// <summary>
@@ -873,12 +874,12 @@ internal sealed class PanelHost : IDisposable
         if (status.State == ComparisonSourceState.Kullanilamiyor)
         {
             var reason = (_turkish ? status.MessageTr : status.MessageEn) ?? status.MessageEn ?? status.MessageTr;
-            _panel.SetNotice(reason ?? "The comparison player could not start");
+            _panel.SetNotice(reason ?? "playback.player-failed");
             _panel.Controls.IsPlaying = false;
         }
         else if (status.State == ComparisonSourceState.Durdu && _submitted == 0)
         {
-            _panel.SetNotice("The comparison player could not start");
+            _panel.SetNotice("playback.player-failed");
             _panel.Controls.IsPlaying = false;
         }
     }

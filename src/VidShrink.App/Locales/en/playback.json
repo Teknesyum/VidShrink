@@ -1,1 +1,12 @@
-{}
+{
+  "playback.badge.original": "Original",
+  "playback.badge.processed": "Processed",
+  "playback.approximate-preview": "Approximate preview",
+  "playback.player-failed": "The comparison player could not start",
+  "playback.sample-failed": "The preview sample could not be encoded",
+  "playback.panel.title": "Comparison panel",
+  "playback.panel.hint": "Load a file to see the two sides",
+  "playback.panel.moved": "The panel moved to the front",
+  "playback.panel.pending": "This part will be processed",
+  "playback.panel.first-frame": "The first frame is on its way"
+}

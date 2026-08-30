@@ -243,7 +243,7 @@ public sealed class ShareFlowTests : IDisposable
     [InlineData("Share the file", "Dosyayı paylaş")]
     [InlineData("Cancel the upload", "Yüklemeyi iptal et")]
     public void TheShareButtonsAreTranslated(string english, string turkish)
-        => Assert.Equal(turkish, TipSources.ReadCatalogue()[english]);
+        => Assert.Equal(turkish, Locales.TurkishFor(english));
 
     // ---- K2: sürüm dizesi --------------------------------------------------------------
 

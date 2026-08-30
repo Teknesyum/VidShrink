@@ -106,6 +106,20 @@ public sealed class WindowLayoutTests
         var root = (Layoutable)window.GetVisualChildren().Single();
         root.Measure(size);
         root.Arrange(new Rect(size));
+
+        ClearEntranceTransforms(window);
+    }
+
+    /// <summary>
+    /// Giriş canlandırması panellere <c>translateY</c> uyguluyor ve <c>PlayPanelEntrance</c>
+    /// başsız koşumda hiç çalışmadığı için o dönüşüm asla geri alınmıyordu:
+    /// <see cref="Visual.TranslatePoint"/> her bloğu on piksel aşağıda gösteriyordu.
+    /// Ölçüm bunu ortamdan devralmıyor, kendisi siliyor.
+    /// </summary>
+    private static void ClearEntranceTransforms(MainWindow window)
+    {
+        foreach (var node in window.GetVisualDescendants().OfType<Visual>())
+            node.RenderTransform = null;
     }
 
     /// <summary>
@@ -217,6 +231,7 @@ public sealed class WindowLayoutTests
         AppHost.Run(() =>
         {
             var window = new MainWindow();
+            window.UseTurkish();
 
             if (loaded)
             {
@@ -391,15 +406,23 @@ public sealed class WindowLayoutTests
     /// onunla birlikte uzadı: tasarım boyunda 830 civarından 956'ya, taban boyunda 975'e.
     /// Boş sayfanın iki aralığı <b>değişmedi</b> — orada sayfayı hâlâ sol ayar sütunu
     /// tutuyor, oynatma paneli onun altında kalıyor.
+    /// <para>T83: ölçüm bugüne kadar <b>İngilizce</b> pencereyi ölçüyordu. Uygulama Türkçe
+    /// açılıyor ama <c>OnWindowLoaded</c> başsız koşumda hiç ateşlenmediği için dil hiç
+    /// değişmiyordu; pinler kullanıcının görmediği bir yerleşimden geliyordu. Düzenek artık
+    /// pencereyi Türkçeye alıyor ve dört sayı yeniden temellendi: boş/tasarım 947-1047 →
+    /// 939-1039 (ölçülen 989), boş/taban 965-1065 → 960-1060 (1010), dolu/tasarım 906-1006
+    /// (956) değişmedi, dolu/taban 925-1025 → 1002-1102 (1052). En büyük kayma dolu/taban:
+    /// Türkçe karşılıklar dar pencerede daha çok satıra sarıyor.</para>
+    ///
     /// <b>Bu sayı neyi koruyor:</b> sayfanın kendi boyunu. Bir daha şişerse ölçüm kırmızıya
     /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, false, 947, 1047)]
-    [InlineData(false, true, 965, 1065)]
+    [InlineData(false, false, 939, 1039)]
+    [InlineData(false, true, 960, 1060)]
     [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 925, 1025)]
+    [InlineData(true, true, 1002, 1102)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -457,13 +480,17 @@ public sealed class WindowLayoutTests
     /// <para>T52: iki eşik de yükseldi — boş sayfa 1008, dolu sayfa 1052. Sebep oynatma
     /// panelinin taban boyunun iki katına çıkması; kural aynı kaldı, sığma yüksekliği yine
     /// içerik boyu artı pencere süsünün 95 pikseli. Aralıkların genişliği (±45)
-    /// değiştirilmedi. <b>Bu sayı neyi koruyor:</b> pencerenin hangi boydan sonra kaymayı
+    /// değiştirilmedi.</para>
+    ///
+    /// <para>T83: ölçüm Türkçe pencereye geçti. Boş sayfa 1047-1137 → 1039-1129 (ölçülen
+    /// 1084), dolu sayfa 1007-1097 (1052) değişmedi.
+    /// <b>Bu sayı neyi koruyor:</b> pencerenin hangi boydan sonra kaymayı
     /// bıraktığını. <b>Bozulursa kullanıcı ne görür:</b> daha uzun pencerelerde bile
     /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 1047, 1137)]
+    [InlineData(false, 1039, 1129)]
     [InlineData(true, 1007, 1097)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
@@ -499,6 +526,10 @@ public sealed class WindowLayoutTests
     /// <para>T74/K1 "Preview" başlığını ve onu taşıyan satırı orta sütundan kaldırdı; orta
     /// sütun 932'den 882'ye indi ve dolu sayfada sol sütun (904) öne geçti. Tabela bu yüzden
     /// iki hâlde de <b>sol sütunu</b> gösteriyor.</para>
+    ///
+    /// <para>T83 ölçümü Türkçe pencereye taşıdı; tutan sütun değişmedi. Türkçe ölçülen
+    /// sütun boyları: boş sayfa sol 973 / orta 844 / sağ 476, dolu sayfa sol 940 /
+    /// orta 882 / sağ 512.</para>
     ///
     /// <para>Yani sayfayı kısaltmak isteyen iş hangi hâli kısaltmak istediğine bakmalı.
     /// Korunan ilişki değişmedi, yalnız doğru adıyla yazıldı: sayfa içeriği <b>en uzun sütun
@@ -639,6 +670,7 @@ public sealed class WindowLayoutTests
         AppHost.Run(() =>
         {
             var window = new MainWindow();
+            window.UseTurkish();
             if (loaded)
             {
                 window.LoadWithoutProbing(SamplePath, Sample());
@@ -744,7 +776,7 @@ public sealed class WindowLayoutTests
 
         Assert.All(scans, scan => Assert.True(scan.Measured > 0, $"{scan.Header} sekmesi hiç ölçülmedi. {report}"));
 
-        var advanced = scans.Single(scan => scan.Header == "Advanced");
+        var advanced = scans.Single(scan => scan.InPerformancePanel > 0);
         Assert.True(advanced.InPerformancePanel > 0, $"Başarım paneli ölçülmedi. {report}");
     }
 
@@ -752,6 +784,7 @@ public sealed class WindowLayoutTests
         AppHost.Run(() =>
         {
             var window = new MainWindow();
+            window.UseTurkish();
             if (loaded)
             {
                 window.LoadWithoutProbing(SamplePath, Sample());
@@ -875,7 +908,7 @@ public sealed class WindowLayoutTests
         });
 
         Assert.Empty(headings);
-        Assert.False(VidShrink.App.LanguageCatalog.EnglishToTurkish.ContainsKey("Preview"));
+        Assert.DoesNotContain("Preview", Locales.Values("en").Values);
     }
 
     /// <summary>

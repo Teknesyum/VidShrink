@@ -87,9 +87,10 @@ public sealed class CasingTests
     [Fact]
     public void NoTranslationIsWrittenInCapitals()
     {
-        var offenders = TipSources.ReadCatalogue()
-            .Where(pair => ShoutedWord.IsMatch(pair.Key) || ShoutedWord.IsMatch(pair.Value))
-            .Select(pair => $"{pair.Key} -> {pair.Value}")
+        var offenders = Locales.Languages
+            .SelectMany(language => Locales.Values(language)
+                .Where(pair => ShoutedWord.IsMatch(pair.Value))
+                .Select(pair => $"{language}/{pair.Key} -> {pair.Value}"))
             .ToList();
 
         Assert.True(
@@ -115,34 +116,6 @@ public sealed class CasingTests
     [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv Beats libsvtav1 On aac")]
     public void UnitsAndEncoderNamesKeepTheirSpelling(string text, string expected)
         => Assert.Equal(expected, LanguageCatalog.Title(text, false));
-
-    /// <summary>
-    /// T65 K2: geçit değişince sözlük anahtarları da kayar. Ölçü örnek seçmiyor —
-    /// kaynaktaki <c>EnglishSource</c> girdilerinin <b>hepsi</b> üzerinde dönüyor, her
-    /// birinin hâlâ çözüldüğünü ve ters yönün aynı girdiye döndüğünü doğruluyor. Girdi
-    /// sayısı kaynak dosyadan okunuyor: iki anahtar çakışıp bir girdi düşerse sayı ayrışır.
-    /// </summary>
-    [Fact]
-    public void EveryCatalogueEntryStillResolves()
-    {
-        var source = File.ReadAllText(Path.Combine(AppRoot, "LanguageCatalog.cs"));
-        var block = Regex.Match(
-            source,
-            @"EnglishSource = new Dictionary<string, string>\s*\{(.*?)\n    \};",
-            RegexOptions.Singleline);
-
-        Assert.True(block.Success, "EnglishSource bloğu kaynakta bulunamadı.");
-
-        var written = Regex.Matches(block.Groups[1].Value, "\n\\s*\\[\"").Count;
-        Assert.Equal(written, LanguageCatalog.EnglishToTurkish.Count);
-        Assert.Equal(written, LanguageCatalog.TurkishToEnglish.Count);
-
-        foreach (var (english, turkish) in LanguageCatalog.EnglishToTurkish)
-        {
-            Assert.Equal(turkish, LanguageCatalog.Localize(english, true));
-            Assert.Equal(english, LanguageCatalog.TurkishToEnglish[turkish]);
-        }
-    }
 
     /// <summary>
     /// T65 K3: birim ve tanımlayıcı listesi tek bir bildirimde durur. İkinci bir kopya

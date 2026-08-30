@@ -4,13 +4,11 @@ using System.Text.RegularExpressions;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// İpucu metinlerinin tek okuma yeri. Metin üç ayrı kaynaktan geliyor
-/// (<c>MainWindow.axaml</c>, <c>Themes/Theme.axaml</c> sabitleri ve
-/// <c>MainWindow.axaml.cs</c> içindeki <c>*TipEnglish</c>/<c>*EffectEnglish</c> sabitleri);
-/// yalnız birine bakan bir ölçüm sessizce yeşil verir. T26 bunu bir kez yaşadı.
-///
-/// Kaynak dosyalar metin olarak okunur, çünkü test projesi <c>VidShrink.App</c>'e
-/// başvurmuyor.
+/// İpucu metinlerinin tek okuma yeri. T83'ten önce metin üç ayrı kaynaktan geliyordu
+/// (biçimleme, tema sabitleri, arka koddaki <c>*TipEnglish</c> sabitleri) ve yalnız birine
+/// bakan bir ölçüm sessizce yeşil veriyordu. Bugün tek kaynak var: <c>Locales</c>
+/// altındaki dil dosyaları. Okuyucu oraya taşındı — biçimlemeye bakmaya devam etseydi
+/// hiçbir ipucu bulamaz ve ölçümler boş kümede yeşil kalırdı.
 /// </summary>
 internal static class TipSources
 {
@@ -30,67 +28,63 @@ internal static class TipSources
     internal static readonly string ThemePath =
         Path.Combine(Root, "src", "VidShrink.App", "Themes", "Theme.axaml");
 
-    /// <summary>Sözlükteki her çift: anahtar İngilizce, değer Türkçe.</summary>
-    private static readonly Regex CatalogPair = new(
-        """^\s*\["((?:[^"\\]|\\.)*)"\]\s*=\s*"((?:[^"\\]|\\.)*)"\s*[,;]?\s*$""",
-        RegexOptions.Multiline | RegexOptions.Compiled);
-
-    /// <summary>XAML'de ipucu balonunun gövdesi.</summary>
-    private static readonly Regex TipInXaml = new(
-        """"Theme="\{StaticResource TipText\}"\s+Text="([^"]*)"""",
-        RegexOptions.Compiled);
-
-    /// <summary>Tema içinde paylaşılan metin sabitleri.</summary>
-    private static readonly Regex ThemeString = new(
-        """<x:String x:Key="([^"]+)">([^<]*)</x:String>""",
-        RegexOptions.Compiled);
-
-    /// <summary>Arka koddan yazılan ipucu metinleri.</summary>
-    private static readonly Regex TipConstant = new(
-        """private const string (\w+(?:Tip|Effect)English) = "((?:[^"\\]|\\.)*)";""",
-        RegexOptions.Compiled);
-
     internal static readonly Regex Bullet = new("""^\s*•""", RegexOptions.Compiled);
 
+    /// <summary>
+    /// Balonun gövdesine bağlanan anahtar. <c>TipText</c> teması şart: aynı madde boyacısına
+    /// bağlanan <c>BulletText</c> blokları sekme gövdesinde tam genişlikte duruyor, balon
+    /// tavanıyla ölçülmeleri yanlış olur.
+    /// </summary>
+    private static readonly Regex TipBinding = new(
+        "Theme=\"\\{StaticResource TipText\\}\"[^>]*?loc:Bullets\\.Text=\"\\{loc:Text ([\\w.\\-]+)\\}\"",
+        RegexOptions.Compiled);
+
+    /// <summary>
+    /// Biçimlemede bağlı olmayan, arka koddan yazılan balon metinleri. Adlarıyla sayılırlar;
+    /// düzen "madde taşıyan her anahtar" olsaydı bilgi kutusunun uzun paragrafları da
+    /// balon sanılır ve tavan ölçümü anlamını yitirirdi.
+    /// </summary>
+    private static readonly IReadOnlyList<string> WrittenFromCode = new[]
+    {
+        "main.fast-gpu.tip",
+        "main.fast-gpu.tip-missing",
+        "settings.update.auto-effect",
+        "settings.update.no-self-effect"
+    };
+
+    /// <summary>
+    /// İngilizce metinden Türkçesine. Eşleşme anahtar üzerinden kuruluyor: iki dil dosyası
+    /// aynı anahtarı taşıdığı için karşılık aramak artık metin karşılaştırması değil.
+    /// </summary>
     internal static IReadOnlyDictionary<string, string> ReadCatalogue()
     {
-        var source = File.ReadAllText(CatalogPath);
+        var english = Locales.Values("en");
+        var turkish = Locales.Values("tr");
         var pairs = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (Match match in CatalogPair.Matches(source))
-            pairs[Unescape(match.Groups[1].Value)] = Unescape(match.Groups[2].Value);
+
+        foreach (var (key, value) in english)
+            if (turkish.TryGetValue(key, out var written))
+                pairs[value] = written;
 
         return pairs;
     }
 
+    /// <summary>
+    /// İpucu balonuna giren metinler. Anahtarlar biçimlemedeki bağlamadan okunur, metinler
+    /// dil dosyasından: balonun tavanı ölçülürken ekranda balonda duran metin ölçülsün diye.
+    /// </summary>
     internal static IReadOnlyList<Tip> ReadTips()
     {
-        var themeStrings = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (Match match in ThemeString.Matches(File.ReadAllText(ThemePath)))
-            themeStrings[match.Groups[1].Value] = DecodeXml(match.Groups[2].Value);
+        var english = Locales.Values("en");
+        var xaml = File.ReadAllText(WindowXamlPath);
+        var keys = TipBinding.Matches(xaml).Select(match => match.Groups[1].Value)
+            .Concat(WrittenFromCode)
+            .Distinct(StringComparer.Ordinal);
 
         var tips = new List<Tip>();
-
-        foreach (Match match in TipInXaml.Matches(File.ReadAllText(WindowXamlPath)))
-        {
-            var raw = match.Groups[1].Value;
-            var reference = Regex.Match(raw, """^\{StaticResource\s+(\w+)\}$""");
-            if (reference.Success)
-            {
-                var key = reference.Groups[1].Value;
-                if (!themeStrings.TryGetValue(key, out var shared))
-                    throw new InvalidOperationException($"Theme.axaml içinde {key} yok.");
-                tips.Add(new Tip($"Theme.axaml/{key}", shared));
-            }
-            else
-            {
-                tips.Add(new Tip("MainWindow.axaml", DecodeXml(raw)));
-            }
-        }
-
-        foreach (Match match in TipConstant.Matches(File.ReadAllText(WindowCodePath)))
-            tips.Add(new Tip(
-                $"MainWindow.axaml.cs/{match.Groups[1].Value}",
-                Unescape(match.Groups[2].Value)));
+        foreach (var key in keys)
+            if (english.TryGetValue(key, out var value))
+                tips.Add(new Tip(key, value));
 
         return tips;
     }

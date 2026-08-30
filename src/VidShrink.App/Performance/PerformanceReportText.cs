@@ -1,4 +1,5 @@
 using System.Globalization;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 
 namespace VidShrink.App.Performance;
@@ -8,12 +9,15 @@ internal readonly record struct PerformanceFact(string Label, string Value);
 
 /// <summary>
 /// Ölçümün cümlesini kuran taraf. <see cref="PerformanceCheck"/> yalnız kod ve sayı
-/// döndürür; okunacak satır burada yazılır.
+/// döndürür; okunacak satır burada anahtarla seçilir.
 ///
 /// Ayrım kasıtlı: cümle ölçümün yanında dursaydı biri değişince öteki sessizce eskirdi.
 /// Buradaki her satırın karşılığı bir <see cref="PerformanceFindingCode"/> değeridir ve
 /// eşlemede serbest geçiş (<c>default</c>) yoktur — enum'a yeni bir değer eklendiğinde
 /// derleyici değil, ölçüm konuşur.
+///
+/// <para>Cümlenin kendisi burada yazılı değil: <c>Locales/&lt;dil&gt;/performance.json</c>
+/// içindedir ve bu sınıf yalnız hangi anahtarın hangi koda düştüğüne karar verir.</para>
 ///
 /// <para>Manşet <see cref="PerformanceCheckResult.Impact"/> üzerinden kurulmaz.
 /// Ölçüldü: makine meşgulken <c>Impact</c>, donanım kodlayıcısı çalışırken bile yazılım
@@ -28,8 +32,7 @@ internal static class PerformanceReportText
     /// hiç koşmamışken bile. VidShrink kayıt yapmaz; ölçtüğü şey bu makinede kodlamanın
     /// maliyetidir, kayıt aracının davranışı değil.
     /// </summary>
-    internal const string Boundary =
-        "VidShrink does not capture video. What is measured here is what encoding costs on this machine, not what a capture tool does with it — its own encoder setting is the first place to look.";
+    internal static string Boundary => Strings.Get("performance.boundary");
 
     internal static IReadOnlyList<string> Describe(PerformanceCheckResult result)
     {
@@ -52,19 +55,12 @@ internal static class PerformanceReportText
         var heavy = Has(result, PerformanceFindingCode.SoftwareCostsCores);
         var light = Has(result, PerformanceFindingCode.SoftwareCostIsSmall);
 
-        if (hardware && offloaded)
-            return "This machine has a working hardware encoder and that pass does not lean on the processor.";
+        if (hardware && offloaded) return Strings.Get("performance.headline.hardware-offloaded");
+        if (hardware) return Strings.Get("performance.headline.hardware");
+        if (heavy) return Strings.Get("performance.headline.software-heavy");
+        if (light) return Strings.Get("performance.headline.software-light");
 
-        if (hardware)
-            return "This machine has a working hardware encoder, but whether the processor carries that pass was not measured here.";
-
-        if (heavy)
-            return "No working hardware encoder was found, and software encoding wants a whole processor core to keep up with realtime.";
-
-        if (light)
-            return "No working hardware encoder was found, but software encoding stays under one processor core at realtime.";
-
-        return "There is not enough measured here to answer the question.";
+        return Strings.Get("performance.headline.not-enough");
     }
 
     /// <summary>
@@ -76,42 +72,46 @@ internal static class PerformanceReportText
         switch (finding.Code)
         {
             case PerformanceFindingCode.NotMeasured:
-                return "Nothing has been measured on this machine yet.";
+                return Strings.Get("performance.line.not-measured");
 
             case PerformanceFindingCode.NoHardwareEncoder:
-                return "No hardware video encoder is available here, so encoding runs on the processor.";
+                return Strings.Get("performance.line.no-hardware");
 
             case PerformanceFindingCode.HardwareEncoderFailed:
-                return "A hardware encoder is listed on this machine, but its test encode failed.";
+                return Strings.Get("performance.line.hardware-failed");
 
             case PerformanceFindingCode.HardwarePathWorks:
-                return "Hardware encoding works on this machine.";
+                return Strings.Get("performance.line.hardware-works");
 
             case PerformanceFindingCode.HardwareNotCpuBound:
-                return "The hardware pass does not lean on the processor: giving it one thread or leaving the threads free took the same time, within "
-                       + Number(finding.Factor, "0.00") + "×.";
+                return Strings.Get("performance.line.hardware-not-cpu-bound", Number(finding.Factor, "0.00"));
 
             case PerformanceFindingCode.HardwareCpuCostNotMeasured:
-                return "The processor cost of the hardware pass was not measured, so it must not be read as free.";
+                return Strings.Get("performance.line.hardware-cost-unknown");
 
             case PerformanceFindingCode.HardwarePipelineHeadroom:
-                return $"The hardware pass ran at {Number(finding.RealtimeFactor, "0.#")}× realtime.";
+                return Strings.Get("performance.line.hardware-headroom", Number(finding.RealtimeFactor, "0.#"));
 
             case PerformanceFindingCode.SoftwareRealtimeCost:
-                return $"Software encoding wants {Number(finding.RealtimeCores, "0.00")} cores to keep up with realtime, on "
-                       + $"{finding.LogicalCores} logical cores.";
+                return Strings.Get(
+                    "performance.line.software-realtime",
+                    Number(finding.RealtimeCores, "0.00"),
+                    finding.LogicalCores.ToString(CultureInfo.InvariantCulture));
 
             case PerformanceFindingCode.SoftwareCostsCores:
-                return $"That is a whole core or more ({Number(finding.RealtimeCores, "0.00")} cores), so software encoding owns one core for as long as it runs.";
+                return Strings.Get("performance.line.software-costs-cores", Number(finding.RealtimeCores, "0.00"));
 
             case PerformanceFindingCode.SoftwareCostIsSmall:
-                return $"That stays under one core ({Number(finding.RealtimeCores, "0.00")} cores), so it can be spread into the gaps left by other work.";
+                return Strings.Get("performance.line.software-small", Number(finding.RealtimeCores, "0.00"));
 
             case PerformanceFindingCode.CpuAccountingUnreliable:
-                return $"The processor time counter on this machine is not dependable ({Number(finding.Factor, "0.00")}× against the wall clock), so processor times are shown but nothing is decided from them.";
+                return Strings.Get("performance.line.cpu-unreliable", Number(finding.Factor, "0.00"));
 
             case PerformanceFindingCode.BudgetExhausted:
-                return $"The measurement budget ran out ({finding.WallMs} ms of {finding.BudgetMs} ms), so one leg of the check is missing.";
+                return Strings.Get(
+                    "performance.line.budget-exhausted",
+                    finding.WallMs.ToString(CultureInfo.InvariantCulture),
+                    finding.BudgetMs.ToString(CultureInfo.InvariantCulture));
         }
 
         throw new ArgumentOutOfRangeException(nameof(finding), finding.Code, "Bulgu kodunun ekranda karşılığı yok.");
@@ -128,26 +128,30 @@ internal static class PerformanceReportText
         var facts = new List<PerformanceFact>();
 
         if (!string.IsNullOrEmpty(result.HardwareCodec))
-            facts.Add(new PerformanceFact("Hardware encoder", result.HardwareCodec));
+            facts.Add(new PerformanceFact(Strings.Get("performance.fact.hardware-encoder"), result.HardwareCodec));
 
         if (result.HardwarePipelineRealtimeFactor > 0)
             facts.Add(new PerformanceFact(
-                "Hardware pipeline",
-                Number(result.HardwarePipelineRealtimeFactor, "0.#") + "× realtime"));
+                Strings.Get("performance.fact.hardware-pipeline"),
+                Strings.Get("performance.value.realtime", Number(result.HardwarePipelineRealtimeFactor, "0.#"))));
 
         if (!string.IsNullOrEmpty(result.SoftwareCodec))
-            facts.Add(new PerformanceFact("Software encoder", result.SoftwareCodec));
+            facts.Add(new PerformanceFact(Strings.Get("performance.fact.software-encoder"), result.SoftwareCodec));
 
         if (result.SoftwareRealtimeCores > 0)
             facts.Add(new PerformanceFact(
-                "Software cost",
-                Number(result.SoftwareRealtimeCores, "0.00") + " cores"));
+                Strings.Get("performance.fact.software-cost"),
+                Strings.Get("performance.value.cores", Number(result.SoftwareRealtimeCores, "0.00"))));
 
         if (result.LogicalCores > 0)
-            facts.Add(new PerformanceFact("Logical cores", result.LogicalCores.ToString(CultureInfo.InvariantCulture)));
+            facts.Add(new PerformanceFact(
+                Strings.Get("performance.fact.logical-cores"),
+                result.LogicalCores.ToString(CultureInfo.InvariantCulture)));
 
         if (result.ElapsedMs > 0)
-            facts.Add(new PerformanceFact("Measured in", result.ElapsedMs.ToString(CultureInfo.InvariantCulture) + " ms"));
+            facts.Add(new PerformanceFact(
+                Strings.Get("performance.fact.measured-in"),
+                Strings.Get("performance.value.ms", result.ElapsedMs.ToString(CultureInfo.InvariantCulture))));
 
         return facts;
     }
