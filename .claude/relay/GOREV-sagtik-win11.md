@@ -1,6 +1,7 @@
 # Görev paketi — sağ tık girdisi Windows 11'in yeni menüsünde görünmüyor
 
-Uzak makinede çalışan ajan için yazıldı. Depo: `github.com/Teknesyum/VidShrink`, dal `main`.
+Windows makinesinde çalışan ajan için yazıldı — sınama Windows 11 gerektiriyor.
+Depo: `github.com/Teknesyum/VidShrink`, dal `main`.
 
 ## Ölçülen durum
 
@@ -65,4 +66,4 @@ kayıt defteri/paket okuması; kaldırma sonrası doğrulama; tam süit sayılar
   yayınlanacaksa).
 - Yeni renk ya da ölçü uydurma.
 - Yorum yazma; mevcut yorumları koru.
-- Kendi dalında çalış (`serkan/sagtik-win11`), bitince **it**. `main`e sen birleştirme.
+- Kendi dalında çalış (`sole/sagtik-win11`), bitince **it**. `main`e sen birleştirme.
