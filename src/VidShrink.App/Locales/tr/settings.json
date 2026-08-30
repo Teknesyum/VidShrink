@@ -1,1 +1,6 @@
-{}
+{
+  "settings.reset-all": "Tüm ayarları sıfırla",
+  "settings.reset-confirm": "Kaydedilen tüm ayarlar silinsin ve varsayılanlar geri yüklensin mi?",
+  "settings.reset-confirm-button": "Ayarları sıfırla",
+  "settings.reset-cancel": "Vazgeç"
+}

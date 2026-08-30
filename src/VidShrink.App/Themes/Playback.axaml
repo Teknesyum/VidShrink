@@ -19,7 +19,7 @@
                                   T79: paravan artık düz bir örtü değil — alt kenarından
                                   yukarı doğru son çeyreğinde sönüyor. Yeni bir oran
                                   uydurulmadı; panelin tek "band payı" oranı kullanıldı.
-      PlaybackIdleVeilOpacity  <- PhoenixOpacity (0,30). T79: kaynak yüklenmemişken
+      PlaybackIdleVeilOpacity  <- PhoenixOpacity (0,08). Kaynak yüklenmemişken
                                   panonun zemini bu opaklıkta durur, yani arkadaki anka
                                   çizildiği güçle panelin içinden görünür. İki yerde iki
                                   ayrı sayı olmasın diye ankanın kendi belirtecinin değeri.
@@ -110,7 +110,7 @@
   <x:Double x:Key="PlaybackBadgeGap">8</x:Double>
   <x:Double x:Key="PlaybackHoverZoom">2</x:Double>
 
-  <x:Double x:Key="PlaybackIdleVeilOpacity">0.30</x:Double>
+  <x:Double x:Key="PlaybackIdleVeilOpacity">0.08</x:Double>
 
   <!--
     T79/K4: panonun iki zemini. Kare varken örtücü olanı (PlaybackStageFill), kaynak

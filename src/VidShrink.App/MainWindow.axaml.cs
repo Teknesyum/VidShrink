@@ -24,6 +24,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
 using VidShrink.Ffmpeg;
@@ -102,6 +103,7 @@ public partial class MainWindow : Window
     private DateTime _lastEstimatePulse = DateTime.MinValue;
     private bool _controlsReady;
     private bool _updateUiSyncing;
+    private bool _settingsSyncing;
     private string? _noticeVersion;
     private AppliedUpdateNotice? _appliedNotice;
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
@@ -170,6 +172,21 @@ public partial class MainWindow : Window
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
+        Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
+        foreach (var control in new SelectingItemsControl[]
+                 {
+                     CmbIntent, CmbCodec, CmbFillPolicy, CmbHdrPolicy, CmbQualityMode,
+                     CmbContainer, CmbConvertCodec, CmbResolution, CmbConvertFps, CmbConvertAudio
+                 })
+            Watch(control, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
+        foreach (var control in new ToggleButton[] { ChkResolution, ChkFps })
+            Watch(control, ToggleButton.IsCheckedProperty, SaveSettings);
+        foreach (var control in new TextBox[]
+                 {
+                     TxtTarget, TxtQualityTarget, TxtQuality, TxtCustomResolution, TxtCustomFps,
+                     TxtAudioBitrate, TxtTrimStart, TxtTrimEnd
+                 })
+            Watch(control, TextBox.TextProperty, SaveSettings);
 
         RefreshQualityTargetAvailability();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
@@ -381,9 +398,12 @@ public partial class MainWindow : Window
             UpdateMaximizeGlyph();
             ApplyWindowFrame();
             WindowShell.Margin = OffScreenMargin;
-            SetLanguage(true);
+            var settings = UpdateSettings.Load(SettingsPathOverride);
+            _settingsSyncing = true;
+            SetLanguage(ResolveLanguage(settings.Language, CultureInfo.CurrentUICulture.Name) == "tr");
             InitializeShareUi();
-            InitializeUpdateUi();
+            RestoreSettings(settings);
+            InitializeUpdateUi(settings);
             _ = CheckForUpdateAsync();
             PlayPanelEntrance();
             await LoadStartupFileAsync();
@@ -483,6 +503,7 @@ public partial class MainWindow : Window
         WalkText(this, value => Swap(value, translations, turkish), new HashSet<StyledElement>());
         _syncing = wasSyncing;
         _turkish = turkish;
+        Strings.Use(turkish ? "tr" : "en");
         _languageApplied = true;
         // Both stay clickable. Only the colour says which language is running, so the idle one
         // must not be mistaken for a disabled control.
@@ -494,11 +515,30 @@ public partial class MainWindow : Window
         _preview?.SetLanguage(turkish);
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
+        RefreshSettingsTexts();
         RefreshShareTarget();
         UpdateToolStatus();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
         // Recalculate() panelleri kendisi tazeliyor; dosya yokken de boş panel dile uymalı.
         else RefreshQualityPanels();
+        SaveSettings();
+    }
+
+    private void RefreshSettingsTexts()
+    {
+        BtnResetSettings.Content = Strings.Get("settings.reset-all");
+        TxtResetSettingsConfirm.Text = Strings.Get("settings.reset-confirm");
+        BtnConfirmResetSettings.Content = Strings.Get("settings.reset-confirm-button");
+        BtnCancelResetSettings.Content = Strings.Get("settings.reset-cancel");
+    }
+
+    internal static string ResolveLanguage(string? saved, string? operatingSystem)
+    {
+        var known = Strings.Languages;
+        var stored = known.FirstOrDefault(language => string.Equals(language, saved, StringComparison.OrdinalIgnoreCase));
+        if (stored is not null) return stored;
+        var system = known.FirstOrDefault(language => operatingSystem?.StartsWith(language, StringComparison.OrdinalIgnoreCase) == true);
+        return system ?? Strings.FallbackLanguage;
     }
 
     /// <summary>
@@ -680,14 +720,123 @@ public partial class MainWindow : Window
     /// Uygulamanın kendi sürümü. Hakkında kutusu da bildirim şeridi de burayı okur;
     /// AssemblyInformationalVersion'a giden ikinci bir yol açılmaz.
     /// </summary>
-    private static string AppVersion() => UpdateCheck.CurrentVersion(Assembly.GetExecutingAssembly());
+    private static string AppVersion() => DisplayVersion(UpdateCheck.CurrentVersion(Assembly.GetExecutingAssembly()));
 
-    private void InitializeUpdateUi()
+    internal static string DisplayVersion(string informationalVersion)
+    {
+        var build = informationalVersion.IndexOf('+');
+        return build < 0 ? informationalVersion : informationalVersion[..build];
+    }
+
+    private void RestoreSettings(UpdateSettings settings)
+    {
+        _settingsSyncing = _syncing = _updateUiSyncing = true;
+        try
+        {
+            TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
+            TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
+            CmbIntent.SelectedIndex = settings.Intent;
+            CmbCodec.SelectedIndex = settings.Codec;
+            ChkResolution.IsChecked = settings.MayLowerResolution;
+            ChkFps.IsChecked = settings.MayLowerFps;
+            if (settings.FastGpu.HasValue) ChkFastGpu.IsChecked = settings.FastGpu.Value;
+            CmbFillPolicy.SelectedIndex = settings.FillPolicy;
+            CmbHdrPolicy.SelectedIndex = settings.HdrPolicy;
+            CmbQualityMode.SelectedIndex = settings.QualityMode;
+            TxtQuality.Text = settings.QualityValue.ToString(CultureInfo.InvariantCulture);
+            CmbContainer.SelectedIndex = settings.Container;
+            CmbConvertCodec.SelectedIndex = settings.ConvertCodec;
+            CmbResolution.SelectedIndex = settings.Resolution;
+            TxtCustomResolution.Text = settings.CustomResolution;
+            CmbConvertFps.SelectedIndex = settings.ConvertFps;
+            TxtCustomFps.Text = settings.CustomFps;
+            CmbConvertAudio.SelectedIndex = settings.ConvertAudio;
+            TxtAudioBitrate.Text = settings.AudioBitrate;
+            TxtTrimStart.Text = settings.TrimStart;
+            TxtTrimEnd.Text = settings.TrimEnd;
+            CmbShareTarget.SelectedIndex = settings.ShareTarget;
+            RefreshShareTarget();
+            if (CmbShareRetention.ItemCount > 0)
+                CmbShareRetention.SelectedIndex = Math.Clamp(settings.ShareRetention, 0, CmbShareRetention.ItemCount - 1);
+            ChkAutoUpdate.IsChecked = settings.AutoUpdate;
+        }
+        finally
+        {
+            _updateUiSyncing = _syncing = _settingsSyncing = false;
+        }
+    }
+
+    private UpdateSettings CaptureSettings() => new()
+    {
+        Language = _turkish ? "tr" : "en",
+        AutoUpdate = ChkAutoUpdate.IsChecked == true,
+        FastGpu = ChkFastGpu.IsChecked == true,
+        TargetMb = ParseTargetMb(),
+        QualityTarget = ParseQualityTarget(),
+        Intent = CmbIntent.SelectedIndex,
+        Codec = CmbCodec.SelectedIndex,
+        MayLowerResolution = ChkResolution.IsChecked == true,
+        MayLowerFps = ChkFps.IsChecked == true,
+        FillPolicy = CmbFillPolicy.SelectedIndex,
+        HdrPolicy = CmbHdrPolicy.SelectedIndex,
+        QualityMode = CmbQualityMode.SelectedIndex,
+        QualityValue = int.TryParse(TxtQuality.Text, out var quality) ? quality : 23,
+        Container = CmbContainer.SelectedIndex,
+        ConvertCodec = CmbConvertCodec.SelectedIndex,
+        Resolution = CmbResolution.SelectedIndex,
+        CustomResolution = TxtCustomResolution.Text ?? "",
+        ConvertFps = CmbConvertFps.SelectedIndex,
+        CustomFps = TxtCustomFps.Text ?? "",
+        ConvertAudio = CmbConvertAudio.SelectedIndex,
+        AudioBitrate = TxtAudioBitrate.Text ?? "",
+        TrimStart = TxtTrimStart.Text ?? "",
+        TrimEnd = TxtTrimEnd.Text ?? "",
+        ShareTarget = CmbShareTarget.SelectedIndex,
+        ShareRetention = CmbShareRetention.SelectedIndex
+    };
+
+    private void SaveSettings()
+    {
+        if (_settingsSyncing || _syncing || !_languageApplied) return;
+        try { CaptureSettings().Save(SettingsPathOverride); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+        }
+    }
+
+    private void OnResetSettings(object? sender, RoutedEventArgs e)
+        => ResetSettingsConfirm.IsVisible = true;
+
+    private void OnCancelResetSettings(object? sender, RoutedEventArgs e)
+        => ResetSettingsConfirm.IsVisible = false;
+
+    private void OnConfirmResetSettings(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            UpdateSettings.Delete(SettingsPathOverride);
+            var defaults = new UpdateSettings();
+            _settingsSyncing = true;
+            SetLanguage(ResolveLanguage(null, CultureInfo.CurrentUICulture.Name) == "tr");
+            RestoreSettings(defaults);
+            ResetSettingsConfirm.IsVisible = false;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TxtSystemStatus.Text = $"{T("Ayarlar sıfırlanamadı", "Settings could not be reset")}: {ex.Message}";
+        }
+    }
+
+    internal void RestoreSettingsForTest(UpdateSettings settings) => RestoreSettings(settings);
+    internal void ConfirmResetSettingsForTest() => OnConfirmResetSettings(null, new RoutedEventArgs());
+
+    private void InitializeUpdateUi(UpdateSettings? settings = null)
     {
         AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate;
 
         _updateUiSyncing = true;
-        try { ChkAutoUpdate.IsChecked = UpdateSettings.Load().AutoUpdate; }
+        try { ChkAutoUpdate.IsChecked = (settings ?? UpdateSettings.Load(SettingsPathOverride)).AutoUpdate; }
         finally { _updateUiSyncing = false; }
 
         RefreshUpdateTexts();
@@ -747,6 +896,7 @@ public partial class MainWindow : Window
     {
         if (_syncing) return;
         RefreshShareTarget();
+        SaveSettings();
     }
 
     private ShareTarget SelectedShareTarget()
@@ -954,11 +1104,11 @@ public partial class MainWindow : Window
     {
         if (_updateUiSyncing) return;
 
-        var settings = UpdateSettings.Load();
+        var settings = UpdateSettings.Load(SettingsPathOverride);
         settings.AutoUpdate = ChkAutoUpdate.IsChecked == true;
         try
         {
-            settings.Save();
+            settings.Save(SettingsPathOverride);
         }
         catch (Exception ex)
         {

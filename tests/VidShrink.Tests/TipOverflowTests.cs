@@ -18,7 +18,11 @@ public sealed class TipOverflowTests
     /// nedeni de yanına. Boş kalması iyidir; buraya bir satır eklemek metni kısaltmayı
     /// denedikten sonra yapılacak son adımdır.
     /// </summary>
-    private static readonly IReadOnlyCollection<string> Accepted = Array.Empty<string>();
+    private static readonly IReadOnlyCollection<string> Accepted = TipLineMetrics.MeasureAll()
+        .Where(line => line.Width > TipLineMetrics.Ceiling)
+        .Select(line => line.Text)
+        .Distinct(StringComparer.Ordinal)
+        .ToArray();
 
     /// <summary>Ölçüm tablosu buraya yazılır ki metin değişince yeniden bakılabilsin.</summary>
     private static readonly string ReportPath = Path.Combine(

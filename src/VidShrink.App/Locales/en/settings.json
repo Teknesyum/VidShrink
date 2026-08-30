@@ -1,1 +1,6 @@
-{}
+{
+  "settings.reset-all": "Reset all settings",
+  "settings.reset-confirm": "Reset every saved setting and restore the defaults?",
+  "settings.reset-confirm-button": "Reset settings",
+  "settings.reset-cancel": "Cancel"
+}

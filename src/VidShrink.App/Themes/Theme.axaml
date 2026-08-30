@@ -48,7 +48,7 @@
   <SolidColorBrush x:Key="OnNeon" Color="#FF000000"/>
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
 
-  <x:Double x:Key="PhoenixOpacity">0.30</x:Double>
+  <x:Double x:Key="PhoenixOpacity">0.08</x:Double>
   <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
 
   <SolidColorBrush x:Key="PanelSurface"
@@ -113,6 +113,31 @@
     <GradientStop Color="Transparent" Offset="1"/>
   </LinearGradientBrush>
 
+  <!-- Broad, low-frequency layers make the backdrop read as heated air rather than an illustration. -->
+  <RadialGradientBrush x:Key="EmberAtmosphereOuter" Center="50%,58%" GradientOrigin="42%,62%" RadiusX="58%" RadiusY="58%" Opacity="0.18">
+    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.48"/>
+    <GradientStop Color="Transparent" Offset="1"/>
+  </RadialGradientBrush>
+  <RadialGradientBrush x:Key="EmberAtmosphereCore" Center="48%,56%" GradientOrigin="44%,62%" RadiusX="52%" RadiusY="52%" Opacity="0.12">
+    <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
+    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.34"/>
+    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.72"/>
+    <GradientStop Color="Transparent" Offset="1"/>
+  </RadialGradientBrush>
+  <LinearGradientBrush x:Key="EmberAtmosphereVeil" StartPoint="0%,100%" EndPoint="100%,0%" Opacity="0.13">
+    <GradientStop Color="Transparent" Offset="0"/>
+    <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.38"/>
+    <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.62"/>
+    <GradientStop Color="Transparent" Offset="1"/>
+  </LinearGradientBrush>
+  <LinearGradientBrush x:Key="EmberAtmosphereCoal" StartPoint="0%,0%" EndPoint="100%,100%" Opacity="0.62">
+    <GradientStop Color="Transparent" Offset="0"/>
+    <GradientStop Color="{StaticResource EmberDeepColor}" Offset="0.46"/>
+    <GradientStop Color="{StaticResource EmberEdgeColor}" Offset="0.7"/>
+    <GradientStop Color="Transparent" Offset="1"/>
+  </LinearGradientBrush>
+
   <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0%,50%" EndPoint="100%,50%">
     <GradientStop Color="{StaticResource EmberBarDeepColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberBarDeepColor}" Offset="0.2"/>
@@ -139,6 +164,27 @@
       <DrawingGroup.Children>
       <GeometryDrawing Brush="{StaticResource WorkspaceGradient}"
                        Geometry="M 0,0 L 1600,0 L 1600,1000 L 0,1000 Z"/>
+      <!-- Offset thermal pools, smoke banks and crossing veils deliberately avoid a readable silhouette. -->
+      <DrawingGroup>
+        <DrawingGroup.Children>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereOuter}"
+                         Geometry="M -120,790 C 70,520 300,390 570,420 C 790,445 920,610 870,790 C 815,985 520,1070 190,1030 C 10,1008 -100,920 -120,790 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereOuter}"
+                         Geometry="M 760,330 C 930,120 1260,95 1510,270 C 1660,375 1700,590 1570,720 C 1420,870 1110,780 930,650 C 790,548 690,418 760,330 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereCore}"
+                         Geometry="M 210,865 C 300,650 470,535 665,565 C 810,588 885,700 820,820 C 735,978 430,1035 250,950 C 215,933 195,905 210,865 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereCore}"
+                         Geometry="M 1010,270 C 1125,150 1370,170 1510,320 C 1600,418 1570,555 1460,610 C 1325,678 1090,555 1005,430 C 965,372 968,315 1010,270 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereVeil}"
+                         Geometry="M -80,735 C 180,610 390,585 610,620 C 850,658 1040,785 1280,770 C 1410,762 1520,720 1680,630 L 1680,715 C 1500,825 1370,865 1215,862 C 970,858 805,740 580,702 C 365,666 155,690 -80,820 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereVeil}"
+                         Geometry="M 390,-70 C 535,120 650,205 825,260 C 1035,327 1210,310 1410,430 C 1510,490 1590,565 1680,675 L 1680,765 C 1555,615 1460,548 1345,495 C 1150,405 980,420 775,345 C 590,278 470,170 330,-10 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereCoal}"
+                         Geometry="M -60,120 C 220,40 480,125 660,300 C 790,425 825,585 745,705 C 650,850 390,842 185,735 C 10,642 -95,430 -60,120 Z"/>
+        <GeometryDrawing Brush="{StaticResource EmberAtmosphereCoal}"
+                         Geometry="M 910,590 C 1100,470 1370,505 1660,700 L 1660,1040 L 850,1040 C 790,875 805,690 910,590 Z"/>
+        </DrawingGroup.Children>
+      </DrawingGroup>
       <DrawingGroup Opacity="{StaticResource PhoenixOpacity}">
         <DrawingGroup.Children>
         <GeometryDrawing Brush="{StaticResource PhoenixGlowOuter}"
@@ -314,7 +360,7 @@
   <x:Int32 x:Key="MotionStaggerCount">6</x:Int32>
 
   <x:Double x:Key="TargetMinSize">24</x:Double>
-  <x:Double x:Key="InfoBadgeSize">20</x:Double>
+  <x:Double x:Key="InfoBadgeSize">18</x:Double>
   <x:Double x:Key="FieldMinHeight">40</x:Double>
   <x:Double x:Key="WindowButtonWidth">42</x:Double>
   <x:Double x:Key="WindowButtonHeight">30</x:Double>
@@ -324,7 +370,7 @@
   <x:Double x:Key="SliderThumbSize">20</x:Double>
   <x:Double x:Key="ProgressBarHeight">8</x:Double>
   <x:Double x:Key="TitleBarHeight">38</x:Double>
-  <x:Double x:Key="TooltipMaxWidth">460</x:Double>
+  <x:Double x:Key="TooltipMaxWidth">780</x:Double>
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>
   <x:Double x:Key="PanelMinHeight">256</x:Double>
   <x:Double x:Key="PlanPanelMinHeight">320</x:Double>

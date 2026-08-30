@@ -393,6 +393,29 @@ public sealed class UpdateSettings
     /// sonra program üstüne yazmaz — kullanıcı kutuyu elle değiştirdiyse o karar kalır.
     /// </summary>
     public bool? FastGpu { get; set; }
+    public string? Language { get; set; }
+    public double TargetMb { get; set; } = 16;
+    public double QualityTarget { get; set; } = 60;
+    public int Intent { get; set; } = 1;
+    public int Codec { get; set; }
+    public bool MayLowerResolution { get; set; } = true;
+    public bool MayLowerFps { get; set; } = true;
+    public int FillPolicy { get; set; }
+    public int HdrPolicy { get; set; }
+    public int QualityMode { get; set; }
+    public int QualityValue { get; set; } = 23;
+    public int Container { get; set; }
+    public int ConvertCodec { get; set; }
+    public int Resolution { get; set; }
+    public string CustomResolution { get; set; } = "1280x720";
+    public int ConvertFps { get; set; }
+    public string CustomFps { get; set; } = "25";
+    public int ConvertAudio { get; set; }
+    public string AudioBitrate { get; set; } = "128";
+    public string TrimStart { get; set; } = "";
+    public string TrimEnd { get; set; } = "";
+    public int ShareTarget { get; set; }
+    public int ShareRetention { get; set; }
 
     /// <summary>VIDSHRINK_SETTINGS_PATH yalnız ölçüm ve deneme için ayarı başka yere alır.</summary>
     public static string DefaultPath
@@ -426,12 +449,55 @@ public sealed class UpdateSettings
             {
                 settings.FastGpu = fastGpu.GetBoolean();
             }
+            ReadString(document.RootElement, "language", value => settings.Language = value);
+            ReadDouble(document.RootElement, "targetMb", value => settings.TargetMb = value);
+            ReadDouble(document.RootElement, "qualityTarget", value => settings.QualityTarget = value);
+            ReadInt(document.RootElement, "intent", value => settings.Intent = value);
+            ReadInt(document.RootElement, "codec", value => settings.Codec = value);
+            ReadBool(document.RootElement, "mayLowerResolution", value => settings.MayLowerResolution = value);
+            ReadBool(document.RootElement, "mayLowerFps", value => settings.MayLowerFps = value);
+            ReadInt(document.RootElement, "fillPolicy", value => settings.FillPolicy = value);
+            ReadInt(document.RootElement, "hdrPolicy", value => settings.HdrPolicy = value);
+            ReadInt(document.RootElement, "qualityMode", value => settings.QualityMode = value);
+            ReadInt(document.RootElement, "qualityValue", value => settings.QualityValue = value);
+            ReadInt(document.RootElement, "container", value => settings.Container = value);
+            ReadInt(document.RootElement, "convertCodec", value => settings.ConvertCodec = value);
+            ReadInt(document.RootElement, "resolution", value => settings.Resolution = value);
+            ReadString(document.RootElement, "customResolution", value => settings.CustomResolution = value);
+            ReadInt(document.RootElement, "convertFps", value => settings.ConvertFps = value);
+            ReadString(document.RootElement, "customFps", value => settings.CustomFps = value);
+            ReadInt(document.RootElement, "convertAudio", value => settings.ConvertAudio = value);
+            ReadString(document.RootElement, "audioBitrate", value => settings.AudioBitrate = value);
+            ReadString(document.RootElement, "trimStart", value => settings.TrimStart = value);
+            ReadString(document.RootElement, "trimEnd", value => settings.TrimEnd = value);
+            ReadInt(document.RootElement, "shareTarget", value => settings.ShareTarget = value);
+            ReadInt(document.RootElement, "shareRetention", value => settings.ShareRetention = value);
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
             // Okunamayan ayar varsayılana düşer; açılış hiçbir koşulda durmaz.
         }
         return settings;
+    }
+
+    private static void ReadBool(JsonElement root, string name, Action<bool> apply)
+    {
+        if (root.TryGetProperty(name, out var value) && value.ValueKind is JsonValueKind.True or JsonValueKind.False) apply(value.GetBoolean());
+    }
+
+    private static void ReadInt(JsonElement root, string name, Action<int> apply)
+    {
+        if (root.TryGetProperty(name, out var value) && value.TryGetInt32(out var found)) apply(found);
+    }
+
+    private static void ReadDouble(JsonElement root, string name, Action<double> apply)
+    {
+        if (root.TryGetProperty(name, out var value) && value.TryGetDouble(out var found) && double.IsFinite(found)) apply(found);
+    }
+
+    private static void ReadString(JsonElement root, string name, Action<string> apply)
+    {
+        if (root.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String) apply(value.GetString() ?? "");
     }
 
     public void Save(string? path = null)
@@ -445,8 +511,37 @@ public sealed class UpdateSettings
         writer.WriteStartObject();
         writer.WriteBoolean("autoUpdate", AutoUpdate);
         if (FastGpu.HasValue) writer.WriteBoolean("fastGpu", FastGpu.Value);
+        if (!string.IsNullOrWhiteSpace(Language)) writer.WriteString("language", Language);
+        writer.WriteNumber("targetMb", TargetMb);
+        writer.WriteNumber("qualityTarget", QualityTarget);
+        writer.WriteNumber("intent", Intent);
+        writer.WriteNumber("codec", Codec);
+        writer.WriteBoolean("mayLowerResolution", MayLowerResolution);
+        writer.WriteBoolean("mayLowerFps", MayLowerFps);
+        writer.WriteNumber("fillPolicy", FillPolicy);
+        writer.WriteNumber("hdrPolicy", HdrPolicy);
+        writer.WriteNumber("qualityMode", QualityMode);
+        writer.WriteNumber("qualityValue", QualityValue);
+        writer.WriteNumber("container", Container);
+        writer.WriteNumber("convertCodec", ConvertCodec);
+        writer.WriteNumber("resolution", Resolution);
+        writer.WriteString("customResolution", CustomResolution);
+        writer.WriteNumber("convertFps", ConvertFps);
+        writer.WriteString("customFps", CustomFps);
+        writer.WriteNumber("convertAudio", ConvertAudio);
+        writer.WriteString("audioBitrate", AudioBitrate);
+        writer.WriteString("trimStart", TrimStart);
+        writer.WriteString("trimEnd", TrimEnd);
+        writer.WriteNumber("shareTarget", ShareTarget);
+        writer.WriteNumber("shareRetention", ShareRetention);
         writer.WriteEndObject();
         writer.Flush();
+    }
+
+    public static void Delete(string? path = null)
+    {
+        var file = path ?? DefaultPath;
+        if (File.Exists(file)) File.Delete(file);
     }
 }
 

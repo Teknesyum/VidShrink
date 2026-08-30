@@ -944,6 +944,22 @@
                 </StackPanel>
               </Border>
 
+              <Border x:Name="ResetSettingsPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <Button x:Name="BtnResetSettings"
+                          Theme="{StaticResource GhostButton}"
+                          HorizontalAlignment="Left"
+                          Click="OnResetSettings"/>
+                  <StackPanel x:Name="ResetSettingsConfirm" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+                    <TextBlock x:Name="TxtResetSettingsConfirm" Theme="{StaticResource Body}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                      <Button x:Name="BtnConfirmResetSettings" Theme="{StaticResource GhostButton}" Click="OnConfirmResetSettings"/>
+                      <Button x:Name="BtnCancelResetSettings" Theme="{StaticResource GhostButton}" Click="OnCancelResetSettings"/>
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
             </StackPanel>
           </ScrollViewer>
         </TabItem>
