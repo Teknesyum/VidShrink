@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 
@@ -237,7 +236,10 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        var expected = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "tr"
+        var systemLanguage = RunPowerShell(
+            "-NoProfile", "-Command", "(Get-UICulture).TwoLetterISOLanguageName");
+        Assert.True(systemLanguage.Code == 0, systemLanguage.Output);
+        var expected = systemLanguage.Output.Trim().Equals("tr", StringComparison.OrdinalIgnoreCase)
             ? TurkishLabel
             : EnglishLabel;
 
