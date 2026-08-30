@@ -36,6 +36,16 @@ public sealed class Windows11ShellMenuTests
     }
 
     [Fact]
+    public void Reinstall_unregisters_the_external_package_before_replacing_its_directory()
+    {
+        var installer = Read("Install-VidShrink.ps1");
+        var unregister = installer.LastIndexOf("Remove-Windows11ShellMenu $RegistryRoot | Out-Null", StringComparison.Ordinal);
+        var removeRoot = installer.LastIndexOf("Remove-InstallRoot $resolvedInstallRoot", StringComparison.Ordinal);
+        Assert.True(unregister >= 0);
+        Assert.True(removeRoot > unregister);
+    }
+
+    [Fact]
     public void Modern_manifest_gets_item_types_from_the_installer_extension_array()
     {
         var installer = Read("Install-VidShrink.ps1");

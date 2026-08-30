@@ -442,6 +442,7 @@ try {
             Stop-Process -Force
     }
 
+    Remove-Windows11ShellMenu $RegistryRoot | Out-Null
     Remove-InstallRoot $resolvedInstallRoot
     New-Item -ItemType Directory -Path $resolvedInstallRoot -Force | Out-Null
     Copy-Item -Path (Join-Path $stageRoot '*') -Destination $resolvedInstallRoot -Recurse -Force
