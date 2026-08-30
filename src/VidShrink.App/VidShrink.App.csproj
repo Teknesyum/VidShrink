@@ -24,6 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Locales\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Locales\**\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.20" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.20" />
