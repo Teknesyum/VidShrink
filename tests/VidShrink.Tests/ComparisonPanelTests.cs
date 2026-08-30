@@ -14,16 +14,17 @@ using VidShrink.App.Playback;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// T44: üç kademe, gecikmeli iniş ve köşe yarıçapı gerçek pencerede ölçülüyor. Pencere
-/// gösterilmiyor — <see cref="AppHost"/> Avalonia'yı kendi iş parçacığında kuruyor, ölçüm
-/// yerleşimi elle koşturuyor. Ekranda hiçbir şey açılmıyor.
+/// T44: üç kademe ve köşe yarıçapı gerçek pencerede ölçülüyor. Pencere gösterilmiyor —
+/// <see cref="AppHost"/> Avalonia'yı kendi iş parçacığında kuruyor, ölçüm yerleşimi elle
+/// koşturuyor. Ekranda hiçbir şey açılmıyor.
+///
+/// T82: panelin boyu artık fareye değil iki tuşa bağlı; gecikmeli iniş ve fareyle büyüme
+/// ölçüleriyle birlikte kalktı. Sahte saat (<see cref="FakeClock"/>) yalnız denetim
+/// şeridinin sayacında kaldı.
 ///
 /// Zamanlayıcılar burada tik atmaz: bu iş parçacığında ileti döngüsü yok, dolayısıyla
-/// <see cref="DispatcherTimer"/> ateşlenmez. Sahte saat (<see cref="FakeClock"/>) yine de
-/// <see cref="HoverZone.Clock"/> yerine takılıyor: T79'dan beri panel beklemediği için
-/// ölçülen şey sürenin dolması değil, <b>hiç tik kurulmamış olması</b>. Sayacın kendi karar
-/// kapıları (<see cref="HoverZone.ShouldHide"/>, <see cref="HoverZone.ShouldShow"/>) de
-/// doğrudan okunabiliyor. Hiçbir ölçümde <c>Thread.Sleep</c> yok (T70/K7).
+/// <see cref="DispatcherTimer"/> ateşlenmez; süreyi ölçümün kendisi ilerletiyor. Hiçbir
+/// ölçümde <c>Thread.Sleep</c> yok (T70/K7).
 /// </summary>
 public sealed class ComparisonPanelTests
 {
@@ -189,28 +190,7 @@ public sealed class ComparisonPanelTests
         Assert.Equal(atMid, atFull, 6);
     }
 
-    // ---- K2: gecikmeli iniş ---------------------------------------------------------
-
-    [Fact]
-    public void Fare_testi_hedef_kademenin_sinirina_gore_yapilir()
-    {
-        var (insideTarget, outsideTarget, window) = Read((host, panel) =>
-        {
-            WheelTo(host, panel, ShelterStage.Mid);
-            var target = panel.StageTarget;
-            var bounds = OverlayBounds(panel);
-
-            // Hedefin dışında ama pencerenin içinde bir nokta: tam pencere sınırına göre
-            // ölçülseydi bu nokta panelin üstünde sayılırdı.
-            return (panel.TargetCovers(target.Center),
-                    panel.TargetCovers(new Point(target.X / 2, bounds.Height / 2)),
-                    bounds);
-        });
-
-        Assert.True(insideTarget);
-        Assert.False(outsideTarget);
-        Assert.True(window.Width > 0);
-    }
+    // ---- T82/K1: fare kademesi kalktı -----------------------------------------------
 
     /// <summary>
     /// T70/K7: bekleme süresini duvar saati olmadan süren sahte saat. Gerçek zamanlayıcı bu
@@ -249,68 +229,64 @@ public sealed class ComparisonPanelTests
         }
     }
 
-    /// <summary>Paneli tabana indirir ve büyüme sayacına sahte saat takar.</summary>
-    private static FakeClock AtBand(MainWindow window, ComparisonPanel panel)
-    {
-        panel.Descend();
-        Settle(window);
-
-        var clock = new FakeClock();
-        panel.Descent.Clock = clock;
-        return clock;
-    }
-
     private static double PanelScale(ComparisonPanel panel) => Math.Round(panel.Gesture.PanelScale, 9);
 
     /// <summary>
-    /// T70/K1: fare çekildiği an panel küçülür. Sahte saat hiç ilerletilmiyor ve panel yine
-    /// de bandına dönüyor; üstelik küçültme için bir tik bile kurulmuyor.
+    /// K1: fare panele girip çıkınca boy değişmiyor. Ölçü kabuğun gerçekten yerleştiği boyu
+    /// okuyor: giriş kademesi kaldırılmasaydı panel bu turda iki katına çıkardı.
     /// </summary>
     [Fact]
-    public void Fare_cekilince_panel_beklemeden_kuculur()
+    public void Fare_panele_girip_cikinca_boy_degismez()
     {
-        var (stage, scale, pending) = Read((host, panel) =>
+        var (start, entered, exited, stage, scale) = Read((host, panel) =>
         {
-            WheelTo(host, panel, ShelterStage.Mid);
+            var band = panel.Shell.Bounds.Size;
 
-            var clock = new FakeClock();
-            panel.Descent.Clock = clock;
+            panel.Shell.RaiseEvent(PointerCrossing(panel.Shell, InputElement.PointerEnteredEvent));
+            Settle(host);
+            var inside = panel.Shell.Bounds.Size;
 
-            panel.TrackPointer(panel.StageTarget.Center);
-            panel.PointerLeftWindow();
-
-            return (panel.Shelter, PanelScale(panel), clock.Pending);
+            panel.Shell.RaiseEvent(PointerCrossing(panel.Shell, InputElement.PointerExitedEvent));
+            Settle(host);
+            return (band, inside, panel.Shell.Bounds.Size, panel.Shelter, PanelScale(panel));
         });
 
+        Assert.True(start.Width > 0 && start.Height > 0, $"band ölçülmedi: {start}");
+        Assert.Equal(start, entered);
+        Assert.Equal(start, exited);
         Assert.Equal(ShelterStage.Band, stage);
         Assert.Equal(1.0, scale);
-        Assert.False(pending, "küçülme için bekleme sayacı kuruldu");
     }
 
     /// <summary>
-    /// T79/K1: bekleme kalktı. Fare panele girdiği turda panel büyür — sahte saat hiç
-    /// ilerletilmiyor, üstelik büyüme için bir tik bile kurulmuyor. T73'ün iki saniyelik
-    /// ölçüsünün yerini bu alıyor: eski ölçü sürenin dolmasını şart koşuyordu.
+    /// K1'in ikinci yönü: fare pencereyi terk edince büyümüş panel küçülmüyor. Eski kademe
+    /// bu olayla iniyordu; artık boyun tek sahibi tuşlardır.
     /// </summary>
     [Fact]
-    public void Fare_girer_girmez_panel_buyur()
+    public void Fare_pencereden_cikinca_buyuk_panel_kuculmez()
     {
-        var (floor, wanted, grown, stage, pending) = Read((host, panel) =>
+        var (grown, afterExit, stage) = Read((host, panel) =>
         {
-            var clock = AtBand(host, panel);
-            host.TryFindResource("PlaybackHoverZoom", out var token);
-            var before = PanelScale(panel);
+            Maximize(host, panel);
+            var big = panel.StageTarget;
 
-            panel.HoverPanel(true);
+            panel.Shell.RaiseEvent(PointerCrossing(panel.Shell, InputElement.PointerExitedEvent));
+            host.RaiseEvent(new PointerEventArgs(
+                InputElement.PointerExitedEvent,
+                host,
+                new Pointer(0, PointerType.Mouse, true),
+                host,
+                new Point(-1, -1),
+                0,
+                new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
+                KeyModifiers.None));
             Settle(host);
 
-            return (before, (double)token!, PanelScale(panel), panel.Shelter, clock.Pending);
+            return (big, panel.StageTarget, panel.Shelter);
         });
 
-        Assert.Equal(1.0, floor);
-        Assert.True(grown >= wanted, $"ölçek {grown:0.###}, eşik {wanted:0.###}");
+        Assert.Equal(grown, afterExit);
         Assert.Equal(ShelterStage.Mid, stage);
-        Assert.False(pending, "büyüme için bekleme sayacı kuruldu");
     }
 
     /// <summary>
@@ -347,14 +323,19 @@ public sealed class ComparisonPanelTests
         Assert.False(hidden, "şerit gecikme dolunca gizlenmedi");
     }
 
-    // ---- T73/K5: büyümüş panel pencereye sığar --------------------------------------
+    // ---- T82/K3: maksimize ----------------------------------------------------------
 
-    /// <summary>Fareyi panele sokar; T79'dan beri büyüme aynı turda uygulanır.</summary>
-    private static void HoverUntilRise(MainWindow window, ComparisonPanel panel)
+    /// <summary>Tuşa basar ve bekleyen yerleşim işlerini koşturur.</summary>
+    private static void Press(MainWindow window, Button button)
     {
-        AtBand(window, panel);
-        panel.HoverPanel(true);
+        button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Settle(window);
+    }
+
+    /// <summary>Maksimize tuşuna basar. Panel orta kademeye çıkar.</summary>
+    private static void Maximize(MainWindow window, ComparisonPanel panel)
+    {
+        Press(window, ZoomButton(window, "BtnPanelMaximize"));
         Assert.Equal(ShelterStage.Mid, panel.Shelter);
     }
 
@@ -365,24 +346,162 @@ public sealed class ComparisonPanelTests
     };
 
     /// <summary>
-    /// K5: büyümüş panelin boyu pencereden hesaplanıyor. Beklenen sayı ölçümde uydurulmuyor,
-    /// kök katmanın kendi boyu ile <c>PlaybackMidShare</c> belirtecinden çıkıyor — sabit
-    /// çarpan kalsaydı uzun pencerede panel bu boyun altında kalırdı.
+    /// K3: maksimize edilmiş panelin boyu pencereden hesaplanıyor. Beklenen sayı ölçümde
+    /// uydurulmuyor, kök katmanın kendi boyu ile <c>PlaybackMidShare</c> belirtecinden
+    /// çıkıyor — sabit çarpan kalsaydı uzun pencerede panel bu boyun altında kalırdı.
+    /// Ölçü iki şeyi birden tutuyor: panel paya sığıyor ve <b>en az bir eksende</b> ona
+    /// değiyor, yani sığan en büyük boy alınmış oluyor.
     /// </summary>
     [Theory]
     [MemberData(nameof(RiseWindows))]
-    public void Fareyle_buyuyen_panel_pencereye_sigan_en_buyuk_boyu_alir(double width, double height)
+    public void Maksimize_panel_pencereye_sigan_en_buyuk_boyu_alir(double width, double height)
     {
-        var (grown, area, share) = Read(new Size(width, height), (host, panel) =>
+        var (band, grown, area, share) = Read(new Size(width, height), (host, panel) =>
         {
-            HoverUntilRise(host, panel);
+            var start = panel.Shell.Bounds.Size;
+            Maximize(host, panel);
             host.TryFindResource("PlaybackMidShare", out var value);
-            return (panel.StageTarget, OverlayBounds(panel), (double)value!);
+            return (start, panel.StageTarget, OverlayBounds(panel), (double)value!);
         });
 
-        Assert.Equal(area.Height * share, grown.Height, 3);
+        var fit = new Size(area.Width * share, area.Height * share);
+
+        Assert.True(grown.Width <= fit.Width + 0.001, $"panel {grown.Width:0.#} > pay {fit.Width:0.#}");
+        Assert.True(grown.Height <= fit.Height + 0.001, $"panel {grown.Height:0.#} > pay {fit.Height:0.#}");
+        Assert.True(Math.Abs(grown.Width - fit.Width) < 0.001 || Math.Abs(grown.Height - fit.Height) < 0.001,
+            $"panel paya hiçbir eksende değmiyor: {grown.Width:0.#}x{grown.Height:0.#}, pay {fit.Width:0.#}x{fit.Height:0.#}");
+
+        Assert.True(grown.Height > band.Height, $"maksimize {grown.Height:0.#} <= band {band.Height:0.#}");
         Assert.True(grown.Height < area.Height, $"panel {grown.Height:0.#} >= pencere {area.Height:0.#}");
-        Assert.True(grown.Y > 0, $"panel üst kenara yapıştı: {grown.Y:0.#}");
+        Assert.True(grown.X > 0 && grown.Y > 0, $"panel kenara yapıştı: {grown.X:0.#},{grown.Y:0.#}");
+    }
+
+    /// <summary>
+    /// K3'ün ikinci yarısı: tuşa ikinci basış eski boya döndürür ve dönüş <b>birebir</b>.
+    /// Ölçü kabuğun gerçekten yerleştiği boyu okuyor — hedef kademe değil — çünkü kusur
+    /// tam orada görünürdü: panel bandına yaklaşık dönseydi altındaki düzen kayardı.
+    /// </summary>
+    [Fact]
+    public void Maksimize_tusu_ikinci_basista_eski_boya_doner()
+    {
+        var (band, grown, back, stage, promoted) = Read((host, panel) =>
+        {
+            panel.MotionReduced = true;
+            var start = panel.Shell.Bounds.Size;
+
+            var button = ZoomButton(host, "BtnPanelMaximize");
+            Press(host, button);
+            ReLayOut(host, WindowSize);
+            var big = panel.Shell.Bounds.Size;
+
+            Press(host, button);
+            ReLayOut(host, WindowSize);
+            return (start, big, panel.Shell.Bounds.Size, panel.Shelter, panel.IsPromoted);
+        });
+
+        Assert.True(grown.Height > band.Height + 1, $"maksimize büyütmedi: {band.Height:0.#} -> {grown.Height:0.#}");
+        Assert.Equal(band.Width, back.Width, 6);
+        Assert.Equal(band.Height, back.Height, 6);
+        Assert.Equal(ShelterStage.Band, stage);
+        Assert.False(promoted, "panel kök katmanda kaldı");
+    }
+
+    // ---- T82/K2: iki tuş sağ üstte ---------------------------------------------------
+
+    /// <summary>
+    /// K2: iki tuş da panelin sağ üst çeyreğinde ve birbirini örtmüyor. Metin taşımadıkları
+    /// da ölçülüyor: içerik bir dizge olsaydı bu sözleşme çevrilecek metin üretirdi.
+    /// </summary>
+    [Fact]
+    public void Maksimize_ve_tam_ekran_tuslari_sag_ust_ceyrekte()
+    {
+        var (maximize, fullScreen, stage, words) = Read((host, panel) =>
+        {
+            FakeFrame(panel);
+            Relayout(host);
+
+            var one = ZoomButton(host, "BtnPanelMaximize");
+            var two = ZoomButton(host, "BtnPanelFullScreen");
+
+            Rect Where(Button button) =>
+                new(button.TranslatePoint(new Point(0, 0), panel.Stage) ?? default, button.Bounds.Size);
+
+            return (Where(one), Where(two), panel.Stage.Bounds.Size,
+                new[] { one.Content as string, two.Content as string });
+        });
+
+        foreach (var (name, box) in new[] { ("maksimize", maximize), ("tam ekran", fullScreen) })
+        {
+            Assert.True(box.Width > 0 && box.Height > 0, $"{name} tuşu ölçülmedi: {box}");
+            Assert.True(box.X > stage.Width / 2, $"{name} tuşu sol yarıda: {box.X:0.#} / {stage.Width:0.#}");
+            Assert.True(box.Bottom < stage.Height / 2, $"{name} tuşu alt yarıda: {box.Bottom:0.#} / {stage.Height:0.#}");
+        }
+
+        Assert.False(maximize.Intersects(fullScreen), $"tuşlar örtüşüyor: {maximize} / {fullScreen}");
+        Assert.All(words, word => Assert.Null(word));
+    }
+
+    // ---- T82/K4: tam ekran -----------------------------------------------------------
+
+    private static KeyEventArgs Escape(MainWindow window) =>
+        new() { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Escape, Source = window };
+
+    /// <summary>
+    /// K4: tam ekran tuşu paneli kök katmanın tamamına yayar — kenar boşluğu yok ve öteki
+    /// paneller görünmez, çünkü kabuk katmanın her pikselini kaplıyor.
+    /// </summary>
+    [Fact]
+    public void Tam_ekran_tusu_pencerenin_tamamini_kaplar()
+    {
+        var (full, area, stage) = Read((host, panel) =>
+        {
+            Press(host, ZoomButton(host, "BtnPanelFullScreen"));
+            return (panel.StageTarget, OverlayBounds(panel), panel.Shelter);
+        });
+
+        Assert.Equal(ShelterStage.Full, stage);
+        Assert.Equal(0, full.X, 6);
+        Assert.Equal(0, full.Y, 6);
+        Assert.Equal(area.Width, full.Width, 6);
+        Assert.Equal(area.Height, full.Height, 6);
+    }
+
+    /// <summary>
+    /// K4'ün ikinci yarısı: üç çıkış yolu da ölçülüyor. Tuşa ikinci basış ve Esc paneli
+    /// bandına indiriyor, maksimize tuşu ise tam ekranı bırakıp maksimize boya oturtuyor.
+    /// </summary>
+    [Fact]
+    public void Tam_ekranin_uc_cikis_yolu()
+    {
+        var (button, escape, viaMaximize, maximized) = Read((host, panel) =>
+        {
+            var full = ZoomButton(host, "BtnPanelFullScreen");
+            var max = ZoomButton(host, "BtnPanelMaximize");
+
+            Press(host, full);
+            Press(host, full);
+            var afterButton = panel.Shelter;
+
+            panel.Descend();
+            Settle(host);
+            Press(host, full);
+            host.RaiseEvent(Escape(host));
+            Settle(host);
+            var afterEscape = panel.Shelter;
+
+            panel.Descend();
+            Settle(host);
+            Press(host, full);
+            var covered = panel.StageTarget;
+            Press(host, max);
+            return (afterButton, afterEscape, panel.Shelter, (covered, after: panel.StageTarget));
+        });
+
+        Assert.Equal(ShelterStage.Band, button);
+        Assert.Equal(ShelterStage.Band, escape);
+        Assert.Equal(ShelterStage.Mid, viaMaximize);
+        Assert.True(maximized.after.Height < maximized.covered.Height - 1,
+            $"maksimize tuşu tam ekranı bırakmadı: {maximized.covered.Height:0.#} -> {maximized.after.Height:0.#}");
     }
 
     /// <summary>Yerleşimi verilen boyda yeniden koşturur; ölçüm arada bir ölçü değiştirdiyse.</summary>
@@ -398,26 +517,28 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// K5'in asıl ölçüsü: taban boy küçükken de panel pencereyi dolduruyor.
+    /// K3'ün asıl ölçüsü: taban boy küçükken de panel pencereyi dolduruyor.
     ///
-    /// Bu ayrımı ölçmek için band bilerek kısaltılıyor. Sebebi şu: bu düzende panel bandı
-    /// pencereyle birlikte uzuyor, dolayısıyla eski sabit çarpan (2x) her erişilebilir
-    /// pencere boyunda tavanı zaten aşıyor ve fark görünmüyor. Band kısaldığı anda —
+    /// Bu ayrımı ölçmek için band bilerek küçültülüyor. Sebebi şu: bu düzende panel bandı
+    /// pencereyle birlikte büyüyor, dolayısıyla eski sabit çarpan (2x) her erişilebilir
+    /// pencere boyunda tavanı zaten aşıyor ve fark görünmüyor. Band küçüldüğü anda —
     /// önizleme sütununa başka bir şey girdiğinde olacağı gibi — sabit çarpan pencerenin
     /// altında kalır: 300'ün iki katı 600, pencerenin payı ise 954. Ölçek pencereden
     /// hesaplandığında panel o 954'ü alıyor.
     ///
-    /// Tavan ölçüldükten sonra kaldırılıyor: kısaltma bandı kurmak içindi, büyümüş paneli
+    /// Tavan ölçüldükten sonra kaldırılıyor: küçültme bandı kurmak içindi, büyümüş paneli
     /// kısıtlamak için değil. Ölçüm hem hedefi hem kabuğun gerçekten yerleştiği boyu okuyor.
     /// </summary>
     /// <summary>
-    /// Ölçümün kısalttığı band. Pencerenin payının (1060 x 0,9 = 954) yarısından küçük
+    /// Ölçümün küçülttüğü band. Pencerenin payının (1060 x 0,9 = 954) yarısından küçük
     /// olmak zorunda: büyüğü sabit çarpanla da tavanı aşar ve iki hesap ayırt edilemez.
+    /// Kare olması gerekiyor: ölçek iki eksenin küçüğünü aldığı için yalnız boyu kısaltmak
+    /// genişliği bağlayıcı eksen yapar ve sabit çarpanla arasındaki fark kapanır.
     /// </summary>
     private const double ShortBand = 300;
 
     [Fact]
-    public void Kisa_bandli_panel_de_pencereyi_dolduruyor()
+    public void Kucuk_bandli_panel_de_pencereyi_dolduruyor()
     {
         var (band, target, settled, area, share, scale, fixedFactor) = Read((host, panel) =>
         {
@@ -428,15 +549,17 @@ public sealed class ComparisonPanelTests
             panel.Descend();
             panel.Shell.MinHeight = ShortBand;
             panel.Shell.MaxHeight = ShortBand;
+            panel.Shell.MaxWidth = ShortBand;
             ReLayOut(host, WindowSize);
             var shortBand = panel.Shell.Bounds.Height;
 
-            HoverUntilRise(host, panel);
+            Maximize(host, panel);
             var grown = panel.StageTarget;
             var reach = panel.Gesture.PanelScale;
 
             panel.Shell.ClearValue(Layoutable.MaxHeightProperty);
             panel.Shell.ClearValue(Layoutable.MinHeightProperty);
+            panel.Shell.ClearValue(Layoutable.MaxWidthProperty);
             ReLayOut(host, WindowSize);
 
             host.TryFindResource("PlaybackMidShare", out var midShare);
@@ -453,7 +576,7 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// K5 ikinci yarısı: iki farklı pencere boyu iki farklı boy veriyor. Sabit çarpan tek
+    /// K3'ün ikinci yarısı: iki farklı pencere boyu iki farklı boy veriyor. Sabit çarpan tek
     /// sayı üretirdi; ölçülen şey tam olarak bu farktır.
     /// </summary>
     [Fact]
@@ -462,7 +585,7 @@ public sealed class ComparisonPanelTests
         double Grown(double width, double height) =>
             Read(new Size(width, height), (host, panel) =>
             {
-                HoverUntilRise(host, panel);
+                Maximize(host, panel);
                 return panel.StageTarget.Height;
             });
 
@@ -474,18 +597,18 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// K6 ikinci kapı: fareyle büyümek paneli tam kademeye çıkarmıyor. T66'da orta kademe
+    /// İkinci kapı: maksimize etmek paneli tam kademeye çıkarmıyor. T66'da orta kademe
     /// pencereye eşitlenerek üç kademeyi ikiye düşürmüştü; aynı sonuç bu kez ölçeği
-    /// tavana dayamakla doğardı. Uzun pencerede bile kademe orta kalıyor ve tekerlekle
-    /// çıkılan tam kademe bundan ölçülebilir biçimde büyük.
+    /// tavana dayamakla doğardı — iki tuş ayırt edilemez olurdu. Uzun pencerede bile kademe
+    /// orta kalıyor ve tam kademe bundan ölçülebilir biçimde büyük.
     /// </summary>
     [Theory]
     [MemberData(nameof(RiseWindows))]
-    public void Fareyle_buyume_tam_kademeye_esitlenmez(double width, double height)
+    public void Maksimize_tam_kademeye_esitlenmez(double width, double height)
     {
         var (stage, grown, full) = Read(new Size(width, height), (host, panel) =>
         {
-            HoverUntilRise(host, panel);
+            Maximize(host, panel);
             var mid = (panel.Shelter, panel.StageTarget);
 
             WheelTo(host, panel, ShelterStage.Full);
@@ -520,97 +643,6 @@ public sealed class ComparisonPanelTests
         Assert.Equal(0, t, 9);
         Assert.Equal(ShelterStage.Band, stage);
         Assert.Equal(ShelterStage.Band, afterOneNotch);
-    }
-
-    /// <summary>
-    /// T70: pencerenin kendi çıkış olayı paneli indirir. Eskiden bu olay yalnız sayacı
-    /// kurardı; küçülme artık beklemesiz olduğu için panel aynı turda bandına döner.
-    /// </summary>
-    [Fact]
-    public void Fare_pencereden_cikinca_panel_iner()
-    {
-        var (armed, decides, stage) = Read((host, panel) =>
-        {
-            WheelTo(host, panel, ShelterStage.Full);
-
-            // Fare önce panelin üstünde: sayaç tutuluyor, iniş kararı yok.
-            panel.TrackPointer(panel.StageTarget.Center);
-            var before = panel.Descent.Generation;
-            Assert.False(panel.Descent.ShouldHide(before));
-
-            // Pencerenin kendi çıkış olayı. Kaynak pencerenin kendisi, yani gerçek terk.
-            host.RaiseEvent(new PointerEventArgs(
-                InputElement.PointerExitedEvent,
-                host,
-                new Pointer(0, PointerType.Mouse, true),
-                host,
-                new Point(-1, -1),
-                0,
-                new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
-                KeyModifiers.None));
-
-            var after = panel.Descent.Generation;
-            return (after > before, panel.Descent.ShouldHide(after), panel.Shelter);
-        });
-
-        Assert.True(armed, "çıkış olayı sayacı ilerletmedi");
-        Assert.True(decides, "sayaç iniş kararını taşımıyor");
-        Assert.Equal(ShelterStage.Band, stage);
-    }
-
-    /// <summary>
-    /// T70: fare pencereden çıkınca panel iner; geri girince büyüme sayacı kurulur ve eski
-    /// kuşak düşer. İki yön de aynı sayaçta yaşıyor, kuşak koruması ikisini karıştırmıyor.
-    /// </summary>
-    [Fact]
-    public void Pencere_disina_cikis_paneli_indirir_geri_giris_sayaci_kurar()
-    {
-        var (stage, afterExit, afterReturn) = Read((host, panel) =>
-        {
-            WheelTo(host, panel, ShelterStage.Mid);
-
-            panel.TrackPointer(panel.StageTarget.Center);
-            panel.PointerLeftWindow();
-            var landed = panel.Shelter;
-            var pending = panel.Descent.Generation;
-            var leaves = panel.Descent.ShouldHide(pending);
-
-            // Fare geri girdi: eski kuşak düştü, bekleyen karar artık uygulanmaz.
-            panel.HoverPanel(true);
-            return (landed, leaves, panel.Descent.ShouldHide(pending));
-        });
-
-        Assert.Equal(ShelterStage.Band, stage);
-        Assert.True(afterExit);
-        Assert.False(afterReturn);
-    }
-
-    [Fact]
-    public void Terfi_kalkinca_pencere_dinleyicileri_sokulur()
-    {
-        var (before, after) = Read((host, panel) =>
-        {
-            WheelTo(host, panel, ShelterStage.Full);
-            panel.Descend();
-            Settle(host);
-
-            // Panel bandına indi. Dinleyici sökülmediyse bu çıkış olayı hâlâ sayacı
-            // oynatırdı; kuşak sabit kalıyorsa pencereden gerçekten ayrılmış demektir.
-            var stale = panel.Descent.Generation;
-            host.RaiseEvent(new PointerEventArgs(
-                InputElement.PointerExitedEvent,
-                host,
-                new Pointer(0, PointerType.Mouse, true),
-                host,
-                new Point(-1, -1),
-                0,
-                new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
-                KeyModifiers.None));
-
-            return (stale, panel.Descent.Generation);
-        });
-
-        Assert.Equal(before, after);
     }
 
     [Fact]
@@ -648,7 +680,7 @@ public sealed class ComparisonPanelTests
             {
                 "PlaybackPanelRiseDelay", "PlaybackPanelFallDelay", "PlaybackDescendDelay",
                 "PlaybackCountdownSize", "PlaybackCountdownRadius", "PlaybackCountdownStroke",
-                "PlaybackCountdown"
+                "PlaybackCountdown", "PlaybackIdleShell"
             };
             return (dead.Where(key => window.TryFindResource(key, out _)).ToArray(),
                     Span(window, "PlaybackStripShowDelay"),
@@ -749,94 +781,12 @@ public sealed class ComparisonPanelTests
         Assert.True(ceilingOut);
     }
 
-    /// <summary>
-    /// T46/K3: fare dugmelerin ustundeyken inis sayaci durur. Dugmeler kabugun icinde
-    /// oldugu icin, tutma olmadan kullanici yakinlastirmaya calisirken panel inerdi.
-    /// </summary>
-    [Fact]
-    public void DugmeUstundeInisSayaciDurur()
-    {
-        var (heldWhileOver, releasedAfter) = Read((window, panel) =>
-        {
-            WheelTo(window, panel, ShelterStage.Full);
-            var zoomIn = ZoomButton(window, "BtnZoomIn");
-
-            zoomIn.RaiseEvent(PointerCrossing(zoomIn, InputElement.PointerEnteredEvent));
-            panel.PointerLeftWindow();
-            var pending = panel.Descent.Generation;
-            var held = !panel.Descent.ShouldHide(pending);
-
-            zoomIn.RaiseEvent(PointerCrossing(zoomIn, InputElement.PointerExitedEvent));
-            var next = panel.Descent.Generation;
-            return (held, panel.Descent.ShouldHide(next));
-        });
-
-        Assert.True(heldWhileOver);
-        Assert.True(releasedAfter);
-    }
+    // ---- T79/K3 (T82/K7): yakinlastirma dugmeleri paneli gercekten buyutur -----------
 
     /// <summary>
-    /// T52/K2: buyume yolu tema belirtecinin soyledigi kata cikar. Iki kat panel bandina
-    /// sigmadigi icin panel ayni anda kok katmana terfi eder. T70: bu yolu artik fare
-    /// girisi degil, bekleme suresi dolan sayac cagiriyor; olcum yolu dogrudan suruyor.
-    /// Terfi ettikten sonra HoverZoom(false) olcegi dusurmez — inis Descend'in isidir.
-    /// </summary>
-    [Fact]
-    public void GirisOlceklemesiPaneliIkiKatinaCikarir()
-    {
-        var (wanted, scale, stage, held, afterDescent) = Read((window, panel) =>
-        {
-            panel.Descend();
-            window.TryFindResource("PlaybackHoverZoom", out var token);
-
-            panel.HoverZoom(true);
-            Settle(window);
-            var entered = Math.Round(panel.Gesture.PanelScale, 9);
-            var shelter = panel.Shelter;
-
-            // Fare cikti ama inis sayaci daha karar vermedi: olcek yerinde durur.
-            panel.HoverZoom(false);
-            var stillUp = Math.Round(panel.Gesture.PanelScale, 9);
-
-            panel.Descend();
-            return ((double)token!, entered, shelter, stillUp, Math.Round(panel.Gesture.PanelScale, 9));
-        });
-
-        Assert.Equal(wanted, scale);
-        Assert.Equal(ShelterStage.Mid, stage);
-        Assert.Equal(wanted, held);
-        Assert.Equal(1.0, afterDescent);
-    }
-
-    /// <summary>
-    /// T46/K5, birinci tuzak: kullanicinin kendi secimi ezilmiyor. Tekerlekle bir deger
-    /// secildikten sonra fare girip cikmak o degeri ne 2x'e ziplatir ne de sifirlar.
-    /// </summary>
-    [Fact]
-    public void GirisYakinlastirmasiKullaniciSeciminiEzmez()
-    {
-        var (chosen, afterEnter, afterExit) = Read((window, panel) =>
-        {
-            panel.Descend();
-            panel.Zoom(2, new Point(0, 0));
-            var picked = panel.Gesture.T;
-            panel.HoverZoom(true);
-            var entered = panel.Gesture.T;
-            panel.HoverZoom(false);
-            return (picked, entered, panel.Gesture.T);
-        });
-
-        Assert.Equal(2 * ZoomGesture.NotchStep, chosen, 9);
-        Assert.Equal(chosen, afterEnter, 9);
-        Assert.Equal(chosen, afterExit, 9);
-    }
-
-    // ---- T79/K3: yakinlastirma dugmeleri paneli gercekten buyutur --------------------
-
-    /// <summary>
-    /// K3, asıl şikâyet. Düğmeye basmak için fare panelin üstünde olmak zorunda, yani panel
-    /// zaten fareyle büyümüş ve orta kademenin payına dayanmış durumda. Eskiden artı tuşu
-    /// bu noktada panelin boyunu değil yalnız yüzde okumasını oynatıyordu.
+    /// K3, asıl şikâyet. Panel maksimize edilmiş, yani orta kademenin payına dayanmış
+    /// durumda. Eskiden artı tuşu bu noktada panelin boyunu değil yalnız yüzde okumasını
+    /// oynatıyordu. T82: büyüten şey fare değil maksimize tuşu; güvence aynı kaldı.
     ///
     /// Ölçü kademenin sınırını da pinliyor: yükseklik payda (<c>PlaybackMidShare</c>) asılı
     /// duruyor — panel o eksende zaten tavanda — ama panel yine de büyüyor. Eksi aynı yoldan
@@ -847,7 +797,7 @@ public sealed class ComparisonPanelTests
     {
         var (risen, afterIn, afterOut, area, share) = Read((window, panel) =>
         {
-            HoverUntilRise(window, panel);
+            Maximize(window, panel);
             var grown = panel.StageTarget;
 
             var zoomIn = ZoomButton(window, "BtnZoomIn");
@@ -874,7 +824,7 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// K3'ün sınır yarısı: hiçbir dokunuş sessizce yutulmuyor. Panel fareyle büyümüş
+    /// K3'ün sınır yarısı: hiçbir dokunuş sessizce yutulmuyor. Panel maksimize edilmiş
     /// hâlden başlayıp artı tuşuna tam kademeye varana kadar basılıyor ve <b>her</b> dokunuşun
     /// boyu değiştirmesi şart koşuluyor.
     ///
@@ -887,7 +837,7 @@ public sealed class ComparisonPanelTests
     {
         var (steps, stage, area) = Read((window, panel) =>
         {
-            HoverUntilRise(window, panel);
+            Maximize(window, panel);
 
             var zoomIn = ZoomButton(window, "BtnZoomIn");
             var seen = new List<Rect> { panel.StageTarget };
@@ -937,16 +887,21 @@ public sealed class ComparisonPanelTests
             $"eksi yutuldu: {full.Height:0.#} -> {after.Height:0.#}");
     }
 
-    // ---- T79/K4: bos onizlemenin arkasi saydam ---------------------------------------
+    // ---- T82/K5, K6: bandda esit saydamlik, buyukken opak siyah ----------------------
+
+    /// <summary>Fırçanın çizime giden örtücülüğü: kendi opaklığı çarpı renginin alfası.</summary>
+    private static double Ink(IBrush? brush)
+        => brush is ISolidColorBrush solid ? solid.Opacity * solid.Color.A / 255.0 : -1;
 
     /// <summary>
-    /// K4: kaynak yüklü değilken panonun zemini arkayı gösterir. Saydamlık kodda yazılmış
-    /// bir sayı değil: perdenin opaklığı <c>PlaybackIdleVeilOpacity</c> belirtecinin kendisi
-    /// ve o belirteç de ankanın çizildiği opaklıkla aynı kaynaktan geliyor. Kare geldiğinde
-    /// zemin yine örtücüdür; iki fırça aynı renk, tek fark opaklık.
+    /// T79/K4'ten kalan yarı: kaynak yüklü değilken panonun zemini arkayı gösterir.
+    /// Saydamlık kodda yazılmış bir sayı değil: perdenin opaklığı
+    /// <c>PlaybackIdleVeilOpacity</c> belirtecinin kendisi ve o belirteç de ankanın
+    /// çizildiği opaklıkla aynı kaynaktan geliyor. Kare geldiğinde zemin yine örtücüdür;
+    /// iki fırça aynı renk, tek fark opaklık.
     ///
-    /// Örtü iki kat olduğu için ikisi de ölçülüyor: pano perdesi ile panelin kendi yüzeyi.
-    /// Yalnız pano saydamlaşsaydı kabuğun %90 örtücü zemini ankanın önünde kalırdı.
+    /// T82: kabuğun kendi yüzeyi bu ölçünün dışına çıktı — orada ölçü artık saydamlık değil
+    /// öteki panellerle eşitlik. <see cref="Bandda_panel_saydamligi_oteki_panellerle_esit"/>.
     ///
     /// Fırçaların kendisi dışarı taşınmıyor: Avalonia nesnelerinin özellikleri yalnız kendi iş
     /// parçacığında okunabiliyor, bu yüzden karşılaştırma konakta yapılıp sayı dönüyor.
@@ -954,19 +909,17 @@ public sealed class ComparisonPanelTests
     [Fact]
     public void Bos_onizlemenin_zemini_arkayi_gosterir()
     {
-        var (idle, filled, veil, phoenix, sameColour, bareShell, filledShell) = Read((window, panel) =>
+        var (idle, filled, veil, phoenix, sameColour) = Read((window, panel) =>
         {
             var empty = (ISolidColorBrush)panel.Stage.Background!;
             var emptyOpacity = empty.Opacity;
-            var shellInk = ((ISolidColorBrush)panel.Shell.Background!).Color.A;
 
             FakeFrame(panel);
             var loaded = (ISolidColorBrush)panel.Stage.Background!;
 
             window.TryFindResource("PlaybackIdleVeilOpacity", out var token);
             window.TryFindResource("PhoenixOpacity", out var anka);
-            return (emptyOpacity, loaded.Opacity, (double)token!, (double)anka!, empty.Color == loaded.Color,
-                shellInk, ((ISolidColorBrush)panel.Shell.Background!).Color.A);
+            return (emptyOpacity, loaded.Opacity, (double)token!, (double)anka!, empty.Color == loaded.Color);
         });
 
         Assert.Equal(veil, idle, 6);
@@ -974,9 +927,66 @@ public sealed class ComparisonPanelTests
         Assert.Equal(phoenix, veil, 6);
         Assert.Equal(1.0, filled, 6);
         Assert.True(sameColour, "iki zemin aynı renk değil");
+    }
 
-        Assert.Equal(0, bareShell);
-        Assert.Equal(byte.MaxValue, filledShell);
+    /// <summary>
+    /// K6: panel büyümemişken kabuğunun saydamlığı öteki panellerinkiyle eşit. Ölçü iki
+    /// yönden bakıyor: iki panelin fırçası <b>aynı nesne</b> — yani kabuk kendi yerel
+    /// değerini taşımıyor, öteki panellerin gösterdiği <c>StaticResource</c>'u gösteriyor —
+    /// ve çizime giden örtücülük iki panelde de aynı. Karşılaştırılan panel kaynak paneli.
+    ///
+    /// Belirtecin adı ayrıca sayıdan doğrulanıyor: <c>PanelSurfaceOpacity</c> temada tek
+    /// yerde duruyor ve kabuğun çizdiği örtücülük odur, kopyalanmış bir sayı değil. Fırçanın
+    /// kendisiyle kimlik karşılaştırması yapılamıyor, çünkü <c>Theme.axaml</c> hem uygulama
+    /// kaynaklarına hem de <c>Controls.axaml</c>'a ayrı ayrı katılıyor: aynı tanımın iki
+    /// örneği var, iki panel bunlardan aynısını gösteriyor.
+    /// </summary>
+    [Fact]
+    public void Bandda_panel_saydamligi_oteki_panellerle_esit()
+    {
+        var (sameBrush, shell, other, token) = Read((window, panel) =>
+        {
+            var source = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "SourcePanel");
+            window.TryFindResource("PanelSurfaceOpacity", out var value);
+
+            return (ReferenceEquals(panel.Shell.Background, source.Background),
+                Ink(panel.Shell.Background), Ink(source.Background), (double)value!);
+        });
+
+        Assert.True(sameBrush, "kabuk öteki panelin fırçasını göstermiyor");
+        Assert.Equal(other, shell, 6);
+        Assert.Equal(token, shell, 6);
+    }
+
+    /// <summary>
+    /// K5: panel taban boyunun üstündeki her kademede zemin opak — arkadaki anka görünmez.
+    /// Ölçü sabit okumuyor: iki katmanın da (kabuk ve pano) çizime giden fırçasını okuyup
+    /// örtücülüğünü hesaplıyor. Bandda perde hâlâ saydam; ölçü büyümenin kendisini ayırıyor.
+    /// </summary>
+    [Fact]
+    public void Buyumus_panelin_zemini_opak()
+    {
+        var (bandShell, bandStage, midShell, midStage, fullShell, fullStage) = Read((window, panel) =>
+        {
+            var atBand = (shell: Ink(panel.Shell.Background), stage: Ink(panel.Stage.Background));
+
+            Maximize(window, panel);
+            var atMid = (shell: Ink(panel.Shell.Background), stage: Ink(panel.Stage.Background));
+
+            Press(window, ZoomButton(window, "BtnPanelFullScreen"));
+            Assert.Equal(ShelterStage.Full, panel.Shelter);
+
+            return (atBand.shell, atBand.stage, atMid.shell, atMid.stage,
+                Ink(panel.Shell.Background), Ink(panel.Stage.Background));
+        });
+
+        Assert.Equal(1.0, midShell, 6);
+        Assert.Equal(1.0, midStage, 6);
+        Assert.Equal(1.0, fullShell, 6);
+        Assert.Equal(1.0, fullStage, 6);
+
+        Assert.True(bandStage < 1, $"bandda pano örtücü: {bandStage:0.###}");
+        Assert.True(bandShell < 1, $"bandda kabuk örtücü: {bandShell:0.###}");
     }
 
     // ---- T79/K5: paravan sekilleniyor ------------------------------------------------
@@ -1135,10 +1145,10 @@ public sealed class ComparisonPanelTests
     }
 
     /// <summary>
-    /// T49/K3 tuzagi: rozet fare olaylarini yutarsa panel kullanici rozetin ustunden
-    /// gecerken inmez. Uc olcum: rozet ve metni isabet testine kapali, rozetten kalkan
-    /// bir fare olayi panonun kendi isleyicisine ulasiyor, ve rozet gosterilirken inis
-    /// sayaci hala karar verebiliyor.
+    /// T49/K3 tuzagi: rozet fare olaylarini yutarsa panonun kendi isleyicileri — denetim
+    /// seridini aciyor olan da dahil — rozetin altinda kor kalir. Iki olcum: rozet ve metni
+    /// isabet testine kapali, ve rozetten kalkan bir fare olayi panonun isleyicisine
+    /// ulasiyor.
     ///
     /// Gercek isabet testi burada olculemez: <c>InputHitTest</c> penceresiz kosuda
     /// panonun ortasinda bile <c>null</c> donuyor, yani cizim yuzeyi olmadan calismiyor.
@@ -1147,7 +1157,7 @@ public sealed class ComparisonPanelTests
     [Fact]
     public void Rozet_fare_olaylarina_saydamdir()
     {
-        var (badgeOpen, textOpen, reached, descends) = Read((window, panel) =>
+        var (badgeOpen, textOpen, reached) = Read((window, panel) =>
         {
             FakeFrame(panel);
             panel.SetRightBadge(BadgeText);
@@ -1159,19 +1169,12 @@ public sealed class ComparisonPanelTests
             panel.ApproxBadge.RaiseEvent(PointerCrossing(panel.ApproxBadge, InputElement.PointerMovedEvent));
             panel.Stage.PointerMoved -= Spy;
 
-            WheelTo(window, panel, ShelterStage.Full);
-            Settle(window);
-            panel.PointerLeftWindow();
-            var generation = panel.Descent.Generation;
-
-            return (panel.ApproxBadge.IsHitTestVisible, panel.ApproxBadgeText.IsHitTestVisible,
-                seen, panel.Descent.ShouldHide(generation));
+            return (panel.ApproxBadge.IsHitTestVisible, panel.ApproxBadgeText.IsHitTestVisible, seen);
         });
 
         Assert.False(badgeOpen, "rozet isabet testine acik");
         Assert.False(textOpen, "rozet metni isabet testine acik");
         Assert.Equal(1, reached);
-        Assert.True(descends, "rozet gosterilirken inis sayaci karar veremedi");
     }
 
     /// <summary>

@@ -23,6 +23,14 @@
                                   panonun zemini bu opaklıkta durur, yani arkadaki anka
                                   çizildiği güçle panelin içinden görünür. İki yerde iki
                                   ayrı sayı olmasın diye ankanın kendi belirtecinin değeri.
+      PlaybackPromotedShell    <- AppBg (#050507). T82: panel taban boyunun üstündeki her
+                                  kademede kabuğun zemini bu fırçadır — programın en koyu
+                                  zemin belirteci, tam örtücü. Yeni bir ton üretilmedi.
+      PlaybackButtonIconSize   <- SpaceMd (12), düğmenin (24) yarısı: simgenin kutusu.
+      PlaybackMaximizeIcon     <- ölçü değil, biçim: kutunun kendisi. Maksimize simgesi
+                                  panelin alacağı çerçevedir.
+      PlaybackFullScreenIcon   <- ölçü değil, biçim: kutunun dört köşesi. Tam ekran
+                                  simgesi kenarların dışarı açılmasıdır.
       PlaybackMaxPanelScale    <- ölçü değil, jest aralığı: panel boyunun tavanı, taban
                                   boyun katı olarak. ZoomGesture ile aynı sayı.
 
@@ -39,16 +47,16 @@
       PlaybackThumbSize        <- SliderThumbSize (20)
       PlaybackCursorWidth      <- DropOutlineThickness (2)
 
-    T44 — orta kademe ve gecikmeli iniş:
+    T44 — orta kademe (T82: gecikmeli iniş de, fareyle büyüme de kalktı):
 
       PlaybackMidShare         <- WindowWorkAreaShare (0,9); orta kademenin tavanı, yani
                                   ölçekli boy pencerenin bu oranını geçemez. Aynı
                                   belirteç pencerenin çalışma alanına oturmasını da
                                   sürüyor: "kapla ama kenarı bırak" ölçüsü tektir.
       T79: panelin iki bekleme süresi (PlaybackPanelRiseDelay, PlaybackPanelFallDelay)
-      buradan tamamen kalktı. Panel fareye anında yanıt veriyor; sıfır yazılı bir
-      belirteç bırakmak "burada ayarlanabilir bir süre var" derdi, oysa yok. Şeridin
-      kendi iki süresi (PlaybackStripShowDelay/HideDelay) duruyor — onlar başka karar.
+      buradan tamamen kalktı. T82: fareyle büyüme de kalktı, yani bir daha bekleyecek
+      bir şey yok — boy iki tuşla değişiyor. Şeridin kendi iki süresi
+      (PlaybackStripShowDelay/HideDelay) duruyor: onlar başka karar.
 
     T46 — boş panel ve tıkla yakınlaştırma:
 
@@ -68,8 +76,9 @@
                                   buradan türer, ters yönden değil; tavan
                                   (PlaybackMaxPanelScale) değişirse hesap kendiliğinden
                                   düzelir. T73: bu kat artık büyümenin tavanı değil tabanı —
-                                  panelin fareyle çıktığı boy pencereden hesaplanıyor, bu
-                                  sayı da orta kademenin eşiği olarak altına inilemeyen sınır.
+                                  panelin maksimize edilince çıktığı boy pencereden
+                                  hesaplanıyor, bu sayı da orta kademenin eşiği olarak
+                                  altına inilemeyen sınır.
 
     T79: yuvarlak geri sayımın üç belirteci de (PlaybackCountdownSize/Radius/Stroke) ve
     perdesi kalktı. Bekleme olmayınca sayan bir gösterge de yok.
@@ -108,15 +117,19 @@
     yüklenmemişken saydam olanı (PlaybackIdleVeil) duruyor. İkisi aynı renk; aralarındaki
     tek fark opaklık ve o da belirteçten geliyor.
 
-    Panelin kendi yüzeyi de kalkmak zorunda: kabuk %90 örtücü bir zemin çiziyor ve tek
-    başına pano saydamlaşırsa ankaya kalan pay yaklaşık yüzde yedi olurdu. Boş panelin
-    kabuğu bu yüzden hiç mürekkep koymuyor — renk değil, mürekkebin yokluğu.
+    T82: panelin kendi yüzeyi artık buradan gelmiyor. Taban boydayken kabuk öteki
+    panellerin belirtecini (PanelSurface) gösterir — saydamlığın ölçüsü eşitlik. Taban
+    boyun üstünde ise kabuk da pano da örtücüdür: arkadaki anka görünmez.
   -->
   <SolidColorBrush x:Key="PlaybackStageFill" Color="{StaticResource AppBgColor}"/>
   <SolidColorBrush x:Key="PlaybackIdleVeil"
                    Color="{StaticResource AppBgColor}"
                    Opacity="{StaticResource PlaybackIdleVeilOpacity}"/>
-  <SolidColorBrush x:Key="PlaybackIdleShell" Color="Transparent"/>
+  <SolidColorBrush x:Key="PlaybackPromotedShell" Color="{StaticResource AppBgColor}"/>
+
+  <x:Double x:Key="PlaybackButtonIconSize">12</x:Double>
+  <StreamGeometry x:Key="PlaybackMaximizeIcon">M0,0 H12 V12 H0 Z</StreamGeometry>
+  <StreamGeometry x:Key="PlaybackFullScreenIcon">M0,4 V0 H4 M8,0 H12 V4 M12,8 V12 H8 M4,12 H0 V8</StreamGeometry>
 
   <Color x:Key="PlaybackScrimColor">#CC050507</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00050507</Color>
