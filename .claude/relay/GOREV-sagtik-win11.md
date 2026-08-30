@@ -50,7 +50,8 @@ devam etsin.
    `irm | iex` yolunu kırıyor. Ölçü baytları okusun.
 6. **Genişletme listesi tek yerde.** Bugün uzantılar `Install-VidShrink.ps1:189` içinde bir
    dizi. Yeni yol da aynı listeyi okusun; iki yerde iki liste tutma.
-7. `dotnet test -c Release` tamamı yeşil.
+7. `dotnet test -c Release` tamamı yeşil — `--no-build` yok. Başlarken `main`de kendi
+   taban koşumunu al; bitirdiğinde **atlanan ölçü sayısı o tabandan yüksek olmasın**.
 
 ## Çıktı
 
@@ -59,11 +60,12 @@ kayıt defteri/paket okuması; kaldırma sonrası doğrulama; tam süit sayılar
 
 ## Sınırlar
 
-- `src/VidShrink.App/**` ve `src/VidShrink.Core/**` **senin değil** — o dosyalarda paralel
-  bir birleştirme yürüyor. Sana ait olanlar: `Install-VidShrink.ps1`,
-  `src/VidShrink.Launcher/**`, yeni bir paket/uzantı projesi, `tests/VidShrink.Tests/`
-  içinde yalnız kendi eklediğin dosya, `.github/workflows/release.yml` (yeni bir varlık
-  yayınlanacaksa).
+- Sana ait olanlar: `Install-VidShrink.ps1`, `src/VidShrink.Launcher/**`, yeni bir
+  paket/uzantı projesi, `tests/VidShrink.Tests/` içinde yalnız kendi eklediğin dosya,
+  `.github/workflows/release.yml` (yeni bir varlık yayınlanacaksa).
+- `src/VidShrink.App/**` **senin değil**. `src/VidShrink.Core/UpdateCheck.cs`,
+  `install-vidshrink.sh` ve `macos-app-bundle.sh` de senin değil — macOS'ta paralel bir
+  kendini güncelleme işi yürüyor.
 - Yeni renk ya da ölçü uydurma.
 - Yorum yazma; mevcut yorumları koru.
 - Kendi dalında çalış (`sole/sagtik-win11`), bitince **it**. `main`e sen birleştirme.
