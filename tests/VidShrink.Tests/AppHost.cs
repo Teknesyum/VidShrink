@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 using Avalonia;
+using VidShrink.App.Localization;
 
 namespace VidShrink.Tests;
 
@@ -66,7 +67,11 @@ internal static class AppHost
 
         Queue.Add(() =>
         {
-            try { result = work(); }
+            try
+            {
+                Strings.Use("en");
+                result = work();
+            }
             catch (Exception ex) { failure = ExceptionDispatchInfo.Capture(ex); }
             finally { done.Set(); }
         });

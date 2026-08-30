@@ -171,7 +171,7 @@ internal sealed class PanelHost : IDisposable
         {
             var clip = ActiveClip;
             if (clip is null || !clip.IsApproximate) return null;
-            var text = LanguageCatalog.Display(Strings.Get("playback.approximate-preview"));
+            var text = PlaybackText("playback.approximate-preview");
             return clip.Crf is { } crf ? $"{text} · CRF {crf}" : text;
         }
     }
@@ -315,6 +315,11 @@ internal sealed class PanelHost : IDisposable
         _panel.SetRightBadge(ApproximateBadge);
     }
 
+    private string PlaybackText(string key)
+        => LanguageCatalog.Title(
+            Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
+            _turkish);
+
     /// <summary>
     /// Akışı panelin o anki ölçüsüyle kurar. Kare ölçüsü sabit bir sayıdan değil, panonun
     /// kendi genişliğinden gelir; kaynağın en boy oranı korunur, yoksa ffmpeg görüntüyü
@@ -366,7 +371,7 @@ internal sealed class PanelHost : IDisposable
         }
         catch (Exception ex)
         {
-            if (generation == _generation) _panel.SetNotice($"{LanguageCatalog.Display(Strings.Get("playback.player-failed"))}: {ex.Message}");
+            if (generation == _generation) _panel.SetNotice($"{PlaybackText("playback.player-failed")}: {ex.Message}");
             return;
         }
 
@@ -476,7 +481,7 @@ internal sealed class PanelHost : IDisposable
         if (_right is not null || ActiveClip is not null) return null;
         return _clipError is null
             ? "playback.panel.pending"
-            : $"{LanguageCatalog.Display(Strings.Get("playback.sample-failed"))}: {_clipError}";
+            : $"{PlaybackText("playback.sample-failed")}: {_clipError}";
     }
 
     /// <summary>

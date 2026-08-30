@@ -264,9 +264,11 @@ internal partial class ComparisonPanel : UserControl
         RightCurtainText.Text = _rightNotice is null ? string.Empty : Say(_rightNotice);
     }
 
-    private static string Say(string key)
+    private string Say(string key)
         => key.StartsWith("playback.", StringComparison.Ordinal)
-            ? LanguageCatalog.Display(Strings.Get(key))
+            ? LanguageCatalog.Title(
+                Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
+                _turkish)
             : key;
 
     // ---- ayırıcı (K2) -------------------------------------------------------------

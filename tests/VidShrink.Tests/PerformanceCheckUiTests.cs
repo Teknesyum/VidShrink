@@ -170,7 +170,7 @@ public sealed class PerformanceCheckUiTests
         var page = xaml[start..xaml.IndexOf("</TabItem>", start, StringComparison.Ordinal)];
 
         Assert.Contains("x:Name=\"PerformancePanel\" Theme=\"{StaticResource Panel}\"", page, StringComparison.Ordinal);
-        Assert.Contains("Text=\"Performance check\" Theme=\"{StaticResource H2}\"", page, StringComparison.Ordinal);
+        Assert.Contains("Text=\"{loc:Text performance.title}\" Theme=\"{StaticResource H2}\"", page, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"BtnPerformanceExpand\"", page, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"PerformanceDetails\" IsVisible=\"False\"", page, StringComparison.Ordinal);
 
