@@ -4,6 +4,8 @@ namespace VidShrink.Ffmpeg;
 
 public static class ToolLocator
 {
+    internal static readonly string[] MacToolDirectories = { "/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin" };
+
     private static string? _ffmpeg;
     private static string? _ffprobe;
 
@@ -27,7 +29,7 @@ public static class ToolLocator
         return line?.Replace("ffmpeg version ", "", StringComparison.OrdinalIgnoreCase) ?? "unknown";
     }
 
-    private static string Locate(string name)
+    internal static string Locate(string name, string? searchPath = null)
     {
         var exe = OperatingSystem.IsWindows() ? name + ".exe" : name;
         var baseDir = AppContext.BaseDirectory;
@@ -41,15 +43,21 @@ public static class ToolLocator
         foreach (var candidate in candidates)
             if (File.Exists(candidate)) return candidate;
 
-        var onPath = FindOnPath(exe);
+        var onPath = FindOnPath(exe, searchPath ?? Environment.GetEnvironmentVariable("PATH") ?? "");
         if (onPath is not null) return onPath;
 
-        throw new FileNotFoundException($"{name} was not found. Place it in tools\\ffmpeg next to the executable, or install it on PATH.", exe);
+        if (OperatingSystem.IsMacOS())
+            foreach (var directory in MacToolDirectories)
+            {
+                var full = Path.Combine(directory, exe);
+                if (File.Exists(full)) return full;
+            }
+
+        throw new FileNotFoundException($"{name} was not found. Place it in {Path.Combine("tools", "ffmpeg")} next to the executable, or install it on PATH.", exe);
     }
 
-    private static string? FindOnPath(string exe)
+    private static string? FindOnPath(string exe, string path)
     {
-        var path = Environment.GetEnvironmentVariable("PATH") ?? "";
         foreach (var dir in path.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
         {
             try

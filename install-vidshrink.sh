@@ -187,8 +187,14 @@ cp -R "$stage_root/." "$install_root/"
 
 # Burada başlatıcı yok: kendini güncelleme yalnız Windows'ta açık, kısayol doğrudan
 # uygulamayı gösterir.
-installed_executable="$install_root/VidShrink.App"
-[ -f "$installed_executable" ] || fail 'Kurulan VidShrink.App bulunamadı.'
+installed_executable=''
+for candidate in VidShrink VidShrink.App; do
+    if [ -f "$install_root/$candidate" ]; then
+        installed_executable="$install_root/$candidate"
+        break
+    fi
+done
+[ -n "$installed_executable" ] || fail 'Kurulan VidShrink çalıştırılabiliri bulunamadı.'
 chmod +x "$installed_executable"
 ln -sf "$installed_executable" "$bin_directory/vidshrink"
 
