@@ -296,7 +296,7 @@ internal partial class ComparisonPanel : UserControl
         RightCurtainText.Text = _rightNotice is null ? string.Empty : Say(_rightNotice);
     }
 
-    private string Say(string english) => LanguageCatalog.Localize(english, _turkish);
+    private string Say(string english) => LanguageCatalog.Playback(english, _turkish);
 
     // ---- ayırıcı (K2) -------------------------------------------------------------
 

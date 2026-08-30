@@ -110,6 +110,6 @@ public sealed class AppliedUpdateTests : IDisposable
     [Fact]
     public void TheAppliedLineIsTranslated()
     {
-        Assert.Equal("Yeni sürüme geçildi", TipSources.ReadCatalogue()["Updated to a new version"]);
+        Assert.Equal("Yeni sürüme geçildi", Locales.TurkishFor("Updated to a new version"));
     }
 }

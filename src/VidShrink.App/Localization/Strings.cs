@@ -35,6 +35,17 @@ public static class Strings
         }
     }
 
+    public static CultureInfo Culture
+    {
+        get
+        {
+            lock (Gate)
+            {
+                return culture;
+            }
+        }
+    }
+
     public static string Root
     {
         get
@@ -102,11 +113,13 @@ public static class Strings
         }
     }
 
-    public static string Get(string key)
+    public static string Get(string key) => GetIn(Language, key);
+
+    public static string GetIn(string language, string key)
     {
+        ArgumentNullException.ThrowIfNull(language);
         ArgumentNullException.ThrowIfNull(key);
 
-        var language = Language;
         if (Catalog(language).TryGetValue(key, out var text))
         {
             return text;
@@ -126,19 +139,17 @@ public static class Strings
         return key;
     }
 
-    public static string Get(string key, params object?[] args)
+    public static string Get(string key, params object?[] args) => GetIn(Language, key, args);
+
+    public static string GetIn(string language, string key, params object?[] args)
     {
-        var text = Get(key);
+        var text = GetIn(language, key);
         if (args is null || args.Length == 0)
         {
             return text;
         }
 
-        CultureInfo format;
-        lock (Gate)
-        {
-            format = culture;
-        }
+        var format = CultureOf(language);
 
         try
         {

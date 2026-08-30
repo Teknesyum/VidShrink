@@ -1,1 +1,12 @@
-{}
+{
+  "playback.badge.original": "Orijinal",
+  "playback.badge.processed": "İşlenmiş",
+  "playback.approximate-preview": "Yaklaşık önizleme",
+  "playback.player-failed": "Karşılaştırma oynatıcısı başlayamadı",
+  "playback.sample-failed": "Önizleme örneği kodlanamadı",
+  "playback.panel.title": "Karşılaştırma paneli",
+  "playback.panel.hint": "İki tarafı görmek için bir dosya yükleyin",
+  "playback.panel.moved": "Panel öne taşındı",
+  "playback.panel.pending": "Bu bölüm işlenecek",
+  "playback.panel.first-frame": "İlk kare yolda"
+}

@@ -19,12 +19,15 @@ public sealed class SettingsTabTests
 
     private static string WindowCode() => File.ReadAllText(TipSources.WindowCodePath);
 
-    /// <summary>Adı verilen sekmenin gövdesini döndürür.</summary>
-    private static string Tab(string header)
+    /// <summary>
+    /// Anahtarı verilen sekmenin gövdesini döndürür. Sekme adı artık biçimlemede yazılı
+    /// değil; başlık dil dosyasındaki anahtardan geliyor ve arama da onu kullanıyor.
+    /// </summary>
+    private static string Tab(string key)
     {
         var xaml = WindowXaml();
-        var start = xaml.IndexOf($"<TabItem Header=\"{header}\"", StringComparison.Ordinal);
-        Assert.True(start >= 0, $"{header} sekmesi MainWindow.axaml içinde yok.");
+        var start = xaml.IndexOf($"<TabItem Header=\"{{loc:Text {key}}}\"", StringComparison.Ordinal);
+        Assert.True(start >= 0, $"{key} sekmesi MainWindow.axaml içinde yok.");
 
         var next = xaml.IndexOf("<TabItem Header=\"", start + 1, StringComparison.Ordinal);
         return next < 0 ? xaml[start..] : xaml[start..next];
@@ -33,8 +36,8 @@ public sealed class SettingsTabTests
     [Fact]
     public void TheSettingsTabExists()
     {
-        Assert.Contains("Header=\"Settings\"", WindowXaml(), StringComparison.Ordinal);
-        Assert.Equal("Ayarlar", LanguageCatalog.EnglishToTurkish[LanguageCatalog.Title("Settings", false)]);
+        Assert.Contains("Header=\"{loc:Text main.tab.settings}\"", WindowXaml(), StringComparison.Ordinal);
+        Assert.Equal("Ayarlar", Locales.Values("tr")["main.tab.settings"]);
     }
 
     /// <summary>
@@ -47,8 +50,8 @@ public sealed class SettingsTabTests
     [InlineData("TxtAutoUpdateEffect")]
     public void TheUpdateSettingMovedOutOfAboutIntoSettings(string name)
     {
-        Assert.Contains($"x:Name=\"{name}\"", Tab("Settings"), StringComparison.Ordinal);
-        Assert.DoesNotContain(name, Tab("About"), StringComparison.Ordinal);
+        Assert.Contains($"x:Name=\"{name}\"", Tab("main.tab.settings"), StringComparison.Ordinal);
+        Assert.DoesNotContain(name, Tab("main.tab.about"), StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -58,7 +61,7 @@ public sealed class SettingsTabTests
     [Fact]
     public void TheTargetListIsNotWrittenIntoTheMarkup()
     {
-        var settings = Tab("Settings");
+        var settings = Tab("main.tab.settings");
 
         Assert.Contains("x:Name=\"CmbShareTarget\"", settings, StringComparison.Ordinal);
         Assert.DoesNotContain("ComboBoxItem", settings, StringComparison.Ordinal);
@@ -165,7 +168,7 @@ public sealed class SettingsTabTests
         Assert.False(uguu.CanDelete);
         Assert.True(storage.CanDelete);
 
-        var button = Regex.Match(Tab("Settings"), """<Button x:Name="BtnShareDelete".*?/>""", RegexOptions.Singleline);
+        var button = Regex.Match(Tab("main.tab.settings"), """<Button x:Name="BtnShareDelete".*?/>""", RegexOptions.Singleline);
         Assert.True(button.Success, "BtnShareDelete ayarlar sekmesinde yok.");
         Assert.DoesNotContain("IsVisible", button.Value, StringComparison.Ordinal);
         Assert.Contains("BtnShareDelete.IsVisible = target.CanDelete;", WindowCode(), StringComparison.Ordinal);
@@ -178,13 +181,14 @@ public sealed class SettingsTabTests
     [Fact]
     public void TheMissingDeleteTokenIsExplainedInBothLanguages()
     {
-        var code = WindowCode();
+        var english = Locales.Values("en");
+        var turkish = Locales.Values("tr");
 
-        Assert.Contains("x:Name=\"TxtShareDeleteNote\"", Tab("Settings"), StringComparison.Ordinal);
-        Assert.Contains("gönderene silme jetonu vermiyor", code, StringComparison.Ordinal);
-        Assert.Contains("hands out no delete token", code, StringComparison.Ordinal);
-        Assert.Contains("saatlik kendiliğinden silme geçer", code, StringComparison.Ordinal);
-        Assert.Contains("stands in for that", code, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"TxtShareDeleteNote\"", Tab("main.tab.settings"), StringComparison.Ordinal);
+        Assert.Contains("hands out no delete token", english["settings.share.no-delete"], StringComparison.Ordinal);
+        Assert.Contains("gönderene silme jetonu vermiyor", turkish["settings.share.no-delete"], StringComparison.Ordinal);
+        Assert.Contains("stands in for that", english["settings.share.no-delete-window"], StringComparison.Ordinal);
+        Assert.Contains("saatlik kendiliğinden silme geçer", turkish["settings.share.no-delete-window"], StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -229,7 +233,6 @@ public sealed class BrandSpellingTests
     {
         Assert.Equal(Sponsor, LanguageCatalog.Title(written, false));
         Assert.Equal(Sponsor, LanguageCatalog.Title(written, true));
-        Assert.Equal(Sponsor, LanguageCatalog.Localize(written, true));
     }
 
     /// <summary>Görünen metin ile erişilebilir ad aynı dizge olacak.</summary>
@@ -247,5 +250,5 @@ public sealed class BrandSpellingTests
     /// <summary>Marka çevrilmez: sözlükte girdisi olmayacak.</summary>
     [Fact]
     public void TheBrandIsNotATranslationEntry()
-        => Assert.False(LanguageCatalog.EnglishToTurkish.ContainsKey(Sponsor));
+        => Assert.DoesNotContain(Sponsor, Locales.Values("en").Values);
 }

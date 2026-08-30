@@ -21,7 +21,7 @@ public sealed class AdviceCoverageTests
     {
         var missing = All()
             .Where(code => !MainWindow.AdviceCodesWithoutText.Contains(code))
-            .Where(code => string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, turkish: true, fastGpu: false)))
+            .Where(code => string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, language: "tr", fastGpu: false)))
             .Select(code => code.ToString())
             .ToList();
 
@@ -34,7 +34,7 @@ public sealed class AdviceCoverageTests
     public void Declared_unused_codes_really_have_no_text()
     {
         var stray = MainWindow.AdviceCodesWithoutText
-            .Where(code => !string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, turkish: true, fastGpu: false)))
+            .Where(code => !string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, language: "tr", fastGpu: false)))
             .Select(code => code.ToString())
             .ToList();
 
@@ -49,8 +49,8 @@ public sealed class AdviceCoverageTests
             .Where(code => !MainWindow.AdviceCodesWithoutText.Contains(code))
             .Where(code =>
             {
-                var turkish = MainWindow.AdviceLine(code, turkish: true, fastGpu: false);
-                var english = MainWindow.AdviceLine(code, turkish: false, fastGpu: false);
+                var turkish = MainWindow.AdviceLine(code, language: "tr", fastGpu: false);
+                var english = MainWindow.AdviceLine(code, language: "en", fastGpu: false);
                 return string.IsNullOrWhiteSpace(english) || turkish == english;
             })
             .Select(code => code.ToString())
@@ -71,7 +71,7 @@ public sealed class AdviceCoverageTests
     [InlineData(AdviceCode.MotionCutIsExpensive)]
     public void Codes_the_engine_produces_reach_the_user(AdviceCode code)
     {
-        Assert.False(string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, turkish: true, fastGpu: false)));
-        Assert.False(string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, turkish: false, fastGpu: false)));
+        Assert.False(string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, language: "tr", fastGpu: false)));
+        Assert.False(string.IsNullOrWhiteSpace(MainWindow.AdviceLine(code, language: "en", fastGpu: false)));
     }
 }

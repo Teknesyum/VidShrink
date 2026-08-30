@@ -1128,10 +1128,10 @@ public sealed class ComparisonPanelTests
     [Fact]
     public void Rozetin_iki_anahtari_sozlukte()
     {
-        Assert.Equal("Yakla\u015f\u0131k \u00d6nizleme", LanguageCatalog.Localize("Approximate preview", true));
-        Assert.Equal(
-            "\u00d6nizleme \u00d6rne\u011fi Kodlanamad\u0131",
-            LanguageCatalog.Localize("The preview sample could not be encoded", true));
+        var turkish = Locales.Values("tr");
+
+        Assert.Equal("Yakla\u015f\u0131k \u00f6nizleme", turkish["playback.approximate-preview"]);
+        Assert.Equal("\u00d6nizleme \u00f6rne\u011fi kodlanamad\u0131", turkish["playback.sample-failed"]);
     }
 
     /// <summary>

@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
+        xmlns:loc="using:VidShrink.App.Localization"
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
         Width="1560" Height="1060" MinWidth="1040" MinHeight="720"
@@ -61,9 +62,9 @@
                       Orientation="Horizontal"
                       VerticalAlignment="Center"
                       ClipToBounds="True">
-            <TextBlock x:Name="TaglineLead" Text="Target size media compression" Theme="{StaticResource ProductTagline}"/>
+            <TextBlock x:Name="TaglineLead" Text="{loc:Text main.tagline.lead}" Theme="{StaticResource ProductTagline}"/>
             <TextBlock x:Name="TaglineSeparator" Text=" &amp; " Theme="{StaticResource ProductTagline}" Foreground="{StaticResource TextBody}"/>
-            <TextBlock x:Name="TaglineConverter" Text="Media converter" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
+            <TextBlock x:Name="TaglineConverter" Text="{loc:Text main.tagline.converter}" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
@@ -88,11 +89,11 @@
             -->
             <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Stretch"
                         Margin="{StaticResource WindowButtonMargin}">
-              <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="Minimize" auto:AutomationProperties.Name="Minimize" Click="OnMinimize">
+              <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.minimize}" auto:AutomationProperties.Name="{loc:Text main.window.minimize}" Click="OnMinimize">
                 <Rectangle Width="10" Height="2" RadiusX="1" RadiusY="1" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
-              <Button x:Name="BtnMaximize" Content="□" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="Maximize" auto:AutomationProperties.Name="Maximize" Click="OnMaximizeRestore"/>
-              <Button x:Name="BtnClose" Content="×" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="Close" auto:AutomationProperties.Name="Close" Click="OnClose"/>
+              <Button x:Name="BtnMaximize" Content="□" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.maximize}" auto:AutomationProperties.Name="{loc:Text main.window.maximize}" Click="OnMaximizeRestore"/>
+              <Button x:Name="BtnClose" Content="×" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="{loc:Text main.window.close}" auto:AutomationProperties.Name="{loc:Text main.window.close}" Click="OnClose"/>
             </StackPanel>
           </StackPanel>
         </Grid>
@@ -111,7 +112,7 @@
           <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
             <TextBlock Grid.Column="0"
                        x:Name="TxtAppliedLead"
-                       Text="Updated to a new version"
+                       Text="{loc:Text main.update.applied}"
                        Theme="{StaticResource Body}"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="1"
@@ -125,7 +126,7 @@
                     Theme="{StaticResource GhostButton}"
                     FontFamily="{StaticResource FontMono}"
                     VerticalAlignment="Center"
-                    auto:AutomationProperties.Name="Close"
+                    auto:AutomationProperties.Name="{loc:Text main.window.close}"
                     Click="OnDismissAppliedNotice"/>
           </Grid>
         </Border>
@@ -142,7 +143,7 @@
           <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
             <TextBlock Grid.Column="0"
                        x:Name="TxtNoticeLead"
-                       Text="A new version is available"
+                       Text="{loc:Text main.update.available}"
                        Theme="{StaticResource Body}"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="1"
@@ -158,7 +159,7 @@
                      VerticalAlignment="Center"/>
             <Button Grid.Column="3"
                     x:Name="BtnNoticeCopy"
-                    Content="Copy"
+                    Content="{loc:Text main.action.copy}"
                     Theme="{StaticResource GhostButton}"
                     VerticalAlignment="Center"
                     Click="OnCopyUpdateCommand"/>
@@ -168,7 +169,7 @@
                     Theme="{StaticResource GhostButton}"
                     FontFamily="{StaticResource FontMono}"
                     VerticalAlignment="Center"
-                    auto:AutomationProperties.Name="Close"
+                    auto:AutomationProperties.Name="{loc:Text main.window.close}"
                     Click="OnDismissUpdateNotice"/>
           </Grid>
         </Border>
@@ -180,13 +181,11 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     ZIndex="1">
-          <Button x:Name="BtnTr" Content="TR" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="TR" Click="OnTurkish"/>
-          <Button x:Name="BtnEn" Content="EN" Theme="{StaticResource LanguageButton}" auto:AutomationProperties.Name="EN" Click="OnEnglish"/>
         </StackPanel>
 
         <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}">
 
-        <TabItem Header="Shrink" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.shrink}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
@@ -194,7 +193,7 @@
 
                 <Border x:Name="SourcePanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="Source" Theme="{StaticResource H2}"/>
+                    <TextBlock Text="{loc:Text main.source.title}" Theme="{StaticResource H2}"/>
 
                     <Panel x:Name="DropZone" MinHeight="{StaticResource DropZoneMinHeight}">
                       <Rectangle x:Name="DropOutline"
@@ -231,50 +230,50 @@
                             </Transitions>
                           </Path.Transitions>
                         </Path>
-                        <TextBlock x:Name="TxtDropTitle" Text="Drop a media file here" Theme="{StaticResource DropTitle}"/>
-                        <TextBlock x:Name="TxtDropHint" Text="Any format ffmpeg can open" Theme="{StaticResource DropHint}"/>
-                        <Button x:Name="BtnBrowseEmpty" Content="Browse" Theme="{StaticResource GhostButton}" HorizontalAlignment="Center" Click="OnBrowse"/>
+                        <TextBlock x:Name="TxtDropTitle" Text="{loc:Text main.drop.title}" Theme="{StaticResource DropTitle}"/>
+                        <TextBlock x:Name="TxtDropHint" Text="{loc:Text main.drop.hint}" Theme="{StaticResource DropHint}"/>
+                        <Button x:Name="BtnBrowseEmpty" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Center" Click="OnBrowse"/>
                       </StackPanel>
                     </Panel>
 
                     <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtFileName" Text="Drop any media file here, or browse." Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                      <Button Grid.Column="1" Content="Browse" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
+                      <TextBlock x:Name="TxtFileName" Text="{loc:Text main.source.placeholder}" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                      <Button Grid.Column="1" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                     </Grid>
 
                     <TextBlock x:Name="TxtSourceStatus" Theme="{StaticResource StatusError}" IsVisible="False"/>
 
                     <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" IsVisible="False">
                       <StackPanel>
-                        <TextBlock Text="Duration" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="Size" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtSize" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="Resolution" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtResolution" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="FPS" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtFps" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="Video codec" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtVideoCodec" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="Audio" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtAudio" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="Bitrate" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtBitrate" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="HDR" Theme="{StaticResource Label}"/>
+                        <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtHdr" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                     </UniformGrid>
@@ -284,10 +283,10 @@
                 <Border x:Name="TargetPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <StackPanel Orientation="Horizontal">
-                      <TextBlock Text="Target" Theme="{StaticResource H2}"/>
-                      <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Target">
+                      <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
+                      <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.target.title}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="• The target is a hard ceiling: VidShrink never hands you a file larger than this.&#10;• WhatsApp accepts files up to 2 GB, but it re-compresses any video you send in chat, and its own encoder is far weaker than this one.&#10;• Staying at or below 16 MB keeps VidShrink's quality instead of WhatsApp's.&#10;• 25 MB fits Discord and most e-mail, 8 MB fits older forums and chat apps."/>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.target.tip}"/>
                         </ToolTip.Tip>
                       </Button>
                     </StackPanel>
@@ -310,8 +309,8 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="WhatsApp recommended"/>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• WhatsApp re-encodes in-chat video with its own low-bitrate encoder.&#10;• Under 16 MB it usually passes your file through with far less damage, so what the other side sees is VidShrink's quality, not WhatsApp's.&#10;• To bypass re-encoding entirely, send the result as a document instead of as a video."/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.whatsapp.label}"/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.whatsapp.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
@@ -319,21 +318,21 @@
                       <Button x:Name="Chip8" Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" Text="8 MB fits Discord without Nitro, older forums, and strict e-mail gateways."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.8.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                       <Button x:Name="Chip25" Content="25" Tag="25" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" Text="25 MB fits Gmail attachments, Discord Nitro Basic, and most ticket systems."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.25.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                       <Button x:Name="Chip100" Content="100" Tag="100" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" Text="100 MB suits archiving and uploads where quality matters more than transfer time."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.100.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -341,8 +340,8 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="Sharing maximum"/>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• 128 MiB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit.&#10;• A file at or under this size can be handed to either share target without being refused.&#10;• The other target, storage.to, carries far more, so this chip is the safe number for both."/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.128.label}"/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.128.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
@@ -351,22 +350,22 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="WhatsApp Web maximum"/>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• On the phone: 16 MB in chat, 2 GB as a document.&#10;• WhatsApp Web takes 180 MB per file. The user reports this, WhatsApp does not publish it.&#10;• So a file of 180 MB or less goes through the web side as it is."/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.180.label}"/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.180.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
-                      <Button x:Name="ChipHalf" Content="Half" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
+                      <Button x:Name="ChipHalf" Content="{loc:Text main.chip.half}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Half of the source size.&#10;• A mild request, so the engine usually keeps the original resolution and frame rate."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.half.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                     </WrapPanel>
 
-                      <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="Quality" Theme="{StaticResource H2}"/>
+                      <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
                       <Slider x:Name="SliderQualityTarget" Grid.Row="3" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
                       <TextBox x:Name="TxtQualityTarget" Grid.Row="3" Grid.Column="1" Text="60" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                       <TextBlock Grid.Row="3" Grid.Column="2" Text="/100" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
@@ -374,86 +373,86 @@
                     </Grid>
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Intent" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Intent">
+                        <TextBlock Text="{loc:Text main.intent.label}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.intent.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Intent sets how early the engine stops spending bits.&#10;• Archive stops only at visually lossless quality, so it can leave a lot of the target unused.&#10;• Sharing stops at the point where a normal viewer stops noticing — the right choice for WhatsApp.&#10;• Social media stops earlier still, because the platform will re-encode the file anyway."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.intent.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbIntent" SelectedIndex="1" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Archive"/>
-                        <ComboBoxItem Content="Sharing"/>
-                        <ComboBoxItem Content="Social media"/>
+                        <ComboBoxItem Content="{loc:Text main.intent.archive}"/>
+                        <ComboBoxItem Content="{loc:Text main.intent.sharing}"/>
+                        <ComboBoxItem Content="{loc:Text main.intent.social}"/>
                       </ComboBox>
                     </StackPanel>
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Compression algorithm" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Compression algorithm">
+                        <TextBlock Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.codec.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• H.264 is universal: every phone made in the last fifteen years plays it, and WhatsApp never re-encodes it.&#10;• H.265 needs roughly a third fewer bits for the same picture, so it wins badly compressed targets — but some older Android phones and some web players refuse it.&#10;• Automatic picks H.264 for mild targets and H.265 once the target is tight enough that the quality gain outweighs the compatibility risk.&#10;• Speed is not chosen here any more: turn on fast shrink (GPU) below to let the graphics card encode."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.codec.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Automatic"/>
-                        <ComboBoxItem Content="H.264 (compatible)"/>
-                        <ComboBoxItem Content="H.265 (smallest)"/>
+                        <ComboBoxItem Content="{loc:Text main.codec.automatic}"/>
+                        <ComboBoxItem Content="{loc:Text main.codec.compatible}"/>
+                        <ComboBoxItem Content="{loc:Text main.codec.smallest}"/>
                       </ComboBox>
                     </StackPanel>
                     <WrapPanel>
                       <StackPanel Orientation="Horizontal" Margin="{StaticResource WrapItemMargin}">
-                        <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="May lower resolution"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="May lower resolution">
+                        <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.allow.resolution}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• When the target is tight, fewer pixels encoded well beat many pixels encoded badly — blur is far less objectionable than blocking.&#10;• The engine measures how much this particular clip actually saves by scaling down, then picks the largest resolution the budget can still hold cleanly.&#10;• On a phone screen a well-encoded 720p is indistinguishable from 1080p; leaving this on is almost always the better trade."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.allow.resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Margin="{StaticResource WrapItemMargin}">
-                        <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="May lower frame rate"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="May lower frame rate">
+                        <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.allow.fps}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Halving the frame rate frees bits for the frames left.&#10;• The engine only does this on hard targets and never drops below a level where motion starts to stutter.&#10;• Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.allow.fps.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Margin="{StaticResource WrapItemMargin}">
-                        <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" Content="Fast shrink (GPU)"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Fast shrink (GPU)">
+                        <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" Content="{loc:Text main.fast-gpu}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.fast-gpu}">
                           <ToolTip.Tip>
-                            <TextBlock x:Name="TipFastGpu" Theme="{StaticResource TipText}" Text="• Graphics cards encode many times faster than the CPU.&#10;• VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed.&#10;• On older cards the speed still arrives, but it costs some quality per megabyte."/>
+                            <TextBlock x:Name="TipFastGpu" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fast-gpu.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                     </WrapPanel>
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Fill policy" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Fill policy">
+                        <TextBlock Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.fill.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Fill target lands close to the target size and squeezes out the best quality the budget allows.&#10;• Stay at quality ceiling stops when quality stops improving: no padding, but the file can come out smaller."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fill.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbFillPolicy" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Fill target"/>
-                        <ComboBoxItem Content="Stay at quality ceiling"/>
+                        <ComboBoxItem Content="{loc:Text main.fill.target}"/>
+                        <ComboBoxItem Content="{loc:Text main.fill.ceiling}"/>
                       </ComboBox>
                     </StackPanel>
                     <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="HDR" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="HDR">
+                        <TextBlock Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.hdr.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Preserving HDR keeps the source's wider color and brightness range, but the file is larger 10-bit and only recent devices and apps play it correctly.&#10;• Converting to SDR maps the picture to the standard range — smaller, safe on WhatsApp and any phone."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.hdr.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbHdrPolicy" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Preserve HDR"/>
-                        <ComboBoxItem Content="Convert to SDR"/>
+                        <ComboBoxItem Content="{loc:Text main.hdr.preserve}"/>
+                        <ComboBoxItem Content="{loc:Text main.hdr.sdr}"/>
                       </ComboBox>
                     </StackPanel>
                   </StackPanel>
@@ -486,10 +485,10 @@
                       MinHeight="{StaticResource PlanPanelMinHeight}"
                       MaxHeight="{StaticResource PlanPanelMaxHeight}">
                 <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
-                  <TextBlock Grid.Row="0" Text="What it will do" Theme="{StaticResource H2}"/>
+                  <TextBlock Grid.Row="0" Text="{loc:Text main.plan.title}" Theme="{StaticResource H2}"/>
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
                     <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="Load a file and every decision the engine makes is listed here."/>
+                      <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.plan.empty}"/>
                       <Grid x:Name="PlanFacts" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
                       <Border x:Name="PlanRule" Theme="{StaticResource PanelRule}" IsVisible="False"/>
                       <!--
@@ -512,7 +511,7 @@
                                 Theme="{StaticResource GhostButton}"
                                 FontFamily="{StaticResource FontMono}"
                                 VerticalAlignment="Center"
-                                auto:AutomationProperties.Name="Why these choices"
+                                auto:AutomationProperties.Name="{loc:Text main.plan.reasons}"
                                 Click="OnTogglePlanReasons"/>
                       </Grid>
                       <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
@@ -527,7 +526,7 @@
 
                 <Border x:Name="OutputPanel" Theme="{StaticResource Panel}" MinHeight="{StaticResource PanelMinHeight}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="Output" Theme="{StaticResource H2}"/>
+                    <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
                     <ProgressBar x:Name="Progress" Maximum="1"/>
                     <Grid ColumnDefinitions="*,*"
                           RowDefinitions="Auto,Auto,Auto"
@@ -535,8 +534,8 @@
                           RowSpacing="{StaticResource SpaceMd}">
 
                       <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="Stage" Theme="{StaticResource OutFactLabel}"/>
-                        <TextBlock x:Name="TxtStage" Text="Idle" Theme="{StaticResource OutFactValue}">
+                        <TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}"/>
+                        <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}">
                           <TextBlock.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
@@ -546,21 +545,21 @@
                       </StackPanel>
 
                       <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="Current output size" Theme="{StaticResource OutFactLabel}"/>
+                        <TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}"/>
                         <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
                       <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="Remaining" Theme="{StaticResource OutFactLabel}"/>
+                        <TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}"/>
                         <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
                       <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceXs}">
                         <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0" x:Name="LblDuration" Text="Estimated time" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="Estimated time">
+                          <TextBlock Grid.Column="0" x:Name="LblDuration" Text="{loc:Text main.output.estimated-time}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-time}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" Text="• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.&#10;• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.&#10;• When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed."/>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-time.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                         </Grid>
@@ -576,10 +575,10 @@
 
                       <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceXs}">
                         <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="Estimated output" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="Estimated output">
+                          <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="{loc:Text main.output.estimated-output}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-output}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" Text="• Before planning, VidShrink encodes short samples of this clip at two resolutions and measures how many bits it needs — it does not guess from the source bitrate.&#10;• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.&#10;• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see."/>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-output.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                         </Grid>
@@ -603,20 +602,20 @@
                             CornerRadius="{StaticResource RadiusCell}"
                             Padding="{StaticResource PanelPadding}">
                       <StackPanel Spacing="{StaticResource SpaceSm}">
-                        <TextBlock Text="Over the target" Theme="{StaticResource H3}"/>
+                        <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}"/>
                         <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
                         <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
                         <WrapPanel>
-                          <Button x:Name="BtnRetryAgain" Content="Try again" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
-                          <Button x:Name="BtnRetryStop" Content="Leave it as is" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
+                          <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
+                          <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
                         </WrapPanel>
                       </StackPanel>
                     </Border>
                     <StackPanel Spacing="{StaticResource SpaceSm}">
                       <WrapPanel>
-                        <Button x:Name="BtnReveal" Content="Show in folder" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
-                        <Button x:Name="BtnShare" Content="Share the file" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
-                        <Button x:Name="BtnShareCancel" Content="Cancel the upload" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
+                        <Button x:Name="BtnReveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnReveal"/>
+                        <Button x:Name="BtnShare" Content="{loc:Text main.action.share}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShare"/>
+                        <Button x:Name="BtnShareCancel" Content="{loc:Text main.action.cancel-upload}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnShareCancel"/>
                       </WrapPanel>
                       <ProgressBar x:Name="ShareProgress" Maximum="1" IsVisible="False"/>
                       <Grid x:Name="ShareLinkRow"
@@ -631,7 +630,7 @@
                                  VerticalAlignment="Center"/>
                         <Button Grid.Column="1"
                                 x:Name="BtnShareCopy"
-                                Content="Copy"
+                                Content="{loc:Text main.action.copy}"
                                 Theme="{StaticResource GhostButton}"
                                 VerticalAlignment="Center"
                                 Click="OnCopyShareLink"/>
@@ -643,8 +642,8 @@
 
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnCancel" Content="Cancel" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
-                  <Button x:Name="BtnStart" Content="Shrink" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart"/>
+                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
+                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart"/>
                 </StackPanel>
 
               </StackPanel>
@@ -652,24 +651,24 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="Convert" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.convert}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
 
               <Border Grid.Column="0" Theme="{StaticResource Panel}" VerticalAlignment="Top">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="Conversion" Theme="{StaticResource H2}"/>
-                  <TextBlock x:Name="TxtConvertSource" Text="Load a source in Shrink or browse here." Theme="{StaticResource Body}" TextWrapping="Wrap"/>
-                  <Button Content="Browse source" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
+                  <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
+                  <TextBlock x:Name="TxtConvertSource" Text="{loc:Text main.convert.source-empty}" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                  <Button Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
                   <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
                     <StackPanel Grid.Row="0" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Container" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Container">
+                        <TextBlock Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• The container is the file type.&#10;• MP4 is the safest general choice and the only one WhatsApp reliably sends as a playable video — every phone opens it.&#10;• MKV supports many stream types but WhatsApp and most phone galleries treat it as a document.&#10;• WebM is for browsers and is not a phone format.&#10;• MOV suits Apple workflows and plays on iPhone, but Android support is uneven.&#10;• AVI is for older software only.&#10;• MP3, M4A, and WAV create audio-only files."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.container.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -688,10 +687,10 @@
 
                     <StackPanel Grid.Row="0" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Video codec" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Video codec">
+                        <TextBlock Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• H.264 plays on nearly every device made and is what WhatsApp expects; pick it when the file must just work.&#10;• H.265 makes files a third smaller at the same picture, and every phone since 2016 decodes it in hardware.&#10;• But older handsets, some smart TVs, and several web players will not open it, and WhatsApp may re-encode it.&#10;• VP9 is a browser and WebM format; phones play it in apps but rarely in the gallery.&#10;• AV1 compresses best and is the slowest to encode, and only recent phones decode it.&#10;• Copy keeps the original video untouched — no quality loss, no waiting — whenever the container accepts it."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.video-codec.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -700,31 +699,31 @@
                         <ComboBoxItem Content="H.265" Tag="libx265"/>
                         <ComboBoxItem Content="VP9" Tag="libvpx-vp9"/>
                         <ComboBoxItem Content="AV1" Tag="libsvtav1"/>
-                        <ComboBoxItem Content="Copy" Tag="copy"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
                       </ComboBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Quality mode" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Quality mode">
+                        <TextBlock Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• CRF targets visual quality, so final size can vary.&#10;• Fixed bitrate targets a data rate, so size is predictable.&#10;• Use CRF for normal viewing quality and fixed bitrate when size or bandwidth matters more."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.quality-mode.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="CRF"/>
-                        <ComboBoxItem Content="Fixed bitrate"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.fixed-bitrate}"/>
                       </ComboBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="CRF quality / bitrate K" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="CRF quality / bitrate K">
+                        <TextBlock Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 starting point.&#10;• In fixed bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.crf-label.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -736,30 +735,30 @@
 
                     <StackPanel Grid.Row="2" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Resolution" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Resolution">
+                        <TextBlock Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Source keeps the original dimensions.&#10;• A numbered option limits output height while preserving aspect ratio.&#10;• Lower resolution reduces file size and processing load.&#10;• Custom allows an exact width and height."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbResolution" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Source"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="2160" Tag="2160"/>
                         <ComboBoxItem Content="1440" Tag="1440"/>
                         <ComboBoxItem Content="1080" Tag="1080"/>
                         <ComboBoxItem Content="720" Tag="720"/>
                         <ComboBoxItem Content="480" Tag="480"/>
-                        <ComboBoxItem Content="Custom" Tag="custom"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.custom}" Tag="custom"/>
                       </ComboBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Custom width x height" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Custom width x height">
+                        <TextBlock Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Used only when resolution is custom.&#10;• Enter width and height as 1280x720.&#10;• Even dimensions are safest for common video codecs."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -768,28 +767,28 @@
 
                     <StackPanel Grid.Row="3" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Frame rate" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Frame rate">
+                        <TextBlock Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Source preserves the original frame rate.&#10;• 60 is smoother but needs more data.&#10;• 30 suits most video.&#10;• 24 gives a cinema-like motion style.&#10;• Reducing frame rate can reduce file size."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.frame-rate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
                       <ComboBox x:Name="CmbConvertFps" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Source"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="60" Tag="60"/>
                         <ComboBoxItem Content="30" Tag="30"/>
                         <ComboBoxItem Content="24" Tag="24"/>
-                        <ComboBoxItem Content="Custom" Tag="custom"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.custom}" Tag="custom"/>
                       </ComboBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Custom FPS" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Custom FPS">
+                        <TextBlock Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Used only when frame rate is custom.&#10;• Enter the frames per second, such as 25 or 29.97.&#10;• Values above the source frame rate usually add no real motion detail."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-fps.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -798,10 +797,10 @@
 
                     <StackPanel Grid.Row="4" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Audio" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Audio">
+                        <TextBlock Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• AAC is the safe pairing for MP4 and the only audio codec every phone and WhatsApp take without complaint.&#10;• Opus sounds better at low bitrates but belongs in WebM; inside MP4 it will not play on many phones.&#10;• MP3 suits older players.&#10;• PCM is uncompressed and very large.&#10;• Copy preserves the original audio without re-encoding when the container supports it.&#10;• Drop removes audio completely, which is the right call when you are squeezing a silent clip."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -810,17 +809,17 @@
                         <ComboBoxItem Content="Opus" Tag="libopus"/>
                         <ComboBoxItem Content="MP3" Tag="libmp3lame"/>
                         <ComboBoxItem Content="PCM" Tag="pcm_s16le"/>
-                        <ComboBoxItem Content="Copy" Tag="copy"/>
-                        <ComboBoxItem Content="Drop"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.drop}"/>
                       </ComboBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="4" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Audio bitrate K" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Audio bitrate K">
+                        <TextBlock Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Audio data rate in kilobits per second.&#10;• 128 is a compact general setting, 192 provides more detail, and 256 or 320 is useful for music.&#10;• This value is ignored for copy, drop, and raw PCM."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-bitrate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -829,10 +828,10 @@
 
                     <StackPanel Grid.Row="5" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Start (HH:MM:SS)" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Start">
+                        <TextBlock Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Optional trim start time.&#10;• Leave empty to begin at the start of the source.&#10;• Use hours:minutes:seconds, for example 00:01:30."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-start.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -841,10 +840,10 @@
 
                     <StackPanel Grid.Row="5" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="End (HH:MM:SS)" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="End">
+                        <TextBlock Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" Text="• Optional trim end time.&#10;• Leave empty to continue to the end of the source.&#10;• The end time must be later than the start time."/>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-end.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </StackPanel>
@@ -858,16 +857,16 @@
               <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceLg}">
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="FFmpeg command" Theme="{StaticResource H2}"/>
+                    <TextBlock Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
                     <TextBox x:Name="TxtConvertCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="6" MaxLines="6"/>
                     <TextBlock x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </Border>
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="Progress" Theme="{StaticResource H2}"/>
+                    <TextBlock Text="{loc:Text main.convert.progress}" Theme="{StaticResource H2}"/>
                     <ProgressBar x:Name="ConvertProgress" Maximum="1"/>
-                    <TextBlock x:Name="TxtConvertStage" Text="Idle" Theme="{StaticResource MonoValue}">
+                    <TextBlock x:Name="TxtConvertStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource MonoValue}">
                       <TextBlock.Transitions>
                         <Transitions>
                           <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
@@ -875,29 +874,29 @@
                       </TextBlock.Transitions>
                     </TextBlock>
                     <TextBlock x:Name="TxtConvertResult" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
-                    <Button x:Name="BtnConvertReveal" Content="Show in folder" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
+                    <Button x:Name="BtnConvertReveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
                   </StackPanel>
                 </Border>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnConvertCancel" Content="Cancel" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
-                  <Button x:Name="BtnConvert" Content="Convert" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnConvert"/>
+                  <Button x:Name="BtnConvertCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
+                  <Button x:Name="BtnConvert" Content="{loc:Text main.action.convert}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnConvert"/>
                 </StackPanel>
               </StackPanel>
             </Grid>
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="Settings" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.settings}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="SharePanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Share target" Theme="{StaticResource H2}"/>
-                    <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="Share target">
+                    <TextBlock Text="{loc:Text settings.share.title}" Theme="{StaticResource H2}"/>
+                    <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text settings.share.title}">
                       <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" Text="• The share target is the service a finished file is uploaded to.&#10;• storage.to carries up to 25 GiB and lets VidShrink delete the file again, so a link can be closed early.&#10;• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early."/>
+                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings.share.tip}"/>
                       </ToolTip.Tip>
                     </Button>
                   </StackPanel>
@@ -908,19 +907,19 @@
                         RowDefinitions="Auto,Auto,Auto"
                         ColumnSpacing="{StaticResource SpaceMd}"
                         RowSpacing="{StaticResource SpaceSm}">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Ceiling" Theme="{StaticResource PlanFactLabel}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Text settings.share.ceiling}" Theme="{StaticResource PlanFactLabel}"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Lifetime" Theme="{StaticResource PlanFactLabel}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}"/>
                     <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
                       <TextBlock x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Deletion" Theme="{StaticResource PlanFactLabel}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Text settings.share.deletion}" Theme="{StaticResource PlanFactLabel}"/>
                     <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <Button x:Name="BtnShareDelete"
-                              Content="Delete the shared file"
+                              Content="{loc:Text settings.share.delete}"
                               Theme="{StaticResource GhostButton}"
                               HorizontalAlignment="Left"
                               IsEnabled="False"
@@ -933,14 +932,14 @@
 
               <Border x:Name="UpdatePanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="Updates" Theme="{StaticResource H2}"/>
+                  <TextBlock Text="{loc:Text settings.update.title}" Theme="{StaticResource H2}"/>
                   <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
-                    <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="Update automatically"/>
+                    <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings.update.auto}"/>
                   </StackPanel>
                   <TextBlock x:Name="TxtAutoUpdateEffect"
                              Theme="{StaticResource Hint}"
                              TextWrapping="Wrap"
-                             Text="When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it."/>
+                             Text="{loc:Text settings.update.auto-effect}"/>
                 </StackPanel>
               </Border>
 
@@ -948,46 +947,46 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="About" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.about}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAbout" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Border Theme="{StaticResource Panel}" Margin="{StaticResource SectionMargin}">
               <StackPanel Spacing="{StaticResource SpaceMd}">
-                <TextBlock Text="About VidShrink" Theme="{StaticResource H2}"/>
-                <TextBlock Theme="{StaticResource BulletText}" Text="• VidShrink is an offline tool for target-size video compression and format conversion.&#10;• Give it a file and a size ceiling; it works out the settings that lose the least of what a person can actually see, and never returns a file larger than you asked for."/>
-                <TextBlock Text="How the engine thinks" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" Text="• Most size-target compressors apply a fixed table: this many megabytes per minute becomes that resolution.&#10;• That table is wrong for every clip that is not average.&#10;• VidShrink measures instead. It encodes short samples of your actual file at two resolutions and reads how many bits it really costs, and how much of that cost disappears when the picture is scaled down.&#10;• Those two measurements make the plan specific to this clip rather than to video in general."/>
-                <TextBlock Text="Measured, not assumed" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource MonoValue}" FontWeight="Normal" Text="complexity      measured from your file, not its bitrate&#x0a;detail falloff  measured; decides if scaling down is worth it&#x0a;resolution      continuous search, not a fixed ladder&#x0a;frame rate      searched alongside resolution, not after it&#x0a;codec           chosen from how hard the target actually is&#x0a;audio           share of budget shrinks as the target tightens&#x0a;estimate        a measured number with a range, shown up front"/>
-                <TextBlock Text="Where the loss goes" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" Text="• Below a certain bit budget something has to give.&#10;• The engine spends the loss where the eye is least sensitive: softness before blocking, fewer pixels before broken pixels, mono audio before a starved picture.&#10;• It also knows when to stop — once quality reaches the point where more bits buy nothing you could see, it hands back a smaller file instead of padding it to the target."/>
-                <TextBlock Text="Scenario awareness" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" Text="• A 1.2x reduction and a 600x reduction are not the same problem, so they do not get the same treatment.&#10;• Light targets keep everything and simply spend the budget.&#10;• Balanced targets allow scaling.&#10;• Aggressive and extreme targets unlock frame-rate reduction, move to H.265, and cut the audio share — and the app tells you what it changed and why, in plain language, before you press start."/>
-                <TextBlock Text="AI mode" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" Text="• AI mode only creates a prompt and validates pasted JSON.&#10;• No AI is embedded, so VidShrink works offline, asks for no API key, and falls back to the complete automatic engine when an answer is malformed or incompatible."/>
-                <TextBlock Text="Codecs" Theme="{StaticResource H3}"/>
-                <TextBlock Theme="{StaticResource BulletText}" Text="• H.264 offers the broadest compatibility.&#10;• H.265 compresses more efficiently.&#10;• VP9 is a strong WebM choice.&#10;• AV1 maximizes modern compression at higher CPU cost.&#10;• Stream copy is fastest and lossless when the destination supports the source streams."/>
-                <TextBlock Text="System status" Theme="{StaticResource H3}"/>
+                <TextBlock Text="{loc:Text main.about.title}" Theme="{StaticResource H2}"/>
+                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
+                <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
+                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
+                <TextBlock Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
+                <TextBlock Theme="{StaticResource MonoValue}" FontWeight="Normal" Text="{loc:Text main.about.measured.table}"/>
+                <TextBlock Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
+                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
+                <TextBlock Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
+                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
+                <TextBlock Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
+                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
+                <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
+                <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
+                <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
                 <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
           </ScrollViewer>
         </TabItem>
 
-          <TabItem Header="Advanced" Theme="{StaticResource NeonTabItem}">
+          <TabItem Header="{loc:Text main.tab.advanced}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" Text="FFmpeg command" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                     <Button Grid.Column="1"
                             x:Name="BtnCommandExpand"
                             Content="▾"
                             Theme="{StaticResource GhostButton}"
                             FontFamily="{StaticResource FontMono}"
                             VerticalAlignment="Center"
-                            auto:AutomationProperties.Name="FFmpeg command"
+                            auto:AutomationProperties.Name="{loc:Text main.command.title}"
                             Click="OnToggleCommand"/>
                   </Grid>
                   <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1"/>
@@ -997,15 +996,15 @@
               <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" Text="AI settings" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{loc:Text main.ai.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                     <TextBlock Grid.Column="1"
                                x:Name="TxtAiHint"
-                               Text="{StaticResource AiHintText}"
+                               Text="{loc:Text main.ai.tip}"
                                Theme="{StaticResource Hint}"
                                TextWrapping="Wrap"
                                VerticalAlignment="Center">
                       <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" Text="{StaticResource AiHintText}"/>
+                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.ai.tip}"/>
                       </ToolTip.Tip>
                     </TextBlock>
                     <Button Grid.Column="2"
@@ -1014,15 +1013,15 @@
                             Theme="{StaticResource GhostButton}"
                             VerticalAlignment="Center"
                             FontFamily="{StaticResource FontMono}"
-                            auto:AutomationProperties.Name="AI settings"
+                            auto:AutomationProperties.Name="{loc:Text main.ai.title}"
                             Click="OnToggleAiDetails"/>
                   </Grid>
                   <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{StaticResource AiHintText}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <TextBlock Text="{loc:Text main.ai.tip}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <WrapPanel>
-                      <Button Content="Copy prompt" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
-                      <Button Content="Apply pasted JSON" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
-                      <Button x:Name="BtnRevert" Content="Back to automatic" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
+                      <Button Content="{loc:Text main.ai.copy-prompt}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
+                      <Button Content="{loc:Text main.ai.apply-json}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
+                      <Button x:Name="BtnRevert" Content="{loc:Text main.ai.revert}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
                     </WrapPanel>
                     <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
                     <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -1033,20 +1032,20 @@
               <Border x:Name="PerformancePanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" Text="Performance check" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{loc:Text performance.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                     <Button Grid.Column="1"
                             x:Name="BtnPerformanceExpand"
                             Content="▾"
                             Theme="{StaticResource GhostButton}"
                             FontFamily="{StaticResource FontMono}"
                             VerticalAlignment="Center"
-                            auto:AutomationProperties.Name="Performance check"
+                            auto:AutomationProperties.Name="{loc:Text performance.title}"
                             Click="OnTogglePerformance"/>
                   </Grid>
                   <StackPanel x:Name="PerformanceDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <WrapPanel>
                       <Button x:Name="BtnPerformanceRun"
-                              Content="Run the check"
+                              Content="{loc:Text performance.run}"
                               Theme="{StaticResource GhostButton}"
                               Margin="{StaticResource WrapItemMargin}"
                               Click="OnRunPerformanceCheck"/>

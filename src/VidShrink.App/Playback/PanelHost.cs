@@ -170,7 +170,7 @@ internal sealed class PanelHost : IDisposable
         {
             var clip = ActiveClip;
             if (clip is null || !clip.IsApproximate) return null;
-            var text = LanguageCatalog.Localize("Approximate preview", _turkish);
+            var text = LanguageCatalog.Playback("Approximate preview", _turkish);
             return clip.Crf is { } crf ? $"{text} · CRF {crf}" : text;
         }
     }
@@ -365,7 +365,7 @@ internal sealed class PanelHost : IDisposable
         }
         catch (Exception ex)
         {
-            if (generation == _generation) _panel.SetNotice($"{LanguageCatalog.Localize("The comparison player could not start", _turkish)}: {ex.Message}");
+            if (generation == _generation) _panel.SetNotice($"{LanguageCatalog.Playback("The comparison player could not start", _turkish)}: {ex.Message}");
             return;
         }
 
@@ -475,7 +475,7 @@ internal sealed class PanelHost : IDisposable
         if (_right is not null || ActiveClip is not null) return null;
         return _clipError is null
             ? "This part will be processed"
-            : $"{LanguageCatalog.Localize("The preview sample could not be encoded", _turkish)}: {_clipError}";
+            : $"{LanguageCatalog.Playback("The preview sample could not be encoded", _turkish)}: {_clipError}";
     }
 
     /// <summary>

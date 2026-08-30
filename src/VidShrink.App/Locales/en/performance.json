@@ -1,1 +1,36 @@
-{}
+{
+  "performance.title": "Performance check",
+  "performance.run": "Run the check",
+  "performance.running": "Measuring — this runs a few short encodes and takes up to twenty seconds.",
+  "performance.failed": "The check could not finish",
+
+  "performance.headline.hardware-offloaded": "This machine has a working hardware encoder and that pass does not lean on the processor.",
+  "performance.headline.hardware": "This machine has a working hardware encoder, but whether the processor carries that pass was not measured here.",
+  "performance.headline.software-heavy": "No working hardware encoder was found, and software encoding wants a whole processor core to keep up with realtime.",
+  "performance.headline.software-light": "No working hardware encoder was found, but software encoding stays under one processor core at realtime.",
+  "performance.headline.not-enough": "There is not enough measured here to answer the question.",
+
+  "performance.line.not-measured": "Nothing has been measured on this machine yet.",
+  "performance.line.no-hardware": "No hardware video encoder is available here, so encoding runs on the processor.",
+  "performance.line.hardware-failed": "A hardware encoder is listed on this machine, but its test encode failed.",
+  "performance.line.hardware-works": "Hardware encoding works on this machine.",
+  "performance.line.hardware-not-cpu-bound": "The hardware pass does not lean on the processor: giving it one thread or leaving the threads free took the same time, within {0}×.",
+  "performance.line.hardware-cost-unknown": "The processor cost of the hardware pass was not measured, so it must not be read as free.",
+  "performance.line.hardware-headroom": "The hardware pass ran at {0}× realtime.",
+  "performance.line.software-realtime": "Software encoding wants {0} cores to keep up with realtime, on {1} logical cores.",
+  "performance.line.software-costs-cores": "That is a whole core or more ({0} cores), so software encoding owns one core for as long as it runs.",
+  "performance.line.software-small": "That stays under one core ({0} cores), so it can be spread into the gaps left by other work.",
+  "performance.line.cpu-unreliable": "The processor time counter on this machine is not dependable ({0}× against the wall clock), so processor times are shown but nothing is decided from them.",
+  "performance.line.budget-exhausted": "The measurement budget ran out ({0} ms of {1} ms), so one leg of the check is missing.",
+  "performance.boundary": "VidShrink does not capture video. What is measured here is what encoding costs on this machine, not what a capture tool does with it — its own encoder setting is the first place to look.",
+
+  "performance.fact.hardware-encoder": "Hardware encoder",
+  "performance.fact.hardware-pipeline": "Hardware pipeline",
+  "performance.fact.software-encoder": "Software encoder",
+  "performance.fact.software-cost": "Software cost",
+  "performance.fact.logical-cores": "Logical cores",
+  "performance.fact.measured-in": "Measured in",
+  "performance.value.realtime": "{0}× realtime",
+  "performance.value.cores": "{0} cores",
+  "performance.value.ms": "{0} ms"
+}

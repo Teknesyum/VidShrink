@@ -1,1 +1,32 @@
-{}
+{
+  "settings.share.title": "Share target",
+  "settings.share.tip": "• The share target is the service a finished file is uploaded to.\n• storage.to carries up to 25 GiB and lets VidShrink delete the file again, so a link can be closed early.\n• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early.",
+  "settings.share.ceiling": "Ceiling",
+  "settings.share.lifetime": "Lifetime",
+  "settings.share.deletion": "Deletion",
+  "settings.share.delete": "Delete the shared file",
+  "settings.share.day-one": "1 day",
+  "settings.share.days": "{0} days",
+  "settings.share.hour-one-fixed": "1 hour, fixed",
+  "settings.share.hours-fixed": "{0} hours, fixed",
+  "settings.share.not-stated": "Not stated",
+  "settings.share.can-delete": "{0} hands out a delete token, so a link can be closed before its lifetime runs out. The button works once a file has been shared.",
+  "settings.share.no-delete-window": "{0} hands out no delete token, so neither you nor VidShrink can close the link early. Its own deletion after {1} hours stands in for that.",
+  "settings.share.no-delete": "{0} hands out no delete token, so neither you nor VidShrink can close the link early.",
+  "settings.share.nothing": "There is no file to share.",
+  "settings.share.targets-missing": "The share targets could not be read; {0} was not found.",
+  "settings.share.uploading": "Uploading...",
+  "settings.share.shared-until": "Shared. The link stays open until {0}.",
+  "settings.share.shared": "Shared.",
+  "settings.share.cancelled": "Cancelled.",
+  "settings.share.failed": "The file could not be shared",
+  "settings.share.closed": "The share was closed.",
+  "settings.share.close-failed": "The share could not be closed",
+  "settings.share.upload-busy": "An upload is already running; wait for it to finish or cancel it.",
+  "settings.share.nothing-to-close": "There is no share to close.",
+
+  "settings.update.title": "Updates",
+  "settings.update.auto": "Update automatically",
+  "settings.update.auto-effect": "When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it.",
+  "settings.update.no-self-effect": "VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it."
+}

@@ -8,6 +8,7 @@ using System.Text.Json;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
@@ -22,6 +23,8 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
+using VidShrink.App.Localization;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
 using VidShrink.Core;
@@ -47,14 +50,6 @@ public partial class MainWindow : Window
     // Şeridin kapatıldığı sürüm. Ayar dosyası değil, yanına konan bir
     // işaret dosyası; UpdateSettings'e ait olduğu için oraya yazılmaz.
     private const string DismissedNoticeFileName = "dismissed-update.txt";
-
-    private const string AutoUpdateEffectEnglish = "When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it.";
-    private const string NoSelfUpdateEffectEnglish = "VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it.";
-
-    // Bu iki metnin LanguageCatalog içinde birebir karşılığı olmalı. Metni değiştirirsen
-    // sözlüğü de değiştir; TipTranslationTests eşleşmeyi ölçer.
-    private const string HardwareTipEnglish = "• Graphics cards encode many times faster than the CPU.\n• VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.";
-    private const string NoHardwareTipEnglish = "• No usable hardware encoder was found on this computer, so fast shrink is unavailable.\n• The graphics card would normally encode many times faster than the CPU.";
 
     private static readonly ConversionPlan ConversionDefaults = new();
 
@@ -89,10 +84,8 @@ public partial class MainWindow : Window
     // döngü tek turda kapanır. İki bayrak var çünkü iki yön ayrı ayrı bastırılıyor.
     private bool _targetIsDerived;
     private bool _qualityIsDerived;
-    private bool _turkish;
     private TaskCompletionSource<bool>? _retryDecision;
     private RetryPrompt? _activeRetryPrompt;
-    private bool _languageApplied;
     private bool _hardwareProbed;
     private bool _hardwareEncoderAvailable;
     private HardwareVerdict _hardwareVerdict = HardwareVerdict.NotProbed;
@@ -127,6 +120,9 @@ public partial class MainWindow : Window
         // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
         // panel hangi motorun kare ürettiğini bilmez.
         _preview = new PanelHost(Preview, () => new PipeComparisonFrameSource());
+
+        BuildLanguageSwitch();
+        Strings.Changed += OnLanguageChanged;
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 
@@ -174,8 +170,6 @@ public partial class MainWindow : Window
         RefreshQualityTargetAvailability();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
-        ApplyTextCase();
-        BtnEn.Classes.Set("selected", true);
         Loaded += OnWindowLoaded;
     }
 
@@ -258,7 +252,7 @@ public partial class MainWindow : Window
     /// o olay ateşlenmiyor ve pencere İngilizce ölçülüyordu; Türkçe karşılıkların
     /// kutulara sığıp sığmadığı bu kapıdan geçmeden ölçülemez.
     /// </summary>
-    internal void UseTurkish() => SetLanguage(true);
+    internal void UseTurkish() => UseLanguage("tr");
 
     internal void SettleFades()
     {
@@ -381,7 +375,7 @@ public partial class MainWindow : Window
             UpdateMaximizeGlyph();
             ApplyWindowFrame();
             WindowShell.Margin = OffScreenMargin;
-            SetLanguage(true);
+            UseLanguage("tr");
             InitializeShareUi();
             InitializeUpdateUi();
             _ = CheckForUpdateAsync();
@@ -392,7 +386,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            ReportSourceError($"{T("Açılış tamamlanamadı", "Startup did not finish")}: {ex.Message}");
+            ReportSourceError($"{Say("main.error.startup")}: {ex.Message}");
         }
     }
 
@@ -406,6 +400,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
+        Strings.Changed -= OnLanguageChanged;
         _probeCts?.Cancel();
         _cts?.Cancel();
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
@@ -459,70 +454,124 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrWhiteSpace(url)) return;
         try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
-        catch (Exception ex) { TxtSystemStatus.Text = $"{T("Bağlantı açılamadı", "The link could not be opened")}: {ex.Message}"; }
+        catch (Exception ex) { TxtSystemStatus.Text = $"{Say("main.error.link")}: {ex.Message}"; }
     }
 
-    private string T(string turkish, string english)
-        => LanguageCatalog.Title(_turkish ? turkish : english, _turkish);
+    /// <summary>Yürürlükteki dilin Türkçe olup olmadığı; yalnız büyük harf kuralı için.</summary>
+    private static bool IsTurkish
+        => Strings.Language.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
 
-    private string Localize(string english)
+    /// <summary>
+    /// Koddan yazılan her metnin geçtiği kapı: karşılık sözlükten anahtarla okunur, sonra
+    /// yürürlükteki dilin büyük harf kuralından geçer. Biçimlemedeki <c>{loc:Text}</c> bağı
+    /// da tam olarak aynı iki adımı uyguluyor, böylece iki yol aynı metni veriyor.
+    /// </summary>
+    private static string Say(string key) => LanguageCatalog.Display(Strings.Get(key));
+
+    private static string Say(string key, params object?[] args)
+        => LanguageCatalog.Display(Strings.Get(key, args));
+
+    /// <summary>
+    /// Aynı geçit, ama dili çağıran seçiyor. Ölçüler iki dilin satırını yan yana koyabilsin
+    /// diye var; arayüz her zaman yürürlükteki dili geçiriyor.
+    /// </summary>
+    /// <summary>Sayı biçimlemesi dile göre kaymasın diye tek yerden geçiyor.</summary>
+    private static string Num(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
+
+    private static string Speak(string language, string key, params object?[] args)
+        => LanguageCatalog.Title(
+            Strings.GetIn(language, key, args),
+            language.StartsWith("tr", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// Dil düğmeleri <c>Locales</c> altındaki klasörlerden kuruluyor; kodda hiçbir dil adı
+    /// yazılı değil. Üçüncü bir dil klasörü kopyalandığında düğmesi kendiliğinden belirir
+    /// ve her dil kendi adını kendi dosyasında taşır.
+    /// </summary>
+    private void BuildLanguageSwitch()
     {
-        var titled = LanguageCatalog.Title(english, false);
-        return _turkish && LanguageCatalog.EnglishToTurkish.TryGetValue(titled, out var turkish) ? turkish : titled;
+        LangSwitch.Children.Clear();
+
+        foreach (var language in Strings.Languages)
+        {
+            var button = new Button
+            {
+                Content = Strings.GetIn(language, "main.language.name"),
+                Theme = Look("LanguageButton"),
+                Tag = language
+            };
+
+            AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
+            button.Click += (_, _) => UseLanguage(language);
+            LangSwitch.Children.Add(button);
+        }
+
+        MarkChosenLanguage();
     }
 
-    private void OnTurkish(object? sender, RoutedEventArgs e) => SetLanguage(true);
-    private void OnEnglish(object? sender, RoutedEventArgs e) => SetLanguage(false);
-
-    private void SetLanguage(bool turkish)
+    /// <summary>
+    /// Açılır listede <b>seçili</b> satırın metni bir kopyadır: Avalonia onu seçim anında
+    /// alıp saklıyor, öğenin bağı sonradan tazelenince kopya eskide kalıyor. Seçim aynı
+    /// yere geri konarak kopya yenileniyor; olay işleyicileri bu sırada susturuluyor.
+    /// </summary>
+    private void RefreshChoiceLabels()
     {
-        if (_languageApplied && _turkish == turkish) return;
-        var translations = turkish ? LanguageCatalog.EnglishToTurkish : LanguageCatalog.TurkishToEnglish;
         var wasSyncing = _syncing;
         _syncing = true;
-        WalkText(this, value => Swap(value, translations, turkish), new HashSet<StyledElement>());
-        _syncing = wasSyncing;
-        _turkish = turkish;
-        _languageApplied = true;
-        // Both stay clickable. Only the colour says which language is running, so the idle one
-        // must not be mistaken for a disabled control.
-        BtnTr.Classes.Set("selected", turkish);
-        BtnEn.Classes.Set("selected", !turkish);
+        try
+        {
+            foreach (var box in this.GetVisualDescendants().OfType<ComboBox>())
+            {
+                var chosen = box.SelectedIndex;
+                if (chosen < 0) continue;
+                box.SelectedIndex = -1;
+                box.SelectedIndex = chosen;
+            }
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+    }
+
+    private void MarkChosenLanguage()
+    {
+        foreach (var button in LangSwitch.Children.OfType<Button>())
+            button.Classes.Set(
+                "selected",
+                string.Equals(button.Tag as string, Strings.Language, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void UseLanguage(string language) => Strings.Use(language);
+
+    /// <summary>
+    /// Dil değişti. Biçimlemeden gelen metni bağlar kendisi tazeliyor; burada yalnız koddan
+    /// yazılan metinler yeniden kuruluyor.
+    /// </summary>
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        // Dil, arayüz iş parçacığının dışından da değiştirilebiliyor (ölçümler böyle
+        // yapıyor). Görsel ağaca oradan dokunmak yasak; iş kuyruğa alınır.
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(() => OnLanguageChanged(sender, e));
+            return;
+        }
+
+        MarkChosenLanguage();
+        RefreshChoiceLabels();
         ApplyFastGpuTip();
-        // Ağaç yürüyüşü panelin metnini de çevirir; panel kendi geçidinden geçirdiği son
-        // hâli sonra yazar, bu yüzden çağrı yürüyüşten sonradır.
-        _preview?.SetLanguage(turkish);
+        _preview?.SetLanguage(IsTurkish);
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshShareTarget();
         UpdateToolStatus();
+        if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
+        ApplyDropText();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
-        // Recalculate() panelleri kendisi tazeliyor; dosya yokken de boş panel dile uymalı.
         else RefreshQualityPanels();
+        RefreshQualityTargetAvailability();
     }
-
-    /// <summary>
-    /// Puts the text into the wanted language and leaves it capitalised. A lookup miss is not a
-    /// failure: the word simply stays where it is and only its casing is fixed.
-    /// </summary>
-    private static string Swap(string value, IReadOnlyDictionary<string, string> translations, bool turkish)
-    {
-        if (translations.TryGetValue(value, out var direct)) return direct;
-        if (translations.TryGetValue(LanguageCatalog.Title(value, !turkish), out var viaTitle)) return viaTitle;
-        return LanguageCatalog.Title(value, turkish);
-    }
-
-    /// <summary>Capitalises everything already on screen without changing the language.</summary>
-    private void ApplyTextCase()
-        => WalkText(this, value => LanguageCatalog.Title(value, _turkish), new HashSet<StyledElement>());
-
-    /// <summary>
-    /// Madde listesi taşıyan iki tema: balon gövdesi (<c>TipText</c>) ve Hakkında sekmesindeki
-    /// açıklama metinleri (<c>BulletText</c>). İkisi de aynı boyayıcıdan geçer.
-    /// </summary>
-    private bool IsTipBody(TextBlock block)
-        => block.Theme is { } theme
-           && (ReferenceEquals(theme, Look("TipText")) || ReferenceEquals(theme, Look("BulletText")));
 
     /// <summary>
     /// K6: madde işaretini gövde metninden ayırır. Yuvarlak işaret neon mavisi bir koşu olur,
@@ -552,56 +601,12 @@ public partial class MainWindow : Window
         }
     }
 
-    private void WalkText(StyledElement node, Func<string, string> map, HashSet<StyledElement> visited)
-    {
-        if (!visited.Add(node)) return;
-
-        switch (node)
-        {
-            // İpucu gövdesi renkli koşulardan kuruluyor, bu yüzden düz metni artık Text
-            // taşımıyor; kaynak metin Tag'da duruyor ve dil değişiminde oradan okunuyor.
-            case TextBlock tip when IsTipBody(tip):
-                PaintBullets(tip, map(tip.Tag as string ?? tip.Text ?? string.Empty));
-                break;
-            // A TextBlock built from runs carries its own colouring; writing Text would erase it.
-            case TextBlock text when text.Inlines is not { Count: > 0 } && text.Text is { } value:
-                text.Text = map(value);
-                break;
-            case HeaderedContentControl header when header.Header is string headerValue:
-                header.Header = map(headerValue);
-                break;
-            case ContentControl content when content.Content is string contentValue:
-                content.Content = map(contentValue);
-                break;
-        }
-
-        if (node is Control control)
-        {
-            var tip = ToolTip.GetTip(control);
-            if (tip is string tipText) ToolTip.SetTip(control, map(tipText));
-            else if (tip is StyledElement tipElement) WalkText(tipElement, map, visited);
-        }
-
-        if (node is ItemsControl items)
-            foreach (var item in items.Items.OfType<StyledElement>()) WalkText(item, map, visited);
-
-        if (node is ContentControl owner && owner.Content is StyledElement contentElement) WalkText(contentElement, map, visited);
-
-        foreach (var child in node.GetLogicalChildren().OfType<StyledElement>()) WalkText(child, map, visited);
-
-        if (node is ComboBox combo && combo.SelectedIndex >= 0)
-        {
-            var index = combo.SelectedIndex;
-            combo.SelectedIndex = -1;
-            combo.SelectedIndex = index;
-        }
-    }
 
     private void ApplyFastGpuTip()
     {
         // Text yazmak koşuları silerdi: ipucu gövdesi aynı boyayıcıdan geçmeli.
-        var body = Localize(_hardwareProbed && !_hardwareEncoderAvailable ? NoHardwareTipEnglish : HardwareTipEnglish);
-        var verdict = FastGpuVerdictLine(_hardwareVerdict, ChkFastGpu.IsChecked == true, _turkish);
+        var body = Say(_hardwareProbed && !_hardwareEncoderAvailable ? "main.fast-gpu.tip-missing" : "main.fast-gpu.tip");
+        var verdict = FastGpuVerdictLine(_hardwareVerdict, ChkFastGpu.IsChecked == true, Strings.Language);
         PaintBullets(TipFastGpu, verdict is null ? body : $"{body}\n{verdict}");
     }
 
@@ -613,9 +618,9 @@ public partial class MainWindow : Window
     /// önerdiği hâlde kullanıcı kutuyu elle açmış olabilir ve satır o zaman "kapalı kaldı"
     /// diyemez.
     /// </summary>
-    internal static string? FastGpuVerdictLine(HardwareVerdict verdict, bool fastGpuOn, bool turkish)
+    internal static string? FastGpuVerdictLine(HardwareVerdict verdict, bool fastGpuOn, string language)
     {
-        string T(string tr, string en) => LanguageCatalog.Title(turkish ? tr : en, turkish);
+        string Line(string key, params object?[] args) => Speak(language, key, args);
 
         var v = verdict;
 
@@ -625,36 +630,26 @@ public partial class MainWindow : Window
 
         if (v.Reason == HardwareVerdictReason.Usable)
             return fastGpuOn
-                ? T($"• Hızlı düşür kendiliğinden açıldı: {v.Codec} yoklamayı {v.ElapsedMs} ms'de geçti ve istenen {v.RequestedBitrateK} kbit/s takip edebildiği {v.UsableBitrateK} kbit/s sınırının üstünde.",
-                    $"• Fast shrink turned itself on: {v.Codec} passed the probe in {v.ElapsedMs} ms and the requested {v.RequestedBitrateK} kbit/s sits above the {v.UsableBitrateK} kbit/s it can follow.")
-                : T($"• {v.Codec} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.",
-                    $"• {v.Codec} passed the measurement; the box stays off because it was turned off by hand.");
+                ? Line("main.fast-gpu.on-usable", v.Codec, v.ElapsedMs, v.RequestedBitrateK, v.UsableBitrateK)
+                : Line("main.fast-gpu.off-usable", v.Codec);
 
         var measurement = v.Reason switch
         {
-            HardwareVerdictReason.ProbeFailed =>
-                T($"{v.Codec} yoklaması geçmedi",
-                  $"the {v.Codec} probe did not pass"),
-            HardwareVerdictReason.ProbeSlow =>
-                T($"{v.Codec} yoklaması {v.ElapsedMs} ms sürdü, {HardwareVerdict.ProbeBudgetMs} ms bütçesinin üstünde",
-                  $"the {v.Codec} probe took {v.ElapsedMs} ms, past the {HardwareVerdict.ProbeBudgetMs} ms budget"),
-            _ =>
-                T($"{v.Codec} ancak {v.UsableBitrateK} kbit/s ve üstünü takip ediyor, plan {v.RequestedBitrateK} kbit/s istiyor",
-                  $"{v.Codec} only follows {v.UsableBitrateK} kbit/s and above while the plan asks for {v.RequestedBitrateK} kbit/s")
+            HardwareVerdictReason.ProbeFailed => Line("main.fast-gpu.probe-failed", v.Codec),
+            HardwareVerdictReason.ProbeSlow => Line("main.fast-gpu.probe-slow", v.Codec, v.ElapsedMs, HardwareVerdict.ProbeBudgetMs),
+            _ => Line("main.fast-gpu.bitrate-floor", v.Codec, v.UsableBitrateK, v.RequestedBitrateK)
         };
 
         return fastGpuOn
-            ? T($"• {measurement}; ölçüm kapalı öneriyordu, kutu elle açıldı.",
-                $"• {measurement}; the measurement advised leaving it off, but the box was turned on by hand.")
-            : T($"• {measurement}, hızlı düşür kapalı kaldı.",
-                $"• {measurement}, so fast shrink stayed off.");
+            ? Line("main.fast-gpu.on-against-advice", measurement)
+            : Line("main.fast-gpu.off-as-advised", measurement);
     }
 
     private async Task LoadFfmpegVersionAsync()
     {
         if (_ffmpegVersion is not null) return;
         try { _ffmpegVersion = await Task.Run(ToolLocator.GetFfmpegVersion); }
-        catch (Exception ex) { _ffmpegVersion = $"{T("okunamadı", "unavailable")} ({ex.Message})"; }
+        catch (Exception ex) { _ffmpegVersion = $"{Say("main.about.unavailable")} ({ex.Message})"; }
         UpdateToolStatus();
     }
 
@@ -662,16 +657,13 @@ public partial class MainWindow : Window
     {
         if (!ToolLocator.IsAvailable(out var missing))
         {
-            var message = T(
-                $"{missing} bulunamadı. VidShrink'in yanındaki tools/ffmpeg klasörüne koyun veya PATH'e kurun.",
-                $"{missing} not found. Put it in tools/ffmpeg next to VidShrink, or install it on PATH.");
-            TxtSystemStatus.Text = message;
+            TxtSystemStatus.Text = Say("main.about.tool-missing", missing);
             return;
         }
 
         TxtSystemStatus.Text = string.Join("\n",
             $"FFmpeg: {ToolLocator.Ffmpeg}",
-            $"{T("Sürüm", "Version")}: {_ffmpegVersion ?? T("okunuyor...", "reading...")}",
+            $"{Say("main.about.version")}: {_ffmpegVersion ?? Say("main.about.reading")}",
             $".NET: {Environment.Version}",
             $"VidShrink: {AppVersion()}");
     }
@@ -716,7 +708,7 @@ public partial class MainWindow : Window
     }
 
     private void RefreshUpdateTexts()
-        => TxtAutoUpdateEffect.Text = Localize(UpdateCheck.CanSelfUpdate ? AutoUpdateEffectEnglish : NoSelfUpdateEffectEnglish);
+        => TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
 
     /// <summary>
     /// Hedef listesi <c>paylasim-hedefleri.json</c>'dan gelir. Dosya yoksa şema
@@ -769,7 +761,7 @@ public partial class MainWindow : Window
         if (target.RetentionDays.Count > 0)
         {
             CmbShareRetention.ItemsSource = target.RetentionDays
-                .Select(day => T($"{day} gün", day == 1 ? "1 day" : $"{day} days"))
+                .Select(day => day == 1 ? Say("settings.share.day-one") : Say("settings.share.days", day))
                 .ToList();
             var chosen = target.RetentionDays.ToList().IndexOf(target.DefaultRetentionDays);
             CmbShareRetention.SelectedIndex = chosen >= 0 ? chosen : 0;
@@ -777,8 +769,8 @@ public partial class MainWindow : Window
         else
         {
             TxtShareRetentionFixed.Text = target.FixedRetentionHours is { } hours
-                ? T($"{hours} saat, sabit", hours == 1 ? "1 hour, fixed" : $"{hours} hours, fixed")
-                : T("Bildirilmemiş", "Not stated");
+                ? hours == 1 ? Say("settings.share.hour-one-fixed") : Say("settings.share.hours-fixed", hours)
+                : Say("settings.share.not-stated");
         }
         _syncing = wasSyncing;
 
@@ -786,16 +778,10 @@ public partial class MainWindow : Window
         // vermiyor, kullanıcı bunu seçim anında bilmek zorunda.
         BtnShareDelete.IsVisible = target.CanDelete;
         TxtShareDeleteNote.Text = target.CanDelete
-            ? T(
-                $"{target.DisplayName} silme jetonu veriyor, bu yüzden bağlantı ömrü dolmadan kapatılabilir. Düğme bir dosya paylaşıldıktan sonra çalışır.",
-                $"{target.DisplayName} hands out a delete token, so a link can be closed before its lifetime runs out. The button works once a file has been shared.")
+            ? Say("settings.share.can-delete", target.DisplayName)
             : target.FixedRetentionHours is { } window
-                ? T(
-                    $"{target.DisplayName} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz. Onun yerine {window} saatlik kendiliğinden silme geçer.",
-                    $"{target.DisplayName} hands out no delete token, so neither you nor VidShrink can close the link early. Its own deletion after {window} hours stands in for that.")
-                : T(
-                    $"{target.DisplayName} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz.",
-                    $"{target.DisplayName} hands out no delete token, so neither you nor VidShrink can close the link early.");
+                ? Say("settings.share.no-delete-window", target.DisplayName, window)
+                : Say("settings.share.no-delete", target.DisplayName);
     }
 
     /// <summary>
@@ -854,15 +840,13 @@ public partial class MainWindow : Window
     {
         if (_lastOutput is null || !File.Exists(_lastOutput))
         {
-            TxtShareStatus.Text = T("Paylaşılacak bir dosya yok.", "There is no file to share.");
+            TxtShareStatus.Text = Say("settings.share.nothing");
             return;
         }
 
         if (SelectedShareEndpoint() is not { } target)
         {
-            TxtShareStatus.Text = T(
-                $"Paylaşım hedefleri okunamadı; {CoreShare.ShareTargetTable.FileName} bulunamadı.",
-                $"The share targets could not be read; {CoreShare.ShareTargetTable.FileName} was not found.");
+            TxtShareStatus.Text = Say("settings.share.targets-missing", CoreShare.ShareTargetTable.FileName);
             return;
         }
 
@@ -870,7 +854,7 @@ public partial class MainWindow : Window
         if (flow.Running) return;
 
         SetSharing(true);
-        TxtShareStatus.Text = T("Yükleniyor...", "Uploading...");
+        TxtShareStatus.Text = Say("settings.share.uploading");
         ShareLinkRow.IsVisible = false;
 
         var progress = new Progress<CoreShare.UploadProgress>(step => ShareProgress.Value = step.Fraction);
@@ -888,17 +872,16 @@ public partial class MainWindow : Window
             ShareLinkRow.IsVisible = true;
             BtnShareDelete.IsEnabled = flow.CanDelete;
             TxtShareStatus.Text = link.ExpiresAt is { } expires
-                ? T($"Paylaşıldı. Bağlantı {expires.ToLocalTime():d MMMM HH:mm} tarihine kadar açık.",
-                    $"Shared. The link stays open until {expires.ToLocalTime():d MMMM HH:mm}.")
-                : T("Paylaşıldı.", "Shared.");
+                ? Say("settings.share.shared-until", expires.ToLocalTime().ToString("d MMMM HH:mm", Strings.Culture))
+                : Say("settings.share.shared");
             return;
         }
 
         ShareLinkRow.IsVisible = false;
         BtnShareDelete.IsEnabled = flow.CanDelete;
         TxtShareStatus.Text = result.Failure == CoreShare.ShareFailure.Cancelled
-            ? T("İptal edildi.", "Cancelled.")
-            : $"{T("Paylaşılamadı", "The file could not be shared")}: {result.Message}";
+            ? Say("settings.share.cancelled")
+            : $"{Say("settings.share.failed")}: {result.Message}";
     }
 
     private void OnShareCancel(object? sender, RoutedEventArgs e) => _shareFlow?.Cancel();
@@ -928,12 +911,12 @@ public partial class MainWindow : Window
         {
             ShareLinkRow.IsVisible = false;
             TxtShareLink.Text = "";
-            TxtShareStatus.Text = T("Paylaşım kapatıldı.", "The share was closed.");
+            TxtShareStatus.Text = Say("settings.share.closed");
             return;
         }
 
         BtnShareDelete.IsEnabled = flow.CanDelete;
-        TxtShareStatus.Text = $"{T("Paylaşım kapatılamadı", "The share could not be closed")}: {result.Message}";
+        TxtShareStatus.Text = $"{Say("settings.share.close-failed")}: {result.Message}";
     }
 
     /// <summary>
@@ -962,7 +945,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+            TxtSystemStatus.Text = $"{Say("main.error.setting")}: {ex.Message}";
             return;
         }
 
@@ -1083,7 +1066,7 @@ public partial class MainWindow : Window
             encoders = null;
             available = false;
             verdict = HardwareVerdict.NotProbed;
-            TxtSystemStatus.Text = $"{T("Donanım kodlayıcı yoklaması başarısız", "The hardware encoder probe failed")}: {ex.Message}";
+            TxtSystemStatus.Text = $"{Say("main.error.probe")}: {ex.Message}";
         }
 
         ApplyHardwareVerdict(encoders, available, verdict);
@@ -1131,7 +1114,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+            TxtSystemStatus.Text = $"{Say("main.error.setting")}: {ex.Message}";
             return false;
         }
     }
@@ -1149,7 +1132,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            TxtSystemStatus.Text = $"{T("Ayar yazılamadı", "The setting could not be saved")}: {ex.Message}";
+            TxtSystemStatus.Text = $"{Say("main.error.setting")}: {ex.Message}";
         }
         ApplyFastGpuTip();
     }
@@ -1192,7 +1175,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            ReportSourceError($"{T("Dosya seçilemedi", "The file could not be chosen")}: {ex.Message}");
+            ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
         }
     }
 
@@ -1236,15 +1219,20 @@ public partial class MainWindow : Window
         DropIcon.Stroke = Paint(icon);
         DropIcon.RenderTransform = TransformOperations.Parse(_motionReduced ? "none" : scale);
 
-        var (title, hint) = state switch
+        ApplyDropText();
+    }
+
+    private void ApplyDropText()
+    {
+        var (title, hint) = _dropVisual switch
         {
-            DropVisual.Accept => ("Release to load this file", "Any format ffmpeg can open"),
-            DropVisual.Reject => ("Only one file at a time", "Folders cannot be dropped"),
-            _ => ("Drop a media file here", "Any format ffmpeg can open")
+            DropVisual.Accept => ("main.drop.release", "main.drop.hint"),
+            DropVisual.Reject => ("main.drop.single", "main.drop.no-folder"),
+            _ => ("main.drop.title", "main.drop.hint")
         };
 
-        TxtDropTitle.Text = Localize(title);
-        TxtDropHint.Text = Localize(hint);
+        TxtDropTitle.Text = Say(title);
+        TxtDropHint.Text = Say(hint);
     }
 
     private static string? TryGetDroppedFile(DragEventArgs e)
@@ -1287,7 +1275,7 @@ public partial class MainWindow : Window
             ResetPlanView();
             RefreshQualityPanels();
             RefreshQualityTargetAvailability();
-            ReportSourceError($"{T("Bu dosya kullanılamıyor", "This file cannot be used")}: {DescribeFailure(ex)}");
+            ReportSourceError($"{Say("main.error.unusable")}: {DescribeFailure(ex)}");
             return;
         }
 
@@ -1354,7 +1342,7 @@ public partial class MainWindow : Window
         var cts = new CancellationTokenSource();
         _probeCts = cts;
 
-        TxtEstimateNote.Text = T("Karmaşıklık ölçülüyor...", "Measuring complexity...");
+        TxtEstimateNote.Text = Say("main.estimate.measuring");
         try
         {
             var speed = CurrentOptions().SpeedMode;
@@ -1363,7 +1351,7 @@ public partial class MainWindow : Window
             _profile = profile;
             Recalculate();
 
-            TxtEstimateNote.Text = T("Plan ayarlarıyla kalibre ediliyor...", "Calibrating with the planned settings...");
+            TxtEstimateNote.Text = Say("main.estimate.calibrating");
             var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, _encoders).Plan;
 
             // The calibration is keyed to the plan it measured, and feeding it back changes the plan,
@@ -1390,7 +1378,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            if (ReferenceEquals(_info, info)) TxtEstimateNote.Text = $"{T("Ölçüm yapılamadı", "Measurement failed")}: {ex.Message}";
+            if (ReferenceEquals(_info, info)) TxtEstimateNote.Text = $"{Say("main.estimate.failed")}: {ex.Message}";
         }
         finally
         {
@@ -1410,9 +1398,9 @@ public partial class MainWindow : Window
         TxtResolution.Text = $"{info.Width}x{info.Height}";
         TxtFps.Text = info.Fps.ToString("0.##", CultureInfo.InvariantCulture);
         TxtVideoCodec.Text = info.VideoCodec;
-        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : T("Yok", "None");
+        TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : Say("main.info.none");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
-        TxtHdr.Text = info.IsHdr ? T("Evet", "Yes") : T("Hayır", "No");
+        TxtHdr.Text = info.IsHdr ? Say("main.info.yes") : Say("main.info.no");
         Fade(HdrPolicyPanel, info.IsHdr);
     }
 
@@ -1457,7 +1445,7 @@ public partial class MainWindow : Window
             {
                 _aiPlan = null;
                 BtnRevert.IsVisible = false;
-                TxtAiStatus.Text = T("AI planı güncel seçeneklerle artık eşleşmiyor; otomatik plan kullanılıyor.", "The AI plan no longer matches the current options; the automatic plan is in use.");
+                TxtAiStatus.Text = Say("main.ai.stale");
             }
         }
 
@@ -1515,9 +1503,7 @@ public partial class MainWindow : Window
         if (hint.Score is not { } score || hint.TargetMb is not { } target)
             return new TextBlock
             {
-                Text = T(
-                    "Bir video yükleyin; bu hedefin tahmini kalite skoru burada çıkar.",
-                    "Load a video and this target's predicted quality score appears here."),
+                Text = Say("main.quality.tip.empty"),
                 Theme = Look("Hint"),
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = Scalar("TooltipMaxWidth", 460)
@@ -1527,9 +1513,9 @@ public partial class MainWindow : Window
         // kullanıcının güvenerek yanlış hedef seçmesine yol açar.
         var basis = hint.Basis switch
         {
-            QualityBasis.Measured => T("Bu klipten kodlanan örnekle ölçüldü", "Measured from a sample encoded from this clip"),
-            QualityBasis.Estimated => T("Kaynak bit hızından tahmin edildi", "Estimated from the source bitrate"),
-            _ => T("Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır", "The source is already under this target and is copied as it is")
+            QualityBasis.Measured => Say("main.quality.basis.measured"),
+            QualityBasis.Estimated => Say("main.quality.basis.estimated"),
+            _ => Say("main.quality.basis.under-target")
         };
 
         var grid = new Grid
@@ -1540,11 +1526,10 @@ public partial class MainWindow : Window
             MaxWidth = Scalar("TooltipMaxWidth", 460)
         };
 
-        AddQualityRow(grid, Localize("Target"), $"{target.ToString("0.##", CultureInfo.InvariantCulture)} MB");
-        AddQualityRow(grid, T("Tahmini kalite", "Predicted quality"), $"{score:0.#}/100");
-        AddQualityRow(grid, T("Kaynağa göre kayıp", "Loss against the source"),
-            T($"{hint.LossPoints:0.#} puan", $"{hint.LossPoints:0.#} points"));
-        AddQualityRow(grid, T("Dayanak", "Basis"), basis);
+        AddQualityRow(grid, Say("main.quality.target"), $"{Num(target, "0.##")} MB");
+        AddQualityRow(grid, Say("main.quality.predicted"), $"{score:0.#}/100");
+        AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.points", Num(hint.LossPoints, "0.#")));
+        AddQualityRow(grid, Say("main.quality.basis"), basis);
         return grid;
     }
 
@@ -1553,11 +1538,11 @@ public partial class MainWindow : Window
         var row = grid.RowDefinitions.Count;
         grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
 
-        var key = new TextBlock { Text = LanguageCatalog.Title(label, _turkish), Theme = Look("PlanFactLabel") };
+        var key = new TextBlock { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
         Grid.SetRow(key, row);
         Grid.SetColumn(key, 0);
 
-        var read = new TextBlock { Text = LanguageCatalog.Title(value, _turkish), Theme = Look("PlanFactValue") };
+        var read = new TextBlock { Text = LanguageCatalog.Display(value), Theme = Look("PlanFactValue") };
         Grid.SetRow(read, row);
         Grid.SetColumn(read, 1);
 
@@ -1580,7 +1565,7 @@ public partial class MainWindow : Window
         var row = PlanFacts.RowDefinitions.Count;
         PlanFacts.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
 
-        var key = new TextBlock { Text = LanguageCatalog.Title(label, _turkish), Theme = Look("PlanFactLabel") };
+        var key = new TextBlock { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
         Grid.SetRow(key, row);
         Grid.SetColumn(key, 0);
 
@@ -1597,7 +1582,7 @@ public partial class MainWindow : Window
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
         row.Children.Add(new TextBlock { Text = "•", Theme = Look("PlanBullet") });
 
-        var body = new TextBlock { Text = LanguageCatalog.Title(text, _turkish), Theme = Look("PlanReasonText") };
+        var body = new TextBlock { Text = LanguageCatalog.Display(text), Theme = Look("PlanReasonText") };
         Grid.SetColumn(body, 1);
         row.Children.Add(body);
 
@@ -1614,20 +1599,20 @@ public partial class MainWindow : Window
         PlanReasons.Children.Clear();
         TxtPlanEmpty.IsVisible = false;
 
-        var channels = plan.AudioChannels == 1 ? $" {T("tek kanal", "mono")}" : "";
-        AddPlanFact("Plan", _aiPlan is null ? T("Otomatik", "Automatic") : "AI");
-        AddPlanFact(Localize("Encoder"), plan.Codec);
-        AddPlanFact(Localize("Mode"), plan.ModeEnum switch
+        var channels = plan.AudioChannels == 1 ? $" {Say("main.plan.audio.mono")}" : "";
+        AddPlanFact(Say("main.plan.fact.plan"), _aiPlan is null ? Say("main.plan.fact.automatic") : "AI");
+        AddPlanFact(Say("main.plan.fact.encoder"), plan.Codec);
+        AddPlanFact(Say("main.plan.fact.mode"), plan.ModeEnum switch
         {
             EncodeMode.Crf => $"CRF {plan.Crf}",
-            EncodeMode.PassThrough => T("kopyala", "stream copy"),
-            _ => $"{plan.VideoBitrateK}k · {T("iki geçiş", "two-pass")}"
+            EncodeMode.PassThrough => Say("main.plan.mode.copy"),
+            _ => $"{plan.VideoBitrateK}k · {Say("main.plan.mode.two-pass")}"
         });
-        AddPlanFact(Localize("Resolution"), $"{plan.Width}x{plan.Height}");
-        AddPlanFact(Localize("Frame rate"), $"{plan.Fps:0.##} FPS");
-        AddPlanFact(Localize("Audio"), plan.AudioCodec is null ? T("Yok", "None") : $"{plan.AudioCodec} {plan.AudioBitrateK}k{channels}");
-        AddPlanFact(Localize("Preset"), plan.Preset);
-        AddPlanFact(Localize("Estimated size"), _estimate is { } size ? $"{size.ExpectedMb:0.0} MB" : "-");
+        AddPlanFact(Say("main.plan.fact.resolution"), $"{plan.Width}x{plan.Height}");
+        AddPlanFact(Say("main.plan.fact.frame-rate"), $"{Num(plan.Fps, "0.##")} FPS");
+        AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {plan.AudioBitrateK}k{channels}");
+        AddPlanFact(Say("main.plan.fact.preset"), plan.Preset);
+        AddPlanFact(Say("main.plan.fact.estimate"), _estimate is { } size ? $"{Num(size.ExpectedMb, "0.0")} MB" : "-");
 
         foreach (var line in StrategyLines()) AddPlanReason(line);
         foreach (var line in ReasonLines(plan)) AddPlanReason(line);
@@ -1635,7 +1620,7 @@ public partial class MainWindow : Window
         var reasons = PlanReasons.Children.Count;
         PlanRule.IsVisible = reasons > 0;
         PlanReasonsHead.IsVisible = reasons > 0;
-        TxtPlanReasonsHead.Text = $"{T("Neden böyle", "Why these choices")} · {reasons}";
+        TxtPlanReasonsHead.Text = $"{Say("main.plan.reasons")} · {reasons}";
         SetPlanReasonsExpanded(_reasonsExpanded);
 
         RefreshEstimateView();
@@ -1656,15 +1641,15 @@ public partial class MainWindow : Window
         var reading = $"{estimate.ExpectedMb:0.0} MB";
         if (TxtEstimateValue.Text != reading) Pulse(TxtEstimateValue, true);
         TxtEstimateValue.Text = reading;
-        TxtEstimateRange.Text = $"{estimate.LowMb:0.0} - {estimate.HighMb:0.0} MB · {T("Kaynağın", "Of source")} %{estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01) * 100:0.#}";
+        TxtEstimateRange.Text = $"{estimate.LowMb:0.0} - {estimate.HighMb:0.0} MB · {Say("main.estimate.of-source")} %{estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01) * 100:0.#}";
 
         var basis = estimate.Measured
-            ? T("kaynaktan ölçülen karmaşıklık", "measured source complexity")
-            : T("kaynak bit hızından tahmin", "estimated from source bitrate");
+            ? Say("main.estimate.basis.measured")
+            : Say("main.estimate.basis.estimated");
         var mode = estimate.Enforced
-            ? T("iki geçişli mod boyutu zorlar", "two-pass enforces this size")
-            : T("kalite modu; hedefin altında kalır", "quality mode; stays under the target");
-        TxtEstimateNote.Text = $"{basis} · {mode} · {T("öngörülen kalite", "predicted quality")} {_predictedQuality:0.#}/100";
+            ? Say("main.estimate.mode.enforced")
+            : Say("main.estimate.mode.ceiling");
+        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {_predictedQuality:0.#}/100";
     }
 
     private void RefreshDurationView()
@@ -1681,15 +1666,15 @@ public partial class MainWindow : Window
         {
             TxtDurationValue.Text = "-";
             TxtDurationRange.Text = profile.Speed is null
-                ? T("Kodlama hızı bu makinede henüz ölçülmedi.", "The encoding speed has not been measured on this machine yet.")
-                : T("Örnekler bu plan ayarlarıyla kodlanmadı; süre tahmin edilmiyor.", "The samples were not encoded with these settings, so no time is shown.");
+                ? Say("main.duration.not-measured")
+                : Say("main.duration.other-settings");
             return;
         }
 
         if (duration.StreamCopy)
         {
-            TxtDurationValue.Text = T("kopyalanacak", "copied");
-            TxtDurationRange.Text = T("Yeniden kodlama yok, dosya olduğu gibi aktarılıyor.", "Nothing is re-encoded; the file is carried over as it is.");
+            TxtDurationValue.Text = Say("main.duration.copied");
+            TxtDurationRange.Text = Say("main.duration.copied-note");
             return;
         }
 
@@ -1698,18 +1683,18 @@ public partial class MainWindow : Window
         TxtDurationValue.Text = reading;
 
         var rate = profile.Speed!.FramesPerSecond;
-        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {T("ölçülen", "measured")} {rate:0} {T("kare/sn", "frames/s")}";
+        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {Say("main.duration.measured")} {rate:0} {Say("main.duration.frames-per-second")}";
     }
 
     private string HumanDuration(double seconds)
     {
-        if (seconds < 60) return $"{Math.Max(5, Math.Round(seconds / 5.0) * 5.0):0} {T("sn", "s")}";
+        if (seconds < 60) return $"{Math.Max(5, Math.Round(seconds / 5.0) * 5.0):0} {Say("main.duration.seconds")}";
 
         if (seconds < 3600)
         {
             var minutes = seconds / 60.0;
-            if (minutes < 10) return $"{Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0):0.#} {T("dk", "min")}";
-            return $"{Math.Round(minutes):0} {T("dk", "min")}";
+            if (minutes < 10) return $"{Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0):0.#} {Say("main.duration.minutes")}";
+            return $"{Math.Round(minutes):0} {Say("main.duration.minutes")}";
         }
 
         var hours = (int)(seconds / 3600);
@@ -1719,7 +1704,7 @@ public partial class MainWindow : Window
             hours++;
             rest = 0;
         }
-        return rest == 0 ? $"{hours} {T("sa", "h")}" : $"{hours} {T("sa", "h")} {rest} {T("dk", "min")}";
+        return rest == 0 ? $"{hours} {Say("main.duration.hours")}" : $"{hours} {Say("main.duration.hours")} {rest} {Say("main.duration.minutes")}";
     }
 
     private List<string> ReasonLines(EncodePlan plan)
@@ -1729,22 +1714,36 @@ public partial class MainWindow : Window
         {
             var text = note.Code switch
             {
-                ReasonCode.ResolutionScaled => T($"{note.Width}x{note.Height}'e ölçeklendi (kaynağın %{note.ScalePercent:0.#}'i); bu klibin ölçülen ayrıntı düşüşünde bu, öngörülen kaliteyi yükseltecek kadar bit kazandırıyor", $"scaled to {note.Width}x{note.Height} ({note.ScalePercent:0.#}% of source); at this title's measured detail falloff that frees enough bits to raise predicted quality"),
-                ReasonCode.FrameRateReduced => T($"kare başına ayrıntıyı korumak için kare hızı {note.Fps:0.##}'e düşürüldü", $"frame rate reduced to {note.Fps:0.##} to keep per-frame detail"),
-                ReasonCode.ResolutionRestoredAtCeiling => T($"tavan bütçeyi boşta bıraktığı için çözünürlük {note.Width}x{note.Height}@{note.Fps:0.##}'e geri getirildi — CRF {note.Crf:0}'te hedefe hâlâ sığan en büyük düzen", $"the ceiling left budget unused, so resolution was restored to {note.Width}x{note.Height}@{note.Fps:0.##} — the largest layout that still fits the target at CRF {note.Crf:0}"),
-                ReasonCode.BudgetExceedsCeiling => T($"bütçe CRF {note.BudgetCrf:0.#}'e imkan tanıyor, bu amaç için CRF {note.Crf:0} şeffaflık tavanından daha iyi; bu yüzden kodlayıcı tavanda durup dosyayı {note.TargetMb:0.##} MB'a şişirmek yerine yaklaşık {note.Mb:0.0} MB verir", $"the budget affords CRF {note.BudgetCrf:0.#}, better than the CRF {note.Crf:0} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {note.Mb:0.0} MB instead of padding the file to {note.TargetMb:0.##} MB"),
-                ReasonCode.BudgetBelowCeilingTwoPass => T($"bütçe CRF {note.BudgetCrf:0.#} civarında kalıyor, CRF {note.Crf:0} tavanının altında; bu yüzden iki geçişli VBR {note.TargetMb:0.##} MB'ın tamamını harcıyor", $"the budget lands near CRF {note.BudgetCrf:0.#}, short of the CRF {note.Crf:0} ceiling, so two-pass VBR spends the whole {note.TargetMb:0.##} MB"),
-                ReasonCode.PredictedQualityMeasured => T($"öngörülen kalite {note.Score:0.#}/100, ölçülen bir örnekten (bppf {note.Bppf:0.0000}, ayrıntı düşüşü {note.DetailExponent:0.00})", $"predicted quality {note.Score:0.#}/100 from a measured sample (bppf {note.Bppf:0.0000}, detail falloff {note.DetailExponent:0.00})"),
-                ReasonCode.PredictedQualityEstimated => T($"öngörülen kalite {note.Score:0.#}/100, kaynak bit hızından tahmin", $"predicted quality {note.Score:0.#}/100 estimated from the source bitrate"),
-                ReasonCode.RetryScaled => T($"yeniden deneme: önceki girişim {note.TargetMb:0.##} MB hedefe karşı {note.Mb:0.0} MB üretti; ses için {note.AudioMb:0.00} MB ayrıldıktan sonra video bit hızı {note.Factor:0.###} ile ölçeklendi ve kalan bütçeyle sınırlandı", $"retry: the previous attempt produced {note.Mb:0.0} MB against a {note.TargetMb:0.##} MB target; after reserving {note.AudioMb:0.00} MB for audio, video bitrate was scaled by {note.Factor:0.###} and capped to the remaining budget"),
-                ReasonCode.EncoderFallback => T($"{note.RequestedCodec} kodlayıcısı bu ffmpeg sürümünde yok, bu yüzden {note.FallbackCodec}'e düşüldü", $"the {note.RequestedCodec} encoder is not available on this ffmpeg build, so encoding falls back to {note.FallbackCodec}"),
-                ReasonCode.HdrTonemapped => T("kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi", "the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709"),
-                ReasonCode.FillCrfLowered => T($"hedefi doldur politikası CRF'yi {note.Crf:0.#}'e düşürdü; şeffaflık tavanında durmak yerine {note.BandLowerMb:0.0}-{note.TargetMb:0.0} MB bandına, {note.Mb:0.0} MB bant merkezine yaklaşıldı", $"the fill target policy lowered CRF to {note.Crf:0.#} instead of stopping at the transparency ceiling, landing near the {note.Mb:0.0} MB band center inside the {note.BandLowerMb:0.0}-{note.TargetMb:0.0} MB band"),
-                ReasonCode.FillTwoPassBandCenter => T($"CRF {note.Crf:0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {note.Mb:0.0} MB bant merkezini hedefliyor", $"CRF floor {note.Crf:0} was reached before the fill band, so two-pass VBR targets the {note.Mb:0.0} MB band center directly"),
-                ReasonCode.FillTwoPassBandTooNarrowForCrf => T($"tek CRF adımı dosyayı %{note.Factor * 100:0.#} kaydırıyor, bu da %{(note.TargetMb - note.BandLowerMb) / Math.Max(note.TargetMb, 0.01) * 100:0.#}'lik doldurma bandından geniş; CRF banda giremediği için iki geçişli VBR doğrudan {note.Mb:0.0} MB hedefliyor", $"one CRF step moves the file by {note.Factor * 100:0.#}%, wider than the {(note.TargetMb - note.BandLowerMb) / Math.Max(note.TargetMb, 0.01) * 100:0.#}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {note.Mb:0.0} MB directly"),
-                ReasonCode.HardwareBitrateBias => T($"{note.FallbackCodec} donanım kodlayıcısı bu klip için henüz kalibre edilmedi; verilen bit hızının {(1 - note.Factor) * 100:0.#}% altına düşebilir, bu yüzden istenen bit hızı hedefte kalır ve tahminin alt ucu o kadar aşağı açılır", $"the {note.FallbackCodec} hardware encoder is not calibrated for this clip yet and can land {(1 - note.Factor) * 100:0.#}% under the bitrate it is given, so the requested bitrate stays on the target and the estimate opens that much room underneath"),
-                ReasonCode.SourceAlreadyUnderTarget => T($"kaynak zaten {note.Mb:0.0} MB, {note.TargetMb:0.##} MB hedefin altında; bu yüzden yeniden kodlanmadan olduğu gibi kopyalanıyor", $"the source is already {note.Mb:0.0} MB, under the {note.TargetMb:0.##} MB target, so it is copied as it is instead of being re-encoded"),
-                ReasonCode.TargetCappedToSource => T($"hedef {note.Mb:0.##} MB'a çekildi çünkü çıktı yapıldığı dosyadan büyük olamaz ({note.TargetMb:0.##} MB istenmişti)", $"the target was capped to {note.Mb:0.##} MB because the output is never larger than what it was made from ({note.TargetMb:0.##} MB was asked for)"),
+                ReasonCode.ResolutionScaled => Say("main.reason.resolution-scaled",
+                    note.Width, note.Height, Num(note.ScalePercent, "0.#")),
+                ReasonCode.FrameRateReduced => Say("main.reason.frame-rate-reduced", Num(note.Fps, "0.##")),
+                ReasonCode.ResolutionRestoredAtCeiling => Say("main.reason.resolution-restored",
+                    note.Width, note.Height, Num(note.Fps, "0.##"), Num(note.Crf, "0")),
+                ReasonCode.BudgetExceedsCeiling => Say("main.reason.budget-exceeds-ceiling",
+                    Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
+                ReasonCode.BudgetBelowCeilingTwoPass => Say("main.reason.budget-below-ceiling",
+                    Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.TargetMb, "0.##")),
+                ReasonCode.PredictedQualityMeasured => Say("main.reason.quality-measured",
+                    Num(note.Score, "0.#"), Num(note.Bppf, "0.0000"), Num(note.DetailExponent, "0.00")),
+                ReasonCode.PredictedQualityEstimated => Say("main.reason.quality-estimated", Num(note.Score, "0.#")),
+                ReasonCode.RetryScaled => Say("main.reason.retry-scaled",
+                    Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"), Num(note.AudioMb, "0.00"), Num(note.Factor, "0.###")),
+                ReasonCode.EncoderFallback => Say("main.reason.encoder-fallback", note.RequestedCodec, note.FallbackCodec),
+                ReasonCode.HdrTonemapped => Say("main.reason.hdr-tonemapped"),
+                ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
+                    Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),
+                ReasonCode.FillTwoPassBandCenter => Say("main.reason.fill-band-center",
+                    Num(note.Crf, "0"), Num(note.Mb, "0.0")),
+                ReasonCode.FillTwoPassBandTooNarrowForCrf => Say("main.reason.fill-band-narrow",
+                    Num(note.Factor * 100, "0.#"),
+                    Num((note.TargetMb - note.BandLowerMb) / Math.Max(note.TargetMb, 0.01) * 100, "0.#"),
+                    Num(note.Mb, "0.0")),
+                ReasonCode.HardwareBitrateBias => Say("main.reason.hardware-bitrate-bias",
+                    note.FallbackCodec, Num((1 - note.Factor) * 100, "0.#")),
+                ReasonCode.SourceAlreadyUnderTarget => Say("main.reason.source-under-target",
+                    Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
+                ReasonCode.TargetCappedToSource => Say("main.reason.target-capped",
+                    Num(note.Mb, "0.##"), Num(note.TargetMb, "0.##")),
                 _ => null
             };
             if (text is not null) parts.Add(text);
@@ -1759,20 +1758,20 @@ public partial class MainWindow : Window
 
         var regime = advice.Regime switch
         {
-            CompressionRegime.Light => T("hafif", "light"),
-            CompressionRegime.Balanced => T("dengeli", "balanced"),
-            CompressionRegime.Aggressive => T("agresif", "aggressive"),
-            _ => T("uç", "extreme")
+            CompressionRegime.Light => Say("main.reason.regime.light"),
+            CompressionRegime.Balanced => Say("main.reason.regime.balanced"),
+            CompressionRegime.Aggressive => Say("main.reason.regime.aggressive"),
+            _ => Say("main.reason.regime.extreme")
         };
 
         var lines = new List<string>
         {
-            T($"{advice.Ratio:0.#}x küçültme — {regime} senaryo.", $"{advice.Ratio:0.#}x reduction — {regime} scenario.")
+            Say("main.reason.ratio", Num(advice.Ratio, "0.#"), regime)
         };
 
         foreach (var note in advice.Notes.Distinct())
         {
-            var text = AdviceLine(note, _turkish, ChkFastGpu.IsChecked == true);
+            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true);
             if (text is not null) lines.Add(text);
         }
 
@@ -1781,35 +1780,34 @@ public partial class MainWindow : Window
 
     internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
 
-    internal static string? AdviceLine(AdviceCode note, bool turkish, bool fastGpu)
+    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu)
     {
-        string T(string tr, string en) => LanguageCatalog.Title(turkish ? tr : en, turkish);
 
         return note switch
         {
-            AdviceCode.BudgetIsGenerous => T("Hedef bu kaynak için bol; motor bütçeyi zorlanmadan karşılıyor.", "The target is generous for this source, so the engine meets it without strain."),
-            AdviceCode.CodecUpgradeRecommended => T("Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya H.265 yapmayı düşün.", "At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or H.265."),
-            AdviceCode.HardwareCodecCostsQuality => T("Donanım kodlayıcısı hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; hızlı düşür (GPU) kapalıyken sonuç daha iyi görünür.", "The hardware encoder is fast but loses noticeable quality per megabyte at a target this tight; the result looks better with fast shrink (GPU) turned off."),
-            AdviceCode.ExtremeRatioWarning => T("Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.", "Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable."),
-            AdviceCode.TargetBelowCodecFloor => T("Bu hedef bu kaynak için gerçekten çok küçük: hiçbir düzen kodlayıcının anlamlı bir görüntü için gereken piksel başına bit yoğunluğuna ulaşmıyor. En yoğun düzen seçildi ama sonuç belirgin şekilde bozuk çıkacak; hedefi büyütmek tek gerçek çare.", "This target is genuinely too small for this source: no layout reaches the bits per pixel the encoder needs for a meaningful picture. The densest layout was taken, but the result will look visibly broken; raising the target is the only real fix."),
-            AdviceCode.FrameRateCutForFloor => T("Kaynak kare hızında her kare kodlayıcının taban yoğunluğunun altına düşerdi; kare hızı düşürüldü ve kazanılan bitler kalan karelere gitti.", "At the source frame rate every frame would fall below the density the encoder needs, so the frame rate was cut and the freed bits went to the frames that remain."),
-            AdviceCode.MotionCutIsCheap => T("Ölçüm bu klipte hareketin az olduğunu söylüyor; kare hızını düşürmek çok bit kazandırıyor ve kayıp zor fark ediliyor.", "The measurement shows little motion in this clip, so cutting the frame rate frees a lot of bits and the loss is hard to notice."),
-            AdviceCode.MotionCutIsExpensive => T("Ölçüm bu klipte hareketin yoğun olduğunu söylüyor; kare düşürmek az kazandırdığı için önce çözünürlükten kısılıyor.", "The measurement shows heavy motion in this clip, so dropping frames buys little and resolution is cut before the frame rate is."),
-            AdviceCode.ContentIsSimple => T("İçerik sade ölçüldü; hedefin altında rahat kalınıyor.", "The content measured as simple, so the target is met with room to spare."),
-            AdviceCode.ContentIsComplex => T("İçerik yoğun ölçüldü; bit bütçesi bu yüzden zorlanıyor.", "The content measured as detail-heavy, which is why the bit budget is tight."),
-            AdviceCode.ScaleSavesMuch => T("Bu klipte çözünürlük düşürmek çok bit kazandırıyor.", "Scaling down frees a lot of bits on this particular clip."),
-            AdviceCode.ScaleSavesLittle => T("Bu klipte çözünürlük düşürmek az kazandırıyor; çözünürlük korunuyor.", "Scaling down frees little on this clip, so resolution is preserved."),
-            AdviceCode.ResolutionReduced => T("Bütçeye sığmak için çözünürlük düşürüldü.", "Resolution was lowered so the picture fits the budget."),
-            AdviceCode.FrameRateReduced => T("Kalan karelere bit kazandırmak için kare hızı düşürüldü.", "Frame rate was lowered to free bits for the frames that remain."),
-            AdviceCode.TargetEnforcedTwoPass => T("Hedef boyutu tutturmak için iki geçişli kodlama kullanılıyor.", "Two-pass encoding is used so the target size is actually hit."),
-            AdviceCode.QualityCeilingReached => T("Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.", "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see."),
-            AdviceCode.AudioReduced => T("Görüntüye bit kalsın diye ses bit hızı düşürüldü.", "The audio bitrate was lowered so more bits are left for the picture."),
-            AdviceCode.AudioMono => T("Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.", "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture."),
-            AdviceCode.AudioDropped => T("Bu boyutta ses tutulamıyor, çıkarıldı.", "Audio cannot fit at this size and was removed."),
+            AdviceCode.BudgetIsGenerous => Speak(language, "main.advice.budget-generous"),
+            AdviceCode.CodecUpgradeRecommended => Speak(language, "main.advice.codec-upgrade"),
+            AdviceCode.HardwareCodecCostsQuality => Speak(language, "main.advice.hardware-costs-quality"),
+            AdviceCode.ExtremeRatioWarning => Speak(language, "main.advice.extreme-ratio"),
+            AdviceCode.TargetBelowCodecFloor => Speak(language, "main.advice.below-codec-floor"),
+            AdviceCode.FrameRateCutForFloor => Speak(language, "main.advice.frame-rate-for-floor"),
+            AdviceCode.MotionCutIsCheap => Speak(language, "main.advice.motion-cut-cheap"),
+            AdviceCode.MotionCutIsExpensive => Speak(language, "main.advice.motion-cut-expensive"),
+            AdviceCode.ContentIsSimple => Speak(language, "main.advice.content-simple"),
+            AdviceCode.ContentIsComplex => Speak(language, "main.advice.content-complex"),
+            AdviceCode.ScaleSavesMuch => Speak(language, "main.advice.scale-saves-much"),
+            AdviceCode.ScaleSavesLittle => Speak(language, "main.advice.scale-saves-little"),
+            AdviceCode.ResolutionReduced => Speak(language, "main.advice.resolution-reduced"),
+            AdviceCode.FrameRateReduced => Speak(language, "main.advice.frame-rate-reduced"),
+            AdviceCode.TargetEnforcedTwoPass => Speak(language, "main.advice.two-pass"),
+            AdviceCode.QualityCeilingReached => Speak(language, "main.advice.quality-ceiling"),
+            AdviceCode.AudioReduced => Speak(language, "main.advice.audio-reduced"),
+            AdviceCode.AudioMono => Speak(language, "main.advice.audio-mono"),
+            AdviceCode.AudioDropped => Speak(language, "main.advice.audio-dropped"),
             AdviceCode.EncoderFallback => fastGpu
-                ? T("Hızlı düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.", "Fast shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.")
-                : T("Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.", "The preferred encoder is not available on this ffmpeg build; falling back to a software encoder."),
-            AdviceCode.HdrTonemapped => T("Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.", "The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709."),
+                ? Speak(language, "main.advice.encoder-fallback-gpu")
+                : Speak(language, "main.advice.encoder-fallback"),
+            AdviceCode.HdrTonemapped => Speak(language, "main.advice.hdr-tonemapped"),
             _ => null
         };
     }
@@ -1936,12 +1934,8 @@ public partial class MainWindow : Window
 
         SetQualityTargetNotice(result.Bound switch
         {
-            QualityTargetBound.BelowFloor => T(
-                $"İstenen kalite tabanın altında: {target} MB'dan küçük bir hedef üretilmiyor, o hedef zaten {reached}/100 veriyor.",
-                $"The requested quality is below the floor: no target smaller than {target} MB is produced, and that target already reaches {reached}/100."),
-            QualityTargetBound.AboveSourceCeiling => T(
-                $"İstenen kalite kaynağın kendisinden iyi: tavan {target} MB ve orada ulaşılan kalite {reached}/100.",
-                $"The requested quality is better than the source itself: the ceiling is {target} MB and the quality reached there is {reached}/100."),
+            QualityTargetBound.BelowFloor => Say("main.quality.below-floor", target, reached),
+            QualityTargetBound.AboveSourceCeiling => Say("main.quality.above-ceiling", target, reached),
             _ => ""
         });
     }
@@ -1961,9 +1955,7 @@ public partial class MainWindow : Window
         var ready = _info is not null;
         SliderQualityTarget.IsEnabled = TxtQualityTarget.IsEnabled = ready;
         if (ready) SetQualityTargetNotice("");
-        else SetQualityTargetNotice(T(
-            "Bir video yükleyin; kalite hedefi ancak kaynak bilinince hedef MB'a çevrilebilir.",
-            "Load a video; a quality target can only be turned into a target size once the source is known."));
+        else SetQualityTargetNotice(Say("main.quality.no-source"));
     }
 
     /// <summary>Ölçüm için tur sayacı: her yönde kaç türetme yapıldı.</summary>
@@ -2050,6 +2042,12 @@ public partial class MainWindow : Window
 
     private bool _performanceRunning;
 
+    /// <summary>
+    /// Ekranda duran son ölçüm sonucu. Dil değişince panel bundan yeniden kuruluyor;
+    /// aksi hâlde açılışta yazılan satırlar ilk dilde donup kalıyordu.
+    /// </summary>
+    private PerformanceCheckResult _performanceShown = PerformanceCheckResult.NotMeasured;
+
     private async void OnRunPerformanceCheck(object? sender, RoutedEventArgs e) => await RunPerformanceCheckAsync();
 
     internal async Task RunPerformanceCheckAsync()
@@ -2058,9 +2056,7 @@ public partial class MainWindow : Window
 
         _performanceRunning = true;
         BtnPerformanceRun.IsEnabled = false;
-        TxtPerformanceStatus.Text = T(
-            "Ölçülüyor — birkaç kısa kodlama koşuyor, en çok yirmi saniye sürer.",
-            "Measuring — this runs a few short encodes and takes up to twenty seconds.");
+        TxtPerformanceStatus.Text = Say("performance.running");
 
         try
         {
@@ -2068,7 +2064,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            TxtPerformanceStatus.Text = $"{T("Ölçüm tamamlanamadı", "The check could not finish")}: {ex.Message}";
+            TxtPerformanceStatus.Text = $"{Say("performance.failed")}: {ex.Message}";
         }
         finally
         {
@@ -2083,6 +2079,7 @@ public partial class MainWindow : Window
     /// </summary>
     internal void ShowPerformanceResult(PerformanceCheckResult result)
     {
+        _performanceShown = result;
         TxtPerformanceStatus.Text = string.Empty;
 
         PerformanceFacts.Children.Clear();
@@ -2100,7 +2097,7 @@ public partial class MainWindow : Window
             // sözcük kuralından geçseydi "Libx264", "ms" ise "Ms" olurdu.
             if (row.Inlines is { } inlines)
             {
-                inlines.Add(new Run(Localize(fact.Label) + ": "));
+                inlines.Add(new Run(LanguageCatalog.Display(fact.Label) + ": "));
                 inlines.Add(new Run(fact.Value));
             }
             else row.Text = $"{fact.Label}: {fact.Value}";
@@ -2112,7 +2109,7 @@ public partial class MainWindow : Window
         foreach (var line in PerformanceReportText.Describe(result))
             PerformanceLines.Children.Add(new TextBlock
             {
-                Text = Localize(line),
+                Text = LanguageCatalog.Display(line),
                 Theme = Look("Hint"),
                 TextWrapping = TextWrapping.Wrap
             });
@@ -2132,19 +2129,19 @@ public partial class MainWindow : Window
         SetAiDetails(true);
         if (_info is null || _autoPlan is null)
         {
-            TxtAiStatus.Text = T("Önce bir video yükleyin.", "Load a video first.");
+            TxtAiStatus.Text = Say("main.ai.load-first");
             return;
         }
 
         try
         {
-            if (Clipboard is null) throw new InvalidOperationException(T("Pano sağlayıcısı yok.", "There is no clipboard provider."));
+            if (Clipboard is null) throw new InvalidOperationException(Say("main.ai.no-clipboard"));
             await Clipboard.SetTextAsync(PromptBuilder.Build(_info, CurrentOptions(), _autoPlan));
-            TxtAiStatus.Text = T("İstem kopyalandı. JSON yanıtını aşağıya yapıştırın.", "The prompt was copied. Paste its JSON answer below.");
+            TxtAiStatus.Text = Say("main.ai.prompt-copied");
         }
         catch (Exception ex)
         {
-            TxtAiStatus.Text = $"{T("Pano kullanılamıyor", "The clipboard is unavailable")}: {ex.Message}";
+            TxtAiStatus.Text = $"{Say("main.ai.clipboard-failed")}: {ex.Message}";
         }
     }
 
@@ -2152,7 +2149,7 @@ public partial class MainWindow : Window
     {
         if (_info is null || _autoPlan is null)
         {
-            TxtAiStatus.Text = T("Önce bir video yükleyin.", "Load a video first.");
+            TxtAiStatus.Text = Say("main.ai.load-first");
             return;
         }
 
@@ -2160,7 +2157,7 @@ public partial class MainWindow : Window
         if (!result.Ok)
         {
             _aiPlan = null;
-            TxtAiStatus.Text = T("Reddedildi; otomatik plan kullanılıyor:\n• ", "Rejected; the automatic plan is in use:\n• ") + string.Join("\n• ", result.Errors);
+            TxtAiStatus.Text = Say("main.ai.rejected") + string.Join("\n• ", result.Errors);
             RefreshPlanView();
             return;
         }
@@ -2169,10 +2166,10 @@ public partial class MainWindow : Window
         BtnRevert.IsVisible = true;
         var differences = _autoPlan.DescribeDifferences(_aiPlan!).ToList();
         TxtAiStatus.Text = differences.Count == 0
-            ? T("AI otomatik planla aynı kararı verdi.", "The AI agreed with the automatic plan.")
-            : T("Otomatik plana göre değişiklikler:\n• ", "Changes vs automatic:\n• ") + string.Join("\n• ", differences);
+            ? Say("main.ai.same-decision")
+            : Say("main.ai.changes") + string.Join("\n• ", differences);
         if (result.Warnings.Count > 0)
-            TxtAiStatus.Text += T("\nUyarılar:\n• ", "\nWarnings:\n• ") + string.Join("\n• ", result.Warnings);
+            TxtAiStatus.Text += Say("main.ai.warnings") + string.Join("\n• ", result.Warnings);
         RefreshPlanView();
     }
 
@@ -2180,7 +2177,7 @@ public partial class MainWindow : Window
     {
         _aiPlan = null;
         BtnRevert.IsVisible = false;
-        TxtAiStatus.Text = T("Otomatik plana dönüldü.", "Back on the automatic plan.");
+        TxtAiStatus.Text = Say("main.ai.reverted");
         RefreshPlanView();
     }
 
@@ -2193,7 +2190,7 @@ public partial class MainWindow : Window
         if (DiskSpaceGuard.TryGetFreeBytes(output, out var freeBytes) && !DiskSpaceGuard.HasEnoughSpace(freeBytes, targetMb))
         {
             var neededMb = DiskSpaceGuard.RequiredBytes(targetMb) / 1024.0 / 1024.0;
-            TxtResult.Text = T($"Hedef sürücüde yeterli boş alan yok; en az {neededMb:0} MB gerekiyor.", $"Not enough free space on the target drive; at least {neededMb:0} MB is needed.");
+            TxtResult.Text = Say("main.run.no-space", Num(neededMb, "0"));
             return;
         }
 
@@ -2223,21 +2220,19 @@ public partial class MainWindow : Window
             {
                 TxtOutSize.Text = $"{result.OutputMb:0.0} MB";
                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
-                TxtResult.Text = T(
-                    $"{result.Attempts} denemede tamamlandı. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB (%{saved:0.#} daha küçük).",
-                    $"Done in {result.Attempts} attempt(s). {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB ({saved:0.#}% smaller).");
+                TxtResult.Text = Say("main.run.done",
+                    result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
             }
             else if (result.CeilingExceeded)
             {
                 TxtOutSize.Text = "-";
-                TxtResult.Text = T(
-                    $"{result.Attempts} denemede {targetMb:0.##} MB hedefinin altına inilemedi (son sonuç {result.OutputMb:0.0} MB). Dosya teslim edilmedi, çünkü hedeften büyük dosya asla verilmez. Hedefi büyütüp yeniden deneyin.",
-                    $"Could not get under the {targetMb:0.##} MB target after {result.Attempts} attempt(s) (last result was {result.OutputMb:0.0} MB). No file was written, because a file larger than the target is never handed back. Raise the target and try again.");
+                TxtResult.Text = Say("main.run.over-ceiling",
+                    Num(targetMb, "0.##"), result.Attempts, Num(result.OutputMb, "0.0"));
             }
             else
             {
                 TxtOutSize.Text = "-";
-                TxtResult.Text = T("Kodlama beklenmedik biçimde sonlandı, dosya yazılmadı.", "Encoding ended unexpectedly and no file was written.");
+                TxtResult.Text = Say("main.run.ended");
             }
 
             BtnReveal.IsVisible = result.Success;
@@ -2245,7 +2240,7 @@ public partial class MainWindow : Window
         }
         catch (OperationCanceledException)
         {
-            TxtResult.Text = T("İptal edildi.", "Cancelled.");
+            TxtResult.Text = Say("main.run.cancelled");
         }
         catch (Exception ex)
         {
@@ -2285,23 +2280,22 @@ public partial class MainWindow : Window
     private void ShowRetryAsk(RetryPrompt prompt)
     {
         _activeRetryPrompt = prompt;
-        TxtOutSize.Text = $"{prompt.ActualMb:0.0} MB";
-        var (outcome, meaning) = LanguageCatalog.RetryQuestion(
-            _turkish,
-            prompt.Attempt.ToString(CultureInfo.CurrentCulture),
-            prompt.MaxAttempts.ToString(CultureInfo.CurrentCulture),
-            prompt.ActualMb.ToString("0.0", CultureInfo.CurrentCulture),
-            prompt.TargetMb.ToString("0.##", CultureInfo.CurrentCulture),
-            prompt.OverMb.ToString("0.0", CultureInfo.CurrentCulture),
-            prompt.OverPercent.ToString("0.#", CultureInfo.CurrentCulture),
-            prompt.AttemptDuration.ToString(@"mm\:ss"),
-            prompt.HasUnderBandFallback,
-            prompt.FallbackMb.ToString("0.0", CultureInfo.CurrentCulture));
+        TxtOutSize.Text = $"{Num(prompt.ActualMb, "0.0")} MB";
 
-        TxtRetryOutcome.Text = outcome;
-        TxtRetryMeaning.Text = meaning;
+        TxtRetryOutcome.Text = Say("main.retry.outcome",
+            prompt.Attempt,
+            prompt.MaxAttempts,
+            Num(prompt.ActualMb, "0.0"),
+            Num(prompt.TargetMb, "0.##"),
+            Num(prompt.OverMb, "0.0"),
+            Num(prompt.OverPercent, "0.#"),
+            prompt.AttemptDuration.ToString(@"mm\:ss", CultureInfo.InvariantCulture));
+
+        TxtRetryMeaning.Text = prompt.HasUnderBandFallback
+            ? Say("main.retry.meaning-with-fallback", Num(prompt.FallbackMb, "0.0"))
+            : Say("main.retry.meaning-without-fallback");
         RetryAskPanel.IsVisible = true;
-        SetStage(TxtStage, T("Kararınız bekleniyor", "Waiting for your decision"));
+        SetStage(TxtStage, Say("main.output.waiting"));
     }
 
     private void HideRetryAsk()
@@ -2425,12 +2419,12 @@ public partial class MainWindow : Window
     {
         if (_info is null) return;
         var plan = ReadConversionPlan();
-        var errors = ConversionArguments.Validate(_info, plan).Select(message => LanguageCatalog.Validation(message, _turkish)).ToList();
+        var errors = ConversionArguments.Validate(_info, plan).Select(message => LanguageCatalog.Validation(message)).ToList();
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue)
-            errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError, _turkish));
+            errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError));
 
         var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
-        TxtConvertValidation.Text = errors.Count == 0 ? T("Hazır.", "Ready.") : string.Join("\n", errors);
+        TxtConvertValidation.Text = errors.Count == 0 ? Say("main.convert.ready") : string.Join("\n", errors);
         BtnConvert.IsEnabled = errors.Count == 0 && _cts is null;
 
         try
@@ -2468,12 +2462,12 @@ public partial class MainWindow : Window
             var result = await new EncodeRunner().ConvertAsync(_info, plan, output, progress, cts.Token);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
-            TxtConvertResult.Text = $"{T("Tamamlandı", "Done")}. {_info.FileSizeMb:0.0} MB → {result.OutputMb:0.0} MB.";
+            TxtConvertResult.Text = Say("main.run.converted", Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"));
             BtnConvertReveal.IsVisible = true;
         }
         catch (OperationCanceledException)
         {
-            TxtConvertResult.Text = T("İptal edildi.", "Cancelled.");
+            TxtConvertResult.Text = Say("main.run.cancelled");
         }
         catch (Exception ex)
         {
@@ -2491,31 +2485,23 @@ public partial class MainWindow : Window
     private string DescribeFailure(Exception ex)
     {
         var raw = ex.Message ?? "";
-        var lead = ClassifyFailure(raw) ?? T(
-            "İşlem tamamlanamadı. Ffmpeg'in bildirdiği ayrıntı aşağıda.",
-            "The operation could not be completed. The detail ffmpeg reported is below.");
+        var lead = ClassifyFailure(raw) ?? Say("main.error.generic");
         return raw.Length == 0 ? lead : $"{lead}\n{raw}";
     }
 
     private string? ClassifyFailure(string raw)
     {
         if (Mentions(raw, "no space left", "not enough space", "enospc", "disk full", "insufficient disk space"))
-            return T(
-                "Hedef sürücüde yer kalmadı. Yer açın ya da çıktıyı başka bir sürücüye alın.",
-                "The target drive ran out of space. Free some room, or write the output to another drive.");
+            return Say("main.error.disk-full");
 
         if (Mentions(raw, "unknown encoder", "encoder not found", "does not support", "could not write header",
                 "error initializing output stream", "automatic encoder selection failed", "incorrect codec parameters",
                 "invalid argument", "muxer does not support"))
-            return T(
-                "Seçilen kodlayıcı ile kapsayıcı birbirine uymuyor. Kapsayıcıyı MP4, video kodeğini H.264 yapıp yeniden deneyin.",
-                "The chosen encoder and container do not fit together. Set the container to MP4 and the video codec to H.264, then try again.");
+            return Say("main.error.encoder-container");
 
         if (Mentions(raw, "invalid data found", "moov atom not found", "could not find codec parameters",
                 "decoder not found", "no such file or directory", "end of file", "unknown format"))
-            return T(
-                "Kaynak dosya çözülemedi; bozuk olabilir ya da bu ffmpeg sürümü bu biçimi tanımıyor.",
-                "The source file could not be decoded; it may be damaged, or this ffmpeg build does not know the format.");
+            return Say("main.error.undecodable");
 
         return null;
     }
@@ -2529,20 +2515,32 @@ public partial class MainWindow : Window
         BtnConvert.IsEnabled = !running && _info is not null;
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         if (running) return;
-        SetStage(TxtStage, T("Boşta", "Idle"));
-        SetStage(TxtConvertStage, T("Boşta", "Idle"));
+        SetStage(TxtStage, Say("main.output.idle"));
+        SetStage(TxtConvertStage, Say("main.output.idle"));
         TxtRemaining.Text = "-";
     }
 
-    private string LocalizeStage(string stage)
+    /// <summary>
+    /// Motorun aşama satırı ("Attempt 2 · encoding") sayı ve İngilizce sözcük karışımıdır.
+    /// Sözcükler motorun kendi belirteçleri: ekrana çıkarken karşılıklarıyla değiştirilir,
+    /// karşılık sözlükten gelir.
+    /// </summary>
+    private static readonly (string Token, string Key)[] StageWords =
     {
-        if (!_turkish) return LanguageCatalog.Title(stage, false);
-        return LanguageCatalog.Title(stage.Replace("encoding", "Kodlama", StringComparison.OrdinalIgnoreCase)
-            .Replace("converting", "Dönüştürme", StringComparison.OrdinalIgnoreCase)
-            .Replace("pass", "Geçiş", StringComparison.OrdinalIgnoreCase)
-            .Replace("attempt", "Deneme", StringComparison.OrdinalIgnoreCase)
-            .Replace("GIF palette", "GIF paleti", StringComparison.OrdinalIgnoreCase)
-            .Replace("GIF encode", "GIF kodlama", StringComparison.OrdinalIgnoreCase), true);
+        ("GIF palette", "main.stage.gif-palette"),
+        ("GIF encode", "main.stage.gif-encode"),
+        ("encoding", "main.stage.encoding"),
+        ("converting", "main.stage.converting"),
+        ("pass", "main.stage.pass"),
+        ("attempt", "main.stage.attempt")
+    };
+
+    private static string LocalizeStage(string stage)
+    {
+        foreach (var (token, key) in StageWords)
+            stage = stage.Replace(token, Strings.Get(key), StringComparison.OrdinalIgnoreCase);
+
+        return LanguageCatalog.Display(stage);
     }
 
     private void OnCancel(object? sender, RoutedEventArgs e)
@@ -2560,7 +2558,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            TxtSystemStatus.Text = $"{T("Klasör açılamadı", "The folder could not be opened")}: {ex.Message}";
+            TxtSystemStatus.Text = $"{Say("main.error.folder")}: {ex.Message}";
         }
     }
 }
@@ -2794,7 +2792,7 @@ internal sealed class ShareFlow
         if (_upload is not null)
             return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
                 CoreShare.ShareFailure.Unknown,
-                "Bir yükleme zaten sürüyor; bitmesini bekleyin ya da iptal edin."));
+                Strings.Get("settings.share.upload-busy")));
 
         var cts = new CancellationTokenSource();
         _upload = cts;
@@ -2826,7 +2824,7 @@ internal sealed class ShareFlow
     {
         if (Link is not { } link)
             return CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
-                CoreShare.ShareFailure.Unknown, "Kapatılacak bir paylaşım yok."));
+                CoreShare.ShareFailure.Unknown, Strings.Get("settings.share.nothing-to-close")));
 
         var result = await _provider(target).DeleteAsync(link, cancellationToken);
         if (!result.Ok && result.Failure != CoreShare.ShareFailure.TokenExpired) return result;

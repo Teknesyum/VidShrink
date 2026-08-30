@@ -354,7 +354,7 @@ public class HardwareVerdictTests
             window.ApplyHardwareVerdict(null, true, ClosedVerdict);
             ToggleByHand(window, true);
 
-            var line = MainWindow.FastGpuVerdictLine(ClosedVerdict, window.ChkFastGpu.IsChecked == true, true);
+            var line = MainWindow.FastGpuVerdictLine(ClosedVerdict, window.ChkFastGpu.IsChecked == true, "tr");
 
             Assert.NotNull(line);
             Assert.DoesNotContain("kapalı kaldı", line!, StringComparison.OrdinalIgnoreCase);
@@ -374,7 +374,7 @@ public class HardwareVerdictTests
     [Fact]
     public void WithoutAProbeThereIsNoVerdictLine()
     {
-        Assert.Null(MainWindow.FastGpuVerdictLine(HardwareVerdict.NotProbed, false, true));
+        Assert.Null(MainWindow.FastGpuVerdictLine(HardwareVerdict.NotProbed, false, "tr"));
     }
 
     /// <summary>Gövde zaten donanım bulunamadığını yazıyor; ikinci kez yazılmaz.</summary>
@@ -383,16 +383,16 @@ public class HardwareVerdictTests
     {
         var verdict = HardwareVerdict.Decide(Passed("libx264"), 1074, 882, 496, 20);
 
-        Assert.Null(MainWindow.FastGpuVerdictLine(verdict, false, true));
+        Assert.Null(MainWindow.FastGpuVerdictLine(verdict, false, "tr"));
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void AnOpenedBoxIsAnnouncedWithItsMeasurement(bool turkish)
+    [InlineData("tr")]
+    [InlineData("en")]
+    public void AnOpenedBoxIsAnnouncedWithItsMeasurement(string language)
     {
         var verdict = HardwareVerdict.Decide(Passed("av1_nvenc", 193), 1074, 882, 496, 20);
-        var line = MainWindow.FastGpuVerdictLine(verdict, true, turkish);
+        var line = MainWindow.FastGpuVerdictLine(verdict, true, language);
 
         Assert.NotNull(line);
         Assert.Contains("193", line!, StringComparison.Ordinal);
@@ -414,8 +414,8 @@ public class HardwareVerdictTests
         Assert.Equal(reason, verdict.Reason);
         Assert.False(verdict.EnableFastMode);
 
-        var off = MainWindow.FastGpuVerdictLine(verdict, false, true);
-        var on = MainWindow.FastGpuVerdictLine(verdict, true, true);
+        var off = MainWindow.FastGpuVerdictLine(verdict, false, "tr");
+        var on = MainWindow.FastGpuVerdictLine(verdict, true, "tr");
 
         Assert.NotNull(off);
         Assert.NotNull(on);
@@ -432,10 +432,10 @@ public class HardwareVerdictTests
     {
         var verdict = Closed(reason);
 
-        foreach (var turkish in new[] { true, false })
+        foreach (var language in new[] { "tr", "en" })
         foreach (var on in new[] { true, false })
         {
-            var line = MainWindow.FastGpuVerdictLine(verdict, on, turkish);
+            var line = MainWindow.FastGpuVerdictLine(verdict, on, language);
 
             Assert.NotNull(line);
             Assert.StartsWith("•", line!, StringComparison.Ordinal);
@@ -448,7 +448,7 @@ public class HardwareVerdictTests
     public void AMissingEncoderIsNotDescribedAsPresent()
     {
         var verdict = HardwareVerdict.Decide(EncoderProbeResult.Missing("av1_nvenc"), 1074, 882, 496, 20);
-        var line = MainWindow.FastGpuVerdictLine(verdict, false, true);
+        var line = MainWindow.FastGpuVerdictLine(verdict, false, "tr");
 
         Assert.NotNull(line);
         Assert.DoesNotContain("bulundu", line!, StringComparison.OrdinalIgnoreCase);

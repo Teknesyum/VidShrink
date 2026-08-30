@@ -80,6 +80,44 @@ public sealed class LocalizationTests : IDisposable
         }
     }
 
+    /// <summary>
+    /// Aynı dilde iki alan dosyası aynı anahtarı taşırsa <see cref="Strings"/> onu sessizce
+    /// üstüne yazar: bir metin hiç görünmeden kaybolur ve anahtar sayısı ölçümü de
+    /// eşitliği koruduğu için yeşil kalır. Çakışma bu yüzden ayrıca aranıyor.
+    /// </summary>
+    [Fact]
+    public void AyniDildeIkiAlanDosyasiAyniAnahtariTasimiyor()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "Locales");
+        var complaints = new StringBuilder();
+
+        foreach (var folder in Directory.GetDirectories(root))
+        {
+            var owner = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            foreach (var file in Directory.GetFiles(folder, "*.json").OrderBy(path => path, StringComparer.Ordinal))
+            {
+                var domain = Path.GetFileNameWithoutExtension(file);
+                var texts = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(file));
+                Assert.NotNull(texts);
+
+                foreach (var key in texts!.Keys)
+                {
+                    if (owner.TryGetValue(key, out var first))
+                    {
+                        complaints.AppendLine(
+                            $"'{key}' hem {first}.json hem {domain}.json içinde ({Path.GetFileName(folder)}).");
+                        continue;
+                    }
+
+                    owner[key] = domain;
+                }
+            }
+        }
+
+        Assert.True(complaints.Length == 0, "Aynı dilde anahtar çakışması:\n" + complaints);
+    }
+
     [Fact]
     public void DortAlanDosyasiHerDilIcinCiktidaVar()
     {
