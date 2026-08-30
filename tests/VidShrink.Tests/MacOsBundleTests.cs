@@ -32,7 +32,11 @@ public sealed class MacOsBundleTests
             RedirectStandardOutput = true,
             RedirectStandardError = true
         };
-        if (home is not null) start.Environment["HOME"] = home;
+        if (home is not null)
+        {
+            start.Environment["HOME"] = home;
+            start.Environment.Remove("VIDSHRINK_INSTALL_ROOT");
+        }
 
         using var process = Process.Start(start)!;
         process.WaitForExit();

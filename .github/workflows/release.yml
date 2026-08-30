@@ -62,11 +62,10 @@ jobs:
 
   test:
     needs: version
-    # Windows, not Linux. The measurement suite builds real Avalonia windows through
-    # AppHost, which sets the platform up with UseWin32(); on a Linux runner that kills
-    # the test host with a missing kernel32.dll and the whole run aborts. Running the
-    # gate where the windows can actually open also means the release is checked against
-    # the same suite the developer sees, not a subset of it.
+    # Windows, not Linux. AppHost now picks a windowing backend per platform, so the
+    # suite completes on Linux and macOS too, on Avalonia's headless backend. The gate
+    # stays where the windows really open: that way the release is checked against the
+    # same suite the developer sees, not a subset of it.
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4

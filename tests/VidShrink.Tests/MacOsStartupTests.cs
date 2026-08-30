@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Linq;
 using Avalonia.Controls;
 using VidShrink.Ffmpeg;
 using Xunit;
@@ -74,16 +73,8 @@ public class MacOsStartupTests
     [Fact]
     public void TheWindowingBackendIsWin32OnWindowsAndHeadlessElsewhere()
     {
-        AppHost.Run(() => new Window());
+        var descriptor = AppHost.Run(() => new Window().TryGetPlatformHandle()?.HandleDescriptor);
 
-        var loaded = AppDomain.CurrentDomain.GetAssemblies()
-            .Select(assembly => assembly.GetName().Name)
-            .ToHashSet(StringComparer.Ordinal);
-
-        var expected = OperatingSystem.IsWindows() ? "Avalonia.Win32" : "Avalonia.Headless";
-        var other = OperatingSystem.IsWindows() ? "Avalonia.Headless" : "Avalonia.Win32";
-
-        Assert.Contains(expected, loaded);
-        Assert.DoesNotContain(other, loaded);
+        Assert.Equal(OperatingSystem.IsWindows() ? "HWND" : "STUB", descriptor);
     }
 }
