@@ -8,7 +8,7 @@ name: release
 # and what the shortcuts point at. That archive is also what the manifest's "launcher"
 # array points at, so an installed launcher can replace itself.
 #
-# ffmpeg is not part of any archive. It is GPLv3 and VidShrink is MIT; the installer
+# ffmpeg is not part of any archive. It is GPLv3 and VidShrink is AGPL-3.0-or-later; the installer
 # fetches it onto the user's machine under its own licence. See README.
 #
 # The asset names and the manifest format are defined in .github/workflows/manifest.md.
