@@ -5,6 +5,60 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.2.5] - 2026-08-30
+
+### Added
+
+- **Every string on screen now comes from a locale file.** `Locales/<language>/<area>.json`
+  holds the text; the window reads it by key instead of walking the visual tree and
+  looking up the English it finds there. Anything the old dictionary did not carry stayed
+  English no matter which language was selected - that is why the Quality and Performance
+  sections showed English under a Turkish window. Adding a language is now copying a
+  folder and translating it; the app discovers it on its own.
+- **Settings survive a restart.** Twenty-five values are written to disk, the selected
+  language among them, so the language no longer has to be set on every launch. A button
+  in Settings clears everything that was saved and puts the app back to its first-run
+  state, after a confirmation.
+- **The comparison panel has maximize and full-screen buttons.** Panel size is a decision
+  the buttons make, not something the pointer's position decides for you.
+- **macOS installs a real application bundle.** `install-vidshrink.sh` wraps the download
+  in an ad-hoc signed `~/Applications/VidShrink.app` that opens from Finder with its own
+  name and icon; the icon is generated from the artwork already in the repository. The
+  script's `--uninstall` removes the bundle, the payload and the shortcut together.
+
+### Changed
+
+- **The comparison panel no longer grows when the pointer crosses it.** The hover-growth
+  path is gone, along with the circular animation that came with it. When the panel is
+  promoted its backdrop is opaque black; at its normal size its transparency matches the
+  other panels.
+- **The version string no longer carries the commit hash.** It reads `0.2.5`, not
+  `0.2.5+3e26738`.
+- **Info boxes are wider and the `?` badge is smaller** (20 px to 18 px), so a single
+  item fits on a single line.
+- **The measurement suite runs on macOS and Linux.** The windowing backend is chosen per
+  platform: Win32 on Windows as before, Avalonia's headless backend elsewhere, still
+  drawing through Skia. Before this the suite could not finish outside Windows at all.
+- **The release workflow publishes the release itself.** It used to leave a draft, and a
+  draft is invisible to `releases/latest/download` - so every release reached nobody
+  until it was published by hand, and installs kept fetching the previous version.
+
+### Fixed
+
+- **VidShrink never started on macOS.** The kernel kills any non-notarized executable
+  whose name ends in `.app` or `.App` at exec time, silently. The published binary is
+  renamed on macOS targets only.
+- **ffmpeg is found on macOS** when it is not on `PATH`, through the usual Homebrew and
+  MacPorts locations.
+- **Quality measurement died on any ffmpeg built without libzimg.** The comparison chain
+  asked for the `zscale` filter without checking it existed; it now falls back to `scale`.
+- **Text that the localization merge left unbound** - the tab title, the automatic plan
+  row and four settings-reset strings - is bound again.
+- **The window painted transparent pixels** after the merge and let the desktop show
+  through. It is fully opaque again.
+- **The release workflow claimed the project is MIT.** The repository is
+  AGPL-3.0-or-later.
+
 ## [0.2.4] - 2026-08-30
 
 ### Changed
