@@ -27,7 +27,6 @@ using Avalonia.VisualTree;
 using VidShrink.App.Localization;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
-using VidShrink.App.Localization;
 using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
 using VidShrink.Ffmpeg;
