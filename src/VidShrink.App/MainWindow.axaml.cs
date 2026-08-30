@@ -1748,7 +1748,7 @@ public partial class MainWindow : Window
         TxtPlanEmpty.IsVisible = false;
 
         var channels = plan.AudioChannels == 1 ? $" {Say("main.plan.audio.mono")}" : "";
-        AddPlanFact(Say("main.plan.fact.plan"), _aiPlan is null ? Say("main.plan.fact.automatic") : "AI");
+        AddPlanFact(Say("main.plan.fact.plan"), _aiPlan is null ? Say("main.plan.automatic") : "AI");
         AddPlanFact(Say("main.plan.fact.encoder"), plan.Codec);
         AddPlanFact(Say("main.plan.fact.mode"), plan.ModeEnum switch
         {

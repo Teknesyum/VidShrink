@@ -8,7 +8,7 @@
         Width="1560" Height="1060" MinWidth="1040" MinHeight="720"
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
-        Background="Transparent"
+        Background="{StaticResource WorkspaceGradient}"
         TransparencyLevelHint="Transparent"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
@@ -32,12 +32,12 @@
   </Window.Styles>
 
   <Border x:Name="WindowShell"
-          Background="{StaticResource WorkspaceBackground}"
+          Background="{StaticResource WorkspaceGradient}"
           BorderBrush="{StaticResource NeonBlue}"
           BorderThickness="{StaticResource BorderThin}"
           CornerRadius="{StaticResource RadiusControl}"
           UseLayoutRounding="True">
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*" Background="{StaticResource WorkspaceBackground}">
 
       <Border x:Name="TitleBar"
               Grid.Row="0"
@@ -946,14 +946,15 @@
               <Border x:Name="ResetSettingsPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnResetSettings"
+                          Content="{loc:Text settings.reset-all}"
                           Theme="{StaticResource GhostButton}"
                           HorizontalAlignment="Left"
                           Click="OnResetSettings"/>
                   <StackPanel x:Name="ResetSettingsConfirm" IsVisible="False" Spacing="{StaticResource SpaceSm}">
-                    <TextBlock x:Name="TxtResetSettingsConfirm" Theme="{StaticResource Body}"/>
+                    <TextBlock x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}"/>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <Button x:Name="BtnConfirmResetSettings" Theme="{StaticResource GhostButton}" Click="OnConfirmResetSettings"/>
-                      <Button x:Name="BtnCancelResetSettings" Theme="{StaticResource GhostButton}" Click="OnCancelResetSettings"/>
+                      <Button x:Name="BtnConfirmResetSettings" Content="{loc:Text settings.reset-confirm-button}" Theme="{StaticResource GhostButton}" Click="OnConfirmResetSettings"/>
+                      <Button x:Name="BtnCancelResetSettings" Content="{loc:Text settings.reset-cancel}" Theme="{StaticResource GhostButton}" Click="OnCancelResetSettings"/>
                     </StackPanel>
                   </StackPanel>
                 </StackPanel>
