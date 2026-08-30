@@ -185,11 +185,53 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
 }
 
 $shellMenuKeyName = 'VidShrink'
+$shellPackageName = 'Teknesyum.VidShrink.Shell'
+$shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
 
 $shellMenuExtensions = @(
     'mp4', 'mkv', 'mov', 'avi', 'webm', 'wmv', 'flv', 'm4v', 'mpg', 'mpeg', 'ts', 'm2ts',
     '3gp', 'ogv', 'vob', 'asf', 'rm', 'rmvb', 'divx', 'mxf', 'f4v', 'mts', 'dav', 'gif'
 )
+
+function Test-Windows11 {
+    return [Environment]::OSVersion.Version.Build -ge 22000
+}
+
+function Test-DefaultRegistryRoot([string]$Root) {
+    return $Root.TrimEnd('\') -eq 'HKCU:\Software\Classes'
+}
+
+function Remove-Windows11ShellMenu([string]$Root) {
+    if (-not (Test-DefaultRegistryRoot $Root)) { return 0 }
+    $packages = @(Get-AppxPackage -Name $shellPackageName -ErrorAction SilentlyContinue)
+    foreach ($package in $packages) {
+        Remove-AppxPackage -Package $package.PackageFullName -ErrorAction Stop
+    }
+    return $packages.Count
+}
+
+function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
+    if (-not (Test-Windows11) -or -not (Test-DefaultRegistryRoot $Root)) { return $false }
+
+    $InstallDirectory = [IO.Path]::GetFullPath($InstallDirectory)
+    $shellRoot = Join-Path $InstallDirectory 'shell'
+    $templatePath = Join-Path $shellRoot 'AppxManifest.template.xml'
+    $extensionPath = Join-Path $shellRoot 'VidShrink.ShellExtension.dll'
+    if (-not (Test-Path -LiteralPath $templatePath) -or -not (Test-Path -LiteralPath $extensionPath)) {
+        throw "Windows 11 kabuk paketi eksik: $shellRoot"
+    }
+
+    $verbs = foreach ($extension in $shellMenuExtensions) {
+        "            <desktop5:ItemType Type=`".$extension`"><desktop5:Verb Id=`"VidShrink$extension`" Clsid=`"$shellCommandClsid`" /></desktop5:ItemType>"
+    }
+    $manifestPath = Join-Path $shellRoot 'AppxManifest.xml'
+    $template = [IO.File]::ReadAllText($templatePath)
+    [IO.File]::WriteAllText($manifestPath, $template.Replace('__ITEM_TYPES__', ($verbs -join [Environment]::NewLine)), [Text.UTF8Encoding]::new($false))
+
+    Remove-Windows11ShellMenu $Root | Out-Null
+    Add-AppxPackage -Register $manifestPath -ExternalLocation $InstallDirectory -ErrorAction Stop
+    return $true
+}
 
 function Get-ShellMenuLabel([string]$Language) {
     $choice = $Language
@@ -246,7 +288,9 @@ function Write-ShellMenu([string]$Root, [string]$Executable, [string]$Label) {
 function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language) {
     Remove-ShellMenu $Root | Out-Null
     $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $Language)
-    Write-Host "Sağ tık menüsü $written uzantıya yazıldı." -ForegroundColor Green
+    $modern = Write-Windows11ShellMenu $Root (Split-Path -Parent $Executable)
+    $path = if ($modern) { 'Windows 11 birincil ve klasik' } else { 'Windows 10 klasik' }
+    Write-Host "Sağ tık menüsü $written uzantıya yazıldı ($path menü)." -ForegroundColor Green
 }
 
 function Get-InstallRootHolder([string]$Root) {
@@ -297,7 +341,8 @@ function Remove-InstallRoot([string]$Root) {
 
 if ($RemoveShellMenu) {
     $cleared = Remove-ShellMenu $RegistryRoot
-    Write-Host "Sağ tık menüsü kaldırıldı: $cleared uzantı." -ForegroundColor Green
+    $packages = Remove-Windows11ShellMenu $RegistryRoot
+    Write-Host "Sağ tık menüsü kaldırıldı: $cleared uzantı, $packages paket." -ForegroundColor Green
     return
 }
 

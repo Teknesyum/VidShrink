@@ -74,8 +74,41 @@ jobs:
           dotnet-version: '8.0.x'
       - run: dotnet test VidShrink.sln -c Release
 
-  publish:
+  shell-extension:
     needs: [version, test]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - name: Build the Windows 11 shell extension
+        run: msbuild src/VidShrink.ShellExtension/VidShrink.ShellExtension.vcxproj /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143
+      - name: Stage the sparse package files
+        shell: pwsh
+        run: |
+          $stage = 'shell-extension'
+          $assets = Join-Path $stage 'Assets'
+          New-Item -ItemType Directory -Path $assets -Force | Out-Null
+          Copy-Item 'src/VidShrink.ShellExtension/x64/Release/VidShrink.ShellExtension.dll' $stage
+          Copy-Item 'src/VidShrink.ShellExtension/AppxManifest.template.xml' $stage
+          Add-Type -AssemblyName System.Drawing
+          $source = [Drawing.Image]::FromFile((Resolve-Path 'src/VidShrink.App/Assets/VidShrink.png'))
+          foreach ($item in @(@('StoreLogo.png', 50), @('Square150x150Logo.png', 150), @('Square44x44Logo.png', 44))) {
+            $bitmap = [Drawing.Bitmap]::new($item[1], $item[1])
+            $graphics = [Drawing.Graphics]::FromImage($bitmap)
+            $graphics.DrawImage($source, 0, 0, $item[1], $item[1])
+            $bitmap.Save((Join-Path $assets $item[0]), [Drawing.Imaging.ImageFormat]::Png)
+            $graphics.Dispose()
+            $bitmap.Dispose()
+          }
+          $source.Dispose()
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shell-extension-win-x64
+          path: shell-extension/
+          if-no-files-found: error
+
+  publish:
+    needs: [version, test, shell-extension]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -109,6 +142,12 @@ jobs:
             -p:Version=${{ needs.version.outputs.version }} \
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish-launcher
+
+      - uses: actions/download-artifact@v4
+        if: matrix.rid == 'win-x64'
+        with:
+          name: shell-extension-win-x64
+          path: publish-launcher/shell
 
       - name: Write manifest.json
         # The manifest tool is a CI helper and is not in VidShrink.sln, so it is built

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+         xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+         xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+         IgnorableNamespaces="uap uap10 rescap com desktop4 desktop5">
+  <Identity Name="Teknesyum.VidShrink.Shell" Publisher="CN=Teknesyum" Version="1.0.0.0" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>VidShrink</DisplayName>
+    <PublisherDisplayName>Teknesyum</PublisherDisplayName>
+    <Logo>shell\Assets\StoreLogo.png</Logo>
+    <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.22631.0" />
+  </Dependencies>
+  <Applications>
+    <Application Id="VidShrink" Executable="VidShrink.exe" uap10:TrustLevel="mediumIL" uap10:RuntimeBehavior="win32App">
+      <uap:VisualElements AppListEntry="none" DisplayName="VidShrink" Description="VidShrink" BackgroundColor="transparent" Square150x150Logo="shell\Assets\Square150x150Logo.png" Square44x44Logo="shell\Assets\Square44x44Logo.png" />
+      <Extensions>
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:SurrogateServer DisplayName="VidShrink">
+              <com:Class Id="7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58" Path="shell\VidShrink.ShellExtension.dll" ThreadingModel="STA" />
+            </com:SurrogateServer>
+          </com:ComServer>
+        </com:Extension>
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+__ITEM_TYPES__
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+</Package>
