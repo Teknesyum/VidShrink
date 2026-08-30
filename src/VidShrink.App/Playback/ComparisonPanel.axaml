@@ -83,11 +83,37 @@
           yaklaşıklık rozeti — ikisi de sağ üstte, yani işaret ettikleri şey sağ yarı.
           Rozet ikinci bir tasarım değil, yan etiketle aynı yonga.
         -->
-        <StackPanel x:Name="RightBadges"
+        <StackPanel x:Name="TopRight"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Spacing="{StaticResource PlaybackBadgeGap}"
                     Margin="{StaticResource PlaybackBadgeMargin}">
+
+          <!--
+            T82: panelin boyunu süren iki tuş. Fare üstüne gelmek bir şey büyütmüyor;
+            boy yalnız buradan değişiyor. İkisi de simge taşır, metin taşımaz.
+          -->
+          <StackPanel x:Name="PanelButtons"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      Spacing="{StaticResource PlaybackZoomButtonGap}">
+            <Button x:Name="BtnPanelMaximize" Theme="{StaticResource PlaybackZoomButton}">
+              <Path Data="{StaticResource PlaybackMaximizeIcon}"
+                    Stroke="{StaticResource NeonBlue}"
+                    StrokeThickness="{StaticResource BorderThinScalar}"
+                    Width="{StaticResource PlaybackButtonIconSize}"
+                    Height="{StaticResource PlaybackButtonIconSize}"
+                    Stretch="Uniform"/>
+            </Button>
+            <Button x:Name="BtnPanelFullScreen" Theme="{StaticResource PlaybackZoomButton}">
+              <Path Data="{StaticResource PlaybackFullScreenIcon}"
+                    Stroke="{StaticResource NeonBlue}"
+                    StrokeThickness="{StaticResource BorderThinScalar}"
+                    Width="{StaticResource PlaybackButtonIconSize}"
+                    Height="{StaticResource PlaybackButtonIconSize}"
+                    Stretch="Uniform"/>
+            </Button>
+          </StackPanel>
 
           <Border x:Name="RightBadge"
                   Theme="{StaticResource PlaybackBadge}"

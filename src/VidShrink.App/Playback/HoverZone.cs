@@ -49,9 +49,9 @@ internal sealed class DispatcherHoverClock : IHoverClock
 /// kuşağını taşıyıp taşımadığına bakıyor; araya yeni bir gösterme girdiyse eski tik
 /// kararını uygulamıyor. Opaklık okuyup karar veren kalıp bu yarışı kaybediyordu.
 ///
-/// T44: aynı kuşak koruması karşılaştırma panelinin gecikmeli inişini de sürüyor. Orada
-/// bölge oranı değil, hedef kademenin sınırı karar veriyor; sınır dışarıdan
-/// <see cref="PointerWithin"/> ile bildiriliyor.
+/// T82: tek kullanıcısı denetim şeridi. Karşılaştırma panelinin boyu bir zamanlar aynı
+/// sayaçtan geçiyordu (T44'ün gecikmeli inişi); panelin boyu artık fareye değil kendi iki
+/// tuşuna bağlı ve o yol tümden kalktı.
 ///
 /// T70: iki yön iki ayrı gecikme taşıyor. Gösterme gecikmesi farenin üstünde <i>durduğu</i>
 /// süreyi ölçer — süre dolmadan fare çıkarsa kuşak ilerler ve bekleyen tik kararını
@@ -114,7 +114,6 @@ internal sealed class HoverZone
 
     /// <summary>
     /// Bölgesi oranla değil, dışarıdan verilen bir sınırla belirlenen kullanıcılar için.
-    /// Karşılaştırma paneli bunu hedef kademenin sınırına göre çağırır.
     /// </summary>
     internal void PointerWithin(bool inside) => SetPointer(inside);
 
@@ -122,15 +121,12 @@ internal sealed class HoverZone
     /// Sayacı sıfırdan kurar. Bekleyen tik kuşağını kaybettiği için kararını uygulamaz;
     /// tutma sebepleri temizlenir, <paramref name="visible"/> yeni başlangıç hâlidir.
     /// <see cref="_apply"/> çağrılmaz — durum değişimi çağıranın kendi elinde.
-    ///
-    /// <paramref name="pointerInside"/> çağıranın bildiği fare durumudur: terfi eden panel
-    /// bunu verirse fare hiç kıpırdamadan çıktığında da sayaç çıkışı görür.
     /// </summary>
-    internal void Reset(bool visible, bool pointerInside = false)
+    internal void Reset(bool visible)
     {
         _generation++;
         _clock.Stop();
-        _pointerInside = pointerInside;
+        _pointerInside = false;
         _held = false;
         _visible = visible;
     }
