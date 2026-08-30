@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: microsoft/setup-msbuild@v2
       - name: Build the Windows 11 shell extension
-        run: msbuild src/VidShrink.ShellExtension/VidShrink.ShellExtension.vcxproj /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143
+        run: msbuild src/VidShrink.ShellExtension/VidShrink.ShellExtension.vcxproj /p:Configuration=Release /p:Platform=x64
       - name: Stage the sparse package files
         shell: pwsh
         run: |

@@ -211,7 +211,7 @@ function Remove-Windows11ShellMenu([string]$Root) {
 }
 
 function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
-    if (-not (Test-Windows11) -or -not (Test-DefaultRegistryRoot $Root)) { return $false }
+    if (-not (Test-Windows11)) { return $false }
 
     $InstallDirectory = [IO.Path]::GetFullPath($InstallDirectory)
     $shellRoot = Join-Path $InstallDirectory 'shell'
@@ -221,6 +221,8 @@ function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
         Write-Host "Bu yayin Windows 11 kabuk paketini tasimiyor; klasik menu yazildi." -ForegroundColor Yellow
         return $false
     }
+
+    if (-not (Test-DefaultRegistryRoot $Root)) { return $false }
 
     $verbs = foreach ($extension in $shellMenuExtensions) {
         "            <desktop5:ItemType Type=`".$extension`"><desktop5:Verb Id=`"VidShrink$extension`" Clsid=`"$shellCommandClsid`" /></desktop5:ItemType>"
