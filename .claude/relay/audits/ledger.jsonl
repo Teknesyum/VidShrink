@@ -80,3 +80,4 @@
 {"id":"T82","result":"stale","at":"2026-08-30T11:16:33.354Z"}
 {"id":"T83","result":"stale","at":"2026-08-30T11:25:47.855Z"}
 {"id":"T81","round":"1","risk":"high","verify":["dotnet test -c Release --filter LocalizationTests"],"auditorRunId":"a5c175e553acf0e73","headSha":"052d949009fbc492dbe4e6943e01bdec71198fde","at":"2026-08-30T11:30:43.384Z"}
+{"id":"T82","round":"1","risk":"high","verify":["dotnet test -c Release --filter \"ComparisonPanelTests|PanelHostTests"],"auditorRunId":"ad44ba76b2e05aed5","headSha":"e45224e89aacbef70ca2c8423173b290d5579afd","at":"2026-08-30T12:08:30.306Z"}

@@ -1,0 +1,25 @@
+{
+  "contractId": "T82",
+  "auditorRunId": "ad44ba76b2e05aed5",
+  "headSha": "e45224e89aacbef70ca2c8423173b290d5579afd",
+  "diffHash": "8852cb4c58ca50352d228e7941820ae6f10a87158a5d04eb2a5ee082acbb4e59",
+  "owns": [
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Playback/HoverZone.cs",
+    "src/VidShrink.App/Playback/ZoomGesture.cs",
+    "src/VidShrink.App/Playback/ControlStrip.axaml",
+    "src/VidShrink.App/Playback/ControlStrip.axaml.cs",
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "src/VidShrink.App/Themes/Playback.axaml",
+    "tests/VidShrink.Tests/ComparisonPanelTests.cs",
+    "tests/VidShrink.Tests/PanelHostTests.cs"
+  ],
+  "verification": [
+    "dotnet test -c Release --filter 'ComparisonPanelTests|PanelHostTests' -> 57/57 yesil. K1: HoverZoom/RiseScale/HoverPanel/TrackPointer/PointerLeftWindow/TargetCovers/RefreshDescentHold/_descent kaynakta yok; HoverZone'un tek kalan kullanicisi ControlStrip. K5: Playback.axaml:128 PlaybackPromotedShell = AppBgColor #FF050507, opaklik override yok, yalniz _stage != Band iken yaziliyor. K6: bandda Shell.ClearValue -> Panel temasindan PanelSurface/PanelSurfaceOpacity 0.90, SourcePanel ile ayni nesne. K7: ComparisonPanelTests.cs:796 T79 zoom guvencesi duruyor. owns: diff yalniz ComparisonPanel.axaml(.cs), HoverZone.cs, Playback.axaml, ComparisonPanelTests.cs; MainWindow ve Theme.axaml degismemis. Yorum eklenmemis. KRITIK yok, borc yok."
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-30T12:06:21.526Z",
+  "usedAt": "2026-08-30T12:08:30.305Z",
+  "completedSha": "e45224e89aacbef70ca2c8423173b290d5579afd"
+}
