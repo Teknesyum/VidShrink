@@ -218,7 +218,8 @@ function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
     $templatePath = Join-Path $shellRoot 'AppxManifest.template.xml'
     $extensionPath = Join-Path $shellRoot 'VidShrink.ShellExtension.dll'
     if (-not (Test-Path -LiteralPath $templatePath) -or -not (Test-Path -LiteralPath $extensionPath)) {
-        throw "Windows 11 kabuk paketi eksik: $shellRoot"
+        Write-Host "Bu yayin Windows 11 kabuk paketini tasimiyor; klasik menu yazildi." -ForegroundColor Yellow
+        return $false
     }
 
     $verbs = foreach ($extension in $shellMenuExtensions) {
