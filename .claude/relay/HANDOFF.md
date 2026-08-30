@@ -14,14 +14,14 @@ None.
 
 ## Closed last
 
+- `T78` — done — 2026-08-29 23:32
+- `T79` — done — 2026-08-29 21:36
 - `T77` — done — 2026-08-29 18:21
 - `T76` — done — 2026-08-29 17:38
 - `T75` — done — 2026-08-29 16:28
-- `T74` — done — 2026-08-29 16:11
-- `T73` — done — 2026-08-29 16:10
 
 ## Tree
 
 - branch: `main`
-- head: `ee0d0e1 Gecici kilit olcusu kendi ipliginde: is parcacigi havuzu ac kalinca kilit birakilmiyordu`
+- head: `e55abcc T78 muhurlendi: anka katmanli tuylerden kuruluyor, isimanin kenari yok`
 - uncommitted files: 0

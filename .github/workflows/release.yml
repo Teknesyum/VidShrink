@@ -2,7 +2,8 @@ name: release
 
 # Runs when a version tag is pushed. Publishes VidShrink self-contained for the four
 # supported targets, writes a per-file manifest next to each archive, and collects
-# everything into a draft GitHub Release. win-x64 additionally carries the launcher as
+# everything into a GitHub Release, published as latest once every asset is uploaded.
+# win-x64 additionally carries the launcher as
 # vidshrink-launcher-win-x64.zip, which is what the installer puts at the install root
 # and what the shortcuts point at. That archive is also what the manifest's "launcher"
 # array points at, so an installed launcher can replace itself.
@@ -189,7 +190,7 @@ jobs:
           pattern: assets-*
           merge-multiple: true
 
-      - name: Create the draft release
+      - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -200,3 +201,19 @@ jobs:
             --title "VidShrink ${{ needs.version.outputs.version }}" \
             --notes "CHANGELOG.md içindeki ${{ needs.version.outputs.version }} bölümüne bakın." \
             downloaded/*
+
+      # The release is created as a draft so no client sees it half-uploaded, then published
+      # here once every asset is in place. It is not left as a draft: an installed launcher
+      # reads its manifest from releases/latest/download and a draft is invisible there, so a
+      # draft release ships to nobody until someone remembers to publish it by hand.
+      - name: Publish it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ needs.version.outputs.tag }}"
+          gh release edit "$tag" --draft=false --latest
+          for rid in win-x64 linux-x64 osx-x64 osx-arm64; do
+            gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "manifest-$rid.json"
+          done
+          test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "false"
