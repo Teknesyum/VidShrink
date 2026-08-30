@@ -1,0 +1,26 @@
+{
+  "contractId": "T81",
+  "auditorRunId": "a5c175e553acf0e73",
+  "headSha": "052d949009fbc492dbe4e6943e01bdec71198fde",
+  "diffHash": "4a59e3cf703d3d0ea9accd2a90f09275b86262d0d03477a5c0f91500868417b0",
+  "owns": [
+    "src/VidShrink.App/Localization/Strings.cs",
+    "src/VidShrink.App/Locales/en/main.json",
+    "src/VidShrink.App/Locales/en/playback.json",
+    "src/VidShrink.App/Locales/en/performance.json",
+    "src/VidShrink.App/Locales/en/settings.json",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "src/VidShrink.App/Locales/tr/playback.json",
+    "src/VidShrink.App/Locales/tr/performance.json",
+    "src/VidShrink.App/Locales/tr/settings.json",
+    "src/VidShrink.App/VidShrink.App.csproj",
+    "tests/VidShrink.Tests/LocalizationTests.cs"
+  ],
+  "verification": [
+    "dotnet test -c Release --filter FullyQualifiedName~LocalizationTests -> 9/9 gecti, 40 ms. csproj hem CopyToOutputDirectory hem EmbeddedResource yapiyor; PublishSingleFile ciktisinda 8 gomulu kaynak adi exe icinde bulundu. Strings.Build once gomuluyu sonra diski okuyor, disk uste biniyor. Uc dusme yolu ayri ayri olculmus. Anahtar esitligi olcusu eksik/fazla anahtari tek tek mesaja yaziyor. MainWindow, Playback, Performance, Themes ve UpdateCheck.cs hic degismemis (git diff --name-only bos). Yorum eklenmemis. Mutasyon: Strings.cs:116 fallback dili degistirildi -> ilgili olcu kirmizi; Strings.cs:65 klasor okuma kapatildi -> sahte dil olcusu kirmizi; ikisi de geri alindi, calisma agaci temiz. KRITIK yok."
+  ],
+  "result": "passed",
+  "createdAt": "2026-08-30T11:30:36.691Z",
+  "usedAt": "2026-08-30T11:30:43.383Z",
+  "completedSha": "052d949009fbc492dbe4e6943e01bdec71198fde"
+}

@@ -78,3 +78,5 @@
 {"id":"T78","round":"2","risk":"low","verify":["dotnet test -c Release --filter \"ThemeTokenTests|ThemeBackdropTests"],"auditorRunId":null,"headSha":"7e910d7c3f8163b07c864fe223bacd426f28daaf","at":"2026-08-29T23:32:08.933Z"}
 {"id":"T81","result":"stale","at":"2026-08-30T11:16:33.354Z"}
 {"id":"T82","result":"stale","at":"2026-08-30T11:16:33.354Z"}
+{"id":"T83","result":"stale","at":"2026-08-30T11:25:47.855Z"}
+{"id":"T81","round":"1","risk":"high","verify":["dotnet test -c Release --filter LocalizationTests"],"auditorRunId":"a5c175e553acf0e73","headSha":"052d949009fbc492dbe4e6943e01bdec71198fde","at":"2026-08-30T11:30:43.384Z"}
