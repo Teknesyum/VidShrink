@@ -18,3 +18,12 @@ düzenek `tools/`a taşınır; geri kalan `.calisma/` ile birlikte gider.
 
 Ajan worktree'si de birikinti: dalı `main`e birleştikten sonra
 `git worktree remove` ile kaldır.
+
+## Dallar
+
+**`main`e yalnız T0 birleştirir.** Kim olursan ol — alt ajan, Sole, uzak makinedeki bir
+ajan — kendi dalında çalış ve oraya it: `git switch -c <sahip>/<is>`. `main`in çalışma
+ağacında doğrudan yazma; iki taraf aynı dosyayı yazınca yarım iş commit'e karışıyor.
+
+Dal adı sahibi ve işi söyler: `sole/sagtik-win11`, `serkan/macos-ilk-kosum`,
+`worktree-agent-<id>` (alt ajanlar bunu kendi kurar).
