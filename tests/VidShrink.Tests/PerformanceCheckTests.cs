@@ -667,7 +667,7 @@ public sealed class PerformanceCheckTests
             Atlandi($"bu makinenin islemci zamani sayaci is parcacigi duzeyinde guvenilir okumadi " +
                     $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi");
 
-        Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
+        if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
 
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t63tani_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(dir);
@@ -684,12 +684,19 @@ public sealed class PerformanceCheckTests
             for (var i = 0; i < 2; i++)
                 Kos($"(c) x264 serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
                     "-an", "-c:v", "libx264", "-preset", "veryfast", "-f", "null", "-" });
-            for (var i = 0; i < 2; i++)
-                Kos($"(d) nvenc -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
-                    "-an", "-c:v", "h264_nvenc", "-threads", "1", "-f", "null", "-" });
-            for (var i = 0; i < 2; i++)
-                Kos($"(e) nvenc serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
-                    "-an", "-c:v", "h264_nvenc", "-f", "null", "-" });
+            if (EncoderCapabilities.Instance.HasEncoder("h264_nvenc"))
+            {
+                for (var i = 0; i < 2; i++)
+                    Kos($"(d) nvenc -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
+                        "-an", "-c:v", "h264_nvenc", "-threads", "1", "-f", "null", "-" });
+                for (var i = 0; i < 2; i++)
+                    Kos($"(e) nvenc serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
+                        "-an", "-c:v", "h264_nvenc", "-f", "null", "-" });
+            }
+            else
+            {
+                Log("[sayac] (d)(e) h264_nvenc bu makinede yok, nvenc gecisleri kosulmadi");
+            }
             for (var i = 0; i < 2; i++)
                 Kos($"(f) taban -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample, "-f", "null", "-" });
 

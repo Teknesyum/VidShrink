@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Linq;
+using Avalonia.Controls;
 using VidShrink.Ffmpeg;
 using Xunit;
 
@@ -59,5 +61,29 @@ public class MacOsStartupTests
         if (OperatingSystem.IsMacOS()) return;
 
         Assert.Throws<FileNotFoundException>(() => ToolLocator.Locate("ffmpeg", ""));
+    }
+
+    /// <summary>
+    /// <see cref="AppHost"/> pencere arka ucunu platforma göre seçiyor. Ölçüm seçimi
+    /// betikten değil kurulmuş çalışma zamanından okuyor: Windows'ta kurulan arka ucun
+    /// hâlâ Win32 olduğunu, yani dalın Windows tarafında hiçbir şeyi değiştirmediğini
+    /// bu doğruluyor. macOS ile Linux'ta Avalonia Native ile X11 pencereyi sürecin ana
+    /// iş parçacığında kurmayı şart koşuyor, o iş parçacığı da xUnit koşucusunun elinde;
+    /// oralarda başsız arka uç kuruluyor ve çizimi yine Skia yapıyor.
+    /// </summary>
+    [Fact]
+    public void TheWindowingBackendIsWin32OnWindowsAndHeadlessElsewhere()
+    {
+        AppHost.Run(() => new Window());
+
+        var loaded = AppDomain.CurrentDomain.GetAssemblies()
+            .Select(assembly => assembly.GetName().Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var expected = OperatingSystem.IsWindows() ? "Avalonia.Win32" : "Avalonia.Headless";
+        var other = OperatingSystem.IsWindows() ? "Avalonia.Headless" : "Avalonia.Win32";
+
+        Assert.Contains(expected, loaded);
+        Assert.DoesNotContain(other, loaded);
     }
 }

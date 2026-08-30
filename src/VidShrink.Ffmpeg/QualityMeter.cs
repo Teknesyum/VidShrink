@@ -98,12 +98,13 @@ public static class QualityMeter
     private static async Task<string> RunFilterAsync(
         string testPath, string referencePath, int width, int height, string filterChain, CancellationToken ct)
     {
+        var scaler = EncoderCapabilities.Instance.HasFilter("zscale") ? "zscale" : "scale";
         var args = new[]
         {
             "-hide_banner", "-nostdin",
             "-i", testPath,
             "-i", referencePath,
-            "-lavfi", $"[0:v]zscale=w={width}:h={height}[t];[t][1:v]{filterChain}",
+            "-lavfi", $"[0:v]{scaler}=w={width}:h={height}[t];[t][1:v]{filterChain}",
             "-f", "null", "-"
         };
 

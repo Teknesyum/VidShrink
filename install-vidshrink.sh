@@ -4,6 +4,7 @@ set -eu
 repository='Teknesyum/VidShrink'
 install_root=${VIDSHRINK_INSTALL_ROOT:-"$HOME/.local/share/vidshrink"}
 bin_directory="$HOME/.local/bin"
+bundle_path="$HOME/Applications/VidShrink.app"
 
 say() {
     printf '%s\n' "$1"
@@ -23,6 +24,53 @@ note() {
 require_command() {
     command -v "$1" >/dev/null 2>&1 || fail "$1 bulunamadı. Kurulum için gereklidir."
 }
+
+# Kurulumun bıraktığı üç iz: uygulama paketi, düz kurulum dizini, PATH'teki kısayol.
+# Kısayol yalnız buraya bakıyorsa siliniyor; kullanıcının kendi koyduğu bir vidshrink
+# başka bir yeri gösteriyorsa ona dokunulmuyor.
+uninstall() {
+    removed=''
+
+    if [ -e "$bundle_path" ]; then
+        rm -rf "$bundle_path"
+        removed="$removed$bundle_path
+"
+    fi
+
+    if [ -e "$install_root" ]; then
+        rm -rf "$install_root"
+        removed="$removed$install_root
+"
+    fi
+
+    link="$bin_directory/vidshrink"
+    if [ -L "$link" ]; then
+        target=$(readlink "$link")
+        case "$target" in
+            "$bundle_path"/*|"$install_root"/*)
+                rm -f "$link"
+                removed="$removed$link
+" ;;
+        esac
+    fi
+
+    if [ -z "$removed" ]; then
+        say 'Kaldırılacak bir kurulum bulunamadı.'
+    else
+        printf 'Silindi:\n%s' "$removed"
+    fi
+}
+
+case "$install_root" in
+    "$HOME/.local/share"/?*) : ;;
+    *) fail "Güvenlik nedeniyle kurulum yolu ~/.local/share altında olmalıdır: $install_root" ;;
+esac
+
+case "${1:-}" in
+    '') : ;;
+    --uninstall) uninstall; exit 0 ;;
+    *) fail "Bilinmeyen seçenek: $1. Kaldırmak için --uninstall kullanın." ;;
+esac
 
 # Yayında dört hedef var: win-x64, osx-arm64, osx-x64, linux-x64. Başka bir mimaride
 # yanlış arşivi sessizce kurmak yerine burada duruluyor.
@@ -135,11 +183,6 @@ runtime=$(runtime_identifier)
 archive_name="vidshrink-$runtime.zip"
 checksums_name="checksums-$runtime.txt"
 
-case "$install_root" in
-    "$HOME/.local/share"/?*) : ;;
-    *) fail "Güvenlik nedeniyle kurulum yolu ~/.local/share altında olmalıdır: $install_root" ;;
-esac
-
 say 'VidShrink kurulumu hazırlanıyor...'
 require_ffmpeg
 
@@ -181,28 +224,50 @@ unzip -qo "$archive_file" -d "$stage_root"
 # indirmekten kurtuluyor; burada uygulamanın kurulu sürümü bildirmesi için duruyor.
 printf '%s' "$version" > "$stage_root/.update-version"
 
-rm -rf "$install_root"
-mkdir -p "$install_root" "$bin_directory"
-cp -R "$stage_root/." "$install_root/"
-
 # Burada başlatıcı yok: kendini güncelleme yalnız Windows'ta açık, kısayol doğrudan
 # uygulamayı gösterir.
-installed_executable=''
+staged_executable=''
 for candidate in VidShrink VidShrink.App; do
-    if [ -f "$install_root/$candidate" ]; then
-        installed_executable="$install_root/$candidate"
+    if [ -f "$stage_root/$candidate" ]; then
+        staged_executable=$candidate
         break
     fi
 done
-[ -n "$installed_executable" ] || fail 'Kurulan VidShrink çalıştırılabiliri bulunamadı.'
-chmod +x "$installed_executable"
-ln -sf "$installed_executable" "$bin_directory/vidshrink"
+[ -n "$staged_executable" ] || fail 'Kurulan VidShrink çalıştırılabiliri bulunamadı.'
 
-say "VidShrink $version kuruldu: $install_root"
+mkdir -p "$bin_directory"
+
+# macOS'ta kurulum uygulama paketinin kendisi; yük hem ~/.local/share hem paket içinde
+# tutulsa yayın iki kez saklanmış olurdu. Paket yerelde üretildiği için karantina
+# almıyor ve ad-hoc imzayla açılıyor — noterleme gerekmiyor.
+#
+# Paketleme betiği arşivin içinden geliyor. Taşımayan eski bir yayın kurulduğunda düz
+# kuruluma düşülüyor: uygulama yine çalışır, yalnız Dock kimliği ve çift tık olmaz.
+if [ "$(uname -s)" = 'Darwin' ] && [ -f "$stage_root/macos-app-bundle.sh" ]; then
+    rm -rf "$install_root"
+    mkdir -p "$HOME/Applications"
+    sh "$stage_root/macos-app-bundle.sh" "$stage_root" "$staged_executable" "$version" "$bundle_path" || \
+        fail 'Uygulama paketi üretilemedi.'
+    installed_executable="$bundle_path/Contents/MacOS/VidShrink"
+    say "VidShrink $version kuruldu: $bundle_path"
+else
+    if [ "$(uname -s)" = 'Darwin' ]; then
+        note 'Bu yayın paketleme betiğini taşımıyor; uygulama paketi olmadan kuruldu.'
+    fi
+    rm -rf "$install_root"
+    mkdir -p "$install_root"
+    cp -R "$stage_root/." "$install_root/"
+    installed_executable="$install_root/$staged_executable"
+    chmod +x "$installed_executable"
+    say "VidShrink $version kuruldu: $install_root"
+fi
+
+ln -sf "$installed_executable" "$bin_directory/vidshrink"
 # macOS ve Linux'ta uygulama kendini güncellemez: paket içindeki bir dosya değişince
 # Gatekeeper imzası bozulur ve uygulama hiç açılmaz. Güncelleme bu betiği yeniden
 # çalıştırmakla olur.
 say 'Güncellemek için bu komutu yeniden çalıştırın.'
+say 'Kaldırmak için: --uninstall'
 case ":${PATH}:" in
     *":$bin_directory:"*) say 'Çalıştırmak için: vidshrink' ;;
     *) say "Çalıştırmak için: $bin_directory/vidshrink ($bin_directory henüz PATH içinde değil)" ;;

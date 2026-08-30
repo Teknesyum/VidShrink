@@ -38,6 +38,16 @@
     <MacHostName>VidShrink</MacHostName>
   </PropertyGroup>
 
+  <!-- macOS yayını iki dosya daha taşıyor: kurulum betiğinin uygulama paketini kurarken
+       çağırdığı paketleme betiği ve paketin simgesini ürettiği görsel. Görsel zaten
+       AvaloniaResource olarak derlemeye gömülü; paketleyici derlemenin içini açamayacağı
+       için yanına düz dosya olarak da kopyalanıyor. Betik arşivin içinden geldiği için
+       sardığı yayınla her zaman aynı sürümden. -->
+  <ItemGroup Condition="$(RuntimeIdentifier.StartsWith('osx'))">
+    <None Include="..\..\macos-app-bundle.sh" CopyToPublishDirectory="PreserveNewest" Link="macos-app-bundle.sh" />
+    <None Include="Assets\VidShrink.png" CopyToPublishDirectory="PreserveNewest" Link="VidShrink.png" />
+  </ItemGroup>
+
   <Target Name="RenameMacHost" AfterTargets="Publish"
           Condition="$(RuntimeIdentifier.StartsWith('osx')) And '$(AssemblyName)' != '$(MacHostName)'">
     <Move SourceFiles="$(PublishDir)$(AssemblyName)" DestinationFiles="$(PublishDir)$(MacHostName)" />

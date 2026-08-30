@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 using Avalonia;
+using Avalonia.Headless;
 using VidShrink.App.Localization;
 
 namespace VidShrink.Tests;
@@ -17,6 +18,11 @@ namespace VidShrink.Tests;
 /// Bu yüzden kurulum ayrı bir iş parçacığına alındı; Avalonia nesnesine dokunan ölçüm
 /// <see cref="Run{T}"/> ile o iş parçacığına gönderilir ve hangi sınıfın önce koştuğu
 /// artık sonucu değiştirmez.
+///
+/// Pencere arka ucu platforma göre seçilir (<see cref="Backend"/>). Windows'ta Win32,
+/// başka her yerde Avalonia'nın başsız arka ucu: Avalonia Native ile X11 pencereyi
+/// sürecin ana iş parçacığında kurmayı şart koşar, bu iş parçacığı ise xUnit koşucusunun
+/// elinde. Başsız arka uç o şartı koymaz, çizimi yine Skia yapar.
 /// </summary>
 internal static class AppHost
 {
@@ -24,6 +30,9 @@ internal static class AppHost
     private static readonly BlockingCollection<Action> Queue = new();
     private static Thread? _host;
     private static bool _ready;
+
+    /// <summary>Bu platformda kurulan pencere arka ucu.</summary>
+    internal static string Backend => OperatingSystem.IsWindows() ? "Win32" : "Headless";
 
     internal static void Ensure()
     {
@@ -35,7 +44,13 @@ internal static class AppHost
             var thread = new Thread(() =>
             {
                 if (Application.Current is null)
-                    AppBuilder.Configure<VidShrink.App.App>().UseSkia().UseWin32().SetupWithoutStarting();
+                {
+                    var builder = AppBuilder.Configure<VidShrink.App.App>().UseSkia();
+                    builder = Backend == "Win32"
+                        ? builder.UseWin32()
+                        : builder.UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
+                    builder.SetupWithoutStarting();
+                }
 
                 started.Set();
 
