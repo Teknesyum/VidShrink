@@ -9,13 +9,23 @@ Kullanıcı 17 dakikalık bir videoyu hedef boyuta küçülttü: HandBrake'in ç
 bizimki kötü. Motorda neyin ne kadar pahalıya geldiğini bilmeden düzeltme yazmak
 tahmin olur. Bu paket o açığı sayıya çeviriyor.
 
-Şüpheli üç karar — hangisinin ne kadar kötü olduğunu ölçüm söyleyecek:
+Şüpheli **dört** karar — hangisinin ne kadar kötü olduğunu ölçüm söyleyecek:
 
 1. **Çözünürlük düşürme.** `CompressionStrategy.AllowsResolutionDrop` `Light` dışında
    her rejimde açık. HandBrake hedef boyutta çözünürlüğü korur, kaliteyi düşürür.
 2. **Kare hızı düşürme.** `AllowsFpsDrop` `Aggressive` ve `Extreme`'de açık.
 3. **Donanım kodlayıcı.** Aynı bit hızında nvenc/qsv/amf, x264/x265 `slow`'un belirgin
    altında kalır. Plan hız için donanımı seçiyorsa kaliteyi orada kaybediyoruz.
+4. **Tepe hız tavanı.** `FfmpegArguments.PeakRateFactor` donanımda `TightPeakFactor = 1.02`
+   veriyor: `-maxrate` ortalamanın %2 üstü, `bufsize` 1.04×. Bu fiilen CBR — kodlayıcı zor
+   sahneye kolay sahneden bit taşıyamıyor. Tavan ancak istek/taban oranı
+   `PeakOpensAtFloorRatio = 6.0`'ı aşınca açılıyor ve 17 dakikalık 1080p bir kaynakta o oran
+   tipik olarak altında kalıyor. HandBrake ABR'de VBV kısıtsız. Sabitin kod içindeki
+   gerekçesi de dar: ölçüm tek makinede, 400 sn'lik bir ekran kaydında yapılmış — düşük
+   varyanslı içerikte boyut isabeti satın alınmış olabilir.
+
+Bu dördüncüsü sonradan eklendi ve **İş 2'de dördüncü ablasyon olarak koşulması şart.**
+Üç kararın toplamı açığı açıklamıyorsa kalan payın burada olması bekleniyor.
 
 ## Ölçüm düzeni
 
@@ -42,6 +52,26 @@ Her kaynak için üç oran: kaynağın **1/2**, **1/6** ve **1/20** boyutu. Bunl
 `CompressionStrategy.RegimeFor` sınırlarının (`1.5`, `6.0`, `30.0`) iki yanına düşüyor,
 yani üç ayrı rejim ölçülmüş oluyor.
 
+### Taban tam olarak ne koşuyor
+
+Kullanıcının şikâyet ettiği çıktı büyük olasılıkla varsayılan hızlı yoldan geldi:
+`HardwareVerdict.ApplyTo` sağlıklı GPU'da hızlı GPU modunu **açık** yazıyor ve
+`PlanCalculator.FastHardwareOrder[0]` `av1_nvenc`. Taban koşumun bu yapılandırmayı birebir
+yakaladığını göster — seçilen kodlayıcıyı, `-maxrate`/`-bufsize` değerlerini ve `-g`'yi
+raporda **gerçek komut satırından** yaz.
+
+`-g` zaten şüpheli: `Math.Round(plan.Fps * 2)`, yani 2 saniyelik GOP. x264/x265/nvenc
+varsayılanı ~10 saniye ve düşük bit hızında her I-kare pahalı. Ölçmüyorsun, ama komut
+satırında görünsün.
+
+### Kaynak HDR mi
+
+Her kaynak için renk aktarımını yaz (`ffprobe` `color_transfer`). HDR ise şunu ayrıca
+kontrol et: `HdrResolver.Hdr10Codecs` yalnız `libx265`, `libsvtav1`, `hevc_nvenc` içeriyor —
+**`av1_nvenc` içinde yok.** Yani varsayılan hızlı yolda HDR kaynak sessizce hable ile
+tonemap ediliyor. Öyleyse "belirgin kötü" izleniminin bir kısmı sıkıştırma değil renk
+olabilir. Çıktının tonemap'e düşüp düşmediğini rapora yaz.
+
 ## İş 1 — açık ne kadar
 
 Her kaynak × her hedef için tabloya şunlar girer: teslim edilen boyut, VMAF, XPSNR,
@@ -53,12 +83,16 @@ durumu da yaz.
 
 ## İş 2 — açığı üç karara dağıt
 
-Aynı kaynak ve aynı hedefte VidShrink'i dört kez koştur:
+Aynı kaynak ve aynı hedefte VidShrink'i **beş** kez koştur:
 
 1. Olduğu gibi (taban).
 2. Çözünürlük düşürme kapalı.
 3. Kare hızı düşürme kapalı.
 4. Kodlayıcı yazılıma sabitlenmiş (`libx265` ya da `libx264`, `slow`).
+5. Tepe tavanı açık: `PeakRateFactor` donanımda da `WidePeakFactor` (1.5) dönsün.
+
+Beşinci koşum dördüncüden bağımsız olmalı — yazılıma sabitleme koşumu da bugünkü tavanla
+kısıtlı kalırsa fark tam kapanmaz ve açık yanlış karara yazılır.
 
 Her koşumda VMAF ve süreyi yaz. Cevap: **her kararın kaç VMAF puanına ve kaç saniyeye
 mal olduğu.** Kapatma yollarını kalıcı seçenek olarak eklemene gerek yok; ölçüm için
@@ -75,6 +109,20 @@ parametresi, ses kararı, kap seçeneği. Listeyi **değer sırasına** koy: han
 gerçekten değiştiriyor, hangisi süs.
 
 Bu liste bir sonraki paketin gündemi olacak, o yüzden eksiksiz olsun.
+
+Listeye **mutlaka bakılacak iki kalem** — ikisi de kendi taramamızda yazılı, motorda
+karşılığı yok:
+
+- **Psiko-görsel kodlayıcı parametreleri.** `FfmpegArguments.Build` bugün hiçbirini
+  üretmiyor; svt-av1 varsayılan tune (PSNR) ile bulanıklaştırıyor.
+  `docs/taramalar/svt-av1-psy.md` somut üçlüyü veriyor. Aynı tarama `-svtav1-params`'ın
+  **çıkış kodu 0 ile sessizce hata yuttuğunu** yerelde doğrulamış — bir parametre yazarsan
+  gerçekten uygulandığını çıktıdan doğrula, dönüş kodundan değil.
+- **Turbo ilk geçiş** (`docs/taramalar/handbrake.md`). Yazılım kodlayıcıya dönmenin süre
+  cezasını yarıya indiriyor; ölçüm 4 numaralı ablasyonun duvar saatini bununla da ver.
+
+Şunu **listeye alma**: altyazı, bölüm işaretleri, kuyruk, kap seçenekleri. Bunlar ürün
+ekseni, kalite ekseni değil; ayrı bir pakette konuşulacak.
 
 ## Çıktı
 
