@@ -85,20 +85,49 @@ Beşli ablasyonu yalnız 1/20 hedefinde koştun. O uçta her şey zaten yıkık:
 tabanla aynı kararı verdi, yazılım −0,17, geniş tepe −0,29 çıktı. Şikâyetin rejimi orası
 değil — 17 dakikalık 1080p60 için ~120 MiB, yani yaklaşık 940 kbps.
 
-Kabul kriteri: ablasyon **şikâyetin rejiminde** tekrarlansın. Tepe tavanının orada
+Kabul kriteri: ablasyon **şikâyetin rejiminde** tekrarlansın — gerçek kaynak, gerçek hedef (~117 MB, oran 14,9, Aggressive rejimi). Tepe tavanının orada
 açık mı kapalı mı olduğu ayrıca yazılsın — HDR 1/6'da açıldığını (`-b:v 7034k` /
 `-maxrate 7737k` = 1,10×) zaten görmüşsün, SDR 1/20'de 1,02× ile fiilen CBR'di. Hangi
 oranda hangisinin geçerli olduğu tabloya girsin.
 
-## Kaynak
+## Kaynak geldi — artık elimizde
 
-`VIDSHRINK_LIVE_SOURCE` boştu ve kullanıcının 17 dakikalık dosyası gelmedi; iki kısa
-sentetik klip kaldı, ikisi de aynı arşivden. Bu tek başına tablonun genellenememesinin
-ikinci nedeni.
+Kullanıcı orijinali verdi. Yeri (git'e girmez, `.calisma/` yoksayılı):
 
-Kullanıcının dosyası hâlâ gelmezse **en az bir gerçek çekim** bul: sentetik desen değil,
-kamera ya da oyun kaydı, en az 60 saniye, tercihen 1080p60. `trash/` altındaki iki çıktı
-**referans değil** — ikisi de sıkıştırılmış.
+```
+.calisma/kaynak/kaynak-1080p60-hdr-17dk.mp4
+```
+
+`ffprobe`: 1036,17 sn, **1920×1080@60**, HEVC Main 10, `yuv420p10le`,
+`bt2020nc` / **`smpte2084`** / `bt2020`, video 13.148 kbps, ses 192 kbps, 1.729.085.563
+bayt. İlk 2 saniyede mastering display yan verisi görünmüyor — statik HDR10 metadata'nın
+kaynakta olup olmadığını sen doğrula, çıktıya ne geçeceği buna bağlı.
+
+Oran: 1729 MB → ~117 MB, yani **14,9**. Bu `CompressionStrategy.RegimeFor` sınırlarında
+**Aggressive** (6,0–30,0): hem çözünürlük hem kare hızı düşürme açık, tabanlar 0,20 / 180p
+/ 10 fps. Şikâyetin rejimi bu; ablasyon burada koşulacak.
+
+### Bunu ilk iş yap — üç dosya zaten eş boyutta
+
+`trash/` altındaki iki çıktı aynı kaynaktan ve birbirinin **%2,1** içinde
+(116.579.291 ve 119.039.598 bayt). Yani eş boyut karşılaştırması fiilen zaten yapılmış;
+eksik olan tek şey referanstı, o da geldi. Yeniden kodlamadan önce **bu üçlüyü ölç**:
+
+1. **HandBrake çıktısı ↔ kaynak.** İkisi de PQ/BT.2020 10 bit; bu karşılaştırma geçerli.
+   Tek sayı: HandBrake bu bütçede kaç VMAF teslim etmiş.
+2. **VidShrink çıktısı ↔ kaynak.** Renk uzayları uyuşmuyor; İş 2'nin kuralı gereği bu
+   **sayı üretmemeli**, "karşılaştırılamaz" dönmeli. Dönmüyorsa İş 2 bitmemiştir.
+3. **VidShrink çıktısı ↔ tonemap edilmiş kaynak.** Kaynağı, VidShrink'in kendi ürettiği
+   filtre zinciriyle birebir aynı şekilde tonemap et
+   (`zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p`),
+   sonra karşılaştır. Bu, **sıkıştırmada kaybettiğimizi** verir.
+
+(1) ile (3) arasındaki fark sıkıştırma açığı; (2)'nin ölçülemez oluşu renk açığı. Şikâyetin
+iki ayrı nedeni bu ikisi ve tek bir VMAF sayısına sıkıştırılamazlar. Raporun baş cümlesi
+bu ayrımı yapsın.
+
+`trash/` altındaki iki çıktı **referans değil**, ikisi de sıkıştırılmış — yalnız ölçülen
+taraf olarak kullan.
 
 ## Sınırlar
 
