@@ -121,18 +121,23 @@ public static class ArchitectureChoice
 
 /// <summary>
 /// Sürüm karşılaştırması, manifest okuma ve fark hesabı. Platformdan bağımsız; indirme ve
-/// dosya değiştirme burada değil, başlatıcıda ve yalnız Windows'ta yaşıyor.
+/// dosya değiştirme burada değil: Windows'ta başlatıcıda, macOS'ta <see cref="MacUpdate"/>'te.
 /// </summary>
 public static class UpdateCheck
 {
     public const string VersionMarkerName = ".update-version";
 
-    /// <summary>Uygulamanın kendini güncelleyebildiği tek platform Windows.</summary>
-    public static bool CanSelfUpdate => OperatingSystem.IsWindows();
+    /// <summary>
+    /// Uygulama kendini güncelleyebilir mi. Windows'ta her zaman; macOS'ta yalnız çalışan
+    /// ikili bir <c>.app</c> paketinin içindeyken (<see cref="MacUpdate.CanSwap"/>) — düz
+    /// kurulumda kapalı kalır ve kullanıcı yeni sürümü yine haber olarak görür. Linux'ta kapalı.
+    /// </summary>
+    public static bool CanSelfUpdate =>
+        OperatingSystem.IsWindows() || MacUpdate.CanSwap(Environment.ProcessPath);
 
     /// <summary>
-    /// Sessiz güncelleme yürürlükte mi. Kapalıysa ve Windows dışında, uygulama yalnız
-    /// haber verir: aynı dal, iki eksen.
+    /// Sessiz güncelleme yürürlükte mi. Kapalıysa ve kendini güncelleyemeyen bir kurulumda,
+    /// uygulama yalnız haber verir: aynı dal, iki eksen.
     /// </summary>
     public static bool AutoUpdateEnabled(UpdateSettings? settings = null) =>
         CanSelfUpdate && (settings ?? UpdateSettings.Load()).AutoUpdate;
@@ -1217,6 +1222,281 @@ public static class UpdateRollout
 
         LauncherUpdate.MarkVerified(baseDirectory, manifest);
         return false;
+    }
+}
+
+/// <summary>
+/// macOS'ta kendini güncelleme. Windows'takinden ayrı bir yol, çünkü güncellemenin birimi
+/// başka: paket imzası <c>Contents/</c>i mühürlüyor, mühürden sonra içeriden tek bir dosya
+/// değişirse paket hiç açılmıyor. Dosya farkı bir <c>.app</c> üzerinde çalışamaz; inen şey
+/// paketin tamamı, değişen şey tek bir dizin adı.
+///
+/// Sıra: açılışta hazırlama dizini koşulsuz silinir, sonra yeni paket <em>kurulu paketin
+/// yanına</em> hazırlanır — aynı dizin, dolayısıyla aynı birim, çünkü <c>renamex_np</c>
+/// birim geçemez. Çıkışta, uygulama paketten kod yüklemeyi bitirdikten sonra, tek bir
+/// <c>RENAME_SWAP</c> ile yer değiştirilir. İmza takasın <em>önünde</em> doğrulanır.
+///
+/// Eski paket takas anında silinmez; hazırlama dizininde kalır ve onu bir sonraki açılışın
+/// koşulsuz silmesi alır. Çalışan sürecin altından hiçbir şey silinmiyor.
+/// </summary>
+public static class MacUpdate
+{
+    /// <summary>Kurulu paketin yanındaki hazırlama dizini; takas aynı birimde kalsın diye kardeş.</summary>
+    public const string StageFolderName = ".vidshrink-update";
+
+    /// <summary>Paketleme adımı yayın arşivinden geliyor, sardığı yayınla aynı sürümden.</summary>
+    public const string BundleScriptName = "macos-app-bundle.sh";
+
+    /// <summary>Paketin içindeki ana çalıştırılabilirin adı.</summary>
+    public const string HostName = "VidShrink";
+
+    /// <summary>Arşivin tamamının inmesi için tanınan süre.</summary>
+    public static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(10);
+
+    private const string TranslocationMarker = "/AppTranslocation/";
+    private const string PayloadFolderName = "payload";
+    private const string WriteProbeName = ".vidshrink-write-probe";
+    private const uint RenameSwap = 0x00000002;
+
+    private static Task<bool>? _prepared;
+
+    [DllImport("libc", SetLastError = true)]
+    private static extern int renamex_np(string from, string to, uint flags);
+
+    /// <summary>
+    /// Çalışan ikilinin içinde durduğu <c>.app</c> kökü; ikili bir paketin
+    /// <c>Contents/MacOS/</c> dizininde değilse null. Düz kurulumun yolu bunu null döndürür.
+    /// </summary>
+    public static string? BundleOf(string? executablePath)
+    {
+        if (string.IsNullOrWhiteSpace(executablePath)) return null;
+
+        var macOs = Path.GetDirectoryName(executablePath);
+        if (macOs is null || Path.GetFileName(macOs) != "MacOS") return null;
+
+        var contents = Path.GetDirectoryName(macOs);
+        if (contents is null || Path.GetFileName(contents) != "Contents") return null;
+
+        var bundle = Path.GetDirectoryName(contents);
+        return bundle is not null && bundle.EndsWith(".app", StringComparison.Ordinal) ? bundle : null;
+    }
+
+    /// <summary>
+    /// Paket App Translocation altında mı. Oradaki bir kopya kendi paketine yazamaz; kurulum
+    /// karantinasız paket bıraktığı için oraya girmez, tarayıcıdan inip sürüklenmiş bir kopya girer.
+    /// </summary>
+    public static bool Translocated(string bundle) =>
+        bundle.Contains(TranslocationMarker, StringComparison.Ordinal);
+
+    /// <summary>
+    /// Kendini güncelleme kapısı: çalışan ikili bir <c>.app</c> paketinin içinde, paket
+    /// taşınmamış ve paketin durduğu dizin yazılabilir. Üçü birden sağlanmazsa kapalı.
+    /// </summary>
+    public static bool CanSwap(string? executablePath)
+    {
+        if (!OperatingSystem.IsMacOS()) return false;
+
+        var bundle = BundleOf(executablePath);
+        if (bundle is null || Translocated(bundle)) return false;
+
+        var parent = Path.GetDirectoryName(bundle);
+        return parent is not null && Writable(parent);
+    }
+
+    public static string StageRoot(string bundle) =>
+        Path.Combine(Path.GetDirectoryName(bundle) ?? "", StageFolderName);
+
+    public static string StagedBundle(string bundle) =>
+        Path.Combine(StageRoot(bundle), Path.GetFileName(bundle));
+
+    /// <summary>Hazırlama dizinini siler; orada ne bulunursa bulunsun çalışan paket o değildir.</summary>
+    public static void Discard(string bundle)
+    {
+        var stage = StageRoot(bundle);
+        try { if (Directory.Exists(stage)) Directory.Delete(stage, recursive: true); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+    }
+
+    /// <summary>Paketin mührü sağlam mı. Takasın önündeki kapı budur.</summary>
+    public static bool SignatureValid(string bundle) =>
+        Run("/usr/bin/codesign", "--verify", "--strict", bundle) == 0;
+
+    /// <summary>
+    /// Hazırlanmış paketi kurulu paketle değiştirir. İmza önce doğrulanır; doğrulanmazsa
+    /// hazırlama dizini atılır ve kurulu pakete hiç dokunulmaz. Takasın kendisi tek çağrı:
+    /// <c>renamex_np(..., RENAME_SWAP)</c> ya iki yolu birlikte değiştirir ya hiçbirini.
+    /// <c>Directory.Move</c> burada kullanılamaz — dolu bir hedefin üstüne geçmediği için
+    /// iki adıma bölünür ve arada çökme kullanıcıyı paketsiz bırakır.
+    /// </summary>
+    public static bool Commit(string bundle)
+    {
+        var staged = StagedBundle(bundle);
+        if (!Directory.Exists(staged)) return false;
+
+        if (!SignatureValid(staged))
+        {
+            Discard(bundle);
+            return false;
+        }
+
+        return renamex_np(staged, bundle, RenameSwap) == 0;
+    }
+
+    /// <summary>
+    /// Yeni sürümü paketin yanına hazırlar: arşivin tamamı iner, her dosyanın özeti manifestle
+    /// karşılaştırılır, yayının kendi paketleme betiği koşar, üretilen paket ad-hoc imzalanır ve
+    /// imzası doğrulanır. Adımlardan biri düşerse hazırlama dizini silinir ve kurulu pakete o
+    /// ana kadar hiç dokunulmamıştır.
+    /// </summary>
+    public static async Task<bool> PrepareAsync(
+        string bundle,
+        string currentVersion,
+        string? source,
+        CancellationToken cancellationToken)
+    {
+        var rid = UpdateCheck.Rid;
+        try
+        {
+            var json = await ReadManifestAsync(rid, source, cancellationToken);
+            if (json is null) return false;
+
+            var manifest = UpdateCheck.ParseManifest(json);
+            if (manifest.Files.Count == 0) return false;
+            if (!UpdateCheck.IsNewer(manifest.Version, currentVersion)) return false;
+
+            var payload = Path.Combine(StageRoot(bundle), PayloadFolderName);
+            Directory.CreateDirectory(payload);
+            await ExtractAsync(rid, source, payload, cancellationToken);
+
+            var mismatch = UpdateStage.FindMismatch(payload, manifest.Files);
+            if (mismatch is not null)
+                throw new InvalidDataException($"İnen dosyanın özeti tutmadı: {mismatch.Path}");
+
+            await File.WriteAllTextAsync(
+                Path.Combine(payload, UpdateCheck.VersionMarkerName), manifest.Version, cancellationToken);
+
+            var script = Path.Combine(payload, BundleScriptName);
+            if (!File.Exists(script))
+                throw new FileNotFoundException($"Yayın paketleme betiğini taşımıyor: {BundleScriptName}");
+
+            var staged = StagedBundle(bundle);
+            if (Run("/bin/sh", script, payload, HostExecutable(payload), manifest.Version, staged) != 0)
+                throw new InvalidOperationException("Uygulama paketi üretilemedi.");
+
+            if (!SignatureValid(staged))
+                throw new InvalidDataException("Üretilen paketin imzası geçersiz.");
+
+            Directory.Delete(payload, recursive: true);
+            return true;
+        }
+        catch (Exception)
+        {
+            Discard(bundle);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Açılış adımı: artık hazırlama dizini koşulsuz silinir, sonra yeni sürüm arka planda
+    /// hazırlanır. macOS dışında ve paket içinde çalışmayan bir ikilide hiçbir şey yapmaz.
+    /// </summary>
+    public static void Begin()
+    {
+        if (!OperatingSystem.IsMacOS()) return;
+        if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return;
+
+        var bundle = BundleOf(Environment.ProcessPath);
+        if (bundle is null) return;
+
+        Discard(bundle);
+        if (!UpdateCheck.AutoUpdateEnabled()) return;
+
+        var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
+        var version = UpdateCheck.CurrentVersion();
+        _prepared = Task.Run(() => PrepareAsync(bundle, version, source, CancellationToken.None));
+    }
+
+    /// <summary>
+    /// Çıkış adımı: yalnız bu turda bitmiş bir hazırlama takas edilir. İndirme yarıda
+    /// kaldıysa kurulu paket olduğu gibi kalır, artık bir sonraki açılışta silinir.
+    ///
+    /// Çağrıldığı yer uygulama ömrünün <c>Exit</c> olayı, <c>Main</c>'in sonu değil: macOS'ta
+    /// AppKit'in sonlandırması Avalonia'nın <c>Start</c>'ından geri dönmüyor, o yüzden
+    /// <c>Start</c>'tan sonraki bir satır menüden çıkışta hiç koşmuyor.
+    /// </summary>
+    public static bool Finish()
+    {
+        if (_prepared is null || !_prepared.IsCompletedSuccessfully || !_prepared.Result) return false;
+
+        var bundle = BundleOf(Environment.ProcessPath);
+        return bundle is not null && Commit(bundle);
+    }
+
+    /// <summary>
+    /// Eski yayınların ana ikilisi hâlâ <c>VidShrink.App</c> adını taşıyor; kurulum betiği de
+    /// aynı iki adaya bakıyor.
+    /// </summary>
+    private static string HostExecutable(string payload) =>
+        File.Exists(Path.Combine(payload, HostName)) ? HostName : "VidShrink.App";
+
+    private static async Task<string?> ReadManifestAsync(string rid, string? source, CancellationToken cancellationToken)
+    {
+        var asset = UpdateCheck.ManifestAssetName(rid);
+        if (source is null)
+            return await UpdateCheck.FetchManifestAsync(UpdateCheck.LatestAssetUrl(asset), cancellationToken);
+
+        var local = Path.Combine(source, asset);
+        return File.Exists(local) ? await File.ReadAllTextAsync(local, cancellationToken) : null;
+    }
+
+    private static async Task ExtractAsync(string rid, string? source, string payload, CancellationToken cancellationToken)
+    {
+        var asset = UpdateCheck.ArchiveAssetName(rid);
+        var archive = Path.Combine(Path.GetDirectoryName(payload)!, asset);
+
+        if (source is not null) File.Copy(Path.Combine(source, asset), archive, overwrite: true);
+        else await DownloadAsync(UpdateCheck.LatestAssetUrl(asset), archive, cancellationToken);
+
+        ZipFile.ExtractToDirectory(archive, payload, overwriteFiles: true);
+        File.Delete(archive);
+    }
+
+    private static async Task DownloadAsync(string url, string target, CancellationToken cancellationToken)
+    {
+        using var client = new HttpClient { Timeout = DownloadTimeout };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("VidShrink-Update");
+        using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        await using var file = File.Create(target);
+        await response.Content.CopyToAsync(file, cancellationToken);
+    }
+
+    private static bool Writable(string directory)
+    {
+        var probe = Path.Combine(directory, WriteProbeName);
+        try
+        {
+            using (File.Create(probe)) { }
+            File.Delete(probe);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    private static int Run(string fileName, params string[] arguments)
+    {
+        var start = new ProcessStartInfo(fileName) { RedirectStandardOutput = true, RedirectStandardError = true };
+        foreach (var argument in arguments) start.ArgumentList.Add(argument);
+
+        using var process = Process.Start(start)!;
+        process.StandardOutput.ReadToEnd();
+        process.StandardError.ReadToEnd();
+        process.WaitForExit();
+        return process.ExitCode;
     }
 }
 
