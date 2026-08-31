@@ -15,7 +15,19 @@ Kullanıcının 17:16 oyun kaynağı ve depodaki canlı kaynak bu çalışma ağ
 
 HDR komutunda açıkça `zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709...format=yuv420p` üretildi. Sebep, hızlı sıranın ilk kodlayıcısı `av1_nvenc` iken `HdrResolver.Hdr10Codecs` kümesinde `av1_nvenc` bulunmaması. Dolayısıyla PQ/BT.2020 kaynak sessizce bt709 8-bit'e düşüyor.
 
-Geçici ölçüm yolu `tools/VidShrink.Bench shrink` komutuna yalnız deney için `--speed fast`, `--no-resolution-drop`, `--no-fps-drop`, `--force-codec libx265` ve `--wide-peak` anahtarları eklenerek açıldı. `--wide-peak`, son ffmpeg seçenekleri olarak `-maxrate=1.5×` ve `-bufsize=2×` yazar; yazılım sabitlemesinden bağımsızdır. Kalıcı motor koduna dokunulmadı.
+### Şikâyet tabanının yeniden üretimi
+
+`trash/` altındaki iki dosya kaynak değil, aynı 1036,17 saniyelik işin sıkıştırılmış çıktılarıdır. VidShrink çıktısı 116.579.291 bayt, 882×496@60, `av1_nvenc`, yuv420p/bt709, 758.873 bit/sn video ve 130.009 bit/sn sestir. HandBrake çıktısı 119.039.598 bayt, 1280×720@60, AV1 10-bit/PQ/BT.2020, 640.124 bit/sn video ve 270.021 bit/sn sestir. Bunlar kalite referansı yapılmadı.
+
+Önceki rapordaki 806×454 sonuç bu tabanı yeniden üretmiyordu; çünkü 20 saniyelik 1080p30 SDR klibi **0,685 MiB** hedefe koşmuştu. Şikâyet işi ise çıktı süresi ve boyutundan, ayrıca tam geometri eşleşmesinden görüldüğü üzere 1080p60 HDR ve yaklaşık **120 MiB** hedef yoludur. Kaynak dosyası bulunmadığından yalnız plan kararını sınamak için HandBrake çıktısının sahne karmaşıklığı örneklendi; plan metadata'sı deney anahtarlarıyla 1920×1080 ve kaynak boyutu 1000–3000 MiB aralığına kondu. Bu aralığın tamamında karar değişmeden aşağıdaki gerçek komuta çıktı:
+
+```text
+ffmpeg -hide_banner -y -hwaccel auto -i source -vf scale=882:496:flags=lanczos,zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p -c:v av1_nvenc -preset p5 -b:v 814k -maxrate 830k -bufsize 846k -rc vbr -multipass fullres -g 120 -pix_fmt yuv420p -color_primaries bt709 -color_trc bt709 -colorspace bt709 -c:a aac -b:a 128k -movflags +faststart output.mp4
+```
+
+Böylece dört imza birlikte yeniden üretildi: **`av1_nvenc`**, **882×496**, **HDR→bt709 hable tonemap** ve 60 fps'te **`-g 120` = 2 saniye GOP**. Planın 814k isteğine karşı gerçek dosyada 759k ortalama teslim görülmesi, 116,6 MB çıktının yaklaşık 120 MiB hedefi az miktarda alttan doldurmasıyla uyumludur. Kaynak olmadığı için yeniden üretim plan/komut seviyesindedir; kullanıcı videosu üzerinde VMAF iddiası değildir.
+
+Geçici ölçüm yolu `tools/VidShrink.Bench shrink` komutuna yalnız deney için `--speed fast`, `--no-resolution-drop`, `--no-fps-drop`, `--force-codec libx265`, `--wide-peak` ve kodlama açmadan komutu yazdıran `--plan-only` anahtarları eklenerek açıldı. Eksik kaynağın plan imzasını sınamak için `--source-size` ve `--source-mb` yalnız plan metadata'sını değiştirdi. `--wide-peak`, son ffmpeg seçenekleri olarak `-maxrate=1.5×` ve `-bufsize=2×` yazar; yazılım sabitlemesinden bağımsızdır. Kalıcı motor koduna dokunulmadı.
 
 ## Eş boyut sonuçları
 
