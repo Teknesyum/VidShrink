@@ -10,18 +10,19 @@ _not written yet - one paragraph on what is being attempted and why._
 
 ## Contracts open
 
-None.
+- `T83` — submitted, round 1
+- `T84` — submitted, round 1
 
 ## Closed last
 
-- `T78` — done — 2026-08-29 23:32
-- `T79` — done — 2026-08-29 21:36
-- `T77` — done — 2026-08-29 18:21
-- `T76` — done — 2026-08-29 17:38
-- `T75` — done — 2026-08-29 16:28
+- `T82` — done — 2026-08-30 12:08
+- `T81` — done — 2026-08-30 11:30
+- `T83` — stale — 2026-08-30 11:25
+- `T82` — stale — 2026-08-30 11:16
+- `T81` — stale — 2026-08-30 11:16
 
 ## Tree
 
-- branch: `main`
-- head: `e55abcc T78 muhurlendi: anka katmanli tuylerden kuruluyor, isimanin kenari yok`
+- branch: `sole/sagtik-artiklari`
+- head: `d4f69a9 test: sag tik paketinin davranisini olc`
 - uncommitted files: 0

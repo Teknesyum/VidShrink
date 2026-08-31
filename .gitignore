@@ -7,3 +7,5 @@ tools/ffmpeg/*.exe
 .claude/worktrees/
 .calisma/
 TestResults/
+trash/calisma/
+trash/*.mp4
