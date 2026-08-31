@@ -224,8 +224,8 @@ unzip -qo "$archive_file" -d "$stage_root"
 # indirmekten kurtuluyor; burada uygulamanın kurulu sürümü bildirmesi için duruyor.
 printf '%s' "$version" > "$stage_root/.update-version"
 
-# Burada başlatıcı yok: kendini güncelleme yalnız Windows'ta açık, kısayol doğrudan
-# uygulamayı gösterir.
+# Burada başlatıcı yok: kısayol doğrudan uygulamayı gösterir. macOS'ta güncellemeyi
+# uygulamanın kendisi yapıyor (paketin tamamını takas ederek), Windows'ta başlatıcı.
 staged_executable=''
 for candidate in VidShrink VidShrink.App; do
     if [ -f "$stage_root/$candidate" ]; then
@@ -263,10 +263,15 @@ else
 fi
 
 ln -sf "$installed_executable" "$bin_directory/vidshrink"
-# macOS ve Linux'ta uygulama kendini güncellemez: paket içindeki bir dosya değişince
-# Gatekeeper imzası bozulur ve uygulama hiç açılmaz. Güncelleme bu betiği yeniden
+# Paket kurulduysa uygulama kendini güncelleyebiliyor: paketin içindeki tek bir dosyayı
+# değiştirmek imzayı bozacağı için birim paketin tamamı, yeni paket yanına hazırlanıp
+# çıkışta takas ediliyor. Paketsiz kurulumda ve Linux'ta güncelleme bu betiği yeniden
 # çalıştırmakla olur.
-say 'Güncellemek için bu komutu yeniden çalıştırın.'
+if [ "$installed_executable" = "$bundle_path/Contents/MacOS/VidShrink" ]; then
+    say 'Yeni sürümleri uygulama kendisi kuruyor; Ayarlar altından kapatabilirsiniz.'
+else
+    say 'Güncellemek için bu komutu yeniden çalıştırın.'
+fi
 say 'Kaldırmak için: --uninstall'
 case ":${PATH}:" in
     *":$bin_directory:"*) say 'Çalıştırmak için: vidshrink' ;;

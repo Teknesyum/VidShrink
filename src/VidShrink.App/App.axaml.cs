@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.App;
@@ -27,6 +28,9 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            MacUpdate.Begin();
+            desktop.Exit += (_, _) => MacUpdate.Finish();
+
             var window = new MainWindow(_startupFile) { Icon = LoadAppIcon() };
             desktop.MainWindow = window;
         }
