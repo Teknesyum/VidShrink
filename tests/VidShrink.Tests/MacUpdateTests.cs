@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.Text.Json;
 using VidShrink.Core;
@@ -60,7 +60,7 @@ public sealed class MacUpdateTests
     public void OnlyABinaryInsideAnAppBundleCounts()
     {
         Assert.Equal(
-            "/Users/x/Applications/VidShrink.app",
+            "/Users/x/Applications/VidShrink.app".Replace('/', Path.DirectorySeparatorChar),
             MacUpdate.BundleOf("/Users/x/Applications/VidShrink.app/Contents/MacOS/VidShrink"));
 
         Assert.Null(MacUpdate.BundleOf("/Users/x/.local/share/vidshrink/VidShrink"));
