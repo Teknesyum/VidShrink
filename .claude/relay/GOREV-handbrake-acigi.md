@@ -27,6 +27,46 @@ tahmin olur. Bu paket o açığı sayıya çeviriyor.
 Bu dördüncüsü sonradan eklendi ve **İş 2'de dördüncü ablasyon olarak koşulması şart.**
 Üç kararın toplamı açığı açıklamıyorsa kalan payın burada olması bekleniyor.
 
+## Şikâyet edilen iki çıktı elimizde — okundu
+
+Kullanıcının iki dosyası `trash/` altında duruyor, ikisi de aynı 17:16'lık kaynaktan
+(`Kingdom Come Deliverance II`, oyun kaydı) ve ikisi de ~100 MB hedefine koşulmuş.
+`ffprobe` çıktıları:
+
+| | VidShrink | HandBrake 1.11.2 |
+|---|---|---|
+| kodlayıcı etiketi | `Lavc63.1.100 av1_nvenc` | `HandBrake 1.11.2` |
+| çözünürlük | **882×496** | **1280×720** |
+| piksel biçimi | `yuv420p` (8 bit) | `yuv420p10le` (10 bit) |
+| renk | `bt709` / `bt709` / `bt709` | `bt2020nc` / **`smpte2084`** / `bt2020` |
+| video bit hızı | 759 kbps | **640 kbps** |
+| ses bit hızı | 130 kbps | 270 kbps |
+| anahtar kare aralığı | ~2 sn (20 sn'de 10) | ~10 sn (20 sn'de 2) |
+| kare hızı | 60 | 60 |
+| toplam | 116,6 MB | 119,0 MB |
+
+Buradan çıkan dört olgu, üçü zaten şüpheli listemizdeydi:
+
+1. **Kaynak HDR ve biz onu attık.** HandBrake çıktısı PQ/BT.2020 10 bit; bizimki bt709
+   8 bit. `av1_nvenc` `HdrResolver.Hdr10Codecs` içinde olmadığı için sessizce tonemap
+   edildi. Kullanıcının gördüğü farkın bir kısmı sıkıştırma değil, **atılmış renk**.
+2. **Aynı bütçede HandBrake 2,1 kat piksel teslim etti.** 1280×720 = 921.600 piksel,
+   882×496 = 437.472. HandBrake bunu bizim video bit hızımızın **%84'ü** ile yaptı ve
+   üstüne sese iki katını verdi.
+3. **GOP farkı ölçüldü.** Bizde ~2 saniye, HandBrake'te ~10. Düşük bit hızında bu fark
+   bedava değil.
+4. **882×496 kimsenin ön ayarı değil.** Ölçek kararı sürekli bir hesaptan çıkıyor;
+   HandBrake standart bir basamağa (720p) oturuyor.
+
+Bu tablo ölçümün yerine geçmez — VMAF yok, kaynak yok. Ama **taban koşumunun ne ürettiğini
+tahmin etmene gerek kalmadı**: `av1_nvenc`, tonemap, 882×496, 2 sn GOP. Ölçümün bunu
+yeniden üretmesi gerekiyor; üretmiyorsa ya kaynak ya ayar farklı, önce onu çöz.
+
+Kaynak dosya kullanıcıdan istendi. Gelmezse `trash/` altındaki **HandBrake çıktısını
+referans alma** — o da sıkıştırılmış, VMAF'ı yanıltır. Kaynak gelene kadar İş 2'yi depodaki
+canlı kaynak ve yüksek hareketli klip üzerinden koştur, kullanıcının dosyasını raporda eksik
+olarak işaretle.
+
 ## Ölçüm düzeni
 
 Ölçüm aracı zaten var: `tools/VidShrink.Bench` ve `QualityMeter` (VMAF, XPSNR, SSIM).
