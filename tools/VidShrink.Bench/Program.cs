@@ -34,7 +34,7 @@ static void PrintUsage()
 {
     Console.WriteLine("Usage:");
     Console.WriteLine("  bench measure <referans> <test>");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
@@ -55,8 +55,11 @@ static async Task<int> MeasureAsync(string[] args)
         return 1;
     }
 
-    var score = await QualityMeter.MeasureAsync(args[1], args[2], CancellationToken.None);
-    Console.WriteLine(JsonSerializer.Serialize(score));
+    var info = await FfprobeClient.ProbeAsync(args[1]);
+    var vmaf = await VmafNegAsync(args[1], args[2], info.Width, info.Height);
+    var planes = await XpsnrPlanesAsync(args[1], args[2], info.Width, info.Height);
+    var xpsnr = planes.Y is { } py && planes.U is { } pu && planes.V is { } pv ? (4 * py + pu + pv) / 6.0 : (double?)null;
+    Console.WriteLine(JsonSerializer.Serialize(new { VmafNegHarmonic = vmaf.Harmonic, VmafNegP10 = vmaf.P10, Xpsnr = xpsnr }));
     return 0;
 }
 
@@ -79,6 +82,11 @@ static async Task<int> ShrinkAsync(string[] args)
     string? resultsPath = null;
     var calibrate = true;
     var fillPolicy = FillPolicy.FillTarget;
+    var speedMode = SpeedMode.Quality;
+    var allowResolutionDrop = true;
+    var allowFpsDrop = true;
+    string? forceCodec = null;
+    var widePeak = false;
     for (var i = 3; i < args.Length; i++)
     {
         switch (args[i])
@@ -91,6 +99,21 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--no-calibrate":
                 calibrate = false;
+                break;
+            case "--speed" when i + 1 < args.Length:
+                speedMode = args[++i].Equals("fast", StringComparison.OrdinalIgnoreCase) ? SpeedMode.Fast : SpeedMode.Quality;
+                break;
+            case "--no-resolution-drop":
+                allowResolutionDrop = false;
+                break;
+            case "--no-fps-drop":
+                allowFpsDrop = false;
+                break;
+            case "--force-codec" when i + 1 < args.Length:
+                forceCodec = args[++i];
+                break;
+            case "--wide-peak":
+                widePeak = true;
                 break;
             case "--fill" when i + 1 < args.Length:
                 fillPolicy = args[++i].Trim().ToLowerInvariant() switch
@@ -112,7 +135,7 @@ static async Task<int> ShrinkAsync(string[] args)
 
     var info = await FfprobeClient.ProbeAsync(source);
     var probeWatch = Stopwatch.StartNew();
-    var complexity = await ComplexityProbe.RunAsync(info, SpeedMode.Quality);
+    var complexity = await ComplexityProbe.RunAsync(info, speedMode);
     probeWatch.Stop();
     var results = new List<BenchResult>();
     var label = Path.GetFileNameWithoutExtension(source);
@@ -120,7 +143,14 @@ static async Task<int> ShrinkAsync(string[] args)
 
     foreach (var targetMb in targets)
     {
-        var options = new PlanOptions { TargetMb = targetMb, FillPolicy = fillPolicy };
+        var options = new PlanOptions
+        {
+            TargetMb = targetMb,
+            FillPolicy = fillPolicy,
+            SpeedMode = speedMode,
+            AllowResolutionDrop = allowResolutionDrop,
+            AllowFpsDrop = allowFpsDrop
+        };
         var planWatch = Stopwatch.StartNew();
         var profile = complexity;
         var planResult = PlanCalculator.BuildDetailed(info, options, profile, EncoderCapabilities.Instance);
@@ -130,7 +160,7 @@ static async Task<int> ShrinkAsync(string[] args)
             var seed = profile;
             for (var round = 0; round < CalibrationRounds; round++)
             {
-                var tuned = await CalibrationProbe.RunAsync(info, draft, seed, SpeedMode.Quality, CancellationToken.None);
+                var tuned = await CalibrationProbe.RunAsync(info, draft, seed, speedMode, CancellationToken.None);
                 profile = tuned;
                 planResult = PlanCalculator.BuildDetailed(info, options, profile, EncoderCapabilities.Instance);
                 if (!tuned.Calibrated) break;
@@ -145,9 +175,30 @@ static async Task<int> ShrinkAsync(string[] args)
         }
         planWatch.Stop();
         var plan = planResult.Plan;
+        if (!string.IsNullOrWhiteSpace(forceCodec))
+        {
+            plan.Codec = forceCodec;
+            plan.Preset = "slow";
+            plan.Mode = "2pass";
+            plan.Crf = null;
+            var hdr = HdrResolver.Resolve(info, options.HdrPolicy, plan.Codec, EncoderCapabilities.Instance);
+            plan.PixelFormat = hdr.PixelFormat;
+            plan.HdrVideoFilter = hdr.VideoFilter;
+            plan.HdrColorArgs = hdr.ColorArgs.ToList();
+        }
+        if (widePeak && CodecModel.IsHardware(plan.Codec))
+        {
+            plan.ExtraArgs.AddRange(new[]
+            {
+                "-maxrate", $"{(int)(plan.VideoBitrateK * FfmpegArguments.WidePeakFactor)}k",
+                "-bufsize", $"{(int)(plan.VideoBitrateK * FfmpegArguments.BufferFactor(FfmpegArguments.WidePeakFactor))}k"
+            });
+        }
         var band = FillBand.For(targetMb);
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
+        var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
+        Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null)));
         var stopwatch = Stopwatch.StartNew();
         var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, fillPolicy);
         stopwatch.Stop();
@@ -269,7 +320,7 @@ static async Task<string> RunLavfiAsync(string referencePath, string testPath, i
                  "-hide_banner", "-nostdin",
                  "-i", testPath,
                  "-i", referencePath,
-                 "-lavfi", $"[0:v]zscale=w={width}:h={height}[t];[t][1:v]{filterChain}",
+                 "-lavfi", $"[0:v]scale=w={width}:h={height}:flags=lanczos[t];[t][1:v]{filterChain}",
                  "-f", "null", "-"
              })
         psi.ArgumentList.Add(arg);
@@ -1899,4 +1950,3 @@ sealed record BenchResult(
     double? XpsnrY,
     double? XpsnrU,
     double? XpsnrV);
-
