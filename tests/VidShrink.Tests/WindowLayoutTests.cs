@@ -236,8 +236,9 @@ public sealed class WindowLayoutTests
     /// dili "en"e, <c>UseTurkish</c> ardından "tr"ye çevirdiği için her dil geçişi o ana
     /// kadar kurulmuş <b>bütün</b> pencerelerin arayüzünü baştan kuruyor. Maliyet ölçü
     /// sayısının karesiyle büyüyor, süreç de biriken pencereleri hiç bırakmıyor —
-    /// makinede ikinci bir koşum varken iki sürecin toplamı ayrılabilir belleği tüketip
-    /// konak sürecini düşürüyordu. T85'te ölçüldü, rapor
+    /// eşzamanlı iki koşumda tepe süreç belleği bu yüzden 10,4 GB'a çıkıyordu, kapatınca
+    /// 6,2 GB'a indi. Konak sürecinin çökmesiyle bağı <b>kanıtlanmadı</b>: çökme ayrık
+    /// düzenekte hiç üretilemedi. T85'te ölçüldü, rapor
     /// <c>docs/olcumler/suit-esszamanli-kosum.md</c>.</para>
     /// </summary>
     private static T Fresh<T>(Func<MainWindow, T> use) =>
