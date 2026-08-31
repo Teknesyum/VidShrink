@@ -6,7 +6,13 @@ nothing; the intent under them is written by hand, once, when it changes.
 
 ## Intent
 
-_not written yet - one paragraph on what is being attempted and why._
+v0.2.5 is out and the platform work is done: the suite runs on macOS, the installer
+leaves a real `.app` bundle, and Windows 11 gets a first-class right-click menu. The
+engine is now the whole job. A 17-minute video came out visibly worse than HandBrake's
+output at the same delivered size, so the target-size engine is being measured before it
+is changed: same size, both tools, and the gap split across the three decisions we
+suspect — dropping resolution, dropping frame rate, and preferring a hardware encoder.
+What that measurement says decides everything after it.
 
 ## Contracts open
 
