@@ -227,10 +227,30 @@ public sealed class WindowLayoutTests
     private static bool InPerformancePanel(TextBlock block)
         => block.GetVisualAncestors().OfType<Border>().Any(border => border.Name == "PerformancePanel");
 
-    private static T Read<T>(Size size, bool loaded, Func<MainWindow, T> read) =>
+    /// <summary>
+    /// Ölçüm için bir pencere kurar ve <b>kapatır</b>.
+    ///
+    /// <para><see cref="MainWindow"/> yapıcısında <c>Strings.Changed</c> statik olayına
+    /// abone oluyor, aboneliği yalnız <c>OnClosing</c> içinde bırakıyor. Kapatılmayan
+    /// pencere o statik olayın ucunda asılı kalır: <see cref="AppHost.Run{T}"/> her ölçüde
+    /// dili "en"e, <c>UseTurkish</c> ardından "tr"ye çevirdiği için her dil geçişi o ana
+    /// kadar kurulmuş <b>bütün</b> pencerelerin arayüzünü baştan kuruyor. Maliyet ölçü
+    /// sayısının karesiyle büyüyor, süreç de biriken pencereleri hiç bırakmıyor —
+    /// makinede ikinci bir koşum varken iki sürecin toplamı ayrılabilir belleği tüketip
+    /// konak sürecini düşürüyordu. T85'te ölçüldü, rapor
+    /// <c>docs/olcumler/suit-esszamanli-kosum.md</c>.</para>
+    /// </summary>
+    private static T Fresh<T>(Func<MainWindow, T> use) =>
         AppHost.Run(() =>
         {
             var window = new MainWindow();
+            try { return use(window); }
+            finally { window.Close(); }
+        });
+
+    private static T Read<T>(Size size, bool loaded, Func<MainWindow, T> read) =>
+        Fresh(window =>
+        {
             window.UseTurkish();
 
             if (loaded)
@@ -261,9 +281,8 @@ public sealed class WindowLayoutTests
             .ToList());
 
     private static double Token(string key) =>
-        AppHost.Run(() =>
+        Fresh(window =>
         {
-            var window = new MainWindow();
             Assert.True(window.TryFindResource(key, out var value), $"{key} belirteci yok.");
             return (double)value!;
         });
@@ -272,9 +291,8 @@ public sealed class WindowLayoutTests
     private static Size DesignSize() => new(Token("WindowPreferredWidth"), Token("WindowPreferredHeight"));
 
     private static Size MinimumSize() =>
-        AppHost.Run(() =>
+        Fresh(window =>
         {
-            var window = new MainWindow();
             return new Size(window.MinWidth, window.MinHeight);
         });
 
@@ -667,9 +685,8 @@ public sealed class WindowLayoutTests
     /// yazılmıyor; taban, tavan ve önizleme tabanı <c>Theme</c> belirteçlerinden okunuyor.
     /// </summary>
     private static PlanLayout PlanPanelLayout(bool loaded, bool reasons) =>
-        AppHost.Run(() =>
+        Fresh(window =>
         {
-            var window = new MainWindow();
             window.UseTurkish();
             if (loaded)
             {
@@ -781,9 +798,8 @@ public sealed class WindowLayoutTests
     }
 
     private static List<TabScan> Scan(Size size, bool loaded) =>
-        AppHost.Run(() =>
+        Fresh(window =>
         {
-            var window = new MainWindow();
             window.UseTurkish();
             if (loaded)
             {
@@ -811,9 +827,8 @@ public sealed class WindowLayoutTests
     [Fact]
     public void TheDropZoneInsetStaysOnTheSpacingScale()
     {
-        var inset = AppHost.Run(() =>
+        var inset = Fresh(window =>
         {
-            var window = new MainWindow();
             window.TryFindResource("DropZonePadding", out var padding);
             return (Thickness)padding!;
         });
@@ -895,9 +910,8 @@ public sealed class WindowLayoutTests
     [InlineData(true)]
     public void ThePreviewHeadingIsGone(bool turkish)
     {
-        var headings = AppHost.Run(() =>
+        var headings = Fresh(window =>
         {
-            var window = new MainWindow();
             if (turkish) window.UseTurkish();
             LayOutAt(window, DesignSize());
 
@@ -919,9 +933,8 @@ public sealed class WindowLayoutTests
     [Fact]
     public void TheSectionInsetStaysOnTheSpacingScale()
     {
-        var inset = AppHost.Run(() =>
+        var inset = Fresh(window =>
         {
-            var window = new MainWindow();
             window.TryFindResource("SectionMargin", out var margin);
             return (Thickness)margin!;
         });
@@ -1027,9 +1040,8 @@ public sealed class WindowLayoutTests
     /// sekme koşuyor: seçili olmayan sekmenin içeriği görsel ağaca hiç girmiyor.
     /// </summary>
     private static IReadOnlyList<BoxLabel> MeasureTurkishBoxes(Size size, bool loaded) =>
-        AppHost.Run(() =>
+        Fresh(window =>
         {
-            var window = new MainWindow();
             window.UseTurkish();
             if (loaded)
             {
