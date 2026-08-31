@@ -2,9 +2,14 @@ namespace VidShrink.Core;
 
 public sealed record HdrResolution(string PixelFormat, string? VideoFilter, IReadOnlyList<string> ColorArgs, bool PolicyChanged);
 
+public interface IHdr10EncoderAvailability
+{
+    string? Hdr10PixelFormat(string codec);
+}
+
 public static class HdrResolver
 {
-    private static readonly HashSet<string> Hdr10Codecs = new(StringComparer.OrdinalIgnoreCase) { "libx265", "libsvtav1", "hevc_nvenc" };
+    private static readonly HashSet<string> SoftwareHdr10Codecs = new(StringComparer.OrdinalIgnoreCase) { "libx265", "libsvtav1" };
 
     public const string TonemapFilter = "zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p";
 
@@ -43,12 +48,16 @@ public static class HdrResolver
             preserveArgs.AddRange(new[] { "-x265-params", x265Params });
         }
 
-        return new HdrResolution("yuv420p10le", null, preserveArgs, false);
+        return new HdrResolution(Hdr10PixelFormat(codec, availability) ?? "yuv420p10le", null, preserveArgs, false);
     }
 
     private static bool SupportsHdr10(string codec, IEncoderAvailability? availability)
     {
-        if (!Hdr10Codecs.Contains(codec)) return false;
-        return availability is null || availability.HasEncoder(codec);
+        if (SoftwareHdr10Codecs.Contains(codec))
+            return availability is null || availability.WorksAsEncoder(codec);
+        return Hdr10PixelFormat(codec, availability) is not null;
     }
+
+    private static string? Hdr10PixelFormat(string codec, IEncoderAvailability? availability)
+        => availability is IHdr10EncoderAvailability hdr ? hdr.Hdr10PixelFormat(codec) : null;
 }

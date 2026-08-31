@@ -4,12 +4,14 @@ namespace VidShrink.Tests;
 
 public sealed class HdrArgumentsTests
 {
-    private sealed class FakeAvailability : IEncoderAvailability
+    private sealed class FakeAvailability : IEncoderAvailability, IHdr10EncoderAvailability
     {
         private readonly HashSet<string> _encoders;
         public FakeAvailability(params string[] encoders) => _encoders = new HashSet<string>(encoders, StringComparer.OrdinalIgnoreCase);
         public bool HasEncoder(string name) => _encoders.Contains(name);
         public bool WorksAsEncoder(string codec) => _encoders.Contains(codec);
+        public string? Hdr10PixelFormat(string codec)
+            => _encoders.Contains(codec) && CodecModel.IsHardware(codec) ? "p010le" : null;
     }
 
     private static MediaInfo BaseInfo() => new()
@@ -79,6 +81,49 @@ public sealed class HdrArgumentsTests
         Assert.Contains("-colorspace", args);
         Assert.Contains("-x265-params", args);
         Assert.Contains(args, a => a.Contains("hdr10-opt=1"));
+    }
+
+    [Fact]
+    public void FastAv1NvencPreservesHdrWhenTenBitProbeSucceeds()
+    {
+        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var availability = new FakeAvailability("av1_nvenc", "libx265");
+
+        var result = PlanCalculator.BuildDetailed(Hdr10Info(), options, null, availability);
+        var args = FfmpegArguments.Build(Hdr10Info(), result.Plan, "out.mp4", 0, null);
+
+        Assert.Equal("av1_nvenc", result.Plan.Codec);
+        Assert.Equal("p010le", result.Plan.PixelFormat);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.HdrTonemapped);
+        Assert.DoesNotContain(args, a => a.Contains("tonemap="));
+        Assert.Contains("smpte2084", args);
+        Assert.Contains("bt2020", args);
+    }
+
+    [Fact]
+    public void RemovingAv1NvencTenBitCapabilityMakesFastPathTonemap()
+    {
+        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var availability = new FakeAvailability("av1_nvenc");
+        IHdr10EncoderAvailability mutation = new NoHdrAvailability();
+
+        var result = PlanCalculator.BuildDetailed(Hdr10Info(), options, null, new MutatedAvailability(availability, mutation));
+
+        Assert.Equal("av1_nvenc", result.Plan.Codec);
+        Assert.Equal("yuv420p", result.Plan.PixelFormat);
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.HdrTonemapped);
+    }
+
+    private sealed class NoHdrAvailability : IHdr10EncoderAvailability
+    {
+        public string? Hdr10PixelFormat(string codec) => null;
+    }
+
+    private sealed class MutatedAvailability(IEncoderAvailability encoders, IHdr10EncoderAvailability hdr) : IEncoderAvailability, IHdr10EncoderAvailability
+    {
+        public bool HasEncoder(string name) => encoders.HasEncoder(name);
+        public bool WorksAsEncoder(string codec) => encoders.WorksAsEncoder(codec);
+        public string? Hdr10PixelFormat(string codec) => hdr.Hdr10PixelFormat(codec);
     }
 
     [Fact]
