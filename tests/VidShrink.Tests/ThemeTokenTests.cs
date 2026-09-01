@@ -230,7 +230,7 @@ public sealed class ThemeTokenTests
         {
             var opacity = (string?)Resource(key).Attribute("Opacity");
             Assert.True(opacity is not null, $"{key} bir opaklık taşımıyor; alev tüyünden ayrışmıyor.");
-            Assert.InRange(double.Parse(opacity!, CultureInfo.InvariantCulture), 0.0, 1.0);
+            Assert.InRange(OpacityOf(key), 0.0, 1.0);
 
             foreach (var stop in FlameStops(key))
             {
@@ -244,6 +244,21 @@ public sealed class ThemeTokenTests
 
         foreach (var key in FlameBrushKeys.Except(WashBrushKeys))
             Assert.Null(Resource(key).Attribute("Opacity"));
+    }
+
+    /// <summary>
+    /// Bir fırçanın opaklığı. T84 turu 2'de doğrudan yazılmış değerler belirtece taşındı;
+    /// öznitelik artık <c>{StaticResource ...}</c> taşıyor ve sayıya doğrudan çevrilemiyor.
+    /// Belirteç adı çözülür, sayı belirtecin kendisinden okunur.
+    /// </summary>
+    private static double OpacityOf(string brushKey)
+    {
+        var raw = ((string)Resource(brushKey).Attribute("Opacity")!).Trim();
+        if (!raw.StartsWith("{StaticResource", StringComparison.Ordinal))
+            return double.Parse(raw, CultureInfo.InvariantCulture);
+
+        var token = raw.Replace("{StaticResource", string.Empty).Trim(' ', '}');
+        return double.Parse(Token(token), CultureInfo.InvariantCulture);
     }
 
     /// <summary>K5: anka çiziminde ve alev rampalarında çıplak onaltılık renk yok.</summary>

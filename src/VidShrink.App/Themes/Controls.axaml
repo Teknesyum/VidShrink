@@ -63,6 +63,7 @@
       </ControlTheme>
 
       <ControlTheme x:Key="Label" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -463,6 +464,81 @@
         <Setter Property="Width" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="Margin" Value="{StaticResource InfoBadgeMargin}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Help"/>
+        <Setter Property="Focusable" Value="True"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Content" Value="?"/>
+        <Setter Property="ToolTip.ShowDelay" Value="120"/>
+        <!-- Anchored to the badge, not to the pointer, so the balloon lines up with the ? it
+             belongs to. Avalonia flips the popup itself when the button sits near a screen edge. -->
+        <Setter Property="ToolTip.Placement" Value="BottomEdgeAlignedLeft"/>
+        <Setter Property="ToolTip.HorizontalOffset" Value="0"/>
+        <Setter Property="ToolTip.VerticalOffset" Value="0"/>
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Button">
+            <Panel Background="Transparent">
+              <Border Name="Badge"
+                      Width="{StaticResource InfoBadgeSize}"
+                      Height="{StaticResource InfoBadgeSize}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      CornerRadius="{StaticResource RadiusChip}">
+                <Border.Transitions>
+                  <Transitions>
+                    <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
+                  </Transitions>
+                </Border.Transitions>
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Content="{TemplateBinding Content}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  HorizontalContentAlignment="Center"
+                                  VerticalContentAlignment="Center"/>
+              </Border>
+              <Border Name="FocusRing"
+                      IsHitTestVisible="False"
+                      BorderBrush="Transparent"
+                      BorderThickness="{StaticResource FocusRingThickness}"
+                      CornerRadius="{StaticResource RadiusCell}"/>
+            </Panel>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#Badge">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+        </Style>
+        <Style Selector="^:focus-visible /template/ Border#FocusRing">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
+        </Style>
+      </ControlTheme>
+
+      <!-- Etiketin yanindaki rozet. Etiket kendi alt boslugunu tasiyor ve satiri asagi
+           dogru buyutuyor; rozet o boslugu paylasmazsa satirin ortasina yerlesip etiketin
+           uzerinden 4,5 px asagi kayiyor. Olculdu: WindowLayoutTests
+           InfoBadgesAlignWithTheirLabelAndTheQuestionMarkFits. Etiket tasimayan satirlarda
+           InfoButton kullanilir; ikisi ayni sayiyi tasiyamaz.
+
+           Dugmenin kendisi TargetMinSize degil InfoBadgeSize kadar yer tutuyor: 24 + 8
+           satiri etiketin 19 + 8'inin uzerine cikarip sayfayi 6 px kaydiriyordu. Gorunen
+           rozet zaten 18; kalan 3 px goruntusuz bir halkaydi. Dokunma hedefi olan
+           denetimler TargetMinSize'i kullanmaya devam eder, bu bir vurgu rozeti. -->
+      <ControlTheme x:Key="InfoButtonBesideLabel" TargetType="Button">
+        <Setter Property="FocusAdorner" Value="{x:Null}"/>
+        <Setter Property="Width" Value="{StaticResource InfoBadgeSize}"/>
+        <Setter Property="Height" Value="{StaticResource InfoBadgeSize}"/>
+        <Setter Property="Margin" Value="{StaticResource InfoBadgeLabelMargin}"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>

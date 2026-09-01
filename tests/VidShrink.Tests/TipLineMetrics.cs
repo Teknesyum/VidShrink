@@ -56,6 +56,15 @@ internal static class TipLineMetrics
     /// </summary>
     internal static double Ceiling { get; } = ReadCeiling();
 
+    /// <summary>
+    /// Balonun kendi tavanı — <c>TooltipMaxWidth</c>, dolgu düşülmemiş hali.
+    /// <see cref="Ceiling"/> ile karıştırılmamalı: <c>Ceiling</c> metnin sarıldığı
+    /// genişliktir, bu ise balonun ekranda kapladığı en geniş yerdir. Bir satırın
+    /// ölçünün dışında bırakılıp bırakılmayacağı balona bakar, sarma genişliğine değil;
+    /// aynı sayıyı iki iş için kullanmak eşiği kendiliğinden dolduruyordu.
+    /// </summary>
+    internal static double Balloon { get; } = ReadBalloon();
+
     /// <summary>Yardım metni ölçüsü — <c>FontSizeMd</c>, <c>TipText</c> teması bunu kullanır.</summary>
     internal const double FontSize = 16;
 
@@ -75,6 +84,16 @@ internal static class TipLineMetrics
         var border = double.Parse(tokens["BorderThin"], CultureInfo.InvariantCulture);
 
         return maxWidth - (2 * horizontalPadding) - (2 * border);
+    }
+
+    internal static double ReadBalloon()
+    {
+        var theme = File.ReadAllText(TipSources.ThemePath);
+        var tokens = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (Match match in Token.Matches(theme))
+            tokens[match.Groups[1].Value] = match.Groups[2].Value.Trim();
+
+        return double.Parse(tokens["TooltipMaxWidth"], CultureInfo.InvariantCulture);
     }
 
     /// <summary>

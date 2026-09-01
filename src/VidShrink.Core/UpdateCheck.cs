@@ -1,4 +1,4 @@
-﻿using System.Buffers.Binary;
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
@@ -444,6 +444,13 @@ public sealed class UpdateSettings
         {
             if (!File.Exists(file)) return settings;
             using var document = JsonDocument.Parse(File.ReadAllText(file));
+
+            // Kok nesne degilse — null, sayi, dizi, dizge — TryGetProperty
+            // InvalidOperationException atiyor ve o tur buradaki catch'e girmiyordu.
+            // Cagiranin genel catch'i cokmeyi engelliyor ama acilis yarida kaliyor:
+            // ayarlar, guncelleme arayuzu ve acilis dosyasi yuklenmiyor.
+            if (document.RootElement.ValueKind != JsonValueKind.Object) return settings;
+
             if (document.RootElement.TryGetProperty("autoUpdate", out var value) &&
                 (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
             {

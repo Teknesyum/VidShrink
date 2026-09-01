@@ -374,7 +374,7 @@
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.intent.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.intent.label}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.intent.label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.intent.tip}"/>
                           </ToolTip.Tip>
@@ -389,7 +389,7 @@
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.codec.label}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.codec.label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.codec.tip}"/>
                           </ToolTip.Tip>
@@ -430,7 +430,7 @@
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.fill.label}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.fill.label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fill.tip}"/>
                           </ToolTip.Tip>
@@ -444,7 +444,7 @@
                     <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.hdr.label}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.hdr.label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.hdr.tip}"/>
                           </ToolTip.Tip>
@@ -666,7 +666,7 @@
                     <StackPanel Grid.Row="0" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.container.tip}"/>
                           </ToolTip.Tip>
@@ -688,7 +688,7 @@
                     <StackPanel Grid.Row="0" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.video-codec.tip}"/>
                           </ToolTip.Tip>
@@ -706,7 +706,7 @@
                     <StackPanel Grid.Row="1" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.quality-mode.tip}"/>
                           </ToolTip.Tip>
@@ -721,7 +721,7 @@
                     <StackPanel Grid.Row="1" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.crf-label.tip}"/>
                           </ToolTip.Tip>
@@ -736,7 +736,7 @@
                     <StackPanel Grid.Row="2" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.resolution.tip}"/>
                           </ToolTip.Tip>
@@ -756,7 +756,7 @@
                     <StackPanel Grid.Row="2" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-resolution.tip}"/>
                           </ToolTip.Tip>
@@ -768,7 +768,7 @@
                     <StackPanel Grid.Row="3" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.frame-rate.tip}"/>
                           </ToolTip.Tip>
@@ -786,7 +786,7 @@
                     <StackPanel Grid.Row="3" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-fps.tip}"/>
                           </ToolTip.Tip>
@@ -798,7 +798,7 @@
                     <StackPanel Grid.Row="4" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio.tip}"/>
                           </ToolTip.Tip>
@@ -817,7 +817,7 @@
                     <StackPanel Grid.Row="4" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-bitrate.tip}"/>
                           </ToolTip.Tip>
@@ -829,7 +829,7 @@
                     <StackPanel Grid.Row="5" Grid.Column="0">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-start.tip}"/>
                           </ToolTip.Tip>
@@ -841,7 +841,7 @@
                     <StackPanel Grid.Row="5" Grid.Column="1">
                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
+                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-end.tip}"/>
                           </ToolTip.Tip>

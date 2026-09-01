@@ -6,7 +6,7 @@
   "settings.error.save": "The setting could not be saved",
   "settings.error.reset": "Settings could not be reset",
   "settings.share.title": "Share target",
-  "settings.share.tip": "• The share target is the service a finished file is uploaded to.\n• storage.to carries up to 25 GiB and lets VidShrink delete the file again, so a link can be closed early.\n• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early.",
+  "settings.share.tip": "• The share target is the service a finished file is uploaded to.\n• storage.to carries up to 25 GiB and lets VidShrink delete the file, so a link can be closed early.\n• uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early.",
   "settings.share.ceiling": "Ceiling",
   "settings.share.lifetime": "Lifetime",
   "settings.share.deletion": "Deletion",

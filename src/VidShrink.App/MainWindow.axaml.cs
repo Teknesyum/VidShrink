@@ -729,7 +729,7 @@ public partial class MainWindow : Window
             CmbCodec.SelectedIndex = settings.Codec;
             ChkResolution.IsChecked = settings.MayLowerResolution;
             ChkFps.IsChecked = settings.MayLowerFps;
-            if (settings.FastGpu.HasValue) ChkFastGpu.IsChecked = settings.FastGpu.Value;
+            ChkFastGpu.IsChecked = settings.FastGpu ?? false;
             CmbFillPolicy.SelectedIndex = settings.FillPolicy;
             CmbHdrPolicy.SelectedIndex = settings.HdrPolicy;
             CmbQualityMode.SelectedIndex = settings.QualityMode;
