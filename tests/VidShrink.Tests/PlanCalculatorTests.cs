@@ -279,4 +279,74 @@ public sealed class PlanCalculatorTests
         Assert.True(fromFrozen.Plan.VideoBitrateK > fromContaminated.Plan.VideoBitrateK * 1.04,
             $"Kirli profil planda ayni sonucu verdi: {fromFrozen.Plan.VideoBitrateK}k / {fromContaminated.Plan.VideoBitrateK}k.");
     }
+
+    private static MediaInfo LongHdrCapture() => new()
+    {
+        FilePath = "uzun-hdr.mp4",
+        FileSizeBytes = 1_729_085_563L,
+        DurationSeconds = 1036.17,
+        Width = 1920,
+        Height = 1080,
+        Fps = 60,
+        VideoCodec = "hevc",
+        TotalBitrateBps = 13_350_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 128_000,
+        AudioChannels = 2
+    };
+
+    private static ComplexityProfile MeasuredProfile() => new()
+    {
+        ReferenceBppf = 0.1264,
+        Measured = true,
+        MotionExponent = 0.871,
+        MotionMeasured = true,
+        DetailExponent = 0.55,
+        SampledSeconds = 6,
+        SampledFrames = 360
+    };
+
+    [Fact]
+    public void NoTargetEverLandsUnderTheFloorWithoutSayingSo()
+    {
+        var info = LongHdrCapture();
+        var profile = MeasuredProfile();
+        var availability = new FakeAvailability("libx264", "libx265", "libsvtav1", "av1_nvenc");
+
+        foreach (var targetMb in new[] { 5.0, 12.0, 25.0, 50.0, 80.0, 117.0, 250.0, 600.0 })
+        {
+            var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = targetMb }, profile, availability);
+            var plan = result.Plan;
+            var pixelRate = (double)plan.Width * plan.Height * plan.Fps;
+            var bppf = plan.VideoBitrateK * 1000.0 / pixelRate;
+            var floor = result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps);
+
+            Assert.True(bppf + 1000.0 / pixelRate >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
+                $"{targetMb:0.#} MB -> {plan.Codec} {plan.Width}x{plan.Height}@{plan.Fps:0.##} at {bppf:0.0000} bppf, under the {floor:0.0000} floor, and the plan says nothing.");
+        }
+    }
+
+    [Fact]
+    public void TheHardwareFloorRejectsALayoutTheSoftwareFloorAccepts()
+    {
+        var profile = MeasuredProfile();
+        const int width = 1280;
+        const int height = 720;
+        const double fps = 60.0;
+
+        var softFloor = profile.FloorBppf("libsvtav1", fps, fps);
+        var hardFloor = profile.FloorBppf("av1_nvenc", fps, fps);
+        var inTheGap = Math.Sqrt(softFloor * hardFloor);
+        var justOverTheHardFloor = hardFloor * 1.02;
+
+        var gapK = inTheGap * width * height * fps / 1000.0;
+        var overK = justOverTheHardFloor * width * height * fps / 1000.0;
+
+        Assert.True(PlanCalculator.LayoutClearsFloor(profile, "libsvtav1", gapK, width, height, fps, fps),
+            $"The software floor rejected {inTheGap:0.00000} bppf, which sits above its own {softFloor:0.00000} floor.");
+        Assert.False(PlanCalculator.LayoutClearsFloor(profile, "av1_nvenc", gapK, width, height, fps, fps),
+            $"The hardware floor accepted {inTheGap:0.00000} bppf, under its {hardFloor:0.00000} floor: the hardware surcharge does nothing.");
+        Assert.True(PlanCalculator.LayoutClearsFloor(profile, "av1_nvenc", overK, width, height, fps, fps),
+            $"The hardware encoder rejected {justOverTheHardFloor:0.00000} bppf, over its {hardFloor:0.00000} floor: something other than the floor is refusing this layout.");
+    }
 }

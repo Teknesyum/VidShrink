@@ -87,3 +87,35 @@ buluyor ve motor `TargetBelowCodecFloor` demiyor. Fark tamsayı bit hızı
 yuvarlamasının bir adımından küçük; nedeni bu turda doğrulanmadı. Ölçü bir kbit'lik
 payı açıkça adlandırıyor, sessizce yutmuyor. Aramanın gördüğü bit hızı ile plana
 yazılan tamsayı bit hızı arasındaki bu tutarsızlık ayrı bir işe aittir.
+
+## 8. Mutasyon kanıtı
+
+Ölçüler tabanı gerçekten sınıyor mu? Üç sabit tek tek bozuldu, her seferinde
+yalnız kendi filtresi koşuldu (`PlanCalculatorTests|ComplexityScanTests|ExtremeCompressionTests`,
+73 ölçü). Bozulmamış ağaçta 70 geçti, 0 kaldı, 3 atlandı (atlananlar canlı ffmpeg isteyenler).
+
+| # | Bozulan | Nereden nereye | Kırılan ölçü |
+|---|---------|----------------|--------------|
+| M4 | `CodecModel.FloorBppf` av1 tabanı | 0.020 → 0.025 | `ACheaperFamilyClearsALayoutTheDearerFamiliesReject` |
+| M5 | `CodecModel.HardwareFloorFactor` | 1.25 → 1.0 | `TheHardwareFloorRejectsALayoutTheSoftwareFloorAccepts` |
+| M6 | `PlanCalculator.LayoutClearsFloor` bppf koşulu | koşul silindi | 5 ölçü birden |
+
+M6'da kırılanlar: yukarıdaki ikisi, `NoTargetEverLandsUnderTheFloorWithoutSayingSo`,
+`OneMegabyteTargetCollapsesThePixelRateAndNeverDropsUnderTheFloorSilently`,
+`ATargetNoLayoutCanCarryIsReportedInsteadOfPretended`.
+
+Eleme koşulu artık `SearchLayout`'un içinde gömülü değil; `PlanCalculator.LayoutClearsFloor`
+olarak dışarı alındı ve ölçüler üretim yolunun kendisini çağırıyor — koşulun kopyasını değil.
+M6 bu yüzden beş ölçüyü birden düşürüyor.
+
+### 8.1 Kaldırılan sabit kopyası
+
+`CodecFloorsAreStatedPerCodecAndRaisedForHardware` altı satırda `Assert.Equal(sabit, sabit)`
+yazıyordu; taban değiştiğinde sayıyı iki yerde güncellemek gerekiyordu ve davranış hakkında
+hiçbir şey söylemiyordu. Yerine `ACheaperFamilyClearsALayoutTheDearerFamiliesReject` geldi:
+1280x720@60'ta av1 ile hevc tabanlarının **arasındaki** bir bppf'te av1 geçiyor, hevc eleniyor;
+hevc ile h264 arasındaki bir bppf'te hevc geçiyor, h264 eleniyor. Sayı yazılmıyor, sıra ölçülüyor.
+
+`TheFloorFollowsTheContentAndTheFrameRate` içindeki `Assert.Equal(0.035, ...)` de
+`CodecModel.FloorBppf("libx264")` çağrısına çevrildi — ölçtüğü şey ölçülmemiş profilin
+tabanı oynatmaması, 0.035 sayısının kendisi değil.

@@ -166,14 +166,29 @@ public sealed class ExtremeCompressionTests
     }
 
     [Fact]
-    public void CodecFloorsAreStatedPerCodecAndRaisedForHardware()
+    public void ACheaperFamilyClearsALayoutTheDearerFamiliesReject()
     {
-        Assert.Equal(0.035, CodecModel.FloorBppf("libx264"), 6);
-        Assert.Equal(0.025, CodecModel.FloorBppf("libx265"), 6);
-        Assert.Equal(0.020, CodecModel.FloorBppf("libsvtav1"), 6);
-        Assert.Equal(0.035 * 1.25, CodecModel.FloorBppf("h264_nvenc"), 6);
-        Assert.Equal(0.025 * 1.25, CodecModel.FloorBppf("hevc_nvenc"), 6);
-        Assert.Equal(0.020 * 1.25, CodecModel.FloorBppf("av1_nvenc"), 6);
+        var profile = Measured(0.25);
+        const int width = 1280;
+        const int height = 720;
+        const double fps = 60;
+        var pixelRateK = (double)width * height * fps / 1000.0;
+
+        double Floor(string codec) => profile.FloorBppf(codec, fps, fps);
+        bool Clears(string codec, double bppf)
+            => PlanCalculator.LayoutClearsFloor(profile, codec, bppf * pixelRateK, width, height, fps, fps);
+
+        var betweenAv1AndHevc = Math.Sqrt(Floor("libsvtav1") * Floor("libx265"));
+        var betweenHevcAndH264 = Math.Sqrt(Floor("libx265") * Floor("libx264"));
+
+        Assert.True(Clears("libsvtav1", betweenAv1AndHevc),
+            $"av1 {betweenAv1AndHevc:F5} bppf ile 720p60 gecmeli, tabani {Floor("libsvtav1"):F5}");
+        Assert.False(Clears("libx265", betweenAv1AndHevc),
+            $"hevc ayni {betweenAv1AndHevc:F5} bppf ile gecmemeli, tabani {Floor("libx265"):F5}");
+        Assert.True(Clears("libx265", betweenHevcAndH264),
+            $"hevc {betweenHevcAndH264:F5} bppf ile gecmeli, tabani {Floor("libx265"):F5}");
+        Assert.False(Clears("libx264", betweenHevcAndH264),
+            $"h264 ayni {betweenHevcAndH264:F5} bppf ile gecmemeli, tabani {Floor("libx264"):F5}");
     }
 
     [Fact]
@@ -185,7 +200,7 @@ public sealed class ExtremeCompressionTests
 
         Assert.True(simple.FloorBppf("libx264", 48, 48) < 0.035, "Simple content should get by under the plain codec floor.");
         Assert.True(complex.FloorBppf("libx264", 48, 48) > 0.035, "Complex content should need more than the plain codec floor.");
-        Assert.Equal(0.035, unmeasured.FloorBppf("libx264", 48, 48), 6);
+        Assert.Equal(CodecModel.FloorBppf("libx264"), unmeasured.FloorBppf("libx264", 48, 48), 6);
         Assert.True(simple.FloorBppf("libx264", 12, 48) > simple.FloorBppf("libx264", 48, 48),
             "Frames that stand further apart carry more new detail, so the floor has to rise.");
     }

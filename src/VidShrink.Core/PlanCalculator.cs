@@ -558,6 +558,10 @@ public static class PlanCalculator
     public static double BitsPerPixel(double videoK, int width, int height, double fps)
         => videoK * 1000.0 / Math.Max(1.0, (double)width * height * fps);
 
+    public static bool LayoutClearsFloor(ComplexityProfile complexity, string codec, double videoK, int width, int height, double fps, double sourceFps)
+        => videoK >= CodecModel.UsableBitrateK(codec, width, height, fps)
+           && BitsPerPixel(videoK, width, height, fps) >= complexity.FloorBppf(codec, fps, sourceFps);
+
     private static double VideoBitrateK(double bppf, int width, int height, double fps)
         => bppf * Math.Max(1.0, (double)width * height * fps) / 1000.0;
 
@@ -641,7 +645,7 @@ public static class PlanCalculator
             if (complexity.AppliesTo(codec, effectiveScale, fps)) score += CalibratedShapeHysteresis;
             var deliverable = videoK >= CodecModel.UsableBitrateK(codec, width, height, fps);
 
-            if (deliverable && provided >= complexity.FloorBppf(codec, fps, info.Fps))
+            if (LayoutClearsFloor(complexity, codec, videoK, width, height, fps, info.Fps))
             {
                 if (fps >= info.Fps - 0.01) sourceFpsViable = true;
                 if (best is null || score > best.Score)
