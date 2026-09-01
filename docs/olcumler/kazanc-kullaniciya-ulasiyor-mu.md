@@ -36,8 +36,9 @@ parca-3 denetim satırı: planı 1. denemede bant içinde, değişen dal hiç ç
 
 Kısıt **koşulsuz doğru değil.** İki uç ayrı davranıyor:
 
-- **parca-1, bandın hemen altında durdu** (alt kenar 38,0 MB; çıkan 37,39 MB, hedefin %93,5'i). Durmak üç ölçüde de kazandı: mean +0,29,
-  harmonic +0,54, p10 **+4,20** — üstelik 1,64 MB daha küçük dosyayla. Yeniden doldurma
+- **parca-1, bandın hemen altında durdu** (alt kenar 38,0 MB; çıkan 37,39 MB, hedefin
+  %93,5'i). Teslim edilen `taban` kolu `önce` kolunun üç ölçüsünde de kazandı: mean
+  +0,29, harmonic +0,52, p10 **+4,14** — üstelik 1,65 MB daha küçük dosyayla. Yeniden doldurma
   kaliteyi *düşürüyordu*, çünkü `PlanCalculator.Correct` CRF planını atıp 2-pass VBR'a
   geçiyor; sabit bit hızı, CRF'in kolay sahnelerden kısıp zor sahnelere aktardığı payı
   geri veremiyor. En açık fark p10'da, yani en kötü karelerde.
@@ -51,6 +52,40 @@ Sonuç: **durma yalnız çıkan dosya `FillBand.HardFloorMb`'nin üstündeyken k
 Sınır uydurulmuş bir sayı değil — `FillBand` zaten "bunun altına inme" anlamıyla
 taşıyordu, burada ikinci kez kullanıldı. Bandın hemen altındaki kasıtlı durma geçer,
 bütçeyi boşa bırakan durma geçmez.
+
+Aynı taban arayüzde de aranıyor (`MainWindow.ShowsMeasuredQualityStop`). İki kapı
+ayrıştığında kullanıcıya "yaklaşık 8,7 MB verir" denip 39,14 MB teslim ediliyordu;
+gerekçe cümlesi de koşucuyla aynı koşula bağlandı.
+
+## Ölçüler
+
+Kapıyı sabitleyen beş ölçü, `tests/VidShrink.Tests/EncodeRunnerTests.cs`:
+
+| ölçü | ne sabitliyor |
+|---|---|
+| `PlanThatFilledTheBandDoesNotClaimADeliberateStop` | işaretin kendisi: doldurma notu taşıyan plan, `Correct()` çıktısı ve gerekçesiz plan "kasıtlı durdu" diyemez |
+| `PlannedStopAboveTheHardFloorIsDeliveredWithoutARetry` | tabanın üstündeki kasıtlı durma tek denemede teslim edilir, bant altı kaza sayılmaz |
+| `UnderBandAccidentAboveTheHardFloorStillRetries` | kapı ters yöne açılmıyor: doldurmayı hedefleyen plan bant altında kalınca hâlâ yeniden dener |
+| `PlannedStopUnderTheHardFloorStillRetries` | sert tabanın altına düşen kasıtlı durma korunmaz |
+| `TheSentenceShownToTheUserAgreesWithWhatTheRunnerDelivers` | arayüzün vaat ettiği durma ile koşucunun teslim ettiği durma aynı kaynakta ayrışmaz |
+
+Altı mutasyon denendi, altısını da bu ölçüler kırdı: kapının kaldırılması, kapının
+sürekli açık bırakılması, işaret yükleminin tersine çevrilmesi, sondanın kaliteyi
+ölçmemesi, sert taban koşulunun koşucudan düşürülmesi, aynı koşulun arayüzden
+düşürülmesi.
+
+## Bilinen riskler
+
+- **`PreviewSegment.cs:149`** 2-pass planı klonlayıp `Mode = "crf"` yapıyor ve gerekçe
+  notlarını olduğu gibi taşıyor; o klon `StopsShortOfBandOnPurpose == true` diyor. Bugün
+  zararsız, çünkü klon `FfmpegRunner`'a gidiyor, `EncodeRunner.RunAsync`'e hiç girmiyor.
+  Önizleme yolu bir gün koşucuya bağlanırsa gizli bir kasıtlı durma doğar.
+- **İşaret saklanan değil türetilen.** `StopsShortOfBandOnPurpose`, planlayıcının
+  `qualityStopBinding` kararını CRF kipi + doldurma notu yokluğundan geri okuyor; bugün
+  `FillTarget` yolunda ikisi birebir örtüşüyor. CRF planı üretip doldurma notu bırakmayan
+  yeni bir dal eklenirse o plan sessizce "kasıtlı durdu" sayılır. Doğru yer
+  `PlanCalculator`'ın kararı doğrudan yazması; `PlanCalculator.cs` bu turda T99'a
+  ayrılmıştı, taşınamadı.
 
 ## Süre
 
@@ -66,3 +101,5 @@ işareti taşıyor ama tek başına kanıt sayılmaz.
 - T89'un tablosu yeniden üretilemedi: o turun `klip` (1080p60 SDR) ve `oyun` (av1)
   kaynakları silinmiş. Bugünkü üç kaynağın hepsi HDR; **SDR ve av1 kolları ölçülmedi.**
 - Kalite ölçüleri tek koşumdur; **tekrar sapması ölçülmedi.**
+- Arayüzün yeni gerekçe cümlesi **ekran görüntüsüyle doğrulanmadı**; yalnız ölçüyle
+  sabitlendi.
