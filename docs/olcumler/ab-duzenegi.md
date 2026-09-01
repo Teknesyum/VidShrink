@@ -34,6 +34,33 @@ değeri ffprobe ile okunur ve referansınkiyle karşılaştırılır. Karar üç
 Etiketsizi reddetmek bu kapının asıl işidir: GEÇERSİZ tablo tam olarak etiketsiz
 tarafa varsayım uydurulduğu için sabit sayı basmıştı.
 
+Kapı canlı olarak iki uçta denendi. Etiketsiz taraf gerçekten etiketsiz üretildi:
+`-c copy` renk etiketini HEVC bitstream VUI'sinden söküp atamıyor, bu yüzden
+etiketleri düşürmek için `setparams=color_primaries=unknown:color_trc=unknown:colorspace=unknown`
+ile yeniden kodlamak gerekti.
+
+```
+> ab denetle parca-1.mkv etiketsiz-2sn.mp4
+referans : parca-1.mkv       | bt2020/smpte2084/bt2020nc/yuv420p10le | hdr=True | 60 fps
+aday     : etiketsiz-2sn.mp4 | etiketsiz/etiketsiz/etiketsiz/yuv420p | hdr=False | 60 fps
+kapı     : Rejected - çıktının renk etiketleri eksik; etiketsiz çıktı etiketli
+           referansla karşılaştırılmaz.
+sonuç    : SAYI BASILMADI - renk kapısı reddetti.              (çıkış kodu 2)
+```
+
+```
+> ab denetle parca-1.mkv sdr-2sn.mp4
+referans : parca-1.mkv | bt2020/smpte2084/bt2020nc/yuv420p10le | hdr=True | 60 fps
+aday     : sdr-2sn.mp4 | bt709/bt709/bt709/yuv420p             | hdr=False | 60 fps
+kapı     : ReferenceTransformed - referans aynı dönüşümden geçirilip öyle ölçüldü
+etiket   : SDR uzayında karşılaştırma - HDR kaybı hariç
+sonuç    : harm=1.17 p10=0.00 min=0.00 ort=1.42 XPSNR=7.86 SSIM=0.70  (çıkış kodu 0)
+```
+
+İkinci koşumdaki puanların düşüklüğü adayın 320x180 crf 30 ile üretilmiş bir kapı
+denemesi olmasındandır; buradaki bulgu sayı değil, kapının hangi yolu seçtiği ve
+etiketi basmasıdır.
+
 Renk kapısının yanında bir **kare hızı kapısı** vardır. Kare hızları ayrıysa
 libvmaf kareleri yanlış eşler ve sessizce bir sayı üretir; araç bu durumda da
 sayı basmaz. Bu yüzden her iki yarışmacı da kaynağın kare hızına sabitlenir
