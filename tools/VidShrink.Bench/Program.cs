@@ -20,6 +20,8 @@ try
         "measure-tonemapped" => await MeasureAsync(args, true),
         "measure-window" => await MeasureWindowAsync(args),
         "probe-quality-cost" => await ProbeQualityCostAsync(args),
+        "normalization-cost" => await NormalizationCostAsync(args),
+        "sample-container-cost" => await SampleContainerCostAsync(args),
         "shrink" => await ShrinkAsync(args),
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
@@ -40,6 +42,8 @@ static void PrintUsage()
     Console.WriteLine("  bench measure-tonemapped <HDR referans> <SDR test>");
     Console.WriteLine("  bench measure-window <referans> <test> <başlangıç-sn> <süre-sn>");
     Console.WriteLine("  bench probe-quality-cost <kaynak> [fast|quality]");
+    Console.WriteLine("  bench normalization-cost <HDR kaynak> <başlangıç-sn> <süre-sn>");
+    Console.WriteLine("  bench sample-container-cost <kaynak> <başlangıç-sn> <çıktı-klasörü>");
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
@@ -85,12 +89,20 @@ static async Task<int> ProbeQualityCostAsync(string[] args)
     var speed = args.Length > 2 && args[2].Equals("quality", StringComparison.OrdinalIgnoreCase)
         ? SpeedMode.Quality : SpeedMode.Fast;
 
-    var offWatch = Stopwatch.StartNew();
-    var without = await ComplexityProbe.RunDetailedAsync(info, speed, measureQuality: false);
-    offWatch.Stop();
-    var onWatch = Stopwatch.StartNew();
-    var with = await ComplexityProbe.RunDetailedAsync(info, speed, measureQuality: true);
-    onWatch.Stop();
+    static async Task<(ProbeResult Result, long Milliseconds)> Run(MediaInfo media, SpeedMode mode, bool quality)
+    {
+        var watch = Stopwatch.StartNew();
+        var result = await ComplexityProbe.RunDetailedAsync(media, mode, measureQuality: quality);
+        watch.Stop();
+        return (result, watch.ElapsedMilliseconds);
+    }
+
+    var offFirst = await Run(info, speed, false);
+    var onSecond = await Run(info, speed, true);
+    var onFirst = await Run(info, speed, true);
+    var offSecond = await Run(info, speed, false);
+    var offMs = (offFirst.Milliseconds + offSecond.Milliseconds) / 2.0;
+    var onMs = (onFirst.Milliseconds + onSecond.Milliseconds) / 2.0;
 
     Console.WriteLine(JsonSerializer.Serialize(new
     {
@@ -98,13 +110,72 @@ static async Task<int> ProbeQualityCostAsync(string[] args)
         info.DurationSeconds,
         info.Width,
         info.Height,
-        QualityOffMilliseconds = offWatch.ElapsedMilliseconds,
-        QualityOnMilliseconds = onWatch.ElapsedMilliseconds,
-        DifferenceMilliseconds = onWatch.ElapsedMilliseconds - offWatch.ElapsedMilliseconds,
-        DifferencePercent = (onWatch.Elapsed.TotalMilliseconds / offWatch.Elapsed.TotalMilliseconds - 1) * 100,
-        QualityWindows = with.QualityMeasurements
+        QualityOffMilliseconds = offMs,
+        QualityOnMilliseconds = onMs,
+        DifferenceMilliseconds = onMs - offMs,
+        DifferencePercent = (onMs / offMs - 1) * 100,
+        OrderRuns = new { OffFirst = offFirst.Milliseconds, OnSecond = onSecond.Milliseconds, OnFirst = onFirst.Milliseconds, OffSecond = offSecond.Milliseconds },
+        QualityWindows = onFirst.Result.QualityMeasurements
     }));
-    return without.Profile.Measured || with.Profile.Measured ? 0 : 2;
+    return offFirst.Result.Profile.Measured || onFirst.Result.Profile.Measured ? 0 : 2;
+}
+
+static async Task<int> NormalizationCostAsync(string[] args)
+{
+    if (args.Length < 4) return 1;
+    var start = double.Parse(args[2], CultureInfo.InvariantCulture);
+    var duration = double.Parse(args[3], CultureInfo.InvariantCulture);
+    var offFirst = await QualityMeter.MeasureReferenceDecodeCostAsync(args[1], start, duration, normalize: false);
+    var onSecond = await QualityMeter.MeasureReferenceDecodeCostAsync(args[1], start, duration, normalize: true);
+    var onFirst = await QualityMeter.MeasureReferenceDecodeCostAsync(args[1], start, duration, normalize: true);
+    var offSecond = await QualityMeter.MeasureReferenceDecodeCostAsync(args[1], start, duration, normalize: false);
+    var without = (offFirst + offSecond) / 2.0;
+    var with = (onFirst + onSecond) / 2.0;
+    Console.WriteLine(JsonSerializer.Serialize(new
+    {
+        Source = Path.GetFileName(args[1]), StartSeconds = start, DurationSeconds = duration,
+        WithoutNormalizationMilliseconds = without,
+        WithNormalizationMilliseconds = with,
+        DifferenceMilliseconds = with - without,
+        DifferencePercent = (with / without - 1) * 100,
+        OrderRuns = new { OffFirst = offFirst, OnSecond = onSecond, OnFirst = onFirst, OffSecond = offSecond }
+    }));
+    return 0;
+}
+
+static async Task<int> SampleContainerCostAsync(string[] args)
+{
+    if (args.Length < 4) return 1;
+    var start = double.Parse(args[2], CultureInfo.InvariantCulture);
+    Directory.CreateDirectory(args[3]);
+    var raw = Path.Combine(args[3], "sample.h264");
+    var muxed = Path.Combine(args[3], "sample.mkv");
+    async Task Encode(string format, string output)
+    {
+        var ffargs = new[] { "-hide_banner", "-loglevel", "error", "-y", "-ss", start.ToString(CultureInfo.InvariantCulture), "-t", "2", "-i", args[1], "-an", "-sn", "-dn", "-c:v", "libx264", "-crf", "23", "-preset", "veryfast", "-f", format, output };
+        var psi = new ProcessStartInfo
+        {
+            FileName = ToolLocator.Ffmpeg,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var arg in ffargs) psi.ArgumentList.Add(arg);
+        using var process = new Process { StartInfo = psi };
+        process.Start();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await Task.WhenAll(stdout, stderr);
+        await process.WaitForExitAsync();
+        if (process.ExitCode != 0) throw new InvalidOperationException(await stderr);
+    }
+    await Encode("h264", raw);
+    await Encode("matroska", muxed);
+    var rawBytes = new FileInfo(raw).Length;
+    var muxedBytes = new FileInfo(muxed).Length;
+    Console.WriteLine(JsonSerializer.Serialize(new { RawBytes = rawBytes, MatroskaBytes = muxedBytes, DifferenceBytes = muxedBytes - rawBytes, DifferencePercent = (muxedBytes / (double)rawBytes - 1) * 100 }));
+    return 0;
 }
 
 static async Task<int> ShrinkAsync(string[] args)

@@ -46,6 +46,32 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
 
 public static class QualityMeter
 {
+    public static async Task<long> MeasureReferenceDecodeCostAsync(
+        string path, double startSeconds, double durationSeconds, bool normalize, CancellationToken ct = default)
+    {
+        var info = await FfprobeClient.ProbeAsync(path, ct);
+        var args = new List<string>
+        {
+            "-hide_banner", "-nostdin", "-ss", startSeconds.ToString(CultureInfo.InvariantCulture),
+            "-t", durationSeconds.ToString(CultureInfo.InvariantCulture), "-i", path
+        };
+        if (normalize)
+            args.AddRange(new[] { "-vf", ColorFilter(info, info, info.Width, info.Height) });
+        args.AddRange(new[] { "-an", "-sn", "-dn", "-f", "null", "-" });
+
+        var watch = Stopwatch.StartNew();
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+        process.Start();
+        using var registration = ct.Register(() => TryKill(process));
+        var stdout = process.StandardOutput.ReadToEndAsync(ct);
+        var stderr = process.StandardError.ReadToEndAsync(ct);
+        await Task.WhenAll(stdout, stderr);
+        await process.WaitForExitAsync(ct);
+        watch.Stop();
+        if (process.ExitCode != 0) throw new InvalidOperationException(await stderr);
+        return watch.ElapsedMilliseconds;
+    }
+
     public static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, CancellationToken ct = default)
         => await MeasureAsync(referencePath, testPath, false, null, null, null, ct);
 

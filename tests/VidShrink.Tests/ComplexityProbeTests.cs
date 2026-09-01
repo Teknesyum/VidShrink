@@ -45,10 +45,29 @@ public sealed class ComplexityProbeTests
 
             Assert.True(result.Profile.Measured);
             Assert.True(result.HasQuality);
-            Assert.Equal(meter.Calls, result.QualityMeasurements.Count);
+            Assert.Equal(2, meter.Calls);
+            Assert.Equal(2, result.QualityMeasurements.Count);
             Assert.All(result.QualityMeasurements, q => Assert.Equal(91.0, q.VmafNegMean));
         });
     }
+
+    [Fact]
+    public async Task DefaultDetailedProbeDoesNotMeasureQualityBeforeT89OptsIn()
+    {
+        await WithClipAsync(async info =>
+        {
+            var meter = new FakeMeter(true);
+            var result = await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Fast, qualityMeasurement: meter);
+
+            Assert.True(result.Profile.Measured);
+            Assert.Equal(0, meter.Calls);
+            Assert.Empty(result.QualityMeasurements);
+        });
+    }
+
+    [Fact]
+    public void FullAndHalfSamplesUseTheSameAccountingContainer()
+        => Assert.Equal(ComplexityProbe.FullSampleFormat, ComplexityProbe.HalfSampleFormat);
 
     [Theory]
     [InlineData(false, false, true)]
@@ -87,7 +106,7 @@ public sealed class ComplexityProbeTests
         try
         {
             var clip = Path.Combine(dir, "clip.mp4");
-            await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=12:duration=2", "-c:v", "libx264", "-pix_fmt", "yuv420p", clip });
+            await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=12:duration=8", "-c:v", "libx264", "-pix_fmt", "yuv420p", clip });
             await body(await FfprobeClient.ProbeAsync(clip));
         }
         finally { try { Directory.Delete(dir, true); } catch { } }

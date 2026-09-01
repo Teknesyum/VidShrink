@@ -9,6 +9,8 @@ public readonly record struct PacketSample(double PtsSeconds, long Size);
 
 public static class ComplexityProbe
 {
+    internal const string FullSampleFormat = "matroska";
+    internal const string HalfSampleFormat = "matroska";
     private const double WindowSeconds = 2.0;
     private const double MotionProbeMinSourceFps = 10.0;
     public const double MotionProbeFpsRatio = 0.5;
@@ -34,10 +36,10 @@ public static class ComplexityProbe
     private static readonly TimeSpan PacketReadTimeout = TimeSpan.FromSeconds(120);
 
     public static async Task<ComplexityProfile> RunAsync(MediaInfo info, SpeedMode speed, CancellationToken ct = default)
-        => (await RunDetailedAsync(info, speed, measureQuality: true, qualityMeasurement: null, ct)).Profile;
+        => (await RunDetailedAsync(info, speed, measureQuality: false, qualityMeasurement: null, ct)).Profile;
 
     public static async Task<ProbeResult> RunDetailedAsync(
-        MediaInfo info, SpeedMode speed, bool measureQuality = true,
+        MediaInfo info, SpeedMode speed, bool measureQuality = false,
         IQualityMeasurement? qualityMeasurement = null, CancellationToken ct = default)
     {
         try
@@ -435,7 +437,7 @@ public static class ComplexityProbe
     {
         var stem = Path.Combine(Path.GetTempPath(), "vidshrink_probe_" + Guid.NewGuid().ToString("N"));
         var fullPath = stem + "_full.mkv";
-        var halfPath = stem + "_half.h264";
+        var halfPath = stem + "_half.mkv";
         try
         {
             var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
@@ -449,7 +451,7 @@ public static class ComplexityProbe
                 "-filter_complex", $"[0:v]split=2[full][raw];[raw]scale={half.Width}:{half.Height}[small]"
             });
 
-            foreach (var (label, target, format) in new[] { ("[full]", fullPath, "matroska"), ("[small]", halfPath, "h264") })
+            foreach (var (label, target, format) in new[] { ("[full]", fullPath, FullSampleFormat), ("[small]", halfPath, HalfSampleFormat) })
             {
                 args.AddRange(new[]
                 {
