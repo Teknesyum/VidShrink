@@ -46,6 +46,19 @@ public enum WindowBiasSource
     Scan
 }
 
+public sealed record QualitySample(double Bppf, double VmafNeg);
+
+public sealed record QualityAnchor
+{
+    public required double Bppf { get; init; }
+    public required double VmafNeg { get; init; }
+    public required int Points { get; init; }
+    public double SpreadHalvings { get; init; }
+    public double? PerHalving { get; init; }
+}
+
+public readonly record struct QualityLevel(double AtReference, double PerHalving, bool Measured, bool SlopeMeasured);
+
 public sealed record ComplexityProfile
 {
     public const double ProbeCrf = 23.0;
@@ -71,6 +84,13 @@ public sealed record ComplexityProfile
     public const double WindowBiasMin = 0.5;
     public const double WindowBiasMax = 2.0;
 
+    public const double SampleWindowSeconds = 2.0;
+    public const double VmafNegMin = 1.0;
+    public const double VmafNegMax = 100.0;
+    private const double QualitySlopeMinSpreadHalvings = 0.25;
+    private const double QualitySlopeMin = 1.5;
+    private const double QualitySlopeMax = 15.0;
+
     private const double SpeedBand = 0.30;
     private const double FirstPassMinShare = 0.0;
     private const double FirstPassMaxShare = 1.0;
@@ -93,6 +113,7 @@ public sealed record ComplexityProfile
     public EncodeSpeed? Speed { get; init; }
     public double WindowBias { get; init; } = 1.0;
     public WindowBiasSource BiasSource { get; init; } = WindowBiasSource.None;
+    public QualityAnchor? QualityAnchor { get; init; }
 
     public bool Calibrated => Calibration is not null && LevelFactor > 0 && HalvingStep > 0;
 
@@ -111,6 +132,65 @@ public sealed record ComplexityProfile
 
     public double EstimateBandFor(string codec, double scale, double fps)
         => AppliesTo(codec, scale, fps) && WindowBiasKnown ? BiasBand : Measured ? MeasuredBand : EstimatedBand;
+
+    public bool QualityMeasured => QualityAnchor is not null;
+
+    public double ProbeBppf => ReferenceBppf * WindowDomainFactor;
+
+    public QualityLevel Level
+    {
+        get
+        {
+            if (QualityAnchor is not { } anchor)
+                return new QualityLevel(CodecModel.PriorQualityAtReference, CodecModel.PriorQualityPerHalving, false, false);
+
+            var slopeMeasured = anchor.PerHalving is > 0;
+            var perHalving = anchor.PerHalving ?? CodecModel.PriorQualityPerHalving;
+            var offset = Math.Log2(Math.Max(anchor.Bppf, 1e-9) / Math.Max(ReferenceBppf, 1e-9));
+            var atReference = Math.Clamp(anchor.VmafNeg - perHalving * offset, VmafNegMin, VmafNegMax);
+            return new QualityLevel(atReference, perHalving, true, slopeMeasured);
+        }
+    }
+
+    public ComplexityProfile WithProbeQuality(IReadOnlyList<double> vmafNegPerWindow)
+        => WithMeasuredQuality(vmafNegPerWindow.Select(v => new QualitySample(ProbeBppf, v)).ToArray());
+
+    public ComplexityProfile WithMeasuredQuality(IReadOnlyList<QualitySample> samples)
+    {
+        var usable = samples
+            .Where(s => double.IsFinite(s.Bppf) && s.Bppf > 0 && double.IsFinite(s.VmafNeg) && s.VmafNeg is > 0 and <= VmafNegMax)
+            .ToArray();
+        if (usable.Length == 0) return this with { QualityAnchor = null };
+
+        var logs = usable.Select(s => Math.Log2(s.Bppf)).ToArray();
+        var meanLog = logs.Average();
+        var meanVmaf = usable.Average(s => s.VmafNeg);
+        var spread = logs.Max() - logs.Min();
+
+        double? slope = null;
+        if (spread >= QualitySlopeMinSpreadHalvings)
+        {
+            var sxx = logs.Sum(l => (l - meanLog) * (l - meanLog));
+            var sxy = logs.Zip(usable, (l, s) => (l - meanLog) * (s.VmafNeg - meanVmaf)).Sum();
+            if (sxx > 0)
+            {
+                var fitted = sxy / sxx;
+                if (double.IsFinite(fitted) && fitted >= QualitySlopeMin && fitted <= QualitySlopeMax) slope = fitted;
+            }
+        }
+
+        return this with
+        {
+            QualityAnchor = new QualityAnchor
+            {
+                Bppf = Math.Pow(2, meanLog),
+                VmafNeg = meanVmaf,
+                Points = usable.Length,
+                SpreadHalvings = spread,
+                PerHalving = slope
+            }
+        };
+    }
 
     public static ComplexityProfile FromSourceBitrate(MediaInfo info)
     {
