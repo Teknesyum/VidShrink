@@ -278,7 +278,31 @@ public sealed class QualityMeterTests
     }
 
     [Fact]
-    public void SceneShorterThanHalfAWindowIsNotTheWorstScene()
+    public void CollapseInTheTrailingHalfSecondIsNotDropped()
+    {
+        var scores = Enumerable.Repeat(100.0, 990).ToArray();
+        for (var i = 960; i < 990; i++) scores[i] = 0.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0);
+
+        Assert.Equal(0.0, worst, 6);
+        Assert.Equal(16.0, at, 6);
+    }
+
+    [Fact]
+    public void TrailingUnitShorterThanHalfASecondIsDropped()
+    {
+        var scores = Enumerable.Repeat(100.0, 975).ToArray();
+        for (var i = 960; i < 975; i++) scores[i] = 0.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0);
+
+        Assert.Equal(100.0, worst, 6);
+        Assert.Equal(0.0, at, 6);
+    }
+
+    [Fact]
+    public void SceneShorterThanHalfASecondIsNotTheWorstScene()
     {
         var scores = Enumerable.Repeat(100.0, 600).ToArray();
         for (var i = 0; i < 12; i++) scores[i] = 0.0;

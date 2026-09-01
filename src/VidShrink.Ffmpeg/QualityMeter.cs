@@ -167,7 +167,7 @@ public static class QualityMeter
 
     public const double SceneWindowSeconds = 2.0;
 
-    public const double MinimumUnitSeconds = SceneWindowSeconds / 2.0;
+    public const double MinimumUnitSeconds = SceneWindowSeconds / 4.0;
 
     public static (double Worst, double StartSeconds) WorstScene(
         IReadOnlyList<double> scores, double frameRate, double offsetSeconds)
