@@ -1,4 +1,4 @@
-﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="using:System">
 
@@ -49,6 +49,14 @@
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
 
   <x:Double x:Key="PhoenixOpacity">0.08</x:Double>
+  <x:Double x:Key="PhoenixGlowInnerOpacity">0.34</x:Double>
+  <x:Double x:Key="PhoenixGlowMidOpacity">0.30</x:Double>
+  <x:Double x:Key="PhoenixGlowOuterOpacity">0.26</x:Double>
+  <x:Double x:Key="PhoenixEmberSparkOpacity">0.85</x:Double>
+  <x:Double x:Key="EmberAtmosphereOuterOpacity">0.18</x:Double>
+  <x:Double x:Key="EmberAtmosphereCoreOpacity">0.12</x:Double>
+  <x:Double x:Key="EmberAtmosphereVeilOpacity">0.13</x:Double>
+  <x:Double x:Key="EmberAtmosphereCoalOpacity">0.62</x:Double>
   <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
 
   <SolidColorBrush x:Key="PanelSurface"
@@ -86,27 +94,27 @@
     <GradientStop Color="Transparent" Offset="1"/>
   </LinearGradientBrush>
 
-  <RadialGradientBrush x:Key="PhoenixGlowInner" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="0.34">
+  <RadialGradientBrush x:Key="PhoenixGlowInner" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowInnerOpacity}">
     <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.45"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.9"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
 
-  <RadialGradientBrush x:Key="PhoenixGlowMid" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="0.30">
+  <RadialGradientBrush x:Key="PhoenixGlowMid" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowMidOpacity}">
     <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.4"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.85"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
 
-  <RadialGradientBrush x:Key="PhoenixGlowOuter" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="0.26">
+  <RadialGradientBrush x:Key="PhoenixGlowOuter" Center="50%,50%" GradientOrigin="50%,50%" RadiusX="50%" RadiusY="50%" Opacity="{StaticResource PhoenixGlowOuterOpacity}">
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.55"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
 
-  <LinearGradientBrush x:Key="PhoenixEmberSpark" StartPoint="50%,100%" EndPoint="50%,0%" Opacity="0.85">
+  <LinearGradientBrush x:Key="PhoenixEmberSpark" StartPoint="50%,100%" EndPoint="50%,0%" Opacity="{StaticResource PhoenixEmberSparkOpacity}">
     <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.5"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.92"/>
@@ -114,24 +122,24 @@
   </LinearGradientBrush>
 
   <!-- Broad, low-frequency layers make the backdrop read as heated air rather than an illustration. -->
-  <RadialGradientBrush x:Key="EmberAtmosphereOuter" Center="50%,58%" GradientOrigin="42%,62%" RadiusX="58%" RadiusY="58%" Opacity="0.18">
+  <RadialGradientBrush x:Key="EmberAtmosphereOuter" Center="50%,58%" GradientOrigin="42%,62%" RadiusX="58%" RadiusY="58%" Opacity="{StaticResource EmberAtmosphereOuterOpacity}">
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.48"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
-  <RadialGradientBrush x:Key="EmberAtmosphereCore" Center="48%,56%" GradientOrigin="44%,62%" RadiusX="52%" RadiusY="52%" Opacity="0.12">
+  <RadialGradientBrush x:Key="EmberAtmosphereCore" Center="48%,56%" GradientOrigin="44%,62%" RadiusX="52%" RadiusY="52%" Opacity="{StaticResource EmberAtmosphereCoreOpacity}">
     <GradientStop Color="{StaticResource EmberBlazeColor}" Offset="0"/>
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.34"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.72"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </RadialGradientBrush>
-  <LinearGradientBrush x:Key="EmberAtmosphereVeil" StartPoint="0%,100%" EndPoint="100%,0%" Opacity="0.13">
+  <LinearGradientBrush x:Key="EmberAtmosphereVeil" StartPoint="0%,100%" EndPoint="100%,0%" Opacity="{StaticResource EmberAtmosphereVeilOpacity}">
     <GradientStop Color="Transparent" Offset="0"/>
     <GradientStop Color="{StaticResource NeonEmberColor}" Offset="0.38"/>
     <GradientStop Color="{StaticResource EmberFlameColor}" Offset="0.62"/>
     <GradientStop Color="Transparent" Offset="1"/>
   </LinearGradientBrush>
-  <LinearGradientBrush x:Key="EmberAtmosphereCoal" StartPoint="0%,0%" EndPoint="100%,100%" Opacity="0.62">
+  <LinearGradientBrush x:Key="EmberAtmosphereCoal" StartPoint="0%,0%" EndPoint="100%,100%" Opacity="{StaticResource EmberAtmosphereCoalOpacity}">
     <GradientStop Color="Transparent" Offset="0"/>
     <GradientStop Color="{StaticResource EmberDeepColor}" Offset="0.46"/>
     <GradientStop Color="{StaticResource EmberEdgeColor}" Offset="0.7"/>
@@ -339,6 +347,7 @@
   <Thickness x:Key="WorkspaceMargin">24,12,24,12</Thickness>
   <Thickness x:Key="CheckMargin">0,0,16,0</Thickness>
   <Thickness x:Key="InfoBadgeMargin">6,0,0,0</Thickness>
+  <Thickness x:Key="InfoBadgeLabelMargin">6,0,0,8</Thickness>
   <Thickness x:Key="SectionMargin">0,16,0,0</Thickness>
   <Thickness x:Key="RowMargin">0,12,0,0</Thickness>
   <Thickness x:Key="BorderThin">1</Thickness>

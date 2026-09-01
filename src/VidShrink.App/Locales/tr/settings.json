@@ -6,7 +6,7 @@
   "settings.error.save": "Ayar yazılamadı",
   "settings.error.reset": "Ayarlar sıfırlanamadı",
   "settings.share.title": "Paylaşım hedefi",
-  "settings.share.tip": "• Paylaşım hedefi, biten dosyanın yüklendiği servistir.\n• storage.to 25 GiB'a kadar taşır ve VidShrink'in dosyayı geri silmesine izin verir, bağlantı erken kapatılabilir.\n• uguu.se 128 MiB'a kadar taşır, 3 saat sonra kendi siler, ama silme jetonu vermez; bağlantı erken kapatılamaz.",
+  "settings.share.tip": "• Paylaşım hedefi, biten dosyanın yüklendiği servistir.\n• storage.to 25 GiB'a kadar taşır ve VidShrink dosyayı geri silebilir, bağlantı erken kapatılabilir.\n• uguu.se 128 MiB'a kadar taşır, 3 saat sonra siler; silme jetonu yok, bağlantı erken kapatılamaz.",
   "settings.share.ceiling": "Tavan",
   "settings.share.lifetime": "Ömür",
   "settings.share.deletion": "Silme",
@@ -33,6 +33,6 @@
 
   "settings.update.title": "Güncelleme",
   "settings.update.auto": "Kendiliğinden güncelle",
-  "settings.update.auto-effect": "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir.",
-  "settings.update.no-self-effect": "VidShrink bu sistemde kendini güncellemez: yalnızca yeni bir sürüm olduğunu söyler ve kuran komutu gösterir."
+  "settings.update.auto-effect": "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir.",
+  "settings.update.no-self-effect": "VidShrink bu sistemde kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir."
 }

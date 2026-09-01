@@ -74,7 +74,7 @@
   "main.quality.basis.under-target": "Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır",
 
   "main.intent.label": "Amaç",
-  "main.intent.tip": "• Amaç, motorun bit harcamayı ne kadar erken keseceğidir.\n• Arşiv yalnızca gözle kayıpsız kalitede durur, bu yüzden hedefin büyük kısmını kullanmadan bırakabilir.\n• Paylaşım, normal bir izleyicinin farkı sezmeyi bıraktığı noktada durur — WhatsApp için doğru seçim budur.\n• Sosyal medya daha da erken durur, çünkü platform dosyayı zaten yeniden kodlayacaktır.",
+  "main.intent.tip": "• Amaç, motorun bit harcamayı ne kadar erken keseceğidir.\n• Arşiv yalnızca gözle kayıpsız kalitede durur, bu yüzden hedefin büyük kısmını kullanmadan bırakabilir.\n• Paylaşım, normal bir izleyicinin farkı sezmeyi bıraktığı noktada durur — WhatsApp için doğrusu budur.\n• Sosyal medya daha da erken durur, çünkü platform dosyayı zaten yeniden kodlayacaktır.",
   "main.intent.archive": "Arşiv",
   "main.intent.sharing": "Paylaşım",
   "main.intent.social": "Sosyal medya",
@@ -92,7 +92,7 @@
 
   "main.fast-gpu": "Hızlı düşür (GPU)",
   "main.fast-gpu.tip": "• Ekran kartı kodlamayı işlemciye göre kat kat hızlandırır.\n• VidShrink kartınızın sunduğu en iyi kodlayıcıyı seçer; modern kartlarda AV1 kodlayıcısı yazılım kodlayıcısıyla neredeyse aynı kaliteyi yaklaşık yedi kat hızlı verir.\n• Daha eski kartlarda hız yine gelir, ama bedeli megabayt başına bir miktar kalitedir.",
-  "main.fast-gpu.tip-missing": "• Bu bilgisayarda kullanılabilir bir donanım kodlayıcı bulunamadı, bu yüzden hızlı düşürme kullanılamıyor.\n• Ekran kartı normalde işlemciden kat kat hızlı kodlar.",
+  "main.fast-gpu.tip-missing": "• Bu bilgisayarda kullanılabilir donanım kodlayıcı bulunamadı, bu yüzden hızlı düşürme kullanılamıyor.\n• Ekran kartı normalde işlemciden kat kat hızlı kodlar.",
   "main.fast-gpu.on-usable": "• Hızlı düşür kendiliğinden açıldı: {0} yoklamayı {1} ms'de geçti ve istenen {2} kbit/s takip edebildiği {3} kbit/s sınırının üstünde.",
   "main.fast-gpu.off-usable": "• {0} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.",
   "main.fast-gpu.probe-failed": "{0} yoklaması geçmedi",
@@ -102,7 +102,7 @@
   "main.fast-gpu.off-as-advised": "• {0}, hızlı düşür kapalı kaldı.",
 
   "main.fill.label": "Doldurma politikası",
-  "main.fill.tip": "• Hedefi doldur, hedef boyuta yakın durur ve bütçenin izin verdiği en iyi kaliteyi sıkar.\n• Kalite tavanında dur, kalite artmayı bıraktığında durur; dosyayı şişirmez ama belirgin biçimde küçük kalabilir.",
+  "main.fill.tip": "• Hedefi doldur, hedef boyuta yakın durur ve bütçenin izin verdiği en iyi kaliteyi sıkar.\n• Kalite tavanında dur, kalite artmayı bıraktığında durur; dosyayı şişirmez ama küçük kalabilir.",
   "main.fill.target": "Hedefi doldur",
   "main.fill.ceiling": "Kalite tavanında dur",
 
@@ -179,12 +179,12 @@
   "main.convert.container": "Kapsayıcı",
   "main.convert.container.tip": "• Kapsayıcı dosya türüdür.\n• MP4 en güvenli genel seçimdir ve WhatsApp'ın oynatılabilir video olarak güvenilir biçimde gönderdiği tek biçimdir — her telefon açar.\n• MKV birçok akış türünü destekler ancak WhatsApp ve çoğu telefon galerisi onu belge sayar.\n• WebM tarayıcılar içindir, telefon biçimi değildir.\n• MOV Apple iş akışlarına uygundur ve iPhone'da oynar, Android desteği ise düzensizdir.\n• AVI yalnızca eski yazılımlar içindir.\n• MP3, M4A ve WAV yalnızca ses dosyası oluşturur.",
   "main.convert.video-codec": "Video kodeği",
-  "main.convert.video-codec.tip": "• H.264 üretilmiş hemen her cihazda oynar ve WhatsApp'ın beklediği biçimdir; dosyanın sorunsuz çalışması gerekiyorsa bunu seçin.\n• H.265 aynı görüntüyü üçte bir daha küçük dosyada verir ve 2016 sonrası her telefon donanımda çözer.\n• Ancak eski cihazlar, bazı akıllı televizyonlar ve birkaç web oynatıcı açmaz, WhatsApp da yeniden kodlayabilir.\n• VP9 bir tarayıcı ve WebM biçimidir; telefonlar uygulamalarda oynatır ama galeride nadiren.\n• AV1 en iyi sıkıştıranıdır ve en yavaş kodlanandır, yalnızca yeni telefonlar çözer.\n• Kopyala, seçilen kapsayıcı kabul ettiğinde özgün videoyu kalite kaybı ve bekleme olmadan olduğu gibi korur.",
+  "main.convert.video-codec.tip": "• H.264 üretilmiş hemen her cihazda oynar ve WhatsApp'ın beklediği biçimdir; dosyanın sorunsuz çalışması gerekiyorsa bunu seçin.\n• H.265 aynı görüntüyü üçte bir daha küçük dosyada verir; 2016 sonrası her telefon donanımda çözer.\n• Ancak eski cihazlar, bazı televizyonlar ve birkaç web oynatıcı açmaz; WhatsApp yeniden kodlayabilir.\n• VP9 bir tarayıcı ve WebM biçimidir; telefonlar uygulamalarda oynatır ama galeride nadiren.\n• AV1 en iyi sıkıştıranıdır ve en yavaş kodlanandır, yalnızca yeni telefonlar çözer.\n• Kopyala, seçilen kapsayıcı kabul ettiğinde özgün videoyu kalite kaybı ve bekleme olmadan olduğu gibi korur.",
   "main.convert.quality-mode": "Kalite modu",
   "main.convert.quality-mode.tip": "• CRF görüntü kalitesini hedefler, son boyut değişebilir.\n• Sabit bit hızı bir veri hızını hedefleyerek dosya boyutunu daha öngörülebilir yapar.\n• Normal izleme kalitesi için CRF, boyut veya bant genişliği daha önemliyse sabit bit hızı kullanın.",
   "main.convert.fixed-bitrate": "Sabit bit hızı",
   "main.convert.crf-label": "CRF kalitesi / bit hızı K",
-  "main.convert.crf-label.tip": "• CRF modunda düşük sayı daha yüksek kalite ve daha büyük dosya demektir; 23, H.264 için yaygın başlangıçtır.\n• Sabit bit hızı modunda saniyedeki kilobit değerini girin: yüksek değer daha fazla kalite ve daha büyük dosya verir.",
+  "main.convert.crf-label.tip": "• CRF modunda düşük sayı daha yüksek kalite, daha büyük dosya demektir; H.264 için 23 yaygındır.\n• Sabit bit hızı modunda saniyedeki kilobit değerini girin: yüksek değer daha fazla kalite ve daha büyük dosya verir.",
   "main.convert.resolution": "Çözünürlük",
   "main.convert.resolution.tip": "• Kaynak özgün boyutları korur.\n• Sayılı seçenekler en-boy oranını koruyarak çıktı yüksekliğini sınırlar.\n• Düşük çözünürlük boyutu ve işlem yükünü azaltır.\n• Özel, kesin genişlik ve yükseklik girmenizi sağlar.",
   "main.convert.source-option": "Kaynak",

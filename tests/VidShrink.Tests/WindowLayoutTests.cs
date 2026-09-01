@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
@@ -154,6 +154,48 @@ public sealed class WindowLayoutTests
     /// <paramref name="size"/> görüş alanında yeniden ölçer. Kırpma ölçütü
     /// <see cref="Clips"/> içinde.
     /// </summary>
+    /// <summary>
+    /// İpucu balonu, pencerenin taban genişliğine sığar ve tema belirteçleri doğrudan
+    /// yazılmış opaklık taşımaz.
+    ///
+    /// <para><c>TooltipMaxWidth</c> 460'tan 780'e çıkarken tek gerekçe "pencerenin
+    /// yarısı" idi; ölçülmüş değildi. Ölçülen iki sayı: 460'ta (sarma genişliği 426)
+    /// 190 satırın 135'i taşıyor, 25'i tek kelimeyle taşıyordu —
+    /// <c>docs/olcumler/t27-ipucu-satir-genislikleri-once.md</c>. 780'de (746) 204
+    /// satırın 40'ı taşıyor, tek kelimeyle taşıyan yok. Üst sınırı ise pencerenin
+    /// tabanı koyuyor: balon ondan geniş olamaz, yoksa kullanıcı pencereyi küçülttüğünde
+    /// balon ekrandan taşar.</para>
+    /// </summary>
+    [Fact]
+    public void TheTooltipBubbleFitsTheNarrowestWindow()
+    {
+        Assert.True(
+            TipLineMetrics.Balloon <= MinimumSize().Width,
+            $"İpucu balonu {TipLineMetrics.Balloon:0} px, pencerenin taban genişliği "
+            + $"{MinimumSize().Width:0} px. Balon pencereye sığmıyor.");
+    }
+
+    /// <summary>
+    /// Tema dosyasında doğrudan yazılmış opaklık kalmaz — <c>Opacity="0"</c> dışında,
+    /// o bir ton değil "hiç görünme" demek. T84 birinci turu dört fırçaya
+    /// <c>0.18/0.12/0.13/0.62</c> yazmıştı; sekizinin tamamı belirtece taşındı.
+    /// </summary>
+    [Fact]
+    public void TheThemeCarriesNoInlineOpacityValues()
+    {
+        var theme = File.ReadAllText(TipSources.ThemePath);
+
+        var inline = Regex.Matches(theme, "Opacity=\"(?<value>[^\"{]+)\"")
+            .Select(match => match.Groups["value"].Value)
+            .Where(value => value != "0")
+            .ToList();
+
+        Assert.True(
+            inline.Count == 0,
+            $"Theme.axaml içinde belirtece taşınmamış {inline.Count} opaklık var: "
+            + string.Join(", ", inline));
+    }
+
     private static List<TabScan> ScanTabs(MainWindow window, Size size)
     {
         LayOutAt(window, size);
@@ -794,8 +836,166 @@ public sealed class WindowLayoutTests
 
         Assert.All(scans, scan => Assert.True(scan.Measured > 0, $"{scan.Header} sekmesi hiç ölçülmedi. {report}"));
 
-        var advanced = scans.Single(scan => scan.InPerformancePanel > 0);
+        var advancedHeader = VidShrink.App.Localization.Strings.Get("main.tab.advanced");
+        var advanced = scans.Single(scan => scan.Header == advancedHeader);
         Assert.True(advanced.InPerformancePanel > 0, $"Başarım paneli ölçülmedi. {report}");
+    }
+
+
+    /// <summary>
+    /// Bilgi rozetinin dikey ortası yanındaki etiketin dikey ortasıyla hizalı mı ve
+    /// içindeki soru işareti kırpılmadan sığıyor mu.
+    ///
+    /// <para>Ölçüm gerçek yerleşimden okunur: rozetin ve etiketin pencere koordinatındaki
+    /// sınırları alınır, dikey ortaları karşılaştırılır. Belirteç değerini dizgi olarak
+    /// aramak bunu ölçmez — belirteç doğru olup yerleşim yanlış olabilir.</para>
+    /// </summary>
+    [Fact]
+    public void InfoBadgesAlignWithTheirLabelAndTheQuestionMarkFits()
+    {
+        var size = DesignSize();
+
+        var (counted, problems) = Read(size, loaded: false, window =>
+        {
+            var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
+            var hdr = window.GetVisualDescendants().OfType<StackPanel>()
+                .FirstOrDefault(panel => panel.Name == "HdrPolicyPanel");
+            Assert.NotNull(hdr);
+            hdr.IsVisible = true;
+
+            var seen = new HashSet<Button>();
+            var found = 0;
+            var faults = new List<string>();
+
+            for (var index = 0; index < tabs.ItemCount; index++)
+            {
+                tabs.SelectedIndex = index;
+                RelayoutAt(window, size);
+                ClearEntranceTransforms(window);
+
+                var header = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
+
+                foreach (var button in window.GetVisualDescendants().OfType<Button>()
+                             .Where(candidate => candidate.IsEffectivelyVisible && candidate.Bounds.Height > 0)
+                             .Where(candidate => candidate.GetVisualDescendants()
+                                 .OfType<Border>().Any(border => border.Name == "Badge"))
+                             .Where(candidate => seen.Add(candidate)))
+                {
+                    var badge = button.GetVisualDescendants().OfType<Border>()
+                        .First(border => border.Name == "Badge");
+                    found++;
+
+                    var glyph = badge.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault();
+                    if (glyph is null || glyph.Bounds.Width <= 0 || glyph.Bounds.Height <= 0)
+                    {
+                        faults.Add($"{header}: rozetin soru işareti hiç ölçülmedi.");
+                        continue;
+                    }
+
+                    var inner = badge.BorderThickness.Left + badge.BorderThickness.Right;
+                    if (glyph.Bounds.Width > badge.Bounds.Width - inner
+                        || glyph.Bounds.Height > badge.Bounds.Height - inner)
+                    {
+                        faults.Add(
+                            $"{header}: soru işareti rozete sığmıyor — "
+                            + $"işaret {glyph.Bounds.Width:F1}x{glyph.Bounds.Height:F1}, "
+                            + $"rozet {badge.Bounds.Width:F1}x{badge.Bounds.Height:F1}, "
+                            + $"kenarlık {inner:F1}.");
+                        continue;
+                    }
+
+                    var label = Label(button);
+                    if (label is null)
+                    {
+                        faults.Add($"{header}: rozetin etiketi bulunamadı, hiza ölçülemedi.");
+                        continue;
+                    }
+
+                    var badgeMiddle = Middle(badge, window);
+                    var labelMiddle = Middle(label, window);
+                    if (badgeMiddle is not { } badgeY || labelMiddle is not { } labelY)
+                    {
+                        faults.Add($"{header}: rozet \"{label.Text}\" pencere koordinatına çevrilemedi.");
+                        continue;
+                    }
+
+                    var drift = badgeY - labelY;
+                    if (Math.Abs(drift) >= BadgeDriftCeiling)
+                        faults.Add(
+                            $"{header}: rozet \"{label.Text}\" etiketinden {drift:+0.0;-0.0} px kayık "
+                            + $"(tavan {BadgeDriftCeiling:F0} px, kapsayıcı {label.GetVisualParent()?.GetType().Name}).");
+                }
+            }
+
+            return (found, faults);
+        });
+
+        // Sayım donduruldu: ölçüm sekme seçimi ya da görünürlük yüzünden rozetleri
+        // görmez olursa sessizce yeşile dönmesin. Sayı MainWindow.axaml'deki rozet
+        // sayısıdır — ölçümün kendi çıktısı değil; rozet eklendiğinde elle güncellenir.
+        Assert.True(
+            counted == 23,
+            $"Ölçülen bilgi rozeti {counted}, beklenen 23. Rozet eklendiyse sayıyı güncelle; "
+            + "eklenmediyse ölçüm rozetleri göremiyor.");
+        Assert.True(
+            problems.Count == 0,
+            $"{problems.Count} bilgi rozeti hatalı:" + Environment.NewLine
+            + string.Join(Environment.NewLine, problems));
+    }
+
+    /// <summary>Rozetin hizalanması beklenen sapma tavanı, piksel.</summary>
+    private const double BadgeDriftCeiling = 2.0;
+
+    /// <summary>
+    /// Etiketin yanındaki rozetin alt boşluğu, etiketin alt boşluğuyla aynı sayıyı taşır;
+    /// yalnız rozet duran satırdaki rozet o boşluğu taşımaz.
+    ///
+    /// <para>Etiket kendi alt boşluğuyla satırı aşağı doğru büyütüyor, düğme ise satırın
+    /// dikey ortasına yerleşiyor. Rozet o boşluğu paylaşmazsa etiketin üzerinden aşağı
+    /// kayıyor — ölçüldü, otuz rozette 4,5 px. Etiket taşımayan satırda aynı boşluk ters
+    /// yönde aynı kadar kaydırıyor; bu yüzden iki ayrı belirteç var ve ikisi de tek
+    /// sayıdan türüyor: <c>LabelMargin</c>'in altı.</para>
+    ///
+    /// <para>Avalonia'da bir <c>Thickness</c> belirtecini başka bir <c>Thickness</c>
+    /// belirtecinden türetmenin yolu yok; bağ o yüzden burada kuruluyor.</para>
+    /// </summary>
+    [Fact]
+    public void TheBadgeBesideALabelCarriesTheLabelBottomInset()
+    {
+        var (plain, besideLabel, label) = Fresh(window =>
+        {
+            window.TryFindResource("InfoBadgeMargin", out var plainMargin);
+            window.TryFindResource("InfoBadgeLabelMargin", out var labelledMargin);
+            window.TryFindResource("LabelMargin", out var labelMargin);
+            return ((Thickness)plainMargin!, (Thickness)labelledMargin!, (Thickness)labelMargin!);
+        });
+
+        Assert.Equal(0, plain.Bottom);
+        Assert.Equal(label.Bottom, besideLabel.Bottom);
+        Assert.Equal(plain.Left, besideLabel.Left);
+    }
+
+    /// <summary>Rozetin ait olduğu etiket: aynı kapsayıcıdaki ilk metin bloğu.</summary>
+    private static TextBlock? Label(Button badge)
+    {
+        var parent = badge.GetVisualParent();
+        while (parent is not null)
+        {
+            var text = parent.GetVisualDescendants().OfType<TextBlock>()
+                .Where(block => block.IsEffectivelyVisible && block.Bounds.Height > 0)
+                .FirstOrDefault(block => !block.GetVisualAncestors().Contains(badge));
+            if (text is not null) return text;
+            parent = parent.GetVisualParent();
+        }
+
+        return null;
+    }
+
+    /// <summary>Denetimin pencere koordinatındaki dikey ortası.</summary>
+    private static double? Middle(Visual visual, Visual root)
+    {
+        var top = visual.TranslatePoint(new Point(0, 0), root);
+        return top is { } point ? point.Y + (visual.Bounds.Height / 2) : null;
     }
 
     private static List<TabScan> Scan(Size size, bool loaded) =>
