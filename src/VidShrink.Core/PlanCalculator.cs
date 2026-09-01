@@ -56,6 +56,8 @@ public static class PlanCalculator
     private const double ScaleStep = 0.02;
     private const double LowFpsSurcharge = 12.0;
     private const double LowFpsThreshold = 20.0;
+    private const double MotionCutCheapSavingShare = 0.20;
+    private static readonly double MotionCutIsCheapBelow = Math.Log2(2 * (1 - MotionCutCheapSavingShare));
     private const double MotionCutIsExpensiveAbove = 0.5;
     private const int MinVideoBitrateK = 48;
     private const double SourceQualityScore = 100.0;
@@ -98,7 +100,7 @@ public static class PlanCalculator
 
     public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
     {
-        var complexity = profile ?? ComplexityProfile.FromSourceBitrate(info);
+        var complexity = (profile ?? ComplexityProfile.FromSourceBitrate(info)).WithoutSampleContainerBias(info.Width, info.Height);
         var regime = CompressionStrategy.RegimeFor(info.FileSizeMb, options.TargetMb);
         var ratio = CompressionStrategy.Ratio(info.FileSizeMb, options.TargetMb);
         var notes = new List<AdviceCode>();
@@ -179,7 +181,7 @@ public static class PlanCalculator
         if (complexity.MotionMeasured && effective.AllowFpsDrop)
         {
             var halvingSaving = (1 - Math.Pow(2, complexity.MotionExponent - 1)) * 100;
-            if (complexity.MotionExponent <= ComplexityProfile.DefaultMotionExponent)
+            if (complexity.MotionExponent <= MotionCutIsCheapBelow)
             {
                 notes.Add(AdviceCode.MotionCutIsCheap);
                 reason.Add($"the motion measurement puts this title's frame rate exponent at {complexity.MotionExponent:0.00}, so halving the frame rate saves {halvingSaving:0.#}% of the bits and dropping frames is cheap here");
@@ -224,6 +226,14 @@ public static class PlanCalculator
         var budgetCrf = complexity.CrfForBppf(codec, budgetBppf, best.Scale, best.Fps, info.Fps);
         var ceilingCrf = TransparencyCrf(codec, options.Intent);
 
+        var qualityStopCrf = MeasuredQualityStopCrf(complexity, codec, best, info);
+        var qualityStopBinding = qualityStopCrf is double stopCrf && stopCrf > ceilingCrf + 1e-9;
+        if (qualityStopBinding)
+        {
+            ceilingCrf = qualityStopCrf!.Value;
+            reason.Add($"the measured quality stop binds before the transparency ceiling: the probe measured VMAF-NEG {complexity.QualityAnchor!.VmafNeg:0.##} on this source, and CRF {ceilingCrf:0.#} already reaches it, so the plan stops there instead of spending the rest of the budget on an extrapolation no measurement covers");
+        }
+
         EncodePlan plan;
         var ceilingBppf = complexity.BppfAtCrf(codec, ceilingCrf, best.Scale, best.Fps, info.Fps);
         var ceilingVideoK = VideoBitrateK(ceilingBppf, best.Width, best.Height, best.Fps);
@@ -257,7 +267,7 @@ public static class PlanCalculator
             plan.Crf = (int)Math.Round(ceilingCrf);
             plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, MinVideoBitrateK));
 
-            if (options.FillPolicy == FillPolicy.FillTarget)
+            if (options.FillPolicy == FillPolicy.FillTarget && !qualityStopBinding)
             {
                 var (minCrf, _) = CodecModel.CrfRange(codec);
                 var totalBudgetK = aimMb * KbitPerMib * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
@@ -364,7 +374,7 @@ public static class PlanCalculator
 
     public static SizeEstimate Estimate(EncodePlan plan, MediaInfo info, ComplexityProfile? profile)
     {
-        var complexity = profile ?? ComplexityProfile.FromSourceBitrate(info);
+        var complexity = (profile ?? ComplexityProfile.FromSourceBitrate(info)).WithoutSampleContainerBias(info.Width, info.Height);
 
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return new SizeEstimate(info.FileSizeMb, info.FileSizeMb, info.FileSizeMb, complexity.Measured, true);
@@ -418,6 +428,8 @@ public static class PlanCalculator
     // ScanResolutionIsChosenByConvergence in QualityTargetTests is that measurement.
     private const double QualityScanStep = 1.005;
     private const int QualityBisectionMaxSteps = 4;
+    private const int QualityBracketEvaluations = 2;
+    public const int QualitySearchMaxEvaluations = 1400;
     private const double QualityBisectionResolution = 0.20;
 
     public static double QualityFloorTargetMb(MediaInfo info)
@@ -454,7 +466,8 @@ public static class PlanCalculator
                 QualityTargetBound.AboveSourceCeiling, evaluations, ceiling);
 
         var span = ceilingMb / floorMb;
-        var steps = Math.Max(1, (int)Math.Ceiling(Math.Log(span) / Math.Log(QualityScanStep)));
+        var scanBudget = QualitySearchMaxEvaluations - QualityBisectionMaxSteps - QualityBracketEvaluations;
+        var steps = Math.Clamp((int)Math.Ceiling(Math.Log(span) / Math.Log(QualityScanStep)), 1, scanBudget);
         var lowMb = floorMb;
         var bestMb = ceilingMb;
         var best = ceiling;
@@ -473,6 +486,7 @@ public static class PlanCalculator
 
         for (var step = 0; step < QualityBisectionMaxSteps; step++)
         {
+            if (evaluations >= QualitySearchMaxEvaluations) break;
             var midMb = Math.Sqrt(lowMb * bestMb);
             if (midMb <= lowMb * 1.000001 || midMb >= bestMb * 0.999999) break;
             var mid = At(midMb);
@@ -572,7 +586,7 @@ public static class PlanCalculator
             if (budgetVideoK < CodecModel.UsableBitrateK(codec, width, height, fps)) continue;
 
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
-            var score = LayoutScore(codec, required, bppf, effectiveScale, fps, info.Fps, regime);
+            var score = LayoutScore(complexity, codec, required, bppf, effectiveScale, fps, info.Fps, regime);
             if (best is null || score > best.Score)
                 best = new Layout(width, height, fps, effectiveScale, score, bppf);
         }
@@ -580,10 +594,27 @@ public static class PlanCalculator
         return best ?? fallback;
     }
 
-    private static double LayoutScore(string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
+    private static double? MeasuredQualityStopCrf(ComplexityProfile complexity, string codec, Layout best, MediaInfo info)
+    {
+        if (complexity.QualityAnchor is not { } anchor) return null;
+        var level = complexity.Level;
+        if (level.PerHalving <= 0) return null;
+
+        var required = complexity.RequiredBppf(codec, best.Scale, best.Fps, info.Fps);
+        var stopBppf = required * Math.Pow(2, (anchor.VmafNeg - level.AtReference) / level.PerHalving);
+        if (!double.IsFinite(stopBppf) || stopBppf <= 0) return null;
+
+        var crf = complexity.CrfForBppf(codec, stopBppf, best.Scale, best.Fps, info.Fps);
+        if (!double.IsFinite(crf)) return null;
+        var (min, max) = CodecModel.CrfRange(codec);
+        return Math.Clamp(crf, min, max);
+    }
+
+    private static double LayoutScore(ComplexityProfile complexity, string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
     {
         var weights = CompressionStrategy.PenaltyWeights(regime);
-        var rate = CodecModel.QualityAtReference - CodecModel.QualityPerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
+        var level = complexity.Level;
+        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
         rate = Math.Min(rate, CodecModel.QualityLimit(codec));
         return rate - ScalePenalty(scale, weights) - FpsPenalty(fps, sourceFps, weights);
     }
@@ -605,7 +636,7 @@ public static class PlanCalculator
             var effectiveScale = (double)height / Math.Max(1, info.Height);
             var required = complexity.RequiredBppf(codec, effectiveScale, fps, info.Fps);
             var provided = BitsPerPixel(videoK, width, height, fps);
-            var score = LayoutScore(codec, required, provided, effectiveScale, fps, info.Fps, regime);
+            var score = LayoutScore(complexity, codec, required, provided, effectiveScale, fps, info.Fps, regime);
             if (complexity.AppliesTo(codec, effectiveScale, fps)) score += CalibratedShapeHysteresis;
             var deliverable = videoK >= CodecModel.UsableBitrateK(codec, width, height, fps);
 

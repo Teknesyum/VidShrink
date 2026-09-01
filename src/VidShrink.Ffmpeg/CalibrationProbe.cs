@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
@@ -203,7 +203,8 @@ public static class CalibrationProbe
         args.AddRange(QualityArgs(draft.Codec, crf));
         args.Add("-preset");
         args.Add(draft.Preset);
-        var psychovisual = FfmpegArguments.PsychovisualArgs(draft.Codec, EncoderCapabilities.Instance);
+        FfmpegArguments.WarmPsychovisual(draft.Codec, EncoderCapabilities.Instance);
+        var psychovisual = FfmpegArguments.CachedPsychovisualArgs(draft.Codec, EncoderCapabilities.Instance);
         args.AddRange(FfmpegArguments.PsychovisualAndColorArgs(draft.Codec, psychovisual, draft.HdrColorArgs));
         args.Add("-pix_fmt");
         args.Add(draft.PixelFormat);
