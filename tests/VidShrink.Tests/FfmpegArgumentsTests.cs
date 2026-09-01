@@ -209,28 +209,84 @@ public sealed class FfmpegArgumentsTests
         Assert.Contains("TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments", windowSource);
     }
 
+    /// <summary>
+    /// Tepe carpaninin taban orani basina verdigi deger. Beklenen sayilar kodun sabitlerinden
+    /// degil elle yurutulen egriden geliyor: diz altinda 1,02, dizle en genis olculen oranin
+    /// ortasinda (8,7x) 1,02 + 0,08/2 = 1,06, en genis olculen oranda ve ustunde 1,10.
+    /// Onceki surum burada carpani <c>TightPeakFactor</c> ile <c>HardwarePeakCeiling</c>
+    /// arasinda sayan bir aralik iddiasi tutuyordu; <c>PeakRateFactor</c> tam o iki sinira
+    /// <c>Clamp</c>lendigi icin iddia tanim geregi dogruydu ve formul tumden bozulsa da
+    /// yesil kaliyordu.
+    /// </summary>
     [Theory]
-    [InlineData("av1_nvenc", 64, 64, 1, 39)]
-    [InlineData("av1_nvenc", 1280, 720, 60, 4200)]
-    [InlineData("hevc_qsv", 3840, 2160, 120, 50000)]
-    public void Donanim_tepe_carpani_boyut_guvencesi_tavanini_asmaz(string codec, int width, int height, double fps, int bitrateK)
+    [InlineData("av1_nvenc", 64, 64, 1, 1.0, 1.02)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 2.92, 1.02)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 6.0, 1.02)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 8.7, 1.06)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 11.4, 1.10)]
+    [InlineData("hevc_qsv", 3840, 2160, 120, 8.7, 1.06)]
+    [InlineData("hevc_qsv", 3840, 2160, 120, 30.0, 1.10)]
+    public void Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir(
+        string codec, int width, int height, double fps, double floorRatio, double expected)
     {
-        var factor = FfmpegArguments.PeakRateFactor(codec, bitrateK, width, height, fps);
-
-        Assert.InRange(factor, FfmpegArguments.TightPeakFactor, FfmpegArguments.HardwarePeakCeiling);
-        Assert.True(factor <= 1.10, $"boyut-guvenli tepe asildi: {factor}");
+        Assert.Equal(expected, PeakAtFloorRatio(codec, width, height, fps, floorRatio), 3);
     }
 
-    private sealed class RecordingAvailability : IEncoderAvailability, IEncoderOptionAvailability
+    [Fact]
+    public void Yazilim_kodlayicisinda_tepe_carpani_genis_kalir()
     {
-        internal List<(string Codec, string Option)> Asked { get; } = new();
+        Assert.Equal(1.5, FfmpegArguments.PeakRateFactor("libx264", 1200, 1280, 720, 30), 12);
+        Assert.Equal(1.5, FfmpegArguments.PeakRateFactor("libx265", 9000, 3840, 2160, 60), 12);
+    }
+
+    /// <summary>
+    /// Yoklamanin kac kez dogurulduğunu sayar. <c>WarmEncoderOption</c> uretimin surec
+    /// doguran yolunun karsiligi; <c>SupportsEncoderOption</c> yalniz isitilmis sonucu okur.
+    /// </summary>
+    private sealed class WarmingAvailability : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup
+    {
+        private readonly Dictionary<string, bool> _warmed = new(StringComparer.Ordinal);
+        internal List<(string Codec, string Option)> Warmed { get; } = new();
         public bool HasEncoder(string name) => true;
         public bool WorksAsEncoder(string codec) => true;
         public bool SupportsEncoderOption(string codec, string option, string value)
+            => _warmed.TryGetValue($"{codec}\0{option}\0{value}", out var cached) && cached;
+        public bool WarmEncoderOption(string codec, string option, string value)
         {
-            Asked.Add((codec, option));
+            Warmed.Add((codec, option));
+            _warmed[$"{codec}\0{option}\0{value}"] = true;
             return true;
         }
+    }
+
+    [Fact]
+    public void Arguman_uretimi_kodlayici_yoklamasi_dogurmaz()
+    {
+        var recorder = new WarmingAvailability();
+        var plan = Plan("av1_nvenc");
+
+        FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", recorder);
+        FfmpegArguments.Build(Source(), plan, "out.mp4", 1, "log", recorder);
+        FfmpegArguments.BuildSegment(Source(), plan, 1, 2, "part.mp4", recorder);
+
+        Assert.Empty(recorder.Warmed);
+    }
+
+    [Fact]
+    public void Isitilan_secenek_sonraki_arguman_uretiminde_onbellekten_okunur()
+    {
+        var recorder = new WarmingAvailability();
+        var plan = Plan("av1_nvenc");
+
+        var cold = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", recorder);
+        Assert.DoesNotContain("-spatial-aq", cold);
+
+        FfmpegArguments.PsychovisualArgs("av1_nvenc", recorder);
+        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Warmed);
+
+        var warmed = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", recorder);
+        Assert.Contains("-spatial-aq", warmed);
+        Assert.Contains("-temporal-aq", warmed);
     }
 
     private static MediaInfo PreviewSource() => new()
@@ -281,40 +337,129 @@ public sealed class FfmpegArgumentsTests
     [Fact]
     public void Yoklama_isinmasi_psy_secenegi_olan_her_kodlayiciyi_arka_planda_sorar()
     {
-        var recorder = new RecordingAvailability();
+        var recorder = new WarmingAvailability();
 
         VidShrink.App.MainWindow.WarmPsychovisualProbe(recorder);
 
-        Assert.Contains(("libx265", "-x265-params"), recorder.Asked);
-        Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Asked);
-        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Asked);
-        Assert.Contains(("av1_nvenc", "-temporal-aq"), recorder.Asked);
-        Assert.Contains(("hevc_nvenc", "-spatial-aq"), recorder.Asked);
+        Assert.Contains(("libx265", "-x265-params"), recorder.Warmed);
+        Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Warmed);
+        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Warmed);
+        Assert.Contains(("av1_nvenc", "-temporal-aq"), recorder.Warmed);
+        Assert.Contains(("hevc_nvenc", "-spatial-aq"), recorder.Warmed);
     }
 
     /// <summary>
-    /// Yoklamayi doguran tek nokta arka plandaki <c>Task.Run</c> olmali. Arayuz yolunda
-    /// <c>EncoderCapabilities.Instance</c> okunursa ilk cagri arayuz is parcacigini
-    /// kodlayici basina yoklama suresi kadar bloklar.
+    /// Kodlama yolu psy/AQ yoklamasini kendisi isitir. <c>FfmpegArguments.Build</c> saf
+    /// oldugu icin isitilmamis bir secenegi desteklenmiyor sayiyor; isitmayan bir cagiran
+    /// -- olcum araci <c>tools/VidShrink.Bench</c> <c>EncodeRunner</c> uzerinden geciyor --
+    /// bayraklari sessizce kaybederdi. Kabiliyet burada hic isitilmamis veriliyor.
+    /// </summary>
+    [Theory]
+    [InlineData("av1_nvenc", "-spatial-aq")]
+    [InlineData("av1_nvenc", "-temporal-aq")]
+    [InlineData("libx265", "-x265-params")]
+    public void Kosucunun_arguman_uretimi_isitilmamis_kabiliyette_psy_bayragini_dusurmez(string codec, string flag)
+    {
+        var cold = new WarmingAvailability();
+
+        var args = VidShrink.Ffmpeg.EncodeRunner.EncodeArguments(Source(), Plan(codec), "out.mp4", 2, "log", cold);
+
+        Assert.Contains(flag, args);
+        Assert.Contains((codec, flag), cold.Warmed);
+    }
+
+    /// <summary>
+    /// Saf okuma yolu adiyla ayrildi: <c>CachedPsychovisualArgs</c> hicbir kosulda yoklama
+    /// dogurmaz, isitmayi <c>WarmPsychovisual</c> ustlenir. Ayrim varsayilan parametreyle
+    /// yapilsaydi yeni bir cagiran hicbir sey yazmadan surec dogururdu.
+    /// </summary>
+    [Fact]
+    public void Saf_psy_yolu_kabiliyeti_isitmaz()
+    {
+        var cold = new WarmingAvailability();
+
+        Assert.Empty(FfmpegArguments.CachedPsychovisualArgs("av1_nvenc", cold));
+        Assert.Empty(FfmpegArguments.CachedPsychovisualArgs("libx265", cold));
+
+        Assert.Empty(cold.Warmed);
+    }
+
+    /// <summary>
+    /// Yoklamayi doguran tek nokta arka plandaki <c>Task.Run</c> olmali. Arayuzun her plan
+    /// tazelemesinde kosturdugu <c>DisplayedEncodeArguments</c> yoklama doguruyorsa ilk cagri
+    /// arayuz is parcacigini kodlayici basina yoklama suresi kadar bloklar. Olcu artik
+    /// pencerenin kaynak metnine degil sahte kabiliyetin cagri sayacina bakiyor.
     /// </summary>
     [Fact]
     public void Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz()
     {
-        var windowSource = File.ReadAllText(TipSources.WindowCodePath);
+        var recorder = new WarmingAvailability();
 
-        Assert.Equal(1, CountOccurrences(windowSource, "EncoderCapabilities.Instance"));
+        VidShrink.App.MainWindow.DisplayedEncodeArguments(Source(), Plan("av1_nvenc"), "out.mp4", recorder);
+        VidShrink.App.MainWindow.DisplayedEncodeArguments(Source(), Plan("libx265"), "out.mp4", recorder);
+
+        Assert.Empty(recorder.Warmed);
+
+        var windowSource = File.ReadAllText(TipSources.WindowCodePath);
         Assert.Contains("var capabilities = EncoderCapabilities.Instance;\n                WarmPsychovisualProbe(capabilities);",
             windowSource.Replace("\r\n", "\n"));
         Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", \"mp4\"), _encoders));", windowSource);
     }
 
-    private static int CountOccurrences(string text, string needle)
+    /// <summary>
+    /// ffmpeg <c>-x265-params</c>'ta son yazani kazandiriyor: ayri ayri uretilen psy, HDR renk
+    /// ve kullanicinin <c>ExtraArgs</c>'i birbirini sessizce iptal ederdi. Ucu de tek
+    /// birlestiriciden geciyor.
+    /// </summary>
+    [Fact]
+    public void Psy_renk_ve_kullanici_x265_parametreleri_tek_dizgide_birlesir()
     {
-        var count = 0;
-        for (var i = text.IndexOf(needle, StringComparison.Ordinal); i >= 0;
-             i = text.IndexOf(needle, i + needle.Length, StringComparison.Ordinal))
-            count++;
-        return count;
+        var plan = Plan("libx265");
+        plan.HdrColorArgs = new List<string> { "-color_primaries", "bt2020", "-x265-params", "hdr10-opt=1" };
+        plan.ExtraArgs = new List<string> { "-tag:v", "hvc1", "-x265-params", "keyint=48" };
+        var availability = new OptionAvailability(("libx265", "-x265-params"));
+
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", availability);
+
+        Assert.Equal(1, args.Count(a => a == "-x265-params"));
+        var value = args[args.IndexOf("-x265-params") + 1];
+        Assert.Contains("psy-rd=2:psy-rdoq=1:aq-mode=2", value);
+        Assert.Contains("hdr10-opt=1", value);
+        Assert.Contains("keyint=48", value);
+        Assert.Contains("-color_primaries", args);
+        Assert.Contains("-tag:v", args);
+        Assert.Contains("hvc1", args);
+    }
+
+    [Fact]
+    public void Ilk_gecis_de_tek_x265_dizgesi_uretir()
+    {
+        var plan = Plan("libx265");
+        plan.HdrColorArgs = new List<string> { "-x265-params", "hdr10-opt=1" };
+        plan.ExtraArgs = new List<string> { "-x265-params", "keyint=48" };
+        var availability = new OptionAvailability(("libx265", "-x265-params"));
+
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 1, "log", availability);
+
+        Assert.Equal(1, args.Count(a => a == "-x265-params"));
+        var value = args[args.IndexOf("-x265-params") + 1];
+        Assert.Contains("hdr10-opt=1", value);
+        Assert.Contains("keyint=48", value);
+    }
+
+    [Fact]
+    public void Svtav1_parametreleri_de_tek_dizgide_birlesir()
+    {
+        var plan = Plan("libsvtav1");
+        plan.ExtraArgs = new List<string> { "-svtav1-params", "fast-decode=1" };
+        var availability = new OptionAvailability(("libsvtav1", "-svtav1-params"));
+
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 0, null, availability);
+
+        Assert.Equal(1, args.Count(a => a == "-svtav1-params"));
+        var value = args[args.IndexOf("-svtav1-params") + 1];
+        Assert.Contains("tune=0:enable-variance-boost=1:variance-boost-strength=2", value);
+        Assert.Contains("fast-decode=1", value);
     }
 
     /// <summary>

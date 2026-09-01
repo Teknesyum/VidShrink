@@ -37,7 +37,7 @@ Tek koşumda AQ açıkken mean +0,09457232250016, harmonic +0,15693780814727 ve 
 - G1 mutasyonunda birleştirme kaldırılınca `Hdr_x265_psy_ve_renk_parametreleri_tek_dizgide_birlesir`; G3 mutasyonunda arayüz eski `Build` çağrısına döndürülünce `Arayuzde_gosterilen_komut_kosucunun_argumanlariyla_aynidir`; G4 mutasyonunda availability aktarımı kaldırılınca `Parca_tam_kodlamayla_ayni_psy_kabiliyetini_kullanir` kırmızı oldu.
 - Sözleşmedeki `CodecModelTests` sınıfı depoda yoktur; yerel filtre bunun yerine mevcut `HardwareRateControlTests` ile koşturuldu.
 - Önceki turda sahiplik listesi dışındaki `IEncoderAvailability.cs`, `EncoderCapabilities.cs` ve `EncodeRunner.cs` değişiklikleri seçenek desteğini gerçek ffmpeg ile ölçmek ve aynı sonucu koşucuya vermek için zorunluydu. Bench `Program.cs` de rapor sayılarını gerçek argümandan üretmek için değişti.
-- Teknik borç: `RunOptionProbe`, saf görünen `Build()` yolundan senkron ffmpeg G/Ç'si başlatabiliyor ve kodlayıcı başına dört saniyeye kadar bloklayabiliyor. Bu turda ayrı önbellekli/asenkron yoklama katmanına taşınmadı.
+- Teknik borç: `RunOptionProbe`, saf görünen `Build()` yolundan senkron ffmpeg G/Ç'si başlatabiliyor ve kodlayıcı başına dört saniyeye kadar bloklayabiliyor. Bu turda ayrı önbellekli/asenkron yoklama katmanına taşınmadı. **Kapandı (T92):** `Build` artık yalnız ısıtılmış sonucu okuyor, yoklamayı çağıran ısıtıyor.
 
 ## Doğrulama
 
@@ -72,7 +72,7 @@ Dört mutasyon, dördü de kırmızı (`dotnet test -c Release --filter "FfmpegA
 
 Sabit hiç değişmedi: `HardwarePeakCeiling = 1.10` ve 6,0–11,4 diz eğrisi tur 2'deki gibi duruyor, bu turda yeni boyut ölçümü alınmadı.
 
-Eski `Donanim_tepe_carpani_boyut_guvencesi_tavanini_asmaz` **kaldırıldı değil, olduğu gibi duruyor**; içindeki `Assert.InRange(factor, TightPeakFactor, HardwarePeakCeiling)` hâlâ `Clamp` çıkışını `Clamp` sınırlarıyla karşılaştırdığı için yanlışlanamaz. Assertion gevşetmemek için silinmedi; iddiayı taşıyan ölçüler yukarıdaki üçü.
+Eski `Donanim_tepe_carpani_boyut_guvencesi_tavanini_asmaz` tur 3'te olduğu gibi bırakılmıştı: `Clamp` çıkışını `Clamp` sınırlarıyla karşılaştırdığı için yanlışlanamazdı, ama assertion gevşetmemek için silinmedi. **Düzeltme (T92):** bu cümle artık geçersiz — o ölçü T92'de yedi vakalık `Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir` teorisine dönüştürüldü; beklenen değerler `Clamp` sınırlarından değil elle yürütülen eğriden geliyor.
 
 ### I2 — önizleme psy/AQ'yu görüyor
 
@@ -122,8 +122,8 @@ Mutasyonlar (taban yeşil 23/23):
 Sözleşmenin bu turda kapanmasını beklemediği üç madde duruyor:
 
 - `tools/VidShrink.Bench/Program.cs` `--no-psy` ablasyonu `-spatial-aq 0 -temporal-aq 0`'ı `ExtraArgs` ile psy'den sonra ekliyor; son-yazan-kazanır kalıbı, `ExtraArgs` sırası değişirse ablasyon sessizce yanlış ölçer.
-- `ExtraArgs` `PsychovisualAndColorArgs` birleştiricisinden geçmiyor: `-x265-params` içeren bir `ExtraArgs` birleşik dizgeyi yine sessizce ezer.
-- `RunOptionProbe` hâlâ `Build()` yolundan senkron ffmpeg süreci doğurabiliyor. Bu turda yalnız **ilk çağrının yeri** düzeltildi; ayrı önbellekli/asenkron yoklama katmanına taşınmadı.
+- `ExtraArgs` `PsychovisualAndColorArgs` birleştiricisinden geçmiyor: `-x265-params` içeren bir `ExtraArgs` birleşik dizgeyi yine sessizce ezer. **Kapandı (T92):** `Build` her iki çıkış yolunda `MergeEncoderParams`tan geçiyor, `ExtraArgs` dahil.
+- `RunOptionProbe` hâlâ `Build()` yolundan senkron ffmpeg süreci doğurabiliyor. Bu turda yalnız **ilk çağrının yeri** düzeltildi; ayrı önbellekli/asenkron yoklama katmanına taşınmadı. **Kapandı (T92):** yoklama `Build`den çıktı.
 
 ### Doğrulama
 
@@ -143,3 +143,95 @@ Dalın CI koşumu (`gh run view 33545797054`, `T87-tepe-tavani-ve-psy`, 14 m 38 
     KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=996 alt-sınır=950
 
 Bir önceki itmenin CI koşumu (33545605270) `dotnet build -c Release -warnaserror` adımında düşmüştü: `MainWindow.axaml.cs:1249` `_preview.Availability = encoders;` satırı CS8602 (olası `null` başvurusu) veriyordu. Yerel `dotnet test` bu bayrağı kullanmadığı için yeşil okunmuştu. `if (_preview is not null)` denetimiyle düzeltildi.
+
+## T92 — yanlışlanamayan ölçü, tek birleştirici ve ısıtma sorumluluğu
+
+T87 denetiminin bıraktığı beş borcu kapatan sözleşme. Bu bölümdeki bütün sayılar
+`dotnet test -c Release --filter "FfmpegArgumentsTests"` çıktısından gelir; bu turda
+`tools/VidShrink.Bench` koşturulmadı, yani **yeni boyut ya da VMAF ölçümü alınmadı**.
+
+### Ne değişti
+
+- Yanlışlanamayan tepe ölçüsü yedi vakalık bir teoriye dönüştü
+  (`Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir`); beklenen değerlerin hiçbiri
+  `TightPeakFactor`/`HardwarePeakCeiling` sabitlerinden okunmuyor, elle yürütülen eğriden
+  geliyor.
+- Psy/AQ, HDR renk ve kullanıcının `ExtraArgs`ı tek `MergeEncoderParams` birleştiricisinden
+  geçiyor; `Build`in her iki çıkış yolu (birinci geçiş ve son geçiş) birleştiriciden dönüyor.
+- Argüman üretimi saf: `Build` yalnız ısıtılmış sonucu okuyor, süreç doğurmuyor.
+
+### J1 — ısıtılmayan çağıranda psy/AQ'nun sessizce düşmesi
+
+Tur 1'de `Build` saf oldu, ama ısıtan tek yer Avalonia penceresiydi. `tools/VidShrink.Bench`
+`EncodeRunner` üzerinden geçtiği ve hiç ısıtmadığı için ölçüm aracı psy/AQ argümanları
+**olmadan** kodluyordu: hata yok, çıkış kodu 0, rapora giren sayı yanlış.
+
+Sözleşmenin iki adayından **ısıtmayı `EncodeRunner`a vermek** seçildi. Gerekçe: tembel
+ısıtma `SupportsEncoderOption`u yeniden süreç doğuran bir yola çevirir ve `Build`in saflığını
+(kriter 6) feda ederdi; kodlayan bütün yollar zaten `EncodeRunner`dan geçtiği için tek nokta
+yetiyor. `EncodeRunner.EncodeArguments` önce `FfmpegArguments.WarmPsychovisual`ı, sonra
+`Build`i çağırıyor; `RunOneAsync` bu yoldan geçiyor. `tools/VidShrink.Bench/Program.cs`
+değiştirilmedi — T88'in elinde.
+
+Ölçüsü `Kosucunun_arguman_uretimi_isitilmamis_kabiliyette_psy_bayragini_dusurmez`: hiç
+ısıtılmamış sahte bir kabiliyetle `EncodeArguments` koşuyor ve üç vakada da (av1_nvenc
+`-spatial-aq`, `-temporal-aq`; libx265 `-x265-params`) bayrağın üretilen komutta bulunduğunu
+ve kabiliyetin ısıtıldığını gösteriyor.
+
+### J2 — ısıtma varsayılan parametreden ada geçti
+
+`PsychovisualArgs(..., bool warm = true)` kalktı. Üç ad var: `PsychovisualArgs` ölçer,
+`CachedPsychovisualArgs` yalnız ısıtılmış sonucu okur, `WarmPsychovisual` yalnız ısıtır.
+`Build` saf olanı çağırıyor; `CalibrationProbe` açıkça ısıtıp saf yoldan okuyor.
+
+**Sapma:** sözleşme "saf yol varsayılan olur" diyor; burada saf yolun adı
+`CachedPsychovisualArgs`, süssüz ad (`PsychovisualArgs`) ölçen yolda kaldı. Nedeni:
+`MainWindow.WarmPsychovisualProbe` ısıtma döngüsünde tam olarak `PsychovisualArgs(codec,
+capabilities)` çağırıyor ve `MainWindow.axaml.cs` bu turda T88'in `owns` kümesinde. Süssüz
+adı saf yola vermek, o dosyaya dokunmadan, arayüzün ısıtmasını sessizce kapatırdı —
+J1'in kapattığı kusurun aynen arayüz tarafında açılması. Ada göre ayrım ve varsayılan
+parametrenin kalkması sağlandı; hangi adın süssüz olduğu `MainWindow.axaml.cs` serbest
+kaldığında çevrilebilir.
+
+Arayüzün ısıtma ölçüsü de bu turda gerçekten davranış ölçer hale geldi:
+`Yoklama_isinmasi_...` artık okuma sayacına değil **ısıtma sayacına** bakıyor, yani
+`WarmPsychovisualProbe` ısıtmayı bırakırsa kırmızıya döner (M8, M10).
+
+### J3 — mutasyon tablosu
+
+Tur 1'de sekiz mutasyon koşturulduğu bildirilmiş ama tablo ağaçta yoktu; denetçi K7'yi
+doğrulayamadı. Tablo bu turda **sıfırdan** koşturuldu ve tur 1'in düzeltmelerini de kapsıyor.
+Düzenek her mutasyonu üretim kaynağına uyguluyor, filtreyi koşuyor, kaynağı geri alıyor.
+Taban yeşil koşum: **Başarısız 0, Başarılı 37, Atlanan 0, Toplam 37**. Mutasyonların hepsi
+üretim davranışını bozar; hiçbiri testin kendi sabitini değiştirmez.
+
+| # | Mutasyon | Sonuç | Kırılan ölçü |
+|---|---|---|---|
+| M1 | `PeakOpensAtFloorRatio` 6.0 → 2.0 | Başarısız 8 / 37 | `Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir`, `Tepe_carpani_olculen_guvenli_degerlerin_disina_cikmaz`, `Tepe_egrisi_..._doymus` |
+| M2 | `PeakWidestAtFloorRatio` 11.4 → 7.0 | Başarısız 4 / 37 | `Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir`, `Tepe_egrisi_..._doymus` |
+| M3 | `opening` payı ters çevrildi | Başarısız 12 / 37 | yukarıdaki üçü + `Tepe_carpani_taban_orani_boyunca_geri_gitmez` |
+| M4 | `MergeEncoderParams` girdiyi olduğu gibi döndürüyor | Başarısız 4 / 37 | `Hdr_x265_psy_ve_renk_parametreleri_tek_dizgide_birlesir`, `Ilk_gecis_de_tek_x265_dizgesi_uretir`, `Psy_renk_ve_kullanici_x265_parametreleri_tek_dizgide_birlesir`, `Svtav1_parametreleri_de_tek_dizgide_birlesir` |
+| M5 | birinci geçiş çıkışı birleştiriciyi atlıyor | Başarısız 1 / 37 | `Ilk_gecis_de_tek_x265_dizgesi_uretir` |
+| M6 | `ExtraArgs` birleştirmeden **sonra** ekleniyor | Başarısız 2 / 37 | `Psy_renk_ve_kullanici_x265_parametreleri_tek_dizgide_birlesir`, `Svtav1_parametreleri_de_tek_dizgide_birlesir` |
+| M7 | `Build` yeniden ölçen yolu çağırıyor (saf değil) | Başarısız 3 / 37 | `Arguman_uretimi_kodlayici_yoklamasi_dogurmaz`, `Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz`, `Isitilan_secenek_sonraki_arguman_uretiminde_onbellekten_okunur` |
+| M8 | ölçen yol ısıtma arabirimini yok sayıyor | Başarısız 5 / 37 | `Yoklama_isinmasi_...`, `Kosucunun_arguman_uretimi_isitilmamis_kabiliyette_psy_bayragini_dusurmez`, `Isitilan_secenek_sonraki_arguman_uretiminde_onbellekten_okunur` |
+| M9 | `EncodeArguments`tan `WarmPsychovisual` çağrısı silindi (J1) | Başarısız 3 / 37 | `Kosucunun_arguman_uretimi_isitilmamis_kabiliyette_psy_bayragini_dusurmez` (üç vaka) |
+| M10 | `CachedPsychovisualArgs` ölçmeye çevrildi (J2) | Başarısız 4 / 37 | `Saf_psy_yolu_kabiliyeti_isitmaz`, `Arguman_uretimi_kodlayici_yoklamasi_dogurmaz`, `Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz`, `Isitilan_secenek_sonraki_arguman_uretiminde_onbellekten_okunur` |
+
+Onunun onu da kırmızıya döndü. M9 ve M10 J1/J2'nin ölçüleridir: ısıtma çağrısı silinince ya
+da saf yol ölçmeye çevrilince ilgili ölçü düşüyor.
+
+### Ölçülmeyenler
+
+- Bu turda `tools/VidShrink.Bench` koşturulmadı: teslim boyutu, VMAF ve ısıtmanın ölçüm
+  aracındaki süre maliyeti **ölçülmedi**.
+- Tam süit bu turda yerel olarak koşturulmadı (paralel çalışan üç ajan ölçüyü kararsız
+  yapıyor); yalnız sözleşme filtresi koştu. Tam süit dalın CI koşumuna bırakıldı.
+- `EncodeRunner.ConvertAsync` (GIF/dönüştürme) yolu psy/AQ argümanı üretmiyor, bu yüzden
+  ısıtma oraya eklenmedi ve ölçülmedi.
+
+### Doğrulama
+
+`dotnet build VidShrink.sln -c Release`: 0 Uyarı, 0 Hata.
+`dotnet test -c Release --filter "FfmpegArgumentsTests"`: Başarısız 0, Başarılı 37,
+Atlanan 0, Toplam 37. Hiçbir assertion gevşetilmedi, hiçbir test `Skip`e alınmadı.
