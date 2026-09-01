@@ -102,6 +102,26 @@ Kullanıcı kaynağı incelemeye yetki verdi; okundu ve karşılaştırıldı.
 | T98 | sabit GOP ve CRF tavanı → dinamikliğe geçiş | `depends: [T89, T95, T96]` |
 | T99 | bppf tabanı kazanan yerleşimi aramıyor | `depends: [T89, T95]` |
 
+## GOP: iki bağımsız kaynaktan doğrulandı
+
+T102 ölçtü (2026-09-02), auto mod tabanına karşı tek değişkenle:
+
+| satır | boyut | ortalama | p10 |
+|---|---|---|---|
+| auto (`-g fps*2` = 120) | 15,04 MiB | 94,462 | 94,534 |
+| preset 4 tek başına | 13,97 MiB (−%7,1) | 94,420 | 94,241 |
+| **`-g 300` tek başına** | **11,35 MiB (−%24,5)** | **94,617** | **94,868** |
+
+Dosya dörtte bir küçülürken puan **yükseliyor**. Her iki eksende de kazanç
+olduğu için bu sonuç boyut eşitliği tartışmasından bağımsız.
+
+HandBrake kaynağı aynı şeyi söylüyordu: `min-keyint=fps`, `keyint=10*fps`,
+yerleşim sahne kesiminden. Sabit `-g fps*2`, scenecut zaten açıkken sahne
+**olmayan** yerlere I-kare basıyor ve bütçeyi yiyor.
+
+Sabit `FfmpegArguments.cs:162`'de ve T98'in `owns`'unda. T102 ölçtü,
+düzeltmiyor.
+
 ## T97'nin çıkardığı ölçü hatası
 
 `NormalizeVmafCeiling` (`score >= 99.8 ? 100.0 : score`) yüksek kalitede
