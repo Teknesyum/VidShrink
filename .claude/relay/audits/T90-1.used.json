@@ -1,0 +1,24 @@
+{
+  "contractId": "T90",
+  "auditorRunId": "a361ac04305c71618",
+  "headSha": "fa0b6c7c08798f26100e9c66b97d413bbccf2bea",
+  "diffHash": "77951723cc9f75d2224f3d5e13b7b5f0f101bded3232525927d110319120b330",
+  "owns": [
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "src/VidShrink.App/Playback/ControlStrip.axaml.cs",
+    "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs",
+    "src/VidShrink.App/Locales/en/playback.json",
+    "src/VidShrink.App/Locales/tr/playback.json",
+    "src/VidShrink.App/Locales/en/main.json",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "tests/VidShrink.Tests/LocalizationTests.cs",
+    "tests/VidShrink.Tests/LanguageTests.cs"
+  ],
+  "verification": [
+    "Sekiz kriterin sekizi de GECTI. K1: LanguageCatalog.cs:229-236 artik Strings.GetIn('main.playback.encode-marker'); iki dilli cift kodda yok, grep yalniz Locales/*/main.json:332 donuyor. K2: yetim docstring silindi. K3: sozlesme dosyayi yanlis adlandirmis — tarama LocalizationTests.cs'te hic olmadi, main'de de LanguageTests.cs'teydi; guclendirme dogru yerde (LanguageTests.cs:175 (?<!$) kalkti, :186-192 tum App/**/*.cs, :224-273 StripInterpolations). Muafiyetler :157-173 adiyla, desenle degil. K4: ScreenBody :101-103 ve gövde döngüsü :123-131. K5: iki mutasyon kagit ustunde izlendi, ikisi de URETIM davranisini kiriyor, testin sabitini degil; ikisi de main'de yakalanmazdi, yani koruma gercekten yeni. K6: git grep 'Say(' Playback altinda 0; playback.json tr/en 5 anahtar, parite pinli. K7: LanguageCatalog.cs:226 etiketle gosteriyor, test pinliyor; LocalizeStage'in ham gecirmesi yazili karar + testle sabit, kriterin kendi metni bu yola izin veriyor. K8: diff'te Skip sifir, silinen assertion yok, muafiyet listesi yalniz daha once HIC taranmayan dosyalardan buyudu, net kapsam artti. Kosum: filtre 37/37, Atlanan 0, cikti temiz (kilitlendi/iptal yok). CI b18e89f'te yesil (33538226768). owns ihlali yok. Denetci hicbir dosyaya yazmadi; olcumler Vidshrink-t86 worktree'sinde b18e89f uzerinde kosturuldu. On borc yazildi; en agiri SegmentEncoder.cs:306,308 gomulu Turkce ekrana cikiyor — main'de zaten var ve owns disinda, ayri sozlesme ister."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T18:36:38.200Z",
+  "usedAt": "2026-09-01T18:36:50.835Z",
+  "completedSha": "fa0b6c7c08798f26100e9c66b97d413bbccf2bea"
+}

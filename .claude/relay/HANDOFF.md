@@ -21,19 +21,22 @@ right-click menu.
 
 ## Contracts open
 
-- `T83` — submitted, round 1
-- `T84` — submitted, round 1
+- `T86` — open, round 2 — Düzeltme turu 2
+- `T87` — open, round 3 — Düzeltme turu 2
+- `T88` — open, round 3 — Düzeltme turu 2
+- `T89` — open, round 1
+- `T90` — open, round 1
 
 ## Closed last
 
+- `T85` — done — 2026-09-01 16:52
+- `T84` — done — 2026-09-01 11:31
+- `T83` — done — 2026-09-01 07:48
 - `T82` — done — 2026-08-30 12:08
 - `T81` — done — 2026-08-30 11:30
-- `T83` — stale — 2026-08-30 11:25
-- `T82` — stale — 2026-08-30 11:16
-- `T81` — stale — 2026-08-30 11:16
 
 ## Tree
 
-- branch: `sole/hdr-ve-olcum-tamiri`
-- head: `fix: normalize quality measurements by color space` (bu commit)
-- uncommitted files: 0
+- branch: `main`
+- head: `86c56b5 muhur: T85 kapandi — kosum kapisi ve olcum yalitimi`
+- uncommitted files: 1
