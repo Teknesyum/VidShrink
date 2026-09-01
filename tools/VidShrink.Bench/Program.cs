@@ -17,6 +17,8 @@ try
     return args[0] switch
     {
         "measure" => await MeasureAsync(args),
+        "measure-tonemapped" => await MeasureAsync(args, true),
+        "measure-window" => await MeasureWindowAsync(args),
         "shrink" => await ShrinkAsync(args),
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
@@ -34,6 +36,8 @@ static void PrintUsage()
 {
     Console.WriteLine("Usage:");
     Console.WriteLine("  bench measure <referans> <test>");
+    Console.WriteLine("  bench measure-tonemapped <HDR referans> <SDR test>");
+    Console.WriteLine("  bench measure-window <referans> <test> <başlangıç-sn> <süre-sn>");
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
@@ -47,7 +51,7 @@ static int Unknown(string command)
     return 1;
 }
 
-static async Task<int> MeasureAsync(string[] args)
+static async Task<int> MeasureAsync(string[] args, bool tonemapReference = false)
 {
     if (args.Length < 3)
     {
@@ -55,11 +59,20 @@ static async Task<int> MeasureAsync(string[] args)
         return 1;
     }
 
-    var info = await FfprobeClient.ProbeAsync(args[1]);
-    var vmaf = await VmafNegAsync(args[1], args[2], info.Width, info.Height);
-    var planes = await XpsnrPlanesAsync(args[1], args[2], info.Width, info.Height);
-    var xpsnr = planes.Y is { } py && planes.U is { } pu && planes.V is { } pv ? (4 * py + pu + pv) / 6.0 : (double?)null;
-    Console.WriteLine(JsonSerializer.Serialize(new { VmafNegHarmonic = vmaf.Harmonic, VmafNegP10 = vmaf.P10, Xpsnr = xpsnr }));
+    var score = tonemapReference
+        ? await QualityMeter.MeasureTonemappedReferenceAsync(args[1], args[2], CancellationToken.None)
+        : await QualityMeter.MeasureAsync(args[1], args[2], CancellationToken.None);
+    Console.WriteLine(JsonSerializer.Serialize(score, new JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
+    return 0;
+}
+
+static async Task<int> MeasureWindowAsync(string[] args)
+{
+    if (args.Length < 5) return 1;
+    var start = double.Parse(args[3], CultureInfo.InvariantCulture);
+    var duration = double.Parse(args[4], CultureInfo.InvariantCulture);
+    var score = await QualityMeter.MeasureWindowAsync(args[1], args[2], start, duration, CancellationToken.None);
+    Console.WriteLine(JsonSerializer.Serialize(score, new JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
     return 0;
 }
 
@@ -88,6 +101,7 @@ static async Task<int> ShrinkAsync(string[] args)
     string? forceCodec = null;
     var widePeak = false;
     var planOnly = false;
+    var noMeasure = false;
     (int Width, int Height)? sourceSize = null;
     double? sourceMb = null;
     for (var i = 3; i < args.Length; i++)
@@ -120,6 +134,9 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--plan-only":
                 planOnly = true;
+                break;
+            case "--no-measure":
+                noMeasure = true;
                 break;
             case "--source-size" when i + 1 < args.Length:
                 var dimensions = args[++i].Split('x', 'X');
@@ -220,8 +237,8 @@ static async Task<int> ShrinkAsync(string[] args)
         stopwatch.Stop();
 
         var measureWatch = Stopwatch.StartNew();
-        var vmaf = await VmafNegAsync(source, outputPath, info.Width, info.Height);
-        var planes = await XpsnrPlanesAsync(source, outputPath, info.Width, info.Height);
+        var vmaf = noMeasure ? (Harmonic: (double?)null, P10: (double?)null) : await VmafNegAsync(source, outputPath, info.Width, info.Height);
+        var planes = noMeasure ? (Y: (double?)null, U: (double?)null, V: (double?)null) : await XpsnrPlanesAsync(source, outputPath, info.Width, info.Height);
         measureWatch.Stop();
         var xpsnr = planes.Y is { } py && planes.U is { } pu && planes.V is { } pv
             ? (4 * py + pu + pv) / 6.0

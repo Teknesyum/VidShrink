@@ -5,37 +5,70 @@ using System.Text.RegularExpressions;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed record QualityScore(double? VmafNegMean, double? VmafNegHarmonic, double? VmafNegP10, double? VmafNegMin, double? Xpsnr, double? Ssim);
+public sealed record QualityScore(
+    double? VmafNegMean,
+    double? VmafNegHarmonic,
+    double? VmafNegP10,
+    double? VmafNegMin,
+    double? Xpsnr,
+    double? Ssim,
+    bool Comparable = true,
+    string? Message = null,
+    string? ColorNormalization = null);
 
 public static class QualityMeter
 {
     public static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, false, null, null, ct);
+
+    public static async Task<QualityScore> MeasureTonemappedReferenceAsync(string referencePath, string testPath, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, true, null, null, ct);
+
+    public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double startSeconds, double durationSeconds, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, false, startSeconds, durationSeconds, ct);
+
+    private static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, bool tonemapReference, double? startSeconds, double? durationSeconds, CancellationToken ct)
     {
         var reference = await FfprobeClient.ProbeAsync(referencePath, ct);
+        var test = await FfprobeClient.ProbeAsync(testPath, ct);
+        var measuredReference = tonemapReference
+            ? reference with
+            {
+                IsHdr = false, PixelFormat = "yuv420p", BitDepth = 8, ColorPrimaries = "bt709",
+                ColorTransfer = "bt709", ColorSpace = "bt709", ColorRange = "tv"
+            }
+            : reference;
+        var incompatibility = ColorIncompatibility(measuredReference, test);
+        if (incompatibility is not null)
+            return new QualityScore(null, null, null, null, null, null, false, incompatibility);
+
+        var normalization = tonemapReference
+            ? $"HDR referans {VidShrink.Core.HdrResolver.TonemapFilter} ile bt709 limited'a tonemap edildi; test aynı uzaya normalize edildi."
+            : NormalizationDescription(reference, test);
 
         double? vmafMean = null, vmafHarmonic = null, vmafP10 = null, vmafMin = null;
         if (EncoderCapabilities.Instance.HasFilter("libvmaf"))
-            (vmafMean, vmafHarmonic, vmafP10, vmafMin) = await MeasureVmafAsync(testPath, referencePath, reference.Width, reference.Height, ct);
+            (vmafMean, vmafHarmonic, vmafP10, vmafMin) = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, startSeconds, durationSeconds, ct);
 
         double? xpsnr = EncoderCapabilities.Instance.HasFilter("xpsnr")
-            ? await MeasureXpsnrAsync(testPath, referencePath, reference.Width, reference.Height, ct)
+            ? await MeasureXpsnrAsync(testPath, referencePath, measuredReference, test, tonemapReference, startSeconds, durationSeconds, ct)
             : null;
 
         double? ssim = EncoderCapabilities.Instance.HasFilter("ssim")
-            ? await MeasureSsimAsync(testPath, referencePath, reference.Width, reference.Height, ct)
+            ? await MeasureSsimAsync(testPath, referencePath, measuredReference, test, tonemapReference, startSeconds, durationSeconds, ct)
             : null;
 
-        return new QualityScore(vmafMean, vmafHarmonic, vmafP10, vmafMin, xpsnr, ssim);
+        return new QualityScore(vmafMean, vmafHarmonic, vmafP10, vmafMin, xpsnr, ssim, true, null, normalization);
     }
 
     private static async Task<(double? Mean, double? Harmonic, double? P10, double? Min)> MeasureVmafAsync(
-        string testPath, string referencePath, int width, int height, CancellationToken ct)
+        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? startSeconds, double? durationSeconds, CancellationToken ct)
     {
         var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
         try
         {
             var filter = $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={EscapeFilterPath(logPath)}";
-            await RunFilterAsync(testPath, referencePath, width, height, filter, ct);
+            await RunFilterAsync(testPath, referencePath, reference, test, tonemapReference, startSeconds, durationSeconds, filter, ct);
 
             if (!File.Exists(logPath)) return (null, null, null, null);
 
@@ -47,7 +80,7 @@ public static class QualityMeter
                 {
                     var metrics = frame.GetProperty("metrics");
                     if (metrics.TryGetProperty("vmaf", out var v) || metrics.TryGetProperty("vmaf_neg", out v))
-                        scores.Add(v.GetDouble());
+                        scores.Add(NormalizeVmafCeiling(v.GetDouble()));
                 }
             }
 
@@ -58,26 +91,30 @@ public static class QualityMeter
             var sorted = scores.OrderBy(x => x).ToList();
             var p10 = Percentile(sorted, 10);
             var min = sorted[0];
-            return (mean, harmonic, p10, min);
+            return (
+                NormalizeVmafCeiling(mean),
+                NormalizeVmafCeiling(harmonic),
+                NormalizeVmafCeiling(p10),
+                NormalizeVmafCeiling(min));
         }
         finally { TryDelete(logPath); }
     }
 
-    private static async Task<double?> MeasureXpsnrAsync(string testPath, string referencePath, int width, int height, CancellationToken ct)
+    private static async Task<double?> MeasureXpsnrAsync(string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? startSeconds, double? durationSeconds, CancellationToken ct)
     {
-        var stderr = await RunFilterAsync(testPath, referencePath, width, height, "xpsnr", ct);
-        var match = Regex.Match(stderr, @"XPSNR\s+y:\s*([\d.]+)\s*u:\s*([\d.]+)\s*v:\s*([\d.]+)", RegexOptions.IgnoreCase);
+        var stderr = await RunFilterAsync(testPath, referencePath, reference, test, tonemapReference, startSeconds, durationSeconds, "xpsnr", ct);
+        var match = Regex.Match(stderr, @"XPSNR\s+y:\s*(inf|[\d.]+)\s*u:\s*(inf|[\d.]+)\s*v:\s*(inf|[\d.]+)", RegexOptions.IgnoreCase);
         if (!match.Success) return null;
 
-        var y = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-        var u = double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
-        var v = double.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture);
+        var y = ParseMetric(match.Groups[1].Value);
+        var u = ParseMetric(match.Groups[2].Value);
+        var v = ParseMetric(match.Groups[3].Value);
         return (4 * y + u + v) / 6.0;
     }
 
-    private static async Task<double?> MeasureSsimAsync(string testPath, string referencePath, int width, int height, CancellationToken ct)
+    private static async Task<double?> MeasureSsimAsync(string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? startSeconds, double? durationSeconds, CancellationToken ct)
     {
-        var stderr = await RunFilterAsync(testPath, referencePath, width, height, "ssim", ct);
+        var stderr = await RunFilterAsync(testPath, referencePath, reference, test, tonemapReference, startSeconds, durationSeconds, "ssim", ct);
         var match = Regex.Match(stderr, @"All:\s*([\d.]+)", RegexOptions.IgnoreCase);
         return match.Success && double.TryParse(match.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var v)
             ? v
@@ -95,18 +132,23 @@ public static class QualityMeter
         return sorted[lower] + (sorted[upper] - sorted[lower]) * frac;
     }
 
+    // vmaf_v0.6.1neg reports about 99.87 for identical frames. Treat that
+    // numerical model ceiling as the user-facing perfect score.
+    private static double NormalizeVmafCeiling(double score)
+        => score >= 99.8 ? 100.0 : score;
+
     private static async Task<string> RunFilterAsync(
-        string testPath, string referencePath, int width, int height, string filterChain, CancellationToken ct)
+        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? startSeconds, double? durationSeconds, string filterChain, CancellationToken ct)
     {
-        var scaler = EncoderCapabilities.Instance.HasFilter("zscale") ? "zscale" : "scale";
-        var args = new[]
-        {
-            "-hide_banner", "-nostdin",
-            "-i", testPath,
-            "-i", referencePath,
-            "-lavfi", $"[0:v]{scaler}=w={width}:h={height}[t];[t][1:v]{filterChain}",
-            "-f", "null", "-"
-        };
+        if (!EncoderCapabilities.Instance.HasFilter("zscale"))
+            throw new InvalidOperationException("Quality measurement requires the zscale filter for explicit color normalization.");
+        var testNormalization = ColorFilter(test, reference, reference.Width, reference.Height);
+        var referenceNormalization = ColorFilter(reference, reference, reference.Width, reference.Height);
+        var referencePrefix = tonemapReference ? VidShrink.Core.HdrResolver.TonemapFilter + "," : "";
+        var args = new List<string> { "-hide_banner", "-nostdin" };
+        AddInput(args, testPath, startSeconds, durationSeconds);
+        AddInput(args, referencePath, startSeconds, durationSeconds);
+        args.AddRange(new[] { "-lavfi", $"[0:v]{testNormalization}[t];[1:v]{referencePrefix}{referenceNormalization}[r];[t][r]{filterChain}", "-f", "null", "-" });
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
         process.Start();
@@ -123,6 +165,55 @@ public static class QualityMeter
 
         return stderr;
     }
+
+    private static void AddInput(List<string> args, string path, double? startSeconds, double? durationSeconds)
+    {
+        if (startSeconds is { } start) args.AddRange(new[] { "-ss", start.ToString(CultureInfo.InvariantCulture) });
+        if (durationSeconds is { } duration) args.AddRange(new[] { "-t", duration.ToString(CultureInfo.InvariantCulture) });
+        args.AddRange(new[] { "-i", path });
+    }
+
+    private static string? ColorIncompatibility(VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test)
+    {
+        if (reference.IsHdr != test.IsHdr)
+            return "Renk uzayı uyuşmuyor; HDR ve SDR/tonemap edilmiş görüntü karşılaştırılamaz.";
+        if (!reference.IsHdr) return null;
+        if (!Same(reference.ColorTransfer, test.ColorTransfer) || !Same(reference.ColorPrimaries, test.ColorPrimaries))
+            return "Renk uzayı uyuşmuyor; HDR aktarım işlevleri veya ana renkleri farklı, karşılaştırılamaz.";
+        return null;
+    }
+
+    private static string NormalizationDescription(VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test)
+        => reference.IsHdr
+            ? $"HDR: {Describe(test)} ve {Describe(reference)} ortak {reference.ColorPrimaries}/{reference.ColorTransfer} uzayına normalize edildi."
+            : $"SDR: {Describe(test)} ve {Describe(reference)} bt709 limited uzayına normalize edildi; etiketsiz yuv420p SDR için bt709 limited varsayıldı.";
+
+    private static string Describe(VidShrink.Core.MediaInfo info)
+        => $"{info.ColorPrimaries ?? "etiketsiz"}/{info.ColorTransfer ?? "etiketsiz"}/{info.ColorSpace ?? "etiketsiz"}/{info.ColorRange ?? "etiketsiz"}";
+
+    private static string ColorFilter(VidShrink.Core.MediaInfo input, VidShrink.Core.MediaInfo reference, int width, int height)
+    {
+        var hdr = reference.IsHdr;
+        var inputPrimaries = input.ColorPrimaries ?? (hdr ? "bt2020" : "bt709");
+        var inputTransfer = input.ColorTransfer ?? (hdr ? "smpte2084" : "bt709");
+        var inputMatrix = input.ColorSpace ?? (hdr ? "bt2020nc" : "bt709");
+        var inputRange = Range(input.ColorRange, defaultFull: hdr);
+        var outputPrimaries = hdr ? reference.ColorPrimaries ?? "bt2020" : "bt709";
+        var outputTransfer = hdr ? reference.ColorTransfer ?? "smpte2084" : "bt709";
+        var outputMatrix = hdr ? reference.ColorSpace ?? "bt2020nc" : "bt709";
+        var outputRange = hdr ? Range(reference.ColorRange, defaultFull: true) : "limited";
+        var format = hdr ? "yuv420p10le" : "yuv420p";
+        return $"zscale=w={width}:h={height}:min={inputMatrix}:tin={inputTransfer}:pin={inputPrimaries}:rin={inputRange}:m={outputMatrix}:t={outputTransfer}:p={outputPrimaries}:r={outputRange},format={format}";
+    }
+
+    private static string Range(string? value, bool defaultFull)
+        => value is "pc" or "jpeg" or "full" ? "full" : value is "tv" or "mpeg" or "limited" ? "limited" : defaultFull ? "full" : "limited";
+
+    private static bool Same(string? left, string? right)
+        => string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+
+    private static double ParseMetric(string value)
+        => value.Equals("inf", StringComparison.OrdinalIgnoreCase) ? double.PositiveInfinity : double.Parse(value, CultureInfo.InvariantCulture);
 
     private static string EscapeFilterPath(string path)
         => "'" + path.Replace("\\", "/").Replace(":", "\\:") + "'";

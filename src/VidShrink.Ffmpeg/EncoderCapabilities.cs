@@ -3,13 +3,14 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed class EncoderCapabilities : IEncoderAvailability
+public sealed class EncoderCapabilities : IEncoderAvailability, IHdr10EncoderAvailability
 {
     private static readonly Lazy<EncoderCapabilities> LazyInstance = new(Load);
 
     public static EncoderCapabilities Instance => LazyInstance.Value;
 
     private readonly Dictionary<string, EncoderProbeResult> _probed = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string?> _hdr10PixelFormats = new(StringComparer.OrdinalIgnoreCase);
 
     public IReadOnlySet<string> Encoders { get; }
     public IReadOnlySet<string> Filters { get; }
@@ -26,6 +27,17 @@ public sealed class EncoderCapabilities : IEncoderAvailability
     public bool HasFilter(string name) => Filters.Contains(name);
 
     public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
+
+    public string? Hdr10PixelFormat(string codec)
+    {
+        lock (_hdr10PixelFormats)
+        {
+            if (_hdr10PixelFormats.TryGetValue(codec, out var cached)) return cached;
+            var result = ProbeHdr10PixelFormat(codec);
+            _hdr10PixelFormats[codec] = result;
+            return result;
+        }
+    }
 
     /// <summary>
     /// Yoklamanın sonucu ve süresi. Süre karar için gerekli: yoklama geçse bile sürücü
@@ -61,6 +73,44 @@ public sealed class EncoderCapabilities : IEncoderAvailability
                 "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
                 "-c:v", codec, "-frames:v", "1",
                 "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
+            };
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+            process.Start();
+            var output = process.StandardOutput.ReadToEndAsync();
+            var error = process.StandardError.ReadToEndAsync();
+            if (!process.WaitForExit(4000))
+            {
+                try { process.Kill(true); } catch { }
+                return false;
+            }
+            Task.WaitAll(new Task[] { output, error }, 1000);
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private string? ProbeHdr10PixelFormat(string codec)
+    {
+        if (!HasEncoder(codec)) return null;
+        foreach (var pixelFormat in new[] { "p010le", "yuv420p10le" })
+            if (RunProbe(codec, pixelFormat)) return pixelFormat;
+        return null;
+    }
+
+    private static bool RunProbe(string codec, string pixelFormat)
+    {
+        try
+        {
+            var args = new[]
+            {
+                "-hide_banner", "-loglevel", "error",
+                "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
+                "-vf", $"format={pixelFormat}", "-c:v", codec, "-pix_fmt", pixelFormat,
+                "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc",
+                "-frames:v", "1", "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
             };
             using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
             process.Start();

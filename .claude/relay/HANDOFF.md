@@ -34,6 +34,6 @@ right-click menu.
 
 ## Tree
 
-- branch: `sole/sagtik-artiklari`
-- head: `d4f69a9 test: sag tik paketinin davranisini olc`
+- branch: `sole/hdr-ve-olcum-tamiri`
+- head: `fix: normalize quality measurements by color space` (bu commit)
 - uncommitted files: 0
