@@ -34,25 +34,30 @@ Yoklamada bayt üreten üç taraf var: tam ölçek örneği, yarım ölçek örn
 | Orta (`smptebars`) | 6595 | 8040 | 1445 | +21,91 |
 | Yüksek hareket (`testsrc2`) | 850339 | 851901 | 1562 | +0,18 |
 
-Ek yük içerikten neredeyse bağımsız, yaklaşık sabit bir toplamdır (1441–1562 bayt). Bu yüzden yüzde olarak yalnız küçük pencerelerde büyür.
+Ölçülen üç kaynakta ek yük içerikten neredeyse bağımsız, yaklaşık sabit bir toplamdır (1441–1562 bayt). Bu yüzden yüzde olarak yalnız küçük pencerelerde büyür. Üç kaynak dışında sınanmadı.
 
 ### Birimin `MotionExponent` girdisine etkisi
 
 `ComplexityProfile.FromProbe` içinde `MotionExponent = Clamp(Log2(halfFpsBppf/fullScaleBppf), 0, 1)`. Aşağıdaki sütunlar aynı ölçülen bayt sayılarından türetilen `Log2` değeridir; kelepçe uygulanmamıştır.
 
-| Kaynak | `main` (ham, KiB yuvarlamalı) | Tur 2 (kırık: hareket ham / referans mkv) | Tur 3 (üç eksen de Matroska) | Ham ES (yuvarlamasız) |
+`main`in kendisi bu oranda **iki ayrı birim** kullanıyordu: pay `-f null -` çıktısının stderr'inden KiB'ye yuvarlanarak okunuyordu (`ParseVideoBytes`), payda ise `-f h264` ile yazılmış ham ES **dosyasının** tam uzunluğuydu (`ComplexityProbe.cs:449,472` — `origin/main`). Yani `main` de temiz bir taban değildi; aşağıdaki sütun onun bu iki yolunu birebir taklit eder.
+
+| Kaynak | `main` (pay KiB yuvarlamalı / payda ham ES dosyası) | Tur 2 (pay yuvarlamalı ham / payda mkv) | Tur 3 (üç eksen de Matroska) | Ham ES, iki taraf da yuvarlamasız |
 |---|---:|---:|---:|---:|
-| Düşük karmaşıklık (`color=gray`) | 0,263 | −0,161 | 0,322 | 0,242 |
-| Orta (`smptebars`) | 0,415 | 0,027 | 0,313 | 0,245 |
-| Yüksek hareket (`testsrc2`) | 0,623 | 0,619 | 0,623 | 0,623 |
+| Düşük karmaşıklık (`color=gray`) | 0,178 | −0,161 | 0,322 | 0,242 |
+| Orta (`smptebars`) | 0,313 | 0,027 | 0,313 | 0,245 |
+| Yüksek hareket (`testsrc2`) | 0,622 | 0,619 | 0,623 | 0,623 |
 
-`CodecModel.DefaultMotionExponent = 1 − 0,75 = 0,25`; `PlanCalculator.cs:182` eşiği `<= DefaultMotionExponent`. Ölçülen üç kaynakta:
+`CodecModel.DefaultMotionExponent = 1 − 0,75 = 0,25`; `PlanCalculator.cs:182` eşiği `<= DefaultMotionExponent`. Ölçülen üç kaynakta eşiğin hangi tarafına düşüldüğü:
 
-- Tur 2 iki düşük bit hızlı kaynağı da eşiğin **yanlış tarafına** düşürüyordu (−0,161 kelepçeyle 0,0; 0,027). Bu, KRİTİK olarak bildirilen davranıştır.
-- Tur 3'te üç kaynak da `main` ile **aynı tarafta**: hepsi 0,25'in üstünde. Bu üç kaynağın gözlemidir; genel durumda eşik tarafının korunduğu **ölçülmedi**.
-- `main`in kendi okuması bu rejimde KiB'ye yuvarlanıyordu: `smptebars` için `main` 0,415 okurken yuvarlamasız değer 0,245'tir (+0,170 sapma). Yani `main` düşük bit hızlı pencerelerde zaten tanesi kaba bir sayı üretiyordu; hiçbir birim seçimi onun değerini birebir yeniden üretmez.
+- **Tur 2** iki düşük bit hızlı kaynağı da eşiğin altına indiriyordu (−0,161, kelepçeyle 0,0; ve 0,027). `main`de `smptebars` 0,313 ile üstteydi. KRİTİK olarak bildirilen davranış budur.
+- **Tur 3** `smptebars` ve `testsrc2`yi `main` ile aynı tarafta bırakıyor, ama `color=gray`i **karşı tarafa geçiriyor**: `main` 0,178 (altta, FPS yarılama dalı), tur 3 0,322 (üstte). Bu, gizlenecek bir şey değil — birim seçiminin bu rejimde kararı belirlediğinin ölçülmüş kanıtıdır.
+- Temiz birimlerle bakıldığında ayrım daha da nettir: iki taraf da yuvarlamasız **ham ES** olduğunda iki düşük bit hızlı kaynak da 0,25'in hemen **altında** (0,242 ve 0,245); iki taraf da **Matroska** olduğunda ikisi de **üstünde** (0,322 ve 0,313). Konteynerin yaklaşık sabit ek yükü, kare sayısı yarı olan hareket tarafına kare başına iki kat bindiği için oranı yukarı iter.
+- `main`in yuvarlaması tek başına da oynatıyordu: aynı kaynaklarda pay yuvarlanınca `color=gray` 0,242'den 0,178'e (−0,064), `smptebars` 0,245'ten 0,313'e (+0,068) gidiyor. Yuvarlamanın yönü içeriğe göre değişiyor.
 
-Ham ES sütunu birim adayı olarak sınandı ve **seçilmedi**: ham `.h264` dosyasında zaman damgası yok, `ffprobe` bu dosya için `r_frame_rate=120/1` ve `nb_frames=N/A` döndürüyor (ölçüldü). Kalite ölçümü aynı tam ölçek dosyasını `QualityMeter`a örnek olarak veriyor; ham akış bu yolu bozma riski taşıdığı için Matroska korundu.
+Bu üç kaynağın gözlemidir; genel durumda hangi kaynakların eşik tarafını değiştirdiği **ölçülmedi**. Karar T89'a aittir: bu sözleşme `PlanCalculator` eşiklerine ve `CodecModel` sabitlerine dokunmuyor.
+
+Ham ES sütunu birim adayı olarak düşünüldü ve **seçilmedi**. Gerekçe ölçülen tek bir olgudur: ham `.h264` dosyasında zaman damgası yok; 640×360@60 kaynaktan üretilen böyle bir dosya için `ffprobe` `r_frame_rate=120/1` ve `nb_frames=N/A` döndürüyor. Kalite ölçümü aynı tam ölçek dosyasını `QualityMeter`a örnek olarak veriyor ve `QualityMeter` karşılaştırılabilirlik kararında `MediaInfo`ya bakıyor. Ham akışın bu yolu **gerçekten bozup bozmadığı ölçülmedi**; sınanmamış bir risk uğruna çalışan bir yol değiştirilmedi.
 
 Kalan sapma T89'a devreder: Matroska birimi düşük bit hızlı iki kaynakta `Log2` değerini yuvarlamasız ham ölçüye göre +0,068 ve +0,079 yukarı taşıyor; yüksek hareketli kaynakta kayma −0,0001'dir. Bu sözleşme `PlanCalculator` eşiklerine dokunmuyor.
 
@@ -122,8 +127,8 @@ CI koşucusunda ffmpeg kurulu değil (`.github/workflows/ci.yml` onu kurmuyor); 
 
 Tur 3'e “kapanması beklenmiyor” diye yazılan iki borç J1 çözülürken kapandı:
 
-- `SampleWindowAsync`ın yedek yolu artık `SampleAsync` üzerinden aynı muxer'a yazıyor. Split'in başarısız olduğu pencereler de Matroska sayıyor; aynı yoklama içinde karışık birim kalmadı.
-- `ParseVideoBytes`ın KiB yuvarlaması `ComplexityProbe`ta yok: yöntem kaldırıldı, bayt tanesi 1 bayt. Ölçülen etkisi yukarıdaki tablodadır — `smptebars` için yuvarlama tek başına `Log2`yi 0,245'ten 0,415'e taşıyordu.
+- `SampleWindowAsync`ın yedek yolu artık `SampleAsync` üzerinden aynı muxer'a yazıyor. Split'in başarısız olduğu pencereler de Matroska sayıyor; aynı yoklama içinde karışık birim kalmadı. (`main`de bu ayrım da vardı: split'in tuttuğu pencereler ham ES dosyası, düştüğü pencereler KiB'ye yuvarlanmış stderr baytı sayıyordu.)
+- `ParseVideoBytes`ın KiB yuvarlaması `ComplexityProbe`ta yok: yöntem kaldırıldı, bayt tanesi 1 bayt. Ölçülen etkisi yukarıdaki tablodadır — yuvarlama tek başına `color=gray` için `Log2`yi 0,242'den 0,178'e, `smptebars` için 0,245'ten 0,313'e taşıyordu; yönü içeriğe göre değişiyordu.
 
 Kapanmayanlar:
 
