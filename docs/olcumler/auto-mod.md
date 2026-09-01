@@ -19,6 +19,14 @@ gelir. Ölçülmemiş olan yerde açıkça **ölçülmedi** yazar.
 Makine paylaşımlı ve ölçüm sırasında dört ajan daha koşuyordu. **Süreler ölçülmedi** —
 duvar saati bu koşullarda anlamlı değil. Kalite sayıları yükten etkilenmez.
 
+**Ölçüm düzeneği nerede.** Auto modun planı bench ile alınamadığı için (kusur 1)
+`.calisma/` altında tek seferlik başsız bir sonda yazıldı: uygulamanın kendi yolunu
+birebir izler — `FfprobeClient.ProbeAsync` → `ComplexityProbe` → iki turlu
+`CalibrationProbe` → `PlanCalculator.BuildDetailed` (`Codec = Auto`) → `EncodeRunner`.
+Tablolardaki sayılar VMAF JSON'larından mekanik olarak üretildi, elle yazılmadı.
+Sonda ve üretici betikler iş bitince silindi; geçici dosya bırakılmadı. Bu ölçümü
+bench'ten tekrarlanabilir kılmak kusur 1'in düzeltilmesine bağlı.
+
 ### Harmonik ortalama bu ölçümde kullanılamaz — sebebi ölçüldü
 
 Sözleşme üç metrik istiyor. Üçüncüsü, harmonik ortalama, bu kaynakta **satırlar arası
