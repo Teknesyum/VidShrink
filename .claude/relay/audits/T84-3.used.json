@@ -1,0 +1,28 @@
+{
+  "contractId": "T84",
+  "auditorRunId": "a5326865baf102f6a",
+  "headSha": "c1b8dd99aafc57ced02679c09838aa8dedc28527",
+  "diffHash": "543126b397e809a404bac28c134ab7f15ae7ebab2f9ca7ae7ae0cf9a565d4bf2",
+  "owns": [
+    "tests/VidShrink.Tests/TipOverflowTests.cs",
+    "tests/VidShrink.Tests/TipLineMetrics.cs",
+    "docs/olcumler/t27-ipucu-satir-genislikleri.md",
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/Themes/Theme.axaml",
+    "src/VidShrink.App/Themes/Controls.axaml",
+    "src/VidShrink.Core/UpdateCheck.cs",
+    "src/VidShrink.App/Locales/en/settings.json",
+    "src/VidShrink.App/Locales/tr/settings.json",
+    "tests/VidShrink.Tests/SettingsTests.cs",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs",
+    "tests/VidShrink.Tests/UpdateCheckTests.cs"
+  ],
+  "verification": [
+    "Bagimsiz denetci tur 2'ye KALDI verdi (KRITIK: rozet sayimi 44 ziyaret sayimiydi, gercek populasyon 23). Tur 3 duzeltmesinden sonra dar kapsamli yeniden denetim GECTI verdi: tekillestirme HashSet ile gercek, 23 sabiti MainWindow.axaml'den bagimsiz dogrulandi (7 InfoButton + 16 InfoButtonBesideLabel), gizli HdrPolicyPanel rozeti artik olculuyor, sessiz atlama kalkti, dil sifirlama testi totolojik degil, hicbir assertion gevsetilmedi. Filtreli kosum 38/38 yesil, kesinti satiri yok. Birlesme sonrasi main'de tam Release suiti: 966 basarili, 0 hata, 17 atlanan, 983 toplam, kesinti satiri yok. Kalan bulgular borc, tur acmaz."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T11:28:06.798Z",
+  "usedAt": "2026-09-01T11:31:15.106Z",
+  "completedSha": "c1b8dd99aafc57ced02679c09838aa8dedc28527"
+}
