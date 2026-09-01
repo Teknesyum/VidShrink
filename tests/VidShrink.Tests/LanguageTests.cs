@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -11,6 +12,7 @@ using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
+using VidShrink.Ffmpeg;
 
 [assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
 
@@ -98,16 +100,43 @@ public sealed class LanguageTests : IDisposable
     private static readonly Regex ScreenAttribute = new(
         "(?:^|\\s)((?:\\w+:)?(?:Text|Content|Header|ToolTip\\.Tip|Watermark|AutomationProperties\\.Name|Bullets\\.Text))=\"([^\"]*)\"",
         RegexOptions.Compiled);
+    /// <summary>
+    /// Öğe gövdesi. Desen bir zamanlar <c>{</c> ve <c>}</c> geçen gövdeleri atlıyordu, yani
+    /// <c>&lt;TextBlock&gt;Hazır {0}&lt;/TextBlock&gt;</c> görünmüyordu; süslü parantez artık
+    /// gövdeyi taramadan düşürmüyor. Gövdenin kendisi bir bağ ise (<c>{loc:Text ...}</c>)
+    /// ayıklama aşamasında eleniyor.
+    /// </summary>
     private static readonly Regex ScreenBody = new(
-        @">([^<>{}]*)<",
+        @">([^<>]*)<",
         RegexOptions.Compiled);
 
     private static readonly Regex AnyLetter = new(@"\p{L}", RegexOptions.Compiled);
 
-    [Fact]
-    public void BicimlemedeKullaniciyaGorunenDuzMetinKalmadi()
+    /// <summary>
+    /// Taranan biçimleme dosyaları. Ölçüm bir zamanlar yalnız <c>MainWindow.axaml</c>'i
+    /// okuyordu; oynatma paneli, denetim şeridi ve tema sözlükleri görünmüyordu. Bugün
+    /// uygulamanın altındaki <b>her</b> <c>.axaml</c> taranıyor: bugün delik olmaması
+    /// yarınki gömülü metni yakalamamak için gerekçe değil.
+    /// </summary>
+    public static TheoryData<string> ScannedMarkup()
     {
-        var xaml = File.ReadAllText(TipSources.WindowXamlPath);
+        var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
+        var data = new TheoryData<string>();
+        foreach (var file in Directory.GetFiles(app, "*.axaml", SearchOption.AllDirectories)
+                     .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+                     .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+                     .OrderBy(path => path, StringComparer.Ordinal))
+            data.Add(file);
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(ScannedMarkup))]
+    public void BicimlemedeKullaniciyaGorunenDuzMetinKalmadi(string path)
+    {
+        var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
+        var relative = Path.GetRelativePath(app, path);
+        var xaml = StripXmlComments(File.ReadAllText(path));
         var stray = new List<string>();
 
         foreach (Match match in ScreenAttribute.Matches(xaml))
@@ -123,14 +152,34 @@ public sealed class LanguageTests : IDisposable
         foreach (Match match in ScreenBody.Matches(xaml))
         {
             var value = TipSources.DecodeXml(match.Groups[1].Value).Trim();
+            if (value.StartsWith('{')) continue;
             if (!AnyLetter.IsMatch(value)) continue;
             if (XamlNamesThatStayAsWritten.Contains(value, StringComparer.Ordinal)) continue;
+            if (IsResourceValue(xaml, match.Index)) continue;
 
             stray.Add($">{value}<");
         }
 
         Assert.True(stray.Count == 0,
-            "MainWindow.axaml içinde anahtardan gelmeyen metin var:\n" + string.Join("\n", stray));
+            $"{relative} içinde anahtardan gelmeyen metin var:\n" + string.Join("\n", stray));
+    }
+
+    private static string StripXmlComments(string markup)
+        => Regex.Replace(markup, "<!--.*?-->", string.Empty, RegexOptions.Singleline);
+
+    /// <summary>
+    /// Gövdenin ekrana değil sözlüğe yazıldığı durum: <c>x:Key</c> taşıyan öğe bir kaynak
+    /// değeridir (renk, geometri, yazı tipi ailesi, bağlantı adresi) ve içeriği anahtarla
+    /// çağrılır. Ölçüt öğe adına değil <b>yapıya</b> bakıyor; tema dosyalarındaki tür adları
+    /// tek tek sayılmıyor.
+    /// </summary>
+    private static bool IsResourceValue(string markup, int bodyStart)
+    {
+        var open = markup.LastIndexOf('<', bodyStart);
+        if (open < 0) return false;
+
+        var tag = markup[open..(bodyStart + 1)];
+        return tag.Contains("x:Key=", StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -166,9 +215,7 @@ public sealed class LanguageTests : IDisposable
         "^The (.+) container does not support the selected (.+) audio encoder.$",
         "^The (.+) container does not support copying the source (.*) video stream.$",
         "^The (.+) container does not support copying the source (.*) audio stream.$",
-        "Localization key ' ' is missing in ' ' and in ' '.",
-        "ffmpeg   ile döndü.",
-        "Parça dosyası oluşmadı."
+        "Localization key ' ' is missing in ' ' and in ' '."
     };
 
     private static readonly Regex CsLiteral = new("(?<interpolated>\\$)?\"(?<body>(?:[^\"\\\\\n]|\\\\.)*)\"", RegexOptions.Compiled);
@@ -211,14 +258,105 @@ public sealed class LanguageTests : IDisposable
     }
 
     /// <summary>
-    /// Taramadan düşenler: yorumlar ve <c>throw</c> ifadeleri. İkincisi ekrana çıkmaz —
-    /// geliştiriciye bir kodun karşılıksız kaldığını söyleyen kesme iletisidir.
+    /// <c>throw</c> ifadelerinin içi. Eskiden bütün ifade taramadan siliniyordu ve içindeki
+    /// metin hiçbir ölçünün görüş alanına girmiyordu.
+    ///
+    /// <para>Kesme iletisi ekran metni değildir; koddan koda konuşur ve kodun dili
+    /// İngilizcedir. Türkçe bir cümle orada kullanıcı metninin sızdığını söyler. Argüman
+    /// sözleşmesi ailesi (<c>ArgumentException</c>, <c>ArgumentNullException</c>,
+    /// <c>ArgumentOutOfRangeException</c>) dışarıda: bunlar çağıranın parametresini adlandırır,
+    /// çalışma zamanı iletiyi parametre adıyla biçimler ve yol bir programlama hatasıdır.
+    /// Muafiyet ada göre değil <b>kesme türüne</b> göre; listeye cümle eklenmiyor.</para>
+    ///
+    /// <para>İkinci ölçüt: kesme iletisi sözlükteki bir değerin ikizi olamaz — olsaydı ekran
+    /// metninin kopyası olurdu.</para>
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(ScannedCode))]
+    public void KesmeIletisiEkranMetniDegil(string path)
+    {
+        var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
+        var relative = Path.GetRelativePath(app, path);
+        var known = new HashSet<string>(
+            Locales.Languages.SelectMany(language => Locales.Values(language).Values), StringComparer.Ordinal);
+        var stray = new List<string>();
+
+        foreach (var statement in ThrowStatements(StripComments(File.ReadAllText(path))))
+        {
+            var contract = ArgumentContractThrow.IsMatch(statement);
+            foreach (Match match in CsLiteral.Matches(StripInterpolations(statement)))
+            {
+                var value = TipSources.Unescape(match.Groups["body"].Value).Trim();
+                if (!value.Contains(' ')) continue;
+                if (CsWord.Matches(value).Count < 2) continue;
+
+                if (known.Contains(value))
+                {
+                    stray.Add($"sözlükteki metnin ikizi: \"{value}\"");
+                    continue;
+                }
+
+                if (!contract && NonAscii.IsMatch(value))
+                    stray.Add($"kesme iletisi kod dilinde değil: \"{value}\"");
+            }
+        }
+
+        Assert.True(stray.Count == 0,
+            $"{relative} içindeki kesme iletileri:\n" + string.Join("\n", stray.Distinct()));
+    }
+
+    private static readonly Regex ArgumentContractThrow = new(
+        @"throw new Argument(Null|OutOfRange)?Exception\b", RegexOptions.Compiled);
+
+    private static readonly Regex NonAscii = new(@"[^\p{IsBasicLatin}]", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Cümle taramasından düşenler: yorumlar ve <c>throw</c> ifadeleri. İkincisi artık
+    /// <b>silinip unutulmuyor</b> — kesme iletileri <see cref="KesmeIletisiEkranMetniDegil"/>
+    /// ölçüsüne veriliyor. Eski desen (<c>throw new [^;]*;</c>) iletinin içindeki noktalı
+    /// virgülde duruyordu; geriye eşi kalmamış bir tırnak bırakıp dosyanın geri kalanındaki
+    /// dizgeleri yanlış eşleştiriyordu.
     /// </summary>
     private static string Strip(string source)
     {
+        source = StripComments(source);
+        foreach (var statement in ThrowStatements(source))
+            source = source.Replace(statement, string.Empty, StringComparison.Ordinal);
+
+        return source;
+    }
+
+    private static string StripComments(string source)
+    {
         source = Regex.Replace(source, @"/\*.*?\*/", string.Empty, RegexOptions.Singleline);
-        source = Regex.Replace(source, @"//[^\n]*", string.Empty);
-        return Regex.Replace(source, @"throw new [^;]*;", string.Empty, RegexOptions.Singleline);
+        return Regex.Replace(source, @"//[^\n]*", string.Empty);
+    }
+
+    /// <summary>
+    /// Kaynaktaki <c>throw new ...;</c> ifadeleri. Tarama dizge farkındadır: iletinin içindeki
+    /// <c>;</c> ifadeyi erken bitirmez.
+    /// </summary>
+    private static IReadOnlyList<string> ThrowStatements(string source)
+    {
+        var found = new List<string>();
+        var at = 0;
+        while ((at = source.IndexOf("throw new ", at, StringComparison.Ordinal)) >= 0)
+        {
+            var index = at;
+            var quoted = false;
+            for (; index < source.Length; index++)
+            {
+                var current = source[index];
+                if (current == '"' && (index == 0 || source[index - 1] != '\\')) quoted = !quoted;
+                else if (current == ';' && !quoted) break;
+            }
+
+            if (index >= source.Length) break;
+            found.Add(source[at..(index + 1)]);
+            at = index + 1;
+        }
+
+        return found;
     }
 
     private static string StripInterpolations(string source)
@@ -373,11 +511,186 @@ public sealed class LanguageTests : IDisposable
 
     // ---- K4: kullanıcının saydığı dört cümle ---------------------------------------
 
+    /// <summary>
+    /// Beklenen metin sabitten değil <c>Locales/&lt;dil&gt;/main.json</c>'daki anahtardan
+    /// okunup biçimleniyor. Sabit karşılaştıran ölçü anahtarı sökülse de yeşil kalırdı;
+    /// bugün sayıların yerini ya da sözcük sırasını değiştiren her düzenleme ölçüyü ilgilendirir.
+    /// </summary>
     [Fact]
     public void KodlamaImleciMetniDilAnahtarindanGelir()
     {
-        Assert.Equal("Analysis 1/2 · Attempt 3", LanguageCatalog.EncodeMarker(false, 1, 2, 3));
-        Assert.Equal("Analiz 1/2 · Deneme 3", LanguageCatalog.EncodeMarker(true, 1, 2, 3));
+        Assert.Equal(Marker("en", 1, 2, 3), LanguageCatalog.EncodeMarker(false, 1, 2, 3));
+        Assert.Equal(Marker("tr", 1, 2, 3), LanguageCatalog.EncodeMarker(true, 1, 2, 3));
+    }
+
+    private static string Marker(string language, int pass, int passCount, int attempt)
+    {
+        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
+        var pattern = Locales.Values(language)["main.playback.encode-marker"];
+
+        return LanguageCatalog.Title(
+            string.Format(CultureInfo.GetCultureInfo(language), pattern, pass, passCount, attempt),
+            turkish);
+    }
+
+    /// <summary>
+    /// T91/K1-K3: örnek hatası İngilizce arayüzde <b>tümüyle</b> İngilizce çıkar. Ölçü
+    /// kodlayanın ürettiği sebebi alıp paneli barındıran tarafın ekrana yazdığı dizgeyi
+    /// okuyor; iki uç da üretim kodu, arada sabit yok.
+    ///
+    /// <para>Beklenen parçalar dil dosyasından geliyor: İngilizce değerin sabit parçaları
+    /// dizgede bulunmalı, Türkçe değerin sabit parçaları bulunmamalı.</para>
+    /// </summary>
+    [Fact]
+    public void OrnekHatasiIngilizceArayuzdeTumuyleIngilizce()
+    {
+        var failures = new[]
+        {
+            SegmentEncoder.FirstFailure(new[] { new FfmpegRun(false, 3, string.Empty, TimeSpan.Zero) }),
+            SegmentEncoder.FirstFailure(new[]
+                { new FfmpegRun(false, 1, "Invalid data found when processing input", TimeSpan.Zero) }),
+            SegmentEncoder.FirstFailure(new[] { new FfmpegRun(true, 0, string.Empty, TimeSpan.Zero) })
+        };
+
+        var (english, turkish) = AppHost.Run(() =>
+        {
+            var host = new PanelHost(
+                new ComparisonPanel(),
+                () => throw new NotSupportedException("The frame source is not needed by this measurement."));
+
+            host.SetLanguage(false);
+            var first = failures.Select(host.SampleFailureText).ToList();
+            host.SetLanguage(true);
+            var second = failures.Select(host.SampleFailureText).ToList();
+            host.Dispose();
+            return (first, second);
+        });
+
+        var en = Locales.Values("en");
+        var tr = Locales.Values("tr");
+        var complaints = new StringBuilder();
+
+        for (var index = 0; index < failures.Length; index++)
+        {
+            var shown = english[index];
+            var key = failures[index].Key;
+
+            foreach (var piece in Shown("en", en["playback.sample-failed"]).Concat(Shown("en", en[key])))
+                if (!shown.Contains(piece, StringComparison.Ordinal))
+                    complaints.AppendLine($"'{key}' İngilizce parçası eksik — \"{piece}\" ∉ \"{shown}\"");
+
+            // Yalnız Türkçeye özgü parçalar: iki dilde aynı yazılan ad (ffmpeg) ölçüt olamaz.
+            var englishSide = string.Join(" ",
+                Shown("en", en["playback.sample-failed"]).Concat(Shown("en", en[key])));
+
+            var onlyTurkish = Shown("tr", tr["playback.sample-failed"]).Concat(Shown("tr", tr[key]))
+                .Where(piece => !englishSide.Contains(piece, StringComparison.Ordinal))
+                .ToList();
+
+            foreach (var piece in onlyTurkish)
+                if (shown.Contains(piece, StringComparison.Ordinal))
+                    complaints.AppendLine($"'{key}' İngilizce arayüzde Türkçe taşıyor — \"{piece}\" ∈ \"{shown}\"");
+
+            if (NonAscii.IsMatch(shown))
+                complaints.AppendLine($"'{key}' İngilizce arayüzde Latin dışı harf taşıyor — \"{shown}\"");
+
+            // Dil düğmesi gerçekten çeviriyor mu: aynı sebep Türkçede Türkçe okunmalı.
+            foreach (var piece in Shown("tr", tr[key]))
+                if (!turkish[index].Contains(piece, StringComparison.Ordinal))
+                    complaints.AppendLine($"'{key}' Türkçe arayüzde çevrilmiyor — \"{piece}\" ∉ \"{turkish[index]}\"");
+        }
+
+        Assert.True(complaints.Length == 0, "Örnek hatası perdesi:\n" + complaints);
+    }
+
+    /// <summary>
+    /// Bir dil değerinin ekranda okunacak sabit parçaları: metin dilin büyük harf kuralından
+    /// geçirilir, biçim yuvaları atılır, kalan anlamlı parçalar döner. Ölçü bu parçaları
+    /// arıyor, üretimin ürettiği dizgeyi yeniden kurmuyor.
+    /// </summary>
+    private static IReadOnlyList<string> Shown(string language, string pattern)
+        => Regex.Split(LanguageCatalog.Title(pattern, string.Equals(language, "tr", StringComparison.Ordinal)), @"\{\d+\}")
+            .Select(piece => piece.Trim())
+            .Where(piece => piece.Length >= 3)
+            .ToList();
+
+    /// <summary>
+    /// T91/K4: motorun doğrulama iletileri ile <c>LanguageCatalog</c>'un anahtar sözlüğü
+    /// karşılaştırılıyor. İki yön de ölçülüyor — Core'a eklenen yeni bir ileti karşılıksız
+    /// kalamaz, sözlükte karşılığı olmayan ölü anahtar da duramaz. Tek yön ölçülseydi
+    /// ayıklayıcı boş dönünce ölçüm sessizce yeşil verirdi.
+    /// </summary>
+    [Fact]
+    public void MotorunDogrulamaIletilerinePerdeArkasindaAnahtarVar()
+    {
+        Strings.Use("en");
+        var messages = CoreValidationMessages();
+        var complaints = new StringBuilder();
+
+        foreach (var message in messages)
+        {
+            var shown = LanguageCatalog.Validation(message);
+            var untranslated = LanguageCatalog.Display(Strings.Get("main.validation.untranslated-engine", message));
+            if (string.Equals(shown, untranslated, StringComparison.Ordinal))
+                complaints.AppendLine($"Core iletisinin anahtarı yok — \"{message}\"");
+        }
+
+        var produced = messages.Concat(CatalogMessageConstants()).ToList();
+        foreach (var known in KnownValidationMessages())
+            if (!produced.Contains(known, StringComparer.Ordinal))
+                complaints.AppendLine($"Sözlükteki anahtar motorda karşılıksız — \"{known}\"");
+
+        Assert.True(complaints.Length == 0, "ConversionArguments.Validate ↔ ValidationKeys:\n" + complaints);
+    }
+
+    /// <summary>
+    /// <c>ConversionArguments.Validate</c>'in ürettiği iletiler. Interpolasyon yuvaları
+    /// <see cref="StripInterpolations"/> ile boşaltılıyor; kalan biçim örüntüyle eşleşir.
+    /// </summary>
+    private static IReadOnlyList<string> CoreValidationMessages()
+    {
+        var path = Path.Combine(TipSources.Root, "src", "VidShrink.Core", "ConversionArguments.cs");
+        var source = StripComments(File.ReadAllText(path));
+        var start = source.IndexOf("IReadOnlyList<string> Validate(", StringComparison.Ordinal);
+        Assert.True(start >= 0, "ConversionArguments.Validate bulunamadı.");
+
+        var end = source.IndexOf("\n    public static", start + 1, StringComparison.Ordinal);
+        var body = StripInterpolations(end < 0 ? source[start..] : source[start..end]);
+
+        return ErrorAdd.Matches(body)
+            .Select(match => TipSources.Unescape(match.Groups["body"].Value).Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static readonly Regex ErrorAdd = new(
+        "errors\\.Add\\(\\$?\"(?<body>(?:[^\"\\\\\n]|\\\\.)*)\"\\)", RegexOptions.Compiled);
+
+    /// <summary>
+    /// <c>LanguageCatalog</c>'un düz eşleşen doğrulama anahtarları. Sözlük gizli; ölçü onu
+    /// kopyalamıyor, yansımayla okuyor — kopyalasa iki taraf ayrışırdı.
+    /// </summary>
+    /// <summary>
+    /// Motorun iletisi olduğu hâlde <c>Validate</c>'ten çıkmayanlar. Kırpma biçimi hatası
+    /// ayrıştırıcıda üretiliyor ve <c>LanguageCatalog</c>'da bir sabit olarak duruyor; ölçü
+    /// onu adıyla değil, sınıftaki <c>const string</c> bildirimlerinden okuyor.
+    /// </summary>
+    private static IReadOnlyList<string> CatalogMessageConstants()
+    {
+        var source = StripComments(File.ReadAllText(TipSources.CatalogPath));
+        return Regex.Matches(source, "const string \\w+ = \"(?<body>(?:[^\"\\\\\n]|\\\\.)*)\";")
+            .Select(match => TipSources.Unescape(match.Groups["body"].Value))
+            .ToList();
+    }
+
+    private static IReadOnlyList<string> KnownValidationMessages()
+    {
+        var field = typeof(LanguageCatalog).GetField("ValidationKeys",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+        Assert.NotNull(field);
+        var map = (IReadOnlyDictionary<string, string>)field!.GetValue(null)!;
+        return map.Keys.ToList();
     }
 
     [Fact]
