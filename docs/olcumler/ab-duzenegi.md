@@ -139,6 +139,7 @@ Bir ölçüm düzeneğinin neyi **reddettiği**, ne ölçtüğü kadar önemlidi
 | iki HDR uzayı ayrı | PQ ile HLG doğrudan puanlanamaz |
 | referans SDR, çıktı HDR | referans yükseltilemez |
 | kare hızları ayrı | libvmaf kareleri yanlış eşler, sessizce sayı üretir |
+| en boy oranları ayrı | kırpma ya da dolgu var; puan bit hızından bağımsız sabitlenir |
 | girdi ses taşıyor | HandBrake `-a none` koşarken bütçe iki tarafta eşit bölünmez |
 
 Son satır bu sözleşme sırasında gerçekten yakalandı ve bir koşumu iptal ettirdi.
@@ -151,6 +152,20 @@ fark etmek zordur: tablo gayet makul görünür.
 
 Düzenek artık sesli her girdiden `-map 0:v:0 -c copy` ile video-only bir kopya
 türetiyor; türetmeden sonra girdi hâlâ ses taşıyorsa kodlamaya başlamadan duruyor.
+
+En boy oranı satırı da bu sözleşme sırasında yakalandı, üstelik GEÇERSİZ tablonun
+tıpatıp aynı imzasıyla. İlk parça koşumunda `parca-2` üzerinde HandBrake'in puanı
+hedef boyut on kat büyürken kımıldamadı: 60 MB'de harmonik 20,27, 600 MB'de 20,30.
+İlk okuyuşta bu "ölçü duyarsız" demektir. Değildi: preset'in otomatik kırpması o
+parçada 8 satır kırpıp 1920x1072 üretiyordu, öbür iki parçada kırpmıyordu. Kırpılmış
+kareyi 1920x1080 referansla eşleştirince puan bit hızından bağımsız bir tabana
+oturuyor. Aynı koşumda VidShrink 1152x648'e inip 68,60'tan 95,84'e çıkıyordu —
+yani ölçü duyarlıydı, hizalama bozuktu.
+
+İki değişiklik yapıldı: HandBrake `--crop 0:0:0:0 --non-anamorphic` ile koşuyor, ve
+en boy oranı %0,5'ten fazla ayrılan çift artık sayı basmıyor. Çözünürlük düşüşü
+serbest kalıyor — 1152x648 ile 1920x1080 aynı oran, libvmaf ölçekleyip karşılaştırır;
+yasak olan oranın değişmesi. Bu belgedeki bütün sayılar düzeltmeden sonraki koşumdan.
 
 ### Bu turda ölçülmeyen
 
