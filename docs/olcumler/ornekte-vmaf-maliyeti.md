@@ -4,7 +4,7 @@ Tarih: 2026-09-01. Ortam Windows 11, ffmpeg 9.0-full. Bütün süre ve kalite sa
 
 ## Köprü ve duvar saati
 
-`IQualityMeasurement` Core katmanındadır. Ffmpeg katmanındaki `QualityMeasurement`, `QualityMeter`ı uygular; `ProbeResult` hem eski `ComplexityProfile`ı hem pencere sonuçlarını taşır. Tur 1'de tam örneğin Matroska, yarım örneğin ham H.264 sayılması plan girdisini değiştirmişti. Tur 2'de iki taraf da Matroska dosya baytı ölçüyor. Aynı 2 saniyelik kodlamada Matroska ek yükü düşük karmaşıklıkta 5434 → 6875 bayt (+%26,52), hareketli içerikte 734368 → 735930 bayt (+%0,21) ölçüldü; aynı birim kullanıldığı için oran hesabında tek tarafa binmiyor.
+`IQualityMeasurement` Core katmanındadır. Ffmpeg katmanındaki `QualityMeasurement`, `QualityMeter`ı uygular; `ProbeResult` hem eski `ComplexityProfile`ı hem pencere sonuçlarını taşır. Yoklamanın bayt birimi üç turda iki kez değişti; bugünkü hali ve ölçülen farkı [Bayt birimi](#bayt-birimi) bölümündedir.
 
 | Kaynak | Süre sn | Çözünürlük | Kalite kapalı ms | Kalite açık ms | Fark ms | Fark % | Ölçülen pencere |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -14,11 +14,47 @@ Tarih: 2026-09-01. Ortam Windows 11, ffmpeg 9.0-full. Bütün süre ve kalite sa
 
 İddia doğrulanmadı: libvmaf ölçümü “neredeyse bedava” değildir. Bu üç koşumda duvar saati farkı 1701–7471 ms'dir. Her durum iki sırada (`kapalı→açık` ve `açık→kapalı`) çalıştırıldı; tablodaki değerler iki koşumun ortalamasıdır, böylece ikinci koşumun dosya önbelleği üstünlüğü tek tarafa yazılmadı.
 
-Aynı HDR kaynak, aynı 517,083–519,083 saniye penceresinde yalnız referans çözme ölçüldü. Normalizasyon kapalı ortalama 301,5 ms, açık 302,5 ms; ölçülen fark **1,0 ms / %0,33**. Tekrarlar kapalı 312/291 ms, açık 305/300 ms idi. Bu tek pencere ve iki tekrarın ölçümüdür; daha genel HDR maliyeti **ölçülmedi**.
+Aynı HDR kaynak, aynı 517,083–519,083 saniye penceresinde yalnız referans çözme ölçüldü. Normalizasyon kapalı ortalama 301,5 ms, açık 302,5 ms; ölçülen fark 1,0 ms. Tekrarlar kapalı 312/291 ms, açık 305/300 ms idi — kapalı koşumun kendi tekrar yayılımı 21 ms, yani ölçülen farkın yirmi katı. **Fark gürültünün içinde kalmıştır**: bu ölçüm ne normalizasyonun referans çözmeye maliyet eklediğini ne de eklemediğini göstermeye yeter. Daha genel HDR maliyeti **ölçülmedi**.
 
 ### Bütçe kararı
 
 Mevcut örnek süreç zaman aşımı pencere başına 90000 ms'dir. En yavaş kalite-açık tam yoklama 20578 ms, en yavaş tek kalite penceresi 7534 ms sürdü; ikisi de mevcut kapının içindedir. Bu nedenle pencere sayısı, pencere süresi veya ölçüm çözünürlüğü sınırı konmadı ve sınır bozunumu **ölçülmedi**. Kullanıcı iptali kalite servisine taşınır; iptal dışındaki ölçüm hatası profili düşürmez ve kalite alanını boş bırakır. `RunAsync` ve `RunDetailedAsync` varsayılanı kaliteyi kapalı tutar; T89 açıkça seçene kadar uygulama bu ek süreyi ödemez.
+
+## Bayt birimi
+
+Yoklamada bayt üreten üç taraf var: tam ölçek örneği, yarım ölçek örneği ve hareket örneği. Tur 3'te üçü de **tek muxer** (`ComplexityProbe.SampleFormat`, Matroska) ve **tek sayma yolu** (`MeasureSampleBytes`, dosya uzunluğu) üzerinden geçiyor. `SampleWindowAsync`ın yedek yolu da aynı yardımcıyı kullandığı için split'in başarısız olduğu pencereler artık karışık birim üretmiyor. Ham akış baytını stderr'den okuyan `ParseVideoBytes` kaldırıldı.
+
+Ölçüm düzeneği: 1280×720@60 lavfi kaynakları, `-ss 2 -t 2`, `-c:v libx264 -crf 23 -preset veryfast`; hareket tarafı `-vf fps=30`. Aynı düzenek iki kez koşuldu, iki koşumun bütün bayt sayıları **bire bir aynı** çıktı (tekrar yayılımı 0 bayt).
+
+### Konteyner ek yükü
+
+| Kaynak | Ham H.264 ES bayt | Matroska bayt | Fark bayt | Fark % |
+|---|---:|---:|---:|---:|
+| Düşük karmaşıklık (`color=gray`) | 5430 | 6871 | 1441 | +26,54 |
+| Orta (`smptebars`) | 6595 | 8040 | 1445 | +21,91 |
+| Yüksek hareket (`testsrc2`) | 850339 | 851901 | 1562 | +0,18 |
+
+Ek yük içerikten neredeyse bağımsız, yaklaşık sabit bir toplamdır (1441–1562 bayt). Bu yüzden yüzde olarak yalnız küçük pencerelerde büyür.
+
+### Birimin `MotionExponent` girdisine etkisi
+
+`ComplexityProfile.FromProbe` içinde `MotionExponent = Clamp(Log2(halfFpsBppf/fullScaleBppf), 0, 1)`. Aşağıdaki sütunlar aynı ölçülen bayt sayılarından türetilen `Log2` değeridir; kelepçe uygulanmamıştır.
+
+| Kaynak | `main` (ham, KiB yuvarlamalı) | Tur 2 (kırık: hareket ham / referans mkv) | Tur 3 (üç eksen de Matroska) | Ham ES (yuvarlamasız) |
+|---|---:|---:|---:|---:|
+| Düşük karmaşıklık (`color=gray`) | 0,263 | −0,161 | 0,322 | 0,242 |
+| Orta (`smptebars`) | 0,415 | 0,027 | 0,313 | 0,245 |
+| Yüksek hareket (`testsrc2`) | 0,623 | 0,619 | 0,623 | 0,623 |
+
+`CodecModel.DefaultMotionExponent = 1 − 0,75 = 0,25`; `PlanCalculator.cs:182` eşiği `<= DefaultMotionExponent`. Ölçülen üç kaynakta:
+
+- Tur 2 iki düşük bit hızlı kaynağı da eşiğin **yanlış tarafına** düşürüyordu (−0,161 kelepçeyle 0,0; 0,027). Bu, KRİTİK olarak bildirilen davranıştır.
+- Tur 3'te üç kaynak da `main` ile **aynı tarafta**: hepsi 0,25'in üstünde. Bu üç kaynağın gözlemidir; genel durumda eşik tarafının korunduğu **ölçülmedi**.
+- `main`in kendi okuması bu rejimde KiB'ye yuvarlanıyordu: `smptebars` için `main` 0,415 okurken yuvarlamasız değer 0,245'tir (+0,170 sapma). Yani `main` düşük bit hızlı pencerelerde zaten tanesi kaba bir sayı üretiyordu; hiçbir birim seçimi onun değerini birebir yeniden üretmez.
+
+Ham ES sütunu birim adayı olarak sınandı ve **seçilmedi**: ham `.h264` dosyasında zaman damgası yok, `ffprobe` bu dosya için `r_frame_rate=120/1` ve `nb_frames=N/A` döndürüyor (ölçüldü). Kalite ölçümü aynı tam ölçek dosyasını `QualityMeter`a örnek olarak veriyor; ham akış bu yolu bozma riski taşıdığı için Matroska korundu.
+
+Kalan sapma T89'a devreder: Matroska birimi düşük bit hızlı iki kaynakta `Log2` değerini yuvarlamasız ham ölçüye göre +0,068 ve +0,079 yukarı taşıyor; yüksek hareketli kaynakta kayma −0,0001'dir. Bu sözleşme `PlanCalculator` eşiklerine dokunmuyor.
 
 ## Yaklaşık 3× taban oranında tepe-kalite
 
@@ -26,10 +62,12 @@ Mevcut örnek süreç zaman aşımı pencere başına 90000 ms'dir. En yavaş ka
 
 | Kaynak | Taban oranı | Tepe | Hedef MiB | Teslim MiB | VMAF-NEG mean | Harmonic | p10 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| 1280×720@60 | 3,0424929178470255 | 1,02 | 16 | 15,817834854125977 | 90,05607107861103 | 90,02760819868892 | 88,0500133 |
-| 1280×720@60 | 3,0424929178470255 | 1,50 | 16 | 15,741707801818848 | 90,06902001666657 | 90,05225934724531 | 88,4909184 |
-| 1920×1080@30 | 3,0348360655737705 | 1,02 | 22 | 21,669864654541016 | 90,37059560666665 | 90,3311891343612 | 88,32392300000001 |
-| 1920×1080@30 | 3,0348360655737705 | 1,50 | 22 | 21,34074306488037 | 90,47315896361098 | 90,4520939149023 | 88,69381940000001 |
+| 1280×720@60 | 3,042 | 1,02 | 16 | 15,818 | 90,056 | 90,028 | 88,050 |
+| 1280×720@60 | 3,042 | 1,50 | 16 | 15,742 | 90,069 | 90,052 | 88,491 |
+| 1920×1080@30 | 3,035 | 1,02 | 22 | 21,670 | 90,371 | 90,331 | 88,324 |
+| 1920×1080@30 | 3,035 | 1,50 | 22 | 21,341 | 90,473 | 90,452 | 88,694 |
+
+Tablo okunabilirlik için üç haneye yuvarlandı; aşağıdaki farklar yuvarlanmamış değerlerden hesaplanmıştır.
 
 Geniş tepe iki kaynakta da hedefi aşmadı. 720p60'da geniş eksi dar: mean +0,013, harmonic +0,025, p10 +0,441; 1080p30'da mean +0,103, harmonic +0,121, p10 +0,370. Tek koşum ve gürültü tahmini olmadığı için 1,02'nin kalite bıraktığı sonucuna varılmadı; yalnız gözlenen fark T89'a devredilir. `FfmpegArguments` sabitleri değiştirilmedi.
 
@@ -39,8 +77,40 @@ Geniş tepe iki kaynakta da hedefi aşmadı. 720p60'da geniş eksi dar: mean +0,
 
 ## Test ve mutasyon kanıtı
 
-Köprü çağrısı geçici kaldırıldığında `DetailedProbeExposesWindowQualityThroughCoreContract` başarısız oldu. Ayrı örnek ofseti geçici olarak referans ofsetine bağlandığında `ReferenceAndSampleMayUseDifferentWindowOffsets` VMAF 22,38367795 ile başarısız oldu. Her iki düzeltme geri getirildikten sonra sözleşme filtresi yeniden çalıştırıldı. Var olan assertion gevşetilmedi, test Skip'e alınmadı.
+Köprü çağrısı geçici kaldırıldığında `DetailedProbeExposesWindowQualityThroughCoreContract` başarısız oldu. Ayrı örnek ofseti geçici olarak referans ofsetine bağlandığında `ReferenceAndSampleMayUseDifferentWindowOffsets` VMAF 22,38367795 ile başarısız oldu.
 
-Son doğrulama: sözleşme filtresi 14 başarılı / 0 başarısız; tam `dotnet test -c Release` 963 başarılı / 0 başarısız.
+Tur 2'nin “yarım örnek formatı `h264` yapıldığında üç bağımsız test de başarısız oldu” cümlesi geri çekildi: o turda kırmızıya dönen ölçü iki sabiti karşılaştırıyordu, davranışı bağlamıyordu. O test silindi.
 
-Tur 2 mutasyonu: yarım örnek formatı yeniden `h264`, kalite varsayılanı yeniden açık ve pencere dizisi `Take(1)` yapıldığında üç bağımsız test de başarısız oldu. Düzeltmeler geri getirildi; tur 2 sözleşme filtresi 16 başarılı / 0 başarısız, kesintisiz tam süit 974 başarılı / 0 başarısız sonuçlandı.
+Tur 3'ün ölçüleri üretilen ffmpeg argümanına ve sayılan bayta bakar:
+
+- `EveryProbeSampleMuxesThroughTheSameContainer` — `SplitArgs` ve `SampleArgs` çıktısındaki her `-f` değerini okur; dört çıkış, tek muxer, `null` yok.
+- `WindowAndMotionSamplesCountTheSameByteUnit` — düşük karmaşıklıklı klipte pencere örneğiyle hareket örneğinin saydığı baytı karşılaştırır. Eşik %8; düzeltilmiş halde ölçülen sapma **%1,5** (pencere 1978 B, hareket 2008 B).
+- `ProbeEntryPointUsedByTheAppDoesNotMeasureQuality` — uygulamanın çağırdığı `RunAsync`a sayaçlı bir ölçer verir ve sıfır çağrı bekler.
+
+Mutasyonlar, her biri tek başına uygulanıp geri alındı:
+
+| Mutasyon | Kırmızıya dönen | Sonuç |
+|---|---|---|
+| `SplitArgs` `[small]` çıkışı yeniden `h264` | `EveryProbeSampleMuxesThroughTheSameContainer` | Başarısız: 1, Başarılı: 17, Toplam: 18 |
+| `SplitArgs` `[full]` çıkışı yeniden `h264` | Yukarıdaki + `WindowAndMotionSamplesCountTheSameByteUnit` (“pencere 1143 B, hareket 2008 B, sapma %75,7”) | Başarısız: 2, Başarılı: 16, Toplam: 18 |
+| `SampleArgs` (hareket ve yedek yol) yeniden `h264` | Yukarıdaki ikisi (“pencere 1978 B, hareket 1143 B, sapma %42,2”) | Başarısız: 2, Başarılı: 16, Toplam: 18 |
+| `RunAsync` içinde `measureQuality: true` | `ProbeEntryPointUsedByTheAppDoesNotMeasureQuality` | Başarısız: 1, Başarılı: 17, Toplam: 18 |
+
+Var olan hiçbir assertion gevşetilmedi, hiçbir test `Skip`e alınmadı.
+
+## Bu turun koşumu
+
+Sözleşme filtresi (`ComplexityProbeTests|QualityMeterTests|PlanCalculatorTests`), `dotnet test` özet satırı olduğu gibi:
+
+```
+Başarılı!  - Başarısız:     0, Başarılı:    18, Atlanan:     0, Toplam:    18, Süre: 19 s - VidShrink.Tests.dll (net8.0)
+```
+
+Aynı çıktı koşum kapısından geçirildi: `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 18` çıkış kodu 0, kapı `başarısız=0 toplam=18 alt-sınır=18` bildirdi.
+
+**Tam süit bu turda koşulmadı.** Ölçüm sırasında aynı makinede üç ajan daha çalışıyordu; paralel koşum ölçüyü kararsız yapıyor. Tur 2 raporundaki 963 ve 974 tam süit sayıları doğrulanmadıkları için kaldırıldı; yerlerine tahmin yazılmadı. Tam süit toplamı bu turda **ölçülmedi**.
+
+## Kalan borç
+
+- `ScanSampleAsync` ve paket okuma yolu baytı `-vstats` `f_size` ve paket boyutundan alır; bunlar konteyner dışı kare/paket yükleridir. Pencere yanlılığı (`bias`) bu sayıların **kendi içindeki oranıdır**, muxlanmış örnek baytlarıyla hiçbir yerde karşılaştırılmaz. Bu yüzden tek muxer kuralının dışında tutuldu.
+- `MotionExponent`in Matroska birimindeki kayması (düşük bit hızlı iki kaynakta +0,068 ve +0,079) T89'a devreder.
