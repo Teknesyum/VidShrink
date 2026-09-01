@@ -119,6 +119,31 @@ Yan bulgu: özdeş 1080p içerikte kare bazlı **min 97,4256**, p10 97,9241. Yan
 `VmafNegMin` özdeş dosyada bile 97,4 diyor — bu bir kalite işareti değil, modelin
 kendi gürültüsü. §4'ün gerekçesi bu.
 
+### 2.1 Geriye dönük kapsam — kaldırma hangi eski sayıyı bozdu (K4c)
+
+T97 kelepçeyi kaldırdı ama **daha önce yayımlanmış sayıların** ne olacağını
+yazmadı. Kapsam şu: kelepçe yalnız `[99,8; 100]` bandındaki değerleri
+değiştiriyordu. O bandın dışındaki her sayı kelepçeli ve kelepçesiz **birebir
+aynı**. Dolayısıyla geriye dönük düzeltme gerektiren sayı, yalnız o banda düşmüş
+olanlardır.
+
+`docs/olcumler/handbrake-acigi.md` tarandı: **o belgedeki hiçbir VMAF değeri
+`[99,8; 100]` bandında değil.** En yüksek değerler 72 civarında (SDR eş-boyut
+tablosu), tonemap hizalı ölçüm 48,96 / 40,17. Yani:
+
+- **8,79 puanlık sıkıştırma farkı iddiası ayakta** — kelepçeden etkilenmedi.
+- Aynı belgedeki harmonik 10,18 ve p10 14,60 farkları da etkilenmedi.
+- Etkilenen tek ifade **düzyazı**: aynı dosyanın kendisiyle karşılaştırıldığı
+  testin "kullanıcıya VMAF 100 verdi" cümlesi. O cümle kelepçenin *davranışını*
+  anlatıyor ve artık geçersiz — bugün aynı test modelin tavanını raporlar. Sayı
+  değil, tarif eskidi.
+
+Bu cümlenin düzeltilmesi T94'ün dosyasında; T104 oraya yazmıyor.
+
+Tarama `docs/` ağacının tamamında koştu (`99,8x`, `99,9x`, `VMAF 100`,
+`100,0000`); yukarıdaki tek düzyazı cümlesi dışında bandın içine düşen değer
+çıkmadı. Kod ve test ağacı taranmadı — orada yayımlanmış ölçüm sayısı yok.
+
 
 ## 3. Tonemap'li referans yolu — **çağrılıyor ve duyarlı**
 
@@ -444,6 +469,79 @@ atlanan yok. ffmpeg gerektirenler `[FfmpegFact]`, tonemap zinciri gerektiren
 `WorstSceneAveragesOverTwoSecondBuckets` pencere uzunluğunu tek başına
 sabitliyor: 600 kare @ 60 fps, yalnız 2,0–3,0 sn arası sıfır. 2 sn'lik pencere 50
 verir, 1 sn'lik 0, 5 sn'lik 80. Ölçü 50 bekliyor.
+
+
+## 7. `VmafNegMin` kararı (K5)
+
+T97 `VmafNegMin`'i arayüz kaydına ekledi ama belgede "modelin kendi gürültüsü"
+dedi. Bir alan hem taşınıp hem kullanılamaz sayılamaz; T104 karar veriyor.
+
+**Ölçüm — min içeriği değil modeli ölçüyor.** Bit düzeyinde özdeş üç klipte:
+
+| İçerik | özdeş min | özdeş ortalama |
+|---|---|---|
+| p1 | 97,4257 | 98,8005 |
+| p2 | 97,4253 | 97,4396 |
+| p3 | 97,4256 | 99,8882 |
+
+Üç ayrı içerik, hiçbir kalite kaybı yokken **aynı sayı**: 97,425. Bu bir içerik
+ölçüsü değil, modelin tek karelik taban salınımı. §3'teki 0,79 da aynı ailedendir
+(sahne kesmesinde hizalanma artığı).
+
+**Ölçüm — gerçek yarışmacıları ayıramıyor.** Aynı referansa karşı crf 8 / crf 12:
+
+| İçerik | crf8 min | crf12 min | sinyal | gürültü |
+|---|---|---|---|---|
+| p1 | 4,3147 | 4,3011 | 0,0136 | 1,3748 |
+| p2 | 95,2609 | 94,2846 | 0,9763 | 0,0143 |
+| p3 | 2,2023 | 2,2041 | **−0,0018** | 2,4626 |
+
+p1'de sinyal gürültünün yüzde biri; p3'te **sıra ters dönüyor** — kötü kodlama
+daha iyi görünüyor. Yalnız p2 ayırıyor, o da hiçbir yolun ayıramadığı durağan
+klip; orada min klip ortalamasına yapıştığı için "ayırıyor" görünüyor.
+
+Aynı tabloda p10 ve en kötü birim aynı içeriklerde çalışıyor (p1 p10 sinyali
+1,9059; p3 2,6384). Yani boşluğu dolduran alan zaten var.
+
+**Karar: kalite yargısı olarak kullanılmıyor, tanı alanı olarak kalıyor.**
+
+- `QualityScore.VmafNegMin` **kalıyor**. Gerekçesi tek: `bench measure` ve
+  `bench measure-tonemapped` çıktısında görünür ve "en kötü kare hangi değere
+  indi" sorusunu ölçüm turlarında yanıtlıyor — §3'teki 0,79'u fark ettiren buydu.
+  Tanıya yarıyor, karara yaramıyor.
+- **Hiçbir karar bu alana bakmamalı.** Plan hesabı, A/B karşılaştırması,
+  kullanıcıya gösterilen kalite — hiçbiri `VmafNegMin` okumamalı. Taban gerekiyorsa
+  `VmafNegWorstScene`, kuyruk gerekiyorsa `VmafNegP10`.
+- `WindowQualityMeasurement.VmafNegMin` de **kalıyor**, aynı gerekçeyle ve aynı
+  yasakla. Kaldırmak `IQualityMeasurement`'ı değiştirmeyi gerektirir; o dosya
+  T104'ün sahibinde değil ve alan zararsız (okuyan yok).
+
+Kısaca: silinmedi çünkü tanıda işe yarıyor; terfi de etmedi çünkü üç içerikte
+ölçüldü ve kalite ayıramadı.
+
+
+## 8. Bu turun sınırları
+
+Ölçülmemiş olanı ölçülmüş göstermemek için:
+
+- **`[TonemapFact]`'in atlama yüzeyi kriterden geniş (K4d).** Kriter yalnız
+  tonemap zincirinin yokluğunda atlamayı öngörüyordu; öznitelik `zscale`
+  **veya** `tonemap` filtresi eksikse de atlıyor. Daraltmak
+  `tests/VidShrink.Tests/FrameGrabberTests.cs` içinde ve o dosya T104'ün
+  sahibinde değil — bu yüzden **sınır olarak adlandırılıyor, düzeltilmiyor.**
+  Ölçüm makinesinde iki filtre de kurulu, atlanan ölçü sıfır; yani bu yüzey
+  burada boş. `zscale`'i olmayan bir makinede tonemap ölçüsü sessizce atlanır ve
+  bunu kimse fark etmez. Daraltma T104 dışında bir tur ister.
+- **İçerik çeşitliliği yok.** Üç klip aynı ana kaynaktan. Farklı tür (konuşan
+  kafa, ekran kaydı, animasyon) ve farklı kare hızı **ölçülmedi**.
+- **Doğru ve ince harita ölçülmedi.** §4.2'deki eşik indirme, T101'in kastettiği
+  doğrulanmış ince harita değil.
+- **Üretim tüketicisi yok.** `VmafNegWorstScene` ve kardeşlerini okuyan üretim
+  kodu hâlâ yok (§4.4). Ölçü doğru, ama kimse ona bakmıyor.
+- **Süre/hız iddiası yok.** Ölçümler beş ajanın koştuğu paylaşımlı makinede
+  yapıldı; hiçbir zaman sayısı rapora girmedi. Bir VMAF koşumu ffmpeg'i geçici
+  olarak düşürdü, aynı komut tekrarında geçti — sayılar o tekrardan.
+- XPSNR/SSIM kare başına dökümü hâlâ okunmuyor; taban yalnız VMAF-NEG'de var.
 
 
 ## Yeniden üretim
