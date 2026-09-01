@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
@@ -9,6 +10,7 @@ using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Performance;
+using VidShrink.App.Playback;
 
 [assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
 
@@ -96,6 +98,9 @@ public sealed class LanguageTests : IDisposable
     private static readonly Regex ScreenAttribute = new(
         "(?:^|\\s)((?:\\w+:)?(?:Text|Content|Header|ToolTip\\.Tip|Watermark|AutomationProperties\\.Name|Bullets\\.Text))=\"([^\"]*)\"",
         RegexOptions.Compiled);
+    private static readonly Regex ScreenBody = new(
+        @">([^<>{}]*)<",
+        RegexOptions.Compiled);
 
     private static readonly Regex AnyLetter = new(@"\p{L}", RegexOptions.Compiled);
 
@@ -115,6 +120,15 @@ public sealed class LanguageTests : IDisposable
             stray.Add($"{match.Groups[1].Value}=\"{value}\"");
         }
 
+        foreach (Match match in ScreenBody.Matches(xaml))
+        {
+            var value = TipSources.DecodeXml(match.Groups[1].Value).Trim();
+            if (!AnyLetter.IsMatch(value)) continue;
+            if (XamlNamesThatStayAsWritten.Contains(value, StringComparer.Ordinal)) continue;
+
+            stray.Add($">{value}<");
+        }
+
         Assert.True(stray.Count == 0,
             "MainWindow.axaml içinde anahtardan gelmeyen metin var:\n" + string.Join("\n", stray));
     }
@@ -125,25 +139,50 @@ public sealed class LanguageTests : IDisposable
     /// satırında aranan iğneler ve ilerleme satırındaki aşama sözcükleri. Hepsi burada
     /// adıyla sayılı.
     /// </summary>
-    private static readonly string[] CodeNamesThatAreEngineTokens =
+    private static readonly string[] CodeNamesThatStayInCode =
     {
+        "Buy me a coffee", "Buy Me a Coffee",
         "GIF palette", "GIF encode",
         "no space left", "not enough space", "disk full", "insufficient disk space",
         "unknown encoder", "encoder not found", "does not support", "could not write header",
         "error initializing output stream", "automatic encoder selection failed",
         "incorrect codec parameters", "invalid argument", "muxer does not support",
         "invalid data found", "moov atom not found", "could not find codec parameters",
-        "decoder not found", "no such file or directory", "end of file", "unknown format"
+        "decoder not found", "no such file or directory", "end of file", "unknown format",
+        "Trim times must use HH:MM:SS format.",
+        "Start time cannot be negative.",
+        "End time must be greater than zero.",
+        "End time must be after start time.",
+        "Start time must be before the end of the source.",
+        "Resolution dimensions must be positive.",
+        "Resolution dimensions must be even for the selected pixel format.",
+        "Frame rate must be greater than zero.",
+        "Stream copy cannot change resolution or frame rate.",
+        "GIF requires video encoding and cannot use stream copy.",
+        "The source has no audio stream to copy.",
+        "The source has no audio stream to extract.",
+        "The trim end must come after the trim start.",
+        "^The (.+) container does not support the selected (.+) video encoder.$",
+        "^The (.+) container does not support the selected (.+) audio encoder.$",
+        "^The (.+) container does not support copying the source (.*) video stream.$",
+        "^The (.+) container does not support copying the source (.*) audio stream.$",
+        "Localization key ' ' is missing in ' ' and in ' '.",
+        "ffmpeg   ile döndü.",
+        "Parça dosyası oluşmadı."
     };
 
-    private static readonly Regex CsLiteral = new("(?<!\\$)\"((?:[^\"\\\\\n]|\\\\.)*)\"", RegexOptions.Compiled);
+    private static readonly Regex CsLiteral = new("(?<interpolated>\\$)?\"(?<body>(?:[^\"\\\\\n]|\\\\.)*)\"", RegexOptions.Compiled);
     private static readonly Regex CsWord = new(@"\p{L}{3,}", RegexOptions.Compiled);
 
     public static TheoryData<string> ScannedCode()
     {
         var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
-        var data = new TheoryData<string> { Path.Combine(app, "MainWindow.axaml.cs") };
-        foreach (var file in Directory.GetFiles(Path.Combine(app, "Performance"), "*.cs")) data.Add(file);
+        var data = new TheoryData<string>();
+        foreach (var file in Directory.GetFiles(app, "*.cs", SearchOption.AllDirectories)
+                     .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+                     .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+                     .OrderBy(path => path, StringComparer.Ordinal))
+            data.Add(file);
         return data;
     }
 
@@ -151,16 +190,18 @@ public sealed class LanguageTests : IDisposable
     [MemberData(nameof(ScannedCode))]
     public void ArkaKoddaCumleKalmadi(string path)
     {
-        var relative = Path.GetFileName(path);
-        var source = Strip(File.ReadAllText(path));
+        var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
+        var relative = Path.GetRelativePath(app, path);
+        var source = StripInterpolations(Strip(File.ReadAllText(path)));
         var stray = new List<string>();
 
         foreach (Match match in CsLiteral.Matches(source))
         {
-            var value = TipSources.Unescape(match.Groups[1].Value);
+            var body = match.Groups["body"].Value;
+            var value = TipSources.Unescape(body).Trim();
             if (!value.Contains(' ')) continue;
             if (CsWord.Matches(value).Count < 2) continue;
-            if (CodeNamesThatAreEngineTokens.Contains(value, StringComparer.Ordinal)) continue;
+            if (CodeNamesThatStayInCode.Contains(value, StringComparer.Ordinal)) continue;
 
             stray.Add(value);
         }
@@ -178,6 +219,59 @@ public sealed class LanguageTests : IDisposable
         source = Regex.Replace(source, @"/\*.*?\*/", string.Empty, RegexOptions.Singleline);
         source = Regex.Replace(source, @"//[^\n]*", string.Empty);
         return Regex.Replace(source, @"throw new [^;]*;", string.Empty, RegexOptions.Singleline);
+    }
+
+    private static string StripInterpolations(string source)
+    {
+        var output = new StringBuilder(source.Length);
+        for (var index = 0; index < source.Length; index++)
+        {
+            if (index + 1 >= source.Length || source[index] != '$' || source[index + 1] != '"')
+            {
+                output.Append(source[index]);
+                continue;
+            }
+
+            output.Append("$\"");
+            index += 2;
+            var depth = 0;
+            var quoted = false;
+            for (; index < source.Length; index++)
+            {
+                var current = source[index];
+                if (depth == 0 && current == '"')
+                {
+                    output.Append('"');
+                    break;
+                }
+
+                if (depth == 0)
+                {
+                    if (current == '{' && index + 1 < source.Length && source[index + 1] == '{')
+                    {
+                        output.Append("{{");
+                        index++;
+                    }
+                    else if (current == '{')
+                    {
+                        depth = 1;
+                        output.Append(' ');
+                    }
+                    else
+                    {
+                        output.Append(current);
+                    }
+                    continue;
+                }
+
+                if (current == '"' && (index == 0 || source[index - 1] != '\\')) quoted = !quoted;
+                if (quoted) continue;
+                if (current == '{') depth++;
+                else if (current == '}') depth--;
+            }
+        }
+
+        return output.ToString();
     }
 
     // ---- K3: Türkçe eksiksiz -------------------------------------------------------
@@ -278,6 +372,60 @@ public sealed class LanguageTests : IDisposable
     }
 
     // ---- K4: kullanıcının saydığı dört cümle ---------------------------------------
+
+    [Fact]
+    public void KodlamaImleciMetniDilAnahtarindanGelir()
+    {
+        Assert.Equal("Analysis 1/2 · Attempt 3", LanguageCatalog.EncodeMarker(false, 1, 2, 3));
+        Assert.Equal("Analiz 1/2 · Deneme 3", LanguageCatalog.EncodeMarker(true, 1, 2, 3));
+    }
+
+    [Fact]
+    public void OynatmaSeridininErisilebilirAdlariDilAnahtarindanGelir()
+    {
+        var (english, turkish) = AppHost.Run(() =>
+        {
+            var strip = new ControlStrip();
+            strip.SetLanguage(false);
+            var first = new[]
+            {
+                AutomationProperties.GetName(strip.FindControl<Button>("Restart")!),
+                AutomationProperties.GetName(strip.FindControl<Grid>("Timeline")!),
+                AutomationProperties.GetName(strip.FindControl<Border>("Bar")!)
+            };
+            strip.SetLanguage(true);
+            var second = new[]
+            {
+                AutomationProperties.GetName(strip.FindControl<Button>("Restart")!),
+                AutomationProperties.GetName(strip.FindControl<Grid>("Timeline")!),
+                AutomationProperties.GetName(strip.FindControl<Border>("Bar")!)
+            };
+            return (first, second);
+        });
+
+        Assert.Contains("Back To The Start", english);
+        Assert.Contains("Control Strip", english);
+        Assert.Contains("Başa Dön", turkish);
+        Assert.Contains("Denetim Şeridi", turkish);
+    }
+
+    [Fact]
+    public void TaninmayanMotorIletisiSessizceIngilizceyeDusmez()
+    {
+        Strings.Use("tr");
+        Assert.Equal("Çevrilmemiş Motor İletisi: Codec Surprise", LanguageCatalog.Validation("codec surprise"));
+    }
+
+    [Fact]
+    public void TaninmayanAsamaHamMotorMetniOlarakKorunur()
+    {
+        Strings.Use("tr");
+        var method = typeof(MainWindow).GetMethod("LocalizeStage",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+        Assert.NotNull(method);
+        Assert.Equal("Mystery Stage", method!.Invoke(null, new object[] { "mystery stage" }));
+    }
 
     /// <summary>
     /// Kalite bölümündeki kaynak-yok uyarısı. Ölçü sözlüğe değil <b>ekrana</b> bakıyor:
