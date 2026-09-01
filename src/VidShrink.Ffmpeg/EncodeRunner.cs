@@ -235,7 +235,7 @@ public sealed class EncodeRunner
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
         IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo, CancellationToken ct)
     {
-        var args = FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix);
+        var args = FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance);
         await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
     }
 

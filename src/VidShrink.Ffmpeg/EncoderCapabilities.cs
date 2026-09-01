@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed class EncoderCapabilities : IEncoderAvailability, IHdr10EncoderAvailability
+public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IHdr10EncoderAvailability
 {
     private static readonly Lazy<EncoderCapabilities> LazyInstance = new(Load);
 
@@ -11,6 +11,7 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IHdr10EncoderAva
 
     private readonly Dictionary<string, EncoderProbeResult> _probed = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string?> _hdr10PixelFormats = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, bool> _encoderOptions = new(StringComparer.OrdinalIgnoreCase);
 
     public IReadOnlySet<string> Encoders { get; }
     public IReadOnlySet<string> Filters { get; }
@@ -27,6 +28,18 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IHdr10EncoderAva
     public bool HasFilter(string name) => Filters.Contains(name);
 
     public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
+
+    public bool SupportsEncoderOption(string codec, string option, string value)
+    {
+        var key = $"{codec}\0{option}\0{value}";
+        lock (_encoderOptions)
+        {
+            if (_encoderOptions.TryGetValue(key, out var cached)) return cached;
+            var supported = HasEncoder(codec) && RunOptionProbe(codec, option, value);
+            _encoderOptions[key] = supported;
+            return supported;
+        }
+    }
 
     public string? Hdr10PixelFormat(string codec)
     {
@@ -128,6 +141,36 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IHdr10EncoderAva
         {
             return false;
         }
+    }
+
+    private static bool RunOptionProbe(string codec, string option, string value)
+    {
+        try
+        {
+            var args = new[]
+            {
+                "-hide_banner", "-loglevel", "info",
+                "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
+                "-c:v", codec, option, value, "-frames:v", "1",
+                "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
+            };
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+            process.Start();
+            var stdout = process.StandardOutput.ReadToEndAsync();
+            var stderr = process.StandardError.ReadToEndAsync();
+            if (!process.WaitForExit(4000))
+            {
+                try { process.Kill(true); } catch { }
+                return false;
+            }
+            Task.WaitAll(new Task[] { stdout, stderr }, 1000);
+            var diagnostic = stderr.Result;
+            return process.ExitCode == 0
+                   && !diagnostic.Contains("Error parsing option", StringComparison.OrdinalIgnoreCase)
+                   && !diagnostic.Contains("Option not found", StringComparison.OrdinalIgnoreCase)
+                   && !diagnostic.Contains("Unrecognized option", StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
     }
 
     public static EncoderCapabilities Parse(string encodersOutput, string filtersOutput, string versionOutput)
