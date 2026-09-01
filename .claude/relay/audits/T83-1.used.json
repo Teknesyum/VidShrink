@@ -1,0 +1,28 @@
+{
+  "contractId": "T83",
+  "auditorRunId": "a7e13d8950f0d7b5f",
+  "headSha": "d5268aa203ec53a95ffb8d48740c4329155eb3ec",
+  "diffHash": "7d31f1000ea113f65abc8682c11a818304e7f98cb7d7c9ec7c56c63024264827",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/LanguageCatalog.cs",
+    "src/VidShrink.App/Performance/PerformanceReportText.cs",
+    "src/VidShrink.App/Locales/en/main.json",
+    "src/VidShrink.App/Locales/en/performance.json",
+    "src/VidShrink.App/Locales/en/settings.json",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "src/VidShrink.App/Locales/tr/performance.json",
+    "src/VidShrink.App/Locales/tr/settings.json",
+    "tests/VidShrink.Tests/LanguageTests.cs",
+    "tests/VidShrink.Tests/LocalizationTests.cs",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs"
+  ],
+  "verification": [
+    "Bagimsiz denetci sekiz kabul kriterini tek tek dogruladi. K1: EnglishToTurkish/TurkishToEnglish/EnglishSource icin repo genelinde 0 satir; SetLanguage kalkmis, yerine OnLanguageChanged + Strings.Changed. LanguageCatalog 433->245 satir. K2: MainWindow.axaml icindeki tum Text/Content/Header/ToolTip.Tip degerleri loc:Text; C# interpolasyonlari elle okundu, sozcukler Say() uzerinden. K3: en 375 / tr 375 anahtar, eksik ve fazla yok; birebir ayni tek deger performance.value.ms ve o olcunun muaf listesinde adiyla yazili. K4: dort cumle de Locales/tr icinde Turkce, olcu ekrandaki dugumu okuyor. K5: dil gecisi tr->en->tr, her sekmede gorunen tum metin toplaniyor. K6: Turkce pencere pinleri guncel. K7: ucuncu dil zz klasoruyle dogrulandi, kodda dil adi yazili degil. Verify komutu kosuldu: dotnet test -c Release --filter LocalizationTests|LanguageTests|WindowLayoutTests -> 56 basarili, 0 basarisiz, cikis kodu 0. KRITIK bulgu yok. Yedi borc kaydedildi; en onemlileri LanguageCatalog.cs:229-237 yetim docstring, EncodeMarker icinde gomulu iki dilli metin ve K2 olcusunun sozlesmedeki olcutten zayif vekil olmasi. Denetci hicbir dosyaya yazmadi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T07:45:09.541Z",
+  "usedAt": "2026-09-01T07:48:07.284Z",
+  "completedSha": "d5268aa203ec53a95ffb8d48740c4329155eb3ec"
+}
