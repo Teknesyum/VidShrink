@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -42,6 +42,20 @@ internal sealed record PreviewClip
 
     public double EndSeconds => StartSeconds + DurationSeconds;
 }
+
+/// <summary>
+/// Başarısız bir kodlamanın sebebi. Kodlayan taraf metin üretmez, <b>anahtar</b> üretir:
+/// dizgeyi dile çeviren taraf paneli barındıran <see cref="PanelHost"/>'tur.
+/// </summary>
+/// <param name="Key">Sebebin dil anahtarı.</param>
+/// <param name="Detail">
+/// Anahtarın biçim argümanı. ffmpeg'in kendi <c>StandardError</c>'ı buraya düşer ve
+/// <b>ham</b> kalır: motorun ürettiği tanı metni çevrilmez, teşhis değerini yitirmesin diye
+/// olduğu gibi taşınır. Ekranda etiketli görünür — <c>playback.error.engine</c> anahtarı
+/// "Motor iletisi: {0}" yazar, yani ham metin sessizce arayüz metnine karışmaz. Aynı karar
+/// T90'ın 7. kriterinde <c>LocalizeStage</c> için verilmişti.
+/// </param>
+internal readonly record struct EncodeFailure(string Key, string? Detail = null);
 
 /// <summary>
 /// Kısa önizleme parçalarını kodlayan taraf. Aynı anda <b>en çok bir</b> kodlama koşar;
@@ -104,8 +118,14 @@ internal sealed class SegmentEncoder : IDisposable
         => PreviewSegment.For(info, plan, startSeconds, outputPath,
             complexity: complexity, availability: Availability);
 
-    /// <summary>Son başarısız kodlamanın ffmpeg hatası. Başarıda temizlenir.</summary>
-    internal string? LastError { get; private set; }
+    /// <summary>Son başarısız kodlamanın sebebi, anahtar hâlinde. Başarıda temizlenir.</summary>
+    internal EncodeFailure? LastFailure { get; private set; }
+
+    /// <summary>
+    /// Son başarısız kodlamanın <b>anahtarı</b>. Ekrana çıkan metin değil, sebebin kimliğidir;
+    /// dile çeviren taraf <see cref="PanelHost"/>'tur.
+    /// </summary>
+    internal string? LastError => LastFailure?.Key;
 
     /// <summary>Başlatılan kodlama sayısı — iptal ölçümü bunu okur.</summary>
     internal int StartedEncodes => Volatile.Read(ref _started);
@@ -157,7 +177,7 @@ internal sealed class SegmentEncoder : IDisposable
 
     /// <summary>
     /// Verilen an için parçayı kodlar. Koşan kodlama varsa iptal edilir. İptal edilen
-    /// istek <c>null</c> döner ve <see cref="LastError"/>'a dokunmaz; ffmpeg hatası da
+    /// istek <c>null</c> döner ve <see cref="LastFailure"/>'a dokunmaz; ffmpeg hatası da
     /// <c>null</c> döner ama hatayı yazar.
     /// </summary>
     internal async Task<PreviewClip?> RequestAsync(
@@ -216,9 +236,9 @@ internal sealed class SegmentEncoder : IDisposable
         {
             segment = Describe(info, plan, start, encodedPath, complexity);
         }
-        catch (ArgumentOutOfRangeException ex)
+        catch (ArgumentOutOfRangeException)
         {
-            LastError = ex.Message;
+            LastFailure = new EncodeFailure(WindowOutOfRangeKey);
             return null;
         }
 
@@ -237,14 +257,14 @@ internal sealed class SegmentEncoder : IDisposable
 
             if (!runs[0].Ok || !runs[1].Ok || !File.Exists(sourcePath) || !File.Exists(encodedPath))
             {
-                LastError = FirstFailure(runs);
+                LastFailure = FirstFailure(runs);
                 Delete(sourcePath);
                 Delete(encodedPath);
                 return null;
             }
 
             Interlocked.Increment(ref _completed);
-            LastError = null;
+            LastFailure = null;
 
             var clip = new PreviewClip
             {
@@ -315,14 +335,34 @@ internal sealed class SegmentEncoder : IDisposable
             Interlocked.CompareExchange(ref _peakRunning, running, peak);
     }
 
-    private static string FirstFailure(FfmpegRun[] runs)
+    /// <summary>ffmpeg tanı metni bırakmadan düştü; geriye yalnız çıkış kodu kaldı.</summary>
+    internal const string ExitCodeKey = "playback.error.exit-code";
+
+    /// <summary>
+    /// ffmpeg'in kendi <c>StandardError</c>'ı. Metin motordan gelir ve İngilizcedir;
+    /// çevrilmez, <b>etiketlenir</b>. Karar bilinçli: ham metin teşhis için değerlidir ama
+    /// etiketsiz geçirilirse arayüz metnine karışır.
+    /// </summary>
+    internal const string EngineMessageKey = "playback.error.engine";
+
+    /// <summary>İki koşum da tamam dedi ama dosya diskte yok.</summary>
+    internal const string NoFileKey = "playback.error.no-file";
+
+    /// <summary>
+    /// İstenen pencere kaynağın dışına düşüyor. <see cref="Clamp"/> bu durumu önlediği için
+    /// yol beklenmedik; kesme iletisi geliştiriciye aittir ve ekrana taşınmaz, kullanıcı
+    /// anahtardan gelen sebebi görür.
+    /// </summary>
+    internal const string WindowOutOfRangeKey = "playback.error.window";
+
+    internal static EncodeFailure FirstFailure(FfmpegRun[] runs)
     {
         foreach (var run in runs)
             if (!run.Ok)
                 return string.IsNullOrWhiteSpace(run.StandardError)
-                    ? $"ffmpeg {run.ExitCode} ile döndü."
-                    : run.StandardError;
-        return "Parça dosyası oluşmadı.";
+                    ? new EncodeFailure(ExitCodeKey, run.ExitCode.ToString(CultureInfo.InvariantCulture))
+                    : new EncodeFailure(EngineMessageKey, run.StandardError.Trim());
+        return new EncodeFailure(NoFileKey);
     }
 
     private static double Clamp(MediaInfo info, double startSeconds)
