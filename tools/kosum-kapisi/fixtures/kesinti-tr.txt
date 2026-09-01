@@ -1,0 +1,3 @@
+Test run aborted.
+Etkin test çalıştırması iptal edildi. Nedeni: Test ana işlemi kilitlendi
+Başarısız: 0, Başarılı: 935, Atlanan: 23, Toplam: 958, Süre: 13 m
