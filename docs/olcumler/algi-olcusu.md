@@ -1,11 +1,22 @@
-# Algı ölçüsü — normalizasyon, tonemap yolu ve sahne tabanı
+# Algı ölçüsü — normalizasyon, tonemap yolu ve en kötü birim
 
-T97. Ölçüm makinesi: Windows 11, `ffmpeg 9.0-full_build-www.gyan.dev` (`--enable-libvmaf
---enable-libzimg`). Kaynak: `.calisma/kaynak/parca-1.mkv` — `kaynak-1080p60-hdr-17dk.mp4`
-içinden 00:02:00 noktasından 60 sn, `-c copy`. 1920x1080, 60 fps, 3624 kare,
-yuv420p10le, bt2020/smpte2084/bt2020nc, `color_range=pc`.
+T97 + T104. Ölçüm makinesi: Windows 11, `ffmpeg 9.0-full_build-www.gyan.dev`
+(`--enable-libvmaf --enable-libzimg`).
 
-Bu turda süre/hız iddiası yok.
+T97 kaynağı: `.calisma/kaynak/parca-1.mkv` — `kaynak-1080p60-hdr-17dk.mp4` içinden
+00:02:00 noktasından 60 sn, `-c copy`. 1920x1080, 60 fps, 3624 kare, yuv420p10le,
+bt2020/smpte2084/bt2020nc, `color_range=pc`.
+
+T104 kaynakları: aynı ana kaynaktan alınmış üç ayrı 60 sn'lik parça
+(`parca-1.mkv`, `parca-2.mkv`, `parca-3.mkv`); her birinin **ilk 30 sn'si**
+`-map 0:v:0 -c copy` ile alındı. `parca-2`/`parca-3` ses taşıyor, `parca-1`
+taşımıyor; karşılaştırma videoya indirgenerek bu fark ortadan kaldırıldı.
+Üçü de 1920x1080 60 fps HDR, 1800/1799/1799 kare. **Üçü aynı ana kaynaktan
+geliyor** — içerik türü çeşitliliği (film, konuşan kafa, ekran kaydı) hâlâ
+ölçülmedi.
+
+Bu turlarda süre/hız iddiası yok. T104 ölçümleri paylaşımlı makinede koştu
+(beş ajan); bir VMAF koşumu ffmpeg'i geçici olarak düşürdü, tekrarında geçti.
 
 
 ## 1. Mevcut durum — `QualityMeter` bugün ne ölçüyor
@@ -29,7 +40,7 @@ kendi uzayı; değilse `yuv420p` bt709 limited.
 | VMAF-NEG harmonik | aynı koşum | aynı günlük | `n / Σ(1/max(x,1))` — 0 puanlı kare 1 sayılıyor |
 | VMAF-NEG p10 | aynı koşum | aynı günlük | sıralı küme üzerinde doğrusal ara değerli 10. yüzdelik |
 | VMAF-NEG min | aynı koşum | aynı günlük | tüm kümenin en küçüğü |
-| VMAF-NEG en kötü sahne | aynı koşum | aynı günlük | **T97'de eklendi** — 2 sn'lik ardışık pencerelerin en düşük ortalaması |
+| VMAF-NEG en kötü birim | aynı koşum | aynı günlük | **T97'de eklendi** — 2 sn'lik ardışık pencerelerin en düşük ortalaması; `SceneMap` verilirse sahne sınırları (§4) |
 | XPSNR | `xpsnr` | stderr özet satırı | `(4y + u + v) / 6`, klibin tamamı |
 | SSIM | `ssim` | stderr `All:` | klibin tamamı |
 
@@ -152,26 +163,137 @@ kuruşu kuruşuna aynı çıktı (38,9113 / 42,7523 / 43,7238). Uyarı bu girdid
 çiftte tekrar bakılmalı — bu turda ölçülmedi.
 
 
-## 4. Sahne tabanı — 2 saniyelik pencere
+## 4. En kötü birim — 2 saniyelik sabit pencere
 
 Sorun: filmin tamamındaki tek en kötü kare kullanıcıyı ilgilendirmiyor, hem de
 ölçülemiyor. §2'nin yan bulgusu: özdeş 1080p içerikte min 97,43. Buna karşılık
 gerçekten iyi bir kodlamada min 0,79 çıkabiliyor (§3). Aynı sayı hem özdeş
 içerikte 97 hem iyi kodlamada 1 diyorsa taban olarak kullanılamaz.
 
-Eklenen: kareler `2 sn × fps` uzunluğunda **ardışık, örtüşmeyen** pencerelere
-bölünüyor, her pencerenin ortalaması alınıyor, en düşüğü ve başlangıç saniyesi
-raporlanıyor (`VmafNegWorstScene`, `WorstSceneStartSeconds`,
-`SceneWindowSeconds`). Başlangıç saniyesi referans zaman çizgisine göre;
-pencereli ölçümde `referenceStartSeconds` ekleniyor.
+Eklenen: kareler **ardışık, örtüşmeyen birimlere** bölünüyor, her birimin
+ortalaması alınıyor, en düşüğü ve başlangıç saniyesi raporlanıyor
+(`VmafNegWorstScene`, `WorstSceneStartSeconds`, `SceneWindowSeconds`). Başlangıç
+saniyesi referans zaman çizgisine göre; pencereli ölçümde `referenceStartSeconds`
+ekleniyor.
 
-**Pencere uzunluğu seçimi.** Altı uzunluk denendi. Ölçüt: pencere, metriğin kendi
-gürültüsünden büyük bir sinyal vermeli. Gürültü = bit düzeyinde özdeş 1080p60
-klipte en kötü pencerenin klip ortalamasının (99,677) altına düşme miktarı.
-Sinyal = iki gerçek yarışmacının (aynı referansa karşı crf 8 ve crf 12) en kötü
-pencereleri arasındaki fark.
+Birim sınırı iki kaynaktan gelebilir: sabit uzunluklu pencere, ya da `SceneMap`
+varsa sahne kesmelerinin kendisi. İkisi §4.2'de karşılaştırıldı.
 
-| Pencere | özdeş klipte en kötü | gürültü (99,677 − ) | crf8 − crf12 sinyali | sinyal > gürültü |
+
+### 4.1 Yargı ölçütü
+
+Ölçüt her iki yolda da aynı: birim, metriğin kendi gürültüsünden büyük bir sinyal
+vermeli.
+
+- **Gürültü** = bit düzeyinde özdeş klipte en kötü birimin, klip ortalamasının
+  altına düşme miktarı. Özdeş çiftte gerçek bir kalite olayı yok; bu düşüş
+  tamamen modelin kendi salınımı.
+- **Sinyal** = aynı referansa karşı crf 8 ve crf 12'nin en kötü birimleri
+  arasındaki fark. İki gerçek yarışmacı, ayırt edilmesi gereken şey bu.
+
+Bilinen yozlaşma: birim klip uzunluğuna yaklaştıkça gürültü sıfıra gidiyor ve
+oran patlıyor, ama ölçü artık taban olmaktan çıkıp klip ortalamasına dönüşüyor.
+Bu yüzden **oran tek başına karar vermiyor; mutlak sinyal de bakılıyor.**
+
+
+### 4.2 Sabit pencere / sahne sınırı — üç içerik (T104)
+
+Üç 30 sn'lik HDR klip, her biri crf 8 ve crf 12'ye kodlandı, ayrıca kendisiyle
+karşılaştırıldı. Sahne haritası `SceneDetector` ile, üç eşikte
+(0,20 = `SceneMap.DefaultThreshold`, 0,10, 0,05). Özdeş klip ortalamaları:
+p1 98,8005 — p2 97,4396 — p3 99,8882.
+
+| Yol | p1 gürültü | p1 sinyal | p2 gürültü | p2 sinyal | p3 gürültü | p3 sinyal |
+|---|---|---|---|---|---|---|
+| sabit 1 sn | 1,2437 | 2,1050 | 0,0027 | 1,0195 | 0,7724 | 2,5138 |
+| **sabit 2 sn** | **1,1745** | **1,7258** | **0,0027** | **0,9310** | **0,5813** | **2,5611** |
+| sabit 3 sn | 1,1807 | 1,6297 | 0,0018 | 0,8498 | 0,3698 | 2,5552 |
+| sabit 5 sn | 0,9750 | 1,5959 | 0,0012 | 0,8083 | 0,1716 | 1,8208 |
+| sahne @0,20 | 0,7119 | 1,6275 | 0,0011 | 0,9802 | 0,5813 | 2,5611 |
+| sahne @0,10 | 1,0115 | 1,7185 | 0,0011 | 0,9802 | 0,0210 | 1,1440 |
+| sahne @0,05 | 1,0273 | 1,7185 | 0,0011 | 0,9802 | 0,1642 | 1,2476 |
+
+Üretim eşiğinde (0,20) 30 saniyeye düşen sahne sayısı:
+
+| İçerik | sahne | en kısa | en uzun |
+|---|---|---|---|
+| p1 | 2 | 5,49 sn | 24,52 sn |
+| p2 | 2 | 1,67 sn | 28,33 sn |
+| p3 | **1** | 30,00 sn | 30,00 sn |
+
+**Karar içerikler arasında değişiyor — ve K2'nin öngördüğü şey bu.**
+
+- **p1**: sahne yolu orana göre kazanıyor (2,29 vs 1,47), mutlak sinyale göre
+  kaybediyor (1,6275 vs 1,7258). Oran kazancının kaynağı ayrım gücü değil,
+  gürültünün birim uzadıkça küçülmesi: kazanan "sahne" 24,5 saniyelik. 24,5
+  saniyelik bir birim taban değil, ikinci bir ortalama.
+- **p2**: hiçbir yol ayırt edemiyor. Özdeş klipte en kötü birim klip
+  ortalamasının 0,001–0,003 altında; gürültü sıfıra çökmüş, her oran yozlaşmış.
+  Bu klip neredeyse durağan bir plan.
+- **p3**: sahne yolu üretim eşiğinde **hiç kurulamıyor** — 30 saniyede tek sahne
+  var, birim sayısı ikiden az kalıyor ve kod sabit pencereye düşüyor (§4.4).
+  Eşiği zorlayınca sinyal yarılanıyor: 2,5611 → 1,2476 (@0,05), 1,1440 (@0,10).
+
+**Kayıp yöntemden mi, haritanın çözünürlüğünden mi (T101 uyarısı).** T101 aynı
+kaynakta haritanın **az böldüğünü** ölçtü: gözle doğrulanmış 144,2–333,3 sn
+penceresinde 28 gerçek kesim var, harita 10 üretiyor; yanlış pozitif sıfır, kaçan
+18 kesim 0,112–0,199 skorlarıyla `SceneMap.DefaultThreshold = 0.2` eleğinde
+düşüyor (ölçen T101, `docs/olcumler/sahne-haritasi.md` — o tur kendi dalında).
+Yani harita "sahne" derken çoğu zaman iki-üç gerçek çekimi birden gösteriyor, ve
+en kötü çekim birleşik birimin ortalamasında kaybolabilir. O halde sahne yolunun
+kaybı yöntemden değil, kaba haritadan geliyor olabilir.
+
+Yukarıdaki tablo bu ayrımı kısmen yapıyor: 0,10 ve 0,05 eşikleri **daha ince
+bölen** haritalar (p1 2 → 6 → 10 sahne, p3 1 → 2 → 8 sahne). İnceltmek sahne
+yolunu kurtarmıyor:
+
+| İçerik | sahne @0,20 | @0,10 | @0,05 | sabit 2 sn |
+|---|---|---|---|---|
+| p1 sinyal | 1,6275 | 1,7185 | 1,7185 | **1,7258** |
+| p3 sinyal | (sabite düştü) | 1,1440 | 1,2476 | **2,5611** |
+
+p1'de sinyal inceldikçe yükseliyor ama sabit pencerenin altında duruyor ve iki
+eşikte aynı sayıya oturuyor; p3'te inceltmek sinyali yarıdan aşağı düşürüyor.
+Ölçülen aralıkta "daha ince harita" hipotezi sahne yolunu öne geçirmiyor.
+
+**Ama ayrım tam değil.** Eşiği düşürmek, T101'in kastettiği *doğru* ince harita
+değil: T96 eşiği 0,20'de yanlış pozitif sıfır olduğu için seçmişti, 0,05'te
+gelen kesmelerin doğruluğu bu turda doğrulanmadı. Yani "doğru ve ince bir
+haritayla sahne yolu kazanır mı" sorusu **ölçülmedi**. Ölçülen: eldeki
+dedektörün ürettiği hiçbir eşikte kazanmıyor.
+
+**K6 yargısı: ölçüldü, sahne tabanlı yol kazandırmadı.** Sabit 2 sn'lik pencere
+kalıyor. Gerekçe üçü birlikte:
+
+1. Üretim eşiğinde sahne yolu üç içeriğin ikisinde erişilebilir değil (p3 tek
+   sahne, p2 tek uzun sahne + kırıntı).
+2. Erişilebildiği yerde mutlak sinyali yükseltmiyor: p1'de 1,7258 → 1,6275,
+   p3'te 2,5611 → 1,2476.
+3. Tek iyileşme p1'in oranı, o da gürültünün birim uzamasından küçülmesiyle —
+   T97'nin 10 sn'lik pencerede zaten adını koyduğu yozlaşmanın aynısı.
+
+Sahne sınırıyla arama **kodda duruyor** ve `SceneMap` verilirse çalışıyor (§4.4);
+üretimde varsayılan yol sabit pencere. İlkeye uyduğu için değiştirilmedi.
+
+Yargı haritanın bugünkü haliyle sınırlı. T101 eşiği inceltirse bu karşılaştırma
+yeniden koşturulmalı — düzenek `analyze` komutuyla hazır, tek gereken yeni
+haritayla üç klibin sahne satırlarını tekrar üretmek.
+
+**Yan kazanç: T97'nin ince payı kalınlaştı.** T97 2 sn'yi tek içerik çiftinden,
+%3,6'lık payla seçmişti (sinyal 0,715 / gürültü 0,690). Üç içerikte aynı seçim
+p1'de %47 (1,7258 / 1,1745), p3'te %341 (2,5611 / 0,5813) payla duruyor; p2 karar
+veremiyor ama bir yolu diğerine de tercih etmiyor. T97'nin mutlak sayıları burada
+tekrar etmiyor — o 10 sn'lik klipti, bu 30 sn. Farklı ölçüm, çelişki değil.
+
+1 sn p1'de daha yüksek sinyal veriyor (2,1050) ama gürültüsü de en yüksek
+(1,2437) ve p3'te 2 sn'nin altında kalıyor. 3 ve 5 sn her içerikte sinyali
+düşürüyor. 2 sn üç içerikte de ilk ikinin içinde kalan tek uzunluk.
+
+**T97'nin tek içerikli taraması, kayıt için.** Farklı klip (`parca-1`, 10 sn),
+farklı sayılar; T104 tablosunun yerini almıyor, yalnız 0,5 sn ve 10 sn uçlarını
+gösterdiği için duruyor. Özdeş klip ortalaması 99,677.
+
+| Pencere | özdeş klipte en kötü | gürültü | sinyal | sinyal > gürültü |
 |---|---|---|---|---|
 | 0,5 sn | 97,914 | 1,763 | 1,384 | hayır |
 | 1 sn | 98,338 | 1,339 | 1,089 | hayır |
@@ -180,21 +302,74 @@ pencereleri arasındaki fark.
 | 5 sn | 99,360 | 0,317 | 0,516 | evet |
 | 10 sn | 99,676 | 0,001 | 0,316 | evet ama yozlaşmış |
 
-2 sn, sinyalin gürültüyü geçtiği **en kısa** uzunluk. Daha kısası tek karelik
-model gürültüsüne teslim oluyor: 0,5 sn'de özdeş klip 97,91'e düşüyor, ki bu
-kullanılamaz min'in (97,43) neredeyse aynısı. Daha uzunu yerel çöküşü seyreltiyor;
-10 sn'lik klipte 10 sn'lik pencere klip ortalamasının kendisi oluyor (99,676 vs
-99,677) ve ayrımı 0,316'ya, yani ortalamalar farkının aynısına indiriyor — sahne
-tabanı olmaktan çıkıyor.
+Alt uç: 0,5 sn'de özdeş klip 97,91'e düşüyor, ki bu kullanılamaz min'in (97,43)
+neredeyse aynısı. Üst uç: 10 sn'lik klipte 10 sn'lik pencere klip ortalamasının
+kendisi oluyor (99,676 vs 99,677) ve ayrımı ortalamalar farkına indiriyor.
 
 Seçilen uzunlukta taban, ortalamanın gizlediğini gösteriyor: tonemap yüksek
-çıktıda ortalama 90,60 iken en kötü 2 sn penceresi 85,97 (50. saniye); düşük
-çıktıda ortalama 25,14 iken en kötü pencere 5,88 (12. saniye). Ayrım 80,10 —
-ortalamalar farkının (65,46) belirgin üstünde.
+çıktıda ortalama 90,60 iken en kötü 2 sn birimi 85,97 (50. saniye); düşük çıktıda
+ortalama 25,14 iken en kötü birim 5,88 (12. saniye). Ayrım 80,10 — ortalamalar
+farkının (65,46) belirgin üstünde.
+
+### 4.3 Son kısmi birim — atmak mı, tutmak mı (K4a)
+
+T97'de son kısmi pencere düşüyordu: klip 1800 kareyse ve pencere 120 kareyse
+kalan 0–119 kare hiç bakılmadan atılıyordu. Bu klibin son saniyesindeki bir
+çöküşü gizler.
+
+Ölçüm: her klip, crf 12'nin en kötü 0,5 sn'lik bloğunun hemen ardından kesildi;
+sonra baştan kare atılarak kuyruk uzunluğu 1/3/6/15/30/45/60 kareye zorlandı.
+Yani çöküş **bilerek** kuyruğa yerleştirildi. İki kural yan yana koşturuldu.
+
+| Kuyruk | p1 atan | p1 tutan | p3 atan | p3 tutan |
+|---|---|---|---|---|
+| 1 kare (0,017 sn) | 1,7826 | 2,8385 | 2,4572 | **0,0282 — kaldı** |
+| 3 kare (0,05 sn) | 1,7862 | 3,9017 | 2,4834 | 1,5174 |
+| 6 kare (0,1 sn) | 1,7929 | 3,9826 | 2,4069 | 1,7274 |
+| 15 kare (0,25 sn) | 1,7062 | 3,4769 | 2,5564 | 2,4043 |
+| **30 kare (0,5 sn)** | **1,5530** | **2,7353** | **1,5301** | **2,3842** |
+| 45 kare (0,75 sn) | 1,3779 | 2,5980 | 0,9327 | 2,4114 |
+| 60 kare (1 sn) | 1,8300 | 1,8300 | 2,4936 | 2,4936 |
+
+(Sayılar sinyal; gürültü iki kolda birebir aynı çıkıyor — kural özdeş klipte
+hiçbir şey değiştirmiyor, yani tutmanın gürültü maliyeti yok.)
+
+0,5 sn'lik kuyrukta tutmak p1'de sinyali %76 (1,5530 → 2,7353), p3'te %56
+(1,5301 → 2,3842) yükseltiyor. Gizlediği şey somut: p3'ün son 0,5 saniyesinde
+crf 12 gerçekte **84,1481**, atan kural aynı klipte en kötü birimi **92,3877**
+diye raporluyor — 8,2 puanlık kör nokta.
+
+Ama sınırsız tutmak da olmuyor. 1 karelik kuyrukta p3'te sinyal 0,0282'ye
+çöküyor ve kural **kalıyor**: tek kare her iki yarışmacıda da aynı sahne kesme
+artığını yakalıyor (14,5851 / 14,5569), yani `VmafNegMin`'in hastalığının aynısı
+(§7). 0,25 sn'de p3 hâlâ sağlıklı (2,4043) ama pay incelmiş.
+
+**Karar: son kısmi birim, tam pencerenin dörtte birinden — 0,5 saniyeden —
+uzunsa tutuluyor, kısaysa atılıyor.** `QualityMeter.MinimumUnitSeconds`.
+0,25 sn de ölçüldü ve çalışıyor; 0,5 sn ölçülen en kısa güvenli sınırın iki katı
+olduğu için seçildi. Aynı alt sınır sahne yolunda da geçerli: yarım saniyeden
+kısa bir sahne en kötü sahne seçilemiyor.
+
+### 4.4 Harita yokken davranış (K3)
+
+`WorstScene` haritasız da çağrılabiliyor; harita `null` ise, boşsa, ya da klip
+içine düşen kesme sayısı ikiden az birim üretiyorsa **sabit 2 sn'lik pencereye
+düşülüyor**. Bu kuramsal bir kol değil: p3, üretim eşiğinde tam olarak bu yoldan
+ölçüldü (30 saniyede tek sahne). İki yol da ölçüyle sabitlendi (§6).
+
+Boş puan listesi artık savunmalı: `WorstScene` `PositiveInfinity` döndürmek
+yerine `ArgumentException` fırlatıyor (K4b).
 
 `WindowQualityMeasurement`'a dört alan **sona, varsayılan değerle** eklendi
 (`VmafNegMin`, `VmafNegWorstScene`, `WorstSceneStartSeconds`,
 `SceneWindowSeconds`). Var olan üye kaldırılmadı, adı değişmedi, sırası bozulmadı.
+
+**Üretimde bu makinenin ölçtüğü fark henüz görünmüyor.** Tek üretim çağıranı
+`ComplexityProbe`, `MeasureWindowAsync`'i 2 sn'lik pencerelerle çağırıyor ve
+yalnız `VmafNegMean` okuyor. Ölçülen aralık tam olarak bir birim olduğu için en
+kötü birim orada pencere ortalamasının kendisi; sahne sınırı da o çağrı yerinde
+sabit pencereden farklı çıkamaz. Alanları okuyan üretim tüketicisi eklemek T104
+kapsamında değil.
 
 
 ## 5. Kurulu metrik envanteri
