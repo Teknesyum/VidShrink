@@ -84,8 +84,15 @@ public sealed class HandBrakeCompetitor : ICompetitor
 public sealed class VidShrinkCompetitor : ICompetitor
 {
     private const int CalibrationRounds = 2;
+    private readonly HdrPolicy _hdrPolicy;
 
-    public string Name => "vidshrink";
+    public VidShrinkCompetitor(string name, HdrPolicy hdrPolicy)
+    {
+        Name = name;
+        _hdrPolicy = hdrPolicy;
+    }
+
+    public string Name { get; }
 
     public async Task<EncodeOutcome> EncodeAsync(MediaInfo reference, double targetMb, string outputDirectory, string logDirectory, CancellationToken ct)
     {
@@ -104,7 +111,8 @@ public sealed class VidShrinkCompetitor : ICompetitor
             FillPolicy = FillPolicy.FillTarget,
             SpeedMode = SpeedMode.Quality,
             AllowResolutionDrop = true,
-            AllowFpsDrop = false
+            AllowFpsDrop = false,
+            HdrPolicy = _hdrPolicy
         };
 
         var profile = await ComplexityProbe.RunAsync(reference, options.SpeedMode, ct);
@@ -156,6 +164,6 @@ public sealed class VidShrinkCompetitor : ICompetitor
             new FileInfo(outputPath).Length,
             commandLine,
             logPath,
-            $"{used.Width}x{used.Height}@{used.Fps:0.###}, {used.Codec}/{used.Mode}, {(used.ModeEnum == EncodeMode.Crf ? "crf " + used.Crf : used.VideoBitrateK + "k")}, pix={used.PixelFormat}, deneme={result.Attempts}");
+            $"{used.Width}x{used.Height}@{used.Fps:0.###}, {used.Codec}/{used.Mode}, {(used.ModeEnum == EncodeMode.Crf ? "crf " + used.Crf : used.VideoBitrateK + "k")}, pix={used.PixelFormat}, hdr={_hdrPolicy}, deneme={result.Attempts}");
     }
 }

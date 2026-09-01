@@ -13,6 +13,7 @@ try
         "kos" => await RunAsync(args.Skip(1).ToList()),
         "parcala" => await CutAsync(args.Skip(1).ToList()),
         "sapma" => Deviation(args.Skip(1).ToList()),
+        "denetle" => await InspectAsync(args.Skip(1).ToList()),
         _ => Unknown(args[0])
     };
 }
@@ -29,6 +30,8 @@ static void Usage()
     Console.WriteLine("         [--parca-dizin <klasör>] [--cikti <klasör>] [--gunluk <klasör>] [--json <yol>] [--tolerans 2]");
     Console.WriteLine("  ab parcala --kaynak <yol> [--parca-dizin <klasör>]");
     Console.WriteLine("  ab sapma <tam.json> <parca.json>");
+    Console.WriteLine("  ab denetle <referans> <aday>");
+    Console.WriteLine("Yarışmacılar: " + string.Join(", ", AbSettings.KnownCompetitors));
 }
 
 static int Unknown(string command)
@@ -72,6 +75,18 @@ static async Task<int> CutAsync(IReadOnlyList<string> args)
     var settings = AbSettings.Parse(args.Concat(new[] { "--hedef-mb", "1" }).ToList(), AbSettings.DefaultWorkRoot());
     await ChunkCutter.EnsureAsync(settings.SourcePath, settings.ChunkDirectory, Console.Out, CancellationToken.None);
     return 0;
+}
+
+static async Task<int> InspectAsync(IReadOnlyList<string> args)
+{
+    if (args.Count < 2)
+    {
+        Console.Error.WriteLine("kullanım: ab denetle <referans> <aday>");
+        return 1;
+    }
+    var (measured, text) = await AbRunner.InspectAsync(args[0], args[1], CancellationToken.None);
+    Console.WriteLine(text);
+    return measured ? 0 : 2;
 }
 
 static int Deviation(IReadOnlyList<string> args)

@@ -217,11 +217,53 @@ public sealed class AbRunner
         return target;
     }
 
+    public static async Task<(bool Measured, string Text)> InspectAsync(string referencePath, string candidatePath, CancellationToken ct)
+    {
+        var reference = await FfprobeClient.ProbeAsync(referencePath, ct);
+        var candidate = await FfprobeClient.ProbeAsync(candidatePath, ct);
+        var referenceSignature = ColorSignature.From(reference);
+        var candidateSignature = ColorSignature.From(candidate);
+        var gate = ColorGate.Decide(referenceSignature, candidateSignature);
+        var rate = RateGate.Check(reference.Fps, candidate.Fps);
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"referans : {Path.GetFileName(referencePath)} | {referenceSignature.Describe()} | hdr={reference.IsHdr} | {reference.Fps:0.###} fps");
+        sb.AppendLine($"aday     : {Path.GetFileName(candidatePath)} | {candidateSignature.Describe()} | hdr={candidate.IsHdr} | {candidate.Fps:0.###} fps");
+        sb.AppendLine($"kapı     : {gate.Kind} — {gate.Reason}");
+        sb.AppendLine($"kare hızı: {rate.Reason}");
+
+        if (!gate.Measurable)
+        {
+            sb.AppendLine("sonuç    : SAYI BASILMADI — renk kapısı reddetti.");
+            return (false, sb.ToString());
+        }
+        if (!rate.Comparable)
+        {
+            sb.AppendLine("sonuç    : SAYI BASILMADI — kare hızı kapısı reddetti.");
+            return (false, sb.ToString());
+        }
+
+        var score = gate.Kind == ColorGateKind.ReferenceTransformed
+            ? await QualityMeter.MeasureTonemappedReferenceAsync(referencePath, candidatePath, ct)
+            : await QualityMeter.MeasureAsync(referencePath, candidatePath, ct);
+
+        if (!score.Comparable)
+        {
+            sb.AppendLine($"sonuç    : SAYI BASILMADI — {score.Message}");
+            return (false, sb.ToString());
+        }
+
+        sb.AppendLine($"etiket   : {gate.Label}");
+        sb.AppendLine($"sonuç    : harm={Fmt(score.VmafNegHarmonic)} p10={Fmt(score.VmafNegP10)} min={Fmt(score.VmafNegMin)} ort={Fmt(score.VmafNegMean)} XPSNR={Fmt(score.Xpsnr)} SSIM={Fmt(score.Ssim)}");
+        return (true, sb.ToString());
+    }
+
     private static ICompetitor Create(string name)
         => name.ToLowerInvariant() switch
         {
             "handbrake" => new HandBrakeCompetitor(),
-            "vidshrink" => new VidShrinkCompetitor(),
+            "vidshrink" => new VidShrinkCompetitor("vidshrink", HdrPolicy.Preserve),
+            "vidshrink-sdr" => new VidShrinkCompetitor("vidshrink-sdr", HdrPolicy.TonemapToSdr),
             _ => throw new ArgumentException($"Bilinmeyen yarışmacı: {name}")
         };
 

@@ -13,7 +13,8 @@ public sealed record AbSettings(
     string JsonPath,
     double TolerancePercent)
 {
-    public static readonly string[] KnownCompetitors = { "handbrake", "vidshrink" };
+    public static readonly string[] KnownCompetitors = { "handbrake", "vidshrink", "vidshrink-sdr" };
+    public static readonly string[] DefaultCompetitors = { "handbrake", "vidshrink" };
 
     public static AbSettings Parse(IReadOnlyList<string> args, string workRoot)
     {
@@ -66,7 +67,7 @@ public sealed record AbSettings(
 
         if (source is null) throw new ArgumentException("--kaynak gerekli.");
         if (targets.Count == 0) throw new ArgumentException("--hedef-mb gerekli.");
-        if (competitors.Count == 0) competitors.AddRange(KnownCompetitors);
+        if (competitors.Count == 0) competitors.AddRange(DefaultCompetitors);
         foreach (var competitor in competitors)
             if (!KnownCompetitors.Contains(competitor))
                 throw new ArgumentException($"Bilinmeyen yarışmacı: {competitor}. Bilinenler: {string.Join(", ", KnownCompetitors)}");

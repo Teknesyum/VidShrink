@@ -359,7 +359,14 @@ public sealed class AbSettingsAbTests
         Assert.True(settings.ChunkMode);
         Assert.Equal(new[] { 60.0, 600.0 }, settings.TargetsMb);
         Assert.Equal(1.5, settings.TolerancePercent);
-        Assert.Equal(AbSettings.KnownCompetitors, settings.Competitors);
+        Assert.Equal(AbSettings.DefaultCompetitors, settings.Competitors);
+    }
+
+    [Fact]
+    public void TheSdrCompetitorIsKnownButNotRunByDefault()
+    {
+        Assert.Contains("vidshrink-sdr", AbSettings.KnownCompetitors);
+        Assert.DoesNotContain("vidshrink-sdr", AbSettings.DefaultCompetitors);
     }
 
     [Fact]
