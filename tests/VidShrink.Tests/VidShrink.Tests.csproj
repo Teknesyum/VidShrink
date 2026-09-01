@@ -28,5 +28,6 @@
     <ProjectReference Include="..\..\src\VidShrink.App\VidShrink.App.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />
+    <ProjectReference Include="..\..\tools\VidShrink.Ab\VidShrink.Ab.csproj" />
   </ItemGroup>
 </Project>
