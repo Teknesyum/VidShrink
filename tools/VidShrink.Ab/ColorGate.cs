@@ -109,3 +109,28 @@ public static class RateGate
             ? new RateGateDecision(true, $"kare hızı eşit ({referenceFps:0.###} fps)")
             : new RateGateDecision(false, $"Kare hızı ayrı: referans {referenceFps:0.###} fps, çıktı {candidateFps:0.###} fps; kare kare hizalama bozulur.");
 }
+
+public sealed record GeometryGateDecision(bool Comparable, string Reason);
+
+public static class GeometryGate
+{
+    public const double ToleranceRatio = 0.005;
+
+    public static GeometryGateDecision Check(int referenceWidth, int referenceHeight, int candidateWidth, int candidateHeight)
+    {
+        if (referenceWidth <= 0 || referenceHeight <= 0) throw new ArgumentOutOfRangeException(nameof(referenceWidth));
+        if (candidateWidth <= 0 || candidateHeight <= 0) throw new ArgumentOutOfRangeException(nameof(candidateWidth));
+
+        var referenceAspect = referenceWidth / (double)referenceHeight;
+        var candidateAspect = candidateWidth / (double)candidateHeight;
+        var drift = Math.Abs(candidateAspect - referenceAspect) / referenceAspect;
+
+        if (drift <= ToleranceRatio)
+            return new GeometryGateDecision(true, $"en boy oranı uyuyor ({referenceAspect:0.####} ~ {candidateAspect:0.####})");
+
+        return new GeometryGateDecision(
+            false,
+            $"En boy oranı ayrı: referans {referenceWidth}x{referenceHeight} ({referenceAspect:0.####}), " +
+            $"çıktı {candidateWidth}x{candidateHeight} ({candidateAspect:0.####}); kırpma ya da dolgu var, kare kare hizalama bozulur.");
+    }
+}

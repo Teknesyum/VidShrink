@@ -312,11 +312,65 @@ public sealed class HandBrakeArgumentsAbTests
         Assert.Equal("x265", ValueAfter(args, "-e"));
     }
 
+    [Fact]
+    public void AutoCropIsDisabledSoTheGeometryStaysComparable()
+    {
+        var args = HandBrakeCompetitor.BuildArguments("in.mkv", "out.mkv", 4321, 60);
+
+        Assert.Equal("0:0:0:0", ValueAfter(args, "--crop"));
+        Assert.Contains("--non-anamorphic", args);
+    }
+
     private static string ValueAfter(IReadOnlyList<string> args, string flag)
     {
         var index = args.ToList().IndexOf(flag);
         Assert.True(index >= 0 && index + 1 < args.Count, $"{flag} yok");
         return args[index + 1];
+    }
+}
+
+public sealed class GeometryGateAbTests
+{
+    [Fact]
+    public void SameShapeAtLowerResolutionStaysComparable()
+    {
+        var decision = GeometryGate.Check(1920, 1080, 1152, 648);
+
+        Assert.True(decision.Comparable);
+    }
+
+    [Fact]
+    public void EightRowsCroppedOffTheHeightIsRefused()
+    {
+        var decision = GeometryGate.Check(1920, 1080, 1920, 1072);
+
+        Assert.False(decision.Comparable);
+        Assert.Contains("1920x1072", decision.Reason);
+    }
+
+    [Fact]
+    public void ThePaddedDirectionIsRefusedToo()
+    {
+        var decision = GeometryGate.Check(1920, 1080, 1920, 1440);
+
+        Assert.False(decision.Comparable);
+    }
+
+    [Fact]
+    public void DriftInsideToleranceIsAccepted()
+    {
+        var accepted = GeometryGate.Check(1000, 1000, 1002, 1000);
+        var refused = GeometryGate.Check(1000, 1000, 1010, 1000);
+
+        Assert.True(accepted.Comparable);
+        Assert.False(refused.Comparable);
+    }
+
+    [Fact]
+    public void ZeroSizedInputIsAProgrammingErrorNotAVerdict()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => GeometryGate.Check(1920, 0, 1920, 1080));
+        Assert.Throws<ArgumentOutOfRangeException>(() => GeometryGate.Check(1920, 1080, 0, 1080));
     }
 }
 

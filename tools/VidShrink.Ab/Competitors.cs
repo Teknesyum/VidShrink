@@ -48,7 +48,9 @@ public sealed class HandBrakeCompetitor : ICompetitor
             "--encoder-preset", "slow",
             "-a", "none",
             "-r", fps.ToString("0.###", CultureInfo.InvariantCulture),
-            "--cfr"
+            "--cfr",
+            "--crop", "0:0:0:0",
+            "--non-anamorphic"
         };
 
     public async Task<EncodeOutcome> EncodeAsync(MediaInfo reference, double targetMb, string outputDirectory, string logDirectory, CancellationToken ct)

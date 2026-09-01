@@ -179,17 +179,22 @@ public sealed class AbRunner
         var candidate = await FfprobeClient.ProbeAsync(outcome.OutputPath, ct);
         var gate = ColorGate.Decide(ColorSignature.From(reference), ColorSignature.From(candidate));
         var rate = RateGate.Check(reference.Fps, candidate.Fps);
+        var geometry = GeometryGate.Check(reference.Width, reference.Height, candidate.Width, candidate.Height);
+        var alignment = !rate.Comparable ? rate.Reason
+            : !geometry.Comparable ? geometry.Reason
+            : $"{rate.Reason}; {geometry.Reason}";
         var weight = (int)Math.Round(reference.DurationSeconds * reference.Fps, MidpointRounding.AwayFromZero);
 
         Measurement Fail(string error) => new(
             outcome.Competitor, Path.GetFileName(reference.FilePath), targetMb, outcome.Bytes, parity.BaselineBytes,
             parity.DeltaPercent, parity.Equal, parity.Stamp,
-            gate.Kind.ToString(), gate.Label, gate.Reason, rate.Reason, false, error,
+            gate.Kind.ToString(), gate.Label, gate.Reason, alignment, false, error,
             null, null, null, null, null, null, Math.Max(weight, 1),
             outcome.Settings, outcome.CommandLine, outcome.LogPath, outcome.OutputPath);
 
         if (!gate.Measurable) return Fail(gate.Reason);
         if (!rate.Comparable) return Fail(rate.Reason);
+        if (!geometry.Comparable) return Fail(geometry.Reason);
 
         var score = gate.Kind == ColorGateKind.ReferenceTransformed
             ? await QualityMeter.MeasureTonemappedReferenceAsync(reference.FilePath, outcome.OutputPath, ct)
@@ -201,7 +206,7 @@ public sealed class AbRunner
         return new Measurement(
             outcome.Competitor, Path.GetFileName(reference.FilePath), targetMb, outcome.Bytes, parity.BaselineBytes,
             parity.DeltaPercent, parity.Equal, parity.Stamp,
-            gate.Kind.ToString(), gate.Label, gate.Reason, rate.Reason, true, null,
+            gate.Kind.ToString(), gate.Label, gate.Reason, alignment, true, null,
             score.VmafNegMean, score.VmafNegHarmonic, score.VmafNegP10, score.VmafNegMin, score.Xpsnr, score.Ssim,
             Math.Max(weight, 1),
             outcome.Settings, outcome.CommandLine, outcome.LogPath, outcome.OutputPath);
@@ -240,12 +245,14 @@ public sealed class AbRunner
         var candidateSignature = ColorSignature.From(candidate);
         var gate = ColorGate.Decide(referenceSignature, candidateSignature);
         var rate = RateGate.Check(reference.Fps, candidate.Fps);
+        var geometry = GeometryGate.Check(reference.Width, reference.Height, candidate.Width, candidate.Height);
 
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine($"referans : {Path.GetFileName(referencePath)} | {referenceSignature.Describe()} | hdr={reference.IsHdr} | {reference.Fps:0.###} fps");
-        sb.AppendLine($"aday     : {Path.GetFileName(candidatePath)} | {candidateSignature.Describe()} | hdr={candidate.IsHdr} | {candidate.Fps:0.###} fps");
+        sb.AppendLine($"referans : {Path.GetFileName(referencePath)} | {referenceSignature.Describe()} | hdr={reference.IsHdr} | {reference.Width}x{reference.Height} | {reference.Fps:0.###} fps");
+        sb.AppendLine($"aday     : {Path.GetFileName(candidatePath)} | {candidateSignature.Describe()} | hdr={candidate.IsHdr} | {candidate.Width}x{candidate.Height} | {candidate.Fps:0.###} fps");
         sb.AppendLine($"kapı     : {gate.Kind} — {gate.Reason}");
         sb.AppendLine($"kare hızı: {rate.Reason}");
+        sb.AppendLine($"geometri : {geometry.Reason}");
 
         if (!gate.Measurable)
         {
@@ -255,6 +262,11 @@ public sealed class AbRunner
         if (!rate.Comparable)
         {
             sb.AppendLine("sonuç    : SAYI BASILMADI — kare hızı kapısı reddetti.");
+            return (false, sb.ToString());
+        }
+        if (!geometry.Comparable)
+        {
+            sb.AppendLine("sonuç    : SAYI BASILMADI — geometri kapısı reddetti.");
             return (false, sb.ToString());
         }
 
