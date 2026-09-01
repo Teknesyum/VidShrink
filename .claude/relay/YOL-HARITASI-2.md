@@ -165,8 +165,28 @@ Kodlayıcı aktarımı da ölçüldü: libx264 0,976, libx265 **0,929**, libsvta
 sapma sistematik, kodlayıcıya özgü değil. n=8'de bu fark tek sıra takası,
 istatistiksel olarak ayrılamaz.
 
-**Sonraki tur:** eşik eğrisi ölçülür (kesinlik/duyarlılık, birkaç eşikte) ve
-değer ölçüye göre konur.
+**Sonraki tur:** T105 — eşik eğrisi üç pencerede ölçülür, değer ölçüye göre
+konur, müşterilere (T98 aralık, T104 pencere) eski/yeni sahne sayısı bildirilir.
+
+### Sondayı ilk geçişle birleştirmek — sahipsiz iş
+
+T101'in K6 yargısı: sonda maliyetinin (%10,36) ezici çoğunluğu **ikinci bir
+çözme**. 107 sn'nin ~92 sn'si çözme; `select` filtre grafiğinde çalıştığı
+için kare atlatma çözmeyi atlayamıyor — ölçüldü, atlatmalı sonda 131,4 sn,
+çıplak çözme 91,8 sn, taban maliyetin altına inilemiyor. Kare atlatma
+**reddedildi**.
+
+Seçilen yol: sondayı asıl kodlamanın **ilk geçişiyle** birleştirmek. İki
+kazanç birden var ve ikincisi beklenmedik:
+
+- Çözme tümüyle kalkar (~%86).
+- İlk geçiş istatistikleri **hedef kodlayıcının kendi kare boyutları**
+  olduğu için, K1'deki 0,929'luk aktarım sapması kökünden kalkar — sonda
+  artık vekil bir kodlayıcı değil, kodlayıcının kendisi olur.
+
+Bedeli planı iki aşamaya bölmek. `EncodeRunner` (T100) ve `PlanCalculator`
+(T99) işi, ikisi de şu an başka turda. **Sahipsiz; T99 ve T100 mühürlendikten
+sonra sözleşmeye çevrilecek.** Buraya yazıldı ki mühürde buharlaşmasın.
 
 ## Makine paylaşımı — hangi sayı bozulur, hangisi bozulmaz
 
