@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Globalization;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
@@ -94,7 +95,7 @@ internal sealed class PanelHost : IDisposable
     private double _clipStart;
     private bool _clipRunning;
     private bool _aheadRunning;
-    private string? _clipError;
+    private EncodeFailure? _clipFailure;
     private string? _clipSignature;
     private string? _pendingSignature;
     private int _scheduled;
@@ -273,7 +274,7 @@ internal sealed class PanelHost : IDisposable
             _clip = null;
             _ahead = null;
             _ = DropStandby();
-            _clipError = null;
+            _clipFailure = null;
             _clipSignature = null;
             if (left != _left) _clipStart = 0;
         }
@@ -410,7 +411,7 @@ internal sealed class PanelHost : IDisposable
     internal ComparisonFrameRequest BuildRequest(PixelSize size)
     {
         var clip = ActiveClip;
-        var left = clip?.SourcePath ?? _left ?? throw new InvalidOperationException("Sol girdi yok; akış kurulamaz.");
+        var left = clip?.SourcePath ?? _left ?? throw new InvalidOperationException("The left input is missing, the stream cannot start.");
         return new ComparisonFrameRequest
         {
             LeftPath = left,
@@ -489,9 +490,22 @@ internal sealed class PanelHost : IDisposable
     private string? RightCurtain()
     {
         if (_right is not null || ActiveClip is not null) return null;
-        return _clipError is null
-            ? "playback.panel.pending"
-            : $"{PlaybackText("playback.sample-failed")}: {_clipError}";
+        return _clipFailure is { } failure ? SampleFailureText(failure) : "playback.panel.pending";
+    }
+
+    /// <summary>
+    /// Kodlayanın bıraktığı sebebin ekrandaki hâli. Perdenin iki parçası da anahtardan gelir;
+    /// ffmpeg'in kendi tanı metni varsa <c>playback.error.engine</c> etiketinin biçim argümanı
+    /// olarak <b>ham</b> taşınır — T91/K2 kararı, motorun metni çevrilmez ama etiketsiz de
+    /// geçmez.
+    /// </summary>
+    internal string SampleFailureText(EncodeFailure failure)
+    {
+        var reason = failure.Detail is null
+            ? PlaybackText(failure.Key)
+            : string.Format(CultureInfo.InvariantCulture, PlaybackText(failure.Key), failure.Detail);
+
+        return $"{PlaybackText("playback.sample-failed")}: {reason}";
     }
 
     /// <summary>
@@ -541,15 +555,15 @@ internal sealed class PanelHost : IDisposable
             if (clip is null)
             {
                 // İptal edilen istek hata değildir; yerine yenisi zaten koşuyor.
-                if (_segments.LastError is null) return;
-                _clipError = _segments.LastError;
+                if (_segments.LastFailure is not { } failure) return;
+                _clipFailure = failure;
                 _clip = null;
                 _clipSignature = null;
                 if (_open) RefreshRight();
                 return;
             }
 
-            _clipError = null;
+            _clipFailure = null;
             _clip = clip;
             _clipStart = clip.StartSeconds;
             _clipSignature = ClipSignature(info, plan, clip.StartSeconds);
@@ -558,7 +572,7 @@ internal sealed class PanelHost : IDisposable
         }
         catch (Exception ex)
         {
-            _clipError = ex.Message;
+            _clipFailure = new EncodeFailure(SegmentEncoder.EngineMessageKey, ex.Message);
             if (_open) RefreshRight();
         }
         finally
@@ -593,7 +607,7 @@ internal sealed class PanelHost : IDisposable
         }
         catch (Exception ex)
         {
-            _clipError = ex.Message;
+            _clipFailure = new EncodeFailure(SegmentEncoder.EngineMessageKey, ex.Message);
         }
         finally
         {
