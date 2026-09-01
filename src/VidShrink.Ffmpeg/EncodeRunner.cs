@@ -90,7 +90,7 @@ public sealed class EncodeRunner
                 var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
                 var over = actualMb > effectiveTargetMb * ToleranceOver;
                 var belowBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < band.LowerMb;
-                var stoppedOnPurpose = belowBand && current.StopsShortOfBandOnPurpose;
+                var stoppedOnPurpose = belowBand && actualMb >= band.HardFloorMb && current.StopsShortOfBandOnPurpose;
                 var underBand = belowBand && !stoppedOnPurpose;
                 var informedByYield = efficiency is not null;
                 var retryUnderBand = underBand && attempt < MaxAttempts

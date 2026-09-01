@@ -6,8 +6,6 @@ namespace VidShrink.Tests;
 
 public sealed class EncodeRunnerTests
 {
-    private const double TargetMb = 5.0;
-
     [Fact]
     public void PlanThatFilledTheBandDoesNotClaimADeliberateStop()
     {
@@ -21,42 +19,41 @@ public sealed class EncodeRunnerTests
         Assert.False(narrowBandFill.StopsShortOfBandOnPurpose);
         Assert.True(stopped.StopsShortOfBandOnPurpose);
 
-        var corrected = PlanCalculator.Correct(stopped, actualMb: 1.0, targetMb: TargetMb, durationSeconds: 2);
+        var corrected = PlanCalculator.Correct(stopped, actualMb: 1.0, targetMb: 5.0, durationSeconds: 2);
         Assert.False(corrected.StopsShortOfBandOnPurpose);
 
-        var handBuilt = CrfPlan();
-        Assert.False(handBuilt.StopsShortOfBandOnPurpose);
+        Assert.False(CrfPlan().StopsShortOfBandOnPurpose);
     }
 
     [FfmpegFact]
-    public async Task PlannedStopBelowTheBandIsDeliveredWithoutARetry()
+    public async Task PlannedStopAboveTheHardFloorIsDeliveredWithoutARetry()
     {
-        await WithClipAsync(async (info, outputPath) =>
+        await WithClipAsync(async (info, outputPath, naturalMb) =>
         {
-            var plan = CrfPlan(ReasonCode.PredictedQualityMeasured);
+            var targetMb = naturalMb / 0.88;
+            var band = FillBand.For(targetMb);
 
             var result = await new EncodeRunner().RunAsync(
-                info, plan, outputPath, TargetMb, progress: null,
-                ct: CancellationToken.None, fillPolicy: FillPolicy.FillTarget);
+                info, CrfPlan(ReasonCode.PredictedQualityMeasured), outputPath, targetMb,
+                progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.FillTarget);
 
             Assert.True(result.Success);
-            Assert.True(result.OutputMb < FillBand.For(TargetMb).LowerMb,
-                $"olcu anlamsiz: cikti {result.OutputMb:0.000} MB, bant alt kenari {FillBand.For(TargetMb).LowerMb:0.000} MB'in altinda degil");
+            Assert.InRange(result.OutputMb, band.HardFloorMb, band.LowerMb);
             Assert.Equal(1, result.Attempts);
             Assert.DoesNotContain(result.Trace ?? Array.Empty<EncodeAttempt>(), a => a.Branch == "under band");
         });
     }
 
     [FfmpegFact]
-    public async Task UnderBandAccidentStillRetries()
+    public async Task UnderBandAccidentAboveTheHardFloorStillRetries()
     {
-        await WithClipAsync(async (info, outputPath) =>
+        await WithClipAsync(async (info, outputPath, naturalMb) =>
         {
-            var plan = CrfPlan(ReasonCode.PredictedQualityMeasured, ReasonCode.FillCrfLowered);
+            var targetMb = naturalMb / 0.88;
 
             var result = await new EncodeRunner().RunAsync(
-                info, plan, outputPath, TargetMb, progress: null,
-                ct: CancellationToken.None, fillPolicy: FillPolicy.FillTarget);
+                info, CrfPlan(ReasonCode.PredictedQualityMeasured, ReasonCode.FillCrfLowered), outputPath, targetMb,
+                progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.FillTarget);
 
             Assert.True(result.Success);
             Assert.True(result.Attempts > 1,
@@ -65,14 +62,34 @@ public sealed class EncodeRunnerTests
         });
     }
 
+    [FfmpegFact]
+    public async Task PlannedStopUnderTheHardFloorStillRetries()
+    {
+        await WithClipAsync(async (info, outputPath, naturalMb) =>
+        {
+            var targetMb = naturalMb / 0.5;
+            var band = FillBand.For(targetMb);
+            Assert.True(naturalMb < band.HardFloorMb);
+
+            var result = await new EncodeRunner().RunAsync(
+                info, CrfPlan(ReasonCode.PredictedQualityMeasured), outputPath, targetMb,
+                progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.FillTarget);
+
+            Assert.True(result.Success);
+            Assert.True(result.Attempts > 1,
+                $"sert tabanin altina dusen bilerek durma yeniden denenmeliydi, {result.Attempts} deneme oldu");
+            Assert.Contains(result.Trace ?? Array.Empty<EncodeAttempt>(), a => a.Branch == "under band");
+        });
+    }
+
     private static EncodePlan CrfPlan(params ReasonCode[] codes) => new()
     {
         Codec = "libx264",
         Mode = "crf",
-        Crf = 40,
-        VideoBitrateK = 20,
-        AudioCodec = "aac",
-        AudioBitrateK = 64,
+        Crf = 30,
+        VideoBitrateK = 200,
+        AudioCodec = null,
+        AudioBitrateK = 0,
         Width = 320,
         Height = 240,
         Fps = 10,
@@ -80,7 +97,7 @@ public sealed class EncodeRunnerTests
         ReasonCodes = codes.Select(code => new ReasonNote(code)).ToList()
     };
 
-    private static async Task WithClipAsync(Func<MediaInfo, string, Task> body)
+    private static async Task WithClipAsync(Func<MediaInfo, string, double, Task> body)
     {
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_runner_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
@@ -89,7 +106,7 @@ public sealed class EncodeRunnerTests
             var source = Path.Combine(dir, "source.mp4");
             await RunFfmpegAsync(new[]
             {
-                "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=10:duration=2",
+                "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=10:duration=4",
                 "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", source
             });
 
@@ -97,7 +114,7 @@ public sealed class EncodeRunnerTests
             {
                 FilePath = source,
                 FileSizeBytes = new FileInfo(source).Length,
-                DurationSeconds = 2,
+                DurationSeconds = 4,
                 Width = 320,
                 Height = 240,
                 Fps = 10,
@@ -105,7 +122,15 @@ public sealed class EncodeRunnerTests
                 TotalBitrateBps = 400_000
             };
 
-            await body(info, Path.Combine(dir, "out.mp4"));
+            var probePath = Path.Combine(dir, "natural.mp4");
+            var natural = await new EncodeRunner().RunAsync(
+                info, CrfPlan(), probePath, targetMb: 1000, progress: null,
+                ct: CancellationToken.None, fillPolicy: FillPolicy.QualityCeiling);
+            Assert.True(natural.Success);
+            Assert.True(natural.OutputMb > 0);
+            File.Delete(probePath);
+
+            await body(info, Path.Combine(dir, "out.mp4"), natural.OutputMb);
         }
         finally { try { Directory.Delete(dir, true); } catch { } }
     }
