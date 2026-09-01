@@ -101,6 +101,29 @@ public sealed class QualityMeterTests
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
     }
 
+    [Fact]
+    public async Task ReferenceAndSampleMayUseDifferentWindowOffsets()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+        if (!EncoderCapabilities.Instance.HasFilter("libvmaf") || !EncoderCapabilities.Instance.HasFilter("zscale")) return;
+
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var reference = Path.Combine(dir, "reference.mp4");
+            var sample = Path.Combine(dir, "sample.mkv");
+            await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=10:duration=4", "-c:v", "libx264", "-g", "10", "-pix_fmt", "yuv420p", reference });
+            await RunFfmpegAsync(new[] { "-y", "-ss", "1", "-t", "2", "-i", reference, "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", sample });
+
+            var score = await QualityMeter.MeasureWindowAsync(reference, sample, 1, 0, 2);
+
+            Assert.True(score.Comparable, score.Message);
+            Assert.True(score.VmafNegMean > 95, $"offset window was not aligned: {score.VmafNegMean}");
+        }
+        finally { try { Directory.Delete(dir, true); } catch { } }
+    }
+
     private static async Task EncodeLavfiAsync(string outputPath, int crf)
     {
         var psi = new ProcessStartInfo
