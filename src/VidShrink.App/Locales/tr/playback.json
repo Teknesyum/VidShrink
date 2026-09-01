@@ -8,5 +8,10 @@
   "playback.panel.hint": "İki tarafı görmek için bir dosya yükleyin",
   "playback.panel.moved": "Panel öne taşındı",
   "playback.panel.pending": "Bu bölüm işlenecek",
-  "playback.panel.first-frame": "İlk kare yolda"
+  "playback.panel.first-frame": "İlk kare yolda",
+  "playback.control.restart": "Başa dön",
+  "playback.control.timeline": "Zaman çizgisi",
+  "playback.control.strip": "Denetim şeridi",
+  "playback.control.pause": "Duraklat",
+  "playback.control.play": "Oynat"
 }

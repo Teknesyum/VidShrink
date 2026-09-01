@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
 
@@ -198,9 +199,9 @@ internal partial class ControlStrip : UserControl
 
         // Düğme yüzleri metin değil işaret; ad erişilebilirlik adında duruyor.
         Restart.Content = "|◀";
-        AutomationProperties.SetName(Restart, Say("Başa dön", "Back to the start"));
-        AutomationProperties.SetName(Timeline, Say("Zaman çizgisi", "Timeline"));
-        AutomationProperties.SetName(Bar, Say("Denetim şeridi", "Control strip"));
+        AutomationProperties.SetName(Restart, Text("playback.control.restart"));
+        AutomationProperties.SetName(Timeline, Text("playback.control.timeline"));
+        AutomationProperties.SetName(Bar, Text("playback.control.strip"));
 
         if (_encodeFraction >= 0)
             EncodeText.Text = LanguageCatalog.EncodeMarker(turkish, _encodePass, _encodePassCount, _encodeAttempt);
@@ -309,8 +310,8 @@ internal partial class ControlStrip : UserControl
     {
         PlayPause.Content = _playing ? "❚❚" : "▶";
         AutomationProperties.SetName(PlayPause, _playing
-            ? Say("Duraklat", "Pause")
-            : Say("Oynat", "Play"));
+            ? Text("playback.control.pause")
+            : Text("playback.control.play"));
 
         var known = _duration is not null;
         Track.Classes.Set("unknown", !known);
@@ -388,8 +389,10 @@ internal partial class ControlStrip : UserControl
 
     // ---- tema -----------------------------------------------------------------------
 
-    private string Say(string turkish, string english)
-        => LanguageCatalog.Title(_turkish ? turkish : english, _turkish);
+    private string Text(string key)
+        => LanguageCatalog.Title(
+            Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
+            _turkish);
 
     private double Scalar(string key, double fallback)
         => this.TryFindResource(key, out var value) && value is double number ? number : fallback;

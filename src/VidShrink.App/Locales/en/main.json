@@ -327,5 +327,7 @@
   "main.validation.container-video-encoder": "The {0} container does not support the selected {1} video encoder.",
   "main.validation.container-audio-encoder": "The {0} container does not support the selected {1} audio encoder.",
   "main.validation.container-video-copy": "The {0} container does not support copying the source {1} video stream.",
-  "main.validation.container-audio-copy": "The {0} container does not support copying the source {1} audio stream."
+  "main.validation.container-audio-copy": "The {0} container does not support copying the source {1} audio stream.",
+  "main.validation.untranslated-engine": "Untranslated engine message: {0}",
+  "main.playback.encode-marker": "analysis {0}/{1} · attempt {2}"
 }
