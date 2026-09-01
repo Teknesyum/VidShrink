@@ -134,4 +134,4 @@ Kapanmayanlar:
 
 - `CalibrationProbe` kendi `ParseVideoBytes`ını kullanmayı sürdürüyor (`src/VidShrink.Ffmpeg/CalibrationProbe.cs:227,249`) ve aynı KiB yuvarlamasını taşıyor. Bu dosya T88'in `owns` listesinde değil; oradaki iki örnek (düşük ve yüksek CRF) aynı yoldan geçtiği için asimetri yok, ama küçük örneklerde tane kaba. Ölçülmedi.
 - `ScanSampleAsync` ve paket okuma yolu baytı `-vstats` `f_size` ve paket boyutundan alır; bunlar konteyner dışı kare/paket yükleridir. Pencere yanlılığı (`bias`) bu sayıların **kendi içindeki oranıdır**, muxlanmış örnek baytlarıyla hiçbir yerde karşılaştırılmaz. Bu yüzden tek muxer kuralının dışında tutuldu.
-- `MotionExponent`in Matroska birimindeki kayması (düşük bit hızlı iki kaynakta +0,068 ve +0,079) T89'a devreder.
+- `MotionExponent`in Matroska birimindeki kayması (yuvarlamasız ham ölçüye göre düşük bit hızlı iki kaynakta +0,068 ve +0,079) T89'a devreder. Somut sonucu: ölçülen üç kaynaktan biri (`color=gray`) `main`e göre 0,25 eşiğinin karşı tarafına geçiyor (0,178 → 0,322). Eşiğin ya da birimin bu rejimde ne olması gerektiği bu sözleşmenin işi değil; T89 karar vermeden önce bu tablo okunmalı.
