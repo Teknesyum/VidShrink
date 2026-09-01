@@ -16,8 +16,9 @@ gelir. Ölçülmemiş olan yerde açıkça **ölçülmedi** yazar.
 | Kalite ölçüsü | VMAF-NEG (`vmaf_v0.6.1neg`) ortalama / harmonik / p10 |
 | Ölçüm komutu | Bench'in kendi düzeni: test lanczos ile 1920x1080'e ölçeklenir, sonra kaynağa karşı `libvmaf` (`tools/VidShrink.Bench/Program.cs:836-848`) |
 
-Makine paylaşımlı ve ölçüm sırasında dört ajan daha koşuyordu. **Süreler ölçülmedi** —
-duvar saati bu koşullarda anlamlı değil. Kalite sayıları yükten etkilenmez.
+Makine paylaşımlıydı: ölçüm boyunca başka ajanlar da koşuyordu (sayı bana
+bildirildi, kendim doğrulamadım). **Süreler ölçülmedi** — duvar saati bu koşullarda
+anlamlı değil. Kalite sayıları yükten etkilenmez.
 
 **Ölçüm düzeneği nerede.** Auto modun planı bench ile alınamadığı için (kusur 1)
 `.calisma/` altında tek seferlik başsız bir sonda yazıldı: uygulamanın kendi yolunu
@@ -321,7 +322,7 @@ kazancının bir kısmını çöpe atar.** `PlanCalculator.cs:82-96`'daki
 **3. Preset varsayılanını 6'dan 4'e almayı tartışmaya aç — ama süre ölçülmeden değil.**
 Kalite tarafı ölçüldü: preset 4, %7,1 küçük dosyada ortalama −0,042 veriyor, yani puan
 pratikte aynı, yer kazancı gerçek. Karşılığında ödenen kodlama süresi **ölçülmedi** —
-makine bu ölçüm boyunca beş ajan tarafından paylaşılıyordu, duvar saati anlamlı değil.
+makine bu ölçüm boyunca paylaşımlıydı, duvar saati anlamlı değil.
 Bu madde ancak yalıtılmış bir makinede süre ölçüldükten sonra karara bağlanabilir.
 Çözünürlük düşürme ise ölçülüp **reddedildi**: %9,8 yer için ortalama −5,691 kötü takas,
 auto'nun bu kaynakta çözünürlüğe dokunmaması doğru karardı.
