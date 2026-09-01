@@ -10,58 +10,70 @@ geçiriyor. `gh run list --branch <dal>` gerçekten sonuç döndürür; itmeden 
 
 ---
 
-## İş 1 — T87 tur 3 (KRİTİK, şimdi başla)
+## İş 1 — T86 tur 2 (KRİTİK, şimdi başla — `main` bu yüzden kırmızı)
+
+Sözleşme: `.claude/relay/contracts/T86.md` — sondaki "# Düzeltme turu 2" (H1–H6).
+Dal: `t86-olcu-yalitimi` sürdürülür (`git switch t86-olcu-yalitimi`).
+
+**H1 KRİTİK — ve 1 Eylül 15:38'de CI'da yeniden düştü** (koşum 33525962057):
+
+    UpdaterTests.TheDeletionStepWaitsOutATransientLock [FAIL]
+    Not found: "yeniden denenecek"
+    geçici kilit: çıkış 0, 874 ms
+    Failed! - Failed: 1, Passed: 910, Skipped: 72, Total: 983
+
+874 ms — kilit ilk denemeden önce serbest kalmış. Ek madde'nin istediği düzeltme
+yapılmadı: `UpdaterTests.cs:1076-1083` bırakma iş parçacığı hâlâ `Thread.Sleep(300)`
+ile çalışıyor ve `.basladi` işareti `Remove-InstallRoot` **çağrılmadan önce**
+yazılıyor. Kilit ölçünün elinde değil, sabit sayacın elinde. Aradaki üç CI koşumu
+yeşil geçti — ölçü kararsız, makinenin o anki yüküne bağlı.
+
+Gereken: kilit, günlükte `yeniden denenecek` görülene kadar (ya da silme denemesinin
+gerçekten düştüğünü söyleyen bir işaret yazılana kadar) tutulur. Duruma bakılır,
+süreye değil. `rg "Sleep\(3" tests/VidShrink.Tests/UpdaterTests.cs` boş dönmeli.
+
+**H2:** rapordaki altı eşzamanlı koşum satırı `Süre: 669,1 sn` biçiminde; `dotnet test`
+bu depoda süreyi hiçbir zaman ondalık saniye yazmıyor (aynı dosyanın 51. satırı
+`Süre: 7 m 52 s`). Sayıların yanlış olduğu değil, **doğrulanamaz** olduğu söyleniyor.
+Altı koşum yeniden yapılır, satırlar araç çıktısından olduğu gibi yapıştırılır, ham
+günlüğün yolu yazılır.
+
+Kalanlar sözleşmede: H3 (`ShellMenuTests` yalıtımı zaten vardı, PID eklemek kozmetik),
+H4 (`Global\` kilit + `AbandonedMutexException`), H5 (`TEMP`/`TMP` süreç genelinde),
+H6 (koşum kapısının üç kör noktası — `Konak işleminden beklenmedik şekilde çıkış
+yapıldı` deseni yok; son-eşleşme semantiği ilk `Başarısız: 5`'i kaçırıyor; CI adımında
+kapının çıkış kodu 66 yerine 1 olarak bildiriliyor).
+
+`owns` genişletildi: koşum kapısının dosyaları ve raporun kendisi artık senin.
+
+---
+
+## İş 2 — T87 tur 3 (birinciden hemen sonra)
 
 Sözleşme: `.claude/relay/contracts/T87.md` — sondaki "# Düzeltme turu 3" (I1–I6).
-Dal: `T87-tepe-tavani-ve-psy` sürdürülür (`git switch T87-tepe-tavani-ve-psy`).
+Dal: `T87-tepe-tavani-ve-psy` sürdürülür.
 
-Tur 2'nin asıl maddesi G1 **kapandı**: tek birleşik `-x265-params` dizgesi hem
-psy/AQ hem HDR yan verisini taşıyor, denetçi gerçek ffmpeg 9.0 + x265 4.3 ile
-ayırt edici değerlerle doğruladı. O tarafa dokunma.
+Tur 2'nin asıl maddesi G1 **kapandı**: tek birleşik `-x265-params` dizgesi hem psy/AQ
+hem HDR yan verisini taşıyor, denetçi gerçek ffmpeg 9.0 + x265 4.3 ile ayırt edici
+değerlerle doğruladı. O tarafa dokunma.
 
-Kapanmayan: **boyut garantisi hâlâ koşan hiçbir ölçüyle bağlı değil (I1, KRİTİK).**
+**I1 KRİTİK:** boyut garantisi hâlâ koşan hiçbir ölçüyle bağlı değil.
 `FfmpegArgumentsTests.cs:216-222` bayt bayt değişmedi ve `Clamp` çıkışlı bir
 fonksiyonun `Clamp` sınırlarına `InRange` sokuyor — tanım gereği yanlışlanamaz.
 Rapor boşluğu `HardwareRateControlTests.LiveFast...`e havale ediyor ama o test
 `[LiveSourceTheory]`, `VIDSHRINK_LIVE_SOURCE` yoksa **atlanıyor**; raporun "63/63"
 dediği koşumda gerçek sayı 63 başarılı / 2 atlanan / 65 toplam ve atlananlar tam da
-iddiayı taşıyan testler.
+iddiayı taşıyan iki test.
 
 Gereken: canlı kaynak gerektirmeyen, `Clamp` sınırlarına değil **formülün şekline**
 bakan bir ölçü — monotonluk, bilinen iki taban oranı arasındaki fark, diz noktasının
 konumu. Mutasyonla kanıtla: `PeakRateFactor` formülünü boz, kırmızıya döndüğünü
 göster, geri al.
 
-Kalanlar sözleşmede: I2 (önizleme psy/AQ'yu görmüyor — iki çağıran `availability`
-geçirmiyor), I3 (yoklama arayüz iş parçacığına düştü), I4 (üç rapor cümlesi veriden
-güçlü), I5 (muhasebe). I6 borç, bu turda kapanması beklenmiyor.
-
----
-
-## İş 2 — T86 tur 2 (birinciden hemen sonra)
-
-Sözleşme: `.claude/relay/contracts/T86.md` — sondaki "# Düzeltme turu 2" (H1–H6).
-Dal: `t86-olcu-yalitimi` sürdürülür.
-
-**H1 KRİTİK:** Ek madde'nin istediği düzeltme yapılmamış, kusur ötelenmiş.
-`UpdaterTests.cs:1076-1083` bırakma iş parçacığı hâlâ `Thread.Sleep(300)` ile
-çalışıyor ve `.basladi` işareti `Remove-InstallRoot` **çağrılmadan önce** yazılıyor.
-Yani `Assert.Contains("yeniden denenecek", log)` yalnız ilk `Remove-Item` denemesi
-işaretin ardından 300 ms içinde düşerse tutuyor — kilit ölçünün elinde değil, sabit
-sayacın elinde. CI koşumu 33502024892'nin düşme nedeni tam olarak bu.
-
-**H2:** rapordaki altı eşzamanlı koşum satırı `Süre: 669,1 sn` biçiminde;
-`dotnet test` bu depoda süreyi hiçbir zaman ondalık saniye yazmıyor (aynı dosyanın
-51. satırı `Süre: 7 m 52 s`). Sayıların yanlış olduğu değil, **doğrulanamaz** olduğu
-söyleniyor. Altı koşum yeniden yapılır, satırlar araç çıktısından olduğu gibi
-yapıştırılır, ham günlüğün yolu yazılır.
-
-Kalanlar sözleşmede: H3 (`ShellMenuTests` yalıtımı zaten vardı, PID eklemek kozmetik),
-H4 (`Global\` kilit + `AbandonedMutexException`), H5 (`TEMP`/`TMP` süreç genelinde),
-H6 (koşum kapısının iki kör noktası — `Konak işleminden beklenmedik şekilde çıkış
-yapıldı` deseni yok, ve son-eşleşme semantiği ilk `Başarısız: 5`'i kaçırıyor).
-
-`owns` genişletildi: `tools/kosum-kapisi/` ve raporun kendisi artık senin.
+Kalanlar sözleşmede: I2 (önizleme psy/AQ'yu görmüyor — `PanelHost.cs:224` ve
+`SegmentEncoder.cs:200` `availability` geçirmiyor), I3 (yoklama arayüz iş parçacığına
+düştü, ~360 ms nvenc planında), I4 (üç rapor cümlesi veriden güçlü), I5 (muhasebe).
+I6 borç, bu turda kapanması beklenmiyor.
 
 ---
 
@@ -69,12 +81,13 @@ yapıldı` deseni yok, ve son-eşleşme semantiği ilk `Başarısız: 5`'i kaç�
 
 - Kendi worktree'nde çalış. Paylaşılan çalışma ağacına (`Desktop/Projeler/Vidshrink`)
   yazma, orada `dotnet test` koşturma.
-- Hiçbir assertion gevşetilmez, hiçbir test `Skip`e alınmaz. Atlanan test bir iddianın
-  dayanağı olamaz. Hiçbir beklenti `Clamp` sınırından ya da ölçümün kendi çıktısından
-  türetilmez.
+- Hiçbir assertion gevşetilmez, hiçbir test `Skip`e alınmaz. **Atlanan test bir
+  iddianın dayanağı olamaz.** Hiçbir beklenti `Clamp` sınırından, bir sabitten ya da
+  ölçümün kendi çıktısından türetilmez.
+- **Sabit karşılaştıran ölçü davranış ölçüsü sayılmaz.** Mutasyon üretim davranışını
+  bozmalı, sabiti değil.
 - **Araç çıktısı yeniden yazılmaz** — rapora olduğu gibi yapıştırılır ve ham günlüğün
   yolu yazılır.
-- Her düzeltme için mutasyon; sonuç `docs/olcumler/` altına.
 - Kod yorumu yazma. Mevcut yorumları koru; kod değişirse üstündeki cümleyi ona uydur.
 - Ara dosyalar `.calisma/` altına; iş bitince kendi bıraktığını sil.
 - Tam süiti kapıdan geçir:
