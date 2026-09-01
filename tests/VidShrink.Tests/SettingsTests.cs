@@ -208,6 +208,11 @@ public sealed class SettingsTests
     /// <summary>
     /// Sıfırlama dili de varsayılana döndürür. Denetim tablosu dili kapsamıyor —
     /// <c>ChkFastGpu</c> tam bu boşlukta sessizce kalmıştı.
+    ///
+    /// <para>Dil <c>RestoreSettings</c> içinde değil <c>OnWindowLoaded</c> içinde
+    /// uygulanıyor; bu yüzden başlangıç durumu <c>Strings.Use</c> ile açıkça kuruluyor.
+    /// Süreç genelindeki ortam diline yaslanmak Türkçe makinede yanlış nedenle
+    /// yeşil veriyordu, İngilizce CI'da düştü.</para>
     /// </summary>
     [Fact]
     public void ResetReturnsTheLanguageToTheOperatingSystemDefault()
@@ -224,6 +229,7 @@ public sealed class SettingsTests
                 var window = new MainWindow { SettingsPathOverride = file };
                 try
                 {
+                    VidShrink.App.Localization.Strings.Use(other);
                     window.RestoreSettingsForTest(UpdateSettings.Load(file));
                     var moved = VidShrink.App.Localization.Strings.Language;
                     window.ConfirmResetSettingsForTest();
