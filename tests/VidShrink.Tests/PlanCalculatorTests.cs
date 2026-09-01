@@ -1,4 +1,4 @@
-using VidShrink.Core;
+﻿using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
@@ -348,5 +348,36 @@ public sealed class PlanCalculatorTests
             $"The hardware floor accepted {inTheGap:0.00000} bppf, under its {hardFloor:0.00000} floor: the hardware surcharge does nothing.");
         Assert.True(PlanCalculator.LayoutClearsFloor(profile, "av1_nvenc", overK, width, height, fps, fps),
             $"The hardware encoder rejected {justOverTheHardFloor:0.00000} bppf, over its {hardFloor:0.00000} floor: something other than the floor is refusing this layout.");
+    }
+
+    [Fact]
+    public void EveryFloorReasonQuotesTheFloorThatWasActuallyApplied()
+    {
+        var info = LongHdrCapture();
+        var profile = MeasuredProfile();
+        var availability = new FakeAvailability("libx264", "libx265", "libsvtav1", "av1_nvenc");
+        var quoted = 0;
+
+        foreach (var targetMb in new[] { 3.0, 5.0, 12.0, 25.0, 50.0, 80.0, 117.0, 250.0 })
+        {
+            var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = targetMb }, profile, availability);
+            var plan = result.Plan;
+
+            if (result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor) && plan.VideoBitrateK >= CodecModel.UsableBitrateK(plan.Codec, plan.Width, plan.Height, plan.Fps))
+            {
+                var applied = result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps);
+                Assert.Contains(applied.ToString("0.0000"), plan.Reason);
+                quoted++;
+            }
+
+            if (result.Advice.Notes.Contains(AdviceCode.FrameRateCutForFloor))
+            {
+                var atSourceFps = result.Profile.FloorBppf(plan.Codec, info.Fps, info.Fps);
+                Assert.Contains(atSourceFps.ToString("0.0000"), plan.Reason);
+                quoted++;
+            }
+        }
+
+        Assert.True(quoted >= 2, $"The sweep never hit a floor reason ({quoted} quotes), so this measure proved nothing.");
     }
 }
