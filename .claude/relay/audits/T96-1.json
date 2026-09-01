@@ -1,0 +1,17 @@
+{
+  "contractId": "T96",
+  "auditorRunId": "a4ba2212ecfff4673",
+  "headSha": "b4688302c8a987199bf4d59a1b4efbeecabad1ff",
+  "diffHash": "8e4d200fba90ad7f410c445c40a3883fa2e0e5d25038299f16c1362e9c5a7462",
+  "owns": [
+    "src/VidShrink.Core/SceneMap.cs",
+    "src/VidShrink.Ffmpeg/SceneDetector.cs",
+    "tests/VidShrink.Tests/SceneMapTests.cs",
+    "docs/olcumler/sahne-haritasi.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim: GECTI, KRITIK yok. Yedi adli suphenin hepsi kovalandi. Sinyal degisimi fit-to-measure degil (basarisiz 0,119 raporda duruyor, hedef ProbeCrf=23 uretim ayari), ama sonda ile dogrulama hedefi ayni kodlayici+ayni CRF: 0,976 olcek/on-ayar aktarimini olcuyor, kodlayicidan bagimsiz sahne zorlugunu degil. Tek icerik sinirlari belgede yazili, K3 durustluk sarti delinmemis. Spearman 0,976 denetci tarafindan elle yeniden hesaplandi (sigma d2=2, 1-12/504=0,9762). Maliyet %10,36 dogru. Mutasyon kaniti gercek: CutTimes_MinimumAraligiUygular uc ayri uretim dalini ayirt ediyor, Spearman_BilinenDegerler dis referans. owns temiz (dort dosya, hepsi ekleme). Skip yok, sessiz erken donus yok. dotnet test -c Release --filter SceneMapTests -> 9 basarili, 0 atlanan. BORC: (1) sonda ile dogrulama hedefinin ayni kodlayici oldugu belgede yazilmiyor; (2) kodlayici aktarimi olculmedi (libx265, libsvtav1, nvenc) ve Olculmeyenler listesinde yok; (3) yanlis negatif hic olculmedi, uc kayip kanali (0,05 taban esigi, 1 sn asgari aralik, esik elemesi) adlandirilmadi; (4) SceneDetector.ScanArgs ve dort sonda sabiti sinanmiyor; (5) K4 maliyet yargisi kosullu cumleyle gecistirildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T22:17:26.951Z"
+}
