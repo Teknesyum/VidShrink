@@ -137,8 +137,9 @@ yükleme yolu), hiçbir denetime dokunulmadan "Küçült"e basıldı.
 
 **Dokunmazsa ne oluyor:** çalışıyor. Teslim edilen dosya
 `parca-2_shrunk.mp4`, **15 766 933 bayt = 15,04 MiB**; AV1, 1920x1080@60,
-`yuv420p10le`, PQ/bt2020 korunmuş, video 1948,8 kbit/s, AAC 129,2 kbit/s stereo,
-60,441 s. Hata yok, uyarı yok.
+`yuv420p10le`, PQ/bt2020 korunmuş, video **1947,5** kbit/s, AAC 129,3 kbit/s stereo,
+60,441 s. Hata yok, uyarı yok. (Bit hızları paket toplamından hesaplandı;
+belgedeki tüm bit hızı sayıları aynı yöntemle.)
 
 Bir çentik: 15,04 MiB, `FillTarget` bandının alt kenarının (0,95 × 16 = **15,20 MiB**)
 altında, sert tabanın (14,40 MiB) üstünde. Yani auto hedefi tutturdu ama kendi
