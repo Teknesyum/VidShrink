@@ -434,7 +434,7 @@ public static class ComplexityProbe
     private static async Task<WindowSample?> SplitSampleAsync(string path, double start, (int Width, int Height) half, string preset, SpeedMode speed, IQualityMeasurement? qualityMeasurement, CancellationToken ct)
     {
         var stem = Path.Combine(Path.GetTempPath(), "vidshrink_probe_" + Guid.NewGuid().ToString("N"));
-        var fullPath = stem + "_full.h264";
+        var fullPath = stem + "_full.mkv";
         var halfPath = stem + "_half.h264";
         try
         {
@@ -449,7 +449,7 @@ public static class ComplexityProbe
                 "-filter_complex", $"[0:v]split=2[full][raw];[raw]scale={half.Width}:{half.Height}[small]"
             });
 
-            foreach (var (label, target) in new[] { ("[full]", fullPath), ("[small]", halfPath) })
+            foreach (var (label, target, format) in new[] { ("[full]", fullPath, "matroska"), ("[small]", halfPath, "h264") })
             {
                 args.AddRange(new[]
                 {
@@ -457,7 +457,7 @@ public static class ComplexityProbe
                     "-c:v", "libx264",
                     "-crf", ComplexityProfile.ProbeCrf.ToString("0", CultureInfo.InvariantCulture),
                     "-preset", preset,
-                    "-f", "h264", target
+                    "-f", format, target
                 });
             }
 
