@@ -145,9 +145,13 @@ An HDR source keeps its wide colour and its ten bits whenever the encoder that w
 
 When nothing available can carry it, the picture is tone-mapped down to SDR rather than failing, and the app says that this is what happened and why. Tone-mapping is a visible loss and is never silent.
 
-### Quality is measured across a stated colour space, or not at all
+### Quality is measured perceptually, across a stated colour space — or not at all
+
+Results are scored with **VMAF-NEG**, **XPSNR** and **SSIM**, and reported as four VMAF numbers rather than one: the mean, the harmonic mean, the 10th percentile and the minimum. The average hides the frames that actually look bad, and those are the frames a viewer notices, so the tail is carried separately all the way into the reports.
 
 Comparing two files means bringing both into one explicitly stated colour space and range first; an untagged source is given a documented assumption rather than a silent one. Where the two sides genuinely cannot be brought together — an HDR original against a tone-mapped result, for instance — the comparison returns *not comparable* instead of a number. A single quality score that quietly mixes a colour conversion with a compression loss is worse than no score, because it reads as if it meant one thing.
+
+**Be clear about where this sits today.** Perceptual scoring is the measurement rig, not the planner: the engine plans from the two bit-cost measurements above, and VMAF is what the plan is *judged* by afterwards, in `tools/VidShrink.Bench`. Closing that loop — letting measured perceptual quality set the planner's own constants — is the first item on the list below.
 
 ### Where the loss goes
 
@@ -227,6 +231,7 @@ The engine is the current job. These are measured, open, and in that order:
 - **Calibrating the trade-offs against measured quality.** The penalties the planner applies for scaling down and for dropping frame rate are fixed constants that were never tied to a quality measurement. The measurement rig that can replace them now exists.
 - **Opening the peak-rate ceiling.** On a 17-minute 1080p60 HDR source encoded to 117 MB, widening the rate ceiling from 1.02× to 1.50× of the average gained 5.87 harmonic and 7.22 p10 VMAF-NEG **at the same delivered size** — the cheapest gain measured so far, and it costs nothing but a wider buffer.
 - **Psycho-visual encoder settings.** HandBrake's x265 preset runs psy-rd, psy-rdoq and adaptive quantisation; VidShrink's arguments do not carry their equivalents yet. Measured against HandBrake at an equal delivered size, with colour handled correctly on both sides, HandBrake is currently ahead by 8.79 mean and 14.60 p10 VMAF-NEG. That gap is the target.
+- **Encoding by scene instead of by clip.** Today one plan covers the whole file: one resolution, one frame rate, one bitrate target from the first frame to the last. A clip that opens on a static title and ends in a chase is given the settings that suit its average, which suit neither. Detecting shot boundaries and letting the budget move between scenes is the largest single structural gain still on the table, and the biggest piece of work on this list.
 - **Longer keyframe intervals.** The current two-second GOP spends bits on keyframes that a longer interval would give back to the picture.
 - **The hardware overshoot at small targets**, described under *Measured results* above.
 
