@@ -134,7 +134,7 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { "-c:v", plan.Codec });
         a.AddRange(new[] { "-preset", plan.Preset });
-        var psychovisualArgs = PsychovisualArgs(plan.Codec, availability, warm: false);
+        var psychovisualArgs = CachedPsychovisualArgs(plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
@@ -227,16 +227,37 @@ public static class FfmpegArguments
     }
 
     /// <summary>
-    /// <paramref name="warm"/> <c>true</c> iken seçenek desteği ölçülür; ölçüm süreç doğurabilir.
-    /// Argüman üretimi <c>false</c> geçer ve yalnız ısıtılmış sonucu okur, böylece saf kalır.
+    /// Seçenek desteğini <b>ölçerek</b> psy/AQ bayraklarını üretir: kabiliyet ölçebiliyorsa
+    /// (<see cref="IEncoderOptionWarmup"/>) yoklama burada doğar ve sonuç ısınır. Süreç
+    /// doğurabildiği için argüman üretimi bu yolu çağırmaz; ısıtma sorumluluğunu üstlenen
+    /// çağıranlar çağırır. Saf okuma için <see cref="CachedPsychovisualArgs"/>.
     /// </summary>
-    public static IReadOnlyList<string> PsychovisualArgs(string codec, IEncoderAvailability? availability, bool warm = true)
+    public static IReadOnlyList<string> PsychovisualArgs(string codec, IEncoderAvailability? availability)
+        => Psychovisual(codec, availability, measure: true);
+
+    /// <summary>
+    /// Yalnız ısıtılmış sonucu okur, süreç doğurmaz. Argüman üretiminin kullandığı yol budur.
+    /// Isıtılmamış bir seçenek desteklenmiyor sayılır, bu yüzden çağıran önce
+    /// <see cref="WarmPsychovisual"/> koşturmalıdır; yoksa bayraklar sessizce düşer.
+    /// </summary>
+    public static IReadOnlyList<string> CachedPsychovisualArgs(string codec, IEncoderAvailability? availability)
+        => Psychovisual(codec, availability, measure: false);
+
+    /// <summary>
+    /// Kodlayıcının psy/AQ seçeneklerini bir kez ölçer ve sonucu kabiliyetin önbelleğine
+    /// yazar. Bundan sonra <see cref="CachedPsychovisualArgs"/> doğru cevabı süreç doğurmadan
+    /// verir. Kodlama yolundaki çağıranların argümanı sessizce kaybetmemesi buna bağlı.
+    /// </summary>
+    public static void WarmPsychovisual(string codec, IEncoderAvailability? availability)
+        => Psychovisual(codec, availability, measure: true);
+
+    private static IReadOnlyList<string> Psychovisual(string codec, IEncoderAvailability? availability, bool measure)
     {
         var args = new List<string>();
         if (availability is not IEncoderOptionAvailability options) return args;
 
         bool Supported(string option, string value)
-            => warm && availability is IEncoderOptionWarmup warmup
+            => measure && availability is IEncoderOptionWarmup warmup
                 ? warmup.WarmEncoderOption(codec, option, value)
                 : options.SupportsEncoderOption(codec, option, value);
 

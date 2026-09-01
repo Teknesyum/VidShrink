@@ -213,9 +213,10 @@ public sealed class FfmpegArgumentsTests
     /// Tepe carpaninin taban orani basina verdigi deger. Beklenen sayilar kodun sabitlerinden
     /// degil elle yurutulen egriden geliyor: diz altinda 1,02, dizle en genis olculen oranin
     /// ortasinda (8,7x) 1,02 + 0,08/2 = 1,06, en genis olculen oranda ve ustunde 1,10.
-    /// Onceki surum burada <c>Assert.InRange(factor, TightPeakFactor, HardwarePeakCeiling)</c>
-    /// diyordu; <c>PeakRateFactor</c> tam o iki sinira <c>Clamp</c>lendigi icin iddia tanim
-    /// geregi dogruydu ve formul tumden bozulsa da yesil kaliyordu.
+    /// Onceki surum burada carpani <c>TightPeakFactor</c> ile <c>HardwarePeakCeiling</c>
+    /// arasinda sayan bir aralik iddiasi tutuyordu; <c>PeakRateFactor</c> tam o iki sinira
+    /// <c>Clamp</c>lendigi icin iddia tanim geregi dogruydu ve formul tumden bozulsa da
+    /// yesil kaliyordu.
     /// </summary>
     [Theory]
     [InlineData("av1_nvenc", 64, 64, 1, 1.0, 1.02)]
@@ -236,20 +237,6 @@ public sealed class FfmpegArgumentsTests
     {
         Assert.Equal(1.5, FfmpegArguments.PeakRateFactor("libx264", 1200, 1280, 720, 30), 12);
         Assert.Equal(1.5, FfmpegArguments.PeakRateFactor("libx265", 9000, 3840, 2160, 60), 12);
-    }
-
-    private sealed class RecordingAvailability : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup
-    {
-        internal List<(string Codec, string Option)> Asked { get; } = new();
-        public bool HasEncoder(string name) => true;
-        public bool WorksAsEncoder(string codec) => true;
-        public bool SupportsEncoderOption(string codec, string option, string value)
-        {
-            Asked.Add((codec, option));
-            return true;
-        }
-        public bool WarmEncoderOption(string codec, string option, string value)
-            => SupportsEncoderOption(codec, option, value);
     }
 
     /// <summary>
@@ -350,15 +337,51 @@ public sealed class FfmpegArgumentsTests
     [Fact]
     public void Yoklama_isinmasi_psy_secenegi_olan_her_kodlayiciyi_arka_planda_sorar()
     {
-        var recorder = new RecordingAvailability();
+        var recorder = new WarmingAvailability();
 
         VidShrink.App.MainWindow.WarmPsychovisualProbe(recorder);
 
-        Assert.Contains(("libx265", "-x265-params"), recorder.Asked);
-        Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Asked);
-        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Asked);
-        Assert.Contains(("av1_nvenc", "-temporal-aq"), recorder.Asked);
-        Assert.Contains(("hevc_nvenc", "-spatial-aq"), recorder.Asked);
+        Assert.Contains(("libx265", "-x265-params"), recorder.Warmed);
+        Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Warmed);
+        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Warmed);
+        Assert.Contains(("av1_nvenc", "-temporal-aq"), recorder.Warmed);
+        Assert.Contains(("hevc_nvenc", "-spatial-aq"), recorder.Warmed);
+    }
+
+    /// <summary>
+    /// Kodlama yolu psy/AQ yoklamasini kendisi isitir. <c>FfmpegArguments.Build</c> saf
+    /// oldugu icin isitilmamis bir secenegi desteklenmiyor sayiyor; isitmayan bir cagiran
+    /// -- olcum araci <c>tools/VidShrink.Bench</c> <c>EncodeRunner</c> uzerinden geciyor --
+    /// bayraklari sessizce kaybederdi. Kabiliyet burada hic isitilmamis veriliyor.
+    /// </summary>
+    [Theory]
+    [InlineData("av1_nvenc", "-spatial-aq")]
+    [InlineData("av1_nvenc", "-temporal-aq")]
+    [InlineData("libx265", "-x265-params")]
+    public void Kosucunun_arguman_uretimi_isitilmamis_kabiliyette_psy_bayragini_dusurmez(string codec, string flag)
+    {
+        var cold = new WarmingAvailability();
+
+        var args = VidShrink.Ffmpeg.EncodeRunner.EncodeArguments(Source(), Plan(codec), "out.mp4", 2, "log", cold);
+
+        Assert.Contains(flag, args);
+        Assert.Contains((codec, flag), cold.Warmed);
+    }
+
+    /// <summary>
+    /// Saf okuma yolu adiyla ayrildi: <c>CachedPsychovisualArgs</c> hicbir kosulda yoklama
+    /// dogurmaz, isitmayi <c>WarmPsychovisual</c> ustlenir. Ayrim varsayilan parametreyle
+    /// yapilsaydi yeni bir cagiran hicbir sey yazmadan surec dogururdu.
+    /// </summary>
+    [Fact]
+    public void Saf_psy_yolu_kabiliyeti_isitmaz()
+    {
+        var cold = new WarmingAvailability();
+
+        Assert.Empty(FfmpegArguments.CachedPsychovisualArgs("av1_nvenc", cold));
+        Assert.Empty(FfmpegArguments.CachedPsychovisualArgs("libx265", cold));
+
+        Assert.Empty(cold.Warmed);
     }
 
     /// <summary>
