@@ -108,7 +108,15 @@ Başarılı!  - Başarısız:     0, Başarılı:    18, Atlanan:     0, Toplam:
 
 Aynı çıktı koşum kapısından geçirildi: `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 18` çıkış kodu 0, kapı `başarısız=0 toplam=18 alt-sınır=18` bildirdi.
 
-**Tam süit bu turda koşulmadı.** Ölçüm sırasında aynı makinede üç ajan daha çalışıyordu; paralel koşum ölçüyü kararsız yapıyor. Tur 2 raporundaki 963 ve 974 tam süit sayıları doğrulanmadıkları için kaldırıldı; yerlerine tahmin yazılmadı. Tam süit toplamı bu turda **ölçülmedi**.
+Tam süit **yerelde koşulmadı**: ölçüm sırasında aynı makinede üç ajan daha çalışıyordu ve paralel koşum ölçüyü kararsız yapıyor. Tur 2 raporundaki 963 ve 974 sayıları doğrulanmadıkları için kaldırıldı.
+
+Tam süidin doğrulanmış sayısı CI'dan gelir. `T88-ornekte-kalite-olcumu` dalının `1c05e7f` koşumu (`gh run 33546346389`, iş `test`) `kosum-kapisi.ps1 -MinimumTotal 950` üzerinden geçti, çıkış kodu 0. Koşumun özet satırı olduğu gibi:
+
+```
+Passed!  - Failed:     0, Passed:   921, Skipped:    72, Total:   993, Duration: 8 m 5 s - VidShrink.Tests.dll (net8.0)
+```
+
+CI koşucusunda ffmpeg kurulu değil (`.github/workflows/ci.yml` onu kurmuyor); 72 atlanan test buradan gelir ve bu tur hiçbir testi `Skip`e almadı. **Bu turun ffmpeg'e dayanan iki ölçüsü — `WindowAndMotionSamplesCountTheSameByteUnit` ve `ProbeEntryPointUsedByTheAppDoesNotMeasureQuality` — CI'da bağlayıcı değildir**; yukarıdaki mutasyon tablosunun dayanağı ffmpeg 9.0-full'ün kurulu olduğu yerel koşumdur. `EveryProbeSampleMuxesThroughTheSameContainer` argüman üretimine baktığı için ffmpeg'siz de bağlayıcıdır.
 
 ## Kalan borç
 
