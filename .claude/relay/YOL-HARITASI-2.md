@@ -212,12 +212,28 @@ Bir ajanın yükü fark etmesi doğru; yükü bekleme gerekçesi yapması değil
 
 1. T98 GOP aralığını `main`e getirir. **Açığın bilinen en büyük tek kalemi bu** —
    T102 tek değişkenle %24,5 boyut kazancı ölçtü, puan da yükseldi.
-2. T95 teslim edince T94 ve T99 aynı anda açılır — ikisi de aletin adillik
-   kapısına dayanıyor.
+2. T99 T95 beklenmeden açıldı (gerekçe sözleşmesinde): tek değişken yerleşim
+   olduğu için aletin adillik kapıları gerekmiyor. **T94 hâlâ T95'te** — HDR
+   hizası iki farklı aracı karşılaştırıyor, orada kapı gerçekten lazım.
 3. T100 + T101 bitince T103 açılır (örnekleme, üçüncü kaldıraç).
 4. `SceneMap` `PlanCalculator`a bağlanır (T99 mühürlendikten sonra).
 5. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır — kuyruk
    açığının ana sahibi (aday A, p10'da +13,76) orada.
+
+## Ölçü penceresi sahneye bağlanmadı (T104, 2026-09-02)
+
+Denemesi yapıldı, kazanmadı: sahne sınırlarına oturan ölçüm penceresi sabit 2
+saniyelik pencereden **daha iyi ayırmıyor**. Sinyal/gürültü tablosu 24 hücrede
+bağımsız yeniden hesaplandı, dördü birebir tuttu. Sabit 2 sn kaldı — ölçüldü,
+değiştirilmedi.
+
+Turun asıl kazancı başka yerde: en kötü blok seçilirken kısa kuyruk bloğu
+atılıyordu ve bu **8,24 puanlık** bir kör nokta üretiyordu (p3'te gerçek
+84,1481, kuralın gördüğü 92,3877). Kapatıldı.
+
+Ders, yol haritasının kendisi için: **sahne haritası her ölçüye yaramıyor.**
+Bit bütçesi sahneye göre bölünür (T98), ama kalite ölçüsü bölünmüyor. Haritayı
+yeni bir yere bağlamadan önce o yerde kazandığı ölçülür.
 
 ## Değişmeyen kurallar
 
