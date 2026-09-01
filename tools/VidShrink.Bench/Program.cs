@@ -38,7 +38,7 @@ static void PrintUsage()
     Console.WriteLine("  bench measure <referans> <test>");
     Console.WriteLine("  bench measure-tonemapped <HDR referans> <SDR test>");
     Console.WriteLine("  bench measure-window <referans> <test> <başlangıç-sn> <süre-sn>");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
@@ -102,6 +102,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var widePeak = false;
     var planOnly = false;
     var noMeasure = false;
+    var noPsy = false;
     (int Width, int Height)? sourceSize = null;
     double? sourceMb = null;
     for (var i = 3; i < args.Length; i++)
@@ -137,6 +138,9 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--no-measure":
                 noMeasure = true;
+                break;
+            case "--no-psy":
+                noPsy = true;
                 break;
             case "--source-size" when i + 1 < args.Length:
                 var dimensions = args[++i].Split('x', 'X');
@@ -226,11 +230,13 @@ static async Task<int> ShrinkAsync(string[] args)
                 "-bufsize", $"{(int)(plan.VideoBitrateK * FfmpegArguments.BufferFactor(FfmpegArguments.WidePeakFactor))}k"
             });
         }
+        if (noPsy && plan.Codec.Contains("nvenc", StringComparison.OrdinalIgnoreCase))
+            plan.ExtraArgs.AddRange(new[] { "-spatial-aq", "0", "-temporal-aq", "0" });
         var band = FillBand.For(targetMb);
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
         var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
-        Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null)));
+        Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null, EncoderCapabilities.Instance)));
         if (planOnly) continue;
         var stopwatch = Stopwatch.StartNew();
         var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, fillPolicy);

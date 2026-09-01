@@ -4,6 +4,13 @@ namespace VidShrink.Tests;
 
 public sealed class FfmpegArgumentsTests
 {
+    private sealed class OptionAvailability(params (string Codec, string Option)[] supported) : IEncoderAvailability, IEncoderOptionAvailability
+    {
+        public bool HasEncoder(string name) => true;
+        public bool WorksAsEncoder(string codec) => true;
+        public bool SupportsEncoderOption(string codec, string option, string value)
+            => supported.Contains((codec, option));
+    }
     private static MediaInfo Source() => new()
     {
         FilePath = "kaynak.mp4",
@@ -16,9 +23,9 @@ public sealed class FfmpegArgumentsTests
         TotalBitrateBps = 5_700_000
     };
 
-    private static EncodePlan Plan() => new()
+    private static EncodePlan Plan(string codec = "libx264") => new()
     {
-        Codec = "libx264",
+        Codec = codec,
         Mode = "2pass",
         VideoBitrateK = 1200,
         Width = 1280,
@@ -119,5 +126,47 @@ public sealed class FfmpegArgumentsTests
         Assert.DoesNotContain("-passlogfile", segment.Arguments);
         Assert.DoesNotContain("-b:v", segment.Arguments);
         Assert.Contains("-crf", segment.Arguments);
+    }
+
+    [Theory]
+    [InlineData("libx265", "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2")]
+    [InlineData("libsvtav1", "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2")]
+    public void Yazilim_psy_bayragi_yalniz_olculen_destekte_uretilir(string codec, string option, string value)
+    {
+        var plan = Plan(codec);
+        var supported = new OptionAvailability((codec, option));
+        var unsupported = new OptionAvailability();
+
+        var enabled = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", supported);
+        var disabled = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", unsupported);
+
+        var index = enabled.IndexOf(option);
+        Assert.True(index >= 0);
+        Assert.Equal(value, enabled[index + 1]);
+        Assert.DoesNotContain(option, disabled);
+    }
+
+    [Fact]
+    public void Nvenc_aq_bayraklari_bagimsiz_olculur()
+    {
+        var plan = Plan("av1_nvenc");
+        var onlySpatial = new OptionAvailability(("av1_nvenc", "-spatial-aq"));
+
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 0, null, onlySpatial);
+
+        Assert.Contains("-spatial-aq", args);
+        Assert.DoesNotContain("-temporal-aq", args);
+    }
+
+    [Theory]
+    [InlineData("av1_nvenc", 64, 64, 1, 39)]
+    [InlineData("av1_nvenc", 1280, 720, 60, 4200)]
+    [InlineData("hevc_qsv", 3840, 2160, 120, 50000)]
+    public void Donanim_tepe_carpani_boyut_guvencesi_tavanini_asmaz(string codec, int width, int height, double fps, int bitrateK)
+    {
+        var factor = FfmpegArguments.PeakRateFactor(codec, bitrateK, width, height, fps);
+
+        Assert.InRange(factor, FfmpegArguments.TightPeakFactor, FfmpegArguments.HardwarePeakCeiling);
+        Assert.True(factor <= 1.10, $"boyut-guvenli tepe asildi: {factor}");
     }
 }
