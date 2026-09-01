@@ -454,11 +454,12 @@ algısal ağırlıklı hali), `identity` ve `msad` (algısal değil), `vmafmotio
 
 ## 6. Mutasyon kanıtı
 
-`dotnet test -c Release --filter "QualityMeterTests"` — 11 ölçü, tamamı geçiyor,
-atlanan yok. ffmpeg gerektirenler `[FfmpegFact]`, tonemap zinciri gerektiren
-`[TonemapFact]`. Ölçünün içinde yetenek yoklayıp sessizce dönen kol yok.
+`dotnet test -c Release --filter "QualityMeterTests"` — **18 ölçü, tamamı
+geçiyor, atlanan 0.** ffmpeg gerektirenler `[FfmpegFact]`, tonemap zinciri
+gerektiren `[TonemapFact]` (sınırı §8'de). Ölçünün içinde yetenek yoklayıp
+sessizce dönen kol yok; iki sabiti karşılaştıran ölçü yok.
 
-Üç mutasyon tek tek uygulandı, kaynak her seferinde geri alındı:
+T97 mutasyonları, kaynak her seferinde geri alınarak:
 
 | Mutasyon | Düşen ölçü |
 |---|---|
@@ -466,9 +467,40 @@ atlanan yok. ffmpeg gerektirenler `[FfmpegFact]`, tonemap zinciri gerektiren
 | Pencere adımı `scores.Count` yapıldı (tek pencere = tüm klip) | `WorstSceneAveragesOverTwoSecondBuckets`, `WorstSceneReportsTheWindowStartOnTheReferenceTimeline`, `WorstSceneFindsTheDamagedSectionTheMeanHides` |
 | Tonemap öneki düşürüldü (`referencePrefix = ""`) | `TonemappedReferenceSeparatesTwoSdrQualities` |
 
-`WorstSceneAveragesOverTwoSecondBuckets` pencere uzunluğunu tek başına
-sabitliyor: 600 kare @ 60 fps, yalnız 2,0–3,0 sn arası sıfır. 2 sn'lik pencere 50
-verir, 1 sn'lik 0, 5 sn'lik 80. Ölçü 50 bekliyor.
+T104 mutasyonları — pencere kuralı, sahne bağı, kısmi birim ve boş liste
+savunması tek tek bozuldu:
+
+| Mutasyon | Düşen ölçü | Sonuç |
+|---|---|---|
+| Sabit pencere `2 sn` → `1 sn` (`fps * SceneWindowSeconds` → `fps * 1.0`) | `WorstSceneAveragesOverTwoSecondBuckets`, `FixedWindowsDiluteTheSceneTheMapWouldIsolate` | 2 başarısız / 16 başarılı |
+| Sahne bağı koparıldı (`SceneBounds(map, …)` → `SceneBounds(null, …)`) | `WorstSceneUsesSceneBoundariesWhenTheMapIsPresent`, `SceneBoundariesAreReadOnTheReferenceTimelineNotFromZero`, `SceneShorterThanHalfASecondIsNotTheWorstScene` | 3 başarısız / 15 başarılı |
+| Kısmi birim eşiği `pencere/4` → `pencere` (T97'nin "kuyruğu at" kuralı) | `CollapseInTheTrailingHalfSecondIsNotDropped` | 1 başarısız / 17 başarılı |
+| Boş liste savunması etkisizleştirildi (`Count == 0` → `Count == -1`) | `WorstSceneRejectsAnEmptyScoreList` | 1 başarısız / 17 başarılı |
+
+Dört koşumun hepsinde **atlanan 0**.
+
+Hangi ölçü neyi tek başına tutuyor:
+
+- `WorstSceneAveragesOverTwoSecondBuckets` — pencere uzunluğu. 600 kare @ 60 fps,
+  yalnız 2,0–3,0 sn arası sıfır. 2 sn'lik pencere 50, 1 sn'lik 0, 5 sn'lik 80
+  verir; ölçü 50 bekliyor. Tek bir sabitle değil, üç uzunluğun üç farklı
+  cevabıyla ayrışıyor.
+- `WorstSceneUsesSceneBoundariesWhenTheMapIsPresent` / 
+  `FixedWindowsDiluteTheSceneTheMapWouldIsolate` — **aynı puan dizisi, iki yol.**
+  Sahne sınırıyla en kötü birim 40,0 @ 2,5 sn; sabit pencereyle aynı hasar
+  seyrelip 55,0 @ 2,0 sn oluyor. İkisi birden §4'ün karşılaştırmasını kodda
+  tutuyor: biri düşerse yollardan biri sessizce diğerine dönüşmüş demektir.
+- `SceneBoundariesAreReadOnTheReferenceTimelineNotFromZero` — sahne kesmeleri
+  referans zaman çizgisinden okunuyor (offset 12,5 sn, kesme 15,0/18,0).
+- `SceneShorterThanHalfASecondIsNotTheWorstScene` — yarım saniyeden kısa sahne en
+  kötü seçilemiyor; 12 karelik sıfır dilim atlanıyor.
+- `CollapseInTheTrailingHalfSecondIsNotDropped` / 
+  `TrailingUnitShorterThanHalfASecondIsDropped` — kısmi kuyruk kuralının iki
+  yüzü. 990 kare: son 0,5 sn sıfır → ölçü 0,0 @ 16,0 sn görüyor. 975 kare: son
+  0,25 sn sıfır → ölçü onu atıyor ve 100,0 raporluyor. Eşiği hangi yöne
+  kaydırırsan biri düşer.
+- `WorstSceneRejectsAnEmptyScoreList` — boş puan listesi `ArgumentException`
+  fırlatıyor, `PositiveInfinity` dönmüyor.
 
 
 ## 7. `VmafNegMin` kararı (K5)
@@ -554,6 +586,20 @@ Kısaca: silinmedi çünkü tanıda işe yarıyor; terfi de etmedi çünkü üç
 
     dotnet run -c Release --project tools/VidShrink.Bench -- measure-tonemapped parca-1.mkv sdr-yuksek.mp4
     dotnet run -c Release --project tools/VidShrink.Bench -- measure-tonemapped parca-1.mkv sdr-dusuk.mp4
+
+T104 tabloları (§4.2, §4.3, §7) için üç klip ve altı kodlama:
+
+    ffmpeg -t 30 -i parca-N.mkv -map 0:v:0 -c copy pN-ref.mkv
+    ffmpeg -i pN-ref.mkv -c:v libx264 -preset veryfast -crf 8  -pix_fmt yuv420p10le \
+      -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc pN-crf8.mkv
+    ffmpeg -i pN-ref.mkv -c:v libx264 -preset veryfast -crf 12 -pix_fmt yuv420p10le \
+      -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc pN-crf12.mkv
+
+Her çift için kare başına VMAF-NEG günlüğü alınır (`pN-ref` kendisiyle, crf 8 ile,
+crf 12 ile); gürültü özdeş günlükten, sinyal iki kodlama günlüğünün farkından
+hesaplanır. Sahne satırları `SceneDetector.BuildMapAsync` haritasıyla, eşik
+parametresi değiştirilerek üretildi. Ölçüm düzeneği `.calisma/` altındaydı ve iş
+bitince silindi; sayılar bu belgede.
 
 §2 ve §4 tabloları kare başına JSON günlüğünden çıkarıldı; günlüğü doğrudan almak
 için filtreye `libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path=...`
