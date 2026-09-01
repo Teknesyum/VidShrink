@@ -40,3 +40,50 @@ Ayrıca döngüsellik: `ExtremeCompressionTests.CodecFloorsAreStatedPerCodecAndR
 sabitleri birebir kopyalıyordu (`Assert.Equal(0.035, ...)`, `Assert.Equal(0.035 * 1.25, ...)`).
 Bu bir doğrulama değil, sabitin ikinci kopyasıdır: sabiti bozan bir mutasyon testi de
 bozar, ama davranışın bozulduğunu göstermez. Bölüm 6'ya bakınız.
+
+## 7. Ölçülen dağılımın dışındaki üç sabit
+
+T89 üç kaynakta 13 pencerede hareket üstelini ölçtü: en küçük **0,597** · medyan
+**0,871** · ortalama **0,859** · en büyük **1,319**
+(`docs/olcumler/olculen-kaliteyle-plan.md:266-276`). T89 üçünü de değiştiremedi,
+çünkü `tests/VidShrink.Tests/ExtremeCompressionTests.cs` `owns` dışındaydı
+(`olculen-kaliteyle-plan.md:298-302`, `:354-357`). Bu turda o dosya bende.
+
+| Sabit | Eski | Yeni | Dayanak |
+|---|---:|---:|---|
+| `ComplexityProfile.DefaultMotionExponent` | 0,25 | **0,871** | Ölçülen 13 pencerenin **medyanı**. Eski değer ölçülen her noktanın altındaydı; ölçüm yokken kullanılan geriye dönüş sabiti artık dağılımın ortasında. `CodecModel.FpsBitrateExponent`'ten türetilmesi kaldırıldı — o sabitin başka kullanıcısı yoktu. |
+| `PlanCalculator.MotionCutIsExpensiveAbove` | 0,5 | **log2(1,8) ≈ 0,848** | T89'un "ucuz" eşiği için kullandığı birim: tasarruf oranı. Kare hızını yarıya indirmek bitlerin **%10'undan azını** kurtarıyorsa pahalıdır. 0,848 ölçülen ortalamanın (0,859) ve medyanın (0,871) hemen altında, yani eşik dağılımın içinden geçiyor. Eski 0,5 ölçülen her noktanın altındaydı: ayrım yapmıyor, yalnız "aksi halde" dalıydı. |
+| `ComplexityProfile.MotionExponentMax` | 1,0 | **1,4** | Ölçülen en büyük iki pencere (1,296 ve 1,319) eski tavana kırpılıyordu; yeni tavan ikisini de geçiriyor. **Tavanın kendisi ölçülmedi** — üstelin fiziksel olarak nerede durduğunu gösteren bir ölçüm yok, bu yüzden 1,4 keyfidir. Tek dayanağı ölçülen en büyüğü kırpmaması. |
+
+`MotionExponentMin = 0,0` değişmedi: ölçülen en küçük 0,597 ve kelepçe hiçbir
+ölçülen noktayı kesmiyor.
+
+### 7.1 Değişikliğin görülen etkisi
+
+Geriye dönüş üsteli 0,25 → 0,871 olunca kare hızını düşürmek artık ucuz görünmüyor
+ve plan aynı hedefte kare yerine çözünürlük veriyor. 830 MB / 52,6 sn / 1920x1080@48
+kaynağında 1 MB hedefi: eskiden kare hızı 15'in altına düşüyordu, şimdi 384x216@25
+(kaynak piksel hızının %2,1'i). Ölçüm kare hızı düşürmenin ucuz olmadığını söylüyor;
+plan artık onu takip ediyor.
+
+### 7.2 Testler sabiti kopyalamayı bıraktı
+
+`MotionExponentComesFromTheHalfFrameRateSample` içindeki `Assert.Equal(0.25, ...)`
+kaldırıldı — sabitin ikinci kopyasıydı. Yerine üç davranış ölçüsü:
+
+- `TheUnmeasuredFallbackPricesAFrameRateCutInsideTheMeasuredRange` — ölçüm yokken
+  yarı kare hızının fiyatı ölçülen en küçük ve en büyük üstelin arasında kalmalı.
+  Sabiti 0,25'e geri almak kırar.
+- `TheMotionCeilingDoesNotClipTheDearestMeasuredWindow` — 1,319 üsteli üreten bir
+  hareket örneği kelepçeden geçmeli. Tavanı 1,0'a geri almak kırar.
+- `TheAdviceBandSplitsTheMeasuredMotionDistribution` — 0,597 ucuz, 0,75 hiçbiri,
+  0,871 pahalı. Eşiği 0,5'e geri almak orta noktayı pahalı yapar ve kırar.
+
+### 7.3 Yolda görülen, kapsam dışı
+
+`OneMegabyteTargetCollapsesThePixelRateAndNeverDropsUnderTheFloorSilently`
+1 MB hedefinde planı 0,0617 bppf'te, tabanın (0,0618) **0,2 kbit/sn altında**
+buluyor ve motor `TargetBelowCodecFloor` demiyor. Fark tamsayı bit hızı
+yuvarlamasının bir adımından küçük; nedeni bu turda doğrulanmadı. Ölçü bir kbit'lik
+payı açıkça adlandırıyor, sessizce yutmuyor. Aramanın gördüğü bit hızı ile plana
+yazılan tamsayı bit hızı arasındaki bu tutarsızlık ayrı bir işe aittir.

@@ -57,8 +57,9 @@ public static class PlanCalculator
     private const double LowFpsSurcharge = 12.0;
     private const double LowFpsThreshold = 20.0;
     private const double MotionCutCheapSavingShare = 0.20;
+    private const double MotionCutExpensiveSavingShare = 0.10;
     private static readonly double MotionCutIsCheapBelow = Math.Log2(2 * (1 - MotionCutCheapSavingShare));
-    private const double MotionCutIsExpensiveAbove = 0.5;
+    private static readonly double MotionCutIsExpensiveAbove = Math.Log2(2 * (1 - MotionCutExpensiveSavingShare));
     private const int MinVideoBitrateK = 48;
     private const double SourceQualityScore = 100.0;
 

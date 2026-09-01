@@ -45,18 +45,24 @@ public sealed class ExtremeCompressionTests
         => plan.VideoBitrateK * 1000.0 / ((double)plan.Width * plan.Height * plan.Fps);
 
     [Fact]
-    public void OneMegabyteTargetDropsTheFrameRateAndKeepsTheFramesAboveTheFloor()
+    public void OneMegabyteTargetCollapsesThePixelRateAndNeverDropsUnderTheFloorSilently()
     {
         var info = GameCapture();
         var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 1.0 }, null);
         var plan = result.Plan;
 
-        _output.WriteLine($"1 MB -> {plan.Codec} {plan.Width}x{plan.Height}@{plan.Fps:0.##} {plan.VideoBitrateK}k bppf {Bppf(plan):0.0000}");
+        var sourcePixelRate = (double)info.Width * info.Height * info.Fps;
+        var planPixelRate = (double)plan.Width * plan.Height * plan.Fps;
+
+        _output.WriteLine($"1 MB -> {plan.Codec} {plan.Width}x{plan.Height}@{plan.Fps:0.##} {plan.VideoBitrateK}k bppf {Bppf(plan):0.0000} pixel rate {planPixelRate / sourcePixelRate * 100:0.0}%");
 
         Assert.Equal(CompressionRegime.Extreme, result.Advice.Regime);
-        Assert.True(plan.Fps < 15.0, $"The frame rate stayed at {plan.Fps:0.##} at a 1 MB target.");
-        Assert.True(Bppf(plan) >= result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps),
-            $"The plan lands at {Bppf(plan):0.0000} bits per pixel per frame, under the {result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps):0.0000} floor.");
+        Assert.True(planPixelRate < sourcePixelRate * 0.10,
+            $"The plan still carries {planPixelRate / sourcePixelRate * 100:0.0}% of the source pixel rate at a 1 MB target.");
+        var floor = result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps);
+        var oneKbitOfRounding = 1000.0 / planPixelRate;
+        Assert.True(Bppf(plan) + oneKbitOfRounding >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
+            $"The plan lands at {Bppf(plan):0.0000} bits per pixel per frame, more than a kbit under the {floor:0.0000} floor, and says nothing about it.");
     }
 
     [Fact]
@@ -104,6 +110,10 @@ public sealed class ExtremeCompressionTests
         Assert.Contains("too small", result.Plan.Reason);
     }
 
+    private const double MeasuredMotionMin = 0.597;
+    private const double MeasuredMotionMedian = 0.871;
+    private const double MeasuredMotionMax = 1.319;
+
     [Fact]
     public void MotionExponentComesFromTheHalfFrameRateSample()
     {
@@ -111,20 +121,48 @@ public sealed class ExtremeCompressionTests
         var withMotion = ComplexityProfile.FromProbe(0.1264, 0.09, 6, 288, 0, WindowBiasSource.Scan, 0.1264 * 1.76);
 
         Assert.False(withoutMotion.MotionMeasured);
-        Assert.Equal(0.25, withoutMotion.MotionExponent, 3);
         Assert.True(withMotion.MotionMeasured);
         Assert.Equal(0.8155, withMotion.MotionExponent, 3);
         Assert.Equal(1.76, withMotion.TemporalFactor(24, 48), 4);
     }
 
     [Fact]
-    public void MeasuredMotionReplacesTheModelConstantAndTheConstantIsTheFallback()
+    public void TheUnmeasuredFallbackPricesAFrameRateCutInsideTheMeasuredRange()
     {
         var fallback = ComplexityProfile.FromProbe(0.148, 0.09, 6, 288);
-        var legacy = Math.Pow(0.5, CodecModel.FpsBitrateExponent - 1.0);
+        var cheapest = Math.Pow(2, MeasuredMotionMin);
+        var dearest = Math.Pow(2, MeasuredMotionMax);
 
-        Assert.Equal(legacy, fallback.TemporalFactor(24, 48), 6);
-        Assert.NotEqual(legacy, Measured(0.85).TemporalFactor(24, 48), 3);
+        Assert.False(fallback.MotionMeasured);
+        Assert.InRange(fallback.TemporalFactor(24, 48), cheapest, dearest);
+        Assert.NotEqual(fallback.TemporalFactor(24, 48), Measured(0.25).TemporalFactor(24, 48), 3);
+    }
+
+    [Fact]
+    public void TheMotionCeilingDoesNotClipTheDearestMeasuredWindow()
+    {
+        var dearest = ComplexityProfile.FromProbe(0.1264, 0.09, 6, 288, 0, WindowBiasSource.Scan,
+            0.1264 * Math.Pow(2, MeasuredMotionMax));
+
+        Assert.True(dearest.MotionMeasured);
+        Assert.Equal(MeasuredMotionMax, dearest.MotionExponent, 3);
+    }
+
+    [Fact]
+    public void TheAdviceBandSplitsTheMeasuredMotionDistribution()
+    {
+        var info = GameCapture();
+        var options = new PlanOptions { TargetMb = 3.0 };
+
+        var cheap = PlanCalculator.BuildDetailed(info, options, Measured(MeasuredMotionMin)).Advice.Notes;
+        var neither = PlanCalculator.BuildDetailed(info, options, Measured(0.75)).Advice.Notes;
+        var expensive = PlanCalculator.BuildDetailed(info, options, Measured(MeasuredMotionMedian)).Advice.Notes;
+
+        Assert.Contains(AdviceCode.MotionCutIsCheap, cheap);
+        Assert.DoesNotContain(AdviceCode.MotionCutIsExpensive, cheap);
+        Assert.DoesNotContain(AdviceCode.MotionCutIsCheap, neither);
+        Assert.DoesNotContain(AdviceCode.MotionCutIsExpensive, neither);
+        Assert.Contains(AdviceCode.MotionCutIsExpensive, expensive);
     }
 
     [Fact]

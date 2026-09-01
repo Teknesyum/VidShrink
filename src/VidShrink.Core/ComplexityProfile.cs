@@ -70,9 +70,9 @@ public sealed record ComplexityProfile
     private const double LowScaleDamping = 0.3;
     private const double DetailExponentMin = -0.2;
     private const double DetailExponentMax = 1.4;
-    public const double DefaultMotionExponent = 1.0 - CodecModel.FpsBitrateExponent;
+    public const double DefaultMotionExponent = 0.871;
     private const double MotionExponentMin = 0.0;
-    private const double MotionExponentMax = 1.0;
+    private const double MotionExponentMax = 1.4;
     public const double FloorComplexityAnchor = 0.1264;
     private const double FloorAdaptExponent = 0.5;
     private const double FloorAdaptMin = 0.6;
