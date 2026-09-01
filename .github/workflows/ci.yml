@@ -24,4 +24,6 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: dotnet build VidShrink.sln -c Release -warnaserror
-      - run: dotnet test VidShrink.sln -c Release
+      # A hung test host prints "Test host process crashed" with Failed: 0 and still
+      # exits 0. The gate reads the output and refuses a run that never finished.
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 950
