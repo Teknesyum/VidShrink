@@ -33,34 +33,43 @@ geçerli; kısaca:
 
 ---
 
-## İş 2 — T89 (birinciden hemen sonra)
+## İş 2 — T88 tur 3 (birinciden hemen sonra) — DEĞİŞTİ
 
-Sözleşme: `.claude/relay/contracts/T89.md`
-Dal: `T89-olculen-kaliteyle-plan`
+**Bu madde 1 Eylül akşamı değişti. Önceki hali T89'du; T89 ertelendi.**
 
-**Başlamadan önce tek adım:** `git fetch origin; git log --oneline origin/main -5`.
-T88 (`T88 tur 2: ornek muhasebesini ve kalite varsayilanini duzelt`) `main`e
-birleşmiş olmalı; dalını `origin/main`den aç. Birleşmemişse T0'a tek satır yaz ve
-`origin/T88-ornekte-kalite-olcumu` üzerinden aç — bekleme.
+Sebep: T88 tur 2'nin bağımsız denetimi KALDI verdi ve iki KRİTİK buldu. T89 tam
+olarak T88'in kurduğu zeminin üzerine oturuyor; zemin bozukken T89 yazmak yanlış
+sayının üzerine plan kurmak olur.
 
-T88 köprüyü kurdu: örnek pencerelerde algılanan kalite ölçülüyor ve `ProbeResult`
-üzerinden planlayıcıya ulaşıyor. T89 onu **kullanır**.
+Sözleşme: `.claude/relay/contracts/T88.md` — sondaki "# Düzeltme turu 3" (J1–J5).
+Dal: `T88-ornekte-kalite-olcumu` sürdürülür.
 
-Bugün `PlanCalculator` kaliteyi tahmin ediyor ve sabitleri elle seçilmiş:
-`QualityPerHalving = 6.0`, `ScalePenaltyScale = 10.0`, `FpsPenaltyPerHalving = 5.0`.
-Motorun kurucu tezi "sabit merdiven değil gerçek ölçüm" — tam burada tahmine düşüyor.
+**J1 KRİTİK:** konteyner asimetrisi kapanmadı, **eksen değiştirdi**. Tur 2 tam ölçek
+ile yarım ölçeği eşitledi (ikisi de matroska, ikisi de `FileInfo.Length`) ama üçüncü
+taraf eşitlenmedi — `ComplexityProbe.cs:124`'teki `motion.Bytes` hâlâ `-f null -`
+üzerinden **ham akış** baytı, `reference.FullBytes` ise artık **Matroska dosya**
+baytı. `main`de ikisi de hamdı; bu dal payı bozdu.
 
-Yön: sabitleri global kalibre etme; **klip-başına ölçülen noktalarla değiştir.**
-Sabitler yalnız ölçüm yokken geriye dönüş (prior) olarak kalır ve bunu söyleyen bir
-isim taşır.
+Ölçülen (720p60, 2 sn, CRF 23, veryfast, düşük karmaşıklık): ham 5430 B, mkv 6871 B
+→ payda %26,5 şişiyor → `MotionExponent` ≈ −0,34 kayıyor, alt kelepçe 0'a çakıyor,
+`PlanCalculator.cs:182` eşiği yanlış tarafa düşüyor: **"burada kare düşürmek ucuz"
+denip FPS yarılanıyor.** Ekran kaydı, sunum, animasyon, statik konuşan kafa — hepsi
+bu rejimde.
 
-**Konumlandırma korunur: hedef boyut birincil.** Kalite ikinci bir hedef değil,
-bir **durdurma kısıtıdır** — hangisi önce dolarsa orada durulur. Bu sözleşme
-VidShrink'i hedef-kalite aracı yapmaz.
+**J2 KRİTİK:** E1'i sabitlediği söylenen test davranış bağlamıyor.
+`ComplexityProbeTests.cs:69-70` iki **sabiti** karşılaştırıyor. Denetçi gerçek kusuru
+geri koydu (yarım örneğin formatını `"h264"` yaptı) ve 12/12 test yeşil kaldı.
 
-Kalan kabul kriterleri sözleşme dosyasında; hepsi geçerli.
+Kalanlar sözleşmede: J3 (uygulama yolu testle sabitlenmemiş — `RunAsync`'in
+varsayılanı `true` yapılınca hiçbir test kırmızıya dönmüyor), J4 (rapor borçları),
+J5 (borç, bu turda kapanması beklenmiyor).
 
 ---
+
+## T89 nerede kaldı
+
+T89 (`.claude/relay/contracts/T89.md`) duruyor ve sırada. T88 tur 3 mühürlendikten
+sonra dağıtılacak; şimdi başlama.
 
 ## İki işte de geçerli kurallar
 
