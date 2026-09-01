@@ -19,4 +19,12 @@ Bu iki klipte 1,50 hiçbir hedefi aşmadı; buna karşın eski 882×496@60, 11,4
 
 ## Psy/AQ ablasyonu
 
-Henüz ölçülmedi.
+Kaynak `clip-720p60.mkv`, hedef 6,9 MiB, plan 1280×720@60 `av1_nvenc` p5 ve 2753 kbit/sn'dir. Tek fark, açık koşumda ölçülerek desteklendiği doğrulanan `-spatial-aq 1 -temporal-aq 1`; kapalı koşumda aynı seçeneklerin son argüman olarak `0` verilmesidir. Kalite, `tools/VidShrink.Bench measure` ile klibin tamamında ölçüldü.
+
+| AQ | Teslim MiB | Hedef oranı | VMAF-NEG mean | Harmonic | p10 |
+|---|---:|---:|---:|---:|---:|
+| Kapalı | 6,787405014038086 | 0,9836818860924762 | 75,19705973749988 | 63,44009931105794 | 36,7723875 |
+| Açık | 6,794994354248047 | 0,9847817904707313 | 75,29163206000004 | 63,59703711920521 | 36,9102289 |
+| Açık − kapalı | 0,007589340209961 | 0,0010999043782551 | 0,09457232250016 | 0,15693780814727 | 0,1378414 |
+
+Üç VMAF özeti de pozitif ve iki çıktı da hedefin altında kaldı; NVENC AQ bayrakları korunuyor. `libx265` ve `libsvtav1` eşdeğerlerinin kalite etkisi bu sözleşmede ölçülmedi; bunlar yalnız gerçek seçenek yoklaması başarılıysa üretiliyor. Özellikle SVT-AV1 yoklaması yalnız çıkış koduna güvenmiyor: stderr'deki `Error parsing option`, `Option not found` ve `Unrecognized option` tanılarını da başarısız sayıyor.
