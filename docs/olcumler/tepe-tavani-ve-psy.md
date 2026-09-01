@@ -28,3 +28,7 @@ Kaynak `clip-720p60.mkv`, hedef 6,9 MiB, plan 1280×720@60 `av1_nvenc` p5 ve 275
 | Açık − kapalı | 0,007589340209961 | 0,0010999043782551 | 0,09457232250016 | 0,15693780814727 | 0,1378414 |
 
 Üç VMAF özeti de pozitif ve iki çıktı da hedefin altında kaldı; NVENC AQ bayrakları korunuyor. `libx265` ve `libsvtav1` eşdeğerlerinin kalite etkisi bu sözleşmede ölçülmedi; bunlar yalnız gerçek seçenek yoklaması başarılıysa üretiliyor. Özellikle SVT-AV1 yoklaması yalnız çıkış koduna güvenmiyor: stderr'deki `Error parsing option`, `Option not found` ve `Unrecognized option` tanılarını da başarısız sayıyor.
+
+## Doğrulama
+
+Psy/AQ argüman ekleme çağrısı geçici olarak kaldırıldığında üç yeni davranış testi de başarısız oldu: libx265, libsvtav1 ve NVENC. Çağrı geri getirildikten sonra sözleşme filtresi 14 başarılı / 0 başarısız; tam Release paketi 957 başarılı / 0 başarısız sonuçlandı. Var olan assertion gevşetilmedi ve test atlaması eklenmedi.
