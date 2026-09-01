@@ -1497,6 +1497,17 @@ public partial class MainWindow : Window
         RefreshConversion();
     }
 
+    public static async Task<ComplexityProfile> ProbeWithMeasuredQualityAsync(
+        MediaInfo info, SpeedMode speed, IQualityMeasurement? meter, CancellationToken ct)
+    {
+        var probed = await ComplexityProbe.RunDetailedAsync(info, speed, measureQuality: true, meter, ct);
+        var anchors = probed.QualityMeasurements
+            .Where(q => q is { Comparable: true, VmafNegMean: not null })
+            .Select(q => q.VmafNegMean!.Value)
+            .ToArray();
+        return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
+    }
+
     private async Task MeasureComplexityAsync(MediaInfo info)
     {
         _probeCts?.Cancel();
@@ -1508,7 +1519,7 @@ public partial class MainWindow : Window
         try
         {
             var speed = CurrentOptions().SpeedMode;
-            var profile = await ComplexityProbe.RunAsync(info, speed, cts.Token);
+            var profile = await ProbeWithMeasuredQualityAsync(info, speed, null, cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             _profile = profile;
             Recalculate();
@@ -1887,8 +1898,11 @@ public partial class MainWindow : Window
                 ReasonCode.FrameRateReduced => Say("main.reason.frame-rate-reduced", Num(note.Fps, "0.##")),
                 ReasonCode.ResolutionRestoredAtCeiling => Say("main.reason.resolution-restored",
                     note.Width, note.Height, Num(note.Fps, "0.##"), Num(note.Crf, "0")),
-                ReasonCode.BudgetExceedsCeiling => Say("main.reason.budget-exceeds-ceiling",
-                    Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
+                ReasonCode.BudgetExceedsCeiling => plan.StopsShortOfBandOnPurpose && CurrentOptions().FillPolicy == FillPolicy.FillTarget
+                    ? Say("main.reason.measured-quality-stop",
+                        Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"))
+                    : Say("main.reason.budget-exceeds-ceiling",
+                        Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
                 ReasonCode.BudgetBelowCeilingTwoPass => Say("main.reason.budget-below-ceiling",
                     Num(note.BudgetCrf, "0.#"), Num(note.Crf, "0"), Num(note.TargetMb, "0.##")),
                 ReasonCode.PredictedQualityMeasured => Say("main.reason.quality-measured",
