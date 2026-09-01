@@ -19,27 +19,43 @@ gelir. Ölçülmemiş olan yerde açıkça **ölçülmedi** yazar.
 Makine paylaşımlı ve ölçüm sırasında dört ajan daha koşuyordu. **Süreler ölçülmedi** —
 duvar saati bu koşullarda anlamlı değil. Kalite sayıları yükten etkilenmez.
 
-### Harmonik ortalama neden düşük okunuyor
+### Harmonik ortalama bu ölçümde kullanılamaz — sebebi ölçüldü
 
-Bu kaynakta VMAF-NEG bazı karelerde **tam 0** veriyor. Auto satırında 3624 karenin
-**26'sı** sıfır: 1699. kare ve 3385-3410 arası kesintisiz blok. Harmonik ortalama
-`n / Σ(1/x)` olduğu için bu 26 kare ortalamayı 94,5'ten 56,3'e çekiyor; aynı satırın
-p10'u 94,5 olduğu halde.
+Sözleşme üç metrik istiyor. Üçüncüsü, harmonik ortalama, bu kaynakta **satırlar arası
+karşılaştırma için geçersiz**. Neden geçersiz olduğu tahmin değil, ölçüldü.
 
-Hizalama hatası değil: kaynak da çıktı da **3624 kare** (`ffprobe -count_frames`),
-libvmaf kareleri birebir eşliyor.
+VMAF-NEG, SVT-AV1 çıktılarımızın **26 karesinde tam 0** veriyor: 1699. kare ve
+3385-3410 arası kesintisiz blok. Harmonik ortalama `n / Σ(1/x)` olduğu için bu 26 kare
+sayıyı 94,5'ten 56,3'e çekiyor.
 
-Sıfırlar kaynaktaki **sahne kesmelerinin hemen önünde** duruyor. Kaynakta iki kesme
-var — 1701. kare (28,353 s) ve 3411. kare (56,870 s; parlaklık `YAVG` 331'den 225'e
-düşüyor). Sıfır veren kareler bu iki kesmenin son karesine kadar olan bloklar
-(1699 ve 3385-3410). VMAF-NEG'in sahne geçişinde tabana çakılması modelin bilinen
-davranışı; kesmenin kendisi kodlayıcı ayarına bağlı değil.
+Dağılım kodlayıcıya göre keskin biçimde ikiye ayrılıyor:
 
-Doğrulandı: `auto` ile `e1-preset4` satırlarında sıfır veren kareler **birebir aynı
-26 kare** (kesişim 26, fark 0). Pasaj kaynağın kendisinde olduğu için her satırı aynı
-vuruyor, satırlar arası karşılaştırma geçerli kalıyor. Yine de tek sayıya bakan biri
-harmonik ortalamayı "kalite yarıya düştü" diye okur — bu yüzden satırlar arası farkı
-**ortalama ve p10** taşıyor, harmonik sütunu sözleşme gereği bütünlük için duruyor.
+| satır | kodek | sıfır puanlı kare | auto ile ortak |
+|---|---|---|---|
+| auto | libsvtav1 | 26 | — |
+| e1-preset4 | libsvtav1 | 26 | 26 |
+| e2-gop300 | libsvtav1 | 26 | 26 |
+| e3-olcek810 | libsvtav1 | 26 | 26 |
+| uzman-biz | libsvtav1 | 26 | 26 |
+| uzman-handbrake | x265 | **0** | 0 |
+
+Beş AV1 koşumunun tamamında **birebir aynı 26 kare**; iki x265 koşumunda hiç yok.
+Ayar (preset, `-g`, çözünürlük) hiçbir şeyi değiştirmiyor.
+
+**Bu kareler bozuk değil.** Aynı karelerde auto'nun kaynağa karşı PSNR'ı **46-48 dB**
+(3380-3415 aralığı ölçüldü) — mutlak olarak yüksek kalite. Parlaklık da kaynakla
+birebir örtüşüyor (`YAVG` 352,5 → 339,1; kaynakta 352,3 → 339,0). HandBrake aynı
+karelerde 98-100 alıyor. Yani ortada görüntü çöküşü yok; VMAF-NEG bu AV1 dosyalarında
+bu karelerde yapay olarak sıfıra düşüyor. Ölçüm düzeninin `scale` adımı da sebep
+değil: aynı çift ölçekleme olmadan yeniden ölçüldü, sonuç birebir aynı.
+
+Sonuç, iki yönlü:
+
+1. **Bu belgede** satırlar arası farkı **ortalama ve p10** taşır. Harmonik sütunu
+   sözleşme gereği tabloda duruyor ama okunmamalı; yanında sıfır kare sayısı var.
+2. **Bu bir kusur** (kusur 4). Depo'nun kendi ölçüm aracı harmonik ortalamayı
+   raporluyor; bu kaynakta AV1 ile x265 arasında **39 puanlık** bir fark üretirdi ve
+   o farkın PSNR'a göre karşılığı yok.
 ---
 
 ## K1 — Auto modun bugün aldığı kararlar
@@ -134,6 +150,103 @@ yoldan (`PlanCalculator` + `EncodeRunner.EncodeArguments` doğrudan çağrılara
 
 ---
 
+## K3 — Uzman açığı
+
+Üç çıktı, **aynı kaynaktan ve aynı teslim boyutunda**. Boyut eşlemesi elle yapıldı:
+her iki uzman koşumunun bit hızı, teslim edilen dosya auto'nun boyutuna oturana
+kadar yeniden ayarlandı (uzman-biz için üç, HandBrake için iki koşum).
+
+| satır | ne yapıldı |
+|---|---|
+| `auto` | Uygulamanın kendi varsayılanları. Hiçbir ayara dokunulmadı. Motor `libsvtav1`, preset 6, `-g 120`, 1920x1080@60, `aac 128k` seçti; istenen `-b:v 2026k`. |
+| `uzman-biz` | Aynı motor, elle ayarlanmış: `libsvtav1` **preset 4**, **`-g 300`**, çözünürlük düşürülmedi; istenen `-b:v 2605k`. Diğer her şey auto ile birebir aynı. |
+| `uzman-handbrake` | `HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900` |
+
+| satır | boyut | ortalama | p10 | harmonik | sıfır puanlı kare | en düşük kare |
+|---|---|---|---|---|---|---|
+| auto | 15,04 MiB (15766933 bayt) | 94,462 | 94,534 | 56,313 | 26 | 0,00 |
+| uzman-biz | 15,02 MiB (15752039 bayt) | 94,861 | 95,337 | 56,472 | 26 | 0,00 |
+| uzman-handbrake | 15,02 MiB (15754005 bayt) | 95,731 | 95,361 | 95,727 | 0 | 74,67 |
+
+**Uzman açığı = uzman-biz - auto:** ortalama +0,400, harmonik +0,159, p10 +0,803
+
+Boyut farkı: uzman-biz 15,02 MiB, auto 15,04 MiB (-0,1%).
+
+**HandBrake - auto:** ortalama +1,269, harmonik +39,414, p10 +0,827; boyut 15,02 MiB (-0,1%).
+
+Okuma: pozitif sayı uzmanın önde olduğunu söyler. Üç satır da 15,02-15,04 MiB
+aralığında, aralarındaki en büyük boyut farkı **%0,1** — yani puan farkı boyut
+farkından gelmiyor.
+
+**Harmonik sütunu bu tabloda okunmamalı.** Beş SVT-AV1 koşumunun tamamında aynı
+26 kare VMAF-NEG'den tam 0 alıyor, iki x265 koşumunda hiç almıyor; o kareler bozuk
+değil (PSNR 46-48 dB). Sütun sözleşme üç metrik istediği için duruyor, yanında
+sıfır kare sayısıyla. Ayrıntı ölçüm düzeneği bölümünde ve kusur 4'te.
+
+---
+
+## K4 — Açığın ayar başına ayrıştırması
+
+`uzman-biz` auto'dan **iki** ayarda ayrılıyor: kodlayıcı çabası ve anahtar kare
+aralığı. Her biri tek tek geri alındı — yani auto'nun argümanına o ayar **yalnız
+başına** uygulandı, geri kalan her şey (kaynak, istenen `-b:v 2026k`, ses,
+`-pix_fmt`, `-svtav1-params`, renk argümanları) birebir sabit tutuldu. Üçüncü satır,
+uzman-biz'in **almadığı** bir ayar: çözünürlük düşürme. Auto bunu yapmaya yetkili
+(`AllowResolutionDrop = true`) ama bu kaynakta yapmadı; elle denendi ve reddedildi.
+
+| değiştirilen tek ayar | auto değeri | uzman değeri | boyut | Δ ortalama | Δ p10 |
+|---|---|---|---|---|---|
+| kodlayıcı çabası (preset) | 6 | 4 | 13,97 MiB (-7,1%) | -0,042 | -0,293 |
+| anahtar kare aralığı (-g) | 120 (fps × 2) | 300 | 11,35 MiB (-24,5%) | +0,155 | +0,333 |
+| çözünürlük | 1920x1080 | 1440x810 | 13,57 MiB (-9,8%) | -5,691 | -5,365 |
+
+### En büyük kalem: anahtar kare aralığı
+
+Tabloda tek satır iki eksende birden kazanıyor: `-g 300`. Dosya **%24,5 küçülürken**
+puan da **yükseliyor** (ortalama +0,155, p10 +0,333). Boyut eşitliği tartışmasından
+bağımsız bir sonuç — daha küçük dosyada daha iyi puan, hangi eksenden bakılırsa
+bakılsın kayıp yok.
+
+Sebebi anahtar kare **sayısı** değil, **yeri**. Üretilen dosyalardaki anahtar kare
+zamanları doğrudan sayıldı (`ffprobe -skip_frame nokey`):
+
+| çıktı | anahtar kare | en kısa aralık | en uzun aralık |
+|---|---|---|---|
+| auto (`-g 120`) | 31 | 2,00 s | 2,00 s |
+| `-g 300` | 13 | 5,00 s | 5,00 s |
+| uzman-handbrake | 7 | 8,33 s | 10,00 s |
+
+Bizim iki satırımızda en kısa ile en uzun aralık **birebir eşit** — yani anahtar kare
+katı bir ızgaraya diziliyor, içeriğe hiç bakılmıyor. Sabit `FfmpegArguments.cs:162`'de:
+`-g = max(2, round(fps × 2))`.
+
+Kaynakta iki sahne kesmesi var: 28,353 s ve 56,870 s. HandBrake'in anahtar kare
+zamanları `0,02 / 10,02 / 20,02 / 28,35 / 38,35 / 48,35 / 56,87` — düzenli 10 s'lik
+tavanın **arasına** tam bu iki kesmeyi yerleştirmiş. Bizimkiler
+`0,02 / 2,02 / 4,02 / … / 60,02` — kesmelerin ikisi de iki ızgara noktasının arasına
+düşüyor. Yani auto, kesmeden 0,34 s **önce** bir anahtar kareyi harcıyor, sonra
+kesmenin kendisini P/B kare olarak kodlamak zorunda kalıyor: en pahalı hâli.
+
+Bit bütçesinin nereye gittiği bu. 31 anahtar karenin 29'u hiçbir sahne sınırında
+değil; HandBrake aynı kaynakta aynı teslim boyutunda 7 taneyle yetiniyor.
+
+**Düzeltme bu sözleşmenin işi değil.** `FfmpegArguments.cs` T98'in `owns`'unda;
+burası ölçüp adlandırıyor.
+
+### Ayrıştırma nasıl okunmalı
+
+Üç ablasyon da auto ile **aynı** `-b:v 2026k` isteğiyle koşturuldu, ama `libsvtav1`
+istenen bit hızını ayara göre farklı tutturuyor (bkz. kusur 3). Bu yüzden satırlar
+farklı boyutlara düşüyor ve puan farkı ile boyut farkı birlikte okunmalı:
+
+- **preset 4**: %7,1 küçük dosyada ortalama −0,042. Puan pratikte aynı, yer kazancı
+  gerçek. Boyut eşitlendiğinde net kazanç — nitekim `uzman-biz` bunu aldı.
+- **`-g 300`**: %24,5 küçük dosyada puan **artıyor**. Tek yönlü kazanç.
+- **1440x810 ölçek**: %9,8 küçük dosyada ortalama −5,691, p10 −5,365. Kötü takas;
+  `uzman-biz` bunu almadı. Auto'nun bu kaynakta çözünürlük düşürmemesi doğru karar.
+
+---
+
 ## K5 — HandBrake'in sormadığı, bizim sorduğumuz
 
 HandBrakeCLI 1.11.2 bu makinede doğrulandı: `--help` çıktısında **hedef boyut seçeneği
@@ -171,6 +284,38 @@ bizde de sabit, ama **preset adı gibi görünür bir kapağı yok**:
 Özet: HandBrake bilmeyen kullanıcıya **1** soru soruyor, biz **9**. Dokuzun
 **ikisi** (hedef boyut, amaç) bilmeyen birinin doğru cevaplayabileceği sorular;
 **altısı** cevaplayamayacağı, **biri** (HDR) doğru soru ama yanlış dille sorulmuş.
+
+---
+
+---
+
+## K6 — Sıradaki adım
+
+Üç madde, üçü de K4'teki bir sayıya bağlı. Hiçbiri bu sözleşmede uygulanmadı.
+
+**1. Anahtar kare aralığını içerikten türet.** K4'ün en büyük kalemi: `-g 300` dosyayı
+%24,5 küçültürken puanı yükseltiyor (ortalama +0,155, p10 +0,333). Ölçülen sebep,
+sabitin katı ızgara üretmesi — auto'nun 31 anahtar karesinin 29'u hiçbir sahne
+sınırında değil, HandBrake aynı kaynakta 7 taneyle yetiniyor ve ikisini tam
+kesmelere koyuyor. Yapılacak iş `FfmpegArguments.cs:162`'deki `fps × 2` sabitini
+bir tavan (`-g`) + sahne kesmesi tetikli anahtar kare düzenine çevirmek.
+**Bu dosya T98'in `owns`'unda; iş oraya ait.**
+
+**2. Yazılım AV1'in bit hızı sapmasını modelle.** Kusur 3'te ölçüldü: teslim oranı
+ayara göre 0,709 ile 0,961 arasında değişiyor, HandBrake aynı istekte 1,024 veriyor.
+Auto bu yüzden kendi doldurma bandının altına düşüyor (15,04 MiB teslim, band alt
+kenarı 15,20 MiB). Madde 1 uygulanırsa sapma daha da büyür (`-g 300` ölçümünde oran
+0,709'a iniyor) ve kazanılan yer boş kalır — yani **madde 1 bu düzeltme olmadan
+kazancının bir kısmını çöpe atar.** `PlanCalculator.cs:82-96`'daki
+`DeliveryReserveK` / `HardwareBitrateYield` yalnız donanım yolunu kapsıyor.
+
+**3. Preset varsayılanını 6'dan 4'e almayı tartışmaya aç — ama süre ölçülmeden değil.**
+Kalite tarafı ölçüldü: preset 4, %7,1 küçük dosyada ortalama −0,042 veriyor, yani puan
+pratikte aynı, yer kazancı gerçek. Karşılığında ödenen kodlama süresi **ölçülmedi** —
+makine bu ölçüm boyunca beş ajan tarafından paylaşılıyordu, duvar saati anlamlı değil.
+Bu madde ancak yalıtılmış bir makinede süre ölçüldükten sonra karara bağlanabilir.
+Çözünürlük düşürme ise ölçülüp **reddedildi**: %9,8 yer için ortalama −5,691 kötü takas,
+auto'nun bu kaynakta çözünürlüğe dokunmaması doğru karardı.
 
 ---
 
@@ -216,3 +361,22 @@ sapma sıfır varsayılıyor. Auto'nun kendi doldurma bandını dolduramamasın�
 (15,04 MiB teslim, band alt kenarı 15,20 MiB) ölçülen sebebi bu. Sapma preset'e ve
 anahtar kare aralığına bağlı olduğu için bu ikisini değiştiren her öneri bu düzeltmeyi
 de ister — aksi halde kazanılan yer boş bırakılır.
+**4. Harmonik ortalama AV1 çıktılarında yapay olarak çöküyor ve bench bunu
+raporluyor.** VMAF-NEG bu kaynakta beş SVT-AV1 koşumunun **tamamında birebir aynı
+26 karede** tam 0 veriyor; iki x265 koşumunda hiç vermiyor. Kareler bozuk değil:
+aynı aralıkta auto'nun PSNR'ı 46-48 dB, parlaklık kaynakla örtüşüyor ve HandBrake
+aynı karelerde 98-100 alıyor. Harmonik ortalama `n / Σ(1/max(x,1))` olduğu için bu
+26 kare sayıyı 94,5'ten 56,3'e indiriyor.
+
+Bench aynı formülü kullanıyor (`tools/VidShrink.Bench/Program.cs:820`) ve sonucu üç
+yerde raporluyor (`:527`, `:775`, `:913`). Bugün bench'e AV1 ile x265 aynı kaynakta
+karşılaştırtılsa **39 puanlık** bir kalite farkı raporlardı; o farkın PSNR'a göre
+karşılığı yok. Kodek kararı bu sayıya bakılarak verilirse yanlış kodek seçilir.
+
+Bench zaten XPSNR de ölçüyor (`:775`) — çelişki oradan yakalanabilirdi, ama sayılar
+yan yana okunmuyor ve sıfır puanlı kare sayısı hiç raporlanmıyor.
+
+Sebep bench'in ölçekleme adımı değil: aynı çift `scale` filtresi olmadan yeniden
+ölçüldü, sonuç birebir aynı çıktı (3624 kare, 26 sıfır, aynı kare numaraları,
+ortalama 94,462, harmonik 56,313). Çıktı dosyasının kendisiyle libvmaf arasında
+kalıyor.
