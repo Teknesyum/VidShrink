@@ -1,18 +1,15 @@
 using System.Diagnostics;
+using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
 
 public sealed class QualityMeterTests
 {
-    [Fact]
-    public async Task SameClipComparedToItselfScoresHighVmaf()
+    [FfmpegFact]
+    public async Task IdenticalClipReportsTheModelCeilingInsteadOfAForcedHundred()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-        if (!EncoderCapabilities.Instance.HasFilter("libvmaf")) return;
-
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
+        var dir = NewDir();
         try
         {
             var clip = Path.Combine(dir, "clip.mp4");
@@ -21,49 +18,74 @@ public sealed class QualityMeterTests
             var score = await QualityMeter.MeasureAsync(clip, clip, CancellationToken.None);
 
             Assert.NotNull(score.VmafNegMean);
-            Assert.Equal(100, score.VmafNegMean);
+            Assert.InRange(score.VmafNegMean!.Value, 99.0, 99.999);
             Assert.True(score.Xpsnr is { } selfXpsnr && double.IsPositiveInfinity(selfXpsnr), $"expected infinite self XPSNR, got {score.Xpsnr}");
         }
-        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+        finally { Cleanup(dir); }
     }
 
-    [Fact]
-    public async Task Bt709MetadataOnlyRemuxStaysAtTheCeiling()
+    [FfmpegFact]
+    public async Task TwoNearLosslessRivalsKeepTheirOrderAboveTheCeilingBand()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-        if (!EncoderCapabilities.Instance.HasFilter("libvmaf") || !EncoderCapabilities.Instance.HasFilter("zscale")) return;
+        var dir = NewDir();
+        try
+        {
+            var reference = Path.Combine(dir, "reference.mp4");
+            var rival = Path.Combine(dir, "rival.mp4");
+            await EncodeLavfiAsync(reference, crf: 23);
+            await RunFfmpegAsync(new[] { "-y", "-i", reference, "-c:v", "libx264", "-preset", "veryslow", "-crf", "10", "-pix_fmt", "yuv420p", rival });
 
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
+            var identical = await QualityMeter.MeasureAsync(reference, reference, CancellationToken.None);
+            var reencoded = await QualityMeter.MeasureAsync(reference, rival, CancellationToken.None);
+
+            Assert.NotNull(identical.VmafNegMean);
+            Assert.NotNull(reencoded.VmafNegMean);
+            Assert.True(identical.VmafNegMean > 99.5 && reencoded.VmafNegMean > 99.5,
+                $"both rivals should sit in the near-lossless band ({identical.VmafNegMean} / {reencoded.VmafNegMean})");
+            Assert.True(reencoded.VmafNegMean < identical.VmafNegMean,
+                $"the re-encoded rival must stay below the identical copy ({reencoded.VmafNegMean} vs {identical.VmafNegMean})");
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task Bt709MetadataOnlyRemuxMatchesTheIdenticalCopyScore()
+    {
+        var dir = NewDir();
         try
         {
             var source = Path.Combine(dir, "source.mp4");
             var tagged = Path.Combine(dir, "tagged.mp4");
             await EncodeLavfiAsync(source, crf: 18);
-            await RemuxWithBt709TagsAsync(source, tagged);
+            await RunFfmpegAsync(new[] { "-y", "-i", source, "-map", "0", "-c", "copy", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", tagged });
 
+            var identical = await QualityMeter.MeasureAsync(source, source, CancellationToken.None);
             var score = await QualityMeter.MeasureAsync(source, tagged, CancellationToken.None);
 
             Assert.True(score.Comparable, score.Message);
-            Assert.Equal(100, score.VmafNegMean);
+            Assert.NotNull(identical.VmafNegMean);
+            Assert.NotNull(score.VmafNegMean);
+            Assert.Equal(identical.VmafNegMean!.Value, score.VmafNegMean!.Value, 3);
             Assert.True(score.Xpsnr is { } remuxXpsnr && double.IsPositiveInfinity(remuxXpsnr), $"expected infinite remux XPSNR, got {score.Xpsnr}");
             Assert.Contains("bt709 limited", score.ColorNormalization);
         }
-        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+        finally { Cleanup(dir); }
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task HdrAndTonemappedSdrAreNotComparable()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
+        var dir = NewDir();
         try
         {
             var hdr = Path.Combine(dir, "hdr.mkv");
             var sdr = Path.Combine(dir, "sdr.mkv");
-            await EncodeHdrAndTonemappedPairAsync(hdr, sdr);
+            await EncodeLavfiAsync(sdr, crf: 18);
+            await RunFfmpegAsync(new[]
+            {
+                "-y", "-i", sdr, "-map", "0", "-c", "copy",
+                "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc", hdr
+            });
 
             var score = await QualityMeter.MeasureAsync(hdr, sdr, CancellationToken.None);
 
@@ -72,17 +94,50 @@ public sealed class QualityMeterTests
             Assert.Null(score.Xpsnr);
             Assert.Contains("karşılaştırılamaz", score.Message);
         }
-        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+        finally { Cleanup(dir); }
     }
 
-    [Fact]
+    [TonemapFact]
+    public async Task TonemappedReferenceSeparatesTwoSdrQualities()
+    {
+        var dir = NewDir();
+        try
+        {
+            var hdr = Path.Combine(dir, "hdr.mkv");
+            var high = Path.Combine(dir, "high.mp4");
+            var low = Path.Combine(dir, "low.mp4");
+            await EncodeHdrAsync(hdr);
+            await EncodeTonemappedSdrAsync(hdr, high, new[] { "-crf", "16" });
+            await EncodeTonemappedSdrAsync(hdr, low, new[] { "-b:v", "24k", "-maxrate", "32k", "-bufsize", "64k" });
+
+            var plain = await QualityMeter.MeasureAsync(hdr, high, CancellationToken.None);
+            var highScore = await QualityMeter.MeasureTonemappedReferenceAsync(hdr, high, CancellationToken.None);
+            var lowScore = await QualityMeter.MeasureTonemappedReferenceAsync(hdr, low, CancellationToken.None);
+
+            Assert.False(plain.Comparable);
+
+            Assert.True(highScore.Comparable, highScore.Message);
+            Assert.True(lowScore.Comparable, lowScore.Message);
+            Assert.True(highScore.TonemappedReference && lowScore.TonemappedReference);
+            Assert.NotNull(highScore.VmafNegMean);
+            Assert.NotNull(lowScore.VmafNegMean);
+            Assert.NotNull(highScore.Xpsnr);
+            Assert.NotNull(lowScore.Xpsnr);
+
+            Assert.True(highScore.VmafNegMean > 70,
+                $"tonemapped reference lost alignment with a high quality SDR output ({highScore.VmafNegMean})");
+            Assert.True(lowScore.VmafNegMean < highScore.VmafNegMean - 20,
+                $"tonemapped path is blind to bitrate ({lowScore.VmafNegMean} vs {highScore.VmafNegMean})");
+            Assert.True(lowScore.Xpsnr < highScore.Xpsnr - 3,
+                $"tonemapped XPSNR is blind to bitrate ({lowScore.Xpsnr} vs {highScore.Xpsnr})");
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
     public async Task HeavilyDegradedCopyScoresClearlyLowerThanTheOriginal()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-        if (!EncoderCapabilities.Instance.HasFilter("libvmaf")) return;
-
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
+        var dir = NewDir();
         try
         {
             var reference = Path.Combine(dir, "reference.mp4");
@@ -98,17 +153,13 @@ public sealed class QualityMeterTests
             Assert.True(degradedScore.VmafNegMean < selfScore.VmafNegMean - 20,
                 $"expected the degraded copy to score well below the original ({degradedScore.VmafNegMean} vs {selfScore.VmafNegMean})");
         }
-        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+        finally { Cleanup(dir); }
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task ReferenceAndSampleMayUseDifferentWindowOffsets()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-        if (!EncoderCapabilities.Instance.HasFilter("libvmaf") || !EncoderCapabilities.Instance.HasFilter("zscale")) return;
-
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
+        var dir = NewDir();
         try
         {
             var reference = Path.Combine(dir, "reference.mp4");
@@ -120,46 +171,111 @@ public sealed class QualityMeterTests
 
             Assert.True(score.Comparable, score.Message);
             Assert.True(score.VmafNegMean > 95, $"offset window was not aligned: {score.VmafNegMean}");
+            Assert.NotNull(score.WorstSceneStartSeconds);
+            Assert.InRange(score.WorstSceneStartSeconds!.Value, 1.0, 3.0);
         }
-        finally { try { Directory.Delete(dir, true); } catch { } }
+        finally { Cleanup(dir); }
     }
 
-    private static async Task EncodeLavfiAsync(string outputPath, int crf)
+    [FfmpegFact]
+    public async Task WorstSceneFindsTheDamagedSectionTheMeanHides()
     {
-        var psi = new ProcessStartInfo
+        var dir = NewDir();
+        try
         {
-            FileName = ToolLocator.Ffmpeg,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-        foreach (var arg in new[]
+            var reference = Path.Combine(dir, "reference.mp4");
+            var damaged = Path.Combine(dir, "damaged.mp4");
+            await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=30:duration=8", "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", reference });
+            await RunFfmpegAsync(new[]
+            {
+                "-y", "-i", reference, "-vf", "boxblur=12:3:enable='gte(t,6)'",
+                "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p", damaged
+            });
+
+            var score = await QualityMeter.MeasureAsync(reference, damaged, CancellationToken.None);
+
+            Assert.True(score.Comparable, score.Message);
+            Assert.Equal(QualityMeter.SceneWindowSeconds, score.SceneWindowSeconds);
+            Assert.NotNull(score.VmafNegMean);
+            Assert.NotNull(score.VmafNegWorstScene);
+            Assert.NotNull(score.WorstSceneStartSeconds);
+            Assert.True(score.VmafNegWorstScene < score.VmafNegMean - 10,
+                $"the scene floor did not drop below the clip mean ({score.VmafNegWorstScene} vs {score.VmafNegMean})");
+            Assert.InRange(score.WorstSceneStartSeconds!.Value, 5.0, 7.0);
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [Fact]
+    public void WorstSceneAveragesOverTwoSecondBuckets()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 120; i < 180; i++) scores[i] = 0.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0);
+
+        Assert.Equal(50.0, worst, 6);
+        Assert.Equal(2.0, at, 6);
+    }
+
+    [Fact]
+    public void WorstSceneReportsTheWindowStartOnTheReferenceTimeline()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 360; i < 480; i++) scores[i] = 40.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 12.5);
+
+        Assert.Equal(40.0, worst, 6);
+        Assert.Equal(18.5, at, 6);
+    }
+
+    [Fact]
+    public void WorstSceneFallsBackToTheWholeClipWhenItIsShorterThanOneWindow()
+    {
+        var scores = new[] { 80.0, 60.0, 40.0 };
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0);
+
+        Assert.Equal(60.0, worst, 6);
+        Assert.Equal(0.0, at, 6);
+    }
+
+    private static string NewDir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
+
+    private static void Cleanup(string dir)
+    {
+        try { Directory.Delete(dir, recursive: true); } catch { }
+    }
+
+    private static Task EncodeLavfiAsync(string outputPath, int crf)
+        => RunFfmpegAsync(new[]
         {
             "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=10:duration=2",
             "-c:v", "libx264", "-crf", crf.ToString(), "-pix_fmt", "yuv420p", outputPath
-        }) psi.ArgumentList.Add(arg);
-
-        using var process = new Process { StartInfo = psi };
-        process.Start();
-        var drain = Task.WhenAll(process.StandardOutput.ReadToEndAsync(), process.StandardError.ReadToEndAsync());
-        await process.WaitForExitAsync();
-        await drain;
-
-        Assert.True(File.Exists(outputPath));
-    }
-
-    private static Task RemuxWithBt709TagsAsync(string source, string output)
-        => RunFfmpegAsync(new[] { "-y", "-i", source, "-map", "0", "-c", "copy", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", output });
-
-    private static async Task EncodeHdrAndTonemappedPairAsync(string hdr, string sdr)
-    {
-        await EncodeLavfiAsync(sdr, crf: 18);
-        await RunFfmpegAsync(new[]
-        {
-            "-y", "-i", sdr, "-map", "0", "-c", "copy",
-            "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc", hdr
         });
+
+    private static Task EncodeHdrAsync(string outputPath)
+        => RunFfmpegAsync(new[]
+        {
+            "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=10:duration=3",
+            "-vf", "zscale=min=bt709:tin=bt709:pin=bt709:rin=limited:m=bt2020nc:t=smpte2084:p=bt2020:r=limited,format=yuv420p10le",
+            "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p10le",
+            "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc",
+            outputPath
+        });
+
+    private static Task EncodeTonemappedSdrAsync(string hdrPath, string outputPath, string[] rateControl)
+    {
+        var args = new List<string> { "-y", "-i", hdrPath, "-vf", HdrResolver.TonemapFilter, "-c:v", "libx264" };
+        args.AddRange(rateControl);
+        args.AddRange(new[] { "-pix_fmt", "yuv420p", outputPath });
+        return RunFfmpegAsync(args);
     }
 
     private static async Task RunFfmpegAsync(IEnumerable<string> args)
@@ -175,9 +291,10 @@ public sealed class QualityMeterTests
         foreach (var arg in args) psi.ArgumentList.Add(arg);
         using var process = new Process { StartInfo = psi };
         process.Start();
-        var drain = Task.WhenAll(process.StandardOutput.ReadToEndAsync(), process.StandardError.ReadToEndAsync());
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
         await process.WaitForExitAsync();
-        await drain;
-        Assert.Equal(0, process.ExitCode);
+        await Task.WhenAll(stdout, stderr);
+        Assert.True(process.ExitCode == 0, await stderr);
     }
 }

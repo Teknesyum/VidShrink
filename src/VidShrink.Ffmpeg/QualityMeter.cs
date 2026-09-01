@@ -14,7 +14,11 @@ public sealed record QualityScore(
     double? Ssim,
     bool Comparable = true,
     string? Message = null,
-    string? ColorNormalization = null);
+    string? ColorNormalization = null,
+    double? VmafNegWorstScene = null,
+    double? WorstSceneStartSeconds = null,
+    double? SceneWindowSeconds = null,
+    bool TonemappedReference = false);
 
 public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
 {
@@ -37,7 +41,9 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
             if (!score.Comparable || score.VmafNegMean is null) return null;
             return new VidShrink.Core.WindowQualityMeasurement(
                 referenceStartSeconds, score.VmafNegMean, score.VmafNegHarmonic,
-                score.VmafNegP10, true, watch.ElapsedMilliseconds, score.Message);
+                score.VmafNegP10, true, watch.ElapsedMilliseconds, score.Message,
+                score.VmafNegMin, score.VmafNegWorstScene,
+                score.WorstSceneStartSeconds, score.SceneWindowSeconds);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         catch { return null; }
@@ -103,9 +109,10 @@ public static class QualityMeter
             ? $"HDR referans {VidShrink.Core.HdrResolver.TonemapFilter} ile bt709 limited'a tonemap edildi; test aynı uzaya normalize edildi."
             : NormalizationDescription(reference, test);
 
-        double? vmafMean = null, vmafHarmonic = null, vmafP10 = null, vmafMin = null;
+        var frameRate = test.Fps > 0 ? test.Fps : reference.Fps;
+        VmafAggregate? vmaf = null;
         if (EncoderCapabilities.Instance.HasFilter("libvmaf"))
-            (vmafMean, vmafHarmonic, vmafP10, vmafMin) = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, ct);
+            vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, ct);
 
         double? xpsnr = EncoderCapabilities.Instance.HasFilter("xpsnr")
             ? await MeasureXpsnrAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, ct)
@@ -115,11 +122,17 @@ public static class QualityMeter
             ? await MeasureSsimAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, ct)
             : null;
 
-        return new QualityScore(vmafMean, vmafHarmonic, vmafP10, vmafMin, xpsnr, ssim, true, null, normalization);
+        return new QualityScore(
+            vmaf?.Mean, vmaf?.Harmonic, vmaf?.P10, vmaf?.Min, xpsnr, ssim, true, null, normalization,
+            vmaf?.WorstScene, vmaf?.WorstSceneStartSeconds,
+            vmaf is null ? null : SceneWindowSeconds, tonemapReference);
     }
 
-    private static async Task<(double? Mean, double? Harmonic, double? P10, double? Min)> MeasureVmafAsync(
-        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, CancellationToken ct)
+    private readonly record struct VmafAggregate(
+        double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds);
+
+    private static async Task<VmafAggregate?> MeasureVmafAsync(
+        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, double frameRate, CancellationToken ct)
     {
         var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
         try
@@ -127,7 +140,7 @@ public static class QualityMeter
             var filter = $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={EscapeFilterPath(logPath)}";
             await RunFilterAsync(testPath, referencePath, reference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, filter, ct);
 
-            if (!File.Exists(logPath)) return (null, null, null, null);
+            if (!File.Exists(logPath)) return null;
 
             var scores = new List<double>();
             await using (var stream = File.OpenRead(logPath))
@@ -137,24 +150,44 @@ public static class QualityMeter
                 {
                     var metrics = frame.GetProperty("metrics");
                     if (metrics.TryGetProperty("vmaf", out var v) || metrics.TryGetProperty("vmaf_neg", out v))
-                        scores.Add(NormalizeVmafCeiling(v.GetDouble()));
+                        scores.Add(v.GetDouble());
                 }
             }
 
-            if (scores.Count == 0) return (null, null, null, null);
+            if (scores.Count == 0) return null;
 
             var mean = scores.Average();
             var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
             var sorted = scores.OrderBy(x => x).ToList();
-            var p10 = Percentile(sorted, 10);
-            var min = sorted[0];
-            return (
-                NormalizeVmafCeiling(mean),
-                NormalizeVmafCeiling(harmonic),
-                NormalizeVmafCeiling(p10),
-                NormalizeVmafCeiling(min));
+            var (worstScene, worstSceneStart) = WorstScene(scores, frameRate, referenceStartSeconds ?? 0);
+            return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], worstScene, worstSceneStart);
         }
         finally { TryDelete(logPath); }
+    }
+
+    public const double SceneWindowSeconds = 2.0;
+
+    public static (double Worst, double StartSeconds) WorstScene(
+        IReadOnlyList<double> scores, double frameRate, double offsetSeconds)
+    {
+        var fps = frameRate > 0 ? frameRate : 25.0;
+        var step = Math.Max(1, (int)Math.Round(fps * SceneWindowSeconds));
+        var worst = double.PositiveInfinity;
+        var at = offsetSeconds;
+        for (var i = 0; i < scores.Count; i += step)
+        {
+            var count = Math.Min(step, scores.Count - i);
+            if (count * 2 < step && !double.IsPositiveInfinity(worst)) break;
+            var sum = 0.0;
+            for (var j = 0; j < count; j++) sum += scores[i + j];
+            var mean = sum / count;
+            if (mean < worst)
+            {
+                worst = mean;
+                at = offsetSeconds + i / fps;
+            }
+        }
+        return (worst, at);
     }
 
     private static async Task<double?> MeasureXpsnrAsync(string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, CancellationToken ct)
@@ -188,11 +221,6 @@ public static class QualityMeter
         var frac = rank - lower;
         return sorted[lower] + (sorted[upper] - sorted[lower]) * frac;
     }
-
-    // vmaf_v0.6.1neg reports about 99.87 for identical frames. Treat that
-    // numerical model ceiling as the user-facing perfect score.
-    private static double NormalizeVmafCeiling(double score)
-        => score >= 99.8 ? 100.0 : score;
 
     private static async Task<string> RunFilterAsync(
         string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, string filterChain, CancellationToken ct)
