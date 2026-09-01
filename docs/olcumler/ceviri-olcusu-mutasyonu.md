@@ -21,3 +21,19 @@ Mutasyon geri alındı. Ölçü artık hem kullanıcı metni taşıyan XAML özn
 ## Tanınmayan girdinin kararı
 
 `LanguageCatalog.Validation` tanınmayan motor iletisini artık sessizce İngilizce göstermiyor; `main.validation.untranslated-engine` anahtarıyla açıkça etiketliyor. Aşama satırındaki tanınmayan motor/ffmpeg metni ise teşhis değerini kaybetmemesi için ham biçimde korunuyor; `TaninmayanAsamaHamMotorMetniOlarakKorunur` testi bu bilinçli düşürme yolunu sabitliyor.
+
+## Doğrulama
+
+Sözleşme filtresi:
+
+`LocalizationTests|LanguageTests|PlaybackTests: 37 başarılı, 0 başarısız`
+
+İlk tam süit, T90 kapsamı dışındaki ve T86 tur 2 sözleşmesinde açıkça kayıtlı süreçler arası geçici-dizin yarışında kırmızı oldu:
+
+`Başarısız: 1, Başarılı: 976, Atlanan: 23, Toplam: 1000, Süre: 19 m 25 s`
+
+Kırılan `PerformanceCheckTests.OlcumArtikBirakmiyor` ölçüsü tek başına art arda üç kez çalıştırıldı ve `1 başarılı, 0 başarısız` × 3 verdi. Makine sakin durumdayken tam süit yeniden kapıdan geçirildi:
+
+`Başarısız: 0, Başarılı: 977, Atlanan: 23, Toplam: 1000, Süre: 18 m 28 s`
+
+Kapı sonucu: `başarısız=0 toplam=1000 alt-sınır=974`.
