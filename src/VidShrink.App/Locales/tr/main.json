@@ -327,5 +327,7 @@
   "main.validation.container-video-encoder": "{0} kapsayıcısı seçilen {1} video kodlayıcısını desteklemiyor.",
   "main.validation.container-audio-encoder": "{0} kapsayıcısı seçilen {1} ses kodlayıcısını desteklemiyor.",
   "main.validation.container-video-copy": "{0} kapsayıcısı kaynaktaki {1} video akışını kopyalamayı desteklemiyor.",
-  "main.validation.container-audio-copy": "{0} kapsayıcısı kaynaktaki {1} ses akışını kopyalamayı desteklemiyor."
+  "main.validation.container-audio-copy": "{0} kapsayıcısı kaynaktaki {1} ses akışını kopyalamayı desteklemiyor.",
+  "main.validation.untranslated-engine": "Çevrilmemiş motor iletisi: {0}",
+  "main.playback.encode-marker": "analiz {0}/{1} · deneme {2}"
 }

@@ -209,8 +209,8 @@ internal static class LanguageCatalog
     internal const string TrimFormatError = "Trim times must use HH:MM:SS format.";
 
     /// <summary>
-    /// Motorun iletisini yürürlükteki dile çevirir. Tanınmayan ileti olduğu gibi geçer:
-    /// ffmpeg'in kendi satırı da bu yoldan geliyor ve uydurulmaz.
+    /// Motorun iletisini yürürlükteki dile çevirir. Tanınmayan ileti açık bir
+    /// "çevrilmemiş motor iletisi" etiketiyle gösterilir; sessizce İngilizceye düşmez.
     /// </summary>
     internal static string Validation(string english)
     {
@@ -223,23 +223,16 @@ internal static class LanguageCatalog
                 return Display(Strings.Get(patternKey, match.Groups[1].Value.Trim(), match.Groups[2].Value.Trim()));
         }
 
-        return Title(english, false);
+        return Display(Strings.Get("main.validation.untranslated-engine", english));
     }
 
     /// <summary>
-    /// Oynatma paneli (T82) kendi metnini hâlâ İngilizce dizgeyle taşıyor. Buradaki eşleme
-    /// geçici bir köprüdür: tanınan dizge <c>Locales</c>'teki karşılığına düşer, tanınmayan
-    /// (ffmpeg'in kendi iletisi gibi) olduğu gibi geçer.
-    /// </summary>
-    /// <summary>
-    /// T40 — the encode cursor label on the playback timeline: "analiz 1/2 · deneme 2".
-    /// The numbers arrive from the caller so no counting lives in the translation.
+    /// Oynatma zaman çizgisindeki kodlama imleci. Sayılar çağırandan gelir; metin ve
+    /// sözcük sırası dil alanındaki tek anahtardan okunur.
     /// </summary>
     internal static string EncodeMarker(bool turkish, int pass, int passCount, int attempt)
-    {
-        var text = turkish
-            ? $"analiz {pass}/{passCount} · deneme {attempt}"
-            : $"analysis {pass}/{passCount} · attempt {attempt}";
-        return Title(text, turkish);
-    }
+        => Title(
+            Strings.GetIn(turkish ? "tr" : Strings.FallbackLanguage,
+                "main.playback.encode-marker", pass, passCount, attempt),
+            turkish);
 }
