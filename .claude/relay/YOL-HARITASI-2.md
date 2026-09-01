@@ -59,19 +59,57 @@ yerleşimleri eliyor. 790k'da 720p60 = 0,0143 bppf → elenir; 882x496 = 0,030
 → geçer. **HandBrake'in kazanan dosyası 0,0116 bppf'te koşuyor.** Yani
 tabanımız, rakibin kazandığı yerleşimi aramaya bile başlamadan dışlıyor.
 
+## Dinamiklik ilkesi (kullanıcı, 2026-09-02)
+
+Ürünün farkı **dinamikliktir.** Sabit iki saniyelik pencere gibi statik
+yöntemler yerine içeriğe göre boyutlanan bir işleyiş. Bir sabiti başka bir
+sabitle değiştirmek bu ilkeyi karşılamaz.
+
+İkinci yarısı da bağlayıcı: **hiçbir ayar bilmeyen kullanıcı auto modumuzda
+uzmana yakın sonuç almalı.** Ölçüsü T102'de.
+
+Her sözleşmede sınanacak soru: bu sayı içerikten mi geliyor, yoksa biz mi
+koyduk? Biz koyduysak neye göre?
+
+## HandBrake kaynağı okundu (2026-09-02)
+
+Kullanıcı kaynağı incelemeye yetki verdi; okundu ve karşılaştırıldı.
+
+| Nokta | Onlar | Biz |
+|---|---|---|
+| Anahtar kare | `min-keyint=fps`, `keyint=10*fps`, yeri **sahne kesimi** belirler; eşik `scenecutThreshold=40`, bias GOP yaşıyla büyür | `-g fps*2` sabit (`FfmpegArguments.cs:151`) |
+| CRF'te VBV | dosya kodlamasında **boş** (`encx265.c:514-522`) | sabit 2x maxrate / 4x bufsize (`:143`) |
+| Lookahead | `rc-lookahead` 5→60 kare, **kayan**; SVT lookahead'i minigop yapısından türetir | sabit 2 sn pencere, en çok 3 (`ComplexityProbe.cs:14,18`) |
+| Preset | kullanıcıya yalnız preset adı sorulur; **hedef boyut modu yok** | hedef boyut birincil — bu bizim gerçek farkımız |
+| Çözünürlük | hedef boyuta göre düşürme yok, preset tavanı statik | ölçülmüş üstellerle tam yerleşim araması (`PlanCalculator.cs:622-658`) — **burada öndeyiz** |
+
+Üç kaldıraç çıktı: GOP'u aralığa çevirmek, CRF'te maxrate'i gevşetmek,
+örneklemeyi paket profiline bağlamak. İlk ikisi T98'de, üçüncüsü açılacak.
+
 ## Sözleşmeler
 
 | # | İş | Durum |
 |---|---|---|
-| T89 | plan hesabı, ölçülen kaliteyle + K13 | teslim edildi, denetimde |
-| T92 | yanlışlanamayan ölçü | denetimden GEÇTİ, T89 ile birleşir |
+| T89 | plan hesabı, ölçülen kaliteyle + K13 | **mühürlendi** |
+| T92 | yanlışlanamayan ölçü | **mühürlendi** |
+| T96 | sahne haritası ve kestirim değeri | **mühürlendi** (Spearman 0,976) |
 | T95 | A/B ölçüm düzeneği (`tools/VidShrink.Ab`) | koşuyor |
-| T96 | sahne haritası ve kestirim değeri | koşuyor |
-| T97 | algı ölçüsünün doğruluğu | koşuyor |
+| T97 | algı ölçüsünün doğruluğu | teslim edildi, denetimde |
+| T100 | ölçülen kalitenin kazancı kullanıcıya ulaşmıyor | koşuyor |
+| T101 | haritanın kodlayıcı aktarımı ve kaçırılan kesim | koşuyor |
+| T102 | auto mod — bilmeyen kullanıcı ne alıyor | koşuyor |
 | T94 | HDR düzeltmesinin gerçek kaynakta doğrulanması | `depends: [T89, T95]` |
-| T98 | tepe tavanı + GOP — iki ucuz kaldıraç | `depends: [T89, T95]` |
+| T98 | sabit GOP ve CRF tavanı → dinamikliğe geçiş | `depends: [T89, T95, T96]` |
 | T99 | bppf tabanı kazanan yerleşimi aramıyor | `depends: [T89, T95]` |
-| T100 | ölçülen kalitenin kazancı kullanıcıya ulaşmıyor | `depends: [T89]` |
+
+## T97'nin çıkardığı ölçü hatası
+
+`NormalizeVmafCeiling` (`score >= 99.8 ? 100.0 : score`) yüksek kalitede
+A/B farkını **siliyordu**: özdeş kopya (99,8712) ile crf 10 yeniden kodlama
+(99,8392) ikisi de 100,0000 raporlanıyordu. Kaldırıldı. Denetimde.
+
+8,79 puanlık açık 99,8'in çok altında ölçüldüğü için etkilenmemiş olmalı —
+denetçiye bunu doğrulatıyorum, varsaymıyorum.
 
 ## T89'un çıkardığı kopukluk (T100)
 
