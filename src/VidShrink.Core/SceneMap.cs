@@ -2,7 +2,7 @@ namespace VidShrink.Core;
 
 public readonly record struct SceneScore(double Time, double Score);
 
-public readonly record struct SourcePacket(double Time, long Size);
+public readonly record struct ProbeFrame(double Time, long Size);
 
 public sealed record Scene
 {
@@ -19,7 +19,7 @@ public sealed record Scene
 
 public sealed record SceneMap
 {
-    public const double DefaultThreshold = 0.3;
+    public const double DefaultThreshold = 0.2;
     public const double DefaultMinSceneSeconds = 1.0;
 
     public required double Threshold { get; init; }
@@ -49,11 +49,11 @@ public sealed record SceneMap
         double duration,
         IReadOnlyList<SceneScore> candidates,
         double threshold,
-        IReadOnlyList<SourcePacket> packets,
+        IReadOnlyList<ProbeFrame> frames,
         double minSceneSeconds = DefaultMinSceneSeconds)
     {
         ArgumentNullException.ThrowIfNull(candidates);
-        ArgumentNullException.ThrowIfNull(packets);
+        ArgumentNullException.ThrowIfNull(frames);
         if (!double.IsFinite(duration) || duration <= 0)
             throw new ArgumentOutOfRangeException(nameof(duration));
 
@@ -62,10 +62,10 @@ public sealed record SceneMap
         bounds.Add(duration);
 
         var bits = new long[bounds.Count - 1];
-        foreach (var packet in packets)
+        foreach (var frame in frames)
         {
-            if (packet.Time < 0 || packet.Time >= duration) continue;
-            bits[SegmentIndex(bounds, packet.Time)] += packet.Size * 8;
+            if (frame.Time < 0 || frame.Time >= duration) continue;
+            bits[SegmentIndex(bounds, frame.Time)] += frame.Size * 8;
         }
 
         var meanBps = bits.Sum() / duration;

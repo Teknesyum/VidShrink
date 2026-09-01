@@ -68,20 +68,38 @@ public sealed class SceneMapTests
     }
 
     [Fact]
-    public void Build_PaketleriSahnelereBolerVeKarmasikligiHesaplar()
+    public void ParseVstats_YalnizKodlayiciCiktisiniOkur()
+    {
+        var vstats = string.Join('\n',
+            "out=  0 st=  0 frame=     0 q= -0.0 f_size= 172800 s_size=      168KiB time= 0.500 br= 2764800.0kbits/s avg_br= 2764800.0kbits/s",
+            "out=  1 st=  0 frame=     0 q= 39.0 f_size=  49452 s_size=       48KiB time= 0.010 br= 23737.0kbits/s avg_br= 23737.0kbits/s type= I",
+            "out=  1 st=  0 frame=     1 q= 30.0 f_size=   1200 s_size=       49KiB time= 0.027 br= 384.0kbits/s avg_br= 12000.0kbits/s type= P",
+            "");
+
+        var frames = SceneDetector.ParseVstats(vstats);
+
+        Assert.Equal(2, frames.Count);
+        Assert.Equal(0.010, frames[0].Time, 6);
+        Assert.Equal(49452, frames[0].Size);
+        Assert.Equal(0.027, frames[1].Time, 6);
+        Assert.Equal(1200, frames[1].Size);
+    }
+
+    [Fact]
+    public void Build_KareleriSahnelereBolerVeKarmasikligiHesaplar()
     {
         var candidates = new[] { new SceneScore(4.0, 0.9) };
-        var packets = new[]
+        var frames = new[]
         {
-            new SourcePacket(0.0, 1000),
-            new SourcePacket(2.0, 3000),
-            new SourcePacket(4.0, 5000),
-            new SourcePacket(9.9, 7000),
-            new SourcePacket(10.0, 9999),
-            new SourcePacket(-1.0, 9999)
+            new ProbeFrame(0.0, 1000),
+            new ProbeFrame(2.0, 3000),
+            new ProbeFrame(4.0, 5000),
+            new ProbeFrame(9.9, 7000),
+            new ProbeFrame(10.0, 9999),
+            new ProbeFrame(-1.0, 9999)
         };
 
-        var map = SceneMap.Build(10.0, candidates, 0.5, packets);
+        var map = SceneMap.Build(10.0, candidates, 0.5, frames);
 
         Assert.Equal(2, map.Scenes.Count);
         Assert.Equal(0.0, map.Scenes[0].Start);
@@ -106,7 +124,7 @@ public sealed class SceneMapTests
             new SceneScore(8.25, 0.8)
         };
 
-        var map = SceneMap.Build(20.0, candidates, 0.5, Array.Empty<SourcePacket>());
+        var map = SceneMap.Build(20.0, candidates, 0.5, Array.Empty<ProbeFrame>());
 
         Assert.Equal(4, map.Scenes.Count);
         Assert.Equal(0.0, map.Scenes[0].Start);
@@ -156,9 +174,8 @@ public sealed class SceneMapTests
             var cut = Assert.Single(cuts);
             Assert.InRange(cut, 1.8, 2.2);
 
-            var packets = await SceneDetector.ReadPacketsAsync(clip);
-            Assert.NotEmpty(packets);
-            Assert.All(packets, p => Assert.InRange(p.Time, -0.5, 4.5));
+            Assert.NotEmpty(scan.Frames);
+            Assert.All(scan.Frames, f => Assert.InRange(f.Time, -0.5, 4.5));
 
             var (map, elapsed) = await SceneDetector.BuildMapAsync(clip, 4.0, 0.4);
             Assert.Equal(2, map.Scenes.Count);

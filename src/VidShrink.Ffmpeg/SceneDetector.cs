@@ -4,51 +4,73 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed record SceneScan(bool Ok, IReadOnlyList<SceneScore> Candidates, TimeSpan Elapsed, string Error);
+public sealed record SceneScan(
+    bool Ok,
+    IReadOnlyList<SceneScore> Candidates,
+    IReadOnlyList<ProbeFrame> Frames,
+    TimeSpan Elapsed,
+    string Error);
 
 public static class SceneDetector
 {
     public const double BaseThreshold = 0.05;
+    public const int ProbeWidth = 640;
+    public const int ProbeCrf = 23;
+    public const string ProbePreset = "ultrafast";
 
-    public static string[] ScanArgs(string path, double baseThreshold = BaseThreshold)
+    public static string[] ScanArgs(string path, string vstatsPath, double baseThreshold = BaseThreshold)
         => new[]
         {
             "-hide_banner", "-loglevel", "info", "-nostats",
             "-i", path,
-            "-vf", FormattableString.Invariant($"select='gte(scene,{baseThreshold:0.###})',metadata=print"),
-            "-an", "-sn", "-f", "null", "-"
+            "-filter_complex", FormattableString.Invariant(
+                $"[0:v]split=2[a][b];[a]select='gte(scene,{baseThreshold:0.###})',metadata=print[sc];[b]scale={ProbeWidth}:-2[enc]"),
+            "-map", "[sc]", "-f", "null", "-",
+            "-map", "[enc]", "-an",
+            "-c:v", "libx264", "-preset", ProbePreset, "-crf", ProbeCrf.ToString(CultureInfo.InvariantCulture),
+            "-vstats_file", vstatsPath,
+            "-f", "null", "-"
         };
 
     public static async Task<SceneScan> ScanAsync(string path, double baseThreshold = BaseThreshold, CancellationToken ct = default)
     {
         var clock = Stopwatch.StartNew();
+        var vstatsPath = Path.Combine(Path.GetTempPath(), $"vidshrink-sahne-{Guid.NewGuid():N}.log");
         Process process;
         try
         {
-            process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, ScanArgs(path, baseThreshold)) };
+            process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, ScanArgs(path, vstatsPath, baseThreshold)) };
             process.Start();
         }
         catch (Exception ex)
         {
             clock.Stop();
-            return new SceneScan(false, Array.Empty<SceneScore>(), clock.Elapsed, ex.Message);
+            return new SceneScan(false, Array.Empty<SceneScore>(), Array.Empty<ProbeFrame>(), clock.Elapsed, ex.Message);
         }
 
-        using (process)
-        using (ct.Register(() => TryKill(process)))
+        try
         {
-            var stdout = process.StandardOutput.ReadToEndAsync();
-            var stderr = process.StandardError.ReadToEndAsync();
-            await process.WaitForExitAsync(CancellationToken.None);
-            _ = await stdout;
-            var log = await stderr;
-            clock.Stop();
-            ct.ThrowIfCancellationRequested();
+            using (process)
+            using (ct.Register(() => TryKill(process)))
+            {
+                var stdout = process.StandardOutput.ReadToEndAsync();
+                var stderr = process.StandardError.ReadToEndAsync();
+                await process.WaitForExitAsync(CancellationToken.None);
+                _ = await stdout;
+                var log = await stderr;
+                clock.Stop();
+                ct.ThrowIfCancellationRequested();
 
-            if (process.ExitCode != 0)
-                return new SceneScan(false, Array.Empty<SceneScore>(), clock.Elapsed, FfmpegRunner.Tail(log));
+                if (process.ExitCode != 0)
+                    return new SceneScan(false, Array.Empty<SceneScore>(), Array.Empty<ProbeFrame>(), clock.Elapsed, FfmpegRunner.Tail(log));
 
-            return new SceneScan(true, ParseScores(log), clock.Elapsed, string.Empty);
+                var vstats = File.Exists(vstatsPath) ? await File.ReadAllTextAsync(vstatsPath, CancellationToken.None) : string.Empty;
+                return new SceneScan(true, ParseScores(log), ParseVstats(vstats), clock.Elapsed, string.Empty);
+            }
+        }
+        finally
+        {
+            try { File.Delete(vstatsPath); } catch (IOException) { }
         }
     }
 
@@ -80,31 +102,22 @@ public static class SceneDetector
         return scores;
     }
 
-    public static async Task<IReadOnlyList<SourcePacket>> ReadPacketsAsync(string path, CancellationToken ct = default)
+    public static IReadOnlyList<ProbeFrame> ParseVstats(string vstats)
     {
-        var args = new[]
+        var frames = new List<ProbeFrame>();
+        foreach (var raw in vstats.Split('\n'))
         {
-            "-v", "error", "-select_streams", "v:0",
-            "-show_entries", "packet=pts_time,size",
-            "-of", "csv=p=0",
-            path
-        };
+            var line = raw.TrimEnd('\r');
+            if (line.Length == 0) continue;
+            if (!TryField(line, "out=", out var outIndex) || outIndex != "1") continue;
+            if (!TryField(line, "f_size=", out var sizeToken)) continue;
+            if (!TryField(line, "time=", out var timeToken)) continue;
 
-        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
-        process.Start();
-        using var cancellationRegistration = ct.Register(() => TryKill(process));
-
-        var stdout = process.StandardOutput.ReadToEndAsync();
-        var stderr = process.StandardError.ReadToEndAsync();
-        await process.WaitForExitAsync(CancellationToken.None);
-        var csv = await stdout;
-        _ = await stderr;
-        ct.ThrowIfCancellationRequested();
-
-        if (process.ExitCode != 0) return Array.Empty<SourcePacket>();
-        return ComplexityProbe.ParsePackets(csv)
-            .Select(p => new SourcePacket(p.PtsSeconds, p.Size))
-            .ToList();
+            if (long.TryParse(sizeToken, NumberStyles.Integer, CultureInfo.InvariantCulture, out var size)
+                && double.TryParse(timeToken, NumberStyles.Float, CultureInfo.InvariantCulture, out var time))
+                frames.Add(new ProbeFrame(time, size));
+        }
+        return frames;
     }
 
     public static async Task<(SceneMap Map, TimeSpan Elapsed)> BuildMapAsync(
@@ -113,12 +126,18 @@ public static class SceneDetector
         double threshold = SceneMap.DefaultThreshold,
         CancellationToken ct = default)
     {
-        var clock = Stopwatch.StartNew();
         var scan = await ScanAsync(path, ct: ct);
         if (!scan.Ok) throw new InvalidOperationException($"Sahne taramasi basarisiz: {scan.Error}");
-        var packets = await ReadPacketsAsync(path, ct);
-        clock.Stop();
-        return (SceneMap.Build(duration, scan.Candidates, threshold, packets), clock.Elapsed);
+        return (SceneMap.Build(duration, scan.Candidates, threshold, scan.Frames), scan.Elapsed);
+    }
+
+    private static bool TryField(string line, string key, out string value)
+    {
+        value = string.Empty;
+        var at = line.IndexOf(key, StringComparison.Ordinal);
+        if (at < 0) return false;
+        value = FirstToken(line[(at + key.Length)..]);
+        return value.Length > 0;
     }
 
     private static string FirstToken(string text)
