@@ -1246,7 +1246,7 @@ public partial class MainWindow : Window
     internal void ApplyHardwareVerdict(IEncoderAvailability? encoders, bool available, HardwareVerdict verdict)
     {
         _encoders = encoders;
-        _preview.Availability = encoders;
+        if (_preview is not null) _preview.Availability = encoders;
         _hardwareProbed = true;
         _hardwareEncoderAvailable = available;
         _hardwareVerdict = verdict;
