@@ -1,0 +1,27 @@
+{
+  "contractId": "T87",
+  "auditorRunId": "a6e4d35270d6738df",
+  "headSha": "8a2de1482152fd327e350a77edc63f7488d88352",
+  "diffHash": "9f546ba9d23572de448e9767bd24aa63fb52a54f2e6603ff29560f4ecfd192d5",
+  "owns": [
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "src/VidShrink.Core/HdrResolver.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/FfmpegArgumentsTests.cs",
+    "tests/VidShrink.Tests/HdrArgumentsTests.cs",
+    "docs/olcumler/tepe-tavani-ve-psy.md",
+    "tools/VidShrink.Bench/Program.cs",
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "src/VidShrink.App/Playback/SegmentEncoder.cs",
+    "tests/VidShrink.Tests/HardwareRateControlTests.cs",
+    "src/VidShrink.Core/PreviewSegment.cs",
+    "src/VidShrink.Ffmpeg/CalibrationProbe.cs"
+  ],
+  "verification": [
+    "Tur 3 GECTI. I1 (KRITIK): uc yeni olcu FfmpegArgumentsTests.cs:319-390; denetci formulu kagitta izledi (FfmpegArguments.cs:92-97, opening=(r-6.0)/5.4, Clamp(1.02+0.08*opening,1.02,1.10)). Beklentilerin hicbiri TightPeakFactor/HardwarePeakCeiling sabitlerinden okunmuyor, olculmus literal kullanilmis — dolayisiyla HardwarePeakCeiling 1.10->1.20 yonu de yakalaniyor. At(5.3)<=1.02 tautoloji degil: diz one cekilirse 1,048 verir ve kirilir. Mutasyon tablosunun dort satiri aritmetikle tuttu: 11.4->7.0 => 2, 6.0->2.0 => 4, opening ters => 6, Clamp ust siniri double.MaxValue => 5 (eski testin uc InlineData'sindan yalniz av1_nvenc 1280x720@60/4200k, oran 11,9 -> 1,1074). I2: PanelHost.cs:224 ve SegmentEncoder.cs:214 tek Describe yolundan geciyor, MainWindow.axaml.cs:1249 yetenegi _preview'e veriyor. I3: EncoderCapabilities.Instance dosyada tam bir kez, Task.Run icinde (MainWindow.axaml.cs:1216). I4: uc cumlenin metni okundu, duzenlenmis halde ayakta duran gizli iddia yok; 63/63 satiri yerinde ama hemen altinda 63/2/65 duzeltmesi var. I5/owns: git diff --name-only sekiz dosya, sekizi de owns icinde; TipSources.cs degismemis. Kosum: filtre 65/67, atlanan 2 (HardwareRateControlTests LiveSourceTheory), kesinti/iptal satiri yok; I1'in uc olcusu FfmpegArgumentsTests icinde ve kostu. CI 33545797054 (5ae9a89) success: Failed: 0, Passed: 924, Skipped: 72, Total: 996; kapi toplam=996 alt-sinir=950. -warnaserror duzeltmesi susturma degil: MainWindow.axaml.cs:1249 'if (_preview is not null)' kullanmis, null-forgiving yok. Bes borc yazildi; en agiri eski tautoloji Donanim_tepe_carpani_boyut_guvencesi_tavanini_asmaz (FfmpegArgumentsTests.cs:212-223) hala yanlislanamaz halde duruyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T19:11:28.845Z",
+  "usedAt": "2026-09-01T19:11:39.433Z",
+  "completedSha": "8a2de1482152fd327e350a77edc63f7488d88352"
+}

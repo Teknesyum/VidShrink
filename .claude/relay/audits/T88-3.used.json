@@ -1,0 +1,25 @@
+{
+  "contractId": "T88",
+  "auditorRunId": "a1576e0a956e4df31",
+  "headSha": "a8efc4fe8aacd162b254557c07ef3e6f65196e35",
+  "diffHash": "0d7bfb245c6f6537af9616edc39a67b1940d97f81cb6af43d4a7227bed0d9062",
+  "owns": [
+    "src/VidShrink.Ffmpeg/ComplexityProbe.cs",
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "src/VidShrink.Core/IQualityMeasurement.cs",
+    "src/VidShrink.Core/ProbeResult.cs",
+    "tests/VidShrink.Tests/ComplexityProbeTests.cs",
+    "tests/VidShrink.Tests/QualityMeterTests.cs",
+    "docs/olcumler/ornekte-vmaf-maliyeti.md",
+    "tools/VidShrink.Bench/Program.cs",
+    "src/VidShrink.Core/ComplexityProfile.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs"
+  ],
+  "verification": [
+    "Tur 3 GECTI (borcla). J1 KRITIK kapandi: ornekleme dongusu VMAF olcuyor, koprue IQualityMeasurement uzerinden kuruldu, ComplexityProbe artik ProbeResult'a olculen kaliteyi tasiyor. J2: bayt birimi tekleşti, MiB/MB karisikligi kalkti; docs/olcumler/ornekte-vmaf-maliyeti.md tablosu ham kosum gunlukleriyle birebir. J3: dort mutasyon uretim davranisini boziyor, testin sabitini degil. J4: main taban sutunu duzeltildi — main de iki birim karistiriyordu, eski sutun yanlis referansti. J5: T89 devri yazildi. Esik kaymasi (DefaultMotionExponent 0.25 sinirinda) BORC olarak kabul edildi, KRITIK degil: uc gerekce olculmus — main hicbir zaman dogru taban degildi (fiziksel gercek 0.242'ye gore main -0.064, yeni +0.080), tur 3 birim degisimini acikca yetkilendirdi ve farkin olculup raporlanmasini emretti, girdi sinira 0.008 uzakta yani hicbir birim secimi kararli taraf vermiyor. owns: diff sekiz dosyaya dokunuyor, hepsi owns icinde. Kosum: dar filtre yesil; denetci tam suiti kosturmadi (paralel ajan var). Dalın kendi CI kaniti eski tabandan geliyordu, bu yuzden claim CI'ya dayandirilmadi; birlesme sonrasi main c92c7a4 uzerinde CI 33551378153 success. Kalan borclar T89'a devredildi: sistematik sapma (Matroska dosya basi 1441-1562 B yarim-kare tarafinda iki kez yukleniyor, ReferenceBppf %21-27 sisiyor) ve olcum duzeneginin tools/VidShrink.Bench'e tasinmasi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T19:59:55.609Z",
+  "usedAt": "2026-09-01T20:00:21.706Z",
+  "completedSha": "a8efc4fe8aacd162b254557c07ef3e6f65196e35"
+}
