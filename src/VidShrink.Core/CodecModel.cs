@@ -6,8 +6,8 @@ public enum EncoderVendor { Software, Nvenc, Qsv, Amf }
 
 public static class CodecModel
 {
-    public const double QualityAtReference = 93.0;
-    public const double QualityPerHalving = 6.0;
+    public const double PriorQualityAtReference = 93.0;
+    public const double PriorQualityPerHalving = 6.0;
     public const double DetailConcentrationExponent = 0.25;
     public const double FpsBitrateExponent = 0.75;
     public const double ScalePenaltyScale = 10.0;

@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IHdr10EncoderAvailability
+public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup, IHdr10EncoderAvailability
 {
     private static readonly Lazy<EncoderCapabilities> LazyInstance = new(Load);
 
@@ -29,9 +29,24 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
 
     public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
 
+    /// <summary>
+    /// Isıtılmış sonucu okur. Süreç doğurmaz: argüman üretimi bu yolu kullanıyor ve saf
+    /// kalması gerekiyor. Hiç ısıtılmamış bir seçenek desteklenmiyor sayılır; ölçüm
+    /// <see cref="WarmEncoderOption"/> ile arka planda yapılır.
+    /// </summary>
     public bool SupportsEncoderOption(string codec, string option, string value)
     {
-        var key = $"{codec}\0{option}\0{value}";
+        lock (_encoderOptions)
+            return _encoderOptions.TryGetValue(OptionKey(codec, option, value), out var cached) && cached;
+    }
+
+    /// <summary>
+    /// Seçeneği bir kez ffmpeg'e sorup sonucu süreç ömrü boyunca saklar. Süreç doğuran tek
+    /// seçenek yolu burasıdır; çağıran tarafın arka planda koşturması gerekir.
+    /// </summary>
+    public bool WarmEncoderOption(string codec, string option, string value)
+    {
+        var key = OptionKey(codec, option, value);
         lock (_encoderOptions)
         {
             if (_encoderOptions.TryGetValue(key, out var cached)) return cached;
@@ -40,6 +55,8 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
             return supported;
         }
     }
+
+    private static string OptionKey(string codec, string option, string value) => $"{codec}\0{option}\0{value}";
 
     public string? Hdr10PixelFormat(string codec)
     {
