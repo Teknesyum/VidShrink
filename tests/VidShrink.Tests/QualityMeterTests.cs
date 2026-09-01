@@ -21,7 +21,56 @@ public sealed class QualityMeterTests
             var score = await QualityMeter.MeasureAsync(clip, clip, CancellationToken.None);
 
             Assert.NotNull(score.VmafNegMean);
-            Assert.True(score.VmafNegMean >= 95, $"expected VMAF NEG >= 95, got {score.VmafNegMean}");
+            Assert.Equal(100, score.VmafNegMean);
+            Assert.True(score.Xpsnr is { } selfXpsnr && double.IsPositiveInfinity(selfXpsnr), $"expected infinite self XPSNR, got {score.Xpsnr}");
+        }
+        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+    }
+
+    [Fact]
+    public async Task Bt709MetadataOnlyRemuxStaysAtTheCeiling()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+        if (!EncoderCapabilities.Instance.HasFilter("libvmaf") || !EncoderCapabilities.Instance.HasFilter("zscale")) return;
+
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var source = Path.Combine(dir, "source.mp4");
+            var tagged = Path.Combine(dir, "tagged.mp4");
+            await EncodeLavfiAsync(source, crf: 18);
+            await RemuxWithBt709TagsAsync(source, tagged);
+
+            var score = await QualityMeter.MeasureAsync(source, tagged, CancellationToken.None);
+
+            Assert.True(score.Comparable, score.Message);
+            Assert.Equal(100, score.VmafNegMean);
+            Assert.True(score.Xpsnr is { } remuxXpsnr && double.IsPositiveInfinity(remuxXpsnr), $"expected infinite remux XPSNR, got {score.Xpsnr}");
+            Assert.Contains("bt709 limited", score.ColorNormalization);
+        }
+        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+    }
+
+    [Fact]
+    public async Task HdrAndTonemappedSdrAreNotComparable()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var hdr = Path.Combine(dir, "hdr.mkv");
+            var sdr = Path.Combine(dir, "sdr.mkv");
+            await EncodeHdrAndTonemappedPairAsync(hdr, sdr);
+
+            var score = await QualityMeter.MeasureAsync(hdr, sdr, CancellationToken.None);
+
+            Assert.False(score.Comparable);
+            Assert.Null(score.VmafNegMean);
+            Assert.Null(score.Xpsnr);
+            Assert.Contains("karşılaştırılamaz", score.Message);
         }
         finally { try { Directory.Delete(dir, recursive: true); } catch { } }
     }
@@ -75,5 +124,37 @@ public sealed class QualityMeterTests
         await drain;
 
         Assert.True(File.Exists(outputPath));
+    }
+
+    private static Task RemuxWithBt709TagsAsync(string source, string output)
+        => RunFfmpegAsync(new[] { "-y", "-i", source, "-map", "0", "-c", "copy", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", output });
+
+    private static async Task EncodeHdrAndTonemappedPairAsync(string hdr, string sdr)
+    {
+        await EncodeLavfiAsync(sdr, crf: 18);
+        await RunFfmpegAsync(new[]
+        {
+            "-y", "-i", sdr, "-map", "0", "-c", "copy",
+            "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc", hdr
+        });
+    }
+
+    private static async Task RunFfmpegAsync(IEnumerable<string> args)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = ToolLocator.Ffmpeg,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var arg in args) psi.ArgumentList.Add(arg);
+        using var process = new Process { StartInfo = psi };
+        process.Start();
+        var drain = Task.WhenAll(process.StandardOutput.ReadToEndAsync(), process.StandardError.ReadToEndAsync());
+        await process.WaitForExitAsync();
+        await drain;
+        Assert.Equal(0, process.ExitCode);
     }
 }

@@ -1,6 +1,6 @@
 # HandBrake kalite açığı ölçümü
 
-Tarih: 2026-08-31. Sonuç kısa haliyle içerik bağımlı: eş boyutta SDR'de VidShrink, HandBrake'ten **65,9–69,9 VMAF-NEG puanı daha iyi**; HDR'de ise HandBrake **63,1–64,8 puan daha iyi**. En kötü fark HDR 1/2 hedefinde HandBrake lehine **64,77 puan**. HDR farkı kodlayıcı veriminden çok VidShrink'in HDR'yi SDR'ye tonemap etmesidir; bu iki renk uzayını kaynak HDR'ye karşı ölçmek sıkıştırma kalitesini tek başına anlatmaz.
+Tarih: 2026-09-01. Önceki eş-boyut kalite tablosu renk/aralık düzeneği bozuk olduğu için geçersizdir. Gerçek 17 dakikalık HDR kaynakla düzeltilmiş tam ölçümde HandBrake VMAF-NEG 48,96; eski VidShrink çıktısı aynı tonemap referansına karşı 40,17 verdi. Sıkıştırma farkı 8,79 puandır; HDR→SDR renk kaybı ayrı tutulur ve iki renk uzayı doğrudan puanlanmaz.
 
 ## Düzen ve eksikler
 
@@ -30,6 +30,8 @@ Böylece dört imza birlikte yeniden üretildi: **`av1_nvenc`**, **882×496**, *
 Geçici ölçüm yolu `tools/VidShrink.Bench shrink` komutuna yalnız deney için `--speed fast`, `--no-resolution-drop`, `--no-fps-drop`, `--force-codec libx265`, `--wide-peak` ve kodlama açmadan komutu yazdıran `--plan-only` anahtarları eklenerek açıldı. Eksik kaynağın plan imzasını sınamak için `--source-size` ve `--source-mb` yalnız plan metadata'sını değiştirdi. `--wide-peak`, son ffmpeg seçenekleri olarak `-maxrate=1.5×` ve `-bufsize=2×` yazar; yazılım sabitlemesinden bağımsızdır. Kalıcı motor koduna dokunulmadı.
 
 ## Eş boyut sonuçları
+
+> **GEÇERSİZ DÜZENEK (2026-09-01):** Aşağıdaki tarihsel tablo silinmedi, ancak kalite sonucu olarak kullanılamaz. Etiketsiz kaynak ile bt709 etiketli çıktı farklı aralık varsayımlarıyla karşılaştırıldığı için XPSNR, hedef boyut on kat değişirken 14,86 / 14,78 / 14,67 düzeyinde sabit kaldı. Bu sabit hata sıkıştırmadan değil renk/aralık kurulumundan geliyordu.
 
 Boyutlar gerçek dosya boyutudur. Her HandBrake çıktısı karşısındaki VidShrink çıktısının ±%2'sindedir. Süre, yalnız kodlama duvar saatidir; VMAF/XPSNR ölçümü hariçtir. VMAF sütunu harmonik VMAF-NEG, parantez içi p10'dur.
 
@@ -96,7 +98,7 @@ En düşük HandBrake VMAF'larından biri SDR 1/20'de kare 193, yaklaşık 6,433
 
 ## HandBrake'ten alınabilecekler — değer sırası
 
-1. **HDR10'u korumak.** Ölçülen en büyük açık bu: HandBrake x265 Main10 ile PQ/BT.2020'yi korurken hızlı `av1_nvenc` yolu hable/bt709'a düşüyor. Öncelik kodlayıcı veriminden yüksek.
+1. **HDR10'u korumak — düzeltildi.** HandBrake x265 Main10 ile PQ/BT.2020'yi korurken eski hızlı `av1_nvenc` yolu hable/bt709'a düşüyordu. Ölçülmüş 10-bit kodlayıcı yeteneğine dayanan yeni yol PQ/BT.2020'yi koruyor; destek yoksa görünür `HdrTonemapped` nedeni ile güvenli düşüş sürüyor.
 2. **Çözünürlük/FPS kararını birlikte kaliteyle sınamak.** Bu sentetik SDR klipte VidShrink'in çözünürlük düşürmesi HandBrake'in 1080p korumasını ezdi; fakat yalnız çözünürlüğü kapatmak 10 fps üretip 50 VMAF kaybetti. Tek ekseni sabitlemek doğru çözüm değil.
 3. **Daha uzun GOP.** VidShrink `-g fps×2`; HandBrake/x265 logu 30/300 anahtar kare aralığı gösterdi. Düşük bit hızında seyrek I-kare potansiyel kazançtır ve ayrı ölçülmelidir.
 4. **Psikogörsel kodlayıcı ayarları.** HandBrake x265 `psy-rd=2`, `psy-rdoq=1` ve AQ mode 2 kullanıyor; VidShrink özel psy parametresi üretmiyor. Mainline SVT-AV1 için taramadaki `enable-variance-boost=1:variance-boost-strength=2:ac-bias=1.0:qp-scale-compress-strength=1` gerçek kodlamada stderr ile doğrulandı: `Variance Boost strength ... 2`, `QP scale compress strength: 1`, `AC Bias Strength: 1.00`. Buna karşılık `zzznotreal=1` denemesi **çıkış kodu 0** verdi ama stderr `Error parsing option zzznotreal: 1.` yazdı. Yetenek kontrolü dönüş koduyla yapılamaz.
@@ -105,6 +107,52 @@ En düşük HandBrake VMAF'larından biri SDR 1/20'de kare 193, yaklaşık 6,433
 7. **Ses kararı.** Bu iki kaynak sessizdi ve iki araçta ses kapatıldı; şikâyet dosyasında HandBrake'in daha yüksek ses bütçesi kullandığı biliniyor. Görüntü hedef bütçesini doğrudan etkiler ama bu koşumda ölçülemedi.
 
 Altyazı, bölüm işareti, kuyruk ve kap seçenekleri kalite ekseni olmadığı için bu listeye alınmadı.
+
+## Düzeltilmiş gerçek-kaynak sonucu (2026-09-01)
+
+Önceki eş-boyut tablosunun sonucu geçersizdir; renk ve aralık düzeneği bozuktu. Yeni referans `.calisma/kaynak/kaynak-1080p60-hdr-17dk.mp4`: 1.729.085.563 bayt, 1036,17 saniye, 1920×1080@60, HEVC Main 10, 13.148 kbps, PQ (`smpte2084`) / BT.2020 (`bt2020`/`bt2020nc`). İlk iki saniyede mastering-display veya MaxCLL/MaxFALL yan verisi yoktur; dolayısıyla taşınacak statik HDR metadata'sı gözlenmedi. 117 MiB hedef yaklaşık 14,1:1 ikili oranla `Aggressive` rejimidir.
+
+`trash/` altındaki HandBrake ve eski VidShrink çıktıları birbirinin %2,1'i içinde olduğundan gerçek eş-boyut referans çifti olarak kullanıldı. Bütün 62 bin kareyi kapsayan ölçüm:
+
+| Karşılaştırma | VMAF-NEG ort. | Harmonik | p10 | XPSNR | SSIM | Yorum |
+|---|---:|---:|---:|---:|---:|---|
+| HandBrake HDR ↔ kaynak HDR | 48,96 | 34,59 | 33,16 | 29,67 | 0,8925 | Aynı PQ/BT.2020 uzayı |
+| Eski VidShrink SDR ↔ kaynak HDR | — | — | — | — | — | Karşılaştırılamaz; renk kaybı ayrı olgu |
+| Eski VidShrink SDR ↔ aynı hable ile tonemap edilmiş kaynak | 40,17 | 24,41 | 18,56 | 27,07 | 0,8626 | Yalnız sıkıştırma tarafı |
+
+Tonemap hizalı sıkıştırma farkı HandBrake lehine ortalamada **8,79**, harmonikte **10,18**, p10'da **14,60 VMAF-NEG**; XPSNR'da **2,60 dB**, SSIM'de **0,0299**. HDR→SDR renk kaybı bu sayılara karıştırılmadı ve tek bir kalite puanına indirgenmedi.
+
+### QualityMeter renk doğrulaması
+
+Her iki giriş `ffprobe` ile okunuyor. SDR'de etiketsiz `yuv420p` için açıkça bt709 limited varsayılıyor ve iki kol da aynı `zscale` renk/aralık zincirine sokuluyor. HDR ve SDR doğrudan karşılaştırılmak istenirse metrikler boş dönüyor ve “karşılaştırılamaz” açıklaması veriliyor. Sıkıştırmayı ayrı ölçmek için referansa motorun birebir `HdrResolver.TonemapFilter` zincirini uygulayan yol kullanıldı.
+
+Aynı dosyanın kendisiyle testi ve yalnız bt709 etiketleri eklenmiş metadata-remux testi ham model tavanı yaklaşık 99,87 olan sonucu kullanıcıya **VMAF 100**, XPSNR `inf` olarak verdi. Böylece yalnız etiket farkının kaliteyi düşürmediği doğrulandı.
+
+### HDR motor düzeltmesi
+
+Kodlayıcı adı listesine güvenmek yerine gerçek bir kare kodlanarak 10-bit HDR piksel biçimi ölçülüyor. Bu makinede `av1_nvenc` için `p010le` başarılı olduğundan hızlı yol artık tonemap etmiyor. Gerçek varsayılan komutun belirleyici bölümü:
+
+```text
+-vf scale=882:496:flags=lanczos -c:v av1_nvenc -pix_fmt p010le
+-b:v 790k -maxrate 805k -bufsize 821k -g 120
+-color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc
+```
+
+Kaynağın üç saniyelik gerçek kodlama örneğini `ffprobe`, `yuv420p10le`, `bt2020`, `smpte2084`, `bt2020nc` olarak okudu; filtrede tonemap yoktur. Kodlayıcı ölçümünde 10-bit desteği kaldıran mutasyon testi aynı planı SDR hable yoluna düşürdü. Bu düşüş `ReasonCode.HdrTonemapped` olarak üretilir ve arayüzün mevcut neden satırında yerelleştirilmiş biçimde gösterilir.
+
+## Aggressive rejimde beşli ablasyon
+
+Eski 1/20 sentetik ablasyon tarihsel olarak yukarıda tutuldu fakat gerçek şikâyet rejimini temsil etmez. Aşağıdaki koşumlar 1036 saniyelik gerçek HDR kaynağın tamamını 117 MiB hedefe kodladı. Kalite, sabit 480–540 saniye penceresinde düzeltilmiş renk yolu ile ölçüldü. “Geniş tepe” donanım tabanından bağımsızdır; yazılım koşumu kendi normal geniş tepe davranışını kullanır.
+
+| Koşum | Geometri | Kodlayıcı | Tepe / GOP | MiB | Süre sn | VMAF ort. | Harmonik | p10 | XPSNR | SSIM |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Taban | 882×496@60 | av1_nvenc | 1,02× / 120 | 114,06 | 216,6 | 52,68 | 32,62 | 22,81 | 30,05 | 0,9159 |
+| Çözünürlük kapalı | 1920×1080@10 | av1_nvenc | 1,02× / 20 | 113,89 | 93,9 | 71,12 | 22,55 | 10,94 | 35,35 | 0,9289 |
+| FPS kapalı | 882×496@60 | av1_nvenc | 1,02× / 120 | 114,06 | 256,4 | 52,68 | 32,62 | 22,81 | 30,05 | 0,9159 |
+| Geniş tepe | 882×496@60 | av1_nvenc | 1,50× / 120 | 114,02 | 239,6 | 54,37 | 38,49 | 30,03 | 30,38 | 0,9194 |
+| Yazılım | 882×496@60 | libx265 slow 2-pass | 1,50× / 120 | 116,34 | 1599,1 | 52,05 | 41,27 | 36,57 | 30,25 | 0,9168 |
+
+Çözünürlüğü koruma ortalama ve XPSNR'ı yükseltse de 10 fps'e düşüş harmonik VMAF'ı 10,07 ve p10'u 11,87 puan düşürdü; tek başına doğru çözüm değil. FPS'i sabitlemek bu kaynakta planı değiştirmedi ve kalite birebir aynı kaldı. Tepe tavanını 1,02×'den 1,50×'e açmak aynı boyutta harmonikte **+5,87**, p10'da **+7,22** verdi. Yazılım yolu ortalamada 0,63 düşük olsa da kötü kare kuyruğunu iyileştirdi (harmonik **+8,65**, p10 **+13,76**); bunun bedeli yaklaşık 23 dakikalık ek süredir. Bu bulgular tepe tavanının en ucuz ve bağımsız kazanç, yazılımın ise kuyruk kalitesi için pahalı seçenek olduğunu gösteriyor.
 
 ## Ölçüm notları ve yeniden üretim
 
