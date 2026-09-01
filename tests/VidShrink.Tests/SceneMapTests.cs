@@ -1,3 +1,4 @@
+using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -145,6 +146,116 @@ public sealed class SceneMapTests
         Assert.Equal(1.0, SceneMap.Spearman(x, new double[] { 10, 20, 30, 40 }), 9);
         Assert.Equal(-1.0, SceneMap.Spearman(x, new double[] { 40, 30, 20, 10 }), 9);
         Assert.Equal(0.8, SceneMap.Spearman(x, new double[] { 10, 30, 20, 40 }), 9);
+    }
+
+    [FfmpegFact]
+    public async Task ScanArgs_TabanEsigiAdayHavuzunuDaraltir()
+    {
+        var outDir = TestPaths.LiveOut("sahne-taban-esigi");
+        Directory.CreateDirectory(outDir);
+        var clip = Path.Combine(outDir, "kademeli.mp4");
+
+        try
+        {
+            await MakeGradedClipAsync(clip);
+
+            var genis = await SceneDetector.ScanAsync(clip, 0.01);
+            var dar = await SceneDetector.ScanAsync(clip, 0.35);
+            var varsayilan = await SceneDetector.ScanAsync(clip);
+            Assert.True(genis.Ok, genis.Error);
+            Assert.True(dar.Ok, dar.Error);
+            Assert.True(varsayilan.Ok, varsayilan.Error);
+
+            Assert.All(genis.Candidates, c => Assert.True(c.Score >= 0.01, $"{c.Score} < 0.01"));
+            Assert.All(dar.Candidates, c => Assert.True(c.Score >= 0.35, $"{c.Score} < 0.35"));
+            Assert.All(varsayilan.Candidates,
+                c => Assert.True(c.Score >= SceneDetector.BaseThreshold, $"{c.Score} < {SceneDetector.BaseThreshold}"));
+
+            Assert.NotEmpty(dar.Candidates);
+            Assert.True(genis.Candidates.Count > varsayilan.Candidates.Count,
+                $"genis={genis.Candidates.Count} varsayilan={varsayilan.Candidates.Count}");
+            Assert.True(varsayilan.Candidates.Count > dar.Candidates.Count,
+                $"varsayilan={varsayilan.Candidates.Count} dar={dar.Candidates.Count}");
+
+            Assert.Contains(genis.Candidates, c => c.Score < SceneDetector.BaseThreshold);
+            Assert.Contains(varsayilan.Candidates, c => c.Score < 0.12);
+        }
+        finally
+        {
+            try { Directory.Delete(outDir, recursive: true); } catch (IOException) { }
+        }
+    }
+
+    [FfmpegFact]
+    public async Task ScanArgs_SondaKolunu640UltrafastCrf23Kodlar()
+    {
+        var outDir = TestPaths.LiveOut("sahne-sonda-sabitleri");
+        Directory.CreateDirectory(outDir);
+        var clip = Path.Combine(outDir, "kademeli.mp4");
+
+        try
+        {
+            await MakeGradedClipAsync(clip);
+
+            var scan = await SceneDetector.ScanAsync(clip);
+            Assert.True(scan.Ok, scan.Error);
+            Assert.NotEmpty(scan.Frames);
+            var sonda = scan.Frames.Sum(f => f.Size);
+
+            var esles = await ReferenceBytesAsync(outDir, clip, "esles", 640, "ultrafast", 23);
+            var darKare = await ReferenceBytesAsync(outDir, clip, "genislik", 320, "ultrafast", 23);
+            var baskaOnAyar = await ReferenceBytesAsync(outDir, clip, "onayar", 640, "veryfast", 23);
+            var baskaCrf = await ReferenceBytesAsync(outDir, clip, "crf", 640, "ultrafast", 30);
+
+            Assert.InRange(Sapma(sonda, esles), 0.0, 0.02);
+            Assert.True(Sapma(sonda, darKare) > 0.10, $"genislik ayirt edilemedi: {sonda} vs {darKare}");
+            Assert.True(Sapma(sonda, baskaOnAyar) > 0.10, $"on ayar ayirt edilemedi: {sonda} vs {baskaOnAyar}");
+            Assert.True(Sapma(sonda, baskaCrf) > 0.10, $"crf ayirt edilemedi: {sonda} vs {baskaCrf}");
+        }
+        finally
+        {
+            try { Directory.Delete(outDir, recursive: true); } catch (IOException) { }
+        }
+    }
+
+    private static double Sapma(long a, long b) => Math.Abs(a - b) / (double)Math.Max(a, b);
+
+    private static async Task<long> ReferenceBytesAsync(
+        string outDir, string clip, string name, int width, string preset, int crf)
+    {
+        var path = Path.Combine(outDir, $"ref-{name}.264");
+        var run = await FfmpegRunner.RunAsync(new[]
+        {
+            "-hide_banner", "-loglevel", "error", "-nostats",
+            "-i", clip,
+            "-an", "-vf", $"scale={width}:-2",
+            "-c:v", "libx264", "-preset", preset, "-crf", crf.ToString(CultureInfo.InvariantCulture),
+            "-f", "h264", "-y", path
+        });
+        Assert.True(run.Ok, run.StandardError);
+        return new FileInfo(path).Length;
+    }
+
+    private static async Task MakeGradedClipAsync(string clip)
+    {
+        const string graph =
+            "[1:v][2:v]concat=n=2:v=1:a=0[sag];[0:v][sag]hstack=inputs=2[parca];"
+            + "[4:v][5:v]hstack=inputs=2[serit];[parca][3:v][serit]concat=n=3:v=1:a=0";
+
+        var run = await FfmpegRunner.RunAsync(new[]
+        {
+            "-hide_banner", "-loglevel", "error",
+            "-f", "lavfi", "-i", "testsrc2=duration=4:size=854x720:rate=30",
+            "-f", "lavfi", "-i", "smptehdbars=duration=2:size=426x720:rate=30",
+            "-f", "lavfi", "-i", "color=c=navy:duration=2:size=426x720:rate=30",
+            "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30",
+            "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1240x720:rate=30",
+            "-f", "lavfi", "-i", "color=c=navy:duration=2:size=40x720:rate=30",
+            "-filter_complex", graph,
+            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-pix_fmt", "yuv420p",
+            "-y", clip
+        });
+        Assert.True(run.Ok, run.StandardError);
     }
 
     [FfmpegFact]
