@@ -1,5 +1,7 @@
 # T85 — Süit eşzamanlı koşumda, arayüz ölçümlerinin maliyeti
 
+Durum: **tamamlandı — düzeltme turu 2 güncel dal başında 2026-09-01 tarihinde yeniden mühürlendi.**
+
 Soru iki taneydi: süit makinede ikinci bir koşum varken neden yarıda duruyor, ve
 `WindowLayoutTests` neden ölçü başına dokuz saniye harcıyor.
 
@@ -209,3 +211,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/kosum-kapisi/kosum-kap
 ```
 
 Tur 1'in pencere kapatma düzeltmesi, hız ve bellek ölçümleri korunmuştur; ölçü silinmedi, `Skip` veya eşik değişikliği yapılmadı. Tur 2'nin üç tam koşumunda atlanan sayı 17'dir.
+
+## Son mühür
+
+`tools/kosum-kapisi/test-kapi.ps1` geçerli Türkçe/İngilizce örnekleri kabul etti; kesinti, başarısız ölçü ve düşük toplam örneklerini beklenen kodlarla reddetti.
+
+Güncel dal başında tam Release süiti doğrudan kapıdan geçirildi:
+
+`Başarısız: 0, Başarılı: 960, Atlanan: 23, Toplam: 983, Süre: 10 m 9 s`
+
+Kapı sonucu: `başarısız=0 toplam=983 alt-sınır=974`. Koşum kesintisiz tamamlandı; atlanan sayı sözleşmedeki 23 sınırını aşmadı.
