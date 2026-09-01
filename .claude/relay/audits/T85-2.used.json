@@ -1,0 +1,26 @@
+{
+  "contractId": "T85",
+  "auditorRunId": "a35437dda709bc098",
+  "headSha": "e577083b403b9cad95cd773f2f32cc6f44ad9e3b",
+  "diffHash": "89e003a2792b05ceb7a352c94792f868f909521d5b57f3049fb51f6e46ba2dc9",
+  "owns": [
+    "tests/VidShrink.Tests/AppHost.cs",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs",
+    "tests/VidShrink.Tests/VidShrink.Tests.csproj",
+    "tools/kosum-kapisi/kosum-kapisi.ps1",
+    "tools/kosum-kapisi/test-kapi.ps1",
+    "tools/kosum-kapisi/fixtures/basarisiz-en.txt",
+    "tools/kosum-kapisi/fixtures/eksik-toplam-en.txt",
+    "tools/kosum-kapisi/fixtures/gecerli-en.txt",
+    "tools/kosum-kapisi/fixtures/gecerli-tr.txt",
+    "tools/kosum-kapisi/fixtures/kesinti-tr.txt",
+    "docs/olcumler/suit-esszamanli-kosum.md"
+  ],
+  "verification": [
+    "Denetim 43a2e5c'de yapildi ve gecti; kayit HEAD ilerledigi icin yenilendi. Aradaki fark yalnizca .claude/relay/ altinda: git diff --stat 43a2e5c..e577083 -- . ':(exclude).claude/relay/**' bos donuyor, yani T85'in owns kumesindeki hicbir dosya degismedi. Ozgun denetim: kapiyi fixture'lardan bagimsiz 11 girdiyle kostum; gercekci TR ve EN suit ozeti cikis 0; 'Test ana islemi kilitlendi' + Basarisiz: 0 + Toplam: 983 -> 65; Basarisiz: 3 -> 66; -MinimumTotal verilmeyince -> 1; Toplam alt sinirin altinda -> 68; Toplam satiri yok -> 67. Denetci hicbir dosyaya yazmadi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T16:42:42.434Z",
+  "usedAt": "2026-09-01T16:52:30.769Z",
+  "completedSha": "e577083b403b9cad95cd773f2f32cc6f44ad9e3b"
+}

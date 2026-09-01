@@ -1,12 +1,14 @@
 name: ci
 
-# Build and test on every push to main and on every pull request. The release workflow
-# runs the same gate, but only when a tag is pushed; without this one a break reaches
-# main and is not seen until release day.
+# Build and test on every branch push and on every pull request. Agent branches were
+# invisible here until now: the trigger only listened to main, so "check CI before you
+# push" could never be satisfied on a working branch. The release workflow runs the same
+# gate, but only when a tag is pushed; without this one a break reaches main and is not
+# seen until release day.
 
 on:
   push:
-    branches: [main]
+    branches: ["**"]
   pull_request:
     branches: [main]
 
@@ -24,4 +26,6 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: dotnet build VidShrink.sln -c Release -warnaserror
-      - run: dotnet test VidShrink.sln -c Release
+      # A hung test host prints "Test host process crashed" with Failed: 0 and still
+      # exits 0. The gate reads the output and refuses a run that never finished.
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 950
