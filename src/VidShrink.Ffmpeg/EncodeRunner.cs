@@ -231,11 +231,24 @@ public sealed class EncodeRunner
         catch { TryDelete(partialPath); throw; }
     }
 
+    /// <summary>
+    /// Kodlama komutunu üretir. Önce psy/AQ yoklamasını ısıtır: <c>FfmpegArguments.Build</c> saf
+    /// kaldığı için ısıtılmamış bir seçeneği desteklenmiyor sayar, ve ısıtmayan bir çağıran
+    /// bayrakları sessizce kaybederdi. Kodlayan her yol buradan geçer; ölçüm aracı da dahil.
+    /// </summary>
+    public static IReadOnlyList<string> EncodeArguments(
+        MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
+        IEncoderAvailability availability)
+    {
+        FfmpegArguments.WarmPsychovisual(plan.Codec, availability);
+        return FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, availability);
+    }
+
     private static async Task RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
         IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo, CancellationToken ct)
     {
-        var args = FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance);
+        var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance);
         await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
     }
 

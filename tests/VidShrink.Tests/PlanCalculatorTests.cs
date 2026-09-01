@@ -102,4 +102,181 @@ public sealed class PlanCalculatorTests
         Assert.NotEmpty(result.Plan.ReasonCodes);
         Assert.False(string.IsNullOrWhiteSpace(result.Plan.Reason));
     }
+
+    private static ComplexityProfile MeasuredComplexity(double referenceBppf)
+        => ComplexityProfile.FromProbe(referenceBppf, referenceBppf * 0.6, 6, 288);
+
+    [Fact]
+    public void MeasuredQualityPointsMoveThePredictionOneForOne()
+    {
+        var info = SampleInfo();
+        var options = new PlanOptions { TargetMb = 8, Intent = Intent.Sharing };
+        var complexity = MeasuredComplexity(0.09);
+
+        var prior = PlanCalculator.BuildDetailed(info, options, complexity).PredictedQuality;
+        var low = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 70.0 })).PredictedQuality;
+        var high = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 85.0 })).PredictedQuality;
+
+        Assert.Equal(15.0, high - low, 6);
+        Assert.True(Math.Abs(prior - low) > 1.0, $"Olculen 70 noktasi tahmini oynatmadi: prior {prior:0.###}, olculen {low:0.###}.");
+        Assert.True(Math.Abs(prior - high) > 1.0, $"Olculen 85 noktasi tahmini oynatmadi: prior {prior:0.###}, olculen {high:0.###}.");
+    }
+
+    [Fact]
+    public void WithoutMeasuredPointsThePredictionFallsBackToThePrior()
+    {
+        var info = SampleInfo();
+        var options = new PlanOptions { TargetMb = 8, Intent = Intent.Sharing };
+        var complexity = MeasuredComplexity(0.09);
+
+        var prior = PlanCalculator.BuildDetailed(info, options, complexity).PredictedQuality;
+        var dropped = complexity.WithProbeQuality(new[] { 70.0 }).WithMeasuredQuality(Array.Empty<QualitySample>());
+
+        Assert.False(dropped.QualityMeasured);
+        Assert.Equal(prior, PlanCalculator.BuildDetailed(info, options, dropped).PredictedQuality, 9);
+    }
+
+    [Fact]
+    public void TwoSeparatedQualityPointsMeasureTheSlopeInsteadOfAssumingIt()
+    {
+        var complexity = MeasuredComplexity(0.09);
+        var flat = complexity.WithMeasuredQuality(new[] { new QualitySample(0.045, 88.0), new QualitySample(0.18, 96.0) });
+
+        Assert.True(flat.Level.SlopeMeasured);
+        Assert.Equal(4.0, flat.Level.PerHalving, 6);
+        Assert.False(complexity.WithProbeQuality(new[] { 88.0, 96.0 }).Level.SlopeMeasured);
+    }
+
+    [Fact]
+    public void MeasuredQualityStopLeavesTheRestOfTheBudgetUnspent()
+    {
+        var info = SampleInfo();
+        var options = new PlanOptions { TargetMb = 60, Intent = Intent.Sharing };
+        var complexity = MeasuredComplexity(0.02);
+
+        var unmeasured = PlanCalculator.BuildDetailed(info, options, complexity);
+        var measured = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 96.0 }));
+
+        Assert.True(unmeasured.Estimate.ExpectedMb >= 55.0,
+            $"Olcumsuz plan hedefi doldurmadi: {unmeasured.Estimate.ExpectedMb:0.00} MB.");
+        Assert.True(measured.Estimate.ExpectedMb <= 30.0,
+            $"Olculen kalite durdurma kisiti butceyi harcamayi surdurdu: {measured.Estimate.ExpectedMb:0.00} MB.");
+        Assert.True(measured.Plan.VideoBitrateK < unmeasured.Plan.VideoBitrateK,
+            $"Durdurma kisiti harcamayi dusurmedi: olculen {measured.Plan.VideoBitrateK}k, olcumsuz {unmeasured.Plan.VideoBitrateK}k.");
+        Assert.True(measured.Estimate.ExpectedMb <= options.TargetMb,
+            $"Hedef boyut garantisi kirildi: {measured.Estimate.ExpectedMb:0.00} MB > {options.TargetMb} MB.");
+    }
+
+    [Fact]
+    public void TheStopSitsAtTheOperatingPointTheMeasurementWasTakenAt()
+    {
+        var info = SampleInfo();
+        var options = new PlanOptions { TargetMb = 60, Intent = Intent.Sharing, AllowResolutionDrop = false, AllowFpsDrop = false };
+
+        PlanResult At(double bias)
+        {
+            var complexity = ComplexityProfile.FromProbe(0.02 * bias, 0.012 * bias, 6, 288, bias);
+            Assert.Equal(0.02, complexity.ReferenceBppf, 9);
+            return PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 90.0 }));
+        }
+
+        var atProbe = At(1.0);
+        var atHalfTheDensity = At(0.5);
+
+        var ratio = (double)atProbe.Plan.VideoBitrateK / atHalfTheDensity.Plan.VideoBitrateK;
+        Assert.True(Math.Abs(ratio - 2.0) < 0.01,
+            $"Durdurma noktasi olcumun alindigi isletme noktasini takip etmiyor: {atProbe.Plan.VideoBitrateK}k / {atHalfTheDensity.Plan.VideoBitrateK}k = {ratio:0.###}, beklenen 2.");
+        Assert.True(atProbe.Estimate.ExpectedMb <= options.TargetMb && atHalfTheDensity.Estimate.ExpectedMb <= options.TargetMb,
+            $"Hedef boyut garantisi kirildi: {atProbe.Estimate.ExpectedMb:0.00} MB / {atHalfTheDensity.Estimate.ExpectedMb:0.00} MB.");
+    }
+
+    [Fact]
+    public void QualitySearchStaysInsideItsEvaluationBudget()
+    {
+        var info = new MediaInfo
+        {
+            FilePath = "huge.mkv",
+            FileSizeBytes = 4L * 1024 * 1024 * 1024 * 1024,
+            DurationSeconds = 28800,
+            Width = 3840,
+            Height = 2160,
+            Fps = 60,
+            VideoCodec = "h264",
+            TotalBitrateBps = 1_200_000_000,
+            AudioCodec = "aac",
+            AudioBitrateBps = 128_000,
+            AudioChannels = 2
+        };
+
+        var ceilingMb = PlanCalculator.QualityCeilingTargetMb(info);
+        var span = ceilingMb / PlanCalculator.QualityFloorTargetMb(info);
+        var unbounded = (int)Math.Ceiling(Math.Log(span) / Math.Log(1.005));
+        Assert.True(unbounded > 1400, $"Bu kaynak siniri zorlamiyor: sinirsiz tarama {unbounded} adim.");
+
+        var options = new PlanOptions { Intent = Intent.Sharing };
+        var atCeiling = PlanCalculator.BuildDetailed(info, new PlanOptions { Intent = Intent.Sharing, TargetMb = ceilingMb }, null);
+        var result = PlanCalculator.TargetMbForQuality(info, options, atCeiling.PredictedQuality - 0.01);
+
+        Assert.Equal(QualityTargetBound.Matched, result.Bound);
+        Assert.True(result.Evaluations <= 1400,
+            $"Arama {result.Evaluations} BuildDetailed cagrisi surdu, olculen 1400 butcesinin ustunde.");
+    }
+
+    [Fact]
+    public void MotionCutIsCalledCheapOnlyWhenHalvingTheFrameRateReallySavesBits()
+    {
+        var info = SampleInfo();
+        var options = new PlanOptions { TargetMb = 20, Intent = Intent.Sharing };
+
+        PlanResult WithMotion(double exponent)
+        {
+            var full = 0.08;
+            var profile = ComplexityProfile.FromProbe(full, full * 0.6, 6, 288, 1.0, WindowBiasSource.Scan, full * Math.Pow(2, exponent));
+            Assert.True(profile.MotionMeasured);
+            return PlanCalculator.BuildDetailed(info, options, profile);
+        }
+
+        var quarter = WithMotion(0.6408);
+        var median = WithMotion(0.8706);
+
+        Assert.Contains(AdviceCode.MotionCutIsCheap, quarter.Advice.Notes);
+        Assert.DoesNotContain(AdviceCode.MotionCutIsCheap, median.Advice.Notes);
+    }
+
+    [Fact]
+    public void ThePlanReadsTheProfileWithTheContainerCostAlreadyTakenOut()
+    {
+        var info = new MediaInfo
+        {
+            FilePath = "dusuk.mp4",
+            FileSizeBytes = 40L * 1024 * 1024,
+            DurationSeconds = 300,
+            Width = 320,
+            Height = 180,
+            Fps = 48,
+            VideoCodec = "h264",
+            TotalBitrateBps = 1_100_000,
+            AudioCodec = "aac",
+            AudioBitrateBps = 128_000,
+            AudioChannels = 2
+        };
+        var options = new PlanOptions { TargetMb = 12, Intent = Intent.Sharing, FillPolicy = FillPolicy.QualityCeiling };
+
+        var pixels = (double)info.Width * info.Height;
+        var measuredBppf = 290.0 * 8.0 / pixels;
+        var contaminated = ComplexityProfile.FromProbe(measuredBppf, measuredBppf * 0.6, 6, 288, 1.0);
+        var cleaned = contaminated.WithoutSampleContainerBias(info.Width, info.Height);
+        var frozen = contaminated with { SampleContainerBiasRemoved = true };
+
+        Assert.True(contaminated.ReferenceBppf / cleaned.ReferenceBppf > 1.04,
+            $"Kirlenme olcusuz kaldi: {contaminated.ReferenceBppf:0.000000} / {cleaned.ReferenceBppf:0.000000}.");
+
+        var fromContaminated = PlanCalculator.BuildDetailed(info, options, contaminated);
+        var fromCleaned = PlanCalculator.BuildDetailed(info, options, cleaned);
+        var fromFrozen = PlanCalculator.BuildDetailed(info, options, frozen);
+
+        Assert.Equal(fromCleaned.Plan.VideoBitrateK, fromContaminated.Plan.VideoBitrateK);
+        Assert.True(fromFrozen.Plan.VideoBitrateK > fromContaminated.Plan.VideoBitrateK * 1.04,
+            $"Kirli profil planda ayni sonucu verdi: {fromFrozen.Plan.VideoBitrateK}k / {fromContaminated.Plan.VideoBitrateK}k.");
+    }
 }

@@ -3,6 +3,17 @@ using System.Text;
 
 namespace VidShrink.Core;
 
+/// <summary>
+/// Bir kodlayıcı seçeneğinin desteklenip desteklenmediğini <b>ölçen</b> taraf. Ölçüm süreç
+/// doğurabilir, bu yüzden argüman üretimi bu arayüzü çağırmaz; yalnız ısıtma yolu çağırır.
+/// <see cref="IEncoderOptionAvailability.SupportsEncoderOption"/> ise ısıtılmış sonucu okur
+/// ve süreç doğurmaz.
+/// </summary>
+public interface IEncoderOptionWarmup
+{
+    bool WarmEncoderOption(string codec, string option, string value);
+}
+
 public static class FfmpegArguments
 {
     private static readonly IReadOnlyDictionary<string, string[]> Presets = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
@@ -123,7 +134,7 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { "-c:v", plan.Codec });
         a.AddRange(new[] { "-preset", plan.Preset });
-        var psychovisualArgs = PsychovisualArgs(plan.Codec, availability);
+        var psychovisualArgs = CachedPsychovisualArgs(plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
@@ -150,14 +161,15 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { "-g", Math.Max(2, (int)Math.Round(plan.Fps * 2)).ToString(CultureInfo.InvariantCulture) });
         a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
-        a.AddRange(PsychovisualAndColorArgs(plan.Codec, psychovisualArgs, plan.HdrColorArgs));
+        a.AddRange(psychovisualArgs);
+        a.AddRange(plan.HdrColorArgs);
 
         if (pass == 1)
         {
             a.AddRange(plan.ExtraArgs);
             a.AddRange(new[] { "-an", "-f", "null" });
             a.Add(OperatingSystem.IsWindows() ? "NUL" : "/dev/null");
-            return a;
+            return MergeEncoderParams(a);
         }
 
         if (plan.AudioCodec is null)
@@ -173,25 +185,93 @@ public static class FfmpegArguments
         a.AddRange(new[] { "-movflags", "+faststart" });
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
-        return a;
+        return MergeEncoderParams(a);
     }
 
+    /// <summary>
+    /// ffmpeg bu bayrakların ikincisini görünce birincisini sessizce atar: son yazan kazanır.
+    /// Psy/AQ, HDR renk ve kullanıcının <c>ExtraArgs</c>'ı ayrı ayrı üretildiği için hepsi
+    /// buradan geçer ve bayrak başına tek dizgeye iner.
+    /// </summary>
+    private static readonly string[] JoinedParamFlags = { "-x264-params", "-x265-params", "-svtav1-params" };
+
+    public static IReadOnlyList<string> MergeEncoderParams(IReadOnlyList<string> args)
+    {
+        var merged = new List<string>(args.Count);
+        var valueAt = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        for (var i = 0; i < args.Count; i++)
+        {
+            if (i + 1 >= args.Count || !JoinedParamFlags.Contains(args[i], StringComparer.OrdinalIgnoreCase))
+            {
+                merged.Add(args[i]);
+                continue;
+            }
+
+            var flag = args[i];
+            var value = args[++i];
+            if (value.Length == 0) continue;
+
+            if (valueAt.TryGetValue(flag, out var at))
+            {
+                merged[at] = $"{merged[at]}:{value}";
+                continue;
+            }
+
+            merged.Add(flag);
+            merged.Add(value);
+            valueAt[flag] = merged.Count - 1;
+        }
+
+        return merged;
+    }
+
+    /// <summary>
+    /// Seçenek desteğini <b>ölçerek</b> psy/AQ bayraklarını üretir: kabiliyet ölçebiliyorsa
+    /// (<see cref="IEncoderOptionWarmup"/>) yoklama burada doğar ve sonuç ısınır. Süreç
+    /// doğurabildiği için argüman üretimi bu yolu çağırmaz; ısıtma sorumluluğunu üstlenen
+    /// çağıranlar çağırır. Saf okuma için <see cref="CachedPsychovisualArgs"/>.
+    /// </summary>
     public static IReadOnlyList<string> PsychovisualArgs(string codec, IEncoderAvailability? availability)
+        => Psychovisual(codec, availability, measure: true);
+
+    /// <summary>
+    /// Yalnız ısıtılmış sonucu okur, süreç doğurmaz. Argüman üretiminin kullandığı yol budur.
+    /// Isıtılmamış bir seçenek desteklenmiyor sayılır, bu yüzden çağıran önce
+    /// <see cref="WarmPsychovisual"/> koşturmalıdır; yoksa bayraklar sessizce düşer.
+    /// </summary>
+    public static IReadOnlyList<string> CachedPsychovisualArgs(string codec, IEncoderAvailability? availability)
+        => Psychovisual(codec, availability, measure: false);
+
+    /// <summary>
+    /// Kodlayıcının psy/AQ seçeneklerini bir kez ölçer ve sonucu kabiliyetin önbelleğine
+    /// yazar. Bundan sonra <see cref="CachedPsychovisualArgs"/> doğru cevabı süreç doğurmadan
+    /// verir. Kodlama yolundaki çağıranların argümanı sessizce kaybetmemesi buna bağlı.
+    /// </summary>
+    public static void WarmPsychovisual(string codec, IEncoderAvailability? availability)
+        => Psychovisual(codec, availability, measure: true);
+
+    private static IReadOnlyList<string> Psychovisual(string codec, IEncoderAvailability? availability, bool measure)
     {
         var args = new List<string>();
         if (availability is not IEncoderOptionAvailability options) return args;
 
+        bool Supported(string option, string value)
+            => measure && availability is IEncoderOptionWarmup warmup
+                ? warmup.WarmEncoderOption(codec, option, value)
+                : options.SupportsEncoderOption(codec, option, value);
+
         if (codec.Equals("libx265", StringComparison.OrdinalIgnoreCase)
-            && options.SupportsEncoderOption(codec, "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2"))
+            && Supported("-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2"))
             args.AddRange(new[] { "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2" });
         else if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
-                 && options.SupportsEncoderOption(codec, "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2"))
+                 && Supported("-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2"))
             args.AddRange(new[] { "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2" });
         else if (codec.Contains("nvenc", StringComparison.OrdinalIgnoreCase))
         {
-            if (options.SupportsEncoderOption(codec, "-spatial-aq", "1"))
+            if (Supported("-spatial-aq", "1"))
                 args.AddRange(new[] { "-spatial-aq", "1" });
-            if (options.SupportsEncoderOption(codec, "-temporal-aq", "1"))
+            if (Supported("-temporal-aq", "1"))
                 args.AddRange(new[] { "-temporal-aq", "1" });
         }
         return args;
@@ -199,28 +279,7 @@ public static class FfmpegArguments
 
     public static IReadOnlyList<string> PsychovisualAndColorArgs(string codec,
         IReadOnlyList<string> psychovisualArgs, IReadOnlyList<string> colorArgs)
-    {
-        var args = new List<string>();
-        if (!codec.Equals("libx265", StringComparison.OrdinalIgnoreCase))
-        {
-            args.AddRange(psychovisualArgs);
-            args.AddRange(colorArgs);
-            return args;
-        }
-
-        var combined = psychovisualArgs.Concat(colorArgs).ToList();
-        var x265 = new List<string>();
-        for (var i = 0; i < combined.Count; i++)
-        {
-            if (combined[i] == "-x265-params" && i + 1 < combined.Count)
-                x265.Add(combined[++i]);
-            else
-                args.Add(combined[i]);
-        }
-        if (x265.Count > 0)
-            args.AddRange(new[] { "-x265-params", string.Join(':', x265) });
-        return args;
-    }
+        => MergeEncoderParams(psychovisualArgs.Concat(colorArgs).ToList());
 
     /// <summary>
     /// Kisa bir parcanin argumanlari. Ayni <paramref name="availability"/> verildiginde tam
