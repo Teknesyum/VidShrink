@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -588,6 +589,14 @@ public sealed class PerformanceCheckTests
     [FfmpegFact]
     public async Task OlcumArtikBirakmiyor()
     {
+        var behavior = typeof(PerformanceCheckTests).Assembly
+            .GetCustomAttribute<Xunit.CollectionBehaviorAttribute>();
+        Assert.True(
+            behavior is { DisableTestParallelization: true },
+            "bu ölçü TEMP/TMP'yi süreç genelinde değiştiriyor; süit içi paralellik açıkken " +
+            "aynı süreçteki öteki ölçüler yönlendirilmiş %TEMP% görür. " +
+            "LanguageTests.cs'teki [assembly: CollectionBehavior(DisableTestParallelization = true)] kalkarsa burası kırmızıya döner.");
+
         var temp = Path.Combine(TestPaths.OutputRoot, "performance-temp", Environment.ProcessId.ToString(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(temp);
         var oldTemp = Environment.GetEnvironmentVariable("TEMP");

@@ -9,6 +9,10 @@ public sealed class Windows11ShellMenuTests
 {
     private static readonly string Installer = Path.Combine(TipSources.Root, "Install-VidShrink.ps1");
 
+    private readonly Xunit.Abstractions.ITestOutputHelper _output;
+
+    public Windows11ShellMenuTests(Xunit.Abstractions.ITestOutputHelper output) => _output = output;
+
     private static string Read(params string[] parts) => File.ReadAllText(Path.Combine([TipSources.Root, .. parts]));
 
     private static (int Code, string Output) Run(string file, params string[] arguments)
@@ -102,16 +106,34 @@ public sealed class Windows11ShellMenuTests
     [Fact]
     public void Sparse_package_really_registers_and_removes_on_Windows_11()
     {
-        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000)) return;
+        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+        {
+            _output.WriteLine("ATLANDI: Windows 11 (10.0.22000) altı, seyrek paket kaydı yapılamaz.");
+            return;
+        }
+
         var msbuild = FindMsBuild();
-        if (msbuild is null) return;
-        using var appxLock = new Mutex(false, @"Local\VidShrink-Sparse-Package-Test");
-        Assert.True(appxLock.WaitOne(TimeSpan.FromMinutes(5)), "AppX test kilidi zaman aşımına uğradı.");
+        if (msbuild is null)
+        {
+            _output.WriteLine("ATLANDI: MSBuild bulunamadı, kabuk uzantısı derlenemez.");
+            return;
+        }
+
+        using var appxLock = new Mutex(false, @"Global\VidShrink-Sparse-Package-Test");
+        var owned = false;
+        try { owned = appxLock.WaitOne(TimeSpan.FromMinutes(5)); }
+        catch (AbandonedMutexException) { owned = true; }
+        Assert.True(owned, "AppX test kilidi zaman aşımına uğradı.");
         try
         {
         var before = PowerShell("-Command", "@(Get-AppxPackage -Name Teknesyum.VidShrink.Shell).Count");
         Assert.True(before.Code == 0, before.Output);
-        if (before.Output.Trim() != "0") return;
+        if (before.Output.Trim() != "0")
+        {
+            _output.WriteLine($"ATLANDI: Teknesyum.VidShrink.Shell zaten kayıtlı (sayı={before.Output.Trim()}); " +
+                "makinede kalıntı paket var, ölçü bu kaydı silmez.");
+            return;
+        }
 
         var work = Path.Combine(TestPaths.OutputRoot, "shell-package", Guid.NewGuid().ToString("n"));
         var install = Path.Combine(work, "install");
