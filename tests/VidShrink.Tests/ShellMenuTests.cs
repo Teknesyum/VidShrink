@@ -49,7 +49,7 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         _installRoot = Path.Combine(_work, "kurulum");
         _executable = Path.Combine(_installRoot, "VidShrink.exe");
         _probe = Path.Combine(_work, "oku.ps1");
-        _registryRoot = @"HKCU:\Software\VidShrink-Test-" + id;
+        _registryRoot = $@"HKCU:\Software\VidShrink-Test-{Environment.ProcessId}-{id}";
 
         Directory.CreateDirectory(_installRoot);
         File.WriteAllText(_executable, "kurulu baslatici");

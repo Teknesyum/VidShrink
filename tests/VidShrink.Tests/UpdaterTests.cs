@@ -30,7 +30,7 @@ public sealed class UpdaterTests : IDisposable
     public UpdaterTests(ITestOutputHelper output)
     {
         _output = output;
-        _root = Path.Combine(Path.GetTempPath(), "vidshrink_update_" + Guid.NewGuid().ToString("N"));
+        _root = Path.Combine(TestPaths.OutputRoot, "updater", Environment.ProcessId.ToString(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_root);
     }
 
@@ -787,7 +787,18 @@ public sealed class UpdaterTests : IDisposable
             misses += probe.Misses;
             rounds++;
 
-            Directory.Delete(root, recursive: true);
+            for (var attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    Directory.Delete(root, recursive: true);
+                    break;
+                }
+                catch (IOException) when (attempt < 20)
+                {
+                    Thread.Sleep(25);
+                }
+            }
         }
 
         return (rounds, samples, misses);
@@ -1060,10 +1071,11 @@ exit $code
         if (!OperatingSystem.IsWindows()) return;
 
         var (installRoot, locked, probe, logPath) = LockedInstall("silme-gecici");
+        var started = logPath + ".basladi";
+        if (File.Exists(started)) File.Delete(started);
         var stream = new FileStream(locked, FileMode.Open, FileAccess.Read, FileShare.None);
         var release = new Thread(() =>
         {
-            var started = logPath + ".basladi";
             var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
             while (!File.Exists(started) && DateTime.UtcNow < deadline) Thread.Sleep(20);
             Thread.Sleep(300);

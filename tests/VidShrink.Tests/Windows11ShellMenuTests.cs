@@ -105,6 +105,10 @@ public sealed class Windows11ShellMenuTests
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000)) return;
         var msbuild = FindMsBuild();
         if (msbuild is null) return;
+        using var appxLock = new Mutex(false, @"Local\VidShrink-Sparse-Package-Test");
+        Assert.True(appxLock.WaitOne(TimeSpan.FromMinutes(5)), "AppX test kilidi zaman aşımına uğradı.");
+        try
+        {
         var before = PowerShell("-Command", "@(Get-AppxPackage -Name Teknesyum.VidShrink.Shell).Count");
         Assert.True(before.Code == 0, before.Output);
         if (before.Output.Trim() != "0") return;
@@ -154,6 +158,11 @@ public sealed class Windows11ShellMenuTests
         {
             PowerShell("-Command", "$p=Get-AppxPackage -Name Teknesyum.VidShrink.Shell -ErrorAction SilentlyContinue; if($p){Remove-AppxPackage -Package $p.PackageFullName}");
             try { Directory.Delete(work, true); } catch (IOException) { }
+        }
+        }
+        finally
+        {
+            appxLock.ReleaseMutex();
         }
     }
 

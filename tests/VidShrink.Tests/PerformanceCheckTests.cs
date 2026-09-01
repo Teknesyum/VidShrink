@@ -588,14 +588,28 @@ public sealed class PerformanceCheckTests
     [FfmpegFact]
     public async Task OlcumArtikBirakmiyor()
     {
-        var temp = Path.GetTempPath();
-        var once = Directory.GetDirectories(temp, PerformanceProbe.TempPrefix + "*").Length;
+        var temp = Path.Combine(TestPaths.OutputRoot, "performance-temp", Environment.ProcessId.ToString(), Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(temp);
+        var oldTemp = Environment.GetEnvironmentVariable("TEMP");
+        var oldTmp = Environment.GetEnvironmentVariable("TMP");
+        try
+        {
+            Environment.SetEnvironmentVariable("TEMP", temp);
+            Environment.SetEnvironmentVariable("TMP", temp);
+            var once = Directory.GetDirectories(temp, PerformanceProbe.TempPrefix + "*").Length;
 
-        await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
+            await PerformanceProbe.RunAsync(EncoderCapabilities.Instance, 30_000);
 
-        var sonra = Directory.GetDirectories(temp, PerformanceProbe.TempPrefix + "*").Length;
-        Log($"[artik] once={once} sonra={sonra}");
-        Assert.Equal(once, sonra);
+            var sonra = Directory.GetDirectories(temp, PerformanceProbe.TempPrefix + "*").Length;
+            Log($"[artik] kok={temp} once={once} sonra={sonra}");
+            Assert.Equal(once, sonra);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TEMP", oldTemp);
+            Environment.SetEnvironmentVariable("TMP", oldTmp);
+            try { Directory.Delete(temp, true); } catch (IOException) { }
+        }
     }
 
     /// <summary>
