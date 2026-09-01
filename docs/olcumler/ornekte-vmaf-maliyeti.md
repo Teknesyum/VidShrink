@@ -38,3 +38,5 @@ Geniş tepe iki kaynakta da hedefi aşmadı. 720p60'da geniş eksi dar: mean +0,
 ## Test ve mutasyon kanıtı
 
 Köprü çağrısı geçici kaldırıldığında `DetailedProbeExposesWindowQualityThroughCoreContract` başarısız oldu. Ayrı örnek ofseti geçici olarak referans ofsetine bağlandığında `ReferenceAndSampleMayUseDifferentWindowOffsets` VMAF 22,38367795 ile başarısız oldu. Her iki düzeltme geri getirildikten sonra sözleşme filtresi yeniden çalıştırıldı. Var olan assertion gevşetilmedi, test Skip'e alınmadı.
+
+Son doğrulama: sözleşme filtresi 14 başarılı / 0 başarısız; tam `dotnet test -c Release` 963 başarılı / 0 başarısız.
