@@ -167,27 +167,69 @@ public static class QualityMeter
 
     public const double SceneWindowSeconds = 2.0;
 
+    public const double MinimumUnitSeconds = SceneWindowSeconds / 2.0;
+
     public static (double Worst, double StartSeconds) WorstScene(
         IReadOnlyList<double> scores, double frameRate, double offsetSeconds)
+        => WorstScene(scores, frameRate, offsetSeconds, null);
+
+    public static (double Worst, double StartSeconds) WorstScene(
+        IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? map)
     {
+        ArgumentNullException.ThrowIfNull(scores);
+        if (scores.Count == 0)
+            throw new ArgumentException("En kotu birim icin en az bir kare puani gerekli.", nameof(scores));
+
         var fps = frameRate > 0 ? frameRate : 25.0;
-        var step = Math.Max(1, (int)Math.Round(fps * SceneWindowSeconds));
+        var bounds = SceneBounds(map, scores.Count, fps, offsetSeconds) ?? FixedBounds(scores.Count, fps);
+        var minFrames = Math.Max(1, (int)Math.Round(fps * MinimumUnitSeconds));
+
         var worst = double.PositiveInfinity;
         var at = offsetSeconds;
-        for (var i = 0; i < scores.Count; i += step)
+        for (var b = 0; b + 1 < bounds.Count; b++)
         {
-            var count = Math.Min(step, scores.Count - i);
-            if (count * 2 < step && !double.IsPositiveInfinity(worst)) break;
+            var start = bounds[b];
+            var count = bounds[b + 1] - start;
+            if (count < minFrames && bounds.Count > 2) continue;
             var sum = 0.0;
-            for (var j = 0; j < count; j++) sum += scores[i + j];
+            for (var j = 0; j < count; j++) sum += scores[start + j];
             var mean = sum / count;
             if (mean < worst)
             {
                 worst = mean;
-                at = offsetSeconds + i / fps;
+                at = offsetSeconds + start / fps;
             }
         }
+
+        if (double.IsPositiveInfinity(worst))
+            return (scores.Average(), offsetSeconds);
         return (worst, at);
+    }
+
+    private static List<int> FixedBounds(int count, double fps)
+    {
+        var step = Math.Max(1, (int)Math.Round(fps * SceneWindowSeconds));
+        var bounds = new List<int>();
+        for (var i = 0; i < count; i += step) bounds.Add(i);
+        bounds.Add(count);
+        return bounds;
+    }
+
+    private static List<int>? SceneBounds(
+        VidShrink.Core.SceneMap? map, int count, double fps, double offsetSeconds)
+    {
+        if (map is null || map.Scenes.Count == 0) return null;
+
+        var endSeconds = offsetSeconds + count / fps;
+        var bounds = new List<int> { 0 };
+        foreach (var scene in map.Scenes)
+        {
+            if (scene.End <= offsetSeconds || scene.End >= endSeconds) continue;
+            var index = (int)Math.Round((scene.End - offsetSeconds) * fps);
+            if (index > bounds[^1] && index < count) bounds.Add(index);
+        }
+        bounds.Add(count);
+        return bounds.Count > 2 ? bounds : null;
     }
 
     private static async Task<double?> MeasureXpsnrAsync(string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, CancellationToken ct)

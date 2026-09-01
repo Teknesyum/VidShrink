@@ -241,6 +241,66 @@ public sealed class QualityMeterTests
         Assert.Equal(0.0, at, 6);
     }
 
+    [Fact]
+    public void WorstSceneUsesSceneBoundariesWhenTheMapIsPresent()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0, MapWithCuts(10.0, 2.5, 5.5));
+
+        Assert.Equal(40.0, worst, 6);
+        Assert.Equal(2.5, at, 6);
+    }
+
+    [Fact]
+    public void FixedWindowsDiluteTheSceneTheMapWouldIsolate()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0, null);
+
+        Assert.Equal(55.0, worst, 6);
+        Assert.Equal(2.0, at, 6);
+    }
+
+    [Fact]
+    public void SceneBoundariesAreReadOnTheReferenceTimelineNotFromZero()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 12.5, MapWithCuts(30.0, 15.0, 18.0));
+
+        Assert.Equal(40.0, worst, 6);
+        Assert.Equal(15.0, at, 6);
+    }
+
+    [Fact]
+    public void SceneShorterThanHalfAWindowIsNotTheWorstScene()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 0; i < 12; i++) scores[i] = 0.0;
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 12.5, MapWithCuts(30.0, 12.7, 15.0, 18.0));
+
+        Assert.Equal(40.0, worst, 6);
+        Assert.Equal(15.0, at, 6);
+    }
+
+    [Fact]
+    public void WorstSceneRejectsAnEmptyScoreList()
+        => Assert.Throws<ArgumentException>(() => QualityMeter.WorstScene(Array.Empty<double>(), 60, 0));
+
+    private static SceneMap MapWithCuts(double duration, params double[] cuts)
+        => SceneMap.Build(
+            duration,
+            cuts.Select(c => new SceneScore(c, 1.0)).ToArray(),
+            SceneMap.DefaultThreshold,
+            Array.Empty<ProbeFrame>());
+
     private static string NewDir()
     {
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_qm_" + Guid.NewGuid().ToString("N"));
