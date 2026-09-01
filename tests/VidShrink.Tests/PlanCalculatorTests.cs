@@ -221,4 +221,62 @@ public sealed class PlanCalculatorTests
         Assert.True(result.Evaluations <= 1400,
             $"Arama {result.Evaluations} BuildDetailed cagrisi surdu, olculen 1400 butcesinin ustunde.");
     }
+
+    [Fact]
+    public void MotionCutIsCalledCheapOnlyWhenHalvingTheFrameRateReallySavesBits()
+    {
+        var info = SampleInfo();
+        var options = new PlanOptions { TargetMb = 20, Intent = Intent.Sharing };
+
+        PlanResult WithMotion(double exponent)
+        {
+            var full = 0.08;
+            var profile = ComplexityProfile.FromProbe(full, full * 0.6, 6, 288, 1.0, WindowBiasSource.Scan, full * Math.Pow(2, exponent));
+            Assert.True(profile.MotionMeasured);
+            return PlanCalculator.BuildDetailed(info, options, profile);
+        }
+
+        var quarter = WithMotion(0.6408);
+        var median = WithMotion(0.8706);
+
+        Assert.Contains(AdviceCode.MotionCutIsCheap, quarter.Advice.Notes);
+        Assert.DoesNotContain(AdviceCode.MotionCutIsCheap, median.Advice.Notes);
+    }
+
+    [Fact]
+    public void ThePlanReadsTheProfileWithTheContainerCostAlreadyTakenOut()
+    {
+        var info = new MediaInfo
+        {
+            FilePath = "dusuk.mp4",
+            FileSizeBytes = 40L * 1024 * 1024,
+            DurationSeconds = 300,
+            Width = 320,
+            Height = 180,
+            Fps = 48,
+            VideoCodec = "h264",
+            TotalBitrateBps = 1_100_000,
+            AudioCodec = "aac",
+            AudioBitrateBps = 128_000,
+            AudioChannels = 2
+        };
+        var options = new PlanOptions { TargetMb = 12, Intent = Intent.Sharing, FillPolicy = FillPolicy.QualityCeiling };
+
+        var pixels = (double)info.Width * info.Height;
+        var measuredBppf = 290.0 * 8.0 / pixels;
+        var contaminated = ComplexityProfile.FromProbe(measuredBppf, measuredBppf * 0.6, 6, 288, 1.0);
+        var cleaned = contaminated.WithoutSampleContainerBias(info.Width, info.Height);
+        var frozen = contaminated with { SampleContainerBiasRemoved = true };
+
+        Assert.True(contaminated.ReferenceBppf / cleaned.ReferenceBppf > 1.04,
+            $"Kirlenme olcusuz kaldi: {contaminated.ReferenceBppf:0.000000} / {cleaned.ReferenceBppf:0.000000}.");
+
+        var fromContaminated = PlanCalculator.BuildDetailed(info, options, contaminated);
+        var fromCleaned = PlanCalculator.BuildDetailed(info, options, cleaned);
+        var fromFrozen = PlanCalculator.BuildDetailed(info, options, frozen);
+
+        Assert.Equal(fromCleaned.Plan.VideoBitrateK, fromContaminated.Plan.VideoBitrateK);
+        Assert.True(fromFrozen.Plan.VideoBitrateK > fromContaminated.Plan.VideoBitrateK * 1.04,
+            $"Kirli profil planda ayni sonucu verdi: {fromFrozen.Plan.VideoBitrateK}k / {fromContaminated.Plan.VideoBitrateK}k.");
+    }
 }

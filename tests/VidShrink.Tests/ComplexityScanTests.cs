@@ -221,4 +221,64 @@ public sealed class ComplexityScanTests
         Assert.Equal(WindowBiasSource.Scan, profile.BiasSource);
         Assert.Equal(0.1 / bias, profile.ReferenceBppf, 9);
     }
+
+    [Fact]
+    public void TheWindowTheProfileCorrectsForIsTheWindowTheProbeCuts()
+    {
+        Assert.Single(ComplexityProbe.Windows(ComplexityProfile.SampleWindowSeconds * 1.5 - 0.01));
+        Assert.Equal(2, ComplexityProbe.Windows(ComplexityProfile.SampleWindowSeconds * 1.5 + 0.01).Count());
+        Assert.Equal(ComplexityProbe.MotionProbeFpsRatio, ComplexityProfile.SampleMotionFpsRatio, 9);
+    }
+
+    [Theory]
+    [InlineData(24, 866)]
+    [InlineData(24, 890)]
+    [InlineData(24, 925)]
+    [InlineData(24, 963)]
+    [InlineData(60, 1151)]
+    [InlineData(96, 1539)]
+    [InlineData(120, 1441)]
+    [InlineData(120, 1499)]
+    [InlineData(120, 1547)]
+    [InlineData(120, 1624)]
+    public void TheContainerOverheadModelMatchesTheMeasuredMatroskaCost(int frames, int measuredBytes)
+    {
+        var predicted = ComplexityProfile.SampleContainerFixedBytes + ComplexityProfile.SampleContainerBytesPerFrame * frames;
+        var deviation = Math.Abs(predicted - measuredBytes) / measuredBytes;
+
+        Assert.True(deviation <= 0.12,
+            $"{frames} karelik pencerede model {predicted:0} B soyluyor, olculen {measuredBytes} B, sapma %{deviation * 100:0.0}.");
+    }
+
+    [Fact]
+    public void ContainerOverheadIsTakenOutOfTheMeasuredUnit()
+    {
+        const int width = 640;
+        const int height = 360;
+        const double pixels = (double)width * height;
+        const long sampledFrames = 288;
+        const double sampledSeconds = 6;
+        const double framesPerWindow = sampledFrames / (sampledSeconds / ComplexityProfile.SampleWindowSeconds);
+        const double motionFrames = framesPerWindow * ComplexityProfile.SampleMotionFpsRatio;
+
+        const double cleanFullBytesPerFrame = 60.0;
+        const double cleanMotionExponent = 0.15;
+        var cleanMotionBytesPerFrame = cleanFullBytesPerFrame * Math.Pow(2, cleanMotionExponent);
+
+        var fullBytesPerFrame = cleanFullBytesPerFrame + (764.3 / framesPerWindow + 6.545);
+        var motionBytesPerFrame = cleanMotionBytesPerFrame + (764.3 / motionFrames + 6.545);
+
+        var fullBppf = fullBytesPerFrame * 8.0 / pixels;
+        var motionBppf = fullBppf * (motionBytesPerFrame / fullBytesPerFrame);
+        var measured = ComplexityProfile.FromProbe(fullBppf, fullBppf * 0.6, sampledSeconds, sampledFrames, 0, WindowBiasSource.Scan, motionBppf);
+
+        Assert.True(measured.MotionExponent > cleanMotionExponent + 0.05,
+            $"Kirlenme zaten yok: olculen ustel {measured.MotionExponent:0.0000}.");
+
+        var clean = measured.WithoutSampleContainerBias(width, height);
+
+        Assert.Equal(cleanMotionExponent, clean.MotionExponent, 6);
+        Assert.Equal(cleanFullBytesPerFrame * 8.0 / pixels, clean.ReferenceBppf, 12);
+        Assert.Same(clean, clean.WithoutSampleContainerBias(width, height));
+    }
 }

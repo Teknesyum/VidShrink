@@ -22,6 +22,8 @@ try
         "probe-quality-cost" => await ProbeQualityCostAsync(args),
         "normalization-cost" => await NormalizationCostAsync(args),
         "sample-container-cost" => await SampleContainerCostAsync(args),
+        "container-unit" => await ContainerUnitAsync(args),
+        "search-cost" => SearchCost(args),
         "shrink" => await ShrinkAsync(args),
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
@@ -44,6 +46,8 @@ static void PrintUsage()
     Console.WriteLine("  bench probe-quality-cost <kaynak> [fast|quality]");
     Console.WriteLine("  bench normalization-cost <HDR kaynak> <başlangıç-sn> <süre-sn>");
     Console.WriteLine("  bench sample-container-cost <kaynak> <başlangıç-sn> <çıktı-klasörü>");
+    Console.WriteLine("  bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
+    Console.WriteLine("  bench search-cost [--runs 5]");
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
@@ -175,6 +179,269 @@ static async Task<int> SampleContainerCostAsync(string[] args)
     var rawBytes = new FileInfo(raw).Length;
     var muxedBytes = new FileInfo(muxed).Length;
     Console.WriteLine(JsonSerializer.Serialize(new { RawBytes = rawBytes, MatroskaBytes = muxedBytes, DifferenceBytes = muxedBytes - rawBytes, DifferencePercent = (muxedBytes / (double)rawBytes - 1) * 100 }));
+    return 0;
+}
+
+static async Task<int> ContainerUnitAsync(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.Error.WriteLine("usage: bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
+        return 1;
+    }
+
+    var sources = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries);
+    var starts = new[] { 5.0 };
+    var fpsList = new[] { 12.0, 24.0, 30.0, 60.0 };
+    var outDir = Path.Combine(".calisma", "kap");
+    for (var i = 2; i < args.Length - 1; i++)
+    {
+        if (args[i] == "--start") starts = args[i + 1].Split(',').Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+        else if (args[i] == "--fps") fpsList = args[i + 1].Split(',').Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+        else if (args[i] == "--out") outDir = args[i + 1];
+    }
+    Directory.CreateDirectory(outDir);
+
+    var start = starts[0];
+    var window = ComplexityProfile.SampleWindowSeconds;
+    var rows = new List<object>();
+    var fitX = new List<double>();
+    var fitY = new List<double>();
+
+    foreach (var source in sources)
+    {
+        var info = await FfprobeClient.ProbeAsync(source);
+        var name = Path.GetFileNameWithoutExtension(source);
+
+        foreach (var fps in fpsList)
+        {
+            if (fps > info.Fps + 0.001) continue;
+            var tag = fps.ToString("0.###", CultureInfo.InvariantCulture);
+            var raw = Path.Combine(outDir, name + "-" + tag + ".h264");
+            var mkv = Path.Combine(outDir, name + "-" + tag + ".mkv");
+            var filter = "fps=" + tag;
+            await EncodeSampleAsync(source, start, window, filter, "h264", raw);
+            await EncodeSampleAsync(source, start, window, filter, "matroska", mkv);
+            var rawBytes = new FileInfo(raw).Length;
+            var mkvBytes = new FileInfo(mkv).Length;
+            var frames = await CountPacketsAsync(mkv);
+            if (frames <= 0) continue;
+            fitX.Add(frames);
+            fitY.Add(mkvBytes - rawBytes);
+            rows.Add(new { Source = name, Fps = fps, Frames = frames, RawBytes = rawBytes, MatroskaBytes = mkvBytes, OverheadBytes = mkvBytes - rawBytes, OverheadPerFrame = (mkvBytes - rawBytes) / (double)frames });
+        }
+    }
+
+    var n = fitX.Count;
+    double a = 0, b = 0, r2 = 0;
+    if (n >= 2)
+    {
+        var mx = fitX.Average();
+        var my = fitY.Average();
+        var sxx = fitX.Sum(x => (x - mx) * (x - mx));
+        var sxy = fitX.Zip(fitY, (x, y) => (x - mx) * (y - my)).Sum();
+        b = sxx > 0 ? sxy / sxx : 0;
+        a = my - b * mx;
+        var ssTot = fitY.Sum(y => (y - my) * (y - my));
+        var ssRes = fitX.Zip(fitY, (x, y) => (y - (a + b * x)) * (y - (a + b * x))).Sum();
+        r2 = ssTot > 0 ? 1 - ssRes / ssTot : 1;
+    }
+
+    var motion = new List<object>();
+    var motionValues = new List<double>();
+    foreach (var source in sources)
+    {
+        var info = await FfprobeClient.ProbeAsync(source);
+        var name = Path.GetFileNameWithoutExtension(source);
+        var halfFps = info.Fps * ComplexityProbe.MotionProbeFpsRatio;
+
+        foreach (var offset in starts)
+        {
+        if (offset + window > info.DurationSeconds) continue;
+        var stamp = offset.ToString("0.###", CultureInfo.InvariantCulture);
+        var fullRaw = Path.Combine(outDir, name + "-m" + stamp + "full.h264");
+        var fullMkv = Path.Combine(outDir, name + "-m" + stamp + "full.mkv");
+        await EncodeSampleAsync(source, offset, window, null, "h264", fullRaw);
+        await EncodeSampleAsync(source, offset, window, null, "matroska", fullMkv);
+        var halfRaw = Path.Combine(outDir, name + "-m" + stamp + "half.h264");
+        var halfMkv = Path.Combine(outDir, name + "-m" + stamp + "half.mkv");
+        var halfFilter = "fps=" + halfFps.ToString("0.###", CultureInfo.InvariantCulture);
+        await EncodeSampleAsync(source, offset, window, halfFilter, "h264", halfRaw);
+        await EncodeSampleAsync(source, offset, window, halfFilter, "matroska", halfMkv);
+
+        var fullFrames = await CountPacketsAsync(fullMkv);
+        var halfFrames = await CountPacketsAsync(halfMkv);
+        if (fullFrames <= 0 || halfFrames <= 0) continue;
+
+        var fullMkvBytes = new FileInfo(fullMkv).Length;
+        var halfMkvBytes = new FileInfo(halfMkv).Length;
+        var fullRawBytes = new FileInfo(fullRaw).Length;
+        var halfRawBytes = new FileInfo(halfRaw).Length;
+
+        var mkvRatio = Math.Log2(halfMkvBytes / (double)halfFrames / (fullMkvBytes / (double)fullFrames));
+        var rawRatio = Math.Log2(halfRawBytes / (double)halfFrames / (fullRawBytes / (double)fullFrames));
+        var cleanFull = fullMkvBytes / (double)fullFrames - (ComplexityProfile.SampleContainerFixedBytes / fullFrames + ComplexityProfile.SampleContainerBytesPerFrame);
+        var cleanHalf = halfMkvBytes / (double)halfFrames - (ComplexityProfile.SampleContainerFixedBytes / halfFrames + ComplexityProfile.SampleContainerBytesPerFrame);
+        var cleanRatio = cleanFull > 0 && cleanHalf > 0 ? Math.Log2(cleanHalf / cleanFull) : double.NaN;
+
+        motionValues.Add(rawRatio);
+        motion.Add(new
+        {
+            Source = name,
+            StartSeconds = offset,
+            SourceFps = info.Fps,
+            FullFrames = fullFrames,
+            HalfFrames = halfFrames,
+            Log2Matroska = mkvRatio,
+            Log2RawElementaryStream = rawRatio,
+            Log2MatroskaDecontaminated = cleanRatio,
+            ResidualToRaw = cleanRatio - rawRatio
+        });
+        }
+    }
+
+    var sorted = motionValues.OrderBy(v => v).ToArray();
+    object? distribution = null;
+    if (sorted.Length > 0)
+        distribution = new
+        {
+            Points = sorted.Length,
+            Min = sorted[0],
+            Median = sorted[sorted.Length / 2],
+            Max = sorted[^1],
+            Mean = sorted.Average(),
+            Default = ComplexityProfile.DefaultMotionExponent
+        };
+
+    Console.WriteLine(JsonSerializer.Serialize(new
+    {
+        WindowSeconds = window,
+        Overhead = rows,
+        Fit = new { FixedBytes = a, BytesPerFrame = b, Points = n, R2 = r2 },
+        InUse = new { FixedBytes = ComplexityProfile.SampleContainerFixedBytes, BytesPerFrame = ComplexityProfile.SampleContainerBytesPerFrame },
+        Motion = motion,
+        MotionDistribution = distribution
+    }, new JsonSerializerOptions { WriteIndented = true, NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
+    return 0;
+}
+
+static async Task EncodeSampleAsync(string source, double start, double seconds, string? filter, string format, string output)
+{
+    var list = new List<string>
+    {
+        "-hide_banner", "-loglevel", "error", "-y",
+        "-ss", start.ToString(CultureInfo.InvariantCulture),
+        "-t", seconds.ToString("0.###", CultureInfo.InvariantCulture),
+        "-i", source, "-an", "-sn", "-dn"
+    };
+    if (filter is not null) { list.Add("-vf"); list.Add(filter); }
+    list.Add("-c:v"); list.Add("libx264");
+    list.Add("-crf"); list.Add(ComplexityProfile.ProbeCrf.ToString("0.###", CultureInfo.InvariantCulture));
+    list.Add("-preset"); list.Add(ComplexityProfile.ProbePreset);
+    list.Add("-f"); list.Add(format);
+    list.Add(output);
+
+    using var process = new Process { StartInfo = BenchProcessInfo(ToolLocator.Ffmpeg, list) };
+    process.Start();
+    var stderr = process.StandardError.ReadToEndAsync();
+    await process.WaitForExitAsync();
+    if (process.ExitCode != 0) throw new InvalidOperationException(await stderr);
+}
+
+static async Task<long> CountPacketsAsync(string path)
+{
+    var list = new[]
+    {
+        "-v", "error", "-select_streams", "v:0", "-count_packets",
+        "-show_entries", "stream=nb_read_packets", "-of", "csv=p=0", path
+    };
+    using var process = new Process { StartInfo = BenchProcessInfo(ToolLocator.Ffprobe, list) };
+    process.Start();
+    var stdout = await process.StandardOutput.ReadToEndAsync();
+    await process.WaitForExitAsync();
+    return long.TryParse(stdout.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : 0;
+}
+
+static ProcessStartInfo BenchProcessInfo(string fileName, IEnumerable<string> arguments)
+{
+    var psi = new ProcessStartInfo
+    {
+        FileName = fileName,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    foreach (var argument in arguments) psi.ArgumentList.Add(argument);
+    return psi;
+}
+
+static int SearchCost(string[] args)
+{
+    var runs = 5;
+    for (var i = 1; i < args.Length - 1; i++)
+        if (args[i] == "--runs") runs = int.Parse(args[i + 1], CultureInfo.InvariantCulture);
+
+    var worst = new MediaInfo
+    {
+        FilePath = "huge.mkv",
+        FileSizeBytes = 4L * 1024 * 1024 * 1024 * 1024,
+        DurationSeconds = 28800,
+        Width = 3840,
+        Height = 2160,
+        Fps = 60,
+        VideoCodec = "h264",
+        TotalBitrateBps = 1_200_000_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 128_000,
+        AudioChannels = 2
+    };
+    var typical = new MediaInfo
+    {
+        FilePath = "capture.mkv",
+        FileSizeBytes = 500L * 1024 * 1024,
+        DurationSeconds = 120,
+        Width = 1920,
+        Height = 1080,
+        Fps = 60,
+        VideoCodec = "h264",
+        TotalBitrateBps = 35_000_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 128_000,
+        AudioChannels = 2
+    };
+
+    var rows = new List<object>();
+    foreach (var (name, info) in new[] { ("worst", worst), ("typical", typical) })
+    {
+        var options = new PlanOptions { Intent = Intent.Sharing };
+        var ceilingMb = PlanCalculator.QualityCeilingTargetMb(info);
+        var requested = PlanCalculator.BuildDetailed(info, new PlanOptions { Intent = Intent.Sharing, TargetMb = ceilingMb }, null).PredictedQuality - 0.01;
+
+        _ = PlanCalculator.TargetMbForQuality(info, options, requested);
+
+        var best = double.MaxValue;
+        var evaluations = 0;
+        for (var run = 0; run < runs; run++)
+        {
+            var watch = Stopwatch.StartNew();
+            var result = PlanCalculator.TargetMbForQuality(info, options, requested);
+            watch.Stop();
+            evaluations = result.Evaluations;
+            best = Math.Min(best, watch.Elapsed.TotalMilliseconds);
+        }
+
+        rows.Add(new
+        {
+            Case = name,
+            Evaluations = evaluations,
+            Budget = PlanCalculator.QualitySearchMaxEvaluations,
+            BestMilliseconds = best,
+            MillisecondsPerEvaluation = best / Math.Max(evaluations, 1)
+        });
+    }
+
+    Console.WriteLine(JsonSerializer.Serialize(rows, new JsonSerializerOptions { WriteIndented = true }));
     return 0;
 }
 

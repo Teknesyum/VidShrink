@@ -85,6 +85,9 @@ public sealed record ComplexityProfile
     public const double WindowBiasMax = 2.0;
 
     public const double SampleWindowSeconds = 2.0;
+    public const double SampleMotionFpsRatio = 0.5;
+    public const double SampleContainerFixedBytes = 764.3;
+    public const double SampleContainerBytesPerFrame = 6.545;
     public const double VmafNegMin = 1.0;
     public const double VmafNegMax = 100.0;
     private const double QualitySlopeMinSpreadHalvings = 0.25;
@@ -114,6 +117,7 @@ public sealed record ComplexityProfile
     public double WindowBias { get; init; } = 1.0;
     public WindowBiasSource BiasSource { get; init; } = WindowBiasSource.None;
     public QualityAnchor? QualityAnchor { get; init; }
+    public bool SampleContainerBiasRemoved { get; init; }
 
     public bool Calibrated => Calibration is not null && LevelFactor > 0 && HalvingStep > 0;
 
@@ -134,6 +138,42 @@ public sealed record ComplexityProfile
         => AppliesTo(codec, scale, fps) && WindowBiasKnown ? BiasBand : Measured ? MeasuredBand : EstimatedBand;
 
     public bool QualityMeasured => QualityAnchor is not null;
+
+    public ComplexityProfile WithoutSampleContainerBias(int width, int height)
+    {
+        if (SampleContainerBiasRemoved || !Measured || width <= 0 || height <= 0) return this;
+
+        var windows = (int)Math.Round(SampledSeconds / SampleWindowSeconds, MidpointRounding.AwayFromZero);
+        if (windows <= 0 || SampledFrames <= 0) return this;
+
+        var framesPerWindow = SampledFrames / (double)windows;
+        if (framesPerWindow < 1) return this;
+
+        var pixels = (double)width * height;
+        var bytesPerFrame = ProbeBppf * pixels / 8.0;
+        var cleanFull = bytesPerFrame - (SampleContainerFixedBytes / framesPerWindow + SampleContainerBytesPerFrame);
+        if (cleanFull <= 0) return this;
+
+        var motion = MotionExponent;
+        if (MotionMeasured)
+        {
+            var motionFrames = framesPerWindow * SampleMotionFpsRatio;
+            var cleanMotion = bytesPerFrame * Math.Pow(2, MotionExponent)
+                              - (SampleContainerFixedBytes / motionFrames + SampleContainerBytesPerFrame);
+            if (cleanMotion > 0)
+                motion = Math.Clamp(Math.Log2(cleanMotion / cleanFull), MotionExponentMin, MotionExponentMax);
+        }
+
+        var cleanBppf = cleanFull * 8.0 / pixels;
+        var reference = WindowBiasKnown && WindowBias > 0 ? cleanBppf / WindowBias : cleanBppf;
+
+        return this with
+        {
+            ReferenceBppf = Math.Clamp(reference, 0.002, 2.0),
+            MotionExponent = motion,
+            SampleContainerBiasRemoved = true
+        };
+    }
 
     public double ProbeBppf => ReferenceBppf * WindowDomainFactor;
 

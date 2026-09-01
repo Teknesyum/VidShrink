@@ -56,6 +56,8 @@ public static class PlanCalculator
     private const double ScaleStep = 0.02;
     private const double LowFpsSurcharge = 12.0;
     private const double LowFpsThreshold = 20.0;
+    private const double MotionCutCheapSavingShare = 0.20;
+    private static readonly double MotionCutIsCheapBelow = Math.Log2(2 * (1 - MotionCutCheapSavingShare));
     private const double MotionCutIsExpensiveAbove = 0.5;
     private const int MinVideoBitrateK = 48;
     private const double SourceQualityScore = 100.0;
@@ -98,7 +100,7 @@ public static class PlanCalculator
 
     public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
     {
-        var complexity = profile ?? ComplexityProfile.FromSourceBitrate(info);
+        var complexity = (profile ?? ComplexityProfile.FromSourceBitrate(info)).WithoutSampleContainerBias(info.Width, info.Height);
         var regime = CompressionStrategy.RegimeFor(info.FileSizeMb, options.TargetMb);
         var ratio = CompressionStrategy.Ratio(info.FileSizeMb, options.TargetMb);
         var notes = new List<AdviceCode>();
@@ -179,7 +181,7 @@ public static class PlanCalculator
         if (complexity.MotionMeasured && effective.AllowFpsDrop)
         {
             var halvingSaving = (1 - Math.Pow(2, complexity.MotionExponent - 1)) * 100;
-            if (complexity.MotionExponent <= ComplexityProfile.DefaultMotionExponent)
+            if (complexity.MotionExponent <= MotionCutIsCheapBelow)
             {
                 notes.Add(AdviceCode.MotionCutIsCheap);
                 reason.Add($"the motion measurement puts this title's frame rate exponent at {complexity.MotionExponent:0.00}, so halving the frame rate saves {halvingSaving:0.#}% of the bits and dropping frames is cheap here");
@@ -372,7 +374,7 @@ public static class PlanCalculator
 
     public static SizeEstimate Estimate(EncodePlan plan, MediaInfo info, ComplexityProfile? profile)
     {
-        var complexity = profile ?? ComplexityProfile.FromSourceBitrate(info);
+        var complexity = (profile ?? ComplexityProfile.FromSourceBitrate(info)).WithoutSampleContainerBias(info.Width, info.Height);
 
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return new SizeEstimate(info.FileSizeMb, info.FileSizeMb, info.FileSizeMb, complexity.Measured, true);
