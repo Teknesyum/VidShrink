@@ -89,3 +89,6 @@
 {"id":"T88","round":"3","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests|QualityMeterTests|PlanCalculatorTests","code":0}],"auditorRunId":"a1576e0a956e4df31","headSha":"a8efc4fe8aacd162b254557c07ef3e6f65196e35","at":"2026-09-01T20:00:21.707Z"}
 {"id":"T86","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|ShellMenuTests|Windows11ShellMenuTests|UpdaterTests","code":0}],"auditorRunId":"a5a45130352b613a5","headSha":"2713da9400aa2cc1c67a75ea9d56ef8a29bea82b","at":"2026-09-01T20:17:28.524Z"}
 {"id":"T91","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"LocalizationTests|LanguageTests","code":0}],"auditorRunId":null,"headSha":"2713da9400aa2cc1c67a75ea9d56ef8a29bea82b","at":"2026-09-01T20:18:11.346Z"}
+{"id":"T89","result":"stale","at":"2026-09-01T20:20:53.586Z"}
+{"id":"T93","result":"stale","at":"2026-09-01T20:20:53.586Z"}
+{"id":"T93","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"LanguageTests|PanelHostTests|SegmentEncoderTests","code":0}],"auditorRunId":null,"headSha":"c3c791c84b1e40bf62e4bddda52a71202dfc01a7","at":"2026-09-01T20:59:58.229Z"}
