@@ -66,8 +66,54 @@ public sealed class ComplexityProbeTests
     }
 
     [Fact]
-    public void FullAndHalfSamplesUseTheSameAccountingContainer()
-        => Assert.Equal(ComplexityProbe.FullSampleFormat, ComplexityProbe.HalfSampleFormat);
+    public void EveryProbeSampleMuxesThroughTheSameContainer()
+    {
+        var split = ComplexityProbe.SplitArgs("in.mp4", 1.0, (160, 120), "veryfast", SpeedMode.Quality, "full.mkv", "half.mkv");
+        var motion = ComplexityProbe.SampleArgs("in.mp4", 1.0, 2.0, "fps=30", "veryfast", SpeedMode.Quality, "motion.mkv");
+        var plain = ComplexityProbe.SampleArgs("in.mp4", 1.0, 2.0, null, "veryfast", SpeedMode.Quality, "plain.mkv");
+
+        var muxers = OutputMuxers(split).Concat(OutputMuxers(motion)).Concat(OutputMuxers(plain)).ToArray();
+
+        Assert.Equal(4, muxers.Length);
+        Assert.Single(muxers.Distinct());
+        Assert.DoesNotContain("null", muxers);
+    }
+
+    [Fact]
+    public async Task WindowAndMotionSamplesCountTheSameByteUnit()
+    {
+        await WithClipAsync(async info =>
+        {
+            var window = await ComplexityProbe.SampleWindowAsync(info.FilePath, 1.0, (160, 120), "veryfast", SpeedMode.Quality, null, default);
+            var (motionBytes, motionFrames) = await ComplexityProbe.SampleAsync(info.FilePath, 1.0, 2.0, null, "veryfast", SpeedMode.Quality, default);
+
+            Assert.True(window.FullFrames > 0, "tam olcek ornegi kare uretmedi");
+            Assert.True(motionFrames > 0, "hareket ornegi kare uretmedi");
+            Assert.True(window.FullBytes > 0, "tam olcek ornegi bayt uretmedi");
+
+            var drift = Math.Abs(motionBytes - window.FullBytes) / (double)window.FullBytes;
+            Assert.True(drift < 0.08, $"pencere {window.FullBytes} B, hareket {motionBytes} B, sapma {drift:P1}");
+        }, "color=c=gray:size=320x240:rate=12:duration=8");
+    }
+
+    [Fact]
+    public async Task ProbeEntryPointUsedByTheAppDoesNotMeasureQuality()
+    {
+        await WithClipAsync(async info =>
+        {
+            var meter = new FakeMeter(true);
+            var profile = await ComplexityProbe.RunAsync(info, SpeedMode.Fast, meter, default);
+
+            Assert.True(profile.Measured);
+            Assert.Equal(0, meter.Calls);
+        });
+    }
+
+    private static IEnumerable<string> OutputMuxers(IReadOnlyList<string> args)
+    {
+        for (var i = 0; i + 1 < args.Count; i++)
+            if (args[i] == "-f") yield return args[i + 1];
+    }
 
     [Theory]
     [InlineData(false, false, true)]
@@ -98,7 +144,7 @@ public sealed class ComplexityProbeTests
         });
     }
 
-    private static async Task WithClipAsync(Func<MediaInfo, Task> body)
+    private static async Task WithClipAsync(Func<MediaInfo, Task> body, string source = "testsrc2=size=320x240:rate=12:duration=8")
     {
         if (!ToolLocator.IsAvailable(out _)) return;
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_complexity_" + Guid.NewGuid().ToString("N"));
@@ -106,7 +152,7 @@ public sealed class ComplexityProbeTests
         try
         {
             var clip = Path.Combine(dir, "clip.mp4");
-            await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=12:duration=8", "-c:v", "libx264", "-pix_fmt", "yuv420p", clip });
+            await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", source, "-c:v", "libx264", "-pix_fmt", "yuv420p", clip });
             await body(await FfprobeClient.ProbeAsync(clip));
         }
         finally { try { Directory.Delete(dir, true); } catch { } }
