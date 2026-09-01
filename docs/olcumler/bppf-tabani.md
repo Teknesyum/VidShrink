@@ -145,10 +145,14 @@ penceresi **480–540 sn** ve bağımsız bir ikinci pencere **200–260 sn**.
 Boyutlar %2,2 bandında (95,33–97,41 MiB); karşılaştırma eşit boyutta yapıldı sayılır.
 Harmonik ortalama libvmaf'ın havuzlama tanımıyla hesaplandı (`n / Σ 1/(x+1) − 1`);
 düz harmonik ortalama, aşağıdaki sıfır puanlı kareler yüzünden her satırda 0 çıkıyor.
+**Harmonik sütununa yaslanmayın — T106 soruşturuyor:** VMAF-NEG'in AV1 çıktılarında
+sıfır veren kareleri harmoniği aşağı çekiyor. Aşağıdaki karar ortalama ve p10 üzerinden verildi;
+harmonik sütun çıkarılsa da kazanan değişmiyor.
 
 **Kazanan 1280x720@60.** Altı ölçüden beşini alıyor. Kaybettiği tek ölçü 480 penceresinin
 düz ortalaması (69,32'ye karşı 68,81, fark 0,51); aynı satır aynı pencerede harmonikte 12,64,
-p10'da 2,80 geride. Bugünkü seçime (882x496@60) karşı üstünlüğü iki pencerede de aynı yönde:
+p10'da 2,80 geride. Harmonik iki sütun tamamen atıldığında da sıralama aynı: kalan dört
+ölçünün üçünde birinci (200 ort, 480 p10, 200 p10), 480 ortalamasında 0,51 farkla ikinci. Bugünkü seçime (882x496@60) karşı üstünlüğü iki pencerede de aynı yönde:
 480'de +6,39 ort / +3,13 harm / +0,31 p10, 200'de +2,19 / +1,25 / +0,72.
 
 Sözleşmedeki liste "960x540" ile "540p60"ı ayrı sayıyordu; bunlar tek yerleşimin iki adı.
@@ -177,5 +181,6 @@ taşımıyor.
 Her satırda 33–62 kare 5 VMAF-NEG'in altına düşüyor (n=3600). Düşük kareler bütün
 satırlarda **aynı indislerde** (480 penceresinde 2471–3231 arası, yani kaynağın 521–534.
 saniyeleri). Bu, ölçüm hizasızlığı değil — hizasızlık bütün kareleri düşürürdü. Bu hedef
-boyutta o sahne yerleşimden bağımsız olarak çöküyor. p1 sütunu bu yüzden yerleşimleri
+boyutta o sahne yerleşimden bağımsız olarak çöküyor. T106 aynı olguyu ölçünün kendi
+tarafından soruşturuyor — sıfır puanlı karelerin ne kadarı kodlayıcının, ne kadarı ölçünün. p1 sütunu bu yüzden yerleşimleri
 ayırmıyor (2,93–5,15), p10 ayırıyor.
