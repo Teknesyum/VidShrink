@@ -101,6 +101,30 @@ Aynı kodlayıcı ve aynı kaynak iki farklı hedef boyutta koşturulur. Büyük
 puanı küçük hedefinkinden en az 1,00 VMAF-NEG puanı yüksek çıkmazsa araç o satırı
 `AYRIŞMIYOR` diye işaretler; düzenek duyarsız sayılır.
 
+## Düzeneğin reddettikleri
+
+Bir ölçüm düzeneğinin neyi **reddettiği**, ne ölçtüğü kadar önemlidir. Bu araç
+şu durumlarda sayı basmaz, hata verir:
+
+| reddediş | gerekçe |
+|---|---|
+| taraflardan biri etiketsiz | etiketsize varsayım uydurmak GEÇERSİZ tabloyu üreten hatanın ta kendisi |
+| iki HDR uzayı ayrı | PQ ile HLG doğrudan puanlanamaz |
+| referans SDR, çıktı HDR | referans yükseltilemez |
+| kare hızları ayrı | libvmaf kareleri yanlış eşler, sessizce sayı üretir |
+| girdi ses taşıyor | HandBrake `-a none` koşarken bütçe iki tarafta eşit bölünmez |
+
+Son satır bu sözleşme sırasında gerçekten yakalandı ve bir koşumu iptal ettirdi.
+`parca-2` ve `parca-3` — bu sözleşmeden önce başka bir ajan tarafından kesilmiş
+oldukları için — ses akışı taşıyordu; `parca-1` taşımıyordu. VidShrink tarafı iki
+parçada bütçenin bir kısmını sese ayırıp üçüncüsünde ayırmayacak, HandBrake tarafı
+ise hiçbirinde ayırmayacaktı. Ortaya çıkacak sayı hem HandBrake'e karşı haksız hem
+de parçalar arasında kendi içinde tutarsız olurdu. Sayılar üretildikten sonra bunu
+fark etmek zordur: tablo gayet makul görünür.
+
+Düzenek artık sesli her girdiden `-map 0:v:0 -c copy` ile video-only bir kopya
+türetiyor; türetmeden sonra girdi hâlâ ses taşıyorsa kodlamaya başlamadan duruyor.
+
 ### Bu turda ölçülmeyen
 
 Süre ve hız. Makine paylaşımlı — ölçüm boyunca aynı makinede başka ajanlar da
@@ -108,7 +132,11 @@ kodlama koşuyordu. Bu belgede hiçbir süre ya da hız iddiası yok.
 
 ## Ölçüler
 
-`AbTests` adıyla, `dotnet test -c Release --filter "AbTests"`. Renk kapısı, eş
+`AbTests` adıyla, `dotnet test -c Release --filter "AbTests"` — 49 test, 49 geçti,
+0 kaldı, 0 atlandı. 36'sı bu sözleşmenin (`ColorGateAbTests` 9,
+`ChunkAggregateAbTests` 8, `SensitivityAbTests` 6, `SizeParityAbTests` 5,
+`AbSettingsAbTests` 4, `HandBrakeArgumentsAbTests` 3, `DeviationAbTests` 1);
+kalan 13 `SettingsTabTests` süzgece adından ötürü takılıyor. Renk kapısı, eş
 boyut toleransı, parça birleştirme (p10 dahil), duyarlılık eşiği ve HandBrake
 bit hızı hesabı üretim davranışı üzerinden ölçülür: sabit karşılaştırma, `Skip`
 ve sessiz erken dönüş yok.
