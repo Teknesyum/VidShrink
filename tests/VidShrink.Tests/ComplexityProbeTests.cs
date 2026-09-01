@@ -22,6 +22,19 @@ public sealed class ComplexityProbeTests
         }
     }
 
+    private sealed class BlockingMeter : IQualityMeasurement
+    {
+        public bool IsAvailable => true;
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public async Task<WindowQualityMeasurement?> MeasureWindowAsync(string referencePath, string samplePath, double referenceStartSeconds, double durationSeconds, CancellationToken ct)
+        {
+            Entered.TrySetResult();
+            await Task.Delay(Timeout.InfiniteTimeSpan, ct);
+            return null;
+        }
+    }
+
     [Fact]
     public async Task DetailedProbeExposesWindowQualityThroughCoreContract()
     {
@@ -58,9 +71,11 @@ public sealed class ComplexityProbeTests
         await WithClipAsync(async info =>
         {
             using var cts = new CancellationTokenSource();
+            var meter = new BlockingMeter();
+            var pending = ComplexityProbe.RunDetailedAsync(info, SpeedMode.Fast, true, meter, cts.Token);
+            await meter.Entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
             cts.Cancel();
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-                ComplexityProbe.RunDetailedAsync(info, SpeedMode.Fast, true, new FakeMeter(true), cts.Token));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pending);
         });
     }
 
