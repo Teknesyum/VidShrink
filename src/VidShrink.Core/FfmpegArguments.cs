@@ -14,6 +14,12 @@ public interface IEncoderOptionWarmup
     bool WarmEncoderOption(string codec, string option, string value);
 }
 
+/// <summary>
+/// Anahtar kare aralığı: alt sınır, üst sınır ve aralığın hangi yoldan çıktığı.
+/// <see cref="FromSceneMap"/> yalnız sahne haritasından türetilen aralıkta doğrudur.
+/// </summary>
+public readonly record struct KeyframeRange(int MinFrames, int MaxFrames, bool FromSceneMap);
+
 public static class FfmpegArguments
 {
     private static readonly IReadOnlyDictionary<string, string[]> Presets = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
@@ -110,6 +116,84 @@ public static class FfmpegArguments
 
     public static double BufferFactor(double peakFactor) => 1.0 + 2.0 * (peakFactor - 1.0);
 
+    // Keyframe interval. This used to be a single number, -g = 2 s, written on every encode. A
+    // fixed short interval forces I-frames where no scene starts, and the software encoders
+    // already place one at every scene on their own, so the forced frames only cost bits.
+    // What replaces it is a range: a floor the encoder may not cut below, a ceiling it may not
+    // run past, and the placement in between left to the encoder's scene-cut decision. The
+    // floor is one second, as in HandBrake (encx264.c:386-391, encx265.c:188-190: min-keyint
+    // = fps, keyint = 10*fps).
+    //
+    // The ceiling is what the measurement decides, and it is not a single number either. The
+    // ceiling only binds inside a scene longer than itself; below that the scene cut fires
+    // first. So the ceiling is read off the content: KeyframeCeilingSceneFactor x the mean
+    // scene length of the SceneMap, clamped between KeyframeCeilingMinSeconds and
+    // KeyframeCeilingMaxSeconds. Without a map the default is HandBrake's 10 s.
+    //
+    // OLCUM-BEKLIYOR: bu blogun sayilari T98 kosumundan sonra yazilacak.
+    //
+    // Hardware is a different mechanism and gets its own ceiling. NVENC only inserts an I-frame
+    // at a scene cut when lookahead is on (ffmpeg -h encoder=hevc_nvenc: "-no-scenecut ... When
+    // lookahead is enabled"), and this project does not turn lookahead on, so on hardware the
+    // ceiling is the whole placement rule: the realized interval is exactly the ceiling and the
+    // seek cost is exactly what the ceiling says. HardwareKeyframeCeilingSeconds is therefore
+    // the seek budget itself, not a content-derived number.
+    public const double KeyframeFloorSeconds = 1.0;
+    public const double KeyframeCeilingDefaultSeconds = 10.0;
+    public const double SceneMapMergeFactor = 2.8;
+    public const double KeyframeCeilingMinSeconds = 5.0;
+    public const double KeyframeCeilingMaxSeconds = 10.0;
+    public const double HardwareKeyframeCeilingSeconds = 5.0;
+
+    /// <summary>
+    /// Sahne haritasından üst sınırı türetir. Harita yoksa ya da hiç sahne taşımıyorsa
+    /// HandBrake'in 10 saniyesine düşer.
+    /// </summary>
+    public static double KeyframeCeilingSeconds(SceneMap? scenes)
+    {
+        if (scenes is null || scenes.Scenes.Count == 0 || scenes.Duration <= 0)
+            return KeyframeCeilingDefaultSeconds;
+        var mappedMeanSeconds = scenes.Duration / scenes.Scenes.Count;
+        return Math.Clamp(
+            mappedMeanSeconds / SceneMapMergeFactor,
+            KeyframeCeilingMinSeconds,
+            KeyframeCeilingMaxSeconds);
+    }
+
+    /// <summary>
+    /// Kodlayıcının uyacağı anahtar kare aralığı. Yerleşim kararı aralığın içinde kodlayıcıya
+    /// bırakılır; donanımda sahne kesimi olmadığı için üst sınır aralığın kendisidir.
+    /// </summary>
+    public static KeyframeRange KeyframeInterval(string codec, double fps, SceneMap? scenes = null)
+    {
+        var rate = double.IsFinite(fps) && fps > 0 ? fps : 30.0;
+        var hardware = CodecModel.IsHardware(codec);
+        var fromMap = !hardware && scenes is not null && scenes.Scenes.Count > 0 && scenes.Duration > 0;
+        var ceilingSeconds = hardware ? HardwareKeyframeCeilingSeconds : KeyframeCeilingSeconds(scenes);
+        var min = Math.Max(1, (int)Math.Round(rate * KeyframeFloorSeconds));
+        var max = Math.Max(min, (int)Math.Round(rate * ceilingSeconds));
+        return new KeyframeRange(min, max, fromMap);
+    }
+
+    /// <summary>
+    /// Aralığı kodlayıcının kendi diliyle yazar. Sahne kesimi her yolda açık kalır: x265'te
+    /// <c>scenecut=40</c>, SVT-AV1'de <c>scd=1</c>, x264/VP9'da varsayılan.
+    /// </summary>
+    public static IReadOnlyList<string> KeyframeArgs(string codec, double fps, SceneMap? scenes = null)
+    {
+        var range = KeyframeInterval(codec, fps, scenes);
+        var max = range.MaxFrames.ToString(CultureInfo.InvariantCulture);
+        var min = range.MinFrames.ToString(CultureInfo.InvariantCulture);
+
+        if (codec.Equals("libx265", StringComparison.OrdinalIgnoreCase))
+            return new[] { "-g", max, "-x265-params", $"keyint={max}:min-keyint={min}:scenecut=40" };
+        if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase))
+            return new[] { "-g", max, "-svtav1-params", $"keyint={max}:scd=1" };
+        if (CodecModel.IsHardware(codec))
+            return new[] { "-g", max };
+        return new[] { "-g", max, "-keyint_min", min };
+    }
+
     public static bool SupportsRateLimits(string codec)
         => !string.Equals(codec, "libsvtav1", StringComparison.OrdinalIgnoreCase);
 
@@ -118,7 +202,7 @@ public static class FfmpegArguments
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
-    public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null)
+    public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
         var a = new List<string> { "-hide_banner", "-y", "-hwaccel", "auto", "-i", info.FilePath };
 
@@ -159,7 +243,7 @@ public static class FfmpegArguments
             }
         }
 
-        a.AddRange(new[] { "-g", Math.Max(2, (int)Math.Round(plan.Fps * 2)).ToString(CultureInfo.InvariantCulture) });
+        a.AddRange(KeyframeArgs(plan.Codec, plan.Fps, scenes));
         a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
@@ -289,9 +373,9 @@ public static class FfmpegArguments
     /// <c>-ss</c> girdiden <b>once</b> gelir: sonra gelirse ffmpeg dosyayi bastan
     /// cozer ve 2 sn'lik bir parca saniyeler surer. Ikinci gecis uretilmez.
     /// </summary>
-    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null)
+    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
-        var a = new List<string>(Build(info, plan, outputPath, 0, null, availability));
+        var a = new List<string>(Build(info, plan, outputPath, 0, null, availability, scenes));
         var input = a.IndexOf("-i");
         if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");
 

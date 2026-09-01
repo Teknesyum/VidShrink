@@ -1,4 +1,5 @@
-﻿using VidShrink.Core;
+﻿using System.Globalization;
+using VidShrink.Core;
 
 namespace VidShrink.Tests;
 
@@ -113,7 +114,8 @@ public sealed class FfmpegArgumentsTests
         Assert.Contains("-pix_fmt yuv420p", part);
         Assert.Contains("-c:a aac", part);
         Assert.Contains("-b:a 128k", part);
-        Assert.Contains("-g 60", part);
+        Assert.Contains("-g 300", part);
+        Assert.Contains("-keyint_min 30", part);
     }
 
     [Fact]
@@ -129,9 +131,9 @@ public sealed class FfmpegArgumentsTests
     }
 
     [Theory]
-    [InlineData("libx265", "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2")]
-    [InlineData("libsvtav1", "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2")]
-    public void Yazilim_psy_bayragi_yalniz_olculen_destekte_uretilir(string codec, string option, string value)
+    [InlineData("libx265", "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2", "keyint=300:min-keyint=30:scenecut=40")]
+    [InlineData("libsvtav1", "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2", "keyint=300:scd=1")]
+    public void Yazilim_psy_bayragi_yalniz_olculen_destekte_uretilir(string codec, string option, string value, string keyframeParams)
     {
         var plan = Plan(codec);
         var supported = new OptionAvailability((codec, option));
@@ -142,8 +144,8 @@ public sealed class FfmpegArgumentsTests
 
         var index = enabled.IndexOf(option);
         Assert.True(index >= 0);
-        Assert.Equal(value, enabled[index + 1]);
-        Assert.DoesNotContain(option, disabled);
+        Assert.Equal($"{keyframeParams}:{value}", enabled[index + 1]);
+        Assert.Equal(keyframeParams, disabled[disabled.IndexOf(option) + 1]);
     }
 
     [Fact]
@@ -541,5 +543,315 @@ public sealed class FfmpegArgumentsTests
         for (var ratio = 11.4; ratio <= 200.0; ratio += 7.3)
             Assert.True(PeakAtFloorRatio(codec, width, height, fps, ratio) < 1.50,
                 $"{ratio:0.0}x tabanda tepe olculen asma degerine ({1.50}) ulasti");
+    }
+
+    /// <summary>
+    /// Esit uzunlukta <paramref name="sceneCount"/> sahneden olusan bir harita. Uretimin
+    /// haritadan okudugu tek sey ortalama sahne uzunlugu oldugu icin esit bolme yeterli.
+    /// </summary>
+    private static SceneMap Harita(double durationSeconds, int sceneCount)
+    {
+        var scenes = new List<Scene>(sceneCount);
+        var step = durationSeconds / sceneCount;
+        for (var i = 0; i < sceneCount; i++)
+            scenes.Add(new Scene
+            {
+                Index = i,
+                Start = i * step,
+                End = (i + 1) * step,
+                Bits = 1_000_000,
+                Complexity = 1.0
+            });
+        return new SceneMap { Threshold = SceneMap.DefaultThreshold, Duration = durationSeconds, Scenes = scenes };
+    }
+
+    private static double TavanSaniye(string codec, double fps, SceneMap? scenes)
+        => FfmpegArguments.KeyframeInterval(codec, fps, scenes).MaxFrames / fps;
+
+    private static double TabanSaniye(string codec, double fps, SceneMap? scenes)
+        => FfmpegArguments.KeyframeInterval(codec, fps, scenes).MinFrames / fps;
+
+    /// <summary>
+    /// Aralik tek sayi degil: alt sinir bir saniye, ust sinir alt sinirdan kat kat buyuk
+    /// ve ikisi de argumana ayri ayri yaziliyor. Eski sabit <c>-g fps*2</c> yolunda ust
+    /// sinir alt sinirin iki kati ve ayri bir alt sinir hic yoktu.
+    /// </summary>
+    [Theory]
+    [InlineData("libx264", 30)]
+    [InlineData("libx264", 60)]
+    [InlineData("libvpx-vp9", 24)]
+    public void Anahtar_kare_araligi_alt_ve_ust_siniri_ayri_yazar(string codec, double fps)
+    {
+        var args = FfmpegArguments.KeyframeArgs(codec, fps);
+        var g = double.Parse(args[args.ToList().IndexOf("-g") + 1], CultureInfo.InvariantCulture);
+        var min = double.Parse(args[args.ToList().IndexOf("-keyint_min") + 1], CultureInfo.InvariantCulture);
+
+        Assert.Equal(1.0, min / fps, 2);
+        Assert.True(g / fps >= FfmpegArguments.KeyframeCeilingMinSeconds,
+            $"ust sinir olculen en kisa degerin altinda: {g / fps:0.##} sn");
+        Assert.True(g >= 4 * min, $"aralik degil tek sayi gibi davraniyor: {min}..{g}");
+    }
+
+    /// <summary>
+    /// Harita yoksa HandBrake araligina dusuluyor: 1 sn alt sinir, 10 sn ust sinir
+    /// (encx264.c:386-391, encx265.c:188-190). Davranis bozulmuyor, sabit 2 sn'ye de
+    /// geri donulmuyor.
+    /// </summary>
+    [Theory]
+    [InlineData(24)]
+    [InlineData(30)]
+    [InlineData(59.94)]
+    public void Harita_yokken_HandBrake_araligina_dusulur(double fps)
+    {
+        Assert.Equal(1.0, TabanSaniye("libx264", fps, null), 2);
+        Assert.Equal(10.0, TavanSaniye("libx264", fps, null), 1);
+    }
+
+    /// <summary>
+    /// Ust sinir haritadan turuyor: kisa sahneli icerikte kisaliyor, uzun sahneli
+    /// icerikte uzuyor. Iddia iki sabiti degil uretimin iki ciktisini karsilastiriyor.
+    /// </summary>
+    [Fact]
+    public void Ust_sinir_ortalama_sahne_uzunluguyla_birlikte_uzar()
+    {
+        var previous = 0.0;
+        foreach (var sceneCount in new[] { 40, 20, 10, 6, 4, 2, 1 })
+        {
+            var ceiling = TavanSaniye("libx264", 60, Harita(60.0, sceneCount));
+            Assert.True(ceiling >= previous,
+                $"{sceneCount} sahnede ust sinir geri gitti: {previous:0.###} -> {ceiling:0.###}");
+            previous = ceiling;
+        }
+
+        Assert.True(TavanSaniye("libx264", 60, Harita(60.0, 20)) < TavanSaniye("libx264", 60, Harita(60.0, 2)),
+            "kisa ve uzun sahneli icerik ayni ust siniri aliyor");
+    }
+
+    /// <summary>
+    /// T101 haritayi yer gercegine karsi olctu: 144,2-333,3 sn penceresinde 28 gercek
+    /// kesim varken harita 10 uretti, yanlis pozitif yok. Yani haritanin bildirdigi
+    /// ortalama sahne uzunlugu sistematik olarak buyuk. Duzeltme uygulanmazsa 189,1 sn'lik
+    /// o pencerenin haritali ortalamasi (18,9 sn) ust siniri dogrudan tavana yapistirir ve
+    /// harita hicbir sey soylememis olur; duzeltme ile ust sinir tavanin altinda kalir.
+    /// </summary>
+    [Fact]
+    public void Haritanin_az_bolmesi_ust_sinirdan_dusulur()
+    {
+        var t101 = Harita(189.1, 10);
+        var haritasiz = TavanSaniye("libx264", 60, null);
+        var haritali = TavanSaniye("libx264", 60, t101);
+
+        Assert.True(haritali < haritasiz,
+            $"az bolen harita ust siniri haritasiz varsayilana esitledi: {haritali:0.###} sn");
+        Assert.True(haritali >= FfmpegArguments.KeyframeCeilingMinSeconds,
+            $"ust sinir olculen en kisa degerin altina indi: {haritali:0.###} sn");
+    }
+
+    /// <summary>
+    /// Donanimda sahne kesimi yok (ffmpeg <c>-h encoder=hevc_nvenc</c>: <c>-no-scenecut</c>
+    /// yalniz lookahead acikken is goruyor, bu proje lookahead acmiyor). Orada ust sinir
+    /// gerceklesen araligin kendisi oldugu icin harita ust siniri oynatmaz ve deger
+    /// yazilim yolundaki varsayilandan kisa kalir.
+    /// </summary>
+    [Theory]
+    [InlineData("av1_nvenc")]
+    [InlineData("hevc_nvenc")]
+    [InlineData("h264_qsv")]
+    public void Donanimda_ust_sinir_haritadan_etkilenmez(string codec)
+    {
+        var kisa = FfmpegArguments.KeyframeInterval(codec, 60, Harita(60.0, 30));
+        var uzun = FfmpegArguments.KeyframeInterval(codec, 60, Harita(60.0, 1));
+
+        Assert.Equal(kisa.MaxFrames, uzun.MaxFrames);
+        Assert.False(kisa.FromSceneMap);
+        Assert.True(kisa.MaxFrames / 60.0 < TavanSaniye("libx264", 60, null),
+            "donanim ust siniri yazilim varsayilanindan kisa degil");
+    }
+
+    /// <summary>
+    /// Yerlesim karari kodlayiciya birakiliyor: her yazilim kodlayicisinda sahne kesimi
+    /// acik yaziliyor ve aralik kodlayicinin kendi diliyle veriliyor.
+    /// </summary>
+    [Fact]
+    public void Sahne_kesimi_kodlayicinin_kendi_diliyle_acik_yazilir()
+    {
+        var x265 = FfmpegArguments.KeyframeArgs("libx265", 30);
+        var x265Params = x265[x265.ToList().IndexOf("-x265-params") + 1];
+        Assert.Contains("keyint=300", x265Params);
+        Assert.Contains("min-keyint=30", x265Params);
+        Assert.Contains("scenecut=40", x265Params);
+
+        var svt = FfmpegArguments.KeyframeArgs("libsvtav1", 30);
+        var svtParams = svt[svt.ToList().IndexOf("-svtav1-params") + 1];
+        Assert.Contains("keyint=300", svtParams);
+        Assert.Contains("scd=1", svtParams);
+    }
+
+    /// <summary>
+    /// Anahtar kare parametreleri de psy/HDR gibi tek dizgede birlesiyor; yoksa ffmpeg
+    /// son yazani alir ve ikisinden biri sessizce duser.
+    /// </summary>
+    [Fact]
+    public void Anahtar_kare_ve_psy_parametreleri_tek_x265_dizgesinde_birlesir()
+    {
+        var plan = Plan("libx265");
+        plan.Fps = 30;
+        var args = FfmpegArguments.Build(Source(), plan, "cikti.mp4", 0, null,
+            new OptionAvailability(("libx265", "-x265-params")));
+
+        Assert.Single(args, a => a == "-x265-params");
+        var value = args[args.ToList().IndexOf("-x265-params") + 1];
+        Assert.Contains("keyint=300", value);
+        Assert.Contains("min-keyint=30", value);
+        Assert.Contains("psy-rd=2", value);
+    }
+
+    /// <summary>
+    /// Aralik degisikligi hiz denetimine dokunmuyor: iki farkli aralikla uretilen iki
+    /// komut yalniz anahtar kare bayraklarinda ayrisiyor, <c>-b:v</c> / <c>-maxrate</c> /
+    /// <c>-bufsize</c> ikisinde de ayni. Boyut guvencesinin ilk savunmasi bu.
+    /// </summary>
+    [Fact]
+    public void Aralik_degisikligi_hiz_denetimi_bayraklarina_dokunmaz()
+    {
+        var plan = Plan();
+        var haritasiz = FfmpegArguments.Build(Source(), plan, "cikti.mp4", 2, "log");
+        var haritali = FfmpegArguments.Build(Source(), plan, "cikti.mp4", 2, "log", null, Harita(60.0, 20));
+
+        var fark = Pairs(haritasiz).Except(Pairs(haritali))
+            .Concat(Pairs(haritali).Except(Pairs(haritasiz)))
+            .Select(FlagOf)
+            .Distinct()
+            .ToList();
+
+        Assert.All(fark, flag => Assert.Contains(flag, new[] { "-g", "-keyint_min" }));
+        Assert.Contains("-g", fark);
+    }
+
+    private static async Task<int> RunAsync(string exe, params string[] a)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = exe,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var x in a) psi.ArgumentList.Add(x);
+        using var p = new System.Diagnostics.Process { StartInfo = psi };
+        p.Start();
+        var so = p.StandardOutput.ReadToEndAsync();
+        var se = p.StandardError.ReadToEndAsync();
+        await p.WaitForExitAsync();
+        await so;
+        await se;
+        return p.ExitCode;
+    }
+
+    private static async Task<int> AnahtarKareSayisiAsync(string path)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = VidShrink.Ffmpeg.ToolLocator.Ffprobe,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var x in new[] { "-v", "error", "-select_streams", "v:0", "-skip_frame", "nokey",
+                                  "-show_entries", "frame=pts_time", "-of", "csv=p=0", path })
+            psi.ArgumentList.Add(x);
+        using var p = new System.Diagnostics.Process { StartInfo = psi };
+        p.Start();
+        var so = p.StandardOutput.ReadToEndAsync();
+        var se = p.StandardError.ReadToEndAsync();
+        await p.WaitForExitAsync();
+        await se;
+        return (await so).Split('\n').Count(l => l.Trim().Length > 0);
+    }
+
+    /// <summary>
+    /// Kesimsiz bir kaynakta ust sinir gerceklesen aralik oluyor: uzun ust sinir kesinlikle
+    /// daha az I-kare uretiyor. Arama gecikmesinin altindaki mekanizma bu; gecikmenin
+    /// kendisi <c>docs/olcumler/tepe-tavani-ve-psy.md</c>'de olculdu.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Uzun_ust_sinir_kesimsiz_kaynakta_daha_az_anahtar_kare_uretir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink-t98-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var kisa = Path.Combine(dir, "kisa.mp4");
+            var uzun = Path.Combine(dir, "uzun.mp4");
+
+            async Task Kodla(string cikti, IReadOnlyList<string> keyframeArgs)
+            {
+                var a = new List<string> { "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=30:duration=20",
+                    "-c:v", "libx264", "-preset", "fast", "-crf", "28" };
+                a.AddRange(keyframeArgs);
+                a.AddRange(new[] { "-pix_fmt", "yuv420p", cikti });
+                Assert.Equal(0, await RunAsync(VidShrink.Ffmpeg.ToolLocator.Ffmpeg, a.ToArray()));
+            }
+
+            await Kodla(kisa, FfmpegArguments.KeyframeArgs("libx264", 30, Harita(20.0, 20)));
+            await Kodla(uzun, FfmpegArguments.KeyframeArgs("libx264", 30, null));
+
+            var kisaSayi = await AnahtarKareSayisiAsync(kisa);
+            var uzunSayi = await AnahtarKareSayisiAsync(uzun);
+
+            Assert.True(kisaSayi > uzunSayi,
+                $"kisa ust sinir daha cok I-kare uretmedi: kisa={kisaSayi} uzun={uzunSayi}");
+            Assert.True(uzunSayi <= 3, $"10 sn ust sinirda 20 sn'lik kesimsiz kaynakta {uzunSayi} I-kare var");
+        }
+        finally
+        {
+            foreach (var f in Directory.GetFiles(dir)) File.Delete(f);
+            Directory.Delete(dir);
+        }
+    }
+
+    /// <summary>
+    /// Yerlesim gercekten kodlayicida: 2,5 saniyede bir sert kesim tasiyan 20 sn'lik kaynak,
+    /// uretilen aralikla kodlandiginda ust sinirin izin verdiginden fazla I-kare aliyor.
+    /// Iddia sabitle degil, ayni argumanlarin <c>scenecut=0</c>'li ikizinden gelen sayiyla
+    /// karsilastiriliyor; aralik sahne kesimini kapatirsa iki sayi esitlenir ve olcu kizarir.
+    /// </summary>
+    [FfmpegFact]
+    public async Task Sahne_kesimi_ust_sinirin_izin_verdiginden_cok_I_kare_yerlestirir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink-t98-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            async Task<int> Kodla(string cikti, string? kapali)
+            {
+                var a = new List<string> { "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=30:duration=2.5",
+                    "-f", "lavfi", "-i", "smptebars=size=320x240:rate=30:duration=2.5",
+                    "-filter_complex", "[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1[v]",
+                    "-map", "[v]", "-c:v", "libx264", "-preset", "fast", "-crf", "28" };
+                a.AddRange(FfmpegArguments.KeyframeArgs("libx264", 30));
+                if (kapali is not null) a.AddRange(new[] { "-x264-params", kapali });
+                a.AddRange(new[] { "-pix_fmt", "yuv420p", Path.Combine(dir, cikti) });
+                Assert.Equal(0, await RunAsync(VidShrink.Ffmpeg.ToolLocator.Ffmpeg, a.ToArray()));
+                return await AnahtarKareSayisiAsync(Path.Combine(dir, cikti));
+            }
+
+            var acik = await Kodla("acik.mp4", null);
+            var kapali = await Kodla("kapali.mp4", "scenecut=0");
+
+            Assert.True(acik > kapali,
+                $"sahne kesimi acikken fazladan I-kare gelmedi: acik={acik} kapali={kapali}");
+            Assert.True(acik > 20.0 / FfmpegArguments.KeyframeCeilingDefaultSeconds + 1,
+                $"20 sn'lik 8 kesimli kaynakta yalniz {acik} I-kare var; yerlesim ust sinirdan geliyor");
+        }
+        finally
+        {
+            foreach (var f in Directory.GetFiles(dir)) File.Delete(f);
+            Directory.Delete(dir);
+        }
     }
 }
