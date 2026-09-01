@@ -195,13 +195,14 @@ public sealed class QualityMeterTests
             var score = await QualityMeter.MeasureAsync(reference, damaged, CancellationToken.None);
 
             Assert.True(score.Comparable, score.Message);
-            Assert.Equal(QualityMeter.SceneWindowSeconds, score.SceneWindowSeconds);
+            Assert.NotNull(score.SceneWindowSeconds);
             Assert.NotNull(score.VmafNegMean);
             Assert.NotNull(score.VmafNegWorstScene);
             Assert.NotNull(score.WorstSceneStartSeconds);
             Assert.True(score.VmafNegWorstScene < score.VmafNegMean - 10,
                 $"the scene floor did not drop below the clip mean ({score.VmafNegWorstScene} vs {score.VmafNegMean})");
             Assert.InRange(score.WorstSceneStartSeconds!.Value, 5.0, 7.0);
+            Assert.Equal(0.0, score.WorstSceneStartSeconds!.Value % score.SceneWindowSeconds!.Value, 6);
         }
         finally { Cleanup(dir); }
     }
@@ -262,6 +263,18 @@ public sealed class QualityMeterTests
         var (worst, at) = QualityMeter.WorstScene(scores, 60, 0, null);
 
         Assert.Equal(55.0, worst, 6);
+        Assert.Equal(2.0, at, 6);
+    }
+
+    [Fact]
+    public void MapWithASingleSceneFallsBackToTheFixedWindow()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 120; i < 240; i++) scores[i] = 0.0;
+
+        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0, MapWithCuts(10.0));
+
+        Assert.Equal(0.0, worst, 6);
         Assert.Equal(2.0, at, 6);
     }
 

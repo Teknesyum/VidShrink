@@ -128,8 +128,10 @@ aynı**. Dolayısıyla geriye dönük düzeltme gerektiren sayı, yalnız o band
 olanlardır.
 
 `docs/olcumler/handbrake-acigi.md` tarandı: **o belgedeki hiçbir VMAF değeri
-`[99,8; 100]` bandında değil.** En yüksek değerler 72 civarında (SDR eş-boyut
-tablosu), tonemap hizalı ölçüm 48,96 / 40,17. Yani:
+`[99,8; 100]` bandında değil.** Eş-boyut tablosundaki (`handbrake-acigi.md:40-51`)
+en yüksek değer **93,51** (HDR 1/2, HandBrake); SDR satırlarının en yükseği 89,55.
+Tonemap hizalı ölçüm 48,96 / 40,17. Bandın alt sınırına en yakın sayı 93,51 ve
+aradaki mesafe 6,3 puan. Yani:
 
 - **8,79 puanlık sıkıştırma farkı iddiası ayakta** — kelepçeden etkilenmedi.
 - Aynı belgedeki harmonik 10,18 ve p10 14,60 farkları da etkilenmedi.
@@ -362,18 +364,25 @@ hiçbir şey değiştirmiyor, yani tutmanın gürültü maliyeti yok.)
 0,5 sn'lik kuyrukta tutmak p1'de sinyali %76 (1,5530 → 2,7353), p3'te %56
 (1,5301 → 2,3842) yükseltiyor. Gizlediği şey somut: p3'ün son 0,5 saniyesinde
 crf 12 gerçekte **84,1481**, atan kural aynı klipte en kötü birimi **92,3877**
-diye raporluyor — 8,2 puanlık kör nokta.
+diye raporluyor — 8,24 puanlık kör nokta.
 
 Ama sınırsız tutmak da olmuyor. 1 karelik kuyrukta p3'te sinyal 0,0282'ye
 çöküyor ve kural **kalıyor**: tek kare her iki yarışmacıda da aynı sahne kesme
 artığını yakalıyor (14,5851 / 14,5569), yani `VmafNegMin`'in hastalığının aynısı
-(§7). 0,25 sn'de p3 hâlâ sağlıklı (2,4043) ama pay incelmiş.
+(§7).
 
 **Karar: son kısmi birim, tam pencerenin dörtte birinden — 0,5 saniyeden —
 uzunsa tutuluyor, kısaysa atılıyor.** `QualityMeter.MinimumUnitSeconds`.
-0,25 sn de ölçüldü ve çalışıyor; 0,5 sn ölçülen en kısa güvenli sınırın iki katı
-olduğu için seçildi. Aynı alt sınır sahne yolunda da geçerli: yarım saniyeden
-kısa bir sahne en kötü sahne seçilemiyor.
+
+Gerekçe doğrudan tablodan: **tutmanın atmayı geçtiği en kısa kuyruk 0,5 sn.**
+Daha kısa her uzunlukta tutmak kaybediyor ya da p1'de kazanırken p3'te
+kaybediyor — 0,25 sn'de p3 tutan 2,4043, atan 2,5564; 0,1 sn'de 1,7274 / 2,4069;
+0,05 sn'de 1,5174 / 2,4834; 1 karede 0,0282 / 2,4572. 0,5 sn'de ikisi birden
+kazanıyor (p1 2,7353 / 1,5530, p3 2,3842 / 1,5301). Seçilen değer güvenli
+sınırın katı değil, güvenli sınırın kendisi — bu yüzden altına inilmiyor.
+
+Aynı alt sınır sahne yolunda da geçerli: yarım saniyeden kısa bir sahne en kötü
+sahne seçilemiyor.
 
 ### 4.4 Harita yokken davranış (K3)
 
@@ -454,7 +463,7 @@ algısal ağırlıklı hali), `identity` ve `msad` (algısal değil), `vmafmotio
 
 ## 6. Mutasyon kanıtı
 
-`dotnet test -c Release --filter "QualityMeterTests"` — **18 ölçü, tamamı
+`dotnet test -c Release --filter "QualityMeterTests"` — **19 ölçü, tamamı
 geçiyor, atlanan 0.** ffmpeg gerektirenler `[FfmpegFact]`, tonemap zinciri
 gerektiren `[TonemapFact]` (sınırı §8'de). Ölçünün içinde yetenek yoklayıp
 sessizce dönen kol yok; iki sabiti karşılaştıran ölçü yok.
@@ -467,17 +476,19 @@ T97 mutasyonları, kaynak her seferinde geri alınarak:
 | Pencere adımı `scores.Count` yapıldı (tek pencere = tüm klip) | `WorstSceneAveragesOverTwoSecondBuckets`, `WorstSceneReportsTheWindowStartOnTheReferenceTimeline`, `WorstSceneFindsTheDamagedSectionTheMeanHides` |
 | Tonemap öneki düşürüldü (`referencePrefix = ""`) | `TonemappedReferenceSeparatesTwoSdrQualities` |
 
-T104 mutasyonları — pencere kuralı, sahne bağı, kısmi birim ve boş liste
-savunması tek tek bozuldu:
+T104 mutasyonları — pencere kuralı, sahne bağı, kısmi birim, boş liste savunması
+ve haritalı geri düşüş tek tek bozuldu. Beşi de koşturuldu; koşum kaydı
+`.calisma/T104/mutasyon.ps1` ve `mutasyon.log`:
 
 | Mutasyon | Düşen ölçü | Sonuç |
 |---|---|---|
-| Sabit pencere `2 sn` → `1 sn` (`fps * SceneWindowSeconds` → `fps * 1.0`) | `WorstSceneAveragesOverTwoSecondBuckets`, `FixedWindowsDiluteTheSceneTheMapWouldIsolate` | 2 başarısız / 16 başarılı |
-| Sahne bağı koparıldı (`SceneBounds(map, …)` → `SceneBounds(null, …)`) | `WorstSceneUsesSceneBoundariesWhenTheMapIsPresent`, `SceneBoundariesAreReadOnTheReferenceTimelineNotFromZero`, `SceneShorterThanHalfASecondIsNotTheWorstScene` | 3 başarısız / 15 başarılı |
-| Kısmi birim eşiği `pencere/4` → `pencere` (T97'nin "kuyruğu at" kuralı) | `CollapseInTheTrailingHalfSecondIsNotDropped` | 1 başarısız / 17 başarılı |
-| Boş liste savunması etkisizleştirildi (`Count == 0` → `Count == -1`) | `WorstSceneRejectsAnEmptyScoreList` | 1 başarısız / 17 başarılı |
+| Sabit pencere `2 sn` → `1 sn` (`fps * SceneWindowSeconds` → `fps * 1.0`) | `WorstSceneAveragesOverTwoSecondBuckets`, `FixedWindowsDiluteTheSceneTheMapWouldIsolate` | 2 başarısız / 17 başarılı |
+| Sahne bağı koparıldı (`SceneBounds(map, …)` → `SceneBounds(null, …)`) | `WorstSceneUsesSceneBoundariesWhenTheMapIsPresent`, `SceneBoundariesAreReadOnTheReferenceTimelineNotFromZero`, `SceneShorterThanHalfASecondIsNotTheWorstScene` | 3 başarısız / 16 başarılı |
+| Kısmi birim eşiği `pencere/4` → `pencere` (T97'nin "kuyruğu at" kuralı) | `CollapseInTheTrailingHalfSecondIsNotDropped` | 1 başarısız / 18 başarılı |
+| Boş liste savunması etkisizleştirildi (`Count == 0` → `Count == -1`) | `WorstSceneRejectsAnEmptyScoreList` | 1 başarısız / 18 başarılı |
+| Geri düşüş eşiği `bounds.Count > 2` → `>= 2` (tek sahnelik harita sabit pencereye düşmez olur) | `MapWithASingleSceneFallsBackToTheFixedWindow` | 1 başarısız / 18 başarılı |
 
-Dört koşumun hepsinde **atlanan 0**.
+Beş koşumun hepsinde **atlanan 0**; mutasyonsuz temel koşum 19/19.
 
 Hangi ölçü neyi tek başına tutuyor:
 
@@ -499,8 +510,18 @@ Hangi ölçü neyi tek başına tutuyor:
   yüzü. 990 kare: son 0,5 sn sıfır → ölçü 0,0 @ 16,0 sn görüyor. 975 kare: son
   0,25 sn sıfır → ölçü onu atıyor ve 100,0 raporluyor. Eşiği hangi yöne
   kaydırırsan biri düşer.
+- `MapWithASingleSceneFallsBackToTheFixedWindow` — harita **var** ama ikiden az
+  birim üretiyorsa sabit pencereye düşülüyor. 600 kare @ 60 fps, kesmesiz 10 sn'lik
+  harita: sabit yol 0,0 @ 2,0 sn buluyor, geri düşüş kapatılırsa tek birim klip
+  ortalamasını (80,0 @ 0,0) veriyor. §4.4'ün p3'te ölçümle gösterdiği kol artık
+  ölçüyle de tutuluyor.
 - `WorstSceneRejectsAnEmptyScoreList` — boş puan listesi `ArgumentException`
   fırlatıyor, `PositiveInfinity` dönmüyor.
+
+Bir not: `WorstSceneFindsTheDamagedSectionTheMeanHides` (ffmpeg'li bütünleşme ölçüsü)
+pencere uzunluğunu **tutmuyor**; raporlanan başlangıcın raporlanan pencere
+ızgarasına oturduğunu doğruluyor, o kadar. Uzunluğu tek başına tutan ölçü
+`WorstSceneAveragesOverTwoSecondBuckets`.
 
 
 ## 7. `VmafNegMin` kararı (K5)
@@ -598,8 +619,12 @@ T104 tabloları (§4.2, §4.3, §7) için üç klip ve altı kodlama:
 Her çift için kare başına VMAF-NEG günlüğü alınır (`pN-ref` kendisiyle, crf 8 ile,
 crf 12 ile); gürültü özdeş günlükten, sinyal iki kodlama günlüğünün farkından
 hesaplanır. Sahne satırları `SceneDetector.BuildMapAsync` haritasıyla, eşik
-parametresi değiştirilerek üretildi. Ölçüm düzeneği `.calisma/` altındaydı ve iş
-bitince silindi; sayılar bu belgede.
+parametresi değiştirilerek üretildi.
+
+Ölçüm düzeneği ve ham günlükler **hâlâ yerinde**: `.calisma/T104/` (sonda programı,
+`mutasyon.ps1`, `mutasyon.log`, `son.log`) ve `.calisma/is/` (klipler ve kare başına
+JSON günlükleri), yaklaşık 1,4 GB. T104 ajanının silme izni yoktu; temizlik T0'da,
+worktree kaldırılırken. `.gitignore`'da, git'e sızmadı.
 
 §2 ve §4 tabloları kare başına JSON günlüğünden çıkarıldı; günlüğü doğrudan almak
 için filtreye `libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path=...`
