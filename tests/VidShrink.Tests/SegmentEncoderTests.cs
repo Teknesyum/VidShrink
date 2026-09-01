@@ -190,6 +190,13 @@ public sealed class SegmentEncoderTests : IClassFixture<SegmentClips>
         Assert.Empty(Directory.GetFiles(dir, SegmentEncoder.TempPrefix + "*"));
     }
 
+    /// <summary>
+    /// Bozuk kaynakta kodlayan sessiz kalmaz. Olcu eskiden "LastError bos degil" diyordu;
+    /// bu iddia LastError ekran iletisi tasirken bir sey olcuyordu, bugun anahtar tasidigi
+    /// icin "anahtar bos degil"e inmisti. Olculen sey artik sebebin kendisi: hangi anahtar
+    /// geliyor, dil dosyalarinda karsiligi var mi, LastError iletiyi degil anahtari mi
+    /// veriyor, ve motorun ham tanisi biciim argumani olarak duruyor mu.
+    /// </summary>
     [FfmpegFact]
     public async Task Bozuk_kaynakta_hata_yutulmaz()
     {
@@ -199,8 +206,38 @@ public sealed class SegmentEncoderTests : IClassFixture<SegmentClips>
         var clip = await encoder.RequestAsync(Source(_clips.Bozuk), Plan(), 0);
 
         Assert.Null(clip);
-        Assert.False(string.IsNullOrWhiteSpace(encoder.LastError));
         Assert.Empty(Directory.GetFiles(dir, SegmentEncoder.TempPrefix + "*"));
+
+        Assert.True(encoder.LastFailure.HasValue, "kodlayan sebep birakmadi");
+        var sebep = encoder.LastFailure!.Value;
+
+        Assert.Equal(sebep.Key, encoder.LastError);
+
+        var ekranMetinleri = Locales.Languages
+            .SelectMany(language => Locales.Values(language).Values)
+            .ToHashSet(StringComparer.Ordinal);
+        Assert.DoesNotContain(sebep.Key, ekranMetinleri);
+
+        foreach (var language in Locales.Languages)
+        {
+            var sozluk = Locales.Values(language);
+            Assert.True(sozluk.ContainsKey(sebep.Key), $"{language} sozlugunde karsiligi yok: {sebep.Key}");
+
+            var sablon = sozluk[sebep.Key];
+            Assert.Equal(sebep.Detail is not null, sablon.Contains("{0}", StringComparison.Ordinal));
+        }
+
+        Assert.NotNull(sebep.Detail);
+        Assert.False(int.TryParse(sebep.Detail, out _), $"cikis kodu geldi: \"{sebep.Detail}\"");
+        Assert.True(sebep.Detail!.Split(' ').Length >= 3, $"motor tanisi bekleniyordu: \"{sebep.Detail}\"");
+
+        Record($"K6 bozuk kaynak sebebi: {sebep.Key} · tani: {Tekcizgi(sebep.Detail)}");
+    }
+
+    private static string Tekcizgi(string text)
+    {
+        var flat = text.Replace('\r', ' ').Replace('\n', ' ').Trim();
+        return flat.Length <= 120 ? flat : flat[..120];
     }
 
     /// <summary>

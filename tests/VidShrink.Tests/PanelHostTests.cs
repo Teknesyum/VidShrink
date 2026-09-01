@@ -292,7 +292,16 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         AppHost.Run(host.Dispose);
     }
 
-    /// <summary>K6: bozuk kaynak cokme uretmez, hata kaydedilir, sag yari bos kalir.</summary>
+    /// <summary>
+    /// K6: bozuk kaynak cokme uretmez, hata kaydedilir, sag yari bos kalir.
+    ///
+    /// <para>Ikinci yari T93: eski iddia "LastError bos degil" idi ve LastError anahtara
+    /// donunce icini yitirdi. Bugun olculen sey gercek kosumdan cikan sebebin ekrana
+    /// donusmesi — kodlayanin biraktigi anahtar, paneli barindiran tarafin urettigi cumlede
+    /// dil dosyasindaki sabit parcalara ve motorun ham tanisina donusuyor mu, iki dilde de.
+    /// Beklenen parcalar dil dosyasindan okunuyor ve uretimin kendi Title gecidinden
+    /// geciriliyor; olcunun kendi sabiti yok.</para>
+    /// </summary>
     [FfmpegFact]
     public async Task Bozuk_kaynakta_panel_cokmez()
     {
@@ -308,7 +317,33 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         await host.LoadClipAsync(0);
 
         Assert.Null(host.ActiveClip);
-        Assert.False(string.IsNullOrWhiteSpace(encoder.LastError));
+
+        Assert.True(encoder.LastFailure.HasValue, "kodlayan sebep birakmadi");
+        var sebep = encoder.LastFailure!.Value;
+        Assert.Equal(sebep.Key, encoder.LastError);
+        Assert.NotNull(sebep.Detail);
+
+        var turkce = AppHost.Run(() => { host.SetLanguage(true); return host.SampleFailureText(sebep); });
+        var ingilizce = AppHost.Run(() => { host.SetLanguage(false); return host.SampleFailureText(sebep); });
+
+        var tr = Locales.Values("tr");
+        var en = Locales.Values("en");
+
+        foreach (var (shown, sozluk, turkish) in
+                 new[] { (turkce, tr, true), (ingilizce, en, false) })
+        {
+            Assert.DoesNotContain(sebep.Key, shown, StringComparison.Ordinal);
+            Assert.DoesNotContain("{0}", shown, StringComparison.Ordinal);
+            Assert.Contains(sebep.Detail!, shown, StringComparison.Ordinal);
+            Assert.Contains(
+                LanguageCatalog.Title(sozluk["playback.sample-failed"], turkish), shown, StringComparison.Ordinal);
+
+            foreach (var piece in LanguageCatalog.Title(sozluk[sebep.Key], turkish).Split("{0}"))
+                if (piece.Trim().Length >= 3)
+                    Assert.Contains(piece.Trim(), shown, StringComparison.Ordinal);
+        }
+
+        Assert.NotEqual(turkce, ingilizce);
         AppHost.Run(host.Dispose);
     }
 

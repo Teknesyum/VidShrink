@@ -135,3 +135,128 @@ Koşum kapısı bu okumanın günlüğü üzerinden geçirildi:
 `KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=60 alt-sınır=60`.
 
 Release yapısı (`dotnet build VidShrink.sln -c Release`): `0 Uyarı, 0 Hata`.
+
+# T93 — İçi boşalmış ölçünün mutasyonları
+
+Durum: **tamamlandı — 2026-09-01.** Dal: `T93-ici-bosalmis-olcu`.
+
+Üç ölçü yeşil okuyordu ama ölçtükleri şey artık o değildi. Her madde için bozulan şey
+üretim davranışı ya da taranan gerçek dosyadır; hiçbir mutasyon testin kendi sabitine
+dokunmuyor. Her mutasyonda **karşı ölçüm** de var: aynı bozukluk dururken ölçünün
+`HEAD` sürümü koşturuldu, deliğin gerçekten var olduğu gösterildi.
+
+## 1. `LastError` iddiası — anahtar yerine tanı döndürüldü
+
+`SegmentEncoder.cs:128` `LastFailure?.Key` yerine `LastFailure?.Detail` döndürecek
+biçimde bozuldu. `LastError` bozuk kaynakta yine dolu geliyor, yani eski iddia
+(`Assert.False(string.IsNullOrWhiteSpace(...))`) hiçbir şey görmüyor.
+
+Yeni ölçüler kırmızı oldu — ikisi de aynı yerden:
+
+`Assert.Equal() Failure: Strings differ / Expected: "playback.error.engine" / Actual: "[in#0 @ 0000026742c74100] moov atom not f"···`
+
+Kırılanlar: `SegmentEncoderTests.Bozuk_kaynakta_hata_yutulmaz`,
+`PanelHostTests.Bozuk_kaynakta_panel_cokmez`.
+
+## 2. Anahtarın metne dönüşü — çeviri geçidi atlandı
+
+`PanelHost.SampleFailureText` içindeki `PlaybackText(failure.Key)` çağrıları kaldırıldı;
+sebep, sözlükten geçmeden ham anahtar olarak birleştirildi.
+
+`PanelHostTests.Bozuk_kaynakta_panel_cokmez` kırmızı oldu ve anahtarın ekrana sızdığını
+birebir bastı:
+
+`Assert.DoesNotContain() Failure: Sub-string found / String: ···"Örneği Kodlanamadı: playback.error.engine"··· / Found: "playback.error.engine"`
+
+`SegmentEncoderTests.Bozuk_kaynakta_hata_yutulmaz` bu mutasyonda haklı olarak yeşil
+kaldı: kodlayanın kendi sebebi bozulmamıştı.
+
+### Karşı ölçüm — 1. ve 2. madde
+
+Her iki mutasyon birlikte dururken `PanelHostTests.cs` ve `SegmentEncoderTests.cs`
+`HEAD` sürümlerine alındı. Aynı filtre **yeşil** verdi:
+
+`Başarısız: 0, Başarılı: 2, Atlanan: 0, Toplam: 2`
+
+İki üretim davranışı da bozukken eski iddialar hiçbir şey söylemiyordu. Ölçülen tek
+şey `LastError`'ın boş olmamasıydı ve `Detail` de boş değildi.
+
+## 3. `IsResourceValue` toptan muafiyeti — tema dosyasına cümle yazıldı
+
+`Themes/Theme.axaml` sonuna `<x:String x:Key="SizanCumle">Bu bir ekran cumlesidir</x:String>`
+eklendi. Açılış etiketinde `x:Key=` geçtiği için eski örüntü bu gövdeyi taramadan
+düşürüyordu.
+
+`LanguageTests.BicimlemedeKullaniciyaGorunenDuzMetinKalmadi` kırmızı oldu:
+
+`Themes\Theme.axaml içinde anahtardan gelmeyen metin var: >Bu bir ekran cumlesidir<`
+
+## 4. `ScreenBody` deliği — yer tutucuyla başlayan metin
+
+`Playback/ComparisonPanel.axaml` içine `<TextBlock>{0} dosya hazir</TextBlock>` eklendi.
+Eski ölçüt `value.StartsWith('{')` olduğu için gövde bağ sanılıp düşürülüyordu.
+
+`LanguageTests.BicimlemedeKullaniciyaGorunenDuzMetinKalmadi` kırmızı oldu:
+
+`Playback\ComparisonPanel.axaml içinde anahtardan gelmeyen metin var: >{0} dosya hazir<`
+
+### Karşı ölçüm — 3. ve 4. madde
+
+Her iki sızıntı dosyalarda dururken `LanguageTests.cs` `HEAD` sürümüne alındı.
+`--filter "BicimlemedeKullaniciyaGorunenDuzMetinKalmadi"` **yeşil** verdi:
+
+`Başarısız: 0, Başarılı: 7, Atlanan: 0, Toplam: 7`
+
+Yedi biçimleme dosyasının hepsi taranıyordu ve iki gömülü metin de görünmüyordu.
+
+## 5. Muafiyet listesinin ölü adı — kaynak gövdesi boşaltıldı
+
+`Themes/Theme.axaml` içindeki `<x:String x:Key="LinkGitHub">` gövdesi harf taşımayan
+bir değere (`12345`) çevrildi; ad artık hiçbir kaynak gövdesine karşılık gelmiyor.
+
+Yeni `LanguageTests.Kaynak_muafiyetinde_kullanilmayan_ad_yok` kırmızı oldu:
+
+`muafiyet listesinde karşılığı olmayan ad: LinkGitHub`
+
+Bu ölçü muafiyetin ölü adla büyümesini engelliyor (sözleşme 5. madde).
+
+## Muafiyetin ölçüsü
+
+Eski örüntüden geçen gövde sayısı sayıldı: `Themes/Theme.axaml` **33**,
+`Themes/Playback.axaml` **3** — toplam **36**, denetimin bildirdiği sayıyla birebir.
+
+Otuz altısı da çevrilmeyecek kaynak değeri: 24 `Color`, 3 `BoxShadows`,
+2 `FontFamily`, 2 `StreamGeometry`, 4 `x:String` (üç bağlantı adresi ve bir varlık
+adresi), 1 perde rengi. Hiçbiri ekran metni taşımıyor, bu yüzden **36 gövdenin
+0'ı taramaya girdi** — bugünkü ağaçta muafiyetten çıkan gövde yok.
+
+Değişen şey sayı değil, muafiyetin kapsamı: örüntü bugünkü 36 gövdeyi olduğu kadar
+yarın yazılacak her `x:Key` gövdesini de düşürüyordu. Ada bağlandıktan sonra muafiyet
+adı yazılı 36 anahtarla sınırlı; listede olmayan her `x:Key` gövdesi taranıyor. 3.
+maddedeki mutasyon bunun kanıtı.
+
+## Ölçülmedi
+
+- Panelin kendi `RightCurtainText` denetimine düşen metin okunmadı. `PanelHost`
+  perdeyi yalnız panel açıkken (`_open`) tazeliyor; başsız ölçümde o yol koşmuyor.
+  Ölçülen şey perdenin metnini üreten üretim yolu (`PanelHost.SampleFailureText`),
+  denetimin `Text` özelliği değil.
+- `playback.error.window`, `playback.error.exit-code` ve `playback.error.no-file`
+  yollarının **gerçek koşumdan** doğuşu ölçülmedi. `Clamp` pencereyi kaynağın içine
+  çektiği için `RequestAsync` üzerinden bu üç yola ulaşılamıyor; üçü de T91'in
+  `FirstFailure` ölçüsünde elle kurulmuş koşumlarla duruyor.
+- Tam süit koşturulmadı. Başka ajan paralel çalışıyordu; sözleşmenin dar filtresi
+  koşturuldu.
+
+## Doğrulama
+
+Sözleşme filtresi (`dotnet test -c Release --filter "LanguageTests|PanelHostTests|SegmentEncoderTests"`):
+
+`Başarısız: 0, Başarılı: 72, Atlanan: 0, Toplam: 72, Süre: 1 m 11 s`
+
+Aynı filtrenin `HEAD` üzerindeki başlangıç okuması 71'di; fark yeni eklenen
+`Kaynak_muafiyetinde_kullanilmayan_ad_yok`. Atlanan test yok — ffmpeg bu makinede
+bulunuyor, `[FfmpegFact]` ölçüleri gerçekten koştu.
+
+Release yapısında `TreatWarningsAsErrors` açık; derleme uyarısız geçti.
+Bütün mutasyonlar geri alındı: `git diff -- src/` boş.
