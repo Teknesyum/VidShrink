@@ -566,8 +566,8 @@ public sealed class UpdaterTests : IDisposable
             var retired = LauncherUpdate.Retired(root, LauncherUpdate.ExecutableName);
             return () =>
             {
-                File.Move(target, retired);
-                File.Move(incoming, target);
+                MoveOverTransientLock(target, retired);
+                MoveOverTransientLock(incoming, target);
             };
         }, MinimumRounds, untilCaught: true);
 
@@ -760,6 +760,28 @@ public sealed class UpdaterTests : IDisposable
         string.Join(", ", Directory.GetFiles(root).Select(Path.GetFileName).OrderBy(name => name, StringComparer.Ordinal));
 
     private const int MinimumRounds = 120;
+
+    /// <summary>
+    /// Windows tazeyken yazılan dosyayı kısa süre tutabiliyor (tarayıcı, dizinleyici).
+    /// Ölçünün iddiası adın boşaldığının görülmesi; taşımanın kendisi o iddianın parçası
+    /// değil, kurulumu. <see cref="Hammer"/>'ın temizlik adımındaki sınırlı yeniden deneme
+    /// burada da geçerli.
+    /// </summary>
+    private static void MoveOverTransientLock(string from, string to)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            try
+            {
+                File.Move(from, to);
+                return;
+            }
+            catch (IOException) when (attempt < 20)
+            {
+                Thread.Sleep(25);
+            }
+        }
+    }
 
     /// <summary>
     /// Aynı değişimi çok kez koşturur ve her turda kurulum kökünü aralıksız yoklayan bir

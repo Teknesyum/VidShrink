@@ -2,18 +2,24 @@ $ErrorActionPreference = 'Stop'
 $gate = Join-Path $PSScriptRoot 'kosum-kapisi.ps1'
 $fixtures = Join-Path $PSScriptRoot 'fixtures'
 
-foreach ($name in @('gecerli-tr.txt', 'gecerli-en.txt')) {
-    & $gate -MinimumTotal 974 -InputFile (Join-Path $fixtures $name)
-    if ($LASTEXITCODE -ne 0) { throw "Geçerli örnek reddedildi: $name" }
+foreach ($case in @(
+    @{ Name = 'gecerli-tr.txt'; Minimum = 974 },
+    @{ Name = 'gecerli-en.txt'; Minimum = 974 },
+    @{ Name = 'gercek-kosum-tr.txt'; Minimum = 80 }
+)) {
+    & $gate -MinimumTotal $case.Minimum -InputFile (Join-Path $fixtures $case.Name)
+    if ($LASTEXITCODE -ne 0) { throw "Geçerli örnek reddedildi: $($case.Name)" }
 }
 
 $ErrorActionPreference = 'Continue'
 foreach ($case in @(
-    @{ Name = 'kesinti-tr.txt'; Exit = 65 },
-    @{ Name = 'basarisiz-en.txt'; Exit = 66 },
-    @{ Name = 'eksik-toplam-en.txt'; Exit = 68 }
+    @{ Name = 'kesinti-tr.txt'; Minimum = 974; Exit = 65 },
+    @{ Name = 'konak-cokmesi-tr.txt'; Minimum = 974; Exit = 65 },
+    @{ Name = 'basarisiz-en.txt'; Minimum = 974; Exit = 66 },
+    @{ Name = 'ikili-ozet-tr.txt'; Minimum = 974; Exit = 66 },
+    @{ Name = 'eksik-toplam-en.txt'; Minimum = 974; Exit = 68 }
 )) {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $gate -MinimumTotal 974 -InputFile (Join-Path $fixtures $case.Name) 2>$null
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $gate -MinimumTotal $case.Minimum -InputFile (Join-Path $fixtures $case.Name) 2>$null
     if ($LASTEXITCODE -ne $case.Exit) {
         throw "Beklenen ret kodu gelmedi: $($case.Name), beklenen=$($case.Exit), gelen=$LASTEXITCODE"
     }
