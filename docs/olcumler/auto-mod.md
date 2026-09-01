@@ -25,8 +25,10 @@ anlamlı değil. Kalite sayıları yükten etkilenmez.
 birebir izler — `FfprobeClient.ProbeAsync` → `ComplexityProbe` → iki turlu
 `CalibrationProbe` → `PlanCalculator.BuildDetailed` (`Codec = Auto`) → `EncodeRunner`.
 Tablolardaki sayılar VMAF JSON'larından mekanik olarak üretildi, elle yazılmadı.
-Sonda ve üretici betikler iş bitince silindi; geçici dosya bırakılmadı. Bu ölçümü
-bench'ten tekrarlanabilir kılmak kusur 1'in düzeltilmesine bağlı.
+Sonda, üretici betikler ve kodlama çıktıları `.calisma/t102/` altında (266 MB);
+silinmeleri gerekiyor ama bu ajanın izinleri silmeye yetmedi — kaldırma işi T0'a
+kalıyor. Dizin `.gitignore`'da, git'e sızmadı. Bu ölçümü bench'ten tekrarlanabilir
+kılmak kusur 1'in düzeltilmesine bağlı.
 
 ### Harmonik ortalama bu ölçümde kullanılamaz — sebebi ölçüldü
 
