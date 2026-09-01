@@ -32,7 +32,7 @@ hasarını olduğundan küçük gösteriyor. Hedef ortalamayı değil kuyruğu k
 | B | Çözünürlük tabanı — 882x496 seçiliyor, 720p60 hiç aday olmuyor | ölçülmedi | **T99** |
 | C | Tepe/VBV tavanı — 1,02x → 1,50x | ort **+1,69**, harmonik **+5,87**, p10 **+7,22**, süre ~0 | **T98** |
 | D | GOP — biz 2 sn (`-g fps*2`), HandBrake tarafı çok daha uzun | ölçülmedi | **T98** |
-| E | Sahne bazlı bit dağıtımı yok | ölçülmedi | T96 |
+| E | Sahne bazlı bit dağıtımı yok | harita var, kestirimi 0,976/0,929; **28 kesimin 10'unu buluyor** | T96 mühürlü, T101 turda |
 | F | psy-rd / AQ | ort +0,095 | kapandı (T87, T92) |
 | G | HDR yıkımı | karşılaştırma dışı; iki taraf da tonemap-hizalı puanlandı | kod düzeltildi (`28637a4`, `main`'de) |
 
@@ -144,6 +144,29 @@ Plan, HDR kaynakta 40 MB bütçenin 15,5 MB'ını bilerek harcamadan bıraktı
 ve T89'un ölçtüğü %78–%193 süre artışının tamamı bu gereksiz yeniden
 denemelerden geliyor. Ayrıca `MainWindow.axaml.cs` ölçülen kaliteyi çağırıp
 atıyor — ölçülen yol uygulamada uyuyor.
+
+## Harita az bölüyor (T101, 2026-09-02)
+
+Gözle doğrulanmış pencerede (144,2–333,3 sn): **28 gerçek kesim, harita 10
+üretti, 18 kaçtı.** Yanlış pozitif **sıfır** — harita ne diyorsa doğru,
+söylemediği çok.
+
+Kaçan 18'in 18'i de tek elekte düştü: `SceneMap.DefaultThreshold = 0.2`,
+skorları 0,112–0,199. Öteki iki eleğin payı sıfır — `BaseThreshold = 0.05`
+bugünkü ayarda hiçbir gerçek kesimi düşüremez (0,2 ≥ 0,05), `DefaultMinSceneSeconds`
+yalnız zaten kesilmiş geçişin ikinci yakalanmasını eliyor.
+
+Bu **tek parametrelik** bir sorun ve yönü belli: 0,2 fazla yüksek. Ama
+düşürmenin bedeli ölçülmedi — yanlış pozitif bugün sıfır ve eşik düşünce
+sıfır kalmayabilir. Eşiği ölçüsüz oynatmak, ölçüsüz koymakla aynı hata.
+
+Kodlayıcı aktarımı da ölçüldü: libx264 0,976, libx265 **0,929**, libsvtav1
+**0,929**. Kayıp tek sahneden geliyor ve HEVC ile AV1 birbirine 1,000 —
+sapma sistematik, kodlayıcıya özgü değil. n=8'de bu fark tek sıra takası,
+istatistiksel olarak ayrılamaz.
+
+**Sonraki tur:** eşik eğrisi ölçülür (kesinlik/duyarlılık, birkaç eşikte) ve
+değer ölçüye göre konur.
 
 ## Makine paylaşımı — hangi sayı bozulur, hangisi bozulmaz
 
