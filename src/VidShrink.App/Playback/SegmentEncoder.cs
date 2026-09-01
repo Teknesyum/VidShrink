@@ -87,6 +87,23 @@ internal sealed class SegmentEncoder : IDisposable
     internal SegmentEncoder(string? tempDirectory = null)
         => _tempDirectory = tempDirectory ?? Path.GetTempPath();
 
+    /// <summary>
+    /// Ölçülmüş kodlayıcı yeteneği. Önizleme parçası psy/AQ bayraklarını buradan alır;
+    /// <c>null</c> kalırsa parça bayraksız kodlanır ve tam kodlamadan ayrışır. Yoklamayı
+    /// arayüz iş parçacığında doğurmamak için dışarıdan, arka planda ölçülmüş hâliyle verilir.
+    /// </summary>
+    internal IEncoderAvailability? Availability { get; set; }
+
+    /// <summary>
+    /// Bir pencerenin parçasını hesaplar; kodlayan yol da imza hesabı da buradan geçer,
+    /// böylece ikisi aynı <see cref="Availability"/> değerini görür. Pencere kaynağın
+    /// dışına düşerse <see cref="ArgumentOutOfRangeException"/> atar.
+    /// </summary>
+    internal PreviewSegment Describe(
+        MediaInfo info, EncodePlan plan, double startSeconds, string outputPath, ComplexityProfile? complexity)
+        => PreviewSegment.For(info, plan, startSeconds, outputPath,
+            complexity: complexity, availability: Availability);
+
     /// <summary>Son başarısız kodlamanın ffmpeg hatası. Başarıda temizlenir.</summary>
     internal string? LastError { get; private set; }
 
@@ -197,7 +214,7 @@ internal sealed class SegmentEncoder : IDisposable
         PreviewSegment segment;
         try
         {
-            segment = PreviewSegment.For(info, plan, start, encodedPath, complexity: complexity);
+            segment = Describe(info, plan, start, encodedPath, complexity);
         }
         catch (ArgumentOutOfRangeException ex)
         {

@@ -22,6 +22,12 @@ public static class FfmpegArguments
         ["av1_amf"] = new[] { "speed", "balanced", "quality", "high_quality" }
     };
 
+    /// <summary>
+    /// Argüman üretiminin tanıdığı bütün kodlayıcılar. Liste ön ayar tablosundan türer,
+    /// ayrıca elle yazılmaz; yeni bir kodlayıcı eklendiğinde yoklamayı ısıtan yol da onu görür.
+    /// </summary>
+    public static IReadOnlyCollection<string> KnownCodecs => (IReadOnlyCollection<string>)Presets.Keys;
+
     public static string DefaultPreset(string codec) => codec.ToLowerInvariant() switch
     {
         "libsvtav1" => "8",
@@ -217,9 +223,11 @@ public static class FfmpegArguments
     }
 
     /// <summary>
-    /// Kisa bir parcanin argumanlari. Tam kodlamanin argumanlarindan yalnizca zaman
-    /// penceresiyle ayrilir; olceklemeyi, fps'i, sesi, on ayari, psy/AQ ve piksel bicimini oldugu gibi
-    /// tasir. <c>-ss</c> girdiden <b>once</b> gelir: sonra gelirse ffmpeg dosyayi bastan
+    /// Kisa bir parcanin argumanlari. Ayni <paramref name="availability"/> verildiginde tam
+    /// kodlamanin argumanlarindan yalnizca zaman penceresiyle ayrilir; olceklemeyi, fps'i, sesi,
+    /// on ayari, psy/AQ ve piksel bicimini oldugu gibi tasir. <paramref name="availability"/>
+    /// <c>null</c> ise psy/AQ bayraklari uretilmez ve parca tam kodlamadan ayrisir.
+    /// <c>-ss</c> girdiden <b>once</b> gelir: sonra gelirse ffmpeg dosyayi bastan
     /// cozer ve 2 sn'lik bir parca saniyeler surer. Ikinci gecis uretilmez.
     /// </summary>
     public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null)

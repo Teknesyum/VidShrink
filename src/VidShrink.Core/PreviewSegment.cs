@@ -114,6 +114,8 @@ public sealed record PreviewSegment
     /// Verilen an icin parcayi hesaplar. <paramref name="startSeconds"/> negatif olamaz,
     /// <paramref name="durationSeconds"/> pozitif olmalidir; parca sonu kaynagi asarsa hata
     /// atilmaz, sure kirpilir ve kirpma <see cref="WasClamped"/> ile gorunur.
+    /// <paramref name="availability"/> olculmus kodlayici yetenegidir: verilmezse parca
+    /// psy/AQ bayraklarsiz kodlanir ve tam kodlamayla ayni argumani tasimaz.
     /// </summary>
     public static PreviewSegment For(
         MediaInfo info,

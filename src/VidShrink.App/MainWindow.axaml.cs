@@ -1191,6 +1191,18 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Psy/AQ seçenek yoklamasını arka planda bir kez tüketir. <c>SupportsEncoderOption</c>
+    /// ilk çağrısında ffmpeg süreci doğuruyor ve sonucu önbelleğe alıyor; o ilk çağrı
+    /// arayüz iş parçacığına düşerse plan görünümü kodlayıcı başına yoklamanın süresi kadar
+    /// kilitleniyor. Burada koşturulunca sonraki bütün okumalar önbellekten geliyor.
+    /// </summary>
+    internal static void WarmPsychovisualProbe(IEncoderAvailability capabilities)
+    {
+        foreach (var codec in FfmpegArguments.KnownCodecs)
+            FfmpegArguments.PsychovisualArgs(codec, capabilities);
+    }
+
     private async Task ProbeHardwareEncodersAsync()
     {
         var available = false;
@@ -1202,6 +1214,7 @@ public partial class MainWindow : Window
             (encoders, available, verdict) = await Task.Run(() =>
             {
                 var capabilities = EncoderCapabilities.Instance;
+                WarmPsychovisualProbe(capabilities);
                 var options = new PlanOptions { TargetMb = WhatsAppTargetMb, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast };
                 var plan = PlanCalculator.Build(HardwareProbeSource, options, capabilities);
                 var probe = capabilities.Probe(plan.Codec);
@@ -1233,6 +1246,7 @@ public partial class MainWindow : Window
     internal void ApplyHardwareVerdict(IEncoderAvailability? encoders, bool available, HardwareVerdict verdict)
     {
         _encoders = encoders;
+        _preview.Availability = encoders;
         _hardwareProbed = true;
         _hardwareEncoderAvailable = available;
         _hardwareVerdict = verdict;
@@ -1774,11 +1788,11 @@ public partial class MainWindow : Window
         RefreshEstimateView();
         RefreshDurationView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), EncoderCapabilities.Instance));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders));
     }
 
     public static IReadOnlyList<string> DisplayedEncodeArguments(MediaInfo info, EncodePlan plan,
-        string outputPath, IEncoderAvailability availability)
+        string outputPath, IEncoderAvailability? availability)
         => FfmpegArguments.Build(info, plan, outputPath,
             plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability);
 

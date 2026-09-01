@@ -221,6 +221,102 @@ public sealed class FfmpegArgumentsTests
         Assert.True(factor <= 1.10, $"boyut-guvenli tepe asildi: {factor}");
     }
 
+    private sealed class RecordingAvailability : IEncoderAvailability, IEncoderOptionAvailability
+    {
+        internal List<(string Codec, string Option)> Asked { get; } = new();
+        public bool HasEncoder(string name) => true;
+        public bool WorksAsEncoder(string codec) => true;
+        public bool SupportsEncoderOption(string codec, string option, string value)
+        {
+            Asked.Add((codec, option));
+            return true;
+        }
+    }
+
+    private static MediaInfo PreviewSource() => new()
+    {
+        FilePath = "kaynak.mp4",
+        FileSizeBytes = 40_000_000,
+        DurationSeconds = 30,
+        Width = 1920,
+        Height = 1080,
+        Fps = 60,
+        VideoCodec = "h264",
+        TotalBitrateBps = 5_700_000
+    };
+
+    [Fact]
+    public void Onizleme_parcasi_verilen_psy_kabiliyetini_argumana_tasir()
+    {
+        var plan = Plan("av1_nvenc");
+        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+
+        var withFlags = PreviewSegment.For(PreviewSource(), plan, 1, "part.mp4", 2, availability: availability);
+        var without = PreviewSegment.For(PreviewSource(), plan, 1, "part.mp4", 2);
+
+        Assert.Contains("-spatial-aq", withFlags.Arguments);
+        Assert.Contains("-temporal-aq", withFlags.Arguments);
+        Assert.DoesNotContain("-spatial-aq", without.Arguments);
+    }
+
+    [Fact]
+    public void Onizleme_kodlayicisi_kendi_kabiliyetini_parcaya_gecirir()
+    {
+        var plan = Plan("av1_nvenc");
+        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+        using var encoder = new VidShrink.App.Playback.SegmentEncoder(Path.GetTempPath())
+        {
+            Availability = availability
+        };
+
+        var segment = encoder.Describe(PreviewSource(), plan, 1, "part.mp4", null);
+
+        Assert.Contains("-spatial-aq", segment.Arguments);
+        Assert.Contains("-temporal-aq", segment.Arguments);
+        var panelSource = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.App", "Playback", "PanelHost.cs"));
+        Assert.Contains("_segments.Describe(info, plan, Math.Max(0, startSeconds), SignatureOutput, _profile)", panelSource);
+    }
+
+    [Fact]
+    public void Yoklama_isinmasi_psy_secenegi_olan_her_kodlayiciyi_arka_planda_sorar()
+    {
+        var recorder = new RecordingAvailability();
+
+        VidShrink.App.MainWindow.WarmPsychovisualProbe(recorder);
+
+        Assert.Contains(("libx265", "-x265-params"), recorder.Asked);
+        Assert.Contains(("libsvtav1", "-svtav1-params"), recorder.Asked);
+        Assert.Contains(("av1_nvenc", "-spatial-aq"), recorder.Asked);
+        Assert.Contains(("av1_nvenc", "-temporal-aq"), recorder.Asked);
+        Assert.Contains(("hevc_nvenc", "-spatial-aq"), recorder.Asked);
+    }
+
+    /// <summary>
+    /// Yoklamayi doguran tek nokta arka plandaki <c>Task.Run</c> olmali. Arayuz yolunda
+    /// <c>EncoderCapabilities.Instance</c> okunursa ilk cagri arayuz is parcacigini
+    /// kodlayici basina yoklama suresi kadar bloklar.
+    /// </summary>
+    [Fact]
+    public void Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz()
+    {
+        var windowSource = File.ReadAllText(TipSources.WindowCodePath);
+
+        Assert.Equal(1, CountOccurrences(windowSource, "EncoderCapabilities.Instance"));
+        Assert.Contains("var capabilities = EncoderCapabilities.Instance;\n                WarmPsychovisualProbe(capabilities);",
+            windowSource.Replace("\r\n", "\n"));
+        Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", \"mp4\"), _encoders));", windowSource);
+    }
+
+    private static int CountOccurrences(string text, string needle)
+    {
+        var count = 0;
+        for (var i = text.IndexOf(needle, StringComparison.Ordinal); i >= 0;
+             i = text.IndexOf(needle, i + needle.Length, StringComparison.Ordinal))
+            count++;
+        return count;
+    }
+
     /// <summary>
     /// Verilen taban oranini planin gercekten tasidigi bit hizina cevirir; tepe carpani
     /// mutlak bit hizina degil bu orana bakiyor, olcum tablosu da oranla yazildi.

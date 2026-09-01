@@ -221,7 +221,7 @@ internal sealed class PanelHost : IDisposable
     {
         try
         {
-            var segment = PreviewSegment.For(info, plan, Math.Max(0, startSeconds), SignatureOutput, complexity: _profile);
+            var segment = _segments.Describe(info, plan, Math.Max(0, startSeconds), SignatureOutput, _profile);
             return string.Join('', segment.Arguments);
         }
         catch (ArgumentOutOfRangeException)
@@ -232,6 +232,16 @@ internal sealed class PanelHost : IDisposable
 
     /// <summary>İmza hesabında kullanılan yer tutucu çıktı yolu; diske hiç dokunulmaz.</summary>
     private const string SignatureOutput = "<signature>";
+
+    /// <summary>
+    /// Önizlemenin psy/AQ bayraklarını aldığı ölçülmüş yetenek. Parça kodlayıcısında durur;
+    /// imza hesabı ile kodlayan yol aynı değeri görsün diye burada yalnız iletilir.
+    /// </summary>
+    internal IEncoderAvailability? Availability
+    {
+        get => _segments.Availability;
+        set => _segments.Availability = value;
+    }
 
     /// <summary>
     /// Sağ yarının <b>şu an hedeflediği</b> pencere. Bir kodlama bekliyor ya da koşuyorsa
