@@ -1,5 +1,7 @@
 # T85 — Süit eşzamanlı koşumda, arayüz ölçümlerinin maliyeti
 
+Durum: **tamamlandı — düzeltme turu 2 güncel dal başında 2026-09-01 tarihinde yeniden mühürlendi.**
+
 Soru iki taneydi: süit makinede ikinci bir koşum varken neden yarıda duruyor, ve
 `WindowLayoutTests` neden ölçü başına dokuz saniye harcıyor.
 
@@ -176,3 +178,46 @@ Dolayısıyla bu rapor şunu **kanıtlamıyor**: sızıntının çökmenin neden
 Kanıtladığı şey, sızıntının ölçülmüş olduğu ve kapatıldığında sınıfın %35 hızlandığı,
 eşzamanlı çiftte tepe süreç belleğinin 10,4 GB'dan 6,2 GB'a düştüğü. Çökmenin
 tekrarlanabilir bir düzeneği hâlâ yok; sırada bunu üretmek var.
+
+## Düzeltme turu 2 — F1 gerçek yük koşumu
+
+Aynı çalışma ağacında `dotnet build src/VidShrink.Core/VidShrink.Core.csproj -c Release --no-restore` döngüsü ve 1920×1080@60 `libx264 ultrafast` ffmpeg kodlaması kesintisiz çalışırken tam süit üç kez koşturuldu. Her koşum aşağıdaki yeni kapıdan geçti.
+
+| Deneme | Sonuç |
+|---|---|
+| 1 | `Başarısız: 0, Başarılı: 966, Atlanan: 17, Toplam: 983, Süre: 10 m 59 s` |
+| 2 | `Başarısız: 0, Başarılı: 966, Atlanan: 17, Toplam: 983, Süre: 10 m 13 s` |
+| 3 | `Başarısız: 0, Başarılı: 966, Atlanan: 17, Toplam: 983, Süre: 10 m 3 s` |
+
+Üç denemede de kilitlenme, iptal veya beklenmedik konak çıkışı **üretilmedi**. Bu düzenekle neden ölçülmedi; bellek veya başka bir kaynak hakkında tahmin yapılmadı. Önceki dört yarım koşumun kök nedeni açık borç olarak kalır.
+
+## Düzeltme turu 2 — F2 koşum kapısı
+
+`tools/kosum-kapisi/kosum-kapisi.ps1` komut çıkışını ve metnini birlikte denetler. Başarı için kesinti sözcüğü bulunmaması, son Türkçe/İngilizce `Başarısız/Failed` sayısının sıfır olması ve son `Toplam/Total` sayısının çağıranın verdiği alt sınırı karşılaması zorunludur. Alt sınır verilmezse PowerShell parametre bağlama aşamasında koşum reddedilir.
+
+Kaydedilmiş fixture sonuçları:
+
+- Türkçe kilitlenme/iptal + `Başarısız: 0` + `Toplam: 958`: çıkış 65.
+- İngilizce `Failed: 1` + `Total: 974`: çıkış 66.
+- İngilizce `Failed: 0` + `Total tests: 500`: çıkış 68.
+- Türkçe ve İngilizce geçerli 974 toplamlı örnekler: çıkış 0.
+
+Kesinti deseni mutasyonda devre dışı bırakıldığında kilitlenmiş fixture kesinti kodu 65 yerine düşük-toplam kodu 68'e düştü ve `test-kapi.ps1` kırmızı oldu. Desen geri getirildi.
+
+Kopyalanabilir çağrı:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 974 -OutputFile .calisma/tam-suit.txt
+```
+
+Tur 1'in pencere kapatma düzeltmesi, hız ve bellek ölçümleri korunmuştur; ölçü silinmedi, `Skip` veya eşik değişikliği yapılmadı. Tur 2'nin üç tam koşumunda atlanan sayı 17'dir.
+
+## Son mühür
+
+`tools/kosum-kapisi/test-kapi.ps1` geçerli Türkçe/İngilizce örnekleri kabul etti; kesinti, başarısız ölçü ve düşük toplam örneklerini beklenen kodlarla reddetti.
+
+Güncel dal başında tam Release süiti doğrudan kapıdan geçirildi:
+
+`Başarısız: 0, Başarılı: 960, Atlanan: 23, Toplam: 983, Süre: 10 m 9 s`
+
+Kapı sonucu: `başarısız=0 toplam=983 alt-sınır=974`. Koşum kesintisiz tamamlandı; atlanan sayı sözleşmedeki 23 sınırını aşmadı.

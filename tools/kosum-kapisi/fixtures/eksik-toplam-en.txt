@@ -1,0 +1,1 @@
+Failed: 0, Passed: 499, Skipped: 1, Total tests: 500, Duration: 4 m
