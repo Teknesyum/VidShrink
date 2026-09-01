@@ -1,0 +1,17 @@
+{
+  "contractId": "T97",
+  "auditorRunId": "a8d9ecc339775310c",
+  "headSha": "f3e3f02bbb4fec95e5169923a2bb3fb9bb4d74fb",
+  "diffHash": "af1ea60ccf83da64ed34284948ad01e930e063fe8a82de9d17ef61852b7e41bb",
+  "owns": [
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "src/VidShrink.Core/IQualityMeasurement.cs",
+    "tests/VidShrink.Tests/QualityMeterTests.cs",
+    "docs/olcumler/algi-olcusu.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim: GECTI, KRITIK yok, owns ihlali yok. Denetim depoya hic yazmadan yapildi (git archive ile scratchpad). NormalizeVmafCeiling'in kaldirilmasi dogru: kelepceye bagli tek bir kod yolu yok, ComplexityProfile.cs:201 suzgeci degismedi, MainWindow QualityHint QualityMeter'dan beslenmiyor. handbrake-acigi.md'deki butun olcum sayilari (48,96 / 40,17 / 34,59 / 33,16 / 24,41 / 18,56 / 22,31) 99,8'in cok altinda, 8,79 puanlik acik ETKILENMEDI. Iki kelepce de kaldirildi, secici olmasi gerekmiyordu: kare duzeyinde birakilsaydi min/p10/sahne tabani kelepceli, ortalama ham olurdu — tutarsiz cift olcek. Dort yeni alan tuketicileri kirmiyor: dotnet build -c Release VidShrink.sln 0 uyari 0 hata, sekiz proje. Mutasyon kaniti gercek, ucu de birebir tuttu (kelepce geri -> 2 olcu, step -> 3 olcu, tonemap oneki -> 1 olcu); denetci iddia edilmeyen dorduncu mutasyonu da kosturdu (SceneWindowSeconds 2.0->3.0 -> 2 olcu), sabit davranisla pinlenmis. Skip yok, silinen assertion yok, iki olcu sabit karsilastirmasindan olculmus tabana cevrilmis. dotnet test -c Release --filter QualityMeterTests -> 11 basarili, 0 atlanan. Denetcinin en ciddi KRITIK adayi (farkli kare hizinda framesync kaymasi) olcumle curutuldu: 60 fps referans + 30 fps test -> 121 kare, libvmaf ciktiyi birincil girdinin hizinda uretiyor, QualityMeter'daki frameRate secimi dogru. BORC: (1) handbrake-acigi.md:129 kelepce kalktigi icin yanlislanmis cumle, owns disiydi; (2) algi-olcusu.md kelepce kaldirmanin geriye donuk kapsamini yazmiyor; (3) pencere karari payi 0,025 tek icerik ciftinden, 'en kisa gecen' kuralinin 'en genis payli' yerine neden secildigi tartisilmamis; (4) sahne siniri tabanli pencere sonraki adim olarak kaydedilmemis (SceneMap T97 agacinda yoktu); (5) WorstScene son kismi pencereyi atiyor, belgede yazmiyor; (6) WorstScene bos listede PositiveInfinity donuyor; (7) VmafNegMin kayda eklenmis ama belge onu kullanilabilir taban degil diyor; (8) TonemapFact zscale/tonemap yoklugunda da atliyor, skip yuzeyi kriterin yazdigindan genis; (9) bes kriter icin iki commit."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T22:32:10.742Z"
+}
