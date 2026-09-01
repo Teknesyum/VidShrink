@@ -114,6 +114,8 @@ public sealed record PreviewSegment
     /// Verilen an icin parcayi hesaplar. <paramref name="startSeconds"/> negatif olamaz,
     /// <paramref name="durationSeconds"/> pozitif olmalidir; parca sonu kaynagi asarsa hata
     /// atilmaz, sure kirpilir ve kirpma <see cref="WasClamped"/> ile gorunur.
+    /// <paramref name="availability"/> olculmus kodlayici yetenegidir: verilmezse parca
+    /// psy/AQ bayraklarsiz kodlanir ve tam kodlamayla ayni argumani tasimaz.
     /// </summary>
     public static PreviewSegment For(
         MediaInfo info,
@@ -121,7 +123,8 @@ public sealed record PreviewSegment
         double startSeconds,
         string outputPath,
         double? durationSeconds = null,
-        ComplexityProfile? complexity = null)
+        ComplexityProfile? complexity = null,
+        IEncoderAvailability? availability = null)
     {
         if (startSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(startSeconds), startSeconds, "Parca baslangici negatif olamaz.");
@@ -155,7 +158,7 @@ public sealed record PreviewSegment
             Quality = quality,
             DroppedSecondPass = plan.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(plan.Codec),
             Plan = segmentPlan,
-            Arguments = FfmpegArguments.BuildSegment(info, segmentPlan, startSeconds, duration, outputPath)
+            Arguments = FfmpegArguments.BuildSegment(info, segmentPlan, startSeconds, duration, outputPath, availability)
         };
     }
 }
