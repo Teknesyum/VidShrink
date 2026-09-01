@@ -62,6 +62,14 @@ public static class FfmpegArguments
     //                            1956k = 11,6x floor, peak 1.02 -> 0.989
     //                            1994k = 11,9x floor, peak 1.02 -> 0.992
     //                            2100k = 12,5x floor, peak 1.02 -> 0.991
+    // T87 repeated 1.50 against the curve on two 20 s moving clips (actual MiB / target MiB):
+    //   1280x720@60: 2.92x floor 0.980 / 0.974, 7.80x 0.983 / 0.985,
+    //                   11.90x 0.968 / 0.969       (1.50 / curve)
+    //   1920x1080@30: 3.06x floor 0.938 / 0.976, 7.78x 0.986 / 0.989,
+    //                   11.90x 0.993 / 0.994       (1.50 / curve)
+    // Wide headroom was safe on those clips, explaining the real-HDR quality result, but the
+    // earlier 882x496@60 11.4x measurement still overshoots at 1.056. The relation is content
+    // and layout dependent; a safe global ceiling therefore cannot be raised from this sample.
     // Up to 5,6x the floor the tight peak lands on the request. At 11,4x it costs 2,7% and 1.10
     // puts the file back on the request, while 1.50 overshoots by 5,6%. So the peak holds at
     // TightPeakFactor up to PeakOpensAtFloorRatio and opens to HardwarePeakCeiling at
@@ -93,7 +101,7 @@ public static class FfmpegArguments
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
-    public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix)
+    public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null)
     {
         var a = new List<string> { "-hide_banner", "-y", "-hwaccel", "auto", "-i", info.FilePath };
 
@@ -109,6 +117,7 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { "-c:v", plan.Codec });
         a.AddRange(new[] { "-preset", plan.Preset });
+        AddPsychovisualArgs(a, plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
@@ -160,6 +169,25 @@ public static class FfmpegArguments
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
         return a;
+    }
+
+    private static void AddPsychovisualArgs(List<string> args, string codec, IEncoderAvailability? availability)
+    {
+        if (availability is not IEncoderOptionAvailability options) return;
+
+        if (codec.Equals("libx265", StringComparison.OrdinalIgnoreCase)
+            && options.SupportsEncoderOption(codec, "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2"))
+            args.AddRange(new[] { "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2" });
+        else if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
+                 && options.SupportsEncoderOption(codec, "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2"))
+            args.AddRange(new[] { "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2" });
+        else if (codec.Contains("nvenc", StringComparison.OrdinalIgnoreCase))
+        {
+            if (options.SupportsEncoderOption(codec, "-spatial-aq", "1"))
+                args.AddRange(new[] { "-spatial-aq", "1" });
+            if (options.SupportsEncoderOption(codec, "-temporal-aq", "1"))
+                args.AddRange(new[] { "-temporal-aq", "1" });
+        }
     }
 
     /// <summary>
