@@ -75,7 +75,14 @@ public sealed class AbRunner
         if (settings.ChunkMode)
         {
             var chunkPaths = await ChunkCutter.EnsureAsync(referencePath, settings.ChunkDirectory, _log, ct);
-            foreach (var path in chunkPaths) inputs.Add(await FfprobeClient.ProbeAsync(path, ct));
+            foreach (var path in chunkPaths)
+            {
+                var chunk = await FfprobeClient.ProbeAsync(path, ct);
+                var videoOnly = await EnsureVideoOnlyAsync(chunk, settings.OutputDirectory, settings.LogDirectory, ct);
+                inputs.Add(ReferenceEquals(videoOnly, chunk.FilePath) || videoOnly == chunk.FilePath
+                    ? chunk
+                    : await FfprobeClient.ProbeAsync(videoOnly, ct));
+            }
         }
         else
         {
@@ -97,7 +104,11 @@ public sealed class AbRunner
                     : targetMb * (input.DurationSeconds / reference.DurationSeconds);
                 var inputTarget = settings.ChunkMode ? share : targetMb;
 
-                _log.WriteLine($"--- {Path.GetFileName(input.FilePath)} | hedef {inputTarget:0.###} MB | {input.DurationSeconds:0.###} sn");
+                if (input.HasAudio)
+                    throw new InvalidOperationException(
+                        $"{Path.GetFileName(input.FilePath)} ses taşıyor. HandBrake tarafı -a none ile koşuyor; sesli girdi bütçeyi eşitsiz böler.");
+
+                _log.WriteLine($"--- {Path.GetFileName(input.FilePath)} | hedef {inputTarget:0.###} MB | {input.DurationSeconds:0.###} sn | {input.Fps:0.###} fps");
 
                 var outcomes = new List<EncodeOutcome>();
                 foreach (var competitor in competitors)
@@ -196,24 +207,28 @@ public sealed class AbRunner
             outcome.Settings, outcome.CommandLine, outcome.LogPath, outcome.OutputPath);
     }
 
-    private async Task<string> VideoOnlyReferenceAsync(MediaInfo source, AbSettings settings, CancellationToken ct)
-    {
-        if (!source.HasAudio) return source.FilePath;
+    private Task<string> VideoOnlyReferenceAsync(MediaInfo source, AbSettings settings, CancellationToken ct)
+        => EnsureVideoOnlyAsync(source, settings.ChunkDirectory, settings.LogDirectory, ct);
 
-        var target = Path.Combine(settings.ChunkDirectory,
-            Path.GetFileNameWithoutExtension(source.FilePath) + "-yalniz-video.mkv");
+    private async Task<string> EnsureVideoOnlyAsync(MediaInfo info, string directory, string logDirectory, CancellationToken ct)
+    {
+        if (!info.HasAudio) return info.FilePath;
+
+        var name = Path.GetFileNameWithoutExtension(info.FilePath) + "-yalniz-video.mkv";
+        var target = Path.Combine(directory, name);
         if (File.Exists(target) && new FileInfo(target).Length > 0)
         {
-            _log.WriteLine($"video-only referans hazır: {target}");
+            _log.WriteLine($"video-only girdi hazır: {target}");
             return target;
         }
 
-        Directory.CreateDirectory(settings.ChunkDirectory);
-        var args = new[] { "-hide_banner", "-nostdin", "-y", "-i", source.FilePath, "-map", "0:v:0", "-c", "copy", target };
-        _log.WriteLine("video-only referans kesiliyor: " + ProcessLauncher.CommandLine("ffmpeg", args));
+        Directory.CreateDirectory(directory);
+        Directory.CreateDirectory(logDirectory);
+        var args = new[] { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath, "-map", "0:v:0", "-c", "copy", target };
+        _log.WriteLine($"video-only girdi türetiliyor ({Path.GetFileName(info.FilePath)} sesli): " + ProcessLauncher.CommandLine("ffmpeg", args));
         var (exitCode, output) = await ProcessLauncher.RunAsync("ffmpeg", args, ct);
-        await File.WriteAllTextAsync(Path.Combine(settings.LogDirectory, "referans-yalniz-video.log"), output, ct);
-        if (exitCode != 0) throw new InvalidOperationException("Video-only referans üretilemedi.");
+        await File.WriteAllTextAsync(Path.Combine(logDirectory, Path.GetFileNameWithoutExtension(name) + ".log"), output, ct);
+        if (exitCode != 0) throw new InvalidOperationException($"Video-only girdi üretilemedi: {info.FilePath}");
         return target;
     }
 
