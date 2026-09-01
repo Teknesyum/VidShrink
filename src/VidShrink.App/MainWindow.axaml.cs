@@ -1773,8 +1773,14 @@ public partial class MainWindow : Window
 
         RefreshEstimateView();
         RefreshDurationView();
-        TxtCommand.Text = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(_info, plan, BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null));
+        TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), EncoderCapabilities.Instance));
     }
+
+    public static IReadOnlyList<string> DisplayedEncodeArguments(MediaInfo info, EncodePlan plan,
+        string outputPath, IEncoderAvailability availability)
+        => FfmpegArguments.Build(info, plan, outputPath,
+            plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability);
 
     private void RefreshEstimateView()
     {

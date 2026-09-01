@@ -121,7 +121,8 @@ public sealed record PreviewSegment
         double startSeconds,
         string outputPath,
         double? durationSeconds = null,
-        ComplexityProfile? complexity = null)
+        ComplexityProfile? complexity = null,
+        IEncoderAvailability? availability = null)
     {
         if (startSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(startSeconds), startSeconds, "Parca baslangici negatif olamaz.");
@@ -155,7 +156,7 @@ public sealed record PreviewSegment
             Quality = quality,
             DroppedSecondPass = plan.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(plan.Codec),
             Plan = segmentPlan,
-            Arguments = FfmpegArguments.BuildSegment(info, segmentPlan, startSeconds, duration, outputPath)
+            Arguments = FfmpegArguments.BuildSegment(info, segmentPlan, startSeconds, duration, outputPath, availability)
         };
     }
 }

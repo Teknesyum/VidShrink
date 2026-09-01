@@ -117,7 +117,7 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { "-c:v", plan.Codec });
         a.AddRange(new[] { "-preset", plan.Preset });
-        AddPsychovisualArgs(a, plan.Codec, availability);
+        var psychovisualArgs = PsychovisualArgs(plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)
         {
@@ -144,8 +144,7 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { "-g", Math.Max(2, (int)Math.Round(plan.Fps * 2)).ToString(CultureInfo.InvariantCulture) });
         a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
-        if (plan.HdrColorArgs.Count > 0)
-            a.AddRange(plan.HdrColorArgs);
+        a.AddRange(PsychovisualAndColorArgs(plan.Codec, psychovisualArgs, plan.HdrColorArgs));
 
         if (pass == 1)
         {
@@ -171,9 +170,10 @@ public static class FfmpegArguments
         return a;
     }
 
-    private static void AddPsychovisualArgs(List<string> args, string codec, IEncoderAvailability? availability)
+    public static IReadOnlyList<string> PsychovisualArgs(string codec, IEncoderAvailability? availability)
     {
-        if (availability is not IEncoderOptionAvailability options) return;
+        var args = new List<string>();
+        if (availability is not IEncoderOptionAvailability options) return args;
 
         if (codec.Equals("libx265", StringComparison.OrdinalIgnoreCase)
             && options.SupportsEncoderOption(codec, "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2"))
@@ -188,17 +188,43 @@ public static class FfmpegArguments
             if (options.SupportsEncoderOption(codec, "-temporal-aq", "1"))
                 args.AddRange(new[] { "-temporal-aq", "1" });
         }
+        return args;
+    }
+
+    public static IReadOnlyList<string> PsychovisualAndColorArgs(string codec,
+        IReadOnlyList<string> psychovisualArgs, IReadOnlyList<string> colorArgs)
+    {
+        var args = new List<string>();
+        if (!codec.Equals("libx265", StringComparison.OrdinalIgnoreCase))
+        {
+            args.AddRange(psychovisualArgs);
+            args.AddRange(colorArgs);
+            return args;
+        }
+
+        var combined = psychovisualArgs.Concat(colorArgs).ToList();
+        var x265 = new List<string>();
+        for (var i = 0; i < combined.Count; i++)
+        {
+            if (combined[i] == "-x265-params" && i + 1 < combined.Count)
+                x265.Add(combined[++i]);
+            else
+                args.Add(combined[i]);
+        }
+        if (x265.Count > 0)
+            args.AddRange(new[] { "-x265-params", string.Join(':', x265) });
+        return args;
     }
 
     /// <summary>
     /// Kisa bir parcanin argumanlari. Tam kodlamanin argumanlarindan yalnizca zaman
-    /// penceresiyle ayrilir; olceklemeyi, fps'i, sesi, on ayari ve piksel bicimini oldugu gibi
+    /// penceresiyle ayrilir; olceklemeyi, fps'i, sesi, on ayari, psy/AQ ve piksel bicimini oldugu gibi
     /// tasir. <c>-ss</c> girdiden <b>once</b> gelir: sonra gelirse ffmpeg dosyayi bastan
     /// cozer ve 2 sn'lik bir parca saniyeler surer. Ikinci gecis uretilmez.
     /// </summary>
-    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath)
+    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null)
     {
-        var a = new List<string>(Build(info, plan, outputPath, 0, null));
+        var a = new List<string>(Build(info, plan, outputPath, 0, null, availability));
         var input = a.IndexOf("-i");
         if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");
 

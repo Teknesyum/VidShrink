@@ -158,6 +158,57 @@ public sealed class FfmpegArgumentsTests
         Assert.DoesNotContain("-temporal-aq", args);
     }
 
+    [Fact]
+    public void Hdr_x265_psy_ve_renk_parametreleri_tek_dizgide_birlesir()
+    {
+        var plan = Plan("libx265");
+        plan.HdrColorArgs = new List<string>
+        {
+            "-color_primaries", "bt2020", "-x265-params", "hdr10-opt=1:repeat-headers=1"
+        };
+        var availability = new OptionAvailability(("libx265", "-x265-params"));
+
+        var args = FfmpegArguments.Build(Source(), plan, "out.mp4", 2, "log", availability);
+
+        Assert.Equal(1, args.Count(a => a == "-x265-params"));
+        var value = args[args.IndexOf("-x265-params") + 1];
+        Assert.Contains("psy-rd=2:psy-rdoq=1:aq-mode=2", value);
+        Assert.Contains("hdr10-opt=1:repeat-headers=1", value);
+    }
+
+    [Fact]
+    public void Parca_tam_kodlamayla_ayni_psy_kabiliyetini_kullanir()
+    {
+        var info = Source();
+        var plan = Plan("av1_nvenc");
+        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+
+        var full = FfmpegArguments.Build(info, plan, "out.mp4", 0, null, availability);
+        var segment = FfmpegArguments.BuildSegment(info, plan, 1, 2, "part.mp4", availability);
+
+        Assert.Contains("-spatial-aq", segment);
+        Assert.Contains("-temporal-aq", segment);
+        Assert.Equal(full.Contains("-spatial-aq"), segment.Contains("-spatial-aq"));
+        Assert.Equal(full.Contains("-temporal-aq"), segment.Contains("-temporal-aq"));
+    }
+
+    [Fact]
+    public void Arayuzde_gosterilen_komut_kosucunun_argumanlariyla_aynidir()
+    {
+        var info = Source();
+        var plan = Plan("av1_nvenc");
+        var availability = new OptionAvailability(("av1_nvenc", "-spatial-aq"), ("av1_nvenc", "-temporal-aq"));
+
+        var displayed = VidShrink.App.MainWindow.DisplayedEncodeArguments(info, plan, "out.mp4", availability);
+        var executed = FfmpegArguments.Build(info, plan, "out.mp4", 2, null, availability);
+
+        Assert.Equal(executed, displayed);
+        Assert.Contains("-spatial-aq", displayed);
+        Assert.Contains("-temporal-aq", displayed);
+        var windowSource = File.ReadAllText(TipSources.WindowCodePath);
+        Assert.Contains("TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments", windowSource);
+    }
+
     [Theory]
     [InlineData("av1_nvenc", 64, 64, 1, 39)]
     [InlineData("av1_nvenc", 1280, 720, 60, 4200)]
