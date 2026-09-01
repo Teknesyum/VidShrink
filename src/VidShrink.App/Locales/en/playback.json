@@ -8,5 +8,10 @@
   "playback.panel.hint": "Load a file to see the two sides",
   "playback.panel.moved": "The panel moved to the front",
   "playback.panel.pending": "This part will be processed",
-  "playback.panel.first-frame": "The first frame is on its way"
+  "playback.panel.first-frame": "The first frame is on its way",
+  "playback.control.restart": "Back to the start",
+  "playback.control.timeline": "Timeline",
+  "playback.control.strip": "Control strip",
+  "playback.control.pause": "Pause",
+  "playback.control.play": "Play"
 }

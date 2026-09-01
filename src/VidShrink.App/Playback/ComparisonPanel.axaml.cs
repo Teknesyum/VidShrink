@@ -256,15 +256,15 @@ internal partial class ComparisonPanel : UserControl
     /// </summary>
     private void RefreshTexts()
     {
-        EmptyTitle.Text = Say("playback.panel.title");
-        EmptyHint.Text = Say(_notice ?? "playback.panel.hint");
-        PlaceholderText.Text = Say("playback.panel.moved");
-        LeftBadgeText.Text = Say("playback.badge.original");
-        RightBadgeText.Text = Say("playback.badge.processed");
-        RightCurtainText.Text = _rightNotice is null ? string.Empty : Say(_rightNotice);
+        EmptyTitle.Text = Text("playback.panel.title");
+        EmptyHint.Text = Text(_notice ?? "playback.panel.hint");
+        PlaceholderText.Text = Text("playback.panel.moved");
+        LeftBadgeText.Text = Text("playback.badge.original");
+        RightBadgeText.Text = Text("playback.badge.processed");
+        RightCurtainText.Text = _rightNotice is null ? string.Empty : Text(_rightNotice);
     }
 
-    private string Say(string key)
+    private string Text(string key)
         => key.StartsWith("playback.", StringComparison.Ordinal)
             ? LanguageCatalog.Title(
                 Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
