@@ -1,0 +1,13 @@
+﻿C:\Users\Administrator\Desktop\Projeler\Vidshrink\.claude\worktrees\agent-ab9ddf645d0852554\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.14.1 (x64)
+
+Test yürütmesi başlatılıyor, lütfen bekleyin...
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:01:57.17]     VidShrink.Tests.UpdaterTests.TheIncomingBinaryRenamesItselfOntoTheTargetName [SKIP]
+  Atlandı VidShrink.Tests.UpdaterTests.TheIncomingBinaryRenamesItselfOntoTheTargetName [1 ms]
+[xUnit.net 00:02:06.73]     VidShrink.Tests.UpdaterTests.EveryLaunchChecksAndStaysWithinTheTimeout [SKIP]
+  Atlandı VidShrink.Tests.UpdaterTests.EveryLaunchChecksAndStaysWithinTheTimeout [1 ms]
+[xUnit.net 00:02:08.50]     VidShrink.Tests.UpdaterTests.SwitchedOffLauncherMakesNoNetworkRequestAtAll [SKIP]
+  Atlandı VidShrink.Tests.UpdaterTests.SwitchedOffLauncherMakesNoNetworkRequestAtAll [1 ms]
+
+Başarılı!  - Başarısız:     0, Başarılı:    85, Atlanan:     3, Toplam:    88, Süre: 3 m 10 s - VidShrink.Tests.dll (net8.0)

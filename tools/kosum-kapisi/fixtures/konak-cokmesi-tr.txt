@@ -1,0 +1,3 @@
+Bu makinede test yürütücüsü çalışırken bir sorun oluştu.
+Konak işleminden beklenmedik şekilde çıkış yapıldı.
+Başarısız: 0, Başarılı: 966, Atlanan: 17, Toplam: 983, Süre: 12 m 4 s

@@ -28,31 +28,40 @@ else {
     }
 }
 
-$interruptPattern = '(?im)kilitlendi|iptal edildi|durduruldu|\baborted\b|\bcancel(?:ed|led)\b'
+function Dur([int]$Code, [string]$Reason) {
+    Write-Host "KOSUM KAPISI DUSTU: kod=$Code sart=$Reason"
+    [Console]::Error.WriteLine($Reason)
+    exit $Code
+}
+
+$interruptPattern = '(?im)kilitlendi|iptal edildi|durduruldu|\baborted\b|\bcancel(?:ed|led)\b' +
+    '|Konak i\u015flemi[^\r\n]*beklenmedik' +
+    '|beklenmedik \u015fekilde \u00e7\u0131k\u0131\u015f yap\u0131ld\u0131' +
+    '|test\s*host process crashed|testhost process exited'
 if ($text -match $interruptPattern) {
-    [Console]::Error.WriteLine('Koşum kesinti/iptal satırı içeriyor.')
-    exit 65
+    Dur 65 'Kosum kesinti/iptal satiri iceriyor.'
 }
 
 $failureMatches = [regex]::Matches($text, '(?im)(?:Ba\u015far\u0131s\u0131z|Failed)\s*:\s*(\d+)')
-if ($failureMatches.Count -eq 0 -or [int]$failureMatches[$failureMatches.Count - 1].Groups[1].Value -ne 0) {
-    [Console]::Error.WriteLine('Başarısız/Failed özeti yok veya sıfır değil.')
-    exit 66
+if ($failureMatches.Count -eq 0) {
+    Dur 66 'Basarisiz/Failed ozeti yok.'
+}
+foreach ($failureMatch in $failureMatches) {
+    if ([int]$failureMatch.Groups[1].Value -ne 0) {
+        Dur 66 "Basarisiz/Failed ozeti sifir degil: $($failureMatch.Value)." 
+    }
 }
 
 $totalMatches = [regex]::Matches($text, '(?im)(?:Toplam|Total(?: tests)?)\s*:\s*(\d+)')
 if ($totalMatches.Count -eq 0) {
-    [Console]::Error.WriteLine('Toplam/Total özeti yok.')
-    exit 67
+    Dur 67 'Toplam/Total ozeti yok.'
 }
 $total = [int]$totalMatches[$totalMatches.Count - 1].Groups[1].Value
 if ($total -lt $MinimumTotal) {
-    [Console]::Error.WriteLine("Toplam test sayısı alt sınırın altında: $total < $MinimumTotal.")
-    exit 68
+    Dur 68 "Toplam test sayisi alt sinirin altinda: $total < $MinimumTotal."
 }
 if ($commandExit -ne 0) {
-    [Console]::Error.WriteLine("Komut sıfırdan farklı çıktı: $commandExit.")
-    exit $commandExit
+    Dur $commandExit "Komut sifirdan farkli cikti: $commandExit."
 }
 
 Write-Host "KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=$total alt-sınır=$MinimumTotal"

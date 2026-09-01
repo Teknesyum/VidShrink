@@ -1,0 +1,2 @@
+Başarısız: 5, Başarılı: 961, Atlanan: 17, Toplam: 983, Süre: 12 m 4 s
+Başarısız: 0, Başarılı: 966, Atlanan: 17, Toplam: 983, Süre: 12 m 9 s
