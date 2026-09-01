@@ -136,3 +136,10 @@ Atlanan iki test `HardwareRateControlTests.LiveFastTargetsLandInsideTheBandOnThe
     KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=67 alt-sınır=67
 
 Tam süit bu turda yerel olarak koşulmadı — makinede paralel çalışan başka ajanlar ölçüyü kararsız yapıyor; tam süit dalın CI koşumuna bırakıldı. Var olan hiçbir assertion gevşetilmedi, hiçbir test `Skip`e alınmadı.
+
+Dalın CI koşumu (`gh run view 33545797054`, `T87-tepe-tavani-ve-psy`, 14 m 38 s):
+
+    Passed!  - Failed:     0, Passed:   924, Skipped:    72, Total:   996, Duration: 13 m 29 s - VidShrink.Tests.dll (net8.0)
+    KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=996 alt-sınır=950
+
+Bir önceki itmenin CI koşumu (33545605270) `dotnet build -c Release -warnaserror` adımında düşmüştü: `MainWindow.axaml.cs:1249` `_preview.Availability = encoders;` satırı CS8602 (olası `null` başvurusu) veriyordu. Yerel `dotnet test` bu bayrağı kullanmadığı için yeşil okunmuştu. `if (_preview is not null)` denetimiyle düzeltildi.
