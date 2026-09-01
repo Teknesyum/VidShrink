@@ -113,19 +113,48 @@ public sealed class LanguageTests : IDisposable
     private static readonly Regex AnyLetter = new(@"\p{L}", RegexOptions.Compiled);
 
     /// <summary>
+    /// Biçim yer tutucusu: <c>{0}</c>, <c>{1,-8}</c>, <c>{0:0.0}</c>. Ekran metni değildir,
+    /// çalışma anında dolar. Metnin geri kalanı ekran metnidir ve taranır.
+    /// </summary>
+    private static readonly Regex FormatPlaceholder = new(
+        @"\{\d+(?:,-?\d+)?(?::[^{}]*)?\}", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Değerin <b>tamamı</b> bir biçimleme bağı: <c>{loc:Text main.x}</c>,
+    /// <c>{TemplateBinding Content}</c>, <c>{DynamicResource X}</c>. Bunlar ekrana metin
+    /// yazmaz, bağladıkları şeyi yazar.
+    ///
+    /// <para>Ölçüt eskiden yalnız "<c>{</c> ile başlıyor mu" idi; <c>{0} dosya hazır</c> de
+    /// bağ sayılıyor ve gövde hiç taranmıyordu. Bugün yer tutucuyla <b>başlayan</b> metin de
+    /// taranır: yer tutucunun kendisi metin sayılmaz, etrafı sayılır.</para>
+    /// </summary>
+    private static readonly Regex MarkupBinding = new(
+        @"^\{(?:\w+:)?[A-Za-z]\w*(?:[^{}]*)?\}$", RegexOptions.Compiled);
+
+    /// <summary>Yer tutucular düşürüldükten sonra geriye kalan ekran metni.</summary>
+    private static string ScreenTextOf(string value)
+        => FormatPlaceholder.Replace(value, " ").Trim();
+
+    /// <summary>
     /// Taranan biçimleme dosyaları. Ölçüm bir zamanlar yalnız <c>MainWindow.axaml</c>'i
     /// okuyordu; oynatma paneli, denetim şeridi ve tema sözlükleri görünmüyordu. Bugün
     /// uygulamanın altındaki <b>her</b> <c>.axaml</c> taranıyor: bugün delik olmaması
     /// yarınki gömülü metni yakalamamak için gerekçe değil.
     /// </summary>
-    public static TheoryData<string> ScannedMarkup()
+    internal static IReadOnlyList<string> MarkupFiles()
     {
         var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
+        return Directory.GetFiles(app, "*.axaml", SearchOption.AllDirectories)
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    public static TheoryData<string> ScannedMarkup()
+    {
         var data = new TheoryData<string>();
-        foreach (var file in Directory.GetFiles(app, "*.axaml", SearchOption.AllDirectories)
-                     .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
-                     .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
-                     .OrderBy(path => path, StringComparer.Ordinal))
+        foreach (var file in MarkupFiles())
             data.Add(file);
         return data;
     }
@@ -141,10 +170,12 @@ public sealed class LanguageTests : IDisposable
 
         foreach (Match match in ScreenAttribute.Matches(xaml))
         {
-            var value = TipSources.DecodeXml(match.Groups[2].Value);
-            if (value.StartsWith('{')) continue;
-            if (!AnyLetter.IsMatch(value)) continue;
-            if (XamlNamesThatStayAsWritten.Contains(value, StringComparer.Ordinal)) continue;
+            var value = TipSources.DecodeXml(match.Groups[2].Value).Trim();
+            if (MarkupBinding.IsMatch(value)) continue;
+
+            var text = ScreenTextOf(value);
+            if (!AnyLetter.IsMatch(text)) continue;
+            if (XamlNamesThatStayAsWritten.Contains(text, StringComparer.Ordinal)) continue;
 
             stray.Add($"{match.Groups[1].Value}=\"{value}\"");
         }
@@ -152,9 +183,11 @@ public sealed class LanguageTests : IDisposable
         foreach (Match match in ScreenBody.Matches(xaml))
         {
             var value = TipSources.DecodeXml(match.Groups[1].Value).Trim();
-            if (value.StartsWith('{')) continue;
-            if (!AnyLetter.IsMatch(value)) continue;
-            if (XamlNamesThatStayAsWritten.Contains(value, StringComparer.Ordinal)) continue;
+            if (MarkupBinding.IsMatch(value)) continue;
+
+            var text = ScreenTextOf(value);
+            if (!AnyLetter.IsMatch(text)) continue;
+            if (XamlNamesThatStayAsWritten.Contains(text, StringComparer.Ordinal)) continue;
             if (IsResourceValue(xaml, match.Index)) continue;
 
             stray.Add($">{value}<");
@@ -168,10 +201,37 @@ public sealed class LanguageTests : IDisposable
         => Regex.Replace(markup, "<!--.*?-->", string.Empty, RegexOptions.Singleline);
 
     /// <summary>
-    /// Gövdenin ekrana değil sözlüğe yazıldığı durum: <c>x:Key</c> taşıyan öğe bir kaynak
-    /// değeridir (renk, geometri, yazı tipi ailesi, bağlantı adresi) ve içeriği anahtarla
-    /// çağrılır. Ölçüt öğe adına değil <b>yapıya</b> bakıyor; tema dosyalarındaki tür adları
-    /// tek tek sayılmıyor.
+    /// Sözlüğe yazılan ve çevrilmeyecek olan kaynak değerlerinin <b>adları</b>: renk,
+    /// geometri, gölge, yazı tipi ailesi, bağlantı adresi. Muafiyet eskiden örüntüydü —
+    /// açılış etiketinde <c>x:Key=</c> geçen her gövde taranmadan düşüyordu, yani tema
+    /// dosyalarına yazılan bir cümle de düşerdi. Bugün yalnız bu adlar düşer; listede
+    /// olmayan her <c>x:Key</c> gövdesi taranır.
+    ///
+    /// <para>Listeye bir ad eklemek görünür bir iştir ve
+    /// <see cref="Kaynak_muafiyetinde_kullanilmayan_ad_yok"/> ölü adı düşürür.</para>
+    /// </summary>
+    private static readonly string[] ResourceKeysThatCarryNoScreenText =
+    {
+        "NeonBlueColor", "NeonPinkColor", "NeonPurpleColor", "NeonSuccessColor",
+        "SurfaceToneColor", "AppBgColor", "TextBodyColor", "TextDisabledColor",
+        "NeonBlueFillColor", "NeonBlueHoverColor", "NeonBlueActiveColor",
+        "NeonBlueBorderColor", "NeonBlueBorderStrongColor", "NeonPinkFillColor",
+        "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor",
+        "EmberDeepColor", "EmberMidColor", "EmberEdgeColor",
+        "EmberBarDeepColor", "EmberBarMidColor", "EmberBarEdgeColor",
+        "FontSans", "FontMono",
+        "GlowBlue", "GlowPink", "GlowPurple",
+        "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
+        "PlaybackMaximizeIcon", "PlaybackFullScreenIcon", "PlaybackScrimColor"
+    };
+
+    private static readonly Regex KeyAttribute = new(
+        "x:Key=\"([^\"]*)\"", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Gövdenin ekrana değil sözlüğe yazıldığı durum. Ölçüt yapı değil <b>ad</b>: öğenin
+    /// <c>x:Key</c> değeri <see cref="ResourceKeysThatCarryNoScreenText"/> içinde geçiyorsa
+    /// gövde kaynak değeridir, geçmiyorsa ekran metni sayılır ve taranır.
     /// </summary>
     private static bool IsResourceValue(string markup, int bodyStart)
     {
@@ -179,7 +239,37 @@ public sealed class LanguageTests : IDisposable
         if (open < 0) return false;
 
         var tag = markup[open..(bodyStart + 1)];
-        return tag.Contains("x:Key=", StringComparison.Ordinal);
+        var key = KeyAttribute.Match(tag);
+        return key.Success
+            && ResourceKeysThatCarryNoScreenText.Contains(key.Groups[1].Value, StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// Muafiyet listesi büyümesin diye: listedeki her ad gerçekten taranan bir dosyada
+    /// kaynak gövdesi olarak duruyor mu. Bir ad kaldırıldığında ya da yeniden
+    /// adlandırıldığında liste kendiliğinden eskir; bu ölçü eskimeyi söyler.
+    /// </summary>
+    [Fact]
+    public void Kaynak_muafiyetinde_kullanilmayan_ad_yok()
+    {
+        var used = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var file in MarkupFiles())
+        {
+            var xaml = StripXmlComments(File.ReadAllText(file));
+            foreach (Match match in ScreenBody.Matches(xaml))
+            {
+                var value = TipSources.DecodeXml(match.Groups[1].Value).Trim();
+                if (!AnyLetter.IsMatch(ScreenTextOf(value))) continue;
+
+                var open = xaml.LastIndexOf('<', match.Index);
+                if (open < 0) continue;
+                var key = KeyAttribute.Match(xaml[open..(match.Index + 1)]);
+                if (key.Success) used.Add(key.Groups[1].Value);
+            }
+        }
+
+        var dead = ResourceKeysThatCarryNoScreenText.Where(name => !used.Contains(name)).ToList();
+        Assert.True(dead.Count == 0, "muafiyet listesinde karşılığı olmayan ad:\n" + string.Join("\n", dead));
     }
 
     /// <summary>
