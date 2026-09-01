@@ -977,9 +977,19 @@ public sealed class UpdaterTests : IDisposable
     private const string RemovalProbe = @"param([string]$Root, [string]$Out)
 $ErrorActionPreference = 'Stop'
 
-{0}
+function Write-Host {{
+    param([Parameter(Position = 0, ValueFromPipeline = $true)]$Object, [string]$ForegroundColor)
+    $line = [string]$Object
+    $akis = [System.IO.File]::Open(($Out + '.akis'), 'Append', 'Write', 'Read')
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($line + ""`n"")
+    $akis.Write($bytes, 0, $bytes.Length)
+    $akis.Flush()
+    $akis.Dispose()
+    if ($ForegroundColor) {{ Microsoft.PowerShell.Utility\Write-Host $line -ForegroundColor $ForegroundColor }}
+    else {{ Microsoft.PowerShell.Utility\Write-Host $line }}
+}}
 
-Set-Content -LiteralPath ($Out + '.basladi') -Value 'basladi' -Encoding UTF8
+{0}
 
 $log = @()
 $code = 0
@@ -1034,6 +1044,21 @@ exit $code
         return path;
     }
 
+    private static string SafeRead(string path)
+    {
+        try
+        {
+            using var handle = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var reader = new StreamReader(handle, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            return reader.ReadToEnd();
+        }
+        catch (IOException) { return string.Empty; }
+        catch (UnauthorizedAccessException) { return string.Empty; }
+    }
+
+    private static bool NoticeSeen(string path, string needle) =>
+        SafeRead(path).Contains(needle, StringComparison.Ordinal);
+
     private static (int Code, string Log) RunRemovalProbe(string probe, string installRoot, string logPath)
     {
         var info = new ProcessStartInfo("powershell.exe")
@@ -1071,14 +1096,19 @@ exit $code
         if (!OperatingSystem.IsWindows()) return;
 
         var (installRoot, locked, probe, logPath) = LockedInstall("silme-gecici");
-        var started = logPath + ".basladi";
-        if (File.Exists(started)) File.Delete(started);
+        var notices = logPath + ".akis";
         var stream = new FileStream(locked, FileMode.Open, FileAccess.Read, FileShare.None);
+        var releasedOnNotice = false;
         var release = new Thread(() =>
         {
             var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
-            while (!File.Exists(started) && DateTime.UtcNow < deadline) Thread.Sleep(20);
-            Thread.Sleep(300);
+            while (DateTime.UtcNow < deadline)
+            {
+                if (NoticeSeen(notices, "yeniden denenecek")) { releasedOnNotice = true; break; }
+                if (File.Exists(logPath)) break;
+                Thread.Sleep(5);
+            }
+
             stream.Dispose();
         }) { IsBackground = true };
         release.Start();
@@ -1086,11 +1116,12 @@ exit $code
         var stopwatch = Stopwatch.StartNew();
         var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
         stopwatch.Stop();
-        release.Join(TimeSpan.FromSeconds(5));
+        Assert.True(release.Join(TimeSpan.FromSeconds(10)), "kilidi bırakan iş parçacığı bitmedi");
 
         _output.WriteLine($"geçici kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
         _output.WriteLine(log.Trim());
 
+        Assert.True(releasedOnNotice, $"kilit yeniden deneme duyurusu görülmeden bırakıldı: {SafeRead(notices)}");
         Assert.Equal(0, code);
         Assert.Contains("BITTI", log, StringComparison.Ordinal);
         Assert.Contains("yeniden denenecek", log, StringComparison.Ordinal);
