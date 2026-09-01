@@ -3,6 +3,33 @@ using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
 
+/// <summary>
+/// Kaynak agacini okuyan olculer. Yalniz derlenmis ikiliyi tasiyan bir kosumda
+/// <c>tools/VidShrink.Bench/Program.cs</c> yoktur; test sessizce yesile donmez, atlanir.
+/// </summary>
+public sealed class BenchSourceFactAttribute : FactAttribute
+{
+    public static readonly string? ProgramPath = Locate();
+
+    public BenchSourceFactAttribute()
+    {
+        if (ProgramPath is null)
+            Skip = "tools/VidShrink.Bench/Program.cs bulunamadi, kaynak agaci olcusu kosturulmadi.";
+    }
+
+    private static string? Locate()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            var candidate = Path.Combine(directory.FullName, "tools", "VidShrink.Bench", "Program.cs");
+            if (File.Exists(candidate)) return candidate;
+            directory = directory.Parent;
+        }
+        return null;
+    }
+}
+
 public sealed class ComplexityScanTests
 {
     private const string Codec = "libx264";
@@ -281,4 +308,85 @@ public sealed class ComplexityScanTests
         Assert.Equal(cleanFullBytesPerFrame * 8.0 / pixels, clean.ReferenceBppf, 12);
         Assert.Same(clean, clean.WithoutSampleContainerBias(width, height));
     }
+
+    private sealed class ColdCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup
+    {
+        private readonly HashSet<string> _warm = new();
+
+        public int Warmups { get; private set; }
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec) => true;
+
+        public bool SupportsEncoderOption(string codec, string option, string value)
+            => _warm.Contains(codec + option + value);
+
+        public bool WarmEncoderOption(string codec, string option, string value)
+        {
+            Warmups++;
+            _warm.Add(codec + option + value);
+            return true;
+        }
+    }
+
+    private static (MediaInfo Info, EncodePlan Plan) PsychovisualCase()
+    {
+        var info = new MediaInfo
+        {
+            FilePath = "kaynak.mkv",
+            FileSizeBytes = 400L * 1024 * 1024,
+            DurationSeconds = 120,
+            Width = 1920,
+            Height = 1080,
+            Fps = 30,
+            VideoCodec = "h264",
+            TotalBitrateBps = 28_000_000,
+            AudioCodec = "aac",
+            AudioBitrateBps = 128_000,
+            AudioChannels = 2
+        };
+        var plan = new EncodePlan
+        {
+            Codec = "libx265",
+            Preset = "slow",
+            Mode = "crf",
+            Crf = 24,
+            Width = 1920,
+            Height = 1080,
+            Fps = 30,
+            AudioBitrateK = 128,
+            AudioCodec = "aac"
+        };
+        return (info, plan);
+    }
+
+    [Fact]
+    public void ThePrintedCommandIsTheCommandThatWouldRun()
+    {
+        var (info, plan) = PsychovisualCase();
+        var capabilities = new ColdCapabilities();
+
+        var unwarmed = FfmpegArguments.Build(info, plan, "cikti.mp4", 0, null, capabilities);
+        Assert.DoesNotContain("-x265-params", unwarmed);
+        Assert.Equal(0, capabilities.Warmups);
+
+        var printed = EncodeRunner.EncodeArguments(info, plan, "cikti.mp4", 0, null, capabilities);
+        var run = EncodeRunner.EncodeArguments(info, plan, "cikti.mp4", 0, null, capabilities);
+
+        Assert.Contains("-x265-params", printed);
+        Assert.Contains("psy-rd=2:psy-rdoq=1:aq-mode=2", printed);
+        Assert.Equal(run, printed);
+    }
+
+    [BenchSourceFact]
+    public void TheBenchPrintsTheCommandThroughTheWarmingPath()
+    {
+        var program = BenchSourceFactAttribute.ProgramPath!;
+        var printLine = File.ReadLines(program).FirstOrDefault(line => line.Contains("\"komut: \""));
+        Assert.NotNull(printLine);
+        Assert.Contains("EncodeRunner.EncodeArguments", printLine);
+        Assert.DoesNotContain("FfmpegArguments.Build", printLine);
+    }
+
 }

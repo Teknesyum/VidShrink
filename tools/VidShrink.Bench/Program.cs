@@ -24,6 +24,7 @@ try
         "sample-container-cost" => await SampleContainerCostAsync(args),
         "container-unit" => await ContainerUnitAsync(args),
         "search-cost" => SearchCost(args),
+        "peak-curve" => await PeakCurveAsync(args),
         "shrink" => await ShrinkAsync(args),
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
@@ -48,7 +49,8 @@ static void PrintUsage()
     Console.WriteLine("  bench sample-container-cost <kaynak> <başlangıç-sn> <çıktı-klasörü>");
     Console.WriteLine("  bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
     Console.WriteLine("  bench search-cost [--runs 5]");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench peak-curve <kaynak> [--codec hevc_nvenc] [--ratios 3,5,8,12] [--peaks 1.02,1.1,1.25,1.5] [--out .calisma/tepe]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
@@ -445,6 +447,106 @@ static int SearchCost(string[] args)
     return 0;
 }
 
+static async Task<int> PeakCurveAsync(string[] args)
+{
+    if (args.Length < 2)
+    {
+        Console.Error.WriteLine("kaynak gerekli.");
+        return 1;
+    }
+
+    var source = Path.GetFullPath(args[1]);
+    var codec = "hevc_nvenc";
+    var outDir = Path.Combine(".calisma", "tepe");
+    var ratios = new[] { 3.0, 5.0, 8.0, 12.0 };
+    var peaks = new[] { 1.02, 1.10, 1.25, 1.50 };
+
+    for (var i = 2; i < args.Length - 1; i++)
+    {
+        if (args[i] == "--codec") codec = args[i + 1];
+        else if (args[i] == "--out") outDir = args[i + 1];
+        else if (args[i] == "--ratios")
+            ratios = args[i + 1].Split(',').Select(x => double.Parse(x, CultureInfo.InvariantCulture)).ToArray();
+        else if (args[i] == "--peaks")
+            peaks = args[i + 1].Split(',').Select(x => double.Parse(x, CultureInfo.InvariantCulture)).ToArray();
+    }
+
+    Directory.CreateDirectory(outDir);
+    var info = await FfprobeClient.ProbeAsync(source);
+    if (info is null)
+    {
+        Console.Error.WriteLine("kaynak okunamadi.");
+        return 1;
+    }
+
+    var floorK = CodecModel.MinBitrateK(codec, info.Width, info.Height, info.Fps);
+    Console.WriteLine($"kaynak {Path.GetFileNameWithoutExtension(source)} | {info.Width}x{info.Height}@{info.Fps:0.##} | {codec} | taban {floorK}k | donanim={CodecModel.IsHardware(codec)}");
+    Console.WriteLine("| oran | tepe | uretim tepesi | b:v k | maxrate k | bufsize k | boyut MB | mean | harm | p10 |");
+    Console.WriteLine("|---|---|---|---|---|---|---|---|---|---|");
+
+    var rows = new List<object>();
+    foreach (var ratio in ratios)
+    {
+        var bitrateK = (int)Math.Round(floorK * ratio);
+        var produced = FfmpegArguments.PeakRateFactor(codec, bitrateK, info.Width, info.Height, info.Fps);
+        foreach (var peak in peaks)
+        {
+            var maxrateK = (int)(bitrateK * peak);
+            var bufsizeK = (int)(bitrateK * FfmpegArguments.BufferFactor(peak));
+            var outputPath = Path.Combine(outDir,
+                $"r{ratio.ToString("0.##", CultureInfo.InvariantCulture)}_p{peak.ToString("0.00", CultureInfo.InvariantCulture)}.mp4");
+
+            var arguments = new List<string>
+            {
+                "-hide_banner", "-y", "-nostdin",
+                "-i", source,
+                "-c:v", codec,
+                "-b:v", $"{bitrateK}k",
+                "-maxrate", $"{maxrateK}k",
+                "-bufsize", $"{bufsizeK}k"
+            };
+            arguments.AddRange(CodecModel.BitrateRateControlArgs(codec));
+            arguments.Add("-an");
+            arguments.Add(outputPath);
+
+            var psi = BenchProcessInfo(ToolLocator.Ffmpeg, arguments);
+            using (var process = Process.Start(psi)!)
+            {
+                var error = await process.StandardError.ReadToEndAsync();
+                await process.WaitForExitAsync();
+                if (process.ExitCode != 0)
+                {
+                    Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | hata | - | - | - |");
+                    Console.Error.WriteLine(error.Trim());
+                    continue;
+                }
+            }
+
+            var sizeMb = new FileInfo(outputPath).Length / 1024.0 / 1024.0;
+            var vmaf = await VmafNegAsync(source, outputPath, info.Width, info.Height);
+            Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | {sizeMb:0.###} | {Fmt(vmaf.Mean)} | {Fmt(vmaf.Harmonic)} | {Fmt(vmaf.P10)} |");
+            rows.Add(new
+            {
+                Ratio = ratio,
+                Peak = peak,
+                ProducedPeak = produced,
+                BitrateK = bitrateK,
+                MaxrateK = maxrateK,
+                BufsizeK = bufsizeK,
+                SizeMb = sizeMb,
+                VmafNegMean = vmaf.Mean,
+                VmafNegHarmonic = vmaf.Harmonic,
+                VmafNegP10 = vmaf.P10
+            });
+            try { File.Delete(outputPath); } catch { }
+        }
+    }
+
+    await File.WriteAllTextAsync(Path.Combine(outDir, "tepe-egrisi.json"),
+        JsonSerializer.Serialize(rows, new JsonSerializerOptions { WriteIndented = true }));
+    return 0;
+}
+
 static async Task<int> ShrinkAsync(string[] args)
 {
     if (args.Length < 3)
@@ -472,6 +574,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var planOnly = false;
     var noMeasure = false;
     var noPsy = false;
+    var measuredQuality = false;
     (int Width, int Height)? sourceSize = null;
     double? sourceMb = null;
     for (var i = 3; i < args.Length; i++)
@@ -511,6 +614,9 @@ static async Task<int> ShrinkAsync(string[] args)
             case "--no-psy":
                 noPsy = true;
                 break;
+            case "--measured-quality":
+                measuredQuality = true;
+                break;
             case "--source-size" when i + 1 < args.Length:
                 var dimensions = args[++i].Split('x', 'X');
                 sourceSize = (int.Parse(dimensions[0], CultureInfo.InvariantCulture), int.Parse(dimensions[1], CultureInfo.InvariantCulture));
@@ -538,13 +644,19 @@ static async Task<int> ShrinkAsync(string[] args)
 
     var info = await FfprobeClient.ProbeAsync(source);
     var probeWatch = Stopwatch.StartNew();
-    var complexity = await ComplexityProbe.RunAsync(info, speedMode);
+    var probed = await ComplexityProbe.RunDetailedAsync(info, speedMode, measuredQuality, measuredQuality ? QualityMeasurement.Instance : null);
+    var complexity = probed.Profile;
+    var anchors = probed.QualityMeasurements
+        .Where(q => q is { Comparable: true, VmafNegMean: not null })
+        .Select(q => q.VmafNegMean!.Value)
+        .ToArray();
+    if (measuredQuality && anchors.Length > 0) complexity = complexity.WithProbeQuality(anchors);
     if (sourceSize is { } overrideSize) info = info with { Width = overrideSize.Width, Height = overrideSize.Height };
     if (sourceMb is { } overrideMb) info = info with { FileSizeBytes = (long)(overrideMb * 1024 * 1024) };
     probeWatch.Stop();
     var results = new List<BenchResult>();
     var label = Path.GetFileNameWithoutExtension(source);
-    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | kalibre={complexity.Calibrated}");
+    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | kalibre={complexity.Calibrated} | olculen kalite={(complexity.QualityMeasured ? string.Join("/", anchors.Select(a => a.ToString("0.##", CultureInfo.InvariantCulture))) : "yok")}");
 
     foreach (var targetMb in targets)
     {
@@ -605,14 +717,17 @@ static async Task<int> ShrinkAsync(string[] args)
 
         var outputPath = Path.Combine(outDir, $"{label}_{targetMb.ToString("0.#", CultureInfo.InvariantCulture)}mb.mp4");
         var commandPass = plan.ModeEnum == EncodeMode.TwoPass && !CodecModel.IsHardware(plan.Codec) ? 2 : 0;
-        Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null, EncoderCapabilities.Instance)));
+        Console.WriteLine("komut: " + FfmpegArguments.ToCommandLine(EncodeRunner.EncodeArguments(info, plan, outputPath, commandPass, commandPass > 0 ? Path.Combine(outDir, "pass") : null, EncoderCapabilities.Instance)));
         if (planOnly) continue;
         var stopwatch = Stopwatch.StartNew();
         var encodeResult = await new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, null, CancellationToken.None, fillPolicy);
         stopwatch.Stop();
 
+        foreach (var step in encodeResult.Trace ?? Array.Empty<EncodeAttempt>())
+            Console.WriteLine($"  deneme {step.Number}: {step.Branch}, {step.Mode}, {step.VideoBitrateK}k, hedeflenen {step.AimMb:0.###} MB, cikan {step.ActualMb:0.###} MB");
+
         var measureWatch = Stopwatch.StartNew();
-        var vmaf = noMeasure ? (Harmonic: (double?)null, P10: (double?)null) : await VmafNegAsync(source, outputPath, info.Width, info.Height);
+        var vmaf = noMeasure ? (Mean: (double?)null, Harmonic: (double?)null, P10: (double?)null) : await VmafNegAsync(source, outputPath, info.Width, info.Height);
         var planes = noMeasure ? (Y: (double?)null, U: (double?)null, V: (double?)null) : await XpsnrPlanesAsync(source, outputPath, info.Width, info.Height);
         measureWatch.Stop();
         var xpsnr = planes.Y is { } py && planes.U is { } pu && planes.V is { } pv
@@ -637,11 +752,13 @@ static async Task<int> ShrinkAsync(string[] args)
             plan.Codec,
             plan.Mode,
             plan.ModeEnum == EncodeMode.Crf ? $"crf {plan.Crf}" : $"{plan.VideoBitrateK}k",
+            encodeResult.Attempts,
             stopwatch.Elapsed.TotalSeconds,
             planWatch.Elapsed.TotalSeconds,
             probeWatch.Elapsed.TotalSeconds,
             measureWatch.Elapsed.TotalSeconds,
             profile.Calibrated,
+            vmaf.Mean,
             vmaf.Harmonic,
             vmaf.P10,
             xpsnr,
@@ -653,9 +770,9 @@ static async Task<int> ShrinkAsync(string[] args)
         Console.WriteLine(
             $"{result.TargetMb:0.##} MB -> {result.ActualMb:0.##} MB ({result.FillPercent:0.#}%), " +
             $"bant={(result.InBand ? "ic" : "dis")} tasma={(result.OverTarget ? "VAR" : "yok")} taban={(result.BelowHardFloor ? "IHLAL" : "ok")}, " +
-            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, " +
+            $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, deneme={result.Attempts}, " +
             $"kalibre={(result.Calibrated ? "evet" : "hayir")}, plan={result.PlanSeconds:0.#}s, sure={result.EncodeSeconds:0.#}s, " +
-            $"VMAF-NEG harm={Fmt(result.VmafNegHarmonic)} p10={Fmt(result.VmafNegP10)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
+            $"VMAF-NEG mean={Fmt(result.VmafNegMean)} harm={Fmt(result.VmafNegHarmonic)} p10={Fmt(result.VmafNegP10)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
 
         await WriteResultsAsync(results, outDir, resultsPath);
     }
@@ -674,7 +791,7 @@ static async Task<string> WriteResultsAsync(List<BenchResult> results, string ou
     return path;
 }
 
-static async Task<(double? Harmonic, double? P10)> VmafNegAsync(string referencePath, string testPath, int width, int height)
+static async Task<(double? Mean, double? Harmonic, double? P10)> VmafNegAsync(string referencePath, string testPath, int width, int height)
 {
     var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_bench_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
     try
@@ -683,7 +800,7 @@ static async Task<(double? Harmonic, double? P10)> VmafNegAsync(string reference
         await RunLavfiAsync(referencePath, testPath, width, height,
             $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={escaped}");
 
-        if (!File.Exists(logPath)) return (null, null);
+        if (!File.Exists(logPath)) return (null, null, null);
 
         var scores = new List<double>();
         await using (var stream = File.OpenRead(logPath))
@@ -697,15 +814,16 @@ static async Task<(double? Harmonic, double? P10)> VmafNegAsync(string reference
             }
         }
 
-        if (scores.Count == 0) return (null, null);
+        if (scores.Count == 0) return (null, null, null);
 
+        var mean = scores.Average();
         var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
         var sorted = scores.OrderBy(x => x).ToList();
         var rank = 10.0 / 100.0 * (sorted.Count - 1);
         var lower = (int)Math.Floor(rank);
         var upper = (int)Math.Ceiling(rank);
         var p10 = lower == upper ? sorted[lower] : sorted[lower] + (sorted[upper] - sorted[lower]) * (rank - lower);
-        return (harmonic, p10);
+        return (mean, harmonic, p10);
     }
     finally
     {
@@ -2347,11 +2465,13 @@ sealed record BenchResult(
     string Codec,
     string Mode,
     string CrfOrBitrate,
+    int Attempts,
     double EncodeSeconds,
     double PlanSeconds,
     double ProbeSeconds,
     double MeasureSeconds,
     bool Calibrated,
+    double? VmafNegMean,
     double? VmafNegHarmonic,
     double? VmafNegP10,
     double? Xpsnr,
