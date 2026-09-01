@@ -860,7 +860,8 @@ public sealed class WindowLayoutTests
             var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
             var hdr = window.GetVisualDescendants().OfType<StackPanel>()
                 .FirstOrDefault(panel => panel.Name == "HdrPolicyPanel");
-            if (hdr is not null) hdr.IsVisible = true;
+            Assert.NotNull(hdr);
+            hdr.IsVisible = true;
 
             var seen = new HashSet<Button>();
             var found = 0;

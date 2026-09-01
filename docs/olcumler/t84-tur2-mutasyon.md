@@ -50,7 +50,9 @@ satır etiketin 27'sinde kalıyor, rozetin ortası 9,5'e oturuyor. Görünen roz
 Bağımsız denetim buldu. Ölçüm her sekmede **pencerenin tamamını** yeniden tarıyordu;
 sekme geçişindeki çapraz geçiş çıkan içeriği ağaçta bıraktığı için her rozet iki kez
 sayıldı. Dondurulan sayı 44'tü, gerçek popülasyon 23. Rapordaki "44 rozetin 30'u"
-cümlesi de aynı çarpanı taşıyordu — 30 = 2 × 15.
+cümlesi de aynı çarpanı taşıyordu: 44 = 2 × 22 görünür rozet, 30 = 2 × 15 kayık rozet.
+Düzeltilmiş sayı 16, çünkü gizli `HdrPolicyPanel` rozeti o koşumda hiç görülmüyordu;
+artık görülüyor ve o da kayıkların arasında.
 
 Ölçüm artık gördüğü düğmeyi `HashSet` ile bir kez sayıyor. Ayrıca varsayılan gizli olan
 `HdrPolicyPanel` açılıyor; oradaki rozet daha önce hiç ölçülmüyordu (M8 bunu gösteriyor:
