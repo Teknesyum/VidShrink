@@ -26,23 +26,20 @@ Bu kaynakta VMAF-NEG bazı karelerde **tam 0** veriyor. Auto satırında 3624 ka
 `n / Σ(1/x)` olduğu için bu 26 kare ortalamayı 94,5'ten 56,3'e çekiyor; aynı satırın
 p10'u 94,5 olduğu halde.
 
-Bunun hizalama hatası olmadığı doğrulandı: kaynak da çıktı da **3624 kare**
-(`ffprobe -count_frames`), yani libvmaf kareleri birebir eşliyor. Sıfır bloğunun
-bittiği yerde kaynakta sahne kesmesi var — 3411. karede parlaklık 331'den 225'e
-düşüyor (`signalstats YAVG`) — yani blok bir kesmenin hemen öncesindeki durağan
-pasaj. Sıfır veren karelerde hareket ölçüsü de sıfıra yakın
-(1699. kare: `motion_sad 0,004`, `adm2 0,364`, `vif_scale0 0,370`). Durağan ve düşük
-detaylı karelerde VMAF-NEG'in tabana çakılması modelin bilinen davranışı.
+Hizalama hatası değil: kaynak da çıktı da **3624 kare** (`ffprobe -count_frames`),
+libvmaf kareleri birebir eşliyor.
 
-Pasaj **kaynağın kendisinde** olduğu için her satırı aynı vuruyor; satırlar arası
-karşılaştırma geçerli kalıyor. Yine de tek bir sayıya bakan biri harmonik ortalamayı
-"kalite yarıya düştü" diye okur. Bu yüzden tablolarda harmonik ortalamanın yanında
-**sıfır kare sayısı** ve **sıfırlar çıkarılmış harmonik** (`harm*`) da veriliyor.
-Üç sütun da her satır için aynı yöntemle hesaplandı.
+Sıfırlar kaynaktaki **sahne kesmelerinin hemen önünde** duruyor. Kaynakta iki kesme
+var — 1701. kare (28,353 s) ve 3411. kare (56,870 s; parlaklık `YAVG` 331'den 225'e
+düşüyor). Sıfır veren kareler bu iki kesmenin son karesine kadar olan bloklar
+(1699 ve 3385-3410). VMAF-NEG'in sahne geçişinde tabana çakılması modelin bilinen
+davranışı; kesmenin kendisi kodlayıcı ayarına bağlı değil.
 
 Doğrulandı: `auto` ile `e1-preset4` satırlarında sıfır veren kareler **birebir aynı
-26 kare** (kesişim 26, fark 0). Yani pasaj kodlayıcı ayarına bağlı değil.
-
+26 kare** (kesişim 26, fark 0). Pasaj kaynağın kendisinde olduğu için her satırı aynı
+vuruyor, satırlar arası karşılaştırma geçerli kalıyor. Yine de tek sayıya bakan biri
+harmonik ortalamayı "kalite yarıya düştü" diye okur — bu yüzden satırlar arası farkı
+**ortalama ve p10** taşıyor, harmonik sütunu sözleşme gereği bütünlük için duruyor.
 ---
 
 ## K1 — Auto modun bugün aldığı kararlar
