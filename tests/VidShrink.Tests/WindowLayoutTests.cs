@@ -858,6 +858,11 @@ public sealed class WindowLayoutTests
         var (counted, problems) = Read(size, loaded: false, window =>
         {
             var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
+            var hdr = window.GetVisualDescendants().OfType<StackPanel>()
+                .FirstOrDefault(panel => panel.Name == "HdrPolicyPanel");
+            if (hdr is not null) hdr.IsVisible = true;
+
+            var seen = new HashSet<Button>();
             var found = 0;
             var faults = new List<string>();
 
@@ -872,7 +877,8 @@ public sealed class WindowLayoutTests
                 foreach (var button in window.GetVisualDescendants().OfType<Button>()
                              .Where(candidate => candidate.IsEffectivelyVisible && candidate.Bounds.Height > 0)
                              .Where(candidate => candidate.GetVisualDescendants()
-                                 .OfType<Border>().Any(border => border.Name == "Badge")))
+                                 .OfType<Border>().Any(border => border.Name == "Badge"))
+                             .Where(candidate => seen.Add(candidate)))
                 {
                     var badge = button.GetVisualDescendants().OfType<Border>()
                         .First(border => border.Name == "Badge");
@@ -898,11 +904,19 @@ public sealed class WindowLayoutTests
                     }
 
                     var label = Label(button);
-                    if (label is null) continue;
+                    if (label is null)
+                    {
+                        faults.Add($"{header}: rozetin etiketi bulunamadı, hiza ölçülemedi.");
+                        continue;
+                    }
 
                     var badgeMiddle = Middle(badge, window);
                     var labelMiddle = Middle(label, window);
-                    if (badgeMiddle is not { } badgeY || labelMiddle is not { } labelY) continue;
+                    if (badgeMiddle is not { } badgeY || labelMiddle is not { } labelY)
+                    {
+                        faults.Add($"{header}: rozet \"{label.Text}\" pencere koordinatına çevrilemedi.");
+                        continue;
+                    }
 
                     var drift = badgeY - labelY;
                     if (Math.Abs(drift) >= BadgeDriftCeiling)
@@ -916,10 +930,11 @@ public sealed class WindowLayoutTests
         });
 
         // Sayım donduruldu: ölçüm sekme seçimi ya da görünürlük yüzünden rozetleri
-        // görmez olursa sessizce yeşile dönmesin. Rozet eklendiğinde bu sayı elle güncellenir.
+        // görmez olursa sessizce yeşile dönmesin. Sayı MainWindow.axaml'deki rozet
+        // sayısıdır — ölçümün kendi çıktısı değil; rozet eklendiğinde elle güncellenir.
         Assert.True(
-            counted == 44,
-            $"Ölçülen bilgi rozeti {counted}, beklenen 44. Rozet eklendiyse sayıyı güncelle; "
+            counted == 23,
+            $"Ölçülen bilgi rozeti {counted}, beklenen 23. Rozet eklendiyse sayıyı güncelle; "
             + "eklenmediyse ölçüm rozetleri göremiyor.");
         Assert.True(
             problems.Count == 0,

@@ -14,8 +14,10 @@ Ağaç: `T84-tur2-olcuyu-gercege-baglama`, worktree `C:\vs-t84`.
 | M4 | `RestoreSettings` içindeki `if (settings.FastGpu.HasValue)` kapısı geri kondu | `ResetRestoresEveryControlToItsDefault` | Başarısız 1 / 1 |
 | M5 | `TipLineMetrics.Ceiling` elle `746` yazıldı, `TooltipMaxWidth` 780→700 | `TipLineThresholdsComeFromTheThemeAndEveryLineCanWrap` | Başarısız 1 / 1 |
 | M6 | `tr/settings.json` içinde `settings.reset-cancel` anahtarı yeniden adlandırıldı | `ResetCopyComesFromBothLocaleFiles` | Başarısız 1 / 1 |
+| M7 | `OnConfirmResetSettings` içindeki `UseLanguage(...)` satırı silindi | `ResetReturnsTheLanguageToTheOperatingSystemDefault` | Başarısız 1 / 1 |
+| M8 | Ölçüm `HdrPolicyPanel`i açmadan koştu | `InfoBadgesAlignWithTheirLabelAndTheQuestionMarkFits` | Başarısız 1 / 1 |
 
-Altı mutasyonun altısı kırmızıya döndü.
+Sekiz mutasyonun sekizi kırmızıya döndü.
 
 ## M6'nın kendi bulgusu
 
@@ -26,8 +28,8 @@ yeniden yazıldı, mutasyon o zaman kırmızıya döndü.
 
 ## Ölçülen hizalama sapması
 
-`InfoBadgesAlign…` ilk koşumunda 44 rozetin **30'u** etiketinin dikey ortasından
-**4,5 px** aşağıda çıktı. Neden: etiket kendi alt boşluğunu (`LabelMargin` = `0,0,0,8`)
+`InfoBadgesAlign…` düzeltme geri alındığında (M3) 23 rozetin **16'sı** etiketinin dikey
+ortasından **4,5 px** aşağıda çıkıyor. Neden: etiket kendi alt boşluğunu (`LabelMargin` = `0,0,0,8`)
 taşıyor ve satırı aşağı doğru büyütüyor, rozet ise satırın dikey ortasına yerleşiyor.
 
 İlk denenen düzeltme — boşluğu etiketten satıra taşımak — hizalamayı düzeltti ama
@@ -41,7 +43,21 @@ satır etiketin 27'sinde kalıyor, rozetin ortası 9,5'e oturuyor. Görünen roz
 18 px'di; kalan 3 px görüntüsüz bir halkaydı. Dokunma hedefi olan denetimler
 `TargetMinSize` kullanmayı sürdürüyor.
 
-44 rozetin tamamı 2 px tavanının altında ve soru işareti hiçbirinde kırpılmıyor.
+23 rozetin tamamı 2 px tavanının altında ve soru işareti hiçbirinde kırpılmıyor.
+
+## Sayım iki kat şişmişti
+
+Bağımsız denetim buldu. Ölçüm her sekmede **pencerenin tamamını** yeniden tarıyordu;
+sekme geçişindeki çapraz geçiş çıkan içeriği ağaçta bıraktığı için her rozet iki kez
+sayıldı. Dondurulan sayı 44'tü, gerçek popülasyon 23. Rapordaki "44 rozetin 30'u"
+cümlesi de aynı çarpanı taşıyordu — 30 = 2 × 15.
+
+Ölçüm artık gördüğü düğmeyi `HashSet` ile bir kez sayıyor. Ayrıca varsayılan gizli olan
+`HdrPolicyPanel` açılıyor; oradaki rozet daha önce hiç ölçülmüyordu (M8 bunu gösteriyor:
+panel kapalıyken sayım 22'de kalıyor).
+
+Etiketi bulunamayan ya da pencere koordinatına çevrilemeyen rozet artık sessizce
+atlanmıyor, hata olarak yazılıyor.
 
 ## Kapsam dışı yazımlar
 

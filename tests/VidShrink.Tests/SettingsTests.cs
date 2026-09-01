@@ -206,6 +206,39 @@ public sealed class SettingsTests
     }
 
     /// <summary>
+    /// Sıfırlama dili de varsayılana döndürür. Denetim tablosu dili kapsamıyor —
+    /// <c>ChkFastGpu</c> tam bu boşlukta sessizce kalmıştı.
+    /// </summary>
+    [Fact]
+    public void ResetReturnsTheLanguageToTheOperatingSystemDefault()
+    {
+        var file = SettingsFile();
+        try
+        {
+            var expected = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);
+            var other = expected == "en" ? "tr" : "en";
+            new UpdateSettings { Language = other }.Save(file);
+
+            var (before, after) = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = file };
+                try
+                {
+                    window.RestoreSettingsForTest(UpdateSettings.Load(file));
+                    var moved = VidShrink.App.Localization.Strings.Language;
+                    window.ConfirmResetSettingsForTest();
+                    return (moved, VidShrink.App.Localization.Strings.Language);
+                }
+                finally { window.Close(); }
+            });
+
+            Assert.Equal(other, before);
+            Assert.Equal(expected, after);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    /// <summary>
     /// Sıfırlama akışının dört metni var: başlık, onay sorusu, onay düğmesi, vazgeç.
     /// Ölçü ikisine bakıyordu; kalan ikisi bir dilden düşse sessiz geçerdi.
     /// </summary>
