@@ -93,14 +93,16 @@ Kullanıcı kaynağı incelemeye yetki verdi; okundu ve karşılaştırıldı.
 | T89 | plan hesabı, ölçülen kaliteyle + K13 | **mühürlendi** |
 | T92 | yanlışlanamayan ölçü | **mühürlendi** |
 | T96 | sahne haritası ve kestirim değeri | **mühürlendi** (Spearman 0,976) |
+| T97 | algı ölçüsünün doğruluğu | **mühürlendi** (kelepçe kaldırıldı) |
 | T95 | A/B ölçüm düzeneği (`tools/VidShrink.Ab`) | koşuyor |
-| T97 | algı ölçüsünün doğruluğu | teslim edildi, denetimde |
+| T98 | sabit GOP ve CRF tavanı → dinamikliğe geçiş | koşuyor |
 | T100 | ölçülen kalitenin kazancı kullanıcıya ulaşmıyor | koşuyor |
 | T101 | haritanın kodlayıcı aktarımı ve kaçırılan kesim | koşuyor |
 | T102 | auto mod — bilmeyen kullanıcı ne alıyor | koşuyor |
+| T104 | ölçü penceresi de sahneden gelsin | koşuyor |
 | T94 | HDR düzeltmesinin gerçek kaynakta doğrulanması | `depends: [T89, T95]` |
-| T98 | sabit GOP ve CRF tavanı → dinamikliğe geçiş | `depends: [T89, T95, T96]` |
 | T99 | bppf tabanı kazanan yerleşimi aramıyor | `depends: [T89, T95]` |
+| T103 | içeriğe bağlı örnekleme (üçüncü kaldıraç) | `depends: [T96, T100, T101]` |
 
 ## GOP: iki bağımsız kaynaktan doğrulandı
 
@@ -143,19 +145,41 @@ ve T89'un ölçtüğü %78–%193 süre artışının tamamı bu gereksiz yenide
 denemelerden geliyor. Ayrıca `MainWindow.axaml.cs` ölçülen kaliteyi çağırıp
 atıyor — ölçülen yol uygulamada uyuyor.
 
+## Makine paylaşımı — hangi sayı bozulur, hangisi bozulmaz
+
+Altı ajan koşuyor, dört ffmpeg aynı anda. "Aynı anda tek ağır kodlama" kuralı bu
+ölçekte uygulanamıyor ve ajanlar onu **bekleme gerekçesi** yapmaya başladı. Kural
+keskinleşiyor: yükü beklemek yok, yükü doğru okumak var.
+
+| Sayı | Yükten etkilenir mi | Ne yapılır |
+|---|---|---|
+| Duvar saati / süre | **Evet, doğrudan** | Rapora "makine paylaşımlıydı, N ffmpeg" damgası basılır |
+| Spearman, sıra korelasyonu | Hayır — sıra ölçüsü | Damga basma; yersiz çekince okuru yanıltır |
+| VMAF / boyut, **iş parçacığı sabitken** | Hayır | Damga basma |
+| VMAF / boyut, **iş parçacığı sabit değilken** | **Evet** | Ölçüm geçersiz; sabitleyip tekrarla |
+
+Son satır esas olan. Kodlayıcı iş parçacığı sayısını boştaki çekirdeğe göre seçerse
+bölümleme koşumdan koşuma değişir ve çıktı da değişir — T87 turundaki kararsızlık
+buradan geliyordu, "paralellik" kendisinden değil. Karşılaştırma koşumlarında
+`-threads N` (x265'te `pools`) **komut satırında yazılır**.
+
+Bir ajanın yükü fark etmesi doğru; yükü bekleme gerekçesi yapması değil.
+
 ## Sonraki basamak
 
-1. T89 + T92 birleşir ve mühürlenir; T100 hemen açılır.
-2. T95 teslim edince T94, T98, T99 aynı anda açılır — üçü de aletin ölçümüne
-   dayanıyor.
-3. `SceneMap` `PlanCalculator`a bağlanır (T99 mühürlendikten sonra).
-4. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır — kuyruk
-   açığının ana sahibi orada.
+1. T98 GOP aralığını `main`e getirir. **Açığın bilinen en büyük tek kalemi bu** —
+   T102 tek değişkenle %24,5 boyut kazancı ölçtü, puan da yükseldi.
+2. T95 teslim edince T94 ve T99 aynı anda açılır — ikisi de aletin adillik
+   kapısına dayanıyor.
+3. T100 + T101 bitince T103 açılır (örnekleme, üçüncü kaldıraç).
+4. `SceneMap` `PlanCalculator`a bağlanır (T99 mühürlendikten sonra).
+5. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır — kuyruk
+   açığının ana sahibi (aday A, p10'da +13,76) orada.
 
 ## Değişmeyen kurallar
 
 - Sabit karşılaştıran ölçü davranış ölçmez.
 - Ölçmediğin şey için "ölçülmedi" yazılır, iddia edilmez.
-- Aynı anda tek ağır kodlama; paralel koşum ölçüyü kararsız yapar.
+- Paralel koşumda **iş parçacığı sabitlenir**; süre sayısı damgalanır (aşağıda).
 - Mühürden önce `gh run list`.
 - `main`e yalnız T0 birleştirir.
