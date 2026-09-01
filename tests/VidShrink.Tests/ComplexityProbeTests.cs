@@ -171,7 +171,7 @@ public sealed class ComplexityProbeTests
 
     private static async Task WithClipAsync(Func<MediaInfo, Task> body, string source = "testsrc2=size=320x240:rate=12:duration=8")
     {
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_complexity_" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Combine(TestPaths.OutputRoot, "complexity-probe", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {

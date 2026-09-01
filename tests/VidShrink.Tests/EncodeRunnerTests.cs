@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -82,6 +83,38 @@ public sealed class EncodeRunnerTests
         });
     }
 
+    [FfmpegFact]
+    public async Task TheSentenceShownToTheUserAgreesWithWhatTheRunnerDelivers()
+    {
+        await WithClipAsync(async (info, outputPath, naturalMb) =>
+        {
+            foreach (var factor in new[] { 0.88, 0.5 })
+            {
+                var targetMb = naturalMb / factor;
+                var plan = StopPlan(naturalMb, targetMb);
+                var promisesStop = MainWindow.ShowsMeasuredQualityStop(plan, plan.ReasonCodes[0], FillPolicy.FillTarget);
+
+                var result = await new EncodeRunner().RunAsync(
+                    info, plan, outputPath, targetMb,
+                    progress: null, ct: CancellationToken.None, fillPolicy: FillPolicy.FillTarget);
+
+                Assert.True(result.Success);
+                Assert.True(promisesStop == (result.Attempts == 1),
+                    $"hedef {targetMb:0.###} MB: arayuz 'burada durur' dedi={promisesStop}, kosucu tek denemede durdu={result.Attempts == 1}");
+            }
+        });
+    }
+
+    private static EncodePlan StopPlan(double ceilingMb, double targetMb)
+    {
+        var plan = CrfPlan();
+        plan.ReasonCodes = new List<ReasonNote>
+        {
+            new(ReasonCode.BudgetExceedsCeiling, Crf: 30, Mb: ceilingMb, TargetMb: targetMb)
+        };
+        return plan;
+    }
+
     private static EncodePlan CrfPlan(params ReasonCode[] codes) => new()
     {
         Codec = "libx264",
@@ -99,7 +132,7 @@ public sealed class EncodeRunnerTests
 
     private static async Task WithClipAsync(Func<MediaInfo, string, double, Task> body)
     {
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_runner_" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Combine(TestPaths.OutputRoot, "encode-runner", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {

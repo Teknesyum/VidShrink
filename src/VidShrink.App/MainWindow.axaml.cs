@@ -1886,6 +1886,11 @@ public partial class MainWindow : Window
         return rest == 0 ? $"{hours} {Say("main.duration.hours")}" : $"{hours} {Say("main.duration.hours")} {rest} {Say("main.duration.minutes")}";
     }
 
+    public static bool ShowsMeasuredQualityStop(EncodePlan plan, ReasonNote note, FillPolicy fillPolicy) =>
+        plan.StopsShortOfBandOnPurpose
+        && fillPolicy == FillPolicy.FillTarget
+        && note.Mb >= FillBand.For(note.TargetMb).HardFloorMb;
+
     private List<string> ReasonLines(EncodePlan plan)
     {
         var parts = new List<string>();
@@ -1898,7 +1903,7 @@ public partial class MainWindow : Window
                 ReasonCode.FrameRateReduced => Say("main.reason.frame-rate-reduced", Num(note.Fps, "0.##")),
                 ReasonCode.ResolutionRestoredAtCeiling => Say("main.reason.resolution-restored",
                     note.Width, note.Height, Num(note.Fps, "0.##"), Num(note.Crf, "0")),
-                ReasonCode.BudgetExceedsCeiling => plan.StopsShortOfBandOnPurpose && CurrentOptions().FillPolicy == FillPolicy.FillTarget
+                ReasonCode.BudgetExceedsCeiling => ShowsMeasuredQualityStop(plan, note, CurrentOptions().FillPolicy)
                     ? Say("main.reason.measured-quality-stop",
                         Num(note.Crf, "0"), Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"))
                     : Say("main.reason.budget-exceeds-ceiling",
