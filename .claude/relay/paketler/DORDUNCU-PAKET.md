@@ -10,7 +10,7 @@ geçiriyor. `gh run list --branch <dal>` gerçekten sonuç döndürür; itmeden 
 
 ---
 
-## İş 1 — T86 tur 2 (KRİTİK, şimdi başla — `main` bu yüzden kırmızı)
+## İş 1 — T86 tur 2 (KRİTİK, şimdi başla — `main`de her yeşil okuma şüpheli)
 
 Sözleşme: `.claude/relay/contracts/T86.md` — sondaki "# Düzeltme turu 2" (H1–H6).
 Dal: `t86-olcu-yalitimi` sürdürülür (`git switch t86-olcu-yalitimi`).
