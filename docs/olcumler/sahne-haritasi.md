@@ -200,3 +200,69 @@ T101'in 8 sahnelik ölçümünden (133,8 sn içerik, paylaşımlı makine):
 donanım olmayan her kodlayıcıda doğru), bu paydaları büyütür ve haritanın payını
 düşürür. Donanım yollarında (`*_nvenc`) tersi geçerli — orada kodlama en hızlı,
 haritanın payı en yüksek. Donanım kodlama hızı **ölçülmedi**.
+
+Tablodaki süreler paylaşımlı makinede alındı (dört ffmpeg paralel, CPU %100).
+Mutlak değerleri değil, aralarındaki büyüklük sırasını okuyun.
+
+### Maliyet nereye gidiyor
+
+Kaynağın tamamı üzerinde ayrı koşumlar (paylaşımlı makine):
+
+| Koşum | Süre |
+|-------|------|
+| Yalnız çözme (`-i src -f null -`) | 91,8 sn |
+| Sonda + kare atlatma (2 karede 1) | 131,4 sn |
+
+Bu ikisi aynı yük penceresinde arka arkaya koştu, karşılaştırılabilir. Daha
+yüklü bir pencerede yalnız çözme ve yalnız sonda **ikisi de 175,5 sn** ölçüldü;
+makine doyduğunda sondanın çözmenin üstüne eklediği yük ölçüm gürültüsünün
+altında kalıyor.
+
+Sonuç: **maliyet çözme-baskın.** Haritanın 107 sn'sinin kabaca ~92 sn'si
+1080p60 10-bit HEVC kaynağı çözmek. Tarama ve sonda kodlaması geriye kalan
+~%14'ün içinde. Bu oran paylaşımlı makinede çıktı; kesin pay **ölçülmedi**,
+ama iki bağımsız koşum aynı yönü gösteriyor.
+
+### Yargı (T101/K6)
+
+**1,8 dakika bugünkü haliyle kabul edilmiyor** — ama T96'nın gerekçesiyle
+değil. Sorun sürenin uzunluğu değil, *ikinci bir çözme* olması: kullanıcı
+kaynağı bir kez harita için, bir kez kodlama için çözüyor.
+
+**Seçilen aday: sondayı asıl kodlamanın ilk geçişiyle birleştirmek.
+Kare atlatma reddedildi.**
+
+Gerekçe — kare atlatma yanlış terime saldırıyor. `select='not(mod(n,2))'`
+filtre grafiğinde, yani **çözmeden sonra** çalışır; atlanan kare yine de
+çözülmüştür. Çözme maliyetin ~%86'sı olduğuna göre kare atlatmanın
+kazanabileceği en fazla şey kalan ~%14'ün yarısı, yani toplamın **~%7'si**.
+Ölçüm de bunu söylüyor: kare atlatmalı sonda 131,4 sn, çıplak çözme 91,8 sn —
+atlatma taban maliyetin altına inemiyor. 107 sn'yi ~100 sn'ye indirmek için
+kestirimin doğruluğunu riske atmak kötü bir takas.
+
+Birleştirme tek terimi kaldırıyor: kodlamanın zaten yapmak zorunda olduğu
+çözmeye binerse haritanın kendi çözmesi sıfırlanır — kazanç ~%86, ~%7 değil.
+
+Bu seçimin bedeli, ve neden bu turda uygulanmadığı:
+
+- Yazılım kodlayıcılarda ilk geçiş zaten var (`FfmpegArguments.NeedsTwoPasses`
+  donanım olmayan her kodlayıcıda doğru) ve ilk geçişin istatistikleri
+  **hedef kodlayıcının kendi** kare boyutlarıdır — 640p x264 sondasından daha
+  iyi bir sinyal, üstelik K1'deki 0,929 sapmasını da kökünden kaldırır.
+- Ama plan (hedef bit oranı / CRF) ilk geçişten **önce** kurulur. Birleştirme
+  planlamayı iki aşamaya bölmeyi gerektirir: haritasız kaba bir ilk geçiş,
+  sonra haritayla ikinci geçiş. Bu `EncodeRunner` (T100) ve `PlanCalculator`
+  (T99) işidir, T101'in `owns`'ı dışında.
+- Donanım yollarında ilk geçiş yok. Orada birleştirme, haritanın kodlamadan
+  önce değil kodlama sırasında kurulması demek — tasarım değişikliği, ayar
+  değil. Donanım yolunun ne kadar kaybettiği **ölçülmedi**.
+
+## Ölçülmeyenler
+
+- Farklı içerik (film, konuşan kafa, ekran kaydı) üzerinde eşik ve korelasyon.
+- Donanım kodlayıcılarda (`h264_nvenc`, `hevc_nvenc`, `av1_nvenc`) aktarım ve hız.
+- Kaçırılan 18 kesimin plan hatasına dönüşen bedeli — eşiği düşürmenin
+  getirdiği yanlış pozitifle karşılaştırılmadı.
+- Kodlayıcı başına Spearman'ın güven aralığı (n = 8).
+- Harita→plan bağlaması (T96 kapsam dışı, `PlanCalculator` T99'da).
+- Sonda kodlamanın süre kararlılığı (tek koşum, paylaşımlı makine).
