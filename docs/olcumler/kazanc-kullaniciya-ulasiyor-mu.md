@@ -28,6 +28,7 @@ düşer. İkisi yan yana ölçülmeden kısıt savunulamaz.
 | parca-2 | 40 MB | taban | 3 | 39,14 MB | 94,72 | 56,41 | 95,12 | ok |
 | parca-3 | 20 MB | önce | 1 | 19,51 MB | 40,51 | 20,10 | 8,51 | ok |
 | parca-3 | 20 MB | kapı | 1 | 19,51 MB | 40,53 | 20,05 | 8,45 | ok |
+| parca-3 | 20 MB | taban | 1 | 19,51 MB | 40,53 | 20,08 | 8,39 | ok |
 
 parca-3 denetim satırı: planı 1. denemede bant içinde, değişen dal hiç çalışmıyor.
 
@@ -55,7 +56,7 @@ bütçeyi boşa bırakan durma geçmez.
 
 **Makine paylaşımlıydı, süre yeniden ölçülmeli.** Ölçüm sırasında aynı makinede başka
 ajanların ffmpeg süreçleri koşuyordu (başlangıçta 2, sonra 6). Denetim satırı parca-3
-hiç değişmeyen tek denemelik planla 52,5 s → 80,7 s oynadı; bu, süre sayılarının
+hiç değişmeyen tek denemelik planla üç kolda 52,5 s / 80,7 s / 64,3 s okudu; bu, süre sayılarının
 gürültüsünün ölçmek istediğimiz farktan büyük olduğunu gösteriyor. Kaydedilen ham
 değerler (parca-1 215,6 s → 41,3 s, parca-2 150,6 s → 156 s) yön olarak beklenen
 işareti taşıyor ama tek başına kanıt sayılmaz.
@@ -64,6 +65,4 @@ işareti taşıyor ama tek başına kanıt sayılmaz.
 
 - T89'un tablosu yeniden üretilemedi: o turun `klip` (1080p60 SDR) ve `oyun` (av1)
   kaynakları silinmiş. Bugünkü üç kaynağın hepsi HDR; **SDR ve av1 kolları ölçülmedi.**
-- parca-3 `taban` kolunda yeniden ölçülmedi; planı bant içinde bittiği için değişen
-  dala hiç girmiyor.
 - Kalite ölçüleri tek koşumdur; **tekrar sapması ölçülmedi.**
