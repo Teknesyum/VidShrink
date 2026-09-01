@@ -36,7 +36,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllT
 
 ### The right-click menu
 
-Right-click a video in Explorer and **Open this video with VidShrink** is in the menu. It appears on the same 24 extensions the application itself opens — the list lives once, in `VidShrink.Core.ShellIntegration.MediaExtensions`, and a test fails if the installer and the application ever disagree about it. Choosing it starts VidShrink with that file already loaded.
+Right-click a video in Explorer and **Open this video with VidShrink** is in the menu. **On Windows 11 it is in the primary menu, not behind "Show more options."** That placement is only available to a packaged application, so the installer registers a sparse package — a manifest that carries the menu, pointing at the ordinary installation on disk — and writes the classic entry alongside it. A release that does not carry the package, or a Windows 10 machine, gets the classic entry alone and says so during install. Uninstalling removes both.
+
+The entry appears on the same 24 extensions the application itself opens — the list lives once, in `VidShrink.Core.ShellIntegration.MediaExtensions`, and a test fails if the installer and the application ever disagree about it. Choosing it starts VidShrink with that file already loaded.
 
 The entry is written per user, under `HKCU\Software\Classes\SystemFileAssociations`, so it needs no administrator rights. It does **not** change your file associations: your default player stays your default player, and double-clicking a video does what it did before. What it points at is `VidShrink.exe`, the launcher, for the same reason the shortcuts do — an entry aimed straight at the application would leave a copy that never updates.
 
@@ -62,6 +64,8 @@ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vi
 
 The installer needs no root and no .NET SDK. It asks GitHub for the latest release, picks the target from `uname` — `osx-arm64`, `osx-x64` or `linux-x64` — downloads that archive, verifies its SHA-256 against the release's own checksum list, installs it under `~/.local/share/vidshrink`, and links it as `~/.local/bin/vidshrink`. Running the same command again replaces the installed app with the newest release. Any other architecture stops the installer with a message naming it; nothing else is published. If `uname` reports nothing at all, Linux continues as `linux-x64` — the only Linux target published — and says that it assumed it, while macOS stops, because `osx-arm64` and `osx-x64` cannot be guessed between.
 
+**On macOS the installer leaves a real application bundle.** It wraps the download in an ad-hoc signed `~/Applications/VidShrink.app` that opens from Finder with its own name and icon, and `--uninstall` removes the bundle, the payload and the shortcut together. On Linux there is no bundle; the launcher link is the whole of it.
+
 FFmpeg is the one thing this installer will not put on your machine for you. If `ffmpeg` or `ffprobe` is missing it prints the command for your package manager — `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading anything else.
 
 ### Staying up to date
@@ -76,7 +80,11 @@ Downloaded files are verified before anything is replaced. A file whose digest d
 
 **Automatic updates are on by default and can be switched off.** The switch lives in the application's settings and is stored in `%APPDATA%\VidShrink\settings.json`, next to your other settings rather than next to the executable, so reinstalling does not reset it. With it off the launcher does not even fetch the manifest and downloads nothing, and Windows behaves like macOS and Linux: the application itself asks once, at startup, whether a newer version exists, and tells you — you update by running the install command again. That one question is the only network request left; dismissing a version stops it being mentioned again.
 
-**On macOS and Linux the application only tells you that a new version exists.** Changing a file inside a `.app` bundle breaks its Gatekeeper signature and the application then refuses to open at all, so nothing is replaced in place. Update by running the install command again:
+**On macOS the application updates itself too, by swapping the whole bundle.** A bundle's signature covers every file inside it, so a file-by-file update of the kind Windows gets would break the signature and the application would then refuse to open at all. The unit of update is therefore the bundle: the new one is built beside the installed one while you work, its signature is verified *before* anything moves, and only then do the two swap places atomically. An update that is interrupted at any point leaves the working old bundle in place — there is no intermediate state in which the bundle is missing or half-written. The swap happens as the application exits, so it is never pulled out from under a running process, and the old bundle is removed on the next launch rather than during the swap.
+
+Self-updating is only offered where it can be done safely: the application must be running from inside a bundle it can replace. A plain payload install under `~/.local/share`, or a bundle macOS has translocated to a read-only path, keeps the switch closed and is told about new versions instead.
+
+**On Linux the application only tells you that a new version exists.** Update by running the install command again:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
@@ -130,6 +138,16 @@ A 1.2× reduction and a 600× reduction are different problems and get different
 | Extreme | over 30× | maximum compression, mono or dropped audio, and it says so |
 
 Whatever it changes, it explains — in plain language, in the app, before you start.
+
+### HDR stays HDR when it can
+
+An HDR source keeps its wide colour and its ten bits whenever the encoder that will run can actually write them. Which encoders those are is not a list of names in the source code — the application encodes a frame with each candidate on your machine and keeps the ones that come back as genuine 10-bit HDR. A codec that is present but cannot deliver HDR on your hardware is not trusted because of its name.
+
+When nothing available can carry it, the picture is tone-mapped down to SDR rather than failing, and the app says that this is what happened and why. Tone-mapping is a visible loss and is never silent.
+
+### Quality is measured across a stated colour space, or not at all
+
+Comparing two files means bringing both into one explicitly stated colour space and range first; an untagged source is given a documented assumption rather than a silent one. Where the two sides genuinely cannot be brought together — an HDR original against a tone-mapped result, for instance — the comparison returns *not comparable* instead of a number. A single quality score that quietly mixes a colour conversion with a compression loss is worse than no score, because it reads as if it meant one thing.
 
 ### Where the loss goes
 
@@ -202,6 +220,20 @@ Scrollbars on both boxes appear only while the pointer is over them.
 - **AV1** compresses best and encodes slowest; only recent phones decode it.
 - **Stream copy** is instant and lossless when the destination accepts the source streams.
 
+## What is being worked on next
+
+The engine is the current job. These are measured, open, and in that order:
+
+- **Calibrating the trade-offs against measured quality.** The penalties the planner applies for scaling down and for dropping frame rate are fixed constants that were never tied to a quality measurement. The measurement rig that can replace them now exists.
+- **Opening the peak-rate ceiling.** On a 17-minute 1080p60 HDR source encoded to 117 MB, widening the rate ceiling from 1.02× to 1.50× of the average gained 5.87 harmonic and 7.22 p10 VMAF-NEG **at the same delivered size** — the cheapest gain measured so far, and it costs nothing but a wider buffer.
+- **Psycho-visual encoder settings.** HandBrake's x265 preset runs psy-rd, psy-rdoq and adaptive quantisation; VidShrink's arguments do not carry their equivalents yet. Measured against HandBrake at an equal delivered size, with colour handled correctly on both sides, HandBrake is currently ahead by 8.79 mean and 14.60 p10 VMAF-NEG. That gap is the target.
+- **Longer keyframe intervals.** The current two-second GOP spends bits on keyframes that a longer interval would give back to the picture.
+- **The hardware overshoot at small targets**, described under *Measured results* above.
+
+Known and not yet handled: HDR10+ dynamic metadata and Dolby Vision are not carried through — an HDR10+ source is delivered as static HDR10. There is no right-click menu on macOS or Linux.
+
+A fuller README with diagrams of the measurement and planning flow will follow this one.
+
 ## Requirements and development build
 
 - Windows 10 or 11, macOS 12 or newer, or a Linux desktop running X11 or Wayland
@@ -225,7 +257,7 @@ src/VidShrink.Launcher Windows launcher, applies the file-level update before th
 tests/VidShrink.Tests  engine and argument-generation regression tests
 ```
 
-Release history is in [`CHANGELOG.md`](CHANGELOG.md). The current engine audit, fixed defects, benchmark requirements, and quality roadmap are documented in [`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md). A market-leading claim is intentionally deferred until the HDR/10-bit, perceptual-metric, and competitor benchmark gates in that report are met.
+Release history is in [`CHANGELOG.md`](CHANGELOG.md). The engine audit, fixed defects and benchmark requirements are in [`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md); the measurements behind the roadmap above are in [`docs/olcumler/`](docs/olcumler/). Two of that report's three gates are now met — HDR and 10-bit are carried, and the perceptual metrics are measured across a normalised colour space. The competitor benchmark is met in the sense that the comparison has been run honestly; it does not yet come out in this project's favour, and a market-leading claim stays deferred until it does.
 
 ## License
 
