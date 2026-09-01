@@ -110,3 +110,43 @@ Etkileşim ve durum okuması **UIA ağacı** üzerinden yapıldı; ağaç doğru
 düğmeye basmak ve kutu değerlerini okumak sorunsuz. Plan ve argümanlar ayrıca başsız
 yoldan (`PlanCalculator` + `EncodeRunner.EncodeArguments` doğrudan çağrılarak)
 üretildi ve teslim edilen dosyayla karşılaştırıldı — ikisi tutuyor.
+
+---
+
+## K5 — HandBrake'in sormadığı, bizim sorduğumuz
+
+HandBrakeCLI 1.11.2 bu makinede doğrulandı: `--help` çıktısında **hedef boyut seçeneği
+yok** — yalnız `-q/--quality` (RF) ve `-b/--vb` (kbit/s) var. Bilmeyen kullanıcıya
+verdiği tek soru `-Z/--preset` (`-z` ile listelenen preset adı); geri kalan her şeyi
+preset sabitliyor.
+
+Bizim Küçült sekmemizin sorduğu **9** soru (biri koşullu). Her satırın tek sınavı:
+*bilmeyen kullanıcı buna doğru cevap verebilir mi?*
+
+| Soru | HandBrake sorar mı | Bilmeyen doğru cevaplar mı | Ne olmalı |
+|---|---|---|---|
+| **Hedef boyut (MB)** | Hayır — bu bizim tek gerçek farkımız | **Evet.** Kullanıcı zaten "25 MB'ı geçmesin" diye geliyor; sayı onun dünyasından | Kalsın, birincil kalsın |
+| **Amaç** (Arşiv / Paylaşım / Sosyal) | Hayır (preset adına gömülü) | **Evet, sınırda.** Kullanıcının diliyle sorulmuş; yanlış cevabın bedeli küçük — yalnız ±3 CRF kayması (`CompressionStrategy.cs:92-97`) | Kalsın |
+| **Kalite hedefi** (1–100 kaydırıcı) | Hayır | **Hayır.** Soyut bir sayı, üstelik hedef boyutla aynı şeyi ters yönden soruyor; ikisi aynı ekranda birbirini eziyor | Hedefe bağlansın, birincil yüzeyden kalksın |
+| **Sıkıştırma Algoritması** (Auto / Uyumlu / En küçük) | Hayır (preset kodeği sabitler) | **Hayır.** "Hangi kodek" uzman sorusunun ta kendisi. Varsayılan `Auto` zaten rejimden cevabı üretiyor | Auto'da kalsın, gelişmiş bölüme insin |
+| **Çözünürlük düşürülebilir mi** | Hayır (preset tavan koyar) | **Hayır.** "İzin verirsem ne kaybederim" sorusunun cevabı ölçüm gerektiriyor | Varsayılan açık doğru; kutu gelişmişe insin |
+| **Kare hızı düşürülebilir mi** | Hayır (preset tavan koyar) | **Hayır.** Aynı gerekçe | Aynı |
+| **Hızlı düşür (GPU)** | Hayır | **Hayır.** Hız/kalite takası; zaten donanım yoklaması karar veriyor (`HardwareVerdict.cs:66-101`) ve kutu karar verilene kadar kilitli duruyor | Karar programda kalsın; kutu gelişmişe insin |
+| **Doldurma politikası** (Hedefi doldur / Kalite tavanı) | Hayır | **Hayır.** İki terim de motor jargonu; projenin dışından kimse ne olduğunu bilmiyor | Arayüzden kalksın, `FillTarget` sabitlensin |
+| **HDR biçimi** (Koru / SDR'a indir) — yalnız HDR kaynakta | Hayır (preset kodeğe göre sabitler) | **Kısmen.** "Telefonumda soluk görünür mü" gerçek bir kullanıcı sorusu, ama böyle sorulmuyor | Kalsın, kullanıcı diliyle sorulsun |
+
+**Tersi — HandBrake'in sorup bizim sormadığımız.** Onların preseti bunları sabitler;
+bizde de sabit, ama **preset adı gibi görünür bir kapağı yok**:
+
+| Onlarda | Bizde | Bilmeyen doğru cevaplar mı |
+|---|---|---|
+| Kodlayıcı preset'i (`--encoder-preset`) | Yok, motor seçer (`PlanCalculator.cs:812-826`) | Hayır — sormamak doğru, ama sabitin bedeli K4'te ölçüldü |
+| Sabit kalite RF (`-q`) | Yok, CRF motorda | Hayır — sormamak doğru |
+| Ses kodeği ve bit hızı (`-E`, `-B`) | Yok, sabit `aac` + rejim payı | Hayır — sormamak doğru |
+| Kap (`-f`) | Yok, `mp4` sabit (`MainWindow.axaml.cs:2356`) | Hayır — sormamak doğru |
+| Kırpma (`--crop-mode`) | Yok, kırpma yapılmıyor | Hayır — sormamak doğru |
+| Anahtar kare aralığı | Yok, `fps × 2` sabit (`FfmpegArguments.cs:162`) | Hayır — sormamak doğru, **ama sabitin kendisi hiç ölçülmemişti** (K4) |
+
+Özet: HandBrake bilmeyen kullanıcıya **1** soru soruyor, biz **9**. Dokuzun
+**ikisi** (hedef boyut, amaç) bilmeyen birinin doğru cevaplayabileceği sorular;
+**altısı** cevaplayamayacağı, **biri** (HDR) doğru soru ama yanlış dille sorulmuş.
