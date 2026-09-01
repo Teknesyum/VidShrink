@@ -34,12 +34,20 @@ public static class ComplexityProbe
     private static readonly TimeSpan PacketReadTimeout = TimeSpan.FromSeconds(120);
 
     public static async Task<ComplexityProfile> RunAsync(MediaInfo info, SpeedMode speed, CancellationToken ct = default)
+        => (await RunDetailedAsync(info, speed, measureQuality: true, qualityMeasurement: null, ct)).Profile;
+
+    public static async Task<ProbeResult> RunDetailedAsync(
+        MediaInfo info, SpeedMode speed, bool measureQuality = true,
+        IQualityMeasurement? qualityMeasurement = null, CancellationToken ct = default)
     {
         try
         {
             long fullBytes = 0, halfBytes = 0;
             long fullFrames = 0, halfFrames = 0;
             var sampled = 0.0;
+            var qualities = new List<WindowQualityMeasurement>();
+            var meter = measureQuality ? qualityMeasurement ?? QualityMeasurement.Instance : null;
+            if (meter is { IsAvailable: false }) meter = null;
 
             var halfWidth = EvenDown((int)Math.Round(info.Width * ComplexityProfile.ProbeScale));
             var halfHeight = EvenDown((int)Math.Round(info.Height * ComplexityProfile.ProbeScale));
@@ -51,13 +59,14 @@ public static class ComplexityProbe
             var motionTask = MotionSampleAsync(info, windows, motionIndex, preset, speed, ct);
 
             var pending = windows
-                .Select(start => SampleWindowAsync(info.FilePath, start, canProbeHalf ? (halfWidth, halfHeight) : null, preset, speed, ct))
+                .Select(start => SampleWindowAsync(info.FilePath, start, canProbeHalf ? (halfWidth, halfHeight) : null, preset, speed, meter, ct))
                 .ToArray();
             var windowSamples = await Task.WhenAll(pending);
             var motion = await motionTask;
 
             foreach (var sample in windowSamples)
             {
+                if (sample.Quality is { Comparable: true, VmafNegMean: not null } quality) qualities.Add(quality);
                 if (sample.FullFrames <= 0) continue;
                 fullBytes += sample.FullBytes;
                 fullFrames += sample.FullFrames;
@@ -69,7 +78,7 @@ public static class ComplexityProbe
             }
 
             if (fullFrames <= 0 || fullBytes <= 0)
-                return ComplexityProfile.FromSourceBitrate(info);
+                return new ProbeResult(ComplexityProfile.FromSourceBitrate(info), qualities);
 
             var fullBppf = fullBytes * 8.0 / ((double)info.Width * info.Height * fullFrames);
             var halfBppf = halfFrames > 0 && halfBytes > 0
@@ -80,7 +89,9 @@ public static class ComplexityProbe
 
             var (bias, source) = await MeasureWindowBiasAsync(info, speed, ct);
 
-            return ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf);
+            return new ProbeResult(
+                ComplexityProfile.FromProbe(fullBppf, halfBppf, sampled, fullFrames, bias, source, halfFpsBppf),
+                qualities);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -88,7 +99,7 @@ public static class ComplexityProbe
         }
         catch
         {
-            return ComplexityProfile.FromSourceBitrate(info);
+            return new ProbeResult(ComplexityProfile.FromSourceBitrate(info), Array.Empty<WindowQualityMeasurement>());
         }
     }
 
@@ -402,9 +413,9 @@ public static class ComplexityProbe
 
     private static int EvenDown(int value) => value % 2 == 0 ? value : value - 1;
 
-    private readonly record struct WindowSample(long FullBytes, long FullFrames, long HalfBytes, long HalfFrames);
+    private readonly record struct WindowSample(long FullBytes, long FullFrames, long HalfBytes, long HalfFrames, WindowQualityMeasurement? Quality = null);
 
-    private static async Task<WindowSample> SampleWindowAsync(string path, double start, (int Width, int Height)? half, string preset, SpeedMode speed, CancellationToken ct)
+    private static async Task<WindowSample> SampleWindowAsync(string path, double start, (int Width, int Height)? half, string preset, SpeedMode speed, IQualityMeasurement? qualityMeasurement, CancellationToken ct)
     {
         if (half is null)
         {
@@ -412,7 +423,7 @@ public static class ComplexityProbe
             return new WindowSample(bytes, frames, 0, 0);
         }
 
-        var split = await SplitSampleAsync(path, start, half.Value, preset, speed, ct);
+        var split = await SplitSampleAsync(path, start, half.Value, preset, speed, qualityMeasurement, ct);
         if (split is { } measured) return measured;
 
         var (fullBytes, fullFrames) = await SampleAsync(path, start, WindowSeconds, null, preset, speed, ct);
@@ -420,7 +431,7 @@ public static class ComplexityProbe
         return new WindowSample(fullBytes, fullFrames, halfBytes, halfFrames);
     }
 
-    private static async Task<WindowSample?> SplitSampleAsync(string path, double start, (int Width, int Height) half, string preset, SpeedMode speed, CancellationToken ct)
+    private static async Task<WindowSample?> SplitSampleAsync(string path, double start, (int Width, int Height) half, string preset, SpeedMode speed, IQualityMeasurement? qualityMeasurement, CancellationToken ct)
     {
         var stem = Path.Combine(Path.GetTempPath(), "vidshrink_probe_" + Guid.NewGuid().ToString("N"));
         var fullPath = stem + "_full.h264";
@@ -473,7 +484,18 @@ public static class ComplexityProbe
             var halfBytes = new FileInfo(halfPath).Length;
             if (fullBytes <= 0 || halfBytes <= 0) return null;
 
-            return new WindowSample(fullBytes, frames, halfBytes, frames);
+            WindowQualityMeasurement? quality = null;
+            if (qualityMeasurement is not null)
+            {
+                try
+                {
+                    quality = await qualityMeasurement.MeasureWindowAsync(path, fullPath, start, WindowSeconds, token);
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+                catch { quality = null; }
+            }
+
+            return new WindowSample(fullBytes, frames, halfBytes, frames, quality);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {

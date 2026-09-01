@@ -19,6 +19,7 @@ try
         "measure" => await MeasureAsync(args),
         "measure-tonemapped" => await MeasureAsync(args, true),
         "measure-window" => await MeasureWindowAsync(args),
+        "probe-quality-cost" => await ProbeQualityCostAsync(args),
         "shrink" => await ShrinkAsync(args),
         "compare" => Compare(args),
         "panel" => await PanelAsync(args),
@@ -38,6 +39,7 @@ static void PrintUsage()
     Console.WriteLine("  bench measure <referans> <test>");
     Console.WriteLine("  bench measure-tonemapped <HDR referans> <SDR test>");
     Console.WriteLine("  bench measure-window <referans> <test> <başlangıç-sn> <süre-sn>");
+    Console.WriteLine("  bench probe-quality-cost <kaynak> [fast|quality]");
     Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
@@ -74,6 +76,35 @@ static async Task<int> MeasureWindowAsync(string[] args)
     var score = await QualityMeter.MeasureWindowAsync(args[1], args[2], start, duration, CancellationToken.None);
     Console.WriteLine(JsonSerializer.Serialize(score, new JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
     return 0;
+}
+
+static async Task<int> ProbeQualityCostAsync(string[] args)
+{
+    if (args.Length < 2) return 1;
+    var info = await FfprobeClient.ProbeAsync(args[1]);
+    var speed = args.Length > 2 && args[2].Equals("quality", StringComparison.OrdinalIgnoreCase)
+        ? SpeedMode.Quality : SpeedMode.Fast;
+
+    var offWatch = Stopwatch.StartNew();
+    var without = await ComplexityProbe.RunDetailedAsync(info, speed, measureQuality: false);
+    offWatch.Stop();
+    var onWatch = Stopwatch.StartNew();
+    var with = await ComplexityProbe.RunDetailedAsync(info, speed, measureQuality: true);
+    onWatch.Stop();
+
+    Console.WriteLine(JsonSerializer.Serialize(new
+    {
+        Source = Path.GetFileName(args[1]),
+        info.DurationSeconds,
+        info.Width,
+        info.Height,
+        QualityOffMilliseconds = offWatch.ElapsedMilliseconds,
+        QualityOnMilliseconds = onWatch.ElapsedMilliseconds,
+        DifferenceMilliseconds = onWatch.ElapsedMilliseconds - offWatch.ElapsedMilliseconds,
+        DifferencePercent = (onWatch.Elapsed.TotalMilliseconds / offWatch.Elapsed.TotalMilliseconds - 1) * 100,
+        QualityWindows = with.QualityMeasurements
+    }));
+    return without.Profile.Measured || with.Profile.Measured ? 0 : 2;
 }
 
 static async Task<int> ShrinkAsync(string[] args)
