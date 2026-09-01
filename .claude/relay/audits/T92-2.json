@@ -1,0 +1,19 @@
+{
+  "contractId": "T92",
+  "auditorRunId": "a7cb9c8f50c4233f8",
+  "headSha": "14db838e2832373289d193de8d23aa0a14f1893a",
+  "diffHash": "77bc2ef5173a36c79c1ffd45b208e0c555524992ddf2180c3a296cd4d77589e1",
+  "owns": [
+    "tests/VidShrink.Tests/FfmpegArgumentsTests.cs",
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
+    "src/VidShrink.Ffmpeg/EncodeRunner.cs",
+    "src/VidShrink.Ffmpeg/CalibrationProbe.cs",
+    "docs/olcumler/tepe-tavani-ve-psy.md"
+  ],
+  "verification": [
+    "Kapanis dogrulamasi main 14db838 uzerinde. Bench Program.cs:720 artik EncodeRunner.EncodeArguments cagiriyor; Bench gercekten kosturuldu ve bastigi komut satirinda -x265-params psy-rd=2:psy-rdoq=1:aq-mode=2 gozle goruldu, sessiz kayip kapandi. T89'a devredilen K13 KRITIK kapali. git diff ef6e7ea..main T92 owns dosyalarinda bos: tur 2'de denetlenen agirlik main'e oldugu gibi girdi. dotnet test -c Release --filter FfmpegArgumentsTests|EncoderCapabilitiesTests -> 40 basarili, 0 atlanan. GECTI, KRITIK yok. Borc: ComplexityScanTests.cs:379 Assert.Equal(run,printed) ayni cagrinin iki kopyasini karsilastiran totoloji; basilan=kosan iddiasinin tek dayanagi kaynak metni okuyan ve kendini Skip'e alabilen BenchSourceFact; basilan komut -passlogfile'da kosandan gercekten farkli; FfmpegArgumentsTests.cs:208 ve :403 hala MainWindow kaynagini metin olarak okuyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T22:15:03.121Z"
+}

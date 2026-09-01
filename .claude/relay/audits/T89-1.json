@@ -1,0 +1,20 @@
+{
+  "contractId": "T89",
+  "auditorRunId": "ad2605ba8164106d4",
+  "headSha": "14db838e2832373289d193de8d23aa0a14f1893a",
+  "diffHash": "5861ea91661a7841d556d68b43f2570ceef1da1ddf7aabb32fc450b22e454368",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/ComplexityProfile.cs",
+    "tests/VidShrink.Tests/PlanCalculatorTests.cs",
+    "tests/VidShrink.Tests/ComplexityScanTests.cs",
+    "tools/VidShrink.Bench/Program.cs",
+    "docs/olcumler/olculen-kaliteyle-plan.md"
+  ],
+  "verification": [
+    "GECTI, KRITIK yok. Bagimsiz denetci diff'i ve olcum kaydini kendi kosturarak dogruladi.\nK3 mutasyon tablosu ornekleme ile yeniden uretildi (M7 9 satir, M8 10 satir kirildi; sayilar birebir tuttu).\nK9 esigi davranis olcuyor: test MotionCutIsCheapBelow'a dokunmuyor, PlanCalculator.BuildDetailed ciktisina bakiyor.\nK13 kod dogru (Program.cs:720 EncodeRunner.EncodeArguments), korumasi zayif: basilan=kosan iddiasini sabitleyen assert ayni cagrinin iki kopyasini karsilastiriyor.\nGevsetme yok: T89'un uc commit'inde test dosyalarindan silinen satir sifir, yeni Skip yok, sessiz erken donus yok. 91/91 yesil, 0 atlandi. Dal CI yesil (run 33562854071).\nBorc: K2 uctan uca etkisiz (EncodeRunner geri aliyor, T100'e devredildi); BudgetExceedsCeiling yanlis gerekce tasiyor, bugun ulasilamaz; egim hicbir gercek olcumde olculmedi (spread=0, prior 6,0'da kaldi); MotionCutIsExpensiveAbove=0.5 olu sabit (T99'a devredildi); rapor ici sayi tutarsizligi (19,465 vs 19,445).\nKazanc tek kaynakta: HDR +0,95 mean; oyun -0,16 mean +%78 sure; klip kazanc yok +%193 sure. Ozellik uc kaynagin ikisinde bedava degil."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T22:08:57.522Z"
+}
