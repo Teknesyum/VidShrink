@@ -157,6 +157,22 @@ türetiyor; türetmeden sonra girdi hâlâ ses taşıyorsa kodlamaya başlamadan
 Süre ve hız. Makine paylaşımlı — ölçüm boyunca aynı makinede başka ajanlar da
 kodlama koşuyordu. Bu belgede hiçbir süre ya da hız iddiası yok.
 
+## `QualityMeter` eksikleri
+
+A/B aracı `QualityMeter`ı kütüphane olarak çağırıyor, kopyalamıyor. Çağırırken
+karşılaşılan eksikler — hepsi T97'nin girdisi:
+
+| eksik | sonucu |
+|---|---|
+| kare başına puanlar dışarı verilmiyor (`Percentile` özel) | parçalar arası p10 kesin birleştirilemiyor; özet satırı "en kötü parça" olmak zorunda kaldı |
+| kare sayısı döndürülmüyor | parça ağırlıkları süreden türetiliyor, kareden değil |
+| libvmaf JSON günlüğü `%TEMP%`e yazılıp `finally` içinde siliniyor | ham ölçüm günlüğü `.calisma/ab/` altında saklanamıyor |
+| `ColorFilter` etiketsiz girdiye varsayım uyduruyor (`?? (hdr ? "bt2020" : "bt709")`) | GEÇERSİZ tabloyu üreten hata `QualityMeter` içinde hâlâ duruyor; kapı A/B aracında, ölçerde değil |
+| `ColorIncompatibility` yalnız HDR/SDR uyuşmazlığını reddediyor | etiketsiz taraf ölçere kadar gidebiliyor |
+| kare hızı hiç bakılmıyor | kare hızları ayrıyken libvmaf sessizce sayı üretiyor; kapı yine A/B aracında |
+| tonemap'li ölçümün pencere (başlangıç/süre) aşırı yüklemesi yok | parça ölçümü ayrı dosya kesmeyi gerektiriyor |
+| XPSNR düzlem başına verilmiyor | kroma bozulması ayrı görülemiyor |
+
 ## Ölçüler
 
 `AbTests` adıyla, `dotnet test -c Release --filter "AbTests"` — 49 test, 49 geçti,
