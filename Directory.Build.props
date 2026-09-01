@@ -7,6 +7,14 @@
     <Version>0.2.5</Version>
   </PropertyGroup>
 
+  <!-- CI builds Release with -warnaserror. Without this the two disagree: a local
+       "dotnet test -c Release" reads green, the push lands, and CI fails on a warning
+       the agent never saw. T87 lost a round to exactly that. Release only; a Debug
+       build still reports warnings as warnings. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
   <PropertyGroup>
     <Company>Teknesyum</Company>
     <Product>VidShrink</Product>
