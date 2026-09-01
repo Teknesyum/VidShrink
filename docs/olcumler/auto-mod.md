@@ -174,3 +174,48 @@ bizde de sabit, ama **preset adı gibi görünür bir kapağı yok**:
 Özet: HandBrake bilmeyen kullanıcıya **1** soru soruyor, biz **9**. Dokuzun
 **ikisi** (hedef boyut, amaç) bilmeyen birinin doğru cevaplayabileceği sorular;
 **altısı** cevaplayamayacağı, **biri** (HDR) doğru soru ama yanlış dille sorulmuş.
+
+---
+
+## Ölçüm sırasında bulunan kusurlar — düzeltilmedi
+
+T102 kod değiştirmiyor. Bunlar ayrı sözleşme ister.
+
+**1. Bench auto modu ölçemiyor.** `tools/VidShrink.Bench` `shrink` alt komutu
+`PlanOptions.Codec` alanını hiç ayarlamıyor (`tools/VidShrink.Bench/Program.cs:663-670`),
+yani `PlanOptions` varsayılanı olan `CodecPreference.Compatible` ile ölçüyor.
+Uygulamanın varsayılanı ise `Auto` (`MainWindow.axaml:398` `SelectedIndex=0`).
+Aggressive/Extreme rejimlerde ikisi **farklı kodek** seçiyor
+(`CompressionStrategy.cs:58-63`): bu kaynakta `Auto` → `libsvtav1`, bench → `libx264`.
+Yani "rapora giren her sayı bench'ten çıkar" kuralı auto mod için bugün tutmuyor;
+bu sözleşmenin ölçümü ayrı bir başsız sonda ile alındı.
+
+**2. `p010le` yoklaması yalancı geçiyor.** `EncoderCapabilities.ProbeHdr10PixelFormat`
+sırayla `p010le` ve `yuv420p10le` deniyor (`src/VidShrink.Ffmpeg/EncoderCapabilities.cs:125-131`)
+ve ilk geçeni HDR10 biçimi diye döndürüyor. Ama `libx264` de `libsvtav1` de `p010le`
+desteklemiyor — `ffmpeg -h encoder=libx264` listesinde yok. ffmpeg bunu hata saymıyor,
+uyarıp `yuv420p10le`'ye çeviriyor, yoklama "geçti" diyor. Sonuç doğru çıkıyor
+(teslim edilen dosyada ölçülen biçim `yuv420p10le`) ama üretilen komut satırı
+`-pix_fmt p010le` diyor ve yoklamanın verdiği "destekliyor" kararı gerçeğe dayanmıyor.
+
+**3. Yazılım AV1'in bit hızı sapması modellenmiyor.** `libsvtav1` istenen `-b:v`
+değerini tutturamıyor ve sapma **ayara bağlı olarak değişiyor**. Bu kaynakta ölçülen
+teslim oranları (teslim edilen video bit hızı / istenen):
+
+| koşum | istenen | teslim | oran |
+|---|---|---|---|
+| auto (preset 6, g=120) | 2026 | 1947,5 | 0,961 |
+| preset 4 | 2026 | 1800,4 | 0,889 |
+| g=300 | 2026 | 1436,1 | 0,709 |
+| ölçek 1440x810 | 2026 | 1743,9 | 0,861 |
+| preset 4 + g=300 | 2975 | 2145,2 | 0,721 |
+| preset 4 + g=300 | 2775 | 2038,8 | 0,735 |
+| HandBrake x265 preset slow | 2026 | 2073,7 | **1,024** |
+
+HandBrake istediğini %2,4 içinde tutturuyor; bizim yolumuz %4 ile %29 arasında altına
+düşüyor. Plan hesabı bu sapmayı yalnız donanım kodlayıcıları için modelliyor
+(`PlanCalculator.cs:82-96`: `DeliveryReserveK`, `HardwareBitrateYield`); yazılım yolunda
+sapma sıfır varsayılıyor. Auto'nun kendi doldurma bandını dolduramamasının
+(15,04 MiB teslim, band alt kenarı 15,20 MiB) ölçülen sebebi bu. Sapma preset'e ve
+anahtar kare aralığına bağlı olduğu için bu ikisini değiştiren her öneri bu düzeltmeyi
+de ister — aksi halde kazanılan yer boş bırakılır.
