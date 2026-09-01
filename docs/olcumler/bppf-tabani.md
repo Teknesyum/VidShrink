@@ -119,3 +119,63 @@ hevc ile h264 arasındaki bir bppf'te hevc geçiyor, h264 eleniyor. Sayı yazıl
 `TheFloorFollowsTheContentAndTheFrameRate` içindeki `Assert.Equal(0.035, ...)` de
 `CodecModel.FloorBppf("libx264")` çağrısına çevrildi — ölçtüğü şey ölçülmemiş profilin
 tabanı oynatmaması, 0.035 sayısının kendisi değil.
+
+## 2. Beş yerleşim, aynı boyut, ölçülen kalite
+
+Şikâyet işi: 1036,17 sn 1920x1080@60 HDR kaynak (bt2020/smpte2084/bt2020nc, hevc
+yuv420p10le), 117 MiB hedef. Motorun bu hedefte videoya ayırdığı pay 790k'dır; beş satır
+da **aynı `-b:v 790k`** ile kodlandı, tek değişken yerleşim oldu.
+
+Ortak kodlama: `av1_nvenc -preset p5 -rc vbr -multipass fullres -pix_fmt p010le`,
+GOP her satırda 2 saniye (60 fps'te 120, 30 fps'te 60), `-threads 4` sabit, ses/altyazı
+atıldı, renk etiketleri elle taşındı. Kalite VMAF-NEG (`vmaf_v0.6.1neg`), çıktı 1920x1080'e
+bicubic ile geri ölçeklenip kaynakla karşılaştırıldı. İki pencere ölçüldü: raporun tarihsel
+penceresi **480–540 sn** ve bağımsız bir ikinci pencere **200–260 sn**.
+
+### 2.1 Sonuç
+
+| Yerleşim | bppf | Boyut (MiB) | 480: ort / harm / p10 | 200: ort / harm / p10 |
+|---|---|---|---|---|
+| **1280x720@60** | 0,01429 | 95,33 | **68,81 / 46,67 / 26,49** | **48,14 / 32,45 / 18,12** |
+| 1280x720@30 | 0,02857 | 96,40 | 69,32 / 34,03 / 23,69 | 47,47 / 27,41 / 11,33 |
+| 882x496@60 (bugünkü seçim) | 0,03010 | 95,42 | 62,42 / 43,54 / 26,18 | 45,95 / 31,20 / 17,40 |
+| 960x540@60 | 0,02540 | 96,13 | 63,58 / 44,14 / 26,10 | 45,85 / 31,76 / 17,96 |
+| 960x540@30 | 0,05080 | 97,41 | 63,84 / 32,86 / 24,57 | 44,61 / 26,52 / 11,49 |
+
+Boyutlar %2,2 bandında (95,33–97,41 MiB); karşılaştırma eşit boyutta yapıldı sayılır.
+Harmonik ortalama libvmaf'ın havuzlama tanımıyla hesaplandı (`n / Σ 1/(x+1) − 1`);
+düz harmonik ortalama, aşağıdaki sıfır puanlı kareler yüzünden her satırda 0 çıkıyor.
+
+**Kazanan 1280x720@60.** Altı ölçüden beşini alıyor. Kaybettiği tek ölçü 480 penceresinin
+düz ortalaması (69,32'ye karşı 68,81, fark 0,51); aynı satır aynı pencerede harmonikte 12,64,
+p10'da 2,80 geride. Bugünkü seçime (882x496@60) karşı üstünlüğü iki pencerede de aynı yönde:
+480'de +6,39 ort / +3,13 harm / +0,31 p10, 200'de +2,19 / +1,25 / +0,72.
+
+Sözleşmedeki liste "960x540" ile "540p60"ı ayrı sayıyordu; bunlar tek yerleşimin iki adı.
+Beşinci satır olarak 960x540@30 kondu, dördüncü satır 960x540@60'tır.
+
+### 2.2 Hangi kolda ölçüldü
+
+Beş satır da **tek denemede** çıktı; hiçbiri motorun `PlanCalculator.Correct` yeniden
+deneme yoluna girmedi, çünkü ffmpeg doğrudan sabit `-b:v` ile çağrıldı. `-multipass fullres`
+zaten iki geçişli VBR'dır — yani tablo, T100'ün ölçtüğü "CRF atılıp VBR'a düşülen" kolun
+**içinde**, satırlar arasında adil. Ölçülmeyen şey, tabanı düşürünce daha düşük bppf'li bir
+yerleşimin ilk denemede hedefi tutturamayıp `Correct`'e düşme olasılığının bedelidir:
+**ayrılmadı**. Kazanan yerleşim 0,01429 bppf'te 95,33 MiB verdi, 117 MiB hedefin dolum
+bandının altında kalmadı; bu satır için yeniden deneme beklenmiyor, ama bu tek koşumluk bir
+gözlem, ölçüm değil.
+
+### 2.3 T95 kapıları (elle)
+
+`ffprobe` beş çıktıda da aynı: `yuv420p10le`, `color_space=bt2020nc`,
+`color_transfer=smpte2084`, `color_primaries=bt2020`, akış sayısı 1 (yalnız video).
+Kare hızı ve geometri yerleşimin kendisi. Ölçüm bu yüzden renk yolu ya da akış farkı
+taşımıyor.
+
+### 2.4 Yolda görülen: çöken kareler her satırda aynı yerde
+
+Her satırda 33–62 kare 5 VMAF-NEG'in altına düşüyor (n=3600). Düşük kareler bütün
+satırlarda **aynı indislerde** (480 penceresinde 2471–3231 arası, yani kaynağın 521–534.
+saniyeleri). Bu, ölçüm hizasızlığı değil — hizasızlık bütün kareleri düşürürdü. Bu hedef
+boyutta o sahne yerleşimden bağımsız olarak çöküyor. p1 sütunu bu yüzden yerleşimleri
+ayırmıyor (2,93–5,15), p10 ayırıyor.
