@@ -1,0 +1,27 @@
+{
+  "contractId": "T86",
+  "auditorRunId": "a5a45130352b613a5",
+  "headSha": "2713da9400aa2cc1c67a75ea9d56ef8a29bea82b",
+  "diffHash": "d0c6b5fc443dec6b28bf346c509af406afbc6877b32f3686ea1252f6d255e903",
+  "owns": [
+    "tests/VidShrink.Tests/PerformanceCheckTests.cs",
+    "tests/VidShrink.Tests/ShellMenuTests.cs",
+    "tests/VidShrink.Tests/Windows11ShellMenuTests.cs",
+    "tests/VidShrink.Tests/UpdaterTests.cs",
+    "tools/kosum-kapisi/kosum-kapisi.ps1",
+    "tools/kosum-kapisi/test-kapi.ps1",
+    "tools/kosum-kapisi/fixtures/basarisiz-en.txt",
+    "tools/kosum-kapisi/fixtures/eksik-toplam-en.txt",
+    "tools/kosum-kapisi/fixtures/gecerli-en.txt",
+    "tools/kosum-kapisi/fixtures/gecerli-tr.txt",
+    "tools/kosum-kapisi/fixtures/kesinti-tr.txt",
+    "docs/olcumler/surecler-arasi-olcu-yalitimi.md"
+  ],
+  "verification": [
+    "Tur 2 GECTI. H1: zamanlamaya dayali bekleme kalkti — .basladi isareti ve Thread.Sleep(300) yok, birakan is parcacigi <gunluk>.akis dosyasinda 'yeniden denenecek' gorene kadar tutuyor (UpdaterTests.cs:1118-1146). 30 sn son tarih ve 10 sn Join yalniz asili kalmayi onluyor: duyuru gorulmeden birakilirsa :1145 Assert.True kirmizi verir, sessiz yesil uretmez. H1 kaniti yuk benzetimiyle: .calisma/t86/yuk-benzetimi.ps1 iki kosumda ayni enjeksiyon (1500 ms), tek fark UpdaterTests.cs surumu; eski surum 'Not found: yeniden denenecek' (CI 33525962057 dususuyle ayni dizgi), yeni surum gecici kilit cikis 0 / 2734 ms. H1 mutasyonu uretim betigini boziyor (RemoveAttempts 6->1) ve kirmizi. H2: uydurulmus 'Sure: 669,1 sn' bicimi gitti; alti eszamanli satir, uc updater satiri ve CI satiri ham kaynakla birebir — denetci CI 33548907080 gunlugunu kendisi cekti, Passed: 911, Total: 983, kapi toplam=983 alt-sinir=950 aynen. H3: durma mesru — Install-VidShrink.ps1:271/280/286 kaynaktan saglandi, h3-cakisma.txt 12 eszamanli yazimin 4. ve 6.sini dusuruyor; ShellMenuTests her ornekte Guid.NewGuid() kokle calistigi icin bugunku olcu kusuru yakalayamaz ve rapor bunu kendisi yaziyor, owns disi oldugu icin dogru sekilde parklandi. H4/H5/H6 mutasyonlari uretim eserinde: PerformanceProbe.cs, Install-VidShrink.ps1, AppxManifest.template.xml — ucu de Basarisiz 1 Toplam 1. H6 kapi cikis kodlari (65/66/67/68) kapinin kendi kodu; test-kapi.ps1 denetci tarafindan kosturuldu, cikis 0, sekiz durum. owns: diff 10 dosya, hepsi owns icinde; ci.yml ve Install-VidShrink.ps1 dokunulmamis, mutasyon betikleri geri almis, worktree temiz. Skip eklenmedi; release.Join(5sn)->Assert.True(Join(10sn)) guclenme. Kriter 2 (ikame yeterliligi) BORC olarak gecti: olculen risk surecler arasi paylasilan isletim sistemi durumu (TEMP dizin sayimi, HKCU anahtari, AppX kaydi, updater koku) ve dordu de dar filtrenin icinde, iki surec dordunu ayni anda kosturdu; 895 test eklemek ortusme penceresini seyreltirdi. Kalan bosluk: TEMP/TMP surec geneli yonlendirmesinin suitin geri kalanina etkisi kosmadi. T0 notu: birlesmis main uzerinde tam kapi bir kez kosturuldu — CI 33552848877 (2713da9) success, Failed 0, Passed 974, Skipped 72, Total 1046; iki tam suit eszamanli kosturulmadi, bosluk burada yazili."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T20:14:37.099Z",
+  "usedAt": "2026-09-01T20:17:28.523Z",
+  "completedSha": "2713da9400aa2cc1c67a75ea9d56ef8a29bea82b"
+}
