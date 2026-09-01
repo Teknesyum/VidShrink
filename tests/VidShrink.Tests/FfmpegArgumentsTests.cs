@@ -220,4 +220,85 @@ public sealed class FfmpegArgumentsTests
         Assert.InRange(factor, FfmpegArguments.TightPeakFactor, FfmpegArguments.HardwarePeakCeiling);
         Assert.True(factor <= 1.10, $"boyut-guvenli tepe asildi: {factor}");
     }
+
+    /// <summary>
+    /// Verilen taban oranini planin gercekten tasidigi bit hizina cevirir; tepe carpani
+    /// mutlak bit hizina degil bu orana bakiyor, olcum tablosu da oranla yazildi.
+    /// </summary>
+    private static double PeakAtFloorRatio(string codec, int width, int height, double fps, double floorRatio)
+    {
+        var floorK = CodecModel.MinBitrateK(codec, width, height, fps);
+        Assert.True(floorK > 0, $"donanim tabani sifir: {codec} {width}x{height}@{fps}");
+        var bitrateK = (int)Math.Round(floorK * floorRatio);
+        return FfmpegArguments.PeakRateFactor(codec, bitrateK, width, height, fps);
+    }
+
+    public static TheoryData<string, int, int, double> OlculenYerlesimler() => new()
+    {
+        { "av1_nvenc", 1280, 720, 60 },
+        { "av1_nvenc", 1920, 1080, 30 }
+    };
+
+    /// <summary>
+    /// Tepe carpani taban orani boyunca geri gitmez. Olcum bunu soyluyor: dar tepe
+    /// tabanin 2,6-5,6 kati arasinda istenen boyuta oturuyor, 11,4 katinda %2,7 eksik
+    /// birakiyor. Eksik teslim yukselen oranla buyudugune gore acilma da tek yonlu.
+    /// Iddia <c>Clamp</c> sinirlarina degil ardisik iki cikti arasindaki iliskiye bakiyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(OlculenYerlesimler))]
+    public void Tepe_carpani_taban_orani_boyunca_geri_gitmez(string codec, int width, int height, double fps)
+    {
+        var previous = PeakAtFloorRatio(codec, width, height, fps, 0.5);
+        for (var ratio = 0.75; ratio <= 30.0; ratio += 0.25)
+        {
+            var factor = PeakAtFloorRatio(codec, width, height, fps, ratio);
+            Assert.True(factor >= previous,
+                $"tepe carpani {ratio:0.00}x tabanda geri gitti: {previous} -> {factor}");
+            previous = factor;
+        }
+    }
+
+    /// <summary>
+    /// Egrinin sekli: dizden once duz, diz ile en genis olculen oran arasinda kesin
+    /// artan, olculen en yuksek oranin ustunde doymus. Ucu de sabit karsilastirmiyor,
+    /// uretimin iki ciktisini birbiriyle karsilastiriyor.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(OlculenYerlesimler))]
+    public void Tepe_egrisi_dizden_once_duz_dizden_sonra_artan_olcum_disinda_doymus(string codec, int width, int height, double fps)
+    {
+        double At(double ratio) => PeakAtFloorRatio(codec, width, height, fps, ratio);
+
+        Assert.Equal(At(1.0), At(2.92), 12);
+        Assert.Equal(At(2.92), At(5.3), 12);
+
+        Assert.True(At(5.3) < At(7.80), $"diz sonrasi artis yok: {At(5.3)} -> {At(7.80)}");
+        Assert.True(At(7.80) < At(11.90), $"diz sonrasi artis yok: {At(7.80)} -> {At(11.90)}");
+
+        Assert.Equal(At(11.90), At(12.5), 12);
+        Assert.Equal(At(11.90), At(30.0), 12);
+    }
+
+    /// <summary>
+    /// Boyut guvencesinin olculmus siniri. Sayilar <c>docs/olcumler/tepe-tavani-ve-psy.md</c>
+    /// ve <c>FfmpegArguments</c> yorum blogundaki bench kosumlarindan geliyor, koddaki
+    /// sabitlerden degil:
+    /// 882x496@60 5,3x tabanda 1,02 tepesi 1,007 teslim etti — orada tepe acilamaz;
+    /// ayni yerlesimde 11,4x tabanda 1,50 tepesi 1,056 ile hedefi asti, 1,10 ise 1,008'de
+    /// kaldi — orada tavan olculen 1,10.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(OlculenYerlesimler))]
+    public void Tepe_carpani_olculen_guvenli_degerlerin_disina_cikmaz(string codec, int width, int height, double fps)
+    {
+        Assert.True(PeakAtFloorRatio(codec, width, height, fps, 5.3) <= 1.02,
+            $"5,3x tabanda tepe acildi: {PeakAtFloorRatio(codec, width, height, fps, 5.3)}");
+        Assert.True(PeakAtFloorRatio(codec, width, height, fps, 11.4) <= 1.10,
+            $"11,4x tabanda olculen guvenli tepe asildi: {PeakAtFloorRatio(codec, width, height, fps, 11.4)}");
+
+        for (var ratio = 11.4; ratio <= 200.0; ratio += 7.3)
+            Assert.True(PeakAtFloorRatio(codec, width, height, fps, ratio) < 1.50,
+                $"{ratio:0.0}x tabanda tepe olculen asma degerine ({1.50}) ulasti");
+    }
 }
