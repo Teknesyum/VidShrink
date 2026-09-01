@@ -112,5 +112,13 @@ Aynı çıktı koşum kapısından geçirildi: `tools/kosum-kapisi/kosum-kapisi.
 
 ## Kalan borç
 
+Tur 3'e “kapanması beklenmiyor” diye yazılan iki borç J1 çözülürken kapandı:
+
+- `SampleWindowAsync`ın yedek yolu artık `SampleAsync` üzerinden aynı muxer'a yazıyor. Split'in başarısız olduğu pencereler de Matroska sayıyor; aynı yoklama içinde karışık birim kalmadı.
+- `ParseVideoBytes`ın KiB yuvarlaması `ComplexityProbe`ta yok: yöntem kaldırıldı, bayt tanesi 1 bayt. Ölçülen etkisi yukarıdaki tablodadır — `smptebars` için yuvarlama tek başına `Log2`yi 0,245'ten 0,415'e taşıyordu.
+
+Kapanmayanlar:
+
+- `CalibrationProbe` kendi `ParseVideoBytes`ını kullanmayı sürdürüyor (`src/VidShrink.Ffmpeg/CalibrationProbe.cs:227,249`) ve aynı KiB yuvarlamasını taşıyor. Bu dosya T88'in `owns` listesinde değil; oradaki iki örnek (düşük ve yüksek CRF) aynı yoldan geçtiği için asimetri yok, ama küçük örneklerde tane kaba. Ölçülmedi.
 - `ScanSampleAsync` ve paket okuma yolu baytı `-vstats` `f_size` ve paket boyutundan alır; bunlar konteyner dışı kare/paket yükleridir. Pencere yanlılığı (`bias`) bu sayıların **kendi içindeki oranıdır**, muxlanmış örnek baytlarıyla hiçbir yerde karşılaştırılmaz. Bu yüzden tek muxer kuralının dışında tutuldu.
 - `MotionExponent`in Matroska birimindeki kayması (düşük bit hızlı iki kaynakta +0,068 ve +0,079) T89'a devreder.
