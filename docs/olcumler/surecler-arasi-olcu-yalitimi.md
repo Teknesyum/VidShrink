@@ -235,10 +235,23 @@ birden koşuyor:
     KOSUM KAPISI DUSTU: kod=68 sart=Toplam test sayisi alt sinirin altinda: 500 < 974.
     kosum-kapisi fixture testleri geçti
 
+## CI — dal başında tam süit
+
+Dal itildikten sonra CI koşumu 33548907080 (`61a3139`) yeşil. Tam süiti koşan ve
+koşum kapısından geçiren adım, GitHub koşucusunda:
+
+    Passed!  - Failed:     0, Passed:   911, Skipped:    72, Total:   983, Duration: 13 m 33 s - VidShrink.Tests.dll (net8.0)
+    KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=983 alt-sınır=950
+
+Bu, tam süitin **tek** bir koşumu — eşzamanlı değil ve bu makinede değil. Sözleşmenin
+"kararsız ölçü" gerekçesi düşünülürse tek yeşil CI koşumu H1'i kanıtlamaz; H1'in
+kanıtı yukarıdaki yük benzetimi ile mutasyondur. Bu satır yalnız şunu söylüyor:
+dal başında süitin tamamı bir kez baştan sona yeşil koştu.
+
 ## Ölçülmeyenler
 
-- **Tam süit.** Bu turda hiç koşturulmadı; ne tek başına ne eşzamanlı. Sebep yukarıda.
-  Süitin bütünü üzerine bu turdan çıkan bir iddia yok.
+- **Eşzamanlı tam süit.** Bu makinede tam süit hiç koşturulmadı, iki tam süit aynı
+  anda hiç koşturulmadı. CI'daki tek koşum bunun yerine geçmez.
 - **Farklı Windows oturumlarında AppX çakışması.** Kilit `Global\` ad alanına alındı
   ve ad alanının sıraya soktuğu ölçüldü; iki ayrı oturumdan eşzamanlı koşum
   denenmedi.
