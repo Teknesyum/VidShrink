@@ -65,6 +65,7 @@ Sonuç, iki yönlü:
 2. **Bu bir kusur** (kusur 4). Depo'nun kendi ölçüm aracı harmonik ortalamayı
    raporluyor; bu kaynakta AV1 ile x265 arasında **39 puanlık** bir fark üretirdi ve
    o farkın PSNR'a göre karşılığı yok.
+
 ---
 
 ## K1 — Auto modun bugün aldığı kararlar
