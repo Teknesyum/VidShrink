@@ -140,7 +140,7 @@ kalıyor. Mutasyon: M7.
 > Yerleşmeyen bir yoklama en çok bir kez daha denenir. Sınır olmasa ölçüm ile yeniden
 > hesap birbirini besleyip sonsuz yoklama üretirdi.
 
-**Yeni (`:1233-1236`):**
+**Yeni (`:1229-1233`):**
 
 > Yerleşmeyen bir yoklama art arda en çok bu kadar denenir; sonrası
 > `RetryAfterFailureMs` beklemeye tabidir.
@@ -199,8 +199,8 @@ karşılaştırma `OrdinalIgnoreCase`. Mutasyon: M8.
 ## T7 — `grep -n "TxtSystemStatus"` gerçek çıktısı
 
 Tur 1'in sunduğu on satır numarası (478, 700, 704, 796, 819, 1098, 1469, 1521, 1656,
-3040) hiçbir commit'te üretilemiyordu; **geri çekildi.** Komut ve çıktısı, commit
-`fb6f782`:
+3040) hiçbir commit'te üretilemiyordu; **geri çekildi.** Komut ve çıktısı; dosya
+`7555059`den beri değişmedi, çıktı dalın ucuna kadar birebir aynı:
 
 ```
 $ grep -n "TxtSystemStatus" src/VidShrink.App/MainWindow.axaml.cs
