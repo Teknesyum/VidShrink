@@ -126,8 +126,10 @@ public static class Rapor
         sb.AppendLine($"- Is parcacigi sabit: `-threads {Program.Threads}`, x265 `pools={Program.Threads}`,");
         sb.AppendLine($"  x264 `threads={Program.Threads}`, SVT-AV1 `lp={Program.Threads}`.");
         sb.AppendLine("- **Makine paylasimliydi**; paralelde baska ajanlarin olcumleri kosuyordu.");
-        sb.AppendLine("  Bu damga yalniz **sure** sayilarindadir. Bu sayfada sure sayisi yok:");
-        sb.AppendLine("  bit, boyut ve kalite sayilari is parcacigi sabitken yukten etkilenmez.");
+        sb.AppendLine("  Bu damga yalniz **sure** sayilarindadir; bit, boyut ve kalite sayilari");
+        sb.AppendLine("  is parcacigi sabitken yukten etkilenmez. Sayfadaki tek sure sayisi");
+        sb.AppendLine("  \"Olculemeyenler\" altindaki hucre maliyetidir: paylasimli makinede");
+        sb.AppendLine("  olculdugu icin **karsilastirma degil, buyukluk mertebesi** olarak okunur.");
         var (_, dal) = Kabuk.Yakala("git", new[] { "rev-parse", "--abbrev-ref", "HEAD" });
         var (_, srcSha) = Kabuk.Yakala("git", new[] { "log", "-1", "--format=%H %s", "--", "src" });
         sb.AppendLine($"- Dal `{dal.Trim()}`. Olculen **uretim kodu**: `src/`in son commit'i");

@@ -13,8 +13,10 @@ commit `eb9165c`. Sonradan secilen esik kanit degildir.
 - Is parcacigi sabit: `-threads 8`, x265 `pools=8`,
   x264 `threads=8`, SVT-AV1 `lp=8`.
 - **Makine paylasimliydi**; paralelde baska ajanlarin olcumleri kosuyordu.
-  Bu damga yalniz **sure** sayilarindadir. Bu sayfada sure sayisi yok:
-  bit, boyut ve kalite sayilari is parcacigi sabitken yukten etkilenmez.
+  Bu damga yalniz **sure** sayilarindadir; bit, boyut ve kalite sayilari
+  is parcacigi sabitken yukten etkilenmez. Sayfadaki tek sure sayisi
+  "Olculemeyenler" altindaki hucre maliyetidir: paylasimli makinede
+  olculdugu icin **karsilastirma degil, buyukluk mertebesi** olarak okunur.
 - Dal `T114-sahne-butcesi`. Olculen **uretim kodu**: `src/`in son commit'i
   `f542dc22efeaa6ace0522e8d41eeed6f56526f87 T135 ve T130 borclari: manset sayilari, verify filtresi, stdout utf-8, kapanmayan etiket`. Butun kodlamalar bu koddan `--no-incremental`
   derlenmis ikiliyle kosuldu; `--no-build` kullanilmadi. Bu commit'ten
