@@ -1191,8 +1191,9 @@ tetiklenmedi ve **ölçülmedi**.
 
 ### 10.2 Belge envanteri — hangi sayı hangi ölçerden geçti (K1)
 
-`docs/olcumler/` altında **20 belge** var; **8'i** VMAF ya da XPSNR sayısı
-taşıyor. Ölçüt: iki kilit anı. Ölçüm boru hattı `tools/VidShrink.Bench`in kendi
+`docs/olcumler/` altında bu dalın ayrıldığı noktada **20 belge** vardı; **8'i**
+VMAF ya da XPSNR sayısı taşıyor. (Envanter alındıktan sonra `main` iki belge daha
+getirdi — bölümün sonundaki eke bakın.) Ölçüt: iki kilit anı. Ölçüm boru hattı `tools/VidShrink.Bench`in kendi
 grafiğinde `0e2b071` (09-02 03:09) ve `48ec9fa` (03:15) ile kilitlendi; ürün
 ölçeri `QualityMeter` `822dd3a` (04:44) ile. Bir belgenin **son** commit'i
 kilitten önceyse içindeki hiçbir sayı kilitli ölçerden geçmiş olamaz.
@@ -1226,6 +1227,29 @@ Bu altı belgenin hiçbiri kapsam dışı bırakılmadı — **ölçülmedi.** 1
 bunları da ilgilendiriyor: içlerindeki VMAF sayıları kaymış olabilir, ama hiçbiri
 plan kararı üretmiyor; hepsi rapor sayısı. Kaymanın rapor sayısına ne yaptığı
 belge belge **ölçülmedi**.
+
+#### Envanter alındıktan sonra `main` iki belge daha getirdi
+
+Envanter bu dalın ayrıldığı `main`e göre alındı. T116 koşarken `main` ilerledi ve
+`docs/olcumler/` **22 belgeye** çıktı. İki yeni belge envanterin tablosunda yok,
+ikisi de VMAF/XPSNR taşıyor ve ikisi de **kilitsiz ölçerden geçti, yeniden
+ölçülmedi**:
+
+| belge | sözleşme | ölçen düzenek | neden kilitsiz |
+|---|---|---|---|
+| `ab-duzenegi.md` (723 satır) | T95 | `tools/VidShrink.Ab` | Ab **ürünün** `QualityMeter`ını çağırıyor (`AbRunner.cs:205-206`, `:338-339`), ama belgenin damgaladığı dört ölçüm commit'inin (`af7a0fe` 02:21, `94df05c` 04:29, `a1994b3` 05:22, `381e8ab` 07:23) **dördünde de** `QualityMeter.cs` `settb=AVTB` taşımıyor — T95'in dalı kilitten (`822dd3a`, 04:44) önce kesilmiş ve kilidi hiç almamış |
+| `bppf-tabani.md` (650 satır) | — | `bench shrink` | sayıları `6fac0be`, **2026-08-25**; `bench`in kendi grafiği 09-02 03:09'da kilitlendi, ölçüm ondan bir hafta önce |
+
+`tools/VidShrink.Ab` **dördüncü bir kilit yeri değil**: ürünün ölçerini
+çağırdığı için `main`e uyduğu anda kilidi kendiliğinden alır. Borç kodda değil,
+`ab-duzenegi.md`de **yayımlanmış sayılarda**. T116 bu iki belgeyi yeniden
+ölçmedi — ikisi de `owns` dışında ve ızgara kapandıktan sonra görüldüler.
+Kaymanın bu iki belgenin sonuçlarına ne yaptığı **ölçülmedi**.
+
+Dikkat çeken tek nokta: `ab-duzenegi.md` kendi §'lerinde "libvmaf kareleri
+yanlış eşler ve sessizce bir sayı üretir" diye **aynı olguyu adlandırıyor**;
+adlandırıp kendi ölçümüne kilidi takmamış. Bunun T95'in sonuçlarını değiştirip
+değiştirmediği **ölçülmedi**.
 
 
 ## Yeniden üretim
