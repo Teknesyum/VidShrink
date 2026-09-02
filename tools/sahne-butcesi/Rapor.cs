@@ -191,6 +191,7 @@ public static class Rapor
         sb.AppendLine("| K4 | `SahneButcesi k4 maks p1-karisik` | `k4-izgara.csv` |");
         sb.AppendLine("| K4 eki | `SahneButcesi k4b <kol> <pencere>` | `k4b-<kol>-<pencere>.csv` |");
         sb.AppendLine("| K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |");
+        sb.AppendLine("| Tekrar gurultusu | `SahneButcesi tekrar <kol> <pencere>` | `tekrar-<kol>-<pencere>.csv` |");
         sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |");
         sb.AppendLine("| Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |");

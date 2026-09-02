@@ -37,6 +37,7 @@ Ikili her seferinde `--no-incremental` derlenir; `--no-build` kullanilmaz.
 | K4 | `SahneButcesi k4 maks p1-karisik` | `k4-izgara.csv` |
 | K4 eki | `SahneButcesi k4b <kol> <pencere>` | `k4b-<kol>-<pencere>.csv` |
 | K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |
+| Tekrar gurultusu | `SahneButcesi tekrar <kol> <pencere>` | `tekrar-<kol>-<pencere>.csv` |
 | K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |
 | Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |
 | Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |
