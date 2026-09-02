@@ -86,6 +86,8 @@ public sealed class HandBrakeCompetitor : ICompetitor
 public sealed class VidShrinkCompetitor : ICompetitor
 {
     private const int CalibrationRounds = 2;
+    private static readonly bool LayoutLocked =
+        Environment.GetEnvironmentVariable("T125_YERLESIM_KILIT") == "1";
     private readonly HdrPolicy _hdrPolicy;
 
     public VidShrinkCompetitor(string name, HdrPolicy hdrPolicy)
@@ -106,6 +108,7 @@ public sealed class VidShrinkCompetitor : ICompetitor
         var outputPath = Path.Combine(outputDirectory, tag + ".mp4");
         var logPath = Path.Combine(logDirectory, tag + ".log");
         var log = new System.Text.StringBuilder();
+        if (LayoutLocked) log.AppendLine("yerlesim kilitli: T125_YERLESIM_KILIT=1, AllowResolutionDrop=false");
 
         var options = new PlanOptions
         {
@@ -113,7 +116,7 @@ public sealed class VidShrinkCompetitor : ICompetitor
             Codec = CodecPreference.Auto,
             FillPolicy = FillPolicy.FillTarget,
             SpeedMode = SpeedMode.Quality,
-            AllowResolutionDrop = true,
+            AllowResolutionDrop = !LayoutLocked,
             AllowFpsDrop = false,
             HdrPolicy = _hdrPolicy
         };
