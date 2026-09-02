@@ -100,6 +100,40 @@ public static class FfmpegArguments
     // highest ratio where the tight peak was still right (5,6x) and the lowest where it was not.
     // Above the widest ratio nothing was measured, so the peak stays at the widest value that was:
     // 1.50 is known to overshoot there and the ceiling is the guarantee this may not break.
+    //
+    // T108 widened that measurement: two sources (one moving, one still) x two hardware
+    // encoders (av1_nvenc, hevc_nvenc) x five floor ratios (2.6, 4.636, 7.5, 10.236, 16.0) x
+    // three peaks (1.02, 1.10, 1.50), 60 cells, 1920x1080@60 HDR PQ, VMAF-NEG p10. The full
+    // table is docs/olcumler/tepe-egrisi.md.
+    //
+    // What the peak buys is not set by the floor ratio. It is set by how much the source
+    // moves. On the moving clip the p10 spread across the three peaks is 11.46 at ratio 2.6
+    // and 0.28 at ratio 16.0, falling all the way; on the still clip it never exceeds 1.61
+    // at any ratio. Both encoders give the same shape (av1_nvenc 11.46 -> 0.28, hevc_nvenc
+    // 11.68 -> 0.50). At ratio 4.636 the same encoder gives 7.385 on the moving clip and
+    // 0.236 on the still one - thirty times apart.
+    //
+    // So the curve reads the wrong axis, and it reads it backwards: it holds the peak tight
+    // below ratio 6.0, which is exactly where opening it pays most on moving content, and
+    // opens it toward 11.4, where the measurement finds the spread already gone. The premise
+    // that the tight peak undershoots at high ratio did not repeat on either source: at ratio
+    // 10.236 the tight peak delivers 1.0330 of the video budget on the moving clip and 0.9809
+    // on the still one.
+    //
+    // The tight peak's size benefit survives only at the lowest ratio: at 2.6 the moving clip
+    // gives 1.0351 tight against 1.1116 at 1.10, but at 4.636 the three peaks are 1.0305 /
+    // 1.0305 / 1.0380, so opening there costs 0.7% of size and buys 7.385 p10. Across all 60
+    // cells 34 overshoot the video budget (moving 30/30, still 4/30) and in 12 of the 20 rows
+    // the size does not move one way with the peak at all.
+    //
+    // The constants are NOT changed here, and that is a scope decision, not a measurement
+    // result: the value the measurement asks for is content agitation, which PeakRateFactor
+    // never receives, and the curve is pinned at five ratios by HardwareRateControlTests
+    // (:122-141), which is outside this contract's owns. Per constant - WidePeakFactor:
+    // measured on the software path, unchanged. TightPeakFactor, HardwarePeakCeiling,
+    // PeakOpensAtFloorRatio, PeakWidestAtFloorRatio: measured, unchanged, and the reason is
+    // above. BufferFactor: NOT measured on its own - every cell moved bufsize with the peak,
+    // so no cell separates the buffer's effect from the peak's.
     public const double WidePeakFactor = 1.5;
     public const double TightPeakFactor = 1.02;
     public const double HardwarePeakCeiling = 1.10;
