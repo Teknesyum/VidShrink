@@ -494,9 +494,16 @@ public sealed class PerformanceCheckTests
     ///
     /// Gecidin verdigi taban uzerine kurulan iddia: kendi yarattigimiz
     /// <see cref="CpuLoad"/> — mantiksal cekirdek sayisi eksi bir kadar donen is parcacigi —
-    /// olcumde <b>gorunmek zorundadir</b>. Bos okuma hafifken yuklu okuma da hafif kaliyorsa
-    /// olcu yuku hic gormuyor demektir; olculen sey urunun kendi karari, makinenin gurultusu
-    /// degil, cunku her iki okuma da ayni kosumda ve ayni tabana gore aliniyor.
+    /// olcumde <b>gorunmek zorundadir</b>. Iki okuma da ayni kosumda alindigi icin iddia
+    /// mutlak sureye degil ikisinin farkina bakar; gecit olmasa disaridan gelen yuk bu farki
+    /// ters cevirebilirdi, ve olculdu: dolu bir makinede 1,177 taban 1,041 yuklu okuma
+    /// uretti, yani yuk kendi isaretini kaybetti.
+    ///
+    /// <b>Karar sinifinin degismesi burada iddia edilmiyor</b>, cunku o urunun degil
+    /// makinenin ozelligi: bos okumasi 0,573 olan hizli bir anda ayni onbes is parcacigi
+    /// okumayi yalniz 0,868'e tasidi, esigi (1,0) hic gecmedi. Sinif ile sayinin
+    /// tutarliligi zaten <see cref="OlcumYukAltindaYalnizAgirlasiyor"/> icinde her canli
+    /// okuma icin ayri ayri sinaniyor.
     /// </summary>
     [QuietMachineFact]
     public async Task YukAltindaKararHafiflemiyorMu()
@@ -535,10 +542,6 @@ public sealed class PerformanceCheckTests
         Assert.True(yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores,
             $"{yukleyici} is parcacigi olcumde gorunmedi: bos {N(bos.SoftwareRealtimeCores)}, " +
             $"yuklu {N(yuklu.SoftwareRealtimeCores)} gercek zaman cekirdegi");
-
-        Assert.False(yuklu.Impact == RecordingImpact.SoftwareLightLoad,
-            $"bos okuma hafifti ({N(bos.SoftwareRealtimeCores)}) ve {yukleyici} is parcacigi altinda " +
-            $"karar hala hafif: {N(yuklu.SoftwareRealtimeCores)}, esik {N(PerformanceCheck.HeavyLoadCores)}");
     }
 
     /// <summary>

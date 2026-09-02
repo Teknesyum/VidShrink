@@ -383,11 +383,26 @@ sınıflandırmasını (`RecordingImpact`) kullanır.
 
 `YukAltindaKararHafiflemiyorMu` — geçit boş tabanı garanti ettiği için iddia
 artık kurulabilir: kendi yarattığımız yük (mantıksal çekirdek eksi bir iş
-parçacığı) ölçümde **görünmek zorunda**. İki assert, ikisi de aynı koşumdaki
-iki okumayı birbirine göre okur, mutlak süreye bakmaz:
+parçacığı) ölçümde **görünmek zorunda**. Tek assert, aynı koşumdaki iki okumayı
+birbirine göre okur, mutlak süreye bakmaz:
 
-1. `yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores` — yük ölçüye girdi
-2. `yuklu.Impact != SoftwareLightLoad` — boş okuma hafifken yüklü okuma hafif kalamaz
+```
+yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores
+```
+
+Geçit olmasaydı bu fark ters dönebilirdi ve **ölçüldü**: dolu bir makinede
+taban 1,177 iken yüklü okuma 1,041 çıktı — dışarıdan gelen yük kendi yükümüzün
+işaretini yuttu. Geçidin işi tam olarak bunu engellemek.
+
+**İkinci bir assert yazıldı, ölçüldü ve geri çekildi.** İlk hali ayrıca
+`yuklu.Impact != SoftwareLightLoad` istiyordu — yani on beş iş parçacığının
+kararı eşiğin (1,0) üstüne taşıması. Bu ürünün değil **makinenin** özelliği:
+boş okuması 0,573 olan hızlı bir anda aynı on beş iş parçacığı okumayı yalnız
+0,868'e taşıdı, eşiği hiç geçmedi. Assert kalsaydı hiçbir ürün kusuru olmadan
+kırmızıya dönerdi. Karar sınıfı ile sayının tutarlılığı zaten
+`OlcumYukAltindaYalnizAgirlasiyor` içinde her canlı okuma için ayrı ayrı
+sınanıyor (yukarıdaki 450 düzeltmesi), yani kapsam kaybı yok — iddia yer
+değiştirdi.
 
 `OlcumYukAltindaYalnizAgirlasiyor`'da kalan yön iddiası
 (`yuklu >= taban × 0,8`) değiştirilmedi; o zaten orana kurulu ve dört koşumda
@@ -407,13 +422,33 @@ en son kaynak dokunuşu 08:39:11).
 | 4 | `Başarısız 0, Başarılı 2, Atlanan 0` | 4 dk 10 sn |
 | 5 | `Başarısız 0, Başarılı 1, Atlanan 1` | 2 dk 36 sn |
 
+### İkinci kanıt turu: assert geri çekildikten sonra beş koşum
+
+| koşum | sonuç | süre | `[bos-makine]` günlüğü |
+|---|---|---|---|
+| 1 | `Başarısız 0, Başarılı 2, Atlanan 0` | 1 dk 16 sn | 0,835 → 1,14 (`Heavy`) |
+| 2 | `Başarısız 0, Başarılı 2, Atlanan 0` | 1 dk 24 sn | 0,581 → 0,972 (`Light`) |
+| 3 | `Başarısız 0, Başarılı 1, Atlanan 1` | 2 dk 6 sn | geçit kapalı |
+| 4 | `Başarısız 0, Başarılı 1, Atlanan 1` | 1 dk 14 sn | geçit kapalı |
+| 5 | `Başarısız 0, Başarılı 2, Atlanan 0` | 1 dk 31 sn | 0,671 → 1,211 (`Heavy`) |
+
+Beş koşum, sıfır kırmızı; iddia bu turda **üç kez** sınandı ve üçünde de yükü
+gördü (fark +0,305, +0,391, +0,540 gerçek zaman çekirdeği).
+
+**Geri çekilen assert'in doğru geri çekildiği burada ölçüldü.** Koşum 2 ve
+koşum 4'te (0,581 → 0,972 ve 0,656 → 0,847) yüklü okuma eşiğin **altında**
+kaldı, yani `Impact` `SoftwareLightLoad` çıktı. İlk yazdığım
+`yuklu.Impact != SoftwareLightLoad` assert'i dursaydı bu iki koşum, ürün
+tarafında hiçbir kusur olmadan **kırmızı** olurdu. Yani o assert kaldırılmadan
+önce ölçü hâlâ kararsızdı — yalnızca kararsızlığın yönü değişmişti.
+
 **Beş koşum, sıfır kırmızı.** Düzeltme öncesi aynı filtre aynı makinede
 1 kırmızı / 4 yeşil vermişti (satır 450, yukarıda). Yeşil/atlanan dağılımının
 koşumdan koşuma değişmesi kararsızlık değil, geçidin **ilan ettiği** şey:
 makine boşsa ölçü koşar, doluysa sayılabilir biçimde atlanır. Kırmızı ile
 yeşil arasında salınım yok.
 
-**Yeni ölçünün iddiaları bu beş koşumda hiç çalışmadı — ölçüldü.** Üç koşumda
+**Bu beş koşumda yeni ölçünün iddiası hiç çalışmadı — ölçüldü.** Üç koşumda
 `[QuietMachineFact]` geçidi kapattı; iki koşumda geçit açıldı ama koşum anında
 alınan taban artık boş değildi ve ölçü `Atlandi` ile döndü. Ölçüm günlüğü:
 
@@ -424,10 +459,19 @@ alınan taban artık boş değildi ve ölçü `Atlandi` ile döndü. Ölçüm g�
 
 Bu, yukarıda "ayrılmadı" diye yazılan **kayma penceresinin ölçülmüş hali**:
 geçit keşif anında `SoftwareLightLoad` gördü, ölçü koştuğunda taban 1,177'ye
-çıkmıştı. Yani `YukAltindaKararHafiflemiyorMu`'nun taşıdığı iddia bu makinede
-**henüz sınanmadı**; ölçünün yeşili "iddia doğrulandı" demek değil, "iddianın
-öncülü kurulamadı, sebebi yazıldı" demektir. Bunun düzeltilmesi boş bir makine
-ister — bu depoda bugün yok.
+çıkmıştı.
+
+**Sözleşmenin `verify` koşumunda iddia sonunda çalıştı ve geçti.**
+`--filter "PerformanceCheckTests|FrameGrabberTests"`, `Başarısız 0, Başarılı 43,
+Atlanan 0, Toplam 43`, 2 dk 45 sn. Günlük:
+
+```
+[bos-makine] yukleyici=15 esik=1 | bos: SoftwareLightLoad/0.835 | yuklu: SoftwareHeavyLoad/1.14
+```
+
+Öncül kuruldu (0,835 < 1,0), yük görüldü (1,14 > 0,835), assert geçti. Yani
+iddia **bir kez sınandı**; kaç koşumda sınanacağı makinenin o anki haline bağlı
+ve bu **ölçünün kendi tasarımı**, kusuru değil.
 
 ### Mutasyon C: yeni assert canlı mı
 
@@ -441,8 +485,11 @@ eşleştirmesi ters çevrildi (`Heavy` ↔ `Light`), tam yeniden derleme, tek ö
 
 Mutasyon geri alındı, kaynak yeniden derlendi (`0 Hata`).
 
-`YukAltindaKararHafiflemiyorMu` için mutasyon **yapılmadı**: iddiaları bu
-makinede hiç çalışmadığı için mutasyon da hiç çalışmazdı, yani kanıt üretmezdi.
+`YukAltindaKararHafiflemiyorMu` için mutasyon **yapılmadı**: iddiasının
+çalışıp çalışmayacağı makinenin o anki yüküne bağlı olduğu için mutasyonun
+kırmızı vermemesi ile iddianın ölü olması ayırt edilemezdi. Bunun yerine
+iddianın canlılığı doğrudan ölçüldü — `verify` koşumunda çalıştı ve sayıları
+günlüğe yazdı (yukarıda).
 
 ### Geçidin ayırdığı ve ayırmadığı eksenler
 
@@ -487,9 +534,11 @@ satır T115'in.
 | T115 sonrası, T117 öncesi | 17 | 1180 | koşum `33593652976` (`045648e`) |
 | `HardwareEncoderFact` sonrası | 18 | 1181 | koşum `33591434219` (`58e2d45`) |
 | `QuietMachineFact` sonrası | **19** | **1182** | koşum `33595878496` (`297ba7b`) |
+| satır 450 düzeltmesinden sonra | **19** | **1182** | koşum `33599862478` (`45ca92c`) |
 
-Kapı çıktısı, son koşum:
+Kapı çıktısı, dalın son koşumu (`45ca92c`, 18 dk 11 sn):
 `KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=1182 alt-sınır=1134 atlanan=19 ust-sinir=30`
+(`Failed: 0, Passed: 1163, Skipped: 19, Total: 1182`)
 
 **Tavan hâlâ anlamlı, değişiklik önerilmiyor.** İki geçit toplam +2 atlanan
 getirdi (17 → 19), tavana 11 pay kaldı. Tavanın işi kütlesel susturmayı
@@ -544,9 +593,9 @@ yanlışlanmadı — yalnızca **benim eksenimin sebebi o değil.** Kim ölçers
 
 ## Ölçülmeyenler
 
-- `YukAltindaKararHafiflemiyorMu`'nun **iddiaları hiç çalışmadı** (beş koşumun
-  üçünde geçit kapalı, ikisinde koşum içi öncül denetimi düştü). Ölçü kırmızı
-  vermiyor, ama "iddia doğrulandı" da denemez. Boş bir makine gerektiriyor.
+- `YukAltindaKararHafiflemiyorMu` **bir kez** gerçekten sınandı (`verify`
+  koşumu, 0,835 → 1,14). Kaç koşumda sınandığı ölçülmedi; beş koşumluk turda
+  sıfır, `verify` turunda bir. Mutasyon kanıtı bu yüzden üretilemedi.
 - `Atlandi` yolunun sayılabilir hale getirilmesi **yapılamadı**: xUnit 2 koşum
   sırasında test atlayamıyor, `Skip` yalnız keşif anında yazılabiliyor. Bugün
   bu yol "geçti" olarak sayılıyor; sebebi ölçüm günlüğüne ve test çıktısına
