@@ -187,8 +187,9 @@ Aynı ağaç yerelde de tam süitle koşturuldu (paylaşımlı makine, 22 dk 32 
 
     Başarılı!  - Başarısız: 0, Başarılı: 1213, Atlanan: 23, Toplam: 1236
 
-Atlanan sayısının farkı (23 yerel, 105 CI) ortam geçitlerinden; bu makinede GPU var,
-CI'da yok.
+İki koşumun toplamları tutmuyor (yerel 1236, CI 1234) ve atlanan sayıları çok farklı
+(23 / 105). **Sebebi ölçülmedi.** Ortam geçitleri akla yakın bir açıklama ama
+doğrulanmadı; buraya tahmin yazılmıyor. Her iki koşumda da kırmızı yok.
 
 `SplitDragTests` bu koşumda kırmızı değil — üç kez düşen ölçü artık düşmüyor. Tek
 yeşil koşum "kararsızlık bitti"nin kanıtı değildir; aşağıda ölçülmeyenler arasında.
