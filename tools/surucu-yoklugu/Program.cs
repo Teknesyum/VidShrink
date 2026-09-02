@@ -52,6 +52,8 @@ public static class Program
         if (bolum is "hepsi" or "onbellek") Onbellek();
         if (bolum is "hepsi" or "geridusme") GeriDusme();
         if (bolum is "hepsi" or "yuk") YukDuyarliligi(bolum == "yuk" ? tekrar : 5);
+        if (bolum is "dagilim") Dagilim.Olc(tekrar);
+        if (bolum is "kodlama") Dagilim.KodlamaMaliyeti(tekrar);
         return 0;
     }
 
