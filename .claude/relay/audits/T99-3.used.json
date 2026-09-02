@@ -1,0 +1,24 @@
+{
+  "contractId": "T99",
+  "auditorRunId": "afb2811bdb8c0141a",
+  "headSha": "dee1d13b77228e38048946aa1bfb9b3127fdcd02",
+  "diffHash": "7b307bc0d4cff519d2d0d2ecdfa8973e7add9e0b2dfeedb626aa23cf88aac2d1",
+  "owns": [
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/ComplexityProfile.cs",
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/PlanCalculatorTests.cs",
+    "tests/VidShrink.Tests/ExtremeCompressionTests.cs",
+    "docs/olcumler/bppf-tabani.md",
+    "tests/VidShrink.Tests/ChipTests.cs",
+    "tests/VidShrink.Tests/QualityTargetTests.cs",
+    "tests/VidShrink.Tests/SpeedModeTests.cs"
+  ],
+  "verification": [
+    "Uc mutasyon --no-incremental ile bagimsiz kosuldu: ustel geri -> kaldi 1/14, yalniz MotionExponentMax 1,0 -> gecti 14/14, yalniz DefaultMotionExponent 0,25 -> kaldi 1/14. Kesim asiri belirlenmis; 7 (degismez) hucresi 9 (eski hal) olarak duzeltilmis. Sebep kaynakta dogrulandi: ChipTests.Sample() Complexity tasimiyor, kelepce ComplexityProfile.cs:259 yalniz olculmus profilde bagliyor. Geri cekilen cumle belgede yalniz curutulen alinti olarak duruyor. src/ altinda tek satir degismedi (git show --stat 3a4b66d beeda05). CI 33583243823 headSha 3a4b66d success 0/1030/95. Alti borc kayitli; en onemlisi CI'in dal ucunu (beeda05) degil bir onceki commit'i olcmus olmasi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T02:53:13.054Z",
+  "usedAt": "2026-09-02T02:54:08.139Z",
+  "completedSha": "dee1d13b77228e38048946aa1bfb9b3127fdcd02"
+}
