@@ -333,28 +333,29 @@ dotnet test -c Release --filter "EncodeRunnerTests|FfmpegRunnerTests|SegmentEnco
 → Başarısız: 0, Başarılı: 37, Atlanan: 0, Toplam: 37
 ```
 
-## Yerel tam takım koşumu hakkında bir not
+## Yerel tam takım koşumu
 
-Teslimden önce `dotnet test -c Release` tamamı yerelde koşuldu:
+İlk tam koşum 87 testte durdu, "Test Çalıştırması Durduruldu" yazdı ve yine de **çıkış
+kodu 0** verdi — bu sözleşmenin konusuyla aynı sınıftan bir yalan, bu kez test host'unda.
+Aynı ikili üzerinde `--blame` ile tekrarlandığında koşum sonuna kadar gitti:
 
 ```
-Başarılı!  - Başarısız: 0, Başarılı: 86, Atlanan: 1, Toplam: 87, Süre: 15 m 24 s
-Test Çalıştırması Durduruldu.
-[exited with code 0]
+Test Çalıştırması Başarılı.
+Toplam test sayısı: 1373
+     Geçti: 1349
+    Atlandı: 24
+ Toplam süre: 16,6943 Dakika
 ```
 
-Bu **tam takım değil**: `--list-tests` projede **1373** test sayıyor. Koşum 87'de durmuş,
-"Durduruldu" yazmış ve yine de **çıkış kodu 0** vermiş. Yani bu sözleşmenin konusuyla aynı
-sınıftan bir yalan, bu kez test host'unda.
-
-Depo bu dersi burada da öğrenmiş: `.github/workflows/ci.yml:89` testleri doğrudan değil
+Yani takım **tam ve yeşil**; ilk koşumdaki durma geçiciydi ve makinede eş zamanlı üç
+sözleşme daha koşarken alındı. Kalıcı bir kusur olarak raporlanmıyor, ama not düşülüyor:
+tek başına "exit 0" yerelde de bir koşumun bittiğini kanıtlamıyor. Depo bu dersi burada da
+öğrenmiş — `.github/workflows/ci.yml:89` testleri doğrudan değil
 `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30` üzerinden
-koşuyor ve dosyadaki yorum aynı şeyi söylüyor — "asılı bir test host'u `Failed: 0` basıp
-0 ile çıkıyor". Yani teslimin otoritesi CI koşumu; yerel durma makinede eş zamanlı üç
-sözleşme daha koşarken alınmış bir çevre gözlemi olarak buraya yazıldı, ölçü olarak
-kullanılmadı.
+koşuyor ve dosyadaki yorum aynı şeyi söylüyor: "asılı bir test host'u `Failed: 0` basıp 0
+ile çıkıyor".
 
-Sözleşmenin verify kolları etkilenmedi; onlar ayrıca ve tam koşuldu (37/37).
+Sözleşmenin verify kolları ayrıca ve tam koşuldu (37/37).
 
 ## Borçlar
 
