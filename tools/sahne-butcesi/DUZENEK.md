@@ -100,3 +100,17 @@ Kapilarin sayisal esikleri degismedi; degisen yalniz sayimin metne uymasidir.
 duzeltildi (`son`). Duzeltmeden **once** yazilmis csv'ler eski basligi tasir;
 rapor csv'yi okumaz, `k1-*.json`'dan uretilir. Tam kosum tekrarlandiginda
 (`01-olcumu-kos.sh`) basliklar da duzelir.
+
+## VMAF'in reddetmeyecegi dogrulandi
+
+T113'te A/B, `QualityMeter`'in renk uzayi reddi yuzunden olculememisti. Burada
+kaynak ve plan ciktisi ayni renk uzayinda oldugu icin ret gelmiyor; kontrol:
+
+    ffprobe -v error -select_streams v:0 \
+      -show_entries stream=width,height,pix_fmt,color_transfer,color_primaries \
+      -of default=nw=1 <dosya>
+
+Kaynak ve uc kolun plan ciktisi da `yuv420p10le / smpte2084 / bt2020` dondu.
+Cozunurluk farki sorun degil: `QualityMeter.RunFilterAsync` testi referansin
+cozunurlugune olceklendiriyor. Cozunurluk **kollar arasinda** farkli oldugu
+icin puanlar yalniz kol icinde karsilastirilabilir; A/B kol icindedir.
