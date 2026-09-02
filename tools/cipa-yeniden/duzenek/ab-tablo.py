@@ -42,3 +42,19 @@ for meter in ['kilitli', 'kilitsiz']:
             ad, mb, dl('VmafNegMean'), dl('VmafNegHarmonic'), dl('VmafNegP10'),
             dl('ActualMb', '%+.3f'), dl('EncodeSeconds', '%+.1f')))
     print()
+
+print('### kilit farki (ayni kol, kilitli - kilitsiz olcer)')
+print('| kaynak | hedef | kol | dmean | dharm | dp10 | plan ayni mi |')
+print('| --- | ---: | --- | ---: | ---: | ---: | --- |')
+for cfg, (ad, mb) in AD.items():
+    for arm in ['eski', 'yeni']:
+        a = oku('%s-%s-kilitsiz' % (cfg, arm)); b = oku('%s-%s-kilitli' % (cfg, arm))
+        if not a or not b:
+            print('| %s | %d MB | %s | KOSULMADI |' % (ad, mb, arm)); continue
+        plan = all(a[k] == b[k] for k in ['Width','Height','Fps','Codec','Mode','CrfOrBitrate'])
+        def d2(k):
+            if a[k] is None or b[k] is None: return 'OLCULMEDI'
+            return '%+.2f' % (b[k] - a[k])
+        print('| %s | %d MB | %s | %s | %s | %s | %s |' % (
+            ad, mb, arm, d2('VmafNegMean'), d2('VmafNegHarmonic'), d2('VmafNegP10'),
+            'evet' if plan else 'HAYIR'))
