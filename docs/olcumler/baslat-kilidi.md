@@ -263,7 +263,18 @@ Süit bu koşumda **yalnız değildi**: aynı makinede başka bir ajanın `testh
 koşuyordu. Süre (18 dk 36 sn) o yüzden bir başarım sayısı değil; K5'in iddiası
 yalnızca kırmızı olmadığıdır.
 
-CI koşumu ve numarası sözleşmenin `## Cikti` bölümünde.
+CI de yeşil — **koşum 33631540902**, aynı commit `702d2a0`, `success`:
+
+```
+Passed!  - Failed:     0, Passed:  1330, Skipped:    18, Total:  1348, Duration: 21 m 51 s
+KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=1348 alt-sınır=1134 atlanan=18 ust-sinir=30
+```
+
+Üç yeni ölçünün üçü de CI'da **koştu**: xUnit yalnız `SKIP`/`FAIL` satırı yazıyor,
+CI günlüğünde 18 `Skipped` satırı var ve hiçbiri bu üçü değil.
+
+Rapor commit'i (`ab1aca6`) `docs/` altında; CI iş akışının `paths-ignore` listesi
+yüzünden yeni koşum açmadı ve koşandakini iptal etmedi. Son kod commit'i `702d2a0`.
 
 ## Kapsam dışı — denetçinin 2. borcu
 
