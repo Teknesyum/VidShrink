@@ -343,7 +343,7 @@ def hukum(vmaf, kanit, yokla, sr):
     var = [v for v in k.values() if v is not None]
     if len(var) < len(LETTERBOX):
         return "Hukum uretilemedi: %d/%d kaynakta %dk olcumu eksik." % (
-            len(var), len(LETTERBOX), ANA_HIZ)
+            len(LETTERBOX) - len(var), len(LETTERBOX), ANA_HIZ)
     ort = sum(var) / len(var)
     poz = sum(1 for v in var if v > 0)
 
