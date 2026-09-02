@@ -1798,7 +1798,6 @@ public partial class MainWindow : Window
         _preview?.SetPlan(_info, ActivePlan, _profile);
     }
 
-    /// <summary>
     /// <summary>Ölçü için: arka planda koşan yoklama var mı.</summary>
     internal bool PlanProbePending => _planEncoders?.Pending ?? false;
 

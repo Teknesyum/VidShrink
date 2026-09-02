@@ -117,7 +117,7 @@ kodlayıcının 10 bit taşıyıp taşımadığı bilinmiyor. Kusur "uyarı yok"
 yanlış nedeni gösteriyor".
 
 *Yoklama süresi.* `libsvtav1` yoklaması bu makinede taze `EncoderCapabilities` ile
-24 tekrar: **75–232 ms**. Öldürme sınırının %1,5'i. Boş makinede sınırı aşmak mümkün
+uc kosum x 8 tekrar (toplam 24): **75–232 ms**. Öldürme sınırının %1,5'i. Boş makinede sınırı aşmak mümkün
 değil.
 
 Sınırın **aşıldığı** durum bu sözleşmede ölçülmedi ama başkası ölçtü: T123'ün ölçümü
@@ -160,7 +160,7 @@ Düzeltme altı yerden tek tek geri alındı, her seferinde ölçü koşuldu, so
 | # | geri alınan | kırılan ölçü |
 |---|---|---|
 | M1 | `Recalculate` yine gerçek yetenek nesnesini görüyor (K2) | `TheWindowThreadNoLongerWaitsForTheProbe`, `RepeatedRecalculatesDoNotRepeatTheProbe` |
-| M2 | donanım kodlayıcısında "ölçülmedi" kontrolü kalkıyor (K3) | **ilk turda hiçbiri** |
+| M2 | donanım kodlayıcısında "ölçülmedi" kontrolü kalkıyor (K3) | **ilk turda hiçbiri** -> olcu eklendikten sonra `AnUnmeasuredHardwareEncoderDoesNotBecomeATonemapVerdict` |
 | M3 | yazılım kodlayıcısında "ölçülmedi" kontrolü kalkıyor (K3) | `AnUnmeasuredEncoderDoesNotBecomeATonemapVerdict`, `TheSameSourceFlipsBetweenHdrAndSdrWhenOnlyTheProbeAnswerChanges` |
 | M4 | `PickFastCodec` ölçülmemişi "yok" sayıyor (K3) | `AnUnmeasuredFastPathDoesNotBecomeANoHardwareVerdict` |
 | M5 | yerleşmeyen yoklama "ölçüldü" sayılıyor (K2, dördüncü yasak) | `AnUnsettledProbeIsNeverPromotedToAMeasurement` |

@@ -21,6 +21,7 @@ sarilmis halde de birebir sayilir. Bagimlilik yok, Python 3.
 import argparse
 import re
 import sys
+sys.stdout.reconfigure(encoding="utf-8")
 from pathlib import Path
 
 SURUM = "1.0"
@@ -480,7 +481,7 @@ def komut_bayat():
     duzeltilmemis = [b for b in BAYAT if "düzeltilmemiş" in b["durum"]]
     print(f"\n{len(BAYAT)} iddia; {len(duzeltilmemis)}'i düzeltilmemiş "
           "(karşılığı ölçülmedi). Çok satıra yayılan iddia ilk satırında çapalandı; "
-          "`tara` çıktısındaki 30 satırın tamamı bu tabloda bir satıra düşüyor.")
+          "`tara` T135 oncesi harita (`890af6e`) uzerinde 30 satir yakalamisti; hepsi bu tabloda bir satira dusuyor. `tara` bugun duzeltilmis haritayi tarar, sayisi farklidir.")
     print("Satır numaraları haritanın **T135 öncesi** hâline aittir (`890af6e`); "
           "bugünkü hâlde kaymışlardır — çapa bölüm başlığıdır, satır değil.")
     return 0
