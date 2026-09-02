@@ -368,15 +368,37 @@ public sealed class ComplexityScanTests
         var capabilities = new ColdCapabilities();
 
         var unwarmed = FfmpegArguments.Build(info, plan, "cikti.mp4", 0, null, capabilities);
-        Assert.DoesNotContain("-x265-params", unwarmed);
+        Assert.Equal("keyint=300:min-keyint=30:scenecut=40", TekParametre(unwarmed, "-x265-params"));
         Assert.Equal(0, capabilities.Warmups);
 
         var printed = EncodeRunner.EncodeArguments(info, plan, "cikti.mp4", 0, null, capabilities);
         var run = EncodeRunner.EncodeArguments(info, plan, "cikti.mp4", 0, null, capabilities);
 
-        Assert.Contains("-x265-params", printed);
-        Assert.Contains("psy-rd=2:psy-rdoq=1:aq-mode=2", printed);
+        Assert.Equal(
+            "keyint=300:min-keyint=30:scenecut=40:psy-rd=2:psy-rdoq=1:aq-mode=2",
+            TekParametre(printed, "-x265-params"));
         Assert.Equal(run, printed);
+    }
+
+    /// <summary>
+    /// Bayragin degerini dondurur ve bayragin komutta <b>bir kez</b> gectigini iddia eder.
+    /// ffmpeg ayni bayragi ikinci kez gorunce birincisini sessizce atar; birlestirme
+    /// (<c>FfmpegArguments.MergeEncoderParams</c>) bunu onlemek icin var, olcu de onu bekliyor.
+    /// </summary>
+    private static string TekParametre(IReadOnlyList<string> args, string flag)
+    {
+        var at = -1;
+        var count = 0;
+        for (var i = 0; i < args.Count; i++)
+        {
+            if (!string.Equals(args[i], flag, StringComparison.Ordinal)) continue;
+            count++;
+            if (at < 0) at = i;
+        }
+
+        Assert.Equal(1, count);
+        Assert.True(at + 1 < args.Count, flag + " degersiz kalmis.");
+        return args[at + 1];
     }
 
     [BenchSourceFact]

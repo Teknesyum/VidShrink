@@ -373,8 +373,17 @@ sıralaması I-kare yoğunluğuyla birebir uyumlu ve üç ölçütte de (p50, p9
 sırada; yön bu yüzden kararlı sayıldı, mutlak milisaniye değeri sayılmadı.
 
 Karar: HandBrake rejimi p10'da sabit rejime göre +0,699 kazandırıyor ama atlama bedelini
-**2,6 katına** çıkarıyor. Dinamik rejim aynı kazancın %84'ünü (+0,589) alıyor ve bedeli
-1,5 katta tutuyor; üstelik ortalamada üçünün en iyisi. Aralık bu yüzden kısaltıldı: üst
+**1,88 katına** çıkarıyor. Dinamik rejim aynı kazancın %84'ünü (+0,589) alıyor ve bedeli
+**1,48 katta** tutuyor; üstelik **K3'ün kalite ortalamasında** üçünün en iyisi (88,9580'e
+karşı 88,9187 ve 88,6303). *(Düzeltme, tur 3: bu paragraf HandBrake için **2,6 kat** diyordu; o oran
+reddedilen n=120 ardışık koşumdan geliyor (328,3/128,0) ve reddedilen rejimi olduğundan
+kötü gösteriyordu. Geçerli sayılan dönüşümlü koşumda 195,6/103,8 = **1,88**. Dinamik için
+yazılan 1,5 iki koşumda da aynı çıkıyor (189,4/128,0 = 1,48 ve 153,4/103,8 = 1,48), yalnız
+yuvarlaması sıkılaştırıldı; bkz. **K4 yeniden**. Paylaşımlı-makine muafiyeti mutlak
+milisaniyeler içindir; orana geçmez. Ayrıca "ortalamada üçünün en iyisi" cümlesi atlama tablosunun yanında
+duruyordu ve orayı işaret ediyor gibi okunuyordu; atlamanın ortalama sütununda dinamik
+**ortada** (236,5 ms), en iyi olduğu sütun K3'ün kalite ortalaması. Sıralama kararı
+değişmedi.)* Aralık bu yüzden kısaltıldı: üst
 sınırın kıskacı 10 saniyeye kadar açık ama harita kısa sahne bildirdiğinde 5 saniyeye
 iniyor ve gecikme oraya değil buraya yaslanıyor.
 
@@ -417,8 +426,12 @@ Sözleşmenin sorduğu şikâyet durumu taban oranı ≈4,7. Klibin 20 MiB hedef
 Sözleşmenin sorusunun cevabı: **4,6 oranında tepeyi açmak boyutu aşırmıyor** — üç değerin
 üçü de hedefin altında, üstelik 1,50 (0,9482) 1,02'den (0,9669) küçük çıkıyor. Ve kazanç
 var: p10 69,812 → 71,241 → 73,477, üç noktada tek yönlü, toplam **+3,665**. 10,2 oranında
-aynı sıralama yok ve fark 0,1 mertebesinde — yani VBV yalnız bütçe sıkışıkken bağlıyor,
-bu da mekanizmayla tutarlı.
+aynı sıralama yok: p10 yayılımı **0,506** (84,211 / 83,705 / 84,108), mean yayılımı 0,190,
+ve yön tek değil — en yüksek p10'u en dar VBV (1,02) veriyor. *(Düzeltme, tur 3: bu cümle
+önce "fark 0,1 mertebesinde" diyordu; tablodaki yayılım beş katı. Yargı değişmiyor, çünkü
+yargıyı taşıyan şey büyüklük değil **yönün kaybolması**: 4,6 oranında üç nokta tek yönlü
+ve toplam +3,665, 10,2 oranında sıralama bozuluyor.)* Yani VBV yalnız bütçe sıkışıkken
+bağlıyor, bu da mekanizmayla tutarlı.
 
 **Karar: eğri değişmedi — ölçüldü, değişmedi.** Gerekçe: kazancı almanın yolu açılma
 noktasını indirmek değil `TightPeakFactor`'ı yükseltmek. Açılma noktasını ölçülen 4,6'ya
@@ -531,11 +544,23 @@ burası olduğu için iki kural aynı ızgarada koşturuldu: libx264, 2 geçiş,
 Kapılar dört satırda da geçti: `pix_fmt yuv420p10le`, renk `bt2020nc`, akış 1→1, boyut
 farkı %0,04 ve %0,29.
 
-**Karar: medyana geçildi.** Üst sınırın gerçekten bağladığı klipte (`parca-1-20sn`) medyan
-kuralı iki kalite ölçüsünde de önde (+0,077 mean, +0,020 p10) ve atlama bedelini
-**%24 düşürüyor**. Kesimli klipte fark iki yönde de 0,06'nın altında, yani orada kural
-seçimi ölçülemiyor — beklenen davranış, çünkü orada yerleşimi zaten scenecut belirliyor.
-Hiçbir yerde medyan kaybettirmiyor, bağladığı yerde kazandırıyor.
+**Çözünürlük tabanı.** İki kuralın denk çıkması beklenen klipte (`kesimli-20sn`, yerleşimi
+zaten scenecut belirliyor) gözlenen en büyük fark **0,057**. Bu tablonun ayırt edebildiği
+en küçük kalite farkı odur; **0,057 ve altı** "önde" sayılmaz.
+
+**Karar: medyana geçildi.** Gerekçe iki sayı:
+
+- Üst sınırın gerçekten bağladığı klipte (`parca-1-20sn`) medyan **mean'de +0,077** —
+  tabanın üstünde, tek ölçülebilir kalite farkı ve medyan lehine.
+- Aynı klipte atlama bedeli **%24 düşüyor** (202,6 → 154,9 ms, paylaşımlı makine damgalı).
+
+Tabanı geçemeyen ve bu yüzden **karara girmeyen** üç sayı: `parca-1-20sn` p10 +0,020
+(medyan lehine), `kesimli-20sn` p10 +0,057 (medyan lehine), `kesimli-20sn` mean **−0,053**
+(ortalama lehine). *(Düzeltme, tur 3: bu paragraf önce p10 +0,020'yi kendi koyduğu 0,06
+tabanının altında olmasına rağmen "önde" sayıyordu ve "hiçbir yerde medyan kaybettirmiyor"
+diyordu — tablosundaki −0,053 bunun tersini söylüyor. Tablo doğruydu, özet taşıyordu.
+Doğrusu: **medyanın ölçülebilir bir kaybı yok**; ölçülebilir tek kalite farkı onun lehine,
+karar da zaten oraya ve atlamaya dayanıyor.)*
 
 ### Kıskaç hâlâ bağlıyor mu — evet, iki ucundan da
 
@@ -643,8 +668,81 @@ ve bedava.
 konumların dördü tespit edilen kesimlerle **birebir**, biri 83 ms yakınında. Yani üst sınır
 kıskacının içinde yerleşim gerçekten içerikten geliyor, ızgaradan değil.
 
+### CI kırmızısı — kök, ve yoklamanın gerçekten değişip değişmediği
+
+Dar süzgeç (`--filter "FfmpegArgumentsTests"`) kabul kriterini ölçtü, gerilemeyi ölçmedi.
+CI koşumu `33579490691` tek kırmızı verdi:
+`ComplexityScanTests.ThePrintedCommandIsTheCommandThatWouldRun`, `ComplexityScanTests.cs:371`,
+`Assert.DoesNotContain("-x265-params", unwarmed)`.
+
+**Kök, sanıldığı yer değil.** İlk okuma "anahtar kare işi karmaşıklık yoklama komutuna
+sızdı" idi. Sızıntı yok, ve bu ölçüldü:
+
+- Yoklamanın komutunu `ComplexityProbe.EncodeTo` üretiyor (`ComplexityProbe.cs:579`):
+  `-c:v libx264 -crf 23 -preset medium -f matroska <hedef>`. `FfmpegArguments`'a
+  hiç uğramıyor; `-g` de `-x265-params` de orada değil.
+- Dosya düzeyinde de doğrulandı: `git diff origin/main...HEAD -- src/VidShrink.Ffmpeg
+  src/VidShrink.Core/ComplexityProfile.cs src/VidShrink.Core/PlanCalculator.cs` **boş**.
+- `ComplexityProbe`'un ürettiği komut altı örnek pencerede elle koşturuldu ve üretimdeki
+  bayt sayıları kayda geçti (aşağıdaki `üretim` sütunu). Bu sayılar T101/T103'ün zeminidir
+  ve **kaymadı**.
+
+Kırmızı, `ComplexityScanTests.cs` dosyasının içinde duran ama karmaşıklıkla ilgisi olmayan
+**T92 ölçüsünden** geliyor: "ısıtılmamış çağıran psy/AQ'yu sessizce almasın". O ölçü
+psy/AQ'nun varlığını **`-x265-params` bayrağının varlığıyla** vekâleten sınıyordu. Bu
+sözleşme aynı bayrağa `keyint`/`min-keyint`/`scenecut` yazınca vekil bozuldu — ürün değil,
+vekil. Ölçü gevşetilmedi, **sıkıldı**: artık bayrağın kendisi değil değeri sınanıyor
+(ısıtılmamışta tam olarak `keyint=300:min-keyint=30:scenecut=40`, ısıtılmışta tam olarak
+o değerin sonuna `:psy-rd=2:psy-rdoq=1:aq-mode=2` eklenmiş hâli) ve bayrağın komutta
+**bir kez** geçtiği de iddia ediliyor. Not: dosyadaki `Assert.Contains("psy-rd=2:...",
+printed)` satırı öge eşitliği arıyordu ve birleştirme yüzünden o da kırılacaktı; CI onu
+göremedi çünkü ölçü ilk iddiada duruyor.
+
+Ölçünün hâlâ kurulduğu kusuru yakaladığı iki mutasyonla sınandı:
+
+| Mutasyon | Sonuç |
+|---|---|
+| `Build` içinde `CachedPsychovisualArgs` → `PsychovisualArgs` (saf yol ölçüm yapar) | Başarısız 1 / 42 |
+| `Build` sonunda `MergeEncoderParams(a)` → `a` (bayrak iki kez geçer) | Başarısız 1 / 42 |
+
+İkincisini eski hâli **yakalayamıyordu**; yeni hâli yakalıyor.
+
+**Yoklama çıktısı — ölçüldü, değişmedi.** Üretim komutu ile, sızıntı gerçek olsaydı
+oluşacak komut yan yana koşturuldu (2 sn pencere, `-crf 23 -preset medium`, matroska; bayt):
+
+| Klip | Başlangıç | üretim (bugün) | `-g 300` eklenseydi | `-g 600` eklenseydi |
+|---|---:|---:|---:|---:|
+| `parca-1` | 4 sn | 3 602 457 | 3 570 326 | 3 570 326 |
+| `parca-1` | 10 sn | 3 175 140 | 3 175 140 | 3 175 140 |
+| `parca-2` | 4 sn | 226 268 | 226 268 | 226 268 |
+| `parca-2` | 10 sn | 228 836 | 228 836 | 228 836 |
+| `parca-3` | 4 sn | 3 948 110 | 3 948 110 | 3 948 110 |
+| `parca-3` | 10 sn | 3 308 743 | 3 308 743 | 3 308 743 |
+
+Üretim sütunu bugünün çıktısıdır ve bu sözleşmenin diff'i yoklama yolunun tek satırına
+dokunmadığı için tur öncesiyle aynıdır. Karşı-olgusal sütunlar şunu söylüyor: sızıntı
+gerçek olsaydı altı örneğin beşi kılı kılına aynı kalır, biri **%0,89** kayardı
+(`parca-1` 4 sn). Kayan tek örnekte hangi bayrağın yaptığı ayrıca ayrıştırıldı: `-g 600`
+tek başına ve `-keyint_min 60` tek başına **aynı** sayıyı veriyor (3 570 326), yani sebep
+`-g`'nin değeri değil — GOP kısıtının varlığı. Daha ileri ayrıştırılmadı. Yani sızıntı
+sessiz olmazdı ama küçük olurdu; ölçüyü bayrağın varlığına değil değerine bağlamanın
+gerekçesi de bu.
+
+**Aynı vekil başka yerde var mı — arandı.** Süitte birleşik parametre bayraklarını
+öge olarak sınayan üç yer daha var, üçü de `HdrArgumentsTests.cs` içinde (82, 174, 186).
+Üçü de bugün doğru: 82 ve 186 libx265 HDR yolunda, bayrak zaten var; 174 `av1_nvenc`
+planında ve bu sözleşme donanım yolunda `-x265-params` üretmiyor (`-g` + `-keyint_min`).
+Yalnız 174 aynı vekil kalıbını taşıyor — psy/AQ bir gün donanım planına sızsa o ölçü
+bunu yakalar ama sebebini söyleyemez. Dosya bu sözleşmenin `owns`'unda değil, dokunulmadı.
+
+**Kural değişikliği.** Teslimden önce dar süzgeç yetmiyor; tam süit ya da
+`tools/ci-gibi-kos.sh` koşuyor.
+
 ### Ölçülmeyenler
 
+- **Yoklama çıktısının tur öncesi hâli ayrıca koşturulmadı.** Tablodaki üretim sütunu bugünün
+  ağacında ölçüldü; tur öncesiyle aynı olduğu, yoklama yolunun diff'te boş çıkmasından
+  çıkarıldı — iki ağaçta yan yana koşturularak doğrulanmadı.
 - **`tools/VidShrink.Ab` kullanılamadı** — T95 bu tur boyunca `main`e inmedi. Renk kapısı,
   akış sayısı kapısı ve boyut karşılaştırılabilirliği elle uygulandı ve her satırda
   raporlandı; aletin sağladığı **duyarlılık kanıtı** (ölçünün gerçek bir farkı ayırt
@@ -678,8 +776,8 @@ kıskacının içinde yerleşim gerçekten içerikten geliyor, ızgaradan değil
 - **Ölçüm düzeneği `tools/`a taşınamadı.** `.calisma/t98/olcum/` ve tur 2'nin betikleri
   git dışında kaldı; `tools/` bu sözleşmenin `owns`'unda değil, yazma kapıya takılıyor.
   Rapora yazıldı, taşıma T0'da.
-- **Harita yolu üretimde bağlı değil.** `MainWindow.axaml.cs:1796`, `PreviewSegment.cs:161`
-  ve `EncodeRunner.cs:244` hiçbiri `scenes` geçirmiyor, dolayısıyla bugün üretimde üst
+- **Harita yolu üretimde bağlı değil.** `MainWindow.axaml.cs:1807`, `PreviewSegment.cs:161`
+  ve `EncodeRunner.cs:246` hiçbiri `scenes` geçirmiyor, dolayısıyla bugün üretimde üst
   sınır **her zaman 10 saniyelik varsayılan**. Bu belgedeki haritalı sayılar `FfmpegArguments`
   seviyesinde geçerli, uçtan uca değil. Üç dosya da bu sözleşmenin `owns`'unda değil —
   bağlama işi ayrı sözleşme.
