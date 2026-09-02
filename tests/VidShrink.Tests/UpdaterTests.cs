@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
@@ -887,7 +887,11 @@ public sealed class UpdaterTests : IDisposable
         var start = new ProcessStartInfo { FileName = incoming, WorkingDirectory = root, UseShellExecute = false };
         start.ArgumentList.Add(LauncherUpdate.CommitArgument);
         using var process = Process.Start(start)!;
-        Assert.True(process.WaitForExit(60_000), "geçiş süreci çıkmadı");
+        var gecis = Stopwatch.StartNew();
+        var cikti = process.WaitForExit(60_000);
+        gecis.Stop();
+        _output.WriteLine($"geçiş süreci: {gecis.Elapsed.TotalMilliseconds:F0} ms (tavan 60000 ms)");
+        Assert.True(cikti, "geçiş süreci çıkmadı");
 
         _output.WriteLine($"çıkış kodu: {process.ExitCode}, kökte: {RootListing(root)}");
         Assert.Equal(0, process.ExitCode);
@@ -1112,6 +1116,8 @@ exit $code
         return (installRoot, locked, WriteRemovalProbe(work), Path.Combine(work, "gunluk.txt"));
     }
 
+    private static readonly TimeSpan KilitBirakmaTavani = TimeSpan.FromSeconds(2);
+
     [Fact]
     public void TheDeletionStepWaitsOutATransientLock()
     {
@@ -1138,7 +1144,12 @@ exit $code
         var stopwatch = Stopwatch.StartNew();
         var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
         stopwatch.Stop();
-        Assert.True(release.Join(TimeSpan.FromSeconds(10)), "kilidi bırakan iş parçacığı bitmedi");
+        var birakma = Stopwatch.StartNew();
+        var birakildi = release.Join(KilitBirakmaTavani);
+        birakma.Stop();
+        _output.WriteLine($"kilidi bırakan iş parçacığı: {birakma.Elapsed.TotalMilliseconds:F0} ms " +
+                          $"(tavan {KilitBirakmaTavani.TotalMilliseconds:F0} ms)");
+        Assert.True(birakildi, "kilidi bırakan iş parçacığı bitmedi");
 
         _output.WriteLine($"geçici kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
         _output.WriteLine(log.Trim());
