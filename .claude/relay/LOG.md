@@ -336,3 +336,55 @@ damgalariyla dogruladi (`eb9165c` 10:48 < ilk ham cikti 11:43).
    dogru haritanin ustunde. Rapor hemen ardindan dogru acikliyor ama `Sonuc`
    maddesinde 0.000 tek basina yaniltici — T138.
 2026-09-02 T136 builder: submitted, T130'un uc borcu kapandi. Baslat artik donanim olcumune bakmiyor (yoklama cevapsizken de sikistirilabiliyor), yoklama istisnasi ucuncu durumda kaliyor (ProbeAnswer bes durumlu, istisna metni durum satirina cikiyor), d>=0 iddiasi gecidin olctugu sureyi kendi yerlesme karariyla yuzlestiriyor. Yerlesmemis yoklamaya iki yeni anahtar (probe-unsettled / probe-failed), T128'in Core cumlesinin dort arayuz kopyasi hizalandi ve ilk kez bir olcuyle bagli. Dort K'nin dordu mutasyonla kirildi (k1:1, k2:1, k3:3, k6:1 kirmizi / 70). Yerel tam suit 1331/1348 yesil, CI 33631540902 success 1330/1348, kosum kapisi gecti. Dal T136-baslat-kilidi (702d2a0), main'e birlestirilmedi. Kapsam disi: EncoderCapabilities.WorksAsEncoder:70 hala Unmeasured'i false'a katliyor (denetci borc 2). DENETIM BEKLIYOR.
+
+## T136 — Baslat kilidi (muhur, denetim GECTI, KRITIK yok)
+
+Uc urun kusuru da kapandi: donanim hic olculemeyince Baslat dugmesinin **kalici**
+kilitlenmesi, yoklama istisnasinin bos `catch` ile yutulmasi, `Unsettled`in yapiskan
+olmasi. Ucuncu durum artik bes durumlu `ProbeAnswer` ile tasiniyor ve kullaniciya
+iki dilde ayri cumleyle cikiyor (`main.status.probe-unsettled` / `probe-failed`).
+
+**Denetci mutasyonlari kendi kosturdu.** Temiz agac 70/70; K1+K2 mutasyonu tam
+hedefledigi iki olcuyu kirdi (2/70), K3 mutasyonu ucu (3/70). CI `33631540902`
+success, 1330/1348, kosum kapisi gecti, `702d2a0..18dec9f` arasi `src`/`tests`
+degisikligi yok — yani CI teslim edilen kodu olctu.
+
+**Iki kronik tuzak bu turda gorunur oldu ve ikisi de kapatildi.** Yapicinin ilk
+K2 mutasyonu `-warnaserror` altinda `CS0162` verip **derlemeyi dusurdu**, ama
+`dotnet test` eski ikiliyi kosturup `Basarisiz: 0` yazdi — `--no-build` yazmasan
+da ayni tuzak. Ikincisi: K3'un ilk pini `MachineIsQuiet` kapisinin **altindaydi**,
+hic kosmadan yesil sayiliyordu. Denetci ikisinin de duzeltilmis halini bagimsiz
+dogruladi.
+
+### On borc
+
+1. `docs/olcumler/baslat-kilidi.md:12` — "kullanici sikistirabiliyor" olculmedi.
+   K1'in yazili ilk cumlesi "bir dosya sikistiriliyor" diyor; kriterin kendi verdigi
+   olcu (`BtnStart.IsEnabled`) tutuyor ama uctan uca kosum yok.
+2. `MainWindow.axaml.cs:1364` `FirstFailure` **yapiskan**: bir kez istisna dusen kayit
+   hic temizlenmiyor, sonraki yerlesmis yoklamalardan sonra da durum satiri
+   `probe-failed` kaliyor. Ayrica `hdr10:` anahtarlarini da tariyor — T137.
+3. K4 yalniz kodla dogrulandi; `ReportUnsettledProbe`un sectigi anahtarin
+   `TxtSystemStatus`a ciktigini tutan olcu yok (rapor kabul ediyor).
+4. **`PlanCalculatorProbeTests.cs:448` olcmuyor ve rapor olcmus gibi sunuyor.**
+   `Assert.True(d < ProbeKillMs)`: gercek sureler 60-100 ms, sinir 15 000 ms;
+   pratikte kirilamaz ve `MachineIsQuiet` kapisinin altinda. Kanit dosyasinda
+   "8 tekrar" satiri **yok**, yani bu kol bu sozlesmede hic kosmadi; rapor 159-161.
+   satirlarda T130'un ana agactaki sayilarini aliyor. Kronik "ozet veriden kayiyor"
+   kusurunun bu turdaki hali — T137.
+5. K6'da yalniz `en/main.reason.encoder-fallback` Core'a bagli; kalan uc satir duz
+   metin `Assert.Contains` ile tutuluyor. Core cumlesi degisirse `tr` sessizce kayar.
+6. Rapor yerel `1331/17` ile CI `1330/18` farkini uzlastirmiyor (fark CI'da atlanan
+   bir `Live*` olcusu; zararsiz ama aciklanmamis).
+7. Rapor 277-278'in gerekcesi gecersiz: "ucu de CI'da kostu" delili SKIP satirlarinin
+   yoklugu, oysa ikisi `if (!ToolLocator.IsAvailable(out _)) return;` ile erken donuyor
+   ve xUnit bunu SKIP degil PASS yazar. Iddia dogru cikiyor, gerekce yanlis.
+8. `owns` disi iki dosya degisti: `LOG.md` ve `contracts/T136.md`. Depo teamulu
+   (T128, T130, T134 aynisini yapti) ama `side_effects: []` ile celisiyor.
+9. `MaxAttempts` dolduktan sonra yoklama bir daha denenmiyor; K1 yalniz dugmeyi
+   serbest birakiyor (rapor kabul ediyor).
+10. **`MainWindow.DeferredEncoderAvailability.WorksAsEncoder` (`:1312`) `Failed`/
+    `Unsettled`i hala `false`a katliyor** — `EncoderCapabilities.cs:70` ile ayni
+    daralmanin arayuz tarafindaki ikizi. T137 acildiginda yalniz Ffmpeg tarafini
+    kapsiyordu; App tarafi da T137'ye eklendi.
+- T138 submitted — uc etiket cumlesi veriye hizalandi (manset zones 3/5 tabani gecti + 1/5 en iyi aday, K4 destek=hayir gerekcesi iki kola ayrildi, K7 en buyuk p10 kaybi -0.014); sayim denetcisi 12 -> 18 iddia, 5 mutasyonun hepsi hedefledigi iddiayi kirdi; T114'un hukmu ('Dagitim koda girmez.') degismedi. Dal T138-rapor-etiketleri 37bae0d.

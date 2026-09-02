@@ -1,0 +1,18 @@
+{
+  "contractId": "T136",
+  "auditorRunId": "a3ca91fce19f0d4fa",
+  "headSha": "b3377a2aa789752a52bc3e98649607c88f2d28b3",
+  "diffHash": "65ca1a2481709c4e804b35ea7560f41682c4d96c35e94a4695842e11a20d08fc",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "src/VidShrink.App/Locales/en/main.json",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs",
+    "docs/olcumler/baslat-kilidi.md"
+  ],
+  "verification": [
+    "GECTI, KRITIK yok. Denetci arsiv kopyasinda calisti, depoya yazmadi. Kendi kosturduklari: temiz agac 70/70 yesil; K1+K2 mutasyonu 2/70 kirmizi (tam hedefledigi iki olcu); K3 mutasyonu 3/70 kirmizi. Iki kronik tuzagin ikisinin de kapali oldugu dogrulandi — yeni K2 mutasyonu -warnaserror altinda 0 uyari/0 hata derledi (dll zaman damgasi kaynaktan sonra), K3'un iddiasi MachineIsQuiet kapisinin ustunde ve mutasyonla denetcinin kendi kosumunda da kirildi. CI 33631540902 success, 1330/1348, kosum kapisi gecti, 18 SKIP'in hicbiri yeni olculer degil, 702d2a0..18dec9f arasi src/tests degisikligi yok. Satir kunyeleri ve dort yerellestirme cumlesi birebir dogrulandi. On borc kaydedildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T13:19:53.764Z"
+}
