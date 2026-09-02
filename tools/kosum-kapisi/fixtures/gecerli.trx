@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="00000000-0000-0000-0000-000000000000" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <ResultSummary outcome="Completed">
+    <Counters total="1150" executed="1120" passed="1120" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>
