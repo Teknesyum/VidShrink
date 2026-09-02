@@ -499,6 +499,24 @@ public sealed class PlanCalculatorProbeTests
         Assert.Null(olculen.FailureFor("av1_nvenc"));
     }
 
+    [Fact]
+    public void EncoderStateGecidinDortDurumunuUcDurumaDogruDusuruyor()
+    {
+        var patlayan = new MainWindow.DeferredEncoderAvailability(new ThrowingAvailability(), () => { });
+        var calismiyor = new MainWindow.DeferredEncoderAvailability(new RecordingAvailability(TimeSpan.Zero), () => { });
+        var calisiyor = new MainWindow.DeferredEncoderAvailability(new RecordingAvailability(TimeSpan.Zero, _ => true), () => { });
+        var hicOlculmemis = new MainWindow.DeferredEncoderAvailability(new RecordingAvailability(TimeSpan.Zero), () => { });
+
+        Drain(patlayan, "av1_nvenc");
+        Drain(calismiyor, "av1_nvenc");
+        Drain(calisiyor, "av1_nvenc");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, patlayan.EncoderState("av1_nvenc"));
+        Assert.Equal(EncoderProbeState.NotWorking, calismiyor.EncoderState("av1_nvenc"));
+        Assert.Equal(EncoderProbeState.Working, calisiyor.EncoderState("av1_nvenc"));
+        Assert.Equal(EncoderProbeState.Unmeasured, hicOlculmemis.EncoderState("av1_nvenc"));
+    }
+
     /// <summary>
     /// T136/K1. Yoklama surekli yerlesmezken plan <c>HardwareNotMeasured</c> kaliyor ama
     /// Baslat calisiyor. Donanim sorusuna cevap alamamak yazilim kodlayicisiyla

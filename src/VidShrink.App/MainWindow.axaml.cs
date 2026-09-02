@@ -1314,6 +1314,13 @@ public partial class MainWindow : Window
             lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) && answer.Works;
         }
 
+        public EncoderProbeState EncoderState(string codec) => AnswerFor(codec) switch
+        {
+            ProbeAnswer.Working => EncoderProbeState.Working,
+            ProbeAnswer.NotWorking => EncoderProbeState.NotWorking,
+            _ => EncoderProbeState.Unmeasured
+        };
+
         public string? Hdr10PixelFormat(string codec)
         {
             lock (_gate) return _answers.TryGetValue(Key("hdr10", codec), out var answer) ? answer.PixelFormat : null;
