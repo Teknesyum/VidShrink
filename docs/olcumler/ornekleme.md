@@ -1,10 +1,39 @@
 # Örnekleme — sabit pencere yerine içeriğe bağlı seçim (T103)
 
-Ölçülen commit: `ef9e905` (dal `T103-icerik-ornekleme`, `main` `b9a6544` üzerinden).
+Ölçülen commit: `8e7ca2a` (dal `T103-icerik-ornekleme`, `main` `b9a6544` üzerinden).
+K1-K4 ve K6 tabloları `ef9e905`'te ölçüldü; o commit'ten bu yana `ComplexityProbe.cs`
+davranışı değişmedi (`ef9e905..8e7ca2a` arasındaki tek kaynak değişikliği
+`ProductionPlan`'ın `internal`'dan `public`'e alınması ve yanlışlıkla commit'lenmiş
+bir mutantın geri alınması).
 ffmpeg 9.0 (gyan.dev), Windows 11, 2026-09-02. **Makine paylaşımlıydı** — aynı anda
 yedi ajanın ölçümü koşuyordu. Bu damga yalnız **süre** sayıları için geçerlidir;
 sapma sayıları yükten bağımsızdır, aynı kodlamaların yeniden kullanılan
 çıktılarından hesaplanır.
+
+## Künye — hangi sayı hangi aletle üretildi
+
+Bu projede iki ölçüm düzeneği var ve sayıları aynı tabloya karışmasın:
+
+| bölüm | alet | ürettiği büyüklük |
+|---|---|---|
+| K1, K2, K3, K6, gerçek kaynaklar, korelasyon | `tools/ornekleme` (bu sözleşme) | pencere yerleşim sapması, yoğun sayıma karşı |
+| K4 (süre) | `tools/ornekleme` | duvar saati, `-threads 4` |
+| K5 (kazanç) | **`tools/VidShrink.Ab`** (`origin/main`, ortak alet) | hedef boyutta VMAF-NEG |
+| K8 | `tools/ornekleme/mutasyon.sh` + `tools/ci-gibi-kos.sh` | test öldü/kaldı |
+
+**Seçim: (a) — kazanç ölçümü ortak aletle.** K5'in sayısı `tools/VidShrink.Ab`
+ile üretildi; T95'in düzeneği `main`'e `381e8ab` ile girdi, bu dalın tabanı
+(`b9a6544`) ondan öncedir, bu yüzden `origin/main`'den alınıp iki ayrı çalışma
+ağacında ayrı ayrı derlendi (`.calisma/t103/ab-taban` = `b9a6544`,
+`.calisma/t103/ab-dal` = dal başı). Alet planlayıcıyı süreç içinde çağırdığı için
+her ağaçta o ağacın kodunu ölçüyor; A/B'nin iki yanı arasındaki tek fark
+sözleşmenin değişikliği.
+
+K1-K4/K6'nın sayıları ortak aletle **üretilemez** — `VidShrink.Ab` hedef boyutta
+VMAF ölçer, pencere yerleşim sapması üretmez. Bu yüzden o sayılar hiçbir yerde
+`VidShrink.Ab` sayısıyla aynı tabloya konmadı; kıyaslandıkları tek şey aynı
+düzeneğin ürettiği "bugünkü sabit pencere" satırı.
+
 
 ## Ne ölçüldü, neye karşı
 
