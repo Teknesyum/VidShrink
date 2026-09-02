@@ -68,13 +68,16 @@ Her mutasyon yalnız kendi ölçüsünü kırdı; diğer dört ölçü yeşil ka
 
 | Girdi | Eski seçim/karar | Yeni seçim/karar |
 |---|---|---|
-| Kalite kipi, `MaxCompression`, `libsvtav1=Unmeasured` | `libx265` | `libsvtav1`, geçici |
-| Kalite kipi, `Fast` tercihi, `h264_nvenc=Unmeasured` | `libx264` | `h264_nvenc`, geçici |
-| Hızlı kip, `av1_nvenc=Unmeasured` | `libx264` | `av1_nvenc`, geçici |
-| Performans adayları: `h264_nvenc=NotWorking`, `h264_qsv=Unmeasured`, `h264_amf=Working` | `h264_amf` | `h264_qsv` |
-| Yazılım HDR, `libsvtav1=Unmeasured` | Kodek `libsvtav1`, SDR tone-map | Kodek `libsvtav1`, HDR korunur ve karar geçici |
+| `DeferredEncoderAvailability`, kalite kipi, `MaxCompression`, `libsvtav1=Unmeasured` | `libx265` | `libsvtav1`, geçici |
+| `DeferredEncoderAvailability`, kalite kipi, `Fast` tercihi, `h264_nvenc=Unmeasured` | `libx264` | `h264_nvenc`, geçici |
+| `DeferredEncoderAvailability`, hızlı kip, `av1_nvenc=Unmeasured` | `libx264` | `av1_nvenc`, geçici |
+| Üçlü üretim cevabı: `h264_nvenc=NotWorking`, `h264_qsv=Unmeasured`, `h264_amf=Working` | `h264_amf` | `h264_qsv` |
+| `DeferredEncoderAvailability`, yazılım HDR, `libsvtav1=Unmeasured` | Kodek `libsvtav1`, SDR tone-map | Kodek `libsvtav1`, HDR korunur ve karar geçici |
+| Doğrudan `EncoderCapabilities`, listede ve `Unmeasured` kodek | T137 sonrası `HasEncoder=true`; kodek kabul edilir | Aynı kodek kabul edilir; plan/HDR kararı geçici işaretlenir |
 | Her karar yerinde `Working` | Çalışan kodek kabul edilir | Değişmedi |
 | Her karar yerinde `NotWorking` | Kodek elenir | Değişmedi |
+
+Rebase tabanı `e0eee12`; T137 tur 2 bu tabanda `EncoderCapabilities.WorksAsEncoder`ın ölçülemeyen cevabını `HasEncoder(codec)` yapmış durumda. Bu nedenle doğrudan `EncoderCapabilities` kullanan üretim yolunda seçilen kodek değişmiyor; T139 farkı süreç doğurmadan üçlü cevabı tüketmesi ve geçicilik işaretidir. Seçim değişikliği, ölçülmemiş cevabı iki değerli yüzünde `false` taşıyan `DeferredEncoderAvailability` geçidinde görülür.
 
 Regresyon riski ölçülmemiş kodeğin sonraki gerçek yoklamada çalışmadığının anlaşılmasıdır. Plan ve HDR yolları bunu `HardwareNotMeasured` / `NotMeasured` ile geçici işaretleyip ölçüm sonrası yeniden hesaplamaya bırakıyor. Performans yolunda ise ölçülmemiş aday gerçekten başarısız olup daha sonraki aday çalışıyor olabilir; eski iki değerli yol aktif yoklamayla sonraki çalışan adayı seçtiğinde o tek koşum için doğru sonuca ulaşabiliyordu. Yeni yol kanıtsız eleme yapmıyor ve seçilen adayı performans koşumunun sınamasına bırakıyor; başarısızlık `HardwareEncoderFailed` olarak görünür.
 
@@ -88,14 +91,22 @@ Her kol ayrı `dotnet test -c Release --list-tests --filter "FullyQualifiedName~
 | `EncoderStateConsumptionTests` | 4 |
 | `HdrResolverTests` | 1 |
 | `PerformanceCheckTests` | 21 |
-| `EncoderAvailabilityTests` | 11 |
-| Toplam | 69 |
+| `EncoderAvailabilityTests` | 12 |
+| Toplam | 70 |
 
-Sıfır test bulan kol yok. Birleşik yerel koşum `56 başarılı / 12 başarısız / 1 atlanan` sonucunu verdi. Kırmızıların 11'i K2'nin etkilediği fakat T139 `owns` kümesi dışında kalan eski iki değerli sahtelerden geliyor:
+Sıfır test bulan kol yok. Genişletilen sahiplik kapsamında yalnız şu üç sahteye `EncoderState` eklendi:
 
-- `PlanCalculatorTests`: `SurucusuzMakine` ve `OlculmemisMakine` kullanan 6 ölçü.
-- `EncoderAvailabilityTests`: `Makine` kullanan 5 ölçü.
+1. `PlanCalculatorTests.FakeAvailability`
+2. `PlanCalculatorTests.SurucusuzMakine`
+3. `EncoderAvailabilityTests.Makine`
 
-Kalan kırmızı `PerformanceCheckTests.DonanimYoluKapatilincaKararDegisiyor`: gerçek ffmpeg koşumu `30231 ms` sürerek sabit `30000 ms` bütçeyi aştı. Sözleşme gereği zaman aşımı sabiti büyütülmedi.
+`OlculmemisMakine` değiştirilmedi. Bu sahte `IEncoderMeasurementState` ile ölçülmüşlük kanıtı taşıdığı için ortak `KnownState` köprüsü, üçlü cevap hâlâ `Unmeasured` ise ve eski arayüz “ölçüldü” diyorsa iki değerli sonucu okuyor. Böylece test iddiası ve K2'nin kanıtsız varsayılanı birlikte korunuyor.
 
-İlk iki dosya T139'un `owns` kümesinde değildir; bu nedenle sahtelere üçlü cevap eklenmedi. K6 yerelde yeşil değildir. İlk bakışta CI koşumu `33649528359` (`a381dbb`) sürüyordu. Sözleşmenin “bir kez bak, sürerse yaz ve devam et” sınırı gereği beklenmedi. Sahiplik genişletilmeden sözleşme teslim edilmiş sayılmaz.
+`DonanimYoluKapatilincaKararDegisiyor` tek başına yeniden çalıştırıldığında `14 s` içinde `1/1` yeşil geçti; önceki `30231 ms` sonucu eşzamanlı yük yapıntısıydı. Zaman aşımı sabiti değiştirilmedi.
+
+Son doğrulama:
+
+- `dotnet build VidShrink.sln -c Release --no-incremental`: başarılı, 0 uyarı, 0 hata.
+- Birleşik verify: `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`.
+- Test çağrılarında `--no-build` kullanılmadı.
+- Rebase sonrası CI koşum kimliği ve durumu son push'tan sonra eklenecek.

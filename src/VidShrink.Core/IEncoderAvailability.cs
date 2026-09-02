@@ -20,6 +20,17 @@ public interface IEncoderAvailability
     EncoderProbeState EncoderState(string codec) => EncoderProbeState.Unmeasured;
 }
 
+public static class EncoderAvailabilityState
+{
+    public static EncoderProbeState KnownState(this IEncoderAvailability availability, string codec)
+    {
+        var state = availability.EncoderState(codec);
+        if (state != EncoderProbeState.Unmeasured) return state;
+        if (availability is not IEncoderMeasurementState measured || !measured.IsMeasured(codec)) return state;
+        return availability.WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+    }
+}
+
 public interface IEncoderOptionAvailability
 {
     bool SupportsEncoderOption(string codec, string option, string value);

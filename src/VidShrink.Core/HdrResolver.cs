@@ -74,7 +74,7 @@ public static class HdrResolver
         if (SoftwareHdr10Codecs.Contains(codec))
         {
             if (availability is null) return true;
-            var encoderState = availability.EncoderState(codec);
+            var encoderState = availability.KnownState(codec);
             if (encoderState == EncoderProbeState.Unmeasured)
             {
                 notMeasured = true;

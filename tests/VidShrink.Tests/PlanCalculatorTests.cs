@@ -12,6 +12,8 @@ public sealed class PlanCalculatorTests
         public FakeAvailability(params string[] encoders) => _encoders = new HashSet<string>(encoders, StringComparer.OrdinalIgnoreCase);
         public bool HasEncoder(string name) => _encoders.Contains(name);
         public bool WorksAsEncoder(string codec) => _encoders.Contains(codec);
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
     }
 
     private static MediaInfo SampleInfo() => new()
@@ -522,6 +524,9 @@ public sealed class PlanCalculatorTests
             _yoklama[codec] = YoklamaSayisi(codec) + 1;
             return _works.Contains(codec);
         }
+
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
 
         public int YoklamaSayisi(string codec) => _yoklama.TryGetValue(codec, out var n) ? n : 0;
     }
