@@ -50,6 +50,7 @@ public static class Rapor
         var k7 = K7(sb, isKok, json, kollar, k5);
         KapiDenemesi(sb, isKok);
         Sonuc(sb, k2, k5, k7, k4, k4b);
+        Olculemeyenler(sb, isKok, json, kollar);
         K9(sb, isKok);
         Sinirlar(sb, isKok, k4b);
 
@@ -1000,6 +1001,71 @@ public static class Rapor
         sb.AppendLine("`SahneButcesi rapor` cagrisidir; girdi `tools/sahne-butcesi/kapi-fikstur.py`,");
         sb.AppendLine("kosum `bash tools/sahne-butcesi/04-kapi-denemesi.sh`. Bu tablodaki sayilar");
         sb.AppendLine("uydurma; olculen sey kapinin **ayirt edip etmedigi**.");
+        sb.AppendLine();
+    }
+
+    private static void Olculemeyenler(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
+    {
+        var satirlar = new List<(string Bolum, string Hucre, string Sebep)>();
+
+        foreach (var kol in kollar)
+            foreach (var p in Program.Pencereler)
+            {
+                var y = Path.Combine(isKok, $"k1-{kol}-{p.Ad}.json");
+                if (!File.Exists(y)) { satirlar.Add(("K1/K2", $"{kol}/{p.Ad}", "kosulmadi: `k1-*.json` yok")); continue; }
+                var k = JsonSerializer.Deserialize<K1Kaydi>(File.ReadAllText(y), json);
+                if (k is null) continue;
+                foreach (var b in k.Bilinmiyor) satirlar.Add(("K1/K2", $"{kol}/{p.Ad}", (string)b));
+                if (k.ReferansToplamBit == 0)
+                    satirlar.Add(("K1/K2", $"{kol}/{p.Ad}", "referans bit toplami sifir; hucre karara girmedi"));
+            }
+
+        foreach (var kol in kollar)
+            foreach (var p in Program.Pencereler)
+            {
+                var y = Path.Combine(isKok, $"k4b-{kol}-{p.Ad}.csv");
+                if (!File.Exists(y)) { satirlar.Add(("K4 eki", $"{kol}/{p.Ad}", "kosulmadi: `k4b-*.csv` yok")); continue; }
+                foreach (var l in File.ReadAllLines(y).Skip(1))
+                {
+                    var c = l.Split(';');
+                    if (c.Length >= 4 && !string.IsNullOrWhiteSpace(c[3]))
+                        satirlar.Add(("K4 eki", $"{kol}/{p.Ad} `{c[0]}`", c[3]));
+                }
+            }
+
+        foreach (var (bolum, on) in new[] { ("K5/K6", "k5"), ("K7", "k7") })
+            foreach (var kol in kollar)
+                foreach (var p in Program.Pencereler)
+                {
+                    var y = Path.Combine(isKok, $"{on}-{kol}-{p.Ad}.json");
+                    if (!File.Exists(y)) { satirlar.Add((bolum, $"{kol}/{p.Ad}", $"kosulmadi: `{on}-*.json` yok")); continue; }
+                    var kayitlar = JsonSerializer.Deserialize<List<OlcumKaydi>>(File.ReadAllText(y), json);
+                    if (kayitlar is null) continue;
+                    foreach (var o in kayitlar)
+                        if (!string.IsNullOrWhiteSpace(o.Bilinmiyor))
+                            satirlar.Add((bolum, $"{kol}/{p.Ad}", o.Bilinmiyor!));
+                }
+
+        sb.AppendLine("## Olculemeyenler");
+        sb.AppendLine();
+        if (satirlar.Count == 0)
+        {
+            sb.AppendLine("Yok: her kol x pencere hucresi olculdu.");
+            sb.AppendLine();
+            return;
+        }
+        sb.AppendLine("Asagidaki hucreler bir sayi uretmedi. Hicbiri varsayilana dusurulmedi ve");
+        sb.AppendLine("hicbiri ortalamaya karistirilmadi; kapilarda \"gecmedi\" degil `bilinmiyor`");
+        sb.AppendLine("sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.");
+        sb.AppendLine();
+        sb.AppendLine("| Bolum | Hucre | Sebep |");
+        sb.AppendLine("|-------|-------|-------|");
+        foreach (var t in satirlar)
+            sb.AppendLine($"| {t.Bolum} | {t.Hucre} | {t.Sebep} |");
+        sb.AppendLine();
+        var bolumler = satirlar.GroupBy(x => x.Bolum).OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
+        sb.AppendLine($"Toplam {satirlar.Count} satir, {bolumler.Count} bolumde: " +
+                      string.Join(", ", bolumler.Select(g => $"{g.Key} {g.Count()}")) + ".");
         sb.AppendLine();
     }
 

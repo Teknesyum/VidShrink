@@ -503,6 +503,46 @@ Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen 5 kodlayicinin yal
 Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve
 bu olcumden onceki commit'te sabitlendi.
 
+## Olculemeyenler
+
+Asagidaki hucreler bir sayi uretmedi. Hicbiri varsayilana dusurulmedi ve
+hicbiri ortalamaya karistirilmadi; kapilarda "gecmedi" degil `bilinmiyor`
+sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
+
+| Bolum | Hucre | Sebep |
+|-------|-------|-------|
+| K1/K2 | yedek/p2-durgun | plan passthrough (hevc); kodlama yok, sahneye bit dagitilmiyor |
+| K1/K2 | yedek/p2-durgun | referans bit toplami sifir; hucre karara girmedi |
+| K4 eki | maks/p1-karisik `zones` | libsvtav1 zone parametresini yok sayiyor (K4 izgarasi) |
+| K4 eki | maks/p1-karisik `qcomp` | duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor |
+| K4 eki | maks/p2-durgun `zones` | libsvtav1 zone parametresini yok sayiyor (K4 izgarasi) |
+| K4 eki | maks/p2-durgun `qcomp` | duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor |
+| K4 eki | maks/p3-hareketli `zones` | libsvtav1 zone parametresini yok sayiyor (K4 izgarasi) |
+| K4 eki | maks/p3-hareketli `qcomp` | duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor |
+| K4 eki | yedek/p2-durgun `zones` | plan passthrough (hevc) |
+| K4 eki | yedek/p2-durgun `qcomp` | plan passthrough (hevc) |
+| K4 eki | yedek/p3-hareketli | kosulmadi: `k4b-*.csv` yok |
+| K5/K6 | maks/p1-karisik | kosulmadi: `k5-*.json` yok |
+| K5/K6 | maks/p2-durgun | kosulmadi: `k5-*.json` yok |
+| K5/K6 | maks/p3-hareketli | kosulmadi: `k5-*.json` yok |
+| K5/K6 | uyumlu/p1-karisik | kosulmadi: `k5-*.json` yok |
+| K5/K6 | uyumlu/p2-durgun | kosulmadi: `k5-*.json` yok |
+| K5/K6 | uyumlu/p3-hareketli | kosulmadi: `k5-*.json` yok |
+| K5/K6 | yedek/p1-karisik | kosulmadi: `k5-*.json` yok |
+| K5/K6 | yedek/p2-durgun | kosulmadi: `k5-*.json` yok |
+| K5/K6 | yedek/p3-hareketli | kosulmadi: `k5-*.json` yok |
+| K7 | maks/p1-karisik | kosulmadi: `k7-*.json` yok |
+| K7 | maks/p2-durgun | kosulmadi: `k7-*.json` yok |
+| K7 | maks/p3-hareketli | kosulmadi: `k7-*.json` yok |
+| K7 | uyumlu/p1-karisik | kosulmadi: `k7-*.json` yok |
+| K7 | uyumlu/p2-durgun | kosulmadi: `k7-*.json` yok |
+| K7 | uyumlu/p3-hareketli | kosulmadi: `k7-*.json` yok |
+| K7 | yedek/p1-karisik | kosulmadi: `k7-*.json` yok |
+| K7 | yedek/p2-durgun | kosulmadi: `k7-*.json` yok |
+| K7 | yedek/p3-hareketli | kosulmadi: `k7-*.json` yok |
+
+Toplam 29 satir, 4 bolumde: K1/K2 2, K4 eki 9, K5/K6 9, K7 9.
+
 ## K9 — kural koda girdiyse mutasyon kaniti
 
 `src/VidShrink.Core/SceneBudget.cs` **yok**: dagitim kurali uretim koduna
