@@ -434,6 +434,7 @@ public sealed class EncodeRunner
         {
             tail.Enqueue(line);
             while (tail.Count > TailLines) tail.TryDequeue(out _);
+            if (FfmpegDiagnostics.ReportsADroppedOption(line)) dropped.Add(line);
         }
 
         public EncodeCommandOutcome Close(int exitCode)

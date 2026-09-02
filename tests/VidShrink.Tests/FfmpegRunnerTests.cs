@@ -59,4 +59,61 @@ public sealed class FfmpegRunnerTests
             "ffmpeg 'Error parsing option zzznotreal: 1.' yazip 0 ile dondu; dusurulen ayar sonuca tasinmali.");
         Assert.Contains(run.DroppedOptions!, line => line.Contains("zzznotreal"));
     }
+
+    /// <summary>Olcum D — libx265, `-x265-params zzznotreal=1`, cikis kodu 0.</summary>
+    internal const string X265DroppedKey = """
+        Stream mapping:
+          Stream #0:0 -> #0:0 (wrapped_avframe (native) -> hevc (libx265))
+        Press [q] to stop, [?] for help
+        [libx265 @ 000001b98a87d040] Unknown option: zzznotreal.
+        x265 [info]: HEVC encoder version 4.3+2-5ab552e
+        x265 [info]: build info [Windows][GCC 16.1.0][64 bit] 8bit+10bit+12bit
+        x265 [warning]: Too few rows/columns, --wpp disabled
+        x265 [warning]: Source height < 720p; disabling lookahead-slices
+        x265 [info]: tools: rd=3 psy-rd=2.00 early-skip rskip mode=1 signhide tmvp
+        [out#0/null @ 000001b988a289c0] video:4KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+        """;
+
+    /// <summary>Olcum D — libx264, `-x264-params zzznotreal=1`, cikis kodu 0.</summary>
+    internal const string X264DroppedKey = """
+        Stream mapping:
+          Stream #0:0 -> #0:0 (wrapped_avframe (native) -> h264 (libx264))
+        Press [q] to stop, [?] for help
+        [libx264 @ 00000184d929db80] Error parsing option 'zzznotreal = 1'.
+        [libx264 @ 00000184d929db80] using SAR=1/1
+        [libx264 @ 00000184d929db80] profile High, level 1.1, 4:2:0, 8-bit
+        [out#0/null @ 00000184d779c4c0] video:3KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+        """;
+
+    [Theory]
+    [InlineData(nameof(SvtAv1DroppedKey))]
+    [InlineData(nameof(X265DroppedKey))]
+    [InlineData(nameof(X264DroppedKey))]
+    public void EveryEncoderMeasuredAtExitZeroReportsItsDroppedKey(string fixture)
+    {
+        var stderr = fixture switch
+        {
+            nameof(SvtAv1DroppedKey) => SvtAv1DroppedKey,
+            nameof(X265DroppedKey) => X265DroppedKey,
+            _ => X264DroppedKey
+        };
+
+        var dropped = FfmpegDiagnostics.DroppedOptionLines(stderr);
+
+        Assert.Contains(dropped, line => line.Contains("zzznotreal"));
+    }
+
+    [Fact]
+    public void BothRunnersReadTheSameDictionary()
+    {
+        var viaFfmpegRunner = FfmpegRunner.Decide(0, X265DroppedKey, TimeSpan.Zero).DroppedOptions;
+
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in X265DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+        var viaEncodeRunner = watch.Close(0).DroppedOptions;
+
+        Assert.Equal(viaFfmpegRunner, viaEncodeRunner);
+        Assert.NotEmpty(viaEncodeRunner);
+    }
 }

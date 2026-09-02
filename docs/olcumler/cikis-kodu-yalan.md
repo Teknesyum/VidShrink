@@ -100,3 +100,62 @@ kendi kod yolu, ölçüye özel kopya değil:
 
 `InternalsVisibleTo("VidShrink.Tests")` bu derlemede zaten vardı (`TempCleanup.cs:5`);
 yeni bir görünürlük eklenmedi.
+
+## K2 — Tanılı hata sözlüğü tek yerde
+
+Çözümleyicinin yeri: `src/VidShrink.Ffmpeg/FfmpegDiagnostics` (`FfmpegRunner.cs` içinde).
+Üretimdeki iki çağrı yeri, ham çıktı:
+
+```
+src/VidShrink.Ffmpeg/EncodeRunner.cs:437:            if (FfmpegDiagnostics.ReportsADroppedOption(line)) dropped.Add(line);
+src/VidShrink.Ffmpeg/FfmpegRunner.cs:138:               FfmpegDiagnostics.DroppedOptionLines(standardError));
+```
+
+İki koşucu da aynı sözlüğü okuyor; desen ikinci kez yazılmadı. `BothRunnersReadTheSameDictionary`
+ölçüsü aynı stderr metnini iki yoldan geçirip çıkan listeleri eşitliyor.
+
+### Sözlüğe giren desenler ve kanıt kaynakları
+
+| Desen | Kodlayıcı | Çıkış kodu | Kanıt |
+|---|---|---|---|
+| `Error parsing option` | libsvtav1 | **0** | Ölçüm A, bu belge; `docs/olcumler/handbrake-acigi.md:139`; `docs/taramalar/lav-filters.md:23`; `mpv.md:23`; `svt-av1-psy.md:25` |
+| `Error parsing option` | libx264 | **0** | Ölçüm D, bu belge: `[libx264 @ …] Error parsing option 'zzznotreal = 1'.` |
+| `Unknown option:` | libx265 | **0** | Ölçüm D, bu belge: `[libx265 @ …] Unknown option: zzznotreal.` |
+
+### Sözlüğe **girmeyen** desenler ve nedeni
+
+Sözleşme `Unrecognized option` ve `Option not found` desenlerinin de "üç belgede ölçüldüğünü"
+söylüyor. Saydım: bu iki ifade depoda tek bir belgede geçiyor
+(`docs/olcumler/tepe-tavani-ve-psy.md:30`), orada da ölçüm olarak değil, `EncoderCapabilities`
+sondasının ne yaptığının anlatımı olarak. `Error parsing option` gerçekten dört belgede;
+diğer ikisi bir belgede. **Sözleşmenin cümlesi bu noktada tutmuyor.**
+
+İkisini de bu makinede kendim ölçtüm — ölçüm C:
+
+```
+ffmpeg … -c:v libx264 -vsync 0 …      → çıkış kodu 8
+Unrecognized option 'vsync'.
+Error splitting the argument list: Option not found
+
+ffmpeg … -c:v libx264 -zzznotreal 1 … → çıkış kodu 8
+Unrecognized option 'zzznotreal'.
+Error splitting the argument list: Option not found
+```
+
+İkisi de **sıfırdan farklı** kodla geliyor. Bu sözlüğün işi "çıkış kodu 0 iken düşürülen
+ayar"; çıkış kodu zaten sıfırdan farklıysa çağıran onu kapı 9'da yakalıyor. Bu yüzden
+ikisi de dışarıda bırakıldı — kanıtsız oldukları için değil, **bu kapının hiç göremeyeceği**
+oldukları için.
+
+Üçüncü bir ölçüm sınırı çiziyor: `-c:v libx264 -preset zzznotreal` çıkış kodu **127** ve
+`Conversion failed!` veriyor. Yani sessiz düşme kodlayıcı parametre dizgisi yoluna
+(`-*-params`) özgü; düz AVOption yolu yüksek sesle düşüyor.
+
+### Depodaki mevcut sözlük hakkında bir bulgu (borç, `owns` dışı)
+
+`src/VidShrink.Ffmpeg/EncoderCapabilities.cs:343-346` seçenek sondasında üç desen tutuyor:
+`Error parsing option`, `Option not found`, `Unrecognized option`. Yukarıdaki ölçümlere göre
+o listenin son iki deseni orada da atıl — sonda da `exitCode == 0` şartını ayrıca koyuyor.
+Buna karşılık liste **libx265'in gerçekten yazdığı `Unknown option:` ifadesini içermiyor**;
+yani x265 seçenek sondası bugün düşürülen anahtarı kaçırıyor. `EncoderCapabilities.cs`
+bu sözleşmenin `owns` kümesi dışında, dokunulmadı. Borç olarak yazıldı.
