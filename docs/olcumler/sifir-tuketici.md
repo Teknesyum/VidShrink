@@ -54,7 +54,7 @@ depoda var (T148, derlenmis IL'den cagri yeri sayimi). **Bu bir borc, asagida ya
 
 Yedi olayin bugunku hali de bakildi: 1, 3, 4, 6 kendi sozlesmelerinde kapanmis
 (`EncoderCapabilities.cs:96` artik `result.Measured ? result.Succeeded : HasEncoder(codec)`,
-`CalibrationProbe.cs` `ComplexityProbe`i cagiriyor, `QualityMeter.cs:295` `sceneMap`i
+`CalibrationProbe.cs` `ComplexityProbe`i cagiriyor, `VidShrink.Ffmpeg/QualityMeter.cs:294` `sceneMap`i
 tasiyor, `FfmpegRunner.cs:138` `DroppedOptionLines`i okuyor). 2 icin `FfmpegArguments.cs`
 tek uretim tuketicisi. 7 icin K5'e bak.
 
@@ -83,8 +83,22 @@ konumu, tahmin degil:
 | `switch-kolu` | `Tur.Uye => ...` (kolun **solu**) |
 | `arama-cagrisi` | `Contains(Tur.Uye)`, `ContainsKey(...)`, `TryGetValue(...)`, `HasFlag(...)` |
 | `arama-dizini` | `tablo[Tur.Uye]` — okuma; `[Tur.Uye] = ...` tablo girdisidir, uretim sayilir |
+| `alan-okumasi` | `public static readonly` **alan** uyesinin `src/**` altindaki **her** gorunumu — kosulsuz |
 
-Bunlarin hicbirine uymayan her gorunum **uretim**dir.
+Bunlarin hicbirine uymayan her gorunum **uretim**dir. **Bu cumle yalnizca enum uyeleri
+icin gecerlidir.** Alan uyelerinde konum hic bakilmiyor: `MemberScan.Classify`
+(`OluUyeTests.cs:189-190`) `Kind == "alan"` gorunce dogrudan `(true, "alan-okumasi")`
+donuyor, dilbilgisi kurallari hic calismiyor.
+
+Bunun olcuye etkisi olculebilir bir sinirdir: bir alan uyesi `src/**` altinda **bir kez
+bile** goruluyorsa tuketilmis sayilir, dolayisiyla **hicbir alan uyesi `varsayilan-kol`
+bicimine dusemez.** Bugun pimdeki bes alan uyesinin hepsi ya `hic-gorunmeyen`
+(`LauncherUpdate.CommitWindow`, `MacUpdate.DownloadTimeout`) ya `yalniz-disarida`
+(`FfmpegArguments.SceneMapRuleOfRecord`, `UpdateCheck.ManifestTimeout`) — yani uretimde
+sifir gorunum. Bir alan uretimde yalnizca **yazilarak** kullaniliyorsa olcu onu tuketilmis
+sanar ve **bulmaz**; bu bir yanlis pozitif degil, bir **yanlis negatif** kaynagidir ve
+kalan borca yazildi. Alan uyeleri icin okuma/yazma ayrimi ancak IL'den cagri yeri sayan
+bir duzenekle yapilabilir (T148 kalibi).
 
 Ad nitelemesi kuralin onune gecmesin diye uyeden onceki `Ad.` zinciri dusuruluyor.
 Bu olmadan `result.Failure == CoreShare.ShareFailure.Cancelled` satirinda kural `==`
@@ -126,11 +140,11 @@ Ozet satiri (K5 uygulandiktan sonraki agac):
 
 ```
 dosya: 70  uye: 129
-sifir tuketici: 27  hic kullanilmayan: 5
+sifir tuketici: 26  hic kullanilmayan: 5
 dizgi/yorum icinde kalan gorunum: 20
 ```
 
-129 uyenin 32'si bulgulu: 27 sifir tuketicili, 5 hic kullanilmayan. Kalan 97 uye
+129 uyenin 31'i bulgulu: 26 sifir tuketicili, 5 hic kullanilmayan. Kalan 98 uye
 tuketiliyor.
 
 **Saklanan 20 gorunumun hepsi docstring satiri.** `TheStripperHidesOnlyCommentsAndStringLiterals`
@@ -144,12 +158,12 @@ sayiyor. Bugun 93 tanesinin adi gecmiyor; kume pim listesinden turemiyor, yansim
 
 ## K3 — Sayi pimlenir
 
-Pim `OluUyeTests.Pinned`: 32 satir, her satirda uye adi, **hesaplanan bicim** ve karar.
+Pim `OluUyeTests.Pinned`: 31 satir, her satirda uye adi, **hesaplanan bicim** ve karar.
 Bicim yorum degil, olcunun kendi verisinden cikan bir siniflandirma:
 
 | bicim | anlami | bugun |
 |---|---:|---:|
-| `varsayilan-kol` | ayni turun baska uyesi okunuyor, bu uye okuma tarafinda hic adlandirilmiyor | 25 |
+| `varsayilan-kol` | ayni turun baska uyesi okunuyor, bu uye okuma tarafinda hic adlandirilmiyor | 24 |
 | `hic-okunmayan-tur` | turun **hicbir** uyesi okunmuyor | 2 |
 | `yalniz-disarida` | uretimde sifir gorunum, testlerde/araclarda var | 2 |
 | `hic-gorunmeyen` | hicbir yerde gorunmuyor | 3 |
@@ -159,44 +173,77 @@ fazla satir da eksik satir da kirmizi.
 
 ### Mutasyon izgarasi
 
-Her kosumda **`dotnet build -c Release --no-incremental`** kosuldu; `--no-build` yalniz
-o yeniden derlemeden hemen sonraki `dotnet test`te kullanildi, yani olculen ikili her
-zaman mutasyonu tasiyan ikili. Derleme hatasi sayisi her kosumda 0.
-
-Ciktilar `.calisma/T150/` altinda (gitignore'da, dalla gelmiyor); mutasyonlar geri
-alindigi icin yeniden uretilemezler, bu yuzden **karari tasiyan satirlar asagida
-tam metinleriyle duruyor.** Tablodaki dosya adlari yalniz hangi kosumun hangi hucreye
-denk geldigini soyluyor.
+Izgara **tur 2'de bastan kosuldu**: pim 27'den 26'ya temellendigi icin tur 1'in mutasyon
+kanitlari gecersizdi. Her hucrede once `dotnet build -c Release --no-incremental`, sonra
+duz `dotnet test -c Release --filter "OluUyeTests"` kosuldu. **`--no-build` hicbir kolda
+kullanilmadi** (tur 1 onu derlemeden hemen sonraki kosumda kullanmisti; tur 2 bunu da
+kaldirdi). Derleme hatasi sayisi her kosumda 0, agac `HEAD` = rebase sonrasi dal.
 
 | # | mutasyon | beklenen | eski kol | yeni kol |
 |---|---|---|---|---|
-| 1 | `EncoderVendor`e `Rkmpp` uyesi + `CodecModel.Vendor`da `c.Contains("rkmpp")` uretici satiri | kirmizi (sayi 27 → 28) | `m1-eski.txt` 11/11 yesil | `m1-yeni.txt` 10/11, `TheZeroConsumerSetIsThePinnedSet` kirmizi |
-| 2 | `QualityArgs`a acik `EncoderVendor.Software => new[] { "-crf", exact }` kolu | kirmizi (sayi 27 → 26) | `m2-eski.txt` 11/11 yesil | `m2-yeni.txt` 10/11, `TheZeroConsumerSetIsThePinnedSet` kirmizi |
+| 1 | `EncoderVendor`e `Rkmpp` uyesi + `CodecModel.Vendor`da `c.Contains("rkmpp")` uretici satiri | kirmizi (sayi 26 → 27) | 11/11 yesil, `sifir tuketici: 26` | `Basarisiz: 1, Basarili: 10`, `sifir tuketici: 27`, cikis kodu 1 |
+| 2 | `QualityArgs`a acik `EncoderVendor.Software => new[] { "-crf", exact }` kolu | kirmizi (sayi 26 → 25) | 11/11 yesil, `sifir tuketici: 26` | `Basarisiz: 1, Basarili: 10`, `sifir tuketici: 25`, cikis kodu 1 |
 
-**Mutasyon 1 — yeni sifir tuketicili uye.** `Rkmpp` uretiliyor ama hicbir yerde okunmuyor,
-yani tam olcunun aradigi bicim. Kodek adlarindan hicbiri `rkmpp` icermedigi icin uretim
-davranisi degismiyor; kirmizi yalniz olcuden geliyor. Hata satiri:
+**Eski kol (iki mutasyon icin de ayni taban).** Rebase sonrasi, mutasyonsuz agac:
 
 ```
-Actual: [..., "EncoderVendor.Rkmpp  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ...]
-Basarisiz: 1, Basarili: 10, Toplam: 11
+dosya: 70  uye: 129
+sifir tuketici: 26  hic kullanilmayan: 5
+uye: 129  bu dosyada adi gecmeyen: 93  pimlenen: 31
+Test Calistirmasi Basarili.
+Toplam test sayisi: 11
+     Gecti: 11
 ```
 
-**Mutasyon 2 — var olan uyeye gercek tuketici.** `EncoderVendor.Software` acik bir switch
-koluna cikinca `switch-kolu` kurali onu tuketici sayiyor ve uye kumeden dusuyor:
+**Mutasyon 1 — yeni sifir tuketicili uye.** `Rkmpp` uretiliyor, hicbir yerde okunmuyor.
+Kodek adlarindan hicbiri `rkmpp` icermedigi icin uretim davranisi degismiyor; kirmizi
+yalniz olcuden geliyor. Yeni kol ham cikti:
 
 ```
-Expected: [..., "EncoderVendor.Software  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"...]
-Actual:   [..., "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"..., "FillPolicy.QualityCeiling  varsayilan-kol", ...]
-Basarisiz: 1, Basarili: 10, Toplam: 11
+dosya: 70  uye: 130
+sifir tuketici: 27  hic kullanilmayan: 5
+uye: 130  bu dosyada adi gecmeyen: 94  pimlenen: 31
+
+Expected: [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ...]
+Actual:   [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Rkmpp  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ...]
+Basarisiz! - Basarisiz: 1, Basarili: 10, Atlanan: 0, Toplam: 11
+cikis kodu: 1
 ```
 
-Iki mutasyon da geri alindi; `git diff src/VidShrink.Core/CodecModel.cs` yalnizca K5'in 15
-satirini gosteriyor. Geri alma sonrasi taban `m-eski.txt`: 11/11 yesil.
+Uye sayisinin 129'dan 130'a cikmasi kumeyle pim listesinin ayri sayildiginin de kaniti:
+kume yansimadan buyudu, pim listesi 31'de kaldi.
 
-**Ikinci mutasyonun kalici ornegi zaten var.** K5'in patlayan kolu `EncoderVendor.VideoToolbox`u
-gercekten tuketici konumuna tasidi ve sayi 28 → 27 dustu — mutasyon 2 ile ayni bicim,
-ama gecici degil. Bkz. K5.
+**Mutasyon 2 — var olan uyeye gercek tuketici.** `EncoderVendor.Software` acik bir
+`switch` koluna cikinca `switch-kolu` kurali onu tuketici sayiyor ve uye kumeden dusuyor:
+
+```
+dosya: 70  uye: 129
+sifir tuketici: 25  hic kullanilmayan: 5
+
+Expected: [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"...]
+Actual:   [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"..., "FillPolicy.QualityCeiling  varsayilan-kol", ...]
+Basarisiz! - Basarisiz: 1, Basarili: 10, Atlanan: 0, Toplam: 11
+cikis kodu: 1
+```
+
+**Geri alma kaniti.** Iki mutasyon da `CodecModel.cs`'in mutasyon oncesi kopyasindan geri
+yuklendi; sonra yeniden derlenip kosuldu:
+
+```
+$ git diff src/VidShrink.Core/CodecModel.cs
+(cikti bos)
+$ git diff --stat src/VidShrink.Core/CodecModel.cs
+(cikti bos)
+dosya: 70  uye: 129
+sifir tuketici: 26  hic kullanilmayan: 5
+     Gecti: 11
+cikis kodu: 0
+```
+
+**Ikinci mutasyonun kalici ornegi zaten var.** K5'in patlayan kolu
+`EncoderVendor.VideoToolbox`u gercekten tuketici konumuna tasidi ve o agacta sayi bir
+dustu (28 → 27; ikisi de K5-oncesi/K5-sonrasi olculmus, rebase oncesi degerlerdir —
+bugunku taban 26). Mutasyon 2 ile ayni bicim, ama gecici degil. Bkz. K5.
 
 ## K4 — Yedi olayin karari ve beyaz liste
 
@@ -218,10 +265,10 @@ Yedi olayin karari:
 | 1 | T137 `ProbeOutcome.Unmeasured` | **kaza**, kapandi | Sozlesme KRITIK sayip duzeltti: `WorksAsEncoder` artik ucuncu cevabi yutmuyor (`EncoderCapabilities.cs:96`). |
 | 2 | T140 turbo ilk gecis | **mesru** | Ozellik kuruldu, varsayilan olcume birakildi; bugun `FfmpegArguments.cs` uretim tuketicisi. |
 | 3 | T142 K3 `PlanWindows` | **kaza**, kapandi | `CalibrationProbe` sabit kopyasini birakip duzenegi cagiriyor. |
-| 4 | T143 (1) `WorstScene(map)` | **kaza**, kapandi | Uretim cagrisi artik `sceneMap`i tasiyor (`QualityMeter.cs:295`). |
+| 4 | T143 (1) `WorstScene(map)` | **kaza**, kapandi | Uretim cagrisi artik `sceneMap`i tasiyor (`VidShrink.Ffmpeg/QualityMeter.cs:294`). |
 | 5 | T143 (2) `SceneWindowSeconds` | **kaza**, kapandi | Deger kosullu hale getirildi. |
 | 6 | T144 `FfmpegRun.StandardError` | **kaza**, kapandi | Basari karari artik metni okuyor (`FfmpegRunner.cs:138`). |
-| 7 | T149 `EncoderVendor.VideoToolbox` | **mesru** | `CodecModel.cs:142-146` docstring'i: donanim kapisinin arkasindaki hicbir sabit VideoToolbox'ta olculmedi, kapiyi acmak bir olcumdur. Kapi acilmadi. |
+| 7 | T149 `EncoderVendor.VideoToolbox` | **mesru** | `CodecModel.cs:142-144` docstring'i: donanim kapisinin arkasindaki hicbir sabit VideoToolbox'ta olculmedi, kapiyi acmak bir olcumdur. Kapi acilmadi. |
 
 **Yedincinin kodda karsiligi degisti ve bunu saklamiyorum:** K5 `QualityArgs`e VideoToolbox
 icin acik bir koruma kolu koydu. O kol bir `switch` kolu oldugu icin olcu artik
@@ -287,28 +334,107 @@ CI kosumu **`33688802430`** — `completed success`, commit `fd46868`
 is akisinin `paths-ignore` listesinde, kosum acmiyorlar). Kosum kapisi adimi
 `-MinimumTotal 1134 -MaximumSkipped 30` esigiyle gecti.
 
-Yerel tam suit, guncel `main` birlestirilmis agacta:
-
-```
-Basarisiz: 0  Basarili: 1480  Atlanan: 23  Toplam: 1503  Sure: 19 m 52 s
-```
-
-Birlestirmeden once ayni sayilar cikmisti (17 m 32 s); `main`in aradaki bes commit'i
-`src/` ve `tests/` altina dokunmadigi icin olcu etkilenmedi
-(`git diff HEAD...origin/main -- src/ tests/` bos).
+**Tur 1'in tam suit beyani yanlisti ve geri cekildi.** Tur 1 "guncel `main`
+birlestirilmis agacta … Toplam: 1503" yazmisti; o kosum birlesmemis agacta yapilmisti.
+1503 dalin **tek basina** toplamidir. Gercek birlesik toplam K9'da, asagida.
 
 ## Kalan borc
 
-1. **Cagri yeri dilimi olculmedi.** Yedi olayin altisi metot / asiri yukleme / ornek alani;
+1. **Alan uyelerinde okuma/yazma ayrilmiyor.** `alan-okumasi` kurali kosulsuz tuketici
+   sayiyor; uretimde yalnizca yazilan bir `public static readonly` alan olcunun gozunden
+   kacar. Ayrimi ancak IL'den cagri yeri sayan bir duzenek verir.
+2. **Cagri yeri dilimi olculmedi.** Yedi olayin altisi metot / asiri yukleme / ornek alani;
    K2 duzenegi tur uyesi sayiyor. "Uretimde cagirani yok" bagintisi icin ayri bir olcu
    gerekiyor; kalip depoda var (T148 derlenmis IL'den cagri yeri sayiyor).
-2. **23 satir siniflanmadi.** Pimin `borc` satirlari. En kalabaligi `ShareFailure`:
+3. **22 satir siniflanmadi.** Pimin `borc` satirlari. En kalabaligi `ShareFailure`:
    on bir uyeden sekizi uretiliyor, hicbiri ayrilmiyor; arayuz yalniz `Cancelled`, `None`,
    `TokenExpired` ve `Unknown` soruyor.
-3. **`ArchitectureOutcome` docstring'i ile kodu ayrisiyor.** `UpdateCheck.cs:34`
+4. **`ArchitectureOutcome` docstring'i ile kodu ayrisiyor.** `UpdateCheck.cs:34`
    "Kullaniciya ne soylenecegini bu ayiriyor" diyor; turun iki uyesinin de uretimde okuyani
    yok. Bu, "pin degisti docstring degismedi" sinifinin bir baska ornegi.
-4. **`EncoderProbeState.NotWorking` bilerek `borc` birakildi.** Bicimi `varsayilan-kol` ve
-   digerleri gibi "olumsuz kol" diye gecistirilebilirdi; T137 tam bu turde uc degerli
-   cevabin ikiye dusmesini KRITIK saydigi icin gecistirilmedi.
-5. **`BitrateRateControlArgs`** — K5'in kardesi, yukarida.
+5. **`EncoderProbeState.NotWorking` borcu kapandi, olcuyle.** Tur 1'de `varsayilan-kol`
+   bicimiyle `borc` satiriydi. T139 uretimde bir tuketici kol acti
+   (`PerformanceProbe.cs:97`, `!= EncoderProbeState.NotWorking`), uye artik sifir tuketicili
+   degil ve pimden dusuruldu. Borc listesinde yeri yok; T137'nin uc degerli cevap kaygisini
+   olcen kol artik uretimde.
+6. **`BitrateRateControlArgs`** — K5'in kardesi, yukarida.
+
+## K7 — Pim birlesik agacta yeniden temellendi (tur 2)
+
+Tur 1'in pimi dalin kendi agacinda yesildi, guncel `origin/main` ile birlesince kirmiziydi.
+Rebase sonrasi ilk kosum, hicbir sey degistirmeden:
+
+```
+$ git rebase origin/main
+$ dotnet build -c Release --no-incremental
+$ dotnet test -c Release --filter "OluUyeTests"
+
+Assert.Equal() Failure: Collections differ
+Expected: [···, "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderProbeState.NotWorking  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ···]
+Actual:   [···, "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ···]
+   at VidShrink.Tests.OluUyeTests.TheZeroConsumerSetIsThePinnedSet() ... OluUyeTests.cs:line 456
+
+dosya: 70  uye: 129
+sifir tuketici: 26  hic kullanilmayan: 5
+
+Basarisiz! - Basarisiz: 1, Basarili: 10, Atlanan: 0, Toplam: 11
+cikis kodu: 1
+```
+
+**Sebep, satiriyla.** `EncoderProbeState.NotWorking` artik tuketiliyor:
+
+```
+EncoderProbeState.NotWorking [enum] tuketiliyor uretim=8 tuketim=1 disarida=18 maskeli=1
+    T esitlik-sag  src/VidShrink.Ffmpeg/PerformanceProbe.cs:97  if (availability.KnownState(candidate) != EncoderProbeState.NotWorking) return candidate;
+```
+
+**Satir nereden geldi — olculdu, aktarilmadi.** Dalin ayrildigi taban `8b8d385`;
+o agacta `PerformanceProbe.cs` icinde `NotWorking` **hic gecmiyor**
+(`git show 8b8d385:src/VidShrink.Ffmpeg/PerformanceProbe.cs | grep NotWorking` bos doner).
+Satiri T139 yazdi: `2caff96` `EncoderState(candidate) != EncoderProbeState.NotWorking`
+olarak ekledi, `cf009f0` cagriyi `KnownState` olarak yeniden adlandirdi. `main`e
+`5df0a98` birlesmesiyle geldi ve o birlesmenin ilk ebeveyni tam olarak dalin tabani
+`8b8d385`. Yani "main'in `5df0a98` ile getirdigi satir" ifadesi birlesme dogruluk
+duzeyinde dogru; satirin yazari `2caff96`.
+
+**Karar: pim 26'ya temellendi, uye dusurulmedi.** `EncoderProbeState.NotWorking` artik
+sifir uretim tuketicisi degil — sekiz yerde uretiliyor, bir yerde tuketiliyor. Pim
+listesinden cikarildi (32 → 31 satir), sayi 27 → 26. Uyenin kendisine dokunulmadi;
+`PerformanceProbe.cs` bu sozlesmenin `owns` listesinde degil ve duzeltilecek bir sey de
+yok — kol dogru kol.
+
+Gerekce koda da yazildi: `OluUyeTests.Pinned` docstring'i hangi commit'in hangi satiri
+getirdigini tasiyor, boylece bir sonraki tur pimi "bayat mi, dogru mu" diye ayirt edebilir.
+
+Yeniden temellendikten sonra:
+
+```
+dosya: 70  uye: 129
+sifir tuketici: 26  hic kullanilmayan: 5
+uye: 129  bu dosyada adi gecmeyen: 93  pimlenen: 31
+mesru: 9  borc: 22
+
+Test Calistirmasi Basarili.
+Toplam test sayisi: 11
+     Gecti: 11
+```
+
+## K9 — Tam suit, birlesik agacta
+
+Agac: rebase edilmis `T150-sifir-tuketici`, tum kod ve rapor degisiklikleri uygulanmis.
+
+```
+$ git rev-parse HEAD
+K9_HEAD
+
+$ git diff HEAD...origin/main -- src/ tests/
+K9_DIFF
+
+$ dotnet test -c Release
+K9_SUIT
+```
+
+`git diff HEAD...origin/main` ucuncu nokta bicimidir: `main`in ortak atadan sonra
+tasidigi ve bu agacta **olmayan** her sey. Bos olmasi `main`de olup dalda bulunmayan
+`src/`/`tests/` degisikligi kalmadigi anlamina gelir — tur 1'in yanlis beyani tam
+buradan cikmisti, o zaman diff bos degildi (12 dosya, +286).

@@ -396,7 +396,7 @@ public sealed class OluUyeTests
         new("PreviewState.TamKodlama", "varsayilan-kol", Debt,
             "Ayni tur, ayni bulgu: uretiliyor, okuma tarafinda adi gecmiyor."),
         new("QualityTargetBound.Matched", "varsayilan-kol", Legitimate,
-            "Hedefe varildi demek; arayuz yalniz sapmalari yaziyor (MainWindow.axaml.cs:2480-2482 BelowFloor ve AboveSourceCeiling, '_ => \"\"'). Varildiginda gosterilecek bir cumle yok, o yuzden okuyan da yok."),
+            "Hedefe varildi demek; arayuz yalniz sapmalari yaziyor (MainWindow.axaml.cs:2494-2496: BelowFloor, AboveSourceCeiling, '_ => \"\"'). Varildiginda gosterilecek bir cumle yok, o yuzden okuyan da yok."),
         new("RecordingImpact.HardwareOffload", "varsayilan-kol", Legitimate,
             "PerformanceReportText.cs:22-26 mansetin Impact uzerinden kurulmadigini olcumle yaziyor: makine mesgulken Impact yazilim dalina kayiyor, dogru bilgi bulgularda. Alan raporda tasiniyor, karar vermiyor."),
         new("RecordingImpact.SoftwareHeavyLoad", "varsayilan-kol", Legitimate,
