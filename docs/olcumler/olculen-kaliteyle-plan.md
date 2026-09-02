@@ -497,8 +497,13 @@ Kodlama parametreleri x264'ün iki geçiş günlüğünden geri okundu
 `threads=4`). Ton eşleme operatörü kapta saklanmadığı için **görüntüden
 ölçüldü**: ilk kare dört operatörle yeniden üretilip elde duran dosyanın ilk
 karesiyle PSNR'landı — hable **39,03 dB**, reinhard 21,28, mobius 20,08,
-clip 19,33 (`duzenek/tonemap-dogrulama.sh`). `desat` değeri ve dosyanın bayt
-bayt yeniden üretilebilirliği **ölçülmedi**.
+clip 19,33 (`duzenek/tonemap-dogrulama.sh`). Bu dört sayı düzenekten yeniden
+üretildi ve **altı basamağına kadar** aynı çıktı (39.025317 / 21.278990 /
+20.075628 / 19.330704). Sayıların koşulu: PSNR iki girdi de `format=yuv420p`'ye
+çevrildikten **sonra** hesaplanır; PNG'ler RGB'de karşılaştırılırsa aynı
+dosyalardan 35,36 / 18,50 / 17,29 / 16,51 çıkar — sıralama değişmez, sayılar
+değişir. `desat` değeri ve dosyanın bayt bayt yeniden üretilebilirliği
+**ölçülmedi**.
 
 ### 11.2 İki ikili, iki kilit yeri
 
