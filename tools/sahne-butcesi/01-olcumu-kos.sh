@@ -29,6 +29,7 @@ for kol in $KOLLAR; do for w in $PENCERELER; do kos k5   "$kol" "$w"; done; done
 # Tekrar gurultusu: ayni plani ikinci kez kosar, MAE farkini pp cinsinden yazar.
 # Tek hucrede kosulur; hucre basina bir tam iki gecisli kodlama maliyeti var.
 kos tekrar "$TEKRAR_KOL" "$TEKRAR_PENCERE"
+bash "$KOK/tools/sahne-butcesi/06-tekrar-denemesi.sh"
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k7   "$kol" "$w"; done; done
 
 bash "$KOK/tools/sahne-butcesi/05-cikti-denetimi.sh"
