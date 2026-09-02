@@ -63,3 +63,17 @@ Her mutasyondan önce `dotnet build VidShrink.sln -c Release --no-incremental` b
 | HdrResolver: üçlü → iki değerli | 0 | 0 | 0 | 0 | 1 | 1 |
 
 Her mutasyon yalnız kendi ölçüsünü kırdı; diğer dört ölçü yeşil kaldı.
+
+## K5 — Üretim çıktısı değişimi
+
+| Girdi | Eski seçim/karar | Yeni seçim/karar |
+|---|---|---|
+| Kalite kipi, `MaxCompression`, `libsvtav1=Unmeasured` | `libx265` | `libsvtav1`, geçici |
+| Kalite kipi, `Fast` tercihi, `h264_nvenc=Unmeasured` | `libx264` | `h264_nvenc`, geçici |
+| Hızlı kip, `av1_nvenc=Unmeasured` | `libx264` | `av1_nvenc`, geçici |
+| Performans adayları: `h264_nvenc=NotWorking`, `h264_qsv=Unmeasured`, `h264_amf=Working` | `h264_amf` | `h264_qsv` |
+| Yazılım HDR, `libsvtav1=Unmeasured` | Kodek `libsvtav1`, SDR tone-map | Kodek `libsvtav1`, HDR korunur ve karar geçici |
+| Her karar yerinde `Working` | Çalışan kodek kabul edilir | Değişmedi |
+| Her karar yerinde `NotWorking` | Kodek elenir | Değişmedi |
+
+Regresyon riski ölçülmemiş kodeğin sonraki gerçek yoklamada çalışmadığının anlaşılmasıdır. Plan ve HDR yolları bunu `HardwareNotMeasured` / `NotMeasured` ile geçici işaretleyip ölçüm sonrası yeniden hesaplamaya bırakıyor. Performans yolunda ise ölçülmemiş aday gerçekten başarısız olup daha sonraki aday çalışıyor olabilir; eski iki değerli yol aktif yoklamayla sonraki çalışan adayı seçtiğinde o tek koşum için doğru sonuca ulaşabiliyordu. Yeni yol kanıtsız eleme yapmıyor ve seçilen adayı performans koşumunun sınamasına bırakıyor; başarısızlık `HardwareEncoderFailed` olarak görünür.
