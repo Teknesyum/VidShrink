@@ -151,4 +151,41 @@ public sealed class TurboFirstPassTests
         foreach (var kodek in CodecModel.TurboFirstPassCodecs)
             Assert.Equal(YazilimMerdiveni, Merdiven(kodek));
     }
+
+    [Theory]
+    [MemberData(nameof(BilinenKodekler))]
+    public void Turbo_tanimayan_kodegin_ilk_gecis_argumani_birebir_ayni_kaliyor(string kodek)
+    {
+        if (CodecModel.SupportsTurboFirstPass(kodek)) return;
+
+        var onAyar = FfmpegArguments.DefaultPreset(kodek);
+        var kapali = Plan(kodek, onAyar);
+        var acik = Plan(kodek, onAyar);
+        acik.TurboFirstPass = true;
+
+        Assert.Equal(onAyar, FfmpegArguments.FirstPassPreset(kodek, onAyar, turbo: true));
+        Assert.Equal(
+            FfmpegArguments.Build(Kaynak(), kapali, "cikti.mp4", 1, "gunluk"),
+            FfmpegArguments.Build(Kaynak(), acik, "cikti.mp4", 1, "gunluk"));
+    }
+
+    [Theory]
+    [MemberData(nameof(BilinenKodekler))]
+    public void Ilk_gecis_yoluna_yalniz_iki_gecis_isteyen_kodekler_giriyor(string kodek)
+    {
+        Assert.Equal(!CodecModel.IsHardware(kodek), FfmpegArguments.NeedsTwoPasses(kodek));
+        if (CodecModel.IsHardware(kodek))
+            Assert.False(CodecModel.SupportsTurboFirstPass(kodek), kodek);
+    }
+
+    [Fact]
+    public void Bilinen_kodekler_dort_yazilim_dokuz_donanim()
+    {
+        var bilinen = FfmpegArguments.KnownCodecs.ToArray();
+        Assert.Equal(13, bilinen.Length);
+        Assert.Equal(4, bilinen.Count(kodek => !CodecModel.IsHardware(kodek)));
+        Assert.Equal(9, bilinen.Count(CodecModel.IsHardware));
+        Assert.Equal(4, bilinen.Count(FfmpegArguments.NeedsTwoPasses));
+        Assert.Equal(2, bilinen.Count(CodecModel.SupportsTurboFirstPass));
+    }
 }
