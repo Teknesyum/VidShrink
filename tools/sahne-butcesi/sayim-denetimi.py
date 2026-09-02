@@ -70,6 +70,36 @@ yaz("zones kazandi", kazZ,
 yaz("qcomp kazandi", kazQ,
     int(re.search(r"`qcomp` (\d+) kez", metin).group(1)))
 
+def yukle(ad):
+    y = os.path.join(IS, ad)
+    if not os.path.exists(y):
+        return []
+    return json.load(io.open(y, encoding="utf-8-sig"))
+
+k7kars = k7alt = 0
+k7ust = 0.0
+for y in sorted(glob.glob(os.path.join(IS, "k7-*.json"))):
+    hucre = os.path.basename(y)[3:-5]
+    dogru = [x for x in yukle("k5-" + hucre + ".json")
+             if x["Kol"] == "dagitim" and x["VmafP10"] is not None]
+    if not dogru:
+        continue
+    for b in json.load(io.open(y, encoding="utf-8-sig")):
+        if b["VmafP10"] is None:
+            continue
+        k7kars += 1
+        kayip = dogru[0]["VmafP10"] - b["VmafP10"]
+        if kayip <= 0:
+            k7alt += 1
+            k7ust = max(k7ust, -kayip)
+
+m = re.search(r"\(K7\) karsilastirilan (\d+) kosumun\s+(\d+) tanesi de dogru haritanin altina dusmedi; "
+              r"en iyi bozuk\s+kol dogru haritayi ([\d.]+) puan gecti", metin)
+if m:
+    yaz("K7 karsilastirilan kosum", k7kars, int(m.group(1)))
+    yaz("K7 geri dusmeyen kosum", k7alt, int(m.group(2)))
+    yaz("K7 en iyi bozuk ustunluk", f"{k7ust:.3f}", m.group(3))
+
 bolum = metin.split("## Olculemeyenler")[1].split("\n\n")
 tablo = [l for b in bolum for l in b.splitlines()
          if l.startswith("| ") and not l.startswith("|--") and "Bolum" not in l]

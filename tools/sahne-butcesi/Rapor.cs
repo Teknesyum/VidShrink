@@ -578,7 +578,8 @@ public static class Rapor
 
     public sealed record Satir(string Arm, OlcumKaydi K);
 
-    public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet);
+    public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet,
+        int Karsilastirilan = 0, int GeriDusmeyen = 0, double EnBuyukUstunluk = 0, double? EnBuyukKazanc = null);
 
     public sealed record K4bSonuc(int Hucre, int TabaniGecen, int ZonesKazandi, int QcompKazandi,
         double? ZonesEnIyiKazanc, double? ZonesEnIyiOran, string? ZonesEnIyiHucre);
@@ -946,6 +947,9 @@ public static class Rapor
 
         var satirlar = new List<string>();
         var enBuyukKayip = 0.0;
+        var enBuyukUstunluk = 0.0;
+        var geriDusmeyen = 0;
+        double? enBuyukKazanc = null;
         var karsilastirilan = 0;
         var kazanciAsan = 0;
         foreach (var g in hepsi.Where(x => x.K.Bilinmiyor is null).GroupBy(x => (x.Arm, x.K.Pencere)))
@@ -956,12 +960,18 @@ public static class Rapor
                 x.Arm == g.Key.Arm && x.K.Pencere == g.Key.Pencere && x.K.Kol == "taban")?.K;
             if (dogru?.VmafP10 is null) continue;
             double? kazanc = taban?.VmafP10 is null ? null : dogru.VmafP10.Value - taban.VmafP10.Value;
+            if (kazanc is not null) enBuyukKazanc = Math.Max(enBuyukKazanc ?? kazanc.Value, kazanc.Value);
             foreach (var (_, bozuk) in g)
             {
                 if (bozuk.VmafP10 is null) continue;
                 karsilastirilan++;
                 var kayip = dogru.VmafP10.Value - bozuk.VmafP10.Value;
                 enBuyukKayip = Math.Max(enBuyukKayip, kayip);
+                if (kayip <= 0)
+                {
+                    geriDusmeyen++;
+                    enBuyukUstunluk = Math.Max(enBuyukUstunluk, -kayip);
+                }
                 var asiyor = kazanc is not null && kayip > kazanc.Value;
                 if (asiyor) kazanciAsan++;
                 satirlar.Add($"| {g.Key.Arm} | `{g.Key.Pencere}` | {bozuk.Kol} | " +
@@ -987,7 +997,29 @@ public static class Rapor
                    $"K5 kazancini asan {kazanciAsan} kosum";
         sb.AppendLine($"**Bozuk haritanin bedeli**: {ozet}.");
         sb.AppendLine();
-        return new AbSonuc(karsilastirilan > 0 && kazanciAsan == 0, hepsi, ozet);
+        if (karsilastirilan > 0 && geriDusmeyen == karsilastirilan)
+        {
+            sb.AppendLine($"Kapi \"kayip kazanci asmiyor\" diyor, ama tablo bundan daha fazlasini");
+            sb.AppendLine($"soyluyor: karsilastirilan {karsilastirilan} kosumun {geriDusmeyen} tanesinde bozuk harita dogru");
+            sb.AppendLine($"haritanin **altina dusmedi**; en iyi bozuk kol dogru haritayi {Kabuk.Inv(enBuyukUstunluk, "0.000")}");
+            sb.AppendLine("puan gecti.");
+            if (enBuyukKazanc is not null)
+                sb.AppendLine($"Ayni hucrede dogru haritanin tabana kazanci {Kabuk.Inv(enBuyukKazanc.Value, "+0.000;-0.000;0.000")} puandi.");
+            sb.AppendLine("Yani bu hucrede sahne basina bit dagitiminin **icerigi** olculebilir bir");
+            sb.AppendLine("fark yaratmiyor: haritayi kasten bozmak sonucu kotulestirmedi.");
+            sb.AppendLine();
+        }
+        else if (karsilastirilan > 0 && geriDusmeyen > 0)
+        {
+            sb.AppendLine($"Karsilastirilan {karsilastirilan} kosumun {geriDusmeyen} tanesinde bozuk harita dogru");
+            sb.AppendLine($"haritanin altina dusmedi; en iyi bozuk kol dogru haritayi {Kabuk.Inv(enBuyukUstunluk, "0.000")} puan gecti.");
+            sb.AppendLine();
+        }
+        if (karsilastirilan > 0 && geriDusmeyen == karsilastirilan)
+            ozet += $"; {geriDusmeyen} kosumun tamaminda bozuk harita dogru haritanin altina dusmedi " +
+                    $"(en iyi bozuk kol {Kabuk.Inv(enBuyukUstunluk, "0.000")} puan onde)";
+        return new AbSonuc(karsilastirilan > 0 && kazanciAsan == 0, hepsi, ozet,
+            karsilastirilan, geriDusmeyen, enBuyukUstunluk, enBuyukKazanc);
     }
 
     private static void Tablo(StringBuilder sb, IReadOnlyList<Satir> kayitlar)
@@ -1317,6 +1349,22 @@ public static class Rapor
                               "secildiginde gorunur.");
             }
             sb.AppendLine();
+            if (k7.Karsilastirilan > 0 && k7.GeriDusmeyen == k7.Karsilastirilan)
+            {
+                sb.AppendLine($"**Ucuncu olcu ayni yone bakiyor:** haritayi kasten bozup ayni hucreyi " +
+                              $"yeniden kodladigimizda (K7) karsilastirilan {k7.Karsilastirilan} kosumun " +
+                              $"{k7.GeriDusmeyen} tanesi de dogru haritanin altina dusmedi; en iyi bozuk " +
+                              $"kol dogru haritayi {Kabuk.Inv(k7.EnBuyukUstunluk, "0.000")} puan gecti" +
+                              (k7.EnBuyukKazanc is null ? "" :
+                               $", ayni hucrede dogru haritanin tabana kazanci ise " +
+                               $"{Kabuk.Inv(k7.EnBuyukKazanc.Value, "+0.000;-0.000;0.000")} puandi") +
+                              ". Dagitimin **icerigi** bu hucrede olculebilir bir fark yaratmiyor: " +
+                              "sahne sinirlarini yanlis yerden gecirmek sonucu kotulestirmedi. " +
+                              "Bu, kalite kapisinin \"kayip kazanci asmiyor\" hukmunden daha " +
+                              "guclu bir ifadedir ve haritayi plana baglamanin lehine degil " +
+                              "aleyhine sayilir.");
+                sb.AppendLine();
+            }
             if (k4.Denenen > 0)
             {
                 sb.AppendLine($"Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen " +

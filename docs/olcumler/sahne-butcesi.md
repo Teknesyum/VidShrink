@@ -57,8 +57,8 @@ kodlama sessizce kucuk bir "hak edilen" ya da "verilen" uretir. Kodlamalar
 suresi `ffprobe` ile olculup beklenen sahne/pencere suresiyle
 karsilastirilir (esik 0,5 sn).
 
-Denetlenen dosya **127** — referans sahnesi 102, 
-kodlama ciktisi 25. Suresi sapan: **0**.
+Denetlenen dosya **130** — referans sahnesi 102, 
+kodlama ciktisi 28. Suresi sapan: **0**.
 
 Uretim: `bash tools/sahne-butcesi/05-cikti-denetimi.sh`, ham dosya
 `cikti-denetimi.csv`. Olcum bittikten sonra kosar.
@@ -81,9 +81,12 @@ dizilerinden bastan hesaplandi.
 | tabani gecen hucre | 4 | 4 | tuttu |
 | zones kazandi | 1 | 1 | tuttu |
 | qcomp kazandi | 3 | 3 | tuttu |
-| olculemeyen satir | 27 | 27 | tuttu |
+| K7 karsilastirilan kosum | 2 | 2 | tuttu |
+| K7 geri dusmeyen kosum | 2 | 2 | tuttu |
+| K7 en iyi bozuk ustunluk | 0.050 | 0.050 | tuttu |
+| olculemeyen satir | 26 | 26 | tuttu |
 
-Denetlenen iddia 9, tutmayan **0**. Uretim:
+Denetlenen iddia 12, tutmayan **0**. Uretim:
 `bash tools/sahne-butcesi/07-sayim-denetimi.sh`, ham dosya
 `sayim-denetimi.csv`. Betik sayfayi da okur; sayfa degisirse tekrar kosar.
 
@@ -573,7 +576,37 @@ Iki kol da ayni duzenekten geciyor, bu yuzden band disiligi kollari
 Uretim: `SahneButcesi k7 <kol> <pencere>`; ham dosya
 `k7-<kol>-<pencere>.json` ve `.zones.txt`.
 
-**bilinmiyor** — K7 kosulmadi.
+Iki bozulma ayri olculdu: **eksik kesim** (her ikinci kesim atildi) ve
+**fazla kesim** (her sahne ortasindan ikiye bolundu). Anahtar kare karari
+her kolda dogru haritadan gelir; degisen tek sey bit dagitimidir.
+
+| Yazilim kolu | Pencere | Kol | Boyut (MB) | Band | Band icinde | VMAF-NEG ort. | p10 | en dusuk kare | en kotu sahne |
+|--------------|---------|-----|------------|------|-------------|---------------|-----|---------------|---------------|
+| uyumlu | `p1-karisik` | eksik-kesim | 58.76 | 58.3–60.0 | evet | 72.519 | 69.095 | 23.622 | 41.422 |
+| uyumlu | `p1-karisik` | fazla-kesim | 58.72 | 58.3–60.0 | evet | 72.510 | 69.131 | 24.041 | 41.700 |
+
+### Bozuk haritanin bedeli, K5 kazanciyla yan yana
+
+Kapi (`ESIKLER.md`): bozuk haritayla olculen p10 **kaybi**, K5'te olculen
+p10 **kazancindan** buyukse dagitim koda girmez. Kayip = ayni kolda ayni
+pencerenin dogru haritali `dagitim` kosumu eksi bozuk kosum; kazanc = ayni
+hucrenin K5'teki `dagitim` eksi `taban` farki. Sabit bir kayip esigi yok;
+olcu kendi hucresinin kazancidir.
+
+| Yazilim kolu | Pencere | Bozulma | p10 kaybi | ayni hucrenin K5 kazanci | kayip kazanci asiyor mu |
+|--------------|---------|---------|-----------|--------------------------|-------------------------|
+| uyumlu | `p1-karisik` | eksik-kesim | -0.014 | +0.007 | hayir |
+| uyumlu | `p1-karisik` | fazla-kesim | -0.050 | +0.007 | hayir |
+
+**Bozuk haritanin bedeli**: karsilastirilan 2 kosum, en buyuk p10 kaybi 0.000 puan, kaybi kendi hucresinin K5 kazancini asan 0 kosum.
+
+Kapi "kayip kazanci asmiyor" diyor, ama tablo bundan daha fazlasini
+soyluyor: karsilastirilan 2 kosumun 2 tanesinde bozuk harita dogru
+haritanin **altina dusmedi**; en iyi bozuk kol dogru haritayi 0.050
+puan gecti.
+Ayni hucrede dogru haritanin tabana kazanci +0.007 puandi.
+Yani bu hucrede sahne basina bit dagitiminin **icerigi** olculebilir bir
+fark yaratmiyor: haritayi kasten bozmak sonucu kotulestirmedi.
 
 ## Karari veren kodun kendisi olculdu
 
@@ -615,11 +648,11 @@ uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.
 
 ## Sonuc
 
-**Karar verilemedi.** Asagidaki kapilardan en az biri olculemedi; olculmemis kapi gecmemis sayilmaz, `bilinmiyor` kalir.
+**Dagitim koda girmez.** Kapilardan en az biri onu durdurdu:
 
 - K2 (kodlayici zaten dogru dagitiyor mu): kapanmadi
 - K5/K6 (kalite kazanci ve hedef boyut): **gecmedi** — olculen cift 1; p10 esigini (>= +0,50) gecen 0, en kotu sahne esigini (>= +1,00) gecen 0, esikten fazla p10 kaybeden 0; olculen 2 kosumdan hedefi **asan** 0, bandin **altinda** kalan 0
-- K7 (bozuk harita bedeli): **bilinmiyor** — olculmedi
+- K7 (bozuk harita bedeli): kabul edilebilir — karsilastirilan 2 kosum, en buyuk p10 kaybi 0.000 puan, kaybi kendi hucresinin K5 kazancini asan 0 kosum; 2 kosumun tamaminda bozuk harita dogru haritanin altina dusmedi (en iyi bozuk kol 0.050 puan onde)
 
 **Sozlesmenin sorusu "haritayi plana baglamali miyiz" idi. Olculen 8 hucrenin 5 tanesinde harita kodlayiciyi geride birakmiyor**: `MAE(verilen) <= MAE(harita)` (K2 tablosu), yani o hucrelerde kodlayicinin kendi dagitimi haritanin onerisi kadar ya da ondan daha dogru. Plana baglanacak sey haritanin sahne basina sayilaridir; o sayilar cogunlukta kodlayicinin kendi kararindan daha iyi degilse, baglamanin tasiyacagi bilgi de yoktur. Sozlesmenin "olculdu, kodlayici zaten daha iyi dagitiyor" secenegi bu satirdan okunur.
 
@@ -628,6 +661,8 @@ uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.
 Dagitim parametresinin kendisi ayri bir sorudur ve ayri olculdu. **Sahne basina dagitim 5 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 5 hucrenin tabani gecen 4 tanesinde `zones` 1 kez kazandi, `qcomp` 3 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones` 5 hucreden 1 tanesinde kazandi ve en buyuk kazanc 0.044 pp; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
 
 **Bu kazanci bugunku varsayilan yol alamaz:** uretimin varsayilan kodlayicisi `libsvtav1` `zones` parametresini hic okumuyor (K4 izgarasi). Yani olculen kazanc, kullanicinin varsayilan ayarlarla yaptigi sikistirmaya ulasmiyor; ancak kodlayici elle `libx265` ya da `libx264` secildiginde gorunur.
+
+**Ucuncu olcu ayni yone bakiyor:** haritayi kasten bozup ayni hucreyi yeniden kodladigimizda (K7) karsilastirilan 2 kosumun 2 tanesi de dogru haritanin altina dusmedi; en iyi bozuk kol dogru haritayi 0.050 puan gecti, ayni hucrede dogru haritanin tabana kazanci ise +0.007 puandi. Dagitimin **icerigi** bu hucrede olculebilir bir fark yaratmiyor: sahne sinirlarini yanlis yerden gecirmek sonucu kotulestirmedi. Bu, kalite kapisinin "kayip kazanci asmiyor" hukmunden daha guclu bir ifadedir ve haritayi plana baglamanin lehine degil aleyhine sayilir.
 
 Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen 5 kodlayicinin yalniz 2 tanesinde calisiyor (`libx265`, `libx264`); uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi sessizce yok sayiyor, nvenc kollarinda parametre hic yok. Yani dagitimin lehine cikan her kanit bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirlidir. Ikisi birlikte: elde `zones` lehine 1 hucrelik kucuk bir isaret var ve o isaret zaten uretimin varsayilan yolunda gecerli degil.
 
@@ -663,16 +698,15 @@ sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
 | K7 | maks/p1-karisik | kosulmadi: `k7-*.json` yok |
 | K7 | maks/p2-durgun | kosulmadi: `k7-*.json` yok |
 | K7 | maks/p3-hareketli | kosulmadi: `k7-*.json` yok |
-| K7 | uyumlu/p1-karisik | kosulmadi: `k7-*.json` yok |
 | K7 | uyumlu/p2-durgun | kosulmadi: `k7-*.json` yok |
 | K7 | uyumlu/p3-hareketli | kosulmadi: `k7-*.json` yok |
 | K7 | yedek/p1-karisik | kosulmadi: `k7-*.json` yok |
 | K7 | yedek/p2-durgun | kosulmadi: `k7-*.json` yok |
 | K7 | yedek/p3-hareketli | kosulmadi: `k7-*.json` yok |
 
-Toplam 27 satir, 4 bolumde: K1/K2 2, K4 eki 8, K5/K6 8, K7 9.
+Toplam 26 satir, 4 bolumde: K1/K2 2, K4 eki 8, K5/K6 8, K7 8.
 
-"Kosulmadi" diyen 17 satirin sebebi tek: olcum penceresi
+"Kosulmadi" diyen 16 satirin sebebi tek: olcum penceresi
 icinde sira gelmedi. Kapasite eksigi degil, sure eksigi.
 Olculen 1 K5 hucresinin gozlenen suresi (ilk kodlama
 dosyasindan sonuc JSON'una) en fazla 36 dk
