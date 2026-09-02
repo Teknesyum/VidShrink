@@ -233,3 +233,20 @@ sayiyor); `qcomp` icin sebep duzenegin kendi eksigi ve csv'de oyle yaziyor.
 `qcomp` olculmedi cunku sozlesmenin sorusu degil: tek kuresel skaler,
 sahne basina harita bilgisi tasimiyor. Olculecek olsa `-svtav1-params`
 yolu acilmali.
+
+## Tekrar gurultusu pp cinsinden olculur, bayt cinsinden degil
+
+K4 izgarasindaki `kontrol` satiri ayni parametreyle iki kosumu **bayt**
+uzerinden karsilastirir. K4 ekinin olcusu ise MAE, birimi yuzde puani.
+Bayttaki sifir fark pp'de de sifir demek olmak zorunda degil: MAE
+normalize edilmis paylardan hesaplanir, tek bir sahnenin paketleri
+kaysa toplam boyut ayni kalirken pay dagilimi degisebilir.
+
+`tekrar <kol> <pencere>` ayni plani ikinci kez kosar ve uc satir yazar:
+dosya boyutu, sha256, `MAE(verilen,hak)`. Ucuncu satirin `fark` sutunu
+pp cinsinden tekrar gurultusudur — K4 ekindeki kazanclarin bu sayinin
+ustunde mi altinda mi kaldigi oradan okunur.
+
+Kosum kolu **`zones`in kazandigi** hucrede yapilir; kazanc en cok orada
+sorgulanir. Diger hucrelerde kosulmadi, maliyeti hucre basina bir tam
+iki gecisli kodlamadir.

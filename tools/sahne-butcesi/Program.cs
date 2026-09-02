@@ -130,6 +130,7 @@ public static class Program
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
                 case "k4b": await K4bAsync(p); break;
+                case "tekrar": await TekrarAsync(p); break;
                 case "kalite": await KaliteAsync(p); break;
                 case "plan": await PlanYazAsync(p); break;
                 case "dogrula": if (!await DogrulaAsync(p)) return 1; break;
@@ -551,6 +552,67 @@ public static class Program
         });
         if (code != 0) return null;
         return double.TryParse(text.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : null;
+    }
+
+    private static async Task TekrarAsync(Pencere p)
+    {
+        var harita = await HaritaAsync(p);
+        var map = Map(harita);
+        var (plan, info) = await PlanAsync(p);
+        var hedef = Yol($"tekrar-{Kol}-{p.Ad}.csv");
+        var ilk = Path.Combine(Is, $"plan-{Kol}-{p.Ad}.mkv");
+        var satirlar = new List<string> { "olcu;kosum1;kosum2;fark;birim;not" };
+
+        if (!File.Exists(ilk))
+        {
+            satirlar.Add("tekrar;;;;;bilinmiyor: birinci kosumun plan ciktisi yok");
+            await File.WriteAllLinesAsync(hedef, satirlar);
+            Console.WriteLine($"{Kol}/{p.Ad}: tekrar BILINMIYOR - plan ciktisi yok");
+            return;
+        }
+
+        var k1Yol = Yol($"k1-{Kol}-{p.Ad}.json");
+        if (!File.Exists(k1Yol))
+        {
+            satirlar.Add("tekrar;;;;;bilinmiyor: k1 kaydi yok, hak edilen dagitim okunamiyor");
+            await File.WriteAllLinesAsync(hedef, satirlar);
+            Console.WriteLine($"{Kol}/{p.Ad}: tekrar BILINMIYOR - k1 kaydi yok");
+            return;
+        }
+        var k1 = JsonSerializer.Deserialize<K1Kaydi>(await File.ReadAllTextAsync(k1Yol), Json)!;
+
+        var ikinci = Path.Combine(Is, $"tekrar-{Kol}-{p.Ad}.mkv");
+        if (!File.Exists(ikinci)) Kodla(info, plan, map, ikinci, null);
+        if (!File.Exists(ikinci))
+        {
+            satirlar.Add("tekrar;;;;;bilinmiyor: ikinci kosum cikti uretmedi");
+            await File.WriteAllLinesAsync(hedef, satirlar);
+            Console.WriteLine($"{Kol}/{p.Ad}: tekrar BILINMIYOR - ikinci kosum cikti uretmedi");
+            return;
+        }
+
+        var b1 = new FileInfo(ilk).Length;
+        var b2 = new FileInfo(ikinci).Length;
+        var h1 = Ozet(ilk);
+        var h2 = Ozet(ikinci);
+        var hak = k1.HakEdilen.ToArray();
+        var mae1 = Butce.MeanAbsoluteError(k1.Verilen.ToArray(), hak) * 100;
+        var mae2 = Butce.MeanAbsoluteError(Normalize(SahneBitleri(ikinci, map)), hak) * 100;
+
+        satirlar.Add($"dosya boyutu;{b1};{b2};{b2 - b1};bayt;");
+        satirlar.Add($"sha256;{h1[..16]};{h2[..16]};{(h1 == h2 ? "ayni" : "farkli")};-;");
+        satirlar.Add($"MAE(verilen,hak);{Kabuk.Inv(mae1, "0.000")};{Kabuk.Inv(mae2, "0.000")};" +
+                     $"{Kabuk.Inv(Math.Abs(mae2 - mae1), "0.000")};pp;ayni parametre, ayni girdi, iki kosum");
+        await File.WriteAllLinesAsync(hedef, satirlar);
+        Console.WriteLine($"{Kol}/{p.Ad}: tekrar gurultusu = {Kabuk.Inv(Math.Abs(mae2 - mae1), "0.000")} pp " +
+                          $"(sha256 {(h1 == h2 ? "ayni" : "farkli")}, boyut farki {b2 - b1} bayt)");
+    }
+
+    private static string Ozet(string dosya)
+    {
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        using var akis = File.OpenRead(dosya);
+        return Convert.ToHexString(sha.ComputeHash(akis));
     }
 
     public static double[] SahneBitleri(string dosya, SceneMap map)
