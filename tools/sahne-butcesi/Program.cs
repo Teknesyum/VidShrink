@@ -137,6 +137,14 @@ public static class Program
         return 0;
     }
 
+    private static bool AyniHarita(SceneMap a, SceneMap b)
+    {
+        if (a.Scenes.Count != b.Scenes.Count) return false;
+        for (var i = 0; i < a.Scenes.Count; i++)
+            if (Math.Abs(a.Scenes[i].Start - b.Scenes[i].Start) > 1e-6) return false;
+        return true;
+    }
+
     private static async Task<bool> DogrulaAsync(Pencere p)
     {
         var harita = await HaritaAsync(p);
@@ -580,6 +588,14 @@ public static class Program
                     "fazla-kesim" => Butce.KesimEkle(map),
                     _ => throw new InvalidOperationException(kol)
                 };
+                if (kol != "dagitim" && AyniHarita(map, kullanilan))
+                {
+                    var not = $"bozulma haritayi degistirmedi ({map.Scenes.Count} sahne); " +
+                              "bu pencerede bu bozulma uretilemiyor.";
+                    sonuclar.Add(new OlcumKaydi(p.Ad, kol, 0, HedefMb, band.LowerMb, band.UpperMb, false, null, null, null, null, not));
+                    Console.WriteLine($"{Kol}/{p.Ad}/{kol}: BILINMIYOR — {not}");
+                    continue;
+                }
                 zones = Butce.ZonesArg(kullanilan, Butce.ZoneCarpanlari(kullanilan, gamma), harita.Fps);
                 await File.WriteAllTextAsync(Yol($"{asama}-{Kol}-{p.Ad}-{kol}.zones.txt"),
                     $"gamma={Kabuk.Inv(gamma)}\nsahne={kullanilan.Scenes.Count}\nzones={zones}\n");
