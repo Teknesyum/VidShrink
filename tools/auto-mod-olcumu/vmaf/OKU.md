@@ -58,3 +58,9 @@ dökümü `t111-damga.sh`, VMAF `t111-olc.sh`, kaydırma kimliği `t111-kaydir.s
 - `y2`/`y3`'ün p10'unun neden diğerlerinin yedi katı oynadığı.
 - Arşivin kendisi kilitli ölçülemez (kodlama çıktıları yok); kilitli sayılar
   T111'in yeniden ürettiği dosyalardan.
+
+## T111 arşivi ayrı klasörde
+
+Bu klasördeki on bir dosya **kilitsiz ölçerle** üretilmiş T102 arşividir ve
+olduğu gibi duruyor — kusurun kaydı bu. T111'in kilitli ölçümleri ve her
+koşumun kilitsiz eşi `../vmaf-t111/` altında; okuma kılavuzu orada.
