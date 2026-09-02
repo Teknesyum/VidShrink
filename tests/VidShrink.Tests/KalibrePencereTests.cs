@@ -1,3 +1,4 @@
+using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -71,13 +72,82 @@ public sealed class KalibrePencereTests
     public void SahneKesigiPencereMerkezleriniDegistirmeli()
     {
         var kaynak = Kaynak(240);
-        var erken = Harita(240, (20, 1.0e6), (20, 16.0e6), (20, 2.0e6), (180, 9.0e6));
-        var gec = Harita(240, (150, 1.0e6), (30, 16.0e6), (30, 2.0e6), (30, 9.0e6));
+        var kabaKesik = Harita(240, (80, 1.0e6), (80, 9.0e6), (80, 3.0e6));
+        var sikKesik = Harita(240, (40, 1.0e6), (40, 1.0e6), (80, 9.0e6), (80, 3.0e6));
 
-        var erkenPencereler = CalibrationProbe.Windows(kaynak, SpeedMode.Quality, erken);
-        var gecPencereler = CalibrationProbe.Windows(kaynak, SpeedMode.Quality, gec);
+        Assert.Equal(SaniyeProfili(kabaKesik, 240), SaniyeProfili(sikKesik, 240));
 
-        Assert.NotEqual(Baslangiclar(erkenPencereler), Baslangiclar(gecPencereler));
+        var kabaPencereler = CalibrationProbe.Windows(kaynak, SpeedMode.Quality, kabaKesik);
+        var sikPencereler = CalibrationProbe.Windows(kaynak, SpeedMode.Quality, sikKesik);
+
+        Assert.NotEqual(Baslangiclar(kabaPencereler), Baslangiclar(sikPencereler));
+    }
+
+    private static double[] SaniyeProfili(SceneMap harita, double sure)
+    {
+        var saniyeler = new double[(int)Math.Floor(sure)];
+        foreach (var sahne in harita.Scenes)
+        {
+            var ilk = Math.Max(0, (int)Math.Floor(sahne.Start));
+            var son = Math.Min(saniyeler.Length - 1, (int)Math.Ceiling(Math.Min(sure, sahne.End)) - 1);
+            for (var i = ilk; i <= son; i++) saniyeler[i] = sahne.BitsPerSecond;
+        }
+        return saniyeler;
+    }
+
+    [Fact]
+    public void KesimArgumaniAyriUzunlugunuTasiyabiliyor()
+    {
+        Assert.Equal(
+            new[] { "-ss", "12.5", "-t", "3.25" },
+            CalibrationProbe.TrimArgs(new SampleWindow(12.5, 3.25, 1.0)).ToArray());
+    }
+
+    [Fact]
+    public void KesimArgumaniPencereninKendiUzunlugunuTasiyor()
+    {
+        var pencereler = CalibrationProbe.Windows(Kaynak(600), SpeedMode.Quality, DegiskenHarita(600, 20));
+
+        foreach (var pencere in pencereler)
+        {
+            var argumanlar = CalibrationProbe.TrimArgs(pencere);
+            Assert.Equal("-ss", argumanlar[0]);
+            Assert.Equal(pencere.Start.ToString("0.###", CultureInfo.InvariantCulture), argumanlar[1]);
+            Assert.Equal("-t", argumanlar[2]);
+            Assert.Equal(pencere.Length.ToString("0.###", CultureInfo.InvariantCulture), argumanlar[3]);
+        }
+    }
+
+    [Theory]
+    [InlineData(8.0)]
+    [InlineData(60.0)]
+    [InlineData(600.0)]
+    [InlineData(3600.0)]
+    public void PencereUzunluklariBugunHepsiAyni(double sure)
+    {
+        var pencereler = CalibrationProbe.Windows(Kaynak(sure), SpeedMode.Quality, DegiskenHarita(sure, 20));
+        var uzunluklar = pencereler.Select(p => p.Length).Distinct().ToArray();
+
+        Assert.Single(uzunluklar);
+    }
+
+    [Theory]
+    [InlineData(8.0, SpeedMode.Quality)]
+    [InlineData(30.0, SpeedMode.Quality)]
+    [InlineData(60.0, SpeedMode.Quality)]
+    [InlineData(120.0, SpeedMode.Quality)]
+    [InlineData(600.0, SpeedMode.Quality)]
+    [InlineData(3600.0, SpeedMode.Quality)]
+    [InlineData(600.0, SpeedMode.Fast)]
+    [InlineData(3600.0, SpeedMode.Fast)]
+    public void SahneHaritasiHicbirGirdideOrnekSayisiniDusurmuyor(double sure, SpeedMode hiz)
+    {
+        var eski = BugunkuBaslangiclar(sure, hiz).Length;
+        var duz = CalibrationProbe.Windows(Kaynak(sure), hiz, DuzHarita(sure, 10)).Count;
+        var degisken = CalibrationProbe.Windows(Kaynak(sure), hiz, DegiskenHarita(sure, 20)).Count;
+
+        Assert.True(degisken >= eski, $"degisken kaynak {eski} yerine {degisken} ornek aliyor");
+        Assert.True(duz >= ComplexityProbe.MinWindows, $"duz kaynak {duz} ornege dustu");
     }
 
     [Fact]
