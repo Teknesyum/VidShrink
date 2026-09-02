@@ -475,3 +475,31 @@ Iki yardimci disaridan devreye alindi; ana oturumun iki paralel ajan tavani degi
 
 Catisma taramasi: T140'in owns kumesi (`FfmpegArguments.cs`, `CodecModel.cs`,
 `EncodePlan.cs`, yeni test, yeni belge) hicbir aktif sozlesmede yok.
+
+- T132 teslim edildi (builder, tur 1): K0 sebebi (i) sayac yarisi olarak olculdu; bes iddia (b,b,c,b,b) siniflandi, uc bant daraltildi. Dal `T132-duvar-saati` itildi, CI `33637321742` success.
+
+## T132 teslim edildi, denetime verildi; T141 acildi — 2 Eylul 2026
+
+Dal `T132-duvar-saati`, dort commit, dordu de `owns` icinde (uc test dosyasi + belge).
+Uretim kodu degismedi. Yapicinin K0 cevabi: sorun yuk degil sayac yarisi —
+`FakeMeter.Calls++` atomik degil, iki pencere `Task.WhenAll` ile esanli olculuyor;
+200.000 denemede 156 kayip artis (%0,078), iki cekirdege sabitlenince sifir. Diger iki
+hipotez 45 kosumda elendi. Uc zamanlama bandi daraldi, genisleyen yok.
+
+Denetci acildi. Ozellikle arattiklarim: manset kaymasi, CI kosumunun (`33637321742`)
+gercekten `7952308`e ait olup olmadigi, daraltilan bantlarin testlerinin sabit mi
+davranis mi olctugu, verify kollarinin kac test buldugu. **Tam suiti yeniden
+kosturmasi yasaklandi** — makinede T137 tur 2 kosuyor, paralel kosum bu deponun
+zamanlama olcusunu kendisi bozuyor.
+
+**T141 acildi** — T132 yapicisinin bulup kapsam disi biraktigi uretim kusuru.
+`ComplexityProbe.WindowSample` bes alanli, sonuncusu kalite; uc kurulum yerinden
+**yalniz biri** kaliteyi tasiyor (`:793`). `half is null` kolu (`:740`) ve yedek yol
+(`:748`) `Quality = null` donuyor, tuketen taraf (`:98`) `null`i sessizce atliyor.
+Yani yedek yola dusen pencerenin kalitesi olculmemis oluyor ve hicbir yere
+"olculmedi" diye yazilmiyor. Bulgu bagimsiz dogrulandi, yapicinin sozune
+dayanmiyor.
+
+`depends: [T132]` — `ComplexityProbeTests.cs` T132 muhurlenene kadar onun.
+Yedek yolun ne siklikta kostugu **olculmedi**; K1 once onu olcuyor ve iki kol da
+olu cikarsa sozlesme orada duruyor.
