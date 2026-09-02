@@ -136,9 +136,15 @@ Okuma:
 
 ### Ölçülen: plan hesabı başına kaç yoklama
 
-`BuildDetailed` `PickCodec`i **iki** kez çağırıyor: plan kodlayıcısı için (`:164`) ve
-tavsiye kodlayıcısı için (`:393` ya da geçiş yolunda `:443` — ikisi birbirini dışlıyor).
-Yani plan hesabı başına en çok iki yoklama.
+`BuildDetailed` iki kez kodlayıcı seçiyor: plan kodlayıcısı (`:164`) ve tavsiye
+kodlayıcısı (`:393` ya da geçiş yolunda `:443` — ikisi birbirini dışlıyor). Yani plan
+hesabı başına en çok iki yoklama.
+
+İkisi hep aynı işlev değil: `:164` `SpeedMode.Fast` iken `PickFastCodec`e gidiyor,
+değilse `PickCodec`e. Tavsiye satırları `fast`e bakmadan hep `PickCodec` çağırıyor. Bu
+ayrım maliyeti bölüyor: hızlı kipte iki yoklamanın biri T128 öncesinde de vardı
+(`PickFastCodec` zaten `WorksAsEncoder` soruyordu), **yeni** olan yalnız tavsiye
+kodlayıcısınınki.
 
 Sayı tahmin değil, ölçüde pimli:
 
@@ -178,7 +184,7 @@ gerçek çağrı kalıyor:
 
 | satır | verdiği yetenek nesnesi | ne zaman koşuyor |
 |---|---|---|
-| `:1377` | ham `EncoderCapabilities` | açılış, `Task.Run` içinde (`:1370`) |
+| `:1377` | ham `EncoderCapabilities` | açılış, `Task.Run` içinde (`:1370`), `SpeedMode.Fast` |
 | `:1694` | `_planEncoders` | yeniden hesap |
 | `:1708` | `_planEncoders` | yeniden hesap |
 | `:1773` | `_planEncoders` | yeniden hesap |
@@ -202,6 +208,11 @@ yaptırmıyor**: hiç yoklanmamış kodlayıcı orada `Unmeasured` döner ve `Pi
 edileni geçici cevap olarak verir, ama o çağıranda ölçümü kuyruğa alacak kimse yoktur.
 Arayüzde karşılığı var — geçit ölçümü arka planda başlatıp hesabı yeniliyor — `tools/`
 altındaki başsız çağıranda yok: kodlama hiç doğrulanmamış bir kodlayıcının üstünde başlar.
+
+Arayüzdeki tek ham çağıran `:1377` de bu yüzden görünenden ucuz: `SpeedMode.Fast`
+veriyor, yani plan kodlayıcısı `PickFastCodec`ten geçiyor ve o yoklama T128 öncesinde de
+vardı. T128'in oraya **eklediği** en çok bir yoklama, tavsiye kodlayıcısınınki — hem de
+adı `ProbeHardwareEncodersAsync` olan, işi zaten yoklamak olan bir `Task.Run` içinde.
 
 `IEncoderMeasurementState` tam bu ayrımı yapıyor: geçidi olan çağıran hiç süreç
 doğurmaz ve ölçüm gelince yeniden hesaplar; geçidi olmayan çağıran yoklamayı senkron öder
@@ -235,7 +246,11 @@ Başarısız VidShrink.Tests.EncoderAvailabilityTests.PickCodecArtikDerlemeListe
 Başarısız! - Başarısız: 5, Başarılı: 36, Atlanan: 0, Toplam: 41
 ```
 
-Beş satır saydım: **5**, koşumun bildirdiğiyle aynı.
+Beş satır saydım: **5**, koşumun bildirdiğiyle aynı. K2'nin dört kırmızısından biri —
+`OlculmemisKodlayiciYoklanmiyorGeciciCevapVeriliyor` — bu mutasyonda yeşil kalıyor,
+çünkü mutasyon `WorksAsEncoder` satırını değiştiriyor, ölçülmemişlik kapısını değil; o
+ölçü zaten kapıda duruyor ve `WorksAsEncoder`a hiç ulaşmıyor. Beşinci kırmızı T123'ün
+çevrilmiş kusur kaydı.
 
 ### (b) `PickFastCodec` `WorksAsEncoder` → `HasEncoder`
 
