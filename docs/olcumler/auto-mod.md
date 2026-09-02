@@ -257,9 +257,10 @@ puan da **yükseliyor** (ortalama +0,155, p10 +0,333). Boyut eşitliği tartış
 bağımsız bir sonuç — daha küçük dosyada daha iyi puan, hangi eksenden bakılırsa
 bakılsın kayıp yok.
 
-**Sebebi ölçüldü: yerleşim değil, aralığın kendisi.** Tur 2'de bu satırda "sebebi
-anahtar kare sayısı değil, yeri" yazıyordu; o cümle türetilmişti, ölçülmemişti. Tur 3'te
-yapılan A/B onu çürüttü — aşağıda.
+**Yerleşim sebep değil — ölçüldü.** Tur 2'de bu satırda "sebebi anahtar kare sayısı
+değil, yeri" yazıyordu; o cümle türetilmişti, ölçülmemişti. Tur 3'te yapılan A/B onu
+çürüttü — aşağıda. Ölçülen tek şey bu **dışlama**; `-g 120 → 300` değişiminde geriye
+kalan tek değişken aralığın (dolayısıyla sabit ızgarada sayının) kendisi.
 
 Üretilen dosyalardaki anahtar kare zamanları doğrudan sayıldı
 (`ffprobe -skip_frame nokey`):
@@ -405,9 +406,10 @@ kalemlerin en büyüğü: `-g 300` dosyayı %24,5 küçültürken puanı yüksel
 çoğu zaten ayrıştırılamadı — **daha küçük dosyada daha yüksek puan** vermesi; iki
 eksende birden kazandığı için boyut eşitliği tartışmasından bağımsız duruyor.
 
-Ölçülen sebep **aralığın uzunluğu**, yerleşim değil: aynı `-g 300`'de anahtar kareyi
-iki sahne kesmesine hizalamak, sayı sabitken ve boyut eşitlenmişken ortalamada
-**-1,225**, p10'da **-2,046** kaybettiriyor (`y1`/`y3`, K4'teki hizalama tablosu).
+Ölçülen şey **yerleşimin sebep olmadığı**: aynı `-g 300`'de anahtar kareyi iki sahne
+kesmesine hizalamak, sayı sabitken ve boyut eşitlenmişken ortalamada **-1,225**,
+p10'da **-2,046** kaybettiriyor (`y1`/`y3`, K4'teki hizalama tablosu). Geriye kalan
+tek değişken aralığın uzunluğu; bu bir dışlama, doğrudan ölçüm değil.
 Yapılacak iş `FfmpegArguments.cs:162`'deki `fps × 2` sabitini daha uzun bir sabit
 aralığa çevirmek. **Sahne kesmesi tetikli anahtar kare denenmemeli** — bu kaynakta
 ölçüldü ve kaybettiriyor.
