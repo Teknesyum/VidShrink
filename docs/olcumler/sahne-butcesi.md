@@ -496,6 +496,7 @@ beklentisinin ust sinirini gosterir.
 | Yazilim kolu | Pencere | Zone sayisi | En kucuk b | En buyuk b | Aralik |
 |--------------|---------|-------------|------------|------------|--------|
 | uyumlu | `p1-karisik` | 28 | 0.842 | 1.279 | 0.437 |
+| uyumlu | `p2-durgun` | 6 | 0.944 | 1.207 | 0.263 |
 
 ### Dagitimli − dagitimsiz
 
@@ -579,6 +580,8 @@ uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.
 - K7 (bozuk harita bedeli): **bilinmiyor** — olculmedi
 
 **Sahne basina dagitim 4 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 4 hucrenin tabani gecen 3 tanesinde `zones` 1 kez kazandi, `qcomp` 2 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones` 4 hucreden 1 tanesinde kazandi ve en buyuk kazanc 0.044 pp; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
+
+**Bu kazanci bugunku varsayilan yol alamaz:** uretimin varsayilan kodlayicisi `libsvtav1` `zones` parametresini hic okumuyor (K4 izgarasi). Yani olculen kazanc, kullanicinin varsayilan ayarlarla yaptigi sikistirmaya ulasmiyor; ancak kodlayici elle `libx265` ya da `libx264` secildiginde gorunur.
 
 Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen 5 kodlayicinin yalniz 2 tanesinde calisiyor (`libx265`, `libx264`); uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi sessizce yok sayiyor, nvenc kollarinda parametre hic yok. Yani dagitimin lehine cikan her kanit bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirlidir. Ikisi birlikte: elde `zones` lehine 1 hucrelik kucuk bir isaret var ve o isaret zaten uretimin varsayilan yolunda gecerli degil.
 

@@ -472,7 +472,7 @@ public static class Rapor
     }
 
     public sealed record K4Sonuc(int Denenen, int Calisan, bool VarsayilanIsliyor,
-        IReadOnlyList<string> CalisanListesi);
+        IReadOnlyList<string> CalisanListesi, string VarsayilanKodlayici = "libsvtav1");
 
     private static K4Sonuc K4(StringBuilder sb, string isKok)
     {
@@ -1225,6 +1225,16 @@ public static class Rapor
                             : $"`zones` {k4b.Hucre} hucreden {k4b.ZonesKazandi} tanesinde kazandi " +
                               $"ve en buyuk kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp; " +
                               "bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir."));
+            if (k4b.ZonesKazandi > 0 && k4.Denenen > 0 && !k4.VarsayilanIsliyor)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"**Bu kazanci bugunku varsayilan yol alamaz:** uretimin varsayilan " +
+                              $"kodlayicisi `{k4.VarsayilanKodlayici}` `zones` parametresini hic " +
+                              "okumuyor (K4 izgarasi). Yani olculen kazanc, kullanicinin varsayilan " +
+                              "ayarlarla yaptigi sikistirmaya ulasmiyor; ancak kodlayici elle " +
+                              $"{string.Join(" ya da ", k4.CalisanListesi.Select(x => $"`{x}`"))} " +
+                              "secildiginde gorunur.");
+            }
             sb.AppendLine();
             if (k4.Denenen > 0)
             {
