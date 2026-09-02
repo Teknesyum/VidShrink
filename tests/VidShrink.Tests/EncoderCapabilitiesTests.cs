@@ -116,8 +116,9 @@ public sealed class EncoderCapabilitiesTests
         Assert.False(first.Succeeded);
         Assert.Equal(EncoderProbeState.Unmeasured, caps.EncoderState("h264_nvenc"));
 
-        // Olculemeyen sonuc onbellege girmedigi icin ikinci cagri yeniden yokluyor.
-        Assert.Equal(3, calls);
+        // Olculemeyen sonuc onbellege girmedigi icin ikinci cagri yeniden yokluyor;
+        // EncoderState surec dogurmadigi icin sayaci artirmiyor.
+        Assert.Equal(2, calls);
         Assert.Equal(EncoderProbeState.Unmeasured, second.State);
 
         var verdict = HardwareVerdict.Decide(first, 12_000, 1920, 1080, 30);
@@ -253,13 +254,34 @@ public sealed class EncoderCapabilitiesTests
     {
         var unmeasured = Capabilities();
         unmeasured.Hdr10ProbeHook = (_, _) => EncoderCapabilities.ProbeOutcome.Unmeasured;
-        Assert.Equal(EncoderProbeState.Unmeasured, unmeasured.Hdr10State("h264_nvenc"));
         Assert.Null(unmeasured.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.Unmeasured, unmeasured.Hdr10State("h264_nvenc"));
 
         var rejected = Capabilities();
         rejected.Hdr10ProbeHook = (_, _) => EncoderCapabilities.ProbeOutcome.Rejected;
-        Assert.Equal(EncoderProbeState.NotWorking, rejected.Hdr10State("h264_nvenc"));
         Assert.Null(rejected.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.NotWorking, rejected.Hdr10State("h264_nvenc"));
+    }
+
+    /// <summary>
+    /// K2 ucuncu olcu: ucuncu durumun yuzu <b>surec dogurmadan</b> okunabiliyor. Yoklamayi
+    /// calistiran her yol atarsa da EncoderState ve Hdr10State cevap veriyor: listede olup
+    /// yoklanmamis kodlayici <see cref="EncoderProbeState.Unmeasured"/>, ffmpeg'in hic
+    /// listelemedigi kodlayici <see cref="EncoderProbeState.NotWorking"/>. Bu ikisinden biri
+    /// yoklamaya delege edilirse olcu firlatilan istisnayla kirilir.
+    /// </summary>
+    [Fact]
+    public void ReadingTheThirdStateNeverSpawnsAProcess()
+    {
+        var caps = Capabilities();
+        caps.EncoderProbeHook = _ => throw new InvalidOperationException("yoklama kosmamaliydi");
+        caps.Hdr10ProbeHook = (_, _) => throw new InvalidOperationException("yoklama kosmamaliydi");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, caps.EncoderState("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.Unmeasured, caps.Hdr10State("h264_nvenc"));
+
+        Assert.Equal(EncoderProbeState.NotWorking, caps.EncoderState("hevc_qsv"));
+        Assert.Equal(EncoderProbeState.NotWorking, caps.Hdr10State("hevc_qsv"));
     }
 
     // --- K6: kilit ffmpeg suresince tutulmuyor ---

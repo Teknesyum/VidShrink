@@ -11,8 +11,12 @@ public interface IEncoderAvailability
     bool WorksAsEncoder(string codec);
 
     /// <summary>
-    /// Aynı sorunun üç durumlu cevabı: çalışıyor, çalışmıyor, ölçülemedi. Varsayılan
-    /// gerçekleştirme ölçebilen yoklaması olmayan sahteleri kırmadan iki durumu korur;
+    /// Aynı sorunun üç durumlu ve <b>süreç doğurmayan</b> cevabı: çalışıyor, çalışmıyor,
+    /// henüz ölçülmedi. <see cref="WorksAsEncoder"/> bilmediğini öğrenmek için ffmpeg
+    /// çağırır; bu yol yalnızca zaten bilineni okur, bu yüzden arayüz iş parçacığından
+    /// çağrılabilir. <see cref="EncoderProbeState.Unmeasured"/> "bu makinede çalışmıyor"
+    /// değil "henüz bakmadık" demektir; ölçüm arka planda yaptırılır.
+    /// Varsayılan gerçekleştirme, yoklaması olmayan sahteleri kırmadan iki durumu korur;
     /// gerçekten yoklayan taraf (<c>EncoderCapabilities</c>) bunu ezer.
     /// </summary>
     EncoderProbeState EncoderState(string codec) =>

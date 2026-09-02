@@ -151,7 +151,16 @@ kullanilir ama muhurlenmez.
 HDR yolunun ucuncu durumu uc olcuyle tutuluyor:
 `AnHdr10AcceptanceAfterAnUnmeasuredFormatIsNotCached` (dongu kacagi),
 `AMeasuredHdr10AcceptanceIsCached` ve
-`Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence`.
+`Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence`. Ikisi de mutasyonla kirildi:
+
+| mutasyon | sonuc |
+|---|---|
+| E: `case Accepted: return (pixelFormat, false)` (T129 oncesi hali) | `AnHdr10Acceptance...` **KIRMIZI** (1 basarisiz / 14) |
+| F: olculemeyen HDR sonucu da onbellege yaziliyor | `Hdr10StateSeparates...` **ve** `AnHdr10Acceptance...` **KIRMIZI** (2 basarisiz / 14) |
+
+Kabul edilen bicim, daha onceki bicim olculemedigi icin muhurlenmese bile
+`Hdr10State` **`Working`** dondurur: calistigi olculdu, muhurlenmemesi daha iyi bir
+bicimin olculememesindendir.
 
 **Olcusuz kapanis:** 3 numaranin (`Load` / `RunCapture` / `Instance`) uc degisikligi de
 **olcuyle tutulmuyor.** `Instance` gercek ffmpeg'i cagiran statik bir tekildir; yeniden

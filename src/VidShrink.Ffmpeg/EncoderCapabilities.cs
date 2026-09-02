@@ -69,7 +69,19 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
 
     public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
 
-    public EncoderProbeState EncoderState(string codec) => Probe(codec).State;
+    /// <summary>
+    /// Bilineni okur, süreç doğurmaz. Kodlayıcı ffmpeg'in listesinde yoksa cevap
+    /// süreçsiz de kesindir; listede olup henüz yoklanmamış ya da yoklaması sonuca
+    /// varamamış kodlayıcı <see cref="EncoderProbeState.Unmeasured"/> döner. Ölçmek
+    /// isteyen <see cref="Probe"/> çağırır ve onu arka planda koşturur.
+    /// </summary>
+    public EncoderProbeState EncoderState(string codec)
+    {
+        lock (_probed)
+            if (_probed.TryGetValue(codec, out var cached)) return cached.State;
+
+        return HasEncoder(codec) ? EncoderProbeState.Unmeasured : EncoderProbeState.NotWorking;
+    }
 
     /// <summary>
     /// Isıtılmış sonucu okur. Süreç doğurmaz: argüman üretimi bu yolu kullanıyor ve saf
@@ -121,15 +133,19 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
     public string? Hdr10PixelFormat(string codec) => Hdr10Probe(codec).PixelFormat;
 
     /// <summary>
-    /// Kabul edilen bir biçim görüldüyse sonuç <see cref="EncoderProbeState.Working"/>:
-    /// mühürlenmemiş olması daha iyi bir biçimin ölçülememesindendir, çalıştığı ölçüldü.
-    /// Hiçbir biçim kabul edilmediyse ayrım ölçüme varılıp varılmadığındadır.
+    /// <see cref="EncoderState"/> ile aynı kural: bilineni okur, süreç doğurmaz. Ölçmek
+    /// isteyen <see cref="Hdr10PixelFormat"/> çağırır. Mühürlenmiş bir biçim varsa
+    /// <see cref="EncoderProbeState.Working"/>, mühürlenmiş yokluk varsa
+    /// <see cref="EncoderProbeState.NotWorking"/>, hiç bilinmiyorsa
+    /// <see cref="EncoderProbeState.Unmeasured"/>.
     /// </summary>
     public EncoderProbeState Hdr10State(string codec)
     {
-        var (pixelFormat, measured) = Hdr10Probe(codec);
-        if (pixelFormat is not null) return EncoderProbeState.Working;
-        return measured ? EncoderProbeState.NotWorking : EncoderProbeState.Unmeasured;
+        lock (_hdr10PixelFormats)
+            if (_hdr10PixelFormats.TryGetValue(codec, out var cached))
+                return cached is null ? EncoderProbeState.NotWorking : EncoderProbeState.Working;
+
+        return HasEncoder(codec) ? EncoderProbeState.Unmeasured : EncoderProbeState.NotWorking;
     }
 
     private (string? PixelFormat, bool Measured) Hdr10Probe(string codec)
