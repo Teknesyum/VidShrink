@@ -242,6 +242,24 @@ kusurun telafisiyse, o sabit koda yazılmaz.** Ya kusurun ölçüsünden türeti
 ya da onu doğuran değere bakan bir ölçüyle bağlanır ki değer değişince
 ölçü kırılsın. Sessizce doğru kalan telafi sabiti yoktur.
 
+## Kapanan açık, kapanmayan sınıf (T100, 2026-09-02)
+
+Arayüz kullanıcıya "burada durur, kalanı harcamaz" derken teslim edilen dosya
+39,14 MB oluyordu — vaat 8,7 MB'tı. İki kapı ayrışmıştı: koşucu
+`actualMb >= HardFloorMb` istiyor, arayüz istemiyordu. Kapandı, tek yükleme
+bağlandı, mutasyonla doğrulandı.
+
+**Ama sınıf kapanmadı.** Arayüz `note.Mb`'yi vuruyor — bu planın *tahmini*.
+Koşucu `actualMb`'yi vuruyor — bu *gerçek*. Üç kaynakta ikisi tabanın aynı
+yanına düştü, o yüzden cümle tutuyor. Tahmin tabanın öbür yanına düşen bir
+kaynakta yine ayrışır, ve **bugünkü ölçü bunu yakalayamaz**: test koşucuya
+`note.Mb ≈ actual` olan bir plan veriyor.
+
+Gerçek çözüm, kararın planlayıcıda saklanması — `StopsShortOfBandOnPurpose`
+bugün türetilen bir işaret, `PlanCalculator` koşulu zaten biliyor ama
+yazmıyor. T99 o dosyayı tuttuğu için bu turda taşınamadı. **T99 mühürlenince
+açılacak ilk küçük iş budur.**
+
 ## Sonraki basamak
 
 1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
