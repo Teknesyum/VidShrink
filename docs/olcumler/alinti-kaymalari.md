@@ -120,8 +120,18 @@ quality.loss" src/VidShrink.App --include=*.cs --include=*.axaml`).
 
 Sonuç: uydurma künye yazmadım. Cümleyi düzelttim — "Ölü anahtarlar (2)" → "(3)", örnek
 dizge ve künye, gerçekten ölü olan üç JSON anahtarıyla ve doğru dosya/satırlarıyla
-değiştirildi; `LanguageCatalog.cs`'in çeviri sözlüğü olmadığı açıkça yazıldı. Commit
-`200bf82` (5 numarayla aynı commit, ikisi de `uygulama-katmani.md` içinde bitişik).
+değiştirildi. Commit `200bf82` (5 numarayla aynı commit, ikisi de `uygulama-katmani.md`
+içinde bitişik).
+
+T0'ın geri bildirimiyle (yanlış atfı sessizce silme, "sanılıyordu/değil/gerçek yer"
+biçiminde açıkça yaz) madde `f155dea`'de yeniden düzenlendi: eski yanlış iddia
+("`LanguageCatalog.cs:7` bir çeviri sözlüğünün ölü anahtarı") **silinmedi**, önce ne
+sanıldığı ve neden yanlış olduğu ("o dizge kaynakta hiç yok, satır 7 bir `// T27:` yorum
+satırı, `LanguageCatalog.cs` hiçbir zaman çeviri sözlüğü olmadı") yazıldı, ardından
+çevirilerin gerçek yeri (`Locales/{en,tr}/*.json`) ve gerçek ölü anahtarlar belirtildi.
+Yeniden kosturma sonrası araç bu paragraftan **KAYMA üretmedi** (eski yanlış dizge hâlâ
+metinde ama artık bir künyeye bitişik "iddia" olarak okunmuyor — `KAYMA: 0  SATIR
+KAYDI: 1` (T125'in bulgusu), `.calisma/T126/mutasyon-sonuc.txt`'ten sonraki son kosum).
 
 **T0'a bildirilecek:** Bu bulgunun ötesinde, `## 4. Çeviri bütünlüğü` bölümünün tamamı
 (satır 87-88, 3, 17) hâlâ aynı eski mimariyi anlatıyor — "112 anahtar, 112 farklı değer",
