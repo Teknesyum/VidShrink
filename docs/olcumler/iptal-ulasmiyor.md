@@ -4,7 +4,9 @@
 
 Sonuç: **(b) doğru — kurulum boğuluyor. (a) ölçümle çürütüldü.**
 `ComplexityProbe.RunDetailedAsync` iptali yutmuyor; `cts.Cancel()` ile
-`OperationCanceledException` arasında geçen süre yük altında bile 0,1–8,8 s.
+`OperationCanceledException` arasında geçen süre yük altında bile **93–427 ms**.
+**[Denetimde düzeltildi: burada duran 0,1–8,8 s aralığının kaynağı yoktu; aşağıdaki
+15 koşumun hiçbirinde 435 ms'yi aşan iptal ulaşma yok.]**
 Testi düşüren 31 saniyenin %99'undan fazlası `cts.Cancel()` çağrılmadan **önce**
 geçiyor; testin o aralığı koruyan `WaitAsync(10 s)` satırı düşüyor, iptal iddiası değil.
 
@@ -62,9 +64,16 @@ kadar geçen süre — sondanın **kendi** ffmpeg pencere kodlamaları. Testte b
 | 4 | 8.303 ms | 20.099 ms | 212 ms | OperationCanceledException |
 | 5 | 7.584 ms | 19.056 ms | 229 ms | OperationCanceledException |
 
-Toplam ≈ 29–32 s. T115'in bildirdiği 31 s bu toplamla örtüşüyor.
-Dağılım: yaklaşık **8 s klip kurulumu + 21 s sondanın kendi pencere kodlaması + 0,2 s
-iptal**. İptalin payı toplamın binde 7'si.
+Toplam **26,9–32,8 s** (tablodaki beş koşum: 30,6 / 30,2 / 32,8 / 28,6 / 26,9).
+T115'in bildirdiği 31 s bu aralığın içinde.
+**[Denetimde düzeltildi: burada 29–32 s yazıyordu, iki uç da kendi tablosundan
+yeniden hesaplanınca yanlış çıktı.]**
+
+Dağılımın buradaki üç terimli hali (8 s kurulum + 21 s pencere kodlaması + 0,2 s iptal)
+**düşen test için geçerli değildi ve geri çekildi:** eski ölçü ölçere girişi
+`WaitAsync(10 s)` ile sınırlıyor, 21 s'ye hiç ulaşamaz — 10. saniyede atar. Düşen
+koşumun doğru dağılımı kurulum + 10 s tavan + teardown'dır. Yukarıdaki tablo iptalsiz
+koşumun dağılımıdır; düşen koşumun kendi dağılımı ölçülmedi.
 
 **T115 koşumunun kendi dağılımı ölçülmedi** — T115 yalnız toplam süreyi bildirmiş,
 hangi satırın attığı kayıtlı değil. Yukarıdaki dağılım bu makinede yeniden üretilen
@@ -108,8 +117,10 @@ edilmezse** `RunDetailedAsync` doğal olarak bitebiliyor mu? Yük altında üç 
 
 Bitmiyor ve bitemez: `BlockingMeter` `Task.Delay(Timeout.InfiniteTimeSpan, ct)` ile
 sonsuza kadar bekler, `RunDetailedAsync` da `Task.WhenAll(pending)` ile onu bekler.
-İptal olmadan tek çıkış `SampleTimeout` (90 s). Dolayısıyla `Cancel()`'dan 92–8.785 ms
+İptal olmadan tek çıkış `SampleTimeout` (90 s). Dolayısıyla `Cancel()`'dan **93–427 ms**
 sonra gelen istisna doğal bitişten gelemez; iptal yolundan gelir.
+**[Denetimde düzeltildi: 92–8.785 ms yazıyordu, 8.785 hiçbir tabloda geçmiyor.
+Sonuç değişmiyor — 427 ms de 90 s'lik tek doğal çıkışın çok altında.]**
 
 **Kullanılamayan sütun:** aynı koşumda `Process.GetProcessesByName("ffmpeg")` ile
 süreç sayımı da alındı, ama sayaç makinedeki **tüm** ffmpeg süreçlerini görüyor —
@@ -137,7 +148,10 @@ Yeni ölçüde iptali **ölçerin kendisi** tetikliyor: `CancellingMeter` çağr
 `source.CancelAsync()` çağırıyor, sonra token üstünde bloke oluyor. Kurulum 0,5 s de
 sürse 60 s de sürse kabul değişmiyor; test yalnız "ölçere ulaşıldı mı" ve
 "iptal `RunDetailedAsync`'ten `OperationCanceledException` olarak çıktı mı" sorularını
-soruyor. **Testte hiçbir süre sınırı, `Task.Delay` ya da `Stopwatch` kalmadı.**
+soruyor. **Testte hiçbir süre sınırı ve `Stopwatch` kalmadı.** Tek zaman yapısı
+`ComplexityProbeTests.cs:46`'daki `Task.Delay(Timeout.InfiniteTimeSpan, ct)`'dir; o bir
+süre değil, iptal bekler — duvar saati kabulü değildir. **[Denetimde düzeltildi:
+cümle `Task.Delay` kalmadı diyordu, kalmıştı.]**
 `meter.Calls > 0` iddiası, ölçere hiç uğramadan sessizce geçen bir koşumun yeşil
 görünmesini engelliyor.
 
@@ -153,7 +167,7 @@ Her koşum tam derlemeyle (`--no-build` yok).
 | M1 | `ComplexityProbe.cs:477` içteki yeniden fırlatma silindi (ölçerin iptali `catch { quality = null; }` tarafından yutulur) | kırmızı | **yeşil — yakalanmadı** | 455 ms |
 | M2 | `ComplexityProbe.cs:101` dıştaki yeniden fırlatma silindi (iptal yutulur, taban profil döner) | kırmızı | **kırmızı** | 481 ms |
 | M3 | M1 + M2 birlikte | kırmızı | **kırmızı** | 479 ms |
-| M4 | Ölçünün kendisi eski haline döndürüldü, 32 iplik yük altında | kırmızı | **kırmızı**, geri döndürülmüş dosyada `:182` — `WaitAsync(TimeSpan.FromSeconds(10))` satırı | 17 s |
+| M4 | Ölçünün kendisi eski haline döndürüldü, 32 iplik yük altında | kırmızı | **kırmızı**, geri döndürülmüş dosyada `:166` — `WaitAsync(TimeSpan.FromSeconds(10))` satırı **[denetimde düzeltildi: `:182` yazıyordu, orası `WithClipAsync`'in `finally` bloğu]** | 17 s |
 | — | Düzeltilmiş ölçü, 32 iplik yük altında | yeşil | **yeşil** | 24 s |
 | — | Düzeltilmiş ölçü, boş makine | yeşil | **yeşil** | 1 s |
 
