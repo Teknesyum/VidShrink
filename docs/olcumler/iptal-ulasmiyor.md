@@ -35,7 +35,7 @@ foreach ($j in $jobs) { Stop-Process -Id $j.Id -Force }
 ## K1 — İki sayı ayrı ayrı
 
 `klip_kurulum`: `WithClipAsync`'in ürettiği 8 saniyelik klibin kodlanması
-(`ComplexityProbeTests.cs:172-183`).
+(`ComplexityProbeTests.cs:176-187`).
 `olcere_giris`: `RunDetailedAsync` çağrısından sahte ölçerin ilk kez çalıştırılmasına
 kadar geçen süre — sondanın **kendi** ffmpeg pencere kodlamaları. Testte bu aralığı
 10 saniyelik `WaitAsync` koruyordu.
@@ -152,7 +152,7 @@ Her koşum tam derlemeyle (`--no-build` yok).
 | M1 | `ComplexityProbe.cs:477` içteki yeniden fırlatma silindi (ölçerin iptali `catch { quality = null; }` tarafından yutulur) | kırmızı | **yeşil — yakalanmadı** | 455 ms |
 | M2 | `ComplexityProbe.cs:101` dıştaki yeniden fırlatma silindi (iptal yutulur, taban profil döner) | kırmızı | **kırmızı** | 481 ms |
 | M3 | M1 + M2 birlikte | kırmızı | **kırmızı** | 479 ms |
-| M4 | Ölçünün kendisi eski haline döndürüldü, 32 iplik yük altında | kırmızı | **kırmızı**, `ComplexityProbeTests.cs:182` — yani `WaitAsync(10 s)` satırı | 17 s |
+| M4 | Ölçünün kendisi eski haline döndürüldü, 32 iplik yük altında | kırmızı | **kırmızı**, geri döndürülmüş dosyada `:182` — `WaitAsync(TimeSpan.FromSeconds(10))` satırı | 17 s |
 | — | Düzeltilmiş ölçü, 32 iplik yük altında | yeşil | **yeşil** | 24 s |
 | — | Düzeltilmiş ölçü, boş makine | yeşil | **yeşil** | 1 s |
 
@@ -174,9 +174,9 @@ iddiası koyulmadı. Bu boşluk kapatılmadı, gizlenmedi de: içteki koruma tek
 
 | Yer | Kusur |
 |---|---|
-| `WithClipAsync:172-183` | Her `[FfmpegFact]`/`[FfmpegTheory]` için 8 saniyelik libx264 klibi baştan kodlar. İptal jetonu almaz, zaman sınırı yoktur. Sınıfta 11 koşum var; yük altında her biri ≈8–11 s kurulum ödüyor. Paylaşılan bir fixture bu maliyeti bire indirir. |
-| `RunFfmpegAsync:185-194` | `ToolLocator` ffmpeg'ini zaman sınırsız ve iptalsiz bekler. ffmpeg asılırsa test asılır; süiti kesen tek şey koşucunun kendi sınırı olur. |
-| `WindowAndMotionSamplesCountTheSameByteUnit:104-105` | `drift < 0.08` eşiği duvar saatine bağlı değil (bayt sayar), ama ampirik ve gerekçesi dosyada yazılı değil. Kodlayıcı sürümü değişirse sessizce kayabilir. |
+| `WithClipAsync:176-187` | Her `[FfmpegFact]`/`[FfmpegTheory]` için 8 saniyelik libx264 klibi baştan kodlar. İptal jetonu almaz, zaman sınırı yoktur. Sınıfta 11 koşum var; yük altında her biri ≈8–11 s kurulum ödüyor. Paylaşılan bir fixture bu maliyeti bire indirir. |
+| `RunFfmpegAsync:189-198` | `ToolLocator` ffmpeg'ini zaman sınırsız ve iptalsiz bekler. ffmpeg asılırsa test asılır; süiti kesen tek şey koşucunun kendi sınırı olur. |
+| `WindowAndMotionSamplesCountTheSameByteUnit:107-108` | `drift < 0.08` eşiği duvar saatine bağlı değil (bayt sayar), ama ampirik ve gerekçesi dosyada yazılı değil. Kodlayıcı sürümü değişirse sessizce kayabilir. |
 
 Duvar saatine bağlı başka kabul kalmadı: sınıfta `TimeSpan`, `Stopwatch`, `Task.Delay`
 ve `WaitAsync` kullanımı yalnız `Task.Delay(Timeout.InfiniteTimeSpan, ct)` satırında
