@@ -1,7 +1,7 @@
 import json, os, sys
 W = '.calisma/T116/gunluk'
 AD = {'sdr8': ('klip ikamesi', 8), 'sdr20': ('klip ikamesi', 20),
-      'hdr1': ('hdr (parca-1)', 40), 'hdr2': ('hdr (parca-2)', 40)}
+      'hdr1': ('hdr ikamesi (parca-1)', 40), 'hdr2': ('hdr ikamesi (parca-2)', 40)}
 
 def oku(tag):
     p = os.path.join(W, tag + '.json')
@@ -11,9 +11,13 @@ def oku(tag):
 def n(v, f='%.2f'):
     return 'OLCULMEDI' if v is None else f % v
 
+def kip(d):
+    m, c = d['Mode'], d['CrfOrBitrate']
+    return c if c.startswith(m) else '%s %s' % (m, c)
+
 def satir(d):
-    return '| %s@%d | %s %s | %.3f | %s | %s | %s | %.1f | %d |' % (
-        d['Width'], d['Fps'], d['Mode'], d['CrfOrBitrate'], d['ActualMb'],
+    return '| %s@%d | %s | %.3f | %s | %s | %s | %.1f | %d |' % (
+        d['Width'], d['Fps'], kip(d), d['ActualMb'],
         n(d['VmafNegMean']), n(d['VmafNegHarmonic']), n(d['VmafNegP10']),
         d['EncodeSeconds'], d['Attempts'])
 

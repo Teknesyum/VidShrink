@@ -599,3 +599,37 @@ olmadığını** gösteriyor; §11.1'de "yeniden üretilebilirlik ölçülmedi" 
 yazılan maddenin somut karşılığıdır. Sebebi ölçülmedi: `bench`in kendi kodlama
 çağrısında iş parçacığı sayısı sabitlenmiyor, ama bunun tek sebep olduğu
 gösterilmedi.
+
+### 11.5 Kilitli ölçerle A/B (K2)
+
+Tablodaki her kaynak **ikamedir** — §11.1'e bakınız. `oyun` satırı yok:
+o kaynak **ölçülmedi**, elde 48 fps av1 oyun kaydı bulunmadığı için.
+
+Aşağıdaki ızgara §1'in tablosuyla **aynı kaynakları ölçmüyor; satırları
+karşılaştırılamaz.** §1'in tablosu "kilitsiz (geçersiz), kaynak silinmiş,
+yeniden üretilemez" damgasını taşıyor ve silinmedi.
+
+#### Satırlar — ölçer kilitli, kaynaklar ikame
+
+| kaynak | hedef | kol | yerlesim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
+| --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | eski | 1190@60 | 2pass 1061k | 7.541 | 64.01 | 56.95 | 34.78 | 52.6 | 1 |
+| klip ikamesi | 8 MB | yeni | 1190@60 | 2pass 1061k | 7.529 | 64.00 | 56.86 | 34.48 | 17.3 | 1 |
+| klip ikamesi | 20 MB | eski | 1920@60 | 2pass 2695k | 19.304 | 79.59 | 75.00 | 51.92 | 81.0 | 1 |
+| klip ikamesi | 20 MB | yeni | 1920@60 | 2pass 2695k | 19.304 | 79.62 | 75.05 | 51.29 | 71.1 | 1 |
+| hdr ikamesi (parca-1) | 40 MB | eski | 1458@60 | 2pass 5389k | 38.990 | 81.25 | 80.92 | 74.90 | 245.2 | 2 |
+| hdr ikamesi (parca-1) | 40 MB | yeni | 1612@60 | crf 21 | 37.396 | 82.85 | 82.59 | 78.22 | 71.6 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | eski | 1920@60 | 2pass 5258k | 39.454 | 95.95 | 95.94 | 95.54 | 111.5 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | yeni | 1920@60 | crf 23 | 39.114 | 95.94 | 95.94 | 95.52 | 101.3 | 3 |
+
+#### Kol farkı (yeni - eski), ölçer kilitli, kaynaklar ikame
+
+| kaynak | hedef | dmean | dharm | dp10 | dteslim MB | dkodlama sn |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | -0.01 | -0.09 | -0.30 | -0.012 | -35.2 |
+| klip ikamesi | 20 MB | +0.03 | +0.05 | -0.63 | +0.000 | -9.9 |
+| hdr ikamesi (parca-1) | 40 MB | +1.60 | +1.66 | +3.32 | -1.594 | -173.6 |
+| hdr ikamesi (parca-2) | 40 MB | -0.01 | -0.01 | -0.01 | -0.340 | -10.1 |
+
+Süre sayıları için: **makine paylaşımlıydı** (dokuz ajan). Kalite ve boyut
+sayılarına bu damga basılmadı.
