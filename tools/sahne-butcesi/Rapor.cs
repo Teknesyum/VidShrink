@@ -925,6 +925,16 @@ public static class Rapor
         sb.AppendLine("(`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc");
         sb.AppendLine("mutasyon o kurali kiriyor.");
         sb.AppendLine();
+        var testDosyasi = Path.Combine(kok, "tests", "VidShrink.Tests", "SceneBudgetTests.cs");
+        sb.AppendLine("Sozlesmenin `verify` komutu `--filter \"SceneBudgetTests|PlanCalculatorTests\"`;");
+        sb.AppendLine(File.Exists(testDosyasi)
+            ? "`SceneBudgetTests.cs` **var**, filtrenin iki kolu da esliyor."
+            : "`SceneBudgetTests.cs` **yok**, yani filtrenin o kolu sifir test esliyor ve " +
+              "sessizce geciyor. Kosan 23 test yalniz `PlanCalculatorTests`'tir. " +
+              "Bu bir eksiklik degil sonucun kendisidir — dagitim koda girmediginde " +
+              "girecek yeni test de yoktur; ama \"verify yesil\" cumlesi tek basina " +
+              "okunursa yaniltir, o yuzden burada yazili.");
+        sb.AppendLine();
         sb.AppendLine("Mutasyon duzenegi silinmedi; kosuldugunda sessizce gecmek yerine");
         sb.AppendLine("reddettigi gorulsun diye ciktisi buraya alindi:");
         sb.AppendLine();

@@ -482,6 +482,9 @@ girmedi, dolayisiyla kiracak yeni bir olcu de yok. Kural duzenekte kaldi
 (`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc
 mutasyon o kurali kiriyor.
 
+Sozlesmenin `verify` komutu `--filter "SceneBudgetTests|PlanCalculatorTests"`;
+`SceneBudgetTests.cs` **yok**, yani filtrenin o kolu sifir test esliyor ve sessizce geciyor. Kosan 23 test yalniz `PlanCalculatorTests`'tir. Bu bir eksiklik degil sonucun kendisidir — dagitim koda girmediginde girecek yeni test de yoktur; ama "verify yesil" cumlesi tek basina okunursa yaniltir, o yuzden burada yazili.
+
 Mutasyon duzenegi silinmedi; kosuldugunda sessizce gecmek yerine
 reddettigi gorulsun diye ciktisi buraya alindi:
 
