@@ -98,12 +98,15 @@ public sealed class EncoderStateConsumptionTests
 
     /// <summary>
     /// <c>EncoderCapabilities</c> biçimli sürücüsüz makine: ffmpeg nvenc'i listeliyor,
-    /// hiçbir yoklama tamamlanmamış. Üç değerli yüzü yok, ölçülmüşlük kanıtı da yok.
+    /// önbellek soğuk, sürücü yok. <see cref="IEncoderAvailability.EncoderState"/> süreç
+    /// doğurmadan "ölçülmedi" der; süreç doğuran <see cref="IEncoderAvailability.WorksAsEncoder"/>
+    /// gerçekten yoklar ve kodlama sürücüsüz makinede geçmez.
+    /// <c>IEncoderMeasurementState</c> taşımaz — gerçek <c>EncoderCapabilities</c> de taşımıyor.
     /// </summary>
     private sealed class ColdCapabilities : IEncoderAvailability
     {
         public bool HasEncoder(string name) => name is "av1_nvenc" or "hevc_nvenc" or "h264_nvenc";
-        public bool WorksAsEncoder(string codec) => HasEncoder(codec);
+        public bool WorksAsEncoder(string codec) => false;
     }
 
     private static EncodePlan ColdFastPlan() => PlanCalculator.Build(
