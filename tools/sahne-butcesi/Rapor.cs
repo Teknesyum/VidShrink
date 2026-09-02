@@ -255,6 +255,9 @@ public static class Rapor
     {
         sb.AppendLine("## Kaynaklar");
         sb.AppendLine();
+        sb.AppendLine("Uretim: `bash tools/sahne-butcesi/00-pencereleri-kes.sh`, sonra");
+        sb.AppendLine("`SahneButcesi harita maks <pencere>`; ham dosya `harita-<pencere>.json`.");
+        sb.AppendLine();
         sb.AppendLine("Uc pencere de `kaynak-1080p60-hdr-17dk-yalniz-video.mkv` icinden kesildi");
         sb.AppendLine("(1920x1080 hevc 10-bit HDR, 60 fps). Ses akisi yok: T63'te A/B'yi haksiz");
         sb.AppendLine("yapan ses farki bu olcume giremez. Pencere sinirlari T105'in yer gercegi");
@@ -287,6 +290,9 @@ public static class Rapor
         string[] kollar)
     {
         sb.AppendLine("## K1 — bugunku dagitimin hatasi");
+        sb.AppendLine();
+        sb.AppendLine("Uretim: `SahneButcesi k1 <kol> <pencere>`; ham dosya");
+        sb.AppendLine("`k1-<kol>-<pencere>.json` ve `.csv`.");
         sb.AppendLine();
 
         foreach (var kol in kollar)
@@ -329,6 +335,9 @@ public static class Rapor
         }
 
         sb.AppendLine("## K2 — kodlayicinin dagitimi bizim onerimizle yan yana");
+        sb.AppendLine();
+        sb.AppendLine("Uretim: K1 ile ayni kosum (`SahneButcesi k1 <kol> <pencere>`);");
+        sb.AppendLine("bu bolum ayni ham dosyalari baska bir kapidan okur.");
         sb.AppendLine();
         sb.AppendLine("Kapi (`ESIKLER.md`, olcumden once): (1) `rho(verilen,hak) >= 0,80`,");
         sb.AppendLine("(2) `MAE(verilen) <= MAE(harita)`, (3) ters dusen sahne orani `< %20`.");
@@ -922,6 +931,9 @@ public static class Rapor
     private static AbSonuc K7(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar, AbSonuc k5)
     {
         sb.AppendLine("## K7 — harita yanlisken dagitimin bedeli");
+        sb.AppendLine();
+        sb.AppendLine("Uretim: `SahneButcesi k7 <kol> <pencere>`; ham dosya");
+        sb.AppendLine("`k7-<kol>-<pencere>.json` ve `.zones.txt`.");
         sb.AppendLine();
         var hepsi = Oku(isKok, "k7", json, kollar);
         if (hepsi.Count == 0) { sb.AppendLine("**bilinmiyor** — K7 kosulmadi."); sb.AppendLine(); return new AbSonuc(false, hepsi, "olculmedi"); }

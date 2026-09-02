@@ -102,6 +102,9 @@ Paylar penceredeki toplama normalize edilir; birim yuzde puani (pp).
 
 ## Kaynaklar
 
+Uretim: `bash tools/sahne-butcesi/00-pencereleri-kes.sh`, sonra
+`SahneButcesi harita maks <pencere>`; ham dosya `harita-<pencere>.json`.
+
 Uc pencere de `kaynak-1080p60-hdr-17dk-yalniz-video.mkv` icinden kesildi
 (1920x1080 hevc 10-bit HDR, 60 fps). Ses akisi yok: T63'te A/B'yi haksiz
 yapan ses farki bu olcume giremez. Pencere sinirlari T105'in yer gercegi
@@ -118,6 +121,9 @@ uc ayri olsa da kodlayici davranisi ayni kamera ve ayni kodlama gecmisi
 uzerinde olculmustur. Bu sayfanin en zayif yani budur.
 
 ## K1 — bugunku dagitimin hatasi
+
+Uretim: `SahneButcesi k1 <kol> <pencere>`; ham dosya
+`k1-<kol>-<pencere>.json` ve `.csv`.
 
 ### maks / p1-karisik
 
@@ -282,6 +288,9 @@ Plan: `libx265` 2pass 2612k 1728x972@60 preset `slow` hedef 60 MB. Referans topl
 | 1 | 41.9 | 147.1 | 1.00 | 79.76 | 80.64 | 77.66 | +0.88 | -2.10 |
 
 ## K2 — kodlayicinin dagitimi bizim onerimizle yan yana
+
+Uretim: K1 ile ayni kosum (`SahneButcesi k1 <kol> <pencere>`);
+bu bolum ayni ham dosyalari baska bir kapidan okur.
 
 Kapi (`ESIKLER.md`, olcumden once): (1) `rho(verilen,hak) >= 0,80`,
 (2) `MAE(verilen) <= MAE(harita)`, (3) ters dusen sahne orani `< %20`.
@@ -560,6 +569,9 @@ Iki kol da ayni duzenekten geciyor, bu yuzden band disiligi kollari
 **ayirt etmez**; K6'nin asil sorusu olan asan kosum orani ayri yazildi.
 
 ## K7 — harita yanlisken dagitimin bedeli
+
+Uretim: `SahneButcesi k7 <kol> <pencere>`; ham dosya
+`k7-<kol>-<pencere>.json` ve `.zones.txt`.
 
 **bilinmiyor** — K7 kosulmadi.
 
