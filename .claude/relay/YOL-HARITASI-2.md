@@ -32,7 +32,7 @@ hasarını olduğundan küçük gösteriyor. Hedef ortalamayı değil kuyruğu k
 | B | Çözünürlük tabanı — 882x496 seçiliyor, 720p60 hiç aday olmuyor | ölçülmedi | **T99** |
 | C | Tepe/VBV tavanı — 1,02x → 1,50x | ort **+1,69**, harmonik **+5,87**, p10 **+7,22**, süre ~0 | **T98** |
 | D | GOP — biz 2 sn (`-g fps*2`), HandBrake tarafı çok daha uzun | ölçülmedi | **T98** |
-| E | Sahne bazlı bit dağıtımı yok | ölçülmedi | T96 |
+| E | Sahne bazlı bit dağıtımı yok | harita var, kestirimi 0,976/0,929; **28 kesimin 10'unu buluyor** | T96 mühürlü, T101 turda |
 | F | psy-rd / AQ | ort +0,095 | kapandı (T87, T92) |
 | G | HDR yıkımı | karşılaştırma dışı; iki taraf da tonemap-hizalı puanlandı | kod düzeltildi (`28637a4`, `main`'de) |
 
@@ -145,6 +145,49 @@ ve T89'un ölçtüğü %78–%193 süre artışının tamamı bu gereksiz yenide
 denemelerden geliyor. Ayrıca `MainWindow.axaml.cs` ölçülen kaliteyi çağırıp
 atıyor — ölçülen yol uygulamada uyuyor.
 
+## Harita az bölüyor (T101, 2026-09-02)
+
+Gözle doğrulanmış pencerede (144,2–333,3 sn): **28 gerçek kesim, harita 10
+üretti, 18 kaçtı.** Yanlış pozitif **sıfır** — harita ne diyorsa doğru,
+söylemediği çok.
+
+Kaçan 18'in 18'i de tek elekte düştü: `SceneMap.DefaultThreshold = 0.2`,
+skorları 0,112–0,199. Öteki iki eleğin payı sıfır — `BaseThreshold = 0.05`
+bugünkü ayarda hiçbir gerçek kesimi düşüremez (0,2 ≥ 0,05), `DefaultMinSceneSeconds`
+yalnız zaten kesilmiş geçişin ikinci yakalanmasını eliyor.
+
+Bu **tek parametrelik** bir sorun ve yönü belli: 0,2 fazla yüksek. Ama
+düşürmenin bedeli ölçülmedi — yanlış pozitif bugün sıfır ve eşik düşünce
+sıfır kalmayabilir. Eşiği ölçüsüz oynatmak, ölçüsüz koymakla aynı hata.
+
+Kodlayıcı aktarımı da ölçüldü: libx264 0,976, libx265 **0,929**, libsvtav1
+**0,929**. Kayıp tek sahneden geliyor ve HEVC ile AV1 birbirine 1,000 —
+sapma sistematik, kodlayıcıya özgü değil. n=8'de bu fark tek sıra takası,
+istatistiksel olarak ayrılamaz.
+
+**Sonraki tur:** T105 — eşik eğrisi üç pencerede ölçülür, değer ölçüye göre
+konur, müşterilere (T98 aralık, T104 pencere) eski/yeni sahne sayısı bildirilir.
+
+### Sondayı ilk geçişle birleştirmek — sahipsiz iş
+
+T101'in K6 yargısı: sonda maliyetinin (%10,36) ezici çoğunluğu **ikinci bir
+çözme**. 107 sn'nin ~92 sn'si çözme; `select` filtre grafiğinde çalıştığı
+için kare atlatma çözmeyi atlayamıyor — ölçüldü, atlatmalı sonda 131,4 sn,
+çıplak çözme 91,8 sn, taban maliyetin altına inilemiyor. Kare atlatma
+**reddedildi**.
+
+Seçilen yol: sondayı asıl kodlamanın **ilk geçişiyle** birleştirmek. İki
+kazanç birden var ve ikincisi beklenmedik:
+
+- Çözme tümüyle kalkar (~%86).
+- İlk geçiş istatistikleri **hedef kodlayıcının kendi kare boyutları**
+  olduğu için, K1'deki 0,929'luk aktarım sapması kökünden kalkar — sonda
+  artık vekil bir kodlayıcı değil, kodlayıcının kendisi olur.
+
+Bedeli planı iki aşamaya bölmek. `EncodeRunner` (T100) ve `PlanCalculator`
+(T99) işi, ikisi de şu an başka turda. **Sahipsiz; T99 ve T100 mühürlendikten
+sonra sözleşmeye çevrilecek.** Buraya yazıldı ki mühürde buharlaşmasın.
+
 ## Makine paylaşımı — hangi sayı bozulur, hangisi bozulmaz
 
 Altı ajan koşuyor, dört ffmpeg aynı anda. "Aynı anda tek ağır kodlama" kuralı bu
@@ -165,21 +208,181 @@ buradan geliyordu, "paralellik" kendisinden değil. Karşılaştırma koşumlar�
 
 Bir ajanın yükü fark etmesi doğru; yükü bekleme gerekçesi yapması değil.
 
+## Ölçü aracı sanıkta (T106, 2026-09-02)
+
+T102 auto modu ölçerken aletin kendisinde kusur buldu. VMAF-NEG, SVT-AV1
+çıktısında **1 puanın altına düşen bir kare kümesi** üretiyor (auto'da 26 kare,
+25'i tam 0); iki x265 koşumunda hiç üretmiyor (en düşük 74,67). O karelerde
+PSNR 46-49 dB, HandBrake 98-100 alıyor — yani görüntü aslında temiz.
+
+Bench'in harmonik ortalaması `n / Σ(1/max(x,1))`. `max(x,1)` yüzünden 0 ile
+0,13 aynı etkiyi yapıyor ve tek bir düşük kare sütunu çökertiyor: bugünkü
+haliyle AV1'i x265'e karşı **39,4 puan** geride gösteriyor.
+
+Bu yüzden T106, kodlayıcı seçim kuralından **önce** gelir. O kural p10 ile
+harmonik ortalamaya dayanıyor; ikisinden biri yalan söylüyorsa yanlış
+kodlayıcıyı seçeriz. T106 ayrıca `docs/olcumler/` altında kirlenmiş satırların
+listesini çıkaracak; sahiplerine T0 dağıtacak.
+
+**Bu arada kural:** harmonik sütuna yaslanan yeni bir sonuç yazılmaz.
+Ortalama ve p10 sağlam.
+
+### Cevap geldi: kusur ölçüde değil, hizalamada (T106, 2026-09-02)
+
+Yukarıdaki teşhis **yanlıştı** ve sayı doğruydu. Harmonik ortalama sağlam,
+`max(x,1)` kelepçesi suçlu değil. Suçlu **ölçüm boru hattımızın kare
+eşlemesi**: karşılaştırmayı zaman damgasıyla yapıyorduk, kaynağın video akışı
+`0,020000 s`'de başlıyor, bizim ffmpeg çağrımız çıktıyı `0,016667 s`'ye
+taşıyor. Kare başına −3,3 ms; ffmpeg framesync "damgası küçük-eşit son
+referans" seçtiği için **her kare komşusuyla** karşılaştırıldı. Yarım kareden
+küçük bir kayma tam bir kare kaydırma üretti.
+
+Kareler indekse kilitlenince aynı dosyalarda PSNR 17,2 → **44,74 dB**.
+
+| | min | <1 | harmonik |
+|---|---:|---:|---:|
+| AV1 eski | 0,000 | 26 | 56,313 |
+| AV1 yeni | 92,391 | 0 | **95,655** |
+| x265 yeni | 76,219 | 0 | 95,793 |
+
+**AV1 ↔ x265 harmonik farkı 39,446 → 0,138.** İki kodlayıcı bu kaynakta başa
+baş. Kodlayıcı seçim kuralı (5. basamak) artık açılabilir — ama 39,4 değil
+**0,14** puanla; yani o basamağın gerekçesi buharlaştı, yeniden gerekçe
+gerekiyor.
+
+Kusur **AV1'e özgü değil**: `libsvtav1`, `libx264`, `libx265` üçü de
+`start_time`'ı düşürüyor, HandBrake düşürmüyor. AV1 yalnızca T102'de ölçülen
+taraf olduğu için suçlu göründü. `docs/olcumler/algi-olcusu.md:171` bir **x264**
+koşumunda `VMAF-NEG min 0,0000` gösteriyor — bağımsız teyit.
+
+**Ayıklama testi, herkese:**
+`ffprobe -v error -select_streams v:0 -show_entries stream=start_time -of csv=p=0 <kaynak>`
+`0` dönerse o satır temiz.
+
+**Ders — bu projenin en pahalı sınıfı, altıncı kez:** sayı doğruydu, sayıyı
+açıklayan cümle yanlıştı. "Harmonik ortalama yalan söylüyor" tanısı üç
+sözleşmenin sınırına yazıldı ve hiçbirinde ölçülmedi. Bir tanının kendisi de
+ölçülür.
+
+## Aynı kusuru iki tur birden düzeltiyor (T98 × T105)
+
+T98 anahtar kare üst sınırını `SceneMap` ortalamasından türetiyor ve
+**2,8'e bölüyor**. Bölen T101'in yer gerçeğinden geliyor: 28 gerçek kesime
+karşı harita 10 sahne buluyor.
+
+Ama T105 tam o kusuru düzeltiyor — eşik ölçüye göre yeniden konuyor ve harita
+daha çok sahne bulacak. İkisi de `main`e girerse **düzeltme iki kez uygulanır**
+ve üst sınır olması gerekenin yarısına iner.
+
+Genel kural, bundan sonrası için: **bir sabit başka bir turun düzelttiği
+kusurun telafisiyse, o sabit koda yazılmaz.** Ya kusurun ölçüsünden türetilir,
+ya da onu doğuran değere bakan bir ölçüyle bağlanır ki değer değişince
+ölçü kırılsın. Sessizce doğru kalan telafi sabiti yoktur.
+
+## Kapanan açık, kapanmayan sınıf (T100, 2026-09-02)
+
+Arayüz kullanıcıya "burada durur, kalanı harcamaz" derken teslim edilen dosya
+39,14 MB oluyordu — vaat 8,7 MB'tı. İki kapı ayrışmıştı: koşucu
+`actualMb >= HardFloorMb` istiyor, arayüz istemiyordu. Kapandı, tek yükleme
+bağlandı, mutasyonla doğrulandı.
+
+**Ama sınıf kapanmadı.** Arayüz `note.Mb`'yi vuruyor — bu planın *tahmini*.
+Koşucu `actualMb`'yi vuruyor — bu *gerçek*. Üç kaynakta ikisi tabanın aynı
+yanına düştü, o yüzden cümle tutuyor. Tahmin tabanın öbür yanına düşen bir
+kaynakta yine ayrışır, ve **bugünkü ölçü bunu yakalayamaz**: test koşucuya
+`note.Mb ≈ actual` olan bir plan veriyor.
+
+Gerçek çözüm, kararın planlayıcıda saklanması — `StopsShortOfBandOnPurpose`
+bugün türetilen bir işaret, `PlanCalculator` koşulu zaten biliyor ama
+yazmıyor. T99 o dosyayı tuttuğu için bu turda taşınamadı. **T99 mühürlenince
+açılacak ilk küçük iş budur.**
+
+## Taban indi, plan hala kaybedeni seciyor (T99, 2026-09-02)
+
+T99 av1 bppf tabanini 0,020'den 0,0095'e indirdi ve donanim carpanini 1,25'ten
+1,52'ye tasidi; ikisi de olcumden. Taban artik kazanan yerlesimi elemiyor.
+
+Ama sikayet kapanmadi. Olculen kazanan `1280x720@60`, `882x496@60`'in **6,39 puan**
+onunde — iki pencerede de ayni yonde. Plan hala `882x496@60` seciyor. **Eleyen taban
+degil, skor.** `PlanCalculator.LayoutScore` (`PlanCalculator.cs:618`) iki tahmin
+egrisinin farki: dusuk cozunurlukte `rate` firliyor, `ScalePenalty` onu 6,39 puan
+eksik dengeliyor. Iki yarisi da olculen kaliteye karsi hic kalibre edilmedi.
+
+Ders: **tabani indirmek kazanani secmeye yetmiyor.** Elek ile secici ayri seylerdir;
+biri duzeltilince oteki kendiliginde duzelmiyor. T107 bunu olcuye oturtuyor.
+
+Yan etki, T99'un kendi bildirdigi: carpan yukselince `hevc_nvenc` tabani da
+0,02196'dan 0,02671'e cikti ve **o taban olculmedi**. Donanim kolunda
+`UsableBitrateK` (706k = 0,01277 bppf) yeni tabandan siki, yani taban orada atil ve
+HandBrake'in 0,0116'lik noktasi hala disarida.
+
+## Esik olcuye oturdu, T101 iki yerde yanildi (T105, 2026-09-02)
+
+`SceneMap.DefaultThreshold` 0,2 → **0,105**. Olcut yazili: uc pencerenin
+birlesiminde F2 (β=2) tepesi. F1 secilseydi 0,115 cikardi; aradaki fark
+asimetrinin kendisi — kacan kesim hatayi sahne boyunca tasiyor, yanlis kesim
+yerel.
+
+T101'in iki sonucu **yanlis cikti**:
+
+- **"Yanlis pozitif sifir"** yalniz 0,2 icin dogruymus. 0,05'te uc pencerede
+  toplam **46 yanlis kesim** var.
+- **`DefaultMinSceneSeconds = 1.0`'in payi sifir degil.** P2'de 334,000 her
+  esikte kaciyor cunku 333,300'de kesim var. 0,5'e cekince P2 6/7 → 7/7,
+  F2 0,899 → 0,922. Sabit yine de degistirilmedi: bedeli T98'in anahtar kare
+  araliginda ve T104'un penceresinde, ikisi de olculmedi.
+
+**En iyi esik pencereden pencereye kayiyor** — P1 0,105–0,110, P2 ≤0,08,
+P3 ≥0,115. Durgun ve hareketli **ters yone** cekiyor, ~0,035 aci. Bu, urunun
+dinamiklik ilkesinin dogrudan kaniti: tek sabit esik dogru cevap degil,
+icerikten turetilebiliyorsa turetilir. Sonraki basamak adayi.
+
+Musteriye: 24 sahne / ort 43,17 / medyan 14,03 → **77 sahne / 13,46 / 5,62**.
+Dagilim saga carpik; **aralik secen taraf medyani kullanmali**, ortalamayi degil.
+
+## Iki tur ayni sabite bagli — carpisma kontrollu (T98 × T105)
+
+T98 2,8 bolenini koda sabit olarak yazmadi: olculdugu iki sayiya ayirdi
+(`SceneMapGroundTruthCuts = 28`, `SceneMapReportedScenes = 10`) ve
+`SceneMapThresholdOfRecord = 0.2` ile `SceneMap.DefaultThreshold` ayrisirsa
+olcu kirmiziya donuyor.
+
+T105 esigi 0,105 yapti. **Yani tuzak kuruldugu gibi calisacak:** T105 `main`e
+girince T98'in olcusu kirmizi doner ve duzeltme yeniden olculmeden gecemez.
+Sira: once T105, sonra T98 yeni sayilarla hizalanir.
+
+Ders: **telafi sabitini silmek tek yol degil — olculdugu kosula baglamak da
+calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
+
 ## Sonraki basamak
 
-1. T98 GOP aralığını `main`e getirir. **Açığın bilinen en büyük tek kalemi bu** —
-   T102 tek değişkenle %24,5 boyut kazancı ölçtü, puan da yükseldi.
-2. T95 teslim edince T94 ve T99 aynı anda açılır — ikisi de aletin adillik
-   kapısına dayanıyor.
-3. T100 + T101 bitince T103 açılır (örnekleme, üçüncü kaldıraç).
-4. `SceneMap` `PlanCalculator`a bağlanır (T99 mühürlendikten sonra).
-5. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır — kuyruk
-   açığının ana sahibi (aday A, p10'da +13,76) orada.
+1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
+   o kuralın kanıtı p10 ve harmonik ortalamadan geliyor.
+2. **T105** önce girer — eşik ölçüye oturdu (0,105), CI yeşil, denetimde.
+3. **T98** ardından hizalanır: T105 girince tel tuzağı kırmızıya döner ve
+   bölen yeni eşikte yeniden ölçülür. GOP aralığı da o zaman `main`e iner.
+4. **T99** taban kararını verdi (denetimde). Mühürlenince iki iş birden açılır:
+   **T107** yerleşim skorunu ölçüye oturtur (asıl şikâyet orada), **T103**
+   örneklemeyi alır.
+5. **T95** teslim edince T94 açılır — HDR hizası iki farklı aracı
+   karşılaştırıyor, aletin adillik kapısı orada gerçekten lazım.
+6. `SceneMap` `PlanCalculator`a bağlanır — harita hâlâ tüketilmiyor.
+7. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır. **T106'dan
+   sonra.**
+8. **T108** — tepe eğrisi. T98 ölçtü ve eğrinin şekli ölçümle ters göründü:
+   aşma kanıtının geldiği ~11,4×'te geniş, açmanın +3,665 puan kazançlı
+   ölçüldüğü ~4,6×'te 1,02'ye kilitli. T98 mühürlenince açılır.
+9. **Eşik içerikten türetilir.** T105 ölçtü: durgun ve hareketli pencere ters
+   yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
+   dinamiklik ilkesinin en somut adayı.
 
 ## Değişmeyen kurallar
 
 - Sabit karşılaştıran ölçü davranış ölçmez.
 - Ölçmediğin şey için "ölçülmedi" yazılır, iddia edilmez.
 - Paralel koşumda **iş parçacığı sabitlenir**; süre sayısı damgalanır (aşağıda).
+- Harmonik ortalamaya yaslanma (T106 soruşturuyor); ortalama ve p10 sağlam.
+- Telafi sabiti koda yazılmaz — ölçüden türetilir ya da **ölçüldüğü koşula bağlanır**
+  (T98'in tel tuzağı: koşul kayarsa ölçü kırmızıya döner).
 - Mühürden önce `gh run list`.
 - `main`e yalnız T0 birleştirir.

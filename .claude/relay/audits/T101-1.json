@@ -1,0 +1,17 @@
+{
+  "contractId": "T101",
+  "auditorRunId": "a23c20a8b93a8fd19",
+  "headSha": "feff970cb90d5c73ed2a0fe9364fa0f34bcace24",
+  "diffHash": "f87d720455d93473dd2bf0e8542fca6e7c9477045c9d0eac28d237e82d042ea8",
+  "owns": [
+    "src/VidShrink.Core/SceneMap.cs",
+    "src/VidShrink.Ffmpeg/SceneDetector.cs",
+    "tests/VidShrink.Tests/SceneMapTests.cs",
+    "docs/olcumler/sahne-haritasi.md"
+  ],
+  "verification": [
+    "GECTI, KRITIK yok. Denetci ajanin hicbir sayisina guvenmeden yeniden hesapladi. K1: Spearman CSV'den yeniden hesaplandi - x264 0,9762, x265 0,9286, svtav1 0,9286, x265~svtav1 1,0000; dordu de hesaplanmis, yuvarlanmis tahmin degil. K2 (en agir iddia): tarama gunlugunden pencere kesilerek dogrulandi - 28 gercek kesimin 10'u >=0,2, harita ciktisiyla birebir ayni 10 sinir, yanlis pozitif 0, kacan 18'in skorlari 0,112259-0,198489. Yer gercegi gozle uretilmis, esikten turetilmemis: turetilseydi 0,1616 skorlu 255,551 listeye girerdi, girmemis - ayrim kareyle yapilmis. K3: uc elegin sayilari yeniden uretildi, birebir. K4: cumle olculen seyi anlatiyor, 'kod dogru ozet yanlis' kusuru bu turda yok. K5: 11/11 yesil 0 atlanan; mutasyon pimleri duz sabitlerle kurulmus, Assert.Equal(sabit,sabit) kalibi yok. K6: yargi verilmis, kare atlatmanin reddi yapisal olarak dogrulandi (select filtre grafiginde, cozmeden sonra). K7: Skip yok, sessiz erken donus yok, uc olcu de FfmpegFact. owns ihlali yok; geri cekilen iddia satirda duzenlenmis halde durmuyor. Alti borc muhur notunda, besi T105'e baglandi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T23:31:27.623Z"
+}
