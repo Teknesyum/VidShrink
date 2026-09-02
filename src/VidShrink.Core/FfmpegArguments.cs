@@ -145,8 +145,21 @@ public static class FfmpegArguments
     // recall has to be measured again before the ceiling can be trusted.
     //
     // What the map is trusted for is the range, not the boundaries: the placement is left to
-    // the encoder's scene cut, whose lookahead is independent of the map and finds exactly the
-    // cuts the map misses.
+    // the encoder's scene cut. That the encoder actually places on content, and what the
+    // placement is worth, are measured rather than assumed. On a cut-bearing 20 s window of the
+    // source (7 detected cuts) libx264 at a 10 s ceiling put 6 I-frames where the ceiling
+    // demanded 3, four of them landing exactly on a detected cut and one within 83 ms. Holding
+    // the count fixed at 8 and changing only where they go - a plain grid against
+    // -force_key_frames on the cuts, both with scenecut=0, 2-pass, same bitrate - gives
+    //
+    //   grid          -> 20.0119 MiB  mean 85.693  p10 76.014
+    //   cut-aligned   -> 19.9705 MiB  mean 85.836  p10 76.192
+    //
+    // so alignment is worth +0.144 mean / +0.179 p10 at equal count and slightly less file.
+    // Real, but second order: the interval itself is worth several times that (2 s -> 5 s alone
+    // is +0.708 p10 in the sweep below). The claim sometimes made in the other direction - that
+    // the cause is where the I-frames go rather than how many there are - is not what these
+    // numbers say, and is not relied on here.
     //
     // The clamp comes from a ceiling sweep on parca-1-20sn (1920x1080@60 HDR PQ, libx264,
     // 2-pass, 20 MiB target, VMAF-NEG over the whole clip, same colour space and stream count

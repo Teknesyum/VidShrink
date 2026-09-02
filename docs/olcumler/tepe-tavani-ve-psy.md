@@ -267,15 +267,19 @@ Alt sınır 1 saniye; HandBrake'in `min-keyint = fps` değeri (`encx264.c:386-39
 ### Üst sınır neye bağlı
 
 Üst sınır **sahne haritasından** türüyor: haritanın bildirdiği ortalama sahne uzunluğu
-`SceneMapMergeFactor = 2.8`'e bölünür, sonuç 5–10 saniye arasına kısılır.
+`SceneMapMergeFactor`'a bölünür, sonuç 5–10 saniye arasına kısılır. Bölen koda sabit
+olarak girmiyor; ölçüldüğü iki sayının bölümü olarak duruyor
+(`SceneMapGroundTruthCuts / SceneMapReportedScenes` = 28 / 10 = 2,8). Gerekçesi
+aşağıda, **Bölen neden sabit yazılmadı** başlığında.
 
 **2,8 nereden geliyor.** T101 haritayı yer gerçeğine karşı ölçtü: 144,2–333,3 saniyelik
 pencerede 28 gerçek kesim var, harita 10 sahne bildiriyor, yanlış pozitif yok. Kaçan 18
 kesimin hepsi `SceneMap.DefaultThreshold = 0.2` eleğinin altında (0,112–0,199) kaldı. Yani
 haritanın ortalama sahne uzunluğu sistematik olarak yaklaşık 2,8 kat uzun; üst sınırı ham
 ortalamaya bağlamak tam da kaçırılan kesimlerin üstünden geçmek olurdu. Haritaya güvenilen
-şey **sınırlar değil aralık**: yerleşim kararı kodlayıcının lookahead'inde ve o, haritanın
-kaçırdığı kesimleri buluyor.
+şey **sınırlar değil aralık**; yerleşim kararı kodlayıcının lookahead'ine bırakılıyor.
+Kodlayıcının haritanın kaçırdığı kesimleri gerçekten bulduğu ve hizalamanın ne kazandırdığı
+türetilmedi, **ölçüldü** — aşağıda *Yerleşimin payı* başlığı.
 
 **5–10 saniyelik kıskaç nereden geliyor.** `parca-1-20sn` üzerinde üst sınır süpürmesi
 (libx264, 2 geçiş, 20 MiB hedef, VMAF-NEG tüm klipte). Teslim boyutu süpürmenin tamamında
@@ -444,6 +448,54 @@ Hiçbir mutasyon testin kendi sabitini değiştirmiyor.
 Onunun onu da kırmızıya döndü. İki ölçü ffmpeg gerektiriyor ve `[FfmpegFact]` ile
 işaretli; ikisi de koşuyor, atlanmıyor. Süitte `Skip` yok, atlanan test yok.
 
+### Yerleşimin payı — ölçüldü
+
+T102 tur 2 denetimi, o sözleşmedeki "sebebi anahtar kare **sayısı** değil **yeri**" cümlesini
+KRİTİK yazdı: cümle ölçülmemişti ve T102'nin kendi tablosu onu çürütüyordu (`-g 300`
+çıktısında en kısa aralık = en uzun aralık = 5,00 s, yani orada da katı ızgara). Bu belgede
+o cümle **kaynak gösterilmiyor**; T102'den yalnız CRF yolundaki %24,5'lik küçülme sayısı
+alınıyor ve o sayı `-g` değerinin kendisini destekliyor. Yerleşimin payı bu turda ayrıca
+ölçüldü.
+
+**Neden yeni bir klip gerekti.** K3'te kullanılan `parca-1-20sn` ve `parca-3-20sn`'de
+sahne kesimi **yok**: `select='gt(scene,0.1)'` her ikisinde de sıfır kare seçiyor,
+`scdet=threshold=6` da sessiz. Kesimi olmayan malzemede scenecut hiç ateşlenmez, dolayısıyla
+K3 tablosu **aralığın** payını ölçer, yerleşimin payını değil — bu, T102 denetiminin
+bulgusunun bağımsız doğrulaması. Ölçüm için kaynağın kesim yoğun bir penceresinden
+`kesimli-20sn.mkv` çıkarıldı (314–334 s, `-c copy`, yalnız video akışı, 1920×1080@60,
+`yuv420p10le`, `bt2020nc/smpte2084/bt2020`, 1224 kare). Klipte 7 kesim var:
+1,883 · 3,951 · 5,933 · 8,266 · 14,083 · 14,101 · 19,700 s.
+
+**Düzenek.** İki koşumda da `scenecut=0`, iki geçiş, `-b:v 8000k`, `preset=medium`, aynı
+kaynak. Tek değişen yerleşim; **anahtar kare sayısı ikisinde de 8**:
+
+- *ızgara*: `-g 153 -keyint_min 153` → 0,00 · 2,55 · 5,10 · 7,65 · 10,20 · 12,75 · 15,30 · 17,85 s
+- *hizalı*: `-force_key_frames` kesim zamanlarında → 0,00 · 1,883 · 3,967 · 5,933 · 8,267 · 14,083 · 14,117 · 19,700 s
+
+| Yerleşim | Teslim MiB | mean | p10 | I-kare |
+|---|---:|---:|---:|---:|
+| ızgara (sayı eşit, yer keyfî) | 20,0119 | 85,6925 | 76,0135 | 8 |
+| kesime hizalı | 19,9705 | **85,8365** | **76,1921** | 8 |
+| fark | −0,0414 (−%0,21) | **+0,1440** | **+0,1786** | 0 |
+
+Kapılar: renk `bt2020nc/smpte2084/bt2020` → iki tarafta aynı, akış 1→1, `pix_fmt
+yuv420p10le` → aynı, boyut farkı %0,21 (karşılaştırılabilir). İki geçiş belirlenimci
+olduğu için bu fark koşum gürültüsü değil.
+
+**Okunan.** Hizalamanın payı **pozitif ama küçük**: aynı sayıda anahtar karede +0,144 mean /
++0,179 p10, üstelik dosya biraz da küçülüyor. Aynı klip ailesinde **aralığın** payı bunun
+katı: üst sınır süpürmesinde 2 sn → 5 sn geçişi tek başına +0,708 p10 getiriyordu. Yani
+"sebep sayı değil yer" cümlesi bu ölçümle de **desteklenmiyor**; doğru sıralama tersi —
+birinci etken aralık, yerleşim ikinci dereceden bir düzeltme. Aralığı seçen, yerleşimi
+kodlayıcıya bırakan bugünkü tasarım yine de yerinde: ikinci dereceden de olsa pay pozitif
+ve bedava.
+
+**Kodlayıcı kesimleri buluyor mu.** Ölçüldü. Aynı klipte scenecut açık, `-g 600
+-keyint_min 60` (10 saniyelik üst sınır), tek geçiş CRF 23 → I-kareler 0,000 · 1,883 ·
+3,950 · 8,267 · 14,000 · 19,700 s. Üst sınır 3 I-kare dayatırken kodlayıcı 6 tane koydu ve
+konumların dördü tespit edilen kesimlerle **birebir**, biri 83 ms yakınında. Yani üst sınır
+kıskacının içinde yerleşim gerçekten içerikten geliyor, ızgaradan değil.
+
 ### Ölçülmeyenler
 
 - **`tools/VidShrink.Ab` kullanılamadı** — T95 bu tur boyunca `main`e inmedi. Renk kapısı,
@@ -452,6 +504,12 @@ işaretli; ikisi de koşuyor, atlanmıyor. Süitte `Skip` yok, atlanan test yok.
   edecek çözünürlükte olduğunun gösterimi) bu turda **yok**.
 - K3, K5 ve K6 **tek klipte** (`parca-1-20sn`) ölçüldü, genellenmedi. `parca-2` ve
   `parca-3` üzerinde hiçbir rejim, maxrate ya da tepe koşumu **ölçülmedi**.
+- Yerleşimin payı da **tek klipte** (`kesimli-20sn`) ve tek kesim kümesinde ölçüldü;
+  +0,144 mean / +0,179 p10 bu klibin sayısıdır, genellenmedi. Yerleşimin payının
+  aralık uzunluğuna göre nasıl değiştiği (ör. 2 saniyelik üst sınırda hizalamanın
+  ne kazandırdığı) **ölçülmedi**.
+- T102'nin "sebep yer, sayı değil" cümlesi bu belgede **kaynak gösterilmiyor**;
+  o cümlenin kendisi T102 tur 3'ün konusu ve burada doğru kabul edilmedi.
 - Üst sınır süpürmesi yalnız `parca-1-20sn`'de tamamlandı; `parca-2`/`parca-3` **ölçülmedi**.
 - CRF yolunda VBV'nin **ara değerleri ölçülmedi**; yalnız 2×/4× ile tümden kaldırma
   karşılaştırıldı.
