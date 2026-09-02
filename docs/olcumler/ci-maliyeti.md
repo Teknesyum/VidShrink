@@ -56,13 +56,13 @@ cikti, siniflandirma tutarli.
 
 ## K2 — degisiklik
 
-`concurrency` bloğu asagida.
+```yaml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+```
 
-## K3 — sonra olcum
-
-(Degisiklik sonrasi doldurulacak.)
-K2 adim 1 kaniti: bu commit, yukaridaki kosumu iptal etmeli.
-### K2 adim 1 kaniti (varsayilan cancel-in-progress)
+### Adim 1 kaniti (varsayilan cancel-in-progress)
 
 `c356f4f` itildi -> kosum `33602997828` `in_progress`e girdi. Hemen ardindan
 `2b5ef68` itildi -> `33602997828` `cancelled` oldu (durum `completed`,
@@ -70,3 +70,25 @@ sonuc `cancelled`), yeni kosum `33603041850` `in_progress`e gecti.
 Ayni dala arka arkaya itilen commit'lerde yalniz sonuncusu kosuyor,
 dogrulandi.
 
+### Adim 3 kaniti (main istisnasi ifadesi — gecici ikame ile)
+
+Gercek `main`e sinama commit'i itmeden, `cancel-in-progress` ifadesindeki
+`refs/heads/main` yerine gecici olarak kendi dalim (`refs/heads/T121-ci-maliyeti`)
+konuldu: `cancel-in-progress: ${{ github.ref != 'refs/heads/T121-ci-maliyeti' }}`.
+Bu dalda calisirken ifade `false` degerlendirmeli — yani ayni davranis
+`main`de beklenen davranisla ayni: kosum iptal edilmeyip kuyruklanmali.
+
+`bcee47e` itildi (commit `2b5ef68` hala `in_progress`ken). Onceki cift
+(`c356f4f` -> `2b5ef68`) aninda `cancelled` uretmisti; bu ciftte
+`bcee47e` (`33603335567`) `in_progress` olan `2b5ef68`'i (`33603041850`)
+**iptal etmedi** — `pending` durumunda kuyruga girdi. Bu, ifadenin
+`concurrency` blogunda gercekten degerlendirildigini ve `false` sonucunun
+`cancel-in-progress`i etkisiz biraktigini kanitlar. Kosumun kendisinin
+tamamlanmasi beklenmedi — kanit kuyruk durumundan zaten okunuyor.
+
+Ispat sonrasi ifade gercek `refs/heads/main`e geri cevrildi ve o haliyle
+commitlendi.
+
+## K3 — sonra olcum
+
+(Degisiklik sonrasi doldurulacak.)
