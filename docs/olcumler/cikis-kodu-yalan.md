@@ -332,3 +332,53 @@ zorunlu.
 dotnet test -c Release --filter "EncodeRunnerTests|FfmpegRunnerTests|SegmentEncoderTests"
 → Başarısız: 0, Başarılı: 37, Atlanan: 0, Toplam: 37
 ```
+
+## Yerel tam takım koşumu hakkında bir not
+
+Teslimden önce `dotnet test -c Release` tamamı yerelde koşuldu:
+
+```
+Başarılı!  - Başarısız: 0, Başarılı: 86, Atlanan: 1, Toplam: 87, Süre: 15 m 24 s
+Test Çalıştırması Durduruldu.
+[exited with code 0]
+```
+
+Bu **tam takım değil**: `--list-tests` projede **1373** test sayıyor. Koşum 87'de durmuş,
+"Durduruldu" yazmış ve yine de **çıkış kodu 0** vermiş. Yani bu sözleşmenin konusuyla aynı
+sınıftan bir yalan, bu kez test host'unda.
+
+Depo bu dersi burada da öğrenmiş: `.github/workflows/ci.yml:89` testleri doğrudan değil
+`tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30` üzerinden
+koşuyor ve dosyadaki yorum aynı şeyi söylüyor — "asılı bir test host'u `Failed: 0` basıp
+0 ile çıkıyor". Yani teslimin otoritesi CI koşumu; yerel durma makinede eş zamanlı üç
+sözleşme daha koşarken alınmış bir çevre gözlemi olarak buraya yazıldı, ölçü olarak
+kullanılmadı.
+
+Sözleşmenin verify kolları etkilenmedi; onlar ayrıca ve tam koşuldu (37/37).
+
+## Borçlar
+
+Hepsi bu sözleşmenin `owns` kümesi dışında, dokunulmadı:
+
+1. **`EncoderCapabilities.cs:343-346`** — seçenek sondasının sözlüğü `libx265`in gerçekten
+   yazdığı `Unknown option:` ifadesini içermiyor; x265 seçenek yoklaması bugün düşürülen
+   anahtarı kaçırıyor. Aynı listedeki `Option not found` ve `Unrecognized option` ise
+   ölçüme göre orada atıl (ikisi de çıkış kodu 8 ile geliyor, sonda ayrıca `exitCode == 0`
+   şartı koyuyor).
+2. **`SegmentEncoder.cs:176`** — `-loglevel error` kullanıyor; üç kodlayıcının da tanısı
+   uyarı seviyesinde ya da altında basıldığı için önizleme yolu düşürülen ayarı hiç
+   göremiyor. `FfmpegRun.DroppedOptions` bugün o taraf için atıl.
+3. **`src/VidShrink.App`** — `EncodeResult.DroppedOptions` teslim noktasına kadar geliyor
+   ama arayüzde gösterilmiyor; kullanıcı hâlâ uyarı almıyor. Kusurun kullanıcıya dokunan
+   yarısı bu borçla kapanır.
+
+## Özet
+
+| Kriter | Durum |
+|---|---|
+| K1 kusur önce ölçüldü | üç kırmızı (biri gerçek ffmpeg), dokuz kapılık liste |
+| K2 sözlük tek yerde | `FfmpegDiagnostics`, iki desen, iki çağrı yeri |
+| K3 yanlış pozitif ölçüsü | dört korpus, `muxing overhead: unknown` dahil |
+| K4 karar | öldürme, bildir — iki koşucuda aynı, üç ölçü tutuyor |
+| K5 mutasyon | yedi mutasyonun yedisi yakalandı, kümeler ayrık |
+| K6 kol başına test | 19 / 10 / 8, sıfır bulan kol yok |
