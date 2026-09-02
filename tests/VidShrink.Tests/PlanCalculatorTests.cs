@@ -502,4 +502,183 @@ public sealed class PlanCalculatorTests
             PlanCalculator.LayoutClearsFloor(complaint, "libsvtav1", 0.0052 * pixelRateK, width, height, fps, info.Fps),
             "At 0,0052 bppf the software arm has already saturated - p10 stops falling, over three per cent of frames score under 5 VMAF-NEG - so the floor must still reject it.");
     }
+
+    private sealed class SurucusuzMakine : IEncoderAvailability
+    {
+        private readonly HashSet<string> _built;
+        private readonly HashSet<string> _works;
+        private readonly Dictionary<string, int> _yoklama = new(StringComparer.OrdinalIgnoreCase);
+
+        public SurucusuzMakine(string[] built, string[] works)
+        {
+            _built = new HashSet<string>(built, StringComparer.OrdinalIgnoreCase);
+            _works = new HashSet<string>(works, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public bool HasEncoder(string name) => _built.Contains(name);
+
+        public bool WorksAsEncoder(string codec)
+        {
+            _yoklama[codec] = YoklamaSayisi(codec) + 1;
+            return _works.Contains(codec);
+        }
+
+        public int YoklamaSayisi(string codec) => _yoklama.TryGetValue(codec, out var n) ? n : 0;
+    }
+
+    private sealed class OlculmemisMakine : IEncoderAvailability, IEncoderMeasurementState
+    {
+        private readonly HashSet<string> _built;
+        private readonly HashSet<string> _olculen;
+        private readonly HashSet<string> _works;
+        private readonly Dictionary<string, int> _yoklama = new(StringComparer.OrdinalIgnoreCase);
+
+        public OlculmemisMakine(string[] built, string[] olculen, string[] works)
+        {
+            _built = new HashSet<string>(built, StringComparer.OrdinalIgnoreCase);
+            _olculen = new HashSet<string>(olculen, StringComparer.OrdinalIgnoreCase);
+            _works = new HashSet<string>(works, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public bool HasEncoder(string name) => _built.Contains(name);
+
+        public bool WorksAsEncoder(string codec)
+        {
+            _yoklama[codec] = YoklamaSayisi(codec) + 1;
+            return _works.Contains(codec);
+        }
+
+        public bool IsMeasured(string codec) => _olculen.Contains(codec);
+        public bool IsHdr10Measured(string codec) => true;
+        public int YoklamaSayisi(string codec) => _yoklama.TryGetValue(codec, out var n) ? n : 0;
+    }
+
+    private static readonly string[] NvencliDerleme =
+    {
+        "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "av1_nvenc"
+    };
+
+    private static readonly string[] YalnizYazilim = { "libx264", "libx265" };
+
+    [Fact]
+    public void MaxCompressionListedeOlupCalismayanKodlayiciyiSecmiyor()
+    {
+        var makine = new SurucusuzMakine(built: NvencliDerleme, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.MaxCompression, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("libx265", result.Plan.Codec);
+        Assert.Equal(1, makine.YoklamaSayisi("libsvtav1"));
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.EncoderFallback && n.RequestedCodec == "libsvtav1" && n.FallbackCodec == "libx265");
+    }
+
+    [Fact]
+    public void FastTercihiListedeOlupCalismayanDonanimiSecmiyor()
+    {
+        var makine = new SurucusuzMakine(built: NvencliDerleme, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("libx264", result.Plan.Codec);
+        Assert.Equal(1, makine.YoklamaSayisi("h264_nvenc"));
+        Assert.Contains(AdviceCode.EncoderFallback, result.Advice.Notes);
+    }
+
+    [Fact]
+    public void CalisanKodlayiciSecilmeyeDevamEdiyor()
+    {
+        var makine = new SurucusuzMakine(built: NvencliDerleme, works: NvencliDerleme);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("h264_nvenc", result.Plan.Codec);
+        Assert.DoesNotContain(AdviceCode.EncoderFallback, result.Advice.Notes);
+    }
+
+    [Fact]
+    public void DerlemeListesindeOlmayanKodlayiciHicYoklanmiyor()
+    {
+        var makine = new SurucusuzMakine(built: YalnizYazilim, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.MaxCompression, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("libx265", result.Plan.Codec);
+        Assert.Equal(0, makine.YoklamaSayisi("libsvtav1"));
+    }
+
+    [Fact]
+    public void OlculmemisKodlayiciYoklanmiyorGeciciCevapVeriliyor()
+    {
+        var makine = new OlculmemisMakine(built: NvencliDerleme, olculen: YalnizYazilim, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("h264_nvenc", result.Plan.Codec);
+        Assert.True(result.HardwareNotMeasured);
+        Assert.Equal(0, makine.YoklamaSayisi("h264_nvenc"));
+    }
+
+    [Fact]
+    public void OlculmusKodlayiciIcinGecicilikIsaretiKonmuyor()
+    {
+        var makine = new OlculmemisMakine(built: NvencliDerleme, olculen: NvencliDerleme, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("libx264", result.Plan.Codec);
+        Assert.False(result.HardwareNotMeasured);
+        Assert.Equal(1, makine.YoklamaSayisi("h264_nvenc"));
+    }
+
+    [Fact]
+    public void AvailabilityNullIkenTercihEdilenKodlayiciDonuyor()
+    {
+        var maxOptions = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.MaxCompression, SpeedMode = SpeedMode.Quality };
+        var fastOptions = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Quality };
+        var uyumluOptions = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality };
+
+        var maxResult = PlanCalculator.BuildDetailed(SampleInfo(), maxOptions, null, null);
+        var fastResult = PlanCalculator.BuildDetailed(SampleInfo(), fastOptions, null, null);
+        var uyumluResult = PlanCalculator.BuildDetailed(SampleInfo(), uyumluOptions, null, null);
+
+        Assert.Equal("libsvtav1", maxResult.Plan.Codec);
+        Assert.Equal("h264_nvenc", fastResult.Plan.Codec);
+        Assert.Equal("libx264", uyumluResult.Plan.Codec);
+        Assert.DoesNotContain(AdviceCode.EncoderFallback, maxResult.Advice.Notes);
+        Assert.DoesNotContain(AdviceCode.EncoderFallback, fastResult.Advice.Notes);
+        Assert.False(maxResult.HardwareNotMeasured);
+        Assert.False(fastResult.HardwareNotMeasured);
+    }
+
+    [Fact]
+    public void CompatibleYoluHicYoklamiyor()
+    {
+        var makine = new SurucusuzMakine(built: NvencliDerleme, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.Equal("libx264", result.Plan.Codec);
+        foreach (var codec in NvencliDerleme)
+            Assert.Equal(0, makine.YoklamaSayisi(codec));
+    }
+
+    [Fact]
+    public void HizliKipDonanimYoklamasinaBagliKaliyor()
+    {
+        var makine = new SurucusuzMakine(built: NvencliDerleme, works: YalnizYazilim);
+        var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, SpeedMode = SpeedMode.Fast };
+
+        var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
+
+        Assert.False(CodecModel.IsHardware(result.Plan.Codec));
+        Assert.Equal(1, makine.YoklamaSayisi("av1_nvenc"));
+        Assert.Contains(AdviceCode.EncoderFallback, result.Advice.Notes);
+    }
 }
