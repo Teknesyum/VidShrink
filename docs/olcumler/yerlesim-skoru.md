@@ -542,13 +542,18 @@ testler orada **atlanır** ve yeşil görünmeleri hiçbir şey söylemez.
 koyduğum 540 sn'lik sınıra takıldı; günlüğün sonunda
 `Etkin test çalıştırması iptal edildi. Nedeni: Test ana işlemi kilitlendi` yazıyor.
 Bastığı `3 başarısız / 1032 başarılı / 67 atlandı / 1102 toplam` özeti **kısmi bir
-koşumun** özeti; CI'ın 1183'ünü tutmuyor ve 1 dk 31 sn süren
-`QualityTargetTests.SearchCostIsBoundedAndCounted` o koşumda hiç çalışmamış.
+koşumun** özeti; CI'ın 1183'ünü tutmuyor ve
+`QualityTargetTests.SearchCostIsBoundedAndCounted` o koşumda hiç çalışmamış
+(o ölçü sonradan tek başına, iki modelde ayrı ayrı koşuldu — §15).
 Aşağıdaki sayılar CI koşumu **33592420948**'dendir (headSha `ab70c85`):
 
 ```
 Failed: 4, Passed: 1074, Skipped: 105, Total: 1183, Duration: 14 m 9 s
 ```
+
+Aynı sayılar yalnız `docs/` değiştiren `2a42bf0` başında koşum **33595322110**'da
+birebir tekrarlandı (`Failed 4 / Passed 1074 / Skipped 105 / Total 1183`, 12 dk 38 sn);
+süre farkı koşucunun, sayılar değil.
 
 **Kabul kriteri ölçüleri atlanan listesinde değil.** K8'in beş durumu
 (`TheRateHalfOfTheScoreDoesNotMoveWhenOnlyTheResolutionChanges` ×2,
