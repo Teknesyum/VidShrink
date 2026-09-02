@@ -309,3 +309,64 @@ iki pencere içerdiği için orta pencere her zaman var. `fullScaleBppf` ve
 üreten kodlama sayısı 3'ten 2-8'e çıkıyor, sıfıra düşmüyor. Korpustaki sekiz
 klibin ve üç gerçek kaynağın hepsinde `Measured` yolu seçildi — **ölçülemeyen
 yola düşen içerik gözlenmedi**.
+
+## Gerçek kaynaklar — yöntemin dayandığı varsayım burada kırılıyor
+
+Yukarıdaki K1-K4 tabloları `.calisma/t103/korpus` altındaki sekiz **sentetik 540p**
+klibe ait. Aynı sürüm üç **gerçek 1080p60 HDR** kaynakta (`parca-1..3`, 60 sn'lik
+kesitler) yeniden ölçüldü. Sonuç korpustakinin tersi:
+
+| klip | cv | bugün (sabit pencere) | üretim planı (N koşumda seçildi) |
+|---|---|---|---|
+| parca-1 | 0.16 | −14.86 % | **+81.00 %** (N=3) |
+| parca-2 | 0.24 | −20.12 % | **+21.40 %** (N=3) |
+| parca-3 | 0.12 | +5.66 % | +1.30 % (N=3) |
+
+Üçte ikisinde yeni plan bugünkünden **belirgin biçimde kötü**. Ortalama mutlak
+sapma bugün 13.55 %, üretim planında 34.57 %.
+
+### Neden — ölçülen kök neden
+
+Plan, pencereleri **ffprobe paket biti** profiline göre tabakalıyor. Bunun
+işe yaraması için paket bitinin kodlama maliyetini (CRF-23 bppf) öngörmesi
+gerekiyor. Bu varsayım ölçüldü: her klipte tüm tamsayı başlangıçlı 2 sn
+pencerelerin paket biti ile önbellekteki gerçek kodlanmış bppf'i arasındaki
+Pearson korelasyonu:
+
+| korpus (sentetik 540p) | r | | gerçek 1080p60 HDR | r |
+|---|---|---|---|---|
+| k5-kisa | +0.972 | | parca-1 | **+0.546** |
+| k1-inisli | +0.990 | | parca-2 | **+0.455** |
+| k3-tepeli | +0.987 | | parca-3 | +0.927 |
+| s1-cuval | +0.971 | | | |
+| s2-donusumlu | +0.967 | | | |
+| k2-duz | +0.976 | | | |
+| k4-bas | +0.992 | | | |
+| k6-uzun | +0.985 | | | |
+
+Korpusta r = 0.967-0.992; gerçek kaynaklarda 0.455-0.927. Korpus klipleri
+x264 ile üretildiği için paket profili kodlama maliyetiyle neredeyse birebir
+gidiyor — yani korpus, yöntemin dayandığı varsayımı **sınamıyor, sağlıyor**.
+
+Mekanizma parca-1'de doğrudan görünüyor: üretim planı `[6, 10, 13]`
+pencerelerini seçiyor ve **paket alanında neredeyse yansız** —
+`PlanBias = 0.9839`. Ama kodlama alanında üç pencerenin üçü de dosya
+ortalamasının üstünde (0.1178 / 0.0956 / 0.0734, sayım 0.0528). Yanlılık
+paket alanında yok, kodlama alanında +81 %. Korelasyonun düştüğü iki klip
+(r = 0.546, 0.455) planın battığı iki klip; korelasyonun durduğu klip
+(r = 0.927) planın kazandığı klip.
+
+Bu, korpusun "temsilci değil" olmasından daha ağır bir sorun: korpus
+yöntemin **öncülünü** doğru kabul ettiriyor.
+
+### Aile sıralaması korpuslar arasında durmuyor
+
+Gerçek kaynaklarda ailelerin N'ler arası en kötü sapması, korpustaki
+sıralamayı korumuyor. Seçilen `pencere` ailesi korpusta en dayanıklıydı
+(0.144); gerçek kaynaklarda en kötüler arasında (0.810). Korpusta ölçümle
+elenen `esaralik-genel` ailesi (2.845) gerçek kaynaklarda en iyisi (0.156).
+Yani K2'nin aday seçimi korpusa aşırı uydurulmuş.
+
+Üç klip "en kötü klip" ölçüsü için az; bu sıralamayı ters yönde de
+kanıt saymıyorum. Kanıt saydığım tek şey şu: **korpusta yapılan seçim
+gerçek kaynaklara taşınmıyor.**
