@@ -27,7 +27,13 @@ Tek bir özel `MeasureAsync` üç genel giriş tarafından çağrılıyor: `Meas
 
 Her metrik **ayrı bir ffmpeg koşumu**. Üçünün de filtre grafiği aynı:
 
-    [0:v]<test-normalizasyonu>[t];[1:v]<tonemap-öneki><referans-normalizasyonu>[r];[t][r]<metrik>
+    [0:v]<test-normalizasyonu>,settb=AVTB,setpts=N[t];
+    [1:v]<tonemap-öneki><referans-normalizasyonu>,settb=AVTB,setpts=N[r];
+    [t][r]<metrik>
+
+> **T116:** bu satır T110'a kadar kilitsiz hâliyle duruyordu ve §9.11'in kirlenmiş
+> satır envanterine de girmemişti. Kilidin kendisi §9.5'te, kaynağı
+> `MeasureFilterGraph.Build` (`QualityMeter.cs:86-88`).
 
 Normalizasyon `zscale` ile açık: giriş uzayı dosyanın etiketlerinden, çıkış uzayı
 referanstan alınıyor. `zscale` yoksa ölçüm hata fırlatıyor — sessizce etiketsiz
@@ -115,7 +121,10 @@ içerikteki tavanını raporluyor — 1080p60 gerçek içerikte 99,68, 320x240
 `testsrc2`'de 99,87. Kullanıcıya gösterilecek "kusursuz" rozeti istenirse sayıyı
 bozarak değil ayrı bir alanla verilmeli.
 
-> **T110:** bu sayı kilitli ölçüyle yeniden ölçüldü, **değişmedi** (97,4257; §9.10).
+> **T116 düzeltmesi:** T110'un buraya koyduğu damga yanlış yere basılmıştı.
+> §9.10 yalnız **p1**'i ölçtü (97,4257, kilitli ve kilitsiz aynı). Aşağıdaki
+> yan bulgunun 97,4256'sı §7'nin özdeş tablosunda **p3**'ün sayısıdır (:556) ve
+> **yeniden ölçülmedi.** İki ayrı klibin sayısı tek damgada birleştirilmişti.
 
 Yan bulgu: özdeş 1080p içerikte kare bazlı **min 97,4256**, p10 97,9241. Yani
 `VmafNegMin` özdeş dosyada bile 97,4 diyor — bu bir kalite işareti değil, modelin
@@ -574,7 +583,14 @@ dedi. Bir alan hem taşınıp hem kullanılamaz sayılamaz; T104 karar veriyor.
 | p3 | 2,2023 | 2,2041 | **−0,0018** | 2,4626 |
 
 p1'de sinyal gürültünün yüzde biri; p3'te **sıra ters dönüyor** — kötü kodlama
-daha iyi görünüyor. Yalnız p2 ayırıyor, o da hiçbir yolun ayıramadığı durağan
+daha iyi görünüyor.
+
+> **T116:** yukarıdaki tablo kilitsiz ölçüden gelir ve §9.10'da damgalıdır; bu
+> cümle damgasız kalmıştı. Kilitli ölçüde **p1 ayırıyor**: sinyal 0,0136'dan
+> **3,1471**'e, gürültü 1,3748'e karşı. "p1'de sinyal gürültünün yüzde biri"
+> gözlemi kilitli ölçüde **yok**. p2 ve p3 satırları **yeniden ölçülmedi**, o
+> yüzden "sıra ters dönüyor" ve "yalnız p2 ayırıyor" cümleleri için
+> **ölçülmedi** geçerlidir. Yalnız p2 ayırıyor, o da hiçbir yolun ayıramadığı durağan
 klip; orada min klip ortalamasına yapıştığı için "ayırıyor" görünüyor.
 
 Aynı tabloda p10 ve en kötü birim aynı içeriklerde çalışıyor (p1 p10 sinyali
@@ -595,6 +611,12 @@ Aynı tabloda p10 ve en kötü birim aynı içeriklerde çalışıyor (p1 p10 si
 
 Kısaca: silinmedi çünkü tanıda işe yarıyor; terfi de etmedi çünkü üç içerikte
 ölçüldü ve kalite ayıramadı.
+
+> **T116:** bu cümlenin "üç içerikte ölçüldü ve kalite ayıramadı" kısmı
+> **kilitsiz ölçüye dayanıyor.** Kilitli ölçüde p1 ayırıyor (§9.10); p2 ve p3
+> **yeniden ölçülmedi.** Bugünkü doğru ifade: üç içerikte kilitsiz ölçüldü,
+> birinde kilitli yeniden ölçüldü ve orada ayırdı, ikisi ölçülmedi. K5 kararı
+> yine de değiştirilmedi — kararı yeniden açmak ayrı bir iştir.
 
 
 ## 8. Bu turun sınırları
@@ -693,8 +715,25 @@ karenin **6'sının** yanlış eşlendiğini gösteriyor — 29/30, 133/134, 205
 | 205 | 44,0798 | 54,0565 |
 | 206 | **5,9679** | 44,0571 |
 
-Kalan 234 kare iki koşumda da aynı. Kilit kare **eklemiyor**, yanlış eşlenmiş
-altı kareyi **kaldırıyor**: min 2,59'dan 30,23'e, ortalama +0,57.
+**T116 yeniden ölçtü — 234 değil 232.** Yukarıdaki altı satır doğru ama sayım
+değil: ham günlükte **8 kare** iki koşumda farklı, **232 kare** aynı. Farklı olan
+sekiz kare 29, 30, **31**, 133, 134, **135**, 205, 206. Altısı bir puandan fazla
+oynuyor (tablodakiler); kalan ikisi kilitle **aşağı** iniyor — 31. kare
+36,7814 → 36,0200 (**−0,7613**), 135. kare 49,9762 → 49,9433 (−0,0328). Kilit
+kare **eklemiyor**, yanlış eşlenmiş altı kareyi **kaldırıyor**: min 2,59'dan
+30,23'e, ortalama +0,57.
+
+Izgaranın ref1 satırları bu turda rakamı rakamına yeniden üretildi (kilitsiz
+40,6656 / 33,1747 / 2,5864; kilitli 41,2331 / 33,4906 / 30,2347). ref2'nin
+kilitsiz satırı da birebir aynı çıktı (81,4185 / 81,2890 / 80,9937).
+
+**ref2'nin kilitli satırında eşlenen kare sayısı yeniden üretilemedi.** Tablo
+**240** diyor; bu turda kesilen `ref2.mkv` **239 kare** taşıyor ve kilitli koşum
+da 239 eşliyor (81,4372 / 81,3171 / 81,0174). Fark ölçümde değil kesme adımında:
+kaptaki 0,020 s'lik kayma yüzünden `-t 4` bir kareyi dışarıda bırakıyor. T110'un
+ref2'si 240 kare taşımış olmalı. Belgenin sayısı geri çekilmedi; yeniden üretimin
+sayısı yanına yazıldı, hangisinin doğru olduğu **ölçülmedi** — iki dosya artık
+karşılaştırılamıyor.
 
 Nedeni ölçüldü: referansın kendi damgaları düzgün ızgarada değil. `ref1.mkv`'nin
 30. karesi `0,501000`'de, testin karşılık gelen karesi `0,500000`'da. Referans
@@ -735,12 +774,38 @@ geciktirilip yanına sıfırdan başlayan sessiz ses akışı konarak §9.1'deki
 | 40 ms | 1,20 | **37,8810** | 98,3724 |
 | 50 ms | 1,50 | **37,8810** | 98,3724 |
 
-Aynı kaynağın **bilerek bir kare kaydırılmış** kodlaması (ilk kare atılıp
-`setpts=N/FR/TB`) 52,3008 veriyor — 10 ms ve 20 ms kaymanın kilitsiz sonucuyla
-birebir aynı sayı. Yarım kareden küçük bir damga kayması tam bir kare kaydırmaya
-dönüşüyor; T106'nın ana iddiası ürün kodunda doğrulandı. Zarar kaymanın
-milisaniyesine değil **kare cinsinden tavanına** bağlı: (0, 1] kare bir kare,
-(1, 2] kare iki kare kaydırıyor. Kilitli sütun her kaymada 98,3724 — onarım tam.
+Yukarıdaki beş satır bu turda rakamı rakamına yeniden üretildi.
+
+**T110'un bir kare çıpası çevrimseldi; geri çekildi.** Belge "aynı kaynağın
+bilerek bir kare kaydırılmış kodlaması (ilk kare atılıp `setpts=N/FR/TB`)
+52,3008 veriyor" diyordu. Ölçüldü: o tarifle üretilen dosya **65,7226** veriyor,
+52,3008 vermiyor. 52,3008'i veren dosya `-itsoffset 0.020` kopyasının **kendisi**,
+yani ızgaranın 20 ms satırındaki `k0.020.mkv`. Yani çıpa kendi ölçtüğü sayıyla
+karşılaştırılmış; bağımsız bir kanıt değildi.
+
+Çevrimsel olmayan çıpalar ölçüldü. Kaydırma **içeriğe** uygulanır, damgaya değil
+(`select=gte(n\,K),setpts=N/FR/TB`, sonra `libx264 -crf 16`), ve sonuç
+**kilitli** ölçülür — böylece ölçülen şey kaymanın kendisi olur, ölçerin kusuru
+değil:
+
+| gerçekten kaydırılmış içerik | kilitli ortalama | karşılığı olan kilitsiz damga kayması | kilitsiz ortalama | fark |
+|---|---:|---|---:|---:|
+| kaydırma yok | 98,3724 | 0 ms | 98,3724 | 0 |
+| 1 kare | **52,1174** | 10 ms ve 20 ms | 52,3008 | 0,18 |
+| 2 kare | **37,4526** | 40 ms ve 50 ms | 37,8810 | 0,43 |
+
+`(1, 2]` bacağının eksik çıpası budur. Yarım kareden küçük bir damga kayması tam
+bir kare kaydırmaya dönüşüyor; T106'nın ana iddiası ürün kodunda doğrulandı.
+Zarar kaymanın milisaniyesine değil **kare cinsinden tavanına** bağlı: (0, 1]
+kare bir kare, (1, 2] kare iki kare kaydırıyor — iki bacağın da çıpası artık
+ölçülmüş. Kilitli sütun her kaymada 98,3724 — onarım tam.
+
+**Yan ölçüm, 0 ms satırının tarifi.** 0 ms hücresi ancak `src.mp4` doğrudan
+kullanıldığında 98,3724 veriyor. Aynı dosyanın `-itsoffset 0` ile sessiz ses
+akışının yanına konmuş mkv kopyası kilitsiz **81,8084** veriyor ve 90 yerine
+**91 kare** üretiyor: mkv'nin 1/1000 zaman tabanı 60→30 fps ızgarasını
+yuvarlıyor ve kayma sıfırken bile kare eşlemesini bozuyor. Kilitli ölçüde aynı
+dosya 98,3724 ve 90 kare. Izgaranın 0 ms satırı `src.mp4` ile üretilmiştir.
 
 ### 9.5 Kilidin kendisi
 
@@ -770,8 +835,15 @@ tüketicide görünüyor, ayrı bir günlük kanalı gerekmiyor, ve karşılaşt
 sonuçlarda bile doluyor (`Comparable=false` dönen erken çıkış da `Alignment`
 taşıyor). `Note` yalnız kayma varken dolu:
 
-    "Kaynak ve test zaman damgaları 20 ms (1,2 kare) ayrık; kareler zaman
+    "Kaynak ve test zaman damgaları 20 ms (1.2 kare) ayrık; kareler zaman
      damgasına değil kare indeksine eşlendi."
+
+> **T116:** yukarıdaki metin çalışan koddan okundu (60 fps ref2 çifti,
+> `ShiftFrames = 1.2`). Belge önce "1,2 kare" yazıyordu; kod
+> `CultureInfo.InvariantCulture` ile biçimliyor, ondalık ayırıcı **nokta**.
+> Arayüzün geri kalanı Türkçe olduğu için bu bir tutarsızlık, ama düzeltmesi
+> `QualityMeter.cs`'te ve o dosya T116'nın `owns`'unda değil — **değiştirilmedi**,
+> yalnız belgedeki alıntı koda uyduruldu.
 
 Ölçüsü `ShiftedSourceIsReportedNotSilentlyRepaired` ve
 `VideoStartAheadOfTheContainerIsTheOffsetThatReachesTheFilterGraph`. İkincisi
@@ -1043,10 +1115,19 @@ Duyarlı düzenek (§9.4), `.calisma/T110/pin/`:
     ffmpeg -i src.mp4 -c:v libx264 -crf 16 -threads 2 same.mp4
     ffmpeg -f lavfi -i anullsrc=r=48000:cl=stereo -t 3 -c:a aac sessiz.m4a
     ffmpeg -itsoffset <kayma> -i src.mp4 -i sessiz.m4a -map 0:v -map 1:a -c copy k<kayma>.mkv
-    ffmpeg -i src.mp4 -vf "select=gte(n\,1),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-ref.mkv
+    ffmpeg -i src.mp4 -vf "select=gte(n\,1),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-1kare.mkv
+    ffmpeg -i src.mp4 -vf "select=gte(n\,2),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-2kare.mkv
 
-Her `k<kayma>.mkv` `same.mp4` ile yukarıdaki ham grafikten geçirilir; `kaymis-ref.mkv`
-bir kare kaymanın referans değeridir.
+Her `k<kayma>.mkv` `same.mp4` ile yukarıdaki ham grafikten geçirilir. 0 ms satırı
+`src.mp4` ile üretilir, `k0.mkv` ile değil — mkv'nin 1/1000 zaman tabanı kayma
+sıfırken bile 91 kare ve 81,8084 veriyor (§9.4).
+
+> **T116 düzeltmesi.** Bu satır belgede `kaymis-ref.mkv` adıyla duruyordu ve
+> "bir kare kaymanın referans değeridir" deniyordu. Bu tarifle üretilen dosya
+> §9.4'te iddia edilen 52,3008'i **vermiyor**, 65,7226 veriyor; 52,3008'i veren
+> dosya `k0.020.mkv`'nin kendisiydi. Tarif dosyaya uyduruldu, dosya tarife değil:
+> iki dosya `kaymis-1kare` / `kaymis-2kare` diye ayrıldı ve **kilitli** ölçülen
+> değerleri (52,1174 · 37,4526) §9.4'e çıpa olarak yazıldı.
 
 Kontrol (§9.3) — ref2'nin kasten iki kare kaydırılmış ve kaydırılmamış kopyaları:
 
