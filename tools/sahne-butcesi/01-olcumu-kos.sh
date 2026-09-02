@@ -15,6 +15,9 @@ PENCERELER="p1-karisik p2-durgun p3-hareketli"
 for w in $PENCERELER; do kos harita maks "$w"; done
 kos k4 maks p1-karisik
 
+for w in $PENCERELER; do kos dogrula maks "$w"; done
+bash "$KOK/tools/sahne-butcesi/03-duzenek-mutasyonu.sh"
+
 for kol in $KOLLAR; do for w in $PENCERELER; do kos plan "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k1   "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k5   "$kol" "$w"; done; done
