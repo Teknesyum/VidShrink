@@ -243,3 +243,103 @@ Türkçe yorum yanıltıcı hale geldi. T0'ın bunu T66'nın mirasçısı bir tu
 olarak açması gerekir: ya betik ffmpeg'i PATH'te bırakıp yalnız donanım
 kodlayıcıyı (NVENC) simüle etsin, ya da adı/amacı "CI'ın artık neyi
 görmediğini" (örn. gerçek GPU) yansıtacak şekilde yeniden yazılsın.
+
+## K9 — kod=66 yanlış kırmızısı (tur 3)
+
+T118 ölçerken yakaladı: bu makinede `tools/kosum-kapisi/kosum-kapisi.ps1`
+gerçekten yeşil bir koşumda (`Failed 0, Passed 1163, Skipped 17, Total 1180`)
+`kod=66 "özet yok"` ile düşüyor. İki ayrı, birbirinden bağımsız kök neden
+ölçüldü — ikisi de aynı canlı-yakalama bloğunda yaşıyor.
+
+### Kök neden 1 — konsol kod sayfası, dil değil
+
+Bu makine `pwsh` içermiyor (`command -v pwsh` → çıkış 1); kapı yalnız
+Windows PowerShell 5.1 ile çalışıyor. Ölçülen kod sayfası: `[Console]::
+OutputEncoding` = Türkçe (DOS), CodePage 857; `$OutputEncoding` = US-ASCII,
+CodePage 20127 — ikisi de UTF-8 değil.
+
+Yalıtılmış kanıt: `gecerli-tr.txt`'yi (`Başarısız: 0, ...`) `cmd /c type` ile
+okuyup PS 5.1'in `2>&1 | ForEach-Object` deseniyle yakalayınca, metin ekranda
+doğru görünse de bellekteki baytlar bozuluyor (`ş`,`ı` yerine kutu-çizim
+karakterleri) ve `(?:Başarısız|Failed)` deseni **0 eşleşme** veriyor —
+oysa betiğin kalıbı zaten Türkçe anahtar kelimeyi de arıyordu. Demek ki
+sorun **dil değil, kod sayfası**: dil kalıbı doğruydu, taşıyan bayt akışı
+bozuktu. `$OutputEncoding = UTF8` tek başına düzeltmiyor (yine 0 eşleşme);
+düzelten `[Console]::OutputEncoding = UTF8` — PowerShell'in dış süreç
+çıktısını bu değere göre çözdüğünü doğruluyor. Script başına eklendi
+(`try { } catch { }` ile sarılı, `pwsh`'de zararsız no-op).
+
+### Kök neden 2 — kendi düzeltmem aynı hatayı bir kez daha üretti
+
+İlk düzeltme denemesinde regex kalıplarındaki `\u`-kaçışlarını (`Ba\u015far
+\u0131s\u0131z`) düz Türkçe karaktere (`Başarısız`) çevirdim — ve
+`gecerli-tr.txt` fikstürü aniden kod=66 ile reddedilmeye başladı. Neden:
+BOM'suz `.ps1` dosyasını PS 5.1 **kaynak kodu olarak** ayrıştırırken de
+sistem kod sayfasını (857) kullanıyor; kaynaktaki UTF-8 baytları o kod
+sayfasıyla yanlış çözülüyor ve regex deseni artık fikstürdeki (doğru
+okunmuş) metinle eşleşmiyor. Orijinal betiğin `\u015f`/`\u0131` gibi kaçış
+dizileri kullanması bilinçliydi — kaynak kod sayfasından bağımsız kalmak
+için. Geri döndüm: tüm işlevsel (regex'te kullanılan) Türkçe literaller
+yine `\u`-kaçışlı; yalnız kozmetik `Write-Host` başarı mesajı (orijinalde
+de öyleydi, işlevsel değil) düz karakterle kaldı.
+
+### Seçilen çözüm — `.trx` logger, ikinci dil kalıbı değil
+
+İki seçenek sözleşmede sıralıydı: (a) iki dilin kalıbını yan yana arama,
+(b) `--logger "trx"` ile dilden bağımsız sayı okuma. (a) **zaten mevcuttu**
+(`Başarısız|Failed`, `Toplam|Total`, `Atlanan|Skipped`) ve yine de
+düşüyordu — çünkü hata dil değil kod sayfasıydı; ikinci bir dil kalıbı
+eklemek bu sınıftaki hiçbir hatayı kapatmazdı. (b) seçildi: `.trx` bir XML
+dosyası, disktan doğrudan okunuyor (konsol yakalamasından geçmiyor),
+kendi `encoding="utf-8"` bildirimini taşıyor ve `Counters` özniteliklerinin
+adları (`total`, `passed`, `failed`) yerelden bağımsız sabit. Bu, hem dil
+hem kod sayfası sorununu aynı anda kapatıyor — (a)'nın kapatamadığı ikinci
+sınıf.
+
+Ölçülen bir tuzak: gerçek bir `.trx` çıktısında (`dotnet test --filter
+UpdaterTests`, 3 `[Skip]`'li test) `Counters/@notExecuted` **0** kaldı,
+oysa 3 test atlandı — xUnit'in `[Skip]` özniteliği trx'te `outcome=
+"NotExecuted"` olarak tekil sonuçlara yazılıyor ama toplayıcı `Counters`
+bunu ayrı bir sayaçta biriktirmiyor. Çözüm: `Atlanan = Toplam - Geçen -
+Başarısız` — kapının kendi yapısal özdeşliğini (tur 2, `Total = Passed +
+Failed + Skipped`) kaynak değiştirince de kullanmaya devam etmek.
+
+Dokunulmayan: metin-regex yolu `-InputFile <düz metin>` ile hâlâ çalışıyor
+(geriye uyum), yalnız canlı koşum (`-InputFile` verilmeden) artık önce
+`.trx` arıyor, bulamazsa metne düşüyor.
+
+### Bulunan üçüncü hata — EAP=Stop, native stderr'i sonlandırıcıya çeviriyor
+
+Gerçek tam-suit koşumunda `ComplexityProbeTests.CancellationReachesQuality
+Measurement` zaman aşımına uğradı ve xUnit `[FAIL]` satırını stderr'e
+yazdı. `$ErrorActionPreference = 'Stop'` altında `2>&1 | ForEach-Object`
+bunu `NativeCommandError`'a çevirip yakalama döngüsünü **betiğin kendi
+çıkış kodunu hiç yazmadan** çökertti — betik ne 65/66/68/69 ne de 0 verdi,
+PowerShell'in kendi hata kodunda düştü. Yalıtılmış kanıt: `cmd /c "echo
+err 1>&2"` aynı desenle `RemoteException` fırlatıyor. Bu, T115 tur 3'ün
+konusu olan hatadan **ayrı, önceden var olan** bir kusur (orijinal betikte
+de aynı desen vardı, tetiklenmemişti) — aynı bloğu değiştirdiğim ve
+sözleşmenin istediği "gerçekten tamamlanmış koşum" kanıtını üretemeden
+engellendiğim için düzelttim: `$ErrorActionPreference` yakalama bloğunda
+geçici olarak `Continue`'ya çekiliyor, blok bitince eski değerine dönüyor.
+
+`ComplexityProbeTests.CancellationReachesQualityMeasurement`'in kendisi
+(31s zaman aşımı) T115'in `owns`'unda değil — ayrı, muhtemelen kararsız
+bir ölçü; buraya not düşüldü, dokunulmadı.
+
+### Kanıt — fikstür + gerçek koşum
+
+Fikstür seviyesi: `tools/kosum-kapisi/fixtures/*.trx` (5 yeni dosya —
+`gecerli`, `basarisiz`→66, `eksik-toplam`→68, `korluk-geri`→69,
+`ozet-yok`→66) + var olan 9 metin fikstürü, `test-kapi.ps1` üzerinden
+toplam 15 durum, hepsi beklenen kodu verdi (geriye uyum korundu).
+
+Gerçek koşum: bu makinede, `pwsh` yokluğunda, `-InputFile` **verilmeden**
+tam suit çalıştırıldı — `Başarılı!  - Başarısız: 0, Başarılı: 1163,
+Atlanan: 17, Toplam: 1180, Süre: 15 m 13 s`, kapı `.trx`'i buldu
+(`Counters total="1180" passed="1163" failed="0"`, atlanan = 1180-1163-0 =
+17) ve **`$LASTEXITCODE = 0`** verdi — T118'in bildirdiği tam sayılarla,
+tam bu makinede, düzeltmeden önce kod=66 üreten senaryo artık geçiyor.
+Çıkış kodu ayrı bir dosyaya yazılarak doğrulandı (`tail | $?` borusunun
+son komutun kodunu döndürdüğü ilk ölçüm hatalıydı, düzeltilip tekrar
+ölçüldü).

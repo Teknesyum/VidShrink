@@ -6,7 +6,8 @@ foreach ($case in @(
     @{ Name = 'gecerli-tr.txt'; Minimum = 974 },
     @{ Name = 'gecerli-en.txt'; Minimum = 974 },
     @{ Name = 'gercek-kosum-tr.txt'; Minimum = 80 },
-    @{ Name = 'gecerli-en.txt'; Minimum = 974; MaximumSkipped = 30 }
+    @{ Name = 'gecerli-en.txt'; Minimum = 974; MaximumSkipped = 30 },
+    @{ Name = 'gecerli.trx'; Minimum = 1134; MaximumSkipped = 30 }
 )) {
     $params = @{ MinimumTotal = $case.Minimum; InputFile = (Join-Path $fixtures $case.Name) }
     if ($case.ContainsKey('MaximumSkipped')) { $params.MaximumSkipped = $case.MaximumSkipped }
@@ -21,7 +22,11 @@ foreach ($case in @(
     @{ Name = 'basarisiz-en.txt'; Minimum = 974; Exit = 66 },
     @{ Name = 'ikili-ozet-tr.txt'; Minimum = 974; Exit = 66 },
     @{ Name = 'eksik-toplam-en.txt'; Minimum = 974; Exit = 68 },
-    @{ Name = 'korluk-geri-en.txt'; Minimum = 1134; MaximumSkipped = 30; Exit = 69 }
+    @{ Name = 'korluk-geri-en.txt'; Minimum = 1134; MaximumSkipped = 30; Exit = 69 },
+    @{ Name = 'basarisiz.trx'; Minimum = 1134; Exit = 66 },
+    @{ Name = 'eksik-toplam.trx'; Minimum = 1134; Exit = 68 },
+    @{ Name = 'korluk-geri.trx'; Minimum = 1134; MaximumSkipped = 30; Exit = 69 },
+    @{ Name = 'ozet-yok.trx'; Minimum = 1134; Exit = 66 }
 )) {
     $params = @{ MinimumTotal = $case.Minimum; InputFile = (Join-Path $fixtures $case.Name) }
     if ($case.ContainsKey('MaximumSkipped')) { $params.MaximumSkipped = $case.MaximumSkipped }
