@@ -292,6 +292,84 @@ saydım:
 Bugün Core düzeltildiği, arayüz düzeltilmediği için **cümlenin iki kopyası ayrıştı.**
 Kullanıcı hâlâ yanlış sebebi görüyor; borç açık.
 
+## K7 — Tam süit ve CI
+
+`verify` filtresi (`PlanCalculatorTests|EncoderAvailabilityTests`) yeşildi ama **yetmedi.**
+Tam süit iki ayrı şey buldu; ikisi de aşağıda, gizlenmedi.
+
+Üreten komut:
+
+```
+dotnet build -c Release --no-incremental tests/VidShrink.Tests/VidShrink.Tests.csproj
+dotnet test  -c Release tests/VidShrink.Tests/VidShrink.Tests.csproj
+```
+
+### Birinci koşum — filtrenin görmediği iki pim
+
+| ölçü | ne kırıldı |
+|---|---|
+| `PlanCalculatorProbeTests.TheFastPathAsksTheAvailabilityForEveryHardwareCandidate` | beklenen çağrı dizisinin sonuna `works:libsvtav1` eklendi |
+| `PlanCalculatorProbeTests.WorkingHardwareStillOpensThePixelFormatProbe` | aynı, `["works:av1_nvenc", "hdr10:av1_nvenc"]` → üçüncü çağrı |
+
+```
+Başarısız! - Başarısız: 2, Başarılı: 1320, Atlanan: 23, Toplam: 1345, Süre: 18 m 50 s
+```
+
+İki satır saydım: **2**, koşumun bildirdiğiyle aynı. Eklenen çağrı T128'in kastettiği
+davranış — tavsiye kodlayıcısı artık yoklanıyor (§K3). Pim eskiydi, davranış doğru:
+beklenen diziler ve üstlerindeki açıklamalar güncellendi (`1d4a259`). Dosya `owns` dışında,
+`verify` filtresinde de yok; §Öneri.3'te bildirildi.
+
+### İkinci koşum — düzeltmeden sonra
+
+```
+Başarısız! - Başarısız: 1, Başarılı: 1321, Atlanan: 23, Toplam: 1345, Süre: 17 m 14 s
+```
+
+İki pim yeşile döndü. Kalan tek kırmızı `PerformanceCheckTests.YukAltindaKararHafiflemiyorMu`:
+
+```
+15 is parcacigi olcumde gorunmedi: bos 0.916, yuklu 0.864 gercek zaman cekirdegi
+```
+
+**Bu ölçü T128'e bağlı değil, makine yüküne bağlı.** Kanıt: aynı commit'te (`1d4a259`)
+tek başına üç kez koşturuldu —
+
+| koşum | sonuç | okunan |
+|---|---|---|
+| 1 | kırmızı | boş 0.921, yüklü 0.866 |
+| 2 | **yeşil** | — |
+| 3 | kırmızı | boş 0.923, yüklü 0.889 |
+
+Kod değişmeden kırmızı-yeşil-kırmızı: ölçü deterministik değil. Üstelik T128'in diff'i
+(`PickCodec` gövdesi, ölçüler, belge) `PerformanceProbe`a değmiyor. Ölçünün kendisi
+`[QuietMachineFact]` ile boş makine bekliyor ve yüklü makine için atlama dalları var, ama
+bu dal yükü "göremediğinde" atlamıyor, iddia ediyor. Ölçüm makinesi bu tur paylaşımlıydı
+(CI + başka ajanlar).
+
+**Bu depoda zamana bağlı ikinci ölçü.** Birincisi `SplitDragTests` (T127 onu düzeltiyor);
+bu ikincisi kayda geçirildi, T128 kapsamında düzeltilmedi — `PerformanceCheckTests.cs`
+`owns`da değil.
+
+### CI
+
+| koşum | commit | sonuç |
+|---|---|---|
+| [33622038561](https://github.com/Teknesyum/VidShrink/actions/runs/33622038561) | `bb18127` | `cancelled` — sonraki itme iptal etti, hüküm vermedi |
+| [33623785112](https://github.com/Teknesyum/VidShrink/actions/runs/33623785112) | `1d4a259` | **`success`** |
+
+```
+Passed! - Failed: 0, Passed: 1326, Skipped: 19, Total: 1345
+```
+
+Toplam yerelle aynı (1345); atlanan sayısı farklı (CI 19, yerel 23) çünkü iki makinenin
+atlama geçitleri farklı. **CI yeşili `YukAltindaKararHafiflemiyorMu`yu doğrulamıyor:**
+koşum kaydında o ölçü `[SKIP]` — `[QuietMachineFact]` geçidi CI makinesini boş saymadı.
+Yani o ölçünün kararsızlığının tek kanıtı yerelde aynı commit'te alınan
+kırmızı-yeşil-kırmızı, yukarıdaki tablo.
+
+Koşum kapısı da geçti: `kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30`.
+
 ## Öneri — T0 kararı gerekli
 
 1. **Yukarıdaki dört yerel metin satırı.** `owns` dışında, dokunulmadı.
@@ -302,7 +380,14 @@ Kullanıcı hâlâ yanlış sebebi görüyor; borç açık.
    bu tura veriyor, ama `owns` listesi vermiyor. Ölçü çevrildi ve adı
    `PickCodecArtikDerlemeListesineDegilYoklamayaBakiyor` oldu. **Bilerek yapıldı ve
    burada bildiriliyor**; `owns` genişletilmezse ihlal olarak okunur.
-3. **`WorksAsEncoder`ın iki durumlu imzası hâlâ tuzak.** Bu tur onu geçidin arkasına
+3. **İkinci `owns` boşluğu: `tests/VidShrink.Tests/PlanCalculatorProbeTests.cs`.**
+   Bu dosya ne `owns`da ne `verify` filtresinde; varlığı ancak tam süit koşunca
+   ortaya çıktı (§K7). İki ölçüsü — `TheFastPathAsksTheAvailabilityForEveryHardwareCandidate`
+   ve `WorkingHardwareStillOpensThePixelFormatProbe` — yoklama çağrılarının **sırasını
+   birebir** pimliyor. T128 tavsiye kodlayıcısını da yoklattığı için ikisinin de sonuna
+   `works:libsvtav1` ekleniyor. Beklenen diziler ve üstlerindeki açıklamalar güncellendi;
+   davranış doğru, pim eskiydi. Aynı bildirim: bilerek yapıldı.
+4. **`WorksAsEncoder`ın iki durumlu imzası hâlâ tuzak.** Bu tur onu geçidin arkasına
    aldı ama kaldırmadı: ham `EncoderCapabilities` veren her çağıran (`:1377`, `tools/`)
    ölçülemeyen yoklamayı "çalışmıyor" diye okumaya devam ediyor. Kalıcı çözüm
    `IEncoderAvailability.EncoderState`in üç durumunu `IEncoderMeasurementState`in yerine
