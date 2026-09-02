@@ -70,5 +70,7 @@ jobs:
           }
       - run: dotnet build VidShrink.sln -c Release -warnaserror
       # A hung test host prints "Test host process crashed" with Failed: 0 and still
-      # exits 0. The gate reads the output and refuses a run that never finished.
+      # exits 0. -MinimumTotal reads the output and refuses a run that never finished.
+      # -MaximumSkipped catches the other blind spot: Total stays the same when a test
+      # silently flips from Passed to Skipped, so Total alone can't see it (T115 tur 2).
       - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30

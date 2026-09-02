@@ -194,6 +194,21 @@ durumunu 1134 altında yakalıyor. Kapının **yeni işi** (sessiz atlama-körl�
 yukarıdaki iki senaryoyla ölçüldü ve **yakalandığı doğrulandı** — önceden
 "yakalar" diye iddia edip ölçmemiştim, bu turda hem iddia hem ölçüm var.
 
+**Düzeltilmiş `ci.yml`'in gerçek koşumu** (tur 1'in borcu — teslim edilen
+`ci.yml` denetim anında hiç tamamlanmış bir koşuma sahip değildi, ölçülen
+koşumların hepsi eski `950` ile koşmuştu): koşum **`33589639249`**, commit
+**`0e122f2`**, `conclusion: failure` — `Failed: 1, Passed: 1162, Skipped: 17,
+Total: 1180, 18 m 59 s`, `KOSUM KAPISI DUSTU: kod=66 sart=Basarisiz/Failed
+ozeti sifir degil: Failed: 1.` Bu, K4'ün bilinen `nvcuda.dll` ortam-yapısal
+kırmızısından geliyor (aynı bulgu, değişmedi) — kapı `Failed:1`'de daha
+`-MinimumTotal`/`-MaximumSkipped` kontrollerine gelmeden reddediyor (kod 66,
+sırayla önce gelen kontrol). Yani bu koşum eşiklerin kendisini yeşil bir
+kapıda sınamadı; onu yukarıdaki `-InputFile` senaryolarıyla yerelde sınadım.
+Kanıtladığı şey: düzeltilmiş `ci.yml` gerçekten tamamlanıyor, yeni
+parametreler (`-MinimumTotal 1134 -MaximumSkipped 30`) hatasız kabul
+ediliyor ve gerçek bir Failed durumunda kapı hâlâ doğru reddediyor.
+Doğrulama: `gh run view 33589639249 --json headSha,conclusion`.
+
 ## K7 — kurulum başarısızlığı kırmızı mı
 
 Evet — gerçek, sahnelenmemiş kanıt: koşum **`33582680807`** (dal
