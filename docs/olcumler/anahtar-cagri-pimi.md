@@ -18,8 +18,11 @@ Sonuç: XAML uygulamanın **en büyük** tüketim yolu (196 çağrı yeri), `Say
 
 Sözleşme düzeltmenin `b692684` ile girdiğini yazıyor; o commit `.DS_Store`
 temizliği. Üç anahtar düzeltmesi `b2f2c62`, `main`e `a2b9664` birleştirmesiyle
-girdi. Çağrı yerleri de `MainWindow.axaml.cs:1893/1895/1980`, sözleşmedeki
-2054/2056/2140 değil.
+girdi. **Satır numarası düzeltmesi geri alındı:** sözleşmenin verdiği
+`MainWindow.axaml.cs:2054/2056/2140` doğrudur, `git show origin/main:` ile iki
+kez ölçüldü. 1893/1895/1980 `b2f2c62^` tabanından okunmuş, orada bile gerçek
+sayılar 1894/1896'dır ve üçüncü çağrı yeri o tabanda hiç yoktur —
+`main.plan.fact.estimated-size` çağrısını `b2f2c62` getirdi.
 
 ## Ortam
 
@@ -154,6 +157,14 @@ yerinin hangi anahtara gittiğini göremez.** Ölçü bu yüzden ikinci bir küm
 daha topluyor: derlemenin tamamındaki anahtar biçimli dizeler (aşağıda),
 böylece dizide duran anahtar "hiç kullanılmıyor" sanılmıyor.
 
+> **Bu bölümün iki sayısı doğrulanmadı.** Denetçi 13 değil **11** saydı; o sayı
+> doğruysa gerçek kör nokta 6 değil 8'dir ve eksik ikisi `LocalizedText::For`
+> ile `LocalizedText::.ctor` adaylarıdır — tablonun sabit-anahtarsız sütununda
+> birer geçişleri var ama yukarıdaki altılı listede yokturlar. T0 kendi
+> düzeneğiyle ölçmedi ve denetçinin sayısını körlemesine yazmadı. Karar
+> T146'ya borç: 19'un dağılımı IL yürüyüşüyle yeniden sayılacak ve altılı
+> liste ya tamamlanacak ya doğrulanacak.
+
 Ölçünün göremediği ikinci şey: `string key` yerine başka adla parametre alan
 bir sarmalayıcı yazılırsa aday kümesine girmez. Bugün öyle bir üye yok;
 `AnahtarTuketenKapilarKaynaktakiBildirimlerleAyni` ölçüsü kapı listesi
@@ -220,6 +231,11 @@ Yön 1b'nin bilinen riski: ilk parçası bir alan adıyla (`main`, `playback`,
 böyle bir dize yok (389 aday, 0 sahte).
 
 ## K4 — `main` tabanında yanlış pozitif yok
+
+> **Başlık ve aşağıdaki cümle fazla iddialı.** Denetçi bu koşumun 15/15 değil
+> 14 yanlış pozitif + **1 gerçek bulgu** olduğunu söyledi; ham çıktı 15 geçen
+> gösteriyor, ama "yanlış pozitif yok" cümlesi geçen testlerin hepsinin sahte
+> aday elediğini varsayıyor. Ayrım ölçülmedi. T146'ya borç.
 
 Anahtarlar yerine konduktan sonra, `origin/main` içeriğiyle:
 
