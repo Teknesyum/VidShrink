@@ -344,8 +344,7 @@ sonucu doğuruyor:
 **Hiçbiri.** Komut (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Koşum adı uzman-hb2: HandBrakeCLI -e x265_10bit…", şu an `:231`):
 
 ```
-HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo \
-  -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900
+HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900
 ```
 
 Preset adı verilmemiş; alanlar tek tek bayrakla kurulmuş. Bayrakların preset

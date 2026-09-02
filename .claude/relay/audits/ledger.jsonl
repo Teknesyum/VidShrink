@@ -155,3 +155,7 @@
 {"id":"T115","round":"3","risk":"high","verify":[{"step":"dotnet build VidShrink.sln -c Release -warnaserror","code":0}],"auditorRunId":"a28b324e74dd6bc22","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:49:53.111Z"}
 {"id":"T103","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests|ComplexityScanTests","code":0}],"auditorRunId":"a73dd0238e5579797","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:50:34.913Z"}
 {"id":"T107","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|ExtremeCompressionTests","code":0}],"auditorRunId":"ac609e23c8ccb05cd","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:50:48.147Z"}
+{"id":"T118","round":"3","risk":"low","verify":[{"step":"C:/PROGRA~1/Git/bin/bash.exe tools/ci-gibi-kos.sh --self-test","code":0}],"auditorRunId":null,"headSha":"890af6e93f5e070b56422dad39a9e3386cf56045","at":"2026-09-02T07:52:35.599Z"}
+{"id":"T114","result":"stale","at":"2026-09-02T07:55:43.497Z"}
+{"id":"T121","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests","code":0}],"auditorRunId":"ae0d74ee80c50fb7a","headSha":"890af6e93f5e070b56422dad39a9e3386cf56045","at":"2026-09-02T07:57:05.724Z"}
+{"id":"T127","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SplitDragTests","code":0}],"auditorRunId":null,"headSha":"890af6e93f5e070b56422dad39a9e3386cf56045","at":"2026-09-02T07:57:34.837Z"}
