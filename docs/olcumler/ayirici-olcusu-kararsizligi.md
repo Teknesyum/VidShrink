@@ -169,8 +169,28 @@ beslediği için o dala hiç girilmiyor. Ölçü bunu iddia ediyor:
 sınıyor; o yazıcıda saat okuması yok (`Math.Clamp` ve `Bounds.Width` üstünden yarım
 piksel eşiği).
 
-## 6. Ölçülmeyenler
+## 6. CI (K6)
 
+Yerel yeşille teslim edilmedi; dalın CI koşumu görülerek yazıldı.
+
+| koşum | commit | sonuç |
+|---|---|---|
+| `33601659638` | `c3da7a9` (düzeltmenin kendisi) | success |
+| `33601866470` | `7a2ca56` (dal başı) | success |
+
+Dal başındaki koşumun tam süiti:
+
+    Passed!  - Failed: 0, Passed: 1129, Skipped: 105, Total: 1234, Duration: 9 m 41 s
+      - VidShrink.Tests.dll (net8.0)
+
+`SplitDragTests` bu koşumda kırmızı değil — üç kez düşen ölçü artık düşmüyor. Tek
+yeşil koşum "kararsızlık bitti"nin kanıtı değildir; aşağıda ölçülmeyenler arasında.
+
+## 7. Ölçülmeyenler
+
+- **Kararsızlığın gerçekten bittiği ölçülmedi.** Elde tek bir yeşil CI koşumu var
+  (`33601866470`). Ölçü artık duvar saatini hiç okumadığı için mekanizma olarak
+  düşemez, ama bu bir çıkarım — tekrarlanan koşumla sınanmadı.
 - **Bu ölçünün geçmişte tam olarak kaç kez düştüğü ölçülmedi.** Üç bilinen vaka var
   (T111, T116, T123 — koşum 33597779584), taranmış bir sayı değil. Kapalı dalların CI
   kaydı geriye dönük taranmadı.
