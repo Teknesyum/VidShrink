@@ -155,6 +155,9 @@ bu turda **değiştirilmedi**; ölçüsüz oynatılacak bir sabit değil, ayrı 
 Açığın büyüklüğü hakkında bu tur şunu söyleyebilir: tabanı doğru yere koymak şikâyet
 işini tek başına çözmüyor. Eleme kalktı, seçim değişmedi.
 
+Bu, belgedeki her "tahmini kalite" sayısını bağlar: §8.5.1'deki 68,9 → 74,4 de aynı
+modelin çıktısıdır ve iyileşme kanıtı değildir.
+
 ### 3.2 HandBrake'in çalışma noktası hâlâ dışarıda — ama tabandan değil
 
 Sözleşme HandBrake'in kazanan dosyasının 0,0116 bppf'te koştuğunu söylüyor. Yeni tabanın
@@ -428,9 +431,48 @@ değerine döndürülüp ölçü yeniden koşuldu.
 
 | Ölçü | Sebep | Taban geri alınınca | Üstel geri alınınca |
 | --- | --- | --- | --- |
-| `ChipTests.KatliGerekceBasligiSayiyiSoyler` | taban | 9 gerekçe (eski hâl) | 7 (değişmez) |
+| `ChipTests.KatliGerekceBasligiSayiyiSoyler` | taban **ve** üstel (aşırı belirlenmiş) | 9 gerekçe (eski hâl) | **9** (eski hâl) |
 | `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched` | hareket üsteli | 12 satır hâlâ değişik | 18/18 eski listeyle birebir |
 | `QualityTargetTests.SearchLandsWithinTheMeasuredTolerance` | hareket üsteli | sapma 3,375 (değişmez) | sapma ≤ 1,0, eski geçit tutuyor |
+
+**Tur 2'de ilk satır yanlış yazılmıştı** ("üstel geri alınınca 7, değişmez"). Denetim
+ölçümü depo dışında tekrarlayınca çürüdü; tur 3'te beş koşum (biri bugünkü hâl)
+yeniden yapıldı ve tablodaki değer düzeltildi. Koşumlar (`--filter ChipTests`, 14 ölçü):
+
+| Geri alınan | ChipTests | Başlık sayısı |
+| --- | --- | ---: |
+| hiçbiri (bugünkü hâl) | geçti | 7 |
+| taban (`HardwareFloorFactor` 1,25 **ve** av1 0,020) | kaldı | **9** |
+| üstel (`DefaultMotionExponent` 0,25 **ve** `MotionExponentMax` 1,0) | kaldı | **9** |
+| yalnız `DefaultMotionExponent` 0,25 | kaldı | **9** |
+| yalnız `MotionExponentMax` 1,0 | geçti | 7 |
+
+**Kare hızı kesintisi iki sabitten de bağımsız olarak geri geliyor.** Taban eski değerine
+alınınca geri geliyor, üstel eski değerine alınınca da geri geliyor; ikisi de tek başına
+yeterli. Sebep **aşırı belirlenmiş** — bu ölçü tek bir sebebi işaret etmiyor ve bugünkü
+konumda iki sabit de gerekli.
+
+Üsteldeki iki sabitten yalnız `DefaultMotionExponent` bağlayıcı: `MotionExponentMax`'ı
+tek başına 1,0'a almak sayıyı değiştirmiyor (7'de kalıyor). Sebebi düzenekte:
+`ChipTests.Sample()` (`ChipTests.cs:104-118`) yalnız bir `MediaInfo`, hiç
+`ComplexityProfile` örneği taşımıyor. Profil ölçülmemiş olduğu için hareket üsteli
+`DefaultMotionExponent`'e düşüyor ve **ölçülen** üstele uygulanan kelepçe hiç
+çalışmıyor. Aynı sebeple `FloorAdaptation` da 1,0'dır; §3'ün 0,7028'i bu örnekte yok.
+
+Diğer iki satır da tur 3'te yeniden koşuldu; ikisi de yerinde duruyor, ama **neyin
+ölçüldüğü** ilk satırdakiyle aynı değil ve tabloda ayrı ayrı söylenmesi gerekiyor:
+
+- `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched` — tablodaki iki hücre **eski
+  beklenen listeye** karşı okunuyor, bugünkü ölçüye karşı değil. Bugünkü ölçü (listesi
+  tur 2'de bugünkü plana güncellendi) taban geri alınınca **geçiyor**, üstel geri
+  alınınca **kalıyor** (`SpeedModeTests|QualityTargetTests`, 1 başarısız / 26 başarılı).
+  İki okuma da aynı şeyi söylüyor: sebep yalnız hareket üsteli.
+- `QualityTargetTests.SearchLandsWithinTheMeasuredTolerance` — bu satırın hücreleri
+  geçti/kaldı değil, ölçünün rapor satırındaki **sayı**. Geçit 3,5 olduğu için ölçü üç
+  durumda da geçiyor; ayıran şey sayı. Tur 3'te `.calisma/t57/olcum.txt`'ten okundu:
+  bugünkü hâl **3,375** (capture.mkv Sharing, istenen 55,5), taban geri alınınca yine
+  **3,375** (değişmez), üstel geri alınınca **0,833** (phone.mp4 Sharing, istenen 80) —
+  yani eski 1,0 geçidinin altı. Sebep yine yalnız hareket üsteli.
 
 ### 8.5.1 Gerekçe sayısı 9'dan 7'ye düştü — kaybolan iki satır
 
@@ -444,15 +486,29 @@ Kaybolan iki satır **aynı olgunun iki yüzü**: kare hızı kesintisi.
 - `ReasonCode.FrameRateReduced` gerekçe satırı — "Frame Rate Reduced To 39.96 To
   Keep Per-frame Detail"
 
-Taban av1'de 0,020 × 1,25 = 0,025'ten 0,0095 × 1,52 = 0,01444 bppf'e inince 59,94 fps
-artık taban altında kalmıyor, plan kare hızını hiç kesmiyor ve iki satır birden
-düşüyor. **Bu tam olarak sözleşmenin istediği sonuç**: taban, kaynağın kendi kare
-hızındaki yerleşimi elemeyi bıraktı.
+İki sabitin de bunu tek başına yapabildiği ölçüldü (yukarıdaki beş koşum), yani
+mekanizma da iki tane:
+
+- **Taban tarafı.** av1'de 0,020 × 1,25 = 0,025'ten 0,0095 × 1,52 = 0,01444 bppf'e
+  inince 59,94 fps artık taban altında kalmıyor (bu örnekte profil ölçülmemiş, uyarlama
+  1,0). Taban eski değerine alınınca kesinti geri geliyor.
+- **Üstel tarafı.** `DefaultMotionExponent` 0,25 → 0,871 olunca kare hızını yarıya
+  indirmek artık ucuz görünmüyor (§7.1) ve plan kareyi kesmemeyi seçiyor. Üstel eski
+  değerine alınınca kesinti yine geri geliyor.
+
+Bu yüzden **bu ölçü tabanın kazandığını kanıtlamıyor**. Kanıtladığı şey daha dar:
+bugünkü iki sabitle kaynağın kendi kare hızındaki yerleşim ayakta kalıyor, ve iki
+sabitten biri eski değerine dönerse kalmıyor. "Taban, kaynağın kendi kare hızındaki
+yerleşimi tek başına elemeyi bıraktı" cümlesi bu tablodan **çıkarılamaz** ve tur 2'de
+yanlışlıkla çıkarılmıştı. Tabanın kendi başına ölçülmüş kanıtı §3'te: uygulanan
+av1_nvenc tabanı 0,01757'den 0,01015'e indi ve K2'nin kazananı aday oldu.
 
 Kalan yedi satır eskisiyle birebir aynı; yerleşim 922x518@39,96'dan
-**1306x734@59,94**'e, tahmini kalite **68,9'dan 74,4**'e çıktı. `TargetBelowCodecFloor`
-notu ne eski ne yeni hâlde vardı — kaybolan o değil. 1080p30 örneğinde
-(`ChipTests.Modest()`) sayı altı ve değişmedi.
+**1306x734@59,94**'e, tahmini kalite **68,9'dan 74,4**'e çıktı. Bu sayı **motorun kendi
+tahminidir, ölçülmüş kalite değil**; §3.1 aynı modelin şikâyet kaynağında ölçümle ters
+düştüğünü (6,39 puan) gösteriyor, yani 68,9 → 74,4 bir iyileşme kanıtı sayılmaz.
+`TargetBelowCodecFloor` notu ne eski ne yeni hâlde vardı — kaybolan o değil. 1080p30
+örneğinde (`ChipTests.Modest()`) sayı altı ve değişmedi.
 
 Ölçü artık sabit sayıyı tek başına tutmuyor: başlıktaki sayının listedeki madde
 sayısıyla aynı olduğu da iddia ediliyor, yani başlığın listeyi yanlış sayması da kırar.
@@ -530,8 +586,16 @@ bir hedef **%1 içinde** çıkmalı. Ölçülen en geniş boşluk 1,00601 (`samp
 istenen 63,5) — %0,5'lik tarama adımının biraz üstü. Mutasyon: `QualityScanStep`
 1,005 → 1,2 yapılınca boşluk %1,611'e çıkıyor ve ölçü kırılıyor. Aynı sabit 1,05'e
 çekildiğinde ölçü **kırılmıyor** — ve kırılmaması doğru: dört bölme adımı %5'lik
-pencereyi %0,305'e indiriyor, arama o hâlde de yeterince keskin. Puan geçidi
-(≤ 3,5) her iki mutasyonu da göremiyordu; boyut geçidi birini görüyor.
+pencereyi %0,305'e indiriyor, arama o hâlde de yeterince keskin.
+
+**Bu geçit o mutasyonu tek yakalayan değil.** Ölçüldü: `QualityScanStep` 1,2 yapılınca
+T57'nin `QualityTargetTests.SearchReturnsTheSmallestTargetThatReachesTheRequest` ölçüsü
+de kırılıyor, kendi okumasıyla — "arama gerçeğin x1,4533 katı büyük bir hedef verdi"
+(`sample.mp4` Sharing 86: 102,7041 MB'a karşı 70,6705 MB). 1,05'te ikisi de kırılmıyor.
+Geçidin kendi iddiası yine de bağımsız ve geçerli: dönen hedefin geçiş noktasının ne
+kadar üstünde durduğunu **hedef boyutla** ölçüyor, T57'nin ölçüsü ise arama sonucunu
+kaba kuvvetle bulunan gerçeğe oranlıyor — farklı iki özellik. Puan geçidi (≤ 3,5) ise
+her iki mutasyonu da göremiyordu; onun yerini boyut geçidi alıyor.
 
 ### 8.5.4 Denenip ölçüyle çürütülen daha sıkı iddia
 
