@@ -309,7 +309,7 @@ metni, biri `Default` bayrağı):
 
 | Alan | Very Fast 1080p30 | Fast 1080p30 | Bizdeki karşılığı |
 |---|---|---|---|
-| `VideoPreset` | `"veryfast"` (`:332`) | `"fast"` (`:1012`) | var — `EncodePlan.Preset`, auto'da libsvtav1 preset 6 (`docs/olcumler/auto-mod.md:209`) |
+| `VideoPreset` | `"veryfast"` (`:332`) | `"fast"` (`:1012`) | var — `EncodePlan.Preset`, auto'da libsvtav1 preset 6 (`docs/olcumler/auto-mod.md:208`) |
 | `VideoQualitySlider` | `24.0` (`:338`) | `22.0` (`:1018`) | var — `PlanCalculator.cs:226` (`budgetCrf`), **ama bütçeden türetiliyor, sabit değil** |
 | `VideoAvgBitrate` | `4000` (`:324`) | `6000` (`:1004`) | var — `PlanCalculator.cs:156` (`videoK`), hedef boyuttan türetiliyor |
 | `PictureCombDetectPreset` | `"fast"` (`:392`) | `"default"` (`:1072`) | **yok** |
@@ -341,7 +341,7 @@ sonucu doğuruyor:
 
 ### T102'nin `uzman-hb2` koşumu hangi preset'ti
 
-**Hiçbiri.** Komut (`docs/olcumler/auto-mod.md:209`):
+**Hiçbiri.** Komut (`docs/olcumler/auto-mod.md:210`):
 
 ```
 HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo \
@@ -410,7 +410,7 @@ Düzeltmenin büyüklüğü henüz ölçülmedi. Aşağıdaki her "beklenir" cü
 - **Ölçü:** `tools/auto-mod-olcumu`, aynı kaynak, `-g` ızgarası, boyut eşitlenmiş.
 - **Açığın hangi kısmını kapatması beklenir:** en büyüğü. Bu zaten ölçüldü —
   `-g 300` dosyayı **%24,5 küçültürken** ortalamayı **+0,155**, p10'u **+0,333**
-  artırdı (`docs/olcumler/auto-mod.md:250`). Tek yönlü kazanç. HandBrake'in bizim
+  artırdı (`docs/olcumler/auto-mod.md:403-404`). Tek yönlü kazanç. HandBrake'in bizim
   önümüzde olduğu 1,269 puanın kayda değer bir kısmının burada olması beklenir.
 - **Not:** aynı belge (`:316`) anahtar kareyi sahne kesmesine hizalamanın payının
   **negatif** olduğunu ölçmüş. Yani kazanç aralığın uzunluğundan; hizalamaya
