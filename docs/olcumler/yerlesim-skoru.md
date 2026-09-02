@@ -529,43 +529,57 @@ ters çeviriyor (0,08/0,05 ve 0,08/0,11).
 `tools/ci-gibi-kos.sh` `ffmpeg`'i PATH'ten çıkarır; `[FfmpegFact]` ile işaretli
 testler orada **atlanır** ve yeşil görünmeleri hiçbir şey söylemez.
 
-`bash tools/ci-gibi-kos.sh` (tam süit, ffmpeg PATH'te değil):
+**Yereldeki koşum geçerli değil, sayılar CI'dan.** `bash tools/ci-gibi-kos.sh`
+koyduğum 540 sn'lik sınıra takıldı; günlüğün sonunda
+`Etkin test çalıştırması iptal edildi. Nedeni: Test ana işlemi kilitlendi` yazıyor.
+Bastığı `3 başarısız / 1032 başarılı / 67 atlandı / 1102 toplam` özeti **kısmi bir
+koşumun** özeti; CI'ın 1183'ünü tutmuyor ve 1 dk 31 sn süren
+`QualityTargetTests.SearchCostIsBoundedAndCounted` o koşumda hiç çalışmamış.
+Aşağıdaki sayılar CI koşumu **33592420948**'dendir (headSha `ab70c85`):
 
 ```
-Başarısız: 3, Başarılı: 1032, Atlanan: 67, Toplam: 1102, Süre: 7 m 6 s
+Failed: 4, Passed: 1074, Skipped: 105, Total: 1183, Duration: 14 m 9 s
 ```
 
-**Kabul kriteri ölçüleri o listede değil.** K8'in beş durumu
+**Kabul kriteri ölçüleri atlanan listesinde değil.** K8'in beş durumu
 (`TheRateHalfOfTheScoreDoesNotMoveWhenOnlyTheResolutionChanges` ×2,
 `DroppingResolutionAtAFixedBitrateAlwaysCostsScore` ×2,
-`TheOnlyThingThatSeparatesTwoResolutionsIsTheScalePenalty`) ffmpeg'siz koşumda
-atlanmadı, yeşil geçti. Üçü de `ComplexityProfile.FromProbe` ile kurulan profil
-üzerinden çalışıyor, kodlayıcıya hiç gitmiyor.
+`TheOnlyThingThatSeparatesTwoResolutionsIsTheScalePenalty`) CI'ın 105 atlananının
+hiçbiri değil; üçü de `ComplexityProfile.FromProbe` ile kurulan profil üzerinden
+çalışıyor, kodlayıcıya hiç gitmiyor.
 
-Atlanan 67 testin tamamı canlı ffmpeg isteyen ölçüler:
-`QualityMeterTests` (13), `PerformanceCheckTests` (6), `SegmentEncoderTests` (6),
-`FpsDropTests` (5), `ComplexityProbeTests` (6), `EncodeRunnerTests` (4),
-`SceneMapTests` (4), `CalibrationProbeTests` (3), `ExtremeCompressionTests` (3),
-`UpdaterTests` (3), `VmafPoolingTests` (3), `HardwareVerdictTests` (2),
-`HardwareRateControlTests` (2), `PlaybackFrameSourceTests` (2),
-`FfmpegArgumentsTests` (2), `FillBandTests` (1), `HardwareFlagTests` (1).
+CI'da atlanan 105 ölçünün sınıf dağılımı:
 
-## 15. `owns` dışında kalan üç kırmızı
+```
+FrameGrabberTests 22   QualityMeterTests 13   PanelHostTests 11
+ComplexityProbeTests 7  SegmentEncoderTests 6  PerformanceCheckTests 6
+FpsDropTests 5          SceneMapTests 4        PreviewSyncTests 4
+EncodeRunnerTests 4     VmafPoolingTests 3     UpdaterTests 3
+ExtremeCompressionTests 3  CalibrationProbeTests 3
+PlaybackFrameSourceTests 2  HardwareVerdictTests 2
+HardwareRateControlTests 2  FfmpegArgumentsTests 2
+QualityTargetTests 1    HardwareFlagTests 1    FillBandTests 1
+```
 
-Değişiklik üç ölçüyü düşürüyor ve üçü de bu sözleşmenin `owns` listesinde **değil**.
-Dosyalara dokunulmadı.
+## 15. `owns` dışında kalan dört kırmızı
+
+Değişiklik dört ölçüyü düşürüyor ve dördü de bu sözleşmenin `owns` listesinde
+**değil**. Dosyalara dokunulmadı; **CI bu yüzden kırmızı** (koşum 33592420948).
 
 | Ölçü | dosya | ne diyor |
 |---|---|---|
 | `FillBandTests.FillTargetReachesTheBandWhenTheCeilingWouldLeaveItUnfilled` | `tests/VidShrink.Tests/FillBandTests.cs:97` | "This fixture is expected to hit the transparency ceiling below the band (118,3 MB < 116,6 MB); adjust the fixture if the model changes." |
 | `QualityTargetUiTests.SinirDurumuEkrandaYazili` | `tests/VidShrink.Tests/QualityTargetUiTests.cs:167` | "Taban sinirinda satir gorunmuyor." Düzenek artık tabana dayanan bir plan üretmiyor. |
 | `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched` | `tests/VidShrink.Tests/SpeedModeTests.cs:346` | Elle yazılmış plan dizisi anlık görüntüsü; skor değişince plan da değişiyor. |
+| `QualityTargetTests.SearchCostIsBoundedAndCounted` | `tests/VidShrink.Tests/QualityTargetTests.cs:313` | `KeyNotFoundException: 'BelowFloor'` — sayaç sözlüğünde artık taban altına düşen plan yok. |
 
-Üçünün de eski modelde yeşil olduğunu ölçtüm: `rate` terimi geri alınmış halde
+İlk üçünün eski modelde yeşil olduğunu ölçtüm: `rate` terimi geri alınmış halde
 `dotnet test -c Release --no-build --filter "FillBandTests|QualityTargetUiTests|SpeedModeTests"`
-→ **0 başarısız / 52 başarılı / 1 atlandı**. Yeni modelde aynı filtre → 3 başarısız.
-Yani üçü de bu değişikliğin sonucudur, önceden kırmızı değillerdi.
+→ **0 başarısız / 52 başarılı / 1 atlandı**; yeni modelde aynı filtre 3 başarısız.
+Dördüncüsü (`SearchCostIsBoundedAndCounted`) **yerelde ölçülmedi** — 1 dk 31 sn süren
+bir arama ölçüsü, yereldeki kesilmiş koşuma girmedi; sadece CI'da düştüğünü biliyorum
+ve hata `BelowFloor` anahtarının bulunamaması, yani o da eski davranışa çivilenmiş.
 
-Üçü de beklenen değeri eski modele çivilenmiş düzeneklerdir; hiçbiri yeni modelin
+Dördü de beklenen değeri eski modele çivilenmiş düzeneklerdir; hiçbiri yeni modelin
 bozuk olduğunu söylemiyor. Ama düzeltmek `owns` dışına yazmayı gerektiriyor,
 o yüzden sözleşme `blocked` teslim ediliyor.
