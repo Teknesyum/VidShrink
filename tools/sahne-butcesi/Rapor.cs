@@ -293,7 +293,9 @@ public static class Rapor
         sb.AppendLine();
     }
 
-    public sealed record AbSonuc(bool Gecti, IReadOnlyList<OlcumKaydi> Kayitlar, string Ozet);
+    public sealed record Satir(string Arm, OlcumKaydi K);
+
+    public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet);
 
     private static AbSonuc K5K6(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
     {
@@ -312,33 +314,52 @@ public static class Rapor
         var p10Kazanan = 0;
         var enKotuKazanan = 0;
         var p10Kaybeden = 0;
-        var bandDisi = hepsi.Count(o => !o.BandIcinde && o.Bilinmiyor is null);
+        var cift = 0;
+        var asan = hepsi.Count(x => x.K.Bilinmiyor is null && x.K.GerceklesenMb > x.K.BandUstMb);
+        var altinda = hepsi.Count(x => x.K.Bilinmiyor is null && x.K.GerceklesenMb < x.K.BandAltMb);
+        var olculenKosum = hepsi.Count(x => x.K.Bilinmiyor is null);
         var farklar = new List<string>();
-        foreach (var g in hepsi.Where(o => o.Bilinmiyor is null).GroupBy(o => o.Pencere))
+        foreach (var g in hepsi.Where(x => x.K.Bilinmiyor is null).GroupBy(x => (x.Arm, x.K.Pencere)))
         {
-            var taban = g.FirstOrDefault(o => o.Kol == "taban");
-            var dagitim = g.FirstOrDefault(o => o.Kol == "dagitim");
+            var taban = g.FirstOrDefault(x => x.K.Kol == "taban")?.K;
+            var dagitim = g.FirstOrDefault(x => x.K.Kol == "dagitim")?.K;
             if (taban?.VmafP10 is null || dagitim?.VmafP10 is null) continue;
+            cift++;
             var dp10 = dagitim.VmafP10.Value - taban.VmafP10.Value;
             var dworst = (dagitim.VmafWorstScene ?? double.NaN) - (taban.VmafWorstScene ?? double.NaN);
             var dmean = (dagitim.VmafMean ?? double.NaN) - (taban.VmafMean ?? double.NaN);
+            var dmb = dagitim.GerceklesenMb - taban.GerceklesenMb;
             if (dp10 >= 0.50) p10Kazanan++;
             if (dworst >= 1.00) enKotuKazanan++;
             if (dp10 < -0.30) p10Kaybeden++;
-            farklar.Add($"| `{g.Key}` | {Kabuk.Inv(dmean, "+0.000;-0.000;0.000")} | {Kabuk.Inv(dp10, "+0.000;-0.000;0.000")} | {Kabuk.Inv(dworst, "+0.000;-0.000;0.000")} |");
+            farklar.Add($"| {g.Key.Arm} | `{g.Key.Pencere}` | {Kabuk.Inv(dmean, "+0.000;-0.000;0.000")} | " +
+                        $"{Kabuk.Inv(dp10, "+0.000;-0.000;0.000")} | {Kabuk.Inv(dworst, "+0.000;-0.000;0.000")} | " +
+                        $"{Kabuk.Inv(dmb, "+0.00;-0.00;0.00")} |");
         }
 
         sb.AppendLine("### Dagitimli − dagitimsiz");
         sb.AppendLine();
-        sb.AppendLine("| Pencere | Δ ortalama | Δ p10 | Δ en kotu sahne |");
-        sb.AppendLine("|---------|------------|-------|-----------------|");
+        sb.AppendLine("Bir satir bir **yazilim kolu x pencere** ciftidir. Boyut farki sutunu");
+        sb.AppendLine("A/B'nin adil olup olmadigini gosterir: iki kol ayni boyutta degilse");
+        sb.AppendLine("kalite farki dagitimdan degil bit farkindan gelebilir.");
+        sb.AppendLine();
+        sb.AppendLine("| Yazilim kolu | Pencere | Δ ortalama | Δ p10 | Δ en kotu sahne | Δ boyut (MB) |");
+        sb.AppendLine("|--------------|---------|------------|-------|-----------------|--------------|");
         foreach (var f in farklar) sb.AppendLine(f);
         sb.AppendLine();
 
-        var gecti = p10Kazanan >= 2 && enKotuKazanan >= 2 && p10Kaybeden == 0 && bandDisi == 0;
-        var ozet = $"p10 kazanci esigi gecen kaynak {p10Kazanan}/3, en kotu sahne esigi gecen {enKotuKazanan}/3, " +
-                   $"esikten fazla p10 kaybeden {p10Kaybeden}, hedef bandi asan kosum {bandDisi}";
+        var gecti = p10Kazanan >= 2 && enKotuKazanan >= 2 && p10Kaybeden == 0 && asan == 0 && altinda == 0;
+        var ozet = $"olculen cift {cift}; p10 esigini (>= +0,50) gecen {p10Kazanan}, " +
+                   $"en kotu sahne esigini (>= +1,00) gecen {enKotuKazanan}, " +
+                   $"esikten fazla p10 kaybeden {p10Kaybeden}; " +
+                   $"olculen {olculenKosum} kosumdan hedefi **asan** {asan}, bandin **altinda** kalan {altinda}";
         sb.AppendLine($"**K5/K6 kapisi {(gecti ? "gecti" : "gecmedi")}** — {ozet}.");
+        sb.AppendLine();
+        sb.AppendLine($"Hedefi asan kosum orani: {Kabuk.Inv(olculenKosum == 0 ? 0 : 100.0 * asan / olculenKosum, "0.0")}%");
+        sb.AppendLine($"({asan}/{olculenKosum}). Bandin altinda kalma bu duzenegin ozelligidir:");
+        sb.AppendLine("`EncodeRunner`'in kapali dongu duzeltmesi kosmuyor, tek iki gecis var.");
+        sb.AppendLine("Iki kol da ayni duzenekten geciyor, bu yuzden band disiligi kollari");
+        sb.AppendLine("**ayirt etmez**; K6'nin asil sorusu olan asan kosum orani ayri yazildi.");
         sb.AppendLine();
         return new AbSonuc(gecti, hepsi, ozet);
     }
@@ -358,42 +379,50 @@ public static class Rapor
 
         var satirlar = new List<string>();
         var enBuyukKayip = 0.0;
-        foreach (var g in hepsi.Where(o => o.Bilinmiyor is null).GroupBy(o => o.Pencere))
+        var karsilastirilan = 0;
+        foreach (var g in hepsi.Where(x => x.K.Bilinmiyor is null).GroupBy(x => (x.Arm, x.K.Pencere)))
         {
-            var dogru = k5.Kayitlar.FirstOrDefault(o => o.Pencere == g.Key && o.Kol == "dagitim");
+            var dogru = k5.Kayitlar.FirstOrDefault(x =>
+                x.Arm == g.Key.Arm && x.K.Pencere == g.Key.Pencere && x.K.Kol == "dagitim")?.K;
             if (dogru?.VmafP10 is null) continue;
-            foreach (var bozuk in g)
+            foreach (var (_, bozuk) in g)
             {
                 if (bozuk.VmafP10 is null) continue;
+                karsilastirilan++;
                 var d = bozuk.VmafP10.Value - dogru.VmafP10.Value;
                 enBuyukKayip = Math.Min(enBuyukKayip, d);
-                satirlar.Add($"| `{g.Key}` | {bozuk.Kol} | {Kabuk.Inv(d, "+0.000;-0.000;0.000")} |");
+                satirlar.Add($"| {g.Key.Arm} | `{g.Key.Pencere}` | {bozuk.Kol} | " +
+                             $"{Kabuk.Inv(d, "+0.000;-0.000;0.000")} |");
             }
         }
         sb.AppendLine("### Bozuk harita − dogru harita (p10)");
         sb.AppendLine();
-        sb.AppendLine("| Pencere | Bozulma | Δ p10 |");
-        sb.AppendLine("|---------|---------|-------|");
-        foreach (var s in satirlar) sb.AppendLine(s);
+        sb.AppendLine("Karsilastirma tabani, ayni yazilim kolunda ayni pencerenin **dogru");
+        sb.AppendLine("haritayla** dagitimli kosumudur (K5'in `dagitim` kolu).");
         sb.AppendLine();
-        var ozet = $"en buyuk p10 kaybi {Kabuk.Inv(enBuyukKayip, "0.000")} puan";
+        sb.AppendLine("| Yazilim kolu | Pencere | Bozulma | Δ p10 |");
+        sb.AppendLine("|--------------|---------|---------|-------|");
+        foreach (var x in satirlar) sb.AppendLine(x);
+        sb.AppendLine();
+        var ozet = $"karsilastirilan {karsilastirilan} kosum, en buyuk p10 kaybi " +
+                   $"{Kabuk.Inv(enBuyukKayip, "0.000")} puan";
         sb.AppendLine($"**Bozuk haritanin bedeli**: {ozet}.");
         sb.AppendLine();
         return new AbSonuc(enBuyukKayip >= -0.30, hepsi, ozet);
     }
 
-    private static void Tablo(StringBuilder sb, IReadOnlyList<OlcumKaydi> kayitlar)
+    private static void Tablo(StringBuilder sb, IReadOnlyList<Satir> kayitlar)
     {
-        sb.AppendLine("| Pencere | Kol | Boyut (MB) | Band | Band icinde | VMAF-NEG ort. | p10 | en dusuk kare | en kotu sahne |");
-        sb.AppendLine("|---------|-----|------------|------|-------------|---------------|-----|---------------|---------------|");
-        foreach (var o in kayitlar)
+        sb.AppendLine("| Yazilim kolu | Pencere | Kol | Boyut (MB) | Band | Band icinde | VMAF-NEG ort. | p10 | en dusuk kare | en kotu sahne |");
+        sb.AppendLine("|--------------|---------|-----|------------|------|-------------|---------------|-----|---------------|---------------|");
+        foreach (var (arm, o) in kayitlar)
         {
             if (o.Bilinmiyor is not null && o.VmafMean is null)
             {
-                sb.AppendLine($"| `{o.Pencere}` | {o.Kol} | — | — | — | — | — | — | **bilinmiyor**: {o.Bilinmiyor} |");
+                sb.AppendLine($"| {arm} | `{o.Pencere}` | {o.Kol} | — | — | — | — | — | — | **bilinmiyor**: {o.Bilinmiyor} |");
                 continue;
             }
-            sb.AppendLine($"| `{o.Pencere}` | {o.Kol} | {Kabuk.Inv(o.GerceklesenMb, "0.00")} | " +
+            sb.AppendLine($"| {arm} | `{o.Pencere}` | {o.Kol} | {Kabuk.Inv(o.GerceklesenMb, "0.00")} | " +
                           $"{Kabuk.Inv(o.BandAltMb, "0.0")}–{Kabuk.Inv(o.BandUstMb, "0.0")} | {(o.BandIcinde ? "evet" : "**hayir**")} | " +
                           $"{Say(o.VmafMean)} | {Say(o.VmafP10)} | {Say(o.VmafMin)} | {Say(o.VmafWorstScene)} |");
         }
@@ -402,15 +431,16 @@ public static class Rapor
 
     private static string Say(double? v) => v is null ? "**bilinmiyor**" : Kabuk.Inv(v.Value, "0.000");
 
-    private static List<OlcumKaydi> Oku(string isKok, string asama, JsonSerializerOptions json, string[] kollar)
+    private static List<Satir> Oku(string isKok, string asama, JsonSerializerOptions json, string[] kollar)
     {
-        var list = new List<OlcumKaydi>();
+        var list = new List<Satir>();
         foreach (var kol in kollar)
             foreach (var p in Program.Pencereler)
             {
                 var y = Path.Combine(isKok, $"{asama}-{kol}-{p.Ad}.json");
                 if (!File.Exists(y)) continue;
-                list.AddRange(JsonSerializer.Deserialize<List<OlcumKaydi>>(File.ReadAllText(y), json)!);
+                foreach (var o in JsonSerializer.Deserialize<List<OlcumKaydi>>(File.ReadAllText(y), json)!)
+                    list.Add(new Satir(kol, o));
             }
         return list;
     }
