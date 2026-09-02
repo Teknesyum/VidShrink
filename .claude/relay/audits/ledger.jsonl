@@ -172,3 +172,4 @@
 {"id":"T134","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":"a5d4d26a060ba136a","headSha":"d0c95b936ef564df3245744661f80689d8bfc04e","at":"2026-09-02T10:34:37.419Z"}
 {"id":"T128","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|EncoderAvailabilityTests","code":0}],"auditorRunId":null,"headSha":"cf65efc9e07bda38d9d00e9450d85a211ed4f415","at":"2026-09-02T12:04:49.063Z"}
 {"id":"T114","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests","code":0}],"auditorRunId":"acbb87089e8f3c111","headSha":"91ec6d4b42baf68e5fba30e74cdeaae6315fdaec","at":"2026-09-02T12:53:29.643Z"}
+{"id":"T132","result":"stale","at":"2026-09-02T13:11:56.173Z"}

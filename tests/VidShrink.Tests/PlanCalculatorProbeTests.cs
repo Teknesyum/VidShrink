@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -400,11 +401,37 @@ public sealed class PlanCalculatorProbeTests
     /// Yoklamanin gercek suresi. T125'in raporundaki 4 s'lik butce bu agacta yok
     /// (<c>EncoderCapabilities.ProbeKillMs = 15000</c>); asagidaki sayilar butcenin
     /// neresinde durdugumuzu soyluyor.
+    ///
+    /// T136/K3: sure listesi tek basina hicbir sey iddia etmiyordu (<c>d &gt;= 0</c>
+    /// hicbir mutasyonla kirilmaz). Olculen sure artik gecidin karariyla yuzlestiriliyor:
+    /// gercek yazilim yoklamasi <c>UnsettledProbeMs</c> esiginin altinda kaliyor, dolayisiyla
+    /// gecit onu <b>yerlesmis ve calisiyor</b> saymak zorunda.
     /// </summary>
     [Fact]
     public void TheRealSoftwareProbeDurationIsMeasured()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
+
+        var gate = new MainWindow.DeferredEncoderAvailability(FreshCapabilities(), () => { });
+        Assert.False(gate.IsMeasured("libsvtav1"));
+        var settle = Stopwatch.StartNew();
+        while (gate.Pending && settle.ElapsedMilliseconds < 30000) Thread.Sleep(10);
+
+        var olculen = gate.ElapsedMsFor("libsvtav1");
+        var yerlesti = olculen >= 0 && olculen < MainWindow.DeferredEncoderAvailability.UnsettledProbeMs;
+        var beklenen = yerlesti
+            ? MainWindow.DeferredEncoderAvailability.ProbeAnswer.Working
+            : MainWindow.DeferredEncoderAvailability.ProbeAnswer.Unsettled;
+
+        WriteEvidence($"gecit libsvtav1: {olculen} ms, esik " +
+                      $"{MainWindow.DeferredEncoderAvailability.UnsettledProbeMs} ms, " +
+                      $"karar {gate.AnswerFor("libsvtav1")}, beklenen {beklenen}");
+
+        Assert.True(olculen >= 0, "gecit yoklamayi hic kosturmadi");
+        Assert.Null(gate.FailureFor("libsvtav1"));
+        Assert.Equal(beklenen, gate.AnswerFor("libsvtav1"));
+        Assert.Equal(yerlesti, gate.IsMeasured("libsvtav1"));
+
         if (!MachineIsQuiet(nameof(PlanCalculatorProbeTests))) return;
 
         var durations = new List<long>();
@@ -418,7 +445,109 @@ public sealed class PlanCalculatorProbeTests
         }
 
         WriteEvidence($"libsvtav1 yoklamasi 8 tekrar: {string.Join(", ", durations)} ms");
-        Assert.All(durations, d => Assert.True(d >= 0));
+        Assert.All(durations, d => Assert.True(d < EncoderCapabilities.ProbeKillMs,
+            $"yoklama oldurme sinirina dayandi: {d} ms >= {EncoderCapabilities.ProbeKillMs} ms"));
+    }
+
+    // --- T136: yoklama cevap veremeyince ---
+
+    /// <summary>Her yoklamasi istisna firlatan yetenek nesnesi.</summary>
+    private sealed class ThrowingAvailability : IEncoderAvailability
+    {
+        internal const string Message = "yoklama surecine erisilemedi";
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec) => throw new InvalidOperationException(Message);
+    }
+
+    /// <summary>Gecidin arka plandaki yoklamalari bitene kadar bekler, ustten sinirli.</summary>
+    private static void Drain(MainWindow.DeferredEncoderAvailability gate, string codec)
+    {
+        for (var i = 0; i <= MainWindow.DeferredEncoderAvailability.MaxAttempts; i++)
+        {
+            gate.IsMeasured(codec);
+            var clock = Stopwatch.StartNew();
+            while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(5);
+        }
+    }
+
+    /// <summary>
+    /// T136/K2. Istisna atan yoklama ile "calismiyor" olculen yoklama ayirt edilebiliyor.
+    /// Ikisi de <c>WorksAsEncoder == false</c> uretiyor; ayrimi <c>AnswerFor</c> tasiyor.
+    /// Istisna hizli firladigi icin gecen sure esigin altinda kaliyor ve duzeltme oncesi
+    /// cevap "yerlesmis olcum" sayiliyordu — ucuncu durum ustte vardi, altta yoktu.
+    /// </summary>
+    [Fact]
+    public void IstisnaAtanYoklamaOlculmusBasarisizliktanAyirtEdiliyor()
+    {
+        var patlayan = new MainWindow.DeferredEncoderAvailability(new ThrowingAvailability(), () => { });
+        var olculen = new MainWindow.DeferredEncoderAvailability(new RecordingAvailability(TimeSpan.Zero), () => { });
+
+        Drain(patlayan, "av1_nvenc");
+        Drain(olculen, "av1_nvenc");
+
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.NotWorking, olculen.AnswerFor("av1_nvenc"));
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.Failed, patlayan.AnswerFor("av1_nvenc"));
+
+        Assert.True(olculen.IsMeasured("av1_nvenc"), "olculmus 'calismiyor' cevabi olcum sayilmali");
+        Assert.False(patlayan.IsMeasured("av1_nvenc"), "istisna atan yoklama olcum sayilmamali");
+
+        Assert.Equal(ThrowingAvailability.Message, patlayan.FailureFor("av1_nvenc"));
+        Assert.Null(olculen.FailureFor("av1_nvenc"));
+    }
+
+    /// <summary>
+    /// T136/K1. Yoklama surekli yerlesmezken plan <c>HardwareNotMeasured</c> kaliyor ama
+    /// Baslat calisiyor. Donanim sorusuna cevap alamamak yazilim kodlayicisiyla
+    /// sikistirmaya engel degil; eski davranis kullaniciyi urunun tamamindan mahrum
+    /// birakiyordu.
+    /// </summary>
+    [Fact]
+    public void YerlesmeyenYoklamaBaslatDugmesiniKilitlemiyor()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var yavas = new RecordingAvailability(
+            TimeSpan.FromMilliseconds(MainWindow.DeferredEncoderAvailability.UnsettledProbeMs + 300));
+
+        var (durum, _) = OnWindow(yavas, window =>
+        {
+            for (var i = 0; i <= MainWindow.DeferredEncoderAvailability.MaxAttempts; i++)
+            {
+                window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+                Settle(window);
+            }
+            window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+            return (window.PlanHardwareNotMeasured, window.BtnStart.IsEnabled);
+        });
+
+        Assert.True(durum.PlanHardwareNotMeasured, "olcu kurulmadi: plan donanimi olculmus sayiyor");
+        Assert.True(durum.IsEnabled, "yoklama yerlesmedigi icin Baslat kalici kilitli kaldi");
+    }
+
+    /// <summary>
+    /// T136/K6. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle ayni seyi
+    /// soyluyor. T128 Core'u duzeltti, arayuzdeki dort kopya eski metinde kaldi ve bunu
+    /// hicbir olcu gormedi; burasi o ayrilmayi bir daha sessiz birakmiyor.
+    /// </summary>
+    [Fact]
+    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor()
+    {
+        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new RecordingAvailability(TimeSpan.Zero));
+        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+
+        var kalip = Locales.Values("en")["main.reason.encoder-fallback"];
+        var arayuz = string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec);
+
+        Assert.Contains(arayuz, detailed.Plan.Reason, StringComparison.Ordinal);
+
+        Assert.Contains("could not be used on this machine",
+            Locales.Values("en")["main.advice.encoder-fallback"], StringComparison.Ordinal);
+        Assert.Contains("bu makinede kullanılamadı",
+            Locales.Values("tr")["main.reason.encoder-fallback"], StringComparison.Ordinal);
+        Assert.Contains("bu makinede kullanılamadı",
+            Locales.Values("tr")["main.advice.encoder-fallback"], StringComparison.Ordinal);
     }
 
     // --- K1: gercek ffmpeg ---

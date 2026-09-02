@@ -1241,6 +1241,22 @@ public partial class MainWindow : Window
             internal string? PixelFormat;
             internal bool Settled;
             internal int Attempts;
+            internal string? Failure;
+            internal long ElapsedMs = -1;
+        }
+
+        /// <summary>
+        /// Bir kodlayicinin yoklama cevabinin hangi durumda oldugu. <c>NotWorking</c> ile
+        /// <c>Failed</c> ayri: birincisi olculmus bir cevap, ikincisi yoklamanin hic cevap
+        /// uretememesi. Ikisini ayni yere yazmak ucuncu durumu yok ediyordu.
+        /// </summary>
+        internal enum ProbeAnswer
+        {
+            Unknown,
+            Working,
+            NotWorking,
+            Unsettled,
+            Failed
         }
 
         private readonly IEncoderAvailability _source;
@@ -1303,6 +1319,45 @@ public partial class MainWindow : Window
             lock (_gate) return _answers.TryGetValue(Key("hdr10", codec), out var answer) ? answer.PixelFormat : null;
         }
 
+        /// <summary>Kodlayicinin bugunku yoklama durumu. Olcu bunu okur, arayuz de.</summary>
+        internal ProbeAnswer AnswerFor(string codec)
+        {
+            lock (_gate)
+            {
+                if (!_answers.TryGetValue(Key("works", codec), out var answer)) return ProbeAnswer.Unknown;
+                if (answer.Failure is not null) return ProbeAnswer.Failed;
+                if (!answer.Settled) return ProbeAnswer.Unsettled;
+                return answer.Works ? ProbeAnswer.Working : ProbeAnswer.NotWorking;
+            }
+        }
+
+        /// <summary>
+        /// Kodlayicinin son yoklamasinin gercekten kac ms surdugu, hic yoklanmadiysa -1.
+        /// Yerlesme karari bu sureden turuyor; olcu ikisini yuzlestiriyor.
+        /// </summary>
+        internal long ElapsedMsFor(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) ? answer.ElapsedMs : -1;
+        }
+
+        /// <summary>Yoklama firlattiysa istisnanin metni, yoksa <c>null</c>.</summary>
+        internal string? FailureFor(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) ? answer.Failure : null;
+        }
+
+        /// <summary>
+        /// Yoklamasi istisnayla dusen ilk kodlayicinin istisna metni. Arayuz durum satiri
+        /// bunu gosterir; istisna sessizce kaybolmaz.
+        /// </summary>
+        internal string? FirstFailure
+        {
+            get
+            {
+                lock (_gate) return _answers.Values.Select(a => a.Failure).FirstOrDefault(f => f is not null);
+            }
+        }
+
         private static string Key(string kind, string codec) => $"{kind}:{codec}";
 
         /// <summary>
@@ -1336,23 +1391,36 @@ public partial class MainWindow : Window
                 var clock = Stopwatch.StartNew();
                 var works = false;
                 string? pixelFormat = null;
+                Exception? failure = null;
                 try
                 {
                     if (hdr10) pixelFormat = (_source as IHdr10EncoderAvailability)?.Hdr10PixelFormat(codec);
                     else works = _source.WorksAsEncoder(codec);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    failure = ex;
                 }
                 clock.Stop();
 
                 lock (_gate)
                 {
                     if (!_answers.TryGetValue(key, out var answer)) _answers[key] = answer = new Answer();
-                    answer.Works = works;
-                    answer.PixelFormat = pixelFormat;
                     answer.Attempts++;
-                    answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;
+                    answer.Failure = failure?.Message;
+                    answer.ElapsedMs = clock.ElapsedMilliseconds;
+                    if (failure is null)
+                    {
+                        answer.Works = works;
+                        answer.PixelFormat = pixelFormat;
+                        answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;
+                    }
+                    else
+                    {
+                        answer.Works = false;
+                        answer.PixelFormat = null;
+                        answer.Settled = false;
+                    }
                     _running.Remove(key);
                 }
 
@@ -1772,6 +1840,7 @@ public partial class MainWindow : Window
         if (_info is null) return;
         var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, _planEncoders);
         _autoPlan = detailed.Plan;
+        PlanHardwareNotMeasured = detailed.HardwareNotMeasured;
         _predictedQuality = detailed.PredictedQuality;
         _advice = detailed.Advice;
         _profile ??= detailed.Profile;
@@ -1790,7 +1859,7 @@ public partial class MainWindow : Window
 
         RefreshPlanView();
         RefreshQualityPanels();
-        BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _) && !detailed.HardwareNotMeasured;
+        BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
         ReportUnsettledProbe();
 
         // T48/K1: plan tazelendi. Panel gecikmesini kendi kurar; burası yalnız haber verir.
@@ -1804,16 +1873,30 @@ public partial class MainWindow : Window
     /// <summary>Ölçü için: geçidin bugüne kadar başlattığı yoklama sayısı.</summary>
     internal int PlanProbeCount => _planEncoders?.Probes ?? 0;
 
+    /// <summary>Ölçü için: son hesabın donanım cevabını ölçülmemiş sayıp saymadığı.</summary>
+    internal bool PlanHardwareNotMeasured { get; private set; }
+
     /// <summary>
     /// Yerleşmeyen yoklamayı kullanıcıya söyler. Yoklama bir cevap üretemediğinde bu bir
     /// sonuç değil bilinmeyendir; sessizce varsayılana düşmek — HDR kaynakta tonemap'e —
     /// aynı dosyanın iki koşumda iki farklı çıktı vermesi demekti ve kullanıcı nedenini
-    /// hiçbir yerde göremiyordu. Satır <c>main.error.probe</c>: yoklama başarısız.
+    /// hiçbir yerde göremiyordu.
+    ///
+    /// İki ayrı cümle, çünkü iki ayrı durum: yoklama koşup sonuca varamadıysa
+    /// <c>main.status.probe-unsettled</c>, hiç koşamayıp istisna fırlattıysa
+    /// <c>main.status.probe-failed</c> — istisnanın metniyle birlikte. İkisi de
+    /// başarısızlık değil bilinmezlik bildiriyor; <c>main.error.probe</c> gerçek
+    /// başarısızlık için açılışta duruyor (<see cref="ProbeHardwareEncodersAsync"/>).
     /// </summary>
     private void ReportUnsettledProbe()
     {
-        if (_planEncoders?.Unsettled != true) return;
-        var text = Say("main.error.probe");
+        if (_planEncoders is null) return;
+
+        string text;
+        if (_planEncoders.FirstFailure is { } failure) text = Say("main.status.probe-failed", failure);
+        else if (_planEncoders.Unsettled) text = Say("main.status.probe-unsettled");
+        else return;
+
         if (TxtSystemStatus.Text != text) TxtSystemStatus.Text = text;
     }
 
