@@ -467,3 +467,137 @@ public sealed class AbSettingsAbTests
         Assert.Equal("60.5", settings.TargetsMb[0].ToString(CultureInfo.InvariantCulture));
     }
 }
+
+public sealed class TargetSearchAbTests
+{
+    private const long Baseline = 3_730_691;
+
+    [Fact]
+    public void WithoutABracketTheStepIsMultiplicative()
+    {
+        var step = TargetSearch.Next(Baseline, new[] { new TargetProbe(3.497, 3_401_123) });
+
+        Assert.Equal(TargetStepKind.Multiplicative, step.Kind);
+        Assert.Equal(3.497 * (Baseline / 3_401_123.0), step.TargetMb, 6);
+        Assert.True(step.TargetMb > 3.497);
+    }
+
+    [Fact]
+    public void OnceBothSidesAreSeenTheStepBisectsTheUnprobedGap()
+    {
+        var step = TargetSearch.Next(Baseline, new[]
+        {
+            new TargetProbe(3.497, 3_401_123),
+            new TargetProbe(3.836, 3_868_475),
+            new TargetProbe(3.700, 3_592_973)
+        });
+
+        Assert.Equal(TargetStepKind.Bisect, step.Kind);
+        Assert.Equal(3.768, step.TargetMb, 3);
+    }
+
+    [Fact]
+    public void TheBisectStepLandsInsideTheGapTheMultiplicativeStepSkips()
+    {
+        var probes = new[]
+        {
+            new TargetProbe(3.497, 3_401_123),
+            new TargetProbe(3.836, 3_868_475),
+            new TargetProbe(3.700, 3_592_973)
+        };
+
+        var bisect = TargetSearch.Next(Baseline, probes);
+        var multiplicative = TargetSearch.Next(Baseline, new[] { probes[2] });
+
+        Assert.True(bisect.TargetMb > 3.700);
+        Assert.True(bisect.TargetMb < 3.836);
+        Assert.True(multiplicative.TargetMb > 3.836);
+    }
+
+    [Fact]
+    public void MultiplicativeCorrectionAloneOscillatesAcrossTheGap()
+    {
+        var fromAbove = TargetSearch.Next(Baseline, new[] { new TargetProbe(3.836, 3_868_475) });
+        var fromBelow = TargetSearch.Next(Baseline, new[] { new TargetProbe(3.700, 3_592_973) });
+
+        Assert.Equal(TargetStepKind.Multiplicative, fromAbove.Kind);
+        Assert.Equal(TargetStepKind.Multiplicative, fromBelow.Kind);
+        Assert.True(fromAbove.TargetMb < 3.767);
+        Assert.True(fromBelow.TargetMb > 3.836);
+    }
+
+    [Fact]
+    public void ABracketBuiltFromTwoProbesIsStillBisected()
+    {
+        var step = TargetSearch.Next(Baseline, new[]
+        {
+            new TargetProbe(3.700, 3_592_973),
+            new TargetProbe(3.836, 3_868_475)
+        });
+
+        Assert.Equal(TargetStepKind.Bisect, step.Kind);
+        Assert.Equal(3.768, step.TargetMb, 3);
+    }
+
+    [Fact]
+    public void ProbesInsideTheBandDoNotFormABracket()
+    {
+        var step = TargetSearch.Next(Baseline, new[]
+        {
+            new TargetProbe(3.700, 3_592_973),
+            new TargetProbe(3.768, 3_721_503)
+        });
+
+        Assert.Equal(TargetStepKind.Multiplicative, step.Kind);
+    }
+
+    [Fact]
+    public void ACollapsedBracketIsReportedAsExhaustedNotAsAnotherProbe()
+    {
+        var step = TargetSearch.Next(Baseline, new[]
+        {
+            new TargetProbe(3.7600, 3_600_000),
+            new TargetProbe(3.7625, 3_900_000)
+        });
+
+        Assert.Equal(TargetStepKind.Exhausted, step.Kind);
+    }
+
+    [Fact]
+    public void ABracketWiderThanTheCollapseThresholdKeepsSearching()
+    {
+        var step = TargetSearch.Next(Baseline, new[]
+        {
+            new TargetProbe(3.7600, 3_600_000),
+            new TargetProbe(3.7800, 3_900_000)
+        });
+
+        Assert.Equal(TargetStepKind.Bisect, step.Kind);
+    }
+
+    [Fact]
+    public void TheSearchHonoursAnExplicitTolerance()
+    {
+        var probes = new[]
+        {
+            new TargetProbe(3.700, 3_592_973),
+            new TargetProbe(3.836, 3_868_475)
+        };
+
+        Assert.Equal(TargetStepKind.Bisect, TargetSearch.Next(Baseline, probes, 2.0).Kind);
+        Assert.Equal(TargetStepKind.Multiplicative, TargetSearch.Next(Baseline, probes, 5.0).Kind);
+    }
+
+    [Fact]
+    public void AnEmptyProbeListIsRefusedRatherThanGuessed()
+        => Assert.Throws<ArgumentException>(() => TargetSearch.Next(Baseline, Array.Empty<TargetProbe>()));
+
+    [Fact]
+    public void TheShippedAttemptBudgetLeavesRoomForABracketAndABisect()
+    {
+        Assert.True(AbSettings.DefaultEqualizeAttempts >= 3);
+
+        var settings = AbSettings.Parse(new[] { "--kaynak", "k.mp4", "--hedef-mb", "60" }, Path.GetTempPath());
+        Assert.Equal(AbSettings.DefaultEqualizeAttempts, settings.EqualizeAttempts);
+    }
+}

@@ -226,16 +226,23 @@ public sealed class AbRunner
     {
         var best = first;
         var bestParity = SizeParityCheck.Evaluate(baselineBytes, first.Bytes, settings.TolerancePercent);
-        var targetMb = requestedMb;
+        var probes = new List<TargetProbe> { new(requestedMb, first.Bytes) };
 
         for (var attempt = 1; attempt <= settings.EqualizeAttempts && !bestParity.Equal; attempt++)
         {
-            if (best.Bytes <= 0) break;
-            targetMb *= baselineBytes / (double)best.Bytes;
-            _log.WriteLine($"eşitleme denemesi {attempt}: {competitor.Name} hedefi {targetMb:0.###} MB'a çekiliyor " +
-                           $"(önceki {best.Bytes} bayt, taban {baselineBytes} bayt, fark {bestParity.DeltaPercent:+0.00;-0.00;0.00}%)");
+            var step = TargetSearch.Next(baselineBytes, probes, settings.TolerancePercent);
+            if (step.Kind == TargetStepKind.Exhausted)
+            {
+                _log.WriteLine($"eşitleme durdu: {step.Reason}");
+                break;
+            }
 
-            var retry = await competitor.EncodeAsync(input, targetMb, settings.OutputDirectory, settings.LogDirectory, ct);
+            _log.WriteLine($"eşitleme denemesi {attempt} ({step.Kind}): {competitor.Name} hedefi " +
+                           $"{step.TargetMb:0.####} MB'a çekiliyor — {step.Reason}");
+
+            var retry = await competitor.EncodeAsync(input, step.TargetMb, settings.OutputDirectory, settings.LogDirectory, ct);
+            probes.Add(new TargetProbe(step.TargetMb, retry.Bytes));
+
             var retryParity = SizeParityCheck.Evaluate(baselineBytes, retry.Bytes, settings.TolerancePercent);
             if (Math.Abs(retryParity.DeltaPercent) < Math.Abs(bestParity.DeltaPercent))
             {
@@ -246,7 +253,7 @@ public sealed class AbRunner
 
         if (!bestParity.Equal)
             _log.WriteLine($"eşitleme tutmadı: {competitor.Name} {bestParity.DeltaPercent:+0.00;-0.00;0.00}% ile kaldı " +
-                           $"(tolerans ±{settings.TolerancePercent:0.##}%).");
+                           $"(tolerans ±{settings.TolerancePercent:0.##}%, {probes.Count} yoklama).");
 
         return best;
     }

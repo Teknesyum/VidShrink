@@ -16,7 +16,7 @@ public sealed record AbSettings(
 {
     public static readonly string[] KnownCompetitors = { "handbrake", "vidshrink", "vidshrink-sdr" };
     public static readonly string[] DefaultCompetitors = { "handbrake", "vidshrink" };
-    public const int DefaultEqualizeAttempts = 2;
+    public const int DefaultEqualizeAttempts = 4;
 
     public static AbSettings Parse(IReadOnlyList<string> args, string workRoot)
     {

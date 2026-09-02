@@ -28,6 +28,7 @@ static void Usage()
     Console.WriteLine("Kullanım:");
     Console.WriteLine("  ab kos --kaynak <yol> --hedef-mb <a[,b]> [--yarismaci handbrake,vidshrink] [--parca]");
     Console.WriteLine("         [--parca-dizin <klasör>] [--cikti <klasör>] [--gunluk <klasör>] [--json <yol>] [--tolerans 2]");
+    Console.WriteLine("         [--esitleme-denemesi 4]");
     Console.WriteLine("  ab parcala --kaynak <yol> [--parca-dizin <klasör>]");
     Console.WriteLine("  ab sapma <tam.json> <parca.json>");
     Console.WriteLine("  ab denetle <referans> <aday>");

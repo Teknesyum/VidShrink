@@ -136,12 +136,17 @@ Aynı kodlayıcı ve aynı kaynak iki farklı hedef boyutta koşturulur. Büyük
 puanı küçük hedefinkinden en az 1,00 VMAF-NEG puanı yüksek çıkmazsa araç o satırı
 `AYRIŞMIYOR` diye işaretler; düzenek duyarsız sayılır.
 
-Ölçülen ayrışma, 60 MB'den 600 MB'ye:
+Ölçülen ayrışma, 60 MB'den 600 MB'ye. **Bu tablo `sonuc-parca.json` koşumundan,
+yani eşitleme turu eklenmeden önceki koşumdan**; VidShrink'in 60 MB satırı
+orada 18,98'di. Eşitleme turlu koşumda o satır 19,66 oluyor (aşağıdaki özet
+tablosu) ve ayrışma +39,17'ye iniyor — duyarlılık kararı iki koşumda da aynı,
+o yüzden tablo yeniden koşturulmadı:
 
 | yarışmacı | 60 MB harm | 600 MB harm | ayrışma | eşik |
 |---|---|---|---|---|
 | handbrake | 28,70 | 67,96 | **+39,26** | 1,00 |
-| vidshrink | 18,98 | 58,83 | **+39,85** | 1,00 |
+| vidshrink (eşitleme öncesi) | 18,98 | 58,83 | **+39,85** | 1,00 |
+| vidshrink (eşitleme sonrası) | 19,66 | 58,83 | **+39,17** | 1,00 |
 
 Eşiğin kırk katı. GEÇERSİZ tablodaki 14,86 → 14,67 (yani -0,19) ile arasındaki fark
 düzeneğin varlık sebebi.
@@ -258,60 +263,99 @@ tanımlı ama bu turda koşturulmadı.
 `aynı renk uzayında doğrudan karşılaştırma` — kaynak da çıktılar da bt2020/PQ kaldı,
 tonemap yoluna hiç girilmedi.
 
+Aşağıdaki sayıların geldiği koşum kayıtları (hepsi `.calisma/` altında, git'e
+girmiyor):
+
+| tablo | koşum kaydı |
+|---|---|
+| 60 MB (ikiye bölmeli eşitleyici) | `.calisma/ab/sonuc-parca-60-ikiyebolme.json` |
+| 600 MB | `.calisma/ab/sonuc-parca.json` |
+| duyarlılık (eşitleme öncesi) | `.calisma/ab/sonuc-parca.json` |
+| tam kaynak koşumu (örnekleme sapması) | `.calisma/ab/sonuc-tam.json` |
+
 ### 60 MB hedefinde
 
 İlk koşumda VidShrink üç parçanın üçünde de hedefin altında kalmış ve üç satır da
 `eş boyut değil` damgası yemişti (-%3,13 / -%8,61 / -%3,17). O tablodan
-karşılaştırma çıkarılamaz. Araca **eşitleme turu** eklendi: taban yarışmacının
-gerçek baytına bakıp adayın hedefini oranla düzeltip yeniden kodluyor, en fazla
-iki deneme. Aşağıdaki tablo eşitleme turlu koşumdan.
+karşılaştırma çıkarılamaz. Araca **eşitleme turu** eklendi
+(`tools/VidShrink.Ab/TargetSearch.cs`): taban yarışmacının gerçek baytına bakıp
+adayın hedefini düzeltip yeniden kodluyor, varsayılan dört deneme. Arayış iki
+kipli — bandın bir yanında kaldığı sürece **oranla** düzeltiyor
+(`hedef x taban/teslim`), bir kez üstte ve bir kez altta teslim gördükten sonra
+o aralığı **ikiye bölüyor**. İkinci kip zorunlu: teslim edilen bayt hedefin
+basamaklı bir fonksiyonu, ve yalnız oranla düzeltme basamak fonksiyonunda
+yakınsamıyor, iki basamak arasında salınıyor (ölçüldü, aşağıda). Aşağıdaki
+tablo ikiye bölmeli eşitleyicinin koşumundan.
 
-| girdi | yarışmacı | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
-|---|---|---|---|---|---|---|---|---|---|
-| parca-1 | handbrake | 3.531.037 | 0,00 | evet | 47,71 | 34,32 | 3,02 | 52,16 | 30,93 |
-| parca-1 | vidshrink | 3.519.437 | -0,33 | evet | 31,81 | 17,76 | 1,19 | 39,16 | 28,97 |
-| parca-2 | handbrake | 3.730.691 | 0,00 | evet | 93,70 | 93,07 | 72,27 | 93,71 | 43,59 |
-| parca-2 | vidshrink | 3.592.973 | -3,69 | **eş boyut değil** | 69,03 | 67,04 | 51,30 | 69,14 | 33,22 |
-| parca-3 | handbrake | 3.680.998 | 0,00 | evet | 13,72 | 11,79 | 0,00 | 17,46 | 28,21 |
-| parca-3 | vidshrink | 3.678.393 | -0,07 | evet | 9,33 | 7,01 | 0,00 | 13,59 | 27,18 |
+| girdi | yarışmacı | yerleşim | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|---|---|
+| parca-1 | handbrake | 1920x1080 @483k | 3.531.037 | 0,00 | evet | 47,71 | 34,32 | 3,02 | 52,16 | 30,93 |
+| parca-1 | vidshrink | 768x432 @479k | 3.526.564 | -0,13 | evet | 31,94 | 18,11 | 1,46 | 39,14 | 28,97 |
+| parca-2 | handbrake | 1920x1080 @483k | 3.730.691 | 0,00 | evet | 93,70 | 93,07 | 72,27 | 93,71 | 43,59 |
+| parca-2 | vidshrink | 1190x670 @522k | 3.769.379 | +1,04 | evet | 69,65 | 67,65 | 52,23 | 69,76 | 33,32 |
+| parca-3 | handbrake | 1920x1080 @483k | 3.680.998 | 0,00 | evet | 13,72 | 11,79 | 0,00 | 17,46 | 28,21 |
+| parca-3 | vidshrink | 652x366 @479k | 3.677.261 | -0,10 | evet | 9,35 | 6,99 | 0,00 | 13,53 | 27,17 |
 
-Üç parçanın ikisi kapının içine girdi (-%0,33 ve -%0,07). `parca-2` giremedi;
-nedeni aşağıda ayrı bir bulgu olarak ölçüldü. Toplam bayt 10.790.803 ↔ 10.942.726,
-yani **-%1,39** — toplamda kapının içinde, ama satır bazında bir parça dışarıda
-kaldığı için özet satırı damgalı kalıyor.
+**Üç parçanın üçü de kapının içinde** (-%0,13, +%1,04, -%0,10). Toplam bayt
+10.973.204 ↔ 10.942.726, yani **+%0,28**. Bu tabloda damga yok.
+
+`parca-2`nin kapıya girmesi ikiye bölmeyle oldu; tur 2'de yalnız oranlı düzeltme
+vardı ve o parça -%3,69'da takılmıştı. Ölçülen yoklama dizisi:
+
+| deneme | kip | hedef | seçilen yerleşim | teslim | tabana fark |
+|---|---|---|---|---|---|
+| 0 | — | 3,4975 MB | 1152x648 | 3.402.466 | -%8,80 |
+| 1 | oranlı | 3,8348 MB | 1190x670 | 3.863.888 | +%3,57 |
+| 2 | ikiye bölme | 3,6661 MB | 1152x648 | 3.572.151 | -%4,25 |
+| 3 | ikiye bölme | **3,7505 MB** | **1190x670** | **3.769.379** | **+%1,04** |
+
+Oranlı düzeltme tek başına 3,8348 ile 3,6661 arasında salınıyordu; aradaki
+aralığı ancak ikiye bölme yokladı ve üçüncü denemede kapının içine girdi.
 
 ### 600 MB hedefinde
 
-| girdi | yarışmacı | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
-|---|---|---|---|---|---|---|---|---|---|
-| parca-1 | handbrake | 35.288.140 | 0,00 | evet | 81,48 | 79,04 | 4,12 | 83,43 | 38,00 |
-| parca-1 | vidshrink | 35.746.203 | +1,30 | evet | 70,82 | 67,21 | 3,49 | 72,56 | 36,07 |
-| parca-2 | handbrake | 36.766.517 | 0,00 | evet | 95,78 | 95,32 | 71,96 | 95,78 | 47,11 |
-| parca-2 | vidshrink | 36.137.359 | -1,71 | evet | 95,84 | 95,42 | 74,89 | 95,84 | 51,25 |
-| parca-3 | handbrake | 36.272.258 | 0,00 | evet | 46,66 | 64,62 | 0,00 | 69,87 | 36,35 |
-| parca-3 | vidshrink | 35.549.615 | -1,99 | evet | 37,83 | 54,59 | 0,00 | 60,10 | 35,00 |
+| girdi | yarışmacı | yerleşim | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|---|---|
+| parca-1 | handbrake | 1920x1080 @4833k | 35.288.140 | 0,00 | evet | 81,48 | 79,04 | 4,12 | 83,43 | 38,00 |
+| parca-1 | vidshrink | 1382x778 @4861k | 35.746.203 | +1,30 | evet | 70,82 | 67,21 | 3,49 | 72,56 | 36,07 |
+| parca-2 | handbrake | 1920x1080 @4833k | 36.766.517 | 0,00 | evet | 95,78 | 95,32 | 71,96 | 95,78 | 47,11 |
+| parca-2 | vidshrink | **1920x1080** @4712k | 36.137.359 | -1,71 | evet | 95,84 | 95,42 | 74,89 | 95,84 | 51,25 |
+| parca-3 | handbrake | 1920x1080 @4833k | 36.272.258 | 0,00 | evet | 46,66 | 64,62 | 0,00 | 69,87 | 36,35 |
+| parca-3 | vidshrink | 1190x670 @4712k | 35.549.615 | **-1,99** | evet (kıl payı) | 37,83 | 54,59 | 0,00 | 60,10 | 35,00 |
+
+`parca-3 / vidshrink` satırı kapıya **0,008 puan** uzakta: ham fark **-%1,9923**,
+eşik -%2. Aşağıdaki "ölçünün kararsızlığı" bölümü kalibrasyonun koşumdan koşuma
+2.728 bayt oynadığını yazıyor; bu satırda **2.900 baytlık** bir oynama hem
+damgayı hem manşetteki "on ikinin on ikisi eş boyut" cümlesini birlikte devirirdi. Satır
+bu haliyle **koşuma bağlı**, kararlı değil — manşetteki 600 MB kaydı bu koşulla
+okunmalı (aşağıda "kıl payı satır" başlığında pimlendi).
 
 ### Özet
 
 | yarışmacı | hedef MB | toplam bayt | eş boyut | harm | en kötü p10 | kare min | ort | XPSNR |
 |---|---|---|---|---|---|---|---|---|
 | handbrake | 60 | 10.942.726 | evet | **28,70** | 11,79 | 0,00 | 54,44 | 34,25 |
-| vidshrink | 60 | 10.790.803 | 2/3 parça eş boyut, toplam -%1,39 | **19,59** | 7,01 | 0,00 | 40,62 | 29,79 |
+| vidshrink | 60 | 10.973.204 | evet (+%0,28) | **19,66** | 6,99 | 0,00 | 40,81 | 29,82 |
 | handbrake | 600 | 108.326.915 | evet | **67,96** | 64,62 | 0,00 | 83,03 | 40,49 |
 | vidshrink | 600 | 107.433.177 | evet | **58,83** | 54,59 | 0,00 | 76,17 | 40,77 |
 
-**Geridiyiz.** Eş boyutta ölçülmüş tek hedef 600 MB ve orada HandBrake harmonik
-ortalamada **9,13 puan** önde (67,96 ↔ 58,83); altı satırın altısı da ±%2 içinde.
+**Geridiyiz.** İki hedefte de eş boyutta ölçüldü ve ikisinde de HandBrake önde:
+600 MB'de harmonik ortalamada **9,13 puan** (67,96 ↔ 58,83), 60 MB'de
+**9,04 puan** (28,70 ↔ 19,66). On iki satırın on ikisi ±%2 kapısının içinde.
 
-60 MB hedefi **tam eş boyutta ölçülemedi**, o yüzden oradan tek bir açık sayısı
-verilmiyor. Eşitleme turundan sonra üç parçanın ikisi kapının içinde (-%0,33 ve
--%0,07), üçüncüsü -%3,69 ile dışarıda; toplam bayt -%1,39. Bu haliyle özet
-harmonik ortalamalar 28,70 ↔ 19,59, yani **9,11 puan** — ama içinde eş boyut
-olmayan bir satır taşıdığı için bu sayı 600 MB'deki 9,13 ile aynı sağlamlıkta
-değil. Yönü de bilinir: dışarıda kalan satırda **VidShrink daha az bayt harcadı**,
-dolayısıyla tam eşitlikte açığın bir miktar **daralması** beklenir, büyümesi değil.
-Nitekim eşitleme turu öncesi aynı satırların açığı 9,72'ydi ve eşitlemeye
-yaklaştıkça 9,11'e indi.
+Bir koşula bağlı: 600 MB'deki `parca-3 / vidshrink` satırı kapıya **0,008 puan**
+uzakta (-%1,9923) ve o satır tek koşuma dayanıyor. Aşağıdaki kararsızlık bölümü
+kalibrasyonun koşumdan koşuma 2.728 bayt oynadığını ölçüyor; o satırda 2.900
+baytlık bir oynama damgayı devirir. Yani "on ikinin on ikisi" cümlesi bir satırı
+kıl payına borçlu ve o satırın kararlılığı **ölçülmedi.**
+
+60 MB'nin eş boyuta girmesi bu turda oldu. Tur 2'de üç parçanın biri -%3,69 ile
+dışarıda kalmıştı ve bunun sebebi ürüne değil **alete** yazıldı: eşitleyici yalnız
+oranlı düzeltme yapıyordu ve teslim edilen bayt hedefin basamaklı bir fonksiyonu
+olduğu için iki basamak arasında salınıyordu. İkiye bölme eklendi, o parça
+üçüncü denemede +%1,04 ile kapının içine girdi. Açığın seyri, aynı satırlar
+eşitliğe yaklaştıkça: **9,72 → 9,11 → 9,04.** Yön beklendiği gibi daralma
+çıktı, çünkü dışarıda kalan satırda VidShrink daha az bayt harcıyordu.
 
 Altı parça-hedef çiftinin beşinde HandBrake kazandı; VidShrink yalnız
 `parca-2` @ 600 MB'de önde (95,84'e 95,78 — bu fark gürültü sayılır) ve orada
@@ -338,9 +382,50 @@ HandBrakeCLI -i parca-1.mkv -o parca-1_handbrake_3.497mb.mkv \
 
 VidShrink tarafı ürünün kendi borusunu koşuyor — `ComplexityProbe` →
 `PlanCalculator` → iki tur `CalibrationProbe` → `EncodeRunner` — ve kendi kararını
-kendi veriyor. 600 MB hedefinde seçtiği: `1190x670@60, libx264/2pass, 4712k,
-pix=p010le, hdr=Preserve`. Yani çözünürlüğü düşürüp bit hızını kurtarma yolunu
-seçiyor; HandBrake 1920x1080'de kalıyor. Bu turda o tercih kazandırmadı.
+kendi veriyor. HandBrake her satırda 1920x1080'de kalıyor; VidShrink **her parçada
+ayrı bir yerleşim seçiyor**, aynı hedefte bile:
+
+| girdi | 60 MB'de seçilen | 600 MB'de seçilen |
+|---|---|---|
+| parca-1 | 768x432 @479k | 1382x778 @4861k |
+| parca-2 | 1190x670 @522k | **1920x1080** @4712k |
+| parca-3 | 652x366 @479k | 1190x670 @4712k |
+
+Yani "çözünürlüğü düşürüp bit hızını kurtarıyor" tek bir karar değil, üç ayrı
+karar. Kodlayıcı, önceden bilinen bir kalıp değil, parçanın karmaşıklığına göre
+oynayan bir seçim yapıyor.
+
+### Ayrı bulgu — kazandığımız tek satır, düşürmediğimiz tek satır
+
+Altı çiftin içinde VidShrink'in önde bitirdiği tek satır `parca-2 @ 600 MB`
+(95,84 ↔ 95,78 harmonik; XPSNR 51,25 ↔ 47,11, bu ikincisi gürültü sayılamayacak
+kadar büyük). Bu satır aynı zamanda **1920x1080'de kaldığımız tek satır.**
+
+Sıralama piksel oranına göre (1920x1080 = 2.073.600 piksel taban):
+
+| girdi @ hedef | yerleşim | piksel oranı | harm (vs ↔ hb) | açık | kazanan |
+|---|---|---|---|---|---|
+| parca-2 @ 600 | **1920x1080** | %100,0 | 95,84 ↔ 95,78 | **-0,06** | **vidshrink** |
+| parca-1 @ 600 | 1382x778 | %51,8 | 70,82 ↔ 81,48 | 10,66 | handbrake |
+| parca-2 @ 60 | 1190x670 | %38,4 | 69,65 ↔ 93,70 | 24,05 | handbrake |
+| parca-3 @ 600 | 1190x670 | %38,4 | 37,83 ↔ 46,66 | 8,83 | handbrake |
+| parca-1 @ 60 | 768x432 | %16,0 | 31,94 ↔ 47,71 | 15,77 | handbrake |
+| parca-3 @ 60 | 652x366 | %11,5 | 9,35 ↔ 13,72 | 4,37 | handbrake |
+
+Tablodan **yalnız yön** okunuyor: düşürmediğimiz tek satırda kazanıyoruz,
+düşürdüğümüz beş satırda kaybediyoruz. **Büyüklük okunmuyor** — açık piksel
+oranıyla tekdüze gitmiyor: aynı %38,4 oranında bir satırda 24,05, diğerinde
+8,83; en çok düşürülen satırda (%11,5) açık en küçük (4,37). Yani "ne kadar
+çok düşürürsek o kadar çok kaybederiz" bu veriden **çıkmıyor**, yazmıyorum.
+
+Altı nokta zaten sebep ayırt etmeye yetmez: düşürülen parçalar aynı zamanda
+başka bakımlardan da farklı parçalar olabilir ve düşürme kararının kendisi
+parçanın karmaşıklığından türetiliyor — yani neden ile sonuç aynı kaynaktan
+besleniyor. Bu bir ilinti gözlemi, ölçülmüş bir sebep değil.
+
+T107'nin öncülü (yerleşim skoru ölçülen kaliteyi tahmin etmiyor) ile aynı yöne
+bakıyor; **T107'ye devredilecek**, burada sonuca bağlanmıyor. Bu düzeneğin
+ölçtüğü şey açık, yerleşim kararının doğruluğu değil.
 
 ### Ayrı bulgu — VidShrink istenen boyutu bitirmiyor
 
@@ -348,15 +433,22 @@ Bu açığın parçası değil, ayrı bir bulgu. Ölçüldü çünkü eş boyutu
 zorlaştıran şey buydu.
 
 VidShrink'e istenen boyut ile teslim ettiği boyut arasında sistematik bir açık
-var. Eşitleme turu öncesi, ilk denemede teslim edilenler:
+var. Eşitleme arayışının **sıfırıncı** yoklaması, yani ürünün hedefe kendi
+başına verdiği cevap:
 
 | girdi | istenen | teslim | fark |
 |---|---|---|---|
-| parca-1 | 3,497 MB | 3,261 MB | **-%6,75** |
-| parca-2 | 3,497 MB | 3,244 MB | **-%7,23** |
-| parca-3 | 3,498 MB | 3,399 MB | **-%2,83** |
+| parca-1 | 3,4975 MB | 3,2594 MB (3.417.703 bayt) | **-%6,81** |
+| parca-2 | 3,4986 MB | 3,2449 MB (3.402.466 bayt) | **-%7,25** |
+| parca-3 | 3,4994 MB | 3,3993 MB (3.564.378 bayt) | **-%2,86** |
 
-Kodlayıcı günlüğü açığın iki katmandan geldiğini gösteriyor.
+(Tur 2'nin koşumunda aynı üç sayı -%6,75 / -%7,23 / -%2,83 çıkmıştı; aradaki
+fark kalibrasyonun koşum gürültüsü, aşağıdaki kararsızlık bölümüne bakın.)
+
+Kodlayıcı günlüğü açığın iki katmandan geldiğini gösteriyor. Aşağıdaki iki tablo
+tur 2'nin kodlayıcı günlüklerinden okundu (`.calisma/ab/gunluk/`); ikiye bölme
+turu bu iki katmanı değiştirmiyor, yalnız aletin onlara rağmen kapıya girmesini
+sağlıyor.
 
 **Birinci katman — planın kendine ayırdığı pay.** Plan, istenen boyutu doğrudan
 hedeflemiyor; altında bir iç hedef kuruyor:
@@ -386,24 +478,33 @@ Bandın kuralını çıkaramadım: -%3,39 kabul edilirken -%3,06 reddediliyor, y
 sabit bir yüzde değil. `PlanCalculator` benim `owns`ımda olmadığı için içine
 bakmadım; ölçülen davranış bu.
 
-**Üçüncü gözlem — çözünürlük basamağı eşitlemeyi kırıyor.** `parca-2`de eşitleme
-turu ±%2'ye giremedi ve nedeni ölçülebilir: hedefi büyütmek plana çözünürlük
-atlatıyor.
+**Üçüncü gözlem — çözünürlük basamağı hedef-bayt eğrisini kesintili yapıyor.**
+Hedefi büyütmek bir noktada plana çözünürlük atlatıyor ve teslim edilen bayt
+sıçrıyor. `parca-2` @ 60 MB'de ölçülen dört nokta:
 
-| istenen | seçilen çözünürlük | teslim | tabana fark |
+| hedef | seçilen çözünürlük | teslim | tabana fark |
 |---|---|---|---|
-| 3,497 MB | 1152x648 | 3.401.123 | -%8,83 |
-| 3,836 MB | **1190x670** | 3.868.475 | +%3,69 |
-| 3,700 MB | 1152x648 | 3.592.973 | -%3,69 |
+| 3,4975 MB | 1152x648 | 3.402.466 | -%8,80 |
+| 3,6661 MB | 1152x648 | 3.572.151 | -%4,25 |
+| **3,7505 MB** | **1190x670** | **3.769.379** | **+%1,04** |
+| 3,8348 MB | 1190x670 | 3.863.888 | +%3,57 |
 
-Hedefi %3,7 büyütmek (3,700 → 3,836) çözünürlüğü bir basamak yukarı atıyor ve
-teslim edilen bayt %7,7 sıçrıyor. Taban (3.730.691 bayt) tam bu sıçramanın
-ortasına düşüyor; iki komşu basamak da ±%2'nin dışında kalıyor. Yani bu parçada
-eş boyut, hedefi ayarlayarak **erişilebilir değil** — ulaşılabilir bayt değerleri
-ayrık.
+Basamak 3,6661 ile 3,7505 arasında. Sıçrama gerçek — %2,3'lük bir hedef artışı
+teslimi %5,5 büyütüyor — ama **eş boyutu engellemiyor:** üst basamağın alt ucu
+(3,7505) tam kapının içine düşüyor.
 
-Bu üç maddenin üçü de `src/VidShrink.Core` tarafında ve bu sözleşmenin dışında.
-Buraya ölçüm olarak yazıldı; düzeltmesi ayrı bir sözleşmenin işi.
+> **Tur 2'de burada yanlış bir cümle vardı.** "Bu parçada eş boyut erişilebilir
+> değil — ulaşılabilir bayt değerleri ayrık" yazılmıştı. Yanlıştı, iki
+> bakımdan. Bir: bir basamak tek bayt değeri üretmiyor, kendi içinde sürekli
+> bir aralık üretiyor (1152x648 basamağında 3.402.466'dan 3.572.151'e). İki:
+> o cümlenin dayandığı üç nokta (3,497 / 3,700 / 3,836) aradaki aralığı hiç
+> yoklamamıştı; **yoklanmamış aralığa dayanan bir imkânsızlık iddiasıydı.**
+> Aralık yoklandı, eş boyut bulundu. Sebep üründe değil, aletin
+> yakınsamamasındaydı — ve alet düzeltildi.
+
+Bu maddelerden ilk ikisi (plan payı ve kabul bandı) `src/VidShrink.Core`
+tarafında ve bu sözleşmenin dışında; buraya ölçüm olarak yazıldı, düzeltmesi
+ayrı bir sözleşmenin işi. Üçüncüsü A/B aracının kendi sorunuydu ve kapandı.
 
 ### Harmonik ortalamanın tabanı — manşetin dayandığı sayı
 
@@ -418,7 +519,7 @@ var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
 olduğu özet tablodan okunuyor — dört satırın **dördünde de** kare minimumu 0,00.
 Yani her dört ölçümde de en az bir kare gerçek sıfır aldı. Kıskaç olmasaydı
 `1/0` sonsuza gider ve dört harmonik ortalamanın dördü de **0,00** olurdu.
-28,70 da, 67,96 da, 58,83 da, 18,98 da kıskacın varlığına borçlu.
+28,70 da, 67,96 da, 58,83 da, 19,66 da kıskacın varlığına borçlu.
 
 Kıskacın kuyruğu ne kadar belirlediğinin göstergesi `parca-3 @ 600 MB /
 handbrake` satırı: harmonik **46,66**, p10 ise **64,62**. Harmonik ortalamanın
@@ -445,6 +546,22 @@ Bu satır `QualityMeter` bizim `owns`ımızda olmadığı için düzeltilmedi; e
 listesine yazıldı. Karşılaştırmayı geçersiz kılmıyor — kıskaç iki tarafa da aynı
 biçimde uygulanıyor — ama **mutlak sayı olarak okunmamalı.**
 
+### Bu belgedeki sayılar sunum için yuvarlanmıştır
+
+Tablolardaki puanlar iki ondalığa yuvarlı, farklar ise **yuvarlanmış sayılardan**
+çıkarılıyor. Ham değerler biraz başka:
+
+| yazılı | ham çıkarma | ham sonuç |
+|---|---|---|
+| 9,13 (600 MB açığı) | 67,9559 - 58,8311 | **9,1248** |
+| 9,04 (60 MB açığı, eş boyut) | 28,6996 - 19,6593 | **9,0403** |
+| 9,72 (60 MB, eşitleme öncesi) | 28,6986 - 18,9843 | **9,7143** |
+
+Yuvarlama sunum tercihi; ama belge boyunca "9,13", "9,04" ve "9,72" ham
+sayıymış gibi kullanılıyor, öyle okunmamalı. Fark bu ölçekte sonucu
+değiştirmiyor (üçüncü ondalıkta), yine de karar bu sayıların binde birine
+dayandırılmamalı.
+
 ### Ölçünün kendi kararsızlığı
 
 Aynı yapılandırma iki kez koştu (geometri düzeltmesinden önce ve sonra, `parca-1`
@@ -453,6 +570,20 @@ kırpmadan etkilenmediği için iki koşumda da aynı girdiyle). HandBrake bit b
 temelli kalibrasyonu koşumdan koşuma az da olsa oynuyor: 3.417.959 → 3.420.687 bayt,
 harmonik 31,40 → 31,50, p10 17,35 → 16,93. Yani bu düzenekte 0,1-0,5 VMAF-NEG'lik
 farklar gürültüdür; yukarıdaki 9 puanlık açık değildir.
+
+#### Kıl payı satır — eş boyut damgası her koşumda aynı çıkmayabilir
+
+Puan gürültüsü açığı devirmiyor, ama **bayt gürültüsü damgayı devirebilir.**
+`parca-3 / vidshrink @ 600 MB` satırı -%1,9923 ile kapıya **0,008 puan** uzakta:
+kapıya 35.549.615 yerine 35.546.715 bayt gelseydi (aradaki fark **2.900 bayt**)
+satır `eş boyut değil` damgası yerdi. Yukarıda ölçülen kalibrasyon oynaması
+**2.728 bayt** — aynı büyüklük sınıfında.
+
+Bu satır iki kez koşturulmadı, yani kararlılığı **ölçülmedi**. O yüzden
+manşetteki "on iki satırın on ikisi ±%2 içinde" cümlesi koşulsuz değil: bir satırı
+tek koşuma dayanıyor ve o satırın payı bin baytlarla ölçülüyor. Manşette bu
+koşul açıkça yazılı. Kapatmanın yolu ucuz değil: `parca-3 @ 600 MB` çiftini
+birkaç kez koşturup bayt dağılımını çıkarmak gerekir; bu turda koşturulmadı.
 
 ## `QualityMeter` eksikleri
 
@@ -475,11 +606,28 @@ karşılaşılan eksikler — hepsi T97'nin girdisi:
 
 ## Ölçüler
 
-`AbTests` adıyla, `dotnet test -c Release --filter "AbTests"` — 55 test, 55 geçti,
-0 kaldı, 0 atlandı. 42'si bu sözleşmenin (`ColorGateAbTests` 9,
-`ChunkAggregateAbTests` 8, `SensitivityAbTests` 6, `GeometryGateAbTests` 5,
-`SizeParityAbTests` 5, `AbSettingsAbTests` 4, `HandBrakeArgumentsAbTests` 4,
-`DeviationAbTests` 1); kalan 13 `SettingsTabTests` süzgece adından ötürü takılıyor.
-Renk kapısı, geometri kapısı, eş boyut toleransı, parça birleştirme (p10 dahil),
-duyarlılık eşiği ve HandBrake bit hızı hesabı üretim davranışı üzerinden ölçülür:
-sabit karşılaştırma, `Skip` ve sessiz erken dönüş yok.
+`AbTests` adıyla, `dotnet test -c Release --filter "AbTests"` — 69 test, 69 geçti,
+0 kaldı, 0 atlandı. 56'sı bu sözleşmenin (`TargetSearchAbTests` 11,
+`ColorGateAbTests` 9, `SizeParityAbTests` 8, `ChunkAggregateAbTests` 8,
+`SensitivityAbTests` 6, `GeometryGateAbTests` 5, `AbSettingsAbTests` 4,
+`HandBrakeArgumentsAbTests` 4, `DeviationAbTests` 1); kalan 13 `SettingsTabTests`
+süzgece adından ötürü takılıyor. Elli altısının elli altısı düz `[Fact]` —
+`ci-gibi-kos.sh`'in ffmpeg yokluğunda atladığı ölçülerin içinde bu sözleşmenin
+hiçbir kabul kriteri yok.
+
+Renk kapısı, geometri kapısı, eş boyut toleransı, hedef arayışı, parça
+birleştirme (p10 dahil), duyarlılık eşiği ve HandBrake bit hızı hesabı üretim
+davranışı üzerinden ölçülür: sabit karşılaştırma, `Skip` ve sessiz erken dönüş yok.
+
+Mutasyonla sınandı (her koşumdan önce `dotnet build ... --no-incremental`):
+
+| mutasyon | sonuç |
+|---|---|
+| `SizeParityCheck.DefaultTolerancePercent` 2.0 → 20.0 | 6 kırmızı |
+| `SizeParityCheck.DefaultTolerancePercent` 2.0 → 0.1 | 3 kırmızı |
+| `TargetSearch` kıskaç dalı devre dışı (hep oranlı) | 6 kırmızı |
+| ikiye bölme orta noktası `span/2` → `span/4` | 2 kırmızı |
+
+Dördü de gerçek kusur: ilk ikisi teslim edilen tolerans **değerini** pimliyor
+(tur 2'de sınır mantığı pimliydi, değer değildi); son ikisi ikiye bölmenin
+varlığını ve orta noktasını pimliyor.
