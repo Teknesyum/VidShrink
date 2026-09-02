@@ -348,12 +348,14 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
     /// Yoklamanin karari: ffmpeg verilen secenegi kabul etti mi. Surec baslatmaktan ayri
     /// durur; olcu, verilen cikis kodunun ve stderr metninin uretecegi karari surec
     /// kosturmadan pimler.
+    /// <para>
+    /// "Cikis kodu 0 iken dusurulen secenek" sorusunun cevabi burada ikinci kez yazilmaz;
+    /// tek sozluk <see cref="FfmpegDiagnostics"/>. Yoklama teslim yoluyla ayni metni ayni
+    /// desenlerle okur.
+    /// </para>
     /// </summary>
     internal static bool OptionAccepted(int exitCode, string diagnostic)
-        => exitCode == 0
-           && !diagnostic.Contains("Error parsing option", StringComparison.OrdinalIgnoreCase)
-           && !diagnostic.Contains("Option not found", StringComparison.OrdinalIgnoreCase)
-           && !diagnostic.Contains("Unrecognized option", StringComparison.OrdinalIgnoreCase);
+        => exitCode == 0 && FfmpegDiagnostics.DroppedOptionLines(diagnostic).Count == 0;
 
     public static EncoderCapabilities Parse(string encodersOutput, string filtersOutput, string versionOutput)
         => new(ParseEncoders(encodersOutput), ParseFilters(filtersOutput), ParseVersion(versionOutput));

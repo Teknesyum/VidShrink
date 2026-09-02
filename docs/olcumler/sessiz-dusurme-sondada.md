@@ -3,37 +3,42 @@
 Sözleşme T147. Ölçüm makinesi: Windows 11 Pro 10.0.26100, ffmpeg 9.0-full_build-www.gyan.dev
 (libavcodec 63.1.100), x265 4.3+2-5ab552e. Dal tabanı `b4161d7`.
 
-## Teslimden önce: iki durdurucu
+## İki durdurucu ve T0'ın kararı
 
-Bu belge **tamamlanmış bir sözleşmenin raporu değil.** K1'in ölçülebilir yarısı yapıldı;
-K2 ve K4 T0'ın kararını bekliyor. İkisi de sözleşmenin kendi sınır maddelerinin işaret
-ettiği durum.
+Bu sözleşme bir kez durdu. İki soru T0'a yazıldı, ikisi de 3 Eylül 2026'da karara bağlandı
+ve **ikisi de engel çıkmadı.**
 
-### Durdurucu 1 — FfmpegDiagnostics main'de yok
+### Durdurucu 1 — taban eskiydi, engel yoktu
 
-K2 "`EncoderCapabilities` kendi kopyasını tutmaz, **onu çağırır**" diyor. Çağrılacak şey
-bu dalın tabanında mevcut değil:
+K2 "`EncoderCapabilities` kendi kopyasını tutmaz, **onu çağırır**" diyor. İlk ölçümde
+çağrılacak şey yoktu:
 
 ```
 git log --oneline -1                        b4161d7 rele: T147 dagitildi
 grep -rl "FfmpegDiagnostics" src/ tests/    (hiçbir dosyada yok)
-wc -l src/VidShrink.Ffmpeg/FfmpegRunner.cs  90   (T144 öncesi hâli)
+wc -l src/VidShrink.Ffmpeg/FfmpegRunner.cs  90
 ```
 
-T144 (`T144-cikis-kodu-yalan`, uç `9a53acf`) bağımsız denetimde; `main`e girmedi.
-Sözleşme bunu öngörmüş — "T144 mühürlenince FfmpegDiagnostics main'e girer" — ama
-mühürlenmedi, dolayısıyla K2 bugün yazılamaz.
+T0'ın cevabı: **taban eski.** T144 mühürlenmişti (`contracts/done/T144.md`); dalın tabanı
+`b4161d7` ise T144 birleşmeden önceki `main`di. Güncel `origin/main`e (`359f37c`) rebase
+edildi ve `FfmpegDiagnostics` göründü:
 
-Sözleşmenin talimatı burada net: "`Unknown option:` desenini oraya eklemeden K1(a)
-kapanmıyorsa **dur ve T0'a yaz.** Çözüm ya T144'e tur açmak ya bu sözleşmeye o dosyayı
-vermektir; sen karar verme." Karar verilmedi, T0'a yazıldı.
+```
+src/VidShrink.Ffmpeg/FfmpegRunner.cs:18:public static class FfmpegDiagnostics
+```
 
-### Durdurucu 2 — Açık 2'nin varsayımı ölçüde tutmuyor
+Bu, bu depoda üçüncü kez aynı sınıf kusur: **araç güncel olmayan ağacı okuyup gerçek
+durumu yanlış bildiriyor.** Ölçümün kendisi doğruydu, okuduğu ağaç eskiydi.
 
-Sözleşme "`SegmentEncoder` `-loglevel error` ile koşuyor, tanı satırı o seviyede hiç
-basılmıyor, T144'te eklenen taşıma bugün **atıl**" diyor. Bu cümlenin kaynağı benim T144
-raporum ve yeterince ayrıntılı yazılmamış. Ölçüm aşağıda: önizleme **iki** ffmpeg koşuyor
-ve `-loglevel error` yalnız motorun ayarlarını hiç taşımayan koşumda.
+### Durdurucu 2 — Açık 2'nin öncülü yanlıştı, amacı doğru
+
+Sözleşmenin öncül cümlesi ("`SegmentEncoder` `-loglevel error` koşuyor, taşıma atıl")
+benim T144 raporumdan geliyordu ve ölçüm onu çürüttü. T0'ın kararı: **öncül değişir, açık
+kapsamda kalır** — Açık 2'nin amacı sessiz düşürmeydi, ölçülen şey tam o amaca giriyor,
+yalnız yeri farklı. Yeni öncül K1(b)'de.
+
+Geri çekilen cümle T144 raporundan **gerçekten çıkarıldı**: silinmedi, yanlış olduğu
+yazıldı ve doğrusu altına kondu (`docs/olcumler/cikis-kodu-yalan.md:223` ve `:388`).
 
 ## K1 — Kusur önce ölçüldü
 
@@ -157,3 +162,59 @@ K2, K3, K4, K5, K6 T0'ın iki kararına bağlı:
 
 Karar gelene kadar `OptionAccepted` dikişi ve K1(a) kırmızısı dalda duruyor; ikisi de
 hangi karar çıkarsa çıksın geçerli kalır.
+
+## K2 — Sözlük tek yerde
+
+Çağrı yeri, ham çıktı:
+
+```
+src/VidShrink.Ffmpeg/EncoderCapabilities.cs:359:        => exitCode == 0 && FfmpegDiagnostics.DroppedOptionLines(diagnostic).Count == 0;
+```
+
+`RunOptionProbe`un satır içi üç desenlik kopyası kaldırıldı; karar artık tek sözlükten
+okunuyor. Yoklama yolu ile teslim yolu aynı metni aynı desenlerle görüyor.
+
+### Hangi desen nereden geliyor
+
+| Desen | Kaynağı | Ölçüm |
+|---|---|---|
+| `Error parsing option` | `FfmpegDiagnostics` (T144) | libsvtav1 ve libx264, çıkış kodu 0 |
+| `Unknown option:` | `FfmpegDiagnostics` (T144) | libx265, çıkış kodu 0 — T147'de sondanın kendi argüman şekliyle yeniden ölçüldü, ölçüm A |
+
+### Sınır aşılmadı
+
+**`FfmpegDiagnostics`e hiçbir desen eklenmedi.** Sözleşme "`Unknown option:` oraya girmeli
+ve o T144'ün dosyası" diyordu; mühürlenmiş hâli okununca desen **zaten içindeydi**:
+
+```
+    public static readonly IReadOnlyList<string> DroppedOptionPatterns = new[]
+    {
+        "Error parsing option",
+        "Unknown option:"
+    };
+```
+
+Yani T144 bu deseni kendi turunda eklemişti. `src/VidShrink.Ffmpeg/FfmpegRunner.cs`
+bu sözleşmede **okundu, değiştirilmedi**; `git diff` o dosyada boş.
+
+### Düşen iki desen ve gerekçesi
+
+Eski satır içi liste üç desen taşıyordu; sözlükte ikisi yok: `Option not found` ve
+`Unrecognized option`. Bunları kaybetmek bir gerileme değil, çünkü ikisi de
+`exitCode == 0` kapısının arkasında zaten erişilemez. Sondanın kendi argüman şekliyle
+ölçüldü:
+
+```
+libx265 -vsync 0        çıkış kodu 8   Option not found, Unrecognized option
+libx265 -zzznotreal 1   çıkış kodu 8   Option not found, Unrecognized option
+```
+
+İkisi de **sıfırdan farklı** kodla geliyor; `OptionAccepted` çıkış kodu 0 değilse zaten
+`false` dönüyor. Bu iki desenin bu kapıda hiçbir koşumda etkisi olamaz.
+
+### `PixelFormatAccepted`e dokunulmadı
+
+Sözleşme piksel biçimine özgü iki desenin kalabileceğini söylüyor. Kaldı: o yordam
+HDR10 piksel biçimi yoklamasını değerlendiriyor ve argümanlarında kodlayıcı parametre
+dizgisi (`-*-params`) yok — sessiz düşürmenin ölçülen yolu orada geçmiyor. Farklı soru,
+ayrı liste.

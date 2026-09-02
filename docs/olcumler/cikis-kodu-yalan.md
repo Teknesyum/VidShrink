@@ -219,10 +219,26 @@ ffmpeg -hide_banner -loglevel error … -c:v libsvtav1 -svtav1-params zzznotreal
 ```
 
 Yani üç kodlayıcının da bu tanısı **uyarı seviyesinde ya da altında** basılıyor.
-`SegmentEncoder.cs:176` tam olarak `-loglevel error` kullanıyor. Sonuç: `FfmpegRunner`e
-eklenen taşıma bugünkü tek tüketicisi için **atıl** — kod doğru, ama önizleme yolunun
-göreceği bir şey yok. `SegmentEncoder.cs` bu sözleşmenin `owns` kümesi dışında,
-loglevel'ine dokunulmadı. Borç.
+
+> **BU PARAGRAF YANLIŞTI — T147'de ölçülüp geri çekildi (3 Eylül 2026).**
+>
+> Burada şöyle yazmıştım: *"`SegmentEncoder.cs:176` tam olarak `-loglevel error`
+> kullanıyor. Sonuç: `FfmpegRunner`e eklenen taşıma bugünkü tek tüketicisi için **atıl**
+> — kod doğru, ama önizleme yolunun göreceği bir şey yok."*
+>
+> **Doğrusu:** `SegmentEncoder` tek değil **iki** ffmpeg koşuyor (`SegmentEncoder.cs:259-261`).
+> `-loglevel error` yalnız birincisinde — `BuildSourceClipArguments` (`:172-184`), yani
+> `libx264 -preset ultrafast -qp 0` ile yapılan **kayıpsız kaynak çıkarması**. O koşum
+> motorun psikogörsel ayarlarını **hiç taşımıyor**; düşecek bir ayar yok.
+>
+> Ayarları taşıyan ikinci koşum `segment.Arguments`, kaynağı
+> `FfmpegArguments.BuildSegment` → `Build`, ve `Build` **hiç `-loglevel` vermiyor**.
+> T147'de ölçüldü: o şekilde koşan ffmpeg tanıyı **basıyor** — çıkış kodu 0, stderr 2351
+> bayt / 38 satır, satır 7 `[libx265 @ …] Unknown option: zzznotreal.`
+>
+> Yani `FfmpegRun.DroppedOptions` önizleme yolu için **atıl değil**. Hatam iki koşumu
+> ayırmamaktı; yukarıdaki üç `-loglevel error` ölçümü doğru, onlardan çıkardığım sonuç
+> yanlıştı. Ölçümün tamamı `docs/olcumler/sessiz-dusurme-sondada.md` içinde.
 
 `EncodeRunner` bu sorunu taşımıyor: `FfmpegArguments.cs:364` `-loglevel` vermiyor, yani
 varsayılan `info` seviyesinde koşuyor ve tanıyı görüyor. Gerçek ffmpeg koşumuyla pimlendi
@@ -366,9 +382,14 @@ Hepsi bu sözleşmenin `owns` kümesi dışında, dokunulmadı:
    anahtarı kaçırıyor. Aynı listedeki `Option not found` ve `Unrecognized option` ise
    ölçüme göre orada atıl (ikisi de çıkış kodu 8 ile geliyor, sonda ayrıca `exitCode == 0`
    şartı koyuyor).
-2. **`SegmentEncoder.cs:176`** — `-loglevel error` kullanıyor; üç kodlayıcının da tanısı
-   uyarı seviyesinde ya da altında basıldığı için önizleme yolu düşürülen ayarı hiç
-   göremiyor. `FfmpegRun.DroppedOptions` bugün o taraf için atıl.
+2. ~~**`SegmentEncoder.cs:176`** — `-loglevel error` kullanıyor; üç kodlayıcının da
+   tanısı uyarı seviyesinde ya da altında basıldığı için önizleme yolu düşürülen ayarı hiç
+   göremiyor. `FfmpegRun.DroppedOptions` bugün o taraf için atıl.~~
+   **Bu borç yanlıştı, T147'de geri çekildi (3 Eylül 2026).** `SegmentEncoder` iki ffmpeg
+   koşuyor; `-loglevel error` yalnız motorun ayarlarını taşımayan kayıpsız kaynak
+   çıkarmasında. Ayarları taşıyan kodlanmış parça `-loglevel` almıyor ve tanıyı basıyor.
+   `DroppedOptions` o taraf için **atıl değil**. Gerçek iş, `SegmentEncoder`in bu alanı
+   okumaması — T147'de kapatıldı.
 3. **`src/VidShrink.App`** — `EncodeResult.DroppedOptions` teslim noktasına kadar geliyor
    ama arayüzde gösterilmiyor; kullanıcı hâlâ uyarı almıyor. Kusurun kullanıcıya dokunan
    yarısı bu borçla kapanır.
