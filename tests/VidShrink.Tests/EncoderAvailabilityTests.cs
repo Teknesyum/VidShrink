@@ -156,4 +156,44 @@ public sealed class EncoderAvailabilityTests
         Assert.Equal(1, makine.YoklamaSayisi("h264_nvenc"));
         Assert.Contains(AdviceCode.EncoderFallback, result.Advice.Notes);
     }
+
+    private const string TekKodlayiciListesi = """
+        Encoders:
+         V..... = Video
+        -------
+         V..... h264_nvenc           NVIDIA NVENC H.264 encoder (codecs: h264)
+        """;
+
+    private static EncoderCapabilities TekKodlayicili()
+        => EncoderCapabilities.Parse(TekKodlayiciListesi, "", "ffmpeg version test\n");
+
+    [Fact]
+    public void WorksAsEncoderOlcemediyleCalismiyoriAyirtEtmiyor()
+    {
+        var caps = TekKodlayicili();
+        caps.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Unmeasured;
+        var olcemedi = caps.WorksAsEncoder("h264_nvenc");
+
+        var caps2 = TekKodlayicili();
+        caps2.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Rejected;
+        var calismiyor = caps2.WorksAsEncoder("h264_nvenc");
+
+        Assert.Equal(olcemedi, calismiyor);
+    }
+
+    [Fact]
+    public void WorksAsEncoderStateOlcemediyleCalismiyoriAyirtEdiyor()
+    {
+        var olcemeyen = TekKodlayicili();
+        olcemeyen.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Unmeasured;
+
+        var calismayan = TekKodlayicili();
+        calismayan.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Rejected;
+
+        Assert.Equal(EncoderProbeState.Unmeasured, olcemeyen.WorksAsEncoderState("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.NotWorking, calismayan.WorksAsEncoderState("h264_nvenc"));
+        Assert.NotEqual(
+            olcemeyen.WorksAsEncoderState("h264_nvenc"),
+            calismayan.WorksAsEncoderState("h264_nvenc"));
+    }
 }

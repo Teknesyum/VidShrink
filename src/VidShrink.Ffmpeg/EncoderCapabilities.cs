@@ -69,6 +69,8 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
 
     public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
 
+    public EncoderProbeState WorksAsEncoderState(string codec) => Probe(codec).State;
+
     /// <summary>
     /// Bilineni okur, süreç doğurmaz. Kodlayıcı ffmpeg'in listesinde yoksa cevap
     /// süreçsiz de kesindir; listede olup henüz yoklanmamış ya da yoklaması sonuca
