@@ -126,11 +126,32 @@ public static class FfmpegArguments
     //
     // The ceiling is what the measurement decides, and it is not a single number either. The
     // ceiling only binds inside a scene longer than itself; below that the scene cut fires
-    // first. So the ceiling is read off the content: KeyframeCeilingSceneFactor x the mean
-    // scene length of the SceneMap, clamped between KeyframeCeilingMinSeconds and
+    // first. So the ceiling is read off the content: the SceneMap's mean scene length divided
+    // by SceneMapMergeFactor, clamped between KeyframeCeilingMinSeconds and
     // KeyframeCeilingMaxSeconds. Without a map the default is HandBrake's 10 s.
     //
-    // OLCUM-BEKLIYOR: bu blogun sayilari T98 kosumundan sonra yazilacak.
+    // SceneMapMergeFactor = 2.8 is the map's under-segmentation, measured against ground truth
+    // by T101: in the 144.2-333.3 s window the source carries 28 real cuts and the map reports
+    // 10, with zero false positives; every one of the 18 missed cuts scored 0.112-0.199, below
+    // SceneMap.DefaultThreshold = 0.2. So the map's mean scene length runs about 2.8x long and
+    // has to be divided down before a ceiling is derived from it. What the map is trusted for
+    // is the range, not the boundaries: the placement is left to the encoder's scene cut, whose
+    // lookahead is independent of the map and finds exactly the cuts the map misses.
+    //
+    // The clamp comes from a ceiling sweep on parca-1-20sn (1920x1080@60 HDR PQ, libx264,
+    // 2-pass, 20 MiB target, VMAF-NEG over the whole clip, same colour space and stream count
+    // on both sides). Delivered size stays inside 0.3% across the whole sweep, so the sweep is
+    // read as quality at equal size:
+    //
+    //   ceiling  2 s -> mean 88.637  p10 85.933  I-frames 13  realized interval 1.539 s
+    //   ceiling  5 s -> mean 88.878  p10 86.641  I-frames  6  realized interval 3.334 s
+    //   ceiling 10 s -> mean 88.951  p10 86.674  I-frames  3  realized interval 6.667 s
+    //   ceiling 20 s -> mean 88.954  p10 86.751  I-frames  3  realized interval 6.667 s
+    //
+    // 5 s already carries 87% of the p10 gain between 2 s and 20 s, which is why the floor of
+    // the clamp is 5 s and not shorter. Above 10 s the ceiling stops binding at all - 10 s and
+    // 20 s produce the same three I-frames at the same places - so 10 s is the ceiling of the
+    // clamp, and it agrees with HandBrake's keyint = 10*fps.
     //
     // Hardware is a different mechanism and gets its own ceiling. NVENC only inserts an I-frame
     // at a scene cut when lookahead is on (ffmpeg -h encoder=hevc_nvenc: "-no-scenecut ... When

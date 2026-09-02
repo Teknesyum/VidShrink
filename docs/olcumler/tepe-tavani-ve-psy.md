@@ -235,3 +235,79 @@ da saf yol ölçmeye çevrilince ilgili ölçü düşüyor.
 `dotnet build VidShrink.sln -c Release`: 0 Uyarı, 0 Hata.
 `dotnet test -c Release --filter "FfmpegArgumentsTests"`: Başarısız 0, Başarılı 37,
 Atlanan 0, Toplam 37. Hiçbir assertion gevşetilmedi, hiçbir test `Skip`e alınmadı.
+
+## T98 — Anahtar kare aralığı
+
+Tarih: 2026-09-02. Ortam: Windows 11, ffmpeg 9.0-full. Ölçüm düzeneği `tools/VidShrink.Ab`
+**değil** — T95'in aleti bu turda `main`de değildi; sayılar sözleşmeye özel bir düzenekten
+(`.calisma/t98/olcum`, `VidShrink.Core` + `VidShrink.Ffmpeg`e bağlı) çıktı ve üç kapı elle
+uygulandı: karşılaştırılan iki tarafın renk uzayı, akış sayısı ve teslim boyutu her satırda
+raporlanıyor. Makine paylaşımlı: ölçüm boyunca beş ajan daha koşuyordu, bu yüzden **süreye
+dayalı hiçbir sayı** (kodlama süresi, atlama gecikmesi) tek başına karar dayanağı sayılmadı.
+
+Kaynaklar `.calisma/kaynak/parca-{1,2,3}.mkv`'nin ilk 20 saniyesinden `-c copy` ile kesilmiş,
+yalnız video akışı taşıyan klipler (1920×1080@60, HDR PQ, `yuv420p10le`, `bt2020nc/smpte2084/bt2020`).
+Ses akışı kesilerek `parca-1` ile `parca-2`/`parca-3` arasındaki akış sayısı farkı kaldırıldı.
+
+### Sabit `-g` yerine aralık
+
+`FfmpegArguments` artık her kodlamaya tek bir `-g` yazmıyor; bir **alt sınır**, bir **üst
+sınır** yazıyor ve I-kareyi nereye koyacağına kodlayıcının sahne kesimi karar veriyor.
+
+| Kodlayıcı | Üretilen |
+|---|---|
+| libx264, libvpx-vp9 | `-g <üst> -keyint_min <alt>` (scenecut varsayılan: açık) |
+| libx265 | `-g <üst> -x265-params keyint=<üst>:min-keyint=<alt>:scenecut=40` |
+| libsvtav1 | `-g <üst> -svtav1-params keyint=<üst>:scd=1` |
+| donanım (nvenc/qsv/amf) | `-g <üst>` |
+
+Alt sınır 1 saniye; HandBrake'in `min-keyint = fps` değeri (`encx264.c:386-391`,
+`encx265.c:188-190`). Üst sınır harita yoksa 10 saniye, yine HandBrake (`keyint = 10*fps`).
+
+### Üst sınır neye bağlı
+
+Üst sınır **sahne haritasından** türüyor: haritanın bildirdiği ortalama sahne uzunluğu
+`SceneMapMergeFactor = 2.8`'e bölünür, sonuç 5–10 saniye arasına kısılır.
+
+**2,8 nereden geliyor.** T101 haritayı yer gerçeğine karşı ölçtü: 144,2–333,3 saniyelik
+pencerede 28 gerçek kesim var, harita 10 sahne bildiriyor, yanlış pozitif yok. Kaçan 18
+kesimin hepsi `SceneMap.DefaultThreshold = 0.2` eleğinin altında (0,112–0,199) kaldı. Yani
+haritanın ortalama sahne uzunluğu sistematik olarak yaklaşık 2,8 kat uzun; üst sınırı ham
+ortalamaya bağlamak tam da kaçırılan kesimlerin üstünden geçmek olurdu. Haritaya güvenilen
+şey **sınırlar değil aralık**: yerleşim kararı kodlayıcının lookahead'inde ve o, haritanın
+kaçırdığı kesimleri buluyor.
+
+**5–10 saniyelik kıskaç nereden geliyor.** `parca-1-20sn` üzerinde üst sınır süpürmesi
+(libx264, 2 geçiş, 20 MiB hedef, VMAF-NEG tüm klipte). Teslim boyutu süpürmenin tamamında
+%0,3 içinde kaldığı için süpürme **eş boyutta kalite** olarak okunuyor:
+
+| Üst sınır | Teslim MiB | Hedef oranı | mean | harmonic | p10 | I-kare | Gerçekleşen aralık |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2 sn | 19,1083 | 0,95541 | 88,6373 | 86,4658 | 85,9327 | 13 | 1,539 sn |
+| 5 sn | 19,0766 | 0,95383 | 88,8782 | 86,6907 | 86,6405 | 6 | 3,334 sn |
+| 10 sn | 19,1347 | 0,95674 | 88,9513 | 86,7729 | 86,6743 | 3 | 6,667 sn |
+| 20 sn | 19,1220 | 0,95610 | 88,9541 | 86,7749 | 86,7507 | 3 | 6,667 sn |
+
+Kapılar: renk `bt2020nc/smpte2084/bt2020` → aynı, akış 1→1, `pix_fmt yuv420p10le` → aynı,
+ölçü 1920×1080, `Comparable=True` (dört satırın dördünde).
+
+Okunan iki şey:
+
+- 2 sn ile 20 sn arasındaki p10 farkının (+0,818) **%87'si 5 saniyede** zaten alınmış
+  (+0,708). Kıskacın alt ucu bu yüzden 5 saniye; daha kısası ölçülen kaybı geri getiriyor.
+- 10 sn ile 20 sn **aynı üç I-kareyi aynı yerlere** koyuyor. Yani 10 saniyenin üstünde üst
+  sınır artık bağlamıyor, karar tümüyle scenecut'a geçiyor. Kıskacın üst ucu bu yüzden 10
+  saniye; büyütmenin ölçülebilir bir karşılığı yok.
+
+Süpürme yalnız `parca-1-20sn` üzerinde tamamlandı. `parca-2` ve `parca-3` için üst sınır
+süpürmesi **ölçülmedi** — makine paylaşımlı olduğu için süpürme kesilip zorunlu üç rejim
+karşılaştırmasına (K3) geçildi.
+
+### Donanım ayrı bir mekanizma
+
+NVENC sahne kesimini yalnız lookahead açıkken uyguluyor (`ffmpeg -h encoder=hevc_nvenc`:
+`-no-scenecut ... When lookahead is enabled`) ve bu proje lookahead açmıyor. Donanımda üst
+sınır bir üst sınır değil, gerçekleşen aralığın kendisi: dosyadaki I-kare sıklığı ve atlama
+bedeli doğrudan o sayı. Bu yüzden donanım üst sınırı içerikten değil atlama bütçesinden
+geliyor ve `HardwareKeyframeCeilingSeconds = 5.0` olarak yazılım varsayılanının altında
+tutuldu. Donanım yolunda sahne haritası üst sınırı **oynatmıyor**.
