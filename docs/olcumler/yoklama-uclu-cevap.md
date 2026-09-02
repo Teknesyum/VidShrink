@@ -297,7 +297,8 @@ Denetçinin M1-M4 ızgarası bozulmadı; bu beş satır onların üstüne geldi.
 
 ## T11 — `baslat-kilidi.md` mutasyon tablosu
 
-`docs/olcumler/baslat-kilidi.md:176`daki `Toplam: 70` satırı T130 zamanına aitti.
+`docs/olcumler/baslat-kilidi.md`deki `Toplam: 70` satırı (tur 1'de `:176`) T130
+zamanına aitti.
 Aynı mutasyon (`answer.Settled = false;`) aynı filtreyle
 (`--filter "PlanCalculatorProbeTests|LanguageTests"`) commit `e7246f0`de yeniden
 koşturuldu: `Başarısız: 8, Başarılı: 68, Atlanan: 0, Toplam: 76`. O satır ve altındaki
@@ -354,8 +355,12 @@ dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --no-build \
 
 Toplam test sayısı: 69
      Geçti: 69
- Toplam süre: 59,4918 Saniye
+ Toplam süre: 1,5813 Dakika
 ```
+
+Koşum dalın ucunda (`b0b571c`), tam derlemeden sonra: `dotnet build VidShrink.sln
+-c Release --no-incremental`. Süre makinede eşzamanlı başka bir ölçüm koştuğu için
+şişkin; sayılar değil süre etkileniyor.
 
 Filtrenin üç kolu `--list-tests` ile tek tek sayıldı — sıfır eşleşmeli ölü kol yok:
 `EncoderAvailabilityTests` 12, `PlanCalculatorTests` 32, `PlanCalculatorProbeTests` 25.
