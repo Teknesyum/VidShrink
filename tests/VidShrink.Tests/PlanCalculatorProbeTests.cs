@@ -575,8 +575,6 @@ public sealed class PlanCalculatorProbeTests
         Assert.Equal(EncoderProbeState.Working, gate.EncoderState(kodlayici));
     }
 
-    // --- T137 tur 2: gecidin girisi, tavan ve durum satiri ---
-
     private const string TekKodlayiciListesi = """
         Encoders:
          V..... = Video
