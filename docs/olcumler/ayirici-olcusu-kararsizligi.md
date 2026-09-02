@@ -20,7 +20,7 @@ Geçici ölçü `Thread.Sleep(60)` ile:
       Actual:   1
 
 Bu, T116'nın CI'da kaydettiği düşüşün **birebir aynısı**: "beklenen 0, gelen 1"
-(`.claude/relay/contracts/done/T116.md:274-275`, koşum `d435ff9`).
+(`.claude/relay/contracts/done/T116.md:275`, koşum `d435ff9`).
 
 İki duraklama değeriyle koşulunca 40 ms → 1 çizim, 60 ms → 2 çizim çıktı; yani
 duraklamanın büyüklüğü çizim sayısını belirliyor. Windows'un uyku çözünürlüğü
@@ -44,7 +44,9 @@ iki tarafını ölçüyor, hangisinin kazandığını geçen süre belirliyor; y
 birbiriyle yarışmıyor ve 50 ms'lik pencere kendi başına haksız değil — çünkü
 karşısındaki bütçe 100 ms.
 
-Boşta çizim açma kararını veren tek yer `ComparisonSurface.cs:217-220`:
+Boşta çizim açma kararını veren tek yer `ComparisonSurface.cs:217-219`. Bu bölümdeki
+bütün satır numaraları **düzeltmeden önceki** duruma, `fcf377f` commit'ine aittir;
+düzeltme satırları kaydırdı.
 
     if (_splitMoved &&
         Stopwatch.GetElapsedTime(_lastPresentTicks) >= Stalled &&
