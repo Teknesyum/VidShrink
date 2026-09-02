@@ -32,6 +32,7 @@ public static class Program
             "sapma" => await DeviationAsync(args),
             "maliyet" => await CostAsync(args),
             "plan" => await PlanAsync(args),
+            "yanlilik" => await BiasAsync(args),
             _ => Unknown(args[0])
         };
     }
@@ -62,6 +63,7 @@ public static class Program
         double Deviation,
         double PlanBias,
         double AppliedCorrection,
+        string CorrectionSource,
         IReadOnlyList<double> Starts,
         IReadOnlyList<double> WindowBppf,
         IReadOnlyList<double> Weights);
@@ -79,10 +81,13 @@ public static class Program
         double Heterogeneity,
         int ProfileSeconds,
         int SceneCuts,
+        IReadOnlyList<double> SceneCutTimes,
         double PacketReadSeconds,
         double SceneScanSeconds,
         double ScanBiasSeconds,
         double ScanBias,
+        double PacketBiasSeconds,
+        double PacketBias,
         int AutoWindowCount,
         IReadOnlyList<double> SecondBits,
         IReadOnlyList<VariantReport> Variants);
@@ -113,7 +118,7 @@ public static class Program
 
     private static string Line(ClipReport report)
     {
-        var today = report.Variants.First(v => v.Name == "bugun-scanpoints");
+        var today = report.Variants.First(v => v.Name == "bugun");
         var best = report.Variants.Where(v => v.Plan != "Fixed").OrderBy(v => Math.Abs(v.Deviation)).First();
         return $"{report.Clip} sure={report.DurationSeconds:0.#} cv={report.Heterogeneity:0.000} " +
                $"nufus-bppf={report.CensusBppf:0.00000} alan-kaymasi={report.WindowDomainOffset:P1} " +
@@ -158,7 +163,7 @@ public static class Program
         cache.Flush();
         var variants = new List<VariantReport>();
 
-        async Task AddAsync(string name, string plan, IReadOnlyList<SampleWindow> windows, double correction)
+        async Task AddAsync(string name, string plan, IReadOnlyList<SampleWindow> windows, double correction, string correctionSource = "yok")
         {
             var snapped = windows.Select(w => w with { Start = Snap(w.Start, w.Length, duration) }).ToList();
             var samples = new List<(long Bytes, long Frames)>(snapped.Count);
@@ -171,17 +176,31 @@ public static class Program
                 name, plan, snapped.Count, snapped.Count > 0 ? snapped[0].Length : 0,
                 snapped.Sum(w => w.Length), corrected,
                 censusBppf > 0 ? corrected / censusBppf - 1.0 : double.NaN,
-                ComplexityProbe.PlanBias(snapped, profile), applied,
+                ComplexityProbe.PlanBias(snapped, profile), applied, correctionSource,
                 snapped.Select(w => w.Start).ToList(),
                 samples.Select(x => Bppf(x, info.Width, info.Height)).ToList(),
                 snapped.Select(w => w.Weight).ToList()));
         }
 
+        var packetBiasWatch = Stopwatch.StartNew();
+        var packetBias = await ComplexityProbe.PacketBiasAsync(info, default);
+        packetBiasWatch.Stop();
+
+        var productionBias = 0.0;
+        var productionSource = "yok";
+        if (ComplexityProfile.IsTrustedBias(scanBias)) { productionBias = scanBias; productionSource = "scan"; }
+        else if (ComplexityProfile.IsTrustedBias(packetBias)) { productionBias = packetBias; productionSource = "paket"; }
+
         var fixedWindows = ComplexityProbe.PlanWindows(SamplingPlan.Fixed, duration);
+        await AddAsync("bugun", "Fixed", fixedWindows, productionBias, productionSource);
         await AddAsync("bugun-duzeltmesiz", "Fixed", fixedWindows, 0.0);
         await AddAsync("bugun-scanpoints", "Fixed", fixedWindows,
-            ComplexityProfile.IsTrustedBias(scanBias) ? scanBias : 0.0);
-        await AddAsync("bugun-paket-orani", "Fixed", fixedWindows, ComplexityProbe.PlanBias(fixedWindows, profile));
+            ComplexityProfile.IsTrustedBias(scanBias) ? scanBias : 0.0,
+            ComplexityProfile.IsTrustedBias(scanBias) ? "scan" : "yok");
+        await AddAsync("bugun-paket", "Fixed", fixedWindows,
+            ComplexityProfile.IsTrustedBias(packetBias) ? packetBias : 0.0,
+            ComplexityProfile.IsTrustedBias(packetBias) ? "paket" : "yok");
+        await AddAsync("bugun-plan-orani", "Fixed", fixedWindows, ComplexityProbe.PlanBias(fixedWindows, profile), "plan-orani");
 
         foreach (var plan in new[] { SamplingPlan.Profile, SamplingPlan.Scene })
         {
@@ -210,9 +229,10 @@ public static class Program
             Path.GetFileNameWithoutExtension(clip), duration, info.Width, info.Height, info.Fps,
             wholeBppf, censusBppf, tiles.Count,
             wholeBppf > 0 ? censusBppf / wholeBppf - 1.0 : double.NaN,
-            cv, profile.Count, cuts.Count,
+            cv, profile.Count, cuts.Count, cuts.ToList(),
             packetWatch.Elapsed.TotalSeconds, sceneWatch.Elapsed.TotalSeconds, scanBiasWatch.Elapsed.TotalSeconds,
-            scanBias, ComplexityProbe.PlanWindowCount(duration, cv), profile, variants);
+            scanBias, packetBiasWatch.Elapsed.TotalSeconds, packetBias,
+            ComplexityProbe.PlanWindowCount(duration, cv), profile, variants);
     }
 
     private static double Snap(double start, double length, double duration)
@@ -347,6 +367,58 @@ public static class Program
             Windows = windows,
             Bias = ComplexityProbe.PlanBias(windows, profile)
         }, Json));
+        return 0;
+    }
+
+    private static async Task<int> BiasAsync(string[] args)
+    {
+        if (args.Length < 2) return Unknown("yanlilik");
+        var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var rows = new List<object>();
+
+        foreach (var clip in clips)
+        {
+            var info = await FfprobeClient.ProbeAsync(clip);
+
+            var scanWatch = Stopwatch.StartNew();
+            var scanBias = await ComplexityProbe.ScanBiasAsync(info, SpeedMode.Quality, default);
+            scanWatch.Stop();
+
+            var packetWatch = Stopwatch.StartNew();
+            var packetBias = await ComplexityProbe.PacketBiasAsync(info, default);
+            packetWatch.Stop();
+
+            var source = ComplexityProfile.IsTrustedBias(scanBias) ? "scan"
+                : ComplexityProfile.IsTrustedBias(packetBias) ? "paket" : "yok";
+
+            var row = new
+            {
+                Clip = Path.GetFileNameWithoutExtension(clip),
+                info.DurationSeconds,
+                info.Width,
+                info.Height,
+                ScanBias = scanBias,
+                ScanTrusted = ComplexityProfile.IsTrustedBias(scanBias),
+                ScanPointCalls = ComplexityProbe.ScanPoints(info.DurationSeconds).Count,
+                ScanSeconds = scanWatch.Elapsed.TotalSeconds,
+                PacketBias = packetBias,
+                PacketTrusted = ComplexityProfile.IsTrustedBias(packetBias),
+                PacketSeconds = packetWatch.Elapsed.TotalSeconds,
+                AppliedSource = source
+            };
+            rows.Add(row);
+            Console.WriteLine($"{row.Clip} sure={row.DurationSeconds:0.#} scan={scanBias:0.0000}({(row.ScanTrusted ? "guvenilir" : "disarida")}) " +
+                              $"paket={packetBias:0.0000}({(row.PacketTrusted ? "guvenilir" : "disarida")}) uygulanan={source} " +
+                              $"scan-sure={row.ScanSeconds:0.0}sn paket-sure={row.PacketSeconds:0.0}sn");
+        }
+
+        var outPath = Option(args, "--out");
+        if (!string.IsNullOrWhiteSpace(outPath))
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath)) ?? ".");
+            await File.WriteAllTextAsync(outPath, JsonSerializer.Serialize(rows, Json));
+            Console.WriteLine($"yazildi: {outPath}");
+        }
         return 0;
     }
 

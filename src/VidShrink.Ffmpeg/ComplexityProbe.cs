@@ -33,6 +33,7 @@ public static class ComplexityProbe
     internal const double SamplingTargetError = 0.05;
     internal const double SamplingErrorScale = 1.0;
     internal const double SamplingErrorDecay = 1.0;
+    internal const SamplingPlan ProductionPlan = SamplingPlan.Profile;
     private const int MinProfileSeconds = 4;
 
     private const double ScanPointSeconds = 1.0;
@@ -77,7 +78,9 @@ public static class ComplexityProbe
             var canProbeHalf = halfWidth >= 64 && halfHeight >= 64;
             var preset = speed == SpeedMode.Fast ? FastProbePreset : ComplexityProfile.ProbePreset;
 
-            var windows = Windows(info.DurationSeconds).ToArray();
+            var secondBits = await SecondProfileAsync(info, ct);
+            var plan = PlanWindows(ProductionPlan, info.DurationSeconds, secondBits.Count >= MinProfileSeconds ? secondBits : null);
+            var windows = plan.Select(w => w.Start).ToArray();
             var motionIndex = windows.Length / 2;
             var motionTask = MotionSampleAsync(info, windows, motionIndex, preset, speed, ct);
 
@@ -87,26 +90,34 @@ public static class ComplexityProbe
             var windowSamples = await Task.WhenAll(pending);
             var motion = await motionTask;
 
-            foreach (var sample in windowSamples)
+            var fullPixels = (double)info.Width * info.Height;
+            var halfPixels = (double)halfWidth * halfHeight;
+            double fullWeighted = 0, fullWeight = 0, halfWeighted = 0, halfWeight = 0;
+
+            for (var i = 0; i < windowSamples.Length; i++)
             {
+                var sample = windowSamples[i];
+                var weight = i < plan.Count && plan[i].Weight > 0 ? plan[i].Weight : 1.0;
                 if (sample.Quality is { Comparable: true, VmafNegMean: not null } quality) qualities.Add(quality);
                 if (sample.FullFrames <= 0) continue;
                 fullBytes += sample.FullBytes;
                 fullFrames += sample.FullFrames;
-                sampled += WindowSeconds;
+                sampled += i < plan.Count ? plan[i].Length : WindowSeconds;
+                fullWeighted += weight * (sample.FullBytes * 8.0 / (fullPixels * sample.FullFrames));
+                fullWeight += weight;
 
-                if (sample.HalfFrames <= 0) continue;
+                if (sample.HalfFrames <= 0 || halfPixels <= 0) continue;
                 halfBytes += sample.HalfBytes;
                 halfFrames += sample.HalfFrames;
+                halfWeighted += weight * (sample.HalfBytes * 8.0 / (halfPixels * sample.HalfFrames));
+                halfWeight += weight;
             }
 
-            if (fullFrames <= 0 || fullBytes <= 0)
+            if (fullFrames <= 0 || fullBytes <= 0 || fullWeight <= 0)
                 return new ProbeResult(ComplexityProfile.FromSourceBitrate(info), qualities);
 
-            var fullBppf = fullBytes * 8.0 / ((double)info.Width * info.Height * fullFrames);
-            var halfBppf = halfFrames > 0 && halfBytes > 0
-                ? halfBytes * 8.0 / ((double)halfWidth * halfHeight * halfFrames)
-                : 0.0;
+            var fullBppf = fullWeighted / fullWeight;
+            var halfBppf = halfWeight > 0 && halfBytes > 0 ? halfWeighted / halfWeight : 0.0;
 
             var halfFpsBppf = MotionBppf(fullBppf, motion, windowSamples, motionIndex);
 
@@ -568,6 +579,24 @@ public static class ComplexityProbe
         if (ComplexityProfile.IsTrustedBias(packet)) return (packet, WindowBiasSource.Packets);
 
         return (0.0, WindowBiasSource.None);
+    }
+
+    internal static async Task<IReadOnlyList<double>> SecondProfileAsync(MediaInfo info, CancellationToken ct)
+    {
+        try
+        {
+            var packets = await ReadPacketsAsync(info.FilePath, Array.Empty<(double Start, double Length)>(), ct);
+            var profile = SecondProfile(packets, info.DurationSeconds);
+            return profile.Length >= MinProfileSeconds ? profile : Array.Empty<double>();
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            return Array.Empty<double>();
+        }
     }
 
     public static async Task<double> ScanBiasAsync(MediaInfo info, SpeedMode speed, CancellationToken ct)
