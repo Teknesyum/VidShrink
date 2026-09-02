@@ -40,8 +40,10 @@ kaynakta plana başka hiçbir yerden girmiyor.
 **Üretim yolu sahne haritasını kullanmıyor — ölçüldü.** T98 tavanı sahne
 haritasından çıkarıp 5-10 s'ye kelepçeliyor (`FfmpegArguments.KeyframeCeilingSeconds`).
 Ama kodlayan yol (`EncodeRunner.EncodeArguments` → `FfmpegArguments.Build`)
-`scenes` parametresini **hiç vermiyor**; `FfmpegArguments.Build`'i harita ile
-çağıran tek yer `src/VidShrink.App/MainWindow.axaml.cs:1807`. Harita yokken tavan
+`scenes` parametresini **hiç vermiyor**; `src/` ve `tools/` altında
+`FfmpegArguments.Build`'e `SceneMap` geçiren **hiçbir** çağıran yok
+(`src/VidShrink.Core/FfmpegArguments.cs:297`, yedinci parametre, her yerde
+varsayılan `null`). Harita yokken tavan
 varsayılan 10 s'de kalıyor, 60 fps'te **600 kare**. Yani bu kaynakta ölçülen
 `-g 600` haritadan gelmiş bir sayı değil, haritasız varsayılan. Bu bir kusur
 tespitidir; düzeltmek bu sözleşmenin işi değil.
