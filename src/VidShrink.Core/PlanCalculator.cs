@@ -34,6 +34,15 @@ public readonly record struct FillBand(double LowerMb, double HardFloorMb, doubl
 
 public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice);
 
+public readonly record struct LayoutScoreParts(
+    double Required,
+    double Provided,
+    double Rate,
+    double ScalePenalty,
+    double FpsPenalty,
+    double Hysteresis,
+    double Score);
+
 public enum QualityTargetBound { Matched, AboveSourceCeiling, BelowFloor }
 
 public sealed record QualityTargetResult(
@@ -310,6 +319,27 @@ public static class PlanCalculator
             AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
         }
 
+        if (best.MeetsFloor && plan.ModeEnum == EncodeMode.TwoPass)
+        {
+            var floorBppf = complexity.FloorBppf(codec, best.Fps, info.Fps);
+            var floorK = (int)Math.Ceiling(VideoBitrateK(floorBppf, best.Width, best.Height, best.Fps));
+            var deliverK = Math.Max(floorK, CodecModel.UsableBitrateK(codec, best.Width, best.Height, best.Fps));
+            if (plan.VideoBitrateK < deliverK)
+            {
+                var liftedMb = SizeMb(deliverK, audioK, info.DurationSeconds);
+                if (liftedMb <= effectiveTargetMb)
+                {
+                    reason.Add($"the search cleared {best.Width}x{best.Height}@{best.Fps:0.##} against the {floorBppf:0.0000} bits per pixel per frame floor, but the whole-kbit bitrate rounded to {plan.VideoBitrateK}k and landed under it, so it was raised to {deliverK}k, still inside the {effectiveTargetMb:0.##} MB target");
+                    plan.VideoBitrateK = deliverK;
+                }
+                else
+                {
+                    notes.Add(AdviceCode.TargetBelowCodecFloor);
+                    reason.Add($"the whole-kbit bitrate for {best.Width}x{best.Height}@{best.Fps:0.##} rounds to {plan.VideoBitrateK}k, under the {deliverK}k the {floorBppf:0.0000} bits per pixel per frame floor needs, and raising it to {deliverK}k would deliver {liftedMb:0.##} MB against a {effectiveTargetMb:0.##} MB target; the target wins and the plan runs under the floor");
+                }
+            }
+        }
+
         reason.Add($"predicted quality {best.Score:0.#}/100{(complexity.Measured ? $" from a measured sample (bppf {complexity.ReferenceBppf:0.0000}, detail falloff {complexity.DetailExponent:0.00})" : " estimated from the source bitrate")}");
         reasonCodes.Add(complexity.Measured
             ? new ReasonNote(ReasonCode.PredictedQualityMeasured, Score: best.Score, Bppf: complexity.ReferenceBppf, DetailExponent: complexity.DetailExponent)
@@ -427,7 +457,7 @@ public static class PlanCalculator
     // worst case. 1% steps would cost half that and answer 1,002x; the cheaper grid was not
     // taken because K5 asks for expensive and right over cheap and wrong.
     // ScanResolutionIsChosenByConvergence in QualityTargetTests is that measurement.
-    private const double QualityScanStep = 1.005;
+    public const double QualityScanStep = 1.005;
     private const int QualityBisectionMaxSteps = 4;
     private const int QualityBracketEvaluations = 2;
     public const int QualitySearchMaxEvaluations = 1400;
@@ -616,12 +646,30 @@ public static class PlanCalculator
     }
 
     private static double LayoutScore(ComplexityProfile complexity, string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
+        => Decompose(complexity, codec, required, provided, scale, fps, sourceFps, regime).Score;
+
+    private static LayoutScoreParts Decompose(ComplexityProfile complexity, string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
     {
         var weights = CompressionStrategy.PenaltyWeights(regime);
         var level = complexity.Level;
-        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
+        var onSourceGrid = !CodecModel.IsHardware(codec);
+        var rateRequired = onSourceGrid ? required / Math.Max(complexity.ScaleFactor(scale), 1e-9) : required;
+        var rateProvided = onSourceGrid ? provided * scale * scale : provided;
+        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(rateRequired, 1e-9) / Math.Max(rateProvided, 1e-9));
         rate = Math.Min(rate, CodecModel.QualityLimit(codec));
-        return rate - ScalePenalty(scale, weights) - FpsPenalty(fps, sourceFps, weights);
+        var scalePenalty = ScalePenalty(scale, weights);
+        var fpsPenalty = FpsPenalty(fps, sourceFps, weights);
+        return new LayoutScoreParts(required, provided, rate, scalePenalty, fpsPenalty, 0, rate - scalePenalty - fpsPenalty);
+    }
+
+    public static LayoutScoreParts ScoreLayout(ComplexityProfile complexity, string codec, double videoK, int width, int height, double fps, double sourceFps, int sourceHeight, CompressionRegime regime)
+    {
+        var scale = (double)height / Math.Max(1, sourceHeight);
+        var required = complexity.RequiredBppf(codec, scale, fps, sourceFps);
+        var provided = BitsPerPixel(videoK, width, height, fps);
+        var parts = Decompose(complexity, codec, required, provided, scale, fps, sourceFps, regime);
+        var hysteresis = complexity.AppliesTo(codec, scale, fps) ? CalibratedShapeHysteresis : 0;
+        return parts with { Hysteresis = hysteresis, Score = parts.Score + hysteresis };
     }
 
     private static (Layout Best, bool SourceFpsViable) SearchLayout(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, double videoK, CompressionRegime regime)

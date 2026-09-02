@@ -270,53 +270,61 @@ public sealed class SpeedModeTests
     }
 
     /// <summary>
-    /// Altın parmak izi: hız kipi Quality'de bugünün planları. Liste T99 turu 2'de
-    /// yenilendi, on sekiz satırın <b>on ikisi</b> değişti. Değişimin tamamı tek sabitten
-    /// geliyor: <c>ComplexityProfile.DefaultMotionExponent</c> 0,25'ten 0,871'e çıktı
-    /// (T89'un ölçtüğü on üç noktanın hepsi 0,25'in üstündeydi). 0,25'te kare hızını
-    /// yarıya indirmek bitlerin %40,5'ini kurtarıyor gibi görünüyordu; ölçülen 0,871'de
-    /// kurtardığı %8,6, yani kare hızı kesmek artık yer açmıyor ve arama kesmiyor.
-    /// Taban değişikliği (av1 0,020 -> 0,0095, donanım çarpanı 1,25 -> 1,52) bu listede
-    /// <b>tek satır</b> bile oynatmadı; ikisi ayrı ayrı geri alınıp ölçüldü.
+    /// Altın parmak izi: hız kipi Quality'de bugünün planları. Liste T107'de yenilendi,
+    /// on sekiz satırın <b>on sekizi de</b> değişti. Sebep tek: yerleşim skorunun
+    /// <c>rate</c> yarısı yazılım kodlayıcısında kaynak ızgarasında hesaplanıyor
+    /// (<c>PlanCalculator.Decompose</c>), yani sabit bit hızında çözünürlük düşürmek
+    /// artık kredi kazandırmıyor. Bu listedeki on sekiz satırın hepsi yazılım
+    /// kodlayıcısı (libx264 / libsvtav1), o yüzden hepsi kolun bu tarafında.
+    /// Donanım kolunda eski davranış duruyor ve bu ayrım
+    /// <c>PlanCalculatorTests.TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp</c>
+    /// ile iki yönlü pimli.
     ///
-    /// <para>Değişen satırlar, hepsi kare hızının kaynakta (30) kalması yönünde:</para>
+    /// <para>Sayılar elle seçilmedi; on sekizi de bu düzeneğin kendi çıktısıdır
+    /// (<c>.calisma/T107/hizkipi-liste.txt</c>). Ölçtüğü değişiklik
+    /// <c>docs/olcumler/yerlesim-skoru.md</c>'de: yazılım kolunda ters çift oranı
+    /// A 29/78 -> 19/78, B 57/78 -> 4/78, sınanmamış C 18/28 -> 6/28.</para>
+    ///
+    /// <para>Değişimin iki ekseni var:</para>
     /// <list type="bullet">
-    /// <item>Compatible|25 (iki satır): 806x454@20 -> 806x454@30</item>
-    /// <item>Compatible|8 (iki satır): 576x324@6 -> 576x324@30</item>
-    /// <item>MaxCompression|25 (iki satır): 806x454@20 -> 806x454@30</item>
-    /// <item>MaxCompression|8|FillTarget: 614x346@6 -> 576x324@30</item>
-    /// <item>MaxCompression|8|QualityCeiling: crf 32 / 433k / 614x346@6 -> 2pass / 470k / 576x324@30</item>
-    /// <item>Auto|25 (iki satır): 806x454@20 -> 806x454@30</item>
-    /// <item>Auto|8|FillTarget: 614x346@6 -> 576x324@30</item>
-    /// <item>Auto|8|QualityCeiling: crf 32 / 433k / 614x346@6 -> 2pass / 470k / 576x324@30</item>
+    /// <item><b>Çözünürlük, on sekiz satırın on sekizinde de yükseldi.</b> 180 MB'ta
+    /// 1190x670 ve 1498x842 -> 1920x1080; 25 MB'ta 806x454 -> 1612x906 (libx264) ve
+    /// 1920x1080 (libsvtav1); 8 MB'ta 576x324 -> 882x496 (libx264) ve 1690x950
+    /// (libsvtav1).</item>
+    /// <item><b>Üç satır CRF'ten iki geçişe döndü:</b> 180 MB QualityCeiling'in üçü de
+    /// (Compatible crf 20 / 11958k, MaxCompression crf 32 / 11798k, Auto crf 20 /
+    /// 11958k) artık 2pass / 12217k. Yerel çözünürlükte bütçe şeffaflık tavanının
+    /// altında kalıyor, o yüzden CRF kipi devreye girmiyor.</item>
     /// </list>
     ///
-    /// <para>Değişmeyen altı satır 180 MB hedefinin hepsi: o bütçede zaten kare hızı
-    /// kesilmiyordu.</para>
+    /// <para>Değişmeyen: kodlayıcı seçimi on sekiz satırın on sekizinde de aynı, kare
+    /// hızı on sekizinde de kaynakta (30) — T99 turu 2'nin
+    /// <c>DefaultMotionExponent</c> düzeltmesiyle oturan hâl bozulmadı. Ses bit hızı
+    /// ve video bit hızı da değişmedi; bu sözleşme hiçbir sabite dokunmadı.</para>
     /// </summary>
     [Fact]
     public void QualityModeLeavesTodaysPlansUntouched()
     {
         var expected = new[]
         {
-            "Compatible|180|FillTarget|libx264|2pass||12217|128|1190x670@30|slow",
-            "Compatible|180|QualityCeiling|libx264|crf|20|11958|128|1190x670@30|slow",
-            "Compatible|25|FillTarget|libx264|2pass||1567|128|806x454@30|slow",
-            "Compatible|25|QualityCeiling|libx264|2pass||1567|128|806x454@30|slow",
-            "Compatible|8|FillTarget|libx264|2pass||470|64|576x324@30|slow",
-            "Compatible|8|QualityCeiling|libx264|2pass||470|64|576x324@30|slow",
-            "MaxCompression|180|FillTarget|libsvtav1|2pass||12217|128|1498x842@30|6",
-            "MaxCompression|180|QualityCeiling|libsvtav1|crf|32|11798|128|1498x842@30|6",
-            "MaxCompression|25|FillTarget|libsvtav1|2pass||1567|128|806x454@30|6",
-            "MaxCompression|25|QualityCeiling|libsvtav1|2pass||1567|128|806x454@30|6",
-            "MaxCompression|8|FillTarget|libsvtav1|2pass||470|64|576x324@30|6",
-            "MaxCompression|8|QualityCeiling|libsvtav1|2pass||470|64|576x324@30|6",
-            "Auto|180|FillTarget|libx264|2pass||12217|128|1190x670@30|slow",
-            "Auto|180|QualityCeiling|libx264|crf|20|11958|128|1190x670@30|slow",
-            "Auto|25|FillTarget|libsvtav1|2pass||1567|128|806x454@30|6",
-            "Auto|25|QualityCeiling|libsvtav1|2pass||1567|128|806x454@30|6",
-            "Auto|8|FillTarget|libsvtav1|2pass||470|64|576x324@30|6",
-            "Auto|8|QualityCeiling|libsvtav1|2pass||470|64|576x324@30|6"
+            "Compatible|180|FillTarget|libx264|2pass||12217|128|1920x1080@30|slow",
+            "Compatible|180|QualityCeiling|libx264|2pass||12217|128|1920x1080@30|slow",
+            "Compatible|25|FillTarget|libx264|2pass||1567|128|1612x906@30|slow",
+            "Compatible|25|QualityCeiling|libx264|2pass||1567|128|1612x906@30|slow",
+            "Compatible|8|FillTarget|libx264|2pass||470|64|882x496@30|slow",
+            "Compatible|8|QualityCeiling|libx264|2pass||470|64|882x496@30|slow",
+            "MaxCompression|180|FillTarget|libsvtav1|2pass||12217|128|1920x1080@30|6",
+            "MaxCompression|180|QualityCeiling|libsvtav1|2pass||12217|128|1920x1080@30|6",
+            "MaxCompression|25|FillTarget|libsvtav1|2pass||1567|128|1920x1080@30|6",
+            "MaxCompression|25|QualityCeiling|libsvtav1|2pass||1567|128|1920x1080@30|6",
+            "MaxCompression|8|FillTarget|libsvtav1|2pass||470|64|1690x950@30|6",
+            "MaxCompression|8|QualityCeiling|libsvtav1|2pass||470|64|1690x950@30|6",
+            "Auto|180|FillTarget|libx264|2pass||12217|128|1920x1080@30|slow",
+            "Auto|180|QualityCeiling|libx264|2pass||12217|128|1920x1080@30|slow",
+            "Auto|25|FillTarget|libsvtav1|2pass||1567|128|1920x1080@30|6",
+            "Auto|25|QualityCeiling|libsvtav1|2pass||1567|128|1920x1080@30|6",
+            "Auto|8|FillTarget|libsvtav1|2pass||470|64|1690x950@30|6",
+            "Auto|8|QualityCeiling|libsvtav1|2pass||470|64|1690x950@30|6"
         };
 
         var actual = new List<string>();
