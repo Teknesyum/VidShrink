@@ -563,4 +563,59 @@ public sealed class ComplexityProbeTests
             Assert.Equal(0, pencere.HalfFrames);
         }, NormalKaynak);
     }
+
+    private static readonly (int Width, int Height) GecerliYarim = (160, 120);
+
+    [FfmpegFact]
+    public async Task AyniPencereHizliYoldaOlculuyorYarimYokKolundaOlculmuyor()
+    {
+        await WithClipAsync(async info =>
+        {
+            var hizliOlcer = new FakeMeter(true);
+            var hizli = await ComplexityProbe.SampleWindowAsync(
+                info.FilePath, 1.0, GecerliYarim, "veryfast", SpeedMode.Quality, hizliOlcer, default);
+
+            var yarimYokOlcer = new FakeMeter(true);
+            var yarimYok = await ComplexityProbe.SampleWindowAsync(
+                info.FilePath, 1.0, null, "veryfast", SpeedMode.Quality, yarimYokOlcer, default);
+
+            Assert.NotNull(hizli.Quality);
+            Assert.True(yarimYok.FullFrames > 0, "yarim yok kolu pencereyi uretti, yani profile giriyor");
+            Assert.NotNull(yarimYok.Quality);
+        }, NormalKaynak);
+    }
+
+    [FfmpegFact]
+    public async Task AyniPencereHizliYoldaOlculuyorYedekYoldaOlculmuyor()
+    {
+        await WithClipAsync(async info =>
+        {
+            var hizliOlcer = new FakeMeter(true);
+            var hizli = await ComplexityProbe.SampleWindowAsync(
+                info.FilePath, 1.0, GecerliYarim, "veryfast", SpeedMode.Quality, hizliOlcer, default);
+
+            var yedekOlcer = new FakeMeter(true);
+            var yedek = await ComplexityProbe.SampleWindowAsync(
+                info.FilePath, 1.0, BolunemeyenYarim, "veryfast", SpeedMode.Quality, yedekOlcer, default);
+
+            Assert.NotNull(hizli.Quality);
+            Assert.True(yedek.FullFrames > 0, "yedek yol pencereyi uretti, yani profile giriyor");
+            Assert.NotNull(yedek.Quality);
+        }, NormalKaynak);
+    }
+
+    [FfmpegFact]
+    public async Task KucukKaynakOlcerVarkenNormalKaynakKadarKaliteUretiyor()
+    {
+        var kucukOlcer = new FakeMeter(true);
+        var normalOlcer = new FakeMeter(true);
+
+        await WithClipAsync(async info =>
+            await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, kucukOlcer), KucukKaynak);
+        await WithClipAsync(async info =>
+            await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, normalOlcer), NormalKaynak);
+
+        Assert.True(normalOlcer.Calls > 0, "normal kaynak da olcmedi, olcu girdiyi ayirt etmiyor");
+        Assert.Equal(normalOlcer.Calls, kucukOlcer.Calls);
+    }
 }
