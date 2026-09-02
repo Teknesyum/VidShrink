@@ -4,22 +4,15 @@ using VidShrink.Core;
 
 namespace VidShrink.SahneButcesi;
 
-/// Dagitim kurali adayi. Uretim kodunda degil, olcum duzeneginde durur:
-/// K2 kapisi acilmadan bu kural koda girmez.
 public static class Butce
 {
     public const double ZoneFloor = 0.25;
     public const double ZoneCeiling = 4.0;
 
-    /// x264/x265 iki gecis hiz denetimi bitleri karmasikliga <c>qcomp</c> ussuyle dagitir
-    /// (varsayilan 0,60). Harita tam oranli dagitim onerir (us 1,0). Aradaki fark
-    /// 1 - qcomp; zone carpani bu farki kapatir. Telafi sabiti degil, kodlayicinin
-    /// belgelenmis ussuyle haritanin onerisi arasindaki fark.
     public const double DefaultQcomp = 0.60;
 
     public static double Gamma(double qcomp) => 1.0 - qcomp;
 
-    /// Sahne basina bit payi: <c>Scene.Bits</c> / toplam. Sondanin onerisi.
     public static double[] HaritaPaylari(SceneMap map)
     {
         ArgumentNullException.ThrowIfNull(map);
@@ -28,7 +21,6 @@ public static class Butce
         return map.Scenes.Select(s => s.Bits / total).ToArray();
     }
 
-    /// Zaman payi: sahne suresi / toplam sure.
     public static double[] ZamanPaylari(SceneMap map)
     {
         ArgumentNullException.ThrowIfNull(map);
@@ -37,8 +29,6 @@ public static class Butce
         return map.Scenes.Select(s => s.Duration / total).ToArray();
     }
 
-    /// Zone carpanlari: Complexity^gamma, sure agirlikli ortalamasi 1,0'a normalize.
-    /// Normalizasyon K6'nin sarti: dagitim bitleri yeniden bolusturur, toplami degistirmez.
     public static double[] ZoneCarpanlari(SceneMap map, double gamma)
     {
         ArgumentNullException.ThrowIfNull(map);
@@ -64,7 +54,6 @@ public static class Butce
         return result;
     }
 
-    /// x264/x265 <c>zones=</c> dizgesi. Kare numaralari sahne sinirlarindan cikar.
     public static string ZonesArg(SceneMap map, double[] factors, double fps)
     {
         ArgumentNullException.ThrowIfNull(map);
@@ -87,7 +76,6 @@ public static class Butce
         return string.Join('/', parts);
     }
 
-    /// Bozuk harita: her n'inci kesim atilir (eksik kesim).
     public static SceneMap KesimDusur(SceneMap map, int every)
     {
         ArgumentNullException.ThrowIfNull(map);
@@ -99,7 +87,6 @@ public static class Butce
         return YenidenBolustur(map, bounds);
     }
 
-    /// Bozuk harita: her sahne ortasindan ikiye bolunur (fazla kesim).
     public static SceneMap KesimEkle(SceneMap map)
     {
         ArgumentNullException.ThrowIfNull(map);
@@ -113,8 +100,6 @@ public static class Butce
         return YenidenBolustur(map, bounds.Distinct().OrderBy(b => b).ToList());
     }
 
-    /// Yeni sinirlara gore bitleri yeniden dagitir. Kaynak haritanin sahne ici bit
-    /// yogunlugu duz kabul edilir; sahne parcalandiginda bit sureyle bolunur.
     private static SceneMap YenidenBolustur(SceneMap map, IReadOnlyList<double> bounds)
     {
         var scenes = new List<Scene>(bounds.Count - 1);
@@ -167,7 +152,6 @@ public static class Butce
         return sum / a.Count;
     }
 
-    /// Referanstan sapmasi zit isaretli olan sahnelerin sayisi.
     public static int TersDusenler(
         IReadOnlyList<double> reference,
         IReadOnlyList<double> first,

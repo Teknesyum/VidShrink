@@ -52,10 +52,6 @@ public static class Program
     public const double HedefMb = 60.0;
     public const int Threads = 8;
 
-    /// Uretimdeki iki yazilim kolu: MaxCompression varsayilani libsvtav1, Compatible libx264.
-    /// MaxCompression'in yedek kodlayicisi: libsvtav1 yokmus gibi davranan sarmalayici.
-    /// K4 libsvtav1'in zones'u sessizce yok saydigini gosterdi; sikistirma ailesinde
-    /// zone denenebilen tek kodlayici bu yoldan cikiyor.
     private sealed class SvtavYok(IEncoderAvailability ic) : IEncoderAvailability
     {
         public bool HasEncoder(string name)
@@ -195,8 +191,6 @@ public static class Program
         return (plan, info);
     }
 
-    /// Is parcacigini sabitleyen kodlayici parametresi. Kodlayici basina farkli;
-    /// yanlis bayrak ffmpeg tarafindan sessizce atilir ve pinleme kaybolur.
     public static string[] IsParcacigiArgs(string codec) => codec.ToLowerInvariant() switch
     {
         var c when c.Contains("x265", StringComparison.Ordinal)
@@ -226,6 +220,19 @@ public static class Program
         Console.WriteLine($"{p.Ad}: plan {plan.Codec} {plan.Mode} {plan.VideoBitrateK}k {plan.Width}x{plan.Height}@{Kabuk.Inv(plan.Fps, "0.##")} preset={plan.Preset}");
 
         var bilinmiyor = new List<string>();
+
+        if (plan.ModeEnum == EncodeMode.PassThrough)
+        {
+            bilinmiyor.Add($"plan passthrough ({plan.Codec}); kodlama yok, sahneye bit dagitilmiyor");
+            var bos = new double[map.Scenes.Count];
+            var bosKayit = new K1Kaydi(
+                p.Ad,
+                new PlanKaydi(plan.Codec, plan.Mode, plan.VideoBitrateK, plan.Crf, plan.Width, plan.Height, plan.Fps, plan.Preset, plan.PixelFormat, HedefMb),
+                ReferansCrf, 0, 0, bos, bos, Butce.HaritaPaylari(map), bilinmiyor);
+            await File.WriteAllTextAsync(hedef, JsonSerializer.Serialize(bosKayit, Json));
+            Console.WriteLine($"{Kol}/{p.Ad}: bilinmiyor — {bilinmiyor[0]}");
+            return;
+        }
 
         var refBits = new long[map.Scenes.Count];
         var refDir = Path.Combine(Is, "referans", $"{Kol}-{p.Ad}");
@@ -360,12 +367,6 @@ public static class Program
         return time >= map.Duration ? map.Scenes.Count - 1 : -1;
     }
 
-    /// Aday x kodlayici izgarasi. Cikis kodunun sifir olmasi destek demek degil:
-    /// SVT-AV1 ve x264/x265 parametre ayristiricilari tanimadiklari anahtari
-    /// uyariyla gecer. Bu yuzden her hucre **iki farkli degerle** kodlanir ve
-    /// ciktilarin baytlari karsilastirilir. Ayni cikti = parametre yok sayildi.
-    /// Hucre: kodlayicinin params bayragina eklenecek anahtar=deger cifti. nvenc'te
-    /// ayri bayraklar kullanilir; orada <c>Ham</c> dolu olur.
     public sealed record K4Hucre(string Codec, string Aday, string A, string B, string[]? HamA = null, string[]? HamB = null);
 
     public static readonly K4Hucre[] K4Izgarasi =
@@ -465,9 +466,11 @@ public static class Program
         var harita = await HaritaAsync(p);
         var map = Map(harita);
         var (plan, info) = await PlanAsync(p);
-        if (ZonesFlag(plan.Codec) is null)
+        if (ZonesFlag(plan.Codec) is null || plan.ModeEnum == EncodeMode.PassThrough)
         {
-            var not = $"{plan.Codec} zones desteklemiyor; {asama} bu kolda kosulamaz.";
+            var not = plan.ModeEnum == EncodeMode.PassThrough
+                ? $"plan passthrough ({plan.Codec}); kodlama yok, {asama} bu kolda kosulamaz."
+                : $"{plan.Codec} zones desteklemiyor; {asama} bu kolda kosulamaz.";
             await File.WriteAllTextAsync(hedef, JsonSerializer.Serialize(new[]
             {
                 new OlcumKaydi(p.Ad, "yok", 0, HedefMb, 0, 0, false, null, null, null, null, not)

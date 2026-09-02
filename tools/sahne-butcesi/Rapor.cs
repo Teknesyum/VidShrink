@@ -5,9 +5,6 @@ using VidShrink.Core;
 
 namespace VidShrink.SahneButcesi;
 
-/// Raporu tumuyle olculen dosyalardan uretir. Bu projenin on sekiz kez tekrarlayan
-/// kusuru "tablo dogru, onu ozetleyen cumle yanlis"tir; buradaki her sayi ve her
-/// karar sozcugu hesaplanir, elle yazilmaz.
 public static class Rapor
 {
     public static void Uret(string isKok, string ciktiYolu, JsonSerializerOptions json)
