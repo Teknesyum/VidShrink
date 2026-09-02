@@ -535,8 +535,9 @@ satır T115'in.
 | `HardwareEncoderFact` sonrası | 18 | 1181 | koşum `33591434219` (`58e2d45`) |
 | `QuietMachineFact` sonrası | **19** | **1182** | koşum `33595878496` (`297ba7b`) |
 | satır 450 düzeltmesinden sonra | **19** | **1182** | koşum `33599862478` (`45ca92c`) |
+| assert geri çekildikten sonra | **19** | **1182** | koşum `33602685158` (`9f25f08`) |
 
-Kapı çıktısı, dalın son koşumu (`45ca92c`, 18 dk 11 sn):
+Kapı çıktısı, dalın son koşumu (`9f25f08`, 15 dk 54 sn):
 `KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=1182 alt-sınır=1134 atlanan=19 ust-sinir=30`
 (`Failed: 0, Passed: 1163, Skipped: 19, Total: 1182`)
 
