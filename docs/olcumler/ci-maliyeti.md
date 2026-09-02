@@ -62,3 +62,11 @@ cikti, siniflandirma tutarli.
 
 (Degisiklik sonrasi doldurulacak.)
 K2 adim 1 kaniti: bu commit, yukaridaki kosumu iptal etmeli.
+### K2 adim 1 kaniti (varsayilan cancel-in-progress)
+
+`c356f4f` itildi -> kosum `33602997828` `in_progress`e girdi. Hemen ardindan
+`2b5ef68` itildi -> `33602997828` `cancelled` oldu (durum `completed`,
+sonuc `cancelled`), yeni kosum `33603041850` `in_progress`e gecti.
+Ayni dala arka arkaya itilen commit'lerde yalniz sonuncusu kosuyor,
+dogrulandi.
+
