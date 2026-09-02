@@ -1,0 +1,14 @@
+{
+  "contractId": "T112",
+  "auditorRunId": "a3e8eea6f47ab532d",
+  "headSha": "4d8549e8e4d346212801396851db69bb649183b9",
+  "diffHash": "26dd0181676881aebf889fb68f451abf081b53794d969a9e6b42723705c747a9",
+  "owns": [
+    "docs/inceleme/handbrake-motoru.md"
+  ],
+  "verification": [
+    "GECTI. Iki oncul de kaynakta dogrulandi. (1) HandBrake'in hedef boyut yolu yok: grep -rn TargetSize tum klonda tek isabet veriyor, VideoEncodeRateType.cs:17 enum tanimi, okuyan yok; VideoEncodeRateType gecen 26 satirin hepsi acildi, yalniz ConstantQuality/AverageBitrate tanınıyor. muxcommon.c:564-568 yalnizca hb_deep_log, geri besleme yok. Bagimsiz ikinci kaynak: docs/olcumler/auto-mod.md:361-364, HandBrakeCLI 1.11.2 --help ciktisinda hedef boyut secenegi yok. (2) ComplexityProbe.cs:14 WindowSeconds=2.0, :17 MaxWindows=3, :131-143 tavan 3 dogrulandi. (3) SceneMap PlanCalculator'da hic gecmiyor, tuketici QualityMeter.cs:177,219 - T98 denetimiyle tutuyor. (4) Uyarlanabilirlik izgarasi sinifllandirmasi dogru: comb_detect.c:1029-1048, work.c:1416-1433, vfr.c:158-171 gercek kare basina karar; devir satirlari encx264.c:1363 hb_x264_param_unparse icinde, goruntuleme. (5) Olu alan iddiasi yazilandan guclu: preset.c:2209 kapisi CRF'de MultiPass/Turbo'yu hic kopyalamiyor. (6) ~50 kunye acildi, uydurma kunye yok. (7) Kaynaktan dogrulanmadi bolumu var ve durust. (8) GPL blok kopyasi yok. BORCLAR: 6 saniyeden planliyoruz ozeti eksik (ComplexityProbe.cs:159 + :304 kaynagin tamamina 40x1 sn tarama kosuyor, plana besleniyor); preset farki 7 degil 5 yazilmis (PresetName sayilmamis); yedi Picture* kunyesi Fast 720p30 blogunu gosteriyor (degerler ayni, isaretci yanlis); preset.c title-> 29 satir belgede 26, work.c vbitrate iki satir belgede tek; docs/olcumler/auto-mod.md:209 iki kez yanlis kunye (:208 ve :210). Dort sayma hatasi da ayni kalipta: kunye ve olgu dogru, onu ozetleyen sayi yanlis - projenin kronik kusurunun besinci tekrari."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T01:47:56.675Z"
+}

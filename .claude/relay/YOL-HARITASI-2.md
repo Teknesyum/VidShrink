@@ -412,6 +412,66 @@ calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
    yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
    dinamiklik ilkesinin en somut adayı.
 
+## Kaynak okundu: bir oncul dogrulandi, bir oncul curudu (T112, muhurlendi)
+
+`docs/inceleme/handbrake-motoru.md` — HandBrake `1d2135bc`, denetim GEÇTİ.
+
+### Ayakta kalan fark: kapalı çevrim hedef boyut
+
+**HandBrake'in hedef boyut yolu yok.** `TargetSize` tüm klonda tek kez geçiyor —
+`VideoEncodeRateType.cs:17`, enum tanımı. **Okuyan yok.** Karar veren iki yer
+yalnız CRF ve ABR tanıyor. Hedef aşımında yapılan tek şey `muxcommon.c:564-568`
+içinde bir `hb_deep_log` satırı; geri besleme yok.
+
+İki yoldan doğrulandı — denetçi ayrıca kendi ölçüm belgemizi buldu
+(`docs/olcumler/auto-mod.md:361-364`): HandBrakeCLI 1.11.2 `--help` çıktısında
+hedef boyut seçeneği yok.
+
+Bizde var: `EncodeRunner.cs:88-165` + `PlanCalculator.cs:525-551`. **Ürünün
+ayırt edici özelliği burasıdır ve ölçülmüş bir gerçektir**, iddia değil.
+
+Yan bulgu: yerleşik preset'ler `VideoQualityType: 2` (CRF) ile geliyor ve
+`preset.c:2209` kapısı CRF'de `MultiPass`/`Turbo`'yu işe hiç kopyalamıyor —
+preset'lerdeki `VideoAvgBitrate` ve `VideoMultiPass` alanları kutudan çıkan
+hâlde **ölü.**
+
+### Çürüyen öncül: "biz dinamiğiz, o statik"
+
+Kullanıcının statik yöntem örneği olarak verdiği **2 saniyelik pencere bugün
+bizim yaptığımız şey.** `ComplexityProbe.cs:14` `WindowSeconds = 2.0`,
+`:17` `MaxWindows = 3`, `:131-143` tavan üç. Denetçi `main`de doğruladı.
+
+Nüans, denetçinin kendi bulgusu: `ComplexityProbe.cs:159` `ScanPoints()`
+kaynağın **tamamına** ~40 nokta × 1 sn serpiyor ve `:304` üzerinden pencere
+yanlılığına besliyor. Yani "bir saatlik videoyu altı saniyeden planlıyoruz"
+cümlesi fazla sert — ama sonuç değişmiyor: **40 da sabit bir sayıdır.**
+Örnekleme sabit ölçekli, içerikten türemiyor.
+
+Ve karşı taraf: HandBrake'in **kendi kodunda** kare başına kararı var —
+`comb_detect.c:1029-1048` kare başına NONE/LIGHT/HEAVY, `vfr.c:158-171` pencere
+içi hareket ölçüsüyle kare seçimi. Kodlayıcıya devrettikleri ayrı; onları
+`encx264.c:1363` `hb_x264_param_unparse` içinde ayırt ettik, o karar değil
+görüntüleme.
+
+**Sonuç: dinamiklik iddiası bugün karşılıksız.** Karşılığını koymak
+**T103'ün** işi ve T103 artık en yüksek öncelikli üründür — sıra 4'ten öne
+alınıyor. Ayırt edici özelliğimiz hedef boyut; dinamiklik ise **kazanılacak**
+bir fark, sahip olduğumuz bir fark değil.
+
+### Kronik kusurun beşinci tekrarı
+
+Denetim dört sayma hatası buldu ve dördü de aynı kalıpta: **künye ve olgu
+doğru, onu özetleyen sayı yanlış.** Preset farkı 7 iken "5", `preset.c` 29
+satır iken "26", `work.c` iki satır iken "tek satır".
+
+T98 tur 2 denetimi aynı gün aynı kalıbın dört örneğini daha buldu (oran 1,88×
+iken "2,6 katına", fark 0,506 iken "0,1 mertebesinde"). T95 denetimi
+manşetin kendisinde buldu.
+
+**Bu artık tekil hata değil, aletin sistematik davranışı.** Kural yetmiyor —
+üç sözleşmede de kural yazılıydı. Sayan ile özetleyen aynı geçişte olduğu
+sürece tekrar edecek: **özet cümlesi tabloya karşı ayrı bir geçişte okunmalı.**
+
 ## Ilk adil A/B: geridiyiz (T95, 2026-09-02, denetimde)
 
 Aylardır HandBrake'i çıktısından tanıyorduk. T95 ilk **adillik kapılı** A/B
