@@ -66,6 +66,11 @@ kaynağında 1 MB hedefi: eskiden kare hızı 15'in altına düşüyordu, şimdi
 (kaynak piksel hızının %2,1'i). Ölçüm kare hızı düşürmenin ucuz olmadığını söylüyor;
 plan artık onu takip ediyor.
 
+Tavanın 1,0'da kalması boşuna değildi: şikâyet işinin kaynağında prob hareket üstelini
+**1,163** ölçüyor — eski tavan bu kaynağı 1,0'a kırpıyordu. Kırpılmış değerle 1280x720@30'un
+tabanı 0,03514, ölçülen değerle 0,03935; ikisi de o yerleşimi eliyor, ama ikincisi ölçüme
+dayanıyor.
+
 ### 7.2 Testler sabiti kopyalamayı bıraktı
 
 `MotionExponentComesFromTheHalfFrameRateSample` içindeki `Assert.Equal(0.25, ...)`
