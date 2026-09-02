@@ -159,3 +159,30 @@ o listenin son iki deseni orada da atıl — sonda da `exitCode == 0` şartını
 Buna karşılık liste **libx265'in gerçekten yazdığı `Unknown option:` ifadesini içermiyor**;
 yani x265 seçenek sondası bugün düşürülen anahtarı kaçırıyor. `EncoderCapabilities.cs`
 bu sözleşmenin `owns` kümesi dışında, dokunulmadı. Borç olarak yazıldı.
+
+## K3 — Yanlış pozitif ölçüsü
+
+Sözlük fazla genişse çalışan kodlamayı düşürülmüş sayar. Ölçü, **hiçbir ayarı düşmemiş**,
+çıkış kodu 0 ile biten gerçek koşumların çıktısını sözlükten geçirip listenin boş kaldığını
+pimliyor (`CleanRunsAreNeverReadAsADroppedOption`, dört korpus).
+
+| # | Korpus | Kaynak | İçindeki tuzak |
+|---|---|---|---|
+| 1 | temiz `libx265` | bu makinede ölçüldü, çıkış 0 | `x265 [warning]: Too few rows/columns, --wpp disabled`, `x265 [warning]: Source height < 720p; …`, `tools: rd=3 psy-rd=2.00 …`, `muxing overhead: unknown` |
+| 2 | temiz `libx264` | bu makinede ölçüldü, çıkış 0 | `[swscaler @ …] deprecated pixel format used, make sure you did set range correctly` |
+| 3 | ffmpeg sürüm banner'ı + kodek banner'ları | bu makinede ölçüldü, çıkış 0 | `configuration: --enable-…`, `Svt[info]: SVT [config]: …`, `frame= … speed=…` |
+| 4 | `Past duration 0.999992 too large` | **bu makinede üretilemedi**, sözleşmeden alındı | muxer uyarısı |
+
+Dördüncü korpus için dürüst olmak gerekiyor: `Past duration … too large` satırını bu ffmpeg
+9.0 derlemesinde iki tetikleyiciyle (`rate=5` kaynağı `-r 30`'a; ses+video `-shortest -r 25`)
+**üretemedim**. Satırı yine de korpusa koydum, çünkü bu ölçüde satırların hepsi *negatif*:
+listeye girmesi yalnızca "buna da takılmıyoruz"un kapsamını genişletir, hiçbir savı
+güçlendirmez. Ölçülmüş gibi göstermemek için tabloda ayrı işaretlendi.
+
+Ayrıca `TheWordUnknownOnItsOwnIsNotEnough` üç satırı tek tek pimliyor. En kritik olanı
+`muxing overhead: unknown`: **her başarılı koşumun son satırlarında geçiyor.** Sözlükteki
+desen `Unknown option:` — iki nokta dahil. Desen `Unknown`'a kısaltılsaydı ölçülen üç
+başarılı koşumun **üçü de** düşürülmüş sayılırdı. K5'te bu tam olarak mutasyonla kırıldı.
+
+Sözlüğün dar tutulmasının ikinci gerekçesi K2'de: çıkış kodu sıfırdan farklı olan iki desen
+dışarıda bırakıldı, çünkü genişlik burada bedava değil.

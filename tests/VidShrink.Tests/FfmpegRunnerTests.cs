@@ -116,4 +116,87 @@ public sealed class FfmpegRunnerTests
         Assert.Equal(viaFfmpegRunner, viaEncodeRunner);
         Assert.NotEmpty(viaEncodeRunner);
     }
+
+    /// <summary>
+    /// Olcum K3 — <b>hicbir ayari dusurulmemis</b>, cikis kodu 0 ile biten gercek kosumlarin
+    /// ciktisi. Sozluk bunlarin hicbirine takilmamali: takilirsa calisan bir kodlamayi
+    /// dusurulmus sayariz, bu da sessiz kalite kaybindan daha kotudur.
+    /// </summary>
+    public static TheoryData<string, string> CleanRuns() => new()
+    {
+        {
+            "libx265, iki uyari + psy-rd iceren tools satiri",
+            """
+            Stream mapping:
+              Stream #0:0 -> #0:0 (wrapped_avframe (native) -> hevc (libx265))
+            Press [q] to stop, [?] for help
+            x265 [info]: HEVC encoder version 4.3+2-5ab552e
+            x265 [info]: build info [Windows][GCC 16.1.0][64 bit] 8bit+10bit+12bit
+            x265 [info]: using cpu capabilities: MMX2 SSE2Fast LZCNT SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+            x265 [info]: Main profile, Level-1 (Main tier)
+            x265 [warning]: Too few rows/columns, --wpp disabled
+            x265 [warning]: Source height < 720p; disabling lookahead-slices
+            x265 [info]: AQ: mode / str / qg-size / cu-tree  : 2 / 1.0 / 32 / 1
+            x265 [info]: Rate Control / qCompress            : CRF-28.0 / 0.60
+            x265 [info]: tools: rd=3 psy-rd=2.00 early-skip rskip mode=1 signhide tmvp
+            x265 [info]: tools: b-intra strong-intra-smoothing deblock sao dhdr10-info
+            [out#0/null @ 000001f0d4ec52c0] video:4KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+            encoded 2 frames in 0.02s (95.24 fps), 247.92 kb/s, Avg QP:32.73
+            """
+        },
+        {
+            "libx264, deprecated pixel format uyarisi",
+            """
+            Press [q] to stop, [?] for help
+            [swscaler @ 000002cebc857980] deprecated pixel format used, make sure you did set range correctly
+            [libx264 @ 000002cebc82dd00] using SAR=1/1
+            [libx264 @ 000002cebc82dd00] profile High, level 1.1, 4:2:0, 8-bit
+            [out#0/null @ 000002cebadd6880] video:3KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+            [libx264 @ 000002cebc82dd00] Weighted P-Frames: Y:0.0% UV:0.0%
+            """
+        },
+        {
+            "ffmpeg surum banner'i ve kodlayici banner'lari",
+            """
+            ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+              built with gcc 16.1.0 (Rev2, Built by MSYS2 project)
+              configuration: --enable-gpl --enable-libsvtav1 --enable-libx264 --enable-libx265 --enable-libaom
+              libavcodec     63.  1.100 / 63.  1.100
+            Svt[info]: SVT [version]:	SVT-AV1 Encoder Lib v4.2.0-68-gc1e79b04f
+            Svt[info]: SVT [config]: preset / tune / pred struct 					: 8 / PSNR / random access
+            Svt[info]: SVT [config]: AQ mode / Variance Boost 					: 2 / 0
+            Svt[info]: SVT [config]: QP scale compress strength 					: 0
+            frame=    2 fps=0.0 q=35.0 Lsize=N/A time=00:00:00.03 bitrate=N/A speed=0.388x elapsed=0:00:00.08
+            """
+        },
+        {
+            "muxer uyarisi (bu makinede uretilemedi, sozlesmeden alindi)",
+            """
+            Past duration 0.999992 too large
+            frame=  100 fps=0.0 q=28.0 Lsize=      42KiB time=00:00:03.30 bitrate=104.2kbits/s speed=9.61x
+            """
+        }
+    };
+
+    [Theory]
+    [MemberData(nameof(CleanRuns))]
+    public void CleanRunsAreNeverReadAsADroppedOption(string label, string stderr)
+    {
+        var dropped = FfmpegDiagnostics.DroppedOptionLines(stderr);
+
+        Assert.True(dropped.Count == 0,
+            $"{label}: calisan kodlama dusurulmus sayildi — {string.Join(" | ", dropped)}");
+        Assert.False(FfmpegRunner.Decide(0, stderr, TimeSpan.Zero).DroppedAnOption, label);
+    }
+
+    [Fact]
+    public void TheWordUnknownOnItsOwnIsNotEnough()
+    {
+        Assert.False(FfmpegDiagnostics.ReportsADroppedOption(
+            "[out#0/null @ 000001b988a289c0] video:4KiB audio:0KiB muxing overhead: unknown"));
+        Assert.False(FfmpegDiagnostics.ReportsADroppedOption(
+            "x265 [warning]: Too few rows/columns, --wpp disabled"));
+        Assert.False(FfmpegDiagnostics.ReportsADroppedOption(
+            "[swscaler @ 0] deprecated pixel format used, make sure you did set range correctly"));
+    }
 }
