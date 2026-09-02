@@ -1,8 +1,18 @@
 using System.Diagnostics;
+using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
+
+public sealed class FfmpegTheoryAttribute : TheoryAttribute
+{
+    public FfmpegTheoryAttribute()
+    {
+        if (!ToolLocator.IsAvailable(out var missing))
+            Skip = $"{missing} bulunamadi, sonda olculeri kosturulmadi.";
+    }
+}
 
 public sealed class ComplexityProbeTests
 {
@@ -35,7 +45,7 @@ public sealed class ComplexityProbeTests
         }
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task DetailedProbeExposesWindowQualityThroughCoreContract()
     {
         await WithClipAsync(async info =>
@@ -51,7 +61,7 @@ public sealed class ComplexityProbeTests
         });
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task DefaultDetailedProbeDoesNotMeasureQualityBeforeT89OptsIn()
     {
         await WithClipAsync(async info =>
@@ -79,7 +89,7 @@ public sealed class ComplexityProbeTests
         Assert.DoesNotContain("null", muxers);
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task WindowAndMotionSamplesCountTheSameByteUnit()
     {
         await WithClipAsync(async info =>
@@ -96,16 +106,31 @@ public sealed class ComplexityProbeTests
         }, "color=c=gray:size=320x240:rate=12:duration=8");
     }
 
-    [Fact]
-    public async Task ProbeEntryPointUsedByTheAppDoesNotMeasureQuality()
+    [FfmpegFact]
+    public async Task ProbeEntryPointUsedByTheAppCarriesMeasuredQualityIntoTheProfile()
     {
         await WithClipAsync(async info =>
         {
             var meter = new FakeMeter(true);
-            var profile = await ComplexityProbe.RunAsync(info, SpeedMode.Fast, meter, default);
+            var profile = await MainWindow.ProbeWithMeasuredQualityAsync(info, SpeedMode.Fast, meter, default);
 
             Assert.True(profile.Measured);
-            Assert.Equal(0, meter.Calls);
+            Assert.True(meter.Calls > 0);
+            Assert.True(profile.QualityMeasured);
+            Assert.Equal(91.0, profile.QualityAnchor!.VmafNeg, 3);
+        });
+    }
+
+    [FfmpegFact]
+    public async Task AppProbeSurvivesAnUnusableQualityMeter()
+    {
+        await WithClipAsync(async info =>
+        {
+            var meter = new FakeMeter(true, comparable: false);
+            var profile = await MainWindow.ProbeWithMeasuredQualityAsync(info, SpeedMode.Fast, meter, default);
+
+            Assert.True(profile.Measured);
+            Assert.False(profile.QualityMeasured);
         });
     }
 
@@ -115,7 +140,7 @@ public sealed class ComplexityProbeTests
             if (args[i] == "-f") yield return args[i + 1];
     }
 
-    [Theory]
+    [FfmpegTheory]
     [InlineData(false, false, true)]
     [InlineData(true, true, true)]
     [InlineData(true, false, false)]
@@ -130,7 +155,7 @@ public sealed class ComplexityProbeTests
         });
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task CancellationReachesQualityMeasurement()
     {
         await WithClipAsync(async info =>
@@ -146,8 +171,7 @@ public sealed class ComplexityProbeTests
 
     private static async Task WithClipAsync(Func<MediaInfo, Task> body, string source = "testsrc2=size=320x240:rate=12:duration=8")
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_complexity_" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Combine(TestPaths.OutputRoot, "complexity-probe", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {

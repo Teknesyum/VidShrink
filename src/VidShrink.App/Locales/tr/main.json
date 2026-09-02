@@ -275,6 +275,7 @@
   "main.reason.frame-rate-reduced": "kare başına ayrıntıyı korumak için kare hızı {0}'e düşürüldü",
   "main.reason.resolution-restored": "tavan bütçeyi boşta bıraktığı için çözünürlük {0}x{1}@{2}'e geri getirildi — CRF {3}'te hedefe hâlâ sığan en büyük düzen",
   "main.reason.budget-exceeds-ceiling": "bütçe CRF {0}'e imkan tanıyor, bu amaç için CRF {1} şeffaflık tavanından daha iyi; bu yüzden kodlayıcı tavanda durup dosyayı {3} MB'a şişirmek yerine yaklaşık {2} MB verir",
+  "main.reason.measured-quality-stop": "CRF {0} bu kaynakta ölçülen kaliteye zaten ulaşıyor; bu yüzden kodlayıcı orada durup {2} MB'ın kalanını hiçbir ölçümün kapsamadığı bir dışdeğerlemeye harcamak yerine yaklaşık {1} MB verir",
   "main.reason.budget-below-ceiling": "bütçe CRF {0} civarında kalıyor, CRF {1} tavanının altında; bu yüzden iki geçişli VBR {2} MB'ın tamamını harcıyor",
   "main.reason.quality-measured": "öngörülen kalite {0}/100, ölçülen bir örnekten (bppf {1}, ayrıntı düşüşü {2})",
   "main.reason.quality-estimated": "öngörülen kalite {0}/100, kaynak bit hızından tahmin",

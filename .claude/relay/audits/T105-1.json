@@ -1,0 +1,17 @@
+{
+  "contractId": "T105",
+  "auditorRunId": "a8df585a500578e5d",
+  "headSha": "4e05fac38ffa094a6a775fe4b7714fb1b32243d2",
+  "diffHash": "adef0c56e7f31275b68dd34dea43fdf934fb483a02ff02705f26296876ce0385",
+  "owns": [
+    "src/VidShrink.Core/SceneMap.cs",
+    "src/VidShrink.Ffmpeg/SceneDetector.cs",
+    "tests/VidShrink.Tests/SceneMapTests.cs",
+    "docs/olcumler/sahne-haritasi.md"
+  ],
+  "verification": [
+    "GECTI: sekiz kriterin sekizi de bagimsiz dogrulandi. 16 esik satirinin 16'si ham CSV'den yeniden hesaplandi (F1/F2 birebir). T101'in iki yanilgisi (yanlis pozitif sifir; MinSceneSeconds payi sifir) bagimsiz teyit edildi. Bes mutasyon kosturuldu, besi de oldu; BaseThreshold kiskacinin iki ucu ayri ayri sinandi. verify 18/0/0, CI run 33575805199 yesil. Denetim depo disinda (git archive -> scratchpad) yapildi, depoya yazilmadi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T00:54:06.030Z"
+}

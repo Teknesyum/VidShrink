@@ -71,6 +71,18 @@ public sealed class EncodePlan
     [JsonIgnore] public double BitrateBias { get; set; } = 1.0;
     [JsonIgnore] public double? EffectiveTargetMb { get; set; }
 
+    private static readonly ReasonCode[] FillNotes =
+    {
+        ReasonCode.FillCrfLowered,
+        ReasonCode.FillTwoPassBandCenter,
+        ReasonCode.FillTwoPassBandTooNarrowForCrf
+    };
+
+    [JsonIgnore] public bool StopsShortOfBandOnPurpose =>
+        ModeEnum == EncodeMode.Crf
+        && ReasonCodes.Count > 0
+        && !ReasonCodes.Any(note => FillNotes.Contains(note.Code));
+
     [JsonIgnore] public EncodeMode ModeEnum => Mode.ToLowerInvariant() switch
     {
         "crf" => EncodeMode.Crf,
