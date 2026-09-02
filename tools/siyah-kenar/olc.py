@@ -17,10 +17,11 @@ def vmaf(dist, ref, dvf, rvf, log):
     if os.path.exists(log):
         return
     lav = "[0:v]%s[d];[1:v]%s[r];[d][r]libvmaf=%s:log_fmt=json:log_path=%s" % (
-        dvf, rvf, MODEL, log.replace(":", "\\:"))
+        dvf, rvf, MODEL, os.path.basename(log))
     a = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin",
          "-i", dist, "-i", ref, "-lavfi", lav, "-f", "null", "-"]
-    p = subprocess.run(a, capture_output=True, text=True, errors="replace")
+    p = subprocess.run(a, capture_output=True, text=True, errors="replace",
+                       cwd=os.path.dirname(log))
     if not os.path.exists(log):
         print("HATA", log, p.stderr[-400:], flush=True)
 

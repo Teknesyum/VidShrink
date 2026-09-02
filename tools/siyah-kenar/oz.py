@@ -158,7 +158,49 @@ def limit_tablo(lim):
         if b:
             r.append("| %s | %s / %s / %s |" % (ADLAR.get(ad, ad),
                                                 s(b["YMIN"]), s(b["YAVG"]), s(b["YMAX"])))
-    return "\n".join(r)
+    r.append("")
+    r.append(limit_ozet(lim, limitler))
+    return NL.join(r)
+
+
+def limit_ozet(lim, limitler):
+    def kutu(ad, x):
+        k = lim[ad]["limit"].get(str(x))
+        return tuple(k) if k else (1920, 1080, 0, 0)
+
+    def dogru(ad, x):
+        return kutu(ad, x) == tuple(lim[ad]["gercek"])
+
+    def yavg(ad):
+        return s(((lim.get(ad) or {}).get("ust_bant_luma") or {}).get("YAVG"))
+
+    guvenli = [x for x in limitler if all(dogru(ad, x) for ad in KENARSIZ if ad in lim)]
+    kd = [x for x in limitler if "KD" in lim and dogru("KD", x)]
+    ke = [x for x in limitler if "KE" in lim and dogru("KE", x)]
+    kd_pencere = [x for x in kd if x in guvenli]
+    ke_pencere = [x for x in ke if x in guvenli]
+
+    def ara(v):
+        if not v:
+            return "yok"
+        if len(v) == 1:
+            return "%d" % v[0]
+        return "%d..%d" % (min(v), max(v))
+
+    r = ["Taranan %d limit degerinden **%s** kenarsiz kaynaklarin ikisini de "
+         "bozmadan biraktigi araliktir. KD'nin (bant YAVG %s) gercek sinirini "
+         "veren aralik **%s**; ikisinin kesisimi **%s**." % (
+             len(limitler), ara(guvenli), yavg("KD"), ara(kd), ara(kd_pencere))]
+    if ke_pencere:
+        r.append("KE (bant YAVG %s) icin de ortak calisan limit var: **%s**."
+                 % (yavg("KE"), ara(ke_pencere)))
+    else:
+        r.append("KE (bant YAVG %s) icin boyle bir ortak deger **yok**: KE'yi dogru "
+                 "bulan aralik %s, kenarsiz kaynaklari bozmayan aralik %s, kesisim "
+                 "bos. Bant parlakligi belli bir noktayi gectikten sonra tek bir "
+                 "esik degeriyle hem tespit hem guvenlik saglanamiyor."
+                 % (yavg("KE"), ara(ke), ara(guvenli)))
+    return NL.join(r)
 
 
 def sure_tablo(sr):
@@ -264,6 +306,11 @@ def k5_tablo(vmaf, yokla):
     r.append("| cropdetect t=15 | %s |" % kutu_str(d["nokta"]["t15"]["kutu"]))
     r.append("| cropdetect 10 kare yayilmis | %s |" % kutu_str(d["yayilmis"]["kutu"]))
     r.append("| cropdetect tam klip | %s |" % kutu_str(d["tam"]["kutu"]))
+    fvd = es_boyut(vmaf, "VD", 2000)
+    r.append("| Boyut, kirpmasiz / kirpilmis | %s / %s bayt (fark %s%%%s) |" % (
+        vmaf.get("VD|duz|2000", {}).get("boyut", "-"),
+        vmaf.get("VD|kirp|2000", {}).get("boyut", "-"),
+        s(fvd), "" if fvd is None or fvd <= 1.0 else ", **es boyut degil**"))
     a = vmaf.get("VD|duz|2000", {}).get("B")
     b = vmaf.get("VD|kirp|2000", {}).get("B")
     r.append("| B yontemi p10, kirpmasiz | %s |" % (s(a["p10"], 3) if a else "-"))
@@ -275,19 +322,23 @@ def k5_tablo(vmaf, yokla):
              "kaynaklarda onerdigi hatali kirpma uygulandi, cikti geri doldurulup "
              "tam karede puanlandi (B yontemi, 2000k):")
     r.append("")
-    r.append("| Kaynak | Hatali kirpma | Kesilen piksel | Kirpmasiz p10 | Hatali kirpilmis p10 | Fark |")
-    r.append("|---|---|---|---|---|---|")
+    r.append("| Kaynak | Hatali kirpma | Kesilen piksel | Boyut farki | Kirpmasiz p10 | Hatali kirpilmis p10 | Fark |")
+    r.append("|---|---|---|---|---|---|---|")
     for ad, kes in (("NA", "1920:1042:0:4"), ("NB", "1920:1072:0:6")):
         a = vmaf.get("%s|duz|2000" % ad, {}).get("B")
         b2 = vmaf.get("%s|yanlis|2000" % ad, {}).get("B")
         d = None if not (a and b2) else b2["p10"] - a["p10"]
-        r.append("| %s | %s | %d satir | %s | %s | %s |" % (
+        bd = vmaf.get("%s|duz|2000" % ad, {}).get("boyut")
+        by = vmaf.get("%s|yanlis|2000" % ad, {}).get("boyut")
+        f = None if not (bd and by) else abs(by - bd) * 100.0 / bd
+        r.append("| %s | %s | %d satir | %s%%%s | %s | %s | %s |" % (
             ADLAR[ad], kes, 1080 - int(kes.split(":")[1]),
+            s(f), "" if f is None or f <= 1.0 else " **es boyut degil**",
             s(a["p10"], 3) if a else "-", s(b2["p10"], 3) if b2 else "-", s(d, 3)))
     return "\n".join(r)
 
 
-def hukum(vmaf, kanit, yokla):
+def hukum(vmaf, kanit, yokla, sr):
     k = {ad: kazanc(vmaf, ad, ANA_HIZ) for ad in LETTERBOX}
     var = [v for v in k.values() if v is not None]
     if len(var) < len(LETTERBOX):
@@ -307,10 +358,14 @@ def hukum(vmaf, kanit, yokla):
             yanlis.append(ad)
     if yanlis:
         vetolar.append("yanlis kirpma vetosu tetiklendi (%s)" % ", ".join(yanlis))
-    en_uzun = max(yokla[ad]["yayilmis"]["sure"] for ad in LETTERBOX + KENARSIZ)
-    if en_uzun > ESIK_SURE:
-        vetolar.append("yoklama maliyeti vetosu tetiklendi (10 kare yayilmis yoklama en kotu %s sn, esik %s sn)"
-                       % (s(en_uzun, 2), s(ESIK_SURE, 1)))
+    if sr:
+        en_uzun = max(d["yayilmis10kare"]["medyan"] for d in sr["kaynak"].values())
+        if en_uzun > ESIK_SURE:
+            vetolar.append("yoklama maliyeti vetosu tetiklendi (10 kare yayilmis "
+                           "yoklama en kotu kaynakta medyan %s sn, esik %s sn)"
+                           % (s(en_uzun, 2), s(ESIK_SURE, 1)))
+    else:
+        vetolar.append("yoklama maliyeti vetosu **degerlendirilemedi** (sure.json yok)")
 
     pay = ("n=%d letterbox'li kaynak, kaynak basina %d kare, VMAF-NEG p10 aktif goruntu alaninda, %dk 2 gecis, teslim boyutu esitlenmis"
            % (len(var), kanit[LETTERBOX[0]]["kare"], ANA_HIZ))
@@ -335,8 +390,18 @@ def hukum(vmaf, kanit, yokla):
         govde = ("Ortalama p10 kazanci %s puan (%s), K4'un +%s tabaninin altinda; %d/%d kaynakta kazanc pozitif."
                  % (s(ort, 3), pay, s(ESIK_TABAN), poz, len(var)))
 
+    bulunan = [ad for ad in LETTERBOX
+               if mod_kutu(yokla[ad]["yayilmis"].get("tekil") or []) == list(yokla[ad]["gercek"])]
     tek = " ".join("%s %s" % (ad, s(k[ad], 3)) for ad in LETTERBOX)
-    satir = [bas + " " + govde, "", "Kaynak basina kazanc (2000k, p10): " + tek + "."]
+    satir = [bas + " " + govde, "", "Kaynak basina kazanc (2000k, p10): " + tek + ".",
+             "",
+             ("Kazanclar **gercek bant sinirina** gore olculdu, cropdetect'in "
+              "buldugu sinira gore degil. Varsayilan `limit=24` ile on kareye "
+              "yayilmis yoklama dort letterbox'li kaynagin **%d tanesinde** "
+              "gercek siniri buluyor (%s); kalan %d kaynakta kirpma varsayilan "
+              "ayarla hic tetiklenmez, yani oradaki kazanc erisilebilir degil, "
+              "tavandir." % (len(bulunan), ", ".join(bulunan) or "hicbiri",
+                             len(LETTERBOX) - len(bulunan)))]
     if vetolar:
         satir += ["", "**Veto:** " + "; ".join(vetolar) +
                   ". Hukum ne olursa olsun otomatik kirpma varsayilan acik gelemez."]
@@ -367,14 +432,15 @@ def main():
     if not (vmaf and kanit and yokla):
         print("EKSIK VERI: vmaf=%s kanit=%s yokla=%s" % (bool(vmaf), bool(kanit), bool(yokla)))
         return 1
-    h = hukum(vmaf, kanit, yokla)
+    sr = yuk(IS + "/yokla/sure.json")
+    h = hukum(vmaf, kanit, yokla, sr)
     yaz(h, "HUKUM")
     yaz(kanit_tablo(kanit), "KANIT")
     yaz(k1_tablo(kanit), "K1")
     yaz(k2_tablo(yokla), "K2")
     yaz(k2b_tablo(yokla), "K2B")
     yaz(limit_tablo(yuk(IS + "/yokla/limit.json")), "LIMIT")
-    yaz(sure_tablo(yuk(IS + "/yokla/sure.json")), "SURE")
+    yaz(sure_tablo(sr), "SURE")
     yaz(k3_tablo(vmaf, kanit), "K3")
     yaz(k5_tablo(vmaf, yokla), "K5")
     print(h)
