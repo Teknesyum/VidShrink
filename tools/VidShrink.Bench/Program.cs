@@ -71,11 +71,11 @@ static async Task<int> MeasureAsync(string[] args, bool tonemapReference = false
         return 1;
     }
 
-    var score = tonemapReference
-        ? await QualityMeter.MeasureTonemappedReferenceAsync(args[1], args[2], CancellationToken.None)
-        : await QualityMeter.MeasureAsync(args[1], args[2], CancellationToken.None);
-    Console.WriteLine(JsonSerializer.Serialize(score, new JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
-    return 0;
+    return await BenchOlcum.YazAsync(
+        () => tonemapReference
+            ? QualityMeter.MeasureTonemappedReferenceAsync(args[1], args[2], CancellationToken.None)
+            : QualityMeter.MeasureAsync(args[1], args[2], CancellationToken.None),
+        Console.Out, Console.Error);
 }
 
 static async Task<int> MeasureWindowAsync(string[] args)
@@ -83,9 +83,9 @@ static async Task<int> MeasureWindowAsync(string[] args)
     if (args.Length < 5) return 1;
     var start = double.Parse(args[3], CultureInfo.InvariantCulture);
     var duration = double.Parse(args[4], CultureInfo.InvariantCulture);
-    var score = await QualityMeter.MeasureWindowAsync(args[1], args[2], start, duration, CancellationToken.None);
-    Console.WriteLine(JsonSerializer.Serialize(score, new JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
-    return 0;
+    return await BenchOlcum.YazAsync(
+        () => QualityMeter.MeasureWindowAsync(args[1], args[2], start, duration, CancellationToken.None),
+        Console.Out, Console.Error);
 }
 
 static async Task<int> ProbeQualityCostAsync(string[] args)
@@ -850,7 +850,7 @@ static async Task<string> RunLavfiAsync(string referencePath, string testPath, i
                  "-hide_banner", "-nostdin",
                  "-i", testPath,
                  "-i", referencePath,
-                 "-lavfi", MeasureFilterGraph.Build(width, height, filterChain),
+                 "-lavfi", BenchMeasureFilterGraph.Build(width, height, filterChain),
                  "-f", "null", "-"
              })
         psi.ArgumentList.Add(arg);
@@ -2542,10 +2542,8 @@ public static class VmafPooling
     }
 }
 
-public static class MeasureFilterGraph
+public static class BenchMeasureFilterGraph
 {
-    public static string FrameLock => VidShrink.Ffmpeg.MeasureFilterGraph.FrameLock;
-
     public static string Build(int width, int height, string filterChain)
     {
         if (string.IsNullOrWhiteSpace(filterChain))
@@ -2553,8 +2551,33 @@ public static class MeasureFilterGraph
         if (width <= 0 || height <= 0)
             throw new ArgumentOutOfRangeException(nameof(width), "Olcum cozunurlugu pozitif olmali.");
 
-        return $"[0:v]scale=w={width}:h={height}:flags=lanczos,{FrameLock}[t];" +
-               $"[1:v]{FrameLock}[r];" +
-               $"[t][r]{filterChain}";
+        return MeasureFilterGraph.Build($"scale=w={width}:h={height}:flags=lanczos", "null", filterChain);
+    }
+}
+
+public static class BenchOlcum
+{
+    public const int Basarili = 0;
+    public const int Basarisiz = 2;
+
+    private static readonly JsonSerializerOptions Bicim = new()
+    {
+        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
+    };
+
+    public static async Task<int> YazAsync(Func<Task<QualityScore>> olcum, TextWriter cikti, TextWriter hata)
+    {
+        try
+        {
+            cikti.WriteLine(JsonSerializer.Serialize(await olcum(), Bicim));
+            return Basarili;
+        }
+        catch (QualityMeasurementFailedException basarisizlik)
+        {
+            if (basarisizlik.PartialScore is { } kismi)
+                cikti.WriteLine(JsonSerializer.Serialize(kismi, Bicim));
+            hata.WriteLine(basarisizlik.Message);
+            return Basarisiz;
+        }
     }
 }

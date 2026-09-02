@@ -133,7 +133,7 @@ public class VmafPoolingTests
     [Fact]
     public void OlcumFiltresi_IkiGirdiyiDe_KareIndeksineKilitler()
     {
-        var graph = MeasureFilterGraph.Build(1920, 1080, "libvmaf=model=version=vmaf_v0.6.1neg");
+        var graph = BenchMeasureFilterGraph.Build(1920, 1080, "libvmaf=model=version=vmaf_v0.6.1neg");
 
         var branches = graph.Split(';');
         var test = Assert.Single(branches, b => b.StartsWith("[0:v]"));
@@ -147,7 +147,7 @@ public class VmafPoolingTests
     [Fact]
     public void OlcumFiltresi_KareKilidi_OlceklemedenSonraGelir()
     {
-        var graph = MeasureFilterGraph.Build(1280, 720, "psnr");
+        var graph = BenchMeasureFilterGraph.Build(1280, 720, "psnr");
 
         var test = graph.Split(';').Single(b => b.StartsWith("[0:v]"));
 
@@ -159,7 +159,7 @@ public class VmafPoolingTests
     [FfmpegFact]
     public async Task KareKilidi_AltKareKaymasinaRagmen_KareleriDogruEsler()
     {
-        var frames = await OlcumSerisiAsync(MeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"));
+        var frames = await OlcumSerisiAsync(BenchMeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"));
 
         Assert.Equal(BeklenenKareSayisi, frames.Count);
         Assert.All(frames, y => Assert.True(y >= TamEslesmeEsigi,
@@ -185,7 +185,7 @@ public class VmafPoolingTests
             "[1:v]settb=AVTB,setpts=N[r];" +
             "[t][r]psnr=stats_file=psnr.log";
 
-        Assert.NotEqual(MeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"), kaydirilmis);
+        Assert.NotEqual(BenchMeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"), kaydirilmis);
 
         var frames = await OlcumSerisiAsync(kaydirilmis);
 
@@ -268,26 +268,65 @@ public class VmafPoolingTests
     }
 
     [FfmpegFact]
-    public async Task GunlukUretmeyenZincir_Olculmedi_Degil_Basarisiz_DiyeOkunur()
+    public async Task GunlukYazilamayanZincir_FfmpegSifirDonuyor_OkuyucuBasarisizDiyor()
     {
         var dir = YeniKlasor();
         try
         {
             var kaynak = Path.Combine(dir, "kaynak.mkv");
             await KaynakUretAsync(dir, kaynak);
-            var gunluk = Path.Combine(dir, "vmaf.json");
 
-            await FfmpegAsync(dir, "-v", "error", "-y", "-nostdin", "-i", kaynak, "-i", kaynak,
-                "-lavfi", UretimGrafigi("libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json"),
+            var gunluk = Path.Combine(dir, "olmayan", "vmaf.json");
+            Assert.False(Directory.Exists(Path.GetDirectoryName(gunluk)!));
+
+            var kod = await FfmpegKoduAsync(dir, "-v", "error", "-y", "-nostdin", "-i", kaynak, "-i", kaynak,
+                "-lavfi", UretimGrafigi(
+                    "libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path='olmayan/vmaf.json'"),
                 "-f", "null", "-");
 
-            Assert.False(File.Exists(gunluk), "zincir gunluk yazmamaliydi; olcu kendi onculunu dogrulayamadi");
+            Assert.Equal(0, kod);
+            Assert.False(File.Exists(gunluk),
+                "libvmaf gunlugu yazabilmis; olcu artik yazilamayan gunlugu olcmuyor");
 
             var hata = await Assert.ThrowsAsync<QualityMeasurementFailedException>(
                 () => QualityMeter.ReadVmafScoresAsync(gunluk));
             Assert.Contains(gunluk, hata.Message);
         }
         finally { Sil(dir); }
+    }
+
+    [Fact]
+    public async Task BasarisizOlcumde_Bench_SifirDonmez_KismiSonucu_YineDeYazar()
+    {
+        var kismi = new QualityScore(
+            null, null, null, null, 41.5, 0.987, false, "libvmaf gunlugu yazilmadi: C:/yok/vmaf.json.");
+
+        var cikti = new StringWriter();
+        var hata = new StringWriter();
+
+        var kod = await BenchOlcum.YazAsync(
+            () => throw new QualityMeasurementFailedException(kismi.Message!, kismi), cikti, hata);
+
+        Assert.Equal(BenchOlcum.Basarisiz, kod);
+        Assert.NotEqual(BenchOlcum.Basarili, kod);
+        Assert.Contains("41.5", cikti.ToString());
+        Assert.Contains("0.987", cikti.ToString());
+        Assert.Contains(kismi.Message!, hata.ToString());
+    }
+
+    [Fact]
+    public async Task BasariliOlcumde_Bench_SifirDoner_VeSkoruYazar()
+    {
+        var skor = new QualityScore(94.5, 94.2, 90.1, 88.0, 41.5, 0.987);
+
+        var cikti = new StringWriter();
+        var hata = new StringWriter();
+
+        var kod = await BenchOlcum.YazAsync(() => Task.FromResult(skor), cikti, hata);
+
+        Assert.Equal(BenchOlcum.Basarili, kod);
+        Assert.Contains("94.5", cikti.ToString());
+        Assert.Equal("", hata.ToString());
     }
 
     [Fact]
@@ -355,7 +394,7 @@ public class VmafPoolingTests
     private const string OlcekZinciri = "scale=w=160:h=120:flags=lanczos";
 
     private static string UretimGrafigi(string karsilastirma)
-        => VidShrink.Ffmpeg.MeasureFilterGraph.Build(OlcekZinciri, "null", karsilastirma);
+        => MeasureFilterGraph.Build(OlcekZinciri, "null", karsilastirma);
 
     private static string YeniKlasor()
     {
@@ -401,6 +440,19 @@ public class VmafPoolingTests
                     : double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture));
         }
         return values;
+    }
+
+    private static async Task<int> FfmpegKoduAsync(string workingDirectory, params string[] args)
+    {
+        var psi = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
+        psi.WorkingDirectory = workingDirectory;
+        using var process = new Process { StartInfo = psi };
+        process.Start();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        await Task.WhenAll(stdout, stderr);
+        return process.ExitCode;
     }
 
     private static async Task<string> ZamanTabaniAsync(string dir, string path)

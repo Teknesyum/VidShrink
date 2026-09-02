@@ -22,6 +22,10 @@ Mutasyon `QualityMeter.cs`'teki üretim sabitine uygulandı. Süit toplamı 43 �
 | M2 | `FrameLock` → `"settb=AVTB"` (**`setpts` yarısı silindi**) | 04:55–04:56 | **4** | 39 |
 | — | geri alındı, yeniden `--no-incremental` | 04:56–04:57 | 0 | 43 |
 
+Tur 2'de aynı iki mutasyon 45 ölçülük süitle yeniden koşuldu (06:45–06:46 UTC)
+ve **aynı dört ölçü** düştü: M1 4 kırmızı / 41 yeşil, M2 4 kırmızı / 41 yeşil.
+Tur 2'nin tip birleştirmesi (aşağıda) sonucu değiştirmedi.
+
 M1'de kırmızıya düşenler:
 
 - `VmafPoolingTests.UretimKilidi_ZamanTabanlariFarkliGirdileri_BireBir_Esler` (**yeni**)
@@ -52,10 +56,15 @@ Ama T111'in ölçmediği bir şey vardı: **üretim kopyası tümüyle koruması
 değilmiş.** `QualityMeterTests`'in üç ölçüsü M1'i zaten yakalıyor. Sebebi
 tesadüf: üçü de **`.mkv` ile `.mp4`'ü** karşılaştırıyor (`hdr.mkv`/`high.mp4`,
 `shifted.mkv`/`test.mp4`, `reference.mp4`/`sample.mkv`), yani girdilerin zaman
-tabanları zaten farklı. Bunu ilk kez bu sözleşme ölçtü. Açık, sözleşmede
-yazıldığı kadar büyük değildi; **T111 yanlış bir şey söylemedi, ölçtüğü kopya
-farklıydı.** Yakalayan üç ölçü de kilidi ölçmek için yazılmamış — kilidi
-adlandıran, kasıtlı ve yalıtık ölçü M1 için yalnızca yeni eklenendir.
+tabanları zaten farklı. Bunu ilk kez bu sözleşme ölçtü.
+
+**Sözleşmenin öncülü çürütüldü, adını koyalım.** `T119.md:23` "kilidin
+`settb=AVTB` yarısını **hiçbir** ölçü korumuyor" diyordu; üretim kopyasında bu
+yanlış — üç ölçü koruyordu. Doğru olan daha dar bir ifade: T111'in ölçtüğü Bench
+kopyasında hiçbir ölçü korumuyordu, ve üretimde kilidi **adlandıran, kasıtlı,
+yalıtık** bir ölçü yoktu. Yakalayan üç ölçü kilidi ölçmek için yazılmamıştı;
+M1'i tesadüfen, girdilerinin kabından yakalıyorlardı. Sözleşme yine de
+gerekliydi: tesadüfe dayanan koruma, ölçü değildir.
 
 ### `settb=AVTB` neden ve ne zaman davranış değiştiriyor
 
@@ -130,15 +139,23 @@ artık o yoldan `null` çıkamıyor, "ölçülmedi" kararı yalnız dışarıdak
 
 ### Bozuk zincirle koşum — ne dönüyor
 
-`GunlukUretmeyenZincir_Olculmedi_Degil_Basarisiz_DiyeOkunur` üretim
-`MeasureFilterGraph.Build`'iyle bir zincir kurup gerçek ffmpeg'le koşturuyor;
-karşılaştırma filtresi `libvmaf=...:log_fmt=json`, **`log_path` yok**. Sonuç:
+`GunlukYazilamayanZincir_FfmpegSifirDonuyor_OkuyucuBasarisizDiyor` üretim
+`MeasureFilterGraph.Build`'iyle zincir kurup gerçek ffmpeg'le koşturuyor.
+Karşılaştırma filtresi `libvmaf=...:log_fmt=json:log_path='olmayan/vmaf.json'`
+— yol **veriliyor**, ama hedef klasör yok, yani libvmaf günlüğü yazamıyor.
+Ölçülen:
 
-- ffmpeg **çıkış kodu 0** verir — yani "hata" gibi görünmez,
-- beklenen günlük dosyası **yoktur**,
-- `QualityMeter.ReadVmafScoresAsync(gunluk)` artık
-  `QualityMeasurementFailedException` fırlatır; eskiden aynı yer `null` dönüp
-  "ölçüm yok" diye okunuyordu.
+- ffmpeg stderr'e `could not open file` yazıp **çıkış kodu 0** veriyor,
+- beklenen günlük dosyası yok,
+- `QualityMeter.ReadVmafScoresAsync(gunluk)` `QualityMeasurementFailedException`
+  fırlatıyor; eskiden aynı yer `null` dönüp "ölçüm yok" diye okunuyordu.
+
+Bu, sessiz başarısızlığın **üretimdeki gerçek biçimi**: `log_path` doğru
+kaçırılıp veriliyor, ffmpeg başarı raporluyor, ölçüm yok.
+
+Tur 1'de bu ölçü `log_path`'i ffmpeg'e hiç vermiyordu; `File.Exists` iddiası o
+hâliyle boştu ve ölçünün tek gerçek katkısı "üretim grafiği + libvmaf çıkış
+kodu 0"dı. Tur 2'de düzeltildi, adı da ölçtüğü şeye göre değişti.
 
 Not: filtre adı yanlış yazılmak gibi kaba bozulmalarda ffmpeg sıfır dışı kod
 döner ve `RunFilterAsync` zaten gürültülü patlıyordu. Sessiz kalan durum dar
@@ -155,6 +172,82 @@ ama hiçbir çağıran o iletiyi **göstermiyor**. İki dosya da bu sözleşmeni
 
 ---
 
+## 4. Tur 2 — düşme yolu, veri kaybı, tip adı
+
+### 4.1 Bench artık sessizce sıfır dönmüyor
+
+Tur 1'in yan etkisi: `QualityMeter.MeasureAsync`/`MeasureWindowAsync` istisna
+sızdırmaya başlayınca `tools/VidShrink.Bench/Program.cs`'in `measure` ve
+`measure-window` komutları **yakalanmamış istisnayla** düşüyordu. Eski davranış
+`null` alanlı JSON basıp `return 0` idi — yani ölçüm başarısızken çıkış kodu
+başarıyı söylüyordu.
+
+**Seçim: sıfırdan farklı.** Gerekçe: bu sözleşmenin kapattığı kusur "başarısız
+ölçümün başarılıdan ayırt edilememesi"ydi; çıkış kodu 0'a dönmek onu geri
+getirir. Bench çıktısı ölçüm tablolarını besliyor, tabloyu üreten betik tek
+baktığı şey çıkış kodu olabilir.
+
+Seçilen davranış — `BenchOlcum.YazAsync`:
+
+| durum | çıkış kodu | stdout | stderr |
+| --- | ---: | --- | --- |
+| ölçüm başarılı | 0 | tam skor JSON'u | — |
+| ölçüm başarısız | **2** | **kısmi** skor JSON'u (`Comparable=false`) | başarısızlık iletisi |
+| kullanım hatası | 1 | — | kullanım iletisi |
+
+2 seçildi çünkü 1 bu programda zaten "kullanım hatası"; üç durum üç kodla
+ayrışıyor. Kısmi JSON yine basılıyor: gürültülü düşmek veri atmayı gerektirmiyor.
+
+### 4.2 `xpsnr` ve `ssim` artık vmaf başarısızlığında kaybolmuyor
+
+Tur 1'de vmaf hatası `MeasureAsync`'in ortasından fırladığı için `xpsnr` ve
+`ssim` **hiç hesaplanmıyordu**; oysa eskiden vmaf `null` dönerken ikisi de
+hesaplanıyordu. Şimdi hata yakalanıp saklanıyor, iki ölçü hesaplanıyor, sonra
+istisna **kısmi skoru taşıyarak** fırlatılıyor
+(`QualityMeasurementFailedException.PartialScore`). Bench o kısmi skoru basıyor.
+
+**Bu düzeltme pimli değil — ölçüldü, tahmin değil.** M4 mutasyonu (`catch`
+gövdesi `throw;` ile değiştirilip eski sıra geri getirildi, `--no-incremental`,
+06:48–06:49 UTC) süiti **0 kırmızı / 45 yeşil** bıraktı. Sebebi: gerçek bir vmaf
+başarısızlığını `MeasureAsync` üzerinden zorlamak için günlük yolunu dışarıdan
+vermek gerekiyor, o yol `private`. Pimlenen tek şey istisnanın kısmi skoru
+taşıması ve Bench'in onu basması (M5, aşağıda). Sıralamanın kendisi
+**ölçülmemiş durumda.**
+
+### 4.3 Tip adı da teklendi
+
+`MeasureFilterGraph` adı iki tipte birden duruyordu: `VidShrink.Ffmpeg`
+içindeki üretim tipi ve Bench'in genel ad alanındaki kopyası. Nitelenmemiş ad
+Bench'e çözülüyordu — T111'in yanlış kopyayı ölçmesine yol açan tuzak buydu ve
+tur 1'de sabit teklenmiş ama **ad teklenmemişti**.
+
+Bench'in tipi `BenchMeasureFilterGraph` oldu ve gövdesi üretim `Build`'ine
+devrediyor:
+
+    return MeasureFilterGraph.Build($"scale=w={width}:h={height}:flags=lanczos", "null", filterChain);
+
+Artık nitelenmemiş `MeasureFilterGraph` her yerde **üretim** tipi demek. Yan
+etki: Bench grafiğinin referans dalı `[1:v]settb=...` yerine
+`[1:v]null,settb=...` oluyor. `null` bir geçirgen filtre; ölçüm sonuçları
+değişmiyor (M1/M2 tur 2 koşumu aynı dört ölçüyü düşürdü, taban 45/45 yeşil),
+ama Bench'in bastığı komut dizesi eski arşiv günlüklerinden bu ek kadar farklı.
+
+### 4.4 Tur 2 mutasyonları
+
+| # | mutasyon | damga (UTC) | kırmızı |
+| --- | --- | --- | ---: |
+| M1 | `FrameLock` → `"setpts=N"` | 06:45 | 4 |
+| M2 | `FrameLock` → `"settb=AVTB"` | 06:45–06:46 | 4 |
+| M3 | `BenchOlcum.Basarisiz` `2` → `0` | 06:46–06:47 | 1 |
+| M4 | vmaf hatası anında yeniden fırlatılır (eski sıra) | 06:48–06:49 | **0** |
+| M5 | kısmi skor basılmaz | 06:47 | 1 |
+
+M3 ve M5'i düşüren ölçü aynı:
+`BasarisizOlcumde_Bench_SifirDonmez_KismiSonucu_YineDeYazar`. M4 hiçbir ölçüyü
+düşürmüyor — 4.2'de yazıldığı gibi.
+
+---
+
 ## Ölçülmeyen / bilerek bırakılan
 
 - **CI hakkında hiçbir şey söylenmiyor.** `main`in CI'ında ffmpeg yok; buradaki
@@ -164,6 +257,13 @@ ama hiçbir çağıran o iletiyi **göstermiyor**. İki dosya da bu sözleşmeni
   Windows 11 üzerinde alındı. `1/1000` ve `1/64000` taban değerleri kapların
   varsayılanı; başka bir sürümde değişirse `ZamanTabaniAsync` karşılaştırması
   ölçüyü boşa düşmeden **kırar** (öncül `Assert.NotEqual` ile pimli).
+- **`xpsnr`/`ssim` korunmasının sırası ölçülmedi** (M4 = 0 kırmızı). Gerçek bir
+  vmaf başarısızlığını üretim `MeasureAsync`'i üzerinden zorlamak için günlük
+  yolunun dışarıdan verilebilmesi gerekiyor; o `private` ve bu sözleşme onu
+  açmadı.
+- **Bench'in çıkış kodu gerçek süreçle ölçülmedi**, `BenchOlcum.YazAsync`
+  seviyesinde ölçüldü. Yani "exe 2 döndürüyor" değil, "karar veren işlev 2
+  döndürüyor ve `Program.cs` onu döndürüyor" ölçüldü.
 - **Kilidin `PTS-STARTPTS` almaşığı yeniden ölçülmedi.** T110'un gerekçesi
   (`docs/olcumler/olcu-gecerliligi.md`) olduğu gibi duruyor.
 - **`FrameLock`'un değeri değişmedi**, yalnız bildirimi (`const` →

@@ -96,7 +96,10 @@ public static class MeasureFilterGraph
 
 public sealed class QualityMeasurementFailedException : InvalidOperationException
 {
-    public QualityMeasurementFailedException(string message) : base(message) { }
+    public QualityMeasurementFailedException(string message, QualityScore? partialScore = null)
+        : base(message) => PartialScore = partialScore;
+
+    public QualityScore? PartialScore { get; }
 }
 
 public static class QualityMeter
@@ -202,8 +205,18 @@ public static class QualityMeter
             : NormalizationDescription(reference, test);
 
         VmafAggregate? vmaf = null;
+        QualityMeasurementFailedException? vmafFailure = null;
         if (EncoderCapabilities.Instance.HasFilter("libvmaf"))
-            vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, ct);
+        {
+            try
+            {
+                vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, ct);
+            }
+            catch (QualityMeasurementFailedException failure)
+            {
+                vmafFailure = failure;
+            }
+        }
 
         double? xpsnr = EncoderCapabilities.Instance.HasFilter("xpsnr")
             ? await MeasureXpsnrAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, ct)
@@ -212,6 +225,13 @@ public static class QualityMeter
         double? ssim = EncoderCapabilities.Instance.HasFilter("ssim")
             ? await MeasureSsimAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, ct)
             : null;
+
+        if (vmafFailure is not null)
+            throw new QualityMeasurementFailedException(
+                vmafFailure.Message,
+                new QualityScore(
+                    null, null, null, null, xpsnr, ssim, false, vmafFailure.Message, normalization,
+                    null, null, null, tonemapReference, alignment));
 
         return new QualityScore(
             vmaf?.Mean, vmaf?.Harmonic, vmaf?.P10, vmaf?.Min, xpsnr, ssim, true, null, normalization,
