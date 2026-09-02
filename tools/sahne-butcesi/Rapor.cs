@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using VidShrink.Core;
@@ -521,6 +521,29 @@ public static class Rapor
     public sealed record K4Sonuc(int Denenen, int Calisan, bool VarsayilanIsliyor,
         IReadOnlyList<string> CalisanListesi, string VarsayilanKodlayici = "libsvtav1");
 
+    public static string DestekNotu(string[] c)
+    {
+        if (c[2] != "hayir") return c[7];
+        if (!long.TryParse(c[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out var a)
+            || !long.TryParse(c[5], NumberStyles.Integer, CultureInfo.InvariantCulture, out var fark)
+            || !long.TryParse(c[6], NumberStyles.Integer, CultureInfo.InvariantCulture, out var gurultu))
+            return c[7];
+        return DestekGerekcesi(fark, gurultu, a);
+    }
+
+    public static string DestekGerekcesi(long fark, long gurultu, long a)
+    {
+        var gurultuKolu = fark > gurultu * 2;
+        var yuzdeKolu = fark > a / 100;
+        var gerekce = gurultuKolu switch
+        {
+            true when !yuzdeKolu => "fark tekrar gurultusunun iki katini asiyor ama ciktinin %1'ini asmiyor",
+            false when yuzdeKolu => "fark ciktinin %1'ini asiyor ama tekrar gurultusunun iki katini asmiyor",
+            _ => "fark ne tekrar gurultusunun iki katini ne de ciktinin %1'ini asiyor"
+        };
+        return gerekce + " — parametre etkisiz ya da yok sayildi";
+    }
+
     private static K4Sonuc K4(StringBuilder sb, string isKok)
     {
         sb.AppendLine("## K4 — aday x kodlayici izgarasi");
@@ -543,7 +566,7 @@ public static class Rapor
             var c = line.Split(';');
             if (c.Length < 8) continue;
             hucreler.Add(c);
-            sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]} | {c[6]} | {c[7]} |");
+            sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]} | {c[6]} | {DestekNotu(c)} |");
         }
         sb.AppendLine();
 
@@ -582,7 +605,8 @@ public static class Rapor
         int Karsilastirilan = 0, int GeriDusmeyen = 0, double EnBuyukUstunluk = 0, double? EnBuyukKazanc = null);
 
     public sealed record K4bSonuc(int Hucre, int TabaniGecen, int ZonesKazandi, int QcompKazandi,
-        double? ZonesEnIyiKazanc, double? ZonesEnIyiOran, string? ZonesEnIyiHucre);
+        double? ZonesEnIyiKazanc, double? ZonesEnIyiOran, string? ZonesEnIyiHucre,
+        int ZonesTabaniGecen = 0);
 
     private static K4bSonuc K4b(StringBuilder sb, string isKok, string[] kollar,
         Dictionary<(string Kol, string Pencere), K1Kaydi> k1)
@@ -601,7 +625,7 @@ public static class Rapor
                     satirlar.Add((kol, p.Ad, c[0], c[1], mae, c[3]));
                 }
             }
-        if (satirlar.Count == 0) return new K4bSonuc(0, 0, 0, 0, null, null, null);
+        if (satirlar.Count == 0) return new K4bSonuc(0, 0, 0, 0, null, null, null, 0);
 
         sb.AppendLine("### K4 eki — iki aday yan yana, K1 farkini hangisi kapatiyor");
         sb.AppendLine();
@@ -663,6 +687,7 @@ public static class Rapor
         double? zonesEnIyiOran = null;
         string? zonesEnIyiHucre = null;
         var kazananZones = 0;
+        var zonesTabaniGecen = 0;
         foreach (var g in satirlar.GroupBy(x => (x.Kol, x.Pencere)))
         {
             var taban = g.FirstOrDefault(x => x.Aday == "taban").Mae;
@@ -675,6 +700,8 @@ public static class Rapor
             var en = olculen.MinBy(x => x.Mae!.Value);
             var kazanc = taban.Value - en.Mae!.Value;
             kapanmaHucre++;
+            var zonesSatiri = olculen.FirstOrDefault(x => x.Aday == "zones");
+            if (zonesSatiri.Aday == "zones" && taban.Value - zonesSatiri.Mae!.Value > 0) zonesTabaniGecen++;
             if (kazanc > 0) kapanmaVar++;
             if (enBuyukKazanc is null || kazanc > enBuyukKazanc) enBuyukKazanc = kazanc;
             if (kazanc > 0 && en.Aday == "qcomp") kazananQcomp++;
@@ -714,7 +741,7 @@ public static class Rapor
         }
 
         return new K4bSonuc(kapanmaHucre, kapanmaVar, kazananZones, kazananQcomp,
-            zonesEnIyi, zonesEnIyiOran, zonesEnIyiHucre);
+            zonesEnIyi, zonesEnIyiOran, zonesEnIyiHucre, zonesTabaniGecen);
     }
 
     public static List<(string Kol, string Pencere, string Sha, long Bayt, double Mae1, double Mae2)>
@@ -946,7 +973,7 @@ public static class Rapor
         Tablo(sb, hepsi);
 
         var satirlar = new List<string>();
-        var enBuyukKayip = 0.0;
+        double? enBuyukKayip = null;
         var enBuyukUstunluk = 0.0;
         var geriDusmeyen = 0;
         double? enBuyukKazanc = null;
@@ -966,7 +993,7 @@ public static class Rapor
                 if (bozuk.VmafP10 is null) continue;
                 karsilastirilan++;
                 var kayip = dogru.VmafP10.Value - bozuk.VmafP10.Value;
-                enBuyukKayip = Math.Max(enBuyukKayip, kayip);
+                enBuyukKayip = enBuyukKayip is null ? kayip : Math.Max(enBuyukKayip.Value, kayip);
                 if (kayip <= 0)
                 {
                     geriDusmeyen++;
@@ -993,7 +1020,10 @@ public static class Rapor
         foreach (var x in satirlar) sb.AppendLine(x);
         sb.AppendLine();
         var ozet = $"karsilastirilan {karsilastirilan} kosum, en buyuk p10 kaybi " +
-                   $"{Kabuk.Inv(enBuyukKayip, "0.000")} puan, kaybi kendi hucresinin " +
+                   (enBuyukKayip is null
+                     ? "**bilinmiyor**"
+                     : Kabuk.Inv(enBuyukKayip.Value, "+0.000;-0.000;0.000")) +
+                   $" puan, kaybi kendi hucresinin " +
                    $"K5 kazancini asan {kazanciAsan} kosum";
         sb.AppendLine($"**Bozuk haritanin bedeli**: {ozet}.");
         sb.AppendLine();
@@ -1241,10 +1271,14 @@ public static class Rapor
         sb.AppendLine("(`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc");
         sb.AppendLine("mutasyon o kurali kiriyor.");
         sb.AppendLine();
-        var sozlesme = Path.Combine(kok, ".claude", "relay", "contracts", "T114.md");
-        var verify = File.Exists(sozlesme)
-            ? File.ReadLines(sozlesme).FirstOrDefault(x => x.StartsWith("verify:"))
-            : null;
+        var sozlesme = new[]
+        {
+            Path.Combine(kok, ".claude", "relay", "contracts", "T114.md"),
+            Path.Combine(kok, ".claude", "relay", "contracts", "done", "T114.md")
+        }.FirstOrDefault(File.Exists);
+        var verify = sozlesme is null
+            ? null
+            : File.ReadLines(sozlesme).FirstOrDefault(x => x.StartsWith("verify:"));
         if (verify is not null)
         {
             sb.AppendLine($"Sozlesmenin dogrulama komutu su an `{verify.Substring("verify:".Length).Trim()}`.");
@@ -1317,8 +1351,10 @@ public static class Rapor
         {
             var basSatir = k4b.ZonesKazandi == 0
                 ? "**Sahne basina dagitimin ise yaradigina dair kanit bu olcumde yok.**"
-                : $"**Sahne basina dagitim {k4b.Hucre} hucrenin {k4b.ZonesKazandi} tanesinde " +
-                  $"tabani gecti; kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp " +
+                : $"**Sahne basina dagitimi tasiyan `zones`, olculen {k4b.Hucre} hucrenin " +
+                  $"{k4b.ZonesTabaniGecen} tanesinde tabani gecti; bunlarin " +
+                  $"{k4b.ZonesKazandi} tanesinde de hucrenin en iyi adayi oldu. En iyi aday " +
+                  $"oldugu hucredeki kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp " +
                   $"({k4b.ZonesEnIyiHucre})" +
                   (k4b.ZonesEnIyiOran is null
                     ? ". O hucrede kapatilacak bir K1 acigi yok: harita kodlayicinin kendi " +
