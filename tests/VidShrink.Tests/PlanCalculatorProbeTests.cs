@@ -400,11 +400,37 @@ public sealed class PlanCalculatorProbeTests
     /// Yoklamanin gercek suresi. T125'in raporundaki 4 s'lik butce bu agacta yok
     /// (<c>EncoderCapabilities.ProbeKillMs = 15000</c>); asagidaki sayilar butcenin
     /// neresinde durdugumuzu soyluyor.
+    ///
+    /// T136/K3: sure listesi tek basina hicbir sey iddia etmiyordu (<c>d &gt;= 0</c>
+    /// hicbir mutasyonla kirilmaz). Olculen sure artik gecidin karariyla yuzlestiriliyor:
+    /// gercek yazilim yoklamasi <c>UnsettledProbeMs</c> esiginin altinda kaliyor, dolayisiyla
+    /// gecit onu <b>yerlesmis ve calisiyor</b> saymak zorunda.
     /// </summary>
     [Fact]
     public void TheRealSoftwareProbeDurationIsMeasured()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
+
+        var gate = new MainWindow.DeferredEncoderAvailability(FreshCapabilities(), () => { });
+        Assert.False(gate.IsMeasured("libsvtav1"));
+        var settle = Stopwatch.StartNew();
+        while (gate.Pending && settle.ElapsedMilliseconds < 30000) Thread.Sleep(10);
+
+        var olculen = gate.ElapsedMsFor("libsvtav1");
+        var yerlesti = olculen >= 0 && olculen < MainWindow.DeferredEncoderAvailability.UnsettledProbeMs;
+        var beklenen = yerlesti
+            ? MainWindow.DeferredEncoderAvailability.ProbeAnswer.Working
+            : MainWindow.DeferredEncoderAvailability.ProbeAnswer.Unsettled;
+
+        WriteEvidence($"gecit libsvtav1: {olculen} ms, esik " +
+                      $"{MainWindow.DeferredEncoderAvailability.UnsettledProbeMs} ms, " +
+                      $"karar {gate.AnswerFor("libsvtav1")}, beklenen {beklenen}");
+
+        Assert.True(olculen >= 0, "gecit yoklamayi hic kosturmadi");
+        Assert.Null(gate.FailureFor("libsvtav1"));
+        Assert.Equal(beklenen, gate.AnswerFor("libsvtav1"));
+        Assert.Equal(yerlesti, gate.IsMeasured("libsvtav1"));
+
         if (!MachineIsQuiet(nameof(PlanCalculatorProbeTests))) return;
 
         var durations = new List<long>();
@@ -418,7 +444,8 @@ public sealed class PlanCalculatorProbeTests
         }
 
         WriteEvidence($"libsvtav1 yoklamasi 8 tekrar: {string.Join(", ", durations)} ms");
-        Assert.All(durations, d => Assert.True(d >= 0));
+        Assert.All(durations, d => Assert.True(d < EncoderCapabilities.ProbeKillMs,
+            $"yoklama oldurme sinirina dayandi: {d} ms >= {EncoderCapabilities.ProbeKillMs} ms"));
     }
 
     // --- T136: yoklama cevap veremeyince ---

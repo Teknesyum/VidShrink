@@ -1242,6 +1242,7 @@ public partial class MainWindow : Window
             internal bool Settled;
             internal int Attempts;
             internal string? Failure;
+            internal long ElapsedMs = -1;
         }
 
         /// <summary>
@@ -1330,6 +1331,15 @@ public partial class MainWindow : Window
             }
         }
 
+        /// <summary>
+        /// Kodlayicinin son yoklamasinin gercekten kac ms surdugu, hic yoklanmadiysa -1.
+        /// Yerlesme karari bu sureden turuyor; olcu ikisini yuzlestiriyor.
+        /// </summary>
+        internal long ElapsedMsFor(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) ? answer.ElapsedMs : -1;
+        }
+
         /// <summary>Yoklama firlattiysa istisnanin metni, yoksa <c>null</c>.</summary>
         internal string? FailureFor(string codec)
         {
@@ -1398,6 +1408,7 @@ public partial class MainWindow : Window
                     if (!_answers.TryGetValue(key, out var answer)) _answers[key] = answer = new Answer();
                     answer.Attempts++;
                     answer.Failure = failure?.Message;
+                    answer.ElapsedMs = clock.ElapsedMilliseconds;
                     if (failure is null)
                     {
                         answer.Works = works;
