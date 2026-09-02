@@ -136,6 +136,42 @@ public sealed class SplitDragTests
         Assert.True(repaints <= ceiling, $"Ayırıcı {moves} harekette {repaints} çizim açtı, tavan {ceiling}.");
     }
 
+    [Theory]
+    [InlineData(25)]
+    [InlineData(40)]
+    [InlineData(60)]
+    public void GECICI_K1_kosucu_duraklarsa_bos_tur_olcusu_duser(int duraklama)
+    {
+        var (repaints, gecikme) = AppHost.Run(() =>
+        {
+            var surface = Ready();
+            Feed(surface);
+            Round(surface);
+
+            // Yuklu kosucunun duraklamasi: yuzeyin ic damgasi (_lastPresentTicks) ile
+            // olcunun kendi saatinin baslangici arasina bu kadar sure giriyor.
+            var bosluk = Stopwatch.StartNew();
+            Thread.Sleep(duraklama);
+            var gecen = bosluk.Elapsed.TotalMilliseconds;
+
+            var before = surface.Repaints;
+            var clock = Stopwatch.StartNew();
+            var moves = 0;
+            while (clock.Elapsed < TimeSpan.FromMilliseconds(50))
+            {
+                surface.Split = 0.2 + 0.6 * (++moves % 400) / 400.0;
+                Round(surface);
+            }
+
+            Assert.True(moves > 100, $"Ölçüm yeterince hareket üretmedi: {moves}");
+            return (surface.Repaints - before, gecen);
+        });
+
+        var beklenen = gecikme < 50 ? 0 : (int)Math.Floor((gecikme + 50 - 100) / (1000.0 / 60)) + 1;
+        Assert.True(beklenen == repaints,
+            $"duraklama={duraklama} gercek gecikme={gecikme:F1} ms · model {beklenen} cizim bekliyor · olcu {repaints} gordu");
+    }
+
     // ---- K4: ayırıcının kendisi bozulmuyor ------------------------------------------
 
     [Fact]
