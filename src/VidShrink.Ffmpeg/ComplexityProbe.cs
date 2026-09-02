@@ -27,6 +27,9 @@ public static class ComplexityProbe
     internal const int MinWindows = 2;
     internal const int MaxPlannedWindows = 12;
     internal const double MaxSampledShare = 0.06;
+    internal const double MaxSampledCeilingShare = 0.25;
+    internal const double MinSampledSeconds = 6.0;
+    internal const double MaxSampledSeconds = 24.0;
     internal const double SamplingTargetError = 0.05;
     internal const double SamplingErrorScale = 1.0;
     internal const double SamplingErrorDecay = 1.0;
@@ -180,7 +183,10 @@ public static class ComplexityProbe
         if (!double.IsFinite(heterogeneity) || heterogeneity <= 0) return MinWindows;
 
         var needed = Math.Pow(Math.Max(heterogeneity, 0.0) * SamplingErrorScale / SamplingTargetError, 1.0 / SamplingErrorDecay);
-        var affordable = Math.Floor(duration * MaxSampledShare / windowSeconds);
+        var budget = Math.Min(
+            Math.Clamp(duration * MaxSampledShare, MinSampledSeconds, MaxSampledSeconds),
+            duration * MaxSampledCeilingShare);
+        var affordable = Math.Floor(budget / windowSeconds);
         var ceiling = Math.Max(MinWindows, Math.Min(MaxPlannedWindows, affordable));
         return (int)Math.Clamp(Math.Ceiling(needed), MinWindows, ceiling);
     }
@@ -235,7 +241,11 @@ public static class ComplexityProbe
             var to = (int)((long)usable.Count * (s + 1) / strata);
             if (to <= from) continue;
 
-            var pick = NearestFreeSecond(usable, from, to, taken);
+            var target = 0.0;
+            for (var i = from; i < to; i++) target += secondBits[usable[i]];
+            target /= to - from;
+
+            var pick = NearestFreeSecond(usable, from, to, taken, secondBits, target);
             if (pick < 0) continue;
             taken.Add(pick);
             windows.Add(new SampleWindow(ClampStart(pick, duration, windowSeconds), windowSeconds, to - from));
@@ -244,17 +254,20 @@ public static class ComplexityProbe
         return windows.OrderBy(w => w.Start).ToList();
     }
 
-    private static int NearestFreeSecond(List<int> sorted, int from, int to, HashSet<int> taken)
+    private static int NearestFreeSecond(List<int> sorted, int from, int to, HashSet<int> taken, IReadOnlyList<double> secondBits, double target)
     {
-        var middle = from + (to - from) / 2;
-        for (var step = 0; step < to - from; step++)
+        var best = -1;
+        var bestDistance = double.MaxValue;
+        for (var i = from; i < to; i++)
         {
-            var forward = middle + step;
-            if (forward < to && !taken.Contains(sorted[forward])) return sorted[forward];
-            var back = middle - step;
-            if (back >= from && !taken.Contains(sorted[back])) return sorted[back];
+            var second = sorted[i];
+            if (taken.Contains(second)) continue;
+            var distance = Math.Abs(secondBits[second] - target);
+            if (distance >= bestDistance) continue;
+            bestDistance = distance;
+            best = second;
         }
-        return -1;
+        return best;
     }
 
     private static IReadOnlyList<SampleWindow> SceneWindows(
@@ -293,21 +306,29 @@ public static class ComplexityProbe
         for (var s = 0; s < strata; s++)
         {
             var edge = total * (s + 1) / strata;
-            var best = -1;
-            var bestLength = 0.0;
+            var first = index;
             var weight = 0.0;
-            while (index < scenes.Count && (carried < edge - 1e-9 || best < 0))
+            while (index < scenes.Count && (carried < edge - 1e-9 || index == first))
             {
                 carried += scenes[index].Length;
                 weight += scenes[index].Length;
-                if (scenes[index].Length > bestLength)
-                {
-                    bestLength = scenes[index].Length;
-                    best = index;
-                }
                 index++;
             }
-            if (best < 0) continue;
+            if (index <= first) continue;
+
+            var target = 0.0;
+            for (var i = first; i < index; i++) target += scenes[i].Rate * scenes[i].Length;
+            target /= weight;
+
+            var best = first;
+            var bestDistance = double.MaxValue;
+            for (var i = first; i < index; i++)
+            {
+                var distance = Math.Abs(scenes[i].Rate - target);
+                if (distance >= bestDistance) continue;
+                bestDistance = distance;
+                best = i;
+            }
             var centre = scenes[best].Start + (scenes[best].Length - windowSeconds) / 2.0;
             windows.Add(new SampleWindow(ClampStart(centre, duration, windowSeconds), windowSeconds, weight));
         }

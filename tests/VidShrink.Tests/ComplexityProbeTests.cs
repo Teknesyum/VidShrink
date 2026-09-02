@@ -267,13 +267,30 @@ public sealed class ComplexityProbeTests
     [Fact]
     public void WindowCountNeverExceedsTheSampledShareTheCostBudgetAllows()
     {
-        foreach (var duration in new[] { 30.0, 60.0, 240.0, 600.0, 3600.0 })
+        foreach (var duration in new[] { 30.0, 60.0, 240.0, 600.0, 3600.0, 36000.0 })
         {
             var count = ComplexityProbe.PlanWindowCount(duration, 5.0);
+            var sampled = count * 2.0;
+
             Assert.True(
-                count == ComplexityProbe.MinWindows || count * 2.0 <= duration * ComplexityProbe.MaxSampledShare,
-                $"{duration} sn icin {count} pencere butceyi asiyor");
+                count <= ComplexityProbe.MaxPlannedWindows,
+                $"{duration} sn icin {count} pencere olculmus ust sinirin uzerinde");
+            Assert.True(
+                sampled <= ComplexityProbe.MaxSampledSeconds,
+                $"{duration} sn icin {sampled} sn ornekleniyor, tavan {ComplexityProbe.MaxSampledSeconds} sn");
+            Assert.True(
+                count == ComplexityProbe.MinWindows || sampled <= duration * ComplexityProbe.MaxSampledCeilingShare,
+                $"{duration} sn icin {sampled} sn ornekleniyor, sureye orani butceyi asiyor");
         }
+    }
+
+    [Fact]
+    public void TheSameContentGetsMoreWindowsWhenTheFileIsLongEnoughToAffordThem()
+    {
+        Assert.True(
+            ComplexityProbe.PlanWindowCount(600.0, 5.0) > ComplexityProbe.PlanWindowCount(60.0, 5.0),
+            $"600 sn icin {ComplexityProbe.PlanWindowCount(600.0, 5.0)}, " +
+            $"60 sn icin {ComplexityProbe.PlanWindowCount(60.0, 5.0)}");
     }
 
     [Fact]
@@ -342,6 +359,83 @@ public sealed class ComplexityProbeTests
         var planned = ComplexityProbe.PlanWindows(SamplingPlan.Profile, duration);
         Assert.Equal(ComplexityProbe.Windows(duration).ToArray(), planned.Select(w => w.Start).ToArray());
         Assert.All(planned, w => Assert.Equal(1.0, w.Weight));
+    }
+
+    [FfmpegFact]
+    public async Task OnUnevenContentTheContentPlanLandsCloserToTheDenseCensusThanTheFixedWindows()
+    {
+        await WithUnevenClipAsync(async info =>
+        {
+            var profile = ComplexityProbe.SecondBitProfile(
+                await ReadClipPacketsAsync(info.FilePath), info.DurationSeconds);
+            Assert.True(profile.Count >= 20, $"saniye profili yalnizca {profile.Count} saniye");
+
+            async Task<double> BppfAsync(IReadOnlyList<SampleWindow> windows)
+            {
+                var samples = new List<(long Bytes, long Frames)>();
+                foreach (var window in windows)
+                    samples.Add(await ComplexityProbe.SampleAsync(
+                        info.FilePath, window.Start, window.Length, null, "medium", SpeedMode.Quality, default));
+                return ComplexityProbe.WeightedBppf(windows, samples, info.Width, info.Height);
+            }
+
+            var census = new List<SampleWindow>();
+            for (var start = 0.0; start + 2.0 <= info.DurationSeconds + 1e-9; start += 2.0)
+                census.Add(new SampleWindow(start, 2.0, 1.0));
+            Assert.True(census.Count >= 10, $"sayim yalnizca {census.Count} pencere");
+
+            var truth = await BppfAsync(census);
+            Assert.True(truth > 0, "yogun sayim bppf uretmedi");
+
+            var fixedError = Math.Abs(
+                await BppfAsync(ComplexityProbe.PlanWindows(SamplingPlan.Fixed, info.DurationSeconds)) / truth - 1.0);
+            var contentError = Math.Abs(
+                await BppfAsync(ComplexityProbe.PlanWindows(SamplingPlan.Profile, info.DurationSeconds, profile, null, 4)) / truth - 1.0);
+
+            Assert.True(
+                contentError < fixedError,
+                $"icerige bagli sapma {contentError:P1}, sabit pencere sapmasi {fixedError:P1}");
+        });
+    }
+
+    private static async Task<IReadOnlyList<PacketSample>> ReadClipPacketsAsync(string path)
+    {
+        using var process = new Process
+        {
+            StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, new[]
+            {
+                "-v", "error", "-select_streams", "v:0",
+                "-show_entries", "packet=pts_time,size", "-of", "csv=p=0", path
+            })
+        };
+        process.Start();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        await Task.WhenAll(stdout, stderr);
+        Assert.Equal(0, process.ExitCode);
+        return ComplexityProbe.ParsePackets(await stdout);
+    }
+
+    private static async Task WithUnevenClipAsync(Func<MediaInfo, Task> body)
+    {
+        var dir = Path.Combine(TestPaths.OutputRoot, "complexity-plan", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var clip = Path.Combine(dir, "uneven.mp4");
+            await RunFfmpegAsync(new[]
+            {
+                "-y",
+                "-f", "lavfi", "-i", "color=c=gray:size=320x240:rate=15:duration=18",
+                "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=15:duration=6",
+                "-filter_complex", "[0:v][1:v]concat=n=2:v=1:a=0[v]",
+                "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "16",
+                "-pix_fmt", "yuv420p", clip
+            });
+            await body(await FfprobeClient.ProbeAsync(clip));
+        }
+        finally { try { Directory.Delete(dir, true); } catch { } }
     }
 
     private static async Task WithClipAsync(Func<MediaInfo, Task> body, string source = "testsrc2=size=320x240:rate=12:duration=8")

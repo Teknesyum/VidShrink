@@ -11,13 +11,19 @@ public static class Program
     private const string Preset = "medium";
     private const int Crf = 23;
 
+    private static readonly JsonSerializerOptions Json = new()
+    {
+        WriteIndented = true,
+        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
+    };
+
     public static async Task<int> Main(string[] args)
     {
         if (args.Length == 0)
         {
-            Console.WriteLine("ornekleme sapma <klip,...> --out <dosya> [--threads 4]");
+            Console.WriteLine("ornekleme sapma <klip,...> --out <dosya> [--threads 4] [--boy 2,1,0.5]");
             Console.WriteLine("ornekleme maliyet <klip,...> [--threads 4] [--tekrar 3]");
-            Console.WriteLine("ornekleme plan <klip> [--threads 4]");
+            Console.WriteLine("ornekleme plan <klip>");
             return 1;
         }
 
@@ -46,40 +52,6 @@ public static class Program
     private static int Threads(string[] args)
         => int.TryParse(Option(args, "--threads"), out var value) && value > 0 ? value : 4;
 
-    private static async Task<int> DeviationAsync(string[] args)
-    {
-        if (args.Length < 2) return Unknown("sapma");
-        var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var threads = Threads(args);
-        var outPath = Option(args, "--out") ?? Path.Combine(".calisma", "t103", "sapma.json");
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath))!);
-
-        var results = new List<ClipReport>();
-        foreach (var clip in clips)
-        {
-            var report = await MeasureClipAsync(clip, threads);
-            results.Add(report);
-            Console.WriteLine(Line(report));
-            await File.WriteAllTextAsync(outPath, JsonSerializer.Serialize(results, Json));
-        }
-
-        Console.WriteLine($"yazildi: {outPath}");
-        return 0;
-    }
-
-    private static readonly JsonSerializerOptions Json = new()
-    {
-        WriteIndented = true,
-        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals
-    };
-
-    private static string Line(ClipReport report)
-    {
-        var best = report.Variants.OrderBy(v => Math.Abs(v.Deviation)).First();
-        return $"{report.Clip} sure={report.DurationSeconds:0.#} cv={report.Heterogeneity:0.000} " +
-               $"referans-bppf={report.ReferenceBppf:0.00000} en-iyi={best.Name} sapma={best.Deviation:P2}";
-    }
-
     private sealed record VariantReport(
         string Name,
         string Plan,
@@ -90,7 +62,9 @@ public static class Program
         double Deviation,
         double PlanBias,
         double AppliedCorrection,
-        IReadOnlyList<double> Starts);
+        IReadOnlyList<double> Starts,
+        IReadOnlyList<double> WindowBppf,
+        IReadOnlyList<double> Weights);
 
     private sealed record ClipReport(
         string Clip,
@@ -98,8 +72,10 @@ public static class Program
         int Width,
         int Height,
         double Fps,
-        double ReferenceBppf,
-        long ReferenceFrames,
+        double WholeFileBppf,
+        double CensusBppf,
+        int CensusTiles,
+        double WindowDomainOffset,
         double Heterogeneity,
         int ProfileSeconds,
         int SceneCuts,
@@ -108,110 +84,187 @@ public static class Program
         double ScanBiasSeconds,
         double ScanBias,
         int AutoWindowCount,
+        IReadOnlyList<double> SecondBits,
         IReadOnlyList<VariantReport> Variants);
 
-    private static async Task<ClipReport> MeasureClipAsync(string clip, int threads)
+    private static async Task<int> DeviationAsync(string[] args)
+    {
+        if (args.Length < 2) return Unknown("sapma");
+        var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var threads = Threads(args);
+        var lengths = (Option(args, "--boy") ?? "2")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+        var outPath = Option(args, "--out") ?? Path.Combine(".calisma", "t103", "sapma.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath))!);
+
+        var results = new List<ClipReport>();
+        foreach (var clip in clips)
+        {
+            var report = await MeasureClipAsync(clip, threads, lengths);
+            results.Add(report);
+            Console.WriteLine(Line(report));
+            await File.WriteAllTextAsync(outPath, JsonSerializer.Serialize(results, Json));
+        }
+
+        Console.WriteLine($"yazildi: {outPath}");
+        return 0;
+    }
+
+    private static string Line(ClipReport report)
+    {
+        var today = report.Variants.First(v => v.Name == "bugun-scanpoints");
+        var best = report.Variants.Where(v => v.Plan != "Fixed").OrderBy(v => Math.Abs(v.Deviation)).First();
+        return $"{report.Clip} sure={report.DurationSeconds:0.#} cv={report.Heterogeneity:0.000} " +
+               $"nufus-bppf={report.CensusBppf:0.00000} alan-kaymasi={report.WindowDomainOffset:P1} " +
+               $"bugun={today.Deviation:P2} en-iyi={best.Name}:{best.Deviation:P2}";
+    }
+
+    private static async Task<ClipReport> MeasureClipAsync(string clip, int threads, IReadOnlyList<double> lengths)
     {
         var info = await FfprobeClient.ProbeAsync(clip);
-        var cache = new SampleCache(clip, info, threads);
+        var cache = new SampleCache(clip, threads);
+        var duration = info.DurationSeconds;
 
-        var reference = await cache.WholeAsync();
-        var referenceBppf = Bppf(reference, info.Width, info.Height);
+        var whole = await cache.GetAsync(0, duration);
+        var wholeBppf = Bppf(whole, info.Width, info.Height);
+
+        foreach (var length in lengths)
+            for (var start = 0.0; start + length <= duration + 1e-9; start += 1.0)
+                await cache.GetAsync(start, length);
+
+        var tiles = new List<(long, long)>();
+        for (var start = 0.0; start + 2.0 <= duration + 1e-9; start += 2.0)
+            tiles.Add(await cache.GetAsync(start, 2.0));
+        var censusBppf = Bppf((tiles.Sum(t => t.Item1), tiles.Sum(t => t.Item2)), info.Width, info.Height);
 
         var packetWatch = Stopwatch.StartNew();
         var packets = await ReadAllPacketsAsync(clip);
         packetWatch.Stop();
-        var profile = ComplexityProbe.SecondBitProfile(packets, info.DurationSeconds);
+        var profile = ComplexityProbe.SecondBitProfile(packets, duration);
         var cv = ComplexityProbe.Heterogeneity(profile);
 
         var sceneWatch = Stopwatch.StartNew();
         var scan = await SceneDetector.ScanAsync(clip);
         sceneWatch.Stop();
         var cuts = scan.Ok
-            ? SceneMap.DerivedCutTimes(scan.Candidates, info.DurationSeconds, Math.Max(scan.Frames.Count / info.DurationSeconds, 1.0), ThresholdRule.Measured)
+            ? SceneMap.DerivedCutTimes(scan.Candidates, duration, Math.Max(scan.Frames.Count / duration, 1.0), ThresholdRule.Measured)
             : Array.Empty<double>();
 
         var scanBiasWatch = Stopwatch.StartNew();
         var scanBias = await ComplexityProbe.ScanBiasAsync(info, SpeedMode.Quality, default);
         scanBiasWatch.Stop();
 
+        cache.Flush();
         var variants = new List<VariantReport>();
 
-        var fixedWindows = ComplexityProbe.PlanWindows(SamplingPlan.Fixed, info.DurationSeconds);
-        variants.Add(await EvaluateAsync("bugun-duzeltmesiz", "Fixed", fixedWindows, cache, info, referenceBppf, profile, 0.0));
-        variants.Add(await EvaluateAsync("bugun-scanpoints", "Fixed", fixedWindows, cache, info, referenceBppf, profile,
-            ComplexityProfile.IsTrustedBias(scanBias) ? scanBias : 0.0));
-        variants.Add(await EvaluateAsync("bugun-paket-orani", "Fixed", fixedWindows, cache, info, referenceBppf, profile,
-            ComplexityProbe.PlanBias(fixedWindows, profile)));
+        async Task AddAsync(string name, string plan, IReadOnlyList<SampleWindow> windows, double correction)
+        {
+            var snapped = windows.Select(w => w with { Start = Snap(w.Start, w.Length, duration) }).ToList();
+            var samples = new List<(long Bytes, long Frames)>(snapped.Count);
+            foreach (var window in snapped) samples.Add(await cache.GetAsync(window.Start, window.Length));
 
-        var autoCount = ComplexityProbe.PlanWindowCount(info.DurationSeconds, cv);
+            var estimate = ComplexityProbe.WeightedBppf(snapped, samples, info.Width, info.Height);
+            var applied = correction > 0 ? correction : 1.0;
+            var corrected = estimate / applied;
+            variants.Add(new VariantReport(
+                name, plan, snapped.Count, snapped.Count > 0 ? snapped[0].Length : 0,
+                snapped.Sum(w => w.Length), corrected,
+                censusBppf > 0 ? corrected / censusBppf - 1.0 : double.NaN,
+                ComplexityProbe.PlanBias(snapped, profile), applied,
+                snapped.Select(w => w.Start).ToList(),
+                samples.Select(x => Bppf(x, info.Width, info.Height)).ToList(),
+                snapped.Select(w => w.Weight).ToList()));
+        }
+
+        var fixedWindows = ComplexityProbe.PlanWindows(SamplingPlan.Fixed, duration);
+        await AddAsync("bugun-duzeltmesiz", "Fixed", fixedWindows, 0.0);
+        await AddAsync("bugun-scanpoints", "Fixed", fixedWindows,
+            ComplexityProfile.IsTrustedBias(scanBias) ? scanBias : 0.0);
+        await AddAsync("bugun-paket-orani", "Fixed", fixedWindows, ComplexityProbe.PlanBias(fixedWindows, profile));
 
         foreach (var plan in new[] { SamplingPlan.Profile, SamplingPlan.Scene })
         {
-            foreach (var count in new[] { 2, 3, 4, 6, 8, 12 })
+            var tag = plan.ToString().ToLowerInvariant();
+            foreach (var count in new[] { 2, 3, 4, 5, 6, 8, 10, 12, 16, 24 })
             {
-                var windows = ComplexityProbe.PlanWindows(plan, info.DurationSeconds, profile, cuts, count);
-                var tag = plan.ToString().ToLowerInvariant();
-                variants.Add(await EvaluateAsync($"{tag}-n{count}", plan.ToString(), windows, cache, info, referenceBppf, profile, 0.0));
-                variants.Add(await EvaluateAsync($"{tag}-n{count}-oran", plan.ToString(), windows, cache, info, referenceBppf, profile,
-                    ComplexityProbe.PlanBias(windows, profile)));
+                var windows = ComplexityProbe.PlanWindows(plan, duration, profile, cuts, count);
+                if (windows.Count != count) continue;
+                await AddAsync($"{tag}-n{count}", plan.ToString(), windows, 0.0);
+                await AddAsync($"{tag}-n{count}-oran", plan.ToString(), windows, ComplexityProbe.PlanBias(windows, profile));
             }
         }
 
-        foreach (var (count, length) in new[] { (3, 2.0), (6, 1.0), (12, 0.5), (2, 3.0), (1, 6.0) })
+        foreach (var length in lengths)
         {
-            var windows = ComplexityProbe.PlanWindows(SamplingPlan.Profile, info.DurationSeconds, profile, cuts, count, length);
-            variants.Add(await EvaluateAsync($"butce6-{count}x{length.ToString("0.#", CultureInfo.InvariantCulture)}",
-                "Profile", windows, cache, info, referenceBppf, profile, ComplexityProbe.PlanBias(windows, profile)));
+            var count = (int)Math.Round(12.0 / length);
+            var windows = ComplexityProbe.PlanWindows(SamplingPlan.Profile, duration, profile, cuts, count, length);
+            if (windows.Count == 0) continue;
+            await AddAsync($"butce12-{windows.Count}x{length.ToString("0.#", CultureInfo.InvariantCulture)}", "Profile", windows, 0.0);
         }
 
-        var auto = ComplexityProbe.PlanWindows(SamplingPlan.Profile, info.DurationSeconds, profile, cuts);
-        variants.Add(await EvaluateAsync("profile-auto-oran", "Profile", auto, cache, info, referenceBppf, profile,
-            ComplexityProbe.PlanBias(auto, profile)));
+        var auto = ComplexityProbe.PlanWindows(SamplingPlan.Profile, duration, profile, cuts);
+        await AddAsync("profile-auto", "Profile", auto, 0.0);
 
         return new ClipReport(
-            Path.GetFileNameWithoutExtension(clip), info.DurationSeconds, info.Width, info.Height, info.Fps,
-            referenceBppf, reference.Frames, cv, profile.Count, cuts.Count,
+            Path.GetFileNameWithoutExtension(clip), duration, info.Width, info.Height, info.Fps,
+            wholeBppf, censusBppf, tiles.Count,
+            wholeBppf > 0 ? censusBppf / wholeBppf - 1.0 : double.NaN,
+            cv, profile.Count, cuts.Count,
             packetWatch.Elapsed.TotalSeconds, sceneWatch.Elapsed.TotalSeconds, scanBiasWatch.Elapsed.TotalSeconds,
-            scanBias, autoCount, variants);
+            scanBias, ComplexityProbe.PlanWindowCount(duration, cv), profile, variants);
     }
 
-    private static async Task<VariantReport> EvaluateAsync(
-        string name, string plan, IReadOnlyList<SampleWindow> windows, SampleCache cache,
-        MediaInfo info, double referenceBppf, IReadOnlyList<double> profile, double correction)
-    {
-        var samples = new List<(long Bytes, long Frames)>(windows.Count);
-        foreach (var window in windows)
-            samples.Add(await cache.WindowAsync(window.Start, window.Length));
-
-        var estimate = ComplexityProbe.WeightedBppf(windows, samples, info.Width, info.Height);
-        var applied = correction > 0 ? correction : 1.0;
-        var corrected = estimate / applied;
-
-        return new VariantReport(
-            name, plan, windows.Count, windows.Count > 0 ? windows[0].Length : 0,
-            windows.Sum(w => w.Length), corrected,
-            referenceBppf > 0 ? corrected / referenceBppf - 1.0 : double.NaN,
-            ComplexityProbe.PlanBias(windows, profile), applied,
-            windows.Select(w => w.Start).ToList());
-    }
+    private static double Snap(double start, double length, double duration)
+        => Math.Clamp(Math.Round(start, MidpointRounding.AwayFromZero), 0, Math.Max(0, Math.Floor(duration - length)));
 
     private static double Bppf((long Bytes, long Frames) sample, int width, int height)
         => sample.Frames > 0 ? sample.Bytes * 8.0 / ((double)width * height * sample.Frames) : 0.0;
 
-    private sealed class SampleCache(string path, MediaInfo info, int threads)
+    private sealed class SampleCache
     {
-        private readonly Dictionary<string, (long Bytes, long Frames)> cache = new();
+        private readonly string path;
+        private readonly int threads;
+        private readonly string store;
+        private readonly Dictionary<string, long[]> cache;
+        private int unsaved;
 
-        public Task<(long Bytes, long Frames)> WholeAsync() => WindowAsync(0, info.DurationSeconds);
+        public SampleCache(string path, int threads)
+        {
+            this.path = path;
+            this.threads = threads;
+            var dir = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(path)) ?? ".", ".onbellek");
+            Directory.CreateDirectory(dir);
+            store = Path.Combine(dir, $"{Path.GetFileNameWithoutExtension(path)}-crf{Crf:0}-{Preset}-t{threads}.json");
+            cache = File.Exists(store)
+                ? JsonSerializer.Deserialize<Dictionary<string, long[]>>(File.ReadAllText(store)) ?? new()
+                : new();
+        }
 
-        public async Task<(long Bytes, long Frames)> WindowAsync(double start, double length)
+        public int Encodes { get; private set; }
+
+        public int Reused { get; private set; }
+
+        public async Task<(long Bytes, long Frames)> GetAsync(double start, double length)
         {
             var key = FormattableString.Invariant($"{start:0.###}/{length:0.###}");
-            if (cache.TryGetValue(key, out var hit)) return hit;
+            if (cache.TryGetValue(key, out var hit) && hit.Length == 2)
+            {
+                Reused++;
+                return (hit[0], hit[1]);
+            }
+
             var measured = await EncodeAsync(path, start, length, threads);
-            cache[key] = measured;
+            Encodes++;
+            cache[key] = new[] { measured.Bytes, measured.Frames };
+            if (++unsaved >= 20) Flush();
             return measured;
+        }
+
+        public void Flush()
+        {
+            unsaved = 0;
+            File.WriteAllText(store, JsonSerializer.Serialize(cache));
         }
     }
 
@@ -264,6 +317,20 @@ public static class Program
         return ComplexityProbe.ParsePackets(await stdout);
     }
 
+    private static ProcessStartInfo StartInfo(string fileName, IEnumerable<string> args)
+    {
+        var info = new ProcessStartInfo
+        {
+            FileName = fileName,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var arg in args) info.ArgumentList.Add(arg);
+        return info;
+    }
+
     private static async Task<int> PlanAsync(string[] args)
     {
         if (args.Length < 2) return Unknown("plan");
@@ -301,6 +368,8 @@ public static class Program
             var newSampleMs = new List<double>();
             var oldEncodes = 0;
             var newEncodes = 0;
+            var oldSeconds = 0.0;
+            var newSeconds = 0.0;
 
             for (var i = 0; i < repeats; i++)
             {
@@ -326,6 +395,7 @@ public static class Program
                 watch.Stop();
                 oldSampleMs.Add(watch.Elapsed.TotalMilliseconds);
                 oldEncodes = fixedWindows.Count + ComplexityProbe.ScanPoints(info.DurationSeconds).Count;
+                oldSeconds = fixedWindows.Sum(w => w.Length) + ComplexityProbe.ScanPoints(info.DurationSeconds).Count * 1.0;
 
                 var planned = ComplexityProbe.PlanWindows(SamplingPlan.Profile, info.DurationSeconds, profile);
                 watch.Restart();
@@ -333,6 +403,7 @@ public static class Program
                 watch.Stop();
                 newSampleMs.Add(watch.Elapsed.TotalMilliseconds);
                 newEncodes = planned.Count;
+                newSeconds = planned.Sum(w => w.Length);
             }
 
             rows.Add(new
@@ -348,27 +419,21 @@ public static class Program
                 NewTotalMs = Median(newSampleMs) + Median(packetMs),
                 OldEncodeCalls = oldEncodes,
                 NewEncodeCalls = newEncodes,
+                OldEncodedSeconds = oldSeconds,
+                NewEncodedSeconds = newSeconds,
                 Repeats = repeats,
                 Threads = threads
             });
             Console.WriteLine(JsonSerializer.Serialize(rows[^1], Json));
         }
 
-        return 0;
-    }
-
-    private static ProcessStartInfo StartInfo(string fileName, IEnumerable<string> args)
-    {
-        var info = new ProcessStartInfo
+        var outPath = Option(args, "--out");
+        if (outPath is not null)
         {
-            FileName = fileName,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-        foreach (var arg in args) info.ArgumentList.Add(arg);
-        return info;
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath))!);
+            await File.WriteAllTextAsync(outPath, JsonSerializer.Serialize(rows, Json));
+        }
+        return 0;
     }
 
     private static double Median(List<double> values)
