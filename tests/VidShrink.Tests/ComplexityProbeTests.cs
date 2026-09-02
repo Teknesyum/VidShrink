@@ -607,15 +607,15 @@ public sealed class ComplexityProbeTests
     [FfmpegFact]
     public async Task KucukKaynakOlcerVarkenNormalKaynakKadarKaliteUretiyor()
     {
-        var kucukOlcer = new FakeMeter(true);
-        var normalOlcer = new FakeMeter(true);
+        var kucuk = 0;
+        var normal = 0;
 
         await WithClipAsync(async info =>
-            await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, kucukOlcer), KucukKaynak);
+            kucuk = (await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, new FakeMeter(true))).QualityMeasurements.Count, KucukKaynak);
         await WithClipAsync(async info =>
-            await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, normalOlcer), NormalKaynak);
+            normal = (await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, new FakeMeter(true))).QualityMeasurements.Count, NormalKaynak);
 
-        Assert.True(normalOlcer.Calls > 0, "normal kaynak da olcmedi, olcu girdiyi ayirt etmiyor");
-        Assert.Equal(normalOlcer.Calls, kucukOlcer.Calls);
+        Assert.True(normal > 0, "normal kaynak da kalite uretmedi, olcu girdiyi ayirt etmiyor");
+        Assert.Equal(normal, kucuk);
     }
 }
