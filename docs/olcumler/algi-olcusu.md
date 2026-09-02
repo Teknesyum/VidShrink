@@ -1045,6 +1045,43 @@ Bunun sonucu: **kare kilidi CI'da korunmuyor.** CI ffmpeg görmediği sürece ki
 kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın ffmpeg'siz
 koşması ayrı bir işe (T115) alındı.
 
+> **T116 eklemesi — CI'da koşan üç "ölçüm filtresi" ölçüsü ürünü pinlemiyor.**
+> `VmafPoolingTests` üç ölçü taşıyor (`OlcumFiltresi_IkiGirdiyiDe_KareIndeksineKilitler`,
+> `OlcumFiltresi_KareKilidi_OlceklemedenSonraGelir` — ikisi düz `[Fact]`, yani
+> **CI'da koşuyor** — ve `OlcumSerisi_KareKilidi_GoreceliKaydirilinca_Bozulur`).
+> Adları kilidi ölçüyormuş gibi duruyor ama çağırdıkları `MeasureFilterGraph`
+> **ürünün sınıfı değil.** Ağaçta aynı adla iki sınıf var:
+> `VidShrink.Ffmpeg.MeasureFilterGraph` (`QualityMeter.cs:73`) ve
+> `tools/VidShrink.Bench/Program.cs:2545`'teki — ikincisi **global ad uzayında**,
+> çünkü `Program.cs` hiç `namespace` bildirmiyor. C#'ta kapsayan ad uzayının
+> üyeleri `using` ile getirilen adların önüne geçtiği için testlerdeki niteliksiz
+> `MeasureFilterGraph` **`VidShrink.Bench`inkine** bağlanıyor.
+>
+> Bu okunarak değil **ölçülerek** saptandı: `VmafPoolingTests.cs`'in ad uzayı ve
+> `using` kümesi birebir kopyalanıp `typeof(MeasureFilterGraph)` yazdırıldı
+> (`.calisma/T116/adcozum/`, `dotnet run --project .calisma/T116/adcozum/adcozum.csproj`):
+>
+> ```
+> tur      : MeasureFilterGraph
+> derleme  : VidShrink.Bench
+> urun tur : VidShrink.Ffmpeg.MeasureFilterGraph @ VidShrink.Ffmpeg
+> ```
+>
+> `grep -rn MeasureFilterGraph tests/` dört kullanımın dördünü de bu dosyada
+> buluyor; **ürünün sınıfını adıyla anan tek bir ölçü yok.** Ürünün
+> `MeasureFilterGraph`ının tek çağıranı `QualityMeter.cs:359`.
+>
+> Bu, yukarıdaki sonucu değiştirmiyor, **güçlendiriyor**: ürün kilidini pinleyen
+> ölçüler §9.8'in mutasyon tablosundaki 9 kırmızıdır ve hepsi `[FfmpegFact]`.
+> CI'da yeşil duran iki `OlcumFiltresi_*` ölçüsü `bench`in grafiğini koruyor
+> (T106'nın kilidi), ürününkini değil. İki `Build` aşırı yüklemesinin imzaları da
+> farklı (`bench`: `(int, int, string)`, ürün: `(string, string, string)`), yani
+> testler nitelenmiş yazılsa **derlenmezdi**.
+>
+> **Düzeltilmedi.** `VmafPoolingTests.cs` ve `Program.cs` bu sözleşmenin
+> `owns`'unda değil. Ad çakışmasının kendisi de bir kusur: iki sınıf aynı adı
+> taşıyor ve biri global ad uzayında duruyor.
+
 > **T116 düzeltmesi — "yaklaşık 80" yanlış.** T110 denetimi bu sayıyı iki
 > koşumda ölçtü: yerel `tools/ci-gibi-kos.sh` **106**, GitHub CI **100** atlıyor.
 > Bu iki sayı denetimin ölçümüdür; T116 tam süiti koşturmadı (sözleşme yasakladı)
