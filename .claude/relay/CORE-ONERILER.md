@@ -109,3 +109,40 @@ kendi ihlalini en ucuz cozum haline getiriyorsa -- kaydi elle duzeltmek, komutu
 dongu icine saklamak, kancasiz araca gecmeyi refleks haline getirmek -- o kapi
 degil surtunmedir. Ve surtunme her asildiginda kapinin gercekten gerektigi ani
 da beraberinde asar.
+
+## Muhur kapisi denetciyi goremiyor — is bitiyor, muhur vurulamiyor
+
+**Ne oldu.** 2 Eylul 2026 aksami saat 19:31'den sonra alt ajanlarin
+`.claude/relay/live/<agentId>.json` kayitlari **hic yazilmadi**. Uc ajan etkilendi:
+iki denetci (T139, T149) ve bir yapici (T149). `live/_calls.json` de son kaydi
+19:31'de aldi ve durdu. `contract.js audit --run-id <id>` kayitsiz denetimi
+reddediyor:
+
+  Refused - no live record for run-id: <id> - the auditor must be an agent that
+  actually ran, not a name
+
+**Sonuc.** T149 isini bitirdi, denetimi GECTI, KRITIK yok, CI yesil (`33677212181`)
+— ve muhurlenemedi. Is `main`e birlestirildi ama sozlesme `submitted` kaldi.
+Kapinin amaci "denetci gercekten kostu ve hicbir seye yazmadi"yi kanitlamak;
+ikisi de dogru, ama kanit dosyasi yok.
+
+**Neden bu bir Core kusuru.** Kapiyi asmanin tek yolu kaydi elle yazmak, yani
+kapinin denetledigi kanitin ta kendisini uydurmak. T0 bunu yapmadi. Bir dogrulama
+kapisi, tek kacisi sahtecilik olacak sekilde tasarlanmamali.
+
+**Uc oneri.**
+
+1. **`audit` kaydi bulamayinca durmasin, tesbit etsin.** Kayit yoksa denetimi
+   `unverified_runner` isaretiyle yazsin ve `complete` bunu mühür notuna gecirsin.
+   Boylece iz kaybolmuyor, kimse de sahte kayit yazmiyor.
+2. **Kanca neden sustu, bunun kendi olcusu olsun.** `live/` yazimi sessizce
+   durabiliyor ve bu ancak muhur anisinda fark ediliyor — saatler sonra.
+   `_saglik` dosyasi bugun 0 bayt.
+3. **`contract.js` `live/`i depo kokunden okusun.** Ayri bir kusur ama ayni turda
+   ikinci kez carpti: T148'in denetci kaydi kokteki `live/` altindaydi, T0 worktree'sinin
+   `live/`i altinda degildi; muhur once bu yuzden dustu, kayit elle kopyalanarak asildi.
+   `live/` worktree-yerel degil, depo-genel bir dizin.
+
+**Ilgili.** Ayni ailenin bilinen uc kusuru: `roleOf` mühür kapisinin rolu yanlis
+okumasi, `agents/auditor.md` ve `advisor.md`nin Core 0.7.3'te hic bulunmamasi,
+`guard.js`in komut metnine bakip etkisine bakmamasi.

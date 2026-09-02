@@ -870,3 +870,25 @@ Dal `T149-videotoolbox-satici`, tepe `d85b6b3` (rebase oncesi `5e50526`), rapor
 `docs/olcumler/videotoolbox-baglama.md`. Denetim GECTI, KRITIK yok, yedi borc. CI `33677212181` completed success.
 Muhur **bloke**: denetci ajanin `live/` kaydi hic yazilmadi, `contract.js audit`
 kayitsiz denetimi kabul etmiyor. Kayit elle uydurulmadi.
+
+## T148 muhurlendi (2 Eylul 2026, tur 1)
+
+Yerellestirme olcusu artik cagri yerlerini okuyor. On olcunun onu da anahtar
+kumelerini birbirine karsilastiriyordu; uc anahtar iki dilde birden eksik oldugu
+icin kumeler esitti ve on olcu de yesil kaldi. Yeni olcu kapali kumeyi **turden**
+cikariyor (`string key` alan uyeler, sabit noktaya kadar buyutulen alicilar) ve
+cagri yerlerini derlenmis IL'den sayiyor: 435 cagri yeri, 416 sabit anahtarli,
+19 sabit anahtarsiz, 389 anahtar iki dilde de var. En kalabalik tuketici
+`Say` degil `TextExtension::.ctor` — yani XAML tarafi, 196 cagri.
+
+Denetim GECTI, KRITIK yok. Denetci alti mutasyonun dordunu kendi kurdu.
+CI `33680321592` completed success. Muhurden once uc rapor cumlesi duzeltildi.
+
+**T0 kusuru bu turda:** sozlesmenin oncululu `Say("` deseniyle olculmustu ve
+`{loc:Text}` yolunu hic gormemisti — 196 cagri yeri, `Say`in 141'inden fazla.
+Desen taramasi yalniz raporu degil **bir sonraki sozlesmenin oncululu de** bozuyor.
+Ikinci kusur: yapicinin satir numarasi duzeltmesini olcmeden kabul ettim ve dogru
+sayinin uzerine yanlisini yazdim; denetci gosterdi, geri alindi.
+
+Iki olcum borcu T146'ya devredildi: 19'un dagilimi (13 mi 11 mi) ve K4'un
+"yanlis pozitif yok" iddiasi. Ikisi de olculmeden duzeltilmedi.
