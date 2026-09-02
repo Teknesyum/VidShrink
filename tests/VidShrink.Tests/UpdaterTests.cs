@@ -904,6 +904,8 @@ public sealed class UpdaterTests : IDisposable
         Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
     }
 
+    private static readonly TimeSpan IkinciAcilisTavani = TimeSpan.FromSeconds(2);
+
     [LiveLauncherFact]
     public void EveryLaunchChecksAndStaysWithinTheTimeout()
     {
@@ -920,7 +922,7 @@ public sealed class UpdaterTests : IDisposable
         _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
         Assert.True(offlineFirst < TimeSpan.FromSeconds(3), $"ağsız açılış çok uzun: {offlineFirst}");
-        Assert.True(offlineSecond < TimeSpan.FromSeconds(3), $"ağsız ikinci açılış çok uzun: {offlineSecond}");
+        Assert.True(offlineSecond < IkinciAcilisTavani, $"ağsız ikinci açılış çok uzun: {offlineSecond}");
     }
 
     [LiveLauncherFact]
