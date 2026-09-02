@@ -40,9 +40,19 @@ class Clip:
         vals = [b for b in self.bits if b > 0]
         return sum(vals) / len(vals) if vals else 0.0
 
-def estimate(clip, windows, ratio=False):
+def estimate(clip, windows, ratio=False, clamp=None):
+    if ratio == "genel":
+        num = den = 0.0
+        for start, weight, _ in windows:
+            v = clip.bppf(clip.snap(start))
+            wb = clip.window_bits(clip.snap(start))
+            if v is None or wb <= 0:
+                return None
+            num += weight * (v / wb)
+            den += weight
+        fm = clip.file_mean_bits()
+        return (num / den) * fm if den > 0 and fm > 0 else None
     num = den = 0.0
-    mean = clip.file_mean_bits()
     for start, weight, stratum_mean in windows:
         v = clip.bppf(clip.snap(start))
         if v is None:
@@ -50,7 +60,10 @@ def estimate(clip, windows, ratio=False):
         if ratio:
             wb = clip.window_bits(clip.snap(start))
             if wb > 0 and stratum_mean > 0:
-                v *= stratum_mean / wb
+                f = stratum_mean / wb
+                if clamp:
+                    f = min(max(f, clamp[0]), clamp[1])
+                v *= f
         num += weight * v
         den += weight
     return num / den if den > 0 else None
@@ -61,6 +74,13 @@ def fixed_plan(clip):
         return [(0.0, 1.0, 0.0)]
     usable = max(0.0, d - WINDOW)
     n = 2 if d < WINDOW * 6 else 3
+    return [(usable * (i + 0.5) / n, 1.0, 0.0) for i in range(n)]
+
+def even_plan(clip, n):
+    d = clip.duration
+    usable = max(0.0, d - WINDOW)
+    if n <= 0 or usable <= 0:
+        return None
     return [(usable * (i + 0.5) / n, 1.0, 0.0) for i in range(n)]
 
 def strata_indices(order, n):
@@ -97,6 +117,31 @@ def profile_plan(clip, n, target="mean", separate=False):
         if pick is None:
             continue
         taken.add(pick)
+        out.append((float(pick), float(len(group)), m))
+    return out or None
+
+def wprofile_plan(clip, n, separate=True):
+    last = int(math.floor(clip.duration - WINDOW))
+    starts = [i for i in range(0, last + 1) if clip.window_bits(i) > 0]
+    if len(starts) < 4:
+        return None
+    wb = {i: clip.window_bits(i) for i in starts}
+    starts.sort(key=lambda i: (wb[i], i))
+    taken = []
+    out = []
+    for group in strata_indices(starts, min(n, len(starts))):
+        if not group:
+            continue
+        m = sum(wb[i] for i in group) / len(group)
+        pick = None
+        for i in sorted(group, key=lambda i: (abs(wb[i] - m), i)):
+            if separate and any(abs(i - t) < WINDOW for t in taken):
+                continue
+            pick = i
+            break
+        if pick is None:
+            continue
+        taken.append(pick)
         out.append((float(pick), float(len(group)), m))
     return out or None
 
@@ -149,8 +194,8 @@ def run(report_path, clip_dir):
             print(f"onbellek yok: {r['Clip']}", file=sys.stderr)
     return clips
 
-def deviation(clip, windows, ratio=False):
-    e = estimate(clip, windows, ratio)
+def deviation(clip, windows, ratio=False, clamp=None):
+    e = estimate(clip, windows, ratio, clamp)
     return None if e is None or clip.census <= 0 else e / clip.census - 1.0
 
 def cv(clip):
@@ -205,34 +250,77 @@ if __name__ == "__main__":
         for ratio in (False, True):
             variants.append((f"sahne{'-ayrik' if sep else ''}{'-oran' if ratio else ''}",
                              (lambda s: lambda c, n: scene_plan(c, n, s))(sep), ratio))
+    for target in ("mean", "median", "window"):
+        variants.append((f"profil-{target}-genel",
+                         (lambda t: lambda c, n: profile_plan(c, n, t))(target), "genel"))
+    variants.append(("sahne-genel", lambda c, n: scene_plan(c, n), "genel"))
+    variants.append(("esaralik-genel", lambda c, n: even_plan(c, n), "genel"))
+    variants.append(("esaralik-duz", lambda c, n: even_plan(c, n), False))
+    for sep in (False, True):
+        for ratio in (False, True):
+            variants.append((f"pencere{'-ayrik' if sep else ''}{'-oran' if ratio else ''}",
+                             (lambda s: lambda c, n: wprofile_plan(c, n, s))(sep), ratio))
 
     ns = [2, 3, 4, 5, 6, 8, 10, 12, 16]
     print()
-    print("== K2/K3: aday planlarin ortalama mutlak sapmasi (korpus ortalamasi) ==")
-    print(f"{'plan':22s} " + " ".join(f"N={n:<6d}" for n in ns))
-    table = {}
+    print("== K2/K3: aday planlar, en kotu klip sapmasi (parantez icinde ortalama mutlak) ==")
+    print(f"{'plan':22s} " + " ".join(f"N={n:<12d}" for n in ns))
+    worst = {}
+    mean = {}
+    percl = {}
     for name, maker, ratio in variants:
         row = []
         for n in ns:
-            devs = [abs(d) for c in clips
-                    for w in [maker(c, n)] if w
-                    for d in [deviation(c, w, ratio)] if d is not None]
-            table[(name, n)] = sum(devs) / len(devs) if devs else None
-            row.append(f"{table[(name,n)]:.3f}  " if devs else "  -    ")
-        print(f"{name:22s} " + " ".join(row))
+            devs = {}
+            for c in clips:
+                w = maker(c, n)
+                d = deviation(c, w, ratio) if w else None
+                if d is not None:
+                    devs[c.name] = d
+            if len(devs) == len(clips) and clips:
+                worst[(name, n)] = max(abs(d) for d in devs.values())
+                mean[(name, n)] = sum(abs(d) for d in devs.values()) / len(devs)
+                percl[(name, n)] = devs
+                row.append(f"{worst[(name,n)]:.3f} ({mean[(name,n)]:.3f})")
+            else:
+                row.append("     -        ")
+        print(f"{name:22s} " + " ".join(f"{r:14s}" for r in row))
 
-    best = min((v, k) for k, v in table.items() if v is not None)
-    print()
-    print(f"en dusuk ortalama mutlak sapma: {best[1][0]} N={best[1][1]} -> {best[0]:.3f}")
+    if worst:
+        fams = {}
+        for (name, n), v in worst.items():
+            fams.setdefault(name, []).append(v)
+        print()
+        print("== aile dayanikliligi: N secimi kosumda yapilir, aileyi N'lerin en kotusu secer ==")
+        for name, vals in sorted(fams.items(), key=lambda kv: max(kv[1])):
+            print(f"  {name:22s} N'ler arasi en kotu={max(vals):.3f}  en iyi={min(vals):.3f}")
+        family = min(fams.items(), key=lambda kv: max(kv[1]))[0]
+        fam_ns = [(n, worst[(family, n)]) for n in ns if (family, n) in worst]
+        knee = min(fam_ns, key=lambda kv: (kv[1], kv[0]))[0]
+        print()
+        print(f"secilen aile: {family}; N egrisi:")
+        for n, v in fam_ns:
+            print(f"  N={n:<3d} enkotu={v:.4f} ortalama={mean[(family,n)]:.4f}")
+        print(f"olculen ust sinir (en kotuyu en aza indiren N): {knee}")
+        print("secilen ailenin klip basina sapmasi, N=%d:" % knee)
+        for c in clips:
+            print(f"  {c.name:16s} {percl[(family,knee)][c.name]:+8.2%}")
 
-    print()
-    print("== secilen adayin icerik basina sapmasi ==")
-    name, n = best[1]
-    maker, ratio = next((m, r) for t, m, r in variants if t == name)
-    for c in clips:
-        w = maker(c, n)
-        d = deviation(c, w, ratio) if w else None
-        b, src = bias[c.name]
-        raw = deviation(c, fixed_plan(c))
-        today = (raw + 1.0) / b - 1.0
-        print(f"{c.name:16s} bugun {today:+8.2%}   {name}-N{n} {d:+8.2%}" if d is not None else f"{c.name:16s} -")
+        best_worst = min(worst.values())
+        winners = sorted((n, name) for (name, n), v in worst.items() if v <= best_worst + 1e-12)
+        print()
+        print(f"en dusuk en-kotu-sapma: {best_worst:.3f} -> " + ", ".join(f"{nm} N={n}" for n, nm in winners))
+
+        print()
+        print("== en iyi uc aday, klip basina ==")
+        top = sorted(worst.items(), key=lambda kv: (kv[1], kv[0][1]))[:3]
+        for (name, n), v in top:
+            cells = " ".join(f"{c.name}={percl[(name,n)][c.name]:+.2%}" for c in clips)
+            print(f"{name}-N{n:<3d} enkotu={v:.3f} | {cells}")
+
+        print()
+        print("== K3: secilen ailenin N egrisi (en kotu sapma) ==")
+        family = top[0][0][0]
+        for n in ns:
+            v = worst.get((family, n))
+            print(f"  {family} N={n:<3d} enkotu={v:.4f} ortalama={mean[(family,n)]:.4f}" if v is not None else f"  {family} N={n:<3d} -")
