@@ -296,6 +296,16 @@ Kusur **yalnız bizim satırlarımızı** vurduğu için buradaki açık olduğu
 - `:222-228` kodlayıcı seçim kuralının bu sayıya dayandığı uyarısı — **kural artık
   düzeltilmiş ölçüyle yeniden kurulabilir**
 
+### Ölçüm düzeneğinin kendisi — sayı değil, sayım kusuru
+
+`tools/auto-mod-olcumu/tablolar.py`
+- `:24` `sifir = sum(1 for x in s if x < 1.0)` — sütun başlığı "sıfır puanlı kare",
+  saydığı şey "1'in altındaki kare". Sözleşmedeki **26** buradan geliyor.
+  Gerçek tam sıfır sayısı koşuma göre **24-25**. Bu satırdan çıkan her tablo
+  ikinci bir damga istiyor: **ölçü kusuru değil, sayım/adlandırma kusuru.**
+  İkisi bağımsız — framesync düzeltilince sütun sıfırlanacak ama başlığı hâlâ
+  yanlış şeyi sayıyor olacak.
+
 ### Temiz görünenler
 
 `docs/olcumler/` altında VMAF sayısı bulunmayanlar: `T30-panel-olcumleri.md`,
