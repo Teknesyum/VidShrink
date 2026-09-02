@@ -384,8 +384,9 @@ gizlemenin anlamı yok.
 | 960x540@60 | 869,4 | 72,294 | 61,127 | **40,036** |
 | 882x496@60 | 858,9 | **72,355** | 59,747 | 38,881 |
 
-Ters çift: eski model **1/10**, yeni model **10/10**. Donanım kolunda küçültme
-gerçekten kazanıyor ve eski modelin ölçek kredisi tam da bunu söylüyordu.
+Ters çift: eski model **1/10** (yalnız `960x540`–`882x496`), yeni model **9/10**.
+Donanım kolunda küçültme gerçekten kazanıyor ve eski modelin ölçek kredisi
+tam da bunu söylüyordu.
 
 Sebep okunabilir: `av1_nvenc` 1920x1080@60'ta 800 kbit/s isteğine karşı 729,0 kbps
 teslim ediyor — diğer dört yerleşim 854–873 bandında. Donanım kodlayıcı yerel
@@ -393,7 +394,8 @@ teslim ediyor — diğer dört yerleşim 854–873 bandında. Donanım kodlayıc
 davranışı; ölçek-kalite ilişkisi değil.
 
 1920x1080@60 satırı eşit boyutta değil (%15 düşük), o yüzden karşılaştırmada
-sayılmamalıdır. Kalan dört yerleşimde bile yeni model **6/6** ters.
+sayılmamalıdır. Kalan dört yerleşimde eski model **1/6**, yeni model **5/6** ters —
+1080p satırını atmak sonucu değiştirmiyor.
 
 Model tarafında `kullanilirK` sütunu 1590k (1080p60) ve 1104k (900p60) diyor, yani
 taban bu iki yerleşimi 800 kbit/s'te zaten eliyor (`tabanGecer=False`). Ölçüm ikisini
@@ -403,7 +405,14 @@ de teslim edebildi; tahmin ile gerçek arasındaki bu fark ayrı bir kusur, kaps
 
 A-hareketli, `libsvtav1`, 12 yerleşim. İki satır dışlandı: `1920x1080@30` 338,6 kbps
 ve `1600x900@60` 298,0 kbps teslim etti (istek 350k, −%15), eşit boyut değiller.
-Kalan n=10:
+Kalan n=10. Ölçülen sütun `.calisma/T107/gunluk/asiri-A.tsv`, skor sütunları
+
+```
+dotnet run --project tools/yerlesim-skoru/Skor.csproj -c Release --no-build --   .calisma/T107/kaynak/A-hareketli.mkv 0.4 libsvtav1   .calisma/T107/yerlesimler-asiri.txt --videok 350
+```
+
+teslim edilen ikilide ve `rate` terimi geri alınmış ikilide (her ikisinden önce
+`--no-incremental` derleme) ayrı ayrı koşuldu:
 
 | Yerleşim | ölçülen | eski skor | yeni skor |
 |---|---|---|---|
@@ -576,9 +585,12 @@ Değişiklik dört ölçüyü düşürüyor ve dördü de bu sözleşmenin `owns
 İlk üçünün eski modelde yeşil olduğunu ölçtüm: `rate` terimi geri alınmış halde
 `dotnet test -c Release --no-build --filter "FillBandTests|QualityTargetUiTests|SpeedModeTests"`
 → **0 başarısız / 52 başarılı / 1 atlandı**; yeni modelde aynı filtre 3 başarısız.
-Dördüncüsü (`SearchCostIsBoundedAndCounted`) **yerelde ölçülmedi** — 1 dk 31 sn süren
-bir arama ölçüsü, yereldeki kesilmiş koşuma girmedi; sadece CI'da düştüğünü biliyorum
-ve hata `BelowFloor` anahtarının bulunamaması, yani o da eski davranışa çivilenmiş.
+Dördüncüsünü (`SearchCostIsBoundedAndCounted`) ayrıca ölçtüm: eski modelde
+`--filter "FullyQualifiedName~QualityTargetTests.SearchCostIsBoundedAndCounted"`
+→ **0 başarısız / 1 başarılı**, 1 dk 23 sn; yeni modelde aynı filtre
+**1 başarısız**, 2 dk 51 sn. Hata `BelowFloor` anahtarının bulunamaması, yani o da
+eski davranışa çivilenmiş. (Süreler makine paylaşımlıydı; sıralama değil, sadece
+kırmızı/yeşil bilgisi ölçüdür.)
 
 Dördü de beklenen değeri eski modele çivilenmiş düzeneklerdir; hiçbiri yeni modelin
 bozuk olduğunu söylemiyor. Ama düzeltmek `owns` dışına yazmayı gerektiriyor,
