@@ -511,12 +511,15 @@ Sebep bench'in ölçekleme adımı değil: aynı çift `scale` filtresi olmadan 
 kare numaraları, ortalama 94,462, harmonik 56,313). Çıktı dosyasının kendisiyle
 libvmaf arasında kalıyor.
 
-**5. Ölçüm betiğinin sütun adı sayıyla uyuşmuyor.** Bu ölçümün tablolarını üreten
-`tablolar.py` sütunu `sifir = sum(1 for x in s if x < 1.0)` ile hesaplıyor ama
-başlığına "sıfır puanlı kare" yazıyor. Saydığı şey 1 puanın altındaki kare; tam
-sıfır sayısı bundan bir ya da iki eksik. Sayı doğru, adı yanlış — ve bu belgenin
-ilk sürümündeki iki yanlış cümlenin kaynağı bu oldu. Betik artık `main`de:
-`tools/auto-mod-olcumu/tablolar.py` — hesap `:24`'te, yanlış başlık `:79`'da ve **hâlâ
-duruyor**. Dosya bu sözleşmenin `owns`'unda değil; düzeltme T0'a bildirildi. Bu
-belgedeki tablolar başlığı doğru ("1 puan altı kare") yazıyor.
+**5. Ölçüm betiğinin sütun adı sayıyla uyuşmuyordu — kapandı.** `tablolar.py`
+sütunu `sifir = sum(1 for x in s if x < 1.0)` ile hesaplayıp başlığına "sıfır puanlı
+kare" yazıyordu. Saydığı şey 1 puanın altındaki kare; tam sıfır sayısı bundan bir ya
+da iki eksik. Sayı doğruydu, adı yanlıştı — ve bu belgenin ilk sürümündeki iki yanlış
+cümlenin kaynağı bu oldu.
+
+**T111'de okundu: başlık düzeltilmiş.** `b552142` ("ölçü aracı: sütun adı saydığı
+şeye göre düzeltildi") başlığı "1 puan altı kare" yaptı; bugün
+`tools/auto-mod-olcumu/tablolar.py:78` böyle diyor. Geriye yalnız değişken adı
+(`sifir`, `:24`) kaldı, o da rapora girmiyor. Bu maddenin "hâlâ duruyor" cümlesi
+düzeltmeden sonra güncellenmemişti; **kusur kapandı, cümle geç kaldı.**
 

@@ -508,7 +508,12 @@ karenin altında — tam olarak sahadaki 3,3 ms'lik kayma gibi.
 
 **Sınırı yazmak gerekiyor:** bu üç ölçü ffmpeg istiyor, bu yüzden `[FfmpegFact]`
 ile işaretli — ffmpeg'i olmayan koşucuda **atlanıyor, düşmüyor.** CI koşucusunda
-ffmpeg yok (aynı süitte 83 test bu sebeple atlanıyor; yerelde 17). Yani kare
+ffmpeg yok. **Atlanan sayısı sabit değil, her turda büyüyor** — T106 "83" yazmıştı,
+o sayı yazıldığı anda bile bir sonraki koşumda geçerliliğini yitiriyordu:
+`33575828972` → 83, `33580719123` → 86, `33583013195` → 95,
+`33585293085` (T111'in dalı) → **103** (geçen 1044, toplam 1147). Bu belge artık
+sayıyı değil **koşumu** yazıyor; sayı isteyen `gh run view <id> --log` ile okur.
+Yani kare
 kilidini tutan pim **yerelde ve ffmpeg'i olan koşucuda** koruyor, CI'da
 korumuyor. Havuzlama ölçüleri saf, her yerde koşuyor. Kilidi CI'da da tutmak
 istenirse yapılacak iş ffmpeg'i koşucuya kurmaktır; bu sözleşme onu yapmadı.
