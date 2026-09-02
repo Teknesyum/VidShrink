@@ -1633,6 +1633,7 @@ public partial class MainWindow : Window
         BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
 
         // T48/K1: plan tazelendi. Panel gecikmesini kendi kurar; burası yalnız haber verir.
+        if (_preview is not null) _preview.Scenes = _sceneMap?.Map;
         _preview?.SetPlan(_info, ActivePlan, _profile);
     }
 

@@ -20,6 +20,67 @@ if (args.Length >= 5 && args[0] == "atlama")
     return 0;
 }
 
+if (args.Length >= 5 && args[0] == "onizleme")
+{
+    var src = Path.GetFullPath(args[1]);
+    var mb = double.Parse(args[2], inv);
+    var dir = Path.GetFullPath(args[3]);
+    var finalFile = Path.GetFullPath(args[4]);
+    var th = args.Length > 5 ? int.Parse(args[5], inv) : 2;
+    Directory.CreateDirectory(dir);
+
+    var capsP = EncoderCapabilities.Instance;
+    var infoP = await FfprobeClient.ProbeAsync(src);
+    var attemptP = await EncodeRunner.TryBuildSceneMapAsync(infoP);
+    if (attemptP.Map is null)
+    {
+        Console.Error.WriteLine("harita uretilemedi: " + attemptP.Fallback);
+        return 3;
+    }
+
+    var optionsP = new PlanOptions
+    {
+        TargetMb = mb,
+        Intent = Intent.Sharing,
+        Codec = CodecPreference.Auto,
+        AllowResolutionDrop = true,
+        AllowFpsDrop = true,
+        HdrPolicy = HdrPolicy.Preserve,
+        FillPolicy = FillPolicy.FillTarget,
+        SpeedMode = SpeedMode.Quality
+    };
+    var profileP = ComplexityProfile.FromSourceBitrate(infoP);
+    var planP = PlanCalculator.BuildDetailed(infoP, optionsP, profileP, capsP).Plan;
+    planP.ExtraArgs = new List<string> { "-threads", th.ToString(inv) };
+
+    var start = Math.Min(10, Math.Max(0, infoP.DurationSeconds - 6));
+    var eskiPath = Path.Combine(dir, "onizleme-baglanmamis.mp4");
+    var yeniPath = Path.Combine(dir, "onizleme-bagli.mp4");
+    var eski = PreviewSegment.For(infoP, planP, start, eskiPath, availability: capsP);
+    var yeni = PreviewSegment.For(infoP, planP, start, yeniPath, availability: capsP, scenes: attemptP.Map);
+
+    Console.WriteLine($"plan {planP.Codec} {planP.Width}x{planP.Height}@{planP.Fps:0.###} · onizleme suresi={yeni.DurationSeconds.ToString("0.###", inv)} sn · baslangic={start.ToString("0.###", inv)} sn");
+    Console.WriteLine($"-g baglanmamis onizleme={Gop(eski.Arguments)} · bagli onizleme={Gop(yeni.Arguments)} · nihai={Gop(EncodeRunner.EncodeArguments(infoP, planP, "x.mp4", 0, null, capsP, attemptP.Map))}");
+
+    await TimeAsync(eski.Arguments);
+    await TimeAsync(yeni.Arguments);
+
+    var eskiKeys = await KeyTimesAsync(eskiPath);
+    var yeniKeys = await KeyTimesAsync(yeniPath);
+    var pencereSonu = start + yeni.DurationSeconds;
+    var nihaiKeys = (await KeyTimesAsync(finalFile)).Where(t => t >= start && t <= pencereSonu).Select(t => t - start).ToList();
+
+    Console.WriteLine(JsonSerializer.Serialize(new
+    {
+        pencere = new { baslangic = start, sure = yeni.DurationSeconds },
+        baglanmamisOnizleme = Ozet(eskiKeys),
+        bagliOnizleme = Ozet(yeniKeys),
+        nihaiAyniPencere = Ozet(nihaiKeys),
+        anahtarKareler = new { baglanmamis = eskiKeys, bagli = yeniKeys, nihai = nihaiKeys }
+    }, new JsonSerializerOptions { WriteIndented = true, NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
+    return 0;
+}
+
 if (args.Length >= 3 && args[0] == "kalite")
 {
     var reference = Path.GetFullPath(args[1]);
@@ -262,6 +323,44 @@ static ProcessStartInfo Start(string exe, IEnumerable<string> args)
     };
     foreach (var a in args) info.ArgumentList.Add(a);
     return info;
+}
+
+static async Task<List<double>> KeyTimesAsync(string path)
+{
+    using var process = new Process
+    {
+        StartInfo = Start(ToolLocator.Ffprobe, new[]
+        {
+            "-v", "error", "-select_streams", "v:0", "-skip_frame", "nokey",
+            "-show_entries", "frame=best_effort_timestamp_time", "-of", "csv=p=0", path
+        })
+    };
+    process.Start();
+    var stdout = await process.StandardOutput.ReadToEndAsync();
+    await process.WaitForExitAsync();
+    var times = new List<double>();
+    foreach (var line in stdout.Split('\n'))
+    {
+        var text = line.Trim().TrimEnd(',');
+        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)) times.Add(value);
+    }
+    times.Sort();
+    return times;
+}
+
+static object Ozet(List<double> times)
+{
+    var gaps = new List<double>();
+    for (var i = 1; i < times.Count; i++) gaps.Add(times[i] - times[i - 1]);
+    return new
+    {
+        sayi = times.Count,
+        ilk = times.Count > 0 ? times[0] : double.NaN,
+        son = times.Count > 0 ? times[^1] : double.NaN,
+        ortalamaAralik = gaps.Count > 0 ? gaps.Average() : double.NaN,
+        medyanAralik = Median(gaps),
+        enBuyukAralik = gaps.Count > 0 ? gaps.Max() : double.NaN
+    };
 }
 
 static double Median(List<double> values)

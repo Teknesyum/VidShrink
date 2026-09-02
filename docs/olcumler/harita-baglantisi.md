@@ -51,9 +51,14 @@ iş parçacığı `-threads 2` ile sabit (`plan.ExtraArgs`, iki geçişe de giri
 | Ön izleme | `src/VidShrink.Core/PreviewSegment.cs:170` | `scenes` (`PreviewSegment.For`'un 7. parametresi) |
 | Koşucu — argüman üretimi | `src/VidShrink.Ffmpeg/EncodeRunner.cs:333` | `scenes` |
 | Koşucu — geçiş başına koşum | `src/VidShrink.Ffmpeg/EncodeRunner.cs:341` | `scenes` (`RunOneAsync`'ten) |
+| Arayüz — ekrandaki ön izleme | `src/VidShrink.App/Playback/SegmentEncoder.cs:126` | `scenes: Scenes` |
+| " — panel ileticisi | `src/VidShrink.App/Playback/PanelHost.cs:251` | `_segments.Scenes` |
+| " — pencere | `src/VidShrink.App/MainWindow.axaml.cs:1636` | `_preview.Scenes = _sceneMap?.Map` |
 
 Sözleşme üç çağıran sayıyor; arayüz ikiye, koşucu ikiye ayrılıyor çünkü ikisi de
-tek başına bağsız kalabilir ve mutasyonda ayrı ayrı ölçülüyor (§ 7).
+tek başına bağsız kalabilir ve mutasyonda ayrı ayrı ölçülüyor (§ 7). Son üç satır
+sözleşmenin başında yoktu: `PreviewSegment.For`'un bağlanması **kullanıcının
+gördüğü ön izlemeyi bağlamaya yetmiyordu**, arada iki halka daha vardı (§ 3).
 
 **Haritayı kim üretiyor.** `EncodeRunner.TryBuildSceneMapAsync`
 (`src/VidShrink.Ffmpeg/EncodeRunner.cs:277`). Arayüz onu
@@ -188,21 +193,75 @@ Davranışla da pimli:
 haritasız ve 3,0 / 7,5 / 40,0 sn'lik haritalarda `PreviewSegment.For` ile
 `FfmpegArguments.Build`'in ürettiği `-g`'yi karşılaştırıyor.
 
-**Ama arayüzdeki ön izleme hâlâ ayrışıyor — ve düzeltmesi `owns` dışında.**
-Kullanıcının ekranda gördüğü parçayı `PreviewSegment.For`'a veren zincir
+### Arayüzdeki zincir ayrışıyordu — kapatıldı
+
+Argüman seviyesindeki bu tutarlılık **kullanıcının gördüğü şeye ulaşmıyordu.**
+Ekrandaki parçayı `PreviewSegment.For`'a veren zincir
 `MainWindow` → `PanelHost` → `SegmentEncoder.Describe`
 (`src/VidShrink.App/Playback/SegmentEncoder.cs:118`) ve o çağrı `scenes`
-**geçirmiyor**. Yani bugün arayüzde nihai kodlama 5 sn tavanla, ön izleme 10 sn
-tavanla üretiliyor. Sözleşme bu ayrışmayı KRİTİK sayıyor; kapatmak iki dosya
-ister ve ikisi de bu sözleşmenin `owns`'unda değil:
+**geçirmiyordu**. Yani kullanıcı bakıp karar verdiği görüntüyü 10 sn tavanla,
+aldığı dosyayı 5 sn tavanla üretiyorduk. T0 kararıyla üç dosya `owns`'a alındı ve
+zincir tamamlandı:
 
-- `src/VidShrink.App/Playback/SegmentEncoder.cs` — `Availability`'nin (:109)
-  birebir eşi bir `SceneMap? Scenes` özelliği ve `Describe`'da geçirilmesi.
-- `src/VidShrink.App/Playback/PanelHost.cs:244` — `Availability`'yi ileten
-  ayarlayıcının eşi.
+| Halka | Künye | Ne eklendi |
+| --- | --- | --- |
+| Parça kodlayıcısı | `src/VidShrink.App/Playback/SegmentEncoder.cs:116` | `internal SceneMap? Scenes { get; set; }` — `Availability`'nin (:109) birebir eşi |
+| " | `:126` | `Describe` artık `scenes: Scenes` geçiriyor |
+| İletici | `src/VidShrink.App/Playback/PanelHost.cs:251` | `Scenes` → `_segments.Scenes`, `Availability` (:241) ile aynı kalıp |
+| Pencere | `src/VidShrink.App/MainWindow.axaml.cs:1636` | `if (_preview is not null) _preview.Scenes = _sceneMap?.Map;`, `SetPlan` çağrısının hemen üstünde |
 
-Ondan sonra `MainWindow.axaml.cs:1250`'nin (`_preview.Availability = encoders;`)
-yanına tek satır düşer. **T0 kararı gerekli.**
+Pencere tarafı bilerek **`SetPlan`'ın yanına** kondu, `_sceneMap`'in üretildiği
+yere değil: plan her tazelendiğinde panel aynı `_sceneMap`'i görür, dolayısıyla
+kaynak değişip harita `null`'a döndüğünde de ön izleme kendiliğinden varsayılana
+iner. `ApplyLoaded`'daki `_sceneMap = null` ile ayrıca eşlenmesi gerekmez.
+
+### Ayrışma ne kadardı — sayıyla
+
+`t113baglanti onizleme <kaynak> 12 <cikti> <nihai.mp4> 2` düzeltmeden önceki
+(`scenes` geçirmeyen) ve sonraki ön izleme argümanlarını aynı kaynakta yan yana
+üretiyor, ikisini de kodluyor ve teslim edilen nihai dosyanın **aynı zaman
+penceresindeki** anahtar karelerini ffprobe ile okuyor:
+
+| Klip | Plan | Ön izleme `-g` (bağlanmamış) | Ön izleme `-g` (bağlı) | Nihai `-g` | Ayrışma |
+| --- | --- | --- | --- | --- | --- |
+| cok-kesimli | libsvtav1 998x562@30 | **300** (10,0 sn) | 150 (5,0 sn) | 150 (5,0 sn) | **2,00×** |
+| durgun | libx264 960x540@60 | 600 (10,0 sn) | 600 | 600 | 1,00× |
+| tek-sahne | libsvtav1 1114x626@25 | 250 (10,0 sn) | 250 | 250 | 1,00× |
+
+**Aranan sayı 2,00×**: çok kesimli kaynakta ön izleme, teslim edilen dosyanın
+anahtar kare aralığının **tam iki katını** gösteriyordu. Aynı oran fps kilitli
+koşumda da çıkıyor (ön izleme 600 ↔ nihai 300, § 2). Öteki iki içerik türünde
+ayrışma **yok** — çünkü orada kıskaç zaten bağlamıyor, harita geçirilse de
+geçirilmese de aynı `-g` çıkıyor.
+
+Teslim edilen dosyada bu ne demek: `cok-kesimli` klibinde ön izlemenin kullandığı
+rejim (10 sn tavan) tam uzunlukta **7 I-kare**, teslim edilen bağlı dosya
+**13 I-kare** veriyor (§ 2 ızgarası) — ön izlemenin gösterdiği yerleşim
+teslimdekinin **%46,2 azı**. Bu iki sayı ön izleme parçasının kendisinden değil,
+aynı argümanların tam klip üzerindeki koşumundan geliyor; **ön izleme parçası
+5 sn uzunluğunda** ve her iki rejimde de içine tek anahtar kare düşüyor
+(ölçüldü: bağlanmamış 1, bağlı 1; aynı 5 sn penceresinde teslim edilen dosyada
+**2**, t = 0,000 ve 5,000 sn).
+
+Yani ayrışmanın kullanıcıya görünen yüzü tek parçada bir anahtar kare, aynı
+pencerede teslimde iki — **oran 2,00×, mutlak fark bir kare.** Bu sayı 5 sn'lik
+bir pencerede küçüktür; büyük olan, ön izlemenin dayandığı **kuralın** yanlış
+olmasıdır: kullanıcı 10 sn tavanlı bir görüntüye bakıp 5 sn tavanlı bir dosya
+alıyordu.
+
+### Davranışla pimlendi
+
+| Ölçü | Ne iddia ediyor |
+| --- | --- |
+| `PreviewSegmentTests.Onizleme_ve_nihai_kodlama_ayni_anahtar_kare_araligini_verir` | `PreviewSegment.For` ile `FfmpegArguments.Build` haritasız ve 3,0 / 7,5 / 40,0 sn'lik haritalarda aynı `-g`'yi veriyor |
+| `PreviewSegmentTests.Arayuz_onizleme_zinciri_nihai_kodlamayla_ayni_tavani_verir` | aynı iddia, ama **`SegmentEncoder.Describe` üzerinden** — arayüzün gerçekten kullandığı yol |
+| `PreviewSegmentTests.Baglanmamis_onizleme_zinciri_nihai_kodlamadan_ayrisir` | zincir bağlanmamışken ayrışmanın **gerçekten oluştuğunu** gösteriyor: ön izleme 600, nihai 300 |
+| `PreviewSegmentTests.Panel_haritayi_parca_kodlayicisina_iletir` | `PanelHost.Scenes` yazınca `SegmentEncoder.Scenes` değişiyor, `null` yazınca temizleniyor |
+| `PreviewSegmentTests.Pencere_haritayi_onizleme_paneline_gecirir` | pencere satırı kaynak metninde pimli (M1–M3 ile aynı sınırlama, § 7) |
+
+Üçüncü satır bu tablonun sebebidir: ilk iki ölçü "ikisi eşit" diyor, ama eşitlik
+**bozulabilir olmasaydı** ölçü boş olurdu. Bağlanmamış zincirin ayrıştığını ayrıca
+iddia etmek, ölçünün iki sabiti karşılaştırmadığını gösteriyor.
 
 ## 4. Yoklama maliyeti
 
@@ -307,9 +366,15 @@ kırmıyor, her biri aşağıdaki kendi ölçüsünü kırıyor.
 | M4 | `PreviewSegment.cs:170` ön izleme | `scenes` → `null` | `Onizleme_haritayi_arguman_uretimine_gecirir`, `Onizleme_ve_nihai_kodlama_ayni_anahtar_kare_araligini_verir` |
 | M5 | `EncodeRunner.cs:333` argüman üretimi | `scenes` → `null` | `EncodeArgumentsCarryTheSceneMapCeiling`, `DisplayedCommandCarriesTheSameCeilingAsTheEncode`, `TheMapChangesTheIFrameCountOfTheDeliveredFile` |
 | M6 | `EncodeRunner.cs:341` geçiş başına koşum | `scenes` → `null` | `TheMapChangesTheIFrameCountOfTheDeliveredFile` |
+| M7 | `SegmentEncoder.cs:126` ekrandaki ön izleme | `scenes: Scenes` düşürüldü | `Arayuz_onizleme_zinciri_nihai_kodlamayla_ayni_tavani_verir` |
+| M8 | `PanelHost.cs:251` panel ileticisi | `set => _segments.Scenes = value;` → `set { }` | `Panel_haritayi_parca_kodlayicisina_iletir` |
+| M9 | `MainWindow.axaml.cs:1636` pencere | `_sceneMap?.Map` → `null` | `Pencere_haritayi_onizleme_paneline_gecirir` |
 
-**Altı mutasyonun altısı da öldü, ve her biri kendi ölçüsünü kırıyor** — biri
-bağlıyken öteki bağsız kalırsa yakalanır.
+**Dokuz mutasyonun dokuzu da öldü, ve her biri kendi ölçüsünü kırıyor** — biri
+bağlıyken öteki bağsız kalırsa yakalanır. M7–M9 ayrı bir düzenekle koşuldu
+(`.calisma/t113/mutasyon-c.sh`, süzgeç `PreviewSegmentTests|EncodeRunnerTests`,
+her birinden önce `--no-incremental`): üçünde de **35 geçti / 1 kaldı / 36
+toplam** ve kalan ölçü her seferinde tabloda yazan ölçü.
 
 M6 bu tablonun sebebidir: `EncodeArguments` haritayı geçirmeye devam ederken
 `RunOneAsync` onu düşürürse **argüman üreten ölçülerin hepsi yeşil kalır.** O
@@ -335,9 +400,11 @@ kusurun sebebidir: çağıran parametreyi unutunca derleyici susuyor.
 - `src/VidShrink.Ffmpeg/EncodeRunner.cs:333` — bu sözleşmede açıkça geçiyor
 - `tests/VidShrink.Tests/FfmpegArgumentsTests.cs:94,125,312,313` (T108'in)
 
-`PreviewSegment.For`'un kendi `scenes = null` varsayılanı da **kaldırılamadı**:
-`src/VidShrink.App/Playback/SegmentEncoder.cs:118` onu 6 argümanla çağırıyor ve o
-dosya `owns` dışında.
+`PreviewSegment.For`'un kendi `scenes = null` varsayılanı **duruyor.**
+`SegmentEncoder.Describe` artık haritayı açıkça geçiriyor (§ 3), yani varsayılanı
+gizleyen üretim çağıranı kalmadı; ama ölçüler onu hâlâ kullanıyor
+(`PreviewSegmentTests` içinde haritasız kurulan çağrılar). Kaldırılması ayrı bir
+iştir ve bu sözleşmede **yapılmadı** — öneri olarak yazılıyor.
 
 **T108'in bir ölçüsünü bu dal kırdı, ve bu dal düzeltti.**
 `FfmpegArgumentsTests.cs:408`, `MainWindow` kaynak metninde
@@ -359,14 +426,22 @@ ediyor, yalnız beklenen dize bugünkü çağrıya güncellendi.
 
 - **VMAF, üç klibin ikisinde.** Sebepleri § 2'de; geçersiz sayı tabloya
   yazılmadı. Çok kesimli klipte kalite ancak fps kilitli ek koşumda ölçülebildi.
-- **Arayüzdeki ön izleme ayrışması** (§ 3) yalnız kod okumasıyla saptandı;
-  ayrışmanın kullanıcı çıktısındaki büyüklüğü **ölçülmedi.**
+- **Ön izleme ayrışmasının 5 sn'lik pencerenin dışındaki hâli.** § 3'teki 2,00×
+  argüman ölçüsü ve tam klip üzerindeki 7 ↔ 13 I-kare sayısı ölçüldü; ön izleme
+  parçası kendi uzunluğunda tek anahtar kare taşıdığı için **daha uzun bir ön
+  izleme penceresinde ayrışmanın nasıl göründüğü ölçülmedi.**
+- **Ayrışmanın kalite ya da atlama etkisi ön izleme yolunda ölçülmedi.** Ölçülen
+  şey yerleşimdir; kullanıcı ön izlemede farklı bir görüntü kalitesi görüyor
+  muydu sorusu **açık.**
 - **`SceneMap.Threshold = NaN` aritmetiğe giriyor mu.** `grep` ile bakıldı,
   **ölçülmedi**: `SceneMap.Threshold` üretim kodunda hiçbir yerde okunmuyor; tek
   okuyan `tests/VidShrink.Tests/SceneMapTests.cs:340,571` ve ikisi de
   `double.IsNaN(...)` iddiası. `tools/harita-baglantisi/Program.cs` de yalnız
   `double.IsNaN` ile basıyor. Yani bugün sessizce aritmetiğe giren bir `NaN` yok.
 - **Yoklamayı ucuzlatan seçenekler** (§ 4).
+- **CI'nın 1183 ile yerelin 1185 toplamı arasındaki iki ölçülük fark** (§ 10).
+- **Pim düzeltmesinden sonraki tam süit ve CI dörtlüsü** (§ 10); dar süzgeç
+  yeniden koşturuldu, tam süit koşturulmadı.
 - **Düşüşün arayüzde söylenmesi** (§ 5).
 - **Donanım kodlayıcı yolu.** `HardwareKeyframeCeilingSeconds` = 5,0 sn bu
   sözleşmede hiç ölçülmedi; üç klip de yazılım kodlayıcıya düştü.
@@ -413,8 +488,10 @@ kabul kriterlerine karşılık gelen iki ölçü o listede:**
 **CI yeşili bu iki kriteri doğrulamaz.** İkisi de yerelde ffmpeg'li koşumda
 geçti; CI'da yalnız atlandı. K5'in öteki iki yolu
 (`AFailedScanFallsBackToTheDefaultCeilingAndSaysSo`, süresiz kaynak) ffmpeg
-gerektirmiyor, onlar CI'da da koşuyor. K1, K3, K7'nin argüman ölçüleri ve
-M1–M5'i yakalayan ölçülerin hepsi ffmpeg'siz.
+gerektirmiyor, onlar CI'da da koşuyor. K1 ve K3'ün ölçülerinin hepsi ffmpeg'siz.
+K7'de **M1–M5'in her biri en az bir ffmpeg'siz ölçüyle** yakalanıyor; yalnız
+**M6'yı yakalayan tek ölçü ffmpeg gerektiriyor**, yani CI'da M6 mutasyonu
+gözetimsiz kalır.
 
 Yerel toplam 1185, CI toplam 1183 — iki ölçü CI'da hiç sayılmıyor. **Sebebi
 ölçülmedi**, bu sözleşmenin ürünü değil.

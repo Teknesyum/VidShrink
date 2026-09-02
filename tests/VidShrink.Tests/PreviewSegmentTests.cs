@@ -287,6 +287,88 @@ public sealed class PreviewSegmentTests
         }
     }
 
+    private sealed class SessizKaynak : VidShrink.Core.Playback.IComparisonFrameSource
+    {
+        public event EventHandler<VidShrink.Core.Playback.ComparisonSourceStatus>? StatusChanged;
+        public VidShrink.Core.Playback.ComparisonSourceStatus Status
+            => new(VidShrink.Core.Playback.ComparisonSourceState.Bosta, 0, 0, 0, 0, 0);
+        public Task StartAsync(VidShrink.Core.Playback.ComparisonFrameRequest request, CancellationToken ct = default)
+        {
+            StatusChanged?.Invoke(this, Status);
+            return Task.CompletedTask;
+        }
+        public bool TryTake(out VidShrink.Core.Playback.PlaybackFrame frame) { frame = null!; return false; }
+        public void Return(VidShrink.Core.Playback.PlaybackFrame frame) { }
+        public void Play() { }
+        public void Pause() { }
+        public Task SeekAsync(TimeSpan position, CancellationToken ct = default) => Task.CompletedTask;
+        public Task StopAsync() => Task.CompletedTask;
+        public void Dispose() { }
+    }
+
+    [Fact]
+    public void Arayuz_onizleme_zinciri_nihai_kodlamayla_ayni_tavani_verir()
+    {
+        var info = Source(durationSeconds: 120, fps: 60);
+        var plan = TwoPassPlan();
+
+        foreach (var harita in new SceneMap?[] { null, Harita(3.0, 120), Harita(7.5, 120), Harita(40.0, 120) })
+        {
+            using var kodlayici = new VidShrink.App.Playback.SegmentEncoder(Path.GetTempPath())
+            {
+                Scenes = harita
+            };
+
+            var onizleme = kodlayici.Describe(info, plan, 10, "parca.mp4", null);
+            var nihai = FfmpegArguments.Build(info, plan, "cikti.mp4", 2, null, null, harita);
+
+            Assert.Equal(Aralik(nihai), Aralik(onizleme.Arguments));
+        }
+    }
+
+    [Fact]
+    public void Baglanmamis_onizleme_zinciri_nihai_kodlamadan_ayrisir()
+    {
+        var info = Source(durationSeconds: 120, fps: 60);
+        var plan = TwoPassPlan();
+        var harita = Harita(sahneSaniye: 3.0, sure: 120);
+
+        using var baglanmamis = new VidShrink.App.Playback.SegmentEncoder(Path.GetTempPath());
+
+        var onizleme = baglanmamis.Describe(info, plan, 10, "parca.mp4", null);
+        var nihai = FfmpegArguments.Build(info, plan, "cikti.mp4", 2, null, null, harita);
+
+        Assert.Equal((int)Math.Round(plan.Fps * FfmpegArguments.KeyframeCeilingDefaultSeconds), Aralik(onizleme.Arguments));
+        Assert.Equal((int)Math.Round(plan.Fps * FfmpegArguments.KeyframeCeilingMinSeconds), Aralik(nihai));
+        Assert.NotEqual(Aralik(nihai), Aralik(onizleme.Arguments));
+    }
+
+    [Fact]
+    public void Panel_haritayi_parca_kodlayicisina_iletir()
+    {
+        var harita = Harita(sahneSaniye: 3.0, sure: 120);
+        using var kodlayici = new VidShrink.App.Playback.SegmentEncoder(Path.GetTempPath());
+        var panel = AppHost.Run(() => new VidShrink.App.Playback.PanelHost(
+            new VidShrink.App.Playback.ComparisonPanel(), () => new SessizKaynak(), kodlayici));
+
+        Assert.Null(kodlayici.Scenes);
+
+        panel.Scenes = harita;
+        Assert.Same(harita, kodlayici.Scenes);
+        Assert.Same(harita, panel.Scenes);
+
+        panel.Scenes = null;
+        Assert.Null(kodlayici.Scenes);
+    }
+
+    [Fact]
+    public void Pencere_haritayi_onizleme_paneline_gecirir()
+    {
+        var source = File.ReadAllText(TipSources.WindowCodePath);
+
+        Assert.Contains("if (_preview is not null) _preview.Scenes = _sceneMap?.Map;", source);
+    }
+
     [Fact]
     public void Harita_yoksa_onizleme_on_saniyelik_varsayilana_duser()
     {
