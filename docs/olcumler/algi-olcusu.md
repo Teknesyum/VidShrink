@@ -115,6 +115,8 @@ içerikteki tavanını raporluyor — 1080p60 gerçek içerikte 99,68, 320x240
 `testsrc2`'de 99,87. Kullanıcıya gösterilecek "kusursuz" rozeti istenirse sayıyı
 bozarak değil ayrı bir alanla verilmeli.
 
+> **T110:** bu sayı kilitli ölçüyle yeniden ölçüldü, **değişmedi** (97,4257; §9.10).
+
 Yan bulgu: özdeş 1080p içerikte kare bazlı **min 97,4256**, p10 97,9241. Yani
 `VmafNegMin` özdeş dosyada bile 97,4 diyor — bu bir kalite işareti değil, modelin
 kendi gürültüsü. §4'ün gerekçesi bu.
@@ -163,6 +165,9 @@ tonemap'in aynısından geçiyor.
 filtresiyle iki SDR çıktı; tek fark bit oranı. Ölçüm `bench measure-tonemapped`
 ile, üretim kodunun kendi yolundan:
 
+> **T110 — `VMAF-NEG min` satırı kaymış ölçüyle yazıldı, geçersiz** (§9.11).
+> Tablonun kalan satırları yeniden **ölçülmedi.**
+
 | | yüksek (`-crf 18`, 14 855 kb/s) | düşük (`-b:v 300k`, 202 kb/s) | fark |
 |---|---|---|---|
 | VMAF-NEG ortalama | **90,5957** | **25,1360** | 65,46 |
@@ -178,9 +183,18 @@ Bit oranı yetmiş kat değişirken üç metrik de ayrışıyor.
 14,86 / 14,78 / 14,67'de çakılı kalması — **bu yolda yok**: XPSNR 40,35'ten
 21,32'ye iniyor.
 
+> **T110 — kaymış ölçüyle yazıldı, geçersiz.** Aşağıdaki 0,79 bir kalite
+> olayı değil, kare kilidi olmayan ölçerin yanlış eşlediği bir karedir.
+> Tanı ("hizalanma artığı") doğru çıktı, nedeni o turda bilinmiyordu
+> (§9.2). Bu çift kilitli ölçüyle **yeniden ölçülmedi.**
+
 Dikkat çeken tek şey `VmafNegMin`: iyi çıktıda 0,79. 90,6 ortalamalı bir klipte
 0,79 puanlı bir kare kalite olayı değil, sahne kesmesinde tek karelik bir
 hizalanma/ani değişim artığı. Kullanılabilir bir taban değil (§4).
+
+> **T110 — kaçırılmış ipucu.** `settb` tek başına zaman tabanını birleştirir,
+> kare **numarasını** birleştirmez; kaymayı kaldıran `setpts=N`'dir (§9.5,
+> mutasyon M6). Deneme doğruydu, eksik kurulmuştu.
 
 **Yan bulgu, düzeltilmedi.** `xpsnr` filtresi bu çiftte uyarı basıyor:
 `not matching timebases found between first input: 1/15360 and second input
@@ -194,7 +208,8 @@ kuruşu kuruşuna aynı çıktı (38,9113 / 42,7523 / 43,7238). Uyarı bu girdid
 
 Sorun: filmin tamamındaki tek en kötü kare kullanıcıyı ilgilendirmiyor, hem de
 ölçülemiyor. §2'nin yan bulgusu: özdeş 1080p içerikte min 97,43. Buna karşılık
-gerçekten iyi bir kodlamada min 0,79 çıkabiliyor (§3). Aynı sayı hem özdeş
+gerçekten iyi bir kodlamada min 0,79 çıkabiliyor (§3 — **kaymış
+ölçüyle yazıldı, geçersiz**, §9.11). Aynı sayı hem özdeş
 içerikte 97 hem iyi kodlamada 1 diyorsa taban olarak kullanılamaz.
 
 Eklenen: kareler **ardışık, örtüşmeyen birimlere** bölünüyor, her birimin
@@ -529,6 +544,9 @@ pencere uzunluğunu **tutmuyor**; raporlanan başlangıcın raporlanan pencere
 T97 `VmafNegMin`'i arayüz kaydına ekledi ama belgede "modelin kendi gürültüsü"
 dedi. Bir alan hem taşınıp hem kullanılamaz sayılamaz; T104 karar veriyor.
 
+> **T110:** bu tablonun p1 satırı kilitli ölçüyle yeniden ölçüldü ve
+> **değişmedi** (97,4257). p2 ve p3 satırları **ölçülmedi.** (§9.10)
+
 **Ölçüm — min içeriği değil modeli ölçüyor.** Bit düzeyinde özdeş üç klipte:
 
 | İçerik | özdeş min | özdeş ortalama |
@@ -540,6 +558,12 @@ dedi. Bir alan hem taşınıp hem kullanılamaz sayılamaz; T104 karar veriyor.
 Üç ayrı içerik, hiçbir kalite kaybı yokken **aynı sayı**: 97,425. Bu bir içerik
 ölçüsü değil, modelin tek karelik taban salınımı. §3'teki 0,79 da aynı ailedendir
 (sahne kesmesinde hizalanma artığı).
+
+> **T110 — kaymış ölçüyle yazıldı, geçersiz.** p1 satırı yeniden ölçüldü:
+> kilitli ölçüde crf8 min **92,5920**, crf12 min **89,4449**; sinyal 0,0136
+> değil **3,1471**. Aşağıdaki 4,3'ler kodlama kalitesini değil yanlış kare
+> eşlemesini ölçüyordu. p2 ve p3 **ölçülmedi**; K5 kararı bu turda
+> değiştirilmedi (§9.10).
 
 **Ölçüm — gerçek yarışmacıları ayıramıyor.** Aynı referansa karşı crf 8 / crf 12:
 
@@ -597,6 +621,358 @@ Kısaca: silinmedi çünkü tanıda işe yarıyor; terfi de etmedi çünkü üç
 - XPSNR/SSIM kare başına dökümü hâlâ okunmuyor; taban yalnız VMAF-NEG'de var.
 
 
+## 9. Kare kilidi — ürün ölçeri kareleri damgayla eşliyordu (T110)
+
+T106 aynı kusuru `tools/VidShrink.Bench` içinde bulup kapattı. Ürün ölçeri
+(`src/VidShrink.Ffmpeg/QualityMeter.cs`) kapatılmamıştı; `--measured-quality`
+yolundan geçen kalibrasyon çıpaları oradan geçiyordu. Bu bölüm o açığı ürün
+kodunda kendi ölçümüyle gösteriyor, kapatıyor ve kapanışın bedelini yazıyor.
+
+Ölçüm makinesi Windows 11, `ffmpeg` (libvmaf + libzimg), altı ajanla paylaşımlı.
+**Bu bölümde hiçbir süre sayısı yok**; kalite ve kare sayıları paylaşımdan
+etkilenmiyor, tekrarlanabilirlik §9.7'de ölçüldü. Üreten komutlar "Yeniden
+üretim" bölümünde.
+
+### 9.1 Kaymayı üreten şey kabın `start_time`'ı değil — ölçüldü
+
+İlk hipotez ("video akışının `start_time`'ı sıfır değilse kayma olur") **yanlış
+çıktı.** `-output_ts_offset 0.02` ile üretilen tek akışlı bir dosyanın
+`start_time`'ı `0,020000` okunuyor ama filtre grafiğine `0` girdi; ölçüm
+kilitli/kilitsiz kuruşu kuruşuna aynı çıktı (VMAF-NEG ortalama 90,1189 ve
+91,6715; x264 ve x265).
+
+`showinfo` ile ölçülen gerçek davranış:
+
+| dosya | akışlar (`start_time`) | grafiğe giren ilk üç `pts_time` |
+|---|---|---|
+| `parca-1.mkv` | video 0,000000 | 0 / 0,016 / 0,033 |
+| `parca-2.mkv` | video 0,020000, ses 0,000000 | **0,02** / 0,036 / 0,053 |
+| `ref2.mkv` (4 sn kesit, ses korunmuş) | video 0,020000, ses 0,000000 | **0,02** / 0,036 / 0,053 |
+| aynı kesit, `-an` ile sesi atılmış | video 0,020000 | 0 / 0,016 / 0,033 |
+| sentetik `-output_ts_offset 0.02` | video 0,020000 | 0 / 0,033 / 0,067 |
+
+Model: **grafiğe giren kayma = video akışının `start_time`'ı eksi kaptaki en
+erken akışın `start_time`'ı.** ffmpeg kabın en erken damgasını sıfırlıyor; video
+tek başınaysa kendi kaymasını da götürüyor, yanında sıfırdan başlayan bir ses
+akışı varsa götürmüyor. Beş dosyanın beşinde de model `showinfo` ölçümüyle
+uyuştu. Ürün koduna giren `TimestampOffsetSecondsAsync` tam bu farkı hesaplıyor.
+
+Kodlanmış çıktılar bu yüzden hep sıfır kaymalı: `p2-x265.mkv` kabının
+`start_time`'ı `0,017000` ama tek akış olduğu için grafiğe `0`'dan giriyor.
+Kayma **çift içindeki farktan** doğuyor, tek dosyanın damgasından değil.
+
+### 9.2 Kaynak × kilit ızgarası
+
+Kaynaklar `.calisma/kaynak/parca-{1,2}.mkv`'nin ilk 4 saniyesi (`-c copy`,
+1920x1080 60 fps HDR10, 240 kare). `ref1` temiz (kayma 0), `ref2` kaymış
+(0,020 s = 1,20 kare). Testler aynı kaynaklardan `libx265 -crf 32` ve
+`libsvtav1 -crf 45`, iş parçacığı sabitlenmiş.
+
+| kaynak | kayma | kodlayıcı | kilit | eşlenen kare | ortalama | p10 | min | `<1` kare |
+|---|---|---|---|---|---|---|---|---|
+| ref1 | 0 | x265 | yok | 240 | 40,6656 | 33,1747 | **2,5864** | 0 |
+| ref1 | 0 | x265 | **var** | 240 | 41,2331 | 33,4906 | **30,2347** | 0 |
+| ref1 | 0 | AV1 | yok | 240 | 62,0461 | 53,1884 | **3,8497** | 0 |
+| ref1 | 0 | AV1 | **var** | 240 | 62,8468 | 53,7968 | **49,7269** | 0 |
+| ref2 | 1,20 kare | x265 | yok | **239** | 81,4185 | 81,2890 | 80,9937 | 0 |
+| ref2 | 1,20 kare | x265 | **var** | **240** | 81,4366 | 81,3168 | 81,0174 | 0 |
+| ref2 | 1,20 kare | AV1 | yok | **239** | 93,8184 | 93,7167 | 93,6651 | 0 |
+| ref2 | 1,20 kare | AV1 | **var** | **240** | 93,8408 | 93,7538 | 93,7025 | 0 |
+
+**Sözleşmenin beklentisi tutmadı ve bu bir kusur değil.** Kriter "temiz kaynakta
+fark çıkmamalı; çıkıyorsa kilidin kendisi bozuktur" diyordu. Fark **temiz
+kaynakta** çıktı. Kilit bozuk değil: kare başına günlükler kilitsiz koşumda 240
+karenin **6'sının** yanlış eşlendiğini gösteriyor — 29/30, 133/134, 205/206:
+
+| kare | kilitsiz | kilitli |
+|---|---|---|
+| 29 | 31,1700 | 36,8686 |
+| 30 | **7,3791** | 45,7804 |
+| 133 | 33,6985 | 41,4162 |
+| 134 | **2,5864** | 39,6974 |
+| 205 | 44,0798 | 54,0565 |
+| 206 | **5,9679** | 44,0571 |
+
+Kalan 234 kare iki koşumda da aynı. Kilit kare **eklemiyor**, yanlış eşlenmiş
+altı kareyi **kaldırıyor**: min 2,59'dan 30,23'e, ortalama +0,57.
+
+Nedeni ölçüldü: referansın kendi damgaları düzgün ızgarada değil. `ref1.mkv`'nin
+30. karesi `0,501000`'de, testin karşılık gelen karesi `0,500000`'da. Referans
+damgası testinkini geçtiği anda framesync bir önceki referans karesini
+tekrarlıyor. **`start_time` sıfır olsa bile ölçü kayıyor;** kilit bunu da
+kapatıyor.
+
+### 9.3 Kontrol — ref2 hücreleri hizalama hakkında bir şey ölçmüyor
+
+ref2 satırlarında kilidin etkisi 0,02 puan. Bunu "60 fps'te kayma zararsız" diye
+okumak §9.2'nin bulduğu hatanın aynısını tekrarlamak olurdu. Kontrol: `ref2`,
+kendi içeriğinin **kasten 2 kare kaydırılmış** ve neredeyse kayıpsız
+(`libx265 -crf 16`) kopyasına karşı ölçüldü.
+
+| ölçüm | ortalama | min |
+|---|---|---|
+| ref2 vs 2 kare kaydırılmış crf16 kopya | 93,0121 | 92,8769 |
+| ref2 vs kaydırılmamış crf16 kopya | 92,9542 | 92,8613 |
+
+İki kare kaydırmak bu klipte skoru **0,06 puan** oynatıyor — yani klip kaymayı
+neredeyse hiç görmüyor. **ref2 hücreleri kilidin işe yarayıp yaramadığını
+ölçmüyor;** ızgarada duruyorlar çünkü kayma gerçekten oradaydı, ama duyarlılık
+başka bir düzenekten gelmek zorunda (§9.4). Kaymış kaynağın zararsız görünmesi
+kaynağın durgunluğundandır, kaymanın masumiyetinden değil.
+
+### 9.4 Kayma kare cinsinden ne yapıyor — duyarlı düzenek
+
+`testsrc2 320x240 30 fps 3 sn` (hareketli), `libx264 -crf 12` kaynak; test aynı
+kaynağın `-crf 16` yeniden kodlaması. Kaynağın video akışı `-itsoffset` ile
+geciktirilip yanına sıfırdan başlayan sessiz ses akışı konarak §9.1'deki kayma
+üretildi.
+
+| kayma | kare cinsinden | kilitsiz ortalama | kilitli ortalama |
+|---|---|---|---|
+| 0 ms | 0,00 | 98,3724 | 98,3724 |
+| 10 ms | 0,30 | **52,3008** | 98,3724 |
+| 20 ms | 0,60 | **52,3008** | 98,3724 |
+| 40 ms | 1,20 | **37,8810** | 98,3724 |
+| 50 ms | 1,50 | **37,8810** | 98,3724 |
+
+Aynı kaynağın **bilerek bir kare kaydırılmış** kodlaması (ilk kare atılıp
+`setpts=N/FR/TB`) 52,3008 veriyor — 10 ms ve 20 ms kaymanın kilitsiz sonucuyla
+birebir aynı sayı. Yarım kareden küçük bir damga kayması tam bir kare kaydırmaya
+dönüşüyor; T106'nın ana iddiası ürün kodunda doğrulandı. Zarar kaymanın
+milisaniyesine değil **kare cinsinden tavanına** bağlı: (0, 1] kare bir kare,
+(1, 2] kare iki kare kaydırıyor. Kilitli sütun her kaymada 98,3724 — onarım tam.
+
+### 9.5 Kilidin kendisi
+
+`settb=AVTB,setpts=N`, her iki zincirin sonunda — **T106'nın kullandığı kilidin
+birebir aynısı** (`MeasureFilterGraph.FrameLock`). Farklı bir kilit seçilmedi;
+iki yerde iki ayrı kilit bir sonraki ayrışmanın tohumu olurdu. Grafik artık
+`MeasureFilterGraph.Build` üzerinden kuruluyor:
+
+    [0:v]<test-normalizasyonu>,settb=AVTB,setpts=N[t];
+    [1:v]<tonemap-öneki><referans-normalizasyonu>,settb=AVTB,setpts=N[r];
+    [t][r]<metrik>
+
+Telafi katsayısı yok; kayma dengelenmiyor, kaldırılıyor.
+
+### 9.6 Kaymış kaynak raporlanıyor — karar
+
+Sessizce doğru sonuç üretmek yetmez; ölçüyü okuyan, ölçerin neyi onardığını
+görebilmeli. Karar: kayma günlüğe değil **`QualityScore.Alignment` alanına**
+yazılıyor.
+
+    QualityScore.Alignment: { ReferenceOffsetSeconds, TestOffsetSeconds,
+                              FrameDurationSeconds, ShiftSeconds, ShiftFrames,
+                              Shifted, Note }
+
+Gerekçe: alan `bench measure` çıktısında ve `QualityScore`'u okuyan her
+tüketicide görünüyor, ayrı bir günlük kanalı gerekmiyor, ve karşılaştırılamaz
+sonuçlarda bile doluyor (`Comparable=false` dönen erken çıkış da `Alignment`
+taşıyor). `Note` yalnız kayma varken dolu:
+
+    "Kaynak ve test zaman damgaları 20 ms (1,2 kare) ayrık; kareler zaman
+     damgasına değil kare indeksine eşlendi."
+
+Ölçüsü `ShiftedSourceIsReportedNotSilentlyRepaired` ve
+`VideoStartAheadOfTheContainerIsTheOffsetThatReachesTheFilterGraph`. İkincisi
+§9.1'deki modeli pimliyor: video akışı geciktirilmiş dosyada 0,02, **her şeyi**
+geciken dosyada 0.
+
+### 9.7 Kalibrasyon çıpaları — eski/yeni
+
+`--measured-quality` yolu: `ComplexityProbe.SplitSampleAsync` her pencere için
+bir örnek kodluyor ve `IQualityMeasurement.MeasureWindowAsync` ile kaynağa karşı
+ölçüyor; sonuçlar `ComplexityProfile.WithProbeQuality` ile tek bir
+`QualityAnchor`'a toplanıyor. Bu yolun tamamı `QualityMeter`'dan geçiyor, yani
+**bugüne kadarki bütün çıpalar kaymış ölçüyle konmuştu.**
+
+İki ikili aynı ağaçtan, biri kilitli biri kilitsiz derlendi; aynı komut koşuldu.
+
+| kaynak | çıpa | eski (kilitsiz) | yeni (kilitli) | fark |
+|---|---|---|---|---|
+| parca-1 (temiz) | 1 | 86,16 | 87,43 | +1,27 |
+| parca-1 | 2 | 86,95 | 86,95 | **ölçüldü, değişmedi** |
+| parca-1 | 3 | **75,07** | **87,20** | **+12,13** |
+| parca-1 | `QualityAnchor.VmafNeg` | 82,73 | 87,19 | **+4,47** |
+| parca-2 (kaymış) | 1 | 92,44 | 92,48 | +0,04 |
+| parca-2 | 2 | 91,11 | 91,13 | +0,02 |
+| parca-2 | 3 | 91,10 | 91,12 | +0,02 |
+| parca-2 | `QualityAnchor.VmafNeg` | 91,55 | 91,58 | +0,03 |
+
+`QualityAnchor` satırları çıpaların ortalaması. **Bu iki satır ölçülmedi,
+türetildi:** `bench` çıpaları iki basamağa yuvarlayarak bastığı için ortalama
+yuvarlanmış değerlerden hesaplandı; alanın kendisi okunmadı.
+
+Üç bağımsız koşumda parca-1'in iki sütunu da rakamı rakamına aynı çıktı
+(86,16 / 86,95 / 75,07 ve 87,43 / 86,95 / 87,20) — bu ölçü kararsız değil.
+
+En büyük hasar yine **temiz** kaynakta: tek bir çıpa 12,13 puan yanlıştı ve
+plana giren çıpayı 4,47 puan aşağı çekiyordu.
+
+### 9.8 Mutasyon kanıtı
+
+Her mutasyon tek başına uygulanıp `dotnet test -c Release --filter
+QualityMeterTests` koşuldu (24 ölçü).
+
+| # | mutasyon | sonuç |
+|---|---|---|
+| M0 | mutasyonsuz | 24 yeşil |
+| M1 | kilit yalnız `[t]`'den kaldırıldı | **9 kırmızı** |
+| M2 | kilit yalnız `[r]`'den kaldırıldı | **9 kırmızı** |
+| M3 | kilit iki zincirden de kaldırıldı | **1 kırmızı** |
+| M4 | `[r]`'de `setpts=N` yerine `setpts=N+1` | **7 kırmızı** |
+| M5 | iki zincirde birden `setpts=N` yerine `setpts=N+1` | 24 yeşil — **eşdeğer mutasyon** |
+| M6 | `settb=AVTB` kaldırıldı | **3 kırmızı** |
+| M7 | `TimestampOffsetSecondsAsync` hep 0 dönüyor | **2 kırmızı** |
+| M8 | etiketsiz taraf kapısı kaldırıldı (§9.9) | **1 kırmızı** |
+
+**M4 sözleşmenin istediği kontrol**: bir kare kaydıran kilit ölçüye takılıyor.
+T106 denetçisinin bulduğu tuzak — `Assert.Contains("settb=AVTB,setpts=N", ...)`
+gibi dizgi karşılaştıran bir ölçü — burada yok; M4'ü öldüren ölçüler skor
+**dizisini** karşılaştırıyor.
+
+**M5 eşdeğer; bu bir iddia değil, ölçüm.** Aynı çifte `setpts=N` ve `setpts=N+1`
+ile iki kez ham libvmaf koşuldu; kare başına puan dizileri **bit düzeyinde aynı**
+(90 kare, ortalama 98,372383, dizinin SHA-256 öneki iki koşumda da
+`01557f15134c6e11`, dizi eşitliği `True`). İki akış eşit kaydığı için eşleme
+değişmiyor. Bu mutasyonu öldüren bir davranış ölçüsü **yok ve olamaz**; kırmızıya
+döndürecek tek şey dizgi karşılaştırmak olurdu, ki reddedilen tuzak tam odur.
+Yakalanması gereken mutasyon tek taraflıdır ve M4 onu yakalıyor.
+
+M3'ün yalnız 1 kırmızı vermesi de ölçülmüş bir olgudur: kilit iki taraftan da
+kalkınca aynı zaman tabanlı mp4 çiftleri hâlâ doğru eşleşiyor; ölen tek ölçü
+kaymış kaynağı kullanan `SubFrameTimestampSlipDoesNotCostTheScoreAWholeFrame`.
+
+### 9.9 Etiketsiz taraf artık sayı bastırmıyor
+
+T95 bağımsız olarak şunu buldu: `ColorFilter` etiketsiz girdiye varsayım
+uyduruyor (`?? (hdr ? "bt2020" : "bt709")`) ve `ColorIncompatibility` yalnız
+HDR/SDR ayrışmasına baktığı için etiketsiz taraf ölçere kadar gidiyordu. Ölçer
+susup bir uzay seçiyor ve sayı basıyordu.
+
+Kapatılan **dar** hâli: bir taraf tamamen etiketsizken öteki taraf bt709 **dışı**
+bir ana renk / aktarım / matris taşıyorsa iki taraf farklı uzaylardan normalize
+edilir; o durumda ölçü `Comparable=false` dönüyor ve **hiçbir sayı basmıyor.**
+Etiketsiz ile bt709 çifti karşılaştırılabilir kalıyor; varsayımla kanıt orada
+çelişmiyor ve `Bt709MetadataOnlyRemuxMatchesTheIdenticalCopyScore` bu eşdeğerliği
+zaten tutuyor.
+
+Ölçüsü `UntaggedSourceAgainstANonBt709TagIsRefusedInsteadOfAssumed`, mutasyonu
+M8. **Ölçülmedi:** etiketsiz bir kaynağın gerçek uzayı bt709 değilse ölçünün ne
+kadar yanıldığı. Kapı yalnız çelişkiyi yakalıyor, varsayımın kendisini
+doğrulamıyor.
+
+### 9.10 §7'nin min tablosu yeniden ölçüldü — K5'in ikinci kanıtı çöktü
+
+§7 `VmafNegMin`'i "kalite yargısı olarak kullanılmıyor" diye sınırlandırırken iki
+ölçüme dayanıyordu. İkisi de p1 için, belgenin kendi "Yeniden üretim" tarifiyle
+yeniden kuruldu ve kilitli/kilitsiz ölçüldü (1800 kare; `<1` puanlı kare her
+hücrede 0).
+
+| çift | kilitsiz min | kilitli min | kilitsiz ort. | kilitli ort. |
+|---|---|---|---|---|
+| p1-ref vs p1-ref (özdeş) | 97,4257 | **97,4257** | 98,8005 | 98,8005 |
+| p1-ref vs crf8 | **4,3022** | **92,5920** | 96,4930 | 96,9712 |
+| p1-ref vs crf12 | **4,2889** | **89,4449** | 95,1904 | 95,6643 |
+
+İki ayrı sonuç:
+
+**Özdeş klip satırı ayakta.** 97,4257 kilitli ve kilitsiz **aynı**; kilit onu
+kımıldatmıyor. "97,425 modelin tek karelik taban salınımı" bulgusu **ölçüldü,
+değişmedi.**
+
+**crf8 / crf12 satırları geçersiz.** Belgedeki 4,3147 ve 4,3011 yeniden üretildi
+(4,3022 ve 4,2889) — yani o sayılar gerçekti, ama ölçtükleri şey **kodlama
+kalitesi değil yanlış kare eşlemesiydi.** Kilit takılınca min 4,3'ten 92,6'ya ve
+4,3'ten 89,4'e çıktı; crf8 ile crf12 arasındaki sinyal 0,0136'dan **3,1471**'e
+yükseldi. "p1'de sinyal gürültünün yüzde biri" gözlemi kilitli ölçüde yok.
+
+**K5 kararı değiştirilmedi.** İki nedenle: p2 ve p3 satırları **yeniden
+ölçülmedi** (K5 üç içeriğe dayanıyor, elimde biri var) ve karar T110'un
+kapsamında değil. Yapılan şey kanıtın durumunu yazmak: K5'in birinci kanıtı
+geçerli, ikinci kanıtı p1 için geçersiz. Kararın yeniden açılması ayrı bir iştir.
+
+### 9.11 Kirlenmiş satırlar
+
+Belgedeki bütün VMAF sayıları kilitsiz ölçüyle üretildi. Kaymanın **göründüğü**
+yerler anormal düşük `min` değerleridir; hepsi aşağıda, her biri ya yeniden
+ölçüldü ya damgalandı.
+
+| yer | sayı | durum |
+|---|---|---|
+| §2 yan bulgusu | özdeş min 97,4256 | **ölçüldü, değişmedi** (§9.10) |
+| §3 tablosu | `VMAF-NEG min` 0,7867 / 0,0000 | **kaymış ölçüyle yazıldı, geçersiz** — yeniden ölçülmedi |
+| §3 metni | "0,79 puanlı bir kare … hizalanma artığı" | tanı doğruymuş, nedeni bilinmiyordu (§9.2); damgalandı |
+| §3 yan bulgusu | `settb=AVTB` denendi, sonuç aynı çıktı | **kaçırılmış ipucu** — aşağıda |
+| §4 gerekçesi | "iyi bir kodlamada min 0,79 çıkabiliyor" | aynı ölçümden türüyor, **geçersiz** |
+| §7 özdeş tablosu | 97,4257 / 97,4253 / 97,4256 | p1 **ölçüldü, değişmedi**; p2 ve p3 **ölçülmedi** |
+| §7 crf8/crf12 tablosu | p1 4,3147 / 4,3011 | **geçersiz**, yeniden ölçüldü (§9.10) |
+| aynı tablo | p2 95,2609 / 94,2846, p3 2,2023 / 2,2041 | **ölçülmedi**; p3'ün 2,2'si p1'inkiyle aynı aileden görünüyor ama bu bir tahmin |
+
+**Kaçırılmış ipucu.** §3'ün yan bulgusu `xpsnr` filtresinin bastığı
+`not matching timebases found between first input: 1/15360 and second input
+1/1000` uyarısını kaydediyor, `settb=AVTB`'yi **deniyor**, sonuç değişmediği için
+üretim zincirini değiştirmiyor. Deneme doğruydu ama eksikti: `settb` tek başına
+zaman tabanını birleştirir, kare **numarasını** birleştirmez; kaymayı kaldıran
+`setpts=N`'dir (mutasyon M6, 3 kırmızı). O turda uyarı görülüp geçildi.
+
+Kilitten **etkilenmesi beklenmeyen ama ölçülmemiş** satırlar: §2 ve §5'in
+ortalama / harmonik / p10 sayıları (ızgarada ortalama en fazla 0,80 oynadı) ve
+§4.2 ile §4.3'ün pencere bölme sayıları (kare eşlemesinden bağımsız aritmetik).
+**Bunların hiçbiri yeniden ölçülmedi.**
+
+### 9.12 Bu turda ölçülmeyenler
+
+- **libvmaf ve framesync'in hangi eşleme kuralını uyguladığı ölçülmedi.** §9.2 ve
+  §9.4'ün sonuçları davranış olarak ölçüldü; bunları üreten iç kural okunmadı.
+- **HDR/tonemap yolunda kilidin etkisi ölçülmedi.** Kilit her iki zincire de
+  giriyor ama §3'ün tonemap'li çifti yeniden ölçülmedi.
+- **`MeasureWindowAsync`'in `-ss`'li yolu ayrıca ölçülmedi.** Çıpa ölçümü (§9.7)
+  o yoldan geçiyor ve değişimi gösteriyor; pencere yolunun kendisi için ayrı bir
+  ızgara kurulmadı.
+- **XPSNR ve SSIM'in kilitten ne kadar etkilendiği ölçülmedi.** Izgarada yalnız
+  VMAF-NEG'in kare başına dökümü var.
+- **İçerik çeşitliliği hâlâ yok.** İki gerçek klip aynı ana kaynaktan, üçüncü
+  düzenek sentetik. Farklı kare hızları (24, 25, 50) ölçülmedi.
+- **T95'in şu bulguları bu turda düzeltilmedi ve ölçülmedi:** kare başına
+  puanların dışarı verilmemesi, eşlenen kare sayısının `QualityScore`'da
+  bulunmaması, libvmaf JSON'unun `%TEMP%`'e yazılması, kare hızı ve en-boy oranı
+  denetiminin olmaması, XPSNR'ın düzlem başına raporlanmaması. Kapsam dışı.
+- **§9.9'un kapısı dar.** Etiketsiz ile bt709 dışı çelişkisini yakalıyor;
+  etiketsiz ile bt709 çiftinde varsayım hâlâ duruyor ve doğrulanmadı.
+- **Süre iddiası yok.** Makine altı ajanla paylaşımlıydı; hiçbir zaman sayısı bu
+  bölüme girmedi.
+
+
+### 9.13 İki koşum iki ayrı şeyi ölçtü — hangisi kilidi tuttu
+
+Teslim iki koşumla raporlandı ve **ikisi aynı şeyi ölçmüyor.** Karıştırılmasın
+diye ayrı yazılıyor.
+
+| koşum | ffmpeg PATH'te | `QualityMeterTests` | kilit ölçüleri |
+|---|---|---|---|
+| `dotnet test -c Release --filter QualityMeterTests` | **var** | 24 geçti / 0 atlandı | **koştu** |
+| `tools/ci-gibi-kos.sh` (tam süit) | **yok** | 11 geçti / **13 atlandı** | **atlandı** |
+
+`ci-gibi-kos.sh` PATH'ten ffmpeg'i çıkarıyor; `[FfmpegFact]` taşıyan ölçüler o
+koşumda çalışmıyor. §9'un beş yeni ölçüsünün **beşi de** orada atlananların
+içinde: `OneFrameOfSlipIsWorthTensOfVmafPointsOnThisFixture`,
+`SubFrameTimestampSlipDoesNotCostTheScoreAWholeFrame`,
+`ShiftedSourceIsReportedNotSilentlyRepaired`,
+`VideoStartAheadOfTheContainerIsTheOffsetThatReachesTheFilterGraph`,
+`UntaggedSourceAgainstANonBt709TagIsRefusedInsteadOfAssumed`.
+
+Yani **"ci-gibi-kos.sh 1018 geçti / 0 kaldı" kare kilidini ölçmedi.** O sayının
+tek anlamı şudur: kilit ürün koduna girerken ffmpeg'siz koşan 1018 ölçüde
+gerileme olmadı. Kilidin kendi kanıtı ffmpeg'li koşumdan ve §9.8'in mutasyon
+bataryasından geliyor; batarya da ffmpeg'li koşuma dayanıyor (M1–M8'in kırmızı
+sayıları `[FfmpegFact]` ölçülerinden çıkıyor).
+
+Bunun sonucu: **kare kilidi CI'da korunmuyor.** CI ffmpeg görmediği sürece kilidi
+kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın yaklaşık 80
+ölçüyü atlaması ayrı bir işe (T115) alındı.
+
+
 ## Yeniden üretim
 
     ffmpeg -ss 00:02:00 -t 60 -i kaynak-1080p60-hdr-17dk.mp4 -map 0:v:0 -c copy parca-1.mkv
@@ -630,3 +1006,70 @@ worktree kaldırılırken. `.gitignore`'da, git'e sızmadı.
 için filtreye `libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path=...`
 verilir. `bench measure-tonemapped` çıktısı bu çözümlemeyle birebir uyuştu
 (ortalama 90,59568; XPSNR 40,35355) — çözümleme üretim yolunun kendisini ölçüyor.
+
+### T110 — kare kilidi ölçümleri
+
+Çalışma klasörü `.calisma/T110/` (worktree-yerel, `.gitignore`'da). İş parçacığı
+her kodlamada sabit: `-threads 2`, x265'te ayrıca `pools=2`, SVT-AV1'de `lp=2`.
+
+Kaynaklar ve testler (§9.2):
+
+    ffmpeg -t 4 -i .calisma/kaynak/parca-1.mkv -c copy ref1.mkv
+    ffmpeg -t 4 -i .calisma/kaynak/parca-2.mkv -c copy ref2.mkv
+    ffmpeg -i refN.mkv -c:v libx265 -crf 32 -preset veryfast -x265-params pools=2 -threads 2 -an pN-x265.mkv
+    ffmpeg -i refN.mkv -c:v libsvtav1 -crf 45 -preset 8 -svtav1-params lp=2 -threads 2 -an pN-av1.mkv
+
+`ref2` **sesiyle birlikte** kesilir; `-an` ile kesilirse kap tek akışa iner ve
+ffmpeg kaymayı sıfırlar (§9.1) — kusur ölçülemez hale gelir.
+
+Ham ölçüm, ürün kodunun kurduğu grafiğin aynısı; `KILIT` boşken kilitsiz,
+`,settb=AVTB,setpts=N` iken kilitli koşum:
+
+    N=zscale=w=1920:h=1080:min=bt2020nc:tin=smpte2084:pin=bt2020:rin=full:m=bt2020nc:t=smpte2084:p=bt2020:r=full,format=yuv420p10le
+    ffmpeg -i pN-<kodlayici>.mkv -i refN.mkv -lavfi \
+      "[0:v]$N$KILIT[t];[1:v]$N$KILIT[r];[t][r]libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path=vmaf-pN-<kodlayici>-<kilit>.json" \
+      -f null -
+
+Bu yolla alınan sayılar `bench measure` çıktısıyla dört basamağa kadar uyuştu,
+yani ham koşum ürün yolunun kendisini ölçüyor.
+
+Zaman damgası modeli (§9.1) `showinfo` ile doğrulanır:
+
+    ffmpeg -i <dosya> -vf showinfo -frames:v 3 -f null - 2>&1 | grep pts_time
+
+Duyarlı düzenek (§9.4), `.calisma/T110/pin/`:
+
+    ffmpeg -f lavfi -i testsrc2=size=320x240:rate=30:duration=3 -c:v libx264 -crf 12 -threads 2 src.mp4
+    ffmpeg -i src.mp4 -c:v libx264 -crf 16 -threads 2 same.mp4
+    ffmpeg -f lavfi -i anullsrc=r=48000:cl=stereo -t 3 -c:a aac sessiz.m4a
+    ffmpeg -itsoffset <kayma> -i src.mp4 -i sessiz.m4a -map 0:v -map 1:a -c copy k<kayma>.mkv
+    ffmpeg -i src.mp4 -vf "select=gte(n\,1),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-ref.mkv
+
+Her `k<kayma>.mkv` `same.mp4` ile yukarıdaki ham grafikten geçirilir; `kaymis-ref.mkv`
+bir kare kaymanın referans değeridir.
+
+Kontrol (§9.3) — ref2'nin kasten iki kare kaydırılmış ve kaydırılmamış kopyaları:
+
+    ffmpeg -i ref2.mkv -vf "select=gte(n\,2),setpts=N/FR/TB" -c:v libx265 -crf 16 -x265-params pools=2 -threads 2 -an ref2-2kare-kaydirilmis.mkv
+    ffmpeg -i ref2.mkv -c:v libx265 -crf 16 -x265-params pools=2 -threads 2 -an ref2-kaydirilmamis-crf16.mkv
+
+Çıpalar (§9.7) — aynı ağaçtan iki ikili, biri kilitli biri kilitsiz:
+
+    dotnet publish -c Release tools/VidShrink.Bench -o .calisma/T110/bench-kilitli
+    # QualityMeter.cs'ten kilit çıkarılır, sonra:
+    dotnet publish -c Release tools/VidShrink.Bench -o .calisma/T110/bench-kilitsiz
+    <bench>/VidShrink.Bench shrink .calisma/kaynak/parca-N.mkv 60 --out cipa-out \
+      --measured-quality --plan-only --no-calibrate
+
+§7'nin yeniden ölçümü (§9.10) belgenin kendi tarifiyle `.calisma/T110/s7/` içinde
+kurulur; ham grafik yukarıdakinin aynısıdır, çiftler `p1-ref` ile kendisi, `crf8`
+ve `crf12`.
+
+Mutasyon bataryası (§9.8) `.calisma/T110/mutasyon.sh`, günlüğü `mutasyon.log`;
+her mutasyonu tek başına uygular, `dotnet test -c Release --filter QualityMeterTests`
+koşar, kaynağı geri yükler. M5'in eşdeğerliği `pin/m5-N.json` ile `pin/m5-Np1.json`
+kare dizileri karşılaştırılarak gösterildi.
+
+**Bu klasör worktree-yereldir ve git'e girmez.** Yukarıdaki komutlar dışarıdan
+yeniden üretmek için yeterlidir; `.calisma/kaynak/` ortak ve bu turda
+değiştirilmedi.

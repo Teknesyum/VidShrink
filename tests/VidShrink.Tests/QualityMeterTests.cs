@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -173,6 +174,139 @@ public sealed class QualityMeterTests
             Assert.True(score.VmafNegMean > 95, $"offset window was not aligned: {score.VmafNegMean}");
             Assert.NotNull(score.WorstSceneStartSeconds);
             Assert.InRange(score.WorstSceneStartSeconds!.Value, 1.0, 3.0);
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task OneFrameOfSlipIsWorthTensOfVmafPointsOnThisFixture()
+    {
+        var dir = NewDir();
+        try
+        {
+            var source = Path.Combine(dir, "source.mp4");
+            var aligned = Path.Combine(dir, "aligned.mp4");
+            var slipped = Path.Combine(dir, "slipped.mp4");
+            await EncodeMovingSourceAsync(source);
+            await EncodeRivalAsync(source, aligned, null);
+            await EncodeRivalAsync(source, slipped, "select='gte(n\\,1)',setpts=N/FR/TB");
+
+            var alignedScore = await QualityMeter.MeasureAsync(source, aligned, CancellationToken.None);
+            var slippedScore = await QualityMeter.MeasureAsync(source, slipped, CancellationToken.None);
+
+            Assert.NotNull(alignedScore.VmafNegMean);
+            Assert.NotNull(slippedScore.VmafNegMean);
+            Assert.True(alignedScore.VmafNegMean - slippedScore.VmafNegMean > 20,
+                $"tek karelik kayma bu dizide okunmuyor ({alignedScore.VmafNegMean} / {slippedScore.VmafNegMean})");
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task SubFrameTimestampSlipDoesNotCostTheScoreAWholeFrame()
+    {
+        var dir = NewDir();
+        try
+        {
+            var source = Path.Combine(dir, "source.mp4");
+            var shifted = Path.Combine(dir, "shifted.mkv");
+            var test = Path.Combine(dir, "test.mp4");
+            var slipped = Path.Combine(dir, "slipped.mp4");
+            await EncodeMovingSourceAsync(source);
+            await MuxWithVideoStartOffsetAsync(source, shifted, 0.02);
+            await EncodeRivalAsync(source, test, null);
+            await EncodeRivalAsync(source, slipped, "select='gte(n\\,1)',setpts=N/FR/TB");
+
+            var straight = await QualityMeter.MeasureAsync(source, test, CancellationToken.None);
+            var overShift = await QualityMeter.MeasureAsync(shifted, test, CancellationToken.None);
+            var slippedScore = await QualityMeter.MeasureAsync(source, slipped, CancellationToken.None);
+
+            Assert.NotNull(straight.VmafNegMean);
+            Assert.NotNull(overShift.VmafNegMean);
+            Assert.NotNull(slippedScore.VmafNegMean);
+            Assert.Equal(straight.VmafNegMean!.Value, overShift.VmafNegMean!.Value, 3);
+            Assert.True(overShift.VmafNegMean - slippedScore.VmafNegMean > 20,
+                $"kaymış kaynak bir kare kaydırılmış gibi ölçüldü ({overShift.VmafNegMean} / {slippedScore.VmafNegMean})");
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task ShiftedSourceIsReportedNotSilentlyRepaired()
+    {
+        var dir = NewDir();
+        try
+        {
+            var source = Path.Combine(dir, "source.mp4");
+            var shifted = Path.Combine(dir, "shifted.mkv");
+            var test = Path.Combine(dir, "test.mp4");
+            await EncodeMovingSourceAsync(source);
+            await MuxWithVideoStartOffsetAsync(source, shifted, 0.02);
+            await EncodeRivalAsync(source, test, null);
+
+            var clean = await QualityMeter.MeasureAsync(source, test, CancellationToken.None);
+            var overShift = await QualityMeter.MeasureAsync(shifted, test, CancellationToken.None);
+
+            Assert.NotNull(clean.Alignment);
+            Assert.False(clean.Alignment!.Shifted);
+            Assert.Null(clean.Alignment.Note);
+
+            Assert.NotNull(overShift.Alignment);
+            Assert.True(overShift.Alignment!.Shifted);
+            Assert.Equal(0.02, overShift.Alignment.ShiftSeconds, 4);
+            Assert.Equal(0.6, overShift.Alignment.ShiftFrames, 3);
+            Assert.Contains("kare indeksine", overShift.Alignment.Note);
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task VideoStartAheadOfTheContainerIsTheOffsetThatReachesTheFilterGraph()
+    {
+        var dir = NewDir();
+        try
+        {
+            var source = Path.Combine(dir, "source.mp4");
+            var shifted = Path.Combine(dir, "shifted.mkv");
+            var everythingLate = Path.Combine(dir, "late.mkv");
+            await EncodeMovingSourceAsync(source);
+            await MuxWithVideoStartOffsetAsync(source, shifted, 0.02);
+            await RunFfmpegAsync(new[] { "-y", "-itsoffset", "0.02", "-i", source, "-map", "0:v", "-c", "copy", everythingLate });
+
+            Assert.Equal(0.0, await QualityMeter.TimestampOffsetSecondsAsync(source), 6);
+            Assert.Equal(0.02, await QualityMeter.TimestampOffsetSecondsAsync(shifted), 6);
+            Assert.Equal(0.0, await QualityMeter.TimestampOffsetSecondsAsync(everythingLate), 6);
+        }
+        finally { Cleanup(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task UntaggedSourceAgainstANonBt709TagIsRefusedInsteadOfAssumed()
+    {
+        var dir = NewDir();
+        try
+        {
+            var untagged = Path.Combine(dir, "untagged.mp4");
+            var bt709 = Path.Combine(dir, "bt709.mkv");
+            var bt2020 = Path.Combine(dir, "bt2020.mkv");
+            await EncodeLavfiAsync(untagged, crf: 18);
+            await RunFfmpegAsync(new[] { "-y", "-i", untagged, "-map", "0", "-c", "copy", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", bt709 });
+            await RunFfmpegAsync(new[] { "-y", "-i", untagged, "-map", "0", "-c", "copy", "-color_primaries", "bt2020", "-color_trc", "bt709", "-colorspace", "bt2020nc", bt2020 });
+
+            var assumedMatch = await QualityMeter.MeasureAsync(untagged, bt709, CancellationToken.None);
+            var conflicting = await QualityMeter.MeasureAsync(untagged, bt2020, CancellationToken.None);
+            var reversed = await QualityMeter.MeasureAsync(bt2020, untagged, CancellationToken.None);
+
+            Assert.True(assumedMatch.Comparable, assumedMatch.Message);
+            Assert.NotNull(assumedMatch.VmafNegMean);
+
+            Assert.False(conflicting.Comparable);
+            Assert.Null(conflicting.VmafNegMean);
+            Assert.Null(conflicting.Xpsnr);
+            Assert.Contains("Ölçülemez", conflicting.Message);
+
+            Assert.False(reversed.Comparable);
+            Assert.Null(reversed.VmafNegMean);
         }
         finally { Cleanup(dir); }
     }
@@ -356,6 +490,32 @@ public sealed class QualityMeterTests
             "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=10:duration=2",
             "-c:v", "libx264", "-crf", crf.ToString(), "-pix_fmt", "yuv420p", outputPath
         });
+
+    private static Task EncodeMovingSourceAsync(string outputPath)
+        => RunFfmpegAsync(new[]
+        {
+            "-y", "-f", "lavfi", "-i", "testsrc2=size=320x240:rate=30:duration=3",
+            "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p", "-threads", "2", outputPath
+        });
+
+    private static Task EncodeRivalAsync(string sourcePath, string outputPath, string? videoFilter)
+    {
+        var args = new List<string> { "-y", "-i", sourcePath };
+        if (videoFilter is not null) args.AddRange(new[] { "-vf", videoFilter });
+        args.AddRange(new[] { "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", "-threads", "2", outputPath });
+        return RunFfmpegAsync(args);
+    }
+
+    private static async Task MuxWithVideoStartOffsetAsync(string sourcePath, string outputPath, double offsetSeconds)
+    {
+        var silence = Path.Combine(Path.GetDirectoryName(outputPath)!, "silence.m4a");
+        await RunFfmpegAsync(new[] { "-y", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo", "-t", "3", "-c:a", "aac", silence });
+        await RunFfmpegAsync(new[]
+        {
+            "-y", "-itsoffset", offsetSeconds.ToString(CultureInfo.InvariantCulture), "-i", sourcePath,
+            "-i", silence, "-map", "0:v", "-map", "1:a", "-c", "copy", outputPath
+        });
+    }
 
     private static Task EncodeHdrAsync(string outputPath)
         => RunFfmpegAsync(new[]

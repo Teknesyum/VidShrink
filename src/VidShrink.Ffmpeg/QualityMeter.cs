@@ -18,7 +18,27 @@ public sealed record QualityScore(
     double? VmafNegWorstScene = null,
     double? WorstSceneStartSeconds = null,
     double? SceneWindowSeconds = null,
-    bool TonemappedReference = false);
+    bool TonemappedReference = false,
+    TimestampAlignment? Alignment = null);
+
+public sealed record TimestampAlignment(
+    double ReferenceOffsetSeconds,
+    double TestOffsetSeconds,
+    double FrameDurationSeconds)
+{
+    public double ShiftSeconds => ReferenceOffsetSeconds - TestOffsetSeconds;
+
+    public double ShiftFrames => FrameDurationSeconds > 0 ? ShiftSeconds / FrameDurationSeconds : 0;
+
+    public bool Shifted => Math.Abs(ShiftSeconds) > 1e-6;
+
+    public string? Note => Shifted
+        ? "Kaynak ve test zaman damgaları "
+          + (ShiftSeconds * 1000).ToString("0.###", CultureInfo.InvariantCulture) + " ms ("
+          + ShiftFrames.ToString("0.###", CultureInfo.InvariantCulture)
+          + " kare) ayrık; kareler zaman damgasına değil kare indeksine eşlendi."
+        : null;
+}
 
 public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
 {
@@ -50,8 +70,64 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
     }
 }
 
+public static class MeasureFilterGraph
+{
+    public const string FrameLock = "settb=AVTB,setpts=N";
+
+    public static string Build(string testChain, string referenceChain, string comparisonFilter)
+    {
+        if (string.IsNullOrWhiteSpace(testChain))
+            throw new ArgumentException("Test normalizasyonu boş olamaz.", nameof(testChain));
+        if (string.IsNullOrWhiteSpace(referenceChain))
+            throw new ArgumentException("Referans normalizasyonu boş olamaz.", nameof(referenceChain));
+        if (string.IsNullOrWhiteSpace(comparisonFilter))
+            throw new ArgumentException("Karşılaştırma filtresi boş olamaz.", nameof(comparisonFilter));
+
+        return $"[0:v]{testChain},{FrameLock}[t];" +
+               $"[1:v]{referenceChain},{FrameLock}[r];" +
+               $"[t][r]{comparisonFilter}";
+    }
+}
+
 public static class QualityMeter
 {
+    public static async Task<double> TimestampOffsetSecondsAsync(string path, CancellationToken ct = default)
+    {
+        var args = new[]
+        {
+            "-v", "error", "-show_entries", "stream=codec_type,start_time",
+            "-of", "json", path
+        };
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
+        process.Start();
+        using var registration = ct.Register(() => TryKill(process));
+        var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
+        var stderrTask = process.StandardError.ReadToEndAsync(ct);
+        await Task.WhenAll(stdoutTask, stderrTask);
+        await process.WaitForExitAsync(ct);
+        if (process.ExitCode != 0) return 0;
+
+        double? video = null;
+        var earliest = double.PositiveInfinity;
+        try
+        {
+            using var doc = JsonDocument.Parse(await stdoutTask);
+            if (!doc.RootElement.TryGetProperty("streams", out var streams)) return 0;
+            foreach (var stream in streams.EnumerateArray())
+            {
+                if (!stream.TryGetProperty("start_time", out var raw)) continue;
+                if (!double.TryParse(raw.GetString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var start)) continue;
+                if (start < earliest) earliest = start;
+                var type = stream.TryGetProperty("codec_type", out var t) ? t.GetString() : null;
+                if (video is null && string.Equals(type, "video", StringComparison.OrdinalIgnoreCase)) video = start;
+            }
+        }
+        catch (JsonException) { return 0; }
+
+        if (video is null || double.IsPositiveInfinity(earliest)) return 0;
+        return video.Value - earliest;
+    }
+
     public static async Task<long> MeasureReferenceDecodeCostAsync(
         string path, double startSeconds, double durationSeconds, bool normalize, CancellationToken ct = default)
     {
@@ -101,15 +177,20 @@ public static class QualityMeter
                 ColorTransfer = "bt709", ColorSpace = "bt709", ColorRange = "tv"
             }
             : reference;
+        var frameRate = test.Fps > 0 ? test.Fps : reference.Fps;
+        var alignment = new TimestampAlignment(
+            await TimestampOffsetSecondsAsync(referencePath, ct),
+            await TimestampOffsetSecondsAsync(testPath, ct),
+            frameRate > 0 ? 1.0 / frameRate : 0);
+
         var incompatibility = ColorIncompatibility(measuredReference, test);
         if (incompatibility is not null)
-            return new QualityScore(null, null, null, null, null, null, false, incompatibility);
+            return new QualityScore(null, null, null, null, null, null, false, incompatibility, Alignment: alignment);
 
         var normalization = tonemapReference
             ? $"HDR referans {VidShrink.Core.HdrResolver.TonemapFilter} ile bt709 limited'a tonemap edildi; test aynı uzaya normalize edildi."
             : NormalizationDescription(reference, test);
 
-        var frameRate = test.Fps > 0 ? test.Fps : reference.Fps;
         VmafAggregate? vmaf = null;
         if (EncoderCapabilities.Instance.HasFilter("libvmaf"))
             vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, ct);
@@ -125,7 +206,7 @@ public static class QualityMeter
         return new QualityScore(
             vmaf?.Mean, vmaf?.Harmonic, vmaf?.P10, vmaf?.Min, xpsnr, ssim, true, null, normalization,
             vmaf?.WorstScene, vmaf?.WorstSceneStartSeconds,
-            vmaf is null ? null : SceneWindowSeconds, tonemapReference);
+            vmaf is null ? null : SceneWindowSeconds, tonemapReference, alignment);
     }
 
     private readonly record struct VmafAggregate(
@@ -275,7 +356,7 @@ public static class QualityMeter
         var args = new List<string> { "-hide_banner", "-nostdin" };
         AddInput(args, testPath, testStartSeconds, durationSeconds);
         AddInput(args, referencePath, referenceStartSeconds, durationSeconds);
-        args.AddRange(new[] { "-lavfi", $"[0:v]{testNormalization}[t];[1:v]{referencePrefix}{referenceNormalization}[r];[t][r]{filterChain}", "-f", "null", "-" });
+        args.AddRange(new[] { "-lavfi", MeasureFilterGraph.Build(testNormalization, referencePrefix + referenceNormalization, filterChain), "-f", "null", "-" });
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
         process.Start();
@@ -304,10 +385,26 @@ public static class QualityMeter
     {
         if (reference.IsHdr != test.IsHdr)
             return "Renk uzayı uyuşmuyor; HDR ve SDR/tonemap edilmiş görüntü karşılaştırılamaz.";
-        if (!reference.IsHdr) return null;
+        if (!reference.IsHdr)
+            return UnverifiableAssumption(reference, test) ?? UnverifiableAssumption(test, reference);
         if (!Same(reference.ColorTransfer, test.ColorTransfer) || !Same(reference.ColorPrimaries, test.ColorPrimaries))
             return "Renk uzayı uyuşmuyor; HDR aktarım işlevleri veya ana renkleri farklı, karşılaştırılamaz.";
         return null;
+    }
+
+    private static string? UnverifiableAssumption(VidShrink.Core.MediaInfo untagged, VidShrink.Core.MediaInfo tagged)
+    {
+        if (untagged.ColorPrimaries is not null || untagged.ColorTransfer is not null || untagged.ColorSpace is not null)
+            return null;
+
+        var conflicting = new List<string>();
+        if (tagged.ColorPrimaries is { } p && !Same(p, "bt709") && !Same(p, "unknown")) conflicting.Add("ana renk " + p);
+        if (tagged.ColorTransfer is { } t && !Same(t, "bt709") && !Same(t, "unknown")) conflicting.Add("aktarım " + t);
+        if (tagged.ColorSpace is { } s && !Same(s, "bt709") && !Same(s, "unknown")) conflicting.Add("matris " + s);
+        if (conflicting.Count == 0) return null;
+
+        return $"Bir taraf etiketsiz, öteki taraf {string.Join(", ", conflicting)} taşıyor; "
+             + "etiketsiz tarafın uzayı bt709 varsayılırsa iki taraf farklı uzaylardan normalize edilir. Ölçülemez.";
     }
 
     private static string NormalizationDescription(VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test)
