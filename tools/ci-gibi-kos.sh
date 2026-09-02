@@ -87,3 +87,19 @@ else
 fi
 
 "$PS" -NoProfile -ExecutionPolicy Bypass -File tools/kosum-kapisi/kosum-kapisi.ps1 $GATE_ARGS
+GATE_EXIT=$?
+
+if command -v ffmpeg >/dev/null 2>&1 && ffmpeg -hide_banner -encoders 2>/dev/null | grep -q h264_nvenc; then
+  if ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=320x240:rate=1:duration=0.1 \
+      -c:v h264_nvenc -f null - >/dev/null 2>&1; then
+    echo ""
+    echo "UYARI: bu makinede GPU gercekten calisiyor (h264_nvenc probu basarili oldu)."
+    echo "  CI runner'inda ffmpeg h264_nvenc'i listeliyor ama gercek GPU yok, nvcuda.dll yuklenemiyor -"
+    echo "  ayni ffmpeg derlemesi orada bu adimda hata verir. GPU'ya bagli testler bu yuzden burada"
+    echo "  CI'dan FARKLI sonuclanabilir (bilinen ornek: PerformanceCheckTests.IslemciZamaniSayaciDogruOkuyorMu,"
+    echo "  kimlik kimlik dogrulandi: CI'da 'Cannot load nvcuda.dll' ile dusuyor, burada geciyor)."
+    echo "  Betik bu farki kapatamiyor, yalniz gorunur kiliyor."
+  fi
+fi
+
+exit $GATE_EXIT

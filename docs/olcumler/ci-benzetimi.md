@@ -34,12 +34,28 @@ bu yüzden **karşılaştırılabilir değil**, ayrı bir bulgu değil).
 - **Skipped (17=17) ve Total (1180=1180) birebir eşleşiyor** — betik CI ile aynı test
   yüzeyini koşturuyor, atlanan testler de aynı. Bu, K2(a)'nın (ffmpeg silme kaldırma +
   parametre hizalama) doğru test setini çalıştırdığının doğrudan kanıtı.
-- **Failed (CI: 1, betik: 0) ve buna bağlı Passed (CI: 1162, betik: 1163) farklı** —
-  hangi testin CI'da başarısız olduğu bu ölçümde görülmedi (CI logunun test-adı
-  detayına bu sözleşmede inilmedi, **ölçülmedi**). Muhtemel açıklama tek-seferlik
-  bir kararsız (flaky) test ya da makineye özgü bir zamanlama farkı; iki koşum da
-  aynı commit'te ama farklı makinede (CI runner'ı vs bu paylaşımlı Windows makinesi)
-  — kesin sebep bu sözleşmenin kapsamı dışında, iddia edilmiyor.
+- **Failed (CI: 1, betik: 0) ve buna bağlı Passed (CI: 1162, betik: 1163) farklı —
+  kimlik kimlik doğrulandı, tahmin edilmedi (tur 2).** CI logu (`gh run view
+  33589639249 --log`) tek başarısız testi adıyla veriyor:
+  `VidShrink.Tests.PerformanceCheckTests.IslemciZamaniSayaciDogruOkuyorMu`, sebep
+  `[h264_nvenc @ ...] Cannot load nvcuda.dll`. Aynı testi bu makinede tek başına
+  koşturdum (`dotnet test ... --filter FullyQualifiedName~PerformanceCheckTests.
+  IslemciZamaniSayaciDogruOkuyorMu`, `.calisma/` altında değil doğrudan konsola,
+  tam süit değil tek test): **Başarılı, 2 dk 3 sn**. Skipped 17=17 ve Total
+  1180=1180 zaten birebir eşleştiği için, kümenin geri kalanında set farkı yok —
+  Failed'daki tek fark bu bir test, kimlik doğrulamayla kapatıldı.
+
+  **Kök sebep de ölçüldü, tahmin edilmedi.** Test kaynağı
+  (`tests/VidShrink.Tests/PerformanceCheckTests.cs:710-711`) nvenc geçişini
+  `EncoderCapabilities.Instance.HasEncoder("h264_nvenc")` ile koşullu çalıştırıyor.
+  Bu kontrol ffmpeg derlemesinin nvenc'i **derlenmiş** listede tutup tutmadığına
+  bakıyor, gerçek GPU/sürücü varlığına değil — CI'ın ffmpeg derlemesi de nvenc'i
+  listeliyor (aynı derleme, T115 kurulumundan), ama CI runner'ında NVIDIA sürücüsü
+  yok, `nvcuda.dll` çalışma anında yüklenemiyor ve encode adımı hata veriyor. Bu
+  makinede gerçek bir GPU var, aynı ffmpeg derlemesiyle aynı encode adımı başarıyla
+  çalışıyor — fark ffmpeg derlemesinden değil **donanımdan** geliyor. `HasEncoder`
+  kontrolü ve test dosyası `tests/` altında, bu sözleşmenin owns'unda değil,
+  değiştirilmedi.
 - **Kapı sonucu ayrıca farklı ve önemli**: CI'da kapı 1 gerçek başarısızlık yüzünden
   düştü. Bu makinede kapı da düştü ama **hiç ilgisiz bir sebeple**: `kosum-kapisi.ps1`
   (`kod=66 sart=Basarisiz/Failed ozeti yok`) — yani Failed/Passed özet satırını hiç
@@ -56,6 +72,24 @@ bu yüzden **karşılaştırılabilir değil**, ayrı bir bulgu değil).
   doğru şekilde çağırsa bile, kapının kendisi bu ortamda güvenilir bir PASS/FAIL
   vermiyor** — K2(a)'nın "betik adını hak ediyor" kararı bu bulguyu geçersiz kılmıyor
   (betik CI'ı doğru temsil ediyor), ama temsil ettiği kapı bu makinede kırık.
+
+  **T115'in ajanına doğrulama verisi (T0'ın isteğiyle).** Tur 2'de gate tam
+  koşumu tekrarlanmadı (yalnız tek bir filtreli test koştu, aşağıya bakın), bu
+  yüzden kod=66 tur 2'de yeniden alınmadı — aşağıdaki, tur 1'in tam koşumundan
+  kalan doğrulama verisi: komut `"$PS" -NoProfile -ExecutionPolicy Bypass -File
+  tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30`
+  (`$PS`=`powershell`, bu makinede `pwsh` yok). Çıktı (`.calisma/t118-kosum.log`,
+  ham bayt denetimi Python'la yapıldı): `Başarılı!  - Başarısız:     0, Başarılı:
+  1163, Atlanan:    17, Toplam:  1180, Süre: 22 m 19 s` satırı **evet, gerçekten
+  Türkçe** üretildi ve dosyada doğru UTF-8 (`Ba\xc5\x9far\xc4\xb1s\xc4\xb1z` =
+  "Başarısız") olarak duruyor; hemen ardından `kosum-kapisi.ps1` `KOSUM KAPISI
+  DUSTU: kod=66 sart=Basarisiz/Failed ozeti yok.` bastı. Yani dosyaya yazılan
+  bayt dizisi doğruydu ama kapının kendi iç `$text` değişkeninde regex'in aradığı
+  "Başarısız"/"ş"/"ı" dizisi eşleşmedi — iki gözlem arasındaki fark (doğru dosya
+  baytı, yanlış regex eşleşmesi) `kosum-kapisi.ps1`'in `dotnet test`'i `2>&1` ile
+  canlı yakaladığı noktada (satır ~20-24) bir kod sayfası dönüşümü olduğuna işaret
+  ediyor; kesin mekanizma (PowerShell 5.1 `[Console]::OutputEncoding` vs. dosyaya
+  yazarken kullanılan encoding) bu sözleşmede adım adım izlenmedi.
 
 ## Seçim: (a) — betik adını hak ediyor
 
@@ -90,11 +124,38 @@ izler, ikinci bir kayma başlamaz.
   eder, tam süiti koşturmaz. Bu makinede geçti (ffmpeg WinGet üzerinden PATH'te,
   `-MinimumTotal=1134`, `-MaximumSkipped=30`).
 - Bilinmeyen argüman (`--self-test` dışında) `DURDU` yazıp çıkış kodu 3 verir.
+- **Parametreler OKUNUYOR, kopyalanmadı (tur 2, K3'ün cevabı).** `tools/ci-gibi-kos.sh`
+  içinde sabit bir sayı yok: her koşumda `grep -E 'kosum-kapisi\.ps1' "$WORKFLOW" |
+  tail -1` ile `.github/workflows/ci.yml`'deki güncel satır okunur, `-MinimumTotal`/
+  `-MaximumSkipped` oradan `grep -oE` ile çıkarılır (bkz. betiğin ilk 6 satırı).
+  `ci.yml` gate parametresini değiştirdiği gün betik bir sonraki koşumda otomatik
+  izler, elle güncelleme gerekmez — üçüncü seçenek (kopyalanmış sabit) yok.
+- **Donanım uyuşmazlığı sessiz geçilmiyor, görünür kılınıyor (tur 2, K2'nin cevabı).**
+  Gate'ten sonra betik `ffmpeg -encoders`'ta `h264_nvenc` listelenip listelenmediğine
+  ve küçük bir gerçek deneme kodlamasının (`testsrc2=320x240`, 0,1 sn, tam süit değil)
+  başarılı olup olmadığına bakıyor. İkisi de doğruysa bu makinede GPU'nun **gerçekten**
+  çalıştığı, CI runner'ında ise yalnız derlemede listeli olup `nvcuda.dll` yokluğuyla
+  düştüğü — yani bu sınıftaki testlerin (bilinen örnek:
+  `PerformanceCheckTests.IslemciZamaniSayaciDogruOkuyorMu`, `tests/` içinde
+  `HasEncoder(".*nvenc")` ile korunan 2 doğrudan çağrı yeri bulundu — bu betiğin
+  taradığı yalnız bu ikisi, listenin tam kapsamı **ölçülmedi**) CI'dan farklı
+  sonuçlanabileceği bir uyarı olarak basılıyor. Betik farkı **kapatamıyor** (test
+  dosyaları owns dışı), yalnız görünür kılıyor — koşum sonunda sessizce geçmiyor.
+  İlk sürümde bu prob 64x64 boyutla yazılmıştı ve nvenc'in kendi minimum çözünürlük
+  sınırına takılıp her zaman "çalışmıyor" diye yanlış rapor veriyordu; 320x240'a
+  çıkarılıp standalone doğrulandıktan sonra teslim edildi.
 
 ## Ölçülmedi
 
-- Betiğin çıktısı ile CI'ın çıktısındaki bireysel test isimleri satır satır
-  karşılaştırılmadı — yalnız Failed/Passed/Skipped/Total dörtlüsü kıyaslandı.
+- Betiğin çıktısı ile CI'ın çıktısındaki 1180 testin tamamı tek tek eşleştirilmedi;
+  yalnız Failed'daki tek farkın kimliği doğrulandı (tur 2). Skipped/Total'ın
+  birebir tutması set eşitliğinin dolaylı kanıtı, birebir liste karşılaştırması değil.
+- `tests/` altında `HasEncoder(".*nvenc")` ile korunan tam çağrı sayısı ve bu
+  sınıftaki testlerin tam listesi ölçülmedi; betiğin GPU-uyuşmazlık uyarısı yalnız
+  2 doğrudan çağrı yerini buldu (`PerformanceCheckTests.cs`, `EncoderCapabilitiesTests.cs`),
+  farklı bir kalıpla (değişken, dolaylı sarmalayıcı) yazılmış başka çağrı yerleri
+  olabilir — betik bunları taramıyor, yalnız gate sonucunun kendisini etkileyen
+  bilinen örneği belgeliyor.
 - Farklı makinelerdeki (ör. başka bir ajanın makinesi) `--self-test` sonucu
   ölçülmedi; yalnız bu makinede koşuldu.
 - Betiğin macOS/Linux altında davranışı ölçülmedi — proje Windows'a kilitli,
