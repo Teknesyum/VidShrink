@@ -61,3 +61,4 @@ cikti, siniflandirma tutarli.
 ## K3 — sonra olcum
 
 (Degisiklik sonrasi doldurulacak.)
+K2 adim 1 kaniti: bu commit, yukaridaki kosumu iptal etmeli.
