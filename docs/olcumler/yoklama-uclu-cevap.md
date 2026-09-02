@@ -4,9 +4,20 @@
 *üretildi* ama tüketilmedi: geçidin girişi iki değerli API'den okuyordu, `Unmeasured`
 `EncoderState`e varamadan ölüyordu. Tur 2 bunu ve iki kardeş kusuru kapattı.
 
-Tur 1'in üç iddiası bu turda **geri çekildi**; eski metinleri bu dosyada bırakılmadı,
-hangi cümlenin ne olduğu T3 / T6 / "Üretim davranışı" bölümlerinde eski-yeni olarak
-yazılı.
+## Geri çekilen iddialar
+
+Tur 1'in üç iddiası bu turda **geri çekildi.** Hiçbiri bu dosyada iddia olarak
+durmuyor; her biri yalnızca kendi bölümünde, "geri çekilen cümle" etiketiyle ve
+hemen ardından neden yanlış olduğuyla alıntılanıyor.
+
+| # | Geri çekilen iddia | Nerede |
+| --- | --- | --- |
+| 1 | "Kusur/düzeltme ayrı commit'lerde (aşağıdaki *Kayıt noktaları*)" — ne ayrıydı ne de o bölüm vardı | T3 |
+| 2 | `_probeStatusShown` bayrağı ilgisiz mesajın silinmesini önlüyor — önlemiyordu | T6 |
+| 3 | "Sınır — üretimde kalan asıl kusur": üretim davranışı değişmedi, üçüncü cevabın çağıranı yok | Üretim davranışı |
+
+İkincisinde iddia zayıflatılmadı, **davranış düzeltildi**; üçüncüsünde iddianın
+kendisi artık doğru değil çünkü T2 üretim davranışını değiştirdi.
 
 ## Tur 2 kayıt noktaları
 
