@@ -95,7 +95,11 @@ public static class Program
     private static async Task<int> DeviationAsync(string[] args)
     {
         if (args.Length < 2) return Unknown("sapma");
-        var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var named = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var root = named.Length > 0 ? Path.GetDirectoryName(Path.GetFullPath(named[0])) : null;
+        var clips = named
+            .Select(name => File.Exists(name) || root is null ? name : Path.Combine(root, Path.GetFileName(name)))
+            .ToArray();
         var threads = Threads(args);
         var lengths = (Option(args, "--boy") ?? "2")
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -224,6 +228,9 @@ public static class Program
 
         var auto = ComplexityProbe.PlanWindows(SamplingPlan.Profile, duration, profile, cuts);
         await AddAsync("profile-auto", "Profile", auto, 0.0);
+
+        var uretim = ComplexityProbe.PlanWindows(ComplexityProbe.ProductionPlan, duration, profile, cuts);
+        await AddAsync("uretim", ComplexityProbe.ProductionPlan.ToString(), uretim, 0.0);
 
         return new ClipReport(
             Path.GetFileNameWithoutExtension(clip), duration, info.Width, info.Height, info.Fps,
@@ -373,7 +380,11 @@ public static class Program
     private static async Task<int> BiasAsync(string[] args)
     {
         if (args.Length < 2) return Unknown("yanlilik");
-        var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var named = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var root = named.Length > 0 ? Path.GetDirectoryName(Path.GetFullPath(named[0])) : null;
+        var clips = named
+            .Select(name => File.Exists(name) || root is null ? name : Path.Combine(root, Path.GetFileName(name)))
+            .ToArray();
         var rows = new List<object>();
 
         foreach (var clip in clips)
@@ -425,7 +436,11 @@ public static class Program
     private static async Task<int> CostAsync(string[] args)
     {
         if (args.Length < 2) return Unknown("maliyet");
-        var clips = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var named = args[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var root = named.Length > 0 ? Path.GetDirectoryName(Path.GetFullPath(named[0])) : null;
+        var clips = named
+            .Select(name => File.Exists(name) || root is null ? name : Path.Combine(root, Path.GetFileName(name)))
+            .ToArray();
         var threads = Threads(args);
         var repeats = int.TryParse(Option(args, "--tekrar"), out var r) && r > 0 ? r : 3;
         var rows = new List<object>();

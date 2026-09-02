@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("VidShrink.Tests")]
+[assembly: InternalsVisibleTo("ornekleme")]
 
 namespace VidShrink.Ffmpeg;
 

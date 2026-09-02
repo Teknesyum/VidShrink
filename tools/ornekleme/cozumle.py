@@ -306,6 +306,22 @@ if __name__ == "__main__":
         for c in clips:
             print(f"  {c.name:16s} {percl[(family,knee)][c.name]:+8.2%}")
 
+        print()
+        print("== N nereye baglanmali: klip basina |sapma| x N ==")
+        print(f"{'klip':16s} {'cv':>6s} " + " ".join(f"N={n:<5d}" for n, _ in fam_ns))
+        for c in clips:
+            row = " ".join(f"{abs(percl[(family,n)][c.name]):6.3f} " for n, _ in fam_ns)
+            print(f"{c.name:16s} {cv(c):6.2f} {row}")
+        for hedef in (0.05, 0.03, 0.02):
+            print(f"  |sapma| <= {hedef:.0%} icin gereken en kucuk N (sonrasinda da asmayan):")
+            for c in clips:
+                ok = None
+                for i, (n, _) in enumerate(fam_ns):
+                    if all(abs(percl[(family, m)][c.name]) <= hedef for m, _ in fam_ns[i:]):
+                        ok = n
+                        break
+                print(f"    {c.name:16s} cv={cv(c):5.2f} N={ok}")
+
         best_worst = min(worst.values())
         winners = sorted((n, name) for (name, n), v in worst.items() if v <= best_worst + 1e-12)
         print()
