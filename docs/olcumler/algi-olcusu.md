@@ -1144,6 +1144,10 @@ kilitsiz iki ikili yayımlandı ve aynı kaynaklarda koşuldu.
 | 3 (48,67 s) | 75,074404 | 87,203740 | **+12,129337** |
 
 Üçüncü pencere T110'un çiftidir ve 12,13 rakamı rakamına yeniden üretildi.
+İkinci pencere onbeş ondalık basamağa kadar özdeş: o pencerede kayma yoktu ve
+kilit hiçbir şey değiştirmedi. Çıpa üç pencerenin aritmetik ortalaması olduğu
+için 12,13 puanlık tek pencere hatası çıpaya **4,04 puan** olarak geçiyor;
+kalan 0,42 birinci pencereden geliyor.
 
 > **Bağımsız doğrulama.** Bu çıpalar `tools/cipa-yeniden/` sondasıyla ölçüldü,
 > ama aynı sayılar ikinci ve bağımsız bir yoldan da çıktı: `bench shrink
@@ -1153,11 +1157,6 @@ kilitsiz iki ikili yayımlandı ve aynı kaynaklarda koşuldu.
 > `sdr-1` → `93.91/90.32/90.93`. Sondanın verdiği ortalamalarla (87,192345 /
 > 91,575281 / 91,718219) basılan basamak sayısına kadar aynı. İki düzenek aynı
 > ürün yolunu ayrı ayrı çağırdı ve aynı sayıyı verdi.
-İkinci pencere onbeş ondalık basamağa kadar özdeş: o pencerede kayma yoktu ve
-kilit hiçbir şey değiştirmedi. Çıpa üç pencerenin aritmetik ortalaması olduğu
-için 12,13 puanlık tek pencere hatası çıpaya **4,04 puan** olarak geçiyor;
-kalan 0,42 birinci pencereden geliyor.
-
 **Plan hiçbir hedefte değişmedi.** Aynı iki ikili `PlanCalculator.BuildDetailed`
 ile koşuldu ve plan alanları (genişlik, yükseklik, fps, kodlayıcı, kip, crf,
 video bit hızı, preset) karşılaştırıldı:
