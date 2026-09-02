@@ -48,8 +48,19 @@ kılmak ayrı bir şey ve kusur 1'in düzeltilmesine bağlı.
 
 ### Harmonik ortalama bu ölçümde kullanılamaz — sebebi ölçüldü
 
+> **T111'de tersine döndü.** Bu bölümün tespiti — "harmonik ortalama bu kaynakta
+> satırlar arası karşılaştırma için geçersiz" — **doğru değildi.** Geçersiz olan
+> metrik değil, girdisiydi. Kare kilidi takıldığında `<1` kare kümesi dokuz AV1
+> koşumunun dokuzunda da **26 → 0** oluyor ve harmonik ortalama ortalamanın 0,01
+> içine yerleşiyor (`auto`: 56,308 → **95,642**, ortalama 95,647). Aşağıdaki
+> ölçümler ve kare numaraları doğru; onlardan çıkarılan "metrik kullanılamaz"
+> sonucu yanlıştı. Düzeltilen tablo T111 bölümünde.
+>
+> Bölüm silinmedi: 26 karenin nerede olduğunu ve bozuk olmadıklarını gösteren
+> ölçüm hâlâ geçerli, ve kusurun nasıl göründüğünün kaydı bu.
+
 Sözleşme üç metrik istiyor. Üçüncüsü, harmonik ortalama, bu kaynakta **satırlar arası
-karşılaştırma için geçersiz**. Neden geçersiz olduğu tahmin değil, ölçüldü.
+karşılaştırma için geçersiz** görünüyordu. Neden öyle göründüğü tahmin değil, ölçüldü.
 
 VMAF-NEG, SVT-AV1 çıktılarımızın **26 karesinde 1 puanın altında** kalıyor;
 bunların **25'i tam 0**. Kareler: 1699, ve 3385-3410 aralığındaki 25 kare. Blok
@@ -69,8 +80,10 @@ Dağılım kodlayıcıya göre keskin biçimde ikiye ayrılıyor:
 | uzman-biz | libsvtav1 | 26 | **24** | 26 / 26 |
 | uzman-handbrake | x265 | **0** | 0 | 0 / 26 |
 
-Birebir aynı olan **kare kümesi**: altı AV1 koşumunun 1 puan altı kare listesi
-arasındaki simetrik fark boş — aynı 26 kare numarası, istisnasız. Tam 0 sayısı ise
+Birebir aynı olan **kare kümesi**: AV1 koşumlarının 1 puan altı kare listesi
+arasındaki simetrik fark boş — aynı 26 kare numarası, istisnasız. (T102 bu cümleyi
+**altı** koşum için yazmıştı; T111'de arşivdeki **dokuz** AV1 koşumu tek tek
+sayıldı, cümle dokuzunda da tutuyor.) Tam 0 sayısı ise
 24 ile 25 arasında oynuyor: her koşumda 3406. kare eşiğin hemen altında kalıyor
 (0,76-0,96), `uzman-biz`de ayrıca 3389. kare 0,133 alıyor. Ayar (preset, `-g`,
 çözünürlük) kümeyi değiştirmiyor, yalnız sıfırın ne kadar dibine inildiğini
@@ -86,12 +99,14 @@ değil: aynı çift ölçekleme olmadan yeniden ölçüldü, sonuç birebir ayn�
 
 Sonuç, iki yönlü:
 
-1. **Bu belgede** satırlar arası farkı **ortalama ve p10** taşır. Harmonik sütunu
-   sözleşme gereği tabloda duruyor ama okunmamalı; yanında 1 puan altı kare sayısı var.
-2. **Bu bir kusur** (kusur 4). Depo'nun kendi ölçüm aracı harmonik ortalamayı
-   raporluyor; bu kaynakta AV1 ile x265 arasında **39 puanlık** bir fark üretirdi ve
-   o farkın PSNR'a göre karşılığı yok. Kusurun kendisi burada değil, **T106**
-   sözleşmesinde ele alınıyor; bu belge yalnız ölçüp adlandırıyor.
+1. **Bu belgenin kilitsiz tablolarında** satırlar arası farkı **ortalama ve p10**
+   taşır. Harmonik sütunu o tablolarda okunmamalı. **T111'in kilitli tablolarında
+   üç sütun da okunabilir.**
+2. **Bu bir kusurdu** (kusur 4) ve **kapandı.** Depo'nun kendi ölçüm aracı harmonik
+   ortalamayı raporluyor; kilitsiz ölçerle bu kaynakta AV1 ile x265 arasında
+   **39 puanlık** bir fark üretiyordu ve o farkın PSNR'a göre karşılığı yoktu.
+   Sebep T106'da bulundu (framesync damga eşlemesi), düzeltme T110'da mühürlendi
+   (`settb=AVTB,setpts=N`), etkisi T111'de ölçüldü: 39,414 → **0,099**.
 
 ---
 
@@ -228,10 +243,15 @@ Okuma: pozitif sayı uzmanın önde olduğunu söyler. Üç satır da 15,02-15,0
 aralığında, aralarındaki en büyük boyut farkı **%0,1** — yani puan farkı boyut
 farkından gelmiyor.
 
-**Harmonik sütunu bu tabloda okunmamalı.** Altı SVT-AV1 koşumunun tamamında aynı
-26 kare VMAF-NEG'den 1 puanın altında alıyor (25'i tam 0), iki x265 koşumunda hiç
-almıyor; o kareler bozuk değil (PSNR 46,30-49,34 dB). Sütun sözleşme üç metrik istediği için duruyor, yanında
-1 puan altı kare sayısıyla. Ayrıntı ölçüm düzeneği bölümünde ve kusur 4'te.
+**Harmonik sütunu bu tabloda okunmamalı** — bu tablo kilitsiz ölçerle üretildi.
+Dokuz SVT-AV1 koşumunun tamamında aynı 26 kare VMAF-NEG'den 1 puanın altında
+alıyor (25'i tam 0, ikisinde 24), iki x265 koşumunda hiç almıyor; o kareler bozuk
+değil (PSNR 46,30-49,34 dB). Sütun sözleşme üç metrik istediği için duruyor,
+yanında 1 puan altı kare sayısıyla.
+
+**T111'de sebep bulundu ve sütun okunabilir hâle geldi:** kare kilidiyle ölçüldüğünde
+`<1` kare kalmıyor ve harmonik ortalama ortalamanın 0,01 içine oturuyor. Bu tablonun
+kilitli hâli ve açık farkları T111 bölümünde.
 
 ---
 
@@ -721,18 +741,27 @@ sapma sıfır varsayılıyor. Auto'nun kendi doldurma bandını dolduramamasın�
 anahtar kare aralığına bağlı olduğu için bu ikisini değiştiren her öneri bu düzeltmeyi
 de ister — aksi halde kazanılan yer boş bırakılır.
 
-**4. Harmonik ortalama AV1 çıktılarında yapay olarak çöküyor ve bench bunu
-raporluyor.** VMAF-NEG bu kaynakta altı SVT-AV1 koşumunun **tamamında birebir aynı
-26 karede** 1 puanın altına iniyor — bunların 25'i tam 0, `uzman-biz`de 24'ü. İki
-x265 koşumunda hiç inmiyor. Kareler bozuk değil: aynı aralıkta auto'nun PSNR'ı
+**4. Harmonik ortalama AV1 çıktılarında yapay olarak çöküyordu ve bench bunu
+raporluyordu — KAPANDI (T110 düzeltti, T111 ölçtü).** Kilitsiz ölçerle VMAF-NEG bu
+kaynakta **dokuz** SVT-AV1 koşumunun **tamamında birebir aynı 26 karede** 1 puanın
+altına iniyordu — yedisinde 25'i tam 0, ikisinde (`uzman-biz3`,
+`y3-hizali-boyutesit`) 24'ü. İki x265 koşumunda hiç inmiyordu.
+
+**Kare kilidiyle bu 26 kare dokuz koşumun dokuzunda da kayboluyor (26 → 0)** ve
+harmonik ortalama ortalamanın 0,01 içine oturuyor. Yani kareler AV1'in bir
+özelliği değil, kaymış eşlemenin ürünüymüş — aşağıdaki eleme ("ölçekleme adımı
+sebep değil") doğruydu ama sebebi bulamamıştı; sebep kaptaki damga farkı.
+Ölçümler T111 bölümünde. Aşağısı kusurun nasıl göründüğünün kaydıdır. Kareler bozuk değil: aynı aralıkta auto'nun PSNR'ı
 46,30-49,34 dB, parlaklık kaynakla örtüşüyor ve HandBrake aynı karelerde 96-100
 alıyor. Harmonik ortalama `n / Σ(1/max(x,1))` olduğu için bu 26 kare sayıyı
 94,5'ten 56,3'e indiriyor.
 
 Bench aynı formülü kullanıyor (`tools/VidShrink.Bench/Program.cs:820`) ve sonucu üç
-yerde raporluyor (`:527`, `:775`, `:913`). Bugün bench'e AV1 ile x265 aynı kaynakta
+yerde raporluyor (`:527`, `:775`, `:913`). Kusur açıkken bench'e AV1 ile x265 aynı kaynakta
 karşılaştırtılsa **39 puanlık** bir kalite farkı raporlardı; o farkın PSNR'a göre
-karşılığı yok. Kodek kararı bu sayıya bakılarak verilirse yanlış kodek seçilir.
+karşılığı yoktu. Kodek kararı o sayıya bakılarak verilseydi yanlış kodek seçilirdi.
+**Bugün bench kilitli ölçüyor** (`tools/VidShrink.Bench/Program.cs:2547`) ve aynı
+karşılaştırma 0,099 veriyor.
 
 Bench zaten XPSNR de ölçüyor (`:775`) — çelişki oradan yakalanabilirdi, ama sayılar
 yan yana okunmuyor ve düşük puanlı kare sayısı hiç raporlanmıyor.
