@@ -1,4 +1,4 @@
-# VideoToolbox bağlama — satıcı tanındı, donanım kapısı kapalı kaldı
+﻿# VideoToolbox bağlama — satıcı tanındı, donanım kapısı kapalı kaldı
 
 **Tarih:** 02.09.2026 · **Sözleşme:** `.claude/relay/contracts/T149.md` · **Dal:** `T149-videotoolbox-satici`
 
@@ -277,6 +277,49 @@ K4'ün genişletme koşumuyla tutuyor: orada 1466 geçmişti, burada 1469 —
 genişletmenin düşürdüğü üç test tam da bu farkı veriyor. Toplam iki koşumda da
 1487; atlanan iki koşumda da 17, CI kapısının `-MaximumSkipped 30` sınırının
 altında.
+
+### CI koşumu
+
+Dalın CI koşumu **kırmızı**, ve kırmızılığın nedeni T149 değil.
+
+| | koşum | head | sonuç | Başarısız / Başarılı / Atlanan / Toplam |
+|---|---|---|---|---|
+| dal | 33673808806 | `7790f1d` | failure | 1 / 1468 / 18 / 1487 |
+| `main` | 33670207004 | `ae98712` | failure | 1 / 1460 / 18 / 1479 |
+
+Kapının düşürdüğü satır:
+
+```
+KOSUM KAPISI DUSTU: kod=66 sart=Basarisiz/Failed ozeti sifir degil: 1.
+```
+
+İki koşumun tek kırmızısı aynı test, aynı değer:
+
+```
+Failed VidShrink.Tests.WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(loaded: True, narrow: True, least: 1002, most: 1102)
+ Assert.InRange() Failure: Value not in range
+Range:  (1002 - 1102)
+Actual: 956
+```
+
+`main` koşumunun head'i `ae98712`; T149'un hiçbir commit'i onun içinde değil. Sayılar
+farkı tek başına anlatıyor: 1479 + 8 = 1487 ve 1460 + 8 = 1468 — sekiz, bu turun
+eklediği test sayısı. Atlanan iki koşumda da 18, Başarısız iki koşumda da 1. Atlanan
+CI'da 18, yerelde 17; fark iki CI koşumunda da aynı.
+
+`main`in son yeşili `33667126174` (`57ccac0`). Ondan sonraki iki koşum —
+`33669294550` (`b692684`, Serkan'ın ölçüm commit'i) ve `33670207004` (`ae98712`) —
+aynı kırmızıyla düştü.
+
+K6'nın CHECK'i `completed success` istiyor; **bu dalda üretilemez**. Tek kırmızıyı
+kaldırmak `WindowLayoutTests`e ya da arayüz koduna dokunmayı gerektirir, ikisi de
+`owns` dışında. T0'a açık soru budur.
+
+Dalın son iki commit'i (`b4fc175`, `5e50526`) koşum başlatmadı; bu eksik koşum değil,
+`ci.yml`in `paths-ignore` listesinde `docs/**` ve `**/*.md` var. İkisi de yalnız bu
+raporu değiştiriyor: `git diff --name-only 7790f1d 5e50526` tek satır
+(`docs/olcumler/videotoolbox-baglama.md`), `git diff --stat 7790f1d 5e50526 -- src tests`
+boş. Koşum `7790f1d`de kodun bugünkü son halini ölçtü.
 
 ## Bu turda kapanmayan işler
 

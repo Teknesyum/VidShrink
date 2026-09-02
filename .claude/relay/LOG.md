@@ -855,3 +855,14 @@ bagimsiz gordu: askida kalan test host'unu `taskkill` ile oldurdugunde arka plan
 isi **exit 0** raporladi. Bu, "yesil okuma gercekti ama olctugu sey yanlis"
 ailesinin yeni bir yuzu — kosum yarida kesilse bile kapi gecer. `kosum-kapisi.ps1`
 `-MinimumTotal` tam bunun icin var ve CI'da devrede; yerel kosumda degil.
+
+## T149 teslim edildi (2 Eylul 2026, tur 1)
+
+VideoToolbox satici olarak tanindi, donanim kapisi **acilmadi**. `IsHardware`
+artik "Software degil" diye sormuyor; sabitlerin olculdugu uc saticiyi
+(nvenc, qsv, amf) adiyla sayiyor, VideoToolbox disarida kaliyor. Boylece
+NVENC'te olculup QSV ve AMF'ye tasinan dort sabit dorduncu kez tasinmadi.
+`AllowedCodecs` genisletilmedi: genisletme olculdu, uc testi dusuruyor ve tek
+basina ise yaramiyor — plan bu kez `FfmpegArguments` preset kapisinda oluyor.
+Dal `T149-videotoolbox-satici`, tepe `5e50526`, rapor
+`docs/olcumler/videotoolbox-baglama.md`. Denetim bekliyor.
