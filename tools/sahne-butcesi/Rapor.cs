@@ -595,6 +595,8 @@ public static class Rapor
         var kapanmaVar = 0;
         var kapanmaHucre = 0;
         double? enBuyukKazanc = null;
+        var kazananQcomp = 0;
+        var kazananZones = 0;
         foreach (var g in satirlar.GroupBy(x => (x.Kol, x.Pencere)))
         {
             var taban = g.FirstOrDefault(x => x.Aday == "taban").Mae;
@@ -609,6 +611,8 @@ public static class Rapor
             kapanmaHucre++;
             if (kazanc > 0) kapanmaVar++;
             if (enBuyukKazanc is null || kazanc > enBuyukKazanc) enBuyukKazanc = kazanc;
+            if (kazanc > 0 && en.Aday == "qcomp") kazananQcomp++;
+            if (kazanc > 0 && en.Aday == "zones") kazananZones++;
             var oran = acik > 0 ? Kabuk.Inv(kazanc / acik * 100, "0.0") + "%" : "acik yok";
             sb.AppendLine($"| {g.Key.Kol} | `{g.Key.Pencere}` | {Kabuk.Inv(acik, "+0.000;-0.000;0.000")} | " +
                           $"{en.Aday} | {Kabuk.Inv(kazanc, "+0.000;-0.000;0.000")} | {oran} |");
@@ -621,6 +625,16 @@ public static class Rapor
             sb.AppendLine("Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama");
             sb.AppendLine("pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite");
             sb.AppendLine("kapisi bu sayfada karari veren yerdir, bu tablo degil.");
+            sb.AppendLine();
+            sb.AppendLine($"Tabani gecen {kapanmaVar} hucrenin {kazananZones} tanesini `zones`, " +
+                          $"{kazananQcomp} tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu " +
+                          "acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya " +
+                          "tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi " +
+                          "sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan " +
+                          "da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre " +
+                          "\"sahne basina dagitim ise yariyor\" kanitina sayilmaz; olsa olsa " +
+                          "iki gecis yanliliginin bugunku varsayilaninin bu icerikte " +
+                          "en iyi olmadigini soyler.");
             sb.AppendLine();
         }
     }

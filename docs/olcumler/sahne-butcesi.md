@@ -420,6 +420,8 @@ Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama
 pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite
 kapisi bu sayfada karari veren yerdir, bu tablo degil.
 
+Tabani gecen 2 hucrenin 0 tanesini `zones`, 2 tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre "sahne basina dagitim ise yariyor" kanitina sayilmaz; olsa olsa iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadigini soyler.
+
 ## K5 ve K6 — kalite kazanci ve hedef boyut
 
 Kapi (olcumden once): p10 kazanci `>= +0,50`, en kotu sahne kazanci
