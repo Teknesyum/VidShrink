@@ -75,13 +75,15 @@ dizilerinden bastan hesaplandi.
 |------|----------------|-----------------|-------|
 | K1/K2 olculen hucre | 8 | 8 | tuttu |
 | kodlayici en az esit | 5 | 5 | tuttu |
-| K4 eki olculen hucre | 4 | 4 | tuttu |
-| tabani gecen hucre | 3 | 3 | tuttu |
+| sahne >= 4 hucre | 5 | 5 | tuttu |
+| sahne >= 4, harita onde | 3 | 3 | tuttu |
+| K4 eki olculen hucre | 5 | 5 | tuttu |
+| tabani gecen hucre | 4 | 4 | tuttu |
 | zones kazandi | 1 | 1 | tuttu |
-| qcomp kazandi | 2 | 2 | tuttu |
-| olculemeyen satir | 28 | 28 | tuttu |
+| qcomp kazandi | 3 | 3 | tuttu |
+| olculemeyen satir | 27 | 27 | tuttu |
 
-Denetlenen iddia 7, tutmayan **0**. Uretim:
+Denetlenen iddia 9, tutmayan **0**. Uretim:
 `bash tools/sahne-butcesi/07-sayim-denetimi.sh`, ham dosya
 `sayim-denetimi.csv`. Betik sayfayi da okur; sayfa degisirse tekrar kosar.
 
@@ -448,8 +450,11 @@ plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.
 | yedek | `p1-karisik` | qcomp | `qcomp=1.0` | 1.272 | -0.001 |
 | yedek | `p2-durgun` | zones | `-` | **bilinmiyor**: plan passthrough (hevc) | — |
 | yedek | `p2-durgun` | qcomp | `-` | **bilinmiyor**: plan passthrough (hevc) | — |
+| yedek | `p3-hareketli` | taban | `-` | 0.877 | — |
+| yedek | `p3-hareketli` | zones | `zones=<harita>` | 0.800 | -0.077 |
+| yedek | `p3-hareketli` | qcomp | `qcomp=1.0` | 0.215 | -0.662 |
 
-Iki adayin da olculdugu hucre 4; hucre basina dusuk MAE'yi veren aday: `qcomp` 3, `zones` 1.
+Iki adayin da olculdugu hucre 5; hucre basina dusuk MAE'yi veren aday: `qcomp` 4, `zones` 1.
 
 Hangi adayin kazandigi tek basina bir sey soylemez: kazanc, kapatilmasi
 istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
@@ -461,14 +466,15 @@ istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
 | uyumlu | `p2-durgun` | -0.606 | qcomp | -0.682 | acik yok |
 | uyumlu | `p3-hareketli` | -0.434 | qcomp | +0.597 | acik yok |
 | yedek | `p1-karisik` | +0.244 | zones | +0.044 | 18.0% |
+| yedek | `p3-hareketli` | -1.223 | qcomp | +0.662 | acik yok |
 
-Olculen 4 hucrenin 3 tanesinde en iyi aday tabani
-gecti; gorulen en buyuk kazanc 0.597 pp.
+Olculen 5 hucrenin 4 tanesinde en iyi aday tabani
+gecti; gorulen en buyuk kazanc 0.662 pp.
 Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama
 pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite
 kapisi bu sayfada karari veren yerdir, bu tablo degil.
 
-Tabani gecen 3 hucrenin 1 tanesini `zones`, 2 tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre "sahne basina dagitim ise yariyor" kanitina sayilmaz; olsa olsa iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadigini soyler.
+Tabani gecen 4 hucrenin 1 tanesini `zones`, 3 tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre "sahne basina dagitim ise yariyor" kanitina sayilmaz; olsa olsa iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadigini soyler.
 
 ### Tekrar gurultusu — ayni hucre iki kez kosuldu
 
@@ -605,7 +611,9 @@ uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.
 
 **Sozlesmenin sorusu "haritayi plana baglamali miyiz" idi. Olculen 8 hucrenin 5 tanesinde harita kodlayiciyi geride birakmiyor**: `MAE(verilen) <= MAE(harita)` (K2 tablosu), yani o hucrelerde kodlayicinin kendi dagitimi haritanin onerisi kadar ya da ondan daha dogru. Plana baglanacak sey haritanin sahne basina sayilaridir; o sayilar cogunlukta kodlayicinin kendi kararindan daha iyi degilse, baglamanin tasiyacagi bilgi de yoktur. Sozlesmenin "olculdu, kodlayici zaten daha iyi dagitiyor" secenegi bu satirdan okunur.
 
-Dagitim parametresinin kendisi ayri bir sorudur ve ayri olculdu. **Sahne basina dagitim 4 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 4 hucrenin tabani gecen 3 tanesinde `zones` 1 kez kazandi, `qcomp` 2 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones` 4 hucreden 1 tanesinde kazandi ve en buyuk kazanc 0.044 pp; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
+
+**Bu sayi sahne sayisina gore ikiye ayrilir ve yon degistirir.** Dort sahneden az olan pencerede dagitilacak sahne neredeyse yoktur; o hucreler sayfada zaten `anlamsiz` diye isaretli. Sahne sayisi dort ve ustu olan 5 hucreye bakildiginda harita 3 tanesinde kodlayiciyi geciyor, 2 tanesinde gecmiyor. Yani "5/8" cogunlugunu kucuk pencereler tasiyor. Ikisi de dogru ve ikisi de burada: genis pencerede harita daha sik onde, ama K5'in kalite kapisi bu onculugun kullaniciya bir sey kazandirdigini gostermedi.
+Dagitim parametresinin kendisi ayri bir sorudur ve ayri olculdu. **Sahne basina dagitim 5 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 5 hucrenin tabani gecen 4 tanesinde `zones` 1 kez kazandi, `qcomp` 3 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones` 5 hucreden 1 tanesinde kazandi ve en buyuk kazanc 0.044 pp; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
 
 **Bu kazanci bugunku varsayilan yol alamaz:** uretimin varsayilan kodlayicisi `libsvtav1` `zones` parametresini hic okumuyor (K4 izgarasi). Yani olculen kazanc, kullanicinin varsayilan ayarlarla yaptigi sikistirmaya ulasmiyor; ancak kodlayici elle `libx265` ya da `libx264` secildiginde gorunur.
 
@@ -632,7 +640,6 @@ sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
 | K4 eki | maks/p3-hareketli `qcomp` | duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor |
 | K4 eki | yedek/p2-durgun `zones` | plan passthrough (hevc) |
 | K4 eki | yedek/p2-durgun `qcomp` | plan passthrough (hevc) |
-| K4 eki | yedek/p3-hareketli | kosulmadi: `k4b-*.csv` yok |
 | K5/K6 | maks/p1-karisik | kosulmadi: `k5-*.json` yok |
 | K5/K6 | maks/p2-durgun | kosulmadi: `k5-*.json` yok |
 | K5/K6 | maks/p3-hareketli | kosulmadi: `k5-*.json` yok |
@@ -651,9 +658,9 @@ sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
 | K7 | yedek/p2-durgun | kosulmadi: `k7-*.json` yok |
 | K7 | yedek/p3-hareketli | kosulmadi: `k7-*.json` yok |
 
-Toplam 28 satir, 4 bolumde: K1/K2 2, K4 eki 9, K5/K6 8, K7 9.
+Toplam 27 satir, 4 bolumde: K1/K2 2, K4 eki 8, K5/K6 8, K7 9.
 
-"Kosulmadi" diyen 18 satirin sebebi tek: olcum penceresi
+"Kosulmadi" diyen 17 satirin sebebi tek: olcum penceresi
 icinde sira gelmedi. Kapasite eksigi degil, sure eksigi.
 Olculen 1 K5 hucresinin gozlenen suresi (ilk kodlama
 dosyasindan sonuc JSON'una) en fazla 36 dk

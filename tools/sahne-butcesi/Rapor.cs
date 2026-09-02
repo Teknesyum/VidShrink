@@ -278,7 +278,7 @@ public static class Rapor
     }
 
     public sealed record K2Sonuc(bool Kapandi, IReadOnlyList<string> Satirlar,
-        int Hucre = 0, int KodlayiciEnAzEsit = 0);
+        int Hucre = 0, int KodlayiciEnAzEsit = 0, int YeterliHucre = 0, int YeterliKodlayiciEnAzEsit = 0);
 
     private static K2Sonuc K1K2(
         StringBuilder sb,
@@ -344,6 +344,8 @@ public static class Rapor
         var hucre = 0;
         var g1Gecen = 0;
         var g2Gecen = 0;
+        var yeterliHucre = 0;
+        var yeterliG2 = 0;
         var g3Gecen = 0;
         var ucuBirden = 0;
         foreach (var kol in kollar)
@@ -371,6 +373,11 @@ public static class Rapor
                 if (!(g1 && g2 && g3)) hepsiKapandi = false;
                 if (g1) g1Gecen++;
                 if (g2) g2Gecen++;
+                if (k.HakEdilen.Count >= 4)
+                {
+                    yeterliHucre++;
+                    if (g2) yeterliG2++;
+                }
                 if (g3) g3Gecen++;
                 if (g1 && g2 && g3) ucuBirden++;
                 var rhoNot = k.HakEdilen.Count < 4 ? $" (n={k.HakEdilen.Count}, anlamsiz)" : string.Empty;
@@ -402,7 +409,7 @@ public static class Rapor
         sb.AppendLine("sutunda isaretlidir; o pencerede karari MAE tasir. Sahne sayisi icerigin");
         sb.AppendLine("kendisidir: kesimi olmayan pencerede dagitilacak sahne de yoktur.");
         sb.AppendLine();
-        return new K2Sonuc(hepsiKapandi, satirlar, hucre, g2Gecen);
+        return new K2Sonuc(hepsiKapandi, satirlar, hucre, g2Gecen, yeterliHucre, yeterliG2);
     }
 
     private static void K3(StringBuilder sb)
@@ -1247,6 +1254,20 @@ public static class Rapor
                           "Sozlesmenin \"olculdu, kodlayici zaten daha iyi dagitiyor\" secenegi " +
                           "bu satirdan okunur.");
             sb.AppendLine();
+            if (k2.YeterliHucre > 0 && k2.YeterliHucre < k2.Hucre)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"**Bu sayi sahne sayisina gore ikiye ayrilir ve yon degistirir.** " +
+                              $"Dort sahneden az olan pencerede dagitilacak sahne neredeyse yoktur; " +
+                              $"o hucreler sayfada zaten `anlamsiz` diye isaretli. Sahne sayisi " +
+                              $"dort ve ustu olan {k2.YeterliHucre} hucreye bakildiginda harita " +
+                              $"{k2.YeterliHucre - k2.YeterliKodlayiciEnAzEsit} tanesinde " +
+                              $"kodlayiciyi geciyor, {k2.YeterliKodlayiciEnAzEsit} tanesinde " +
+                              $"gecmiyor. Yani \"{k2.KodlayiciEnAzEsit}/{k2.Hucre}\" cogunlugunu " +
+                              $"kucuk pencereler tasiyor. Ikisi de dogru ve ikisi de burada: " +
+                              "genis pencerede harita daha sik onde, ama K5'in kalite kapisi bu " +
+                              "onculugun kullaniciya bir sey kazandirdigini gostermedi.");
+            }
         }
         if (k4b.Hucre > 0)
         {

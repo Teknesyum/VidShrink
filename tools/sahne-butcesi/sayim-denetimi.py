@@ -34,6 +34,15 @@ esit = sum(1 for k in k1.values()
 m = re.search(r"MAE\(verilen\) <= MAE\(harita\)`\): (\d+)/(\d+) hucre", metin)
 yaz("kodlayici en az esit", esit, int(m.group(1)))
 
+yeterli = [k for k in k1.values() if len(k["HakEdilen"]) >= 4]
+m = re.search(r"dort ve ustu olan (\d+) hucreye bakildiginda harita (\d+) tanesinde", metin)
+if m:
+    yaz("sahne >= 4 hucre", len(yeterli), int(m.group(1)))
+    yaz("sahne >= 4, harita onde",
+        sum(1 for k in yeterli
+            if mae(k["Verilen"], k["HakEdilen"]) > mae(k["Harita"], k["HakEdilen"])),
+        int(m.group(2)))
+
 hucre = kazZ = kazQ = tabani = 0
 for y in sorted(glob.glob(os.path.join(IS, "k4b-*.csv"))):
     o = {}
