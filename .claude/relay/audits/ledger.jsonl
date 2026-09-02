@@ -187,3 +187,4 @@
 {"id":"T145","result":"stale","at":"2026-09-02T17:59:04.079Z"}
 {"id":"T143","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|VmafPoolingTests","code":0}],"auditorRunId":null,"headSha":"65a7f1938517fae1c61e9992e527118b6bb0897d","at":"2026-09-02T18:23:49.764Z"}
 {"id":"T147","result":"stale","at":"2026-09-02T18:26:48.309Z"}
+{"id":"T144","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncodeRunnerTests|FfmpegRunnerTests|SegmentEncoderTests","code":0}],"auditorRunId":null,"headSha":"317ed9f4fffefe1e3f81d7e46dd357cb2cafb7b1","at":"2026-09-02T18:53:55.309Z"}

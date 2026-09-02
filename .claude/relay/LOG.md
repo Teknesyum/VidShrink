@@ -792,3 +792,66 @@ HDR parca secmek suresi sisiren karardi ve bunu kendi kararı olarak yaziyor.
   sekiz noktali bppf egrisi gerekiyor ve o olcum yok.
 
 **`.DS_Store`** git'e sizmisti; `b692684` ile cikarildi ve `.gitignore`a eklendi.
+
+## T144 muhurlendi (2 Eylul 2026)
+
+`docs/olcumler/cikis-kodu-yalan.md`. Denetim **GECTI**, KRITIK yok. Ledger `317ed9f4`,
+risk low, verify 37/37.
+
+**Ne kapandi.** ffmpeg tanili bir hata basip **cikis kodu 0** dondugunde depo bunu
+"basarili" sayiyordu. Artik iki kosucu da ayni sozlugu okuyor: tek tanim
+`FfmpegRunner.cs:18` `FfmpegDiagnostics`, iki desen, iki cagri yeri
+(`EncodeRunner.cs:437`, `FfmpegRunner.cs:138`).
+
+**Denetim neyi kendi uretti.** Yapicinin fixture'larina hic guvenmedi. Iki desenin
+kanitini kendi makinesinde yeniden uretti: `libsvtav1` → `Error parsing option`
+(35 satirin 12.si, raporunkiyle birebir), `libx264` → ayni desen, `libx265` →
+`Unknown option:`; ucu de EXIT=0. Yanlis pozitif olcusunu de taze ciktiyla kurdu:
+114 satir temiz stderr, **sifir eslesme**. Dort mutasyonu kendisi kosturdu; M1/M3/M4
+kumeleri birebir tuttu, M6'daki tek fazlalik paralel gercek ffmpeg kararsizligi
+(test tek basina kosunca geciyor).
+
+**Denetci sayimi ucuncu kez yeniden uretti ve raporu duzeltti.** K1'in "dokuz kapi,
+tam liste" iddiasi tutmuyor: `EncodeRunner.cs:141` (`stoppedOnPurpose`,
+`band.HardFloorMb` — ucuncu boyut kapisi), `:147` (`if (!over && !underBand)`,
+teslimin asil kapisi) ve `:121` (`twoPass`) tabloda yok. **En az on iki.** Dokuz,
+secilmis bir grep'ti. Kritik degil cunku sayidan hicbir karar turetilmiyor ve
+cikarilan sonuc paydadan bagimsiz dogru — ama bu, **kronik kusur 1'in 24. tekrari**:
+tablo dogru, onu ozetleyen cumle yanlis.
+
+### Sifir uretim cagirani: **altinci** ornek
+
+`EncodeResult.DroppedOptions` her donus yolunda dolduruluyor
+(`EncodeRunner.cs:151,183,188,218`) — ve `src/` altinda onu **okuyan kod yok**.
+Kusurun kullaniciya dokunan yarisi acik kaldi.
+
+Simdiye kadar ayni sinifin altisi: T137 (ucuncu cevap), T142 K3 (harita),
+T143 (`WorstScene` harita kolu), T143 (`WorstScene`in kendi iki asiri yuklemesi),
+T140 (turbo anahtari), **T144 (`DroppedOptions`)**.
+
+Kok neden her seferinde ayni: **yetenegi yazan sozlesme, onu cagiracak dosyayi
+sahiplenmiyor.** T146 bu sinifi kapatmak icin acik; tablosu artik alti satir.
+
+### Borclar (tur acmaz)
+
+1. K1 kapi listesi eksik (yukarida).
+2. `FfmpegRun.DroppedOptions` tek tuketicisi icin olu — `SegmentEncoder.cs:176`
+   `-loglevel error` kullaniyor, uc kodlayicinin tanisi da o seviyede basilmiyor.
+3. `EncoderCapabilities.cs:343-346` sozlugu `Unknown option:` icermiyor; x265
+   secenek sondasi bugun dusurulen anahtari kaciriyor.
+4. Izgaranin ham ciktisi agacta yok (`.calisma/T144/K5-izgara.txt` silinmis);
+   M2, M5, M7 bagimsiz dogrulanmadi.
+5. `EncodeRunnerTests` kolu `EncodeRunnerAtomicOutputTests`i kapsamiyor (alt dize
+   eslesmiyor). T144'un getirdigi degil, onceden var.
+6. `EncodeRunnerTests.cs`e BOM eklendi.
+
+**Borc 2 ve 3 zaten T147'nin kapsaminda** (T144 teslimindeki kapsam disi bulgulardan
+acilmisti). Borc 6 mekanik; ayri sozlesme acmiyorum.
+
+### Ortam bulgusu
+
+Yerel takim bir kez **87 testte durup exit code 0** dondu. Denetci ayni seyi
+bagimsiz gordu: askida kalan test host'unu `taskkill` ile oldurdugunde arka plan
+isi **exit 0** raporladi. Bu, "yesil okuma gercekti ama olctugu sey yanlis"
+ailesinin yeni bir yuzu — kosum yarida kesilse bile kapi gecer. `kosum-kapisi.ps1`
+`-MinimumTotal` tam bunun icin var ve CI'da devrede; yerel kosumda degil.

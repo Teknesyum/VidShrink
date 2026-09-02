@@ -1,0 +1,18 @@
+{
+  "contractId": "T144",
+  "auditorRunId": "ad71bd6b83f348314",
+  "headSha": "317ed9f4fffefe1e3f81d7e46dd357cb2cafb7b1",
+  "diffHash": "14138e4a3cae996e6738a2cabed1cb3baa82f4e99c4136ffc66d34fd95e7437a",
+  "owns": [
+    "src/VidShrink.Ffmpeg/FfmpegRunner.cs",
+    "src/VidShrink.Ffmpeg/EncodeRunner.cs",
+    "tests/VidShrink.Tests/EncodeRunnerTests.cs",
+    "tests/VidShrink.Tests/FfmpegRunnerTests.cs",
+    "docs/olcumler/cikis-kodu-yalan.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim GECTI. Denetci scratchpad'te git archive 9a53acf kopyasinda calisti, depo agacina yazmadi (files: [], git status bos). K1: K1 commit'ini (7439d61) ayri kopyada --no-incremental derleyip kosturdu, uc kirmizi raporun ham metniyle birebir; 7439d61'de FfmpegDiagnostics yok, dikis acilmis davranis degismemis. K2: sozluk tek tanim (FfmpegRunner.cs:18), iki desen, iki cagri yeri; her iki desenin kanitini kendi makinesinde yeniden uretti (libsvtav1 Error parsing option 35 satirin 12.si, libx264 ayni desen, libx265 Unknown option:, ucu de EXIT=0). Geri cekilen Unrecognized option / Option not found sozlukte gercekten yok. K3: dort korpusun ucunun satirlarini kendi kosumlarinda gordu; dorduncusu test verisinin kendi etiketinde uretilemedi diye isaretli, gizlenmemis. Yapicinin fixture'larina hic guvenmeden taze cikti ile bagimsiz yanlis pozitif olcusu: 114 satir temiz stderr, sifir eslesme. K4: karar yazili, Ok ve firlatma yalniz cikis koduna bagli, M6 ile pimli. K5: dort mutasyonu kendisi kosturdu (--no-build olmadan, --no-incremental ile), M1/M3/M4 kumeleri raporunkiyle birebir; M6'daki fazlalik gercek izgara hatasi degil, TheMapChanges tek basina kosunca geciyor, paralel gercek ffmpeg ile kararsiz. Sabit-sabit karsilastirmasi yok (grep DroppedOptionPatterns tests/ bos). Mutasyonlar geri alindi, bes dosya dalla byte-esit. K6: 19/10/8, sifir bulan kol yok, verify 37/37 yesil, Atlanan 0 yani FfmpegFact atlanmadi. CI 33660013606 success, be6d79d, adimlar gercekten kostu; kod ve testlerin tamami be6d79d'de, tip commit'i yalniz docs. owns ihlali yok: bes dosya, besi de listede. KRITIK yok. Borclar: (1) K1'in dokuz kapi listesi eksik, en az on iki -- EncodeRunner.cs:141 ucuncu boyut kapisi (band.HardFloorMb), :147 teslimin asil kapisi, :121 twoPass tabloda yok; sayidan karar turetilmedigi ve cikarilan sonuc paydadan bagimsiz dogru oldugu icin kritik degil. (2) Uretim cagirani sifir -- EncodeResult.DroppedOptions her donus yolunda doluyor (:151,183,188,218) ama src/ altinda okuyan kod yok; kusurun kullaniciya dokunan yarisi acik, App owns disinda. (3) FfmpegRun.DroppedOptions tek tuketicisi icin olu -- SegmentEncoder.cs:176 -loglevel error, tani o seviyede basilmiyor. (4) EncoderCapabilities.cs:343-346 sozlugu Unknown option: icermiyor, x265 sondasi dusurulen anahtari kaciriyor. (5) Izgaranin ham ciktisi agacta yok, M2/M5/M7 bagimsiz dogrulanmadi. (6) EncodeRunnerTests kolu EncodeRunnerAtomicOutputTests'i kapsamiyor, onceden var. (7) EncodeRunnerTests.cs'e BOM eklendi. Denetci tam takimi izole kopyada bastan derleyip kosturdu: 1355 gecen, 1 dusen, 17 atlanan, 1373 toplam; tek dusen Windows11ShellMenuTests scratchpad yolundan C++ derleme hatasi, T144 ile ilgisiz, ayni kod CI'da yesil. Borc 2, 3 ve 4 T147 sozlesmesinde zaten kapsanmis durumda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T18:53:00.620Z"
+}
