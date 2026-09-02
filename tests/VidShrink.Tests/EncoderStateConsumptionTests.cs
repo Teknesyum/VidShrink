@@ -111,6 +111,12 @@ public sealed class EncoderStateConsumptionTests
         new PlanOptions { TargetMb = 16, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast },
         new ColdCapabilities());
 
+    /// <summary>Sürücüsüz makinede av1_nvenc yoklaması: ölçüldü ve kodlayamadı.</summary>
+    private static EncoderProbeResult FailedProbe() => new("av1_nvenc", false, 42);
+
+    /// <summary>Sürücüsü çalışan makinede aynı yoklama.</summary>
+    private static EncoderProbeResult PassedProbe() => new("av1_nvenc", true, 42);
+
     [Fact]
     public void OlculmemisDonanimAdayiArayuzeDonanimVarDemiyor()
     {
@@ -118,7 +124,17 @@ public sealed class EncoderStateConsumptionTests
 
         Assert.Equal("av1_nvenc", plan.Codec);
         Assert.True(plan.CodecNotMeasured);
-        Assert.False(MainWindow.HardwareAvailableFrom(plan));
+        Assert.False(MainWindow.HardwareAvailableFrom(plan, FailedProbe()));
+    }
+
+    [Fact]
+    public void OlculmemisAdayiDogrulayanYoklamaGecerseDonanimVarDiyor()
+    {
+        var plan = ColdFastPlan();
+
+        Assert.True(plan.CodecNotMeasured);
+        Assert.True(MainWindow.HardwareAvailableFrom(plan, PassedProbe()));
+        Assert.False(MainWindow.HardwareAvailableFrom(plan, EncoderProbeResult.Unmeasured("av1_nvenc", 30_000)));
     }
 
     [Fact]
@@ -133,7 +149,7 @@ public sealed class EncoderStateConsumptionTests
                 var window = new MainWindow { SettingsPathOverride = file };
                 window.ApplyHardwareVerdict(
                     new ColdCapabilities(),
-                    MainWindow.HardwareAvailableFrom(plan),
+                    MainWindow.HardwareAvailableFrom(plan, FailedProbe()),
                     HardwareVerdict.NotProbed);
                 return (window.ChkFastGpu.IsEnabled, window.HardwareEncoderAvailable);
             });
