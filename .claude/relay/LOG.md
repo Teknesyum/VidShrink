@@ -435,3 +435,25 @@ Borclar:
    sifati tek basina okundugunda kaygan — `tools/sahne-butcesi/Rapor.cs:1022`.
 
 Borc 1 ve 5 T0'da kaldi; ikisi de tek sozlesmelik degil, sablon isi.
+
+## T137 — tur 2 acildi (denetim KALDI, uc KRITIK)
+
+2 Eylul 2026. Denetci `ac658ba72aa77692a` (opus), izole kopya `git archive 4fae7e7`.
+
+Mutasyon izgarasi, K4, K8, K9 tuttu; **isin ozu tutmadi.** Uc KRITIK, ucu de `owns` icinde:
+
+1. `MainWindow.axaml.cs:1411` gecidin girisinde iki degerli API'yi cagiriyor — ucuncu
+   cevap App yolunda hala yok ediliyor, ustelik olculmemis kodek icin `IsMeasured=True`
+   donuyor. Sozlesmenin kapatmak icin acildigi kusurun ta kendisi.
+2. `EncoderCapabilities.cs:70` degismedi. Sozlesme iki bicim kabul ediyordu; teslim
+   edilen ucuncusu — cagirani sifir olan bir kardes metot.
+3. K1'in CHECK'i saglanmadi ve rapor saglandigini soyluyor; `yoklama-uclu-cevap.md:29`
+   var olmayan bir bolume yonlendiriyor.
+
+Tur 2'ye T1-T11 yazildi; sekizi borctan yukseldi (tavansiz yeniden deneme, kod ile
+celisen belge, `_probeStatusShown` iddiasi, uretilemeyen grep satirlari, kesit demeyen
+tablo, ffmpeg'siz ortamda sessizce yesil sayilan K9, main'de hic baslamayan CI kosumu,
+eskimis mutasyon toplami).
+
+T139 daraltildi: `MainWindow.axaml.cs` tur 2'ye gecti, T139'un owns'undan ve K4'unden
+cikarildi. Ayni dosya iki aktif sozlesmeye atanmaz.
