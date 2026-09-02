@@ -123,3 +123,15 @@
 {"id":"T103","result":"stale","at":"2026-09-02T03:05:35.051Z"}
 {"id":"T117","result":"stale","at":"2026-09-02T04:32:19.677Z"}
 {"id":"T95","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":"ad299f8bf4f22efc1","headSha":"d5b3c8bad93a71073db1e67f6a0b5c7395a31ea3","at":"2026-09-02T04:47:52.721Z"}
+{"id":"T119","result":"stale","at":"2026-09-02T04:48:41.675Z"}
+{"id":"T111","result":"stale","at":"2026-09-02T05:01:25.040Z"}
+{"id":"T120","result":"stale","at":"2026-09-02T05:01:25.040Z"}
+{"id":"T107","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T116","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T118","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T94","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T121","result":"stale","at":"2026-09-02T05:10:54.836Z"}
+{"id":"T115","result":"stale","at":"2026-09-02T05:20:30.467Z"}
+{"id":"T122","result":"stale","at":"2026-09-02T05:20:30.467Z"}
+{"id":"T111","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"SettingsTabTests","code":0}],"auditorRunId":"ace57ce00ddae3246","headSha":"2cd03617620c1e4504af141c05f1a750a28d6836","at":"2026-09-02T05:41:08.755Z"}
+{"id":"T123","result":"stale","at":"2026-09-02T05:48:41.051Z"}
