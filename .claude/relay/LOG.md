@@ -744,3 +744,51 @@ Ikinci onemli borc: uygulama **haritayi olcumden sonra kuruyor**
 (`MainWindow.axaml.cs:1807` olcum, `:1812` harita). Yapici buldu, denetci gozle dogruladi.
 Imza bugun degistirilse bile gecirilecek harita o noktada **yok**. Ayri sozlesme; T141 ve
 T143 muhurlenince acilir.
+
+## Serkan — macOS kosumu ve VideoToolbox olcumu (2 Eylul 2026)
+
+Numarasiz is; gorev paketi disaridan verildi, dal `serkan/macos-olcum`, `main`e
+`a2b9664` ile birlesti. Dort commit, on dosya.
+
+**Ne getirdi.**
+
+1. **Uc gercek yerellestirme kusuru** — Release'te arayuzde ham anahtar dizesi
+   gorunuyordu. T0 ucunu de `origin/main` uzerinde bagimsiz dogruladi:
+   `MainWindow.axaml.cs:2054` `main.quality.target` (hicbir dilde yoktu),
+   `:2056` `main.quality.points` (gercegi `main.quality.loss-points`),
+   `:2140` `main.plan.fact.estimate` (gercegi `main.plan.fact.estimated-size`).
+   Duzeltme dort satir; `dotnet build -c Release -warnaserror` temiz,
+   `LocalizationTests` 10/10 yesil.
+
+2. **VideoToolbox olcumu** — Apple M1, uc parca x uc kol = dokuz kosum.
+   `hevc_videotoolbox` `libx265 -preset slow`tan **16,1x–37,7x** hizli;
+   ayni `-b:v 5500k`ta VMAF p10'u **6,383 / 17,365 / 33,357** puan geride.
+   `grep -rn videotoolbox --include=*.cs src/` → **0 satir**; depo bu yolu hic
+   tanimiyor. `CodecModel.Vendor` yalniz `nvenc|qsv|amf` dizgilerine bakiyor,
+   dolayisiyla `hevc_videotoolbox` **yazilim** sayiliyor.
+
+3. **macOS suit kosumu** — 1339 gecen, 9 kirmizi, 6 atlanan, 1354 toplam, 2 sa 44 dk.
+   Yerellestirme duzeltmeleri kirmiziyi 56 → 37 → 9'a dusurdu; kalan 9'un hicbiri
+   yerellestirme degil.
+
+**Ne getirmedi, kendi yaziyor.** Kalan 9 kirmizinin kok nedeni cozumlenmedi
+("tahmin uydurmadim"). Is 3'un GUI maddeleri (K2/K3/K4) acik kaldi: **ekran izni
+iki kez reddedildi**, `_sorun.log`da kayitli. Canli kaynak olarak 60 sn'lik 1080p60
+HDR parca secmek suresi sisiren karardi ve bunu kendi kararı olarak yaziyor.
+
+**Acilan sozlesmeler.**
+
+- **T148** — `LocalizationTests` on test tasiyor ve hepsi yesildi, cunku hepsi anahtar
+  **kumelerini birbirine** karsilastiriyor; hicbiri kaynak kodun ne **cagirdigina**
+  bakmiyor. Uc anahtar iki dilde de yoktu, dolayisiyla iki kume esitti. Kume esitligi,
+  kumenin dogru olmasini olcmez. `Strings.AssertOnMissingKey` mekanizmasi zaten var
+  (`LocalizationTests.cs:171` onu kapatiyor) — kusur mekanizmanin yoklugu degil,
+  **statik olarak kosturulmamasi**.
+- **T149** — VideoToolbox saticisinin tanimlanmasi. Bagla-gec degil: `IsHardware`
+  kapisinin arkasindaki dort sabit (1,52 / 0,877 / 11 / 1,10) **NVENC'te olculdu** ve
+  `bppf-tabani.md` §5.3 bunlarin olculmemis QSV ve AMF'ye de uygulandigini kendi
+  yaziyor. VideoToolbox'i ayni kapinin arkasina koymak kusuru **dorduncu kez** tekrar
+  eder. Sozlesme saticiyi tanimlar, `IsHardware`i acmaz; acmak icin Mac'te kol basina
+  sekiz noktali bppf egrisi gerekiyor ve o olcum yok.
+
+**`.DS_Store`** git'e sizmisti; `b692684` ile cikarildi ve `.gitignore`a eklendi.
