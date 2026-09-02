@@ -1,0 +1,18 @@
+{
+  "contractId": "T100",
+  "auditorRunId": "a93590acfcb50d65a",
+  "headSha": "7551de089516a55e656a1e73c0b0eed193c25b05",
+  "diffHash": "d1d70199c6f80d5d320dae3028e8db846de4c7cda9ac965a288caf8cff4673d8",
+  "owns": [
+    "src/VidShrink.Ffmpeg/EncodeRunner.cs",
+    "src/VidShrink.Core/EncodePlan.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/ComplexityProbeTests.cs",
+    "tests/VidShrink.Tests/EncodeRunnerTests.cs"
+  ],
+  "verification": [
+    "Tur 2. KRITIK kapandi: MainWindow.axaml.cs:1889 yuklemi uc kosulu birden istiyor, BudgetExceedsCeiling gerekcesini ureten tek yol ReasonLines (:1906), grep ikinci cagri yeri bulmadi. note.TargetMb = effectiveTargetMb (PlanCalculator.cs:264/:318); kosucu EncodeRunner.cs:56 ayni sayiya variyor; ikisi de tek FillBand.For statigini cagiriyor, kopya hesap yok. Denetci mutasyon 6'yi kendisi kosturdu - fb99b04 agacini git archive ile depo disina cikarip orada bozdu, proje agacina yazmadi - ve olcu kirildi: 'hedef 0,249 MB: arayuz burada durur dedi=True, kosucu tek denemede durdu=False'. Iki dal da geziliyor ([FfmpegFact], sessiz erken donus yok). Belge deltalari .calisma/T100/sonra-taban JSON'lariyla birebir: +0,2908 / +0,5185 / +4,1376 / 1,6518 MB; dokuz satirin dokuzu da sapmasiz. PreviewSegment.cs ve PlanCalculator.cs dal boyunca hic degismemis. Path.GetTempPath() kalmamis. 23 basarili, 0 atlanan, 0 basarisiz."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T00:12:49.904Z"
+}
