@@ -228,6 +228,29 @@ if __name__ == "__main__":
         clips.append(c)
         bias[c.name] = production_bias(r)
 
+    print("== capraz kontrol: python plani ile C# plani ayni mi ==")
+    mismatch = 0
+    for r in reports:
+        c = next((x for x in clips if x.name == r["Clip"]), None)
+        if c is None:
+            continue
+        for v in r["Variants"]:
+            if not v["Name"].startswith("profile-n"):
+                continue
+            n = int(v["Name"].split("-n")[1].split("-")[0])
+            if v["Name"].endswith("-oran"):
+                continue
+            w = wprofile_plan(c, n)
+            if w is None:
+                continue
+            py = sorted(float(x) for x, _, _ in w)
+            cs = sorted(float(x) for x in v["Starts"])
+            if py != cs:
+                mismatch += 1
+                print(f"  AYRIM {c.name} {v['Name']}: python={py} C#={cs}")
+    print(f"  {'ayni' if mismatch == 0 else str(mismatch) + ' ayrim'}")
+    print()
+
     print("== K1: bugunku ornekleme, icerik basina ==")
     print(f"{'klip':16s} {'sure':>6s} {'cv':>6s} {'duzeltme':>9s} {'duzeltmesiz':>12s} {'bugun':>9s}")
     todays = []
