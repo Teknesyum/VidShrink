@@ -406,7 +406,10 @@ def hukum(vmaf, kanit, yokla, sr):
         satir += ["", "**Veto:** " + "; ".join(vetolar) +
                   ". Hukum ne olursa olsun otomatik kirpma varsayilan acik gelemez."]
     else:
-        satir += ["", "K4'un iki vetosu da tetiklenmedi."]
+        satir += ["", "K4'un iki vetosu da tetiklenmedi. Yanlis kirpma vetosu "
+                  "varsayilan `limit=24`'te degerlendirildi; limit taramasi "
+                  "(K2) daha yuksek degerlerde kenarsiz kaynaklarin kirpildigini "
+                  "gosteriyor, yani veto ayardan bagimsiz degil."]
     return "\n".join(satir)
 
 
