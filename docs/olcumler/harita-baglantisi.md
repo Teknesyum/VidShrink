@@ -150,19 +150,24 @@ Aynı hedef boyutta, çok kesimli içerikte:
 - **Atlama hızlanıyor.** Üretim planında net p50 124,8 → 97,0 ms, yani
   **%22,3**; fps kilitli koşumda 186,0 → 98,4 ms, yani **%47,1**. İkisi de
   gürültü tabanının (0,5–4,0 ms) çok üstünde. Paylaşımlı makine damgalı.
-- **Boyut değişmiyor.** 11,637 → 11,644 MB (fps kilitli), 11,609 → 11,614 MB
-  (üretim planı); iki fark da gürültü tabanının (0,001–0,003 MB) mertebesinde.
+- **Boyut pratikte değişmiyor, ama gürültüye gömülmüyor.** 11,637 → 11,644 MB
+  (fps kilitli), 11,609 → 11,614 MB (üretim planı); bağlı koşum iki kez de
+  **biraz büyük** (0,007 ve 0,005 MB). Gürültü tabanının üst ucu 0,003 MB, yani
+  fark tabanın iki katı. Hedefin (12 MB) binde biri mertebesinde — ölçülebilir
+  ama kullanıcı için görünmez.
 - **Kalite bir miktar düşüyor.** Ortalama 52,957 → 52,872 (**0,085 düşük**),
   p10 45,525 → 45,076 (**0,449 düşük**). İkisi de gürültü tabanının
   (0,0005 / 0,0011) üstünde, yani **gerçek ama küçük bir bedel.**
 
 **Takas gizlenmiyor: bağlamak aynı boyutta biraz kalite verip belirgin atlama
 hızı alıyor.** Bu, T98'in `FfmpegArguments` seviyesinde ölçtüğü sonuçla aynı
-yönde değil: T98 medyan tavanın iki kalite ölçütünde de kötü olmadığını ölçmüştü
-(88,525 → 88,603 ort., 86,496 → 86,516 p10). Burada iki ölçütte de küçük bir
-düşüş var. İki ölçüm **aynı rejimde değil** — T98 libx264 2 geçiş 8000k'da, bu
-ölçüm libsvtav1 preset 6'da 12 MB hedefiyle; bu bir çelişki iddiası değil, aynı
-yönün uçtan uca **tekrarlanmadığı** kaydıdır.
+yönde değil. T98'in karşılaştırdığı çift bu çift değildi:
+`tepe-tavani-ve-psy.md:539,540` **ortalama tavan ile medyan tavanı** karşılaştırıp
+medyanın iki kalite ölçütünde de kötü olmadığını ölçtü (88,5253 → 88,6025 ort.,
+86,4959 → 86,5155 p10). Buradaki çift **haritalı ile haritasız**, ve iki ölçütte
+de küçük bir düşüş var. Rejimler de ayrı — T98 libx264 2 geçiş 8000k'da, bu ölçüm
+libsvtav1 preset 6'da 12 MB hedefiyle. Bu bir çelişki iddiası değil: T98'in
+bulgusu uçtan uca **sınanmadı**, farklı bir soru sınandı.
 
 Diğer iki içerik türünde **kazanç da bedel de yok**: argüman değişmiyor.
 
@@ -191,7 +196,7 @@ Kullanıcının ekranda gördüğü parçayı `PreviewSegment.For`'a veren zinci
 tavanla üretiliyor. Sözleşme bu ayrışmayı KRİTİK sayıyor; kapatmak iki dosya
 ister ve ikisi de bu sözleşmenin `owns`'unda değil:
 
-- `src/VidShrink.App/Playback/SegmentEncoder.cs` — `Availability`'nin (:110)
+- `src/VidShrink.App/Playback/SegmentEncoder.cs` — `Availability`'nin (:109)
   birebir eşi bir `SceneMap? Scenes` özelliği ve `Describe`'da geçirilmesi.
 - `src/VidShrink.App/Playback/PanelHost.cs:244` — `Availability`'yi ileten
   ayarlayıcının eşi.
