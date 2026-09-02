@@ -1,6 +1,14 @@
 namespace VidShrink.Core;
 
-public sealed record HdrResolution(string PixelFormat, string? VideoFilter, IReadOnlyList<string> ColorArgs, bool PolicyChanged);
+public sealed record HdrResolution(string PixelFormat, string? VideoFilter, IReadOnlyList<string> ColorArgs, bool PolicyChanged)
+{
+    /// <summary>
+    /// Kodlayicinin HDR10 destegi henuz olculmedi; karar gecici ve olcum gelince yenilenmeli.
+    /// <see cref="PolicyChanged"/> bu durumda kurulmaz: olculmemis bir kodlayici
+    /// "10 bit tasiyamiyor" demek degildir.
+    /// </summary>
+    public bool NotMeasured { get; init; }
+}
 
 public interface IHdr10EncoderAvailability
 {
@@ -20,7 +28,8 @@ public static class HdrResolver
 
         var effective = requested;
         var policyChanged = false;
-        if (effective == HdrPolicy.Preserve && !SupportsHdr10(codec, availability))
+        var notMeasured = false;
+        if (effective == HdrPolicy.Preserve && !SupportsHdr10(codec, availability, out notMeasured))
         {
             effective = HdrPolicy.TonemapToSdr;
             policyChanged = true;
@@ -29,7 +38,7 @@ public static class HdrResolver
         if (effective == HdrPolicy.TonemapToSdr)
         {
             var colorArgs = new List<string> { "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709" };
-            return new HdrResolution("yuv420p", TonemapFilter, colorArgs, policyChanged);
+            return new HdrResolution("yuv420p", TonemapFilter, colorArgs, policyChanged) { NotMeasured = notMeasured };
         }
 
         var preserveArgs = new List<string>();
@@ -48,13 +57,36 @@ public static class HdrResolver
             preserveArgs.AddRange(new[] { "-x265-params", x265Params });
         }
 
-        return new HdrResolution(Hdr10PixelFormat(codec, availability) ?? "yuv420p10le", null, preserveArgs, false);
+        return new HdrResolution(Hdr10PixelFormat(codec, availability) ?? "yuv420p10le", null, preserveArgs, false)
+        {
+            NotMeasured = notMeasured
+        };
     }
 
-    private static bool SupportsHdr10(string codec, IEncoderAvailability? availability)
+    /// <summary>
+    /// Olculmemis kodlayici "destekliyor" sayilir ve <paramref name="notMeasured"/> kurulur:
+    /// karar gecici, olcum gelince yeniden hesaplanir. Alternatifi — olculmemisi destegi yok
+    /// saymak — kullaniciya HDR'i kaybettigini soyler ve o cumle yanlis olurdu.
+    /// </summary>
+    private static bool SupportsHdr10(string codec, IEncoderAvailability? availability, out bool notMeasured)
     {
+        notMeasured = false;
         if (SoftwareHdr10Codecs.Contains(codec))
-            return availability is null || availability.WorksAsEncoder(codec);
+        {
+            if (availability is null) return true;
+            if (availability is IEncoderMeasurementState software && !software.IsMeasured(codec))
+            {
+                notMeasured = true;
+                return true;
+            }
+            return availability.WorksAsEncoder(codec);
+        }
+
+        if (availability is IEncoderMeasurementState state && !state.IsHdr10Measured(codec))
+        {
+            notMeasured = true;
+            return true;
+        }
         return Hdr10PixelFormat(codec, availability) is not null;
     }
 
