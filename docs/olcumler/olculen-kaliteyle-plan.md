@@ -468,3 +468,55 @@ bir betikten gelmez.
 - `dotnet build VidShrink.sln -c Release` → 0 uyarı, 0 hata.
 - Tam süit bu turda **koşturulmadı**: paralel çalışan başka ajanlar varken eşzamanlı
   tam koşum ölçüyü kararsız yapıyor (bkz. `docs/olcumler/suit-esszamanli-kosum.md`).
+
+---
+
+## 11. Tablo kilitli ölçerle yeniden ölçüldü (T116)
+
+Ölçülen ağaç: dal `T116-cipa-yeniden`. Ortam: Windows 11, ffmpeg 9.0, libvmaf
+`vmaf_v0.6.1neg`. Düzenek ve her sayının komutu `tools/cipa-yeniden/`
+(`README.md` ve `duzenek/`) altında; ölçüm çıktıları `.calisma/` altında ve
+git'e girmiyor.
+
+### 11.1 Kaynaklar ikamedir — hangi satır neyin yerine geçti
+
+T89'un üç kaynağı o turda silindi (§1). **Aynı kaynaklarla yeniden ölçmek
+mümkün değil.** Bunun yerine elde duran kaynaklarla yeni bir ızgara kuruldu ve
+aynı ızgara **hem kilitli hem kilitsiz** ikiliyle koşuldu — böylece kilidin
+bedeli eski tabloya hiç ihtiyaç duymadan görünüyor.
+
+| T89 satırı | T116'da ne koşuldu | durum |
+|---|---|---|
+| `klip` (1080p60 SDR hevc, 24,8 MB) | `sdr-1.mkv` — **ikame**: `parca-1.mkv` hable ile SDR'e indirilip libx264 preset fast iki geçiş 3400k ile 23,1 MiB'a kodlandı | ikame ölçüldü |
+| `oyun` (1080p48 av1 oyun kaydı, 78,3 MB) | — | **ölçülmedi**: elde 48 fps av1 oyun kaydı yok, sentetik taklit oyun kaydının hareket istatistiğini vermez |
+| `hdr` (1080p60 HDR hevc, 77,7 MB) | `parca-1.mkv` ve `parca-2.mkv` — ikisi de 1080p60 HDR, T89'un kaynağının kendisi değil | ikame ölçüldü |
+
+İkame kaynağın üretim tarifi `tools/cipa-yeniden/duzenek/ikame-kaynak.sh`.
+Kodlama parametreleri x264'ün iki geçiş günlüğünden geri okundu
+(`rc=abr bitrate=3400`, `rc_lookahead=30`, `b_adapt=1` → preset fast,
+`threads=4`). Ton eşleme operatörü kapta saklanmadığı için **görüntüden
+ölçüldü**: ilk kare dört operatörle yeniden üretilip elde duran dosyanın ilk
+karesiyle PSNR'landı — hable **39,03 dB**, reinhard 21,28, mobius 20,08,
+clip 19,33 (`duzenek/tonemap-dogrulama.sh`). `desat` değeri ve dosyanın bayt
+bayt yeniden üretilebilirliği **ölçülmedi**.
+
+### 11.2 İki ikili, iki kilit yeri
+
+Kare kilidi iki ayrı yerde duruyor ve ikisi de bu ızgarayı etkiliyor:
+
+- **`QualityMeter`** (`src/VidShrink.Ffmpeg`) — `--measured-quality` kolunun
+  çıpasını üretir, yani **planı** besler. Kilit `822dd3a`, 09-02 04:44.
+- **`bench`in kendi grafiği** (`tools/VidShrink.Bench/Program.cs`) — raporun
+  VMAF/XPSNR sütunlarını üretir, yani **tabloyu** besler. Kilit `0e2b071`, 03:09.
+
+Aynı ağaçtan iki ikili yayımlandı. `bench-kilitli` ikisini de kilitli taşıyor;
+`bench-kilitsiz` **ikisini de kilitsiz** taşıyor — yani T89'un rejimini birebir
+yeniden üretiyor. Bu kaynaktan değil **yayımlanmış DLL'den** doğrulandı
+(`duzenek/ikili-kilit-denetimi.sh`): `bench-kilitsiz/VidShrink.Bench.dll`
+`[1:v]null[r]` ve `flags=lanczos[t];` dizgilerini taşıyor, `bench-kilitli`
+taşımıyor.
+
+Izgara bu yüzden 2×2: iki kol (`eski` = sabitler, `yeni` = `--measured-quality`)
+× iki ölçer. `eski` kolu `QualityMeter`'a hiç uğramıyor
+(`Program.cs:657`, meter `null`), dolayısıyla `eski-kilitli` ile
+`eski-kilitsiz` arasındaki fark **yalnız raporun ölçerinden** geliyor.
