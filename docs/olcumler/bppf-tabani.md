@@ -1,4 +1,4 @@
-# Bppf tabanı
+﻿# Bppf tabanı
 
 Sözleşme: T99. Tarih: 2026-09-02. Kaynak: `.calisma/kaynak/kaynak-1080p60-hdr-17dk.mp4`
 (1920x1080, hevc, yuv420p10le, bt2020/smpte2084/bt2020nc, 60 fps, 1036,17 sn).
@@ -158,6 +158,13 @@ işini tek başına çözmüyor. Eleme kalktı, seçim değişmedi.
 Bu, belgedeki her "tahmini kalite" sayısını bağlar: §8.5.1'deki 68,9 → 74,4 de aynı
 modelin çıktısıdır ve iyileşme kanıtı değildir.
 
+**T107 güncellemesi.** Skor modeli ölçüye karşı sınandı ve `rate` terimi kaynak
+ızgarasına taşındı; ayrıntı `docs/olcumler/yerlesim-skoru.md`. 6,39 puanlık örnek
+kapandı: yeni modelde `1280x720@60` 65,615, `882x496@60` 60,501 ve ölçüm de aynı yönde
+(44,951 / 43,461). Yukarıdaki uyarı geçerliliğini koruyor — bu belgedeki "tahmini
+kalite" sayılarının hepsi **T107 öncesi** modelin çıktısıdır, yeniden hesaplanmadı.
+Hiçbir ceza sabiti değişmedi.
+
 ### 3.2 HandBrake'in çalışma noktası hâlâ dışarıda — ama tabandan değil
 
 Sözleşme HandBrake'in kazanan dosyasının 0,0116 bppf'te koştuğunu söylüyor. Yeni tabanın
@@ -296,6 +303,27 @@ ve o iki taban ölçülmedi. Şikâyet kaynağında `hevc_nvenc` tabanı 0,02196
 
 Ayrıca T4 denetiminin yazdığı kusur duruyor: `IsHardware` çarpanı QSV ve AMF'ye de
 uyguluyor, oysa ölçülen yalnız NVENC (bu turda da yalnız NVENC ölçüldü).
+
+**T107 ölçtü, borç kapanmadı.** Şikâyet kaynağında `hevc_nvenc`, 1920x1080@60'ta sekiz
+bit hızında ölçüldü (`av1_nvenc` değil, doğrudan hevc kolu):
+
+| bppf | ortalama | p10 |
+|---|---|---|
+| 0,005016 | 28,186 | 16,874 |
+| 0,005308 | 29,259 | 17,772 |
+| 0,009226 | 42,601 | 28,730 |
+| 0,013570 | 52,145 | 40,038 |
+| 0,018493 | 59,157 | 47,861 |
+| 0,023121 | 63,439 | 53,124 |
+| 0,027731 | 66,828 | 57,430 |
+| 0,037958 | 72,122 | 64,328 |
+
+Ne 0,02196'da ne 0,02671'de diz var; eğri iki adayın da çok altında, 0,0053–0,0092
+arasında dikleşiyor. **İki aday taban da kalitenin çöktüğü yerin çok üstünde.** Hangisinin
+doğru olduğu bu ölçümle seçilemedi, çünkü ölçüm ikisini de gereksiz sıkı buluyor.
+Ayrıca NVENC bu yerleşimde ~624 kbps'in altına inemiyor (500k isteğine 624,1 kbps),
+yani tabanın altındaki bölgeyi kodlayıcı zaten üretmiyor. Taban yeniden konmadı;
+karar ayrı bir sözleşmeye ait.
 
 ## 6. Kullanıcıya görünen gerekçe
 
