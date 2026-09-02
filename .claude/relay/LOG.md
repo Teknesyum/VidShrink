@@ -922,3 +922,33 @@ Iki kapi kusuru yakaladi ve ikisi de gercekti:
 
 T139'un sonraki sozlesmesi **T151** (`PickFastCodec` ilk olculmemis adayda duruyor),
 denetcinin altinci borcundan dogdu. T146'nin engeli kalkti.
+
+## T149 muhurlendi — tur 1
+
+Denetci `af8a39f` depo disi klonda kusur commit'ini ve dort mutasyonu `--no-incremental`
+ile yeniden uretti, `files: 0`. KRITIK yok, **GECTI**. Risk dusuk. Yedi borc muhur
+notunda; ikisi (`EncoderVendor.VideoToolbox`in sifir tuketicisi, `QualityArgs` mayini)
+zaten T150'nin isi.
+
+Iki T0 kusuru bu turda kayda gecti:
+- Denetciye verilen gorev tarifi yanlisti — T149'un `PlanParser.cs`, `PreviewSegment.cs`
+  ve `FfmpegArguments.cs`e dokundugu soylendi, dokunmamis. Tarif olculmeden yazilmisti.
+- Ilk denetcinin `live/` kaydi hic yazilmadi; kayit **uydurulmadi**, denetim bastan
+  kosuldu. Ikinci denetim 41 dakika surdu ve bu sirada `Stop` kancasi turu uc kez kesti
+  (Core'a bildirildi, `6ebfaf2`).
+
+## T150 tur 1 denetimi — KALDI, tur 2 acildi
+
+KRITIK: olcu dalin kendi agacinda yesil, guncel `main` birlesince kirmizi.
+`PerformanceProbe.cs:97` `EncoderProbeState.NotWorking`i tuketiyor, sayi 27 → 26.
+Raporun "birlestirilmis agacta 1503 test" cumlesi yanlisti — dalin tek basina toplami
+1503, birlesigin 1511. Tur 2 kriterleri K7-K11.
+
+## T151 bekletildi, yerine T145 acildi
+
+T151 `PlanCalculator.cs`te ayni enum uyelerinin tuketimini degistiriyor; T150 tur 2 pimi
+26'ya temellendirirken acilirsa ayni carpisma ucuncu bir sayiyla tekrarlanir. Sira:
+T150 tur 2 muhurlenir, sonra T151.
+
+Bosalan yuvaya **T145** acildi (alti duvar saati bandi) — `owns` yalniz iki test dosyasi
+ve bir olcum belgesi, hicbiri T150 ile kesismiyor.
