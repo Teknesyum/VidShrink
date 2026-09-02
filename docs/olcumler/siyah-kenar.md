@@ -12,7 +12,7 @@ elimizde sıfır veri vardı. Bu belge o veriyi üretiyor.
 
 Kaynak basina kazanc (2000k, p10): KA 0,102 KB -0,048 KC -0,130 KD 0,408.
 
-Kazanclar **gercek bant sinirina** gore olculdu, cropdetect'in buldugu sinira gore degil. Varsayilan `limit=24` ile on kareye yayilmis yoklama dort letterbox'li kaynagin **3 tanesinde** gercek siniri buluyor (KA, KB, KC); kalan 1 kaynakta kirpma varsayilan ayarla hic tetiklenmez, yani oradaki kazanc erisilebilir degil, tavandir.
+Kazanclar **gercek bant sinirina** gore olculdu, cropdetect'in buldugu sinira gore degil. Varsayilan `limit=24` ile on kareye yayilmis yoklamanin **mod birlestirmesi** (en sik gecen kutu; birlesim degil) dort letterbox'li kaynagin **3 tanesinde** gercek siniri buluyor (KA, KB, KC); kalan 1 kaynakta kirpma varsayilan ayarla hic tetiklenmez, yani oradaki kazanc erisilebilir degil, tavandir.
 
 Yalniz erisilebilir kaynaklara bakildiginda (KA, KB, KC) ortalama kazanc -0,025 puan; hukmu pozitife tasiyan tek kaynak varsayilan ayarla bulunamayan KD.
 
@@ -101,15 +101,23 @@ aradaki fark bundan etkilenmez. B yönteminde iki kol da 1920x1080'dedir.
 kullanıcı faydası — aynı ekranda daha büyük görüntü, daha az ölü piksel —
 oynatma tarafındadır ve bu belgede ölçülmüyor.
 
-### İki kolun aynı kaynaktan aynı aralıkta olduğunun kanıtı
+### İki kolun aynı kaynaktan aynı aralıkta olduğu — ve bunun neyle gösterildiği
 
 Bu depoda ölçüm parçalarının sessizce farklı çıktığı görüldü. Burada o hata
-yapısal olarak imkânsız kılındı: **iki kol tek bir kaynak dosyayı okur.**
-Kırpmasız kol dosyayı olduğu gibi, kırpmalı kol aynı dosyaya `crop` filtresi
-ekleyerek alır. Ayrı kesim, ayrı `-ss`, ayrı ara kodlama yok.
+**yapısal olarak** imkânsız kılındı, bir ölçümle değil: iki kol tek bir kaynak
+dosyayı okur. Kırpmasız kol dosyayı olduğu gibi, kırpmalı kol aynı dosyaya
+`crop` filtresi ekleyerek alır. Ayrı kesim, ayrı `-ss`, ayrı ara kodlama yok.
+İddianın dayanağı `tools/siyah-kenar/kos.sh`'tir: iki kolun komut satırı
+arasındaki tek fark `-vf` değeridir.
+
+Aşağıdaki tablo bu yapısal iddiayı **destekler** ama onun yerine geçmez.
+sha256, kare sayısı ve PTS aralığı kaynağın künyesidir. Son sütun ise ayrı bir
+şeydir — aynı dosyanın aynı argümanlarla iki kez çözülmesi — ve bir **çözme
+determinizmi** denetimidir; okumanın koşumdan koşuma değişmediğini gösterir.
+İki kolun aynı kaynaktan geldiğinin kanıtı değildir.
 
 <!-- BETIK-KANIT-BASLANGIC -->
-| Kaynak | Kaynak dosya sha256 (ilk 16) | Kare | PTS ilk / son | Aktif alan framemd5 ozeti (ilk 16) | Tekrar esit mi |
+| Kaynak | Kaynak dosya sha256 (ilk 16) | Kare | PTS ilk / son | Aktif alan framemd5 ozeti (ilk 16) | Iki cozumde ayni mi |
 |---|---|---|---|---|---|
 | KA 2,39:1 duz bant | `f4d63b722db3927e` | 1200 | 0 / 1199 | `2e8aee8dcd5dd7ed` | evet |
 | KB 2,20:1 duz bant | `8acbbf63e9173ee3` | 1200 | 0 / 1199 | `d9d7a2b81bf9239c` | evet |
@@ -119,7 +127,7 @@ ekleyerek alır. Ayrı kesim, ayrı `-ss`, ayrı ara kodlama yok.
 | NB kenarsiz (parca-2) | `d71ee789c0cf4ada` | 1200 | 0 / 1199 | `72f96a2f58b1bf44` | evet |
 | VD bant genisligi sahne icinde degisiyor | `bd292496252557ed` | 1200 | 0 / 1199 | `dee486bb34619999` | evet |
 
-Her satirda tek bir kaynak dosya var ve iki kol da onu okuyor; kirpmali kolun gordugu aktif alanin kare kare md5 dizisi iki bagimsiz cozumde ayni cikti. Kaynak dosyalarin uretimi `tools/siyah-kenar/kaynak.sh`, kanit `tools/siyah-kenar/kanit.py`.
+**Son sutunun ne oldugu, ne olmadigi.** Ayni dosya ayni argumanlarla iki kez `framemd5`'e verildi; sutun bunlarin esit oldugunu soyluyor. Bu bir **cozme determinizmi** denetimidir — okumanin kosumdan kosuma degismedigini gosterir. Iki kolun ayni kaynaktan geldiginin kaniti degildir; o kanit yapisaldir ve `tools/siyah-kenar/kos.sh` icindedir: iki kol tek bir dosyayi okur, aralarindaki tek fark `-vf`'tir. sha256 / kare sayisi / PTS araligi sutunlari da o yapisal iddiayi destekler. Uretim `tools/siyah-kenar/kaynak.sh`, kanit `tools/siyah-kenar/kanit.py`.
 <!-- BETIK-KANIT-BITIS -->
 
 ## K1 — Kaynak sınıfı
@@ -149,9 +157,11 @@ Kaynağa özel işler:
   kusurunu yalıtır.
 
   **Bu kaynak bir kez yeniden üretildi.** İlk üretimde gürültü doğrudan 10 bit
-  düzlemde uygulanmıştı; `noise` filtresinin genliği 10 bit ölçekte
-  değerlendirildiği için bant neredeyse siyah kaldı (YAVG 6,8/1023). Gürültü
-  8 bit alanında üretilip 10 bite çevrilerek düzeltildi. KD'nin bütün
+  düzlemde uygulanmıştı; `noise` filtresinin genliği düzlemin kendi bit
+  derinliğine göre değerlendirildiği için bant neredeyse siyah kaldı. Gürültü
+  8 bit alanında üretilip 10 bite çevrilerek düzeltildi. İlk üretimin luma
+  değeri burada verilmiyor: o kaynak silindi, taahhütlü hiçbir çıktı ya da
+  komut o sayıyı üretmiyor. Yeni KD'nin bandı `limit` taraması tablosundadır. KD'nin bütün
   kodlamaları ve yoklamaları yeni kaynakla baştan koşuldu; bu belgedeki KD
   sayıları yalnız yeni kaynaktandır. Eşik (K4) bu düzeltmeden önce
   commit'lenmişti ve değişmedi.
@@ -243,13 +253,26 @@ K3 ızgarasına girmez.
 | NA kenarsiz (parca-1) | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1042:0:4 | 1920:904:0:136 | 1920:902:0:136 |
 | NB kenarsiz (parca-2) | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1072:0:6 | 1920:1070:0:6 | 1920:1064:0:10 |
 
-| Kaynak | Ust bant YMIN / YAVG / YMAX (8 bit olcek, 60 kare ortalamasi) |
+**Olcek notu.** `signalstats` girdinin kendi bit derinliginde raporluyor; kaynaklar yuv420p10le oldugu icin asagidaki luma degerleri **10 bit olcektedir (0..1023)**. Dogrulama: `color=#2c2c2c` yuv420p10le'de YAVG 216, yuv420p'de 54 veriyor. `cropdetect`'in `limit` parametresi de ayni olcektedir (asagida olculdu), yani bu tablodaki sayilarla yukaridaki `limit` degerleri dogrudan karsilastirilabilir.
+
+| Kaynak | Ust bant YMIN / YAVG / YMAX (10 bit, 0..1023) |
 |---|---|
 | KD 2,39:1 gurultulu asimetrik bant | 4,67 / 44,65 / 85,28 |
 | KE 2,39:1 agir gurultulu bant (yalniz tespit sinamasi) | 14,15 / 95,72 / 178,21 |
 
-Taranan 10 limit degerinden **8..56** kenarsiz kaynaklarin ikisini de bozmadan biraktigi araliktir. KD'nin (bant YAVG 44,65) gercek sinirini veren aralik **48..96**; ikisinin kesisimi **48..56**.
-KE (bant YAVG 95,72) icin boyle bir ortak deger **yok**: KE'yi dogru bulan aralik yok, kenarsiz kaynaklari bozmayan aralik 8..56, kesisim bos. Bant parlakligi belli bir noktayi gectikten sonra tek bir esik degeriyle hem tespit hem guvenlik saglanamiyor.
+**`limit` hangi olcekte yorumlaniyor?** Ayni icerik iki bit derinliginde yoklandi: kaynagin kendisi (yuv420p10le) ve `format=yuv420p` ile 8 bite cevrilmis kopyasi. Uretici: `python tools/siyah-kenar/derinlik.py`.
+
+| Kaynak | Derinlik | Gercek sinir | limit=8 | limit=12 | limit=16 | limit=24 | limit=32 | limit=40 | limit=48 | limit=56 | limit=64 | limit=80 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| KD 2,39:1 gurultulu asimetrik bant | 10bit | 1920:804:0:120 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:804:0:120 | 1920:804:0:120 | 1920:804:0:120 | 1920:804:0:120 |
+| KD 2,39:1 gurultulu asimetrik bant | 8bit | 1920:804:0:120 | 1920:1080:0:0 | 1920:804:0:120 | 1920:804:0:120 | 1920:804:0:120 | 1920:804:0:120 | 1920:804:0:120 | 1770:804:150:120 | 1762:804:158:120 | 1750:804:170:120 | 744:804:1176:120 |
+| NA kenarsiz (parca-1) | 10bit | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1042:0:4 | 1920:904:0:136 |
+| NA kenarsiz (parca-1) | 8bit | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1080:0:0 | 1920:1040:0:6 | 1920:902:0:136 | 1920:902:0:136 | 1920:902:0:136 | 1798:902:122:136 | 1764:808:156:136 | 1756:808:164:136 | 758:808:1162:136 |
+
+Ayni icerik, ayni bant: KD'nin gercek sinirini veren en dusuk limit 10 bitte **48**, 8 bitte **12** — orani 4,00x. Yani `limit` 8 bit olcegine normalize edilmiyor, **girdinin kendi bit derinliginde** yorumlaniyor. Kenarsiz NA ilk kez 10 bitte limit **64**'te, 8 bitte limit **16**'te yanlis kirpiliyor. **Sonuc: tek bir sabit `limit` varsayilani bit derinliginden bagimsiz olamaz.** Bu belgedeki 48..56 penceresi 10 bit kaynaklar icindir; 8 bit bir kaynakta ayni pencere goruntuyu keser.
+
+Asagidaki butun limit degerleri 10 bit olcektedir; kaynaklar 10 bit. Taranan 10 limit degerinden **8..56** kenarsiz kaynaklarin ikisini de bozmadan biraktigi araliktir. KD'nin (bant YAVG 44,65 / 1023) gercek sinirini veren aralik **48..96**; ikisinin kesisimi **48..56**.
+KE (bant YAVG 95,72 / 1023) icin boyle bir ortak deger **yok**: KE'yi dogru bulan aralik yok, kenarsiz kaynaklari bozmayan aralik 8..56, kesisim bos. Bant parlakligi belli bir noktayi gectikten sonra tek bir esik degeriyle hem tespit hem guvenlik saglanamiyor.
 <!-- BETIK-LIMIT-BITIS -->
 
 ### Yoklamanın süresi
@@ -310,7 +333,7 @@ Makine bosken tekrarlanan olcum. Tekrar sayisi 3, medyan verildi. Olcum sirasind
 | KC 1,85:1 duz bant | 4,07% | -0,032 | -0,130 | -0,080 |
 | KD 2,39:1 gurultulu asimetrik bant | 25,56% | 0,094 | 0,408 | 0,514 |
 
-Bitrate yukseldikce kazanc 1 kaynakta artiyor (KD), 3 kaynakta azaliyor (KA, KB, KC). Karar noktasinda (2000k) kazanci pozitif olan kaynak sayisi 2/4: KA, KD.
+Uc noktalar karsilastirildiginda (4000k kazanci - 1000k kazanci; aradaki 2000k'ya bakmayan, tek adimlik bir kiyas) 1 kaynakta kazanc daha buyuk (KD), 3 kaynakta daha kucuk (KA, KB, KC). Bu monotonluk iddiasi degildir: KC'nin uc degeri artan ya da azalan bir dizi olusturmuyor. Karar noktasinda (2000k) kazanci pozitif olan kaynak sayisi 2/4: KA, KD.
 
 **Kaynagin kendi zorlugu** (kirpmasiz kol, 2000k, A yontemi). p10 duzeyi kaynaga gore cok degisiyor; asagidaki iki sutun kazanci hangi zeminde olctugumuzu gosterir.
 
@@ -402,8 +425,13 @@ Buna rağmen bir uygulama sözleşmesi açılırsa, bu ölçümden çıkan önc�
   sahne değişimine düşüyor. En az on kareye yayılmış örnekleme gerekir.
 - **Birleştirme birleşim değil, mod olmalı.** Birleşim tek bir siyah kareye
   karşı kırılgan; KA'da kırpmayı iptal ediyor, mod kurtarıyor.
-- **`limit` varsayılanı yükseltilemez.** 56'nın üstünde kenarsız kaynaklar
-  kesilmeye başlıyor.
+- **`limit` varsayılanı sabit bir sayı olamaz — kaynağın bit derinliğine
+  bağlıdır.** Ölçüldü: `cropdetect` `limit`'i 8 bit ölçeğine normalize etmiyor,
+  girdinin kendi derinliğinde yorumluyor; aynı içerik 10 bitte 48'de bulunurken
+  8 bitte 12'de bulunuyor (4,00×). Bu belgedeki 48..56 penceresi **yalnız 10 bit
+  kaynaklar içindir**; 8 bit bir kaynakta aynı pencere görüntüyü keser. Bir
+  uygulama bunu ya derinliğe göre ölçeklemeli ya da girdiyi tek bir derinliğe
+  normalize edip öyle yoklamalı.
 - **Kırpma varsayılan açık gelemez.** Kazanç, hatalı kırpmanın bedelinden
   küçük; K5(c) bunun ölçüsüdür.
 - **Bant genişliği sahne içinde değişiyorsa kırpma yapılmamalı.** Örneklenen
@@ -468,7 +496,7 @@ PY
 Son koşumun sonucu (bu satırı da betik yazar):
 
 <!-- BETIK-K6CHECK-BASLANGIC -->
-`python tools/siyah-kenar/oz.py` — rapordaki hukum blogu ile betigin stdout ciktisi **birebir ayni** (1023 bayt).
+`python tools/siyah-kenar/oz.py` — rapordaki hukum blogu ile betigin stdout ciktisi **birebir ayni** (1084 bayt).
 <!-- BETIK-K6CHECK-BITIS -->
 
 **Hangi sayı hangi komuttan geliyor:**
@@ -478,6 +506,7 @@ Son koşumun sonucu (bu satırı da betik yazar):
 | K1 künye + kanıt tabloları | `.calisma/t134/olcu/kaynak-kanit.json` | `python tools/siyah-kenar/kanit.py` |
 | K2 cropdetect ızgarası, birleşim/mod | `.calisma/t134/yokla/cropdetect.json` | `python tools/siyah-kenar/yokla.py` |
 | K2 `limit` taraması + bant lumaları | `.calisma/t134/yokla/limit.json` | `python tools/siyah-kenar/esik.py` |
+| K2 `limit`'in bit derinliği ölçeği | `.calisma/t134/yokla/derinlik.json` | `python tools/siyah-kenar/derinlik.py` |
 | K2 yoklama süreleri | `.calisma/t134/yokla/sure.json` | `python tools/siyah-kenar/sure.py` |
 | K3 ızgarası, K5 sayıları | `.calisma/t134/olcu/vmaf.json` + `A-*.json` / `B-*.json` | `python tools/siyah-kenar/olc.py` |
 | Kaynaklar | `.calisma/t134/kaynak/*.mkv` | `bash tools/siyah-kenar/kaynak.sh` |

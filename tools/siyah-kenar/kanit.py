@@ -87,7 +87,7 @@ def main():
             kayit["alt_bant_px"] = alt
         a_ozet, a_kare, a_pts = framemd5(yol, h, y)
         b_ozet, b_kare, b_pts = framemd5(yol, h, y)
-        kayit["kol_ozdesligi"] = {
+        kayit["cozme_determinizmi"] = {
             "kirpilmis_alan_md5": a_ozet, "tekrar_md5": b_ozet,
             "esit": a_ozet == b_ozet, "kare": a_kare, "pts": a_pts,
             "tekrar_kare": b_kare, "tekrar_pts": b_pts,
