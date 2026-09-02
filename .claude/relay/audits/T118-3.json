@@ -1,7 +1,7 @@
 {
   "contractId": "T118",
   "auditorRunId": "a1b5b7b6c5a31db96",
-  "headSha": "e673d2048206054c02b4d3ec62e837dfc1a52cb5",
+  "headSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4",
   "diffHash": "be355e8dd1a0efc4ff0e03a0133a47b394ffe344ed45c2c9de0822a2a87400d0",
   "owns": [
     "tools/ci-gibi-kos.sh",
@@ -9,8 +9,8 @@
     "docs/inceleme/handbrake-motoru.md"
   ],
   "verification": [
-    "Sifir dotnet test ile denetlendi. CI tarafi bagimsiz okundu: 33589639249 headSha 0e122f2, gunluk satir 265 Failed 1 / Passed 1162 / Skipped 17 / Total 1180. Betik tarafi ajanin raporundan bagimsiz olarak kosum gunlugunden okundu: 0 / 1163 / 17 / 1180. Agac denkligi dogrulandi: 361b96e ile 90bc3de arasinda src ve tests bos, --no-build yok. Sapma yakalayici mutasyonla sinandi: kapi satirina aciklama eklenince GATE_LINE kayiyor ve self-test guvenli yonde exit 1 veriyor. --self-test kendi kosuldu, exit 0. Kanit etiketleri git ls-remote ile dogrulandi, ikisi de annotated. Sekiz borc kaydedildi; birlestirme sarti T115 ucuyla birlikte olmasiydi ve oyle yapildi."
+    "Sifir dotnet test ile denetlendi. CI tarafi bagimsiz okundu: 33589639249 headSha 0e122f2, gunluk satir 265 Failed 1 / Passed 1162 / Skipped 17 / Total 1180. Betik tarafi ajanin raporundan bagimsiz olarak kosum gunlugunden okundu: 0 / 1163 / 17 / 1180. Agac denkligi dogrulandi: 361b96e ile 90bc3de arasinda src ve tests bos, --no-build yok. Sapma yakalayici mutasyonla sinandi: kapi satirina aciklama eklenince GATE_LINE kayiyor ve self-test guvenli yonde exit 1 veriyor. --self-test kendi kosuldu, exit 0. Kanit etiketleri git ls-remote ile dogrulandi, ikisi de annotated. Sekiz borc kaydedildi; birlestirme sarti T115 ucuyla birlikte olmasiydi ve oyle yapildi. Muhur oncesi verify adimi tam yola cevrildi: node cocuk sureci PATH'te bash bulamiyordu, komut simdi C:/Program Files/Git/bin/bash.exe."
   ],
   "result": "passed",
-  "createdAt": "2026-09-02T07:45:21.246Z"
+  "createdAt": "2026-09-02T07:49:54.915Z"
 }
