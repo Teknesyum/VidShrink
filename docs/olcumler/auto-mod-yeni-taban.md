@@ -80,6 +80,118 @@ yükten etkilenmez.
 
 ---
 
+## K4 — T98'in GOP'u ayrıştırıldı
+
+Beş koşum, **aynı kaynak, aynı istenen bit hızı (`-b:v 2026k`), aynı preset (6),
+aynı psy, aynı ses**; değişen tek şey anahtar kare argümanı. Hepsi
+`-threads 4` + `lp=4` ile sabitlendi, hepsi kare kilidiyle ölçüldü. Üreten komut:
+
+    .calisma/t120/uret.sh <ad> 6 <g> "<keyint/scd>" 2026
+    .calisma/t120/olc.sh   <ad>
+    python .calisma/t120/tablo.py <ad>
+
+| koşum | anahtar kare argümanı | bayt | ortalama | p10 | harmonik | en düşük kare | `<1` kare |
+|---|---|---|---|---|---|---|---|
+| `g120-taban` | `-g 120` (T111 tabanı) | 14 401 960 | 95,481 | 94,496 | 95,475 | 91,786 | 0 |
+| `g120-scd1` | `-g 120 keyint=120:scd=1` | 14 247 160 | 95,469 | 94,498 | 95,463 | 91,785 | 0 |
+| `g300-taban` | `-g 300` | 11 912 391 | 95,828 | 95,136 | 95,824 | 94,216 | 0 |
+| `g600-scd0` | `-g 600 keyint=600:scd=0` | 12 218 377 | 95,945 | 95,385 | 95,942 | 94,583 | 0 |
+| `g600-scd1` | `-g 600 keyint=600:scd=1` (**bugünkü**) | 12 275 437 | 95,945 | 95,382 | 95,942 | 94,583 | 0 |
+
+Üretilen dosyalardaki anahtar kareler doğrudan sayıldı
+(`ffprobe -skip_frame nokey -show_entries frame=pts_time`):
+
+| koşum | anahtar kare | en kısa aralık | en uzun aralık |
+|---|---|---|---|
+| `g120-taban` | 31 | 2,00 s | 2,00 s |
+| `g120-scd1` | 31 | 2,00 s | 2,00 s |
+| `g300-taban` | 13 | 5,00 s | 5,00 s |
+| `g600-scd0` | 7 | 10,00 s | 10,00 s |
+| `g600-scd1` | 7 | 10,00 s | 10,00 s |
+| `auto` (üretim yolu) | 7 | 10,00 s | 10,00 s |
+
+### Ölçüm zinciri çapraz doğrulandı
+
+`g300-taban` bugünkü tabanda üretildi ama argümanları T111'in `e2-gop300`
+koşumuyla birebir aynı. İki taban, iki ayrı kodlama, aynı ölçer:
+
+| | ortalama | p10 | harmonik | en düşük kare |
+|---|---|---|---|---|
+| T111 arşivi `e2-gop300-kilitli` (taban `3688336`) | 95,828 | 95,138 | 95,825 | 94,216 |
+| T120 `g300-taban` (taban `2d5f710`) | 95,828 | 95,136 | 95,824 | 94,216 |
+| fark | 0,000 | **−0,002** | −0,001 | 0,000 |
+
+Aynı argümanlar iki tabanda aynı sayıyı veriyor. Yani aşağıdaki farklar
+tabandan değil, **argümandan** geliyor — `FfmpegArguments`'in T98'de değişen
+kısmı bu kaynakta yalnız anahtar kare argümanına dokunuyor, ölçüm de bunu
+doğruluyor.
+
+### Aralığın payı
+
+| değişim | Δ bayt | Δ ortalama | Δ p10 | Δ en düşük kare |
+|---|---|---|---|---|
+| `-g 120` → `-g 300` | **−%17,3** | **+0,347** | **+0,640** | +2,430 |
+| `-g 300` → `-g 600` | +%2,6 | +0,117 | +0,246 | +0,367 |
+| `-g 120` → `-g 600` (T111 tabanı → bugün) | **−%14,8** | **+0,464** | **+0,886** | +2,797 |
+
+**Fark 0,0x mertebesinde değil.** T98'in aralığı bu kaynakta hem dosyayı
+küçültüyor hem puanı yükseltiyor: iki eksende birden kazanç. Büyük kalem
+120 → 300 adımı; 300 → 600 adımı puanı yükseltmeye devam ediyor ama boyutu
+%2,6 **büyütüyor**, yani tek yönlü kazanç değil.
+
+T102 aynı 120 → 300 adımını kilitsiz ölçerle +0,155 ortalama / +0,333 p10 diye
+ölçmüştü. Kilitli ölçümde aynı adım +0,347 / +0,640. **İşaret aynı, büyüklük
+iki katından fazla.** Bu, T111'in "kilitsiz ölçü farkları küçültüyor" bulgusuyla
+aynı yönde.
+
+### `scd=1`'in payı
+
+`scd=1` ile `-force_key_frames` **ayrı mekanizmalardır**; bu bölüm yalnız
+`scd=1`'i ölçüyor. `-force_key_frames`'in bu kaynaktaki etkisi T111'de ölçüldü
+ve bu belgede tekrarlanmadı.
+
+| karşılaştırma | Δ bayt | Δ ortalama | Δ p10 | Δ en düşük kare |
+|---|---|---|---|---|
+| `g600-scd0` → `g600-scd1` | **+%0,47** | **0,000** | **−0,003** | 0,000 |
+| `g120-taban` → `g120-scd1` | −%1,07 | −0,012 | +0,002 | −0,001 |
+
+**`scd=1` bu kaynakta kaliteye dokunmuyor.** İki `-g` değerinde de puan farkı
+0,012'nin altında, yani ölçüm gürültüsü mertebesinde. Boyuta dokunuyor ama
+işareti bile sabit değil: `-g 600`'de %0,47 büyütüyor, `-g 120`'de %1,07
+küçültüyor.
+
+**Anahtar kare yerleşimine hiç dokunmuyor — ölçüldü.** `scd=1` açık ve kapalı
+çıktılarda anahtar kare sayısı ve aralığı birebir aynı (7 kare / 10,00 s ve
+31 kare / 2,00 s). Kaynaktaki iki sahne kesmesi (28,353 s ve 56,870 s) hiçbir
+koşumda anahtar kare değil. Kodlayıcının kendisi de bunu söylüyor; `scd=1`
+geçilen koşumların günlüğünde SVT-AV1 şu satırı basıyor:
+
+    Svt[warn]: SVT-AV1 has an integrated mode decision mechanism to handle
+    scene changes and will not insert a key frame at scene changes
+
+Bu satır yalnız `scd=1` geçilen koşumlarda çıkıyor. Ölçüm koşumlarının
+günlüğünde göremezsin — `uret.sh` ffmpeg'i `-loglevel error` ile çağırıyor ve
+bu satır `warning` seviyesinde. Ayrı bir 1 saniyelik koşumla üç kipi yan yana
+koydum; üreten komut:
+
+    for sp in "keyint=600:scd=1" "keyint=600:scd=0" ""; do
+      if [ -n "$sp" ]; then A=(-svtav1-params "$sp"); else A=(); fi
+      n=$(ffmpeg -hide_banner -y -nostdin -threads 4 -t 1 -i gui/parca-2.mkv           -c:v libsvtav1 -preset 6 -b:v 2026k -g 600 -pix_fmt p010le "${A[@]}"           -an -f null NUL 2>&1 | grep -c "integrated mode decision")
+      echo "svtav1-params='${sp:-yok}' -> $n"
+    done
+
+Sonuç: `scd=1` → 1, `scd=0` → 0, parametresiz → 0. Yani SVT-AV1 `v4.2.0-68`
+bayrağı alıyor, sahne kesmesine anahtar kare koymayacağını söylüyor, ama
+çıktıyı yine de değiştiriyor — dosyalar bayt bayt farklı
+(`cmp ciktilar/g120-scd1.mp4 ciktilar/g120-taban.mp4` → `differ: char 647`).
+**Değiştirdiği şeyin ne olduğu ölçülmedi**; ölçülen, kaliteye etkisinin
+sıfıra yakın olduğu.
+
+**Tek kaynakta ölçüldü.** Daha sık ve daha sert kesmeli bir içerikte `scd=1`'in
+aynı çıkacağı **ölçülmedi**.
+
+---
+
 ## K5 — `y2`/`y3`'ün p10'u neden diğerlerinin yedi katı oynuyor
 
 T111 bunu gördü ve sebebini aramadı: kilit takılınca on üç AV1 koşumunun p10'u
