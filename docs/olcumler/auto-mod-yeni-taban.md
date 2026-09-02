@@ -80,6 +80,207 @@ yükten etkilenmez.
 
 ---
 
+## K1 — bugünkü `main`de üç satır, kilitli
+
+Üç koşum, aynı kaynak, aynı ölçüm grafiği, hepsinde kare kilidi takılı. Boyutlar
+`auto`nun teslim ettiği dosyaya eşitlendi; eşitleme yöntemi ve denemeleri K3'te.
+
+| koşum | ne | teslim (bayt) | Δ `auto` | ortalama | p10 | harmonik | en düşük kare | `<1` kare |
+|---|---|---|---|---|---|---|---|---|
+| `auto` | uygulamanın kendi kararı, hiçbir ayara dokunulmadı | 16 289 648 | — | **96,025** | **95,526** | **96,022** | 94,806 | **0** |
+| `uzman-biz3` | aynı motor, elle: `libsvtav1` preset **4**, **`-g 300`** | 16 222 129 | −%0,414 | **96,099** | **95,605** | **96,097** | 94,843 | **0** |
+| `uzman-hb2` | HandBrakeCLI `x265_10bit`, preset `slow` | 16 284 727 | −%0,030 | **95,759** | **95,396** | **95,757** | 94,140 | **0** |
+
+Taban commit **`2d5f710`**. Üç satırın da `<1` kare sayısı sıfır.
+
+### Üreten komutlar
+
+`auto` uygulamanın kendi yolundan geçti (`ComplexityProbe` → `CalibrationProbe`
+→ `PlanCalculator` → `EncodeRunner`), hedef 16 MB:
+
+    cd tools/auto-mod-olcumu/harness
+    dotnet run -c Release -- \
+      ../../../.calisma/t120/gui/parca-2.mkv 16 \
+      ../../../.calisma/t120/ciktilar/auto.mp4 auto
+
+Bu koşumun bastığı plan ve ikinci geçiş komutu:
+
+    PLAN mode=2pass codec=libsvtav1 preset=6 1920x1080@60 vbit=2026k abit=128k
+         pix=p010le hdrfilt=True tahminMB=15,60
+    ffmpeg -hide_banner -y -hwaccel auto -i gui/parca-2.mkv -c:v libsvtav1 \
+      -preset 6 -b:v 2026k -pass 2 -passlogfile pl -g 600 \
+      -svtav1-params keyint=600:scd=1 -pix_fmt p010le \
+      -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc \
+      -c:a aac -b:a 128k -movflags +faststart ciktilar/auto.mp4
+
+`uzman-biz3` — iki geçiş; birincisi aynı komutun `-pass 1 -an -f null NUL` hâli:
+
+    ffmpeg -hide_banner -loglevel error -y -nostdin -threads 4 -i gui/parca-2.mkv \
+      -c:v libsvtav1 -preset 4 -b:v 2712k -pass 2 -passlogfile log/uzman-biz3 \
+      -g 300 -pix_fmt p010le \
+      -svtav1-params tune=0:enable-variance-boost=1:variance-boost-strength=2:lp=4 \
+      -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc \
+      -c:a aac -b:a 128k -movflags +faststart ciktilar/uzman-biz3.mp4
+
+`uzman-hb2`:
+
+    HandBrakeCLI -i gui/parca-2.mkv -o ciktilar/uzman-hb2.mp4 \
+      -e x265_10bit --encoder-preset slow --encopts pools=4 \
+      -b 1969 --multi-pass --turbo \
+      -E ca_aac -B 128 --mixdown stereo \
+      -w 1920 -l 1080 --crop-mode none -r 60 --cfr -f av_mp4 -O
+
+Üçünün kalite sayısı da düzenek bölümündeki kilitli grafikle üretildi ve şununla
+özetlendi:
+
+    python .calisma/t120/oz.py vmaf/<ad>-kilitli.json
+
+Boyutlar `stat -c %s ciktilar/<ad>.mp4`, kodlayıcı süreci sıfırla döndükten
+sonra okundu: her koşum önce `.<ad>.yaziliyor.mp4` adına yazıyor ve dosya ancak
+çıkış kodu denetlendikten sonra `mv` ile yerine konuyor.
+
+### İstenen bit hızı teslim edilen bit hızı değildir
+
+`libsvtav1` VBR'de istenenin belirgin altına iniyor: `uzman-biz3` 2712 kbps
+istedi, teslim edilen videoda `ffprobe` **2 029 038 bps** okuyor. Bu yüzden bu
+belgede eşleme **teslim edilen bayt** üzerinden yapıldı, istenen bit hızı
+üzerinden değil.
+
+`auto` da tek geçişte hedefi tutturmuyor; `EncodeRunner` düzeltiyor ve koşum
+`deneme=2` ile bitiyor. Elle koşumlar tek denemelik, bu yüzden onların istenen
+bit hızı `auto`nunkinden yüksek. Teslim edilen boyutlar eşit olduğu için
+karşılaştırma bundan etkilenmiyor.
+
+**`-maxrate`/`-bufsize` bu yolda yok ve olamaz.** `FfmpegArguments.Build` VBV
+sınırlarını `SupportsRateLimits` kapısının arkasına koyuyor, o kapı da
+`libsvtav1` için `false` döndürüyor. Kapının doğru olduğu ölçüldü: aynı komut
+elle `-maxrate` eklenerek koşturulunca kodlayıcı açılmıyor —
+`Svt[error]: Max Bitrate only supported with CRF mode`, ffmpeg `-22`.
+
+### İş parçacığı sabitlemesinin kaliteye ve boyuta etkisi ölçüldü
+
+Aynı koşum bir kez `-threads 4` + `lp=4` ile, bir kez hiç sabitlemeden:
+
+| koşum | teslim (bayt) | ortalama | p10 | harmonik |
+|---|---|---|---|---|
+| `g600-scd1` (sabit) | 12 275 437 | 95,945 | 95,382 | 95,942 |
+| `g600-scd1-serbest` | 12 283 897 | 95,946 | 95,383 | 95,943 |
+
+Fark boyutta %0,069, kalitede 0,001 puan. **Kalite ve boyut sayılarına "makine
+paylaşımlıydı" damgası basılmadı**; süre sayısı bu belgede zaten yok.
+
+---
+
+## K2 — T111'in sayılarıyla yan yana
+
+T111 tabanı **`3688336`**, bugünkü taban **`2d5f710`**. Her iki tabanda da açık,
+kendi tabanının boyut eşli rakibine karşı ölçüldü. İşaret **rakip eksi `auto`**;
+artı = rakip önde.
+
+| açık | T111 (`3688336`, kilitli) | bugün (`2d5f710`, kilitli) | fark |
+|---|---|---|---|
+| uzman açığı, Δ ortalama | +0,437 | **+0,074** | −0,363 |
+| uzman açığı, Δ p10 | +0,673 | **+0,079** | −0,594 |
+| uzman açığı, Δ harmonik | +0,439 | **+0,075** | −0,364 |
+| HandBrake açığı, Δ ortalama | +0,097 | **−0,266** | −0,363 |
+| HandBrake açığı, Δ p10 | +0,477 | **−0,130** | −0,607 |
+| HandBrake açığı, Δ harmonik | +0,099 | **−0,265** | −0,364 |
+
+T111 sütunu `docs/olcumler/auto-mod.md`'nin K2 ve K3 tablolarındaki kilitli
+satırlardan alındı (`uzman-biz3` − `auto`, `uzman-hb2` − `auto`). Bugünkü sütun
+K1 tablosundan çıkar.
+
+### Sonuç: açık kapandı
+
+Altı ölçünün altısında da açık `auto` lehine kapandı. Rakip başına iki ayrı
+cümle gerekiyor, çünkü biri işaret değiştirdi, diğeri değiştirmedi.
+
+**HandBrake: geçtik.** İşaret gerçekten döndü. T111'de HandBrake üç ölçüde de
+öndeydi (+0,097 / +0,477 / +0,099); bugün üçünde de geride (−0,266 / −0,130 /
+−0,265). Bu cümle boyut avantajından gelmiyor: `uzman-hb2` `auto`dan **%0,030
+küçük** dosya teslim etti, yani `auto` daha az bayt harcayıp daha yüksek puan
+aldı. T111'in kendi en dar eşleşmesi `uzman-hb3` (−%0,08, kilitli ortalama açığı
++0,083) alınsa bile bugünkü −0,266 onun da tersi.
+
+**Uzman ayarı: hâlâ önde, açık +0,074 ortalama / +0,079 p10 / +0,075 harmonik.**
+İşaret dönmedi. Elle preset 4 + `-g 300` seçmek `auto`yu hâlâ geçiyor; geçtiği
+mesafe +0,437'den +0,074'e, altıda birine indi. **"Yakaladık" yazılmıyor, çünkü
+işaret dönmedi.**
+
+<!--K2NOKTA-->
+
+### Karşılaştırılabilirliğin sınırı
+
+- T111'in sayıları o tabanın `auto`suna göre, bugünküler bugünkü `auto`ya göre.
+  İki `auto` aynı dosya değil; **satırlar değil, açıklar karşılaştırılıyor.**
+- Kaynak, kilit grafiği ve VMAF modeli iki tabanda birebir aynı; ölçüm zinciri
+  T111'in on sekiz arşiv özetine karşı doğrulandı (düzenek bölümü).
+- Tek kaynakta ölçüldü. Başka içerikte aynı işaretin çıkacağı **ölçülmedi**.
+
+---
+
+## K3 — boyut eşliği
+
+**Yöntem:** istenen bit hızı üzerinde ikiye bölme; ölçüt teslim edilen bayt,
+hedef `auto`nun 16 289 648 baytı. Her deneme tam bir iki geçişli kodlama;
+`uzman-biz*` koşumlarında preset 4 ve `-g 300` sabit, yalnız `-b:v` değişiyor.
+
+| koşum | istenen | teslim (bayt) | Δ `auto` |
+|---|---|---|---|
+| `uzman-biz1` | 2719 kbps | 16 368 743 | +%0,486 |
+| `uzman-biz2` | 2705 kbps | 16 207 125 | −%0,507 |
+| `uzman-biz3` | 2712 kbps | 16 222 129 | **−%0,414** |
+| `uzman-hb1` | 1980 kbps | 16 372 823 | +%0,511 |
+| `uzman-hb2` | 1969 kbps | 16 284 727 | **−%0,030** |
+
+    ./uret.sh uzman-biz1 4 300 "" 2719      ./hb.sh uzman-hb1 1980
+    ./uret.sh uzman-biz2 4 300 "" 2705      ./hb.sh uzman-hb2 1969
+    ./uret.sh uzman-biz3 4 300 "" 2712
+
+**Band T111'inkinden dar.** T111 AV1 tarafında beş denemede ±%0,48'e, HandBrake
+tarafında bir denemede −%0,08'e inmişti. Bu turda AV1 tarafı üç denemede
+**−%0,414**, HandBrake tarafı iki denemede **−%0,030**. İki taraf da T111'in
+bandının içinde.
+
+**AV1 tarafında teslim edilen boyut istenen bit hızına çok duyarlı.** 2719 →
+2705 kbps, yani %0,51'lik bir istenen bit hızı değişimi teslim edilen boyutu
+%0,99 oynattı. Üçüncü deneme bu yüzden iki denemenin arasına nişan aldı ve
+banda girdi; dördüncü denemeye gerek görülmedi.
+
+### Kalan sapmanın açığa katkısı
+
+Skorun boyuta eğimi bu turda **yeniden ölçüldü**, T111'inki devralınmadı.
+`uzman-biz1` ile `uzman-biz2` aynı ayarlarla üretilmiş, yalnız bit hızı farklı
+iki koşum; aralarında **%0,997** boyut farkı var:
+
+| | `uzman-biz1` (16 368 743) | `uzman-biz2` (16 207 125) | fark | eğim |
+|---|---|---|---|---|
+| ortalama | 96,102 | 96,096 | +0,006 | **0,006 puan / %1** |
+| p10 | 95,605 | 95,601 | +0,004 | **0,004 puan / %1** |
+| harmonik | 96,100 | 96,093 | +0,007 | **0,007 puan / %1** |
+
+T111 aynı eğimi 0,003 puan / %1 ölçmüştü. İki ölçüm aynı mertebede; bugünkü iki
+katı, ikisi de 0,00x.
+
+Kalan sapmanın katkısı bu eğimle:
+
+| koşum | Δ boyut | katkı (ortalama) | ölçülen açık | katkının payı |
+|---|---|---|---|---|
+| `uzman-biz3` | −%0,414 | 0,0025 puan | +0,074 | %3,4 |
+| `uzman-hb2` | −%0,030 | 0,0002 puan | −0,266 | %0,1 |
+
+**Kalan sapma sonucu değiştirmiyor.** İki koşumda da katkı ölçülen açığın yüzde
+birkaçı; işareti çevirecek büyüklükte değil. Üstelik iki rakip de `auto`dan
+**küçük** dosya teslim etti, yani sapmanın düzeltilmesi `auto` lehine değil
+aleyhine bir düzeltme olurdu ve HandBrake açığı daha da açılırdı.
+
+Eğim yalnız AV1 tarafında, yalnız %1'lik bir aralıkta ölçüldü. x265 tarafında
+ayrı bir eğim **ölçülmedi**: `uzman-hb1` ile `uzman-hb2` arasındaki %0,54 boyut
+farkında kilitli ortalama 95,759 → 95,759 hiç oynamadı, yani orada da eğim
+0,00x mertebesinde, ama iki noktayla sayı verilmedi.
+
+---
+
 ## K4 — T98'in GOP'u ayrıştırıldı
 
 Beş koşum, **aynı kaynak, aynı istenen bit hızı (`-b:v 2026k`), aynı preset (6),
@@ -143,6 +344,35 @@ T102 aynı 120 → 300 adımını kilitsiz ölçerle +0,155 ortalama / +0,333 p1
 ölçmüştü. Kilitli ölçümde aynı adım +0,347 / +0,640. **İşaret aynı, büyüklük
 iki katından fazla.** Bu, T111'in "kilitsiz ölçü farkları küçültüyor" bulgusuyla
 aynı yönde.
+
+### Ayrışma teslim noktasında da ölçüldü
+
+Yukarıdaki beş koşum `-b:v 2026k` ile üretildi ve ~12 MB teslim ediyor. Bu,
+T111'in ayrıştırma noktasıdır — arşivle karşılaştırılabilir olsun diye seçildi —
+ama `auto`nun teslim noktası değil (16,3 MB). Aralığın etkisinin orada da aynı
+kalıp kalmadığı varsayılmadı, ölçüldü: aynı çift `-b:v 2746k` ile tekrarlandı.
+
+| koşum | anahtar kare | istenen | teslim (bayt) | ortalama | p10 | harmonik | en düşük kare |
+|---|---|---|---|---|---|---|---|
+| `g120-teslim` | `-g 120` | 2746 kbps | 17 642 679 | 95,794 | 95,060 | 95,790 | 92,630 |
+| `g600-teslim` | `-g 600 keyint=600:scd=1` | 2746 kbps | 17 030 628 | 96,053 | 95,609 | 96,051 | 94,837 |
+
+    ./uret.sh g120-teslim 6 120 "" 2746
+    ./uret.sh g600-teslim 6 600 "keyint=600:scd=1" 2746
+
+| çalışma noktası | Δ boyut | Δ ortalama | Δ p10 | Δ en düşük kare |
+|---|---|---|---|---|
+| 2026 kbps (~12 MB) | −%14,8 | +0,464 | +0,886 | +2,797 |
+| 2746 kbps (~17 MB) | −%3,5 | **+0,259** | **+0,549** | +2,207 |
+
+**Aralığın kazancı teslim noktasında yarıya düşüyor ama işaret değişmiyor.**
+Yüksek bit hızında zorlanan anahtar karenin maliyeti görece küçülüyor; yine de
+`-g 600` hem daha küçük dosya hem daha yüksek puan veriyor. En düşük kare
+kazancı iki noktada da 2 puanın üstünde.
+
+**Bu çift kendi arasında boyut eşli değil** (aynı `-b:v`, farklı teslim), çünkü
+ölçülen şey aralığın kendi etkisi: aynı düğme, iki değer. Boyut eşli hâli
+ölçülmedi.
 
 ### `scd=1`'in payı
 
