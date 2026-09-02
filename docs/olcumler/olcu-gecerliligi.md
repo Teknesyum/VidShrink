@@ -129,7 +129,13 @@ VMAF'in doygunluğu ise görünmez kılıyor.
 Kaynağın video akışı **0,020000 s**'de başlıyor (Matroska, 1/1000 zaman tabanı,
 milisaniyeye yuvarlanmış ve titreşimli damgalar: 0,016/0,017/0,018 s aralıkları).
 Bizim çıktımız **0,016667 s**'de başlıyor — kaynağın başlangıç kaymasını atıp tam
-1/60'a oturuyor. Fark her karede **−3,3 ms**.
+1/60'a oturuyor. Fark **her karede aynı değil**: kare başına sapma
+**−1,67 … −4,33 ms**, ortalama **−3,02 ms**; −3,3 yalnız 0. karenin farkı. Dağılım
+(3624 kare, `t111-damga.sh` ile yeniden ölçüldü): −2,67 ms 1177 kare, −3,00 ms 1157,
+−3,33 ms 1014, kalan 276 kare −1,67 ile −4,33 arasında. Sapmanın **işareti** sabit —
+3624 karenin 3624'ü negatif — kaydırmayı üreten de o; büyüklüğü sabit değil.
+Sebebi kaynağın kendi damgalarının titreşimi: kare aralığı **14,00 … 19,00 ms**
+(ortalama 16,6666), oysa çıktı tam 16,6667'lik ızgaraya oturuyor.
 
 ffmpeg framesync kareleri damgaya göre eşler ve "damgası küçük-eşit olan **son**
 referans karesini" seçer. Bizim kare hep erken geldiği için seçilen kare komşusu
@@ -170,10 +176,24 @@ kanıtı: hiçbir damga değişmeden, yalnız ses akışları düşünce ölçü
 Düzenek `tools/auto-mod-olcumu/t111-ses.sh`.
 
 **HandBrake neden kurtuluyor:** çıktısını kaynağın **0,020000** başlangıcıyla
-yazıyor, kayması ±1 ms içinde kalıyor. Tek istisnası kanıtın kendisi: 2721. karede
-HandBrake'in damgası **−1 ms**'e düşüyor ve tüm dosyada tek başına düşen PSNR karesi
-(**34,5 dB**, diğer her karede ≥ 47,95 dB) **tam da 2721**. Yani 1 ms'lik negatif
-kayma bile tam kare kaydırıyor.
+yazıyor, yani **sabit ofseti yok**; geriye yalnız kaynağın kendi titreşimi kalıyor.
+Tüm dosyada tek başına düşen PSNR karesi (**34,5 dB**, diğer her karede ≥ 47,95 dB)
+**2721**, ve 2721'de HandBrake'in damgası kaynağa göre **−1 ms**.
+
+**"Tek istisna" cümlesi geri çekiliyor — ölçüldü, istisna değil.** T106 denetçisi
+HandBrake çıktısında **139 kare tam −1,00 ms**, toplam **180 kare negatif**, aralık
+−1,00 … **+1,67 ms** saydı. T111 aynı sayımı **kendi AV1 çıktımızda** yaptı: sabit
+ofset (`PTS-STARTPTS`) çıkarıldıktan sonra kalan artık **139 kare tam −1,00 ms,
+180 kare negatif, aralık −1,00 … +1,67 ms** — üç sayı da birebir aynı. İki farklı
+kodlayıcının çıktısında aynı dağılımın çıkması bunun kodlayıcının değil
+**kaynağın** özelliği olduğunu söylüyor: 60 fps'lik katı ızgaraya oturan her çıktı
+aynı artığı üretir.
+
+Öyleyse 2721'i ayıran şey kaymanın orada olması değil, **hareketin** orada olması
+(`motion_sad` 0,052 → 1,012). Negatif kayma 139 karede de var; durgun ekranda
+`kare[n]` ile `kare[n−1]` neredeyse aynı olduğu için görünmüyor — mekanizma bu
+belgenin kendi `(b)` bölümünde yazılı. Ayakta kalan sonuç şu: **1 ms'lik negatif
+kayma tam kare kaydırıyor, ve kaydırma yalnız hareketli karede skora yansıyor.**
 
 ### Kusur AV1'e özgü değil — bu, sözleşmenin öncülünün ikinci düzeltmesi
 
@@ -443,8 +463,9 @@ Neden `settb=AVTB,setpts=N`, neden başka bir şey değil:
 - **Neden bir şey gerekiyor.** ffmpeg'in iki girdili filtreleri (`psnr`, `libvmaf`,
   `xpsnr`) kareleri **zaman damgasıyla** eşler: "damgası test karesinden küçük-eşit
   olan **en son** referans karesi". Yarım kareden küçük, tek yönlü bir sapma bile
-  tam bir kare kaydırma üretir. Sapma sabit olduğu için de kaydırma **her karede**
-  tekrarlanır.
+  tam bir kare kaydırma üretir. Sapmanın **işareti** sabit olduğu için de kaydırma
+  **her karede** tekrarlanır — büyüklüğünün sabit olması gerekmiyor, bu kaynakta
+  zaten sabit değil (−1,67 … −4,33 ms).
 - **Neden `setpts=N`.** Kareleri damgaya değil **sıraya** göre eşler. Kaynak ile
   çıktının kare sayısı aynı olduğu sürece — ki ölçüm bunu zaten varsayıyor —
   n'inci kare n'inci kareyle karşılaşır. Kare hızından bağımsızdır;
@@ -554,12 +575,28 @@ bırakılmıyor:
 
   Yani `settb` düşerse ölçü çöküyor, kare sayısı bile tutmuyor — ve süitteki 15
   ölçünün hiçbiri bunu görmüyor. Düzenek `tools/auto-mod-olcumu/t111-settb.sh`.
-- **`PTS-STARTPTS` hayatta çünkü bu kusuru gerçekten düzeltiyor.** İki akışı da
-  başlangıcına göre sıfırlıyor, sabit ofseti siliyor. `setpts=N`'i tercih etme
-  sebebi: damga *titreşimliyse* (kare başına değişen sapma) `PTS-STARTPTS`
-  yetmez, indeks kilidi yeter. Bu üstünlüğü **ölçemedim** — jitter'lı bir damga
-  dizisini bu ffmpeg sürümünde diske yazdıramadım (mkv/nut/avi üçü de CFR'ye
-  normalize etti), o yüzden almaşığın zayıflığı burada **gerekçe, kanıt değil**.
+- **`PTS-STARTPTS` hayatta çünkü sabit ofseti gerçekten siliyor — ama yetmiyor,
+  ve T111 bunu ölçtü.** T106 "damga titreşimliyse `PTS-STARTPTS` yetmez, indeks
+  kilidi yeter" diyor, sonra "bu üstünlüğü **ölçemedim**" diye ekliyordu; jitter'lı
+  bir damga dizisi *üretemediği* için. Üretmeye gerek yokmuş: **kaynağın kendi
+  damgası zaten titreşimli** (belgenin `(b)` bölümündeki 0,016/0,017/0,018
+  gözlemi). Aynı dosya çifti, tek fark filtre:
+
+  | filtre | ortalama | p10 | harmonik | en düşük kare | nerede |
+  |---|---|---|---|---|---|
+  | `settb=AVTB,setpts=N` (indeks kilidi) | 95,647 | 94,903 | 95,642 | **92,376** | 3411 |
+  | `settb=AVTB,setpts=PTS-STARTPTS` | 95,637 | 94,898 | 95,631 | **74,421** | **2721** |
+
+  Ortalamada fark **0,010** — üç metrikte de virgülden sonra ikinci hane. En kötü
+  karede fark **17,955 puan**. `PTS-STARTPTS` sabit ofseti siliyor, ortalamayı
+  kurtarıyor, ama **2721. karede** hâlâ yanlış eşliyor; indeks kilidinde o kare
+  temiz. Yani almaşığın zayıflığı artık gerekçe değil **ölçüm** — ve zayıflık
+  ortalamada değil kuyruğunda.
+
+  Aynı sayılar ikinci bir yoldan da çıktı: iki dosyanın ses akışı `-c copy` ile
+  atılıp ofsetler doğal olarak sıfırlanınca ölçü **birebir aynı** üç sayıyı verdi
+  (95,637 / 94,898 / 95,631, en düşük 74,421 @ 2721). İki yol aynı şeyi ölçüyor;
+  `PTS-STARTPTS` kap ofsetini sıfırlamaktan başka bir şey yapmıyor.
 
 ---
 
@@ -579,9 +616,15 @@ bırakılmıyor:
   `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor` (1100 geçti, 1 kaldı).
   Ölçü boş makinede ffmpeg hızını ölçüp `ProcessorCount-1` iş parçacığıyla yük
   bindirdikten sonrakiyle kıyaslıyor; altı ajan koşarken "boş" okuma boş değil.
-  İki bağımsız kanıtla eleme: tek başına koşturulunca **geçti**, ve aynı commit'te
-  **CI yeşil** (`33575828972`). Bu sözleşmenin dokunduğu hiçbir dosya
-  (`tools/VidShrink.Bench`) bu ölçünün yolunda değil.
+  Elemenin **tek** dayanağı var: ölçü tek başına koşturulunca **geçti**. T106 burada
+  ikinci bir kanıt olarak "aynı commit'te CI yeşil (`33575828972`)" yazıyordu; o
+  gerekçe **geçersiz ve geri çekiliyor** — `OlcumYukAltindaYalnizAgirlasiyor`
+  (`tests/VidShrink.Tests/PerformanceCheckTests.cs:393`) `[FfmpegFact]` ve CI
+  koşucusunda ffmpeg yok, yani o ölçü CI'da **hiç koşmuyor**; yeşil olması onun
+  hakkında hiçbir şey söylemiyor. Belge bunu kendi "kare kilidi CI'da korumuyor"
+  paragrafında zaten yazıyor, burada unutmuştu. Ayakta kalan destekleyici gözlem:
+  bu sözleşmenin dokunduğu hiçbir dosya (`tools/VidShrink.Bench`) bu ölçünün
+  yolunda değil.
 - **Süre sayısı verilmedi.** Makine altı ajanla paylaşımlıydı; kodlama koşumlarında
   iş parçacığı sabitlendi (`-threads 4`, `pools=4`, `lp=4`) ama süre yine de
   güvenilmez. Bu belgedeki **kalite ve boyut** sayıları paylaşımdan etkilenmez.
