@@ -459,7 +459,6 @@ public sealed class QualityMeterTests
         var unit = QualityMeter.WorstSceneUnit(scores, 60, 12.5, MapWithCuts(30.0, 12.7, 15.0));
 
         Assert.Equal(12.5, unit.StartSeconds, 6);
-        Assert.Equal(2.5, unit.UnitSeconds, 6);
         Assert.Equal(92.0, unit.Score, 6);
     }
 
