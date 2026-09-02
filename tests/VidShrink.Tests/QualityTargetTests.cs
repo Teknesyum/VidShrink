@@ -15,6 +15,8 @@ public sealed class QualityTargetTests
 
     private const double LadderStepThreshold = 1.0;
     private const double OneScanStep = 1.005;
+    private const double CrossingSearchStep = 1.002;
+    private const int CrossingSearchSteps = 40;
 
     private static MediaInfo SampleInfo() => new()
     {
@@ -136,6 +138,8 @@ public sealed class QualityTargetTests
         var worstCase = "";
         var undershoots = 0;
         var unexplained = new List<string>();
+        var worstSlack = 1.0;
+        var worstSlackCase = "";
         var report = new StringBuilder();
         report.AppendLine("# T57 ters cevirme sapmasi");
 
@@ -152,13 +156,34 @@ public sealed class QualityTargetTests
             report.AppendLine(FormattableString.Invariant(
                 $"{Path.GetFileName(info.FilePath)} {intent} {quality:0.0} -> {result.TargetMb:0.####} MB / {result.PredictedQuality:0.###} (sapma {result.QualityError:+0.###;-0.###;0}) {result.Evaluations} cagri"));
 
+            if (result.TargetMb > PlanCalculator.QualityFloorTargetMb(info) * 1.000001)
+            {
+                var slack = double.PositiveInfinity;
+                for (var step = 1; step <= CrossingSearchSteps; step++)
+                {
+                    var belowMb = result.TargetMb / Math.Pow(CrossingSearchStep, step);
+                    if (QualityAt(info, options, belowMb) < quality)
+                    {
+                        slack = result.TargetMb / belowMb;
+                        break;
+                    }
+                }
+
+                if (slack > worstSlack)
+                {
+                    worstSlack = slack;
+                    worstSlackCase = FormattableString.Invariant(
+                        $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0} -> {result.TargetMb:0.####} MB");
+                }
+            }
+
             if (error > LadderStepThreshold)
             {
-                var belowMb = result.TargetMb / OneScanStep;
-                var below = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = belowMb, Intent = intent }, null).Plan;
+                var stepMb = result.TargetMb / OneScanStep;
+                var below = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = stepMb, Intent = intent }, null).Plan;
                 var here = result.Plan!.Plan;
                 report.AppendLine(FormattableString.Invariant(
-                    $"  basamak: {belowMb:0.####} MB {below.Width}x{below.Height}@{below.Fps:0.##} -> {result.TargetMb:0.####} MB {here.Width}x{here.Height}@{here.Fps:0.##}"));
+                    $"  basamak: {stepMb:0.####} MB {below.Width}x{below.Height}@{below.Fps:0.##} -> {result.TargetMb:0.####} MB {here.Width}x{here.Height}@{here.Fps:0.##}"));
                 if (below.Width == here.Width && below.Height == here.Height && Math.Abs(below.Fps - here.Fps) < 0.01)
                     unexplained.Add(FormattableString.Invariant(
                         $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0}: sapma {error:0.###} ama yerlesim {here.Width}x{here.Height}@{here.Fps:0.##} degismedi"));
@@ -172,7 +197,7 @@ public sealed class QualityTargetTests
             }
         }
 
-        report.AppendLine(FormattableString.Invariant($"en kotu sapma {worst:0.###} puan ({worstCase}), {undershoots} eksik kalma, {unexplained.Count} aciklanmayan"));
+        report.AppendLine(FormattableString.Invariant($"en kotu sapma {worst:0.###} puan ({worstCase}), {undershoots} eksik kalma, {unexplained.Count} aciklanmayan, en genis bosluk {worstSlack:0.#####} ({worstSlackCase})"));
         _output.WriteLine(report.ToString());
         Write(report.ToString());
 
@@ -180,10 +205,20 @@ public sealed class QualityTargetTests
         // lands under it - the undershoot count is asserted at zero rather than tolerated.
         Assert.Equal(0, undershoots);
 
-        // Every overshoot past the old 1,0 gate has to be a step in the layout ladder, not a
-        // search that stopped early: one scan step below the returned target the plan must be a
-        // different layout. This is the claim the loosened gate below rests on, and it is
-        // asserted rather than assumed.
+        // The returned target has to sit just above where the request is actually crossed. Walking
+        // down from it in 0,2% steps, a target that fails the request must turn up within 1% -
+        // measured worst is 1,00601 (sample.mp4 Sharing, request 63,5), a little over the 0,5%
+        // scan step. This is the gate on the search itself, and it is stated in target size, not
+        // in quality points, because the quality gate below is the ladder's height and cannot see
+        // a search that stopped early. Coarsening QualityScanStep to 1,2 breaks it (1,611%);
+        // coarsening it only to 1,05 does not, because the four bisections cut that 5%
+        // bracket back to 0,305% and the search is still sharp enough.
+        Assert.True(worstSlack <= 1.01,
+            $"Donen hedef gecis noktasinin {(worstSlack - 1) * 100:0.###}% uzerinde: {worstSlackCase}");
+
+        // Every overshoot past the old 1,0 gate has to be a step in the layout ladder: one scan
+        // step below the returned target the plan must be a different layout. This is the claim
+        // the loosened quality gate below rests on, and it is asserted rather than assumed.
         Assert.True(unexplained.Count == 0,
             $"{unexplained.Count} istekte 1,0 puani asan sapma yerlesim degisimiyle aciklanmiyor: {string.Join(" ; ", unexplained.Take(5))}");
 

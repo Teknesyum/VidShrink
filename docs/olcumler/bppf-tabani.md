@@ -523,6 +523,16 @@ istek var ve dokuzu da böyle bir basamak:
 Yani aşım aramanın erken durmasından değil, merdivenin basamağından. "Eksik kalma
 sıfır" iddiası olduğu gibi duruyor.
 
+Aramanın kendisi ayrı bir geçitle tutuluyor ve bu geçit **puanla değil hedef boyutla**
+konuşuyor, çünkü puan geçidi merdivenin yüksekliği kadar gevşek ve erken duran bir
+aramayı göremez: dönen hedeften aşağı %0,2 adımlarla inildiğinde isteği karşılayamayan
+bir hedef **%1 içinde** çıkmalı. Ölçülen en geniş boşluk 1,00601 (`sample.mp4` Sharing,
+istenen 63,5) — %0,5'lik tarama adımının biraz üstü. Mutasyon: `QualityScanStep`
+1,005 → 1,2 yapılınca boşluk %1,611'e çıkıyor ve ölçü kırılıyor. Aynı sabit 1,05'e
+çekildiğinde ölçü **kırılmıyor** — ve kırılmaması doğru: dört bölme adımı %5'lik
+pencereyi %0,305'e indiriyor, arama o hâlde de yeterince keskin. Puan geçidi
+(≤ 3,5) her iki mutasyonu da göremiyordu; boyut geçidi birini görüyor.
+
 ### 8.5.4 Denenip ölçüyle çürütülen daha sıkı iddia
 
 Önce şu iddia yazıldı: "dönen hedefin %0,1 altındaki hedef isteği karşılayamamalı" —
