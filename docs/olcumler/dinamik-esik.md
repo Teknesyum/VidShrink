@@ -82,8 +82,9 @@ sayım başka düzeylerde. Öneri listesindeki "kare arası hareket miktarı" ay
 girdi olarak ölçülmedi; sahne skorunun kendisi kare arası fark ölçüsüdür ve
 A-\* ailesi onun dağılımını kullanır — **ayrı bir hareket vektörü ölçülmedi.**
 
-Beş aday kalibrasyonda 0,977'de eşit. Ayrımı sınama kümesi yaptı: A-p90 0,962,
-en yakın rakip 0,921, üçü 0,886'da sabit eşikle aynı yere düşüyor.
+Altı aday kalibrasyonda 0,977'de eşit — kalibrasyon tek başına seçemiyor.
+Ayrımı sınama kümesi yaptı: A-p90 0,962, en yakın rakip 0,921; kalan dördü
+0,867 – 0,921 arasında, yani sabit eşiğin 0,886'sının etrafında dağılıyor.
 
 **Eşitlik bozmanın payı ölçüldü.** Kalibrasyon tepesinde birden çok yapılandırma
 var; hangisinin seçildiği sınama sonucunu oynatıyor. Tepede eşit yapılandırmalar
