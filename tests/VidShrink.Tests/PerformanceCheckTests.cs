@@ -355,7 +355,7 @@ public sealed class PerformanceCheckTests
     /// Yuk altinda maliyetin bos okumanin altina dusmedigi sayilan alt sinir.
     /// Olcum gurultusune pay; yon hatasi bu payin cok otesinde durur.
     /// </summary>
-    private const double YonPayi = 0.8;
+    private const double YonPayi = 0.9;
 
     /// <summary>
     /// K1: olcum makine yukune ne kadar dayanikli, ve <b>nerede dayanmiyor</b>.
