@@ -452,4 +452,47 @@ public sealed class EncodeRunnerDroppedOptionTests
         Assert.Equal(0, outcome.ExitCode);
         Assert.Contains(outcome.DroppedOptions, line => line.Contains("zzznotreal"));
     }
+
+    /// <summary>
+    /// Karar: dusurulen ayar kodlamayi <b>oldurmez</b>. Kullanicinin elindeki dosya
+    /// calisiyor; onu atmak sessiz kalite kaybindan daha buyuk bir zarar.
+    /// </summary>
+    [Fact]
+    public void ADroppedOptionNeverFailsTheDeliveryPath()
+    {
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in FfmpegRunnerTests.X265DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+
+        var outcome = watch.Close(0);
+
+        Assert.NotEmpty(outcome.DroppedOptions);
+        EncodeRunner.ThrowIfFailed(outcome);
+    }
+
+    /// <summary>Karar simetrik: dusurulen ayar bir kosumu kurtarmaz da.</summary>
+    [Fact]
+    public void ANonZeroExitStillFailsWhateverTheDiagnosticSays()
+    {
+        var clean = new EncodeRunner.StderrWatch();
+        clean.Line("x265 [warning]: Too few rows/columns, --wpp disabled");
+        Assert.Throws<InvalidOperationException>(() => EncodeRunner.ThrowIfFailed(clean.Close(3)));
+
+        var dropped = new EncodeRunner.StderrWatch();
+        dropped.Line("[libx265 @ 0] Unknown option: zzznotreal.");
+        Assert.Throws<InvalidOperationException>(() => EncodeRunner.ThrowIfFailed(dropped.Close(3)));
+    }
+
+    /// <summary>Ayni karar dusuk seviyeli kosucuda da: <c>Ok</c> yalniz cikis koduna bagli.</summary>
+    [Fact]
+    public void TheLowLevelRunnerKeepsOkIndependentOfTheDiagnostic()
+    {
+        var dropped = FfmpegRunner.Decide(0, FfmpegRunnerTests.X264DroppedKey, TimeSpan.Zero);
+        Assert.True(dropped.Ok);
+        Assert.True(dropped.DroppedAnOption);
+
+        var failed = FfmpegRunner.Decide(3, FfmpegRunnerTests.X264DroppedKey, TimeSpan.Zero);
+        Assert.False(failed.Ok);
+        Assert.True(failed.DroppedAnOption);
+    }
 }

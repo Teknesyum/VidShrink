@@ -186,3 +186,48 @@ başarılı koşumun **üçü de** düşürülmüş sayılırdı. K5'te bu tam o
 
 Sözlüğün dar tutulmasının ikinci gerekçesi K2'de: çıkış kodu sıfırdan farklı olan iki desen
 dışarıda bırakıldı, çünkü genişlik burada bedava değil.
+
+## K4 — Karar: öldürme, bildir
+
+| Koşucu | Tanılı hata bulununca | Gerekçe |
+|---|---|---|
+| `EncodeRunner` (teslim dosyası) | Koşum **başarılı** sayılır; düşürülen satırlar `EncodeResult.DroppedOptions` ile taşınır | Dosya çalışıyor, yalnız bir psikogörsel ayarı taşımıyor. Koşumu öldürmek kullanıcıya **hiç dosya vermemek** demek; K3'ün dediği gibi bu, sessiz kalite kaybından büyük bir zarar |
+| `FfmpegRunner` (önizleme borusu) | `Ok` değişmez; satırlar `FfmpegRun.DroppedOptions` ile taşınır | Aynı gerekçe, üstüne: tek tüketici `SegmentEncoder` önizleme koşturuyor, düşen bir ayar yüzünden önizlemeyi karartmak kullanıcıyı sebepsiz bloklar |
+
+Karar iki koşucuda **aynı**. Sözleşme farklı olabileceğini söylüyordu; farklı yapmak için
+bir gerekçe bulamadım — ikisinde de düşürülen ayar, koşumun kendisi hakkında değil,
+koşumun *ne kadarının uygulandığı* hakkında bilgi. Bunu başarısızlığa çevirmek her iki
+tarafta da çalışan işi atmak olurdu.
+
+Kararı tutan üç ölçü:
+
+- `ADroppedOptionNeverFailsTheDeliveryPath` — çıkış 0 + düşürülen ayar → `ThrowIfFailed` fırlatmıyor.
+- `ANonZeroExitStillFailsWhateverTheDiagnosticSays` — karar simetrik: düşürülen ayar bir koşumu kurtarmıyor da (çıkış 3, iki yönde de fırlatıyor).
+- `TheLowLevelRunnerKeepsOkIndependentOfTheDiagnostic` — `Ok` yalnız çıkış koduna bağlı; `DroppedAnOption` ondan bağımsız dolabiliyor.
+
+### Kararın bugünkü sınırı — iki borç
+
+**1. `-loglevel error` altında tanı hiç görünmüyor.** Ölçüldü:
+
+```
+ffmpeg -hide_banner -loglevel error … -c:v libx265 -x265-params zzznotreal=1 …
+→ çıkış kodu 0, stderr tamamen boş
+ffmpeg -hide_banner -loglevel error … -c:v libx264 -x264-params zzznotreal=1 …
+→ çıkış kodu 0, stderr tamamen boş
+ffmpeg -hide_banner -loglevel error … -c:v libsvtav1 -svtav1-params zzznotreal=1 …
+→ çıkış kodu 0, yalnız SVT'nin kendi Svt[info] banner'ı; tanı satırı yok
+```
+
+Yani üç kodlayıcının da bu tanısı **uyarı seviyesinde ya da altında** basılıyor.
+`SegmentEncoder.cs:176` tam olarak `-loglevel error` kullanıyor. Sonuç: `FfmpegRunner`e
+eklenen taşıma bugünkü tek tüketicisi için **atıl** — kod doğru, ama önizleme yolunun
+göreceği bir şey yok. `SegmentEncoder.cs` bu sözleşmenin `owns` kümesi dışında,
+loglevel'ine dokunulmadı. Borç.
+
+`EncodeRunner` bu sorunu taşımıyor: `FfmpegArguments.cs:364` `-loglevel` vermiyor, yani
+varsayılan `info` seviyesinde koşuyor ve tanıyı görüyor. Gerçek ffmpeg koşumuyla pimlendi
+(`ARealEncodeThatDropsAnOptionReportsTheDrop`).
+
+**2. Taşıma `EncodeResult`ta duruyor, arayüze çıkmıyor.** Kullanıcıya uyarı göstermek
+`src/VidShrink.App` altında bir değişiklik ister; orası `owns` dışında. Veri teslim
+noktasına kadar geliyor, gösterilmesi ayrı bir iş. Borç.
