@@ -62,12 +62,12 @@ public static class Program
         Baslik("1. Derleme listesi ile gercek yoklama ayrisiyor mu");
         var caps = TazeYetenek();
         Console.WriteLine($"ffmpeg {caps.Version}");
-        Console.WriteLine("kodlayici      HasEncoder  WorksAsEncoder  yoklama_ms");
+        Console.WriteLine("kodlayici      HasEncoder  WorksAsEncoder  Durum        yoklama_ms");
         foreach (var codec in HardwareCandidates)
         {
             var has = caps.HasEncoder(codec);
             var probe = caps.Probe(codec);
-            Console.WriteLine($"{codec,-14} {has,-11} {probe.Succeeded,-15} {probe.ElapsedMs}");
+            Console.WriteLine($"{codec,-14} {has,-11} {probe.Succeeded,-15} {probe.State,-12} {probe.ElapsedMs}");
         }
     }
 
