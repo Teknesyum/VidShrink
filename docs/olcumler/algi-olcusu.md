@@ -1059,7 +1059,7 @@ koşması ayrı bir işe (T115) alındı.
 >
 > Bu okunarak değil **ölçülerek** saptandı: `VmafPoolingTests.cs`'in ad uzayı ve
 > `using` kümesi birebir kopyalanıp `typeof(MeasureFilterGraph)` yazdırıldı
-> (`.calisma/T116/adcozum/`, `dotnet run --project .calisma/T116/adcozum/adcozum.csproj`):
+> (`dotnet run --project tools/cipa-yeniden/duzenek/adcozum/adcozum.csproj`):
 >
 > ```
 > tur      : MeasureFilterGraph
