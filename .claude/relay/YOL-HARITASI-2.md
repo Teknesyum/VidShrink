@@ -412,6 +412,44 @@ calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
    yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
    dinamiklik ilkesinin en somut adayı.
 
+## Ilk adil A/B: geridiyiz (T95, 2026-09-02, denetimde)
+
+Aylardır HandBrake'i çıktısından tanıyorduk. T95 ilk **adillik kapılı** A/B
+aletini kurdu ve altı çift ölçtü. Sonuç ürünün hedefine ters:
+
+| Hedef | HandBrake | VidShrink |
+|---|---:|---:|
+| 60 MB (harmonik) | 28,70 | 18,98 |
+| 600 MB (harmonik) | 67,96 | 58,83 |
+
+**Altı çiftin beşinde HandBrake önde.** Bu sayıya güvenmeden önce üç çekince var
+ve üçü de denetimde:
+
+1. **Manşet ölçüt harmonik ortalama** ve harmonik ortalama T106'da soruşturma
+   altında. Ajanın kendi tablosunda bir satırda kare minimumu **0,00** duruyor —
+   matematiksel olarak tek sıfır harmonik ortalamayı sıfıra çeker, demek ki bir
+   taban kıskacı var. Kıskacın manşeti ne kadar biçimlendirdiği ölçülmedi.
+2. **60 MB satırları kendi eş boyut kapısını geçmiyor.** Kapı ±%2, VidShrink'in
+   üç satırı da −%3,13 / −%8,61 / −%3,17. Kapı kendi kuralına göre o
+   karşılaştırmayı geçersiz sayar.
+3. **Parça kipi iyimser.** 600 MB'da parça kestirimi 58,83, tam koşum 47,78 —
+   sapma **+11,05**. K6'nın sayıları parça kipinden geliyorsa mutlak iddia
+   kurulamaz.
+
+Yine de **yön haber değeri taşıyor** ve ölçüm iki gerçek tuzağı yakaladıktan
+sonra alındı: HandBrake preset'inin otomatik kırpması 1920x1072 üretiyordu (aynı
+satır düzeltilince 20,27 → 93,70), ve parçaların biri ses taşırken öteki
+taşımıyordu — bütçe eşitsiz bölünüyordu. İkisi de ölçüyü haksız yapıyordu, ikisi
+de ajanın kendi bulgusu.
+
+**Bütçeyi bitirmiyoruz.** 60 MB hedefinde üç satırın üçü de hedefin altında
+kalıyor. Daha az bit harcayıp daha düşük puan almak, kalite açığının bir kısmını
+tek başına açıklayabilir — ama **bu bir hipotez, ölçülmedi.** Nedensel bağı
+kurmak için eş boyutta yeniden ölçmek gerekir.
+
+Bu bulgu T112'yle kavuşuyor: bir taraf HandBrake'in **çıktısını** ölçüyor, öteki
+**kaynağını** okuyor. Açığın büyüklüğünü T95, sebebini T112 verecek.
+
 ## Duzenek tools'a ulasamiyor — ikinci tekrar (T105, T98)
 
 `AGENTS.md` diyor ki: ölçümü üreten düzenek `tools/` altına taşınır. Ama `owns`
