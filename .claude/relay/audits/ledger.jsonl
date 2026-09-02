@@ -148,3 +148,6 @@
 {"id":"T120","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:05:12.820Z"}
 {"id":"T129","result":"stale","at":"2026-09-02T07:15:19.440Z"}
 {"id":"T130","result":"stale","at":"2026-09-02T07:15:19.440Z"}
+{"id":"T117","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|FrameGrabberTests","code":0}],"auditorRunId":null,"headSha":"e673d2048206054c02b4d3ec62e837dfc1a52cb5","at":"2026-09-02T07:45:20.587Z"}
+{"id":"T119","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"VmafPoolingTests|QualityMeterTests","code":0}],"auditorRunId":null,"headSha":"e673d2048206054c02b4d3ec62e837dfc1a52cb5","at":"2026-09-02T07:46:06.645Z"}
+{"id":"T122","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"VmafPoolingTests","code":0}],"auditorRunId":"aeec64989210612ce","headSha":"e673d2048206054c02b4d3ec62e837dfc1a52cb5","at":"2026-09-02T07:47:12.197Z"}

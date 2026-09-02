@@ -1,0 +1,24 @@
+{
+  "contractId": "T113",
+  "auditorRunId": "a1137321645fa0a91",
+  "headSha": "e673d2048206054c02b4d3ec62e837dfc1a52cb5",
+  "diffHash": "5fd3c0232d17e75172881926344f5393ef6df3f7c76ebd8da6212d3dd51f9ef8",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.Core/PreviewSegment.cs",
+    "src/VidShrink.Ffmpeg/EncodeRunner.cs",
+    "src/VidShrink.Ffmpeg/SegmentEncoder.cs",
+    "src/VidShrink.App/PanelHost.cs",
+    "tests/VidShrink.Tests/EncodeRunnerTests.cs",
+    "tests/VidShrink.Tests/PreviewSegmentTests.cs",
+    "docs/olcumler/harita-baglantisi.md",
+    "tools/harita-baglantisi/**",
+    "docs/olcumler/sahne-haritasi.md",
+    "tools/sahne-yer-gercegi/**"
+  ],
+  "verification": [
+    "Zincir kaynagindan ciktisina kadar bagimsiz izlendi; sekiz cagirma noktasinin hicbirinde null dusmuyor, RunAsync'in iki kodlama kolu da haritayi tasiyor. Baglanti gercekten ciktiyi degistiriyor: haritali 5,0 sn -> -g 150, haritasiz 10,0 sn -> -g 300. Denetci iki mutasyonu kendi uyguladi (EncodeRunner.cs:341 scenes->null, SegmentEncoder.cs:126 dusuruldu), ikisi de oldu ve iddia edilen olculeri kirdi; temiz agacta 0 kirmizi / 98 yesil. Olctugu commit dogru: 97ae59f ile 06c1e97 arasinda kaynak ve testler bayt bayt ayni. CI 33597703249 basarili, Failed 0 / Passed 1080 / Skipped 107 / Total 1187. Kronik kusur (a) taramasi: iki bolumun her yuzdesi yeniden hesaplandi, sapma yok. Dokuz borc kaydedildi; owns ihlali (FfmpegArgumentsTests.cs:408) T0 karariyla korundu."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:39:23.408Z"
+}
