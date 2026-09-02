@@ -405,9 +405,45 @@ calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
 8. **T108** — tepe eğrisi. T98 ölçtü ve eğrinin şekli ölçümle ters göründü:
    aşma kanıtının geldiği ~11,4×'te geniş, açmanın +3,665 puan kazançlı
    ölçüldüğü ~4,6×'te 1,02'ye kilitli. T98 mühürlenince açılır.
-9. **Eşik içerikten türetilir.** T105 ölçtü: durgun ve hareketli pencere ters
+9. **T111** — T102'nin sekiz sayısı kaymış eşlemeyle ölçüldü. Uzman açığı
+   (+0,400) ayakta, HandBrake karşılaştırması değil. T110 kilidi inince
+   yeniden ölçülür.
+10. **Eşik içerikten türetilir.** T105 ölçtü: durgun ve hareketli pencere ters
    yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
    dinamiklik ilkesinin en somut adayı.
+
+## Muhurlenmis bir olcum kirli cikti (T102 x T106, 2026-09-02)
+
+T102 mühürlendi ve iyi iş yaptı. **Ama ölçüldüğü boru hattı kaymış** ve bunu
+ölçen T106'ydı — T102 kapandıktan sonra.
+
+T106 denetçisi T102'nin ham verisinden doğrudan saydı (`.calisma/t102/vmaf/*.json`):
+**altı AV1 koşumunun `<1,0` kümesi birebir özdeş, iki x265/HandBrake koşumunda boş.**
+Sebep T110'un konusu: kaynağın video akışı `0,020000 s`'de başlıyor, bizim ffmpeg
+çağrımız çıktıyı `0,016667 s`'ye taşıyor, framesync her kareyi komşusuyla eşliyor.
+HandBrake `start_time`'ı düşürmüyor — o yüzden temiz.
+
+Yani T102'nin tablosunda **iki ayrı sınıf koşum yan yana duruyor**:
+
+| Karşılaştırma | Durum |
+|---|---|
+| auto ↔ uzman-biz (ikisi de AV1) | muhtemelen sağlam — yanlılık iki tarafta da var |
+| y1 ↔ y2 ↔ y3 (üçü de AV1) | muhtemelen sağlam — aynı gerekçe |
+| auto ↔ uzman-handbrake | **sağlam değil** — bir taraf kaymış, öteki değil |
+
+Bu, iki sonucu ayırıyor. **+0,400'lük uzman açığı ayakta** — AV1 ile AV1
+karşılaştırılıyor, ceza iki tarafta da aynı. Ama **auto 94,462 ↔ uzman-hb2 95,731**
+karşılaştırması ayakta değil; o 1,269 puanın içinde yalnız bizim tarafın ödediği
+bir ceza var ve **düzeltmenin büyüklüğü ölçülmedi.** İddia edilmez.
+
+"Muhtemelen" kelimesi bilerek duruyor: kümenin özdeş olması yanlılığın **aynı
+yönde** olduğunu gösterir, **aynı büyüklükte** olduğunu göstermez. **T111** bunu
+ölçüyor.
+
+Kural: **bir ölçümün mührü, ölçen aletin geçerliliğini mühürlemez.** T102 kendi
+kabul kriterlerinin hepsini geçti; kusur kriterlerde değil, hepsinin altındaki
+alettteydi. Alet sonradan sorgulandığında **mühürlenmiş sayılar yeniden açılır** —
+mühür geriye dönük bir doğruluk garantisi değil, o günkü kanıtın kaydıdır.
 
 ## Değişmeyen kurallar
 
