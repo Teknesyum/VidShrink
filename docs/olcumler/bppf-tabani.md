@@ -414,6 +414,137 @@ hevc ile h264 arasındaki bir bppf'te hevc geçiyor, h264 eleniyor. Sayı yazıl
 `CodecModel.FloorBppf("libx264")` çağrısına çevrildi — ölçtüğü şey ölçülmemiş profilin
 tabanı oynatmaması, 0.035 sayısının kendisi değil.
 
+## 8.5 Tur 2: CI'da düşen üç ölçü
+
+Tur 1 yerelde yeşildi ama CI kırmızı döndü — run `33575858190`, commit `293ced8`,
+`Failed: 3, Passed: 1020, Skipped: 81, Total: 1104`. Ne sözleşmenin `verify` filtresi
+(`PlanCalculatorTests|ComplexityScanTests`) ne de denetimin geniş filtresi bu üç
+ölçüden birine değiyordu. Üçü de üretim kodunun kusuru değil; üçü de tur 1'in
+değiştirdiği iki sabitin görülmemiş sonucu. **Bu turda `src/` altında tek satır
+değişmedi**, yalnız üç ölçü düzeltildi.
+
+Hangi sabitin hangi ölçüyü düşürdüğü tek tek ayrıştırıldı: her sabit tek başına eski
+değerine döndürülüp ölçü yeniden koşuldu.
+
+| Ölçü | Sebep | Taban geri alınınca | Üstel geri alınınca |
+| --- | --- | --- | --- |
+| `ChipTests.KatliGerekceBasligiSayiyiSoyler` | taban | 9 gerekçe (eski hâl) | 7 (değişmez) |
+| `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched` | hareket üsteli | 12 satır hâlâ değişik | 18/18 eski listeyle birebir |
+| `QualityTargetTests.SearchLandsWithinTheMeasuredTolerance` | hareket üsteli | sapma 3,375 (değişmez) | sapma ≤ 1,0, eski geçit tutuyor |
+
+### 8.5.1 Gerekçe sayısı 9'dan 7'ye düştü — kaybolan iki satır
+
+Ölçü 4K/60 örneğinde (`ChipTests.Sample()`, 3840x2160@59,94, 420 MB, 187,5 sn,
+hedef 16 MB) katlı gerekçe başlığının `"Why These Choices · 9"` demesini bekliyordu.
+
+Kaybolan iki satır **aynı olgunun iki yüzü**: kare hızı kesintisi.
+
+- `AdviceCode.FrameRateReduced` strateji satırı — "Frame Rate Was Lowered To Free
+  Bits For The Frames That Remain."
+- `ReasonCode.FrameRateReduced` gerekçe satırı — "Frame Rate Reduced To 39.96 To
+  Keep Per-frame Detail"
+
+Taban av1'de 0,020 × 1,25 = 0,025'ten 0,0095 × 1,52 = 0,01444 bppf'e inince 59,94 fps
+artık taban altında kalmıyor, plan kare hızını hiç kesmiyor ve iki satır birden
+düşüyor. **Bu tam olarak sözleşmenin istediği sonuç**: taban, kaynağın kendi kare
+hızındaki yerleşimi elemeyi bıraktı.
+
+Kalan yedi satır eskisiyle birebir aynı; yerleşim 922x518@39,96'dan
+**1306x734@59,94**'e, tahmini kalite **68,9'dan 74,4**'e çıktı. `TargetBelowCodecFloor`
+notu ne eski ne yeni hâlde vardı — kaybolan o değil. 1080p30 örneğinde
+(`ChipTests.Modest()`) sayı altı ve değişmedi.
+
+Ölçü artık sabit sayıyı tek başına tutmuyor: başlıktaki sayının listedeki madde
+sayısıyla aynı olduğu da iddia ediliyor, yani başlığın listeyi yanlış sayması da kırar.
+
+### 8.5.2 Altın parmak izinin 12 satırı değişti — sebep hareket üsteli
+
+`SpeedModeTests.QualityModeLeavesTodaysPlansUntouched` 18 satırlık bir liste tutuyor
+(üç kodlayıcı tercihi × üç hedef boyut × iki doldurma politikası). On ikisi değişti.
+
+**Değişimin tamamı `ComplexityProfile.DefaultMotionExponent` 0,25 → 0,871'den geliyor.**
+Taban değişikliği bu listede tek satır bile oynatmadı: yalnız `CodecModel` sabitleri
+eski değerine alınınca liste yine bugünkü hâline çıkıyor, yalnız üstel eski değerine
+alınınca liste 18/18 eski beklentiyle birebir oturuyor.
+
+0,25'te kare hızını yarıya indirmek bitlerin %40,5'ini kurtarıyor görünüyordu; T89'un
+ölçtüğü 0,871'de kurtardığı **%8,6**. Kare hızı kesmek artık yer açmadığı için arama
+kesmiyor. Değişen satırların hepsi bu yönde:
+
+| Satır | Eski | Yeni |
+| --- | --- | --- |
+| `Compatible\|25\|FillTarget` | 806x454@20 | 806x454@30 |
+| `Compatible\|25\|QualityCeiling` | 806x454@20 | 806x454@30 |
+| `Compatible\|8\|FillTarget` | 576x324@6 | 576x324@30 |
+| `Compatible\|8\|QualityCeiling` | 576x324@6 | 576x324@30 |
+| `MaxCompression\|25\|FillTarget` | 806x454@20 | 806x454@30 |
+| `MaxCompression\|25\|QualityCeiling` | 806x454@20 | 806x454@30 |
+| `MaxCompression\|8\|FillTarget` | 614x346@6 | 576x324@30 |
+| `MaxCompression\|8\|QualityCeiling` | crf 32 / 433k / 614x346@6 | 2pass / 470k / 576x324@30 |
+| `Auto\|25\|FillTarget` | 806x454@20 | 806x454@30 |
+| `Auto\|25\|QualityCeiling` | 806x454@20 | 806x454@30 |
+| `Auto\|8\|FillTarget` | 614x346@6 | 576x324@30 |
+| `Auto\|8\|QualityCeiling` | crf 32 / 433k / 614x346@6 | 2pass / 470k / 576x324@30 |
+
+Değişmeyen altı satırın hepsi 180 MB hedefinde: o bütçede zaten kare hızı
+kesilmiyordu. Liste yenilendi, değişen her satır burada ve ölçünün kendi belgesinde
+yazılı.
+
+### 8.5.3 Ters çevirme sapması 0,833'ten 3,375 puana çıktı
+
+`QualityTargetTests.SearchLandsWithinTheMeasuredTolerance` istenen kaliteyi hedef
+boyuta çeviriyor ve dönen hedefin ne kadar aştığını ölçüyor. Geçit 1,0 puandaydı
+(ölçülen 0,833'ün yukarı yuvarlanmışı). Şimdi ölçülen en kötü sapma **3,375 puan**:
+`capture.mkv` Sharing, istenen 55,5 → 23,2606 MB / **58,875**.
+
+Sebep taban değil, yine hareket üsteli. Hedefi 0,1 MB adımlarla tarayınca:
+
+| Hedef | Kazanan yerleşim | Tahmini kalite |
+| --- | --- | --- |
+| 23,2 MB | 306x172@30 | 55,49 |
+| 23,3 MB | 358x202@6 | 58,875 |
+
+İkisinin arasında bir şey seçen hedef yok — merdivenin o basamağı 3,385 puan
+yüksekliğinde. Üstel 0,25'ken 30 fps ile 6 fps yerleşimleri birbirinden uzaktı;
+0,871'de puanları birbirine yaklaştı ve basamak oluştu. Taban sabitleri tek başına eski
+değerine alınınca bu tarama **hiç** değişmiyor.
+
+Geçit ölçülen en kötüye (3,5) çekildi, ama ölçü sabit güncellemesine indirgenmedi:
+1,0 puanı aşan her istek için, dönen hedefin bir tarama adımı (%0,5) altındaki planın
+**farklı bir yerleşim** olduğu ayrıca iddia ediliyor. Bu taramada 1,0'ı aşan dokuz
+istek var ve dokuzu da böyle bir basamak:
+
+```
+0,3272 MB 130x230@40  -> 0,3288 MB 150x268@6     (phone.mp4, iki istek)
+23,1449 MB 306x172@30 -> 23,2606 MB 358x202@6    (capture.mkv, beş istek)
+27,1633 MB 306x172@30 -> 27,2991 MB 358x202@6    (capture.mkv, iki istek)
+```
+
+Yani aşım aramanın erken durmasından değil, merdivenin basamağından. "Eksik kalma
+sıfır" iddiası olduğu gibi duruyor.
+
+### 8.5.4 Denenip ölçüyle çürütülen daha sıkı iddia
+
+Önce şu iddia yazıldı: "dönen hedefin %0,1 altındaki hedef isteği karşılayamamalı" —
+yani arama gerçekten en küçük hedefi buluyor. Ölçü bunu **çürüttü**: tahmini kalite
+hedef boyutta yüzde-altı ölçekte tekdüze değil.
+
+`capture.mkv` Sharing, 204,3 MB civarı, hedefi 0,02 MB adımlarla:
+
+| Hedef | Ses | Video | Yerleşim | Kalite |
+| --- | --- | --- | --- | --- |
+| 204,31 MB | 84k | 383k | 818x460@30 | 79,915 |
+| 204,33 MB | 85k | 382k | 818x460@25 | 78,995 |
+| 204,43 MB | 85k | 382k | 818x460@25 | 78,995 |
+| 204,45 MB | 85k | 382k | 818x460@30 | 79,915 |
+
+Hedef büyürken ses merdiveni 84k'dan 85k'ya çıkıyor, videodan bir kbit çalıyor ve
+382k penceresinde 25 fps yerleşimi 30 fps'i geçiyor. Yaklaşık 0,12 MB (%0,06)
+genişliğinde bir ada. Bu ada `PickAudio`'nun kademesinden geliyor, tabandan değil;
+T99'un kapsamı dışında ve kendi işine bırakıldı. Aynı sebep %0,5 payda iki istek daha
+düşürüyor (`sample.mp4`, istenen 62,5). İddia bu yüzden yazılmadı — yanlış olduğu
+ölçüldü.
+
 ## 9. Notlar
 
 **Sözleşmenin `verify` filtresi bu turun ölçülerinin tamamını kapsamıyor.** Filtre

@@ -197,7 +197,7 @@ public sealed class ChipTests
 
     /// <summary>
     /// T46/K6: gerekçeler katlıyken plan paneli tipik durumda kaymıyor. İki girdide de
-    /// ölçüldü — 4K/60 (dokuz gerekçe) ve 1080p30 (altı gerekçe). Metin kısaltılmadı,
+    /// ölçüldü — 4K/60 (T99'dan beri yedi gerekçe, önce dokuzdu) ve 1080p30 (altı gerekçe). Metin kısaltılmadı,
     /// yalnız katlandı; <c>PlanScroll</c> uzun listede taşma supabı olarak duruyor.
     /// </summary>
     [Theory]
@@ -215,14 +215,31 @@ public sealed class ChipTests
         Assert.True(content <= viewport, $"icerik={content:0.##} gorunur={viewport:0.##}");
     }
 
-    /// <summary>Katlıyken gerekçe listesi görünmez, başlığı sayıyı söyler.</summary>
+    /// <summary>
+    /// Katlıyken gerekçe listesi görünmez, başlığı listenin uzunluğunu söyler. İki iddia
+    /// var: başlıktaki sayı listedeki madde sayısıyla aynı olmak zorunda, ve bu örnekte o
+    /// sayı yedi.
+    ///
+    /// <para>T99'a kadar yediydi<b>ler</b> değil dokuzdu. Taban av1'de 0,020×1,25 = 0,025
+    /// bppf'ten 0,0095×1,52 = 0,01444'e inince 4K/60 kaynağı kendi kare hızında kalabilir
+    /// hâle geldi; kare hızı kesintisini anlatan iki satır birden düştü —
+    /// <c>AdviceCode.FrameRateReduced</c> strateji satırı ("frame rate was lowered...") ve
+    /// <c>ReasonCode.FrameRateReduced</c> gerekçe satırı ("frame rate reduced to 39.96...").
+    /// Kaybolan başka bir şey yok: kalan yedi madde eskisiyle birebir aynı,
+    /// yalnız yerleşim 922x518@39,96'dan 1306x734@59,94'e ve tahmini kalite 68,9'dan
+    /// 74,4'e çıktı. 1080p30 örneğinde (<see cref="Modest"/>) sayı altı, değişmedi.</para>
+    /// </summary>
     [Fact]
     public void KatliGerekceBasligiSayiyiSoyler()
     {
-        var (visible, head) = Loaded(Sample(), window =>
-            (Named(window, "PlanReasons").IsVisible, ((TextBlock)Named(window, "TxtPlanReasonsHead")).Text));
+        var (visible, head, count) = Loaded(Sample(), window =>
+            (Named(window, "PlanReasons").IsVisible,
+                ((TextBlock)Named(window, "TxtPlanReasonsHead")).Text,
+                ((Panel)Named(window, "PlanReasons")).Children.Count));
 
         Assert.False(visible);
-        Assert.Equal("Why These Choices · 9", head);
+        Assert.Equal(7, count);
+        Assert.Equal($"Why These Choices · {count}", head);
     }
+
 }
