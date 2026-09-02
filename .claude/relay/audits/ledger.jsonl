@@ -118,3 +118,6 @@
 {"id":"T98","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"bfb87778c72e5bb44d1c2518903419b11d30a098","at":"2026-09-02T02:38:29.925Z"}
 {"id":"T108","result":"stale","at":"2026-09-02T02:45:56.553Z"}
 {"id":"T99","round":"3","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|ComplexityScanTests","code":0}],"auditorRunId":"afb2811bdb8c0141a","headSha":"dee1d13b77228e38048946aa1bfb9b3127fdcd02","at":"2026-09-02T02:54:08.142Z"}
+{"id":"T107","result":"stale","at":"2026-09-02T02:56:54.243Z"}
+{"id":"T113","result":"stale","at":"2026-09-02T02:56:54.243Z"}
+{"id":"T103","result":"stale","at":"2026-09-02T03:05:35.051Z"}
