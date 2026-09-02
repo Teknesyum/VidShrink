@@ -471,9 +471,9 @@ satır teslim commit'ini (`97ae59f`, ön izleme zinciri bağlandıktan sonra)
 | CI koşum **33597703249** (`T113-harita-baglantisi`, `97ae59f`, `success`) | 0 | 1080 | **107** | **1187** | 9 dk 40 sn |
 | CI koşum **33601722961** (teslim itmesi `6f091b9`, yalnız belge, `success`) | 0 | 1080 | **107** | **1187** | 8 dk 26 sn |
 
-Bu satırdan sonra dalda **tek bir commit** var: bu tablo satırını ekleyen belge
-commit'i. Kod değişmedi, üç sayı da bu satırdaki koşumların ölçtüğü kodu
-anlatıyor.
+Bu satırdan sonraki commit'ler **kaynak koda dokunmuyor**: bu tablo satırı,
+§ 7'nin düzenek notu ve mutasyon bataryasının `tools/` altına kopyalanması.
+Üç sayı da bu satırlardaki koşumların ölçtüğü ürün kodunu anlatıyor.
 
 **Bu koşum yeşil, ama "süit yeşil" cümlesi bu dalın hikâyesini anlatmıyor.**
 Tur boyunca üç kırmızı görüldü; üçünün de kimliği, sahibi ve bugünkü durumu:
