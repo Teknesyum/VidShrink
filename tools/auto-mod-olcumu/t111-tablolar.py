@@ -18,6 +18,9 @@ KOSUMLAR = [
     ("y1-g300-izgara",      "ciktilar/y1-g300-izgara.mp4"),
     ("y2-g300-hizali",      "ciktilar/y2-g300-hizali.mp4"),
     ("y3-hizali-boyutesit", "ciktilar/y3-hizali-boyutesit.mp4"),
+    ("uzman-biz4",          "ciktilar/uzman-biz4.mp4"),
+    ("uzman-biz5",          "ciktilar/uzman-biz5.mp4"),
+    ("uzman-hb3",           "ciktilar/uzman-hb3.mp4"),
 ]
 
 
@@ -187,7 +190,9 @@ for etiket, anahtar in ((u"T102 arşivi (kilitsiz)", "arsiv"),
 
 CIFTLER = [(u"uzman açığı", "uzman-biz3", "auto"),
            (u"HandBrake açığı (boyut eşli)", "uzman-hb2", "auto"),
-           (u"HandBrake açığı (boyut eşsiz)", "uzman-hb", "auto")]
+           (u"HandBrake açığı (boyut eşsiz)", "uzman-hb", "auto"),
+           (u"HandBrake açığı (T111 boyut eşli)", "uzman-hb3", "auto"),
+           (u"uzman açığı (T111 boyut eşli)", "uzman-biz5", "auto")]
 
 w(u"### F. Açıklar — eski fark / yeni fark")
 w(u"")

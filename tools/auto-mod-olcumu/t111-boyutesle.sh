@@ -34,4 +34,5 @@ hb () {
 }
 enc "uzman-biz4" 4 300 "${1:-2557}"
 hb  "uzman-hb3" "${2:-1867}"
+enc "uzman-biz5" 4 300 "${3:-2587}"
 echo "ESLEME BITTI $(date +%T)"
