@@ -299,7 +299,7 @@ public sealed class UpdaterTests : IDisposable
     public async Task AnUnreachableSourceIsGivenUpWithinTheManifestTimeout()
     {
         const string unreachable = "http://10.255.255.1/vidshrink/manifest-win-x64.json";
-        var ceiling = UpdateCheck.ManifestTimeout + TimeSpan.FromMilliseconds(500);
+        var ceiling = UpdateCheck.ManifestTimeout + TimeSpan.FromMilliseconds(250);
 
         await UpdateCheck.FetchManifestAsync(unreachable, CancellationToken.None);
 
@@ -1170,7 +1170,7 @@ exit $code
         Assert.Contains("başka bir süreçte açık", log, StringComparison.Ordinal);
         Assert.Contains(installRoot, log, StringComparison.Ordinal);
         Assert.True(File.Exists(locked), "kilitli dosya silinmiş görünüyor");
-        Assert.True(stopwatch.Elapsed > TimeSpan.FromSeconds(1), $"hiç beklenmedi: {stopwatch.Elapsed}");
+        Assert.True(stopwatch.Elapsed > TimeSpan.FromSeconds(5), $"geri çekilme adımları koşmadı: {stopwatch.Elapsed}");
     }
 
     /// <summary>
@@ -1314,4 +1314,5 @@ exit $code
             return bytes;
         }
     }
+
 }
