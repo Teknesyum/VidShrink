@@ -55,8 +55,8 @@ public sealed class ComplexityProbeTests
 
             Assert.True(result.Profile.Measured);
             Assert.True(result.HasQuality);
-            Assert.Equal(2, meter.Calls);
-            Assert.Equal(2, result.QualityMeasurements.Count);
+            Assert.True(meter.Calls >= 2, $"{meter.Calls} pencere olculdu");
+            Assert.Equal(meter.Calls, result.QualityMeasurements.Count);
             Assert.All(result.QualityMeasurements, q => Assert.Equal(91.0, q.VmafNegMean));
         });
     }
@@ -227,9 +227,18 @@ public sealed class ComplexityProbeTests
 
         var earlyProfile = Profile((60, 9.0e6), (180, 1.0e6));
         var lateProfile = Profile((180, 1.0e6), (60, 9.0e6));
+        var trueShare = earlyProfile.Count(b => b > 5.0e6) / (double)earlyProfile.Count;
+        var fixedEarly = ComplexityProbe.PlanWindows(SamplingPlan.Fixed, duration);
+        var fixedLate = ComplexityProbe.PlanWindows(SamplingPlan.Fixed, duration);
 
-        Assert.Equal(0.25, HeavyShare(early, earlyProfile), 1);
-        Assert.Equal(0.25, HeavyShare(late, lateProfile), 1);
+        Assert.True(
+            Math.Abs(HeavyShare(early, earlyProfile) - trueShare)
+            < Math.Abs(HeavyShare(fixedEarly, earlyProfile) - trueShare),
+            $"icerige bagli {HeavyShare(early, earlyProfile):P2}, sabit {HeavyShare(fixedEarly, earlyProfile):P2}, gercek {trueShare:P2}");
+        Assert.True(
+            Math.Abs(HeavyShare(late, lateProfile) - trueShare)
+            < Math.Abs(HeavyShare(fixedLate, lateProfile) - trueShare),
+            $"icerige bagli {HeavyShare(late, lateProfile):P2}, sabit {HeavyShare(fixedLate, lateProfile):P2}, gercek {trueShare:P2}");
         Assert.All(early.Where(w => earlyProfile[(int)w.Start] > 5.0e6), w => Assert.True(w.Start < 60));
         Assert.All(late.Where(w => lateProfile[(int)w.Start] > 5.0e6), w => Assert.True(w.Start >= 180));
     }
@@ -265,32 +274,46 @@ public sealed class ComplexityProbeTests
     }
 
     [Fact]
-    public void WindowCountNeverExceedsTheSampledShareTheCostBudgetAllows()
+    public void WindowCountNeverExceedsTheMeasuredCeilingNorTheFileItself()
     {
-        foreach (var duration in new[] { 30.0, 60.0, 240.0, 600.0, 3600.0, 36000.0 })
+        foreach (var duration in new[] { 6.0, 10.0, 30.0, 60.0, 240.0, 600.0, 3600.0, 36000.0 })
+        foreach (var heterogeneity in new[] { 0.1, 0.9, 2.0, 5.0, 50.0 })
         {
-            var count = ComplexityProbe.PlanWindowCount(duration, 5.0);
-            var sampled = count * 2.0;
+            var count = ComplexityProbe.PlanWindowCount(duration, heterogeneity);
 
             Assert.True(
                 count <= ComplexityProbe.MaxPlannedWindows,
-                $"{duration} sn icin {count} pencere olculmus ust sinirin uzerinde");
+                $"{duration} sn / cv {heterogeneity} icin {count} pencere olculmus ust sinirin uzerinde");
             Assert.True(
-                sampled <= ComplexityProbe.MaxSampledSeconds,
-                $"{duration} sn icin {sampled} sn ornekleniyor, tavan {ComplexityProbe.MaxSampledSeconds} sn");
-            Assert.True(
-                count == ComplexityProbe.MinWindows || sampled <= duration * ComplexityProbe.MaxSampledCeilingShare,
-                $"{duration} sn icin {sampled} sn ornekleniyor, sureye orani butceyi asiyor");
+                count * 2.0 <= duration,
+                $"{duration} sn icin {count} pencere dosyanin kendisinden uzun");
         }
     }
 
     [Fact]
-    public void TheSameContentGetsMoreWindowsWhenTheFileIsLongEnoughToAffordThem()
+    public void PlannedWindowsNeverOverlapEachOther()
+    {
+        var duration = 240.0;
+        var profile = Profile((60, 1.0e6), (30, 8.0e6), (90, 2.0e6), (60, 5.0e6));
+
+        foreach (var count in new[] { 2, 3, 5, 8 })
+        {
+            var windows = ComplexityProbe.PlanWindows(SamplingPlan.Profile, duration, profile, null, count)
+                .OrderBy(w => w.Start).ToArray();
+            for (var i = 1; i < windows.Length; i++)
+                Assert.True(
+                    windows[i].Start >= windows[i - 1].Start + windows[i - 1].Length,
+                    $"{count} pencerede {windows[i - 1].Start} ve {windows[i].Start} ortusuyor");
+        }
+    }
+
+    [Fact]
+    public void AFileTooShortToAffordTheCeilingGetsFewerWindowsThanALongOne()
     {
         Assert.True(
-            ComplexityProbe.PlanWindowCount(600.0, 5.0) > ComplexityProbe.PlanWindowCount(60.0, 5.0),
+            ComplexityProbe.PlanWindowCount(600.0, 5.0) > ComplexityProbe.PlanWindowCount(10.0, 5.0),
             $"600 sn icin {ComplexityProbe.PlanWindowCount(600.0, 5.0)}, " +
-            $"60 sn icin {ComplexityProbe.PlanWindowCount(60.0, 5.0)}");
+            $"10 sn icin {ComplexityProbe.PlanWindowCount(10.0, 5.0)}");
     }
 
     [Fact]

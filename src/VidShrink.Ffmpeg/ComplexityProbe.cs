@@ -25,14 +25,9 @@ public static class ComplexityProbe
     public const double MotionProbeFpsRatio = 0.5;
     private const int MaxWindows = 3;
     internal const int MinWindows = 2;
-    internal const int MaxPlannedWindows = 12;
-    internal const double MaxSampledShare = 0.06;
-    internal const double MaxSampledCeilingShare = 0.25;
-    internal const double MinSampledSeconds = 6.0;
-    internal const double MaxSampledSeconds = 24.0;
+    internal const int MaxPlannedWindows = 8;
     internal const double SamplingTargetError = 0.05;
-    internal const double SamplingErrorScale = 1.0;
-    internal const double SamplingErrorDecay = 1.0;
+    internal const double WindowsPerHeterogeneity = 3.0;
     internal const SamplingPlan ProductionPlan = SamplingPlan.Profile;
     private const int MinProfileSeconds = 4;
 
@@ -193,11 +188,8 @@ public static class ComplexityProbe
         if (!double.IsFinite(duration) || duration <= windowSeconds * 1.5) return 1;
         if (!double.IsFinite(heterogeneity) || heterogeneity <= 0) return MinWindows;
 
-        var needed = Math.Pow(Math.Max(heterogeneity, 0.0) * SamplingErrorScale / SamplingTargetError, 1.0 / SamplingErrorDecay);
-        var budget = Math.Min(
-            Math.Clamp(duration * MaxSampledShare, MinSampledSeconds, MaxSampledSeconds),
-            duration * MaxSampledCeilingShare);
-        var affordable = Math.Floor(budget / windowSeconds);
+        var needed = MinWindows + WindowsPerHeterogeneity * heterogeneity;
+        var affordable = Math.Floor(duration / windowSeconds);
         var ceiling = Math.Max(MinWindows, Math.Min(MaxPlannedWindows, affordable));
         return (int)Math.Clamp(Math.Ceiling(needed), MinWindows, ceiling);
     }
@@ -232,31 +224,39 @@ public static class ComplexityProbe
     private static IReadOnlyList<SampleWindow> ProfileWindows(
         double duration, IReadOnlyList<double> secondBits, int count, double windowSeconds)
     {
-        var usable = new List<int>(secondBits.Count);
-        for (var i = 0; i < secondBits.Count; i++)
-            if (double.IsFinite(secondBits[i]) && secondBits[i] > 0) usable.Add(i);
-        if (usable.Count < MinProfileSeconds) return Array.Empty<SampleWindow>();
-
-        usable.Sort((a, b) =>
+        var last = (int)Math.Floor(duration - windowSeconds);
+        var starts = new List<int>(Math.Max(0, last + 1));
+        var windowBits = new Dictionary<int, double>();
+        for (var start = 0; start <= last; start++)
         {
-            var byBits = secondBits[a].CompareTo(secondBits[b]);
+            var bits = WindowBits(secondBits, start, windowSeconds);
+            if (bits <= 0) continue;
+            starts.Add(start);
+            windowBits[start] = bits;
+        }
+        if (starts.Count < MinProfileSeconds) return Array.Empty<SampleWindow>();
+
+        starts.Sort((a, b) =>
+        {
+            var byBits = windowBits[a].CompareTo(windowBits[b]);
             return byBits != 0 ? byBits : a.CompareTo(b);
         });
-        var strata = Math.Min(count, usable.Count);
-        var taken = new HashSet<int>();
+
+        var strata = Math.Min(count, starts.Count);
+        var taken = new List<int>(strata);
         var windows = new List<SampleWindow>(strata);
 
         for (var s = 0; s < strata; s++)
         {
-            var from = (int)((long)usable.Count * s / strata);
-            var to = (int)((long)usable.Count * (s + 1) / strata);
+            var from = (int)((long)starts.Count * s / strata);
+            var to = (int)((long)starts.Count * (s + 1) / strata);
             if (to <= from) continue;
 
             var target = 0.0;
-            for (var i = from; i < to; i++) target += secondBits[usable[i]];
+            for (var i = from; i < to; i++) target += windowBits[starts[i]];
             target /= to - from;
 
-            var pick = NearestFreeSecond(usable, from, to, taken, secondBits, target);
+            var pick = NearestFreeStart(starts, from, to, taken, windowBits, target, windowSeconds);
             if (pick < 0) continue;
             taken.Add(pick);
             windows.Add(new SampleWindow(ClampStart(pick, duration, windowSeconds), windowSeconds, to - from));
@@ -265,18 +265,30 @@ public static class ComplexityProbe
         return windows.OrderBy(w => w.Start).ToList();
     }
 
-    private static int NearestFreeSecond(List<int> sorted, int from, int to, HashSet<int> taken, IReadOnlyList<double> secondBits, double target)
+    internal static double WindowBits(IReadOnlyList<double> secondBits, double start, double windowSeconds)
+    {
+        var seconds = SegmentSeconds(secondBits, start, start + windowSeconds);
+        return seconds.Count == 0 ? 0.0 : seconds.Average();
+    }
+
+    private static int NearestFreeStart(
+        List<int> sorted, int from, int to, List<int> taken,
+        Dictionary<int, double> windowBits, double target, double windowSeconds)
     {
         var best = -1;
         var bestDistance = double.MaxValue;
         for (var i = from; i < to; i++)
         {
-            var second = sorted[i];
-            if (taken.Contains(second)) continue;
-            var distance = Math.Abs(secondBits[second] - target);
+            var start = sorted[i];
+            var clash = false;
+            foreach (var other in taken)
+                if (Math.Abs(start - other) < windowSeconds) { clash = true; break; }
+            if (clash) continue;
+
+            var distance = Math.Abs(windowBits[start] - target);
             if (distance >= bestDistance) continue;
             bestDistance = distance;
-            best = second;
+            best = start;
         }
         return best;
     }
