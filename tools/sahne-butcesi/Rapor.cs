@@ -62,6 +62,10 @@ public static class Rapor
         sb.AppendLine("- **Makine paylasimliydi**; paralelde baska ajanlarin olcumleri kosuyordu.");
         sb.AppendLine("  Bu damga yalniz **sure** sayilarindadir. Bu sayfada sure sayisi yok:");
         sb.AppendLine("  bit, boyut ve kalite sayilari is parcacigi sabitken yukten etkilenmez.");
+        var (_, sha) = Kabuk.Yakala("git", new[] { "rev-parse", "HEAD" });
+        var (_, dal) = Kabuk.Yakala("git", new[] { "rev-parse", "--abbrev-ref", "HEAD" });
+        sb.AppendLine($"- Olculen agac: `{dal.Trim()}` @ `{sha.Trim()}` — butun kodlamalar bu");
+        sb.AppendLine("  commit'te derlenmis ikiliyle kosuldu (`--no-incremental`).");
         sb.AppendLine($"- Ham cikti: `{isKok.Replace('\\', '/')}` (gitignore'lu).");
         sb.AppendLine();
     }

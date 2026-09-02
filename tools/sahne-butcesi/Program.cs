@@ -129,6 +129,7 @@ public static class Program
                 case "k5": await K5Async(p); break;
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
+                case "plan": await PlanYazAsync(p); break;
                 default: Console.Error.WriteLine($"bilinmeyen komut: {komut}"); return 2;
             }
         }
@@ -208,6 +209,14 @@ public static class Program
         var c when c.Contains("x264", StringComparison.Ordinal) => "-x264-params",
         _ => null
     };
+
+    private static async Task PlanYazAsync(Pencere p)
+    {
+        var (plan, _) = await PlanAsync(p);
+        Console.WriteLine($"{Kol}/{p.Ad}: {plan.Codec} {plan.Mode} {plan.VideoBitrateK}k " +
+                          $"{plan.Width}x{plan.Height}@{Kabuk.Inv(plan.Fps, "0.##")} preset={plan.Preset} " +
+                          $"pix={plan.PixelFormat} crf={plan.Crf?.ToString(CultureInfo.InvariantCulture) ?? "-"}");
+    }
 
     private static async Task K1Async(Pencere p)
     {
