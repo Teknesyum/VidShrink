@@ -461,6 +461,8 @@ ayakta — ama uçtan uca iddia yalnızca ffmpeg'li koşumda sınanıyor.
 ## K5 — Plan düzeyinde kazanç: ölçüldü, güvenilir kazanç yok
 
 Alet: `tools/VidShrink.Ab` (`origin/main`), `ab kos --hedef-mb 20 --yarismaci vidshrink`.
+Yeniden koşumu: `tools/ornekleme/plan-kazanci.sh b9a6544 216f450 .calisma/t103 20 <kaynak...>`
+— betik iki çalışma ağacını kurup `origin/main`'den ortak aleti alır ve ayrı ayrı derler.
 Taban `.calisma/t103/ab-taban` = `b9a6544`, dal `.calisma/t103/ab-dal` = `216f450`.
 Aynı hedef boyut, boyut eşitliği toleransı %2; ölçülen boyut farkı her üç kaynakta
 %0.25'in altında. Renk kapısı üçünde de `Direct` (aynı bt2020/smpte2084 uzayı).
