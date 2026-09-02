@@ -17,14 +17,45 @@ Gerçek CI koşumu: id `33589639249`, headSha `0e122f2728fd429f5136ae3bc6a784736
 | kaynak | Failed | Passed | Skipped | Total | Süre |
 |---|---|---|---|---|---|
 | CI (koşum 33589639249) | 1 | 1162 | 17 | 1180 | 18 m 59 s |
-| `ci-gibi-kos.sh` (aynı taban, `T118-ci-benzetimi` = `0e122f2` + yorum-only commit) | ÖLÇÜLDÜ_DOLDUR | ÖLÇÜLDÜ_DOLDUR | ÖLÇÜLDÜ_DOLDUR | ÖLÇÜLDÜ_DOLDUR | ÖLÇÜLDÜ_DOLDUR |
+| `ci-gibi-kos.sh` (aynı taban, `T118-ci-benzetimi` = `0e122f2` + yorum-only commit) | 0 | 1163 | 17 | 1180 | 22 m 19 s |
 
 Betik `361b96e`'de (headSha `0e122f2`'nin bir yorum-only commit ilerisi — `.github/workflows/ci.yml`
 içindeki fark yalnız açıklama satırları, `-MinimumTotal 1134 -MaximumSkipped 30` her
-ikisinde de aynı) koştu; kaynak ve derlenen ikili headSha'daki ile birebir aynı.
+ikisinde de aynı) koştu; kaynak ve derlenen ikili headSha'daki ile birebir aynı. Ağaç:
+`origin/T115-ci-ffmpeg`, worktree HEAD `361b96e`.
 
 Makine paylaşımlı, dokuz ajan aynı anda koşuyor: yukarıdaki süre CI'in tek-koşum
-süresiyle doğrudan kıyaslanamaz, yalnız kayıt için tutuldu.
+süresiyle doğrudan kıyaslanamaz, yalnız kayıt için tutuldu (CI'in 18 m 59 s'i tek
+başına bir runner'da; bu 22 m 19 s dokuz ajanla paylaşılan bir makinede — süre farkı
+bu yüzden **karşılaştırılabilir değil**, ayrı bir bulgu değil).
+
+**Farklı hücrelerin sebebi:**
+
+- **Skipped (17=17) ve Total (1180=1180) birebir eşleşiyor** — betik CI ile aynı test
+  yüzeyini koşturuyor, atlanan testler de aynı. Bu, K2(a)'nın (ffmpeg silme kaldırma +
+  parametre hizalama) doğru test setini çalıştırdığının doğrudan kanıtı.
+- **Failed (CI: 1, betik: 0) ve buna bağlı Passed (CI: 1162, betik: 1163) farklı** —
+  hangi testin CI'da başarısız olduğu bu ölçümde görülmedi (CI logunun test-adı
+  detayına bu sözleşmede inilmedi, **ölçülmedi**). Muhtemel açıklama tek-seferlik
+  bir kararsız (flaky) test ya da makineye özgü bir zamanlama farkı; iki koşum da
+  aynı commit'te ama farklı makinede (CI runner'ı vs bu paylaşımlı Windows makinesi)
+  — kesin sebep bu sözleşmenin kapsamı dışında, iddia edilmiyor.
+- **Kapı sonucu ayrıca farklı ve önemli**: CI'da kapı 1 gerçek başarısızlık yüzünden
+  düştü. Bu makinede kapı da düştü ama **hiç ilgisiz bir sebeple**: `kosum-kapisi.ps1`
+  (`kod=66 sart=Basarisiz/Failed ozeti yok`) — yani Failed/Passed özet satırını hiç
+  bulamadı, `Başarısız: 0` cümlesi gerçekte üretilmiş olsa bile. Bu betiğin
+  (`ci-gibi-kos.sh`) hatası değil: `kosum-kapisi.ps1` `-InputFile` verilmediği için
+  `dotnet test`'i kendi başlatıp `2>&1` ile canlı yakalıyor (T115-owned, satır ~20-24);
+  bu makinede dotnet'in Türkçe konsol çıktısı ("Başarısız", "ş"/"ı" harfleri) bu canlı
+  yakalama sırasında PowerShell 5.1'in öntanımlı konsol kod sayfasıyla bozuluyor
+  olabilir — kaydettiğim log dosyasında baytlar doğru UTF-8 (`\xc5\x9f`=ş, `\xc4\xb1`=ı)
+  ama kapının kendi regex'i (`ş`, `ı` tam eşleşme bekliyor) sıfır eşleşme
+  buldu. Bu bir hipotez, **kesin köken bu sözleşmede doğrulanmadı** (ölçülmedi) —
+  ve `kosum-kapisi.ps1` T115'in `owns`'unda, burada düzeltilmedi/düzeltilemezdi.
+  T0'a aktarılması gereken ayrı bir bulgu: **bu makinede `ci-gibi-kos.sh` betiği CI'ı
+  doğru şekilde çağırsa bile, kapının kendisi bu ortamda güvenilir bir PASS/FAIL
+  vermiyor** — K2(a)'nın "betik adını hak ediyor" kararı bu bulguyu geçersiz kılmıyor
+  (betik CI'ı doğru temsil ediyor), ama temsil ettiği kapı bu makinede kırık.
 
 ## Seçim: (a) — betik adını hak ediyor
 
@@ -89,28 +120,32 @@ değiştirilmedi.
 ## Ek iş: handbrake-motoru.md satır atıfları
 
 T111 `docs/olcumler/auto-mod.md`'ye komşu satırlar ekledi/çıkardı, `docs/inceleme/handbrake-motoru.md`
-içindeki bazı `auto-mod.md:N` atıfları kaydı. Sekiz atıf tek tek açılıp hedef
-cümle karşılaştırıldı: beşi hâlâ doğru satırı gösteriyordu (`:202-204`, `:283-287`,
-`:289`, `:214,216`, `:214` — bir kısmı önceki bir kaymadan sonra başka bir eklemeyle
-rastlantısal olarak yeniden hizalanmış), üçü kaymıştı ve düzeltildi: preset 6
-satırı `:209` → `:208`, HandBrakeCLI komutu `:209` → `:210`, `-g 300` kazanç
-cümlesi `:250` → `:403-404`.
+içindeki bazı `auto-mod.md:N` atıfları kaydı. Dokuz atıf bulundu (sekizi
+`grep "auto-mod.md"` ile, dokuzuncusu — "aynı belge (`:316`)" — yakın satırdaki
+örtük öz-referans olarak yakından okumada). Hepsi tek tek açılıp hedef cümle
+`auto-mod.md`'de gerçekten var mı diye doğrulandı: beşi doğru satırı gösteriyordu
+(`:202-204`, `:283-287`, `:289`, `:214,216`, `:214`), dördü kaymıştı — preset 6
+satırı `:209`→`:208`, HandBrakeCLI komutu `:209`→`:210`, `-g 300` kazanç cümlesi
+`:250`→`:403-404`, öz-referans `:316`→`:311`. Bu doğrulama aşağıdaki çapa
+biçiminin malzemesi oldu; tek başına satır numarası düzeltmesi olarak
+**bırakılmadı** (aşağıya bakın).
 
-**T0'ın verdiği `:223`/`:225` bu branch'te doğrulanmadı.** Kontrat metni
-preset 6 için `:223`, HandBrakeCLI komutu için `:225` diyordu (T111'in
-`b17c8f9` commit'indeki kendi notundan). Bu worktree'nin tabanı olan
-`origin/T115-ci-ffmpeg`'teki `docs/olcumler/auto-mod.md`'de o iki satırda
-farklı içerik var: `:223` "Boyut farkı: uzman-biz 15,02 MiB..." cümlesi,
-`:225` "**HandBrake - auto:** ortalama +1,269..." cümlesi — ikisi de K3
-bölümünün devamı, preset ya da HandBrakeCLI komutuyla ilgisi yok. Sebep:
-`b17c8f9`'dan sonra T111 dalında beş commit daha `auto-mod.md`'ye satır
-ekledi/çıkardı (`9bef2a0`, `29412b0`, `536fb44`, `72d4c6c`, `63cb851`,
-dal ucu), bunlardan `29412b0` satır ~46 civarına 6 satır ekleyerek 202+
-bölgesini kaydırdı — ama bu beş commit **T111 henüz main'e/`T115`'e
-birleşmedi**, dolayısıyla bu worktree'nin `auto-mod.md`'si hâlâ daha eski
-bir an. Bu belgedeki `:208`/`:210` düzeltmesi doğrudan bu worktree'de
-`grep -n` ile doğrulanan içeriğe dayanıyor — T111 birleşince yeniden
-kayabilir, o zaman üçüncü bir düzeltme turu gerekir.
+**Hangi ağaçta ölçüldü, ve neden T0'ın verdiği `:223`/`:225` burada
+doğrulanmadı.** Bu sözleşmenin tamamı `origin/T115-ci-ffmpeg` dalı üzerinde
+(worktree taban commit `361b96e`, headSha karşılaştırması `0e122f2`) yapıldı.
+T0'ın verdiği `:223`/`:225` `origin/T111-auto-mod` ucunda (o gün orada) doğruydu;
+bu dalda değil — bu dalın `auto-mod.md`'sinde o iki satırda K3'ün devamı başka
+cümleler var. **İki taraf da haklıydı, çünkü iki farklı ağaç ölçülüyordu:**
+`T115` tabanlı bu worktree'de `:208`/`:210`, `T111-auto-mod` ucunda `:229`/`:231`.
+Kök sebep aynı kaldı: T111 dalı `auto-mod.md` üzerinde hâlâ commit atıyor —
+sözleşme sırasında T111'e tur 2 açıldığı öğrenildi, yani bu dosya **birleşme
+anına kadar kararlı değil**. Bu bir borç değil, ölçüm sırasında bilinmesi
+gereken bir gerçek: `docs/inceleme/handbrake-motoru.md` içindeki dokuz
+`auto-mod.md` atfı satır numarasına değil **çapaya** çevrildi (bölüm başlığı
+`§` + hedef cümlenin ilk birkaç kelimesi, satır numarası yalnız `şu an :N`
+diye ikincil not olarak duruyor) — T111 tur 2 birleştiğinde satırlar yine
+kayarsa çapa metni `grep`'le hâlâ bulunur, üçüncü bir "satır numarası düzeltme"
+turu gerekmez. `handbrake-motoru.md`'deki dokuz atfın hepsi bu biçime çevrildi.
 
 Bayatlama şöyle oluyor: yerleşim yeniden temellendirilirken (satır ekleme/çıkarma)
 üstündeki referans cümle güncellenmiyor, ve atıf başka bir ekleme ile rastlantısal
