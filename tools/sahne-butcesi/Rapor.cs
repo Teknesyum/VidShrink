@@ -43,6 +43,7 @@ public static class Rapor
         K3(sb);
         K3Denetim(sb, isKok);
         K4(sb, isKok);
+        K4b(sb, isKok, kollar);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         Sonuc(sb, k2, k5, k7);
@@ -466,6 +467,71 @@ public static class Rapor
     public sealed record Satir(string Arm, OlcumKaydi K);
 
     public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet);
+
+    private static void K4b(StringBuilder sb, string isKok, string[] kollar)
+    {
+        var satirlar = new List<(string Kol, string Pencere, string Aday, string Param, double? Mae, string Not)>();
+        foreach (var kol in kollar)
+            foreach (var p in Program.Pencereler)
+            {
+                var y = Path.Combine(isKok, $"k4b-{kol}-{p.Ad}.csv");
+                if (!File.Exists(y)) continue;
+                foreach (var l in File.ReadAllLines(y).Skip(1))
+                {
+                    var c = l.Split(';');
+                    if (c.Length < 4) continue;
+                    double? mae = double.TryParse(c[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : null;
+                    satirlar.Add((kol, p.Ad, c[0], c[1], mae, c[3]));
+                }
+            }
+        if (satirlar.Count == 0) return;
+
+        sb.AppendLine("### K4 eki — iki aday yan yana, K1 farkini hangisi kapatiyor");
+        sb.AppendLine();
+        sb.AppendLine("K4'un izgarasi \"parametre isliyor mu\" sorusunu yanitlar; kabul kriteri");
+        sb.AppendLine("ayrica **hangi adayin K1 farkini daha cok kapattigini** sorar. Olcu K1'in");
+        sb.AppendLine("kendi olcusudur: `MAE(verilen, hak edilen)`, yuzde puani. Uc kosum ayni");
+        sb.AppendLine("plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.");
+        sb.AppendLine();
+        sb.AppendLine("- `taban` — bugunku plan, ek parametre yok (K1'in `verilen` sutunu).");
+        sb.AppendLine("- `zones` — sahne araligina `b` carpani; carpanlar haritadan.");
+        sb.AppendLine("- `qcomp` — iki gecis yanliligi. Kodlayici biti `karmasiklik^qcomp` ile");
+        sb.AppendLine("  dagitir, harita `karmasiklik^1` onerir; ikisini esitleyen deger");
+        sb.AppendLine("  `qcomp = 1,0`'dir. Telafi sabiti degil, haritanin onerisinin ayni");
+        sb.AppendLine("  denklemdeki karsiligi.");
+        sb.AppendLine();
+        sb.AppendLine("| Yazilim kolu | Pencere | Aday | Parametre | MAE (pp) | Tabana gore |");
+        sb.AppendLine("|--------------|---------|------|-----------|----------|-------------|");
+        var kazanan = new Dictionary<string, int>();
+        var hucre = 0;
+        foreach (var g in satirlar.GroupBy(x => (x.Kol, x.Pencere)))
+        {
+            var taban = g.FirstOrDefault(x => x.Aday == "taban").Mae;
+            var olculen = g.Where(x => x.Aday != "taban" && x.Mae is not null).ToList();
+            foreach (var x in g)
+            {
+                var fark = x.Mae is null || taban is null || x.Aday == "taban"
+                    ? "—"
+                    : Kabuk.Inv(x.Mae.Value - taban.Value, "+0.000;-0.000;0.000");
+                sb.AppendLine($"| {x.Kol} | `{x.Pencere}` | {x.Aday} | `{x.Param}` | " +
+                              $"{(x.Mae is null ? $"**bilinmiyor**: {x.Not}" : Kabuk.Inv(x.Mae.Value, "0.000"))} | {fark} |");
+            }
+            if (olculen.Count > 0)
+            {
+                hucre++;
+                var en = olculen.MinBy(x => x.Mae!.Value);
+                kazanan[en.Aday] = kazanan.GetValueOrDefault(en.Aday) + 1;
+            }
+        }
+        sb.AppendLine();
+        if (hucre > 0)
+        {
+            var sirali = kazanan.OrderByDescending(x => x.Value).ToList();
+            sb.AppendLine($"Iki adayin da olculdugu hucre {hucre}; hucre basina dusuk MAE'yi veren aday: " +
+                          string.Join(", ", sirali.Select(x => $"`{x.Key}` {x.Value}")) + ".");
+            sb.AppendLine();
+        }
+    }
 
     private static AbSonuc K5K6(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
     {
