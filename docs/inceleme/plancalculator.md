@@ -91,7 +91,7 @@ listesindeki av1_amf'i (`:47`) tutmaz; dayanağı yok.
 5. `ComplexityProfile.cs:142` — `bppf = reference · 2^((refCrf − crf)/step)`. `step = 6` (h264/hevc) ⇒
    **1 CRF adımı = %12,25 boyut**; `step = 7` (av1) ⇒ %10,4; kalibre en iyi durumda `HalvingStep ≤ 12`
    (`ComplexityProfile.cs:39`) ⇒ %5,9. Izgara her koşulda %2,8'lik banddan geniş; isabet ≈ **%23**.
-6. `EncodeRunner.cs:62` — `actual < LowerMb` ⇒ yeniden deneme. `:295` `Correct` 2pass'e geçer ama K1
+6. `EncodeRunner.cs:92` — `actualMb < band.LowerMb` ⇒ yeniden deneme. `:295` `Correct` 2pass'e geçer ama K1
    yüzünden `0,96154·T` ister; verim 0,9815 ile teslim `0,9437·T`, hard floor'un (`0,944·T`) da altı.
    2. deneme yalnız "verim ölç" işine yarayan tam bir kodlamadır.
 7. 3. deneme `RetryAimMb` ölçümlü dalına (`:271`) girer, `0,986·T` ister, tutturur; `EncodeRunner.cs:64`
