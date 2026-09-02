@@ -247,7 +247,8 @@ public static class Rapor
         sb.AppendLine();
     }
 
-    public sealed record K2Sonuc(bool Kapandi, IReadOnlyList<string> Satirlar);
+    public sealed record K2Sonuc(bool Kapandi, IReadOnlyList<string> Satirlar,
+        int Hucre = 0, int KodlayiciEnAzEsit = 0);
 
     private static K2Sonuc K1K2(
         StringBuilder sb,
@@ -371,7 +372,7 @@ public static class Rapor
         sb.AppendLine("sutunda isaretlidir; o pencerede karari MAE tasir. Sahne sayisi icerigin");
         sb.AppendLine("kendisidir: kesimi olmayan pencerede dagitilacak sahne de yoktur.");
         sb.AppendLine();
-        return new K2Sonuc(hepsiKapandi, satirlar);
+        return new K2Sonuc(hepsiKapandi, satirlar, hucre, g2Gecen);
     }
 
     private static void K3(StringBuilder sb)
@@ -1228,6 +1229,19 @@ public static class Rapor
                             : $"`zones` {k4b.Hucre} hucreden {k4b.ZonesKazandi} tanesinde kazandi " +
                               $"ve en buyuk kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp; " +
                               "bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir."));
+            if (k2.Hucre > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"**Haritanin kendisi olculen {k2.Hucre} hucrenin " +
+                              $"{k2.KodlayiciEnAzEsit} tanesinde kodlayiciyi geride birakmiyor** " +
+                              "(`MAE(verilen) <= MAE(harita)`, K2 tablosu): o hucrelerde kodlayicinin " +
+                              "kendi dagitimi haritanin onerisi kadar ya da ondan daha dogru. Bu, " +
+                              "kazanc bulunan hucrelerle celismez, onlarin yaninda durur: dagitim " +
+                              "parametresi tabana gore bir sey kazandirabilirken, o kazanci yoneten " +
+                              "haritanin kendisi cogu hucrede kodlayicidan iyi degildir. " +
+                              "Sozlesmenin \"kodlayici zaten daha iyi dagitiyor\" secenegi bu " +
+                              "satirdan okunur.");
+            }
             if (k4b.ZonesKazandi > 0 && k4.Denenen > 0 && !k4.VarsayilanIsliyor)
             {
                 sb.AppendLine();
