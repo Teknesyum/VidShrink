@@ -259,6 +259,8 @@
   "main.error.folder": "The folder could not be opened",
   "main.error.setting": "The setting could not be saved",
   "main.error.probe": "The hardware encoder probe failed",
+  "main.status.probe-unsettled": "The hardware encoder probe did not settle, so the plan falls back to the software encoder. Compression still works.",
+  "main.status.probe-failed": "The hardware encoder probe could not run: {0}. The plan falls back to the software encoder; compression still works.",
   "main.error.pick": "The file could not be chosen",
   "main.error.unusable": "This file cannot be used",
   "main.error.generic": "The operation could not be completed. The detail ffmpeg reported is below.",

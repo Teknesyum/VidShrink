@@ -259,6 +259,8 @@
   "main.error.folder": "Klasör açılamadı",
   "main.error.setting": "Ayar yazılamadı",
   "main.error.probe": "Donanım kodlayıcı yoklaması başarısız",
+  "main.status.probe-unsettled": "Donanım kodlayıcı yoklaması sonuca varamadı, plan yazılım kodlayıcısına düştü. Sıkıştırma yine de çalışıyor.",
+  "main.status.probe-failed": "Donanım kodlayıcı yoklaması koşturulamadı: {0}. Plan yazılım kodlayıcısına düştü; sıkıştırma yine de çalışıyor.",
   "main.error.pick": "Dosya seçilemedi",
   "main.error.unusable": "Bu dosya kullanılamıyor",
   "main.error.generic": "İşlem tamamlanamadı. Ffmpeg'in bildirdiği ayrıntı aşağıda.",

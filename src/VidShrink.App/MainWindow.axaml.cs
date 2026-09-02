@@ -1396,11 +1396,20 @@ public partial class MainWindow : Window
                 lock (_gate)
                 {
                     if (!_answers.TryGetValue(key, out var answer)) _answers[key] = answer = new Answer();
-                    answer.Works = works;
-                    answer.PixelFormat = pixelFormat;
-                    answer.Failure = failure?.Message;
                     answer.Attempts++;
-                    answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;
+                    answer.Failure = failure?.Message;
+                    if (failure is null)
+                    {
+                        answer.Works = works;
+                        answer.PixelFormat = pixelFormat;
+                        answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;
+                    }
+                    else
+                    {
+                        answer.Works = false;
+                        answer.PixelFormat = null;
+                        answer.Settled = false;
+                    }
                     _running.Remove(key);
                 }
 
@@ -1839,7 +1848,7 @@ public partial class MainWindow : Window
 
         RefreshPlanView();
         RefreshQualityPanels();
-        BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _) && !detailed.HardwareNotMeasured;
+        BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
         ReportUnsettledProbe();
 
         // T48/K1: plan tazelendi. Panel gecikmesini kendi kurar; burası yalnız haber verir.
@@ -1860,12 +1869,23 @@ public partial class MainWindow : Window
     /// Yerleşmeyen yoklamayı kullanıcıya söyler. Yoklama bir cevap üretemediğinde bu bir
     /// sonuç değil bilinmeyendir; sessizce varsayılana düşmek — HDR kaynakta tonemap'e —
     /// aynı dosyanın iki koşumda iki farklı çıktı vermesi demekti ve kullanıcı nedenini
-    /// hiçbir yerde göremiyordu. Satır <c>main.error.probe</c>: yoklama başarısız.
+    /// hiçbir yerde göremiyordu.
+    ///
+    /// İki ayrı cümle, çünkü iki ayrı durum: yoklama koşup sonuca varamadıysa
+    /// <c>main.status.probe-unsettled</c>, hiç koşamayıp istisna fırlattıysa
+    /// <c>main.status.probe-failed</c> — istisnanın metniyle birlikte. İkisi de
+    /// başarısızlık değil bilinmezlik bildiriyor; <c>main.error.probe</c> gerçek
+    /// başarısızlık için açılışta duruyor (<see cref="ProbeHardwareEncodersAsync"/>).
     /// </summary>
     private void ReportUnsettledProbe()
     {
-        if (_planEncoders?.Unsettled != true) return;
-        var text = Say("main.error.probe");
+        if (_planEncoders is null) return;
+
+        string text;
+        if (_planEncoders.FirstFailure is { } failure) text = Say("main.status.probe-failed", failure);
+        else if (_planEncoders.Unsettled) text = Say("main.status.probe-unsettled");
+        else return;
+
         if (TxtSystemStatus.Text != text) TxtSystemStatus.Text = text;
     }
 
