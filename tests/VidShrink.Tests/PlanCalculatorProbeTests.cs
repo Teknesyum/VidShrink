@@ -100,7 +100,9 @@ public sealed class PlanCalculatorProbeTests
     /// <summary>
     /// Zincirin ilk halkasi: <c>BuildDetailed</c> hizli modda donanim adaylarini tek tek
     /// yetenek nesnesine soruyor, HDR kaynakta ustune piksel bicimini soruyor. Adaylarin
-    /// sayisi <c>PlanCalculator.FastHardwareOrder</c>'in uzunlugu.
+    /// sayisi <c>PlanCalculator.FastHardwareOrder</c>'in uzunlugu. Sondaki
+    /// <c>works:libsvtav1</c> aday taramasinin degil tavsiye kodlayicisinin yoklamasi:
+    /// T128'den beri <c>PickCodec</c> de <c>PickFastCodec</c> gibi soruyor.
     /// </summary>
     [Fact]
     public void TheFastPathAsksTheAvailabilityForEveryHardwareCandidate()
@@ -114,7 +116,7 @@ public sealed class PlanCalculatorProbeTests
             {
                 "works:av1_nvenc", "works:hevc_nvenc", "works:av1_qsv", "works:hevc_qsv",
                 "works:av1_amf", "works:hevc_amf", "works:h264_nvenc",
-                "works:libx265"
+                "works:libx265", "works:libsvtav1"
             },
             availability.Calls);
     }
@@ -122,7 +124,8 @@ public sealed class PlanCalculatorProbeTests
     /// <summary>
     /// Donanim yolu calisiyorsa aday taramasi ilkinde duruyor, ama HDR kaynak bu kez
     /// piksel bicimi yoklamasini aciyor. <see cref="EncoderCapabilities.Hdr10PixelFormat"/>
-    /// iki piksel bicimi deniyor, yani tek cagri iki ffmpeg sureci demek.
+    /// iki piksel bicimi deniyor, yani tek cagri iki ffmpeg sureci demek. Ucuncu cagri
+    /// tavsiye kodlayicisinin: plan donanimda kalsa da tavsiye <c>libsvtav1</c> soruyor.
     /// </summary>
     [Fact]
     public void WorkingHardwareStillOpensThePixelFormatProbe()
@@ -131,7 +134,7 @@ public sealed class PlanCalculatorProbeTests
 
         PlanCalculator.BuildDetailed(HdrSource, FastPreserve, null, availability);
 
-        Assert.Equal(new[] { "works:av1_nvenc", "hdr10:av1_nvenc" }, availability.Calls);
+        Assert.Equal(new[] { "works:av1_nvenc", "hdr10:av1_nvenc", "works:libsvtav1" }, availability.Calls);
     }
 
     /// <summary>

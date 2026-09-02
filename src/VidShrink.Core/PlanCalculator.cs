@@ -161,7 +161,7 @@ public static class PlanCalculator
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
         var fast = options.SpeedMode == SpeedMode.Fast;
-        var codec = fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability);
+        var codec = fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability, probe);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
@@ -191,7 +191,7 @@ public static class PlanCalculator
         if (codec != preferredCodec)
         {
             notes.Add(AdviceCode.EncoderFallback);
-            reason.Add($"the {preferredCodec} encoder is not available on this ffmpeg build, so encoding falls back to {codec}");
+            reason.Add($"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}");
             reasonCodes.Add(new ReasonNote(ReasonCode.EncoderFallback, RequestedCodec: preferredCodec, FallbackCodec: codec));
         }
 
@@ -863,10 +863,30 @@ public static class PlanCalculator
     };
 
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
+        => PickCodec(pref, availability, null);
+
+    /// <summary>
+    /// Tercih edileni <b>gercekten kodluyor mu</b> diye secer, derleme listesinde
+    /// gorunuyor mu diye degil — <see cref="PickFastCodec"/> ile ayni soru.
+    ///
+    /// Yoklama surec doguruyor, o yuzden sira onemli: listede olmayan yoklanmadan
+    /// elenir, henuz olculmemis de yoklanmaz — gecici cevap olarak doner ve
+    /// <paramref name="probe"/> ile isaretlenir. <paramref name="probe"/> <c>null</c>
+    /// iken secim ayni, isaret yok: tavsiye kodlayicisinin olculmemisligi baslat
+    /// dugmesini kapatmamali.
+    /// </summary>
+    private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState? probe)
     {
         var preferred = PreferredCodecFor(pref);
         if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
-        if (availability is null || availability.HasEncoder(preferred)) return preferred;
+        if (availability is null) return preferred;
+        if (!availability.HasEncoder(preferred)) return FallbackCodecFor(pref);
+        if (availability is IEncoderMeasurementState state && !state.IsMeasured(preferred))
+        {
+            if (probe is not null) probe.NotMeasured = true;
+            return preferred;
+        }
+        if (availability.WorksAsEncoder(preferred)) return preferred;
         return FallbackCodecFor(pref);
     }
 
