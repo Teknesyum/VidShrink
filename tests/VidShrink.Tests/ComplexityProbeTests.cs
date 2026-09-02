@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -518,4 +518,49 @@ public sealed class ComplexityProbeTests
         Assert.Equal(0, process.ExitCode);
     }
 
+
+    private const string KucukKaynak = "testsrc2=size=96x96:rate=12:duration=8";
+    private const string NormalKaynak = "testsrc2=size=320x240:rate=12:duration=8";
+    private static readonly (int Width, int Height) BolunemeyenYarim = (161, 121);
+
+    [FfmpegFact]
+    public async Task YarimCozunurlukYoluKapalikenPencereHalaUretiliyor()
+    {
+        await WithClipAsync(async info =>
+        {
+            var olcer = new FakeMeter(true);
+            var pencere = await ComplexityProbe.SampleWindowAsync(
+                info.FilePath, 1.0, null, "veryfast", SpeedMode.Quality, olcer, default);
+
+            Assert.True(pencere.FullFrames > 0, "tam olcek ornegi kare uretmedi");
+            Assert.Equal(0, pencere.HalfFrames);
+        }, NormalKaynak);
+    }
+
+    [FfmpegFact]
+    public async Task KucukKaynakUretimdeGercektenIsleniyor()
+    {
+        await WithClipAsync(async info =>
+        {
+            Assert.True(info.Width < 128 || info.Height < 128, $"kaynak {info.Width}x{info.Height}, yarim cozunurluk yoklanabilir");
+
+            var sonuc = await ComplexityProbe.RunDetailedAsync(info, SpeedMode.Quality, true, new FakeMeter(true));
+
+            Assert.True(sonuc.Profile.Measured, "kucuk kaynak olculmeden dondu; kol olu olabilir");
+        }, KucukKaynak);
+    }
+
+    [FfmpegFact]
+    public async Task BolunemeyenYarimOlcuHizliYoluDusuruyorAmaPencereyiDusurmuyor()
+    {
+        await WithClipAsync(async info =>
+        {
+            var olcer = new FakeMeter(true);
+            var pencere = await ComplexityProbe.SampleWindowAsync(
+                info.FilePath, 1.0, BolunemeyenYarim, "veryfast", SpeedMode.Quality, olcer, default);
+
+            Assert.True(pencere.FullFrames > 0, "yedek yol tam olcek ornegi uretmedi");
+            Assert.Equal(0, pencere.HalfFrames);
+        }, NormalKaynak);
+    }
 }
