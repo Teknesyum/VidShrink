@@ -239,3 +239,93 @@ K5'te not edildiği gibi iki küçük sapma bulundu (düzeltme değil, kayıt):
 1. `handbrake-motoru.md:387` → gerçekte `:386` (T126'nın kendi #2 düzeltmesinin yan etkisi).
 2. `testler.md:81`'in susturma sebebi kontratın dediği `duzyazi-formulu` değil,
    `sozdizim-yok` — içerik yine de doğru, sebep kodu farklı.
+
+## Tur 2 — K8, K9, K10, K11
+
+Denetim tur 1 **KALDI**: 6 numaranın düzeltmesi eski kaymayı yeni bir kaymayla
+değiştirmişti — `uygulama-katmani.md:92-93` "`LanguageCatalog.cs` hiçbir zaman çeviri
+sözlüğü olmadı" diyordu, oysa depo geçmişi tam tersini gösteriyor.
+
+### K8 — teşhis düzeltildi
+
+Madde 90 artık "uydurmaydı" demiyor. Doğru teşhis: künye `19af115` commit'inde
+**doğruydu**, `b976332` (T83, 2026-08-30) çeviri sözlüğünü kaldırınca **bayatladı**.
+"hiçbir zaman" ifadesi kaldırıldı. Üç ölü JSON anahtarı ve `Locales/{en,tr}/*.json`
+yeri değişmedi (onlar zaten doğruydu). Commit `6d7ce6b`.
+
+### K9 — çelişki kapatıldı
+
+Satır 87-88 hâlâ `TurkishToEnglish` ters sözlüğünü var sayıyordu; madde 90 ile aynı
+listede iki zıt iddia duruyordu. Bullet başlığına "(T83 öncesi — artık geçersiz)"
+eklendi, gövdeye sözlüğün `b976332` ile kaldırıldığı ve bugünkü karşılığının
+`Locales/{en,tr}/*.json` olduğu yazıldı. Commit `6d7ce6b` (K8 ile aynı commit, bitişik
+satırlar).
+
+### K10 — teşhis kaynağından üretildi
+
+Zorunlu komut ve çıktısı:
+
+```
+$ git log -S 'Target Size Media Compression & Media Converter' --all -- src/ --oneline
+commit 774b18715fc799638440ee43159fe018008a2f91
+    Move the interface to Avalonia and reach three platforms
+commit 19af1155c4989e7cc2f1686d351ab82bf3ad6051
+    Update product description wording
+```
+
+`19af115` dizgeyi ekleyen/değiştiren commit; `774b187` (Avalonia geçişi) dizgeyi
+kaldırdı — ama gerçek kaldırma T0'ın belirttiği gibi `b976332` (T83) ile, sözlüğün
+tamamının silinmesiyle oldu (`774b187` WPF→Avalonia geçişinde LanguageCatalog zaten
+başka bir haldeydi; kronolojik sıra `19af115` → ... → `b976332` → ... → `774b187`).
+
+**Diligence — diğer üç "kaynakta hiç yok" iddiası da aynı komutla tekrar kontrol edildi**
+(K10'un zorunlu kıldığı yalnız 6 numaraydı, kalanlar ek özen):
+
+```
+$ git log -S 'actual < LowerMb' --all -- src/ --oneline
+(sonuç yok — hiç var olmadı)
+
+$ git log -S 'ct.Register(TryKill)' --all -- src/ --oneline
+(sonuç yok — hiç var olmadı)
+
+$ git log -p --all -- tests/VidShrink.Tests/LanguageTests.cs | grep CollectionBehavior
+238: [assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
+659: [assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
+922:+[assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
+(satır dosyanın tüm geçmişinde hep "Xunit." önekiyle var — hiç bayatlamamış)
+```
+
+Üçü de gerçekten "hiç yok" — 6 numaranın aksine "artık yok" değil. K2'deki düzeltmeler
+değişmedi.
+
+### K11 — aracın duyarlılık tavanı
+
+`KAYMA: 0` bir kapanış değil. Araç yalnız **format A/B** görüyor: bir `dosya:satır`
+künyesinin hemen ardından backtick içinde alıntılanmış bir dizge geldiğinde, o dizgeyi
+hedef dosyada arıyor. **Çıplak `dosya:satır` atıflarını** — künyenin arkasından alıntı
+gelmeyen, yalnız davranışı düzyazıyla anlatan atıfları — hiç denetlemiyor. Bu sınıf
+kayma araçla yakalanamaz; yalnız kaynağı elle açıp okumakla bulunur.
+
+Denetçinin elle bulduğu, araçın görmediği üç kayma (**düzeltilmedi, yalnız kayıt
+altına alınıyor** — bu üçü T126'nın yedi bulgusuna dahil değildi, `owns` içindeki
+dosyalarda ama farklı bir kusur sınıfı):
+
+1. `docs/inceleme/model-strateji.md` "§2.4" — `PlanCalculator.cs:92`'ye atıfta bulunup
+   `totalK` 0 çıkınca `MinVideoBitrateK` tabanına düşme davranışını anlatıyor.
+   `PlanCalculator.cs:92` gerçekte `DeliveryReserveK(codec)` yardımcı metodu, ilgisiz;
+   gerçek davranış `:155-157`'de (`totalK = aimMb * KbitPerMib / ...`, `videoK =
+   Math.Max(MinVideoBitrateK, totalK * ContainerOverhead - ...)`) — **63 satır fark**.
+2. Aynı belge "§2.3" — `CompressionStrategy.cs:41-43` künyesinden sonra kısaltılmış
+   `:57` ile `AllowsResolutionDrop`'a atıfta bulunuyor. Gerçek satır `:65`
+   (`public static bool AllowsResolutionDrop(...) => regime != CompressionRegime.Light;`).
+3. `docs/inceleme/plancalculator.md` madde 6-7 — `EncodeRunner.cs:92` künyesinden sonra
+   kısaltılmış `:295` (`Correct` 2pass'e geçiş iddiası) ve `:271` (`RetryAimMb` ölçümlü
+   dalı iddiası) ve `EncodeRunner.cs:64` (4. deneme yok iddiası) ile devam ediyor.
+   Üçü de yanlış hedefte: `:295` gerçekte ffmpeg `out_time_ms` ilerleme ayrıştırması,
+   `:271` gerçekte `ct.Register(() => TryKill(process))` (5 numaralı düzeltmenin kendi
+   hedefi), `:64` gerçekte metot başındaki yerel değişken tanımları. Üçü de anlatılan
+   davranışla ilgisiz.
+
+Ortak desen: **kısaltılmış bare `:N` künyeler**, önceki tam künyenin dosyasını miras
+alıyor ama satır numarası bağımsız kayıyor; format A/B bunları hiç görmüyor çünkü
+aralarında alıntılanmış bir dizge yok, yalnız düzyazı iddiası var.
