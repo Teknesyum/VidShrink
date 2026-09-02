@@ -20,8 +20,9 @@ public sealed class BasarimOlculeri
 /// <summary>
 /// Basarim denetcisinin olculeri. VidShrink kayit yapmaz; burada olculen sey kayit
 /// araci degil, bu makinede kodlamanin nereye dustugu ve maliyeti. Saf karar olculeri
-/// <c>[Fact]</c>, gercek kodlama kosturanlar <c>[FfmpegFact]</c>: CI makinesinde ne
-/// ffmpeg ne de donanim kodlayicisi var.
+/// <c>[Fact]</c>, gercek kodlama kosturanlar <c>[FfmpegFact]</c>, donanim kodlayicisi
+/// isteyenler <c>[HardwareEncoderFact]</c>. T115'ten sonra CI makinesinde ffmpeg **var**,
+/// donanim kodlayicisi hala yok — iki gecit bu yuzden ayri.
 /// </summary>
 [Collection(BasarimOlculeri.Ad)]
 public sealed class PerformanceCheckTests
@@ -707,24 +708,50 @@ public sealed class PerformanceCheckTests
             for (var i = 0; i < 2; i++)
                 Kos($"(c) x264 serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
                     "-an", "-c:v", "libx264", "-preset", "veryfast", "-f", "null", "-" });
-            if (EncoderCapabilities.Instance.HasEncoder("h264_nvenc"))
-            {
-                for (var i = 0; i < 2; i++)
-                    Kos($"(d) nvenc -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
-                        "-an", "-c:v", "h264_nvenc", "-threads", "1", "-f", "null", "-" });
-                for (var i = 0; i < 2; i++)
-                    Kos($"(e) nvenc serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
-                        "-an", "-c:v", "h264_nvenc", "-f", "null", "-" });
-            }
-            else
-            {
-                Log("[sayac] (d)(e) h264_nvenc bu makinede yok, nvenc gecisleri kosulmadi");
-            }
             for (var i = 0; i < 2; i++)
                 Kos($"(f) taban -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample, "-f", "null", "-" });
 
             for (var i = 0; i < 3; i++)
                 Log($"[sayac] (g) tekrar {i}: is parcacigi duzeltmesi={N(PerformanceProbe.CalibrateCpuClock(1500))}x");
+        }
+        finally
+        {
+            try { Directory.Delete(dir, true); } catch { }
+        }
+    }
+
+    /// <summary>
+    /// Sayac olcumunun (d)/(e) bacaklari: ayni kodlama donanim kodlayicisiyla, once tek is
+    /// parcacigiyla sonra serbest. Yazilim bacaklarindan ayri bir olcu, cunku ayri bir sey
+    /// varsayiyor: bu makinede acilan bir <c>h264_nvenc</c>. O varsayim
+    /// <see cref="HardwareEncoderFactAttribute"/> ile sinaniyor; kodlayici acilmiyorsa olcu
+    /// dusmez, sebebini yazarak atlanir. Yazilim bacaklari
+    /// <see cref="IslemciZamaniSayaciDogruOkuyorMu"/> icinde kalir ve donanimdan bagimsiz kosar.
+    ///
+    /// Ayrim T117'de yapildi: bacaklar tek olcudeydi ve geçit yalnizca
+    /// <c>HasEncoder("h264_nvenc")</c> soruyordu. Ad CI'daki ffmpeg derlemesinin listesinde
+    /// gectigi icin geçit aciliyor, acilis surucu yoklugundan dusuyor ve olcunun donanimdan
+    /// bagimsiz kismi da onunla birlikte kirmiziya gidiyordu.
+    /// </summary>
+    [HardwareEncoderFact]
+    public void DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu()
+    {
+        var codec = HardwareEncoderFactAttribute.Codec;
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t117donanim_" + Guid.NewGuid().ToString("N")[..8]);
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var sample = Path.Combine(dir, "ornek.mp4");
+            Kos("uretim", new[] { "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i",
+                $"testsrc2=size={PerformanceProbe.SampleWidth}x{PerformanceProbe.SampleHeight}:rate=60:duration=6",
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-pix_fmt", "yuv420p", sample });
+
+            for (var i = 0; i < 2; i++)
+                Kos($"(d) {codec} -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
+                    "-an", "-c:v", codec, "-threads", "1", "-f", "null", "-" });
+            for (var i = 0; i < 2; i++)
+                Kos($"(e) {codec} serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
+                    "-an", "-c:v", codec, "-f", "null", "-" });
         }
         finally
         {

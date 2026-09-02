@@ -58,6 +58,40 @@ public sealed class TonemapFactAttribute : FactAttribute
 }
 
 /// <summary>
+/// ffmpeg **ve** bu makinede gercekten acilan bir donanim kodlayicisi gerektiren olculer.
+/// <c>FfmpegFact</c> tek soru soruyordu: ffmpeg var mi. Kodlayicinin adinin
+/// <c>ffmpeg -encoders</c> listesinde gecmesi onun bu makinede acilacagi anlamina gelmiyor:
+/// surucu yoksa ad listede durur, acilis <c>Cannot load nvcuda.dll</c> ile duser. Ayrim
+/// <see cref="EncoderCapabilities"/> icinde zaten var — <c>HasEncoder</c> derlemeyi,
+/// <c>Probe</c> bu makineyi yokluyor; geçit ikincisini kullanir. Donanim yoklugu bir kod
+/// hatasi degil ortam bulgusudur, o yuzden dusmez, sebebini yazarak atlanir.
+/// </summary>
+public sealed class HardwareEncoderFactAttribute : FactAttribute
+{
+    public const string Codec = "h264_nvenc";
+
+    public HardwareEncoderFactAttribute()
+    {
+        if (!ToolLocator.IsAvailable(out var missing))
+        {
+            Skip = $"{missing} bulunamadi, donanim kodlayici olculeri kosturulmadi.";
+            return;
+        }
+
+        if (!EncoderCapabilities.Instance.HasEncoder(Codec))
+        {
+            Skip = $"{Codec} bu ffmpeg derlemesinde yok, donanim kodlayici olculeri kosturulmadi.";
+            return;
+        }
+
+        var probe = EncoderCapabilities.Instance.Probe(Codec);
+        if (!probe.Succeeded)
+            Skip = $"{Codec} derlemede var ama bu makinede acilmadi ({probe.ElapsedMs}ms), " +
+                   "donanim kodlayici olculeri kosturulmadi.";
+    }
+}
+
+/// <summary>
 /// Kliplar bir kez uretilir ve butun testler paylasir. T30 ayni yolu kullandi:
 /// <c>testsrc2</c> ile uretilmis kisa klipler.
 /// </summary>
