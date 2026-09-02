@@ -137,3 +137,4 @@
 {"id":"T123","result":"stale","at":"2026-09-02T05:48:41.051Z"}
 {"id":"T116","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|MeasuredQualityTests","code":0}],"auditorRunId":"aed396e0910fc44af","headSha":"c856ee406e4d4d68e4c28825906bc4ee2f1bc705","at":"2026-09-02T06:08:51.809Z"}
 {"id":"T124","result":"stale","at":"2026-09-02T06:15:12.753Z"}
+{"id":"T124","round":"1","risk":"low","verify":[{"step":"powershell -NoProfile -Command \"python tools/alinti-denetimi/alinti-denetimi.py --self-test","code":0}],"auditorRunId":null,"headSha":"f009e03619dccfbe32e2729e3f43d360a3d841f7","at":"2026-09-02T06:53:39.527Z"}
