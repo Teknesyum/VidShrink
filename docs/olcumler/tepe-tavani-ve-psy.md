@@ -266,13 +266,14 @@ Alt sınır 1 saniye; HandBrake'in `min-keyint = fps` değeri (`encx264.c:386-39
 
 ### Üst sınır neye bağlı
 
-Üst sınır **sahne haritasından** türüyor: haritanın bildirdiği ortalama sahne uzunluğu
-`SceneMapMergeFactor`'a bölünür, sonuç 5–10 saniye arasına kısılır. Bölen koda sabit
-olarak girmiyor; ölçüldüğü iki sayının bölümü olarak duruyor
-(`SceneMapGroundTruthCuts / SceneMapReportedScenes` = 28 / 10 = 2,8). Gerekçesi
-aşağıda, **Bölen neden sabit yazılmadı** başlığında.
+Üst sınır **sahne haritasından** türüyor: haritanın bildirdiği sahne uzunluklarının
+**medyanı** `SceneMapMergeFactor`'a bölünür, sonuç 5–10 saniye arasına kısılır. Bölen koda
+sabit olarak girmiyor; ölçüldüğü iki sayının bölümü olarak duruyor
+(`SceneMapGroundTruthCutsInWindow / SceneMapMappedCutsInWindow`). T105'ten sonra bu oran
+**28 / 28 = 1,0**; ayrıntısı aşağıda, *Bölen yeniden ölçüldü* başlığında. Ortalama değil
+medyan okunmasının gerekçesi de ölçüldü: *Ortalama mı medyan mı*.
 
-**2,8 nereden geliyor.** T101 haritayı yer gerçeğine karşı ölçtü: 144,2–333,3 saniyelik
+**2,8 nereden gelmişti.** T101 haritayı yer gerçeğine karşı ölçtü: 144,2–333,3 saniyelik
 pencerede 28 gerçek kesim var, harita 10 sahne bildiriyor, yanlış pozitif yok. Kaçan 18
 kesimin hepsi `SceneMap.DefaultThreshold = 0.2` eleğinin altında (0,112–0,199) kaldı. Yani
 haritanın ortalama sahne uzunluğu sistematik olarak yaklaşık 2,8 kat uzun; üst sınırı ham
@@ -307,9 +308,9 @@ Süpürme yalnız `parca-1-20sn` üzerinde tamamlandı. `parca-2` ve `parca-3` i
 süpürmesi **ölçülmedi** — makine paylaşımlı olduğu için süpürme kesilip zorunlu üç rejim
 karşılaştırmasına (K3) geçildi.
 
-**Bölen neden sabit yazılmadı.** 2,8 bir ayar sabiti değil, haritanın ölçülen duyarlılığı;
-koda ölçüldüğü iki sayı olarak (`SceneMapGroundTruthCuts = 28`, `SceneMapReportedScenes = 10`)
-girdi. Bunun nedeni somut: T105 şu anda `SceneMap.DefaultThreshold`'u ölçüye göre yeniden
+**Bölen neden sabit yazılmadı.** *(Tur 1'in kaydı. Bu bölenin bugünkü değeri 1,0 —
+bkz. Bölen yeniden ölçüldü.)* 2,8 bir ayar sabiti değil, haritanın ölçülen duyarlılığı;
+koda ölçüldüğü iki sayı olarak girdi. Bunun nedeni somut: T105 şu anda `SceneMap.DefaultThreshold`'u ölçüye göre yeniden
 koyuyor ve kaçan 18 kesimin 18'i tam o eleğe takılıyordu. Eşik düşerse harita daha çok sahne
 bulur, ortalama sahne uzunluğu kendiliğinden kısalır — ve sabit bir bölen o düzeltmeyi **ikinci
 kez** uygular, üst sınır olması gerekenin yarısına iner. Bölen tümden atılsaydı da işlemezdi:
@@ -319,11 +320,18 @@ ucunun üstünde; bölensiz harita üst sınırı hiç oynatmazdı ve K2 lafta k
 ile `SceneMap.DefaultThreshold` ayrışırsa `Az_bolme_duzeltmesi_olculdugu_esikte_kalir`
 kırmızıya döner ve duyarlılık yeniden ölçülmeden geçilemez.
 
+Bu tuzak **tur 2'de ateş aldı** ve işini gördü: T105 eşiği 0,105'e taşıdı, ölçü kırmızıya
+döndü, bölen yeniden ölçüldü ve 1,0 çıktı. Bu paragraf geçmiş kaydı olarak duruyor.
+
 ### K3 — üç rejim yan yana
 
-`parca-1-20sn`, libx264, 2 geçiş, 20 MiB hedef, `preset=slow`, VMAF-NEG tüm klipte. Sahne
-haritası bu klipte 2 sahne bildiriyor (ortalama 10 sn); duyarlılık düzeltmesiyle üst sınır
-3,57 sn çıkıyor ve kıskacın alt ucuna, 5 saniyeye oturuyor. Üç rejim gerçekten üç ayrı
+`parca-1-20sn`, libx264, 2 geçiş, 20 MiB hedef, `preset=slow`, VMAF-NEG tüm klipte.
+
+*(Tur 1'de ölçüldü, o günün kuralıyla: 0,200 eşiği, ortalama sahne uzunluğu, bölen 2,8.
+Harita bu klipte 2 sahne bildiriyordu — ortalama 10 sn, düzeltmeyle 3,57 sn, kıskacın alt
+ucuna 5 saniyeye oturuyordu. Bugünkü kuralla — 0,105 eşiği, medyan, bölen 1,0 — aynı klip
+4 sahne veriyor, medyan 4,92 sn ve üst sınır yine alt uca, 5 saniyeye oturuyor. Yani
+üretilen üç `-g` değişmiyor ve tablo geçerliliğini koruyor.)* Üç rejim gerçekten üç ayrı
 `-g` üretiyor: 120 / 600 / 300.
 
 | Rejim | `-g` | `keyint_min` | Teslim MiB | Hedef oranı | mean | p10 | harmonic* | I-kare | Gerçekleşen aralık |
@@ -343,6 +351,11 @@ Teslim boyutu üç rejimde %0,11 içinde. Yani 2 geçişte kazanç boyuta değil
 T102'nin CRF yolunda gördüğü %24,5'lik küçülme burada görünmüyor, görünmesi de beklenmiyor.
 
 ### K4 — atlama gecikmesi
+
+*(Tur 1'in koşumu. Yönü tek koşuma dayanıyordu ve saklanan `matris.tsv` belgenin
+sıralamasının tersini veriyordu; tur 2'de üç koşumla yeniden ölçüldü — bkz.
+**K4 yeniden**. Aşağıdaki mutlak milisaniyeler o turun kaydı, bugünkü yön kararı
+K4 yeniden bölümünden okunur.)*
 
 K3'ün üç çıktısı üzerinde, dosya başına **120** rastgele nokta, her noktada
 `ffmpeg -ss T -i dosya -frames:v 1 -f null -`. Süreç açılış tabanı aynı koşumda ölçüldü
@@ -448,6 +461,130 @@ Hiçbir mutasyon testin kendi sabitini değiştirmiyor.
 Onunun onu da kırmızıya döndü. İki ölçü ffmpeg gerektiriyor ve `[FfmpegFact]` ile
 işaretli; ikisi de koşuyor, atlanmıyor. Süitte `Skip` yok, atlanan test yok.
 
+**Tur 2 — denetimin hayatta bulduğu üç mutasyon.** Denetim üç mutasyonun süiti
+kırmadığını gösterdi. Sebep tablonun kendisinde değil, ölçülerdeydi: `FfmpegArgumentsTests`
+üst ve alt sınırı **kendi modülünden okuyup** onunla karşılaştırıyordu
+(`FfmpegArgumentsTests.cs:591,648`), yani sabiti kendisiyle ölçüyordu. Üçü de çift yönlü
+pimlendi: hem sabitin değeri düz sayıyla, hem de üretilen `-g` dizesi düz sayıyla
+karşılaştırılıyor. Taban yeşil koşum: **Başarısız 0, Başarılı 62, Atlanan 0**.
+
+| # | Mutasyon | Sonuç | Kırılan ölçü (ilk üç) |
+|---|---|---|---|
+| M1 | `KeyframeCeilingMinSeconds` 5,0 → 1,0 | Başarısız 1 / 62 | `Kiskacin_alt_ucu_bes_saniyede_bagliyor` |
+| M2 | `KeyframeCeilingMaxSeconds` 10,0 → 30,0 | Başarısız 1 / 62 | `Kiskacin_ust_ucu_on_saniyede_bagliyor` |
+| M3 | `HardwareKeyframeCeilingSeconds` 5,0 → 2,0 | Başarısız 1 / 62 | `Donanim_ust_siniri_bes_saniyede_sabit` |
+| M4 | `SceneMapThresholdOfRecord` 0,105 → 0,2 | Başarısız 1 / 62 | `Az_bolme_duzeltmesi_olculdugu_esikte_kalir` |
+| M5 | `SceneMapMappedCutsInWindow` 28 → 10 | Başarısız 3 / 62 | `Bolen_olculen_geri_cagirmadan_geliyor`, `Duzeltme_olculen_pencerede_gercek_cekim_uzunlugunu_uretir`, `Ust_sinir_sahne_uzunluguyla_birlikte_uzar` |
+| M6 | medyan → ortalama | Başarısız 2 / 62 | `Ust_sinir_ortalamayi_degil_medyani_okur`, `Bolen_olculen_geri_cagirmadan_geliyor` |
+
+Altısının altısı da kırmızıya döndü; kaynak geri alındıktan sonra süit 62/62 yeşil.
+M1–M3 tur 1'de hayattaydı, artık değil.
+
+### Bölen yeniden ölçüldü — T105 eşiği taşıdı, tel tuzağı ateş aldı
+
+T105 `SceneMap.DefaultThreshold`'u **0,2'den 0,105'e** taşıdı ve `main`e birleşti. Tel
+tuzağı tam bunun için kurulmuştu: `Az_bolme_duzeltmesi_olculdugu_esikte_kalir` kırmızıya
+döndü ve bölen tahmin edilmeden yeniden ölçüldü.
+
+**Nasıl ölçüldü.** Harita yeniden üretildi — `tools/sahne-yer-gercegi/sahneler.csv` eski
+eşiğin çıktısı olduğu için kullanılmadı. Tarama üretim yolunun kendisiyle yapıldı
+(`select='gte(scene,0.05)'` + `metadata=print`, sonra `SceneMap.CutTimes` mantığı: eşik
+süzgeci ve `DefaultMinSceneSeconds = 1.0`), tam kaynak üzerinde, 531 aday. Yer gerçeği
+`tools/sahne-yer-gercegi/gercek-kesimler.txt`, 28 elle işaretlenmiş kesim, değişmedi.
+Eşleştirme toleransı 0,5 sn.
+
+| Eşik | Pencerede harita kesimi | Eşleşen | Geri çağırma | Yanlış pozitif | Bölen |
+|---:|---:|---:|---:|---:|---:|
+| 0,200 (eski) | 10 | 10/28 | 0,357 | 0 | 2,80 |
+| **0,105 (yeni)** | **28** | **28/28** | **1,000** | **0** | **1,00** |
+
+Yani düzeltilmiş eşikte harita artık az bölmüyor ve **düzeltme borcu yok**: bölen 1,0.
+Üretim yolunun yeniden üretildiğinin kontrolü, T105'in bağımsız olarak bildirdiği tam
+kaynak sayılarının birebir çıkmasıdır: ortalama sahne 43,17 → 13,46 sn, medyan
+14,03 → 5,62 sn.
+
+Bölen bugün 1,0 olduğu için **aritmetik olarak etkisiz** ve hiçbir davranış ölçüsü onu
+"bölen yok" durumundan ayırt edemez. Bu belgeye yazılıyor, ölçüyle örtülmüyor. Sınanan şey
+bölenin **nereden geldiği**: iki sayı da aynı birimden (pencere içi kesim sayısı) ve
+`SceneMapThresholdOfRecord` yine `SceneMap.DefaultThreshold`'a pimli. Eşik bir daha
+oynarsa tuzak yine ateş alır.
+
+Birim adları da düzeltildi: eski `SceneMapGroundTruthCuts` (28 **kesim**) ile
+`SceneMapReportedScenes` (10 **sahne**) tek orana giriyordu; o pencerede iki sayım da 10
+olduğu için aritmetik doğru, etiket yanlıştı. Yeni adlar
+`SceneMapGroundTruthCutsInWindow` / `SceneMapMappedCutsInWindow` — ikisi de kesim sayar.
+
+### Ortalama mı medyan mı — ölçüldü, medyana geçildi
+
+T105 dağılımı da ölçtü: tam kaynakta ortalama sahne 13,46 sn, medyan 5,62 sn. Dağılım
+**sağa çarpık**, yani ortalamayı birkaç uzun sahne belirliyor. Üst sınır seçen taraf
+burası olduğu için iki kural aynı ızgarada koşturuldu: libx264, 2 geçiş, `-b:v 8000k`,
+`preset=slow`, `-keyint_min 60`, VMAF-NEG tüm klipte.
+
+| Klip | Kural | Üst sınır | Teslim MiB | mean | p10 | I-kare | Gerçekleşen | Atlama net p50 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `parca-1-20sn` | ortalama | 10,00 sn | 18,2533 | 88,5253 | 86,4959 | 3 | 6,667 sn | 202,6 ms |
+| `parca-1-20sn` | **medyan** | 5,62 sn | 18,2600 | **88,6025** | **86,5155** | 5 | 4,000 sn | **154,9 ms** |
+| `kesimli-20sn` | ortalama | 10,00 sn | 20,0277 | **85,8858** | 76,1197 | 6 | 3,400 sn | 142,7 ms |
+| `kesimli-20sn` | **medyan** | 5,62 sn | 19,9690 | 85,8330 | **76,1769** | 7 | 2,914 sn | **135,6 ms** |
+
+Kapılar dört satırda da geçti: `pix_fmt yuv420p10le`, renk `bt2020nc`, akış 1→1, boyut
+farkı %0,04 ve %0,29.
+
+**Karar: medyana geçildi.** Üst sınırın gerçekten bağladığı klipte (`parca-1-20sn`) medyan
+kuralı iki kalite ölçüsünde de önde (+0,077 mean, +0,020 p10) ve atlama bedelini
+**%24 düşürüyor**. Kesimli klipte fark iki yönde de 0,06'nın altında, yani orada kural
+seçimi ölçülemiyor — beklenen davranış, çünkü orada yerleşimi zaten scenecut belirliyor.
+Hiçbir yerde medyan kaybettirmiyor, bağladığı yerde kazandırıyor.
+
+### Kıskaç hâlâ bağlıyor mu — evet, iki ucundan da
+
+Bölen küçüldü (2,8 → 1,0) *ve* okunan istatistik küçüldü (ortalama → medyan); ikisi de aynı
+yöne gidiyor, bu yüzden kıskacın hâlâ iş görüp görmediği ayrıca sayıldı. Her kaynak için
+harita 0,105 eşiğinde yeniden üretildi:
+
+| Kaynak | Süre | Kesim | Sahne | Ortalama | Medyan | Tavan (medyan) | Kıskaç bağlıyor mu |
+|---|---:|---:|---:|---:|---:|---:|---|
+| tam kaynak | 1036,17 sn | 76 | 77 | 13,46 | 5,62 | 5,62 | hayır (kıskacın içinde) |
+| `parca-1-20sn` | 20,00 sn | 3 | 4 | 5,00 | 4,92 | 5,00 | **evet, alt uç** |
+| `parca-2-20sn` | 20,48 sn | 1 | 2 | 10,24 | 10,24 | 10,00 | **evet, üst uç** |
+| `parca-3-20sn` | 20,48 sn | 0 | 1 | 20,48 | 20,48 | 10,00 | **evet, üst uç** |
+| `kesimli-20sn` | 20,40 sn | 5 | 6 | 3,40 | 2,20 | 5,00 | **evet, alt uç** |
+
+Beş kaynağın dördünde kıskaç bağlıyor ve iki ucu da kullanılıyor. Tam kaynakta bağlamıyor —
+medyan 5,62 sn zaten kıskacın içinde. Yani kıskaç ölü bir sınır değil; kısa çekimli
+içerikte alt uç, tek sahnelik içerikte üst uç devrede.
+
+### K4 yeniden — üç koşum, ham veri ve yön
+
+Tur 1'in atlama sayısında iki borç vardı: ham veri saklanmamıştı ve yön tek koşuma
+dayanıyordu — saklanan `matris.tsv` (n=40) dinamik rejimi **en hızlı** gösteriyordu, belgeye
+yazılan n=120 koşumu ise **ortada**. Üçüncü koşum bu çelişkiyi çözmek için farklı
+kuruldu: rejimler **tur içinde sırası karıştırılarak** ölçüldü, yani her rejim aynı makine
+yükünü gördü. Ham satırlar (`tur`, `rejim`, `nokta_sn`, `ms`) saklandı.
+
+| Rejim | I-kare | n=40 net p50 | n=120 net p50 | **n=120 dönüşümlü net p50** |
+|---|---:|---:|---:|---:|
+| sabit 2 sn | 13 | 47,4 ms | 128,0 ms | **103,8 ms** |
+| dinamik | 6 | 35,6 ms | 189,4 ms | **153,4 ms** |
+| HandBrake 1–10 sn | 3 | 191,5 ms | 328,3 ms | **195,6 ms** |
+
+Süreç açılış tabanı: 174,3 ms (n=40) · 30,5 ms (n=120) · 23,0 ms (dönüşümlü).
+**Bütün atlama sayıları paylaşımlı makine damgalıdır**; kalite ve boyut sayıları değildir.
+
+Geçerli sayılan koşum **dönüşümlü olan**, ve gerekçesi ölçünün kendisinde: n=40 koşumunun
+taban p50'si 174,3 ms, ölçtüğü farkların kendisinden büyük — o koşumda süreç açılışı
+sinyalden baskındı ve rejimler ardışık ölçüldüğü için makine yükü rejimlere eşit
+dağılmamıştı. Dönüşümlü koşumda taban 23,0 ms'ye indi ve sıralama I-kare yoğunluğuyla
+**tek yönlü** hizalandı: 13 → 6 → 3 I-kare için 103,8 → 153,4 → 195,6 ms. n=40 koşumunu
+gizlemiyoruz; yanlış olduğu için değil, **çözünürlüğü yetersiz** olduğu için geçersiz
+sayıldı.
+
+Ham veri `.calisma/t98/atlama/atlama-ham.tsv` (840 atlama + 120 taban satırı) ve özeti
+`atlama-ozet.tsv`. Bu yol **git'e girmiyor** (`.calisma/` gitignore'da), dolayısıyla
+başka bir ağaçta doğrulanamaz; buradaki tablo kalıcı kayıttır.
+
+
 ### Yerleşimin payı — ölçüldü
 
 T102 tur 2 denetimi, o sözleşmedeki "sebebi anahtar kare **sayısı** değil **yeri**" cümlesini
@@ -457,11 +594,21 @@ o cümle **kaynak gösterilmiyor**; T102'den yalnız CRF yolundaki %24,5'lik kü
 alınıyor ve o sayı `-g` değerinin kendisini destekliyor. Yerleşimin payı bu turda ayrıca
 ölçüldü.
 
-**Neden yeni bir klip gerekti.** K3'te kullanılan `parca-1-20sn` ve `parca-3-20sn`'de
-sahne kesimi **yok**: `select='gt(scene,0.1)'` her ikisinde de sıfır kare seçiyor,
-`scdet=threshold=6` da sessiz. Kesimi olmayan malzemede scenecut hiç ateşlenmez, dolayısıyla
-K3 tablosu **aralığın** payını ölçer, yerleşimin payını değil — bu, T102 denetiminin
-bulgusunun bağımsız doğrulaması. Ölçüm için kaynağın kesim yoğun bir penceresinden
+**Neden yeni bir klip gerekti.** K3'te kullanılan klipler kesim bakımından fakir. Tur 2'de
+her klibin haritası yeniden üretilerek tam olarak sayıldı — tur 1'de bu belgede duran
+"`parca-1-20sn` ve `parca-3-20sn`'de sahne kesimi yok" cümlesi **yanlıştı**; yalnız
+`parca-3` sınanmıştı ve sonucu `parca-1`e de genellenmişti. Doğrusu:
+
+| Klip | 0,200 eşiğinde kesim | 0,105 eşiğinde kesim | En yüksek aday skoru |
+|---|---:|---:|---:|
+| `parca-1-20sn` | 1 (14,516 sn) | 3 | 0,2160 |
+| `parca-3-20sn` | **0** | **0** | 0,0688 |
+| `kesimli-20sn` | 1 | 5 | 0,6714 |
+
+Yani `parca-3` gerçekten kesimsiz, `parca-1` ise K3 sırasında geçerli olan 0,200 eşiğinde
+tek kesim taşıyordu. K3'ün okuması bundan etkilenmiyor — üç rejimin I-kare sayısını (13 / 3 / 6)
+tek bir kesim değil üst sınır belirliyor — ama tek klipten yapılan genelleme burada
+düzeltilmiş oluyor. Kesim yoğun bir ölçüm için yine de yeni klip gerekti. Ölçüm için kaynağın kesim yoğun bir penceresinden
 `kesimli-20sn.mkv` çıkarıldı (314–334 s, `-c copy`, yalnız video akışı, 1920×1080@60,
 `yuv420p10le`, `bt2020nc/smpte2084/bt2020`, 1224 kare). Klipte 7 kesim var:
 1,883 · 3,951 · 5,933 · 8,266 · 14,083 · 14,101 · 19,700 s.
@@ -522,6 +669,20 @@ kıskacının içinde yerleşim gerçekten içerikten geliyor, ızgaradan değil
   sabitlemeden koşmuştu; sonraki koşumları sabitlemek iki tabloyu kıyaslanamaz yapardı.
   Sonuç: bütün süre sayıları paylaşımlı makine damgalıdır, kalite ve boyut sayıları değil.
 - Tam süit koşturulmadı; sözleşme yalnız `FfmpegArgumentsTests` filtresini istiyor.
+- **Bölen bugün 1,0 olduğu için davranış ölçüsüyle ayırt edilemiyor.** Hiçbir ölçü onu
+  "bölen hiç yok" durumundan ayıramaz; ayırt edilebilir olan yalnız nereden geldiği
+  (iki sayım) ve hangi eşiğe ait olduğu. Bu bir eksik, örtülmüyor.
+- Ortalama/medyan karşılaştırması **iki klipte** yapıldı, genellenmedi; ölçüde üst sınırın
+  gerçekten bağladığı tek klip `parca-1-20sn`. Aradaki kurallar (ör. 0,75 yüzdelik)
+  **ölçülmedi**.
+- **Ölçüm düzeneği `tools/`a taşınamadı.** `.calisma/t98/olcum/` ve tur 2'nin betikleri
+  git dışında kaldı; `tools/` bu sözleşmenin `owns`'unda değil, yazma kapıya takılıyor.
+  Rapora yazıldı, taşıma T0'da.
+- **Harita yolu üretimde bağlı değil.** `MainWindow.axaml.cs:1796`, `PreviewSegment.cs:161`
+  ve `EncodeRunner.cs:244` hiçbiri `scenes` geçirmiyor, dolayısıyla bugün üretimde üst
+  sınır **her zaman 10 saniyelik varsayılan**. Bu belgedeki haritalı sayılar `FfmpegArguments`
+  seviyesinde geçerli, uçtan uca değil. Üç dosya da bu sözleşmenin `owns`'unda değil —
+  bağlama işi ayrı sözleşme.
 
 
 ### Donanım ayrı bir mekanizma
