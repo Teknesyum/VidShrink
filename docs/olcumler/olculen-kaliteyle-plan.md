@@ -33,6 +33,19 @@ tanımlar:
 **Yeni plan** = aynı komut `--measured-quality` ile (T88'in ölçtüğü VMAF-NEG
 noktaları planlayıcıya girer).
 
+> **KİLİTSİZ ÖLÇER — GEÇERSİZ (T116, 2026-09-02).** Aşağıdaki iki tablonun
+> **bütün** sütunları kare kilidinden önceki ölçerden geçti: hem `--measured-quality`
+> kolunu besleyen `QualityMeter` (kilit `822dd3a`, 04:44) hem de bu tablonun
+> VMAF sütunlarını üreten `bench`in kendi grafiği (kilit `0e2b071`, 03:09) o gün
+> kilitsizdi. Kilitsiz ölçer kareleri zaman damgasıyla eşliyordu; T110 aynı çift
+> üzerinde 12,13 puanlık hata ölçtü (`algi-olcusu.md` §9).
+>
+> **Tablolar silinmedi, geçersiz sayıldı.** Aynı kaynaklarla yeniden ölçmek de
+> mümkün değil: üç kaynak da o turda silindi (yukarıdaki satır). Yeniden ölçüm
+> **ikame kaynaklarla** yapıldı ve **§11'de ayrı tablolarda** duruyor.
+> **Bu iki tablo ile §11'in tabloları aynı kaynakları ölçmüyor, satırları
+> karşılaştırılamaz.**
+
 | kaynak | hedef | kol | yerleşim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
 | --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | klip | 8 MB | eski | 1266x712@60 | 2pass 1188k | 7,824 | 85,79 | 85,62 | 81,40 | 10,6 | 1 |
