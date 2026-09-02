@@ -165,6 +165,16 @@ Depo kapısı `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134` ile filtr
 
 **Tur 2'de bu kapı yerelde tamamlanmadı.** Filtresiz koşum başlatıldı ama makinede eşzamanlı başka ajan koşumları vardı ve süre teslimi bloke ettiği için durduruldu; kısmi çıktı kanıt sayılmaz ve rapora yazılmadı. Tur 2'nin tam suit doğrulaması **CI'a bırakıldı** — yerelde yeşil olduğu varsayılmıyor. Yerelde tamamlanan doğrulama, yukarıdaki `74/74` birleşik verify koşumudur.
 
+Tur 2'nin CI koşumu: **`33687394637`**, `f9bcd1d`, teslim anında **`in_progress`** — sonucu görülmedi, yeşil olduğu iddia edilmiyor.
+
+```
+> gh run list --branch sole/T139-uclu-cevap-uretimde --limit 3
+33687394637  f9bcd1d  in_progress
+33680674698  a125667  completed  success
+33662334067  ed64ef5  completed  success
+```
+
+
 
 ## K7 — Geçici cevap arayüze ölçülmüş gibi ulaşmıyor
 
