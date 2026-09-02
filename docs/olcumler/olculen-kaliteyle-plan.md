@@ -822,5 +822,9 @@ yeşil `[FfmpegFact]` ölçüleri hakkında hiçbir şey söylemez. T110 denetim
 | `VmafPoolingTests`in iki `OlcumFiltresi_*` ölçüsü | `[Fact]` | koşar, ama **`bench`in grafiğini** pinliyor, ürününkini değil (`algi-olcusu.md` §9.13) |
 
 Izgaranın 16 koşumunun hiçbiri bir test değil; `bench` ikilileri elle koşuldu
-(`tools/cipa-yeniden/duzenek/ab-kos.sh`). Süre sayıları için **makine
+(`tools/cipa-yeniden/duzenek/ab-kos.sh`). Izgara 16 hücre, ama `bench` **17 kez**
+koştu: `sdr8-yeni-kilitli` bir kez sessizce boş VMAF döndürdüğü için
+tekrarlandı (§11.4). Tabloya giren, tekrarın sayısıdır. Bunların dışında çıpa
+ölçümü için 3, süpürme için 3 koşum daha yapıldı (§10.1) — hepsi
+`.calisma/T116/gunluk/` altında, JSON adıyla. Süre sayıları için **makine
 paylaşımlıydı** — dokuz ajan aynı makinede koştu.
