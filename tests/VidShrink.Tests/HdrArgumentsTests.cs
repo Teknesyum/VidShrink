@@ -1,5 +1,6 @@
 using VidShrink.App;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
 
@@ -270,6 +271,56 @@ public sealed class HdrArgumentsTests
         Assert.False(string.IsNullOrWhiteSpace(turkish));
         Assert.False(string.IsNullOrWhiteSpace(english));
         Assert.NotEqual(turkish, english);
+    }
+
+    [Theory]
+    [InlineData(0, "", true)]
+    [InlineData(0, "x265 [warning]: Source height < 720p; disabling lookahead-slices\n", true)]
+    [InlineData(0, "Incompatible pixel format 'p010le' for codec 'libx265', auto-selecting format 'yuv420p10le'\n", false)]
+    [InlineData(0, "auto-selecting format 'yuv420p10le'\n", false)]
+    [InlineData(1, "", false)]
+    public void SilentPixelFormatConversionIsNotAcceptance(int exitCode, string diagnostic, bool expected)
+        => Assert.Equal(expected, EncoderCapabilities.PixelFormatAccepted(exitCode, diagnostic));
+
+    [FfmpegFact]
+    public void RealEncoderRefusesP010leForLibx265AndTheGateReadsThatRefusal()
+    {
+        Assert.True(EncoderCapabilities.Instance.HasEncoder("libx265"), "libx265 bu ffmpeg derlemesinde yok; olcu kosturulamaz.");
+
+        var refused = EncodeOneFrame("libx265", "p010le");
+        var accepted = EncodeOneFrame("libx265", "yuv420p10le");
+
+        Assert.Contains("Incompatible pixel format", refused, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Incompatible pixel format", accepted, StringComparison.OrdinalIgnoreCase);
+
+        Assert.False(EncoderCapabilities.PixelFormatAccepted(0, refused));
+        Assert.True(EncoderCapabilities.PixelFormatAccepted(0, accepted));
+    }
+
+    private static string EncodeOneFrame(string codec, string pixelFormat)
+    {
+        var args = string.Join(' ',
+            "-hide_banner", "-loglevel", "warning",
+            "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
+            "-vf", $"format={pixelFormat}", "-c:v", codec, "-pix_fmt", pixelFormat,
+            "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc",
+            "-frames:v", "1", "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null");
+
+        using var process = new System.Diagnostics.Process
+        {
+            StartInfo = new System.Diagnostics.ProcessStartInfo("ffmpeg", args)
+            {
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        var stderr = process.StandardError.ReadToEnd();
+        process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        return stderr;
     }
 
     private sealed class FixedHdrAvailability(string pixelFormat) : IHdr10EncoderAvailability
