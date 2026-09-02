@@ -173,8 +173,6 @@ public sealed class ComplexityProbeTests
         Assert.True(meter.Calls > 0, "olcer hic cagrilmadi; iptal yolu sinanmadan gecti");
     }
 
-
-
     private static async Task WithClipAsync(Func<MediaInfo, Task> body, string source = "testsrc2=size=320x240:rate=12:duration=8")
     {
         var dir = Path.Combine(TestPaths.OutputRoot, "complexity-probe", Guid.NewGuid().ToString("N"));
