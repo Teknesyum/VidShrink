@@ -342,13 +342,35 @@ public static class Rapor
         var satirlar = File.ReadAllLines(yol);
         sb.AppendLine("| Kodlayici | Aday | Destek | A (bayt) | B (bayt) | Fark | Gurultu | Not |");
         sb.AppendLine("|-----------|------|--------|----------|----------|------|---------|-----|");
+        var hucreler = new List<string[]>();
         foreach (var line in satirlar.Skip(1))
         {
             var c = line.Split(';');
             if (c.Length < 8) continue;
+            hucreler.Add(c);
             sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]} | {c[6]} | {c[7]} |");
         }
         sb.AppendLine();
+
+        var zon = hucreler.Where(c => c[1] == "zones").ToList();
+        if (zon.Count > 0)
+        {
+            var calisan = zon.Where(c => c[2] == "evet").Select(c => c[0]).ToList();
+            var calismayan = zon.Where(c => c[2] != "evet").Select(c => c[0]).ToList();
+            var listeyi = (IEnumerable<string> x) => string.Join(", ", x.Select(k => $"`{k}`"));
+            sb.AppendLine($"**Tabloda `zones` denenen {zon.Count} kodlayicinin {calisan.Count} tanesinde");
+            sb.AppendLine($"parametre isliyor:** {listeyi(calisan)}. Islemeyen {calismayan.Count}:");
+            sb.AppendLine($"{listeyi(calismayan)}.");
+            sb.AppendLine();
+            var varsayilan = hucreler.Any(c => c[0] == "libsvtav1" && c[1] == "zones" && c[2] != "evet");
+            if (varsayilan)
+            {
+                sb.AppendLine("Uretimin varsayilan kolu (`maks` -> `libsvtav1`) islemeyen listede.");
+                sb.AppendLine("Dagitim koda girse bile varsayilan yolda **etkisiz kalir**; kazanc");
+                sb.AppendLine("yalniz `libx264` ve `libx265` yollarinda mumkun.");
+                sb.AppendLine();
+            }
+        }
     }
 
     public sealed record Satir(string Arm, OlcumKaydi K);
