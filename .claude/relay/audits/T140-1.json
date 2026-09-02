@@ -1,0 +1,18 @@
+{
+  "contractId": "T140",
+  "auditorRunId": "aad5af6848a6ba228",
+  "headSha": "fb20ebdd2a62465ce5faaf6e8cf8f481fc277b10",
+  "diffHash": "c1556c1b21282b28aa4c0b996aa569092b13ac768c1f07404764cdce9374051b",
+  "owns": [
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/EncodePlan.cs",
+    "tests/VidShrink.Tests/TurboFirstPassTests.cs",
+    "docs/olcumler/turbo-ilk-gecis.md"
+  ],
+  "verification": [
+    "GECTI. Dort sayim bagimsiz enumerator ile uretim kodundan yeniden turetildi ve tuttu: turbo kumesi 2 (libx264, libx265), bilinen kodek 13 = 4 yazilim + 9 donanim, kume disi 11 kodegin pass-1 argumani birebir ayni, merdiven 9 basamak, slow(6)->veryfast(2) tam 4 basamak. Kume disi olma yapisal: FirstPassPreset tavan null ise kosulsuz return preset. Build govdesinde kodek adina bakan tek satir yok; turbonun tum baglantisi FfmpegArguments.cs:400, diff bunu dogruluyor. Iki mutasyon kosuldu (--no-incremental, --no-build yok): libsvtav1 kumeye eklendi -> 10/75 kirmizi, :400 pass==1 dali geri alindi -> 7/75 kirmizi; ikinci mutasyonda Turbo_acikken_ilk_gecis_son_gecisin_on_ayarini_kosmaz yalniz Build ciktisini okuyor, sabit karsilastirmiyor - bu deponun mutasyonla kirilmayan olcu kusuru burada yok. Verify kollari 66+75+7=148, ortusme yok, Atlanan 0. owns ihlali yok. CI 33652799954 ba5b1f... success, kosum kapisi -MinimumTotal 1134 dahil. Uc commit uc ikili. KRITIK yok. Borc: (1) rapor turbo-ilk-gecis.md:105-106 'test kendi kopyasini tasimiyor' diyor, tasiyor - beklenen merdiven TurboFirstPassTests.cs:34-35'te yazili, olculen taraf PresetLadder; yon zararsiz cunku yerel kopya daha guclu pim, ama cumle yanlis ve rapor kendi icinde celisiyor (23. tekrar). (2) M4'un izgara zayifligi kabul edilmis ama kapatilmamis: :160 kume uyeleri icin sessizce return ediyor, 13 theory vakasinin 2'si bos geciyor; kume boyutu 2'ye pimli oldugu icin bugun buyuyemiyor. (3) Ilk_gecis_merdiveni_tavanda_kesiliyor icindeki Build iddiasi (:107) golgede - :103 once dusuyor, iki ayri Fact'e bolunmeli. (4) Kalite etkisi hala olculmedi, sozlesmenin bilincli siniri, varsayilan kapali; sonraki sozlesmenin onculu. (5) Surec notu: T140 muhur denetiminden ONCE main'e girdi (183cdd3), icerik byte-esit, sira yanlis. (6) Ortam: guard.js salt-okuma git merge-base/branch --contains sorgularini itme sanip engelledi. (7) Turbo anahtarini uretimde acan yok - T146'da kapaniyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T17:46:20.118Z"
+}
