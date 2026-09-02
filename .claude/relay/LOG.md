@@ -503,3 +503,20 @@ dayanmiyor.
 `depends: [T132]` — `ComplexityProbeTests.cs` T132 muhurlenene kadar onun.
 Yedek yolun ne siklikta kostugu **olculmedi**; K1 once onu olcuyor ve iki kol da
 olu cikarsa sozlesme orada duruyor.
+
+## Ajan dali yine ana agacta acildi — T0 kendine worktree acti (2 Eylul 2026)
+
+Sole `sole/T139-uclu-cevap-uretimde` dalini **depo kokunde** acti; depo koku artik
+`main`de degil. T141 sozlesme commit'i (`c3ffda1`) farkinda olmadan Sole'nin dalina
+dustu. Ayni kusur ayni gun T125'te de olmustu.
+
+Sebep: ajana verilen kalipta "dal ac, `main`e itme" var, **worktree yok**. Yasak yazma
+eylemine bagli; `git switch -c` yazma gibi gorunmuyor ve sessizce geciyor.
+
+Toparlama Sole'nin calisan agacina dokunmadan yapildi: `git worktree add
+.claude/worktrees/T0 main`, oraya `cherry-pick c3ffda1`, `main` oradan itildi
+(`b88bb66..df72725`). Sole'nin dalindaki `c3ffda1` yerinde birakildi — ayni icerik,
+birlesmede kendiliginden dusecek.
+
+**Bundan sonra butun role commit'leri `.claude/worktrees/T0` uzerinden atilir.**
+Depo koku ajanlara birakildi. Ajan kaliplarina worktree satiri eklenecek — Core borcu.
