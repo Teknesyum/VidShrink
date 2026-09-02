@@ -1208,10 +1208,16 @@ Kalan 12 belge VMAF ya da XPSNR sayısı taşımıyor, kilitten etkilenmiyor:
 `T37-sunum-olcumleri.md`, `T32-anahtar-kare-olcumleri.md`,
 `T30-panel-olcumleri.md`.
 
-**Yeniden ölçülmeyen beş belgenin hiçbiri bu turda kapsam dışı bırakılmadı —
-ölçülmedi.** 10.1'in sonucu bunları da ilgilendiriyor: içlerindeki VMAF sayıları
-kaymış olabilir, ama hiçbiri plan kararı üretmiyor; hepsi rapor sayısı.
-Kaymanın rapor sayısına ne yaptığı belge belge **ölçülmedi**.
+**Bu turda hiç yeniden ölçülmeyen belgeler beş tanedir** — `handbrake-acigi.md`,
+`auto-mod.md`, `tepe-tavani-ve-psy.md`, `ornekte-vmaf-maliyeti.md`,
+`kazanc-kullaniciya-ulasiyor-mu.md`. Altıncısı `olcu-gecerliligi.md`: karışık ve
+o da yeniden ölçülmedi, ama dosya T111'in. `algi-olcusu.md` kısmen yeniden
+ölçüldü (§9.2, §9.4, §7'nin p1 satırı), geri kalanı ölçülmedi.
+
+Bu altı belgenin hiçbiri kapsam dışı bırakılmadı — **ölçülmedi.** 10.1'in sonucu
+bunları da ilgilendiriyor: içlerindeki VMAF sayıları kaymış olabilir, ama hiçbiri
+plan kararı üretmiyor; hepsi rapor sayısı. Kaymanın rapor sayısına ne yaptığı
+belge belge **ölçülmedi**.
 
 
 ## Yeniden üretim
