@@ -45,10 +45,34 @@ public static class Rapor
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         Sonuc(sb, k2, k5, k7);
+        Sinirlar(sb);
 
         Directory.CreateDirectory(Path.GetDirectoryName(ciktiYolu)!);
         File.WriteAllText(ciktiYolu, sb.ToString());
         Console.WriteLine($"rapor yazildi: {ciktiYolu}");
+    }
+
+    private static void Sinirlar(StringBuilder sb)
+    {
+        sb.AppendLine("## Bu sayfanin bilinen sinirlari");
+        sb.AppendLine();
+        sb.AppendLine("1. **Uc pencere tek kaynaktan.** Icerik rejimi uc ayri (kesik cok /");
+        sb.AppendLine("   durgun / kesintisiz hareket) ama kamera, kodlama gecmisi ve gren");
+        sb.AppendLine("   ayni. Kaynaklar arasi genelleme bu sayfadan cikmaz.");
+        sb.AppendLine("2. **`p3-hareketli` iki sahneli, `p2-durgun` alti.** Iki sahnede sira");
+        sb.AppendLine("   korelasyonu ve \"ters dusen orani\" anlamsizdir; tabloda isaretli.");
+        sb.AppendLine("   Istatistik agirligi tasiyan tek pencere 28 sahneli `p1-karisik`.");
+        sb.AppendLine("3. **Duzenek kapali dongu duzeltmesi kosmuyor.** `EncodeRunner`'in hedef");
+        sb.AppendLine("   boyut duzeltme dongusu yok, tek iki gecis var; band uyeligi urunun");
+        sb.AppendLine("   degil duzenegin ozelligi. K6'nin asil sorusu olan **asan** kosum");
+        sb.AppendLine("   orani ayri yazildi.");
+        sb.AppendLine("4. **Referans sahneleri `-ss` ile kesiliyor.** Kesim noktasi kare");
+        sb.AppendLine("   sinirina yuvarlanabilir; hata butun sahnelerde ayni yonde ve paylar");
+        sb.AppendLine("   normalize edildigi icin kucuk, ama sifir degil.");
+        sb.AppendLine("5. **`libsvtav1` kolunda dagitim hic denenemedi.** K4 zone parametresini");
+        sb.AppendLine("   sessizce yok saydigini gosterdi; uretimin varsayilan kodlayicisi bu.");
+        sb.AppendLine("   Dagitim koda girse bile varsayilan yolda **etkisiz kalirdi**.");
+        sb.AppendLine();
     }
 
     private static void Ortam(StringBuilder sb, string isKok)
