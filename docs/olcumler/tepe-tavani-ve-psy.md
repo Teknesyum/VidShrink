@@ -443,6 +443,15 @@ ve kendi turunu hak ediyor: **eğrinin şekli ölçümle ters görünüyor** —
 geldiği yüksek oranda (11,4×) geniş açılıyor, açmanın güvenli ve kazançlı ölçüldüğü
 düşük oranda (4,6×) 1,02'ye kilitli.
 
+*(T108, 2026-09-02: bu ipucu takip edildi. Ölçüm 60 hücreye genişletildi — iki kaynak ×
+iki donanım kodlayıcı × beş taban oranı × üç tepe. Buradaki +3,665 **hareketli kaynakta
+doğrulandı ve aşıldı** (av1_nvenc 4,636'da +7,385, hevc_nvenc +6,318) ama **durgun
+kaynakta doğrulanmadı** (0,236, yön yok). Kazancı belirleyen şey taban oranı değil
+kaynağın hareketliliği; eğri o ekseni hiç görmüyor. Sabitler yine değişmedi, gerekçesi
+`docs/olcumler/tepe-egrisi.md` K6'da. Ayrıca bu bölümün klibi T108'in düzeneğiyle
+**kimliklenemedi**: `parca-1/2/3` üçünün de aynı hücredeki p10'u buradaki 69,812'yi
+üretmiyor.)*
+
 ### K8 — boyut garantisi
 
 Anahtar kare değişikliği boyutu **sistematik olarak aşırmıyor**. İki geçişte üç rejimin
