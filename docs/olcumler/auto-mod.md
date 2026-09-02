@@ -527,6 +527,89 @@ olduğu artık tarif değil, kimlik: **referansın bir kare ileri kaydırılmı�
 
 Bu ölçüm `auto` koşumunda yapıldı; diğer koşumlarda **ölçülmedi**.
 
+### Kilidin tek başına etkisi — aynı dosya, iki ölçüm
+
+Yeniden kodlamanın payını kilidin payından ayırmak için her koşum T111'de
+yeniden üretildi ve **hem kilitsiz hem kilitli** ölçüldü; T102 arşivi de üçüncü
+sütun olarak duruyor. Böylece "kilidin payı" ile "yeniden kodlamanın payı"
+karışmıyor.
+
+Önce yeniden kodlamanın payı, çünkü küçük olmasa geri kalanı okunamazdı
+(T102 arşivi ↔ T111 kilitsiz, ikisi de kilitsiz, on bir koşum):
+
+| en büyük sapma | Δ ortalama | Δ p10 | Δ harmonik | `<1` kare |
+|---|---|---|---|---|
+| on bir koşumun hepsi | ≤ 0,013 | ≤ 0,023 | ≤ 0,005 | 26 → 26 (hiç değişmedi) |
+
+Yani T102'nin kilitsiz sayıları T111'de birebir yeniden üretildi. Aşağıdaki her
+değişiklik **kilidin** payıdır.
+
+| koşum | Δ ortalama | Δ p10 | Δ harmonik | `<1` kare | en düşük kare |
+|---|---|---|---|---|---|
+| `auto` | +1,198 | +0,378 | **+39,334** | 26 → **0** | 0,000 → 92,376 |
+| `auto-olceksiz` | +1,198 | +0,378 | +39,334 | 26 → 0 | 0,000 → 92,376 |
+| `e1-preset4` | +1,189 | +0,379 | +39,295 | 26 → 0 | 0,000 → 91,908 |
+| `e2-gop300` | +1,209 | +0,267 | +39,458 | 26 → 0 | 0,000 → 94,216 |
+| `e3-olcek810` | +1,153 | +0,334 | +35,745 | 26 → 0 | 0,000 → 87,288 |
+| `uzman-biz3` | +1,222 | +0,239 | +39,609 | 26 → 0 | 0,000 → 94,769 |
+| `y1-g300-izgara` | +1,209 | +0,267 | +39,454 | 26 → 0 | 0,000 → 94,230 |
+| `y2-g300-hizali` | +1,201 | **+2,343** | +38,385 | 26 → 0 | 0,000 → 72,574 |
+| `y3-hizali-boyutesit` | +1,205 | **+2,448** | +38,394 | 26 → 0 | 0,000 → 71,940 |
+| `uzman-hb` (x265) | +0,010 | +0,004 | +0,011 | 0 → 0 | 74,692 → **94,211** |
+| `uzman-hb2` (x265) | +0,010 | +0,003 | +0,011 | 0 → 0 | 74,673 → **94,156** |
+
+Eşlenen kare sayısı on bir koşumun hepsinde **3624 → 3624**: kilit kare
+düşürmüyor, eşleşmeyi kaydırıyor.
+
+Üç şey okunuyor:
+
+1. **Dokuz AV1 koşumunun dokuzunda da `<1` kare kümesi tamamen kayboluyor.**
+   26 → 0, istisnasız. Kusur 4'ün konusu olan kareler AV1'in bir özelliği değil,
+   ölçümün ürünüymüş.
+2. **x265 tarafında ortalama neredeyse hiç oynamıyor (+0,010) ama en düşük kare
+   74,7'den 94,2'ye çıkıyor.** Kusur x265'te de vardı; yalnız kuyruktaydı, çünkü
+   iki kaymanın farkı sıfırdı ve geriye kaynağın kendi damga gürültüsündeki
+   180 kare kalıyordu.
+3. **`y2`/`y3`'ün p10'u diğerlerinin yedi katı oynuyor (+2,3 / +2,4).** Zorlanmış
+   anahtar kareli iki koşum bunlar. Kilitli en düşük kareleri de tablonun en
+   düşükleri (72,57 / 71,94). **Neden bu iki koşumda kuyruk daha ağır, ölçülmedi.**
+
+### K2 — yanlılığın büyüklüğü: eski fark, yeni fark
+
+Sözleşmenin sorduğu sayı bu: kilit takılınca **uzman açığı** ne oluyor.
+
+| açık | ölçüm | Δ ortalama | Δ p10 | Δ harmonik |
+|---|---|---|---|---|
+| uzman açığı (`uzman-biz3` − `auto`) | T102 arşivi (kilitsiz) | +0,400 | +0,803 | +0,159 |
+| uzman açığı | T111 yeni (kilitsiz) | +0,413 | +0,812 | +0,163 |
+| uzman açığı | T111 yeni (**kilitli**) | **+0,437** | **+0,673** | **+0,439** |
+
+**Uzman açığı kilitten sağ çıktı.** Ortalamada +0,400 → +0,437, yani 0,037
+büyüdü. p10'da +0,803 → +0,673, 0,130 küçüldü. Harmonik sütunu ilk kez
+okunabilir hâle geldi (+0,159 → +0,439) ama o sayı eskiden **anlamsızdı**, şimdi
+anlamlı — karşılaştırılabilir değil, değiştirildi diye değil, tanımı düzeldi diye.
+
+K3'ün asıl sonucu — "uzman elle ayar yaparak auto'yu geçiyor" — **değişmedi.**
+Yönü de büyüklük sırası da aynı kaldı.
+
+### K3 — AV1 ↔ HandBrake yeniden ölçüldü
+
+| açık | ölçüm | Δ ortalama | Δ p10 | Δ harmonik |
+|---|---|---|---|---|
+| HandBrake açığı (`uzman-hb2` − `auto`) | T102 arşivi (kilitsiz) | +1,269 | +0,827 | +39,414 |
+| HandBrake açığı | T111 yeni (kilitsiz) | +1,285 | +0,852 | +39,421 |
+| HandBrake açığı | T111 yeni (**kilitli**) | **+0,097** | **+0,477** | **+0,099** |
+| HandBrake açığı, boyut eşsiz (`uzman-hb` − `auto`) | T102 arşivi (kilitsiz) | +1,301 | +0,862 | +39,446 |
+| HandBrake açığı, boyut eşsiz | T111 yeni (**kilitli**) | +0,126 | +0,503 | +0,128 |
+
+**Bu sonuç tersine döndü.** T102 "HandBrake bizden 1,269 puan önde" yazmıştı;
+kilitli ölçümde açık **+0,097**. Yani 1,269'un **1,172'si ölçüm kusuruymuş**.
+
+Ne tersine dönmedi: **açığın işareti.** HandBrake hâlâ önde, üç metrikte de.
+Değişen büyüklük — "bir puandan fazla geri" ile "onda bir puan geri" farklı iki
+cümle, ve ikincisi doğru olanı. p10'daki 0,477 ise en dayanıklı kalem: kilitle
+0,852'den 0,477'ye indi ama sıfırlanmadı.
+
 ## Ölçüm sırasında bulunan kusurlar — düzeltilmedi
 
 T102 kod değiştirmiyor. Bunlar ayrı sözleşme ister.
