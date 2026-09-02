@@ -545,3 +545,57 @@ Sonuç: `bench`in `--measured-quality` bayrağı bir *deneme kolu* değil,
 **uygulamanın hâlihazırdaki davranışını `bench`te açan anahtar**. `bench`in
 bayraksız hâli (`eski`) uygulamanın hiç koşmadığı yoldur. Karar bu yüzden
 "açalım mı" değil, **"kilitli ölçüde de açık kalmalı mı"**.
+
+### 11.4 Izgara sırasında çıkan iki olay (ölçüm borcu, düzeltilmedi)
+
+**a) Ölçü sessizce boş döndü ve koşum başarı raporladı.**
+
+`sdr8-yeni-kilitli` koşumu `rc=0` ile bitti, XPSNR yazdı, VMAF alanlarının
+dördünü birden `null` bıraktı ve **hiçbir yerde hata satırı üretmedi**:
+
+| alan | değer |
+|---|---|
+| `VmafNegMean` / `Harmonic` / `P10` / `Min` | `null` |
+| `VmafNegFloorFrames` | 0 |
+| `Xpsnr` | 32,5278 (var) |
+| `MeasureSeconds` | 287,6935 |
+| günlük satırı | `VMAF-NEG mean=- harm=- p10=- min=-` |
+| süreç çıkış kodu | 0 |
+
+Kanıt `.calisma/T116/gunluk/sessiz-bos/` altında saklandı (json + log).
+
+Sebep okundu: `tools/VidShrink.Bench/Program.cs:807` `VmafNegAsync`, libvmaf
+çağrısından sonra
+
+```csharp
+await RunLavfiAsync(referencePath, testPath, width, height,
+    $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={escaped}");
+if (!File.Exists(logPath)) return VmafPool.Empty;
+```
+
+yapıyor. `RunLavfiAsync`'in döndürdüğü stderr bu çağrı yerinde **atılıyor** ve
+çıkış kodu **hiç bakılmıyor**. Filtre herhangi bir sebeple kırıldığında sonuç
+"hata" değil "ölçü yok" olarak görünüyor. Bu, koordinatörün `QualityMeter.cs:224`
+için kaydettiği borcun **ikinci örneğidir**; aynı kusur iki ayrı yerde duruyor.
+`Program.cs` bu sözleşmenin `owns`'unda değil — **bildirildi, düzeltilmedi.**
+
+Koşum aynı parametrelerle tekrarlandı ve ölçü geldi: mean 64,0037, harm 56,8565,
+p10 34,4760, `MeasureSeconds` 110,8945. Yani arıza geçiciydi; tablodaki
+`sdr8-yeni-kilitli` satırı bu ikinci koşumdan gelir. **Arızanın kök sebebi
+ölçülmedi** — ffmpeg'in ne dediği kaydedilmediği için geriye dönük okunamıyor.
+
+**b) Aynı plan iki koşumda birebir aynı dosyayı üretmedi.**
+
+İki koşumun planı, çözünürlüğü, kipi ve bit hızı özdeşti (1190×670@60,
+2pass 1061k, deneme=1) ama çıktı farklı:
+
+| koşum | boyut (MB) | XPSNR |
+|---|---:|---:|
+| ilk (ölçüsü boş dönen) | 7,536956 | 32,527750 |
+| ikinci (tabloya giren) | 7,528613 | 32,526333 |
+
+Fark 0,0083 MB. Bu, tablo satırlarının **bayt bayt yeniden üretilebilir
+olmadığını** gösteriyor; §11.1'de "yeniden üretilebilirlik ölçülmedi" diye
+yazılan maddenin somut karşılığıdır. Sebebi ölçülmedi: `bench`in kendi kodlama
+çağrısında iş parçacığı sayısı sabitlenmiyor, ama bunun tek sebep olduğu
+gösterilmedi.
