@@ -17,14 +17,29 @@ public sealed record Scene
     public double BitsPerSecond => Duration > 0 ? Bits / Duration : 0.0;
 }
 
+public readonly record struct ThresholdRule(
+    double Floor,
+    double Ceiling,
+    double Offset,
+    double Slope,
+    double NeighbourhoodSeconds,
+    double Percentile)
+{
+    public static ThresholdRule Measured => new(0.05, 0.15, 0.08, 2.09, 40.0, 0.90);
+
+    public double At(double agitation) => Math.Clamp(Offset + Slope * agitation, Floor, Ceiling);
+}
+
 public sealed record SceneMap
 {
-    public const double DefaultThreshold = 0.105;
+    public const double FixedThreshold = 0.105;
+    public const double DefaultThreshold = FixedThreshold;
     public const double DefaultMinSceneSeconds = 1.0;
 
     public required double Threshold { get; init; }
     public required double Duration { get; init; }
     public required IReadOnlyList<Scene> Scenes { get; init; }
+    public ThresholdRule? Rule { get; init; }
 
     public static IReadOnlyList<double> CutTimes(
         IEnumerable<SceneScore> candidates,
@@ -45,6 +60,92 @@ public sealed record SceneMap
         return cuts;
     }
 
+    public static double Agitation(
+        IReadOnlyList<SceneScore> ordered,
+        double time,
+        double duration,
+        double frameRate,
+        ThresholdRule rule)
+    {
+        ArgumentNullException.ThrowIfNull(ordered);
+        if (!double.IsFinite(duration) || duration <= 0)
+            throw new ArgumentOutOfRangeException(nameof(duration));
+        if (!double.IsFinite(frameRate) || frameRate <= 0)
+            throw new ArgumentOutOfRangeException(nameof(frameRate));
+
+        var width = rule.NeighbourhoodSeconds;
+        var low = UpperBound(ordered, time - width);
+        var high = UpperBound(ordered, time + width);
+        var span = Math.Min(time + width, duration) - Math.Max(time - width, 0.0);
+        if (span <= 0) return 0.0;
+
+        var count = Math.Max(1, (int)Math.Round(span * frameRate));
+        var index = (int)(rule.Percentile * count);
+        var present = high - low;
+        var zeros = Math.Max(0, count - present);
+        if (index < zeros || present == 0) return 0.0;
+
+        var values = new double[present];
+        for (var i = 0; i < present; i++) values[i] = ordered[low + i].Score;
+        Array.Sort(values);
+        return values[Math.Min(index - zeros, present - 1)];
+    }
+
+    public static IReadOnlyList<double> DerivedCutTimes(
+        IEnumerable<SceneScore> candidates,
+        double duration,
+        double frameRate,
+        ThresholdRule rule,
+        double minSceneSeconds = DefaultMinSceneSeconds)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        var ordered = candidates.OrderBy(c => c.Time).ToArray();
+        var cuts = new List<double>();
+        var last = 0.0;
+        foreach (var candidate in ordered)
+        {
+            var threshold = rule.At(Agitation(ordered, candidate.Time, duration, frameRate, rule));
+            if (candidate.Score < threshold) continue;
+            if (candidate.Time - last < minSceneSeconds) continue;
+            if (duration - candidate.Time < minSceneSeconds) continue;
+            cuts.Add(candidate.Time);
+            last = candidate.Time;
+        }
+        return cuts;
+    }
+
+    public static SceneMap BuildDerived(
+        double duration,
+        IReadOnlyList<SceneScore> candidates,
+        IReadOnlyList<ProbeFrame> frames,
+        ThresholdRule rule,
+        double minSceneSeconds = DefaultMinSceneSeconds)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        ArgumentNullException.ThrowIfNull(frames);
+        if (!double.IsFinite(duration) || duration <= 0)
+            throw new ArgumentOutOfRangeException(nameof(duration));
+        if (frames.Count == 0)
+            throw new ArgumentException("Turetilen esik kare hizina dayanir; sonda karesi yok.", nameof(frames));
+
+        var frameRate = frames.Count / duration;
+        var cuts = DerivedCutTimes(candidates, duration, frameRate, rule, minSceneSeconds);
+        return Assemble(duration, cuts, frames, double.NaN, rule);
+    }
+
+    private static int UpperBound(IReadOnlyList<SceneScore> ordered, double time)
+    {
+        var low = 0;
+        var high = ordered.Count;
+        while (low < high)
+        {
+            var mid = (low + high) / 2;
+            if (ordered[mid].Time <= time) low = mid + 1;
+            else high = mid;
+        }
+        return low;
+    }
+
     public static SceneMap Build(
         double duration,
         IReadOnlyList<SceneScore> candidates,
@@ -57,8 +158,18 @@ public sealed record SceneMap
         if (!double.IsFinite(duration) || duration <= 0)
             throw new ArgumentOutOfRangeException(nameof(duration));
 
+        return Assemble(duration, CutTimes(candidates, threshold, duration, minSceneSeconds), frames, threshold, null);
+    }
+
+    private static SceneMap Assemble(
+        double duration,
+        IReadOnlyList<double> cuts,
+        IReadOnlyList<ProbeFrame> frames,
+        double threshold,
+        ThresholdRule? rule)
+    {
         var bounds = new List<double> { 0.0 };
-        bounds.AddRange(CutTimes(candidates, threshold, duration, minSceneSeconds));
+        bounds.AddRange(cuts);
         bounds.Add(duration);
 
         var bits = new long[bounds.Count - 1];
@@ -85,7 +196,7 @@ public sealed record SceneMap
             });
         }
 
-        return new SceneMap { Threshold = threshold, Duration = duration, Scenes = scenes };
+        return new SceneMap { Threshold = threshold, Duration = duration, Scenes = scenes, Rule = rule };
     }
 
     private static int SegmentIndex(List<double> bounds, double time)

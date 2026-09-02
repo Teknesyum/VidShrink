@@ -13,7 +13,7 @@ public sealed record SceneScan(
 
 public static class SceneDetector
 {
-    public const double BaseThreshold = 0.05;
+    public const double BaseThreshold = 0.012;
     public const int ProbeWidth = 640;
     public const int ProbeCrf = 23;
     public const string ProbePreset = "ultrafast";
@@ -24,7 +24,7 @@ public static class SceneDetector
             "-hide_banner", "-loglevel", "info", "-nostats",
             "-i", path,
             "-filter_complex", FormattableString.Invariant(
-                $"[0:v]split=2[a][b];[a]select='gte(scene,{baseThreshold:0.###})',metadata=print[sc];[b]scale={ProbeWidth}:-2[enc]"),
+                $"[0:v]split=2[a][b];[a]select='gte(scene,{baseThreshold:0.#####})',metadata=print[sc];[b]scale={ProbeWidth}:-2[enc]"),
             "-map", "[sc]", "-f", "null", "-",
             "-map", "[enc]", "-an",
             "-c:v", "libx264", "-preset", ProbePreset, "-crf", ProbeCrf.ToString(CultureInfo.InvariantCulture),
@@ -123,7 +123,19 @@ public static class SceneDetector
     public static async Task<(SceneMap Map, TimeSpan Elapsed)> BuildMapAsync(
         string path,
         double duration,
-        double threshold = SceneMap.DefaultThreshold,
+        ThresholdRule? rule = null,
+        CancellationToken ct = default)
+    {
+        var scan = await ScanAsync(path, ct: ct);
+        if (!scan.Ok) throw new InvalidOperationException($"Sahne taramasi basarisiz: {scan.Error}");
+        var map = SceneMap.BuildDerived(duration, scan.Candidates, scan.Frames, rule ?? ThresholdRule.Measured);
+        return (map, scan.Elapsed);
+    }
+
+    public static async Task<(SceneMap Map, TimeSpan Elapsed)> BuildFixedMapAsync(
+        string path,
+        double duration,
+        double threshold,
         CancellationToken ct = default)
     {
         var scan = await ScanAsync(path, ct: ct);
