@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -402,10 +402,11 @@ public sealed class EncodeRunnerTests
         return stdout.Split('\n').Count(line => line.Trim().TrimEnd(',') == "I");
     }
 
-    // --- Teslim yolunun basari kapisi ---
-    // ffmpeg taninmayan bir kodlayici anahtarini dusurup cikis kodu 0 ile donuyor;
-    // motorun sectigi psikogorsel ayar sessizce kayboluyor. Olcumler:
-    // docs/olcumler/cikis-kodu-yalan.md
+    /// <summary>
+    /// Teslim yolunun basari kapisi. ffmpeg taninmayan bir kodlayici anahtarini dusurup
+    /// <b>cikis kodu 0</b> ile donuyor; motorun sectigi psikogorsel ayar sessizce
+    /// kayboluyor. Olcumler <c>docs/olcumler/cikis-kodu-yalan.md</c> altinda.
+    /// </summary>
     [Fact]
     public void ExitZeroWithADroppedOptionDoesNotFailButTheDropIsCarried()
     {

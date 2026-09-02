@@ -273,6 +273,24 @@ verilen stderr metninin ürettiği kararı pimliyor.
 Mutasyon koşumu bitince çalışma ağacı geri alındı; `git status --short` boş, taban 16/16
 yeşil.
 
+### Izgarayı yeniden üretmek
+
+Düzenek `.calisma/T144/` altındaydı ve iş bitince silindi; `tools/` bu sözleşmenin `owns`
+kümesi dışında olduğu için oraya taşınmadı. Her mutasyon tek bir `sed` değişimi; sırayla
+uygulanıp her turda `dotnet build -c Release --no-incremental` ve ardından `--no-build`
+**olmadan** `dotnet test -c Release --filter "EncodeRunnerTests|FfmpegRunnerTests"` koşuldu.
+Her turdan sonra `git checkout -- src/VidShrink.Ffmpeg/FfmpegRunner.cs src/VidShrink.Ffmpeg/EncodeRunner.cs`.
+
+| # | Dosya | Değişim |
+|---|---|---|
+| M1 | `FfmpegRunner.cs` | `"Error parsing option",` satırı yorumlanır |
+| M2 | `FfmpegRunner.cs` | `"Unknown option:"` satırı yorumlanır |
+| M3 | `FfmpegRunner.cs` | `"Unknown option:"` → `"Unknown"` |
+| M4 | `EncodeRunner.cs` | `StderrWatch.Line` içindeki `dropped.Add(line)` satırı yorumlanır |
+| M5 | `FfmpegRunner.cs` | `Decide` içinde `FfmpegDiagnostics.DroppedOptionLines(standardError)` → `Array.Empty<string>()` |
+| M6 | `EncodeRunner.cs` | `ThrowIfFailed` koşulu → `outcome.ExitCode != 0 || outcome.DroppedOptions.Count > 0` |
+| M7 | `EncodeRunner.cs` | `StderrWatch.Close` → `dropped.ToArray()` yerine `tail.Where(FfmpegDiagnostics.ReportsADroppedOption).ToArray()` |
+
 ## K6 — Her verify kolu gerçekten test buluyor
 
 `dotnet test -c Release --list-tests --filter "<kol>"`, kol başına bulunan test sayısı:
