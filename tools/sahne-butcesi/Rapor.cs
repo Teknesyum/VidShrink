@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using VidShrink.Core;
@@ -41,6 +41,7 @@ public static class Rapor
         Kaynaklar(sb, haritalar);
         var k2 = K1K2(sb, k1, haritalar, kollar);
         K3(sb);
+        K3Denetim(sb, isKok);
         K4(sb, isKok);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
@@ -117,6 +118,8 @@ public static class Rapor
         sb.AppendLine("| Kaynaklar | `00-pencereleri-kes.sh`, sonra `SahneButcesi harita maks <pencere>` | `harita-<pencere>.json` |");
         sb.AppendLine("| K1, K2 | `SahneButcesi k1 <kol> <pencere>` | `k1-<kol>-<pencere>.json` / `.csv` |");
         sb.AppendLine("| K3 | olcum degil; kural `tools/sahne-butcesi/Butce.cs` | — |");
+        sb.AppendLine("| K3 eki (denetim) | `SahneButcesi dogrula <kol>` | `dogrula-<pencere>.csv` |");
+        sb.AppendLine("| K3 eki (mutasyon) | `bash tools/sahne-butcesi/03-duzenek-mutasyonu.sh` | `duzenek-mutasyon.csv` |");
         sb.AppendLine("| K4 | `SahneButcesi k4 maks p1-karisik` | `k4-izgara.csv` |");
         sb.AppendLine("| K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
@@ -325,6 +328,74 @@ public static class Rapor
     }
 
     private static string Evet(bool value) => value ? "evet" : "**hayir**";
+
+    private static void K3Denetim(StringBuilder sb, string isKok)
+    {
+        var dosyalar = Program.Pencereler
+            .Select(p => Path.Combine(isKok, $"dogrula-{p.Ad}.csv"))
+            .Where(File.Exists).ToArray();
+        var mut = Path.Combine(isKok, "duzenek-mutasyon.csv");
+        if (dosyalar.Length == 0 && !File.Exists(mut)) return;
+
+        sb.AppendLine("### K3 eki — kural duzenegin icinde denetleniyor");
+        sb.AppendLine();
+        sb.AppendLine("Dagitim koda girmeyebilir, ama K5'in A/B'sini ureten sey bu kuraldir:");
+        sb.AppendLine("kuralda sessiz bir hata olsaydi K5 zayif bir kazanc olcer ve biz onu");
+        sb.AppendLine("\"dagitim ise yaramiyor\" diye okurduk. Bu yuzden kural duzenek icinde");
+        sb.AppendLine("denetleniyor: `SahneButcesi dogrula <kol> [pencere]`.");
+        sb.AppendLine();
+
+        if (dosyalar.Length > 0)
+        {
+            sb.AppendLine("Denetlenen sartlar: carpan sayisi sahne sayisina esit, her carpan");
+            sb.AppendLine($"`[{Kabuk.Inv(Butce.ZoneFloor, "0.00")}, {Kabuk.Inv(Butce.ZoneCeiling, "0.00")}]`");
+            sb.AppendLine("kiskaci icinde, sure agirlikli ortalama `1,0` (kiskac baglamadikca),");
+            sb.AppendLine("karmasiklik sirasi carpan sirasiyla ayni, zone kare araliklari artan");
+            sb.AppendLine("ve cakismasiz. Uc harita da denetlenir: dogru, eksik kesim, fazla kesim.");
+            sb.AppendLine();
+            sb.AppendLine("| Pencere | Harita | Sahne | Zone | En kucuk b | En buyuk b | Aralik |");
+            sb.AppendLine("|---------|--------|-------|------|------------|------------|--------|");
+            var gecen = 0;
+            foreach (var d in dosyalar)
+                foreach (var satir in File.ReadAllLines(d))
+                {
+                    if (satir.StartsWith("# sonuc", StringComparison.Ordinal))
+                    { if (satir.Contains(";gecti;", StringComparison.Ordinal)) gecen++; continue; }
+                    var c = satir.Split(';');
+                    if (c.Length < 7 || c[0] == "pencere") continue;
+                    sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]} | {c[6]} |");
+                }
+            sb.AppendLine();
+            sb.AppendLine($"Denetlenen pencere {dosyalar.Length}, denetimden gecen {gecen}.");
+            sb.AppendLine();
+            sb.AppendLine("**Aralik sutunu kazancin ust sinirini soyluyor.** `1,0` \"kodlayicinin");
+            sb.AppendLine("verecegi kadar ver\" demektir; aralik daraldikca dagitim kodlayicinin");
+            sb.AppendLine("kararindan uzaklasamaz. `p3-hareketli`'de aralik sifira yakin: o");
+            sb.AppendLine("pencerede dagitim taban kosumuyla neredeyse ayni dosyayi uretir ve");
+            sb.AppendLine("kazanc olcusu oradan gelemez. Bu bir olcum kusuru degil, kuralin");
+            sb.AppendLine("kesintisiz hareket iceren kaynakta soyleyecek sozu olmamasidir.");
+            sb.AppendLine();
+        }
+
+        if (File.Exists(mut))
+        {
+            var satirlar = File.ReadAllLines(mut).Where(x => !x.StartsWith("mutasyon;", StringComparison.Ordinal))
+                .Select(x => x.Split(';')).Where(c => c.Length >= 3).ToList();
+            sb.AppendLine("Denetimin kendisi de olculdu: kural bilerek bozuldu ve denetimin");
+            sb.AppendLine("kirildigi goruldu (`bash tools/sahne-butcesi/03-duzenek-mutasyonu.sh`).");
+            sb.AppendLine();
+            sb.AppendLine("| Mutasyon | Ne degisti | Denetim |");
+            sb.AppendLine("|----------|------------|---------|");
+            foreach (var c in satirlar)
+                sb.AppendLine($"| {c[0]} | {c[1]} | {(c[2] == "kirildi" ? "**kirildi**" : c[2])} |");
+            sb.AppendLine();
+            var bozuk = satirlar.Where(c => c[0] != "M0").ToList();
+            var kirilan = bozuk.Count(c => c[2] == "kirildi");
+            var temiz = satirlar.FirstOrDefault(c => c[0] == "M0")?[2] ?? "yok";
+            sb.AppendLine($"Bozucu mutasyon {bozuk.Count}, denetimi kiran {kirilan}; temiz agac: {temiz}.");
+            sb.AppendLine();
+        }
+    }
 
     private static void K4(StringBuilder sb, string isKok)
     {

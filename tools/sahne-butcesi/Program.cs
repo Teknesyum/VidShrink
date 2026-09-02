@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using VidShrink.Core;
@@ -130,10 +130,86 @@ public static class Program
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
                 case "plan": await PlanYazAsync(p); break;
+                case "dogrula": if (!await DogrulaAsync(p)) return 1; break;
                 default: Console.Error.WriteLine($"bilinmeyen komut: {komut}"); return 2;
             }
         }
         return 0;
+    }
+
+    private static async Task<bool> DogrulaAsync(Pencere p)
+    {
+        var harita = await HaritaAsync(p);
+        var map = Map(harita);
+        var gamma = Butce.Gamma(Butce.DefaultQcomp);
+        var b = Butce.ZoneCarpanlari(map, gamma);
+        var bozuklar = new (string Ad, SceneMap M)[]
+        {
+            ("dogru", map),
+            ("eksik-kesim", Butce.KesimDusur(map, 2)),
+            ("fazla-kesim", Butce.KesimEkle(map))
+        };
+
+        var hata = new List<string>();
+
+        if (b.Length != map.Scenes.Count) hata.Add($"carpan sayisi {b.Length}, sahne sayisi {map.Scenes.Count}");
+        foreach (var v in b)
+            if (!(v >= Butce.ZoneFloor - 1e-9 && v <= Butce.ZoneCeiling + 1e-9))
+                hata.Add($"carpan kiskac disinda: {Kabuk.Inv(v, "0.####")}");
+
+        var toplamSure = map.Scenes.Sum(s => s.Duration);
+        var agirlikli = 0.0;
+        for (var i = 0; i < b.Length; i++) agirlikli += b[i] * map.Scenes[i].Duration / toplamSure;
+        var kiskacBagladi = b.Any(v => Math.Abs(v - Butce.ZoneFloor) < 1e-9 || Math.Abs(v - Butce.ZoneCeiling) < 1e-9);
+        if (!kiskacBagladi && Math.Abs(agirlikli - 1.0) > 1e-6)
+            hata.Add($"sure agirlikli ortalama 1,0 degil: {Kabuk.Inv(agirlikli, "0.######")}");
+
+        for (var i = 0; i < b.Length; i++)
+            for (var j = 0; j < b.Length; j++)
+                if (map.Scenes[i].Complexity > map.Scenes[j].Complexity && b[i] < b[j] - 1e-9)
+                    hata.Add($"sira bozuk: sahne {i} karmasikligi buyuk ama carpani kucuk ({j})");
+
+        foreach (var (ad, m) in bozuklar)
+        {
+            if (m.Scenes.Count == 0) { hata.Add($"{ad}: sahne yok"); continue; }
+            var f = Butce.ZoneCarpanlari(m, gamma);
+            var metin = Butce.ZonesArg(m, f, harita.Fps);
+            var parcalar = metin.Split('/');
+            var sonBitis = -1;
+            foreach (var parca in parcalar)
+            {
+                var alan = parca.Split(',');
+                if (alan.Length != 3) { hata.Add($"{ad}: bicim bozuk: {parca}"); continue; }
+                if (!int.TryParse(alan[0], out var bas) || !int.TryParse(alan[1], out var bit))
+                { hata.Add($"{ad}: kare numarasi sayi degil: {parca}"); continue; }
+                if (bas <= sonBitis) hata.Add($"{ad}: araliklar cakisiyor: {parca}");
+                if (bit < bas) hata.Add($"{ad}: bitis baslangictan kucuk: {parca}");
+                sonBitis = bit;
+            }
+            Console.WriteLine($"{p.Ad}/{ad}: sahne {m.Scenes.Count}, zone {parcalar.Length}, " +
+                              $"b araligi {Kabuk.Inv(f.Min(), "0.###")}..{Kabuk.Inv(f.Max(), "0.###")}");
+        }
+
+        var satirlar = new List<string> { "pencere;bozulma;sahne;zone;b_min;b_max;b_aralik" };
+        foreach (var (ad, m) in bozuklar)
+        {
+            if (m.Scenes.Count == 0) continue;
+            var f = Butce.ZoneCarpanlari(m, gamma);
+            var zone = Butce.ZonesArg(m, f, harita.Fps).Split('/').Length;
+            satirlar.Add(string.Join(';', new[]
+            {
+                p.Ad, ad, m.Scenes.Count.ToString(CultureInfo.InvariantCulture),
+                zone.ToString(CultureInfo.InvariantCulture),
+                Kabuk.Inv(f.Min(), "0.###"), Kabuk.Inv(f.Max(), "0.###"),
+                Kabuk.Inv(f.Max() - f.Min(), "0.###")
+            }));
+        }
+        satirlar.Add($"# sonuc;{(hata.Count == 0 ? "gecti" : "kirildi")};hata={hata.Count}");
+        await File.WriteAllLinesAsync(Yol($"dogrula-{p.Ad}.csv"), satirlar);
+
+        if (hata.Count == 0) { Console.WriteLine($"{p.Ad}: DOGRULAMA GECTI"); return true; }
+        foreach (var h in hata) Console.Error.WriteLine($"{p.Ad}: KIRILDI — {h}");
+        return false;
     }
 
     private static string Kaynak(Pencere p) => Path.Combine(Is, "kaynak", p.Dosya);
