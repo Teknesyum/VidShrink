@@ -903,3 +903,22 @@ yedi olay mesru/kaza diye siniflanir, `QualityArgs` mayini kapatilir.
 T0 onculu **olcerek** yazdi ve olcunun **basarisiz** oldugunu sozlesmeye yazdi: ayni
 agacta iki desen denemesi 63 ve 1 dedi. Sayi verilmedi; sayinin yoklugu kanit olarak
 verildi.
+
+## T139 muhurlendi — tur 2 (3 Eylul 2026)
+
+Denetci bagimsiz klonda GECTI verdi, KRITIK yok, yedi borc. Birlestirildi `63d8e1a`,
+muhurlendi `28cc93c`, risk yuksek (owns 14 dosya, sinir 8). Dal ve iki worktree kaldirildi.
+
+Iki kapi kusuru yakaladi ve ikisi de gercekti:
+
+1. `owns` iki turdur var olmayan bir dosya adi tasiyordu (`HdrResolverTests.cs`).
+   `complete` durdurdu. T0 duzeltirken **olcmeden** "gercek adi `HdrArgumentsTests.cs`"
+   diye yazdi — yanlisti; sinif `EncoderStateConsumptionTests.cs:170` icinde. Olculup
+   duzeltildi. Ayni turda ikinci kez: T0'in yazdigi tur 2 gerekcesi de
+   ("`EncoderCapabilities` `EncoderState`i uygulamiyor") yanlisti, yapici bildirdi,
+   T0 tek komutla olctu ve geri cekti.
+2. `audit` ile `complete` **bitisik** kosmali. Araya iki commit girdi, kapi
+   "record written for another HEAD" deyip durdurdu. Dogru davranis.
+
+T139'un sonraki sozlesmesi **T151** (`PickFastCodec` ilk olculmemis adayda duruyor),
+denetcinin altinci borcundan dogdu. T146'nin engeli kalkti.
