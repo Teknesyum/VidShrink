@@ -308,7 +308,7 @@ public static class QualityMeter
 
     public const double SceneWindowSeconds = 2.0;
 
-    public const double MinimumUnitSeconds = SceneWindowSeconds / 4.0;
+    public const double MinimumUnitSeconds = 0.5;
 
     public readonly record struct WorstUnit(double Score, double StartSeconds, double UnitSeconds);
 
@@ -331,8 +331,10 @@ public static class QualityMeter
             throw new ArgumentException("En kotu birim icin en az bir kare puani gerekli.", nameof(scores));
 
         var fps = frameRate > 0 ? frameRate : 25.0;
-        var bounds = SceneBounds(map, scores.Count, fps, offsetSeconds) ?? FixedBounds(scores.Count, fps);
         var minFrames = Math.Max(1, (int)Math.Round(fps * MinimumUnitSeconds));
+        var bounds = MergeShortUnits(
+            SceneBounds(map, scores.Count, fps, offsetSeconds) ?? FixedBounds(scores.Count, fps),
+            minFrames);
 
         var worst = double.PositiveInfinity;
         var at = offsetSeconds;
@@ -341,7 +343,6 @@ public static class QualityMeter
         {
             var start = bounds[b];
             var count = bounds[b + 1] - start;
-            if (count < minFrames && bounds.Count > 2) continue;
             var sum = 0.0;
             for (var j = 0; j < count; j++) sum += scores[start + j];
             var mean = sum / count;
@@ -353,9 +354,22 @@ public static class QualityMeter
             }
         }
 
-        if (double.IsPositiveInfinity(worst))
-            return new WorstUnit(scores.Average(), offsetSeconds, scores.Count / fps);
         return new WorstUnit(worst, at, unitFrames / fps);
+    }
+
+    private static List<int> MergeShortUnits(List<int> bounds, int minFrames)
+    {
+        if (bounds.Count <= 2) return bounds;
+
+        var merged = new List<int> { bounds[0] };
+        for (var b = 1; b < bounds.Count - 1; b++)
+            if (bounds[b] - merged[^1] >= minFrames) merged.Add(bounds[b]);
+        merged.Add(bounds[^1]);
+
+        while (merged.Count > 2 && merged[^1] - merged[^2] < minFrames)
+            merged.RemoveAt(merged.Count - 2);
+
+        return merged;
     }
 
     private static List<int> FixedBounds(int count, double fps)

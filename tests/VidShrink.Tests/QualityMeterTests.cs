@@ -438,19 +438,50 @@ public sealed class QualityMeterTests
     }
 
     [Fact]
-    public void TrailingUnitShorterThanHalfASecondIsDropped()
+    public void TrailingUnitShorterThanHalfASecondJoinsTheUnitBeforeIt()
     {
         var scores = Enumerable.Repeat(100.0, 975).ToArray();
         for (var i = 960; i < 975; i++) scores[i] = 0.0;
 
-        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0);
+        var unit = QualityMeter.WorstSceneUnit(scores, 60, 0);
 
-        Assert.Equal(100.0, worst, 6);
-        Assert.Equal(0.0, at, 6);
+        Assert.Equal(12000.0 / 135.0, unit.Score, 6);
+        Assert.Equal(14.0, unit.StartSeconds, 6);
+        Assert.Equal(2.25, unit.UnitSeconds, 6);
     }
 
     [Fact]
-    public void SceneShorterThanHalfASecondIsNotTheWorstScene()
+    public void LeadingUnitShorterThanHalfASecondJoinsTheUnitAfterIt()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 0; i < 12; i++) scores[i] = 0.0;
+
+        var unit = QualityMeter.WorstSceneUnit(scores, 60, 12.5, MapWithCuts(30.0, 12.7, 15.0));
+
+        Assert.Equal(12.5, unit.StartSeconds, 6);
+        Assert.Equal(2.5, unit.UnitSeconds, 6);
+        Assert.Equal(92.0, unit.Score, 6);
+    }
+
+    [Fact]
+    public void EveryFrameLandsInExactlyOneMeasuredUnit()
+    {
+        var scores = Enumerable.Repeat(100.0, 975).ToArray();
+
+        for (var i = 0; i < scores.Length; i++)
+        {
+            var probe = scores.ToArray();
+            probe[i] = 0.0;
+
+            var unit = QualityMeter.WorstSceneUnit(probe, 60, 0);
+
+            Assert.True(unit.Score < 100.0,
+                $"a zero at frame {i} left the measurement untouched");
+        }
+    }
+
+    [Fact]
+    public void SceneShorterThanHalfASecondIsNotTheWorstSceneOnItsOwn()
     {
         var scores = Enumerable.Repeat(100.0, 600).ToArray();
         for (var i = 0; i < 12; i++) scores[i] = 0.0;
