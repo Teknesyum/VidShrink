@@ -13,6 +13,11 @@ public sealed class QualityTargetTests
 
     public QualityTargetTests(ITestOutputHelper output) => _output = output;
 
+    private const double LadderStepThreshold = 1.0;
+    private const double OneScanStep = 1.005;
+    private const double CrossingSearchStep = 1.002;
+    private const int CrossingSearchSteps = 40;
+
     private static MediaInfo SampleInfo() => new()
     {
         FilePath = "sample.mp4",
@@ -132,6 +137,9 @@ public sealed class QualityTargetTests
         var worst = 0.0;
         var worstCase = "";
         var undershoots = 0;
+        var unexplained = new List<string>();
+        var worstSlack = 1.0;
+        var worstSlackCase = "";
         var report = new StringBuilder();
         report.AppendLine("# T57 ters cevirme sapmasi");
 
@@ -147,6 +155,40 @@ public sealed class QualityTargetTests
             var error = Math.Abs(result.QualityError);
             report.AppendLine(FormattableString.Invariant(
                 $"{Path.GetFileName(info.FilePath)} {intent} {quality:0.0} -> {result.TargetMb:0.####} MB / {result.PredictedQuality:0.###} (sapma {result.QualityError:+0.###;-0.###;0}) {result.Evaluations} cagri"));
+
+            if (result.TargetMb > PlanCalculator.QualityFloorTargetMb(info) * 1.000001)
+            {
+                var slack = double.PositiveInfinity;
+                for (var step = 1; step <= CrossingSearchSteps; step++)
+                {
+                    var belowMb = result.TargetMb / Math.Pow(CrossingSearchStep, step);
+                    if (QualityAt(info, options, belowMb) < quality)
+                    {
+                        slack = result.TargetMb / belowMb;
+                        break;
+                    }
+                }
+
+                if (slack > worstSlack)
+                {
+                    worstSlack = slack;
+                    worstSlackCase = FormattableString.Invariant(
+                        $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0} -> {result.TargetMb:0.####} MB");
+                }
+            }
+
+            if (error > LadderStepThreshold)
+            {
+                var stepMb = result.TargetMb / OneScanStep;
+                var below = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = stepMb, Intent = intent }, null).Plan;
+                var here = result.Plan!.Plan;
+                report.AppendLine(FormattableString.Invariant(
+                    $"  basamak: {stepMb:0.####} MB {below.Width}x{below.Height}@{below.Fps:0.##} -> {result.TargetMb:0.####} MB {here.Width}x{here.Height}@{here.Fps:0.##}"));
+                if (below.Width == here.Width && below.Height == here.Height && Math.Abs(below.Fps - here.Fps) < 0.01)
+                    unexplained.Add(FormattableString.Invariant(
+                        $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0}: sapma {error:0.###} ama yerlesim {here.Width}x{here.Height}@{here.Fps:0.##} degismedi"));
+            }
+
             if (error > worst)
             {
                 worst = error;
@@ -155,7 +197,7 @@ public sealed class QualityTargetTests
             }
         }
 
-        report.AppendLine(FormattableString.Invariant($"en kotu sapma {worst:0.###} puan ({worstCase}), {undershoots} eksik kalma"));
+        report.AppendLine(FormattableString.Invariant($"en kotu sapma {worst:0.###} puan ({worstCase}), {undershoots} eksik kalma, {unexplained.Count} aciklanmayan, en genis bosluk {worstSlack:0.#####} ({worstSlackCase})"));
         _output.WriteLine(report.ToString());
         Write(report.ToString());
 
@@ -163,13 +205,43 @@ public sealed class QualityTargetTests
         // lands under it - the undershoot count is asserted at zero rather than tolerated.
         Assert.Equal(0, undershoots);
 
-        // The overshoot is what the curve gives at the first target that clears the request. Round
-        // one blamed it on step height and gated at 3,0; that reading was wrong - the 2,78 points
-        // it measured came from the coarse grid stepping over a peak, not from the curve. With the
-        // 0,5% scan the same sweep (0,5-point requests from 20 to 95, three sources, two intents)
-        // measures 0,833 points at worst (phone.mp4 Sharing, request 80 -> 2,498 MB / 80,83), so
-        // the gate is 1,0 - the measured maximum rounded up.
-        Assert.True(worst <= 1.0, $"En kotu sapma {worst:0.###} puan: {worstCase}");
+        // The returned target has to sit just above where the request is actually crossed. Walking
+        // down from it in 0,2% steps, a target that fails the request must turn up within 1% -
+        // measured worst is 1,00601 (sample.mp4 Sharing, request 63,5), a little over the 0,5%
+        // scan step. This is the gate on the search itself, and it is stated in target size, not
+        // in quality points, because the quality gate below is the ladder's height and cannot see
+        // a search that stopped early. Coarsening QualityScanStep to 1,2 breaks it (1,611%);
+        // coarsening it only to 1,05 does not, because the four bisections cut that 5%
+        // bracket back to 0,305% and the search is still sharp enough.
+        Assert.True(worstSlack <= 1.01,
+            $"Donen hedef gecis noktasinin {(worstSlack - 1) * 100:0.###}% uzerinde: {worstSlackCase}");
+
+        // Every overshoot past the old 1,0 gate has to be a step in the layout ladder: one scan
+        // step below the returned target the plan must be a different layout. This is the claim
+        // the loosened quality gate below rests on, and it is asserted rather than assumed.
+        Assert.True(unexplained.Count == 0,
+            $"{unexplained.Count} istekte 1,0 puani asan sapma yerlesim degisimiyle aciklanmiyor: {string.Join(" ; ", unexplained.Take(5))}");
+
+        // The overshoot is what the curve gives at the first target that clears the request, so it
+        // is the height of the layout ladder's step there. Round one gated at 3,0 blaming step
+        // height; the 0,5% scan then measured 0,833 (phone.mp4 Sharing, request 80) and the gate
+        // went to 1,0. T99 raised DefaultMotionExponent from 0,25 to the measured 0,871, the
+        // 30 fps and the 6 fps layouts came within a point of each other, and the ladder grew a
+        // taller step: capture.mkv Sharing, request 55,5 lands at 23,2606 MB / 58,875, 3,375
+        // points out. Measured cause, sweeping the target in 0,1 MB steps: at 23,2 MB the winner
+        // is 306x172@30 (55,49), at 23,3 MB it is 358x202@6 (58,875), and nothing in between
+        // scores between the two. Nine requests in this sweep pass 1,0 and all nine are such
+        // steps - the assertion above checks that, so this gate is the ladder's height and not a
+        // tolerance for a sloppy search. The floor change (av1 0,020 -> 0,0095, hardware factor
+        // 1,25 -> 1,52) was reverted on its own and moved this sweep by nothing.
+        //
+        // A tighter claim was tried and refused by measurement: "a target 0,1% below the returned
+        // one must fail the request" is false, because predicted quality is not monotone in the
+        // target at sub-percent scale. capture.mkv Sharing near 204,3 MB is the case - the audio
+        // ladder steps 84k -> 85k there, video drops 383k -> 382k, and the winner flips back from
+        // 818x460@30 (79,915) to 818x460@25 (78,995) for about 0,12 MB before flipping again.
+        // That island belongs to PickAudio, not to the floor, and is left to its own contract.
+        Assert.True(worst <= 3.5, $"En kotu sapma {worst:0.###} puan: {worstCase}");
     }
 
     [Fact]
@@ -511,4 +583,6 @@ public sealed class QualityTargetTests
         await stderr;
         await stdout;
     }
+
+
 }

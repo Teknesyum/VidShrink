@@ -1,8 +1,13 @@
 # Ölçü geçerliliği — VMAF sıfırlarının sebebi ve kirlenen geçmiş sayılar
 
-T106. Kaynak veri: T102'nin ham çıktısı
-`.claude/worktrees/agent-a3f969792f618f57f/.calisma/t102/` (yeniden kodlama yapılmadı,
-mevcut sekiz VMAF JSON'u ve sekiz çıktı dosyası üzerinden ölçüldü).
+T106. **Kaynak veri T111'de yeniden temellendirildi.** T106 ölçümünü
+`.claude/worktrees/agent-a3f969792f618f57f/.calisma/t102/` altındaki sekiz VMAF JSON'u
+ve sekiz çıktı dosyası üzerinden yaptı (yeniden kodlama yapmadı); o worktree
+kaldırıldı, çıktı dosyaları diskte yok. Ama **ham VMAF arşivi git'te duruyor**:
+`tools/auto-mod-olcumu/vmaf/*.json.gz`, **on bir koşum**. T111 bu belgedeki her
+sayımı o arşivden yeniden saydı; aşağıda "arşivden yeniden sayıldı" yazan her satır
+oradan gelir. Sekiz sayısı T106'nın o gün diskte bulduğu **alt kümeyi** anlatıyordu,
+ölçümün tamamını değil.
 
 Sonuç tek cümlede: **görüntüde bir kusur yok, ölçüde var.** Ölçüm boru hattımız
 kareleri zaman damgasına göre eşliyordu ve bizim çıktımızın zaman damgası kaynağınkinden
@@ -15,6 +20,10 @@ kareleri zaman damgasına göre eşliyordu ve bizim çıktımızın zaman damgas
 Sözleşme "beş SVT-AV1 koşumunun birebir aynı **26 karesinde** VMAF-NEG **0**" diyor.
 Ham JSON'dan sayıldığında bu iki ayrı eşiğin karışmış hâli:
 
+Aşağıdaki tablo **arşivin tamamından yeniden sayıldı** (on bir koşum). T106'nın
+kendi tablosu diskte bulduğu sekiz JSON'la sınırlıydı; `y1`/`y2`/`y3` satırları o
+yüzden eksikti.
+
 | koşum | kodek | vmaf **== 0** | vmaf **< 1,0** | min |
 |---|---|---|---|---|
 | auto | libsvtav1 | 25 | 26 | 0,000 |
@@ -23,21 +32,28 @@ Ham JSON'dan sayıldığında bu iki ayrı eşiğin karışmış hâli:
 | e2-gop300 | libsvtav1 | 25 | 26 | 0,000 |
 | e3-ölçek810 | libsvtav1 | 25 | 26 | 0,000 |
 | uzman-biz3 | libsvtav1 | **24** | 26 | 0,000 |
+| y1-g300-ızgara | libsvtav1 | 25 | 26 | 0,000 |
+| y2-g300-hizalı | libsvtav1 | 25 | 26 | 0,000 |
+| y3-hizalı-boyuteşit | libsvtav1 | **24** | 26 | 0,000 |
 | uzman-hb | x265 (HandBrake) | 0 | 0 | 74,701 |
 | uzman-hb2 | x265 (HandBrake) | 0 | 0 | 74,667 |
 
 26 sayısı `<1,0` eşiğinden geliyor; T102'nin `tablolar.py:24` satırı
 `sum(1 for x in s if x < 1.0)` sayıp sütuna "sıfır puanlı kare" adını vermiş.
-Tam sıfır sayısı dörtte 25, `uzman-biz3`'te 24 — orada 3389. kare 0,132882.
+Tam sıfır sayısı **yedi** AV1 koşumunda 25, **iki**sinde 24: `uzman-biz3` ve
+`y3-hizalı-boyuteşit`. `uzman-biz3`'te farkı yapan 3389. kare, 0,132882.
 
-**"Birebir aynı" iddiası `<1,0` eşiğinde doğru, `==0` eşiğinde değil.** Ölçüldü:
-**dokuz** AV1 koşumunun `<1,0` kümesi birbirinin aynısı, 26/26 örtüşüyor, simetrik
-farkları boş. İki HandBrake koşumunda küme boş. Tam sıfır sayısı ise koşumdan
+**"Birebir aynı" iddiası `<1,0` eşiğinde doğru, `==0` eşiğinde değil.** Arşivden
+yeniden sayıldı: **dokuz** AV1 koşumunun tamamında `<1,0` kümesi birbirinin aynısı,
+26/26 örtüşüyor, simetrik farkları boş. İki HandBrake koşumunda küme boş. Tam sıfır sayısı ise koşumdan
 koşuma **24-25** arasında oynuyor — kümenin sabit, sıfır sayısının değişken
 olması `max(x,1)` kelepçesinin ikisini ayırt etmediğini gösteriyor.
 
 Ortak küme, tam tanımıyla: **{1699} ∪ {3385…3408} ∪ {3410}** — yani
 `{1699} ∪ ({3385…3410} \ {3409})`, toplam **26 kare**.
+
+Bu paragrafın üç sayısı (dokuz koşum / yedi-iki dağılımı / 26 karelik ortak küme)
+**arşivden yeniden sayıldı**, tabloyla aynı koşumdan çıkıyor.
 Sınır kareleri: 3384 = 2,15 ve 3409 = 12,38 kümenin **dışında**;
 3406 = 0,945848 < 1,0 olduğu için kümenin **içinde**. Blok bu yüzden
 "kesintisiz" değil: 3409 aralığın ortasında bir delik açıyor.
@@ -63,7 +79,7 @@ ekranı. Görüntünün kare kareye değiştiği yalnız iki yer var:
 Ölçü kareleri bir kaydırarak eşliyordu. Durgun ekranda `kare[n]` ile `kare[n-1]`
 neredeyse aynı olduğu için kaydırma görünmüyor (PSNR 50 dB'de kalıyor, VMAF 95'te).
 Görüntünün değiştiği bu iki yerde ise iki **farklı** resim karşılaştırılıyor ve skor
-çöküyor. Kümenin altı koşumda birebir aynı olması bu yüzden tesadüf değil: küme
+çöküyor. Kümenin dokuz AV1 koşumunda birebir aynı olması bu yüzden tesadüf değil: küme
 kodlayıcının değil **kaynağın** özelliği — hangi karelerde hareket olduğu.
 
 ### Elenen hipotezler
@@ -113,7 +129,13 @@ VMAF'in doygunluğu ise görünmez kılıyor.
 Kaynağın video akışı **0,020000 s**'de başlıyor (Matroska, 1/1000 zaman tabanı,
 milisaniyeye yuvarlanmış ve titreşimli damgalar: 0,016/0,017/0,018 s aralıkları).
 Bizim çıktımız **0,016667 s**'de başlıyor — kaynağın başlangıç kaymasını atıp tam
-1/60'a oturuyor. Fark her karede **−3,3 ms**.
+1/60'a oturuyor. Fark **her karede aynı değil**: kare başına sapma
+**−1,67 … −4,33 ms**, ortalama **−3,02 ms**; −3,3 yalnız 0. karenin farkı. Dağılım
+(3624 kare, `t111-damga.sh` ile yeniden ölçüldü): −2,67 ms 1177 kare, −3,00 ms 1157,
+−3,33 ms 1014, kalan 276 kare −1,67 ile −4,33 arasında. Sapmanın **işareti** sabit —
+3624 karenin 3624'ü negatif — kaydırmayı üreten de o; büyüklüğü sabit değil.
+Sebebi kaynağın kendi damgalarının titreşimi: kare aralığı **14,00 … 19,00 ms**
+(ortalama 16,6666), oysa çıktı tam 16,6667'lik ızgaraya oturuyor.
 
 ffmpeg framesync kareleri damgaya göre eşler ve "damgası küçük-eşit olan **son**
 referans karesini" seçer. Bizim kare hep erken geldiği için seçilen kare komşusu
@@ -126,11 +148,52 @@ Filtre grafiği `Program.cs`'de `setpts` içermiyordu:
 [0:v]scale=w=1920:h=1080:flags=lanczos[t];[t][1:v]libvmaf=...
 ```
 
+#### Kaymayı üreten şey videonun kendi damgası değil, kaptaki ses akışı — ölçüldü
+
+T110 mekanizmayı ayrı bir düzenekte ölçtü: grafiğe giren kayma, video akışının
+`start_time`'ı eksi **kaptaki en erken akışın** `start_time`'ı. T111 bunu bu
+sözleşmenin kendi dosyalarında doğruladı. Dört ölçüm, hepsi kilitsiz, tek değişen
+şey karşılaştırılan kaptaki **ses akışının varlığı**:
+
+| test | referans | kaptaki ofset (test / ref) | ortalama | harmonik | `<1` kare |
+|---|---|---|---|---|---|
+| auto (sesli) | kaynak (sesli) | 0,016667 / 0,020000 | 94,448 | 56,308 | 26 |
+| auto (**sessiz**) | kaynak (sesli) | 0 / 0,020000 | 94,241 | 53,400 | **30** |
+| auto (sesli) | kaynak (**sessiz**) | 0,016667 / 0 | 94,458 | 56,532 | 26 |
+| auto (**sessiz**) | kaynak (**sessiz**) | 0 / 0 | **95,637** | **95,631** | **0** |
+
+Sessiz kopyalar `ffmpeg -map 0:v:0 -c copy` ile alındı: **video damgalarına
+dokunulmadı.** Dosyaların kendi `start_time`'ı değişmedi bile — sessiz kaynak hâlâ
+`0,020000`, sessiz çıktı hâlâ `0,016667` diyor. Değişen tek şey kapta ondan erken
+başlayan bir akışın **olup olmaması**; ffmpeg kabın en erken damgasını sıfıra
+çektiği için, yalnız video kalınca kayma videonun kendisiyle birlikte gidiyor.
+
+**Sonuç:** "kaynak kaymıştı" cümlesi bu ölçümün söylediği şey değil. Kayma
+kaynağın damgasında değil, **iki kabın ofsetleri arasındaki farkta**; ikisinde de
+ses akışı videodan önce başlıyor ve farkı ayakta tutan o. Dördüncü satır bunun
+kanıtı: hiçbir damga değişmeden, yalnız ses akışları düşünce ölçü düzeliyor.
+
+Düzenek `tools/auto-mod-olcumu/t111-ses.sh`.
+
 **HandBrake neden kurtuluyor:** çıktısını kaynağın **0,020000** başlangıcıyla
-yazıyor, kayması ±1 ms içinde kalıyor. Tek istisnası kanıtın kendisi: 2721. karede
-HandBrake'in damgası **−1 ms**'e düşüyor ve tüm dosyada tek başına düşen PSNR karesi
-(**34,5 dB**, diğer her karede ≥ 47,95 dB) **tam da 2721**. Yani 1 ms'lik negatif
-kayma bile tam kare kaydırıyor.
+yazıyor, yani **sabit ofseti yok**; geriye yalnız kaynağın kendi titreşimi kalıyor.
+Tüm dosyada tek başına düşen PSNR karesi (**34,5 dB**, diğer her karede ≥ 47,95 dB)
+**2721**, ve 2721'de HandBrake'in damgası kaynağa göre **−1 ms**.
+
+**"Tek istisna" cümlesi geri çekiliyor — ölçüldü, istisna değil.** T106 denetçisi
+HandBrake çıktısında **139 kare tam −1,00 ms**, toplam **180 kare negatif**, aralık
+−1,00 … **+1,67 ms** saydı. T111 aynı sayımı **kendi AV1 çıktımızda** yaptı: sabit
+ofset (`PTS-STARTPTS`) çıkarıldıktan sonra kalan artık **139 kare tam −1,00 ms,
+180 kare negatif, aralık −1,00 … +1,67 ms** — üç sayı da birebir aynı. İki farklı
+kodlayıcının çıktısında aynı dağılımın çıkması bunun kodlayıcının değil
+**kaynağın** özelliği olduğunu söylüyor: 60 fps'lik katı ızgaraya oturan her çıktı
+aynı artığı üretir.
+
+Öyleyse 2721'i ayıran şey kaymanın orada olması değil, **hareketin** orada olması
+(`motion_sad` 0,052 → 1,012). Negatif kayma 139 karede de var; durgun ekranda
+`kare[n]` ile `kare[n−1]` neredeyse aynı olduğu için görünmüyor — mekanizma bu
+belgenin kendi `(b)` bölümünde yazılı. Ayakta kalan sonuç şu: **1 ms'lik negatif
+kayma tam kare kaydırıyor, ve kaydırma yalnız hareketli karede skora yansıyor.**
 
 ### Kusur AV1'e özgü değil — bu, sözleşmenin öncülünün ikinci düzeltmesi
 
@@ -172,19 +235,39 @@ kusurdan etkilenmişti.**
 
 | koşum | min | `<1,0` kare | ortalama | harmonik | p10 |
 |---|---|---|---|---|---|
-| AV1 auto — eski (damga eşli) | 0,000 | 26 | 94,462 | **56,313** | 94,534 |
-| AV1 auto — yeni (indeks kilitli) | **92,391** | **0** | 95,659 | **95,655** | 94,904 |
-| x265 HandBrake — eski | 74,701 | 0 | 95,763 | 95,759 | 95,396 |
-| x265 HandBrake — yeni | 76,219 | 0 | 95,799 | 95,793 | 95,473 |
+| `auto` (AV1) — eski (damga eşli) | 0,000 | 26 | 94,462 | **56,313** | 94,534 |
+| `auto` (AV1) — yeni (indeks kilitli) | **92,391** | **0** | 95,659 | **95,655** | 94,904 |
+| `uzman-hb` (x265) — eski | 74,701 | 0 | 95,763 | 95,759 | 95,396 |
+| `uzman-hb` (x265) — yeni (T106) | 76,219 | 0 | 95,799 | 95,793 | 95,473 |
+| `uzman-hb` (x265) — yeni (T111'de yeniden) | **94,211** | 0 | 95,772 | 95,770 | 95,406 |
 
-**Harmonik ortalamada AV1 ile x265 arası fark: 39,446 → 0,138.**
-p10 farkı 0,862 → 0,569. HandBrake tarafı da kusurdan bir miktar etkilenmiş
-(min 74,70 → 76,22); yani düzeltme her iki tarafı da yukarı çekiyor, ama
-AV1 tarafını kıyaslanamayacak kadar fazla.
+**T111'de düzeltildi: satır etiketleri hangi koşumu gösterdiğini söylemiyordu.**
+"x265 HandBrake" yazan iki satırın verisi `uzman-hb` koşumundan geliyor — `-b 2026`
+ile koşan, boyut eşitlemeye **girmemiş** olan. K3'ün karşılaştırmasını taşıyan koşum
+`uzman-hb2` (`-b 1900`, min 74,667). İkisi karıştırılmamalı, çünkü boyutları
+farklı: `auto` 15 766 933 bayt, `uzman-hb` 16 745 000 bayt — x265 dosyası
+**%6,2 daha büyük**.
+
+**Harmonik ortalamada `auto` ile `uzman-hb` arası fark: 39,446 → 0,138.**
+p10 farkı 0,862 → 0,569. HandBrake tarafı da kusurdan etkilenmiş: `<1` kare
+hiç yokken **en düşük kare** 74,69'dan 94,21'e çıkıyor. Yani düzeltme her iki
+tarafı da yukarı çekiyor, ama AV1 tarafını kıyaslanamayacak kadar fazla —
+AV1'de kusur ortalamayı ve harmoniği taşıyordu, x265'te yalnız kuyruğu.
+
+**T106'nın `76,219`'u T111'de yeniden üretilemedi.** Aynı kilit
+(`settb=AVTB,setpts=N`), aynı ayarla yeniden kodlanmış `uzman-hb` ile ölçüldüğünde
+en düşük kare **94,211** çıkıyor; ortalama, harmonik ve p10 ise 0,03 içinde
+tutuyor (95,772 / 95,770 / 95,406). Yani üç sayı tekrarlanıyor, en düşük kare
+tekrarlanmıyor — ve fark 18 puan, yeniden kodlama gürültüsü değil. T106'nın o
+satırını üreten ham JSON git'te olmadığı için **farkın sebebi ölçülmedi**;
+satır silinmedi, yanına yeniden üretilen ölçüm kondu.
 
 Yol haritasının "AV1'i x265'e karşı 39,4 puan geride gösteriyor" tespiti doğruydu;
-sebebi yanlıştı. **Ölçülen gerçek fark 0,14 puan — yani bu kaynakta iki kodlayıcı
-kalitede başa baş.**
+sebebi yanlıştı. **Kilit takıldığında kalan fark 0,138 puan.** Bu sayı iki
+kodlayıcının **başa baş olduğunu göstermez**: karşılaştırılan iki dosyadan x265
+olanı %6,2 daha büyük, yani fark boyut lehine kirli. Boyut eşitlenmiş çift
+(`auto` ↔ `uzman-hb2`) bu belgede **ölçülmedi**; T111'de ölçülüyor ve sonucu
+`docs/olcumler/auto-mod.md`'nin T111 bölümünde.
 
 ---
 
@@ -313,7 +396,12 @@ Kusur **yalnız bizim satırlarımızı** vurduğu için buradaki açık olduğu
 
 `.claude/relay/YOL-HARITASI-2.md`
 - `:113-115` T102 satırları
-- `:218-220` "AV1'i x265'e karşı **39,4 puan** geride gösteriyor" → **0,14 puan**
+- `:218-220` "AV1'i x265'e karşı **39,4 puan** geride gösteriyor" → kilit
+  takıldığında kalan fark **0,138 puan**; ama karşılaştırılan çift (`auto` ↔
+  `uzman-hb`) boyut eşli değil (x265 dosyası %6,2 büyük), o yüzden bu sayı
+  "başa baş" demek için yeterli değil. `:248`'de duran **"İki kodlayıcı bu
+  kaynakta başa baş"** cümlesi bu yüzden dayanaksızdı; dosya bu sözleşmenin
+  `owns`'unda değil, **T0 düzeltti** (cümle geri çekildi, gerekçesi yazıldı).
 - `:222-228` kodlayıcı seçim kuralının bu sayıya dayandığı uyarısı — **kural artık
   düzeltilmiş ölçüyle yeniden kurulabilir**
 
@@ -390,18 +478,36 @@ karşılaştırma için kullanılmamalı.
 
 ## Kare kilidinin gerekçesi — T110 bunu referans alacak
 
-Bu bölüm ölçüm aracının dışında da geçerli. `src/VidShrink.Ffmpeg/QualityMeter.cs:278`
-üretim yolunda **aynı açık duruyor**: kare kilidi yok. `--measured-quality` ve
-kalibrasyon çıpaları o yoldan geçiyor. **Bu sözleşme oraya dokunmadı** (sahibi
-T110); aşağısı o iş için gerekçedir.
+Bu bölüm ölçüm aracının dışında da geçerli. T106 burada "üretim yolunda **aynı
+açık duruyor**: kare kilidi yok (`QualityMeter.cs:278`)" yazıyordu; **o cümle
+artık yanlış ve geri çekiliyor.**
+
+**T110 açığı kapattı ve mühürlendi.** Üretim yolu bugün aynı kilidi kullanıyor:
+`src/VidShrink.Ffmpeg/QualityMeter.cs:75` sabiti tanımlıyor
+(`settb=AVTB,setpts=N`), `:359` grafiği onunla kuruyor. `--measured-quality` ve
+kalibrasyon çıpaları o yoldan geçiyor, yani kilitli ölçüyorlar. Aşağısı bu iş
+için yazılmış gerekçedir; **kaldırılmadı çünkü kilidin neden bu biçimde olduğunu
+tek yerde anlatan metin bu.**
+
+Kilidin üretim tarafındaki etkisi T110'da ölçüldü: kilitsiz ölçerle konmuş bir
+çıpa **75,07**, kilitli ölçerle **87,20** — **12,13 puan**. Ölçünün kendisi bu
+kadar kaymıştı.
+
+**Kayan ölçü, kayan karar demek değil.** T116 aynı ölçümde çıpanın koşum başına
+yeniden hesaplandığını ölçtü: kilit girer girmez çıpa kendiliğinden düzeldi ve
+plan **yedi hedefin hiçbirinde değişmedi**; değişen tek alan `PredictedQuality`.
+Yani bu kusur *bildirilen kaliteyi* bozuyordu, *verilen kararı* değil. Bu belgede
+ve `auto-mod.md`'de düzeltilen sayıların hepsi ilk gruba ait; hangi kararın
+değiştiği ayrıca gösterilmeden **"karar da yanlıştı" denemez.**
 
 Neden `settb=AVTB,setpts=N`, neden başka bir şey değil:
 
 - **Neden bir şey gerekiyor.** ffmpeg'in iki girdili filtreleri (`psnr`, `libvmaf`,
   `xpsnr`) kareleri **zaman damgasıyla** eşler: "damgası test karesinden küçük-eşit
   olan **en son** referans karesi". Yarım kareden küçük, tek yönlü bir sapma bile
-  tam bir kare kaydırma üretir. Sapma sabit olduğu için de kaydırma **her karede**
-  tekrarlanır.
+  tam bir kare kaydırma üretir. Sapmanın **işareti** sabit olduğu için de kaydırma
+  **her karede** tekrarlanır — büyüklüğünün sabit olması gerekmiyor, bu kaynakta
+  zaten sabit değil (−1,67 … −4,33 ms).
 - **Neden `setpts=N`.** Kareleri damgaya değil **sıraya** göre eşler. Kaynak ile
   çıktının kare sayısı aynı olduğu sürece — ki ölçüm bunu zaten varsayıyor —
   n'inci kare n'inci kareyle karşılaşır. Kare hızından bağımsızdır;
@@ -444,23 +550,58 @@ karenin altında — tam olarak sahadaki 3,3 ms'lik kayma gibi.
 
 **Sınırı yazmak gerekiyor:** bu üç ölçü ffmpeg istiyor, bu yüzden `[FfmpegFact]`
 ile işaretli — ffmpeg'i olmayan koşucuda **atlanıyor, düşmüyor.** CI koşucusunda
-ffmpeg yok (aynı süitte 83 test bu sebeple atlanıyor; yerelde 17). Yani kare
+ffmpeg yok. **Atlanan sayısı sabit değil, her turda büyüyor** — T106 "83" yazmıştı,
+o sayı yazıldığı anda bile bir sonraki koşumda geçerliliğini yitiriyordu:
+`33575828972` → 83, `33580719123` → 86, `33583013195` → 95,
+`33585293085` (T111'in dalı) → **103** (geçen 1044, toplam 1147). Bu belge artık
+sayıyı değil **koşumu** yazıyor; sayı isteyen `gh run view <id> --log` ile okur.
+Yani kare
 kilidini tutan pim **yerelde ve ffmpeg'i olan koşucuda** koruyor, CI'da
 korumuyor. Havuzlama ölçüleri saf, her yerde koşuyor. Kilidi CI'da da tutmak
 istenirse yapılacak iş ffmpeg'i koşucuya kurmaktır; bu sözleşme onu yapmadı.
+
+**Bu cümlenin ömrü belli — T115 tam o işi yapıyor.** T115 (bu satır yazılırken
+tur 2, `main`'e **birleşmedi**) CI koşucusuna ffmpeg kuruyor. Birleştiğinde
+atlanan sayısı 103'ten **17**'ye düşüyor ve kare kilidini taşıyan üç
+`[FfmpegFact]` ölçüsü CI'da **gerçekten koşuyor**. Yani yukarıdaki "CI'da
+korumuyor" tespiti `33585293085` koşumu için doğru, T115 birleştiği anda yanlış
+olacak. 17 sayısı T115'ten devralındı; **bu belgede ölçülmedi.**
+
+`tools/ci-gibi-kos.sh` bu sorunun kanıtı olarak **kullanılmamalı**: betik
+ffmpeg'i PATH'ten siliyor, yani CI'ın bugünkü hâlini taklit ediyor, yarınki
+hâlini değil. Bu belgedeki atlanan sayıları gerçek CI koşumlarından okundu.
 
 Mutasyon denemesi — her satır kaç ölçü düşürüyor. **Her tur `--no-incremental`
 ile yeniden derlendi;** artımlı derleme bir turda bayat ikili koşturup yanlış
 sonuç verdi:
 
-| mutasyon | düşen ölçü |
-|---|---|
-| `Math.Max(raw, HarmonicFloor)` → `raw` (kelepçe kalkar) | 2 |
-| `Min` kelepçelenmiş değerden hesaplanır | 2 |
-| taban altı sayacı yalnız `raw == 0.0` sayar | 2 |
-| **`FrameLock` → `settb=AVTB` (kare kilidi kalkar)** | **2** |
-| `FrameLock` → `settb=AVTB,setpts=N+1` | 0 — **eşdeğer mutasyon** |
-| `FrameLock` → `settb=AVTB,setpts=PTS-STARTPTS` | 0 — zayıf ama geçerli almaşık |
+| mutasyon | düşen ölçü | kim koşturdu |
+|---|---|---|
+| `Math.Max(raw, HarmonicFloor)` → `raw` (kelepçe kalkar) | 2 | T106 |
+| `Min` kelepçelenmiş değerden hesaplanır | 2 | T106 |
+| taban altı sayacı yalnız `raw == 0.0` sayar | 2 | T106 |
+| `FrameLock` → `settb=AVTB,setpts=PTS-STARTPTS` | 0 — zayıf ama geçerli almaşık | T106 |
+| **`FrameLock` → `settb=AVTB`** (`setpts` düşer) | **2** | T111 |
+| **`FrameLock` → `"null"`** (kilit tümden kalkar) | **2** | T111 |
+| `FrameLock` → `settb=AVTB,setpts=N+1` | 0 — **eşdeğer mutasyon** | T111 |
+| **`FrameLock` → `setpts=N`** (`settb` düşer) | **0 — eşdeğer değil, gerçek açık** | T111 |
+
+T106'nın son dört satırı belgede iki ayrı tabloda iki farklı adla duruyordu
+(`settb=AVTB` bir yerde, `"null"` başka yerde) ve hangisinin koşturulduğu belirsizdi.
+**T111 dördünü de yeniden koşturdu**, her turdan önce
+`dotnet build VidShrink.sln -c Release --no-incremental`, sonra
+`dotnet test -c Release --no-build --filter FullyQualifiedName~VmafPoolingTests`
+(15 ölçü, ffmpeg yerelde var, atlanan 0). Sonuç: **ikisi de 2 ölçü düşürüyor ve
+düşen ölçüler aynı ikisi** —
+`OlcumFiltresi_KareKilidi_OlceklemedenSonraGelir` ve
+`KareKilidi_AltKareKaymasinaRagmen_KareleriDogruEsler`. Yani belirsizlik sonucu
+değiştirmiyordu; yine de ölçülmeden bırakılmıyor. Düzenek
+`tools/auto-mod-olcumu/t111-mutasyon.sh`.
+
+**Düşen iki ölçünün yalnız biri CI'da koşuyor.** `KareKilidi_AltKareKaymasinaRagmen_...`
+`[FfmpegFact]`; CI koşucusunda ffmpeg yok, o ölçü orada atlanıyor. Kare kilidini
+CI'da tutan tek şey `OlcumFiltresi_KareKilidi_OlceklemedenSonraGelir`, o da
+saf dizgi ölçüsü. (Bunu kapatan iş T115'te.)
 
 Son iki satır ölçünün açığı değil, mutasyonun kendi özelliği; ikisi de yazılmadan
 bırakılmıyor:
@@ -468,20 +609,52 @@ bırakılmıyor:
 - **`setpts=N+1` eşdeğer.** Sabit iki dalda birden kullanılıyor, yani her iki akışı
   **aynı miktarda** kaydırıyor. Framesync eşleşmesi değişmiyor; yalnız çıktının
   mutlak damgaları bir tik kayıyor. Hiçbir davranışsal ölçü bunu yakalayamaz,
-  çünkü ortada davranış farkı yok. Yakalanması gereken şey **göreli** kayma, ve o
-  ayrı bir ölçüyle pimlenmiş durumda (üstteki üçüncü madde).
-- **`PTS-STARTPTS` hayatta çünkü bu kusuru gerçekten düzeltiyor.** İki akışı da
-  başlangıcına göre sıfırlıyor, sabit ofseti siliyor. `setpts=N`'i tercih etme
-  sebebi: damga *titreşimliyse* (kare başına değişen sapma) `PTS-STARTPTS`
-  yetmez, indeks kilidi yeter. Bu üstünlüğü **ölçemedim** — jitter'lı bir damga
-  dizisini bu ffmpeg sürümünde diske yazdıramadım (mkv/nut/avi üçü de CFR'ye
-  normalize etti), o yüzden almaşığın zayıflığı burada **gerekçe, kanıt değil**.
+  çünkü ortada davranış farkı yok. Yakalanması gereken şey **göreli** kayma —
+  **ve o pimlenmiş değil.** T106 burada "ayrı bir ölçüyle pimlenmiş durumda"
+  yazıyordu; okundu ve iddia geri çekiliyor:
+  `tests/VidShrink.Tests/VmafPoolingTests.cs:181-195` elle yazılmış sabit bir grafiği
+  `Build`'e karşı yalnız `Assert.NotEqual` ile karşılaştırıyor, sonra o sabit grafiği
+  ffmpeg'e koşturuyor. `FrameLock` ne olursa olsun `[1:v]` dalı elle yazılmış dizgiden
+  farklı kalır, `Assert.NotEqual` geçer; ölçünün geri kalanı bizim kodumuzu değil
+  ffmpeg'in framesync davranışını ölçer. **Göreli kaymayı düşüren bir mutasyon yok**
+  — çünkü göreli kaymayı üretecek tek yol sabiti iki dalda **farklı** kılmak, sabit
+  ise tek. Pimi gerçekten kurmak `Build`'e iki ayrı kilit dizgisi geçirmeyi gerektirir;
+  o dosya T111'in `owns`'unda değil, **yapılmadı**.
+- **`settb=AVTB` düşünce hiçbir ölçü düşmüyor — ve bu eşdeğerlik değil, açık.**
+  `setpts=N` sayacı, girdinin kendi zaman tabanında yazılır. Ölçü dosyayı **kendisiyle**
+  karşılaştırdığı için iki dalın tabanı da aynı çıkıyor ve mutasyon görünmüyor.
+  Gerçek ölçümde iki taban aynı değil: kaynak `parca-2.mkv` **1/1000**, bizim
+  çıktımız **1/15360**. Ölçüldü — aynı dosya çifti, tek fark `settb`:
 
----|---|
-| `Math.Max(raw, HarmonicFloor)` → `raw` (kelepçe kalkar) | 2 |
-| `Min` kelepçelenmiş değerden hesaplanır | 2 |
-| taban altı sayacı yalnız `raw == 0.0` sayar | 2 |
-| `FrameLock` → `"null"` (kare kilidi kalkar) | 2 |
+  | filtre | kare | ortalama | p10 | harmonik | `<1` kare |
+  |---|---|---|---|---|---|
+  | `settb=AVTB,setpts=N` | 3624 | 95,647 | 94,903 | 95,642 | 0 |
+  | `setpts=N` (settb yok) | **7012** | **26,090** | **0,000** | **1,370** | **5099** |
+
+  Yani `settb` düşerse ölçü çöküyor, kare sayısı bile tutmuyor — ve süitteki 15
+  ölçünün hiçbiri bunu görmüyor. Düzenek `tools/auto-mod-olcumu/t111-settb.sh`.
+- **`PTS-STARTPTS` hayatta çünkü sabit ofseti gerçekten siliyor — ama yetmiyor,
+  ve T111 bunu ölçtü.** T106 "damga titreşimliyse `PTS-STARTPTS` yetmez, indeks
+  kilidi yeter" diyor, sonra "bu üstünlüğü **ölçemedim**" diye ekliyordu; jitter'lı
+  bir damga dizisi *üretemediği* için. Üretmeye gerek yokmuş: **kaynağın kendi
+  damgası zaten titreşimli** (belgenin `(b)` bölümündeki 0,016/0,017/0,018
+  gözlemi). Aynı dosya çifti, tek fark filtre:
+
+  | filtre | ortalama | p10 | harmonik | en düşük kare | nerede |
+  |---|---|---|---|---|---|
+  | `settb=AVTB,setpts=N` (indeks kilidi) | 95,647 | 94,903 | 95,642 | **92,376** | 3411 |
+  | `settb=AVTB,setpts=PTS-STARTPTS` | 95,637 | 94,898 | 95,631 | **74,421** | **2721** |
+
+  Ortalamada fark **0,010** — üç metrikte de virgülden sonra ikinci hane. En kötü
+  karede fark **17,955 puan**. `PTS-STARTPTS` sabit ofseti siliyor, ortalamayı
+  kurtarıyor, ama **2721. karede** hâlâ yanlış eşliyor; indeks kilidinde o kare
+  temiz. Yani almaşığın zayıflığı artık gerekçe değil **ölçüm** — ve zayıflık
+  ortalamada değil kuyruğunda.
+
+  Aynı sayılar ikinci bir yoldan da çıktı: iki dosyanın ses akışı `-c copy` ile
+  atılıp ofsetler doğal olarak sıfırlanınca ölçü **birebir aynı** üç sayıyı verdi
+  (95,637 / 94,898 / 95,631, en düşük 74,421 @ 2721). İki yol aynı şeyi ölçüyor;
+  `PTS-STARTPTS` kap ofsetini sıfırlamaktan başka bir şey yapmıyor.
 
 ---
 
@@ -501,9 +674,15 @@ bırakılmıyor:
   `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor` (1100 geçti, 1 kaldı).
   Ölçü boş makinede ffmpeg hızını ölçüp `ProcessorCount-1` iş parçacığıyla yük
   bindirdikten sonrakiyle kıyaslıyor; altı ajan koşarken "boş" okuma boş değil.
-  İki bağımsız kanıtla eleme: tek başına koşturulunca **geçti**, ve aynı commit'te
-  **CI yeşil** (`33575828972`). Bu sözleşmenin dokunduğu hiçbir dosya
-  (`tools/VidShrink.Bench`) bu ölçünün yolunda değil.
+  Elemenin **tek** dayanağı var: ölçü tek başına koşturulunca **geçti**. T106 burada
+  ikinci bir kanıt olarak "aynı commit'te CI yeşil (`33575828972`)" yazıyordu; o
+  gerekçe **geçersiz ve geri çekiliyor** — `OlcumYukAltindaYalnizAgirlasiyor`
+  (`tests/VidShrink.Tests/PerformanceCheckTests.cs:393`) `[FfmpegFact]` ve CI
+  koşucusunda ffmpeg yok, yani o ölçü CI'da **hiç koşmuyor**; yeşil olması onun
+  hakkında hiçbir şey söylemiyor. Belge bunu kendi "kare kilidi CI'da korumuyor"
+  paragrafında zaten yazıyor, burada unutmuştu. Ayakta kalan destekleyici gözlem:
+  bu sözleşmenin dokunduğu hiçbir dosya (`tools/VidShrink.Bench`) bu ölçünün
+  yolunda değil.
 - **Süre sayısı verilmedi.** Makine altı ajanla paylaşımlıydı; kodlama koşumlarında
   iş parçacığı sabitlendi (`-threads 4`, `pools=4`, `lp=4`) ama süre yine de
   güvenilmez. Bu belgedeki **kalite ve boyut** sayıları paylaşımdan etkilenmez.

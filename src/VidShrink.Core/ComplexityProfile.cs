@@ -70,9 +70,9 @@ public sealed record ComplexityProfile
     private const double LowScaleDamping = 0.3;
     private const double DetailExponentMin = -0.2;
     private const double DetailExponentMax = 1.4;
-    public const double DefaultMotionExponent = 1.0 - CodecModel.FpsBitrateExponent;
+    public const double DefaultMotionExponent = 0.871;
     private const double MotionExponentMin = 0.0;
-    private const double MotionExponentMax = 1.0;
+    private const double MotionExponentMax = 1.4;
     public const double FloorComplexityAnchor = 0.1264;
     private const double FloorAdaptExponent = 0.5;
     private const double FloorAdaptMin = 0.6;
@@ -88,8 +88,8 @@ public sealed record ComplexityProfile
     public const double SampleMotionFpsRatio = 0.5;
     public const double SampleContainerFixedBytes = 764.3;
     public const double SampleContainerBytesPerFrame = 6.545;
-    public const double VmafNegMin = 1.0;
-    public const double VmafNegMax = 100.0;
+    public const double ReferenceVmafNegMin = 1.0;
+    public const double ReferenceVmafNegMax = 100.0;
     private const double QualitySlopeMinSpreadHalvings = 0.25;
     private const double QualitySlopeMin = 1.5;
     private const double QualitySlopeMax = 15.0;
@@ -187,7 +187,7 @@ public sealed record ComplexityProfile
             var slopeMeasured = anchor.PerHalving is > 0;
             var perHalving = anchor.PerHalving ?? CodecModel.PriorQualityPerHalving;
             var offset = Math.Log2(Math.Max(anchor.Bppf, 1e-9) / Math.Max(ReferenceBppf, 1e-9));
-            var atReference = Math.Clamp(anchor.VmafNeg - perHalving * offset, VmafNegMin, VmafNegMax);
+            var atReference = Math.Clamp(anchor.VmafNeg - perHalving * offset, ReferenceVmafNegMin, ReferenceVmafNegMax);
             return new QualityLevel(atReference, perHalving, true, slopeMeasured);
         }
     }
@@ -198,7 +198,7 @@ public sealed record ComplexityProfile
     public ComplexityProfile WithMeasuredQuality(IReadOnlyList<QualitySample> samples)
     {
         var usable = samples
-            .Where(s => double.IsFinite(s.Bppf) && s.Bppf > 0 && double.IsFinite(s.VmafNeg) && s.VmafNeg is > 0 and <= VmafNegMax)
+            .Where(s => double.IsFinite(s.Bppf) && s.Bppf > 0 && double.IsFinite(s.VmafNeg) && s.VmafNeg is > 0 and <= ReferenceVmafNegMax)
             .ToArray();
         if (usable.Length == 0) return this with { QualityAnchor = null };
 

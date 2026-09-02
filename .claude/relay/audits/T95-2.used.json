@@ -1,0 +1,32 @@
+{
+  "contractId": "T95",
+  "auditorRunId": "ad299f8bf4f22efc1",
+  "headSha": "d5b3c8bad93a71073db1e67f6a0b5c7395a31ea3",
+  "diffHash": "49df371d58d50e051fd00acbebd7f6f6503d8b6c86d2bbbf28133786521a2e33",
+  "owns": [
+    "tools/VidShrink.Ab/AbRunner.cs",
+    "tools/VidShrink.Ab/AbSettings.cs",
+    "tools/VidShrink.Ab/ChunkAggregate.cs",
+    "tools/VidShrink.Ab/ChunkCutter.cs",
+    "tools/VidShrink.Ab/ColorGate.cs",
+    "tools/VidShrink.Ab/Competitors.cs",
+    "tools/VidShrink.Ab/ProcessLauncher.cs",
+    "tools/VidShrink.Ab/Program.cs",
+    "tools/VidShrink.Ab/Reporting.cs",
+    "tools/VidShrink.Ab/Sensitivity.cs",
+    "tools/VidShrink.Ab/SizeParity.cs",
+    "tools/VidShrink.Ab/TargetSearch.cs",
+    "tools/VidShrink.Ab/VidShrink.Ab.csproj",
+    "VidShrink.sln",
+    "docs/olcumler/ab-duzenegi.md",
+    "tests/VidShrink.Tests/AbTests.cs",
+    "tests/VidShrink.Tests/VidShrink.Tests.csproj"
+  ],
+  "verification": [
+    "Tur 3 GECTI (kayit birlestirme sonrasi HEAD icin yenilendi). Denetci solution'i kendisi derledi, tolerans mutasyonunu kendisi kosturdu: 2.0-20.0 = 11 kirmizi, 2.0-0.1 = 3 kirmizi; tur 2'nin 55/55 yesili kapandi. Mansetin harmonikleri parca satirlarindan yeniden hesaplandi ve toplam baytlarla tutuyor: kazanilan tek cift parca-2 600 MB (tek 1920x1080 satiri), cozunurluk dusen bes ciftin besinde kayip. Renk kapisi bloklari kayitlarla birebir. owns temiz, 381e8ab sonrasi commitlerde kod sizintisi yok. CI 33590657090 basarili; atlanan 72'nin icinde AbTests eslesmesi 0, yani yesil bu sozlesme hakkinda konusuyor. Dort sayi hatasi muhurden once 1c73203 ile duzeltildi: damga af7a0fe, damga kurali, mutasyon sayisi 11, kil payi 2802 bayt."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T04:47:36.713Z",
+  "usedAt": "2026-09-02T04:47:52.718Z",
+  "completedSha": "d5b3c8bad93a71073db1e67f6a0b5c7395a31ea3"
+}

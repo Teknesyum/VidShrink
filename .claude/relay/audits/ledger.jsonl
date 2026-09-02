@@ -115,3 +115,34 @@
 {"id":"T109","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SceneMapTests","code":0}],"auditorRunId":null,"headSha":"edef1049a5cb706a2608c575875ad41ed0d4dbd3","at":"2026-09-02T02:23:09.272Z"}
 {"id":"T106","round":"2","risk":"low","verify":[{"step":"dotnet build VidShrink.sln -c Release -warnaserror","code":0}],"auditorRunId":null,"headSha":"bd78dd06c033df981635d307221b3636271f514d","at":"2026-09-02T02:24:02.438Z"}
 {"id":"T110","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests","code":0}],"auditorRunId":null,"headSha":"3296fd51bfef228150eadab2893cfd4b5a0bb467","at":"2026-09-02T02:29:02.024Z"}
+{"id":"T98","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"bfb87778c72e5bb44d1c2518903419b11d30a098","at":"2026-09-02T02:38:29.925Z"}
+{"id":"T108","result":"stale","at":"2026-09-02T02:45:56.553Z"}
+{"id":"T99","round":"3","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|ComplexityScanTests","code":0}],"auditorRunId":"afb2811bdb8c0141a","headSha":"dee1d13b77228e38048946aa1bfb9b3127fdcd02","at":"2026-09-02T02:54:08.142Z"}
+{"id":"T107","result":"stale","at":"2026-09-02T02:56:54.243Z"}
+{"id":"T113","result":"stale","at":"2026-09-02T02:56:54.243Z"}
+{"id":"T103","result":"stale","at":"2026-09-02T03:05:35.051Z"}
+{"id":"T117","result":"stale","at":"2026-09-02T04:32:19.677Z"}
+{"id":"T95","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":"ad299f8bf4f22efc1","headSha":"d5b3c8bad93a71073db1e67f6a0b5c7395a31ea3","at":"2026-09-02T04:47:52.721Z"}
+{"id":"T119","result":"stale","at":"2026-09-02T04:48:41.675Z"}
+{"id":"T111","result":"stale","at":"2026-09-02T05:01:25.040Z"}
+{"id":"T120","result":"stale","at":"2026-09-02T05:01:25.040Z"}
+{"id":"T107","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T116","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T118","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T94","result":"stale","at":"2026-09-02T05:05:04.893Z"}
+{"id":"T121","result":"stale","at":"2026-09-02T05:10:54.836Z"}
+{"id":"T115","result":"stale","at":"2026-09-02T05:20:30.467Z"}
+{"id":"T122","result":"stale","at":"2026-09-02T05:20:30.467Z"}
+{"id":"T111","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"SettingsTabTests","code":0}],"auditorRunId":"ace57ce00ddae3246","headSha":"2cd03617620c1e4504af141c05f1a750a28d6836","at":"2026-09-02T05:41:08.755Z"}
+{"id":"T123","result":"stale","at":"2026-09-02T05:48:41.051Z"}
+{"id":"T116","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|MeasuredQualityTests","code":0}],"auditorRunId":"aed396e0910fc44af","headSha":"c856ee406e4d4d68e4c28825906bc4ee2f1bc705","at":"2026-09-02T06:08:51.809Z"}
+{"id":"T124","result":"stale","at":"2026-09-02T06:15:12.753Z"}
+{"id":"T124","round":"1","risk":"low","verify":[{"step":"powershell -NoProfile -Command \"python tools/alinti-denetimi/alinti-denetimi.py --self-test","code":0}],"auditorRunId":null,"headSha":"f009e03619dccfbe32e2729e3f43d360a3d841f7","at":"2026-09-02T06:53:39.527Z"}
+{"id":"T119","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T123","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T125","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T126","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T127","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T128","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T94","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"HdrArgumentsTests|EncoderCapabilitiesTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:04:57.811Z"}
+{"id":"T120","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:05:12.820Z"}

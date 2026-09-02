@@ -1,0 +1,16 @@
+{
+  "contractId": "T115",
+  "auditorRunId": "a0ea4b8da409e805c",
+  "headSha": "e066b0f5ed1f81ef639d2ae11be621a51202f856",
+  "diffHash": "ecdc07f432ac33ee499fc7e35d037ddbc1fde6db4bfe94cb6a37594186609172",
+  "owns": [
+    ".github/workflows/ci.yml",
+    "tools/kosum-kapisi/**",
+    "docs/olcumler/ci-ffmpeg.md"
+  ],
+  "verification": [
+    "Tur 2 GECTI. Denetci esigi kendi olctu: kosum 33525816911 Total 983 dogrulandi, 0.966x1174=1134 aritmetigi tuttu. Kapiyi kendisi besledi: korluk senaryosu exit 69, kayip-olcu senaryosu exit 68, eski 1000 esiginde ikisi de 0 - tur 1'in deligi kanitlandi. Geriye uyumluluk alti fixture ile sinandi. 78 vs 83 ayrimi kosum ozetlerinden dogrulandi. Kirmizi CI (33589639249) raporda durustce yazili, dusen olcu T115'in owns'unda degil, T117'ye verildi. owns ihlali yok, 0 dotnet test kosumu. Yedi borc kaydedildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T04:38:20.626Z"
+}

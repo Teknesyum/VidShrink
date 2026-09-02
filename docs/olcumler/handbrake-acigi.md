@@ -1,5 +1,26 @@
 # HandBrake kalite açığı ölçümü
 
+> **DAMGA — kilitsiz ölçerden gelen satırlar (T94, 2026-09-02).** Bu dosyadaki bütün
+> kalite sayıları kare kilidi üretime girmeden önce ölçüldü. Kilit T110'da yazıldı
+> (`3688336`) ve T111'de üretim yoluna oturdu. T111 sonra T106'nın kilitli ölçtüğü
+> HandBrake en düşük karesini (76,219) aynı kilitle yeniden üretemedi, 94,211 aldı
+> (`d019478`); sebebi ölçülmedi. Yani ölçen aracın o dönemki hâli şüphelidir, hangi
+> satırın ne kadar etkilendiği bilinmiyor.
+>
+> Şüphe altındaki satırlar, yalnız **harmonik** ve **p10** sütunları:
+> "Düzeltilmiş gerçek-kaynak sonucu" tablosunun `HandBrake HDR ↔ kaynak HDR`
+> (34,59 / 33,16) ve `Eski VidShrink SDR ↔ tonemap edilmiş kaynak` (24,41 / 18,56)
+> satırları — HandBrake çıktısı AV1 10-bit, VidShrink çıktısı `av1_nvenc`; onlardan
+> türeyen 10,18 ve 14,60 farkları; "Aggressive rejimde beşli ablasyon" tablosunun
+> dört `av1_nvenc` satırı (Taban, Çözünürlük kapalı, FPS kapalı, Geniş tepe) ve
+> onlardan türeyen +5,87 / +7,22 / +8,65 / +13,76 farkları.
+>
+> Şüphe altında **olmayan**: ortalama VMAF sütunları, XPSNR, SSIM, boyut, süre ve
+> geometri sayıları; `libx265` satırı da AV1 kodlayıcı taşımıyor.
+>
+> Bu satırlar T94'te yeniden **ölçülmedi** — beş tam koşum ve VMAF geçişi gerekiyordu,
+> sözleşme kapsamı dışıydı. Sayılar olduğu gibi bırakıldı, üzerlerine yazılmadı.
+
 Tarih: 2026-09-01. Önceki eş-boyut kalite tablosu renk/aralık düzeneği bozuk olduğu için geçersizdir. Gerçek 17 dakikalık HDR kaynakla düzeltilmiş tam ölçümde HandBrake VMAF-NEG 48,96; eski VidShrink çıktısı aynı tonemap referansına karşı 40,17 verdi. Sıkıştırma farkı 8,79 puandır; HDR→SDR renk kaybı ayrı tutulur ve iki renk uzayı doğrudan puanlanmaz.
 
 ## Düzen ve eksikler
@@ -14,6 +35,20 @@ Kullanıcının 17:16 oyun kaynağı ve depodaki canlı kaynak bu çalışma ağ
 | `hareketli-hdr-12s.mkv` | 12,00 sn, 1280×720@60 HEVC 10-bit | 65.359.789 | `smpte2084` | **hable tonemap var** |
 
 HDR komutunda açıkça `zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709...format=yuv420p` üretildi. Sebep, hızlı sıranın ilk kodlayıcısı `av1_nvenc` iken `HdrResolver.Hdr10Codecs` kümesinde `av1_nvenc` bulunmaması. Dolayısıyla PQ/BT.2020 kaynak sessizce bt709 8-bit'e düşüyor.
+
+> **Bu paragraf yazıldığı tarihte (2026-09-01) doğruydu; `28637a4`'ten sonra bayattır.**
+> `HdrResolver.Hdr10Codecs` diye bir küme bugünkü kodda yoktur. Yerine `HdrResolver`
+> içinde `SoftwareHdr10Codecs = { libx265, libsvtav1 }` var ve karar iki dala ayrılıyor:
+> kodek bu kümedeyse yalnız kodlayıcı olarak çalışıp çalışmadığına bakılıyor
+> (`IEncoderAvailability.WorksAsEncoder`), kümede değilse — `av1_nvenc` dahil —
+> `IHdr10EncoderAvailability.Hdr10PixelFormat` ile canlı yoklamaya soruluyor. Yoklama
+> `EncoderCapabilities.ProbeHdr10PixelFormat`; gerçek bir kare kodlayıp `p010le` ve
+> `yuv420p10le` biçimlerini sırayla dener, ilk kabul edileni döndürür, ikisi de
+> tutmazsa `null` verir. Bu makinede `av1_nvenc` `p010le` döndürüyor, dolayısıyla
+> hızlı yol tonemap etmiyor; ölçümü aşağıda "T94 doğrulaması" başlığındadır.
+> Düşüş yaşandığında da sessiz değildir: `HdrResolution.PolicyChanged` planı
+> `ReasonCode.HdrTonemapped` ve `AdviceCode.HdrTonemapped` ile işaretler, arayüz bunu
+> plan neden satırında Türkçe ve İngilizce gösterir.
 
 ### Şikâyet tabanının yeniden üretimi
 
@@ -128,6 +163,17 @@ Her iki giriş `ffprobe` ile okunuyor. SDR'de etiketsiz `yuv420p` için açıkç
 
 Aynı dosyanın kendisiyle testi ve yalnız bt709 etiketleri eklenmiş metadata-remux testi ham model tavanı yaklaşık 99,87 olan sonucu kullanıcıya **VMAF 100**, XPSNR `inf` olarak verdi. Böylece yalnız etiket farkının kaliteyi düşürmediği doğrulandı.
 
+> **Bu cümle yazıldığı tarihte (2026-09-01) doğruydu; T97'den sonra yalnız VMAF yarısı
+> bayattır.** `QualityMeter` içindeki `NormalizeVmafCeiling` kelepçesi kaldırıldı
+> (`e290624`): [99,8; 100] bandını 100'e çökerten adım yok, ham VMAF-NEG raporlanıyor.
+> Aynı iki test bugün koşulsa VMAF sütununda 100 değil ham model tavanı (yaklaşık
+> 99,87) görünür. XPSNR tarafı değişmedi; `inf` hâlâ olduğu gibi geçiyor. Cümlenin
+> sonucu — yalnız etiket farkının kaliteyi düşürmediği — ayakta.
+>
+> Bu dosyadaki ölçüm sayılarının hiçbiri etkilenmedi: 48,96 / 40,17 / 34,59 / 33,16 /
+> 24,41 / 18,56 / 22,31 hepsi 99,8'in çok altında, kelepçenin bandına hiç girmiyor;
+> 8,79 puanlık açık yerinde duruyor.
+
 ### HDR motor düzeltmesi
 
 Kodlayıcı adı listesine güvenmek yerine gerçek bir kare kodlanarak 10-bit HDR piksel biçimi ölçülüyor. Bu makinede `av1_nvenc` için `p010le` başarılı olduğundan hızlı yol artık tonemap etmiyor. Gerçek varsayılan komutun belirleyici bölümü:
@@ -153,6 +199,82 @@ Eski 1/20 sentetik ablasyon tarihsel olarak yukarıda tutuldu fakat gerçek şik
 | Yazılım | 882×496@60 | libx265 slow 2-pass | 1,50× / 120 | 116,34 | 1599,1 | 52,05 | 41,27 | 36,57 | 30,25 | 0,9168 |
 
 Çözünürlüğü koruma ortalama ve XPSNR'ı yükseltse de 10 fps'e düşüş harmonik VMAF'ı 10,07 ve p10'u 11,87 puan düşürdü; tek başına doğru çözüm değil. FPS'i sabitlemek bu kaynakta planı değiştirmedi ve kalite birebir aynı kaldı. Tepe tavanını 1,02×'den 1,50×'e açmak aynı boyutta harmonikte **+5,87**, p10'da **+7,22** verdi. Yazılım yolu ortalamada 0,63 düşük olsa da kötü kare kuyruğunu iyileştirdi (harmonik **+8,65**, p10 **+13,76**); bunun bedeli yaklaşık 23 dakikalık ek süredir. Bu bulgular tepe tavanının en ucuz ve bağımsız kazanç, yazılımın ise kuyruk kalitesi için pahalı seçenek olduğunu gösteriyor.
+
+## T94 doğrulaması (2026-09-02)
+
+Bu bölüm `28637a4` HDR düzeltmesinin plan seviyesinde değil, **üretilen dosyada** çalıştığını gösterir. Süre sayıları makine paylaşımlıdır (aynı anda dokuz ajan koşuyordu); boyut, renk ve kalite sayılarına bu damga basılmaz.
+
+### K1 — üretilen dosyanın ffprobe çıktısı
+
+`.calisma/kaynak/kaynak-1080p60-hdr-17dk.mp4` (1036 sn, 1920×1080@60, HDR10) gerçek motorla 120 MB hedefe kodlandı. Motor hızlı yolda `-pix_fmt p010le`, tonemap filtresi yok, `-color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc`, `-g 300`, `scale=882:496` üretti. Teslim edilen dosyanın `ffprobe` okuması:
+
+```text
+codec_name=av1
+profile=Main
+width=882
+height=496
+pix_fmt=yuv420p10le
+color_range=pc
+color_space=bt2020nc
+color_transfer=smpte2084
+color_primaries=bt2020
+r_frame_rate=60/1
+duration=1036.166667
+size=123294744
+bit_rate=951929
+```
+
+HDR gerçekten korunuyor; çıktı bt709 8-bit'e düşmüyor. Motorun istediği `p010le` ile ffprobe'un okuduğu `yuv420p10le` arasındaki fark etiket farkıdır: AV1'de yarı-düzlemsel ayrım yoktur ve `av1_nvenc p010le` yoklaması hiçbir `Incompatible pixel format` uyarısı üretmez, yani 10-bit isteği geri çevrilmemiştir. Kaynağın `color_range=pc` değeri çıktıda da `pc`; aralık kayması yok.
+
+### K2 — `SupportsHdr10` ne diyor, gerçek kodlama ne üretiyor
+
+Yoklama sonuçları `EncoderCapabilities.Instance` üzerinden, gerçek kodlama sonuçları aynı koşumda ham `ffmpeg` çağrısının çıkış kodu ve `stderr`'i ile alındı.
+
+| Kodlayıcı | Yoklama (`Hdr10PixelFormat`) | Gerçek kodlama | Plan | Not |
+|---|---|---|---|---|
+| `av1_nvenc` | `p010le` | `p010le` kabul (rc=0, uyarı yok); `yuv420p10le` reddedilip `p010le`'ye çevriliyor | HDR korunur | K1 ile tam boy doğrulandı |
+| `hevc_nvenc` | `p010le` | `p010le` kabul (rc=0, uyarı yok) | HDR korunur | |
+| `libsvtav1` | `yuv420p10le` | `p010le` reddediliyor, `yuv420p10le` kabul | HDR korunur | T102 borcu: eskiden `p010le` diyordu |
+| `libx265` | `yuv420p10le` | `p010le` için `Incompatible pixel format`, `yuv420p10le` kabul | HDR korunur | **Yanlış negatifti**, düzeltildi |
+| `av1_qsv` | yok | `Error creating a MFX session: -9` — bu makinede Intel aygıtı yok | Tonemap | **Ölçülmedi**: donanım desteklemiyor değil, bu makinede yok |
+| `av1_amf` | yok | `AMFQueryVersion failed with error 1` — bu makinede AMD aygıtı yok | Tonemap | **Ölçülmedi**: aynı sebep |
+
+İki ayrı kusur çıktı ve ikisi de düzeltildi:
+
+1. **Sessiz piksel biçimi dönüşümü kabul sayılıyordu.** ffmpeg desteklenmeyen bir `-pix_fmt` istendiğinde 0 ile çıkar ve yalnız uyarı satırı basar (`Incompatible pixel format 'p010le' for codec 'libx265', auto-selecting format 'yuv420p10le'`). Yoklama `-loglevel error` ile koştuğu için bu satırı hiç görmüyor, çıkış koduna bakıp kabul ediyordu. Yoklama `-loglevel warning`'e alındı, karar `EncoderCapabilities.PixelFormatAccepted` içinde verilir hâle geldi. `libsvtav1` bu yüzden `p010le` diyordu; etkisi doğruluk kusuruydu, kalite kaybı değil — `plan.PixelFormat` yalnız `FfmpegArguments` içinde `-pix_fmt` olarak tüketiliyor ve ffmpeg zaten sessizce doğru biçime çeviriyordu.
+
+2. **Yoklamanın 4000 ms'lik öldürme sınırı yüke duyarlıydı.** Aynı makinede aynı komut, boş koşumda saniyenin altında, dokuz ajan koşarken 3625–14855 ms sürüyor. Sınırı aşan yoklama "çalışmıyor" diye okunuyor ve `_probed` / `_hdr10PixelFormats` önbelleklerine yazıldığı için **süreç ömrü boyunca** orada kalıyordu; kullanıcı uygulamayı kapatıp açmadan HDR'ı geri kazanamıyordu. Sınır `EncoderCapabilities.ProbeKillMs = 15000`'e çıkarıldı ve **zaman aşımı artık önbelleğe yazılmıyor**: geçici bir düşüş kalıcı bir "donanım yok" kararına dönüşmüyor. Öldürme sınırı bir performans kapısı değil askı koruyucusudur; performans kapısı ayrıca `HardwareVerdict.ProbeBudgetMs = 1500` olarak duruyor ve bu değişiklikten etkilenmez.
+
+### K4 — eş boyutta HDR koruma ile tonemap
+
+`.calisma/kaynak/parca-1.mkv` (60,4 sn, 1920×1080@60, HDR10) iki kolda `av1_nvenc -preset p5 -b:v 814k` ile 882×496'ya kodlandı. Tek fark renk yolu: HDR kolu `-pix_fmt p010le` + bt2020/PQ, SDR kolu aynı `tonemap=hable` zinciri + `-pix_fmt yuv420p` + bt709. Her kodlamanın çıkış kodu, dosya boyutu okunmadan önce denetlendi.
+
+| Kol | Bayt | Kapı | VMAF ort. | Harmonik | p10 | min | XPSNR | SSIM |
+|---|---:|---|---:|---:|---:|---:|---:|---:|
+| HDR korunmuş | 6.295.120 | `Direct` | 48,99 | 36,06 | 18,37 | 2,58 | 30,56 | 0,93 |
+| SDR'a tonemap | 6.293.467 | `ReferenceTransformed` | 47,34 | 31,30 | 16,59 | 0,28 | 28,77 | 0,91 |
+| HDR kolu, kayıpsız tonemap edilmiş | — | `ReferenceTransformed` | 47,45 | 32,15 | 17,03 | 0,05 | 28,55 | 0,91 |
+
+Boyut sapması on binde 2,6; eş boyut şartı sağlandı.
+
+**Eş boyutta HDR'ı korumak neye mal oluyor?** İlk iki satır doğrudan karşılaştırılamaz: A/B aletinin kapısı ilkinde `Direct`, ikincisinde `ReferenceTransformed` ve aletin kendi etiketi ikincisi için "SDR uzayında karşılaştırma — HDR kaybı hariç" diyor. Karşılaştırılabilir olan son iki satırdır: ikisi de aynı referans dönüşümünden geçmiş, aynı uzayda ölçülmüştür. HDR kolu, kayıpsız `ffv1` ile SDR'a çevrildiğinde, doğrudan SDR kodlanmış kola göre harmonikte **+0,85**, p10'da **+0,44**, ortalamada **+0,11**, XPSNR'de **−0,22** veriyor; SSIM eşit. Yani bu kaynakta ve bu bit hızında **HDR'ı korumanın eş boyutta ölçülebilir bir bedeli yok**; fark iki kodlamanın gürültüsü içinde kalıyor ve işaret bile tek yönlü değil. Tek kaynak, tek 60 saniyelik parça, tek bit hızı, tek kodlayıcı; genelleme için yeterli değil.
+
+**Korunan HDR kullanıcıya ne katıyor?** **Ölçülmedi.** Elimizdeki üç ölçüt de (VMAF-NEG, XPSNR, SSIM) referansa sadakati ölçer; geniş gamut ve PQ'nun izleyiciye değeri bu ölçütlerin sorusu değildir ve bu turda buna uygun bir düzenek kurulmadı.
+
+### K5 — düşüş kullanıcıya görünüyor mu
+
+Görünüyor. `HdrResolution.PolicyChanged` → `PlanCalculator` planın nedenlerine `ReasonCode.HdrTonemapped` ve `AdviceCode.HdrTonemapped` ekliyor → `MainWindow` bunu `main.reason.hdr-tonemapped` ve `main.advice.hdr-tonemapped` anahtarlarıyla plan panelinin neden satırına yazıyor. Anahtarların ikisi de hem `Locales/tr/main.json` hem `Locales/en/main.json` içinde dolu. `HdrArgumentsTests.DroppedHdrReachesTheUserAsAPlanLineInBothLanguages` bunu iki dilde birden çiviliyor: düşen planda kod var, korunan planda yok, iki dilin metni de boş değil ve birbirinden farklı.
+
+### K7 — mutasyon kanıtı
+
+Üç karar ekseninin ve düzeltilen kapının her biri, bozulduğunda bir ölçüyü kırıyor. Her mutasyon tek başına uygulandı, koşumdan sonra geri alındı; ağaç temiz bırakıldı.
+
+| Mutasyon | Kıran ölçüler |
+|---|---|
+| Yoklamanın cevabı yok sayılıyor (`Hdr10PixelFormat` yerine sabit `yuv420p10le`) | `ProbeAnswerDecidesFastPathPixelFormatNotTheCodecName`, `FastAv1NvencPreservesHdrWhenTenBitProbeSucceeds` |
+| Yazılım kodek kümesine `libx264` ekleniyor | `SoftwareHdr10SetMembershipDecidesPreservationWhenProbeSaysNothing`, `HdrSourceFallsBackToTonemapWhenEncoderLacks10Bit`, `RequestedTonemapIsNotReportedAsAPolicyChange` |
+| `policyChanged` hep `false` | Yukarıdaki üçü ve ayrıca `DroppedHdrReachesTheUserAsAPlanLineInBothLanguages`, `RemovingAv1NvencTenBitCapabilityMakesFastPathTonemap` |
+| `PixelFormatAccepted` yalnız çıkış koduna bakıyor | `SilentPixelFormatConversionIsNotAcceptance` (iki satır) ve `RealEncoderRefusesP010leForLibx265AndTheGateReadsThatRefusal` |
 
 ## Ölçüm notları ve yeniden üretim
 
