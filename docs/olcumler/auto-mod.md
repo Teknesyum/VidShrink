@@ -813,6 +813,8 @@ yazıldı ve neyle değiştiği söylendi.
 - T106'nın `76,219`'unun neden T111'de `94,211` çıktığı. Ham JSON git'te değil;
   fark yeniden kodlama gürültüsünden büyük, sebebi **ölçülmedi**.
 - Kalan on iki koşumun kare kare damga dökümü; onlar için kanıt kap ofseti.
+- Üretim kopyasının (`QualityMeter.cs:75`) mutasyon altındaki davranışı;
+  mutasyon yalnız Bench kopyasında koşturuldu (kusur 8).
 - Kodlama süreleri. Makinede dokuz ajan koşuyordu; süre ölçülmedi, bu bölümde
   hiçbir süre sayısı yok. Kalite ve boyut sayıları paylaşımdan etkilenmez.
 
@@ -924,3 +926,29 @@ ekledi; aynı sebeple `handbrake-motoru.md`'nin diğer atıfları (`:202-204`,
 Düzeltme `docs/inceleme/handbrake-motoru.md`'de yapılmalı; o dosya T111'in
 `owns`'ında değil, bu yüzden **düzeltilmedi**, künyenin bugünkü doğrusu burada
 kayda geçiyor.
+
+**8. Kare kilidinin `settb=AVTB` yarısını hiçbir ölçü korumuyor.** T111 kilidi
+`tools/VidShrink.Bench/Program.cs:2547`'deki sabit üzerinden mutasyona soktu
+(`tools/auto-mod-olcumu/t111-mutasyon.sh`, her koşumda `--no-incremental` derleme,
+sonra `--filter FullyQualifiedName~VmafPoolingTests`, **atlanan 0** — ffmpeg
+yereldeydi, ölçüler gerçekten koştu):
+
+| # | mutasyon | sonuç |
+|---|---|---|
+| M0 | mutasyonsuz | 15 yeşil |
+| M1 | `setpts=N` silindi (`settb=AVTB`) | **2 kırmızı** — öldürüldü |
+| M2 | kilit tamamen silindi | **2 kırmızı** — öldürüldü |
+| M3 | iki zincirde birden `setpts=N+1` | 15 yeşil — **eşdeğer mutasyon** |
+| M4 | `settb=AVTB` silindi (`setpts=N`) | **15 yeşil — öldürülmedi** |
+
+M3 eşdeğerdir: iki zinciri birlikte kaydırmak eşlemeyi değiştirmez, onu öldüren
+bir davranış ölçüsü olamaz. **M4 eşdeğer değil ve bu ölçüldü.** `settb` olmadan
+`setpts=N` sayacı girdinin kendi zaman tabanına yazılıyor (mkv 1/1000, mp4
+1/15360); bu belgenin ölçüm düzeneğinde aynı mutasyon 3624 kare yerine **7012
+kare** eşledi. Yani M4 gerçek bir davranış değişikliği ve süit onu görmüyor:
+mevcut ölçüler iki girdiyi de aynı kapta kuruyor, zaman tabanı farkı hiç doğmuyor.
+
+Mutasyon yalnız **Bench kopyası** üzerinde koşturuldu; üretim kopyası
+(`src/VidShrink.Ffmpeg/QualityMeter.cs:75`) mutasyona sokulmadı, orada durumun
+aynı olup olmadığı **ölçülmedi**. Düzeltme ayrı sözleşme ister: farklı kaptan
+iki girdi kuran bir ölçü. `tests/VidShrink.Tests` T111'in `owns`'ında değil.
