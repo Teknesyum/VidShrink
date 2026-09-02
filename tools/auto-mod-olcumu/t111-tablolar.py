@@ -184,5 +184,34 @@ for etiket, anahtar in ((u"T102 arşivi (kilitsiz)", "arsiv"),
             w(u"- `%s` (x265): `<1` %d, tam 0 %d, min %s" % (a, v["alti"], v["tamsifir"], tr(v["min"], 3)))
     w(u"")
 
+
+CIFTLER = [(u"uzman açığı", "uzman-biz3", "auto"),
+           (u"HandBrake açığı (boyut eşli)", "uzman-hb2", "auto"),
+           (u"HandBrake açığı (boyut eşsiz)", "uzman-hb", "auto")]
+
+w(u"### F. Açıklar — eski fark / yeni fark")
+w(u"")
+w(u"| açık | ölçüm | Δ ortalama | Δ p10 | Δ harmonik |")
+w(u"|---|---|---|---|---|")
+for etiket, ust, alt in CIFTLER:
+    for ad, anahtar in ((u"T102 arşivi (kilitsiz)", "arsiv"),
+                        (u"T111 yeni (kilitsiz)", "kilitsiz"),
+                        (u"T111 yeni (**kilitli**)", "kilitli")):
+        u_, a_ = D[ust][anahtar], D[alt][anahtar]
+        if not u_ or not a_:
+            w(u"| %s | %s | ölçülmedi | | |" % (etiket, ad))
+            continue
+        w(u"| %s | %s | %s | %s | %s |" % (etiket, ad, fk(u_["ort"] - a_["ort"]),
+                                           fk(u_["p10"] - a_["p10"]), fk(u_["harm"] - a_["harm"])))
+w(u"")
+w(u"Boyut farkları (T111 yeniden kodlaması, üst / alt):")
+for etiket, ust, alt in CIFTLER:
+    bu, ba = D[ust]["bayt"], D[alt]["bayt"]
+    if bu and ba:
+        w(u"- %s: %d / %d bayt — **%s%%**" % (etiket, bu, ba, fk((bu / float(ba) - 1) * 100, 2)))
+    else:
+        w(u"- %s: ölçülmedi" % etiket)
+w(u"")
+
 io.open(os.path.join(yeni, "uretilen.md"), "w", encoding="utf-8", newline="\n").write(u"\n".join(out) + u"\n")
 sys.stdout.write("uretildi: %d satir -> %s\n" % (len(out), os.path.join(yeni, "uretilen.md")))
