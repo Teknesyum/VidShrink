@@ -387,6 +387,37 @@ Sira: once T105, sonra T98 yeni sayilarla hizalanir.
 Ders: **telafi sabitini silmek tek yol degil — olculdugu kosula baglamak da
 calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
 
+
+## CI motorun dortte birini gormuyor (T106 tur 2, 2026-09-02)
+
+T106 yapicisi kendi kusurunu bildirdi ve bildirdigi sey sozlesmesinden buyuktu:
+uc yeni olcu `[FfmpegFact]` tasiyor, dolayisiyla kare kilidini tutan pim
+**yerelde koruyor, CI'da atlaniyor.**
+
+Sayilar: T99 CI 1030 gecti / **95 atlandi**; T98 CI 1046 / **97**; T106 yerel
+tam suit 1106 / **17**. Aradaki ~80 olcu ffmpeg isteyenler ve on bir dosyaya
+yayilmis — `ComplexityProbeTests`, `EncodeRunnerTests`, `FpsDropTests`,
+`FrameGrabberTests`, `PanelHostTests`, `PerformanceCheckTests`,
+`PreviewSyncTests`, `QualityMeterTests`, `QualityTargetTests`, `SceneMapTests`,
+`SegmentEncoderTests`.
+
+Yani **motoru olcen her sey** CI'nin kor noktasinda. "Teslimden once tam suit
+kos" kurali bunu kapatmiyor; kural yerel kosumu buyutuyor, CI'nin gordugunu
+degil. **T115** acildi ve dagitildi.
+
+Ikinci ders ayni turdan: **artimli derleme mutasyon olcumunu zehirliyor.**
+Yapici bir sabiti bozup "kirilmadi" okudu; `--no-incremental` ile tekrarlayinca
+tablo degisti. Mutasyon kaniti bu projede kabul kriterinin kendisi — yanlis
+okunan bir "kirilmadi" tum kaniti curutur. **Kural: her mutasyondan sonra
+`dotnet build VidShrink.sln -c Release --no-incremental`, sonra `--no-build`
+ile kos. Denetci istemine de yazilir.**
+
+Ucuncu ders: **esdeger mutasyon olcu acigi degildir.** T0 `setpts=N+1`
+mutasyonunu onerdi; yapici olctu ve sabitin iki dalda birden kullanildigini,
+her iki akisi ayni miktarda kaydirdigini gosterdi. Ortada davranis farki yok,
+hicbir davranissal olcu yakalayamaz. Mutasyon secerken once sabitin kac yerde
+kullanildigina bak.
+
 ## Sonraki basamak
 
 1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
