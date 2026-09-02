@@ -500,6 +500,33 @@ Kalan yedi koşumun kare kare damgası **ölçülmedi**; onlar için kanıt yaln
 kap ofseti. Dördü ölçüldü çünkü belgedeki karşılaştırmaları bu dört koşum
 taşıyor.
 
+### Kaymanın tam bir kare olduğu ölçüldü, çıkarılmadı
+
+"İşaret sabit, demek ki framesync bir önceki kaynak karesini eşliyor" bir
+çıkarım. T111 onu ölçtü: kilit takılı kaldı, ama **referans zinciri bilerek bir
+kare kaydırıldı** (`tools/auto-mod-olcumu/t111-kaydir.sh`):
+
+```
+[0:v]scale=...,settb=AVTB,setpts=N[t];[1:v]settb=AVTB,setpts=N+1[r];[t][r]libvmaf=...
+```
+
+Bu grafik "test karesi *i*, kaynak karesi *i−1* ile karşılaştırılsın" demek.
+Sonuç, `auto` koşumunda:
+
+| ölçüm | ortalama | p10 | harmonik | en düşük | `<1` kare |
+|---|---|---|---|---|---|
+| kilitsiz (damga eşli) | 94,448 | 94,525 | 56,308 | 0,000 | 26 |
+| kilitli, referans `N+1` (bir kare kaydırılmış) | **94,448** | **94,525** | **56,308** | **0,000** | **26** |
+| kilitli, referans `N−1` (ters yön) | 94,452 | 94,524 | 56,529 | 0,000 | 26 |
+| kilitli, kaydırmasız | 95,647 | 94,903 | 95,642 | 92,376 | 0 |
+
+Bilerek bir kare kaydırılmış kilitli ölçüm, kilitsiz ölçümü **dört sayının
+dördünde de birebir** veriyor. Ters yöne kaydırma benzer büyüklükte hasar veriyor
+ama aynı sayıları vermiyor (harmonik 56,529 ≠ 56,308). Yani kilitsiz ölçümün ne
+olduğu artık tarif değil, kimlik: **referansın bir kare ileri kaydırılmış hâli.**
+
+Bu ölçüm `auto` koşumunda yapıldı; diğer koşumlarda **ölçülmedi**.
+
 ## Ölçüm sırasında bulunan kusurlar — düzeltilmedi
 
 T102 kod değiştirmiyor. Bunlar ayrı sözleşme ister.
