@@ -850,7 +850,7 @@ static async Task<string> RunLavfiAsync(string referencePath, string testPath, i
                  "-hide_banner", "-nostdin",
                  "-i", testPath,
                  "-i", referencePath,
-                 "-lavfi", $"[0:v]scale=w={width}:h={height}:flags=lanczos,settb=AVTB,setpts=N[t];[1:v]settb=AVTB,setpts=N[r];[t][r]{filterChain}",
+                 "-lavfi", MeasureFilterGraph.Build(width, height, filterChain),
                  "-f", "null", "-"
              })
         psi.ArgumentList.Add(arg);
@@ -2539,5 +2539,22 @@ public static class VmafPooling
             p10,
             min,
             clamped);
+    }
+}
+
+public static class MeasureFilterGraph
+{
+    public const string FrameLock = "settb=AVTB,setpts=N";
+
+    public static string Build(int width, int height, string filterChain)
+    {
+        if (string.IsNullOrWhiteSpace(filterChain))
+            throw new ArgumentException("Karsilastirma filtresi bos olamaz.", nameof(filterChain));
+        if (width <= 0 || height <= 0)
+            throw new ArgumentOutOfRangeException(nameof(width), "Olcum cozunurlugu pozitif olmali.");
+
+        return $"[0:v]scale=w={width}:h={height}:flags=lanczos,{FrameLock}[t];" +
+               $"[1:v]{FrameLock}[r];" +
+               $"[t][r]{filterChain}";
     }
 }
