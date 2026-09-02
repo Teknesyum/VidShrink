@@ -32,6 +32,18 @@ ancak kaybolan bir artışla mümkün. Düzenek `.calisma/t132/yaris/`, ham veri
 | `ComplexityProbe.Windows`: kısa klipte pencere sayısı 2 → 1 | **kırıldı** — `1 pencere olculdu` |
 | `SplitSampleAsync`: ölçer yalnız `start > 2.0` penceresinde çağrılıyor, yani (iii)'ün şekli | **kırıldı** — `1 pencere olculdu` |
 
+Düzeltmeden sonra tam süit beş kez koşuldu, beşi de yeşil:
+
+| koşum | süre | sonuç |
+|---|---|---|
+| 1 | 11 m 26 s | Başarısız 0, Başarılı 1328, Atlanan 17, Toplam 1345 |
+| 2 | 11 m 28 s | aynı |
+| 3 | 14 m 13 s | aynı |
+| 4 | 12 m 5 s | aynı |
+| 5 | 19 m 51 s | aynı |
+
+Ham kayıt `.calisma/t132/k03-tam-suit.txt`. Dal koşumu `33637321742`, sonuç `success`.
+
 ## K1 — Beş iddianın sınıflaması
 
 | # | yer | ne tutmak istiyor | cevap | gerekçe |
