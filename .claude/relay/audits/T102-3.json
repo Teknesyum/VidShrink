@@ -1,0 +1,14 @@
+{
+  "contractId": "T102",
+  "auditorRunId": "a159c751be9ccfe40",
+  "headSha": "b862dba882b1c9381397055fac6c954687655bbb",
+  "diffHash": "cc1a75922af7df4f0b53a7f57ab2e5504269a9bdfdaef6ef2a081d3b73fde09a",
+  "owns": [
+    "docs/olcumler/auto-mod.md"
+  ],
+  "verification": [
+    "GECTI (tur 3): tek KRITIK kapandi - 'olculen sebep' cumlesi silindi, yerine dislama/dogrudan olcum ayrimi yazildi (grep 'olculen sebep' bos). Uc kosumun sekiz sayisi vmaf/*.json.gz arsivinden bagimsiz yeniden hesaplandi, birebir tuttu. Anahtar kare sayisi ffprobe -skip_frame nokey ile ucunde de 13 dogrulandi; y3'un boyut esitlemesi durust (cozunurluk, kare hizi, renk uzayi, ses bit hizi, sure birebir ayni). Alti borcun altisi kapandi. Uretim kodu degismedi. verify 13/13, CI 33577509419 yesil."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T01:14:57.514Z"
+}

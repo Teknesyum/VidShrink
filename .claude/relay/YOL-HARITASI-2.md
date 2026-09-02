@@ -264,6 +264,39 @@ açıklayan cümle yanlıştı. "Harmonik ortalama yalan söylüyor" tanısı ü
 sözleşmenin sınırına yazıldı ve hiçbirinde ölçülmedi. Bir tanının kendisi de
 ölçülür.
 
+## Alet kendi adlandirdigi kusuru tekrarladi (T106 denetimi, 2026-09-02)
+
+T106 denetimden **KALDI** dondu — ama teshis onaylandi. Duseren sey su:
+
+T106'nin K4 listesi `tools/auto-mod-olcumu/tablolar.py:24`'u "sutun adi
+saydigiyla uyusmuyor" diye isaretledi. **Ayni commit'te bench'in kendi
+ciktisinda ayni kusuru uretti:** `peak-curve` tablosunun baslik satiri 10 sutun,
+veri satiri 11 hucre. Markdown isleyicisi fazlayi atar, yani T106'nin ekledigi
+kelepce uyarisi aletin rapora sayi ureten asil isinde sessizce kaybolur.
+
+Denetci bunu iddiadan degil **gercek kosumdan** cikardi. Ders bu:
+
+**Bir kusuru adlandirmak ondan bagisiklik vermez.** Cikti bicimini degistiren her
+commit, ciktinin kendisine sorulmadan kapanmaz. "Uc yerin ucu de artik damgayi
+yaziyor" cumlesi kod okunarak yazilmisti; alet kosturulsaydi bir satirda
+gorunurdu.
+
+Ayrica denetci iki olcunun **davranis degil dizgi** olctugunu buldu:
+`Assert.Contains("settb=AVTB,setpts=N", …)` — `setpts=N+1` mutasyonu 10/10 yesil
+geciyor. Yani **bir kare kaydiran kilit**, yani T106'nin kapattigi kusurun tam
+kendisi, olcuye takilmiyor. Bu projenin adi konmus kusuru: sabit karsilastiran
+test davranis olcmez.
+
+### Ayni acik uretim kodunda duruyor — T110
+
+`src/VidShrink.Ffmpeg/QualityMeter.cs:278` grafiginde kare kilidi yok ve
+`--measured-quality` ile **kalibrasyon cipalari** o yoldan geciyor. Alet duzeldi,
+urun duzelmedi; ikisi ayrisirsa bir sonraki yanlis karar oradan cikar.
+
+**T110 acildi.** Kalibrasyon cipalarinin hepsi kaymis olcuyle konmus olabilir —
+o zaman hepsi gecersiz. `docs/olcumler/algi-olcusu.md:171` bir x264 kosumunda
+`VMAF-NEG min 0,0000` gosteriyor; belge de kirlenmis.
+
 ## Aynı kusuru iki tur birden düzeltiyor (T98 × T105)
 
 T98 anahtar kare üst sınırını `SceneMap` ortalamasından türetiyor ve
