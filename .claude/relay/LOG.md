@@ -214,3 +214,38 @@ K7: CI 33623785112 (`1d4a259`) success, 0/1326/19/1345. Tam suit yerelde
 uc kez kosuldu, kirmizi-yesil-kirmizi — makine yukune bagli, T128'e degil. CI'da o
 olcu `[SKIP]`, yani CI yesili onu dogrulamiyor. `SplitDragTests`ten sonra bu depoda
 zamana bagli ikinci olcu.
+
+## T128 — muhur (GECTI, KRITIK yok, yedi borc)
+
+Denetci arsiv kopyasinda uc kosum yapti. Mutasyon (a) `PlanCalculator.cs:889`
+`WorksAsEncoder`->`HasEncoder`: 5 kirmizi, kirilan olculerin ADLARI raporla birebir.
+Mutasyon (b) `:909`: 2 kirmizi, yine birebir. K2'nin kusuru gercekten uretilmis
+(kusur olcusu `80686a2`, duzeltme `ccd2abd` — sira dogru), olculer davranis olcuyor.
+
+BORCLAR (mühür notunda kalir, tur acmaz):
+
+1. "Arayuzun plan hesabi hic surec dogurmuyor" cumlesi fazla soyluyor. Gecit sureci
+   kaldirmiyor, ERTELIYOR: `MainWindow.axaml.cs:1292 -> :1315 -> :1325 -> :1342`
+   gercek bir ffmpeg sureci, `Task.Run` icinde. Pimlenen sey senkron surecin
+   dogmamasi. Sonuc dogru, cumle yanlis — bu deponun kronik kusuru.
+2. Ucuncu durum yalniz `IEncoderMeasurementState` uygulayan cagirianda uc durum.
+   Ham `EncoderCapabilities.WorksAsEncoder` (`:70`) `Unmeasured`i hala false'a katliyor.
+   `docs/olcumler/surucu-yoklugu.md:322`: yuklu makinede 9/12 yoklama 15 000 ms'yi
+   asiyor ama 12/12 cikis 0 veriyor — `tools/` cagiranlari calisan kodlayiciya
+   "kullanilamadi" diyor. Arayuzde ulasilmiyor.
+3. `HardwareNotMeasured` Baslat dugmesini SURESIZ kapatabilir (`:1322` -> `:1793`).
+   T128 bu yolu Quality kipine de acti. -> **T136 K1**
+4. `owns` bosluguydu: `EncoderAvailabilityTests.cs` `verify` filtresinde vardi ama
+   `owns`ta yoktu — sozlesme kendisiyle celisiyordu. Geriye donuk genisletildi.
+5. K6 yarim: Core cumlesi duzeldi, kullanicinin gordugu dort satir eski kaldi
+   (`Locales/{en,tr}/main.json:283,312`). -> **T136 K6**
+6. K4 raporu olcunun bir adim onunde: iki iddia yalniz `MaxCompression` ve `Fast`
+   icin pimli, `Compatible` icin pimli degil.
+7. Atif kaymasi: hukum "(§3)" diyor, belgede §3 yok, kastedilen K3. K3'un yuk
+   damgasi "1 ffmpeg + 6 dotnet" diyor, ureten komut yalniz ffmpeg sayiyor.
+
+SUREC KUSURU (Core'a): denetim kaydi REDDEDILDI — "auditorRunId points at a
+non-auditor agent record: worker". Denetciyi `teknesyum-core:worker` tipiyle actim,
+oysa oturumda ayri bir `auditor` ajan tipi var. Risk `low` oldugu icin `complete`
+yine de gecti; yuksek riskli bir sozlesmede muhur duserdi ve sebebi ancak o an
+gorulurdu. Denetim FIILEN yapildi ve gecti; kayit tutulamadi.
