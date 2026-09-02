@@ -311,10 +311,10 @@ settings first launch=0,16ms, later launch=0,06ms, rewrote=False
   saniyenin altındaydı. Bu 72 ms boş bir Mac'in tek ölçümü, dağılım değil —
   dağılım İş 2 K3'e ait.
 
-### `VIDSHRINK_LIVE_SOURCE` — koşturulamadı
+### `VIDSHRINK_LIVE_SOURCE` — sonradan koşturuldu
 
-Ortak ölçüm havuzu bu makinede yok ve indirilemedi; ayrıntısı
-`.claude/relay/live/_sorun.log`da. Yukarıdaki 12 ölçü bu paket turunda da koşmadı.
+Bu bölüm yazıldığında ortak ölçüm havuzu makinede yoktu. Havuz sonradan geldi
+ve 12 ölçünün hepsi koştu; sonucu aşağıda "Dördüncü tam koşum"da.
 
 ## İkinci tam koşum — zscale kurulduktan sonra
 
@@ -593,7 +593,93 @@ Düzeltmeden sonra tarama temiz:
 eksik anahtar: yok
 ```
 
-<!--DORDUNCUKOSUM-->
+## Dördüncü tam koşum — iki düzeltme + canlı kaynak
+
+Aynı yapılandırma (Debug), aynı ffmpeg; iki değişen: ikinci yerelleştirme
+düzeltmesi ve `VIDSHRINK_LIVE_SOURCE` kapısının açılması.
+
+```
+VIDSHRINK_LIVE_SOURCE=$PWD/.calisma/kaynak/parca-2.mkv \
+dotnet test --logger "trx;LogFileName=suit-canli.trx" --results-directory .calisma/gunluk
+```
+
+Kaynak `parca-2.mkv`: ortak havuzun ses taşıyan tek temsili parçası
+(video+AAC, 60,442 sn, 115 933 238 bayt). `parca-1`de ses yok.
+
+```
+Failed!  - Failed:     9, Passed:  1339, Skipped:     6, Total:  1354, Duration: 2 h 44 m
+```
+
+| | Üçüncü | Dördüncü |
+|---|---:|---:|
+| Toplam | 1336 | **1354** |
+| Geçen | 1281 | 1339 |
+| Kırmızı | 37 | **9** |
+| Atlanan | 18 | **6** |
+| Süre | 20 dk 7 sn | 2 sa 44 dk |
+
+Toplam 1336'dan 1354'e çıktı: canlı kaynakla birlikte `LiveSourceTheory`
+üyelerinin `InlineData` durumları da sayıya girdi, +18.
+
+### İki düzeltme de doğrulandı
+
+Dokuz kırmızının **hiçbiri** yerelleştirme kaynaklı değil — üçüncü koşumda
+37/37 olan `main.quality.target` iletisi bu koşumda sıfır kez geçiyor, ikinci
+koşumun `main.plan.fact.estimate`i de öyle. Statik taramanın "eksik anahtar:
+yok" sonucu koşumla tutuyor.
+
+### `VIDSHRINK_LIVE_SOURCE` kapısındaki 12 ölçünün hepsi koştu
+
+Atlanan 18'den 6'ya düştü. Kalan 6'yı tek tek saydım:
+
+| Ölçü | Kapı |
+|---|---|
+| `UpdaterTests.EveryLaunchChecksAndStaysWithinTheTimeout` | `VIDSHRINK_LAUNCHER_EXE` |
+| `UpdaterTests.TheIncomingBinaryRenamesItselfOntoTheTargetName` | `VIDSHRINK_LAUNCHER_EXE` |
+| `UpdaterTests.SwitchedOffLauncherMakesNoNetworkRequestAtAll` | `VIDSHRINK_LAUNCHER_EXE` |
+| `HardwareVerdictTests.LiveProbeDecidesOnThisMachine` | `VIDSHRINK_LIVE_PROBE` |
+| `HardwareVerdictTests.TheFirstLayoutDoesNotWaitForTheProbe` | `VIDSHRINK_LIVE_PROBE` |
+| `PerformanceCheckTests.DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu` | `h264_nvenc` yok |
+
+3 + 2 + 1 = **6**. `VIDSHRINK_LIVE_SOURCE` ve `zscale` grupları listeden
+tamamen düştü.
+
+### Kalan 9 kırmızı
+
+| Ölçü | İleti (ilk satır) |
+|---|---|
+| `CalibrationProbeTests.LiveFastModeLandsInsideTheBandOnTheFirstAttempt(8)` | `target 8 MB \| band 7,36-8,00 \| plan libx264 slow 1920x1080@60 2pass bias 1` |
+| `CalibrationProbeTests.LiveFastModeLandsInsideTheBandOnTheFirstAttempt(25)` | `target 25 MB \| band 23,75-25,00 \| plan libx264 slow 1920x1080@60 2pass bias 1` |
+| `CalibrationProbeTests.LiveFastModeLandsInsideTheBandOnTheFirstAttempt(50)` | `target 50 MB \| band 48,60-50,00 \| plan libx264 slow 1920x1080@60 2pass bias 1` |
+| `CalibrationProbeTests.LiveFastModeLandsInsideTheBandOnTheFirstAttempt(100)` | `target 100 MB \| band 97,20-100,00 \| plan libx264 slow 1920x1080@60 2pass bias 1` |
+| `FillBandTests.LiveFillTargetRunStaysInsideTheBand(180)` | `target 180 MB \| band 174,96-180,00 \| hard floor 169,92 \| calibrated True` |
+| `HardwareFlagTests.LiveFastRunDoesNotSpendEveryAttempt(180)` | `target 180 MB \| band 174,96-180,00 \| plan libx264 slow 1920x1080@60 2pass 14174k` |
+| `HardwareRateControlTests.LiveFastTargetsLandInsideTheBandOnTheFirstAttempt(50)` | `Fast 50 MB \| libx264 slow 1920x1080@60 2pass 6680k` |
+| `PlaybackFrameSourceTests.Duraklatma_sureci_oldurmez` | `Assert.Equal() Failure: Values differ` |
+| `WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(loaded: True, narrow: True, least: 1002, most: 1102)` | `Assert.InRange() Failure: Value not in range` |
+
+7 + 2 = **9**. İlk yedisi canlı kaynak kapısındandı ve hepsi aynı şeyi
+söylüyor: bu kaynakta plan hedef bandının dışına düşüyor. Son ikisi canlı
+kaynakla ilgisiz; üçüncü koşumda da vardılar (`WindowLayoutTests`in 17
+kırmızısından biri) ya da orada yerelleştirme kırmızısının altında kalmıştı.
+Bu dokuzunun kök nedenini **çözümlemedim** — İş 1'in kapsamı Windows'ta erken
+dönüp geçen ölçüleri gerçekten koşturmak ve kırmızıya düşenleri raporlamaktı;
+bu yedi ölçü bu turda ilk kez gerçek kaynakla koştu, dolayısıyla bulgunun
+kendisi çıktı.
+
+**Yedi canlı kırmızının hepsinde plan `libx264`.** "Fast" yolu bu makinede
+yazılım kodlayıcıya düşüyor; donanım kolu yok. Bu, İş 2'nin K4 hükmüyle aynı
+kapı: depoda VideoToolbox'a giden tek satır bile yok, dolayısıyla Apple
+Silicon'da `FastHardwareOrder` boşa çıkıyor.
+
+### Koşumun 2 saat 44 dakika sürmesinin sebebi de aynı hüküm
+
+Canlı ölçüler 60 saniyelik 1080p60 HDR klibi altı ayrı hedef boyutta
+`libx264`/`libx265` **yazılım** kodlayıcıyla defalarca kodluyor. İş 2'de bu
+makinede ölçülen hız: `libx265 -preset slow` 60 saniyelik kaynağı 327-1244
+saniyede kodluyor, `hevc_videotoolbox` aynı işi 17,9-45,5 saniyede
+(`videotoolbox.md`, "Hız" — 6 oranın hepsi 16,1×-37,7× arasında). Yani süre
+bir ölçüm kazası değil, donanım kolunun bağlı olmamasının doğrudan bedeli.
 
 ## Koşan ve koşmayan — özet
 
@@ -601,7 +687,7 @@ eksik anahtar: yok
 |---|---|---|
 | `VIDSHRINK_LIVE_PROBE` | 2 | **koştu, geçti** |
 | Platform kapısı (macOS) | 7 | **koştu, geçti** |
-| `VIDSHRINK_LIVE_SOURCE` | 12 | koşmadı — kaynak yok |
+| `VIDSHRINK_LIVE_SOURCE` | 12 | **koştu** (dördüncü koşum, `parca-2.mkv`); 7'si kırmızı |
 | `zscale` yok | 2 atlanan + 10 kırmızı | koşmadı — ffmpeg derlemesi |
 | `VIDSHRINK_LAUNCHER_EXE` | 3 | macOS'ta hiç koşamaz |
 | `h264_nvenc` yok | 1 | Apple Silicon'da hiç koşamaz |
