@@ -3,6 +3,15 @@
 T107. **Ölçülen commit: `9fa1cda`** (`9fa1cdacbf1627cc07c5943a388ad1ae59167a3d`).
 Bu belgedeki bütün skor ve kalite sayıları o ağaçtan derlenmiş ikiliyle üretildi.
 Değişiklikten önceki ("eski model") sütunları `4a6377d`'nin skor modelidir.
+Tur 2'nin ölçümleri (kol ayrımı, dört kırmızının kapanışı, iki yönlü mutasyon)
+**`0d13a48`** ağacından; §9.1, §13.1, §14.1 ve §15.1 o ikiliyle üretildi.
+
+> **Tur 2 (`0d13a48`) uyarısı — bu belgedeki "yeni model" sütunu her yerde
+> teslim edilen model değildir.** T0 kararıyla yeni `rate` terimi **yalnız yazılım
+> kodlayıcısında** geçerli; donanım kolunda eski davranış duruyor (§6.1). Yazılım
+> kolunu ölçen bölümlerde (§3, §4, §7, §8, §10) "yeni model" sütunu teslim edilen
+> modeldir. **Donanım kolunu ölçen §9'da değildir:** orada teslim edilen model
+> "eski skor" sütunudur ve bu ayrıca ölçüldü (§9.1).
 
 ## 1. Soru
 
@@ -306,10 +315,11 @@ B'de 3,819 ve 3,582, C'de **38,816**. C 30 fps kaynak; 24 fps'e inmek 5:4 teklem
 ızgarasında** hesaplanıyor:
 
 ```csharp
-var requiredAtSourceGrid = required / Math.Max(complexity.ScaleFactor(scale), 1e-9);
-var providedAtSourceGrid = provided * scale * scale;
+var onSourceGrid = !CodecModel.IsHardware(codec);
+var rateRequired = onSourceGrid ? required / Math.Max(complexity.ScaleFactor(scale), 1e-9) : required;
+var rateProvided = onSourceGrid ? provided * scale * scale : provided;
 var rate = level.AtReference - level.PerHalving * Math.Log2(
-    Math.Max(requiredAtSourceGrid, 1e-9) / Math.Max(providedAtSourceGrid, 1e-9));
+    Math.Max(rateRequired, 1e-9) / Math.Max(rateProvided, 1e-9));
 ```
 
 Her iki taraf da ölçeğe göre aynı şekilde normalize edildiğinden `rate` ölçekten
@@ -320,6 +330,25 @@ beşincisinde (882x496) 68,878 — fark aday ölçeğinin 0,02'lik adıma yuvarl
 **Hiçbir sabit değiştirilmedi.** Ne `ScalePenaltyScale`, ne `FpsPenaltyPerHalving`,
 ne `PenaltyWeights`. Gerekçe: uydurulmuş cezalar sınanmamış kaynakta daha iyi değil
 (§7'deki varyant taraması). Telafi sabiti de eklenmedi.
+
+### 6.1 Tur 2 — kol ayrımı
+
+Tur 1 ölçümü iki yönü birden söylüyordu ve ikisi de gerçek: yazılım kolunda asıl
+şikâyet kapanıyor (§4), donanım kolunda aynı büyüklükte gerileme üretiliyor (§9).
+T0 kararı: **yeni terim yalnız yazılım kodlayıcısında geçerli olsun.**
+
+Kolu ayıran koşul kodda zaten vardı — `CodecModel.IsHardware(codec)`
+(`src/VidShrink.Core/CodecModel.cs:134`, `Vendor(codec) != EncoderVendor.Software`).
+Yeni bayrak eklenmedi, telafi sabiti eklenmedi, hiçbir sabit değişmedi.
+
+Gerekçe **ölçülmüş iki farklı rejimdir, tercih değil**: `av1_nvenc` 1920x1080@60'ta
+800 kbit/s isteğine 729,0 kbps teslim ediyor ve 500k isteğine 624,1 kbps — yani
+yerel çözünürlükte istenen hızın altına inemiyor. O kolda küçültmek gerçekten
+kazanıyor (540p 40,036 > 1080p 31,842 VMAF-NEG) ve eski model bunu **kazara**
+tutturuyordu: 1080p'yi aşırı cezalandırdığı için doğru sıraya düşüyordu. Sebep
+kodlayıcının bit hızı tabanı; ölçek-kalite ilişkisi değil.
+
+Ayrımın iki yönlü mutasyon kanıtı §13.1'de.
 
 ## 7. K4 — doğrulama ve varyant taraması
 
@@ -401,7 +430,24 @@ Model tarafında `kullanilirK` sütunu 1590k (1080p60) ve 1104k (900p60) diyor, 
 taban bu iki yerleşimi 800 kbit/s'te zaten eliyor (`tabanGecer=False`). Ölçüm ikisini
 de teslim edebildi; tahmin ile gerçek arasındaki bu fark ayrı bir kusur, kapsam dışı.
 
+### 9.1 Tur 2 — bu kolda teslim edilen model "eski skor" sütunudur
+
+Yukarıdaki "yeni skor" sütunu **reddedilen** varyanttır. Teslim edilen model
+donanım kolunda eski terimi kullanıyor (§6.1) ve bunu iddia etmekle bırakmadım,
+aynı ızgarayı teslim edilen ikiliyle yeniden koşturdum:
+
+```
+dotnet run --project tools/yerlesim-skoru/Skor.csproj -c Release --no-build --   .calisma/T107/kaynak/A-hareketli.mkv 2.0 av1_nvenc   .calisma/T107/yerlesimler-hw.txt --videok 800
+```
+
+Sonuç 68,127 / 69,873 / 71,394 / 72,294 / 72,355 — "eski skor" sütununun beş
+sayısıyla **birebir aynı**. Yani teslim edilen modelin bu koldaki ters çift oranı
+**1/10** (eşit boyut olmayan 1080p satırı atılınca **1/6**), 9/10 değil.
+
 ## 10. Aşırı rejim (350 kbit/s)
+
+Kodlayıcı `libsvtav1`, yani bu bölüm **yazılım kolunu** ölçer; "yeni skor" sütunu
+teslim edilen modeldir (§6.1).
 
 A-hareketli, `libsvtav1`, 12 yerleşim. İki satır dışlandı: `1920x1080@30` 338,6 kbps
 ve `1600x900@60` 298,0 kbps teslim etti (istek 350k, −%15), eşit boyut değiller.
@@ -487,9 +533,14 @@ biçimidir. Telafi sabiti yok.
 ## 12. Açık kusurlar
 
 1. **Ölçek bedeli bit hızına bağlı** (§10). Geçiş A kaynağında 400k–800k arasında.
-   Bunun sonucu olarak yeni model aşırı rejimde ve donanım kolunda yanlış tarafta.
-   Ölçeğin tek fonksiyonu olan bir ceza terimi bunu ifade edemez; çözüm ceza terimini
-   bit hızına da bağlamaktır ve bu ayrı bir sözleşmedir.
+   Bunun sonucu olarak yeni model yazılım kolunda da aşırı rejimde yanlış tarafta:
+   350 kbit/s'te ölçüm `1280x720@60`'ı `1920x1080@60`'ın 1,12 puan önüne koyuyor,
+   yeni model 1080p'yi 2,10 puan öne koyuyor. Ölçeğin tek fonksiyonu olan bir ceza
+   terimi bunu ifade edemez; çözüm ceza terimini bit hızına da bağlamaktır.
+   **Bu sözleşmede kapanmadı, ayrı sözleşme açılacak** (T0 kararı, madde 5).
+   Donanım kolundaki yanlış taraf tur 2'de düzeltilmedi, **atlatıldı**: o kol eski
+   terimde bırakıldı (§6.1). Eski terim orada kazara doğru; bit hızı bağlılığı
+   kapandığında bu ayrımın hâlâ gerekli olup olmadığı yeniden ölçülmelidir.
 2. **Ölçek bedeli içeriğe bağlı** (§5). Yarım ölçekte 1,410 (A) ile 16,988 (B)
    arasında, 12 kat. Sabit tablo bunu da taşıyamaz.
 3. **`PerHalving` üç kaynakta da ölçülmedi.** `SlopeMeasured=False`, model 6
@@ -533,6 +584,27 @@ boş yere yeşil olurdu, o yüzden `Assert.NotEqual(0.0, complexity.DetailExpone
 ile önce onun sıfır olmadığı doğrulanıyor; iki `InlineData` satırı işareti de
 ters çeviriyor (0,08/0,05 ve 0,08/0,11).
 
+### 13.1 Tur 2 — kol ayrımının iki yönlü mutasyonu
+
+Ayrımı tutan ölçü `PlanCalculatorTests.TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp`
+(iki `InlineData`): aynı profille dört basamaklı bir merdiven iki kodlayıcıda
+kuruluyor, `av1_nvenc`'te skorun küçüldükçe **artması**, `libsvtav1`'de **azalması**
+bekleniyor. Elle yazılmış skor yok; iki kol birbirine karşılaştırılıyor.
+
+Her koşumdan önce `dotnet build VidShrink.sln -c Release --no-incremental`.
+Filtre `PlanCalculatorTests|ExtremeCompressionTests|FillBandTests|SpeedModeTests`
+(85 ölçü).
+
+| Mutasyon | sonuç | düşen ölçüler |
+|---|---|---|
+| Koşul kaldırıldı: `onSourceGrid = true` (iki kol da yeni) | **2 başarısız** / 79 başarılı / 4 atlandı | `TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp` ×2 |
+| Koşul ters çevrildi: `onSourceGrid = false` (iki kol da eski) | **8 başarısız** / 73 başarılı / 4 atlandı | yazılım kolunun beş durumu (§13) + `TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp` ×2 + `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched` |
+| Teslim edilen hal (`onSourceGrid = !CodecModel.IsHardware(codec)`) | **0 başarısız** / 81 başarılı / 4 atlandı | — |
+
+Kol ölçüsü iki yönde de kırmızı, çünkü tek başına iki kolu birden iddia ediyor;
+kaldırma yönünde **yalnız** o düşüyor, ters çevirme yönünde yazılım kolunun beş
+ölçüsü de düşüyor. Yani koşulun hem varlığı hem yönü pimli.
+
 ## 14. Atlanan testler
 
 `tools/ci-gibi-kos.sh` `ffmpeg`'i PATH'ten çıkarır; `[FfmpegFact]` ile işaretli
@@ -562,6 +634,36 @@ süre farkı koşucunun, sayılar değil.
 hiçbiri değil; üçü de `ComplexityProfile.FromProbe` ile kurulan profil üzerinden
 çalışıyor, kodlayıcıya hiç gitmiyor.
 
+### 14.1 Tur 2 — yerel ci-gibi koşumu tamamlandı
+
+Tur 1'de bu koşum 540 sn sınırına takılmıştı; tur 2'de sınır kaldırılıp tam koşuldu
+(`bash tools/ci-gibi-kos.sh`, günlük `.calisma/T107/ci-gibi-tur2.log`):
+
+```
+Başarısız: 0, Başarılı: 1080, Atlanan: 105, Toplam: 1185, Süre: 15 m 6 s
+```
+
+CI aynı sayıları verdi — koşum **33601165873**, headSha `0d13a48`, **success**:
+
+```
+Passed!  - Failed: 0, Passed: 1080, Skipped: 105, Total: 1185, Duration: 16 m 57 s
+```
+
+Yani tur 1'in dört kırmızısı CI'da da sıfıra indi; açıklanacak artık kalmadı.
+
+(Süre makine paylaşımlıydı; sayılar değil.) Tur 1'in dört kırmızısı bu koşumda yok.
+Toplam 1183'ten 1185'e çıktı: tur 2'de eklenen iki ölçü
+`TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp`'ın iki `InlineData` durumu.
+
+**Kabul kriteri ölçülerinin hiçbiri atlananlar arasında değil.** Günlükten çıkarılan
+atlanan listesinde `PlanCalculatorTests`ten tek bir ad yok; `owns`a tur 2'de eklenen
+dört dosyadan atlanan yalnız `FillBandTests.LiveFillTargetRunStaysInsideTheBand` ve
+`QualityTargetTests.MonotonicityOnRealSourcesIsMeasuredNotAssumed` — ikisi de
+`[FfmpegFact]`, bu turda düzeltilen ölçüler değil. Düzeltilen dördü
+(`FillTargetReachesTheBandWhenTheCeilingWouldLeaveItUnfilled`,
+`SearchCostIsBoundedAndCounted`, `SinirDurumuEkrandaYazili`,
+`QualityModeLeavesTodaysPlansUntouched`) ffmpeg'siz ortamda gerçekten koştu.
+
 CI'da atlanan 105 ölçünün sınıf dağılımı:
 
 ```
@@ -575,10 +677,12 @@ HardwareRateControlTests 2  FfmpegArgumentsTests 2
 QualityTargetTests 1    HardwareFlagTests 1    FillBandTests 1
 ```
 
-## 15. `owns` dışında kalan dört kırmızı
+## 15. Dört kırmızı
 
-Değişiklik dört ölçüyü düşürüyor ve dördü de bu sözleşmenin `owns` listesinde
-**değil**. Dosyalara dokunulmadı; **CI bu yüzden kırmızı** (koşum 33592420948).
+**Tur 1'de** değişiklik dört ölçüyü düşürüyordu ve dördü de o turun `owns`
+listesinde değildi; dosyalara dokunulmadı ve CI bu yüzden kırmızıydı
+(koşum 33592420948). **Tur 2'de** T0 dördünü `owns`a ekledi ve dördü de kapatıldı
+(§15.1). Aşağıdaki tablo tur 1'in tespitidir.
 
 | Ölçü | dosya | ne diyor |
 |---|---|---|
@@ -598,5 +702,64 @@ eski davranışa çivilenmiş. (Süreler makine paylaşımlıydı; sıralama de�
 kırmızı/yeşil bilgisi ölçüdür.)
 
 Dördü de beklenen değeri eski modele çivilenmiş düzeneklerdir; hiçbiri yeni modelin
-bozuk olduğunu söylemiyor. Ama düzeltmek `owns` dışına yazmayı gerektiriyor,
-o yüzden sözleşme `blocked` teslim ediliyor.
+bozuk olduğunu söylemiyor.
+
+### 15.1 Tur 2 — dördünün kapanışı
+
+Kural: **beklenen sayıyı yenisiyle değiştirmek yetmez.** Her birinin yanına o
+sayının nereden geldiği yazıldı; hiçbiri elle uydurulmadı.
+
+**1. `FillBandTests.FillTargetReachesTheBandWhenTheCeilingWouldLeaveItUnfilled`.**
+Düzeneğin *önkoşulu* yok olmuştu, beklentisi değil: profil ölçülmemiş
+(`Measured=false`) kurulduğu için yeni yazılım modelinde "tavan bandın altında"
+rejimi hiç oluşmuyordu. 7 kaynak bit hızı × 6 hedef taraması yapıldı
+(`.calisma/T107/fillband-tarama.tsv`, `fillband-tarama2.tsv`); rejime giren her
+satır önemsiz bir `PassThrough` çıktı. Düzenek **ölçülmüş** şikâyet profiline
+yeniden temellendirildi (`ReferenceBppf = 0,06244`, kaynağı
+`docs/olcumler/bppf-tabani.md:125`; `MotionExponent = 1,163`). O profille tavan
+80,8 MB, bandın altı 116,6 MB, dolgu 118,3 MB'a ulaşıyor ve karar
+`FillTwoPassBandTooNarrowForCrf`. Yeni sayılar taramadan, testin docstring'inde
+kayıtlı.
+
+**2. `QualityTargetTests.SearchCostIsBoundedAndCounted` (`:313`).**
+Bu, ötekilerin aksine bir anlık görüntü değil: hata `KeyNotFoundException 'BelowFloor'`,
+yani süpürme artık **hiç** taban-altı plan üretmiyor ve sözlükte anahtar yok.
+Sebep, süpürmenin elle yazılmış 20,0 alt sınırı: taban planının kalitesi ölçüldü
+(`.calisma/T107/taban-kalitesi.tsv`) — sample.mp4 8,08; phone.mp4 −3,511;
+capture.mkv 13,358 (Sharing) ve 12,431 (Archive). Dördü de 20'nin altında, yani
+süpürme taban rejimine hiç girmiyordu. Alt sınır artık kaynağa/niyete göre
+**türetiliyor**: `QualityAt(info, options, PlanCalculator.QualityFloorTargetMb(info))`
+bir puan altından başlanıyor. Ayrıca sözlük araması yapılmadan önce
+`Assert.True(worstByBound.ContainsKey(QualityTargetBound.BelowFloor), ...)` eklendi;
+rejim ölçülmediyse test artık `KeyNotFoundException` değil, sebebi yazan bir
+kırmızı veriyor. Arama maliyeti yeniden ölçüldü: en kötü durum **1315 çağrı**
+(sample.mp4, Sharing, istek 94) — tur 1 ile aynı, sınır 1400 değişmedi.
+
+**3. `QualityTargetUiTests.SinirDurumuEkrandaYazili`.**
+Düzeneğin 4K/60 `Sample()`'ı yeni modelde `BelowFloor`a artık ulaşamıyor: varsayılan
+`PlanOptions` ile taban planının kalitesi −3,989, arayüz kalite 1'de bile boş uyarı
+gösteriyor. Yeni düzenek `FloorBoundSample()` **ölçülerek** seçildi (2560x1440@30,
+h264 5,1 Mbps, 3600 sn, 2200 MB): arayüzde taban 20,7 MB → 40,5 puan, tavan
+2090 MB → 94,1 puan. Docstring'e arayüzden okunan bu sayılar yazıldı. **Dikkat:**
+aynı kaynağın varsayılan `PlanOptions` ile taban kalitesi 13,358'dir; pencere kendi
+seçeneklerini kuruyor, iki sayı farklı yollardan gelir ve birbirine karıştırılmamalı.
+
+**4. `SpeedModeTests.QualityModeLeavesTodaysPlansUntouched`.**
+Gerçek bir anlık görüntü; 18 altın satırın tamamı düzenekten yeniden üretildi
+(`.calisma/T107/hizkipi-liste.txt`), elle düzenlenmedi. Farkın yönü: **18 satırın
+18'inde çözünürlük yükseldi**; 180 MB `QualityCeiling` satırlarının üçü crf→2pass
+geçti; kodek ve kare hızı 18 satırın hiçbirinde değişmedi. Docstring'e listenin
+hangi komutla üretildiği ve bu üç gözlem yazıldı.
+
+Yeniden ölçüm sonrası yerel:
+`--filter "QualityTargetUiTests|FillBandTests|SpeedModeTests|PlanCalculatorTests|ExtremeCompressionTests"`
+→ **0 başarısız / 89 başarılı / 4 atlandı**; `--filter "QualityTargetTests"`
+→ **0 başarısız / 11 başarılı** (4 dk 39 sn; süre makine paylaşımlıydı).
+
+### 15.2 Tur 2'de çıkan, kapsam dışı gözlem
+
+Yukarıdaki 1. maddenin taraması bir yan bulgu verdi: **ölçülmemiş** profille
+1920x1080@30 düzenek ailesinde yeni yazılım modelinde tavan-bandın-altında rejimi
+tamamen kayboluyor — taranan 42 kombinasyonun hiçbirinde önemsiz olmayan bir örnek
+yok. Bu tek başına bir kusur olabilir de olmayabilir de; **ölçülmedi**, yalnız
+gözlendi. Bu sözleşmenin kapsamı dışında.
