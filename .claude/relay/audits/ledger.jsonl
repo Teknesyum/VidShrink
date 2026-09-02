@@ -102,3 +102,9 @@
 {"id":"T101","result":"stale","at":"2026-09-01T23:07:52.039Z"}
 {"id":"T99","result":"stale","at":"2026-09-01T23:15:11.873Z"}
 {"id":"T101","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SceneMapTests","code":0}],"auditorRunId":null,"headSha":"feff970cb90d5c73ed2a0fe9364fa0f34bcace24","at":"2026-09-01T23:38:08.662Z"}
+{"id":"T100","result":"stale","at":"2026-09-01T23:48:49.722Z"}
+{"id":"T104","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests","code":0}],"auditorRunId":null,"headSha":"c648272ed7bdf8d0a31e8d53d039d25c2a78f1bd","at":"2026-09-01T23:54:24.892Z"}
+{"id":"T102","result":"stale","at":"2026-09-02T00:02:42.730Z"}
+{"id":"T98","result":"stale","at":"2026-09-02T00:02:42.730Z"}
+{"id":"T106","result":"stale","at":"2026-09-02T00:06:11.553Z"}
+{"id":"T100","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncodeRunnerTests|ComplexityProbeTests|SegmentEncoderTests","code":0}],"auditorRunId":null,"headSha":"7551de089516a55e656a1e73c0b0eed193c25b05","at":"2026-09-02T00:14:09.956Z"}

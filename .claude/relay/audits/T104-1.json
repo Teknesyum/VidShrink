@@ -1,0 +1,16 @@
+{
+  "contractId": "T104",
+  "auditorRunId": "ad2eea591088b8873",
+  "headSha": "c648272ed7bdf8d0a31e8d53d039d25c2a78f1bd",
+  "diffHash": "f8092e2ac0a0cde691ad4ce4d34682abd4db77b1a7e1e80d2187a07fd7bf0d22",
+  "owns": [
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "tests/VidShrink.Tests/QualityMeterTests.cs",
+    "docs/olcumler/algi-olcusu.md"
+  ],
+  "verification": [
+    "Denetci sinyal/gurultu tablosunun 24 hucresini ham kare-basi VMAF JSON'undan (p1/p3 x ozdes/crf8/crf12, 1800/1799 kare) bagimsiz yeniden hesapladi; dort deger birebir tuttu (p1 2sn 1,1745/1,7258; p3 2sn 0,5813/2,5611; p1 sahne@0,20 0,7119/1,6275). K4a kor noktasi ham gunlukten dogrulandi: p3'un en kotu 0,5 sn blogu 28,82 sn'de, crf12 gercek 84,1481, atma kuralinin gordugu 92,3877 - 8,24 puan. 18 olcu gecti, 0 atlandi. owns temiz. Tur 2'de dort belge iddiasi ve iki pimsiz kol kapandi; T0 main'de dogruladi: 93,51 dogru degerle yerinde, '72 civarinda' / 'iki katinin' / 'silindi' cumlelerinin ucu de kalkmis, MapWithASingleSceneFallsBackToTheFixedWindow olcusu eklenmis, kendi modulunden turetilen assert cikarilmis. 19 olcu, 0 atlanan."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-01T23:53:20.060Z"
+}

@@ -208,37 +208,101 @@ buradan geliyordu, "paralellik" kendisinden değil. Karşılaştırma koşumlar�
 
 Bir ajanın yükü fark etmesi doğru; yükü bekleme gerekçesi yapması değil.
 
+## Ölçü aracı sanıkta (T106, 2026-09-02)
+
+T102 auto modu ölçerken aletin kendisinde kusur buldu. VMAF-NEG, SVT-AV1
+çıktısında **1 puanın altına düşen bir kare kümesi** üretiyor (auto'da 26 kare,
+25'i tam 0); iki x265 koşumunda hiç üretmiyor (en düşük 74,67). O karelerde
+PSNR 46-49 dB, HandBrake 98-100 alıyor — yani görüntü aslında temiz.
+
+Bench'in harmonik ortalaması `n / Σ(1/max(x,1))`. `max(x,1)` yüzünden 0 ile
+0,13 aynı etkiyi yapıyor ve tek bir düşük kare sütunu çökertiyor: bugünkü
+haliyle AV1'i x265'e karşı **39,4 puan** geride gösteriyor.
+
+Bu yüzden T106, kodlayıcı seçim kuralından **önce** gelir. O kural p10 ile
+harmonik ortalamaya dayanıyor; ikisinden biri yalan söylüyorsa yanlış
+kodlayıcıyı seçeriz. T106 ayrıca `docs/olcumler/` altında kirlenmiş satırların
+listesini çıkaracak; sahiplerine T0 dağıtacak.
+
+**Bu arada kural:** harmonik sütuna yaslanan yeni bir sonuç yazılmaz.
+Ortalama ve p10 sağlam.
+
+## Aynı kusuru iki tur birden düzeltiyor (T98 × T105)
+
+T98 anahtar kare üst sınırını `SceneMap` ortalamasından türetiyor ve
+**2,8'e bölüyor**. Bölen T101'in yer gerçeğinden geliyor: 28 gerçek kesime
+karşı harita 10 sahne buluyor.
+
+Ama T105 tam o kusuru düzeltiyor — eşik ölçüye göre yeniden konuyor ve harita
+daha çok sahne bulacak. İkisi de `main`e girerse **düzeltme iki kez uygulanır**
+ve üst sınır olması gerekenin yarısına iner.
+
+Genel kural, bundan sonrası için: **bir sabit başka bir turun düzelttiği
+kusurun telafisiyse, o sabit koda yazılmaz.** Ya kusurun ölçüsünden türetilir,
+ya da onu doğuran değere bakan bir ölçüyle bağlanır ki değer değişince
+ölçü kırılsın. Sessizce doğru kalan telafi sabiti yoktur.
+
+## Kapanan açık, kapanmayan sınıf (T100, 2026-09-02)
+
+Arayüz kullanıcıya "burada durur, kalanı harcamaz" derken teslim edilen dosya
+39,14 MB oluyordu — vaat 8,7 MB'tı. İki kapı ayrışmıştı: koşucu
+`actualMb >= HardFloorMb` istiyor, arayüz istemiyordu. Kapandı, tek yükleme
+bağlandı, mutasyonla doğrulandı.
+
+**Ama sınıf kapanmadı.** Arayüz `note.Mb`'yi vuruyor — bu planın *tahmini*.
+Koşucu `actualMb`'yi vuruyor — bu *gerçek*. Üç kaynakta ikisi tabanın aynı
+yanına düştü, o yüzden cümle tutuyor. Tahmin tabanın öbür yanına düşen bir
+kaynakta yine ayrışır, ve **bugünkü ölçü bunu yakalayamaz**: test koşucuya
+`note.Mb ≈ actual` olan bir plan veriyor.
+
+Gerçek çözüm, kararın planlayıcıda saklanması — `StopsShortOfBandOnPurpose`
+bugün türetilen bir işaret, `PlanCalculator` koşulu zaten biliyor ama
+yazmıyor. T99 o dosyayı tuttuğu için bu turda taşınamadı. **T99 mühürlenince
+açılacak ilk küçük iş budur.**
+
+## Taban indi, plan hala kaybedeni seciyor (T99, 2026-09-02)
+
+T99 av1 bppf tabanini 0,020'den 0,0095'e indirdi ve donanim carpanini 1,25'ten
+1,52'ye tasidi; ikisi de olcumden. Taban artik kazanan yerlesimi elemiyor.
+
+Ama sikayet kapanmadi. Olculen kazanan `1280x720@60`, `882x496@60`'in **6,39 puan**
+onunde — iki pencerede de ayni yonde. Plan hala `882x496@60` seciyor. **Eleyen taban
+degil, skor.** `PlanCalculator.LayoutScore` (`PlanCalculator.cs:618`) iki tahmin
+egrisinin farki: dusuk cozunurlukte `rate` firliyor, `ScalePenalty` onu 6,39 puan
+eksik dengeliyor. Iki yarisi da olculen kaliteye karsi hic kalibre edilmedi.
+
+Ders: **tabani indirmek kazanani secmeye yetmiyor.** Elek ile secici ayri seylerdir;
+biri duzeltilince oteki kendiliginde duzelmiyor. T107 bunu olcuye oturtuyor.
+
+Yan etki, T99'un kendi bildirdigi: carpan yukselince `hevc_nvenc` tabani da
+0,02196'dan 0,02671'e cikti ve **o taban olculmedi**. Donanim kolunda
+`UsableBitrateK` (706k = 0,01277 bppf) yeni tabandan siki, yani taban orada atil ve
+HandBrake'in 0,0116'lik noktasi hala disarida.
+
 ## Sonraki basamak
 
-1. T98 GOP aralığını `main`e getirir. **Açığın bilinen en büyük tek kalemi bu** —
-   T102 tek değişkenle %24,5 boyut kazancı ölçtü, puan da yükseldi.
-2. T99 T95 beklenmeden açıldı (gerekçe sözleşmesinde): tek değişken yerleşim
-   olduğu için aletin adillik kapıları gerekmiyor. **T94 hâlâ T95'te** — HDR
-   hizası iki farklı aracı karşılaştırıyor, orada kapı gerçekten lazım.
-3. T100 + T101 bitince T103 açılır (örnekleme, üçüncü kaldıraç).
-4. `SceneMap` `PlanCalculator`a bağlanır (T99 mühürlendikten sonra).
-5. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır — kuyruk
-   açığının ana sahibi (aday A, p10'da +13,76) orada.
-
-## Ölçü penceresi sahneye bağlanmadı (T104, 2026-09-02)
-
-Denemesi yapıldı, kazanmadı: sahne sınırlarına oturan ölçüm penceresi sabit 2
-saniyelik pencereden **daha iyi ayırmıyor**. Sinyal/gürültü tablosu 24 hücrede
-bağımsız yeniden hesaplandı, dördü birebir tuttu. Sabit 2 sn kaldı — ölçüldü,
-değiştirilmedi.
-
-Turun asıl kazancı başka yerde: en kötü blok seçilirken kısa kuyruk bloğu
-atılıyordu ve bu **8,24 puanlık** bir kör nokta üretiyordu (p3'te gerçek
-84,1481, kuralın gördüğü 92,3877). Kapatıldı.
-
-Ders, yol haritasının kendisi için: **sahne haritası her ölçüye yaramıyor.**
-Bit bütçesi sahneye göre bölünür (T98), ama kalite ölçüsü bölünmüyor. Haritayı
-yeni bir yere bağlamadan önce o yerde kazandığı ölçülür.
+1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
+   o kuralın kanıtı p10 ve harmonik ortalamadan geliyor.
+2. **T98** GOP aralığını `main`e getirir. Açığın bilinen en büyük tek kalemi —
+   T102 tek değişkenle %24,5 boyut kazancı ölçtü, puan da yükseldi. T105 ile
+   çakışması yukarıda; iki turdan biri `main`e girmeden öteki hizalanır.
+3. **T105** haritanın eşiğini ölçüye oturtur; T98 ve T104'ün gördüğü sahne
+   sayısı değişir.
+4. **T99** taban kararını verdi (denetimde). Mühürlenince iki iş birden açılır:
+   **T107** yerleşim skorunu ölçüye oturtur (asıl şikâyet orada), **T103**
+   örneklemeyi alır.
+5. **T95** teslim edince T94 açılır — HDR hizası iki farklı aracı
+   karşılaştırıyor, aletin adillik kapısı orada gerçekten lazım.
+6. `SceneMap` `PlanCalculator`a bağlanır — harita hâlâ tüketilmiyor.
+7. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır. **T106'dan
+   sonra.**
 
 ## Değişmeyen kurallar
 
 - Sabit karşılaştıran ölçü davranış ölçmez.
 - Ölçmediğin şey için "ölçülmedi" yazılır, iddia edilmez.
 - Paralel koşumda **iş parçacığı sabitlenir**; süre sayısı damgalanır (aşağıda).
+- Harmonik ortalamaya yaslanma (T106 soruşturuyor); ortalama ve p10 sağlam.
+- Telafi sabiti koda yazılmaz — ölçüden türetilir ya da ölçüyle bağlanır.
 - Mühürden önce `gh run list`.
 - `main`e yalnız T0 birleştirir.

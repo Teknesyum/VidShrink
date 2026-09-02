@@ -275,6 +275,7 @@
   "main.reason.frame-rate-reduced": "frame rate reduced to {0} to keep per-frame detail",
   "main.reason.resolution-restored": "the ceiling left budget unused, so resolution was restored to {0}x{1}@{2} — the largest layout that still fits the target at CRF {3}",
   "main.reason.budget-exceeds-ceiling": "the budget affords CRF {0}, better than the CRF {1} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {2} MB instead of padding the file to {3} MB",
+  "main.reason.measured-quality-stop": "CRF {0} already reaches the quality measured on this source, so the encoder stops there and delivers about {1} MB instead of spending the rest of the {2} MB on an extrapolation no measurement covers",
   "main.reason.budget-below-ceiling": "the budget lands near CRF {0}, short of the CRF {1} ceiling, so two-pass VBR spends the whole {2} MB",
   "main.reason.quality-measured": "predicted quality {0}/100 from a measured sample (bppf {1}, detail falloff {2})",
   "main.reason.quality-estimated": "predicted quality {0}/100 estimated from the source bitrate",
