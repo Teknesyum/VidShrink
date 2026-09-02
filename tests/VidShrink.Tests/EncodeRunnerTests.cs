@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -400,5 +400,96 @@ public sealed class EncodeRunnerTests
         var stdout = await process.StandardOutput.ReadToEndAsync();
         await process.WaitForExitAsync();
         return stdout.Split('\n').Count(line => line.Trim().TrimEnd(',') == "I");
+    }
+
+    /// <summary>
+    /// Teslim yolunun basari kapisi. ffmpeg taninmayan bir kodlayici anahtarini dusurup
+    /// <b>cikis kodu 0</b> ile donuyor; motorun sectigi psikogorsel ayar sessizce
+    /// kayboluyor. Olcumler <c>docs/olcumler/cikis-kodu-yalan.md</c> altinda.
+    /// </summary>
+    [Fact]
+    public void ExitZeroWithADroppedOptionDoesNotFailButTheDropIsCarried()
+    {
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in FfmpegRunnerTests.SvtAv1DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+
+        var outcome = watch.Close(0);
+
+        EncodeRunner.ThrowIfFailed(outcome);
+        Assert.NotEmpty(outcome.DroppedOptions);
+        Assert.Contains(outcome.DroppedOptions, line => line.Contains("zzznotreal"));
+    }
+
+    [Fact]
+    public void TheDiagnosticLineDoesNotSurviveTheTailWindow()
+    {
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in FfmpegRunnerTests.SvtAv1DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+
+        var outcome = watch.Close(0);
+
+        Assert.DoesNotContain(outcome.Tail, line => line.Contains("Error parsing option"));
+    }
+
+    [FfmpegFact]
+    public async Task ARealEncodeThatDropsAnOptionReportsTheDrop()
+    {
+        var outcome = await EncodeRunner.RunCommandAsync(
+            new[]
+            {
+                "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=128x128:rate=30:duration=0.1",
+                "-c:v", "libx264", "-x264-params", "zzznotreal=1", "-frames:v", "2",
+                "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
+            },
+            durationSeconds: 0.1, progress: null, stage: "olcum", spanFrom: 0.0, spanTo: 1.0,
+            ct: CancellationToken.None);
+
+        Assert.Equal(0, outcome.ExitCode);
+        Assert.Contains(outcome.DroppedOptions, line => line.Contains("zzznotreal"));
+    }
+
+    /// <summary>
+    /// Karar: dusurulen ayar kodlamayi <b>oldurmez</b>. Kullanicinin elindeki dosya
+    /// calisiyor; onu atmak sessiz kalite kaybindan daha buyuk bir zarar.
+    /// </summary>
+    [Fact]
+    public void ADroppedOptionNeverFailsTheDeliveryPath()
+    {
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in FfmpegRunnerTests.X265DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+
+        var outcome = watch.Close(0);
+
+        Assert.NotEmpty(outcome.DroppedOptions);
+        EncodeRunner.ThrowIfFailed(outcome);
+    }
+
+    /// <summary>Karar simetrik: dusurulen ayar bir kosumu kurtarmaz da.</summary>
+    [Fact]
+    public void ANonZeroExitStillFailsWhateverTheDiagnosticSays()
+    {
+        var clean = new EncodeRunner.StderrWatch();
+        clean.Line("x265 [warning]: Too few rows/columns, --wpp disabled");
+        Assert.Throws<InvalidOperationException>(() => EncodeRunner.ThrowIfFailed(clean.Close(3)));
+
+        var dropped = new EncodeRunner.StderrWatch();
+        dropped.Line("[libx265 @ 0] Unknown option: zzznotreal.");
+        Assert.Throws<InvalidOperationException>(() => EncodeRunner.ThrowIfFailed(dropped.Close(3)));
+    }
+
+    /// <summary>Ayni karar dusuk seviyeli kosucuda da: <c>Ok</c> yalniz cikis koduna bagli.</summary>
+    [Fact]
+    public void TheLowLevelRunnerKeepsOkIndependentOfTheDiagnostic()
+    {
+        var dropped = FfmpegRunner.Decide(0, FfmpegRunnerTests.X264DroppedKey, TimeSpan.Zero);
+        Assert.True(dropped.Ok);
+        Assert.True(dropped.DroppedAnOption);
+
+        var failed = FfmpegRunner.Decide(3, FfmpegRunnerTests.X264DroppedKey, TimeSpan.Zero);
+        Assert.False(failed.Ok);
+        Assert.True(failed.DroppedAnOption);
     }
 }

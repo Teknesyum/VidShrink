@@ -639,3 +639,221 @@ sectigi psikogorsel parametre sessizce dusuyor, kullanici uyari almiyor.
 Yan bulgu (ayri sozlesme gerekiyor): `ComplexityProbe.cs:31`
 `public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;` — sahne farkindali
 ornekleme uretimde pimli olarak kapali.
+
+## T140 teslim edildi, denetimde (2 Eylul 2026)
+
+Dal `T140-turbo-ilk-gecis` @ `6f64593`. Diff tamamen `owns` icinde. CI `33652799954`
+(`ba1f6be`) success. Denetci acildi.
+
+Yapicinin uc sorusu, T0 cevabi:
+
+1. **Atlanan 18 -> 19, hangi olcunun kaydigi bilinmiyor.** Borc. Yapici bunun bir cikarim
+   oldugunu acikca yazdi — dogru davranis. Denetci dalin yeni bir `Skip` getirip
+   getirmedigine bakiyor.
+2. **Merdiven yonu kumeye bagli** (`libvpx-vp9`, `libsvtav1` ters yonlu). **Ucuncu
+   kodlayici girdiginde.** Bugun kume iki ve ikisi de ayni yonde; koruma kume olcusunun
+   kirmiziya donmesi. Veriye tasimak bugun olu alan ekler.
+3. **Turbo anahtarini uretimde kimse acmiyor.** Ayri sozlesme. `CompressionStrategy`,
+   `PlanCalculator` ve ayarlar tarafi T140'in `owns`unda degil; dokunmamakla dogru yapti.
+
+### Ayni sinif dorduncu kez: duzenek var, uretim cagirani sifir
+
+T137 (ucuncu cevap uretilmis, tuketilmemis), T142 K3 (harita uretiliyor, cagriya
+verilmiyor), T143 (`WorstScene`in haritali kolu yalniz testlerden cagriliyor), T140
+(turbo anahtari kimse acmiyor). Dordu de ayni: yeni yetenek yazildi, olculdu, muhurlendi
+— ve kullaniciya ulasan yolda **kosmuyor.**
+
+Kok neden `owns` disiplini: yetenegi yazan sozlesme onu **cagiran** dosyaya sahip degil,
+o yuzden bagalamak her seferinde borc olarak devrediliyor ve borc hicbir sozlesmeye
+donmuyor. Cozum: bu dort borcu tek bir "uretim yolunu bagla" sozlesmesinde toplamak;
+`owns` tam da cagiran dosyalar olur (`src/VidShrink.App/MainWindow.axaml.cs`,
+`src/VidShrink.Core/PlanCalculator.cs`, `CompressionStrategy`).
+
+## T132 muhurlendi (2 Eylul 2026, tur 3)
+
+Denetim GECTI, KRITIK yok. `main` @ `8075ed0`. CI `33658444761` (`46d9d48`) success.
+Dal ve worktree kaldirildi.
+
+Denetci taint taramasini bagimsiz yeniden kurdu: **tam olarak 23**, ayni satir kumesi.
+Fazla kapsayici 65 assert'lik elek ek saat turevi iddia bulmadi. Pimleyen olcunun gercek
+oldugunu izole kopyada **24. bandi kendi ekleyerek** dogruladi — test kirmizi dondu ve
+yeni satiri adiyla soyledi. Dort U1 gunlugu derleme ciktisiyla basliyor (`--no-build` yok),
+her biri `Toplam: 1` (olu kol yok). `--list-tests` 22 + 54 + 29 = 105.
+
+Bes borc:
+1. `duvar-saati-iddialari.md:463` "yirmi dorduncu saat turevi assert CI'i kirmizi yapar"
+   diyor; `DateTime.UtcNow` bandi yesil kaliyor. Yazili kapali kume uretim saat turevi
+   uyeleri + zaman asimi alan beklemelerle sinirli, olcu spec'e uyuyor. Tek cumle fazla
+   iddia ediyor.
+2. `:511-515` arasinda "bilinen sinirlar" paragrafi yok.
+3. Tur 3 icin saklanmis yerel verify gunlugu yok.
+4. `PerformanceCheckTests.cs:455-462` gercek bir `else` kapisinin arkasinda. Tur 2'nin
+   `:757` icin **uydurdugu** mekanizma burada gercek — ve bant tablosu bunu soylemiyor.
+5. `KorumaAraligi` olu savunma.
+
+Devredilen borc: kalan alti bant sayildi, daraltilmadi -> **T145**. Artik `depends`i
+karsilandi, acilabilir. **T141** de acildi (ayni bagimlilik).
+
+## T142 tur 2 acildi — iki KRITIK, ikisi de belge
+
+Kod bagimsiz olarak dogrulandi: K1, K2, K4, K6, K7 ve K3'un **karari** gecti. Denetci
+mutasyon izgarasini kendi kosturdu (dort mutasyon, her biri yalniz kendi olcusunu kirdi),
+K1'in uc kirmizisini `b5f1750`i ayri agaca acip birebir uretti, `--list-tests` ile 46 + 22
+saydi, `ComplexityProbe.cs`in **degistirilmedigini** diff'ten dogruladi.
+
+KRITIK 1: `kalibre-pencere.md:118`, `8 | Fast | degisken harita` hucresi `2: [4 6]` yaziyor.
+4000 fixture supuruldu; `Fast == [4 6]` **hicbirinde cikmiyor**. Ayni satirin Quality
+hucresini ureten fixture'larin hepsinde Fast `[0 2]`. Fark onemsiz degil: `[4 6]` klibin
+ikinci yarisina yayilmis yerlesim, `[0 2]` iki ornegin de ilk dort saniyeye yigildigi hal
+— raporun kendi borc 2'sinde tarif ettigi tehlike. Yanlis hucre tehlikenin ornegini
+gizliyor.
+
+KRITIK 2: `:68-69` "sceneCuts'i dolduran tek yer ... `:383`, yani bir olcu". Yedi yer var
+ve `:383` bir cagri bile degil, metot basligi. `tools/ornekleme` de olcu degil, olcum araci.
+
+Kalan 13 satir ve K5'in tasiyici cumlesi dogrulandi. Tur 2 **belge turu**; kod degismiyor.
+Yerel yapici acildi, dal `T142-tur2`.
+
+## T143 muhurlendi (2 Eylul 2026)
+
+Denetci `a0d2d12375e3e973a`. Cagri sayimi **ucuncu kez ve tur turetimli yontemle** uretildi:
+imzalardan `map`in 4. arguman oldugu okundu, agactaki 16 `WorstScene(` satiri
+bildirim/metot-adi/cagri diye ayrildi, cagrilar arguman sayisina bolundu. 2+1+13=16,
+6+5=11, 1+1+11=13 — toplamlar tutuyor. Yapicinin 11/5/4/1 tablosu dogru; **sozlesmenin
+yazdigi 12 yanlisti** ve yapici bunu kendisi buldu.
+
+K4'un iki sayisi denetcinin kendi kosumunda uretildi: duzeltilmis `88.888889 @ 14.0 unit
+2.25`, eski davranis `100.0 @ 0.0 unit 2.0`. Eski testin yeniden yazilmasi mesru:
+`MinimumUnitSeconds` 0,5 sn olarak **duruyor**, degisen yalniz sonuc (dusur -> kat). Yeni
+test daha siki. Bant genisletilmedi.
+
+Dort mutasyonun ucu denetcide kosuldu, izgara birebir tuttu. Izgara daraltmasinin olcuyu
+zayiflatmadigi ayrica dogrulandi.
+
+Yedi borc, KRITIK yok. **En onemlisi dorduncusu:** `WorstScene`in iki asiri yuklemesinin
+**artik uretim cagirani sifir.** Uretim `AggregateVmaf` -> `WorstSceneUnit` yolundan
+geciyor; `WorstScene` yalniz 10 test satirindan cagriliyor. Yani sozlesmenin actigi kusur
+sinifi kapanmadi, **eski giris noktasina kaydi** — ve rapor bunu anmiyor.
+
+Bu, "uretim cagirani sifir" sinifinin **besinci** gorunumu (T137, T142 K3, T143 map kolu,
+T140 turbo anahtari, simdi `WorstScene`). Kok neden ayni: yetenegi yazan sozlesme onu
+cagiran dosyayi sahiplenmiyor. T146 bu sinifi kapatmak icin acildi ve `PlanCalculator.cs`
+T139'da oldugu icin bekliyor.
+
+Ikinci onemli borc: uygulama **haritayi olcumden sonra kuruyor**
+(`MainWindow.axaml.cs:1807` olcum, `:1812` harita). Yapici buldu, denetci gozle dogruladi.
+Imza bugun degistirilse bile gecirilecek harita o noktada **yok**. Ayri sozlesme; T141 ve
+T143 muhurlenince acilir.
+
+## Serkan — macOS kosumu ve VideoToolbox olcumu (2 Eylul 2026)
+
+Numarasiz is; gorev paketi disaridan verildi, dal `serkan/macos-olcum`, `main`e
+`a2b9664` ile birlesti. Dort commit, on dosya.
+
+**Ne getirdi.**
+
+1. **Uc gercek yerellestirme kusuru** — Release'te arayuzde ham anahtar dizesi
+   gorunuyordu. T0 ucunu de `origin/main` uzerinde bagimsiz dogruladi:
+   `MainWindow.axaml.cs:2054` `main.quality.target` (hicbir dilde yoktu),
+   `:2056` `main.quality.points` (gercegi `main.quality.loss-points`),
+   `:2140` `main.plan.fact.estimate` (gercegi `main.plan.fact.estimated-size`).
+   Duzeltme dort satir; `dotnet build -c Release -warnaserror` temiz,
+   `LocalizationTests` 10/10 yesil.
+
+2. **VideoToolbox olcumu** — Apple M1, uc parca x uc kol = dokuz kosum.
+   `hevc_videotoolbox` `libx265 -preset slow`tan **16,1x–37,7x** hizli;
+   ayni `-b:v 5500k`ta VMAF p10'u **6,383 / 17,365 / 33,357** puan geride.
+   `grep -rn videotoolbox --include=*.cs src/` → **0 satir**; depo bu yolu hic
+   tanimiyor. `CodecModel.Vendor` yalniz `nvenc|qsv|amf` dizgilerine bakiyor,
+   dolayisiyla `hevc_videotoolbox` **yazilim** sayiliyor.
+
+3. **macOS suit kosumu** — 1339 gecen, 9 kirmizi, 6 atlanan, 1354 toplam, 2 sa 44 dk.
+   Yerellestirme duzeltmeleri kirmiziyi 56 → 37 → 9'a dusurdu; kalan 9'un hicbiri
+   yerellestirme degil.
+
+**Ne getirmedi, kendi yaziyor.** Kalan 9 kirmizinin kok nedeni cozumlenmedi
+("tahmin uydurmadim"). Is 3'un GUI maddeleri (K2/K3/K4) acik kaldi: **ekran izni
+iki kez reddedildi**, `_sorun.log`da kayitli. Canli kaynak olarak 60 sn'lik 1080p60
+HDR parca secmek suresi sisiren karardi ve bunu kendi kararı olarak yaziyor.
+
+**Acilan sozlesmeler.**
+
+- **T148** — `LocalizationTests` on test tasiyor ve hepsi yesildi, cunku hepsi anahtar
+  **kumelerini birbirine** karsilastiriyor; hicbiri kaynak kodun ne **cagirdigina**
+  bakmiyor. Uc anahtar iki dilde de yoktu, dolayisiyla iki kume esitti. Kume esitligi,
+  kumenin dogru olmasini olcmez. `Strings.AssertOnMissingKey` mekanizmasi zaten var
+  (`LocalizationTests.cs:171` onu kapatiyor) — kusur mekanizmanin yoklugu degil,
+  **statik olarak kosturulmamasi**.
+- **T149** — VideoToolbox saticisinin tanimlanmasi. Bagla-gec degil: `IsHardware`
+  kapisinin arkasindaki dort sabit (1,52 / 0,877 / 11 / 1,10) **NVENC'te olculdu** ve
+  `bppf-tabani.md` §5.3 bunlarin olculmemis QSV ve AMF'ye de uygulandigini kendi
+  yaziyor. VideoToolbox'i ayni kapinin arkasina koymak kusuru **dorduncu kez** tekrar
+  eder. Sozlesme saticiyi tanimlar, `IsHardware`i acmaz; acmak icin Mac'te kol basina
+  sekiz noktali bppf egrisi gerekiyor ve o olcum yok.
+
+**`.DS_Store`** git'e sizmisti; `b692684` ile cikarildi ve `.gitignore`a eklendi.
+
+## T144 muhurlendi (2 Eylul 2026)
+
+`docs/olcumler/cikis-kodu-yalan.md`. Denetim **GECTI**, KRITIK yok. Ledger `317ed9f4`,
+risk low, verify 37/37.
+
+**Ne kapandi.** ffmpeg tanili bir hata basip **cikis kodu 0** dondugunde depo bunu
+"basarili" sayiyordu. Artik iki kosucu da ayni sozlugu okuyor: tek tanim
+`FfmpegRunner.cs:18` `FfmpegDiagnostics`, iki desen, iki cagri yeri
+(`EncodeRunner.cs:437`, `FfmpegRunner.cs:138`).
+
+**Denetim neyi kendi uretti.** Yapicinin fixture'larina hic guvenmedi. Iki desenin
+kanitini kendi makinesinde yeniden uretti: `libsvtav1` → `Error parsing option`
+(35 satirin 12.si, raporunkiyle birebir), `libx264` → ayni desen, `libx265` →
+`Unknown option:`; ucu de EXIT=0. Yanlis pozitif olcusunu de taze ciktiyla kurdu:
+114 satir temiz stderr, **sifir eslesme**. Dort mutasyonu kendisi kosturdu; M1/M3/M4
+kumeleri birebir tuttu, M6'daki tek fazlalik paralel gercek ffmpeg kararsizligi
+(test tek basina kosunca geciyor).
+
+**Denetci sayimi ucuncu kez yeniden uretti ve raporu duzeltti.** K1'in "dokuz kapi,
+tam liste" iddiasi tutmuyor: `EncodeRunner.cs:141` (`stoppedOnPurpose`,
+`band.HardFloorMb` — ucuncu boyut kapisi), `:147` (`if (!over && !underBand)`,
+teslimin asil kapisi) ve `:121` (`twoPass`) tabloda yok. **En az on iki.** Dokuz,
+secilmis bir grep'ti. Kritik degil cunku sayidan hicbir karar turetilmiyor ve
+cikarilan sonuc paydadan bagimsiz dogru — ama bu, **kronik kusur 1'in 24. tekrari**:
+tablo dogru, onu ozetleyen cumle yanlis.
+
+### Sifir uretim cagirani: **altinci** ornek
+
+`EncodeResult.DroppedOptions` her donus yolunda dolduruluyor
+(`EncodeRunner.cs:151,183,188,218`) — ve `src/` altinda onu **okuyan kod yok**.
+Kusurun kullaniciya dokunan yarisi acik kaldi.
+
+Simdiye kadar ayni sinifin altisi: T137 (ucuncu cevap), T142 K3 (harita),
+T143 (`WorstScene` harita kolu), T143 (`WorstScene`in kendi iki asiri yuklemesi),
+T140 (turbo anahtari), **T144 (`DroppedOptions`)**.
+
+Kok neden her seferinde ayni: **yetenegi yazan sozlesme, onu cagiracak dosyayi
+sahiplenmiyor.** T146 bu sinifi kapatmak icin acik; tablosu artik alti satir.
+
+### Borclar (tur acmaz)
+
+1. K1 kapi listesi eksik (yukarida).
+2. `FfmpegRun.DroppedOptions` tek tuketicisi icin olu — `SegmentEncoder.cs:176`
+   `-loglevel error` kullaniyor, uc kodlayicinin tanisi da o seviyede basilmiyor.
+3. `EncoderCapabilities.cs:343-346` sozlugu `Unknown option:` icermiyor; x265
+   secenek sondasi bugun dusurulen anahtari kaciriyor.
+4. Izgaranin ham ciktisi agacta yok (`.calisma/T144/K5-izgara.txt` silinmis);
+   M2, M5, M7 bagimsiz dogrulanmadi.
+5. `EncodeRunnerTests` kolu `EncodeRunnerAtomicOutputTests`i kapsamiyor (alt dize
+   eslesmiyor). T144'un getirdigi degil, onceden var.
+6. `EncodeRunnerTests.cs`e BOM eklendi.
+
+**Borc 2 ve 3 zaten T147'nin kapsaminda** (T144 teslimindeki kapsam disi bulgulardan
+acilmisti). Borc 6 mekanik; ayri sozlesme acmiyorum.
+
+### Ortam bulgusu
+
+Yerel takim bir kez **87 testte durup exit code 0** dondu. Denetci ayni seyi
+bagimsiz gordu: askida kalan test host'unu `taskkill` ile oldurdugunde arka plan
+isi **exit 0** raporladi. Bu, "yesil okuma gercekti ama olctugu sey yanlis"
+ailesinin yeni bir yuzu — kosum yarida kesilse bile kapi gecer. `kosum-kapisi.ps1`
+`-MinimumTotal` tam bunun icin var ve CI'da devrede; yerel kosumda degil.
+
+- 02.09.2026 · T148 teslim edildi (submitted): yerellestirme olcusu artik cagri yerlerini IL'den okuyor; 10 -> 15 test, olu anahtar 0 (bulunan tek olu anahtar T0 karariyla silindi), dal T148-anahtar-cagri-pimi.

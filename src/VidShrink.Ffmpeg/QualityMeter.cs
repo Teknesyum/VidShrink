@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -168,18 +168,24 @@ public static class QualityMeter
     }
 
     public static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, false, null, null, null, ct);
+        => await MeasureAsync(referencePath, testPath, false, null, null, null, null, ct);
+
+    public static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, false, null, null, null, sceneMap, ct);
 
     public static async Task<QualityScore> MeasureTonemappedReferenceAsync(string referencePath, string testPath, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, true, null, null, null, ct);
+        => await MeasureAsync(referencePath, testPath, true, null, null, null, null, ct);
 
     public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double startSeconds, double durationSeconds, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, false, startSeconds, startSeconds, durationSeconds, ct);
+        => await MeasureAsync(referencePath, testPath, false, startSeconds, startSeconds, durationSeconds, null, ct);
 
     public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double referenceStartSeconds, double testStartSeconds, double durationSeconds, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, false, referenceStartSeconds, testStartSeconds, durationSeconds, ct);
+        => await MeasureAsync(referencePath, testPath, false, referenceStartSeconds, testStartSeconds, durationSeconds, null, ct);
 
-    private static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, CancellationToken ct)
+    public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double referenceStartSeconds, double testStartSeconds, double durationSeconds, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, false, referenceStartSeconds, testStartSeconds, durationSeconds, sceneMap, ct);
+
+    private static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct)
     {
         var reference = await FfprobeClient.ProbeAsync(referencePath, ct);
         var test = await FfprobeClient.ProbeAsync(testPath, ct);
@@ -210,7 +216,7 @@ public static class QualityMeter
         {
             try
             {
-                vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, ct);
+                vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, sceneMap, ct);
             }
             catch (QualityMeasurementFailedException failure)
             {
@@ -236,11 +242,11 @@ public static class QualityMeter
         return new QualityScore(
             vmaf?.Mean, vmaf?.Harmonic, vmaf?.P10, vmaf?.Min, xpsnr, ssim, true, null, normalization,
             vmaf?.WorstScene, vmaf?.WorstSceneStartSeconds,
-            vmaf is null ? null : SceneWindowSeconds, tonemapReference, alignment);
+            vmaf?.WorstSceneUnitSeconds, tonemapReference, alignment);
     }
 
-    private readonly record struct VmafAggregate(
-        double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds);
+    public readonly record struct VmafAggregate(
+        double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds, double WorstSceneUnitSeconds);
 
     public static async Task<IReadOnlyList<double>> ReadVmafScoresAsync(string logPath, CancellationToken ct = default)
     {
@@ -275,7 +281,7 @@ public static class QualityMeter
     }
 
     private static async Task<VmafAggregate> MeasureVmafAsync(
-        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, double frameRate, CancellationToken ct)
+        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, double frameRate, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct)
     {
         var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
         try
@@ -285,18 +291,26 @@ public static class QualityMeter
 
             var scores = await ReadVmafScoresAsync(logPath, ct);
 
-            var mean = scores.Average();
-            var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
-            var sorted = scores.OrderBy(x => x).ToList();
-            var (worstScene, worstSceneStart) = WorstScene(scores, frameRate, referenceStartSeconds ?? 0);
-            return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], worstScene, worstSceneStart);
+            return AggregateVmaf(scores, frameRate, referenceStartSeconds ?? 0, sceneMap);
         }
         finally { TryDelete(logPath); }
     }
 
+    public static VmafAggregate AggregateVmaf(
+        IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? sceneMap = null)
+    {
+        var mean = scores.Average();
+        var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
+        var sorted = scores.OrderBy(x => x).ToList();
+        var unit = WorstSceneUnit(scores, frameRate, offsetSeconds, sceneMap);
+        return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], unit.Score, unit.StartSeconds, unit.UnitSeconds);
+    }
+
     public const double SceneWindowSeconds = 2.0;
 
-    public const double MinimumUnitSeconds = SceneWindowSeconds / 4.0;
+    public const double MinimumUnitSeconds = 0.5;
+
+    public readonly record struct WorstUnit(double Score, double StartSeconds, double UnitSeconds);
 
     public static (double Worst, double StartSeconds) WorstScene(
         IReadOnlyList<double> scores, double frameRate, double offsetSeconds)
@@ -305,21 +319,30 @@ public static class QualityMeter
     public static (double Worst, double StartSeconds) WorstScene(
         IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? map)
     {
+        var unit = WorstSceneUnit(scores, frameRate, offsetSeconds, map);
+        return (unit.Score, unit.StartSeconds);
+    }
+
+    public static WorstUnit WorstSceneUnit(
+        IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? map = null)
+    {
         ArgumentNullException.ThrowIfNull(scores);
         if (scores.Count == 0)
             throw new ArgumentException("En kotu birim icin en az bir kare puani gerekli.", nameof(scores));
 
         var fps = frameRate > 0 ? frameRate : 25.0;
-        var bounds = SceneBounds(map, scores.Count, fps, offsetSeconds) ?? FixedBounds(scores.Count, fps);
         var minFrames = Math.Max(1, (int)Math.Round(fps * MinimumUnitSeconds));
+        var bounds = MergeShortUnits(
+            SceneBounds(map, scores.Count, fps, offsetSeconds) ?? FixedBounds(scores.Count, fps),
+            minFrames);
 
         var worst = double.PositiveInfinity;
         var at = offsetSeconds;
+        var unitFrames = scores.Count;
         for (var b = 0; b + 1 < bounds.Count; b++)
         {
             var start = bounds[b];
             var count = bounds[b + 1] - start;
-            if (count < minFrames && bounds.Count > 2) continue;
             var sum = 0.0;
             for (var j = 0; j < count; j++) sum += scores[start + j];
             var mean = sum / count;
@@ -327,12 +350,26 @@ public static class QualityMeter
             {
                 worst = mean;
                 at = offsetSeconds + start / fps;
+                unitFrames = count;
             }
         }
 
-        if (double.IsPositiveInfinity(worst))
-            return (scores.Average(), offsetSeconds);
-        return (worst, at);
+        return new WorstUnit(worst, at, unitFrames / fps);
+    }
+
+    private static List<int> MergeShortUnits(List<int> bounds, int minFrames)
+    {
+        if (bounds.Count <= 2) return bounds;
+
+        var merged = new List<int> { bounds[0] };
+        for (var b = 1; b < bounds.Count - 1; b++)
+            if (bounds[b] - merged[^1] >= minFrames) merged.Add(bounds[b]);
+        merged.Add(bounds[^1]);
+
+        while (merged.Count > 2 && merged[^1] - merged[^2] < minFrames)
+            merged.RemoveAt(merged.Count - 2);
+
+        return merged;
     }
 
     private static List<int> FixedBounds(int count, double fps)

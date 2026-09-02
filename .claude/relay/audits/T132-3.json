@@ -1,0 +1,17 @@
+{
+  "contractId": "T132",
+  "auditorRunId": "a569ba8fcec036ab9",
+  "headSha": "8075ed0618bbc2c7fe3e0afa3fbef5f1e8c74f3c",
+  "diffHash": "4256f02d10b60c3a690a00da1d3938892aa3704705b63c3ffbe60b4085c6bee9",
+  "owns": [
+    "tests/VidShrink.Tests/PerformanceCheckTests.cs",
+    "tests/VidShrink.Tests/UpdaterTests.cs",
+    "tests/VidShrink.Tests/ComplexityProbeTests.cs",
+    "docs/olcumler/duvar-saati-iddialari.md"
+  ],
+  "verification": [
+    "Tur 3 denetimi, bagimsiz denetci, izole kopyada kosuldu (agaca yazmadi, files=[]).\nGECTI, KRITIK yok.\n\nU1/U2/U3 dogrulandi: denetci taint taramasini bagimsiz yeniden kurdu ve tam olarak 23\nbuldu, ayni satir kumesiyle (PerformanceCheckTests.cs:165 221 253 290 302 303 341 450\n462 542 566 618 629 646 751 757 854 + UpdaterTests.cs:316 890 915 916 1141 1173). Ayrica\nkasitli olarak fazla kapsayici 65 assert'lik elek kurdu; ek saat turevi iddia cikmadi.\nPimleyen olcunun gercek oldugunu izole kopyada 24. bandi kendi ekleyerek dogruladi: test\nkirmizi dondu VE yeni satiri adiyla soyledi.\nDort U1 gunlugunun hepsi derleme ciktisiyla basliyor (--no-build yok), her biri Toplam: 1\n(olu kol yok). Hayatta kalan kollarin sayilari .calisma/t63/olcum.txt:359,361,373,385 ile\nrapordan bagimsiz capraz dogrulandi. --list-tests kol basina 22 + 54 + 29 = 105, yapicinin\nbildirdigi toplamla birebir.\nCI 33658444761 (46d9d48) completed success.\n\nBes borc mühür notuna yazildi (hicbiri KRITIK degil):\n1) docs/olcumler/duvar-saati-iddialari.md:463 cumlesi yirmi"
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T17:23:17.917Z"
+}

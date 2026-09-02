@@ -10,3 +10,4 @@ TestResults/
 trash/calisma/
 trash/*.mp4
 __pycache__/
+.DS_Store
