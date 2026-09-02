@@ -980,6 +980,7 @@ yerler anormal düşük `min` değerleridir; hepsi aşağıda, her biri ya yenid
 | §7 özdeş tablosu | 97,4257 / 97,4253 / 97,4256 | p1 **ölçüldü, değişmedi**; p2 ve p3 **ölçülmedi** |
 | §7 crf8/crf12 tablosu | p1 4,3147 / 4,3011 | **geçersiz**, yeniden ölçüldü (§9.10) |
 | aynı tablo | p2 95,2609 / 94,2846, p3 2,2023 / 2,2041 | **ölçülmedi**; p3'ün 2,2'si p1'inkiyle aynı aileden görünüyor ama bu bir tahmin |
+| §1 grafiği | kilitsiz filtre satırı | **envanterde eksikti** — T116 ekledi; belgenin kendi tarif satırı kilitsiz haliyle duruyordu, kilitli haliyle değiştirildi (§1) |
 
 **Kaçırılmış ipucu.** §3'ün yan bulgusu `xpsnr` filtresinin bastığı
 `not matching timebases found between first input: 1/15360 and second input
