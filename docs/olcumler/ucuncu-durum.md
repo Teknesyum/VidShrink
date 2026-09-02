@@ -137,7 +137,7 @@ Iki yonlu mutasyon — `ProbeEncoder`'in sonuc esleme satiri degistirildi:
 | B: reddedildi "olculemedi" kovasina dusuruldu | `AMeasuredRejection...` **KIRMIZI**, digeri yesil (1 basarisiz / 15) |
 
 Iki durum ayni kovaya dusunce her seferinde tam olarak bir olcu kirildi. Sekiz
-mutasyonun sekizi de dalin ucundaki agaca (`5ee8408`) karsi yeniden kosturuldu; sayilar
+mutasyonun sekizi de son kod agacina (`5ee8408`) karsi yeniden kosturuldu; sayilar
 o kosumlarindir, `EncoderCapabilitiesTests` suiti 15 olcu.
 
 Ucuncu olcu `AnEncoderMissingFromTheListIsMeasuredNotUnmeasured`: ffmpeg kodlayiciyi hic
@@ -239,9 +239,10 @@ Kosum kapisi tam suiti kosuyor, yani CI yesili tam suit yesilidir.
 |---|---|---|
 | `33604326223` | `0df815b` (K4-K6) | Failed 0, Passed 1146, Skipped 106, Total 1252 |
 | `33605024087` | `19941e1` (K5/4) | yesil |
-| `33605884286` | `5ee8408` (dalin ucu) | Failed 0, Passed 1150, Skipped 106, Total 1256 |
+| `33605884286` | `5ee8408` (**son kod commit'i**) | Failed 0, Passed 1150, Skipped 106, Total 1256 |
 
-`SplitDragTests` uc kosumun hicbirinde kirmizi cikmadi; T127'nin bildirdigi kirmizi bu
+`5ee8408`'den sonraki commit'ler yalnizca bu belgeyi degistiriyor; kodun CI kaniti
+`33605884286`'dir. `SplitDragTests` uc kosumun hicbirinde kirmizi cikmadi; T127'nin bildirdigi kirmizi bu
 dalda gorulmedi. Toplamin 1252 → 1256 artmasi T129'un ekledigi dort yeni olcudur.
 
 **Yerel tam suit kasitli olarak yarida kesildi.** Makinede yedi kardes ajan es zamanli
