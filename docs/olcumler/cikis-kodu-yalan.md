@@ -383,3 +383,24 @@ Hepsi bu sözleşmenin `owns` kümesi dışında, dokunulmadı:
 | K4 karar | öldürme, bildir — iki koşucuda aynı, üç ölçü tutuyor |
 | K5 mutasyon | yedi mutasyonun yedisi yakalandı, kümeler ayrık |
 | K6 kol başına test | 19 / 10 / 8, sıfır bulan kol yok |
+
+## CI
+
+| | |
+|---|---|
+| Koşum kimliği | **33660013606** |
+| Sonuç | `completed` `success` |
+| Commit | `be6d79d` |
+| Süre | 26 dk 59 sn |
+
+`be6d79d` bu sözleşmenin kodunun ve testlerinin tamamını taşıyor; sonraki iki commit yalnız
+bu belgeyi değiştiriyor ve koşum başlatmıyor, çünkü `.github/workflows/ci.yml:15-18`
+`docs/**` ve `**/*.md` yollarını `paths-ignore` ile dışarıda bırakıyor.
+
+Daha önceki koşum (`33659555701`) `cancelled` görünüyor: aynı dosyadaki `concurrency` bloğu
+`main` dışındaki dallarda uçuştaki koşumu iptal ediyor, yani sonraki itiş onu yerine geçirdi.
+Başarısızlık değil.
+
+CI `dotnet test`i doğrudan çağırmıyor: `dotnet build VidShrink.sln -c Release -warnaserror`
+ardından `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30`.
+Yani yeşil sonuç hem uyarısız derlemeyi hem de koşumun gerçekten bittiğini kapsıyor.
