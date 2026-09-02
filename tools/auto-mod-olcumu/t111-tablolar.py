@@ -64,6 +64,10 @@ def taze(ad, kilit):
 
 def bayt(yol):
     p = os.path.join(yeni, yol)
+    d, ad = os.path.split(p)
+    yaziliyor = os.path.join(d, "." + os.path.splitext(ad)[0] + ".yaziliyor.mp4")
+    if os.path.exists(yaziliyor):
+        raise SystemExit("YAZILIYOR: %s hala uretiliyor, tablo uretilmedi" % ad)
     return os.path.getsize(p) if os.path.exists(p) else None
 
 

@@ -15,13 +15,16 @@ enc () {
   if [ -f "$out" ]; then echo "atlandi $name"; return; fi
   vfarg=(); [ -n "$vf" ] && vfarg=(-vf "$vf")
   fkfarg=(); [ -n "$fkf" ] && fkfarg=(-force_key_frames "$fkf")
+  tmp="ciktilar/.${name}.yaziliyor.mp4"
+  rm -f "$tmp"
   echo "=== $name preset=$preset gop=$gop br=${br}k vf=${vf:-yok} fkf=${fkf:-yok} $(date +%T)"
   for p in 1 2; do
-    if [ "$p" = 1 ]; then extra=(-an -f null NUL); else extra=(-c:a aac -b:a 128k -movflags +faststart "$out"); fi
+    if [ "$p" = 1 ]; then extra=(-an -f null NUL); else extra=(-c:a aac -b:a 128k -movflags +faststart "$tmp"); fi
     ffmpeg -hide_banner -loglevel error -y -nostdin -threads $TH -i "$SRC" "${vfarg[@]}" \
       -c:v libsvtav1 -preset "$preset" -b:v "${br}k" -pass $p -passlogfile "log/${name}" \
       -g "$gop" "${fkfarg[@]}" -pix_fmt p010le -svtav1-params "$PSY" $COL "${extra[@]}" || { echo "HATA $name pass$p"; return; }
   done
+  mv -f "$tmp" "$out" || { echo "HATA $name tasima"; return; }
   echo "bitti $name $(stat -c %s "$out") $(date +%T)"
 }
 
@@ -29,13 +32,16 @@ hb () {
   name="$1"; br="$2"
   out="ciktilar/${name}.mp4"
   if [ -f "$out" ]; then echo "atlandi $name"; return; fi
+  tmp="ciktilar/.${name}.yaziliyor.mp4"
+  rm -f "$tmp"
   echo "=== $name HandBrake b=${br} $(date +%T)"
-  HandBrakeCLI -i "$SRC" -o "$out" \
+  HandBrakeCLI -i "$SRC" -o "$tmp" \
     -e x265_10bit --encoder-preset slow --encopts "pools=4" \
     -b "$br" --multi-pass --turbo \
     -E ca_aac -B 128 --mixdown stereo \
     -w 1920 -l 1080 --crop-mode none -r 60 --cfr \
-    -f av_mp4 -O >"log/${name}.log" 2>&1
+    -f av_mp4 -O >"log/${name}.log" 2>&1 || { echo "HATA $name HandBrake"; return; }
+  mv -f "$tmp" "$out" || { echo "HATA $name tasima"; return; }
   echo "bitti $name $(stat -c %s "$out") $(date +%T)"
 }
 
