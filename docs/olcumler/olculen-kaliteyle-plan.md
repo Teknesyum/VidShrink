@@ -600,18 +600,21 @@ yazılan maddenin somut karşılığıdır. Sebebi ölçülmedi: `bench`in kendi
 çağrısında iş parçacığı sayısı sabitlenmiyor, ama bunun tek sebep olduğu
 gösterilmedi.
 
-### 11.5 Kilitli ölçerle A/B (K2)
+### 11.5 Kilitli ve kilitsiz ölçerle A/B (K2)
 
-Tablodaki her kaynak **ikamedir** — §11.1'e bakınız. `oyun` satırı yok:
-o kaynak **ölçülmedi**, elde 48 fps av1 oyun kaydı bulunmadığı için.
+Izgaradaki her kaynak **ikamedir** — §11.1. `oyun` satırı yok: o kaynak
+**ölçülmedi**, elde 48 fps av1 oyun kaydı bulunmadığı için.
 
-Aşağıdaki ızgara §1'in tablosuyla **aynı kaynakları ölçmüyor; satırları
+Aşağıdaki tablolar §1'in tablosuyla **aynı kaynakları ölçmüyor; satırları
 karşılaştırılamaz.** §1'in tablosu "kilitsiz (geçersiz), kaynak silinmiş,
-yeniden üretilemez" damgasını taşıyor ve silinmedi.
+yeniden üretilemez" damgasıyla yerinde duruyor, silinmedi.
 
-#### Satırlar — ölçer kilitli, kaynaklar ikame
+Süre sayıları için **makine paylaşımlıydı** (dokuz ajan). Kalite ve boyut
+sayılarına bu damga basılmadı.
 
-| kaynak | hedef | kol | yerlesim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
+#### Satırlar — ölçer **kilitli**, kaynaklar ikame
+
+| kaynak (ikame) | hedef | kol | yerleşim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
 | --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | klip ikamesi | 8 MB | eski | 1190@60 | 2pass 1061k | 7.541 | 64.01 | 56.95 | 34.78 | 52.6 | 1 |
 | klip ikamesi | 8 MB | yeni | 1190@60 | 2pass 1061k | 7.529 | 64.00 | 56.86 | 34.48 | 17.3 | 1 |
@@ -622,19 +625,112 @@ yeniden üretilemez" damgasını taşıyor ve silinmedi.
 | hdr ikamesi (parca-2) | 40 MB | eski | 1920@60 | 2pass 5258k | 39.454 | 95.95 | 95.94 | 95.54 | 111.5 | 1 |
 | hdr ikamesi (parca-2) | 40 MB | yeni | 1920@60 | crf 23 | 39.114 | 95.94 | 95.94 | 95.52 | 101.3 | 3 |
 
-#### Kol farkı (yeni - eski), ölçer kilitli, kaynaklar ikame
+#### Satırlar — ölçer **kilitsiz**, kaynaklar ikame
 
-| kaynak | hedef | dmean | dharm | dp10 | dteslim MB | dkodlama sn |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| klip ikamesi | 8 MB | -0.01 | -0.09 | -0.30 | -0.012 | -35.2 |
-| klip ikamesi | 20 MB | +0.03 | +0.05 | -0.63 | +0.000 | -9.9 |
-| hdr ikamesi (parca-1) | 40 MB | +1.60 | +1.66 | +3.32 | -1.594 | -173.6 |
-| hdr ikamesi (parca-2) | 40 MB | -0.01 | -0.01 | -0.01 | -0.340 | -10.1 |
+| kaynak (ikame) | hedef | kol | yerleşim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
+| --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | eski | 1190@60 | 2pass 1061k | 7.539 | 60.33 | 27.47 | 23.00 | 16.6 | 1 |
+| klip ikamesi | 8 MB | yeni | 1190@60 | 2pass 1061k | 7.540 | 60.32 | 27.55 | 23.71 | 16.3 | 1 |
+| klip ikamesi | 20 MB | eski | 1920@60 | 2pass 2695k | 19.325 | 74.06 | 32.49 | 38.70 | 34.8 | 1 |
+| klip ikamesi | 20 MB | yeni | 1920@60 | 2pass 2695k | 19.328 | 74.05 | 32.43 | 38.91 | 38.5 | 1 |
 
-Süre sayıları için: **makine paylaşımlıydı** (dokuz ajan). Kalite ve boyut
-sayılarına bu damga basılmadı.
+#### Kol farkı (yeni − eski), aynı ölçer, kaynaklar ikame
 
-### 11.6 Bu turda ne koştu (K7, K8)
+| kaynak (ikame) | hedef | ölçer | Δmean | Δharm | Δp10 | Δteslim MB | Δkodlama sn |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | kilitli | -0.01 | -0.09 | -0.30 | -0.012 | -35.2 |
+| klip ikamesi | 8 MB | kilitsiz | -0.00 | +0.08 | +0.71 | +0.001 | -0.3 |
+| klip ikamesi | 20 MB | kilitli | +0.03 | +0.05 | -0.63 | +0.000 | -9.9 |
+| klip ikamesi | 20 MB | kilitsiz | -0.01 | -0.06 | +0.20 | +0.004 | +3.7 |
+| hdr ikamesi (parca-1) | 40 MB | kilitli | +1.60 | +1.66 | +3.32 | -1.594 | -173.6 |
+| hdr ikamesi (parca-2) | 40 MB | kilitli | -0.01 | -0.01 | -0.01 | -0.340 | -10.1 |
+
+#### Kilidin bedeli (aynı kol, kilitli − kilitsiz ölçer)
+
+| kaynak (ikame) | hedef | kol | Δmean | Δharm | Δp10 | plan aynı mı |
+| --- | ---: | --- | ---: | ---: | ---: | --- |
+| klip ikamesi | 8 MB | eski | +3.69 | +29.47 | +11.78 | evet |
+| klip ikamesi | 8 MB | yeni | +3.68 | +29.30 | +10.77 | evet |
+| klip ikamesi | 20 MB | eski | +5.53 | +42.52 | +13.22 | evet |
+| klip ikamesi | 20 MB | yeni | +5.57 | +42.62 | +12.38 | evet |
+
+#### Izgarada eksik kalan hücreler
+
+Onaltı hücrenin **4'i ölçülmedi**:
+
+- `hdr1-eski-kilitsiz` — hdr ikamesi (parca-1), 40 MB, eski kolu, kilitsiz ölçer: **ölçülmedi**
+- `hdr1-yeni-kilitsiz` — hdr ikamesi (parca-1), 40 MB, yeni kolu, kilitsiz ölçer: **ölçülmedi**
+- `hdr2-eski-kilitsiz` — hdr ikamesi (parca-2), 40 MB, eski kolu, kilitsiz ölçer: **ölçülmedi**
+- `hdr2-yeni-kilitsiz` — hdr ikamesi (parca-2), 40 MB, yeni kolu, kilitsiz ölçer: **ölçülmedi**
+
+### 11.6 K3 kararı — `--measured-quality` kolu açık kalır
+
+**Karar ölçüye bağlıdır ve ölçü şudur: kilitli ölçüde kolun ölçülmüş bir zararı
+yok, ölçülmüş bir kazancı var.**
+
+Kilitli ölçerde dört hücrenin dördü de tamamlandı:
+
+| hücre (kaynak ikame) | planı değiştirdi mi | Δmean | Δp10 | Δteslim |
+|---|---|---:|---:|---:|
+| klip ikamesi 8 MB | **hayır**, plan özdeş | −0,01 | −0,30 | −0,012 MB |
+| klip ikamesi 20 MB | **hayır**, plan özdeş | +0,03 | −0,63 | ±0,000 MB |
+| hdr ikamesi (parca-1) 40 MB | **evet** — 1458@60 2pass 5389k → 1612@60 crf 21 | **+1,60** | **+3,32** | **−1,594 MB** |
+| hdr ikamesi (parca-2) 40 MB | **evet** — 1920@60 2pass 5258k → 1920@60 crf 23 | −0,01 | −0,01 | −0,340 MB |
+
+Üç şey okunuyor:
+
+1. **Kol yalnız planı değiştirdiğinde bir şey yapıyor.** İki SDR hücresinde plan
+   alan alan özdeş çıktı; oradaki ±0,03'lük oynama koşumdan koşuma gürültüdür —
+   aynı planın iki koşumu §11.4'te 0,0083 MB farklı dosya üretti, yani gürültü
+   tabanı bu mertebede.
+2. **Planı değiştirdiği yerde kazanç garantili değil.** İki HDR ikamesinin
+   **birinde** kazanç var (+1,60 mean, +3,32 p10) ve **üstelik dosya 1,59 MB
+   daha küçük**; diğerinde hiçbir şey yok (−0,01). HDR olmak yeterli koşul değil.
+3. **Kazancın mekanizması T89'un adlandırdığıyla aynı.** T89 "kazanç durdurma
+   kısıtından değil yerleşim seçiminden geliyor" demişti; kazanan hücrede
+   yerleşim 1458×820 → 1612×906'ya çıkıyor ve kip iki geçişten crf'ye dönüyor —
+   T89'un `hdr` satırındaki 1650×928 → 1842×1036 / crf 22 hareketinin aynısı.
+
+**"+0,95 yalnız HDR'de" yargısı bugün nasıl okunmalı:** yön doğru, ifade fazla
+geniş, büyüklük karşılaştırılamaz. Kazanç yine yalnız HDR kaynaklarda göründü,
+ama **iki HDR ikamesinin birinde**; "HDR'de kazanır" değil "planı değiştirdiği
+bazı HDR kaynaklarda kazanır" denebilir. +1,60 ile +0,95 **karşılaştırılamaz** —
+kaynaklar farklı (§11.1), aynı ölçek üzerinde durmuyorlar.
+
+**Karar: kol kapatılmaz.** Gerekçe ölçüdür, tercih değil:
+
+- Ölçülen en kötü sonuç −0,01 mean; bu gürültü tabanının altında. **Ölçülmüş
+  zarar yok.**
+- Ölçülen en iyi sonuç +1,60 mean / +3,32 p10 ve 1,59 MB daha küçük dosya.
+  **Ölçülmüş kazanç var.**
+- Kol zaten sevk edilmiş ve varsayılan (§11.3). Kapatmak bir ürün değişikliğidir
+  ve onu haklı çıkaracak bir sayı bu ızgarada **yok**.
+
+**Bu kararın dayanmadığı şeyler — ölçülmedi:**
+
+- Kolun **zaman bedeli ölçülmedi.** `ProbeSeconds` farkı (yeni − eski) dört
+  hücrede +1,9 / +14,9 / +7,2 / **−7,7** saniye çıktı; işareti bile tutarlı
+  değil. Makine dokuz ajanla paylaşımlıydı, bu fark gürültüden ayrılamadı.
+- **Deneme sayısı karışık:** klip ikamesi 1/1 ve 1/1, `parca-1` eski 2 → yeni 1,
+  `parca-2` eski 1 → yeni **3**. Denemenin bedeli ayrıca ölçülmedi.
+- Kazancın **genellenip genellenmediği ölçülmedi**: iki HDR ikamesi var, biri
+  kazandı.
+- `oyun` sınıfı **hiç ölçülmedi** (§11.1).
+- Kolun kaybettiği bir kaynak olup olmadığı **ölçülmedi**; ızgarada böyle bir
+  hücre çıkmadı, ama aranmadı da.
+
+**Ölçerin bu karara etkisi.** İki SDR hücresi hem kilitli hem kilitsiz koşuldu ve
+kol farkı iki ölçerde de gürültü çıktı (kilitli −0,01 / +0,03, kilitsiz
+−0,00 / −0,01). Yani **SDR'de ölçerin kusuru kol yargısını ne yarattı ne gizledi.**
+HDR hücrelerinin kilitsiz karşılıkları §11.5'in eksik listesinde; HDR için aynı
+şey **ölçülmedi**.
+
+Buna karşılık ölçerin kendi hatası büyük: aynı kolda, aynı dosyada, yalnız ölçer
+değişince `klip` ikamesi 20 MB'ta mean **+5,53**, p10 **+13,22** oynuyor
+(§11.5, "kilidin bedeli"). Kilitsiz ölçer kaliteyi sistematik olarak **düşük**
+gösteriyordu.
+
+### 11.7 Bu turda ne koştu (K7, K8)
 
 **Ürün kodu değişmedi.** Değişen dosyalar: bu belge, `algi-olcusu.md` ve yeni
 ölçüm düzeneği `tools/cipa-yeniden/`. Düzenek `src/` altındaki hiçbir sabiti
