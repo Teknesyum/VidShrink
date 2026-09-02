@@ -401,6 +401,9 @@ public static class Rapor
         var enKotuKazanan = 0;
         var p10Kaybeden = 0;
         var cift = 0;
+        var kolP10 = new Dictionary<string, int>();
+        var kolEnKotu = new Dictionary<string, int>();
+        var kolCift = new Dictionary<string, int>();
         var asan = hepsi.Count(x => x.K.Bilinmiyor is null && x.K.GerceklesenMb > x.K.BandUstMb);
         var altinda = hepsi.Count(x => x.K.Bilinmiyor is null && x.K.GerceklesenMb < x.K.BandAltMb);
         var olculenKosum = hepsi.Count(x => x.K.Bilinmiyor is null);
@@ -415,8 +418,9 @@ public static class Rapor
             var dworst = (dagitim.VmafWorstScene ?? double.NaN) - (taban.VmafWorstScene ?? double.NaN);
             var dmean = (dagitim.VmafMean ?? double.NaN) - (taban.VmafMean ?? double.NaN);
             var dmb = dagitim.GerceklesenMb - taban.GerceklesenMb;
-            if (dp10 >= 0.50) p10Kazanan++;
-            if (dworst >= 1.00) enKotuKazanan++;
+            kolCift[g.Key.Arm] = kolCift.GetValueOrDefault(g.Key.Arm) + 1;
+            if (dp10 >= 0.50) { p10Kazanan++; kolP10[g.Key.Arm] = kolP10.GetValueOrDefault(g.Key.Arm) + 1; }
+            if (dworst >= 1.00) { enKotuKazanan++; kolEnKotu[g.Key.Arm] = kolEnKotu.GetValueOrDefault(g.Key.Arm) + 1; }
             if (dp10 < -0.30) p10Kaybeden++;
             farklar.Add($"| {g.Key.Arm} | `{g.Key.Pencere}` | {Kabuk.Inv(dmean, "+0.000;-0.000;0.000")} | " +
                         $"{Kabuk.Inv(dp10, "+0.000;-0.000;0.000")} | {Kabuk.Inv(dworst, "+0.000;-0.000;0.000")} | " +
@@ -436,12 +440,31 @@ public static class Rapor
         foreach (var f in farklar) sb.AppendLine(f);
         sb.AppendLine();
 
-        var gecti = p10Kazanan >= 2 && enKotuKazanan >= 2 && p10Kaybeden == 0 && asan == 0 && altinda == 0;
+        var kaliteGecen = kolCift.Keys
+            .Where(k => kolP10.GetValueOrDefault(k) >= 2 && kolEnKotu.GetValueOrDefault(k) >= 2)
+            .ToList();
+        var kalite = kaliteGecen.Count > 0 && p10Kaybeden == 0;
+        var gecti = kalite && asan == 0 && altinda == 0;
         var ozet = $"olculen cift {cift}; p10 esigini (>= +0,50) gecen {p10Kazanan}, " +
                    $"en kotu sahne esigini (>= +1,00) gecen {enKotuKazanan}, " +
                    $"esikten fazla p10 kaybeden {p10Kaybeden}; " +
                    $"olculen {olculenKosum} kosumdan hedefi **asan** {asan}, bandin **altinda** kalan {altinda}";
         sb.AppendLine($"**K5/K6 kapisi {(gecti ? "gecti" : "gecmedi")}** — {ozet}.");
+        sb.AppendLine();
+        sb.AppendLine("Esik metni \"uc kaynagin en az ikisinde\" der; kaynak = pencere. Kollar");
+        sb.AppendLine("esikten sonra eklendi, o yuzden sayim **kol icinde** yapilir: bir kolun");
+        sb.AppendLine("kendi uc penceresinin en az ikisi esigi gecmelidir. Ayri kollardan birer");
+        sb.AppendLine("pencere toplanip \"iki kaynak\" sayilmaz.");
+        sb.AppendLine();
+        sb.AppendLine("| Yazilim kolu | Olculen pencere | p10 esigini gecen | En kotu sahne esigini gecen | Kalite sarti (1-3) |");
+        sb.AppendLine("|--------------|-----------------|-------------------|-----------------------------|--------------------|");
+        foreach (var k in kolCift.Keys.OrderBy(x => x, StringComparer.Ordinal))
+            sb.AppendLine($"| {k} | {kolCift[k]}/3 | {kolP10.GetValueOrDefault(k)} | {kolEnKotu.GetValueOrDefault(k)} | " +
+                          $"{(kaliteGecen.Contains(k) ? "evet" : "**hayir**")} |");
+        sb.AppendLine();
+        sb.AppendLine($"Kalite sartlari (1-3) tek basina: {(kalite ? "**saglandi**" : "**saglanmadi**")} " +
+                      $"({kaliteGecen.Count} kolda saglandi, esikten fazla p10 kaybeden {p10Kaybeden}). " +
+                      $"K6 sarti (4) tek basina: {(asan == 0 && altinda == 0 ? "**saglandi**" : "**saglanmadi**")}.");
         sb.AppendLine();
         sb.AppendLine($"Hedefi asan kosum orani: {Kabuk.Inv(olculenKosum == 0 ? 0 : 100.0 * asan / olculenKosum, "0.0")}%");
         sb.AppendLine($"({asan}/{olculenKosum}). Bandin altinda kalma bu duzenegin ozelligidir:");
