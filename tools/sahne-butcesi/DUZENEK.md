@@ -93,3 +93,10 @@ uretilmeden once duzeltildi.
    hucresinin (ayni kol, ayni pencere) K5 kazanciyla karsilastiriliyor.
 
 Kapilarin sayisal esikleri degismedi; degisen yalniz sayimin metne uymasidir.
+
+## `.calisma/` icindeki eski csv basliklari
+
+`k1-*.csv`'nin ucuncu sutunu `s.End` yaziyordu ama basligi `bit` idi. Baslik
+duzeltildi (`son`). Duzeltmeden **once** yazilmis csv'ler eski basligi tasir;
+rapor csv'yi okumaz, `k1-*.json`'dan uretilir. Tam kosum tekrarlandiginda
+(`01-olcumu-kos.sh`) basliklar da duzelir.
