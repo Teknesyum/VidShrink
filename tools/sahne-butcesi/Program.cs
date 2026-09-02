@@ -173,13 +173,21 @@ public static class Program
         var satirlar = new List<string> { "aday;parametre;mae_pp;bilinmiyor" };
         if (bayrak is null || plan.ModeEnum == EncodeMode.PassThrough)
         {
-            var not = plan.ModeEnum == EncodeMode.PassThrough
-                ? $"plan passthrough ({plan.Codec})"
-                : $"{plan.Codec} parametre yolu yok";
-            satirlar.Add($"zones;-;;{not}");
-            satirlar.Add($"qcomp;-;;{not}");
+            if (plan.ModeEnum == EncodeMode.PassThrough)
+            {
+                var not = $"plan passthrough ({plan.Codec})";
+                satirlar.Add($"zones;-;;{not}");
+                satirlar.Add($"qcomp;-;;{not}");
+                await File.WriteAllLinesAsync(hedef, satirlar);
+                Console.WriteLine($"{Kol}/{p.Ad}: k4b BILINMIYOR — {not}");
+                return;
+            }
+            satirlar.Add($"zones;-;;{plan.Codec} zone parametresini yok sayiyor (K4 izgarasi)");
+            satirlar.Add($"qcomp;-;;duzenek olcmedi: qcomp {plan.Codec}'de calisiyor (K4 izgarasi) " +
+                         "ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor");
+            var not2 = $"{plan.Codec} zones yolu yok";
             await File.WriteAllLinesAsync(hedef, satirlar);
-            Console.WriteLine($"{Kol}/{p.Ad}: k4b BILINMIYOR — {not}");
+            Console.WriteLine($"{Kol}/{p.Ad}: k4b BILINMIYOR — {not2}");
             return;
         }
 

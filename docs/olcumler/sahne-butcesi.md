@@ -402,6 +402,12 @@ plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.
 
 | Yazilim kolu | Pencere | Aday | Parametre | MAE (pp) | Tabana gore |
 |--------------|---------|------|-----------|----------|-------------|
+| maks | `p1-karisik` | zones | `-` | **bilinmiyor**: libsvtav1 zone parametresini yok sayiyor (K4 izgarasi) | — |
+| maks | `p1-karisik` | qcomp | `-` | **bilinmiyor**: duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor | — |
+| maks | `p2-durgun` | zones | `-` | **bilinmiyor**: libsvtav1 zone parametresini yok sayiyor (K4 izgarasi) | — |
+| maks | `p2-durgun` | qcomp | `-` | **bilinmiyor**: duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor | — |
+| maks | `p3-hareketli` | zones | `-` | **bilinmiyor**: libsvtav1 zone parametresini yok sayiyor (K4 izgarasi) | — |
+| maks | `p3-hareketli` | qcomp | `-` | **bilinmiyor**: duzenek olcmedi: qcomp libsvtav1'de calisiyor (K4 izgarasi) ama duzenek her iki adayi da ZonesFlag'in bayragindan geciriyor | — |
 | uyumlu | `p1-karisik` | taban | `-` | 1.552 | — |
 | uyumlu | `p1-karisik` | zones | `zones=<harita>` | 1.553 | +0.001 |
 | uyumlu | `p1-karisik` | qcomp | `qcomp=1.0` | 1.546 | -0.006 |

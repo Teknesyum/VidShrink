@@ -215,3 +215,21 @@ baska bir sey yapmaz ve kol basina bir kodlama suresi harcar. Bu yuzden
 
 Kopyalanan yalniz `taban`dir. `dagitim` her zaman kodlanir — degisen parametre
 odur. VMAF olcumu iki kolda da bastan kosar; kisalan sey yalniz kodlama.
+
+## `maks` kolunda `qcomp` olculmedi, `zones`ten baska sebeple
+
+K4 izgarasi `libsvtav1` icin iki ayri sey soyluyor: `zones` yok sayiliyor
+(fark 4830 bayt, tekrar gurultusu 1104 bayt, %1 esigi 7613 bayt), `qcomp`
+ise calisiyor (34298 bayt, ayni gurultunun cok ustunde).
+
+Duzenek k4b'de her iki adayi da `ZonesFlag`in dondurdugu bayraktan
+(`-x265-params` / `-x264-params`) geciriyor; `libsvtav1` icin bu bayrak
+`null` oldugundan iki aday birden dusuyordu ve csv ikisine de ayni notu
+yaziyordu. Not izgarayla celisiyordu: izgara "qcomp evet" diyor, k4b
+"parametre yolu yok" diyordu.
+
+Notlar ayrildi. `zones` icin sebep gercek (kodlayici parametreyi yok
+sayiyor); `qcomp` icin sebep duzenegin kendi eksigi ve csv'de oyle yaziyor.
+`qcomp` olculmedi cunku sozlesmenin sorusu degil: tek kuresel skaler,
+sahne basina harita bilgisi tasimiyor. Olculecek olsa `-svtav1-params`
+yolu acilmali.
