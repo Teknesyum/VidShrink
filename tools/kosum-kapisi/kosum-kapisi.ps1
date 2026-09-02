@@ -3,6 +3,9 @@ param(
     [ValidateRange(1, 1000000)]
     [int]$MinimumTotal,
 
+    [ValidateRange(0, 1000000)]
+    [Nullable[int]]$MaximumSkipped,
+
     [string]$InputFile,
     [string]$OutputFile
 )
@@ -60,9 +63,20 @@ $total = [int]$totalMatches[$totalMatches.Count - 1].Groups[1].Value
 if ($total -lt $MinimumTotal) {
     Dur 68 "Toplam test sayisi alt sinirin altinda: $total < $MinimumTotal."
 }
+if ($null -ne $MaximumSkipped) {
+    $skippedMatches = [regex]::Matches($text, '(?im)(?:Atlanan|Skipped)\s*:\s*(\d+)')
+    if ($skippedMatches.Count -eq 0) {
+        Dur 69 'Atlanan/Skipped ozeti yok.'
+    }
+    $skipped = [int]$skippedMatches[$skippedMatches.Count - 1].Groups[1].Value
+    if ($skipped -gt $MaximumSkipped) {
+        Dur 69 "Atlanan sayisi ust sinirin ustunde: $skipped > $MaximumSkipped."
+    }
+}
 if ($commandExit -ne 0) {
     Dur $commandExit "Komut sifirdan farkli cikti: $commandExit."
 }
 
-Write-Host "KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=$total alt-sınır=$MinimumTotal"
+$skippedNote = if ($null -ne $MaximumSkipped) { " atlanan=$skipped ust-sinir=$MaximumSkipped" } else { "" }
+Write-Host "KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=$total alt-sınır=$MinimumTotal$skippedNote"
 exit 0

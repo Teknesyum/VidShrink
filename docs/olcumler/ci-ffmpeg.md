@@ -46,15 +46,25 @@ adımı hash uyuşmazsa düşer (K7).
 | Öncesi (ffmpeg yok) | `33582206982` | `68cb3c93` | 0 | 1024 | 95 | 1119 | 10 m 21 s |
 | Sonrası (ffmpeg kurulu, nihai dal ucu) | `33584487781` | `5694bc6d` | 1 | 1156 | 17 | 1174 | 16 m 10 s |
 
-Skipped 95 → 17: **78 ölçü** atlanmaktan gerçekten koşmaya geçti — ~80
-beklentisiyle örtüşüyor. Total 1119 → 1174 (+55) bu 78'den ayrı bir etki:
-aradaki commit farkı (T109/T110) main'e yeni testler ekledi; iki koşum aynı
-kod tabanında değil, dolayısıyla Total farkını doğrudan "atlamadan kurtulan
-sayı" olarak okumak yanlış olur — Skipped farkı (78) izole edilmiş sayı,
-Total farkı değil.
+Skipped 95 → 17: **78 ölçü** atlanmaktan gerçekten koşmaya geçti (isim
+kümesi farkı, `comm` ile — aritmetikle değil) — ~80 beklentisiyle örtüşüyor.
+Total 1119 → 1174 (+55) bu 78'den ayrı bir etki: aradaki commit farkı
+(T109/T110) main'e yeni testler ekledi; iki koşum aynı kod tabanında değil,
+dolayısıyla Total farkını doğrudan "atlamadan kurtulan sayı" olarak okumak
+yanlış olur — Skipped farkı (78) izole edilmiş sayı, Total farkı değil.
+
+**İkinci, daha sıkı kontrollü bir çift** aynı isim-kümesi yöntemiyle **83**
+veriyor: `33582483001` (`3868d621`, ffmpeg yok, Skipped 100/Total 1124) →
+`33582768395` (`0a56868f`, ffmpeg kurulu, Skipped 17/Total 1126). Bu çift
+neredeyse aynı ağaç üzerinde (aradaki commit farkı çok daha dar), bu yüzden
+**83 daha güvenilir sayı** — 78, T109/T110 gibi araya giren commit'lerin de
+karıştığı daha geniş bir aralığı ölçüyor. İkisi de doğru, farklı şeyi
+ölçüyorlar: 78 = geniş aralık (`33582206982`→`33584487781`), 83 = dar/
+neredeyse-aynı-ağaç karşılaştırması (`33582483001`→`33582768395`).
 
 Ayrı, isimli doğrulama — T110'un kare-kilidi ölçüleri (5 adet, hepsi
-`QualityMeterTests`, kilit tutulmazsa ilk kırılacak testler):
+`QualityMeterTests`, kilit tutulmazsa ilk kırılacak testler, **83'ün
+içinde**, 78'in değil — 78'in tabanı T110 main'e girmeden önce alındı):
 
 | Ölçü | Öncesi (`33582483001`, `3868d621`, ffmpeg yok) | Sonrası (`33582768395`, `0a56868f`, ffmpeg kurulu) |
 |---|---|---|
@@ -91,17 +101,18 @@ Kök neden: `EncoderCapabilities.HasEncoder` (`src/VidShrink.Ffmpeg/EncoderCapab
 donanımın gerçekten çalışır olduğunu doğrulamıyor. GitHub Actions
 `windows-latest` koşucusunda NVIDIA sürücüsü/GPU'su yok; ffmpeg `h264_nvenc`'i
 derlenmiş kodek olarak listeliyor ama çalışma anında `nvcuda.dll`'i
-yükleyemiyor. Aynı `HasEncoder` mekanizması `src/VidShrink.Ffmpeg/PerformanceProbe.cs:81`'de
-de kullanılıyor — bu üründe de aynı yanlış-pozitife açık bir yüzey olabilir,
-ayrı inceleme ister.
+yükleyemiyor. **Düzeltme**: yeni bir prob yazmaya gerek yok, gerçek donanım
+prob'u zaten var — `EncoderCapabilities.cs:30`, `WorksAsEncoder(codec) =>
+Probe(codec).Succeeded`. `src/VidShrink.Ffmpeg/PerformanceProbe.cs:81`'deki
+`HardwareCandidates.FirstOrDefault(availability.HasEncoder)` çağrısı bu
+mevcut prob'a bağlanmalı — liste-üyeliği yerine gerçek çalışırlık testi.
+Bu iş **T115'in kapsamında değil**, **T117'ye taşındı**.
 
 Bu dosya benim `owns`'umda değil (`tests/VidShrink.Tests/**` T115'in kapsamı
 dışında) — **düzeltilmedi**. Kaynak sözleşme **T63**
 (`.claude/relay/contracts/done/T63.md`, kapalı) bu testi yazan sözleşme.
-T0 yeni bir tur açmalı: test ya CI'da NVENC'in gerçekte kullanılamayacağını
-bilip `[FfmpegFact]`'e ek bir donanım-var mı kontrolüyle atlamalı, ya da
-`HasEncoder` ürün kodunda gerçek bir prob'a (küçük bir encode denemesi)
-dönüşmeli — ikinci seçenek `PerformanceProbe.cs:81`'deki aynı kusuru da kapatır.
+Düzeltme yukarıda tarif edildi (`WorksAsEncoder` → `PerformanceProbe.cs:81`),
+iş **T117**'de.
 
 **K7 ile karıştırılmasın:** `33582680807` (ayrı, bilerek bozulmuş kanıt dalı
 `T115-kanit-t110`, commit `f2f05f5f`) kurulum adımının kendisinde düştü —
@@ -130,28 +141,58 @@ koşum küçük farklar taşıyor). Artış, 78 ölçünün artık gerçekten ff
 edilebilir, çünkü CI'nın ölçtüğü şey artık gerçek: önceki 10 dk 21 sn,
 78 ölçüyü hiç çalıştırmadan geçen bir sayıydı.
 
-## K6 — `kosum-kapisi.ps1 -MinimumTotal`
+## K6 — `kosum-kapisi.ps1 -MinimumTotal` / `-MaximumSkipped` (tur 2, düzeltildi)
 
-Eşik **950 → 1000** olarak değiştirildi (bu sözleşmenin `owns`'unda,
-`.github/workflows/ci.yml:74`).
+**Tur 1'in hatası** (denetçi buldu, `.claude/relay/contracts/T115.md` Tur 2):
+eşik 950 → 1000 türetimi ölçülmemiş bir tarihsel Total'e (~1119, "yaklaşık
+referans") dayanıyordu. Denetçi eşiğin ilk konduğu commit'i (`9ae6dce`)
+gerçekten ölçtü: koşum **`33525816911`** — `Failed: 0, Passed: 911,
+Skipped: 72, Total: 983`, `KOSUM KAPISI GECTI: toplam=983 alt-sinir=950`.
+Doğrulama: `gh run view 33525816911 --json headSha,conclusion` → headSha
+`9ae6dce`, `conclusion: success`, çıktısında yukarıdaki özet satırı var.
 
-Gerekçe — "yeni sayıya uydurmak" değil, kapının kendi tarihindeki oranı
-korumak: eşik ilk konduğunda (`9ae6dce`, 01.09.2026) 950 seçilmişti; o
-commit ile bu raporun tabanı (`68cb3c93`, Total 1119) arasında test
-dosyalarını değiştiren onlarca commit var (T96–T105 aralığı), yani o
-andaki gerçek Total'i geriye dönük ölçmedim — 1119'u yaklaşık referans
-alıyorum. Oran 950/1119 ≈ **%85** (üst sınır; gerçek tarihsel oran
-muhtemelen bir miktar farklıydı). Kapının işi Total'i izlemek değil,
-"Test host process crashed" gibi çökmüş/yarım bir koşumu (Failed: 0 basıp
-0 ile çıkan) yakalamak — bunun için gerçek Total'in büyük bir kısmının
-altında, ama normal test sayısı büyümesine tolerans tanıyan bir taban
-gerekiyor. Nihai ölçülen Total artık 1174; aynı %85 oranı 1174 × 0.85 ≈ 998,
-yuvarlanarak **1000**. Bu, eski eşiğin bıraktığı boşluğu (1119 − 950 = 169
-~ %15) korur, gevşetmez ya da rastgele daraltmaz.
+Gerçek taban **983**, gerçek oran 950/983 ≈ **%96,6** (**alt sınır**, üst
+sınır değil — Total zamanla yalnız büyür, yani `950/Total_tarihsel` gerçek
+orana bir alt sınırdır; ben bunu üst sınır gibi kullanıp eşiği gevşek
+tarafa düşürmüştüm). Oran korunarak türetilen doğru değer:
+0,966 × 1174 ≈ **1134**. Tur 1'de seçtiğim 1000, tasarımın bıraktığı asıl
+boşluğun (983 − 950 = 33 ölçü, %3,4) **5,3 katı** (174 ölçü) boşluk
+bırakıyordu — "gevşetmez" iddiam yanlıştı, kapı gevşetilmişti. Bu turda
+`-MinimumTotal` **1134** olarak düzeltildi (`.github/workflows/ci.yml:74`).
 
-Kapının asıl işi hâlâ çalışıyor mu: evet — mekanizma (`kosum-kapisi.ps1`)
-değişmedi, sadece parametre değişti; çökmüş/yarım koşum hâlâ "Failed: 0,
-Total küçük" üretir ve 1000 tabanının altında kalır, kapı hâlâ reddeder.
+**Yapısal soru — `-MinimumTotal` tek başına sessiz atlama-körlüğünü hiçbir
+değerde yakalayamaz**, çünkü `Total = Passed + Failed + Skipped`: bir
+testin Passed'den Skipped'e geçmesi Total'i değiştirmez. Denetçi bunu iki
+sahte-geçme senaryosuyla gösterdi (`kosum-kapisi.ps1 -InputFile` ile):
+
+| Senaryo | Eski (`-MinimumTotal 1000`, tek kapı) | Yeni (`-MinimumTotal 1134 -MaximumSkipped 30`) |
+|---|---|---|
+| Körlük tümüyle geri geldi: `Failed: 0, Passed: 1079, Skipped: 95, Total: 1174` | **GEÇTİ** (yanlış) | **DÜŞTÜ**, `kod=69`, `"Atlanan sayisi ust sinirin ustunde: 95 > 30."` |
+| 78 ölçü büsbütün yok oldu: `Failed: 0, Passed: 1079, Skipped: 17, Total: 1096` | **GEÇTİ** (yanlış) | **DÜŞTÜ**, `kod=68`, `"Toplam test sayisi alt sinirin altinda: 1096 < 1134."` |
+
+Seçilen yol: **(a) ikinci kapı eklendi** — `tools/kosum-kapisi/kosum-kapisi.ps1`'e
+opsiyonel `-MaximumSkipped` parametresi ve yeni çıkış kodu **69**
+(`Atlanan/Skipped ozeti yok` ya da üst sınır aşımı). Gerekçe: dosya zaten
+`owns`'umda, ekleme geriye-uyumlu (parametre `Nullable[int]`, verilmezse
+eski davranış birebir), ve gösterilen deliği doğrudan kapatıyor — ayrı bir
+sözleşmeye ertelemek (seçenek c) gereksiz gecikme, ölçmeden bırakmak
+(seçenek b) denetçinin ölçtüğü deliği kapatmıyor. Değer **30**: mevcut
+meşru kalıcı atlama sayısının (17) kabaca iki katı, organik ortam-gated
+test büyümesine yer bırakıyor ama tarihsel "körlük" değerlerinin (72, 95,
+97, 100 — hepsi bu ve tur-1 raporunda ölçülen gerçek koşumlar) çok altında.
+
+Bu davranış kalıcı regresyon testine bağlandı:
+`tools/kosum-kapisi/fixtures/korluk-geri-en.txt` (`Failed: 0, Passed: 1079,
+Skipped: 95, Total: 1174`) ve `tools/kosum-kapisi/test-kapi.ps1`'e eklenen
+`-MinimumTotal 1134 -MaximumSkipped 30` reddetme durumu (beklenen çıkış
+69) — `test-kapi.ps1` yerelde çalıştırıldı, tüm durumlar (4 geçerli, 6
+reddetme, ikisi yeni) beklenen kodu verdi.
+
+Kapının **asıl işi** (çökmüş/yarım koşumu yakalamak) hâlâ çalışıyor:
+mekanizma değişmedi, `-MinimumTotal` hâlâ "Failed: 0, Total küçük"
+durumunu 1134 altında yakalıyor. Kapının **yeni işi** (sessiz atlama-körlüğü)
+yukarıdaki iki senaryoyla ölçüldü ve **yakalandığı doğrulandı** — önceden
+"yakalar" diye iddia edip ölçmemiştim, bu turda hem iddia hem ölçüm var.
 
 ## K7 — kurulum başarısızlığı kırmızı mı
 
