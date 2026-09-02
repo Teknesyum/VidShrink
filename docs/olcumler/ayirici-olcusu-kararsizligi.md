@@ -111,6 +111,11 @@ kalmadı. Süre artık turla birlikte, adım adım ilerliyor:
 
 Ölçülerin süresi 2 s'den **375 ms**'ye düştü; artık gerçek zaman beklenmiyor.
 
+Bir uyarı: `Assert.Equal(495, moves)` ve `Assert.Equal(500, moves)` **davranış
+ölçmüyor** — döngü aritmetiğinden çıkan sabitler. İşleri düzeneği çivilemek: adım
+büyüklüğü ya da pencere değişirse bu sayı da değişir ve çizim beklentisinin yeniden
+hesaplanması gerektiği görülür. Davranışı ölçen iddialar `repaints` üstündekiler.
+
 ## 4. İki yönlü mutasyon (K4)
 
 Üçü de üretim kodunda, ölçüye dokunmadan yapıldı.
