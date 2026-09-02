@@ -7,6 +7,11 @@
 Apple M1 · 8 çekirdek · 8 GB · arm64 · macOS 26.6.2 (25G83) · ffmpeg 9.0.1 (Homebrew)
 · dal `serkan/macos-olcum`, taban `53bbc16`.
 
+Bu bölümdeki koşumlar stok `homebrew/core` ffmpeg 9.0.1_1 ile yapıldı. Aynı tur
+içinde sonradan `zimg`li derlemeye geçildi (`macos-gercek-kosum.md`, "Düzeltme");
+buradaki sayılar o değişiklikten öncesine aittir ve kurulum betiği ffmpeg'e
+dokunmuyor.
+
 Yayın: `v0.2.5`, `Teknesyum/VidShrink` — betiğin kendi bulduğu son yayın.
 
 ## K1 — Betiğin tam çıktısı ve çıkış kodu
@@ -201,4 +206,10 @@ göründüğünü göstermez.
 | `.app`in arayüzünden sıkıştırma (K2) | Ekran denetimi izni reddedildi. Motor başsız yoldan ölçüldü. |
 | Kurulu paketin gerçek güncelleme takası (K3) | Aynı sebep — `Begin()`/`Finish()` uygulama ömrüne bağlı. |
 | Ekran görüntüsü (K4) | Aynı sebep. Simge `.icns`ten belgelendi. |
+
+İzin iki kez istendi, ikisi de reddedildi: ilki İş 3'ün kendi koşumunda, ikincisi
+istek üzerine yeniden. İkinci istek VidShrink ve Finder içindi, dönen cevap
+`{"granted":[],"denied":[com.teknesyum.vidshrink, com.apple.finder]}`. Ekranı
+başka yoldan (`screencapture`, `osascript`) almaya çalışmadım; reddedilen izin
+etrafından dolaşılmaz. Bu üç madde izin verildiği anda tek koşumluk iştir.
 | Linux'ta betik | Bu paketin kapsamı dışında; T13 notunun Linux yarısı açık kalıyor. |

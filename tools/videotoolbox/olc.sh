@@ -8,6 +8,10 @@
 #
 # Kullanim:  tools/videotoolbox/olc.sh [parca-1 parca-2 ...]
 # Ayarlar:   BIT=5500  (kbit/s, uc kolda ayni)   C=<calisma dizini>
+#            OLCUM=0   yalniz kodla ve sureyi yaz, VMAF olcme. Duvar saatini tek
+#                      bir guc durumunda yeniden olcmek icin; kodlama argumanlari
+#                      birebir ayni kaldigindan uretilen dosya da ayni olmali.
+#            KOLLAR="hevc_videotoolbox"  kollarin alt kumesini kos.
 set -u
 
 KOK=$(cd "$(dirname "$0")/../.." && pwd)
@@ -15,6 +19,7 @@ K=${K:-"$KOK/.calisma/kaynak"}
 C=${C:-"$KOK/.calisma/vt"}
 BENCH=${BENCH:-"$KOK/tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench"}
 BIT=${BIT:-5500}
+OLCUM=${OLCUM:-1}
 TSV="$C/olcumler.tsv"
 
 mkdir -p "$C/cikti" "$C/olcum" "$C/gunluk"
@@ -22,11 +27,15 @@ mkdir -p "$C/cikti" "$C/olcum" "$C/gunluk"
 
 # Kodlanan kolun ffmpeg argumanlari. Uc kolda da tek gecis ABR: VideoToolbox iki gecis
 # desteklemiyor, dolayisiyla esit hiz denetimi ancak boyle kuruluyor.
+# Kaynak bt2020/PQ; etiketler uc kolda da acikca yaziliyor ki olcum tarafi
+# hangi uzaydan normalize edecegini tahmin etmesin.
+RENK='-color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc'
+
 kol_arg() {
     case "$1" in
-        libx265)            printf -- '-c:v libx265 -preset slow -pix_fmt yuv420p10le -tag:v hvc1' ;;
-        hevc_videotoolbox)  printf -- '-c:v hevc_videotoolbox -profile:v main10 -pix_fmt p010le -tag:v hvc1' ;;
-        h264_videotoolbox)  printf -- '-c:v h264_videotoolbox -pix_fmt yuv420p' ;;
+        libx265)            printf -- '-c:v libx265 -preset slow -pix_fmt yuv420p10le -tag:v hvc1 %s' "$RENK" ;;
+        hevc_videotoolbox)  printf -- '-c:v hevc_videotoolbox -profile:v main10 -pix_fmt p010le -tag:v hvc1 %s' "$RENK" ;;
+        h264_videotoolbox)  printf -- '-c:v h264_videotoolbox -pix_fmt yuv420p %s' "$RENK" ;;
         *) echo "bilinmeyen kol: $1" >&2; exit 1 ;;
     esac
 }
@@ -61,6 +70,13 @@ kos() {
     bayt=$(wc -c < "$out" | tr -d ' ')
     pix=$(alan "$out" pix_fmt)
 
+    if [ "$OLCUM" = "0" ]; then
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t-\t-\t-\t-\n' \
+            "$parca" "$kod" "$BIT" "$bayt" "$sure" "$pix" >> "$TSV"
+        echo "    $bayt bayt, ${sure}s (olcum kapali)"
+        return 0
+    fi
+
     "$BENCH" measure "$ref" "$out" > "$olcum" 2>> "$C/gunluk/$parca-$kod.olcum.log" \
         || { echo "OLCUM HATASI $parca $kod" >&2; return 1; }
 
@@ -73,7 +89,7 @@ kos() {
 
 parcalar=${*:-"parca-1 parca-2 parca-3"}
 for p in $parcalar; do
-    for kod in libx265 hevc_videotoolbox h264_videotoolbox; do
+    for kod in ${KOLLAR:-libx265 hevc_videotoolbox h264_videotoolbox}; do
         kos "$p" "$kod"
     done
 done

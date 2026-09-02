@@ -233,26 +233,50 @@ taşıyor. Depoda macOS koşan bir CI işi yok.
 
 ### Düzeltme
 
-**Düzeltilmedi.** Sebebi: düzeltmesi kod değişikliği değil ortam değişikliği —
-`zscale` taşıyan bir ffmpeg gerekiyor (kaynaktan `--enable-libzimg`, ya da
-zimg taşıyan bir dağıtım). Bunu kurmak paketin sınırları dışında ve T0'ın kararı;
-`_sorun.log`a yazıldı.
+**Düzeltildi — ortam değişikliğiyle, kod değişmedi.** İlk turda "düzeltilmedi,
+çünkü ortam kararı T0'ın" yazmıştım ve `_sorun.log`a koymuştum; T0 kurmamı
+söyledi. Kurulan:
+
+```
+brew tap homebrew-ffmpeg/ffmpeg
+brew uninstall --ignore-dependencies ffmpeg
+brew install homebrew-ffmpeg/ffmpeg/ffmpeg --with-zimg --with-libvmaf
+```
+
+İkinci satır zorunlu: `homebrew/core` ile `homebrew-ffmpeg/ffmpeg` aynı formül
+adını taşıdığı için ikisi bir arada duramıyor. `--with-libvmaf` de zorunlu:
+tap'in varsayılan derlemesinde `libvmaf` **isteğe bağlı**, yalnız `--with-zimg`
+verilseydi ölçer bu kez libvmaf'sız kalırdı.
+
+Kurulum sonrası (`ffmpeg -version` ve `ffmpeg -hide_banner -filters`):
+
+| Ne | Önce | Sonra |
+|---|---|---|
+| ffmpeg | 9.0.1 (`homebrew/core`, `ffmpeg 9.0.1_1`) | 9.0.1 (`homebrew-ffmpeg/ffmpeg`) |
+| `--enable-libzimg` | yok | var |
+| `--enable-libvmaf` | var | var |
+| `zscale` filtresi | 0 satır | `.S zscale V->V` |
+| `libvmaf` filtresi | var | var |
+| `libx265` / `videotoolbox` | var | var |
+| `libvmaf` (brew) | 3.2.0 | 3.2.0 |
+| `zimg` (brew) | — | 3.0.6 |
+
+Model dosyası yerinde: `/opt/homebrew/opt/libvmaf/share/libvmaf/model/vmaf_v0.6.1neg.json`.
+
+Bu on ölçünün onu da bu kurulumdan sonra yeşil (aşağıdaki ikinci tam koşumun
+başarısız listesinde `QualityMeterTests` yok).
 
 İki not, ikisi de ölçülmüş:
 
 - `EncoderCapabilitiesTests.cs:55` `Assert.True(caps.HasFilter("zscale"))` diyor
   ama o ölçü kırmızı listede değil — çünkü gerçek ffmpeg'i değil dosyadaki sabit
   metni ayrıştırıyor (`EncoderCapabilitiesTests.cs:40`).
-- Bu eksik İş 2'nin ölçerini kesiyor: `tools/VidShrink.Bench measure` aynı
-  `QualityMeter`i çağırıyor (`Program.cs:76`), yani bu makinede koşmuyor.
-  **Ama Bench'in ikinci bir ölçeri var ve o koşuyor:** `bench shrink` kendi
-  `VmafNegAsync`ini kullanıyor (`Program.cs`, `BenchMeasureFilterGraph.Build`),
-  o da `scale=...:flags=lanczos` + kare kilidi kuruyor, `zscale` istemiyor.
-  Aşağıdaki uçtan uca koşum VMAF üretti. İkisinin farkı tam olarak renk
-  normalizasyonu: Bench'in yolu **açık renk normalizasyonu yapmıyor**, yani
-  etiketi farklı iki klibi karşılaştırdığında `QualityMeter`in kapattığı kusura
-  açık. Aynı renk uzayındaki iki klip için sonuç güvenilir, farklı olanlar için
-  değil.
+- Bu eksik İş 2'nin ölçerini de kesiyordu: `tools/VidShrink.Bench measure` aynı
+  `QualityMeter`i çağırıyor (`Program.cs:76`). Kurulumdan sonra o da koşuyor ve
+  İş 2'nin bütün VMAF sayıları bu yoldan, yani **açık renk normalizasyonuyla**
+  üretildi (`docs/olcumler/videotoolbox.md`). Bench'in ikinci ölçeri
+  (`bench shrink` → `VmafNegAsync` → `BenchMeasureFilterGraph.Build`) `zscale`
+  istemiyor ama açık renk normalizasyonu da yapmıyor; İş 2'de kullanılmadı.
 
 ## Kapıları açınca ne oluyor
 
@@ -291,6 +315,285 @@ settings first launch=0,16ms, later launch=0,06ms, rewrote=False
 
 Ortak ölçüm havuzu bu makinede yok ve indirilemedi; ayrıntısı
 `.claude/relay/live/_sorun.log`da. Yukarıdaki 12 ölçü bu paket turunda da koşmadı.
+
+## İkinci tam koşum — zscale kurulduktan sonra
+
+```
+dotnet test --logger "trx;LogFileName=suit-zimg.trx" --results-directory .calisma/gunluk
+```
+
+```
+Failed!  - Failed:    56, Passed:  1262, Skipped:    18, Total:  1336, Duration: 11 m 25 s - VidShrink.Tests.dll (net8.0)
+```
+
+Birinci koşumla yan yana:
+
+| | Birinci | İkinci |
+|---|---:|---:|
+| ffmpeg | stok | zimg'li |
+| Yapılandırma | **Release** | **Debug** |
+| Toplam | 1336 | 1336 |
+| Geçen | 1306 | 1262 |
+| Kırmızı | 10 | 56 |
+| Atlanan | 20 | 18 |
+| Süre | 19 dk 10 sn | 11 dk 25 sn |
+
+**İki koşum arasında iki şey birden değişti**, yalnız ffmpeg değil:
+yapılandırma da Release'ten Debug'a geçti. Bu, kırmızı sayılarını doğrudan
+kıyaslanamaz kılıyor. Eksik anahtar `Strings.cs:136`da `Debug.Fail` ile
+bildiriliyor (`AssertOnMissingKey` kapısının arkasında, `Strings.cs:134`;
+varsayılanı `true`, `Strings.cs:25`). `Debug.Fail` `[Conditional("DEBUG")]`
+olduğundan aşağıda kök nedeni verilen yerelleştirme anahtarı
+kusuru **Release'te hiç patlamaz**: birinci koşum onu görebilecek durumda
+değildi. Dolayısıyla "10 → 56" farkının tamamı zimg'e yazılamaz; bu farkın
+ne kadarının hangi değişkenden geldiğini bu iki koşum ayıramaz. Aşağıdaki
+kök neden çözümlemesi tek başına ikinci koşuma dayanıyor ve o koşumun kendi
+içinde tutarlı.
+
+### Atlanan 20 → 18: hangi ikisi düştü
+
+`suit-zimg.trx` içindeki `outcome="NotExecuted"` kayıtlarını tek tek sayıp
+birinci koşumun listesiyle karşılaştırdım. Düşen tam olarak "bu ffmpeg
+derlemesinde `zscale`/`tonemap` yok" grubunun ikisi:
+
+1. `FrameGrabberTests.Hdr_kaynak_sdr_ciktiyla_eslesince_ton_eslenir_ve_bildirilir`
+2. `QualityMeterTests.TonemappedReferenceSeparatesTwoSdrQualities`
+
+İkisi de artık koşuyor ve geçiyor. Kalan 18'in hepsi öteki dört gruptan:
+12 (`VIDSHRINK_LIVE_SOURCE`) + 2 (`VIDSHRINK_LIVE_PROBE`) + 3
+(`VIDSHRINK_LAUNCHER_EXE`) + 1 (`h264_nvenc` yok) = **18**.
+
+Paketin verdiği "18 atlanan" sayısı bu koşumda tesadüfen tutuyor ama **aynı 18
+değil**: paketin kaynağı `macos-guncelleme.md:346`, 964 ölçülük bir süiti
+anlatıyor.
+
+### 56 kırmızı: tek kök neden, ve altında gerçek bir kusur
+
+56'sının da istisnası aynı:
+
+```
+Microsoft.VisualStudio.TestPlatform.TestHost.DebugAssertException :
+Method Debug.Fail failed with 'Localization key 'main.plan.fact.estimate'
+is missing in 'en' and in 'en'.'
+```
+
+Sınıfa göre dağılım (`suit-zimg.trx`ten sayıldı, 7 sınıf, toplam
+36 + 7 + 6 + 3 + 2 + 1 + 1 = **56**):
+
+| Sınıf | Kırmızı |
+|---|---:|
+| `WindowLayoutTests` | 36 |
+| `QualityTargetUiTests` | 7 |
+| `LanguageTests` | 6 |
+| `ChipTests` | 3 |
+| `PlanCalculatorProbeTests` | 2 |
+| `SettingsTests` | 1 |
+| `HardwareVerdictTests` | 1 |
+
+Dile göre dağılımı da aynı anahtarı gösteriyor: 31 kayıt `'en'`, 24 kayıt `'tr'`,
+1 kayıt `'zz'` — 31 + 24 + 1 = 56.
+
+**Tek başına yeşil.** İki tanesini kendi süreçlerinde koşturdum:
+
+```
+dotnet test --no-build --filter "FullyQualifiedName~WindowLayoutTests.TheTooltipBubbleFitsTheNarrowestWindow|FullyQualifiedName~LanguageTests.SinirCumlesi_EkrandaTurkce"
+# Passed!  - Failed: 0, Passed: 2, Skipped: 0, Total: 2, Duration: 91 ms
+```
+
+Yani bu 56 kırmızı **yük/sıra yapıntısı.** Nedeninin sınırı: `RefreshPlanView`in
+tek erken dönüşü `MainWindow.axaml.cs:1959`daki `ActivePlan is not { } plan ||
+_info is null` kapısı; eksik anahtar 21 satır aşağıda (`:1980`) isteniyor. Tek
+başına koşumda istisna atılmadığına göre orada kapı kapalı dönmüş, tam süitte
+açılmış. Hangi ölçünün bıraktığı durumun kapıyı açtığını **izole etmedim**;
+ölçülen şey iki koşumun kendisi.
+
+**Altındaki kusur yapıntı değil.** `MainWindow.axaml.cs:1980` `Say("main.plan.fact.estimate")`
+diyor; yerelleştirme dosyalarında o anahtar **yok**, olan
+`main.plan.fact.estimated-size` (`Locales/en/main.json:126`,
+`Locales/tr/main.json:126`). `Strings.GetIn` bulamadığı anahtarda önce `en`e
+düşüyor, orada da bulamayınca `Debug.Fail` atıyor ve **anahtarın kendisini
+döndürüyor** (`Strings.cs:134-139`; `Debug.Fail` `[Conditional("DEBUG")]` olduğu için Release derlemesinde sessizce yalnız anahtar döner). Yani Release'te kullanıcı plan panelinde
+"Tahmini boyut" yerine ham `main.plan.fact.estimate` dizgisini görüyor.
+
+Bu `origin/main`de de var: `git show origin/main:src/VidShrink.App/MainWindow.axaml.cs`
+1980. satırda aynı anahtarı, `git show origin/main:src/VidShrink.App/Locales/en/main.json`
+126. satırda `estimated-size`ı veriyor. Platforma bağlı değil; Windows'ta da aynı
+dizge ekrana gelir. Süitin orada yeşil kalması kusurun yokluğunu değil, o kod
+yolunun oradaki koşumda erişilemediğini gösteriyor.
+
+**Düzeltildi.** Tek kelimelik değişiklik, çağrı yeri var olan anahtara çevrildi:
+
+```
+src/VidShrink.App/MainWindow.axaml.cs:1980
+-  AddPlanFact(Say("main.plan.fact.estimate"), ...)
++  AddPlanFact(Say("main.plan.fact.estimated-size"), ...)
+```
+
+Yerelleştirme dosyaları değil çağrı yeri düzeltildi, çünkü `estimated-size`
+anahtarı iki dilde de doğru metinle zaten duruyor ve başka bir çağıranı yok.
+
+## Üçüncü tam koşum — birinci yerelleştirme düzeltmesinden sonra
+
+İkinci koşumla aynı yapılandırma (Debug), aynı ffmpeg; tek değişen yukarıdaki
+`main.plan.fact.estimate` düzeltmesi:
+
+```
+dotnet test --logger "trx;LogFileName=suit-duzeltme.trx" --results-directory .calisma/gunluk
+```
+
+```
+Failed!  - Failed:    37, Passed:  1281, Skipped:    18, Total:  1336, Duration: 20 m 7 s - VidShrink.Tests.dll (net8.0)
+```
+
+| | İkinci | Üçüncü |
+|---|---:|---:|
+| Toplam | 1336 | 1336 |
+| Geçen | 1262 | 1281 |
+| Kırmızı | 56 | 37 |
+| Atlanan | 18 | 18 |
+| Süre | 11 dk 25 sn | 20 dk 7 sn |
+
+Süre neredeyse iki katına çıktı. Nedenini ayırmadım: bu makinede duvar saatinin
+öncesindeki sürekli yüke göre 2 katına kadar saptığını İş 2'de ölçtüm
+(`videotoolbox.md`, "Duvar saati ne kadar güvenilir"), dolayısıyla iki süit
+süresini yan yana koyup fark çıkarmak bu makinede güvenli değil.
+
+### Düzeltme işe yaradı, ama altından ikinci bir kusur çıktı
+
+Her iki koşumun `trx`indeki kırmızıların iletisinden eksik anahtar adını çekip
+saydım:
+
+```
+import xml.etree.ElementTree as ET, re, collections
+ns = {"t": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
+for etiket, p in (("2. koşum", ".calisma/gunluk/suit-zimg.trx"),
+                  ("3. koşum", ".calisma/gunluk/suit-duzeltme.trx")):
+    fails = [r for r in ET.parse(p).getroot().findall(".//t:UnitTestResult", ns)
+             if r.get("outcome") == "Failed"]
+    c = collections.Counter()
+    for r in fails:
+        m = re.search(r"Localization key '([^']+)' is missing", "".join(r.itertext()))
+        c[m.group(1) if m else "BASKA NEDEN"] += 1
+    print(f"{etiket}: {len(fails)} kırmızı ->", dict(c))
+```
+
+```
+2. koşum: 56 kırmızı -> {'main.plan.fact.estimate': 56}
+3. koşum: 37 kırmızı -> {'main.quality.target': 37}
+```
+
+İki koşumun da kırmızısında **tek bir kök neden** var ve ikisi farklı anahtar.
+`BASKA NEDEN` sayacı iki koşumda da sıfır: 56'nın ve 37'nin hepsi eksik
+yerelleştirme anahtarı. Düzeltme birinci anahtarı tamamen kaldırdı — 3. koşumda
+onu anan tek bir kırmızı yok.
+
+Küme farkı da bunu doğruluyor: 2. koşumun kırmızılarından 20 tanesi yeşile
+döndü, 36'sı kırmızı kaldı, 1 tanesi "yeni" göründü
+(`PlaybackBaseHeightTests.Bos_panel_de_sahne_de_ayni_tabana_oturur`). Bu
+sonuncusu gerçekte yeni değil: 2. koşumda ikinci anahtara **varamadan** birinci
+anahtarda patlıyordu, birinci düzelince ikinciye ulaştı. Aynı sebeple 2.
+koşumda kırmızı olan
+`HardwareVerdictTests.TheSettingsPathOverrideKeepsTheTestOutOfAppData` de
+yeşile döndü — onun iletisi de `main.plan.fact.estimate` diyordu.
+
+37 kırmızının sınıf dağılımı:
+
+| Sınıf | Kırmızı |
+|---|---:|
+| `WindowLayoutTests` | 17 |
+| `QualityTargetUiTests` | 7 |
+| `LanguageTests` | 6 |
+| `ChipTests` | 3 |
+| `PlanCalculatorProbeTests` | 2 |
+| `PlaybackBaseHeightTests` | 1 |
+| `SettingsTests` | 1 |
+
+7 sınıf, 17+7+6+3+2+1+1 = **37**.
+
+### İkinci kusurun kök nedeni: `QualityBody` iki anahtarı da yanlış çağırıyor
+
+Çağrı yeri `MainWindow.axaml.cs:1894-1896`. Yığın izi
+`QualityBody` → `RefreshQualityPanels` (`:1858`) → `Recalculate` (`:1792`).
+
+```
+AddQualityRow(grid, Say("main.quality.target"), ...);
+AddQualityRow(grid, Say("main.quality.predicted"), ...);
+AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.points", ...));
+```
+
+`main.quality.target` hiçbir dilde yok. `main.quality.points` de yok — locale'de
+duran ad `main.quality.loss-points` (`Locales/en/main.json:70`,
+`Locales/tr/main.json:70`, metni `"{0} points"` / `"{0} puan"`). İkincisi 37
+kırmızının hiçbirinde görünmüyor çünkü aynı satır dizisinde birinci anahtar
+önce patlıyor ve onu gölgeliyor.
+
+### Anahtarları koşumla değil taramayla avladım
+
+Her düzeltmeden sonra 20 dakikalık süit koşup bir sonraki anahtarı beklemek
+yerine, kodun çağırdığı bütün anahtar sabitlerini çıkarıp locale kümesinden
+çıkardım:
+
+```
+import json, re, pathlib
+kok = pathlib.Path("src/VidShrink.App")
+en = set()
+for f in (kok / "Locales" / "en").glob("*.json"):
+    en |= set(json.load(open(f)).keys())
+pat = re.compile(r'\b(?:Say|Strings\.Get(?:In)?)\(\s*"([^"]+)"')
+eksik = {m.group(1) for f in kok.rglob("*.cs") for m in pat.finditer(f.read_text())} - en
+print("eksik anahtar:", sorted(eksik) or "yok")
+```
+
+Düzeltmeden önce iki anahtar çıktı, ikisi de aynı yerden:
+
+```
+kod 158 ayri anahtar cagiriyor; 2 tanesi hicbir locale dosyasinda yok:
+  main.quality.points     src/VidShrink.App/MainWindow.axaml.cs:1896
+  main.quality.target     src/VidShrink.App/MainWindow.axaml.cs:1894
+```
+
+Aynı tarama `en` ve `tr` kataloglarının birebir aynı 387 anahtarı taşıdığını da
+gösterdi (iki yönde de fark yok), yani kusur çeviri eksiği değil, çağrı yeriyle
+katalog arasındaki uyuşmazlık.
+
+**Taramanın kör noktası:** anahtarı çalışma anında kuran çağrılar sabit
+taramayla görünmez. Depoda böyle iki çağrı var, `MainWindow.axaml.cs:1557` ve
+`:1558`; ikisi de anahtarı başka yerdeki sabitlerden alıyor, yani bu iki satır
+yeni bir eksik anahtar saklamıyor. Onun dışında her `Say(`/`Strings.Get(`
+çağrısı sabit dizeyle yazılmış.
+
+### İkinci düzeltme
+
+İki kusur, iki farklı onarım — çünkü birinde doğru anahtar zaten duruyor,
+öbüründe hiç yazılmamış:
+
+```
+- AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.points", ...));
++ AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", ...));
+```
+
+```
+  Locales/en/main.json:68  + "main.quality.target": "Target",
+  Locales/tr/main.json:68  + "main.quality.target": "Hedef",
+```
+
+`main.quality.points` için çağrı yeri düzeltildi: `loss-points` anahtarı iki
+dilde de doğru metinle duruyor ve başka çağıranı yok — yani eksik olan anahtar
+değil, adı. `main.quality.target` içinse ortada bir anahtar yok, o yüzden
+anahtarın kendisi eklendi. Metni `main.target.title`ın metninden birebir alındı
+(`"Target"` / `"Hedef"`); satırın gösterdiği değer zaten hedef boyut. Bunu
+doğrudan `main.target.title`a bağlamak da mümkündü, ama o anahtar hedef
+panelinin başlığı; kalite ipucu satırını panel başlığına bağlamak ikisini
+birbirine kilitler. **Yeni bir kullanıcıya görünen dize eklemek T0'ın kararı;
+tersini isterseniz tek satır.**
+
+Düzeltmeden sonra tarama temiz:
+
+```
+eksik anahtar: yok
+```
+
+<!--DORDUNCUKOSUM-->
 
 ## Koşan ve koşmayan — özet
 
