@@ -639,3 +639,32 @@ sectigi psikogorsel parametre sessizce dusuyor, kullanici uyari almiyor.
 Yan bulgu (ayri sozlesme gerekiyor): `ComplexityProbe.cs:31`
 `public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;` — sahne farkindali
 ornekleme uretimde pimli olarak kapali.
+
+## T140 teslim edildi, denetimde (2 Eylul 2026)
+
+Dal `T140-turbo-ilk-gecis` @ `6f64593`. Diff tamamen `owns` icinde. CI `33652799954`
+(`ba1f6be`) success. Denetci acildi.
+
+Yapicinin uc sorusu, T0 cevabi:
+
+1. **Atlanan 18 -> 19, hangi olcunun kaydigi bilinmiyor.** Borc. Yapici bunun bir cikarim
+   oldugunu acikca yazdi — dogru davranis. Denetci dalin yeni bir `Skip` getirip
+   getirmedigine bakiyor.
+2. **Merdiven yonu kumeye bagli** (`libvpx-vp9`, `libsvtav1` ters yonlu). **Ucuncu
+   kodlayici girdiginde.** Bugun kume iki ve ikisi de ayni yonde; koruma kume olcusunun
+   kirmiziya donmesi. Veriye tasimak bugun olu alan ekler.
+3. **Turbo anahtarini uretimde kimse acmiyor.** Ayri sozlesme. `CompressionStrategy`,
+   `PlanCalculator` ve ayarlar tarafi T140'in `owns`unda degil; dokunmamakla dogru yapti.
+
+### Ayni sinif dorduncu kez: duzenek var, uretim cagirani sifir
+
+T137 (ucuncu cevap uretilmis, tuketilmemis), T142 K3 (harita uretiliyor, cagriya
+verilmiyor), T143 (`WorstScene`in haritali kolu yalniz testlerden cagriliyor), T140
+(turbo anahtari kimse acmiyor). Dordu de ayni: yeni yetenek yazildi, olculdu, muhurlendi
+— ve kullaniciya ulasan yolda **kosmuyor.**
+
+Kok neden `owns` disiplini: yetenegi yazan sozlesme onu **cagiran** dosyaya sahip degil,
+o yuzden bagalamak her seferinde borc olarak devrediliyor ve borc hicbir sozlesmeye
+donmuyor. Cozum: bu dort borcu tek bir "uretim yolunu bagla" sozlesmesinde toplamak;
+`owns` tam da cagiran dosyalar olur (`src/VidShrink.App/MainWindow.axaml.cs`,
+`src/VidShrink.Core/PlanCalculator.cs`, `CompressionStrategy`).
