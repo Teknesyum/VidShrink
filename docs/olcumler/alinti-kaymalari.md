@@ -129,6 +129,13 @@ biçiminde açıkça yaz) madde `f155dea`'de yeniden düzenlendi: eski yanlış 
 sanıldığı ve neden yanlış olduğu ("o dizge kaynakta hiç yok, satır 7 bir `// T27:` yorum
 satırı, `LanguageCatalog.cs` hiçbir zaman çeviri sözlüğü olmadı") yazıldı, ardından
 çevirilerin gerçek yeri (`Locales/{en,tr}/*.json`) ve gerçek ölü anahtarlar belirtildi.
+
+> **Geri çekildi (bkz. "Tur 3" bölümü aşağıda).** Buradaki "hiçbir zaman çeviri
+> sözlüğü olmadı" ifadesi tur 1 denetiminde KALDI aldı — `LanguageCatalog.cs`
+> gerçekten bir çeviri sözlüğü taşımıştı (`19af115`), sözlük `774b187`'de
+> kaldırıldı. Tur 2'de "künye doğruydu, bayatladı" olarak düzeltildi, ama tur 2'nin
+> kendi "hangi commit kaldırdı" iddiası da yanlış çıktı (bkz. Tur 3). Doğru hâli
+> `docs/inceleme/uygulama-katmani.md` madde 90'da duruyor.
 Yeniden kosturma sonrası araç bu paragraftan **KAYMA üretmedi** (eski yanlış dizge hâlâ
 metinde ama artık bir künyeye bitişik "iddia" olarak okunmuyor — `KAYMA: 0  SATIR
 KAYDI: 1` (T125'in bulgusu), `.calisma/T126/mutasyon-sonuc.txt`'ten sonraki son kosum).
@@ -322,10 +329,79 @@ dosyalarda ama farklı bir kusur sınıfı):
    kısaltılmış `:295` (`Correct` 2pass'e geçiş iddiası) ve `:271` (`RetryAimMb` ölçümlü
    dalı iddiası) ve `EncodeRunner.cs:64` (4. deneme yok iddiası) ile devam ediyor.
    Üçü de yanlış hedefte: `:295` gerçekte ffmpeg `out_time_ms` ilerleme ayrıştırması,
-   `:271` gerçekte `ct.Register(() => TryKill(process))` (5 numaralı düzeltmenin kendi
-   hedefi), `:64` gerçekte metot başındaki yerel değişken tanımları. Üçü de anlatılan
-   davranışla ilgisiz.
+   `:271` gerçekte `var stderrTask = Task.Run(async () => ...)` — stderr okuma görevinin
+   başlangıcı, ilgisiz (5 numaralı düzeltmenin kendi hedefi olan `ct.Register(() =>
+   TryKill(process))` iki satır yukarıda, `:269`'da — bu satır burada yanlışlıkla `:271`
+   diye yazılmıştı, düzeltildi), `:64` gerçekte metot başındaki yerel değişken
+   tanımları. Üçü de anlatılan davranışla ilgisiz.
 
 Ortak desen: **kısaltılmış bare `:N` künyeler**, önceki tam künyenin dosyasını miras
 alıyor ama satır numarası bağımsız kayıyor; format A/B bunları hiç görmüyor çünkü
 aralarında alıntılanmış bir dizge yok, yalnız düzyazı iddiası var.
+
+## Tur 3 — K12 (kaldırıcı commit yanlış teşhis edildiydi)
+
+Tur 2 kaldı: madde 90'a yazdığım "sözlük `b976332` (T83) ile kaldırılınca dizge
+kaynaktan düştü" cümlesi **yanlıştı.** Kaldıran commit `774b187` (2026-08-22, Avalonia
+geçişi) — `b976332` (2026-08-30, T83) değil. Bu iki olayı tek olay sanmışım; hatanın
+kaynağı T0'ın tur 2 talimat metnindeki bir yanlış varsayımdı ama **çürüten kanıt
+kendi koşturduğum `git log -S` çıktısındaydı** — çıktı `774b187`'yi gösteriyordu, ben
+onu görmezden gelip talimattaki sıralamayı yazdım. Ders: elimdeki veri talimatla
+çelişince veriyi tutmalıydım.
+
+### Bağımsız doğrulama (kendi kendime tekrar koşturdum, T0'ın verdiği komutları
+kopyalamadım — aynı sonuca ayrı ayrı vardım)
+
+```
+$ git log -S 'Target Size Media Compression & Media Converter' --all --format='%h %ad %s' --date=short -- src/
+774b187 2026-08-22 Move the interface to Avalonia and reach three platforms
+19af115 2026-08-17 Update product description wording
+
+$ git grep -c 'Target Size Media Compression & Media Converter' 774b187^ -- src/
+src/VidShrink.App/LanguageCatalog.cs:1        <- var (774b187'den ONCE dizge var)
+
+$ git grep -c 'Target Size Media Compression & Media Converter' 774b187 -- src/
+(eslesme yok, exit 1)                          <- 774b187'nin KENDISINDE yok
+
+$ git grep -c 'Target Size Media Compression & Media Converter' b976332^ -- src/
+(eslesme yok, exit 1)                          <- T83'ten (b976332) 1 commit ONCE de yok
+
+$ git rev-list --count 774b187..b976332
+488
+```
+
+Sonuç: dizge tam `774b187`'de düşüyor (öncesinde var, kendisinde yok). `b976332`'nin
+bir commit öncesinde de zaten yoktu — T83 onu "kaldıramazdı", 488 commit önce zaten
+kaynaktan düşmüştü. Doğru kronoloji: `19af115` (dizge var) → `774b187` (dizge düşüyor,
+Avalonia geçişi) → … 486 commit … → `b976332`/T83 (çeviri sözlüğü *mekanizması*
+kaldırılıyor, dizgeyle ilgisiz, çünkü dizge zaten yoktu).
+
+### K12 — madde 90 çürütüldü, silinmedi
+
+`docs/inceleme/uygulama-katmani.md` madde 90'daki yanlış sıralama cümlesi **silinmedi**;
+yanlış olduğu, neden yanlış olduğu ve doğru kronoloji yukarıdaki komut çıktılarıyla
+birlikte aynı yere yazıldı (T126, tur 3 etiketiyle). Commit aşağıda.
+
+**Dokunulmadı (T0'ın işaretlediği doğru kalanlar):** `uygulama-katmani.md:87-88`'deki
+"sözlük `b976332` ile kaldırıldı" cümlesi — bu, sözlük *mekanizması* için doğru, dizge
+için değil, ikisi ayrı önerme; üç ölü JSON anahtarı; `Locales/{en,tr}/*.json` yeri.
+
+### Genel kural (K12'nin istediği)
+
+**Bir commit'i "şu dizgeyi kaldıran" ilan etmeden önce onu `git log -S '<dizge>' --all
+-- <yol>` çıktısında görmüş olmak zorunludur.** Çıktıda görünmeyen bir commit'e kaldırma
+atfetme — görünüyor olması bile yetmez, kaldırma iddiasını `git grep -c '<dizge>'
+<commit>^ -- <yol>` (öncesinde var, çıktı ≥1) ile `git grep -c '<dizge>' <commit> --
+<yol>` (kendisinde yok, çıktı 0/hata) çiftiyle doğrula. Tur 2'nin hatası tam bu adımı
+atlamaktı: `git log -S` çıktısını gördüm ama çıktıdaki commit'i (`774b187`) değil,
+talimatta verilen commit'i (`b976332`) yazdım.
+
+### İki küçük düzeltme (T0'ın işaret ettiği)
+
+1. K11'in 3. maddesindeki `EncodeRunner.cs:271` yanlış transkripsiyondu — gerçek satır
+   `:269`. Yukarıdaki "K11" bölümünde düzeltildi (`var stderrTask = Task.Run(...)`
+   gerçekten `:271`'de, `ct.Register(() => TryKill(process))` `:269`'da).
+2. Tur 1'in geri çekilen "hiçbir zaman çeviri sözlüğü olmadı" ifadesinin göründüğü
+   paragrafa (yukarıda, K3 bölümünde) geri çekildiğine işaret eden bir not eklendi —
+   önceden yalnız 100 satır aşağıdaki "Tur 2" bölümünde geri çekiliyordu, yukarıdan
+   okuyan fark etmiyordu.

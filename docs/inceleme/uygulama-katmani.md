@@ -88,12 +88,25 @@ tıklamayı araya sokamaz, `SetRunning(true)` (539) düğmeyi kapatır. **Fakat 
   değer — `TurkishToEnglish` ters sözlüğü (`LanguageCatalog.cs:121`) çakışma vermiyordu. Sözlük
   `b976332` (T83, 2026-08-30) ile kaldırıldı; bugünkü karşılığı `Locales/{en,tr}/*.json`'daki
   387 anahtarın İngilizce/Türkçe çiftleri, ayrı bir "ters sözlük" artık yok (bkz. alttaki madde).
-- **Düzeltme notu (T126, tur 2):** Bu madde eskiden `LanguageCatalog.cs:7`'yi bir çeviri
-  sözlüğündeki ölü bileşik anahtar (`"Target Size Media Compression & Media Converter"`) olarak
-  gösteriyordu. Künye **yazıldığı gün doğruydu**: `git log -S` `LanguageCatalog.cs`'in o tarihte
-  `TurkishToEnglish`/`EnglishToTurkish` sözlüklerini ve `Localize(english, turkish)`'i taşıdığını
-  gösteriyor (commit `19af115`); sözlük `b976332` (T83, 2026-08-30) ile kaldırılınca dizge kaynaktan
-  düştü. Bugün `LanguageCatalog.cs` artık çeviri sözlüğü değil, yalnız başlık büyütme yardımcısı
+- **Düzeltme notu (T126, tur 3 — tur 2'nin sıralaması çürütüldü):** Bu madde eskiden
+  `LanguageCatalog.cs:7`'yi bir çeviri sözlüğündeki ölü bileşik anahtar (`"Target Size Media
+  Compression & Media Converter"`) olarak gösteriyordu. Künye **yazıldığı gün (`19af115`,
+  2026-08-17) doğruydu**: `LanguageCatalog.cs` o tarihte `TurkishToEnglish`/`EnglishToTurkish`
+  sözlüklerini ve `Localize(english, turkish)`'i taşıyordu.
+
+  Dizgeyi kaynaktan düşüren commit **`774b187`**'dir (2026-08-22, Avalonia'ya geçiş) —
+  **`b976332` değil.** Kanıt: `git log -S '<dizge>' --all -- src/` yalnız `19af115` ve
+  `774b187`'yi listeliyor; `git grep -c '<dizge>' 774b187^ -- src/` dizgeyi buluyor (1 eşleşme),
+  `774b187`'nin kendisinde bulmuyor (0) — dizge tam o commit'te düşüyor. `774b187` ile `b976332`
+  (T83, 2026-08-30) arasında 488 commit var; `git grep -c '<dizge>' b976332^ -- src/` de
+  bulmuyor (0) — yani T83'ten sekiz gün önce dizge zaten yoktu, `b976332` onu "kaldıramazdı".
+  Tur 2'de bu maddeye yazılan "sözlük `b976332` ile kaldırılınca dizge kaynaktan düştü"
+  cümlesi **yanlıştı**, burada düzeltiliyor: T83 (`b976332`) çeviri sözlüğü *mekanizmasını*
+  (`EnglishToTurkish`/`TurkishToEnglish`/`Localize`) kaldırdı — bu doğru, üstteki maddeyle
+  tutarlı — ama bu spesifik dizge o mekanizmadan sekiz gün önce, ayrı bir commit'te
+  (`774b187`) zaten kaynaktan düşmüştü. İki ayrı olay, tur 2 ikisini tek olay sanmıştı.
+
+  Bugün `LanguageCatalog.cs` artık çeviri sözlüğü değil, yalnız başlık büyütme yardımcısı
   (`Title(text, turkish)`, sabit-yazım tablosu `Names`); çeviriler `src/VidShrink.App/Locales/{en,tr}/*.json`
   altındaki JSON dosyalarına taşındı. O dosyalarda gerçekten ölü olan 3 anahtar var:
   `main.plan.fact.estimated-size`, `main.plan.reasons-count`, `main.quality.loss-points`
