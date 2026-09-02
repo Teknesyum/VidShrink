@@ -142,8 +142,10 @@ public static class Rapor
         sb.AppendLine("| K3 eki (denetim) | `SahneButcesi dogrula <kol>` | `dogrula-<pencere>.csv` |");
         sb.AppendLine("| K3 eki (mutasyon) | `bash tools/sahne-butcesi/03-duzenek-mutasyonu.sh` | `duzenek-mutasyon.csv` |");
         sb.AppendLine("| K4 | `SahneButcesi k4 maks p1-karisik` | `k4-izgara.csv` |");
+        sb.AppendLine("| K4 eki | `SahneButcesi k4b <kol> <pencere>` | `k4b-<kol>-<pencere>.csv` |");
         sb.AppendLine("| K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
+        sb.AppendLine("| Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |");
         sb.AppendLine("| bu sayfa | `SahneButcesi rapor` | — |");
         sb.AppendLine();
         sb.AppendLine($"Kollar: {string.Join(", ", Program.Kollar.Keys.Select(k => $"`{k}`"))}. " +

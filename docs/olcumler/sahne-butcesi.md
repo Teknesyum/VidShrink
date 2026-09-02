@@ -35,8 +35,10 @@ Ikili her seferinde `--no-incremental` derlenir; `--no-build` kullanilmaz.
 | K3 eki (denetim) | `SahneButcesi dogrula <kol>` | `dogrula-<pencere>.csv` |
 | K3 eki (mutasyon) | `bash tools/sahne-butcesi/03-duzenek-mutasyonu.sh` | `duzenek-mutasyon.csv` |
 | K4 | `SahneButcesi k4 maks p1-karisik` | `k4-izgara.csv` |
+| K4 eki | `SahneButcesi k4b <kol> <pencere>` | `k4b-<kol>-<pencere>.csv` |
 | K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |
 | K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |
+| Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |
 | bu sayfa | `SahneButcesi rapor` | — |
 
 Kollar: `maks`, `uyumlu`, `yedek`. Pencereler: `p1-karisik`, `p2-durgun`, `p3-hareketli`.
@@ -377,8 +379,11 @@ plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.
 | uyumlu | `p1-karisik` | taban | `-` | 1.552 | — |
 | uyumlu | `p1-karisik` | zones | `zones=<harita>` | 1.553 | +0.001 |
 | uyumlu | `p1-karisik` | qcomp | `qcomp=1.0` | 1.546 | -0.006 |
+| uyumlu | `p2-durgun` | taban | `-` | 1.901 | — |
+| uyumlu | `p2-durgun` | zones | `zones=<harita>` | 2.757 | +0.856 |
+| uyumlu | `p2-durgun` | qcomp | `qcomp=1.0` | 2.583 | +0.682 |
 
-Iki adayin da olculdugu hucre 1; hucre basina dusuk MAE'yi veren aday: `qcomp` 1.
+Iki adayin da olculdugu hucre 2; hucre basina dusuk MAE'yi veren aday: `qcomp` 2.
 
 Hangi adayin kazandigi tek basina bir sey soylemez: kazanc, kapatilmasi
 istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
@@ -387,8 +392,9 @@ istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
 | Yazilim kolu | Pencere | K1 acigi (pp) | En iyi aday | Kazanc (pp) | Acigin kapanan orani |
 |--------------|---------|---------------|-------------|-------------|----------------------|
 | uyumlu | `p1-karisik` | +0.261 | qcomp | +0.006 | 2.3% |
+| uyumlu | `p2-durgun` | -0.606 | qcomp | -0.682 | acik yok |
 
-Olculen 1 hucrenin 1 tanesinde en iyi aday tabani
+Olculen 2 hucrenin 1 tanesinde en iyi aday tabani
 gecti; gorulen en buyuk kazanc 0.006 pp.
 Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama
 pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite
@@ -411,6 +417,26 @@ cozunurluktedir — A/B icinde bu sorun yoktur.
 ## K7 — harita yanlisken dagitimin bedeli
 
 **bilinmiyor** — K7 kosulmadi.
+
+## Karari veren kodun kendisi olculdu
+
+Asagidaki karar bir programdan cikiyor; o program hep "gecti" diyorsa
+sayfadaki butun sayilar bosa gider. Bu yuzden kapi kodu uydurma girdiyle
+kosuldu: once dort sartin da saglandigi bir girdi (karar **degismeli**),
+sonra her seferinde tek bir sarti bozan girdiler.
+
+| Senaryo | Ne degisti | Beklenen karar | Cikan karar | Sonuc |
+|---------|------------|----------------|-------------|-------|
+| `temiz` | dort kapi da saglaniyor | girer | girer | gecti |
+| `p10-kaybi` | bir pencerede p10 kaybi 0,50 (esik 0,30) | girmez | girmez | gecti |
+| `band-asan` | bir kosum hedef bandin ustunde | girmez | girmez | gecti |
+| `k7-bedeli` | bozuk harita kaybi kendi hucresinin kazancini asiyor | girmez | girmez | gecti |
+| `olcum-yok` | k5 ve k7 dosyasi yok | karar-yok | karar-yok | gecti |
+
+Denenen senaryo 5, beklenen karari veren 5. Uretim
+`SahneButcesi rapor` cagrisidir; girdi `tools/sahne-butcesi/kapi-fikstur.py`,
+kosum `bash tools/sahne-butcesi/04-kapi-denemesi.sh`. Bu tablodaki sayilar
+uydurma; olculen sey kapinin **ayirt edip etmedigi**.
 
 ## Sonuc
 

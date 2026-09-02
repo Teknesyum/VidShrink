@@ -21,6 +21,7 @@ bash "$KOK/tools/sahne-butcesi/04-kapi-denemesi.sh"
 
 for kol in $KOLLAR; do for w in $PENCERELER; do kos plan "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k1   "$kol" "$w"; done; done
+for kol in $KOLLAR; do for w in $PENCERELER; do kos k4b  "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k5   "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k7   "$kol" "$w"; done; done
 
