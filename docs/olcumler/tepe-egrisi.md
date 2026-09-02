@@ -396,7 +396,7 @@ Hicbir tepe sabiti degismedi. Gerekce yanindaki cumle degisti
 | `HardwarePeakCeiling` = 1,10 | **olculdu, degismedi** | 1,50 hareketli kaynakta 4,636 ve 7,500'de en iyi p10'u veriyor, 10,236 ve 16,000'de 1,10'un altinda kaliyor; tek yonlu bir tavan cikmiyor |
 | `PeakOpensAtFloorRatio` = 6,0 | **olculdu, degismedi** | acilma noktasinin altinda (2,600 ve 4,636) kazanc en buyuk, ustunde soniyor — yani esik ters yerde; ama duzeltmesi taban orani ekseninde degil |
 | `PeakWidestAtFloorRatio` = 11,4 | **olculdu, degismedi** | 10,236 ve 16,000 oranlarinda p10 yayilimi 0,07-2,65; en genis noktada acmanin karsiligi yok |
-| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda 12 hucrenin dordunun ucunde 1,50 en iyi ya da esit p10'u veriyor; tek istisna hareketli/4,636 (−0,389). Bkz. K2 |
+| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda dort satirin ucunde 1,50 en iyi ya da esit p10'u veriyor; tek istisna hareketli/4,636 (−0,389). Bkz. K2 |
 | `BufferFactor` | **olculmedi** | her hucrede `bufsize` tepeyle birlikte oynadi; buffer'in payini tepeninkinden ayiran hucre yok |
 
 **Neden sabit degismedi.** Iki neden var ve ikisi de olcumden bagimsiz:
