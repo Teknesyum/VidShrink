@@ -303,7 +303,13 @@ public static class Rapor
         sb.AppendLine();
         sb.AppendLine("Kapi (olcumden once): p10 kazanci `>= +0,50`, en kotu sahne kazanci");
         sb.AppendLine("`>= +1,00`, ayni iki kaynakta; hicbir kaynakta p10 kaybi `> 0,30`;");
-        sb.AppendLine("her kosum hedef bandin icinde.");
+        sb.AppendLine("her kosum hedef bandin icinde ve asan kosum orani %0.");
+        sb.AppendLine();
+        sb.AppendLine("**Puanlar yalniz kol icinde karsilastirilabilir.** Plan cozunurlugu kola");
+        sb.AppendLine("gore degisiyor (T107 sonrasi ayni pencerede libx264 `1458x820`,");
+        sb.AppendLine("libx265 `1728x972`, libsvtav1 `1920x1080`); farkli cozunurlukten cikan");
+        sb.AppendLine("VMAF puanlari yan yana konmaz. `taban` ile `dagitim` ayni kolda ayni");
+        sb.AppendLine("cozunurluktedir — A/B icinde bu sorun yoktur.");
         sb.AppendLine();
 
         var hepsi = Oku(isKok, "k5", json, kollar);
