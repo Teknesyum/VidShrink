@@ -36,6 +36,7 @@ public static class Rapor
         sb.AppendLine();
 
         Ortam(sb, isKok);
+        Komutlar(sb);
         Sorulan(sb);
         Kaynaklar(sb, haritalar);
         var k2 = K1K2(sb, k1, haritalar, kollar);
@@ -67,6 +68,28 @@ public static class Rapor
         sb.AppendLine($"- Olculen agac: `{dal.Trim()}` @ `{sha.Trim()}` — butun kodlamalar bu");
         sb.AppendLine("  commit'te derlenmis ikiliyle kosuldu (`--no-incremental`).");
         sb.AppendLine($"- Ham cikti: `{isKok.Replace('\\', '/')}` (gitignore'lu).");
+        sb.AppendLine();
+    }
+
+    private static void Komutlar(StringBuilder sb)
+    {
+        sb.AppendLine("## Hangi sayi hangi komuttan cikti");
+        sb.AppendLine();
+        sb.AppendLine("Butun olcum tek komutla bastan kosar: `bash tools/sahne-butcesi/01-olcumu-kos.sh`.");
+        sb.AppendLine("Ikili her seferinde `--no-incremental` derlenir; `--no-build` kullanilmaz.");
+        sb.AppendLine();
+        sb.AppendLine("| Bolum | Ureten komut | Ham dosya |");
+        sb.AppendLine("|-------|--------------|-----------|");
+        sb.AppendLine("| Kaynaklar | `00-pencereleri-kes.sh`, sonra `SahneButcesi harita maks <pencere>` | `harita-<pencere>.json` |");
+        sb.AppendLine("| K1, K2 | `SahneButcesi k1 <kol> <pencere>` | `k1-<kol>-<pencere>.json` / `.csv` |");
+        sb.AppendLine("| K3 | olcum degil; kural `tools/sahne-butcesi/Butce.cs` | — |");
+        sb.AppendLine("| K4 | `SahneButcesi k4 maks p1-karisik` | `k4-izgara.csv` |");
+        sb.AppendLine("| K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |");
+        sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
+        sb.AppendLine("| bu sayfa | `SahneButcesi rapor` | — |");
+        sb.AppendLine();
+        sb.AppendLine($"Kollar: {string.Join(", ", Program.Kollar.Keys.Select(k => $"`{k}`"))}. " +
+                      $"Pencereler: {string.Join(", ", Program.Pencereler.Select(p => $"`{p.Ad}`"))}.");
         sb.AppendLine();
     }
 
