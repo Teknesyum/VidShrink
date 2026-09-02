@@ -91,6 +91,22 @@ Bu olmadan `result.Failure == CoreShare.ShareFailure.Cancelled` satirinda kural 
 yerine `CoreShare.` goruyor ve iki gercek tuketici uretim sayiliyordu: ilk kosum 30,
 duzeltilmis kosum 28 verdi.
 
+### Duzenegin dayandigi iki kosul
+
+Tarama `Tur.Uye` bicimindeki **nitelenmis** gorunumleri ariyor. Bu iki kosul saglanmazsa
+tuketici gozden kacar; ikisi de olculdu:
+
+1. **Uye adi niteliksiz yazilamaz.** `src/` altinda tek bir `using static` yok
+   (`grep -rn "using static" src/` bos doner), yani bir enum uyesine `Nvenc` diye
+   basvurulamiyor — C# zaten `case`/`switch` kolunda niteleme istiyor.
+2. **Basit tur adi tek anlamli.** Yansimanin verdigi 129 anahtarin (`Tur.Uye`) hicbiri
+   tekrar etmiyor; `VidShrink.Core` altinda ayni basit ada sahip iki tur yok, bu yuzden
+   `type.Name` kullanmak iki turu birbirine karistirmiyor.
+
+Niteleyici zinciri ayrica soyuluyor: `CoreShare.ShareFailure.Cancelled` gibi bir yazimda
+"onceki pencere" `CoreShare.` ile bitiyordu ve `==` gorunmuyordu. Bu kusur ilk kosumda
+iki uyeyi yanlis siniflandirdi (bkz. yukarida, 30 → 28).
+
 ### Ham cikti
 
 **Ham cikti dosyalari `.calisma/T150/` altinda ve `.gitignore`'da — dalla birlikte
