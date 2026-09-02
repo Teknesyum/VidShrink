@@ -1,0 +1,17 @@
+{
+  "contractId": "T106",
+  "auditorRunId": "acfc67f1a825d6d80",
+  "headSha": "bd78dd06c033df981635d307221b3636271f514d",
+  "diffHash": "7c49674b1b4cc2f5878f0d8032acf2ae1020e80f47d405057a74eb07c797b9d3",
+  "owns": [
+    "tools/VidShrink.Bench/Program.cs",
+    "docs/olcumler/olcu-gecerliligi.md",
+    "tests/VidShrink.Tests/VmafPoolingTests.cs",
+    "tests/VidShrink.Tests/VidShrink.Tests.csproj"
+  ],
+  "verification": [
+    "GECTI (tur 2). Tur 2 KRITIK'i kapandi: peak-curve tablosu gercek kosumda alti satirin altisinda 13 boru / 12 hucre, hata satiri zorlandi ve o da 12. Kare kilidi artik davranis olcuyor: FrameLock -> settb=AVTB mutasyonu --no-incremental derlemeyle tam 2 olcu dusurdu, biri gercek ffmpeg kosan. K1/K2/K5 sayilari ham JSON ve PSNR gunluklerinden yeniden turetildi, birebir tuttu. :96 iddiasi olculdu (93 kare <40 dB, 26'nin hepsi icinde). owns temiz, QualityMeter.cs'e dokunulmamis. CI 33580719123 headSha d56f27e5, Failed 0 / Passed 1037 / Skipped 86. KRITIK yok; on borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T02:23:52.630Z"
+}
