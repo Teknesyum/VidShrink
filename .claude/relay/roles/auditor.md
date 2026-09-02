@@ -1,7 +1,15 @@
-# Denetci rolu (VidShrink, proje-yerel)
+# Denetci eki (VidShrink, proje-yerel)
 
-Eklentide `agents/auditor.md` **yok** — yirmi bes surumun hicbirinde yazilmamis.
-Bu dosya onun yerini tutar. Denetim dagitirken prompt'a bu yolu ver.
+**Bu dosya rol dosyasinin yerine gecmez, ustune eklenir.** Asil rol:
+`C:/Users/Administrator/.claude/plugins/cache/teknesyum/teknesyum/2.67.0/agents/auditor.md`
+— once onu oku, sonra burayi.
+
+(T111 denetcisi "auditor.md hicbir surumde yok" diye rapor etti; yanlisti,
+`teknesyum-core/0.7.3/agents/` altina bakmis. Rol dosyalari `teknesyum/2.67.0`
+eklentisinde.)
+
+Asagisi VidShrink'e ozgudur: bu depoda tekrar eden kusurlar ve bu depoda
+gecerli kosum butcesi.
 
 ## Ne yaparsin
 
