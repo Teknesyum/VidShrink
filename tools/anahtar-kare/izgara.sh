@@ -24,5 +24,5 @@ EOF2
     echo "$s,$sn,$g,$kmin,$br,$(stat -c %s "$ISI/$ad.mp4"),$ik,$ar,$(python "$OZ" "$VMD/$ad.json" | tr ' ' ',')" >> "$CSV"
     echo "bitti $ad"
   done
-done < "$ROOT/.calisma/t133/bitrate.txt"
+done < "${BR_FILE:-$ROOT/.calisma/t133/bitrate.txt}"
 echo "IZGARA-BITTI $ETI"

@@ -14,7 +14,9 @@ kodla () {
   out="$ISI/$ad.mp4"
   [ -f "$out" ] && { echo "atlandi $ad"; return 0; }
   log="$ROOT/.calisma/t133/log/$ad"
-  if [ "$enc" = "libsvtav1" ]; then
+  if [ "${enc%_nvenc}" != "$enc" ]; then
+    ffmpeg -hide_banner -v error -nostdin -y -i "$src" -an -sn -dn       -c:v "$enc" -preset p5 -b:v "${br}k" -g "$g"       "$out" || return 1
+  elif [ "$enc" = "libsvtav1" ]; then
     ffmpeg -hide_banner -v error -nostdin -y -i "$src" -an -sn -dn \
       -c:v libsvtav1 -preset 4 -b:v "${br}k" -g "$g" -svtav1-params "keyint=$g:scd=1" \
       "$out" || return 1
