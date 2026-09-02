@@ -260,6 +260,25 @@ bugün türetilen bir işaret, `PlanCalculator` koşulu zaten biliyor ama
 yazmıyor. T99 o dosyayı tuttuğu için bu turda taşınamadı. **T99 mühürlenince
 açılacak ilk küçük iş budur.**
 
+## Taban indi, plan hala kaybedeni seciyor (T99, 2026-09-02)
+
+T99 av1 bppf tabanini 0,020'den 0,0095'e indirdi ve donanim carpanini 1,25'ten
+1,52'ye tasidi; ikisi de olcumden. Taban artik kazanan yerlesimi elemiyor.
+
+Ama sikayet kapanmadi. Olculen kazanan `1280x720@60`, `882x496@60`'in **6,39 puan**
+onunde — iki pencerede de ayni yonde. Plan hala `882x496@60` seciyor. **Eleyen taban
+degil, skor.** `PlanCalculator.LayoutScore` (`PlanCalculator.cs:618`) iki tahmin
+egrisinin farki: dusuk cozunurlukte `rate` firliyor, `ScalePenalty` onu 6,39 puan
+eksik dengeliyor. Iki yarisi da olculen kaliteye karsi hic kalibre edilmedi.
+
+Ders: **tabani indirmek kazanani secmeye yetmiyor.** Elek ile secici ayri seylerdir;
+biri duzeltilince oteki kendiliginde duzelmiyor. T107 bunu olcuye oturtuyor.
+
+Yan etki, T99'un kendi bildirdigi: carpan yukselince `hevc_nvenc` tabani da
+0,02196'dan 0,02671'e cikti ve **o taban olculmedi**. Donanim kolunda
+`UsableBitrateK` (706k = 0,01277 bppf) yeni tabandan siki, yani taban orada atil ve
+HandBrake'in 0,0116'lik noktasi hala disarida.
+
 ## Sonraki basamak
 
 1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
@@ -269,7 +288,9 @@ açılacak ilk küçük iş budur.**
    çakışması yukarıda; iki turdan biri `main`e girmeden öteki hizalanır.
 3. **T105** haritanın eşiğini ölçüye oturtur; T98 ve T104'ün gördüğü sahne
    sayısı değişir.
-4. **T99** taban kararını verir; T103 onun ardından açılır (örnekleme).
+4. **T99** taban kararını verdi (denetimde). Mühürlenince iki iş birden açılır:
+   **T107** yerleşim skorunu ölçüye oturtur (asıl şikâyet orada), **T103**
+   örneklemeyi alır.
 5. **T95** teslim edince T94 açılır — HDR hizası iki farklı aracı
    karşılaştırıyor, aletin adillik kapısı orada gerçekten lazım.
 6. `SceneMap` `PlanCalculator`a bağlanır — harita hâlâ tüketilmiyor.
