@@ -520,3 +520,29 @@ birlesmede kendiliginden dusecek.
 
 **Bundan sonra butun role commit'leri `.claude/worktrees/T0` uzerinden atilir.**
 Depo koku ajanlara birakildi. Ajan kaliplarina worktree satiri eklenecek — Core borcu.
+
+## T132 — tur 2 acildi (denetim KALDI, bir KRITIK)
+
+Denetci yerel kosum yapmadi (0 kosum) ve gerekcesini yazdi: CI `33637321742` filtresiz
+tam suiti kosuyor, yukte tekrar kosturmak hem T137'yi hem olcuyu bozardi. Bunun yerine
+K2'nin on iki dagilim satirinin **hepsini** ham CSV'den yeniden hesapladi — birebir
+tuttu. Manset kaymasi yok. Isin govdesi saglam; dusen tek sey bir yokluk beyani.
+
+**KRITIK:** `duvar-saati-iddialari.md:147` "besin disinda assert edilen yeni bant
+bulunmadi" diyor; ayni iki dosyada uc bant daha var (`UpdaterTests.cs:915,916,1141`).
+`:915/:916` gercek surec acilisina konmus 3 sn'lik sabit tavan — iddia 4'ten (1050 ms)
+daha kirilgan. Sebep: K5'in yazili tarama komutu `TimeSpan.From`, `DateTime.UtcNow` ve
+`Join(` desenlerini icermiyor. Kusur eksik bulmak degil, **eksik bulup "yok" demek.**
+
+Tur 2 kriterleri T1-T8: KRITIK'i kapatmak, daralan iki tavani mutasyonla pimlemek
+(denetcinin yapisal gozlemi: dort mutasyondan yalniz biri eski bandi yasatip yenisini
+olduruyor, yani iki daralmanin daralma olmasi hicbir olcuyle tutulmuyor), K0'in (iii)
+belirsizligini yazmak ve T141'e baglamak, eskiyen satir numarasi, adi yalan soyleyen
+`verify-final.log`, olu ham veri, yaris ifadesinin daraltilmasi, K1'in eksik sutunu.
+
+Borc (tur acmaz): iddia 4'un 1050 ms tavani en riskli daralma — `ManifestTimeout=800`
+ustune 250 ms pay, dagilim yalniz bu makinede olculdu.
+
+Denetci T141'in gerekcesini de bagimsiz dogruladi ve ek bir sey soyledi: yedek yol
+`SampleTimeout` ile tetiklendiginde **tam olarak `Calls=1`** uretir — yani K0'in (iii)
+adayinin mekanizmasi bu. T141 artik iki sozlesmeye birden hizmet ediyor.
