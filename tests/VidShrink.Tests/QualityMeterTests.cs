@@ -1,5 +1,6 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -459,6 +460,48 @@ public sealed class QualityMeterTests
 
         Assert.Equal(40.0, worst, 6);
         Assert.Equal(15.0, at, 6);
+    }
+
+    [Fact]
+    public void TheProductionMeasurementEntryPointCanCarryASceneMap()
+    {
+        var carriers = typeof(QualityMeter)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.Name is "MeasureAsync" or "MeasureWindowAsync")
+            .Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(SceneMap)))
+            .Select(m => m.Name)
+            .ToList();
+
+        Assert.True(carriers.Count > 0,
+            "no production measurement entry point accepts a SceneMap, so the map-aware arm of "
+            + "WorstScene can only ever be reached from tests");
+    }
+
+    [Fact]
+    public void TheWorstUnitReportsItsOwnLengthNotTheFixedWindow()
+    {
+        var reporters = typeof(QualityMeter)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.ReturnType.GetProperties().Any(p => p.Name == "UnitSeconds"))
+            .Select(m => m.Name)
+            .ToList();
+
+        Assert.True(reporters.Count > 0,
+            "nothing reports how long the winning unit actually was, so SceneWindowSeconds can "
+            + "only be filled from the constant 2.0 whichever arm ran");
+    }
+
+    [Fact]
+    public void ACollapseInAShortTrailingUnitStillReachesTheMeasurement()
+    {
+        var scores = Enumerable.Repeat(100.0, 975).ToArray();
+        for (var i = 960; i < 975; i++) scores[i] = 0.0;
+
+        var (worst, _) = QualityMeter.WorstScene(scores, 60, 0);
+
+        Assert.True(worst < 100.0,
+            $"the last 0.25 s of the clip scored zero and the measurement still reported {worst}: "
+            + "the trailing remainder is outside the metric");
     }
 
     [Fact]
