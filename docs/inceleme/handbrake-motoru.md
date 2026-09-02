@@ -341,11 +341,10 @@ sonucu doğuruyor:
 
 ### T102'nin `uzman-hb2` koşumu hangi preset'ti
 
-**Hiçbiri.** Komut (`docs/olcumler/auto-mod.md:209`):
+**Hiçbiri.** Komut (`docs/olcumler/auto-mod.md:231`):
 
 ```
-HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo \
-  -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900
+HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900
 ```
 
 Preset adı verilmemiş; alanlar tek tek bayrakla kurulmuş. Bayrakların preset
