@@ -1,5 +1,26 @@
 # HandBrake kalite açığı ölçümü
 
+> **DAMGA — kilitsiz ölçerden gelen satırlar (T94, 2026-09-02).** Bu dosyadaki bütün
+> kalite sayıları kare kilidi üretime girmeden önce ölçüldü. Kilit T110'da yazıldı
+> (`3688336`) ve T111'de üretim yoluna oturdu. T111 sonra T106'nın kilitli ölçtüğü
+> HandBrake en düşük karesini (76,219) aynı kilitle yeniden üretemedi, 94,211 aldı
+> (`d019478`); sebebi ölçülmedi. Yani ölçen aracın o dönemki hâli şüphelidir, hangi
+> satırın ne kadar etkilendiği bilinmiyor.
+>
+> Şüphe altındaki satırlar, yalnız **harmonik** ve **p10** sütunları:
+> "Düzeltilmiş gerçek-kaynak sonucu" tablosunun `HandBrake HDR ↔ kaynak HDR`
+> (34,59 / 33,16) ve `Eski VidShrink SDR ↔ tonemap edilmiş kaynak` (24,41 / 18,56)
+> satırları — HandBrake çıktısı AV1 10-bit, VidShrink çıktısı `av1_nvenc`; onlardan
+> türeyen 10,18 ve 14,60 farkları; "Aggressive rejimde beşli ablasyon" tablosunun
+> dört `av1_nvenc` satırı (Taban, Çözünürlük kapalı, FPS kapalı, Geniş tepe) ve
+> onlardan türeyen +5,87 / +7,22 / +8,65 / +13,76 farkları.
+>
+> Şüphe altında **olmayan**: ortalama VMAF sütunları, XPSNR, SSIM, boyut, süre ve
+> geometri sayıları; `libx265` satırı da AV1 kodlayıcı taşımıyor.
+>
+> Bu satırlar T94'te yeniden **ölçülmedi** — beş tam koşum ve VMAF geçişi gerekiyordu,
+> sözleşme kapsamı dışıydı. Sayılar olduğu gibi bırakıldı, üzerlerine yazılmadı.
+
 Tarih: 2026-09-01. Önceki eş-boyut kalite tablosu renk/aralık düzeneği bozuk olduğu için geçersizdir. Gerçek 17 dakikalık HDR kaynakla düzeltilmiş tam ölçümde HandBrake VMAF-NEG 48,96; eski VidShrink çıktısı aynı tonemap referansına karşı 40,17 verdi. Sıkıştırma farkı 8,79 puandır; HDR→SDR renk kaybı ayrı tutulur ve iki renk uzayı doğrudan puanlanmaz.
 
 ## Düzen ve eksikler
@@ -14,6 +35,20 @@ Kullanıcının 17:16 oyun kaynağı ve depodaki canlı kaynak bu çalışma ağ
 | `hareketli-hdr-12s.mkv` | 12,00 sn, 1280×720@60 HEVC 10-bit | 65.359.789 | `smpte2084` | **hable tonemap var** |
 
 HDR komutunda açıkça `zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709...format=yuv420p` üretildi. Sebep, hızlı sıranın ilk kodlayıcısı `av1_nvenc` iken `HdrResolver.Hdr10Codecs` kümesinde `av1_nvenc` bulunmaması. Dolayısıyla PQ/BT.2020 kaynak sessizce bt709 8-bit'e düşüyor.
+
+> **Bu paragraf yazıldığı tarihte (2026-09-01) doğruydu; `28637a4`'ten sonra bayattır.**
+> `HdrResolver.Hdr10Codecs` diye bir küme bugünkü kodda yoktur. Yerine `HdrResolver`
+> içinde `SoftwareHdr10Codecs = { libx265, libsvtav1 }` var ve karar iki dala ayrılıyor:
+> kodek bu kümedeyse yalnız kodlayıcı olarak çalışıp çalışmadığına bakılıyor
+> (`IEncoderAvailability.WorksAsEncoder`), kümede değilse — `av1_nvenc` dahil —
+> `IHdr10EncoderAvailability.Hdr10PixelFormat` ile canlı yoklamaya soruluyor. Yoklama
+> `EncoderCapabilities.ProbeHdr10PixelFormat`; gerçek bir kare kodlayıp `p010le` ve
+> `yuv420p10le` biçimlerini sırayla dener, ilk kabul edileni döndürür, ikisi de
+> tutmazsa `null` verir. Bu makinede `av1_nvenc` `p010le` döndürüyor, dolayısıyla
+> hızlı yol tonemap etmiyor; ölçümü aşağıda "T94 doğrulaması" başlığındadır.
+> Düşüş yaşandığında da sessiz değildir: `HdrResolution.PolicyChanged` planı
+> `ReasonCode.HdrTonemapped` ve `AdviceCode.HdrTonemapped` ile işaretler, arayüz bunu
+> plan neden satırında Türkçe ve İngilizce gösterir.
 
 ### Şikâyet tabanının yeniden üretimi
 
@@ -127,6 +162,17 @@ Tonemap hizalı sıkıştırma farkı HandBrake lehine ortalamada **8,79**, harm
 Her iki giriş `ffprobe` ile okunuyor. SDR'de etiketsiz `yuv420p` için açıkça bt709 limited varsayılıyor ve iki kol da aynı `zscale` renk/aralık zincirine sokuluyor. HDR ve SDR doğrudan karşılaştırılmak istenirse metrikler boş dönüyor ve “karşılaştırılamaz” açıklaması veriliyor. Sıkıştırmayı ayrı ölçmek için referansa motorun birebir `HdrResolver.TonemapFilter` zincirini uygulayan yol kullanıldı.
 
 Aynı dosyanın kendisiyle testi ve yalnız bt709 etiketleri eklenmiş metadata-remux testi ham model tavanı yaklaşık 99,87 olan sonucu kullanıcıya **VMAF 100**, XPSNR `inf` olarak verdi. Böylece yalnız etiket farkının kaliteyi düşürmediği doğrulandı.
+
+> **Bu cümle yazıldığı tarihte (2026-09-01) doğruydu; T97'den sonra yalnız VMAF yarısı
+> bayattır.** `QualityMeter` içindeki `NormalizeVmafCeiling` kelepçesi kaldırıldı
+> (`e290624`): [99,8; 100] bandını 100'e çökerten adım yok, ham VMAF-NEG raporlanıyor.
+> Aynı iki test bugün koşulsa VMAF sütununda 100 değil ham model tavanı (yaklaşık
+> 99,87) görünür. XPSNR tarafı değişmedi; `inf` hâlâ olduğu gibi geçiyor. Cümlenin
+> sonucu — yalnız etiket farkının kaliteyi düşürmediği — ayakta.
+>
+> Bu dosyadaki ölçüm sayılarının hiçbiri etkilenmedi: 48,96 / 40,17 / 34,59 / 33,16 /
+> 24,41 / 18,56 / 22,31 hepsi 99,8'in çok altında, kelepçenin bandına hiç girmiyor;
+> 8,79 puanlık açık yerinde duruyor.
 
 ### HDR motor düzeltmesi
 

@@ -1,3 +1,4 @@
+using VidShrink.App;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -197,5 +198,82 @@ public sealed class HdrArgumentsTests
         Assert.Contains("yuv420p", args);
         Assert.DoesNotContain("yuv420p10le", args);
         Assert.Contains(args, a => a.Contains("tonemap=hable"));
+    }
+
+    [Fact]
+    public void ProbeAnswerDecidesFastPathPixelFormatNotTheCodecName()
+    {
+        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var encoders = new FakeAvailability("av1_nvenc");
+
+        var p010 = PlanCalculator.BuildDetailed(Hdr10Info(), options, null,
+            new MutatedAvailability(encoders, new FixedHdrAvailability("p010le")));
+        var planar = PlanCalculator.BuildDetailed(Hdr10Info(), options, null,
+            new MutatedAvailability(encoders, new FixedHdrAvailability("yuv420p10le")));
+
+        Assert.Equal("av1_nvenc", p010.Plan.Codec);
+        Assert.Equal("av1_nvenc", planar.Plan.Codec);
+        Assert.Equal("p010le", p010.Plan.PixelFormat);
+        Assert.Equal("yuv420p10le", planar.Plan.PixelFormat);
+        Assert.Contains("p010le", FfmpegArguments.Build(Hdr10Info(), p010.Plan, "out.mp4", 0, null));
+        Assert.Contains("yuv420p10le", FfmpegArguments.Build(Hdr10Info(), planar.Plan, "out.mp4", 0, null));
+    }
+
+    [Fact]
+    public void SoftwareHdr10SetMembershipDecidesPreservationWhenProbeSaysNothing()
+    {
+        IHdr10EncoderAvailability silentProbe = new NoHdrAvailability();
+
+        var inSet = HdrResolver.Resolve(Hdr10Info(), HdrPolicy.Preserve, "libx265",
+            new MutatedAvailability(new FakeAvailability("libx265"), silentProbe));
+        var outOfSet = HdrResolver.Resolve(Hdr10Info(), HdrPolicy.Preserve, "libx264",
+            new MutatedAvailability(new FakeAvailability("libx264"), silentProbe));
+
+        Assert.False(inSet.PolicyChanged);
+        Assert.Equal("yuv420p10le", inSet.PixelFormat);
+        Assert.Null(inSet.VideoFilter);
+
+        Assert.True(outOfSet.PolicyChanged);
+        Assert.Equal("yuv420p", outOfSet.PixelFormat);
+        Assert.Contains("tonemap=hable", outOfSet.VideoFilter!);
+    }
+
+    [Fact]
+    public void RequestedTonemapIsNotReportedAsAPolicyChange()
+    {
+        var availability = new FakeAvailability("av1_nvenc");
+
+        var forced = HdrResolver.Resolve(Hdr10Info(), HdrPolicy.Preserve, "libx264", new FakeAvailability("libx264"));
+        var asked = HdrResolver.Resolve(Hdr10Info(), HdrPolicy.TonemapToSdr, "av1_nvenc", availability);
+
+        Assert.Contains("tonemap=hable", forced.VideoFilter!);
+        Assert.Contains("tonemap=hable", asked.VideoFilter!);
+        Assert.True(forced.PolicyChanged);
+        Assert.False(asked.PolicyChanged);
+    }
+
+    [Fact]
+    public void DroppedHdrReachesTheUserAsAPlanLineInBothLanguages()
+    {
+        var options = new PlanOptions { TargetMb = 40, SpeedMode = SpeedMode.Fast, HdrPolicy = HdrPolicy.Preserve };
+        var availability = new MutatedAvailability(new FakeAvailability("av1_nvenc"), new NoHdrAvailability());
+
+        var dropped = PlanCalculator.BuildDetailed(Hdr10Info(), options, null, availability);
+        var kept = PlanCalculator.BuildDetailed(Hdr10Info(), options, null, new FakeAvailability("av1_nvenc"));
+
+        Assert.Contains(AdviceCode.HdrTonemapped, dropped.Advice.Notes);
+        Assert.DoesNotContain(AdviceCode.HdrTonemapped, kept.Advice.Notes);
+
+        var turkish = MainWindow.AdviceLine(AdviceCode.HdrTonemapped, language: "tr", fastGpu: false);
+        var english = MainWindow.AdviceLine(AdviceCode.HdrTonemapped, language: "en", fastGpu: false);
+
+        Assert.False(string.IsNullOrWhiteSpace(turkish));
+        Assert.False(string.IsNullOrWhiteSpace(english));
+        Assert.NotEqual(turkish, english);
+    }
+
+    private sealed class FixedHdrAvailability(string pixelFormat) : IHdr10EncoderAvailability
+    {
+        public string? Hdr10PixelFormat(string codec) => pixelFormat;
     }
 }

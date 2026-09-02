@@ -63,8 +63,8 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
         lock (_hdr10PixelFormats)
         {
             if (_hdr10PixelFormats.TryGetValue(codec, out var cached)) return cached;
-            var result = ProbeHdr10PixelFormat(codec);
-            _hdr10PixelFormats[codec] = result;
+            var (result, timedOut) = ProbeHdr10PixelFormat(codec);
+            if (!timedOut) _hdr10PixelFormats[codec] = result;
             return result;
         }
     }
@@ -79,21 +79,32 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
         lock (_probed)
         {
             if (_probed.TryGetValue(codec, out var cached)) return cached;
-            var result = HasEncoder(codec) ? ProbeEncoder(codec) : EncoderProbeResult.Missing(codec);
-            _probed[codec] = result;
+            if (!HasEncoder(codec))
+            {
+                var missing = EncoderProbeResult.Missing(codec);
+                _probed[codec] = missing;
+                return missing;
+            }
+            var (result, timedOut) = ProbeEncoder(codec);
+            if (!timedOut) _probed[codec] = result;
             return result;
         }
     }
 
-    private static EncoderProbeResult ProbeEncoder(string codec)
+    private static (EncoderProbeResult Result, bool TimedOut) ProbeEncoder(string codec)
     {
         var stopwatch = Stopwatch.StartNew();
-        var succeeded = RunProbe(codec);
+        var outcome = RunProbe(codec);
         stopwatch.Stop();
-        return new EncoderProbeResult(codec, succeeded, stopwatch.ElapsedMilliseconds);
+        return (new EncoderProbeResult(codec, outcome == ProbeOutcome.Accepted, stopwatch.ElapsedMilliseconds),
+                outcome == ProbeOutcome.TimedOut);
     }
 
-    private static bool RunProbe(string codec)
+    internal const int ProbeKillMs = 15000;
+
+    private enum ProbeOutcome { Accepted, Rejected, TimedOut }
+
+    private static ProbeOutcome RunProbe(string codec)
     {
         try
         {
@@ -108,35 +119,40 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
             process.Start();
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
-            if (!process.WaitForExit(4000))
+            if (!process.WaitForExit(ProbeKillMs))
             {
                 try { process.Kill(true); } catch { }
-                return false;
+                return ProbeOutcome.TimedOut;
             }
             Task.WaitAll(new Task[] { output, error }, 1000);
-            return process.ExitCode == 0;
+            return process.ExitCode == 0 ? ProbeOutcome.Accepted : ProbeOutcome.Rejected;
         }
         catch
         {
-            return false;
+            return ProbeOutcome.Rejected;
         }
     }
 
-    private string? ProbeHdr10PixelFormat(string codec)
+    private (string? PixelFormat, bool TimedOut) ProbeHdr10PixelFormat(string codec)
     {
-        if (!HasEncoder(codec)) return null;
+        if (!HasEncoder(codec)) return (null, false);
+        var timedOut = false;
         foreach (var pixelFormat in new[] { "p010le", "yuv420p10le" })
-            if (RunProbe(codec, pixelFormat)) return pixelFormat;
-        return null;
+            switch (RunProbe(codec, pixelFormat))
+            {
+                case ProbeOutcome.Accepted: return (pixelFormat, false);
+                case ProbeOutcome.TimedOut: timedOut = true; break;
+            }
+        return (null, timedOut);
     }
 
-    private static bool RunProbe(string codec, string pixelFormat)
+    private static ProbeOutcome RunProbe(string codec, string pixelFormat)
     {
         try
         {
             var args = new[]
             {
-                "-hide_banner", "-loglevel", "error",
+                "-hide_banner", "-loglevel", "warning",
                 "-f", "lavfi", "-i", "testsrc2=size=256x256:rate=30:duration=0.1",
                 "-vf", $"format={pixelFormat}", "-c:v", codec, "-pix_fmt", pixelFormat,
                 "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc",
@@ -146,19 +162,24 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
             process.Start();
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
-            if (!process.WaitForExit(4000))
+            if (!process.WaitForExit(ProbeKillMs))
             {
                 try { process.Kill(true); } catch { }
-                return false;
+                return ProbeOutcome.TimedOut;
             }
             Task.WaitAll(new Task[] { output, error }, 1000);
-            return process.ExitCode == 0;
+            return PixelFormatAccepted(process.ExitCode, error.Result) ? ProbeOutcome.Accepted : ProbeOutcome.Rejected;
         }
         catch
         {
-            return false;
+            return ProbeOutcome.Rejected;
         }
     }
+
+    internal static bool PixelFormatAccepted(int exitCode, string diagnostic)
+        => exitCode == 0
+           && !diagnostic.Contains("Incompatible pixel format", StringComparison.OrdinalIgnoreCase)
+           && !diagnostic.Contains("auto-selecting format", StringComparison.OrdinalIgnoreCase);
 
     private static bool RunOptionProbe(string codec, string option, string value)
     {
@@ -175,7 +196,7 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
             process.Start();
             var stdout = process.StandardOutput.ReadToEndAsync();
             var stderr = process.StandardError.ReadToEndAsync();
-            if (!process.WaitForExit(4000))
+            if (!process.WaitForExit(ProbeKillMs))
             {
                 try { process.Kill(true); } catch { }
                 return false;
