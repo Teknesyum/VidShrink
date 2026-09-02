@@ -569,7 +569,7 @@ public sealed class PlanCalculatorTests
         var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
 
         Assert.Equal("libx265", result.Plan.Codec);
-        Assert.Equal(1, makine.YoklamaSayisi("libsvtav1"));
+        Assert.Equal(2, makine.YoklamaSayisi("libsvtav1"));
         Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.EncoderFallback && n.RequestedCodec == "libsvtav1" && n.FallbackCodec == "libx265");
     }
 
@@ -657,7 +657,7 @@ public sealed class PlanCalculatorTests
     }
 
     [Fact]
-    public void CompatibleYoluHicYoklamiyor()
+    public void CompatibleYolununPlanKodlayicisiYoklanmiyorTavsiyeninkiYoklaniyor()
     {
         var makine = new SurucusuzMakine(built: NvencliDerleme, works: YalnizYazilim);
         var options = new PlanOptions { TargetMb = 25, Intent = Intent.Sharing, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality };
@@ -665,8 +665,12 @@ public sealed class PlanCalculatorTests
         var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, makine);
 
         Assert.Equal("libx264", result.Plan.Codec);
-        foreach (var codec in NvencliDerleme)
-            Assert.Equal(0, makine.YoklamaSayisi(codec));
+        Assert.Equal(0, makine.YoklamaSayisi("libx264"));
+        Assert.Equal(0, makine.YoklamaSayisi("h264_nvenc"));
+
+        Assert.Equal(CodecPreference.MaxCompression, result.Advice.SuggestedPreference);
+        Assert.Equal(1, makine.YoklamaSayisi("libsvtav1"));
+        Assert.Equal("libx265", result.Advice.SuggestedCodec);
     }
 
     [Fact]

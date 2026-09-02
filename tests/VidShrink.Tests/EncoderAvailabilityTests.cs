@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -140,7 +140,7 @@ public sealed class EncoderAvailabilityTests
     }
 
     [Fact]
-    public void KusurKaydiPickCodecYoklamayaDegilDerlemeListesineBakiyor()
+    public void PickCodecArtikDerlemeListesineDegilYoklamayaBakiyor()
     {
         var makine = new Makine(
             built: new[] { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "av1_nvenc" },
@@ -152,8 +152,8 @@ public sealed class EncoderAvailabilityTests
             null,
             makine);
 
-        Assert.Equal("h264_nvenc", result.Plan.Codec);
-        Assert.Equal(0, makine.YoklamaSayisi("h264_nvenc"));
-        Assert.DoesNotContain(AdviceCode.EncoderFallback, result.Advice.Notes);
+        Assert.Equal("libx264", result.Plan.Codec);
+        Assert.Equal(1, makine.YoklamaSayisi("h264_nvenc"));
+        Assert.Contains(AdviceCode.EncoderFallback, result.Advice.Notes);
     }
 }
