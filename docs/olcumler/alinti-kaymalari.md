@@ -132,10 +132,14 @@ satırı, `LanguageCatalog.cs` hiçbir zaman çeviri sözlüğü olmadı") yazı
 
 > **Geri çekildi (bkz. "Tur 3" bölümü aşağıda).** Buradaki "hiçbir zaman çeviri
 > sözlüğü olmadı" ifadesi tur 1 denetiminde KALDI aldı — `LanguageCatalog.cs`
-> gerçekten bir çeviri sözlüğü taşımıştı (`19af115`), sözlük `774b187`'de
-> kaldırıldı. Tur 2'de "künye doğruydu, bayatladı" olarak düzeltildi, ama tur 2'nin
-> kendi "hangi commit kaldırdı" iddiası da yanlış çıktı (bkz. Tur 3). Doğru hâli
-> `docs/inceleme/uygulama-katmani.md` madde 90'da duruyor.
+> gerçekten bir çeviri sözlüğü taşımıştı (`19af115`). İki ayrı olay var, tek cümlede
+> birleştirilmemeli: sözlük *mekanizması* (`EnglishToTurkish`/`TurkishToEnglish`/
+> `Localize`) `b976332`'de (T83, 2026-08-30) kaldırıldı; alıntılanan spesifik *dizge*
+> ise ayrı ve daha erken bir olay — kaynaktan `774b187`'de (2026-08-22, Avalonia
+> geçişi) düştü, mekanizmadan sekiz gün önce. Tur 2'de "künye doğruydu, bayatladı"
+> olarak düzeltildi, ama tur 2'nin kendi "hangi commit kaldırdı" iddiası da yanlış
+> çıktı (bkz. Tur 3). Doğru hâli `docs/inceleme/uygulama-katmani.md` madde 90'da
+> duruyor.
 Yeniden kosturma sonrası araç bu paragraftan **KAYMA üretmedi** (eski yanlış dizge hâlâ
 metinde ama artık bir künyeye bitişik "iddia" olarak okunmuyor — `KAYMA: 0  SATIR
 KAYDI: 1` (T125'in bulgusu), `.calisma/T126/mutasyon-sonuc.txt`'ten sonraki son kosum).
@@ -285,6 +289,16 @@ kaldırdı — ama gerçek kaldırma T0'ın belirttiği gibi `b976332` (T83) ile
 tamamının silinmesiyle oldu (`774b187` WPF→Avalonia geçişinde LanguageCatalog zaten
 başka bir haldeydi; kronolojik sıra `19af115` → ... → `b976332` → ... → `774b187`).
 
+**Tur 4 düzeltmesi — yukarıdaki cümle yanlış (silinmiyor, çürütülüyor).** İlk yarısı
+doğru: `774b187` gerçekten dizgeyi kaldırdı. Ama "ama gerçek kaldırma ... `b976332`
+ile ... oldu" ve tersine çevrilmiş kronoloji (`19af115` → `b976332` → `774b187`)
+yanlış — iki ayrı olayı (dizge ve sözlük *mekanizması*) tek olay saymış, sırayı da
+tersine çevirmiş. `b976332`, dizgenin düşüşünden 488 commit sonra, sözlük
+*mekanizmasını* kaldırdı; dizgeyle ilgisi yok, çünkü dizge o noktada zaten sekiz
+gündür kaynakta değildi. Doğru kronoloji ve bağımsız komut kanıtı için bkz. aşağıdaki
+"## Tur 3 — K12" bölümü, "Bağımsız doğrulama" alt bölümü — orada aynı komutlar ayrıca
+koşturulup doğru sıra (`19af115` → `774b187` → `b976332`) kayıt altına alındı.
+
 **Diligence — diğer üç "kaynakta hiç yok" iddiası da aynı komutla tekrar kontrol edildi**
 (K10'un zorunlu kıldığı yalnız 6 numaraydı, kalanlar ek özen):
 
@@ -405,3 +419,82 @@ talimatta verilen commit'i (`b976332`) yazdım.
    paragrafa (yukarıda, K3 bölümünde) geri çekildiğine işaret eden bir not eklendi —
    önceden yalnız 100 satır aşağıdaki "Tur 2" bölümünde geri çekiliyordu, yukarıdan
    okuyan fark etmiyordu.
+
+## Tur 4 — K13 (mekanik tarama)
+
+Danışman gerekçesi: KRİTİK 2, T0'ın hatasının kalıntısı değil, tur 3'ün kendi
+düzeltmesinin geri tepmesiydi — "kaldıran commit `774b187`" dersi öğrenilip yanlış
+cümleye (sözlük) taşındı. Bu turun kuralı: **cümleyi okuyup karar verme, komut
+çıktısına bak.** `git grep -n -E "774b187|b976332" -- docs/` çıktısının tamamı (36
+satır) aşağıda, satır satır, "dizge" ya da "mekanizma" etiketiyle.
+
+### Kanıt blokları (tablo bunlara referans verir)
+
+**Dizge** (`Target Size Media Compression & Media Converter`):
+```
+$ git grep -c '<dizge>' 774b187^ -- src/   →  1  (774b187'den önce var)
+$ git grep -c '<dizge>' 774b187  -- src/   →  0  (774b187'nin kendisinde yok)
+$ git grep -c '<dizge>' b976332^ -- src/   →  0  (b976332'den önce de yok)
+$ git grep -c '<dizge>' b976332  -- src/   →  0
+```
+Kaldıran: **`774b187`**.
+
+**Mekanizma** (`EnglishToTurkish` — sözlük/`Localize` kümesinin izi):
+```
+$ git grep -c EnglishToTurkish 774b187^ -- src/  →  3  (774b187'den önce var)
+$ git grep -c EnglishToTurkish 774b187  -- src/  →  4  (774b187'nin KENDİSİNDE de var — kaldırılmadı)
+$ git grep -c EnglishToTurkish b976332^ -- src/  →  5  (b976332'den önce var)
+$ git grep -c EnglishToTurkish b976332  -- src/  →  0  (b976332'nin kendisinde yok)
+```
+Kaldıran: **`b976332`**.
+
+### Tablo
+
+| # | Konum | Etiket | Kanıt | Durum |
+|---|-------|--------|-------|-------|
+| 1 | uygulama-katmani.md:89 | mekanizma | mekanizma-bloğu | doğru |
+| 2 | uygulama-katmani.md:97 | dizge | dizge-bloğu | doğru |
+| 3 | uygulama-katmani.md:98 | dizge | dizge-bloğu | doğru |
+| 4 | uygulama-katmani.md:99 | dizge | dizge-bloğu | doğru |
+| 5 | uygulama-katmani.md:100 | dizge | dizge-bloğu | doğru |
+| 6 | uygulama-katmani.md:101 | dizge | dizge-bloğu | doğru |
+| 7 | uygulama-katmani.md:102 | dizge | dizge-bloğu | doğru |
+| 8 | uygulama-katmani.md:103 | dizge | dizge-bloğu | doğru (tur 2'nin yanlış cümlesini alıntılayıp çürütüyor) |
+| 9 | uygulama-katmani.md:104 | mekanizma | mekanizma-bloğu | doğru |
+| 10 | uygulama-katmani.md:107 | dizge | dizge-bloğu | doğru |
+| 11 | alinti-kaymalari.md:135 | mekanizma | mekanizma-bloğu | **YANLIŞTI → tur 4'te (a) ile düzeltildi** |
+| 12 | alinti-kaymalari.md:259 | mekanizma | mekanizma-bloğu | doğru |
+| 13 | alinti-kaymalari.md:267 | mekanizma | mekanizma-bloğu | doğru |
+| 14 | alinti-kaymalari.md:277 | dizge | dizge-bloğu | doğru (git log -S ham çıktısı) |
+| 15 | alinti-kaymalari.md:283 | dizge | dizge-bloğu | **YANLIŞTI → tur 4'te (b) ile çürütüldü** |
+| 16 | alinti-kaymalari.md:284 | dizge | dizge-bloğu | **YANLIŞTI → tur 4'te (b) ile çürütüldü** |
+| 17 | alinti-kaymalari.md:285 | dizge | dizge-bloğu | **YANLIŞTI → tur 4'te (b) ile çürütüldü** |
+| 18 | alinti-kaymalari.md:286 | dizge | dizge-bloğu | **YANLIŞTI → tur 4'te (b) ile çürütüldü** |
+| 19 | alinti-kaymalari.md:344 | dizge | dizge-bloğu | doğru |
+| 20 | alinti-kaymalari.md:345 | dizge | dizge-bloğu | doğru |
+| 21 | alinti-kaymalari.md:346 | dizge | dizge-bloğu | doğru |
+| 22 | alinti-kaymalari.md:348 | dizge | dizge-bloğu | doğru |
+| 23 | alinti-kaymalari.md:357 | dizge | dizge-bloğu | doğru (git log -S ham çıktısı) |
+| 24 | alinti-kaymalari.md:360 | dizge | dizge-bloğu | doğru |
+| 25 | alinti-kaymalari.md:361 | dizge | dizge-bloğu | doğru |
+| 26 | alinti-kaymalari.md:363 | dizge | dizge-bloğu | doğru |
+| 27 | alinti-kaymalari.md:364 | dizge | dizge-bloğu | doğru |
+| 28 | alinti-kaymalari.md:366 | dizge | dizge-bloğu | doğru |
+| 29 | alinti-kaymalari.md:367 | dizge | dizge-bloğu | doğru |
+| 30 | alinti-kaymalari.md:369 | mekanizma | — (`774b187..b976332` mesafesi, 488) | doğru (bkz. "Düzelmeyecekler" — 486/487/488 tutarsızlığı burada değil, `:376`'da) |
+| 31 | alinti-kaymalari.md:373 | dizge | dizge-bloğu | doğru |
+| 32 | alinti-kaymalari.md:375 | dizge | dizge-bloğu | doğru |
+| 33 | alinti-kaymalari.md:376 | mekanizma | mekanizma-bloğu | doğru (rakam "486" burada — bilinen tutarsızlık, bu tur dokunulmadı) |
+| 34 | alinti-kaymalari.md:386 | mekanizma | mekanizma-bloğu | doğru |
+| 35 | alinti-kaymalari.md:396 | dizge | dizge-bloğu | doğru |
+| 36 | alinti-kaymalari.md:397 | dizge | dizge-bloğu | doğru (tur 2'nin `b976332` talimatını yanlış yazdığını anlatıyor) |
+
+**Toplam 36 satır.** Dizge: 28 (satır 2-8, 10, 14-18, 19-29, 31-32, 35-36).
+Mekanizma: 8 (satır 1, 9, 11-13, 30, 33-34). Yanlış çıkan: **2 iddia** — #11
+(`:135`, tek satır) ve #15-18 (`:283-286`, tek cümle/4 satır) — ikisi de bu turda
+(a) ve (b) ile düzeltildi, satır numaraları taramanın koşturulduğu commit'e göredir
+(düzeltmeler eklendikten sonra dosyadaki gerçek satır numaraları kayar).
+
+**Not:** satır 30 ve 33'teki "486/487/488" tutarsızlığı (gerçek sayı `git rev-list
+--count 774b187..b976332` → **488**, doğrulandı) bu taramada görüldü ama K13'ün
+"dokunulmayacaklar" listesinde — düzeltilmedi, mühür notuna borç olarak kalıyor.
