@@ -388,6 +388,13 @@ Mutasyon denemesi — her satır kaç ölçü düşürüyor:
   kapatıldı (eşleme artık damgaya bakmıyor). Ama teslim edilen dosyanın kaynaktan
   3,3 ms kaymış olması **ürün tarafında ayrı bir soru**: ses/görüntü eşzamanı
   bundan etkileniyor mu? Ölçülmedi, ayrı sözleşme ister.
+- **Yerel tam süit bir ölçüde kırmızı verdi:**
+  `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor` (1100 geçti, 1 kaldı).
+  Ölçü boş makinede ffmpeg hızını ölçüp `ProcessorCount-1` iş parçacığıyla yük
+  bindirdikten sonrakiyle kıyaslıyor; altı ajan koşarken "boş" okuma boş değil.
+  İki bağımsız kanıtla eleme: tek başına koşturulunca **geçti**, ve aynı commit'te
+  **CI yeşil** (`33575828972`). Bu sözleşmenin dokunduğu hiçbir dosya
+  (`tools/VidShrink.Bench`) bu ölçünün yolunda değil.
 - **Süre sayısı verilmedi.** Makine altı ajanla paylaşımlıydı; kodlama koşumlarında
   iş parçacığı sabitlendi (`-threads 4`, `pools=4`, `lp=4`) ama süre yine de
   güvenilmez. Bu belgedeki **kalite ve boyut** sayıları paylaşımdan etkilenmez.
