@@ -187,6 +187,45 @@ Plan: `libx264` 2pass 2612k 1458x820@60 preset `slow` hedef 60 MB. Referans topl
 | 0 | 0.0 | 41.9 | 1.01 | 21.23 | 20.56 | 22.34 | -0.67 | +1.11 |
 | 1 | 41.9 | 147.1 | 1.00 | 78.77 | 79.44 | 77.66 | +0.67 | -1.11 |
 
+### yedek / p1-karisik
+
+Plan: `libx265` 2pass 2610k 1728x972@60 preset `slow` hedef 60 MB. Referans toplami 496.4 Mbit, plan ciktisi 490.7 Mbit (referans/plan = 1.01x).
+
+| Sahne | Bas (sn) | Sure (sn) | Karmasiklik | hak edilen (pp) | verilen (pp) | harita (pp) | verilen−hak | harita−hak |
+|-------|----------|-----------|-------------|-----------------|--------------|-------------|-------------|------------|
+| 0 | 0.0 | 14.9 | 0.96 | 5.29 | 6.92 | 7.51 | +1.64 | +2.22 |
+| 1 | 14.9 | 11.1 | 0.76 | 3.61 | 5.41 | 4.45 | +1.80 | +0.84 |
+| 2 | 25.9 | 13.0 | 0.64 | 3.94 | 5.52 | 4.39 | +1.58 | +0.45 |
+| 3 | 38.9 | 2.4 | 0.79 | 0.64 | 0.97 | 1.01 | +0.33 | +0.37 |
+| 4 | 41.4 | 4.6 | 0.70 | 1.39 | 1.85 | 1.70 | +0.46 | +0.31 |
+| 5 | 45.9 | 10.6 | 0.75 | 2.69 | 3.92 | 4.22 | +1.23 | +1.53 |
+| 6 | 56.6 | 2.1 | 0.94 | 0.73 | 1.00 | 1.03 | +0.27 | +0.31 |
+| 7 | 58.6 | 6.1 | 0.74 | 1.61 | 2.38 | 2.39 | +0.77 | +0.78 |
+| 8 | 64.8 | 5.0 | 0.76 | 1.60 | 2.33 | 2.03 | +0.74 | +0.43 |
+| 9 | 69.8 | 2.1 | 0.77 | 0.50 | 0.77 | 0.84 | +0.27 | +0.33 |
+| 10 | 71.8 | 39.6 | 1.77 | 49.26 | 32.31 | 37.02 | -16.95 | -12.24 |
+| 11 | 111.4 | 3.1 | 0.71 | 0.82 | 1.22 | 1.16 | +0.40 | +0.34 |
+| 12 | 114.5 | 6.3 | 0.93 | 3.07 | 4.49 | 3.09 | +1.43 | +0.02 |
+| 13 | 120.8 | 4.3 | 0.65 | 1.20 | 1.62 | 1.49 | +0.43 | +0.30 |
+| 14 | 125.1 | 3.8 | 0.74 | 1.50 | 2.21 | 1.47 | +0.71 | -0.02 |
+| 15 | 128.9 | 6.2 | 0.68 | 1.67 | 2.11 | 2.24 | +0.43 | +0.57 |
+| 16 | 135.1 | 8.3 | 0.76 | 1.76 | 2.22 | 3.30 | +0.45 | +1.54 |
+| 17 | 143.4 | 7.2 | 0.90 | 2.77 | 3.82 | 3.42 | +1.06 | +0.65 |
+| 18 | 150.5 | 3.6 | 0.65 | 0.79 | 1.10 | 1.24 | +0.31 | +0.45 |
+| 19 | 154.2 | 5.2 | 0.69 | 1.41 | 1.82 | 1.90 | +0.41 | +0.49 |
+| 20 | 159.4 | 2.8 | 0.90 | 1.33 | 1.80 | 1.34 | +0.46 | +0.01 |
+| 21 | 162.2 | 3.5 | 0.62 | 0.88 | 1.26 | 1.14 | +0.38 | +0.26 |
+| 22 | 165.7 | 5.7 | 0.86 | 2.16 | 3.18 | 2.61 | +1.01 | +0.45 |
+| 23 | 171.4 | 2.1 | 0.62 | 0.50 | 0.74 | 0.68 | +0.24 | +0.18 |
+| 24 | 173.4 | 2.0 | 0.98 | 0.90 | 1.23 | 1.02 | +0.32 | +0.12 |
+| 25 | 175.4 | 2.3 | 0.71 | 0.55 | 0.69 | 0.88 | +0.13 | +0.32 |
+| 26 | 177.8 | 5.7 | 0.87 | 1.53 | 2.08 | 2.64 | +0.56 | +1.12 |
+| 27 | 183.5 | 5.7 | 1.25 | 5.90 | 5.03 | 3.77 | -0.87 | -2.13 |
+
+### yedek / p2-durgun
+
+- **bilinmiyor**: plan passthrough (hevc); kodlama yok, sahneye bit dagitilmiyor
+
 ## K2 — kodlayicinin dagitimi bizim onerimizle yan yana
 
 Kapi (`ESIKLER.md`, olcumden once): (1) `rho(verilen,hak) >= 0,80`,
@@ -201,12 +240,17 @@ Ucu birden saglaniyorsa is biter ve kod degismez.
 | uyumlu | `p1-karisik` | 28 | 0.990 | 0.979 | 1.55 | 1.29 | 0/28 (0%) | evet | **hayir** | evet |
 | uyumlu | `p2-durgun` | 6 | 0.829 | 0.657 | 1.90 | 2.51 | 2/6 (33%) | evet | evet | **hayir** |
 | uyumlu | `p3-hareketli` | 2 | 1.000 (n=2, anlamsiz) | 1.000 | 0.67 | 1.11 | 2/2 (100%) (n=2, anlamsiz) | evet | evet | **hayir** |
+| yedek | `p1-karisik` | 28 | 0.986 | 0.969 | 1.27 | 1.03 | 1/28 (4%) | evet | **hayir** | evet |
+| yedek | `p2-durgun` | 6 | bilinmiyor | bilinmiyor | bilinmiyor | bilinmiyor | bilinmiyor | — | — | — |
 
-**K2 kapisi kapanmadi.** Olculen 6 hucreden 1 tanesinde ucu birden saglandi.
+**K2 kapisi kapanmadi.** Olculen 7 hucreden 1 tanesinde ucu birden saglandi.
 
-- K1 kapisi (`rho(verilen,hak) >= 0,80`): 6/6 hucre
-- K2 kapisi (`MAE(verilen) <= MAE(harita)`): 4/6 hucre
-- K3 kapisi (ters dusen orani `< %20`): 2/6 hucre
+- K1 kapisi (`rho(verilen,hak) >= 0,80`): 7/7 hucre
+- K2 kapisi (`MAE(verilen) <= MAE(harita)`): 4/7 hucre
+- K3 kapisi (ters dusen orani `< %20`): 3/7 hucre
+
+Olculemeyen 1 hucre (varsayilana dusurulmedi, ayri satir):
+- **bilinmiyor** — yedek/p2-durgun: plan passthrough (hevc); kodlama yok, sahneye bit dagitilmiyor
 
 Sahne sayisi 4'un altindaki pencerede sira korelasyonu anlamsizdir ve o
 sutunda isaretlidir; o pencerede karari MAE tasir. Sahne sayisi icerigin
