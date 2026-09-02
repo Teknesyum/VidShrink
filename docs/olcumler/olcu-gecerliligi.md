@@ -235,19 +235,29 @@ kusurdan etkilenmişti.**
 
 | koşum | min | `<1,0` kare | ortalama | harmonik | p10 |
 |---|---|---|---|---|---|
-| AV1 auto — eski (damga eşli) | 0,000 | 26 | 94,462 | **56,313** | 94,534 |
-| AV1 auto — yeni (indeks kilitli) | **92,391** | **0** | 95,659 | **95,655** | 94,904 |
-| x265 HandBrake — eski | 74,701 | 0 | 95,763 | 95,759 | 95,396 |
-| x265 HandBrake — yeni | 76,219 | 0 | 95,799 | 95,793 | 95,473 |
+| `auto` (AV1) — eski (damga eşli) | 0,000 | 26 | 94,462 | **56,313** | 94,534 |
+| `auto` (AV1) — yeni (indeks kilitli) | **92,391** | **0** | 95,659 | **95,655** | 94,904 |
+| `uzman-hb` (x265) — eski | 74,701 | 0 | 95,763 | 95,759 | 95,396 |
+| `uzman-hb` (x265) — yeni | 76,219 | 0 | 95,799 | 95,793 | 95,473 |
 
-**Harmonik ortalamada AV1 ile x265 arası fark: 39,446 → 0,138.**
+**T111'de düzeltildi: satır etiketleri hangi koşumu gösterdiğini söylemiyordu.**
+"x265 HandBrake" yazan iki satırın verisi `uzman-hb` koşumundan geliyor — `-b 2026`
+ile koşan, boyut eşitlemeye **girmemiş** olan. K3'ün karşılaştırmasını taşıyan koşum
+`uzman-hb2` (`-b 1900`, min 74,667). İkisi karıştırılmamalı, çünkü boyutları
+farklı: `auto` 15 766 933 bayt, `uzman-hb` 16 745 000 bayt — x265 dosyası
+**%6,2 daha büyük**.
+
+**Harmonik ortalamada `auto` ile `uzman-hb` arası fark: 39,446 → 0,138.**
 p10 farkı 0,862 → 0,569. HandBrake tarafı da kusurdan bir miktar etkilenmiş
 (min 74,70 → 76,22); yani düzeltme her iki tarafı da yukarı çekiyor, ama
 AV1 tarafını kıyaslanamayacak kadar fazla.
 
 Yol haritasının "AV1'i x265'e karşı 39,4 puan geride gösteriyor" tespiti doğruydu;
-sebebi yanlıştı. **Ölçülen gerçek fark 0,14 puan — yani bu kaynakta iki kodlayıcı
-kalitede başa baş.**
+sebebi yanlıştı. **Kilit takıldığında kalan fark 0,138 puan.** Bu sayı iki
+kodlayıcının **başa baş olduğunu göstermez**: karşılaştırılan iki dosyadan x265
+olanı %6,2 daha büyük, yani fark boyut lehine kirli. Boyut eşitlenmiş çift
+(`auto` ↔ `uzman-hb2`) bu belgede **ölçülmedi**; T111'de ölçülüyor ve sonucu
+`docs/olcumler/auto-mod.md`'nin T111 bölümünde.
 
 ---
 
