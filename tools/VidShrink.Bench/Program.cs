@@ -481,8 +481,8 @@ static async Task<int> PeakCurveAsync(string[] args)
 
     var floorK = CodecModel.MinBitrateK(codec, info.Width, info.Height, info.Fps);
     Console.WriteLine($"kaynak {Path.GetFileNameWithoutExtension(source)} | {info.Width}x{info.Height}@{info.Fps:0.##} | {codec} | taban {floorK}k | donanim={CodecModel.IsHardware(codec)}");
-    Console.WriteLine("| oran | tepe | uretim tepesi | b:v k | maxrate k | bufsize k | boyut MB | mean | harm | p10 |");
-    Console.WriteLine("|---|---|---|---|---|---|---|---|---|---|");
+    Console.WriteLine("| oran | tepe | uretim tepesi | b:v k | maxrate k | bufsize k | boyut MB | mean | harm | p10 | min | kelepce |");
+    Console.WriteLine("|---|---|---|---|---|---|---|---|---|---|---|---|");
 
     var rows = new List<object>();
     foreach (var ratio in ratios)
@@ -516,7 +516,7 @@ static async Task<int> PeakCurveAsync(string[] args)
                 await process.WaitForExitAsync();
                 if (process.ExitCode != 0)
                 {
-                    Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | hata | - | - | - |");
+                    Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | hata | - | - | - | - | - |");
                     Console.Error.WriteLine(error.Trim());
                     continue;
                 }
@@ -524,7 +524,7 @@ static async Task<int> PeakCurveAsync(string[] args)
 
             var sizeMb = new FileInfo(outputPath).Length / 1024.0 / 1024.0;
             var vmaf = await VmafNegAsync(source, outputPath, info.Width, info.Height);
-            Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | {sizeMb:0.###} | {Fmt(vmaf.Mean)} | {Fmt(vmaf.Harmonic)} | {Fmt(vmaf.P10)} | {vmaf.FloorClampedFrames} |");
+            Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | {sizeMb:0.###} | {Fmt(vmaf.Mean)} | {Fmt(vmaf.Harmonic)} | {Fmt(vmaf.P10)} | {Fmt(vmaf.Min)} | {vmaf.FloorClampedFrames} |");
             rows.Add(new
             {
                 Ratio = ratio,

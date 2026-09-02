@@ -1,3 +1,8 @@
+﻿using System.Diagnostics;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using VidShrink.Core;
+using VidShrink.Ffmpeg;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -134,8 +139,6 @@ public class VmafPoolingTests
         var test = Assert.Single(branches, b => b.StartsWith("[0:v]"));
         var reference = Assert.Single(branches, b => b.StartsWith("[1:v]"));
 
-        Assert.Contains("settb=AVTB,setpts=N", test);
-        Assert.Contains("settb=AVTB,setpts=N", reference);
         Assert.EndsWith("[t]", test);
         Assert.EndsWith("[r]", reference);
         Assert.Contains("[t][r]libvmaf=", graph);
@@ -148,7 +151,155 @@ public class VmafPoolingTests
 
         var test = graph.Split(';').Single(b => b.StartsWith("[0:v]"));
 
-        Assert.True(test.IndexOf("scale=", StringComparison.Ordinal) < test.IndexOf("setpts=N", StringComparison.Ordinal), test);
-        Assert.Contains("settb=AVTB,setpts=N", test);
+        Assert.True(
+            test.IndexOf("scale=", StringComparison.Ordinal) < test.IndexOf("setpts", StringComparison.Ordinal),
+            test);
+    }
+
+    [Fact]
+    public async Task KareKilidi_AltKareKaymasinaRagmen_KareleriDogruEsler()
+    {
+        var frames = await OlcumSerisiAsync(MeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"));
+
+        Assert.Equal(BeklenenKareSayisi, frames.Count);
+        Assert.All(frames, y => Assert.True(y >= TamEslesmeEsigi,
+            $"kaynak kendisiyle karsilastirildi ama tam eslesmedi; en dusuk psnr_y={frames.Min():0.##} dB"));
+    }
+
+    [Fact]
+    public async Task KareKilidiOlmadan_AltKareKaymasi_SkorDizisiniCokertir()
+    {
+        var kilitsiz = $"[0:v]scale=w=160:h=120:flags=lanczos[t];[1:v]null[r];[t][r]psnr=stats_file=psnr.log";
+
+        var frames = await OlcumSerisiAsync(kilitsiz);
+
+        Assert.True(frames.Min() < TamEslesmeEsigi,
+            $"kare kilidi olmadan da tam eslesme cikti: olcu {KaymaSaniye}s'lik kaymaya duyarsiz");
+    }
+
+    [Fact]
+    public async Task OlcumSerisi_KareKilidi_GoreceliKaydirilinca_Bozulur()
+    {
+        var kaydirilmis =
+            "[0:v]scale=w=160:h=120:flags=lanczos,settb=AVTB,setpts=N+1[t];" +
+            "[1:v]settb=AVTB,setpts=N[r];" +
+            "[t][r]psnr=stats_file=psnr.log";
+
+        Assert.NotEqual(MeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"), kaydirilmis);
+
+        var frames = await OlcumSerisiAsync(kaydirilmis);
+
+        Assert.True(frames.Min() < TamEslesmeEsigi,
+            $"iki akis birbirine gore bir kare kaydirildigi halde olcu tam eslesme veriyor: " +
+            $"en dusuk psnr_y={frames.Min():0.##} dB");
+    }
+
+    [Fact]
+    public void KodekTercihi_AutoIleCompatible_AgresifHedefte_FarkliKodlayiciSecer()
+    {
+        var info = OyunKaydi();
+        var profil = OlculenProfil();
+
+        var uyumlu = Kodek(info, profil, CodecPreference.Compatible);
+        var oto = Kodek(info, profil, CodecPreference.Auto);
+
+        Assert.NotEqual(uyumlu, oto);
+    }
+
+    [Fact]
+    public void KodekTercihi_PlanaGercektenGecer_VarsayilaninaDusmez()
+    {
+        var info = OyunKaydi();
+        var profil = OlculenProfil();
+
+        var secilen = Enum.GetValues<CodecPreference>()
+            .ToDictionary(p => p, p => Kodek(info, profil, p));
+
+        Assert.True(secilen.Values.Distinct().Count() > 1,
+            "butun kodek tercihleri ayni kodlayiciyi verdi: tercih plana gecmiyor olabilir");
+    }
+
+    private static string Kodek(MediaInfo info, ComplexityProfile profil, CodecPreference tercih)
+        => PlanCalculator.BuildDetailed(
+            info,
+            new PlanOptions { TargetMb = 1.5, Codec = tercih, FillPolicy = FillPolicy.FillTarget },
+            profil,
+            EncoderCapabilities.Instance).Plan.Codec;
+
+    private static MediaInfo OyunKaydi() => new()
+    {
+        FilePath = "kaynak.mp4",
+        FileSizeBytes = 830L * 1024 * 1024,
+        DurationSeconds = 52.6,
+        Width = 1920,
+        Height = 1080,
+        Fps = 48.0,
+        VideoCodec = "h264",
+        TotalBitrateBps = 132_000_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 160_000,
+        AudioChannels = 2
+    };
+
+    private static ComplexityProfile OlculenProfil() => new()
+    {
+        ReferenceBppf = 0.1264,
+        Measured = true,
+        MotionExponent = 0.55,
+        MotionMeasured = true,
+        DetailExponent = 0.55,
+        SampledSeconds = 6,
+        SampledFrames = 288
+    };
+
+    private const int BeklenenKareSayisi = 60;
+    private const double TamEslesmeEsigi = 80.0;
+    private const string KaymaSaniye = "0.004";
+
+    private static async Task<IReadOnlyList<double>> OlcumSerisiAsync(string graph)
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_kilit_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var kaynak = Path.Combine(dir, "kaynak.mkv");
+
+            await FfmpegAsync(dir, "-v", "error", "-y", "-nostdin", "-f", "lavfi",
+                "-i", $"testsrc2=size=160x120:rate=30:duration={BeklenenKareSayisi / 30.0:0.###}",
+                "-c:v", "ffv1", kaynak);
+
+            await FfmpegAsync(dir, "-v", "error", "-y", "-nostdin",
+                "-i", kaynak,
+                "-itsoffset", KaymaSaniye, "-i", kaynak,
+                "-lavfi", graph, "-f", "null", "-");
+
+            var log = Path.Combine(dir, "psnr.log");
+            Assert.True(File.Exists(log), "psnr gunlugu uretilmedi");
+
+            var values = new List<double>();
+            foreach (var line in await File.ReadAllLinesAsync(log))
+            {
+                var m = Regex.Match(line, @"psnr_y:(inf|[0-9.]+)");
+                if (m.Success)
+                    values.Add(m.Groups[1].Value == "inf"
+                        ? double.PositiveInfinity
+                        : double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture));
+            }
+            return values;
+        }
+        finally { try { Directory.Delete(dir, true); } catch { } }
+    }
+
+    private static async Task FfmpegAsync(string workingDirectory, params string[] args)
+    {
+        var psi = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
+        psi.WorkingDirectory = workingDirectory;
+        using var process = new Process { StartInfo = psi };
+        process.Start();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        await Task.WhenAll(stdout, stderr);
+        Assert.True(process.ExitCode == 0, await stderr);
     }
 }

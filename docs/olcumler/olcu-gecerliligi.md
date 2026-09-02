@@ -31,11 +31,16 @@ Ham JSON'dan sayıldığında bu iki ayrı eşiğin karışmış hâli:
 Tam sıfır sayısı dörtte 25, `uzman-biz3`'te 24 — orada 3389. kare 0,132882.
 
 **"Birebir aynı" iddiası `<1,0` eşiğinde doğru, `==0` eşiğinde değil.** Ölçüldü:
-altı AV1 koşumunun `<1,0` kümesi birbirinin aynısı, 26/26 örtüşüyor, hiçbirinde
-fazla ya da eksik kare yok. İki x265 koşumunda küme boş.
+**dokuz** AV1 koşumunun `<1,0` kümesi birbirinin aynısı, 26/26 örtüşüyor, simetrik
+farkları boş. İki HandBrake koşumunda küme boş. Tam sıfır sayısı ise koşumdan
+koşuma **24-25** arasında oynuyor — kümenin sabit, sıfır sayısının değişken
+olması `max(x,1)` kelepçesinin ikisini ayırt etmediğini gösteriyor.
 
-Ortak küme: **1699** ve **3385-3410** aralığından 25 kare (3384, 3406, 3409 kümenin
-dışında; 3384 = 2,15, 3406 = 0,95, 3409 = 12,38 — yani blok "kesintisiz" değil).
+Ortak küme, tam tanımıyla: **{1699} ∪ {3385…3408} ∪ {3410}** — yani
+`{1699} ∪ ({3385…3410} \ {3409})`, toplam **26 kare**.
+Sınır kareleri: 3384 = 2,15 ve 3409 = 12,38 kümenin **dışında**;
+3406 = 0,945848 < 1,0 olduğu için kümenin **içinde**. Blok bu yüzden
+"kesintisiz" değil: 3409 aralığın ortasında bir delik açıyor.
 
 Bu ayrım pratikte önemsiz, çünkü bench'in harmonik formülü
 `scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0))` — **`max(x,1)` kelepçesi
@@ -93,8 +98,15 @@ Dosyanın hiçbir yerinde 44,7 dB'nin altına inen kare yok. Çıktı sağlam.
 ### (a) libvmaf'in kendisi AV1'de kareleri yanlış hizalıyor — **elendi**
 
 Kusur libvmaf'te olsaydı `psnr` filtresinde görünmezdi. Görünüyor: aynı dosya çifti,
-aynı ffmpeg, sadece `psnr` — **birebir aynı karelerde** çöküyor. Ortak olan şey
-libvmaf değil, ikisinin de kullandığı **framesync**.
+aynı ffmpeg, sadece `psnr` — **VMAF'in çöktüğü 26 karenin hepsinde** PSNR de
+çöküyor. Ortak olan şey libvmaf değil, ikisinin de kullandığı **framesync**.
+
+Sınırını yazmak gerekiyor: iki küme **birebir aynı değil**. Damga eşli PSNR'de
+`psnr_y < 40 dB` olan **93 kare** var; VMAF'in 26 karesi bunların **öz alt kümesi**
+(67 kare fazladan). Eleme yine de geçerli — elemeyi taşıyan şey "kümeler eşit"
+değil, "VMAF'in suçladığı her kareyi libvmaf'siz bir ölçü de suçluyor". Kalan 67
+kare de aynı kaymanın eseri; PSNR eşiğinin 40 dB'de olması onları görünür,
+VMAF'in doygunluğu ise görünmez kılıyor.
 
 ### (b) Boru hattımız kareleri kaydırıyor — **kaldı, sebebi bulundu**
 
@@ -196,8 +208,17 @@ sonucu tanımsız yapıyor. Ama kelepçe artık **sessiz değil**:
 - `VmafPool.Min` — **kelepçelenmemiş** gerçek en düşük skor,
 - `VmafPool.Suspect` — kelepçelenen kare varsa doğru.
 
-Harmonik ortalamanın basıldığı üç yerin üçü de artık yanına
-`(SUPHELI: n kare 1 altında, tabana kelepcelendi)` yazıyor. Kelepçenin
+Harmonik ortalamanın basıldığı üç yer, kelepçeyi **iki ayrı biçimde** ama üçü de
+görünür şekilde yazıyor:
+
+- `shrink` özeti (`Program.cs:788`) ve `compare` çıktısı (`:917`) serbest metin
+  damgası basıyor: `(SUPHELI: n kare 1 altında, tabana kelepcelendi)`.
+- `peak-curve` tablosu (`:484-527`) markdown olduğu için serbest metin
+  basamıyor; onun yerine **başlıklı iki sütun** ekliyor: `min` ve `kelepce`.
+
+Bu ayrım kasıtlı: tabloya serbest metin damgası basmak sütun hizasını bozar.
+Doğrulaması iddiaya değil çıktıya soruldu — `peak-curve` gerçek koşumda
+başlık, ayıraç, veri ve hata satırlarının **dördü de 12 hücre** üretiyor. Kelepçenin
 0 ile 0,13'ü ayrı tutmadığı `VmafPoolingTests` içinde ölçüye bağlandı:
 `SifirIleTabanAltiKucukDeger_HarmonikOrtalamada_AyniKefeyeKonur`.
 
@@ -325,7 +346,22 @@ sevk edilen modunu hiç ölçmemişti.
 `--codec-preference auto|compatible|maxcompression|fast` eklendi, **varsayılan `Auto`** —
 yani bench artık uygulamanın kendi varsayılanıyla ölçüyor.
 
-Koşum (`.calisma/t106/k5/kaynak.mkv`, 12 sn, hedef 1,5 MB, `--plan-only`):
+Bu ayrım **ölçüye bağlandı**, koşum kaydına değil:
+`KodekTercihi_AutoIleCompatible_AgresifHedefte_FarkliKodlayiciSecer` ve
+`KodekTercihi_PlanaGercektenGecer_VarsayilaninaDusmez` — ikincisi bütün
+`CodecPreference` değerlerini plana sokup en az ikisinin farklı kodlayıcı
+seçtiğini doğruluyor, yani tercihin plana **geçtiğini** tutuyor.
+
+Koşumun kendisi `.calisma/` altında ve git'e gitmiyor; tekrar üretmek için
+kaynağa ihtiyaç duymayan hâli:
+
+```
+ffmpeg -y -f lavfi -i "testsrc2=size=1920x1080:rate=60:duration=12"        -c:v libx264 -pix_fmt yuv420p kaynak.mp4
+dotnet run --project tools/VidShrink.Bench -c Release --        shrink kaynak.mp4 1.5 --plan-only --codec-preference compatible
+dotnet run --project tools/VidShrink.Bench -c Release --        shrink kaynak.mp4 1.5 --plan-only --codec-preference auto
+```
+
+Ölçülen koşum (`.calisma/t106/k5/kaynak.mkv`, 12 sn, hedef 1,5 MB, `--plan-only`):
 
 | `--codec-preference` | seçilen kodek |
 |---|---|
@@ -352,9 +388,40 @@ karşılaştırma için kullanılmamalı.
 
 ---
 
+## Kare kilidinin gerekçesi — T110 bunu referans alacak
+
+Bu bölüm ölçüm aracının dışında da geçerli. `src/VidShrink.Ffmpeg/QualityMeter.cs:278`
+üretim yolunda **aynı açık duruyor**: kare kilidi yok. `--measured-quality` ve
+kalibrasyon çıpaları o yoldan geçiyor. **Bu sözleşme oraya dokunmadı** (sahibi
+T110); aşağısı o iş için gerekçedir.
+
+Neden `settb=AVTB,setpts=N`, neden başka bir şey değil:
+
+- **Neden bir şey gerekiyor.** ffmpeg'in iki girdili filtreleri (`psnr`, `libvmaf`,
+  `xpsnr`) kareleri **zaman damgasıyla** eşler: "damgası test karesinden küçük-eşit
+  olan **en son** referans karesi". Yarım kareden küçük, tek yönlü bir sapma bile
+  tam bir kare kaydırma üretir. Sapma sabit olduğu için de kaydırma **her karede**
+  tekrarlanır.
+- **Neden `setpts=N`.** Kareleri damgaya değil **sıraya** göre eşler. Kaynak ile
+  çıktının kare sayısı aynı olduğu sürece — ki ölçüm bunu zaten varsayıyor —
+  n'inci kare n'inci kareyle karşılaşır. Kare hızından bağımsızdır;
+  `setpts=N/FRAME_RATE/TB` bilinen ve sabit bir kare hızı ister, `setpts=N` istemez.
+- **Neden `settb=AVTB` önce.** `N` sayacını sabit ve ince bir zaman tabanına yazar;
+  girdinin kendi tabanı kaba olduğunda (ör. 1/30) kesir tik'ler yuvarlanmaz.
+- **Neden ölçeklemeden sonra.** `scale` kendi çıktı damgasını üretir; kilit önce
+  gelirse ölçekleyici onu ezer.
+- **Sınırı.** Kilit kare **sayıları eşitse** doğrudur. Ölçüm zaten eşit sayı
+  varsayıyor; eşit değilse doğru davranış hizalamak değil, **ölçümü reddetmektir**.
+  Bu sözleşme o reddi eklemedi — T110 için açık uç.
+
+---
+
 ## K6 — Düzeltmeyi tutan ölçüler
 
-`tests/VidShrink.Tests/VmafPoolingTests.cs`, 10 ölçü:
+`tests/VidShrink.Tests/VmafPoolingTests.cs`, **15 ölçü**. Havuzlama tarafı sabit
+dizilerle, kare kilidi tarafı **gerçek ffmpeg koşumuyla** ölçülüyor.
+
+Havuzlama (saf, hızlı):
 
 - taban altı kare yokken harmonik tanıma birebir uyuyor,
 - taban altı kareler sayılıyor, `Min` **kelepçelenmeden** raporlanıyor,
@@ -362,13 +429,48 @@ karşılaştırma için kullanılmamalı.
 - tek bir 0 harmonik ortalamayı, ortalamanın düşüşünün 20 katından fazla düşürüyor,
 - taban altı kare sayısı arttıkça harmonik tek yönlü düşüyor (0/1/5/25/26),
 - sabit dizide üç istatistik de aynı değeri veriyor,
-- boş dizi 0 değil `null` dönüyor, NaN sessizce yutulmuyor,
-- ölçüm filtresi iki girdiyi de kare indeksine kilitliyor, kilit ölçeklemeden sonra geliyor.
+- boş dizi 0 değil `null` dönüyor, NaN sessizce yutulmuyor.
 
-Mutasyon denemesi — her satır kaç ölçü düşürüyor:
+Kare kilidi (davranışsal — kusurun küçük ölçekli kopyası):
+
+Ölçü, T106'nın kusurunu minyatürde yeniden kuruyor. Tek bir kaynak üretiliyor
+(`testsrc2`, 160x120, 30 fps, 60 kare, kayıpsız ffv1) ve **kendisiyle**
+karşılaştırılıyor; referans girdiye `-itsoffset 0.004` veriliyor. 4 ms, 33 ms'lik
+karenin altında — tam olarak sahadaki 3,3 ms'lik kayma gibi.
+
+- kilitliyken 60 karenin hepsi tam eşleşiyor (`psnr_y = inf`),
+- kilit olmadan aynı çift çöküyor (`psnr_y` en düşük **23,53 dB**),
+- iki akış birbirine göre bir kare kaydırılınca skor dizisi bozuluyor.
+
+Mutasyon denemesi — her satır kaç ölçü düşürüyor. **Her tur `--no-incremental`
+ile yeniden derlendi;** artımlı derleme bir turda bayat ikili koşturup yanlış
+sonuç verdi:
 
 | mutasyon | düşen ölçü |
 |---|---|
+| `Math.Max(raw, HarmonicFloor)` → `raw` (kelepçe kalkar) | 2 |
+| `Min` kelepçelenmiş değerden hesaplanır | 2 |
+| taban altı sayacı yalnız `raw == 0.0` sayar | 2 |
+| **`FrameLock` → `settb=AVTB` (kare kilidi kalkar)** | **2** |
+| `FrameLock` → `settb=AVTB,setpts=N+1` | 0 — **eşdeğer mutasyon** |
+| `FrameLock` → `settb=AVTB,setpts=PTS-STARTPTS` | 0 — zayıf ama geçerli almaşık |
+
+Son iki satır ölçünün açığı değil, mutasyonun kendi özelliği; ikisi de yazılmadan
+bırakılmıyor:
+
+- **`setpts=N+1` eşdeğer.** Sabit iki dalda birden kullanılıyor, yani her iki akışı
+  **aynı miktarda** kaydırıyor. Framesync eşleşmesi değişmiyor; yalnız çıktının
+  mutlak damgaları bir tik kayıyor. Hiçbir davranışsal ölçü bunu yakalayamaz,
+  çünkü ortada davranış farkı yok. Yakalanması gereken şey **göreli** kayma, ve o
+  ayrı bir ölçüyle pimlenmiş durumda (üstteki üçüncü madde).
+- **`PTS-STARTPTS` hayatta çünkü bu kusuru gerçekten düzeltiyor.** İki akışı da
+  başlangıcına göre sıfırlıyor, sabit ofseti siliyor. `setpts=N`'i tercih etme
+  sebebi: damga *titreşimliyse* (kare başına değişen sapma) `PTS-STARTPTS`
+  yetmez, indeks kilidi yeter. Bu üstünlüğü **ölçemedim** — jitter'lı bir damga
+  dizisini bu ffmpeg sürümünde diske yazdıramadım (mkv/nut/avi üçü de CFR'ye
+  normalize etti), o yüzden almaşığın zayıflığı burada **gerekçe, kanıt değil**.
+
+---|---|
 | `Math.Max(raw, HarmonicFloor)` → `raw` (kelepçe kalkar) | 2 |
 | `Min` kelepçelenmiş değerden hesaplanır | 2 |
 | taban altı sayacı yalnız `raw == 0.0` sayar | 2 |
