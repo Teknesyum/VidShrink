@@ -631,9 +631,14 @@ karşılaşılan eksikler — hepsi T97'nin girdisi:
 `ColorGateAbTests` 9, `SizeParityAbTests` 8, `ChunkAggregateAbTests` 8,
 `SensitivityAbTests` 6, `GeometryGateAbTests` 5, `AbSettingsAbTests` 4,
 `HandBrakeArgumentsAbTests` 4, `DeviationAbTests` 1); kalan 13 `SettingsTabTests`
-süzgece adından ötürü takılıyor. Elli altısının elli altısı düz `[Fact]` —
-`ci-gibi-kos.sh`'in ffmpeg yokluğunda atladığı ölçülerin içinde bu sözleşmenin
-hiçbir kabul kriteri yok.
+süzgece adından ötürü takılıyor. Elli altısının elli altısı düz `[Fact]`.
+
+Bunun ffmpeg'siz CI'da ne anlama geldiği tahminle değil **koşum günlüğüyle**
+kapatıldı: CI koşumu `33590657090`'ın atladığı 72 ölçünün sıfırı `AbTests`
+(aşağıda "Tam süit"). Yani bu sözleşmenin hiçbir kabul kriteri atlananların
+içinde değil. Eskiden bu cümle `ci-gibi-kos.sh`'e dayanıyordu; o dayanak
+**geçersiz** — betik ffmpeg'i PATH'ten siliyor ve T115'ten sonra CI'ı temsil
+etmiyor (T118).
 
 Renk kapısı, geometri kapısı, eş boyut toleransı, hedef arayışı, parça
 birleştirme (p10 dahil), duyarlılık eşiği ve HandBrake bit hızı hesabı üretim
@@ -654,14 +659,34 @@ varlığını ve orta noktasını pimliyor.
 
 ### Tam süit
 
-Yerel `tools/ci-gibi-kos.sh --no-build` koşumu `381e8ab` üzerinde **0 çıkış
-koduyla** bitti; koşum bu makinede yedi ajanla paylaşımlı koştuğu için yeniden
-açılmadı. **Geçti/kaldı/atlandı dökümü yakalanamadı — ölçülmedi**, çünkü koşumun
-çıktısı boruda kaldı. Bağlayıcı sayı CI'ınki:
+| koşum | headSha | sonuç | toplam | geçti | kaldı | atlandı |
+|---|---|---|---|---|---|---|
+| CI `33590657090` (`ci`, `T95-ab-duzenegi`) | `381e8ab` | success | 1139 | 1067 | 0 | **72** |
 
-| koşum | commit | sonuç |
-|---|---|---|
-| CI (`ci`, `T95-ab-duzenegi`) | `381e8ab` | _(koşum kimliği ve sonucu buraya)_ |
+Koşum süzgeçsiz: `.github/workflows/ci.yml:31` → `tools/kosum-kapisi/kosum-kapisi.ps1`
+→ `dotnet test -c Release --no-restore`, `--filter` yok. Yani bütün çözüm koştu.
+
+**Bu koşum `AbTests` ölçülerini kapsıyor.** Atlanan 72 satırın **sıfırı** `AbTests`
+(koşum günlüğündeki `Skipped VidShrink…` satırları sayıldı: 72 satır, `AbTests`
+eşleşmesi 0). Bu sözleşmenin 56 ölçüsünün 56'sı düz `[Fact]` ve süzgeç
+yok — dolayısıyla ikisi bir arada: ölçüler toplandı ve atlananların içinde
+değiller, yani geçenlerin içindeler. Yeşil bu sözleşme hakkında **konuşuyor.**
+
+**Ama yeşilin kapsamı dar, ve bunu yazmak gerekiyor.** Bu koşum **ffmpeg'siz
+CI**'da koştu: `main`in bugünkü CI'ında ffmpeg kurulu değil, atlanan 72 ölçünün
+tamamı bu yüzden atlanıyor (`Live…`, `PerformanceCheck…`, `ExtremeCompression…`,
+`CalibrationProbe…`, `FillBand…`, `Updater…`). Yani "CI yeşil" cümlesi bu belge
+için şunu söylüyor: **ffmpeg gerektirmeyen ölçüler geçti.** ffmpeg gerektiren
+ölçüler hakkında hiçbir şey söylemiyor — onlar koşmadı. Bu sözleşmenin kabul
+kriterleri o 72'nin dışında olduğu için kapsam yeterli; ama cümle "süit geçti"
+diye genişletilemez.
+
+**Yerel `tools/ci-gibi-kos.sh` koşumu artık CI'ı temsil etmiyor.**
+`381e8ab` üzerindeki yerel koşum 0 çıkış koduyla bitti (dökümü yakalanamadı —
+**ölçülmedi**, çıktı boruda kaldı), ama bu çıkış kodu "tam süit geçti" diye
+okunamaz: betik ffmpeg'i PATH'ten siliyor, oysa T115 ffmpeg'i CI'a kurdu.
+Betik T118'de düzeltilecek. **Bu belgede o betiğe dayanan her cümle bu damgayı
+taşır.**
 
 `headSha` ile dalın ucu **aynı değil**, ve bu bilerek böyle: izlenen CI koşumunun
 `headSha`'sı `381e8ab`; dalın ucu ondan sonraki, yalnız bu belgeyi değiştiren
