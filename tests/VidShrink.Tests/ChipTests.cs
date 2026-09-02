@@ -220,7 +220,7 @@ public sealed class ChipTests
     /// var: başlıktaki sayı listedeki madde sayısıyla aynı olmak zorunda, ve bu örnekte o
     /// sayı yedi.
     ///
-    /// <para>T99'a kadar yediydi<b>ler</b> değil dokuzdu. Taban av1'de 0,020×1,25 = 0,025
+    /// <para>T99'a kadar bu sayı dokuzdu. Taban av1'de 0,020×1,25 = 0,025
     /// bppf'ten 0,0095×1,52 = 0,01444'e inince 4K/60 kaynağı kendi kare hızında kalabilir
     /// hâle geldi; kare hızı kesintisini anlatan iki satır birden düştü —
     /// <c>AdviceCode.FrameRateReduced</c> strateji satırı ("frame rate was lowered...") ve
@@ -241,5 +241,4 @@ public sealed class ChipTests
         Assert.Equal(7, count);
         Assert.Equal($"Why These Choices · {count}", head);
     }
-
 }
