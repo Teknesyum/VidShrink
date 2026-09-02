@@ -508,6 +508,31 @@ public sealed class QualityMeterTests
     }
 
     [Fact]
+    public void TheReportedUnitLengthSeparatesTheTwoArms()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var fixedArm = QualityMeter.WorstSceneUnit(scores, 60, 0);
+        var mapArm = QualityMeter.WorstSceneUnit(scores, 60, 0, MapWithCuts(10.0, 2.5, 5.5));
+
+        Assert.Equal(2.0, fixedArm.UnitSeconds, 6);
+        Assert.Equal(3.0, mapArm.UnitSeconds, 6);
+        Assert.NotEqual(fixedArm.UnitSeconds, mapArm.UnitSeconds);
+    }
+
+    [Fact]
+    public void TheClipShorterThanOneWindowReportsItsOwnLengthNotTwoSeconds()
+    {
+        var scores = new[] { 80.0, 60.0, 40.0 };
+
+        var unit = QualityMeter.WorstSceneUnit(scores, 60, 0);
+
+        Assert.Equal(0.05, unit.UnitSeconds, 6);
+        Assert.NotEqual(QualityMeter.SceneWindowSeconds, unit.UnitSeconds);
+    }
+
+    [Fact]
     public void ACollapseInAShortTrailingUnitStillReachesTheMeasurement()
     {
         var scores = Enumerable.Repeat(100.0, 975).ToArray();

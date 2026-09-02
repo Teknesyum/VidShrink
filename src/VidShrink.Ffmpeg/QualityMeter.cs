@@ -242,11 +242,11 @@ public static class QualityMeter
         return new QualityScore(
             vmaf?.Mean, vmaf?.Harmonic, vmaf?.P10, vmaf?.Min, xpsnr, ssim, true, null, normalization,
             vmaf?.WorstScene, vmaf?.WorstSceneStartSeconds,
-            vmaf is null ? null : SceneWindowSeconds, tonemapReference, alignment);
+            vmaf?.WorstSceneUnitSeconds, tonemapReference, alignment);
     }
 
     public readonly record struct VmafAggregate(
-        double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds);
+        double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds, double WorstSceneUnitSeconds);
 
     public static async Task<IReadOnlyList<double>> ReadVmafScoresAsync(string logPath, CancellationToken ct = default)
     {
@@ -302,13 +302,15 @@ public static class QualityMeter
         var mean = scores.Average();
         var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
         var sorted = scores.OrderBy(x => x).ToList();
-        var (worstScene, worstSceneStart) = WorstScene(scores, frameRate, offsetSeconds, sceneMap);
-        return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], worstScene, worstSceneStart);
+        var unit = WorstSceneUnit(scores, frameRate, offsetSeconds, sceneMap);
+        return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], unit.Score, unit.StartSeconds, unit.UnitSeconds);
     }
 
     public const double SceneWindowSeconds = 2.0;
 
     public const double MinimumUnitSeconds = SceneWindowSeconds / 4.0;
+
+    public readonly record struct WorstUnit(double Score, double StartSeconds, double UnitSeconds);
 
     public static (double Worst, double StartSeconds) WorstScene(
         IReadOnlyList<double> scores, double frameRate, double offsetSeconds)
@@ -316,6 +318,13 @@ public static class QualityMeter
 
     public static (double Worst, double StartSeconds) WorstScene(
         IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? map)
+    {
+        var unit = WorstSceneUnit(scores, frameRate, offsetSeconds, map);
+        return (unit.Score, unit.StartSeconds);
+    }
+
+    public static WorstUnit WorstSceneUnit(
+        IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? map = null)
     {
         ArgumentNullException.ThrowIfNull(scores);
         if (scores.Count == 0)
@@ -327,6 +336,7 @@ public static class QualityMeter
 
         var worst = double.PositiveInfinity;
         var at = offsetSeconds;
+        var unitFrames = scores.Count;
         for (var b = 0; b + 1 < bounds.Count; b++)
         {
             var start = bounds[b];
@@ -339,12 +349,13 @@ public static class QualityMeter
             {
                 worst = mean;
                 at = offsetSeconds + start / fps;
+                unitFrames = count;
             }
         }
 
         if (double.IsPositiveInfinity(worst))
-            return (scores.Average(), offsetSeconds);
-        return (worst, at);
+            return new WorstUnit(scores.Average(), offsetSeconds, scores.Count / fps);
+        return new WorstUnit(worst, at, unitFrames / fps);
     }
 
     private static List<int> FixedBounds(int count, double fps)
