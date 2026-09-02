@@ -1045,6 +1045,112 @@ kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın yakl
 ölçüyü atlaması ayrı bir işe (T115) alındı.
 
 
+## 10. Kilitsiz ölçerle konmuş çıpalar — geri alınır mı (T116)
+
+T110 ürün ölçerine kare kilidini koydu ve aynı çift üzerinde çıpanın kilitsiz
+75,07, kilitli 87,20 okuduğunu gösterdi — **12,13 puan**. Bu turun sorusu şuydu:
+o hata daha önce konmuş çıpalara ve o çıpalara dayanan kararlara ne yaptı.
+
+Ölçülen ağaç: worktree `T116-cipa-yeniden`, commit `31472cb`. Ölçer ffmpeg 9.0,
+libvmaf `vmaf_v0.6.1neg`. Düzenek `tools/cipa-yeniden/`; her sayının komutu
+oradaki `README.md` ve `duzenek/` altında yazılı.
+
+### 10.1 Çıpa kendiliğinden düzeldi — kalibrasyon turu gerekmedi (K4)
+
+**Bu turun en önemli sonucu budur ve sözleşmenin açılış öncülünü yumuşatıyor.**
+
+Çıpa saklanan bir sabit değil; `ComplexityProfile.WithProbeQuality` her koşumda
+pencere ölçümlerinden yeniden hesaplıyor. Yani kilit ürün koduna girdiği an
+(`822dd3a`, 09-02 04:44) eski çıpa diye bir şey kalmadı — bir sonraki koşum
+kilitli ölçüyle yeni çıpayı kuruyor. **Diskte düzeltilecek bir çıpa yok,
+kalibrasyon turu gerekmiyor.** Bu ölçüldü: aynı ağaçtan biri kilitli biri
+kilitsiz iki ikili yayımlandı ve aynı kaynaklarda koşuldu.
+
+| kaynak | çıpa kilitsiz | çıpa kilitli | fark |
+|---|---:|---:|---:|
+| `parca-1.mkv` (1080p60 HDR) | 82,726502 | 87,192345 | **+4,465842** |
+| `parca-2.mkv` (1080p60 HDR) | 91,550111 | 91,575281 | +0,025170 |
+| `sdr-1.mkv` (ikame, 1080p60 SDR) | 82,277860 | 91,718219 | **+9,440358** |
+
+`parca-1`in +4,47'si T110'un 12,13'ünün üçe bölünmüş halidir. Pencere pencere:
+
+| pencere | kilitsiz | kilitli | fark |
+|---|---:|---:|---:|
+| 1 (9,73 s) | 86,157256 | 87,425446 | +1,268190 |
+| 2 (29,20 s) | 86,947848 | 86,947848 | **0,000000** |
+| 3 (48,67 s) | 75,074404 | 87,203740 | **+12,129337** |
+
+Üçüncü pencere T110'un çiftidir ve 12,13 rakamı rakamına yeniden üretildi.
+İkinci pencere onbeş ondalık basamağa kadar özdeş: o pencerede kayma yoktu ve
+kilit hiçbir şey değiştirmedi. Çıpa üç pencerenin aritmetik ortalaması olduğu
+için 12,13 puanlık tek pencere hatası çıpaya **4,04 puan** olarak geçiyor;
+kalan 0,42 birinci pencereden geliyor.
+
+**Plan hiçbir hedefte değişmedi.** Aynı iki ikili `PlanCalculator.BuildDetailed`
+ile koşuldu ve plan alanları (genişlik, yükseklik, fps, kodlayıcı, kip, crf,
+video bit hızı, preset) karşılaştırıldı:
+
+| kaynak | sayılan hedef | plan aynı |
+|---|---|---|
+| `parca-1.mkv` | 8, 12, 20, 30, 40, 60, 80 MB — **yedisi de** | 7/7 |
+| `parca-2.mkv` | 8, 12, 20, 30, 40, 60, 80 MB — **yedisi de** | 7/7 |
+| `sdr-1.mkv` (ikame) | 8, 12, 20, 30, 40 MB — **beşi** | 5/5 |
+
+**Toplam 19 çift sayıldı, 19'unda plan özdeş.** `sdr-1` 23,1 MiB olduğu için
+60 ve 80 MB hedefleri **sayılmadı** — kaynak zaten hedeften küçük, plan
+kopyalamaya düşüyor ve karşılaştırma bir şey ölçmez.
+
+Değişen tek alan `PredictedQuality`, ve o da çıpa farkının aynısı kadar:
+`parca-1` her hedefte tam **+4,4658**, `sdr-1` her hedefte tam **+9,4404**.
+Tavana dayanan satırlar (99,00 ve 100,00) hiç oynamadı. Örnek — `parca-1` @ 60 MB:
+plan 1920×1080 libx264 crf 21 7585k iki koşumda da aynı, `PredictedQuality`
+83,3757 → 87,8416.
+
+**Sonuç: çıpalar yanlıştı ama kararlar yanlış değildi.** T110'un 12,13 puanı
+kullanıcıya ulaşmadı; hedef boyut bütçesi çıpadan önce geliyor ve çözünürlük,
+kodlayıcı, crf seçimini bütçe belirliyor. Çıpa yalnız **tahmin edilen kaliteyi**
+kaydırıyor — kullanıcıya gösterilen sayıyı, teslim edilen dosyayı değil. `sdr-1`
+ikamesinde ilk pencerenin **+28,32** puanlık hatası bile planı değiştirmedi;
+bu, sonucu zayıflatmıyor, güçlendiriyor.
+
+Ölçülmedi: çıpanın plana **hiçbir** koşulda geçmediği ölçülmedi. Ölçülen şey bu
+üç kaynağın 19 hedefidir. `SpreadHalvings` üç kaynakta da 0 çıktı, yani
+`PerHalving` yolu (çıpanın bit hızına göre eğim verdiği kol) bu turda hiç
+tetiklenmedi ve **ölçülmedi**.
+
+### 10.2 Belge envanteri — hangi sayı hangi ölçerden geçti (K1)
+
+`docs/olcumler/` altında **20 belge** var; **8'i** VMAF ya da XPSNR sayısı
+taşıyor. Ölçüt: iki kilit anı. Ölçüm boru hattı `tools/VidShrink.Bench`in kendi
+grafiğinde `0e2b071` (09-02 03:09) ve `48ec9fa` (03:15) ile kilitlendi; ürün
+ölçeri `QualityMeter` `822dd3a` (04:44) ile. Bir belgenin **son** commit'i
+kilitten önceyse içindeki hiçbir sayı kilitli ölçerden geçmiş olamaz.
+
+| belge | VMAF/XPSNR satırı | durum |
+|---|---:|---|
+| `algi-olcusu.md` | 86 | **karışık** — §9'un ızgarası ve çıpaları kilitli ölçüldü; §2, §3, §4, §5, §7'nin sayıları kilitsiz. Hangisinin yeniden ölçüldüğü §9.11'de satır satır yazılı; bu turda §9.2, §9.4 ve §7'nin p1 satırı yeniden ölçüldü |
+| `olcu-gecerliligi.md` | 37 | **karışık** — gövdesi 03:30'da yazıldı: kendi `bench` koşumları boru hattı kilidinden **sonra**, T102'nin JSON'larından yeniden saydığı sayılar kilitsiz. **Yeniden ölçülmedi** (dosya T111'in) |
+| `handbrake-acigi.md` | 18 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-01 08:49, iki kilitten de önce) |
+| `auto-mod.md` | 12 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** — sayıları T102'nin (09-02 01:40–02:08) ve `tools/auto-mod-olcumu/*.sh` kendi ffmpeg çağrılarını kuruyor: 8 ölçüm satırının **0'ında** kilit var. Zaman değil düzenek belirliyor |
+| `tepe-tavani-ve-psy.md` | 4 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-01 22:54) |
+| `ornekte-vmaf-maliyeti.md` | 4 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-01 22:18) |
+| `olculen-kaliteyle-plan.md` | 3 | **kilitsiz ölçerden geçti, yeniden ölçüldü** — A/B ızgarası bu turda kilitli ve kilitsiz ikiliyle yeniden koşuldu; eski sütun geçersiz damgasıyla duruyor |
+| `kazanc-kullaniciya-ulasiyor-mu.md` | 2 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-02 02:56, boru hattı kilidinden 13 dakika önce) |
+
+Kalan 12 belge VMAF ya da XPSNR sayısı taşımıyor, kilitten etkilenmiyor:
+`dinamik-esik.md`, `sahne-haritasi.md`, `ceviri-olcusu-mutasyonu.md`,
+`surecler-arasi-olcu-yalitimi.md`, `suit-eszamanli-kosum.md`,
+`t84-tur2-mutasyon.md`, `t27-ipucu-satir-genislikleri.md`,
+`t27-ipucu-satir-genislikleri-once.md`, `T33-oynatma-olcumleri.md`,
+`T37-sunum-olcumleri.md`, `T32-anahtar-kare-olcumleri.md`,
+`T30-panel-olcumleri.md`.
+
+**Yeniden ölçülmeyen beş belgenin hiçbiri bu turda kapsam dışı bırakılmadı —
+ölçülmedi.** 10.1'in sonucu bunları da ilgilendiriyor: içlerindeki VMAF sayıları
+kaymış olabilir, ama hiçbiri plan kararı üretmiyor; hepsi rapor sayısı.
+Kaymanın rapor sayısına ne yaptığı belge belge **ölçülmedi**.
+
+
 ## Yeniden üretim
 
     ffmpeg -ss 00:02:00 -t 60 -i kaynak-1080p60-hdr-17dk.mp4 -map 0:v:0 -c copy parca-1.mkv
