@@ -521,6 +521,18 @@ yeniden üretiyor. Bu kaynaktan değil **yayımlanmış DLL'den** doğrulandı
 `[1:v]null[r]` ve `flags=lanczos[t];` dizgilerini taşıyor, `bench-kilitli`
 taşımıyor.
 
+**`settb=AVTB` dizgisini DLL'de saymak kanıt değildir.** İkisinde de var —
+kilitsiz ikilide bir kez, kilitli ikilide iki kez (UTF-16, `#US` yığınında;
+ASCII arayan bir araç hiçbirini bulamaz ve yanlışlıkla "kilit yok" der). Kilidin
+o koşumda gerçekten takılı olduğunun kanıtı ikilide değil **koşumun kendi
+kaydındadır**: `cipa-yeniden` her JSON'a kurduğu grafiği `OlcerKilidi` alanında
+yazıyor —
+
+    cipa-p1-kilitli.json    [0:v]null,settb=AVTB,setpts=N[t];[1:v]null,settb=AVTB,setpts=N[r];[t][r]libvmaf
+    cipa-p1-kilitsiz.json   [0:v]null[t];[1:v]null[r];[t][r]libvmaf
+
+Rapordaki her çıpa sayısının yanında hangi grafikten geldiği bu alanla duruyor.
+
 Izgara bu yüzden 2×2: iki kol (`eski` = sabitler, `yeni` = `--measured-quality`)
 × iki ölçer. `eski` kolu `QualityMeter`'a hiç uğramıyor
 (`Program.cs:657`, meter `null`), dolayısıyla `eski-kilitli` ile
