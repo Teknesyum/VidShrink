@@ -75,3 +75,21 @@ ve eski cikti yanlis commit'i olcer. T114'te bir kez oldu — `origin/main`
 birlestirilince (T107) ayni pencerenin plan cozunurlugu `806x454`ten
 `1458x820` / `1728x972` / `1920x1080`e cikti; birlestirme oncesi olculen
 butun K1 sayilari silinip bastan kosuldu.
+
+## Kapilarin koda gecirilisinde duzeltilen iki nokta
+
+`ESIKLER.md` olcumden once yazildi ve degismedi. Kapilari hesaplayan kod
+sonradan yazildigi icin iki yerde metinden sapmisti; ikisi de ilk `k5-*.json`
+uretilmeden once duzeltildi.
+
+1. **"Uc kaynagin en az ikisinde"** — kaynak penceredir. Kollar (`maks`,
+   `uyumlu`, `yedek`) esik metninden sonra eklendi. Ilk kod butun kol x pencere
+   ciftlerini tek havuzda sayiyordu; boylece iki ayri koldan birer pencere
+   "iki kaynak" gibi gorunuyordu. Sayim kol icine alindi: bir kolun kendi uc
+   penceresinin en az ikisi esigi gecmelidir.
+2. **K7'nin olcusu sabit degil** — esik metni "bozuk haritanin p10 kaybi,
+   K5'te olculen p10 kazancindan buyukse" der. Ilk kod sabit `-0,30` puanlik
+   bir kayip esigi kullaniyordu; bu esik metinde yok. Kayip artik kendi
+   hucresinin (ayni kol, ayni pencere) K5 kazanciyla karsilastiriliyor.
+
+Kapilarin sayisal esikleri degismedi; degisen yalniz sayimin metne uymasidir.
