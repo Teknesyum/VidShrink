@@ -44,11 +44,11 @@ public static class Rapor
         K3(sb);
         K3Denetim(sb, isKok);
         var k4 = K4(sb, isKok);
-        K4b(sb, isKok, kollar, k1);
+        var k4b = K4b(sb, isKok, kollar, k1);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         KapiDenemesi(sb, isKok);
-        Sonuc(sb, k2, k5, k7, k4);
+        Sonuc(sb, k2, k5, k7, k4, k4b);
         K9(sb, isKok);
         Sinirlar(sb, isKok);
 
@@ -521,7 +521,9 @@ public static class Rapor
 
     public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet);
 
-    private static void K4b(StringBuilder sb, string isKok, string[] kollar,
+    public sealed record K4bSonuc(int Hucre, int TabaniGecen, int ZonesKazandi, int QcompKazandi);
+
+    private static K4bSonuc K4b(StringBuilder sb, string isKok, string[] kollar,
         Dictionary<(string Kol, string Pencere), K1Kaydi> k1)
     {
         var satirlar = new List<(string Kol, string Pencere, string Aday, string Param, double? Mae, string Not)>();
@@ -538,7 +540,7 @@ public static class Rapor
                     satirlar.Add((kol, p.Ad, c[0], c[1], mae, c[3]));
                 }
             }
-        if (satirlar.Count == 0) return;
+        if (satirlar.Count == 0) return new K4bSonuc(0, 0, 0, 0);
 
         sb.AppendLine("### K4 eki — iki aday yan yana, K1 farkini hangisi kapatiyor");
         sb.AppendLine();
@@ -637,6 +639,8 @@ public static class Rapor
                           "en iyi olmadigini soyler.");
             sb.AppendLine();
         }
+
+        return new K4bSonuc(kapanmaHucre, kapanmaVar, kazananZones, kazananQcomp);
     }
 
     private static AbSonuc K5K6(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
@@ -946,7 +950,7 @@ public static class Rapor
         sb.AppendLine();
     }
 
-    private static void Sonuc(StringBuilder sb, K2Sonuc k2, AbSonuc k5, AbSonuc k7, K4Sonuc k4)
+    private static void Sonuc(StringBuilder sb, K2Sonuc k2, AbSonuc k5, AbSonuc k7, K4Sonuc k4, K4bSonuc k4b)
     {
         sb.AppendLine("## Sonuc");
         sb.AppendLine();
@@ -966,7 +970,32 @@ public static class Rapor
         sb.AppendLine($"- K5/K6 (kalite kazanci ve hedef boyut): {(!k5Olculdu ? "**bilinmiyor**" : k5.Gecti ? "gecti" : "**gecmedi**")} — {k5.Ozet}");
         sb.AppendLine($"- K7 (bozuk harita bedeli): {(!k7Olculdu ? "**bilinmiyor**" : k7.Gecti ? "kabul edilebilir" : "**kabul edilemez**")} — {k7.Ozet}");
         sb.AppendLine();
-        if (k4.Denenen > 0)
+        if (k4b.Hucre > 0)
+        {
+            sb.AppendLine($"**Sahne basina dagitimin ise yaradigina dair kanit bu olcumde yok.** " +
+                          $"Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; " +
+                          $"olculen {k4b.Hucre} hucrenin tabani gecen {k4b.TabaniGecen} tanesinde " +
+                          $"`zones` {k4b.ZonesKazandi} kez kazandi, `qcomp` {k4b.QcompKazandi} kez. " +
+                          "`qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — " +
+                          "kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku " +
+                          "varsayilaninin bu icerikte en iyi olmadiginin kanitidir.");
+            sb.AppendLine();
+            if (k4.Denenen > 0)
+            {
+                sb.AppendLine($"Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen " +
+                              $"{k4.Denenen} kodlayicinin yalniz {k4.Calisan} tanesinde calisiyor " +
+                              $"({string.Join(", ", k4.CalisanListesi.Select(x => $"`{x}`"))}); " +
+                              (k4.VarsayilanIsliyor
+                                ? "uretimin varsayilan kodlayicisi bu listede."
+                                : "uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi " +
+                                  "sessizce yok sayiyor, nvenc kollarinda parametre hic yok. " +
+                                  "Yani dagitimin lehine bir kanit cikmis olsa bile, o kanit " +
+                                  "bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirli " +
+                                  "kalirdi. Ikisi birlikte: kanit yok, kanit cikmis olsaydi da dar olurdu."));
+                sb.AppendLine();
+            }
+        }
+        if (k4.Denenen > 0 && k4b.Hucre == 0)
         {
             sb.AppendLine($"Karar hangi yollari kapsar: `zones` denenen {k4.Denenen} kodlayicinin");
             sb.AppendLine($"{k4.Calisan} tanesinde isliyor ({string.Join(", ", k4.CalisanListesi.Select(x => $"`{x}`"))}).");

@@ -468,9 +468,9 @@ uydurma; olculen sey kapinin **ayirt edip etmedigi**.
 - K5/K6 (kalite kazanci ve hedef boyut): **bilinmiyor** — olculmedi
 - K7 (bozuk harita bedeli): **bilinmiyor** — olculmedi
 
-Karar hangi yollari kapsar: `zones` denenen 5 kodlayicinin
-2 tanesinde isliyor (`libx265`, `libx264`).
-**Uretimin varsayilan kodlayicisi bu listede degil**; "girer" karari cikmis olsa bile dagitim varsayilan yolda etkisiz kalir, kazanc yalniz bu iki kodlayicinin secildigi kosumlarda gorulur.
+**Sahne basina dagitimin ise yaradigina dair kanit bu olcumde yok.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 3 hucrenin tabani gecen 2 tanesinde `zones` 0 kez kazandi, `qcomp` 2 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir.
+
+Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen 5 kodlayicinin yalniz 2 tanesinde calisiyor (`libx265`, `libx264`); uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi sessizce yok sayiyor, nvenc kollarinda parametre hic yok. Yani dagitimin lehine bir kanit cikmis olsa bile, o kanit bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirli kalirdi. Ikisi birlikte: kanit yok, kanit cikmis olsaydi da dar olurdu.
 
 Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve
 bu olcumden onceki commit'te sabitlendi.
