@@ -138,3 +138,36 @@ Bu karıştırıcı düzeltilmiş kolda küçülüyor ama yok olmuyor: Auto art�
 libsvtav1 koşuyor, yani "zayıf kodek" kolu 60 MB hedefinde geçerli değil —
 ama K6 kodeği bugünkü libx264'te sabit tutmayı istiyor, dolayısıyla K6'nın
 kendi koşumunda karıştırıcı **tam güçte** duruyor.
+
+## Koşum künyesi
+
+| ne | değer |
+|---|---|
+| kaynak | `.calisma/kaynak/parca-1.mkv` — 92.577.316 bayt, 1920x1080, 60 fps, 60,399 sn, bt2020/PQ HDR, yalnız video |
+| kaynağın kaynağı | `kaynak-1080p60-hdr-17dk-yalniz-video.mkv`, `00:02:00`'dan 60 sn, `-c copy` (`ChunkCutter.Specs`) |
+| hedef | 3,4974511806023365 MB — yayımlanan `parca-1` @ 60 MB satırının hedefiyle **birebir aynı** |
+| taban commit | `fcf377f` (`origin/main`) |
+| karşılaştırılan taban | `381e8ab` (yayımlanan tablo) |
+| HandBrake | 1.11.2 |
+| ffmpeg | 9.0-full_build-www.gyan.dev |
+| kodek yedeği | `libsvtav1` ffmpeg'de mevcut, yani `MaxCompression` = libsvtav1 (libx265'e düşülmedi) |
+| makine | Windows 11 Pro 22631, **yüklü** — koşum sırasında başka ajanlar da kodluyordu |
+| koşum sayısı | Compatible kolu 1, Auto kolu 1, HandBrake 2 (iki koşumda da aynı dosya) |
+| süre ölçüsü | **alınmadı** — makine yüklüydü, duvar saati anlamlı değil |
+
+Çıktılar ve günlükler `.calisma/ab/t125/` altında (`k1-parca-1-compatible.json`,
+`k2-parca-1-auto.json`, `cikti/`, `auto-cikti/`, `gunluk/`, `auto-gunluk/`).
+
+### Bu turda ölçülmeyenler
+
+- `parca-2` ve `parca-3` hiçbir hedefte, hiçbir kolla koşulmadı.
+- 600 MB hedefinin altı satırının hiçbiri koşulmadı; dolayısıyla K4'ün
+  "kodeği değişmeyen satırda puan da değişmemeli" kapısı **sınanmadı**.
+- K6'nın zorunlu-1080p koşumu yapılmadı.
+- VidShrink kolundaki değişimin ne kadarının kodlayıcıdan (`-g 120` →
+  `-g 600 -keyint_min 60`) ne kadarının ölçerden geldiği ayrıştırılmadı.
+  HandBrake kolunda bu ayrıştırma gerekmedi: dosya bit bit aynı olduğu için
+  farkın tamamı ölçerden geliyor.
+- Ölçerin tekrar sapması bugünkü kodda **sıfır** ölçüldü (iki koşum, onbeş
+  basamak aynı); ama bu tek dosya üzerinde. Başka girdilerde sıfır olduğu
+  varsayılmadı, ölçülmedi.
