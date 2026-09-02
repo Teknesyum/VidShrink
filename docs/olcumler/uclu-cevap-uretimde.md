@@ -77,3 +77,25 @@ Her mutasyon yalnız kendi ölçüsünü kırdı; diğer dört ölçü yeşil ka
 | Her karar yerinde `NotWorking` | Kodek elenir | Değişmedi |
 
 Regresyon riski ölçülmemiş kodeğin sonraki gerçek yoklamada çalışmadığının anlaşılmasıdır. Plan ve HDR yolları bunu `HardwareNotMeasured` / `NotMeasured` ile geçici işaretleyip ölçüm sonrası yeniden hesaplamaya bırakıyor. Performans yolunda ise ölçülmemiş aday gerçekten başarısız olup daha sonraki aday çalışıyor olabilir; eski iki değerli yol aktif yoklamayla sonraki çalışan adayı seçtiğinde o tek koşum için doğru sonuca ulaşabiliyordu. Yeni yol kanıtsız eleme yapmıyor ve seçilen adayı performans koşumunun sınamasına bırakıyor; başarısızlık `HardwareEncoderFailed` olarak görünür.
+
+## K6 — Verify kolları ve açık engel
+
+Her kol ayrı `dotnet test -c Release --list-tests --filter "FullyQualifiedName~..."` çağrısıyla sayıldı:
+
+| Verify kolu | Test sayısı |
+|---|---:|
+| `PlanCalculatorTests` | 32 |
+| `EncoderStateConsumptionTests` | 4 |
+| `HdrResolverTests` | 1 |
+| `PerformanceCheckTests` | 21 |
+| `EncoderAvailabilityTests` | 11 |
+| Toplam | 69 |
+
+Sıfır test bulan kol yok. Birleşik yerel koşum `56 başarılı / 12 başarısız / 1 atlanan` sonucunu verdi. Kırmızıların 11'i K2'nin etkilediği fakat T139 `owns` kümesi dışında kalan eski iki değerli sahtelerden geliyor:
+
+- `PlanCalculatorTests`: `SurucusuzMakine` ve `OlculmemisMakine` kullanan 6 ölçü.
+- `EncoderAvailabilityTests`: `Makine` kullanan 5 ölçü.
+
+Kalan kırmızı `PerformanceCheckTests.DonanimYoluKapatilincaKararDegisiyor`: gerçek ffmpeg koşumu `30231 ms` sürerek sabit `30000 ms` bütçeyi aştı. Sözleşme gereği zaman aşımı sabiti büyütülmedi.
+
+İlk iki dosya T139'un `owns` kümesinde değildir; bu nedenle sahtelere üçlü cevap eklenmedi. K6 yerelde yeşil değildir ve CI koşumu henüz yoktur. Sahiplik genişletilmeden sözleşme teslim edilmiş sayılmaz.
