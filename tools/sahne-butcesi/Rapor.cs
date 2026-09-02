@@ -651,6 +651,12 @@ public static class Rapor
         sb.AppendLine("`>= +1,00`, ayni iki kaynakta; hicbir kaynakta p10 kaybi `> 0,30`;");
         sb.AppendLine("her kosum hedef bandin icinde ve asan kosum orani %0.");
         sb.AppendLine();
+        sb.AppendLine("**Kapinin \"kaynak\" dedigi sey burada \"pencere\"dir.** `ESIKLER.md`");
+        sb.AppendLine("uc ayri kaynak varsayarak yazildi; elde uc pencere var ve ucu de ayni");
+        sb.AppendLine("dosyadan kesildi. Kapi bu haliyle yazildigindan daha zayiftir: iki");
+        sb.AppendLine("pencerede tutan bir kazanc, iki ayri kaynakta tuttugunu gostermez.");
+        sb.AppendLine("Esik olcumden once sabitlendigi icin degistirilmedi, sinir burada yazili.");
+        sb.AppendLine();
         sb.AppendLine("**Puanlar yalniz kol icinde karsilastirilabilir.** Plan cozunurlugu kola");
         sb.AppendLine("gore degisiyor (T107 sonrasi ayni pencerede libx264 `1458x820`,");
         sb.AppendLine("libx265 `1728x972`, libsvtav1 `1920x1080`); farkli cozunurlukten cikan");

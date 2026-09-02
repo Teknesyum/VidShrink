@@ -428,6 +428,12 @@ Kapi (olcumden once): p10 kazanci `>= +0,50`, en kotu sahne kazanci
 `>= +1,00`, ayni iki kaynakta; hicbir kaynakta p10 kaybi `> 0,30`;
 her kosum hedef bandin icinde ve asan kosum orani %0.
 
+**Kapinin "kaynak" dedigi sey burada "pencere"dir.** `ESIKLER.md`
+uc ayri kaynak varsayarak yazildi; elde uc pencere var ve ucu de ayni
+dosyadan kesildi. Kapi bu haliyle yazildigindan daha zayiftir: iki
+pencerede tutan bir kazanc, iki ayri kaynakta tuttugunu gostermez.
+Esik olcumden once sabitlendigi icin degistirilmedi, sinir burada yazili.
+
 **Puanlar yalniz kol icinde karsilastirilabilir.** Plan cozunurlugu kola
 gore degisiyor (T107 sonrasi ayni pencerede libx264 `1458x820`,
 libx265 `1728x972`, libsvtav1 `1920x1080`); farkli cozunurlukten cikan
