@@ -17,6 +17,7 @@ kos k4 maks p1-karisik
 
 for w in $PENCERELER; do kos dogrula maks "$w"; done
 bash "$KOK/tools/sahne-butcesi/03-duzenek-mutasyonu.sh"
+bash "$KOK/tools/sahne-butcesi/04-kapi-denemesi.sh"
 
 for kol in $KOLLAR; do for w in $PENCERELER; do kos plan "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k1   "$kol" "$w"; done; done

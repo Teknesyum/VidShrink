@@ -46,6 +46,7 @@ public static class Rapor
         K4b(sb, isKok, kollar, k1);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
+        KapiDenemesi(sb, isKok);
         Sonuc(sb, k2, k5, k7);
         Sinirlar(sb, isKok);
 
@@ -797,6 +798,38 @@ public static class Rapor
                     list.Add(new Satir(kol, o));
             }
         return list;
+    }
+
+    private static void KapiDenemesi(StringBuilder sb, string isKok)
+    {
+        var y = Path.Combine(isKok, "kapi-denemesi.csv");
+        if (!File.Exists(y)) return;
+        var satirlar = File.ReadAllLines(y).Skip(1).Where(x => x.Contains(';')).ToList();
+        if (satirlar.Count == 0) return;
+
+        sb.AppendLine("## Karari veren kodun kendisi olculdu");
+        sb.AppendLine();
+        sb.AppendLine("Asagidaki karar bir programdan cikiyor; o program hep \"gecti\" diyorsa");
+        sb.AppendLine("sayfadaki butun sayilar bosa gider. Bu yuzden kapi kodu uydurma girdiyle");
+        sb.AppendLine("kosuldu: once dort sartin da saglandigi bir girdi (karar **degismeli**),");
+        sb.AppendLine("sonra her seferinde tek bir sarti bozan girdiler.");
+        sb.AppendLine();
+        sb.AppendLine("| Senaryo | Ne degisti | Beklenen karar | Cikan karar | Sonuc |");
+        sb.AppendLine("|---------|------------|----------------|-------------|-------|");
+        var gecen = 0;
+        foreach (var l in satirlar)
+        {
+            var c = l.Split(';');
+            if (c.Length < 5) continue;
+            if (c[4] == "gecti") gecen++;
+            sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {(c[4] == "gecti" ? "gecti" : "**KIRIK**")} |");
+        }
+        sb.AppendLine();
+        sb.AppendLine($"Denenen senaryo {satirlar.Count}, beklenen karari veren {gecen}. Uretim");
+        sb.AppendLine("`SahneButcesi rapor` cagrisidir; girdi `tools/sahne-butcesi/kapi-fikstur.py`,");
+        sb.AppendLine("kosum `bash tools/sahne-butcesi/04-kapi-denemesi.sh`. Bu tablodaki sayilar");
+        sb.AppendLine("uydurma; olculen sey kapinin **ayirt edip etmedigi**.");
+        sb.AppendLine();
     }
 
     private static void Sonuc(StringBuilder sb, K2Sonuc k2, AbSonuc k5, AbSonuc k7)

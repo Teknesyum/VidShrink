@@ -167,3 +167,18 @@ tablodan:
 
 Ucu de tutuyor. K4 izgarasinin ozet cumlesi de ayni sekilde sayildi: `zones`
 satiri 5 kodlayicida var, `destek=evet` olan 2 (`libx265`, `libx264`).
+
+## Karari veren kodu da kirmayi dene
+
+`03-duzenek-mutasyonu.sh` dagitim **kuralini** denetliyor; kurali dogru bulup
+karari yanlis veren bir rapor programi yine de yanlis sonuc yazardi. Kapi kodu
+(`Rapor.Sonuc`, `K5K6`, `K7`) uydurma girdiyle kosuluyor:
+`04-kapi-denemesi.sh` once dort sartin da saglandigi bir girdi verir — karar
+"koda girer" cikmali, yani kapinin **gecirebildigi** gorulur — sonra sirayla
+p10 kaybi, band asimi ve K7 bedeli sartlarini tek tek bozar; her birinde karar
+"girmez"e donmelidir. Bes senaryonun sonuncusu dosyalari hic yazmaz: karar
+"karar verilemedi" olmali, sessizce "gecmedi"ye dusmemeli.
+
+Fikstur sayilari uydurmadir ve rapora girmez; olculen sey kapinin ayirt edip
+etmedigidir. Senaryo tablosu `.calisma/T114/kapi-denemesi.csv`, rapora
+"Karari veren kodun kendisi olculdu" basligi altinda girer.
