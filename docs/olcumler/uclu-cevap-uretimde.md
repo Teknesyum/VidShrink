@@ -2,7 +2,9 @@
 
 ## K1 — Kusurun ölçümü
 
-Taban: `b88bb66`. Önce `dotnet build VidShrink.sln -c Release --no-incremental`, sonra her ölçü `dotnet test -c Release --filter ...` ile ve `--no-build` kullanılmadan çalıştırıldı. `10f9073` commit'inde dört ölçünün dördü de kırmızıydı.
+Taban: `b88bb66`. Önce `dotnet build VidShrink.sln -c Release --no-incremental`, sonra her ölçü `dotnet test -c Release --filter ...` ile ve `--no-build` kullanılmadan çalıştırıldı. Dört ölçünün dördü de **`d3f8962`** commit'inde kırmızıydı (`T139 K1: dort karar yolunun kirmizi olculeri`).
+
+Tur 2 düzeltmesi: bu paragraf önce `10f9073` diyordu. O commit rebase öncesindendi ve daldan erişilemiyor; daldaki karşılığı `d3f8962`.
 
 | Karar yeri | Ölçü | Eski sonuç |
 |---|---|---|
@@ -15,7 +17,16 @@ Taban: `b88bb66`. Önce `dotnet build VidShrink.sln -c Release --no-incremental`
 
 `IEncoderAvailability.EncoderState` varsayılanı `Unmeasured` döndürüyor ve süreç doğuran `WorksAsEncoder`ı çağırmıyor. Üçüncü durumu taşıyamayan uygulayıcı için hem `true` hem `false` iki değerli cevap yetersiz kanıttır; varsayılan bu nedenle olumlu veya olumsuz hüküm kurmuyor. `EncoderCapabilities` ile `MainWindow.DeferredEncoderAvailability` üçlü cevabı bildikleri için kendi gerçekleştirmelerini kullanıyor.
 
-Tabandaki varsayılanı kullanan 19 test sahtesi etkileniyor:
+Varsayılanı kullanan test sahtesi sayısı **20**. Tur 2 düzeltmesi: bu liste 19 sayıyordu ve `PlanCalculatorProbeTests.SwitchableAvailability` eksikti. Sayı yazıldığı anda taban `b88bb66` idi ve o tabanda gerçekten 19'du; 20'nci sahte `879c88b` (T137 tur 2) ile geldi ve tur 2'nin birleştirme tabanı `f8b33ee` ile bu dala girdi. Geçerli sayı 20'dir.
+
+```
+> git grep -c "class .*IEncoderAvailability" b88bb66 -- "tests/VidShrink.Tests/*.cs"   → toplam 19
+> git grep -c "class .*IEncoderAvailability" f8b33ee -- "tests/VidShrink.Tests/*.cs"   → toplam 20
+> git log --oneline -S SwitchableAvailability f8b33ee -- tests/VidShrink.Tests/PlanCalculatorProbeTests.cs
+879c88b T137 tur 2: kusurlar uretildi (T1, T2, T4, T6) — dordu de kirmizi
+```
+
+`f8b33ee` tabanında listenin tamamı:
 
 1. `ComplexityScanTests.ColdCapabilities`
 2. `EncodeRunnerTests.Encoders`
@@ -31,11 +42,12 @@ Tabandaki varsayılanı kullanan 19 test sahtesi etkileniyor:
 12. `PlanCalculatorProbeTests.RecordingAvailability`
 13. `PlanCalculatorProbeTests.UnmeasuredAvailability`
 14. `PlanCalculatorProbeTests.ThrowingAvailability`
-15. `PlanCalculatorProbeTests.FlakyThenWorkingAvailability`
-16. `PlanCalculatorTests.FakeAvailability`
-17. `PlanCalculatorTests.SurucusuzMakine`
-18. `PlanCalculatorTests.OlculmemisMakine`
-19. `SpeedModeTests.FakeAvailability`
+15. `PlanCalculatorProbeTests.SwitchableAvailability`
+16. `PlanCalculatorProbeTests.FlakyThenWorkingAvailability`
+17. `PlanCalculatorTests.FakeAvailability`
+18. `PlanCalculatorTests.SurucusuzMakine`
+19. `PlanCalculatorTests.OlculmemisMakine`
+20. `SpeedModeTests.FakeAvailability`
 
 T139 ölçüsündeki `LegacyAvailability` da yalnız varsayılan davranışı doğrulamak için eklendi; taban sayımına dahil değildir.
 
@@ -118,3 +130,100 @@ Son doğrulama:
 - Son push'ın CI koşum kimliği ve sonucu aşağıya eklenecek.
 
 Depo kapısı `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134` ile filtresiz çalıştırıldı: `1345 başarılı / 0 başarısız / 17 atlanan / toplam 1362`, süre `17 dk 49 sn`. Kapı `başarısız=0 toplam=1362 alt-sınır=1134` sonucu ile geçti. Üç dosyada test iddiası, bandı, eşiği veya test adı değiştirilmedi.
+
+## K7 — Geçici cevap arayüze ölçülmüş gibi ulaşmıyor
+
+Tur 1'in kararı doğruydu ve üretimde tüketiliyor; kırılan, kararın arayüze **nasıl** sızdığıydı. `PickFastCodec` ölçülmemiş adayı geçici cevap olarak döndürüyor, `MainWindow.ProbeHardwareEncodersAsync` ise cevabı yalnız kodek adına bakarak okuyordu: `CodecModel.IsHardware(plan.Codec)`. Sürücüsüz makinede aday `av1_nvenc` olduğu için arayüz "donanım var" diyor, hızlı GPU kutusu açılıyordu.
+
+Düzeltme iki parça. `EncodePlan.CodecNotMeasured` işareti geçiciliği plana bindiriyor (`PlanResult.HardwareNotMeasured` HDR yolundaki ölçülmemişliği de topladığı için daha geniş; kodek seçimi için ayrı ve dar bir işaret gerekiyordu — üstelik `ProbeHardwareEncodersAsync` `PlanCalculator.Build` çağırıp `PlanResult`ı atıyor). `MainWindow.HardwareAvailableFrom` ise geçici cevabı, aynı gövdenin zaten çalıştırdığı gerçek yoklamayla doğruluyor:
+
+```csharp
+internal static bool HardwareAvailableFrom(EncodePlan plan, EncoderProbeResult probe)
+    => CodecModel.IsHardware(plan.Codec)
+       && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
+```
+
+Girdi `docs/olcumler/surucu-yoklugu.md` sürücüsüz makinesi: ffmpeg `av1_nvenc`/`hevc_nvenc`/`h264_nvenc` listeliyor, önbellek soğuk, sürücü yok — `HasEncoder=true`, `WorksAsEncoder=false`, `EncoderState=Unmeasured`.
+
+| Ölçülen | `f8b33ee` tabanı | K7 öncesi (`13d5db3`) | K7 sonrası (`931582d`) |
+|---|---|---|---|
+| `PickFastCodec` seçimi | `libx265`, `IsHardware=False` | `av1_nvenc`, `CodecNotMeasured=True` | `av1_nvenc`, `CodecNotMeasured=True` |
+| Arayüze giden `available` | `False` | **`True`** | `False` |
+| `ChkFastGpu.IsEnabled` | `False` | **`True`** | `False` |
+| `_hardwareEncoderAvailable` | `False` | **`True`** | `False` |
+
+Birinci satır tur 1'in kasıtlı kararıdır ve K7 onu değiştirmiyor: seçim aynı kalıyor, değişen yalnız o seçimin arayüze ölçülmüş bir evet gibi ulaşması. Taban sütunu `.claude/worktrees/T139-taban` (`f8b33ee`) üzerinde `T139TabanOlcusu.TabanSatir6_DogrudanEncoderCapabilitiesHizliKip` koşumundan:
+
+```
+TABAN satir6 codec=libx265 IsHardware=False
+```
+
+`ChkFastGpu.IsEnabled` pimleyen ölçü kalıcıdır — `EncoderStateConsumptionTests.OlculmemisDonanimAdayiHizliKipKutusunuAcmiyor`. Gerçek pencereyi `AppHost.Run` içinde kurup `ApplyHardwareVerdict`i sürücüsüz cevapla çağırıyor ve hem kutunun hem alanın kapalı olduğunu iddia ediyor. Yanına iki ölçü daha kondu: `OlculmemisDonanimAdayiArayuzeDonanimVarDemiyor` (geçici cevap + başarısız yoklama → donanım yok) ve `OlculmemisAdayiDogrulayanYoklamaGecerseDonanimVarDiyor` (geçici cevap + **başarılı** yoklama → donanım var). İkincisi olmadan düzeltmenin ucuz hali —`&& !plan.CodecNotMeasured`— de yeşil geçerdi; o hal çalışan GPU'lu makinede de donanımı kapatırdı, çünkü `PlanCalculator.Build` koştuğunda `EncoderCapabilities` yoklama önbelleği henüz soğuk.
+
+## K8 — Mutasyon
+
+Her mutasyondan önce `dotnet build VidShrink.sln -c Release --no-incremental`; testlerde `--no-build` yok. Her mutasyon uygulandıktan sonra `git diff -U0` ile dosyada gerçekten değiştiği doğrulandı (bu depoda satır sonu yüzünden sessizce uygulanmayan ikame sahte yeşil üretmişti). Her kolun kaç test bulduğu `--list-tests` ile ayrıca sayıldı; sıfır test bulan kol yok.
+
+**Mutasyon A** — `MainWindow.HardwareAvailableFrom` içinde doğrulama şartı düşürülüyor, yani kusur birebir geri geliyor:
+
+```
+-       && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
++       && true;
+```
+
+**Mutasyon B** — işaret plana hiç basılmıyor, `BuildDetailed` içindeki satır siliniyor:
+
+```
+-        result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
+```
+
+| Verify kolu | Test | Mutasyon A | Mutasyon B |
+|---|---:|---|---|
+| `EncoderStateConsumptionTests` | 7 | **Başarısız 3, Başarılı 4** | **Başarısız 3, Başarılı 4** |
+| `PlanCalculatorTests` | 32 | 32/32 yeşil | 32/32 yeşil |
+| `PerformanceCheckTests` | 22 | 22/22 yeşil | 22/22 yeşil |
+| `HdrResolverTests` | 1 | 1/1 yeşil | 1/1 yeşil |
+| `EncoderAvailabilityTests` | 12 | 12/12 yeşil | 12/12 yeşil |
+
+Her iki mutasyon da yalnız K7'nin kolunu kırıyor ve üçünü birden kırıyor: kutu ölçüsü, negatif yön ölçüsü ve pozitif yön ölçüsü. Mutasyon B'nin de aynı üçünü kırması, işaretin `EncodePlan` üzerinden taşınmasının ölçüldüğünü gösteriyor — `MainWindow` tarafı tek başına pimlenmiş olsaydı B yeşil kalırdı.
+
+## K9 — K5 paragrafı yeniden yazılıyor
+
+K5'in altındaki gerekçe paragrafı **yanlış**. Yanlış olan cümle şuydu:
+
+> Seçim değişikliği, ölçülmemiş cevabı iki değerli yüzünde `false` taşıyan `DeferredEncoderAvailability` geçidinde görülür.
+
+Doğrusu bunun tersi. `DeferredEncoderAvailability` `IEncoderMeasurementState` uyguluyor ve `IsMeasured(codec)` ile `EncoderState(codec) != Unmeasured` bu sınıfta aynı şeyi söylüyor; ortak `KnownState` köprüsü de zaten "eski yüz ölçüldü diyorsa iki değerli sonucu oku" kuralını işletiyor. Bu nedenle T139'un üçlü cevabı bu geçitte **hiçbir seçimi değiştirmiyor**: K5 tablosunun 1, 2, 3 ve 5. satırları bu girdide eski ile aynı çıkıyor. Değişen taraf, ölçülmüşlük yüzünü hiç taşımayan **doğrudan `EncoderCapabilities`** yolu (6. satır) ile üçlü cevabı doğrudan veren performans yolu (4. satır).
+
+Tablo aşağıda düzeltilmiş hâliyle. Karşılaştırma tabanı `f8b33ee`; taban sütunundaki her satırın altında onu üreten koşum var.
+
+| # | Girdi | `f8b33ee` | Dal | Değişti mi |
+|---:|---|---|---|---|
+| 1 | Geçit, kalite kipi, `MaxCompression`, `libsvtav1=Unmeasured` | `libsvtav1`, `notMeasured=True` | aynı | **hayır** |
+| 2 | Geçit, kalite kipi, `Fast` tercihi, `h264_nvenc=Unmeasured` | `h264_nvenc`, `notMeasured=True` | aynı | **hayır** |
+| 3 | Geçit, hızlı kip, `av1_nvenc=Unmeasured` | `av1_nvenc`, `notMeasured=True` | aynı | **hayır** |
+| 4 | Üçlü cevap: `h264_nvenc=NotWorking`, `h264_qsv=Unmeasured`, `h264_amf=Working` | `h264_amf` | `h264_qsv` | **evet** |
+| 5 | Geçit, yazılım HDR, `libsvtav1=Unmeasured` | `policyChanged=False notMeasured=True pix=yuv420p10le` | aynı | **hayır** |
+| 6 | Doğrudan `EncoderCapabilities`, hızlı kip, sürücüsüz makine | `libx265`, `IsHardware=False` | `av1_nvenc`, `IsHardware=True` | **evet** |
+
+Taban koşumu — `.claude/worktrees/T139-taban` (`f8b33ee`), `dotnet build -c Release --no-incremental` ardından `dotnet test -c Release --filter "FullyQualifiedName~T139TabanOlcusu"`:
+
+```
+TABAN satir1 codec=libsvtav1 notMeasured=True
+TABAN satir2 codec=h264_nvenc notMeasured=True
+TABAN satir3 codec=av1_nvenc notMeasured=True
+TABAN satir4 selected=h264_amf
+TABAN satir5 policyChanged=False notMeasured=True pix=yuv420p10le
+TABAN satir6 codec=libx265 IsHardware=False
+```
+
+6. satır T139 tur 2'nin KRİTİK'ini üreten satırdır: sürücüsüz makinede seçim yazılımdan donanıma geçiyor. Tur 1 bu geçişi kasten yapmıştı; kusur geçişin kendisinde değil, K7'de yazıldığı gibi geçici seçimin arayüze ölçülmüş gibi ulaşmasındaydı. K7'den sonra 6. satırın seçimi hâlâ `av1_nvenc` — değişen, o seçimin arayüzde donanım varlığına çevrilmemesi.
+
+K5 tablosu ve paragrafı yukarıda olduğu gibi duruyor; bu bölüm onu iptal eder.
+
+## Kapanmayanlar
+
+Tur 2 kapsamında **kapatılmayan**, ölçülmüş iki nokta:
+
+1. **`PickFastCodec` ilk ölçülmemiş adayda duruyor.** `av1_nvenc`in çalışmadığı ama `hevc_nvenc`in çalıştığı makinede taban kod aday listesinde ilerleyip `hevc_nvenc`i buluyordu; tur 1'den beri yeni kod ilk adayı geçici cevap olarak döndürüyor, `ProbeHardwareEncodersAsync` o tek adayı yokluyor ve başarısız olunca donanım yok görünüyor. Bu yanlış-negatif K7'nin ürünü değil, tur 1 kararının ürünü; yeniden deneme döngüsünü yazmak tur 2'nin sahipliğinde değil. Ayrı sözleşme gerekiyor.
+2. **Sözleşme metnindeki gerekçe yanlış.** Tur 2 metni "`EncoderCapabilities` `EncoderState`i uygulamıyor" diyor; `src/VidShrink.Ffmpeg/EncoderCapabilities.cs:108` uyguluyor ve listede olup yoklanmamış kodek için `Unmeasured` döndürüyor. Sonuç aynı, gerekçe farklı.
