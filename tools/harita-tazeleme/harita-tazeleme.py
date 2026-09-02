@@ -481,6 +481,8 @@ def komut_bayat():
     print(f"\n{len(BAYAT)} iddia; {len(duzeltilmemis)}'i düzeltilmemiş "
           "(karşılığı ölçülmedi). Çok satıra yayılan iddia ilk satırında çapalandı; "
           "`tara` çıktısındaki 30 satırın tamamı bu tabloda bir satıra düşüyor.")
+    print("Satır numaraları haritanın **T135 öncesi** hâline aittir (`890af6e`); "
+          "bugünkü hâlde kaymışlardır — çapa bölüm başlığıdır, satır değil.")
     return 0
 
 
