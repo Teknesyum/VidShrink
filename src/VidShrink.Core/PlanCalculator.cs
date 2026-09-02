@@ -136,6 +136,7 @@ public static class PlanCalculator
     {
         var probe = new ProbeState();
         var result = BuildDetailedCore(info, options, profile, availability, probe);
+        result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
     }
 
@@ -146,6 +147,13 @@ public static class PlanCalculator
     private sealed class ProbeState
     {
         internal bool NotMeasured;
+
+        /// <summary>
+        /// İşaretin dar hâli: <b>kodlayıcı seçimi</b> ölçülmemiş bir adaydan geldi.
+        /// <see cref="NotMeasured"/> HDR yolunun ölçülmemişliğini de topladığı için
+        /// "seçilen kodek geçici mi" sorusunun cevabı ayrı taşınıyor.
+        /// </summary>
+        internal bool CodecNotMeasured;
     }
 
     private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
@@ -884,7 +892,11 @@ public static class PlanCalculator
         var state = availability.KnownState(preferred);
         if (state == EncoderProbeState.Unmeasured)
         {
-            if (probe is not null) probe.NotMeasured = true;
+            if (probe is not null)
+            {
+                probe.NotMeasured = true;
+                probe.CodecNotMeasured = true;
+            }
             return preferred;
         }
         if (state == EncoderProbeState.Working) return preferred;
@@ -905,6 +917,7 @@ public static class PlanCalculator
             if (state == EncoderProbeState.Unmeasured)
             {
                 probe.NotMeasured = true;
+                probe.CodecNotMeasured = true;
                 return candidate;
             }
             if (state == EncoderProbeState.Working) return candidate;

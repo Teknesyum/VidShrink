@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -93,6 +94,57 @@ public sealed class EncoderStateConsumptionTests
         var selected = PerformanceProbe.SelectHardwareCodec(availability, Stopwatch.StartNew(), 0);
 
         Assert.Equal("h264_qsv", selected);
+    }
+
+    /// <summary>
+    /// <c>EncoderCapabilities</c> biçimli sürücüsüz makine: ffmpeg nvenc'i listeliyor,
+    /// hiçbir yoklama tamamlanmamış. Üç değerli yüzü yok, ölçülmüşlük kanıtı da yok.
+    /// </summary>
+    private sealed class ColdCapabilities : IEncoderAvailability
+    {
+        public bool HasEncoder(string name) => name is "av1_nvenc" or "hevc_nvenc" or "h264_nvenc";
+        public bool WorksAsEncoder(string codec) => HasEncoder(codec);
+    }
+
+    private static EncodePlan ColdFastPlan() => PlanCalculator.Build(
+        SdrSource(),
+        new PlanOptions { TargetMb = 16, Codec = CodecPreference.Auto, SpeedMode = SpeedMode.Fast },
+        new ColdCapabilities());
+
+    [Fact]
+    public void OlculmemisDonanimAdayiArayuzeDonanimVarDemiyor()
+    {
+        var plan = ColdFastPlan();
+
+        Assert.Equal("av1_nvenc", plan.Codec);
+        Assert.True(plan.CodecNotMeasured);
+        Assert.False(MainWindow.HardwareAvailableFrom(plan));
+    }
+
+    [Fact]
+    public void OlculmemisDonanimAdayiHizliKipKutusunuAcmiyor()
+    {
+        var file = Path.Combine(Path.GetTempPath(), $"vidshrink-t139-{Guid.NewGuid():N}.json");
+        try
+        {
+            var (enabled, available) = AppHost.Run(() =>
+            {
+                var plan = ColdFastPlan();
+                var window = new MainWindow { SettingsPathOverride = file };
+                window.ApplyHardwareVerdict(
+                    new ColdCapabilities(),
+                    MainWindow.HardwareAvailableFrom(plan),
+                    HardwareVerdict.NotProbed);
+                return (window.ChkFastGpu.IsEnabled, window.HardwareEncoderAvailable);
+            });
+
+            Assert.False(enabled);
+            Assert.False(available);
+        }
+        finally
+        {
+            if (File.Exists(file)) File.Delete(file);
+        }
     }
 }
 

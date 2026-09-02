@@ -69,6 +69,13 @@ public sealed class EncodePlan
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
     [JsonIgnore] public bool TurboFirstPass { get; set; }
+
+    /// <summary>
+    /// Plandaki kodlayıcı <b>ölçülmemiş</b> bir adaydan geldi: yoklama henüz cevap
+    /// vermediği için aday elenmeden geçirildi ve seçim geçicidir. Bu plana bakıp
+    /// "bu makinede donanım kodlayıcı var" denemez; ölçüm gelince hesap yenilenir.
+    /// </summary>
+    [JsonIgnore] public bool CodecNotMeasured { get; set; }
     [JsonIgnore] public double BitrateBias { get; set; } = 1.0;
     [JsonIgnore] public double? EffectiveTargetMb { get; set; }
 
