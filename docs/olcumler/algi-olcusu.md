@@ -1041,8 +1041,20 @@ bataryasından geliyor; batarya da ffmpeg'li koşuma dayanıyor (M1–M8'in kır
 sayıları `[FfmpegFact]` ölçülerinden çıkıyor).
 
 Bunun sonucu: **kare kilidi CI'da korunmuyor.** CI ffmpeg görmediği sürece kilidi
-kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın yaklaşık 80
-ölçüyü atlaması ayrı bir işe (T115) alındı.
+kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın ffmpeg'siz
+koşması ayrı bir işe (T115) alındı.
+
+> **T116:** "yaklaşık 80" tahmindi; **sayıldı, 87.** Ölçüt kaynak ağacındaki
+> öznitelikler: `[FfmpegFact]` **84** kez, `[FfmpegTheory]` **1** kez ve o tek
+> teori **3** `InlineData` taşıyor. `tools/ci-gibi-kos.sh` ffmpeg ve ffprobe'u
+> PATH'ten çıkarıyor, iki öznitelik de kurucuda `ToolLocator.IsAvailable`
+> başarısız olunca `Skip` atıyor; yani ffmpeg'siz koşumda **87 ölçü atlanır.**
+> Dağılım: `FrameGrabberTests` 21, `QualityMeterTests` 12, `PanelHostTests` 11,
+> `PerformanceCheckTests` 7, `ComplexityProbeTests` 6+3, `SegmentEncoderTests` 6,
+> `FpsDropTests` 5, `EncodeRunnerTests` 4, `PreviewSyncTests` 4, `SceneMapTests` 4,
+> `VmafPoolingTests` 3, `QualityTargetTests` 1.
+> Bu sayı **kaynaktan sayıldı, koşumdan okunmadı** — sözleşme tam süiti
+> koşturmayı yasakladı. Koşulmuş atlama sayısı **ölçülmedi**.
 
 
 ## 10. Kilitsiz ölçerle konmuş çıpalar — geri alınır mı (T116)
