@@ -464,6 +464,23 @@ yok" dedi, tur 2 "sekiz" dedi; ikisi de eksikti. Sayı artık belgede değil **k
 tutuluyor — yirmi dördüncü saat türevi assert eklendiği anda CI kırmızıya döner,
 bir sonraki turun raporuna kalmaz.
 
+### `:629`un elenmesi ölçüldü
+
+Danışmanın gerekçesi kendi koşumumla teyit edildi. `PerformanceCheck.cs:244`te
+`WallMs: elapsedMs` → `WallMs: 0` mutasyonu uygulandı,
+`dotnet build -c Release --no-incremental` ile derlendi, ölçü `--filter` ile koşuldu:
+
+```
+Başarısız VidShrink.Tests.PerformanceCheckTests.ButceGercektenBagliyorVeSebebiniSoyluyor [11 s]
+  Hata İletisi:  butce bulgusu gecen sureyi tasimiyor
+  ...PerformanceCheckTests.cs:line 629
+```
+
+Yani `:629` bir şey ölçüyor: geçen sürenin bulguya taşındığını. Bant değil — sabit eşik
+yok, ve karşılaştırdığı `dar` üretimin bulguyu üretmek için zaten aştığını şart koştuğu
+eşik. Kayıt `.calisma/t132/t3/iddia629-mutasyon.txt`. Üretim dosyası `git checkout --`
+ile geri alındı; teslim edilen dalda üretim kodu değişmedi.
+
 ### Sayımı tutan ölçü
 
 `PerformanceCheckTests.SaatTureviIddialarinSayisiBelgedekiyleAyni` üç test dosyasını
