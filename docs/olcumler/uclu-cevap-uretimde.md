@@ -110,3 +110,14 @@ Son doğrulama:
 - Birleşik verify: `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`.
 - Test çağrılarında `--no-build` kullanılmadı.
 - Rebase sonrası CI koşum kimliği ve durumu son push'tan sonra eklenecek.
+
+Depo kapısı olan filtresiz `dotnet test VidShrink.sln -c Release` de çalıştırıldı: `1330 başarılı / 14 başarısız / 18 atlanan`, süre `35 dk 43 sn`. On dört kırmızı üç izin dışı eski iki değerli sahteye dağılıyor:
+
+| Sahte | Kırmızı ölçü sayısı |
+|---|---:|
+| `SpeedModeTests.FakeAvailability` | 7 |
+| `HardwareRateControlTests.FixedAvailability` | 1 |
+| `PlanCalculatorProbeTests.RecordingAvailability` | 6 |
+| Toplam | 14 |
+
+Bu ölçülerin iddiaları değiştirilmedi. Üç sahteye `EncoderState` eklemek ölçülerin temsilini üçlü sözleşmeyle hizalar; ancak dosyaları verilen genişletilmiş sahiplikte değildir ve `PlanCalculatorProbeTests.cs` için ayrıca dokunmama sınırı vardır. Bu nedenle sözleşme filtresi yeşil olsa da depo tam suit kapısı yeşil değildir; T139 teslim edilmiş sayılmaz.
