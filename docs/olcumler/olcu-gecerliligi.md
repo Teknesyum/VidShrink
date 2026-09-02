@@ -442,6 +442,13 @@ karenin altında — tam olarak sahadaki 3,3 ms'lik kayma gibi.
 - kilit olmadan aynı çift çöküyor (`psnr_y` en düşük **23,53 dB**),
 - iki akış birbirine göre bir kare kaydırılınca skor dizisi bozuluyor.
 
+**Sınırı yazmak gerekiyor:** bu üç ölçü ffmpeg istiyor, bu yüzden `[FfmpegFact]`
+ile işaretli — ffmpeg'i olmayan koşucuda **atlanıyor, düşmüyor.** CI koşucusunda
+ffmpeg yok (aynı süitte 83 test bu sebeple atlanıyor; yerelde 17). Yani kare
+kilidini tutan pim **yerelde ve ffmpeg'i olan koşucuda** koruyor, CI'da
+korumuyor. Havuzlama ölçüleri saf, her yerde koşuyor. Kilidi CI'da da tutmak
+istenirse yapılacak iş ffmpeg'i koşucuya kurmaktır; bu sözleşme onu yapmadı.
+
 Mutasyon denemesi — her satır kaç ölçü düşürüyor. **Her tur `--no-incremental`
 ile yeniden derlendi;** artımlı derleme bir turda bayat ikili koşturup yanlış
 sonuç verdi:

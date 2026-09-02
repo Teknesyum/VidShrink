@@ -156,7 +156,7 @@ public class VmafPoolingTests
             test);
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task KareKilidi_AltKareKaymasinaRagmen_KareleriDogruEsler()
     {
         var frames = await OlcumSerisiAsync(MeasureFilterGraph.Build(160, 120, "psnr=stats_file=psnr.log"));
@@ -166,7 +166,7 @@ public class VmafPoolingTests
             $"kaynak kendisiyle karsilastirildi ama tam eslesmedi; en dusuk psnr_y={frames.Min():0.##} dB"));
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task KareKilidiOlmadan_AltKareKaymasi_SkorDizisiniCokertir()
     {
         var kilitsiz = $"[0:v]scale=w=160:h=120:flags=lanczos[t];[1:v]null[r];[t][r]psnr=stats_file=psnr.log";
@@ -177,7 +177,7 @@ public class VmafPoolingTests
             $"kare kilidi olmadan da tam eslesme cikti: olcu {KaymaSaniye}s'lik kaymaya duyarsiz");
     }
 
-    [Fact]
+    [FfmpegFact]
     public async Task OlcumSerisi_KareKilidi_GoreceliKaydirilinca_Bozulur()
     {
         var kaydirilmis =
