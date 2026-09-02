@@ -67,9 +67,32 @@ ayarlanmış.** Mac'te aynı eşiklerin doğru olup olmadığı bilinmiyor.
 
 **Yap:**
 
-1. `.calisma/kaynak/` altındaki ortak ölçüm parçalarını kullan. **Kendi kaynağını
-   üretme** — bu depoda "aynı yerden kesilmiş ama aynı içerikte olmayan" parçalar
-   ölçümü bir kez haksız yaptı. Hangi dosyayı kullandığını yaz.
+1. Ortak ölçüm parçalarını kullan. **Kendi kaynağını üretme** — bu depoda "aynı
+   yerden kesilmiş ama aynı içerikte olmayan" parçalar ölçümü bir kez haksız yaptı.
+   Hangi dosyayı kullandığını yaz.
+
+   Parçalar `.gitignore`da, yani sende yok. Depo kökünde indir:
+
+   ```
+   mkdir -p .calisma/kaynak
+   gh release download olcum-kaynak-v1      --repo Teknesyum/VidShrink-olcum-kaynak      --dir .calisma/kaynak
+   shasum -a 256 .calisma/kaynak/parca-*.mkv
+   ```
+
+   Beklenen sha256:
+   ```
+   89CBDE4012ED6220243C973F1BA1D657C984695FD1A935742DFED9511BBD9492  parca-1.mkv
+   18F9B8E578285705F67BD4324687D2DA8A5E6DCC59A3A541EE060354ACD8A7BA  parca-2.mkv
+   B69C00C589D60CBF0B2A4199408B5B22E6C417913762CCBD03A711F7E60B104D  parca-3.mkv
+   ```
+
+   Üçü de 1920x1080, 60 fps, hevc, yuv420p10le, bt2020/smpte2084, ~60 sn. İndirme
+   sürerken bekleme — İş 1 ve İş 3 kaynak dosyaya bağlı değil, onları bitir.
+
+   **Havuzda bilinen kusur:** `parca-1.mkv`de ses YOK, `parca-2` ve `parca-3`te AAC
+   ses VAR; süreler de birebir eşit değil (60,399 / 60,442 / 60,432 sn). Ses hedef
+   boyuttan yer, parçalar arası kıyası haksız yapar. **Her kolda `-an` kullan**,
+   VMAF'ı video üzerinden ölç, üç parçanın da video-only koştuğunu raporda belge.
 2. Her parça için üç kol koştur, aynı hedef boyutta:
    - `libx265` (yazılım)
    - `hevc_videotoolbox` (donanım)
@@ -88,6 +111,12 @@ ayarlanmış.** Mac'te aynı eşiklerin doğru olup olmadığı bilinmiyor.
   türetilmiş** olmalı ve cümledeki her sayı tabloda birebir geçmeli. Bu deponun
   en sık kusuru budur: tablo doğru, onu özetleyen cümle uydurma.
 - K3 — Yoklama süresi dağılımı: en az 10 ölçüm, min/medyan/maks.
+- **Mutlak VMAF sayılarını Windows'unkilerle karşılaştırma.** Ölçüldü: aynı bayta
+  iki farklı libvmaf sürümü iki farklı puan veriyor; sabit ofset, tekrarla
+  küçülmüyor. Sürüm sınırını geçen kıyas geçersiz. Onun yerine **farkı**
+  karşılaştır: Mac'te `libx265 p10 − hevc_videotoolbox p10`, Windows'ta
+  `libx265 p10 − hevc_nvenc p10`. İki farkı yan yana koy; ofset büyük ölçüde
+  sadeleşir. Rapora `ffmpeg -version` çıktısının ilk iki satırını yaz.
 - K4 — Windows eşiklerinin Mac'te geçerli olup olmadığı hakkında **hüküm**:
   geçerli / geçerli değil / ölçü yetmiyor. Üçünden biri, gerekçesiyle.
   Kod değiştirme — hüküm yeter, kararı ben veririm.
