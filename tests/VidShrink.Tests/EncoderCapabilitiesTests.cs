@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -89,4 +90,288 @@ public sealed class EncoderCapabilitiesTests
         var caps = EncoderCapabilities.Parse(EncodersWithSvtav1, Filters, Version);
         Assert.True(caps.HasEncoder("libsvtav1"));
     }
+
+    // --- K4: ucuncu durum iki olcuyle tutuluyor ---
+
+    private static EncoderCapabilities Capabilities() =>
+        EncoderCapabilities.Parse(EncodersWithoutSvtav1, Filters, Version);
+
+    /// <summary>
+    /// K4 birinci olcu: yoklama sonuca varamadiginda sonuc "calismiyor" degil
+    /// "olculemedi"dir, karar yazilima duser ve <b>onbellege yazilmaz</b> - bir sonraki
+    /// cagri yeniden olcer. Ucuncu durum "calismiyor" kovasina dusurulurse bu olcu kirilir.
+    /// </summary>
+    [Fact]
+    public void AnUnmeasuredProbeIsNeitherWorkingNorCachedAndFallsBackToSoftware()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.EncoderProbeHook = _ => { calls++; return EncoderCapabilities.ProbeOutcome.Unmeasured; };
+
+        var first = caps.Probe("h264_nvenc");
+        var second = caps.Probe("h264_nvenc");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, first.State);
+        Assert.False(first.Measured);
+        Assert.False(first.Succeeded);
+        Assert.Equal(EncoderProbeState.Unmeasured, caps.EncoderState("h264_nvenc"));
+
+        // Olculemeyen sonuc onbellege girmedigi icin ikinci cagri yeniden yokluyor;
+        // EncoderState surec dogurmadigi icin sayaci artirmiyor.
+        Assert.Equal(2, calls);
+        Assert.Equal(EncoderProbeState.Unmeasured, second.State);
+
+        var verdict = HardwareVerdict.Decide(first, 12_000, 1920, 1080, 30);
+        Assert.False(verdict.EnableFastMode);
+        Assert.False(verdict.Measured);
+    }
+
+    /// <summary>
+    /// K4 ikinci olcu: yoklama kostu ve kodlayici reddettiyse sonuc olculmustur, geri
+    /// dusme kalicidir ve tekrar yoklanmaz. "Calismiyor" ucuncu duruma dusurulurse bu
+    /// olcu kirilir.
+    /// </summary>
+    [Fact]
+    public void AMeasuredRejectionIsCachedAndStaysDistinctFromUnmeasured()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.EncoderProbeHook = _ => { calls++; return EncoderCapabilities.ProbeOutcome.Rejected; };
+
+        var first = caps.Probe("h264_nvenc");
+        var second = caps.Probe("h264_nvenc");
+
+        Assert.Equal(EncoderProbeState.NotWorking, first.State);
+        Assert.True(first.Measured);
+        Assert.False(first.Succeeded);
+        Assert.Equal(EncoderProbeState.NotWorking, caps.EncoderState("h264_nvenc"));
+
+        // Olculmus red onbellege girdi: ikinci cagri surec dogurmuyor.
+        Assert.Equal(1, calls);
+        Assert.Same(first, second);
+
+        var verdict = HardwareVerdict.Decide(first, 12_000, 1920, 1080, 30);
+        Assert.False(verdict.EnableFastMode);
+        Assert.True(verdict.Measured);
+    }
+
+    /// <summary>ffmpeg kodlayiciyi hic listelemiyorsa bu olculmus bir yokluktur.</summary>
+    [Fact]
+    public void AnEncoderMissingFromTheListIsMeasuredNotUnmeasured()
+    {
+        var caps = Capabilities();
+        caps.EncoderProbeHook = _ => throw new InvalidOperationException("Listede olmayan kodlayici yoklanmamali.");
+
+        var probe = caps.Probe("libsvtav1");
+
+        Assert.Equal(EncoderProbeState.NotWorking, probe.State);
+        Assert.True(probe.Measured);
+    }
+
+    // --- K5: olculemeyen secenek yoklamasi onbellege girmiyor ---
+
+    [Fact]
+    public void AnUnmeasuredOptionProbeIsNotCached()
+    {
+        var caps = Capabilities();
+        var outcome = EncoderCapabilities.ProbeOutcome.Unmeasured;
+        var calls = 0;
+        caps.OptionProbeHook = (_, _, _) => { calls++; return outcome; };
+
+        Assert.False(caps.WarmEncoderOption("libx264", "-tune", "film"));
+        Assert.False(caps.SupportsEncoderOption("libx264", "-tune", "film"));
+        Assert.Equal(1, calls);
+
+        // Ayni anahtar false olarak muhurlenmedi: kaynak serbestleyince olculebiliyor.
+        outcome = EncoderCapabilities.ProbeOutcome.Accepted;
+        Assert.True(caps.WarmEncoderOption("libx264", "-tune", "film"));
+        Assert.True(caps.SupportsEncoderOption("libx264", "-tune", "film"));
+        Assert.Equal(2, calls);
+    }
+
+    [Fact]
+    public void AMeasuredOptionRejectionIsCached()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.OptionProbeHook = (_, _, _) => { calls++; return EncoderCapabilities.ProbeOutcome.Rejected; };
+
+        Assert.False(caps.WarmEncoderOption("libx264", "-tune", "film"));
+        Assert.False(caps.WarmEncoderOption("libx264", "-tune", "film"));
+
+        Assert.Equal(1, calls);
+    }
+
+
+    // --- K5/4: HDR10 yoklamasinin ucuncu durumu ---
+
+    /// <summary>
+    /// p010le olculemeyip yuv420p10le kabul edilirse sonuc kullanilir ama <b>muhurlenmez</b>:
+    /// olculemeyen bicim aslinda kabul edilseydi secilen o olacakti. Dongudeki
+    /// <c>break</c> kacagi bu olcuyle kapali.
+    /// </summary>
+    [Fact]
+    public void AnHdr10AcceptanceAfterAnUnmeasuredFormatIsNotCached()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.Hdr10ProbeHook = (_, pixelFormat) =>
+        {
+            calls++;
+            return pixelFormat == "p010le"
+                ? EncoderCapabilities.ProbeOutcome.Unmeasured
+                : EncoderCapabilities.ProbeOutcome.Accepted;
+        };
+
+        Assert.Equal("yuv420p10le", caps.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(2, calls);
+
+        // Onbellege girmediyse ikinci cagri iki bicimi de yeniden yokluyor.
+        Assert.Equal("yuv420p10le", caps.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(4, calls);
+    }
+
+    [Fact]
+    public void AMeasuredHdr10AcceptanceIsCached()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.Hdr10ProbeHook = (_, _) => { calls++; return EncoderCapabilities.ProbeOutcome.Accepted; };
+
+        Assert.Equal("p010le", caps.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal("p010le", caps.Hdr10PixelFormat("h264_nvenc"));
+
+        Assert.Equal(1, calls);
+        Assert.Equal(EncoderProbeState.Working, caps.Hdr10State("h264_nvenc"));
+    }
+
+    /// <summary>
+    /// Iki bicim de olculemediyse "HDR10 yok" denmiyor: <see cref="EncoderProbeState.Unmeasured"/>.
+    /// Olculmus yokluk ise <see cref="EncoderProbeState.NotWorking"/>.
+    /// </summary>
+    [Fact]
+    public void Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence()
+    {
+        var unmeasured = Capabilities();
+        unmeasured.Hdr10ProbeHook = (_, _) => EncoderCapabilities.ProbeOutcome.Unmeasured;
+        Assert.Null(unmeasured.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.Unmeasured, unmeasured.Hdr10State("h264_nvenc"));
+
+        var rejected = Capabilities();
+        rejected.Hdr10ProbeHook = (_, _) => EncoderCapabilities.ProbeOutcome.Rejected;
+        Assert.Null(rejected.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.NotWorking, rejected.Hdr10State("h264_nvenc"));
+    }
+
+    /// <summary>
+    /// K2 ucuncu olcu: ucuncu durumun yuzu <b>surec dogurmadan</b> okunabiliyor. Yoklamayi
+    /// calistiran her yol atarsa da EncoderState ve Hdr10State cevap veriyor: listede olup
+    /// yoklanmamis kodlayici <see cref="EncoderProbeState.Unmeasured"/>, ffmpeg'in hic
+    /// listelemedigi kodlayici <see cref="EncoderProbeState.NotWorking"/>. Bu ikisinden biri
+    /// yoklamaya delege edilirse olcu firlatilan istisnayla kirilir.
+    /// </summary>
+    [Fact]
+    public void ReadingTheThirdStateNeverSpawnsAProcess()
+    {
+        var caps = Capabilities();
+        caps.EncoderProbeHook = _ => throw new InvalidOperationException("yoklama kosmamaliydi");
+        caps.Hdr10ProbeHook = (_, _) => throw new InvalidOperationException("yoklama kosmamaliydi");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, caps.EncoderState("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.Unmeasured, caps.Hdr10State("h264_nvenc"));
+
+        Assert.Equal(EncoderProbeState.NotWorking, caps.EncoderState("hevc_qsv"));
+        Assert.Equal(EncoderProbeState.NotWorking, caps.Hdr10State("hevc_qsv"));
+    }
+
+    // --- K6: kilit ffmpeg suresince tutulmuyor ---
+
+    private const int SlowProbeMs = 2000;
+    private const int ReaderBudgetMs = 750;
+
+    /// <summary>
+    /// Yavas bir yoklama surerken baska bir kodlayicinin yoklamasi kilidin arkasinda
+    /// beklemiyor. Kilit surec boyunca tutulsaydi okuyan <see cref="SlowProbeMs"/> kadar
+    /// beklerdi; butce onun ucte birinden az.
+    /// </summary>
+    [Fact]
+    public async Task ASlowProbeDoesNotBlockAnotherRead()
+    {
+        var caps = Capabilities();
+        using var probeStarted = new ManualResetEventSlim(false);
+        caps.EncoderProbeHook = codec =>
+        {
+            if (!codec.Equals("h264_nvenc", StringComparison.OrdinalIgnoreCase))
+                return EncoderCapabilities.ProbeOutcome.Accepted;
+            probeStarted.Set();
+            Thread.Sleep(SlowProbeMs);
+            return EncoderCapabilities.ProbeOutcome.Accepted;
+        };
+
+        var slow = Task.Run(() => caps.Probe("h264_nvenc"));
+        Assert.True(probeStarted.Wait(TimeSpan.FromSeconds(5)), "Yavas yoklama hic baslamadi.");
+
+        var stopwatch = Stopwatch.StartNew();
+        var fast = caps.Probe("libx264");
+        stopwatch.Stop();
+
+        Assert.True(fast.Succeeded);
+        Assert.True(
+            stopwatch.ElapsedMilliseconds < ReaderBudgetMs,
+            $"Okuma {stopwatch.ElapsedMilliseconds} ms bekledi; kilit ffmpeg suresince tutuluyor.");
+
+        var slowResult = await slow;
+        Assert.True(slowResult.Succeeded);
+    }
+
+    /// <summary>Ayni kural secenek onbelleginde: isitma surerken okuma bloke olmuyor.</summary>
+    [Fact]
+    public async Task ASlowOptionProbeDoesNotBlockCachedOptionReads()
+    {
+        var caps = Capabilities();
+        using var probeStarted = new ManualResetEventSlim(false);
+        caps.OptionProbeHook = (_, _, _) =>
+        {
+            probeStarted.Set();
+            Thread.Sleep(SlowProbeMs);
+            return EncoderCapabilities.ProbeOutcome.Accepted;
+        };
+
+        var warming = Task.Run(() => caps.WarmEncoderOption("libx264", "-tune", "film"));
+        Assert.True(probeStarted.Wait(TimeSpan.FromSeconds(5)), "Isitma hic baslamadi.");
+
+        var stopwatch = Stopwatch.StartNew();
+        var read = caps.SupportsEncoderOption("libx265", "-tune", "grain");
+        stopwatch.Stop();
+
+        Assert.False(read);
+        Assert.True(
+            stopwatch.ElapsedMilliseconds < ReaderBudgetMs,
+            $"Okuma {stopwatch.ElapsedMilliseconds} ms bekledi; kilit ffmpeg suresince tutuluyor.");
+
+        Assert.True(await warming);
+    }
+
+    /// <summary>
+    /// Kilit daraldi ama sonuc kararsizlasmadi: ayni kodlayiciya ayni anda giren onaltisi
+    /// da ayni sonucu goruyor ve onbellekte tek bir deger kaliyor.
+    /// </summary>
+    [Fact]
+    public void ConcurrentProbesAgreeOnOneResult()
+    {
+        var caps = Capabilities();
+        caps.EncoderProbeHook = _ =>
+        {
+            Thread.Sleep(20);
+            return EncoderCapabilities.ProbeOutcome.Accepted;
+        };
+
+        var results = new EncoderProbeResult[16];
+        Parallel.For(0, results.Length, i => results[i] = caps.Probe("h264_nvenc"));
+
+        Assert.All(results, r => Assert.Equal(EncoderProbeState.Working, r.State));
+        var settled = caps.Probe("h264_nvenc");
+        Assert.All(results, r => Assert.Same(settled, r));
+    }
 }
+
