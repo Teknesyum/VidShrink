@@ -46,6 +46,12 @@ tablolar bu arşivden yeniden üretilebilir; tur 3'te K3 ve K4'ün sekiz sayıs�
 arşivden yeniden hesaplandı ve birebir tuttu. Bu ölçümü **bench'ten** tekrarlanabilir
 kılmak ayrı bir şey ve kusur 1'in düzeltilmesine bağlı.
 
+**T111'in arşivi ayrı klasörde.** Yukarıdaki on bir dosya kilitsiz ölçerle
+üretilmiş T102 arşividir; olduğu gibi duruyor. T111'in **38** ölçümü
+(on altı koşumun kilitli ve kilitsiz eşleri, iki kare kaydırma kimliği, dört
+ses ölçümü) `tools/auto-mod-olcumu/vmaf-t111/*.json.gz` altında, okuma kılavuzu
+`vmaf-t111/OKU.md`. T111 bölümündeki her sayı oradan yeniden üretilebilir.
+
 ### Harmonik ortalama bu ölçümde kullanılamaz — sebebi ölçüldü
 
 > **T111'de tersine döndü.** Bu bölümün tespiti — "harmonik ortalama bu kaynakta
