@@ -1890,6 +1890,15 @@ public partial class MainWindow : Window
     /// <summary>Ölçü için: son hesabın donanım cevabını ölçülmemiş sayıp saymadığı.</summary>
     internal bool PlanHardwareNotMeasured { get; private set; }
 
+    /// <summary>Ölçü için: geçitte denemesi bitmiş ama yerleşmemiş bir yoklama var mı.</summary>
+    internal bool PlanProbeUnsettled => _planEncoders?.Unsettled ?? false;
+
+    /// <summary>Ölçü için: geçitte istisnayla düşmüş bir yoklamanın metni.</summary>
+    internal string? PlanProbeFailure => _planEncoders?.FirstFailure;
+
+    /// <summary>Ölçü için: durum satırı raporlamasını tek başına koşturur.</summary>
+    internal void ReportProbeStatusForMeasurement() => ReportUnsettledProbe();
+
     /// <summary>
     /// Yerleşmeyen yoklamayı kullanıcıya söyler. Yoklama bir cevap üretemediğinde bu bir
     /// sonuç değil bilinmeyendir; sessizce varsayılana düşmek — HDR kaynakta tonemap'e —

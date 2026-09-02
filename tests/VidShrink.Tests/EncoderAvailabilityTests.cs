@@ -168,17 +168,29 @@ public sealed class EncoderAvailabilityTests
         => EncoderCapabilities.Parse(TekKodlayiciListesi, "", "ffmpeg version test\n");
 
     [Fact]
-    public void WorksAsEncoderOlcemediyleCalismiyoriAyirtEtmiyor()
+    public void WorksAsEncoderOlcemediyiCalismiyordanAyiriyor()
+    {
+        var olcemeyen = TekKodlayicili();
+        olcemeyen.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Unmeasured;
+
+        var calismayan = TekKodlayicili();
+        calismayan.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Rejected;
+
+        Assert.True(olcemeyen.WorksAsEncoder("h264_nvenc"), "olcemeyen yoklama 'bu kodlayici yok' sayiliyor");
+        Assert.False(calismayan.WorksAsEncoder("h264_nvenc"));
+        Assert.NotEqual(
+            olcemeyen.WorksAsEncoder("h264_nvenc"),
+            calismayan.WorksAsEncoder("h264_nvenc"));
+    }
+
+    [Fact]
+    public void OlcemeyenYoklamaListedeOlmayanKodlayiciyiVarSaymiyor()
     {
         var caps = TekKodlayicili();
         caps.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Unmeasured;
-        var olcemedi = caps.WorksAsEncoder("h264_nvenc");
 
-        var caps2 = TekKodlayicili();
-        caps2.EncoderProbeHook = _ => EncoderCapabilities.ProbeOutcome.Rejected;
-        var calismiyor = caps2.WorksAsEncoder("h264_nvenc");
-
-        Assert.Equal(olcemedi, calismiyor);
+        Assert.False(caps.WorksAsEncoder("av1_nvenc"));
+        Assert.Equal(EncoderProbeState.NotWorking, caps.WorksAsEncoderState("av1_nvenc"));
     }
 
     [Fact]
