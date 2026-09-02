@@ -35,35 +35,43 @@ kılmak kusur 1'in düzeltilmesine bağlı.
 Sözleşme üç metrik istiyor. Üçüncüsü, harmonik ortalama, bu kaynakta **satırlar arası
 karşılaştırma için geçersiz**. Neden geçersiz olduğu tahmin değil, ölçüldü.
 
-VMAF-NEG, SVT-AV1 çıktılarımızın **26 karesinde tam 0** veriyor: 1699. kare ve
-3385-3410 arası kesintisiz blok. Harmonik ortalama `n / Σ(1/x)` olduğu için bu 26 kare
-sayıyı 94,5'ten 56,3'e çekiyor.
+VMAF-NEG, SVT-AV1 çıktılarımızın **26 karesinde 1 puanın altında** kalıyor;
+bunların **25'i tam 0**. Kareler: 1699, ve 3385-3410 aralığındaki 25 kare. Blok
+kesintisiz değil — 3409. kare aralığın içinde ama 12,38 alıyor, 3406. kare ise
+0,946 ile eşiğin hemen altında. Harmonik ortalama `n / Σ(1/max(x,1))` olduğu için
+bu 26 kare sayıyı 94,5'ten 56,3'e çekiyor.
 
 Dağılım kodlayıcıya göre keskin biçimde ikiye ayrılıyor:
 
-| satır | kodek | sıfır puanlı kare | auto ile ortak |
-|---|---|---|---|
-| auto | libsvtav1 | 26 | — |
-| e1-preset4 | libsvtav1 | 26 | 26 |
-| e2-gop300 | libsvtav1 | 26 | 26 |
-| e3-olcek810 | libsvtav1 | 26 | 26 |
-| uzman-biz | libsvtav1 | 26 | 26 |
-| uzman-handbrake | x265 | **0** | 0 |
+| satır | kodek | 1 puan altı kare | bunlardan tam 0 | auto'nun 26 karesiyle örtüşme |
+|---|---|---|---|---|
+| auto | libsvtav1 | 26 | 25 | — |
+| auto-olceksiz | libsvtav1 | 26 | 25 | 26 / 26 |
+| e1-preset4 | libsvtav1 | 26 | 25 | 26 / 26 |
+| e2-gop300 | libsvtav1 | 26 | 25 | 26 / 26 |
+| e3-olcek810 | libsvtav1 | 26 | 25 | 26 / 26 |
+| uzman-biz | libsvtav1 | 26 | **24** | 26 / 26 |
+| uzman-handbrake | x265 | **0** | 0 | 0 / 26 |
 
-Beş AV1 koşumunun tamamında **birebir aynı 26 kare**; iki x265 koşumunda hiç yok.
-Ayar (preset, `-g`, çözünürlük) hiçbir şeyi değiştirmiyor.
+Birebir aynı olan **kare kümesi**: altı AV1 koşumunun 1 puan altı kare listesi
+arasındaki simetrik fark boş — aynı 26 kare numarası, istisnasız. Tam 0 sayısı ise
+24 ile 25 arasında oynuyor: her koşumda 3406. kare eşiğin hemen altında kalıyor
+(0,76-0,96), `uzman-biz`de ayrıca 3389. kare 0,133 alıyor. Ayar (preset, `-g`,
+çözünürlük) kümeyi değiştirmiyor, yalnız sıfırın ne kadar dibine inildiğini
+değiştiriyor. İki x265 koşumunda kümenin tamamı 96-100 arasında.
 
-**Bu kareler bozuk değil.** Aynı karelerde auto'nun kaynağa karşı PSNR'ı **46-48 dB**
-(3380-3415 aralığı ölçüldü) — mutlak olarak yüksek kalite. Parlaklık da kaynakla
-birebir örtüşüyor (`YAVG` 352,5 → 339,1; kaynakta 352,3 → 339,0). HandBrake aynı
-karelerde 98-100 alıyor. Yani ortada görüntü çöküşü yok; VMAF-NEG bu AV1 dosyalarında
-bu karelerde yapay olarak sıfıra düşüyor. Ölçüm düzeninin `scale` adımı da sebep
+**Bu kareler bozuk değil.** Aynı karelerde auto'nun kaynağa karşı PSNR'ı
+**46,30-49,34 dB** (3380-3415 penceresi ölçüldü, etkilenen 25 kare) — mutlak
+olarak yüksek kalite. Parlaklık da kaynakla birebir örtüşüyor (`YAVG` 352,5 → 339,1;
+kaynakta 352,3 → 339,0). HandBrake aynı karelerde 96-100 alıyor. Yani ortada görüntü
+çöküşü yok; VMAF-NEG bu AV1 dosyalarında bu karelerde yapay olarak sıfırın dibine
+iniyor. Ölçüm düzeninin `scale` adımı da sebep
 değil: aynı çift ölçekleme olmadan yeniden ölçüldü, sonuç birebir aynı.
 
 Sonuç, iki yönlü:
 
 1. **Bu belgede** satırlar arası farkı **ortalama ve p10** taşır. Harmonik sütunu
-   sözleşme gereği tabloda duruyor ama okunmamalı; yanında sıfır kare sayısı var.
+   sözleşme gereği tabloda duruyor ama okunmamalı; yanında 1 puan altı kare sayısı var.
 2. **Bu bir kusur** (kusur 4). Depo'nun kendi ölçüm aracı harmonik ortalamayı
    raporluyor; bu kaynakta AV1 ile x265 arasında **39 puanlık** bir fark üretirdi ve
    o farkın PSNR'a göre karşılığı yok.
@@ -79,27 +87,36 @@ Kullanıcı dosyayı sürükleyip "Küçült"e bastığında, onun adına alına
 |---|---|---|---|---|---|
 | 1 | Hedef boyut | **16 MB** (kaynak 16 MB'ın altındaysa `max(1, kaynak/2)`) | `MainWindow.axaml.cs:41`, `:1303-1307`; kutu `MainWindow.axaml:299-300`; kalıcı ayar `UpdateCheck.cs:402` | Evet, kutuda yazıyor | Evet |
 | 2 | Amaç | **Paylaşım** (`Intent.Sharing`) → şeffaflık CRF'ine −3 kaydırma | `MainWindow.axaml:383` `SelectedIndex=1`; `UpdateCheck.cs:404`; etki `CompressionStrategy.cs:92-97` | Evet, açılır kutu | Evet |
-| 3 | Kodek tercihi | **Auto** → rejimden türer: Light/Balanced → `Compatible`, Aggressive/Extreme → `MaxCompression` | `MainWindow.axaml:398` `SelectedIndex=0`; `CompressionStrategy.cs:58-63` | Kutu "Auto" der; **hangi kodeğe döndüğünü söylemez** | Evet (Uyumlu / En küçük) |
-| 4 | Somut video kodeği | Bu kaynakta **`libsvtav1`** (bulunamazsa `libx265`); Compatible yolunda `libx264` | `PlanCalculator.cs:757-777`; ölçülen çıktı: `av1` | Hayır | Dolaylı (3 üzerinden) |
-| 5 | Kodlayıcı preset'i | **`6`** (libsvtav1). Yazılım x264/x265'te `slow`, donanımda `p4`/`p6`/`medium`/`quality` | `PlanCalculator.cs:812-826`; donanım tabloları `FfmpegArguments.cs:19-51` | Hayır | **Hayır** — arayüzde hiç yok |
-| 6 | Oran kipi | **2-pass VBR**, `-b:v 2026k`. CRF'e ancak bütçe CRF'i şeffaflık tavanının altında kalırsa geçilir | `PlanCalculator.cs:242-310`; argüman `FfmpegArguments.cs:146-159` | Hayır | Hayır |
-| 7 | Doldurma politikası | **`FillTarget`** — bandı doldurmak için CRF düşürülür / 2-pass'e geçilir. Band 16 MB'da `[15,20 – 16,00]`, sert taban `14,40` | `PlanCalculator.cs:15`, `:25-32`; `MainWindow.axaml:439` | Evet, ama adı motor jargonu | Evet |
-| 8 | Çözünürlük | **1920x1080 korundu.** İzin var (kutu açık) ama arama 1,00 ölçeği seçti; izin verilseydi taban 0,20 / 180 px | `PlanCalculator.cs:622-670`; `CompressionStrategy.cs:65,85-90`; kutu `MainWindow.axaml:406` | Kutu "düşürülebilir" der; **sonucun ne olduğunu plan satırı dışında söylemez** | Kısmen (yalnız izin verir/vermez) |
-| 9 | Kare hızı | **60 fps korundu.** Aggressive rejimde düşürmeye izin var, taban 10 fps | `PlanCalculator.cs:672-691`; `CompressionStrategy.cs:67`; kutu `MainWindow.axaml:414` | Aynı | Kısmen |
-| 10 | Ses kodeği | **`aac`**, her zaman yeniden kodlanır — kopyalama yolu yok | `PlanCalculator.cs:810`, `:328` | Hayır | **Hayır** |
-| 11 | Ses bit hızı | **128k stereo** (mono 96k, Arşiv 160/112); kaynak bit hızı ve rejim payı (`Aggressive` → toplamın %18'i) tavan; 56k altında zorla mono | `PlanCalculator.cs:724-755`; `CompressionStrategy.cs:70-76` | Hayır | **Hayır** |
-| 12 | HDR politikası | **Koru.** Kodeğin 10-bit yolu yoksa sessizce `tonemap`e düşer (hable, npl=100, bt709) | `PlanCalculator.cs:14`; `HdrResolver.cs:14-52` | Yalnız kaynak HDR'ken görünen kutu (`MainWindow.axaml.cs:1566`) | Evet, kaynak HDR ise |
-| 13 | Piksel biçimi | **`p010le` istenir** (yoklama sırası `p010le` → `yuv420p10le`, `EncoderCapabilities.cs:125-131`). ffmpeg bunu sessizce `yuv420p10le`'ye çevirir — teslim edilen dosyada ölçülen biçim `yuv420p10le` | `HdrResolver.cs:51`; `FfmpegArguments.cs:163` | Hayır | Hayır |
-| 14 | Anahtar kare aralığı | **`-g 120`** = `round(fps × 2)`, yani sabit 2 saniye | `FfmpegArguments.cs:162` | Hayır | **Hayır** |
-| 15 | Psychovisual / tune | **`-svtav1-params tune=0:enable-variance-boost=1:variance-boost-strength=2`** (x265'te `psy-rd=2:psy-rdoq=1:aq-mode=2`, nvenc'te `-spatial-aq 1 -temporal-aq 1`) | `FfmpegArguments.cs:254-278` | Hayır | Hayır |
-| 16 | Hız kipi (GPU) | **`Quality`** (yazılım). Kutu ilk açılışta kilitli gelir; donanım yoklaması karar verip ayara yazar ve bir daha üstüne yazmaz | `MainWindow.axaml:422` `IsEnabled=False`; yoklama `MainWindow.axaml.cs:1206-1262`; kural `HardwareVerdict.cs:66-101`; ayar `UpdateCheck.cs:399-400` | Kutu görünür ama kararı program verdi | Evet, karar verildikten sonra |
-| 17 | Kap ve çıktı adı | **`mp4`**, `<ad>_shrunk.mp4`, kaynağın yanına, `-movflags +faststart` | `MainWindow.axaml.cs:1983-1994`, `:2356`; `FfmpegArguments.cs:185` | Hayır (yol sonuçta görünür) | **Hayır** |
-| 18 | Çözme ivmesi | **`-hwaccel auto`** her girişte | `FfmpegArguments.cs:123` | Hayır | Hayır |
-| 19 | Yeniden deneme | En çok **3 deneme**; hedefi aşan çıktı asla teslim edilmez, band altı kalan bir kez (ölçüm varsa iki kez) tekrarlanır | `EncodeRunner.cs:39-40`, `:71-167` | Kısmen (sonuç metninde deneme sayısı) | Hayır |
+| 3 | Kalite hedefi (1-100) | **60** kayıtlı varsayılan. Dosya yüklenince kutunun üzerine, geçerli hedef boyutun tahmini puanı yazılıyor — bu kaynakta **87,1**. Denetim `PlanCalculator.BuildDetailed`'e girmiyor; yalnız `TargetMbForQuality` ile puandan hedef MB üretiyor, yani 1. satırın ters yönden sorulmuş hâli | `MainWindow.axaml:369` `Value=60`; `UpdateCheck.cs:403`; geri yazma `MainWindow.axaml.cs:2080-2091`; tüketici `PlanCalculator.cs:444` | Evet, kaydırıcı + kutu | Evet |
+| 4 | Kodek tercihi | **Auto** → rejimden türer: Light/Balanced → `Compatible`, Aggressive/Extreme → `MaxCompression` | `MainWindow.axaml:398` `SelectedIndex=0`; `CompressionStrategy.cs:58-63` | Kutu "Auto" der; **hangi kodeğe döndüğünü söylemez** | Evet (Uyumlu / En küçük) |
+| 5 | Somut video kodeği | Bu kaynakta **`libsvtav1`** (bulunamazsa `libx265`); Compatible yolunda `libx264` | `PlanCalculator.cs:757-777`; ölçülen çıktı: `av1` | Hayır | Dolaylı (4 üzerinden) |
+| 6 | Kodlayıcı preset'i | **`6`** (libsvtav1). Yazılım x264/x265'te `slow`, donanımda `p4`/`p6`/`medium`/`quality` | `PlanCalculator.cs:812-826`; donanım tabloları `FfmpegArguments.cs:19-51` | Hayır | **Hayır** — arayüzde hiç yok |
+| 7 | Oran kipi | **2-pass VBR**, `-b:v 2026k`. CRF'e ancak bütçe CRF'i şeffaflık tavanının altında kalırsa geçilir | `PlanCalculator.cs:242-310`; argüman `FfmpegArguments.cs:146-159` | Hayır | Hayır |
+| 8 | Doldurma politikası | **`FillTarget`** — bandı doldurmak için CRF düşürülür / 2-pass'e geçilir. Band 16 MB'da `[15,20 – 16,00]`, sert taban `14,40` | `PlanCalculator.cs:15`, `:25-32`; `MainWindow.axaml:439` | Evet, ama adı motor jargonu | Evet |
+| 9 | Çözünürlük | **1920x1080 korundu.** İzin var (kutu açık) ama arama 1,00 ölçeği seçti; izin verilseydi taban 0,20 / 180 px | `PlanCalculator.cs:622-670`; `CompressionStrategy.cs:65,85-90`; kutu `MainWindow.axaml:406` | Kutu "düşürülebilir" der; **sonucun ne olduğunu plan satırı dışında söylemez** | Kısmen (yalnız izin verir/vermez) |
+| 10 | Kare hızı | **60 fps korundu.** Aggressive rejimde düşürmeye izin var, taban 10 fps | `PlanCalculator.cs:672-691`; `CompressionStrategy.cs:67`; kutu `MainWindow.axaml:414` | Aynı | Kısmen |
+| 11 | Ses kodeği | **`aac`**, her zaman yeniden kodlanır — kopyalama yolu yok | `PlanCalculator.cs:810`, `:328` | Hayır | **Hayır** |
+| 12 | Ses bit hızı | **128k stereo** (mono 96k, Arşiv 160/112); kaynak bit hızı ve rejim payı (`Aggressive` → toplamın %18'i) tavan; 56k altında zorla mono | `PlanCalculator.cs:724-755`; `CompressionStrategy.cs:70-76` | Hayır | **Hayır** |
+| 13 | HDR politikası | **Koru.** Kodeğin 10-bit yolu yoksa sessizce `tonemap`e düşer (hable, npl=100, bt709) | `PlanCalculator.cs:14`; `HdrResolver.cs:14-52` | Yalnız kaynak HDR'ken görünen kutu (`MainWindow.axaml.cs:1566`) | Evet, kaynak HDR ise |
+| 14 | Piksel biçimi | **`p010le` istenir** (yoklama sırası `p010le` → `yuv420p10le`, `EncoderCapabilities.cs:125-131`). ffmpeg bunu sessizce `yuv420p10le`'ye çevirir — teslim edilen dosyada ölçülen biçim `yuv420p10le` | `HdrResolver.cs:51`; `FfmpegArguments.cs:163` | Hayır | Hayır |
+| 15 | Anahtar kare aralığı | **`-g 120`** = `round(fps × 2)`, yani sabit 2 saniye | `FfmpegArguments.cs:162` | Hayır | **Hayır** |
+| 16 | Psychovisual / tune | **`-svtav1-params tune=0:enable-variance-boost=1:variance-boost-strength=2`** (x265'te `psy-rd=2:psy-rdoq=1:aq-mode=2`, nvenc'te `-spatial-aq 1 -temporal-aq 1`) | `FfmpegArguments.cs:254-278` | Hayır | Hayır |
+| 17 | Hız kipi (GPU) | **`Quality`** (yazılım). Kutu ilk açılışta kilitli gelir; donanım yoklaması karar verip ayara yazar ve bir daha üstüne yazmaz | `MainWindow.axaml:422` `IsEnabled=False`; yoklama `MainWindow.axaml.cs:1206-1262`; kural `HardwareVerdict.cs:66-101`; ayar `UpdateCheck.cs:399-400` | Kutu görünür ama kararı program verdi | Evet, karar verildikten sonra |
+| 18 | Kap ve çıktı adı | **`mp4`**, `<ad>_shrunk.mp4`, kaynağın yanına, `-movflags +faststart` | `MainWindow.axaml.cs:1983-1994`, `:2356`; `FfmpegArguments.cs:185` | Hayır (yol sonuçta görünür) | **Hayır** |
+| 19 | Çözme ivmesi | **`-hwaccel auto`** her girişte | `FfmpegArguments.cs:123` | Hayır | Hayır |
+| 20 | Yeniden deneme | En çok **3 deneme**; hedefi aşan çıktı asla teslim edilmez, band altı kalan bir kez (ölçüm varsa iki kez) tekrarlanır | `EncodeRunner.cs:39-40`, `:71-167` | Kısmen (sonuç metninde deneme sayısı) | Hayır |
 
-**Sayım:** 19 kararın **6'sı** kullanıcıya sorulur (1, 2, 3, 7, 8/9 izinleri, 12),
-**13'ü** hiç sorulmaz. Sorulmayanların içinde kaliteyi doğrudan belirleyen üç tanesi var:
-preset (5), anahtar kare aralığı (14) ve ses bütçesi payı (11).
+**Sayım:** 20 kararın **9'u** kullanıcıya sorulabilir — "Değiştirebilir mi" sütunu
+Evet ya da Kısmen olanlar: hedef boyut (1), amaç (2), kalite hedefi (3), kodek
+tercihi (4), doldurma politikası (8), çözünürlük izni (9), kare hızı izni (10),
+HDR biçimi (13, yalnız HDR kaynakta) ve GPU hız kipi (17). Bu dokuz, K5'te tek tek
+sınanan dokuz sorunun aynısı.
+
+Kalan **11'i** hiç sorulmaz. Biri (somut video kodeği, 5) yalnız 4 üzerinden dolaylı
+belirlenir; onu da sorulmayanlara yazdık, çünkü kullanıcı `libsvtav1` ile `libx264`
+arasında doğrudan seçim yapamıyor. Sorulmayanların içinde kaliteyi doğrudan
+belirleyen üç tanesi var: preset (6), anahtar kare aralığı (15) ve ses bütçesi
+payı (12).
 
 ### Bu kaynakta üretilen tam plan
 
@@ -173,15 +190,18 @@ kadar yeniden ayarlandı (uzman-biz için üç, HandBrake için iki koşum).
 |---|---|
 | `auto` | Uygulamanın kendi varsayılanları. Hiçbir ayara dokunulmadı. Motor `libsvtav1`, preset 6, `-g 120`, 1920x1080@60, `aac 128k` seçti; istenen `-b:v 2026k`. |
 | `uzman-biz` | Aynı motor, elle ayarlanmış: `libsvtav1` **preset 4**, **`-g 300`**, çözünürlük düşürülmedi; istenen `-b:v 2605k`. Diğer her şey auto ile birebir aynı. |
-| `uzman-handbrake` | `HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900` |
+| `uzman-handbrake` | Koşum adı **`uzman-hb2`**: `HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900`. Boyut eşitlemenin ikinci denemesi; ilk deneme `uzman-hb` aynı komutu `-b 2026` ile koştu ve 15,97 MiB verdi — K3'e girmedi, kusur 3'ün oran tablosunda kullanıldı. |
 
-| satır | boyut | ortalama | p10 | harmonik | sıfır puanlı kare | en düşük kare |
+| satır | boyut | ortalama | p10 | harmonik | 1 puan altı kare | en düşük kare |
 |---|---|---|---|---|---|---|
 | auto | 15,04 MiB (15766933 bayt) | 94,462 | 94,534 | 56,313 | 26 | 0,00 |
 | uzman-biz | 15,02 MiB (15752039 bayt) | 94,861 | 95,337 | 56,472 | 26 | 0,00 |
 | uzman-handbrake | 15,02 MiB (15754005 bayt) | 95,731 | 95,361 | 95,727 | 0 | 74,67 |
 
 **Uzman açığı = uzman-biz - auto:** ortalama +0,400, harmonik +0,159, p10 +0,803
+
+Bu açığın tamamı ayar başına ayrıştırılamadı; ne kadarının ayrıştırıldığı ve kalanın
+neden ölçülmediği K4'te yazılı.
 
 Boyut farkı: uzman-biz 15,02 MiB, auto 15,04 MiB (-0,1%).
 
@@ -191,10 +211,10 @@ Okuma: pozitif sayı uzmanın önde olduğunu söyler. Üç satır da 15,02-15,0
 aralığında, aralarındaki en büyük boyut farkı **%0,1** — yani puan farkı boyut
 farkından gelmiyor.
 
-**Harmonik sütunu bu tabloda okunmamalı.** Beş SVT-AV1 koşumunun tamamında aynı
-26 kare VMAF-NEG'den tam 0 alıyor, iki x265 koşumunda hiç almıyor; o kareler bozuk
-değil (PSNR 46-48 dB). Sütun sözleşme üç metrik istediği için duruyor, yanında
-sıfır kare sayısıyla. Ayrıntı ölçüm düzeneği bölümünde ve kusur 4'te.
+**Harmonik sütunu bu tabloda okunmamalı.** Altı SVT-AV1 koşumunun tamamında aynı
+26 kare VMAF-NEG'den 1 puanın altında alıyor (25'i tam 0), iki x265 koşumunda hiç
+almıyor; o kareler bozuk değil (PSNR 46,30-49,34 dB). Sütun sözleşme üç metrik istediği için duruyor, yanında
+1 puan altı kare sayısıyla. Ayrıntı ölçüm düzeneği bölümünde ve kusur 4'te.
 
 ---
 
@@ -240,13 +260,34 @@ tavanın **arasına** tam bu iki kesmeyi yerleştirmiş. Bizimkiler
 düşüyor. Yani auto, kesmeden 0,34 s **önce** bir anahtar kareyi harcıyor, sonra
 kesmenin kendisini P/B kare olarak kodlamak zorunda kalıyor: en pahalı hâli.
 
-Bit bütçesinin nereye gittiği bu. 31 anahtar karenin 29'u hiçbir sahne sınırında
-değil; HandBrake aynı kaynakta aynı teslim boyutunda 7 taneyle yetiniyor.
+Bit bütçesinin nereye gittiği bu. Auto'nun 31 anahtar karesinin **31'i de** hiçbir
+sahne sınırında değil — ızgara 0,0167 s'den başlayıp 2,00 s'de bir ilerliyor, iki
+kesme ise 28,353 ve 56,870 s'de; ızgaranın hiçbir noktası ikisine denk gelmiyor.
+HandBrake aynı kaynakta aynı teslim boyutunda 7 taneyle yetiniyor ve ikisini tam
+kesmelere koyuyor.
 
 **Düzeltme bu sözleşmenin işi değil.** `FfmpegArguments.cs` T98'in `owns`'unda;
 burası ölçüp adlandırıyor.
 
-### Ayrıştırma nasıl okunmalı
+### Ayrıştırma açığın ne kadarını açıklıyor
+
+**Toplam tutmuyor, ve bu belgenin söylemesi gereken bir şey.** İki ablasyonun
+Δ ortalaması toplamı `+0,155 − 0,042 = **+0,113**`; K3'teki açık **+0,400**. p10'da
+durum daha keskin: `+0,333 − 0,293 = **+0,040**`, açık ise **+0,803**. Yani ayar
+başına ayrıştırma açığın ortalamada kabaca **dörtte birini**, p10'da **yirmide
+birini** açıklıyor.
+
+**Kalan kısım ayrıştırılamadı — ölçülmedi.** İki aday var, ikisi de bu sözleşmede
+ölçülmedi: (a) iki ayarın birlikte kullanıldığındaki etkileşimi, (b) boyut eşitlemek
+için gereken bit hızı farkı — ablasyonlar auto'nun `-b:v 2026k` isteğiyle koştu,
+`uzman-biz` ise 15,02 MiB'a oturmak için `2605k` ile koştu. Ayırmak için her
+ablasyonun ayrıca boyut eşitlenmiş bir koşumu gerekirdi; o koşumlar yapılmadı.
+
+Bu yüzden `-g`'ye "en büyük kalem" demek, "açığın açıklaması" demek değil. `-g`
+bulgusunun gücü açığa katkısından gelmiyor — **daha küçük dosyada daha yüksek puan**
+verdiği için, boyut eşitliği tartışmasından bağımsız olarak tek başına duruyor.
+
+### Satır satır okuma
 
 Üç ablasyon da auto ile **aynı** `-b:v 2026k` isteğiyle koşturuldu, ama `libsvtav1`
 istenen bit hızını ayara göre farklı tutturuyor (bkz. kusur 3). Bu yüzden satırlar
@@ -300,16 +341,17 @@ bizde de sabit, ama **preset adı gibi görünür bir kapağı yok**:
 
 ---
 
----
-
 ## K6 — Sıradaki adım
 
 Üç madde, üçü de K4'teki bir sayıya bağlı. Hiçbiri bu sözleşmede uygulanmadı.
 
-**1. Anahtar kare aralığını içerikten türet.** K4'ün en büyük kalemi: `-g 300` dosyayı
-%24,5 küçültürken puanı yükseltiyor (ortalama +0,155, p10 +0,333). Ölçülen sebep,
-sabitin katı ızgara üretmesi — auto'nun 31 anahtar karesinin 29'u hiçbir sahne
-sınırında değil, HandBrake aynı kaynakta 7 taneyle yetiniyor ve ikisini tam
+**1. Anahtar kare aralığını içerikten türet.** K4'te ölçülen kalemlerin en büyüğü:
+`-g 300` dosyayı %24,5 küçültürken puanı yükseltiyor (ortalama +0,155, p10 +0,333).
+Bu maddenin gerekçesi açığa katkısı değil — açığın çoğu zaten ayrıştırılamadı —
+**daha küçük dosyada daha yüksek puan** vermesi; iki eksende birden kazandığı için
+boyut eşitliği tartışmasından bağımsız duruyor. Ölçülen sebep,
+sabitin katı ızgara üretmesi — auto'nun 31 anahtar karesinin **hiçbiri** sahne
+sınırına denk gelmiyor, HandBrake aynı kaynakta 7 taneyle yetiniyor ve ikisini tam
 kesmelere koyuyor. Yapılacak iş `FfmpegArguments.cs:162`'deki `fps × 2` sabitini
 bir tavan (`-g`) + sahne kesmesi tetikli anahtar kare düzenine çevirmek.
 **Bu dosya T98'in `owns`'unda; iş oraya ait.**
@@ -365,7 +407,7 @@ teslim oranları (teslim edilen video bit hızı / istenen):
 | ölçek 1440x810 | 2026 | 1743,9 | 0,861 |
 | preset 4 + g=300 | 2975 | 2145,2 | 0,721 |
 | preset 4 + g=300 | 2775 | 2038,8 | 0,735 |
-| HandBrake x265 preset slow | 2026 | 2073,7 | **1,024** |
+| HandBrake x265 preset slow (`uzman-hb`) | 2026 | 2073,7 | **1,024** |
 
 HandBrake istediğini %2,4 içinde tutturuyor; bizim yolumuz %4 ile %29 arasında altına
 düşüyor. Plan hesabı bu sapmayı yalnız donanım kodlayıcıları için modelliyor
@@ -374,12 +416,14 @@ sapma sıfır varsayılıyor. Auto'nun kendi doldurma bandını dolduramamasın�
 (15,04 MiB teslim, band alt kenarı 15,20 MiB) ölçülen sebebi bu. Sapma preset'e ve
 anahtar kare aralığına bağlı olduğu için bu ikisini değiştiren her öneri bu düzeltmeyi
 de ister — aksi halde kazanılan yer boş bırakılır.
+
 **4. Harmonik ortalama AV1 çıktılarında yapay olarak çöküyor ve bench bunu
-raporluyor.** VMAF-NEG bu kaynakta beş SVT-AV1 koşumunun **tamamında birebir aynı
-26 karede** tam 0 veriyor; iki x265 koşumunda hiç vermiyor. Kareler bozuk değil:
-aynı aralıkta auto'nun PSNR'ı 46-48 dB, parlaklık kaynakla örtüşüyor ve HandBrake
-aynı karelerde 98-100 alıyor. Harmonik ortalama `n / Σ(1/max(x,1))` olduğu için bu
-26 kare sayıyı 94,5'ten 56,3'e indiriyor.
+raporluyor.** VMAF-NEG bu kaynakta altı SVT-AV1 koşumunun **tamamında birebir aynı
+26 karede** 1 puanın altına iniyor — bunların 25'i tam 0, `uzman-biz`de 24'ü. İki
+x265 koşumunda hiç inmiyor. Kareler bozuk değil: aynı aralıkta auto'nun PSNR'ı
+46,30-49,34 dB, parlaklık kaynakla örtüşüyor ve HandBrake aynı karelerde 96-100
+alıyor. Harmonik ortalama `n / Σ(1/max(x,1))` olduğu için bu 26 kare sayıyı
+94,5'ten 56,3'e indiriyor.
 
 Bench aynı formülü kullanıyor (`tools/VidShrink.Bench/Program.cs:820`) ve sonucu üç
 yerde raporluyor (`:527`, `:775`, `:913`). Bugün bench'e AV1 ile x265 aynı kaynakta
@@ -387,9 +431,20 @@ karşılaştırtılsa **39 puanlık** bir kalite farkı raporlardı; o farkın P
 karşılığı yok. Kodek kararı bu sayıya bakılarak verilirse yanlış kodek seçilir.
 
 Bench zaten XPSNR de ölçüyor (`:775`) — çelişki oradan yakalanabilirdi, ama sayılar
-yan yana okunmuyor ve sıfır puanlı kare sayısı hiç raporlanmıyor.
+yan yana okunmuyor ve düşük puanlı kare sayısı hiç raporlanmıyor.
 
 Sebep bench'in ölçekleme adımı değil: aynı çift `scale` filtresi olmadan yeniden
-ölçüldü, sonuç birebir aynı çıktı (3624 kare, 26 sıfır, aynı kare numaraları,
-ortalama 94,462, harmonik 56,313). Çıktı dosyasının kendisiyle libvmaf arasında
-kalıyor.
+ölçüldü, sonuç birebir aynı çıktı (3624 kare, 1 puan altı 26 kare, 25'i tam 0, aynı
+kare numaraları, ortalama 94,462, harmonik 56,313). Çıktı dosyasının kendisiyle
+libvmaf arasında kalıyor.
+
+**5. Ölçüm betiğinin sütun adı sayıyla uyuşmuyor.** Bu ölçümün tablolarını üreten
+`tablolar.py` sütunu `sifir = sum(1 for x in s if x < 1.0)` ile hesaplıyor ama
+başlığına "sıfır puanlı kare" yazıyor. Saydığı şey 1 puanın altındaki kare; tam
+sıfır sayısı bundan bir ya da iki eksik. Sayı doğru, adı yanlış — ve bu belgenin
+ilk sürümündeki iki yanlış cümlenin kaynağı bu oldu. Betik `.calisma/t102/` altındaki
+kopyada düzeltildi. T0 betiği `tools/auto-mod-olcumu/` altına taşıdığını bildirdi;
+`origin/main`de (`c648272`) o dizin **yok**, dolayısıyla taşınan kopyada başlık
+düzeltilmiş değil. Taşıma tamamlandığında aynı tek kelimelik düzeltme oraya da
+uygulanmalı.
+
