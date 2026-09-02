@@ -19,7 +19,7 @@ public sealed record Scene
 
 public sealed record SceneMap
 {
-    public const double DefaultThreshold = 0.2;
+    public const double DefaultThreshold = 0.105;
     public const double DefaultMinSceneSeconds = 1.0;
 
     public required double Threshold { get; init; }
