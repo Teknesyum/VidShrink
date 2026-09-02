@@ -7,6 +7,15 @@ namespace VidShrink.Ffmpeg;
 
 public readonly record struct PacketSample(double PtsSeconds, long Size);
 
+public readonly record struct SampleWindow(double Start, double Length, double Weight);
+
+public enum SamplingPlan
+{
+    Fixed,
+    Profile,
+    Scene
+}
+
 public static class ComplexityProbe
 {
     internal const string SampleFormat = "matroska";
@@ -15,6 +24,12 @@ public static class ComplexityProbe
     private const double MotionProbeMinSourceFps = 10.0;
     public const double MotionProbeFpsRatio = 0.5;
     private const int MaxWindows = 3;
+    internal const int MinWindows = 2;
+    internal const int MaxPlannedWindows = 12;
+    internal const double MaxSampledShare = 0.06;
+    internal const double SamplingTargetError = 0.05;
+    internal const double SamplingErrorScale = 1.0;
+    internal const double SamplingErrorDecay = 1.0;
     private const int MinProfileSeconds = 4;
 
     private const double ScanPointSeconds = 1.0;
@@ -140,6 +155,236 @@ public static class ComplexityProbe
         var count = duration < WindowSeconds * 6 ? 2 : MaxWindows;
         for (var i = 0; i < count; i++)
             yield return usable * (i + 0.5) / count;
+    }
+
+
+    public static double Heterogeneity(IReadOnlyList<double> secondBits)
+    {
+        if (secondBits is null) return 0.0;
+        var used = new List<double>(secondBits.Count);
+        foreach (var bits in secondBits)
+            if (double.IsFinite(bits) && bits > 0) used.Add(bits);
+        if (used.Count < MinProfileSeconds) return 0.0;
+
+        var mean = used.Average();
+        if (mean <= 0) return 0.0;
+
+        var variance = used.Sum(v => (v - mean) * (v - mean)) / used.Count;
+        var cv = Math.Sqrt(variance) / mean;
+        return double.IsFinite(cv) ? cv : 0.0;
+    }
+
+    public static int PlanWindowCount(double duration, double heterogeneity, double windowSeconds = WindowSeconds)
+    {
+        if (!double.IsFinite(duration) || duration <= windowSeconds * 1.5) return 1;
+        if (!double.IsFinite(heterogeneity) || heterogeneity <= 0) return MinWindows;
+
+        var needed = Math.Pow(Math.Max(heterogeneity, 0.0) * SamplingErrorScale / SamplingTargetError, 1.0 / SamplingErrorDecay);
+        var affordable = Math.Floor(duration * MaxSampledShare / windowSeconds);
+        var ceiling = Math.Max(MinWindows, Math.Min(MaxPlannedWindows, affordable));
+        return (int)Math.Clamp(Math.Ceiling(needed), MinWindows, ceiling);
+    }
+
+    public static IReadOnlyList<SampleWindow> PlanWindows(
+        SamplingPlan plan,
+        double duration,
+        IReadOnlyList<double>? secondBits = null,
+        IReadOnlyList<double>? sceneCuts = null,
+        int windowCount = 0,
+        double windowSeconds = WindowSeconds)
+    {
+        if (!double.IsFinite(duration) || duration <= 0) return Array.Empty<SampleWindow>();
+        if (plan == SamplingPlan.Fixed || secondBits is null || secondBits.Count < MinProfileSeconds)
+            return FixedWindows(duration, windowSeconds);
+
+        var count = windowCount > 0
+            ? windowCount
+            : PlanWindowCount(duration, Heterogeneity(secondBits), windowSeconds);
+        if (count <= 0) return FixedWindows(duration, windowSeconds);
+
+        var placed = plan == SamplingPlan.Scene
+            ? SceneWindows(duration, secondBits, sceneCuts, count, windowSeconds)
+            : ProfileWindows(duration, secondBits, count, windowSeconds);
+
+        return placed.Count == 0 ? FixedWindows(duration, windowSeconds) : placed;
+    }
+
+    private static IReadOnlyList<SampleWindow> FixedWindows(double duration, double windowSeconds)
+        => Windows(duration).Select(start => new SampleWindow(start, windowSeconds, 1.0)).ToList();
+
+    private static IReadOnlyList<SampleWindow> ProfileWindows(
+        double duration, IReadOnlyList<double> secondBits, int count, double windowSeconds)
+    {
+        var usable = new List<int>(secondBits.Count);
+        for (var i = 0; i < secondBits.Count; i++)
+            if (double.IsFinite(secondBits[i]) && secondBits[i] > 0) usable.Add(i);
+        if (usable.Count < MinProfileSeconds) return Array.Empty<SampleWindow>();
+
+        usable.Sort((a, b) =>
+        {
+            var byBits = secondBits[a].CompareTo(secondBits[b]);
+            return byBits != 0 ? byBits : a.CompareTo(b);
+        });
+        var strata = Math.Min(count, usable.Count);
+        var taken = new HashSet<int>();
+        var windows = new List<SampleWindow>(strata);
+
+        for (var s = 0; s < strata; s++)
+        {
+            var from = (int)((long)usable.Count * s / strata);
+            var to = (int)((long)usable.Count * (s + 1) / strata);
+            if (to <= from) continue;
+
+            var pick = NearestFreeSecond(usable, from, to, taken);
+            if (pick < 0) continue;
+            taken.Add(pick);
+            windows.Add(new SampleWindow(ClampStart(pick, duration, windowSeconds), windowSeconds, to - from));
+        }
+
+        return windows.OrderBy(w => w.Start).ToList();
+    }
+
+    private static int NearestFreeSecond(List<int> sorted, int from, int to, HashSet<int> taken)
+    {
+        var middle = from + (to - from) / 2;
+        for (var step = 0; step < to - from; step++)
+        {
+            var forward = middle + step;
+            if (forward < to && !taken.Contains(sorted[forward])) return sorted[forward];
+            var back = middle - step;
+            if (back >= from && !taken.Contains(sorted[back])) return sorted[back];
+        }
+        return -1;
+    }
+
+    private static IReadOnlyList<SampleWindow> SceneWindows(
+        double duration, IReadOnlyList<double> secondBits, IReadOnlyList<double>? sceneCuts, int count, double windowSeconds)
+    {
+        var bounds = new List<double> { 0.0 };
+        if (sceneCuts is not null)
+            foreach (var cut in sceneCuts.Where(c => c > 0 && c < duration).OrderBy(c => c))
+                if (cut - bounds[^1] >= windowSeconds) bounds.Add(cut);
+        bounds.Add(duration);
+        if (bounds.Count < 3) return ProfileWindows(duration, secondBits, count, windowSeconds);
+
+        var scenes = new List<(double Start, double Length, double Rate)>(bounds.Count - 1);
+        for (var i = 0; i + 1 < bounds.Count; i++)
+        {
+            var start = bounds[i];
+            var length = bounds[i + 1] - start;
+            if (length < windowSeconds) continue;
+            var bits = SegmentBits(secondBits, start, bounds[i + 1]);
+            if (bits <= 0) continue;
+            scenes.Add((start, length, bits / length));
+        }
+        if (scenes.Count == 0) return ProfileWindows(duration, secondBits, count, windowSeconds);
+
+        scenes.Sort((a, b) =>
+        {
+            var byRate = a.Rate.CompareTo(b.Rate);
+            return byRate != 0 ? byRate : a.Start.CompareTo(b.Start);
+        });
+        var total = scenes.Sum(s => s.Length);
+        var strata = Math.Min(count, scenes.Count);
+        var windows = new List<SampleWindow>(strata);
+        var index = 0;
+        var carried = 0.0;
+
+        for (var s = 0; s < strata; s++)
+        {
+            var edge = total * (s + 1) / strata;
+            var best = -1;
+            var bestLength = 0.0;
+            var weight = 0.0;
+            while (index < scenes.Count && (carried < edge - 1e-9 || best < 0))
+            {
+                carried += scenes[index].Length;
+                weight += scenes[index].Length;
+                if (scenes[index].Length > bestLength)
+                {
+                    bestLength = scenes[index].Length;
+                    best = index;
+                }
+                index++;
+            }
+            if (best < 0) continue;
+            var centre = scenes[best].Start + (scenes[best].Length - windowSeconds) / 2.0;
+            windows.Add(new SampleWindow(ClampStart(centre, duration, windowSeconds), windowSeconds, weight));
+        }
+
+        return windows.Count == 0
+            ? ProfileWindows(duration, secondBits, count, windowSeconds)
+            : windows.OrderBy(w => w.Start).ToList();
+    }
+
+    private static double SegmentBits(IReadOnlyList<double> secondBits, double start, double end)
+    {
+        var first = (int)Math.Floor(start);
+        var last = (int)Math.Ceiling(end) - 1;
+        var sum = 0.0;
+        for (var i = first; i <= last; i++)
+            if (i >= 0 && i < secondBits.Count && double.IsFinite(secondBits[i]) && secondBits[i] > 0) sum += secondBits[i];
+        return sum;
+    }
+
+    private static double ClampStart(double start, double duration, double windowSeconds)
+        => Math.Round(Math.Clamp(start, 0.0, Math.Max(0.0, duration - windowSeconds)), 3, MidpointRounding.AwayFromZero);
+
+    public static double WeightedBppf(IReadOnlyList<SampleWindow> windows, IReadOnlyList<(long Bytes, long Frames)> samples, int width, int height)
+    {
+        if (windows is null || samples is null || windows.Count != samples.Count) return 0.0;
+        var pixels = (double)width * height;
+        if (pixels <= 0) return 0.0;
+
+        double weighted = 0, weight = 0;
+        for (var i = 0; i < windows.Count; i++)
+        {
+            var (bytes, frames) = samples[i];
+            if (bytes <= 0 || frames <= 0) continue;
+            var w = windows[i].Weight > 0 ? windows[i].Weight : 1.0;
+            weighted += w * (bytes * 8.0 / (pixels * frames));
+            weight += w;
+        }
+
+        if (weight <= 0) return 0.0;
+        var bppf = weighted / weight;
+        return double.IsFinite(bppf) ? bppf : 0.0;
+    }
+
+    public static double PlanBias(IReadOnlyList<SampleWindow> windows, IReadOnlyList<double> secondBits)
+    {
+        if (windows is null || windows.Count == 0 || secondBits is null || secondBits.Count < MinProfileSeconds) return 0.0;
+
+        double sampled = 0, weight = 0;
+        foreach (var window in windows)
+        {
+            var seconds = SegmentSeconds(secondBits, window.Start, window.Start + window.Length);
+            if (seconds.Count == 0) continue;
+            var w = window.Weight > 0 ? window.Weight : 1.0;
+            sampled += w * seconds.Average();
+            weight += w;
+        }
+        if (weight <= 0) return 0.0;
+
+        var pool = secondBits.Where(b => double.IsFinite(b) && b > 0).ToArray();
+        if (pool.Length < MinProfileSeconds) return 0.0;
+
+        var fileMean = pool.Average();
+        var windowMean = sampled / weight;
+        if (fileMean <= 0 || windowMean <= 0) return 0.0;
+
+        var bias = windowMean / fileMean;
+        return double.IsFinite(bias) ? bias : 0.0;
+    }
+
+    private static List<double> SegmentSeconds(IReadOnlyList<double> secondBits, double start, double end)
+    {
+        var values = new List<double>();
+        var first = (int)Math.Floor(start);
+        var last = (int)Math.Ceiling(end) - 1;
+        for (var i = first; i <= last; i++)
+            if (i >= 0 && i < secondBits.Count && double.IsFinite(secondBits[i]) && secondBits[i] > 0) values.Add(secondBits[i]);
+        return values;
     }
 
     public static IReadOnlyList<double> WindowScanPoints(double duration)
@@ -270,6 +515,9 @@ public static class ComplexityProbe
     }
 
     private static double Round(double value) => Math.Round(Math.Max(0.0, value), 3, MidpointRounding.AwayFromZero);
+
+    public static IReadOnlyList<double> SecondBitProfile(IReadOnlyList<PacketSample> packets, double duration)
+        => SecondProfile(packets, duration);
 
     private static double[] SecondProfile(IReadOnlyList<PacketSample> packets, double duration)
     {
