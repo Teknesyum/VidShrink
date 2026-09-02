@@ -249,3 +249,28 @@ non-auditor agent record: worker". Denetciyi `teknesyum-core:worker` tipiyle act
 oysa oturumda ayri bir `auditor` ajan tipi var. Risk `low` oldugu icin `complete`
 yine de gecti; yuksek riskli bir sozlesmede muhur duserdi ve sebebi ancak o an
 gorulurdu. Denetim FIILEN yapildi ve gecti; kayit tutulamadi.
+
+## Bulgu — muhurlenmis iki sozlesmede olu verify kolu (2 Eylul 2026)
+
+Tur acilmiyor, sozlesmeler kapali kaliyor. Kayit, kusurun tekrarini gormek icin.
+
+vstest'in `--filter` varsayilani `FullyQualifiedName~`, yani alt dizi eslemesi.
+**Hicbir teste denk gelmeyen bir filtre kolu hata vermez, sessizce gecer.** Sayilan
+olcu sayisi dusuk cikar ama kimse bakmaz.
+
+Iki muhurlu sozlesmede bu var. Depoda `grep -rl "class <ad>" tests/` ile sayildi:
+
+| sozlesme | filtre kolu | eslesen sinif |
+|---|---|---:|
+| T116 | `MeasuredQualityTests` | 0 |
+| T130 | `HdrResolverTests` | 0 |
+
+Ayni sozlesmelerin oteki kollari gercek: `QualityMeterTests` 1, `PlanCalculatorTests` 1,
+`PlanCalculatorProbeTests` 1, `EncoderCapabilitiesTests` 1.
+
+Ikinci kusur T130'da ayrica duruyor: `verify` satirinin kapanis tirnagi eksik —
+`...|EncoderCapabilitiesTests]`. Betik yine de kabul etti.
+
+Alinan onlem: yeni sozlesmelerin dagitim metnine "kurdugun her filtre kolunun
+gercekten test buldugunu dogrula" satiri kondu (T132, T137). Sozlesme sablonuna
+kalici madde olarak gecmesi Core'a borc.
