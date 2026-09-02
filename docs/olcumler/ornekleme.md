@@ -247,3 +247,65 @@ kullanmıyor. Birleştirilecek iki geçiş yok. T101'in K6 yargısı (haritanın
 kodlamanın ilk geçişiyle birleştirilmesi, maliyetin çözmede olması) yerinde
 duruyor ve burada tekrarlanmadı; T103 haritayı örnekleme yolundan çıkardığı için
 o yargının kapsamı değişmiyor.
+
+## K6 — `ScanPoints` düzeltmesi hâlâ gerekli mi
+
+Bugünkü yol, sabit pencerelerin kestirimini `ScanPoints` yanlılığıyla bölerek
+düzeltiyor (`ComplexityProfile.WindowBiasMin/Max` = 0,5-2,0 güven bandı, band
+dışında paket aralığı yedeği). Yeni planda aynı düzeltme uygulanırsa ne oluyor:
+
+| klip | cv | N | `ScanBias` | düzeltmesiz | scan uygulanırsa |
+| --- | --- | --- | --- | --- | --- |
+| `k5-kisa` | 1,95 | 8 | 0,4197 | −2,15 % | bandda değil |
+| `k1-inisli` | 2,06 | 8 | 0,1851 | +2,06 % | bandda değil |
+| `k3-tepeli` | 0,90 | 5 | 0,7282 | +1,98 % | +40,05 % |
+| `s1-cuval` | 0,34 | 4 | 0,7064 | +4,34 % | +47,70 % |
+| `s2-donusumlu` | 0,35 | 4 | 1,0436 | +3,45 % | −0,88 % |
+| `k2-duz` | 0,27 | 3 | 1,1040 | +0,56 % | −8,91 % |
+| `k4-bas` | 1,00 | 5 | 0,9889 | −1,02 % | +0,09 % |
+| `k6-uzun` | 1,08 | 6 | 1,0269 | +1,24 % | −1,41 % |
+| **ortalama mutlak** | | | | **2,10 %** | **12,91 %** |
+
+**Yargı: yeni örnekleme yolunda `ScanPoints` düzeltmesi gerekli değil, zararlı.**
+Düzeltmenin kapattığı şey sabit pencerelerin *örnekleme* yanlılığıydı; örnekleme
+tabakalı ve ağırlıklı olunca o yanlılık kaynağında yok oluyor, düzeltme üstüne
+binince kendi hatasını ekliyor. Ortalama mutlak sapmayı 6 katına çıkarıyor.
+
+**Bu yargının sınırı:** yukarıdaki tablo 540p CRF-14 korpus kliplerine ait ve bu
+kliplerde `ScanBias` sekizde ikisinde güven bandının dışına düşüyor — yani korpus
+yanlılık yolu için temsilci değil. Gerçek 1080p60 HDR kaynaklarda yanlılık
+bandın içinde kalıyor (ölçüldü: `parca-1` 1,2230 · `parca-3` 0,9957 ·
+17 dk kaynak 0,7362; `parca-2` 0,3863 ile band dışı, paket yedeği 1,0057
+devreye giriyor).
+
+## K7 — Geriye dönük kırılma
+
+`src/VidShrink.Core/ComplexityProfile.cs` bu dalda **hiç değişmedi**
+(`git diff main...HEAD -- src/VidShrink.Core/ComplexityProfile.cs` boş).
+`ComplexityProfile.FromMeasurements` imzası, alan sırası ve `WindowBias`
+güven bandı aynı. Yoklama tarafında eklenenlerin hepsi yeni üye:
+`SampleWindow`, `SamplingPlan`, `PlanWindows`, `PlanWindowCount`,
+`Heterogeneity`, `WindowBits`, `WeightedBppf`, `PlanBias`, `SecondBitProfile`.
+Var olan `Windows`, `ScanPoints`, `ScanBiasAsync`, `PacketBiasAsync`,
+`RunDetailedAsync` imzaları korundu; `ComplexityScanTests` (42 test) dokunulmadan
+yeşil.
+
+### T99'un iki yolu — ölçüldü
+
+`ComplexityProfile.cs:257-260` iki yol açıyor:
+
+```
+var motionMeasured = fullScaleBppf > 0 && halfFpsBppf > 0;
+var motion = motionMeasured
+    ? Math.Clamp(Math.Log2(halfFpsBppf / fullScaleBppf), MotionExponentMin, MotionExponentMax)
+    : DefaultMotionExponent;
+```
+
+Ölçülen yolda `:259`'daki kırpma bağlar, ölçülemeyende `:260`'taki varsayılan
+devreye girer. Örnekleme değişikliği bu ayrımı **kaydırmıyor**: hareket örneği
+(`MotionSampleAsync`) planın orta penceresinden alınıyor ve plan her zaman en az
+iki pencere içerdiği için orta pencere her zaman var. `fullScaleBppf` ve
+`halfFpsBppf`'in ikisi de pozitif çıktığı sürece yol değişmiyor; ikisini de
+üreten kodlama sayısı 3'ten 2-8'e çıkıyor, sıfıra düşmüyor. Korpustaki sekiz
+klibin ve üç gerçek kaynağın hepsinde `Measured` yolu seçildi — **ölçülemeyen
+yola düşen içerik gözlenmedi**.

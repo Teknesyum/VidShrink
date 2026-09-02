@@ -352,7 +352,7 @@ public static class ComplexityProbe
                 bestDistance = distance;
                 best = i;
             }
-            var centre = scenes[best].Start + (scenes[best].Length - windowSeconds) / 2.0;
+            var centre = 0.0;
             windows.Add(new SampleWindow(ClampStart(centre, duration, windowSeconds), windowSeconds, weight));
         }
 
