@@ -713,3 +713,34 @@ ve `:383` bir cagri bile degil, metot basligi. `tools/ornekleme` de olcu degil, 
 
 Kalan 13 satir ve K5'in tasiyici cumlesi dogrulandi. Tur 2 **belge turu**; kod degismiyor.
 Yerel yapici acildi, dal `T142-tur2`.
+
+## T143 muhurlendi (2 Eylul 2026)
+
+Denetci `a0d2d12375e3e973a`. Cagri sayimi **ucuncu kez ve tur turetimli yontemle** uretildi:
+imzalardan `map`in 4. arguman oldugu okundu, agactaki 16 `WorstScene(` satiri
+bildirim/metot-adi/cagri diye ayrildi, cagrilar arguman sayisina bolundu. 2+1+13=16,
+6+5=11, 1+1+11=13 — toplamlar tutuyor. Yapicinin 11/5/4/1 tablosu dogru; **sozlesmenin
+yazdigi 12 yanlisti** ve yapici bunu kendisi buldu.
+
+K4'un iki sayisi denetcinin kendi kosumunda uretildi: duzeltilmis `88.888889 @ 14.0 unit
+2.25`, eski davranis `100.0 @ 0.0 unit 2.0`. Eski testin yeniden yazilmasi mesru:
+`MinimumUnitSeconds` 0,5 sn olarak **duruyor**, degisen yalniz sonuc (dusur -> kat). Yeni
+test daha siki. Bant genisletilmedi.
+
+Dort mutasyonun ucu denetcide kosuldu, izgara birebir tuttu. Izgara daraltmasinin olcuyu
+zayiflatmadigi ayrica dogrulandi.
+
+Yedi borc, KRITIK yok. **En onemlisi dorduncusu:** `WorstScene`in iki asiri yuklemesinin
+**artik uretim cagirani sifir.** Uretim `AggregateVmaf` -> `WorstSceneUnit` yolundan
+geciyor; `WorstScene` yalniz 10 test satirindan cagriliyor. Yani sozlesmenin actigi kusur
+sinifi kapanmadi, **eski giris noktasina kaydi** — ve rapor bunu anmiyor.
+
+Bu, "uretim cagirani sifir" sinifinin **besinci** gorunumu (T137, T142 K3, T143 map kolu,
+T140 turbo anahtari, simdi `WorstScene`). Kok neden ayni: yetenegi yazan sozlesme onu
+cagiran dosyayi sahiplenmiyor. T146 bu sinifi kapatmak icin acildi ve `PlanCalculator.cs`
+T139'da oldugu icin bekliyor.
+
+Ikinci onemli borc: uygulama **haritayi olcumden sonra kuruyor**
+(`MainWindow.axaml.cs:1807` olcum, `:1812` harita). Yapici buldu, denetci gozle dogruladi.
+Imza bugun degistirilse bile gecirilecek harita o noktada **yok**. Ayri sozlesme; T141 ve
+T143 muhurlenince acilir.
