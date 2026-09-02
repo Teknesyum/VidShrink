@@ -44,15 +44,42 @@ Düzeltmeden sonra tam süit beş kez koşuldu, beşi de yeşil:
 
 Ham kayıt `.calisma/t132/k03-tam-suit.txt`. Dal koşumu `33637321742`, sonuç `success`.
 
+**Nihai kanıt bu beş tam süit koşumu ile CI koşumudur.** Tur 1'in raporunda anılan
+yerel `verify` sonucu (`Toplam 104, Başarısız 0`) için saklanmış bir kayıt yoktu;
+`.calisma/t132/verify-final.log` adını taşıyan dosya taban sıfırlamasından **önceki**
+tura ait (`Toplam 73, Başarısız 1`, düşen test `DonanimYoluKapatilincaKararDegisiyor`,
+duvar saati değil). O dosya adı yalan söylüyordu; adı düzeltilip
+`.calisma/t132/onceki-tur/sifirlama-oncesi-verify.log` yoluna taşındı. Tur 2'nin
+`verify` koşumu `.calisma/t132/verify-tur2.log` olarak saklandı ve şöyle bitiyor:
+
+```
+Başarılı!  - Başarısız: 0, Başarılı: 101, Atlanan: 3, Toplam: 104, Süre: 2 m 59 s
+```
+
+**Ölü ham veri ağaçtan çıkarıldı.** `.calisma/t132/claim1.csv` ve `claim2.csv` taban
+sıfırlamasından önceki tura aitti ve K2 tablosuyla uyuşmuyordu (claim1 boş dilim
+1500-1516, tabloda 1500-1500; claim2 geniş bütçe 10848-27666, tabloda 6714-7236).
+Silinmediler, `.calisma/t132/onceki-tur/` altına taşındılar:
+
+```
+$ ls .calisma/t132/onceki-tur/
+claim1.csv                    400 B   11:02
+claim2.csv                    830 B   11:22
+sifirlama-oncesi-verify.log  10821 B  12:03
+```
+
+Bu turun geçerli ham verisi `.calisma/test-ciktilari/t132/` altında
+(`iddia1.csv`, `iddia2.csv`, `iddia4.csv`, `iddia5.csv`, `tani.csv`).
+
 ## K1 — Beş iddianın sınıflaması
 
-| # | yer | ne tutmak istiyor | cevap | gerekçe |
-|---|---|---|---|---|
-| 1 | `PerformanceCheckTests.cs:757` | `CalibrateCpuClock(1500)` gerçekten 1500 ms yakıyor mu | (b) | Yakan iş parçacığı kendi `Stopwatch`ına bakıyor; saat üretim kodunun içinde ve bu sözleşme üretimi değiştirmiyor. Bant ölçülen dağılımdan daraltıldı. |
-| 2 | `PerformanceCheckTests.cs:618` | dar bütçe (900 ms) geniş bütçeye (60.000 ms) göre gerçekten erken kesiyor mu | (b) | İki taraf da gerçek ffmpeg geçişleri koşuyor, süre gerçek süreç süresi. Docstring bu satırı kendisi "ikincil ve bilerek gevşek" ilan ediyor; asıl kanıt üstündeki iki `Assert.False`. Bant değişmedi. |
-| 3 | `PerformanceCheckTests.cs:854` | ffmpeg geçişi gerçekten koştu mu | (c) | **Bu satır ölçmüyor.** Bir satır üstündeki `Assert.True(p.ExitCode == 0, ...)` sürecin koştuğunu zaten kanıtlıyor; `> 0` ondan sonra hiçbir şey eklemiyor. Kırabilecek gerçekçi bir mutasyon yok: `Stopwatch` çözünürlüğünün altında biten bir geçiş çıkış kodu da veremezdi. |
-| 4 | `UpdaterTests.cs:316` | ağsız açılış `ManifestTimeout` içinde vazgeçiyor mu | (b) | `HttpClient.Timeout` gerçek bir ağ isteğini kesiyor, enjekte edilebilir saat yok. Bant ölçülen dağılımdan daraltıldı. |
-| 5 | `UpdaterTests.cs:1173` | silme adımı geri çekilme turlarını gerçekten koşuyor mu | (b) | `Install-VidShrink.ps1`in gerçek `Start-Sleep` çağrıları, ayrı bir powershell süreci. Eski tabanıyla (1 sn) hiçbir şey tutmuyordu — o haliyle (c) idi; ölçülen dağılıma göre daraltılınca mutasyonu yakalamaya başladı (K3). |
+| # | yer | iddia | ne tutmak istiyor | cevap | gerekçe |
+|---|---|---|---|---|---|
+| 1 | `PerformanceCheckTests.cs:757` | `Assert.InRange(saat.ElapsedMilliseconds, 1500, 5_000)` | `CalibrateCpuClock(1500)` gerçekten 1500 ms yakıyor mu | (b) | Yakan iş parçacığı kendi `Stopwatch`ına bakıyor; saat üretim kodunun içinde ve bu sözleşme üretimi değiştirmiyor. Bant ölçülen dağılımdan daraltıldı. |
+| 2 | `PerformanceCheckTests.cs:618` | `Assert.True(basladi.ElapsedMilliseconds < genisSaat.ElapsedMilliseconds / 2, ...)` | dar bütçe (900 ms) geniş bütçeye (60.000 ms) göre gerçekten erken kesiyor mu | (b) | İki taraf da gerçek ffmpeg geçişleri koşuyor, süre gerçek süreç süresi. Docstring bu satırı kendisi "ikincil ve bilerek gevşek" ilan ediyor; asıl kanıt üstündeki iki `Assert.False`. Bant değişmedi. |
+| 3 | `PerformanceCheckTests.cs:854` | `Assert.True(clock.ElapsedMilliseconds > 0, ...)` | ffmpeg geçişi gerçekten koştu mu | (c) | **Bu satır ölçmüyor.** Bir satır üstündeki `Assert.True(p.ExitCode == 0, ...)` sürecin koştuğunu zaten kanıtlıyor; `> 0` ondan sonra hiçbir şey eklemiyor. Kırabilecek gerçekçi bir mutasyon yok: `Stopwatch` çözünürlüğünün altında biten bir geçiş çıkış kodu da veremezdi. |
+| 4 | `UpdaterTests.cs:316` | `Assert.True(stopwatch.Elapsed < ceiling, ...)`, `ceiling = ManifestTimeout + 250 ms` | ağsız açılış `ManifestTimeout` içinde vazgeçiyor mu | (b) | `HttpClient.Timeout` gerçek bir ağ isteğini kesiyor, enjekte edilebilir saat yok. Bant ölçülen dağılımdan daraltıldı. |
+| 5 | `UpdaterTests.cs:1173` | `Assert.True(stopwatch.Elapsed > TimeSpan.FromSeconds(5), ...)` | silme adımı geri çekilme turlarını gerçekten koşuyor mu | (b) | `Install-VidShrink.ps1`in gerçek `Start-Sleep` çağrıları, ayrı bir powershell süreci. Eski tabanıyla (1 sn) hiçbir şey tutmuyordu — o haliyle (c) idi; ölçülen dağılıma göre daraltılınca mutasyonu yakalamaya başladı (K3). |
 
 ## K2 — Ölçülen dağılım
 
@@ -94,8 +121,8 @@ Mutasyonlar üretim dosyalarına geçici uygulandı, her biri
 
 | ölçü | mutasyon | eski bantla | yeni bantla |
 |---|---|---|---|
-| K0 `ComplexityProbeTests.cs:61` | pencere sayısı 2 → 1 | — | **kırıldı** |
-| K0 `ComplexityProbeTests.cs:61` | ölçer bir pencerede hiç çağrılmıyor | — | **kırıldı** |
+| K0 `ComplexityProbeTests.cs:63` | pencere sayısı 2 → 1 | — | **kırıldı** |
+| K0 `ComplexityProbeTests.cs:63` | ölçer bir pencerede hiç çağrılmıyor | — | **kırıldı** |
 | 1 `PerformanceCheckTests.cs:757` | `CalibrateCpuClock` yakımı `durationMs / 100` | **kırıldı** (15 ms) | **kırıldı** (15 ms) |
 | 4 `UpdaterTests.cs:316` | `HttpClient.Timeout` 800 → 3000 ms, `ManifestTimeout` sabiti yerinde | **kırıldı** (3006 > 1300) | **kırıldı** (3006 > 1050) |
 | 5 `UpdaterTests.cs:1173` | `Install-VidShrink.ps1`: `RemoveAttempts` 6 → 5, yani 3200 ms'lik son geri çekilme turu düşüyor | **yaşadı** (4147 ms > 1000 ms) | **kırıldı** (4147 ms < 5000 ms) |
