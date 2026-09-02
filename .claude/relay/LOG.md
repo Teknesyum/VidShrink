@@ -903,3 +903,5 @@ yedi olay mesru/kaza diye siniflanir, `QualityArgs` mayini kapatilir.
 T0 onculu **olcerek** yazdi ve olcunun **basarisiz** oldugunu sozlesmeye yazdi: ayni
 agacta iki desen denemesi 63 ve 1 dedi. Sayi verilmedi; sayinin yoklugu kanit olarak
 verildi.
+
+- **T150** teslim edildi. Sifir tuketici sinifi olculebilir oldu: kume yansimayla turden turetiliyor, sayi 32 satirla pimlendi (27 sifir tuketici + 5 hic kullanilmayan), iki mutasyon kirmizi. T0 onculunun 63/1 ikilemi kapandi. K5 ile `QualityArgs` mayini kapandi; VideoToolbox kapisi acilmadi. Dal `T150-sifir-tuketici`.
