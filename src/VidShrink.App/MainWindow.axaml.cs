@@ -70,6 +70,7 @@ public partial class MainWindow : Window
     private EncodePlan? _aiPlan;
     private CancellationTokenSource? _cts;
     private ComplexityProfile? _profile;
+    private SceneMapAttempt? _sceneMap;
     private CancellationTokenSource? _probeCts;
     private SizeEstimate? _estimate;
     private IEncoderAvailability? _encoders;
@@ -1474,6 +1475,7 @@ public partial class MainWindow : Window
 
         _aiPlan = null;
         _profile = null;
+        _sceneMap = null;
         BtnRevert.IsVisible = false;
         TxtAiStatus.Text = "";
         SetAiDetails(false);
@@ -1522,6 +1524,10 @@ public partial class MainWindow : Window
             var profile = await ProbeWithMeasuredQualityAsync(info, speed, null, cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             _profile = profile;
+            Recalculate();
+
+            _sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);
+            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             Recalculate();
 
             TxtEstimateNote.Text = Say("main.estimate.calibrating");
@@ -1799,13 +1805,17 @@ public partial class MainWindow : Window
         RefreshEstimateView();
         RefreshDurationView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders, _sceneMap?.Map));
     }
 
+    /// <summary>
+    /// Ekranda gosterilen komut. <paramref name="scenes"/> kodlamaya giden haritanin ta kendisidir;
+    /// ayri gecilmezse gosterilen komut kosan komuttan anahtar kare araliginda ayrisirdi.
+    /// </summary>
     public static IReadOnlyList<string> DisplayedEncodeArguments(MediaInfo info, EncodePlan plan,
-        string outputPath, IEncoderAvailability? availability)
+        string outputPath, IEncoderAvailability? availability, SceneMap? scenes = null)
         => FfmpegArguments.Build(info, plan, outputPath,
-            plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability);
+            plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability, scenes);
 
     private void RefreshEstimateView()
     {
@@ -2399,7 +2409,7 @@ public partial class MainWindow : Window
                 if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB";
             });
 
-            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync);
+            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
 
