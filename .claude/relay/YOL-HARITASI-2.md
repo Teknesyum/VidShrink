@@ -227,6 +227,43 @@ listesini çıkaracak; sahiplerine T0 dağıtacak.
 **Bu arada kural:** harmonik sütuna yaslanan yeni bir sonuç yazılmaz.
 Ortalama ve p10 sağlam.
 
+### Cevap geldi: kusur ölçüde değil, hizalamada (T106, 2026-09-02)
+
+Yukarıdaki teşhis **yanlıştı** ve sayı doğruydu. Harmonik ortalama sağlam,
+`max(x,1)` kelepçesi suçlu değil. Suçlu **ölçüm boru hattımızın kare
+eşlemesi**: karşılaştırmayı zaman damgasıyla yapıyorduk, kaynağın video akışı
+`0,020000 s`'de başlıyor, bizim ffmpeg çağrımız çıktıyı `0,016667 s`'ye
+taşıyor. Kare başına −3,3 ms; ffmpeg framesync "damgası küçük-eşit son
+referans" seçtiği için **her kare komşusuyla** karşılaştırıldı. Yarım kareden
+küçük bir kayma tam bir kare kaydırma üretti.
+
+Kareler indekse kilitlenince aynı dosyalarda PSNR 17,2 → **44,74 dB**.
+
+| | min | <1 | harmonik |
+|---|---:|---:|---:|
+| AV1 eski | 0,000 | 26 | 56,313 |
+| AV1 yeni | 92,391 | 0 | **95,655** |
+| x265 yeni | 76,219 | 0 | 95,793 |
+
+**AV1 ↔ x265 harmonik farkı 39,446 → 0,138.** İki kodlayıcı bu kaynakta başa
+baş. Kodlayıcı seçim kuralı (5. basamak) artık açılabilir — ama 39,4 değil
+**0,14** puanla; yani o basamağın gerekçesi buharlaştı, yeniden gerekçe
+gerekiyor.
+
+Kusur **AV1'e özgü değil**: `libsvtav1`, `libx264`, `libx265` üçü de
+`start_time`'ı düşürüyor, HandBrake düşürmüyor. AV1 yalnızca T102'de ölçülen
+taraf olduğu için suçlu göründü. `docs/olcumler/algi-olcusu.md:171` bir **x264**
+koşumunda `VMAF-NEG min 0,0000` gösteriyor — bağımsız teyit.
+
+**Ayıklama testi, herkese:**
+`ffprobe -v error -select_streams v:0 -show_entries stream=start_time -of csv=p=0 <kaynak>`
+`0` dönerse o satır temiz.
+
+**Ders — bu projenin en pahalı sınıfı, altıncı kez:** sayı doğruydu, sayıyı
+açıklayan cümle yanlıştı. "Harmonik ortalama yalan söylüyor" tanısı üç
+sözleşmenin sınırına yazıldı ve hiçbirinde ölçülmedi. Bir tanının kendisi de
+ölçülür.
+
 ## Aynı kusuru iki tur birden düzeltiyor (T98 × T105)
 
 T98 anahtar kare üst sınırını `SceneMap` ortalamasından türetiyor ve
