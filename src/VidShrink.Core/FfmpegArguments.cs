@@ -130,13 +130,23 @@ public static class FfmpegArguments
     // by SceneMapMergeFactor, clamped between KeyframeCeilingMinSeconds and
     // KeyframeCeilingMaxSeconds. Without a map the default is HandBrake's 10 s.
     //
-    // SceneMapMergeFactor = 2.8 is the map's under-segmentation, measured against ground truth
-    // by T101: in the 144.2-333.3 s window the source carries 28 real cuts and the map reports
-    // 10, with zero false positives; every one of the 18 missed cuts scored 0.112-0.199, below
-    // SceneMap.DefaultThreshold = 0.2. So the map's mean scene length runs about 2.8x long and
-    // has to be divided down before a ceiling is derived from it. What the map is trusted for
-    // is the range, not the boundaries: the placement is left to the encoder's scene cut, whose
-    // lookahead is independent of the map and finds exactly the cuts the map misses.
+    // SceneMapMergeFactor is not a tuning constant; it is the map's measured recall, written as
+    // the two counts it was measured from. T101 checked the map against ground truth: in the
+    // 144.2-333.3 s window the source carries 28 real cuts and the map reports 10, with zero
+    // false positives; every one of the 18 missed cuts scored 0.112-0.199, below the threshold
+    // the map ran at. Dividing the mapped mean by 28/10 turns "mean length of a map scene" back
+    // into "mean length of a real shot", which is the quantity the ceiling wants.
+    //
+    // That recall belongs to one threshold, SceneMapThresholdOfRecord. If the threshold moves,
+    // the map splits differently and the recall is no longer 28/10 - applying the old divider
+    // on top of a corrected threshold would shorten the ceiling twice. The threshold is owned
+    // elsewhere (SceneMap.DefaultThreshold), so the guard is a measure, not a comment:
+    // Az_bolme_duzeltmesi_olculdugu_esikte_kalir turns red the moment the two diverge, and the
+    // recall has to be measured again before the ceiling can be trusted.
+    //
+    // What the map is trusted for is the range, not the boundaries: the placement is left to
+    // the encoder's scene cut, whose lookahead is independent of the map and finds exactly the
+    // cuts the map misses.
     //
     // The clamp comes from a ceiling sweep on parca-1-20sn (1920x1080@60 HDR PQ, libx264,
     // 2-pass, 20 MiB target, VMAF-NEG over the whole clip, same colour space and stream count
@@ -161,7 +171,10 @@ public static class FfmpegArguments
     // the seek budget itself, not a content-derived number.
     public const double KeyframeFloorSeconds = 1.0;
     public const double KeyframeCeilingDefaultSeconds = 10.0;
-    public const double SceneMapMergeFactor = 2.8;
+    public const double SceneMapThresholdOfRecord = 0.2;
+    public const double SceneMapGroundTruthCuts = 28.0;
+    public const double SceneMapReportedScenes = 10.0;
+    public const double SceneMapMergeFactor = SceneMapGroundTruthCuts / SceneMapReportedScenes;
     public const double KeyframeCeilingMinSeconds = 5.0;
     public const double KeyframeCeilingMaxSeconds = 10.0;
     public const double HardwareKeyframeCeilingSeconds = 5.0;

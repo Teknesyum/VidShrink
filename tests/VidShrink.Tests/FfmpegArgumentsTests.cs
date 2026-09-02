@@ -648,6 +648,31 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
+    /// Az bolme duzeltmesi bir ayar sabiti degil, haritanin **olculen duyarliligi**: T101'in
+    /// 189,1 sn'lik penceresinde 28 gercek kesime karsi harita 10 sahne bildiriyor. Bu
+    /// duyarlilik tek bir esige aittir. T105 <c>SceneMap.DefaultThreshold</c>'u yeniden
+    /// koyarsa harita baska bolusur, duzeltme gecersizlesir ve ust sinir iki kez kisalir.
+    /// Bu olcu tam o an kizarir; duyarlilik yeniden olculmeden gecilemez.
+    /// </summary>
+    [Fact]
+    public void Az_bolme_duzeltmesi_olculdugu_esikte_kalir()
+    {
+        Assert.Equal(FfmpegArguments.SceneMapThresholdOfRecord, SceneMap.DefaultThreshold);
+    }
+
+    /// <summary>
+    /// Duzeltme dogru buyuklugu uretiyor: T101'in penceresi 189,1 sn ve 28 gercek kesim
+    /// tasiyor; haritanin bildirdigi 10 sahneden turetilen ust sinir, gercek ortalama cekim
+    /// uzunlugunu vermeli. Iddia iki sabiti degil, uretimin ciktisini yer gercegiyle
+    /// karsilastiriyor.
+    /// </summary>
+    [Fact]
+    public void Az_bolme_duzeltmesi_T101_penceresinde_gercek_ortalamayi_uretir()
+    {
+        Assert.Equal(189.1 / 28.0, FfmpegArguments.KeyframeCeilingSeconds(Harita(189.1, 10)), 2);
+    }
+
+    /// <summary>
     /// Donanimda sahne kesimi yok (ffmpeg <c>-h encoder=hevc_nvenc</c>: <c>-no-scenecut</c>
     /// yalniz lookahead acikken is goruyor, bu proje lookahead acmiyor). Orada ust sinir
     /// gerceklesen araligin kendisi oldugu icin harita ust siniri oynatmaz ve deger
