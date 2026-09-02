@@ -504,8 +504,12 @@ girmedi, dolayisiyla kiracak yeni bir olcu de yok. Kural duzenekte kaldi
 (`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc
 mutasyon o kurali kiriyor.
 
-Sozlesmenin `verify` komutu `--filter "SceneBudgetTests|PlanCalculatorTests"`;
-`SceneBudgetTests.cs` **yok**, yani filtrenin o kolu sifir test esliyor ve sessizce geciyor. Kosan 23 test yalniz `PlanCalculatorTests`'tir. Bu bir eksiklik degil sonucun kendisidir — dagitim koda girmediginde girecek yeni test de yoktur; ama "verify yesil" cumlesi tek basina okunursa yaniltir, o yuzden burada yazili.
+Sozlesmenin dogrulama komutu su an `[dotnet test -c Release --filter "PlanCalculatorTests"]`.
+Ilk halinde filtre `"SceneBudgetTests|PlanCalculatorTests"` idi;
+`SceneBudgetTests.cs` agacta olmadigi icin o kol **sifir test esliyor**
+ve sessizce geciyordu. Sessiz gecen kol birakilmadi, filtreden cikarildi.
+Kosan testlerin hepsi `PlanCalculatorTests`'tir; "verify yesil" cumlesi
+bu sayfada yalnizca onu kapsar.
 
 Mutasyon duzenegi silinmedi; kosuldugunda sessizce gecmek yerine
 reddettigi gorulsun diye ciktisi buraya alindi:

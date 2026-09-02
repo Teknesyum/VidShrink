@@ -949,15 +949,19 @@ public static class Rapor
         sb.AppendLine("(`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc");
         sb.AppendLine("mutasyon o kurali kiriyor.");
         sb.AppendLine();
-        var testDosyasi = Path.Combine(kok, "tests", "VidShrink.Tests", "SceneBudgetTests.cs");
-        sb.AppendLine("Sozlesmenin `verify` komutu `--filter \"SceneBudgetTests|PlanCalculatorTests\"`;");
-        sb.AppendLine(File.Exists(testDosyasi)
-            ? "`SceneBudgetTests.cs` **var**, filtrenin iki kolu da esliyor."
-            : "`SceneBudgetTests.cs` **yok**, yani filtrenin o kolu sifir test esliyor ve " +
-              "sessizce geciyor. Kosan 23 test yalniz `PlanCalculatorTests`'tir. " +
-              "Bu bir eksiklik degil sonucun kendisidir — dagitim koda girmediginde " +
-              "girecek yeni test de yoktur; ama \"verify yesil\" cumlesi tek basina " +
-              "okunursa yaniltir, o yuzden burada yazili.");
+        var sozlesme = Path.Combine(kok, ".claude", "relay", "contracts", "T114.md");
+        var verify = File.Exists(sozlesme)
+            ? File.ReadLines(sozlesme).FirstOrDefault(x => x.StartsWith("verify:"))
+            : null;
+        if (verify is not null)
+        {
+            sb.AppendLine($"Sozlesmenin dogrulama komutu su an `{verify.Substring("verify:".Length).Trim()}`.");
+            sb.AppendLine("Ilk halinde filtre `\"SceneBudgetTests|PlanCalculatorTests\"` idi;");
+            sb.AppendLine("`SceneBudgetTests.cs` agacta olmadigi icin o kol **sifir test esliyor**");
+            sb.AppendLine("ve sessizce geciyordu. Sessiz gecen kol birakilmadi, filtreden cikarildi.");
+            sb.AppendLine("Kosan testlerin hepsi `PlanCalculatorTests`'tir; \"verify yesil\" cumlesi");
+            sb.AppendLine("bu sayfada yalnizca onu kapsar.");
+        }
         sb.AppendLine();
         sb.AppendLine("Mutasyon duzenegi silinmedi; kosuldugunda sessizce gecmek yerine");
         sb.AppendLine("reddettigi gorulsun diye ciktisi buraya alindi:");
