@@ -207,6 +207,12 @@ def cv(clip):
         return 0.0
     return (sum((v - m) ** 2 for v in vals) / len(vals)) ** 0.5 / m
 
+def maker_of(variants, name):
+    return next(m for t, m, _ in variants if t == name)
+
+def ratio_of(variants, name):
+    return next(r for t, _, r in variants if t == name)
+
 def production_bias(report):
     scan, packet = report.get("ScanBias", 0.0), report.get("PacketBias", 0.0)
     if 0.5 <= scan <= 2.0:
@@ -344,6 +350,30 @@ if __name__ == "__main__":
                         ok = n
                         break
                 print(f"    {c.name:16s} cv={cv(c):5.2f} N={ok}")
+
+        print()
+        print("== K6: yeni planda ScanPoints yanliligi hala gerekli mi ==")
+        print(f"{'klip':16s} {'cv':>5s} {'N':>3s} {'scanBias':>9s} {'duzeltmesiz':>12s} {'scan uygulanirsa':>17s}")
+        raw_sum = corr_sum = 0.0
+        rows = 0
+        for r in reports:
+            c = next((x for x in clips if x.name == r["Clip"]), None)
+            if c is None:
+                continue
+            n = max(2, min(8, math.ceil(2 + 3 * cv(c)), int(c.duration // WINDOW)))
+            w = maker_of(variants, family)(c, n)
+            d = deviation(c, w, ratio_of(variants, family)) if w else None
+            if d is None:
+                continue
+            sb = r.get("ScanBias", 0.0)
+            corr = (d + 1.0) / sb - 1.0 if 0.5 <= sb <= 2.0 else None
+            raw_sum += abs(d)
+            corr_sum += abs(corr) if corr is not None else abs(d)
+            rows += 1
+            shown = f"{corr:+16.2%}" if corr is not None else "        bandda degil"
+            print(f"{c.name:16s} {cv(c):5.2f} {n:3d} {sb:9.4f} {d:+11.2%} {shown}")
+        if rows:
+            print(f"  ortalama mutlak: duzeltmesiz {raw_sum/rows:.2%}, scan uygulanirsa {corr_sum/rows:.2%}")
 
         best_worst = min(worst.values())
         winners = sorted((n, name) for (name, n), v in worst.items() if v <= best_worst + 1e-12)
