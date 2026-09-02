@@ -715,10 +715,11 @@ HandBrake'te aynı hesap: %1,67'lik aralıkta 0,014 puan.
 Tek bir eşleşmiş çiftten daha güçlü bir ifade bu — açık, boyut eşleşmesinin
 tesadüfüne bağlı değil.
 
-**Karşılaştırılan dosyaların akış kümesi eşitlendiği doğrulandı.** Yedi dosyada
-(kaynak + üç AV1 + iki x265 + auto) `ffprobe` ile: 1920x1080, 60 fps, **3624
-video paketi**, tek AAC 48000 Hz stereo ses akışı. Süreler: kaynak 60,442 s,
-AV1 çıktıları 60,441167 s, HandBrake çıktıları 60,437 s. Bu projede ortak
+**Karşılaştırılan dosyaların akış kümesi eşitlendiği doğrulandı.** Karşılaştırmaya
+giren **on** dosyanın hepsinde (kaynak + auto + beş AV1 + üç x265) `ffprobe` ile:
+1920x1080, `60/1` kare hızı, **3624 video paketi**, tek `aac` 48000 Hz stereo ses
+akışı — istisnasız. Süreler: kaynak 60,442000 s, AV1 çıktılarının hepsi
+60,441167 s, HandBrake çıktılarının hepsi 60,437000 s. Bu projede ortak
 ölçüm parçalarının sessizce farklı çıkması bir kez A/B'yi haksız yapmıştı;
 burada eşitlik ölçüldü.
 
