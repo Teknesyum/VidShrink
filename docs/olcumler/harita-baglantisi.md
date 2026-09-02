@@ -349,6 +349,14 @@ de yanlış. Düzeltmesi T108'in.
 
 ## 7. Mutasyon kanıtı
 
+Batarya `tools/harita-baglantisi/mutasyon/` altında (`mutasyon.sh` M1–M3,
+`mutasyon-b.sh` M4–M6, `mutasyon-c.sh` M7–M9). Her mutasyondan önce
+`dotnet build VidShrink.sln -c Release --no-incremental` koşuyor — artımlı
+derleme mutasyonu taşımadığı için bu proje aynı tuzağa daha önce düştü.
+**Dürüst kayıt:** üçü de `.calisma/t113/` altında koşturuldu, worktree
+silinince kaybolmasınlar diye `tools/`a kopyalandı ve kök yolu göreliye
+çevrildi; **yeni yerinden yeniden koşturulmadılar.**
+
 Her mutasyondan **önce** `dotnet build VidShrink.sln -c Release --no-incremental`,
 sonra `dotnet test … --no-build --filter "EncodeRunnerTests|PreviewSegmentTests|FfmpegArgumentsTests"`.
 Düzenek `.calisma/t113/mutasyon.sh`: yamayı uygular, derler, koşar, kaynağı geri
