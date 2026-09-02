@@ -170,12 +170,27 @@ public static class CodecModel
            && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
            && !codec.Equals("av1_qsv", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Kalite hedefinin kodlayici olcegindeki karsiligi. Son kol <c>-crf</c> uretir, cunku
+    /// yazilim kodlayicilarinin hepsi onu kabul eder.
+    /// <para>
+    /// VideoToolbox o kola dusemez: <c>-crf</c> kabul etmiyor, kendi olcegi <c>-q:v</c> ise bu
+    /// depoda olculmedi — <c>docs/olcumler/videotoolbox.md</c> bir Apple M1'de kol basina tek
+    /// bir bit hizi veriyor, bir olcek cikarmaya yetmiyor. Olculmemis bir olcek yazmak yerine
+    /// kol acikca patliyor: bugun <c>PlanParser.AllowedCodecs</c> videotoolbox kodeklerini
+    /// gecirmedigi icin buraya ulasan yok, ama kapiyi acan sozlesme sessiz bir gecersiz bayrak
+    /// yerine bu istisnayi gorur.
+    /// </para>
+    /// </summary>
     public static IReadOnlyList<string> QualityArgs(string codec, double quality)
     {
         var exact = quality.ToString("0.#", CultureInfo.InvariantCulture);
         var whole = Math.Round(quality).ToString("0", CultureInfo.InvariantCulture);
         return Vendor(codec) switch
         {
+            EncoderVendor.VideoToolbox => throw new NotSupportedException(
+                $"VideoToolbox hiz kontrolu olculmedi ({codec}): -crf kabul edilmiyor ve -q:v olceginin "
+                + "bu depoda dayanagi yok. Kapiyi acan sozlesme olcegi olcup bu kolu yazar."),
             EncoderVendor.Nvenc => new[] { "-rc", "vbr", "-multipass", "fullres", "-cq", exact },
             EncoderVendor.Qsv => codec.Equals("h264_qsv", StringComparison.OrdinalIgnoreCase)
                 ? new[] { "-global_quality", whole, "-look_ahead", "1" }
