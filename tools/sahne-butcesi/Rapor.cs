@@ -1211,7 +1211,10 @@ public static class Rapor
                 : $"**Sahne basina dagitim {k4b.Hucre} hucrenin {k4b.ZonesKazandi} tanesinde " +
                   $"tabani gecti; kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp " +
                   $"({k4b.ZonesEnIyiHucre})" +
-                  (k4b.ZonesEnIyiOran is null ? "" : $", K1 aciginin %{Kabuk.Inv(k4b.ZonesEnIyiOran.Value, "0.0")}'i") +
+                  (k4b.ZonesEnIyiOran is null
+                    ? ". O hucrede kapatilacak bir K1 acigi yok: harita kodlayicinin kendi " +
+                      "dagitimindan daha kotu, kazanc tabana gore olculuyor"
+                    : $", K1 aciginin %{Kabuk.Inv(k4b.ZonesEnIyiOran.Value, "0.0")}'i") +
                   ".**";
             sb.AppendLine(basSatir + " " +
                           $"Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; " +
