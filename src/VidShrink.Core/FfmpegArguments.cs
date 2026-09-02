@@ -14,6 +14,12 @@ public interface IEncoderOptionWarmup
     bool WarmEncoderOption(string codec, string option, string value);
 }
 
+/// <summary>
+/// Anahtar kare aralığı: alt sınır, üst sınır ve aralığın hangi yoldan çıktığı.
+/// <see cref="FromSceneMap"/> yalnız sahne haritasından türetilen aralıkta doğrudur.
+/// </summary>
+public readonly record struct KeyframeRange(int MinFrames, int MaxFrames, bool FromSceneMap);
+
 public static class FfmpegArguments
 {
     private static readonly IReadOnlyDictionary<string, string[]> Presets = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
@@ -110,6 +116,176 @@ public static class FfmpegArguments
 
     public static double BufferFactor(double peakFactor) => 1.0 + 2.0 * (peakFactor - 1.0);
 
+    // Keyframe interval. This used to be a single number, -g = 2 s, written on every encode. A
+    // fixed short interval forces I-frames where no scene starts, and the software encoders
+    // already place one at every scene on their own, so the forced frames only cost bits.
+    // What replaces it is a range: a floor the encoder may not cut below, a ceiling it may not
+    // run past, and the placement in between left to the encoder's scene-cut decision. The
+    // floor is one second, as in HandBrake (encx264.c:386-391, encx265.c:188-190: min-keyint
+    // = fps, keyint = 10*fps).
+    //
+    // The ceiling is what the measurement decides, and it is not a single number either. The
+    // ceiling only binds inside a scene longer than itself; below that the scene cut fires
+    // first. So the ceiling is read off the content: the SceneMap's MEDIAN scene length divided
+    // by SceneMapMergeFactor, clamped between KeyframeCeilingMinSeconds and
+    // KeyframeCeilingMaxSeconds. Without a map the default is HandBrake's 10 s.
+    //
+    // Median, not mean, and that is measured rather than assumed. T105 re-measured the scene
+    // threshold and the distribution behind it: over the full source the scene length is right
+    // skewed, mean 13.46 s against median 5.62 s, so a mean-driven ceiling is set by a handful
+    // of long scenes. Encoding both rules on the same grid (libx264, 2-pass, -b:v 8000k,
+    // preset slow, VMAF-NEG over the whole clip) on a clip where the ceiling actually binds:
+    //
+    //   ceiling 10.00 s (mean)   -> 18.2533 MiB  mean 88.525  p10 86.496  3 I-frames  seek 202.6 ms
+    //   ceiling  5.62 s (median) -> 18.2600 MiB  mean 88.603  p10 86.516  5 I-frames  seek 154.9 ms
+    //
+    // The median rule is not worse on either quality metric at the same size and costs 24% less
+    // seek, so the ceiling reads the median. (Seek is a shared-machine number; quality and size
+    // are not.)
+    //
+    // SceneMapMergeFactor is not a tuning constant; it is the map's measured recall, written as
+    // the two counts it was measured from, both counted in the same unit - cuts inside the
+    // ground-truth window (144.117, 333.300]. At the threshold of record the map finds 28 of
+    // the 28 hand-marked cuts with zero false positives, so the recall is 1.000 and the divider
+    // is 1.0: at this threshold the map no longer under-segments and no correction is owed.
+    // It was not always so - at the previous threshold of 0.2 the same window gave 10 of 28,
+    // and the divider was 2.8.
+    //
+    // Because the divider is 1.0 today it is arithmetically inert, and no behaviour test can
+    // tell it from having no divider at all. What is testable is where it comes from: the two
+    // counts are pinned to what was counted, and SceneMapThresholdOfRecord is pinned to
+    // SceneMap.DefaultThreshold, which is owned elsewhere. If that threshold moves again the
+    // map splits differently, the recall is no longer 1.000, and
+    // Az_bolme_duzeltmesi_olculdugu_esikte_kalir turns red before a stale divider can be
+    // applied on top of a corrected threshold.
+    //
+    // What the map is trusted for is the range, not the boundaries: the placement is left to
+    // the encoder's scene cut. That the encoder actually places on content, and what the
+    // placement is worth, are measured rather than assumed. On a cut-bearing 20 s window of the
+    // source (7 detected cuts) libx264 at a 10 s ceiling put 6 I-frames where the ceiling
+    // demanded 3, four of them landing exactly on a detected cut and one within 83 ms. Holding
+    // the count fixed at 8 and changing only where they go - a plain grid against
+    // -force_key_frames on the cuts, both with scenecut=0, 2-pass, same bitrate - gives
+    //
+    //   grid          -> 20.0119 MiB  mean 85.693  p10 76.014
+    //   cut-aligned   -> 19.9705 MiB  mean 85.836  p10 76.192
+    //
+    // so alignment is worth +0.144 mean / +0.179 p10 at equal count and slightly less file.
+    // Real, but second order: the interval itself is worth several times that (2 s -> 5 s alone
+    // is +0.708 p10 in the sweep below). The claim sometimes made in the other direction - that
+    // the cause is where the I-frames go rather than how many there are - is not what these
+    // numbers say, and is not relied on here.
+    //
+    // The clamp comes from a ceiling sweep on parca-1-20sn (1920x1080@60 HDR PQ, libx264,
+    // 2-pass, 20 MiB target, VMAF-NEG over the whole clip, same colour space and stream count
+    // on both sides). Delivered size stays inside 0.3% across the whole sweep, so the sweep is
+    // read as quality at equal size:
+    //
+    //   ceiling  2 s -> mean 88.637  p10 85.933  I-frames 13  realized interval 1.539 s
+    //   ceiling  5 s -> mean 88.878  p10 86.641  I-frames  6  realized interval 3.334 s
+    //   ceiling 10 s -> mean 88.951  p10 86.674  I-frames  3  realized interval 6.667 s
+    //   ceiling 20 s -> mean 88.954  p10 86.751  I-frames  3  realized interval 6.667 s
+    //
+    // 5 s already carries 87% of the p10 gain between 2 s and 20 s, which is why the floor of
+    // the clamp is 5 s and not shorter. Above 10 s the ceiling stops binding at all - 10 s and
+    // 20 s produce the same three I-frames at the same places - so 10 s is the ceiling of the
+    // clamp, and it agrees with HandBrake's keyint = 10*fps.
+    //
+    // Hardware is a different mechanism and gets its own ceiling. NVENC only inserts an I-frame
+    // at a scene cut when lookahead is on (ffmpeg -h encoder=hevc_nvenc: "-no-scenecut ... When
+    // lookahead is enabled"), and this project does not turn lookahead on, so on hardware the
+    // ceiling is the whole placement rule: the realized interval is exactly the ceiling and the
+    // seek cost is exactly what the ceiling says. HardwareKeyframeCeilingSeconds is therefore
+    // the seek budget itself, not a content-derived number.
+    // The software CRF path keeps a VBV cap where HandBrake leaves one out (encx265.c:514-522
+    // fills VBV only on user request or for DoVi). Measured on parca-1-20sn at CRF 23, libx264,
+    // same colour space and stream count on both sides. Quality and size do not carry the
+    // shared-machine stamp - only time-derived numbers do, and there are none in this table:
+    //
+    //   VBV on  -> 14.731 MiB   mean 86.977   p10 84.999
+    //   VBV off -> 15.312 MiB   mean 87.287   p10 85.598
+    //
+    // Dropping it is a real quality gain and it lands exactly in the tail (p10 +0.599), but it
+    // costs 3.9% more file at the same CRF. HandBrake can afford that because its CRF is an
+    // open-ended quality mode; here CRF is a target-landing mode - PlanCalculator's fill policy
+    // picks a CRF aimed at the band centre - so a systematic +3.9% eats the band. Measured and
+    // needed, therefore kept. Loosening it to something between 2x and off was not measured.
+    public const double CrfVbvPeakFactor = 2.0;
+    public const double CrfVbvBufferFactor = 4.0;
+
+    public const double KeyframeFloorSeconds = 1.0;
+    public const double KeyframeCeilingDefaultSeconds = 10.0;
+    public const double SceneMapThresholdOfRecord = 0.105;
+    public const double SceneMapGroundTruthCutsInWindow = 28.0;
+    public const double SceneMapMappedCutsInWindow = 28.0;
+    public const double SceneMapMergeFactor = SceneMapGroundTruthCutsInWindow / SceneMapMappedCutsInWindow;
+    public const double KeyframeCeilingMinSeconds = 5.0;
+    public const double KeyframeCeilingMaxSeconds = 10.0;
+    public const double HardwareKeyframeCeilingSeconds = 5.0;
+
+    /// <summary>
+    /// Sahne haritasından üst sınırı türetir: sahne uzunluklarının <b>medyanı</b>, ölçülen
+    /// geri çağırmaya bölünür ve kıskaca kısılır. Ortalama değil medyan, çünkü dağılım sağa
+    /// çarpık (tam kaynakta ortalama 13,46 sn, medyan 5,62 sn) ve ortalamayı birkaç uzun
+    /// sahne belirliyor. Harita yoksa ya da hiç sahne taşımıyorsa HandBrake'in 10 saniyesine
+    /// düşer.
+    /// </summary>
+    public static double KeyframeCeilingSeconds(SceneMap? scenes)
+    {
+        if (scenes is null || scenes.Scenes.Count == 0 || scenes.Duration <= 0)
+            return KeyframeCeilingDefaultSeconds;
+
+        var lengths = new List<double>(scenes.Scenes.Count);
+        foreach (var scene in scenes.Scenes)
+            if (scene.Duration > 0) lengths.Add(scene.Duration);
+        if (lengths.Count == 0) return KeyframeCeilingDefaultSeconds;
+
+        lengths.Sort();
+        var mid = lengths.Count / 2;
+        var mappedMedianSeconds = lengths.Count % 2 == 1
+            ? lengths[mid]
+            : (lengths[mid - 1] + lengths[mid]) / 2.0;
+
+        return Math.Clamp(
+            mappedMedianSeconds / SceneMapMergeFactor,
+            KeyframeCeilingMinSeconds,
+            KeyframeCeilingMaxSeconds);
+    }
+
+    /// <summary>
+    /// Kodlayıcının uyacağı anahtar kare aralığı. Yerleşim kararı aralığın içinde kodlayıcıya
+    /// bırakılır; donanımda sahne kesimi olmadığı için üst sınır aralığın kendisidir.
+    /// </summary>
+    public static KeyframeRange KeyframeInterval(string codec, double fps, SceneMap? scenes = null)
+    {
+        var rate = double.IsFinite(fps) && fps > 0 ? fps : 30.0;
+        var hardware = CodecModel.IsHardware(codec);
+        var fromMap = !hardware && scenes is not null && scenes.Scenes.Count > 0 && scenes.Duration > 0;
+        var ceilingSeconds = hardware ? HardwareKeyframeCeilingSeconds : KeyframeCeilingSeconds(scenes);
+        var min = Math.Max(1, (int)Math.Round(rate * KeyframeFloorSeconds));
+        var max = Math.Max(min, (int)Math.Round(rate * ceilingSeconds));
+        return new KeyframeRange(min, max, fromMap);
+    }
+
+    /// <summary>
+    /// Aralığı kodlayıcının kendi diliyle yazar. Sahne kesimi her yolda açık kalır: x265'te
+    /// <c>scenecut=40</c>, SVT-AV1'de <c>scd=1</c>, x264/VP9'da varsayılan.
+    /// </summary>
+    public static IReadOnlyList<string> KeyframeArgs(string codec, double fps, SceneMap? scenes = null)
+    {
+        var range = KeyframeInterval(codec, fps, scenes);
+        var max = range.MaxFrames.ToString(CultureInfo.InvariantCulture);
+        var min = range.MinFrames.ToString(CultureInfo.InvariantCulture);
+
+        if (codec.Equals("libx265", StringComparison.OrdinalIgnoreCase))
+            return new[] { "-g", max, "-x265-params", $"keyint={max}:min-keyint={min}:scenecut=40" };
+        if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase))
+            return new[] { "-g", max, "-svtav1-params", $"keyint={max}:scd=1" };
+        if (CodecModel.IsHardware(codec))
+            return new[] { "-g", max };
+        return new[] { "-g", max, "-keyint_min", min };
+    }
+
     public static bool SupportsRateLimits(string codec)
         => !string.Equals(codec, "libsvtav1", StringComparison.OrdinalIgnoreCase);
 
@@ -118,7 +294,7 @@ public static class FfmpegArguments
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
-    public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null)
+    public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
         var a = new List<string> { "-hide_banner", "-y", "-hwaccel", "auto", "-i", info.FilePath };
 
@@ -140,7 +316,7 @@ public static class FfmpegArguments
         {
             a.AddRange(CodecModel.QualityArgs(plan.Codec, plan.Crf!.Value));
             if (SupportsRateLimits(plan.Codec) && !CodecModel.IsHardware(plan.Codec))
-                a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK * 2}k", "-bufsize", $"{plan.VideoBitrateK * 4}k" });
+                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * CrfVbvPeakFactor)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * CrfVbvBufferFactor)}k" });
         }
         else
         {
@@ -159,7 +335,7 @@ public static class FfmpegArguments
             }
         }
 
-        a.AddRange(new[] { "-g", Math.Max(2, (int)Math.Round(plan.Fps * 2)).ToString(CultureInfo.InvariantCulture) });
+        a.AddRange(KeyframeArgs(plan.Codec, plan.Fps, scenes));
         a.AddRange(new[] { "-pix_fmt", plan.PixelFormat });
         a.AddRange(psychovisualArgs);
         a.AddRange(plan.HdrColorArgs);
@@ -289,9 +465,9 @@ public static class FfmpegArguments
     /// <c>-ss</c> girdiden <b>once</b> gelir: sonra gelirse ffmpeg dosyayi bastan
     /// cozer ve 2 sn'lik bir parca saniyeler surer. Ikinci gecis uretilmez.
     /// </summary>
-    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null)
+    public static IReadOnlyList<string> BuildSegment(MediaInfo info, EncodePlan plan, double startSeconds, double durationSeconds, string outputPath, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
-        var a = new List<string>(Build(info, plan, outputPath, 0, null, availability));
+        var a = new List<string>(Build(info, plan, outputPath, 0, null, availability, scenes));
         var input = a.IndexOf("-i");
         if (input < 0) throw new InvalidOperationException("Arguman dizisinde girdi bayragi yok.");
 
