@@ -142,11 +142,11 @@ orada 18,98'di. Eşitleme turlu koşumda o satır 19,66 oluyor (aşağıdaki öz
 tablosu) ve ayrışma +39,17'ye iniyor — duyarlılık kararı iki koşumda da aynı,
 o yüzden tablo yeniden koşturulmadı:
 
-| yarışmacı | 60 MB harm | 600 MB harm | ayrışma | eşik |
-|---|---|---|---|---|
-| handbrake | 28,70 | 67,96 | **+39,26** | 1,00 |
-| vidshrink (eşitleme öncesi) | 18,98 | 58,83 | **+39,85** | 1,00 |
-| vidshrink (eşitleme sonrası) | 19,66 | 58,83 | **+39,17** | 1,00 |
+| yarışmacı | 60 MB harm | 600 MB harm | ayrışma | eşik | ölçülen commit |
+|---|---|---|---|---|---|
+| handbrake | 28,70 | 67,96 | **+39,26** | 1,00 | `af7a0fe` |
+| vidshrink (eşitleme öncesi) | 18,98 | 58,83 | **+39,85** | 1,00 | `af7a0fe` |
+| vidshrink (eşitleme sonrası) | 19,66 | 58,83 | **+39,17** | 1,00 | 60 MB `381e8ab`, 600 MB `af7a0fe` |
 
 Eşiğin kırk katı. GEÇERSİZ tablodaki 14,86 → 14,67 (yani -0,19) ile arasındaki fark
 düzeneğin varlık sebebi.
@@ -195,9 +195,9 @@ yasak olan oranın değişmesi. Bu belgedeki bütün sayılar düzeltmeden sonra
 Bir yapılandırma hem parça kestirimiyle hem baştan sona tam koşumla ölçüldü:
 VidShrink, 600 MB hedefi, aynı kaynak.
 
-| yapılandırma | tam koşum harm | parça kestirimi harm | sapma |
-|---|---|---|---|
-| vidshrink @ 600 MB | 47,78 | 58,83 | **+11,05** |
+| yapılandırma | tam koşum harm | parça kestirimi harm | sapma | ölçülen commit |
+|---|---|---|---|---|
+| vidshrink @ 600 MB | 47,78 | 58,83 | **+11,05** | tam `94df05c`, parça `af7a0fe` |
 
 Diğer sütunlar da aynı yöne kayıyor: ortalama 67,33 → 76,17 (+8,84), XPSNR
 34,54 → 40,77 (+6,23). Kare minimumu iki tarafta da 0,00.
@@ -264,14 +264,23 @@ tanımlı ama bu turda koşturulmadı.
 tonemap yoluna hiç girilmedi.
 
 Aşağıdaki sayıların geldiği koşum kayıtları (hepsi `.calisma/` altında, git'e
-girmiyor):
+girmiyor) ve her koşumun **ölçtüğü commit**. Ölçtüğü commit = koşumun ikilisini
+üreten ağaç; bunu koşum saatinden önceki son **kod taşıyan** commit belirliyor
+(araya giren commit'ler yalnız `docs/` değiştirdi, ölçüme dokunmuyor).
 
-| tablo | koşum kaydı |
-|---|---|
-| 60 MB (ikiye bölmeli eşitleyici) | `.calisma/ab/sonuc-parca-60-ikiyebolme.json` |
-| 600 MB | `.calisma/ab/sonuc-parca.json` |
-| duyarlılık (eşitleme öncesi) | `.calisma/ab/sonuc-parca.json` |
-| tam kaynak koşumu (örnekleme sapması) | `.calisma/ab/sonuc-tam.json` |
+| tablo | koşum kaydı | koşum saati | ölçülen commit |
+|---|---|---|---|
+| 60 MB (ikiye bölmeli eşitleyici) | `.calisma/ab/sonuc-parca-60-ikiyebolme.json` | 09-02 06:38 | `381e8ab` (tur 3) |
+| 60 MB (yalnız oranlı eşitleyici, çürütülen tablo) | `.calisma/ab/sonuc-parca-60-esboyut.json` | 09-02 05:06 | `a1994b3` (tur 2) |
+| 600 MB | `.calisma/ab/sonuc-parca.json` | 09-02 03:34 | `af7a0fe` (tur 1) |
+| duyarlılık (eşitleme öncesi) | `.calisma/ab/sonuc-parca.json` | 09-02 03:34 | `af7a0fe` (tur 1) |
+| tam kaynak koşumu (örnekleme sapması) | `.calisma/ab/sonuc-tam.json` | 09-02 04:27 | `94df05c` (tur 1) |
+
+600 MB tablosu tur 1'in commit'inden geliyor ve **yeniden ölçülmedi**: eşitleyici
+o tabloya dokunmuyor, çünkü altı satırın altısı zaten kapının içindeydi. 60 MB
+tablosu ise dalın ucuyla (`381e8ab`) ölçüldü. Yani bu belgede iki farklı commit
+ölçülmüş durumda. İki commit'in sayısı tek tabloda yan yana geldiği tek yer
+**Özet** tablosu; orada satır başına `ölçülen commit` sütunu var.
 
 ### 60 MB hedefinde
 
@@ -286,6 +295,8 @@ o aralığı **ikiye bölüyor**. İkinci kip zorunlu: teslim edilen bayt hedefi
 basamaklı bir fonksiyonu, ve yalnız oranla düzeltme basamak fonksiyonunda
 yakınsamıyor, iki basamak arasında salınıyor (ölçüldü, aşağıda). Aşağıdaki
 tablo ikiye bölmeli eşitleyicinin koşumundan.
+
+**Ölçülen commit: `381e8ab` (dalın ucu).**
 
 | girdi | yarışmacı | yerleşim | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -314,6 +325,11 @@ aralığı ancak ikiye bölme yokladı ve üçüncü denemede kapının içine g
 
 ### 600 MB hedefinde
 
+**Ölçülen commit: `af7a0fe` (tur 1).** Bu tablo dalın ucuyla ölçülmedi; aradaki
+kod değişikliği yalnız eşitleyicidir ve bu tablonun altı satırının altısı zaten
+kapının içindeydi, yani eşitleyici hiç devreye girmiyor. Yine de yazılı olan
+budur: **bu altı satır `381e8ab` ile yeniden ölçülmedi.**
+
 | girdi | yarışmacı | yerleşim | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
 |---|---|---|---|---|---|---|---|---|---|---|
 | parca-1 | handbrake | 1920x1080 @4833k | 35.288.140 | 0,00 | evet | 81,48 | 79,04 | 4,12 | 83,43 | 38,00 |
@@ -332,12 +348,12 @@ okunmalı (aşağıda "kıl payı satır" başlığında pimlendi).
 
 ### Özet
 
-| yarışmacı | hedef MB | toplam bayt | eş boyut | harm | en kötü p10 | kare min | ort | XPSNR |
-|---|---|---|---|---|---|---|---|---|
-| handbrake | 60 | 10.942.726 | evet | **28,70** | 11,79 | 0,00 | 54,44 | 34,25 |
-| vidshrink | 60 | 10.973.204 | evet (+%0,28) | **19,66** | 6,99 | 0,00 | 40,81 | 29,82 |
-| handbrake | 600 | 108.326.915 | evet | **67,96** | 64,62 | 0,00 | 83,03 | 40,49 |
-| vidshrink | 600 | 107.433.177 | evet | **58,83** | 54,59 | 0,00 | 76,17 | 40,77 |
+| yarışmacı | hedef MB | ölçülen commit | toplam bayt | eş boyut | harm | en kötü p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|---|
+| handbrake | 60 | `381e8ab` | 10.942.726 | evet | **28,70** | 11,79 | 0,00 | 54,44 | 34,25 |
+| vidshrink | 60 | `381e8ab` | 10.973.204 | evet (+%0,28) | **19,66** | 6,99 | 0,00 | 40,81 | 29,82 |
+| handbrake | 600 | `af7a0fe` | 108.326.915 | evet | **67,96** | 64,62 | 0,00 | 83,03 | 40,49 |
+| vidshrink | 600 | `af7a0fe` | 107.433.177 | evet | **58,83** | 54,59 | 0,00 | 76,17 | 40,77 |
 
 **Geridiyiz.** İki hedefte de eş boyutta ölçüldü ve ikisinde de HandBrake önde:
 600 MB'de harmonik ortalamada **9,13 puan** (67,96 ↔ 58,83), 60 MB'de
@@ -357,9 +373,13 @@ olduğu için iki basamak arasında salınıyordu. İkiye bölme eklendi, o par�
 eşitliğe yaklaştıkça: **9,72 → 9,11 → 9,04.** Yön beklendiği gibi daralma
 çıktı, çünkü dışarıda kalan satırda VidShrink daha az bayt harcıyordu.
 
-Altı parça-hedef çiftinin beşinde HandBrake kazandı; VidShrink yalnız
-`parca-2` @ 600 MB'de önde (95,84'e 95,78 — bu fark gürültü sayılır) ve orada
-XPSNR'ı belirgin yüksek (51,25'e 47,11).
+Altı parça-hedef çiftinin beşinde HandBrake kazandı. Kazandığımız tek çift
+`parca-2` @ 600 MB (95,84'e 95,78 — bu fark gürültü sayılır; XPSNR ise belirgin
+yüksek, 51,25'e 47,11) ve bu, **çözünürlüğü düşürmediğimiz tek çift**: orada
+VidShrink 1920x1080'de kaldı. Cümle "kazandık" diye kurulamaz — kurulacaksa
+**çözünürlük düşürmediğimiz yerde kazandık** diye kurulur. Çözünürlük düşüren
+beş çiftin beşinde kaybettik. Yönün ötesinde bir şey iddia edilmiyor; büyüklüğün
+düşürme oranıyla gitmediği aşağıda ayrı başlıkta ölçüldü.
 
 Bir gözlem daha, o da sayıdan çıkıyor:
 
@@ -385,7 +405,7 @@ VidShrink tarafı ürünün kendi borusunu koşuyor — `ComplexityProbe` →
 kendi veriyor. HandBrake her satırda 1920x1080'de kalıyor; VidShrink **her parçada
 ayrı bir yerleşim seçiyor**, aynı hedefte bile:
 
-| girdi | 60 MB'de seçilen | 600 MB'de seçilen |
+| girdi | 60 MB'de seçilen (`381e8ab`) | 600 MB'de seçilen (`af7a0fe`) |
 |---|---|---|
 | parca-1 | 768x432 @479k | 1382x778 @4861k |
 | parca-2 | 1190x670 @522k | **1920x1080** @4712k |
@@ -403,14 +423,14 @@ kadar büyük). Bu satır aynı zamanda **1920x1080'de kaldığımız tek satır
 
 Sıralama piksel oranına göre (1920x1080 = 2.073.600 piksel taban):
 
-| girdi @ hedef | yerleşim | piksel oranı | harm (vs ↔ hb) | açık | kazanan |
-|---|---|---|---|---|---|
-| parca-2 @ 600 | **1920x1080** | %100,0 | 95,84 ↔ 95,78 | **-0,06** | **vidshrink** |
-| parca-1 @ 600 | 1382x778 | %51,8 | 70,82 ↔ 81,48 | 10,66 | handbrake |
-| parca-2 @ 60 | 1190x670 | %38,4 | 69,65 ↔ 93,70 | 24,05 | handbrake |
-| parca-3 @ 600 | 1190x670 | %38,4 | 37,83 ↔ 46,66 | 8,83 | handbrake |
-| parca-1 @ 60 | 768x432 | %16,0 | 31,94 ↔ 47,71 | 15,77 | handbrake |
-| parca-3 @ 60 | 652x366 | %11,5 | 9,35 ↔ 13,72 | 4,37 | handbrake |
+| girdi @ hedef | yerleşim | piksel oranı | harm (vs ↔ hb) | açık | kazanan | ölçülen commit |
+|---|---|---|---|---|---|---|
+| parca-2 @ 600 | **1920x1080** | %100,0 | 95,84 ↔ 95,78 | **-0,06** | **vidshrink** | `af7a0fe` |
+| parca-1 @ 600 | 1382x778 | %51,8 | 70,82 ↔ 81,48 | 10,66 | handbrake | `af7a0fe` |
+| parca-2 @ 60 | 1190x670 | %38,4 | 69,65 ↔ 93,70 | 24,05 | handbrake | `381e8ab` |
+| parca-3 @ 600 | 1190x670 | %38,4 | 37,83 ↔ 46,66 | 8,83 | handbrake | `af7a0fe` |
+| parca-1 @ 60 | 768x432 | %16,0 | 31,94 ↔ 47,71 | 15,77 | handbrake | `381e8ab` |
+| parca-3 @ 60 | 652x366 | %11,5 | 9,35 ↔ 13,72 | 4,37 | handbrake | `381e8ab` |
 
 Tablodan **yalnız yön** okunuyor: düşürmediğimiz tek satırda kazanıyoruz,
 düşürdüğümüz beş satırda kaybediyoruz. **Büyüklük okunmuyor** — açık piksel
@@ -631,3 +651,17 @@ Mutasyonla sınandı (her koşumdan önce `dotnet build ... --no-incremental`):
 Dördü de gerçek kusur: ilk ikisi teslim edilen tolerans **değerini** pimliyor
 (tur 2'de sınır mantığı pimliydi, değer değildi); son ikisi ikiye bölmenin
 varlığını ve orta noktasını pimliyor.
+
+### Tam süit
+
+Yerel `tools/ci-gibi-kos.sh --no-build` koşumu `381e8ab` üzerinde **0 çıkış
+koduyla** bitti; koşum bu makinede yedi ajanla paylaşımlı koştuğu için yeniden
+açılmadı. **Geçti/kaldı/atlandı dökümü yakalanamadı — ölçülmedi**, çünkü koşumun
+çıktısı boruda kaldı. Bağlayıcı sayı CI'ınki:
+
+| koşum | commit | sonuç |
+|---|---|---|
+| CI (`ci`, `T95-ab-duzenegi`) | `381e8ab` | _(koşum kimliği ve sonucu buraya)_ |
+
+CI koşumunun `headSha`'sı ile dalın ucu aynı olmalı: dalın ucu **`381e8ab`**.
+Farklıysa yukarıdaki bütün "ölçülen commit" damgaları CI için geçersizdir.
