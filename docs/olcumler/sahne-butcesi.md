@@ -411,8 +411,13 @@ plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.
 | uyumlu | `p3-hareketli` | taban | `-` | 0.674 | — |
 | uyumlu | `p3-hareketli` | zones | `zones=<harita>` | 0.609 | -0.065 |
 | uyumlu | `p3-hareketli` | qcomp | `qcomp=1.0` | 0.077 | -0.597 |
+| yedek | `p1-karisik` | taban | `-` | 1.273 | — |
+| yedek | `p1-karisik` | zones | `zones=<harita>` | 1.229 | -0.044 |
+| yedek | `p1-karisik` | qcomp | `qcomp=1.0` | 1.272 | -0.001 |
+| yedek | `p2-durgun` | zones | `-` | **bilinmiyor**: plan passthrough (hevc) | — |
+| yedek | `p2-durgun` | qcomp | `-` | **bilinmiyor**: plan passthrough (hevc) | — |
 
-Iki adayin da olculdugu hucre 3; hucre basina dusuk MAE'yi veren aday: `qcomp` 3.
+Iki adayin da olculdugu hucre 4; hucre basina dusuk MAE'yi veren aday: `qcomp` 3, `zones` 1.
 
 Hangi adayin kazandigi tek basina bir sey soylemez: kazanc, kapatilmasi
 istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
@@ -423,14 +428,15 @@ istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
 | uyumlu | `p1-karisik` | +0.261 | qcomp | +0.006 | 2.3% |
 | uyumlu | `p2-durgun` | -0.606 | qcomp | -0.682 | acik yok |
 | uyumlu | `p3-hareketli` | -0.434 | qcomp | +0.597 | acik yok |
+| yedek | `p1-karisik` | +0.244 | zones | +0.044 | 18.0% |
 
-Olculen 3 hucrenin 2 tanesinde en iyi aday tabani
+Olculen 4 hucrenin 3 tanesinde en iyi aday tabani
 gecti; gorulen en buyuk kazanc 0.597 pp.
 Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama
 pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite
 kapisi bu sayfada karari veren yerdir, bu tablo degil.
 
-Tabani gecen 2 hucrenin 0 tanesini `zones`, 2 tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre "sahne basina dagitim ise yariyor" kanitina sayilmaz; olsa olsa iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadigini soyler.
+Tabani gecen 3 hucrenin 1 tanesini `zones`, 2 tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre "sahne basina dagitim ise yariyor" kanitina sayilmaz; olsa olsa iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadigini soyler.
 
 ## K5 ve K6 — kalite kazanci ve hedef boyut
 
@@ -484,9 +490,9 @@ uydurma; olculen sey kapinin **ayirt edip etmedigi**.
 - K5/K6 (kalite kazanci ve hedef boyut): **bilinmiyor** — olculmedi
 - K7 (bozuk harita bedeli): **bilinmiyor** — olculmedi
 
-**Sahne basina dagitimin ise yaradigina dair kanit bu olcumde yok.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 3 hucrenin tabani gecen 2 tanesinde `zones` 0 kez kazandi, `qcomp` 2 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir.
+**Sahne basina dagitim 4 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 4 hucrenin tabani gecen 3 tanesinde `zones` 1 kez kazandi, `qcomp` 2 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones`in kazandigi hucre tek ve kazanc pp'nin yuzde birleri mertebesinde; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
 
-Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen 5 kodlayicinin yalniz 2 tanesinde calisiyor (`libx265`, `libx264`); uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi sessizce yok sayiyor, nvenc kollarinda parametre hic yok. Yani dagitimin lehine bir kanit cikmis olsa bile, o kanit bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirli kalirdi. Ikisi birlikte: kanit yok, kanit cikmis olsaydi da dar olurdu.
+Bu bulgu K4'un izgarasiyla yan yana okunmali: `zones` denenen 5 kodlayicinin yalniz 2 tanesinde calisiyor (`libx265`, `libx264`); uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi sessizce yok sayiyor, nvenc kollarinda parametre hic yok. Yani dagitimin lehine cikan her kanit bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirlidir. Ikisi birlikte: elde `zones` lehine 1 hucrelik kucuk bir isaret var ve o isaret zaten uretimin varsayilan yolunda gecerli degil.
 
 Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve
 bu olcumden onceki commit'te sabitlendi.

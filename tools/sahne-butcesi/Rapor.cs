@@ -521,7 +521,8 @@ public static class Rapor
 
     public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet);
 
-    public sealed record K4bSonuc(int Hucre, int TabaniGecen, int ZonesKazandi, int QcompKazandi);
+    public sealed record K4bSonuc(int Hucre, int TabaniGecen, int ZonesKazandi, int QcompKazandi,
+        double? ZonesEnIyiKazanc, double? ZonesEnIyiOran, string? ZonesEnIyiHucre);
 
     private static K4bSonuc K4b(StringBuilder sb, string isKok, string[] kollar,
         Dictionary<(string Kol, string Pencere), K1Kaydi> k1)
@@ -540,7 +541,7 @@ public static class Rapor
                     satirlar.Add((kol, p.Ad, c[0], c[1], mae, c[3]));
                 }
             }
-        if (satirlar.Count == 0) return new K4bSonuc(0, 0, 0, 0);
+        if (satirlar.Count == 0) return new K4bSonuc(0, 0, 0, 0, null, null, null);
 
         sb.AppendLine("### K4 eki — iki aday yan yana, K1 farkini hangisi kapatiyor");
         sb.AppendLine();
@@ -598,6 +599,9 @@ public static class Rapor
         var kapanmaHucre = 0;
         double? enBuyukKazanc = null;
         var kazananQcomp = 0;
+        double? zonesEnIyi = null;
+        double? zonesEnIyiOran = null;
+        string? zonesEnIyiHucre = null;
         var kazananZones = 0;
         foreach (var g in satirlar.GroupBy(x => (x.Kol, x.Pencere)))
         {
@@ -614,7 +618,16 @@ public static class Rapor
             if (kazanc > 0) kapanmaVar++;
             if (enBuyukKazanc is null || kazanc > enBuyukKazanc) enBuyukKazanc = kazanc;
             if (kazanc > 0 && en.Aday == "qcomp") kazananQcomp++;
-            if (kazanc > 0 && en.Aday == "zones") kazananZones++;
+            if (kazanc > 0 && en.Aday == "zones")
+            {
+                kazananZones++;
+                if (zonesEnIyi is null || kazanc > zonesEnIyi)
+                {
+                    zonesEnIyi = kazanc;
+                    zonesEnIyiOran = acik > 0 ? kazanc / acik * 100 : null;
+                    zonesEnIyiHucre = $"{g.Key.Kol}/{g.Key.Pencere}";
+                }
+            }
             var oran = acik > 0 ? Kabuk.Inv(kazanc / acik * 100, "0.0") + "%" : "acik yok";
             sb.AppendLine($"| {g.Key.Kol} | `{g.Key.Pencere}` | {Kabuk.Inv(acik, "+0.000;-0.000;0.000")} | " +
                           $"{en.Aday} | {Kabuk.Inv(kazanc, "+0.000;-0.000;0.000")} | {oran} |");
@@ -640,7 +653,8 @@ public static class Rapor
             sb.AppendLine();
         }
 
-        return new K4bSonuc(kapanmaHucre, kapanmaVar, kazananZones, kazananQcomp);
+        return new K4bSonuc(kapanmaHucre, kapanmaVar, kazananZones, kazananQcomp,
+            zonesEnIyi, zonesEnIyiOran, zonesEnIyiHucre);
     }
 
     private static AbSonuc K5K6(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
@@ -978,13 +992,25 @@ public static class Rapor
         sb.AppendLine();
         if (k4b.Hucre > 0)
         {
-            sb.AppendLine($"**Sahne basina dagitimin ise yaradigina dair kanit bu olcumde yok.** " +
+            var basSatir = k4b.ZonesKazandi == 0
+                ? "**Sahne basina dagitimin ise yaradigina dair kanit bu olcumde yok.**"
+                : $"**Sahne basina dagitim {k4b.Hucre} hucrenin {k4b.ZonesKazandi} tanesinde " +
+                  $"tabani gecti; kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp " +
+                  $"({k4b.ZonesEnIyiHucre})" +
+                  (k4b.ZonesEnIyiOran is null ? "" : $", K1 aciginin %{Kabuk.Inv(k4b.ZonesEnIyiOran.Value, "0.0")}'i") +
+                  ".**";
+            sb.AppendLine(basSatir + " " +
                           $"Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; " +
                           $"olculen {k4b.Hucre} hucrenin tabani gecen {k4b.TabaniGecen} tanesinde " +
                           $"`zones` {k4b.ZonesKazandi} kez kazandi, `qcomp` {k4b.QcompKazandi} kez. " +
                           "`qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — " +
                           "kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku " +
-                          "varsayilaninin bu icerikte en iyi olmadiginin kanitidir.");
+                          "varsayilaninin bu icerikte en iyi olmadiginin kanitidir. " +
+                          (k4b.ZonesKazandi == 0
+                            ? ""
+                            : "`zones`in kazandigi hucre tek ve kazanc pp'nin yuzde birleri " +
+                              "mertebesinde; bu buyukluk tek basina karar tasimaz, karari K5'in " +
+                              "kalite kapisi verir."));
             sb.AppendLine();
             if (k4.Denenen > 0)
             {
@@ -995,9 +1021,13 @@ public static class Rapor
                                 ? "uretimin varsayilan kodlayicisi bu listede."
                                 : "uretimin varsayilan kodlayicisi (`libsvtav1`) parametreyi " +
                                   "sessizce yok sayiyor, nvenc kollarinda parametre hic yok. " +
-                                  "Yani dagitimin lehine bir kanit cikmis olsa bile, o kanit " +
-                                  "bes kodlayicinin ikisiyle ve varsayilan olmayan yolla sinirli " +
-                                  "kalirdi. Ikisi birlikte: kanit yok, kanit cikmis olsaydi da dar olurdu."));
+                                  "Yani dagitimin lehine cikan her kanit bes kodlayicinin " +
+                                  "ikisiyle ve varsayilan olmayan yolla sinirlidir. " +
+                                  (k4b.ZonesKazandi == 0
+                                    ? "Ikisi birlikte: kanit yok, kanit cikmis olsaydi da dar olurdu."
+                                    : $"Ikisi birlikte: elde `zones` lehine {k4b.ZonesKazandi} hucrelik " +
+                                      "kucuk bir isaret var ve o isaret zaten uretimin varsayilan " +
+                                      "yolunda gecerli degil.")));
                 sb.AppendLine();
             }
         }
