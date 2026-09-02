@@ -244,6 +244,15 @@ Plan: `libx265` 2pass 2610k 1728x972@60 preset `slow` hedef 60 MB. Referans topl
 
 - **bilinmiyor**: plan passthrough (hevc); kodlama yok, sahneye bit dagitilmiyor
 
+### yedek / p3-hareketli
+
+Plan: `libx265` 2pass 2612k 1728x972@60 preset `slow` hedef 60 MB. Referans toplami 923.0 Mbit, plan ciktisi 494.6 Mbit (referans/plan = 1.87x).
+
+| Sahne | Bas (sn) | Sure (sn) | Karmasiklik | hak edilen (pp) | verilen (pp) | harita (pp) | verilen−hak | harita−hak |
+|-------|----------|-----------|-------------|-----------------|--------------|-------------|-------------|------------|
+| 0 | 0.0 | 41.9 | 1.01 | 20.24 | 19.36 | 22.34 | -0.88 | +2.10 |
+| 1 | 41.9 | 147.1 | 1.00 | 79.76 | 80.64 | 77.66 | +0.88 | -2.10 |
+
 ## K2 — kodlayicinin dagitimi bizim onerimizle yan yana
 
 Kapi (`ESIKLER.md`, olcumden once): (1) `rho(verilen,hak) >= 0,80`,
@@ -260,12 +269,13 @@ Ucu birden saglaniyorsa is biter ve kod degismez.
 | uyumlu | `p3-hareketli` | 2 | 1.000 (n=2, anlamsiz) | 1.000 | 0.67 | 1.11 | 2/2 (100%) (n=2, anlamsiz) | evet | evet | **hayir** |
 | yedek | `p1-karisik` | 28 | 0.986 | 0.969 | 1.27 | 1.03 | 1/28 (4%) | evet | **hayir** | evet |
 | yedek | `p2-durgun` | 6 | bilinmiyor | bilinmiyor | bilinmiyor | bilinmiyor | bilinmiyor | — | — | — |
+| yedek | `p3-hareketli` | 2 | 1.000 (n=2, anlamsiz) | 1.000 | 0.88 | 2.10 | 2/2 (100%) (n=2, anlamsiz) | evet | evet | **hayir** |
 
-**K2 kapisi kapanmadi.** Olculen 7 hucreden 1 tanesinde ucu birden saglandi.
+**K2 kapisi kapanmadi.** Olculen 8 hucreden 1 tanesinde ucu birden saglandi.
 
-- K1 kapisi (`rho(verilen,hak) >= 0,80`): 7/7 hucre
-- K2 kapisi (`MAE(verilen) <= MAE(harita)`): 4/7 hucre
-- K3 kapisi (ters dusen orani `< %20`): 3/7 hucre
+- K1 kapisi (`rho(verilen,hak) >= 0,80`): 8/8 hucre
+- K2 kapisi (`MAE(verilen) <= MAE(harita)`): 5/8 hucre
+- K3 kapisi (ters dusen orani `< %20`): 3/8 hucre
 
 Olculemeyen 1 hucre (varsayilana dusurulmedi, ayri satir):
 - **bilinmiyor** — yedek/p2-durgun: plan passthrough (hevc); kodlama yok, sahneye bit dagitilmiyor
