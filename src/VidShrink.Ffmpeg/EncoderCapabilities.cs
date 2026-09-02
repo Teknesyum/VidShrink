@@ -339,15 +339,21 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
                 return ProbeOutcome.Unmeasured;
             }
             Task.WaitAll(new Task[] { stdout, stderr }, 1000);
-            var diagnostic = stderr.Result;
-            var supported = process.ExitCode == 0
-                   && !diagnostic.Contains("Error parsing option", StringComparison.OrdinalIgnoreCase)
-                   && !diagnostic.Contains("Option not found", StringComparison.OrdinalIgnoreCase)
-                   && !diagnostic.Contains("Unrecognized option", StringComparison.OrdinalIgnoreCase);
-            return supported ? ProbeOutcome.Accepted : ProbeOutcome.Rejected;
+            return OptionAccepted(process.ExitCode, stderr.Result) ? ProbeOutcome.Accepted : ProbeOutcome.Rejected;
         }
         catch { return ProbeOutcome.Unmeasured; }
     }
+
+    /// <summary>
+    /// Yoklamanin karari: ffmpeg verilen secenegi kabul etti mi. Surec baslatmaktan ayri
+    /// durur; olcu, verilen cikis kodunun ve stderr metninin uretecegi karari surec
+    /// kosturmadan pimler.
+    /// </summary>
+    internal static bool OptionAccepted(int exitCode, string diagnostic)
+        => exitCode == 0
+           && !diagnostic.Contains("Error parsing option", StringComparison.OrdinalIgnoreCase)
+           && !diagnostic.Contains("Option not found", StringComparison.OrdinalIgnoreCase)
+           && !diagnostic.Contains("Unrecognized option", StringComparison.OrdinalIgnoreCase);
 
     public static EncoderCapabilities Parse(string encodersOutput, string filtersOutput, string versionOutput)
         => new(ParseEncoders(encodersOutput), ParseFilters(filtersOutput), ParseVersion(versionOutput));
