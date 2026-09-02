@@ -50,7 +50,7 @@ static void PrintUsage()
     Console.WriteLine("  bench container-unit <kaynak,...> [--start 5] [--fps 12,24,30,60] [--out .calisma/kap]");
     Console.WriteLine("  bench search-cost [--runs 5]");
     Console.WriteLine("  bench peak-curve <kaynak> [--codec hevc_nvenc] [--ratios 3,5,8,12] [--peaks 1.02,1.1,1.25,1.5] [--out .calisma/tepe]");
-    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
+    Console.WriteLine("  bench shrink <kaynak> <hedefMb,...> --out <klasor> [--measured-quality] [--fill filltarget|qualityceiling] [--speed quality|fast] [--no-resolution-drop] [--no-fps-drop] [--force-codec libx265] [--codec-preference auto|compatible|maxcompression|fast] [--wide-peak] [--no-psy] [--plan-only] [--source-size 1920x1080] [--source-mb 1000] [--no-calibrate] [--results <yol>]");
     Console.WriteLine("  bench compare <a.json> <b.json>");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
@@ -524,7 +524,7 @@ static async Task<int> PeakCurveAsync(string[] args)
 
             var sizeMb = new FileInfo(outputPath).Length / 1024.0 / 1024.0;
             var vmaf = await VmafNegAsync(source, outputPath, info.Width, info.Height);
-            Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | {sizeMb:0.###} | {Fmt(vmaf.Mean)} | {Fmt(vmaf.Harmonic)} | {Fmt(vmaf.P10)} |");
+            Console.WriteLine($"| {ratio:0.##} | {peak:0.00} | {produced:0.000} | {bitrateK} | {maxrateK} | {bufsizeK} | {sizeMb:0.###} | {Fmt(vmaf.Mean)} | {Fmt(vmaf.Harmonic)} | {Fmt(vmaf.P10)} | {vmaf.FloorClampedFrames} |");
             rows.Add(new
             {
                 Ratio = ratio,
@@ -536,7 +536,9 @@ static async Task<int> PeakCurveAsync(string[] args)
                 SizeMb = sizeMb,
                 VmafNegMean = vmaf.Mean,
                 VmafNegHarmonic = vmaf.Harmonic,
-                VmafNegP10 = vmaf.P10
+                VmafNegP10 = vmaf.P10,
+                VmafNegMin = vmaf.Min,
+                VmafNegFloorFrames = vmaf.FloorClampedFrames
             });
             try { File.Delete(outputPath); } catch { }
         }
@@ -570,6 +572,7 @@ static async Task<int> ShrinkAsync(string[] args)
     var allowResolutionDrop = true;
     var allowFpsDrop = true;
     string? forceCodec = null;
+    var codecPreference = CodecPreference.Auto;
     var widePeak = false;
     var planOnly = false;
     var noMeasure = false;
@@ -601,6 +604,13 @@ static async Task<int> ShrinkAsync(string[] args)
                 break;
             case "--force-codec" when i + 1 < args.Length:
                 forceCodec = args[++i];
+                break;
+            case "--codec-preference" when i + 1 < args.Length:
+                if (!Enum.TryParse<CodecPreference>(args[++i], ignoreCase: true, out codecPreference))
+                {
+                    Console.Error.WriteLine($"bilinmeyen --codec-preference: {args[i]} (Auto|Compatible|MaxCompression|Fast)");
+                    return 1;
+                }
                 break;
             case "--wide-peak":
                 widePeak = true;
@@ -656,13 +666,14 @@ static async Task<int> ShrinkAsync(string[] args)
     probeWatch.Stop();
     var results = new List<BenchResult>();
     var label = Path.GetFileNameWithoutExtension(source);
-    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | kalibre={complexity.Calibrated} | olculen kalite={(complexity.QualityMeasured ? string.Join("/", anchors.Select(a => a.ToString("0.##", CultureInfo.InvariantCulture))) : "yok")}");
+    Console.WriteLine($"kaynak {label} | fill={fillPolicy} | codec-tercihi={codecPreference} | prob {probeWatch.Elapsed.TotalSeconds:0.#}s | kalibre={complexity.Calibrated} | olculen kalite={(complexity.QualityMeasured ? string.Join("/", anchors.Select(a => a.ToString("0.##", CultureInfo.InvariantCulture))) : "yok")}");
 
     foreach (var targetMb in targets)
     {
         var options = new PlanOptions
         {
             TargetMb = targetMb,
+            Codec = codecPreference,
             FillPolicy = fillPolicy,
             SpeedMode = speedMode,
             AllowResolutionDrop = allowResolutionDrop,
@@ -727,7 +738,7 @@ static async Task<int> ShrinkAsync(string[] args)
             Console.WriteLine($"  deneme {step.Number}: {step.Branch}, {step.Mode}, {step.VideoBitrateK}k, hedeflenen {step.AimMb:0.###} MB, cikan {step.ActualMb:0.###} MB");
 
         var measureWatch = Stopwatch.StartNew();
-        var vmaf = noMeasure ? (Mean: (double?)null, Harmonic: (double?)null, P10: (double?)null) : await VmafNegAsync(source, outputPath, info.Width, info.Height);
+        var vmaf = noMeasure ? VmafPool.Empty : await VmafNegAsync(source, outputPath, info.Width, info.Height);
         var planes = noMeasure ? (Y: (double?)null, U: (double?)null, V: (double?)null) : await XpsnrPlanesAsync(source, outputPath, info.Width, info.Height);
         measureWatch.Stop();
         var xpsnr = planes.Y is { } py && planes.U is { } pu && planes.V is { } pv
@@ -761,6 +772,8 @@ static async Task<int> ShrinkAsync(string[] args)
             vmaf.Mean,
             vmaf.Harmonic,
             vmaf.P10,
+            vmaf.Min,
+            vmaf.FloorClampedFrames,
             xpsnr,
             planes.Y,
             planes.U,
@@ -772,7 +785,7 @@ static async Task<int> ShrinkAsync(string[] args)
             $"bant={(result.InBand ? "ic" : "dis")} tasma={(result.OverTarget ? "VAR" : "yok")} taban={(result.BelowHardFloor ? "IHLAL" : "ok")}, " +
             $"{result.Width}x{result.Height}@{result.Fps:0.##}, {result.Codec}/{result.Mode}, {result.CrfOrBitrate}, deneme={result.Attempts}, " +
             $"kalibre={(result.Calibrated ? "evet" : "hayir")}, plan={result.PlanSeconds:0.#}s, sure={result.EncodeSeconds:0.#}s, " +
-            $"VMAF-NEG mean={Fmt(result.VmafNegMean)} harm={Fmt(result.VmafNegHarmonic)} p10={Fmt(result.VmafNegP10)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
+            $"VMAF-NEG mean={Fmt(result.VmafNegMean)} harm={Fmt(result.VmafNegHarmonic)}{HarmonicWarning(result.VmafNegFloorFrames)} p10={Fmt(result.VmafNegP10)} min={Fmt(result.VmafNegMin)}, XPSNR={Fmt(result.Xpsnr)} (y={Fmt(result.XpsnrY)} u={Fmt(result.XpsnrU)} v={Fmt(result.XpsnrV)})");
 
         await WriteResultsAsync(results, outDir, resultsPath);
     }
@@ -791,7 +804,7 @@ static async Task<string> WriteResultsAsync(List<BenchResult> results, string ou
     return path;
 }
 
-static async Task<(double? Mean, double? Harmonic, double? P10)> VmafNegAsync(string referencePath, string testPath, int width, int height)
+static async Task<VmafPool> VmafNegAsync(string referencePath, string testPath, int width, int height)
 {
     var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_bench_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
     try
@@ -800,7 +813,7 @@ static async Task<(double? Mean, double? Harmonic, double? P10)> VmafNegAsync(st
         await RunLavfiAsync(referencePath, testPath, width, height,
             $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={escaped}");
 
-        if (!File.Exists(logPath)) return (null, null, null);
+        if (!File.Exists(logPath)) return VmafPool.Empty;
 
         var scores = new List<double>();
         await using (var stream = File.OpenRead(logPath))
@@ -814,16 +827,7 @@ static async Task<(double? Mean, double? Harmonic, double? P10)> VmafNegAsync(st
             }
         }
 
-        if (scores.Count == 0) return (null, null, null);
-
-        var mean = scores.Average();
-        var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
-        var sorted = scores.OrderBy(x => x).ToList();
-        var rank = 10.0 / 100.0 * (sorted.Count - 1);
-        var lower = (int)Math.Floor(rank);
-        var upper = (int)Math.Ceiling(rank);
-        var p10 = lower == upper ? sorted[lower] : sorted[lower] + (sorted[upper] - sorted[lower]) * (rank - lower);
-        return (mean, harmonic, p10);
+        return VmafPooling.Pool(scores);
     }
     finally
     {
@@ -846,7 +850,7 @@ static async Task<string> RunLavfiAsync(string referencePath, string testPath, i
                  "-hide_banner", "-nostdin",
                  "-i", testPath,
                  "-i", referencePath,
-                 "-lavfi", $"[0:v]scale=w={width}:h={height}:flags=lanczos[t];[t][1:v]{filterChain}",
+                 "-lavfi", $"[0:v]scale=w={width}:h={height}:flags=lanczos,settb=AVTB,setpts=N[t];[1:v]settb=AVTB,setpts=N[r];[t][r]{filterChain}",
                  "-f", "null", "-"
              })
         psi.ArgumentList.Add(arg);
@@ -910,7 +914,8 @@ static int Compare(string[] args)
         Console.WriteLine($"  codec/mod  {ar.Codec}/{ar.Mode} -> {br.Codec}/{br.Mode}");
         Console.WriteLine($"  crf/bitrate {ar.CrfOrBitrate} -> {br.CrfOrBitrate}");
         Console.WriteLine($"  sure(s)    {ar.EncodeSeconds:0.#} -> {br.EncodeSeconds:0.#}");
-        Console.WriteLine($"  vmaf harm  {Fmt(ar.VmafNegHarmonic)} -> {Fmt(br.VmafNegHarmonic)}");
+        Console.WriteLine($"  vmaf harm  {Fmt(ar.VmafNegHarmonic)}{HarmonicWarning(ar.VmafNegFloorFrames)} -> {Fmt(br.VmafNegHarmonic)}{HarmonicWarning(br.VmafNegFloorFrames)}");
+        Console.WriteLine($"  vmaf min   {Fmt(ar.VmafNegMin)} -> {Fmt(br.VmafNegMin)}");
         Console.WriteLine($"  vmaf p10   {Fmt(ar.VmafNegP10)} -> {Fmt(br.VmafNegP10)}");
         Console.WriteLine($"  xpsnr      {Fmt(ar.Xpsnr)} -> {Fmt(br.Xpsnr)}");
         Console.WriteLine($"  xpsnr yuv  {Fmt(ar.XpsnrY)}/{Fmt(ar.XpsnrU)}/{Fmt(ar.XpsnrV)} -> {Fmt(br.XpsnrY)}/{Fmt(br.XpsnrU)}/{Fmt(br.XpsnrV)}");
@@ -923,6 +928,9 @@ static int Compare(string[] args)
 }
 
 static string Fmt(double? value) => value?.ToString("0.##", CultureInfo.InvariantCulture) ?? "-";
+
+static string HarmonicWarning(int floorFrames) =>
+    floorFrames > 0 ? $"(SUPHELI: {floorFrames} kare {VmafPooling.HarmonicFloor:0.##} altinda, tabana kelepcelendi)" : string.Empty;
 
 // --- T30: karsilastirma paneli olcum kapisi -----------------------------------------
 // Bu komut yalniz sayi uretir. src/ altina hicbir sey yazmaz.
@@ -2474,7 +2482,62 @@ sealed record BenchResult(
     double? VmafNegMean,
     double? VmafNegHarmonic,
     double? VmafNegP10,
+    double? VmafNegMin,
+    int VmafNegFloorFrames,
     double? Xpsnr,
     double? XpsnrY,
     double? XpsnrU,
     double? XpsnrV);
+
+public sealed record VmafPool(
+    int Count,
+    double? Mean,
+    double? Harmonic,
+    double? P10,
+    double? Min,
+    int FloorClampedFrames)
+{
+    public static readonly VmafPool Empty = new(0, null, null, null, null, 0);
+
+    public bool Suspect => FloorClampedFrames > 0;
+}
+
+public static class VmafPooling
+{
+    public const double HarmonicFloor = 1.0;
+
+    public static VmafPool Pool(IReadOnlyList<double> scores)
+    {
+        if (scores is null) throw new ArgumentNullException(nameof(scores));
+        if (scores.Count == 0) return VmafPool.Empty;
+
+        var sum = 0.0;
+        var reciprocalSum = 0.0;
+        var min = double.PositiveInfinity;
+        var clamped = 0;
+        foreach (var raw in scores)
+        {
+            if (double.IsNaN(raw)) throw new ArgumentException("VMAF dizisi NaN iceriyor.", nameof(scores));
+            sum += raw;
+            if (raw < min) min = raw;
+            if (raw < HarmonicFloor) clamped++;
+            reciprocalSum += 1.0 / Math.Max(raw, HarmonicFloor);
+        }
+
+        var sorted = scores.OrderBy(x => x).ToArray();
+        var rank = 0.10 * (sorted.Length - 1);
+        var lower = (int)Math.Floor(rank);
+        var upper = (int)Math.Ceiling(rank);
+        var p10 = lower == upper
+            ? sorted[lower]
+            : sorted[lower] + (sorted[upper] - sorted[lower]) * (rank - lower);
+
+        return new VmafPool(
+            scores.Count,
+            sum / scores.Count,
+            scores.Count / reciprocalSum,
+            p10,
+            min,
+            clamped);
+    }
+}
