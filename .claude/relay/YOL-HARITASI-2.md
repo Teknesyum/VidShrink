@@ -412,6 +412,31 @@ calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
    yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
    dinamiklik ilkesinin en somut adayı.
 
+## Duzenek tools'a ulasamiyor — ikinci tekrar (T105, T98)
+
+`AGENTS.md` diyor ki: ölçümü üreten düzenek `tools/` altına taşınır. Ama `owns`
+disiplini diyor ki: sahiplenmediğin yola yazamazsın. **İki sözleşme arka arkaya
+bu iki kuralın arasında sıkıştı** — T105 sahne yer gerçeği üretecini, T98 atlama
+ölçüm düzeneğini `tools/`a koyamadı. İkisi de `.calisma/` altında kaldı;
+`.calisma/` gitignore'lu, yani **düzenekler depoda yok.**
+
+Sonuç: rapora giren sayı kalıcı, onu üreten alet değil. Sayı bir gün
+sorgulandığında yeniden üretilemez. T111'in varlık sebebi tam olarak budur —
+T102'nin sayıları sorgulandı ve arşivi olduğu için kurtarılabildi.
+
+**Kural: her sözleşmenin `owns` satırı kendi düzenek yolunu içerir.**
+`tools/<is-adi>/**` biçiminde, sözleşme yazılırken. Sonradan eklenmez; ajan
+duvara çarptığında iş zaten bitmiştir. T111 bunu taşıyor
+(`tools/auto-mod-olcumu/**`), T112'nin düzeneği yok.
+
+**Sahipsiz kalan iki düzenek** — bir sahip bulunana kadar borç:
+- T105'in sahne yer gerçeği üreteci (`.calisma/` altında, T109'un ağacında)
+- T98'in atlama ölçüm düzeneği (`.calisma/t98/atlama/`, ham veri 840+120 satır)
+
+Genel biçimi: **bir kural ihlali iki ayrı kuralın kesişiminden doğuyorsa,
+suçlu ajan değil kesişimdir.** İkinci tekrarda ajanı uyarmak değil, sözleşme
+şablonunu düzeltmek gerekir.
+
 ## Muhurlenmis bir olcum kirli cikti (T102 x T106, 2026-09-02)
 
 T102 mühürlendi ve iyi iş yaptı. **Ama ölçüldüğü boru hattı kaymış** ve bunu
