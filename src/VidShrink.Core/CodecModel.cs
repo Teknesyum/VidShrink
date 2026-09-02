@@ -2,7 +2,7 @@
 
 namespace VidShrink.Core;
 
-public enum EncoderVendor { Software, Nvenc, Qsv, Amf }
+public enum EncoderVendor { Software, Nvenc, Qsv, Amf, VideoToolbox }
 
 public static class CodecModel
 {
@@ -67,7 +67,9 @@ public static class CodecModel
 
     /// <summary>
     /// The lowest video bitrate the encoder will actually deliver at this layout, in kbit/s.
-    /// Zero for software encoders: libx264 and its siblings follow -b:v all the way down.
+    /// Zero for every encoder off the hardware path: libx264 and its siblings follow -b:v all the
+    /// way down, and VideoToolbox reads zero too because <see cref="IsHardware"/> keeps it out,
+    /// not because its floor was measured.
     /// Only av1_nvenc was measured; QSV and AMF carry the same line, which is not measured.
     /// </summary>
     public static int MinBitrateK(string codec, int width, int height, double fps)
@@ -128,10 +130,24 @@ public static class CodecModel
         if (c.Contains("nvenc")) return EncoderVendor.Nvenc;
         if (c.Contains("qsv")) return EncoderVendor.Qsv;
         if (c.Contains("amf")) return EncoderVendor.Amf;
+        if (c.Contains("videotoolbox")) return EncoderVendor.VideoToolbox;
         return EncoderVendor.Software;
     }
 
-    public static bool IsHardware(string codec) => Vendor(codec) != EncoderVendor.Software;
+    /// <summary>
+    /// Whether the encoder is sent down the hardware path. Everything behind this gate - the
+    /// floor factor, the delivered-bitrate yield, the delivery reserve, the peak ceiling and the
+    /// lower quality ceiling - was measured on NVENC, so the gate names the vendors those numbers
+    /// are carried to instead of asking whether the vendor is a chip.
+    /// VideoToolbox is a chip and is still false here: nothing behind this gate has been measured
+    /// on it. docs/olcumler/videotoolbox.md gives one bitrate per arm on one Apple M1, which is not
+    /// enough for any of them. Opening this gate for VideoToolbox is a measurement, not an edit.
+    /// </summary>
+    public static bool IsHardware(string codec) => Vendor(codec) switch
+    {
+        EncoderVendor.Nvenc or EncoderVendor.Qsv or EncoderVendor.Amf => true,
+        _ => false
+    };
 
     private static readonly IReadOnlyDictionary<string, string> TurboFirstPassCeilings =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

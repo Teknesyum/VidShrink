@@ -857,3 +857,16 @@ ailesinin yeni bir yuzu — kosum yarida kesilse bile kapi gecer. `kosum-kapisi.
 `-MinimumTotal` tam bunun icin var ve CI'da devrede; yerel kosumda degil.
 
 - 02.09.2026 · T148 teslim edildi (submitted): yerellestirme olcusu artik cagri yerlerini IL'den okuyor; 10 -> 15 test, olu anahtar 0 (bulunan tek olu anahtar T0 karariyla silindi), dal T148-anahtar-cagri-pimi.
+
+## T149 teslim edildi (2 Eylul 2026, tur 1)
+
+VideoToolbox satici olarak tanindi, donanim kapisi **acilmadi**. `IsHardware`
+artik "Software degil" diye sormuyor; sabitlerin olculdugu uc saticiyi
+(nvenc, qsv, amf) adiyla sayiyor, VideoToolbox disarida kaliyor. Boylece
+NVENC'te olculup QSV ve AMF'ye tasinan dort sabit dorduncu kez tasinmadi.
+`AllowedCodecs` genisletilmedi: genisletme olculdu, uc testi dusuruyor ve tek
+basina ise yaramiyor — plan bu kez `FfmpegArguments` preset kapisinda oluyor.
+Dal `T149-videotoolbox-satici`, tepe `d85b6b3` (rebase oncesi `5e50526`), rapor
+`docs/olcumler/videotoolbox-baglama.md`. Denetim GECTI, KRITIK yok, yedi borc. CI `33677212181` completed success.
+Muhur **bloke**: denetci ajanin `live/` kaydi hic yazilmadi, `contract.js audit`
+kayitsiz denetimi kabul etmiyor. Kayit elle uydurulmadi.
