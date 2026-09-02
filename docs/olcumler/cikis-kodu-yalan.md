@@ -231,3 +231,44 @@ varsayılan `info` seviyesinde koşuyor ve tanıyı görüyor. Gerçek ffmpeg ko
 **2. Taşıma `EncodeResult`ta duruyor, arayüze çıkmıyor.** Kullanıcıya uyarı göstermek
 `src/VidShrink.App` altında bir değişiklik ister; orası `owns` dışında. Veri teslim
 noktasına kadar geliyor, gösterilmesi ayrı bir iş. Borç.
+
+## K5 — Mutasyon ızgarası
+
+Yedi mutasyon tek tek uygulandı; her turda `dotnet build -c Release --no-incremental`
+koştu ve `dotnet test` `--no-build` **olmadan** çalıştı. Ham çıktı `.calisma/T144/K5-izgara.txt`
+altında üretildi; özeti:
+
+| Mutasyon | Kırılan ölçüler | Kırılan / 16 |
+|---|---|---|
+| **M0** taban, mutasyon yok | — | 0 |
+| **M1** sözlükten `Error parsing option` çıkarıldı | `ARealEncodeThatDropsAnOptionReportsTheDrop`, `TheLowLevelRunnerKeepsOkIndependentOfTheDiagnostic`, `ExitZeroWithADroppedOptionDoesNotFailButTheDropIsCarried`, `EveryEncoderMeasuredAtExitZeroReportsItsDroppedKey(SvtAv1)`, `…(X264)`, `ExitZeroWithADroppedOptionIsStillOkButTheDropIsCarried` | 6 |
+| **M2** sözlükten `Unknown option:` çıkarıldı | `EveryEncoder…(X265)`, `BothRunnersReadTheSameDictionary`, `ADroppedOptionNeverFailsTheDeliveryPath` | 3 |
+| **M3** desen `Unknown`a genişletildi | `TheWordUnknownOnItsOwnIsNotEnough`, `CleanRunsAreNeverReadAsADroppedOption(libx265)`, `…(libx264)` | 3 |
+| **M4** `EncodeRunner` tanılı satırı kaydetmiyor | `BothRunnersReadTheSameDictionary`, `ADroppedOptionNeverFailsTheDeliveryPath`, `ARealEncode…`, `ExitZeroWithADroppedOption…` | 4 |
+| **M5** `FfmpegRunner` tanılı satırı taşımıyor | `ExitZeroWithADroppedOptionIsStillOkButTheDropIsCarried`, `BothRunnersReadTheSameDictionary`, `TheLowLevelRunnerKeeps…` | 3 |
+| **M6** karar tersine: düşürülen ayar kodlamayı öldürüyor | `ADroppedOptionNeverFailsTheDeliveryPath`, `ARealEncode…`, `ExitZeroWithADroppedOption…` | 3 |
+| **M7** tanılı satır tüm akış yerine yalnız kuyruktan aranıyor | `ARealEncode…`, `ExitZeroWithADroppedOption…` | 2 |
+
+**Yedi mutasyonun yedisi de yakalandı; hiçbiri hayatta kalmadı.**
+
+Sözleşme "her mutasyon yalnız kendi ölçüsünü kırmalı" diyor; ızgara bunu harfiyen
+karşılamıyor ve karşılamamalı da: tek bir desen (`Error parsing option`) üç kodlayıcının
+metninde birden geçtiği için M1 altı ölçüyü birden düşürüyor. Sağlanan ve sağlanması
+gereken özellik şu: **yedi kümenin yedisi de birbirinden farklı**, yani hiçbir iki mutasyon
+ölçülerden ayırt edilemez değil.
+
+İki satır ayrıca dikkate değer:
+
+- **M3 tek başına sözlüğün genişlemesini yakalayan mutasyon.** Deseni `Unknown option:`ten
+  `Unknown`a açmak *hiçbir* tespit ölçüsünü kırmıyor — düşürülen ayarlar hâlâ bulunuyor.
+  Yalnız K3'ün yanlış pozitif ölçüleri kırılıyor, çünkü `muxing overhead: unknown` her
+  başarılı koşumun sonunda duruyor. Genişleme ancak yanlış pozitif ölçüsüyle görülüyor.
+- **M7 tanının kuyruğa girmediğini pimliyor.** Yalnız `EncodeRunner`in iki ölçüsü kırılıyor,
+  ikisi de uzun (35 satırlık) gerçek metni kullananlar; kısa metinli ölçüler etkilenmiyor.
+
+Hiçbir ölçü sabiti sabitle karşılaştırmıyor: `DroppedOptionPatterns` dizisi test
+dosyalarında hiç geçmiyor (`grep -n "DroppedOptionPatterns" tests/…` boş döndü). Ölçüler
+verilen stderr metninin ürettiği kararı pimliyor.
+
+Mutasyon koşumu bitince çalışma ağacı geri alındı; `git status --short` boş, taban 16/16
+yeşil.
