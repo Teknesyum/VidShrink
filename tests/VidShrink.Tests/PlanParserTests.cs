@@ -60,13 +60,16 @@ public sealed class PlanParserTests
     [Theory]
     [InlineData("hevc_videotoolbox")]
     [InlineData("h264_videotoolbox")]
-    public void ParserAcceptsVideoToolboxEncoders(string codec)
+    public void ParserStillRejectsVideoToolboxEncoders(string codec)
     {
         var json = ValidPlan(Array.Empty<string>(), codec: codec);
 
         var result = PlanParser.Parse(json, Source, new PlanOptions());
 
-        Assert.True(result.Ok, string.Join(" | ", result.Errors));
+        Assert.False(result.Ok);
+        Assert.Contains(result.Errors, error =>
+            error.Contains("Unsupported codec", StringComparison.Ordinal)
+            && error.Contains(codec, StringComparison.Ordinal));
     }
 
     private static string ValidPlan(string[] extraArgs, int width = 1920, int height = 1080, double fps = 30, string codec = "libx264")
