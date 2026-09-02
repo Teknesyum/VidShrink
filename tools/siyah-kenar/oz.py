@@ -66,20 +66,25 @@ def k1_tablo(kanit):
 
 
 def kanit_tablo(kanit):
-    r = ["| Kaynak | Kaynak dosya sha256 (ilk 16) | Kare | PTS ilk / son | Aktif alan framemd5 ozeti (ilk 16) | Tekrar esit mi |",
+    r = ["| Kaynak | Kaynak dosya sha256 (ilk 16) | Kare | PTS ilk / son | Aktif alan framemd5 ozeti (ilk 16) | Iki cozumde ayni mi |",
          "|---|---|---|---|---|---|"]
     for ad in LETTERBOX + KENARSIZ + ["VD"]:
         d = kanit[ad]
-        o = d["kol_ozdesligi"]
+        o = d.get("cozme_determinizmi") or d["kol_ozdesligi"]
         pts = o["pts"] or ("-", "-")
         r.append("| %s | `%s` | %d | %s / %s | `%s` | %s |" % (
             ADLAR[ad], d["sha256"][:16], o["kare"], pts[0], pts[1],
             o["kirpilmis_alan_md5"][:16], "evet" if o["esit"] else "**HAYIR**"))
     r.append("")
-    r.append("Her satirda tek bir kaynak dosya var ve iki kol da onu okuyor; "
-             "kirpmali kolun gordugu aktif alanin kare kare md5 dizisi iki bagimsiz "
-             "cozumde ayni cikti. Kaynak dosyalarin uretimi `tools/siyah-kenar/kaynak.sh`, "
-             "kanit `tools/siyah-kenar/kanit.py`.")
+    r.append("**Son sutunun ne oldugu, ne olmadigi.** Ayni dosya ayni argumanlarla "
+             "iki kez `framemd5`'e verildi; sutun bunlarin esit oldugunu soyluyor. "
+             "Bu bir **cozme determinizmi** denetimidir — okumanin kosumdan kosuma "
+             "degismedigini gosterir. Iki kolun ayni kaynaktan geldiginin kaniti "
+             "degildir; o kanit yapisaldir ve `tools/siyah-kenar/kos.sh` icindedir: "
+             "iki kol tek bir dosyayi okur, aralarindaki tek fark `-vf`'tir. "
+             "sha256 / kare sayisi / PTS araligi sutunlari da o yapisal iddiayi "
+             "destekler. Uretim `tools/siyah-kenar/kaynak.sh`, kanit "
+             "`tools/siyah-kenar/kanit.py`.")
     return "\n".join(r)
 
 
@@ -146,16 +151,83 @@ def limit_tablo(lim):
             ADLAR.get(ad, ad), kutu_str(tuple(d["gercek"])),
             " | ".join(kutu_str(d["limit"].get(str(x))) for x in limitler)))
     r.append("")
-    r.append("| Kaynak | Ust bant YMIN / YAVG / YMAX (8 bit olcek, 60 kare ortalamasi) |")
+    r.append("**Olcek notu.** `signalstats` girdinin kendi bit derinliginde "
+             "raporluyor; kaynaklar yuv420p10le oldugu icin asagidaki luma "
+             "degerleri **10 bit olcektedir (0..1023)**. Dogrulama: "
+             "`color=#2c2c2c` yuv420p10le'de YAVG 216, yuv420p'de 54 veriyor. "
+             "`cropdetect`'in `limit` parametresi de ayni olcektedir (asagida "
+             "olculdu), yani bu tablodaki sayilarla yukaridaki `limit` degerleri "
+             "dogrudan karsilastirilabilir.")
+    r.append("")
+    r.append("| Kaynak | Ust bant YMIN / YAVG / YMAX (10 bit, 0..1023) |")
     r.append("|---|---|")
     for ad, d in lim.items():
         b = d.get("ust_bant_luma")
         if b:
-            r.append("| %s | %s / %s / %s |" % (ADLAR.get(ad, ad),
-                                                s(b["YMIN"]), s(b["YAVG"]), s(b["YMAX"])))
+            r.append("| %s | %s / %s / %s |" % (
+                ADLAR.get(ad, ad), s(b["YMIN"]), s(b["YAVG"]), s(b["YMAX"])))
+    r.append("")
+    r.append(derinlik_tablo(yuk(IS + "/yokla/derinlik.json")))
     r.append("")
     r.append(limit_ozet(lim, limitler))
     return NL.join(r)
+
+
+def derinlik_tablo(dr):
+    if not dr:
+        return "`derinlik.json` yok — bit derinligi sinamasi kosulmadi."
+    L = dr["limitler"]
+    r = ["**`limit` hangi olcekte yorumlaniyor?** Ayni icerik iki bit derinliginde "
+         "yoklandi: kaynagin kendisi (yuv420p10le) ve `format=yuv420p` ile 8 bite "
+         "cevrilmis kopyasi. Uretici: `python tools/siyah-kenar/derinlik.py`.",
+         "",
+         "| Kaynak | Derinlik | Gercek sinir | " + " | ".join("limit=%d" % x for x in L) + " |",
+         "|---" * (4 + len(L)) + "|"]
+    for ad, d in dr["kaynak"].items():
+        for et in ("10bit", "8bit"):
+            r.append("| %s | %s | %s | %s |" % (
+                ADLAR.get(ad, ad), et, kutu_str(tuple(d["gercek"])),
+                " | ".join(kutu_str(d["derinlik"][et].get(str(x))) for x in L)))
+    r.append("")
+    r.append(derinlik_ozet(dr))
+    return NL.join(r)
+
+
+def derinlik_ozet(dr):
+    L = dr["limitler"]
+
+    def ilk_dogru(ad, et):
+        d = dr["kaynak"][ad]
+        for x in L:
+            k = d["derinlik"][et].get(str(x))
+            if k and tuple(k) == tuple(d["gercek"]):
+                return x
+        return None
+
+    def ilk_bozuk(ad, et):
+        d = dr["kaynak"][ad]
+        for x in L:
+            k = d["derinlik"][et].get(str(x))
+            if k and tuple(k) != tuple(d["gercek"]):
+                return x
+        return None
+
+    a = ilk_dogru("KD", "10bit")
+    b = ilk_dogru("KD", "8bit")
+    oran = "-" if not (a and b) else s(float(a) / b, 2)
+    na10 = ilk_bozuk("NA", "10bit")
+    na8 = ilk_bozuk("NA", "8bit")
+    return ("Ayni icerik, ayni bant: KD'nin gercek sinirini veren en dusuk limit "
+            "10 bitte **%s**, 8 bitte **%s** — orani %sx. Yani `limit` 8 bit "
+            "olcegine normalize edilmiyor, **girdinin kendi bit derinliginde** "
+            "yorumlaniyor. Kenarsiz NA ilk kez 10 bitte limit **%s**'te, 8 bitte "
+            "limit **%s**'te yanlis kirpiliyor. **Sonuc: tek bir sabit `limit` "
+            "varsayilani bit derinliginden bagimsiz olamaz.** Bu belgedeki 48..56 "
+            "penceresi 10 bit kaynaklar icindir; 8 bit bir kaynakta ayni pencere "
+            "goruntuyu keser." % (
+                "-" if a is None else "%d" % a, "-" if b is None else "%d" % b,
+                oran, "-" if na10 is None else "%d" % na10,
+                "-" if na8 is None else "%d" % na8))
 
 
 def limit_ozet(lim, limitler):
@@ -167,7 +239,8 @@ def limit_ozet(lim, limitler):
         return kutu(ad, x) == tuple(lim[ad]["gercek"])
 
     def yavg(ad):
-        return s(((lim.get(ad) or {}).get("ust_bant_luma") or {}).get("YAVG"))
+        v = ((lim.get(ad) or {}).get("ust_bant_luma") or {}).get("YAVG")
+        return "-" if v is None else "%s / 1023" % s(v)
 
     guvenli = [x for x in limitler if all(dogru(ad, x) for ad in KENARSIZ if ad in lim)]
     kd = [x for x in limitler if "KD" in lim and dogru("KD", x)]
@@ -182,7 +255,8 @@ def limit_ozet(lim, limitler):
             return "%d" % v[0]
         return "%d..%d" % (min(v), max(v))
 
-    r = ["Taranan %d limit degerinden **%s** kenarsiz kaynaklarin ikisini de "
+    r = ["Asagidaki butun limit degerleri 10 bit olcektedir; kaynaklar 10 bit. "
+         "Taranan %d limit degerinden **%s** kenarsiz kaynaklarin ikisini de "
          "bozmadan biraktigi araliktir. KD'nin (bant YAVG %s) gercek sinirini "
          "veren aralik **%s**; ikisinin kesisimi **%s**." % (
              len(limitler), ara(guvenli), yavg("KD"), ara(kd), ara(kd_pencere))]
@@ -240,8 +314,11 @@ def k3_egilim(vmaf):
         (artan if b > a else azalan).append(ad)
     poz = [ad for ad in LETTERBOX
            if kazanc(vmaf, ad, ANA_HIZ) is not None and kazanc(vmaf, ad, ANA_HIZ) > 0]
-    return ("Bitrate yukseldikce kazanc %d kaynakta artiyor (%s), %d kaynakta "
-            "azaliyor (%s). Karar noktasinda (%dk) kazanci pozitif olan kaynak "
+    return ("Uc noktalar karsilastirildiginda (4000k kazanci - 1000k kazanci; "
+            "aradaki 2000k'ya bakmayan, tek adimlik bir kiyas) %d kaynakta "
+            "kazanc daha buyuk (%s), %d kaynakta daha kucuk (%s). Bu monotonluk "
+            "iddiasi degildir: KC'nin uc degeri artan ya da azalan bir dizi "
+            "olusturmuyor. Karar noktasinda (%dk) kazanci pozitif olan kaynak "
             "sayisi %d/%d: %s." % (
                 len(artan), ", ".join(artan) or "yok",
                 len(azalan), ", ".join(azalan) or "yok",
@@ -468,7 +545,8 @@ def hukum(vmaf, kanit, yokla, sr):
              "",
              ("Kazanclar **gercek bant sinirina** gore olculdu, cropdetect'in "
               "buldugu sinira gore degil. Varsayilan `limit=24` ile on kareye "
-              "yayilmis yoklama dort letterbox'li kaynagin **%d tanesinde** "
+              "yayilmis yoklamanin **mod birlestirmesi** (en sik gecen kutu; "
+              "birlesim degil) dort letterbox'li kaynagin **%d tanesinde** "
               "gercek siniri buluyor (%s); kalan %d kaynakta kirpma varsayilan "
               "ayarla hic tetiklenmez, yani oradaki kazanc erisilebilir degil, "
               "tavandir." % (len(bulunan), ", ".join(bulunan) or "hicbiri",
