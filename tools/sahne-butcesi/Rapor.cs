@@ -45,6 +45,7 @@ public static class Rapor
         K3Denetim(sb, isKok);
         var k4 = K4(sb, isKok);
         var k4b = K4b(sb, isKok, kollar, k1);
+        Tekrar(sb, isKok, k4b);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         KapiDenemesi(sb, isKok);
@@ -103,14 +104,13 @@ public static class Rapor
             sb.AppendLine("   acardi ama `gamma = 1 - qcomp` turetilmis bir sayidir, telafi sabitine");
             sb.AppendLine("   cevrilmedi.");
         }
-        if (k4b.ZonesKazandi > 0)
+        if (k4b.ZonesKazandi > 0 && TekrarSatirlari(isKok).Count == 0)
         {
             sb.AppendLine($"8. **MAE farkinin gurultu tabani olculmedi.** `zones`in kazandigi " +
                           $"{Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp'lik fark icin " +
-                          "ayni hucrenin tekrar kosulmus bir ikinci olcusu yok; K4 izgarasinda " +
-                          "tekrar gurultusu bayt uzerinden olculdu, MAE pp uzerinden olculmedi. " +
-                          "Bu buyuklukteki bir farkin gurultunun ustunde oldugu bu sayfadan " +
-                          "cikmaz. Karari K5'in kalite kapisi tasir.");
+                          "ayni hucrenin tekrar kosulmus bir ikinci olcusu yok. Kosulmadi; " +
+                          "maliyeti hucre basina bir tam iki gecisli kodlamadir " +
+                          "(`SahneButcesi tekrar <kol> <pencere>`).");
         }
         sb.AppendLine();
     }
@@ -664,6 +664,78 @@ public static class Rapor
 
         return new K4bSonuc(kapanmaHucre, kapanmaVar, kazananZones, kazananQcomp,
             zonesEnIyi, zonesEnIyiOran, zonesEnIyiHucre);
+    }
+
+    public static List<(string Kol, string Pencere, string Sha, long Bayt, double Mae1, double Mae2)>
+        TekrarSatirlari(string isKok)
+    {
+        var liste = new List<(string, string, string, long, double, double)>();
+        foreach (var y in Directory.GetFiles(isKok, "tekrar-*.csv").OrderBy(x => x))
+        {
+            var ad = Path.GetFileNameWithoutExtension(y)["tekrar-".Length..];
+            var i = ad.IndexOf('-');
+            if (i < 0) continue;
+            var satir = File.ReadAllLines(y);
+            string? sha = null; long bayt = 0; double m1 = 0, m2 = 0; var tam = false;
+            foreach (var l in satir.Skip(1))
+            {
+                var c = l.Split(';');
+                if (c.Length < 4) continue;
+                if (c[0] == "sha256") sha = c[3];
+                if (c[0] == "dosya boyutu" && long.TryParse(c[3], out var b)) bayt = b;
+                if (c[0].StartsWith("MAE", StringComparison.Ordinal)
+                    && double.TryParse(c[1], NumberStyles.Float, CultureInfo.InvariantCulture, out m1)
+                    && double.TryParse(c[2], NumberStyles.Float, CultureInfo.InvariantCulture, out m2))
+                    tam = true;
+            }
+            if (tam && sha is not null) liste.Add((ad[..i], ad[(i + 1)..], sha, bayt, m1, m2));
+        }
+        return liste;
+    }
+
+    private static void Tekrar(StringBuilder sb, string isKok, K4bSonuc k4b)
+    {
+        var satirlar = TekrarSatirlari(isKok);
+        if (satirlar.Count == 0) return;
+        sb.AppendLine("### Tekrar gurultusu — ayni hucre iki kez kosuldu");
+        sb.AppendLine();
+        sb.AppendLine("K4 ekindeki kazanclar pp cinsindendir; kazancin gurultunun ustunde olup");
+        sb.AppendLine("olmadigi ancak ayni parametreyle ikinci bir kosumla anlasilir. K4");
+        sb.AppendLine("izgarasindaki `kontrol` satiri bayt uzerinden olcer, bu tablo pp uzerinden.");
+        sb.AppendLine();
+        sb.AppendLine("| Kol | Pencere | sha256 | Boyut farki (bayt) | MAE kosum 1 | MAE kosum 2 | Tekrar gurultusu (pp) |");
+        sb.AppendLine("|-----|---------|--------|--------------------|-------------|-------------|-----------------------|");
+        double? enBuyuk = null;
+        foreach (var t in satirlar)
+        {
+            var g = Math.Abs(t.Mae2 - t.Mae1);
+            if (enBuyuk is null || g > enBuyuk) enBuyuk = g;
+            sb.AppendLine($"| {t.Kol} | `{t.Pencere}` | {t.Sha} | {t.Bayt} | " +
+                          $"{Kabuk.Inv(t.Mae1, "0.000")} | {Kabuk.Inv(t.Mae2, "0.000")} | " +
+                          $"{Kabuk.Inv(g, "0.000")} |");
+        }
+        sb.AppendLine();
+        sb.AppendLine($"Kosulan hucre {satirlar.Count}; olculen en buyuk tekrar gurultusu " +
+                      $"{Kabuk.Inv(enBuyuk!.Value, "0.000")} pp.");
+        if (k4b.ZonesEnIyiKazanc is { } kz)
+        {
+            var kat = enBuyuk.Value > 0 ? kz / enBuyuk.Value : double.PositiveInfinity;
+            sb.AppendLine(enBuyuk.Value <= 0
+                ? $"`zones`in kazandigi {Kabuk.Inv(kz, "0.000")} pp bu gurultunun **ustunde**: " +
+                  "iki kosum ayni ciktiyi verdi, yani bu kodlayici bu parametrelerle yinelenebilir " +
+                  "ve olculen fark kodlamanin kendi degiskenliginden gelmiyor. Farkin **kucuklugu** " +
+                  "ayri bir sorudur ve bu tablo onu yanitlamaz."
+                : kz > enBuyuk.Value
+                    ? $"`zones`in kazandigi {Kabuk.Inv(kz, "0.000")} pp gurultunun " +
+                      $"{Kabuk.Inv(kat, "0.0")} kati; gurultunun ustunde."
+                    : $"`zones`in kazandigi {Kabuk.Inv(kz, "0.000")} pp gurultunun **altinda** " +
+                      "kaliyor; o kazanc olcum degiskenliginden ayirt edilemez.");
+        }
+        sb.AppendLine();
+        sb.AppendLine("Uretim: `SahneButcesi tekrar <kol> <pencere>`, ham dosya `tekrar-<kol>-<pencere>.csv`.");
+        sb.AppendLine("Yalniz `zones`in kazandigi hucrede kosuldu; diger hucrelerin maliyeti");
+        sb.AppendLine("hucre basina bir tam iki gecisli kodlamadir.");
+        sb.AppendLine();
     }
 
     private static AbSonuc K5K6(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
