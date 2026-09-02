@@ -440,9 +440,10 @@ ediyor, yalnız beklenen dize bugünkü çağrıya güncellendi.
   `double.IsNaN(...)` iddiası. `tools/harita-baglantisi/Program.cs` de yalnız
   `double.IsNaN` ile basıyor. Yani bugün sessizce aritmetiğe giren bir `NaN` yok.
 - **Yoklamayı ucuzlatan seçenekler** (§ 4).
-- **CI'nın 1183 ile yerelin 1185 toplamı arasındaki iki ölçülük fark** (§ 10).
-- **Pim düzeltmesinden sonraki tam süit ve CI dörtlüsü** (§ 10); dar süzgeç
-  yeniden koşturuldu, tam süit koşturulmadı.
+- **CI'nın 1187 ile yerelin 1189 toplamı arasındaki iki ölçülük fark** (§ 10).
+- **İki kararsız kırmızının kökü** (§ 10). Teslim koşumunda ikisi de yeşil
+  döndü; **kararsızlıklarının sebebi ölçülmedi**, ikisi de bu sözleşmenin
+  dosyaları değil.
 - **Düşüşün arayüzde söylenmesi** (§ 5).
 - **Donanım kodlayıcı yolu.** `HardwareKeyframeCeilingSeconds` = 5,0 sn bu
   sözleşmede hiç ölçülmedi; üç klip de yazılım kodlayıcıya düştü.
@@ -452,34 +453,34 @@ ediyor, yalnız beklenen dize bugünkü çağrıya güncellendi.
 ## 10. Süit ve CI
 
 İki koşum ayrı satır; yerel yeşilin CI'yi temsil etmediği bu projede **on üç
-itme boyunca fark edilmedi**, o yüzden koşum kimliği yazılıyor.
+itme boyunca fark edilmedi**, o yüzden koşum kimliği yazılıyor. Aşağıdaki iki
+satır teslim commit'ini (`97ae59f`, ön izleme zinciri bağlandıktan sonra)
+ölçüyor.
 
 | Koşum | Kırmızı | Yeşil | Atlanan | Toplam | Süre |
 | --- | --- | --- | --- | --- | --- |
-| Yerel tam süit (`dotnet test VidShrink.sln -c Release`) | **2** | 1166 | 17 | 1185 | 18 dk 15 sn |
-| CI koşum **33592638991** (`T113-harita-baglantisi`, `tools/kosum-kapisi/kosum-kapisi.ps1`) | **1** | 1075 | **107** | 1183 | 13 dk 24 sn |
+| Yerel tam süit (`dotnet test VidShrink.sln -c Release`, `97ae59f`) | 0 | 1172 | 17 | **1189** | 44 dk 47 sn (paylaşımlı makine, on bir ajan) |
+| CI koşum **33597703249** (`T113-harita-baglantisi`, `97ae59f`, `success`) | 0 | 1080 | **107** | **1187** | 9 dk 40 sn |
 
-**Süit yeşil değil.** İki kırmızının ikisi de kimliğiyle:
+**Bu koşum yeşil, ama "süit yeşil" cümlesi bu dalın hikâyesini anlatmıyor.**
+Tur boyunca üç kırmızı görüldü; üçünün de kimliği, sahibi ve bugünkü durumu:
 
-| Ölçü | Nerede | Sahibi | Durum |
-| --- | --- | --- | --- |
-| `FfmpegArgumentsTests.Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz` (`:408`) | yerel **ve** CI | T108 (`active`) | bu dalın kırdığı pim, § 8'de T0 talimatıyla düzeltildi; yukarıdaki iki dörtlü **düzeltmeden önceki** koşumlardır |
-| `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor` (`:458`) | yalnız yerel | T117 (`active`) | yük duyarlı, **kararsız** — aşağıya bak |
+| Ölçü | Sahibi | Ne oldu |
+| --- | --- | --- |
+| `FfmpegArgumentsTests.Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz` (`:408`) | T108 (`active`) | **bu dalın kırdığı kaynak-metin pimi.** `origin/main`de geçiyordu (`MainWindow.axaml.cs:1802` hâlâ `_encoders));`), kıran benim `_sceneMap?.Map` eklemem. T0 talimatıyla **beklenen dize** düzeltildi, iddia değil. Bugün yeşil. T108 ile birleşme çakışması riski var, T0'a bildirildi |
+| `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor` (`:458`) | T117 (`active`) | **kararsız.** Tek başına beş koşumda 1 kırmızı / 4 yeşil; bu tam süitte yeşil. Dokunulmadı |
+| `PanelHostTests.Pencere_sinirindaki_oynatma_boslugu_olculur` | **sahipsiz** — `tests/VidShrink.Tests/PanelHostTests.cs` hiçbir aktif sözleşmenin `owns`'unda değil | **kararsız.** Bir önceki tam süitte kırmızıydı (`ilk pencere kare vermedi`); denetim koşumunda üç App dosyası ve kendi ölçü dosyam `git stash` ile çekilip `--no-incremental` derlemeden sonra **aynı** kırmızı çıktı, yani bu dalın değil. Bu tam süitte yeşil. Dokunulmadı |
 
-**Yük duyarlılığı ayrıştırıldı.** Ölçü tek başına beş kez koşturuldu
-(`--filter "FullyQualifiedName~PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor"`,
-makinede altı ajan): **1 kırmızı, 4 yeşil.** Aynı ikili, aynı bayrak, farklı
-sonuç — yani yalıtılmışta da düşebiliyor ama deterministik değil; **gerçek bir
-kusur değil, ortam varsayımı kusuru.** Kırmızı iddia `yuk altinda karar
-hafifledi`: boş okumalar `SoftwareHeavyLoad` verirken yüklü okuma
-`SoftwareLightLoad` verdi — makine zaten yüklüyken "boş okuma"nın boş olduğu
-varsayımı tutmuyor. Koşum süreleri de bunu söylüyor: 1 dk 15 sn ↔ 4 dk 13 sn.
-Bu dalın diff'i `PerformanceProbe` yoluna hiç değmiyor
-(`git diff --stat origin/main...HEAD` on dosya, hiçbiri o yolda değil).
+**İki kararsız ölçünün bugünkü yeşili, düzeldiklerinin kanıtı değil.** İkisi de
+makine yükünden etkileniyor; bu koşum 44 dk 47 sn sürdü, bir öncekiyle
+(18 dk 15 sn) aynı süiti ölçüyor. Kırmızıları yeşile döndüren şey bu dalın
+diff'i değil, makinenin o anki hâli.
 
-**CI'da atlanan 107 ölçü, yerelde 17.** Fark ffmpeg: `tools/ci-gibi-kos.sh`in
-benzettiği hâl budur, CI'da ffmpeg ve ffprobe PATH'te yok. **Bu sözleşmenin
-kabul kriterlerine karşılık gelen iki ölçü o listede:**
+**CI'da atlanan 107 ölçü, yerelde 17.** Fark ffmpeg: CI'da ffmpeg ve ffprobe
+PATH'te yok, `tools/ci-gibi-kos.sh` bu hâli benzetiyor. Yerelde atlanan 17'nin
+**hiçbiri bu sözleşmenin ölçüsü değil** (hepsi `Live…` önekli canlı kodlama ve
+güncelleyici ölçüleri). CI'da atlananların içinde **bu sözleşmenin kabul
+kriterlerine karşılık gelen iki ölçü var:**
 
 | Atlanan ölçü | Hangi kriteri doğruluyor |
 | --- | --- |
@@ -489,16 +490,22 @@ kabul kriterlerine karşılık gelen iki ölçü o listede:**
 **CI yeşili bu iki kriteri doğrulamaz.** İkisi de yerelde ffmpeg'li koşumda
 geçti; CI'da yalnız atlandı. K5'in öteki iki yolu
 (`AFailedScanFallsBackToTheDefaultCeilingAndSaysSo`, süresiz kaynak) ffmpeg
-gerektirmiyor, onlar CI'da da koşuyor. K1 ve K3'ün ölçülerinin hepsi ffmpeg'siz.
-K7'de **M1–M5'in her biri en az bir ffmpeg'siz ölçüyle** yakalanıyor; yalnız
-**M6'yı yakalayan tek ölçü ffmpeg gerektiriyor**, yani CI'da M6 mutasyonu
-gözetimsiz kalır.
+gerektirmiyor, onlar CI'da da koşuyor. K1 ve K3'ün ölçülerinin hepsi ffmpeg'siz
+— **§ 3'ün dört ön izleme ölçüsünün dördü de CI'da koştu**, atlananlar
+listesinde yok. K7'de M1–M5 ve M7–M9'un her biri en az bir ffmpeg'siz ölçüyle
+yakalanıyor; yalnız **M6'yı yakalayan tek ölçü ffmpeg gerektiriyor**, yani
+CI'da M6 mutasyonu gözetimsiz kalır.
 
-Yerel toplam 1185, CI toplam 1183 — iki ölçü CI'da hiç sayılmıyor. **Sebebi
-ölçülmedi**, bu sözleşmenin ürünü değil.
+`PanelHostTests.Pencere_sinirindaki_oynatma_boslugu_olculur` de CI'nın atlanan
+listesinde — yukarıdaki kararsız kırmızı **CI'da hiç koşmuyor**, o yüzden CI
+yeşili onun hakkında bir şey söylemiyor.
 
-Pim düzeltmesinden sonra dar `verify` süzgeci yeniden koşturuldu
-(`--no-incremental` derleme ardından): **94 geçti / 0 kaldı / 0 atlandı / 94
-toplam.** Düzeltmenin tam süit ve CI dörtlüsü **yeniden koşturulmadı**; yukarıdaki
-iki satır düzeltmeden öncesini gösteriyor, teslim itmesinin CI kimliği
-`## Çıktı`da.
+Yerel toplam 1189, CI toplam 1187 — iki ölçü CI'da hiç sayılmıyor (atlanmıyor,
+**sayılmıyor**). **Sebebi ölçülmedi**, bu sözleşmenin ürünü değil. Aynı fark
+düzeltmeden önceki koşumlarda da vardı (1185 ↔ 1183); aradaki dört ölçülük
+artış § 3'ün dört yeni ön izleme ölçüsü.
+
+Tur içindeki önceki koşumlar, kayıt için: yerel **2** / 1166 / 17 / 1185
+(18 dk 15 sn, pim düzeltmesinden önce), CI **33592638991** (`3aa3911`,
+`failure`) **1** / 1075 / 107 / 1183 (13 dk 24 sn), CI **33594558492**
+(`63ebdbb`, pim düzeltmesiyle, `success`).
