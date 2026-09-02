@@ -43,12 +43,12 @@ public static class Rapor
         var k2 = K1K2(sb, k1, haritalar, kollar);
         K3(sb);
         K3Denetim(sb, isKok);
-        K4(sb, isKok);
+        var k4 = K4(sb, isKok);
         K4b(sb, isKok, kollar, k1);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         KapiDenemesi(sb, isKok);
-        Sonuc(sb, k2, k5, k7);
+        Sonuc(sb, k2, k5, k7, k4);
         Sinirlar(sb, isKok);
 
         Directory.CreateDirectory(Path.GetDirectoryName(ciktiYolu)!);
@@ -457,12 +457,15 @@ public static class Rapor
         }
     }
 
-    private static void K4(StringBuilder sb, string isKok)
+    public sealed record K4Sonuc(int Denenen, int Calisan, bool VarsayilanIsliyor,
+        IReadOnlyList<string> CalisanListesi);
+
+    private static K4Sonuc K4(StringBuilder sb, string isKok)
     {
         sb.AppendLine("## K4 — aday x kodlayici izgarasi");
         sb.AppendLine();
         var yol = Path.Combine(isKok, "k4-izgara.csv");
-        if (!File.Exists(yol)) { sb.AppendLine("**bilinmiyor** — izgara kosulmadi."); sb.AppendLine(); return; }
+        if (!File.Exists(yol)) { sb.AppendLine("**bilinmiyor** — izgara kosulmadi."); sb.AppendLine(); return new K4Sonuc(0, 0, false, Array.Empty<string>()); }
 
         sb.AppendLine("Cikis kodunun sifir olmasi destek sayilmaz: x264/x265 ve SVT-AV1 parametre");
         sb.AppendLine("ayristiricilari tanimadiklari anahtari uyariyla geciyor. Her hucre **iki");
@@ -483,10 +486,15 @@ public static class Rapor
         }
         sb.AppendLine();
 
+        var calisanKodlayici = new List<string>();
+        var varsayilanIsliyor = true;
+        var denenenSayi = 0;
         var zon = hucreler.Where(c => c[1] == "zones").ToList();
         if (zon.Count > 0)
         {
             var calisan = zon.Where(c => c[2] == "evet").Select(c => c[0]).ToList();
+            calisanKodlayici = calisan;
+            denenenSayi = zon.Count;
             var calismayan = zon.Where(c => c[2] != "evet").Select(c => c[0]).ToList();
             var listeyi = (IEnumerable<string> x) => string.Join(", ", x.Select(k => $"`{k}`"));
             sb.AppendLine($"**Tabloda `zones` denenen {zon.Count} kodlayicinin {calisan.Count} tanesinde");
@@ -494,6 +502,7 @@ public static class Rapor
             sb.AppendLine($"{listeyi(calismayan)}.");
             sb.AppendLine();
             var varsayilan = hucreler.Any(c => c[0] == "libsvtav1" && c[1] == "zones" && c[2] != "evet");
+            varsayilanIsliyor = !varsayilan;
             if (varsayilan)
             {
                 sb.AppendLine("Uretimin varsayilan kolu (`maks` -> `libsvtav1`) islemeyen listede.");
@@ -502,6 +511,8 @@ public static class Rapor
                 sb.AppendLine();
             }
         }
+
+        return new K4Sonuc(denenenSayi, calisanKodlayici.Count, varsayilanIsliyor, calisanKodlayici);
     }
 
     public sealed record Satir(string Arm, OlcumKaydi K);
@@ -871,7 +882,7 @@ public static class Rapor
         sb.AppendLine();
     }
 
-    private static void Sonuc(StringBuilder sb, K2Sonuc k2, AbSonuc k5, AbSonuc k7)
+    private static void Sonuc(StringBuilder sb, K2Sonuc k2, AbSonuc k5, AbSonuc k7, K4Sonuc k4)
     {
         sb.AppendLine("## Sonuc");
         sb.AppendLine();
@@ -891,6 +902,17 @@ public static class Rapor
         sb.AppendLine($"- K5/K6 (kalite kazanci ve hedef boyut): {(!k5Olculdu ? "**bilinmiyor**" : k5.Gecti ? "gecti" : "**gecmedi**")} — {k5.Ozet}");
         sb.AppendLine($"- K7 (bozuk harita bedeli): {(!k7Olculdu ? "**bilinmiyor**" : k7.Gecti ? "kabul edilebilir" : "**kabul edilemez**")} — {k7.Ozet}");
         sb.AppendLine();
+        if (k4.Denenen > 0)
+        {
+            sb.AppendLine($"Karar hangi yollari kapsar: `zones` denenen {k4.Denenen} kodlayicinin");
+            sb.AppendLine($"{k4.Calisan} tanesinde isliyor ({string.Join(", ", k4.CalisanListesi.Select(x => $"`{x}`"))}).");
+            sb.AppendLine(k4.VarsayilanIsliyor
+                ? "Uretimin varsayilan kodlayicisi bu listede; karar varsayilan yolu da kapsar."
+                : "**Uretimin varsayilan kodlayicisi bu listede degil**; \"girer\" karari cikmis"
+                  + " olsa bile dagitim varsayilan yolda etkisiz kalir, kazanc yalniz bu iki"
+                  + " kodlayicinin secildigi kosumlarda gorulur.");
+            sb.AppendLine();
+        }
         sb.AppendLine("Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve");
         sb.AppendLine("bu olcumden onceki commit'te sabitlendi.");
         sb.AppendLine();

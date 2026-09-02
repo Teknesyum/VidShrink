@@ -465,6 +465,10 @@ uydurma; olculen sey kapinin **ayirt edip etmedigi**.
 - K5/K6 (kalite kazanci ve hedef boyut): **bilinmiyor** — olculmedi
 - K7 (bozuk harita bedeli): **bilinmiyor** — olculmedi
 
+Karar hangi yollari kapsar: `zones` denenen 5 kodlayicinin
+2 tanesinde isliyor (`libx265`, `libx264`).
+**Uretimin varsayilan kodlayicisi bu listede degil**; "girer" karari cikmis olsa bile dagitim varsayilan yolda etkisiz kalir, kazanc yalniz bu iki kodlayicinin secildigi kosumlarda gorulur.
+
 Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve
 bu olcumden onceki commit'te sabitlendi.
 
