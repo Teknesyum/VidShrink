@@ -113,11 +113,14 @@ public sealed class PlanCalculatorTests
         var options = new PlanOptions { TargetMb = 8, Intent = Intent.Sharing };
         var complexity = MeasuredComplexity(0.09);
 
-        var prior = PlanCalculator.BuildDetailed(info, options, complexity).PredictedQuality;
-        var low = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 70.0 })).PredictedQuality;
-        var high = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 85.0 })).PredictedQuality;
+        const double lowAnchor = 70.0;
+        const double highAnchor = 85.0;
 
-        Assert.Equal(15.0, high - low, 6);
+        var prior = PlanCalculator.BuildDetailed(info, options, complexity).PredictedQuality;
+        var low = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { lowAnchor })).PredictedQuality;
+        var high = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { highAnchor })).PredictedQuality;
+
+        Assert.Equal(highAnchor - lowAnchor, high - low, 6);
         Assert.True(Math.Abs(prior - low) > 1.0, $"Olculen 70 noktasi tahmini oynatmadi: prior {prior:0.###}, olculen {low:0.###}.");
         Assert.True(Math.Abs(prior - high) > 1.0, $"Olculen 85 noktasi tahmini oynatmadi: prior {prior:0.###}, olculen {high:0.###}.");
     }
@@ -140,10 +143,13 @@ public sealed class PlanCalculatorTests
     public void TwoSeparatedQualityPointsMeasureTheSlopeInsteadOfAssumingIt()
     {
         var complexity = MeasuredComplexity(0.09);
-        var flat = complexity.WithMeasuredQuality(new[] { new QualitySample(0.045, 88.0), new QualitySample(0.18, 96.0) });
+        var lower = new QualitySample(0.045, 88.0);
+        var upper = new QualitySample(0.18, 96.0);
+        var flat = complexity.WithMeasuredQuality(new[] { lower, upper });
+        var halvings = Math.Log2(upper.Bppf / lower.Bppf);
 
         Assert.True(flat.Level.SlopeMeasured);
-        Assert.Equal(4.0, flat.Level.PerHalving, 6);
+        Assert.Equal((upper.VmafNeg - lower.VmafNeg) / halvings, flat.Level.PerHalving, 6);
         Assert.False(complexity.WithProbeQuality(new[] { 88.0, 96.0 }).Level.SlopeMeasured);
     }
 
@@ -173,10 +179,12 @@ public sealed class PlanCalculatorTests
         var info = SampleInfo();
         var options = new PlanOptions { TargetMb = 60, Intent = Intent.Sharing, AllowResolutionDrop = false, AllowFpsDrop = false };
 
+        const double trueBppf = 0.02;
+
         PlanResult At(double bias)
         {
-            var complexity = ComplexityProfile.FromProbe(0.02 * bias, 0.012 * bias, 6, 288, bias);
-            Assert.Equal(0.02, complexity.ReferenceBppf, 9);
+            var complexity = ComplexityProfile.FromProbe(trueBppf * bias, 0.012 * bias, 6, 288, bias);
+            Assert.Equal(trueBppf, complexity.ReferenceBppf, 9);
             return PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 90.0 }));
         }
 
@@ -321,7 +329,7 @@ public sealed class PlanCalculatorTests
             var bppf = plan.VideoBitrateK * 1000.0 / pixelRate;
             var floor = result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps);
 
-            Assert.True(bppf + 1000.0 / pixelRate >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
+            Assert.True(bppf >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
                 $"{targetMb:0.#} MB -> {plan.Codec} {plan.Width}x{plan.Height}@{plan.Fps:0.##} at {bppf:0.0000} bppf, under the {floor:0.0000} floor, and the plan says nothing.");
         }
     }
@@ -408,6 +416,6 @@ public sealed class PlanCalculatorTests
 
         Assert.False(
             PlanCalculator.LayoutClearsFloor(complaint, "libsvtav1", 0.0052 * pixelRateK, width, height, fps, info.Fps),
-            "At 0,0052 bppf the software arm has already saturated - p10 stops falling, one frame in thirty is at zero - so the floor must still reject it.");
+            "At 0,0052 bppf the software arm has already saturated - p10 stops falling, over three per cent of frames score under 5 VMAF-NEG - so the floor must still reject it.");
     }
 }

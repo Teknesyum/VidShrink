@@ -60,9 +60,8 @@ public sealed class ExtremeCompressionTests
         Assert.True(planPixelRate < sourcePixelRate * 0.10,
             $"The plan still carries {planPixelRate / sourcePixelRate * 100:0.0}% of the source pixel rate at a 1 MB target.");
         var floor = result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps);
-        var oneKbitOfRounding = 1000.0 / planPixelRate;
-        Assert.True(Bppf(plan) + oneKbitOfRounding >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
-            $"The plan lands at {Bppf(plan):0.0000} bits per pixel per frame, more than a kbit under the {floor:0.0000} floor, and says nothing about it.");
+        Assert.True(Bppf(plan) >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
+            $"The plan lands at {Bppf(plan):0.0000} bits per pixel per frame, under the {floor:0.0000} floor, and says nothing about it.");
     }
 
     [Fact]
@@ -117,13 +116,16 @@ public sealed class ExtremeCompressionTests
     [Fact]
     public void MotionExponentComesFromTheHalfFrameRateSample()
     {
-        var withoutMotion = ComplexityProfile.FromProbe(0.1264, 0.09, 6, 288);
-        var withMotion = ComplexityProfile.FromProbe(0.1264, 0.09, 6, 288, 0, WindowBiasSource.Scan, 0.1264 * 1.76);
+        const double fullScaleBppf = 0.1264;
+        const double halfFpsCost = 1.76;
+
+        var withoutMotion = ComplexityProfile.FromProbe(fullScaleBppf, 0.09, 6, 288);
+        var withMotion = ComplexityProfile.FromProbe(fullScaleBppf, 0.09, 6, 288, 0, WindowBiasSource.Scan, fullScaleBppf * halfFpsCost);
 
         Assert.False(withoutMotion.MotionMeasured);
         Assert.True(withMotion.MotionMeasured);
-        Assert.Equal(0.8155, withMotion.MotionExponent, 3);
-        Assert.Equal(1.76, withMotion.TemporalFactor(24, 48), 4);
+        Assert.Equal(Math.Log2(halfFpsCost), withMotion.MotionExponent, 6);
+        Assert.Equal(halfFpsCost, withMotion.TemporalFactor(SourceFps / 2, SourceFps), 6);
     }
 
     [Fact]

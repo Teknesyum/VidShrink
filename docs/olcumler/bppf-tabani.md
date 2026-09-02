@@ -206,7 +206,7 @@ Yarılanma başına düşen p10 puanı, düşükten yükseğe:
 
 Okunan şey: yıkım 0,0084–0,0099 arasında en hızlı; **0,00669'un altında eğri düzleşiyor**
 (bir yarılanma 1,24 puana mal oluyor, üstündeki aralıkta 17,18'e). Sebebi tabloda görünüyor —
-o noktada karelerin %3,6'sı zaten sıfırda ve p10 dibe oturmuş. Aşağıda kaybedilecek bir şey
+o noktada karelerin %3,6'sı 5 VMAF-NEG'in altında ve p10 dibe oturmuş. Aşağıda kaybedilecek bir şey
 kalmadığı için eğri yatıyor. Taban buraya kondu: **0,00669 / 0,7028 = 0,00952 → 0,0095**.
 
 ### 4.1 Bu bir seçim, ve hangi seçim olduğu
@@ -250,9 +250,12 @@ donanım kolundan da çıkarıldı) ve iş parçacığı dörde sabitlendi. Kali
 | p10 yıkım noktası (en dik aralığın geometrik ortası) | 480–540 sn | **1,52** |
 | Eşit p10, 20 / 30 / 40 / 50 | 480–540 sn | 0,79 · 0,93 · 0,97 · 0,88 |
 
-**Seçilen 1,52.** Sebebi: tabanı da üreten alet bu — p10 yıkım noktası. Bir tabanın
-koruduğu olgu ortalama kalite değil, alt yüzdeliklerin çökmesidir; iki kolun bu olguyu
-nerede yaşadığının oranı, tabanın ölçeklenmesi gereken orandır. Donanım kolunun en dik
+**Seçilen 1,52.** İkisi de aynı p10 eğrisinden okunuyor, ama eğrinin aynı noktasından
+değil: taban **doygunluk** noktasından (0,00669), çarpan **en dik aralığın** geometrik
+ortasından (donanım 0,01387 / yazılım 0,00912). Tek alet değil, bir eğrinin iki ayrı
+özelliği. Çarpan için yıkım noktasının seçilme sebebi şu: bir tabanın koruduğu olgu
+ortalama kalite değil, alt yüzdeliklerin çökmesidir; iki kolun bu olguyu en hızlı
+yaşadığı noktanın oranı, tabanın ölçeklenmesi gereken orandır. Donanım kolunun en dik
 p10 aralığı 0,01219–0,01578 (geometrik ortası 0,01387), yazılım kolununki
 0,00842–0,00987 (ortası 0,00912); oran 1,521.
 
@@ -262,8 +265,8 @@ duruyor.
 
 ### 5.1 p10 okuması neden ağır basmadı
 
-Eşit-p10 okuması donanımı yazılımdan **iyi** gösteriyor (oran < 1). Aynı bppf'te sıfır
-puanlı kare sayısı: yazılım 133 / 128 / 95 / 63 / 40 / 34 / 23 / 18, donanım
+Eşit-p10 okuması donanımı yazılımdan **iyi** gösteriyor (oran < 1). Aynı bppf'te 5 VMAF-NEG'in altındaki
+kare sayısı: yazılım 133 / 128 / 95 / 63 / 40 / 34 / 23 / 18, donanım
 50 / 49 / 27 / 28 / 23 / 18 / 8 / 6 — yazılım kolunda iki-üç katı. T106 tam bu olguyu
 soruşturuyor: VMAF-NEG'in SVT-AV1 çıktılarında aynı karelerde sıfır vermesi ölçünün mü
 kodlayıcının mı. Artefakt çıkarsa yazılımın gerçek kalitesi ölçülenden **yüksek** demektir,
