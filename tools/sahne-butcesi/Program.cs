@@ -69,9 +69,26 @@ public static class Program
         DefaultIgnoreCondition = JsonIgnoreCondition.Never
     };
 
+    private static string KokBul()
+    {
+        var env = Environment.GetEnvironmentVariable("VIDSHRINK_KOK");
+        if (!string.IsNullOrWhiteSpace(env) && Directory.Exists(env)) return Path.GetFullPath(env);
+
+        foreach (var basla in new[] { AppContext.BaseDirectory, Directory.GetCurrentDirectory() })
+        {
+            var dir = new DirectoryInfo(basla);
+            while (dir is not null)
+            {
+                if (File.Exists(Path.Combine(dir.FullName, "VidShrink.sln"))) return dir.FullName;
+                dir = dir.Parent;
+            }
+        }
+        throw new InvalidOperationException("Proje koku bulunamadi; VIDSHRINK_KOK ayarlayin.");
+    }
+
     public static async Task<int> Main(string[] args)
     {
-        Kok = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        Kok = KokBul();
         Is = Path.Combine(Kok, ".calisma", "T114");
         Directory.CreateDirectory(Is);
 
