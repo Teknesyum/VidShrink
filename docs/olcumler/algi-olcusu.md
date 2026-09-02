@@ -1045,17 +1045,30 @@ Bunun sonucu: **kare kilidi CI'da korunmuyor.** CI ffmpeg görmediği sürece ki
 kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın ffmpeg'siz
 koşması ayrı bir işe (T115) alındı.
 
-> **T116:** "yaklaşık 80" tahmindi; **sayıldı, 87.** Ölçüt kaynak ağacındaki
-> öznitelikler: `[FfmpegFact]` **84** kez, `[FfmpegTheory]` **1** kez ve o tek
-> teori **3** `InlineData` taşıyor. `tools/ci-gibi-kos.sh` ffmpeg ve ffprobe'u
-> PATH'ten çıkarıyor, iki öznitelik de kurucuda `ToolLocator.IsAvailable`
-> başarısız olunca `Skip` atıyor; yani ffmpeg'siz koşumda **87 ölçü atlanır.**
-> Dağılım: `FrameGrabberTests` 21, `QualityMeterTests` 12, `PanelHostTests` 11,
-> `PerformanceCheckTests` 7, `ComplexityProbeTests` 6+3, `SegmentEncoderTests` 6,
-> `FpsDropTests` 5, `EncodeRunnerTests` 4, `PreviewSyncTests` 4, `SceneMapTests` 4,
+> **T116 düzeltmesi — "yaklaşık 80" yanlış.** T110 denetimi bu sayıyı iki
+> koşumda ölçtü: yerel `tools/ci-gibi-kos.sh` **106**, GitHub CI **100** atlıyor.
+> Bu iki sayı denetimin ölçümüdür; T116 tam süiti koşturmadı (sözleşme yasakladı)
+> ve **kendi koşumundan bir atlama sayısı ölçmedi.**
+>
+> T116'nın kaynaktan saydığı şey kapının kendisi: süitte tek değil **on bir**
+> atlama özniteliği var, toplam **111** kullanım — `FfmpegFact` 84,
+> `LiveSourceTheory` 7, `SplashImageFact` 5, `LiveSourceFact` 3,
+> `LiveLauncherFact` 3, `TonemapFact` 2, `LiveProbeFact` 2, `LivePlaybackFact` 2,
+> `FfmpegTheory` 1, `BenchSourceFact` 1, `LauncherBinaryFact` 1. Sekiz kullanım
+> teori olduğu için koşulan **durum** sayısı bundan yüksek, ve hangi özniteliğin
+> kaç durum ürettiği **sayılmadı**. 106 ile 100 arasındaki fark ortamdan geliyor:
+> GitHub CI'da ffmpeg'in yanı sıra `VIDSHRINK_LIVE_*` değişkenleri ve derlenmiş
+> fırlatıcı da yok.
+>
+> `[FfmpegFact]`'in dosya dosya dağılımı: `FrameGrabberTests` 21,
+> `QualityMeterTests` 12, `PanelHostTests` 11, `PerformanceCheckTests` 7,
+> `ComplexityProbeTests` 6, `SegmentEncoderTests` 6, `FpsDropTests` 5,
+> `EncodeRunnerTests` 4, `PreviewSyncTests` 4, `SceneMapTests` 4,
 > `VmafPoolingTests` 3, `QualityTargetTests` 1.
-> Bu sayı **kaynaktan sayıldı, koşumdan okunmadı** — sözleşme tam süiti
-> koşturmayı yasakladı. Koşulmuş atlama sayısı **ölçülmedi**.
+>
+> §9'un beş kilit ölçüsünün beşi de `[FfmpegFact]`, yani 84'lük kümenin içinde.
+> Hangi toplam alınırsa alınsın **kilidin kanıtı CI'da koşmuyor**; bu bölümün ana
+> iddiası sayının düzeltilmesinden etkilenmiyor.
 
 
 ## 10. Kilitsiz ölçerle konmuş çıpalar — geri alınır mı (T116)
