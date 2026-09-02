@@ -103,9 +103,12 @@ ultrafast superfast veryfast faster fast medium slow slower veryslow
 ```
 
 Dokuz basamağı saydım. Merdiven `FfmpegArguments.PresetLadder(codec)` ile ölçüye
-açıldı; test kendi kopyasını taşımıyor, deponun tablosunu okuyor.
-`Kumedeki_kodeklerin_merdiveni_dokuz_basamak_ve_hizlidan_yavasa` merdivenin bu
-içerik ve sırada olduğunu tutuyor.
+açıldı. Test **kendi kopyasını da taşıyor**
+(`tests/VidShrink.Tests/TurboFirstPassTests.cs:34-35`, `YazilimMerdiveni`) ve
+`Kumedeki_kodeklerin_merdiveni_dokuz_basamak_ve_hizlidan_yavasa` deponun
+tablosunu bu kopyayla karşılaştırıyor; yani ölçü, merdivenin bu içerik ve sırada
+olduğunu pimliyor. Kopya bilerek duruyor: `PresetLadder`ı okuyup ona göre beklenti
+kurmak, merdiven değişirse ölçüyü de birlikte kaydırırdı.
 
 ### Seçilen kural: tavan
 
@@ -252,12 +255,13 @@ Altı mutasyon saydım; altısı da kırmızı verdi, hiçbiri sessiz geçmedi. 
 sürücüsü `.calisma/T140/mutasyon.py`, ham çıktılar `.calisma/T140/mut-M*.txt` —
 ikisi de git'e girmiyor.
 
-**Izgaranın kendi zayıflığı, açıkça:** M4'te `libsvtav1` kümeye girince
+**M4'ün bir ayrıntısı:** `libsvtav1` kümeye girince
 `Turbo_tanimayan_kodegin_ilk_gecis_argumani_birebir_ayni_kaliyor` ölçüsü o
 kodlayıcıyı kapsamdan düşürüyor — ölçü kümedeki kodlayıcılarda erken dönüyor.
-Yani M4'ü yakalayan, K4'ün asıl ölçüsü değil; küme ve sayım ölçüleri. Mutasyon
-yine de kırmızı, ama kırmızıyı hangi ölçünün verdiği önemli olduğu için buraya
-yazıldı.
+Izgarayı ayakta tutan bu değil zaten: M4'ün kırdığı beş ölçünün içinde
+`Ilk_gecis_merdiveni_tavanda_kesiliyor` var ve o ölçü sabit karşılaştırmıyor,
+`Build`i gerçekten koşturup ürettiği argümana bakıyor. Yani mutasyon sabit
+pimlere değil davranışa çarpıyor.
 
 M1 ile M6 aynı iki ölçüyü kırıyor: ikisi de ilk geçişin preset'ini bozuyor.
 Ayrıştıkları yer kırmızının içeriği — M1'de ilk geçiş `slow`, M6'da `medium`
@@ -325,6 +329,10 @@ kuyruktan kesilmiş halde kaldı, 19 adın hangi 18'i olduğunu o günlükten
 bu sözleşmenin dokunduğu üç dosyanın hiçbiri o yolda değil. Yukarıdaki 19 adın
 hepsi de canlı ortam kapılı. Yine de bu bir çıkarım, ölçüm değil.
 
+**Sonradan kapandı (T0 denetimi):** bağımsız denetçi ölçtü — bu dalda
+`Skip`/`Conditional`/`Trait` eşleşmesi 0 ve verify kollarında `Atlanan: 0`. Kayan
+ölçü `VIDSHRINK_LIVE_*` korumalı, makine durumuna bağlı; dalla ilgisi yok.
+
 ## CI
 
 | Alan | Değer |
@@ -362,3 +370,14 @@ başlatmayacak. Kodun tamamı yukarıdaki koşumda yeşil.
    dosyasından alındı (`docs/taramalar/handbrake.md`, `turbo_supported`). Tavanın
    `veryfast` olması HandBrake'ten değil, sözleşme K3'ün verdiği örnekten ve
    yukarıdaki gerekçeden geliyor.
+
+### T0'ın cevapları (mühürleme denetimi)
+
+1. **Merdiven yönü:** şimdi taşınmayacak. İki üyeli kümede veri yapmak erken
+   soyutlama; üçüncü kodlayıcı kümeye girdiğinde taşınacak, borç olarak yazıldı.
+2. **Anahtarı üretimde açan yok:** tespit doğru, bu sözleşmenin borcu değil.
+   Açma yolu için **T146** açıldı; `PlanCalculator` üzerinde başka aktif sözleşme
+   olduğu için bekliyor.
+3. **`CodecModel` seçimi doğru:** sözleşmenin `owns` listesi bağlayıcı, tarama
+   belgeleri yol gösterici.
+4. Değişiklik yok.
