@@ -1,0 +1,17 @@
+{
+  "contractId": "T94",
+  "auditorRunId": "af1c2e7396a60377f",
+  "headSha": "2d6dd407e28a8c88c954732ac10e2add5f1b68cb",
+  "diffHash": "44c13909544d4670ad9597736b87eb8ea882408e4965314ee1ec492f1a395138",
+  "owns": [
+    "src/VidShrink.Core/HdrResolver.cs",
+    "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
+    "tests/VidShrink.Tests/HdrArgumentsTests.cs",
+    "docs/olcumler/handbrake-acigi.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim GECTI: yedi kriterin yedisi kanitla gecti, KRITIK yok, owns ihlali yok. Verify kaynaktan derlenerek kosuldu: 21 basarili / 0 basarisiz / 0 atlanan. Uc kalite borcu: (1) turun baslik degisikligi pimsiz, mutasyon geri alindiginda 21/21 yesil kaldi, (2) RunOptionProbe zaman asimini hala onbellege yaziyor - T129, (3) teslim raporu 27 test diyor, gercegi 21. UI donmasi bulgusu T130'a acildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:04:48.111Z"
+}

@@ -138,3 +138,11 @@
 {"id":"T116","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|MeasuredQualityTests","code":0}],"auditorRunId":"aed396e0910fc44af","headSha":"c856ee406e4d4d68e4c28825906bc4ee2f1bc705","at":"2026-09-02T06:08:51.809Z"}
 {"id":"T124","result":"stale","at":"2026-09-02T06:15:12.753Z"}
 {"id":"T124","round":"1","risk":"low","verify":[{"step":"powershell -NoProfile -Command \"python tools/alinti-denetimi/alinti-denetimi.py --self-test","code":0}],"auditorRunId":null,"headSha":"f009e03619dccfbe32e2729e3f43d360a3d841f7","at":"2026-09-02T06:53:39.527Z"}
+{"id":"T119","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T123","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T125","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T126","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T127","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T128","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T94","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"HdrArgumentsTests|EncoderCapabilitiesTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:04:57.811Z"}
+{"id":"T120","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:05:12.820Z"}

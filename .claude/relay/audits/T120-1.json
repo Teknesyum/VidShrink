@@ -1,0 +1,14 @@
+{
+  "contractId": "T120",
+  "auditorRunId": "a49c5d0fee26e7d65",
+  "headSha": "2d6dd407e28a8c88c954732ac10e2add5f1b68cb",
+  "diffHash": "28132049af0b73cc3e0d79afcb9b32b27813ad84cf1c696844baf8a47e220f5a",
+  "owns": [
+    "docs/olcumler/auto-mod-yeni-taban.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim GECTI: 18 vmaf JSON'unun tamami denetci tarafindan yeniden hesaplandi, +0,097 -> -0,266 her okumada ayni cikti; T111 sutunu ham arsivden yeniden uretildi. T0'in KRITIK adayi curutuldu: T120 tools/VidShrink.Ab'i cagirmadi, harness Program.cs:18 dogrudan CodecPreference.Auto kuruyor ve teslim edilen ciktilar/auto.mp4 av1/yuv420p10le yokluyor. On borc; en agiri MainWindow.axaml.cs:1807 atfinin yanlis olmasi - dogrusu daha guclu (haritayi hicbir cagiran vermiyor), T0 tek satirla duzeltti."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:05:09.982Z"
+}
