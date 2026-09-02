@@ -279,15 +279,51 @@ Yan etki, T99'un kendi bildirdigi: carpan yukselince `hevc_nvenc` tabani da
 `UsableBitrateK` (706k = 0,01277 bppf) yeni tabandan siki, yani taban orada atil ve
 HandBrake'in 0,0116'lik noktasi hala disarida.
 
+## Esik olcuye oturdu, T101 iki yerde yanildi (T105, 2026-09-02)
+
+`SceneMap.DefaultThreshold` 0,2 → **0,105**. Olcut yazili: uc pencerenin
+birlesiminde F2 (β=2) tepesi. F1 secilseydi 0,115 cikardi; aradaki fark
+asimetrinin kendisi — kacan kesim hatayi sahne boyunca tasiyor, yanlis kesim
+yerel.
+
+T101'in iki sonucu **yanlis cikti**:
+
+- **"Yanlis pozitif sifir"** yalniz 0,2 icin dogruymus. 0,05'te uc pencerede
+  toplam **46 yanlis kesim** var.
+- **`DefaultMinSceneSeconds = 1.0`'in payi sifir degil.** P2'de 334,000 her
+  esikte kaciyor cunku 333,300'de kesim var. 0,5'e cekince P2 6/7 → 7/7,
+  F2 0,899 → 0,922. Sabit yine de degistirilmedi: bedeli T98'in anahtar kare
+  araliginda ve T104'un penceresinde, ikisi de olculmedi.
+
+**En iyi esik pencereden pencereye kayiyor** — P1 0,105–0,110, P2 ≤0,08,
+P3 ≥0,115. Durgun ve hareketli **ters yone** cekiyor, ~0,035 aci. Bu, urunun
+dinamiklik ilkesinin dogrudan kaniti: tek sabit esik dogru cevap degil,
+icerikten turetilebiliyorsa turetilir. Sonraki basamak adayi.
+
+Musteriye: 24 sahne / ort 43,17 / medyan 14,03 → **77 sahne / 13,46 / 5,62**.
+Dagilim saga carpik; **aralik secen taraf medyani kullanmali**, ortalamayi degil.
+
+## Iki tur ayni sabite bagli — carpisma kontrollu (T98 × T105)
+
+T98 2,8 bolenini koda sabit olarak yazmadi: olculdugu iki sayiya ayirdi
+(`SceneMapGroundTruthCuts = 28`, `SceneMapReportedScenes = 10`) ve
+`SceneMapThresholdOfRecord = 0.2` ile `SceneMap.DefaultThreshold` ayrisirsa
+olcu kirmiziya donuyor.
+
+T105 esigi 0,105 yapti. **Yani tuzak kuruldugu gibi calisacak:** T105 `main`e
+girince T98'in olcusu kirmizi doner ve duzeltme yeniden olculmeden gecemez.
+Sira: once T105, sonra T98 yeni sayilarla hizalanir.
+
+Ders: **telafi sabitini silmek tek yol degil — olculdugu kosula baglamak da
+calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
+
 ## Sonraki basamak
 
 1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
    o kuralın kanıtı p10 ve harmonik ortalamadan geliyor.
-2. **T98** GOP aralığını `main`e getirir. Açığın bilinen en büyük tek kalemi —
-   T102 tek değişkenle %24,5 boyut kazancı ölçtü, puan da yükseldi. T105 ile
-   çakışması yukarıda; iki turdan biri `main`e girmeden öteki hizalanır.
-3. **T105** haritanın eşiğini ölçüye oturtur; T98 ve T104'ün gördüğü sahne
-   sayısı değişir.
+2. **T105** önce girer — eşik ölçüye oturdu (0,105), CI yeşil, denetimde.
+3. **T98** ardından hizalanır: T105 girince tel tuzağı kırmızıya döner ve
+   bölen yeni eşikte yeniden ölçülür. GOP aralığı da o zaman `main`e iner.
 4. **T99** taban kararını verdi (denetimde). Mühürlenince iki iş birden açılır:
    **T107** yerleşim skorunu ölçüye oturtur (asıl şikâyet orada), **T103**
    örneklemeyi alır.
@@ -296,6 +332,12 @@ HandBrake'in 0,0116'lik noktasi hala disarida.
 6. `SceneMap` `PlanCalculator`a bağlanır — harita hâlâ tüketilmiyor.
 7. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır. **T106'dan
    sonra.**
+8. **T108** — tepe eğrisi. T98 ölçtü ve eğrinin şekli ölçümle ters göründü:
+   aşma kanıtının geldiği ~11,4×'te geniş, açmanın +3,665 puan kazançlı
+   ölçüldüğü ~4,6×'te 1,02'ye kilitli. T98 mühürlenince açılır.
+9. **Eşik içerikten türetilir.** T105 ölçtü: durgun ve hareketli pencere ters
+   yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
+   dinamiklik ilkesinin en somut adayı.
 
 ## Değişmeyen kurallar
 
@@ -303,6 +345,7 @@ HandBrake'in 0,0116'lik noktasi hala disarida.
 - Ölçmediğin şey için "ölçülmedi" yazılır, iddia edilmez.
 - Paralel koşumda **iş parçacığı sabitlenir**; süre sayısı damgalanır (aşağıda).
 - Harmonik ortalamaya yaslanma (T106 soruşturuyor); ortalama ve p10 sağlam.
-- Telafi sabiti koda yazılmaz — ölçüden türetilir ya da ölçüyle bağlanır.
+- Telafi sabiti koda yazılmaz — ölçüden türetilir ya da **ölçüldüğü koşula bağlanır**
+  (T98'in tel tuzağı: koşul kayarsa ölçü kırmızıya döner).
 - Mühürden önce `gh run list`.
 - `main`e yalnız T0 birleştirir.
