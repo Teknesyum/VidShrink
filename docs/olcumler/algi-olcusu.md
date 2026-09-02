@@ -583,15 +583,15 @@ dedi. Bir alan hem taşınıp hem kullanılamaz sayılamaz; T104 karar veriyor.
 | p3 | 2,2023 | 2,2041 | **−0,0018** | 2,4626 |
 
 p1'de sinyal gürültünün yüzde biri; p3'te **sıra ters dönüyor** — kötü kodlama
-daha iyi görünüyor.
+daha iyi görünüyor. Yalnız p2 ayırıyor, o da hiçbir yolun ayıramadığı durağan
+klip; orada min klip ortalamasına yapıştığı için "ayırıyor" görünüyor.
 
 > **T116:** yukarıdaki tablo kilitsiz ölçüden gelir ve §9.10'da damgalıdır; bu
-> cümle damgasız kalmıştı. Kilitli ölçüde **p1 ayırıyor**: sinyal 0,0136'dan
+> paragraf damgasız kalmıştı. Kilitli ölçüde **p1 ayırıyor**: sinyal 0,0136'dan
 > **3,1471**'e, gürültü 1,3748'e karşı. "p1'de sinyal gürültünün yüzde biri"
 > gözlemi kilitli ölçüde **yok**. p2 ve p3 satırları **yeniden ölçülmedi**, o
 > yüzden "sıra ters dönüyor" ve "yalnız p2 ayırıyor" cümleleri için
-> **ölçülmedi** geçerlidir. Yalnız p2 ayırıyor, o da hiçbir yolun ayıramadığı durağan
-klip; orada min klip ortalamasına yapıştığı için "ayırıyor" görünüyor.
+> **ölçülmedi** geçerlidir.
 
 Aynı tabloda p10 ve en kötü birim aynı içeriklerde çalışıyor (p1 p10 sinyali
 1,9059; p3 2,6384). Yani boşluğu dolduran alan zaten var.
@@ -1157,6 +1157,7 @@ kalan 0,42 birinci pencereden geliyor.
 > `sdr-1` → `93.91/90.32/90.93`. Sondanın verdiği ortalamalarla (87,192345 /
 > 91,575281 / 91,718219) basılan basamak sayısına kadar aynı. İki düzenek aynı
 > ürün yolunu ayrı ayrı çağırdı ve aynı sayıyı verdi.
+
 **Plan hiçbir hedefte değişmedi.** Aynı iki ikili `PlanCalculator.BuildDetailed`
 ile koşuldu ve plan alanları (genişlik, yükseklik, fps, kodlayıcı, kip, crf,
 video bit hızı, preset) karşılaştırıldı:
