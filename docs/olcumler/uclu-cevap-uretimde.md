@@ -98,4 +98,4 @@ Sıfır test bulan kol yok. Birleşik yerel koşum `56 başarılı / 12 başarı
 
 Kalan kırmızı `PerformanceCheckTests.DonanimYoluKapatilincaKararDegisiyor`: gerçek ffmpeg koşumu `30231 ms` sürerek sabit `30000 ms` bütçeyi aştı. Sözleşme gereği zaman aşımı sabiti büyütülmedi.
 
-İlk iki dosya T139'un `owns` kümesinde değildir; bu nedenle sahtelere üçlü cevap eklenmedi. K6 yerelde yeşil değildir ve CI koşumu henüz yoktur. Sahiplik genişletilmeden sözleşme teslim edilmiş sayılmaz.
+İlk iki dosya T139'un `owns` kümesinde değildir; bu nedenle sahtelere üçlü cevap eklenmedi. K6 yerelde yeşil değildir. İlk bakışta CI koşumu `33649528359` (`a381dbb`) sürüyordu. Sözleşmenin “bir kez bak, sürerse yaz ve devam et” sınırı gereği beklenmedi. Sahiplik genişletilmeden sözleşme teslim edilmiş sayılmaz.
