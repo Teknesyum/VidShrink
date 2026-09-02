@@ -546,8 +546,9 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
-    /// Esit uzunlukta <paramref name="sceneCount"/> sahneden olusan bir harita. Uretimin
-    /// haritadan okudugu tek sey ortalama sahne uzunlugu oldugu icin esit bolme yeterli.
+    /// Esit uzunlukta <paramref name="sceneCount"/> sahneden olusan bir harita. Esit bolmede
+    /// ortalama ile medyan ayni oldugu icin bu yardimci iki kurali ayirt etmez; ayirt etmesi
+    /// gereken olculer <see cref="CarpikHarita"/> kullanir.
     /// </summary>
     private static SceneMap Harita(double durationSeconds, int sceneCount)
     {
@@ -563,6 +564,29 @@ public sealed class FfmpegArgumentsTests
                 Complexity = 1.0
             });
         return new SceneMap { Threshold = SceneMap.DefaultThreshold, Duration = durationSeconds, Scenes = scenes };
+    }
+
+    /// <summary>
+    /// Verilen uzunluklardan bir harita kurar. Sagi carpik dagilimlar burada uretiliyor:
+    /// T105'in olctugu tam kaynak dagiliminda ortalama 13,46 sn iken medyan 5,62 sn.
+    /// </summary>
+    private static SceneMap CarpikHarita(params double[] lengths)
+    {
+        var scenes = new List<Scene>(lengths.Length);
+        var t = 0.0;
+        for (var i = 0; i < lengths.Length; i++)
+        {
+            scenes.Add(new Scene
+            {
+                Index = i,
+                Start = t,
+                End = t + lengths[i],
+                Bits = 1_000_000,
+                Complexity = 1.0
+            });
+            t += lengths[i];
+        }
+        return new SceneMap { Threshold = SceneMap.DefaultThreshold, Duration = t, Scenes = scenes };
     }
 
     private static double TavanSaniye(string codec, double fps, SceneMap? scenes)
@@ -587,8 +611,8 @@ public sealed class FfmpegArgumentsTests
         var min = double.Parse(args[args.ToList().IndexOf("-keyint_min") + 1], CultureInfo.InvariantCulture);
 
         Assert.Equal(1.0, min / fps, 2);
-        Assert.True(g / fps >= FfmpegArguments.KeyframeCeilingMinSeconds,
-            $"ust sinir olculen en kisa degerin altinda: {g / fps:0.##} sn");
+        Assert.True(g / fps >= 5.0,
+            $"ust sinir olculen en kisa degerin (5 sn) altinda: {g / fps:0.##} sn");
         Assert.True(g >= 4 * min, $"aralik degil tek sayi gibi davraniyor: {min}..{g}");
     }
 
@@ -612,7 +636,7 @@ public sealed class FfmpegArgumentsTests
     /// icerikte uzuyor. Iddia iki sabiti degil uretimin iki ciktisini karsilastiriyor.
     /// </summary>
     [Fact]
-    public void Ust_sinir_ortalama_sahne_uzunluguyla_birlikte_uzar()
+    public void Ust_sinir_sahne_uzunluguyla_birlikte_uzar()
     {
         var previous = 0.0;
         foreach (var sceneCount in new[] { 40, 20, 10, 6, 4, 2, 1 })
@@ -628,23 +652,35 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
-    /// T101 haritayi yer gercegine karsi olctu: 144,2-333,3 sn penceresinde 28 gercek
-    /// kesim varken harita 10 uretti, yanlis pozitif yok. Yani haritanin bildirdigi
-    /// ortalama sahne uzunlugu sistematik olarak buyuk. Duzeltme uygulanmazsa 189,1 sn'lik
-    /// o pencerenin haritali ortalamasi (18,9 sn) ust siniri dogrudan tavana yapistirir ve
-    /// harita hicbir sey soylememis olur; duzeltme ile ust sinir tavanin altinda kalir.
+    /// Ust sinir ortalamayi degil **medyani** okuyor. Iddia sagi carpik bir haritayla
+    /// kuruluyor: bes sahnenin dordu 6 sn, biri 60 sn; ortalama 16,8 sn (kiskacin ustune
+    /// tasar, tavana yapisir), medyan 6 sn (kiskacin icinde). Ortalama okunsaydi ust sinir
+    /// 10 sn cikardi. T105 tam kaynakta ayni carpikligi olctu: ortalama 13,46 sn, medyan
+    /// 5,62 sn. Ayni izgarada olculdugunde medyan kurali kalitede geride kalmadi ve %24
+    /// daha az atlama bedeli getirdi.
     /// </summary>
     [Fact]
-    public void Haritanin_az_bolmesi_ust_sinirdan_dusulur()
+    public void Ust_sinir_ortalamayi_degil_medyani_okur()
     {
-        var t101 = Harita(189.1, 10);
-        var haritasiz = TavanSaniye("libx264", 60, null);
-        var haritali = TavanSaniye("libx264", 60, t101);
+        var carpik = CarpikHarita(6.0, 6.0, 6.0, 6.0, 60.0);
+        var ortalama = carpik.Duration / carpik.Scenes.Count;
 
-        Assert.True(haritali < haritasiz,
-            $"az bolen harita ust siniri haritasiz varsayilana esitledi: {haritali:0.###} sn");
-        Assert.True(haritali >= FfmpegArguments.KeyframeCeilingMinSeconds,
-            $"ust sinir olculen en kisa degerin altina indi: {haritali:0.###} sn");
+        Assert.True(ortalama > 10.0, $"harita carpik degil, olcu bir sey ayirt etmiyor: {ortalama:0.##} sn");
+        Assert.Equal(6.0, TavanSaniye("libx264", 60, carpik), 2);
+    }
+
+    /// <summary>
+    /// Bolen bir ayar sabiti degil, haritanin **olculen geri cagirmasi**, ve iki sayisi da
+    /// ayni birimden: yer gercegi penceresindeki (144,117-333,300] kesim sayilari. Olculen
+    /// esikte harita 28 gercek kesimin 28'ini buluyor, yanlis pozitif yok; geri cagirma
+    /// 1,000, bolen 1,0 ve duzeltme borcu yok. Eski 0,2 esiginde ayni pencere 28'de 10
+    /// veriyordu ve bolen 2,8'di. Bu olcu boleni ciktidan siniyor: sayilardan biri oynarsa
+    /// medyani kiskacin icinde olan bir harita baska ust sinir uretir.
+    /// </summary>
+    [Fact]
+    public void Bolen_olculen_geri_cagirmadan_geliyor()
+    {
+        Assert.Equal(8.0, TavanSaniye("libx264", 60, CarpikHarita(3.0, 8.0, 8.0, 8.0, 40.0)), 2);
     }
 
     private static int VbvTavani(string codec, int bitrateK, string bayrak)
@@ -690,11 +726,10 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
-    /// Az bolme duzeltmesi bir ayar sabiti degil, haritanin **olculen duyarliligi**: T101'in
-    /// 189,1 sn'lik penceresinde 28 gercek kesime karsi harita 10 sahne bildiriyor. Bu
-    /// duyarlilik tek bir esige aittir. T105 <c>SceneMap.DefaultThreshold</c>'u yeniden
-    /// koyarsa harita baska bolusur, duzeltme gecersizlesir ve ust sinir iki kez kisalir.
-    /// Bu olcu tam o an kizarir; duyarlilik yeniden olculmeden gecilemez.
+    /// Geri cagirma tek bir esige aittir. T105 <c>SceneMap.DefaultThreshold</c>'u 0,2'den
+    /// 0,105'e tasiyinca bu olcu kizardi ve geri cagirma yeniden olculdu: 28/10 yerine
+    /// 28/28. Esik yine oynarsa harita yine baska bolusur ve eski bolen ust siniri ikinci
+    /// kez kisaltir; bu olcu tam o an kizarir, yeniden olculmeden gecilemez.
     /// </summary>
     [Fact]
     public void Az_bolme_duzeltmesi_olculdugu_esikte_kalir()
@@ -703,15 +738,64 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
-    /// Duzeltme dogru buyuklugu uretiyor: T101'in penceresi 189,1 sn ve 28 gercek kesim
-    /// tasiyor; haritanin bildirdigi 10 sahneden turetilen ust sinir, gercek ortalama cekim
-    /// uzunlugunu vermeli. Iddia iki sabiti degil, uretimin ciktisini yer gercegiyle
-    /// karsilastiriyor.
+    /// Olculen esikte harita yer gercegiyle ayni bolusu veriyor: 189,183 sn'lik pencerede
+    /// 28 gercek kesim, yani 29 gercek cekim; harita da 28 kesim bildiriyor. Bu bolusten
+    /// turetilen ust sinir, gercek cekim uzunlugunun kendisi olmali (6,52 sn) - bolen
+    /// oynarsa olmaz.
     /// </summary>
     [Fact]
-    public void Az_bolme_duzeltmesi_T101_penceresinde_gercek_ortalamayi_uretir()
+    public void Duzeltme_olculen_pencerede_gercek_cekim_uzunlugunu_uretir()
     {
-        Assert.Equal(189.1 / 28.0, FfmpegArguments.KeyframeCeilingSeconds(Harita(189.1, 10)), 2);
+        const double pencere = 189.183;
+        var gercekCekim = pencere / (FfmpegArguments.SceneMapGroundTruthCutsInWindow + 1);
+
+        Assert.Equal(6.52, gercekCekim, 2);
+        Assert.Equal(gercekCekim, FfmpegArguments.KeyframeCeilingSeconds(Harita(pencere, 29)), 2);
+    }
+
+    /// <summary>
+    /// Kiskacin alt ucu olculen 5 saniyede bagliyor. Iddia sabiti kendi modulunden okumuyor:
+    /// medyani 2 sn olan bir harita 60 fps'te <c>-g 300</c> uretmeli. Alt uc 1 sn'ye
+    /// indirilirse 120 gelir ve bu olcu kizarir. Deger keyfi degil - ust sinir supurmesinde
+    /// 2 sn ile 20 sn arasindaki p10 kazancinin %87'si 5 saniyede zaten alinmisti.
+    /// </summary>
+    [Fact]
+    public void Kiskacin_alt_ucu_bes_saniyede_bagliyor()
+    {
+        var args = FfmpegArguments.KeyframeArgs("libx264", 60, CarpikHarita(2.0, 2.0, 2.0)).ToList();
+
+        Assert.Equal("300", args[args.IndexOf("-g") + 1]);
+        Assert.Equal(5.0, FfmpegArguments.KeyframeCeilingMinSeconds);
+    }
+
+    /// <summary>
+    /// Kiskacin ust ucu olculen 10 saniyede bagliyor: medyani 30 sn olan harita 60 fps'te
+    /// <c>-g 600</c> uretmeli, 1800 degil. Deger HandBrake'in <c>keyint = 10*fps</c>'i ile
+    /// ayni ve supurmede 10 sn ile 20 sn ayni uc I-kareyi ayni yerlere koymustu - ustunde
+    /// ust sinir artik baglamiyor.
+    /// </summary>
+    [Fact]
+    public void Kiskacin_ust_ucu_on_saniyede_bagliyor()
+    {
+        var args = FfmpegArguments.KeyframeArgs("libx264", 60, CarpikHarita(30.0, 30.0, 30.0)).ToList();
+
+        Assert.Equal("600", args[args.IndexOf("-g") + 1]);
+        Assert.Equal(10.0, FfmpegArguments.KeyframeCeilingMaxSeconds);
+    }
+
+    /// <summary>
+    /// Donanim ust siniri olculen 5 saniyede sabit ve haritadan bagimsiz: uzun sahneli
+    /// harita bile 60 fps'te <c>-g 300</c> almali. Donanimda sahne kesimi olmadigi icin
+    /// ust sinir gerceklesen araligin kendisi, yani dogrudan atlama butcesi; 2 sn'ye
+    /// indirilirse 120 gelir ve bu olcu kizarir.
+    /// </summary>
+    [Fact]
+    public void Donanim_ust_siniri_bes_saniyede_sabit()
+    {
+        var args = FfmpegArguments.KeyframeArgs("av1_nvenc", 60, CarpikHarita(30.0, 30.0, 30.0)).ToList();
+
+        Assert.Equal("300", args[args.IndexOf("-g") + 1]);
+        Assert.Equal(5.0, FfmpegArguments.HardwareKeyframeCeilingSeconds);
     }
 
     /// <summary>

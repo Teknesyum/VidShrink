@@ -126,23 +126,38 @@ public static class FfmpegArguments
     //
     // The ceiling is what the measurement decides, and it is not a single number either. The
     // ceiling only binds inside a scene longer than itself; below that the scene cut fires
-    // first. So the ceiling is read off the content: the SceneMap's mean scene length divided
+    // first. So the ceiling is read off the content: the SceneMap's MEDIAN scene length divided
     // by SceneMapMergeFactor, clamped between KeyframeCeilingMinSeconds and
     // KeyframeCeilingMaxSeconds. Without a map the default is HandBrake's 10 s.
     //
-    // SceneMapMergeFactor is not a tuning constant; it is the map's measured recall, written as
-    // the two counts it was measured from. T101 checked the map against ground truth: in the
-    // 144.2-333.3 s window the source carries 28 real cuts and the map reports 10, with zero
-    // false positives; every one of the 18 missed cuts scored 0.112-0.199, below the threshold
-    // the map ran at. Dividing the mapped mean by 28/10 turns "mean length of a map scene" back
-    // into "mean length of a real shot", which is the quantity the ceiling wants.
+    // Median, not mean, and that is measured rather than assumed. T105 re-measured the scene
+    // threshold and the distribution behind it: over the full source the scene length is right
+    // skewed, mean 13.46 s against median 5.62 s, so a mean-driven ceiling is set by a handful
+    // of long scenes. Encoding both rules on the same grid (libx264, 2-pass, -b:v 8000k,
+    // preset slow, VMAF-NEG over the whole clip) on a clip where the ceiling actually binds:
     //
-    // That recall belongs to one threshold, SceneMapThresholdOfRecord. If the threshold moves,
-    // the map splits differently and the recall is no longer 28/10 - applying the old divider
-    // on top of a corrected threshold would shorten the ceiling twice. The threshold is owned
-    // elsewhere (SceneMap.DefaultThreshold), so the guard is a measure, not a comment:
-    // Az_bolme_duzeltmesi_olculdugu_esikte_kalir turns red the moment the two diverge, and the
-    // recall has to be measured again before the ceiling can be trusted.
+    //   ceiling 10.00 s (mean)   -> 18.2533 MiB  mean 88.525  p10 86.496  3 I-frames  seek 202.6 ms
+    //   ceiling  5.62 s (median) -> 18.2600 MiB  mean 88.603  p10 86.516  5 I-frames  seek 154.9 ms
+    //
+    // The median rule is not worse on either quality metric at the same size and costs 24% less
+    // seek, so the ceiling reads the median. (Seek is a shared-machine number; quality and size
+    // are not.)
+    //
+    // SceneMapMergeFactor is not a tuning constant; it is the map's measured recall, written as
+    // the two counts it was measured from, both counted in the same unit - cuts inside the
+    // ground-truth window (144.117, 333.300]. At the threshold of record the map finds 28 of
+    // the 28 hand-marked cuts with zero false positives, so the recall is 1.000 and the divider
+    // is 1.0: at this threshold the map no longer under-segments and no correction is owed.
+    // It was not always so - at the previous threshold of 0.2 the same window gave 10 of 28,
+    // and the divider was 2.8.
+    //
+    // Because the divider is 1.0 today it is arithmetically inert, and no behaviour test can
+    // tell it from having no divider at all. What is testable is where it comes from: the two
+    // counts are pinned to what was counted, and SceneMapThresholdOfRecord is pinned to
+    // SceneMap.DefaultThreshold, which is owned elsewhere. If that threshold moves again the
+    // map splits differently, the recall is no longer 1.000, and
+    // Az_bolme_duzeltmesi_olculdugu_esikte_kalir turns red before a stale divider can be
+    // applied on top of a corrected threshold.
     //
     // What the map is trusted for is the range, not the boundaries: the placement is left to
     // the encoder's scene cut. That the encoder actually places on content, and what the
@@ -184,7 +199,8 @@ public static class FfmpegArguments
     // the seek budget itself, not a content-derived number.
     // The software CRF path keeps a VBV cap where HandBrake leaves one out (encx265.c:514-522
     // fills VBV only on user request or for DoVi). Measured on parca-1-20sn at CRF 23, libx264,
-    // same colour space and stream count on both sides, machine shared:
+    // same colour space and stream count on both sides. Quality and size do not carry the
+    // shared-machine stamp - only time-derived numbers do, and there are none in this table:
     //
     //   VBV on  -> 14.731 MiB   mean 86.977   p10 84.999
     //   VBV off -> 15.312 MiB   mean 87.287   p10 85.598
@@ -199,25 +215,39 @@ public static class FfmpegArguments
 
     public const double KeyframeFloorSeconds = 1.0;
     public const double KeyframeCeilingDefaultSeconds = 10.0;
-    public const double SceneMapThresholdOfRecord = 0.2;
-    public const double SceneMapGroundTruthCuts = 28.0;
-    public const double SceneMapReportedScenes = 10.0;
-    public const double SceneMapMergeFactor = SceneMapGroundTruthCuts / SceneMapReportedScenes;
+    public const double SceneMapThresholdOfRecord = 0.105;
+    public const double SceneMapGroundTruthCutsInWindow = 28.0;
+    public const double SceneMapMappedCutsInWindow = 28.0;
+    public const double SceneMapMergeFactor = SceneMapGroundTruthCutsInWindow / SceneMapMappedCutsInWindow;
     public const double KeyframeCeilingMinSeconds = 5.0;
     public const double KeyframeCeilingMaxSeconds = 10.0;
     public const double HardwareKeyframeCeilingSeconds = 5.0;
 
     /// <summary>
-    /// Sahne haritasından üst sınırı türetir. Harita yoksa ya da hiç sahne taşımıyorsa
-    /// HandBrake'in 10 saniyesine düşer.
+    /// Sahne haritasından üst sınırı türetir: sahne uzunluklarının <b>medyanı</b>, ölçülen
+    /// geri çağırmaya bölünür ve kıskaca kısılır. Ortalama değil medyan, çünkü dağılım sağa
+    /// çarpık (tam kaynakta ortalama 13,46 sn, medyan 5,62 sn) ve ortalamayı birkaç uzun
+    /// sahne belirliyor. Harita yoksa ya da hiç sahne taşımıyorsa HandBrake'in 10 saniyesine
+    /// düşer.
     /// </summary>
     public static double KeyframeCeilingSeconds(SceneMap? scenes)
     {
         if (scenes is null || scenes.Scenes.Count == 0 || scenes.Duration <= 0)
             return KeyframeCeilingDefaultSeconds;
-        var mappedMeanSeconds = scenes.Duration / scenes.Scenes.Count;
+
+        var lengths = new List<double>(scenes.Scenes.Count);
+        foreach (var scene in scenes.Scenes)
+            if (scene.Duration > 0) lengths.Add(scene.Duration);
+        if (lengths.Count == 0) return KeyframeCeilingDefaultSeconds;
+
+        lengths.Sort();
+        var mid = lengths.Count / 2;
+        var mappedMedianSeconds = lengths.Count % 2 == 1
+            ? lengths[mid]
+            : (lengths[mid - 1] + lengths[mid]) / 2.0;
+
         return Math.Clamp(
-            mappedMeanSeconds / SceneMapMergeFactor,
+            mappedMedianSeconds / SceneMapMergeFactor,
             KeyframeCeilingMinSeconds,
             KeyframeCeilingMaxSeconds);
     }
