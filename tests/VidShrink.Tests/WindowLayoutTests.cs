@@ -475,6 +475,14 @@ public sealed class WindowLayoutTests
     /// (956) değişmedi, dolu/taban 925-1025 → 1002-1102 (1052). En büyük kayma dolu/taban:
     /// Türkçe karşılıklar dar pencerede daha çok satıra sarıyor.</para>
     ///
+    /// <para>T148 sonrası: dolu/taban 1002-1102 → 906-1006 (ölçülen 956). Eski pin
+    /// <b>bozuk arayüzün</b> üstüne çakılmıştı — <c>main.quality.target</c>,
+    /// <c>main.quality.loss</c> ve <c>main.plan.fact.estimated-size</c> anahtarları
+    /// hiçbir dilde yoktu, arayüz onların yerine ham anahtar metnini basıyordu ve o uzun
+    /// metin dar pencerede satıra sarıp sayfayı 1052'ye çıkarıyordu. Anahtarlar
+    /// <c>b2f2c62</c> ile gelince sarma bitti, boy dolu/tasarım ile aynı 956'ya indi.
+    /// <c>main</c> bu yüzden iki koşum kırmızı kaldı.</para>
+    ///
     /// <b>Bu sayı neyi koruyor:</b> sayfanın kendi boyunu. Bir daha şişerse ölçüm kırmızıya
     /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
@@ -483,7 +491,7 @@ public sealed class WindowLayoutTests
     [InlineData(false, false, 939, 1039)]
     [InlineData(false, true, 960, 1060)]
     [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 1002, 1102)]
+    [InlineData(true, true, 906, 1006)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
