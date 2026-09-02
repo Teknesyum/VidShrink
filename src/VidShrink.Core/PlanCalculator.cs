@@ -652,7 +652,9 @@ public static class PlanCalculator
     {
         var weights = CompressionStrategy.PenaltyWeights(regime);
         var level = complexity.Level;
-        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
+        var requiredAtSourceGrid = required / Math.Max(complexity.ScaleFactor(scale), 1e-9);
+        var providedAtSourceGrid = provided * scale * scale;
+        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(requiredAtSourceGrid, 1e-9) / Math.Max(providedAtSourceGrid, 1e-9));
         rate = Math.Min(rate, CodecModel.QualityLimit(codec));
         var scalePenalty = ScalePenalty(scale, weights);
         var fpsPenalty = FpsPenalty(fps, sourceFps, weights);

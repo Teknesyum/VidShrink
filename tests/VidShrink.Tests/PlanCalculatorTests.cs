@@ -1,4 +1,5 @@
-﻿using VidShrink.Core;
+﻿using System.Linq;
+using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
@@ -399,6 +400,59 @@ public sealed class PlanCalculatorTests
         SampledSeconds = 6,
         SampledFrames = 360
     };
+
+    private static ComplexityProfile GridProfile(double fullScaleBppf, double halfScaleBppf)
+        => ComplexityProfile.FromProbe(fullScaleBppf, halfScaleBppf, 6, 288);
+
+    private static LayoutScoreParts ScoreAt(ComplexityProfile complexity, int width, int height, double videoK)
+        => PlanCalculator.ScoreLayout(complexity, "libsvtav1", videoK, width, height, 60.0, 60.0, 1080, CompressionRegime.Aggressive);
+
+    [Theory]
+    [InlineData(0.08, 0.05)]
+    [InlineData(0.08, 0.11)]
+    public void TheRateHalfOfTheScoreDoesNotMoveWhenOnlyTheResolutionChanges(double fullScaleBppf, double halfScaleBppf)
+    {
+        var complexity = GridProfile(fullScaleBppf, halfScaleBppf);
+        const double videoK = 2000;
+
+        var native = ScoreAt(complexity, 1920, 1080, videoK);
+        var threeQuarters = ScoreAt(complexity, 1440, 810, videoK);
+        var half = ScoreAt(complexity, 960, 540, videoK);
+
+        Assert.NotEqual(0.0, complexity.DetailExponent, 3);
+        Assert.Equal(native.Rate, threeQuarters.Rate, 6);
+        Assert.Equal(native.Rate, half.Rate, 6);
+    }
+
+    [Theory]
+    [InlineData(0.08, 0.05)]
+    [InlineData(0.08, 0.11)]
+    public void DroppingResolutionAtAFixedBitrateAlwaysCostsScore(double fullScaleBppf, double halfScaleBppf)
+    {
+        var complexity = GridProfile(fullScaleBppf, halfScaleBppf);
+        const double videoK = 2000;
+
+        var ladder = new[] { (1920, 1080), (1600, 900), (1280, 720), (960, 540) }
+            .Select(l => ScoreAt(complexity, l.Item1, l.Item2, videoK))
+            .ToArray();
+
+        for (var i = 1; i < ladder.Length; i++)
+            Assert.True(ladder[i].Score < ladder[i - 1].Score,
+                $"Layout {i} scores {ladder[i].Score:0.###} against {ladder[i - 1].Score:0.###} one step above it. At a fixed bitrate the measured grid never rewarded the smaller frame: on the moving source 1920x1080@60 read 45,27 VMAF-NEG against 43,86 at 960x540@60, on the still source 81,29 against 64,30. A score that rises as the frame shrinks is the defect T107 measured.");
+    }
+
+    [Fact]
+    public void TheOnlyThingThatSeparatesTwoResolutionsIsTheScalePenalty()
+    {
+        var complexity = GridProfile(0.08, 0.05);
+        const double videoK = 2000;
+
+        var native = ScoreAt(complexity, 1920, 1080, videoK);
+        var half = ScoreAt(complexity, 960, 540, videoK);
+
+        Assert.Equal(0.0, native.ScalePenalty, 9);
+        Assert.Equal(native.Score - half.Score, half.ScalePenalty - native.ScalePenalty, 6);
+    }
 
     [Fact]
     public void TheFloorAdmitsTheLayoutThatWonTheMeasurementAndStillRejectsTheSaturatedOne()
