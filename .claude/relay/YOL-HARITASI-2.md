@@ -399,7 +399,10 @@ calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
    örneklemeyi alır.
 5. **T95** teslim edince T94 açılır — HDR hizası iki farklı aracı
    karşılaştırıyor, aletin adillik kapısı orada gerçekten lazım.
-6. `SceneMap` `PlanCalculator`a bağlanır — harita hâlâ tüketilmiyor.
+6. `SceneMap` tüketime bağlanır — harita hâlâ okunmuyor. İki ayrı iş:
+   **T113** anahtar kare kararını bağlar (üç çağrı yeri `scenes: null`
+   geçiyor), **T114** bit dağıtımını sorar. T114'ün asıl sorusu "kodlayıcı
+   zaten yapıyor mu" — cevabı hayırsa ürünün en büyük kolu, evetse iş biter.
 7. Kodlayıcı seçim kuralı ölçülen veriye göre yeniden yazılır. **T106'dan
    sonra.**
 8. **T108** — tepe eğrisi. T98 ölçtü ve eğrinin şekli ölçümle ters göründü:
