@@ -200,8 +200,9 @@ var rate = level.AtReference - level.PerHalving * Math.Log2(
 ```
 
 Her iki taraf da ölçeğe göre aynı şekilde normalize edildiğinden `rate` ölçekten
-bağımsız hale geliyor: A kaynağında 60 fps'lik beş yerleşimin beşinde de 68,88.
-Çözünürlüğü ayıran tek şey artık `ScalePenalty`.
+bağımsız hale geliyor: A kaynağında 60 fps'lik beş yerleşimin dördünde 68,880,
+beşincisinde (882x496) 68,878 — fark aday ölçeğinin 0,02'lik adıma yuvarlanmasından,
+`rate`'in ölçeğe bağlılığından değil. Çözünürlüğü ayıran tek şey artık `ScalePenalty`.
 
 **Hiçbir sabit değiştirilmedi.** Ne `ScalePenaltyScale`, ne `FpsPenaltyPerHalving`,
 ne `PenaltyWeights`. Gerekçe: uydurulmuş cezalar sınanmamış kaynakta daha iyi değil
