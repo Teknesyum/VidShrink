@@ -754,7 +754,7 @@ public sealed class PerformanceCheckTests
             Atlandi($"bu makinenin islemci zamani sayaci is parcacigi duzeyinde guvenilir okumadi " +
                     $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi");
 
-        if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
+        if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 5_000);
 
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t63tani_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(dir);
@@ -881,4 +881,5 @@ public sealed class PerformanceCheckTests
             _stop.Dispose();
         }
     }
+
 }
