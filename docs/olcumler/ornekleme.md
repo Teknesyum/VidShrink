@@ -370,3 +370,61 @@ Yani K2'nin aday seçimi korpusa aşırı uydurulmuş.
 Üç klip "en kötü klip" ölçüsü için az; bu sıralamayı ters yönde de
 kanıt saymıyorum. Kanıt saydığım tek şey şu: **korpusta yapılan seçim
 gerçek kaynaklara taşınmıyor.**
+
+## K8 — Mutasyon kanıtı
+
+Düzenek: `tools/ornekleme/mutasyon.sh`. Her mutasyonda **tam yeniden derleme**
+(`dotnet build VidShrink.sln -c Release --no-incremental`); mtime'a güvenilmiyor.
+Süzgeç `ComplexityProbeTests|ComplexityScanTests`. Betik dizin kilidi alıyor,
+kirli ağaçta başlamıyor, çıkışta kaynağı geri alıyor.
+
+| # | mutasyon | sonuç | öldüren test |
+|---|---|---|---|
+| — | mutasyonsuz taban | **yeşil** | — |
+| M1 | yerleşim içeriği izlemiyor (`distance = start`) | ÖLDÜ | WindowPlacementFollows…, OnUnevenContent…\[FfmpegFact\], ContentDrivenWindowsTrack… |
+| M2 | sayı içeriğe bağlanmıyor (`WindowsPerHeterogeneity = 0`) | ÖLDÜ | AFileTooShortToAfford…, PastSomePointMoreHeterogeneity… |
+| M3 | üst sınır yok (`MaxPlannedWindows = 100`) | ÖLDÜ | PastSomePointMoreHeterogeneity… |
+| M4 | pencereler örtüşebilir (ayrım `< 0.0`) | ÖLDÜ | PlannedWindowsNeverOverlapEachOther |
+| M5 | tabaka ağırlıkları eşitlendi (`to - from` → `1.0`) | **HAYATTA KALDI** | — |
+| M6 | sahne penceresi sahne ortasına gitmiyor (`centre = 0.0`) | ÖLDÜ | SceneCutsChangeWhereTheScenePlanLooks |
+| M7 | kanıt yokken geri dönüş boş | ÖLDÜ | WindowPlacementFollows… |
+| M8 | ağırlıklar kestirimde yok (`w = 1.0`) | ÖLDÜ | TheWeightedEstimateFollowsTheWeightsNotTheWindowOrder |
+
+Sekizde yedi öldü.
+
+**M5 hayatta kaldı ve bunu test açığı olarak yazmıyorum — eşdeğere yakın.**
+Tabakalar eşit sayıda öğe içerecek şekilde kuruluyor, yani `to - from`
+tabakalar arasında **en çok 1 fark ediyor** (N=8, 59 aday başlangıçta 7 ya da 8).
+Ağırlıkları 1.0'a sabitlemek kestirimi ancak bu 7/8 oranı kadar oynatıyor.
+Bunu yakalayacak bir test yazılabilirdi ama yazsaydım testin ölçtüğü şey
+davranış değil, tabaka bölme aritmetiği olurdu — projede daha önce kapanmış
+"sabit karşılaştıran test davranış ölçmez" hatasının aynısı. M8 (ağırlıkların
+kestirimde hiç kullanılmaması) ölüyor; yani ağırlık **mekanizması** testli,
+ölçülemeyen şey ağırlıkların bu plandaki **büyüklük farkı**.
+
+### ffmpeg olmadan — CI'ın gördüğü hal
+
+`tools/ci-gibi-kos.sh --filter "ComplexityProbeTests|ComplexityScanTests"`
+sonucu aşağıda. `[FfmpegFact]` testleri `Skip` ile değil, ffmpeg yokluğunda
+atlanarak geçiyor; sessiz erken dönüş yok.
+
+```
+Başarılı! - Başarısız: 0, Başarılı: 60, Atlanan: 8, Toplam: 68
+```
+
+**Atlanan 8 testin listesi ve kabul kriteri uyarısı.** Atlananlar:
+`OnUnevenContentTheContentPlanLandsCloserToTheDenseCensusThanTheFixedWindows`,
+`MissingFailedOrIncomparableQualityKeepsComplexityProbeAlive`,
+`DetailedProbeExposesWindowQualityThroughCoreContract`,
+`DefaultDetailedProbeDoesNotMeasureQualityBeforeT89OptsIn`,
+`CancellationReachesQualityMeasurement`,
+`WindowAndMotionSamplesCountTheSameByteUnit`,
+`AppProbeSurvivesAnUnusableQualityMeter`,
+`ProbeEntryPointUsedByTheAppCarriesMeasuredQualityIntoTheProfile`.
+
+Bunlardan **birincisi bu sözleşmenin kabul kriterine ait ölçümdür** — planın
+yoğun sayıma bugünkü sabit pencerelerden daha yakın düştüğünü uçtan uca
+gösteren tek test. CI'da ffmpeg olmadığı için **atlanıyor**; yani CI'ın yeşili
+bu iddiayı doğrulamıyor. M1 ve M7 mutasyonlarını bu testin yanında yerel
+testler de öldürüyor, dolayısıyla mutasyon kanıtı ffmpeg'siz ortamda da
+ayakta — ama uçtan uca iddia yalnızca ffmpeg'li koşumda sınanıyor.
