@@ -870,6 +870,8 @@ public sealed class UpdaterTests : IDisposable
     /// koşar. Yukarıdaki ölçüler adın hiç boşalmadığını süreç içinde gösteriyor, bu ölçü de
     /// o geçişi yapacak sürecin gerçekten açılabildiğini gösteriyor.
     /// </summary>
+    private static readonly TimeSpan GecisTavani = TimeSpan.FromSeconds(5);
+
     [LiveLauncherFact]
     public void TheIncomingBinaryRenamesItselfOntoTheTargetName()
     {
@@ -888,9 +890,10 @@ public sealed class UpdaterTests : IDisposable
         start.ArgumentList.Add(LauncherUpdate.CommitArgument);
         using var process = Process.Start(start)!;
         var gecis = Stopwatch.StartNew();
-        var cikti = process.WaitForExit(60_000);
+        var cikti = process.WaitForExit((int)GecisTavani.TotalMilliseconds);
         gecis.Stop();
-        _output.WriteLine($"geçiş süreci: {gecis.Elapsed.TotalMilliseconds:F0} ms (tavan 60000 ms)");
+        _output.WriteLine($"geçiş süreci: {gecis.Elapsed.TotalMilliseconds:F0} ms " +
+                          $"(tavan {GecisTavani.TotalMilliseconds:F0} ms)");
         Assert.True(cikti, "geçiş süreci çıkmadı");
 
         _output.WriteLine($"çıkış kodu: {process.ExitCode}, kökte: {RootListing(root)}");
