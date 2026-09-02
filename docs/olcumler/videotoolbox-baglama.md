@@ -263,6 +263,21 @@ Başarılı!  - Başarısız:     0, Başarılı:    11, Atlanan:     0, Toplam:
 
 11 = 6 + 5; iki kolun kesişimi boş.
 
+### Dalın tam süiti
+
+İki kollu verify dar bir pencere, bu yüzden dal ayrıca tam süitle koşuldu:
+
+```
+Başarısız! - Başarısız:     1, Başarılı:  1469, Atlanan:    17, Toplam:  1487, Süre: 15 m 17 s - VidShrink.Tests.dll (net8.0)
+```
+
+Tek kırmızı, K4'te ölçülen ve `main`den gelen
+`WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(True, True)`. Sayılar
+K4'ün genişletme koşumuyla tutuyor: orada 1466 geçmişti, burada 1469 —
+genişletmenin düşürdüğü üç test tam da bu farkı veriyor. Toplam iki koşumda da
+1487; atlanan iki koşumda da 17, CI kapısının `-MaximumSkipped 30` sınırının
+altında.
+
 ## Bu turda kapanmayan işler
 
 - **İkinci aşama Mac gerektiriyor.** `IsHardware`ı VideoToolbox'a açmak, kol
