@@ -36,7 +36,8 @@ public static class PerformanceProbe
     /// Bütün ölçümün duvar saati üst sınırı. <see cref="HardwareVerdict.ProbeBudgetMs"/>
     /// tek karelik bir varlık yoklamasının bütçesi; burada altı geçiş var — sayaç
     /// kalibrasyonu, örnek klip üretimi, taban çözme, donanım kodlamasının iki geçişi
-    /// (tek iş parçacıklı ve serbest) ve yazılım kodlaması — ve kodlama geçişleri tek
+    /// (tek iş parçacıklı ve serbest) ve yazılım kodlaması — artı
+    /// <see cref="SelectHardwareCodec"/>'in aday yoklaması, ve kodlama geçişleri tek
     /// iş parçacığıyla örnek klibin tamamını işliyor. Sınır, ölçülen sürenin birkaç
     /// katında tutuldu ki makine meşgulken de yetsin; gerçekleşen süre her koşumda
     /// ham günlüğe yazılır. Aşılırsa ölçüm yarıda kesilir ve eksik bacak
@@ -66,6 +67,39 @@ public static class PerformanceProbe
     internal const string SoftwareCodec = "libx264";
     internal const string SoftwarePreset = "veryfast";
 
+    /// <summary>
+    /// Ölçülecek donanım kodlayıcısını seçer. Derleme listesinden ilk adayı almak iki
+    /// yerde yanlış cevap veriyordu: nvenc'li bir ffmpeg sürücüsüz makinede de listede
+    /// <c>h264_nvenc</c> gösterir, ve bir adayı düşen ama başka bir adayı çalışan
+    /// makinede ölçüm düşeni ölçüp "donanım yolu yok" diyordu. Bu yüzden sıra gerçek
+    /// yoklamayla yürünür ve <b>çalışan</b> ilk aday seçilir.
+    ///
+    /// Hiçbiri çalışmıyorsa listedeki ilk adaya dönülür — null değil. Sebebi
+    /// <see cref="PerformanceCheck.Evaluate"/>'in ayrımı: kodlayıcı listede varken
+    /// kodlamanın düşmesi (<see cref="PerformanceFindingCode.HardwareEncoderFailed"/>)
+    /// ile hiç olmaması (<see cref="PerformanceFindingCode.NoHardwareEncoder"/>) farklı
+    /// iki cevap. Null dönmek düşen makinede ikinciyi söyleyip birinciyi ulaşılmaz
+    /// yapardı.
+    ///
+    /// Bedeli <see cref="IEncoderAvailability.WorksAsEncoder"/> ödüyor: her aday için bir
+    /// ffmpeg süreci. Soğuk önbellekte bu yürüyüş saniyeler sürüyor, o yüzden adaylar
+    /// arasında kalan bütçeye bakılır; bütçe biterse kalan adaylar yoklanmaz.
+    /// <paramref name="budgetMs"/> sıfır ise sınır yoktur.
+    /// </summary>
+    internal static string? SelectHardwareCodec(IEncoderAvailability availability, Stopwatch clock, long budgetMs)
+    {
+        var built = HardwareCandidates.Where(availability.HasEncoder).ToArray();
+        if (built.Length == 0) return null;
+
+        foreach (var candidate in built)
+        {
+            if (budgetMs > 0 && clock.ElapsedMilliseconds >= budgetMs) break;
+            if (availability.WorksAsEncoder(candidate)) return candidate;
+        }
+
+        return built[0];
+    }
+
     public static Task<PerformanceCheckResult> RunAsync(
         IEncoderAvailability? availability = null,
         long budgetMs = BudgetMs,
@@ -78,9 +112,9 @@ public static class PerformanceProbe
         long budgetMs,
         CancellationToken ct)
     {
-        var hardwareCodec = HardwareCandidates.FirstOrDefault(availability.HasEncoder);
-        var directory = Path.Combine(Path.GetTempPath(), TempPrefix + Guid.NewGuid().ToString("N"));
         var total = Stopwatch.StartNew();
+        var hardwareCodec = SelectHardwareCodec(availability, total, budgetMs);
+        var directory = Path.Combine(Path.GetTempPath(), TempPrefix + Guid.NewGuid().ToString("N"));
         EncoderCost? software = null, hardwareSingle = null, hardwareFree = null;
         var cpuFactor = 0.0;
 
