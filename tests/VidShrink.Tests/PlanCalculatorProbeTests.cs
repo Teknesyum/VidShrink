@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -523,6 +524,30 @@ public sealed class PlanCalculatorProbeTests
 
         Assert.True(durum.PlanHardwareNotMeasured, "olcu kurulmadi: plan donanimi olculmus sayiyor");
         Assert.True(durum.IsEnabled, "yoklama yerlesmedigi icin Baslat kalici kilitli kaldi");
+    }
+
+    /// <summary>
+    /// T136/K6. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle ayni seyi
+    /// soyluyor. T128 Core'u duzeltti, arayuzdeki dort kopya eski metinde kaldi ve bunu
+    /// hicbir olcu gormedi; burasi o ayrilmayi bir daha sessiz birakmiyor.
+    /// </summary>
+    [Fact]
+    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor()
+    {
+        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new RecordingAvailability(TimeSpan.Zero));
+        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+
+        var kalip = Locales.Values("en")["main.reason.encoder-fallback"];
+        var arayuz = string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec);
+
+        Assert.Contains(arayuz, detailed.Plan.Reason, StringComparison.Ordinal);
+
+        Assert.Contains("could not be used on this machine",
+            Locales.Values("en")["main.advice.encoder-fallback"], StringComparison.Ordinal);
+        Assert.Contains("bu makinede kullanılamadı",
+            Locales.Values("tr")["main.reason.encoder-fallback"], StringComparison.Ordinal);
+        Assert.Contains("bu makinede kullanılamadı",
+            Locales.Values("tr")["main.advice.encoder-fallback"], StringComparison.Ordinal);
     }
 
     // --- K1: gercek ffmpeg ---
