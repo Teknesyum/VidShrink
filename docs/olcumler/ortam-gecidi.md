@@ -120,7 +120,8 @@ Geçit sırayla ikisini de sorar, `Probe` başarısızsa ölçüyü sebebiyle at
 
 Yerel filtre: `--filter "FullyQualifiedName~IslemciZamaniSayaciDogruOkuyorMu|FullyQualifiedName~DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu"`.
 
-Mutasyon A dalı `T117-mutasyon-a`, kanıt alındıktan sonra silinir; `main`e
+Mutasyon A dalı `T117-mutasyon-a` denetim bitene kadar duruyor (koşum kaydı
+id ile kalıcı, dal denetçinin doğrulaması için tutuldu); `main`e
 gitmez.
 
 Süreler paylaşımlı makinede alındı (aynı anda sekiz ajan koşuyor); karar
