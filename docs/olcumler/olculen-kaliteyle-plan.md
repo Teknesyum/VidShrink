@@ -635,6 +635,8 @@ sayılarına bu damga basılmadı.
 | klip ikamesi | 20 MB | yeni | 1920@60 | 2pass 2695k | 19.328 | 74.05 | 32.43 | 38.91 | 38.5 | 1 |
 | hdr ikamesi (parca-1) | 40 MB | eski | 1458@60 | 2pass 5389k | 38.988 | 80.82 | 78.85 | 73.53 | 80.6 | 2 |
 | hdr ikamesi (parca-1) | 40 MB | yeni | 1612@60 | crf 21 | 37.384 | 82.43 | 80.49 | 76.89 | 25.5 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | eski | 1920@60 | 2pass 5258k | 39.445 | 94.72 | 56.42 | 95.13 | 46.6 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | yeni | 1920@60 | crf 23 | 39.146 | 94.72 | 56.42 | 95.11 | 152.8 | 3 |
 
 #### Kol farkı (yeni − eski), aynı ölçer, kaynaklar ikame
 
@@ -647,6 +649,7 @@ sayılarına bu damga basılmadı.
 | hdr ikamesi (parca-1) | 40 MB | kilitli | +1.60 | +1.66 | +3.32 | -1.594 | -173.6 |
 | hdr ikamesi (parca-1) | 40 MB | kilitsiz | +1.61 | +1.65 | +3.36 | -1.603 | -55.1 |
 | hdr ikamesi (parca-2) | 40 MB | kilitli | -0.01 | -0.01 | -0.01 | -0.340 | -10.1 |
+| hdr ikamesi (parca-2) | 40 MB | kilitsiz | -0.01 | +0.01 | -0.02 | -0.299 | +106.2 |
 
 #### Kilidin bedeli (aynı kol, kilitli − kilitsiz ölçer)
 
@@ -658,13 +661,12 @@ sayılarına bu damga basılmadı.
 | klip ikamesi | 20 MB | yeni | +5.57 | +42.62 | +12.38 | evet |
 | hdr ikamesi (parca-1) | 40 MB | eski | +0.43 | +2.08 | +1.37 | evet |
 | hdr ikamesi (parca-1) | 40 MB | yeni | +0.42 | +2.09 | +1.33 | evet |
+| hdr ikamesi (parca-2) | 40 MB | eski | +1.22 | +39.53 | +0.41 | evet |
+| hdr ikamesi (parca-2) | 40 MB | yeni | +1.22 | +39.51 | +0.41 | evet |
 
 #### Izgarada eksik kalan hücreler
 
-Onaltı hücrenin **2 tanesi ölçülmedi**:
-
-- `hdr2-eski-kilitsiz` — hdr ikamesi (parca-2), 40 MB, eski kolu, kilitsiz ölçer: **ölçülmedi**
-- `hdr2-yeni-kilitsiz` — hdr ikamesi (parca-2), 40 MB, yeni kolu, kilitsiz ölçer: **ölçülmedi**
+Yok. Onaltı hücrenin onaltısı da koşuldu.
 
 ### 11.6 K3 kararı — `--measured-quality` kolu açık kalır
 
@@ -680,7 +682,7 @@ Kilitli ölçerde dört hücrenin dördü de tamamlandı:
 | hdr ikamesi (parca-1) 40 MB | **evet** — 1458@60 2pass 5389k → 1612@60 crf 21 | **+1,60** | **+3,32** | **−1,594 MB** |
 | hdr ikamesi (parca-2) 40 MB | **evet** — 1920@60 2pass 5258k → 1920@60 crf 23 | −0,01 | −0,01 | −0,340 MB |
 
-Üç şey okunuyor:
+Beş şey okunuyor:
 
 1. **Kol yalnız planı değiştirdiğinde bir şey yapıyor.** İki SDR hücresinde plan
    sekiz alanın sekizinde de özdeş çıktı (genişlik, yükseklik, fps, kodlayıcı,
@@ -693,7 +695,17 @@ Kilitli ölçerde dört hücrenin dördü de tamamlandı:
 2. **Planı değiştirdiği yerde kazanç garantili değil.** İki HDR ikamesinin
    **birinde** kazanç var (+1,60 mean, +3,32 p10) ve **üstelik dosya 1,59 MB
    daha küçük**; diğerinde hiçbir şey yok (−0,01). HDR olmak yeterli koşul değil.
-3. **Kazancın mekanizması T89'un adlandırdığıyla aynı.** T89 "kazanç durdurma
+3. **Kazanan hücre hedef bandını ıskaladı.** `parca-1`de `yeni` kolu 40 MB
+   hedefine karşı 37,4 MB teslim etti — **%93,5, bant=dış**; `eski` kol 38,99 MB
+   ile **%97,5, bant=iç** vermişti. Yani kol bütçenin 1,6 MB'ını kullanmadan
+   bıraktı ve kaliteyi yine de yükseltti. Kalite ve boyut eksenlerinde zarar yok,
+   ama "aynı bütçeyi daha iyi harcadı" demek yanlış olur: bütçeyi harcamadı.
+4. **`parca-2`de planın kip kararı teslime hiç ulaşmadı.** Plan `crf 23` diyordu;
+   doldurma döngüsü onu ezip 2 geçiş 5214k'ya çıkardı (kilitsiz ikilide 5210k) ve
+   dosya `eski` kolun çıktığı yere, 39,1 MB'a oturdu. Δmean'in −0,01 kalmasının
+   sebebi bu: plan değişti, **teslim edilen kodlama değişmedi**. Doldurma
+   döngüsünün planın kip kararını hangi koşullarda ezdiği **ölçülmedi**.
+5. **Kazancın mekanizması T89'un adlandırdığıyla aynı.** T89 "kazanç durdurma
    kısıtından değil yerleşim seçiminden geliyor" demişti; kazanan hücrede
    yerleşim 1458×820 → 1612×906'ya çıkıyor ve kip iki geçişten crf'ye dönüyor —
    T89'un `hdr` satırındaki 1650×928 → 1842×1036 / crf 22 hareketinin aynısı.
@@ -709,8 +721,9 @@ kaynaklar farklı (§11.1), aynı ölçek üzerinde durmuyorlar.
 - Ölçülen en kötü sonuç −0,01 mean, ve o da planın özdeş olduğu bir hücrede,
   yani koldan gelmiyor. Planı değiştirdiği iki hücrede sonuç +1,60 ve −0,01.
   **Ölçülmüş zarar yok.**
-- Ölçülen en iyi sonuç +1,60 mean / +3,32 p10 ve 1,59 MB daha küçük dosya.
-  **Ölçülmüş kazanç var.**
+- Ölçülen en iyi sonuç +1,60 mean / +3,32 p10, üstelik 1,59 MB daha küçük
+  dosyayla. **Ölçülmüş kazanç var.** Aynı hücrede kolun hedef bandını ıskaladığı
+  da ölçüldü (yukarıda 3. madde) — kazanç bu kayıtla birlikte okunmalı.
 - Kol zaten sevk edilmiş ve varsayılan (§11.3). Kapatmak bir ürün değişikliğidir
   ve onu haklı çıkaracak bir sayı bu ızgarada **yok**.
 
@@ -735,10 +748,11 @@ ikiliyle koşuldu ve kol farkı iki ölçerde de aynı çıktı:
 | klip 8 MB | −0,01 | −0,00 |
 | klip 20 MB | +0,03 | −0,01 |
 | hdr parca-1 40 MB | **+1,60** | **+1,61** |
+| hdr parca-2 40 MB | −0,01 | −0,01 |
 
-Yani **ölçerin kusuru kol yargısını ne yarattı ne gizledi** — kazanan hücrede
-kazanç kilitsiz ölçerde de aynı büyüklükte duruyor. `parca-2`nin kilitsiz
-karşılıkları §11.5'in eksik listesinde, o hücre için **ölçülmedi**.
+Yani **ölçerin kusuru kol yargısını ne yarattı ne gizledi** — dört hücrenin
+dördünde de kol farkı iki ölçerde aynı işaret ve aynı büyüklükte çıktı,
+kazanan hücrede kazanç kilitsiz ölçerde de duruyor.
 
 Buna karşılık ölçerin **kendi** hatası büyük ve içeriğe bağlı. Aynı kolda, aynı
 dosyada, yalnız ölçer değişince:
@@ -748,12 +762,18 @@ dosyada, yalnız ölçer değişince:
 | klip 8 MB | eski / yeni | +3,69 / +3,68 | +11,78 / +10,77 |
 | klip 20 MB | eski / yeni | **+5,53 / +5,57** | **+13,22 / +12,38** |
 | hdr parca-1 40 MB | eski / yeni | +0,43 / +0,42 | +1,37 / +1,33 |
+| hdr parca-2 40 MB | eski / yeni | +1,22 / +1,22 | +0,41 / +0,41 |
 
 Kilitsiz ölçer kaliteyi sistematik olarak **düşük** gösteriyordu; sapma SDR
-ikamesinde 3,7–5,6 mean puanı, HDR ikamesinde 0,4 puan. Neden içeriğe bağlı
-olduğu **ölçülmedi**.
+ikamesinde 3,7–5,6 mean puanı, HDR ikamelerinde 0,4 ve 1,2 puan. Neden içeriğe
+bağlı olduğu **ölçülmedi**.
 
-Altı hücrenin altısında da **plan iki ölçerde özdeş** (§11.5). Bu, K4'ün
+§11.5'in `Δharm` sütunları burada **hiçbir yargıya girmiyor**: harmonik ortalama
+`QualityMeter.cs:147`'deki `Math.Max(x, 1.0)` tabanını taşıyor ve tek bir düşük
+kare sütunu 40 puan oynatabiliyor. Kararlar yalnız mean ve p10 üzerinden
+okundu.
+
+Sekiz hücrenin sekizinde de **plan iki ölçerde özdeş** (§11.5). Bu, K4'ün
 sonucunun ızgaradan gelen bağımsız bir doğrulamasıdır: `yeni` kolunda çıpa iki
 ikilide farklı hesaplandığı halde plan değişmedi.
 
