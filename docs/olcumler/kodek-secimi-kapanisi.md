@@ -194,6 +194,19 @@ Beşi saydım: dördü geçidi görüyor, biri ham nesneyi ve o da arka planda, 
 Bu, ölçüde pimli: `OlculmemisKodlayiciYoklanmiyorGeciciCevapVeriliyor`
 `YoklamaSayisi("h264_nvenc") == 0` sayıyor.
 
+### Neden `IEncoderMeasurementState`, neden `EncoderState` değil
+
+`EncoderCapabilities.EncoderState` (`:78`) de üç durumlu ve süreç doğurmuyor; ilk bakışta
+daha temiz kapı o. Kullanılmadı, çünkü ham nesne veren çağıranda **hiç ölçüm
+yaptırmıyor**: hiç yoklanmamış kodlayıcı orada `Unmeasured` döner ve `PickCodec` tercih
+edileni geçici cevap olarak verir, ama o çağıranda ölçümü kuyruğa alacak kimse yoktur.
+Arayüzde karşılığı var — geçit ölçümü arka planda başlatıp hesabı yeniliyor — `tools/`
+altındaki başsız çağıranda yok: kodlama hiç doğrulanmamış bir kodlayıcının üstünde başlar.
+
+`IEncoderMeasurementState` tam bu ayrımı yapıyor: geçidi olan çağıran hiç süreç
+doğurmaz ve ölçüm gelince yeniden hesaplar; geçidi olmayan çağıran yoklamayı senkron öder
+ve gerçek cevabı alır. İkisi de doğru cevabı alıyor, bedelini farklı yerde ödüyor.
+
 Yani K3'ün asıl sorusu — "kullanıcı ayarı değiştirdiğinde arayüz ne kadar donuyor" —
 cevabı **sıfır süreç, 0,1658 ms**. 30 000 ms'lik en kötü durum yalnız ham nesne veren
 çağıranlara ait: arayüzde `:1377` (arka planda, açılışta) ve `tools/` altındaki ölçüm
