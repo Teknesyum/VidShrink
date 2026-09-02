@@ -10,7 +10,20 @@ namespace VidShrink.Ffmpeg;
 /// <param name="ExitCode">Surec cikis kodu; surec hic kosmadiysa -1.</param>
 /// <param name="StandardError">ffmpeg'in son hata satirlari.</param>
 /// <param name="Elapsed">Duvar saati.</param>
-public sealed record FfmpegRun(bool Ok, int ExitCode, string StandardError, TimeSpan Elapsed);
+/// <param name="DroppedOptions">
+/// ffmpeg'in kabul etmeyip sessizce dusurdugu ayarlarin tanili satirlari. Cikis kodu 0
+/// olsa da dolu olabilir; <see cref="Ok"/> bundan etkilenmez.
+/// </param>
+public sealed record FfmpegRun(
+    bool Ok,
+    int ExitCode,
+    string StandardError,
+    TimeSpan Elapsed,
+    IReadOnlyList<string>? DroppedOptions = null)
+{
+    /// <summary>Kosum bittiginde ffmpeg'e verilen ayarlardan en az biri dusurulmus.</summary>
+    public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
+}
 
 /// <summary>
 /// Hazir bir arguman listesini kosturur ve bitmesini bekler. Arguman uretmez — ne
@@ -57,7 +70,7 @@ public static class FfmpegRunner
                 var text = await stderr;
                 clock.Stop();
                 ct.ThrowIfCancellationRequested();
-                return new FfmpegRun(process.ExitCode == 0, process.ExitCode, Tail(text), clock.Elapsed);
+                return Decide(process.ExitCode, text, clock.Elapsed);
             }
             catch (OperationCanceledException)
             {
@@ -70,6 +83,13 @@ public static class FfmpegRunner
             }
         }
     }
+
+    /// <summary>
+    /// Bitmis bir kosumun ham cikis kodunu ve tam stderr metnini sonuca cevirir. Surec
+    /// baslatmaktan ayri durur: olcu, verilen metnin uretecegi karari surec kosturmadan pimler.
+    /// </summary>
+    internal static FfmpegRun Decide(int exitCode, string standardError, TimeSpan elapsed)
+        => new(exitCode == 0, exitCode, Tail(standardError), elapsed);
 
     /// <summary>Uzun hata akisindan yalnizca son satirlar; sebep hep sonda durur.</summary>
     public static string Tail(string text)

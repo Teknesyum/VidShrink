@@ -402,3 +402,54 @@ public sealed class EncodeRunnerTests
         return stdout.Split('\n').Count(line => line.Trim().TrimEnd(',') == "I");
     }
 }
+
+/// <summary>
+/// Teslim yolunun basari kapisi. ffmpeg taninmayan bir kodlayici anahtarini dusurup
+/// <b>cikis kodu 0</b> ile donuyor; motorun sectigi psikogorsel ayar sessizce kayboluyor.
+/// Olcumler `docs/olcumler/cikis-kodu-yalan.md` altinda.
+/// </summary>
+public sealed class EncodeRunnerDroppedOptionTests
+{
+    [Fact]
+    public void ExitZeroWithADroppedOptionDoesNotFailButTheDropIsCarried()
+    {
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in FfmpegRunnerTests.SvtAv1DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+
+        var outcome = watch.Close(0);
+
+        EncodeRunner.ThrowIfFailed(outcome);
+        Assert.NotEmpty(outcome.DroppedOptions);
+        Assert.Contains(outcome.DroppedOptions, line => line.Contains("zzznotreal"));
+    }
+
+    [Fact]
+    public void TheDiagnosticLineDoesNotSurviveTheTailWindow()
+    {
+        var watch = new EncodeRunner.StderrWatch();
+        foreach (var line in FfmpegRunnerTests.SvtAv1DroppedKey.Split('\n'))
+            watch.Line(line.TrimEnd('\r'));
+
+        var outcome = watch.Close(0);
+
+        Assert.DoesNotContain(outcome.Tail, line => line.Contains("Error parsing option"));
+    }
+
+    [FfmpegFact]
+    public async Task ARealEncodeThatDropsAnOptionReportsTheDrop()
+    {
+        var outcome = await EncodeRunner.RunCommandAsync(
+            new[]
+            {
+                "-hide_banner", "-f", "lavfi", "-i", "testsrc2=size=128x128:rate=30:duration=0.1",
+                "-c:v", "libx264", "-x264-params", "zzznotreal=1", "-frames:v", "2",
+                "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null"
+            },
+            durationSeconds: 0.1, progress: null, stage: "olcum", spanFrom: 0.0, spanTo: 1.0,
+            ct: CancellationToken.None);
+
+        Assert.Equal(0, outcome.ExitCode);
+        Assert.Contains(outcome.DroppedOptions, line => line.Contains("zzznotreal"));
+    }
+}
