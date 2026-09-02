@@ -155,17 +155,40 @@ public sealed class PlanCalculatorProbeTests
     }
 
     /// <summary>
-    /// Ucuncu halka ve asil iddia: bekleyen taraf arayuz is parcacigi. Pencere gercek,
-    /// yol gercek (<c>LoadWithoutProbing</c> -> <c>ApplyLoaded</c> -> <c>Recalculate</c>);
-    /// yalniz ffmpeg'in yerinde bekleyen bir taklit duruyor.
+    /// Ucuncu halka ve asil iddia: bekleyen taraf arayuz is parcacigiydi. Bu yolun
+    /// duzeltmeden onceki hali <c>docs/olcumler/ui-yoklama-donmasi.md</c>'de tabloda;
+    /// bugunku hali <see cref="TheWindowThreadNoLongerWaitsForTheProbe"/>. Ayni olcunun
+    /// iki yonu ayni dosyada durmasin diye eski surumu burada tutulmuyor: duzeltme geri
+    /// alindiginda kirilan olcu asagidakidir.
+    /// </summary>
+
+    // --- K2 ve K4: duzeltmenin olculeri ---
+
+    /// <summary>
+    /// Hicbir kodlayici olculmemis diyen yetenek nesnesi. <see cref="PlanCalculator"/> bunu
+    /// gorunce "donanim yok" dememeli, "heniz olculmedi" demeli.
+    /// </summary>
+    private sealed class UnmeasuredAvailability : IEncoderAvailability, IHdr10EncoderAvailability, IEncoderMeasurementState
+    {
+        public bool HasEncoder(string name) => true;
+        public bool WorksAsEncoder(string codec) => false;
+        public string? Hdr10PixelFormat(string codec) => null;
+        public bool IsMeasured(string codec) => false;
+        public bool IsHdr10Measured(string codec) => false;
+    }
+
+    /// <summary>
+    /// K2. Yoklama 400 ms suruyor, arayuz beklemiyor. Olctugu sey onbellegin varligi degil
+    /// arayuz is parcaciginin gecen suresi: yoklama arka plana alinmazsa bu sure yoklama
+    /// suresinin altina inemez.
     /// </summary>
     [Fact]
-    public void TheWindowThreadWaitsWhileTheProbesRun()
+    public void TheWindowThreadNoLongerWaitsForTheProbe()
     {
-        var delay = TimeSpan.FromMilliseconds(20);
+        var delay = TimeSpan.FromMilliseconds(400);
         var availability = new RecordingAvailability(delay);
 
-        var (elapsed, calls) = OnWindow(availability, window =>
+        var (elapsed, _) = OnWindow(availability, window =>
         {
             var clock = Stopwatch.StartNew();
             window.LoadWithoutProbing(HdrSource.FilePath, HdrSource);
@@ -173,41 +196,226 @@ public sealed class PlanCalculatorProbeTests
             return clock.Elapsed;
         });
 
-        Assert.True(calls > 0, "arayuz yolu yetenek nesnesine hic sormadi");
-        Assert.True(
-            elapsed >= delay * (calls - 1),
-            $"arayuz is parcacigi {elapsed.TotalMilliseconds} ms bekledi, {calls} yoklama");
+        Assert.True(elapsed < delay, $"arayuz is parcacigi {elapsed.TotalMilliseconds} ms bekledi, tek yoklama {delay.TotalMilliseconds} ms");
     }
 
-    // --- K4: tekrar sayisi ---
-
     /// <summary>
-    /// N kez yeniden hesap, yoklama sayisi N ile buyuyor mu. Olctugu sey arayuzun bekleyip
-    /// beklemedigi: yetenek nesnesi surec dogurmayan bir taklit, onbellegi yok, dolayisiyla
-    /// sayilar dogrudan arayuzun kac kez yoklamayi bekledigini veriyor.
+    /// K4. N kez yeniden hesap, yoklama sayisi N ile buyumuyor. Yetenek nesnesinin kendi
+    /// onbellegi yok; sayilan sey gecidin gercek yoklamaya kac kez gittigi. Olcu T94
+    /// oncesine (onbellekli) de sonrasina (onbelleksiz) de anlamli, cunku onbellegi degil
+    /// arayuzun bekleyip beklemedigini pinliyor.
+    ///
+    /// Ust sinir sabit ve N'den bagimsiz: en cok 16 anahtar (8 kodlayici x works/hdr10)
+    /// x <c>MaxAttempts</c>. Coalescing olmasa on tur 160 yoklama ederdi.
     /// </summary>
     [Fact]
-    public void EveryRecalculateRepeatsTheProbes()
+    public void RepeatedRecalculatesDoNotRepeatTheProbe()
     {
-        const int rounds = 4;
+        const int rounds = 10;
+        const int keys = 16;
         var availability = new RecordingAvailability(TimeSpan.Zero);
 
-        var (perRound, _) = OnWindow(availability, window =>
+        var (counts, _) = OnWindow(availability, window =>
         {
-            var counts = new List<int>();
-            var before = 0;
+            var perRound = new List<int>();
             for (var i = 0; i < rounds; i++)
             {
                 window.LoadWithoutProbing(HdrSource.FilePath, HdrSource);
-                var now = availability.Calls.Count;
-                counts.Add(now - before);
-                before = now;
+                Settle(window);
+                perRound.Add(availability.Calls.Count);
             }
-            return counts;
+            return perRound;
         });
 
-        Assert.Equal(rounds, perRound.Count);
-        Assert.All(perRound, c => Assert.True(c > 0, "bir turda hic yoklama olmadi"));
+        var trace = string.Join(", ", counts);
+        Assert.Equal(rounds, counts.Count);
+
+        Assert.True(counts[^1] <= keys * MainWindow.DeferredEncoderAvailability.MaxAttempts,
+            $"yoklama sayisi sabitle sinirli degil: {trace}");
+        Assert.True(counts[^1] < rounds * 2, $"yoklama sayisi tur sayisiyla buyuyor: {trace}");
+        Assert.True(counts[^1] - counts[^2] <= 2, $"son turda hala yeni yoklama var: {trace}");
+    }
+
+
+    /// <summary>
+    /// K3, hizli yol. Hicbir aday olculmemisken cevap "donanim yok" degil "heniz
+    /// olculmedi": tarama ilk adayda duruyor, yazilim yedegine dusmuyor ve plan
+    /// <c>HardwareNotMeasured</c> ile isaretleniyor. Isaret olmasa
+    /// arayuz gecici bir cevabi kesin cevap gibi gosterirdi.
+    /// </summary>
+    [Fact]
+    public void AnUnmeasuredFastPathDoesNotBecomeANoHardwareVerdict()
+    {
+        var unmeasured = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new UnmeasuredAvailability());
+        var measuredFailure = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new RecordingAvailability(TimeSpan.Zero));
+
+        Assert.True(unmeasured.HardwareNotMeasured);
+        Assert.Equal("av1_nvenc", unmeasured.Plan.Codec);
+
+        Assert.False(measuredFailure.HardwareNotMeasured);
+        Assert.Equal("libx265", measuredFailure.Plan.Codec);
+    }
+
+    /// <summary>
+    /// K2'nin dorduncu yasagi. Yerlesmeyen yoklama olcum sayilmiyor: <c>MaxAttempts</c>
+    /// kadar deneniyor, sonrasinda deneme duruyor ama cevap <b>bilinmeyen</b> kaliyor ve
+    /// <c>Unsettled</c> ile arayuze tasiniyor. Yerlesmeyeni "olculdu" saymak, oldurulmus bir
+    /// denemeyi kalici "bu kodlayici 10 bit tasiyamiyor" kararina cevirmek olurdu — T94'un
+    /// kaldirdigi kusurun aynisi. Ikinci iddia sonsuz dongunun yoklugu: uctan fazla soru,
+    /// ikiden fazla yoklama dogurmuyor.
+    /// </summary>
+    [Fact]
+    public void AnUnsettledProbeIsNeverPromotedToAMeasurement()
+    {
+        var attempts = MainWindow.DeferredEncoderAvailability.MaxAttempts;
+        var slow = new RecordingAvailability(TimeSpan.FromMilliseconds(MainWindow.DeferredEncoderAvailability.UnsettledProbeMs + 300));
+        var gate = new MainWindow.DeferredEncoderAvailability(slow, () => { });
+
+        for (var i = 0; i < attempts + 1; i++)
+        {
+            Assert.False(gate.IsMeasured("av1_nvenc"));
+            var clock = Stopwatch.StartNew();
+            while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(10);
+        }
+
+        Assert.False(gate.IsMeasured("av1_nvenc"));
+        Assert.True(gate.Unsettled);
+        Assert.Equal(attempts, gate.Probes);
+    }
+
+    /// <summary>
+    /// Yerlesen yoklama olcum sayiliyor: ayni soru ikinci kez gercek yoklamaya gitmiyor
+    /// ve cevap okunabiliyor. <see cref="AnUnsettledProbeIsNeverPromotedToAMeasurement"/>
+    /// ile birlikte gecidin iki yonunu de pinliyor.
+    /// </summary>
+    [Fact]
+    public void ASettledProbeIsReadWithoutSpawningAgain()
+    {
+        var fast = new RecordingAvailability(TimeSpan.Zero, codec => codec == "av1_nvenc");
+        var gate = new MainWindow.DeferredEncoderAvailability(fast, () => { });
+
+        Assert.False(gate.IsMeasured("av1_nvenc"));
+        var clock = Stopwatch.StartNew();
+        while (gate.Pending && clock.ElapsedMilliseconds < 5000) Thread.Sleep(5);
+
+        Assert.True(gate.IsMeasured("av1_nvenc"));
+        Assert.True(gate.WorksAsEncoder("av1_nvenc"));
+        Assert.False(gate.Unsettled);
+        Assert.Equal(1, gate.Probes);
+    }
+
+    /// <summary>Arka plandaki yoklamalar bitene kadar bekler; kilitlenmemek icin ustten sinirli.</summary>
+    private static void Settle(MainWindow window)
+    {
+        var clock = Stopwatch.StartNew();
+        while (window.PlanProbePending && clock.ElapsedMilliseconds < 5000) Thread.Sleep(5);
+    }
+
+    // --- K3: ara durum yalan soylemiyor ---
+
+    /// <summary>
+    /// Olculmemis kodlayici "10 bit tasiyamiyor" sayilmiyor: ilke degismiyor, ton esleme
+    /// suzgeci kurulmuyor, cevap "heniz olculmedi" olarak isaretleniyor.
+    /// </summary>
+    [Fact]
+    public void AnUnmeasuredEncoderDoesNotBecomeATonemapVerdict()
+    {
+        var unmeasured = HdrResolver.Resolve(HdrSource, HdrPolicy.Preserve, "libsvtav1", new UnmeasuredAvailability());
+
+        Assert.False(unmeasured.PolicyChanged);
+        Assert.True(unmeasured.NotMeasured);
+        Assert.Null(unmeasured.VideoFilter);
+    }
+
+    /// <summary>
+    /// Ayni iddia donanim kodlayicisi icin. Yazilim kodlayicisi <c>WorksAsEncoder</c>'a,
+    /// donanim kodlayicisi <c>Hdr10PixelFormat</c>'a soruyor — iki ayri dal, iki ayri olcu.
+    /// K6'nin ilk turunda ikinci dal olcusuzdu: mutasyon kirilmadi, bu olcu o yuzden var.
+    /// </summary>
+    [Fact]
+    public void AnUnmeasuredHardwareEncoderDoesNotBecomeATonemapVerdict()
+    {
+        var unmeasured = HdrResolver.Resolve(HdrSource, HdrPolicy.Preserve, "av1_nvenc", new UnmeasuredAvailability());
+        var measuredFailure = HdrResolver.Resolve(HdrSource, HdrPolicy.Preserve, "av1_nvenc", new RecordingAvailability(TimeSpan.Zero));
+
+        Assert.True(unmeasured.NotMeasured);
+        Assert.False(unmeasured.PolicyChanged);
+        Assert.Null(unmeasured.VideoFilter);
+
+        Assert.False(measuredFailure.NotMeasured);
+        Assert.True(measuredFailure.PolicyChanged);
+        Assert.Equal(HdrResolver.TonemapFilter, measuredFailure.VideoFilter);
+    }
+
+    /// <summary>
+    /// Olculmus ve gercekten calismayan kodlayici hala ton eslemeye dusuyor: duzeltme
+    /// dogru negatifleri kaldirmadi.
+    /// </summary>
+    [Fact]
+    public void AMeasuredFailureStillTonemaps()
+    {
+        var measuredFailure = new RecordingAvailability(TimeSpan.Zero);
+
+        var resolved = HdrResolver.Resolve(HdrSource, HdrPolicy.Preserve, "libsvtav1", measuredFailure);
+
+        Assert.True(resolved.PolicyChanged);
+        Assert.False(resolved.NotMeasured);
+        Assert.Equal(HdrResolver.TonemapFilter, resolved.VideoFilter);
+    }
+
+    /// <summary>
+    /// T125'in yakaladigi urun kusuru, koda cevrilmis hali: ayni dosya, ayni kodlayici,
+    /// tek degisen yoklamanin cevabi — cikti HDR ile SDR arasinda gidip geliyor. Kodlayici
+    /// secimi degismiyor cunku o yol <c>HasEncoder</c>'a bakiyor.
+    /// </summary>
+    [Fact]
+    public void TheSameSourceFlipsBetweenHdrAndSdrWhenOnlyTheProbeAnswerChanges()
+    {
+        var options = new PlanOptions
+        {
+            TargetMb = 16,
+            Codec = CodecPreference.MaxCompression,
+            SpeedMode = SpeedMode.Quality,
+            HdrPolicy = HdrPolicy.Preserve
+        };
+
+        var probePassed = HdrResolver.Resolve(HdrSource, options.HdrPolicy, "libsvtav1",
+            new RecordingAvailability(TimeSpan.Zero, codec => codec == "libsvtav1"));
+        var probeKilled = HdrResolver.Resolve(HdrSource, options.HdrPolicy, "libsvtav1",
+            new RecordingAvailability(TimeSpan.Zero));
+
+        Assert.Equal("yuv420p10le", probePassed.PixelFormat);
+        Assert.Equal("yuv420p", probeKilled.PixelFormat);
+        Assert.True(probeKilled.PolicyChanged);
+
+        var unmeasured = HdrResolver.Resolve(HdrSource, options.HdrPolicy, "libsvtav1", new UnmeasuredAvailability());
+        Assert.Equal("yuv420p10le", unmeasured.PixelFormat);
+        Assert.True(unmeasured.NotMeasured);
+    }
+
+    /// <summary>
+    /// Yoklamanin gercek suresi. T125'in raporundaki 4 s'lik butce bu agacta yok
+    /// (<c>EncoderCapabilities.ProbeKillMs = 15000</c>); asagidaki sayilar butcenin
+    /// neresinde durdugumuzu soyluyor.
+    /// </summary>
+    [Fact]
+    public void TheRealSoftwareProbeDurationIsMeasured()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+        if (!MachineIsQuiet(nameof(PlanCalculatorProbeTests))) return;
+
+        var durations = new List<long>();
+        for (var i = 0; i < 8; i++)
+        {
+            var capabilities = FreshCapabilities();
+            var clock = Stopwatch.StartNew();
+            capabilities.Probe("libsvtav1");
+            clock.Stop();
+            durations.Add(clock.ElapsedMilliseconds);
+        }
+
+        WriteEvidence($"libsvtav1 yoklamasi 8 tekrar: {string.Join(", ", durations)} ms");
+        Assert.All(durations, d => Assert.True(d >= 0));
     }
 
     // --- K1: gercek ffmpeg ---
@@ -221,6 +429,7 @@ public sealed class PlanCalculatorProbeTests
     public void TheRealFastPathSpawnsFfmpegProcesses()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
+        if (!MachineIsQuiet(nameof(PlanCalculatorProbeTests))) return;
 
         var measured = MeasureRealSpawns(HdrSource);
 
@@ -236,6 +445,7 @@ public sealed class PlanCalculatorProbeTests
     public void TheRealSdrPathSpawnsFewerProcessesThanHdr()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
+        if (!MachineIsQuiet(nameof(PlanCalculatorProbeTests))) return;
 
         var sdr = MeasureRealSpawns(SdrSource);
         var hdr = MeasureRealSpawns(HdrSource);
@@ -255,6 +465,7 @@ public sealed class PlanCalculatorProbeTests
     public void TheWarmedStartupStillLeavesTheHdrProbeOnTheCaller()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
+        if (!MachineIsQuiet(nameof(PlanCalculatorProbeTests))) return;
 
         var capabilities = FreshCapabilities();
         var warm = MeasureSpawns(() => PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, capabilities));
@@ -285,6 +496,35 @@ public sealed class PlanCalculatorProbeTests
     /// bir olcu varsa sayi yukari kayar, bu yuzden sifir olmasi gereken durumlar ayrica
     /// pinlenmistir.
     /// </summary>
+    /// <summary>
+    /// Sayac PID yoklamasiyla calisiyor, dolayisiyla o sirada makinede kosan baska bir
+    /// ffmpeg de sayiya girer. Duzeltmeden sonra bunun en buyuk kaynagi olcunun kendisi
+    /// oldu: arka plana alinan yoklamalar test sinirini asip bir sonraki olcumun icinde
+    /// bitiyor. Bu yuzden her olcumden once makine sessizlesene kadar bekleniyor.
+    /// </summary>
+    private static bool WaitForQuietFfmpeg()
+    {
+        var clock = Stopwatch.StartNew();
+        while (clock.ElapsedMilliseconds < 5000)
+        {
+            if (!RunningFfmpegPids(DateTime.MinValue).Any()) return true;
+            Thread.Sleep(25);
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Surec sayan olculer yalniz sessiz makinede anlamli. Makinede baska bir ffmpeg
+    /// kosuyorsa olcu kirmizi vermez, <b>atlanir</b> ve atlandigi kanit dosyasina yazilir:
+    /// yanlis kirmizi, olculmemis olmaktan daha kotudur.
+    /// </summary>
+    private static bool MachineIsQuiet(string test)
+    {
+        if (WaitForQuietFfmpeg()) return true;
+        WriteEvidence($"{test}: atlandi, makinede baska ffmpeg kosuyor");
+        return false;
+    }
+
     private static (int Processes, long Ms) MeasureSpawns(Action work)
     {
         var start = DateTime.Now;

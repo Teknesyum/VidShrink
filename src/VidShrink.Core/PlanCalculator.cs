@@ -32,7 +32,31 @@ public readonly record struct FillBand(double LowerMb, double HardFloorMb, doubl
     }
 }
 
-public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice);
+public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice)
+{
+    /// <summary>
+    /// Donanim yoklamasi henuz bitmedi; plandaki kodlayici ve HDR karari gecici. Cagiran
+    /// bu plana bakip "donanim yok" dememeli, olcum gelince yeniden hesap yapmali.
+    /// </summary>
+    public bool HardwareNotMeasured { get; init; }
+}
+
+/// <summary>
+/// Yoklamanin ucuncu durumu: "henuz olculmedi". <see cref="IEncoderAvailability"/> yalniz
+/// evet/hayir soyleyebiliyor ve olculmemis bir kodlayici orada "hayir" gorunuyor; bu, henuz
+/// sorulmamis bir donanimi yokmus gibi gostermek demek. Bu arayuz o ayrimi tasiyor.
+///
+/// Gecici: T129 ayni ayrimi <c>EncoderProbeResult</c> uzerinde aciyor. O is birlestiginde
+/// buradaki temsil oraya devredilir ve bu arayuz kalkar.
+/// </summary>
+public interface IEncoderMeasurementState
+{
+    /// <summary>Kodlayicinin calisip calismadigi olculdu mu.</summary>
+    bool IsMeasured(string codec);
+
+    /// <summary>Kodlayicinin HDR10 piksel bicimi olculdu mu.</summary>
+    bool IsHdr10Measured(string codec);
+}
 
 public enum QualityTargetBound { Matched, AboveSourceCeiling, BelowFloor }
 
@@ -101,6 +125,22 @@ public static class PlanCalculator
 
     public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
     {
+        var probe = new ProbeState();
+        var result = BuildDetailedCore(info, options, profile, availability, probe);
+        return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
+    }
+
+    /// <summary>
+    /// Hesap boyunca "yoklama henuz bitmedi" isaretini tasiyan kap. Cikis noktalari cok
+    /// oldugu icin isaret <c>out</c> ile degil buradan geciriliyor.
+    /// </summary>
+    private sealed class ProbeState
+    {
+        internal bool NotMeasured;
+    }
+
+    private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
+    {
         var complexity = (profile ?? ComplexityProfile.FromSourceBitrate(info)).WithoutSampleContainerBias(info.Width, info.Height);
         var regime = CompressionStrategy.RegimeFor(info.FileSizeMb, options.TargetMb);
         var ratio = CompressionStrategy.Ratio(info.FileSizeMb, options.TargetMb);
@@ -112,10 +152,11 @@ public static class PlanCalculator
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
         var fast = options.SpeedMode == SpeedMode.Fast;
-        var codec = fast ? PickFastCodec(preference, availability) : PickCodec(preference, availability);
+        var codec = fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
+        if (hdr.NotMeasured) probe.NotMeasured = true;
 
         if (CanPassThrough(info, options, codec, hdr))
             return PassThroughResult(info, options, complexity, regime, ratio, suggestedPreference, availability, notes);
@@ -781,11 +822,24 @@ public static class PlanCalculator
         return FallbackCodecFor(pref);
     }
 
-    private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability)
+    /// <summary>
+    /// Adaylari sirayla dener. Bir aday <b>henuz olculmemisse</b> tarama orada durur ve o
+    /// aday gecici cevap olarak doner: olculmemis bir donanimi "yok" saymak yanlis olurdu.
+    /// Isaret <paramref name="probe"/> ile yukari tasinir, olcum gelince hesap yenilenir.
+    /// </summary>
+    private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
+        var state = availability as IEncoderMeasurementState;
         foreach (var candidate in FastHardwareOrder)
+        {
+            if (state is not null && !state.IsMeasured(candidate))
+            {
+                probe.NotMeasured = true;
+                return candidate;
+            }
             if (availability.WorksAsEncoder(candidate)) return candidate;
+        }
         return FallbackCodecFor(pref);
     }
 
