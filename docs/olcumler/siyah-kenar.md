@@ -194,6 +194,43 @@ Bekliyor.
 
 ## K5 — Zarar tarafı
 
+Kazanç tarafı tek başına kararı vermez: kırpma yanlış tetiklenirse görüntü
+kalıcı olarak kesilir ve bu, birkaç puanlık VMAF kazancıyla telafi edilebilir
+bir şey değil. Üç risk ayrı ölçüldü — (a) kenarsız kaynakta `cropdetect`'in
+hiç kırpma önermemesi gerekiyor, (b) bant genişliği sahne içinde değişen
+kaynakta tek bir kırpma kutusu yanlış olmak zorunda, (c) yanlış kırpma
+gerçekten uygulanırsa bedeli ne.
+
+(c)'deki hatalı kırpmalar uydurulmuş değil: `limit=64` taramasında
+`cropdetect`'in NA ve NB üzerinde **kendi önerdiği** kutulardır.
+
 <!-- BETIK-K5-BASLANGIC -->
 Bekliyor.
 <!-- BETIK-K5-BITIS -->
+
+## Bu ölçümün kapsamadıkları
+
+- **Kaynak sınıfı üretilmiş, bulunmuş değil.** Bantlar `pad` ile konuldu; gerçek
+  bir DVD/Blu-ray aktarımının bandında olan sıkıştırma çınlaması, hafif eğik
+  bant sınırı ve kenar bulanıklığı burada yok. KD ve KE bunun yerine gürültü ve
+  asimetri taşıyor. Gerçek bir letterbox'lı aktarımda `cropdetect`'in davranışı
+  ölçülmedi.
+- **Tek çözünürlük, tek kodek, tek süre.** 1920x1080, 60 fps, libx264 2 geçiş,
+  20 saniye. 4K, 24 fps, libx265 ve uzun klip ölçülmedi.
+- **Ses yok.** Bütün koşumlar sessiz; teslim boyutu eşitlemesi yalnız video
+  akışı üzerinden yapıldı.
+- **Oynatma tarafı ölçülmedi.** Kırpılmış dosyanın en-boy oranı değişiyor;
+  oynatıcının kendi siyah bandını koyması, ekranı doldurma davranışı ve
+  kullanıcının gördüğü görüntü büyüklüğü bu belgenin dışında.
+- **Yoklamanın kendi kodlama maliyeti yok.** Ölçülen süre yalnız `cropdetect`
+  geçişidir; VidShrink'in mevcut yoklamasına eklendiğinde paylaşılan çözme
+  maliyeti bu sayıdan düşük olabilir.
+- **Kazançlar gerçek bant sınırıyla ölçüldü.** Kırpma kolunun `crop` değeri
+  kaynağın bilinen sınırından geldi, `cropdetect`'in önerisinden değil. Bu
+  bilerek seçildi: K3 kırpmanın *tavanını* ölçüyor, tespitin başarısını değil.
+  Tespit ayrı ölçüldü (K2) ve ikisi hükümde birleştirildi. Uçtan uca bir boru
+  hattının (yokla → kırp → kodla) gerçek kazancı bu belgede yok.
+- **Havuzda letterbox'lı kaynak yoktu.** `.calisma/kaynak` altındaki üç ortak
+  parçanın üçü de tam kare. Sınıf bu yüzden üretildi. Ölçüm ortamının boşluğu
+  olarak kayda değer: siyah kenar üzerine ileride yapılacak her ölçüm aynı
+  üretim adımını tekrarlamak zorunda kalacak.
