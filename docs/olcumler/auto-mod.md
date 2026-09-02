@@ -897,3 +897,14 @@ cümlenin kaynağı bu oldu.
 (`sifir`, `:24`) kaldı, o da rapora girmiyor. Bu maddenin "hâlâ duruyor" cümlesi
 düzeltmeden sonra güncellenmemişti; **kusur kapandı, cümle geç kaldı.**
 
+
+**7. Bu belgeye satır numarasıyla yapılan dış atıflar T111'den sonra kaymış
+durumda.** T112 denetçisi bir künye borcu bırakmıştı: `docs/inceleme/handbrake-motoru.md`
+iki kez `auto-mod.md:209`'a atıf veriyor, oysa "auto … libsvtav1 preset 6" olgusu
+ile `HandBrakeCLI` komutu iki ayrı satırda. **Bugünkü doğru künyeler: preset 6
+satırı `:223`, HandBrakeCLI komutu `:225`.** T111 bu belgeye yaklaşık 380 satır
+ekledi; aynı sebeple `handbrake-motoru.md`'nin diğer atıfları (`:202-204`,
+`:214,216`, `:250`, `:283-287`, `:289`) de artık başka satırları gösteriyor.
+Düzeltme `docs/inceleme/handbrake-motoru.md`'de yapılmalı; o dosya T111'in
+`owns`'ında değil, bu yüzden **düzeltilmedi**, künyenin bugünkü doğrusu burada
+kayda geçiyor.
