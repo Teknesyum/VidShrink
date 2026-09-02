@@ -172,12 +172,13 @@ Yukarıdaki ızgaranın yapısal boşluğu: dört mutasyondan yalnız biri (iddi
 bandı yaşatıp yeni bandı öldürüyor. İddia 1'in mutasyonu **tabanı** kırıyor,
 iddia 4'ünki hem eski hem yeni tavanı aşıyor. Yani `15.000 → 5.000` ve `500 → 250`
 daralmalarının **daralma olduğunu** hiçbir ölçü tutmuyordu. İkisi için de "eski
-bantta yaşayan, yeni bantta ölen" birer mutasyon arandı.
+bantta yaşayan, yeni bantta ölen" birer mutasyon arandı; tur 3'te ikisi de bulundu.
 
 | ölçü | mutasyon | eski bant | eski bantla | yeni bant | yeni bantla |
 |---|---|---|---|---|---|
 | 4 `UpdaterTests.cs:316` | `HttpClient { Timeout = TimeSpan.FromMilliseconds(1150) }`, `ManifestTimeout` sabiti 800'de bırakıldı | 1300 ms | **yaşadı** — 1160 ms | 1050 ms | **kırıldı** — 1159 ms > 1050 ms |
-| 1 `PerformanceCheckTests.cs:757` | (a) yakım `durationMs * 5`; (b) `burner.Join()` sonrası `Thread.Sleep(6000)` | 15.000 ms | **ölçülemedi** | 5.000 ms | **ölçülemedi** |
+| 1 `PerformanceCheckTests.cs:757` | (a) yakım `durationMs * 5` | 15.000 ms | **yaşadı** — 7508 ms | 5.000 ms | **kırıldı** — 7526 ms > 5.000 ms |
+| 1 `PerformanceCheckTests.cs:757` | (b) `burner.Join()` sonrası `Thread.Sleep(6000)` | 15.000 ms | **yaşadı** — 7521 ms | 5.000 ms | **kırıldı** — 7511 ms > 5.000 ms |
 
 Her mutasyon `dotnet build -c Release --no-incremental` ile derlendi; test
 koşumlarında `--no-build` kullanılmadı. Kayıtlar `.calisma/t132/t2/` altında ve
@@ -188,51 +189,54 @@ eski-bant.txt:25:  Başarılı VidShrink.Tests.UpdaterTests.AnUnreachableSourceI
 eski-bant.txt:27:   ağsız manifest denemesi: 1160 ms (zaman aşımı 800 ms, tavan 1300 ms)
 iddia4-yeni-bant.txt:27:  Başarısız VidShrink.Tests.UpdaterTests.AnUnreachableSourceIsGivenUpWithinTheManifestTimeout [2 s]
 iddia4-yeni-bant.txt:29:   ağsız açılış zaman aşımını aştı: 1159 ms > 1050 ms
-eski-bant.txt:21:   [atlandi] ... (duzeltme=9.232x)          <- mutasyon (a), :757 atlandı
-iddia1-eski-bant.txt:22:   [atlandi] ... (duzeltme=8.005x)   <- mutasyon (b), :757 atlandı
-iddia1-mutasyonsuz.txt:22:   [atlandi] ... (duzeltme=12x)    <- mutasyonsuz, :757 atlandı
+t3/a-eski-bant.txt:  Başarılı ...IslemciZamaniSayaciDogruOkuyorMu [2 m 13 s]      <- (a) eski bant, yakim-duvar=7508ms
+t3/a-yeni-bant.txt:  Assert.InRange() Failure  Range: (1500 - 5000)  Actual: 7526 <- (a) yeni bant
+t3/b-eski-bant.txt:  Başarılı ...IslemciZamaniSayaciDogruOkuyorMu [2 m 19 s]      <- (b) eski bant, yakim-duvar=7521ms
+t3/b-yeni-bant.txt:  Assert.InRange() Failure  Range: (1500 - 5000)  Actual: 7511 <- (b) yeni bant
 ```
 
 **İddia 4 pimlendi.** 1150 ms'lik zaman aşımı eski tavanın altında, yeni tavanın
 üstünde kalıyor; daralma artık bir ölçüyle tutuluyor.
 
-**İddia 1 pimlenemedi, sebebi mutasyon değil testin kendi kapısı.** `:757`'den önce
-şu satır var:
+**İddia 1 pimlendi.** İki mutasyon da `saat`i ~7500 ms'ye çıkarıyor: eski tavan 15.000
+bunu geçiriyor, yeni tavan 5.000 öldürüyor. Daralmanın daralma olduğu artık iki ayrı
+mutasyonla tutuluyor. Dört kol da `dotnet build -c Release --no-incremental` ile
+derlendi, `--no-build` kullanılmadı; kayıtlar
+`.calisma/t132/t3/{a,b}-{eski,yeni}-bant.txt`.
 
-```
-if (!guvenilir) Atlandi("bu makinenin islemci zamani sayaci ... guvenilir okumadi");
-```
+### Tur 2'nin `Atlandi` gerekçesi yanlıştı — geri çekiliyor
 
-`guvenilir`, `CalibrateCpuClock`in döndürdüğü düzeltme katsayısının
-`PerformanceCheck.CpuAccountingTolerance` içinde kalmasını istiyor. Bu turdaki üç
-koşumda katsayı **9,232 / 8,005 / 12,0** okundu — üçü de toleransın dışında, yani
-test `Atlandi` dalına giriyor ve `:757` hiç çalışmıyor. Aynı sırada makine yükü
-`Win32_Processor` ortalamasıyla %51-79 ölçüldü (başka ajan koşumları ve bir oyun
-süreci açıktı). Katsayının neden bu kadar yüksek okunduğu **izole edilmedi**; yükle
-birlikte gözlendi, yükün sebep olduğu ölçülmedi.
+Tur 2 bu daralmayı "pimlenemedi" diye kapatmış ve sebebini şuna bağlamıştı: `:757`'den
+önceki `if (!guvenilir) Atlandi(...)` bir kapıdır, yüklü makinede kapanır, `:757` hiç
+koşmaz. **Bu yanlıştı.** `Atlandi` bir `private void` günlükçüdür
+(`PerformanceCheckTests.cs:48-52`): `return` yok, `throw` yok, `Skip` yok; çağrı
+yerinde de `return` yok, `:753-757` düz akış. `:757` Windows'ta **her** koşumda
+değerlendiriliyor.
 
-| koşum | üretim | okunan katsayı | `:757` değerlendirildi mi |
+Bu turun dört koşumu bunu doğrudan gösteriyor: dördünde de `[atlandi]` satırı basıldı
+**ve** `:757` yine de değerlendirildi; iki kolunda kırmızı verdi.
+
+| koşum | okunan katsayı | `[atlandi]` basıldı mı | `:757` değerlendirildi mi |
 |---|---|---|---|
-| mutasyon (a) `durationMs * 5` | değişik | 9,232 | hayır, atlandı |
-| mutasyon (b) `Thread.Sleep(6000)` | değişik | 8,005 | hayır, atlandı |
-| denetim koşumu | **değişmemiş** | 12,0 | hayır, atlandı |
+| (a) yeni bant | 6,155 | evet | **evet** — kırıldı, 7526 ms |
+| (a) eski bant | 16,552 | evet | **evet** — geçti, 7508 ms |
+| (b) eski bant | 5,662 | evet | **evet** — geçti, 7521 ms |
+| (b) yeni bant | 12,0 | evet | **evet** — kırıldı, 7511 ms |
 
-Kritik olan üçüncü satır: bandı gizleyen şey mutasyon değil, **yüklü makinede
-kapının kapanması**. Bu yüzden bu turda iddia 1 için "eski bantta yaşayan, yeni
-bantta ölen" bir mutasyon **üretilemedi** — ve üretilemediği ölçüldü, tahmin
-edilmedi. Boş makinede (b) mutasyonunun ~7500 ms üretip eski tavanı (15.000) geçip
-yeni tavanda (5.000) öleceği **beklenir**, ama bu beklenti bu turda koşulmadı;
-kanıt diye yazılmıyor.
+Tur 2'nin bu yanlış olgudan türettiği iki sonuç geri çekildi ve belgeden **çıkarıldı**;
+düzenlenmiş halleri de kalmadı. Ne söylüyorlardı ve yerlerine ne geçti:
 
-İki sonuç bundan çıkıyor:
+- "`:757`'nin bandı yalnız sayacın güvenilir okuduğu koşumlarda değerlendiriliyor"
+  → **yanlış.** Windows'ta her koşumda değerlendiriliyor; kapı diye anlatılan şey yok.
+- "K2'deki iddia 1 dağılımı kapının önüne konmuş geçici bir ölçümden geliyordu, bandın
+  değerlendirildiğinin kanıtı değildir" → **dayanağı düştü.** Kapı olmadığı için o
+  dağılım doğrudan bandın değerlendirildiği büyüklüğün dağılımıdır; K2'nin ve K4'ün
+  daraltma gerekçesi olduğu gibi duruyor.
 
-1. `:757`'nin bandı yalnız işlemci zamanı sayacının güvenilir okuduğu — yani makinenin
-   boş olduğu — koşumlarda değerlendiriliyor. Duvar saati bandının düşmesini
-   bekleyeceğimiz durum (yüklü koşucu) tam da bandın hiç bakılmadığı durum.
-2. K2'deki iddia 1 dağılımı (boş 1500/1500/1500/1500) kapının **önüne** konmuş geçici
-   bir ölçümden geliyordu; o sayılar `saat.ElapsedMilliseconds`in dağılımıdır, bandın
-   değerlendirildiğinin kanıtı değildir. Daraltma hâlâ ölçülen dağılıma dayanıyor ve
-   hiçbir yönde genişletme değil, ama "mutasyonla tutuluyor" denemez.
+Geriye tek gözlem kalıyor: katsayı bu makinede toleransın dışında okunuyor (bu turda
+5,662 - 16,552). Sebebi hâlâ **izole edilmedi**; yükle birlikte gözlendi, yükün sebep
+olduğu ölçülmedi. Kapı olmadığı ölçüldüğü için bu artık bandı gizleyen bir şey değil,
+ayrı bir gözlem.
 
 ## K4 — Bant değişiklikleri ve yönü
 
