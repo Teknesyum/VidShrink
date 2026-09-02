@@ -800,10 +800,19 @@ public sealed class FfmpegArgumentsTests
     }
 
     /// <summary>
-    /// Altinci sayi, Floor, yuk tasimiyor ve tasiyamaz: kipirti negatif olmadigi ve Slope
-    /// pozitif oldugu icin <c>Offset + Slope * kipirti</c> hicbir zaman Offset'in altina
-    /// inmez, alt kiskaca ulasilmaz. Iki yone de oynatmak bolusu degistirmiyor. Bu bir
-    /// test acigi degil, esdeger mutasyon; iddia olarak degil olcu olarak duruyor.
+    /// Altinci sayi, Floor, <b>kayitli kuralda erisilemez</b>: kipirti negatif olmadigi ve
+    /// Slope pozitif oldugu icin <c>Offset + Slope * kipirti</c> hicbir zaman Offset'in
+    /// (0,08) altina inmez, yani 0,05'lik alt kiskac hicbir girdide dokunmuyor. Bu yuzden
+    /// 0,05'i az yukari ya da az asagi oynatmak bolusu degistirmiyor - esdeger mutasyon,
+    /// test acigi degil.
+    ///
+    /// <b>Bu "Floor yuk tasiyamaz" demek degildir.</b> Floor Offset'in ustune cikarsa
+    /// bolus degisir; siniri
+    /// <see cref="Kayitli_kuralin_alt_ucu_bolusu_erisilebilir_ucta_degisiyor"/> olcuyor.
+    /// Sabitin kendisini koruyan olcu de bu degil,
+    /// <see cref="Az_bolme_duzeltmesi_olculdugu_kuralda_kalir"/>: kayitli kuralin kesim
+    /// listesini <c>ThresholdRule.Measured</c>inkiyle karsilastirdigi icin Offset'i asan
+    /// bir Floor'u kizartir.
     /// </summary>
     [Fact]
     public void Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor()
@@ -815,6 +824,30 @@ public sealed class FfmpegArgumentsTests
             Assert.Equal(temel, KuralKesimleri(k with { Floor = 0.06 }, adaylar));
             Assert.Equal(temel, KuralKesimleri(k with { Floor = 0.04 }, adaylar));
         }
+    }
+
+    /// <summary>
+    /// Floor'un erisilemezligi kuralin degil <b>kaynagin</b> ozelligi. Durgun adaylarda
+    /// esik kiskacin ortasinda duruyor (Offset + Slope * kipirti, yaklasik 0,109), oradan
+    /// alt kiskaci 0,12'ye cikarmak butun kesimleri siliyor. Hareketli adaylarda kipirti
+    /// yuksek oldugu icin esik zaten <b>Ceiling</b>'e (0,15) yapisik, alt kiskac orada
+    /// hicbir degerde baglamiyor - 0,12 hicbir seyi degistirmiyor.
+    ///
+    /// Yani "Floor yuk tasimiyor" cumlesi yalniz kayitli 0,05 icin ve yalniz Offset'in
+    /// altinda kaldigi surece dogru; sabitin kendisi olu degil.
+    /// </summary>
+    [Fact]
+    public void Kayitli_kuralin_alt_ucu_bolusu_erisilebilir_ucta_degisiyor()
+    {
+        var k = FfmpegArguments.SceneMapRuleOfRecord;
+        var yuksekTaban = k with { Floor = 0.12 };
+
+        Assert.NotEmpty(KuralKesimleri(k, DurgunAdaylar));
+        Assert.Empty(KuralKesimleri(yuksekTaban, DurgunAdaylar));
+
+        Assert.Equal(
+            KuralKesimleri(k, HareketliAdaylar),
+            KuralKesimleri(yuksekTaban, HareketliAdaylar));
     }
 
     /// <summary>

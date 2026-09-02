@@ -123,7 +123,8 @@ public static class FfmpegArguments
     // The tight peak's size benefit survives only at the lowest ratio: at 2.6 the moving clip
     // gives 1.0351 tight against 1.1116 at 1.10, but at 4.636 the three peaks are 1.0305 /
     // 1.0305 / 1.0380, so opening there costs 0.7% of size and buys 7.385 p10. Across all 60
-    // cells 34 overshoot the video budget (moving 30/30, still 4/30) and in 12 of the 20 rows
+    // cells 34 overshoot the video budget (moving 29/30, still 5/30 - the one moving cell that
+    // stays under is av1_nvenc at ratio 16.000 with the tight peak, 0.9931) and in 12 of the 20 rows
     // the size does not move one way with the peak at all.
     //
     // That agitation rule belongs to the hardware encoders only. A software grid (libx265
@@ -136,8 +137,10 @@ public static class FfmpegArguments
     // result: the value the measurement asks for is content agitation, which PeakRateFactor
     // never receives, and the curve is pinned at five ratios by HardwareRateControlTests
     // (:122-141), which is outside this contract's owns. Per constant - WidePeakFactor:
-    // measured on the software path, unchanged - 1.50 gives the best or equal p10 in three of
-    // the four software rows, the exception being the moving clip at ratio 4.636.
+    // measured on the software path, unchanged - but 1.50 wins only two of the four software
+    // rows (both still-clip rows). On the moving clip 1.02 wins at both ratios, by 0.389 at
+    // 4.636 and by 0.066 at 10.236. The winning peak follows the source, not the ratio, and
+    // PeakRateFactor does not receive that input either - same reason as below.
     // TightPeakFactor, HardwarePeakCeiling,
     // PeakOpensAtFloorRatio, PeakWidestAtFloorRatio: measured, unchanged, and the reason is
     // above. BufferFactor: NOT measured on its own - every cell moved bufsize with the peak,
@@ -266,7 +269,12 @@ public static class FfmpegArguments
     // costs 3.9% more file at the same CRF. HandBrake can afford that because its CRF is an
     // open-ended quality mode; here CRF is a target-landing mode - PlanCalculator's fill policy
     // picks a CRF aimed at the band centre - so a systematic +3.9% eats the band. Measured and
-    // needed, therefore kept. Loosening it to something between 2x and off was not measured.
+    // needed, therefore kept. Loosening it to something between 2x and off WAS measured, on
+    // libx265 at CRF 23 (T108 K5, docs/olcumler/tepe-egrisi.md): the VBV stops binding above
+    // 1.25 - peaks 1.25, 1.50 and 2.00 give a byte-identical file on the moving clip - so there
+    // is no intermediate setting between 2x and off that buys anything; the only real choice is
+    // 1.10 or off. On the still clip CRF 23 lands at 5% of target and the VBV never binds at
+    // all. Not measured on libx264, which is where the two rows above come from.
     public const double CrfVbvPeakFactor = 2.0;
     public const double CrfVbvBufferFactor = 4.0;
 

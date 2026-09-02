@@ -118,9 +118,28 @@ iki kez turetip karsilastiriyor, alanlari yer degistirmis bir kurali da yakalar.
 
 Kuralin alti sayisindan **besi yuk tasiyor** (dusuk kipirtida Offset, Slope,
 NeighbourhoodSeconds, Percentile; yuksek kipirtida Ceiling), her biri iki yonde de
-bolusu degistiriyor. **Floor tasimiyor ve tasiyamaz**: kipirti negatif olmadigi ve Slope
-pozitif oldugu icin `Offset + Slope * kipirti >= 0,08 > 0,05`, alt kiskaca ulasilmaz.
-Esdeger mutasyon, test acigi degil.
+bolusu degistiriyor. **Floor kayitli kuralda erisilemez**, ama tasiyamaz degil: kipirti
+negatif olmadigi ve Slope pozitif oldugu icin `Offset + Slope * kipirti >= 0,08 > 0,05`,
+yani **kayitli** Floor 0,05 alt kiskaca hicbir girdide dokunmuyor. Floor Offset'in
+**ustune** cikarsa bolus degisir, ama **yalnizca bir kaynak sinifinda** — olculdu
+(`Kayitli_kuralin_alt_ucu_bolusu_erisilebilir_ucta_degisiyor`):
+
+| aday sinifi | esigin durdugu yer | `Floor = 0,12` |
+|---|---|---|
+| durgun | kiskacin ortasinda, ~0,109 | butun kesimler siliniyor (liste bosaliyor) |
+| hareketli | zaten Ceiling'e (0,15) yapisik | kesim listesi **degismiyor** |
+
+Yani 0,05'i az oynatmak esdeger mutasyondur, ama sabitin kendisi olu degil; olu olmasi
+kaynaga bagli. Denetimde "kesim listesi bosaldi" bulgusu **durgun** aday sinifi icin
+dogru, hareketli icin degil — cunku orada alt kiskac degil ust kiskac karar veriyor.
+
+Korumayi `Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor` degil,
+`Az_bolme_duzeltmesi_olculdugu_kuralda_kalir` sagliyor: o olcu kayitli kuralin kesim
+listesini `ThresholdRule.Measured`inkiyle karsilastiriyor, yani Offset'i asan bir Floor
+onu kizartir. `Kayitli_kuralin_alt_ucu_bolusu_erisilebilir_ucta_degisiyor` da bu sinirin
+kendisini pimliyor.
+
+*(Tur 1'de "tasimiyor ve tasiyamaz" yaziyordu; ikinci yarisi fazla genisti.)*
 
 NaN sizintisi arandi: uretim kodunda `SceneMap.Threshold`'u okuyan **yok** (yalniz
 `SceneMapTests` ve olcum duzenegi). `Turetilen_haritanin_NaN_esigi_ust_sinira_sizmiyor`
@@ -235,8 +254,18 @@ donanim hiz denetiminin ozelligi.
 Boyut yonu de kaynaga bagli: durgun kaynakta 4,636'da tepeyi acmak dosyayi
 **kucultuyor** (0,9797 sonra 0,9668), 10,236'da buyutuyor (0,9779 sonra 0,9857).
 
-`WidePeakFactor = 1,5` bu dort satirin ucunde en iyi ya da esit p10'u veriyor; tek
-istisna hareketli/4,636. Sabiti degistirmeyi gerektiren bir sonuc cikmadi.
+`WidePeakFactor = 1,5` dort satirin **ikisinde** en iyi p10'u veriyor (durgun/4,636 ve
+durgun/10,236). Diger ikisinde **1,02 kazaniyor**: hareketli/4,636'da 50,6154 karsi
+50,2262 (0,389) ve hareketli/10,236'da 67,7700 karsi 67,7038 (0,066). Yani tablo
+1,5'i degil, "kaynaga gore secilmeli"yi soyluyor.
+
+Sabit yine de degismedi, ama gerekce bu: kazanan tepe kaynagin hareketliligine gore
+degisiyor ve `PeakRateFactor` bu girdiyi hic almiyor (K6). Iki kayip da kucuk (0,389
+ve 0,066), iki kazanc buyuk (1,559 ve 0,213); ama bu bir **takas**, tek yonlu bir
+ustunluk degil.
+
+*(Tur 1'de bu satir "dort satirin ucunde en iyi ya da esit, tek istisna
+hareketli/4,636" diyordu. Yanlisti: hareketli/10,236 da istisna.)*
 
 ## K3 — iki kaynak, T98'in +3,665'i
 
@@ -325,8 +354,16 @@ Gozlemden degil, sayimla: **60 hucrenin 34'u** video butcesini asiyor.
 En buyuk asim **1,1116** — hareketli, av1_nvenc, oran 2,600, tepe 1,10.
 Asim her taban oraninda goruluyor (2,600 / 4,636 / 7,500 / 10,236 / 16,000).
 
-Kaynak kirilimi: hareketli 30/30, durgun 4/30. Yani asim da kaynagin hareketliligine
-bagli.
+Kaynak kirilimi: **hareketli 29/30, durgun 5/30** (yukaridaki tablonun "asan" sutunu
+makineyle toplandi, gozle degil). Asim yine de kaynagin hareketliligine bagli, ama
+"hareketli kaynakta istisnasiz" degil: hareketli tarafta asmayan tek hucre
+**av1_nvenc / oran 16,000 / tepe 1,02**, teslim/butce **0,9931**. Durgun tarafta asan
+bes hucre: av1 2,600@1,10 · av1 7,500@1,02 · hevc 2,600@1,10 · hevc 2,600@1,50 ·
+hevc 4,636@1,50.
+
+*(Tur 1'de bu satir "hareketli 30/30, durgun 4/30" diyordu. Toplam 34 dogruydu,
+kirilim yanlisti; tablonun kendi sutunlari bastan beri dogruydu — hatali olan onu
+ozetleyen cumleydi.)*
 
 Boyutun tepeyle **tek yonlu gitmedigi** satir sayisi: 20 satirin **12'si**. Tepe carpanini
 buyutmek dosyayi tek yonlu buyutmuyor.
@@ -396,7 +433,7 @@ Hicbir tepe sabiti degismedi. Gerekce yanindaki cumle degisti
 | `HardwarePeakCeiling` = 1,10 | **olculdu, degismedi** | 1,50 hareketli kaynakta 4,636 ve 7,500'de en iyi p10'u veriyor, 10,236 ve 16,000'de 1,10'un altinda kaliyor; tek yonlu bir tavan cikmiyor |
 | `PeakOpensAtFloorRatio` = 6,0 | **olculdu, degismedi** | acilma noktasinin altinda (2,600 ve 4,636) kazanc en buyuk, ustunde soniyor — yani esik ters yerde; ama duzeltmesi taban orani ekseninde degil |
 | `PeakWidestAtFloorRatio` = 11,4 | **olculdu, degismedi** | 10,236 ve 16,000 oranlarinda p10 yayilimi 0,07-2,65; en genis noktada acmanin karsiligi yok |
-| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda dort satirin ucunde 1,50 en iyi ya da esit p10'u veriyor; tek istisna hareketli/4,636 (−0,389). Bkz. K2 |
+| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda dort satirin **ikisinde** 1,50 kazaniyor (durgun/4,636 +1,559, durgun/10,236 +0,213), ikisinde 1,02 kazaniyor (hareketli/4,636 +0,389, hareketli/10,236 +0,066). Kazanan tepe kaynaga bagli, `PeakRateFactor` o girdiyi almiyor. Bkz. K2 |
 | `BufferFactor` | **olculmedi** | her hucrede `bufsize` tepeyle birlikte oynadi; buffer'in payini tepeninkinden ayiran hucre yok |
 
 **Neden sabit degismedi.** Iki neden var ve ikisi de olcumden bagimsiz:
