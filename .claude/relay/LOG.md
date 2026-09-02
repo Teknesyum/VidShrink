@@ -595,3 +595,47 @@ etmeyen sahteler kirildi. Uc sahte iki dosyada: `PlanCalculatorTests.cs` (sahips
 acildi, **yalniz uc sahteye `EncoderState` override'i** siniriyla.
 
 - T132 tur 2 teslim edildi: KRITIK kapandi (uc bant listelendi, yokluk beyani geri cekildi), sekiz kriterden yedisi kapali; T2 yarim — iddia 4 pimlendi, iddia 1 testin kendi kapisi yuzunden pimlenemedi. Commit 0c371f7/eec17e7/cdc7853.
+
+## T132 tur 3 acildi — 2 Eylul 2026
+
+Denetim KALDI, iki KRITIK. T3-T8 gecti.
+
+- **K-1:** yapici T2'yi "`Atlandi` bir kapi, `:757` hic kosmuyor" diye kapatti. Yanlis —
+  `Atlandi` `private void` gunlukcu, `return` yok. Denetci `:757`'yi
+  `InRange(999_000, 999_999)` yapip kosturdu: `[atlandi]` basildi **ve** assert patladi.
+  Pim uretilebilirdi; yeni bant kolu hic kosulmamis (iki gunluk de `eski-bant` adli).
+- **K-2:** `UpdaterTests.cs:890` dokuzuncu bant, listede yok; ustune uc yerde "sekiz"
+  mutlak sayimi yazili. Kronik kusur ucuncu kez, bicim degistirerek: "yok" -> "sekiz".
+
+Tur 3 kriterleri U1/U2/U3 sozlesmeye yazildi. Protokol geregi **advisor zorunlu**;
+yapici ve danisman es zamanli acildi. Danismana sorulan uc soru: iki KRITIK dogru mu
+siniflanmis, desen genisletmek dorduncu tekrari onler mi, `PerformanceCheckTests.cs:629`
+bant mi.
+
+Borc kayda gecti: `Atlandi` cagri yerlerinde tek `return`suz olan `:753`; `Atlandi`nin
+gercek SKIP olmamasi (xUnit 2, T117'nin ayni borcu); `T132.md:68`'in hala `:61` demesi.
+
+## T143 ve T144 acildi — 2 Eylul 2026
+
+ProClaude'un ucuncu ve dorduncu isi. T140/T142 ile birlikte dort sozlesme es zamanli;
+`owns` kumeleri kesismiyor.
+
+**T143 — en kotu sahne olcusu uretimde sabit izgarada.** `QualityMeter.WorstScene`in
+`SceneMap` alan asiri yuklemesinin **sifir uretim cagirani** var; tek uretim cagrisi
+`QualityMeter.cs:291`, uc argumanli, `map = null`. Haritali her cagri
+`QualityMeterTests.cs` icinde. Yani algiyi olcen metrik her zaman sabit 2 sn izgarada
+kosuyor. T137'nin KRITIK 2'siyle ayni sinif: duzenek yazilmis, olculmus, uretimde olu.
+Ikinci kusur: `:239` raporlanan pencere uzunlugunu **kosulsuz** 2.0 basiyor. Ucuncu:
+`MinimumUnitSeconds` sabit pencereden turetilmis ve kisa artik parca olcunun disinda.
+
+**T144 — kodlama basarisi yalniz cikis koduna bakiyor.** `EncodeRunner.cs:395` ve
+`FfmpegRunner.cs:60` basariyi `ExitCode == 0` ile karar veriyor. Depo bu dersi
+`EncoderCapabilities.PixelFormatAccepted` (`:316-318`) ile **bir yerde** ogrenmis; gercek
+teslim yolu ogrenmemis. Kanit dort belgede olculmus: `zzznotreal=1` icin ffmpeg cikis
+kodu 0, stderr `Error parsing option` (`docs/olcumler/handbrake-acigi.md:139`,
+`docs/taramalar/lav-filters.md:23`, `mpv.md:23`, `svt-av1-psy.md:25`). Sonuc: motorun
+sectigi psikogorsel parametre sessizce dusuyor, kullanici uyari almiyor.
+
+Yan bulgu (ayri sozlesme gerekiyor): `ComplexityProbe.cs:31`
+`public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;` — sahne farkindali
+ornekleme uretimde pimli olarak kapali.
