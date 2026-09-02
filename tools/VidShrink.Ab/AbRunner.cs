@@ -114,7 +114,12 @@ public sealed class AbRunner
                 foreach (var competitor in competitors)
                 {
                     _log.WriteLine($"kodlanıyor: {competitor.Name}");
-                    outcomes.Add(await competitor.EncodeAsync(input, inputTarget, settings.OutputDirectory, settings.LogDirectory, ct));
+                    var outcome = await competitor.EncodeAsync(input, inputTarget, settings.OutputDirectory, settings.LogDirectory, ct);
+
+                    if (outcomes.Count > 0)
+                        outcome = await EqualizeAsync(competitor, input, inputTarget, outcomes[0].Bytes, outcome, settings, ct);
+
+                    outcomes.Add(outcome);
                 }
 
                 var baseline = outcomes[0].Bytes;
@@ -214,6 +219,37 @@ public sealed class AbRunner
 
     private Task<string> VideoOnlyReferenceAsync(MediaInfo source, AbSettings settings, CancellationToken ct)
         => EnsureVideoOnlyAsync(source, settings.ChunkDirectory, settings.LogDirectory, ct);
+
+    private async Task<EncodeOutcome> EqualizeAsync(
+        ICompetitor competitor, MediaInfo input, double requestedMb, long baselineBytes,
+        EncodeOutcome first, AbSettings settings, CancellationToken ct)
+    {
+        var best = first;
+        var bestParity = SizeParityCheck.Evaluate(baselineBytes, first.Bytes, settings.TolerancePercent);
+        var targetMb = requestedMb;
+
+        for (var attempt = 1; attempt <= settings.EqualizeAttempts && !bestParity.Equal; attempt++)
+        {
+            if (best.Bytes <= 0) break;
+            targetMb *= baselineBytes / (double)best.Bytes;
+            _log.WriteLine($"eşitleme denemesi {attempt}: {competitor.Name} hedefi {targetMb:0.###} MB'a çekiliyor " +
+                           $"(önceki {best.Bytes} bayt, taban {baselineBytes} bayt, fark {bestParity.DeltaPercent:+0.00;-0.00;0.00}%)");
+
+            var retry = await competitor.EncodeAsync(input, targetMb, settings.OutputDirectory, settings.LogDirectory, ct);
+            var retryParity = SizeParityCheck.Evaluate(baselineBytes, retry.Bytes, settings.TolerancePercent);
+            if (Math.Abs(retryParity.DeltaPercent) < Math.Abs(bestParity.DeltaPercent))
+            {
+                best = retry;
+                bestParity = retryParity;
+            }
+        }
+
+        if (!bestParity.Equal)
+            _log.WriteLine($"eşitleme tutmadı: {competitor.Name} {bestParity.DeltaPercent:+0.00;-0.00;0.00}% ile kaldı " +
+                           $"(tolerans ±{settings.TolerancePercent:0.##}%).");
+
+        return best;
+    }
 
     public static async Task<double> StartTimeSecondsAsync(string path, CancellationToken ct)
     {

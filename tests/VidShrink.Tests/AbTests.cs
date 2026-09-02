@@ -99,7 +99,7 @@ public sealed class SizeParityAbTests
     [Fact]
     public void DeltaIsMeasuredAgainstTheBaseline()
     {
-        var parity = SizeParityCheck.Evaluate(100_000_000, 97_000_000, 2.0);
+        var parity = SizeParityCheck.Evaluate(100_000_000, 97_000_000);
 
         Assert.Equal(-3.0, parity.DeltaPercent, 9);
         Assert.False(parity.Equal);
@@ -109,7 +109,7 @@ public sealed class SizeParityAbTests
     [Fact]
     public void ExactlyOnToleranceStillCountsAsEqual()
     {
-        var parity = SizeParityCheck.Evaluate(100_000_000, 102_000_000, 2.0);
+        var parity = SizeParityCheck.Evaluate(100_000_000, 102_000_000);
 
         Assert.Equal(2.0, parity.DeltaPercent, 9);
         Assert.True(parity.Equal);
@@ -119,7 +119,7 @@ public sealed class SizeParityAbTests
     [Fact]
     public void OneByteOverToleranceIsStamped()
     {
-        var parity = SizeParityCheck.Evaluate(100_000_000, 102_000_001, 2.0);
+        var parity = SizeParityCheck.Evaluate(100_000_000, 102_000_001);
 
         Assert.False(parity.Equal);
         Assert.Equal("eş boyut değil", parity.Stamp);
@@ -128,9 +128,36 @@ public sealed class SizeParityAbTests
     [Fact]
     public void UndershootOutsideToleranceIsStampedToo()
     {
-        var parity = SizeParityCheck.Evaluate(100_000_000, 97_500_000, 2.0);
+        var parity = SizeParityCheck.Evaluate(100_000_000, 97_500_000);
 
         Assert.False(parity.Equal);
+    }
+
+    [Fact]
+    public void TheShippedToleranceIsPinnedFromBothSides()
+    {
+        Assert.True(SizeParityCheck.Evaluate(100_000_000, 101_990_000).Equal);
+        Assert.False(SizeParityCheck.Evaluate(100_000_000, 102_010_000).Equal);
+        Assert.True(SizeParityCheck.Evaluate(100_000_000, 98_010_000).Equal);
+        Assert.False(SizeParityCheck.Evaluate(100_000_000, 97_990_000).Equal);
+    }
+
+    [Fact]
+    public void TheRunSettingsCarryTheShippedToleranceUnlessOverridden()
+    {
+        var shipped = AbSettings.Parse(new[] { "--kaynak", "k.mp4", "--hedef-mb", "60" }, "w");
+        var overridden = AbSettings.Parse(new[] { "--kaynak", "k.mp4", "--hedef-mb", "60", "--tolerans", "5" }, "w");
+
+        Assert.True(SizeParityCheck.Evaluate(100_000_000, 101_990_000, shipped.TolerancePercent).Equal);
+        Assert.False(SizeParityCheck.Evaluate(100_000_000, 102_010_000, shipped.TolerancePercent).Equal);
+        Assert.True(SizeParityCheck.Evaluate(100_000_000, 104_900_000, overridden.TolerancePercent).Equal);
+    }
+
+    [Fact]
+    public void AnExplicitToleranceOverridesTheShippedOne()
+    {
+        Assert.False(SizeParityCheck.Evaluate(100_000_000, 103_000_000).Equal);
+        Assert.True(SizeParityCheck.Evaluate(100_000_000, 103_000_000, 5.0).Equal);
     }
 
     [Fact]

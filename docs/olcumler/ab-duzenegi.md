@@ -41,21 +41,29 @@ ile yeniden kodlamak gerekti.
 
 ```
 > ab denetle parca-1.mkv etiketsiz-2sn.mp4
-referans : parca-1.mkv       | bt2020/smpte2084/bt2020nc/yuv420p10le | hdr=True | 60 fps
-aday     : etiketsiz-2sn.mp4 | etiketsiz/etiketsiz/etiketsiz/yuv420p | hdr=False | 60 fps
-kapı     : Rejected - çıktının renk etiketleri eksik; etiketsiz çıktı etiketli
-           referansla karşılaştırılmaz.
-sonuç    : SAYI BASILMADI - renk kapısı reddetti.              (çıkış kodu 2)
+referans : parca-1.mkv | bt2020/smpte2084/bt2020nc/yuv420p10le | hdr=True | 1920x1080 | 60 fps
+aday     : etiketsiz-2sn.mp4 | etiketsiz/etiketsiz/etiketsiz/yuv420p | hdr=False | 320x180 | 60 fps
+kapı     : Rejected — Çıktının renk etiketleri eksik (color_primaries, color_transfer, color_space); etiketsiz çıktı etiketli referansla karşılaştırılmaz.
+kare hızı: kare hızı eşit (60 fps)
+geometri : en boy oranı uyuyor (1,7778 ~ 1,7778)
+sonuç    : SAYI BASILMADI — renk kapısı reddetti.
 ```
+
+Çıkış kodu 2.
 
 ```
 > ab denetle parca-1.mkv sdr-2sn.mp4
-referans : parca-1.mkv | bt2020/smpte2084/bt2020nc/yuv420p10le | hdr=True | 60 fps
-aday     : sdr-2sn.mp4 | bt709/bt709/bt709/yuv420p             | hdr=False | 60 fps
-kapı     : ReferenceTransformed - referans aynı dönüşümden geçirilip öyle ölçüldü
-etiket   : SDR uzayında karşılaştırma - HDR kaybı hariç
-sonuç    : harm=1.17 p10=0.00 min=0.00 ort=1.42 XPSNR=7.86 SSIM=0.70  (çıkış kodu 0)
+referans : parca-1.mkv | bt2020/smpte2084/bt2020nc/yuv420p10le | hdr=True | 1920x1080 | 60 fps
+aday     : sdr-2sn.mp4 | bt709/bt709/bt709/yuv420p | hdr=False | 320x180 | 60 fps
+kapı     : ReferenceTransformed — Çıktı SDR bt709; referans aynı dönüşümden (zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p) geçirilip öyle ölçüldü.
+kare hızı: kare hızı eşit (60 fps)
+geometri : en boy oranı uyuyor (1,7778 ~ 1,7778)
+etiket   : SDR uzayında karşılaştırma — HDR kaybı hariç
+sonuç    : harm=1.17 p10=0.00 min=0.00 ort=1.42 XPSNR=7.86 SSIM=0.70
 ```
+
+Çıkış kodu 0. İki blok da `ab denetle`nin çıktısının birebir kopyasıdır,
+düzenlenmemiştir.
 
 İkinci koşumdaki puanların düşüklüğü adayın 320x180 crf 30 ile üretilmiş bir kapı
 denemesi olmasındandır; buradaki bulgu sayı değil, kapının hangi yolu seçtiği ve
@@ -194,10 +202,19 @@ Sayı olarak: 60 saniyelik üç parçadan çıkan tahmin, 17 dakikanın tamamın
 11 VMAF-NEG puan yüksek. Bu, iki kodlayıcı arasındaki 9,13 puanlık farktan büyük.
 
 Sonuç, düzeneğin kullanım kuralı olarak: **parça kipi mutlak kalite iddiası için
-kullanılamaz.** Aynı parçalar üzerinde iki yarışmacıyı karşılaştırmak için
-kullanılabilir — iyimserlik iki tarafa da aynı biçimde biniyor — ama "VidShrink bu
-kaynakta 58,8 alıyor" cümlesi parça sayısından kurulamaz. Bu belgedeki parça
-tabloları o yüzden karşılaştırma tablosudur, mutlak kalite tablosu değil.
+kullanılamaz.** "VidShrink bu kaynakta 58,8 alıyor" cümlesi parça sayısından
+kurulamaz. Bu belgedeki parça tabloları karşılaştırma tablosudur, mutlak kalite
+tablosu değil.
+
+Parça kipinin **karşılaştırma** için kullanılabilir olması ayrı bir iddia ve
+**ölçülmedi.** Dayanağı şu varsayım: iyimserlik iki yarışmacıya da aynı biçimde
+biniyor, yani aradaki fark parçalarda da tam koşumda da aynı kalıyor. Bu varsayım
+sınanmadı, çünkü sınamak HandBrake'in de tam koşumunu gerektirirdi ve o
+koşturulmadı. Sınanmamış olması hafif bir eksik değil: sapmanın kendisi (11,05)
+karşılaştırdığımız farktan (9,13) **büyük**, yani varsayım yıkılırsa sıralama da
+gidebilir. Elimizdeki tek yan kanıt, altı parça-hedef çiftinin altısında da
+harmonik ortalama, p10 ve ortalamanın aynı kazananı vermesi — bu ölçütten
+bağımsızlığı gösterir, örneklemeden bağımsızlığı değil.
 
 Tam koşum tek yapılandırmayla sınırlı kaldı; HandBrake tarafının tam koşumu ve
 60 MB hedefinin tam koşumu **ölçülmedi**.
@@ -243,14 +260,25 @@ tonemap yoluna hiç girilmedi.
 
 ### 60 MB hedefinde
 
+İlk koşumda VidShrink üç parçanın üçünde de hedefin altında kalmış ve üç satır da
+`eş boyut değil` damgası yemişti (-%3,13 / -%8,61 / -%3,17). O tablodan
+karşılaştırma çıkarılamaz. Araca **eşitleme turu** eklendi: taban yarışmacının
+gerçek baytına bakıp adayın hedefini oranla düzeltip yeniden kodluyor, en fazla
+iki deneme. Aşağıdaki tablo eşitleme turlu koşumdan.
+
 | girdi | yarışmacı | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
 |---|---|---|---|---|---|---|---|---|---|
 | parca-1 | handbrake | 3.531.037 | 0,00 | evet | 47,71 | 34,32 | 3,02 | 52,16 | 30,93 |
-| parca-1 | vidshrink | 3.420.687 | -3,13 | **eş boyut değil** | 31,50 | 16,93 | 1,25 | 38,77 | 28,91 |
+| parca-1 | vidshrink | 3.519.437 | -0,33 | evet | 31,81 | 17,76 | 1,19 | 39,16 | 28,97 |
 | parca-2 | handbrake | 3.730.691 | 0,00 | evet | 93,70 | 93,07 | 72,27 | 93,71 | 43,59 |
-| parca-2 | vidshrink | 3.409.438 | -8,61 | **eş boyut değil** | 68,60 | 66,52 | 49,48 | 68,71 | 33,07 |
+| parca-2 | vidshrink | 3.592.973 | -3,69 | **eş boyut değil** | 69,03 | 67,04 | 51,30 | 69,14 | 33,22 |
 | parca-3 | handbrake | 3.680.998 | 0,00 | evet | 13,72 | 11,79 | 0,00 | 17,46 | 28,21 |
-| parca-3 | vidshrink | 3.564.225 | -3,17 | **eş boyut değil** | 8,95 | 6,64 | 0,00 | 13,02 | 27,06 |
+| parca-3 | vidshrink | 3.678.393 | -0,07 | evet | 9,33 | 7,01 | 0,00 | 13,59 | 27,18 |
+
+Üç parçanın ikisi kapının içine girdi (-%0,33 ve -%0,07). `parca-2` giremedi;
+nedeni aşağıda ayrı bir bulgu olarak ölçüldü. Toplam bayt 10.790.803 ↔ 10.942.726,
+yani **-%1,39** — toplamda kapının içinde, ama satır bazında bir parça dışarıda
+kaldığı için özet satırı damgalı kalıyor.
 
 ### 600 MB hedefinde
 
@@ -268,22 +296,29 @@ tonemap yoluna hiç girilmedi.
 | yarışmacı | hedef MB | toplam bayt | eş boyut | harm | en kötü p10 | kare min | ort | XPSNR |
 |---|---|---|---|---|---|---|---|---|
 | handbrake | 60 | 10.942.726 | evet | **28,70** | 11,79 | 0,00 | 54,44 | 34,25 |
-| vidshrink | 60 | 10.394.350 | **eş boyut değil** | **18,98** | 6,64 | 0,00 | 40,16 | 29,68 |
+| vidshrink | 60 | 10.790.803 | 2/3 parça eş boyut, toplam -%1,39 | **19,59** | 7,01 | 0,00 | 40,62 | 29,79 |
 | handbrake | 600 | 108.326.915 | evet | **67,96** | 64,62 | 0,00 | 83,03 | 40,49 |
 | vidshrink | 600 | 107.433.177 | evet | **58,83** | 54,59 | 0,00 | 76,17 | 40,77 |
 
-**Geridiyiz.** Eş boyutta HandBrake her iki hedefte de önde: 60 MB'de harmonik
-ortalamada 9,72 puan, 600 MB'de 9,13 puan. Altı parça-hedef çiftinin beşinde
-HandBrake kazandı; VidShrink yalnız `parca-2` @ 600 MB'de önde (95,84'e 95,78 —
-bu fark gürültü sayılır) ve orada XPSNR'ı belirgin yüksek (51,25'e 47,11).
+**Geridiyiz.** Eş boyutta ölçülmüş tek hedef 600 MB ve orada HandBrake harmonik
+ortalamada **9,13 puan** önde (67,96 ↔ 58,83); altı satırın altısı da ±%2 içinde.
 
-İki gözlem, ikisi de sayıdan çıkıyor:
+60 MB hedefi **tam eş boyutta ölçülemedi**, o yüzden oradan tek bir açık sayısı
+verilmiyor. Eşitleme turundan sonra üç parçanın ikisi kapının içinde (-%0,33 ve
+-%0,07), üçüncüsü -%3,69 ile dışarıda; toplam bayt -%1,39. Bu haliyle özet
+harmonik ortalamalar 28,70 ↔ 19,59, yani **9,11 puan** — ama içinde eş boyut
+olmayan bir satır taşıdığı için bu sayı 600 MB'deki 9,13 ile aynı sağlamlıkta
+değil. Yönü de bilinir: dışarıda kalan satırda **VidShrink daha az bayt harcadı**,
+dolayısıyla tam eşitlikte açığın bir miktar **daralması** beklenir, büyümesi değil.
+Nitekim eşitleme turu öncesi aynı satırların açığı 9,72'ydi ve eşitlemeye
+yaklaştıkça 9,11'e indi.
 
-- **60 MB hedefinde VidShrink bütçeyi bitirmiyor.** Üç parçanın üçünde de hedefin
-  altında kalıyor (-%3,13, -%8,61, -%3,17) ve üç satır da `eş boyut değil` damgalı.
-  Yani bu üç satırda VidShrink hem daha az bit harcayıp hem daha düşük puan aldı;
-  kullanılmayan bütçe doğrudan kayıp. 600 MB hedefinde bu kaybolmuyor ama küçülüyor
-  (+%1,30 / -%1,71 / -%1,99, üçü de ±%2 içinde).
+Altı parça-hedef çiftinin beşinde HandBrake kazandı; VidShrink yalnız
+`parca-2` @ 600 MB'de önde (95,84'e 95,78 — bu fark gürültü sayılır) ve orada
+XPSNR'ı belirgin yüksek (51,25'e 47,11).
+
+Bir gözlem daha, o da sayıdan çıkıyor:
+
 - **Kare minimumu tek başına ayırt etmiyor.** `parca-3`'te iki taraf da her hedefte
   0,00 kare minimumu veriyor; oradaki farkı ancak harmonik ortalama ve p10 gösteriyor.
   Tersi de var: `parca-1` @ 600 MB'de harmonik 81,48'ken kare minimumu 4,12. Tek
@@ -307,6 +342,109 @@ kendi veriyor. 600 MB hedefinde seçtiği: `1190x670@60, libx264/2pass, 4712k,
 pix=p010le, hdr=Preserve`. Yani çözünürlüğü düşürüp bit hızını kurtarma yolunu
 seçiyor; HandBrake 1920x1080'de kalıyor. Bu turda o tercih kazandırmadı.
 
+### Ayrı bulgu — VidShrink istenen boyutu bitirmiyor
+
+Bu açığın parçası değil, ayrı bir bulgu. Ölçüldü çünkü eş boyutu tutturmayı
+zorlaştıran şey buydu.
+
+VidShrink'e istenen boyut ile teslim ettiği boyut arasında sistematik bir açık
+var. Eşitleme turu öncesi, ilk denemede teslim edilenler:
+
+| girdi | istenen | teslim | fark |
+|---|---|---|---|
+| parca-1 | 3,497 MB | 3,261 MB | **-%6,75** |
+| parca-2 | 3,497 MB | 3,244 MB | **-%7,23** |
+| parca-3 | 3,498 MB | 3,399 MB | **-%2,83** |
+
+Kodlayıcı günlüğü açığın iki katmandan geldiğini gösteriyor.
+
+**Birinci katman — planın kendine ayırdığı pay.** Plan, istenen boyutu doğrudan
+hedeflemiyor; altında bir iç hedef kuruyor:
+
+| istenen | iç hedef | pay |
+|---|---|---|
+| 3,497 MB | 3,358 MB | -%3,97 |
+| 3,612 MB | 3,467 MB | -%4,01 |
+| 34,975 MB | 34,100 MB | -%2,50 |
+| 34,994 MB | 34,119 MB | -%2,50 |
+
+Küçük hedeflerde pay ~%4, büyük hedeflerde ~%2,5.
+
+**İkinci katman — kalibrasyonun kabul bandı.** Kodlayıcı iç hedefin de altına
+düşüyor ve kalibrasyon bunu `in band` sayıp yeni tur açmıyor:
+
+| iç hedef | gerçek | fark | kalibrasyon kararı |
+|---|---|---|---|
+| 3,358 MB | 3,244 MB | -%3,39 | `in band` |
+| 3,358 MB | 3,261 MB | -%2,89 | `in band` |
+| 3,467 MB | 3,356 MB | -%3,20 | `in band` |
+| 34,119 MB | 33,903 MB | -%0,63 | `in band` |
+| 34,100 MB | 33,055 MB | -%3,06 | `under band` → yeni tur |
+| 3,683 MB | 3,496 MB | -%5,08 | `under band` → yeni tur |
+
+Bandın kuralını çıkaramadım: -%3,39 kabul edilirken -%3,06 reddediliyor, yani
+sabit bir yüzde değil. `PlanCalculator` benim `owns`ımda olmadığı için içine
+bakmadım; ölçülen davranış bu.
+
+**Üçüncü gözlem — çözünürlük basamağı eşitlemeyi kırıyor.** `parca-2`de eşitleme
+turu ±%2'ye giremedi ve nedeni ölçülebilir: hedefi büyütmek plana çözünürlük
+atlatıyor.
+
+| istenen | seçilen çözünürlük | teslim | tabana fark |
+|---|---|---|---|
+| 3,497 MB | 1152x648 | 3.401.123 | -%8,83 |
+| 3,836 MB | **1190x670** | 3.868.475 | +%3,69 |
+| 3,700 MB | 1152x648 | 3.592.973 | -%3,69 |
+
+Hedefi %3,7 büyütmek (3,700 → 3,836) çözünürlüğü bir basamak yukarı atıyor ve
+teslim edilen bayt %7,7 sıçrıyor. Taban (3.730.691 bayt) tam bu sıçramanın
+ortasına düşüyor; iki komşu basamak da ±%2'nin dışında kalıyor. Yani bu parçada
+eş boyut, hedefi ayarlayarak **erişilebilir değil** — ulaşılabilir bayt değerleri
+ayrık.
+
+Bu üç maddenin üçü de `src/VidShrink.Core` tarafında ve bu sözleşmenin dışında.
+Buraya ölçüm olarak yazıldı; düzeltmesi ayrı bir sözleşmenin işi.
+
+### Harmonik ortalamanın tabanı — manşetin dayandığı sayı
+
+Bu belgedeki bütün manşet sayıları harmonik ortalamadır ve harmonik ortalama
+`src/VidShrink.Ffmpeg/QualityMeter.cs:147`'de şöyle hesaplanıyor:
+
+```csharp
+var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
+```
+
+`Math.Max(x, 1.0)` bir kıskaçtır: **taban 1,0 VMAF-NEG.** Bunun neden önemli
+olduğu özet tablodan okunuyor — dört satırın **dördünde de** kare minimumu 0,00.
+Yani her dört ölçümde de en az bir kare gerçek sıfır aldı. Kıskaç olmasaydı
+`1/0` sonsuza gider ve dört harmonik ortalamanın dördü de **0,00** olurdu.
+28,70 da, 67,96 da, 58,83 da, 18,98 da kıskacın varlığına borçlu.
+
+Kıskacın kuyruğu ne kadar belirlediğinin göstergesi `parca-3 @ 600 MB /
+handbrake` satırı: harmonik **46,66**, p10 ise **64,62**. Harmonik ortalamanın
+p10'un altına düşmesi, dağılımın alt ucunun tamamen taban tarafından
+tutulduğu anlamına gelir.
+
+**Kaç karenin kıskaca değdiği ölçülemedi.** Sebebi: libvmaf'ın kare kare JSON
+günlüğü `QualityMeter.cs:124`'te `%TEMP%`'e yazılıyor ve `157`'deki `finally`
+bloğunda siliniyor; `QualityScore` yalnız dört toplu sayı döndürüyor, kare
+listesini dışarı vermiyor. Elimizdeki tek şey toplu sayı.
+
+Toplu sayıdan bir **üst sınır** türetilebilir. Kıskaca değen karelerin oranı
+`f` ise, o karelerin her biri toplama `1/1 = 1` katkı verir; diğer karelerin
+katkısı pozitiftir. `H = N / Σ(1/max(x,1))` olduğundan `Σ/N = 1/H ≥ f`, yani
+**`f ≤ 1/H`.** `parca-3 / handbrake @ 60 MB` için `H = 13,72` → **`f ≤ %7,3`.**
+Bu bir tavan, ölçüm değil; gerçek oran bundan çok daha küçük olabilir.
+
+Kaldıraç büyük. Aynı satırda karelerin yalnız %1'i gerçek 0 olsaydı ve taban
+1,0 yerine 0,1 olsaydı, o kareler toplama 1 yerine 10 katkı verirdi ve harmonik
+ortalama **13,72 → 6,14**'e düşerdi. Yani manşet sayı, seçilmiş ama belgelenmemiş
+bir sabite bu ölçüde duyarlı.
+
+Bu satır `QualityMeter` bizim `owns`ımızda olmadığı için düzeltilmedi; eksik
+listesine yazıldı. Karşılaştırmayı geçersiz kılmıyor — kıskaç iki tarafa da aynı
+biçimde uygulanıyor — ama **mutlak sayı olarak okunmamalı.**
+
 ### Ölçünün kendi kararsızlığı
 
 Aynı yapılandırma iki kez koştu (geometri düzeltmesinden önce ve sonra, `parca-1`
@@ -325,7 +463,8 @@ karşılaşılan eksikler — hepsi T97'nin girdisi:
 |---|---|
 | kare başına puanlar dışarı verilmiyor (`Percentile` özel) | parçalar arası p10 kesin birleştirilemiyor; özet satırı "en kötü parça" olmak zorunda kaldı |
 | kare sayısı döndürülmüyor | parça ağırlıkları süreden türetiliyor, kareden değil |
-| libvmaf JSON günlüğü `%TEMP%`e yazılıp `finally` içinde siliniyor | ham ölçüm günlüğü `.calisma/ab/` altında saklanamıyor |
+| harmonik ortalamada `Math.Max(x, 1.0)` kıskacı (satır 147) belgesiz | manşet sayının tamamı taban 1,0'a bağlı; kıskaç olmasa dört özet satırının dördü de 0,00 olurdu |
+| libvmaf JSON günlüğü `%TEMP%`e yazılıp `finally` içinde siliniyor (satır 124, 157) | ham ölçüm günlüğü saklanamıyor **ve** kıskaca kaç karenin değdiği sayılamıyor; yalnız `f ≤ 1/H` tavanı türetilebiliyor |
 | `ColorFilter` etiketsiz girdiye varsayım uyduruyor (`?? (hdr ? "bt2020" : "bt709")`) | GEÇERSİZ tabloyu üreten hata `QualityMeter` içinde hâlâ duruyor; kapı A/B aracında, ölçerde değil |
 | `ColorIncompatibility` yalnız HDR/SDR uyuşmazlığını reddediyor | etiketsiz taraf ölçere kadar gidebiliyor |
 | kare hızı hiç bakılmıyor | kare hızları ayrıyken libvmaf sessizce sayı üretiyor; kapı yine A/B aracında |

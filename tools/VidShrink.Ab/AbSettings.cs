@@ -11,10 +11,12 @@ public sealed record AbSettings(
     string OutputDirectory,
     string LogDirectory,
     string JsonPath,
-    double TolerancePercent)
+    double TolerancePercent,
+    int EqualizeAttempts)
 {
     public static readonly string[] KnownCompetitors = { "handbrake", "vidshrink", "vidshrink-sdr" };
     public static readonly string[] DefaultCompetitors = { "handbrake", "vidshrink" };
+    public const int DefaultEqualizeAttempts = 2;
 
     public static AbSettings Parse(IReadOnlyList<string> args, string workRoot)
     {
@@ -27,6 +29,7 @@ public sealed record AbSettings(
         string? logDirectory = null;
         string? jsonPath = null;
         var tolerance = SizeParityCheck.DefaultTolerancePercent;
+        var equalizeAttempts = DefaultEqualizeAttempts;
 
         for (var i = 0; i < args.Count; i++)
         {
@@ -60,6 +63,10 @@ public sealed record AbSettings(
                 case "--tolerans" when i + 1 < args.Count:
                     tolerance = double.Parse(args[++i], CultureInfo.InvariantCulture);
                     break;
+                case "--esitleme-denemesi" when i + 1 < args.Count:
+                    equalizeAttempts = int.Parse(args[++i], CultureInfo.InvariantCulture);
+                    if (equalizeAttempts < 0) throw new ArgumentException("--esitleme-denemesi negatif olamaz.");
+                    break;
                 default:
                     throw new ArgumentException($"Bilinmeyen seçenek: {args[i]}");
             }
@@ -82,7 +89,8 @@ public sealed record AbSettings(
             Path.GetFullPath(outputDirectory ?? Path.Combine(workRoot, "cikti")),
             Path.GetFullPath(logDirectory ?? Path.Combine(workRoot, "gunluk")),
             Path.GetFullPath(jsonPath ?? Path.Combine(workRoot, $"sonuc-{(chunkMode ? "parca" : "tam")}-{stamp}.json")),
-            tolerance);
+            tolerance,
+            equalizeAttempts);
     }
 
     public static string DefaultWorkRoot()
