@@ -1,6 +1,7 @@
 # Auto mod — hiçbir ayar bilmeyen kullanıcı ne alıyor
 
-T102. Ölçüm tarihi 2026-09-02. Dal `T102-auto-mod`, taban `main@3ede43d`.
+T102. Ölçüm tarihi 2026-09-02 (K1-K6 tur 1; anahtar kare hizalama A/B'si tur 3,
+aynı gün ve aynı makinede). Dal `T102-auto-mod`, taban `main@2b4477c`.
 
 Bu belge ölçer, düzeltmez. İçindeki her sayı bu makinede koşturulmuş bir ölçümden
 gelir. Ölçülmemiş olan yerde açıkça **ölçülmedi** yazar.
@@ -18,17 +19,32 @@ gelir. Ölçülmemiş olan yerde açıkça **ölçülmedi** yazar.
 
 Makine paylaşımlıydı: ölçüm boyunca başka ajanlar da koşuyordu (sayı bana
 bildirildi, kendim doğrulamadım). **Süreler ölçülmedi** — duvar saati bu koşullarda
-anlamlı değil. Kalite sayıları yükten etkilenmez.
+anlamlı değil. Tur 2'de burada duran "kalite sayıları yükten etkilenmez" cümlesi
+**geri çekildi** — ölçülmemişti. K3/K4 koşumları iş parçacığını sabitlemeden koştu.
+
+Tur 3'te eklenen koşumlar `-threads 4` + `svtav1-params lp=4` ile sabitlendi
+(`tools/auto-mod-olcumu/hizalama.sh`). Bu, ölçülmemiş iddianın yerine tek bir ölçülen
+sayı koyuyor: `y1-g300-izgara`, `e2-gop300` ile birebir aynı ayarların iş parçacığı
+sabitlenmiş hâli. Dosya boyutu **%0,79** oynuyor (11 903 000 → 11 809 579 bayt), puan
+ise **0,003** (ortalama 94,617 → 94,614; p10 94,868 → 94,870). Yani sabitlenmemiş iş
+parçacığı sayısının bu ölçüdeki payı virgülden sonra üçüncü hanede. Tek ayarda, tek
+kaynakta ölçüldü; genel bir iddia değil.
 
 **Ölçüm düzeneği nerede.** Auto modun planı bench ile alınamadığı için (kusur 1)
 `.calisma/` altında tek seferlik başsız bir sonda yazıldı: uygulamanın kendi yolunu
 birebir izler — `FfprobeClient.ProbeAsync` → `ComplexityProbe` → iki turlu
 `CalibrationProbe` → `PlanCalculator.BuildDetailed` (`Codec = Auto`) → `EncodeRunner`.
 Tablolardaki sayılar VMAF JSON'larından mekanik olarak üretildi, elle yazılmadı.
-Sonda, üretici betikler ve kodlama çıktıları `.calisma/t102/` altında (266 MB);
-silinmeleri gerekiyor ama bu ajanın izinleri silmeye yetmedi — kaldırma işi T0'a
-kalıyor. Dizin `.gitignore`'da, git'e sızmadı. Bu ölçümü bench'ten tekrarlanabilir
-kılmak kusur 1'in düzeltilmesine bağlı.
+Üretici betikler `tools/auto-mod-olcumu/` altında, `main`de. Kodlama çıktıları
+(mkv/mp4, 266 MB) `.calisma/t102/` altında ve git'e sızmıyor; silinmeleri T0'a kalıyor.
+
+**Ham VMAF çıktısı korundu.** Bu belgedeki her VMAF sayısını üreten kare kare JSON
+`tools/auto-mod-olcumu/vmaf/*.json.gz` altında, git'te — on bir koşum
+(sıkıştırılmamış 11 × 2,6 MB depoya konmayacak kadar büyüktü; gzip ile toplam 2 288 809 bayt). `gunzip -k tools/auto-mod-olcumu/vmaf/*.gz`
+`tablolar.py`'nin beklediği dizini birebir geri veriyor. Kodlama çıktıları silinse bile
+tablolar bu arşivden yeniden üretilebilir; tur 3'te K3 ve K4'ün sekiz sayısı bu
+arşivden yeniden hesaplandı ve birebir tuttu. Bu ölçümü **bench'ten** tekrarlanabilir
+kılmak ayrı bir şey ve kusur 1'in düzeltilmesine bağlı.
 
 ### Harmonik ortalama bu ölçümde kullanılamaz — sebebi ölçüldü
 
@@ -74,7 +90,8 @@ Sonuç, iki yönlü:
    sözleşme gereği tabloda duruyor ama okunmamalı; yanında 1 puan altı kare sayısı var.
 2. **Bu bir kusur** (kusur 4). Depo'nun kendi ölçüm aracı harmonik ortalamayı
    raporluyor; bu kaynakta AV1 ile x265 arasında **39 puanlık** bir fark üretirdi ve
-   o farkın PSNR'a göre karşılığı yok.
+   o farkın PSNR'a göre karşılığı yok. Kusurun kendisi burada değil, **T106**
+   sözleşmesinde ele alınıyor; bu belge yalnız ölçüp adlandırıyor.
 
 ---
 
@@ -240,8 +257,12 @@ puan da **yükseliyor** (ortalama +0,155, p10 +0,333). Boyut eşitliği tartış
 bağımsız bir sonuç — daha küçük dosyada daha iyi puan, hangi eksenden bakılırsa
 bakılsın kayıp yok.
 
-Sebebi anahtar kare **sayısı** değil, **yeri**. Üretilen dosyalardaki anahtar kare
-zamanları doğrudan sayıldı (`ffprobe -skip_frame nokey`):
+**Sebebi ölçüldü: yerleşim değil, aralığın kendisi.** Tur 2'de bu satırda "sebebi
+anahtar kare sayısı değil, yeri" yazıyordu; o cümle türetilmişti, ölçülmemişti. Tur 3'te
+yapılan A/B onu çürüttü — aşağıda.
+
+Üretilen dosyalardaki anahtar kare zamanları doğrudan sayıldı
+(`ffprobe -skip_frame nokey`):
 
 | çıktı | anahtar kare | en kısa aralık | en uzun aralık |
 |---|---|---|---|
@@ -251,20 +272,53 @@ zamanları doğrudan sayıldı (`ffprobe -skip_frame nokey`):
 
 Bizim iki satırımızda en kısa ile en uzun aralık **birebir eşit** — yani anahtar kare
 katı bir ızgaraya diziliyor, içeriğe hiç bakılmıyor. Sabit `FfmpegArguments.cs:162`'de:
-`-g = max(2, round(fps × 2))`.
+`-g = max(2, round(fps × 2))`. **Bu, kazanan koşum için de geçerli:** `-g 300` çıktısı da
+katı ızgara, yalnız adımı 5,00 s. Dolayısıyla "ızgara olması" tek başına `-g 300`'ün
+kazancını açıklayamaz — kazanan koşum da ızgara.
 
-Kaynakta iki sahne kesmesi var: 28,353 s ve 56,870 s. HandBrake'in anahtar kare
-zamanları `0,02 / 10,02 / 20,02 / 28,35 / 38,35 / 48,35 / 56,87` — düzenli 10 s'lik
-tavanın **arasına** tam bu iki kesmeyi yerleştirmiş. Bizimkiler
-`0,02 / 2,02 / 4,02 / … / 60,02` — kesmelerin ikisi de iki ızgara noktasının arasına
-düşüyor. Yani auto, kesmeden 0,34 s **önce** bir anahtar kareyi harcıyor, sonra
-kesmenin kendisini P/B kare olarak kodlamak zorunda kalıyor: en pahalı hâli.
+**Sahne kesmeleri nereden geliyor.** Kaynakta iki kesme var: 28,353 s ve 56,870 s.
+Üreten komut:
 
-Bit bütçesinin nereye gittiği bu. Auto'nun 31 anahtar karesinin **31'i de** hiçbir
-sahne sınırında değil — ızgara 0,0167 s'den başlayıp 2,00 s'de bir ilerliyor, iki
-kesme ise 28,353 ve 56,870 s'de; ızgaranın hiçbir noktası ikisine denk gelmiyor.
-HandBrake aynı kaynakta aynı teslim boyutunda 7 taneyle yetiniyor ve ikisini tam
-kesmelere koyuyor.
+    ffmpeg -i gui/parca-2.mkv \
+      -vf "select='gt(scene,0.2)',metadata=print:file=-" -an -f null -
+
+Çıktı: `pts_time 28.353` (skor 0,314) ve `pts_time 56.870` (skor 0,261). Eşik 0,3'te
+yalnız birincisi geçiyor; **"iki kesme" ifadesi 0,2 eşiğine bağlıdır.**
+
+HandBrake'in anahtar kare zamanları `0,02 / 10,02 / 20,02 / 28,35 / 38,35 / 48,35 / 56,87`
+— düzenli 10 s'lik tavanın **arasına** tam bu iki kesmeyi yerleştirmiş. Bizimkiler
+`0,02 / 2,02 / 4,02 / … / 60,02`; kesmelerin ikisi de iki ızgara noktasının arasına
+düşüyor. Bu bir gözlem; aşağıdaki koşumlar bunun bir **sebep** olmadığını gösteriyor.
+
+### Yerleşimin payı ölçüldü: sıfır değil, negatif
+
+Yerleşimi aralıktan ayırmak için aynı `-g 300`'de üç koşum yapıldı
+(`tools/auto-mod-olcumu/hizalama.sh`; üçü de preset 6, `-threads 4`, `lp=4`, aynı
+kaynak, aynı ses):
+
+| koşum | anahtar kare | boyut | istenen bit hızı | ortalama | p10 |
+|---|---|---|---|---|---|
+| `y1` düz ızgara | 13 (5,00 s adım) | 11 809 579 B | 2026k | 94,614 | 94,870 |
+| `y2` kesmelere hizalı | 13 | 11 160 196 B (-5,5%) | 2026k | 93,368 | 92,778 |
+| `y3` kesmelere hizalı, boyut eşitlenmiş | 13 | 11 973 383 B (+1,4%) | 2144k | 93,389 | 92,824 |
+
+`-force_key_frames 28.353,56.870` anahtar kare **sayısını değiştirmiyor**: zorlanan
+anahtar kare ızgara sayacını sıfırladığı için üçünde de 13 tane var. Değişen tek şey
+yer — `y2`/`y3` anahtar kareleri `0,02 / 5,02 / … / 25,02 / 28,37 / 33,37 / … / 53,37 / 56,88`,
+yani iki kesmenin ikisi de (bir kare sonrasında) anahtar kare.
+
+**Sonuç: hizalamanın payı negatif.** Boyutu eşitlenmiş `y3`, `y1`'den %1,4 **büyük**
+olduğu hâlde ortalamada **-1,225**, p10'da **-2,046** puan veriyor. `y2` ile `y3`'ün
+neredeyse eşit olması (fark 0,021 ortalama, 0,046 p10) kaybın bit bütçesinden değil
+yapıdan geldiğini gösteriyor: 108 kbit/s daha fazla bit hiçbir şey kazandırmadı.
+
+Yani `-g 300`'ün kazancı **aralığın uzunluğundan** geliyor; anahtar kareyi sahne
+kesmesine oturtmak bu kaynakta kaybettiriyor. **Neden kaybettirdiği ölçülmedi** —
+zorlanan anahtar karenin 16 karelik mini-GOP yapısını ortasından kesmesi bir aday,
+ama denenmedi. Ölçülen tek şey işaret ve büyüklük.
+
+Bu ölçüm **tek kaynakta ve tek `-g` değerinde** yapıldı. Başka içerikte (daha sık ve
+daha sert kesmeli) sonucun aynı çıkacağı **ölçülmedi**.
 
 **Düzeltme bu sözleşmenin işi değil.** `FfmpegArguments.cs` T98'in `owns`'unda;
 burası ölçüp adlandırıyor.
@@ -345,16 +399,21 @@ bizde de sabit, ama **preset adı gibi görünür bir kapağı yok**:
 
 Üç madde, üçü de K4'teki bir sayıya bağlı. Hiçbiri bu sözleşmede uygulanmadı.
 
-**1. Anahtar kare aralığını içerikten türet.** K4'te ölçülen kalemlerin en büyüğü:
-`-g 300` dosyayı %24,5 küçültürken puanı yükseltiyor (ortalama +0,155, p10 +0,333).
-Bu maddenin gerekçesi açığa katkısı değil — açığın çoğu zaten ayrıştırılamadı —
-**daha küçük dosyada daha yüksek puan** vermesi; iki eksende birden kazandığı için
-boyut eşitliği tartışmasından bağımsız duruyor. Ölçülen sebep,
-sabitin katı ızgara üretmesi — auto'nun 31 anahtar karesinin **hiçbiri** sahne
-sınırına denk gelmiyor, HandBrake aynı kaynakta 7 taneyle yetiniyor ve ikisini tam
-kesmelere koyuyor. Yapılacak iş `FfmpegArguments.cs:162`'deki `fps × 2` sabitini
-bir tavan (`-g`) + sahne kesmesi tetikli anahtar kare düzenine çevirmek.
-**Bu dosya T98'in `owns`'unda; iş oraya ait.**
+**1. Anahtar kare aralığını uzat — sahne kesmesine bağlama.** K4'te ölçülen
+kalemlerin en büyüğü: `-g 300` dosyayı %24,5 küçültürken puanı yükseltiyor
+(ortalama +0,155, p10 +0,333). Bu maddenin gerekçesi açığa katkısı değil — açığın
+çoğu zaten ayrıştırılamadı — **daha küçük dosyada daha yüksek puan** vermesi; iki
+eksende birden kazandığı için boyut eşitliği tartışmasından bağımsız duruyor.
+
+Ölçülen sebep **aralığın uzunluğu**, yerleşim değil: aynı `-g 300`'de anahtar kareyi
+iki sahne kesmesine hizalamak, sayı sabitken ve boyut eşitlenmişken ortalamada
+**-1,225**, p10'da **-2,046** kaybettiriyor (`y1`/`y3`, K4'teki hizalama tablosu).
+Yapılacak iş `FfmpegArguments.cs:162`'deki `fps × 2` sabitini daha uzun bir sabit
+aralığa çevirmek. **Sahne kesmesi tetikli anahtar kare denenmemeli** — bu kaynakta
+ölçüldü ve kaybettiriyor.
+
+Ölçülen tek nokta `-g 300`'dür; **hangi `-g` değerinin en iyi olduğu ölçülmedi**,
+120 ile 300 arası taranmadı. **Bu dosya T98'in `owns`'unda; iş oraya ait.**
 
 **2. Yazılım AV1'in bit hızı sapmasını modelle.** Kusur 3'te ölçüldü: teslim oranı
 ayara göre 0,709 ile 0,961 arasında değişiyor, HandBrake aynı istekte 1,024 veriyor.
@@ -399,18 +458,30 @@ uyarıp `yuv420p10le`'ye çeviriyor, yoklama "geçti" diyor. Sonuç doğru çık
 değerini tutturamıyor ve sapma **ayara bağlı olarak değişiyor**. Bu kaynakta ölçülen
 teslim oranları (teslim edilen video bit hızı / istenen):
 
-| koşum | istenen | teslim | oran |
-|---|---|---|---|
-| auto (preset 6, g=120) | 2026 | 1947,5 | 0,961 |
-| preset 4 | 2026 | 1800,4 | 0,889 |
-| g=300 | 2026 | 1436,1 | 0,709 |
-| ölçek 1440x810 | 2026 | 1743,9 | 0,861 |
-| preset 4 + g=300 | 2975 | 2145,2 | 0,721 |
-| preset 4 + g=300 | 2775 | 2038,8 | 0,735 |
-| HandBrake x265 preset slow (`uzman-hb`) | 2026 | 2073,7 | **1,024** |
+| koşum | K3/K4'te | istenen | teslim | oran |
+|---|---|---|---|---|
+| auto (preset 6, g=120) | K3 `auto`, K4 taban | 2026 | 1947,5 | 0,961 |
+| preset 4 | K4 ablasyon | 2026 | 1800,4 | 0,889 |
+| g=300 | K4 ablasyon (`e2-gop300`) | 2026 | 1436,1 | 0,709 |
+| ölçek 1440x810 | K4 ablasyon | 2026 | 1743,9 | 0,861 |
+| preset 4 + g=300 (`uzman-biz-2975`) | boyut eşitleme denemesi | 2975 | 2145,2 | 0,721 |
+| preset 4 + g=300 (`uzman-biz-2775`) | boyut eşitleme denemesi | 2775 | 2038,8 | 0,735 |
+| preset 4 + g=300 (`uzman-biz3`) | **K3 `uzman-biz` satırı** | 2605 | 1946,0 | 0,747 |
+| HandBrake x265 slow (`uzman-hb`) | boyut eşitleme denemesi | 2026 | 2073,7 | **1,024** |
+| HandBrake x265 slow (`uzman-hb2`) | **K3 `uzman-handbrake` satırı** | 1900 | 1942,5 | **1,022** |
+| `y1` düz ızgara, g=300 (tur 3, `-threads 4`) | hizalama A/B | 2026 | 1423,7 | 0,703 |
+| `y2` kesmelere hizalı, g=300 (tur 3) | hizalama A/B | 2026 | 1337,8 | **0,660** |
+| `y3` hizalı, boyut eşitlenmiş (tur 3) | hizalama A/B | 2144 | 1445,4 | 0,674 |
 
-HandBrake istediğini %2,4 içinde tutturuyor; bizim yolumuz %4 ile %29 arasında altına
-düşüyor. Plan hesabı bu sapmayı yalnız donanım kodlayıcıları için modelliyor
+İlk sürümde bu tabloda K3'ün iki satırını **üreten** koşumlar (`uzman-biz3`,
+`uzman-hb2`) yoktu; yerlerine boyut eşitlemenin ara denemeleri konmuştu. İkisi de
+yukarıya eklendi. Boyut eşitleme `uzman-biz` için üç (2975 → 2775 → 2605), HandBrake
+için iki (2026 → 1900) koşum sürdü; betiklerde geçen `uzman-biz` adı `uzman.sh`'in
+varsayılanıdır, o adla bir çıktı üretilmedi.
+
+HandBrake istediğini %2,4 içinde tutturuyor; bizim yolumuz %4 ile %34 arasında altına
+düşüyor. En kötü oran zorlanmış anahtar kareli koşumda (`y2`, 0,660) —
+`-force_key_frames` sapmayı büyütüyor. Plan hesabı bu sapmayı yalnız donanım kodlayıcıları için modelliyor
 (`PlanCalculator.cs:82-96`: `DeliveryReserveK`, `HardwareBitrateYield`); yazılım yolunda
 sapma sıfır varsayılıyor. Auto'nun kendi doldurma bandını dolduramamasının
 (15,04 MiB teslim, band alt kenarı 15,20 MiB) ölçülen sebebi bu. Sapma preset'e ve
@@ -442,9 +513,8 @@ libvmaf arasında kalıyor.
 `tablolar.py` sütunu `sifir = sum(1 for x in s if x < 1.0)` ile hesaplıyor ama
 başlığına "sıfır puanlı kare" yazıyor. Saydığı şey 1 puanın altındaki kare; tam
 sıfır sayısı bundan bir ya da iki eksik. Sayı doğru, adı yanlış — ve bu belgenin
-ilk sürümündeki iki yanlış cümlenin kaynağı bu oldu. Betik `.calisma/t102/` altındaki
-kopyada düzeltildi. T0 betiği `tools/auto-mod-olcumu/` altına taşıdığını bildirdi;
-`origin/main`de (`c648272`) o dizin **yok**, dolayısıyla taşınan kopyada başlık
-düzeltilmiş değil. Taşıma tamamlandığında aynı tek kelimelik düzeltme oraya da
-uygulanmalı.
+ilk sürümündeki iki yanlış cümlenin kaynağı bu oldu. Betik artık `main`de:
+`tools/auto-mod-olcumu/tablolar.py` — hesap `:24`'te, yanlış başlık `:79`'da ve **hâlâ
+duruyor**. Dosya bu sözleşmenin `owns`'unda değil; düzeltme T0'a bildirildi. Bu
+belgedeki tablolar başlığı doğru ("1 puan altı kare") yazıyor.
 
