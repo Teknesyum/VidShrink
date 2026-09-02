@@ -359,6 +359,15 @@ public sealed class OluUyeTests
     /// yansimayla turden cikar, bu satirlar yalniz cikanla karsilastirilir. Yeni bir sifir
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
+    /// <para>
+    /// Sayi 27'den 26'ya indi (T150 tur 2). Cikan uye <c>EncoderProbeState.NotWorking</c>:
+    /// T139 <c>src/VidShrink.Ffmpeg/PerformanceProbe.cs:97</c> satirini yazdi
+    /// (<c>2caff96</c> ekledi, <c>cf009f0</c> cagriyi <c>KnownState</c> olarak yeniden adlandirdi)
+    /// ve satir <c>main</c>e <c>5df0a98</c> birlesmesiyle geldi. Satir
+    /// <c>if (availability.KnownState(candidate) != EncoderProbeState.NotWorking) return candidate;</c>
+    /// olcunun <c>esitlik-sag</c> kuralina dusuyor: uye artik sekiz yerde uretilip bir yerde
+    /// tuketiliyor, sifir uretim tuketicisi degil. Pimden dusuruldu, uye dusurulmedi.
+    /// </para>
     /// </summary>
     private static readonly PinnedFinding[] Pinned =
     {
@@ -370,8 +379,6 @@ public sealed class OluUyeTests
             "Karsilastirma kaynaginin duraklatilmis durumu uretiliyor, hicbir kol duraklatilmisi ayirmiyor. Ayirmanin gerekip gerekmedigi olculmedi."),
         new("ConversionQualityMode.Bitrate", "varsayilan-kol", Legitimate,
             "Iki degerli kipin olumsuz kolu. Tek okuyan ConversionArguments.cs:86 'QualityMode == ConversionQualityMode.Crf' diye soruyor; Bitrate o kosulun else'i, ayrica adlandirilmasi ayni dali ikiye bolerdi."),
-        new("EncoderProbeState.NotWorking", "varsayilan-kol", Debt,
-            "Sekiz yerde uretiliyor, hicbir kol adini anmiyor; okuyanlar Working ve Unmeasured soruyor. T137 tam bu turde uc degerli cevabin ikiye dusmesini KRITIK saymisti, o yuzden 'olumsuz kol' diye gecistirilmedi."),
         new("EncoderVendor.Software", "varsayilan-kol", Legitimate,
             "Vendor()'in son satiri; IsHardware olculmus uc saticiyi adiyla sayip '_ => false' diyor, QualityArgs son kolda -crf veriyor. Software'i ayrica adlandirmak ayni davranisi iki yere yazardi."),
         new("FillPolicy.QualityCeiling", "varsayilan-kol", Legitimate,
@@ -474,7 +481,7 @@ public sealed class OluUyeTests
 
     /// <summary>
     /// K2: kume anahtar kelime listesinden degil turden cikiyor. Kanit, olcunun bu dosyada
-    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 32 satir 129 uyelik kumenin bir parcasi,
+    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 31 satir 129 uyelik kumenin bir parcasi,
     /// kumenin kendisi degil.
     /// </summary>
     [Fact]
