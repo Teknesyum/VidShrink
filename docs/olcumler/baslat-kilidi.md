@@ -161,9 +161,14 @@ Süre listesi ölçülüyor ama bu iddia "gerçek bir sınıra bağlı" değildi
 gerçek sürelerin (60-100 ms) 15 000 ms'lik öldürme sınırına hiç yaklaşmaması
 yüzünden mutasyona dayanıklı değildi — killer mantığı tamamen bozulsa bile bu
 karşılaştırma yeşil kalırdı. T137, bu iddiayı `dogrudan.State` üzerinden gerçekten
-kırılabilir bir ölçüme çevirdi (bkz. `docs/olcumler/yoklama-uclu-cevap.md`, K9);
+kırılabilir bir ölçüme çevirdi (bkz. `docs/olcumler/yoklama-uclu-cevap.md`, T9);
 8 tekrarlık süre dağılımı artık yalnız kanıt (`WriteEvidence`) olarak kalıyor,
 "ölçüldü" iddiası taşımıyor.
+
+Ama o ölçü ffmpeg'e bağlıydı: ffmpeg'siz ortamda `return` edip **sessizce yeşil**
+sayılıyordu. T137 tur 2'de iddianın süreç doğurmayan ikizi eklendi
+(`TheGateSettlesOnTheMeasuredDurationNotTheKillLimit`), ffmpeg'e bağlı kol da
+atlarken kanıt dosyasına görünür bir `ATLANDI` satırı bırakıyor.
 
 **Bir sessiz atlama düzeltildi.** İlk hâlde bu iddia `MachineIsQuiet` kapısının
 *altında* duruyordu; makinede başka ffmpeg koşarken ölçü hiç çalışmadan yeşil
@@ -171,16 +176,28 @@ sayılıyordu (kanıt dosyasında yalnız `atlandi, makinede baska ffmpeg kosuyo
 satırı vardı). Yük gerektirmeyen pin kapının üstüne alındı; kapı yalnız 8 tekrarlık
 süre dağılımını koruyor.
 
-| Koşum | Sonuç |
-| --- | --- |
-| Mutasyon k3: `answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;` → `answer.Settled = false;` | `Başarısız! - Başarısız: 3, Başarılı: 67, Atlanan: 0, Toplam: 70` |
+Mutasyon k3, `answer.Settled` hesabını `false`a sabitliyor. Filtre iki koşumda da
+`--filter "PlanCalculatorProbeTests|LanguageTests"`.
 
-Kırılan ölçüler, elle sayıldı — üç tane:
+| Koşum | Commit | Sonuç |
+| --- | --- | --- |
+| k3, ilk ölçüm (T130) | `702d2a0` | `Başarısız! - Başarısız: 3, Başarılı: 67, Atlanan: 0, Toplam: 70` |
+| k3, T137 tur 2'den sonra yeniden | `e7246f0` | `Başarısız! - Başarısız: 8, Başarılı: 68, Atlanan: 0, Toplam: 76` |
+
+Toplam 70 → 76: `PlanCalculatorProbeTests`in `[Fact]`/`[Theory]` sayısı `702d2a0`de
+19, `e7246f0`de 25 — artışın altısı da T137'nin. Filtrenin öbür kolu değişmedi
+(70−19 = 51, 76−25 = 51). İkinci koşumda kırılan ölçüler,
+elle sayıldı — **sekiz tane**:
 
 ```
-Başarısız ...ASettledProbeIsReadWithoutSpawningAgain [14 ms]                       Expected: True   Actual: False
-Başarısız ...IstisnaAtanYoklamaOlculmusBasarisizliktanAyirtEdiliyor [69 ms]        Expected: NotWorking  Actual: Unsettled
-Başarısız ...TheRealSoftwareProbeDurationIsMeasured [254 ms]                       Expected: Working     Actual: Unsettled
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.TheGateEntranceKeepsTheUnmeasuredAnswer [74 ms]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.TheProbeStatusDoesNotEraseAnUnrelatedMessage [21 s]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.ASettledProbeIsReadWithoutSpawningAgain [< 1 ms]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.IstisnaAtanYoklamaOlculmusBasarisizliktanAyirtEdiliyor [62 ms]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.EncoderStateGecidinDortDurumunuUcDurumaDogruDusuruyor [86 ms]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.TheRealSoftwareProbeDurationIsMeasured [188 ms]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.TheGateSettlesOnTheMeasuredDurationNotTheKillLimit [4 s]
+Başarısız VidShrink.Tests.PlanCalculatorProbeTests.FirstFailureCooldownSonrasiYerlesenYoklamaylaTemizleniyor [5 s]
 ```
 
 ## K4 — Yerleşmemiş yoklamanın kendi cümlesi var
