@@ -881,12 +881,13 @@ public static class PlanCalculator
         if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
         if (availability is null) return preferred;
         if (!availability.HasEncoder(preferred)) return FallbackCodecFor(pref);
-        if (availability is IEncoderMeasurementState state && !state.IsMeasured(preferred))
+        var state = availability.EncoderState(preferred);
+        if (state == EncoderProbeState.Unmeasured)
         {
             if (probe is not null) probe.NotMeasured = true;
             return preferred;
         }
-        if (availability.WorksAsEncoder(preferred)) return preferred;
+        if (state == EncoderProbeState.Working) return preferred;
         return FallbackCodecFor(pref);
     }
 
@@ -898,15 +899,15 @@ public static class PlanCalculator
     private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
-        var state = availability as IEncoderMeasurementState;
         foreach (var candidate in FastHardwareOrder)
         {
-            if (state is not null && !state.IsMeasured(candidate))
+            var state = availability.EncoderState(candidate);
+            if (state == EncoderProbeState.Unmeasured)
             {
                 probe.NotMeasured = true;
                 return candidate;
             }
-            if (availability.WorksAsEncoder(candidate)) return candidate;
+            if (state == EncoderProbeState.Working) return candidate;
         }
         return FallbackCodecFor(pref);
     }

@@ -94,7 +94,7 @@ public static class PerformanceProbe
         foreach (var candidate in built)
         {
             if (budgetMs > 0 && clock.ElapsedMilliseconds >= budgetMs) break;
-            if (availability.WorksAsEncoder(candidate)) return candidate;
+            if (availability.EncoderState(candidate) != EncoderProbeState.NotWorking) return candidate;
         }
 
         return built[0];
