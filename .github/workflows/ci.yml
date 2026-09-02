@@ -9,6 +9,14 @@ name: ci
 on:
   push:
     branches: ["**"]
+    # Relay bookkeeping (contracts, LOG, task packets) lands on main between code
+    # merges. Those commits cannot break the build, but each one started a run that
+    # cancelled the code run still in flight, so main went hours without a green
+    # reading. Paths that cannot affect the build no longer trigger one.
+    paths-ignore:
+      - ".claude/**"
+      - "docs/**"
+      - "**/*.md"
   pull_request:
     branches: [main]
 
