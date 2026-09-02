@@ -109,6 +109,13 @@ internal sealed class SegmentEncoder : IDisposable
     internal IEncoderAvailability? Availability { get; set; }
 
     /// <summary>
+    /// Kaynağın sahne haritası. Önizleme parçası anahtar kare tavanını buradan alır;
+    /// <c>null</c> kalırsa parça 10 sn varsayılan tavanla kodlanır ve tam kodlamadan
+    /// ayrışır — kullanıcı baktığı görüntüden farklı bir dosya alır.
+    /// </summary>
+    internal SceneMap? Scenes { get; set; }
+
+    /// <summary>
     /// Bir pencerenin parçasını hesaplar; kodlayan yol da imza hesabı da buradan geçer,
     /// böylece ikisi aynı <see cref="Availability"/> değerini görür. Pencere kaynağın
     /// dışına düşerse <see cref="ArgumentOutOfRangeException"/> atar.
@@ -116,7 +123,7 @@ internal sealed class SegmentEncoder : IDisposable
     internal PreviewSegment Describe(
         MediaInfo info, EncodePlan plan, double startSeconds, string outputPath, ComplexityProfile? complexity)
         => PreviewSegment.For(info, plan, startSeconds, outputPath,
-            complexity: complexity, availability: Availability);
+            complexity: complexity, availability: Availability, scenes: Scenes);
 
     /// <summary>Son başarısız kodlamanın sebebi, anahtar hâlinde. Başarıda temizlenir.</summary>
     internal EncodeFailure? LastFailure { get; private set; }

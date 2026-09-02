@@ -80,6 +80,13 @@ public sealed record PreviewSegment
     /// <summary>Parcanin kodlanmasi icin ffmpeg argumanlari.</summary>
     public required IReadOnlyList<string> Arguments { get; init; }
 
+    /// <summary>
+    /// Parcaya uygulanan sahne haritasi. <c>null</c> ise anahtar kare tavani
+    /// <see cref="FfmpegArguments.KeyframeCeilingDefaultSeconds"/> varsayilanidir ve parca bu
+    /// noktada nihai kodlamadan ayrisir; ayrismayi olcen taraf bu alani okur.
+    /// </summary>
+    public SceneMap? Scenes { get; init; }
+
     /// <summary>Parcanin kodlamada kullandigi plan; tam plandan yalnizca hiz kontrolunde ayrilir.</summary>
     public required EncodePlan Plan { get; init; }
 
@@ -124,7 +131,8 @@ public sealed record PreviewSegment
         string outputPath,
         double? durationSeconds = null,
         ComplexityProfile? complexity = null,
-        IEncoderAvailability? availability = null)
+        IEncoderAvailability? availability = null,
+        SceneMap? scenes = null)
     {
         if (startSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(startSeconds), startSeconds, "Parca baslangici negatif olamaz.");
@@ -158,7 +166,8 @@ public sealed record PreviewSegment
             Quality = quality,
             DroppedSecondPass = plan.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(plan.Codec),
             Plan = segmentPlan,
-            Arguments = FfmpegArguments.BuildSegment(info, segmentPlan, startSeconds, duration, outputPath, availability)
+            Scenes = scenes,
+            Arguments = FfmpegArguments.BuildSegment(info, segmentPlan, startSeconds, duration, outputPath, availability, scenes)
         };
     }
 }

@@ -1,3 +1,10 @@
+# REJIM: sabit esik 0,2 (T101). Bugunku uretim esigi turetiyor —
+# theta(t) = clamp(0,08 + 2,09*p90(+-40 sn); 0,05; 0,15), ThresholdRule.Measured;
+# turetilen haritada tek esik yoktur (SceneMap.Threshold = NaN, kural SceneMap.Rule'da).
+# Bu dosya YENIDEN URETILMEDI: docs/olcumler/sahne-haritasi.md:13 bu sinirlari
+# 0,2 rejiminin kaydi olarak pimliyor. Bugunku kuralin haritasi ve tam komutlari
+# docs/olcumler/dinamik-esik.md icinde. Ureten: tools/sahne-yer-gercegi/tara.ps1
+# kaynak .calisma/kaynak/kaynak-1080p60-hdr-17dk.mp4 · not T113.
 index;start;end;sure;karmasiklik
 0;0;34.367811;34.368;1.47762
 1;34.367811;93.100433;58.733;0.10019
