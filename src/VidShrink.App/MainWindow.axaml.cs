@@ -2053,7 +2053,7 @@ public partial class MainWindow : Window
 
         AddQualityRow(grid, Say("main.quality.target"), $"{Num(target, "0.##")} MB");
         AddQualityRow(grid, Say("main.quality.predicted"), $"{score:0.#}/100");
-        AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.points", Num(hint.LossPoints, "0.#")));
+        AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", Num(hint.LossPoints, "0.#")));
         AddQualityRow(grid, Say("main.quality.basis"), basis);
         return grid;
     }
@@ -2137,7 +2137,7 @@ public partial class MainWindow : Window
         AddPlanFact(Say("main.plan.fact.frame-rate"), $"{Num(plan.Fps, "0.##")} FPS");
         AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {plan.AudioBitrateK}k{channels}");
         AddPlanFact(Say("main.plan.fact.preset"), plan.Preset);
-        AddPlanFact(Say("main.plan.fact.estimate"), _estimate is { } size ? $"{Num(size.ExpectedMb, "0.0")} MB" : "-");
+        AddPlanFact(Say("main.plan.fact.estimated-size"), _estimate is { } size ? $"{Num(size.ExpectedMb, "0.0")} MB" : "-");
 
         foreach (var line in StrategyLines()) AddPlanReason(line);
         foreach (var line in ReasonLines(plan)) AddPlanReason(line);
