@@ -388,3 +388,50 @@ dogruladi.
     daralmanin arayuz tarafindaki ikizi. T137 acildiginda yalniz Ffmpeg tarafini
     kapsiyordu; App tarafi da T137'ye eklendi.
 - T138 submitted — uc etiket cumlesi veriye hizalandi (manset zones 3/5 tabani gecti + 1/5 en iyi aday, K4 destek=hayir gerekcesi iki kola ayrildi, K7 en buyuk p10 kaybi -0.014); sayim denetcisi 12 -> 18 iddia, 5 mutasyonun hepsi hedefledigi iddiayi kirdi; T114'un hukmu ('Dagitim koda girmez.') degismedi. Dal T138-rapor-etiketleri 37bae0d.
+
+## T138 — Sahne butcesi etiketleri (muhur, denetim GECTI, KRITIK yok)
+
+131. sozlesme. Denetci izole kopyada (`git archive 3bb5706`) calisti, depoya yazmadi.
+
+Kriterlerin besi de bagimsiz olcumle tuttu. Denetci ajanin sayilarina guvenmedi:
+manset iddiasinin 3/5 ve 1/5 degerlerini ham `k4b-*.csv`den kendi saydi, K7 kaybini
+iki json'dan yeniden hesapladi, bes mutasyonun **besini de** `--no-incremental`
+derlemeyle kendisi kosturdu. Her mutasyon yalniz kendi iddiasini kirdi, 17 iddia yasadi.
+
+K2'nin asil kaniti: denetci mansetteki her sayiyi tek tek elle bozdu, altisinda da
+denetci `TUTMADI` dondu; manset cumlesi tumden yeniden yazilinca `exit=1`. Eski
+betigin dokuz regex'i cikarildi — hicbiri manseti taramiyordu, teshis dogru.
+
+K4: rapor yeniden uretildi, farkli cikan uc satirin ucu de cevre degeri (dal adi,
+`git log -1 -- src`, ham cikti yolu). **Olcum sayisi farki 0.** `src/` ve `tests/`
+diffi bos.
+
+Borclar:
+
+1. `Olculen uretim kodu` satiri olcum anini degil **rapor uretim anini** okuyor.
+   T114 olcumleri `f542dc2` ile kosuldu, `ccd2abd` o dala hic girmedi; T138
+   birlesince satir `ccd2abd` oldu. Yani birlesmis belgede su an olcumun hic gormedigi
+   bir koken iddiasi duruyor ve sonraki uretim ucuncu bir commit yazacak
+   (`main`in `src` basi artik `7ad8ffa`) — `tools/sahne-butcesi/Rapor.cs:135`.
+2. `sayim-denetimi.py`de K7 iddiasinin `if m:` kolunun `else`i yok: K7 cumlesi
+   yeniden yazilirsa iddia sessizce kayboluyor. Olculdu: 17 iddia, exit 0 —
+   `tools/sahne-butcesi/sayim-denetimi.py:130`.
+3. Ayni sessiz dusme `k4-izgara.csv` yoksa da oluyor (dosya gecici tasindi: 17 iddia,
+   exit 0) — `tools/sahne-butcesi/sayim-denetimi.py:83`.
+4. Verify paragrafi iki yolda da bulunamazsa hicbir uyari vermeden atlaniyor —
+   `tools/sahne-butcesi/Rapor.cs:1279`.
+5. **Sozlesmenin `verify` kolu yalniz `dotnet build`.** K2/K3'u kanitlayan
+   `sayim-denetimi.py` muhur kapisinda hic kosmuyor; sozlesmenin asil olcusunu kapi
+   calistirmiyor. Kusur G'nin (olu verify kolu) kardesi: kol olu degil, **eksik** —
+   `.claude/relay/contracts/T138.md:9`.
+6. Ham `k4-izgara.csv` satir 11 ve 13'un `not` sutunu hala eski yanlis gerekceyi
+   tasiyor; sayfa dogru cunku etiket uretimde yeniden hesaplaniyor, ham dosyayi okuyan
+   yanlis cumleyi gorur.
+7. Bir ajan gecici dosyayi `AGENTS.md`in dedigi depo kokundeki `.calisma/` yerine
+   `.claude/.calisma/T114` altina yazmis (T0 sildi).
+8. T138 worktree'si birlesme sonrasi duruyordu (T0 kaldirdi).
+9. "en buyuk p10 kaybi -0.014" `Math.Max` anlaminda dogru ama iki kayiptan buyuk dusus
+   olan -0.050'yi adlandirmiyor; isaretli bicim ve alttaki tablo kurtariyor, ustunluk
+   sifati tek basina okundugunda kaygan — `tools/sahne-butcesi/Rapor.cs:1022`.
+
+Borc 1 ve 5 T0'da kaldi; ikisi de tek sozlesmelik degil, sablon isi.

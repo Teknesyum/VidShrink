@@ -1,0 +1,17 @@
+{
+  "contractId": "T138",
+  "auditorRunId": "afcf7514d10828d36",
+  "headSha": "3bb5706351100a42fef14f78873e47608e832e2d",
+  "diffHash": "7932d9057d91edc8f111bc10a3dc621e87d294d5af4b4e237763fd8bfd23334c",
+  "owns": [
+    "tools/sahne-butcesi/Rapor.cs",
+    "tools/sahne-butcesi/Program.cs",
+    "tools/sahne-butcesi/sayim-denetimi.py",
+    "docs/olcumler/sahne-butcesi.md"
+  ],
+  "verification": [
+    "Denetci izole kopyada (git archive 3bb5706) calisti, depoya yazmadi. K1: manset 3/5 ve 1/5 sayilari ham k4b-*.csv'den bagimsiz sayildi, tablo ve uretici kodla ucu de tuttu; K7 kaybi -0.014 iki json'dan dogrulandi. K2: sayim-denetimi.py 18/18; eski betigin dokuz regex'i cikarildi, hicbiri manseti taramiyordu - teshis dogru; manset sayilari tek tek elle bozuldu, altisi da TUTMADI dondu, manset yeniden yazilinca exit=1. K3: bes mutasyonun BESI de denetci tarafindan --no-incremental derlemeyle kosuldu, her biri yalniz kendi iddiasini kirdi, 17 iddia yasadi. K4: rapor yeniden uretildi, farkli cikan uc satirin ucu de cevre degeri (dal adi, git log, yol); etiket cumlesi farki 0, sayim tablosu farki 0, OLCUM SAYISI FARKI 0. K5: T114 hukum cumlesi 657. satirda karakterine ayni, kapi degiskeni kazanciAsan=0, enBuyukKayip hicbir karara girmiyor. src/ ve tests/ diffi bos. KRITIK yok, dokuz borc kaydedildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T13:40:25.234Z"
+}
