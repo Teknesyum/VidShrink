@@ -66,7 +66,7 @@ cevabı, cevap vermemek.
 
 Bu, T102'de HandBrake koşumunun boyutunun **elle** eşitlenmiş olmasının sebebi:
 `docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "boyut eşlemesi elle yapıldı … HandBrake
-için iki koşum" (şu an `:202-204`). Yani T102'de HandBrake'e bizim yaptığımız işi yaptırmadık;
+için iki koşum" (şu an `:223-225`). Yani T102'de HandBrake'e bizim yaptığımız işi yaptırmadık;
 insan yaptı.
 
 ### İki geçiş nasıl kuruluyor
@@ -162,9 +162,9 @@ seçtiğini görünür kılıyor. Yorum satırları bunu kendisi söylüyor:
 **Bu ayrımın kullanıcıya ulaşan sonucu var mı?** Var, ama iddiamızın lehine değil.
 T102'de HandBrake çıktısının anahtar kareleri
 `0,02 / 10,02 / 20,02 / 28,35 / 38,35 / 48,35 / 56,87` idi
-(`docs/olcumler/auto-mod.md` § "K4 — Açığın ayar başına ayrıştırması" > "En büyük kalem: anahtar kare aralığı" — "HandBrake'in anahtar kare zamanları 0,02 / 10,02…", şu an `:289`). 10 saniyelik tavan `libhb/encx265.c:188-190`'in
+(`docs/olcumler/auto-mod.md` § "K4 — Açığın ayar başına ayrıştırması" > "En büyük kalem: anahtar kare aralığı" — "HandBrake'in anahtar kare zamanları 0,02 / 10,02…", şu an `:320`). 10 saniyelik tavan `libhb/encx265.c:188-190`'in
 sonucu (60 fps × 10). Aradaki `28,35` ve `56,87` ise **tam olarak kaynağın iki
-sahne kesmesi** (`docs/olcumler/auto-mod.md` § "K4 — Açığın ayar başına ayrıştırması" > "En büyük kalem: anahtar kare aralığı" — "Çıktı: pts_time 28.353 (skor 0,314)…", şu an `:283-287`, ölçülen skorlar 0,314 ve
+sahne kesmesi** (`docs/olcumler/auto-mod.md` § "K4 — Açığın ayar başına ayrıştırması" > "En büyük kalem: anahtar kare aralığı" — "Çıktı: pts_time 28.353 (skor 0,314)…", şu an `:314-318`, ölçülen skorlar 0,314 ve
 0,261). Bu iki anahtar kareyi HandBrake koymadı — x265'in `scenecut`'ı koydu.
 
 Sonuç kullanıcının dosyasında duruyor ve kimin koyduğunu sormuyor. **"HandBrake
@@ -309,7 +309,7 @@ metni, biri `Default` bayrağı):
 
 | Alan | Very Fast 1080p30 | Fast 1080p30 | Bizdeki karşılığı |
 |---|---|---|---|
-| `VideoPreset` | `"veryfast"` (`:332`) | `"fast"` (`:1012`) | var — `EncodePlan.Preset`, auto'da libsvtav1 preset 6 (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Motor libsvtav1, preset 6, -g 120…", şu an `:208`) |
+| `VideoPreset` | `"veryfast"` (`:332`) | `"fast"` (`:1012`) | var — `EncodePlan.Preset`, auto'da libsvtav1 preset 6 (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Motor libsvtav1, preset 6, -g 120…", şu an `:229`) |
 | `VideoQualitySlider` | `24.0` (`:338`) | `22.0` (`:1018`) | var — `PlanCalculator.cs:226` (`budgetCrf`), **ama bütçeden türetiliyor, sabit değil** |
 | `VideoAvgBitrate` | `4000` (`:324`) | `6000` (`:1004`) | var — `PlanCalculator.cs:156` (`videoK`), hedef boyuttan türetiliyor |
 | `PictureCombDetectPreset` | `"fast"` (`:392`) | `"default"` (`:1072`) | **yok** |
@@ -341,7 +341,7 @@ sonucu doğuruyor:
 
 ### T102'nin `uzman-hb2` koşumu hangi preset'ti
 
-**Hiçbiri.** Komut (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Koşum adı uzman-hb2: HandBrakeCLI -e x265_10bit…", şu an `:210`):
+**Hiçbiri.** Komut (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Koşum adı uzman-hb2: HandBrakeCLI -e x265_10bit…", şu an `:231`):
 
 ```
 HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo \
@@ -395,7 +395,7 @@ Her madde: ne, hangi dosyaya, hangi ölçüyle sınanır. Sözleşme açmıyorum
 sözleşme yazılabilecek somutlukta.
 
 **Öncelik sırası hakkında bir uyarı.** Elimizdeki tek ölçülmüş açık T102'nin
-auto 94,462 ↔ uzman-hb2 95,731 farkı (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — tablo satırları "auto | 15,04 MiB … | 94,462" ve "uzman-handbrake | 15,02 MiB … | 95,731", şu an `:214,216`).
+auto 94,462 ↔ uzman-hb2 95,731 farkı (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — tablo satırları "auto | 15,04 MiB … | 94,462" ve "uzman-handbrake | 15,02 MiB … | 95,731", şu an `:235,237`).
 **O sayı kirli:** T111 sebebini yazıyor — bizim AV1 koşumlarımızda kaymış kare
 eşlemesi var, HandBrake koşumunda yok (`.claude/relay/contracts/T111.md:25-39`).
 Düzeltmenin büyüklüğü henüz ölçülmedi. Aşağıdaki her "beklenir" cümlesi
@@ -410,11 +410,19 @@ Düzeltmenin büyüklüğü henüz ölçülmedi. Aşağıdaki her "beklenir" cü
 - **Ölçü:** `tools/auto-mod-olcumu`, aynı kaynak, `-g` ızgarası, boyut eşitlenmiş.
 - **Açığın hangi kısmını kapatması beklenir:** en büyüğü. Bu zaten ölçüldü —
   `-g 300` dosyayı **%24,5 küçültürken** ortalamayı **+0,155**, p10'u **+0,333**
-  artırdı (`docs/olcumler/auto-mod.md` § "K6 — Sıradaki adım" — "-g 300 dosyayı %24,5 küçültürken puanı yükseltiyor…", şu an `:403-404`). Tek yönlü kazanç. HandBrake'in bizim
+  artırdı (`docs/olcumler/auto-mod.md` § "K6 — Sıradaki adım" — "-g 300 dosyayı %24,5 küçültürken puanı yükseltiyor…", şu an `:448`). Tek yönlü kazanç. HandBrake'in bizim
   önümüzde olduğu 1,269 puanın kayda değer bir kısmının burada olması beklenir.
-- **Not:** aynı belge (§ "K4 — Açığın ayar başına ayrıştırması" > "Yerleşimin payı ölçüldü: sıfır değil, negatif" — "Sonuç: hizalamanın payı negatif.", şu an `:311`) anahtar kareyi sahne kesmesine hizalamanın payının
-  **negatif** olduğunu ölçmüş. Yani kazanç aralığın uzunluğundan; hizalamaya
-  yatırım yapılmamalı.
+- **Not (çapa hedefinin içeriği de kaymış, yalnız satırı değil):** aynı belge
+  (§ "K4 — Açığın ayar başına ayrıştırması" > "Yerleşimin payı ölçüldü: sıfır
+  değil, negatif" — "Sonuç: hizalamanın payı ortalamada negatif, p10'da değil.",
+  şu an `:342`) anahtar kareyi sahne kesmesine hizalamanın payını **ortalamada
+  negatif ama p10'da pozitif** (+0,135) ölçmüş. Bu cümle T111'in kilit
+  düzeltmesinden önce yalnız "negatif" diyordu (eski alıntı: "Sonuç:
+  hizalamanın payı negatif."); T111 sonrası ölçüm kuyrukta (p10) küçük bir
+  kazanç bulmuş. Yani kazanç aralığın uzunluğundan geliyor iddiası **ortalama**
+  için hâlâ geçerli; "hizalamaya yatırım yapılmamalı" sonucu da ortalama
+  içindir — p10'da tam tersini gösteren güncel bir veri var, bu maddeye
+  yatırım kararı verilecekse bu nüans hesaba katılmalı.
 
 ### 2. Örnekleme penceresi içeriğe göre büyüsün
 
@@ -439,7 +447,7 @@ Düzeltmenin büyüklüğü henüz ölçülmedi. Aşağıdaki her "beklenir" cü
 - **Beklenen:** p10 ve harmonik ortalamada kazanç, ortalamada az. T102'de
   auto'nun harmonik ortalaması **56,313**, HandBrake'in **95,727** —
   ama bu fark T111'in kaymış eşlemesinin en çok bozduğu metrik
-  (26 kare 1 puan altında, en düşük kare 0,00; `docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — tablo satırı "auto | 15,04 MiB … | 94,462 | … | 26 | 0,00", şu an `:214`).
+  (26 kare 1 puan altında, en düşük kare 0,00; `docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — tablo satırı "auto | 15,04 MiB … | 94,462 | … | 26 | 0,00", şu an `:235`).
   **T111 kapanmadan bu maddeye yatırım yapılmamalı.**
 
 ### 4. Kare hızı modu `pfr` olsun

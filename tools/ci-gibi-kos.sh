@@ -25,7 +25,8 @@ selftest() {
   fi
 
   if [ -z "$MAX_SKIPPED" ]; then
-    echo "  UYARI: -MaximumSkipped $WORKFLOW icinde bulunamadi, sinirsiz kabul edilecek."
+    echo "  DUSTU: -MaximumSkipped $WORKFLOW icinde bulunamadi veya bicimi degisti."
+    ok=0
   else
     echo "  -MaximumSkipped=$MAX_SKIPPED (kaynak: $WORKFLOW)"
   fi
@@ -37,8 +38,13 @@ selftest() {
     ok=0
   fi
 
-  if command -v powershell >/dev/null 2>&1 || command -v pwsh >/dev/null 2>&1; then
-    echo "  powershell/pwsh PATH'te bulundu."
+  if command -v pwsh >/dev/null 2>&1; then
+    echo "  pwsh PATH'te bulundu - CI de kapiyi pwsh (PowerShell 7) ile calistiriyor, ayni surum ailesi."
+  elif command -v powershell >/dev/null 2>&1; then
+    echo "  UYARI: pwsh PATH'te yok. CI kapiyi pwsh (PowerShell 7) ile calistiriyor, bu ortam Windows"
+    echo "    PowerShell 5.1'e dusecek. Bu sessiz degil, ayri bir temsil acigi: kod=66 gibi aciklanamayan"
+    echo "    kapi farklari bu surum farkindan kaynaklanabilir, kanitlanmadi. KENDI-SINAMA yine de gecer,"
+    echo "    ama gercek kosumda ayni uyari tekrar basilir."
   else
     echo "  DUSTU: ne powershell ne pwsh PATH'te."
     ok=0
@@ -69,14 +75,18 @@ if [ -z "$MIN_TOTAL" ]; then
   exit 3
 fi
 
-SKIPPED_NOTE=""
-GATE_ARGS="-MinimumTotal $MIN_TOTAL"
-if [ -n "$MAX_SKIPPED" ]; then
-  GATE_ARGS="$GATE_ARGS -MaximumSkipped $MAX_SKIPPED"
-  SKIPPED_NOTE=" -MaximumSkipped $MAX_SKIPPED"
+if [ -z "$MAX_SKIPPED" ]; then
+  echo "DURDU: $WORKFLOW icinden -MaximumSkipped okunamadi veya bicimi degisti - kapi parametresi" >&2
+  echo "  belirsiz. Sinirsiz atlama kabul edip sessizce daha gevsek bir kapiyla kosmak yerine duruyor." >&2
+  exit 3
 fi
 
-echo "CI TEMSILI: ffmpeg PATH'te birakiliyor, kapi $WORKFLOW'dan okunuyor (-MinimumTotal $MIN_TOTAL$SKIPPED_NOTE)."
+GATE_ARGS="-MinimumTotal $MIN_TOTAL -MaximumSkipped $MAX_SKIPPED"
+
+echo "CI TEMSILI: ffmpeg PATH'te birakiliyor, kapi $WORKFLOW'dan okunuyor (-MinimumTotal $MIN_TOTAL -MaximumSkipped $MAX_SKIPPED)."
+echo "  TEMSIL EDEMEDIGI: bu makinede GPU donanimi var, CI runner'inda yok. h264_nvenc'e bagli testler"
+echo "  bu farktan dolayi burada CI'dan FARKLI sonuclanabilir; betik bu ekseni asla CI gibi kirmiziya"
+echo "  ceviremez, yalniz asagida (varsa) gorunur kilar."
 
 dotnet build VidShrink.sln -c Release -warnaserror || exit $?
 
@@ -84,6 +94,9 @@ if command -v pwsh >/dev/null 2>&1; then
   PS=pwsh
 else
   PS=powershell
+  echo "UYARI: pwsh yok, Windows PowerShell 5.1'e dusuluyor. CI kapiyi pwsh (PowerShell 7) ile calistirir -"
+  echo "  bu ortam ayni surumu temsil etmiyor. Aciklanamayan kapi farklari (orn. kod=66) bu geri dususten"
+  echo "  kaynaklaniyor olabilir."
 fi
 
 "$PS" -NoProfile -ExecutionPolicy Bypass -File tools/kosum-kapisi/kosum-kapisi.ps1 $GATE_ARGS

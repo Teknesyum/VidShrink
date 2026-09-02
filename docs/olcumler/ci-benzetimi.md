@@ -122,7 +122,7 @@ izler, ikinci bir kayma başlamaz.
 - `--self-test`: ffmpeg/ffprobe PATH'te mi, `-MinimumTotal`/`-MaximumSkipped`
   `ci.yml`'den okunabiliyor mu, `dotnet` ve `powershell`/`pwsh` var mı — kontrol
   eder, tam süiti koşturmaz. Bu makinede geçti (ffmpeg WinGet üzerinden PATH'te,
-  `-MinimumTotal=1134`, `-MaximumSkipped=30`).
+  `-MinimumTotal=1134`, `-MaximumSkipped=30`, `pwsh` yok — aşağıdaki tur 3 notuna bakın).
 - Bilinmeyen argüman (`--self-test` dışında) `DURDU` yazıp çıkış kodu 3 verir.
 - **Parametreler OKUNUYOR, kopyalanmadı (tur 2, K3'ün cevabı).** `tools/ci-gibi-kos.sh`
   içinde sabit bir sayı yok: her koşumda `grep -E 'kosum-kapisi\.ps1' "$WORKFLOW" |
@@ -144,6 +144,70 @@ izler, ikinci bir kayma başlamaz.
   İlk sürümde bu prob 64x64 boyutla yazılmıştı ve nvenc'in kendi minimum çözünürlük
   sınırına takılıp her zaman "çalışmıyor" diye yanlış rapor veriyordu; 320x240'a
   çıkarılıp standalone doğrulandıktan sonra teslim edildi.
+
+## Tur 3: iki temsil borcu daha kapatıldı
+
+**1) `pwsh` yokluğu artık ayrı, görünür bir bulgu.** Önceden `--self-test`
+`command -v powershell || command -v pwsh` diyip ikisini eşitliyordu, "powershell/pwsh
+PATH'te bulundu" tek satırıyla geçiyordu — bu makinede `pwsh` yok, yalnız Windows
+PowerShell 5.1 var, ama bu fark görünmüyordu. Artık `pwsh` varsa "ayni surum ailesi"
+diyor; yoksa `UYARI:` ile CI'ın `pwsh` (PowerShell 7) kullandığını, bu ortamın 5.1'e
+düştüğünü ve `kod=66` gibi açıklanamayan kapı farklarının bu sürüm düşüşünden
+kaynaklanabileceğini (kanıtlanmadı, aday) yazıyor — `KENDI-SINAMA` yine geçiyor
+(fatal değil), ama sessiz değil. Gerçek koşumda (`ci-gibi-kos.sh` argümansız) `$PS`
+seçimi sırasında aynı uyarı tekrar basılıyor, yalnız `--self-test`'e özel değil.
+
+**2) `-MaximumSkipped` artık `-MinimumTotal` ile eş sıkılıkta.** Önceden format
+değişir/satır kaybolursa yalnız `UYARI: ... sinirsiz kabul edilecek` yazıp
+`--self-test` yine `exit 0` veriyordu, gerçek koşum da `-MaximumSkipped` olmadan
+`kosum-kapisi.ps1`'i çağırıyordu — yani betik "CI ile hizalıyım" derken CI'dan daha
+gevşek bir kapıyla koşabiliyordu. Artık `-MinimumTotal`'ın izlediği yol: `--self-test`
+`DUSTU` deyip `ok=0` yapıyor, gerçek koşum `DURDU` deyip `exit 3` ile duruyor.
+Doğrulama: `.calisma/` altında `-MaximumSkipped`i silinmiş bir `ci.yml` kopyası ve
+`WORKFLOW` değişkeni o kopyaya çevrilmiş bir betik kopyasıyla iki yol da denendi —
+`--self-test` `KENDI-SINAMA DUSTU` (exit 1), gerçek koşum `DURDU` (exit 3) verdi;
+kopyalar teslimden önce silindi, `owns` dışına kalıcı iz bırakmadı.
+
+**3) İlk satır artık GPU'yu temsil edemediğini de söylüyor.** `CI TEMSILI:` satırının
+hemen altına, koşum ffmpeg-prob'una gitmeden önce, sabit bir `TEMSIL EDEMEDIGI:`
+satırı eklendi — bu makinede GPU donanımı gerçek, CI runner'ında yok, betik bu
+ekseni asla CI gibi kırmızıya çeviremez. Önceki UYARI (satır ~92-103) hâlâ duruyor
+ve yalnız prob gerçekten GPU çalıştığını doğrularsa basılıyor; yeni satır ise
+koşuldan bağımsız, her koşumda baştan açıklıyor — K3'ün "temsil ettiği kadar
+edemediğini de söylesin" isteğinin karşılığı.
+
+**Doğrulama:** `bash tools/ci-gibi-kos.sh --self-test` tur 3 sonunda yine `KENDI-SINAMA
+GECTI` (exit 0) veriyor — yeni `pwsh` UYARI'sı `ok`u düşürmüyor, yalnız görünür
+kılıyor; `-MaximumSkipped` gerçek `ci.yml`'de var olduğu için `DUSTU` yolu bu
+makinede tetiklenmiyor, yalnız yukarıdaki `.calisma/` senaryosuyla ayrıca kanıtlandı.
+
+## `handbrake-motoru.md` çapaları: main'e karşı yeniden doğrulandı, iki sapma bulundu
+
+T0'ın verdiği "eski main → main'de şimdi" tablosu **beklenti** olarak kullanıldı,
+kaynak olarak değil: `origin/main` (uç `2cd0361`) çekildi, dokuz çapanın her biri
+kendi alıntı metniyle `auto-mod.md`'nin güncel haline karşı tek tek arandı. Yedisi
+tabloyla birebir örtüştü (`:223-225`, `:320`, `:314-318`, `:229`, `:231`, `:235`,
+`:237`). İki sapma bulundu:
+
+- **`-g 300`/K6 çapası: tablo `:276` diyor, kendi ölçümüm `:448` buldu.** Çapanın
+  alıntısı ("kalemlerin en büyüğü: `-g 300` dosyayı %24,5 küçültürken puanı
+  yükseltiyor…") `auto-mod.md`'de yalnız `:448`'de, `## K6 — Sıradaki adım` başlığı
+  altında geçiyor — çapanın kendi kayıtlı üst başlığıyla tutarlı. `:276` farklı bir
+  cümleye ait: K4 tablosunun bir satırı ("Dosya %24,5 küçülürken…"), yalnız aynı
+  "%24,5" rakamını paylaşıyor, alıntı metni farklı. T0'ın talimatı ("bu sayıları
+  körlemesine yazma… kendi gözünle bul") gereği kendi ölçümüme güvenip `:448` yazdım;
+  tablonun bu satırı muhtemelen iki benzer cümleyi karıştırmış.
+- **Öz-referans çapası: tabloda hiç yok, içerik de kaymış (yalnız satır değil).**
+  `handbrake-motoru.md`'nin kendi K4 bölümüne yaptığı öz-referans (önceki `:311`)
+  T0'ın tablosunda hiç listelenmemişti. Hedef cümle önceden "Sonuç: hizalamanın payı
+  negatif." derken, `auto-mod.md`'de şimdi (`:342`) "Sonuç: hizalamanın payı
+  ortalamada negatif, p10'da değil." diyor — T111'in sonraki kilit düzeltmesi p10
+  kuyruğunda **+0,135** ölçmüş, yani pozitif bir pay bulmuş. Yalnız satır numarasını
+  kaydırmak bu değişikliği kaçırırdı: alıntı da, çevresindeki iddia da güncellendi
+  (`handbrake-motoru.md` içinde "ortalama için hâlâ geçerli, p10'da tersi var"
+  diye nüanslandı) — çapa biçiminin varlık sebebi tam olarak bu: satır numarası
+  bayatlar, ama alıntıyı okumadan yalnız `grep`le "bulundu" demek içerik kaymasını
+  yakalamaz.
 
 ## Ölçülmedi
 
