@@ -549,4 +549,5 @@ reddettigi gorulsun diye ciktisi buraya alindi:
    Kazancin ust siniri bu araliktan gelir; `gamma`yi buyutmek araligi
    acardi ama `gamma = 1 - qcomp` turetilmis bir sayidir, telafi sabitine
    cevrilmedi.
+8. **MAE farkinin gurultu tabani olculmedi.** `zones`in kazandigi 0.044 pp'lik fark icin ayni hucrenin tekrar kosulmus bir ikinci olcusu yok; K4 izgarasinda tekrar gurultusu bayt uzerinden olculdu, MAE pp uzerinden olculmedi. Bu buyuklukteki bir farkin gurultunun ustunde oldugu bu sayfadan cikmaz. Karari K5'in kalite kapisi tasir.
 

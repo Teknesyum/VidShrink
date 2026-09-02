@@ -50,14 +50,14 @@ public static class Rapor
         KapiDenemesi(sb, isKok);
         Sonuc(sb, k2, k5, k7, k4, k4b);
         K9(sb, isKok);
-        Sinirlar(sb, isKok);
+        Sinirlar(sb, isKok, k4b);
 
         Directory.CreateDirectory(Path.GetDirectoryName(ciktiYolu)!);
         File.WriteAllText(ciktiYolu, sb.ToString());
         Console.WriteLine($"rapor yazildi: {ciktiYolu}");
     }
 
-    private static void Sinirlar(StringBuilder sb, string isKok)
+    private static void Sinirlar(StringBuilder sb, string isKok, K4bSonuc k4b)
     {
         sb.AppendLine("## Bu sayfanin bilinen sinirlari");
         sb.AppendLine();
@@ -102,6 +102,15 @@ public static class Rapor
             sb.AppendLine("   Kazancin ust siniri bu araliktan gelir; `gamma`yi buyutmek araligi");
             sb.AppendLine("   acardi ama `gamma = 1 - qcomp` turetilmis bir sayidir, telafi sabitine");
             sb.AppendLine("   cevrilmedi.");
+        }
+        if (k4b.ZonesKazandi > 0)
+        {
+            sb.AppendLine($"8. **MAE farkinin gurultu tabani olculmedi.** `zones`in kazandigi " +
+                          $"{Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp'lik fark icin " +
+                          "ayni hucrenin tekrar kosulmus bir ikinci olcusu yok; K4 izgarasinda " +
+                          "tekrar gurultusu bayt uzerinden olculdu, MAE pp uzerinden olculmedi. " +
+                          "Bu buyuklukteki bir farkin gurultunun ustunde oldugu bu sayfadan " +
+                          "cikmaz. Karari K5'in kalite kapisi tasir.");
         }
         sb.AppendLine();
     }
