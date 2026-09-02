@@ -39,6 +39,7 @@ public static class Rapor
         Sorulan(sb);
         Kaynaklar(sb, haritalar);
         var k2 = K1K2(sb, k1, haritalar, kollar);
+        K3(sb);
         K4(sb, isKok);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
@@ -125,6 +126,13 @@ public static class Rapor
             {
                 if (!k1.TryGetValue((kol, p.Ad), out var k)) continue;
                 sb.AppendLine($"### {kol} / {p.Ad}");
+                if (k.ReferansToplamBit == 0)
+                {
+                    sb.AppendLine();
+                    foreach (var b in k.Bilinmiyor) sb.AppendLine($"- **bilinmiyor**: {b}");
+                    sb.AppendLine();
+                    continue;
+                }
                 sb.AppendLine();
                 sb.AppendLine($"Plan: `{k.Plan.Codec}` {k.Plan.Mode} {k.Plan.VideoBitrateK}k " +
                               $"{k.Plan.Width}x{k.Plan.Height}@{Kabuk.Inv(k.Plan.Fps, "0.##")} preset `{k.Plan.Preset}` " +
@@ -160,14 +168,27 @@ public static class Rapor
         sb.AppendLine("|-----|---------|-------|------------------|-----------------|------------------|-----------------|------------|---------|---------|---------|");
 
         var satirlar = new List<string>();
+        var bilinmeyen = new List<string>();
         var hepsiKapandi = true;
         var olculdu = false;
+        var hucre = 0;
+        var g1Gecen = 0;
+        var g2Gecen = 0;
+        var g3Gecen = 0;
+        var ucuBirden = 0;
         foreach (var kol in kollar)
         {
             foreach (var p in Program.Pencereler)
             {
                 if (!k1.TryGetValue((kol, p.Ad), out var k)) continue;
+                if (k.ReferansToplamBit == 0)
+                {
+                    bilinmeyen.Add($"{kol}/{p.Ad}: {string.Join("; ", k.Bilinmiyor)}");
+                    sb.AppendLine($"| {kol} | `{p.Ad}` | {k.Harita.Count} | bilinmiyor | bilinmiyor | bilinmiyor | bilinmiyor | bilinmiyor | — | — | — |");
+                    continue;
+                }
                 olculdu = true;
+                hucre++;
                 var rhoV = SceneMap.Spearman(k.Verilen, k.HakEdilen);
                 var rhoH = SceneMap.Spearman(k.Harita, k.HakEdilen);
                 var maeV = Butce.MeanAbsoluteError(k.Verilen, k.HakEdilen) * 100;
@@ -178,11 +199,15 @@ public static class Rapor
                 var g2 = maeV <= maeH;
                 var g3 = oran < 0.20;
                 if (!(g1 && g2 && g3)) hepsiKapandi = false;
+                if (g1) g1Gecen++;
+                if (g2) g2Gecen++;
+                if (g3) g3Gecen++;
+                if (g1 && g2 && g3) ucuBirden++;
                 var rhoNot = k.HakEdilen.Count < 4 ? $" (n={k.HakEdilen.Count}, anlamsiz)" : string.Empty;
                 satirlar.Add($"{kol}/{p.Ad}: rho(verilen)={Kabuk.Inv(rhoV, "0.000")} rho(harita)={Kabuk.Inv(rhoH, "0.000")} " +
                              $"MAE {Kabuk.Inv(maeV, "0.00")} vs {Kabuk.Inv(maeH, "0.00")} pp, ters {ters}/{k.HakEdilen.Count}");
                 sb.AppendLine($"| {kol} | `{p.Ad}` | {k.HakEdilen.Count} | {Kabuk.Inv(rhoV, "0.000")}{rhoNot} | {Kabuk.Inv(rhoH, "0.000")} | " +
-                              $"{Kabuk.Inv(maeV, "0.00")} | {Kabuk.Inv(maeH, "0.00")} | {ters}/{k.HakEdilen.Count} ({Kabuk.Inv(oran * 100, "0")}%) | " +
+                              $"{Kabuk.Inv(maeV, "0.00")} | {Kabuk.Inv(maeH, "0.00")} | {ters}/{k.HakEdilen.Count} ({Kabuk.Inv(oran * 100, "0")}%){rhoNot} | " +
                               $"{Evet(g1)} | {Evet(g2)} | {Evet(g3)} |");
             }
         }
@@ -190,15 +215,51 @@ public static class Rapor
         if (!olculdu) { sb.AppendLine("**bilinmiyor** — K1 ciktisi yok."); sb.AppendLine(); return new K2Sonuc(false, satirlar); }
 
         sb.AppendLine(hepsiKapandi
-            ? "**K2 kapisi kapandi.** Olculen her kol ve her pencerede ucu birden saglandi;"
-            : "**K2 kapisi kapanmadi.** En az bir kol/pencere ucunu birden saglamadi;");
-        sb.AppendLine("her satirin son uc sutunu yukarida.");
+            ? $"**K2 kapisi kapandi.** Olculen {hucre} hucrenin hepsinde ucu birden saglandi."
+            : $"**K2 kapisi kapanmadi.** Olculen {hucre} hucreden {ucuBirden} tanesinde ucu birden saglandi.");
         sb.AppendLine();
+        sb.AppendLine($"- K1 kapisi (`rho(verilen,hak) >= 0,80`): {g1Gecen}/{hucre} hucre");
+        sb.AppendLine($"- K2 kapisi (`MAE(verilen) <= MAE(harita)`): {g2Gecen}/{hucre} hucre");
+        sb.AppendLine($"- K3 kapisi (ters dusen orani `< %20`): {g3Gecen}/{hucre} hucre");
+        sb.AppendLine();
+        if (bilinmeyen.Count > 0)
+        {
+            sb.AppendLine($"Olculemeyen {bilinmeyen.Count} hucre (varsayilana dusurulmedi, ayri satir):");
+            foreach (var b in bilinmeyen) sb.AppendLine($"- **bilinmiyor** — {b}");
+            sb.AppendLine();
+        }
         sb.AppendLine("Sahne sayisi 4'un altindaki pencerede sira korelasyonu anlamsizdir ve o");
         sb.AppendLine("sutunda isaretlidir; o pencerede karari MAE tasir. Sahne sayisi icerigin");
         sb.AppendLine("kendisidir: kesimi olmayan pencerede dagitilacak sahne de yoktur.");
         sb.AppendLine();
         return new K2Sonuc(hepsiKapandi, satirlar);
+    }
+
+    private static void K3(StringBuilder sb)
+    {
+        sb.AppendLine("## K3 — kural `SceneMap`'in kendi sayilarindan cikiyor mu");
+        sb.AppendLine();
+        sb.AppendLine("Evet. Aday kural `Butce.ZoneCarpanlari` yalniz su ucunu okur:");
+        sb.AppendLine();
+        sb.AppendLine("| Girdi | Kaynak | Yeni sonda kosumu |");
+        sb.AppendLine("|-------|--------|-------------------|");
+        sb.AppendLine("| `Scene.Complexity` | `SceneMap.cs:13` — sonda ciktisi | yok |");
+        sb.AppendLine("| `Scene.Bits` | `SceneMap.cs:12` — sonda ciktisi | yok |");
+        sb.AppendLine("| sahne suresi | `Scene.Start` / `Scene.End` | yok |");
+        sb.AppendLine();
+        sb.AppendLine($"Kural: `b_i = clamp(Complexity_i^gamma, {Kabuk.Inv(Butce.ZoneFloor, "0.00")}, " +
+                      $"{Kabuk.Inv(Butce.ZoneCeiling, "0.0")})`, sure agirlikli ortalamasi 1,0'a normalize.");
+        sb.AppendLine($"`gamma = 1 - qcomp = {Kabuk.Inv(Butce.Gamma(Butce.DefaultQcomp), "0.00")}` " +
+                      $"(x264/x265 varsayilan `qcomp = {Kabuk.Inv(Butce.DefaultQcomp, "0.00")}`).");
+        sb.AppendLine();
+        sb.AppendLine("`gamma` telafi sabiti degil: iki gecis hiz denetimi biti karmasikliga");
+        sb.AppendLine("`qcomp` ussuyle dagitir, harita tam oranli dagitim onerir (us 1,0);");
+        sb.AppendLine("us farki tam olarak `1 - qcomp`'tur. Normalizasyon K6'nin sartidir —");
+        sb.AppendLine("carpanlar biti yeniden bolusturur, toplami degistirmez.");
+        sb.AppendLine();
+        sb.AppendLine("**T96'nin %10,4'luk sonda maliyeti artmaz**: kural mevcut haritanin");
+        sb.AppendLine("ustunde calisir, yeni tarama acmaz.");
+        sb.AppendLine();
     }
 
     private static string Evet(bool value) => value ? "evet" : "**hayir**";
