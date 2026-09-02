@@ -1222,9 +1222,9 @@ public static class Rapor
                           "varsayilaninin bu icerikte en iyi olmadiginin kanitidir. " +
                           (k4b.ZonesKazandi == 0
                             ? ""
-                            : "`zones`in kazandigi hucre tek ve kazanc pp'nin yuzde birleri " +
-                              "mertebesinde; bu buyukluk tek basina karar tasimaz, karari K5'in " +
-                              "kalite kapisi verir."));
+                            : $"`zones` {k4b.Hucre} hucreden {k4b.ZonesKazandi} tanesinde kazandi " +
+                              $"ve en buyuk kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp; " +
+                              "bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir."));
             sb.AppendLine();
             if (k4.Denenen > 0)
             {
