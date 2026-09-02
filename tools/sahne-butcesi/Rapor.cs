@@ -549,14 +549,21 @@ public static class Rapor
     {
         sb.AppendLine("## Sonuc");
         sb.AppendLine();
+        var k5Olculdu = k5.Kayitlar.Count > 0;
+        var k7Olculdu = k7.Kayitlar.Count > 0;
+        var eksik = !k5Olculdu || !k7Olculdu;
         var girer = !k2.Kapandi && k5.Gecti && k7.Gecti;
-        sb.AppendLine(girer
-            ? "**Dagitim koda girer.** K2 kapisi kapanmadi, K5/K6 kapisi gecti, bozuk"
-            : "**Dagitim koda girmez.** Kapilardan en az biri onu durdurdu:");
+        sb.AppendLine(eksik
+            ? "**Karar verilemedi.** Asagidaki kapilardan en az biri olculemedi;"
+              + " olculmemis kapi gecmemis sayilmaz, `bilinmiyor` kalir."
+            : girer
+                ? "**Dagitim koda girer.** K2 kapisi kapanmadi, K5/K6 kapisi gecti, bozuk"
+                  + " harita bedeli kazancin altinda kaldi."
+                : "**Dagitim koda girmez.** Kapilardan en az biri onu durdurdu:");
         sb.AppendLine();
         sb.AppendLine($"- K2 (kodlayici zaten dogru dagitiyor mu): {(k2.Kapandi ? "**kapandi** — kodlayici zaten en az bizim kadar iyi dagitiyor" : "kapanmadi")}");
-        sb.AppendLine($"- K5/K6 (kalite kazanci ve hedef boyut): {(k5.Gecti ? "gecti" : "**gecmedi**")} — {k5.Ozet}");
-        sb.AppendLine($"- K7 (bozuk harita bedeli): {(k7.Gecti ? "kabul edilebilir" : "**kabul edilemez**")} — {k7.Ozet}");
+        sb.AppendLine($"- K5/K6 (kalite kazanci ve hedef boyut): {(!k5Olculdu ? "**bilinmiyor**" : k5.Gecti ? "gecti" : "**gecmedi**")} — {k5.Ozet}");
+        sb.AppendLine($"- K7 (bozuk harita bedeli): {(!k7Olculdu ? "**bilinmiyor**" : k7.Gecti ? "kabul edilebilir" : "**kabul edilemez**")} — {k7.Ozet}");
         sb.AppendLine();
         sb.AppendLine("Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve");
         sb.AppendLine("bu olcumden onceki commit'te sabitlendi.");
