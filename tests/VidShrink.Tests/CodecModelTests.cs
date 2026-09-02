@@ -34,4 +34,16 @@ public sealed class CodecModelTests
         Assert.Equal(CodecModel.CostsQualityInHardware(softwareTwin), CodecModel.CostsQualityInHardware(codec));
         Assert.NotEqual(CodecModel.CostsQualityInHardware(hardwareTwin), CodecModel.CostsQualityInHardware(codec));
     }
+
+    [Theory]
+    [InlineData("hevc_videotoolbox")]
+    [InlineData("h264_videotoolbox")]
+    public void VideoToolboxHasNoRowInTheBitrateNeedTable(string codec)
+    {
+        var offTable = CodecModel.RelativeBitrateNeed("an_encoder_that_does_not_exist");
+
+        Assert.Equal(offTable, CodecModel.RelativeBitrateNeed(codec));
+        Assert.NotEqual(CodecModel.RelativeBitrateNeed("libx265"), CodecModel.RelativeBitrateNeed(codec));
+        Assert.NotEqual(CodecModel.RelativeBitrateNeed("hevc_nvenc"), CodecModel.RelativeBitrateNeed(codec));
+    }
 }
