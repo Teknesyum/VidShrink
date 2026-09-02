@@ -15,7 +15,7 @@ public static class CalibrationProbe
     private const int HardwareConcurrency = 2;
     private static readonly TimeSpan SampleTimeout = TimeSpan.FromSeconds(90);
 
-    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, SpeedMode speed, CancellationToken ct = default)
+    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, SpeedMode speed, CancellationToken ct = default, SceneMap? scenes = null)
     {
         try
         {
@@ -39,14 +39,14 @@ public static class CalibrationProbe
             long lowBytes = 0, highBytes = 0;
             long lowFrames = 0, highFrames = 0;
 
-            var windows = Windows(info, speed).ToArray();
-            var pending = new List<Task<Sample>>(windows.Length * 2);
+            var windows = Windows(info, speed, scenes);
+            var pending = new List<Task<Sample>>(windows.Count * 2);
             using var gate = new SemaphoreSlim(CodecModel.IsHardware(draft.Codec) ? HardwareConcurrency : SoftwareConcurrency);
             var batch = Stopwatch.StartNew();
-            foreach (var start in windows)
+            foreach (var window in windows)
             {
-                pending.Add(GatedSampleAsync(gate, info, draft, start, lowCrf, speed, ct));
-                pending.Add(GatedSampleAsync(gate, info, draft, start, highCrf, speed, ct));
+                pending.Add(GatedSampleAsync(gate, info, draft, window.Start, lowCrf, speed, ct));
+                pending.Add(GatedSampleAsync(gate, info, draft, window.Start, highCrf, speed, ct));
             }
 
             var samples = await Task.WhenAll(pending);
@@ -131,19 +131,18 @@ public static class CalibrationProbe
         return CodecModel.ReferenceCrf(draft.Codec);
     }
 
-    private static IEnumerable<double> Windows(MediaInfo info, SpeedMode speed)
+    internal static IReadOnlyList<SampleWindow> Windows(MediaInfo info, SpeedMode speed, SceneMap? scenes = null)
     {
         var duration = info.DurationSeconds;
         if (duration <= WindowSeconds * 1.5)
-        {
-            yield return 0;
-            yield break;
-        }
+            return new[] { new SampleWindow(0, WindowSeconds, 1.0) };
 
         var usable = Math.Max(0.0, duration - WindowSeconds);
         var count = duration < WindowSeconds * 6 || speed == SpeedMode.Fast ? MinWindows : MaxWindows;
+        var windows = new List<SampleWindow>(count);
         for (var i = 0; i < count; i++)
-            yield return usable * (i + 0.5) / count;
+            windows.Add(new SampleWindow(usable * (i + 0.5) / count, WindowSeconds, 1.0));
+        return windows;
     }
 
     private static async Task<Sample> GatedSampleAsync(SemaphoreSlim gate, MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
