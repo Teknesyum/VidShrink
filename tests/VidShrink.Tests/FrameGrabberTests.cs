@@ -72,22 +72,7 @@ public sealed class HardwareEncoderFactAttribute : FactAttribute
 
     public HardwareEncoderFactAttribute()
     {
-        if (!ToolLocator.IsAvailable(out var missing))
-        {
-            Skip = $"{missing} bulunamadi, donanim kodlayici olculeri kosturulmadi.";
-            return;
-        }
-
-        if (!EncoderCapabilities.Instance.HasEncoder(Codec))
-        {
-            Skip = $"{Codec} bu ffmpeg derlemesinde yok, donanim kodlayici olculeri kosturulmadi.";
-            return;
-        }
-
-        var probe = EncoderCapabilities.Instance.Probe(Codec);
-        if (!probe.Succeeded)
-            Skip = $"{Codec} derlemede var ama bu makinede acilmadi ({probe.ElapsedMs}ms), " +
-                   "donanim kodlayici olculeri kosturulmadi.";
+        Skip = null;
     }
 }
 
