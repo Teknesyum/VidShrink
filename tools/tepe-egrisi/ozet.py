@@ -16,12 +16,12 @@ def f(r, k):
 
 def tablo(rows, baslik):
     print(f"\n### {baslik}\n")
-    print("| kaynak | kodlayici | oran | tepe | bitrate k | maxrate k | teslim MiB | hedef orani | mean | p10 |")
-    print("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+    print("| kaynak | kodlayici | oran | tepe | bitrate k | maxrate k | teslim MiB | video butcesi MiB | teslim/butce | mean | p10 |")
+    print("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     for r in rows:
-        print("| {} | {} | {} | {} | {} | {} | {:.4f} | {:.4f} | {:.3f} | {:.3f} |".format(
+        print("| {} | {} | {} | {} | {} | {} | {:.4f} | {:.4f} | {:.4f} | {:.3f} | {:.3f} |".format(
             r['kaynak'], r['kodlayici'], r['oran'], r['tepe'], r['bitrate_k'], r['maxrate_k'],
-            f(r,'teslim_mib'), f(r,'hedef_orani'), f(r,'vmaf_mean'), f(r,'vmaf_p10')))
+            f(r,'teslim_mib'), f(r,'hedef_mib'), f(r,'hedef_orani'), f(r,'vmaf_mean'), f(r,'vmaf_p10')))
 
 def egri(rows):
     print("\n### Tepe egrisi: p10 ve boyut, oran basina\n")

@@ -385,7 +385,7 @@ internal static class Program
         proc.WaitForExit();
         var cikti = ciktiGorevi.GetAwaiter().GetResult();
         var ham = hataGorevi.GetAwaiter().GetResult();
-        hata = ham.Length > 4000 ? ham[^4000..] : ham;
+        hata = "[cikis " + proc.ExitCode + "] " + (ham.Length > 4000 ? ham[^4000..] : ham);
         return proc.ExitCode == 0 ? cikti : null;
     }
 }
