@@ -550,7 +550,7 @@ ayrı bir sözleşmenin işi. Üçüncüsü A/B aracının kendi sorunuydu ve ka
 ### Harmonik ortalamanın tabanı — manşetin dayandığı sayı
 
 Bu belgedeki bütün manşet sayıları harmonik ortalamadır ve harmonik ortalama
-`src/VidShrink.Ffmpeg/QualityMeter.cs:147`'de şöyle hesaplanıyor:
+`src/VidShrink.Ffmpeg/QualityMeter.cs:241`'de şöyle hesaplanıyor:
 
 ```csharp
 var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
@@ -636,8 +636,8 @@ karşılaşılan eksikler — hepsi T97'nin girdisi:
 |---|---|
 | kare başına puanlar dışarı verilmiyor (`Percentile` özel) | parçalar arası p10 kesin birleştirilemiyor; özet satırı "en kötü parça" olmak zorunda kaldı |
 | kare sayısı döndürülmüyor | parça ağırlıkları süreden türetiliyor, kareden değil |
-| harmonik ortalamada `Math.Max(x, 1.0)` kıskacı (satır 147) belgesiz | manşet sayının tamamı taban 1,0'a bağlı; kıskaç olmasa dört özet satırının dördü de 0,00 olurdu |
-| libvmaf JSON günlüğü `%TEMP%`e yazılıp `finally` içinde siliniyor (satır 124, 157) | ham ölçüm günlüğü saklanamıyor **ve** kıskaca kaç karenin değdiği sayılamıyor; yalnız `f ≤ 1/H` tavanı türetilebiliyor |
+| harmonik ortalamada `Math.Max(x, 1.0)` kıskacı (satır 241) belgesiz | manşet sayının tamamı taban 1,0'a bağlı; kıskaç olmasa dört özet satırının dördü de 0,00 olurdu |
+| libvmaf JSON günlüğü `%TEMP%`e yazılıp `finally` içinde siliniyor (satır 218, 246) | ham ölçüm günlüğü saklanamıyor **ve** kıskaca kaç karenin değdiği sayılamıyor; yalnız `f ≤ 1/H` tavanı türetilebiliyor |
 | `ColorFilter` etiketsiz girdiye varsayım uyduruyor (`?? (hdr ? "bt2020" : "bt709")`) | GEÇERSİZ tabloyu üreten hata `QualityMeter` içinde hâlâ duruyor; kapı A/B aracında, ölçerde değil |
 | `ColorIncompatibility` yalnız HDR/SDR uyuşmazlığını reddediyor | etiketsiz taraf ölçere kadar gidebiliyor |
 | kare hızı hiç bakılmıyor | kare hızları ayrıyken libvmaf sessizce sayı üretiyor; kapı yine A/B aracında |
