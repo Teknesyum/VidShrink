@@ -169,3 +169,40 @@ Oneri:
    durum okunamadi" desin — sessizce eski durumu bildirmesin.
 3. **Yanlis pozitif bedava degil.** Bu kanca turu bitirmiyor; olmayan bir teslim icin
    ajan is uretmeye zorlaniyor. Durum okunamiyorsa turu bloke etmemeli.
+
+## `Stop` kancasi "cevapsiz teslim" ile "denetim ucusta"yi ayirt edemiyor
+
+**Belirti.** T149 `status: submitted`. Denetcisi acildi ve **koşuyor** —
+`live/af8a39f096d0cd285.json`: `role: auditor`, `steps: 41`, `files: 0`,
+`ended` bos, `updated` 9 saniye once. Yani teslim cevapsiz degil, cevap
+uretiliyor. Kanca yine de her turda ayni metinle turu kesiyor:
+
+> T149 is submitted and still waiting on you. Audit it, then say what happens
+> next in the same turn. A turn does not close on a delivery it left unanswered.
+
+Tur ucuncu kez kesildi. T0'in yapabilecegi bir sey yok: muhur kapisi
+`seal.checkAuditor` ile denetci kaydini ariyor, kayit denetci bitmeden yazilmiyor,
+ve **kayit uydurulmaz.** Kancanin istedigi eylem, kancanin engelledigi surede
+zaten yurutuluyor.
+
+**Neden onemli.** Kanca T0'i iki kotu secenege sikistiriyor: ya denetimi
+beklemeden `status`u elle degistirip kancayi kandiracak, ya da denetci kaydini
+uyduracak. Ikisi de deponun tam onlemeye calistigi seyler. Kural bir davranisi
+zorluyorsa, o davranisin mumkun oldugu durumu da tanimali.
+
+**Oneri — uc kademe.**
+
+1. **Ucusta olan denetimi tani.** Kanca `contracts/*.md` icinde `submitted`
+   goruyorsa, `live/*.json` altinda `role: auditor` + `ended` bos + `updated`
+   son 10 dakika icinde bir kayit var mi diye baksin. Varsa **kesme**; tek
+   satir bassin: `T149 denetimde (af8a39f, 41 adim, 9 sn once)`.
+2. **Kesme yerine hatirlatma.** Denetci yoksa bile kanca turu kesmesin, uyarsin.
+   Kesmek yalniz ayni sozlesme icin **ust uste uc tur** denetcisiz kaldiysa.
+3. **Kancanin kendi cikmazini raporlamasi.** Kanca ayni sozlesme icin ayni metni
+   ucuncu kez basiyorsa `live/_sorun.log`a yazsin ve gecirsin. `1.1.1`deki
+   guvenlik valfinin ayni mantigi: ayni madde turu uc kez engellerse gecer.
+
+**Ilgili.** Bu, daha once bildirilen "kanca depo kokunu okuyor, kok ise geride
+kalabiliyor" maddesinin kardesi. Ikisinde de kanca **eksik durum** okuyup mutlak
+karar veriyor. Ortak cozum ayni: kanca durumu okuyamiyorsa ya da yarim okuyorsa
+**turu engellememeli.**
