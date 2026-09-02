@@ -1,0 +1,17 @@
+{
+  "contractId": "T109",
+  "auditorRunId": "a60ff651b5e2c3155",
+  "headSha": "edef1049a5cb706a2608c575875ad41ed0d4dbd3",
+  "diffHash": "46fa6caea5175af35e9d4a032cbf32ddf8d9abf5ffde837d807a993b4bc8490d",
+  "owns": [
+    "src/VidShrink.Core/SceneMap.cs",
+    "src/VidShrink.Ffmpeg/SceneDetector.cs",
+    "tests/VidShrink.Tests/SceneMapTests.cs",
+    "docs/olcumler/dinamik-esik.md"
+  ],
+  "verification": [
+    "GECTI. Dokuz kriterin dokuzu bagimsiz dogrulandi. Turetilen kural theta(t)=clamp(0,08+2,09*p90(+-40sn),0,05,0,15) F2'de sabiti yeniyor: kalibrasyon 0,972 vs 0,895, ayrik sinama kumesi 0,962 vs 0,886, yanlis pozitif 3 vs 11. Denetci F2 hucrelerini ham sayimdan yeniden turetti, iki mutasyonu --no-incremental ile yeniden kosturdu. CI 33581787966 headSha 1b952af, Failed 0 / Passed 1032 / Skipped 95. owns temiz, denetci agaci temiz (git status --porcelain bos). KRITIK yok; yedi borc mühür notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T02:22:59.032Z"
+}
