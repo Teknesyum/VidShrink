@@ -146,3 +146,5 @@
 {"id":"T128","result":"stale","at":"2026-09-02T06:54:52.482Z"}
 {"id":"T94","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"HdrArgumentsTests|EncoderCapabilitiesTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:04:57.811Z"}
 {"id":"T120","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:05:12.820Z"}
+{"id":"T129","result":"stale","at":"2026-09-02T07:15:19.440Z"}
+{"id":"T130","result":"stale","at":"2026-09-02T07:15:19.440Z"}
