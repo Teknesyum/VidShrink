@@ -386,7 +386,12 @@ Kusur **yalnız bizim satırlarımızı** vurduğu için buradaki açık olduğu
 
 `.claude/relay/YOL-HARITASI-2.md`
 - `:113-115` T102 satırları
-- `:218-220` "AV1'i x265'e karşı **39,4 puan** geride gösteriyor" → **0,14 puan**
+- `:218-220` "AV1'i x265'e karşı **39,4 puan** geride gösteriyor" → kilit
+  takıldığında kalan fark **0,138 puan**; ama karşılaştırılan çift (`auto` ↔
+  `uzman-hb`) boyut eşli değil (x265 dosyası %6,2 büyük), o yüzden bu sayı
+  "başa baş" demek için yeterli değil. `:248`'de duran **"İki kodlayıcı bu
+  kaynakta başa baş"** cümlesi bu yüzden hâlâ dayanaksız — dosya bu sözleşmenin
+  `owns`'unda değil, **düzeltilmedi**.
 - `:222-228` kodlayıcı seçim kuralının bu sayıya dayandığı uyarısı — **kural artık
   düzeltilmiş ölçüyle yeniden kurulabilir**
 
@@ -463,10 +468,27 @@ karşılaştırma için kullanılmamalı.
 
 ## Kare kilidinin gerekçesi — T110 bunu referans alacak
 
-Bu bölüm ölçüm aracının dışında da geçerli. `src/VidShrink.Ffmpeg/QualityMeter.cs:278`
-üretim yolunda **aynı açık duruyor**: kare kilidi yok. `--measured-quality` ve
-kalibrasyon çıpaları o yoldan geçiyor. **Bu sözleşme oraya dokunmadı** (sahibi
-T110); aşağısı o iş için gerekçedir.
+Bu bölüm ölçüm aracının dışında da geçerli. T106 burada "üretim yolunda **aynı
+açık duruyor**: kare kilidi yok (`QualityMeter.cs:278`)" yazıyordu; **o cümle
+artık yanlış ve geri çekiliyor.**
+
+**T110 açığı kapattı ve mühürlendi.** Üretim yolu bugün aynı kilidi kullanıyor:
+`src/VidShrink.Ffmpeg/QualityMeter.cs:75` sabiti tanımlıyor
+(`settb=AVTB,setpts=N`), `:359` grafiği onunla kuruyor. `--measured-quality` ve
+kalibrasyon çıpaları o yoldan geçiyor, yani kilitli ölçüyorlar. Aşağısı bu iş
+için yazılmış gerekçedir; **kaldırılmadı çünkü kilidin neden bu biçimde olduğunu
+tek yerde anlatan metin bu.**
+
+Kilidin üretim tarafındaki etkisi T110'da ölçüldü: kilitsiz ölçerle konmuş bir
+çıpa **75,07**, kilitli ölçerle **87,20** — **12,13 puan**. Ölçünün kendisi bu
+kadar kaymıştı.
+
+**Kayan ölçü, kayan karar demek değil.** T116 aynı ölçümde çıpanın koşum başına
+yeniden hesaplandığını ölçtü: kilit girer girmez çıpa kendiliğinden düzeldi ve
+plan **yedi hedefin hiçbirinde değişmedi**; değişen tek alan `PredictedQuality`.
+Yani bu kusur *bildirilen kaliteyi* bozuyordu, *verilen kararı* değil. Bu belgede
+ve `auto-mod.md`'de düzeltilen sayıların hepsi ilk gruba ait; hangi kararın
+değiştiği ayrıca gösterilmeden **"karar da yanlıştı" denemez.**
 
 Neden `settb=AVTB,setpts=N`, neden başka bir şey değil:
 
@@ -527,6 +549,17 @@ Yani kare
 kilidini tutan pim **yerelde ve ffmpeg'i olan koşucuda** koruyor, CI'da
 korumuyor. Havuzlama ölçüleri saf, her yerde koşuyor. Kilidi CI'da da tutmak
 istenirse yapılacak iş ffmpeg'i koşucuya kurmaktır; bu sözleşme onu yapmadı.
+
+**Bu cümlenin ömrü belli — T115 tam o işi yapıyor.** T115 (bu satır yazılırken
+tur 2, `main`'e **birleşmedi**) CI koşucusuna ffmpeg kuruyor. Birleştiğinde
+atlanan sayısı 103'ten **17**'ye düşüyor ve kare kilidini taşıyan üç
+`[FfmpegFact]` ölçüsü CI'da **gerçekten koşuyor**. Yani yukarıdaki "CI'da
+korumuyor" tespiti `33585293085` koşumu için doğru, T115 birleştiği anda yanlış
+olacak. 17 sayısı T115'ten devralındı; **bu belgede ölçülmedi.**
+
+`tools/ci-gibi-kos.sh` bu sorunun kanıtı olarak **kullanılmamalı**: betik
+ffmpeg'i PATH'ten siliyor, yani CI'ın bugünkü hâlini taklit ediyor, yarınki
+hâlini değil. Bu belgedeki atlanan sayıları gerçek CI koşumlarından okundu.
 
 Mutasyon denemesi — her satır kaç ölçü düşürüyor. **Her tur `--no-incremental`
 ile yeniden derlendi;** artımlı derleme bir turda bayat ikili koşturup yanlış

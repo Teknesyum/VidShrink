@@ -41,4 +41,5 @@ olc "y3-hizali-boyutesit" "ciktilar/y3-hizali-boyutesit.mp4" 1
 olc "uzman-biz4"          "ciktilar/uzman-biz4.mp4"      1
 olc "uzman-hb3"           "ciktilar/uzman-hb3.mp4"      1
 olc "uzman-biz5"          "ciktilar/uzman-biz5.mp4"     1
+olc "uzman-biz6"          "ciktilar/uzman-biz6.mp4"     1
 echo "OLCUM BITTI $(date +%T)"
