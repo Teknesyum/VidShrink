@@ -166,6 +166,74 @@ taşındı.
 bağımsız kıracak bir mutasyon da aranmadı: bütçeyi bozan her mutasyon üstündeki iki
 `Assert.False`u önce kırıyor, satır 618 onların gölgesinde kalıyor.
 
+### Daralmaların kendisi pimlendi mi — iki tavan
+
+Yukarıdaki ızgaranın yapısal boşluğu: dört mutasyondan yalnız biri (iddia 5) eski
+bandı yaşatıp yeni bandı öldürüyor. İddia 1'in mutasyonu **tabanı** kırıyor,
+iddia 4'ünki hem eski hem yeni tavanı aşıyor. Yani `15.000 → 5.000` ve `500 → 250`
+daralmalarının **daralma olduğunu** hiçbir ölçü tutmuyordu. İkisi için de "eski
+bantta yaşayan, yeni bantta ölen" birer mutasyon arandı.
+
+| ölçü | mutasyon | eski bant | eski bantla | yeni bant | yeni bantla |
+|---|---|---|---|---|---|
+| 4 `UpdaterTests.cs:316` | `HttpClient { Timeout = TimeSpan.FromMilliseconds(1150) }`, `ManifestTimeout` sabiti 800'de bırakıldı | 1300 ms | **yaşadı** — 1160 ms | 1050 ms | **kırıldı** — 1159 ms > 1050 ms |
+| 1 `PerformanceCheckTests.cs:757` | (a) yakım `durationMs * 5`; (b) `burner.Join()` sonrası `Thread.Sleep(6000)` | 15.000 ms | **ölçülemedi** | 5.000 ms | **ölçülemedi** |
+
+Her mutasyon `dotnet build -c Release --no-incremental` ile derlendi; test
+koşumlarında `--no-build` kullanılmadı. Kayıtlar `.calisma/t132/t2/` altında ve
+`.calisma/` git'e girmediği için karar veren satırlar buraya gömülü:
+
+```
+eski-bant.txt:25:  Başarılı VidShrink.Tests.UpdaterTests.AnUnreachableSourceIsGivenUpWithinTheManifestTimeout [2 s]
+eski-bant.txt:27:   ağsız manifest denemesi: 1160 ms (zaman aşımı 800 ms, tavan 1300 ms)
+iddia4-yeni-bant.txt:27:  Başarısız VidShrink.Tests.UpdaterTests.AnUnreachableSourceIsGivenUpWithinTheManifestTimeout [2 s]
+iddia4-yeni-bant.txt:29:   ağsız açılış zaman aşımını aştı: 1159 ms > 1050 ms
+eski-bant.txt:21:   [atlandi] ... (duzeltme=9.232x)          <- mutasyon (a), :757 atlandı
+iddia1-eski-bant.txt:22:   [atlandi] ... (duzeltme=8.005x)   <- mutasyon (b), :757 atlandı
+iddia1-mutasyonsuz.txt:22:   [atlandi] ... (duzeltme=12x)    <- mutasyonsuz, :757 atlandı
+```
+
+**İddia 4 pimlendi.** 1150 ms'lik zaman aşımı eski tavanın altında, yeni tavanın
+üstünde kalıyor; daralma artık bir ölçüyle tutuluyor.
+
+**İddia 1 pimlenemedi, sebebi mutasyon değil testin kendi kapısı.** `:757`'den önce
+şu satır var:
+
+```
+if (!guvenilir) Atlandi("bu makinenin islemci zamani sayaci ... guvenilir okumadi");
+```
+
+`guvenilir`, `CalibrateCpuClock`in döndürdüğü düzeltme katsayısının
+`PerformanceCheck.CpuAccountingTolerance` içinde kalmasını istiyor. Bu turdaki üç
+koşumda katsayı **9,232 / 8,005 / 12,0** okundu — üçü de toleransın dışında, yani
+test `Atlandi` dalına giriyor ve `:757` hiç çalışmıyor. Aynı sırada makine yükü
+`Win32_Processor` ortalamasıyla %51-79 ölçüldü (başka ajan koşumları ve bir oyun
+süreci açıktı). Katsayının neden bu kadar yüksek okunduğu **izole edilmedi**; yükle
+birlikte gözlendi, yükün sebep olduğu ölçülmedi.
+
+| koşum | üretim | okunan katsayı | `:757` değerlendirildi mi |
+|---|---|---|---|
+| mutasyon (a) `durationMs * 5` | değişik | 9,232 | hayır, atlandı |
+| mutasyon (b) `Thread.Sleep(6000)` | değişik | 8,005 | hayır, atlandı |
+| denetim koşumu | **değişmemiş** | 12,0 | hayır, atlandı |
+
+Kritik olan üçüncü satır: bandı gizleyen şey mutasyon değil, **yüklü makinede
+kapının kapanması**. Bu yüzden bu turda iddia 1 için "eski bantta yaşayan, yeni
+bantta ölen" bir mutasyon **üretilemedi** — ve üretilemediği ölçüldü, tahmin
+edilmedi. Boş makinede (b) mutasyonunun ~7500 ms üretip eski tavanı (15.000) geçip
+yeni tavanda (5.000) öleceği **beklenir**, ama bu beklenti bu turda koşulmadı;
+kanıt diye yazılmıyor.
+
+İki sonuç bundan çıkıyor:
+
+1. `:757`'nin bandı yalnız işlemci zamanı sayacının güvenilir okuduğu — yani makinenin
+   boş olduğu — koşumlarda değerlendiriliyor. Duvar saati bandının düşmesini
+   bekleyeceğimiz durum (yüklü koşucu) tam da bandın hiç bakılmadığı durum.
+2. K2'deki iddia 1 dağılımı (boş 1500/1500/1500/1500) kapının **önüne** konmuş geçici
+   bir ölçümden geliyordu; o sayılar `saat.ElapsedMilliseconds`in dağılımıdır, bandın
+   değerlendirildiğinin kanıtı değildir. Daraltma hâlâ ölçülen dağılıma dayanıyor ve
+   hiçbir yönde genişletme değil, ama "mutasyonla tutuluyor" denemez.
+
 ## K4 — Bant değişiklikleri ve yönü
 
 | # | eski | yeni | yön | gerekçe |
