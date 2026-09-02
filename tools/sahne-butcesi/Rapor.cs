@@ -401,6 +401,8 @@ public static class Rapor
                         $"{Kabuk.Inv(dmb, "+0.00;-0.00;0.00")} |");
         }
 
+        ZoneGenisligi(sb, isKok, "k5", kollar);
+
         sb.AppendLine("### Dagitimli − dagitimsiz");
         sb.AppendLine();
         sb.AppendLine("Bir satir bir **yazilim kolu x pencere** ciftidir. Boyut farki sutunu");
@@ -426,6 +428,40 @@ public static class Rapor
         sb.AppendLine("**ayirt etmez**; K6'nin asil sorusu olan asan kosum orani ayri yazildi.");
         sb.AppendLine();
         return new AbSonuc(gecti, hepsi, ozet);
+    }
+
+    private static void ZoneGenisligi(StringBuilder sb, string isKok, string asama, string[] kollar)
+    {
+        var satirlar = new List<string>();
+        foreach (var kol in kollar)
+            foreach (var p in Program.Pencereler)
+            {
+                var y = Path.Combine(isKok, $"{asama}-{kol}-{p.Ad}-dagitim.zones.txt");
+                if (!File.Exists(y)) continue;
+                var metin = File.ReadAllText(y);
+                var i = metin.IndexOf("zones=", StringComparison.Ordinal);
+                if (i < 0) continue;
+                var b = metin[(i + 6)..].Split('/')
+                    .Select(x => x.Split("b=").Last().Trim())
+                    .Select(x => double.TryParse(x, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : double.NaN)
+                    .Where(double.IsFinite).ToArray();
+                if (b.Length == 0) continue;
+                satirlar.Add($"| {kol} | `{p.Ad}` | {b.Length} | {Kabuk.Inv(b.Min(), "0.000")} | " +
+                             $"{Kabuk.Inv(b.Max(), "0.000")} | {Kabuk.Inv(b.Max() - b.Min(), "0.000")} |");
+            }
+        if (satirlar.Count == 0) return;
+
+        sb.AppendLine("### Dagitimin gercekte ne kadar oynadigi");
+        sb.AppendLine();
+        sb.AppendLine("Zone carpani `1,0` demek \"bu sahneye kodlayicinin verecegi kadar ver\"");
+        sb.AppendLine("demektir. Carpanlarin araligi dar kaldiginda dagitimin kaliteye");
+        sb.AppendLine("yapabilecegi etki de dar kalir; asagidaki fark sutunu kazanc");
+        sb.AppendLine("beklentisinin ust sinirini gosterir.");
+        sb.AppendLine();
+        sb.AppendLine("| Yazilim kolu | Pencere | Zone sayisi | En kucuk b | En buyuk b | Aralik |");
+        sb.AppendLine("|--------------|---------|-------------|------------|------------|--------|");
+        foreach (var x in satirlar) sb.AppendLine(x);
+        sb.AppendLine();
     }
 
     private static AbSonuc K7(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar, AbSonuc k5)
