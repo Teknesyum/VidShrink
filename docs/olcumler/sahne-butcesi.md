@@ -39,9 +39,24 @@ Ikili her seferinde `--no-incremental` derlenir; `--no-build` kullanilmaz.
 | K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |
 | K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |
 | Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |
+| Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |
 | bu sayfa | `SahneButcesi rapor` | — |
 
 Kollar: `maks`, `uyumlu`, `yedek`. Pencereler: `p1-karisik`, `p2-durgun`, `p3-hareketli`.
+
+## Olculen dosyalarin tamligi
+
+Bu sayfadaki bitler dosya uzunluklarindan geliyor; yarim kalmis bir
+kodlama sessizce kucuk bir "hak edilen" ya da "verilen" uretir. Kodlamalar
+`<ad>.yarim.mkv`e yazilip basarida yerine tasinir; ayrica her dosyanin
+suresi `ffprobe` ile olculup beklenen sahne/pencere suresiyle
+karsilastirilir (esik 0,5 sn).
+
+Denetlenen dosya **116** — referans sahnesi 102, 
+kodlama ciktisi 14. Suresi sapan: **0**.
+
+Uretim: `bash tools/sahne-butcesi/05-cikti-denetimi.sh`, ham dosya
+`cikti-denetimi.csv`. Olcum bittikten sonra kosar.
 
 ## Sorulan tek soru
 
@@ -382,8 +397,11 @@ plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.
 | uyumlu | `p2-durgun` | taban | `-` | 1.901 | — |
 | uyumlu | `p2-durgun` | zones | `zones=<harita>` | 2.757 | +0.856 |
 | uyumlu | `p2-durgun` | qcomp | `qcomp=1.0` | 2.583 | +0.682 |
+| uyumlu | `p3-hareketli` | taban | `-` | 0.674 | — |
+| uyumlu | `p3-hareketli` | zones | `zones=<harita>` | 0.609 | -0.065 |
+| uyumlu | `p3-hareketli` | qcomp | `qcomp=1.0` | 0.077 | -0.597 |
 
-Iki adayin da olculdugu hucre 2; hucre basina dusuk MAE'yi veren aday: `qcomp` 2.
+Iki adayin da olculdugu hucre 3; hucre basina dusuk MAE'yi veren aday: `qcomp` 3.
 
 Hangi adayin kazandigi tek basina bir sey soylemez: kazanc, kapatilmasi
 istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
@@ -393,9 +411,10 @@ istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
 |--------------|---------|---------------|-------------|-------------|----------------------|
 | uyumlu | `p1-karisik` | +0.261 | qcomp | +0.006 | 2.3% |
 | uyumlu | `p2-durgun` | -0.606 | qcomp | -0.682 | acik yok |
+| uyumlu | `p3-hareketli` | -0.434 | qcomp | +0.597 | acik yok |
 
-Olculen 2 hucrenin 1 tanesinde en iyi aday tabani
-gecti; gorulen en buyuk kazanc 0.006 pp.
+Olculen 3 hucrenin 2 tanesinde en iyi aday tabani
+gecti; gorulen en buyuk kazanc 0.597 pp.
 Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama
 pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite
 kapisi bu sayfada karari veren yerdir, bu tablo degil.

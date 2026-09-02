@@ -25,4 +25,6 @@ for kol in $KOLLAR; do for w in $PENCERELER; do kos k4b  "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k5   "$kol" "$w"; done; done
 for kol in $KOLLAR; do for w in $PENCERELER; do kos k7   "$kol" "$w"; done; done
 
+bash "$KOK/tools/sahne-butcesi/05-cikti-denetimi.sh"
+
 kos rapor

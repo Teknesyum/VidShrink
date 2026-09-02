@@ -37,6 +37,7 @@ public static class Rapor
 
         Ortam(sb, isKok);
         Komutlar(sb);
+        CiktiDenetimi(sb, isKok);
         Sorulan(sb);
         Kaynaklar(sb, haritalar);
         var k2 = K1K2(sb, k1, haritalar, kollar);
@@ -127,6 +128,41 @@ public static class Rapor
         sb.AppendLine();
     }
 
+    private static void CiktiDenetimi(StringBuilder sb, string isKok)
+    {
+        var y = Path.Combine(isKok, "cikti-denetimi.csv");
+        if (!File.Exists(y)) return;
+        var satirlar = File.ReadAllLines(y).Skip(1).Select(x => x.Split(';')).Where(c => c.Length >= 5).ToList();
+        if (satirlar.Count == 0) return;
+
+        var referans = satirlar.Count(c => c[0] == "referans");
+        var cikti = satirlar.Count(c => c[0] == "cikti");
+        var sapan = satirlar.Count(c => c[4] != "tam");
+
+        sb.AppendLine("## Olculen dosyalarin tamligi");
+        sb.AppendLine();
+        sb.AppendLine("Bu sayfadaki bitler dosya uzunluklarindan geliyor; yarim kalmis bir");
+        sb.AppendLine("kodlama sessizce kucuk bir \"hak edilen\" ya da \"verilen\" uretir. Kodlamalar");
+        sb.AppendLine("`<ad>.yarim.mkv`e yazilip basarida yerine tasinir; ayrica her dosyanin");
+        sb.AppendLine("suresi `ffprobe` ile olculup beklenen sahne/pencere suresiyle");
+        sb.AppendLine("karsilastirilir (esik 0,5 sn).");
+        sb.AppendLine();
+        sb.AppendLine($"Denetlenen dosya **{satirlar.Count}** — referans sahnesi {referans}, ");
+        sb.AppendLine($"kodlama ciktisi {cikti}. Suresi sapan: **{sapan}**.");
+        sb.AppendLine();
+        if (sapan > 0)
+        {
+            sb.AppendLine("| Tur | Dosya | Beklenen (sn) | Olculen (sn) |");
+            sb.AppendLine("|-----|-------|---------------|--------------|");
+            foreach (var c in satirlar.Where(c => c[4] != "tam"))
+                sb.AppendLine($"| {c[0]} | `{c[1]}` | {c[2]} | {(c[3].Length == 0 ? "**okunamadi**" : c[3])} |");
+            sb.AppendLine();
+        }
+        sb.AppendLine("Uretim: `bash tools/sahne-butcesi/05-cikti-denetimi.sh`, ham dosya");
+        sb.AppendLine("`cikti-denetimi.csv`. Olcum bittikten sonra kosar.");
+        sb.AppendLine();
+    }
+
     private static void Komutlar(StringBuilder sb)
     {
         sb.AppendLine("## Hangi sayi hangi komuttan cikti");
@@ -146,6 +182,7 @@ public static class Rapor
         sb.AppendLine("| K5, K6 | `SahneButcesi k5 <kol> <pencere>` | `k5-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |");
+        sb.AppendLine("| Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |");
         sb.AppendLine("| bu sayfa | `SahneButcesi rapor` | — |");
         sb.AppendLine();
         sb.AppendLine($"Kollar: {string.Join(", ", Program.Kollar.Keys.Select(k => $"`{k}`"))}. " +
