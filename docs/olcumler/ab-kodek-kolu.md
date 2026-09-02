@@ -85,3 +85,56 @@ yazıldı, değiştirilmedi.
   zaten yazılı (T103, "Rejim eşikleri sınırda sert").
 - **Tavsiye metni ile kod ayrışıyor.** Metin "H.265" diyor; `MaxCompression`in
   tercihi `libsvtav1`, yani AV1. libx265 yalnız yedek.
+
+## Düzeltme ve mutasyon — kodek gerçekten değişiyor mu
+
+Düzeltme tek satır: `tools/VidShrink.Ab/Competitors.cs`de `PlanOptions`a
+`Codec = CodecPreference.Auto` eklendi. **Başka hiçbir alan değişmedi** —
+`TargetMb`, `FillPolicy`, `SpeedMode`, `AllowResolutionDrop`, `AllowFpsDrop`,
+`HdrPolicy` olduğu gibi duruyor. Değer uydurulmadı, uygulamanın geçirdiği
+değerin aynısı (`CodecFromIndex(0)`).
+
+Kolu yanlışa çevirmek düzeneğin çıktısını **dört yerden** değiştiriyor. İki yön
+de koşuldu, aynı satırda (`parca-1` @ 3,4975 MB), aynı gün, aynı tabanda:
+
+| düzeneğin çıktısı | `Codec` atanmadan (Compatible) | `Codec = Auto` |
+|---|---|---|
+| ffmpeg kodek argümanı | `-c:v libx264 -preset slow` | `-c:v libsvtav1 -preset 6` |
+| kodek özel parametreler | yok | `-svtav1-params keyint=600:scd=1:tune=0:…` |
+| seçilen yerleşim | 768x432 | **882x496** |
+| teslim edilen bayt | 3.525.089 | 3.531.823 |
+| harmonik | 33,44 | **45,97** |
+
+Yani mutasyon ölçülüyor ve dört ayrı çıktıyı birden kırıyor; "ölçü yok" durumu
+değil.
+
+## Hangi satırda kodek gerçekten değişti
+
+Ölçülen tek satır `parca-1` @ 3,4975 MB (oran 25,24, `Aggressive`) ve orada
+kodek **değişti**: libx264 → libsvtav1. Yukarıdaki oran tablosuna göre 60 MB
+hedefinin öteki iki satırında da değişmesi beklenir, 600 MB hedefinin üç
+satırında ise değişmemesi. **Bu beş satır koşulmadı — beklenti koddan okundu,
+ölçülmedi.**
+
+Kodeğin değişmediği satırlarda puanın da değişmemesi gerektiği koşulu
+(sözleşmenin K4 kapısı) bu turda **sınanamadı**: sınanabilmesi için 600 MB
+hedefinin üç satırının hem eski hem yeni kolla koşulması gerekiyordu, koşulmadı.
+
+## K6'yı koşacak olana — adıyla duran karıştırıcı
+
+Yerleşim ayrıştırması (`parca-2` @ 60 MB, `AllowResolutionDrop = false`) bu
+turda **koşulmadı**; sözleşmedeki karar eşikleri (69,65 ve 93,70) yeniden
+üretilemeyen `381e8ab` tabanından geliyor ve önce bugünkü tabanla yeniden
+kurulmaları gerekiyor (`ab-duzenegi.md`, T125 bölümü).
+
+Koşulduğunda şu karıştırıcı sonucun içinde olacak ve ayrıştırılmamış olacak:
+düşürme kararı parçanın karmaşıklığından türediği için **düşürülen parçalar
+aynı zamanda zor parçalardır**; ve ~500k bit hızında 1080p60 için x264,
+x265-slow'a karşı sınıf farkıyla zayıftır. Zorunlu-1080p daha kötü çıkarsa bu
+"düşürme doğruydu" demek değildir; **"düşürme zayıf kodek için doğruydu"**
+anlamına da gelebilir. İki okumayı ayırmak ayrı bir ölçümün işi.
+
+Bu karıştırıcı düzeltilmiş kolda küçülüyor ama yok olmuyor: Auto artık
+libsvtav1 koşuyor, yani "zayıf kodek" kolu 60 MB hedefinde geçerli değil —
+ama K6 kodeği bugünkü libx264'te sabit tutmayı istiyor, dolayısıyla K6'nın
+kendi koşumunda karıştırıcı **tam güçte** duruyor.
