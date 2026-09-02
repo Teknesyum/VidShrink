@@ -258,7 +258,61 @@ indi.** Bunu bir "eşitlik" iddiasına çevirmek için `auto`nun saçılımını
 daraltmak ya da her iki tarafı çok kez tekrarlayıp ortalamak gerekir; **bu
 turda yapılmadı.**
 
-<!--K2NOKTA-->
+### Kapanmanın ne kadarı motorun, ne kadarı çalışma noktasının
+
+İki taban aynı çalışma noktasında değil: T111'in `auto`su **15 496 155** bayt
+teslim ediyordu, bugünkü **16 289 648** — **%5,12 daha büyük**. Aynı hedefte
+(16 MB) bugünkü motor bütçenin daha çoğunu kullanıyor. Yüksek bit hızında AV1 ile
+x265'in birbirine göre yeri kayabilir, yani kapanmanın bir kısmı motordan değil
+çalışma noktasından geliyor olabilir. **Bu ayrıştırıldı, varsayılmadı.**
+
+Bugünkü motorun argümanlarıyla (preset 6, `-g 600`, `keyint=600:scd=1`) ve aynı
+HandBrake yapılandırmasıyla T111'in çalışma noktasında bir çift daha üretildi:
+
+    ./uret.sh av1-15m 6 600 "keyint=600:scd=1" 2514
+    ./hb.sh hb2-15m 1897
+
+| koşum | teslim (bayt) | eşlenme | ortalama | p10 | harmonik | en düşük kare |
+|---|---|---|---|---|---|---|
+| `av1-15m` | 15 716 673 | — | 96,024 | 95,548 | 96,022 | 94,795 |
+| `hb2-15m` | 15 715 417 | **−%0,008** | 95,743 | 95,386 | 95,741 | 94,167 |
+
+| HandBrake açığı | Δ ortalama | Δ p10 | Δ harmonik |
+|---|---|---|---|
+| ~15,7 MB (T111'in noktası) | **−0,281** | **−0,162** | **−0,281** |
+| ~16,3 MB (bugünün noktası) | −0,266 | −0,130 | −0,265 |
+
+**Çalışma noktası sonucu taşımıyor.** İki nokta arasında açık 0,015 oynuyor;
+T111'den bugüne olan salınım 0,363. İşareti çeviren şey %5'lik boyut farkı değil.
+
+### Hangi taraf oynadı: ölçüldü
+
+Aynı makinede, aynı kilitle, iki tabanın satirlari yan yana:
+
+| ne | T111 (`3688336`) | bugün (`2d5f710`) | fark |
+|---|---|---|---|
+| `auto`, kilitli ortalama | 95,647 | 96,025 | **+0,378** |
+| `auto`, kilitli p10 | 94,903 | 95,526 | **+0,623** |
+| `auto`, kilitli en düşük kare | 92,376 | 94,806 | **+2,430** |
+| uzman ayarı (preset 4, `-g 300`), ortalama | 96,084 | 96,099 | +0,015 |
+| HandBrake `x265_10bit`, ~15,7 MB'ta ortalama | 95,743 | 95,743 | **0,000** |
+
+T111 satırları: `auto` ve `uzman-biz3` T111'in arşivinden bu makinede yeniden
+özetlendi; HandBrake satırı T111'in yayımladığı `uzman-hb2` değerinden
+(15 743 067 bayt, kilitli ortalama 95,743) alındı ve bugün 15 715 417 baytta
+tekrar ölçüldü.
+
+**Oynayan taraf bizim tarafımız.** HandBrake aynı boyutta aynı puanı üç hane
+boyunca birebir tekrarladı — bu aynı zamanda ölçüm zincirinin iki taban arasında
+değişmediğinin ikinci kanıtı. Uzman ayarı da neredeyse hiç oynamadı (+0,015).
+Oynayan `auto`: +0,378 ortalama, +0,623 p10, +2,430 en düşük kare. Boyut
+farkının (%5,12) K3 eğimiyle katkısı bu +0,378'in **0,031'i**; geri kalanı
+motordan.
+
+**Motorun neresinden geldiği K4'te ölçüldü**: plan tarafında iki taban arasında
+değişen tek şey anahtar kare argümanı ve `-g 120` → `-g 600` geçişi tek başına
++0,464 ortalama / +0,886 p10 veriyor.
+
 
 ### Karşılaştırılabilirliğin sınırı
 
@@ -325,10 +379,22 @@ birkaçı; işareti çevirecek büyüklükte değil. Üstelik iki rakip de `auto
 **küçük** dosya teslim etti, yani sapmanın düzeltilmesi `auto` lehine değil
 aleyhine bir düzeltme olurdu ve HandBrake açığı daha da açılırdı.
 
-Eğim yalnız AV1 tarafında, yalnız %1'lik bir aralıkta ölçüldü. x265 tarafında
-ayrı bir eğim **ölçülmedi**: `uzman-hb1` ile `uzman-hb2` arasındaki %0,54 boyut
-farkında kilitli ortalama 95,759 → 95,759 hiç oynamadı, yani orada da eğim
-0,00x mertebesinde, ama iki noktayla sayı verilmedi.
+AV1 eğimi yalnız %1'lik bir aralıkta ve yalnız preset 4 / `-g 300` koşumlarında
+ölçüldü; daha geniş aralıkta doğrusal kaldığı **ölçülmedi.**
+
+**x265 tarafının eğimi ayrıca ölçüldü.** Aynı HandBrake yapılandırmasıyla,
+yalnız `-b` değişerek üretilmiş dört koşum:
+
+| koşum | teslim (bayt) | Δ (en küçüğe göre) | kilitli ortalama |
+|---|---|---|---|
+| `hb-15m` (1870 kbps) | 15 501 405 | — | 95,732 |
+| `hb2-15m` (1897 kbps) | 15 715 417 | +%1,38 | 95,743 |
+| `uzman-hb2` (1969 kbps) | 16 284 727 | +%5,05 | 95,759 |
+| `uzman-hb1` (1980 kbps) | 16 372 823 | +%5,62 | 95,759 |
+
+Dört noktaya en küçük kareler: **0,0047 puan / %1.** AV1 tarafında ölçülen
+0,006 ile aynı mertebede. İki tarafın eğimi birbirine yakın olduğu için kalan
+boyut sapması açığa neredeyse hiç geçmiyor.
 
 ---
 
@@ -573,8 +639,10 @@ Bu belgeye giren her sayı yukarıdaki komutlardan çıktı. Aşağıdakiler **b
 
 **Boyut eşliği**
 
-- **x265 tarafının boyut eğimi.** İki nokta arasında oynamadığı görüldü
-  (95,759 → 95,759, %0,54 boyut farkı), ama iki noktayla eğim sayısı verilmedi.
+- **Uzman açığının işareti.** +0,074, `auto`nun kendi saçılımı olan 0,055'in
+  hemen üstünde ve ikinci `auto` koşumuna göre +0,019. İşaretin gerçekten
+  hangi tarafta olduğunu söylemek için her iki tarafı çok kez tekrarlayıp
+  ortalamak gerekir; **bu turda yapılmadı.**
 - **AV1 eğiminin geçerlilik aralığı.** Eğim yalnız %1'lik bir aralıkta, yalnız
   preset 4 / `-g 300` koşumlarında ölçüldü. Daha geniş aralıkta ya da başka
   ayarda doğrusal kaldığı ölçülmedi.
