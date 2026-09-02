@@ -83,6 +83,12 @@ public static class Program
             if (!Kollar.ContainsKey(args[1])) { Console.Error.WriteLine($"kol yok: {args[1]}"); return 2; }
             Kol = args[1];
         }
+        if (komut == "rapor")
+        {
+            Rapor.Uret(Is, Path.Combine(Kok, "docs", "olcumler", "sahne-butcesi.md"), Json);
+            return 0;
+        }
+
         var secilen = args.Length > 2
             ? Pencereler.Where(p => p.Ad == args[2]).ToArray()
             : Pencereler;
@@ -320,19 +326,23 @@ public static class Program
     /// SVT-AV1 ve x264/x265 parametre ayristiricilari tanimadiklari anahtari
     /// uyariyla gecer. Bu yuzden her hucre **iki farkli degerle** kodlanir ve
     /// ciktilarin baytlari karsilastirilir. Ayni cikti = parametre yok sayildi.
-    public static readonly (string Codec, string Aday, string[] A, string[] B)[] K4Izgarasi =
+    /// Hucre: kodlayicinin params bayragina eklenecek anahtar=deger cifti. nvenc'te
+    /// ayri bayraklar kullanilir; orada <c>Ham</c> dolu olur.
+    public sealed record K4Hucre(string Codec, string Aday, string A, string B, string[]? HamA = null, string[]? HamB = null);
+
+    public static readonly K4Hucre[] K4Izgarasi =
     {
-        ("libx265", "zones", new[] { "-x265-params", "zones=0,119,b=2.00" }, new[] { "-x265-params", "zones=0,119,b=0.50" }),
-        ("libx265", "qcomp", new[] { "-x265-params", "qcomp=0.50" }, new[] { "-x265-params", "qcomp=0.95" }),
-        ("libx264", "zones", new[] { "-x264-params", "zones=0,119,b=2.00" }, new[] { "-x264-params", "zones=0,119,b=0.50" }),
-        ("libx264", "qcomp", new[] { "-x264-params", "qcomp=0.50" }, new[] { "-x264-params", "qcomp=0.95" }),
-        ("libsvtav1", "zones", new[] { "-svtav1-params", "zones=0,119,b=2.00" }, new[] { "-svtav1-params", "zones=0,119,b=0.50" }),
-        ("libsvtav1", "qcomp", new[] { "-svtav1-params", "qp-scale-compress-strength=0" }, new[] { "-svtav1-params", "qp-scale-compress-strength=3" }),
-        ("libsvtav1", "aq", new[] { "-svtav1-params", "variance-boost-strength=1" }, new[] { "-svtav1-params", "variance-boost-strength=4" }),
-        ("hevc_nvenc", "zones", new[] { "-hevc_nvenc-zone-yok", "1" }, new[] { "-hevc_nvenc-zone-yok", "2" }),
-        ("hevc_nvenc", "aq", new[] { "-spatial-aq", "0" }, new[] { "-spatial-aq", "1", "-aq-strength", "15" }),
-        ("av1_nvenc", "zones", new[] { "-av1_nvenc-zone-yok", "1" }, new[] { "-av1_nvenc-zone-yok", "2" }),
-        ("av1_nvenc", "aq", new[] { "-spatial-aq", "0" }, new[] { "-spatial-aq", "1", "-aq-strength", "15" })
+        new("libx265", "zones", "zones=0,119,b=2.00", "zones=0,119,b=0.50"),
+        new("libx265", "qcomp", "qcomp=0.50", "qcomp=0.95"),
+        new("libx264", "zones", "zones=0,119,b=2.00", "zones=0,119,b=0.50"),
+        new("libx264", "qcomp", "qcomp=0.50", "qcomp=0.95"),
+        new("libsvtav1", "zones", "zones=0,119,b=2.00", "zones=0,119,b=0.50"),
+        new("libsvtav1", "qcomp", "qp-scale-compress-strength=0", "qp-scale-compress-strength=3"),
+        new("libsvtav1", "aq", "variance-boost-strength=1", "variance-boost-strength=4"),
+        new("hevc_nvenc", "zones", "", "", Array.Empty<string>(), null),
+        new("hevc_nvenc", "aq", "", "", new[] { "-spatial-aq", "0" }, new[] { "-spatial-aq", "1", "-aq-strength", "15" }),
+        new("av1_nvenc", "zones", "", "", Array.Empty<string>(), null),
+        new("av1_nvenc", "aq", "", "", new[] { "-spatial-aq", "0" }, new[] { "-spatial-aq", "1", "-aq-strength", "15" })
     };
 
     private static void K4(Pencere p)
@@ -340,33 +350,50 @@ public static class Program
         var hedef = Yol("k4-izgara.csv");
         if (File.Exists(hedef)) { Console.WriteLine("k4 zaten var"); return; }
 
-        var satirlar = new List<string> { "kodlayici;aday;destek;a_bayt;b_bayt;not" };
         var deneme = Path.Combine(Is, "k4");
         Directory.CreateDirectory(deneme);
+        var satirlar = new List<string> { "kodlayici;aday;destek;a_bayt;b_bayt;fark_bayt;gurultu_bayt;not" };
 
-        foreach (var (codec, aday, a, b) in K4Izgarasi)
+        var gurultu = new Dictionary<string, long?>();
+        foreach (var codec in K4Izgarasi.Select(h => h.Codec).Distinct())
         {
-            if (!EncoderCapabilities.Instance.HasEncoder(codec))
-            { satirlar.Add($"{codec};{aday};bilinmiyor;;;kodlayici bu makinede yok"); continue; }
-            if (a[0].EndsWith("-zone-yok", StringComparison.Ordinal))
-            { satirlar.Add($"{codec};{aday};hayir;;;kodlayicida zone parametresi yok"); continue; }
+            if (!EncoderCapabilities.Instance.HasEncoder(codec)) { gurultu[codec] = null; continue; }
+            var (ok1, l1, _) = K4Kodla(p, codec, null, null, Path.Combine(deneme, $"{codec}-kontrol-1.mkv"));
+            var (ok2, l2, _) = K4Kodla(p, codec, null, null, Path.Combine(deneme, $"{codec}-kontrol-2.mkv"));
+            gurultu[codec] = ok1 && ok2 ? Math.Abs(l1 - l2) : null;
+            satirlar.Add($"{codec};kontrol;-;{l1};{l2};{(ok1 && ok2 ? Math.Abs(l1 - l2).ToString(CultureInfo.InvariantCulture) : string.Empty)};;" +
+                         "ayni parametreyle iki kosum — tekrar gurultusu");
+        }
 
-            var (okA, lenA, errA) = K4Kodla(p, codec, a, Path.Combine(deneme, $"{codec}-{aday}-a.mkv"));
-            var (okB, lenB, errB) = K4Kodla(p, codec, b, Path.Combine(deneme, $"{codec}-{aday}-b.mkv"));
+        foreach (var h in K4Izgarasi)
+        {
+            if (!EncoderCapabilities.Instance.HasEncoder(h.Codec))
+            { satirlar.Add($"{h.Codec};{h.Aday};bilinmiyor;;;;;kodlayici bu makinede yok"); continue; }
+            if (h.HamA is { Length: 0 })
+            { satirlar.Add($"{h.Codec};{h.Aday};hayir;;;;;kodlayicida zone parametresi yok"); continue; }
+            if (gurultu[h.Codec] is not { } noise)
+            { satirlar.Add($"{h.Codec};{h.Aday};bilinmiyor;;;;;kontrol kosumu cikti uretmedi"); continue; }
+
+            var (okA, lenA, errA) = K4Kodla(p, h.Codec, h.A, h.HamA, Path.Combine(deneme, $"{h.Codec}-{h.Aday}-a.mkv"));
+            var (okB, lenB, errB) = K4Kodla(p, h.Codec, h.B, h.HamB, Path.Combine(deneme, $"{h.Codec}-{h.Aday}-b.mkv"));
             if (!okA || !okB)
             {
-                satirlar.Add($"{codec};{aday};hayir;{lenA};{lenB};{(errA + " " + errB).Replace(';', ' ').Replace('\n', ' ').Trim()}");
+                satirlar.Add($"{h.Codec};{h.Aday};bilinmiyor;{lenA};{lenB};;{noise};" +
+                             (errA + " " + errB).Replace(';', ' ').Replace('\n', ' ').Trim());
                 continue;
             }
-            var farkli = lenA != lenB;
-            satirlar.Add($"{codec};{aday};{(farkli ? "evet" : "hayir")};{lenA};{lenB};" +
-                         (farkli ? "iki deger farkli cikti uretti" : "iki deger ayni ciktiyi uretti — parametre sessizce yok sayildi"));
+            var fark = Math.Abs(lenA - lenB);
+            var etkili = fark > noise * 2 && fark > lenA / 100;
+            satirlar.Add($"{h.Codec};{h.Aday};{(etkili ? "evet" : "hayir")};{lenA};{lenB};{fark};{noise};" +
+                         (etkili
+                             ? "iki deger belirgin farkli cikti uretti"
+                             : "fark tekrar gurultusunun icinde — parametre etkisiz ya da yok sayildi"));
         }
         File.WriteAllLines(hedef, satirlar);
         foreach (var s in satirlar) Console.WriteLine(s);
     }
 
-    private static (bool Ok, long Length, string Err) K4Kodla(Pencere p, string codec, string[] extra, string cikti)
+    private static (bool Ok, long Length, string Err) K4Kodla(Pencere p, string codec, string? param, string[]? ham, string cikti)
     {
         var argv = new List<string>
         {
@@ -374,9 +401,15 @@ public static class Program
             "-ss", "0", "-t", "2", "-i", Kaynak(p), "-an",
             "-c:v", codec, "-b:v", "2000k", "-pix_fmt", "yuv420p"
         };
-        argv.AddRange(extra);
-        argv.AddRange(new[] { "-threads", "2", cikti });
-        var r = Kabuk.Kos(ToolLocator.Ffmpeg, argv, TimeSpan.FromMinutes(5));
+        var pin = IsParcacigiArgs(codec);
+        if (pin.Length == 2)
+            argv.AddRange(new[] { pin[0], string.IsNullOrEmpty(param) ? pin[1] : pin[1] + ":" + param });
+        else if (!string.IsNullOrEmpty(param))
+            throw new InvalidOperationException($"{codec} icin params bayragi yok.");
+        if (ham is { Length: > 0 }) argv.AddRange(ham);
+        argv.AddRange(new[] { "-threads", Threads.ToString(CultureInfo.InvariantCulture), cikti });
+
+        var r = Kabuk.Kos(ToolLocator.Ffmpeg, argv, TimeSpan.FromMinutes(15));
         if (r.TimedOut) return (false, 0, "zaman asimi");
         if (r.Code != 0) return (false, 0, r.StdErr);
         return (true, new FileInfo(cikti).Length, string.Empty);

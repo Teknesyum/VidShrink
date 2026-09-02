@@ -1,0 +1,373 @@
+using System.Globalization;
+using System.Text;
+using System.Text.Json;
+using VidShrink.Core;
+
+namespace VidShrink.SahneButcesi;
+
+/// Raporu tumuyle olculen dosyalardan uretir. Bu projenin on sekiz kez tekrarlayan
+/// kusuru "tablo dogru, onu ozetleyen cumle yanlis"tir; buradaki her sayi ve her
+/// karar sozcugu hesaplanir, elle yazilmaz.
+public static class Rapor
+{
+    public static void Uret(string isKok, string ciktiYolu, JsonSerializerOptions json)
+    {
+        var sb = new StringBuilder();
+        var kollar = Program.Kollar.Keys.ToArray();
+
+        var k1 = new Dictionary<(string Kol, string Pencere), K1Kaydi>();
+        var haritalar = new Dictionary<string, HaritaKaydi>();
+        foreach (var p in Program.Pencereler)
+        {
+            var hy = Path.Combine(isKok, $"harita-{p.Ad}.json");
+            if (File.Exists(hy)) haritalar[p.Ad] = JsonSerializer.Deserialize<HaritaKaydi>(File.ReadAllText(hy), json)!;
+            foreach (var kol in kollar)
+            {
+                var y = Path.Combine(isKok, $"k1-{kol}-{p.Ad}.json");
+                if (File.Exists(y)) k1[(kol, p.Ad)] = JsonSerializer.Deserialize<K1Kaydi>(File.ReadAllText(y), json)!;
+            }
+        }
+
+        sb.AppendLine("# Sahne basina bit dagitimi — harita plana bagli degil (T114)");
+        sb.AppendLine();
+        sb.AppendLine("Bu sayfadaki her sayi `tools/sahne-butcesi/` altindaki duzenekten cikar ve");
+        sb.AppendLine("bu sayfayi da o duzenek yazar (`SahneButcesi rapor`). Ozet cumleler elle");
+        sb.AppendLine("yazilmaz, tablodan hesaplanir.");
+        sb.AppendLine();
+        sb.AppendLine("Karar kurallari olcumden **once** yazildi: `tools/sahne-butcesi/ESIKLER.md`,");
+        sb.AppendLine("commit `eb9165c`. Sonradan secilen esik kanit degildir.");
+        sb.AppendLine();
+
+        Ortam(sb, isKok);
+        Sorulan(sb);
+        Kaynaklar(sb, haritalar);
+        var k2 = K1K2(sb, k1, haritalar, kollar);
+        K4(sb, isKok);
+        var k5 = K5K6(sb, isKok, json, kollar);
+        var k7 = K7(sb, isKok, json, kollar, k5);
+        Sonuc(sb, k2, k5, k7);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(ciktiYolu)!);
+        File.WriteAllText(ciktiYolu, sb.ToString());
+        Console.WriteLine($"rapor yazildi: {ciktiYolu}");
+    }
+
+    private static void Ortam(StringBuilder sb, string isKok)
+    {
+        var (_, ver) = Kabuk.Yakala(VidShrink.Ffmpeg.ToolLocator.Ffmpeg, new[] { "-version" });
+        var ilk = ver.Split('\n').FirstOrDefault()?.Trim() ?? "bilinmiyor";
+        sb.AppendLine("## Olcum ortami");
+        sb.AppendLine();
+        sb.AppendLine($"- `{ilk}` — butun kosumlar tek surumle. Surum sinirini gecen kiyas yok.");
+        sb.AppendLine($"- Is parcacigi sabit: `-threads {Program.Threads}`, x265 `pools={Program.Threads}`,");
+        sb.AppendLine($"  x264 `threads={Program.Threads}`, SVT-AV1 `lp={Program.Threads}`.");
+        sb.AppendLine("- **Makine paylasimliydi**; paralelde baska ajanlarin olcumleri kosuyordu.");
+        sb.AppendLine("  Bu damga yalniz **sure** sayilarindadir. Bu sayfada sure sayisi yok:");
+        sb.AppendLine("  bit, boyut ve kalite sayilari is parcacigi sabitken yukten etkilenmez.");
+        sb.AppendLine($"- Ham cikti: `{isKok.Replace('\\', '/')}` (gitignore'lu).");
+        sb.AppendLine();
+    }
+
+    private static void Sorulan(StringBuilder sb)
+    {
+        sb.AppendLine("## Sorulan tek soru");
+        sb.AppendLine();
+        sb.AppendLine("Kodlayicinin kendi hiz denetimi sahne basina biti zaten dogru dagitiyor mu?");
+        sb.AppendLine("Uc dagitim yan yana olculur:");
+        sb.AppendLine();
+        sb.AppendLine("| Ad | Nasil olculdu | Kimin karari |");
+        sb.AppendLine("|----|---------------|--------------|");
+        sb.AppendLine($"| hak edilen | her sahne **ayri ayri**, sabit `CRF {Program.ReferansCrf}` | referans |");
+        sb.AppendLine("| verilen | pencere butun halinde bugunku planla (iki gecis, hedef boyut); paket boyutlari sahne araligina toplanir | kodlayici |");
+        sb.AppendLine("| harita | `SceneMap.Scenes[i].Bits` — sonda ciktisi (x264 ultrafast crf23, 640 genislik) | bizim onerimiz |");
+        sb.AppendLine();
+        sb.AppendLine("Paylar penceredeki toplama normalize edilir; birim yuzde puani (pp).");
+        sb.AppendLine();
+    }
+
+    private static void Kaynaklar(StringBuilder sb, Dictionary<string, HaritaKaydi> haritalar)
+    {
+        sb.AppendLine("## Kaynaklar");
+        sb.AppendLine();
+        sb.AppendLine("Uc pencere de `kaynak-1080p60-hdr-17dk-yalniz-video.mkv` icinden kesildi");
+        sb.AppendLine("(1920x1080 hevc 10-bit HDR, 60 fps). Ses akisi yok: T63'te A/B'yi haksiz");
+        sb.AppendLine("yapan ses farki bu olcume giremez. Pencere sinirlari T105'in yer gercegi");
+        sb.AppendLine("pencereleridir; gercek kesim sayilari oradan gelir.");
+        sb.AppendLine();
+        sb.AppendLine("| Pencere | Icerik | Gercek kesim (T105) | Harita sahnesi | Sure (sn) |");
+        sb.AppendLine("|---------|--------|---------------------|----------------|-----------|");
+        foreach (var p in Program.Pencereler)
+        {
+            var h = haritalar.GetValueOrDefault(p.Ad);
+            var gercek = p.Ad switch { "p1-karisik" => "28", "p2-durgun" => "7", _ => "0" };
+            sb.AppendLine($"| `{p.Ad}` | {p.Not.Split('—').Last().Trim()} | {gercek} | " +
+                          $"{(h is null ? "olculmedi" : h.Scenes.Count.ToString(CultureInfo.InvariantCulture))} | " +
+                          $"{(h is null ? "olculmedi" : Kabuk.Inv(h.Duration, "0.0"))} |");
+        }
+        sb.AppendLine();
+        sb.AppendLine("**Uc pencere de tek kaynaktan gelir.** Uc ayri film degil; icerik rejimi");
+        sb.AppendLine("uc ayri olsa da kodlayici davranisi ayni kamera ve ayni kodlama gecmisi");
+        sb.AppendLine("uzerinde olculmustur. Bu sayfanin en zayif yani budur.");
+        sb.AppendLine();
+    }
+
+    public sealed record K2Sonuc(bool Kapandi, IReadOnlyList<string> Satirlar);
+
+    private static K2Sonuc K1K2(
+        StringBuilder sb,
+        Dictionary<(string, string), K1Kaydi> k1,
+        Dictionary<string, HaritaKaydi> haritalar,
+        string[] kollar)
+    {
+        sb.AppendLine("## K1 — bugunku dagitimin hatasi");
+        sb.AppendLine();
+
+        foreach (var kol in kollar)
+        {
+            foreach (var p in Program.Pencereler)
+            {
+                if (!k1.TryGetValue((kol, p.Ad), out var k)) continue;
+                sb.AppendLine($"### {kol} / {p.Ad}");
+                sb.AppendLine();
+                sb.AppendLine($"Plan: `{k.Plan.Codec}` {k.Plan.Mode} {k.Plan.VideoBitrateK}k " +
+                              $"{k.Plan.Width}x{k.Plan.Height}@{Kabuk.Inv(k.Plan.Fps, "0.##")} preset `{k.Plan.Preset}` " +
+                              $"hedef {Kabuk.Inv(k.Plan.TargetMb, "0.#")} MB. " +
+                              $"Referans toplami {Kabuk.Inv(k.ReferansToplamBit / 1e6, "0.0")} Mbit, " +
+                              $"plan ciktisi {Kabuk.Inv(k.PlanToplamBit / 1e6, "0.0")} Mbit.");
+                sb.AppendLine();
+                var h = haritalar[p.Ad];
+                sb.AppendLine("| Sahne | Bas (sn) | Sure (sn) | Karmasiklik | hak edilen (pp) | verilen (pp) | harita (pp) | verilen−hak | harita−hak |");
+                sb.AppendLine("|-------|----------|-----------|-------------|-----------------|--------------|-------------|-------------|------------|");
+                for (var i = 0; i < k.HakEdilen.Count; i++)
+                {
+                    var s = h.Scenes[i];
+                    sb.AppendLine($"| {i} | {Kabuk.Inv(s.Start, "0.0")} | {Kabuk.Inv(s.End - s.Start, "0.0")} | " +
+                                  $"{Kabuk.Inv(s.Complexity, "0.00")} | {Kabuk.Inv(k.HakEdilen[i] * 100, "0.00")} | " +
+                                  $"{Kabuk.Inv(k.Verilen[i] * 100, "0.00")} | {Kabuk.Inv(k.Harita[i] * 100, "0.00")} | " +
+                                  $"{Kabuk.Inv((k.Verilen[i] - k.HakEdilen[i]) * 100, "+0.00;-0.00;0.00")} | " +
+                                  $"{Kabuk.Inv((k.Harita[i] - k.HakEdilen[i]) * 100, "+0.00;-0.00;0.00")} |");
+                }
+                sb.AppendLine();
+                foreach (var b in k.Bilinmiyor) sb.AppendLine($"- **bilinmiyor**: {b}");
+                if (k.Bilinmiyor.Count > 0) sb.AppendLine();
+            }
+        }
+
+        sb.AppendLine("## K2 — kodlayicinin dagitimi bizim onerimizle yan yana");
+        sb.AppendLine();
+        sb.AppendLine("Kapi (`ESIKLER.md`, olcumden once): (1) `rho(verilen,hak) >= 0,80`,");
+        sb.AppendLine("(2) `MAE(verilen) <= MAE(harita)`, (3) ters dusen sahne orani `< %20`.");
+        sb.AppendLine("Ucu birden saglaniyorsa is biter ve kod degismez.");
+        sb.AppendLine();
+        sb.AppendLine("| Kol | Pencere | Sahne | rho(verilen,hak) | rho(harita,hak) | MAE verilen (pp) | MAE harita (pp) | Ters dusen | K1 kapi | K2 kapi | K3 kapi |");
+        sb.AppendLine("|-----|---------|-------|------------------|-----------------|------------------|-----------------|------------|---------|---------|---------|");
+
+        var satirlar = new List<string>();
+        var hepsiKapandi = true;
+        var olculdu = false;
+        foreach (var kol in kollar)
+        {
+            foreach (var p in Program.Pencereler)
+            {
+                if (!k1.TryGetValue((kol, p.Ad), out var k)) continue;
+                olculdu = true;
+                var rhoV = SceneMap.Spearman(k.Verilen, k.HakEdilen);
+                var rhoH = SceneMap.Spearman(k.Harita, k.HakEdilen);
+                var maeV = Butce.MeanAbsoluteError(k.Verilen, k.HakEdilen) * 100;
+                var maeH = Butce.MeanAbsoluteError(k.Harita, k.HakEdilen) * 100;
+                var ters = Butce.TersDusenler(k.HakEdilen, k.Verilen, k.Harita);
+                var oran = (double)ters / k.HakEdilen.Count;
+                var g1 = rhoV >= 0.80;
+                var g2 = maeV <= maeH;
+                var g3 = oran < 0.20;
+                if (!(g1 && g2 && g3)) hepsiKapandi = false;
+                var rhoNot = k.HakEdilen.Count < 4 ? $" (n={k.HakEdilen.Count}, anlamsiz)" : string.Empty;
+                satirlar.Add($"{kol}/{p.Ad}: rho(verilen)={Kabuk.Inv(rhoV, "0.000")} rho(harita)={Kabuk.Inv(rhoH, "0.000")} " +
+                             $"MAE {Kabuk.Inv(maeV, "0.00")} vs {Kabuk.Inv(maeH, "0.00")} pp, ters {ters}/{k.HakEdilen.Count}");
+                sb.AppendLine($"| {kol} | `{p.Ad}` | {k.HakEdilen.Count} | {Kabuk.Inv(rhoV, "0.000")}{rhoNot} | {Kabuk.Inv(rhoH, "0.000")} | " +
+                              $"{Kabuk.Inv(maeV, "0.00")} | {Kabuk.Inv(maeH, "0.00")} | {ters}/{k.HakEdilen.Count} ({Kabuk.Inv(oran * 100, "0")}%) | " +
+                              $"{Evet(g1)} | {Evet(g2)} | {Evet(g3)} |");
+            }
+        }
+        sb.AppendLine();
+        if (!olculdu) { sb.AppendLine("**bilinmiyor** — K1 ciktisi yok."); sb.AppendLine(); return new K2Sonuc(false, satirlar); }
+
+        sb.AppendLine(hepsiKapandi
+            ? "**K2 kapisi kapandi.** Olculen her kol ve her pencerede ucu birden saglandi;"
+            : "**K2 kapisi kapanmadi.** En az bir kol/pencere ucunu birden saglamadi;");
+        sb.AppendLine("her satirin son uc sutunu yukarida.");
+        sb.AppendLine();
+        sb.AppendLine("Sahne sayisi 4'un altindaki pencerede sira korelasyonu anlamsizdir ve o");
+        sb.AppendLine("sutunda isaretlidir; o pencerede karari MAE tasir. Sahne sayisi icerigin");
+        sb.AppendLine("kendisidir: kesimi olmayan pencerede dagitilacak sahne de yoktur.");
+        sb.AppendLine();
+        return new K2Sonuc(hepsiKapandi, satirlar);
+    }
+
+    private static string Evet(bool value) => value ? "evet" : "**hayir**";
+
+    private static void K4(StringBuilder sb, string isKok)
+    {
+        sb.AppendLine("## K4 — aday x kodlayici izgarasi");
+        sb.AppendLine();
+        var yol = Path.Combine(isKok, "k4-izgara.csv");
+        if (!File.Exists(yol)) { sb.AppendLine("**bilinmiyor** — izgara kosulmadi."); sb.AppendLine(); return; }
+
+        sb.AppendLine("Cikis kodunun sifir olmasi destek sayilmaz: x264/x265 ve SVT-AV1 parametre");
+        sb.AppendLine("ayristiricilari tanimadiklari anahtari uyariyla geciyor. Her hucre **iki");
+        sb.AppendLine("farkli degerle** kodlandi; once ayni parametreyle iki kosum yapilip tekrar");
+        sb.AppendLine("gurultusu olculdu. Fark gurultunun iki katini ve ciktinin %1'ini asmadikca");
+        sb.AppendLine("destek yazilmaz.");
+        sb.AppendLine();
+        var satirlar = File.ReadAllLines(yol);
+        sb.AppendLine("| Kodlayici | Aday | Destek | A (bayt) | B (bayt) | Fark | Gurultu | Not |");
+        sb.AppendLine("|-----------|------|--------|----------|----------|------|---------|-----|");
+        foreach (var line in satirlar.Skip(1))
+        {
+            var c = line.Split(';');
+            if (c.Length < 8) continue;
+            sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]} | {c[6]} | {c[7]} |");
+        }
+        sb.AppendLine();
+    }
+
+    public sealed record AbSonuc(bool Gecti, IReadOnlyList<OlcumKaydi> Kayitlar, string Ozet);
+
+    private static AbSonuc K5K6(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
+    {
+        sb.AppendLine("## K5 ve K6 — kalite kazanci ve hedef boyut");
+        sb.AppendLine();
+        sb.AppendLine("Kapi (olcumden once): p10 kazanci `>= +0,50`, en kotu sahne kazanci");
+        sb.AppendLine("`>= +1,00`, ayni iki kaynakta; hicbir kaynakta p10 kaybi `> 0,30`;");
+        sb.AppendLine("her kosum hedef bandin icinde.");
+        sb.AppendLine();
+
+        var hepsi = Oku(isKok, "k5", json, kollar);
+        if (hepsi.Count == 0) { sb.AppendLine("**bilinmiyor** — K5 kosulmadi."); sb.AppendLine(); return new AbSonuc(false, hepsi, "olculmedi"); }
+
+        Tablo(sb, hepsi);
+
+        var p10Kazanan = 0;
+        var enKotuKazanan = 0;
+        var p10Kaybeden = 0;
+        var bandDisi = hepsi.Count(o => !o.BandIcinde && o.Bilinmiyor is null);
+        var farklar = new List<string>();
+        foreach (var g in hepsi.Where(o => o.Bilinmiyor is null).GroupBy(o => o.Pencere))
+        {
+            var taban = g.FirstOrDefault(o => o.Kol == "taban");
+            var dagitim = g.FirstOrDefault(o => o.Kol == "dagitim");
+            if (taban?.VmafP10 is null || dagitim?.VmafP10 is null) continue;
+            var dp10 = dagitim.VmafP10.Value - taban.VmafP10.Value;
+            var dworst = (dagitim.VmafWorstScene ?? double.NaN) - (taban.VmafWorstScene ?? double.NaN);
+            var dmean = (dagitim.VmafMean ?? double.NaN) - (taban.VmafMean ?? double.NaN);
+            if (dp10 >= 0.50) p10Kazanan++;
+            if (dworst >= 1.00) enKotuKazanan++;
+            if (dp10 < -0.30) p10Kaybeden++;
+            farklar.Add($"| `{g.Key}` | {Kabuk.Inv(dmean, "+0.000;-0.000;0.000")} | {Kabuk.Inv(dp10, "+0.000;-0.000;0.000")} | {Kabuk.Inv(dworst, "+0.000;-0.000;0.000")} |");
+        }
+
+        sb.AppendLine("### Dagitimli − dagitimsiz");
+        sb.AppendLine();
+        sb.AppendLine("| Pencere | Δ ortalama | Δ p10 | Δ en kotu sahne |");
+        sb.AppendLine("|---------|------------|-------|-----------------|");
+        foreach (var f in farklar) sb.AppendLine(f);
+        sb.AppendLine();
+
+        var gecti = p10Kazanan >= 2 && enKotuKazanan >= 2 && p10Kaybeden == 0 && bandDisi == 0;
+        var ozet = $"p10 kazanci esigi gecen kaynak {p10Kazanan}/3, en kotu sahne esigi gecen {enKotuKazanan}/3, " +
+                   $"esikten fazla p10 kaybeden {p10Kaybeden}, hedef bandi asan kosum {bandDisi}";
+        sb.AppendLine($"**K5/K6 kapisi {(gecti ? "gecti" : "gecmedi")}** — {ozet}.");
+        sb.AppendLine();
+        return new AbSonuc(gecti, hepsi, ozet);
+    }
+
+    private static AbSonuc K7(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar, AbSonuc k5)
+    {
+        sb.AppendLine("## K7 — harita yanlisken dagitimin bedeli");
+        sb.AppendLine();
+        var hepsi = Oku(isKok, "k7", json, kollar);
+        if (hepsi.Count == 0) { sb.AppendLine("**bilinmiyor** — K7 kosulmadi."); sb.AppendLine(); return new AbSonuc(false, hepsi, "olculmedi"); }
+
+        sb.AppendLine("Iki bozulma ayri olculdu: **eksik kesim** (her ikinci kesim atildi) ve");
+        sb.AppendLine("**fazla kesim** (her sahne ortasindan ikiye bolundu). Anahtar kare karari");
+        sb.AppendLine("her kolda dogru haritadan gelir; degisen tek sey bit dagitimidir.");
+        sb.AppendLine();
+        Tablo(sb, hepsi);
+
+        var satirlar = new List<string>();
+        var enBuyukKayip = 0.0;
+        foreach (var g in hepsi.Where(o => o.Bilinmiyor is null).GroupBy(o => o.Pencere))
+        {
+            var dogru = k5.Kayitlar.FirstOrDefault(o => o.Pencere == g.Key && o.Kol == "dagitim");
+            if (dogru?.VmafP10 is null) continue;
+            foreach (var bozuk in g)
+            {
+                if (bozuk.VmafP10 is null) continue;
+                var d = bozuk.VmafP10.Value - dogru.VmafP10.Value;
+                enBuyukKayip = Math.Min(enBuyukKayip, d);
+                satirlar.Add($"| `{g.Key}` | {bozuk.Kol} | {Kabuk.Inv(d, "+0.000;-0.000;0.000")} |");
+            }
+        }
+        sb.AppendLine("### Bozuk harita − dogru harita (p10)");
+        sb.AppendLine();
+        sb.AppendLine("| Pencere | Bozulma | Δ p10 |");
+        sb.AppendLine("|---------|---------|-------|");
+        foreach (var s in satirlar) sb.AppendLine(s);
+        sb.AppendLine();
+        var ozet = $"en buyuk p10 kaybi {Kabuk.Inv(enBuyukKayip, "0.000")} puan";
+        sb.AppendLine($"**Bozuk haritanin bedeli**: {ozet}.");
+        sb.AppendLine();
+        return new AbSonuc(enBuyukKayip >= -0.30, hepsi, ozet);
+    }
+
+    private static void Tablo(StringBuilder sb, IReadOnlyList<OlcumKaydi> kayitlar)
+    {
+        sb.AppendLine("| Pencere | Kol | Boyut (MB) | Band | Band icinde | VMAF-NEG ort. | p10 | en dusuk kare | en kotu sahne |");
+        sb.AppendLine("|---------|-----|------------|------|-------------|---------------|-----|---------------|---------------|");
+        foreach (var o in kayitlar)
+        {
+            if (o.Bilinmiyor is not null && o.VmafMean is null)
+            {
+                sb.AppendLine($"| `{o.Pencere}` | {o.Kol} | — | — | — | — | — | — | **bilinmiyor**: {o.Bilinmiyor} |");
+                continue;
+            }
+            sb.AppendLine($"| `{o.Pencere}` | {o.Kol} | {Kabuk.Inv(o.GerceklesenMb, "0.00")} | " +
+                          $"{Kabuk.Inv(o.BandAltMb, "0.0")}–{Kabuk.Inv(o.BandUstMb, "0.0")} | {(o.BandIcinde ? "evet" : "**hayir**")} | " +
+                          $"{Say(o.VmafMean)} | {Say(o.VmafP10)} | {Say(o.VmafMin)} | {Say(o.VmafWorstScene)} |");
+        }
+        sb.AppendLine();
+    }
+
+    private static string Say(double? v) => v is null ? "**bilinmiyor**" : Kabuk.Inv(v.Value, "0.000");
+
+    private static List<OlcumKaydi> Oku(string isKok, string asama, JsonSerializerOptions json, string[] kollar)
+    {
+        var list = new List<OlcumKaydi>();
+        foreach (var kol in kollar)
+            foreach (var p in Program.Pencereler)
+            {
+                var y = Path.Combine(isKok, $"{asama}-{kol}-{p.Ad}.json");
+                if (!File.Exists(y)) continue;
+                list.AddRange(JsonSerializer.Deserialize<List<OlcumKaydi>>(File.ReadAllText(y), json)!);
+            }
+        return list;
+    }
+
+    private static void Sonuc(StringBuilder sb, K2Sonuc k2, AbSonuc k5, AbSonuc k7)
+    {
+        sb.AppendLine("## Sonuc");
+        sb.AppendLine();
+        var girer = !k2.Kapandi && k5.Gecti && k7.Gecti;
+        sb.AppendLine(girer
+            ? "**Dagitim koda girer.** K2 kapisi kapanmadi, K5/K6 kapisi gecti, bozuk"
+            : "**Dagitim koda girmez.** Kapilardan en az biri onu durdurdu:");
+        sb.AppendLine();
+        sb.AppendLine($"- K2 (kodlayici zaten dogru dagitiyor mu): {(k2.Kapandi ? "**kapandi** — kodlayici zaten en az bizim kadar iyi dagitiyor" : "kapanmadi")}");
+        sb.AppendLine($"- K5/K6 (kalite kazanci ve hedef boyut): {(k5.Gecti ? "gecti" : "**gecmedi**")} — {k5.Ozet}");
+        sb.AppendLine($"- K7 (bozuk harita bedeli): {(k7.Gecti ? "kabul edilebilir" : "**kabul edilemez**")} — {k7.Ozet}");
+        sb.AppendLine();
+        sb.AppendLine("Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve");
+        sb.AppendLine("bu olcumden onceki commit'te sabitlendi.");
+        sb.AppendLine();
+    }
+}
