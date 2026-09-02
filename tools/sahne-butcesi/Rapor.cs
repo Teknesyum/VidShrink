@@ -72,6 +72,13 @@ public static class Rapor
         sb.AppendLine("5. **`libsvtav1` kolunda dagitim hic denenemedi.** K4 zone parametresini");
         sb.AppendLine("   sessizce yok saydigini gosterdi; uretimin varsayilan kodlayicisi bu.");
         sb.AppendLine("   Dagitim koda girse bile varsayilan yolda **etkisiz kalirdi**.");
+        sb.AppendLine("6. **Referans calisma noktasi planinkiyle ayni degil.** Sabit");
+        sb.AppendLine($"   `CRF {Program.ReferansCrf}` her kodlayicida farkli bir bit hizina");
+        sb.AppendLine("   dusuyor; her K1 basliginda `referans/plan` orani yazili. Oran 1'den");
+        sb.AppendLine("   uzaklastikca \"hak edilen\" dagitimi planin gercek calistigi hizdan");
+        sb.AppendLine("   uzak bir noktada olculmus olur — sira genelde korunur ama paylar");
+        sb.AppendLine("   hizla birlikte kayar. Kollar arasi hak-edilen kiyasi bu yuzden");
+        sb.AppendLine("   yapilmaz; her kol kendi referansiyla karsilastirilir.");
         sb.AppendLine();
     }
 
@@ -192,7 +199,8 @@ public static class Rapor
                               $"{k.Plan.Width}x{k.Plan.Height}@{Kabuk.Inv(k.Plan.Fps, "0.##")} preset `{k.Plan.Preset}` " +
                               $"hedef {Kabuk.Inv(k.Plan.TargetMb, "0.#")} MB. " +
                               $"Referans toplami {Kabuk.Inv(k.ReferansToplamBit / 1e6, "0.0")} Mbit, " +
-                              $"plan ciktisi {Kabuk.Inv(k.PlanToplamBit / 1e6, "0.0")} Mbit.");
+                              $"plan ciktisi {Kabuk.Inv(k.PlanToplamBit / 1e6, "0.0")} Mbit " +
+                              $"(referans/plan = {Kabuk.Inv(k.PlanToplamBit == 0 ? 0 : (double)k.ReferansToplamBit / k.PlanToplamBit, "0.00")}x).");
                 sb.AppendLine();
                 var h = haritalar[p.Ad];
                 sb.AppendLine("| Sahne | Bas (sn) | Sure (sn) | Karmasiklik | hak edilen (pp) | verilen (pp) | harita (pp) | verilen−hak | harita−hak |");
