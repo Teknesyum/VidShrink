@@ -27,7 +27,11 @@ derlemesini gördü.
 | Derleme | `dotnet build -c Release --no-incremental` |
 | Sözleşme süiti | `dotnet test -c Release --filter "PlanCalculatorProbeTests\|LanguageTests"` |
 | Tam süit | `dotnet test -c Release` |
-| Mutasyon | `python <scratchpad>/mutasyon.py <k>` → derle → koş → `git checkout -- src/VidShrink.App` |
+| Mutasyon | tek satirlik degisiklik → derle → kos → `git checkout -- src/VidShrink.App` |
+
+Mutasyonlar tek satırlık; hangi satırın neyle değiştirildiği her K bölümünde
+yazılı, yani bu belge tek başına yeniden üretilebilir. Sürücü betiği geçiciydi,
+depoya girmedi.
 
 Mutasyon çıktıları `.calisma/t136/mutasyon-k{1,2,3,6}.txt`; kusurun düzeltmeden
 önceki kırmızısı `.calisma/t136/k1k2-kirmizi.txt` (commit `a90b5f5`). **`.calisma/`
