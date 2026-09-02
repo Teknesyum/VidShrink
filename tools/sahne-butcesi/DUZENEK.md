@@ -204,3 +204,14 @@ Onlem oncesi uretilmis dosyalar geriye donuk denetlendi: 102 referans
 sahnesinin (maks 36, uyumlu 36, yedek 30) sapani yok; 14 plan/aday
 ciktisinin suresi de pencere suresiyle birebir. Kesilen tek dosya silinip
 yeniden kodlandi.
+
+## K5'in `taban` kolu K1'in plan ciktisini kullanir
+
+K5'te `taban`, "bugunku plan, ek parametre yok" demektir; K1 zaten tam olarak
+o dosyayi uretiyor (`plan-<kol>-<pencere>.mkv`, ayni `EncodePlan`, ayni is
+parcacigi, `zones` yok). Ikinci kez kodlamak ayni baytlari yeniden uretmekten
+baska bir sey yapmaz ve kol basina bir kodlama suresi harcar. Bu yuzden
+`taban` dosyasi varsa plan ciktisindan kopyalanir.
+
+Kopyalanan yalniz `taban`dir. `dagitim` her zaman kodlanir — degisen parametre
+odur. VMAF olcumu iki kolda da bastan kosar; kisalan sey yalniz kodlama.

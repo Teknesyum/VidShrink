@@ -717,6 +717,11 @@ public static class Program
                 await File.WriteAllTextAsync(Yol($"{asama}-{Kol}-{p.Ad}-{kol}.zones.txt"),
                     $"gamma={Kabuk.Inv(gamma)}\nsahne={kullanilan.Scenes.Count}\nzones={zones}\n");
             }
+            if (!File.Exists(cikti) && asama == "k5" && kol == "taban")
+            {
+                var planCikti = Yol($"plan-{Kol}-{p.Ad}.mkv");
+                if (File.Exists(planCikti)) File.Copy(planCikti, cikti);
+            }
             if (!File.Exists(cikti)) Kodla(info, plan, map, cikti, zones);
             if (!File.Exists(cikti))
             {
