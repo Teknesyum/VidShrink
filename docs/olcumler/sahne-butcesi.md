@@ -40,6 +40,7 @@ Ikili her seferinde `--no-incremental` derlenir; `--no-build` kullanilmaz.
 | K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |
 | Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |
 | Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |
+| K9 | `bash tools/sahne-butcesi/02-mutasyon.sh` | `k9-mutasyon.txt` |
 | bu sayfa | `SahneButcesi rapor` | — |
 
 Kollar: `maks`, `uyumlu`, `yedek`. Pencereler: `p1-karisik`, `p2-durgun`, `p3-hareketli`.
@@ -471,6 +472,20 @@ Karar hangi yollari kapsar: `zones` denenen 5 kodlayicinin
 
 Kapilarin sayisal esikleri `tools/sahne-butcesi/ESIKLER.md` icinde ve
 bu olcumden onceki commit'te sabitlendi.
+
+## K9 — kural koda girdiyse mutasyon kaniti
+
+`src/VidShrink.Core/SceneBudget.cs` **yok**: dagitim kurali uretim koduna
+girmedi, dolayisiyla kiracak yeni bir olcu de yok. Kural duzenekte kaldi
+(`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc
+mutasyon o kurali kiriyor.
+
+Mutasyon duzenegi silinmedi; kosuldugunda sessizce gecmek yerine
+reddettigi gorulsun diye ciktisi buraya alindi:
+
+```
+/c/Users/Administrator/Desktop/Projeler/Vidshrink/.claude/worktrees/T114/src/VidShrink.Core/SceneBudget.cs yok — dagitim kurali koda girmedi, mutasyon kaniti uygulanamaz.
+```
 
 ## Bu sayfanin bilinen sinirlari
 

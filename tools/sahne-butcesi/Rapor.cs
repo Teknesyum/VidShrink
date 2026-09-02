@@ -49,6 +49,7 @@ public static class Rapor
         var k7 = K7(sb, isKok, json, kollar, k5);
         KapiDenemesi(sb, isKok);
         Sonuc(sb, k2, k5, k7, k4);
+        K9(sb, isKok);
         Sinirlar(sb, isKok);
 
         Directory.CreateDirectory(Path.GetDirectoryName(ciktiYolu)!);
@@ -183,6 +184,7 @@ public static class Rapor
         sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |");
         sb.AppendLine("| Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |");
+        sb.AppendLine("| K9 | `bash tools/sahne-butcesi/02-mutasyon.sh` | `k9-mutasyon.txt` |");
         sb.AppendLine("| bu sayfa | `SahneButcesi rapor` | — |");
         sb.AppendLine();
         sb.AppendLine($"Kollar: {string.Join(", ", Program.Kollar.Keys.Select(k => $"`{k}`"))}. " +
@@ -879,6 +881,44 @@ public static class Rapor
         sb.AppendLine("`SahneButcesi rapor` cagrisidir; girdi `tools/sahne-butcesi/kapi-fikstur.py`,");
         sb.AppendLine("kosum `bash tools/sahne-butcesi/04-kapi-denemesi.sh`. Bu tablodaki sayilar");
         sb.AppendLine("uydurma; olculen sey kapinin **ayirt edip etmedigi**.");
+        sb.AppendLine();
+    }
+
+    private static void K9(StringBuilder sb, string isKok)
+    {
+        var kok = Directory.GetParent(Directory.GetParent(isKok)!.FullName)!.FullName;
+        var kural = Path.Combine(kok, "src", "VidShrink.Core", "SceneBudget.cs");
+        var kanit = Path.Combine(isKok, "k9-mutasyon.txt");
+        sb.AppendLine("## K9 — kural koda girdiyse mutasyon kaniti");
+        sb.AppendLine();
+        if (File.Exists(kural))
+        {
+            sb.AppendLine("`src/VidShrink.Core/SceneBudget.cs` var; yeni olcunun mutasyonla");
+            sb.AppendLine("kirildigi `bash tools/sahne-butcesi/02-mutasyon.sh` ciktisindan okunur.");
+            sb.AppendLine();
+            if (File.Exists(kanit))
+            {
+                sb.AppendLine("```");
+                foreach (var l in File.ReadAllLines(kanit)) sb.AppendLine(l);
+                sb.AppendLine("```");
+                sb.AppendLine();
+            }
+            return;
+        }
+
+        sb.AppendLine("`src/VidShrink.Core/SceneBudget.cs` **yok**: dagitim kurali uretim koduna");
+        sb.AppendLine("girmedi, dolayisiyla kiracak yeni bir olcu de yok. Kural duzenekte kaldi");
+        sb.AppendLine("(`tools/sahne-butcesi/Butce.cs`) ve orada denetleniyor — K3 ekindeki uc");
+        sb.AppendLine("mutasyon o kurali kiriyor.");
+        sb.AppendLine();
+        sb.AppendLine("Mutasyon duzenegi silinmedi; kosuldugunda sessizce gecmek yerine");
+        sb.AppendLine("reddettigi gorulsun diye ciktisi buraya alindi:");
+        sb.AppendLine();
+        sb.AppendLine("```");
+        sb.AppendLine(File.Exists(kanit)
+            ? string.Join(Environment.NewLine, File.ReadAllLines(kanit))
+            : "kosulmadi");
+        sb.AppendLine("```");
         sb.AppendLine();
     }
 
