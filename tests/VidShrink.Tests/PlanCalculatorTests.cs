@@ -380,4 +380,34 @@ public sealed class PlanCalculatorTests
 
         Assert.True(quoted >= 2, $"The sweep never hit a floor reason ({quoted} quotes), so this measure proved nothing.");
     }
+
+    private static ComplexityProfile ComplaintProfile() => new()
+    {
+        ReferenceBppf = 0.06244,
+        Measured = true,
+        MotionExponent = 1.163,
+        MotionMeasured = true,
+        DetailExponent = 0.55,
+        SampledSeconds = 6,
+        SampledFrames = 360
+    };
+
+    [Fact]
+    public void TheFloorAdmitsTheLayoutThatWonTheMeasurementAndStillRejectsTheSaturatedOne()
+    {
+        var info = LongHdrCapture();
+        var complaint = ComplaintProfile();
+        const int width = 1280;
+        const int height = 720;
+        const double fps = 60.0;
+        var pixelRateK = (double)width * height * fps / 1000.0;
+
+        Assert.True(
+            PlanCalculator.LayoutClearsFloor(complaint, "av1_nvenc", 790.0, width, height, fps, info.Fps),
+            $"1280x720@60 at 790k won the five-layout measurement at 117 MB; a floor that rejects it throws the winner away before it is ever scored. bppf={PlanCalculator.BitsPerPixel(790.0, width, height, fps):0.00000} floor={complaint.FloorBppf("av1_nvenc", fps, info.Fps):0.00000} usable={CodecModel.UsableBitrateK("av1_nvenc", width, height, fps)}");
+
+        Assert.False(
+            PlanCalculator.LayoutClearsFloor(complaint, "libsvtav1", 0.0052 * pixelRateK, width, height, fps, info.Fps),
+            "At 0,0052 bppf the software arm has already saturated - p10 stops falling, one frame in thirty is at zero - so the floor must still reject it.");
+    }
 }
