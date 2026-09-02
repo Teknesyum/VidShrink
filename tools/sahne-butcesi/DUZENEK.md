@@ -66,3 +66,12 @@ sayfadaki her sayi ve her karar sozcugu hesaplanir, elle yazilmaz.
 ## Kosum
 
     bash tools/sahne-butcesi/01-olcumu-kos.sh
+
+## Ara ciktilar atlanir
+
+Her asama hedef dosyasi varsa atlar. Yeniden olcmek icin o dosyalari silin.
+**Uretim kaynagi degistiginde hepsini silin**: `src/` degisirse plan degisir
+ve eski cikti yanlis commit'i olcer. T114'te bir kez oldu — `origin/main`
+birlestirilince (T107) ayni pencerenin plan cozunurlugu `806x454`ten
+`1458x820` / `1728x972` / `1920x1080`e cikti; birlestirme oncesi olculen
+butun K1 sayilari silinip bastan kosuldu.
