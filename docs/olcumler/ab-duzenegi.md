@@ -765,6 +765,35 @@ geliyor. Harmonikteki 0,86 puan, bu belgenin kendi gürültü bandının
 (0,1–0,5 VMAF-NEG, "Ölçünün kendi kararsızlığı") **dışında**. Kare minimumundaki
 13,40 puan ise gürültüyle aynı sınıfta bile değil.
 
+### Ölçer gürültülü değil — sapma tamamen sürüm farkı
+
+Yukarıdaki 0,86 puan **koşumdan koşuma oynama değil**, iki kod sürümü arasındaki
+sabit fark. Ölçüldü: aynı HandBrake dosyası bugünkü kodla **iki ayrı koşumda**
+ölçüldü (`k1-parca-1-compatible.json` ve `k2-parca-1-auto.json`), her iki koşum
+da bağımsız süreçlerdi:
+
+| ölçü | 1. koşum | 2. koşum | fark |
+|---|---|---|---|
+| bayt | 3.531.037 | 3.531.037 | 0 |
+| harmonik | 48,564643568602555 | 48,564643568602555 | **0,0** |
+| p10 | 34,555593900000005 | 34,555593900000005 | **0,0** |
+| kare min | 16,423202 | 16,423202 | **0,0** |
+| ortalama | 52,326031802704215 | 52,326031802704215 | **0,0** |
+| XPSNR | 30,952233333333336 | 30,952233333333336 | **0,0** |
+| SSIM | 0,920894 | 0,920894 | **0,0** |
+
+Onbeş anlamlı basamağa kadar aynı. HandBrake de üç bağımsız koşumda aynı baytı
+üretti (yayımlanan koşum + bugünkü iki koşum: 3.531.037, üçünde de).
+
+Yani **sabit kod + sabit girdi = sıfır sapma**. Ölçüm zincirinde gürültü yok.
+0,86'nın kaynağı ölçerin kendisi değil, ölçerin **değişmiş olması**. Bu ayrım
+önemli: gürültü olsaydı tekrarla küçültülebilirdi; sürüm farkı tekrarla
+küçülmez, yalnız aynı sürümde yeniden ölçmekle giderilir.
+
+Bunun pratik sonucu: **aynı koşumda ölçülmüş iki sayının farkı sağlamdır.**
+Sapma yalnız sürüm sınırını geçen karşılaştırmaları vurur — yani bu belgedeki
+`381e8ab` tablolarının bugünkü sayılarla yan yana konmasını.
+
 `src/VidShrink.Ffmpeg/QualityMeter.cs` bu aralıkta dört commit aldı
 (`e290624` T97 VMAF tavan kelepçesi, `63ac655` ve `9dbb6b1` T104 en kötü birim,
 `822dd3a` kare kilidi). `381e8ab`de dönen değerler `NormalizeVmafCeiling`den
@@ -810,7 +839,36 @@ kurulmadan K6 koşulmadı.
 
 **Ölçülmedi:** `parca-2` ve `parca-3`'ün hiçbir hedefte yeniden koşumu; 600 MB
 hedefinin altı satırının hiçbiri; K6'nın zorunlu-1080p koşumu; kodlayıcı
-değişikliğiyle ölçer değişikliğinin paylarının ayrıştırılması.
+değişikliğiyle ölçer değişikliğinin paylarının VidShrink kolundaki ayrıştırması.
+
+### Üç sütunlu tablo — ölçülen tek satır
+
+`parca-1` @ 3,4975 MB, üç sütunun **üçü de bugünkü tabanla (`fcf377f`) ve aynı
+gün ölçüldü**, yani aralarındaki fark sürüm sınırını geçmiyor. Kodek kolu
+düzeltmesinin (`Codec = CodecPreference.Auto`) etkisi budur:
+
+| sütun | yerleşim | kodek | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|---|---|
+| handbrake | 1920x1080 @483k | x265 slow | 3.531.037 | 0,00 | evet | 48,56 | 34,56 | 16,42 | 52,33 | 30,95 |
+| biz — Compatible (eski kol) | 768x432 @481k | libx264 | 3.525.089 | −0,17 | evet | 33,44 | 18,57 | 5,53 | 40,35 | 29,06 |
+| biz — Auto (düzeltilmiş kol) | **882x496** @464k | **libsvtav1** | 3.531.823 | **+0,02** | evet | **45,97** | **37,23** | 13,38 | 48,50 | 30,17 |
+
+Satır satır okunuşu — **yalnız bu satır için**:
+
+- Harmonikte HandBrake hâlâ önde, ama açık **15,12 puandan 2,59 puana** indi
+  (48,5646 − 33,4408 = 15,1238; 48,5646 − 45,9707 = 2,5939). Fark **12,53 puan**
+  ve bu açığın **%83'ü**.
+- **p10'da öne geçtik:** 37,23 ↔ 34,56, bizim lehimize **2,67 puan**. Eski kolda
+  aynı ölçü 18,57 ile 15,99 puan geridendi.
+- Kare minimumunda (13,38 ↔ 16,42), ortalamada (48,50 ↔ 52,33) ve XPSNR'de
+  (30,17 ↔ 30,95) HandBrake önde.
+- Auto kolu eş boyutu **ilk denemede** tutturdu (+%0,022, 786 bayt); eşitleyici
+  hiç devreye girmedi. Eski kol bir eşitleme denemesi istemişti.
+- Auto daha yüksek çözünürlük seçti: 882x496 (kaynağın %45,9'u), Compatible ise
+  768x432 (%40). Plan tahmini de değişti: 76,9/100 → 82,1/100.
+
+Bu **tek satırdır.** Öteki beş çift ölçülmedi; "altı çiftin beşinde HandBrake
+önde" manşetinin düzeltilmiş kolla ne olduğu **bilinmiyor**.
 
 ### "Bütçeyi bitirmiyoruz" hipotezi — kapandı
 
