@@ -56,6 +56,100 @@ public sealed class SceneMapTests
     }
 
     [Fact]
+    public void CutTimes_VarsayilanEsikOlculenBandaKilitli()
+    {
+        var candidates = new[]
+        {
+            new SceneScore(2.0, 0.100),
+            new SceneScore(4.0, 0.110)
+        };
+
+        var cuts = SceneMap.CutTimes(candidates, SceneMap.DefaultThreshold, 20.0);
+
+        Assert.Equal(new[] { 4.0 }, cuts);
+    }
+
+    [Fact]
+    public void CutTimes_SkorDusenAdayAralikSayacniIlerletmez()
+    {
+        var candidates = new[]
+        {
+            new SceneScore(2.0, 0.9),
+            new SceneScore(2.5, 0.05),
+            new SceneScore(3.2, 0.9)
+        };
+
+        Assert.Equal(new[] { 2.0, 3.2 }, SceneMap.CutTimes(candidates, 0.5, 20.0));
+    }
+
+    [Fact]
+    public void CutTimes_VarsayilanAsgariAralikIkiYonluKiskacta()
+    {
+        var candidates = new[]
+        {
+            new SceneScore(2.0, 0.9),
+            new SceneScore(2.9, 0.9),
+            new SceneScore(3.05, 0.9),
+            new SceneScore(4.0, 0.9)
+        };
+
+        Assert.Equal(new[] { 2.0, 3.05 }, SceneMap.CutTimes(candidates, 0.5, 20.0));
+    }
+
+    [Fact]
+    public void CutTimes_VarsayilanAsgariAralikKaynaginSonunaDaUygulanir()
+    {
+        var candidates = new[]
+        {
+            new SceneScore(19.0, 0.9),
+            new SceneScore(19.5, 0.9)
+        };
+
+        Assert.Equal(new[] { 19.0 }, SceneMap.CutTimes(candidates, 0.5, 20.0));
+        Assert.Empty(SceneMap.CutTimes(new[] { new SceneScore(19.5, 0.9) }, 0.5, 20.0));
+    }
+
+    [Fact]
+    public void ScanArgs_TabanEsigiFiltreyeGecer()
+    {
+        var varsayilan = SceneDetector.ScanArgs("girdi.mp4", "vstats.log");
+        var acik = SceneDetector.ScanArgs("girdi.mp4", "vstats.log", 0.123);
+
+        Assert.Equal("0.05", TabanEsigi(varsayilan));
+        Assert.Equal("0.123", TabanEsigi(acik));
+
+        Assert.Contains("girdi.mp4", varsayilan);
+        Assert.Contains("vstats.log", varsayilan);
+        Assert.Contains($"[b]scale={SceneDetector.ProbeWidth}:-2[enc]", FiltreGrafigi(varsayilan));
+        Assert.Contains(SceneDetector.ProbePreset, varsayilan);
+        Assert.Contains(SceneDetector.ProbeCrf.ToString(CultureInfo.InvariantCulture), varsayilan);
+    }
+
+    [Fact]
+    public void ScanArgs_TabanEsigiKararElegininAltinda()
+    {
+        var taban = double.Parse(TabanEsigi(SceneDetector.ScanArgs("g.mp4", "v.log")), CultureInfo.InvariantCulture);
+
+        Assert.True(taban < SceneMap.DefaultThreshold,
+            $"gunluge giren taban {taban}, karar elegi {SceneMap.DefaultThreshold}: "
+            + "taban karar eleginin ustune cikarsa esigi dusurmek etkisiz kalir.");
+    }
+
+    private static string FiltreGrafigi(string[] args)
+    {
+        var i = Array.IndexOf(args, "-filter_complex");
+        Assert.True(i >= 0 && i + 1 < args.Length, "-filter_complex bulunamadi");
+        return args[i + 1];
+    }
+
+    private static string TabanEsigi(string[] args)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(FiltreGrafigi(args), @"gte\(scene,([0-9.]+)\)");
+        Assert.True(m.Success, $"gte(scene,X) bulunamadi: {FiltreGrafigi(args)}");
+        return m.Groups[1].Value;
+    }
+
+    [Fact]
     public void CutTimes_SirasizAdaylariSiralar()
     {
         var candidates = new[]
@@ -234,6 +328,76 @@ public sealed class SceneMapTests
         });
         Assert.True(run.Ok, run.StandardError);
         return new FileInfo(path).Length;
+    }
+
+    [FfmpegFact]
+    public async Task ScanAsync_TabanEsigiIkiYonluKiskacta()
+    {
+        var outDir = TestPaths.LiveOut("sahne-taban-kiskac");
+        Directory.CreateDirectory(outDir);
+        var clip = Path.Combine(outDir, "kiskac.mp4");
+
+        try
+        {
+            await MakeBracketClipAsync(clip);
+
+            var olcek = await SceneDetector.ScanAsync(clip, 0.005);
+            Assert.True(olcek.Ok, olcek.Error);
+
+            var basamaklar = olcek.Candidates.Select(c => c.Score).OrderBy(s => s).ToArray();
+            Assert.Equal(7, basamaklar.Length);
+            Assert.All(basamaklar.Take(2), s => Assert.InRange(s, 0.020, 0.030));
+            Assert.All(basamaklar.Skip(2).Take(2), s => Assert.InRange(s, 0.031, 0.044));
+            Assert.All(basamaklar.Skip(4).Take(2), s => Assert.InRange(s, 0.052, 0.059));
+            Assert.InRange(basamaklar[6], 0.085, 0.098);
+
+            var alt = await SceneDetector.ScanAsync(clip, 0.03);
+            var varsayilan = await SceneDetector.ScanAsync(clip);
+            var ust = await SceneDetector.ScanAsync(clip, 0.06);
+            Assert.True(alt.Ok, alt.Error);
+            Assert.True(varsayilan.Ok, varsayilan.Error);
+            Assert.True(ust.Ok, ust.Error);
+
+            Assert.True(alt.Candidates.Count > varsayilan.Candidates.Count,
+                $"taban 0,036'nin altina kaydi: alt={alt.Candidates.Count} varsayilan={varsayilan.Candidates.Count}");
+            Assert.True(varsayilan.Candidates.Count > ust.Candidates.Count,
+                $"taban 0,057'nin ustune cikti: varsayilan={varsayilan.Candidates.Count} ust={ust.Candidates.Count}");
+        }
+        finally
+        {
+            try { Directory.Delete(outDir, recursive: true); } catch (IOException) { }
+        }
+    }
+
+    private static async Task MakeBracketClipAsync(string clip)
+    {
+        const string graph =
+            "[1:v][2:v]hstack=inputs=2[a8];[4:v][5:v]hstack=inputs=2[a20];"
+            + "[7:v][8:v]hstack=inputs=2[a24];[10:v][11:v]hstack=inputs=2[a40];"
+            + "[0:v][a8][3:v][a20][6:v][a24][9:v][a40]concat=n=8:v=1:a=0";
+
+        var args = new List<string> { "-hide_banner", "-loglevel", "error" };
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1272x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=8x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1260x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=20x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1256x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=24x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1240x720:rate=30" });
+        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=40x720:rate=30" });
+        args.AddRange(new[]
+        {
+            "-filter_complex", graph,
+            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-pix_fmt", "yuv420p",
+            "-y", clip
+        });
+
+        var run = await FfmpegRunner.RunAsync(args.ToArray());
+        Assert.True(run.Ok, run.StandardError);
     }
 
     private static async Task MakeGradedClipAsync(string clip)

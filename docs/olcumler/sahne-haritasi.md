@@ -424,6 +424,40 @@ Bu seçimin bedeli, ve neden bu turda uygulanmadığı:
   önce değil kodlama sırasında kurulması demek — tasarım değişikliği, ayar
   değil. Donanım yolunun ne kadar kaybettiği **ölçülmedi**.
 
+## Sabitleri tutan testler (T105/K8)
+
+Üç sabit de artık **iki yönlü** kıskaçta. Kanıt sabit karşılaştırarak değil,
+sabiti oynatıp testin düşüp düşmediğine bakarak alındı:
+
+| Mutasyon | Sonuç |
+|----------|-------|
+| `DefaultThreshold` 0,105 → 0,100 | öldü (1 test) |
+| `DefaultThreshold` 0,105 → 0,111 | öldü (1 test) |
+| `DefaultThreshold` 0,105 → 0,2 (eski değer) | öldü (1 test) |
+| `DefaultMinSceneSeconds` 1,0 → 0,8 | öldü (1 test) |
+| `DefaultMinSceneSeconds` 1,0 → 1,2 | öldü (2 test) |
+| `BaseThreshold` 0,05 → 0,02 | öldü (2 test) |
+| `BaseThreshold` 0,05 → 0,08 | öldü (2 test) |
+| `ProbeWidth` 640 → 320 | öldü (1 test) |
+| `ProbeCrf` 23 → 30 | öldü (1 test) |
+| Sona yakınlık eleği kaldırıldı | öldü (2 test) |
+| Elek sırası: `last` skoru düşen adayda da ilerlesin | öldü (1 test) |
+
+Ham çıktı: `.calisma/T105/mutasyon-tum.txt`.
+
+T101 denetiminin bulduğu borç kapandı: eski taban eşiği pini yalnız
+**yukarı** kaçışı yakalıyordu (`0,05 → 0,15` düşürüyordu ama `0,05 → 0,02`
+sessizce geçiyordu, sabit ~0,017'ye kadar kayabiliyordu). Yeni pin,
+skorları ölçülerek merdiven halinde kurulmuş bir klip kullanıyor —
+0,0246 · 0,0357 · 0,0572 · 0,0910 — ve tabanı **(0,036 – 0,057]** aralığına
+kilitliyor. `ScanArgs` ayrıca doğrudan test ediliyor (T101'de hiç test
+edilmiyordu): üretilen filtre grafiğinden `gte(scene,X)` çekiliyor ve hem
+varsayılan hem açıkça verilen değer için karşılaştırılıyor.
+
+ffmpeg gerektiren testler `[FfmpegFact]` ile işaretli; ffmpeg yoksa **atlanır**,
+sessizce yeşil dönmez. Süitte `Skip` sabiti ve ffmpeg yokluğunda erken dönen
+test yok.
+
 ## Yer gerçeği listeleri ve komutlar
 
 Düzenek `tools/sahne-yer-gercegi/` altında ve T105'in `owns`'ı dışında; T105'in
