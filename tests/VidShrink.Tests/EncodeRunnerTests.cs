@@ -253,18 +253,35 @@ public sealed class EncodeRunnerTests
     }
 
     /// <summary>
-    /// Pencerenin kodlamaya gonderdigi haritayi gosterdigi komuta da gonderdigi. Argumandan
-    /// okunamaz - cagrinin kendisi okunur.
+    /// Arayuzun uc baglantisi ayri ayri pimlenir; biri bagliyken oteki bagsiz kalirsa
+    /// kirmiziya donen olcu o baglantiya ait olur. Pencere bassiz kosumda kurulamadigi icin
+    /// pim davranisa degil kaynak metnine bakar - projedeki mevcut kalip budur
+    /// (FfmpegArgumentsTests.cs:405).
     /// </summary>
     [Fact]
-    public void TheWindowFeedsTheSameMapToBothCallSites()
+    public void TheWindowFeedsTheMapToTheDisplayedCommand()
     {
         var source = File.ReadAllText(TipSources.WindowCodePath);
 
         Assert.Contains("DisplayedEncodeArguments(_info, plan,", source);
         Assert.Contains("_encoders, _sceneMap?.Map));", source);
+    }
+
+    [Fact]
+    public void TheWindowFeedsTheMapToTheEncode()
+    {
+        var source = File.ReadAllText(TipSources.WindowCodePath);
+
         Assert.Contains("CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);", source);
+    }
+
+    [Fact]
+    public void TheWindowBuildsTheMapWhenTheSourceLoads()
+    {
+        var source = File.ReadAllText(TipSources.WindowCodePath);
+
         Assert.Contains("_sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);", source);
+        Assert.Contains("_sceneMap = null;", source);
     }
 
     [Fact]
