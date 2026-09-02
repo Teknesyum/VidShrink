@@ -944,6 +944,35 @@ ortalama / harmonik / p10 sayıları (ızgarada ortalama en fazla 0,80 oynadı) 
   bölüme girmedi.
 
 
+### 9.13 İki koşum iki ayrı şeyi ölçtü — hangisi kilidi tuttu
+
+Teslim iki koşumla raporlandı ve **ikisi aynı şeyi ölçmüyor.** Karıştırılmasın
+diye ayrı yazılıyor.
+
+| koşum | ffmpeg PATH'te | `QualityMeterTests` | kilit ölçüleri |
+|---|---|---|---|
+| `dotnet test -c Release --filter QualityMeterTests` | **var** | 24 geçti / 0 atlandı | **koştu** |
+| `tools/ci-gibi-kos.sh` (tam süit) | **yok** | 11 geçti / **13 atlandı** | **atlandı** |
+
+`ci-gibi-kos.sh` PATH'ten ffmpeg'i çıkarıyor; `[FfmpegFact]` taşıyan ölçüler o
+koşumda çalışmıyor. §9'un beş yeni ölçüsünün **beşi de** orada atlananların
+içinde: `OneFrameOfSlipIsWorthTensOfVmafPointsOnThisFixture`,
+`SubFrameTimestampSlipDoesNotCostTheScoreAWholeFrame`,
+`ShiftedSourceIsReportedNotSilentlyRepaired`,
+`VideoStartAheadOfTheContainerIsTheOffsetThatReachesTheFilterGraph`,
+`UntaggedSourceAgainstANonBt709TagIsRefusedInsteadOfAssumed`.
+
+Yani **"ci-gibi-kos.sh 1018 geçti / 0 kaldı" kare kilidini ölçmedi.** O sayının
+tek anlamı şudur: kilit ürün koduna girerken ffmpeg'siz koşan 1018 ölçüde
+gerileme olmadı. Kilidin kendi kanıtı ffmpeg'li koşumdan ve §9.8'in mutasyon
+bataryasından geliyor; batarya da ffmpeg'li koşuma dayanıyor (M1–M8'in kırmızı
+sayıları `[FfmpegFact]` ölçülerinden çıkıyor).
+
+Bunun sonucu: **kare kilidi CI'da korunmuyor.** CI ffmpeg görmediği sürece kilidi
+kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın yaklaşık 80
+ölçüyü atlaması ayrı bir işe (T115) alındı.
+
+
 ## Yeniden üretim
 
     ffmpeg -ss 00:02:00 -t 60 -i kaynak-1080p60-hdr-17dk.mp4 -map 0:v:0 -c copy parca-1.mkv
