@@ -109,7 +109,7 @@ Son doğrulama:
 - `dotnet build VidShrink.sln -c Release --no-incremental`: başarılı, 0 uyarı, 0 hata.
 - Birleşik verify: `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`.
 - Test çağrılarında `--no-build` kullanılmadı.
-- Rebase sonrası CI koşum kimliği ve durumu son push'tan sonra eklenecek.
+- Rebase sonrası kod ucu CI koşumu `33657686105` (`e768faa`): ilk ve tek kontrolde sürüyordu; sözleşme gereği beklenmedi.
 
 Depo kapısı olan filtresiz `dotnet test VidShrink.sln -c Release` de çalıştırıldı: `1330 başarılı / 14 başarısız / 18 atlanan`, süre `35 dk 43 sn`. On dört kırmızı üç izin dışı eski iki değerli sahteye dağılıyor:
 
