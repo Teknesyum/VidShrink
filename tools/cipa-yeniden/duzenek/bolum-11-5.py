@@ -112,7 +112,7 @@ A(u'')
 A(u'#### Izgarada eksik kalan hücreler')
 A(u'')
 if eksik:
-    A(u'Onaltı hücrenin **%d\'i ölçülmedi**:' % len(eksik))
+    A(u'Onaltı hücrenin **%d tanesi ölçülmedi**:' % len(eksik))
     A(u'')
     for tag, ad, mb, kol, olcer in eksik:
         A(u'- `%s` — %s, %d MB, %s kolu, %s ölçer: **ölçülmedi**' % (tag, ad, mb, kol, olcer))

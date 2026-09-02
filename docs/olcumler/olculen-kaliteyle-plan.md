@@ -633,6 +633,8 @@ sayılarına bu damga basılmadı.
 | klip ikamesi | 8 MB | yeni | 1190@60 | 2pass 1061k | 7.540 | 60.32 | 27.55 | 23.71 | 16.3 | 1 |
 | klip ikamesi | 20 MB | eski | 1920@60 | 2pass 2695k | 19.325 | 74.06 | 32.49 | 38.70 | 34.8 | 1 |
 | klip ikamesi | 20 MB | yeni | 1920@60 | 2pass 2695k | 19.328 | 74.05 | 32.43 | 38.91 | 38.5 | 1 |
+| hdr ikamesi (parca-1) | 40 MB | eski | 1458@60 | 2pass 5389k | 38.988 | 80.82 | 78.85 | 73.53 | 80.6 | 2 |
+| hdr ikamesi (parca-1) | 40 MB | yeni | 1612@60 | crf 21 | 37.384 | 82.43 | 80.49 | 76.89 | 25.5 | 1 |
 
 #### Kol farkı (yeni − eski), aynı ölçer, kaynaklar ikame
 
@@ -643,6 +645,7 @@ sayılarına bu damga basılmadı.
 | klip ikamesi | 20 MB | kilitli | +0.03 | +0.05 | -0.63 | +0.000 | -9.9 |
 | klip ikamesi | 20 MB | kilitsiz | -0.01 | -0.06 | +0.20 | +0.004 | +3.7 |
 | hdr ikamesi (parca-1) | 40 MB | kilitli | +1.60 | +1.66 | +3.32 | -1.594 | -173.6 |
+| hdr ikamesi (parca-1) | 40 MB | kilitsiz | +1.61 | +1.65 | +3.36 | -1.603 | -55.1 |
 | hdr ikamesi (parca-2) | 40 MB | kilitli | -0.01 | -0.01 | -0.01 | -0.340 | -10.1 |
 
 #### Kilidin bedeli (aynı kol, kilitli − kilitsiz ölçer)
@@ -653,13 +656,13 @@ sayılarına bu damga basılmadı.
 | klip ikamesi | 8 MB | yeni | +3.68 | +29.30 | +10.77 | evet |
 | klip ikamesi | 20 MB | eski | +5.53 | +42.52 | +13.22 | evet |
 | klip ikamesi | 20 MB | yeni | +5.57 | +42.62 | +12.38 | evet |
+| hdr ikamesi (parca-1) | 40 MB | eski | +0.43 | +2.08 | +1.37 | evet |
+| hdr ikamesi (parca-1) | 40 MB | yeni | +0.42 | +2.09 | +1.33 | evet |
 
 #### Izgarada eksik kalan hücreler
 
-Onaltı hücrenin **4'i ölçülmedi**:
+Onaltı hücrenin **2 tanesi ölçülmedi**:
 
-- `hdr1-eski-kilitsiz` — hdr ikamesi (parca-1), 40 MB, eski kolu, kilitsiz ölçer: **ölçülmedi**
-- `hdr1-yeni-kilitsiz` — hdr ikamesi (parca-1), 40 MB, yeni kolu, kilitsiz ölçer: **ölçülmedi**
 - `hdr2-eski-kilitsiz` — hdr ikamesi (parca-2), 40 MB, eski kolu, kilitsiz ölçer: **ölçülmedi**
 - `hdr2-yeni-kilitsiz` — hdr ikamesi (parca-2), 40 MB, yeni kolu, kilitsiz ölçer: **ölçülmedi**
 
@@ -719,16 +722,35 @@ kaynaklar farklı (§11.1), aynı ölçek üzerinde durmuyorlar.
 - Kolun kaybettiği bir kaynak olup olmadığı **ölçülmedi**; ızgarada böyle bir
   hücre çıkmadı, ama aranmadı da.
 
-**Ölçerin bu karara etkisi.** İki SDR hücresi hem kilitli hem kilitsiz koşuldu ve
-kol farkı iki ölçerde de gürültü çıktı (kilitli −0,01 / +0,03, kilitsiz
-−0,00 / −0,01). Yani **SDR'de ölçerin kusuru kol yargısını ne yarattı ne gizledi.**
-HDR hücrelerinin kilitsiz karşılıkları §11.5'in eksik listesinde; HDR için aynı
-şey **ölçülmedi**.
+**Ölçerin bu karara etkisi ölçüldü: yok.** Üç hücre hem kilitli hem kilitsiz
+ikiliyle koşuldu ve kol farkı iki ölçerde de aynı çıktı:
 
-Buna karşılık ölçerin kendi hatası büyük: aynı kolda, aynı dosyada, yalnız ölçer
-değişince `klip` ikamesi 20 MB'ta mean **+5,53**, p10 **+13,22** oynuyor
-(§11.5, "kilidin bedeli"). Kilitsiz ölçer kaliteyi sistematik olarak **düşük**
-gösteriyordu.
+| hücre (ikame) | Δmean kilitli | Δmean kilitsiz |
+|---|---:|---:|
+| klip 8 MB | −0,01 | −0,00 |
+| klip 20 MB | +0,03 | −0,01 |
+| hdr parca-1 40 MB | **+1,60** | **+1,61** |
+
+Yani **ölçerin kusuru kol yargısını ne yarattı ne gizledi** — kazanan hücrede
+kazanç kilitsiz ölçerde de aynı büyüklükte duruyor. `parca-2`nin kilitsiz
+karşılıkları §11.5'in eksik listesinde, o hücre için **ölçülmedi**.
+
+Buna karşılık ölçerin **kendi** hatası büyük ve içeriğe bağlı. Aynı kolda, aynı
+dosyada, yalnız ölçer değişince:
+
+| hücre (ikame) | kol | Δmean | Δp10 |
+|---|---|---:|---:|
+| klip 8 MB | eski / yeni | +3,69 / +3,68 | +11,78 / +10,77 |
+| klip 20 MB | eski / yeni | **+5,53 / +5,57** | **+13,22 / +12,38** |
+| hdr parca-1 40 MB | eski / yeni | +0,43 / +0,42 | +1,37 / +1,33 |
+
+Kilitsiz ölçer kaliteyi sistematik olarak **düşük** gösteriyordu; sapma SDR
+ikamesinde 3,7–5,6 mean puanı, HDR ikamesinde 0,4 puan. Neden içeriğe bağlı
+olduğu **ölçülmedi**.
+
+Altı hücrenin altısında da **plan iki ölçerde özdeş** (§11.5). Bu, K4'ün
+sonucunun ızgaradan gelen bağımsız bir doğrulamasıdır: `yeni` kolunda çıpa iki
+ikilide farklı hesaplandığı halde plan değişmedi.
 
 ### 11.7 Bu turda ne koştu (K7, K8)
 
