@@ -8,6 +8,26 @@ ve geriye kalan ortam varsayımlarını sayar.
 
 Ölçülen dal: `T117-ortam-gecidi`, taban `origin/T115-ci-ffmpeg` (`0e122f2`).
 
+**Üç cümlelik sonuç.** (1) CI'daki kırmızı kararsız değil, **belirlenimci**: iki
+farklı commit'te iki koşum, aynı ölçü, aynı dörtlü — GitHub runner'ında NVIDIA
+aygıtı yok. (2) `origin/main`in ci.yml'inde ffmpeg kurulumu yok
+(`grep -c 'codexffmpeg'` → 0), yani main'in bugünkü yeşili bu ölçünün geçtiğini
+değil **hiç koşmadığını** gösteriyor; T115 main'e girdiği anda main de bu ölçüden
+kırmızıya dönerdi. (3) Bu belgedeki geçit o kapıyı açar: ölçü artık gerçek NVIDIA
+aygıtı olmayan makinede sebebiyle atlanır, olan makinede koşar — ikisi de
+ölçüldü (§K3).
+
+**Bu ölçü gerçek NVIDIA aygıtı gerektiriyor mu?** Evet. (d)(e) bacakları
+`h264_nvenc` ile gerçek kodlama yapar; sürücü yoksa `Cannot load nvcuda.dll`
+ile düşer. Bu yüzden geçit "nvenc derlenmiş mi" (`HasEncoder`) sorusuna değil,
+**"nvenc bu makinede açılıyor mu"** sorusuna bağlandı — `WorksAsEncoder`ın
+altındaki `Probe` yolu. Ölçünün donanım gerektirmeyen bacakları (a)(b)(c)(f)(g)
+ayrıldı ve `[FfmpegFact]` altında koşmaya devam ediyor.
+
+Üretim kodundaki kök sebep — `HasEncoder`ın sürücüye değil derlemeye bakması —
+bu sözleşmede **düzeltilmedi**, T123'ün. Burada yapılan, ölçünün doğru ortamda
+koşmasıdır.
+
 ## K1 — kırmızının ölçülen sebebi
 
 Kanıt koşumu: **`33589639249`**, headSha **`0e122f2728fd429f5136ae3bc6a784736a51f85b`**.
@@ -293,10 +313,53 @@ okumaların hepsi eşiğin (`HeavyLoadCores = 1.0`) üstünde:
 | 3 | 2,305 · 2,458 · 3,108 | 2,220 | 1,844 → %20 |
 | 4 | 1,806 · 2,289 · 1,909 | 2,072 | 1,445 → %43 |
 
-On iki boş okumanın on ikisi de `SoftwareHeavyLoad`. Yani "yükün etkisi" bir
-tahmin değil: bu depoda paralel ajanlar altında **boş taban diye bir şey yok**,
-ve kaldırılan iddianın öncülü her koşumda sağlanıyordu — kırmızıyı belirleyen
-tek şey yüklü okumanın o anda nereye düştüğüydü.
+Bu dört koşumda on iki boş okumanın on ikisi de `SoftwareHeavyLoad`. Yani
+"yükün etkisi" bir tahmin değil: ölçüldüğü anda paralel ajanlar altında boş
+taban yoktu ve kaldırılan iddianın öncülü her koşumda sağlanıyordu — kırmızıyı
+belirleyen tek şey yüklü okumanın o anda nereye düştüğüydü.
+
+**Bu cümle sonraki ölçümle sınırlandı.** Beşinci bir koşum grubunda okumalar
+eşiğin *dibine* indi (1,023 / 1,052 / 0,916) ve biri eşiğin altına geçti. Yani
+"bu makinede boş taban hiç yok" yanlış olurdu; doğrusu: **taban ajan sayısıyla
+değişiyor ve eşiğin iki yanına da düşebiliyor.** Bir sonraki bölüm bunun
+doğurduğu ikinci kusuru anlatıyor.
+
+### İkinci kırmızı: uyum bandı eşiği kesiyor (satır 450)
+
+Beş koşumluk kanıt turunda 4 yeşil 1 kırmızı çıktı — ama **T0'ın işaret ettiği
+satırdan değil.** Düşen assert 450. satırdı:
+
+```
+ayni sessiz makinede art arda alinan okumalar farkli karar verdi:
+SoftwareHeavyLoad/1.023  SoftwareHeavyLoad/1.052  SoftwareLightLoad/0.916
+```
+
+Mekanizma ayrı ve satır 458'inkiyle karıştırılmamalı: `TabanUyumBandi = 1,25`
+okumaların **sayıca** anlaştığını tanımlıyordu (0,916 × 1,25 = 1,145; üçü de
+bandın içinde), sonra bu okumaların aynı **karar sınıfına** düşmesini istiyordu.
+Karar sınıfı eşiğin kesikli bir fonksiyonu: eşik 1,0 tam bu üç sayının arasından
+geçiyor. Sayıca %13 anlaşan iki okuma farklı sınıfa düşebilir. İddia, okumaların
+eşikten **uzak** olmasını gerektiriyordu — ölçünün denetleyemediği bir makine
+özelliği.
+
+**Düzeltme eşiği gevşetmedi, iddiayı değiştirdi.** `TabanUyumBandi` silindi;
+yerine gelen iddia eşiğin kendisini sınıyor ve yükten bağımsız:
+
+```csharp
+foreach (var okuma in olculen)
+{
+    var beklenen = okuma.SoftwareRealtimeCores >= PerformanceCheck.HeavyLoadCores
+        ? RecordingImpact.SoftwareHeavyLoad
+        : RecordingImpact.SoftwareLightLoad;
+    Assert.True(beklenen == okuma.Impact, ...);
+}
+```
+
+Söylediği şey: **sınıflandırıcı canlı veri üzerinde de saf.** Donanım yokken
+(`FakeAvailability`) `PerformanceCheck` kararı yalnız `sw.RealtimeCores >=
+HeavyLoadCores` karşılaştırmasından üretir (`PerformanceCheck.cs:309-310`);
+ölçü artık tam olarak bunu doğruluyor. Makinenin o an ne kadar meşgul olduğunu
+sormuyor, dolayısıyla ajan sayısıyla değişmiyor.
 
 ### Yeni geçit: `QuietMachineFactAttribute`
 
@@ -330,6 +393,57 @@ iki okumayı birbirine göre okur, mutlak süreye bakmaz:
 (`yuklu >= taban × 0,8`) değiştirilmedi; o zaten orana kurulu ve dört koşumda
 yeşil.
 
+### Kanıt: aynı yük altında beş koşum
+
+`--filter "OlcumYukAltindaYalnizAgirlasiyor|YukAltindaKararHafiflemiyorMu"`,
+`--no-build` (ikili kaynaklardan yeni: `VidShrink.Tests.dll` 08:47:43,
+en son kaynak dokunuşu 08:39:11).
+
+| koşum | sonuç | süre |
+|---|---|---|
+| 1 | `Başarısız 0, Başarılı 2, Atlanan 0` | 1 dk 41 sn |
+| 2 | `Başarısız 0, Başarılı 1, Atlanan 1` | 2 dk 10 sn |
+| 3 | `Başarısız 0, Başarılı 1, Atlanan 1` | 1 dk 13 sn |
+| 4 | `Başarısız 0, Başarılı 2, Atlanan 0` | 4 dk 10 sn |
+| 5 | `Başarısız 0, Başarılı 1, Atlanan 1` | 2 dk 36 sn |
+
+**Beş koşum, sıfır kırmızı.** Düzeltme öncesi aynı filtre aynı makinede
+1 kırmızı / 4 yeşil vermişti (satır 450, yukarıda). Yeşil/atlanan dağılımının
+koşumdan koşuma değişmesi kararsızlık değil, geçidin **ilan ettiği** şey:
+makine boşsa ölçü koşar, doluysa sayılabilir biçimde atlanır. Kırmızı ile
+yeşil arasında salınım yok.
+
+**Yeni ölçünün iddiaları bu beş koşumda hiç çalışmadı — ölçüldü.** Üç koşumda
+`[QuietMachineFact]` geçidi kapattı; iki koşumda geçit açıldı ama koşum anında
+alınan taban artık boş değildi ve ölçü `Atlandi` ile döndü. Ölçüm günlüğü:
+
+```
+[bos-makine] yukleyici=15 esik=1 | bos: SoftwareHeavyLoad/1.177 | yuklu: SoftwareHeavyLoad/1.041
+[bos-makine] yukleyici=15 esik=1 | bos: SoftwareHeavyLoad/1.177 | yuklu: SoftwareHeavyLoad/2.219
+```
+
+Bu, yukarıda "ayrılmadı" diye yazılan **kayma penceresinin ölçülmüş hali**:
+geçit keşif anında `SoftwareLightLoad` gördü, ölçü koştuğunda taban 1,177'ye
+çıkmıştı. Yani `YukAltindaKararHafiflemiyorMu`'nun taşıdığı iddia bu makinede
+**henüz sınanmadı**; ölçünün yeşili "iddia doğrulandı" demek değil, "iddianın
+öncülü kurulamadı, sebebi yazıldı" demektir. Bunun düzeltilmesi boş bir makine
+ister — bu depoda bugün yok.
+
+### Mutasyon C: yeni assert canlı mı
+
+Yerine konan sınıflandırıcı iddiasının ölü olmadığı ölçüldü. Beklenen sınıf
+eşleştirmesi ters çevrildi (`Heavy` ↔ `Light`), tam yeniden derleme, tek ölçü:
+
+| mutasyon | sonuç | süre |
+|---|---|---|
+| yok | `Başarısız 0, Başarılı 1` (yukarıdaki beş koşumun her birinde) | — |
+| C: sınıf eşleştirmesi ters | `Başarısız 1, Başarılı 0` — `canli okuma 2.446 icin karar SoftwareHeavyLoad, esik 1 ile SoftwareLightLoad olmaliydi` | 5 dk 24 sn |
+
+Mutasyon geri alındı, kaynak yeniden derlendi (`0 Hata`).
+
+`YukAltindaKararHafiflemiyorMu` için mutasyon **yapılmadı**: iddiaları bu
+makinede hiç çalışmadığı için mutasyon da hiç çalışmazdı, yani kanıt üretmezdi.
+
 ### Geçidin ayırdığı ve ayırmadığı eksenler
 
 **Ayırdığı** (ölçü koşmadan önce sınanan, atlandığında sayılabilen):
@@ -347,7 +461,9 @@ yeşil.
 - **Geçit ile koşum arasındaki kayma.** `Skip` keşif anında hesaplanır, ölçü
   dakikalar sonra koşar. Makine arada dolabilir. `YukAltindaKararHafiflemiyorMu`
   bunu koşum içinde tekrar okuyup `Atlandi` ile bildirir — ama `Atlandi` özette
-  görünmez (aşağıdaki kusur). Kayma penceresinin **genişliği ölçülmedi**.
+  görünmez (aşağıdaki kusur). Kayma **ölçüldü ve gerçek**: iki koşumda geçit
+  `SoftwareLightLoad` görüp açtı, ölçü koştuğunda taban 1,177'ye çıkmıştı.
+  Pencerenin ne kadar sürede ne kadar kaydığı ölçülmedi, yalnız kaydığı ölçüldü.
 - **Süreç dışı paralellik.** `DisableTestParallelization` tek süreç içinde
   sıralar; aynı makinede koşan on dört ajanı sıralamaz. Geçit bunu ölçer ama
   engelleyemez.
@@ -366,13 +482,77 @@ yeşil.
 `tools/kosum-kapisi/kosum-kapisi.ps1:20`. **Bu sözleşmede değiştirilmedi**,
 satır T115'in.
 
-| aşama | CI'da atlanan | ölçüm |
+| aşama | CI'da atlanan | CI'da toplam | ölçüm |
+|---|---|---|---|
+| T115 sonrası, T117 öncesi | 17 | 1180 | koşum `33593652976` (`045648e`) |
+| `HardwareEncoderFact` sonrası | 18 | 1181 | koşum `33591434219` (`58e2d45`) |
+| `QuietMachineFact` sonrası | **19** | **1182** | koşum `33595878496` (`297ba7b`) |
+
+Kapı çıktısı, son koşum:
+`KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=1182 alt-sınır=1134 atlanan=19 ust-sinir=30`
+
+**Tavan hâlâ anlamlı, değişiklik önerilmiyor.** İki geçit toplam +2 atlanan
+getirdi (17 → 19), tavana 11 pay kaldı. Tavanın işi kütlesel susturmayı
+yakalamak: T115 öncesi bu sayı **95**'ti, yani tavan aşılınca ne olduğunu
+depo zaten yaşadı. 19/1182 = %1,6; bir sözleşme daha bu ölçekte geçit eklerse
+(+1, +2) tavan yine tutar, on bir ölçü birden susturulursa tutmaz — istenen
+davranış bu. Alt sınır (`-MinimumTotal 1134`) da tarafımdan artırılmadı;
+toplam 1180'den 1182'ye çıktı, sınır 48 pay altında kalmaya devam ediyor.
+
+`QuietMachineFact`'in CI'da neden atladığı **ölçülmedi**: sebep `Skip` alanında
+duruyor ama konsola basılmıyor (bkz. K2 — aynı kusurun ikinci örneği). GitHub
+runner'ının çekirdek sayısı düşük olduğu için boş okumanın eşiği aşması
+beklenir, ama bu bir **tahmindir**, ölçüm değil.
+
+## K8 — üçüncü eksen: T62'nin kökü burada değil
+
+T0 tur ortasında koşullu sahiplik verdi: T62'nin bulduğu kararsızlık kökü
+`TempCleanup` / `AppHost` içinde duruyor, "yalnızca kovaladığın kararsızlık
+oraya çıkarsa yaz". Çıkmadı. Ölçüm:
+
+**Yol düzeltmesi.** Verilen yollar (`src/VidShrink.App/TempCleanup.cs`,
+`src/VidShrink.App/AppHost.cs`) hiçbir dalda ve `9b37fc5`'te **yok**. Gerçek
+yerleri `src/VidShrink.Ffmpeg/TempCleanup.cs` (147 satır) ve
+`tests/VidShrink.Tests/AppHost.cs` (100 satır).
+
+**Bağlantı ölçüldü, yok:**
+
+| soru | ölçüm | sonuç |
 |---|---|---|
-| T115 sonrası, T117 öncesi | 17 | koşum `33593652976` |
-| `HardwareEncoderFact` sonrası | 18 | koşum `33591434219` |
-| `QuietMachineFact` sonrası | *(aşağıda)* | *(aşağıda)* |
+| `PerformanceCheckTests` bu dosyalara dokunuyor mu | `grep -nE "AppHost\|TempCleanup\|Avalonia"` | **0 satır** |
+| `PerformanceProbe` / `PerformanceCheck` `TempCleanup` çağırıyor mu | aynı grep | 0 çağrı (yalnız bir açıklama satırında adı geçiyor, `PerformanceProbe.cs:303`) |
+| `CleanupStaleArtifacts`'i kim çağırıyor | depo geneli grep | yalnız `src/VidShrink.App/App.axaml.cs:27` (uygulama açılışı) ve `TempCleanupTests` (kendi geçici dizinini vererek, `%TEMP%`'i değil) |
+
+Üstelik `TempCleanup.DeleteMatching` `Directory.EnumerateFiles` kullanıyor —
+**dosya** siler, dizin silmez. Ölçülerin ürettiği `vidshrink_*` artıkları dizin;
+silme yolu onlara zaten uğramıyor.
+
+`AppHost`'un çözdüğü kararsızlık ayrı bir eksen ve kendi belgesinde açık:
+Avalonia arayüz iş parçacığının hangi ölçüm sınıfına düştüğü ("Call from
+invalid thread"). `PerformanceCheckTests` Avalonia'ya hiç dokunmuyor.
+
+**Sonuç: bu iki dosyaya yazılmadı.** Kovaladığım kararsızlığın kökü ölçüldü ve
+başka yerde: paralel ajanların işlemci tüketimi (§K7). T62'nin gözlemi
+yanlışlanmadı — yalnızca **benim eksenimin sebebi o değil.** Kim ölçerse
+ölçsün, üç gözlem üç ayrı sebeple açıklanmalı:
+
+| # | gözlem | ölçülen sebep | sahibi |
+|---|---|---|---|
+| 1 | CI'da belirlenimci kırmızı | `nvcuda.dll` yok, runner'da NVIDIA aygıtı yok | geçit T117'de, kök T123'te |
+| 2 | bu makinede 1/5 kırmızı | paralel ajanların işlemci yükü, boş taban yok (12/12 okuma eşik üstü) | T117 (§K7) |
+| 3 | süit iki koşumda farklı | **T117'de ölçülmedi** — T62'nin gözlemi, benim eksenimle bağlantısı ölçüldü ve yok | açık |
 
 ## Ölçülmeyenler
+
+- `YukAltindaKararHafiflemiyorMu`'nun **iddiaları hiç çalışmadı** (beş koşumun
+  üçünde geçit kapalı, ikisinde koşum içi öncül denetimi düştü). Ölçü kırmızı
+  vermiyor, ama "iddia doğrulandı" da denemez. Boş bir makine gerektiriyor.
+- `Atlandi` yolunun sayılabilir hale getirilmesi **yapılamadı**: xUnit 2 koşum
+  sırasında test atlayamıyor, `Skip` yalnız keşif anında yazılabiliyor. Bugün
+  bu yol "geçti" olarak sayılıyor; sebebi ölçüm günlüğüne ve test çıktısına
+  yazılıyor ama özet sayısında görünmüyor.
+- T62'nin gözlemi ("süit iki koşumda farklı sonuç") T117'de **yeniden
+  üretilmedi**; yalnız benim eksenimle bağlantısının olmadığı ölçüldü (§K8).
 
 - Mutasyon A'nın **yerel** karşılığı ölçülmedi: bu makinede GPU var, geçit
   zaten `true` dönüyor, mutasyon eşdeğer olurdu.

@@ -352,13 +352,6 @@ public sealed class PerformanceCheckTests
     private const long YukOlcumButcesiMs = 60_000;
 
     /// <summary>
-    /// Iki bagimsiz bos okumanin ayni sessiz makineden geldigi sayilan bant. Disaridan
-    /// gelen yuk okumayi yalniz yukari iter; bandi asan bir fark, iki okumadan en az
-    /// birinin kirlendigini soyler.
-    /// </summary>
-    private const double TabanUyumBandi = 1.25;
-
-    /// <summary>
     /// Yuk altinda maliyetin bos okumanin altina dusmedigi sayilan alt sinir.
     /// Olcum gurultusune pay; yon hatasi bu payin cok otesinde durur.
     /// </summary>
@@ -384,8 +377,17 @@ public sealed class PerformanceCheckTests
     /// okuma dusuk gorunur ve olcu, gercekte olmayan bir gerilemeyi bildirir. Bu
     /// yuzden bos okuma birden fazla kez, biri de yuk kalktiktan sonra aliniyor:
     /// kirlenme sayiyi yalniz yukari itebildigi icin en dusuk okuma gercege en yakin
-    /// olanidir, ve okumalar birbirini <see cref="TabanUyumBandi"/> icinde
-    /// dogrulamiyorsa makine olcum boyunca sessiz degildi.
+    /// olanidir.
+    ///
+    /// Okumalarin birbirini bir <b>bant</b> icinde dogrulamasi ve ayni karar sinifina
+    /// dusmesi de T117'de kaldirildi. Karar sinifi esigin kesikli bir fonksiyonudur:
+    /// sayica %25 bandinda anlasan iki okuma esigi ortasina alirsa farkli sinifa duser.
+    /// Olculdu — 1,023 / 1,052 / 0,916 okumalari bandin icindeydi ama esik 1,0 aralarindan
+    /// geciyordu, ve olcu bu yuzden kirmizi dustu. Yerine konan iddia esigin kendisini
+    /// sinar ve yuke duyarli degil: her canli okuma icin sinif, sayinin
+    /// <see cref="PerformanceCheck.HeavyLoadCores"/> ile karsilastirmasindan
+    /// <b>tam olarak</b> cikmali. Siniflandiricinin canli veri uzerinde de saf
+    /// oldugunu soyler; makinenin o an ne kadar mesgul oldugunu sormaz.
     ///
     /// Olculmeyen bacak da dusmus maliyet sayilmiyor. Bacak butce doldugu icin
     /// eksikse bu ortamin haberidir: iddia kurulmaz, sebebi yazilir. Butce dolmadan
@@ -438,18 +440,16 @@ public sealed class PerformanceCheckTests
         }
 
         var taban = olculen.Min(r => r.SoftwareRealtimeCores);
-        var sessizler = olculen.Where(r => r.SoftwareRealtimeCores <= taban * TabanUyumBandi).ToArray();
 
-        if (sessizler.Length < 2)
+        foreach (var okuma in olculen)
         {
-            Atlandi($"bos okumalar birbirini dogrulamadi, makine sessiz degildi: " +
-                    string.Join(" ", olculen.Select(r => N(r.SoftwareRealtimeCores))));
-        }
-        else
-        {
-            Assert.True(sessizler.Select(r => r.Impact).Distinct().Count() == 1,
-                "ayni sessiz makinede art arda alinan okumalar farkli karar verdi: " +
-                string.Join(" ", sessizler.Select(r => $"{r.Impact}/{N(r.SoftwareRealtimeCores)}")));
+            var beklenen = okuma.SoftwareRealtimeCores >= PerformanceCheck.HeavyLoadCores
+                ? RecordingImpact.SoftwareHeavyLoad
+                : RecordingImpact.SoftwareLightLoad;
+
+            Assert.True(beklenen == okuma.Impact,
+                $"canli okuma {N(okuma.SoftwareRealtimeCores)} icin karar {okuma.Impact}, " +
+                $"esik {N(PerformanceCheck.HeavyLoadCores)} ile {beklenen} olmaliydi");
         }
 
         if (!yuklu.SoftwareMeasured)
