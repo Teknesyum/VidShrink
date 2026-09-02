@@ -1,0 +1,16 @@
+{
+  "contractId": "T116",
+  "auditorRunId": "aed396e0910fc44af",
+  "headSha": "678176f0580236f08486f5e37dcc814dc8188932",
+  "diffHash": "46ac81dba8e19ffda76b783d0043f57208eeb5f3ab50d6ec53bfa0697f287e58",
+  "owns": [
+    "docs/olcumler/algi-olcusu.md",
+    "docs/olcumler/olculen-kaliteyle-plan.md",
+    "tools/cipa-yeniden/**"
+  ],
+  "verification": [
+    "Bagimsiz denetci uc 6d30b52'yi depo disina arsivleyip sekiz kriteri tek tek dogruladi; sifir dotnet test kosuldu. K1 envanteri bagimsiz yeniden uretildi (86/37/18/12/4/4/3/2 + 12 sifir), K2'nin on alti hucresi sayildi, K4 mekanizmasi urun kodunda dogrulandi (ComplexityProfile.cs:195-207). owns ihlali yok, done/T95.md'ye dokunulmamis. d435ff9 kirmizisi sandvicle kararsiz olcu olarak ayristirildi (SplitDragTests.cs:88-93, duvar saati). KRITIK yok, yedi borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T06:07:22.115Z"
+}
