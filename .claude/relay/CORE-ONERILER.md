@@ -146,3 +146,26 @@ kapisi, tek kacisi sahtecilik olacak sekilde tasarlanmamali.
 **Ilgili.** Ayni ailenin bilinen uc kusuru: `roleOf` mühür kapisinin rolu yanlis
 okumasi, `agents/auditor.md` ve `advisor.md`nin Core 0.7.3'te hic bulunmamasi,
 `guard.js`in komut metnine bakip etkisine bakmamasi.
+
+## Kanca depo kokunu okuyor, kok ise geride kalabiliyor
+
+3 Eylul 2026: `Stop` kancasi "T148 submitted, hala seni bekliyor" dedi. T148 o sirada
+**muhurlenmisti** — `contracts/done/T148.md`, `status: done`, `main`de. Kanca yanlis
+yeri okumustu: T0 `.claude/worktrees/T0` icinde calisiyor ve `main` orada; depo koku
+`ae98712`de **ayrik HEAD** olarak duruyordu, yani T148'in muhurlenmesinden onceki
+agacta. Kanca kokun `.claude/relay/`ini okudu ve eski durumu bildirdi.
+
+Bu, ayni kusurun ucuncu yuzu. Digerleri: `contract.js audit` `live/` kaydini T0'in
+worktree'sinde arayip kokte bulamamasi (T148), ve denetcinin gitignore'daki
+worktree-yerel dosyayi eski gormesi (T78).
+
+Oneri:
+
+1. **Rolenin dizini tek bir yerden cozulsun.** `git rev-parse --git-common-dir` her
+   worktree'den ayni ortak dizini verir; `.claude/relay/` onun yaninda aranmali,
+   `process.cwd()` yaninda degil. Bu ucunu birden kapatir.
+2. **Ayrik HEAD'deki kok kaynak sayilmasin.** Kanca okudugu agacin `main` olup
+   olmadigini kontrol etsin; degilse ya dogru worktree'ye gecsin ya da "kok geride,
+   durum okunamadi" desin — sessizce eski durumu bildirmesin.
+3. **Yanlis pozitif bedava degil.** Bu kanca turu bitirmiyor; olmayan bir teslim icin
+   ajan is uretmeye zorlaniyor. Durum okunamiyorsa turu bloke etmemeli.
