@@ -418,6 +418,34 @@ her iki akisi ayni miktarda kaydirdigini gosterdi. Ortada davranis farki yok,
 hicbir davranissal olcu yakalayamaz. Mutasyon secerken once sabitin kac yerde
 kullanildigina bak.
 
+
+## "0 kaldi" hicbir sey olcmemis olabilir (T110, 2026-09-02)
+
+T110 tam suit okumasi olarak `tools/ci-gibi-kos.sh` -> **1018 gecti / 0 kaldi
+/ 106 atlandi** verdi. T0 sordu: bu sayi kare kilidini olctu mu? Yapici olctu
+ve cevap **hayir**:
+
+| kosum | ffmpeg PATH'te | QualityMeterTests | kilit olculeri |
+|---|---|---|---|
+| `dotnet test --filter "QualityMeterTests"` | var | 24 gecti / 0 atlandi | **kostu** |
+| `tools/ci-gibi-kos.sh` | yok | 11 gecti / 13 atlandi | **atlandi** |
+
+`ci-gibi-kos.sh` PATH'ten ffmpeg'i cikariyor. Kilidi tutan bes olcunun besi de
+atlananlarin icinde. "1018 gecti / 0 kaldi"in tek anlami: **ffmpeg'siz kosan
+1018 olcude gerileme yok.** Kilidin kaniti o kosumdan gelmiyor.
+
+Ayni sey mutasyon bataryasi icin de gecerli: M1-M8'in kirmizi sayilari
+ffmpeg'li kosuma dayaniyor, CI'da uretilemez.
+
+**Kural: "tam suit yesil" bir kanit degil, bir kosumdur.** Hangi olcunun
+gercekten kostugunu soylemeyen yesil okuma, olcmedigi seyi kanitlamaz. Teslim
+raporunda tam suit sayisi verilecekse **atlanan sayisi ve kabul kriterini
+tutan olculerin o listede olup olmadigi** ayni cumlede yazilir.
+
+Yapici bunu sorulunca kendi mansset cumlesini duzeltti (`3868d62`, belgede
+`§9.13`). Dogru davranis: sayi dogruydu, onu ozetleyen cumle yanlisti — ve bu
+projenin kronik kusuru tam olarak bu.
+
 ## Sonraki basamak
 
 1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
