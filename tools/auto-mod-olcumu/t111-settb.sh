@@ -18,4 +18,5 @@ kos () {
 }
 kos "tam"       "settb=AVTB,setpts=N"
 kos "settb-yok" "setpts=N"
+kos "startpts"  "settb=AVTB,setpts=PTS-STARTPTS"
 echo "SETTB BITTI $(date +%T)"
