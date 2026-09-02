@@ -128,6 +128,16 @@ Aynı kodlayıcı ve aynı kaynak iki farklı hedef boyutta koşturulur. Büyük
 puanı küçük hedefinkinden en az 1,00 VMAF-NEG puanı yüksek çıkmazsa araç o satırı
 `AYRIŞMIYOR` diye işaretler; düzenek duyarsız sayılır.
 
+Ölçülen ayrışma, 60 MB'den 600 MB'ye:
+
+| yarışmacı | 60 MB harm | 600 MB harm | ayrışma | eşik |
+|---|---|---|---|---|
+| handbrake | 28,70 | 67,96 | **+39,26** | 1,00 |
+| vidshrink | 18,98 | 58,83 | **+39,85** | 1,00 |
+
+Eşiğin kırk katı. GEÇERSİZ tablodaki 14,86 → 14,67 (yani -0,19) ile arasındaki fark
+düzeneğin varlık sebebi.
+
 ## Düzeneğin reddettikleri
 
 Bir ölçüm düzeneğinin neyi **reddettiği**, ne ölçtüğü kadar önemlidir. Bu araç
@@ -171,6 +181,88 @@ yasak olan oranın değişmesi. Bu belgedeki bütün sayılar düzeltmeden sonra
 
 Süre ve hız. Makine paylaşımlı — ölçüm boyunca aynı makinede başka ajanlar da
 kodlama koşuyordu. Bu belgede hiçbir süre ya da hız iddiası yok.
+
+## İlk gerçek koşum
+
+Üç parça, iki hedef boyut, iki yarışmacı. Hedef boyutlar tam kaynak için 60 MB ve
+600 MB; parça başına 3,497-3,499 MB ve 34,975-34,994 MB'a oranlandı. Bütün satırlar
+`aynı renk uzayında doğrudan karşılaştırma` — kaynak da çıktılar da bt2020/PQ kaldı,
+tonemap yoluna hiç girilmedi.
+
+### 60 MB hedefinde
+
+| girdi | yarışmacı | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|---|
+| parca-1 | handbrake | 3.531.037 | 0,00 | evet | 47,71 | 34,32 | 3,02 | 52,16 | 30,93 |
+| parca-1 | vidshrink | 3.420.687 | -3,13 | **eş boyut değil** | 31,50 | 16,93 | 1,25 | 38,77 | 28,91 |
+| parca-2 | handbrake | 3.730.691 | 0,00 | evet | 93,70 | 93,07 | 72,27 | 93,71 | 43,59 |
+| parca-2 | vidshrink | 3.409.438 | -8,61 | **eş boyut değil** | 68,60 | 66,52 | 49,48 | 68,71 | 33,07 |
+| parca-3 | handbrake | 3.680.998 | 0,00 | evet | 13,72 | 11,79 | 0,00 | 17,46 | 28,21 |
+| parca-3 | vidshrink | 3.564.225 | -3,17 | **eş boyut değil** | 8,95 | 6,64 | 0,00 | 13,02 | 27,06 |
+
+### 600 MB hedefinde
+
+| girdi | yarışmacı | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|---|
+| parca-1 | handbrake | 35.288.140 | 0,00 | evet | 81,48 | 79,04 | 4,12 | 83,43 | 38,00 |
+| parca-1 | vidshrink | 35.746.203 | +1,30 | evet | 70,82 | 67,21 | 3,49 | 72,56 | 36,07 |
+| parca-2 | handbrake | 36.766.517 | 0,00 | evet | 95,78 | 95,32 | 71,96 | 95,78 | 47,11 |
+| parca-2 | vidshrink | 36.137.359 | -1,71 | evet | 95,84 | 95,42 | 74,89 | 95,84 | 51,25 |
+| parca-3 | handbrake | 36.272.258 | 0,00 | evet | 46,66 | 64,62 | 0,00 | 69,87 | 36,35 |
+| parca-3 | vidshrink | 35.549.615 | -1,99 | evet | 37,83 | 54,59 | 0,00 | 60,10 | 35,00 |
+
+### Özet
+
+| yarışmacı | hedef MB | toplam bayt | eş boyut | harm | en kötü p10 | kare min | ort | XPSNR |
+|---|---|---|---|---|---|---|---|---|
+| handbrake | 60 | 10.942.726 | evet | **28,70** | 11,79 | 0,00 | 54,44 | 34,25 |
+| vidshrink | 60 | 10.394.350 | **eş boyut değil** | **18,98** | 6,64 | 0,00 | 40,16 | 29,68 |
+| handbrake | 600 | 108.326.915 | evet | **67,96** | 64,62 | 0,00 | 83,03 | 40,49 |
+| vidshrink | 600 | 107.433.177 | evet | **58,83** | 54,59 | 0,00 | 76,17 | 40,77 |
+
+**Geridiyiz.** Eş boyutta HandBrake her iki hedefte de önde: 60 MB'de harmonik
+ortalamada 9,72 puan, 600 MB'de 9,13 puan. Altı parça-hedef çiftinin beşinde
+HandBrake kazandı; VidShrink yalnız `parca-2` @ 600 MB'de önde (95,84'e 95,78 —
+bu fark gürültü sayılır) ve orada XPSNR'ı belirgin yüksek (51,25'e 47,11).
+
+İki gözlem, ikisi de sayıdan çıkıyor:
+
+- **60 MB hedefinde VidShrink bütçeyi bitirmiyor.** Üç parçanın üçünde de hedefin
+  altında kalıyor (-%3,13, -%8,61, -%3,17) ve üç satır da `eş boyut değil` damgalı.
+  Yani bu üç satırda VidShrink hem daha az bit harcayıp hem daha düşük puan aldı;
+  kullanılmayan bütçe doğrudan kayıp. 600 MB hedefinde bu kaybolmuyor ama küçülüyor
+  (+%1,30 / -%1,71 / -%1,99, üçü de ±%2 içinde).
+- **Kare minimumu tek başına ayırt etmiyor.** `parca-3`'te iki taraf da her hedefte
+  0,00 kare minimumu veriyor; oradaki farkı ancak harmonik ortalama ve p10 gösteriyor.
+  Tersi de var: `parca-1` @ 600 MB'de harmonik 81,48'ken kare minimumu 4,12. Tek
+  sayıya indirgenmiş bir başlık bu tabloyu anlatamaz.
+
+HandBrake'in tam komut satırı (parça 1, 60 MB hedefi; bit hızı dışında bütün
+satırlarda aynı):
+
+```
+HandBrakeCLI -i parca-1.mkv -o parca-1_handbrake_3.497mb.mkv \
+  -Z "H.265 MKV 1080p30" -e x265 -b 483 --multi-pass --turbo \
+  --encoder-preset slow -a none -r 60 --cfr --crop 0:0:0:0 --non-anamorphic
+```
+
+600 MB hedefinde tek fark `-b 4833`. Bit hızı hedeften türetiliyor:
+`hedef_bayt x 8 x (1 - 0,005) / süre / 1000`, kapsayıcı payı %0,5.
+
+VidShrink tarafı ürünün kendi borusunu koşuyor — `ComplexityProbe` →
+`PlanCalculator` → iki tur `CalibrationProbe` → `EncodeRunner` — ve kendi kararını
+kendi veriyor. 600 MB hedefinde seçtiği: `1190x670@60, libx264/2pass, 4712k,
+pix=p010le, hdr=Preserve`. Yani çözünürlüğü düşürüp bit hızını kurtarma yolunu
+seçiyor; HandBrake 1920x1080'de kalıyor. Bu turda o tercih kazandırmadı.
+
+### Ölçünün kendi kararsızlığı
+
+Aynı yapılandırma iki kez koştu (geometri düzeltmesinden önce ve sonra, `parca-1`
+kırpmadan etkilenmediği için iki koşumda da aynı girdiyle). HandBrake bit bit aynı
+çıktıyı verdi (3.531.037 bayt, harmonik 47,71 — sıfır fark). VidShrink'in ölçüm
+temelli kalibrasyonu koşumdan koşuma az da olsa oynuyor: 3.417.959 → 3.420.687 bayt,
+harmonik 31,40 → 31,50, p10 17,35 → 16,93. Yani bu düzenekte 0,1-0,5 VMAF-NEG'lik
+farklar gürültüdür; yukarıdaki 9 puanlık açık değildir.
 
 ## `QualityMeter` eksikleri
 
