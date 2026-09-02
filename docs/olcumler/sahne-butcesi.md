@@ -445,6 +445,23 @@ kapisi bu sayfada karari veren yerdir, bu tablo degil.
 
 Tabani gecen 3 hucrenin 1 tanesini `zones`, 2 tanesini `qcomp` kazandi. Bu ayrim sozlesmenin sorusu acisindan belirleyicidir: **haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`**. `qcomp` tek bir kuresel skalerdir; hangi sahnenin ne kadar karmasik oldugu bilgisini tasimaz, `SceneMap` olmadan da ayni deger verilebilir. Dolayisiyla `qcomp` kazandigi hucre "sahne basina dagitim ise yariyor" kanitina sayilmaz; olsa olsa iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadigini soyler.
 
+### Tekrar gurultusu — ayni hucre iki kez kosuldu
+
+K4 ekindeki kazanclar pp cinsindendir; kazancin gurultunun ustunde olup
+olmadigi ancak ayni parametreyle ikinci bir kosumla anlasilir. K4
+izgarasindaki `kontrol` satiri bayt uzerinden olcer, bu tablo pp uzerinden.
+
+| Kol | Pencere | sha256 | Boyut farki (bayt) | MAE kosum 1 | MAE kosum 2 | Tekrar gurultusu (pp) |
+|-----|---------|--------|--------------------|-------------|-------------|-----------------------|
+| yedek | `p1-karisik` | farkli | -60414 | 1.273 | 1.275 | 0.002 |
+
+Kosulan hucre 1; olculen en buyuk tekrar gurultusu 0.002 pp.
+`zones`in kazandigi 0.044 pp gurultunun 22.0 kati; gurultunun ustunde.
+
+Uretim: `SahneButcesi tekrar <kol> <pencere>`, ham dosya `tekrar-<kol>-<pencere>.csv`.
+Yalniz `zones`in kazandigi hucrede kosuldu; diger hucrelerin maliyeti
+hucre basina bir tam iki gecisli kodlamadir.
+
 ## K5 ve K6 — kalite kazanci ve hedef boyut
 
 Kapi (olcumden once): p10 kazanci `>= +0,50`, en kotu sahne kazanci
@@ -463,7 +480,52 @@ libx265 `1728x972`, libsvtav1 `1920x1080`); farkli cozunurlukten cikan
 VMAF puanlari yan yana konmaz. `taban` ile `dagitim` ayni kolda ayni
 cozunurluktedir — A/B icinde bu sorun yoktur.
 
-**bilinmiyor** — K5 kosulmadi.
+| Yazilim kolu | Pencere | Kol | Boyut (MB) | Band | Band icinde | VMAF-NEG ort. | p10 | en dusuk kare | en kotu sahne |
+|--------------|---------|-----|------------|------|-------------|---------------|-----|---------------|---------------|
+| uyumlu | `p1-karisik` | taban | 58.66 | 58.3–60.0 | evet | 72.538 | 69.074 | 22.119 | 41.296 |
+| uyumlu | `p1-karisik` | dagitim | 58.71 | 58.3–60.0 | evet | 72.500 | 69.081 | 19.215 | 41.197 |
+
+### Dagitimin gercekte ne kadar oynadigi
+
+Zone carpani `1,0` demek "bu sahneye kodlayicinin verecegi kadar ver"
+demektir. Carpanlarin araligi dar kaldiginda dagitimin kaliteye
+yapabilecegi etki de dar kalir; asagidaki fark sutunu kazanc
+beklentisinin ust sinirini gosterir.
+
+| Yazilim kolu | Pencere | Zone sayisi | En kucuk b | En buyuk b | Aralik |
+|--------------|---------|-------------|------------|------------|--------|
+| uyumlu | `p1-karisik` | 28 | 0.842 | 1.279 | 0.437 |
+
+### Dagitimli − dagitimsiz
+
+Bir satir bir **yazilim kolu x pencere** ciftidir. Boyut farki sutunu
+A/B'nin adil olup olmadigini gosterir: iki kol ayni boyutta degilse
+kalite farki dagitimdan degil bit farkindan gelebilir.
+
+| Yazilim kolu | Pencere | Δ ortalama | Δ p10 | Δ en kotu sahne | Δ boyut (MB) |
+|--------------|---------|------------|-------|-----------------|--------------|
+| uyumlu | `p1-karisik` | -0.039 | +0.007 | -0.099 | +0.04 |
+
+**K5/K6 kapisi gecmedi** — olculen cift 1; p10 esigini (>= +0,50) gecen 0, en kotu sahne esigini (>= +1,00) gecen 0, esikten fazla p10 kaybeden 0; olculen 2 kosumdan hedefi **asan** 0, bandin **altinda** kalan 0.
+
+Esik metni "uc kaynagin en az ikisinde" der; kaynak = pencere. Kollar
+esikten sonra eklendi, o yuzden sayim **kol icinde** yapilir: bir kolun
+kendi uc penceresinin en az ikisi esigi gecmelidir. Ayri kollardan birer
+pencere toplanip "iki kaynak" sayilmaz. Bu netlestirme commit `a965416`,
+ilk `k5-*.json` yazilmadan once: `git log -1 --format=%cI a965416` ile
+`.calisma/T114/k5-*.json` zaman damgalari karsilastirilabilir.
+
+| Yazilim kolu | Olculen pencere | p10 esigini gecen | En kotu sahne esigini gecen | Kalite sarti (1-3) |
+|--------------|-----------------|-------------------|-----------------------------|--------------------|
+| uyumlu | 1/3 | 0 | 0 | **hayir** |
+
+Kalite sartlari (1-3) tek basina: **saglanmadi** (0 kolda saglandi, esikten fazla p10 kaybeden 0). K6 sarti (4) tek basina: **saglandi**.
+
+Hedefi asan kosum orani: 0.0%
+(0/2). Bandin altinda kalma bu duzenegin ozelligidir:
+`EncodeRunner`'in kapali dongu duzeltmesi kosmuyor, tek iki gecis var.
+Iki kol da ayni duzenekten geciyor, bu yuzden band disiligi kollari
+**ayirt etmez**; K6'nin asil sorusu olan asan kosum orani ayri yazildi.
 
 ## K7 — harita yanlisken dagitimin bedeli
 
@@ -489,12 +551,30 @@ Denenen senaryo 5, beklenen karari veren 5. Uretim
 kosum `bash tools/sahne-butcesi/04-kapi-denemesi.sh`. Bu tablodaki sayilar
 uydurma; olculen sey kapinin **ayirt edip etmedigi**.
 
+### Tekrar gurultusunu yorumlayan cumle de olculdu
+
+`zones`in kazanci gurultunun ustunde mi altinda mi — bunu bir cumle
+soyluyor. O cumle hep ayni seyi diyorsa hukum de bosa gider. Uydurma
+tekrar dosyasiyla uc senaryo kosuldu: gurultu sifir, kazanctan kucuk,
+kazanctan buyuk.
+
+| Senaryo | Kosum 1 (pp) | Kosum 2 (pp) | Beklenen cumle | Cikan cumle | Sonuc |
+|---------|--------------|--------------|----------------|-------------|-------|
+| `gurultu-sifir` | 1.273 | 1.273 | ustunde | ustunde | gecti |
+| `gurultu-kucuk` | 1.273 | 1.293 | ustunde | ustunde | gecti |
+| `gurultu-buyuk` | 1.273 | 1.373 | altinda | altinda | gecti |
+
+Denenen senaryo 3, beklenen cumleyi veren 3. Girdi
+`tools/sahne-butcesi/tekrar-fikstur.py`, kosum
+`bash tools/sahne-butcesi/06-tekrar-denemesi.sh`. Bu tablodaki pp degerleri
+uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.
+
 ## Sonuc
 
 **Karar verilemedi.** Asagidaki kapilardan en az biri olculemedi; olculmemis kapi gecmemis sayilmaz, `bilinmiyor` kalir.
 
 - K2 (kodlayici zaten dogru dagitiyor mu): kapanmadi
-- K5/K6 (kalite kazanci ve hedef boyut): **bilinmiyor** — olculmedi
+- K5/K6 (kalite kazanci ve hedef boyut): **gecmedi** — olculen cift 1; p10 esigini (>= +0,50) gecen 0, en kotu sahne esigini (>= +1,00) gecen 0, esikten fazla p10 kaybeden 0; olculen 2 kosumdan hedefi **asan** 0, bandin **altinda** kalan 0
 - K7 (bozuk harita bedeli): **bilinmiyor** — olculmedi
 
 **Sahne basina dagitim 4 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 4 hucrenin tabani gecen 3 tanesinde `zones` 1 kez kazandi, `qcomp` 2 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones`in kazandigi hucre tek ve kazanc pp'nin yuzde birleri mertebesinde; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
@@ -526,7 +606,6 @@ sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
 | K5/K6 | maks/p1-karisik | kosulmadi: `k5-*.json` yok |
 | K5/K6 | maks/p2-durgun | kosulmadi: `k5-*.json` yok |
 | K5/K6 | maks/p3-hareketli | kosulmadi: `k5-*.json` yok |
-| K5/K6 | uyumlu/p1-karisik | kosulmadi: `k5-*.json` yok |
 | K5/K6 | uyumlu/p2-durgun | kosulmadi: `k5-*.json` yok |
 | K5/K6 | uyumlu/p3-hareketli | kosulmadi: `k5-*.json` yok |
 | K5/K6 | yedek/p1-karisik | kosulmadi: `k5-*.json` yok |
@@ -542,7 +621,7 @@ sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
 | K7 | yedek/p2-durgun | kosulmadi: `k7-*.json` yok |
 | K7 | yedek/p3-hareketli | kosulmadi: `k7-*.json` yok |
 
-Toplam 29 satir, 4 bolumde: K1/K2 2, K4 eki 9, K5/K6 9, K7 9.
+Toplam 28 satir, 4 bolumde: K1/K2 2, K4 eki 9, K5/K6 8, K7 9.
 
 ## K9 — kural koda girdiyse mutasyon kaniti
 
@@ -596,5 +675,4 @@ reddettigi gorulsun diye ciktisi buraya alindi:
    Kazancin ust siniri bu araliktan gelir; `gamma`yi buyutmek araligi
    acardi ama `gamma = 1 - qcomp` turetilmis bir sayidir, telafi sabitine
    cevrilmedi.
-8. **MAE farkinin gurultu tabani olculmedi.** `zones`in kazandigi 0.044 pp'lik fark icin ayni hucrenin tekrar kosulmus bir ikinci olcusu yok. Kosulmadi; maliyeti hucre basina bir tam iki gecisli kodlamadir (`SahneButcesi tekrar <kol> <pencere>`).
 
