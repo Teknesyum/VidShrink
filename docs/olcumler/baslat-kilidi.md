@@ -156,9 +156,14 @@ Bu iddia makine yükünden bağımsız — yük altında da doğru, boşta da do
 | 75 ms | 2000 ms | `Working` | `Working` |
 | 2187 ms | 2000 ms | `Unsettled` | `Unsettled` |
 
-Süre listesi de gerçek bir sınıra bağlandı:
+Süre listesi ölçülüyor ama bu iddia "gerçek bir sınıra bağlı" değildi:
 `Assert.All(durations, d => Assert.True(d < EncoderCapabilities.ProbeKillMs))`
-— 8 tekrarın hiçbiri 15 000 ms'lik öldürme sınırına dayanmıyor.
+gerçek sürelerin (60-100 ms) 15 000 ms'lik öldürme sınırına hiç yaklaşmaması
+yüzünden mutasyona dayanıklı değildi — killer mantığı tamamen bozulsa bile bu
+karşılaştırma yeşil kalırdı. T137, bu iddiayı `dogrudan.State` üzerinden gerçekten
+kırılabilir bir ölçüme çevirdi (bkz. `docs/olcumler/yoklama-uclu-cevap.md`, K9);
+8 tekrarlık süre dağılımı artık yalnız kanıt (`WriteEvidence`) olarak kalıyor,
+"ölçüldü" iddiası taşımıyor.
 
 **Bir sessiz atlama düzeltildi.** İlk hâlde bu iddia `MachineIsQuiet` kapısının
 *altında* duruyordu; makinede başka ffmpeg koşarken ölçü hiç çalışmadan yeşil
