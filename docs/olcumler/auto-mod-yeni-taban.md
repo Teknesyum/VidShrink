@@ -299,10 +299,18 @@ p10'da 0,121).
 
 **HandBrake: geçtik.** İşaret gerçekten döndü. T111'de HandBrake üç ölçüde de
 öndeydi (+0,097 / +0,477 / +0,099); bugün `auto`nun **her iki koşumuna göre de**
-altı ölçünün altısında geride. Büyüklük saçılımın iki ile beş katı, yani
-tekrarlanabilirliğin içine düşmüyor. Boyut avantajından da gelmiyor:
-`uzman-hb2` birinci koşumdan **%0,030 küçük**, ikinciden %0,93 büyük; erişim
-eğimiyle (K3) ikinci durumdaki katkı 0,006 puan, −0,321'i çevirmiyor. T111'in
+altı ölçünün altısında geride.
+
+Açıkların saçılıma oranı ölçüye göre değişiyor, tek bir kat sayısı verilemez:
+ortalamada **4,8 ve 5,8 kat** (0,266 ve 0,321'e karşı 0,055), harmonikte 4,7 ve
+5,7 kat, ama p10'da **1,1 ve 2,1 kat** (0,130 ve 0,251'e karşı 0,121). Yani
+birinci koşumun p10 açığı saçılımın sınırında; **"geçtik" o tek sayıya değil,
+altı okumada da işaretin dönmüş olmasına dayanıyor.** Ortalama ve harmonikte
+açık saçılımın beş katı civarında.
+
+Boyut avantajından da gelmiyor: `uzman-hb2` birinci koşumdan **%0,030 küçük**,
+ikinciden %0,93 büyük; K3'te ölçülen boyut eğimiyle ikinci durumdaki katkı
+0,006 puan, −0,321'i çevirmiyor. T111'in
 kendi en dar eşleşmesi `uzman-hb3` (−%0,08, kilitli ortalama açığı +0,083)
 alınsa bile bugünkü işaret onun da tersi.
 
@@ -509,13 +517,15 @@ doğruluyor.
 | değişim | Δ bayt | Δ ortalama | Δ p10 | Δ en düşük kare |
 |---|---|---|---|---|
 | `-g 120` → `-g 300` | **−%17,3** | **+0,347** | **+0,640** | +2,430 |
-| `-g 300` → `-g 600` | +%2,6 | +0,117 | +0,246 | +0,367 |
+| `-g 300` → `-g 600` | +%3,0 | +0,117 | +0,246 | +0,367 |
 | `-g 120` → `-g 600` (T111 tabanı → bugün) | **−%14,8** | **+0,464** | **+0,886** | +2,797 |
 
 **Fark 0,0x mertebesinde değil.** T98'in aralığı bu kaynakta hem dosyayı
 küçültüyor hem puanı yükseltiyor: iki eksende birden kazanç. Büyük kalem
 120 → 300 adımı; 300 → 600 adımı puanı yükseltmeye devam ediyor ama boyutu
-%2,6 **büyütüyor**, yani tek yönlü kazanç değil.
+%3,0 **büyütüyor**, yani tek yönlü kazanç değil. (Tablodaki her satır `-g 600`
+için `g600-scd1` satırından okundu; `g600-scd0` ile fark boyutta %0,47, puanda
+0,003.)
 
 T102 aynı 120 → 300 adımını kilitsiz ölçerle +0,155 ortalama / +0,333 p10 diye
 ölçmüştü. Kilitli ölçümde aynı adım +0,347 / +0,640. **İşaret aynı, büyüklük
@@ -641,7 +651,7 @@ Mekanizma buradan çıkıyor. p10 3624 karenin en düşük **363**'ünü kesiyor
 | `y2` | kilitli | 1 / 150 / 212 | 95,121 |
 
 `y2`'nin çöküş bloğu **212 kare**, yani kuyruğun 363 kontenjanının %58'i.
-Geriye kaymanın hasar verdiği orta bölgeden yalnız **151** kare sığıyor;
+Geriye kaymanın hasar verdiği orta bölgeden yalnız **150** kare sığıyor;
 `y1`'de ise 309 kare sığıyor. Kesme noktası hasarlı dağılımın daha derinine
 iniyor, dolayısıyla kilitsiz p10 daha aşağıda başlıyor: 92,778 ile 94,870
 arasındaki **2,09 puanlık** fark buradan geliyor. Kilit orta bölgeyi kaldırınca
