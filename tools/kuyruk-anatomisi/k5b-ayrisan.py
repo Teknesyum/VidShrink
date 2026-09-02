@@ -2,21 +2,11 @@
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bitler import paketler
-from kuyruk import kotu
+from kuyruk import kotu, t122
 
-def duz(y):
-    fr = json.load(open(y, encoding="utf-8"))["frames"]
-    o = []
-    for f in fr:
-        m = f["metrics"]
-        v = m.get("vmaf", m.get("vmaf_neg"))
-        if v is not None:
-            o.append((f["frameNum"], v))
-    o.sort()
-    return o
 
 def yukle(ad):
-    kr = duz(".calisma/t122/vmaf-t122/%s-kilitli.json" % ad)
+    kr = t122(ad)
     e, kt = kotu(kr)
     p = paketler(".calisma/t122/ciktilar/%s.mp4" % ad)
     B = {i: s for i, s, _ in p}

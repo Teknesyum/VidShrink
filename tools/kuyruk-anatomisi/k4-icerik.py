@@ -2,7 +2,7 @@
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bitler import paketler
-from kuyruk import kotu, p10esik
+from kuyruk import kotu, p10esik, t122
 
 def duz(yol):
     fr = json.load(open(yol, encoding="utf-8"))["frames"]
@@ -16,7 +16,7 @@ def duz(yol):
     return out
 
 def rapor(ad):
-    kr = duz(".calisma/t122/vmaf-t122/%s-kilitli.json" % ad)
+    kr = t122(ad)
     e, kt = kotu(kr)
     ks = set(kt)
     p = paketler(".calisma/t122/ciktilar/%s.mp4" % ad)

@@ -39,3 +39,31 @@ def kumele(idx, bosluk):
 
 def sn(n):
     return n / FPS
+
+
+_KOK = os.path.dirname(os.path.abspath(__file__))
+
+def t122(ad):
+    duz = os.path.join(_KOK, "..", "..", ".calisma", "t122", "vmaf-t122", ad + "-kilitli.json")
+    if os.path.exists(duz):
+        with open(duz, encoding="utf-8") as fh:
+            fr = json.load(fh)["frames"]
+    else:
+        with gzip.open(os.path.join(_KOK, "vmaf-t122", ad + "-kilitli.json.gz"), "rt", encoding="utf-8") as fh:
+            fr = json.load(fh)["frames"]
+    out = []
+    for f in fr:
+        m = f["metrics"]
+        v = m.get("vmaf", m.get("vmaf_neg"))
+        if v is not None:
+            out.append((f["frameNum"], v))
+    out.sort()
+    return out
+
+BOYUT = {
+    "auto": 14450295,
+    "auto-g300": 11788146,
+    "auto-g600": 12172458,
+    "auto-g600-boyutesit": 14646149,
+    "uzman-hb2": 15743067,
+}

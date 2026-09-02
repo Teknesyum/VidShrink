@@ -418,3 +418,185 @@ kusur kodlayıcıya ait ve düzeltilebilir.
 **153 KB**, video bütçesinin **%1,14**'ü. Bu bit başka bir yerden gelmek
 zorunda; nereden geleceği K6'nın konusu.
 
+## K6 — Öneri ve maliyeti
+
+Sözleşme uygulama istemiyor; bulguyu, yerini ve bedelini istiyor.
+
+### Önce: ölçülen kuyruk artık `main`de olmayan bir motora ait
+
+K4 anahtar kare aralığını suçlu gösterince kodun bugünkü hali okundu.
+`src/VidShrink.Core/FfmpegArguments.cs:216-253`: sabit `-g` **kaldırılmış**.
+Yerinde bir aralık var — taban 1 s, tavan sahne haritasının **ortanca** sahne
+uzunluğu, `[KeyframeCeilingMinSeconds = 5,0 ; KeyframeCeilingMaxSeconds = 10,0]`
+arasına kırpılıyor, harita yoksa 10 s.
+
+Bunu getiren commit **`8ea80c4`** ("T98 K1+K2: sabit -g yerine anahtar kare
+aralığı"). T111'in ölçüm tabanı **`3688336`**. `merge-base --is-ancestor` ile
+doğrulandı: `8ea80c4` **`3688336`'nın atası değil**, ama T122 tabanının
+(`59eac70`) atası. Yani T111'in arşivindeki her `-g 120` koşumu **T98'den
+önceki motoru** ölçüyor. T111 bunu arşivinin `OKU.md`'sinde zaten damgalamıştı;
+T122 o damganın **kuyruğun tamamını** kapsadığını gösteriyor.
+
+60 fps'te tavan `[5 s, 10 s]` demek `-g` ∈ `[300, 600]` demek. İkisi de ölçüldü.
+
+### Ölçülen süpürme
+
+Beşi de aynı kaynağa (`parca-2.mkv`), aynı ölçere (kilitli VMAF-NEG), aynı
+kodlayıcı ayarlarına — yalnız `-g` ve `-b:v` değişiyor. `AK` = anahtar kare.
+
+| koşum | `-g` | `-b:v` | boyut | AK | AK bütçe payı | inter B/kare | ort | **p10** | en düşük kare |
+|---|---|---|---|---|---|---|---|---|---|
+| `auto` (T111 ayarı) | 120 | 2026k | 14 450 295 | 31 | **%83,9** | 602 | 95,486 | **94,497** | 91,785 |
+| `auto-g300` | 300 | 2026k | 11 788 146 | 13 | %64,2 | 1066 | 95,821 | 95,137 | 94,230 |
+| `auto-g600` | 600 | 2026k | 12 172 458 | 7 | %38,0 | 1905 | 95,944 | 95,382 | 94,583 |
+| **`auto-g600-boyutesit`** | 600 | **2405k** | **14 646 149** | 7 | %33,8 | 2489 | **96,015** | **95,553** | **94,790** |
+| `uzman-hb2` (HandBrake) | — | 1900 | 15 743 067 | 7 | %18,0 | 3327 | 95,743 | 95,380 | 94,156 |
+
+`-b:v` 2026k'da `-g` büyüdükçe dosya **küçülüyor** (14,45 MB → 12,17 MB):
+anahtar kareler bütçeyi dolduruyordu, kalkınca SVT-AV1 boşalan payı inter
+karelere aktarmıyor, daha küçük dosya teslim ediyor. Bu yüzden son satır
+`-b:v`'yi `2405k`'ya çekip boyutu eşitliyor (14 646 149 ↔ 14 450 295,
+**%+1,36**), ve karşılaştırma orada yapılıyor.
+
+**Eşit boyutta, yalnız `-g` 120 → 600:**
+
+| | ortalama | p10 | en düşük kare |
+|---|---|---|---|
+| `auto` (g=120) | 95,486 | 94,497 | 91,785 |
+| `auto-g600-boyutesit` | 96,015 | 95,553 | 94,790 |
+| **fark** | **+0,529** | **+1,056** | **+3,005** |
+
+**Aynı koşum HandBrake'e karşı** (%7,0 **daha küçük** dosyayla):
+
+| | ortalama | p10 | en düşük kare |
+|---|---|---|---|
+| `uzman-hb2` | 95,743 | 95,380 | 94,156 |
+| `auto-g600-boyutesit` | 96,015 | 95,553 | 94,790 |
+| **fark** | **+0,272** | **+0,173** | **+0,634** |
+
+T111'in kapatamadığı p10 açığı burada kapanıyor ve işaret değiştiriyor.
+Nedeni K4'te ölçülen tek şey: anahtar kare başına maliyet iki kodlayıcıda
+neredeyse aynı (362 KB ↔ 376 KB), fark sayıdadır, ve `-g 120` 60 fps'te
+bütçenin %83,9'unu 31 kareye veriyordu.
+
+### Öneri
+
+**Öneri 1 — ölçümü yenile, tek satır bile değiştirme.**
+`docs/olcumler/auto-mod.md`'nin K3 tablosu ve "HandBrake açığı" satırları
+emekli bir motoru anlatıyor. Yapılacak iş: T111 düzeneğini
+(`tools/auto-mod-olcumu/t111-uret.sh` + `t111-olc.sh`) bugünkü `main`de
+yeniden koşmak.
+*Yer:* yeni sözleşme, `docs/olcumler/auto-mod.md`.
+*Beklenen kazanç:* yukarıdaki tabloya göre p10'da +1,0 mertebesi; sayı
+zaten var, eksik olan onun `auto` yolundan da geldiğinin gösterilmesi.
+*Maliyet:* 16 kodlama + 32 ölçüm, T111'de yaklaşık iki saat makine.
+*Risk:* düşük — kod değişmiyor.
+
+**Öneri 2 — tavanı bit bütçesine de baktır.**
+`FfmpegArguments.KeyframeCeilingSeconds` (`:233-253`) tavanı **yalnız içerikten**
+okuyor: ortanca sahne uzunluğu. Bu ölçüm gösteriyor ki kuyruğu belirleyen şey
+sahne uzunluğu değil, **anahtar karelerin bütçe payı** — ve o pay hedef boyuta
+bağlı, içeriğe değil. Aynı klipte pay `-g 120`'de %83,9, `-g 600`'de %33,8.
+*Değişecek yer:* `KeyframeCeilingSeconds`'a hedef bit hızı ve kare başına
+tahmini intra maliyeti girdi olarak eklenir; tavan, öngörülen pay bir eşiğin
+altına inene kadar yükseltilir. İki ölçülü çapa var: %18,0 (HandBrake) ve
+%33,8 (`auto-g600-boyutesit`) sağlıklı, %83,9 çöküyor. **Eşiğin kendisi
+ölçülmedi** — bu ölçüm üç nokta veriyor, eğri vermiyor.
+*Beklenen kazanç:* `[5 s, 10 s]` kırpmasının **tabanında** p10 95,137,
+tavanında 95,553. Yani bugünkü kural klibin ortanca sahnesi kısa olduğunda
+p10'da 0,4 puana kadar bırakıyor olabilir. Bu klipte hangi ucun seçildiği
+**ölçülmedi** (K7).
+*Maliyet:* `KeyframeCeilingSeconds` imzası değişir; `FfmpegArgumentsTests`
+içindeki tavan testleri yeniden temellendirilir. Bir sözleşmelik iş.
+*Risk:* **arama süresi.** T98 kendi ölçümünde 5,62 s tavanla 154,9 ms,
+10 s tavanla 202,6 ms arama maliyeti ölçmüştü (`FfmpegArguments.cs:139-141`).
+Tavanı yükseltmek aramayı pahalılaştırır ve bu kullanıcıya dokunan bir
+takas; kalite kazancıyla birlikte tartılması gerekir.
+
+**Öneri 3 — 60 fps kapta 30 fps içerik ölçülüp raporlansın.**
+K4 bu klipte inter karelerin %49,6'sının 3 baytlık tekrar olduğunu ölçtü.
+SVT-AV1 bunu doğru görüyor; **`PlanCalculator` görmüyor**. Kare sayısı
+gerçek içerik hızının iki katı sayıldığı sürece kare başına bit tahmini
+de yarı yarıya yanlış.
+*Değişecek yer:* `ComplexityProbe`'a ardışık kare özdeşliği sayacı; sonuç
+plan hesabına girer.
+*Beklenen kazanç:* **ölçülmedi.** Bu sözleşme yalnız olgunun kendisini
+ölçtü, plan hesabına etkisini ölçmedi.
+*Maliyet:* bir yoklama geçişi; yoklama zaten kareleri okuyor.
+*Risk:* orta — `PlanCalculator` çıktısı değişirse tüm boyut tahmini
+çapaları yeniden temellenir.
+
+**Üçünün de uygulaması bu sözleşmede yok.**
+
+## Sahne sınırlarının üç yoldan doğrulanması
+
+K3'ün tamamı iki kesimin (kare 1700 ve 3411) doğru yerde olmasına dayanıyor.
+Üç bağımsız kaynak aynı iki kareyi veriyor:
+
+1. **T105 haritası + aritmetik.** `sahneler.csv` sınırları 477,933 ve 506,450;
+   parçanın kaynaktaki başlangıcı 449,600 çıkarılınca 28,333 ve 56,850 s.
+2. **T111'in hizalama koşumları.** `-force_key_frames 28.353,56.870` — aradaki
+   +0,020 s tam olarak `parca-2`'nin kap içi video başlangıç kayması.
+3. **HandBrake'in kendi sahne kesimi.** Yedi anahtar karesinden ikisi
+   ölçülerek **1700** ve **3411** karelerinde bulundu; kalan beşi 600'lük
+   ızgarada. SVT-AV1 de aynı yerlere fazladan intra koydu (1697, 3409).
+
+Üçü de aynı yeri gösteriyor, biri diğerinden türetilmedi.
+
+## K7 — Ölçülmedi
+
+- **Hareket.** Kare başına hareket hiç ölçülmedi. Bu sayfada "yüksek
+  hareketli sahnede kötü" türü hiçbir cümle yok ve olamaz. Elde olan
+  karmaşıklık T105'in **sahne başına** `ComplexityProbe` sayısıdır
+  (S13 0,07119 / S14 0,12892 / S15 0,08546); kare başına karmaşıklık da
+  ölçülmedi.
+- **Bugünkü motorun bu klipte hangi tavanı seçtiği.** Kural okundu
+  (`FfmpegArguments.cs:233-253`) ve tavanın `[5 s, 10 s]` = `-g [300, 600]`
+  aralığına düştüğü biliniyor, ama uygulamanın kendi `SceneMap`'i
+  `parca-2` üzerinde **koşturulmadı**. K6'nın süpürmesi aralığın iki ucunu
+  da ölçtüğü için sonuç bu belirsizliğe dayanıklı; yine de hangi ucun
+  seçildiği ölçülmedi.
+- **Üretim komut satırının kendisi.** Süpürme yalın `-g N` ile koştu;
+  üretim `-g N -svtav1-params keyint=N:scd=1` yazıyor. Açık `keyint`/`scd`
+  yazmanın farkı ölçülmedi.
+- **Anahtar kare bütçe payının eşiği.** Üç nokta ölçüldü (%18,0 / %33,8 /
+  %83,9); aradaki eğri ölçülmedi, "şu payın altında kal" diyecek bir sayı
+  bu sayfadan çıkmaz.
+- **Arşivdeki `auto`'nun bütçe payı.** O dosya T111 temizliğinde silindi;
+  %83,9 **yeniden üretilen** koşumdan. Anahtar kare sayısı (31) `-g 120` ve
+  3624 kareden zaten belli, ama payın kendisi eski dosyada ölçülmedi.
+- **SVT-AV1'in yeniden üretilebilirliği.** `auto-g300` 11 788 146 B teslim
+  etti; T111'in aynı ayarlarla koşan `y1-g300-izgara`'sı 11 809 579 B idi
+  — **%0,18** fark. HandBrake tarafı **birebir** yeniden üretildi
+  (15 743 067 B, kare kare aynı VMAF). SVT-AV1'deki bu küçük kararsızlığın
+  nedeni ölçülmedi.
+- **Süreler.** Makine paylaşımlıydı; bu sözleşme koşarken aynı makinede
+  başka ajanların ölçümleri vardı. Hiçbir süre sayısı üretilmedi.
+- **Tek klip.** Her sayı `parca-2` üzerinde. `parca-1` ve `parca-3` ölçülmedi;
+  bulguların genellenmesi ölçülmedi.
+- **Öneri 3'ün plan hesabına etkisi.** 30 fps içerik olgusu ölçüldü,
+  `PlanCalculator`'ın tahminine ne yaptığı ölçülmedi.
+- **Hiçbir üretim kodu değişmedi.** K6 üç öneri veriyor, üçü de uygulanmadı.
+
+## T122 — ne bulundu
+
+1. Kuyruk tek bir zor sahne değil: `auto`'da 25, HandBrake'te 39 ayrı küme.
+2. **İki çıktının kötü kareleri aynı yerde değil.** Kare düzeyinde kesişim
+   68/363, şansın 1,87 katı, olabileceğin %9,7'si. Kontrol: aynı
+   yapılandırmanın iki ayrı kodlaması **%87,3** kesişiyor. Kuyruğun yerini
+   kodlayıcı belirliyor.
+3. Saniye ölçeğinde ortak bir zemin var (normalize örtüşme 0,588): kaynak
+   arenayı seçiyor, kodlayıcı kurbanı seçiyor.
+4. Kuyruk sahne geçişinde değil **sahne içinde**: S13'te (klibin %46,9'u)
+   üç koşumun da sıfır kötü karesi var, GOP fazı 0–9'da sıfır, 110–119'da
+   2,17 kat.
+5. Nedeni ölçüldü: `-g 120` bütçenin **%83,9'unu 31 anahtar kareye** veriyor,
+   inter kareye 602 bayt kalıyor. HandBrake 7 anahtar kareyle %18,0 harcayıp
+   inter kareye 3327 bayt bırakıyor.
+6. Ayrışan karelerde her iki kodlayıcı da öbürünün az beslediği yerde
+   düşüyor (1,89× ↔ 1,05× ve 1,48× ↔ 0,51×). Kuyruk yetenek değil
+   **dağıtım** sorunu.
+7. Bu kuyruk **`main`de olmayan bir motora ait**: sabit `-g` T98'de
+   (`8ea80c4`) kaldırıldı, T111'in tabanı ondan önce. Aralığın iki ucu da
+   ölçüldü; boyut eşitlenince `-g 600` `auto`'yu p10'da **+1,056**
+   iyileştiriyor ve HandBrake'i %7,0 küçük dosyayla **+0,173** geçiyor.
