@@ -12,8 +12,16 @@ koşturulmuş bir ölçümden gelir. Ölçülmemiş olan yerde açıkça **ölç
 
 Bugünkü auto planı, ölçümden önce plan kipinde alındı:
 
-    T102_PLAN_ONLY=1 tools/auto-mod-olcumu/harness/bin/Release/net8.0/t102harness.exe \
-      .calisma/t120/gui/parca-2.mkv 16 .calisma/t120/ciktilar/auto.mp4
+    cd tools/auto-mod-olcumu/harness
+    T102_PLAN_ONLY=1 dotnet run -c Release -- \
+      ../../../.calisma/t120/gui/parca-2.mkv 16 \
+      ../../../.calisma/t120/ciktilar/auto.mp4 auto
+
+**Derlenmiş ikili çağrılmadı, kaynak her koşumda yeniden derlendi — ve bu
+ayrım bu turda gerçekten fark yarattı.** `bin/Release/net8.0/` altındaki hazır
+ikili T111 tabanından kalmaydı; çağrıldığında `-g 120` basıyor, yani T98 öncesi
+motoru anlatıyordu. Aşağıdaki tablonun sağ sütunu o ikiliden değil, yeniden
+derlenmiş koşumdan geliyor.
 
 | | T111 tabanı (`3688336`) | bugünkü `main` (`2d5f710`) |
 |---|---|---|
@@ -139,6 +147,28 @@ Boyutlar `stat -c %s ciktilar/<ad>.mp4`, kodlayıcı süreci sıfırla döndükt
 sonra okundu: her koşum önce `.<ad>.yaziliyor.mp4` adına yazıyor ve dosya ancak
 çıkış kodu denetlendikten sonra `mv` ile yerine konuyor.
 
+### `auto` iki kez koşturuldu — kendi saçılımı ölçüldü
+
+Aynı komut, aynı hedef, yalnız çıktı adı farklı:
+
+    dotnet run -c Release -- ../../../.calisma/t120/gui/parca-2.mkv 16 \
+      ../../../.calisma/t120/ciktilar/auto2.mp4 auto
+
+| koşum | teslim (bayt) | `EncodeRunner` denemesi | ortalama | p10 | harmonik | en düşük kare |
+|---|---|---|---|---|---|---|
+| `auto` | 16 289 648 | 2 | 96,025 | 95,526 | 96,022 | 94,806 |
+| `auto2` | 16 134 366 | 3 | 96,080 | 95,647 | 96,078 | 94,257 |
+| **saçılım** | **%0,95** | | **0,055** | **0,121** | **0,056** | **0,549** |
+
+**`auto` tekrarlanabilir değil.** Sonda kodlamaları (`ComplexityProbe`,
+`CalibrationProbe`) gerçek kısa kodlamalar; makine yükü altında hem plan hem
+`EncodeRunner`'ın düzeltme deneme sayısı değişiyor. İki koşum arasında teslim
+edilen boyut %0,95, kilitli ortalama 0,055, p10 0,121 puan oynadı.
+
+Bu saçılım K2'nin cetvelidir: **açıklar bu büyüklüğe göre okunuyor.** K1
+tablosunun `auto` satırı birinci koşumdur; K2'de her açık iki koşuma göre de
+ayrı ayrı verildi.
+
 ### İstenen bit hızı teslim edilen bit hızı değildir
 
 `libsvtav1` VBR'de istenenin belirgin altına iniyor: `uzman-biz3` 2712 kbps
@@ -190,22 +220,43 @@ T111 sütunu `docs/olcumler/auto-mod.md`'nin K2 ve K3 tablolarındaki kilitli
 satırlardan alındı (`uzman-biz3` − `auto`, `uzman-hb2` − `auto`). Bugünkü sütun
 K1 tablosundan çıkar.
 
-### Sonuç: açık kapandı
+### Sonuç: açık **kapandı**
 
-Altı ölçünün altısında da açık `auto` lehine kapandı. Rakip başına iki ayrı
-cümle gerekiyor, çünkü biri işaret değiştirdi, diğeri değiştirmedi.
+Altı ölçünün altısında da açık `auto` lehine kapandı. Ama iki rakip için iki ayrı
+cümle gerekiyor, çünkü biri işareti çevirdi, diğeri ölçümün kendi
+tekrarlanabilirliğinin içine düştü. Aşağıdaki tablo her açığı `auto`nun **iki
+koşumuna** göre de veriyor; cetvel K1'de ölçülen saçılım (ortalamada 0,055,
+p10'da 0,121).
+
+| açık | `auto` (1. koşum) | `auto2` (2. koşum) |
+|---|---|---|
+| uzman, Δ ortalama | +0,074 | +0,019 |
+| uzman, Δ p10 | +0,079 | **−0,042** |
+| uzman, Δ harmonik | +0,075 | +0,019 |
+| HandBrake, Δ ortalama | −0,266 | −0,321 |
+| HandBrake, Δ p10 | −0,130 | −0,251 |
+| HandBrake, Δ harmonik | −0,265 | −0,321 |
 
 **HandBrake: geçtik.** İşaret gerçekten döndü. T111'de HandBrake üç ölçüde de
-öndeydi (+0,097 / +0,477 / +0,099); bugün üçünde de geride (−0,266 / −0,130 /
-−0,265). Bu cümle boyut avantajından gelmiyor: `uzman-hb2` `auto`dan **%0,030
-küçük** dosya teslim etti, yani `auto` daha az bayt harcayıp daha yüksek puan
-aldı. T111'in kendi en dar eşleşmesi `uzman-hb3` (−%0,08, kilitli ortalama açığı
-+0,083) alınsa bile bugünkü −0,266 onun da tersi.
+öndeydi (+0,097 / +0,477 / +0,099); bugün `auto`nun **her iki koşumuna göre de**
+altı ölçünün altısında geride. Büyüklük saçılımın iki ile beş katı, yani
+tekrarlanabilirliğin içine düşmüyor. Boyut avantajından da gelmiyor:
+`uzman-hb2` birinci koşumdan **%0,030 küçük**, ikinciden %0,93 büyük; erişim
+eğimiyle (K3) ikinci durumdaki katkı 0,006 puan, −0,321'i çevirmiyor. T111'in
+kendi en dar eşleşmesi `uzman-hb3` (−%0,08, kilitli ortalama açığı +0,083)
+alınsa bile bugünkü işaret onun da tersi.
 
-**Uzman ayarı: hâlâ önde, açık +0,074 ortalama / +0,079 p10 / +0,075 harmonik.**
-İşaret dönmedi. Elle preset 4 + `-g 300` seçmek `auto`yu hâlâ geçiyor; geçtiği
-mesafe +0,437'den +0,074'e, altıda birine indi. **"Yakaladık" yazılmıyor, çünkü
-işaret dönmedi.**
+**Uzman ayarı: açık kapandı ama işaret dönmedi — ve artık ölçülemiyor.**
++0,437'den +0,074'e indi, altıda bire. Ne var ki +0,074, `auto`nun kendi
+koşumdan koşuma saçılımı olan 0,055'in hemen üstünde; ikinci `auto` koşumuna
+göre açık +0,019'a düşüyor ve **p10'da işaret −0,042 ile değişiyor.** Yani
+uzmanın hangi tarafta olduğu artık hangi `auto` koşumunu aldığınıza bağlı.
+
+Bu yüzden **"yakaladık" da "geçtik" de yazılmıyor**: işaretin döndüğü
+gösterilemedi. Yazılabilen şu: **uzman açığı ölçümün ayırt etme gücünün altına
+indi.** Bunu bir "eşitlik" iddiasına çevirmek için `auto`nun saçılımını
+daraltmak ya da her iki tarafı çok kez tekrarlayıp ortalamak gerekir; **bu
+turda yapılmadı.**
 
 <!--K2NOKTA-->
 
@@ -485,3 +536,66 @@ salt bit bütçesi olmadığını söylüyor; daha ötesi ölçülmedi.
 **Bu bölüm T111'in tabanındaki (`3688336`) dosyalardan ölçüldü**, bugünkü
 `main`'den değil. `y2`/`y3` bugünkü motorla yeniden üretilmedi; `-force_key_frames`
 zaten motorun kullandığı bir mekanizma değil.
+
+---
+
+## Ölçülmedi
+
+Bu belgeye giren her sayı yukarıdaki komutlardan çıktı. Aşağıdakiler **bu turda
+ölçülmedi**; hiçbiri hakkında bu belgede cümle kurulmadı.
+
+**Ölçüm kapsamı**
+
+- **Tek kaynak.** Her sayı `parca-2.mkv` üzerinden. Başka içerikte — daha sık
+  kesmeli, daha hareketli, SDR, düşük kare hızlı — aynı işaretin çıkacağı
+  ölçülmedi. K2'nin "geçtik" cümlesi bu kaynak için doğrudur, genel bir iddia
+  değildir.
+- **Süre.** Makine paylaşımlıydı, on ajan koşuyordu. Bu belgede hiçbir süre
+  sayısı yok; kodlama ya da ölçüm hızı hakkında hiçbir şey söylenmiyor.
+- **Kilitsiz sayılar.** Sözleşme geçersiz saydığı için üretilmedi. K5'in
+  kilitli/kilitsiz karşılaştırması yalnız T111'in arşivinden okundu, yeni
+  kilitsiz kodlama yapılmadı.
+
+**GOP ve `scd`**
+
+- **`scd=1`'in ne değiştirdiği.** Çıktının bayt bayt değiştiği ölçüldü
+  (`cmp` → `differ: char 647`), anahtar kare yerleşiminin değişmediği ölçüldü,
+  kaliteye etkisinin 0,012'nin altında olduğu ölçüldü. **Hangi kararı
+  değiştirdiği ölçülmedi.**
+- **`-force_key_frames` bu turda hiç koşturulmadı.** T111 bu ikisinin ayrı
+  mekanizmalar olduğunu işaretlemişti; bu belgedeki hiçbir `scd` cümlesi
+  `-force_key_frames` hakkında bir şey söylemiyor.
+- **Sahne haritalı `-g`.** Üretim yolu haritayı vermiyor, bu yüzden ölçülen
+  `-g 600` haritasız varsayılan. Haritanın gerçekten bağlandığı bir koşumda
+  aralığın ne olacağı **ölçülmedi**.
+- **Ara `-g` değerleri.** 120, 300, 600 ölçüldü; aradaki değerler ölçülmedi,
+  eğrinin şekli hakkında bir şey söylenmiyor.
+
+**Boyut eşliği**
+
+- **x265 tarafının boyut eğimi.** İki nokta arasında oynamadığı görüldü
+  (95,759 → 95,759, %0,54 boyut farkı), ama iki noktayla eğim sayısı verilmedi.
+- **AV1 eğiminin geçerlilik aralığı.** Eğim yalnız %1'lik bir aralıkta, yalnız
+  preset 4 / `-g 300` koşumlarında ölçüldü. Daha geniş aralıkta ya da başka
+  ayarda doğrusal kaldığı ölçülmedi.
+- **Daha dar band.** AV1 tarafı −%0,414'te, HandBrake tarafı −%0,030'da
+  bırakıldı. Dördüncü/üçüncü denemeye gidilmedi.
+
+**`y2`/`y3` kuyruğu (K5)**
+
+- **Çöküş bloğunun sebebi.** 56,870 s'den sonraki 212 karenin `y2`/`y3`'te neden
+  73,49'a düştüğü **ölçülmedi**. Ölçülen: bu bloğun var olduğu, kilidin onu
+  yalnız +0,019 oynattığı, ve p10 kotasının %58'ini doldurduğu.
+
+**Düzenek**
+
+- **`tools/VidShrink.Ab` bu turda çağrılmadı.** Okundu; verdiği ölçü kümesi bu
+  sözleşmenin istediği beş sayıdan dördünü veriyor (`<1` kare sayısı yok) ve
+  HandBrake rakibi farklı bir yapılandırmada (`-e x265` 8 bit, `-a none`,
+  `H.265 MKV 1080p30` ön ayarı) — T111 zinciriyle karşılaştırılabilir değil.
+  Bağımsız çapraz kontrol olarak koşturulması ölçülmedi.
+- **`auto` planının kararsızlığı.** Aynı hedefte (16 MB) iki plan-only koşumu
+  farklı plan verdi: biri `p010le hdrfilt=True`, diğeri `yuv420p hdrfilt=False`.
+  Sonda kodlamaları makine yükü altında koştuğu için karar kayıyor. **Kararın
+  hangi eşikte döndüğü ölçülmedi**; K1'in `auto` satırının hangi planla
+  üretildiği yukarıda yazılı.
