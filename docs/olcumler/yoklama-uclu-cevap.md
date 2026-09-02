@@ -27,9 +27,13 @@ kendisi artık doğru değil çünkü T2 üretim davranışını değiştirdi.
 | `7555059` | Dört kusur düzeltildi — dört ölçü **yeşile** döndü |
 | `e7246f0` | T9 ffmpeg'siz ikiz ölçü + `surucu-yoklugu` sütun etiketi |
 | `fb6f782` | T1 ölçüsü geçidin iki cevabını kanıt dosyasına yazıyor |
+| `d150801` | Bölüm yorumu kaldırıldı (depo kuralı: kodda yorum yok) |
+
+Beş kod/ölçü commit'i; sayısı elle sayıldı. Kalanlar yalnız bu raporu ve
+`baslat-kilidi.md`yi yazıyor (`b2299bb` ve sonrası).
 
 `src/VidShrink.App/MainWindow.axaml.cs` bu turda son kez `7555059`de değişti;
-aşağıdaki satır numaraları `7555059`den `fb6f782`ye kadar aynı.
+aşağıdaki satır numaraları `7555059`den dalın ucuna kadar aynı.
 
 ## T1 — Geçidin girişi üçüncü cevabı içeri alıyor
 
