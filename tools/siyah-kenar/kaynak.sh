@@ -20,7 +20,7 @@ uret () {
         -vf "$vf" $ARA_KOD $RENK "$hedef" ;;
     gurultulu)
       ffmpeg -hide_banner -loglevel error -nostdin -ss "$ss" -t "$sure" -i "$HAVUZ/$taban" \
-        -f lavfi -t "$sure" -i "color=c=black:s=1920x1080:r=60,format=yuv420p10le,noise=alls=9:allf=t+u" \
+        -f lavfi -t "$sure" -i "color=c=#0c0c0c:s=1920x1080:r=60,format=yuv420p,noise=alls=10:allf=t+u,format=yuv420p10le" \
         -filter_complex "[0:v]crop=1920:$h:0:$yoff[akt];[1:v][akt]overlay=0:$ust:format=yuv420p10[v]" \
         -map "[v]" $ARA_KOD $RENK "$hedef" ;;
     degisken)

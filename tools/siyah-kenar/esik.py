@@ -18,7 +18,7 @@ def ke_uret():
     a = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin",
          "-ss", "20", "-t", "20", "-i", HAVUZ + "/parca-1.mkv",
          "-f", "lavfi", "-t", "20",
-         "-i", "color=c=#141414:s=1920x1080:r=60,format=yuv420p10le,noise=alls=24:allf=t+u",
+         "-i", "color=c=#181818:s=1920x1080:r=60,format=yuv420p,noise=alls=22:allf=t+u,format=yuv420p10le",
          "-filter_complex",
          "[0:v]crop=1920:804:0:138[akt];[1:v][akt]overlay=0:120:format=yuv420p10[v]",
          "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "12",

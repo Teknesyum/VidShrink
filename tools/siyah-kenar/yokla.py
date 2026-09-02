@@ -46,8 +46,15 @@ def birlesim(kutular):
 
 def main():
     os.makedirs(CIK, exist_ok=True)
+    hedef = CIK + "/cropdetect.json"
     sonuc = {}
+    if os.path.exists(hedef):
+        with open(hedef, encoding="utf-8") as f:
+            sonuc = json.load(f)
+    istenen = sys.argv[1:] or list(GERCEK)
     for ad in GERCEK:
+        if ad not in istenen:
+            continue
         kayit = {"gercek": GERCEK[ad], "nokta": {}, "yayilmis": None, "tam": None,
                  "limit": {}}
         for ss in (0, 5, 10, 15):
@@ -67,7 +74,7 @@ def main():
             kayit["limit"][str(lim)] = k
         sonuc[ad] = kayit
         print(ad, "bitti", flush=True)
-    with open(CIK + "/cropdetect.json", "w", encoding="utf-8") as f:
+    with open(hedef, "w", encoding="utf-8") as f:
         json.dump(sonuc, f, indent=1)
     print("YOKLA BITTI")
 

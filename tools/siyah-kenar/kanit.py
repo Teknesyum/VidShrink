@@ -1,4 +1,4 @@
-import hashlib, json, os, re, subprocess
+import hashlib, json, os, re, subprocess, sys
 
 KOK = "C:/Users/Administrator/Desktop/Projeler/Vidshrink"
 IS = KOK + "/.claude/worktrees/T134/.calisma/t134"
@@ -53,8 +53,15 @@ def framemd5(yol, h, y):
 
 def main():
     os.makedirs(CIK, exist_ok=True)
+    hedef = CIK + "/kaynak-kanit.json"
     out = {}
+    if os.path.exists(hedef):
+        with open(hedef, encoding="utf-8") as f:
+            out = json.load(f)
+    istenen = sys.argv[1:] or list(AKTIF)
     for ad, (h, y) in AKTIF.items():
+        if ad not in istenen:
+            continue
         yol = KAYNAK + "/" + ad + ".mkv"
         pr = ffprobe(yol)
         st = pr["streams"][0]
@@ -87,7 +94,7 @@ def main():
         }
         out[ad] = kayit
         print(ad, "bitti", flush=True)
-    with open(CIK + "/kaynak-kanit.json", "w", encoding="utf-8") as f:
+    with open(hedef, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=1)
     print("KANIT BITTI")
 

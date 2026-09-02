@@ -114,15 +114,21 @@ def k2_tablo(yokla):
     return "\n".join(r)
 
 
-def medyan_kutu(tekil):
-    k = [t for t in tekil if t]
+def mod_kutu(tekil):
+    k = [tuple(t) for t in tekil if t]
     if not k:
         return None
-    return [sorted(x[i] for x in k)[len(k) // 2] for i in range(4)]
+    sayim = {}
+    for x in k:
+        sayim[x] = sayim.get(x, 0) + 1
+    en = max(sayim.values())
+    aday = [x for x in sayim if sayim[x] == en]
+    aday.sort(key=lambda x: x[0] * x[1], reverse=True)
+    return list(aday[0])
 
 
 def k2b_tablo(yokla):
-    r = ["| Kaynak | Gercek sinir | 10 tekil karenin birlesimi | 10 tekil karenin medyani | Tam kare donen kare sayisi |",
+    r = ["| Kaynak | Gercek sinir | 10 tekil karenin birlesimi | 10 tekil karenin modu (esitlikte genis olan) | Tam kare donen kare sayisi |",
          "|---|---|---|---|---|"]
     for ad in LETTERBOX + KENARSIZ + ["VD"]:
         d = yokla[ad]
@@ -130,7 +136,7 @@ def k2b_tablo(yokla):
         bozuk = sum(1 for t in tekil if t and tuple(t) == (1920, 1080, 0, 0))
         r.append("| %s | %s | %s | %s | %d/%d |" % (
             ADLAR[ad], kutu_str(tuple(d["gercek"])), kutu_str(d["yayilmis"]["kutu"]),
-            kutu_str(medyan_kutu(tekil)), bozuk, len(tekil)))
+            kutu_str(mod_kutu(tekil)), bozuk, len(tekil)))
     return "\n".join(r)
 
 

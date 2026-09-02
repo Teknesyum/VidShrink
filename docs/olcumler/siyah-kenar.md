@@ -83,6 +83,12 @@ puanlanır.
   puan alır ve puanın büyük kısmı karenin kolay dörtte birinden gelir; bu,
   aktif alandaki gerçek farkı **seyreltir**. Karar bu yüzden A'ya bağlandı.
 
+**Ölçünün kendi künyesi.** Model `vmaf_v0.6.1neg`, `n_threads=8`, ölçek
+değişikliği yok — iki kol da kendi doğal çözünürlüğünde puanlanır. A yönteminde
+bu çözünürlük 1920xH'dir (örn. 1920x804), yani modelin varsaydığı 1080p izleme
+düzeninden biraz farklıdır; ama **iki kol da aynı çerçevede** olduğu için
+aradaki fark bundan etkilenmez. B yönteminde iki kol da 1920x1080'dedir.
+
 **İkisinin de kaçırdığı.** VMAF-NEG algısal bir vekildir. Kırpmanın asıl
 kullanıcı faydası — aynı ekranda daha büyük görüntü, daha az ölü piksel —
 oynatma tarafındadır ve bu belgede ölçülmüyor.
@@ -100,6 +106,44 @@ Bekliyor.
 
 ## K1 — Kaynak sınıfı
 
+Paylaşılan havuzda (`.calisma/kaynak/`) letterbox'lı kaynak yok: havuzdaki üç
+parça da 1920x1080, kenarsız, 60 fps, HEVC 10 bit HDR PQ. Kaynak sınıfı bu
+yüzden havuzdan **üretildi**; havuza yazılmadı, dokunulmadı.
+
+**Üretim yöntemi** (`tools/siyah-kenar/kaynak.sh`): her kaynak, havuzdaki bir
+parçanın **20.–40. saniyesinden** alınır. Görüntü önce hedef en-boy oranının
+yüksekliğine **kırpılır** (`crop=1920:H:0:(1080-H)/2`) — yani aktif alan gerçek
+içeriktir, dikey olarak sıkıştırılmış değil — sonra `pad` ile 1920x1080 kutuya
+siyah bantla geri konur. Ara kodlama libx264 CRF 12, preset veryfast,
+yuv420p10le, keyint 120, sahne kesme kapalı, ses yok; renk künyesi kaynağınkiyle
+aynı (bt2020nc / smpte2084 / pc).
+
+Kaynağa özel işler:
+
+- **KA** — 2,39:1. Başına 1,5 saniyelik siyahtan açılma (`fade=t=in`) konuldu.
+  Gerçek filmlerde olan bu açılma, K2'nin örnekleme yeri sorusunun sınama
+  düzeneğidir.
+- **KD** — 2,39:1, **gerçek dünya kusuru taşıyan kaynak.** İki kusuru birden
+  taşır: (1) bant tam siyah değil — #0c0c0c zemine 8 bit alanında üretilmiş,
+  zamanla değişen gürültü bindirildi (`noise=alls=10:allf=t+u`), sonra 10 bite
+  çevrildi; (2) bant genişliği simetrik değil, üstte 120 altta 156 piksel.
+  Aktif alanı KA ile aynı içerikten geldiği için KA–KD çifti yalnız bandın
+  kusurunu yalıtır.
+
+  **Bu kaynak bir kez yeniden üretildi.** İlk üretimde gürültü doğrudan 10 bit
+  düzlemde uygulanmıştı; `noise` filtresinin genliği 10 bit ölçekte
+  değerlendirildiği için bant neredeyse siyah kaldı (YAVG 6,8/1023). Gürültü
+  8 bit alanında üretilip 10 bite çevrilerek düzeltildi. KD'nin bütün
+  kodlamaları ve yoklamaları yeni kaynakla baştan koşuldu; bu belgedeki KD
+  sayıları yalnız yeni kaynaktandır. Eşik (K4) bu düzeltmeden önce
+  commit'lenmişti ve değişmedi.
+- **VD** — ilk 10 saniyesi 2,39:1 letterbox, son 10 saniyesi tam kare. Bant
+  genişliğinin sahne içinde değiştiği kaynak; K5(b) bunu kullanır.
+- **NA, NB** — kenarsız denetim kaynakları. Aynı zaman aralığı, aynı ara
+  kodlama, hiçbir geometri işlemi yok. K5(a) bunları kullanır.
+- **KE** — yalnız `limit` taraması için, ağır gürültülü bantla üretildi
+  (zemin #181818, 8 bit alanında `noise=alls=22`). K3 ızgarasına girmez.
+
 <!-- BETIK-K1-BASLANGIC -->
 Bekliyor.
 <!-- BETIK-K1-BITIS -->
@@ -115,7 +159,8 @@ Bekliyor.
 10 tek kareyi ayrı ayrı yoklayıp sonuçları birleştirmek (HandBrake'in önizleme
 taraması bu şekle benziyor) tek bir tamamen siyah kareye karşı kırılgandır:
 siyah karede `cropdetect` tam kareyi döndürür, birleşim de kırpmayı iptal eder.
-Aynı on kareden **medyan** almak bu kareyi yutar. İkisi de aşağıda.
+Aynı on kareden **en sık geçen kutuyu** almak (eşitlikte geniş olanı seçerek)
+o kareyi yutar. İkisi de aşağıda.
 
 <!-- BETIK-K2B-BASLANGIC -->
 Bekliyor.

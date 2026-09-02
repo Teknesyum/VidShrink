@@ -28,7 +28,8 @@ def vmaf(dist, ref, dvf, rvf, log):
 def oku(log):
     with open(log, encoding="utf-8") as f:
         d = json.load(f)
-    p = sorted(k["metrics"]["vmaf_neg"] for k in d["frames"])
+    anahtar = "vmaf_neg" if "vmaf_neg" in d["frames"][0]["metrics"] else "vmaf"
+    p = sorted(k["metrics"][anahtar] for k in d["frames"])
     n = len(p)
     i = int(0.10 * (n - 1))
     return {"kare": n, "ort": round(sum(p) / n, 3), "p10": round(p[i], 3),
