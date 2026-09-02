@@ -245,10 +245,16 @@ Kareler indekse kilitlenince aynı dosyalarda PSNR 17,2 → **44,74 dB**.
 | AV1 yeni | 92,391 | 0 | **95,655** |
 | x265 yeni | 76,219 | 0 | 95,793 |
 
-**AV1 ↔ x265 harmonik farkı 39,446 → 0,138.** İki kodlayıcı bu kaynakta başa
-baş. Kodlayıcı seçim kuralı (5. basamak) artık açılabilir — ama 39,4 değil
-**0,14** puanla; yani o basamağın gerekçesi buharlaştı, yeniden gerekçe
-gerekiyor.
+**AV1 ↔ x265 harmonik farkı 39,446 → 0,138.** Kodlayıcı seçim kuralı
+(5. basamak) artık açılabilir — ama 39,4 değil **0,14** puanla; yani o
+basamağın gerekçesi buharlaştı, yeniden gerekçe gerekiyor.
+
+> **Düzeltme (T0, 2026-09-02, T111 ölçümü):** burada duran *"iki kodlayıcı bu
+> kaynakta başa baş"* cümlesi **geri çekildi**. Karşılaştırılan x265 dosyası
+> AV1'inkinden **%6,2 daha büyük**; eşit boyutta ölçülmemiş iki dosyanın kalite
+> farkı "başa baş" diye okunamaz. 0,138'lik fark duruyor, yorumu düşüyor.
+> T111 aynı düzeltmeyi `docs/olcumler/olcu-gecerliligi.md` içinde iki yerde
+> yaptı; bu satır onun `owns` sınırının dışındaydı.
 
 Kusur **AV1'e özgü değil**: `libsvtav1`, `libx264`, `libx265` üçü de
 `start_time`'ı düşürüyor, HandBrake düşürmüyor. AV1 yalnızca T102'de ölçülen
