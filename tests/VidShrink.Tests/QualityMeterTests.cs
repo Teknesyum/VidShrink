@@ -1,5 +1,6 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -437,19 +438,49 @@ public sealed class QualityMeterTests
     }
 
     [Fact]
-    public void TrailingUnitShorterThanHalfASecondIsDropped()
+    public void TrailingUnitShorterThanHalfASecondJoinsTheUnitBeforeIt()
     {
         var scores = Enumerable.Repeat(100.0, 975).ToArray();
         for (var i = 960; i < 975; i++) scores[i] = 0.0;
 
-        var (worst, at) = QualityMeter.WorstScene(scores, 60, 0);
+        var unit = QualityMeter.WorstSceneUnit(scores, 60, 0);
 
-        Assert.Equal(100.0, worst, 6);
-        Assert.Equal(0.0, at, 6);
+        Assert.Equal(12000.0 / 135.0, unit.Score, 6);
+        Assert.Equal(14.0, unit.StartSeconds, 6);
+        Assert.Equal(2.25, unit.UnitSeconds, 6);
     }
 
     [Fact]
-    public void SceneShorterThanHalfASecondIsNotTheWorstScene()
+    public void LeadingUnitShorterThanHalfASecondJoinsTheUnitAfterIt()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 0; i < 12; i++) scores[i] = 0.0;
+
+        var unit = QualityMeter.WorstSceneUnit(scores, 60, 12.5, MapWithCuts(30.0, 12.7, 15.0));
+
+        Assert.Equal(12.5, unit.StartSeconds, 6);
+        Assert.Equal(92.0, unit.Score, 6);
+    }
+
+    [Fact]
+    public void EveryFrameLandsInExactlyOneMeasuredUnit()
+    {
+        var scores = Enumerable.Repeat(100.0, 975).ToArray();
+
+        for (var i = 0; i < scores.Length; i++)
+        {
+            var probe = scores.ToArray();
+            probe[i] = 0.0;
+
+            var unit = QualityMeter.WorstSceneUnit(probe, 60, 0);
+
+            Assert.True(unit.Score < 100.0,
+                $"a zero at frame {i} left the measurement untouched");
+        }
+    }
+
+    [Fact]
+    public void SceneShorterThanHalfASecondIsNotTheWorstSceneOnItsOwn()
     {
         var scores = Enumerable.Repeat(100.0, 600).ToArray();
         for (var i = 0; i < 12; i++) scores[i] = 0.0;
@@ -459,6 +490,89 @@ public sealed class QualityMeterTests
 
         Assert.Equal(40.0, worst, 6);
         Assert.Equal(15.0, at, 6);
+    }
+
+    [Fact]
+    public void TheProductionMeasurementEntryPointCanCarryASceneMap()
+    {
+        var carriers = typeof(QualityMeter)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.Name is "MeasureAsync" or "MeasureWindowAsync")
+            .Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(SceneMap)))
+            .Select(m => m.Name)
+            .ToList();
+
+        Assert.True(carriers.Count > 0,
+            "no production measurement entry point accepts a SceneMap, so the map-aware arm of "
+            + "WorstScene can only ever be reached from tests");
+    }
+
+    [Fact]
+    public void TheProductionAggregationHonoursTheMapItIsGiven()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var withoutMap = QualityMeter.AggregateVmaf(scores, 60, 0);
+        var withMap = QualityMeter.AggregateVmaf(scores, 60, 0, MapWithCuts(10.0, 2.5, 5.5));
+
+        Assert.Equal(withoutMap.Mean, withMap.Mean, 6);
+        Assert.Equal(55.0, withoutMap.WorstScene, 6);
+        Assert.Equal(40.0, withMap.WorstScene, 6);
+        Assert.Equal(2.0, withoutMap.WorstSceneStartSeconds, 6);
+        Assert.Equal(2.5, withMap.WorstSceneStartSeconds, 6);
+    }
+
+    [Fact]
+    public void TheWorstUnitReportsItsOwnLengthNotTheFixedWindow()
+    {
+        var reporters = typeof(QualityMeter)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Where(m => m.ReturnType.GetProperties().Any(p => p.Name == "UnitSeconds"))
+            .Select(m => m.Name)
+            .ToList();
+
+        Assert.True(reporters.Count > 0,
+            "nothing reports how long the winning unit actually was, so SceneWindowSeconds can "
+            + "only be filled from the constant 2.0 whichever arm ran");
+    }
+
+    [Fact]
+    public void TheReportedUnitLengthSeparatesTheTwoArms()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var fixedArm = QualityMeter.WorstSceneUnit(scores, 60, 0);
+        var mapArm = QualityMeter.WorstSceneUnit(scores, 60, 0, MapWithCuts(10.0, 2.5, 5.5));
+
+        Assert.Equal(2.0, fixedArm.UnitSeconds, 6);
+        Assert.Equal(3.0, mapArm.UnitSeconds, 6);
+        Assert.NotEqual(fixedArm.UnitSeconds, mapArm.UnitSeconds);
+    }
+
+    [Fact]
+    public void TheClipShorterThanOneWindowReportsItsOwnLengthNotTwoSeconds()
+    {
+        var scores = new[] { 80.0, 60.0, 40.0 };
+
+        var unit = QualityMeter.WorstSceneUnit(scores, 60, 0);
+
+        Assert.Equal(0.05, unit.UnitSeconds, 6);
+        Assert.NotEqual(QualityMeter.SceneWindowSeconds, unit.UnitSeconds);
+    }
+
+    [Fact]
+    public void ACollapseInAShortTrailingUnitStillReachesTheMeasurement()
+    {
+        var scores = Enumerable.Repeat(100.0, 975).ToArray();
+        for (var i = 960; i < 975; i++) scores[i] = 0.0;
+
+        var (worst, _) = QualityMeter.WorstScene(scores, 60, 0);
+
+        Assert.True(worst < 100.0,
+            $"the last 0.25 s of the clip scored zero and the measurement still reported {worst}: "
+            + "the trailing remainder is outside the metric");
     }
 
     [Fact]

@@ -1,0 +1,17 @@
+{
+  "contractId": "T142",
+  "auditorRunId": "a9a66ae4737994654",
+  "headSha": "c88b69ff7dffa4163e250754c34621f8acd47369",
+  "diffHash": "ba08bfe2d36e0640faf1fac068f46b0ab4b7420e1d70a1d9ebba70ac4010f286",
+  "owns": [
+    "src/VidShrink.Ffmpeg/CalibrationProbe.cs",
+    "tests/VidShrink.Tests/CalibrationProbeTests.cs",
+    "tests/VidShrink.Tests/KalibrePencereTests.cs",
+    "docs/olcumler/kalibre-pencere.md"
+  ],
+  "verification": [
+    "GECTI, tur 2. U4 tuttu: dal ile tur 1 arasindaki tek fark docs/olcumler/kalibre-pencere.md, kod degismedi (git diff --name-only tek dosya). Tablonun 42 hucresinin 42'si bagimsiz uretecle dogrulandi - denetci Kaynak/DuzHarita/DegiskenHarita'yi KalibrePencereTests.cs:9-56'dan izole kopyaya alip CalibrationProbe.Windows'u kendisi cagirdi, yapicinin uretecine bakmadi. Tur 1'in KRITIK'i olan 2: [4 6] gitti; 8 sn satirinin uc hucresi de tuttu. n=2..24 taramasi da dogrulandi: 4: [0 2 4 6] yalniz n=4 ve n=8'de, 2: [4 6] hicbir n'de yok. sceneCuts sayimi ucuncu kez ve UCUNCU YONTEMLE olculdu - desen degil kapali kume: agactaki her PlanWindows cagrisi cikarildi (26), imzanin 4. parametresine gore ayrildi, 9 dolu + 6 acikca null + 11 uc-ya-da-az-argumanli = 26. Yapicinin dokuz sayisi tuttu; tur 1 denetcisinin kacirdigi iki yer (CalibrationProbe.cs:141, ComplexityProbeTests.cs:184) gozle dogrulandi, ikisi de gercek. :383'un cagri degil metot basligi oldugu da dogru. Fixture bolumu yeniden uretilebilirligi tasiyor: uretec YALNIZ :165-178 okunarak yazildi, hicbir hucreye bakilmadan 42/42 ilk kosumda tuttu. Kosum 0 basarisiz / 65 basarili / 3 atlanan / 68 toplam; atlanan uc LiveSourceFact korumali. KRITIK yok. Borc: (1) K4 uzunluk listesi :132 hala ilan edilmemis fixture'dan - yazili [2 2 2 2] n=8'den geliyor, ilan edilen DegiskenHarita(sure,20) ile [2 2] cikiyor; U1'in actigi bozuklugun ayni sinifi komsu blokta, ama tasiyici iddia (tum uzunluklar 2.0) her n'de dogru kaliyor, yanlis olan pencere sayisi. (2) Ayni iki cagri yeri iki listede iki farkli satirla aniliyor (:74-75 arguman satiri, :94/:96 cagri baslangici); cok satirli cagrida hangi satirin anildigi yazilmamis. (3) :302-304 'agirlikca ondeki ikisi' ifadesi olcuye degil sezgiye dayaniyor; olgu dogru (Fast son ikisini aliyor). (4) :237 dizgi: cividiyor -> civiliyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T17:47:34.956Z"
+}

@@ -65,6 +65,7 @@
   "main.quality.below-floor": "The requested quality is below the floor: no target smaller than {0} MB is produced, and that target already reaches {1}/100.",
   "main.quality.above-ceiling": "The requested quality is better than the source itself: the ceiling is {0} MB and the quality reached there is {1}/100.",
   "main.quality.tip.empty": "Load a video and this target's predicted quality score appears here.",
+  "main.quality.target": "Target",
   "main.quality.predicted": "Predicted quality",
   "main.quality.loss": "Loss against the source",
   "main.quality.loss-points": "{0} points",

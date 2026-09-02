@@ -68,6 +68,7 @@ public sealed class EncodePlan
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
+    [JsonIgnore] public bool TurboFirstPass { get; set; }
     [JsonIgnore] public double BitrateBias { get; set; } = 1.0;
     [JsonIgnore] public double? EffectiveTargetMb { get; set; }
 
