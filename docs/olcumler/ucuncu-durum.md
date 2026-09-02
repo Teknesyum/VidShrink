@@ -51,6 +51,25 @@ EncoderProbeState EncoderState(string codec) =>
     WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
 ```
 
+Gercekten yoklayan taraf bunu ezer ve **surec dogurmadan** cevap verir:
+
+```
+public EncoderProbeState EncoderState(string codec)
+{
+    lock (_probed)
+        if (_probed.TryGetValue(codec, out var cached)) return cached.State;
+
+    return HasEncoder(codec) ? EncoderProbeState.Unmeasured : EncoderProbeState.NotWorking;
+}
+```
+
+`Hdr10State` ayni kurali izliyor. Ayrim su: `WorksAsEncoder` / `Probe` /
+`Hdr10PixelFormat` bilmedigini **ogrenmek icin** ffmpeg cagirir; `EncoderState` /
+`Hdr10State` yalnizca **zaten bilineni okur**. Bu ikincisi arayuz is parcacigindan
+cagrilabilir ve T130'un sorunu tam burasi: `Recalculate` her hesapta canli ffmpeg
+doguruyor. `Unmeasured` "bu makinede calismiyor" degil "henuz bakmadik" demek; olcumu
+yaptirmak isteyen taraf `Probe`'u arka planda kosturur.
+
 ### Neden bu
 
 - `EncoderProbeResult`'in pozisyonel imzasi (`string, bool, long`) korundu. `Succeeded`
@@ -114,13 +133,27 @@ Iki yonlu mutasyon — `ProbeEncoder`'in sonuc esleme satiri degistirildi:
 
 | mutasyon | sonuc |
 |---|---|
-| A: olculemedi "calismiyor" kovasina dusuruldu (T94 oncesi davranis) | `AnUnmeasuredProbe...` **KIRMIZI**, digeri yesil (1 basarisiz / 11) |
-| B: reddedildi "olculemedi" kovasina dusuruldu | `AMeasuredRejection...` **KIRMIZI**, digeri yesil (1 basarisiz / 11) |
+| A: olculemedi "calismiyor" kovasina dusuruldu (T94 oncesi davranis) | `AnUnmeasuredProbe...` **KIRMIZI**, digeri yesil (1 basarisiz / 15) |
+| B: reddedildi "olculemedi" kovasina dusuruldu | `AMeasuredRejection...` **KIRMIZI**, digeri yesil (1 basarisiz / 15) |
 
-Iki durum ayni kovaya dusunce her seferinde tam olarak bir olcu kirildi.
+Iki durum ayni kovaya dusunce her seferinde tam olarak bir olcu kirildi. Sekiz
+mutasyonun sekizi de dalin ucundaki agaca (`5ee8408`) karsi yeniden kosturuldu; sayilar
+o kosumlarindir, `EncoderCapabilitiesTests` suiti 15 olcu.
 
 Ucuncu olcu `AnEncoderMissingFromTheListIsMeasuredNotUnmeasured`: ffmpeg kodlayiciyi hic
 listelemiyorsa bu **olculmus** bir yokluktur, surec bile dogurulmaz.
+
+Dorduncu olcu `ReadingTheThirdStateNeverSpawnsAProcess`: ucuncu durumun yuzu okunurken
+yoklama kosmuyor. Iki yoklama kancasi da `InvalidOperationException` firlatacak sekilde
+kuruluyor; `EncoderState` ve `Hdr10State` yine de cevap veriyor.
+
+| mutasyon | sonuc |
+|---|---|
+| G: `EncoderState` govdesi `Probe(codec).State`e delege edildi | `ReadingTheThirdState...` ve `AnUnmeasuredProbe...` **KIRMIZI** (2 basarisiz / 15) |
+| H: `Hdr10State` govdesi `Hdr10Probe`a delege edildi | `ReadingTheThirdState...` **KIRMIZI**, digerleri yesil (1 basarisiz / 15) |
+
+G'de ikinci olcunun de kirilmasi beklenen: delege edilen `EncoderState` yoklamayi bir kez
+daha kosturuyor, `AnUnmeasuredProbe...`in sayaci 2 yerine 3 goruyor.
 
 ## K5 — Kalan kacaklarin kapanisi
 
@@ -155,12 +188,14 @@ HDR yolunun ucuncu durumu uc olcuyle tutuluyor:
 
 | mutasyon | sonuc |
 |---|---|
-| E: `case Accepted: return (pixelFormat, false)` (T129 oncesi hali) | `AnHdr10Acceptance...` **KIRMIZI** (1 basarisiz / 14) |
-| F: olculemeyen HDR sonucu da onbellege yaziliyor | `Hdr10StateSeparates...` **ve** `AnHdr10Acceptance...` **KIRMIZI** (2 basarisiz / 14) |
+| E: `case Accepted: return (pixelFormat, false)` (T129 oncesi hali) | `AnHdr10Acceptance...` **KIRMIZI** (1 basarisiz / 15) |
+| F: olculemeyen HDR sonucu da onbellege yaziliyor | `Hdr10StateSeparates...` **ve** `AnHdr10Acceptance...` **KIRMIZI** (2 basarisiz / 15) |
 
-Kabul edilen bicim, daha onceki bicim olculemedigi icin muhurlenmese bile
-`Hdr10State` **`Working`** dondurur: calistigi olculdu, muhurlenmemesi daha iyi bir
-bicimin olculememesindendir.
+Bu kabul **cagirana donuyor** (`Hdr10PixelFormat` bicimi verir) ama onbellege
+girmedigi icin `Hdr10State` onu `Working` diye **okuyamaz**: `Hdr10State` yalnizca
+muhurlenmis bilgiyi okur, muhurlenmemis kabul `Unmeasured` gorunur. Bilerek boyle: iki
+yuzden biri "su an ne kullanabilirim", digeri "neyi kesin biliyorum" sorusuna cevap
+veriyor ve ikincisi surec dogurmadigi icin ancak muhurlenmis olani bilebilir.
 
 **Olcusuz kapanis:** 3 numaranin (`Load` / `RunCapture` / `Instance`) uc degisikligi de
 **olcuyle tutulmuyor.** `Instance` gercek ffmpeg'i cagiran statik bir tekildir; yeniden
@@ -190,15 +225,30 @@ Kilit mutasyonu (ffmpeg cagrisi yeniden kilidin icine alindi):
 
 | mutasyon | sonuc |
 |---|---|
-| C: `Probe` kilidi surec boyunca tutuyor (T129 oncesi kalip) | `ASlowProbeDoesNotBlockAnotherRead` **KIRMIZI** (1 basarisiz / 11); okuma 2 s bekledi |
-| D: `WarmEncoderOption` kilidi surec boyunca tutuyor | `ASlowOptionProbeDoesNotBlockCachedOptionReads` **KIRMIZI** (1 basarisiz / 11) |
+| C: `Probe` kilidi surec boyunca tutuyor (T129 oncesi kalip) | `ASlowProbeDoesNotBlockAnotherRead` **KIRMIZI** (1 basarisiz / 15); okuma 2 s bekledi |
+| D: `WarmEncoderOption` kilidi surec boyunca tutuyor | `ASlowOptionProbeDoesNotBlockCachedOptionReads` **KIRMIZI** (1 basarisiz / 15) |
 
 Her mutasyon tam olarak bir olcuyu kirdi; `ConcurrentProbesAgreeOnOneResult` her iki
 mutasyonda da yesil kaldi, yani daralan kilidin urettigi tek fark bekleme suresi.
 
 ## K7 — CI
 
-(kosum kimligi asagida)
+Kosum kapisi tam suiti kosuyor, yani CI yesili tam suit yesilidir.
+
+| kosum | commit | sonuc |
+|---|---|---|
+| `33604326223` | `0df815b` (K4-K6) | Failed 0, Passed 1146, Skipped 106, Total 1252 |
+| `33605024087` | `19941e1` (K5/4) | yesil |
+| `33605884286` | `5ee8408` (dalin ucu) | Failed 0, Passed 1150, Skipped 106, Total 1256 |
+
+`SplitDragTests` uc kosumun hicbirinde kirmizi cikmadi; T127'nin bildirdigi kirmizi bu
+dalda gorulmedi. Toplamin 1252 → 1256 artmasi T129'un ekledigi dort yeni olcudur.
+
+**Yerel tam suit kasitli olarak yarida kesildi.** Makinede yedi kardes ajan es zamanli
+`dotnet test` kosturuyordu (47 dotnet sureci); K6'nin zaman butceli yaris olculeri
+(`ReaderBudgetMs = 750`) boyle bir yukte kendiliginden kararsizdir ve yesil de kirmizi da
+kanit olmazdi. Tam suitin kaniti yalniz CI kosumudur; hedefli suit (`verify` filtresi,
+33 olcu) ve `EncoderCapabilitiesTests` (15 olcu) yerelde bosalmis makinede yesil kostu.
 
 ## Olculmeyenler
 
@@ -222,6 +272,13 @@ mutasyonda da yesil kaldi, yani daralan kilidin urettigi tek fark bekleme suresi
 - **`ReloadAfterFailureMs = 5000` bir olcuye dayanmiyor.** Gecici acilis hatasinin ne
   kadar surdugu olculmedi; sayi "kalici olmasin" kuralini saglayan keyfi bir alt sinir.
   Yeniden deneme maliyeti ffmpeg bulunamadiginda uc hizli firlatmadir.
+- **Arka plan yoklamasini kimin kosturacagi T129'da yok.** `EncoderState` artik surec
+  dogurmadigi icin hic yoklanmamis bir kodlayici surekli `Unmeasured` doner; onbellegi
+  isitacak cagriyi (`Probe`'u arka planda kosturmak) T129 yazmadi, sunulan yuzun boyle
+  bir cagiranla gercek makinede nasil davrandigi olculmedi. Isitma yolu T130'un.
+- **Yerel tam suit bu agacta tamamlanmadi.** Yukaridaki gerekceyle kesildi; tam suit
+  yesili CI'dan okunuyor. Yerel ve CI ortamlari (ffmpeg surumu ayni, NVENC yalniz yerelde)
+  farkli oldugu icin bu bire bir ayni kanit degildir.
 - **Yaris olculeri zamana bakiyor.** `ReaderBudgetMs = 750` ile `SlowProbeMs = 2000`
   arasindaki pay yuklu bir CI kosumunda daralabilir; olcu kararsizlasirsa payi buyutmek
   degil, dikisi baska turlu olcmek gerekir.
