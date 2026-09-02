@@ -56,7 +56,7 @@ public sealed class SceneMapTests
     }
 
     [Fact]
-    public void CutTimes_VarsayilanEsikOlculenBandaKilitli()
+    public void CutTimes_SabitEsikOlculenBandaKilitli()
     {
         var candidates = new[]
         {
@@ -64,7 +64,7 @@ public sealed class SceneMapTests
             new SceneScore(4.0, 0.110)
         };
 
-        var cuts = SceneMap.CutTimes(candidates, SceneMap.DefaultThreshold, 20.0);
+        var cuts = SceneMap.CutTimes(candidates, SceneMap.FixedThreshold, 20.0);
 
         Assert.Equal(new[] { 4.0 }, cuts);
     }
@@ -115,8 +115,13 @@ public sealed class SceneMapTests
         var varsayilan = SceneDetector.ScanArgs("girdi.mp4", "vstats.log");
         var acik = SceneDetector.ScanArgs("girdi.mp4", "vstats.log", 0.123);
 
-        Assert.Equal("0.05", TabanEsigi(varsayilan));
+        Assert.Equal("0.012", TabanEsigi(varsayilan));
         Assert.Equal("0.123", TabanEsigi(acik));
+        Assert.Equal("0.0002", TabanEsigi(SceneDetector.ScanArgs("girdi.mp4", "vstats.log", 0.0002)));
+        Assert.Equal(
+            SceneDetector.BaseThreshold,
+            double.Parse(TabanEsigi(varsayilan), CultureInfo.InvariantCulture),
+            9);
 
         Assert.Contains("girdi.mp4", varsayilan);
         Assert.Contains("vstats.log", varsayilan);
@@ -126,13 +131,16 @@ public sealed class SceneMapTests
     }
 
     [Fact]
-    public void ScanArgs_TabanEsigiKararElegininAltinda()
+    public void ScanArgs_TabanEsigiTureyenEsiginTabaniniAsmaz()
     {
         var taban = double.Parse(TabanEsigi(SceneDetector.ScanArgs("g.mp4", "v.log")), CultureInfo.InvariantCulture);
+        var kural = ThresholdRule.Measured;
 
-        Assert.True(taban < SceneMap.DefaultThreshold,
-            $"gunluge giren taban {taban}, karar elegi {SceneMap.DefaultThreshold}: "
-            + "taban karar eleginin ustune cikarsa esigi dusurmek etkisiz kalir.");
+        Assert.True(taban <= kural.Floor,
+            $"gunluge giren taban {taban}, kuralin alt kiskaci {kural.Floor}: "
+            + "taban alt kiskacin ustune cikarsa esigi dusurmek etkisiz kalir.");
+        Assert.True(taban < kural.Offset,
+            $"taban {taban}, kuralin sabit terimi {kural.Offset}: taban sabit terime ulasirsa durgun icerikte de eleme yapmaz.");
     }
 
     private static string FiltreGrafigi(string[] args)
@@ -233,6 +241,117 @@ public sealed class SceneMapTests
     }
 
     [Fact]
+    public void TuretilenEsik_KiskacHerIkiUctaBaglar()
+    {
+        var kural = ThresholdRule.Measured;
+
+        Assert.Equal(0.08, kural.At(0.0), 9);
+        Assert.Equal(0.1009, kural.At(0.01), 9);
+        Assert.Equal(0.15, kural.At(1.0), 9);
+        Assert.Equal(0.15, kural.At(0.05), 9);
+
+        var alcakSabit = kural with { Offset = 0.02 };
+        Assert.Equal(0.05, alcakSabit.At(0.0), 9);
+        Assert.Equal(0.05, alcakSabit.At(0.01), 9);
+        Assert.Equal(0.0409, (alcakSabit with { Floor = 0.0 }).At(0.01), 9);
+    }
+
+    [Fact]
+    public void TuretilenEsik_KiskacUclariOlculenAralikla()
+    {
+        var kural = ThresholdRule.Measured;
+
+        Assert.True(kural.Ceiling >= 0.1468,
+            $"tavan {kural.Ceiling}, kaynakta olculen en yuksek turemis esik 0,1468: tavan altina inerse kural kendi araligini kirpar.");
+        Assert.True(kural.Ceiling < 0.1568,
+            $"tavan {kural.Ceiling}: olculen aralik + bir 0,01 basamagi disinda tavani koyan bir olcu yok.");
+
+        Assert.True(kural.Floor <= kural.Offset,
+            $"alt kiskac {kural.Floor}, sabit terim {kural.Offset}: alt kiskac sabit terimin ustune cikarsa kuralin durgun ucu susturulur.");
+        Assert.True(kural.Floor >= SceneDetector.BaseThreshold,
+            $"alt kiskac {kural.Floor}, tarama tabani {SceneDetector.BaseThreshold}: tabanin altindaki aday zaten gunluge girmez.");
+    }
+
+    [Fact]
+    public void Agitation_YuzdelikBosKareleriSifirSayar()
+    {
+        var kural = ThresholdRule.Measured;
+        var adaylar = Enumerable.Range(0, 100)
+            .Select(i => new SceneScore(10.5 + 0.5 * i, 0.001 * (i + 1)))
+            .ToArray();
+
+        Assert.Equal(0.021, SceneMap.Agitation(adaylar, 50.0, 100.0, 10.0, kural), 9);
+        Assert.Equal(0.0, SceneMap.Agitation(adaylar, 50.0, 100.0, 10.0, kural with { Percentile = 0.50 }), 9);
+        Assert.Equal(0.061, SceneMap.Agitation(adaylar, 50.0, 100.0, 10.0, kural with { Percentile = 0.95 }), 9);
+    }
+
+    [Fact]
+    public void Agitation_KomsulukGenisligiOlcuyuDegistirir()
+    {
+        var kural = ThresholdRule.Measured;
+        var adaylar = Enumerable.Range(0, 100)
+            .Select(i => new SceneScore(10.5 + 0.5 * i, 0.001 * (i + 1)))
+            .ToArray();
+
+        Assert.Equal(0.021, SceneMap.Agitation(adaylar, 50.0, 100.0, 10.0, kural), 9);
+        Assert.Equal(0.061, SceneMap.Agitation(adaylar, 50.0, 100.0, 10.0, kural with { NeighbourhoodSeconds = 20.0 }), 9);
+        Assert.Equal(0.001, SceneMap.Agitation(adaylar, 50.0, 100.0, 10.0, kural with { NeighbourhoodSeconds = 60.0 }), 9);
+    }
+
+    [Fact]
+    public void DerivedCutTimes_AyniSkorDurgunKomsuluktaGecerHareketlideGecmez()
+    {
+        var kural = ThresholdRule.Measured;
+        var aday = new SceneScore(100.0, 0.09);
+
+        var durgun = new[] { aday };
+        var hareketli = Enumerable.Range(0, 200)
+            .Select(i => new SceneScore(60.5 + 0.2 * i, 0.02))
+            .Append(aday)
+            .ToArray();
+
+        Assert.Equal(new[] { 100.0 }, SceneMap.DerivedCutTimes(durgun, 200.0, 10.0, kural));
+        Assert.Empty(SceneMap.DerivedCutTimes(hareketli, 200.0, 10.0, kural));
+
+        Assert.Equal(0.0, SceneMap.Agitation(durgun, 100.0, 200.0, 10.0, kural), 9);
+        Assert.Equal(0.02, SceneMap.Agitation(hareketli, 100.0, 200.0, 10.0, kural), 9);
+    }
+
+    [Fact]
+    public void DerivedCutTimes_EgimSifirlanirsaAyrimKaybolur()
+    {
+        var kural = ThresholdRule.Measured with { Slope = 0.0 };
+        var aday = new SceneScore(100.0, 0.09);
+        var hareketli = Enumerable.Range(0, 200)
+            .Select(i => new SceneScore(60.5 + 0.2 * i, 0.02))
+            .Append(aday)
+            .ToArray();
+
+        Assert.Equal(new[] { 100.0 }, SceneMap.DerivedCutTimes(hareketli, 200.0, 10.0, kural));
+    }
+
+    [Fact]
+    public void BuildDerived_TekEsikBildirmezSabitYolBildirir()
+    {
+        var adaylar = new[] { new SceneScore(4.0, 0.9) };
+        var kareler = new[] { new ProbeFrame(0.0, 1000), new ProbeFrame(5.0, 1000) };
+
+        var turetilen = SceneMap.BuildDerived(10.0, adaylar, kareler, ThresholdRule.Measured);
+        Assert.True(double.IsNaN(turetilen.Threshold));
+        Assert.Equal(ThresholdRule.Measured, turetilen.Rule!.Value);
+        Assert.Equal(2, turetilen.Scenes.Count);
+
+        var sabit = SceneMap.Build(10.0, adaylar, SceneMap.FixedThreshold, kareler);
+        Assert.Equal(SceneMap.FixedThreshold, sabit.Threshold, 9);
+        Assert.Null(sabit.Rule);
+    }
+
+    [Fact]
+    public void BuildDerived_SondaKaresiYoksaKareHiziniUydurmaz()
+        => Assert.Throws<ArgumentException>(() => SceneMap.BuildDerived(
+            10.0, new[] { new SceneScore(4.0, 0.9) }, Array.Empty<ProbeFrame>(), ThresholdRule.Measured));
+
+    [Fact]
     public void Spearman_BilinenDegerler()
     {
         var x = new double[] { 1, 2, 3, 4 };
@@ -253,14 +372,14 @@ public sealed class SceneMapTests
         {
             await MakeGradedClipAsync(clip);
 
-            var genis = await SceneDetector.ScanAsync(clip, 0.01);
+            var genis = await SceneDetector.ScanAsync(clip, 0.003);
             var dar = await SceneDetector.ScanAsync(clip, 0.35);
             var varsayilan = await SceneDetector.ScanAsync(clip);
             Assert.True(genis.Ok, genis.Error);
             Assert.True(dar.Ok, dar.Error);
             Assert.True(varsayilan.Ok, varsayilan.Error);
 
-            Assert.All(genis.Candidates, c => Assert.True(c.Score >= 0.01, $"{c.Score} < 0.01"));
+            Assert.All(genis.Candidates, c => Assert.True(c.Score >= 0.003, $"{c.Score} < 0.003"));
             Assert.All(dar.Candidates, c => Assert.True(c.Score >= 0.35, $"{c.Score} < 0.35"));
             Assert.All(varsayilan.Candidates,
                 c => Assert.True(c.Score >= SceneDetector.BaseThreshold, $"{c.Score} < {SceneDetector.BaseThreshold}"));
@@ -341,27 +460,27 @@ public sealed class SceneMapTests
         {
             await MakeBracketClipAsync(clip);
 
-            var olcek = await SceneDetector.ScanAsync(clip, 0.005);
+            var olcek = await SceneDetector.ScanAsync(clip, 0.0002);
             Assert.True(olcek.Ok, olcek.Error);
 
             var basamaklar = olcek.Candidates.Select(c => c.Score).OrderBy(s => s).ToArray();
-            Assert.Equal(7, basamaklar.Length);
-            Assert.All(basamaklar.Take(2), s => Assert.InRange(s, 0.020, 0.030));
-            Assert.All(basamaklar.Skip(2).Take(2), s => Assert.InRange(s, 0.031, 0.044));
-            Assert.All(basamaklar.Skip(4).Take(2), s => Assert.InRange(s, 0.052, 0.059));
-            Assert.InRange(basamaklar[6], 0.085, 0.098);
+            Assert.Equal(6, basamaklar.Length);
+            Assert.InRange(basamaklar[0], 0.0002, 0.0009);
+            Assert.All(basamaklar.Skip(1).Take(2), s => Assert.InRange(s, 0.0095, 0.0105));
+            Assert.All(basamaklar.Skip(3).Take(2), s => Assert.InRange(s, 0.0195, 0.0205));
+            Assert.InRange(basamaklar[5], 0.0395, 0.0405);
 
-            var alt = await SceneDetector.ScanAsync(clip, 0.03);
+            var alt = await SceneDetector.ScanAsync(clip, 0.0099);
             var varsayilan = await SceneDetector.ScanAsync(clip);
-            var ust = await SceneDetector.ScanAsync(clip, 0.06);
+            var ust = await SceneDetector.ScanAsync(clip, 0.0201);
             Assert.True(alt.Ok, alt.Error);
             Assert.True(varsayilan.Ok, varsayilan.Error);
             Assert.True(ust.Ok, ust.Error);
 
             Assert.True(alt.Candidates.Count > varsayilan.Candidates.Count,
-                $"taban 0,036'nin altina kaydi: alt={alt.Candidates.Count} varsayilan={varsayilan.Candidates.Count}");
+                $"taban 0,0100'un altina kaydi: alt={alt.Candidates.Count} varsayilan={varsayilan.Candidates.Count}");
             Assert.True(varsayilan.Candidates.Count > ust.Candidates.Count,
-                $"taban 0,057'nin ustune cikti: varsayilan={varsayilan.Candidates.Count} ust={ust.Candidates.Count}");
+                $"taban 0,0200'un ustune cikti: varsayilan={varsayilan.Candidates.Count} ust={ust.Candidates.Count}");
         }
         finally
         {
@@ -372,23 +491,12 @@ public sealed class SceneMapTests
     private static async Task MakeBracketClipAsync(string clip)
     {
         const string graph =
-            "[1:v][2:v]hstack=inputs=2[a8];[4:v][5:v]hstack=inputs=2[a20];"
-            + "[7:v][8:v]hstack=inputs=2[a24];[10:v][11:v]hstack=inputs=2[a40];"
-            + "[0:v][a8][3:v][a20][6:v][a24][9:v][a40]concat=n=8:v=1:a=0";
+            "[1:v]eq=brightness=0.002[b1];[3:v]eq=brightness=0.012[b2];[5:v]eq=brightness=0.03[b3];"
+            + "[0:v][b1][2:v][b2][4:v][b3]concat=n=6:v=1:a=0";
 
         var args = new List<string> { "-hide_banner", "-loglevel", "error" };
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1272x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=8x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1260x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=20x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1256x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=24x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1280x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=2:size=1240x720:rate=30" });
-        args.AddRange(new[] { "-f", "lavfi", "-i", "color=c=navy:duration=2:size=40x720:rate=30" });
+        for (var i = 0; i < 6; i++)
+            args.AddRange(new[] { "-f", "lavfi", "-i", "smptehdbars=duration=1:size=1280x720:rate=30" });
         args.AddRange(new[]
         {
             "-filter_complex", graph,
@@ -452,10 +560,16 @@ public sealed class SceneMapTests
             Assert.NotEmpty(scan.Frames);
             Assert.All(scan.Frames, f => Assert.InRange(f.Time, -0.5, 4.5));
 
-            var (map, elapsed) = await SceneDetector.BuildMapAsync(clip, 4.0, 0.4);
-            Assert.Equal(2, map.Scenes.Count);
-            Assert.True(map.Scenes[0].Complexity > map.Scenes[1].Complexity);
+            var (sabitHarita, elapsed) = await SceneDetector.BuildFixedMapAsync(clip, 4.0, 0.4);
+            Assert.Equal(2, sabitHarita.Scenes.Count);
+            Assert.True(sabitHarita.Scenes[0].Complexity > sabitHarita.Scenes[1].Complexity);
             Assert.True(elapsed > TimeSpan.Zero);
+
+            var (harita, _) = await SceneDetector.BuildMapAsync(clip, 4.0);
+            Assert.NotNull(harita.Rule);
+            Assert.Equal(ThresholdRule.Measured, harita.Rule!.Value);
+            Assert.True(double.IsNaN(harita.Threshold), "turetilen harita tek bir esik bildiriyor");
+            Assert.Equal(2, harita.Scenes.Count);
         }
         finally
         {
