@@ -608,6 +608,9 @@ public sealed class PlanCalculatorProbeTests
         Drain(olcemeyen, "h264_nvenc");
         Drain(calismayan, "h264_nvenc");
 
+        WriteEvidence($"T137/T1 App gecidi olcemeyen : {olcemeyen.EncoderState("h264_nvenc")} / IsMeasured={olcemeyen.IsMeasured("h264_nvenc")}");
+        WriteEvidence($"T137/T1 App gecidi calismayan: {calismayan.EncoderState("h264_nvenc")} / IsMeasured={calismayan.IsMeasured("h264_nvenc")}");
+
         Assert.Equal(EncoderProbeState.Unmeasured, olcemeyen.EncoderState("h264_nvenc"));
         Assert.Equal(EncoderProbeState.NotWorking, calismayan.EncoderState("h264_nvenc"));
         Assert.NotEqual(olcemeyen.EncoderState("h264_nvenc"), calismayan.EncoderState("h264_nvenc"));
