@@ -1,4 +1,4 @@
-# Bppf tabanı
+﻿# Bppf tabanı
 
 Sözleşme: T99. Tarih: 2026-09-02. Kaynak: `.calisma/kaynak/kaynak-1080p60-hdr-17dk.mp4`
 (1920x1080, hevc, yuv420p10le, bt2020/smpte2084/bt2020nc, 60 fps, 1036,17 sn).
@@ -158,6 +158,13 @@ işini tek başına çözmüyor. Eleme kalktı, seçim değişmedi.
 Bu, belgedeki her "tahmini kalite" sayısını bağlar: §8.5.1'deki 68,9 → 74,4 de aynı
 modelin çıktısıdır ve iyileşme kanıtı değildir.
 
+**T107 güncellemesi.** Skor modeli ölçüye karşı sınandı ve `rate` terimi kaynak
+ızgarasına taşındı; ayrıntı `docs/olcumler/yerlesim-skoru.md`. 6,39 puanlık örnek
+kapandı: yeni modelde `1280x720@60` 65,615, `882x496@60` 60,501 ve ölçüm de aynı yönde
+(44,951 / 43,461). Yukarıdaki uyarı geçerliliğini koruyor — bu belgedeki "tahmini
+kalite" sayılarının hepsi **T107 öncesi** modelin çıktısıdır, yeniden hesaplanmadı.
+Hiçbir ceza sabiti değişmedi.
+
 ### 3.2 HandBrake'in çalışma noktası hâlâ dışarıda — ama tabandan değil
 
 Sözleşme HandBrake'in kazanan dosyasının 0,0116 bppf'te koştuğunu söylüyor. Yeni tabanın
@@ -206,7 +213,7 @@ Yarılanma başına düşen p10 puanı, düşükten yükseğe:
 
 Okunan şey: yıkım 0,0084–0,0099 arasında en hızlı; **0,00669'un altında eğri düzleşiyor**
 (bir yarılanma 1,24 puana mal oluyor, üstündeki aralıkta 17,18'e). Sebebi tabloda görünüyor —
-o noktada karelerin %3,6'sı zaten sıfırda ve p10 dibe oturmuş. Aşağıda kaybedilecek bir şey
+o noktada karelerin %3,6'sı 5 VMAF-NEG'in altında ve p10 dibe oturmuş. Aşağıda kaybedilecek bir şey
 kalmadığı için eğri yatıyor. Taban buraya kondu: **0,00669 / 0,7028 = 0,00952 → 0,0095**.
 
 ### 4.1 Bu bir seçim, ve hangi seçim olduğu
@@ -250,9 +257,12 @@ donanım kolundan da çıkarıldı) ve iş parçacığı dörde sabitlendi. Kali
 | p10 yıkım noktası (en dik aralığın geometrik ortası) | 480–540 sn | **1,52** |
 | Eşit p10, 20 / 30 / 40 / 50 | 480–540 sn | 0,79 · 0,93 · 0,97 · 0,88 |
 
-**Seçilen 1,52.** Sebebi: tabanı da üreten alet bu — p10 yıkım noktası. Bir tabanın
-koruduğu olgu ortalama kalite değil, alt yüzdeliklerin çökmesidir; iki kolun bu olguyu
-nerede yaşadığının oranı, tabanın ölçeklenmesi gereken orandır. Donanım kolunun en dik
+**Seçilen 1,52.** İkisi de aynı p10 eğrisinden okunuyor, ama eğrinin aynı noktasından
+değil: taban **doygunluk** noktasından (0,00669), çarpan **en dik aralığın** geometrik
+ortasından (donanım 0,01387 / yazılım 0,00912). Tek alet değil, bir eğrinin iki ayrı
+özelliği. Çarpan için yıkım noktasının seçilme sebebi şu: bir tabanın koruduğu olgu
+ortalama kalite değil, alt yüzdeliklerin çökmesidir; iki kolun bu olguyu en hızlı
+yaşadığı noktanın oranı, tabanın ölçeklenmesi gereken orandır. Donanım kolunun en dik
 p10 aralığı 0,01219–0,01578 (geometrik ortası 0,01387), yazılım kolununki
 0,00842–0,00987 (ortası 0,00912); oran 1,521.
 
@@ -262,8 +272,8 @@ duruyor.
 
 ### 5.1 p10 okuması neden ağır basmadı
 
-Eşit-p10 okuması donanımı yazılımdan **iyi** gösteriyor (oran < 1). Aynı bppf'te sıfır
-puanlı kare sayısı: yazılım 133 / 128 / 95 / 63 / 40 / 34 / 23 / 18, donanım
+Eşit-p10 okuması donanımı yazılımdan **iyi** gösteriyor (oran < 1). Aynı bppf'te 5 VMAF-NEG'in altındaki
+kare sayısı: yazılım 133 / 128 / 95 / 63 / 40 / 34 / 23 / 18, donanım
 50 / 49 / 27 / 28 / 23 / 18 / 8 / 6 — yazılım kolunda iki-üç katı. T106 tam bu olguyu
 soruşturuyor: VMAF-NEG'in SVT-AV1 çıktılarında aynı karelerde sıfır vermesi ölçünün mü
 kodlayıcının mı. Artefakt çıkarsa yazılımın gerçek kalitesi ölçülenden **yüksek** demektir,
@@ -293,6 +303,27 @@ ve o iki taban ölçülmedi. Şikâyet kaynağında `hevc_nvenc` tabanı 0,02196
 
 Ayrıca T4 denetiminin yazdığı kusur duruyor: `IsHardware` çarpanı QSV ve AMF'ye de
 uyguluyor, oysa ölçülen yalnız NVENC (bu turda da yalnız NVENC ölçüldü).
+
+**T107 ölçtü, borç kapanmadı.** Şikâyet kaynağında `hevc_nvenc`, 1920x1080@60'ta sekiz
+bit hızında ölçüldü (`av1_nvenc` değil, doğrudan hevc kolu):
+
+| bppf | ortalama | p10 |
+|---|---|---|
+| 0,005016 | 28,186 | 16,874 |
+| 0,005308 | 29,259 | 17,772 |
+| 0,009226 | 42,601 | 28,730 |
+| 0,013570 | 52,145 | 40,038 |
+| 0,018493 | 59,157 | 47,861 |
+| 0,023121 | 63,439 | 53,124 |
+| 0,027731 | 66,828 | 57,430 |
+| 0,037958 | 72,122 | 64,328 |
+
+Ne 0,02196'da ne 0,02671'de diz var; eğri iki adayın da çok altında, 0,0053–0,0092
+arasında dikleşiyor. **İki aday taban da kalitenin çöktüğü yerin çok üstünde.** Hangisinin
+doğru olduğu bu ölçümle seçilemedi, çünkü ölçüm ikisini de gereksiz sıkı buluyor.
+Ayrıca NVENC bu yerleşimde ~624 kbps'in altına inemiyor (500k isteğine 624,1 kbps),
+yani tabanın altındaki bölgeyi kodlayıcı zaten üretmiyor. Taban yeniden konmadı;
+karar ayrı bir sözleşmeye ait.
 
 ## 6. Kullanıcıya görünen gerekçe
 

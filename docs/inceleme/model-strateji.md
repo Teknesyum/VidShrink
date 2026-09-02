@@ -43,7 +43,7 @@ değiştiriyor. 1.5 sınırında `AllowsResolutionDrop` (`:57`) açılıp kapan�
 baskısından değil **dosya boyutundan** hesaplanıyor (`PlanCalculator.cs:56`).
 
 ### 2.4 Sıfır/eksik girdi (orta)
-`CompressionStrategy.cs:40`: `targetMb <= 0` → oran 1.0 → sessizce **Light**;
+`CompressionStrategy.cs:48`: `targetMb <= 0` → oran 1.0 → sessizce **Light**;
 `PlanCalculator.cs:92`'de `totalK` 0 çıkıp `MinVideoBitrateK` tabanına düşüyor, yani motor "hafif
 sıkıştırma" derken en düşük bitrate'i üretiyor. Süre `FfprobeClient.cs:51-52`'de ≤0'da atılıyor
 ama `MediaInfo` kendi doğrulamasını içermiyor. `ComplexityProfile.cs:132`'de `sourceFps` 0 ise

@@ -1,0 +1,1 @@
+Failed: 0, Passed: 1079, Skipped: 95, Total: 1174, Duration: 17 m 48 s

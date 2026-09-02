@@ -1,0 +1,28 @@
+{
+  "contractId": "T108",
+  "auditorRunId": "ab15530a9e22a8a11",
+  "headSha": "2b6746a0c985aeb763c53b36d52ff3981547a186",
+  "diffHash": "105ef33955e8cb64948d9bb245977263f409ca1c891c2b5d000884ded23d9e08",
+  "owns": [
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "tests/VidShrink.Tests/FfmpegArgumentsTests.cs",
+    "docs/olcumler/tepe-egrisi.md",
+    "docs/olcumler/tepe-tavani-ve-psy.md",
+    "tools/tepe-egrisi/Program.cs",
+    "tools/tepe-egrisi/TepeEgrisi.csproj",
+    "tools/tepe-egrisi/kos.sh",
+    "tools/tepe-egrisi/kos-yazilim2.sh",
+    "tools/tepe-egrisi/kos-yazilim-kalan.sh",
+    "tools/tepe-egrisi/nostdin-ayrim.sh",
+    "tools/tepe-egrisi/nvenc-oturum.sh",
+    "tools/tepe-egrisi/oldurme-imzasi.sh",
+    "tools/tepe-egrisi/ozet.py"
+  ],
+  "verification": [
+    "Denetci depo disinda calisti (git archive 7bc3be0), uc dar filtreli dotnet test ve uc derleme kullandi. Tur 2'nin dort maddesinin dordu de birinci elden dogrulandi. (1) Tasma kirilimi denetcinin kendi elle toplamiyla yeniden uretildi: durgun av1 1+0+1+0+0=2, durgun hevc 2+1+0+0+0=3, toplam 5; hareketli av1 3+3+3+3+2=14, hareketli hevc 3+3+3+3+3=15, toplam 29; genel toplam 34, teslimin sayisiyla birebir. Uc yerin ucu de duzeltilmis: tepe-egrisi.md:358, FfmpegArguments.cs:126-127, ve sozlesmenin Rapor K4 satiri. Sinir: hucre basina teslim/butce degerleri .calisma altinda ve gitignore'lu, o yuzden aymayan tek hareketli hucre iddiasi satirin ucte ikisiyle tutarli ama bagimsiz uretilemedi. (2) WidePeakFactor gerekcesi yazilim tablosundan yeniden hesaplandi: hareketli/4,636 farki 0,3892, durgun/4,636 1,5589, hareketli/10,236 0,0662, durgun/10,236 0,2132; belge ve kod ayni seyi soyluyor. (3) Floor 0,12 gercekten olculmus ve cumle olcuyle uyusuyor: olcu FfmpegArgumentsTests.cs:840-851, kesim listesi karsilastirmasi yapiyor yani davranis olcuyor, sabit karsilastirmiyor. Denetci mutasyonu kendi uyguladi (FfmpegArguments.cs:283 SceneMapRuleOfRecord Floor 0,05 -> 0,12, --no-incremental): 4/4 kirmizi, kirilanlar arasinda docstring'in koruyucu diye gosterdigi olcu de var. Mutasyon geri alindi ve agacin 7bc3be0 ile denkligi diff ile dogrulandi. Erisilemez ama olu degil, kaynaga bagli cumlesi olcuyle ortusuyor. (4) FfmpegArguments.cs:269'daki was not measured kalkti ve yerine gelen sayilar K5 tablosuyla ozdes cikti. Kronik kusur taramasi satir satir yapildi: K1 yayilim sutunundan sekiz satir orneklendi ve hepsi max-min ile uyustu, yon sutunu ve boyut tek yonlu mu sutunu (HAYIR sayimi 12, yirmi satirin 12'si ifadesi dogru), K4 rakamlari, K3'un T98 tablosunu yeniden hesabi ve K5 karsilastirma tablosu. Payda tuzagi dogru islenmis: K5'teki uc yuzde de paydayi VBV'li degere aliyor (1,434 / 1,12 / 3,94) ve K1/K4'un teslim/butce paydasi acikca tanimlanip T98'in paydasindan ayrilmis. Denetci koseumlarinda --no-build yok, --no-incremental ile temiz arsivden derlendi: FfmpegArgumentsTests filtresi 0 basarisiz / 66 basarili / 0 atlanan, teslimin bildirdigi sayiyla birebir. CI 33605278420, 7bc3be0, success, 18m9s; teslimin bildirdigi SplitDragTests kirmizisi yeniden denemede yesile donmus ve dalin son bes kosumu da success, T108'in kusuru degil. owns ihlali yok: 13 commit'in dokundugu dosyalar owns icinde ve tools/tepe-egrisi globunun somut karsiligi dokuz dosya - muhur oncesi T0 tarafindan aciklandi. HardwareRateControlTests.cs bu turda hic dokunulmadi, owns'a eklenmesi gerekmedi; teslim onu bir sonraki tur icin borc olarak zaten yazmis. KRITIK yok, yedi borc kaydedildi. Birincisi bu deponun kronik kusurunun ayni tablodaki bir baska ornegi: tepe-egrisi.md:433 HardwarePeakCeiling satiri 1,50 icin 10,236 ve 16,000'de 1,10'un altinda kaliyor diyor, oysa K1 tablosunda hareketli/av1_nvenc/16,000 satirinda 1,50 = 78,525 ile 1,10'un (78,475) ustunde ve en iyisi; dort satirin ucunde dogru, birinde yanlis, sonuc cumlesi ve sabit degismedigi icin KRITIK degil. Digerleri: bayt bayt ayni dosya ifadesi dort ondalikli MiB ile desteklenmis ve bayt duzeyinde bir cikti gosterilmemis (zayif hali ayni sonucu veriyor), FfmpegArguments.cs:274-276 iki cumlede kendini yalanliyor (2x ile kapali arasinda hicbir ara ayar bir sey satin almiyor diyor, iki cumle sonra tek gercek secim 1,10 ya da kapali diyor - 1,10 tam olarak o ara ayar; yorum, davranis degil), yazilim yolu genellemesi 4,636 satirindan tum satirlara tasinmis (10,236'da kazanc 0,213 kayip 0,066 ve yon yok; hemen ardindaki paragraf tam tabloyu veriyor), K7 ve kosum kapisi envanterleri yeni eklenen olcuyu saymiyor (65 -> 66 oldu, ustundeki cumle olmadi - sabit degisti ustundeki cumle eskidi ailesi), tepe-egrisi.md:432'nin 60 hucrenin 20'sinde en dar tepe ifadesi tanimi geregi dogru ve bir sey olcmuyor, ve teslimin FfmpegArgumentsTests.cs:408 hakkindaki main'de _sceneMap gecmiyor cumlesi 929d6fc anindaki main icin dogruydu ama origin/main o zamandan ilerledi - denetci uc yollu birlesmenin main tarafini catismasiz alacagini dogruladi ve birlesmede oyle oldu."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T08:53:50.000Z",
+  "usedAt": "2026-09-02T08:55:07.951Z",
+  "completedSha": "2b6746a0c985aeb763c53b36d52ff3981547a186"
+}

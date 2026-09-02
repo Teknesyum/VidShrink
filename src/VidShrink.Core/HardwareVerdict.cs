@@ -1,11 +1,42 @@
 namespace VidShrink.Core;
 
 /// <summary>
-/// Tek bir kodlayıcı yoklamasının ölçülen sonucu: gerçekten kodladı mı ve ne kadar sürdü.
+/// Bir kodlayıcı yoklamasının üç durumu. <see cref="Unmeasured"/> "çalışmıyor" değildir:
+/// yoklama sonuca varamadı, makine hakkında yeni bir şey öğrenilmedi.
+/// </summary>
+public enum EncoderProbeState
+{
+    /// <summary>Yoklama koştu ve kodlayıcı gerçekten kodladı.</summary>
+    Working,
+
+    /// <summary>Yoklama koştu ve kodlayıcı reddetti; ya da ffmpeg kodlayıcıyı hiç listelemiyor.</summary>
+    NotWorking,
+
+    /// <summary>Yoklama sonuca varamadı: zaman aşımı ya da sürecin hiç başlayamaması.</summary>
+    Unmeasured
+}
+
+/// <summary>
+/// Tek bir kodlayıcı yoklamasının ölçülen sonucu: gerçekten kodladı mı, ne kadar sürdü ve
+/// ölçüm sonuca vardı mı. <see cref="Succeeded"/> tek başına iki durumu ayırt edemez —
+/// ölçülemeyen yoklama da false döner, çünkü varsayılan güvenli yön yazılıma düşmektir.
+/// Ayrımı isteyen çağıran <see cref="State"/> ya da <see cref="Measured"/> okur.
 /// </summary>
 public sealed record EncoderProbeResult(string Codec, bool Succeeded, long ElapsedMs)
 {
+    /// <summary>Yoklama bir sonuca vardıysa true. Zaman aşımı ve başlatma hatası false.</summary>
+    public bool Measured { get; init; } = true;
+
+    public EncoderProbeState State => !Measured
+        ? EncoderProbeState.Unmeasured
+        : Succeeded ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+
+    /// <summary>ffmpeg kodlayıcıyı hiç listelemiyor: ölçülmüş bir yokluk.</summary>
     public static EncoderProbeResult Missing(string codec) => new(codec, false, 0);
+
+    /// <summary>Yoklama sonuca varamadı. Önbelleğe yazılmaz, bir sonraki çağrı yeniden dener.</summary>
+    public static EncoderProbeResult Unmeasured(string codec, long elapsedMs) =>
+        new(codec, false, elapsedMs) { Measured = false };
 }
 
 /// <summary>Hızlı modun kendiliğinden açılıp açılmama sebebi.</summary>
@@ -14,7 +45,10 @@ public enum HardwareVerdictReason
     /// <summary>Yoklama koşmadı; karar verilemez.</summary>
     NotProbed,
 
-    /// <summary>Kodlayıcı bulundu ama yoklama kodlaması başarısız oldu ya da zaman aşımına uğradı.</summary>
+    /// <summary>
+    /// Kodlayıcı bulundu ama yoklama kodlaması başarısız oldu ya da sonuca varamadı.
+    /// İkisini ayırmak için <see cref="HardwareVerdict.Measured"/> okunur.
+    /// </summary>
     ProbeFailed,
 
     /// <summary>Yoklama geçti ama bütçenin üstünde sürdü; yol sağlıklı değil.</summary>
@@ -45,18 +79,27 @@ public sealed record HardwareVerdict(
     int UsableBitrateK)
 {
     /// <summary>
-    /// Yoklamanın sağlıklı sayıldığı üst süre. Yoklamanın kendi zaman aşımı 4000 ms; bu
-    /// makinede av1_nvenc yoklaması 185-209 ms sürüyor. Bütçe ikisinin arasına, ölçülen
-    /// sürenin kabaca altı katına konuldu: sürücü içinde geri düşe düşe zar zor tamamlanan
-    /// bir yol "çalışıyor" sayılmasın, ölçüm gürültüsü de kararı çevirmesin.
+    /// Yoklamanın sağlıklı sayıldığı üst süre. Yoklamanın kendi öldürme sınırı 15000 ms
+    /// (T94, <c>EncoderCapabilities.ProbeKillMs</c>); bu makinede av1_nvenc yoklaması
+    /// 185-209 ms sürüyor. Bütçe ikisinin arasına, ölçülen sürenin kabaca altı katına
+    /// konuldu: sürücü içinde geri düşe düşe zar zor tamamlanan bir yol "çalışıyor"
+    /// sayılmasın, ölçüm gürültüsü de kararı çevirmesin. Öldürme sınırını aşan yoklama
+    /// yavaş değil <b>ölçülemedi</b> sayılır ve bu bütçeye hiç gelmez.
     /// </summary>
     public const long ProbeBudgetMs = 1500;
+
+    /// <summary>
+    /// Kararın ölçüme mi dayandığı. false ise yoklama sonuca varamadı ve karar
+    /// <see cref="HardwareVerdictReason.ProbeFailed"/> yönüne varsayılanla düştü;
+    /// "bu donanım çalışmıyor" değil "bilmiyoruz" demektir.
+    /// </summary>
+    public bool Measured { get; init; } = true;
 
     /// <summary>Planın istediği bit hızının kodlayıcının takip edebildiği alt sınıra oranı.</summary>
     public double HeadroomRatio => UsableBitrateK <= 0 ? 0 : (double)RequestedBitrateK / UsableBitrateK;
 
     public static HardwareVerdict NotProbed { get; } =
-        new(false, HardwareVerdictReason.NotProbed, string.Empty, 0, 0, 0);
+        new(false, HardwareVerdictReason.NotProbed, string.Empty, 0, 0, 0) { Measured = false };
 
     /// <summary>
     /// <paramref name="probe"/> plan tarafından seçilen kodlayıcının yoklaması,
@@ -75,8 +118,13 @@ public sealed record HardwareVerdict(
         if (!CodecModel.IsHardware(codec))
             return new HardwareVerdict(false, HardwareVerdictReason.NoHardwareEncoder, codec, probe.ElapsedMs, requestedBitrateK, 0);
 
+        // K3: ölçülemeyen yoklama da yazılıma düşer. Asimetri ölçüldü — yanlış donanım
+        // seçiminin bedeli dönüşümün tümden başarısız olması (EncodeRunner sıfırdan farklı
+        // çıkışta fırlatıyor, kodlayıcı düzeyinde geri düşme yok), yanlış yazılım seçiminin
+        // bedeli 1,23 kat süre. Sınırsız bedelden kaçmak için sonlu bedel seçiliyor.
         if (!probe.Succeeded)
-            return new HardwareVerdict(false, HardwareVerdictReason.ProbeFailed, codec, probe.ElapsedMs, requestedBitrateK, 0);
+            return new HardwareVerdict(false, HardwareVerdictReason.ProbeFailed, codec, probe.ElapsedMs, requestedBitrateK, 0)
+                { Measured = probe.Measured };
 
         var usable = CodecModel.UsableBitrateK(codec, width, height, fps);
 

@@ -13,6 +13,41 @@ public sealed record EncodeResult(bool Success, string OutputPath, double Output
 public sealed record ConversionResult(string OutputPath, double OutputMb);
 
 /// <summary>
+/// Sahne haritasi uretilemedigi zaman hangi yoldan dusuldugu. <see cref="None"/> disindaki her
+/// deger anahtar kare tavaninin <see cref="FfmpegArguments.KeyframeCeilingDefaultSeconds"/>
+/// varsayilanina dustugunu soyler; cagiran bunu sessizce gecmemek icin okur.
+/// </summary>
+public enum SceneMapFallback
+{
+    /// <summary>Harita uretildi.</summary>
+    None,
+
+    /// <summary>Kaynagin suresi bilinmiyor; sahne uzunlugu hesaplanamaz.</summary>
+    NoDuration,
+
+    /// <summary>Yoklama kosmadi ya da sifirdan farkli kodla dondu. ffmpeg yoklugu da buraya duser.</summary>
+    ScanFailed,
+
+    /// <summary>Yoklama kostu ama tek sonda karesi vermedi; kare hizi turetilecek zemin yok.</summary>
+    NoProbeFrames
+}
+
+/// <summary>
+/// Bir sahne haritasi uretme denemesinin sonucu. <see cref="Map"/> <c>null</c> ise
+/// <see cref="Fallback"/> nedeni tasir; <see cref="Detail"/> ffmpeg'in kendi metnidir.
+/// </summary>
+public sealed record SceneMapAttempt(SceneMap? Map, TimeSpan Elapsed, SceneMapFallback Fallback, string Detail)
+{
+    public bool Ok => Map is not null;
+}
+
+/// <summary>
+/// Sahne yoklamasini calistiran taraf. Varsayilani <see cref="SceneDetector.ScanAsync"/>;
+/// ayri verilebilmesinin sebebi dusus yollarinin ffmpeg olmadan da olculebilmesidir.
+/// </summary>
+public delegate Task<SceneScan> SceneScanAsync(string path, CancellationToken ct);
+
+/// <summary>
 /// What the caller is told when an attempt lands over the target and another attempt is still allowed.
 /// </summary>
 public sealed record RetryPrompt(
@@ -48,7 +83,8 @@ public sealed class EncodeRunner
         CancellationToken ct = default,
         FillPolicy fillPolicy = FillPolicy.QualityCeiling,
         ComplexityProfile? profile = null,
-        RetryDecisionAsync? askBeforeRetry = null)
+        RetryDecisionAsync? askBeforeRetry = null,
+        SceneMap? scenes = null)
     {
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return PassThrough(info, plan, outputPath);
@@ -76,12 +112,12 @@ public sealed class EncodeRunner
 
                 if (twoPass)
                 {
-                    await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, ct);
-                    await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, ct);
+                    await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, scenes, ct);
+                    await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, scenes, ct);
                 }
                 else
                 {
-                    await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, ct);
+                    await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, scenes, ct);
                 }
 
                 attemptClock.Stop();
@@ -234,23 +270,75 @@ public sealed class EncodeRunner
     }
 
     /// <summary>
+    /// Kaynagin sahne haritasini uretir. Basarisiz olursa <b>atmaz</b>: haritasiz bir deneme
+    /// dondurur ve nedenini soyler. Haritasiz kodlama gecerli bir kodlamadir — anahtar kare
+    /// tavani <see cref="FfmpegArguments.KeyframeCeilingDefaultSeconds"/> varsayilanina duser.
+    /// </summary>
+    public static async Task<SceneMapAttempt> TryBuildSceneMapAsync(
+        MediaInfo info, SceneScanAsync? scan = null, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(info);
+        var clock = Stopwatch.StartNew();
+
+        if (!double.IsFinite(info.DurationSeconds) || info.DurationSeconds <= 0)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.NoDuration,
+                $"sure={info.DurationSeconds.ToString("0.###", CultureInfo.InvariantCulture)}");
+        }
+
+        var runner = scan ?? ((path, token) => SceneDetector.ScanAsync(path, ct: token));
+        SceneScan result;
+        try
+        {
+            result = await runner(info.FilePath, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.ScanFailed, ex.Message);
+        }
+
+        if (!result.Ok)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.ScanFailed, result.Error);
+        }
+
+        if (result.Frames.Count == 0)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.NoProbeFrames, "sonda karesi yok");
+        }
+
+        var map = SceneMap.BuildDerived(info.DurationSeconds, result.Candidates, result.Frames, ThresholdRule.Measured);
+        clock.Stop();
+        return new SceneMapAttempt(map, clock.Elapsed, SceneMapFallback.None, string.Empty);
+    }
+
+    /// <summary>
     /// Kodlama komutunu üretir. Önce psy/AQ yoklamasını ısıtır: <c>FfmpegArguments.Build</c> saf
     /// kaldığı için ısıtılmamış bir seçeneği desteklenmiyor sayar, ve ısıtmayan bir çağıran
     /// bayrakları sessizce kaybederdi. Kodlayan her yol buradan geçer; ölçüm aracı da dahil.
     /// </summary>
     public static IReadOnlyList<string> EncodeArguments(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
-        IEncoderAvailability availability)
+        IEncoderAvailability availability, SceneMap? scenes = null)
     {
         FfmpegArguments.WarmPsychovisual(plan.Codec, availability);
-        return FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, availability);
+        return FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, availability, scenes);
     }
 
     private static async Task RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
-        IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo, CancellationToken ct)
+        IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo,
+        SceneMap? scenes, CancellationToken ct)
     {
-        var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance);
+        var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
         await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
     }
 
