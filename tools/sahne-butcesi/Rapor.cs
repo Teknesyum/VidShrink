@@ -38,6 +38,7 @@ public static class Rapor
         Ortam(sb, isKok);
         Komutlar(sb);
         CiktiDenetimi(sb, isKok);
+        SayimDenetimi(sb, isKok);
         Sorulan(sb);
         Kaynaklar(sb, haritalar);
         var k2 = K1K2(sb, k1, haritalar, kollar);
@@ -138,6 +139,33 @@ public static class Rapor
         sb.AppendLine("  sonraki degisiklikler yalniz `tools/` ve `docs/` icindedir, plani");
         sb.AppendLine("  etkilemez.");
         sb.AppendLine($"- Ham cikti: `{isKok.Replace('\\', '/')}` (gitignore'lu).");
+        sb.AppendLine();
+    }
+
+    private static void SayimDenetimi(StringBuilder sb, string isKok)
+    {
+        var y = Path.Combine(isKok, "sayim-denetimi.csv");
+        if (!File.Exists(y)) return;
+        var satirlar = File.ReadAllLines(y).Skip(1).Select(x => x.Split(';')).Where(c => c.Length >= 4).ToList();
+        if (satirlar.Count == 0) return;
+        var tutmayan = satirlar.Count(c => c[3] != "tuttu");
+
+        sb.AppendLine("## \"N hucre\" diyen cumleler bagimsiz sayildi");
+        sb.AppendLine();
+        sb.AppendLine("Bu sayfadaki ozet cumleleri `SahneButcesi rapor` uretir; ayni programin");
+        sb.AppendLine("kendi sayisini dogrulamasi kanit degildir. Asagidaki satirlar ayri bir");
+        sb.AppendLine("betikle, ham `.json` ve `.csv` dosyalarindan **yeniden** sayildi; MAE");
+        sb.AppendLine("degerleri de rapordan alinmadi, `HakEdilen`/`Verilen`/`Harita`");
+        sb.AppendLine("dizilerinden bastan hesaplandi.");
+        sb.AppendLine();
+        sb.AppendLine("| Olcu | Bagimsiz sayim | Sayfadaki iddia | Sonuc |");
+        sb.AppendLine("|------|----------------|-----------------|-------|");
+        foreach (var c in satirlar)
+            sb.AppendLine($"| {c[0]} | {c[1]} | {c[2]} | {(c[3] == "tuttu" ? "tuttu" : "**TUTMADI**")} |");
+        sb.AppendLine();
+        sb.AppendLine($"Denetlenen iddia {satirlar.Count}, tutmayan **{tutmayan}**. Uretim:");
+        sb.AppendLine("`bash tools/sahne-butcesi/07-sayim-denetimi.sh`, ham dosya");
+        sb.AppendLine("`sayim-denetimi.csv`. Betik sayfayi da okur; sayfa degisirse tekrar kosar.");
         sb.AppendLine();
     }
 

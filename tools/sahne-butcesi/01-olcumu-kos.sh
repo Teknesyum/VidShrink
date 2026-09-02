@@ -35,3 +35,6 @@ for kol in $KOLLAR; do for w in $PENCERELER; do kos k7   "$kol" "$w"; done; done
 bash "$KOK/tools/sahne-butcesi/05-cikti-denetimi.sh"
 
 kos rapor
+# Sayim denetimi sayfayi okur, sonra sayfa denetimi gomer: rapor iki kez kosar.
+bash "$KOK/tools/sahne-butcesi/07-sayim-denetimi.sh"
+kos rapor

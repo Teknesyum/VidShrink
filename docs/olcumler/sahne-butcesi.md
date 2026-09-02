@@ -63,6 +63,28 @@ kodlama ciktisi 25. Suresi sapan: **0**.
 Uretim: `bash tools/sahne-butcesi/05-cikti-denetimi.sh`, ham dosya
 `cikti-denetimi.csv`. Olcum bittikten sonra kosar.
 
+## "N hucre" diyen cumleler bagimsiz sayildi
+
+Bu sayfadaki ozet cumleleri `SahneButcesi rapor` uretir; ayni programin
+kendi sayisini dogrulamasi kanit degildir. Asagidaki satirlar ayri bir
+betikle, ham `.json` ve `.csv` dosyalarindan **yeniden** sayildi; MAE
+degerleri de rapordan alinmadi, `HakEdilen`/`Verilen`/`Harita`
+dizilerinden bastan hesaplandi.
+
+| Olcu | Bagimsiz sayim | Sayfadaki iddia | Sonuc |
+|------|----------------|-----------------|-------|
+| K1/K2 olculen hucre | 8 | 8 | tuttu |
+| kodlayici en az esit | 5 | 5 | tuttu |
+| K4 eki olculen hucre | 4 | 4 | tuttu |
+| tabani gecen hucre | 3 | 3 | tuttu |
+| zones kazandi | 1 | 1 | tuttu |
+| qcomp kazandi | 2 | 2 | tuttu |
+| olculemeyen satir | 28 | 28 | tuttu |
+
+Denetlenen iddia 7, tutmayan **0**. Uretim:
+`bash tools/sahne-butcesi/07-sayim-denetimi.sh`, ham dosya
+`sayim-denetimi.csv`. Betik sayfayi da okur; sayfa degisirse tekrar kosar.
+
 ## Sorulan tek soru
 
 Kodlayicinin kendi hiz denetimi sahne basina biti zaten dogru dagitiyor mu?
