@@ -17,9 +17,13 @@
 #   b_adapt=1 bframes=3 threads=4
 # rc_lookahead=30 + b_adapt=1 x264'te tam olarak "preset fast"tir.
 #
-# TONEMAP ZINCIRI DOGRULANMADI. Kodlama tarafi gunlukten okundu, renk
-# tarafi okunamadi (mkv icinde filtre zinciri saklanmiyor). Asagidaki zincir
-# yeniden uretimdir; ayni dosyayi bayt bayt verdigi OLCULMEDI.
+# TONEMAP OPERATORU OLCULDU. Filtre zinciri kapta saklanmiyor, o yuzden geri
+# okunamadi; onun yerine ilk kare dort operatorle yeniden uretilip elde duran
+# sdr-1.mkv'nin ilk karesiyle PSNR'landi (duzenek: tonemap-dogrulama/):
+#   hable 39,03 dB · reinhard 21,28 · mobius 20,08 · clip 19,33
+# Yani operator hable. Kalan 39 dB'lik fark x264'un kendi kaybi (a.png
+# sikistirilmis akistan cikiyor). desat degeri ve zscale parametreleri
+# ayrica OLCULMEDI; dosyanin bayt bayt yeniden uretildigi de OLCULMEDI.
 set -eu
 cd "$(dirname "$0")/../../.." || exit 1
 K=".calisma/kaynak/parca-1.mkv"
