@@ -4,7 +4,19 @@
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 
+KILIT=.calisma/t103/mutasyon.kilit
+mkdir -p .calisma/t103
+if ! mkdir "$KILIT" 2>/dev/null; then
+  echo "DURDU: baska bir mutasyon kosumu surüyor ($KILIT). Iki kosum ayni dosyayi yamalar." >&2
+  exit 3
+fi
+trap 'git checkout -- "$PROBE" 2>/dev/null; rmdir "$KILIT" 2>/dev/null' EXIT INT TERM
+
 PROBE=src/VidShrink.Ffmpeg/ComplexityProbe.cs
+if ! git diff --quiet -- "$PROBE"; then
+  echo "DURDU: $PROBE zaten kirli. Temiz agactan basla." >&2
+  exit 4
+fi
 FILTER='ComplexityProbeTests|ComplexityScanTests'
 
 mutate() {
