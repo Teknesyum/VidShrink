@@ -250,3 +250,15 @@ ustunde mi altinda mi kaldigi oradan okunur.
 Kosum kolu **`zones`in kazandigi** hucrede yapilir; kazanc en cok orada
 sorgulanir. Diger hucrelerde kosulmadi, maliyeti hucre basina bir tam
 iki gecisli kodlamadir.
+
+## Tekrar gurultusunu yorumlayan cumle uydurma girdiyle denendi
+
+`zones`in kazandigi pp gurultunun ustunde mi altinda mi — bunu rapordaki tek bir
+cumle soyluyor. Kapi kodunda oldugu gibi burada da cumle hep ayni seyi diyorsa
+hukum bosa gider. `06-tekrar-denemesi.sh` uc uydurma `tekrar-*.csv` uretir
+(gurultu sifir, kazanctan kucuk, kazanctan buyuk), her biri icin `rapor` komutunu
+ayri bir `VIDSHRINK_KOK` altinda kosar ve cikan cumlenin yonunu okur. Uc senaryoda
+da yon beklenene esit olmali; sonuc `.calisma/T114/tekrar-denemesi.csv`.
+
+Gercek olcumun kendisi `01-olcumu-kos.sh` icindeki `kos tekrar` adimidir; bu betik
+onun yerine gecmez, yalnizca yorumu olcer.

@@ -1003,6 +1003,39 @@ public static class Rapor
         sb.AppendLine("kosum `bash tools/sahne-butcesi/04-kapi-denemesi.sh`. Bu tablodaki sayilar");
         sb.AppendLine("uydurma; olculen sey kapinin **ayirt edip etmedigi**.");
         sb.AppendLine();
+        TekrarDenemesi(sb, isKok);
+    }
+
+    private static void TekrarDenemesi(StringBuilder sb, string isKok)
+    {
+        var y = Path.Combine(isKok, "tekrar-denemesi.csv");
+        if (!File.Exists(y)) return;
+        var satirlar = File.ReadAllLines(y).Skip(1).Where(x => x.Contains(';')).ToList();
+        if (satirlar.Count == 0) return;
+
+        sb.AppendLine("### Tekrar gurultusunu yorumlayan cumle de olculdu");
+        sb.AppendLine();
+        sb.AppendLine("`zones`in kazanci gurultunun ustunde mi altinda mi — bunu bir cumle");
+        sb.AppendLine("soyluyor. O cumle hep ayni seyi diyorsa hukum de bosa gider. Uydurma");
+        sb.AppendLine("tekrar dosyasiyla uc senaryo kosuldu: gurultu sifir, kazanctan kucuk,");
+        sb.AppendLine("kazanctan buyuk.");
+        sb.AppendLine();
+        sb.AppendLine("| Senaryo | Kosum 1 (pp) | Kosum 2 (pp) | Beklenen cumle | Cikan cumle | Sonuc |");
+        sb.AppendLine("|---------|--------------|--------------|----------------|-------------|-------|");
+        var gecen = 0;
+        foreach (var l in satirlar)
+        {
+            var c = l.Split(';');
+            if (c.Length < 6) continue;
+            if (c[5] == "gecti") gecen++;
+            sb.AppendLine($"| `{c[0]}` | {c[1]} | {c[2]} | {c[3]} | {c[4]} | {(c[5] == "gecti" ? "gecti" : "**KIRIK**")} |");
+        }
+        sb.AppendLine();
+        sb.AppendLine($"Denenen senaryo {satirlar.Count}, beklenen cumleyi veren {gecen}. Girdi");
+        sb.AppendLine("`tools/sahne-butcesi/tekrar-fikstur.py`, kosum");
+        sb.AppendLine("`bash tools/sahne-butcesi/06-tekrar-denemesi.sh`. Bu tablodaki pp degerleri");
+        sb.AppendLine("uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.");
+        sb.AppendLine();
     }
 
     private static void Olculemeyenler(StringBuilder sb, string isKok, JsonSerializerOptions json, string[] kollar)
