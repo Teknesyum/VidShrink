@@ -1,0 +1,16 @@
+{
+  "contractId": "T110",
+  "auditorRunId": "a7f08817bdb5c4dd1",
+  "headSha": "3296fd51bfef228150eadab2893cfd4b5a0bb467",
+  "diffHash": "5f7afb25aa6a5ca9553f8bdbb0cd8d7b63216041c8d46a7ef8c5baafd41675f6",
+  "owns": [
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "tests/VidShrink.Tests/QualityMeterTests.cs",
+    "docs/olcumler/algi-olcusu.md"
+  ],
+  "verification": [
+    "GECTI. Sekiz kriterin sekizi bagimsiz dogrulandi, denetci hicbir sayiyi kopyalamadi. Kare kilidi (settb=AVTB,setpts=N) iki zincirin de sonunda, tek uretim yolundan geciyor. Cipa hatasi gercek: kilitsiz 75,07 vs kilitli 87,20 = 12,13 puan. Mutasyon cift yonlu (M4 ve aynasi, her biri 7 kirmizi, --no-incremental derlemeyle). Mekanizma iddiasi dort ayri dosyada tutuldu. Onculun curudugu olculerek gosterildi: ref1.mkv start_time=0 ama 31. kare 0,501000'de. CI 33582483001 headSha 3868d621, Failed 0 / Passed 1024 / Skipped 100. owns temiz (uc dosya), denetci agaci temiz. KRITIK yok; dokuz borc muhur notunda, ayrica owns disi bir bulgu (olculen-kaliteyle-plan.md:36-53 cipalari kilitsiz olcerden) T111'e devredildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T02:28:49.273Z"
+}
