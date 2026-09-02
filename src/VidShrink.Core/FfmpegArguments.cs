@@ -106,8 +106,8 @@ public static class FfmpegArguments
     // three peaks (1.02, 1.10, 1.50), 60 cells, 1920x1080@60 HDR PQ, VMAF-NEG p10. The full
     // table is docs/olcumler/tepe-egrisi.md.
     //
-    // What the peak buys is not set by the floor ratio. It is set by how much the source
-    // moves. On the moving clip the p10 spread across the three peaks is 11.46 at ratio 2.6
+    // On the hardware encoders, what the peak buys is not set by the floor ratio. It is set
+    // by how much the source moves. On the moving clip the p10 spread across the three peaks is 11.46 at ratio 2.6
     // and 0.28 at ratio 16.0, falling all the way; on the still clip it never exceeds 1.61
     // at any ratio. Both encoders give the same shape (av1_nvenc 11.46 -> 0.28, hevc_nvenc
     // 11.68 -> 0.50). At ratio 4.636 the same encoder gives 7.385 on the moving clip and
@@ -126,11 +126,19 @@ public static class FfmpegArguments
     // cells 34 overshoot the video budget (moving 30/30, still 4/30) and in 12 of the 20 rows
     // the size does not move one way with the peak at all.
     //
+    // That agitation rule belongs to the hardware encoders only. A software grid (libx265
+    // medium, two-pass, 12 cells, ratios 4.636 and 10.236) reverses the sign: the still clip
+    // gains 1.559 p10 from opening the peak while the moving clip loses 0.389, monotonically.
+    // None of the 12 software cells overshoot the video budget (largest 0.9926), so the
+    // overshoot above is a property of hardware rate control, not of this curve.
+    //
     // The constants are NOT changed here, and that is a scope decision, not a measurement
     // result: the value the measurement asks for is content agitation, which PeakRateFactor
     // never receives, and the curve is pinned at five ratios by HardwareRateControlTests
     // (:122-141), which is outside this contract's owns. Per constant - WidePeakFactor:
-    // measured on the software path, unchanged. TightPeakFactor, HardwarePeakCeiling,
+    // measured on the software path, unchanged - 1.50 gives the best or equal p10 in three of
+    // the four software rows, the exception being the moving clip at ratio 4.636.
+    // TightPeakFactor, HardwarePeakCeiling,
     // PeakOpensAtFloorRatio, PeakWidestAtFloorRatio: measured, unchanged, and the reason is
     // above. BufferFactor: NOT measured on its own - every cell moved bufsize with the peak,
     // so no cell separates the buffer's effect from the peak's.

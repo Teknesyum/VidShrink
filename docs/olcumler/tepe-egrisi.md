@@ -1,7 +1,7 @@
 # Tepe-tavan egrisi (T108)
 
-Durum: donanim izgarasi (60 hucre) tamam, VBV blogu (10 hucre) tamam,
-yazilim izgarasi kosuyor (12 hucrenin 3'u icerde).
+Durum: donanim izgarasi (60 hucre), VBV blogu (10 hucre) ve yazilim izgarasi
+(12 hucre) tamam. Toplam 82 hucre.
 
 Olculen commit: `0d34f08` (dal `T108-tepe-egrisi`). `tools/tepe-egrisi` o commit'ten
 sonra yalnizca **kosum tarafinda** degisti (cikis kodunun kaydi, `-nostdin`, yeniden
@@ -210,10 +210,33 @@ Iki donanim kodlayicisi ayni sekli veriyor. Hareketli kaynakta p10 yayilimi taba
 buyudukce sonuyor: av1_nvenc 11,462 sonra 0,275, hevc_nvenc 11,675 sonra 0,496.
 Durgun kaynakta her iki kodlayicida da yayilim her oranda 1,611'in altinda.
 
-Yazilim kodlayici blogu (libx265, medium) **kosuyor**; bu bolum tamamlanmadi.
-Simdiye kadar tek tam satir grubu (hareketli, oran 4,636): p10 50,615 / 50,456 / 50,226,
-yayilim 0,389, yon yok; teslim/butce 0,9869 / 0,9886 / 0,9886. Yani yazilim yolunda tepe
-carpanini acmak ne kaliteyi ne boyutu oynatiyor. Tek grup, genellenmedi.
+### Yazilim yolu — libx265 `medium`, iki gecis, 12 hucre
+
+Uretimde yazilim yolu tepeyi hep `WidePeakFactor = 1,5` aliyor; burada 1,02 / 1,10 / 1,50
+zorlandi. Iki oran olculdu (4,636 ve 10,236), donanim izgarasindaki iki uc nokta.
+
+| kaynak | oran | p10 1,02 | p10 1,10 | p10 1,50 | yayilim | yon | teslim/butce 1,02 / 1,10 / 1,50 |
+|---|---:|---:|---:|---:|---:|---|---|
+| hareketli | 4,636 | 50,6154 | 50,4556 | 50,2262 | 0,389 | tek yonlu **azalan** | 0,9869 / 0,9886 / 0,9886 |
+| durgun | 4,636 | 93,3120 | 93,6640 | 94,8709 | 1,559 | tek yonlu artan | 0,9797 / 0,9747 / 0,9668 |
+| hareketli | 10,236 | 67,7700 | 67,5481 | 67,7038 | 0,222 | yon yok | 0,9883 / 0,9926 / 0,9926 |
+| durgun | 10,236 | 95,5798 | 95,6008 | 95,7930 | 0,213 | tek yonlu artan | 0,9779 / 0,9815 / 0,9857 |
+
+**Yazilim yolu donanimin tersini veriyor.** Donanimda tepeyi acmanin karsiligi
+hareketli kaynakta buyuktu (4,636'da 7,385 ve 6,318), durgun kaynakta yoktu (0,236).
+libx265'te isaret donuyor: kazanc **durgun** kaynakta (1,559), hareketli kaynakta ise
+tepeyi acmak p10'u **dusuruyor** (−0,389, tek yonlu). Yani "tepeyi acmak hareketliligi
+odullendirir" bulgusu donanim kodlayicilarina ait, evrensel degil.
+
+**Yazilim yolunda hicbir hucre butceyi asmiyor.** 12 hucrenin 12'si 1,0'in altinda;
+en buyugu 0,9926. Donanimda 60 hucrenin 34'u asiyordu. Asim tepe egrisinin degil,
+donanim hiz denetiminin ozelligi.
+
+Boyut yonu de kaynaga bagli: durgun kaynakta 4,636'da tepeyi acmak dosyayi
+**kucultuyor** (0,9797 sonra 0,9668), 10,236'da buyutuyor (0,9779 sonra 0,9857).
+
+`WidePeakFactor = 1,5` bu dort satirin ucunde en iyi ya da esit p10'u veriyor; tek
+istisna hareketli/4,636. Sabiti degistirmeyi gerektiren bir sonuc cikmadi.
 
 ## K3 — iki kaynak, T98'in +3,665'i
 
@@ -310,6 +333,9 @@ buyutmek dosyayi tek yonlu buyutmuyor.
 
 "Uc degerin ucu de hedefin altinda" turu bir cumle bu izgaradan yazilamaz.
 
+Yazilim yolunda (libx265, 12 hucre) **hicbir hucre asmiyor**; en buyugu 0,9926.
+Asim donanim hiz denetiminin ozelligi, tepe egrisinin degil.
+
 ## K5 — VBV ara degerleri
 
 T98'in K5'i CRF yolunda VBV'yi **var/yok** olarak olcmustu. Bu tur araya deger koydu:
@@ -370,7 +396,7 @@ Hicbir tepe sabiti degismedi. Gerekce yanindaki cumle degisti
 | `HardwarePeakCeiling` = 1,10 | **olculdu, degismedi** | 1,50 hareketli kaynakta 4,636 ve 7,500'de en iyi p10'u veriyor, 10,236 ve 16,000'de 1,10'un altinda kaliyor; tek yonlu bir tavan cikmiyor |
 | `PeakOpensAtFloorRatio` = 6,0 | **olculdu, degismedi** | acilma noktasinin altinda (2,600 ve 4,636) kazanc en buyuk, ustunde soniyor — yani esik ters yerde; ama duzeltmesi taban orani ekseninde degil |
 | `PeakWidestAtFloorRatio` = 11,4 | **olculdu, degismedi** | 10,236 ve 16,000 oranlarinda p10 yayilimi 0,07-2,65; en genis noktada acmanin karsiligi yok |
-| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda tepe carpani ne boyutu ne p10'u oynatiyor (bkz. K2) |
+| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda 12 hucrenin dordunun ucunde 1,50 en iyi ya da esit p10'u veriyor; tek istisna hareketli/4,636 (−0,389). Bkz. K2 |
 | `BufferFactor` | **olculmedi** | her hucrede `bufsize` tepeyle birlikte oynadi; buffer'in payini tepeninkinden ayiran hucre yok |
 
 **Neden sabit degismedi.** Iki neden var ve ikisi de olcumden bagimsiz:
@@ -410,7 +436,10 @@ Tepe sabitlerinden hicbiri degismedigi icin onlar icin mutasyon kaniti **gerekme
 - T98'in K6 klibinin kimligi. `parca-1/2/3` elendi (olculdu); dogru klip bulunamadi.
 - T98 ile aramizdaki 29 puanlik seviye farkinin klip disindaki bir nedeni. Alet farki
   elendi (olculdu, 0,6 puan).
-- Yazilim yolunda ikinci bir kodlayici (`libsvtav1`).
+- Yazilim yolunda ikinci bir kodlayici (`libsvtav1`). Yazilim izgarasi tek kodlayici
+  (libx265) ile olculdu; K2'deki isaret donmesi ikinci bir yazilim kodlayicisinda
+  dogrulanmadi.
+- Yazilim yolunda 4,636 ve 10,236 disindaki oranlar. Donanimda bes oran var, yazilimda iki.
 - 1920x1080@60 disinda bir yerlesim. Butun izgara tek yerlesimde.
 - Ses tasiyan kaynak. Her satir tek video akisi.
 - Hareketlilik ile kazanc arasindaki iliskinin **fonksiyonel bicimi**. Iki kaynak iki
