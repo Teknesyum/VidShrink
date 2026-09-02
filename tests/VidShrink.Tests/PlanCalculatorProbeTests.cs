@@ -598,7 +598,7 @@ public sealed class PlanCalculatorProbeTests
         }
 
         Assert.Equal(MainWindow.DeferredEncoderAvailability.MaxAttempts, hizliDenemeler);
-        Assert.True(patlayan.Probes <= 3, $"yeniden deneme tavansiz: {patlayan.Probes} yoklama");
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.MaxTotalAttempts, patlayan.Probes);
     }
 
     /// <summary>Yoklamasi istege bagli olarak firlatan yetenek nesnesi.</summary>
