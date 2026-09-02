@@ -193,3 +193,5 @@
 {"id":"T147","result":"stale","at":"2026-09-02T20:42:05.722Z"}
 {"id":"T148","result":"stale","at":"2026-09-02T20:42:05.722Z"}
 {"id":"T139","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|EncoderStateConsumptionTests|HdrResolverTests|PerformanceCheckTests|EncoderAvailabilityTests","code":0}],"auditorRunId":"ab121208d67ab1368","headSha":"c26879b312bf6e21fdc06c040c2020914386375e","at":"2026-09-02T22:28:52.512Z"}
+{"id":"T150","result":"stale","at":"2026-09-02T22:51:55.468Z"}
+{"id":"T149","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"CodecModelTests|PlanParserTests","code":0}],"auditorRunId":null,"headSha":"af974072e7c9627994965d18c65628767ebbd5ae","at":"2026-09-02T23:06:01.843Z"}

@@ -1,0 +1,18 @@
+{
+  "contractId": "T149",
+  "auditorRunId": "af8a39f096d0cd285",
+  "headSha": "af974072e7c9627994965d18c65628767ebbd5ae",
+  "diffHash": "f20620ae39b513c216364fbee4246112f4fa55c31e9d9477e22514e504ba937c",
+  "owns": [
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/PlanParser.cs",
+    "tests/VidShrink.Tests/CodecModelTests.cs",
+    "tests/VidShrink.Tests/PlanParserTests.cs",
+    "docs/olcumler/videotoolbox-baglama.md"
+  ],
+  "verification": [
+    "Denetci depo disi klonda kusur commit'ini (8490958) ve dort mutasyonu --no-incremental ile yeniden uretti: K1 ciktisi birebir, K4 mutasyonu uc kirmizi verdi (1/1481/18/1500 -> 4/1479/17/1500), K5'in dort mutasyonu her biri yalniz kendi olcusunu kirdi (2/9/11). Dort kodek envanterinin dordunde de VideoToolbox yok, alti donanim sabitinin tuketicisi IsHardware kapisinin arkasinda. Verify kollari --no-build'suz 6 ve 5 test buluyor, kesisim bos. CI 33683868062 head e6fff33 success (0/1474/18/1492). KRITIK yok, yedi borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T23:05:46.788Z"
+}
