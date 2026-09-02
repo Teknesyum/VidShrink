@@ -46,14 +46,14 @@ public static class Rapor
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         Sonuc(sb, k2, k5, k7);
-        Sinirlar(sb);
+        Sinirlar(sb, isKok);
 
         Directory.CreateDirectory(Path.GetDirectoryName(ciktiYolu)!);
         File.WriteAllText(ciktiYolu, sb.ToString());
         Console.WriteLine($"rapor yazildi: {ciktiYolu}");
     }
 
-    private static void Sinirlar(StringBuilder sb)
+    private static void Sinirlar(StringBuilder sb, string isKok)
     {
         sb.AppendLine("## Bu sayfanin bilinen sinirlari");
         sb.AppendLine();
@@ -80,6 +80,25 @@ public static class Rapor
         sb.AppendLine("   uzak bir noktada olculmus olur — sira genelde korunur ama paylar");
         sb.AppendLine("   hizla birlikte kayar. Kollar arasi hak-edilen kiyasi bu yuzden");
         sb.AppendLine("   yapilmaz; her kol kendi referansiyla karsilastirilir.");
+        var araliklar = Program.Pencereler
+            .Select(x => Path.Combine(isKok, $"dogrula-{x.Ad}.csv"))
+            .Where(File.Exists)
+            .SelectMany(File.ReadAllLines)
+            .Select(l => l.Split(';'))
+            .Where(c => c.Length >= 7 && c[1] == "dogru")
+            .Select(c => (Pencere: c[0], Aralik: double.Parse(c[6], CultureInfo.InvariantCulture)))
+            .ToList();
+        if (araliklar.Count > 0)
+        {
+            var enGenis = araliklar.MaxBy(x => x.Aralik);
+            var enDar = araliklar.MinBy(x => x.Aralik);
+            sb.AppendLine("7. **Kuralin oynatabildigi aralik dar.** Zone carpani `1,0` etrafinda");
+            sb.AppendLine($"   kaliyor: en genis pencere `{enGenis.Pencere}` {Kabuk.Inv(enGenis.Aralik, "0.000")},");
+            sb.AppendLine($"   en dar `{enDar.Pencere}` {Kabuk.Inv(enDar.Aralik, "0.000")} (K3 eki tablosu).");
+            sb.AppendLine("   Kazancin ust siniri bu araliktan gelir; `gamma`yi buyutmek araligi");
+            sb.AppendLine("   acardi ama `gamma = 1 - qcomp` turetilmis bir sayidir, telafi sabitine");
+            sb.AppendLine("   cevrilmedi.");
+        }
         sb.AppendLine();
     }
 
