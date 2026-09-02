@@ -446,6 +446,52 @@ Yapici bunu sorulunca kendi mansset cumlesini duzeltti (`3868d62`, belgede
 `§9.13`). Dogru davranis: sayi dogruydu, onu ozetleyen cumle yanlisti — ve bu
 projenin kronik kusuru tam olarak bu.
 
+
+## Esik turetildi ve sabiti yendi (T109, 2026-09-02, denetimde)
+
+Kural: `θ(t) = clamp(0,08 + 2,09·p90(±40 sn), 0,05, 0,15)`. Girdi sekiz aday
+arasindan olcuyle secildi, uydurma yalniz kalibrasyon pencerelerinde (P1-P3)
+yapildi.
+
+| kume | turetilen F2 | en iyi sabit (0,105) |
+|---|---|---|
+| alti pencere birlesik | **0,972** | 0,895 |
+| yalniz sinama (P4-P6) | **0,962** | 0,886 |
+
+Sinama kalibrasyondan ayri: uc yeni pencere elle isaretlendi (P4 hareketli 2
+kesim, P5 durgun 0 kesim, P6 hareketli 13 kesim). Asiri uydurma karsiti kanit
+guclu — kalibrasyon optimumunda **esit kalan 133 yapilandirmanin** sinama
+dagilimi min 0,921 / medyan 0,974 / max 0,974, secilen 0,962 yani **kendi
+esitlik kumesinin medyaninin altinda.** Secim sinamaya bakmamis.
+
+Yanlis pozitif sayildi: turetilen **3** (hepsi P5'te), sabit **11**.
+
+**Sozlesme disi kazanc:** `SceneDetector.ScanArgs` tabani `0.###` ile
+bicimliyordu; 0,0005 altindaki taban sessizce `0`a kirpilip `gte(scene,0)` her
+kareyi aday yapiyordu. 0,05 tabaniyla gorunmez bir kusur — taban 0,012'ye
+inince ortaya cikti ve bicim pime baglandi.
+
+**Tuketiciye:** sahne 77 -> 67, ortalama 13,46 -> 15,47 sn, medyan 5,62 ->
+5,33 sn, en uzun **122,37 -> 271,15 sn**. Dagilim daha da saga carpik; aralik
+secen taraf medyani kullanmali.
+
+### Uc borc, uc sahip
+
+1. **`SceneMap.DefaultThreshold` silinemedi** — `QualityMeterTests.cs:338`
+   kullaniyor ve o dosya **T110'un**. T110 muhurlenince cagri yeri
+   `SceneMap.FixedThreshold`e cevrilir.
+2. **`FfmpegArguments.SceneMapThresholdOfRecord` karardan dustu** — turetilen
+   haritada tek esik yok, `SceneMap.Threshold` **`NaN`**, kural
+   `SceneMap.Rule`'da. **T108**'e yazildi.
+3. **Bayat metinler:** `docs/olcumler/sahne-haritasi.md`,
+   `tools/sahne-yer-gercegi/sahneler.csv` (24 satir, 0,2 ile uretilmis) ve bu
+   yol haritasinin eski bolumleri hala asilmis sabit yolu anlatiyor. Sahipsiz —
+   T109 muhurlenince tek bir temizlik turuna baglanacak.
+
+**`NaN` sentinel'i ayri bir risk.** Tek esik yoksa `Threshold` alani neyi
+tasiyor sorusunun cevabi bugun `NaN`. Onu okuyan her yerin `NaN` ile ne
+yaptigi denetime ayri madde olarak verildi.
+
 ## Sonraki basamak
 
 1. **T106** — ölçü aracının geçerliliği. Kodlayıcı seçim kuralından önce gelir;
