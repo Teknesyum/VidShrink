@@ -268,12 +268,24 @@ Başarılı!  - Başarısız:     0, Başarılı:    53, Atlanan:     0, Toplam:
 
 ### CI
 
-| koşum | commit | durum |
+| koşum | commit | sonuç |
 |---|---|---|
-| `33659543712` | `cc6c69c` (K4) | *rapor yazılırken in_progress* |
-| `33659565512` | `92d671b` (K5, uç) | *rapor yazılırken pending* |
+| `33659543712` | `cc6c69c` (K4) | `cancelled` — ardılı tarafından iptal edildi |
+| `33659565512` | `92d671b` (K5) | **`completed success`** |
 
-CI beklenmedi. Son durum aşağıda, "CI son durum" başlığında.
+```
+$ gh run view 33659565512 --json status,conclusion,headSha
+{"conclusion":"success","status":"completed",
+ "headSha":"92d671be982b6f2172819cbb7fadf6b9b387d7ed"}
+```
+
+Yeşil koşum bütün kod commit'lerini kapsıyor: `92d671b` K1-K5'in tamamının ucu. Ondan
+sonraki tek commit rapor (`de106cf`), yalnız `docs/` altında; CI iş akışı `docs/**` ve
+`**/*.md` yollarını görmezden geldiği için yeni koşum başlatmıyor.
+
+CI kapısı yerel verify'dan geniş: `dotnet build -warnaserror` ve
+`kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30` — yani bütün süit, atlanan test
+tavanıyla birlikte. İkisi de geçti.
 
 ---
 
