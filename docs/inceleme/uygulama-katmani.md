@@ -51,7 +51,7 @@ mesajı da aynı gizli alana gider; yalnız Hakkında sekmesindeki `TxtSystemSta
 - `_probeCts`: `202-205` bir öncekini iptal edip atıyor, fakat **son örnek hiç atılmıyor** —
   dosya başına bir CTS sızıntısı. `438` iptal ediyor ama atmıyor/null'lamıyor. `Closing` işleyicisi
   de yok: kodlama sürerken uygulama kapatılırsa `_cts` iptal edilmez,
-  `EncodeRunner.cs:269`'daki `ct.Register(() => TryKill(process))` tetiklenmez, ffmpeg süreci öksüz kalır.
+  `EncodeRunner.cs:357`'daki `ct.Register(() => TryKill(process))` tetiklenmez, ffmpeg süreci öksüz kalır.
 
 **İki kere Başlat.** Güvenli: `429`–`439` arası tamamen eşzamanlı, ilk `await` `443`'te; WPF ikinci
 tıklamayı araya sokamaz, `SetRunning(true)` (539) düğmeyi kapatır. **Fakat üç gerçek boşluk var:**

@@ -77,7 +77,7 @@ doğru, hem satır hem alıntı metni yanlıştı, ikisi de düzeltildi. Commit 
 
 **5. `docs/inceleme/uygulama-katmani.md:54`** — `EncodeRunner.cs:185` → `:269`, alıntı
 `ct.Register(TryKill)` → `ct.Register(() => TryKill(process))`.
-`src/VidShrink.Ffmpeg/EncodeRunner.cs:269`: `using var cancellationRegistration =
+`src/VidShrink.Ffmpeg/EncodeRunner.cs:357`: `using var cancellationRegistration =
 ct.Register(() => TryKill(process));`; `:185` bir `finally` bloğu, ilgisiz. Tablo doğru.
 Commit `200bf82`.
 
