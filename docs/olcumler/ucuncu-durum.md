@@ -91,7 +91,7 @@ yaptirmak isteyen taraf `Probe`'u arka planda kosturur.
 |---|---|
 | `bool Succeeded` → `EncoderProbeState State` (pozisyonel alani degistirmek) | `tests/VidShrink.Tests/HardwareVerdictTests.cs` **owns disinda** ve `new EncoderProbeResult("av1_nvenc", false, 4000)` cagriyor. Tipi degistirmek T129'un dokunamayacagi bir dosyayi kirardi. |
 | `bool?` | `!probe.Succeeded` gibi mevcut kullanimlar sessizce anlam degistirir; `null` un "olculemedi" mi "bilinmiyor" mu oldugu tipten okunmaz. Uc durumu adlandirmayan bir tip ucuncu durumu **gorunur** kilmaz. |
-| `IEncoderAvailability`'ye uyeyi varsayilansiz eklemek | Dokuz sahteyi kirar; hepsi owns disindaki test dosyalarinda. |
+| `IEncoderAvailability`'ye uyeyi varsayilansiz eklemek | On sahteyi kirar; hepsi owns disindaki test dosyalarinda. |
 | `HardwareVerdictReason.ProbeUnmeasured` (yeni enum uyesi) | `MainWindow.axaml.cs:676` reason switch'inde `_` dusme kolu var ve yeni uye **kullaniciya "bit hizi tabani" cumlesini** yanlis yazdirirdi. App kapsam disi. Yerine `HardwareVerdict.Measured` eklendi: karar ayni (`ProbeFailed`, hizli mod kapali), ayrim cagirana aciliyor, kullaniciya gorunen cumle degismiyor. Ayri bir cumle gerekiyorsa T0'in karari. |
 
 HDR10 tarafinda `IHdr10EncoderAvailability.Hdr10PixelFormat` `HdrResolver.cs` icinde
@@ -184,7 +184,9 @@ kullanilir ama muhurlenmez.
 HDR yolunun ucuncu durumu uc olcuyle tutuluyor:
 `AnHdr10AcceptanceAfterAnUnmeasuredFormatIsNotCached` (dongu kacagi),
 `AMeasuredHdr10AcceptanceIsCached` ve
-`Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence`. Ikisi de mutasyonla kirildi:
+`Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence`. Uc olcuden ikisi mutasyonla
+kirildi (`AnHdr10Acceptance...` ve `Hdr10StateSeparates...`);
+`AMeasuredHdr10AcceptanceIsCached` icin kiran mutasyon bu turda gosterilmedi:
 
 | mutasyon | sonuc |
 |---|---|

@@ -163,3 +163,5 @@
 {"id":"T133","result":"stale","at":"2026-09-02T08:36:30.868Z"}
 {"id":"T134","result":"stale","at":"2026-09-02T08:36:30.868Z"}
 {"id":"T135","result":"stale","at":"2026-09-02T08:36:30.868Z"}
+{"id":"T108","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":"ab15530a9e22a8a11","headSha":"2b6746a0c985aeb763c53b36d52ff3981547a186","at":"2026-09-02T08:55:07.953Z"}
+{"id":"T131","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests","code":0}],"auditorRunId":null,"headSha":"df3f8965a86144bb7b33ca8647a55357862bf66c","at":"2026-09-02T09:00:29.054Z"}

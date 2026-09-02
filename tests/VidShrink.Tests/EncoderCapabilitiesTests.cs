@@ -292,7 +292,7 @@ public sealed class EncoderCapabilitiesTests
     /// <summary>
     /// Yavas bir yoklama surerken baska bir kodlayicinin yoklamasi kilidin arkasinda
     /// beklemiyor. Kilit surec boyunca tutulsaydi okuyan <see cref="SlowProbeMs"/> kadar
-    /// beklerdi; butce onun ucte birinden az.
+    /// beklerdi; butce onun yarisindan az.
     /// </summary>
     [Fact]
     public async Task ASlowProbeDoesNotBlockAnotherRead()
