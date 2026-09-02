@@ -437,6 +437,14 @@ auto'nun bu kaynakta çözünürlüğe dokunmaması doğru karardı.
 
 ## T111 — kare kilidiyle yeniden ölçüm
 
+**Taban commit `3688336`** (T110'un mührü). Bu bölümdeki her sayı o ağaçtaki
+motorla üretildi. `main` o tabandan beri `FfmpegArguments.cs`'i değiştirdi
+(T98'in dinamik anahtar kare aralığı, `8ea80c4`) — **yani bu ölçümler T98'in
+dinamik GOP'undan önceki motoru ölçüyor.** Yeni tabanda tekrarlanmadılar;
+T98'in değişikliğinin bu sayıları ne yönde oynatacağı **ölçülmedi.** Ölçtüğü
+motor gerçekten var olmuş bir motordur ve karşılaştırmalar kendi içinde
+tutarlıdır: on bir koşumun hepsi aynı tabanda üretildi.
+
 T110 mühürlendi: ölçer artık iki girdiyi de `settb=AVTB,setpts=N` ile kare
 indeksine kilitliyor. Bu bölümün üstündeki **bütün** VMAF sayıları kilitsiz
 ölçerle, yani damga eşlemesiyle üretildi. T111 aynı düzeneği yeniden koşturup
@@ -609,6 +617,46 @@ Ne tersine dönmedi: **açığın işareti.** HandBrake hâlâ önde, üç metri
 Değişen büyüklük — "bir puandan fazla geri" ile "onda bir puan geri" farklı iki
 cümle, ve ikincisi doğru olanı. p10'daki 0,477 ise en dayanıklı kalem: kilitle
 0,852'den 0,477'ye indi ama sıfırlanmadı.
+
+### K6'nın önerileri bugünkü `main`e karşı denetlendi
+
+T111'in ölçümleri `3688336` tabanında koştu. `main` o tabandan beri
+`FfmpegArguments.cs`'i 186 satır değiştirdi. Yani K6'nın "yapılacak iş" diye
+yazdığı üç maddenin durumu bugün farklı olabilir; üçü de tek tek bakıldı.
+
+**Madde 1 — anahtar kare aralığını uzat: T98'de uygulandı.** Tabanda
+(`3688336`) argüman tek satırdı: `-g = fps × 2`, her kodlamaya sabit yazılıyordu.
+Bugünkü `main`'de (`8ea80c4`, "sabit -g yerine anahtar kare aralığı, üst sınır
+sahne haritasından") `FfmpegArguments.KeyframeArgs` bir **aralık** üretiyor:
+taban 1 s (`KeyframeFloorSeconds`), tavan sahne haritasından çıkıp 5-10 s'ye
+kelepçeleniyor (`KeyframeCeilingMinSeconds` / `MaxSeconds`), harita yoksa
+HandBrake'in 10 s'si. SVT-AV1 için `-g <tavan> -svtav1-params keyint=<tavan>:scd=1`.
+**Bu madde artık bir öneri değil, yapılmış bir iş.**
+
+İki uyarı, ikisi de "ölçülmedi" sınıfında:
+
+- **T98'in aralığının bu kaynakta ne verdiği yeni tabanda ölçülmedi.** T111'in
+  ölçtüğü `-g 300` (60 fps'te 5 s) T98'in kelepçesinin alt ucu; varsayılan tavan
+  10 s, yani 600 kare. 300'den 600'e çıkmanın bu kaynakta ne yaptığı **ölçülmedi**.
+  "Muhtemelen daha da iyileşir" **yazılmıyor** — ölçülen tek nokta 120 → 300.
+- **T98'in `scd=1`'i, T111'in ölçtüğü şey değil.** Bu belgedeki "sahne kesmesine
+  hizalama kaybettiriyor" bulgusu `-force_key_frames <zaman damgaları>` ile
+  ölçüldü — ızgara sayacını sıfırlayan, dışarıdan zorlanmış anahtar kare. T98'in
+  yazdığı `scd=1` kodlayıcının **kendi** sahne kesme algılaması, farklı bir
+  mekanizma. Bu belgenin ölçümü onu **kapsamıyor**; `scd=1`'in bu kaynakta ne
+  yaptığı **ölçülmedi**.
+
+**Madde 2 — yazılım AV1'in bit hızı sapmasını modelle: uygulanmadı, açık duruyor.**
+`CodecModel.HardwareBitrateYield` bugün de 0,877 ve adı gibi yalnız donanım
+yolunu kapsıyor; yazılım yolu için karşılığı yok. `main`'in `CodecModel`'de
+değiştirdiği iki sayı (`HardwareFloorFactor` 1,25 → 1,52, AV1 `baseFloor`
+0,020 → 0,0095) **taban/kullanılabilirlik eşikleri**, teslim oranı modeli değil —
+bu maddenin sorduğu şey değişmedi.
+
+**Madde 3 — preset varsayılanı 6 → 4: uygulanmadı, açık duruyor.**
+`PlanCalculator.PickPreset` / `FfmpegArguments.DefaultPreset` yolu tabanla
+bugünkü `main` arasında değişmedi. Maddeyi bekleten şey de değişmedi: kodlama
+süresi hâlâ **ölçülmedi**.
 
 ## Ölçüm sırasında bulunan kusurlar — düzeltilmedi
 
