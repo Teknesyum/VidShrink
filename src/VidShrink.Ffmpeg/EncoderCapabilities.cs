@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup, IHdr10EncoderAvailability
+public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup, IHdr10EncoderAvailability, IHdr10ProbeAvailability
 {
     private static readonly object InstanceGate = new();
     private static EncoderCapabilities? _instance;
@@ -52,6 +52,9 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
 
     /// <summary>Ölçüm dikişi: seçenek yoklamasının ffmpeg'siz karşılığı.</summary>
     internal Func<string, string, string, ProbeOutcome>? OptionProbeHook;
+
+    /// <summary>Ölçüm dikişi: HDR10 piksel biçimi yoklamasının ffmpeg'siz karşılığı.</summary>
+    internal Func<string, string, ProbeOutcome>? Hdr10ProbeHook;
 
     private EncoderCapabilities(IReadOnlySet<string> encoders, IReadOnlySet<string> filters, string version, bool loaded = true)
     {
@@ -117,11 +120,16 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
     /// </summary>
     public string? Hdr10PixelFormat(string codec) => Hdr10Probe(codec).PixelFormat;
 
+    /// <summary>
+    /// Kabul edilen bir biçim görüldüyse sonuç <see cref="EncoderProbeState.Working"/>:
+    /// mühürlenmemiş olması daha iyi bir biçimin ölçülememesindendir, çalıştığı ölçüldü.
+    /// Hiçbir biçim kabul edilmediyse ayrım ölçüme varılıp varılmadığındadır.
+    /// </summary>
     public EncoderProbeState Hdr10State(string codec)
     {
         var (pixelFormat, measured) = Hdr10Probe(codec);
-        if (!measured) return EncoderProbeState.Unmeasured;
-        return pixelFormat is null ? EncoderProbeState.NotWorking : EncoderProbeState.Working;
+        if (pixelFormat is not null) return EncoderProbeState.Working;
+        return measured ? EncoderProbeState.NotWorking : EncoderProbeState.Unmeasured;
     }
 
     private (string? PixelFormat, bool Measured) Hdr10Probe(string codec)
@@ -130,7 +138,7 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
             if (_hdr10PixelFormats.TryGetValue(codec, out var cached)) return (cached, true);
 
         var (result, timedOut) = ProbeHdr10PixelFormat(codec);
-        if (timedOut) return (null, false);
+        if (timedOut) return (result, false);
 
         lock (_hdr10PixelFormats)
         {
@@ -221,7 +229,7 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
         if (!HasEncoder(codec)) return (null, false);
         var timedOut = false;
         foreach (var pixelFormat in new[] { "p010le", "yuv420p10le" })
-            switch (RunProbe(codec, pixelFormat))
+            switch ((Hdr10ProbeHook ?? RunProbe)(codec, pixelFormat))
             {
                 case ProbeOutcome.Accepted: return (pixelFormat, timedOut);
                 case ProbeOutcome.Unmeasured: timedOut = true; break;

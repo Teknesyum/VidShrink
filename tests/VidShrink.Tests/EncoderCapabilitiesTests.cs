@@ -201,6 +201,67 @@ public sealed class EncoderCapabilitiesTests
         Assert.Equal(1, calls);
     }
 
+
+    // --- K5/4: HDR10 yoklamasinin ucuncu durumu ---
+
+    /// <summary>
+    /// p010le olculemeyip yuv420p10le kabul edilirse sonuc kullanilir ama <b>muhurlenmez</b>:
+    /// olculemeyen bicim aslinda kabul edilseydi secilen o olacakti. Dongudeki
+    /// <c>break</c> kacagi bu olcuyle kapali.
+    /// </summary>
+    [Fact]
+    public void AnHdr10AcceptanceAfterAnUnmeasuredFormatIsNotCached()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.Hdr10ProbeHook = (_, pixelFormat) =>
+        {
+            calls++;
+            return pixelFormat == "p010le"
+                ? EncoderCapabilities.ProbeOutcome.Unmeasured
+                : EncoderCapabilities.ProbeOutcome.Accepted;
+        };
+
+        Assert.Equal("yuv420p10le", caps.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(2, calls);
+
+        // Onbellege girmediyse ikinci cagri iki bicimi de yeniden yokluyor.
+        Assert.Equal("yuv420p10le", caps.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal(4, calls);
+    }
+
+    [Fact]
+    public void AMeasuredHdr10AcceptanceIsCached()
+    {
+        var caps = Capabilities();
+        var calls = 0;
+        caps.Hdr10ProbeHook = (_, _) => { calls++; return EncoderCapabilities.ProbeOutcome.Accepted; };
+
+        Assert.Equal("p010le", caps.Hdr10PixelFormat("h264_nvenc"));
+        Assert.Equal("p010le", caps.Hdr10PixelFormat("h264_nvenc"));
+
+        Assert.Equal(1, calls);
+        Assert.Equal(EncoderProbeState.Working, caps.Hdr10State("h264_nvenc"));
+    }
+
+    /// <summary>
+    /// Iki bicim de olculemediyse "HDR10 yok" denmiyor: <see cref="EncoderProbeState.Unmeasured"/>.
+    /// Olculmus yokluk ise <see cref="EncoderProbeState.NotWorking"/>.
+    /// </summary>
+    [Fact]
+    public void Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence()
+    {
+        var unmeasured = Capabilities();
+        unmeasured.Hdr10ProbeHook = (_, _) => EncoderCapabilities.ProbeOutcome.Unmeasured;
+        Assert.Equal(EncoderProbeState.Unmeasured, unmeasured.Hdr10State("h264_nvenc"));
+        Assert.Null(unmeasured.Hdr10PixelFormat("h264_nvenc"));
+
+        var rejected = Capabilities();
+        rejected.Hdr10ProbeHook = (_, _) => EncoderCapabilities.ProbeOutcome.Rejected;
+        Assert.Equal(EncoderProbeState.NotWorking, rejected.Hdr10State("h264_nvenc"));
+        Assert.Null(rejected.Hdr10PixelFormat("h264_nvenc"));
+    }
+
     // --- K6: kilit ffmpeg suresince tutulmuyor ---
 
     private const int SlowProbeMs = 2000;

@@ -57,11 +57,14 @@ EncoderProbeState EncoderState(string codec) =>
   okuyan her cagiran calismaya devam ediyor ve **varsayilani guvenli yon**: olculemeyen
   yoklama `Succeeded == false` dondugu icin farkinda olmayan cagiran yazilima duser
   (K3'un politikasi). Ayrimi isteyen `State` ya da `Measured` okur.
-- Varsayilan gerceklestirme, `IEncoderAvailability`'yi uygulayan **dokuz test sahtesini**
-  (`PlanCalculatorTests`, `SpeedModeTests`, `HardwareFlagTests`, `HardwareRateControlTests`,
-  `HdrArgumentsTests`, `PerformanceCheckTests`, `FfmpegArgumentsTests` x2,
-  `ComplexityScanTests`) kirmadan uyeyi ekliyor. Cozum kapsam disi dosyalara tek satir
-  bile yazmadan derledi.
+- Varsayilan gerceklestirme, `IEncoderAvailability`'yi uygulayan **on test sahtesini**
+  kirmadan uyeyi ekliyor: `PlanCalculatorTests.FakeAvailability`,
+  `SpeedModeTests.FakeAvailability`, `HardwareFlagTests.Availability`,
+  `HardwareRateControlTests.FixedAvailability`, `HdrArgumentsTests.FakeAvailability`,
+  `HdrArgumentsTests.MutatedAvailability`, `PerformanceCheckTests.FakeAvailability`,
+  `FfmpegArgumentsTests.OptionAvailability`, `FfmpegArgumentsTests.WarmingAvailability`,
+  `ComplexityScanTests.ColdCapabilities`. Hepsi owns disinda; cozum kapsam disi dosyalara
+  tek satir bile yazmadan derledi.
 
 ### Reddedilenler
 
@@ -145,6 +148,16 @@ kaynak serbestleyince bir sonraki cagri olcebiliyor. Olculer:
 onbellege yazilmiyor. p010le zaman asimina ugrayip yuv420p10le kabul edilirse sonuc
 kullanilir ama muhurlenmez.
 
+HDR yolunun ucuncu durumu uc olcuyle tutuluyor:
+`AnHdr10AcceptanceAfterAnUnmeasuredFormatIsNotCached` (dongu kacagi),
+`AMeasuredHdr10AcceptanceIsCached` ve
+`Hdr10StateSeparatesUnmeasuredFromMeasuredAbsence`.
+
+**Olcusuz kapanis:** 3 numaranin (`Load` / `RunCapture` / `Instance`) uc degisikligi de
+**olcuyle tutulmuyor.** `Instance` gercek ffmpeg'i cagiran statik bir tekildir; yeniden
+deneme yolunu ffmpeg'i gecici olarak bozmadan kosturacak bir dikis T129'da acilmadi.
+Degisiklikler okunarak dogrulandi, davranisla degil. Bu bir borctur.
+
 **Kapatilamayan:** `HdrResolver.cs:58`'in `null`'i "HDR10 yok" okumasi kodda duruyor —
 dosya T130'un, T129 dokunamaz. T129 ayrimi `IHdr10ProbeAvailability.Hdr10State` ile
 suruyor; tuketmek tuketen tarafin isi. Bu **acik bir borctur**, sessiz birakilmadi.
@@ -193,6 +206,10 @@ mutasyonda da yesil kaldi, yani daralan kilidin urettigi tek fark bekleme suresi
   konusu** ve T129 olcmedi.
 - **K3'un asimetri sayilari T123'un olcumu.** T129 ne 1,23 kati ne de yoklama surelerini
   yeniden olctu; politikayi degistirmedigi icin sozlesme yeni olcum istemiyor.
+- **K5/3'un uc degisikligi olculmedi.** `RunCapture`'in yeni zaman asimi, `Load`'un bos
+  kume reddi ve `Instance`'in yeniden deneme yolu okunarak dogrulandi; hicbiri bir olcuyle
+  tutulmuyor. Ucu de gercek ffmpeg'i cagiran statik bir tekilin icinde ve T129 oraya dikis
+  acmadi.
 - **`ReloadAfterFailureMs = 5000` bir olcuye dayanmiyor.** Gecici acilis hatasinin ne
   kadar surdugu olculmedi; sayi "kalici olmasin" kuralini saglayan keyfi bir alt sinir.
   Yeniden deneme maliyeti ffmpeg bulunamadiginda uc hizli firlatmadir.
