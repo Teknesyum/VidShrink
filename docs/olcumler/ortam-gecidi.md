@@ -246,6 +246,132 @@ Bu belge bunu tespit eder, çözmez.
 Kaçının içinde saklı bir kusur olduğu **ölçülmedi**: ölçmek gerçek bir kaynak
 dosya ve gerçek bir başlatıcı ikilisi ister, ikisi de CI'da yok.
 
+## K7 — ikinci eksen: makinenin yükü
+
+Bu bölüm T0'ın tur ortasında eklediği maddedir. Aynı dosyada, aynı sınıftan
+ikinci bir kusur: **ölçü, koştuğu makinenin durumunu sabit sanıyor.**
+
+### İki kırmızı karıştırılmasın
+
+| olay | nerede | ölçülen sıklık | sebep | sınıf |
+|---|---|---|---|---|
+| `IslemciZamaniSayaciDogruOkuyorMu` | CI | 2/2 kırmızı (`33589639249` `0e122f2`, `33593652976` `045648e`) | runner'da NVIDIA aygıtı yok, `Cannot load nvcuda.dll` | **belirlenimci** |
+| `OlcumYukAltindaYalnizAgirlasiyor:458` | bu makine | 1/5 kırmızı (T113 ölçtü, yalıtılmış koşumlar) | altı ajan koşuyordu, boş okumalar `HeavyLoad` düştü | **kararsız** |
+
+İkisinin ortak yanı sebep değil, kusur sınıfı: her ikisi de ortam varsayımını
+sınamadan kullanıyor. Sebepleri ayrı, çözümleri ayrı geçit.
+
+Belirlenimci olanın **üretim kodundaki** yüzü bu sözleşmede düzeltilmedi:
+`HasEncoder` derlenmiş yeteneğe bakıyor, sürücüye değil. O T123'ün.
+
+### Kararsız iddianın sınıflandırması
+
+Kaldırılan satır (`PerformanceCheckTests.cs:458`, T117 öncesi):
+
+```csharp
+Assert.False(sessizler.Any(r => r.Impact == RecordingImpact.SoftwareHeavyLoad)
+             && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
+    "yuk altinda karar hafifledi");
+```
+
+İddia yalnızca **boş okumalar zaten `SoftwareHeavyLoad` çıktığında** — yani
+kendi öncülü olan "sessiz taban" yanlışken — kurulabiliyor. Gerçekten boş bir
+makinede vakuf doğru, hiçbir şey ölçmüyor. Dolu bir makinede ölçtüğü şey ürünün
+kararı değil, makinenin o anki gürültüsü. **Eşik gevşetilmedi, kaldırıldı ve
+öncülünü ilan eden bir geçidin arkasına taşındı.**
+
+### Ölçülen sayı: bu makine hiç sessiz değil
+
+`OlcumYukAltindaYalnizAgirlasiyor` dört koşum, dördü de yeşil
+(4 dk 23 sn / 4 dk 8 sn / 3 dk 56 sn / 3 dk 14 sn). Ölçüm günlüğünden boş
+okumaların hepsi eşiğin (`HeavyLoadCores = 1.0`) üstünde:
+
+| koşum | boş okumalar (gerçek zaman çekirdeği) | yüklü | kırmızıya uzaklık |
+|---|---|---|---|
+| 1 | 3,381 · 3,358 · 3,075 | 2,610 | taban×0,8 = 2,460 → **%6,1** |
+| 2 | 3,011 · 2,509 · 2,270 | 3,837 | 1,816 → %111 |
+| 3 | 2,305 · 2,458 · 3,108 | 2,220 | 1,844 → %20 |
+| 4 | 1,806 · 2,289 · 1,909 | 2,072 | 1,445 → %43 |
+
+On iki boş okumanın on ikisi de `SoftwareHeavyLoad`. Yani "yükün etkisi" bir
+tahmin değil: bu depoda paralel ajanlar altında **boş taban diye bir şey yok**,
+ve kaldırılan iddianın öncülü her koşumda sağlanıyordu — kırmızıyı belirleyen
+tek şey yüklü okumanın o anda nereye düştüğüydü.
+
+### Yeni geçit: `QuietMachineFactAttribute`
+
+`FrameGrabberTests.cs` içinde, donanım geçidinin yanında. Sorduğu soru ikili
+değil, ölçülen: **bir kere** boş okuma alır (`PerformanceProbe.RunAsync` ile,
+kodlayıcıları kapalı sahte `NoEncoders` üzerinden, süreç başına önbellekli) ve
+üç halden birini yazar:
+
+| durum | `Skip` metni |
+|---|---|
+| ffmpeg yok | `<arac> bulunamadi, bos makine olculeri kosturulmadi.` |
+| okuma alınamadı | `makinenin bos okumasi alinamadi (yazilim bacagi olculemedi), bos makine iddiasi kurulmadi.` |
+| makine dolu | `makine olcum oncesi bos degil: yazilim bacagi <n> gercek zaman cekirdegi istedi, esik 1. Bos taban yok, yuk iddiasi kurulmadi.` |
+
+Donanım geçidinden farkı, T0'ın işaret ettiği yer: "GPU var mı" ikili bir
+sorudur, "makine yüklü mü" değildir. Bu yüzden geçit eşiği kendisi uydurmaz,
+ürünün kendi eşiğini (`PerformanceCheck.HeavyLoadCores`) ve ürünün kendi
+sınıflandırmasını (`RecordingImpact`) kullanır.
+
+### Geçidin taşıdığı yeni iddia
+
+`YukAltindaKararHafiflemiyorMu` — geçit boş tabanı garanti ettiği için iddia
+artık kurulabilir: kendi yarattığımız yük (mantıksal çekirdek eksi bir iş
+parçacığı) ölçümde **görünmek zorunda**. İki assert, ikisi de aynı koşumdaki
+iki okumayı birbirine göre okur, mutlak süreye bakmaz:
+
+1. `yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores` — yük ölçüye girdi
+2. `yuklu.Impact != SoftwareLightLoad` — boş okuma hafifken yüklü okuma hafif kalamaz
+
+`OlcumYukAltindaYalnizAgirlasiyor`'da kalan yön iddiası
+(`yuklu >= taban × 0,8`) değiştirilmedi; o zaten orana kurulu ve dört koşumda
+yeşil.
+
+### Geçidin ayırdığı ve ayırmadığı eksenler
+
+**Ayırdığı** (ölçü koşmadan önce sınanan, atlandığında sayılabilen):
+
+| eksen | geçit | nasıl sorulur |
+|---|---|---|
+| ffmpeg/ffprobe PATH'te var mı | `FfmpegFact` | `ToolLocator.IsAvailable` |
+| tonemap süzgeci bu derlemede var mı | `TonemapFact` | süzgeç listesi + gerçek deneme |
+| donanım kodlayıcı **derlemede** var mı | `HardwareEncoderFact` | `EncoderCapabilities.HasEncoder` |
+| donanım kodlayıcı **bu makinede açılıyor mu** | `HardwareEncoderFact` | `EncoderCapabilities.Probe` (1 kare gerçek kodlama) |
+| makine ölçüm öncesi boş mu | `QuietMachineFact` | `PerformanceProbe` boş okuma + `RecordingImpact` |
+
+**Ayırmadığı** (bugün hâlâ varsayım):
+
+- **Geçit ile koşum arasındaki kayma.** `Skip` keşif anında hesaplanır, ölçü
+  dakikalar sonra koşar. Makine arada dolabilir. `YukAltindaKararHafiflemiyorMu`
+  bunu koşum içinde tekrar okuyup `Atlandi` ile bildirir — ama `Atlandi` özette
+  görünmez (aşağıdaki kusur). Kayma penceresinin **genişliği ölçülmedi**.
+- **Süreç dışı paralellik.** `DisableTestParallelization` tek süreç içinde
+  sıralar; aynı makinede koşan on dört ajanı sıralamaz. Geçit bunu ölçer ama
+  engelleyemez.
+- **Çekirdek sayısı.** Bu makine 16 mantıksal çekirdek, GitHub runner'ı değil.
+  Hiçbir geçit "kaç çekirdek" sormuyor; eşik mutlak (`1.0`), çekirdek sayısına
+  göre ölçeklenmiyor. Ölçüler bugün geçiyor, **ölçeklenme sınanmadı**.
+- **Disk ve bellek baskısı.** Ölçülerin hiçbiri G/Ç doygunluğunu ayırmıyor.
+- **Sürücü sürümü.** `Probe` "açıldı mı" sorusunu yanıtlar, "hangi sürücüyle"
+  sorusunu değil. Farklı NVENC nesillerinin sayıları karşılaştırılabilir mi,
+  **ölçülmedi**.
+- **Termal/güç durumu.** Uzun süitte işlemci frekansı düşerse ölçü bunu yük
+  sanar. Ayrılmadı.
+
+### `-MaximumSkipped 30` marjı
+
+`tools/kosum-kapisi/kosum-kapisi.ps1:20`. **Bu sözleşmede değiştirilmedi**,
+satır T115'in.
+
+| aşama | CI'da atlanan | ölçüm |
+|---|---|---|
+| T115 sonrası, T117 öncesi | 17 | koşum `33593652976` |
+| `HardwareEncoderFact` sonrası | 18 | koşum `33591434219` |
+| `QuietMachineFact` sonrası | *(aşağıda)* | *(aşağıda)* |
+
 ## Ölçülmeyenler
 
 - Mutasyon A'nın **yerel** karşılığı ölçülmedi: bu makinede GPU var, geçit

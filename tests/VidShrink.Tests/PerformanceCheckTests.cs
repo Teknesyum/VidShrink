@@ -367,9 +367,16 @@ public sealed class PerformanceCheckTests
     /// <summary>
     /// K1: olcum makine yukune ne kadar dayanikli, ve <b>nerede dayanmiyor</b>.
     ///
-    /// Iddia edilen sey <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
-    /// dolayisiyla karar ancak agirlasabilir. Yuk altinda "daha hafif" bir karar,
-    /// olcunun bozuldugu anlamina gelir.
+    /// Iddia edilen sey <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir, yani
+    /// yuklu okuma en dusuk bos okumanin <see cref="YonPayi"/> kati altina inemez.
+    ///
+    /// <b>Karar sinifi</b> iddiasi (yuk altinda karar hafiflemez) T117'de buradan cikti ve
+    /// <see cref="YukAltindaKararHafiflemiyorMu"/> olcusune, <c>[QuietMachineFact]</c>
+    /// gecidinin arkasina tasindi. Sebebi: iddia yalnizca bos okumalar zaten
+    /// <c>SoftwareHeavyLoad</c> ciktiginda — yani tabanin bos olmadigi durumda —
+    /// kurulabiliyordu; bos bir makinede vakuftu, dolu bir makinede ise olctugu sey urun
+    /// degil makinenin o anki gurultusuydu. On dort ajanin ayni makinede kostugu bu
+    /// depoda bu, yalitilmis bes kosumda 1 kirmizi 4 yesil olarak olculdu.
     ///
     /// Iddianin dayandigi bos okuma <b>dogrulanmadan</b> kullanilamaz. Olcunun para
     /// birimi tek is parcacikli gecisin duvar saati; makinede baska bir is kosuyorsa
@@ -456,9 +463,6 @@ public sealed class PerformanceCheckTests
                 $"yuk altinda maliyet dustu: en dusuk bos okuma {N(taban)}, yuklu {N(yuklu.SoftwareRealtimeCores)}");
 
             Assert.NotEqual(RecordingImpact.Unknown, yuklu.Impact);
-            Assert.False(sessizler.Any(r => r.Impact == RecordingImpact.SoftwareHeavyLoad)
-                         && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
-                "yuk altinda karar hafifledi");
         }
 
         if (!bosDonanim.HardwareMeasured)
@@ -479,6 +483,62 @@ public sealed class PerformanceCheckTests
                 DonanimAtla("yuk altinda", yukluDonanim, "yuk karsilastirmasi kurulmadi");
             }
         }
+    }
+
+    /// <summary>
+    /// <b>Bos makine iddiasi.</b> Yukaridaki olcunun kaybettigi karar-sinifi iddiasi burada,
+    /// varsayimini ilan eden bir gecidin arkasinda: <c>[QuietMachineFact]</c> yalnizca bos
+    /// okuma alinabildiginde <b>ve</b> o okuma <see cref="RecordingImpact.SoftwareLightLoad"/>
+    /// ciktiginda kosar. Makine mesgulse olcu kirmizi dusmez, <b>sayilabilir sekilde atlanir</b>
+    /// ve sebebi konsola sebebiyle yazilir.
+    ///
+    /// Gecidin verdigi taban uzerine kurulan iddia: kendi yarattigimiz
+    /// <see cref="CpuLoad"/> — mantiksal cekirdek sayisi eksi bir kadar donen is parcacigi —
+    /// olcumde <b>gorunmek zorundadir</b>. Bos okuma hafifken yuklu okuma da hafif kaliyorsa
+    /// olcu yuku hic gormuyor demektir; olculen sey urunun kendi karari, makinenin gurultusu
+    /// degil, cunku her iki okuma da ayni kosumda ve ayni tabana gore aliniyor.
+    /// </summary>
+    [QuietMachineFact]
+    public async Task YukAltindaKararHafiflemiyorMu()
+    {
+        var yukleyici = Math.Max(1, Environment.ProcessorCount - 1);
+        var kapali = new FakeAvailability();
+
+        var bos = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+
+        PerformanceCheckResult yuklu;
+        using (new CpuLoad(yukleyici))
+            yuklu = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+
+        Log($"[bos-makine] yukleyici={yukleyici} esik={N(PerformanceCheck.HeavyLoadCores)} | " +
+            $"bos: {bos.Impact}/{N(bos.SoftwareRealtimeCores)}/olculdu={bos.SoftwareMeasured} | " +
+            $"yuklu: {yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)}/olculdu={yuklu.SoftwareMeasured}");
+
+        if (!bos.SoftwareMeasured || bos.Impact != RecordingImpact.SoftwareLightLoad)
+        {
+            Atlandi("gecit ile kosum arasinda makine doldu: bos okuma " +
+                    $"{bos.Impact}/{N(bos.SoftwareRealtimeCores)} (olculdu={bos.SoftwareMeasured}), " +
+                    "bos taban kalmadi, karar-sinifi iddiasi kurulmadi");
+            return;
+        }
+
+        if (!yuklu.SoftwareMeasured)
+        {
+            Assert.True(yuklu.BudgetExhausted,
+                "yuk altinda yazilim bacagi butce dolmadan olculemedi: " +
+                string.Join(",", yuklu.Findings.Select(f => f.Code)));
+            Atlandi($"yuk altinda yazilim bacagi butce doldugu icin alinamadi (gecen {yuklu.ElapsedMs}ms), " +
+                    "karar-sinifi iddiasi kurulmadi");
+            return;
+        }
+
+        Assert.True(yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores,
+            $"{yukleyici} is parcacigi olcumde gorunmedi: bos {N(bos.SoftwareRealtimeCores)}, " +
+            $"yuklu {N(yuklu.SoftwareRealtimeCores)} gercek zaman cekirdegi");
+
+        Assert.False(yuklu.Impact == RecordingImpact.SoftwareLightLoad,
+            $"bos okuma hafifti ({N(bos.SoftwareRealtimeCores)}) ve {yukleyici} is parcacigi altinda " +
+            $"karar hala hafif: {N(yuklu.SoftwareRealtimeCores)}, esik {N(PerformanceCheck.HeavyLoadCores)}");
     }
 
     /// <summary>
