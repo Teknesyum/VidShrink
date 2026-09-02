@@ -50,8 +50,8 @@ kılmak ayrı bir şey ve kusur 1'in düzeltilmesine bağlı.
 
 > **T111'de tersine döndü.** Bu bölümün tespiti — "harmonik ortalama bu kaynakta
 > satırlar arası karşılaştırma için geçersiz" — **doğru değildi.** Geçersiz olan
-> metrik değil, girdisiydi. Kare kilidi takıldığında `<1` kare kümesi dokuz AV1
-> koşumunun dokuzunda da **26 → 0** oluyor ve harmonik ortalama ortalamanın 0,01
+> metrik değil, girdisiydi. Kare kilidi takıldığında `<1` kare kümesi on üç AV1
+> koşumunun on üçünde de **26 → 0** oluyor ve harmonik ortalama ortalamanın 0,01
 > içine yerleşiyor (`auto`: 56,308 → **95,642**, ortalama 95,647). Aşağıdaki
 > ölçümler ve kare numaraları doğru; onlardan çıkarılan "metrik kullanılamaz"
 > sonucu yanlıştı. Düzeltilen tablo T111 bölümünde.
@@ -471,7 +471,7 @@ motorla üretildi. `main` o tabandan beri `FfmpegArguments.cs`'i değiştirdi
 dinamik GOP'undan önceki motoru ölçüyor.** Yeni tabanda tekrarlanmadılar;
 T98'in değişikliğinin bu sayıları ne yönde oynatacağı **ölçülmedi.** Ölçtüğü
 motor gerçekten var olmuş bir motordur ve karşılaştırmalar kendi içinde
-tutarlıdır: on bir koşumun hepsi aynı tabanda üretildi.
+tutarlıdır: on altı koşumun hepsi aynı tabanda üretildi.
 
 T110 mühürlendi: ölçer artık iki girdiyi de `settb=AVTB,setpts=N` ile kare
 indeksine kilitliyor. Bu bölümün üstündeki **bütün** VMAF sayıları kilitsiz
@@ -483,7 +483,7 @@ altında; çıktılar `.calisma/t111/`.
 
 `ffprobe` kaptaki **her** akışın `start_time`'ını okuyor; grafik kayması videonun
 `start_time`'ı eksi kaptaki en erken akışın `start_time`'ı
-(`tools/auto-mod-olcumu/t111-kayma.sh`). Onbir koşumun tamamı ve kaynak ölçüldü:
+(`tools/auto-mod-olcumu/t111-kayma.sh`). On altı koşumun tamamı ve kaynak ölçüldü:
 
 | dosya | akış | video `start_time` | en erken akış | kap içi kayma |
 |---|---|---|---|---|
@@ -496,16 +496,21 @@ altında; çıktılar `.calisma/t111/`.
 | `y1-g300-izgara` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
 | `y2-g300-hizali` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
 | `y3-hizali-boyutesit` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `uzman-biz4` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `uzman-biz5` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `uzman-biz6` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `uzman-biz7` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
 | `uzman-hb` (x265) | 2 | 0,020000 | 0,000000 | 0,020000 s = 1,200 kare |
 | `uzman-hb2` (x265) | 2 | 0,020000 | 0,000000 | 0,020000 s = 1,200 kare |
+| `uzman-hb3` (x265) | 2 | 0,020000 | 0,000000 | 0,020000 s = 1,200 kare |
 
 Framesync tek bir dosyanın kaymasına değil, **iki kaymanın farkına** bakıyor.
 Test eksi kaynak:
 
 | aile | kaynak | çıktı | fark | kare cinsinden |
 |---|---|---|---|---|
-| dokuz SVT-AV1 koşumu | 0,020000 | 0,016667 | **−0,003333 s** | −0,200 kare |
-| iki HandBrake koşumu | 0,020000 | 0,020000 | **0,000000 s** | 0,000 kare |
+| on üç SVT-AV1 koşumu | 0,020000 | 0,016667 | **−0,003333 s** | −0,200 kare |
+| üç HandBrake koşumu | 0,020000 | 0,020000 | **0,000000 s** | 0,000 kare |
 
 **HandBrake koşumlarının temiz çıkması beklentiydi; doğrulandı — ama beklenen
 sebeple değil.** HandBrake çıktısı kaymasız değil: kaynağın kaymasının aynısını,
@@ -532,7 +537,7 @@ beşte biri kadar; ama işareti hiç değişmediği için framesync her karede b
 (3624 karenin 3444'ü pozitif), ortalaması sıfırın üstünde ve kare 0 tam sıfır —
 tam kare kayması üretmiyor.
 
-Kalan yedi koşumun kare kare damgası **ölçülmedi**; onlar için kanıt yalnız
+Kalan on iki koşumun kare kare damgası **ölçülmedi**; onlar için kanıt yalnız
 kap ofseti. Dördü ölçüldü çünkü belgedeki karşılaştırmaları bu dört koşum
 taşıyor.
 
@@ -593,13 +598,22 @@ değişiklik **kilidin** payıdır.
 | `y3-hizali-boyutesit` | +1,205 | **+2,448** | +38,394 | 26 → 0 | 0,000 → 71,940 |
 | `uzman-hb` (x265) | +0,010 | +0,004 | +0,011 | 0 → 0 | 74,692 → **94,211** |
 | `uzman-hb2` (x265) | +0,010 | +0,003 | +0,011 | 0 → 0 | 74,673 → **94,156** |
+| `uzman-biz4` † | +1,221 | +0,264 | +39,605 | 26 → 0 | 0,000 → 94,747 |
+| `uzman-biz5` † | +1,222 | +0,253 | +39,612 | 26 → 0 | 0,000 → 94,673 |
+| `uzman-biz6` † | +1,222 | +0,249 | +39,612 | 26 → 0 | 0,000 → 94,673 |
+| `uzman-biz7` † | +1,222 | +0,258 | +39,610 | 26 → 0 | 0,000 → 94,673 |
+| `uzman-hb3` (x265) † | +0,010 | +0,003 | +0,011 | 0 → 0 | 74,678 → **94,126** |
 
-Eşlenen kare sayısı on bir koşumun hepsinde **3624 → 3624**: kilit kare
+† T111'de boyut eşlemesi için üretilen beş yeni koşum; T102 arşivinde
+karşılıkları yok, dolayısıyla üstteki yeniden üretim sınırı bunlara
+uygulanmıyor. Kilidin payı yine de doğrudan: aynı dosya iki kez ölçüldü.
+
+Eşlenen kare sayısı on altı koşumun hepsinde **3624 → 3624**: kilit kare
 düşürmüyor, eşleşmeyi kaydırıyor.
 
 Üç şey okunuyor:
 
-1. **Dokuz AV1 koşumunun dokuzunda da `<1` kare kümesi tamamen kayboluyor.**
+1. **On üç AV1 koşumunun on üçünde de `<1` kare kümesi tamamen kayboluyor.**
    26 → 0, istisnasız. Kusur 4'ün konusu olan kareler AV1'in bir özelliği değil,
    ölçümün ürünüymüş.
 2. **x265 tarafında ortalama neredeyse hiç oynamıyor (+0,010) ama en düşük kare
@@ -646,6 +660,60 @@ Değişen büyüklük — "bir puandan fazla geri" ile "onda bir puan geri" fark
 cümle, ve ikincisi doğru olanı. p10'daki 0,477 ise en dayanıklı kalem: kilitle
 0,852'den 0,477'ye indi ama sıfırlanmadı.
 
+### Boyut eşlemesi — band yoklandı, yöntem ve deneme sayısı
+
+T102'nin boyut eşli çifti (`uzman-biz3` 2605 kbps, `uzman-hb2` 1900 kbps) yeni
+auto'ya artık eşlenmiyor: yeni auto **15 496 155** bayt teslim etti, T102'nin
+belgelediği 15 766 933'ten **%1,72 küçük** — kalibrasyon sondası bu turda farklı
+karar verdi. Eski eşleşme çifti bu yüzden %1,75 ve %1,59 yukarıda kaldı.
+
+**Yöntem:** istenen bit hızı üzerinde ikiye bölme. Ölçüt teslim edilen dosya
+boyutu, hedef yeni auto'nun 15 496 155 baytı. Her deneme tam bir iki geçişli
+kodlama; ayarlar sabit (preset 4, `-g 300`, `lp=4`), yalnız `-b:v` değişiyor.
+**AV1'de beş deneme, HandBrake'te bir deneme.** Bandı kapatan şey son değer
+değil, bandın kendisi — beş nokta hedefin iki yanını da kapsıyor.
+
+| koşum | istenen | teslim (bayt) | Δ auto'ya göre | kilitli ortalama | açık (auto = 95,647) |
+|---|---|---|---|---|---|
+| `uzman-biz4` | 2557 kbps | 15 316 867 | **−%1,16** | 96,076 | +0,429 |
+| `uzman-biz7` | 2564 kbps | 15 422 001 | **−%0,48** | 96,077 | +0,430 |
+| `uzman-biz6` | 2571 kbps | 15 654 575 | **+%1,02** | 96,080 | +0,433 |
+| `uzman-biz5` | 2587 kbps | 15 703 022 | **+%1,33** | 96,079 | +0,433 |
+| `uzman-biz3` | 2605 kbps | 15 767 022 | **+%1,75** | 96,084 | +0,437 |
+| `uzman-hb3` | 1867 kbps | 15 483 689 | **−%0,08** | 95,729 | +0,083 |
+| `uzman-hb2` | 1900 kbps | 15 743 067 | **+%1,59** | 95,743 | +0,097 |
+
+**Tam eşleşme sağlanmadı; band ±%1,02'den ±%0,48'e daraltıldı.** AV1 tarafında
+hedefe en yakın koşum `uzman-biz7`, −%0,48. Üçüncü tur açılmadı, band burada
+bırakıldı. HandBrake tarafında `uzman-hb3` −%0,08 ile tek denemede tutturdu.
+
+**Kalan sapmanın açığa etkisi ölçüldü, çıkarılmadı.** Aynı ayarlarla üretilmiş
+beş AV1 koşumu %2,91'lik bir boyut aralığına yayılıyor (15 316 867 → 15 767 022);
+bu aralık boyunca kilitli ortalama **0,008** puan, p10 **0,006** puan oynuyor.
+Yani skorun boyuta eğimi bu bandda 0,008 / %2,91 ≈ **puan başına %0,003**.
+`uzman-biz7`'nin kalan %0,48'lik sapmasının açığa katkısı bu eğimle **0,001
+puandan küçük** — uzman açığının +0,43'ü boyut farkından gelmiyor.
+HandBrake'te aynı hesap: %1,67'lik aralıkta 0,014 puan.
+
+**Açık band boyunca kararlı:** beş koşumun beşinde de +0,429 ile +0,437 arasında.
+Tek bir eşleşmiş çiftten daha güçlü bir ifade bu — açık, boyut eşleşmesinin
+tesadüfüne bağlı değil.
+
+**Karşılaştırılan dosyaların akış kümesi eşitlendiği doğrulandı.** Yedi dosyada
+(kaynak + üç AV1 + iki x265 + auto) `ffprobe` ile: 1920x1080, 60 fps, **3624
+video paketi**, tek AAC 48000 Hz stereo ses akışı. Süreler: kaynak 60,442 s,
+AV1 çıktıları 60,441167 s, HandBrake çıktıları 60,437 s. Bu projede ortak
+ölçüm parçalarının sessizce farklı çıkması bir kez A/B'yi haksız yapmıştı;
+burada eşitlik ölçüldü.
+
+**Bir boyut yanlış okundu ve düzeltildi.** `uzman-biz6` ilk okumada **14 942 256**
+bayt göründü; dosya o anda hâlâ yazılıyordu. Gerçek teslim boyutu 15 654 575.
+Yanlış okuma tabloya girmedi ama bu satırda duruyor: silinmiyor, ölçüm anında
+okunduğu ve düzeltildiği kayda geçiyor. Düzenek `tools/auto-mod-olcumu/` altında
+düzeltildi — kodlama artık geçici ada (`.<ad>.yaziliyor.mp4`) yazıp süreç
+çıkış kodu beklendikten sonra `mv` ile taşınıyor, tablo üreticisi ortada
+`.yaziliyor` dosyası görürse tablo üretmeden duruyor.
+
 ### K6'nın önerileri bugünkü `main`e karşı denetlendi
 
 T111'in ölçümleri `3688336` tabanında koştu. `main` o tabandan beri
@@ -685,6 +753,52 @@ bu maddenin sorduğu şey değişmedi.
 `PlanCalculator.PickPreset` / `FfmpegArguments.DefaultPreset` yolu tabanla
 bugünkü `main` arasında değişmedi. Maddeyi bekleten şey de değişmedi: kodlama
 süresi hâlâ **ölçülmedi**.
+
+### T111 — ne değişti, ne değişmedi, ne ölçülmedi
+
+Aşağıdaki üç liste bu bölümün kapanışı. Bir sonuç değiştiyse değiştiği yerde
+değişti (aynı commit'te); geri çekilen cümlenin üstü çizilmedi, yerine ölçülen
+yazıldı ve neyle değiştiği söylendi.
+
+**Tersine dönen sonuçlar** — dördü de yukarıda kendi bölümünde düzeltildi:
+
+1. **"Harmonik ortalama bu kaynakta kullanılamaz"** → yanlıştı. Geçersiz olan
+   metrik değil girdisiydi; kilitle harmonik, ortalamanın 0,01 içine oturuyor.
+2. **Kusur 4 ("26 kare AV1'in özelliği")** → değil. On üç AV1 koşumunun on
+   üçünde 26 → 0. Kusur kapandı (T110 düzeltti, T111 ölçtü).
+3. **"HandBrake bizden 1,269 puan önde"** → kilitli ölçümde açık **+0,097**.
+   Eski açığın **%92'si ölçüm kusuruymuş**. Açığın **işareti dönmedi**:
+   HandBrake üç metrikte de hâlâ önde, kalan gerçek açık onda bir puan.
+4. **"Kilit üretim yolunda takılı değil"** (T106'nın notu) → T110 kapattı;
+   `QualityMeter.FrameLock` bugün `main`'de.
+
+**Ölçüldü, değişmedi** — sayısı oynadı, sonucu durdu:
+
+- **Uzman açığı.** +0,400 → +0,437 (kilitli). İşaret, büyüklük sırası ve K3'ün
+  sonucu aynı: uzman elle ayar yaparak auto'yu geçiyor.
+- **Uzman açığı boyut bandı boyunca kararlı.** ±%1,75'lik bandın beş noktasında
+  +0,429 ile +0,437 arası; açık boyut eşleşmesine bağlı değil.
+- **Eşlenen kare sayısı.** On altı koşumun hepsinde 3624 → 3624. Kilit kare
+  düşürmüyor, eşleşmeyi kaydırıyor.
+- **K1'in plan kararları, K4'ün ayrıştırması, K5'in karşılaştırması.** Bu
+  bölümde yeniden ölçülmediler; kilit bunları taşıyan sayıları değiştirmedi
+  demek **değil** — değiştirip değiştirmediği **ölçülmedi**.
+- **Yeniden kodlamanın kendi payı.** T102 arşivi ↔ T111 kilitsiz, on bir
+  koşumda ≤ 0,013 ortalama. Kilidin payı bu sınırın çok üstünde.
+
+**Ölçülmedi** — bu bölümde iddia edilmeyen şeyler:
+
+- T98'in dinamik anahtar kare aralığının (`8ea80c4`) bu sayıları ne yönde
+  oynatacağı. Ölçümler `3688336` tabanında; yeni tabanda tekrarlanmadılar.
+- `scd=1`'in (kodlayıcının kendi sahne kesme algılaması) bu kaynakta ne yaptığı.
+  Bu belgenin ölçtüğü şey `-force_key_frames`, farklı bir mekanizma.
+- `-g` tavanının 300'den 600'e çıkmasının etkisi. Ölçülen tek nokta 120 → 300.
+- `y2`/`y3`'ün p10'unun neden diğerlerinin yedi katı oynadığı.
+- T106'nın `76,219`'unun neden T111'de `94,211` çıktığı. Ham JSON git'te değil;
+  fark yeniden kodlama gürültüsünden büyük, sebebi **ölçülmedi**.
+- Kalan on iki koşumun kare kare damga dökümü; onlar için kanıt kap ofseti.
+- Kodlama süreleri. Makinede dokuz ajan koşuyordu; süre ölçülmedi, bu bölümde
+  hiçbir süre sayısı yok. Kalite ve boyut sayıları paylaşımdan etkilenmez.
 
 ## Ölçüm sırasında bulunan kusurlar — düzeltilmedi
 
