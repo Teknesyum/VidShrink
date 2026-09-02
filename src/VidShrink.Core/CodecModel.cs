@@ -9,7 +9,6 @@ public static class CodecModel
     public const double PriorQualityAtReference = 93.0;
     public const double PriorQualityPerHalving = 6.0;
     public const double DetailConcentrationExponent = 0.25;
-    public const double FpsBitrateExponent = 0.75;
     public const double ScalePenaltyScale = 10.0;
     public const double ScalePenaltyExponent = 1.1;
     public const double FpsPenaltyPerHalving = 5.0;

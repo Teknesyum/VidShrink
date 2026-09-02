@@ -27,7 +27,13 @@ Tek bir özel `MeasureAsync` üç genel giriş tarafından çağrılıyor: `Meas
 
 Her metrik **ayrı bir ffmpeg koşumu**. Üçünün de filtre grafiği aynı:
 
-    [0:v]<test-normalizasyonu>[t];[1:v]<tonemap-öneki><referans-normalizasyonu>[r];[t][r]<metrik>
+    [0:v]<test-normalizasyonu>,settb=AVTB,setpts=N[t];
+    [1:v]<tonemap-öneki><referans-normalizasyonu>,settb=AVTB,setpts=N[r];
+    [t][r]<metrik>
+
+> **T116:** bu satır T110'a kadar kilitsiz hâliyle duruyordu ve §9.11'in kirlenmiş
+> satır envanterine de girmemişti. Kilidin kendisi §9.5'te, kaynağı
+> `MeasureFilterGraph.Build` (`QualityMeter.cs:86-88`).
 
 Normalizasyon `zscale` ile açık: giriş uzayı dosyanın etiketlerinden, çıkış uzayı
 referanstan alınıyor. `zscale` yoksa ölçüm hata fırlatıyor — sessizce etiketsiz
@@ -115,7 +121,10 @@ içerikteki tavanını raporluyor — 1080p60 gerçek içerikte 99,68, 320x240
 `testsrc2`'de 99,87. Kullanıcıya gösterilecek "kusursuz" rozeti istenirse sayıyı
 bozarak değil ayrı bir alanla verilmeli.
 
-> **T110:** bu sayı kilitli ölçüyle yeniden ölçüldü, **değişmedi** (97,4257; §9.10).
+> **T116 düzeltmesi:** T110'un buraya koyduğu damga yanlış yere basılmıştı.
+> §9.10 yalnız **p1**'i ölçtü (97,4257, kilitli ve kilitsiz aynı). Aşağıdaki
+> yan bulgunun 97,4256'sı §7'nin özdeş tablosunda **p3**'ün sayısıdır (:556) ve
+> **yeniden ölçülmedi.** İki ayrı klibin sayısı tek damgada birleştirilmişti.
 
 Yan bulgu: özdeş 1080p içerikte kare bazlı **min 97,4256**, p10 97,9241. Yani
 `VmafNegMin` özdeş dosyada bile 97,4 diyor — bu bir kalite işareti değil, modelin
@@ -577,6 +586,13 @@ p1'de sinyal gürültünün yüzde biri; p3'te **sıra ters dönüyor** — köt
 daha iyi görünüyor. Yalnız p2 ayırıyor, o da hiçbir yolun ayıramadığı durağan
 klip; orada min klip ortalamasına yapıştığı için "ayırıyor" görünüyor.
 
+> **T116:** yukarıdaki tablo kilitsiz ölçüden gelir ve §9.10'da damgalıdır; bu
+> paragraf damgasız kalmıştı. Kilitli ölçüde **p1 ayırıyor**: sinyal 0,0136'dan
+> **3,1471**'e, gürültü 1,3748'e karşı. "p1'de sinyal gürültünün yüzde biri"
+> gözlemi kilitli ölçüde **yok**. p2 ve p3 satırları **yeniden ölçülmedi**, o
+> yüzden "sıra ters dönüyor" ve "yalnız p2 ayırıyor" cümleleri için
+> **ölçülmedi** geçerlidir.
+
 Aynı tabloda p10 ve en kötü birim aynı içeriklerde çalışıyor (p1 p10 sinyali
 1,9059; p3 2,6384). Yani boşluğu dolduran alan zaten var.
 
@@ -595,6 +611,12 @@ Aynı tabloda p10 ve en kötü birim aynı içeriklerde çalışıyor (p1 p10 si
 
 Kısaca: silinmedi çünkü tanıda işe yarıyor; terfi de etmedi çünkü üç içerikte
 ölçüldü ve kalite ayıramadı.
+
+> **T116:** bu cümlenin "üç içerikte ölçüldü ve kalite ayıramadı" kısmı
+> **kilitsiz ölçüye dayanıyor.** Kilitli ölçüde p1 ayırıyor (§9.10); p2 ve p3
+> **yeniden ölçülmedi.** Bugünkü doğru ifade: üç içerikte kilitsiz ölçüldü,
+> birinde kilitli yeniden ölçüldü ve orada ayırdı, ikisi ölçülmedi. K5 kararı
+> yine de değiştirilmedi — kararı yeniden açmak ayrı bir iştir.
 
 
 ## 8. Bu turun sınırları
@@ -693,8 +715,25 @@ karenin **6'sının** yanlış eşlendiğini gösteriyor — 29/30, 133/134, 205
 | 205 | 44,0798 | 54,0565 |
 | 206 | **5,9679** | 44,0571 |
 
-Kalan 234 kare iki koşumda da aynı. Kilit kare **eklemiyor**, yanlış eşlenmiş
-altı kareyi **kaldırıyor**: min 2,59'dan 30,23'e, ortalama +0,57.
+**T116 yeniden ölçtü — 234 değil 232.** Yukarıdaki altı satır doğru ama sayım
+değil: ham günlükte **8 kare** iki koşumda farklı, **232 kare** aynı. Farklı olan
+sekiz kare 29, 30, **31**, 133, 134, **135**, 205, 206. Altısı bir puandan fazla
+oynuyor (tablodakiler); kalan ikisi kilitle **aşağı** iniyor — 31. kare
+36,7814 → 36,0200 (**−0,7613**), 135. kare 49,9762 → 49,9433 (−0,0328). Kilit
+kare **eklemiyor**, yanlış eşlenmiş altı kareyi **kaldırıyor**: min 2,59'dan
+30,23'e, ortalama +0,57.
+
+Izgaranın ref1 satırları bu turda rakamı rakamına yeniden üretildi (kilitsiz
+40,6656 / 33,1747 / 2,5864; kilitli 41,2331 / 33,4906 / 30,2347). ref2'nin
+kilitsiz satırı da birebir aynı çıktı (81,4185 / 81,2890 / 80,9937).
+
+**ref2'nin kilitli satırında eşlenen kare sayısı yeniden üretilemedi.** Tablo
+**240** diyor; bu turda kesilen `ref2.mkv` **239 kare** taşıyor ve kilitli koşum
+da 239 eşliyor (81,4372 / 81,3171 / 81,0174). Fark ölçümde değil kesme adımında:
+kaptaki 0,020 s'lik kayma yüzünden `-t 4` bir kareyi dışarıda bırakıyor. T110'un
+ref2'si 240 kare taşımış olmalı. Belgenin sayısı geri çekilmedi; yeniden üretimin
+sayısı yanına yazıldı, hangisinin doğru olduğu **ölçülmedi** — iki dosya artık
+karşılaştırılamıyor.
 
 Nedeni ölçüldü: referansın kendi damgaları düzgün ızgarada değil. `ref1.mkv`'nin
 30. karesi `0,501000`'de, testin karşılık gelen karesi `0,500000`'da. Referans
@@ -735,12 +774,38 @@ geciktirilip yanına sıfırdan başlayan sessiz ses akışı konarak §9.1'deki
 | 40 ms | 1,20 | **37,8810** | 98,3724 |
 | 50 ms | 1,50 | **37,8810** | 98,3724 |
 
-Aynı kaynağın **bilerek bir kare kaydırılmış** kodlaması (ilk kare atılıp
-`setpts=N/FR/TB`) 52,3008 veriyor — 10 ms ve 20 ms kaymanın kilitsiz sonucuyla
-birebir aynı sayı. Yarım kareden küçük bir damga kayması tam bir kare kaydırmaya
-dönüşüyor; T106'nın ana iddiası ürün kodunda doğrulandı. Zarar kaymanın
-milisaniyesine değil **kare cinsinden tavanına** bağlı: (0, 1] kare bir kare,
-(1, 2] kare iki kare kaydırıyor. Kilitli sütun her kaymada 98,3724 — onarım tam.
+Yukarıdaki beş satır bu turda rakamı rakamına yeniden üretildi.
+
+**T110'un bir kare çıpası çevrimseldi; geri çekildi.** Belge "aynı kaynağın
+bilerek bir kare kaydırılmış kodlaması (ilk kare atılıp `setpts=N/FR/TB`)
+52,3008 veriyor" diyordu. Ölçüldü: o tarifle üretilen dosya **65,7226** veriyor,
+52,3008 vermiyor. 52,3008'i veren dosya `-itsoffset 0.020` kopyasının **kendisi**,
+yani ızgaranın 20 ms satırındaki `k0.020.mkv`. Yani çıpa kendi ölçtüğü sayıyla
+karşılaştırılmış; bağımsız bir kanıt değildi.
+
+Çevrimsel olmayan çıpalar ölçüldü. Kaydırma **içeriğe** uygulanır, damgaya değil
+(`select=gte(n\,K),setpts=N/FR/TB`, sonra `libx264 -crf 16`), ve sonuç
+**kilitli** ölçülür — böylece ölçülen şey kaymanın kendisi olur, ölçerin kusuru
+değil:
+
+| gerçekten kaydırılmış içerik | kilitli ortalama | karşılığı olan kilitsiz damga kayması | kilitsiz ortalama | fark |
+|---|---:|---|---:|---:|
+| kaydırma yok | 98,3724 | 0 ms | 98,3724 | 0 |
+| 1 kare | **52,1174** | 10 ms ve 20 ms | 52,3008 | 0,18 |
+| 2 kare | **37,4526** | 40 ms ve 50 ms | 37,8810 | 0,43 |
+
+`(1, 2]` bacağının eksik çıpası budur. Yarım kareden küçük bir damga kayması tam
+bir kare kaydırmaya dönüşüyor; T106'nın ana iddiası ürün kodunda doğrulandı.
+Zarar kaymanın milisaniyesine değil **kare cinsinden tavanına** bağlı: (0, 1]
+kare bir kare, (1, 2] kare iki kare kaydırıyor — iki bacağın da çıpası artık
+ölçülmüş. Kilitli sütun her kaymada 98,3724 — onarım tam.
+
+**Yan ölçüm, 0 ms satırının tarifi.** 0 ms hücresi ancak `src.mp4` doğrudan
+kullanıldığında 98,3724 veriyor. Aynı dosyanın `-itsoffset 0` ile sessiz ses
+akışının yanına konmuş mkv kopyası kilitsiz **81,8084** veriyor ve 90 yerine
+**91 kare** üretiyor: mkv'nin 1/1000 zaman tabanı 60→30 fps ızgarasını
+yuvarlıyor ve kayma sıfırken bile kare eşlemesini bozuyor. Kilitli ölçüde aynı
+dosya 98,3724 ve 90 kare. Izgaranın 0 ms satırı `src.mp4` ile üretilmiştir.
 
 ### 9.5 Kilidin kendisi
 
@@ -770,8 +835,15 @@ tüketicide görünüyor, ayrı bir günlük kanalı gerekmiyor, ve karşılaşt
 sonuçlarda bile doluyor (`Comparable=false` dönen erken çıkış da `Alignment`
 taşıyor). `Note` yalnız kayma varken dolu:
 
-    "Kaynak ve test zaman damgaları 20 ms (1,2 kare) ayrık; kareler zaman
+    "Kaynak ve test zaman damgaları 20 ms (1.2 kare) ayrık; kareler zaman
      damgasına değil kare indeksine eşlendi."
+
+> **T116:** yukarıdaki metin çalışan koddan okundu (60 fps ref2 çifti,
+> `ShiftFrames = 1.2`). Belge önce "1,2 kare" yazıyordu; kod
+> `CultureInfo.InvariantCulture` ile biçimliyor, ondalık ayırıcı **nokta**.
+> Arayüzün geri kalanı Türkçe olduğu için bu bir tutarsızlık, ama düzeltmesi
+> `QualityMeter.cs`'te ve o dosya T116'nın `owns`'unda değil — **değiştirilmedi**,
+> yalnız belgedeki alıntı koda uyduruldu.
 
 Ölçüsü `ShiftedSourceIsReportedNotSilentlyRepaired` ve
 `VideoStartAheadOfTheContainerIsTheOffsetThatReachesTheFilterGraph`. İkincisi
@@ -908,6 +980,7 @@ yerler anormal düşük `min` değerleridir; hepsi aşağıda, her biri ya yenid
 | §7 özdeş tablosu | 97,4257 / 97,4253 / 97,4256 | p1 **ölçüldü, değişmedi**; p2 ve p3 **ölçülmedi** |
 | §7 crf8/crf12 tablosu | p1 4,3147 / 4,3011 | **geçersiz**, yeniden ölçüldü (§9.10) |
 | aynı tablo | p2 95,2609 / 94,2846, p3 2,2023 / 2,2041 | **ölçülmedi**; p3'ün 2,2'si p1'inkiyle aynı aileden görünüyor ama bu bir tahmin |
+| §1 grafiği | kilitsiz filtre satırı | **envanterde eksikti** — T116 ekledi; belgenin kendi tarif satırı kilitsiz haliyle duruyordu, kilitli haliyle değiştirildi (§1) |
 
 **Kaçırılmış ipucu.** §3'ün yan bulgusu `xpsnr` filtresinin bastığı
 `not matching timebases found between first input: 1/15360 and second input
@@ -969,8 +1042,215 @@ bataryasından geliyor; batarya da ffmpeg'li koşuma dayanıyor (M1–M8'in kır
 sayıları `[FfmpegFact]` ölçülerinden çıkıyor).
 
 Bunun sonucu: **kare kilidi CI'da korunmuyor.** CI ffmpeg görmediği sürece kilidi
-kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın yaklaşık 80
-ölçüyü atlaması ayrı bir işe (T115) alındı.
+kaldıran bir değişiklik yeşil geçer. Bu turda düzeltilmedi — CI'ın ffmpeg'siz
+koşması ayrı bir işe (T115) alındı.
+
+> **T116 eklemesi — CI'da koşan üç "ölçüm filtresi" ölçüsü ürünü pinlemiyor.**
+> `VmafPoolingTests` üç ölçü taşıyor (`OlcumFiltresi_IkiGirdiyiDe_KareIndeksineKilitler`,
+> `OlcumFiltresi_KareKilidi_OlceklemedenSonraGelir` — ikisi düz `[Fact]`, yani
+> **CI'da koşuyor** — ve `OlcumSerisi_KareKilidi_GoreceliKaydirilinca_Bozulur`).
+> Adları kilidi ölçüyormuş gibi duruyor ama çağırdıkları `MeasureFilterGraph`
+> **ürünün sınıfı değil.** Ağaçta aynı adla iki sınıf var:
+> `VidShrink.Ffmpeg.MeasureFilterGraph` (`QualityMeter.cs:73`) ve
+> `tools/VidShrink.Bench/Program.cs:2545`'teki — ikincisi **global ad uzayında**,
+> çünkü `Program.cs` hiç `namespace` bildirmiyor. C#'ta kapsayan ad uzayının
+> üyeleri `using` ile getirilen adların önüne geçtiği için testlerdeki niteliksiz
+> `MeasureFilterGraph` **`VidShrink.Bench`inkine** bağlanıyor.
+>
+> Bu okunarak değil **ölçülerek** saptandı: `VmafPoolingTests.cs`'in ad uzayı ve
+> `using` kümesi birebir kopyalanıp `typeof(MeasureFilterGraph)` yazdırıldı
+> (`dotnet run --project tools/cipa-yeniden/duzenek/adcozum/adcozum.csproj`):
+>
+> ```
+> tur      : MeasureFilterGraph
+> derleme  : VidShrink.Bench
+> urun tur : VidShrink.Ffmpeg.MeasureFilterGraph @ VidShrink.Ffmpeg
+> ```
+>
+> `grep -rn MeasureFilterGraph tests/` dört kullanımın dördünü de bu dosyada
+> buluyor; **ürünün sınıfını adıyla anan tek bir ölçü yok.** Ürünün
+> `MeasureFilterGraph`ının tek çağıranı `QualityMeter.cs:359`.
+>
+> Bu, yukarıdaki sonucu değiştirmiyor, **güçlendiriyor**: ürün kilidini pinleyen
+> ölçüler §9.8'in mutasyon tablosundaki 9 kırmızıdır ve hepsi `[FfmpegFact]`.
+> CI'da yeşil duran iki `OlcumFiltresi_*` ölçüsü `bench`in grafiğini koruyor
+> (T106'nın kilidi), ürününkini değil. İki `Build` aşırı yüklemesinin imzaları da
+> farklı (`bench`: `(int, int, string)`, ürün: `(string, string, string)`), yani
+> testler nitelenmiş yazılsa **derlenmezdi**.
+>
+> **Düzeltilmedi.** `VmafPoolingTests.cs` ve `Program.cs` bu sözleşmenin
+> `owns`'unda değil. Ad çakışmasının kendisi de bir kusur: iki sınıf aynı adı
+> taşıyor ve biri global ad uzayında duruyor.
+
+> **T116 düzeltmesi — "yaklaşık 80" yanlış.** T110 denetimi bu sayıyı iki
+> koşumda ölçtü: yerel `tools/ci-gibi-kos.sh` **106**, GitHub CI **100** atlıyor.
+> Bu iki sayı denetimin ölçümüdür; T116 tam süiti koşturmadı (sözleşme yasakladı)
+> ve **kendi koşumundan bir atlama sayısı ölçmedi.**
+>
+> T116'nın kaynaktan saydığı şey kapının kendisi: süitte tek değil **on bir**
+> atlama özniteliği var, toplam **111** kullanım — `FfmpegFact` 84,
+> `LiveSourceTheory` 7, `SplashImageFact` 5, `LiveSourceFact` 3,
+> `LiveLauncherFact` 3, `TonemapFact` 2, `LiveProbeFact` 2, `LivePlaybackFact` 2,
+> `FfmpegTheory` 1, `BenchSourceFact` 1, `LauncherBinaryFact` 1. Sekiz kullanım
+> teori olduğu için koşulan **durum** sayısı bundan yüksek, ve hangi özniteliğin
+> kaç durum ürettiği **sayılmadı**. 106 ile 100 arasındaki fark ortamdan geliyor:
+> GitHub CI'da ffmpeg'in yanı sıra `VIDSHRINK_LIVE_*` değişkenleri ve derlenmiş
+> fırlatıcı da yok.
+>
+> `[FfmpegFact]`'in dosya dosya dağılımı: `FrameGrabberTests` 21,
+> `QualityMeterTests` 12, `PanelHostTests` 11, `PerformanceCheckTests` 7,
+> `ComplexityProbeTests` 6, `SegmentEncoderTests` 6, `FpsDropTests` 5,
+> `EncodeRunnerTests` 4, `PreviewSyncTests` 4, `SceneMapTests` 4,
+> `VmafPoolingTests` 3, `QualityTargetTests` 1.
+>
+> §9'un beş kilit ölçüsünün beşi de `[FfmpegFact]`, yani 84'lük kümenin içinde.
+> Hangi toplam alınırsa alınsın **kilidin kanıtı CI'da koşmuyor**; bu bölümün ana
+> iddiası sayının düzeltilmesinden etkilenmiyor.
+
+
+## 10. Kilitsiz ölçerle konmuş çıpalar — geri alınır mı (T116)
+
+T110 ürün ölçerine kare kilidini koydu ve aynı çift üzerinde çıpanın kilitsiz
+75,07, kilitli 87,20 okuduğunu gösterdi — **12,13 puan**. Bu turun sorusu şuydu:
+o hata daha önce konmuş çıpalara ve o çıpalara dayanan kararlara ne yaptı.
+
+Ölçülen ağaç: worktree `T116-cipa-yeniden`, commit `31472cb`. Ölçer ffmpeg 9.0,
+libvmaf `vmaf_v0.6.1neg`. Düzenek `tools/cipa-yeniden/`; her sayının komutu
+oradaki `README.md` ve `duzenek/` altında yazılı.
+
+### 10.1 Çıpa kendiliğinden düzeldi — kalibrasyon turu gerekmedi (K4)
+
+**Bu turun en önemli sonucu budur ve sözleşmenin açılış öncülünü yumuşatıyor.**
+
+Çıpa saklanan bir sabit değil; `ComplexityProfile.WithProbeQuality` her koşumda
+pencere ölçümlerinden yeniden hesaplıyor. Yani kilit ürün koduna girdiği an
+(`822dd3a`, 09-02 04:44) eski çıpa diye bir şey kalmadı — bir sonraki koşum
+kilitli ölçüyle yeni çıpayı kuruyor. **Diskte düzeltilecek bir çıpa yok,
+kalibrasyon turu gerekmiyor.** Bu ölçüldü: aynı ağaçtan biri kilitli biri
+kilitsiz iki ikili yayımlandı ve aynı kaynaklarda koşuldu.
+
+| kaynak | çıpa kilitsiz | çıpa kilitli | fark |
+|---|---:|---:|---:|
+| `parca-1.mkv` (1080p60 HDR) | 82,726502 | 87,192345 | **+4,465842** |
+| `parca-2.mkv` (1080p60 HDR) | 91,550111 | 91,575281 | +0,025170 |
+| `sdr-1.mkv` (ikame, 1080p60 SDR) | 82,277860 | 91,718219 | **+9,440358** |
+
+`parca-1`in +4,47'si T110'un 12,13'ünün üçe bölünmüş halidir. Pencere pencere:
+
+| pencere | kilitsiz | kilitli | fark |
+|---|---:|---:|---:|
+| 1 (9,73 s) | 86,157256 | 87,425446 | +1,268190 |
+| 2 (29,20 s) | 86,947848 | 86,947848 | **0,000000** |
+| 3 (48,67 s) | 75,074404 | 87,203740 | **+12,129337** |
+
+Üçüncü pencere T110'un çiftidir ve 12,13 rakamı rakamına yeniden üretildi.
+İkinci pencere onbeş ondalık basamağa kadar özdeş: o pencerede kayma yoktu ve
+kilit hiçbir şey değiştirmedi. Çıpa üç pencerenin aritmetik ortalaması olduğu
+için 12,13 puanlık tek pencere hatası çıpaya **4,04 puan** olarak geçiyor;
+kalan 0,42 birinci pencereden geliyor.
+
+> **Bağımsız doğrulama.** Bu çıpalar `tools/cipa-yeniden/` sondasıyla ölçüldü,
+> ama aynı sayılar ikinci ve bağımsız bir yoldan da çıktı: `bench shrink
+> --measured-quality` koşumları pencere çıpalarını kendi günlüklerine basıyor
+> (`olculen-kaliteyle-plan.md` §11.5'in ızgarası, kilitli ölçer):
+> `parca-1` → `87.43/86.95/87.2`, `parca-2` → `92.48/91.13/91.12`,
+> `sdr-1` → `93.91/90.32/90.93`. Sondanın verdiği ortalamalarla (87,192345 /
+> 91,575281 / 91,718219) basılan basamak sayısına kadar aynı. İki düzenek aynı
+> ürün yolunu ayrı ayrı çağırdı ve aynı sayıyı verdi.
+
+**Plan hiçbir hedefte değişmedi.** Aynı iki ikili `PlanCalculator.BuildDetailed`
+ile koşuldu ve plan alanları (genişlik, yükseklik, fps, kodlayıcı, kip, crf,
+video bit hızı, preset) karşılaştırıldı:
+
+| kaynak | sayılan hedef | plan aynı |
+|---|---|---|
+| `parca-1.mkv` | 8, 12, 20, 30, 40, 60, 80 MB — **yedisi de** | 7/7 |
+| `parca-2.mkv` | 8, 12, 20, 30, 40, 60, 80 MB — **yedisi de** | 7/7 |
+| `sdr-1.mkv` (ikame) | 8, 12, 20, 30, 40 MB — **beşi** | 5/5 |
+
+**Toplam 19 çift sayıldı, 19'unda plan özdeş.** `sdr-1` 23,1 MiB olduğu için
+60 ve 80 MB hedefleri **sayılmadı** — kaynak zaten hedeften küçük, plan
+kopyalamaya düşüyor ve karşılaştırma bir şey ölçmez.
+
+Değişen tek alan `PredictedQuality`, ve o da çıpa farkının aynısı kadar:
+`parca-1` her hedefte tam **+4,4658**, `sdr-1` her hedefte tam **+9,4404**.
+Tavana dayanan satırlar (99,00 ve 100,00) hiç oynamadı. Örnek — `parca-1` @ 60 MB:
+plan 1920×1080 libx264 crf 21 7585k iki koşumda da aynı, `PredictedQuality`
+83,3757 → 87,8416.
+
+**Sonuç: çıpalar yanlıştı ama kararlar yanlış değildi.** T110'un 12,13 puanı
+kullanıcıya ulaşmadı; hedef boyut bütçesi çıpadan önce geliyor ve çözünürlük,
+kodlayıcı, crf seçimini bütçe belirliyor. Çıpa yalnız **tahmin edilen kaliteyi**
+kaydırıyor — kullanıcıya gösterilen sayıyı, teslim edilen dosyayı değil. `sdr-1`
+ikamesinde ilk pencerenin **+28,32** puanlık hatası bile planı değiştirmedi;
+bu, sonucu zayıflatmıyor, güçlendiriyor.
+
+Ölçülmedi: çıpanın plana **hiçbir** koşulda geçmediği ölçülmedi. Ölçülen şey bu
+üç kaynağın 19 hedefidir. `SpreadHalvings` üç kaynakta da 0 çıktı, yani
+`PerHalving` yolu (çıpanın bit hızına göre eğim verdiği kol) bu turda hiç
+tetiklenmedi ve **ölçülmedi**.
+
+### 10.2 Belge envanteri — hangi sayı hangi ölçerden geçti (K1)
+
+`docs/olcumler/` altında bu dalın ayrıldığı noktada **20 belge** vardı; **8'i**
+VMAF ya da XPSNR sayısı taşıyor. (Envanter alındıktan sonra `main` iki belge daha
+getirdi — bölümün sonundaki eke bakın.) Ölçüt: iki kilit anı. Ölçüm boru hattı `tools/VidShrink.Bench`in kendi
+grafiğinde `0e2b071` (09-02 03:09) ve `48ec9fa` (03:15) ile kilitlendi; ürün
+ölçeri `QualityMeter` `822dd3a` (04:44) ile. Bir belgenin **son** commit'i
+kilitten önceyse içindeki hiçbir sayı kilitli ölçerden geçmiş olamaz.
+
+| belge | VMAF/XPSNR satırı | durum |
+|---|---:|---|
+| `algi-olcusu.md` | 86 | **karışık** — §9'un ızgarası ve çıpaları kilitli ölçüldü; §2, §3, §4, §5, §7'nin sayıları kilitsiz. Hangisinin yeniden ölçüldüğü §9.11'de satır satır yazılı; bu turda §9.2, §9.4 ve §7'nin p1 satırı yeniden ölçüldü |
+| `olcu-gecerliligi.md` | 37 | **karışık** — gövdesi 03:30'da yazıldı: kendi `bench` koşumları boru hattı kilidinden **sonra**, T102'nin JSON'larından yeniden saydığı sayılar kilitsiz. **Yeniden ölçülmedi** (dosya T111'in) |
+| `handbrake-acigi.md` | 18 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-01 08:49, iki kilitten de önce) |
+| `auto-mod.md` | 12 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** — sayıları T102'nin (09-02 01:40–02:08) ve `tools/auto-mod-olcumu/*.sh` kendi ffmpeg çağrılarını kuruyor: 8 ölçüm satırının **0'ında** kilit var. Zaman değil düzenek belirliyor |
+| `tepe-tavani-ve-psy.md` | 4 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-01 22:54) |
+| `ornekte-vmaf-maliyeti.md` | 4 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-01 22:18) |
+| `olculen-kaliteyle-plan.md` | 3 | **kilitsiz ölçerden geçti, yeniden ölçüldü** — A/B ızgarası bu turda kilitli ve kilitsiz ikiliyle yeniden koşuldu; eski sütun geçersiz damgasıyla duruyor |
+| `kazanc-kullaniciya-ulasiyor-mu.md` | 2 | **kilitsiz ölçerden geçti, yeniden ölçülmedi** (09-02 02:56, boru hattı kilidinden 13 dakika önce) |
+
+Kalan 12 belge VMAF ya da XPSNR sayısı taşımıyor, kilitten etkilenmiyor:
+`dinamik-esik.md`, `sahne-haritasi.md`, `ceviri-olcusu-mutasyonu.md`,
+`surecler-arasi-olcu-yalitimi.md`, `suit-eszamanli-kosum.md`,
+`t84-tur2-mutasyon.md`, `t27-ipucu-satir-genislikleri.md`,
+`t27-ipucu-satir-genislikleri-once.md`, `T33-oynatma-olcumleri.md`,
+`T37-sunum-olcumleri.md`, `T32-anahtar-kare-olcumleri.md`,
+`T30-panel-olcumleri.md`.
+
+**Bu turda hiç yeniden ölçülmeyen belgeler beş tanedir** — `handbrake-acigi.md`,
+`auto-mod.md`, `tepe-tavani-ve-psy.md`, `ornekte-vmaf-maliyeti.md`,
+`kazanc-kullaniciya-ulasiyor-mu.md`. Altıncısı `olcu-gecerliligi.md`: karışık ve
+o da yeniden ölçülmedi, ama dosya T111'in. `algi-olcusu.md` kısmen yeniden
+ölçüldü (§9.2, §9.4, §7'nin p1 satırı), geri kalanı ölçülmedi.
+
+Bu altı belgenin hiçbiri kapsam dışı bırakılmadı — **ölçülmedi.** 10.1'in sonucu
+bunları da ilgilendiriyor: içlerindeki VMAF sayıları kaymış olabilir, ama hiçbiri
+plan kararı üretmiyor; hepsi rapor sayısı. Kaymanın rapor sayısına ne yaptığı
+belge belge **ölçülmedi**.
+
+#### Envanter alındıktan sonra `main` iki belge daha getirdi
+
+Envanter bu dalın ayrıldığı `main`e göre alındı. T116 koşarken `main` ilerledi ve
+`docs/olcumler/` **22 belgeye** çıktı. İki yeni belge envanterin tablosunda yok,
+ikisi de VMAF/XPSNR taşıyor ve ikisi de **kilitsiz ölçerden geçti, yeniden
+ölçülmedi**:
+
+| belge | sözleşme | ölçen düzenek | neden kilitsiz |
+|---|---|---|---|
+| `ab-duzenegi.md` (723 satır) | T95 | `tools/VidShrink.Ab` | Ab **ürünün** `QualityMeter`ını çağırıyor (`AbRunner.cs:205-206`, `:338-339`), ama belgenin damgaladığı dört ölçüm commit'inin (`af7a0fe` 02:21, `94df05c` 04:29, `a1994b3` 05:22, `381e8ab` 07:23) **dördünde de** `QualityMeter.cs` `settb=AVTB` taşımıyor — T95'in dalı kilitten (`822dd3a`, 04:44) önce kesilmiş ve kilidi hiç almamış |
+| `bppf-tabani.md` (650 satır) | — | `bench shrink` | sayıları `6fac0be`, **2026-08-25**; `bench`in kendi grafiği 09-02 03:09'da kilitlendi, ölçüm ondan bir hafta önce |
+
+`tools/VidShrink.Ab` **dördüncü bir kilit yeri değil**: ürünün ölçerini
+çağırdığı için `main`e uyduğu anda kilidi kendiliğinden alır. Borç kodda değil,
+`ab-duzenegi.md`de **yayımlanmış sayılarda**. T116 bu iki belgeyi yeniden
+ölçmedi — ikisi de `owns` dışında ve ızgara kapandıktan sonra görüldüler.
+Kaymanın bu iki belgenin sonuçlarına ne yaptığı **ölçülmedi**.
+
+Dikkat çeken tek nokta: `ab-duzenegi.md` kendi §'lerinde "libvmaf kareleri
+yanlış eşler ve sessizce bir sayı üretir" diye **aynı olguyu adlandırıyor**;
+adlandırıp kendi ölçümüne kilidi takmamış. Bunun T95'in sonuçlarını değiştirip
+değiştirmediği **ölçülmedi**.
 
 
 ## Yeniden üretim
@@ -1043,10 +1323,19 @@ Duyarlı düzenek (§9.4), `.calisma/T110/pin/`:
     ffmpeg -i src.mp4 -c:v libx264 -crf 16 -threads 2 same.mp4
     ffmpeg -f lavfi -i anullsrc=r=48000:cl=stereo -t 3 -c:a aac sessiz.m4a
     ffmpeg -itsoffset <kayma> -i src.mp4 -i sessiz.m4a -map 0:v -map 1:a -c copy k<kayma>.mkv
-    ffmpeg -i src.mp4 -vf "select=gte(n\,1),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-ref.mkv
+    ffmpeg -i src.mp4 -vf "select=gte(n\,1),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-1kare.mkv
+    ffmpeg -i src.mp4 -vf "select=gte(n\,2),setpts=N/FR/TB" -c:v libx264 -crf 16 -threads 2 kaymis-2kare.mkv
 
-Her `k<kayma>.mkv` `same.mp4` ile yukarıdaki ham grafikten geçirilir; `kaymis-ref.mkv`
-bir kare kaymanın referans değeridir.
+Her `k<kayma>.mkv` `same.mp4` ile yukarıdaki ham grafikten geçirilir. 0 ms satırı
+`src.mp4` ile üretilir, `k0.mkv` ile değil — mkv'nin 1/1000 zaman tabanı kayma
+sıfırken bile 91 kare ve 81,8084 veriyor (§9.4).
+
+> **T116 düzeltmesi.** Bu satır belgede `kaymis-ref.mkv` adıyla duruyordu ve
+> "bir kare kaymanın referans değeridir" deniyordu. Bu tarifle üretilen dosya
+> §9.4'te iddia edilen 52,3008'i **vermiyor**, 65,7226 veriyor; 52,3008'i veren
+> dosya `k0.020.mkv`'nin kendisiydi. Tarif dosyaya uyduruldu, dosya tarife değil:
+> iki dosya `kaymis-1kare` / `kaymis-2kare` diye ayrıldı ve **kilitli** ölçülen
+> değerleri (52,1174 · 37,4526) §9.4'e çıpa olarak yazıldı.
 
 Kontrol (§9.3) — ref2'nin kasten iki kare kaydırılmış ve kaydırılmamış kopyaları:
 

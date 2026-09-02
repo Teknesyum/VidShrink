@@ -692,3 +692,66 @@ mühür geriye dönük bir doğruluk garantisi değil, o günkü kanıtın kayd�
   (T98'in tel tuzağı: koşul kayarsa ölçü kırmızıya döner).
 - Mühürden önce `gh run list`.
 - `main`e yalnız T0 birleştirir.
+
+## Açık ölçüldü, işaret döndü — ve ölçerin kendisi sanık çıktı (2026-09-02)
+
+Bu bölüm önceki manşetlerin hepsini geçersiz kılıyor. Üç sözleşme aynı anda kapandı
+ve birbirini düzeltti.
+
+**1. Açık işaret döndürdü ve bu bağımsız doğrulandı (T120, mühürlü).**
+Yeni motor tabanında HandBrake açığı `+0,097` → **`−0,266`**. Denetçi 18 vmaf JSON'unun
+tamamını kendi ortamında yeniden hesapladı, her okumada aynı sayıyı buldu; T111 sütununu
+da ham arşivden **bugünkü ölçerle** yeniden üretti. Yani kıyasın iki tarafı da tek
+build'de ölçüldü — aşağıdaki 4. maddenin tuzağına düşmedi.
+
+Benim KRİTİK adayım **çürütüldü**: T120'nin bozuk A/B düzeneğini kullandığından
+şüphelenmiştim, kullanmamış. `tools/auto-mod-olcumu/harness/Program.cs:18` doğrudan
+`Codec = CodecPreference.Auto` kuruyor ve teslim edilen `ciktilar/auto.mp4`
+`av1, 1920x1080, yuv420p10le` yokluyor. libx264 değil.
+
+**2. A/B düzeneğinin Auto kolu libx264'e düşüyordu (T125).** `Competitors.cs:113`
+tek satır. Düzeltildikten sonra bugünkü tabanda ölçülebilen **tek** satırda:
+
+| | HandBrake | biz-Compatible | biz-Auto |
+|---|---|---|---|
+| harmonik | 48,56 | 33,44 | **45,97** |
+| p10 | 34,56 | — | **37,23** |
+
+Açık `15,12` → **`2,59`**, p10'da **öne geçtik**. Kare min, ortalama ve XPSNR'de
+HandBrake hâlâ önde. **Bu tek satırdır** — "altı çiftin beşinde HandBrake önde"
+manşetinin düzeltilmiş kolla ne olduğu **bilinmiyor**. On iki satırlık tablonun
+tamamı bugünkü kodla yeniden kuruluyor.
+
+**3. Kodek seçimi iki farklı soru soruyordu (T123 → T129).** `PickCodec` "listede mi"
+diye soruyor, `PickFastCodec` "kodluyor mu" diye. T94 iç yapıyı üç durumlu yaptı ama
+`EncoderProbeResult` hâlâ tek `bool` — **dışarı açılan yüz iki durumlu.** Çağıran
+"ölçülemedi" ile "çalışmıyor"u ayırt edemiyor. Sabiti büyütmek çözmüyor, ölçüldü:
+
+| öldürme sınırı | ilk yanlış veren yük | oran |
+|---|---|---|
+| 8000 ms | ek yük 4 | 4/12 |
+| 15000 ms | ek yük 8 | 9/12 |
+| 30000 ms | ek yük 16 | 4/12 |
+
+Politikayı belirleyen asimetri: yanlış **donanım** seçimi `EncodeRunner.cs:307-308`'de
+fırlatıyor, koşum içi kodek yedeği yok — maliyet sınırsız. Yanlış **yazılım** seçimi
+1,23× (12 732 / 10 347 ms). Bu yüzden "ölçülemedi → yazılım" pimleniyor.
+
+**4. Ve ölçerin kendisi sanık: 0,86 puanlık sabit sürüm ofseti (T125).**
+Aynı girdiye iki tarihte 0,86 fark. Kodlayıcı elendi — HandBrake üç bağımsız koşumda
+**aynı baytı** verdi. Bugünkü kodla iki ayrı süreçte ölçüm **on beş basamağa kadar**
+aynı: dağılım sıfır. Yani bu bir varyans değil, `QualityMeter.cs`'in dört commit'inin
+(özellikle `e290624`, T97, VMAF tavan kırpmasının kaldırılması) ürettiği **sabit ofset**.
+
+Sonuç: **sürüm sınırını geçen her karşılaştırma geçersiz**, aynı koşumda ölçülmüş iki
+sayının farkı sağlam. `ab-duzenegi.md`nin on iki satırı tek eski commit'te ölçüldüğü
+için tablonun tamamı sınırın yanlış tarafında. Bundan sonra her ölçüm tablosu
+**ölçerin commit'ini künye olarak taşıyacak.**
+
+### Ne bilmiyoruz
+
+- Düzeltilmiş Auto kolunda altı çiftin kaçında öndeyiz — **tek satır biliniyor.**
+- Kare min / ortalama / XPSNR'deki HandBrake üstünlüğü düzeltilmiş kolda da sürüyor mu.
+- `ComplexityProbeTests.CancellationReachesQualityMeasurement` tam süitte 31 s'de zaman
+  aşımına uğradı. 31 saniye süren bir **iptal** testi kararsızlıktan fazlası olabilir —
+  iptal ulaşmıyorsa bu ürün kusurudur. Sahiplendirilmedi.

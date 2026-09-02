@@ -1,0 +1,35 @@
+{
+  "contractId": "T116",
+  "auditorRunId": "aed396e0910fc44af",
+  "headSha": "c856ee406e4d4d68e4c28825906bc4ee2f1bc705",
+  "diffHash": "26bd5e91184449302c3e31d5fd986d0bf63483784d04ed91418d5a3467dbaa39",
+  "owns": [
+    "docs/olcumler/algi-olcusu.md",
+    "docs/olcumler/olculen-kaliteyle-plan.md",
+    "tools/cipa-yeniden/Program.cs",
+    "tools/cipa-yeniden/README.md",
+    "tools/cipa-yeniden/cipa-yeniden.csproj",
+    "tools/cipa-yeniden/duzenek/ab-devam.sh",
+    "tools/cipa-yeniden/duzenek/ab-kos.sh",
+    "tools/cipa-yeniden/duzenek/ab-tablo.py",
+    "tools/cipa-yeniden/duzenek/adcozum/Probe.cs",
+    "tools/cipa-yeniden/duzenek/adcozum/adcozum.csproj",
+    "tools/cipa-yeniden/duzenek/bolum-11-5.py",
+    "tools/cipa-yeniden/duzenek/esc.py",
+    "tools/cipa-yeniden/duzenek/ikame-kaynak.sh",
+    "tools/cipa-yeniden/duzenek/ikili-kilit-denetimi.sh",
+    "tools/cipa-yeniden/duzenek/log-yolu-denetimi.sh",
+    "tools/cipa-yeniden/duzenek/pin-kur.sh",
+    "tools/cipa-yeniden/duzenek/pin-olc.sh",
+    "tools/cipa-yeniden/duzenek/s92-kur.sh",
+    "tools/cipa-yeniden/duzenek/s92-olc.sh",
+    "tools/cipa-yeniden/duzenek/tonemap-dogrulama.sh"
+  ],
+  "verification": [
+    "Bagimsiz denetci uc 6d30b52'yi depo disina arsivleyip sekiz kriteri tek tek dogruladi; sifir dotnet test kosuldu. K1 envanteri bagimsiz yeniden uretildi, K2'nin on alti hucresi sayildi, K4 mekanizmasi urun kodunda dogrulandi (ComplexityProfile.cs:195-207). owns ihlali yok. d435ff9 kirmizisi sandvicle kararsiz olcu olarak ayristirildi (SplitDragTests.cs:88-93). KRITIK yok, yedi borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T06:08:21.335Z",
+  "usedAt": "2026-09-02T06:08:51.807Z",
+  "completedSha": "c856ee406e4d4d68e4c28825906bc4ee2f1bc705"
+}

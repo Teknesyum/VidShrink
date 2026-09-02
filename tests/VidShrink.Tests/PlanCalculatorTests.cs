@@ -1,4 +1,5 @@
-﻿using VidShrink.Core;
+﻿using System.Linq;
+using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
@@ -113,11 +114,14 @@ public sealed class PlanCalculatorTests
         var options = new PlanOptions { TargetMb = 8, Intent = Intent.Sharing };
         var complexity = MeasuredComplexity(0.09);
 
-        var prior = PlanCalculator.BuildDetailed(info, options, complexity).PredictedQuality;
-        var low = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 70.0 })).PredictedQuality;
-        var high = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 85.0 })).PredictedQuality;
+        const double lowAnchor = 70.0;
+        const double highAnchor = 85.0;
 
-        Assert.Equal(15.0, high - low, 6);
+        var prior = PlanCalculator.BuildDetailed(info, options, complexity).PredictedQuality;
+        var low = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { lowAnchor })).PredictedQuality;
+        var high = PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { highAnchor })).PredictedQuality;
+
+        Assert.Equal(highAnchor - lowAnchor, high - low, 6);
         Assert.True(Math.Abs(prior - low) > 1.0, $"Olculen 70 noktasi tahmini oynatmadi: prior {prior:0.###}, olculen {low:0.###}.");
         Assert.True(Math.Abs(prior - high) > 1.0, $"Olculen 85 noktasi tahmini oynatmadi: prior {prior:0.###}, olculen {high:0.###}.");
     }
@@ -140,10 +144,13 @@ public sealed class PlanCalculatorTests
     public void TwoSeparatedQualityPointsMeasureTheSlopeInsteadOfAssumingIt()
     {
         var complexity = MeasuredComplexity(0.09);
-        var flat = complexity.WithMeasuredQuality(new[] { new QualitySample(0.045, 88.0), new QualitySample(0.18, 96.0) });
+        var lower = new QualitySample(0.045, 88.0);
+        var upper = new QualitySample(0.18, 96.0);
+        var flat = complexity.WithMeasuredQuality(new[] { lower, upper });
+        var halvings = Math.Log2(upper.Bppf / lower.Bppf);
 
         Assert.True(flat.Level.SlopeMeasured);
-        Assert.Equal(4.0, flat.Level.PerHalving, 6);
+        Assert.Equal((upper.VmafNeg - lower.VmafNeg) / halvings, flat.Level.PerHalving, 6);
         Assert.False(complexity.WithProbeQuality(new[] { 88.0, 96.0 }).Level.SlopeMeasured);
     }
 
@@ -173,10 +180,12 @@ public sealed class PlanCalculatorTests
         var info = SampleInfo();
         var options = new PlanOptions { TargetMb = 60, Intent = Intent.Sharing, AllowResolutionDrop = false, AllowFpsDrop = false };
 
+        const double trueBppf = 0.02;
+
         PlanResult At(double bias)
         {
-            var complexity = ComplexityProfile.FromProbe(0.02 * bias, 0.012 * bias, 6, 288, bias);
-            Assert.Equal(0.02, complexity.ReferenceBppf, 9);
+            var complexity = ComplexityProfile.FromProbe(trueBppf * bias, 0.012 * bias, 6, 288, bias);
+            Assert.Equal(trueBppf, complexity.ReferenceBppf, 9);
             return PlanCalculator.BuildDetailed(info, options, complexity.WithProbeQuality(new[] { 90.0 }));
         }
 
@@ -321,7 +330,7 @@ public sealed class PlanCalculatorTests
             var bppf = plan.VideoBitrateK * 1000.0 / pixelRate;
             var floor = result.Profile.FloorBppf(plan.Codec, plan.Fps, info.Fps);
 
-            Assert.True(bppf + 1000.0 / pixelRate >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
+            Assert.True(bppf >= floor || result.Advice.Notes.Contains(AdviceCode.TargetBelowCodecFloor),
                 $"{targetMb:0.#} MB -> {plan.Codec} {plan.Width}x{plan.Height}@{plan.Fps:0.##} at {bppf:0.0000} bppf, under the {floor:0.0000} floor, and the plan says nothing.");
         }
     }
@@ -392,6 +401,89 @@ public sealed class PlanCalculatorTests
         SampledFrames = 360
     };
 
+    private static ComplexityProfile GridProfile(double fullScaleBppf, double halfScaleBppf)
+        => ComplexityProfile.FromProbe(fullScaleBppf, halfScaleBppf, 6, 288);
+
+    private static LayoutScoreParts ScoreAt(ComplexityProfile complexity, int width, int height, double videoK)
+        => ScoreAt(complexity, "libsvtav1", width, height, videoK);
+
+    private static LayoutScoreParts ScoreAt(ComplexityProfile complexity, string codec, int width, int height, double videoK)
+        => PlanCalculator.ScoreLayout(complexity, codec, videoK, width, height, 60.0, 60.0, 1080, CompressionRegime.Aggressive);
+
+    private static LayoutScoreParts[] Ladder(ComplexityProfile complexity, string codec, double videoK)
+        => new[] { (1920, 1080), (1600, 900), (1280, 720), (960, 540) }
+            .Select(l => ScoreAt(complexity, codec, l.Item1, l.Item2, videoK))
+            .ToArray();
+
+    [Theory]
+    [InlineData(0.08, 0.05)]
+    [InlineData(0.08, 0.11)]
+    public void TheRateHalfOfTheScoreDoesNotMoveWhenOnlyTheResolutionChanges(double fullScaleBppf, double halfScaleBppf)
+    {
+        var complexity = GridProfile(fullScaleBppf, halfScaleBppf);
+        const double videoK = 2000;
+
+        var native = ScoreAt(complexity, 1920, 1080, videoK);
+        var threeQuarters = ScoreAt(complexity, 1440, 810, videoK);
+        var half = ScoreAt(complexity, 960, 540, videoK);
+
+        Assert.NotEqual(0.0, complexity.DetailExponent, 3);
+        Assert.Equal(native.Rate, threeQuarters.Rate, 6);
+        Assert.Equal(native.Rate, half.Rate, 6);
+    }
+
+    [Theory]
+    [InlineData(0.08, 0.05)]
+    [InlineData(0.08, 0.11)]
+    public void DroppingResolutionAtAFixedBitrateAlwaysCostsScore(double fullScaleBppf, double halfScaleBppf)
+    {
+        var complexity = GridProfile(fullScaleBppf, halfScaleBppf);
+        const double videoK = 2000;
+
+        var ladder = new[] { (1920, 1080), (1600, 900), (1280, 720), (960, 540) }
+            .Select(l => ScoreAt(complexity, l.Item1, l.Item2, videoK))
+            .ToArray();
+
+        for (var i = 1; i < ladder.Length; i++)
+            Assert.True(ladder[i].Score < ladder[i - 1].Score,
+                $"Layout {i} scores {ladder[i].Score:0.###} against {ladder[i - 1].Score:0.###} one step above it. At a fixed bitrate the measured grid never rewarded the smaller frame: on the moving source 1920x1080@60 read 45,27 VMAF-NEG against 43,86 at 960x540@60, on the still source 81,29 against 64,30. A score that rises as the frame shrinks is the defect T107 measured.");
+    }
+
+    [Theory]
+    [InlineData(0.08, 0.05)]
+    [InlineData(0.08, 0.11)]
+    public void TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp(double fullScaleBppf, double halfScaleBppf)
+    {
+        var complexity = GridProfile(fullScaleBppf, halfScaleBppf);
+        const double videoK = 800;
+
+        var hardware = Ladder(complexity, "av1_nvenc", videoK);
+        var software = Ladder(complexity, "libsvtav1", videoK);
+
+        Assert.NotEqual(0.0, complexity.DetailExponent, 3);
+
+        for (var i = 1; i < hardware.Length; i++)
+            Assert.True(hardware[i].Score > hardware[i - 1].Score,
+                $"Hardware layout {i} scores {hardware[i].Score:0.###} against {hardware[i - 1].Score:0.###} one step above it. On av1_nvenc the measured grid at 800k rose as the frame shrank - 1920x1080@60 read 31,842 VMAF-NEG, 1600x900 37,097, 1280x720 38,730, 960x540 40,036 - because the encoder cannot deliver 1080p60 below about 624 kbps. The scale credit is right on this arm and must survive.");
+
+        for (var i = 1; i < software.Length; i++)
+            Assert.True(software[i].Score < software[i - 1].Score,
+                $"Software layout {i} scores {software[i].Score:0.###} against {software[i - 1].Score:0.###} one step above it. On libsvtav1 the same grid fell as the frame shrank (moving source 45,266 at 1920x1080@60 against 43,856 at 960x540@60; still source 81,288 against 64,300). One condition serves both arms, so a change that fixes software by breaking hardware fails here.");
+    }
+
+    [Fact]
+    public void TheOnlyThingThatSeparatesTwoResolutionsIsTheScalePenalty()
+    {
+        var complexity = GridProfile(0.08, 0.05);
+        const double videoK = 2000;
+
+        var native = ScoreAt(complexity, 1920, 1080, videoK);
+        var half = ScoreAt(complexity, 960, 540, videoK);
+
+        Assert.Equal(0.0, native.ScalePenalty, 9);
+        Assert.Equal(native.Score - half.Score, half.ScalePenalty - native.ScalePenalty, 6);
+    }
+
     [Fact]
     public void TheFloorAdmitsTheLayoutThatWonTheMeasurementAndStillRejectsTheSaturatedOne()
     {
@@ -408,6 +500,6 @@ public sealed class PlanCalculatorTests
 
         Assert.False(
             PlanCalculator.LayoutClearsFloor(complaint, "libsvtav1", 0.0052 * pixelRateK, width, height, fps, info.Fps),
-            "At 0,0052 bppf the software arm has already saturated - p10 stops falling, one frame in thirty is at zero - so the floor must still reject it.");
+            "At 0,0052 bppf the software arm has already saturated - p10 stops falling, over three per cent of frames score under 5 VMAF-NEG - so the floor must still reject it.");
     }
 }

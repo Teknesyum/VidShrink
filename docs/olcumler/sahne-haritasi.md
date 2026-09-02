@@ -117,7 +117,12 @@ hesaba kattığı için bir kademe aşağı iniyor.
 
 ### Seçilen değer
 
-**`SceneMap.DefaultThreshold = 0.105`.** F2 = 0,899 ile eğrinin tepesi.
+**Sabit eşikte seçilen değer 0,105'ti** — F2 = 0,899 ile eğrinin tepesi. Bugün bu
+değer üretimde **karar eşiği değil**: T109 eşiği içerikten türetiyor
+(`θ(t) = clamp(0,08 + 2,09·p90(±40 sn); 0,05; 0,15)`, `ThresholdRule.Measured`) ve türetilen
+haritada tek bir eşik yok: `SceneMap.Threshold` **`NaN`** gelir, kural `SceneMap.Rule`'da
+durur. 0,105 sabiti `SceneMap.FixedThreshold` adıyla, bu sayfadaki eğriyi üreten rejimin
+kaydı olarak duruyor. Türetilen eşiğin ölçümü `docs/olcumler/dinamik-esik.md`'de.
 
 Kararlılık kontrolleri (hepsi diskte):
 
@@ -159,8 +164,10 @@ karar eleğiyle taban arasındaki açıklık 0,15 iken 0,055 oldu. Kural yazıld
 teste bağlandı: `DefaultThreshold` 0,05'in altına indirilecekse `BaseThreshold`
 de indirilmelidir.
 
-**2. `SceneMap.DefaultThreshold = 0.105`** — asıl karar eleği. `CutTimes` skoru
-bunun altındaki adayı atar. Seçilen değerde düşürdüğü gerçek kesim: P1'de **0**,
+**2. Karar eleği** — sabit rejimde `SceneMap.FixedThreshold = 0.105`, bugünkü
+üretimde `ThresholdRule.Measured` kuralının o an verdiği `θ(t)`. Sabit rejimde `CutTimes`,
+türetilen rejimde `DerivedCutTimes` skoru eşiğin altındaki adayı atar. Aşağıdaki sayılar
+**sabit 0,105 rejiminde** ölçüldü. Seçilen değerde düşürdüğü gerçek kesim: P1'de **0**,
 P2'de **2** (405,733 ve 444,000), P3'te 0. Üretilen yanlış kesim: P1'de 0,
 P2'de 0, P3'te 6.
 

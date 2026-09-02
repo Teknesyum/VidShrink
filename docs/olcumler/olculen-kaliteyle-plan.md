@@ -33,6 +33,19 @@ tanımlar:
 **Yeni plan** = aynı komut `--measured-quality` ile (T88'in ölçtüğü VMAF-NEG
 noktaları planlayıcıya girer).
 
+> **KİLİTSİZ ÖLÇER — GEÇERSİZ (T116, 2026-09-02).** Aşağıdaki iki tablonun
+> **bütün** sütunları kare kilidinden önceki ölçerden geçti: hem `--measured-quality`
+> kolunu besleyen `QualityMeter` (kilit `822dd3a`, 04:44) hem de bu tablonun
+> VMAF sütunlarını üreten `bench`in kendi grafiği (kilit `0e2b071`, 03:09) o gün
+> kilitsizdi. Kilitsiz ölçer kareleri zaman damgasıyla eşliyordu; T110 aynı çift
+> üzerinde 12,13 puanlık hata ölçtü (`algi-olcusu.md` §9).
+>
+> **Tablolar silinmedi, geçersiz sayıldı.** Aynı kaynaklarla yeniden ölçmek de
+> mümkün değil: üç kaynak da o turda silindi (yukarıdaki satır). Yeniden ölçüm
+> **ikame kaynaklarla** yapıldı ve **§11'de ayrı tablolarda** duruyor.
+> **Bu iki tablo ile §11'in tabloları aynı kaynakları ölçmüyor, satırları
+> karşılaştırılamaz.**
+
 | kaynak | hedef | kol | yerleşim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
 | --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | klip | 8 MB | eski | 1266x712@60 | 2pass 1188k | 7,824 | 85,79 | 85,62 | 81,40 | 10,6 | 1 |
@@ -455,3 +468,383 @@ bir betikten gelmez.
 - `dotnet build VidShrink.sln -c Release` → 0 uyarı, 0 hata.
 - Tam süit bu turda **koşturulmadı**: paralel çalışan başka ajanlar varken eşzamanlı
   tam koşum ölçüyü kararsız yapıyor (bkz. `docs/olcumler/suit-esszamanli-kosum.md`).
+
+---
+
+## 11. Tablo kilitli ölçerle yeniden ölçüldü (T116)
+
+Ölçülen ağaç: dal `T116-cipa-yeniden`. Ortam: Windows 11, ffmpeg 9.0, libvmaf
+`vmaf_v0.6.1neg`. Düzenek ve her sayının komutu `tools/cipa-yeniden/`
+(`README.md` ve `duzenek/`) altında; ölçüm çıktıları `.calisma/` altında ve
+git'e girmiyor.
+
+### 11.1 Kaynaklar ikamedir — hangi satır neyin yerine geçti
+
+T89'un üç kaynağı o turda silindi (§1). **Aynı kaynaklarla yeniden ölçmek
+mümkün değil.** Bunun yerine elde duran kaynaklarla yeni bir ızgara kuruldu ve
+aynı ızgara **hem kilitli hem kilitsiz** ikiliyle koşuldu — böylece kilidin
+bedeli eski tabloya hiç ihtiyaç duymadan görünüyor.
+
+| T89 satırı | T116'da ne koşuldu | durum |
+|---|---|---|
+| `klip` (1080p60 SDR hevc, 24,8 MB) | `sdr-1.mkv` — **ikame**: `parca-1.mkv` hable ile SDR'e indirilip libx264 preset fast iki geçiş 3400k ile 23,1 MiB'a kodlandı | ikame ölçüldü |
+| `oyun` (1080p48 av1 oyun kaydı, 78,3 MB) | — | **ölçülmedi**: elde 48 fps av1 oyun kaydı yok, sentetik taklit oyun kaydının hareket istatistiğini vermez |
+| `hdr` (1080p60 HDR hevc, 77,7 MB) | `parca-1.mkv` ve `parca-2.mkv` — ikisi de 1080p60 HDR, T89'un kaynağının kendisi değil | ikame ölçüldü |
+
+İkame kaynağın üretim tarifi `tools/cipa-yeniden/duzenek/ikame-kaynak.sh`.
+Kodlama parametreleri x264'ün iki geçiş günlüğünden geri okundu
+(`rc=abr bitrate=3400`, `rc_lookahead=30`, `b_adapt=1` → preset fast,
+`threads=4`). Ton eşleme operatörü kapta saklanmadığı için **görüntüden
+ölçüldü**: ilk kare dört operatörle yeniden üretilip elde duran dosyanın ilk
+karesiyle PSNR'landı — hable **39,03 dB**, reinhard 21,28, mobius 20,08,
+clip 19,33 (`duzenek/tonemap-dogrulama.sh`). Bu dört sayı düzenekten yeniden
+üretildi ve **altı basamağına kadar** aynı çıktı (39.025317 / 21.278990 /
+20.075628 / 19.330704). Sayıların koşulu: PSNR iki girdi de `format=yuv420p`'ye
+çevrildikten **sonra** hesaplanır; PNG'ler RGB'de karşılaştırılırsa aynı
+dosyalardan 35,36 / 18,50 / 17,29 / 16,51 çıkar — sıralama değişmez, sayılar
+değişir. `desat` değeri ve dosyanın bayt bayt yeniden üretilebilirliği
+**ölçülmedi**.
+
+### 11.2 İki ikili, iki kilit yeri
+
+Kare kilidi iki ayrı yerde duruyor ve ikisi de bu ızgarayı etkiliyor:
+
+- **`QualityMeter`** (`src/VidShrink.Ffmpeg`) — `--measured-quality` kolunun
+  çıpasını üretir, yani **planı** besler. Kilit `822dd3a`, 09-02 04:44.
+- **`bench`in kendi grafiği** (`tools/VidShrink.Bench/Program.cs`) — raporun
+  VMAF/XPSNR sütunlarını üretir, yani **tabloyu** besler. Kilit `0e2b071`, 03:09.
+
+Aynı ağaçtan iki ikili yayımlandı. `bench-kilitli` ikisini de kilitli taşıyor;
+`bench-kilitsiz` **ikisini de kilitsiz** taşıyor — yani T89'un rejimini birebir
+yeniden üretiyor. Bu kaynaktan değil **yayımlanmış DLL'den** doğrulandı
+(`duzenek/ikili-kilit-denetimi.sh`): `bench-kilitsiz/VidShrink.Bench.dll`
+`[1:v]null[r]` ve `flags=lanczos[t];` dizgilerini taşıyor, `bench-kilitli`
+taşımıyor.
+
+**`settb=AVTB` dizgisini DLL'de saymak kanıt değildir.** İkisinde de var —
+kilitsiz ikilide bir kez, kilitli ikilide iki kez (UTF-16, `#US` yığınında;
+ASCII arayan bir araç hiçbirini bulamaz ve yanlışlıkla "kilit yok" der). Kilidin
+o koşumda gerçekten takılı olduğunun kanıtı ikilide değil **koşumun kendi
+kaydındadır**: `cipa-yeniden` her JSON'a kurduğu grafiği `OlcerKilidi` alanında
+yazıyor —
+
+    cipa-p1-kilitli.json    [0:v]null,settb=AVTB,setpts=N[t];[1:v]null,settb=AVTB,setpts=N[r];[t][r]libvmaf
+    cipa-p1-kilitsiz.json   [0:v]null[t];[1:v]null[r];[t][r]libvmaf
+
+Rapordaki her çıpa sayısının yanında hangi grafikten geldiği bu alanla duruyor.
+
+Izgara bu yüzden 2×2: iki kol (`eski` = sabitler, `yeni` = `--measured-quality`)
+× iki ölçer. `eski` kolu `QualityMeter`'a hiç uğramıyor
+(`Program.cs:657`, meter `null`), dolayısıyla `eski-kilitli` ile
+`eski-kilitsiz` arasındaki fark **yalnız raporun ölçerinden** geliyor.
+
+### 11.3 Karar neye bağlıydı — kol zaten sevk edildi
+
+K3'ün sorusu "kol açılsın mı" değil: **kol kapalı değil, açık ve varsayılan.**
+Zincir şöyle:
+
+1. §1'in tablosu (kilitsiz ölçer) "kazanç yalnız HDR'de, +0,95 mean" dedi ve
+   "kazancın kaynağı yerleşim seçimidir, durdurma kısıtı değil" diye ekledi.
+2. **T100 bu cümleyi gerekçe olarak aldı.** Sözleşmesi birebir şöyle yazıyor:
+   *"T89'un tek gerçek kalite kazancı (HDR'de +0,95 mean) durdurma kısıtından
+   değil yerleşim seçiminden geliyordu."* Aynı sözleşmenin K5'i
+   `MainWindow.axaml.cs`'in ölçülen kaliteyi atmasını kusur sayıp bağlanmasını
+   istedi.
+3. T100 bağladı (`f2bd2a6`, 09-02 01:20). Bugün `MainWindow.axaml.cs:1445`
+   her dosya yüklemesinde `MeasureComplexityAsync` çağırıyor, o da
+   `ProbeWithMeasuredQualityAsync(info, speed, **null**, ct)` ile
+   `RunDetailedAsync(measureQuality: true, ...)`'a giriyor.
+   `ComplexityProbe.cs:53` `null` metreyi `QualityMeasurement.Instance`'a
+   çeviriyor. Yani **arayüzden geçen her kullanıcı `--measured-quality`
+   yolundan geçiyor.**
+
+Sonuç: `bench`in `--measured-quality` bayrağı bir *deneme kolu* değil,
+**uygulamanın hâlihazırdaki davranışını `bench`te açan anahtar**. `bench`in
+bayraksız hâli (`eski`) uygulamanın hiç koşmadığı yoldur. Karar bu yüzden
+"açalım mı" değil, **"kilitli ölçüde de açık kalmalı mı"**.
+
+### 11.4 Izgara sırasında çıkan iki olay (ölçüm borcu, düzeltilmedi)
+
+**a) Ölçü sessizce boş döndü ve koşum başarı raporladı.**
+
+`sdr8-yeni-kilitli` koşumu `rc=0` ile bitti, XPSNR yazdı, VMAF alanlarının
+dördünü birden `null` bıraktı ve **hiçbir yerde hata satırı üretmedi**:
+
+| alan | değer |
+|---|---|
+| `VmafNegMean` / `Harmonic` / `P10` / `Min` | `null` |
+| `VmafNegFloorFrames` | 0 |
+| `Xpsnr` | 32,5278 (var) |
+| `MeasureSeconds` | 287,6935 |
+| günlük satırı | `VMAF-NEG mean=- harm=- p10=- min=-` |
+| süreç çıkış kodu | 0 |
+
+Kanıt `.calisma/T116/gunluk/sessiz-bos/` altında saklandı (json + log).
+
+Sebep okundu: `tools/VidShrink.Bench/Program.cs:807` `VmafNegAsync`, libvmaf
+çağrısından sonra
+
+```csharp
+await RunLavfiAsync(referencePath, testPath, width, height,
+    $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={escaped}");
+if (!File.Exists(logPath)) return VmafPool.Empty;
+```
+
+yapıyor. `RunLavfiAsync`'in döndürdüğü stderr bu çağrı yerinde **atılıyor** ve
+çıkış kodu **hiç bakılmıyor**. Filtre herhangi bir sebeple kırıldığında sonuç
+"hata" değil "ölçü yok" olarak görünüyor. Bu, koordinatörün `QualityMeter.cs:224`
+için kaydettiği borcun **ikinci örneğidir**; aynı kusur iki ayrı yerde duruyor.
+`Program.cs` bu sözleşmenin `owns`'unda değil — **bildirildi, düzeltilmedi.**
+
+Koşum aynı parametrelerle tekrarlandı ve ölçü geldi: mean 64,0037, harm 56,8565,
+p10 34,4760, `MeasureSeconds` 110,8945. Yani arıza geçiciydi; tablodaki
+`sdr8-yeni-kilitli` satırı bu ikinci koşumdan gelir. **Arızanın kök sebebi
+ölçülmedi** — ffmpeg'in ne dediği kaydedilmediği için geriye dönük okunamıyor.
+
+**b) Aynı plan iki koşumda birebir aynı dosyayı üretmedi.**
+
+İki koşumun planı, çözünürlüğü, kipi ve bit hızı özdeşti (1190×670@60,
+2pass 1061k, deneme=1) ama çıktı farklı:
+
+| koşum | boyut (MB) | XPSNR |
+|---|---:|---:|
+| ilk (ölçüsü boş dönen) | 7,536956 | 32,527750 |
+| ikinci (tabloya giren) | 7,528613 | 32,526333 |
+
+Fark 0,0083 MB. Bu, tablo satırlarının **bayt bayt yeniden üretilebilir
+olmadığını** gösteriyor; §11.1'de "yeniden üretilebilirlik ölçülmedi" diye
+yazılan maddenin somut karşılığıdır. Sebebi ölçülmedi: `bench`in kendi kodlama
+çağrısında iş parçacığı sayısı sabitlenmiyor, ama bunun tek sebep olduğu
+gösterilmedi.
+
+### 11.5 Kilitli ve kilitsiz ölçerle A/B (K2)
+
+Izgaradaki her kaynak **ikamedir** — §11.1. `oyun` satırı yok: o kaynak
+**ölçülmedi**, elde 48 fps av1 oyun kaydı bulunmadığı için.
+
+Aşağıdaki tablolar §1'in tablosuyla **aynı kaynakları ölçmüyor; satırları
+karşılaştırılamaz.** §1'in tablosu "kilitsiz (geçersiz), kaynak silinmiş,
+yeniden üretilemez" damgasıyla yerinde duruyor, silinmedi.
+
+Süre sayıları için **makine paylaşımlıydı** (dokuz ajan). Kalite ve boyut
+sayılarına bu damga basılmadı.
+
+#### Satırlar — ölçer **kilitli**, kaynaklar ikame
+
+| kaynak (ikame) | hedef | kol | yerleşim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
+| --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | eski | 1190@60 | 2pass 1061k | 7.541 | 64.01 | 56.95 | 34.78 | 52.6 | 1 |
+| klip ikamesi | 8 MB | yeni | 1190@60 | 2pass 1061k | 7.529 | 64.00 | 56.86 | 34.48 | 17.3 | 1 |
+| klip ikamesi | 20 MB | eski | 1920@60 | 2pass 2695k | 19.304 | 79.59 | 75.00 | 51.92 | 81.0 | 1 |
+| klip ikamesi | 20 MB | yeni | 1920@60 | 2pass 2695k | 19.304 | 79.62 | 75.05 | 51.29 | 71.1 | 1 |
+| hdr ikamesi (parca-1) | 40 MB | eski | 1458@60 | 2pass 5389k | 38.990 | 81.25 | 80.92 | 74.90 | 245.2 | 2 |
+| hdr ikamesi (parca-1) | 40 MB | yeni | 1612@60 | crf 21 | 37.396 | 82.85 | 82.59 | 78.22 | 71.6 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | eski | 1920@60 | 2pass 5258k | 39.454 | 95.95 | 95.94 | 95.54 | 111.5 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | yeni | 1920@60 | crf 23 | 39.114 | 95.94 | 95.94 | 95.52 | 101.3 | 3 |
+
+#### Satırlar — ölçer **kilitsiz**, kaynaklar ikame
+
+| kaynak (ikame) | hedef | kol | yerleşim | kip | teslim MB | mean | harm | p10 | kodlama sn | deneme |
+| --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | eski | 1190@60 | 2pass 1061k | 7.539 | 60.33 | 27.47 | 23.00 | 16.6 | 1 |
+| klip ikamesi | 8 MB | yeni | 1190@60 | 2pass 1061k | 7.540 | 60.32 | 27.55 | 23.71 | 16.3 | 1 |
+| klip ikamesi | 20 MB | eski | 1920@60 | 2pass 2695k | 19.325 | 74.06 | 32.49 | 38.70 | 34.8 | 1 |
+| klip ikamesi | 20 MB | yeni | 1920@60 | 2pass 2695k | 19.328 | 74.05 | 32.43 | 38.91 | 38.5 | 1 |
+| hdr ikamesi (parca-1) | 40 MB | eski | 1458@60 | 2pass 5389k | 38.988 | 80.82 | 78.85 | 73.53 | 80.6 | 2 |
+| hdr ikamesi (parca-1) | 40 MB | yeni | 1612@60 | crf 21 | 37.384 | 82.43 | 80.49 | 76.89 | 25.5 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | eski | 1920@60 | 2pass 5258k | 39.445 | 94.72 | 56.42 | 95.13 | 46.6 | 1 |
+| hdr ikamesi (parca-2) | 40 MB | yeni | 1920@60 | crf 23 | 39.146 | 94.72 | 56.42 | 95.11 | 152.8 | 3 |
+
+#### Kol farkı (yeni − eski), aynı ölçer, kaynaklar ikame
+
+| kaynak (ikame) | hedef | ölçer | Δmean | Δharm | Δp10 | Δteslim MB | Δkodlama sn |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| klip ikamesi | 8 MB | kilitli | -0.01 | -0.09 | -0.30 | -0.012 | -35.2 |
+| klip ikamesi | 8 MB | kilitsiz | -0.00 | +0.08 | +0.71 | +0.001 | -0.3 |
+| klip ikamesi | 20 MB | kilitli | +0.03 | +0.05 | -0.63 | +0.000 | -9.9 |
+| klip ikamesi | 20 MB | kilitsiz | -0.01 | -0.06 | +0.20 | +0.004 | +3.7 |
+| hdr ikamesi (parca-1) | 40 MB | kilitli | +1.60 | +1.66 | +3.32 | -1.594 | -173.6 |
+| hdr ikamesi (parca-1) | 40 MB | kilitsiz | +1.61 | +1.65 | +3.36 | -1.603 | -55.1 |
+| hdr ikamesi (parca-2) | 40 MB | kilitli | -0.01 | -0.01 | -0.01 | -0.340 | -10.1 |
+| hdr ikamesi (parca-2) | 40 MB | kilitsiz | -0.01 | +0.01 | -0.02 | -0.299 | +106.2 |
+
+#### Kilidin bedeli (aynı kol, kilitli − kilitsiz ölçer)
+
+| kaynak (ikame) | hedef | kol | Δmean | Δharm | Δp10 | plan aynı mı |
+| --- | ---: | --- | ---: | ---: | ---: | --- |
+| klip ikamesi | 8 MB | eski | +3.69 | +29.47 | +11.78 | evet |
+| klip ikamesi | 8 MB | yeni | +3.68 | +29.30 | +10.77 | evet |
+| klip ikamesi | 20 MB | eski | +5.53 | +42.52 | +13.22 | evet |
+| klip ikamesi | 20 MB | yeni | +5.57 | +42.62 | +12.38 | evet |
+| hdr ikamesi (parca-1) | 40 MB | eski | +0.43 | +2.08 | +1.37 | evet |
+| hdr ikamesi (parca-1) | 40 MB | yeni | +0.42 | +2.09 | +1.33 | evet |
+| hdr ikamesi (parca-2) | 40 MB | eski | +1.22 | +39.53 | +0.41 | evet |
+| hdr ikamesi (parca-2) | 40 MB | yeni | +1.22 | +39.51 | +0.41 | evet |
+
+#### Izgarada eksik kalan hücreler
+
+Yok. Onaltı hücrenin onaltısı da koşuldu.
+
+### 11.6 K3 kararı — `--measured-quality` kolu açık kalır
+
+**Karar ölçüye bağlıdır ve ölçü şudur: kilitli ölçüde kolun ölçülmüş bir zararı
+yok, ölçülmüş bir kazancı var.**
+
+Kilitli ölçerde dört hücrenin dördü de tamamlandı:
+
+| hücre (kaynak ikame) | planı değiştirdi mi | Δmean | Δp10 | Δteslim |
+|---|---|---:|---:|---:|
+| klip ikamesi 8 MB | **hayır**, plan özdeş | −0,01 | −0,30 | −0,012 MB |
+| klip ikamesi 20 MB | **hayır**, plan özdeş | +0,03 | −0,63 | ±0,000 MB |
+| hdr ikamesi (parca-1) 40 MB | **evet** — 1458@60 2pass 5389k → 1612@60 crf 21 | **+1,60** | **+3,32** | **−1,594 MB** |
+| hdr ikamesi (parca-2) 40 MB | **evet** — 1920@60 2pass 5258k → 1920@60 crf 23 | −0,01 | −0,01 | −0,340 MB |
+
+Beş şey okunuyor:
+
+1. **Kol yalnız planı değiştirdiğinde bir şey yapıyor.** İki SDR hücresinde plan
+   sekiz alanın sekizinde de özdeş çıktı (genişlik, yükseklik, fps, kodlayıcı,
+   kip, crf, bit hızı, preset). Kolun oradaki etkisi **tam olarak sıfırdır** ve
+   bu sayıdan değil **plan özdeşliğinden** okunur; tabloda görünen ±0,03 mean ve
+   −0,63 p10, aynı planın iki ayrı kodlamasından gelir. Aynı planın iki koşumu
+   §11.4'te 0,0083 MB farklı dosya ve 0,0014 dB farklı XPSNR üretti — yani
+   kodlama yeniden üretilebilir değil. **Bu değişkenliğin mean VMAF cinsinden
+   büyüklüğü ölçülmedi.**
+2. **Planı değiştirdiği yerde kazanç garantili değil.** İki HDR ikamesinin
+   **birinde** kazanç var (+1,60 mean, +3,32 p10) ve **üstelik dosya 1,59 MB
+   daha küçük**; diğerinde hiçbir şey yok (−0,01) ve sebebi 4. maddede. HDR olmak
+   yeterli koşul değil.
+3. **Kazanan hücre hedef bandını ıskaladı.** `parca-1`de `yeni` kolu 40 MB
+   hedefine karşı 37,4 MB teslim etti — **%93,5, bant=dış**; `eski` kol 38,99 MB
+   ile **%97,5, bant=iç** vermişti. Yani kol bütçenin 1,6 MB'ını kullanmadan
+   bıraktı ve kaliteyi yine de yükseltti. Kalite ve boyut eksenlerinde zarar yok,
+   ama "aynı bütçeyi daha iyi harcadı" demek yanlış olur: bütçeyi harcamadı.
+4. **`parca-2`de planın kip kararı teslime hiç ulaşmadı.** Plan `crf 23` diyordu;
+   doldurma döngüsü onu ezip 2 geçiş 5214k'ya çıkardı (kilitsiz ikilide 5210k) ve
+   dosya `eski` kolun çıktığı yere, 39,1 MB'a oturdu. Δmean'in −0,01 kalmasının
+   sebebi bu: plan değişti, **teslim edilen kodlama değişmedi**. Doldurma
+   döngüsünün planın kip kararını hangi koşullarda ezdiği **ölçülmedi**.
+5. **Kazancın mekanizması T89'un adlandırdığıyla aynı.** T89 "kazanç durdurma
+   kısıtından değil yerleşim seçiminden geliyor" demişti; kazanan hücrede
+   yerleşim 1458×820 → 1612×906'ya çıkıyor ve kip iki geçişten crf'ye dönüyor —
+   T89'un `hdr` satırındaki 1650×928 → 1842×1036 / crf 22 hareketinin aynısı.
+
+**"+0,95 yalnız HDR'de" yargısı bugün nasıl okunmalı:** yön doğru, ifade fazla
+geniş, büyüklük karşılaştırılamaz. Kazanç yine yalnız HDR kaynaklarda göründü,
+ama **iki HDR ikamesinin birinde**; "HDR'de kazanır" değil "planı değiştirdiği
+bazı HDR kaynaklarda kazanır" denebilir. +1,60 ile +0,95 **karşılaştırılamaz** —
+kaynaklar farklı (§11.1), aynı ölçek üzerinde durmuyorlar.
+
+**Karar: kol kapatılmaz.** Gerekçe ölçüdür, tercih değil:
+
+- Ölçülen en kötü sonuç −0,01 mean, ve o da planın özdeş olduğu bir hücrede,
+  yani koldan gelmiyor. Planı değiştirdiği iki hücrede sonuç +1,60 ve −0,01.
+  **Ölçülmüş zarar yok.**
+- Ölçülen en iyi sonuç +1,60 mean / +3,32 p10, üstelik 1,59 MB daha küçük
+  dosyayla. **Ölçülmüş kazanç var.** Aynı hücrede kolun hedef bandını ıskaladığı
+  da ölçüldü (yukarıda 3. madde) — kazanç bu kayıtla birlikte okunmalı.
+- Kol zaten sevk edilmiş ve varsayılan (§11.3). Kapatmak bir ürün değişikliğidir
+  ve onu haklı çıkaracak bir sayı bu ızgarada **yok**.
+
+**Bu kararın dayanmadığı şeyler — ölçülmedi:**
+
+- Kolun **zaman bedeli ölçülmedi.** `ProbeSeconds` farkı (yeni − eski) dört
+  hücrede +1,9 / +14,9 / +7,2 / **−7,7** saniye çıktı; işareti bile tutarlı
+  değil. Makine dokuz ajanla paylaşımlıydı, bu fark gürültüden ayrılamadı.
+- **Deneme sayısı karışık:** klip ikamesi 1/1 ve 1/1, `parca-1` eski 2 → yeni 1,
+  `parca-2` eski 1 → yeni **3**. Denemenin bedeli ayrıca ölçülmedi.
+- Kazancın **genellenip genellenmediği ölçülmedi**: iki HDR ikamesi var, biri
+  kazandı.
+- `oyun` sınıfı **hiç ölçülmedi** (§11.1).
+- Bant ıskasının (3. madde) yinelenip yinelenmediği **ölçülmedi**; tek hücrede
+  görüldü.
+- Kolun kaybettiği bir kaynak olup olmadığı **ölçülmedi**; ızgarada böyle bir
+  hücre çıkmadı, ama aranmadı da.
+
+**Ölçerin bu karara etkisi ölçüldü: yok.** Üç hücre hem kilitli hem kilitsiz
+ikiliyle koşuldu ve kol farkı iki ölçerde de aynı çıktı:
+
+| hücre (ikame) | Δmean kilitli | Δmean kilitsiz |
+|---|---:|---:|
+| klip 8 MB | −0,01 | −0,00 |
+| klip 20 MB | +0,03 | −0,01 |
+| hdr parca-1 40 MB | **+1,60** | **+1,61** |
+| hdr parca-2 40 MB | −0,01 | −0,01 |
+
+Yani **ölçerin kusuru kol yargısını ne yarattı ne gizledi** — dört hücrenin
+dördünde de kol farkı iki ölçerde aynı işaret ve aynı büyüklükte çıktı,
+kazanan hücrede kazanç kilitsiz ölçerde de duruyor.
+
+Buna karşılık ölçerin **kendi** hatası büyük ve içeriğe bağlı. Aynı kolda, aynı
+dosyada, yalnız ölçer değişince:
+
+| hücre (ikame) | kol | Δmean | Δp10 |
+|---|---|---:|---:|
+| klip 8 MB | eski / yeni | +3,69 / +3,68 | +11,78 / +10,77 |
+| klip 20 MB | eski / yeni | **+5,53 / +5,57** | **+13,22 / +12,38** |
+| hdr parca-1 40 MB | eski / yeni | +0,43 / +0,42 | +1,37 / +1,33 |
+| hdr parca-2 40 MB | eski / yeni | +1,22 / +1,22 | +0,41 / +0,41 |
+
+Kilitsiz ölçer kaliteyi sistematik olarak **düşük** gösteriyordu; sapma SDR
+ikamesinde 3,7–5,6 mean puanı, HDR ikamelerinde 0,4 ve 1,2 puan. Neden içeriğe
+bağlı olduğu **ölçülmedi**.
+
+§11.5'in `Δharm` sütunları burada **hiçbir yargıya girmiyor**: harmonik ortalama
+`QualityMeter.cs:147`'deki `Math.Max(x, 1.0)` tabanını taşıyor ve tek bir düşük
+kare sütunu 40 puan oynatabiliyor. Kararlar yalnız mean ve p10 üzerinden
+okundu.
+
+Sekiz hücrenin sekizinde de **plan iki ölçerde özdeş** (§11.5). Bu, K4'ün
+sonucunun ızgaradan gelen bağımsız bir doğrulamasıdır: `yeni` kolunda çıpa iki
+ikilide farklı hesaplandığı halde plan değişmedi.
+
+### 11.7 Bu turda ne koştu (K7, K8)
+
+**Ürün kodu değişmedi.** Değişen dosyalar: bu belge, `algi-olcusu.md` ve yeni
+ölçüm düzeneği `tools/cipa-yeniden/`. Düzenek `src/` altındaki hiçbir sabiti
+değiştirmiyor, ürün yoluna girmiyor; **mutasyon kanıtı gerekmedi.** Kilidin
+kendi mutasyon bataryası T110'da koşuldu (`algi-olcusu.md` §9.8, M0–M8).
+
+Sözleşmenin `verify` adımı, önce `--no-incremental` derleme ile:
+
+    dotnet build VidShrink.sln -c Release --no-incremental        # rc=0
+    dotnet test -c Release --no-build --filter "QualityMeterTests|MeasuredQualityTests"
+    # Basarisiz: 0, Basarili: 24, Atlanan: 0, Toplam: 24, Sure: 4 dk 8 sn
+
+**`MeasuredQualityTests` diye bir sınıf yok.** Süzgecin ikinci yarısı hiçbir
+şeyle eşleşmiyor; 24 ölçünün 24'ü de `QualityMeterTests`ten geliyor. Ölçülen
+kaliteyi gerçekten sınayan üç ölçü `PlanCalculatorTests` içinde ve düz `[Fact]`:
+
+    dotnet test -c Release --no-build --filter "FullyQualifiedName~MeasuredQuality"
+    # Basarisiz: 0, Basarili: 3, Atlanan: 0, Toplam: 3, Sure: 3 sn
+
+`MeasuredQualityPointsMoveThePredictionOneForOne`,
+`WithoutMeasuredPointsThePredictionFallsBackToThePrior`,
+`MeasuredQualityStopLeavesTheRestOfTheBudgetUnspent` — üçü de ffmpeg
+gerektirmiyor, **CI'da koşuyor.**
+
+`QualityMeterTests`in 24 ölçüsünün kapı dağılımı sayıldı: **11 düz `[Fact]`,
+12 `[FfmpegFact]`, 1 `[TonemapFact]`.** İkinci ve üçüncüsü ffmpeg'e bağlı
+(`TonemapFactAttribute`, `FrameGrabberTests.cs:22`, filtre listesi için ffmpeg
+koşuyor). Yani ffmpeg'siz koşucuda bu süzgeç **11 geçer, 13 atlar**; yerel
+koşumda ffmpeg PATH'te olduğu için 0 atlandı.
+
+**Tam süit koşulmadı** (sözleşme yasakladı), dolayısıyla T116 kendi atlama
+sayısını **ölçmedi**. `tools/ci-gibi-kos.sh` ffmpeg'i PATH'ten siliyor; oradaki
+yeşil `[FfmpegFact]` ölçüleri hakkında hiçbir şey söylemez. T110 denetiminin
+ölçtüğü sayılar: yerel `ci-gibi-kos.sh` **106**, GitHub CI **100** atlıyor.
+
+**Kabul kriteri ölçüleri o atlanan listede mi?** İkiye ayrılıyor:
+
+| ölçü | kapı | ffmpeg'siz CI'da |
+|---|---|---|
+| `PlanCalculatorTests`in üç `MeasuredQuality*` ölçüsü | `[Fact]` | **koşar** |
+| `QualityMeterTests`in beş kare kilidi ölçüsü (§9.8) | `[FfmpegFact]` | **atlanır** |
+| `VmafPoolingTests`in iki `OlcumFiltresi_*` ölçüsü | `[Fact]` | koşar, ama **`bench`in grafiğini** pinliyor, ürününkini değil (`algi-olcusu.md` §9.13) |
+
+Izgaranın 16 koşumunun hiçbiri bir test değil; `bench` ikilileri elle koşuldu
+(`tools/cipa-yeniden/duzenek/ab-kos.sh`). Izgara 16 hücre, ama `bench` **17 kez**
+koştu: `sdr8-yeni-kilitli` bir kez sessizce boş VMAF döndürdüğü için
+tekrarlandı (§11.4). Tabloya giren, tekrarın sayısıdır. Bunların dışında çıpa
+ölçümü için 3, süpürme için 3 koşum daha yapıldı (§10.1) — hepsi
+`.calisma/T116/gunluk/` altında, JSON adıyla. Süre sayıları için **makine
+paylaşımlıydı** — dokuz ajan aynı makinede koştu.

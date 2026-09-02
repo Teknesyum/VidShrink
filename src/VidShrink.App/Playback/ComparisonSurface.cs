@@ -48,13 +48,24 @@ internal sealed class ComparisonSurface : Control
     private double _split = 0.5;
     private bool _splitMoved;
     private long _lastSplitPaintTicks;
-    private long _lastPresentTicks = Stopwatch.GetTimestamp();
+    private long _lastPresentTicks;
 
-    public ComparisonSurface()
+    private readonly Func<long> _now;
+
+    public ComparisonSurface() : this(Stopwatch.GetTimestamp)
     {
+    }
+
+    internal ComparisonSurface(Func<long> now)
+    {
+        _now = now;
+        _lastPresentTicks = now();
+        _lastSplitPaintTicks = now();
         ClipToBounds = true;
         IsHitTestVisible = false;
     }
+
+    private TimeSpan Since(long ticks) => Stopwatch.GetElapsedTime(ticks, _now());
 
     internal ZoomGesture Gesture { get; set; } = new();
 
@@ -215,8 +226,8 @@ internal sealed class ComparisonSurface : Control
             // boşta bile 217 tur/sn dönüyor. Kare akmıyorsa (duraklatılmış, boru tıkalı)
             // sınırın takılı kalmaması için çizim açılır, en fazla 60 Hz.
             if (_splitMoved &&
-                Stopwatch.GetElapsedTime(_lastPresentTicks) >= Stalled &&
-                Stopwatch.GetElapsedTime(_lastSplitPaintTicks) >= SplitPaintInterval)
+                Since(_lastPresentTicks) >= Stalled &&
+                Since(_lastSplitPaintTicks) >= SplitPaintInterval)
             {
                 _splitMoved = false;
                 Repaint();
@@ -231,7 +242,7 @@ internal sealed class ComparisonSurface : Control
                 _hasFrame = true;
             }
             Interlocked.Increment(ref _presented);
-            _lastPresentTicks = Stopwatch.GetTimestamp();
+            _lastPresentTicks = _now();
             _splitMoved = false;
             Repaint();
         }
@@ -241,7 +252,7 @@ internal sealed class ComparisonSurface : Control
 
     private void Repaint()
     {
-        _lastSplitPaintTicks = Stopwatch.GetTimestamp();
+        _lastSplitPaintTicks = _now();
         Interlocked.Increment(ref _repaints);
         InvalidateVisual();
     }

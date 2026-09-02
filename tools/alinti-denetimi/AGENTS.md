@@ -14,10 +14,10 @@ normalleştirilir, `...` ile kırpılan alıntı parça parça aranır.
 
 Bulgu: `KAYMA` dizge dosyada hiç yok. `SATIR KAYDI` dizge var ama künyedeki aralıkta değil.
 
-`--supheli` (blok kapsamı) **deneysel ve kapalı** — ölçülen yanlış pozitif oranı 20/20.
+`--supheli` (blok kapsamı) **deneysel ve kapalı** — örneklenen 20 bulgunun 18'i yanlış pozitif.
 Gürültüsü rapordadır, üretimde kullanma.
 
 Kapsam yalnız `docs/`. Sözleşme klasörü uygun değil: sözleşmeler henüz yazılmamış kodu
-alıntılar, 19 iddianın 16'sı bulgu verir.
+alıntılar, 21 iddianın 18'i bulgu verir.
 
 Ölçüm ve oranlar: `docs/olcumler/alinti-denetimi.md`.

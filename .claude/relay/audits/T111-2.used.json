@@ -1,0 +1,30 @@
+{
+  "contractId": "T111",
+  "auditorRunId": "ace57ce00ddae3246",
+  "headSha": "2cd03617620c1e4504af141c05f1a750a28d6836",
+  "diffHash": "41cad1fadb96fed47b9a09ab7356aefe0277cd51cec79b937778c86063690e66",
+  "owns": [
+    "docs/olcumler/auto-mod.md",
+    "docs/olcumler/olcu-gecerliligi.md",
+    "tools/auto-mod-olcumu/t111-boyutesle.sh",
+    "tools/auto-mod-olcumu/t111-damga.sh",
+    "tools/auto-mod-olcumu/t111-kaydir.sh",
+    "tools/auto-mod-olcumu/t111-kayma.sh",
+    "tools/auto-mod-olcumu/t111-mutasyon.sh",
+    "tools/auto-mod-olcumu/t111-olc.sh",
+    "tools/auto-mod-olcumu/t111-oz.py",
+    "tools/auto-mod-olcumu/t111-ses.sh",
+    "tools/auto-mod-olcumu/t111-settb.sh",
+    "tools/auto-mod-olcumu/t111-tablolar.py",
+    "tools/auto-mod-olcumu/t111-uret.sh",
+    "tools/auto-mod-olcumu/tablolar.py",
+    "tools/auto-mod-olcumu/vmaf-t111/OKU.md"
+  ],
+  "verification": [
+    "Tur 2 GECTI. Bagimsiz yeniden hesap arsivden: kilitli ort -1,231 / p10 +0,135, kilitsiz -1,227 / -2,046 — teslimle birebir. e1/e2/e3 kilitli olculdu. diff tek dosya +73/-31, yeni ham cikti yok. CI 33593030788 yesil, headSha 0c38256. Bes borc kaydedildi; KRITIK yok."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T05:40:15.920Z",
+  "usedAt": "2026-09-02T05:41:08.742Z",
+  "completedSha": "2cd03617620c1e4504af141c05f1a750a28d6836"
+}

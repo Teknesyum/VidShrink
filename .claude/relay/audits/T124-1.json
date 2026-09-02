@@ -1,0 +1,17 @@
+{
+  "contractId": "T124",
+  "auditorRunId": "a88901dc30428ecc6",
+  "headSha": "f009e03619dccfbe32e2729e3f43d360a3d841f7",
+  "diffHash": "37bff206b9ce03829fab6e09e30cad138a125e25050a1492ae86e6931b080bc6",
+  "owns": [
+    "tools/alinti-denetimi/alinti-denetimi.py",
+    "tools/alinti-denetimi/AGENTS.md",
+    "tools/alinti-denetimi/CLAUDE.md",
+    "docs/olcumler/alinti-denetimi.md"
+  ],
+  "verification": [
+    "Denetci butun sayilari git archive da8890e kopyasinda bagimsiz yeniden kosturdu; depoya yazmadi. Yedi kriterin yedisi karsilandi. K1 birebir tuttu: KAYMA 5 / SATIR KAYDI 3. K3 ayakta: sekiz bulgunun sekizi de kaynaktan dogrulandi, hicbiri curutulemedi. Suzgeclerin sustuurdugu uc ornek acildi, ucu de belgenin kendi formulu. --self-test uc bagimsiz mutasyonla kirmizi verdi. K6 tutuyor: diff dort dosya, sekiz kaymanin hicbiri susturulmamis. CI 33598151000 yesil. KRITIK yok; alti borc muhur notunda, ikisi T0 tarafindan kapatildi, verify satiri PowerShell'e sarildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T06:53:38.521Z"
+}

@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
@@ -50,14 +50,50 @@ public sealed class QualityTargetUiTests
     private static T Empty<T>(Func<MainWindow, T> read) =>
         AppHost.Run(() => read(new MainWindow()));
 
-    private static T Loaded<T>(Func<MainWindow, T> read) =>
+    private static T Loaded<T>(Func<MainWindow, T> read) => Loaded(Sample(), read);
+
+    private static T Loaded<T>(MediaInfo info, Func<MainWindow, T> read) =>
         AppHost.Run(() =>
         {
             var window = new MainWindow();
-            var info = Sample();
             window.LoadWithoutProbing(info.FilePath, info);
             return read(window);
         });
+
+    /// <summary>
+    /// T107: <see cref="Sample"/> artık taban sınırını gösteremiyor. Yerleşim skorunun
+    /// <c>rate</c> yarısı yazılım kodlayıcısında kaynak ızgarasına taşınınca en küçük plan
+    /// çok daha kötü puan alıyor. Arayüzden ölçülen: o 4K/60 örnekte kaliteye 1 yazınca
+    /// denetimin altındaki satır <b>boş</b> geliyor, yani <c>BelowFloor</c> hiç doğmuyor.
+    /// Varsayılan <c>PlanOptions</c> ile aynı kaynağın taban planı <b>-3,989</b> puan
+    /// (<c>.calisma/T107/taban-kalitesi.tsv</c>), yani denetime yazılabilen en küçük sayı
+    /// olan 1 bile tabanın üstünde.
+    ///
+    /// <para>Buradaki örnek, taban planının kalitesi ölçülerek seçildi. Arayüzün kendi
+    /// seçenekleriyle bu kaynakta taban hedefi <b>20,7 MB</b> ve orada ulaşılan kalite
+    /// <b>40,5/100</b>; kaynak tavanı <b>2090 MB</b> ve orada ulaşılan kalite
+    /// <b>94,1/100</b> — ikisi de bu ölçünün kendi çıktısıdır, elle yazılmadı. 1 tabanın
+    /// altında, 100 tavanın üstünde, 80 ikisinin arasında. (Varsayılan
+    /// <c>PlanOptions</c> ile aynı kaynağın taban planı 13,358 puan; arayüz kendi
+    /// seçenekleriyle daha büyük bir taban planı kuruyor, iki sayı farklı yollardan
+    /// gelir ve karıştırılmamalıdır.) Aynı kaynak
+    /// <c>QualityTargetTests.QualityBelowTheSmallestPlanIsReportedNotClipped</c>
+    /// düzeneğinin de kaynağıdır.</para>
+    /// </summary>
+    private static MediaInfo FloorBoundSample() => new()
+    {
+        FilePath = @"C:\Kayitlar\ekran-kaydi-1440p30.mkv",
+        FileSizeBytes = 2200L * 1024 * 1024,
+        DurationSeconds = 3600,
+        Width = 2560,
+        Height = 1440,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 5_100_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 96_000,
+        AudioChannels = 2
+    };
 
     private static TextBox QualityBox(MainWindow window) => window.FindControl<TextBox>("TxtQualityTarget")!;
     private static Slider QualitySlider(MainWindow window) => window.FindControl<Slider>("SliderQualityTarget")!;
@@ -147,7 +183,7 @@ public sealed class QualityTargetUiTests
     [Fact]
     public void SinirDurumuEkrandaYazili()
     {
-        var (floor, ceiling, matched) = Loaded(window =>
+        var (floor, ceiling, matched) = Loaded(FloorBoundSample(), window =>
         {
             QualityBox(window).Text = "1";
             var low = (Notice(window).IsVisible, Notice(window).Text ?? "");
@@ -164,7 +200,8 @@ public sealed class QualityTargetUiTests
         _output.WriteLine($"taban: {floor.Item2}");
         _output.WriteLine($"tavan: {ceiling.Item2}");
 
-        Assert.True(floor.Item1, "Taban sinirinda satir gorunmuyor.");
+        Assert.True(floor.Item1,
+            "Taban sinirinda satir gorunmuyor. Bu ornekte arayuzun taban hedefi 20,7 MB ve orada ulasilan kalite 40,5/100 olculdu; 1 istegi onun altinda kaldigi icin BelowFloor dogmali. Satir yoksa ya taban rejimi kayboldu ya da ornek artik onu gostermiyor - T107'de Sample() tam olarak boyle sessizce ise yaramaz olmustu.");
         Assert.True(ceiling.Item1, "Tavan sinirinda satir gorunmuyor.");
         Assert.NotEqual(floor.Item2, ceiling.Item2);
         Assert.False(matched.Item1, $"Sinir yokken satir duruyor: {matched.Item2}");

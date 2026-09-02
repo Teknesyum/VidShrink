@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using VidShrink.Core;
@@ -285,16 +285,24 @@ public sealed class QualityTargetTests
 
         foreach (var info in Sources())
         foreach (var intent in new[] { Intent.Sharing, Intent.Archive })
-        for (var quality = 20.0; quality <= 95.0; quality += 0.5)
         {
-            var result = PlanCalculator.TargetMbForQuality(info, new PlanOptions { Intent = intent }, quality);
-            worstByBound.TryGetValue(result.Bound, out var soFar);
-            worstByBound[result.Bound] = Math.Max(soFar, result.Evaluations);
-            if (result.Evaluations > worstOverall)
+            var options = new PlanOptions { Intent = intent };
+            var floorQuality = QualityAt(info, options, PlanCalculator.QualityFloorTargetMb(info));
+            var start = Math.Min(20.0, Math.Floor(floorQuality * 2) / 2 - 1.0);
+            report.AppendLine(FormattableString.Invariant(
+                $"{Path.GetFileName(info.FilePath)} {intent}: taban plani {floorQuality:0.###} puan, supurme {start:0.0}'dan basliyor"));
+
+            for (var quality = start; quality <= 95.0; quality += 0.5)
             {
-                worstOverall = result.Evaluations;
-                worstOverallCase = FormattableString.Invariant(
-                    $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0} ({result.Bound})");
+                var result = PlanCalculator.TargetMbForQuality(info, options, quality);
+                worstByBound.TryGetValue(result.Bound, out var soFar);
+                worstByBound[result.Bound] = Math.Max(soFar, result.Evaluations);
+                if (result.Evaluations > worstOverall)
+                {
+                    worstOverall = result.Evaluations;
+                    worstOverallCase = FormattableString.Invariant(
+                        $"{Path.GetFileName(info.FilePath)} {intent} istenen {quality:0.0} ({result.Bound})");
+                }
             }
         }
 
@@ -307,9 +315,22 @@ public sealed class QualityTargetTests
         // Measured over the whole 0,5-point request sweep on every source and intent, not over a
         // hand-picked list - that is what let round 1 publish a wrong number. BelowFloor costs one
         // call and AboveSourceCeiling two; a Matched request costs the 0,5% scan walking from the
-        // floor to the answer, and the gate below is the measured worst of that sweep: 1315 calls
+        // floor to the answer. The gate below is the measured worst of that sweep: 1315 calls
         // (sample.mp4 Sharing, request 94 - the answer sits just under the ceiling, so the scan
-        // walks nearly the whole range), about 240 ms at ~0,18 ms a call.
+        // walks nearly the whole range). T107 re-ran the sweep after the model change and it is
+        // still 1315 on the same case; the layout change did not move the search cost.
+        //
+        // T107: the sweep used to start at a hand-written 20,0 and that number stopped meaning
+        // anything. Once the layout score's rate half moved onto the source grid for software
+        // encoders, the smallest plan got much worse and every source's floor quality dropped
+        // below 20 - measured: sample.mp4 8,08 / phone.mp4 -3,511 / capture.mkv 13,358 Sharing and
+        // 12,431 Archive. No request in 20..95 was BelowFloor any more, so worstByBound had no
+        // BelowFloor key at all and the line below threw KeyNotFoundException. The lower bound is
+        // therefore derived per source and intent from the floor plan the model itself reports,
+        // one 0,5 step under it, instead of being written down. The guard right below fails loudly
+        // if that derivation ever stops reaching the regime rather than throwing on a missing key.
+        Assert.True(worstByBound.ContainsKey(QualityTargetBound.BelowFloor),
+            "Supurme hic BelowFloor uretmedi, yani taban rejimi olculmedi: " + report);
         Assert.Equal(1, worstByBound[QualityTargetBound.BelowFloor]);
         Assert.Equal(2, worstByBound[QualityTargetBound.AboveSourceCeiling]);
         Assert.True(worstOverall <= 1320, $"En pahali arama {worstOverall} BuildDetailed cagrisi surdu: {worstOverallCase}");

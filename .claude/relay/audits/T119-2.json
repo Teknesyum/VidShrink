@@ -1,0 +1,17 @@
+{
+  "contractId": "T119",
+  "auditorRunId": "a1190cc6a38538627",
+  "headSha": "e673d2048206054c02b4d3ec62e837dfc1a52cb5",
+  "diffHash": "26dbf0656f27df34588566af7891ab700a5abac7aa7269ca348b023a11f22146",
+  "owns": [
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "tests/VidShrink.Tests/VmafPoolingTests.cs",
+    "tools/VidShrink.Bench/Program.cs",
+    "docs/olcumler/kilit-olcusu.md"
+  ],
+  "verification": [
+    "Denetci main arsivinde dotnet test -c Release --filter VmafPoolingTests|QualityMeterTests kosturdu: Basarisiz 0 / Basarili 45 / Atlanan 0, cikis kodu 0. owns ihlali yok: cc816a7, 98e94ad ve birlesme 929d6fc yalniz dort sahiplenilen dosyaya dokunuyor. Kronik kusur (a) taramasi temiz - kilit-olcusu.md'nin alti ozet cumlesi kendi tablolariyla tek tek karsilastirildi, sapma yok. Uc borc: :179-183'un 'yakalanmamis istisnayla dusuyordu' gerekcesi yanlis (cc816a7:Program.cs:15-39'da ust duzey try/catch zaten vardi ve 1 donuyordu; bu T0'in tur 1 KRITIK'inin gerekcesiydi, karar ayakta gerekce curuk), :196-198'de 1 hem kullanim hatasi hem her yakalanan istisnanin kodu, :253-254 bayat tur 1 sayisi tasiyor (dort degil alti olcu eklendi)."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:45:21.608Z"
+}

@@ -405,7 +405,7 @@ public sealed class FfmpegArgumentsTests
         var windowSource = File.ReadAllText(TipSources.WindowCodePath);
         Assert.Contains("var capabilities = EncoderCapabilities.Instance;\n                WarmPsychovisualProbe(capabilities);",
             windowSource.Replace("\r\n", "\n"));
-        Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", \"mp4\"), _encoders));", windowSource);
+        Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", \"mp4\"), _encoders, _sceneMap?.Map));", windowSource);
     }
 
     /// <summary>
