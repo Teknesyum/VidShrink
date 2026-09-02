@@ -633,3 +633,51 @@ yeniden üretilemez" damgasını taşıyor ve silinmedi.
 
 Süre sayıları için: **makine paylaşımlıydı** (dokuz ajan). Kalite ve boyut
 sayılarına bu damga basılmadı.
+
+### 11.6 Bu turda ne koştu (K7, K8)
+
+**Ürün kodu değişmedi.** Değişen dosyalar: bu belge, `algi-olcusu.md` ve yeni
+ölçüm düzeneği `tools/cipa-yeniden/`. Düzenek `src/` altındaki hiçbir sabiti
+değiştirmiyor, ürün yoluna girmiyor; **mutasyon kanıtı gerekmedi.** Kilidin
+kendi mutasyon bataryası T110'da koşuldu (`algi-olcusu.md` §9.8, M0–M8).
+
+Sözleşmenin `verify` adımı, önce `--no-incremental` derleme ile:
+
+    dotnet build VidShrink.sln -c Release --no-incremental        # rc=0
+    dotnet test -c Release --no-build --filter "QualityMeterTests|MeasuredQualityTests"
+    # Basarisiz: 0, Basarili: 24, Atlanan: 0, Toplam: 24, Sure: 4 dk 8 sn
+
+**`MeasuredQualityTests` diye bir sınıf yok.** Süzgecin ikinci yarısı hiçbir
+şeyle eşleşmiyor; 24 ölçünün 24'ü de `QualityMeterTests`ten geliyor. Ölçülen
+kaliteyi gerçekten sınayan üç ölçü `PlanCalculatorTests` içinde ve düz `[Fact]`:
+
+    dotnet test -c Release --no-build --filter "FullyQualifiedName~MeasuredQuality"
+    # Basarisiz: 0, Basarili: 3, Atlanan: 0, Toplam: 3, Sure: 3 sn
+
+`MeasuredQualityPointsMoveThePredictionOneForOne`,
+`WithoutMeasuredPointsThePredictionFallsBackToThePrior`,
+`MeasuredQualityStopLeavesTheRestOfTheBudgetUnspent` — üçü de ffmpeg
+gerektirmiyor, **CI'da koşuyor.**
+
+`QualityMeterTests`in 24 ölçüsünün kapı dağılımı sayıldı: **11 düz `[Fact]`,
+12 `[FfmpegFact]`, 1 `[TonemapFact]`.** İkinci ve üçüncüsü ffmpeg'e bağlı
+(`TonemapFactAttribute`, `FrameGrabberTests.cs:22`, filtre listesi için ffmpeg
+koşuyor). Yani ffmpeg'siz koşucuda bu süzgeç **11 geçer, 13 atlar**; yerel
+koşumda ffmpeg PATH'te olduğu için 0 atlandı.
+
+**Tam süit koşulmadı** (sözleşme yasakladı), dolayısıyla T116 kendi atlama
+sayısını **ölçmedi**. `tools/ci-gibi-kos.sh` ffmpeg'i PATH'ten siliyor; oradaki
+yeşil `[FfmpegFact]` ölçüleri hakkında hiçbir şey söylemez. T110 denetiminin
+ölçtüğü sayılar: yerel `ci-gibi-kos.sh` **106**, GitHub CI **100** atlıyor.
+
+**Kabul kriteri ölçüleri o atlanan listede mi?** İkiye ayrılıyor:
+
+| ölçü | kapı | ffmpeg'siz CI'da |
+|---|---|---|
+| `PlanCalculatorTests`in üç `MeasuredQuality*` ölçüsü | `[Fact]` | **koşar** |
+| `QualityMeterTests`in beş kare kilidi ölçüsü (§9.8) | `[FfmpegFact]` | **atlanır** |
+| `VmafPoolingTests`in iki `OlcumFiltresi_*` ölçüsü | `[Fact]` | koşar, ama **`bench`in grafiğini** pinliyor, ürününkini değil (`algi-olcusu.md` §9.13) |
+
+Izgaranın 16 koşumunun hiçbiri bir test değil; `bench` ikilileri elle koşuldu
+(`tools/cipa-yeniden/duzenek/ab-kos.sh`). Süre sayıları için **makine
+paylaşımlıydı** — dokuz ajan aynı makinede koştu.
