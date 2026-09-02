@@ -75,7 +75,7 @@ public partial class MainWindow : Window
     private SizeEstimate? _estimate;
     private IEncoderAvailability? _encoders;
     private DeferredEncoderAvailability? _planEncoders;
-    private bool _probeStatusShown;
+    private string? _probeStatusText;
     private double _predictedQuality;
     private StrategyAdvice? _advice;
     private string? _lastOutput;
@@ -1231,15 +1231,26 @@ public partial class MainWindow : Window
         internal const int UnsettledProbeMs = 2000;
 
         /// <summary>
-        /// Yerleşmeyen bir yoklama en çok bir kez daha denenir. Sınır olmasa ölçüm ile
-        /// yeniden hesap birbirini besleyip sonsuz yoklama üretirdi.
+        /// Yerleşmeyen bir yoklama art arda en çok bu kadar denenir; sonrası
+        /// <see cref="RetryAfterFailureMs"/> beklemeye tabidir.
         /// </summary>
         internal const int MaxAttempts = 2;
+
+        /// <summary>
+        /// Bir kodlayıcı için toplam yoklama tavanı. Bekleme sonrası yeniden deneme kolu
+        /// <see cref="MaxAttempts"/>i aşabiliyordu ve <b>tavanı yoktu</b>: yerleşmeyen bir
+        /// yoklama oturum boyunca her <see cref="RetryAfterFailureMs"/> ms'de bir yeni
+        /// ffmpeg doğuruyordu. Tavan, geçici bir arızadan bir kez toparlanmaya izin verir
+        /// (iki hızlı deneme + bir beklemeli deneme); ondan sonra cevap <b>bilinmeyen</b>
+        /// kalır ve <see cref="Unsettled"/> ile arayüze taşınır.
+        /// </summary>
+        internal const int MaxTotalAttempts = 3;
 
         internal const int RetryAfterFailureMs = 5000;
 
         private sealed class Answer
         {
+            internal EncoderProbeState State = EncoderProbeState.Unmeasured;
             internal bool Works;
             internal string? PixelFormat;
             internal bool Settled;
@@ -1260,7 +1271,14 @@ public partial class MainWindow : Window
             Working,
             NotWorking,
             Unsettled,
-            Failed
+            Failed,
+
+            /// <summary>
+            /// Yoklama koştu, hızlı döndü ve <b>sonuca varamadı</b>: ffmpeg zaman aşımına
+            /// uğradı ya da süreç hiç başlayamadı. <c>Unsettled</c>dan ayrı, çünkü o "çok
+            /// uzun sürdü" demek; bu, süresi ne olursa olsun "cevap yok" demek.
+            /// </summary>
+            Unmeasured
         }
 
         private readonly IEncoderAvailability _source;
@@ -1337,8 +1355,9 @@ public partial class MainWindow : Window
             {
                 if (!_answers.TryGetValue(Key("works", codec), out var answer)) return ProbeAnswer.Unknown;
                 if (answer.Failure is not null) return ProbeAnswer.Failed;
+                if (answer.State == EncoderProbeState.Unmeasured) return ProbeAnswer.Unmeasured;
                 if (!answer.Settled) return ProbeAnswer.Unsettled;
-                return answer.Works ? ProbeAnswer.Working : ProbeAnswer.NotWorking;
+                return answer.State == EncoderProbeState.Working ? ProbeAnswer.Working : ProbeAnswer.NotWorking;
             }
         }
 
@@ -1372,11 +1391,13 @@ public partial class MainWindow : Window
         private static string Key(string kind, string codec) => $"{kind}:{codec}";
 
         /// <summary>
-        /// Yoklama yerleşmediyse cevap "ölçüldü" sayılmaz: bir kez daha denenir, o da
-        /// yerleşmezse deneme durur ama cevap yine <b>bilinmeyen</b> kalır. Yerleşmeyen bir
-        /// yoklamayı ölçüm gibi kabul etmek, öldürülmüş bir denemeyi "bu kodlayıcı 10 bit
-        /// taşıyamıyor" cümlesine çevirmek demekti; <see cref="Unsettled"/> bunun yerine
-        /// durumu arayüze taşır.
+        /// Yoklama yerleşmediyse cevap "ölçüldü" sayılmaz. Deneme sırası şu:
+        /// <see cref="MaxAttempts"/> kadar art arda denenir, sonra
+        /// <see cref="RetryAfterFailureMs"/> beklenip <b>bir kez daha</b> denenir
+        /// (<see cref="MaxTotalAttempts"/>), ondan sonra deneme <b>durur</b> ama cevap
+        /// yine <b>bilinmeyen</b> kalır. Yerleşmeyen bir yoklamayı ölçüm gibi kabul etmek,
+        /// öldürülmüş bir denemeyi "bu kodlayıcı 10 bit taşıyamıyor" cümlesine çevirmek
+        /// demekti; <see cref="Unsettled"/> bunun yerine durumu arayüze taşır.
         /// </summary>
         private bool Ready(string key, string codec, bool hdr10)
         {
@@ -1385,6 +1406,7 @@ public partial class MainWindow : Window
                 if (_answers.TryGetValue(key, out var answer))
                 {
                     if (answer.Settled) return true;
+                    if (answer.Attempts >= MaxTotalAttempts) return false;
                     var stuck = answer.Attempts >= MaxAttempts;
                     var cooling = stuck && Environment.TickCount64 - answer.LastAttemptTicks < RetryAfterFailureMs;
                     if (cooling) return false;
@@ -1397,18 +1419,34 @@ public partial class MainWindow : Window
             return false;
         }
 
+        /// <summary>
+        /// Geçidin <b>girişi</b>. Ölçen çağrı üç değerli cevabı taşıyabiliyorsa oradan
+        /// alınır; iki değerli <c>WorksAsEncoder</c>den geçirmek <c>Unmeasured</c>ı geçit
+        /// daha <see cref="Answer"/>a yazmadan yok ediyordu ve "ölçemedik" ile "çalışmıyor"
+        /// geçitten birebir aynı çıkıyordu. Üç değerli yüzü olmayan bir kaynak (ölçülerin
+        /// sahteleri) iki değerli koldan geçer; o kolda üçüncü durum zaten yok.
+        /// </summary>
+        private EncoderProbeState ProbedEncoderState(string codec)
+            => _source is IEncoderProbeState prober
+                ? prober.WorksAsEncoderState(codec)
+                : _source.WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+
         private void Measure(string key, string codec, bool hdr10)
         {
             Task.Run(() =>
             {
                 var clock = Stopwatch.StartNew();
-                var works = false;
+                var state = EncoderProbeState.Unmeasured;
                 string? pixelFormat = null;
                 Exception? failure = null;
                 try
                 {
-                    if (hdr10) pixelFormat = (_source as IHdr10EncoderAvailability)?.Hdr10PixelFormat(codec);
-                    else works = _source.WorksAsEncoder(codec);
+                    if (hdr10)
+                    {
+                        pixelFormat = (_source as IHdr10EncoderAvailability)?.Hdr10PixelFormat(codec);
+                        state = pixelFormat is null ? EncoderProbeState.NotWorking : EncoderProbeState.Working;
+                    }
+                    else state = ProbedEncoderState(codec);
                 }
                 catch (Exception ex)
                 {
@@ -1425,12 +1463,15 @@ public partial class MainWindow : Window
                     answer.ElapsedMs = clock.ElapsedMilliseconds;
                     if (failure is null)
                     {
-                        answer.Works = works;
+                        answer.State = state;
+                        answer.Works = state == EncoderProbeState.Working;
                         answer.PixelFormat = pixelFormat;
-                        answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;
+                        answer.Settled = state != EncoderProbeState.Unmeasured
+                                         && clock.ElapsedMilliseconds < UnsettledProbeMs;
                     }
                     else
                     {
+                        answer.State = EncoderProbeState.Unmeasured;
                         answer.Works = false;
                         answer.PixelFormat = null;
                         answer.Settled = false;
@@ -1890,6 +1931,15 @@ public partial class MainWindow : Window
     /// <summary>Ölçü için: son hesabın donanım cevabını ölçülmemiş sayıp saymadığı.</summary>
     internal bool PlanHardwareNotMeasured { get; private set; }
 
+    /// <summary>Ölçü için: geçitte denemesi bitmiş ama yerleşmemiş bir yoklama var mı.</summary>
+    internal bool PlanProbeUnsettled => _planEncoders?.Unsettled ?? false;
+
+    /// <summary>Ölçü için: geçitte istisnayla düşmüş bir yoklamanın metni.</summary>
+    internal string? PlanProbeFailure => _planEncoders?.FirstFailure;
+
+    /// <summary>Ölçü için: durum satırı raporlamasını tek başına koşturur.</summary>
+    internal void ReportProbeStatusForMeasurement() => ReportUnsettledProbe();
+
     /// <summary>
     /// Yerleşmeyen yoklamayı kullanıcıya söyler. Yoklama bir cevap üretemediğinde bu bir
     /// sonuç değil bilinmeyendir; sessizce varsayılana düşmek — HDR kaynakta tonemap'e —
@@ -1901,6 +1951,11 @@ public partial class MainWindow : Window
     /// <c>main.status.probe-failed</c> — istisnanın metniyle birlikte. İkisi de
     /// başarısızlık değil bilinmezlik bildiriyor; <c>main.error.probe</c> gerçek
     /// başarısızlık için açılışta duruyor (<see cref="ProbeHardwareEncodersAsync"/>).
+    ///
+    /// Temizlik yalnız <b>yoklamanın kendi yazdığı metni</b> siler. Önceki hâli "yoklama
+    /// bir kez yazdı mı" tutan bir bayraktı ve "şu anki metin yoklamanın mı" tutmuyordu:
+    /// durum satırını <see cref="UpdateToolStatus"/>, bağlantı, ayar ve araç hataları da
+    /// yazıyor; yoklama yerleştiğinde o metinler de siliniyordu.
     /// </summary>
     private void ReportUnsettledProbe()
     {
@@ -1913,12 +1968,12 @@ public partial class MainWindow : Window
         if (text is not null)
         {
             if (TxtSystemStatus.Text != text) TxtSystemStatus.Text = text;
-            _probeStatusShown = true;
+            _probeStatusText = text;
         }
-        else if (_probeStatusShown)
+        else if (_probeStatusText is not null)
         {
-            TxtSystemStatus.Text = string.Empty;
-            _probeStatusShown = false;
+            if (TxtSystemStatus.Text == _probeStatusText) TxtSystemStatus.Text = string.Empty;
+            _probeStatusText = null;
         }
     }
 

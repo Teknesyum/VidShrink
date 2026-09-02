@@ -407,10 +407,48 @@ public sealed class PlanCalculatorProbeTests
     /// gercek yazilim yoklamasi <c>UnsettledProbeMs</c> esiginin altinda kaliyor, dolayisiyla
     /// gecit onu <b>yerlesmis ve calisiyor</b> saymak zorunda.
     /// </summary>
+    /// <summary>
+    /// T137 tur 2 / T9. <see cref="TheRealSoftwareProbeDurationIsMeasured"/> ffmpeg'siz
+    /// ortamda hic kosmadan yesil sayiliyordu; iddianin ffmpeg gerektirmeyen yarisi buraya
+    /// alindi ve <b>her kosumda</b> kosuyor. Olculen sey esik ile gecidin karari arasindaki
+    /// bag: esigin altinda kalan yoklama yerlesmis ve okunabilir, esigin ustundeki
+    /// yerlesmemis ve olcum sayilmiyor. Sinir <c>ProbeKillMs</c> degil
+    /// <c>UnsettledProbeMs</c>; ikisi arasindaki ucurum eski iddiayi mutasyona dayanikli
+    /// yapiyordu.
+    /// </summary>
+    [Fact]
+    public void TheGateSettlesOnTheMeasuredDurationNotTheKillLimit()
+    {
+        var esik = MainWindow.DeferredEncoderAvailability.UnsettledProbeMs;
+        var hizli = new MainWindow.DeferredEncoderAvailability(
+            new RecordingAvailability(TimeSpan.Zero, _ => true), () => { });
+        var yavas = new MainWindow.DeferredEncoderAvailability(
+            new RecordingAvailability(TimeSpan.FromMilliseconds(esik + 300), _ => true), () => { });
+
+        Drain(hizli, "av1_nvenc");
+        Drain(yavas, "av1_nvenc");
+
+        Assert.InRange(hizli.ElapsedMsFor("av1_nvenc"), 0, esik - 1);
+        Assert.True(yavas.ElapsedMsFor("av1_nvenc") >= esik,
+            $"yavas yoklama esigin altinda kaldi: {yavas.ElapsedMsFor("av1_nvenc")} ms");
+
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.Working, hizli.AnswerFor("av1_nvenc"));
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.Unsettled, yavas.AnswerFor("av1_nvenc"));
+
+        Assert.True(hizli.IsMeasured("av1_nvenc"), "esigin altindaki yoklama olcum sayilmali");
+        Assert.False(yavas.IsMeasured("av1_nvenc"), "esigin ustundeki yoklama olcum sayilmamali");
+    }
+
     [Fact]
     public void TheRealSoftwareProbeDurationIsMeasured()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
+        if (!ToolLocator.IsAvailable(out _))
+        {
+            WriteEvidence($"{nameof(TheRealSoftwareProbeDurationIsMeasured)}: ATLANDI — ffmpeg yok, " +
+                          "gercek yoklama iddiasi kosmadi; ffmpeg gerektirmeyen karsiligi " +
+                          $"{nameof(TheGateSettlesOnTheMeasuredDurationNotTheKillLimit)}");
+            return;
+        }
 
         var gate = new MainWindow.DeferredEncoderAvailability(FreshCapabilities(), () => { });
         Assert.False(gate.IsMeasured("libsvtav1"));
@@ -535,6 +573,134 @@ public sealed class PlanCalculatorProbeTests
         Assert.False(gate.Unsettled);
         Assert.True(gate.WorksAsEncoder(kodlayici));
         Assert.Equal(EncoderProbeState.Working, gate.EncoderState(kodlayici));
+    }
+
+    private const string TekKodlayiciListesi = """
+        Encoders:
+         V..... = Video
+        -------
+         V..... h264_nvenc           NVIDIA NVENC H.264 encoder (codecs: h264)
+        """;
+
+    private static EncoderCapabilities Yoklamasi(EncoderCapabilities.ProbeOutcome sonuc)
+    {
+        var caps = EncoderCapabilities.Parse(TekKodlayiciListesi, "", "ffmpeg version test\n");
+        caps.EncoderProbeHook = _ => sonuc;
+        return caps;
+    }
+
+    /// <summary>
+    /// T137 tur 2 / T1. Gecidin <b>girisi</b>. Olcum su soruyu soruyor: ucuncu cevap
+    /// gecide girerken hayatta kaliyor mu. Yoklamasi <c>Unmeasured</c> donen kodlayici ile
+    /// yoklamasi <c>Rejected</c> donen kodlayici gecitten ayni cikamaz; ustelik hic
+    /// olculmemis kodlayici icin <c>IsMeasured</c> dogru diyemez.
+    /// </summary>
+    [Fact]
+    public void TheGateEntranceKeepsTheUnmeasuredAnswer()
+    {
+        var olcemeyen = new MainWindow.DeferredEncoderAvailability(
+            Yoklamasi(EncoderCapabilities.ProbeOutcome.Unmeasured), () => { });
+        var calismayan = new MainWindow.DeferredEncoderAvailability(
+            Yoklamasi(EncoderCapabilities.ProbeOutcome.Rejected), () => { });
+
+        Drain(olcemeyen, "h264_nvenc");
+        Drain(calismayan, "h264_nvenc");
+
+        WriteEvidence($"T137/T1 App gecidi olcemeyen : {olcemeyen.EncoderState("h264_nvenc")} / IsMeasured={olcemeyen.IsMeasured("h264_nvenc")}");
+        WriteEvidence($"T137/T1 App gecidi calismayan: {calismayan.EncoderState("h264_nvenc")} / IsMeasured={calismayan.IsMeasured("h264_nvenc")}");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, olcemeyen.EncoderState("h264_nvenc"));
+        Assert.Equal(EncoderProbeState.NotWorking, calismayan.EncoderState("h264_nvenc"));
+        Assert.NotEqual(olcemeyen.EncoderState("h264_nvenc"), calismayan.EncoderState("h264_nvenc"));
+
+        Assert.False(olcemeyen.IsMeasured("h264_nvenc"), "hic olculmemis kodlayici olculmus sayiliyor");
+        Assert.True(calismayan.IsMeasured("h264_nvenc"), "olculmus ret olcum sayilmali");
+    }
+
+    /// <summary>
+    /// T137 tur 2 / T4. Yerlesmeyen yoklama sonsuza kadar yeniden denenmiyor. Sogumali
+    /// yeniden deneme kolu <c>Attempts</c>i artirip yeniden yokluyordu ve hicbir tavan
+    /// yoktu: oturum boyunca her <c>RetryAfterFailureMs</c>de bir yeni ffmpeg dogardi.
+    /// </summary>
+    [Fact]
+    public void TheRetryCeilingStopsTheProbeStorm()
+    {
+        var patlayan = new MainWindow.DeferredEncoderAvailability(new ThrowingAvailability(), () => { });
+
+        Drain(patlayan, "av1_nvenc");
+        var hizliDenemeler = patlayan.Probes;
+
+        for (var tur = 0; tur < 2; tur++)
+        {
+            Thread.Sleep(MainWindow.DeferredEncoderAvailability.RetryAfterFailureMs + 200);
+            Drain(patlayan, "av1_nvenc");
+        }
+
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.MaxAttempts, hizliDenemeler);
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.MaxTotalAttempts, patlayan.Probes);
+    }
+
+    /// <summary>Yoklamasi istege bagli olarak firlatan yetenek nesnesi.</summary>
+    private sealed class SwitchableAvailability : IEncoderAvailability, IHdr10EncoderAvailability
+    {
+        internal const string Message = "yoklama surecine erisilemedi";
+
+        private volatile bool _fail = true;
+
+        internal void Duzel() => _fail = false;
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec)
+            => _fail ? throw new InvalidOperationException(Message) : true;
+
+        public string? Hdr10PixelFormat(string codec)
+            => _fail ? throw new InvalidOperationException(Message) : "p010le";
+    }
+
+    /// <summary>
+    /// T137 tur 2 / T6. Durum satirini yoklama disinda bir altsistem de yaziyor:
+    /// <c>ApplyLoaded</c> her dosya yuklemesinde once <c>UpdateToolStatus</c> ile arac
+    /// bilgisini yaziyor, hemen ardindan <c>Recalculate</c> yoklama durumunu raporluyor.
+    /// Yoklama yerlestiginde <c>_probeStatusShown</c> bayragi durum satirini kosulsuz
+    /// bosaltiyordu: bayrak "yoklama bir kez yazdi mi" tutuyor, "su anki metin
+    /// yoklamanin mi" tutmuyor. Silinen metin yoklamanin degil, arac bilgisinin.
+    /// </summary>
+    [Fact]
+    public void TheProbeStatusDoesNotEraseAnUnrelatedMessage()
+    {
+        var makine = new SwitchableAvailability();
+
+        var (durum, _) = OnAnyWindow(makine, window =>
+        {
+            for (var tur = 0; tur <= MainWindow.DeferredEncoderAvailability.MaxAttempts; tur++)
+            {
+                window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+                Settle(window);
+            }
+            window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+            var yoklamaHatasi = window.TxtSystemStatus.Text ?? "";
+
+            makine.Duzel();
+            var izler = new List<string>();
+            for (var tur = 0; tur < 4; tur++)
+            {
+                Thread.Sleep(MainWindow.DeferredEncoderAvailability.RetryAfterFailureMs + 200);
+                window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+                izler.Add(window.TxtSystemStatus.Text ?? "");
+                Settle(window);
+                if (window.PlanProbeFailure is null && !window.PlanProbeUnsettled) break;
+            }
+
+            return (
+                YoklamaHatasi: yoklamaHatasi,
+                Yerlesti: window.PlanProbeFailure is null && !window.PlanProbeUnsettled,
+                Izler: izler);
+        });
+
+        Assert.Contains(SwitchableAvailability.Message, durum.YoklamaHatasi, StringComparison.OrdinalIgnoreCase);
+        Assert.True(durum.Yerlesti, "olcu kurulmadi: yoklama iyilesmedi");
+        Assert.DoesNotContain("", durum.Izler);
     }
 
     private sealed class FlakyThenWorkingAvailability : IEncoderAvailability
@@ -784,6 +950,10 @@ public sealed class PlanCalculatorProbeTests
     }
 
     private static (T Result, int Calls) OnWindow<T>(RecordingAvailability availability, Func<MainWindow, T> work)
+        => OnAnyWindow(availability, work, () => availability.Calls.Count);
+
+    private static (T Result, int Calls) OnAnyWindow<T>(
+        IEncoderAvailability availability, Func<MainWindow, T> work, Func<int>? calls = null)
     {
         var settings = Path.Combine(Path.GetTempPath(), $"vidshrink-t130-{Guid.NewGuid():N}.json");
         try
@@ -793,9 +963,9 @@ public sealed class PlanCalculatorProbeTests
                 var window = new MainWindow { SettingsPathOverride = settings };
                 window.ApplyHardwareVerdict(availability, true, UsableVerdict);
                 window.ChkFastGpu.IsChecked = true;
-                var before = availability.Calls.Count;
+                var before = calls?.Invoke() ?? 0;
                 var value = work(window);
-                return (value, availability.Calls.Count - before);
+                return (value, (calls?.Invoke() ?? 0) - before);
             });
             return result;
         }

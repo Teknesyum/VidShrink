@@ -3,7 +3,20 @@ using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
-public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup, IHdr10EncoderAvailability, IHdr10ProbeAvailability
+/// <summary>
+/// Yoklayan üç değerli cevabın arayüzü. <see cref="IEncoderAvailability.EncoderState"/>
+/// süreç doğurmaz, yalnız bilineni okur; bu arayüz <b>ölçer</b>. Çağıran taraf ölçümü
+/// kendi arka planına aldıysa (App'teki geçit) üçüncü cevabı buradan alır — iki değerli
+/// <c>WorksAsEncoder</c>den geçirmek üçüncü cevabı geçidin girişinde yok ediyordu.
+/// Arayüz Core'da değil burada, çünkü Core'daki <see cref="IEncoderAvailability"/> saf
+/// okuma sözleşmesi; ölçen yol ffmpeg'e bağlı ve o bağ bu derlemede.
+/// </summary>
+public interface IEncoderProbeState
+{
+    EncoderProbeState WorksAsEncoderState(string codec);
+}
+
+public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup, IHdr10EncoderAvailability, IHdr10ProbeAvailability, IEncoderProbeState
 {
     private static readonly object InstanceGate = new();
     private static EncoderCapabilities? _instance;
@@ -67,8 +80,23 @@ public sealed class EncoderCapabilities : IEncoderAvailability, IEncoderOptionAv
     public bool HasEncoder(string name) => Encoders.Contains(name);
     public bool HasFilter(string name) => Filters.Contains(name);
 
-    public bool WorksAsEncoder(string codec) => Probe(codec).Succeeded;
+    /// <summary>
+    /// İki değerli cevap, ama <b>ölçülemeyen yoklama "yok" değil.</b> Yoklama sonuca
+    /// varamadığında (zaman aşımı ya da sürecin hiç başlayamaması) yoklamadan önce
+    /// bilinene, yani ffmpeg'in kendi kodlayıcı listesine düşülür. Ölçüm ekleyemediğinde
+    /// zaten bilinen bilgi silinmez: <c>docs/olcumler/surucu-yoklugu.md:318-322</c>'de orta
+    /// yükte 12 yoklamanın 9'u zaman aşımına uğrayıp <b>çıkış kodu 0 ile kodlayan</b> bir
+    /// kodlayıcıya "yok" diyordu. Listede olmayan kodlayıcı ölçülmüş bir yokluktur ve
+    /// burada da <c>false</c> döner. Üç durumu ayrı ayrı isteyen çağıran
+    /// <see cref="WorksAsEncoderState"/> okur.
+    /// </summary>
+    public bool WorksAsEncoder(string codec)
+    {
+        var result = Probe(codec);
+        return result.Measured ? result.Succeeded : HasEncoder(codec);
+    }
 
+    /// <summary>Yoklayan üç değerli cevap: ölçer, sonra üç durumdan birini döner.</summary>
     public EncoderProbeState WorksAsEncoderState(string codec) => Probe(codec).State;
 
     /// <summary>
