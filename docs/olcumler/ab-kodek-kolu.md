@@ -171,3 +171,58 @@ kendi koşumunda karıştırıcı **tam güçte** duruyor.
 - Ölçerin tekrar sapması bugünkü kodda **sıfır** ölçüldü (iki koşum, onbeş
   basamak aynı); ama bu tek dosya üzerinde. Başka girdilerde sıfır olduğu
   varsayılmadı, ölçülmedi.
+
+## Taban yeniden kuruluyor — karar kuralları sayılardan önce yazıldı
+
+T0 kararı: `ab-duzenegi.md`nin on iki satırının **tamamı** bugünkü kodla yeniden
+ölçülüyor, kalan beş çiftle sınırlanmıyor. Gerekçe K1'in bulgusu: 0,86 bir
+varyans değil sabit sürüm ofseti, ve on iki satırın hepsi `381e8ab`de ölçülmüş.
+Beşini yenileyip yedisini eskide bırakmak, tek tabloda iki ayrı ölçer demek
+olurdu — düzeltilmeye çalışılan kusurun daha kötü hali.
+
+Aşağıdaki kurallar **koşum bitmeden** yazıldı; yeni sayılar geldiğinde
+eşiklerin sayıya göre seçilmediği bu sırayla belli olsun.
+
+- **Manşet.** "Altı parça-hedef çiftinin beşinde HandBrake kazandı" cümlesi
+  yeni tablonun harmonik sütununda satır satır sayılır. Kaç çift çıkarsa o
+  yazılır; beklenen yön yok. Eş boyut kapısından geçmeyen satır **sayıma
+  girmez**, sayılmadığı da yazılır.
+- **Kodek kolunun payı.** Yeni tablo eski tabloyla **kıyaslanmaz** (sürüm
+  sınırı). Kodeğin payı yalnız aynı tabanda ölçülmüş Compatible ↔ Auto
+  ikilisinden okunur.
+- **K6 eşikleri.** Eski 69,65 / 93,70 / "≥ ~81" üçlüsü **düşürüldü**. Yeni
+  kural: zorunlu-1080p koşumu, aynı tabandaki kendi iki sayısıyla kıyaslanır —
+  düşük çözünürlüklü VidShrink satırı (alt sınır) ve HandBrake satırı (üst
+  sınır). Puan alt sınırda ya da altında kalırsa yerleşim hipotezi **öldü**;
+  iki sayının arasını yarıdan fazla kapatırsa **yaşıyor**. Sayılar koşum
+  bitince buraya yazılır.
+
+## Asimetri — hangi kolda ne değişti
+
+`381e8ab` ile bugünkü taban arasında iki kol **eşit ölçüde** değişmedi:
+
+| kol | kodlayıcı değişti mi | ölçer değişti mi |
+|---|---|---|
+| HandBrake | hayır — argüman dizesi aynı, çıktı bit bit aynı (3.531.037 bayt) | evet |
+| VidShrink | evet — `8ea80c4` (T98) `-g 120` → `-g 600 -keyint_min 60` | evet |
+
+Bu yüzden eski tablodaki iki kolun farkı, sürüm sınırını geçen bir çıkarmadır ve
+iki kolda iki farklı sebep taşır. Yeniden kurum bunu **çözüyor**: on iki satırın
+on ikisi tek tabanda, tek ölçerle üretiliyor. Sonraki okuyanın aynı soruyu
+sormasına gerek yok — eski tabloyla yeni tablo arasında satır kıyaslaması
+yapılamaz, yalnız yeni tablo kendi içinde okunur.
+
+## T120 bu bulgudan etkilenmiyor
+
+T125'in bulgusu T120'ye **dokunmuyor** ve bu iki ayrı yoldan doğrulandı.
+T120 bu düzeneği hiç çağırmıyor: kendi koşum programı var
+(`tools/auto-mod-olcumu/harness/Program.cs`) ve orada `Codec = CodecPreference.Auto`
+doğrudan kuruluyor — yani T125'in düzelttiği yapılandırma hatası o koşumda hiç
+yoktu. Ayrıca T120'nin denetimi 18 vmaf JSON'unu kendi ortamında yeniden
+hesapladı, yani −0,266'nın iki tarafı tek tabanda ölçülmüş; sürüm sınırı o
+satırdan geçmiyor.
+
+İki düzenek tek bir alanda ayrışıyor, karıştırılmasın diye yazılı: T120'nin
+koşumu `AllowFpsDrop = true`, buradaki A/B `AllowFpsDrop = false`. Öteki alanlar
+(`Intent.Sharing`, `FillPolicy.FillTarget`, `SpeedMode.Quality`,
+`AllowResolutionDrop = true`) iki tarafta da aynı.
