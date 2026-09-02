@@ -198,8 +198,8 @@ haritasız ve 3,0 / 7,5 / 40,0 sn'lik haritalarda `PreviewSegment.For` ile
 Argüman seviyesindeki bu tutarlılık **kullanıcının gördüğü şeye ulaşmıyordu.**
 Ekrandaki parçayı `PreviewSegment.For`'a veren zincir
 `MainWindow` → `PanelHost` → `SegmentEncoder.Describe`
-(`src/VidShrink.App/Playback/SegmentEncoder.cs:118`) ve o çağrı `scenes`
-**geçirmiyordu**. Yani kullanıcı bakıp karar verdiği görüntüyü 10 sn tavanla,
+(düzeltmeden önce `src/VidShrink.App/Playback/SegmentEncoder.cs:118`, bugün `:126`)
+ve o çağrı `scenes` **geçirmiyordu**. Yani kullanıcı bakıp karar verdiği görüntüyü 10 sn tavanla,
 aldığı dosyayı 5 sn tavanla üretiyorduk. T0 kararıyla üç dosya `owns`'a alındı ve
 zincir tamamlandı:
 
@@ -355,7 +355,7 @@ Düzenek `.calisma/t113/mutasyon.sh`: yamayı uygular, derler, koşar, kaynağı
 alır. Mutasyonlar koşulurken taban **93 geçti / 1 kaldı / 0 atlandı / 94 toplam**
 idi; kalan tek ölçü `FfmpegArgumentsTests.cs:408` pimiydi ve o pim § 8'de
 düzeltildi. Düzeltmeden sonra aynı süzgeç **94 geçti / 0 kaldı / 0 atlandı**
-veriyor. Mutasyon sonuçları bundan etkilenmiyor: altı mutasyonun hiçbiri o pimi
+veriyor. Mutasyon sonuçları bundan etkilenmiyor: dokuz mutasyonun hiçbiri o pimi
 kırmıyor, her biri aşağıdaki kendi ölçüsünü kırıyor.
 
 | # | Bozulan bağlantı | Yama | Kırmızıya dönen ölçü |
@@ -382,9 +382,10 @@ mutasyonu yalnız `TheMapChangesTheIFrameCountOfTheDeliveredFile` yakalıyor; o
 ölçü argüman değil **teslim edilen dosyanın I-kare sayısını** okuyor (30 sn
 `testsrc2`, hem crf hem 2 geçiş kipinde, haritalı 6 haritasız 3 I-kare).
 
-**Dürüst kayıt: M1–M3 davranışla değil kaynak metniyle pimli.** `MainWindow`
-başsız koşumda kurulamıyor, o yüzden üç arayüz bağlantısı
-`TipSources.WindowCodePath` üzerinden dosya metni okunarak pimlendi. Bu projedeki
+**Dürüst kayıt: M1–M3 ve M9 davranışla değil kaynak metniyle pimli.**
+`MainWindow` başsız koşumda kurulamıyor, o yüzden dört arayüz bağlantısı
+`TipSources.WindowCodePath` üzerinden dosya metni okunarak pimlendi. M7 ve M8
+davranışla pimli: `SegmentEncoder` ve `PanelHost` başsız kurulabiliyor. Bu projedeki
 mevcut kalıptır (`FfmpegArgumentsTests.cs:405` aynısını yapıyor) ama davranış
 ölçüsü değildir: `MainWindow`'un o satırları başka bir yoldan etkisizleştiren bir
 değişikliği yakalayamaz.
