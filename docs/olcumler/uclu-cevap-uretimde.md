@@ -127,9 +127,44 @@ Son doğrulama:
 - `dotnet build VidShrink.sln -c Release --no-incremental`: başarılı, 0 uyarı, 0 hata.
 - Birleşik verify: `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`.
 - Test çağrılarında `--no-build` kullanılmadı.
-- Son push'ın CI koşum kimliği ve sonucu aşağıya eklenecek.
+- Tur 1'in son push'ının CI koşumu: **`33680674698`**, `a125667`, `completed success` — `Failed: 0, Passed: 1465, Skipped: 19, Total: 1484`. Bu satır tur 1'de boş bırakılmıştı; tur 2 borcu olarak dolduruldu.
+
+**Tur 2 düzeltmesi — kol sayıları yeniden sayıldı.** Yukarıdaki tablo `b88bb66` tabanına aitti ve `origin/main` birleştirildikten sonra bayatladı. `a125667`/`f8b33ee` sonrası gerçek sayılar:
+
+| Verify kolu | Test sayısı (tur 1 yazılan) | Test sayısı (tur 2, ölçülen) |
+|---|---:|---:|
+| `PlanCalculatorTests` | 32 | 32 |
+| `EncoderStateConsumptionTests` | 4 | **7** |
+| `HdrResolverTests` | 1 | 1 |
+| `PerformanceCheckTests` | 21 | **22** |
+| `EncoderAvailabilityTests` | 12 | 12 |
+| Toplam | 70 | **74** |
+
+```
+> foreach ($k in ...) { dotnet test ... -c Release --list-tests --filter $k }
+PlanCalculatorTests = 32
+EncoderStateConsumptionTests = 7
+HdrResolverTests = 1
+PerformanceCheckTests = 22
+EncoderAvailabilityTests = 12
+```
+
+Sıfır test bulan kol yok; beş kolun toplamı birleşik koşumun toplamına eşit (32+7+1+22+12 = 74).
+
+```
+> dotnet build VidShrink.sln -c Release --no-incremental
+    0 Uyarı
+    0 Hata
+> dotnet test -c Release --filter "PlanCalculatorTests|EncoderStateConsumptionTests|HdrResolverTests|PerformanceCheckTests|EncoderAvailabilityTests"
+Başarılı!  - Başarısız: 0, Başarılı: 74, Atlanan: 0, Toplam: 74, Süre: 2 m 22 s
+```
+
+`EncoderStateConsumptionTests` 4 → 7 farkı K7'nin üç yeni ölçüsüdür. `PerformanceCheckTests` 21 → 22 farkı bu dalın işi değil; birleştirilen `origin/main` ile geldi.
 
 Depo kapısı `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134` ile filtresiz çalıştırıldı: `1345 başarılı / 0 başarısız / 17 atlanan / toplam 1362`, süre `17 dk 49 sn`. Kapı `başarısız=0 toplam=1362 alt-sınır=1134` sonucu ile geçti. Üç dosyada test iddiası, bandı, eşiği veya test adı değiştirilmedi.
+
+**Tur 2'de bu kapı yerelde tamamlanmadı.** Filtresiz koşum başlatıldı ama makinede eşzamanlı başka ajan koşumları vardı ve süre teslimi bloke ettiği için durduruldu; kısmi çıktı kanıt sayılmaz ve rapora yazılmadı. Tur 2'nin tam suit doğrulaması **CI'a bırakıldı** — yerelde yeşil olduğu varsayılmıyor. Yerelde tamamlanan doğrulama, yukarıdaki `74/74` birleşik verify koşumudur.
+
 
 ## K7 — Geçici cevap arayüze ölçülmüş gibi ulaşmıyor
 
