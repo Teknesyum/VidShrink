@@ -169,6 +169,21 @@ public static class FfmpegArguments
     // ceiling is the whole placement rule: the realized interval is exactly the ceiling and the
     // seek cost is exactly what the ceiling says. HardwareKeyframeCeilingSeconds is therefore
     // the seek budget itself, not a content-derived number.
+    // The software CRF path keeps a VBV cap where HandBrake leaves one out (encx265.c:514-522
+    // fills VBV only on user request or for DoVi). Measured on parca-1-20sn at CRF 23, libx264,
+    // same colour space and stream count on both sides, machine shared:
+    //
+    //   VBV on  -> 14.731 MiB   mean 86.977   p10 84.999
+    //   VBV off -> 15.312 MiB   mean 87.287   p10 85.598
+    //
+    // Dropping it is a real quality gain and it lands exactly in the tail (p10 +0.599), but it
+    // costs 3.9% more file at the same CRF. HandBrake can afford that because its CRF is an
+    // open-ended quality mode; here CRF is a target-landing mode - PlanCalculator's fill policy
+    // picks a CRF aimed at the band centre - so a systematic +3.9% eats the band. Measured and
+    // needed, therefore kept. Loosening it to something between 2x and off was not measured.
+    public const double CrfVbvPeakFactor = 2.0;
+    public const double CrfVbvBufferFactor = 4.0;
+
     public const double KeyframeFloorSeconds = 1.0;
     public const double KeyframeCeilingDefaultSeconds = 10.0;
     public const double SceneMapThresholdOfRecord = 0.2;
@@ -258,7 +273,7 @@ public static class FfmpegArguments
         {
             a.AddRange(CodecModel.QualityArgs(plan.Codec, plan.Crf!.Value));
             if (SupportsRateLimits(plan.Codec) && !CodecModel.IsHardware(plan.Codec))
-                a.AddRange(new[] { "-maxrate", $"{plan.VideoBitrateK * 2}k", "-bufsize", $"{plan.VideoBitrateK * 4}k" });
+                a.AddRange(new[] { "-maxrate", $"{(int)(plan.VideoBitrateK * CrfVbvPeakFactor)}k", "-bufsize", $"{(int)(plan.VideoBitrateK * CrfVbvBufferFactor)}k" });
         }
         else
         {

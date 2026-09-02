@@ -647,6 +647,48 @@ public sealed class FfmpegArgumentsTests
             $"ust sinir olculen en kisa degerin altina indi: {haritali:0.###} sn");
     }
 
+    private static int VbvTavani(string codec, int bitrateK, string bayrak)
+    {
+        var plan = Plan(codec);
+        plan.Mode = "crf";
+        plan.Crf = 23;
+        plan.VideoBitrateK = bitrateK;
+        var args = FfmpegArguments.Build(Source(), plan, "cikti.mp4", 0, null).ToList();
+        var at = args.IndexOf(bayrak);
+        return at < 0 ? -1 : int.Parse(args[at + 1].TrimEnd('k'), CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// CRF yolunda yazilim kodlayicisi VBV tavanini tasiyor ve tavan bit hiziyla olcekleniyor.
+    /// Bu sabit degil bir kosul: T98'de kaldirildiginda olculen sonuc kalite +0,310 mean /
+    /// +0,599 p10 ama ayni CRF'te dosya %3,9 buyuk. CRF bu projede hedefe inen bir kip
+    /// oldugu icin tavan kaldi. Iddia iki bit hizinin uretimini birbiriyle karsilastiriyor.
+    /// </summary>
+    [Theory]
+    [InlineData("libx264")]
+    [InlineData("libx265")]
+    public void Crf_yolunda_VBV_tavani_bit_hiziyla_olcekleniyor(string codec)
+    {
+        var dusuk = VbvTavani(codec, 2000, "-maxrate");
+        var yuksek = VbvTavani(codec, 4000, "-maxrate");
+
+        Assert.True(dusuk > 2000, $"{codec} CRF yolunda VBV tavani yok ya da ortalamanin altinda: {dusuk}");
+        Assert.Equal(2 * dusuk, yuksek);
+        Assert.Equal(2 * VbvTavani(codec, 2000, "-bufsize"), VbvTavani(codec, 4000, "-bufsize"));
+        Assert.True(VbvTavani(codec, 2000, "-bufsize") > dusuk,
+            "arabellek tavandan kucuk; VBV penceresi tepeyi tasimaz");
+    }
+
+    /// <summary>
+    /// SVT-AV1 hiz siniri tasimiyor; kosul kaldirilirsa bu ölçü kizarir.
+    /// </summary>
+    [Fact]
+    public void Crf_yolunda_hiz_siniri_desteklemeyen_kodlayici_VBV_almaz()
+    {
+        Assert.Equal(-1, VbvTavani("libsvtav1", 4000, "-maxrate"));
+        Assert.Equal(-1, VbvTavani("libsvtav1", 4000, "-bufsize"));
+    }
+
     /// <summary>
     /// Az bolme duzeltmesi bir ayar sabiti degil, haritanin **olculen duyarliligi**: T101'in
     /// 189,1 sn'lik penceresinde 28 gercek kesime karsi harita 10 sahne bildiriyor. Bu
