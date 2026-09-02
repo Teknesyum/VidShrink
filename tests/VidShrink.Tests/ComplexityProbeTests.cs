@@ -308,6 +308,19 @@ public sealed class ComplexityProbeTests
     }
 
     [Fact]
+    public void PastSomePointMoreHeterogeneityStopsBuyingMoreWindows()
+    {
+        var duration = 3600.0;
+
+        Assert.Equal(
+            ComplexityProbe.PlanWindowCount(duration, 5.0),
+            ComplexityProbe.PlanWindowCount(duration, 50.0));
+        Assert.True(
+            ComplexityProbe.PlanWindowCount(duration, 50.0) > ComplexityProbe.PlanWindowCount(duration, 0.1),
+            "tavan her cv'yi ayni sayiya indirmemeli");
+    }
+
+    [Fact]
     public void AFileTooShortToAffordTheCeilingGetsFewerWindowsThanALongOne()
     {
         Assert.True(
