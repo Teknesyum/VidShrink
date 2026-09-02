@@ -694,7 +694,8 @@ Beş şey okunuyor:
    büyüklüğü ölçülmedi.**
 2. **Planı değiştirdiği yerde kazanç garantili değil.** İki HDR ikamesinin
    **birinde** kazanç var (+1,60 mean, +3,32 p10) ve **üstelik dosya 1,59 MB
-   daha küçük**; diğerinde hiçbir şey yok (−0,01). HDR olmak yeterli koşul değil.
+   daha küçük**; diğerinde hiçbir şey yok (−0,01) ve sebebi 4. maddede. HDR olmak
+   yeterli koşul değil.
 3. **Kazanan hücre hedef bandını ıskaladı.** `parca-1`de `yeni` kolu 40 MB
    hedefine karşı 37,4 MB teslim etti — **%93,5, bant=dış**; `eski` kol 38,99 MB
    ile **%97,5, bant=iç** vermişti. Yani kol bütçenin 1,6 MB'ını kullanmadan
@@ -737,6 +738,8 @@ kaynaklar farklı (§11.1), aynı ölçek üzerinde durmuyorlar.
 - Kazancın **genellenip genellenmediği ölçülmedi**: iki HDR ikamesi var, biri
   kazandı.
 - `oyun` sınıfı **hiç ölçülmedi** (§11.1).
+- Bant ıskasının (3. madde) yinelenip yinelenmediği **ölçülmedi**; tek hücrede
+  görüldü.
 - Kolun kaybettiği bir kaynak olup olmadığı **ölçülmedi**; ızgarada böyle bir
   hücre çıkmadı, ama aranmadı da.
 
