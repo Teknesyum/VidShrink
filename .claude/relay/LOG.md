@@ -855,3 +855,5 @@ bagimsiz gordu: askida kalan test host'unu `taskkill` ile oldurdugunde arka plan
 isi **exit 0** raporladi. Bu, "yesil okuma gercekti ama olctugu sey yanlis"
 ailesinin yeni bir yuzu — kosum yarida kesilse bile kapi gecer. `kosum-kapisi.ps1`
 `-MinimumTotal` tam bunun icin var ve CI'da devrede; yerel kosumda degil.
+
+- 02.09.2026 · T148 teslim edildi (submitted): yerellestirme olcusu artik cagri yerlerini IL'den okuyor; 10 -> 15 test, olu anahtar 0 (bulunan tek olu anahtar T0 karariyla silindi), dal T148-anahtar-cagri-pimi.
