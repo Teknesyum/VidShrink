@@ -173,7 +173,7 @@ public static class Butce
     public static string Csv(SceneMap map, double[] deserved, double[] given, double[] mapShare)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("sahne;bas;bit;sure;karmasiklik;hak_edilen;verilen;harita;verilen_fark;harita_fark");
+        sb.AppendLine("sahne;bas;son;sure;karmasiklik;hak_edilen;verilen;harita;verilen_fark;harita_fark");
         for (var i = 0; i < map.Scenes.Count; i++)
         {
             var s = map.Scenes[i];
