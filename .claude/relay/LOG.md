@@ -892,3 +892,14 @@ sayinin uzerine yanlisini yazdim; denetci gosterdi, geri alindi.
 
 Iki olcum borcu T146'ya devredildi: 19'un dagilimi (13 mi 11 mi) ve K4'un
 "yanlis pozitif yok" iddiasi. Ikisi de olculmeden duzeltilmedi.
+
+## T150 acildi — sifir tuketici sinifina olcu (3 Eylul 2026)
+
+T149 GECTI, KRITIK yok, yedi borc. Yedincisi ayni sinifin **yedinci** olayi ve bu sefer
+sozlesmenin kendi onayladigi cevapti — yani sinif artik kusur degil, **olculmeyen bir
+durum**. T150 olcuyu kuruyor: kume turden turetilir, sayi kaynagi okuyan testle pimlenir,
+yedi olay mesru/kaza diye siniflanir, `QualityArgs` mayini kapatilir.
+
+T0 onculu **olcerek** yazdi ve olcunun **basarisiz** oldugunu sozlesmeye yazdi: ayni
+agacta iki desen denemesi 63 ve 1 dedi. Sayi verilmedi; sayinin yoklugu kanit olarak
+verildi.
