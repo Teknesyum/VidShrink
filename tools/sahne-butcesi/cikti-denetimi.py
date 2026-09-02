@@ -35,7 +35,8 @@ for d in sorted(glob.glob(os.path.join(IS, "referans", "*"))):
         satirlar.append(("referans", f"{ad}/sahne-{i:03d}", bekle, s))
 
 for f in sorted(glob.glob(os.path.join(IS, "plan-*.mkv")) + glob.glob(os.path.join(IS, "k4b-*.mkv"))
-                + glob.glob(os.path.join(IS, "k5-*.mkv")) + glob.glob(os.path.join(IS, "k7-*.mkv"))):
+                + glob.glob(os.path.join(IS, "k5-*.mkv")) + glob.glob(os.path.join(IS, "k7-*.mkv"))
+                + glob.glob(os.path.join(IS, "tekrar-*.mkv"))):
     ad = os.path.basename(f)
     pencere = next((p for p in PENCERELER if p in ad), None)
     if pencere is None:
