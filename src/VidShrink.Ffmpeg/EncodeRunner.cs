@@ -89,14 +89,16 @@ public sealed class EncodeRunner
                 var efficiency = PlanCalculator.MeasuredEncoderEfficiency(current, actualMb, info.DurationSeconds);
                 var aimMb = PlanCalculator.RetryAimMb(effectiveTargetMb, efficiency);
                 var over = actualMb > effectiveTargetMb * ToleranceOver;
-                var underBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < band.LowerMb;
+                var belowBand = !over && fillPolicy == FillPolicy.FillTarget && actualMb < band.LowerMb;
+                var stoppedOnPurpose = belowBand && actualMb >= band.HardFloorMb && current.StopsShortOfBandOnPurpose;
+                var underBand = belowBand && !stoppedOnPurpose;
                 var informedByYield = efficiency is not null;
                 var retryUnderBand = underBand && attempt < MaxAttempts
                     && (!usedUnderBandRetry || (informedByYield && !usedMeasuredUnderBandRetry));
 
                 if (!over && !underBand)
                 {
-                    trace.Add(new EncodeAttempt(attempt, "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
+                    trace.Add(new EncodeAttempt(attempt, stoppedOnPurpose ? "below band, the plan stopped there on purpose" : "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     File.Move(partialPath, outputPath, overwrite: true);
                     return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace);
                 }
