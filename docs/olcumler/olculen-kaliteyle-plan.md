@@ -520,3 +520,28 @@ Izgara bu yüzden 2×2: iki kol (`eski` = sabitler, `yeni` = `--measured-quality
 × iki ölçer. `eski` kolu `QualityMeter`'a hiç uğramıyor
 (`Program.cs:657`, meter `null`), dolayısıyla `eski-kilitli` ile
 `eski-kilitsiz` arasındaki fark **yalnız raporun ölçerinden** geliyor.
+
+### 11.3 Karar neye bağlıydı — kol zaten sevk edildi
+
+K3'ün sorusu "kol açılsın mı" değil: **kol kapalı değil, açık ve varsayılan.**
+Zincir şöyle:
+
+1. §1'in tablosu (kilitsiz ölçer) "kazanç yalnız HDR'de, +0,95 mean" dedi ve
+   "kazancın kaynağı yerleşim seçimidir, durdurma kısıtı değil" diye ekledi.
+2. **T100 bu cümleyi gerekçe olarak aldı.** Sözleşmesi birebir şöyle yazıyor:
+   *"T89'un tek gerçek kalite kazancı (HDR'de +0,95 mean) durdurma kısıtından
+   değil yerleşim seçiminden geliyordu."* Aynı sözleşmenin K5'i
+   `MainWindow.axaml.cs`'in ölçülen kaliteyi atmasını kusur sayıp bağlanmasını
+   istedi.
+3. T100 bağladı (`f2bd2a6`, 09-02 01:20). Bugün `MainWindow.axaml.cs:1445`
+   her dosya yüklemesinde `MeasureComplexityAsync` çağırıyor, o da
+   `ProbeWithMeasuredQualityAsync(info, speed, **null**, ct)` ile
+   `RunDetailedAsync(measureQuality: true, ...)`'a giriyor.
+   `ComplexityProbe.cs:53` `null` metreyi `QualityMeasurement.Instance`'a
+   çeviriyor. Yani **arayüzden geçen her kullanıcı `--measured-quality`
+   yolundan geçiyor.**
+
+Sonuç: `bench`in `--measured-quality` bayrağı bir *deneme kolu* değil,
+**uygulamanın hâlihazırdaki davranışını `bench`te açan anahtar**. `bench`in
+bayraksız hâli (`eski`) uygulamanın hiç koşmadığı yoldur. Karar bu yüzden
+"açalım mı" değil, **"kilitli ölçüde de açık kalmalı mı"**.
