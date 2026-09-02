@@ -98,3 +98,7 @@
 {"id":"T89","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|ComplexityScanTests","code":0}],"auditorRunId":null,"headSha":"14db838e2832373289d193de8d23aa0a14f1893a","at":"2026-09-01T22:09:07.664Z"}
 {"id":"T92","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"14db838e2832373289d193de8d23aa0a14f1893a","at":"2026-09-01T22:15:09.564Z"}
 {"id":"T96","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SceneMapTests","code":0}],"auditorRunId":null,"headSha":"b4688302c8a987199bf4d59a1b4efbeecabad1ff","at":"2026-09-01T22:17:30.913Z"}
+{"id":"T97","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests","code":0}],"auditorRunId":null,"headSha":"f3e3f02bbb4fec95e5169923a2bb3fb9bb4d74fb","at":"2026-09-01T22:33:02.567Z"}
+{"id":"T101","result":"stale","at":"2026-09-01T23:07:52.039Z"}
+{"id":"T99","result":"stale","at":"2026-09-01T23:15:11.873Z"}
+{"id":"T101","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SceneMapTests","code":0}],"auditorRunId":null,"headSha":"feff970cb90d5c73ed2a0fe9364fa0f34bcace24","at":"2026-09-01T23:38:08.662Z"}

@@ -7,7 +7,11 @@ public sealed record WindowQualityMeasurement(
     double? VmafNegP10,
     bool Comparable,
     long ElapsedMilliseconds,
-    string? Message = null);
+    string? Message = null,
+    double? VmafNegMin = null,
+    double? VmafNegWorstScene = null,
+    double? WorstSceneStartSeconds = null,
+    double? SceneWindowSeconds = null);
 
 public interface IQualityMeasurement
 {
