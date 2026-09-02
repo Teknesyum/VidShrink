@@ -400,7 +400,12 @@ bizde de sabit, ama **preset adı gibi görünür bir kapağı yok**:
 
 Üç madde, üçü de K4'teki bir sayıya bağlı. Hiçbiri bu sözleşmede uygulanmadı.
 
-**1. Anahtar kare aralığını uzat — sahne kesmesine bağlama.** K4'te ölçülen
+**1. Anahtar kare aralığını uzat — sahne kesmesine bağlama.**
+**T111'de denetlendi: bu madde `main`'de uygulandı** (T98, `8ea80c4`) — sabit
+`-g = fps × 2` yerine sahne haritasından çıkan bir aralık var. Aşağısı maddenin
+yazıldığı andaki gerekçesidir, yapılacak iş değil. Ayrıntı ve iki uyarı
+("T98'in aralığı ölçülmedi", "`scd=1` bu belgenin ölçtüğü şey değil") T111
+bölümündeki denetimde. K4'te ölçülen
 kalemlerin en büyüğü: `-g 300` dosyayı %24,5 küçültürken puanı yükseltiyor
 (ortalama +0,155, p10 +0,333). Bu maddenin gerekçesi açığa katkısı değil — açığın
 çoğu zaten ayrıştırılamadı — **daha küçük dosyada daha yüksek puan** vermesi; iki
@@ -410,14 +415,16 @@ eksende birden kazandığı için boyut eşitliği tartışmasından bağımsız
 kesmesine hizalamak, sayı sabitken ve boyut eşitlenmişken ortalamada **-1,225**,
 p10'da **-2,046** kaybettiriyor (`y1`/`y3`, K4'teki hizalama tablosu). Geriye kalan
 tek değişken aralığın uzunluğu; bu bir dışlama, doğrudan ölçüm değil.
-Yapılacak iş `FfmpegArguments.cs:162`'deki `fps × 2` sabitini daha uzun bir sabit
-aralığa çevirmek. **Sahne kesmesi tetikli anahtar kare denenmemeli** — bu kaynakta
-ölçüldü ve kaybettiriyor.
+Yapılacak iş diye yazılan şey (`FfmpegArguments.cs:162`'deki `fps × 2` sabitini
+daha uzun bir aralığa çevirmek) T98'de yapıldı. **Sahne kesmesi tetikli anahtar
+kare denenmemeli** uyarısı ise yalnız `-force_key_frames` için ölçüldü; T98'in
+kullandığı kodlayıcı içi `scd=1` **ölçülmedi**.
 
 Ölçülen tek nokta `-g 300`'dür; **hangi `-g` değerinin en iyi olduğu ölçülmedi**,
 120 ile 300 arası taranmadı. **Bu dosya T98'in `owns`'unda; iş oraya ait.**
 
-**2. Yazılım AV1'in bit hızı sapmasını modelle.** Kusur 3'te ölçüldü: teslim oranı
+**2. Yazılım AV1'in bit hızı sapmasını modelle.**
+**T111'de denetlendi: uygulanmadı, açık duruyor.** Kusur 3'te ölçüldü: teslim oranı
 ayara göre 0,709 ile 0,961 arasında değişiyor, HandBrake aynı istekte 1,024 veriyor.
 Auto bu yüzden kendi doldurma bandının altına düşüyor (15,04 MiB teslim, band alt
 kenarı 15,20 MiB). Madde 1 uygulanırsa sapma daha da büyür (`-g 300` ölçümünde oran
@@ -426,6 +433,7 @@ kazancının bir kısmını çöpe atar.** `PlanCalculator.cs:82-96`'daki
 `DeliveryReserveK` / `HardwareBitrateYield` yalnız donanım yolunu kapsıyor.
 
 **3. Preset varsayılanını 6'dan 4'e almayı tartışmaya aç — ama süre ölçülmeden değil.**
+**T111'de denetlendi: uygulanmadı, açık duruyor; bekleten sebep de değişmedi.**
 Kalite tarafı ölçüldü: preset 4, %7,1 küçük dosyada ortalama −0,042 veriyor, yani puan
 pratikte aynı, yer kazancı gerçek. Karşılığında ödenen kodlama süresi **ölçülmedi** —
 makine bu ölçüm boyunca paylaşımlıydı, duvar saati anlamlı değil.
