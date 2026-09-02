@@ -84,15 +84,18 @@ def kanit_tablo(kanit):
 
 
 def k2_tablo(yokla):
-    r = ["| Kaynak | Gercek sinir | cropdetect t=10sn | Fark (px) | Sure (sn) |",
-         "|---|---|---|---|---|"]
+    r = ["Sureler bu tabloda yok: ilk kosumda makine mesguldu ve sayilar "
+         "kararsizdi. Sure olcumu asagida, bos makinede tekrarlanmis haliyle "
+         "verilir.",
+         "",
+         "| Kaynak | Gercek sinir | cropdetect t=10sn | Fark (px) |",
+         "|---|---|---|---|"]
     for ad in LETTERBOX + KENARSIZ + ["VD"]:
         d = yokla[ad]
         g = tuple(d["gercek"])
         n = d["nokta"]["t10"]["kutu"]
         fark = "-" if not n else "%+d yatay / %+d dikey" % (n[0] - g[0], n[1] - g[1])
-        r.append("| %s | %s | %s | %s | %s |" % (
-            ADLAR[ad], kutu_str(g), kutu_str(n), fark, s(d["nokta"]["t10"]["sure"], 2)))
+        r.append("| %s | %s | %s | %s |" % (ADLAR[ad], kutu_str(g), kutu_str(n), fark))
     r.append("")
     r.append("| Kaynak | t=0 | t=5 | t=10 | t=15 | 10 kare yayilmis (birlesim) | tam klip |")
     r.append("|---|---|---|---|---|---|---|")
@@ -103,15 +106,7 @@ def k2_tablo(yokla):
             kutu_str(d["nokta"]["t00"]["kutu"]), kutu_str(d["nokta"]["t05"]["kutu"]),
             kutu_str(d["nokta"]["t10"]["kutu"]), kutu_str(d["nokta"]["t15"]["kutu"]),
             kutu_str(d["yayilmis"]["kutu"]), kutu_str(d["tam"]["kutu"])))
-    r.append("")
-    r.append("| Kaynak | 2 sn pencere | 10 kare yayilmis | tam klip (20 sn) |")
-    r.append("|---|---|---|---|")
-    for ad in LETTERBOX + KENARSIZ + ["VD"]:
-        d = yokla[ad]
-        r.append("| %s | %s sn | %s sn | %s sn |" % (
-            ADLAR[ad], s(d["nokta"]["t10"]["sure"], 2),
-            s(d["yayilmis"]["sure"], 2), s(d["tam"]["sure"], 2)))
-    return "\n".join(r)
+    return NL.join(r)
 
 
 def mod_kutu(tekil):
@@ -235,6 +230,35 @@ def es_boyut(vmaf, ad, hiz):
     return abs(b["boyut"] - a["boyut"]) * 100.0 / a["boyut"]
 
 
+def k3_egilim(vmaf):
+    artan, azalan = [], []
+    for ad in LETTERBOX:
+        a = kazanc(vmaf, ad, 1000)
+        b = kazanc(vmaf, ad, 4000)
+        if a is None or b is None:
+            continue
+        (artan if b > a else azalan).append(ad)
+    poz = [ad for ad in LETTERBOX
+           if kazanc(vmaf, ad, ANA_HIZ) is not None and kazanc(vmaf, ad, ANA_HIZ) > 0]
+    return ("Bitrate yukseldikce kazanc %d kaynakta artiyor (%s), %d kaynakta "
+            "azaliyor (%s). Karar noktasinda (%dk) kazanci pozitif olan kaynak "
+            "sayisi %d/%d: %s." % (
+                len(artan), ", ".join(artan) or "yok",
+                len(azalan), ", ".join(azalan) or "yok",
+                ANA_HIZ, len(poz), len(LETTERBOX), ", ".join(poz) or "yok"))
+
+
+def zorluk(ad):
+    p = IS + "/olcu/A-%s-duz-%d.json" % (ad, ANA_HIZ)
+    d = yuk(p)
+    if not d:
+        return None
+    anahtar = "vmaf_neg" if "vmaf_neg" in d["frames"][0]["metrics"] else "vmaf"
+    v = sorted(k["metrics"][anahtar] for k in d["frames"])
+    return {"kare": len(v), "medyan": v[len(v) // 2],
+            "dusuk": sum(1 for x in v if x < 1.0)}
+
+
 def k3_tablo(vmaf, kanit):
     r = ["| Kaynak | Bitrate | Kol | Boyut (bayt) | Boyut farki | VMAF-NEG ort | p10 | En kotu kare |",
          "|---|---|---|---|---|---|---|---|"]
@@ -265,6 +289,21 @@ def k3_tablo(vmaf, kanit):
             s(kazanc(vmaf, ad, 1000), 3), s(kazanc(vmaf, ad, 2000), 3),
             s(kazanc(vmaf, ad, 4000), 3)))
     r.append("")
+    r.append(k3_egilim(vmaf))
+    r.append("")
+    r.append("**Kaynagin kendi zorlugu** (kirpmasiz kol, %dk, A yontemi). p10 duzeyi "
+             "kaynaga gore cok degisiyor; asagidaki iki sutun kazanci hangi zeminde "
+             "olctugumuzu gosterir." % ANA_HIZ)
+    r.append("")
+    r.append("| Kaynak | Kare | VMAF-NEG medyan | 1,0'in altinda kalan kare |")
+    r.append("|---|---|---|---|")
+    for ad in LETTERBOX:
+        z = zorluk(ad)
+        if not z:
+            r.append("| %s | - | - | - |" % ADLAR[ad])
+            continue
+        r.append("| %s | %d | %s | %d |" % (ADLAR[ad], z["kare"], s(z["medyan"], 3), z["dusuk"]))
+    r.append("")
     r.append("**B yontemi (kirpmali cikti geri doldurulup tam karede puanlandi), 2000k:**")
     r.append("")
     r.append("| Kaynak | Kirpmasiz p10 | Kirpmali+dolgu p10 | Kazanc |")
@@ -276,6 +315,36 @@ def k3_tablo(vmaf, kanit):
             ADLAR[ad], s(a["p10"], 3) if a else "-", s(b["p10"], 3) if b else "-",
             s(kazanc(vmaf, ad, 2000, "B"), 3)))
     return "\n".join(r)
+
+
+def vd_ikinci_yari():
+    a = yuk(IS + "/olcu/B-VD-duz-%d.json" % ANA_HIZ)
+    b = yuk(IS + "/olcu/B-VD-kirp-%d.json" % ANA_HIZ)
+    if not (a and b):
+        return "VD ikinci yari cozumlemesi yapilamadi: B gunlukleri yok."
+    ah = "vmaf_neg" if "vmaf_neg" in a["frames"][0]["metrics"] else "vmaf"
+    va = [k["metrics"][ah] for k in a["frames"]]
+    vb = [k["metrics"][ah] for k in b["frames"]]
+    n = min(len(va), len(vb))
+    yari = n // 2
+    fark = [vb[i] - va[i] for i in range(n)]
+    ilk = fark[:yari]
+    son = fark[yari:]
+
+    def ort(v):
+        return sum(v) / len(v)
+
+    kotu = sum(1 for x in son if x < 0)
+    return ("**VD'nin iki yarisi ayri ayri.** Bant yalniz ilk yaridadir; ikinci "
+            "yarida 804'e kirpmak **gercek goruntuyu** kesiyor. B yontemi kare "
+            "farki (kirpilmis - kirpmasiz), ilk %d karede ortalama %s, son %d "
+            "karede ortalama %s. Son yaridaki %d karenin %d tanesinde kirpilmis "
+            "kol daha kotu. Yine de kaynagin **butun klip p10'u kirpmayla "
+            "yukseliyor**: p10 alt %%10'luk dilime bakiyor ve o dilim buyuk "
+            "olcude ilk yaridan geliyor. Tek bir toplu VMAF sayisi, gercek "
+            "goruntunun kesilmesini bu kaynakta gizleyebiliyor." % (
+                len(ilk), s(ort(ilk), 3), len(son), s(ort(son), 3),
+                len(son), kotu))
 
 
 def k5_tablo(vmaf, yokla):
@@ -317,6 +386,8 @@ def k5_tablo(vmaf, yokla):
     r.append("| B yontemi p10, 804'e kirpilip geri doldurulmus | %s |" % (s(b["p10"], 3) if b else "-"))
     r.append("| B yontemi en kotu kare, kirpmasiz | %s |" % (s(a["en_kotu"], 3) if a else "-"))
     r.append("| B yontemi en kotu kare, kirpilmis | %s |" % (s(b["en_kotu"], 3) if b else "-"))
+    r.append("")
+    r.append(vd_ikinci_yari())
     r.append("")
     r.append("**(c) Yanlis kirpmanin bedeli.** `limit=64`'te cropdetect'in kenarsiz "
              "kaynaklarda onerdigi hatali kirpma uygulandi, cikti geri doldurulup "
@@ -402,6 +473,13 @@ def hukum(vmaf, kanit, yokla, sr):
               "ayarla hic tetiklenmez, yani oradaki kazanc erisilebilir degil, "
               "tavandir." % (len(bulunan), ", ".join(bulunan) or "hicbiri",
                              len(LETTERBOX) - len(bulunan)))]
+    er = [k[ad] for ad in bulunan if k[ad] is not None]
+    if er:
+        satir += ["", "Yalniz erisilebilir kaynaklara bakildiginda (%s) ortalama "
+                  "kazanc %s puan; hukmu pozitife tasiyan tek kaynak varsayilan "
+                  "ayarla bulunamayan %s." % (
+                      ", ".join(bulunan), s(sum(er) / len(er), 3),
+                      ", ".join(ad for ad in LETTERBOX if ad not in bulunan) or "yok")]
     if vetolar:
         satir += ["", "**Veto:** " + "; ".join(vetolar) +
                   ". Hukum ne olursa olsun otomatik kirpma varsayilan acik gelemez."]
@@ -446,6 +524,15 @@ def main():
     yaz(sure_tablo(sr), "SURE")
     yaz(k3_tablo(vmaf, kanit), "K3")
     yaz(k5_tablo(vmaf, yokla), "K5")
+    m = "<!-- BETIK-HUKUM-BASLANGIC -->"
+    t = open(RAPOR, encoding="utf-8").read()
+    a = t.index(m) + len(m)
+    b = t.index("<!-- BETIK-HUKUM-BITIS -->")
+    ayni = t[a:b].strip() == h.strip()
+    yaz("`%s` — rapordaki hukum blogu ile betigin stdout ciktisi %s (%d bayt)."
+        % ("python tools/siyah-kenar/oz.py",
+           "**birebir ayni**" if ayni else "**FARKLI**",
+           len(h.strip().encode())), "K6CHECK")
     print(h)
     return 0
 
