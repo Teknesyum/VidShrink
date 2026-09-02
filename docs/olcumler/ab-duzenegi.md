@@ -177,10 +177,62 @@ en boy oranı %0,5'ten fazla ayrılan çift artık sayı basmıyor. Çözünürl
 serbest kalıyor — 1152x648 ile 1920x1080 aynı oran, libvmaf ölçekleyip karşılaştırır;
 yasak olan oranın değişmesi. Bu belgedeki bütün sayılar düzeltmeden sonraki koşumdan.
 
+### Parça kestiriminin sapması
+
+Bir yapılandırma hem parça kestirimiyle hem baştan sona tam koşumla ölçüldü:
+VidShrink, 600 MB hedefi, aynı kaynak.
+
+| yapılandırma | tam koşum harm | parça kestirimi harm | sapma |
+|---|---|---|---|
+| vidshrink @ 600 MB | 47,78 | 58,83 | **+11,05** |
+
+Diğer sütunlar da aynı yöne kayıyor: ortalama 67,33 → 76,17 (+8,84), XPSNR
+34,54 → 40,77 (+6,23). Kare minimumu iki tarafta da 0,00.
+
+**Parça kestirimi iyimser.** Seçtiğimiz üç dakika, filmin ortalamasından kolay.
+Sayı olarak: 60 saniyelik üç parçadan çıkan tahmin, 17 dakikanın tamamından
+11 VMAF-NEG puan yüksek. Bu, iki kodlayıcı arasındaki 9,13 puanlık farktan büyük.
+
+Sonuç, düzeneğin kullanım kuralı olarak: **parça kipi mutlak kalite iddiası için
+kullanılamaz.** Aynı parçalar üzerinde iki yarışmacıyı karşılaştırmak için
+kullanılabilir — iyimserlik iki tarafa da aynı biçimde biniyor — ama "VidShrink bu
+kaynakta 58,8 alıyor" cümlesi parça sayısından kurulamaz. Bu belgedeki parça
+tabloları o yüzden karşılaştırma tablosudur, mutlak kalite tablosu değil.
+
+Tam koşum tek yapılandırmayla sınırlı kaldı; HandBrake tarafının tam koşumu ve
+60 MB hedefinin tam koşumu **ölçülmedi**.
+
+### Kare eşlemesi zaman damgasına takılıyor mu
+
+`start_time` sıfır olmayan bir girdide libvmaf'ın kareleri komşusuyla eşleyip
+eşlemediği ayrıca sınandı. Kaynağın ve `parca-1`in `start_time`ı 0,000000;
+`parca-2` 0,020000, `parca-3` 0,017000 (ikisi de `-c copy` kesiminden geliyor).
+Bütün kodlayıcı çıktıları 0,000000.
+
+Sınama: aynı çift, bir kez ham referansla, bir kez zaman damgası sıfırlanmış
+referansla ölçüldü.
+
+| çift | ham referans | sıfırlanmış referans |
+|---|---|---|
+| parca-3 / handbrake 3,499 MB | 13,72 / 11,79 / 0,00 / 17,46 | 13,72 / 11,79 / 0,00 / 17,46 |
+| parca-2 / handbrake 3,499 MB | 93,70 / 93,07 / 72,27 / 93,71 | 93,70 / 93,07 / 72,27 / 93,71 |
+
+Tek basamağına kadar aynı; bu düzenekte kayma eşlemeyi bozmuyor. Yine de araç
+artık `start_time`ı sıfır olmayan her girdiyi ölçümden önce
+`-fflags +genpts -c copy -avoid_negative_ts make_zero` ile sıfıra çekiyor ve bunu
+günlüğe yazıyor. Yukarıdaki tablolardaki sayılar sıfırlamadan önceki koşumdan —
+sıfırlamanın sayıyı değiştirmediği ölçülerek gösterildiği için oldukları gibi
+duruyorlar.
+
 ### Bu turda ölçülmeyen
 
 Süre ve hız. Makine paylaşımlı — ölçüm boyunca aynı makinede başka ajanlar da
 kodlama koşuyordu. Bu belgede hiçbir süre ya da hız iddiası yok.
+
+HandBrake'in tam kaynak koşumu ve 60 MB hedefinin tam kaynak koşumu da ölçülmedi;
+tam koşum yalnız VidShrink @ 600 MB için yapıldı. Tonemap yolu gerçek bir
+yarışmacı çıktısıyla değil, kapı denemesiyle sınandı — `vidshrink-sdr` yarışmacısı
+tanımlı ama bu turda koşturulmadı.
 
 ## İlk gerçek koşum
 
@@ -277,16 +329,18 @@ karşılaşılan eksikler — hepsi T97'nin girdisi:
 | `ColorFilter` etiketsiz girdiye varsayım uyduruyor (`?? (hdr ? "bt2020" : "bt709")`) | GEÇERSİZ tabloyu üreten hata `QualityMeter` içinde hâlâ duruyor; kapı A/B aracında, ölçerde değil |
 | `ColorIncompatibility` yalnız HDR/SDR uyuşmazlığını reddediyor | etiketsiz taraf ölçere kadar gidebiliyor |
 | kare hızı hiç bakılmıyor | kare hızları ayrıyken libvmaf sessizce sayı üretiyor; kapı yine A/B aracında |
+| en boy oranı hiç bakılmıyor | kırpılmış çıktı sayı basıyor ve puan bit hızından bağımsız sabitleniyor |
+| `[t][r]libvmaf` grafiğinde `setpts=PTS-STARTPTS` yok | kare eşlemesi zaman damgasına bağlı; `start_time` sıfır değilse sıfırlama A/B aracının işi oluyor |
 | tonemap'li ölçümün pencere (başlangıç/süre) aşırı yüklemesi yok | parça ölçümü ayrı dosya kesmeyi gerektiriyor |
 | XPSNR düzlem başına verilmiyor | kroma bozulması ayrı görülemiyor |
 
 ## Ölçüler
 
-`AbTests` adıyla, `dotnet test -c Release --filter "AbTests"` — 49 test, 49 geçti,
-0 kaldı, 0 atlandı. 36'sı bu sözleşmenin (`ColorGateAbTests` 9,
-`ChunkAggregateAbTests` 8, `SensitivityAbTests` 6, `SizeParityAbTests` 5,
-`AbSettingsAbTests` 4, `HandBrakeArgumentsAbTests` 3, `DeviationAbTests` 1);
-kalan 13 `SettingsTabTests` süzgece adından ötürü takılıyor. Renk kapısı, eş
-boyut toleransı, parça birleştirme (p10 dahil), duyarlılık eşiği ve HandBrake
-bit hızı hesabı üretim davranışı üzerinden ölçülür: sabit karşılaştırma, `Skip`
-ve sessiz erken dönüş yok.
+`AbTests` adıyla, `dotnet test -c Release --filter "AbTests"` — 55 test, 55 geçti,
+0 kaldı, 0 atlandı. 42'si bu sözleşmenin (`ColorGateAbTests` 9,
+`ChunkAggregateAbTests` 8, `SensitivityAbTests` 6, `GeometryGateAbTests` 5,
+`SizeParityAbTests` 5, `AbSettingsAbTests` 4, `HandBrakeArgumentsAbTests` 4,
+`DeviationAbTests` 1); kalan 13 `SettingsTabTests` süzgece adından ötürü takılıyor.
+Renk kapısı, geometri kapısı, eş boyut toleransı, parça birleştirme (p10 dahil),
+duyarlılık eşiği ve HandBrake bit hızı hesabı üretim davranışı üzerinden ölçülür:
+sabit karşılaştırma, `Skip` ve sessiz erken dönüş yok.

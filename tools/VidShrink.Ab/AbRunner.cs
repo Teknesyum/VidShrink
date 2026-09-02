@@ -215,22 +215,43 @@ public sealed class AbRunner
     private Task<string> VideoOnlyReferenceAsync(MediaInfo source, AbSettings settings, CancellationToken ct)
         => EnsureVideoOnlyAsync(source, settings.ChunkDirectory, settings.LogDirectory, ct);
 
+    public static async Task<double> StartTimeSecondsAsync(string path, CancellationToken ct)
+    {
+        var args = new[] { "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=start_time", "-of", "csv=p=0", path };
+        var (exitCode, output) = await ProcessLauncher.RunAsync("ffprobe", args, ct);
+        if (exitCode != 0) throw new InvalidOperationException($"start_time okunamadı: {path}");
+        var text = output.Trim();
+        return double.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var seconds)
+            ? seconds
+            : 0.0;
+    }
+
     private async Task<string> EnsureVideoOnlyAsync(MediaInfo info, string directory, string logDirectory, CancellationToken ct)
     {
-        if (!info.HasAudio) return info.FilePath;
+        var startSeconds = await StartTimeSecondsAsync(info.FilePath, ct);
+        var shifted = Math.Abs(startSeconds) > 1e-6;
+        if (!info.HasAudio && !shifted) return info.FilePath;
 
         var name = Path.GetFileNameWithoutExtension(info.FilePath) + "-yalniz-video.mkv";
         var target = Path.Combine(directory, name);
-        if (File.Exists(target) && new FileInfo(target).Length > 0)
+        if (File.Exists(target) && new FileInfo(target).Length > 0
+            && Math.Abs(await StartTimeSecondsAsync(target, ct)) <= 1e-6)
         {
-            _log.WriteLine($"video-only girdi hazır: {target}");
+            _log.WriteLine($"normalize girdi hazır: {target}");
             return target;
         }
 
         Directory.CreateDirectory(directory);
         Directory.CreateDirectory(logDirectory);
-        var args = new[] { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath, "-map", "0:v:0", "-c", "copy", target };
-        _log.WriteLine($"video-only girdi türetiliyor ({Path.GetFileName(info.FilePath)} sesli): " + ProcessLauncher.CommandLine("ffmpeg", args));
+        var args = new[]
+        {
+            "-hide_banner", "-nostdin", "-y", "-fflags", "+genpts", "-i", info.FilePath,
+            "-map", "0:v:0", "-c", "copy", "-avoid_negative_ts", "make_zero", target
+        };
+        var why = info.HasAudio
+            ? shifted ? "sesli ve zaman damgası kaymış" : "sesli"
+            : $"zaman damgası kaymış (start_time={startSeconds.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture)})";
+        _log.WriteLine($"girdi normalize ediliyor ({Path.GetFileName(info.FilePath)} {why}): " + ProcessLauncher.CommandLine("ffmpeg", args));
         var (exitCode, output) = await ProcessLauncher.RunAsync("ffmpeg", args, ct);
         await File.WriteAllTextAsync(Path.Combine(logDirectory, Path.GetFileNameWithoutExtension(name) + ".log"), output, ct);
         if (exitCode != 0) throw new InvalidOperationException($"Video-only girdi üretilemedi: {info.FilePath}");
