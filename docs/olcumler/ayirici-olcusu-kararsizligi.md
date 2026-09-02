@@ -183,6 +183,13 @@ Dal başındaki koşumun tam süiti:
     Passed!  - Failed: 0, Passed: 1129, Skipped: 105, Total: 1234, Duration: 9 m 41 s
       - VidShrink.Tests.dll (net8.0)
 
+Aynı ağaç yerelde de tam süitle koşturuldu (paylaşımlı makine, 22 dk 32 sn):
+
+    Başarılı!  - Başarısız: 0, Başarılı: 1213, Atlanan: 23, Toplam: 1236
+
+Atlanan sayısının farkı (23 yerel, 105 CI) ortam geçitlerinden; bu makinede GPU var,
+CI'da yok.
+
 `SplitDragTests` bu koşumda kırmızı değil — üç kez düşen ölçü artık düşmüyor. Tek
 yeşil koşum "kararsızlık bitti"nin kanıtı değildir; aşağıda ölçülmeyenler arasında.
 
