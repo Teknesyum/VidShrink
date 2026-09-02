@@ -97,6 +97,9 @@ Regresyon riski ölçülmemiş kodeğin sonraki gerçek yoklamada çalışmadı�
 
 Her kol ayrı `dotnet test -c Release --list-tests --filter "FullyQualifiedName~..."` çağrısıyla sayıldı:
 
+Aşağıdaki tablo **tur 1'e aittir ve bayattır**; geçerli sayılar aynı bölümün altındaki tur 2 tablosundadır.
+
+
 | Verify kolu | Test sayısı |
 |---|---:|
 | `PlanCalculatorTests` | 32 |
@@ -125,7 +128,7 @@ Tam suitin gösterdiği kalan üç eski sahte için genişletilen sahiplikte yin
 Son doğrulama:
 
 - `dotnet build VidShrink.sln -c Release --no-incremental`: başarılı, 0 uyarı, 0 hata.
-- Birleşik verify: `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`.
+- Birleşik verify (tur 1, taban `b88bb66`): `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`. **Geçerli sayı için aşağıdaki tur 2 ölçümüne bakın: `74/74`.**
 - Test çağrılarında `--no-build` kullanılmadı.
 - Tur 1'in son push'ının CI koşumu: **`33680674698`**, `a125667`, `completed success` — `Failed: 0, Passed: 1465, Skipped: 19, Total: 1484`. Bu satır tur 1'de boş bırakılmıştı; tur 2 borcu olarak dolduruldu.
 
