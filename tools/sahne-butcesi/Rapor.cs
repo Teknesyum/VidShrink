@@ -1235,6 +1235,19 @@ public static class Rapor
         sb.AppendLine($"- K5/K6 (kalite kazanci ve hedef boyut): {(!k5Olculdu ? "**bilinmiyor**" : k5.Gecti ? "gecti" : "**gecmedi**")} — {k5.Ozet}");
         sb.AppendLine($"- K7 (bozuk harita bedeli): {(!k7Olculdu ? "**bilinmiyor**" : k7.Gecti ? "kabul edilebilir" : "**kabul edilemez**")} — {k7.Ozet}");
         sb.AppendLine();
+        if (k2.Hucre > 0)
+        {
+            sb.AppendLine($"**Sozlesmenin sorusu \"haritayi plana baglamali miyiz\" idi. " +
+                          $"Olculen {k2.Hucre} hucrenin {k2.KodlayiciEnAzEsit} tanesinde harita " +
+                          $"kodlayiciyi geride birakmiyor**: `MAE(verilen) <= MAE(harita)` " +
+                          "(K2 tablosu), yani o hucrelerde kodlayicinin kendi dagitimi haritanin " +
+                          "onerisi kadar ya da ondan daha dogru. Plana baglanacak sey haritanin " +
+                          "sahne basina sayilaridir; o sayilar cogunlukta kodlayicinin kendi " +
+                          "kararindan daha iyi degilse, baglamanin tasiyacagi bilgi de yoktur. " +
+                          "Sozlesmenin \"olculdu, kodlayici zaten daha iyi dagitiyor\" secenegi " +
+                          "bu satirdan okunur.");
+            sb.AppendLine();
+        }
         if (k4b.Hucre > 0)
         {
             var basSatir = k4b.ZonesKazandi == 0
@@ -1247,7 +1260,8 @@ public static class Rapor
                       "dagitimindan daha kotu, kazanc tabana gore olculuyor"
                     : $", K1 aciginin %{Kabuk.Inv(k4b.ZonesEnIyiOran.Value, "0.0")}'i") +
                   ".**";
-            sb.AppendLine(basSatir + " " +
+            sb.AppendLine("Dagitim parametresinin kendisi ayri bir sorudur ve ayri olculdu. " +
+                          basSatir + " " +
                           $"Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; " +
                           $"olculen {k4b.Hucre} hucrenin tabani gecen {k4b.TabaniGecen} tanesinde " +
                           $"`zones` {k4b.ZonesKazandi} kez kazandi, `qcomp` {k4b.QcompKazandi} kez. " +
@@ -1259,19 +1273,6 @@ public static class Rapor
                             : $"`zones` {k4b.Hucre} hucreden {k4b.ZonesKazandi} tanesinde kazandi " +
                               $"ve en buyuk kazanc {Kabuk.Inv(k4b.ZonesEnIyiKazanc!.Value, "0.000")} pp; " +
                               "bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir."));
-            if (k2.Hucre > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine($"**Haritanin kendisi olculen {k2.Hucre} hucrenin " +
-                              $"{k2.KodlayiciEnAzEsit} tanesinde kodlayiciyi geride birakmiyor** " +
-                              "(`MAE(verilen) <= MAE(harita)`, K2 tablosu): o hucrelerde kodlayicinin " +
-                              "kendi dagitimi haritanin onerisi kadar ya da ondan daha dogru. Bu, " +
-                              "kazanc bulunan hucrelerle celismez, onlarin yaninda durur: dagitim " +
-                              "parametresi tabana gore bir sey kazandirabilirken, o kazanci yoneten " +
-                              "haritanin kendisi cogu hucrede kodlayicidan iyi degildir. " +
-                              "Sozlesmenin \"kodlayici zaten daha iyi dagitiyor\" secenegi bu " +
-                              "satirdan okunur.");
-            }
             if (k4b.ZonesKazandi > 0 && k4.Denenen > 0 && !k4.VarsayilanIsliyor)
             {
                 sb.AppendLine();
