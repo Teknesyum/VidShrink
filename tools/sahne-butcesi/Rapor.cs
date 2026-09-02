@@ -454,7 +454,9 @@ public static class Rapor
         sb.AppendLine("Esik metni \"uc kaynagin en az ikisinde\" der; kaynak = pencere. Kollar");
         sb.AppendLine("esikten sonra eklendi, o yuzden sayim **kol icinde** yapilir: bir kolun");
         sb.AppendLine("kendi uc penceresinin en az ikisi esigi gecmelidir. Ayri kollardan birer");
-        sb.AppendLine("pencere toplanip \"iki kaynak\" sayilmaz.");
+        sb.AppendLine("pencere toplanip \"iki kaynak\" sayilmaz. Bu netlestirme commit `a965416`,");
+        sb.AppendLine("ilk `k5-*.json` yazilmadan once: `git log -1 --format=%cI a965416` ile");
+        sb.AppendLine("`.calisma/T114/k5-*.json` zaman damgalari karsilastirilabilir.");
         sb.AppendLine();
         sb.AppendLine("| Yazilim kolu | Olculen pencere | p10 esigini gecen | En kotu sahne esigini gecen | Kalite sarti (1-3) |");
         sb.AppendLine("|--------------|-----------------|-------------------|-----------------------------|--------------------|");
