@@ -91,4 +91,73 @@ commitlendi.
 
 ## K3 — sonra olcum
 
-(Degisiklik sonrasi doldurulacak.)
+Dal `main`e henuz birlesmedi (sozlesme geregi birlesmeyecek), o yuzden
+`concurrency` blogu su an yalniz `T121-ci-maliyeti` dalinda calisiyor.
+Bu, iki ayri sonuc uretiyor: (a) dogrudan gozlenen, kucuk olcekli bir
+kanit — kendi dalimdaki gercek iptaller; (b) K1'in ayni penceresine
+kuralı geriye donuk uygulayarak cikan bir **projeksiyon** — depo genelinde
+`main`e birlestikten sonra ne olacaginin tahmini. Ikisi karistirilmadan
+ayri yazilir.
+
+### (a) Dogrudan gozlenen kazanc (kendi dalim, gercek)
+
+Ayni K1 komutu, degisiklik sonrasi bir pencerede tekrar calistirildi:
+
+```
+gh run list --workflow ci.yml \
+  --json conclusion,createdAt,databaseId,event,headBranch,headSha,status,updatedAt,workflowName \
+  --created "2026-09-01T05:11:21Z..2026-09-02T05:11:21Z" --limit 1000
+```
+
+Ayni pencere icin yine 210 kosum dondu — beklenen, cunku pencere kapandi
+ve `main`e henuz birlesme yok; bu komutun tekrari K1 sayisinin
+tekrar-uretilebilir oldugunu dogruluyor, tek basina "sonra"yi olcmuyor.
+Asil "sonra" `T121-ci-maliyeti` dalindaki kosumlarin kendisinde:
+
+- `33602997828` (`c356f4f`): 07:19:33'te basladi, `2b5ef68` itilince
+  07:20:12'de `cancelled` oldu — **39 saniye** calisti. K1'in ortalama
+  tamamlanan-kosum suresi (13.18 dk) ile kiyaslanirsa, iptal edilmeseydi
+  yaklasik 12-19 dk suren bir kosumun sadece 39 saniyesi harcandi.
+- `33603041850` (`2b5ef68`): 07:20:05'te basladi, `bcee47e` `main`
+  istisnasi (gecici ikame) ile kuyruklandiginda iptal edilmedi (kanit,
+  K2 bolumunde); ref gercek `main`e geri cevrilip `e1f0b27` itilince
+  07:32:05'te `cancelled` oldu — yaklasik **12 dakika** calismisti.
+- `33603335567` (`bcee47e`): hic `in_progress`e gecmeden, kuyrukta
+  beklerken `e1f0b27` tarafindan iptal edildi.
+
+Bu ucu, mekanizmanin calistiginin dogrudan kaniti — ama tek basina
+"repo genelinde X dakika/yuzde kazanildi" demek icin yeterli olcek
+degil, cunku degisiklik henuz `main`e birlesmedi.
+
+### (b) Geriye donuk projeksiyon (depo genelinde, K1 verisine kural uygulanarak)
+
+K1'in 210 kosumluk verisine concurrency kurali (ayni is akisi + ayni dal
+= grup; `main` haric grup icinde ust uste binen kosumun oncekisi iptal
+edilir) geriye donuk uygulandi: ayni dalda ardisik iki kosumun zaman
+araligi ortusuyorsa (`onceki.updatedAt > sonraki.createdAt`), onceki
+kosum kurami altinda iptal edilmis olurdu; kazanc, ortusen sureden
+hesaplandi.
+
+- **`main`-disi dallarda 42 kosum cifti** ortusuyordu — kural olsaydi
+  bunlarin oncekileri iptal edilir, toplam **396.6 dakika** tasarruf
+  edilirdi. Bu, K1'in toplam tamamlanan-kosum dakikasinin (2557.6)
+  **%15.5**'i — **`%81.9` degil.** `%81.9`, kosumlarin docs-only *payi*;
+  tasarruf yalniz **ayni dalda art arda, ortusen** kosumlardan gelir —
+  yalniz basina itilen (arkasindan hemen yeni bir itme gelmeyen) bir
+  docs-only kosum tam suresince calismaya devam eder, concurrency onu
+  kesmez.
+- **`main` dalinda 74 kosum cifti** de ortusuyordu — bunlar istisna
+  sayesinde iptal **edilmeyecek** (mühür kaniti korunuyor). Bu sayi,
+  sozlesmenin `Baglam` bolumundeki gozlemi (5 ust uste `main` kosumu,
+  4 kosumluk kuyruk) dogruluyor: kuyruklanma sorunu gercek ve sik, ve
+  `main` istisnasi onu tam da hedefledigi yerde etkisiz birakmiyor.
+
+Ureten komut (K1 dosyasindan, `event == "push"`, dal bazinda sirali
+zaman araligi kesisimi): `.calisma/T121/` altindaki gecici Python
+betiginde — betik `docs/`e tasinmadi, tek seferlik olcum, `tools/`a
+girecek kadar tekrar kullanilan bir arac degil.
+
+**Ozet cumlesi:** degisiklik `main`e birlestiginde, K1 penceresindeki
+gibi bir gunde, docs-only kosumlarin **hepsi** degil, **ortusenleri**
+kesilir; bu olculen pencerede o **%15.5** (396.6/2557.6 dk) demek,
+kosum sayisinin %81.9'unun docs-only olmasi degil.
