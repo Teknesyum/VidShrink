@@ -21,6 +21,7 @@ KOSUMLAR = [
     ("uzman-biz4",          "ciktilar/uzman-biz4.mp4"),
     ("uzman-biz5",          "ciktilar/uzman-biz5.mp4"),
     ("uzman-biz6",          "ciktilar/uzman-biz6.mp4"),
+    ("uzman-biz7",          "ciktilar/uzman-biz7.mp4"),
     ("uzman-hb3",           "ciktilar/uzman-hb3.mp4"),
 ]
 
@@ -194,7 +195,8 @@ CIFTLER = [(u"uzman açığı", "uzman-biz3", "auto"),
            (u"HandBrake açığı (boyut eşsiz)", "uzman-hb", "auto"),
            (u"HandBrake açığı (T111 boyut eşli)", "uzman-hb3", "auto"),
            (u"uzman açığı (T111 boyut eşli)", "uzman-biz5", "auto"),
-           (u"uzman açığı (T111 boyut eşli, biz6)", "uzman-biz6", "auto")]
+           (u"uzman açığı (T111 boyut eşli, biz6)", "uzman-biz6", "auto"),
+           (u"uzman açığı (T111 boyut eşli, biz7)", "uzman-biz7", "auto")]
 
 w(u"### F. Açıklar — eski fark / yeni fark")
 w(u"")

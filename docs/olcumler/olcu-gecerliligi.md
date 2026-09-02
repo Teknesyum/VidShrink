@@ -238,7 +238,8 @@ kusurdan etkilenmişti.**
 | `auto` (AV1) — eski (damga eşli) | 0,000 | 26 | 94,462 | **56,313** | 94,534 |
 | `auto` (AV1) — yeni (indeks kilitli) | **92,391** | **0** | 95,659 | **95,655** | 94,904 |
 | `uzman-hb` (x265) — eski | 74,701 | 0 | 95,763 | 95,759 | 95,396 |
-| `uzman-hb` (x265) — yeni | 76,219 | 0 | 95,799 | 95,793 | 95,473 |
+| `uzman-hb` (x265) — yeni (T106) | 76,219 | 0 | 95,799 | 95,793 | 95,473 |
+| `uzman-hb` (x265) — yeni (T111'de yeniden) | **94,211** | 0 | 95,772 | 95,770 | 95,406 |
 
 **T111'de düzeltildi: satır etiketleri hangi koşumu gösterdiğini söylemiyordu.**
 "x265 HandBrake" yazan iki satırın verisi `uzman-hb` koşumundan geliyor — `-b 2026`
@@ -248,9 +249,18 @@ farklı: `auto` 15 766 933 bayt, `uzman-hb` 16 745 000 bayt — x265 dosyası
 **%6,2 daha büyük**.
 
 **Harmonik ortalamada `auto` ile `uzman-hb` arası fark: 39,446 → 0,138.**
-p10 farkı 0,862 → 0,569. HandBrake tarafı da kusurdan bir miktar etkilenmiş
-(min 74,70 → 76,22); yani düzeltme her iki tarafı da yukarı çekiyor, ama
-AV1 tarafını kıyaslanamayacak kadar fazla.
+p10 farkı 0,862 → 0,569. HandBrake tarafı da kusurdan etkilenmiş: `<1` kare
+hiç yokken **en düşük kare** 74,69'dan 94,21'e çıkıyor. Yani düzeltme her iki
+tarafı da yukarı çekiyor, ama AV1 tarafını kıyaslanamayacak kadar fazla —
+AV1'de kusur ortalamayı ve harmoniği taşıyordu, x265'te yalnız kuyruğu.
+
+**T106'nın `76,219`'u T111'de yeniden üretilemedi.** Aynı kilit
+(`settb=AVTB,setpts=N`), aynı ayarla yeniden kodlanmış `uzman-hb` ile ölçüldüğünde
+en düşük kare **94,211** çıkıyor; ortalama, harmonik ve p10 ise 0,03 içinde
+tutuyor (95,772 / 95,770 / 95,406). Yani üç sayı tekrarlanıyor, en düşük kare
+tekrarlanmıyor — ve fark 18 puan, yeniden kodlama gürültüsü değil. T106'nın o
+satırını üreten ham JSON git'te olmadığı için **farkın sebebi ölçülmedi**;
+satır silinmedi, yanına yeniden üretilen ölçüm kondu.
 
 Yol haritasının "AV1'i x265'e karşı 39,4 puan geride gösteriyor" tespiti doğruydu;
 sebebi yanlıştı. **Kilit takıldığında kalan fark 0,138 puan.** Bu sayı iki
@@ -390,8 +400,8 @@ Kusur **yalnız bizim satırlarımızı** vurduğu için buradaki açık olduğu
   takıldığında kalan fark **0,138 puan**; ama karşılaştırılan çift (`auto` ↔
   `uzman-hb`) boyut eşli değil (x265 dosyası %6,2 büyük), o yüzden bu sayı
   "başa baş" demek için yeterli değil. `:248`'de duran **"İki kodlayıcı bu
-  kaynakta başa baş"** cümlesi bu yüzden hâlâ dayanaksız — dosya bu sözleşmenin
-  `owns`'unda değil, **düzeltilmedi**.
+  kaynakta başa baş"** cümlesi bu yüzden dayanaksızdı; dosya bu sözleşmenin
+  `owns`'unda değil, **T0 düzeltti** (cümle geri çekildi, gerekçesi yazıldı).
 - `:222-228` kodlayıcı seçim kuralının bu sayıya dayandığı uyarısı — **kural artık
   düzeltilmiş ölçüyle yeniden kurulabilir**
 
