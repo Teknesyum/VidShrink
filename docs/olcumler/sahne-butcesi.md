@@ -55,8 +55,8 @@ kodlama sessizce kucuk bir "hak edilen" ya da "verilen" uretir. Kodlamalar
 suresi `ffprobe` ile olculup beklenen sahne/pencere suresiyle
 karsilastirilir (esik 0,5 sn).
 
-Denetlenen dosya **116** — referans sahnesi 102, 
-kodlama ciktisi 14. Suresi sapan: **0**.
+Denetlenen dosya **127** — referans sahnesi 102, 
+kodlama ciktisi 25. Suresi sapan: **0**.
 
 Uretim: `bash tools/sahne-butcesi/05-cikti-denetimi.sh`, ham dosya
 `cikti-denetimi.csv`. Olcum bittikten sonra kosar.
