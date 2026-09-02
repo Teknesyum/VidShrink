@@ -145,19 +145,34 @@ public static class FfmpegArguments
     //
     // SceneMapMergeFactor is not a tuning constant; it is the map's measured recall, written as
     // the two counts it was measured from, both counted in the same unit - cuts inside the
-    // ground-truth window (144.117, 333.300]. At the threshold of record the map finds 28 of
-    // the 28 hand-marked cuts with zero false positives, so the recall is 1.000 and the divider
-    // is 1.0: at this threshold the map no longer under-segments and no correction is owed.
-    // It was not always so - at the previous threshold of 0.2 the same window gave 10 of 28,
-    // and the divider was 2.8.
+    // ground-truth window (144.117, 333.300]. T108 re-counted them against the map production
+    // actually builds, which since T109 is the DERIVED one (SceneDetector.BuildMapAsync ->
+    // SceneMap.BuildDerived with ThresholdRule.Measured), not the fixed-threshold one: over the
+    // full source the derived rule finds 28 of the 28 hand-marked cuts with zero false
+    // positives, so the recall is 1.000 and the divider is 1.0. The fixed 0.105 path was run
+    // beside it in the same window and gave the same 28/28, which is why replacing the
+    // threshold with the rule did not move the divider. It was not always so - at the earlier
+    // fixed threshold of 0.2 the same window gave 10 of 28, and the divider was 2.8.
     //
     // Because the divider is 1.0 today it is arithmetically inert, and no behaviour test can
-    // tell it from having no divider at all. What is testable is where it comes from: the two
-    // counts are pinned to what was counted, and SceneMapThresholdOfRecord is pinned to
-    // SceneMap.DefaultThreshold, which is owned elsewhere. If that threshold moves again the
-    // map splits differently, the recall is no longer 1.000, and
-    // Az_bolme_duzeltmesi_olculdugu_esikte_kalir turns red before a stale divider can be
-    // applied on top of a corrected threshold.
+    // tell it from having no divider at all. What is testable is where it comes from. The two
+    // counts are pinned to what was counted. The threshold cannot be pinned any more: the
+    // derived map reports SceneMap.Threshold = NaN and carries SceneMap.Rule instead, so
+    // SceneMapThresholdOfRecord pinned a number production no longer decides by. What replaces
+    // it is SceneMapRuleOfRecord, the whole six-number identity of the rule, not its endpoints:
+    // Floor and Ceiling alone would let Offset, Slope, NeighbourhoodSeconds and Percentile drift
+    // while the pin stayed green, and each of those four changes where the map splits. The trap
+    // is behavioural rather than constant-against-constant - it derives the cut list twice, once
+    // under the rule of record and once under the rule production defaults to, and compares the
+    // lists - so it also covers a rule whose numbers were shuffled between fields.
+    //
+    // Five of the six numbers carry load and are measured to: on a low-agitation candidate set
+    // Offset, Slope, NeighbourhoodSeconds and Percentile each change the cut list when moved in
+    // either direction, and on a high-agitation set Ceiling does. Floor does not, in either
+    // direction, and cannot: agitation is never negative and Slope is positive, so
+    // Offset + Slope * agitation >= Offset = 0.08 > Floor = 0.05 and the lower clamp is
+    // unreachable. That is an equivalent mutation, not a test gap, and
+    // Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor states it as a measure rather than a claim.
     //
     // What the map is trusted for is the range, not the boundaries: the placement is left to
     // the encoder's scene cut. That the encoder actually places on content, and what the
@@ -215,7 +230,7 @@ public static class FfmpegArguments
 
     public const double KeyframeFloorSeconds = 1.0;
     public const double KeyframeCeilingDefaultSeconds = 10.0;
-    public const double SceneMapThresholdOfRecord = 0.105;
+    public static readonly ThresholdRule SceneMapRuleOfRecord = new(0.05, 0.15, 0.08, 2.09, 40.0, 0.90);
     public const double SceneMapGroundTruthCutsInWindow = 28.0;
     public const double SceneMapMappedCutsInWindow = 28.0;
     public const double SceneMapMergeFactor = SceneMapGroundTruthCutsInWindow / SceneMapMappedCutsInWindow;

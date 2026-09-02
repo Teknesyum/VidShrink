@@ -17,10 +17,13 @@ internal static class Program
         var p = Ayristir(argv.Skip(1));
 
         var kaynak = Zorunlu(p, "kaynak");
+        if (komut == "sahne") return Sahne(kaynak, p).GetAwaiter().GetResult();
+
         var ad = Zorunlu(p, "ad");
         var kodlayici = Zorunlu(p, "kodlayici");
         var isDizin = Zorunlu(p, "is");
         var threads = int.Parse(p.GetValueOrDefault("threads", "6"), Inv);
+        var onAyar = p.GetValueOrDefault("onayar");
         Directory.CreateDirectory(Path.Combine(isDizin, "ciktilar"));
         Directory.CreateDirectory(Path.Combine(isDizin, "vmaf"));
 
@@ -28,7 +31,7 @@ internal static class Program
         var csv = Path.Combine(isDizin, "olcum.csv");
         var gunluk = Path.Combine(isDizin, "komutlar.log");
         if (!File.Exists(csv))
-            File.WriteAllText(csv, "kaynak;kodlayici;yol;gen;yuk;fps;taban_k;oran;tepe;bitrate_k;maxrate_k;bufsize_k;hedef_mib;teslim_mib;hedef_orani;vmaf_mean;vmaf_p10;akis;pixfmt;renk;sure_sn\n");
+            File.WriteAllText(csv, "kaynak;kodlayici;onayar;yol;gen;yuk;fps;taban_k;oran;tepe;bitrate_k;maxrate_k;bufsize_k;hedef_mib;teslim_mib;hedef_orani;vmaf_mean;vmaf_p10;akis;pixfmt;renk;sure_sn\n");
 
         switch (komut)
         {
@@ -42,7 +45,7 @@ internal static class Program
                 {
                     var bitrateK = (int)Math.Round(tabanK * oran);
                     foreach (var tepe in tepeler)
-                        Kos(bilgi, ad, kodlayici, "2gecis", tabanK, oran, tepe, bitrateK, null, isDizin, csv, gunluk, threads);
+                        Kos(bilgi, ad, kodlayici, "2gecis", tabanK, oran, tepe, bitrateK, null, isDizin, csv, gunluk, threads, onAyar);
                 }
                 return 0;
             }
@@ -53,13 +56,58 @@ internal static class Program
                 var bitrateK = int.Parse(Zorunlu(p, "bitrate"), Inv);
                 var tabanK = CodecModel.MinBitrateK(kodlayici, bilgi.Width, bilgi.Height, bilgi.Fps);
                 foreach (var tepe in tepeler)
-                    Kos(bilgi, ad, kodlayici, "crf", tabanK, 0, tepe, bitrateK, crf, isDizin, csv, gunluk, threads);
+                    Kos(bilgi, ad, kodlayici, "crf", tabanK, 0, tepe, bitrateK, crf, isDizin, csv, gunluk, threads, onAyar);
                 return 0;
             }
             default:
                 Kullanim();
                 return 2;
         }
+    }
+
+    /// <summary>
+    /// Bolenin dayanagini yeniden olcer: turetilen kuralla uretilen kesimleri elle
+    /// isaretlenmis yer gercegiyle ayni pencerede sayar, ve haritanin bildirdigi medyan
+    /// sahne uzunlugunu yazar. Sabit esik yolu ayni pencerede yanina kosulur.
+    /// </summary>
+    private static async Task<int> Sahne(string kaynak, Dictionary<string, string> p)
+    {
+        var yerGercegi = File.ReadAllLines(Zorunlu(p, "yergercegi"))
+            .Where(l => l.Length > 0 && !l.StartsWith("#", StringComparison.Ordinal))
+            .Select(l => double.Parse(l.Trim(), Inv))
+            .OrderBy(x => x)
+            .ToArray();
+        var alt = double.Parse(Zorunlu(p, "alt"), Inv);
+        var ust = double.Parse(Zorunlu(p, "ust"), Inv);
+        var tolerans = double.Parse(p.GetValueOrDefault("tolerans", "0.5"), Inv);
+
+        var sure = double.Parse(Zorunlu(p, "sure"), Inv);
+        var tarama = await SceneDetector.ScanAsync(kaynak);
+        if (!tarama.Ok) { Console.Error.WriteLine("tarama basarisiz: " + tarama.Error); return 1; }
+        Console.WriteLine($"tarama: aday={tarama.Candidates.Count} kare={tarama.Frames.Count} sure_sn={tarama.Elapsed.TotalSeconds:0.0}");
+
+        var kareHizi = tarama.Frames.Count / sure;
+        var turetilen = SceneMap.DerivedCutTimes(tarama.Candidates, sure, kareHizi, ThresholdRule.Measured);
+        var sabit = SceneMap.CutTimes(tarama.Candidates, SceneMap.FixedThreshold, sure);
+
+        void Say(string etiket, IReadOnlyList<double> kesimler)
+        {
+            var pencerede = kesimler.Where(t => t > alt && t <= ust).ToArray();
+            var yakalanan = yerGercegi.Count(g => pencerede.Any(t => Math.Abs(t - g) <= tolerans));
+            var yanlisPozitif = pencerede.Count(t => !yerGercegi.Any(g => Math.Abs(t - g) <= tolerans));
+            Console.WriteLine($"{etiket}: gercek={yerGercegi.Length} uretilen={pencerede.Length} " +
+                              $"yakalanan={yakalanan} kacan={yerGercegi.Length - yakalanan} yp={yanlisPozitif} " +
+                              $"bolen={(double)yerGercegi.Length / Math.Max(1, pencerede.Length):0.000}");
+        }
+
+        Say("turetilen", turetilen);
+        Say("sabit-0.105", sabit);
+
+        var harita = SceneMap.BuildDerived(sure, tarama.Candidates, tarama.Frames, ThresholdRule.Measured);
+        Console.WriteLine($"turetilen harita: sahne={harita.Scenes.Count} esik={harita.Threshold} " +
+                          $"kural={(harita.Rule is null ? "yok" : "var")} " +
+                          $"ust_sinir_sn={FfmpegArguments.KeyframeCeilingSeconds(harita):0.000}");
+        return 0;
     }
 
     private static void Kullanim()
@@ -121,11 +169,15 @@ internal static class Program
 
     private static void Kos(
         MediaInfo bilgi, string ad, string kodlayici, string yol, int tabanK, double oran,
-        string tepeMetin, int bitrateK, int? crf, string isDizin, string csv, string gunluk, int threads)
+        string tepeMetin, int bitrateK, int? crf, string isDizin, string csv, string gunluk, int threads,
+        string? onAyar)
     {
-        var kap = EncoderCapabilities.Instance;
+        var kap = SabitKabiliyet.Ortak;
         FfmpegArguments.WarmPsychovisual(kodlayici, kap);
         var hdr = HdrResolver.Resolve(bilgi, HdrPolicy.Preserve, kodlayici, kap);
+        if (hdr.VideoFilter is not null || hdr.PolicyChanged)
+            throw new InvalidOperationException(
+                $"HDR korunmadi, {kodlayici} tonemap'e dustu: satirlar arasinda boru hatti degisir.");
 
         var plan = new EncodePlan
         {
@@ -137,7 +189,7 @@ internal static class Program
             Width = bilgi.Width,
             Height = bilgi.Height,
             Fps = bilgi.Fps,
-            Preset = FfmpegArguments.DefaultPreset(kodlayici),
+            Preset = onAyar ?? FfmpegArguments.DefaultPreset(kodlayici),
             PixelFormat = hdr.PixelFormat,
             HdrVideoFilter = hdr.VideoFilter,
             HdrColorArgs = new List<string>(hdr.ColorArgs),
@@ -151,24 +203,25 @@ internal static class Program
         double tepe = tepeMetin == "yok" ? 0 : double.Parse(tepeMetin, Inv);
         int maxrateK = 0, bufsizeK = 0;
 
+        var passLog = Path.Combine(isDizin, "ciktilar", etiket);
+        var iki = FfmpegArguments.NeedsTwoPasses(kodlayici) && crf is null;
+        var son = TepeyiDegistir(FfmpegArguments.Build(bilgi, plan, cikti, iki ? 2 : 0, iki ? passLog : null, kap), bitrateK, tepe, crf is not null, out maxrateK, out bufsizeK);
+        var imza = FfmpegArguments.ToCommandLine(son);
+        var imzaYolu = cikti + ".args";
+
         var sw = Stopwatch.StartNew();
-        if (!File.Exists(cikti))
+        if (!File.Exists(cikti) || !File.Exists(imzaYolu) || File.ReadAllText(imzaYolu) != imza)
         {
-            var passLog = Path.Combine(isDizin, "ciktilar", etiket);
-            var iki = FfmpegArguments.NeedsTwoPasses(kodlayici) && crf is null;
             if (iki)
             {
                 var p1 = TepeyiDegistir(FfmpegArguments.Build(bilgi, plan, cikti, 1, passLog, kap), bitrateK, tepe, crf is not null, out _, out _);
                 Yaz(gunluk, etiket + " [1]", p1);
                 if (FfKos("ffmpeg", p1, out var h1) is null) throw new InvalidOperationException($"pass1 hata {etiket}: {h1}");
             }
-            var son = TepeyiDegistir(FfmpegArguments.Build(bilgi, plan, cikti, iki ? 2 : 0, iki ? passLog : null, kap), bitrateK, tepe, crf is not null, out maxrateK, out bufsizeK);
             Yaz(gunluk, etiket, son);
             if (FfKos("ffmpeg", son, out var h2) is null) throw new InvalidOperationException($"kodlama hata {etiket}: {h2}");
-        }
-        else
-        {
-            TepeyiDegistir(FfmpegArguments.Build(bilgi, plan, cikti, 0, null, kap), bitrateK, tepe, crf is not null, out maxrateK, out bufsizeK);
+            File.WriteAllText(imzaYolu, imza);
+            if (File.Exists(vmafJson)) File.Delete(vmafJson);
         }
         sw.Stop();
 
@@ -182,7 +235,7 @@ internal static class Program
 
         var satir = string.Join(';', new[]
         {
-            ad, kodlayici, yol,
+            ad, kodlayici, plan.Preset, yol,
             bilgi.Width.ToString(Inv), bilgi.Height.ToString(Inv), bilgi.Fps.ToString("0.###", Inv),
             tabanK.ToString(Inv), oran.ToString("0.0000", Inv), tepeMetin,
             bitrateK.ToString(Inv), maxrateK.ToString(Inv), bufsizeK.ToString(Inv),
@@ -194,6 +247,35 @@ internal static class Program
         });
         File.AppendAllText(csv, satir + "\n");
         Console.WriteLine(satir);
+    }
+
+    private sealed class SabitKabiliyet
+        : IEncoderAvailability, IEncoderOptionAvailability, IEncoderOptionWarmup, IHdr10EncoderAvailability
+    {
+        internal static readonly SabitKabiliyet Ortak = new();
+
+        private static readonly Dictionary<string, string> Hdr10 = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["av1_nvenc"] = "p010le",
+            ["hevc_nvenc"] = "p010le"
+        };
+
+        private static readonly HashSet<string> Destekli = new(StringComparer.Ordinal)
+        {
+            "libx265\0-x265-params\0psy-rd=2:psy-rdoq=1:aq-mode=2",
+            "av1_nvenc\0-spatial-aq\01",
+            "av1_nvenc\0-temporal-aq\01",
+            "hevc_nvenc\0-spatial-aq\01",
+            "hevc_nvenc\0-temporal-aq\01"
+        };
+
+        public bool HasEncoder(string name) => true;
+        public bool WorksAsEncoder(string codec) => true;
+        public bool SupportsEncoderOption(string codec, string option, string value)
+            => Destekli.Contains($"{codec}\0{option}\0{value}");
+        public bool WarmEncoderOption(string codec, string option, string value)
+            => SupportsEncoderOption(codec, option, value);
+        public string? Hdr10PixelFormat(string codec) => Hdr10.GetValueOrDefault(codec);
     }
 
     private static List<string> Sabitlenmis(string kodlayici, int threads)
@@ -247,16 +329,17 @@ internal static class Program
 
     private static void Vmaf(string test, string referans, string ciktiJson, string gunluk, int threads)
     {
-        var yolu = ciktiJson.Replace('\\', '/').Replace(":", "\\:");
+        var dizin = Path.GetDirectoryName(Path.GetFullPath(ciktiJson))!;
+        var dosya = Path.GetFileName(ciktiJson);
         var args = new[]
         {
             "-hide_banner", "-loglevel", "error", "-nostdin",
-            "-i", test, "-i", referans,
-            "-lavfi", $"[0:v][1:v]libvmaf=model=version=vmaf_v0.6.1neg:n_threads={threads}:log_fmt=json:log_path={yolu}",
+            "-i", Path.GetFullPath(test), "-i", Path.GetFullPath(referans),
+            "-lavfi", $"[0:v][1:v]libvmaf=model=version=vmaf_v0.6.1neg:n_threads={threads}:log_fmt=json:log_path={dosya}",
             "-f", "null", "-"
         };
-        Yaz(gunluk, "vmaf " + Path.GetFileName(ciktiJson), args);
-        if (FfKos("ffmpeg", args, out var hata) is null)
+        Yaz(gunluk, $"vmaf {dosya} (cwd {dizin})", args);
+        if (FfKos("ffmpeg", args, out var hata, dizin) is null)
             throw new InvalidOperationException($"vmaf hata {ciktiJson}: {hata}");
     }
 
@@ -276,9 +359,10 @@ internal static class Program
     private static void Yaz(string gunluk, string etiket, IEnumerable<string> args)
         => File.AppendAllText(gunluk, $"### {etiket}\n{FfmpegArguments.ToCommandLine(args)}\n\n");
 
-    private static string? FfKos(string arac, IEnumerable<string> args, out string hata)
+    private static string? FfKos(string arac, IEnumerable<string> args, out string hata, string? calismaDizini = null)
     {
         var psi = new ProcessStartInfo(arac) { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
+        if (calismaDizini is not null) psi.WorkingDirectory = calismaDizini;
         foreach (var a in args) psi.ArgumentList.Add(a);
         using var proc = Process.Start(psi)!;
         var cikti = proc.StandardOutput.ReadToEnd();

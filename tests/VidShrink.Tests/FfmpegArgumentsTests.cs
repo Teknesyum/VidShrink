@@ -725,16 +725,114 @@ public sealed class FfmpegArgumentsTests
         Assert.Equal(-1, VbvTavani("libsvtav1", 4000, "-bufsize"));
     }
 
+    private const double KuralSuresi = 60.0;
+    private const double KuralKareHizi = 60.0;
+
+    private static SceneScore[] KuralAdaylari(bool hareketli)
+    {
+        var n = (int)(KuralSuresi * KuralKareHizi) / 2;
+        var liste = new List<SceneScore>(n);
+        ulong s = 0x9E3779B97F4A7C15UL;
+        double Sonraki()
+        {
+            s ^= s << 13; s ^= s >> 7; s ^= s << 17;
+            return (s >> 11) * (1.0 / 9007199254740992.0);
+        }
+        for (var i = 0; i < n; i++)
+        {
+            var t = 2 * i / KuralKareHizi;
+            var zarf = hareketli
+                ? 0.0300 + 0.0200 * (0.5 + 0.5 * Math.Sin(2 * Math.PI * t / 37.0))
+                : 0.0060 + 0.0075 * (0.5 + 0.5 * Math.Sin(2 * Math.PI * t / 37.0));
+            var skor = zarf * (0.5 + Sonraki());
+            if (i % 41 == 0) skor = hareketli ? 0.1300 + 0.00060 * (i / 41) : 0.0950 + 0.00040 * (i / 41);
+            liste.Add(new SceneScore(t, Math.Round(skor, 4)));
+        }
+        return liste.ToArray();
+    }
+
+    private static readonly SceneScore[] DurgunAdaylar = KuralAdaylari(false);
+    private static readonly SceneScore[] HareketliAdaylar = KuralAdaylari(true);
+
+    private static IReadOnlyList<double> KuralKesimleri(ThresholdRule kural, SceneScore[] adaylar)
+        => SceneMap.DerivedCutTimes(adaylar, KuralSuresi, KuralKareHizi, kural);
+
     /// <summary>
-    /// Geri cagirma tek bir esige aittir. T105 <c>SceneMap.DefaultThreshold</c>'u 0,2'den
-    /// 0,105'e tasiyinca bu olcu kizardi ve geri cagirma yeniden olculdu: 28/10 yerine
-    /// 28/28. Esik yine oynarsa harita yine baska bolusur ve eski bolen ust siniri ikinci
-    /// kez kisaltir; bu olcu tam o an kizarir, yeniden olculmeden gecilemez.
+    /// Bolen tek bir kurala aittir, tek bir esige degil. T109 uretimi turetilen haritaya
+    /// tasidi: <c>SceneMap.Threshold</c> artik NaN, karari veren <c>SceneMap.Rule</c>.
+    /// Bu olcu kayitli kuralin uretimin varsayilan kuraliyla ayni bolusu verdigini
+    /// dogrular - sabiti sabite degil, iki kesim listesini karsilastirarak. Alanlari yer
+    /// degistirmis bir kural da bunu kizartir.
     /// </summary>
     [Fact]
-    public void Az_bolme_duzeltmesi_olculdugu_esikte_kalir()
+    public void Az_bolme_duzeltmesi_olculdugu_kuralda_kalir()
     {
-        Assert.Equal(FfmpegArguments.SceneMapThresholdOfRecord, SceneMap.DefaultThreshold);
+        Assert.Equal(
+            KuralKesimleri(ThresholdRule.Measured, DurgunAdaylar),
+            KuralKesimleri(FfmpegArguments.SceneMapRuleOfRecord, DurgunAdaylar));
+        Assert.Equal(
+            KuralKesimleri(ThresholdRule.Measured, HareketliAdaylar),
+            KuralKesimleri(FfmpegArguments.SceneMapRuleOfRecord, HareketliAdaylar));
+    }
+
+    /// <summary>
+    /// Kayitli kuralin yuku tasiyan bes sayisi: dusuk kipirtida Offset, Slope,
+    /// NeighbourhoodSeconds ve Percentile, yuksek kipirtida Ceiling. Her biri iki yone de
+    /// oynatildiginda bolus degisir; degismezse tuzak bos kalmis demektir.
+    /// </summary>
+    [Fact]
+    public void Kayitli_kuralin_yuku_tasiyan_sayilari_bolusu_degistiriyor()
+    {
+        var k = FfmpegArguments.SceneMapRuleOfRecord;
+        var durgun = KuralKesimleri(k, DurgunAdaylar);
+        var hareketli = KuralKesimleri(k, HareketliAdaylar);
+
+        Assert.NotEqual(durgun, KuralKesimleri(k with { Offset = 0.09 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { Offset = 0.07 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { Slope = 2.19 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { Slope = 1.99 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { NeighbourhoodSeconds = 45.0 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { NeighbourhoodSeconds = 35.0 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { Percentile = 0.92 }, DurgunAdaylar));
+        Assert.NotEqual(durgun, KuralKesimleri(k with { Percentile = 0.88 }, DurgunAdaylar));
+        Assert.NotEqual(hareketli, KuralKesimleri(k with { Ceiling = 0.16 }, HareketliAdaylar));
+        Assert.NotEqual(hareketli, KuralKesimleri(k with { Ceiling = 0.14 }, HareketliAdaylar));
+    }
+
+    /// <summary>
+    /// Altinci sayi, Floor, yuk tasimiyor ve tasiyamaz: kipirti negatif olmadigi ve Slope
+    /// pozitif oldugu icin <c>Offset + Slope * kipirti</c> hicbir zaman Offset'in altina
+    /// inmez, alt kiskaca ulasilmaz. Iki yone de oynatmak bolusu degistirmiyor. Bu bir
+    /// test acigi degil, esdeger mutasyon; iddia olarak degil olcu olarak duruyor.
+    /// </summary>
+    [Fact]
+    public void Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor()
+    {
+        var k = FfmpegArguments.SceneMapRuleOfRecord;
+        foreach (var adaylar in new[] { DurgunAdaylar, HareketliAdaylar })
+        {
+            var temel = KuralKesimleri(k, adaylar);
+            Assert.Equal(temel, KuralKesimleri(k with { Floor = 0.06 }, adaylar));
+            Assert.Equal(temel, KuralKesimleri(k with { Floor = 0.04 }, adaylar));
+        }
+    }
+
+    /// <summary>
+    /// Turetilen harita tek bir esik bildirmez; <c>Threshold</c> NaN gelir. NaN sessizce
+    /// aritmetige girerse ust sinir NaN olur ve <c>-g</c> uretilemez. Ust sinir hesabi
+    /// haritanin esigini hic okumadigi icin bu olmaz - olcu tam onu dogruluyor.
+    /// </summary>
+    [Fact]
+    public void Turetilen_haritanin_NaN_esigi_ust_sinira_sizmiyor()
+    {
+        var harita = CarpikHarita(4.0, 6.0, 8.0) with { Threshold = double.NaN, Rule = ThresholdRule.Measured };
+
+        var sinir = FfmpegArguments.KeyframeCeilingSeconds(harita);
+
+        Assert.False(double.IsNaN(sinir));
+        Assert.Equal(6.0, sinir, 6);
+        Assert.Equal("360", FfmpegArguments.KeyframeArgs("libx264", 60, harita).ToList() is var a
+            ? a[a.IndexOf("-g") + 1] : "?");
     }
 
     /// <summary>
