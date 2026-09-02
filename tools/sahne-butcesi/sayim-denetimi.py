@@ -43,7 +43,8 @@ if m:
             if mae(k["Verilen"], k["HakEdilen"]) > mae(k["Harita"], k["HakEdilen"])),
         int(m.group(2)))
 
-hucre = kazZ = kazQ = tabani = 0
+hucre = kazZ = kazQ = tabani = zonesTaban = 0
+zonesEnIyiKazanc = None
 for y in sorted(glob.glob(os.path.join(IS, "k4b-*.csv"))):
     o = {}
     for l in io.open(y, encoding="utf-8-sig").read().splitlines()[1:]:
@@ -53,13 +54,42 @@ for y in sorted(glob.glob(os.path.join(IS, "k4b-*.csv"))):
     if "taban" not in o or len(o) < 2:
         continue
     hucre += 1
+    if "zones" in o and o["zones"] < o["taban"]:
+        zonesTaban += 1
     en = min((a for a in o if a != "taban"), key=lambda a: o[a])
     if o[en] < o["taban"]:
         tabani += 1
         if en == "zones":
             kazZ += 1
+            k = o["taban"] - o["zones"]
+            if zonesEnIyiKazanc is None or k > zonesEnIyiKazanc:
+                zonesEnIyiKazanc = k
         if en == "qcomp":
             kazQ += 1
+
+m = re.search(r"olculen (\d+) hucrenin (\d+) tanesinde tabani gecti; bunlarin "
+              r"(\d+) tanesinde de hucrenin en iyi adayi oldu\. En iyi aday oldugu "
+              r"hucredeki kazanc ([\d.]+) pp", metin)
+if m:
+    yaz("manset olculen hucre", hucre, int(m.group(1)))
+    yaz("manset zones tabani gecen", zonesTaban, int(m.group(2)))
+    yaz("manset zones en iyi aday", kazZ, int(m.group(3)))
+    yaz("manset zones en iyi kazanc",
+        "yok" if zonesEnIyiKazanc is None else f"{zonesEnIyiKazanc:.3f}", m.group(4))
+else:
+    yaz("manset okundu", "evet", "hayir")
+
+izgara = os.path.join(IS, "k4-izgara.csv")
+if os.path.exists(izgara):
+    yalnizYuzde = 0
+    for l in io.open(izgara, encoding="utf-8-sig").read().splitlines()[1:]:
+        c = l.split(";")
+        if len(c) < 8 or c[2] != "hayir" or not (c[3] and c[5] and c[6]):
+            continue
+        if int(c[5]) > int(c[6]) * 2 and not int(c[5]) > int(c[3]) // 100:
+            yalnizYuzde += 1
+    yaz("K4 destek gerekcesi yalniz %1 kolu", yalnizYuzde,
+        len(re.findall(r"iki katini asiyor ama ciktinin %1'ini asmiyor", metin)))
 
 yaz("K4 eki olculen hucre", hucre,
     int(re.search(r"olculen (\d+) hucrenin tabani gecen", metin).group(1)))
@@ -78,6 +108,7 @@ def yukle(ad):
 
 k7kars = k7alt = 0
 k7ust = 0.0
+k7enKayip = None
 for y in sorted(glob.glob(os.path.join(IS, "k7-*.json"))):
     hucre = os.path.basename(y)[3:-5]
     dogru = [x for x in yukle("k5-" + hucre + ".json")
@@ -89,9 +120,17 @@ for y in sorted(glob.glob(os.path.join(IS, "k7-*.json"))):
             continue
         k7kars += 1
         kayip = dogru[0]["VmafP10"] - b["VmafP10"]
+        if k7enKayip is None or kayip > k7enKayip:
+            k7enKayip = kayip
         if kayip <= 0:
             k7alt += 1
             k7ust = max(k7ust, -kayip)
+
+m = re.search(r"en buyuk p10 kaybi (-?[\d.]+) puan", metin)
+if m:
+    yaz("K7 en buyuk p10 kaybi",
+        "yok" if k7enKayip is None else f"{k7enKayip:+.3f}".replace("+0.000", "0.000"),
+        m.group(1))
 
 m = re.search(r"\(K7\) karsilastirilan (\d+) kosumun\s+(\d+) tanesi de dogru haritanin altina dusmedi; "
               r"en iyi bozuk\s+kol dogru haritayi ([\d.]+) puan gecti", metin)
