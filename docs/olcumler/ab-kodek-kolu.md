@@ -226,3 +226,69 @@ satırdan geçmiyor.
 koşumu `AllowFpsDrop = true`, buradaki A/B `AllowFpsDrop = false`. Öteki alanlar
 (`Intent.Sharing`, `FillPolicy.FillTarget`, `SpeedMode.Quality`,
 `AllowResolutionDrop = true`) iki tarafta da aynı.
+
+## K6 düzeneği sınandı — ve sınarken bir kararsızlık ölçüldü
+
+Anahtar iki yönde de çalışıyor. Aynı girdi (3 sn'lik 1080p60 HDR kesit), aynı
+hedef (0,35 MB), aynı ikili, tek fark ortam değişkeni:
+
+| koşum | `T125_YERLESIM_KILIT` | plan | sonuç |
+|---|---|---|---|
+| kilitli | 1 | **1920x1080**@60 | hedefin üstünde kaldı, dosya yazılmadı (çıkış 1) |
+| serbest | yok | 882x496@60 | teslim edildi (çıkış 0) |
+
+Günlüğe `yerlesim kilitli: T125_YERLESIM_KILIT=1, AllowResolutionDrop=false`
+satırı basılıyor, yani kilit koşum künyesinde görünür.
+
+### Aynı komut iki farklı deney üretiyor — HDR yolu koşumdan koşuma dönüyor
+
+Sınama sırasında **beklenmeyen** bir şey çıktı ve ölçüldü. Aynı komut, aynı
+girdi, aynı ikili, arka arkaya iki koşum:
+
+| koşum | pix | HDR | renk kapısı | bayt | harm | p10 | XPSNR |
+|---|---|---|---|---|---|---|---|
+| serbest (1) | yuv420p | SDR'a tonemap | **ReferenceTransformed** | 362.102 | **25,85** | 16,49 | 28,86 |
+| serbest (2) | p010le | korundu | **Direct** | 355.516 | **27,57** | 17,76 | 30,68 |
+
+Yerleşim ikisinde de aynı (882x496); dönen tek şey HDR yolu. Fark **1,72 puan**,
+yani K1'de ölçülen sürüm ofsetinden (0,86) büyük.
+
+Sebep koda kadar izlendi, tahmin değil: `HdrResolver.Resolve` HDR korumayı
+`SupportsHdr10` → `WorksAsEncoder(codec)` üzerinden soruyor
+(`src/VidShrink.Core/HdrResolver.cs:24`), o da `EncoderCapabilities.Probe`nin
+**deneme kodlamasına** bakıyor (`src/VidShrink.Ffmpeg/EncoderCapabilities.cs:30`).
+Deneme kodlamanın duvar saati bütçesi **4 sn** ve aşılırsa süreç öldürülüp
+`false` dönüyor (`EncoderCapabilities.cs:110-114`). `false` dönünce ilke
+sessizce `TonemapToSdr`a düşüyor — kodek yine `libsvtav1` seçiliyor, çünkü kodek
+seçimi ayrı yoldan (`HasEncoder`) karar veriyor.
+
+Yoklamanın bu makinedeki süresi ayrıca ölçüldü, sekiz tekrar: **121–720 ms**
+(p010le yoklaması 126–324 ms). Yani bütçeye kalan pay bugünkü yükte yaklaşık
+5 kat. Gözlenen dönüş bir kez görüldü ve tekrarında geri döndü; **4 sn'yi neyin
+aştığı ölçülmedi** — süre damgası `EncoderProbeResult`ta duruyor ama A/B
+raporuna yazılmıyor.
+
+Ölçüm için sonucu şudur, ve iyi haber tarafı var: **düzenek buna kör değil.**
+Tonemap'e düşen satır renk kapısında `ReferenceTransformed` damgası yiyor ve bu
+damga JSON'da satır satır duruyor. Yani karışım **tespit edilebilir**; yeni
+tablonun on iki satırının on ikisinde `ColorGate` alanı tek tek denetlenir,
+`Direct` olmayan satır tabloya girmez, yeniden koşulur.
+
+Kök `src/` altında ve **bu sözleşmenin owns'unda değil**: ölçüldü, yazıldı,
+dokunulmadı.
+
+### Bizim kolun koşumdan koşuma yayılımı
+
+K1'de HandBrake'in bit bit aynı dosyayı ürettiği ölçülmüştü (üç koşum, 0 fark).
+Bizim kol için aynısı **doğru değil**: `parca-1` @ 3,4975 MB, aynı kod, iki
+koşum, ikisi de `Direct` ve Auto:
+
+| koşum | yerleşim | bayt | harm |
+|---|---|---|---|
+| K2 turu | 882x496 @464k | 3.531.823 | 45,9707 |
+| taban turu | 882x496 @464k | 3.531.265 | 45,93 |
+
+Fark **0,04 puan** (bayt farkı 558). Kalibrasyon yoklaması ve eşitleyici koşuma
+bağlı olduğu için bizim kolda küçük ama sıfır olmayan bir yayılım var; ölçer
+tarafı gürültüsüz (K1), yayılım kodlayıcı tarafından geliyor. Yeni tablodaki
+0,04'ten küçük farklar bu yüzden ayırt edici sayılmaz. n = 2, makine yüklü.
