@@ -278,48 +278,28 @@ genişletmenin düşürdüğü üç test tam da bu farkı veriyor. Toplam iki ko
 1487; atlanan iki koşumda da 17, CI kapısının `-MaximumSkipped 30` sınırının
 altında.
 
-### CI koşumu
+### CI koşumu — yeşil
 
-Dalın CI koşumu **kırmızı**, ve kırmızılığın nedeni T149 değil.
-
-| | koşum | head | sonuç | Başarısız / Başarılı / Atlanan / Toplam |
-|---|---|---|---|---|
-| dal | 33673808806 | `7790f1d` | failure | 1 / 1468 / 18 / 1487 |
-| `main` | 33670207004 | `ae98712` | failure | 1 / 1460 / 18 / 1479 |
-
-Kapının düşürdüğü satır:
+| koşum | head | sonuç | Başarısız / Başarılı / Atlanan / Toplam |
+|---|---|---|---|
+| `33677212181` | `2a24a00` | **success** | 0 / 1468 / 19 / 1487 |
 
 ```
-KOSUM KAPISI DUSTU: kod=66 sart=Basarisiz/Failed ozeti sifir degil: 1.
+Passed!  - Failed:     0, Passed:  1468, Skipped:    19, Total:  1487, Duration: 26 m 34 s - VidShrink.Tests.dll (net8.0)
 ```
 
-İki koşumun tek kırmızısı aynı test, aynı değer:
+Tek iş (`test`) `success`; koşum kapısı `-MinimumTotal 1134 -MaximumSkipped 30`
+şartıyla geçti.
 
-```
-Failed VidShrink.Tests.WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(loaded: True, narrow: True, least: 1002, most: 1102)
- Assert.InRange() Failure: Value not in range
-Range:  (1002 - 1102)
-Actual: 956
-```
-
-`main` koşumunun head'i `ae98712`; T149'un hiçbir commit'i onun içinde değil. Sayılar
-farkı tek başına anlatıyor: 1479 + 8 = 1487 ve 1460 + 8 = 1468 — sekiz, bu turun
-eklediği test sayısı. Atlanan iki koşumda da 18, Başarısız iki koşumda da 1. Atlanan
-CI'da 18, yerelde 17; fark iki CI koşumunda da aynı.
-
-`main`in son yeşili `33667126174` (`57ccac0`). Ondan sonraki iki koşum —
-`33669294550` (`b692684`, Serkan'ın ölçüm commit'i) ve `33670207004` (`ae98712`) —
-aynı kırmızıyla düştü.
-
-K6'nın CHECK'i `completed success` istiyor; **bu dalda üretilemez**. Tek kırmızıyı
-kaldırmak `WindowLayoutTests`e ya da arayüz koduna dokunmayı gerektirir, ikisi de
-`owns` dışında. T0'a açık soru budur.
-
-Dalın son iki commit'i (`b4fc175`, `5e50526`) koşum başlatmadı; bu eksik koşum değil,
-`ci.yml`in `paths-ignore` listesinde `docs/**` ve `**/*.md` var. İkisi de yalnız bu
-raporu değiştiriyor: `git diff --name-only 7790f1d 5e50526` tek satır
-(`docs/olcumler/videotoolbox-baglama.md`), `git diff --stat 7790f1d 5e50526 -- src tests`
-boş. Koşum `7790f1d`de kodun bugünkü son halini ölçtü.
+Bu koşumdan önce dal kırmızıydı (`33673808806`, `7790f1d`): tek kırmızı
+`WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(True, True)`, ölçülen 956,
+pin 1002-1102. Kırmızı T149'dan gelmiyordu — `main`in kendi koşumu (`33670207004`,
+`ae98712`) aynı testte aynı değerle düşüyordu. T0 kök nedeni kapattı: üç yerelleştirme
+anahtarı hiçbir dilde yokken arayüz ham anahtar metnini basıyor, o metin dar pencerede
+satıra sarıp sayfayı uzatıyordu; `b2f2c62` anahtarları getirdi, `755b78c` pini bozuk
+arayüzün üzerinden alıp 906-1006'ya temellendi. Dal o `main`e rebase edildi
+(`9626b68` → `2a24a00`), kod değişmedi: `git diff --stat origin/main -- src tests`
+bu turun üç dosyasını gösteriyor, başka bir şey göstermiyor.
 
 ## Bu turda kapanmayan işler
 
@@ -335,9 +315,9 @@ boş. Koşum `7790f1d`de kodun bugünkü son halini ölçtü.
   düşer.
 - **`PreviewSegment.ModelledCodecs` VideoToolbox tanımıyor.** `owns` dışında.
   Kalite ölçeği ölçülmeden eklenemez.
-- **`WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(True, True)` `main`de
-  kırmızı**: ölçülen 956, pin 1002–1102. Bu turdan önce geliyor, bu turda
-  dokunulmadı.
+- **`WindowLayoutTests` kırmızısı kapandı** — bu turun işi değildi, T0 `main`de
+  `b2f2c62` + `755b78c` ile kapattı. Bu raporun eski sürümlerinde "`main`de kırmızı"
+  diye geçen satır artık geçerli değil; dalın CI koşumu yeşil.
 - **`owns` listesinde bir eksik var.** Sözleşme `src/VidShrink.Core/PlanParser.cs`i
   ve `tests/VidShrink.Tests/CodecModelTests.cs`i sayıyor ama
   `tests/VidShrink.Tests/PlanParserTests.cs`i saymıyor; öte yandan verify komutu
