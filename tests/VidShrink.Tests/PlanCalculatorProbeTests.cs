@@ -421,6 +421,83 @@ public sealed class PlanCalculatorProbeTests
         Assert.All(durations, d => Assert.True(d >= 0));
     }
 
+    // --- T136: yoklama cevap veremeyince ---
+
+    /// <summary>Her yoklamasi istisna firlatan yetenek nesnesi.</summary>
+    private sealed class ThrowingAvailability : IEncoderAvailability
+    {
+        internal const string Message = "yoklama surecine erisilemedi";
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec) => throw new InvalidOperationException(Message);
+    }
+
+    /// <summary>Gecidin arka plandaki yoklamalari bitene kadar bekler, ustten sinirli.</summary>
+    private static void Drain(MainWindow.DeferredEncoderAvailability gate, string codec)
+    {
+        for (var i = 0; i <= MainWindow.DeferredEncoderAvailability.MaxAttempts; i++)
+        {
+            gate.IsMeasured(codec);
+            var clock = Stopwatch.StartNew();
+            while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(5);
+        }
+    }
+
+    /// <summary>
+    /// T136/K2. Istisna atan yoklama ile "calismiyor" olculen yoklama ayirt edilebiliyor.
+    /// Ikisi de <c>WorksAsEncoder == false</c> uretiyor; ayrimi <c>AnswerFor</c> tasiyor.
+    /// Istisna hizli firladigi icin gecen sure esigin altinda kaliyor ve duzeltme oncesi
+    /// cevap "yerlesmis olcum" sayiliyordu — ucuncu durum ustte vardi, altta yoktu.
+    /// </summary>
+    [Fact]
+    public void IstisnaAtanYoklamaOlculmusBasarisizliktanAyirtEdiliyor()
+    {
+        var patlayan = new MainWindow.DeferredEncoderAvailability(new ThrowingAvailability(), () => { });
+        var olculen = new MainWindow.DeferredEncoderAvailability(new RecordingAvailability(TimeSpan.Zero), () => { });
+
+        Drain(patlayan, "av1_nvenc");
+        Drain(olculen, "av1_nvenc");
+
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.NotWorking, olculen.AnswerFor("av1_nvenc"));
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.Failed, patlayan.AnswerFor("av1_nvenc"));
+
+        Assert.True(olculen.IsMeasured("av1_nvenc"), "olculmus 'calismiyor' cevabi olcum sayilmali");
+        Assert.False(patlayan.IsMeasured("av1_nvenc"), "istisna atan yoklama olcum sayilmamali");
+
+        Assert.Equal(ThrowingAvailability.Message, patlayan.FailureFor("av1_nvenc"));
+        Assert.Null(olculen.FailureFor("av1_nvenc"));
+    }
+
+    /// <summary>
+    /// T136/K1. Yoklama surekli yerlesmezken plan <c>HardwareNotMeasured</c> kaliyor ama
+    /// Baslat calisiyor. Donanim sorusuna cevap alamamak yazilim kodlayicisiyla
+    /// sikistirmaya engel degil; eski davranis kullaniciyi urunun tamamindan mahrum
+    /// birakiyordu.
+    /// </summary>
+    [Fact]
+    public void YerlesmeyenYoklamaBaslatDugmesiniKilitlemiyor()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var yavas = new RecordingAvailability(
+            TimeSpan.FromMilliseconds(MainWindow.DeferredEncoderAvailability.UnsettledProbeMs + 300));
+
+        var (durum, _) = OnWindow(yavas, window =>
+        {
+            for (var i = 0; i <= MainWindow.DeferredEncoderAvailability.MaxAttempts; i++)
+            {
+                window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+                Settle(window);
+            }
+            window.LoadWithoutProbing(SdrSource.FilePath, SdrSource);
+            return (window.PlanHardwareNotMeasured, window.BtnStart.IsEnabled);
+        });
+
+        Assert.True(durum.PlanHardwareNotMeasured, "olcu kurulmadi: plan donanimi olculmus sayiyor");
+        Assert.True(durum.IsEnabled, "yoklama yerlesmedigi icin Baslat kalici kilitli kaldi");
+    }
+
     // --- K1: gercek ffmpeg ---
 
     /// <summary>

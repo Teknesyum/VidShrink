@@ -1241,6 +1241,21 @@ public partial class MainWindow : Window
             internal string? PixelFormat;
             internal bool Settled;
             internal int Attempts;
+            internal string? Failure;
+        }
+
+        /// <summary>
+        /// Bir kodlayicinin yoklama cevabinin hangi durumda oldugu. <c>NotWorking</c> ile
+        /// <c>Failed</c> ayri: birincisi olculmus bir cevap, ikincisi yoklamanin hic cevap
+        /// uretememesi. Ikisini ayni yere yazmak ucuncu durumu yok ediyordu.
+        /// </summary>
+        internal enum ProbeAnswer
+        {
+            Unknown,
+            Working,
+            NotWorking,
+            Unsettled,
+            Failed
         }
 
         private readonly IEncoderAvailability _source;
@@ -1303,6 +1318,36 @@ public partial class MainWindow : Window
             lock (_gate) return _answers.TryGetValue(Key("hdr10", codec), out var answer) ? answer.PixelFormat : null;
         }
 
+        /// <summary>Kodlayicinin bugunku yoklama durumu. Olcu bunu okur, arayuz de.</summary>
+        internal ProbeAnswer AnswerFor(string codec)
+        {
+            lock (_gate)
+            {
+                if (!_answers.TryGetValue(Key("works", codec), out var answer)) return ProbeAnswer.Unknown;
+                if (answer.Failure is not null) return ProbeAnswer.Failed;
+                if (!answer.Settled) return ProbeAnswer.Unsettled;
+                return answer.Works ? ProbeAnswer.Working : ProbeAnswer.NotWorking;
+            }
+        }
+
+        /// <summary>Yoklama firlattiysa istisnanin metni, yoksa <c>null</c>.</summary>
+        internal string? FailureFor(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) ? answer.Failure : null;
+        }
+
+        /// <summary>
+        /// Yoklamasi istisnayla dusen ilk kodlayicinin istisna metni. Arayuz durum satiri
+        /// bunu gosterir; istisna sessizce kaybolmaz.
+        /// </summary>
+        internal string? FirstFailure
+        {
+            get
+            {
+                lock (_gate) return _answers.Values.Select(a => a.Failure).FirstOrDefault(f => f is not null);
+            }
+        }
+
         private static string Key(string kind, string codec) => $"{kind}:{codec}";
 
         /// <summary>
@@ -1336,13 +1381,15 @@ public partial class MainWindow : Window
                 var clock = Stopwatch.StartNew();
                 var works = false;
                 string? pixelFormat = null;
+                Exception? failure = null;
                 try
                 {
                     if (hdr10) pixelFormat = (_source as IHdr10EncoderAvailability)?.Hdr10PixelFormat(codec);
                     else works = _source.WorksAsEncoder(codec);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    failure = ex;
                 }
                 clock.Stop();
 
@@ -1351,6 +1398,7 @@ public partial class MainWindow : Window
                     if (!_answers.TryGetValue(key, out var answer)) _answers[key] = answer = new Answer();
                     answer.Works = works;
                     answer.PixelFormat = pixelFormat;
+                    answer.Failure = failure?.Message;
                     answer.Attempts++;
                     answer.Settled = clock.ElapsedMilliseconds < UnsettledProbeMs;
                     _running.Remove(key);
@@ -1772,6 +1820,7 @@ public partial class MainWindow : Window
         if (_info is null) return;
         var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, _planEncoders);
         _autoPlan = detailed.Plan;
+        PlanHardwareNotMeasured = detailed.HardwareNotMeasured;
         _predictedQuality = detailed.PredictedQuality;
         _advice = detailed.Advice;
         _profile ??= detailed.Profile;
@@ -1803,6 +1852,9 @@ public partial class MainWindow : Window
 
     /// <summary>Ölçü için: geçidin bugüne kadar başlattığı yoklama sayısı.</summary>
     internal int PlanProbeCount => _planEncoders?.Probes ?? 0;
+
+    /// <summary>Ölçü için: son hesabın donanım cevabını ölçülmemiş sayıp saymadığı.</summary>
+    internal bool PlanHardwareNotMeasured { get; private set; }
 
     /// <summary>
     /// Yerleşmeyen yoklamayı kullanıcıya söyler. Yoklama bir cevap üretemediğinde bu bir
