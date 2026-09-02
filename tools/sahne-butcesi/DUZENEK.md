@@ -153,3 +153,17 @@ besi "Failed to run as a self-contained app" ile dustu, dongu devam etti,
 toplam cikis kodu 0 kaldi. Kosumun bittigini cikis kodundan degil, beklenen
 cikti dosyasinin varligindan anla. Ayri kosumlara ayri `-o` dizini verilir;
 calisan bir ikilinin dizinine derleme yapilmaz.
+
+## K8 — elle yeniden hesaplanan hucre
+
+Ozet cumlelerin tablodan turemesi yetmez; en az bir hucre elle yeniden
+hesaplanip tutuyor mu diye bakildi. `maks/p1-karisik`, rapordaki 28 satirlik
+tablodan:
+
+- `MAE verilen` — `|verilen-hak|` toplami 14,11 pp / 28 = 0,504 pp. Rapor 0,504.
+- `MAE harita` — `|harita-hak|` toplami 17,64 pp / 28 = 0,630 pp. Rapor 0,630.
+- `ters dusen` — iki fark sutununun isareti zit oldugu satirlar: 0, 2, 4, 5, 6,
+  7, 8, 9, 10, 13, 15, 17, 19, 23, 25, 27 — 16 satir. Rapor 16/28.
+
+Ucu de tutuyor. K4 izgarasinin ozet cumlesi de ayni sekilde sayildi: `zones`
+satiri 5 kodlayicida var, `destek=evet` olan 2 (`libx265`, `libx264`).

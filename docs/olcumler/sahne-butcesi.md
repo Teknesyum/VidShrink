@@ -358,6 +358,42 @@ Uretimin varsayilan kolu (`maks` -> `libsvtav1`) islemeyen listede.
 Dagitim koda girse bile varsayilan yolda **etkisiz kalir**; kazanc
 yalniz `libx264` ve `libx265` yollarinda mumkun.
 
+### K4 eki — iki aday yan yana, K1 farkini hangisi kapatiyor
+
+K4'un izgarasi "parametre isliyor mu" sorusunu yanitlar; kabul kriteri
+ayrica **hangi adayin K1 farkini daha cok kapattigini** sorar. Olcu K1'in
+kendi olcusudur: `MAE(verilen, hak edilen)`, yuzde puani. Uc kosum ayni
+plan ve ayni hedef boyutla yapilir, degisen tek sey parametredir.
+
+- `taban` — bugunku plan, ek parametre yok (K1'in `verilen` sutunu).
+- `zones` — sahne araligina `b` carpani; carpanlar haritadan.
+- `qcomp` — iki gecis yanliligi. Kodlayici biti `karmasiklik^qcomp` ile
+  dagitir, harita `karmasiklik^1` onerir; ikisini esitleyen deger
+  `qcomp = 1,0`'dir. Telafi sabiti degil, haritanin onerisinin ayni
+  denklemdeki karsiligi.
+
+| Yazilim kolu | Pencere | Aday | Parametre | MAE (pp) | Tabana gore |
+|--------------|---------|------|-----------|----------|-------------|
+| uyumlu | `p1-karisik` | taban | `-` | 1.552 | — |
+| uyumlu | `p1-karisik` | zones | `zones=<harita>` | 1.553 | +0.001 |
+| uyumlu | `p1-karisik` | qcomp | `qcomp=1.0` | 1.546 | -0.006 |
+
+Iki adayin da olculdugu hucre 1; hucre basina dusuk MAE'yi veren aday: `qcomp` 1.
+
+Hangi adayin kazandigi tek basina bir sey soylemez: kazanc, kapatilmasi
+istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede
+`MAE(verilen) - MAE(harita)`; kazanc, `MAE(taban) - MAE(en iyi aday)`.
+
+| Yazilim kolu | Pencere | K1 acigi (pp) | En iyi aday | Kazanc (pp) | Acigin kapanan orani |
+|--------------|---------|---------------|-------------|-------------|----------------------|
+| uyumlu | `p1-karisik` | +0.261 | qcomp | +0.006 | 2.3% |
+
+Olculen 1 hucrenin 1 tanesinde en iyi aday tabani
+gecti; gorulen en buyuk kazanc 0.006 pp.
+Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama
+pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite
+kapisi bu sayfada karari veren yerdir, bu tablo degil.
+
 ## K5 ve K6 — kalite kazanci ve hedef boyut
 
 Kapi (olcumden once): p10 kazanci `>= +0,50`, en kotu sahne kazanci
