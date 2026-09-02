@@ -1,7 +1,11 @@
 # Tepe-tavan egrisi (T108)
 
-Durum: donanim izgarasi (60 hucre) tamam, yazilim izgarasi kosuyor.
-Olculen commit: `0d34f08` (dal `T108-tepe-egrisi`).
+Durum: donanim izgarasi (60 hucre) tamam, VBV blogu (10 hucre) tamam,
+yazilim izgarasi kosuyor (12 hucrenin 3'u icerde).
+
+Olculen commit: `0d34f08` (dal `T108-tepe-egrisi`). `tools/tepe-egrisi` o commit'ten
+sonra yalnizca **kosum tarafinda** degisti (cikis kodunun kaydi, `-nostdin`, yeniden
+deneme); `src/VidShrink.Core` tarafinda izgarayi ureten kod hic degismedi.
 
 ## Olcum duzenegi
 
@@ -305,3 +309,154 @@ Boyutun tepeyle **tek yonlu gitmedigi** satir sayisi: 20 satirin **12'si**. Tepe
 buyutmek dosyayi tek yonlu buyutmuyor.
 
 "Uc degerin ucu de hedefin altinda" turu bir cumle bu izgaradan yazilamaz.
+
+## K5 — VBV ara degerleri
+
+T98'in K5'i CRF yolunda VBV'yi **var/yok** olarak olcmustu. Bu tur araya deger koydu:
+ayni CRF'te tepe carpani `yok, 1,10, 1,25, 1,50, 2,00`.
+
+Kosum: libx265 `medium`, CRF 23, hedef bit hizi 8138k, 1920x1080@60 HDR PQ, 20 sn.
+**T98 bu blogu libx264 ile olcmustu; bu blok libx265.** Sayilar dogrudan
+karsilastirilamaz, yon karsilastirilabilir.
+
+| kaynak | tepe | teslim MiB | hedef orani | mean | p10 |
+|---|---|---:|---:|---:|---:|
+| hareketli | yok | 21,5117 | 1,0869 | 74,0004 | 68,9083 |
+| hareketli | 1,10 | 21,2075 | 1,0715 | 73,6632 | 67,9308 |
+| hareketli | 1,25 | 21,7557 | 1,0992 | 74,1964 | 69,2146 |
+| hareketli | 1,50 | 21,7557 | 1,0992 | 74,1964 | 69,2146 |
+| hareketli | 2,00 | 21,7557 | 1,0992 | 74,1964 | 69,2146 |
+| durgun | yok | 1,0147 | 0,0513 | 90,9122 | 90,4697 |
+| durgun | 1,10 | 1,0140 | 0,0512 | 90,9123 | 90,4609 |
+| durgun | 1,25 | 1,0140 | 0,0512 | 90,9123 | 90,4609 |
+| durgun | 1,50 | 1,0140 | 0,0512 | 90,9123 | 90,4609 |
+| durgun | 2,00 | 1,0140 | 0,0512 | 90,9123 | 90,4609 |
+
+**VBV 1,25'in ustunde baglamiyor.** Hareketli kaynakta 1,25 / 1,50 / 2,00 hucreleri
+bayt bayt ayni dosyayi veriyor. Ara deger arayisi bu yuzden yalnizca `yok`, `1,10` ve
+`>=1,25` olmak uzere uc noktaya iniyor.
+
+**Durgun kaynakta VBV hic baglamiyor.** CRF 23 bu klipte ~1 MiB uretiyor, hedefin
+%5'i; besinin de p10'u 90,46 civarinda ve fark 0,009. Bu satirlardan VBV hakkinda
+sonuc cikarilamaz.
+
+**T98'in yonu yalnizca dar VBV'ye karsi tekrarliyor.** Hareketli kaynakta:
+
+| karsilastirma | boyut | p10 |
+|---|---:|---:|
+| yok − 1,10 | +0,3042 MiB (+%1,43) | +0,9775 |
+| yok − 1,25 | −0,2440 MiB (−%1,12) | −0,3063 |
+| (T98, libx264) yok − var | +0,5810 MiB (+%3,9) | +0,5990 |
+
+Dar VBV'ye (1,10) karsi T98'in isareti tekrarliyor: VBV'yi kaldirmak dosyayi buyutuyor
+ve p10'u yukseltiyor. Gevsek VBV'ye (>=1,25) karsi **isaret donuyor** — VBV'siz dosya
+daha kucuk ve p10 daha dusuk. Yani "VBV kaldirilinca p10 artar" tek yonlu bir kural
+degil; baglayip baglamadigina bagli. libx265'te VBV'yi acmak, baglamasa bile hiz
+denetimi yolunu degistiriyor.
+
+**Sozlesme metnindeki ozet ters.** T108 sozlesmesinin K5 girisi "VBV p10'da +0,599
+kazandiriyor ... ama ayni CRF'te dosya %3,9 buyuyor" diyor. T98'in kendi tablosu
+(`tepe-tavani-ve-psy.md`, K5) VBV'siz 15,3120 MiB / p10 85,5980, VBV'li 14,7310 MiB /
+p10 84,9990 veriyor; yani **+0,599 ve +%3,9'un ikisi de VBV'yi kaldirmanin** sonucu.
+T98'in kendi cumlesi dogru, ozetleyen cumle yon degistirmis.
+## K6 — sabit basina karar
+
+Hicbir tepe sabiti degismedi. Gerekce yanindaki cumle degisti
+(`FfmpegArguments.cs`, `WidePeakFactor`'un ustundeki blok, commit `8eb243d`).
+
+| Sabit | Karar | Dayanak |
+|---|---|---|
+| `TightPeakFactor` = 1,02 | **olculdu, degismedi** | 60 hucrenin 20'sinde en dar tepe; boyut faydasi yalnizca 2,600 oraninda var (1,0351 karsi 1,1116), 4,636'da kayboluyor |
+| `HardwarePeakCeiling` = 1,10 | **olculdu, degismedi** | 1,50 hareketli kaynakta 4,636 ve 7,500'de en iyi p10'u veriyor, 10,236 ve 16,000'de 1,10'un altinda kaliyor; tek yonlu bir tavan cikmiyor |
+| `PeakOpensAtFloorRatio` = 6,0 | **olculdu, degismedi** | acilma noktasinin altinda (2,600 ve 4,636) kazanc en buyuk, ustunde soniyor — yani esik ters yerde; ama duzeltmesi taban orani ekseninde degil |
+| `PeakWidestAtFloorRatio` = 11,4 | **olculdu, degismedi** | 10,236 ve 16,000 oranlarinda p10 yayilimi 0,07-2,65; en genis noktada acmanin karsiligi yok |
+| `WidePeakFactor` = 1,5 | **olculdu, degismedi** | yazilim yolunda tepe carpani ne boyutu ne p10'u oynatiyor (bkz. K2) |
+| `BufferFactor` | **olculmedi** | her hucrede `bufsize` tepeyle birlikte oynadi; buffer'in payini tepeninkinden ayiran hucre yok |
+
+**Neden sabit degismedi.** Iki neden var ve ikisi de olcumden bagimsiz:
+
+1. Olcumun istedigi girdi **kaynagin hareketliligi**; `PeakRateFactor(codec,
+   videoBitrateK, width, height, fps)` bu sayiyi hic almiyor. Taban orani ekseninde
+   esigi asagi cekmek de yukari itmek de yanlis ekseni ayarlamak olur.
+2. Egri `tests/VidShrink.Tests/HardwareRateControlTests.cs:122-141`'de bes taban
+   oraninda pinli ve **o dosya bu sozlesmenin `owns`'unda degil**. Sabiti degistirmek
+   o dosyayi da degistirmeyi gerektirir.
+
+Sabitin degismesi icin gereken degisiklik yazili duruyor; ayri bir tur ister.
+
+## K7 — mutasyon kaniti
+
+Bu turda degisen tek sabit `SceneMapThresholdOfRecord` -> `SceneMapRuleOfRecord`
+(commit `b0f1aca`). Mutasyon iddiasi kaynak metni degil **davranisi** olcuyor: ayni
+adaylardan turetilen kesim listesi iki kez uretilip karsilastiriliyor.
+
+- `Kayitli_kuralin_yuku_tasiyan_sayilari_bolusu_degistiriyor` — on `Assert.NotEqual`:
+  Offset ±0,01, Slope ±0,10, NeighbourhoodSeconds ±5,0, Percentile ±0,02 (durgun
+  profilde), Ceiling ±0,01 (hareketli profilde). Her sayi **iki yonde** kiriliyor.
+- `Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor` — Floor 0,06 ve 0,04 iki profilde de
+  kesim listesini degistirmiyor. Bu bir test acigi degil **esdeger mutasyon**:
+  `Offset + Slope x agitation >= Offset = 0,08 > Floor = 0,05`, yani taban hicbir
+  girdide baglayamiyor. Olcu bunu iddia olarak yaziyor.
+- `Turetilen_haritanin_NaN_esigi_ust_sinira_sizmiyor` — `Threshold = NaN` tasiyan
+  turetilmis haritada ust sinirin NaN olmadigi, 6,0 kaldigi ve `-g`'nin 360 ciktigi.
+
+`Skip` yok, ffmpeg yoklugunda sessiz erken donus yok, iki sabiti karsilastiran iddia yok.
+
+Tepe sabitlerinden hicbiri degismedigi icin onlar icin mutasyon kaniti **gerekmedi**.
+
+## K8 — olculmeyenler
+
+- `BufferFactor`'un tepe carpanindan ayrisan etkisi.
+- T98'in K6 klibinin kimligi. `parca-1/2/3` elendi (olculdu); dogru klip bulunamadi.
+- T98 ile aramizdaki 29 puanlik seviye farkinin klip disindaki bir nedeni. Alet farki
+  elendi (olculdu, 0,6 puan).
+- Yazilim yolunda ikinci bir kodlayici (`libsvtav1`).
+- 1920x1080@60 disinda bir yerlesim. Butun izgara tek yerlesimde.
+- Ses tasiyan kaynak. Her satir tek video akisi.
+- Hareketlilik ile kazanc arasindaki iliskinin **fonksiyonel bicimi**. Iki kaynak iki
+  uc nokta veriyor; aradaki egri olculmedi.
+- Dusen hucrenin kendi cikis kodu (bkz. sessiz cikis bolumu).
+
+## Kosum kapisi — `tools/ci-gibi-kos.sh` atlananlari
+
+`ci-gibi-kos.sh` PATH'ten ffmpeg'i siliyor; orada yesil goruna `[FfmpegFact]` hicbir sey
+kanitlamaz. Bu yuzden atlananlar sayildi.
+
+Kosum: `.calisma/t108/ci-gibi2.log`, cikis 0.
+**Basarili 1070, atlanan 105, toplam 1175**, sure 31 dk 56 sn.
+
+Atlananlarin dosya kirilimi (ilk besi): FrameGrabberTests 22, QualityMeterTests 13,
+PanelHostTests 11, ComplexityProbeTests 7, SegmentEncoderTests 6.
+
+`FfmpegArgumentsTests`'ten atlanan **iki** test var:
+
+- `Uzun_ust_sinir_kesimsiz_kaynakta_daha_az_anahtar_kare_uretir`
+- `Sahne_kesimi_ust_sinirin_izin_verdiginden_cok_I_kare_yerlestirir`
+
+**Bu sozlesmenin kabul kriteri olculerinin hicbiri o listede degil.** Tek tek arandi:
+`Kayitli_kuralin_yuku_tasiyan_sayilari_bolusu_degistiriyor`,
+`Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor`,
+`Turetilen_haritanin_NaN_esigi_ust_sinira_sizmiyor`,
+`Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir`,
+`Yazilim_kodlayicisinda_tepe_carpani_genis_kalir` — besi de ffmpeg'siz ortamda kosup
+gecti, atlanmadi.
+
+Izgaranin kendisi zaten test degil; `tools/tepe-egrisi` gercek ffmpeg ile kosuyor.
+
+## Yan bulgular (owns disi, rapora)
+
+- **`HardwareRateControlTests.cs:122-141`** tepe egrisini bes oranda sabit sayilarla
+  pinliyor. Egriyi olcuye gore degistirecek her tur bu dosyaya da dokunmak zorunda.
+- **T108 sozlesmesinin K5 girisi T98'in kendi tablosunu ters ozetliyor.** Sozlesme
+  "VBV p10'da +0,599 kazandiriyor ... ama ayni CRF'te dosya %3,9 buyuyor" diyor.
+  T98'in tablosu (`tepe-tavani-ve-psy.md`, K5) bunun tersini soyluyor: VBV'siz
+  15,3120 MiB / p10 85,5980, VBV'li 14,7310 MiB / p10 84,9990 — yani **+0,599 ve
+  +%3,9'un ikisi de VBV'yi kaldirmanin** sonucu. T98'in kendi cumlesi dogru
+  ("kaldirinca p10 +0,599 geliyor"); ozetleyen cumle yon degistirmis.
+- **`FfmpegArgumentsTests.cs:408` kaynak-metin pimi.** T113 dalinda
+  `_encoders` -> `_encoders, _sceneMap?.Map` olarak guncellenmis. Iki metin de
+  okundu: iddia (`_encoders`in cagriya gectigi) her ikisinde de duruyor, yalniz
+  cagri imzasi genislemis. Benim dalimda pim `origin/main`deki haliyle duruyor ve
+  yesil. Birlesmede bu satirda catisma cikarsa **T113'un tarafi alinmali** — degisikligi
+  doguran davranis onun diffinde.
+
