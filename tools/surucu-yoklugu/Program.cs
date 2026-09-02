@@ -67,7 +67,8 @@ public static class Program
         {
             var has = caps.HasEncoder(codec);
             var probe = caps.Probe(codec);
-            Console.WriteLine($"{codec,-14} {has,-11} {probe.Succeeded,-15} {probe.State,-12} {probe.ElapsedMs}");
+            var works = caps.WorksAsEncoder(codec);
+            Console.WriteLine($"{codec,-14} {has,-11} {works,-15} {probe.State,-12} {probe.ElapsedMs}");
         }
     }
 

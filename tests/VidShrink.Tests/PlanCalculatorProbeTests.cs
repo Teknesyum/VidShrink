@@ -407,10 +407,48 @@ public sealed class PlanCalculatorProbeTests
     /// gercek yazilim yoklamasi <c>UnsettledProbeMs</c> esiginin altinda kaliyor, dolayisiyla
     /// gecit onu <b>yerlesmis ve calisiyor</b> saymak zorunda.
     /// </summary>
+    /// <summary>
+    /// T137 tur 2 / T9. <see cref="TheRealSoftwareProbeDurationIsMeasured"/> ffmpeg'siz
+    /// ortamda hic kosmadan yesil sayiliyordu; iddianin ffmpeg gerektirmeyen yarisi buraya
+    /// alindi ve <b>her kosumda</b> kosuyor. Olculen sey esik ile gecidin karari arasindaki
+    /// bag: esigin altinda kalan yoklama yerlesmis ve okunabilir, esigin ustundeki
+    /// yerlesmemis ve olcum sayilmiyor. Sinir <c>ProbeKillMs</c> degil
+    /// <c>UnsettledProbeMs</c>; ikisi arasindaki ucurum eski iddiayi mutasyona dayanikli
+    /// yapiyordu.
+    /// </summary>
+    [Fact]
+    public void TheGateSettlesOnTheMeasuredDurationNotTheKillLimit()
+    {
+        var esik = MainWindow.DeferredEncoderAvailability.UnsettledProbeMs;
+        var hizli = new MainWindow.DeferredEncoderAvailability(
+            new RecordingAvailability(TimeSpan.Zero, _ => true), () => { });
+        var yavas = new MainWindow.DeferredEncoderAvailability(
+            new RecordingAvailability(TimeSpan.FromMilliseconds(esik + 300), _ => true), () => { });
+
+        Drain(hizli, "av1_nvenc");
+        Drain(yavas, "av1_nvenc");
+
+        Assert.InRange(hizli.ElapsedMsFor("av1_nvenc"), 0, esik - 1);
+        Assert.True(yavas.ElapsedMsFor("av1_nvenc") >= esik,
+            $"yavas yoklama esigin altinda kaldi: {yavas.ElapsedMsFor("av1_nvenc")} ms");
+
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.Working, hizli.AnswerFor("av1_nvenc"));
+        Assert.Equal(MainWindow.DeferredEncoderAvailability.ProbeAnswer.Unsettled, yavas.AnswerFor("av1_nvenc"));
+
+        Assert.True(hizli.IsMeasured("av1_nvenc"), "esigin altindaki yoklama olcum sayilmali");
+        Assert.False(yavas.IsMeasured("av1_nvenc"), "esigin ustundeki yoklama olcum sayilmamali");
+    }
+
     [Fact]
     public void TheRealSoftwareProbeDurationIsMeasured()
     {
-        if (!ToolLocator.IsAvailable(out _)) return;
+        if (!ToolLocator.IsAvailable(out _))
+        {
+            WriteEvidence($"{nameof(TheRealSoftwareProbeDurationIsMeasured)}: ATLANDI — ffmpeg yok, " +
+                          "gercek yoklama iddiasi kosmadi; ffmpeg gerektirmeyen karsiligi " +
+                          $"{nameof(TheGateSettlesOnTheMeasuredDurationNotTheKillLimit)}");
+            return;
+        }
 
         var gate = new MainWindow.DeferredEncoderAvailability(FreshCapabilities(), () => { });
         Assert.False(gate.IsMeasured("libsvtav1"));
