@@ -136,6 +136,7 @@ public static class PlanCalculator
     {
         var probe = new ProbeState();
         var result = BuildDetailedCore(info, options, profile, availability, probe);
+        result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
     }
 
@@ -146,6 +147,13 @@ public static class PlanCalculator
     private sealed class ProbeState
     {
         internal bool NotMeasured;
+
+        /// <summary>
+        /// İşaretin dar hâli: <b>kodlayıcı seçimi</b> ölçülmemiş bir adaydan geldi.
+        /// <see cref="NotMeasured"/> HDR yolunun ölçülmemişliğini de topladığı için
+        /// "seçilen kodek geçici mi" sorusunun cevabı ayrı taşınıyor.
+        /// </summary>
+        internal bool CodecNotMeasured;
     }
 
     private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
@@ -881,12 +889,17 @@ public static class PlanCalculator
         if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
         if (availability is null) return preferred;
         if (!availability.HasEncoder(preferred)) return FallbackCodecFor(pref);
-        if (availability is IEncoderMeasurementState state && !state.IsMeasured(preferred))
+        var state = availability.KnownState(preferred);
+        if (state == EncoderProbeState.Unmeasured)
         {
-            if (probe is not null) probe.NotMeasured = true;
+            if (probe is not null)
+            {
+                probe.NotMeasured = true;
+                probe.CodecNotMeasured = true;
+            }
             return preferred;
         }
-        if (availability.WorksAsEncoder(preferred)) return preferred;
+        if (state == EncoderProbeState.Working) return preferred;
         return FallbackCodecFor(pref);
     }
 
@@ -898,15 +911,16 @@ public static class PlanCalculator
     private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
-        var state = availability as IEncoderMeasurementState;
         foreach (var candidate in FastHardwareOrder)
         {
-            if (state is not null && !state.IsMeasured(candidate))
+            var state = availability.KnownState(candidate);
+            if (state == EncoderProbeState.Unmeasured)
             {
                 probe.NotMeasured = true;
+                probe.CodecNotMeasured = true;
                 return candidate;
             }
-            if (availability.WorksAsEncoder(candidate)) return candidate;
+            if (state == EncoderProbeState.Working) return candidate;
         }
         return FallbackCodecFor(pref);
     }

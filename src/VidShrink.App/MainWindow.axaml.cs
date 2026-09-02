@@ -1484,6 +1484,20 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Yoklamanın "bu makinede donanım kodlayıcı var" cevabı. Plandaki kodlayıcı adı tek
+    /// başına yetmez: <see cref="PlanCalculator"/> ölçülmemiş bir adayı geçici cevap olarak
+    /// da döndürebiliyor ve o cevap ölçülmüş bir evet gibi okunursa sürücüsüz makine
+    /// hızlı kipi açık görüyor. Geçici cevap bu yüzden aynı gövdenin çalıştırdığı gerçek
+    /// yoklamayla doğrulanır; ölçülmüş bir seçim yeniden sınanmaz.
+    /// </summary>
+    internal static bool HardwareAvailableFrom(EncodePlan plan, EncoderProbeResult probe)
+        => CodecModel.IsHardware(plan.Codec)
+           && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
+
+    /// <summary>Ölçü için: yoklamanın arayüze taşıdığı donanım cevabı.</summary>
+    internal bool HardwareEncoderAvailable => _hardwareEncoderAvailable;
+
     private async Task ProbeHardwareEncodersAsync()
     {
         var available = false;
@@ -1500,7 +1514,7 @@ public partial class MainWindow : Window
                 var plan = PlanCalculator.Build(HardwareProbeSource, options, capabilities);
                 var probe = capabilities.Probe(plan.Codec);
                 var decision = HardwareVerdict.Decide(probe, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
-                return ((IEncoderAvailability?)capabilities, CodecModel.IsHardware(plan.Codec), decision);
+                return ((IEncoderAvailability?)capabilities, HardwareAvailableFrom(plan, probe), decision);
             });
         }
         catch (Exception ex)

@@ -26,6 +26,9 @@ public sealed class EncoderAvailabilityTests
             return _works.Contains(codec);
         }
 
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+
         public int YoklamaSayisi(string codec) => _yoklama.TryGetValue(codec, out var n) ? n : 0;
     }
 

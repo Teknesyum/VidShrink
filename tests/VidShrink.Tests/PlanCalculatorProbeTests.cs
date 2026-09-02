@@ -83,6 +83,9 @@ public sealed class PlanCalculatorProbeTests
             return _works(codec);
         }
 
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+
         public string? Hdr10PixelFormat(string codec)
         {
             Record($"hdr10:{codec}");
