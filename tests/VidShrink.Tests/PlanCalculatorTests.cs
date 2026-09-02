@@ -405,7 +405,15 @@ public sealed class PlanCalculatorTests
         => ComplexityProfile.FromProbe(fullScaleBppf, halfScaleBppf, 6, 288);
 
     private static LayoutScoreParts ScoreAt(ComplexityProfile complexity, int width, int height, double videoK)
-        => PlanCalculator.ScoreLayout(complexity, "libsvtav1", videoK, width, height, 60.0, 60.0, 1080, CompressionRegime.Aggressive);
+        => ScoreAt(complexity, "libsvtav1", width, height, videoK);
+
+    private static LayoutScoreParts ScoreAt(ComplexityProfile complexity, string codec, int width, int height, double videoK)
+        => PlanCalculator.ScoreLayout(complexity, codec, videoK, width, height, 60.0, 60.0, 1080, CompressionRegime.Aggressive);
+
+    private static LayoutScoreParts[] Ladder(ComplexityProfile complexity, string codec, double videoK)
+        => new[] { (1920, 1080), (1600, 900), (1280, 720), (960, 540) }
+            .Select(l => ScoreAt(complexity, codec, l.Item1, l.Item2, videoK))
+            .ToArray();
 
     [Theory]
     [InlineData(0.08, 0.05)]
@@ -439,6 +447,28 @@ public sealed class PlanCalculatorTests
         for (var i = 1; i < ladder.Length; i++)
             Assert.True(ladder[i].Score < ladder[i - 1].Score,
                 $"Layout {i} scores {ladder[i].Score:0.###} against {ladder[i - 1].Score:0.###} one step above it. At a fixed bitrate the measured grid never rewarded the smaller frame: on the moving source 1920x1080@60 read 45,27 VMAF-NEG against 43,86 at 960x540@60, on the still source 81,29 against 64,30. A score that rises as the frame shrinks is the defect T107 measured.");
+    }
+
+    [Theory]
+    [InlineData(0.08, 0.05)]
+    [InlineData(0.08, 0.11)]
+    public void TheHardwareArmKeepsTheScaleCreditTheSoftwareArmGaveUp(double fullScaleBppf, double halfScaleBppf)
+    {
+        var complexity = GridProfile(fullScaleBppf, halfScaleBppf);
+        const double videoK = 800;
+
+        var hardware = Ladder(complexity, "av1_nvenc", videoK);
+        var software = Ladder(complexity, "libsvtav1", videoK);
+
+        Assert.NotEqual(0.0, complexity.DetailExponent, 3);
+
+        for (var i = 1; i < hardware.Length; i++)
+            Assert.True(hardware[i].Score > hardware[i - 1].Score,
+                $"Hardware layout {i} scores {hardware[i].Score:0.###} against {hardware[i - 1].Score:0.###} one step above it. On av1_nvenc the measured grid at 800k rose as the frame shrank - 1920x1080@60 read 31,842 VMAF-NEG, 1600x900 37,097, 1280x720 38,730, 960x540 40,036 - because the encoder cannot deliver 1080p60 below about 624 kbps. The scale credit is right on this arm and must survive.");
+
+        for (var i = 1; i < software.Length; i++)
+            Assert.True(software[i].Score < software[i - 1].Score,
+                $"Software layout {i} scores {software[i].Score:0.###} against {software[i - 1].Score:0.###} one step above it. On libsvtav1 the same grid fell as the frame shrank (moving source 45,266 at 1920x1080@60 against 43,856 at 960x540@60; still source 81,288 against 64,300). One condition serves both arms, so a change that fixes software by breaking hardware fails here.");
     }
 
     [Fact]
