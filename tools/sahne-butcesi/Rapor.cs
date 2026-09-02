@@ -527,35 +527,47 @@ public static class Rapor
         var satirlar = new List<string>();
         var enBuyukKayip = 0.0;
         var karsilastirilan = 0;
+        var kazanciAsan = 0;
         foreach (var g in hepsi.Where(x => x.K.Bilinmiyor is null).GroupBy(x => (x.Arm, x.K.Pencere)))
         {
             var dogru = k5.Kayitlar.FirstOrDefault(x =>
                 x.Arm == g.Key.Arm && x.K.Pencere == g.Key.Pencere && x.K.Kol == "dagitim")?.K;
+            var taban = k5.Kayitlar.FirstOrDefault(x =>
+                x.Arm == g.Key.Arm && x.K.Pencere == g.Key.Pencere && x.K.Kol == "taban")?.K;
             if (dogru?.VmafP10 is null) continue;
+            double? kazanc = taban?.VmafP10 is null ? null : dogru.VmafP10.Value - taban.VmafP10.Value;
             foreach (var (_, bozuk) in g)
             {
                 if (bozuk.VmafP10 is null) continue;
                 karsilastirilan++;
-                var d = bozuk.VmafP10.Value - dogru.VmafP10.Value;
-                enBuyukKayip = Math.Min(enBuyukKayip, d);
+                var kayip = dogru.VmafP10.Value - bozuk.VmafP10.Value;
+                enBuyukKayip = Math.Max(enBuyukKayip, kayip);
+                var asiyor = kazanc is not null && kayip > kazanc.Value;
+                if (asiyor) kazanciAsan++;
                 satirlar.Add($"| {g.Key.Arm} | `{g.Key.Pencere}` | {bozuk.Kol} | " +
-                             $"{Kabuk.Inv(d, "+0.000;-0.000;0.000")} |");
+                             $"{Kabuk.Inv(kayip, "+0.000;-0.000;0.000")} | " +
+                             $"{(kazanc is null ? "**bilinmiyor**" : Kabuk.Inv(kazanc.Value, "+0.000;-0.000;0.000"))} | " +
+                             $"{(kazanc is null ? "**bilinmiyor**" : asiyor ? "**evet**" : "hayir")} |");
             }
         }
-        sb.AppendLine("### Bozuk harita − dogru harita (p10)");
+        sb.AppendLine("### Bozuk haritanin bedeli, K5 kazanciyla yan yana");
         sb.AppendLine();
-        sb.AppendLine("Karsilastirma tabani, ayni yazilim kolunda ayni pencerenin **dogru");
-        sb.AppendLine("haritayla** dagitimli kosumudur (K5'in `dagitim` kolu).");
+        sb.AppendLine("Kapi (`ESIKLER.md`): bozuk haritayla olculen p10 **kaybi**, K5'te olculen");
+        sb.AppendLine("p10 **kazancindan** buyukse dagitim koda girmez. Kayip = ayni kolda ayni");
+        sb.AppendLine("pencerenin dogru haritali `dagitim` kosumu eksi bozuk kosum; kazanc = ayni");
+        sb.AppendLine("hucrenin K5'teki `dagitim` eksi `taban` farki. Sabit bir kayip esigi yok;");
+        sb.AppendLine("olcu kendi hucresinin kazancidir.");
         sb.AppendLine();
-        sb.AppendLine("| Yazilim kolu | Pencere | Bozulma | Δ p10 |");
-        sb.AppendLine("|--------------|---------|---------|-------|");
+        sb.AppendLine("| Yazilim kolu | Pencere | Bozulma | p10 kaybi | ayni hucrenin K5 kazanci | kayip kazanci asiyor mu |");
+        sb.AppendLine("|--------------|---------|---------|-----------|--------------------------|-------------------------|");
         foreach (var x in satirlar) sb.AppendLine(x);
         sb.AppendLine();
         var ozet = $"karsilastirilan {karsilastirilan} kosum, en buyuk p10 kaybi " +
-                   $"{Kabuk.Inv(enBuyukKayip, "0.000")} puan";
+                   $"{Kabuk.Inv(enBuyukKayip, "0.000")} puan, kaybi kendi hucresinin " +
+                   $"K5 kazancini asan {kazanciAsan} kosum";
         sb.AppendLine($"**Bozuk haritanin bedeli**: {ozet}.");
         sb.AppendLine();
-        return new AbSonuc(enBuyukKayip >= -0.30, hepsi, ozet);
+        return new AbSonuc(karsilastirilan > 0 && kazanciAsan == 0, hepsi, ozet);
     }
 
     private static void Tablo(StringBuilder sb, IReadOnlyList<Satir> kayitlar)
