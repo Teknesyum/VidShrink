@@ -65,6 +65,66 @@ tespitidir; düzeltmek bu sözleşmenin işi değil.
        [t][r]libvmaf=model=version=vmaf_v0.6.1neg:n_threads=4:log_fmt=json:log_path=vmaf/<ad>-kilitli.json" \
       -f null -
 
+### Betiklerin tam gövdesi
+
+Aşağıda `./uret.sh`, `./hb.sh`, `./olc.sh`, `oz.py` diye kısaltılan çağrılar
+`.calisma/t120/` altındaydı. **O klasör git dışıdır ve iş bitince silindi**, yani
+denetçi onu göremez. Rapora giren her sayının komutu belgede kalsın diye
+gövdeler burada; tablolardaki kısaltmalar bunlarla birebir açılır.
+`olc.sh`'nin gövdesi yukarıdaki ölçüm grafiğinin kendisidir.
+
+`uret.sh <ad> <preset> <g> "<svtav1-params>" <kbps>` — iki geçişli SVT-AV1:
+
+    SRC="gui/parca-2.mkv"
+    PSY="tune=0:enable-variance-boost=1:variance-boost-strength=2:lp=4"
+    COL="-color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc"
+    name="$1"; preset="$2"; gop="$3"; kf="$4"; br="$5"
+    if [ -n "$kf" ]; then SP="${kf}:${PSY}"; else SP="$PSY"; fi
+    tmp="ciktilar/.${name}.yaziliyor.mp4"; rm -f "$tmp"
+    for p in 1 2; do
+      if [ "$p" = 1 ]; then extra=(-an -f null NUL)
+      else extra=(-c:a aac -b:a 128k -movflags +faststart "$tmp"); fi
+      ffmpeg -hide_banner -loglevel error -y -nostdin -threads 4 -i "$SRC" \
+        -c:v libsvtav1 -preset "$preset" -b:v "${br}k" -pass $p \
+        -passlogfile "log/${name}" -g "$gop" -pix_fmt p010le \
+        -svtav1-params "$SP" $COL "${extra[@]}" \
+        || { echo "HATA $name pass$p"; return; }
+    done
+    mv -f "$tmp" "ciktilar/${name}.mp4" || { echo "HATA $name tasima"; return; }
+    echo "bitti $name $(stat -c %s "ciktilar/${name}.mp4")"
+
+**Boyut, kodlayıcının çıkış kodu beklenmeden okunmuyor.** İki geçiş de ayrı ayrı
+denetleniyor; ikinci geçiş geçici bir dosyaya yazıyor ve `mv` ancak `ffmpeg` sıfır
+dönerse çalışıyor. Yani `stat` her zaman tamamlanmış bir dosyayı okuyor, yarım
+yazılmış bir dosyayı değil.
+
+`hb.sh <ad> <kbps>` — HandBrakeCLI rakibi:
+
+    HandBrakeCLI -i "gui/parca-2.mkv" -o "$tmp" \
+      -e x265_10bit --encoder-preset slow --encopts "pools=4" \
+      -b "$br" --multi-pass --turbo \
+      -E ca_aac -B 128 --mixdown stereo \
+      -w 1920 -l 1080 --crop-mode none -r 60 --cfr \
+      -f av_mp4 -O >"log/${name}.log" 2>&1 || { echo "HATA $name"; exit 1; }
+    mv -f "$tmp" "ciktilar/${name}.mp4" || { echo "HATA $name tasima"; exit 1; }
+
+`oz.py` — tablolardaki beş sayının tanımı. Ortalama, p10 (doğrusal aradeğerli
+yüzdelik), harmonik ortalama, en düşük kare, `<1` kare sayısı:
+
+    fr = json.load(fh)["frames"]
+    s = [f["metrics"].get("vmaf", f["metrics"].get("vmaf_neg")) for f in fr]
+    s = [x for x in s if x is not None]
+    srt = sorted(s); r = 0.10 * (len(srt) - 1)
+    lo, hi = int(r // 1), int(-(-r // 1))
+    p10 = srt[lo] if lo == hi else srt[lo] + (srt[hi] - srt[lo]) * (r - lo)
+    harm = len(s) / sum(1.0 / max(x, 1.0) for x in s)
+    return len(s), sum(s)/len(s), p10, harm, min(s), sum(1 for x in s if x < 1.0)
+
+`tablo.py` aynı `stat` gövdesini kullanıp satırı markdown olarak basar; boyut
+sütunu `os.path.getsize("ciktilar/<ad>.mp4")`. `fark.py` (yalnız K5'te) T111'in
+arşivindeki kilitli/kilitsiz çiftini kare kare çıkarır ve kareleri
+`0-1700 / 1701-3411 / 3412-son` diye üç bloğa ayırır.
+
 **Bu belgede kilitsiz sayı yok.** Sözleşme kilitsiz ölçümü geçersiz sayıyor;
 tablolarda yalnız kilitli sayılar var.
 
@@ -616,7 +676,7 @@ Bu belgeye giren her sayı yukarıdaki komutlardan çıktı. Aşağıdakiler **b
   kesmeli, daha hareketli, SDR, düşük kare hızlı — aynı işaretin çıkacağı
   ölçülmedi. K2'nin "geçtik" cümlesi bu kaynak için doğrudur, genel bir iddia
   değildir.
-- **Süre.** Makine paylaşımlıydı, on ajan koşuyordu. Bu belgede hiçbir süre
+- **Süre.** Makine paylaşımlıydı, dokuz ajan koşuyordu. Bu belgede hiçbir süre
   sayısı yok; kodlama ya da ölçüm hızı hakkında hiçbir şey söylenmiyor.
 - **Kilitsiz sayılar.** Sözleşme geçersiz saydığı için üretilmedi. K5'in
   kilitli/kilitsiz karşılaştırması yalnız T111'in arşivinden okundu, yeni
