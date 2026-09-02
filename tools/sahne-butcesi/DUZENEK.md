@@ -182,3 +182,25 @@ p10 kaybi, band asimi ve K7 bedeli sartlarini tek tek bozar; her birinde karar
 Fikstur sayilari uydurmadir ve rapora girmez; olculen sey kapinin ayirt edip
 etmedigidir. Senaryo tablosu `.calisma/T114/kapi-denemesi.csv`, rapora
 "Karari veren kodun kendisi olculdu" basligi altinda girer.
+
+## Yarim kalan kodlama tam sanilir
+
+Kosum bir kez disaridan durduruldu; o anda `plan-yedek-p3-hareketli.mkv`
+yaziliyordu ve 20 MB'da kaldi (tamami ~60 MB). Duzenek "cikti varsa yeniden
+kodlama" diye baktigi icin, yeniden baslatilsa bu yarim dosyayi tam sayip
+`verilen` paylarini ondan cikaracakti. Referans sahnelerinde bedeli daha
+agir: dosya uzunlugu dogrudan `hak edilen`e giriyor.
+
+Iki onlem:
+
+1. **Atomik yazim.** Hem plan hem referans kodlamalari `<ad>.yarim.mkv`e
+   yazilir, ffmpeg sifir donerse `File.Move` ile yerine gecer. Yarida kesilen
+   kosum ardinda yalniz `.yarim.mkv` birakir; onu kimse tam saymaz.
+2. **Sure denetimi.** Her referans sahnesi, var olanlar dahil, `ffprobe` ile
+   olculur; suresi haritadaki sahne suresinden 0,5 sn'den fazla saparsa
+   `bilinmiyor` yazilir, bit sayisina girmez.
+
+Onlem oncesi uretilmis dosyalar geriye donuk denetlendi: 102 referans
+sahnesinin (maks 36, uyumlu 36, yedek 30) sapani yok; 14 plan/aday
+ciktisinin suresi de pencere suresiyle birebir. Kesilen tek dosya silinip
+yeniden kodlandi.

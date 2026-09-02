@@ -130,12 +130,30 @@ public static class Program
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
                 case "k4b": await K4bAsync(p); break;
+                case "kalite": await KaliteAsync(p); break;
                 case "plan": await PlanYazAsync(p); break;
                 case "dogrula": if (!await DogrulaAsync(p)) return 1; break;
                 default: Console.Error.WriteLine($"bilinmeyen komut: {komut}"); return 2;
             }
         }
         return 0;
+    }
+
+    private static async Task KaliteAsync(Pencere p)
+    {
+        var cikti = Yol($"plan-{Kol}-{p.Ad}.mkv");
+        if (!File.Exists(cikti)) { Console.WriteLine($"{Kol}/{p.Ad}: kalite atlandi — plan ciktisi yok"); return; }
+        try
+        {
+            var skor = await QualityMeter.MeasureAsync(Kaynak(p), cikti);
+            Console.WriteLine($"{Kol}/{p.Ad}: vmaf={Kabuk.Inv(skor.VmafNegMean ?? double.NaN, "0.000")} " +
+                              $"p10={Kabuk.Inv(skor.VmafNegP10 ?? double.NaN, "0.000")} min={Kabuk.Inv(skor.VmafNegMin ?? double.NaN, "0.000")} " +
+                              $"enkotu={Kabuk.Inv(skor.VmafNegWorstScene ?? double.NaN, "0.000")}");
+        }
+        catch (QualityMeasurementFailedException ex)
+        {
+            Console.WriteLine($"{Kol}/{p.Ad}: BILINMIYOR — {ex.Message}");
+        }
     }
 
     private static async Task K4bAsync(Pencere p)
@@ -404,6 +422,8 @@ public static class Program
             var cikti = Path.Combine(refDir, $"sahne-{i:D3}.mkv");
             if (!File.Exists(cikti))
             {
+                var yarim = cikti + ".yarim.mkv";
+                if (File.Exists(yarim)) File.Delete(yarim);
                 var argv = new List<string>
                 {
                     "-hide_banner", "-v", "error", "-y",
@@ -419,13 +439,27 @@ public static class Program
                     "-pix_fmt", plan.PixelFormat
                 });
                 argv.AddRange(IsParcacigiArgs(plan.Codec));
-                argv.AddRange(new[] { "-threads", Threads.ToString(CultureInfo.InvariantCulture), cikti });
+                argv.AddRange(new[] { "-threads", Threads.ToString(CultureInfo.InvariantCulture), yarim });
                 var r = Kabuk.Kos(ToolLocator.Ffmpeg, argv);
                 if (r.TimedOut || r.Code != 0)
                 {
                     bilinmiyor.Add($"referans sahne {i}: {(r.TimedOut ? "zaman asimi" : r.StdErr)}");
                     continue;
                 }
+                if (!File.Exists(yarim))
+                {
+                    bilinmiyor.Add($"referans sahne {i}: cikti uretilmedi");
+                    continue;
+                }
+                File.Move(yarim, cikti, true);
+            }
+
+            var sure = Sure(cikti);
+            if (sure is null || Math.Abs(sure.Value - s.Duration) > 0.5)
+            {
+                bilinmiyor.Add($"referans sahne {i}: sure {(sure is null ? "okunamadi" : Kabuk.Inv(sure.Value, "0.000"))}, " +
+                               $"beklenen {Kabuk.Inv(s.Duration, "0.000")} — dosya yarim olabilir");
+                continue;
             }
             refBits[i] = new FileInfo(cikti).Length * 8;
         }
@@ -464,8 +498,10 @@ public static class Program
         return total > 0 ? values.Select(v => v / total).ToArray() : values;
     }
 
-    private static void Kodla(MediaInfo info, EncodePlan plan, SceneMap? map, string cikti, string? zones)
+    private static void Kodla(MediaInfo info, EncodePlan plan, SceneMap? map, string hedefCikti, string? zones)
     {
+        var cikti = hedefCikti + ".yarim.mkv";
+        if (File.Exists(cikti)) File.Delete(cikti);
         var used = plan.Clone();
         if (zones is not null)
         {
@@ -494,6 +530,19 @@ public static class Program
             var r = Kabuk.Kos(ToolLocator.Ffmpeg, a);
             if (r.Code != 0) { Console.Error.WriteLine($"kodlama hata: {r.StdErr}"); return; }
         }
+
+        if (File.Exists(cikti)) File.Move(cikti, hedefCikti, true);
+    }
+
+    public static double? Sure(string dosya)
+    {
+        var (code, text) = Kabuk.Yakala(ToolLocator.Ffprobe, new[]
+        {
+            "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=nw=1:nk=1", dosya
+        });
+        if (code != 0) return null;
+        return double.TryParse(text.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : null;
     }
 
     public static double[] SahneBitleri(string dosya, SceneMap map)
