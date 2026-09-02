@@ -695,6 +695,9 @@ değil, bandın kendisi — beş nokta hedefin iki yanını da kapsıyor.
 | `uzman-hb3` | 1867 kbps | 15 483 689 | **−%0,08** | 95,729 | +0,083 |
 | `uzman-hb2` | 1900 kbps | 15 743 067 | **+%1,59** | 95,743 | +0,097 |
 
+Açık sütunu yuvarlanmamış değerlerden hesaplandı; gösterilen üç haneli
+ortalamaları elle çıkarınca son hanede 0,001 sapma görülebilir.
+
 **Tam eşleşme sağlanmadı; band ±%1,02'den ±%0,48'e daraltıldı.** AV1 tarafında
 hedefe en yakın koşum `uzman-biz7`, −%0,48. Üçüncü tur açılmadı, band burada
 bırakıldı. HandBrake tarafında `uzman-hb3` −%0,08 ile tek denemede tutturdu.
@@ -702,9 +705,10 @@ bırakıldı. HandBrake tarafında `uzman-hb3` −%0,08 ile tek denemede tutturd
 **Kalan sapmanın açığa etkisi ölçüldü, çıkarılmadı.** Aynı ayarlarla üretilmiş
 beş AV1 koşumu %2,91'lik bir boyut aralığına yayılıyor (15 316 867 → 15 767 022);
 bu aralık boyunca kilitli ortalama **0,008** puan, p10 **0,006** puan oynuyor.
-Yani skorun boyuta eğimi bu bandda 0,008 / %2,91 ≈ **puan başına %0,003**.
-`uzman-biz7`'nin kalan %0,48'lik sapmasının açığa katkısı bu eğimle **0,001
-puandan küçük** — uzman açığının +0,43'ü boyut farkından gelmiyor.
+Yani skorun boyuta eğimi bu bandda 0,008 / 2,91 puan yüzdesi ≈ **boyutta her
+%1 için 0,003 puan**. `uzman-biz7`'nin kalan %0,48'lik sapmasının açığa katkısı
+bu eğimle **0,002 puandan küçük** — uzman açığının +0,43'ü boyut farkından
+gelmiyor.
 HandBrake'te aynı hesap: %1,67'lik aralıkta 0,014 puan.
 
 **Açık band boyunca kararlı:** beş koşumun beşinde de +0,429 ile +0,437 arasında.
