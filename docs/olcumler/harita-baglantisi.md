@@ -293,8 +293,11 @@ de yanlış. Düzeltmesi T108'in.
 Her mutasyondan **önce** `dotnet build VidShrink.sln -c Release --no-incremental`,
 sonra `dotnet test … --no-build --filter "EncodeRunnerTests|PreviewSegmentTests|FfmpegArgumentsTests"`.
 Düzenek `.calisma/t113/mutasyon.sh`: yamayı uygular, derler, koşar, kaynağı geri
-alır. Mutasyonsuz taban **93 geçti / 1 kaldı / 0 atlandı / 94 toplam**; kalan tek
-ölçü T108'in `FfmpegArgumentsTests.cs:408` kaynak-metin pimi (§ 8).
+alır. Mutasyonlar koşulurken taban **93 geçti / 1 kaldı / 0 atlandı / 94 toplam**
+idi; kalan tek ölçü `FfmpegArgumentsTests.cs:408` pimiydi ve o pim § 8'de
+düzeltildi. Düzeltmeden sonra aynı süzgeç **94 geçti / 0 kaldı / 0 atlandı**
+veriyor. Mutasyon sonuçları bundan etkilenmiyor: altı mutasyonun hiçbiri o pimi
+kırmıyor, her biri aşağıdaki kendi ölçüsünü kırıyor.
 
 | # | Bozulan bağlantı | Yama | Kırmızıya dönen ölçü |
 | --- | --- | --- | --- |
@@ -336,15 +339,21 @@ kusurun sebebidir: çağıran parametreyi unutunca derleyici susuyor.
 `src/VidShrink.App/Playback/SegmentEncoder.cs:118` onu 6 argümanla çağırıyor ve o
 dosya `owns` dışında.
 
-**T108'in bir ölçüsü bu sözleşme yüzünden kırmızı.**
+**T108'in bir ölçüsünü bu dal kırdı, ve bu dal düzeltti.**
 `FfmpegArgumentsTests.cs:408`, `MainWindow` kaynak metninde
 `BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders));` dizesini
-arıyor; çağrıya `, _sceneMap?.Map` eklenince pim tutmuyor. Dosya T108'in
-`owns`'unda, **dokunulmadı**. Tek satırlık düzeltme:
+arıyordu; çağrıya `, _sceneMap?.Map` eklenince pim tutmadı. Kırmızının sahibi
+arandı ve **kaynağı bu daldı**: `origin/main`de çağrı `MainWindow.axaml.cs:1802`de
+hâlâ `_encoders));` biçiminde ve pim orada tutuyor. Yani bu devralınan bir borç
+değil, bu sözleşmenin ürettiği bir kırılma. Dosya T108'in `owns`'unda olduğu
+için **T0'ın açık talimatıyla** tek satır düzeltildi:
 
 ```csharp
 Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", \"mp4\"), _encoders, _sceneMap?.Map));", windowSource);
 ```
+
+Pimin iddiası değişmedi — aynı çağrının aynı kaynak metinde durduğunu iddia
+ediyor, yalnız beklenen dize bugünkü çağrıya güncellendi.
 
 ## 9. Ölçülmedi
 
@@ -363,3 +372,55 @@ Assert.Contains("BuildUniqueOutputPath(_info.FilePath, \"shrunk\", \"mp4\"), _en
   sözleşmede hiç ölçülmedi; üç klip de yazılım kodlayıcıya düştü.
 - **Uzun kaynak.** Bütün ölçümler 60 sn'lik kliplerde. 17 dakikalık kaynakta
   yoklama maliyeti oranla değil **doğrusal** büyür ve o hiç ölçülmedi.
+
+## 10. Süit ve CI
+
+İki koşum ayrı satır; yerel yeşilin CI'yi temsil etmediği bu projede **on üç
+itme boyunca fark edilmedi**, o yüzden koşum kimliği yazılıyor.
+
+| Koşum | Kırmızı | Yeşil | Atlanan | Toplam | Süre |
+| --- | --- | --- | --- | --- | --- |
+| Yerel tam süit (`dotnet test VidShrink.sln -c Release`) | **2** | 1166 | 17 | 1185 | 18 dk 15 sn |
+| CI koşum **33592638991** (`T113-harita-baglantisi`, `tools/kosum-kapisi/kosum-kapisi.ps1`) | **1** | 1075 | **107** | 1183 | 13 dk 24 sn |
+
+**Süit yeşil değil.** İki kırmızının ikisi de kimliğiyle:
+
+| Ölçü | Nerede | Sahibi | Durum |
+| --- | --- | --- | --- |
+| `FfmpegArgumentsTests.Arayuz_yolunda_kodlayici_yoklamasi_dogurulmaz` (`:408`) | yerel **ve** CI | T108 (`active`) | bu dalın kırdığı pim, § 8'de T0 talimatıyla düzeltildi; yukarıdaki iki dörtlü **düzeltmeden önceki** koşumlardır |
+| `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor` (`:458`) | yalnız yerel | T117 (`active`) | yük duyarlı, **kararsız** — aşağıya bak |
+
+**Yük duyarlılığı ayrıştırıldı.** Ölçü tek başına beş kez koşturuldu
+(`--filter "FullyQualifiedName~PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor"`,
+makinede altı ajan): **1 kırmızı, 4 yeşil.** Aynı ikili, aynı bayrak, farklı
+sonuç — yani yalıtılmışta da düşebiliyor ama deterministik değil; **gerçek bir
+kusur değil, ortam varsayımı kusuru.** Kırmızı iddia `yuk altinda karar
+hafifledi`: boş okumalar `SoftwareHeavyLoad` verirken yüklü okuma
+`SoftwareLightLoad` verdi — makine zaten yüklüyken "boş okuma"nın boş olduğu
+varsayımı tutmuyor. Koşum süreleri de bunu söylüyor: 1 dk 15 sn ↔ 4 dk 13 sn.
+Bu dalın diff'i `PerformanceProbe` yoluna hiç değmiyor
+(`git diff --stat origin/main...HEAD` on dosya, hiçbiri o yolda değil).
+
+**CI'da atlanan 107 ölçü, yerelde 17.** Fark ffmpeg: `tools/ci-gibi-kos.sh`in
+benzettiği hâl budur, CI'da ffmpeg ve ffprobe PATH'te yok. **Bu sözleşmenin
+kabul kriterlerine karşılık gelen iki ölçü o listede:**
+
+| Atlanan ölçü | Hangi kriteri doğruluyor |
+| --- | --- |
+| `EncodeRunnerTests.TheMapChangesTheIFrameCountOfTheDeliveredFile` | K2 (bağlanmanın çıktıya etkisi) ve K7'nin **tek davranış ölçüsü** — M6'yı yakalayan tek ölçü |
+| `EncodeRunnerTests.ABrokenSourceFallsBackInsteadOfThrowing` | K5, bozuk kaynak düşüş yolu |
+
+**CI yeşili bu iki kriteri doğrulamaz.** İkisi de yerelde ffmpeg'li koşumda
+geçti; CI'da yalnız atlandı. K5'in öteki iki yolu
+(`AFailedScanFallsBackToTheDefaultCeilingAndSaysSo`, süresiz kaynak) ffmpeg
+gerektirmiyor, onlar CI'da da koşuyor. K1, K3, K7'nin argüman ölçüleri ve
+M1–M5'i yakalayan ölçülerin hepsi ffmpeg'siz.
+
+Yerel toplam 1185, CI toplam 1183 — iki ölçü CI'da hiç sayılmıyor. **Sebebi
+ölçülmedi**, bu sözleşmenin ürünü değil.
+
+Pim düzeltmesinden sonra dar `verify` süzgeci yeniden koşturuldu
+(`--no-incremental` derleme ardından): **94 geçti / 0 kaldı / 0 atlandı / 94
+toplam.** Düzeltmenin tam süit ve CI dörtlüsü **yeniden koşturulmadı**; yukarıdaki
+iki satır düzeltmeden öncesini gösteriyor, teslim itmesinin CI kimliği
+`## Çıktı`da.
