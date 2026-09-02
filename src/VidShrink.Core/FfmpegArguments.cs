@@ -356,6 +356,29 @@ public static class FfmpegArguments
 
     public static bool NeedsTwoPasses(string codec) => !CodecModel.IsHardware(codec);
 
+    public static IReadOnlyList<string> PresetLadder(string codec)
+        => Presets.TryGetValue(codec, out var ladder) ? ladder : Array.Empty<string>();
+
+    public static string FirstPassPreset(string codec, string preset, bool turbo)
+    {
+        if (!turbo) return preset;
+        var ceiling = CodecModel.TurboFirstPassCeiling(codec);
+        if (ceiling is null) return preset;
+        if (!Presets.TryGetValue(codec, out var ladder)) return preset;
+
+        var at = RungOf(ladder, preset);
+        var cap = RungOf(ladder, ceiling);
+        if (at < 0 || cap < 0) return preset;
+        return at <= cap ? preset : ladder[cap];
+    }
+
+    private static int RungOf(IReadOnlyList<string> ladder, string preset)
+    {
+        for (var i = 0; i < ladder.Count; i++)
+            if (ladder[i].Equals(preset, StringComparison.OrdinalIgnoreCase)) return i;
+        return -1;
+    }
+
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
@@ -374,7 +397,7 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
         a.AddRange(new[] { "-c:v", plan.Codec });
-        a.AddRange(new[] { "-preset", plan.Preset });
+        a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
         var psychovisualArgs = CachedPsychovisualArgs(plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)

@@ -30,6 +30,11 @@ public sealed class TurboFirstPassTests
         AudioBitrateK = 128
     };
 
+    private static readonly string[] YazilimMerdiveni =
+        { "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow" };
+
+    private static IReadOnlyList<string> Merdiven(string kodek) => FfmpegArguments.PresetLadder(kodek);
+
     private static string OnAyar(IReadOnlyList<string> args)
     {
         var yer = args.IndexOf("-preset");
@@ -78,5 +83,72 @@ public sealed class TurboFirstPassTests
             Assert.NotNull(tavan);
             Assert.True(FfmpegArguments.IsValidPreset(kodek, tavan!), $"{kodek}: {tavan}");
         }
+    }
+
+    [Theory]
+    [InlineData("ultrafast", "ultrafast")]
+    [InlineData("superfast", "superfast")]
+    [InlineData("veryfast", "veryfast")]
+    [InlineData("faster", "veryfast")]
+    [InlineData("fast", "veryfast")]
+    [InlineData("medium", "veryfast")]
+    [InlineData("slow", "veryfast")]
+    [InlineData("slower", "veryfast")]
+    [InlineData("veryslow", "veryfast")]
+    public void Ilk_gecis_merdiveni_tavanda_kesiliyor(string sonGecis, string beklenen)
+    {
+        foreach (var kodek in CodecModel.TurboFirstPassCodecs)
+        {
+            Assert.Equal(beklenen, FfmpegArguments.FirstPassPreset(kodek, sonGecis, turbo: true));
+
+            var plan = Plan(kodek, sonGecis);
+            plan.TurboFirstPass = true;
+            Assert.Equal(beklenen, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk")));
+        }
+    }
+
+    [Theory]
+    [InlineData("ultrafast")]
+    [InlineData("veryfast")]
+    [InlineData("medium")]
+    [InlineData("slow")]
+    [InlineData("veryslow")]
+    public void Turbo_son_gecisin_argumanina_dokunmuyor(string onAyar)
+    {
+        foreach (var kodek in CodecModel.TurboFirstPassCodecs)
+        {
+            var kapali = Plan(kodek, onAyar);
+            var acik = Plan(kodek, onAyar);
+            acik.TurboFirstPass = true;
+
+            Assert.Equal(
+                FfmpegArguments.Build(Kaynak(), kapali, "cikti.mp4", 2, "gunluk"),
+                FfmpegArguments.Build(Kaynak(), acik, "cikti.mp4", 2, "gunluk"));
+            Assert.Equal(
+                FfmpegArguments.Build(Kaynak(), kapali, "cikti.mp4", 0, null),
+                FfmpegArguments.Build(Kaynak(), acik, "cikti.mp4", 0, null));
+            Assert.Equal(onAyar, OnAyar(FfmpegArguments.Build(Kaynak(), acik, "cikti.mp4", 2, "gunluk")));
+        }
+    }
+
+    [Fact]
+    public void Ilk_gecis_hicbir_zaman_son_gecisten_yavas_kosmuyor()
+    {
+        foreach (var kodek in CodecModel.TurboFirstPassCodecs)
+        {
+            var merdiven = Merdiven(kodek);
+            for (var basamak = 0; basamak < merdiven.Count; basamak++)
+            {
+                var ilk = FfmpegArguments.FirstPassPreset(kodek, merdiven[basamak], turbo: true);
+                Assert.True(merdiven.IndexOf(ilk) <= basamak, $"{kodek}: {merdiven[basamak]} -> {ilk}");
+            }
+        }
+    }
+
+    [Fact]
+    public void Kumedeki_kodeklerin_merdiveni_dokuz_basamak_ve_hizlidan_yavasa()
+    {
+        foreach (var kodek in CodecModel.TurboFirstPassCodecs)
+            Assert.Equal(YazilimMerdiveni, Merdiven(kodek));
     }
 }
