@@ -1,0 +1,19 @@
+{
+  "contractId": "T137",
+  "auditorRunId": "a8a854894b7b17aae",
+  "headSha": "27ae5f2810ab7780d40daedfd8d040de4dc5d232",
+  "diffHash": "ff47f6da394b265a31bc8c2b61adc999954ce75ba817f09ae507099ca9ec70b9",
+  "owns": [
+    "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tools/surucu-yoklugu/Program.cs",
+    "tests/VidShrink.Tests/EncoderAvailabilityTests.cs",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs",
+    "docs/olcumler/yoklama-uclu-cevap.md"
+  ],
+  "verification": [
+    "Tur 2 bagimsiz denetim, izole kopyada (git archive b9ab843). Tur 1'in uc KRITIK'i yeniden olculdu, ucu de kapandi: gecit girisi Unmeasured/IsMeasured=False donuyor (MainWindow.axaml.cs:1429-1432, denetcinin kendi kosumu), EncoderCapabilities.cs:93-97 ikinci bicime gecti ve uretim cagirani sifirdan bire cikti, kusur commit'i 879c88b duzeltmeden ayri. T1-T11 on birinin de gectigi dosya:satir ve komut ciktisiyla dogrulandi. verify uc kolu --list-tests ile sayildi: 12+32+25=69, sifir eslesmeli kol yok. CI 33647517701 success, filtresiz tam suit, headSha d150801. KRITIK yok. Sonuc: GECTI."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T15:55:14.706Z"
+}

@@ -546,3 +546,51 @@ ustune 250 ms pay, dagilim yalniz bu makinede olculdu.
 Denetci T141'in gerekcesini de bagimsiz dogruladi ve ek bir sey soyledi: yedek yol
 `SampleTimeout` ile tetiklendiginde **tam olarak `Calls=1`** uretir — yani K0'in (iii)
 adayinin mekanizmasi bu. T141 artik iki sozlesmeye birden hizmet ediyor.
+
+## 2 Eylul 2026 — T137 muhurlendi (tur 2, GECTI)
+
+Denetci izole kopyada olctu, tur 1'in uc KRITIK'inin ucu de kapandi. Gecit girisi artik
+`Unmeasured / IsMeasured=False` donuyor; `EncoderCapabilities.WorksAsEncoder` olcemedigi
+kodek icin `false` yerine `HasEncoder(codec)` donuyor, yani uretim cagirani sifirdan
+bire cikti ve `HdrResolver`, `PlanCalculator`, `PerformanceProbe` hic dokunulmadan yeni
+davranisi aldi. `main` `27ae5f2`.
+
+Muhur notuna gecen borclar (tur acmadi):
+
+- Rapor `:379-381` yanlis commit kimligi (`431c1ae` aslinda `d150801`den once).
+- Rapor `:32-33` kendi kayit noktalari tablosuyla celisiyor.
+- T5'in satir atfi `:1229-1233` degil `:1233-1236` — "pin degisti, docstring degismedi".
+- T6'nin `OrdinalIgnoreCase` gerekcesi yanlis; olcu dogru, aciklamasi degil.
+- `baslat-kilidi.md` k1/k2/k6 hala atifsiz `Toplam: 70` diyor; suit 76.
+- `tools/surucu-yoklugu/Program.cs:26` T2'den sonra sessizce anlam degistirdi; `Ayrisma()`
+  tablosunu etkilemiyor ama aracin `:105-118` simulasyonu artik farkli davraniyor.
+- M5-M9 mutasyon ciktilari yapicinin kendi olcumu; denetci kosum siniri yuzunden
+  tekrarlamadi, yalniz olculerin davranis olctugunu koddan dogruladi.
+
+## 2 Eylul 2026 — T132 tur 2 teslim edildi
+
+`cdc7853`. T1 sekiz bandi ham ciktisiyla belgeye gomdu, yokluk beyani geri cekildi.
+T2'de iki mutasyondan **yalnizca biri** pimledi: iddia 1'in bandi `PerformanceCheckTests.cs:757`
+oncesindeki `if (!guvenilir) Atlandi(...)` kapisi yuzunden yuklu kosucuda hic
+degerlendirilmiyor. Bu, "sabit karsilastiran test davranis olcmez" ailesinin yeni yuzu:
+test kirmizi olamiyor cunku hic kosmuyor. Denetci acildi.
+
+## 2 Eylul 2026 — T142 acildi, ProClaude'un ikinci isi
+
+`CalibrationProbe` kendi sabit pencere kopyasini tasiyor: esit aralikli yerlesim, sureye
+bakan sayim, tavan uc. `ComplexityProbe.PlanWindowCount` / `PlanWindows` sahne kesigine ve
+heterojenlige bakan duzenegi zaten tasiyor ama bu yol onu cagirmiyor. `owns` T140 ile
+kesismiyor, es zamanli kosar.
+
+Yan bulgu, bu sozlesmenin disinda: `ComplexityProbe.cs:31`
+`public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;` — sahne farkindali
+ornekleme uretimde **kapali** pimlenmis. Kullanicinin "dinamiklik" hedefinin onundeki en
+buyuk tek satir. Ayri sozlesme gerekiyor; dosya T141'in.
+
+## 2 Eylul 2026 — T139 owns genisletildi
+
+K2 arayuz varsayilanini degistirince `WorksAsEncoder`i override edip `EncoderState`i
+etmeyen sahteler kirildi. Uc sahte iki dosyada: `PlanCalculatorTests.cs` (sahipsizdi) ve
+`EncoderAvailabilityTests.cs` (T137'nindi, muhurlenince serbest kaldi). Ikisi de T139'a
+acildi, **yalniz uc sahteye `EncoderState` override'i** siniriyla.
+

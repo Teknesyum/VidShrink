@@ -177,3 +177,4 @@
 {"id":"T138","round":"1","risk":"low","verify":[{"step":"dotnet build -c Release tools/sahne-butcesi/SahneButcesi.csproj","code":0}],"auditorRunId":null,"headSha":"3bb5706351100a42fef14f78873e47608e832e2d","at":"2026-09-02T13:40:30.557Z"}
 {"id":"T137","result":"stale","at":"2026-09-02T14:46:35.084Z"}
 {"id":"T139","result":"stale","at":"2026-09-02T15:03:38.688Z"}
+{"id":"T137","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderAvailabilityTests|PlanCalculatorTests|PlanCalculatorProbeTests","code":0}],"auditorRunId":null,"headSha":"27ae5f2810ab7780d40daedfd8d040de4dc5d232","at":"2026-09-02T15:56:16.852Z"}
