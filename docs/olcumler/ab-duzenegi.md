@@ -197,7 +197,7 @@ VidShrink, 600 MB hedefi, aynı kaynak.
 
 | yapılandırma | tam koşum harm | parça kestirimi harm | sapma | ölçülen commit |
 |---|---|---|---|---|
-| vidshrink @ 600 MB | 47,78 | 58,83 | **+11,05** | tam `94df05c`, parça `af7a0fe` |
+| vidshrink @ 600 MB | 47,78 | 58,83 | **+11,05** | ikisi de `af7a0fe` |
 
 Diğer sütunlar da aynı yöne kayıyor: ortalama 67,33 → 76,17 (+8,84), XPSNR
 34,54 → 40,77 (+6,23). Kare minimumu iki tarafta da 0,00.
@@ -264,9 +264,19 @@ tanımlı ama bu turda koşturulmadı.
 tonemap yoluna hiç girilmedi.
 
 Aşağıdaki sayıların geldiği koşum kayıtları (hepsi `.calisma/` altında, git'e
-girmiyor) ve her koşumun **ölçtüğü commit**. Ölçtüğü commit = koşumun ikilisini
-üreten ağaç; bunu koşum saatinden önceki son **kod taşıyan** commit belirliyor
-(araya giren commit'ler yalnız `docs/` değiştirdi, ölçüme dokunmuyor).
+girmiyor) ve her koşumun **ölçtüğü commit**.
+
+Eşlemenin nasıl kurulduğunu olduğu gibi yazmak gerekiyor, çünkü ilk yazdığım
+kural yaptığım şeyi anlatmıyordu. Kural "koşum saatinden önceki son kod taşıyan
+commit" diyordu; oysa beş satırın üçünde damgaladığım commit koşum **bittikten
+sonra** atıldı — kod koşum sırasında çalışma ağacında yazılıydı, commit sonra
+geldi. Yani eşlemenin gerçek dayanağı **çalışma ağacı**, git değil: koşumu
+başlatırken derlenmiş olan kaynak, sonradan o commit'e giren kaynakla aynıydı.
+
+Bunun **git'çe kanıtı yok.** Doğrulanabilir tek yön şudur: damgalanan commit ile
+bir sonraki kod taşıyan commit arasında `tools/VidShrink.Ab` değişmiş olamaz,
+yoksa koşum günlüğü tutmazdı — nitekim tam koşumun damgası bu yolla düzeltildi
+(aşağıda). Damgalar bu güçte okunmalı: **kanıt değil, günlükle tutarlı eşleme.**
 
 | tablo | koşum kaydı | koşum saati | ölçülen commit |
 |---|---|---|---|
@@ -274,7 +284,18 @@ girmiyor) ve her koşumun **ölçtüğü commit**. Ölçtüğü commit = koşumu
 | 60 MB (yalnız oranlı eşitleyici, çürütülen tablo) | `.calisma/ab/sonuc-parca-60-esboyut.json` | 09-02 05:06 | `a1994b3` (tur 2) |
 | 600 MB | `.calisma/ab/sonuc-parca.json` | 09-02 03:34 | `af7a0fe` (tur 1) |
 | duyarlılık (eşitleme öncesi) | `.calisma/ab/sonuc-parca.json` | 09-02 03:34 | `af7a0fe` (tur 1) |
-| tam kaynak koşumu (örnekleme sapması) | `.calisma/ab/sonuc-tam.json` | 09-02 04:27 | `94df05c` (tur 1) |
+| tam kaynak koşumu (örnekleme sapması) | `.calisma/ab/sonuc-tam.json` | 09-02 04:27 | `af7a0fe` (tur 1) |
+
+Tam koşum önce `94df05c` diye damgalanmıştı, **yanlıştı.** Kanıt koşum
+günlüğünde: `.calisma/ab/kosum-tam.out:1` `video-only girdi hazır:` yazıyor, ve
+o dizeyi `normalize girdi hazır` yapan commit `94df05c`'nin kendisi
+(`git log -S`). Yani koşum `94df05c`'den **önceki** kodu koşturmuş; doğru damga
+`af7a0fe`. Sayılara etkisi yok, damga yanlıştı.
+
+`koşum saati` sütunu için bir uyarı: saat JSON'daki `StartedUtc` alanından değil
+dosyanın yazılma zamanından alındı, çünkü `StartedUtc` raporun yazıldığı anı
+taşıyor, koşumun başlangıcını değil — yani alan adı saydığı şeyle uyuşmuyor.
+Sütun bu haliyle **bitiş saatidir.** Alan adı bu turda değiştirilmedi.
 
 600 MB tablosu tur 1'in commit'inden geliyor ve **yeniden ölçülmedi**: eşitleyici
 o tabloya dokunmuyor, çünkü altı satırın altısı zaten kapının içindeydi. 60 MB
@@ -341,7 +362,7 @@ budur: **bu altı satır `381e8ab` ile yeniden ölçülmedi.**
 
 `parca-3 / vidshrink` satırı kapıya **0,008 puan** uzakta: ham fark **-%1,9923**,
 eşik -%2. Aşağıdaki "ölçünün kararsızlığı" bölümü kalibrasyonun koşumdan koşuma
-2.728 bayt oynadığını yazıyor; bu satırda **2.900 baytlık** bir oynama hem
+2.728 bayt oynadığını yazıyor; bu satırda **2.802 baytlık** bir oynama hem
 damgayı hem manşetteki "on ikinin on ikisi eş boyut" cümlesini birlikte devirirdi. Satır
 bu haliyle **koşuma bağlı**, kararlı değil — manşetteki 600 MB kaydı bu koşulla
 okunmalı (aşağıda "kıl payı satır" başlığında pimlendi).
@@ -361,7 +382,7 @@ okunmalı (aşağıda "kıl payı satır" başlığında pimlendi).
 
 Bir koşula bağlı: 600 MB'deki `parca-3 / vidshrink` satırı kapıya **0,008 puan**
 uzakta (-%1,9923) ve o satır tek koşuma dayanıyor. Aşağıdaki kararsızlık bölümü
-kalibrasyonun koşumdan koşuma 2.728 bayt oynadığını ölçüyor; o satırda 2.900
+kalibrasyonun koşumdan koşuma 2.728 bayt oynadığını ölçüyor; o satırda 2.802
 baytlık bir oynama damgayı devirir. Yani "on ikinin on ikisi" cümlesi bir satırı
 kıl payına borçlu ve o satırın kararlılığı **ölçülmedi.**
 
@@ -595,9 +616,10 @@ farklar gürültüdür; yukarıdaki 9 puanlık açık değildir.
 
 Puan gürültüsü açığı devirmiyor, ama **bayt gürültüsü damgayı devirebilir.**
 `parca-3 / vidshrink @ 600 MB` satırı -%1,9923 ile kapıya **0,008 puan** uzakta:
-kapıya 35.549.615 yerine 35.546.715 bayt gelseydi (aradaki fark **2.900 bayt**)
-satır `eş boyut değil` damgası yerdi. Yukarıda ölçülen kalibrasyon oynaması
-**2.728 bayt** — aynı büyüklük sınıfında.
+kapının alt kenarı `36.272.258 x 0,98 = 35.546.813` bayt, teslim 35.549.615;
+aradaki marj **2.802 bayt**. Bu kadarlık bir eksilme satıra `eş boyut değil`
+damgası yedirirdi. Yukarıda ölçülen kalibrasyon oynaması **2.728 bayt** — aynı
+büyüklük sınıfında, marjın %97'si.
 
 Bu satır iki kez koşturulmadı, yani kararlılığı **ölçülmedi**. O yüzden
 manşetteki "on iki satırın on ikisi ±%2 içinde" cümlesi koşulsuz değil: bir satırı
@@ -648,7 +670,7 @@ Mutasyonla sınandı (her koşumdan önce `dotnet build ... --no-incremental`):
 
 | mutasyon | sonuç |
 |---|---|
-| `SizeParityCheck.DefaultTolerancePercent` 2.0 → 20.0 | 6 kırmızı |
+| `SizeParityCheck.DefaultTolerancePercent` 2.0 → 20.0 | 11 kırmızı |
 | `SizeParityCheck.DefaultTolerancePercent` 2.0 → 0.1 | 3 kırmızı |
 | `TargetSearch` kıskaç dalı devre dışı (hep oranlı) | 6 kırmızı |
 | ikiye bölme orta noktası `span/2` → `span/4` | 2 kırmızı |
@@ -656,6 +678,12 @@ Mutasyonla sınandı (her koşumdan önce `dotnet build ... --no-incremental`):
 Dördü de gerçek kusur: ilk ikisi teslim edilen tolerans **değerini** pimliyor
 (tur 2'de sınır mantığı pimliydi, değer değildi); son ikisi ikiye bölmenin
 varlığını ve orta noktasını pimliyor.
+
+İlk satırdaki 11 sayısı denetçinin bağımsız koşumundan. Ben bu turda aynı
+mutasyona **6 kırmızı** yazmıştım; o sayı **geri çekildi, tablodaki değer
+düzeltildi.** İkisinin neden ayrıldığı **ölçülmedi** — tahmin yazmıyorum.
+`DefaultTolerancePercent` ve `SizeParityCheck` yalnız `tests/VidShrink.Tests/AbTests.cs`
+içinden görülüyor (`grep`), yani fark süzgeç genişliğinden gelmiyor.
 
 ### Tam süit
 
