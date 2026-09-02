@@ -668,3 +668,48 @@ o yuzden bagalamak her seferinde borc olarak devrediliyor ve borc hicbir sozlesm
 donmuyor. Cozum: bu dort borcu tek bir "uretim yolunu bagla" sozlesmesinde toplamak;
 `owns` tam da cagiran dosyalar olur (`src/VidShrink.App/MainWindow.axaml.cs`,
 `src/VidShrink.Core/PlanCalculator.cs`, `CompressionStrategy`).
+
+## T132 muhurlendi (2 Eylul 2026, tur 3)
+
+Denetim GECTI, KRITIK yok. `main` @ `8075ed0`. CI `33658444761` (`46d9d48`) success.
+Dal ve worktree kaldirildi.
+
+Denetci taint taramasini bagimsiz yeniden kurdu: **tam olarak 23**, ayni satir kumesi.
+Fazla kapsayici 65 assert'lik elek ek saat turevi iddia bulmadi. Pimleyen olcunun gercek
+oldugunu izole kopyada **24. bandi kendi ekleyerek** dogruladi — test kirmizi dondu ve
+yeni satiri adiyla soyledi. Dort U1 gunlugu derleme ciktisiyla basliyor (`--no-build` yok),
+her biri `Toplam: 1` (olu kol yok). `--list-tests` 22 + 54 + 29 = 105.
+
+Bes borc:
+1. `duvar-saati-iddialari.md:463` "yirmi dorduncu saat turevi assert CI'i kirmizi yapar"
+   diyor; `DateTime.UtcNow` bandi yesil kaliyor. Yazili kapali kume uretim saat turevi
+   uyeleri + zaman asimi alan beklemelerle sinirli, olcu spec'e uyuyor. Tek cumle fazla
+   iddia ediyor.
+2. `:511-515` arasinda "bilinen sinirlar" paragrafi yok.
+3. Tur 3 icin saklanmis yerel verify gunlugu yok.
+4. `PerformanceCheckTests.cs:455-462` gercek bir `else` kapisinin arkasinda. Tur 2'nin
+   `:757` icin **uydurdugu** mekanizma burada gercek — ve bant tablosu bunu soylemiyor.
+5. `KorumaAraligi` olu savunma.
+
+Devredilen borc: kalan alti bant sayildi, daraltilmadi -> **T145**. Artik `depends`i
+karsilandi, acilabilir. **T141** de acildi (ayni bagimlilik).
+
+## T142 tur 2 acildi — iki KRITIK, ikisi de belge
+
+Kod bagimsiz olarak dogrulandi: K1, K2, K4, K6, K7 ve K3'un **karari** gecti. Denetci
+mutasyon izgarasini kendi kosturdu (dort mutasyon, her biri yalniz kendi olcusunu kirdi),
+K1'in uc kirmizisini `b5f1750`i ayri agaca acip birebir uretti, `--list-tests` ile 46 + 22
+saydi, `ComplexityProbe.cs`in **degistirilmedigini** diff'ten dogruladi.
+
+KRITIK 1: `kalibre-pencere.md:118`, `8 | Fast | degisken harita` hucresi `2: [4 6]` yaziyor.
+4000 fixture supuruldu; `Fast == [4 6]` **hicbirinde cikmiyor**. Ayni satirin Quality
+hucresini ureten fixture'larin hepsinde Fast `[0 2]`. Fark onemsiz degil: `[4 6]` klibin
+ikinci yarisina yayilmis yerlesim, `[0 2]` iki ornegin de ilk dort saniyeye yigildigi hal
+— raporun kendi borc 2'sinde tarif ettigi tehlike. Yanlis hucre tehlikenin ornegini
+gizliyor.
+
+KRITIK 2: `:68-69` "sceneCuts'i dolduran tek yer ... `:383`, yani bir olcu". Yedi yer var
+ve `:383` bir cagri bile degil, metot basligi. `tools/ornekleme` de olcu degil, olcum araci.
+
+Kalan 13 satir ve K5'in tasiyici cumlesi dogrulandi. Tur 2 **belge turu**; kod degismiyor.
+Yerel yapici acildi, dal `T142-tur2`.
