@@ -114,3 +114,10 @@ Kaynak ve uc kolun plan ciktisi da `yuv420p10le / smpte2084 / bt2020` dondu.
 Cozunurluk farki sorun degil: `QualityMeter.RunFilterAsync` testi referansin
 cozunurlugune olceklendiriyor. Cozunurluk **kollar arasinda** farkli oldugu
 icin puanlar yalniz kol icinde karsilastirilabilir; A/B kol icindedir.
+
+## Ayni cikan bozulma kosulmaz
+
+`KesimDusur` iki sahneli haritada hicbir kesim atamaz, `KesimEkle` her zaman
+boler. Bozulma haritayi degistirmediyse o kol kosulmaz: `AbAsync` `bilinmiyor`
+yazar. Aksi halde tabloda "bozuk harita" diye duran satir aslinda dogru
+haritanin kendisi olur ve K7'nin kaybi yapay olarak sifir cikardi.
