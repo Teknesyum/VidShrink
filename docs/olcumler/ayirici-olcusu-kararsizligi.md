@@ -176,9 +176,13 @@ Yerel yeşille teslim edilmedi; dalın CI koşumu görülerek yazıldı.
 | koşum | commit | sonuç |
 |---|---|---|
 | `33601659638` | `c3da7a9` (düzeltmenin kendisi) | success |
-| `33601866470` | `7a2ca56` (dal başı) | success |
+| `33601795379` | `9fb86b0` (belge) | success |
+| `33601866470` | `7a2ca56` (belge) | success |
 
-Dal başındaki koşumun tam süiti:
+Kod değişikliği `c3da7a9`'da; sonraki commit'ler yalnız bu belgeye dokunuyor. Bu
+satırdan sonra eklenen belge commit'lerinin koşumları **beklenmedi** — beklemek her
+seferinde yeni bir commit ve yeni bir koşum doğuruyor. Kod taşıyan tek commit yeşil.
+`33601866470` koşumunun tam süiti:
 
     Passed!  - Failed: 0, Passed: 1129, Skipped: 105, Total: 1234, Duration: 9 m 41 s
       - VidShrink.Tests.dll (net8.0)
@@ -191,13 +195,14 @@ Aynı ağaç yerelde de tam süitle koşturuldu (paylaşımlı makine, 22 dk 32 
 (23 / 105). **Sebebi ölçülmedi.** Ortam geçitleri akla yakın bir açıklama ama
 doğrulanmadı; buraya tahmin yazılmıyor. Her iki koşumda da kırmızı yok.
 
-`SplitDragTests` bu koşumda kırmızı değil — üç kez düşen ölçü artık düşmüyor. Tek
-yeşil koşum "kararsızlık bitti"nin kanıtı değildir; aşağıda ölçülmeyenler arasında.
+`SplitDragTests` bu koşumların hiçbirinde kırmızı değil — üç kez düşen ölçü artık
+düşmüyor. Ama üç yeşil koşum "kararsızlık bitti"nin kanıtı değildir: üçü de aynı kodu
+koşturuyor, yani bu üç bağımsız deneme değil. Aşağıda ölçülmeyenler arasında.
 
 ## 7. Ölçülmeyenler
 
-- **Kararsızlığın gerçekten bittiği ölçülmedi.** Elde tek bir yeşil CI koşumu var
-  (`33601866470`). Ölçü artık duvar saatini hiç okumadığı için mekanizma olarak
+- **Kararsızlığın gerçekten bittiği ölçülmedi.** Elde üç yeşil CI koşumu var ama
+  üçü de aynı kodu koşturuyor; tekrarlanan bağımsız deneme yapılmadı. Ölçü artık duvar saatini hiç okumadığı için mekanizma olarak
   düşemez, ama bu bir çıkarım — tekrarlanan koşumla sınanmadı.
 - **Bu ölçünün geçmişte tam olarak kaç kez düştüğü ölçülmedi.** Üç bilinen vaka var
   (T111, T116, T123 — koşum 33597779584), taranmış bir sayı değil. Kapalı dalların CI
