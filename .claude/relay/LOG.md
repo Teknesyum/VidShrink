@@ -594,3 +594,4 @@ etmeyen sahteler kirildi. Uc sahte iki dosyada: `PlanCalculatorTests.cs` (sahips
 `EncoderAvailabilityTests.cs` (T137'nindi, muhurlenince serbest kaldi). Ikisi de T139'a
 acildi, **yalniz uc sahteye `EncoderState` override'i** siniriyla.
 
+- T132 tur 2 teslim edildi: KRITIK kapandi (uc bant listelendi, yokluk beyani geri cekildi), sekiz kriterden yedisi kapali; T2 yarim — iddia 4 pimlendi, iddia 1 testin kendi kapisi yuzunden pimlenemedi. Commit 0c371f7/eec17e7/cdc7853.
