@@ -60,6 +60,12 @@ def t122(ad):
     out.sort()
     return out
 
+def arsiv(ad):
+    yol = os.path.join(_KOK, "vmaf-t122", "arsiv-" + ad + "-kilitli.json.gz")
+    if not os.path.exists(yol):
+        yol = os.path.join(_KOK, "..", "..", ".calisma", "t122", "vmaf", ad + "-kilitli.json.gz")
+    return kareler(yol)
+
 BOYUT = {
     "auto": 14450295,
     "auto-g300": 11788146,

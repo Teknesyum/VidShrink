@@ -15,13 +15,13 @@ def profil(ad, g):
     print("== %s  kare=%d  video=%d bayt  ort=%.0f bayt/kare  anahtar=%d" % (ad, n, sum(b), ort, len(kf)))
     print("  sahne bazinda (anahtar kareler haric):")
     for a, z, ix in SAHNE:
-        v = [b[i] for i in range(a, min(z, n)) if i not in kf]
+        v = [b[i] for i in range(a, min(z, n)) if i not in kf and b[i] > 3]
         print("   S%-2d  kare=%4d  ort=%6.0f bayt  goreli=%.3f" % (ix, len(v), sum(v) / len(v), (sum(v) / len(v)) / ort))
     if g:
         print("  GOP fazi (yalniz S14, anahtar kareler haric):")
         d = max(1, g // 12)
         for i in range(0, g, d):
-            v = [b[k] for k in range(1700, 3411) if i <= k % g < min(i + d, g) and k not in kf]
+            v = [b[k] for k in range(1700, 3411) if i <= k % g < min(i + d, g) and k not in kf and b[k] > 3]
             if v:
                 print("   %3d-%3d  kare=%3d  ort=%6.0f bayt  goreli=%.3f" % (i, min(i + d, g) - 1, len(v), sum(v) / len(v), (sum(v) / len(v)) / ort))
     print()

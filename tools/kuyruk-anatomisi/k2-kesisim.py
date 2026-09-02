@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kuyruk import kareler, kotu, kumele, sn
+from kuyruk import arsiv, kotu, kumele, sn
 
-A = ".calisma/t122/vmaf/auto-kilitli.json.gz"
-B = ".calisma/t122/vmaf/uzman-hb2-kilitli.json.gz"
-ka, kb = kareler(A), kareler(B)
+ka, kb = arsiv("auto"), arsiv("uzman-hb2")
 ea, ia = kotu(ka)
 eb, ib = kotu(kb)
 sa, sb = set(ia), set(ib)

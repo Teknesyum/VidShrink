@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kuyruk import kareler, kotu, FPS
+from kuyruk import arsiv, kotu, FPS
 
 KESIM = [1700, 3411]
 SAHNE = [(0, 1700, 0.07119, 13), (1700, 3411, 0.12892, 14), (3411, 3626, 0.08546, 15)]
 
-def rapor(ad, yol):
-    kr = kareler(yol)
+def rapor(ad):
+    kr = arsiv(ad)
     n = len(kr)
     e, kt = kotu(kr)
     ks = set(kt)
@@ -49,6 +49,5 @@ def rapor(ad, yol):
               % (w, kap, top, bek, top / max(bek, 1e-9)))
     print()
 
-V = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".calisma", "t122", "vmaf")
 for ad in sys.argv[1:] or ["auto", "uzman-hb2", "uzman-biz3"]:
-    rapor(ad, os.path.join(V, ad + "-kilitli.json.gz"))
+    rapor(ad)

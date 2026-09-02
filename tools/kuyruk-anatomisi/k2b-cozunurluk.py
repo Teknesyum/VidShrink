@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kuyruk import kareler, kotu, FPS
-
-V = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".calisma", "t122", "vmaf")
+from kuyruk import arsiv, kotu, FPS
 
 def yukle(ad):
-    kr = kareler(os.path.join(V, ad + "-kilitli.json.gz"))
+    kr = arsiv(ad)
     e, kt = kotu(kr)
     return len(kr), set(kt)
 

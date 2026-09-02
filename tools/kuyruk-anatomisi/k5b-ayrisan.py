@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, os, json
+import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bitler import paketler
 from kuyruk import kotu, t122
@@ -8,34 +8,40 @@ from kuyruk import kotu, t122
 def yukle(ad):
     kr = t122(ad)
     e, kt = kotu(kr)
-    p = paketler(".calisma/t122/ciktilar/%s.mp4" % ad)
-    B = {i: s for i, s, _ in p}
-    kf = set(i for i, _, k in p if k)
-    inter = [B[i] for i in B if i not in kf]
-    return dict(kr), set(kt), B, kf, sum(inter) / float(len(inter))
+    p = paketler(ad + ".mp4")
+    B = dict((i, s) for i, s, k in p if not k)
+    return dict(kr), set(kt), B
 
-VA, SA, BA, KA, oA = yukle("auto")
-VB, SB, BB, KB, oB = yukle("uzman-hb2")
-N = len(VA)
-print("auto  kotu=%d  inter ort=%.0f B   hb2 kotu=%d  inter ort=%.0f B  (hb2/auto=%.2f)"
-      % (len(SA), oA, len(SB), oB, oB / oA))
-print("kesisim=%d  sanstan=%.1f" % (len(SA & SB), len(SA) * len(SB) / float(N)))
-print()
+VA, SA, BA = yukle("auto")
+VB, SB, BB = yukle("uzman-hb2")
 
-def kume(ad, S):
-    ic = [n for n in S if n not in KA and n not in KB]
-    if not ic:
-        return
-    ba = sum(BA[n] for n in ic) / float(len(ic))
-    bb = sum(BB[n] for n in ic) / float(len(ic))
-    va = sum(VA[n] for n in ic) / float(len(ic))
-    vb = sum(VB[n] for n in ic) / float(len(ic))
-    print("%-22s kare=%4d | auto %6.0f B (%.2f×) VMAF %.3f | hb2 %6.0f B (%.2f×) VMAF %.3f | hb2/auto bit=%.2f"
-          % (ad, len(ic), ba, ba / oA, va, bb, bb / oB, vb, (bb / oB) / (ba / oA)))
+ORT = set(BA) & set(BB)
+KOD = set(i for i in ORT if BA[i] > 3)
 
-tum = set(range(N))
-kume("TUM inter kareler", tum)
-kume("YALNIZ auto kotu", SA - SB)
-kume("YALNIZ hb2 kotu", SB - SA)
-kume("ORTAK kotu", SA & SB)
-kume("IKISI DE IYI", tum - SA - SB)
+def tablo(baslik, evren):
+    evren = set(evren)
+    oA = sum(BA[i] for i in evren) / float(len(evren))
+    oB = sum(BB[i] for i in evren) / float(len(evren))
+    print("== %s  evren=%d  auto taban=%.0f B  hb2 taban=%.0f B" % (baslik, len(evren), oA, oB))
+
+    def sat(ad, S):
+        ic = sorted(S & evren)
+        if not ic:
+            return
+        n = float(len(ic))
+        ba = sum(BA[i] for i in ic) / n
+        bb = sum(BB[i] for i in ic) / n
+        va = sum(VA[i] for i in ic) / n
+        vb = sum(VB[i] for i in ic) / n
+        print("   %-20s kare=%4d | auto %6.0f B %.2fx VMAF %7.3f | hb2 %6.0f B %.2fx VMAF %7.3f"
+              % (ad, len(ic), ba, ba / oA, va, bb, bb / oB, vb))
+
+    sat("evrenin tamami", evren)
+    sat("yalniz auto kotu", SA - SB)
+    sat("yalniz hb2 kotu", SB - SA)
+    sat("ortak kotu", SA & SB)
+    sat("ikisi de iyi", evren - SA - SB)
+    print()
+
+tablo("YALNIZ KODLANAN inter kareler (rapordaki tablo)", KOD)
+tablo("TUM inter paketler (dayaniklilik)", ORT)

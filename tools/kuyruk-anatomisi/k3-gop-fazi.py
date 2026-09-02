@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kuyruk import kareler, kotu
+from kuyruk import arsiv, kotu
 
-def faz(yol, g, ad):
-    kr = kareler(yol)
-    e, idx = kotu(kr)
+ALT = int(sys.argv[1]) if len(sys.argv) > 1 else 1700
+UST = int(sys.argv[2]) if len(sys.argv) > 2 else 3411
+
+def faz(kaynak, g, ad):
+    tum = arsiv(kaynak)
+    e, tumidx = kotu(tum)
+    kr = [(n, v) for n, v in tum if ALT <= n < UST]
+    idx = [n for n in tumidx if ALT <= n < UST]
     kotus = set(idx)
     puan = dict(kr)
     kova = [[] for _ in range(g)]
@@ -15,7 +20,7 @@ def faz(yol, g, ad):
         if n in kotus:
             kotukova[n % g] += 1
     dilim = max(1, g // 12)
-    print("== %s  (g=%d varsayimi, %d dilim)" % (ad, g, g // dilim))
+    print("== %s  (g=%d varsayimi, %d dilim, kare [%d,%d), esik=%.3f)" % (ad, g, g // dilim, ALT, UST, e))
     print("   faz araligi | ort VMAF | kotu kare | beklenen")
     tk = len(idx); tn = len(kr)
     for i in range(0, g, dilim):
@@ -26,6 +31,6 @@ def faz(yol, g, ad):
               % (i, min(i + dilim, g) - 1, sum(vs) / len(vs), kk, bek,
                  "<<<" if kk > 2 * bek else ("---" if kk < 0.5 * bek else "")))
 
-faz(".calisma/t122/vmaf/auto-kilitli.json.gz", 120, "auto  -g 120")
+faz("auto", 120, "auto  -g 120")
 print()
-faz(".calisma/t122/vmaf/uzman-biz3-kilitli.json.gz", 300, "uzman-biz3  -g 300")
+faz("uzman-biz3", 300, "uzman-biz3  -g 300")

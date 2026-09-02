@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kuyruk import kareler, kotu, kumele, sn, FPS
+from kuyruk import arsiv, kotu, kumele, sn, FPS
 
 bosluk = int(sys.argv[1]) if len(sys.argv) > 1 else 6
-for ad, yol in (("auto", ".calisma/t122/vmaf/auto-kilitli.json.gz"),
-                ("uzman-hb2", ".calisma/t122/vmaf/uzman-hb2-kilitli.json.gz")):
-    kr = kareler(yol)
+for ad in ("auto", "uzman-hb2"):
+    kr = arsiv(ad)
     e, idx = kotu(kr)
     ku = kumele(idx, bosluk)
     buyuk = [k for k in ku if (k[1] - k[0] + 1) >= 5]

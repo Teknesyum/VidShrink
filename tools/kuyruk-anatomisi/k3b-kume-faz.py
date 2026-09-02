@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from kuyruk import kareler, kotu, kumele
+from kuyruk import arsiv, kotu, kumele
 
-V = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".calisma", "t122", "vmaf")
 ad = sys.argv[1] if len(sys.argv) > 1 else "auto"
 g = int(sys.argv[2]) if len(sys.argv) > 2 else 120
-kr = kareler(os.path.join(V, ad + "-kilitli.json.gz"))
+kr = arsiv(ad)
 e, kt = kotu(kr)
 ku = [k for k in kumele(kt, 6) if k[1] - k[0] + 1 >= 5]
 print("%s g=%d  >=5 karelik kume=%d" % (ad, g, len(ku)))

@@ -22,9 +22,9 @@ def rapor(ad):
     p = paketler(".calisma/t122/ciktilar/%s.mp4" % ad)
     b = {i: s for i, s, _ in p}
     kf = set(i for i, _, k in p if k)
-    iyi = [b[n] for n, _ in kr if n not in ks and n not in kf]
-    kot = [b[n] for n in kt if n not in kf]
-    tum = [b[n] for n, _ in kr if n not in kf]
+    iyi = [b[n] for n, _ in kr if n not in ks and n not in kf and b[n] > 3]
+    kot = [b[n] for n in kt if n not in kf and b[n] > 3]
+    tum = [b[n] for n, _ in kr if n not in kf and b[n] > 3]
     o = lambda x: sum(x) / float(len(x))
     print("== %s  p10 esigi=%.3f  kotu=%d (anahtar kare kotu listede: %d)"
           % (ad, e, len(kt), len(ks & kf)))
@@ -38,7 +38,7 @@ def rapor(ad):
     for i in range(len(dilim) - 1):
         a = srt[int(len(srt) * dilim[i] / 100.0)]
         z = srt[min(int(len(srt) * dilim[i + 1] / 100.0), len(srt) - 1)]
-        gr = [n for n, _ in kr if n not in kf and a <= b[n] <= z]
+        gr = [n for n, _ in kr if n not in kf and b[n] > 3 and a <= b[n] <= z]
         kk = sum(1 for n in gr if n in ks)
         print("     %%%3d-%%%3d (%6d-%6d bayt) kare=%4d kotu=%3d (%%%.1f)"
               % (dilim[i], dilim[i + 1], a, z, len(gr), kk, 100.0 * kk / max(len(gr), 1)))
