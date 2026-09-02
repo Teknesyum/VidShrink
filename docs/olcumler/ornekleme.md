@@ -457,3 +457,85 @@ gösteren tek test. CI'da ffmpeg olmadığı için **atlanıyor**; yani CI'ın y
 bu iddiayı doğrulamıyor. M1 ve M7 mutasyonlarını bu testin yanında yerel
 testler de öldürüyor, dolayısıyla mutasyon kanıtı ffmpeg'siz ortamda da
 ayakta — ama uçtan uca iddia yalnızca ffmpeg'li koşumda sınanıyor.
+
+## K5 — Plan düzeyinde kazanç: ölçüldü, güvenilir kazanç yok
+
+Alet: `tools/VidShrink.Ab` (`origin/main`), `ab kos --hedef-mb 20 --yarismaci vidshrink`.
+Taban `.calisma/t103/ab-taban` = `b9a6544`, dal `.calisma/t103/ab-dal` = `216f450`.
+Aynı hedef boyut, boyut eşitliği toleransı %2; ölçülen boyut farkı her üç kaynakta
+%0.25'in altında. Renk kapısı üçünde de `Direct` (aynı bt2020/smpte2084 uzayı).
+
+| kaynak | yan | bayt | VMAF-NEG ort. | harmonik | p10 | seçilen plan |
+|---|---|---|---|---|---|---|
+| parca-1 | taban | 20 507 016 | 64.024 | 63.427 | 57.191 | 1074x604 @ 2804k |
+| parca-1 | dal | 20 455 084 | **66.445** | **65.660** | 57.130 | 1152x648 @ 2796k |
+| parca-2 | taban | 20 377 501 | 95.751 | 95.748 | 95.303 | 1920x1080 @ 2695k |
+| parca-2 | dal | 20 385 852 | 95.749 | 95.746 | 95.318 | 1920x1080 @ 2695k |
+| parca-3 | taban | 20 375 524 | 54.048 | 53.720 | 49.246 | 1190x670 @ 2694k |
+| parca-3 | dal | 20 377 623 | 54.042 | 53.717 | 49.281 | 1190x670 @ 2694k |
+
+Fark (dal − taban):
+
+| kaynak | Δ ort. | Δ harmonik | Δ p10 | plan değişti mi |
+|---|---|---|---|---|
+| parca-1 | **+2.421** | **+2.233** | −0.062 | evet |
+| parca-2 | −0.003 | −0.003 | +0.016 | hayır |
+| parca-3 | −0.006 | −0.004 | +0.035 | hayır |
+
+**Okunuşu.** Üç kaynağın **ikisinde plan hiç değişmedi** — planlayıcı aynı
+çözünürlüğü ve aynı bit hızını seçti, VMAF farkı ±0.006 ile kodlama gürültüsü
+düzeyinde. Yani örnekleme değişikliği bu iki kaynakta ürüne hiç yansımadı;
+bunu "kazanç yok" diye değil, **"etki yok"** diye yazıyorum.
+
+Üçüncüsünde (parca-1) plan değişti ve yeni plan ortalama ve harmonik VMAF-NEG'de
+**2.4 / 2.2 puan iyi**, p10'da **0.06 puan kötü**. Sözleşmenin istediği üç ölçüden
+ikisi lehte, biri (en kötü onda birlik dilim) aleyhte ve ihmal edilebilir.
+
+**Buna güvenilir kazanç demiyorum, gerekçesi ölçülmüş:** aynı kaynakta yeni
+örneklemenin bppf kestirimi yoğun sayıma göre **+81.00 %** sapıyor (bugünkü
+sabit pencere −14.86 %). Yani parca-1'deki kazanç, kestirimin *doğru* olmasından
+gelmiyor — kestirim belirgin biçimde daha yanlışken çıktı. Çözünürlük
+merdiveninin bir basamak yukarı düşmesi bu kaynakta işe yaramış; bu bir
+mekanizma değil, tek örnekte denk gelen bir sonuç.
+
+**Kazancın mekanizması ölçülmedi.** Daha yanlış bir bppf kestiriminin neden daha
+yüksek çözünürlük seçtirdiğini ve bunun neden VMAF'ı artırdığını bu sözleşmede
+ölçmedim; `ComplexityProfile.cs` bu sözleşmenin yazma alanı dışında.
+
+### Karar
+
+Sözleşmenin kuralı: kazanç yoksa değişiklik geri alınır. Burada durum tam olarak
+"kazanç yok" değil — bir kaynakta ölçülmüş bir kazanç var. Yine de **üretim
+bağlantısını geri alıyorum**, üç ölçülmüş nedenle:
+
+1. Üç kaynağın ikisinde etki sıfır; kazanç tek kaynakta ve üç ölçüden ikisinde.
+2. Kazancın çıktığı kaynakta kestirim **daha yanlış** (+81.00 % / −14.86 %).
+   Kazanç kestirimin doğruluğuna bağlanamıyor.
+3. Yöntemin öncülü gerçek içerikte ölçülerek kırıldı (paket biti ↔ kodlanmış
+   bppf korelasyonu 0.455-0.927; korpusta 0.967-0.992).
+
+Geri alma en küçük biçimde yapıldı: `ProductionPlan` yeniden `SamplingPlan.Fixed`
+ve plan sabit olduğunda paket profili hiç okunmuyor — yani üretimin pencere
+seçimi ve maliyeti `b9a6544`'teki hali. Plan makinesi, testleri ve ölçüm düzeneği
+duruyor; bir sonraki sözleşme sıfırdan başlamasın diye. `ScanPoints` düzeltmesi
+(K6) üretimde **değiştirilmedi**; bu dalda hiç dokunulmadı.
+
+### K6'ya gerçek kaynaklardan ek kanıt
+
+`ScanPoints` düzeltmesinin bugünkü sabit pencerelerde ne yaptığı gerçek
+kaynaklarda da ölçüldü — bu, örnekleme değişikliğinden bağımsız bir sorudur:
+
+| kaynak | güven bandındaki düzeltme | düzeltmesiz sapma | düzeltmeli sapma |
+|---|---|---|---|
+| parca-1 | 1.2230 (`scan`) | **+4.12 %** | **−14.86 %** |
+| parca-2 | 1.0057 (`paket`) | −19.66 % | −20.12 % |
+| parca-3 | 0.9957 (`scan`) | +5.21 % | +5.66 % |
+
+parca-1'de düzeltme bandın içinde (1.2230, güven aralığı 0.5-2.0) ve sapmayı
+4.12 %'den −14.86 %'ye **büyütüyor**; diğer ikisinde düzeltme 1'e yakın, etkisi
+yarım puanın altında. Yani düzeltme ya zararlı ya etkisiz; üç kaynakta da
+faydalı çıkmadı. Bu, korpustaki yargıyla aynı yönde.
+
+**Üretimde `ScanPoints` yine de kaldırılmadı.** Bu dalda `MeasureWindowBiasAsync`
+hiç değiştirilmedi. Üç gerçek kaynak, canlı yoldan bir düzeltmeyi çıkarmak için
+yeterli kanıt değil; kararı veriyle birlikte T0'a bırakıyorum.

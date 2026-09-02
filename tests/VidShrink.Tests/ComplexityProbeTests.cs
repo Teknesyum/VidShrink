@@ -170,6 +170,20 @@ public sealed class ComplexityProbeTests
     }
 
 
+    [Fact]
+    public void ProductionStillPlansTodaysFixedWindowsUntilContentSamplingIsMeasuredToPayOff()
+    {
+        foreach (var duration in new[] { 8.0, 60.0, 240.0, 1036.0 })
+        {
+            var heavyLate = Profile(((int)duration * 3 / 4, 1.0e6), ((int)duration / 4, 9.0e6));
+            var planned = ComplexityProbe.PlanWindows(
+                ComplexityProbe.ProductionPlan, duration, heavyLate, new[] { duration / 2 });
+
+            Assert.Equal(ComplexityProbe.Windows(duration).ToArray(), planned.Select(w => w.Start).ToArray());
+            Assert.All(planned, w => Assert.Equal(1.0, w.Weight));
+        }
+    }
+
     private static IReadOnlyList<double> Profile(params (int Seconds, double Bits)[] runs)
     {
         var profile = new List<double>();

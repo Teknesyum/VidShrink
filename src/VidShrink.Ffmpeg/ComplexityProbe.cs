@@ -28,7 +28,7 @@ public static class ComplexityProbe
     internal const int MaxPlannedWindows = 8;
     internal const double SamplingTargetError = 0.05;
     internal const double WindowsPerHeterogeneity = 3.0;
-    public const SamplingPlan ProductionPlan = SamplingPlan.Profile;
+    public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;
     private const int MinProfileSeconds = 4;
 
     private const double ScanPointSeconds = 1.0;
@@ -73,7 +73,9 @@ public static class ComplexityProbe
             var canProbeHalf = halfWidth >= 64 && halfHeight >= 64;
             var preset = speed == SpeedMode.Fast ? FastProbePreset : ComplexityProfile.ProbePreset;
 
-            var secondBits = await SecondProfileAsync(info, ct);
+            var secondBits = ProductionPlan == SamplingPlan.Fixed
+                ? Array.Empty<double>()
+                : await SecondProfileAsync(info, ct);
             var plan = PlanWindows(ProductionPlan, info.DurationSeconds, secondBits.Count >= MinProfileSeconds ? secondBits : null);
             var windows = plan.Select(w => w.Start).ToArray();
             var motionIndex = windows.Length / 2;
