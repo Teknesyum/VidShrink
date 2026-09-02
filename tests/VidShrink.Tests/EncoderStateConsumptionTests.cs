@@ -6,6 +6,12 @@ namespace VidShrink.Tests;
 
 public sealed class EncoderStateConsumptionTests
 {
+    private sealed class LegacyAvailability(bool works) : IEncoderAvailability
+    {
+        public bool HasEncoder(string name) => true;
+        public bool WorksAsEncoder(string codec) => works;
+    }
+
     private sealed class StateAvailability(params (string Codec, EncoderProbeState State)[] answers) : IEncoderAvailability
     {
         private readonly Dictionary<string, EncoderProbeState> _answers = answers.ToDictionary(
@@ -35,6 +41,16 @@ public sealed class EncoderStateConsumptionTests
         AudioBitrateBps = 128_000,
         AudioChannels = 2
     };
+
+    [Fact]
+    public void ArayuzVarsayilaniOlculemeyeniCalismiyorSaymiyor()
+    {
+        IEncoderAvailability unavailable = new LegacyAvailability(false);
+        IEncoderAvailability available = new LegacyAvailability(true);
+
+        Assert.Equal(EncoderProbeState.Unmeasured, unavailable.EncoderState("libsvtav1"));
+        Assert.Equal(EncoderProbeState.Unmeasured, available.EncoderState("libsvtav1"));
+    }
 
     [Fact]
     public void PickCodecOlculmemisTercihiElemedenGeciriyor()
