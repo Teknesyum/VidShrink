@@ -63,10 +63,13 @@ public static class Rapor
         sb.AppendLine("- **Makine paylasimliydi**; paralelde baska ajanlarin olcumleri kosuyordu.");
         sb.AppendLine("  Bu damga yalniz **sure** sayilarindadir. Bu sayfada sure sayisi yok:");
         sb.AppendLine("  bit, boyut ve kalite sayilari is parcacigi sabitken yukten etkilenmez.");
-        var (_, sha) = Kabuk.Yakala("git", new[] { "rev-parse", "HEAD" });
         var (_, dal) = Kabuk.Yakala("git", new[] { "rev-parse", "--abbrev-ref", "HEAD" });
-        sb.AppendLine($"- Olculen agac: `{dal.Trim()}` @ `{sha.Trim()}` — butun kodlamalar bu");
-        sb.AppendLine("  commit'te derlenmis ikiliyle kosuldu (`--no-incremental`).");
+        var (_, srcSha) = Kabuk.Yakala("git", new[] { "log", "-1", "--format=%H %s", "--", "src" });
+        sb.AppendLine($"- Dal `{dal.Trim()}`. Olculen **uretim kodu**: `src/`in son commit'i");
+        sb.AppendLine($"  `{srcSha.Trim()}`. Butun kodlamalar bu koddan `--no-incremental`");
+        sb.AppendLine("  derlenmis ikiliyle kosuldu; `--no-build` kullanilmadi. Bu commit'ten");
+        sb.AppendLine("  sonraki degisiklikler yalniz `tools/` ve `docs/` icindedir, plani");
+        sb.AppendLine("  etkilemez.");
         sb.AppendLine($"- Ham cikti: `{isKok.Replace('\\', '/')}` (gitignore'lu).");
         sb.AppendLine();
     }
