@@ -25,6 +25,49 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+      # [FfmpegFact] covers ~80 measures across 11 files: the engine's own probe, encode,
+      # scene-map and quality-meter tests. Without ffmpeg on PATH they silently skip, so
+      # the runner never sees them. Pinned to a GitHub Release asset (immutable, unlike
+      # windows-latest's own drift or a rolling "latest" build tag) and checked against a
+      # recorded sha256 so a corrupted or replaced download fails the step instead of
+      # installing something untested.
+      # This installs ffmpeg onto the CI runner to execute tests, which is not distribution
+      # of the built application; the release itself still ships without ffmpeg (see the
+      # GPLv3/AGPL-3.0-or-later note at the top of release.yml).
+      - name: ffmpeg kur (GyanD/codexffmpeg surum 9.0, yerelde kullanilanla ayni)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/GyanD/codexffmpeg/releases/download/9.0/ffmpeg-9.0-full_build.zip'
+          $expectedSha256 = 'F42F0C4B04EAE3AC918707FF66E3E0FF0CEE527BFA6D322624D4BC1160D5055E'
+          $zip = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
+
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          $actual = (Get-FileHash -Path $zip -Algorithm SHA256).Hash
+          if ($actual -ne $expectedSha256) {
+            Write-Error "ffmpeg indirmesi sha256 uyusmuyor: beklenen=$expectedSha256 gelen=$actual"
+            exit 1
+          }
+
+          Expand-Archive -Path $zip -DestinationPath $env:RUNNER_TEMP -Force
+          $bin = Join-Path $env:RUNNER_TEMP 'ffmpeg-9.0-full_build\bin'
+          if (-not (Test-Path (Join-Path $bin 'ffmpeg.exe')) -or -not (Test-Path (Join-Path $bin 'ffprobe.exe'))) {
+            Write-Error "ffmpeg.exe/ffprobe.exe beklenen yolda yok: $bin"
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_PATH -Value $bin
+      # Informational only: this does not fail the build. If a future version swap drops
+      # libvmaf, the quality-meter measures should degrade to a counted, documented skip
+      # (contract T115 K2), not a red install step — the install step above already
+      # verified the binary it downloaded is the one it meant to.
+      - name: ffmpeg surumu ve libvmaf filtresi
+        run: |
+          ffmpeg -version
+          $filters = ffmpeg -hide_banner -filters 2>&1 | Out-String
+          if ($filters -match 'libvmaf') {
+            Write-Host "libvmaf filtresi var."
+          } else {
+            Write-Host "UYARI: libvmaf filtresi yok, kalite olcen testler atlanmaya devam edecek."
+          }
       - run: dotnet build VidShrink.sln -c Release -warnaserror
       # A hung test host prints "Test host process crashed" with Failed: 0 and still
       # exits 0. The gate reads the output and refuses a run that never finished.
