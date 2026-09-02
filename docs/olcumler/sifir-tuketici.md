@@ -93,6 +93,12 @@ duzeltilmis kosum 28 verdi.
 
 ### Ham cikti
 
+**Ham cikti dosyalari `.calisma/T150/` altinda ve `.gitignore`'da — dalla birlikte
+gelmiyorlar.** Denetci onlari aramasin: kararı tasiyan her parca bu rapora **satir icine**
+alindi, geri kalani `dotnet test -c Release --filter "OluUyeTests" --logger
+"console;verbosity=detailed"` ile yeniden uretiliyor. `TheScanDumpsEveryMemberItFound`
+dokumu her kosumda ayni cikiyor, kaydedilmis kopyaya ihtiyac yok.
+
 `OluUyeTests.TheScanDumpsEveryMemberItFound` her uyeyi, her gorunumu, gorunumu siniflayan
 kurali ve dosya:satiri basiyor. Kosum:
 
@@ -140,6 +146,11 @@ fazla satir da eksik satir da kirmizi.
 Her kosumda **`dotnet build -c Release --no-incremental`** kosuldu; `--no-build` yalniz
 o yeniden derlemeden hemen sonraki `dotnet test`te kullanildi, yani olculen ikili her
 zaman mutasyonu tasiyan ikili. Derleme hatasi sayisi her kosumda 0.
+
+Ciktilar `.calisma/T150/` altinda (gitignore'da, dalla gelmiyor); mutasyonlar geri
+alindigi icin yeniden uretilemezler, bu yuzden **karari tasiyan satirlar asagida
+tam metinleriyle duruyor.** Tablodaki dosya adlari yalniz hangi kosumun hangi hucreye
+denk geldigini soyluyor.
 
 | # | mutasyon | beklenen | eski kol | yeni kol |
 |---|---|---|---|---|
@@ -247,7 +258,7 @@ Tek kol var: `--filter "OluUyeTests"`.
 dotnet test -c Release --filter "OluUyeTests" --list-tests
 ```
 
-Sonuc `.calisma/T150/k6-list.txt`: **11 test**, hepsi `VidShrink.Tests.OluUyeTests`
+Sonuc: **11 test**, hepsi `VidShrink.Tests.OluUyeTests`
 altinda. Ikisi `VideoToolboxDoesNotFallIntoTheCrfArm` kodek durumu, ucu
 `TheSoftwareArmStillProducesCrf` kodek durumu, geri kalan alti tekil.
 
