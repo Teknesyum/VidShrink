@@ -435,6 +435,71 @@ auto'nun bu kaynakta çözünürlüğe dokunmaması doğru karardı.
 
 ---
 
+## T111 — kare kilidiyle yeniden ölçüm
+
+T110 mühürlendi: ölçer artık iki girdiyi de `settb=AVTB,setpts=N` ile kare
+indeksine kilitliyor. Bu bölümün üstündeki **bütün** VMAF sayıları kilitsiz
+ölçerle, yani damga eşlemesiyle üretildi. T111 aynı düzeneği yeniden koşturup
+kilidin her sayıya ne yaptığını ölçüyor. Düzenek `tools/auto-mod-olcumu/t111-*.sh`
+altında; çıktılar `.calisma/t111/`.
+
+### Kayma her koşum için tek tek doğrulandı
+
+`ffprobe` kaptaki **her** akışın `start_time`'ını okuyor; grafik kayması videonun
+`start_time`'ı eksi kaptaki en erken akışın `start_time`'ı
+(`tools/auto-mod-olcumu/t111-kayma.sh`). Onbir koşumun tamamı ve kaynak ölçüldü:
+
+| dosya | akış | video `start_time` | en erken akış | kap içi kayma |
+|---|---|---|---|---|
+| `parca-2.mkv` (**kaynak**) | 2 | 0,020000 | 0,000000 | 0,020000 s = 1,200 kare |
+| `auto` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `e1-preset4` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `e2-gop300` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `e3-olcek810` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `uzman-biz3` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `y1-g300-izgara` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `y2-g300-hizali` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `y3-hizali-boyutesit` | 2 | 0,016667 | 0,000000 | 0,016667 s = 1,000 kare |
+| `uzman-hb` (x265) | 2 | 0,020000 | 0,000000 | 0,020000 s = 1,200 kare |
+| `uzman-hb2` (x265) | 2 | 0,020000 | 0,000000 | 0,020000 s = 1,200 kare |
+
+Framesync tek bir dosyanın kaymasına değil, **iki kaymanın farkına** bakıyor.
+Test eksi kaynak:
+
+| aile | kaynak | çıktı | fark | kare cinsinden |
+|---|---|---|---|---|
+| dokuz SVT-AV1 koşumu | 0,020000 | 0,016667 | **−0,003333 s** | −0,200 kare |
+| iki HandBrake koşumu | 0,020000 | 0,020000 | **0,000000 s** | 0,000 kare |
+
+**HandBrake koşumlarının temiz çıkması beklentiydi; doğrulandı — ama beklenen
+sebeple değil.** HandBrake çıktısı kaymasız değil: kaynağın kaymasının aynısını,
+0,020000 s'yi taşıyor. Temiz olan mutlak damgası değil, farkı. Bu ayrımı yazmak
+gerekiyor, çünkü "x265 kaymıyor" cümlesi ölçülen şeyi yanlış anlatır: ölçülen
+şey, x265 yolunun kaynağın kap ofsetini olduğu gibi geçirdiği, bizim AV1
+yolumuzun ise 0,020000'i 0,016667'ye çevirdiğidir.
+
+Kap ofseti dolaylı bir okuma; kare kare damga farkı doğrudan ölçüldü
+(`tools/auto-mod-olcumu/t111-damga.sh`, `showinfo` `pts_time` dökümü, 3624 kare):
+
+| koşum | kare 0 | ortalama | en düşük | en yüksek | negatif kare |
+|---|---|---|---|---|---|
+| `auto` (AV1) | −3,33 ms | −3,02 ms | −4,33 ms | −1,67 ms | **3624 / 3624** |
+| `uzman-biz3` (AV1) | −3,33 ms | −3,02 ms | −4,33 ms | −1,67 ms | **3624 / 3624** |
+| `uzman-hb` (x265) | +0,00 ms | +0,31 ms | −1,00 ms | +1,67 ms | 180 / 3624 |
+| `uzman-hb2` (x265) | +0,00 ms | +0,31 ms | −1,00 ms | +1,67 ms | 180 / 3624 |
+
+İki ölçüm birbirini tutuyor: AV1 tarafında sapma **tek yönlü** — 3624 karenin
+3624'ü kaynağın damgasının gerisinde, ortalama −3,02 ms. Kaynağın kendi kare
+aralığı 16,6666 ms (en kısa 14,00, en uzun 19,00), yani sapma bir karenin
+beşte biri kadar; ama işareti hiç değişmediği için framesync her karede bir
+önceki kaynak karesini eşliyor. x265 tarafında sapmanın işareti değişiyor
+(3624 karenin 3444'ü pozitif), ortalaması sıfırın üstünde ve kare 0 tam sıfır —
+tam kare kayması üretmiyor.
+
+Kalan yedi koşumun kare kare damgası **ölçülmedi**; onlar için kanıt yalnız
+kap ofseti. Dördü ölçüldü çünkü belgedeki karşılaştırmaları bu dört koşum
+taşıyor.
+
 ## Ölçüm sırasında bulunan kusurlar — düzeltilmedi
 
 T102 kod değiştirmiyor. Bunlar ayrı sözleşme ister.
