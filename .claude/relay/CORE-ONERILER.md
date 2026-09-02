@@ -206,3 +206,36 @@ zorluyorsa, o davranisin mumkun oldugu durumu da tanimali.
 kalabiliyor" maddesinin kardesi. Ikisinde de kanca **eksik durum** okuyup mutlak
 karar veriyor. Ortak cozum ayni: kanca durumu okuyamiyorsa ya da yarim okuyorsa
 **turu engellememeli.**
+
+## Ekran kapisi `dotnet test`in icinden acilan pencereyi gecirir
+
+**Belirti.** T145 yapicisi `UpdaterTests`in canli baslatici bandini olcmek icin
+`VIDSHRINK_LAUNCHER_EXE`i kurdu; test gercek `Process.Start` yapti, baslatici eksik
+kurulumda **kullanicinin masaustune modal hata kutusu** acti. Kullanici calisirken
+ekranina kutu dustu.
+
+Kapi bunu tasarimi geregi gecirdi: `ekran-kapisi.js` `dotnet test`i hic engellemiyor
+(dogru bir varsayilan, cogu test bassiz). Ama testin **icinden** baslatilan GUI sureci
+de ayni muafiyetin altinda kaliyor.
+
+**Neden onemli.** Kapinin sozu "ajan masaustunu habersiz almaz". Bu yol o sozu deliyor
+ve ajan kotu niyetli olmadan deliyor — T145 sozlesmesi bandi olcmesini istiyordu,
+bandi olcmek sureci baslatmayi gerektiriyordu.
+
+**Ikinci zarar: olcu de bozuluyor.** `UpdaterTests.cs:890`
+`process.WaitForExit(60_000)` modal kutu kapanana kadar donmuyor. Yani o bant
+olculdugunde olculen sey baslaticinin suresi degil, kutunun ekranda kaldigi sure.
+Kullaniciyi kesen sey ayni zamanda olcuyu de yalanci yapiyor.
+
+**Oneri.**
+
+1. Kapi `dotnet test`i engellemeye devam etmesin, ama **test kosumu sirasinda acilan
+   pencereyi** yakalasin: kosum baslarken gorunur pencere sayisi alinip kosum sonunda
+   karsilastirilabilir, ya da alt surec agaci GUI alt sistemi icin taranabilir.
+   Engelleme degil **uyari** yeterli: `T145 kosumu 1 pencere acti (VidShrink.exe)`.
+2. Sozlesme sablonunda "surec baslatan olcu" ayri bir kalem olsun. Boyle bir bandi
+   olcen sozlesme, olcumu bassiz yapmayi ya da bandi saatten kurtarmayi **kriter olarak**
+   tasisin; yapicinin kesfetmesine birakilmasin.
+3. Bu depoya ozel: `LiveLauncherFact` bandlari kurulum eksikken **atlanmali**, kutu
+   acmamali. `VIDSHRINK_LAUNCHER_EXE` var ama yanindaki `VidShrink.App.exe` yoksa
+   `Skip` yine devreye girsin. Bugun oznitelik yalniz baslaticinin varligina bakiyor.
