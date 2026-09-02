@@ -167,3 +167,50 @@ YAN BULGU (motoru ilgilendirir): VD kaynaginda 276 satir gercek goruntu kesilmes
 ragmen klip p10'u yukseliyor (10,837 -> 12,211); son yarinin 600 karesinin 413'unde
 kirpilmis kol daha kotu. Kirpma benzeri her ozelligin guvenligi tek bir toplu VMAF
 sayisiyla denetlenemez — kabul kriteri kare dagilimina bakmali.
+
+## T128 — PickCodec gercek yoklamaya baglandi (teslim, dal `T128-pickcodec`)
+
+T123'un bilerek yazmadigi duzeltme yazildi. `PickCodec` artik `PickFastCodec` ile ayni
+soruyu soruyor, ama `WorksAsEncoder`a ciplak baglanmadi: onunde iki kapi var — derleme
+listesinde olmayan yoklanmadan elenir, henuz olculmemis yoklanmaz (gecici cevap +
+`HardwareNotMeasured`). Kalan `WorksAsEncoder` ile okunur.
+
+K1 on kosulu bagimsiz dogrulandi: `_probed`e yazan iki yer (`:180`, `:191`), zaman asimi
+`if (!result.Measured) return result;` ile erken donuyor, `Hdr10Probe` ayni desen. Kacak
+dal yok. Nuans: `WorksAsEncoder` iki durumlu, `Unmeasured`i false'a katliyor ve zaman
+asimi onbellege yazilmadigi icin olculmemis kodlayici her cagrida yeniden yoklaniyor.
+Tasarim bu nuanstan cikti.
+
+K3: ham `EncoderCapabilities` yolunda soguk 9,56 -> 279,45 ms, sicak 0,1693 -> 0,1658 ms.
+Plan hesabi basina en cok 2 yoklama (olcuyle pimli), en kotu durum 2 x `ProbeKillMs` =
+30 000 ms. Kabul edilebilir, cunku arayuzun yeniden hesabi bu yolu kullanmiyor: bes plan
+cagrisinin dordu `DeferredEncoderAvailability` gecidini goruyor, besincisi ham nesneyi ve
+o da `Task.Run` icinde acilista — ustelik `SpeedMode.Fast` verdigi icin plan kodlayicisi
+`PickFastCodec`ten geciyor, T128'in oraya ekledigi en cok bir yoklama. Gecitli yolda
+sifir surec.
+
+K5 iki yonde de kirmizi: (a) 5 olcu, (b) 2 olcu.
+
+BULGU: "Uyumlu" secmek yoklamadan kurtarmiyor. Plan kodlayicisi (`libx264`) yoklanmiyor
+ama tavsiye kodlayicisi yoklaniyor, cunku `suggestedPreference` `MaxCompression`.
+`Compatible` yolu "hic degismedi" degil.
+
+BULGU: `verify` filtresi yetmedi. Tam suit `PlanCalculatorProbeTests`in iki cagri-sirasi
+pimini kirdi (`works:libsvtav1` eklendi); filtre o dosyayi hic kosturmuyordu.
+
+T0 KARARI GEREKLI:
+1. `src/VidShrink.App/Locales/{en,tr}/main.json:283` ve `:312` — dort satir, `owns`
+   disinda, dokunulmadi. Core cumlesi duzeltildigi icin iki kopya ayristi; kullanici hala
+   yanlis sebebi ("not available on this ffmpeg build") goruyor.
+2. `owns` boslugu, iki dosya: `EncoderAvailabilityTests.cs` (`verify`de var, `owns`da yok;
+   T123'un kusur kaydi cevrildi) ve `PlanCalculatorProbeTests.cs` (ikisinde de yok; iki
+   cagri-sirasi pimi guncellendi). Ikisi de bilerek yapildi.
+3. `WorksAsEncoder`in iki durumlu imzasi kaldirilmadi, gecidin arkasina alindi. Ham nesne
+   veren her cagiran (`:1377`, `tools/`) olculemeyen yoklamayi hala "calismiyor" okuyor.
+   T129 ayni ayrimi `EncoderProbeResult` uzerinde aciyor; birlesince tek temsile inmeli.
+
+K7: CI 33623785112 (`1d4a259`) success, 0/1326/19/1345. Tam suit yerelde
+`PerformanceCheckTests.YukAltindaKararHafiflemiyorMu`yu kirmizi verdi; ayni commit'te
+uc kez kosuldu, kirmizi-yesil-kirmizi — makine yukune bagli, T128'e degil. CI'da o
+olcu `[SKIP]`, yani CI yesili onu dogrulamiyor. `SplitDragTests`ten sonra bu depoda
+zamana bagli ikinci olcu.
