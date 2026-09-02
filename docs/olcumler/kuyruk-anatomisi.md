@@ -267,3 +267,154 @@ kare, GOP fazı 0–9'da sıfır kötü kare, faz 110–119'da 2,17× yığılma
 Sahne geçişi etkisi `auto`'da var ama küçük (kuyruğun %24'ü) ve
 HandBrake'te yok.
 
+## Yeniden kodlama ve neyin neyle eşlendiği
+
+K1–K3 arşivden çıktı, yeni kodlama gerekmedi. K4 ve K5 **kare başına bit**
+istiyor; T111'in kodlama çıktıları o sözleşmenin temizliğinde silinmişti,
+dolayısıyla iki koşum yeniden üretildi (`tools/kuyruk-anatomisi/k45-uret.sh`,
+tek seferde tek ağır kodlama, `-threads 4` + `lp=4` / `pools=4`).
+
+| koşum | T111'deki boyut | yeniden üretilen | fark |
+|---|---|---|---|
+| `uzman-hb2` | 15 743 067 B | **15 743 067 B** | **0** |
+| `auto` | 15 496 155 B | 14 450 295 B | −%6,7 |
+
+**`uzman-hb2` birebir yeniden üretildi.** Yeni dosya kilitli ölçerden geçirildi
+ve arşivin JSON'uyla **kare kare aynı** çıktı: ortalama 95,7432, p10 95,3799,
+en büyük kare farkı **0,000000**, kötü kare kümesi birebir aynı 363 kare.
+HandBrake tarafında bit verisi ile K1–K3'ün kalite verisi **aynı dosyadan**
+geliyor.
+
+`auto` yeniden üretilemedi ve bu beklenen bir sonuç: `auto` düzenekten değil
+uygulamanın kendi başsız yolundan çıkmıştı (`t111-olc.sh` onu
+`gui/parca-2_shrunk.mp4` üzerinde ölçüyor), T111 zaten motorun o tabandan beri
+değiştiğini ve yeni `auto`'nun T102'nin dosyasına eşlenmediğini kaydetmişti.
+Yeniden üretilen `auto` **ayrı bir koşum** sayıldı ve kendi kilitli ölçümü
+alındı:
+
+| | arşiv `auto` | yeniden üretilen `auto` |
+|---|---|---|
+| ortalama | 95,647 | 95,486 |
+| p10 | 94,903 | 94,497 |
+| en düşük kare | 92,376 | 91,785 |
+| kötü kare kesişimi | — | **317 / 363 (%87,3)** |
+
+Bu kesişim K2'nin en güçlü kontrolü: **aynı yapılandırmanın iki ayrı kodlaması
+kuyruğunun %87'sini aynı karelere koyuyor** (şans 36,4 kare, yani %10). Aynı
+kaynağa karşı `auto` ↔ HandBrake kesişimi %18,7. Kuyruğun yerini belirleyen
+şey kodlayıcıdır; ölçüm gürültüsü değildir.
+
+**K4 ve K5'in her sayısı, kalite ve bit aynı dosyadan olmak üzere yeniden
+üretilen çiftten alınmıştır.** K1–K3'ün sayıları arşivden; ikisi karıştırılmadı.
+
+## K4 — Kötü karelerin içeriği
+
+`tools/kuyruk-anatomisi/bitler.py` paket boyutlarını `ffprobe`'dan alır
+(`packet=pts_time,size,flags`, pts'e göre sıralanır; hb2 B kare taşıdığı için
+sıralama zorunlu). Kalite verisi aynı dosyanın `vmaf-t122/` altındaki kilitli
+ölçümünden.
+
+### Bütçe nereye gidiyor
+
+| | `auto` | `uzman-hb2` |
+|---|---|---|
+| video toplamı | 13 397 086 B | 14 665 457 B |
+| **anahtar kare sayısı** | **31** (%0,86) | **7** (%0,19) |
+| anahtar karelere giden bayt | **11 235 518 (%83,9)** | **2 633 052 (%18,0)** |
+| anahtar kare başına | 362 436 B | 376 150 B |
+| inter karelere giden bayt | 2 161 568 (%16,1) | 12 032 405 (%82,0) |
+| **inter kare başına** | **602 B** | **3 327 B** |
+
+Anahtar kare başına maliyet iki tarafta neredeyse aynı (362 KB ↔ 376 KB).
+Fark **sayıdadır**: `-g 120` 60 fps'te iki saniyede bir anahtar kare demek,
+60 saniyelik klipte 31 tane. HandBrake 7 tane koyuyor. Sonuç: `auto`'nun
+inter kareleri HandBrake'inkinin **beşte biri** kadar bit alıyor.
+
+### Anahtar karelerin yeri — ölçülen
+
+| koşum | anahtar kare indeksleri |
+|---|---|
+| `auto` | 0, 120, 240, … 3600 (tam 120'lik ızgara) + sahne kaynaklı 1697, 2313, 2345, 2721, 2777, 2881, 3377, 3393, 3409 |
+| `uzman-hb2` | 0, 600, 1200, **1700**, 2300, 2900, **3411** |
+
+HandBrake'in yedi anahtar karesinden **ikisi tam olarak S13→S14 (1700) ve
+S14→S15 (3411) kesimlerine oturuyor**; kalan beşi 600 karelik (10 s) ızgara.
+SVT-AV1 aynı kesimleri de buluyor (1697 ve 3409'da fazladan intra) ama
+üstüne katı 120 ızgarasını da koyuyor.
+
+Bu, K3'ün testere dişini açıklıyor: her 120 karede bir 362 KB'lik bir intra
+bütçeyi silip süpürüyor, arkasındaki 119 kare artakalanı paylaşıyor ve
+anahtar kareden uzaklaştıkça kalite tek yönlü düşüyor.
+
+### Kaynak 60 fps kapta 30 fps içerik
+
+`auto`'nun inter karelerinin **1781'i (%49,6) 10 bayttan küçük** — hepsi
+**çift indeksli** ve ardışık farkları 2 (1750 çiftte 2, 30 çiftte 4).
+3 bayt AV1'de "önceki kareyi tekrarla" demektir. Çıkarım kapanıyor: kodlayıcı
+kopya yazdığı halde puan düşmüyorsa (aşağıdaki tablo) **kaynak kareler de
+birbirinin aynısıdır**. Yani kaynak 60 kare/s kapta 30 kare/s içerik taşıyor
+ve SVT-AV1 bunu doğru görüyor.
+
+Bunun kuyruğa etkisi ölçüldü:
+
+| | |
+|---|---|
+| atlanan kare ile öncekinin VMAF farkı | ortalama **+0,0025**, medyan −0,0010 |
+| farkı 0,5 puandan büyük olan | 1781 karede **20** |
+| kötü kare çiftleri: ikisi de kötü | **165** |
+| yalnız biri kötü | 26 |
+
+Atlanan kare, kopyaladığı karenin puanını **aynen** alıyor. Yani `auto`'nun
+363 kötü karesi **191 ayrı içerik anına** karşılık geliyor; kuyruk sayının
+gösterdiğinin yarısı kadar geniş. Bu, p10'un ölçüde nasıl davrandığına dair
+bir düzeltme değil (eşik aynı), kuyruğun **yorumuna** dair bir düzeltme.
+
+**`uzman-hb2`'de 10 bayttan küçük tek kare yok.** x265 kopyaları da
+kodluyor; kopya karelerin VMAF farkı ortalama −0,0042, yani sonuç aynı,
+maliyeti değil. HandBrake'in çift kare çiftlerinde ikisi de kötü olan
+sayısı 130.
+
+## K5 — HandBrake aynı yerde ne yapıyor
+
+`tools/kuyruk-anatomisi/k5b-ayrisan.py`. Her kare için iki dosyanın paket
+boyutu yan yana konur. İki dosyanın inter kare ortalaması farklı olduğu için
+(602 B ↔ 3327 B, **5,53 kat**) mutlak bayt karşılaştırması yanıltıcı olurdu;
+**her sayı kendi dosyasının inter kare ortalamasına bölünmüş** olarak da
+veriliyor (`×` sütunu). Bu, seviye farkını çıkarıp **dağıtım biçimini**
+karşılaştırır — sorunun sorduğu şey budur.
+
+Anahtar kareler dışarıda. Kalite verisi her iki tarafta kendi dosyasının
+kilitli ölçümünden; `auto` yeniden üretilen koşum.
+
+| küme | kare | `auto` bayt | `auto` × | `auto` VMAF | `hb2` bayt | `hb2` × | `hb2` VMAF |
+|---|---|---|---|---|---|---|---|
+| tüm inter kareler | 3589 | 602 | 1,00 | 95,483 | 3332 | 1,00 | 95,743 |
+| **yalnız `auto` kötü** | 302 | 630 | **1,05** | 94,144 | 6292 | **1,89** | 95,553 |
+| **yalnız `hb2` kötü** | 297 | 892 | **1,48** | 95,239 | 1681 | **0,51** | 95,327 |
+| ortak kötü | 60 | 1422 | 2,36 | 94,101 | 3828 | 1,15 | 95,271 |
+| ikisi de iyi | 2930 | 553 | 0,92 | 95,674 | 3184 | 0,96 | 95,814 |
+
+Tablo simetrik ve tek bir şey söylüyor:
+
+- `auto`'nun **yalnız kendi** düştüğü 302 karede kendi ortalamasının
+  **1,05 katını** harcıyor — yani o kareleri özel olarak görmüyor.
+  HandBrake aynı karelerde kendi ortalamasının **1,89 katını** harcıyor
+  ve **düşmüyor** (95,553).
+- Aynanın öbür yüzü: HandBrake'in **yalnız kendi** düştüğü 297 karede
+  kendi ortalamasının **0,51 katını** harcıyor; `auto` aynı karelerde
+  **1,48 katını** harcıyor ve **düşmüyor** (95,239).
+- İkisinin de düştüğü 60 kare gerçekten zor: `auto` 2,36×, HandBrake
+  1,15× harcıyor, ikisi de kurtaramıyor. Kuyruğun **%16,5**'i.
+
+**Kuyruk bir yetenek sorunu değil, bir dağıtım sorunu.** Her iki kodlayıcının
+kötü kareleri, tam olarak kendi hız denetiminin öbürünün yargısına göre
+az beslediği karelerdir. Bu K2'nin sonucunu ikinci bir yoldan doğruluyor:
+kusur kodlayıcıya ait ve düzeltilebilir.
+
+### Kuyruğu kapatmanın ölçülen maliyeti
+
+`auto`'nun yalnız kendi düştüğü 302 karenin her birine HandBrake'in oranını
+(1,89×) vermek, kare başına 630 B yerine 1138 B demek. Fark 302 × 508 B =
+**153 KB**, video bütçesinin **%1,14**'ü. Bu bit başka bir yerden gelmek
+zorunda; nereden geleceği K6'nın konusu.
+
