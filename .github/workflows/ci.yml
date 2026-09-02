@@ -38,7 +38,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $url = 'https://github.com/GyanD/codexffmpeg/releases/download/9.0/ffmpeg-9.0-full_build.zip'
-          $expectedSha256 = 'F42F0C4B04EAE3AC918707FF66E3E0FF0CEE527BFA6D322624D4BC1160D5055'
+          $expectedSha256 = 'F42F0C4B04EAE3AC918707FF66E3E0FF0CEE527BFA6D322624D4BC1160D5055E'
           $zip = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
 
           Invoke-WebRequest -Uri $url -OutFile $zip
