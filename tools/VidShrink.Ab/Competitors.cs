@@ -110,6 +110,7 @@ public sealed class VidShrinkCompetitor : ICompetitor
         var options = new PlanOptions
         {
             TargetMb = targetMb,
+            Codec = CodecPreference.Auto,
             FillPolicy = FillPolicy.FillTarget,
             SpeedMode = SpeedMode.Quality,
             AllowResolutionDrop = true,
