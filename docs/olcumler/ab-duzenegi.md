@@ -721,3 +721,111 @@ taşır.**
 commit'ler. Dalın **son kod commit'i `381e8ab`** — `git log --oneline 381e8ab..HEAD
 -- src tests tools` boş dönmelidir. Dönmüyorsa CI ölçülen kodu koşturmamıştır ve
 yukarıdaki damgalar CI için geçersizdir.
+
+## T125 — bu belgedeki tablolar bugünün koduyla yeniden üretilemiyor
+
+Bu bölüm T125'in **K1** adımıdır: düzeneği değiştirmeden bir satırı yeniden koş,
+yayımlanmış sayılarla karşılaştır. **Tutmadı.** Sebep ölçüm düzeneğinde değil,
+düzeneğin ölçtüğü kodda.
+
+### Düzenek aynı, ölçtüğü şey değişti
+
+Yukarıdaki bütün tablolar `381e8ab` ile ölçüldü. Bugünün tabanı `fcf377f`
+(`origin/main`). Arada:
+
+| ne | fark |
+|---|---|
+| `tools/VidShrink.Ab` (A/B aracının kendisi) | `git diff 381e8ab origin/main -- tools/VidShrink.Ab` **boş** |
+| `src/` (ürün + ölçer) | **31 commit**, 13 dosya, +856 / −46 satır |
+
+Yani A/B aracı bit bit aynı; **ürün ve ölçer** değişti. Bu belgedeki sayılar
+artık var olmayan bir kodun sayıları.
+
+### Kanıt — aynı bayt, başka puan
+
+`parca-1` @ 3,4975 MB satırı bugünkü tabanla yeniden koşuldu (koşum
+`.calisma/ab/t125/k1-parca-1-compatible.json`, makine yüklü — başka ajanlar da
+koşuyordu; **hiçbir süre ölçüsü alınmadı**).
+
+HandBrake tarafı **bit bit aynı dosyayı** üretti: 3.531.037 bayt, yayımlanan
+değerle farkı **0 bayt**. Aynı dosya, aynı kaynak, aynı komut. Değişen tek şey
+onu ölçen kod:
+
+| ölçü | yayımlanan (`381e8ab`) | bugün (`fcf377f`) | fark |
+|---|---|---|---|
+| bayt | 3.531.037 | 3.531.037 | **0** |
+| harmonik | 47,71 | 48,56 | **+0,86** |
+| p10 | 34,32 | 34,56 | +0,23 |
+| kare min | 3,02 | **16,42** | **+13,40** |
+| ortalama | 52,16 | 52,33 | +0,16 |
+| XPSNR | 30,93 | 30,95 | +0,02 |
+
+Bu bir kontrollü deney: girdi baytı değişmediği için farkın **tamamı ölçerden**
+geliyor. Harmonikteki 0,86 puan, bu belgenin kendi gürültü bandının
+(0,1–0,5 VMAF-NEG, "Ölçünün kendi kararsızlığı") **dışında**. Kare minimumundaki
+13,40 puan ise gürültüyle aynı sınıfta bile değil.
+
+`src/VidShrink.Ffmpeg/QualityMeter.cs` bu aralıkta dört commit aldı
+(`e290624` T97 VMAF tavan kelepçesi, `63ac655` ve `9dbb6b1` T104 en kötü birim,
+`822dd3a` kare kilidi). `381e8ab`de dönen değerler `NormalizeVmafCeiling`den
+geçiyordu (`score >= 99.8 ? 100.0 : score`), bugün geçmiyor.
+
+### VidShrink tarafında iki şey birden oynadı
+
+| ölçü | yayımlanan | bugün | fark |
+|---|---|---|---|
+| bayt | 3.526.564 | 3.525.089 | −1.475 |
+| harmonik | 31,94 | 33,44 | +1,50 |
+| p10 | 18,11 | 18,57 | +0,46 |
+| kare min | 1,46 | 5,53 | +4,06 |
+| ortalama | 39,14 | 40,35 | +1,21 |
+| XPSNR | 28,97 | 29,06 | +0,09 |
+
+Plan kararı aynı kaldı (768x432@60, libx264/2pass, aynı gerekçe metni, aynı
+tahmin 76,9/100), ama üretilen ffmpeg komutu değişti: **`-g 120` → `-g 600
+-keyint_min 60`** (T98, `8ea80c4` — sabit anahtar kare aralığı yerine sahne
+haritasından türetilen aralık). Yani bu satırda hem kodlayıcı hem ölçer değişti;
+ikisinin payı **ayrıştırılmadı**.
+
+### Bu satırda açığa ne oldu
+
+| | HandBrake | VidShrink | açık |
+|---|---|---|---|
+| yayımlanan | 47,7061 | 31,9442 | **15,7619** |
+| bugün | 48,5646 | 33,4408 | **15,1238** |
+
+Açık bu satırda **0,64 puan daraldı** ve yönü değişmedi: HandBrake hâlâ önde.
+Ölçülen tek satır budur. Öteki beş çift **ölçülmedi**, dolayısıyla "altı çiftin
+beşinde HandBrake önde" manşetinin bugünkü kodda ne olduğu hakkında bu bölüm
+hiçbir şey söylemiyor — ne doğruluyor ne çürütüyor.
+
+### Bunun neyi durdurduğu
+
+T125'in geri kalan ölçümleri (K3 üç sütunlu tablo, K4 kodek ayrımı, K6 yerleşim
+ayrıştırması) yayımlanmış sayılara dayanıyordu. K6'nın karar eşikleri
+(69,65 ve 93,70, ve "≥ ~81 çıkarsa hipotez yaşıyor") doğrudan yukarıdaki
+`381e8ab` tablosundan alınmış. O taban yeniden üretilemediği için bu eşiklere
+karşı verilecek bir karar **ölçüm değil**. Eşikler bugünkü tabanla yeniden
+kurulmadan K6 koşulmadı.
+
+**Ölçülmedi:** `parca-2` ve `parca-3`'ün hiçbir hedefte yeniden koşumu; 600 MB
+hedefinin altı satırının hiçbiri; K6'nın zorunlu-1080p koşumu; kodlayıcı
+değişikliğiyle ölçer değişikliğinin paylarının ayrıştırılması.
+
+### "Bütçeyi bitirmiyoruz" hipotezi — kapandı
+
+Yol haritası bunu hâlâ açık bir soru gibi taşıyor; değil. Yayımlanmış iki
+koşumun JSON'ları sayıldı (`sonuc-parca-60-ikiyebolme.json` 6 satır,
+`sonuc-parca.json`ın 600 MB bölümü 6 satır): **on iki satırın on ikisinde de
+`SizeEqual` doğru**, yani eşitlemeden sonra bütün satırlar ±%2'nin içinde. Aynı
+satırlar eşitliğe yaklaşırken 60 MB açığı **9,72 → 9,11 → 9,04** izledi.
+
+Tek cümleyle: bütçeyi bitirmemek 60 MB'deki 9,72 puanlık açığın **0,68'ini**
+açıklıyordu; kalan **9,04 puan eş boyutta ölçüldü** ve bu hipotezle
+açıklanamıyor. Hipotez ölçüldü ve kapandı.
+
+İki koşul, ikisi de yukarıda ayrıntılı: (1) bu sayılar `381e8ab` tabanının
+sayılarıdır ve o taban bugünkü kodla yeniden üretilemiyor (üstteki T125
+bölümü) — ama kapanış **bayta** dayandığı için puandaki kaymadan etkilenmiyor;
+(2) `parca-3 / vidshrink @ 600 MB` satırı kapıya 2.802 bayt uzakta ve tek koşuma
+dayanıyor, kararlılığı **ölçülmedi**.
