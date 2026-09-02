@@ -129,12 +129,80 @@ public static class Program
                 case "k5": await K5Async(p); break;
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
+                case "k4b": await K4bAsync(p); break;
                 case "plan": await PlanYazAsync(p); break;
                 case "dogrula": if (!await DogrulaAsync(p)) return 1; break;
                 default: Console.Error.WriteLine($"bilinmeyen komut: {komut}"); return 2;
             }
         }
         return 0;
+    }
+
+    private static async Task K4bAsync(Pencere p)
+    {
+        var hedef = Yol($"k4b-{Kol}-{p.Ad}.csv");
+        if (File.Exists(hedef)) { Console.WriteLine($"{p.Ad}: k4b zaten var"); return; }
+
+        var k1Yol = Yol($"k1-{Kol}-{p.Ad}.json");
+        if (!File.Exists(k1Yol)) { Console.WriteLine($"{Kol}/{p.Ad}: k4b atlandi — k1 yok"); return; }
+        var k1 = JsonSerializer.Deserialize<K1Kaydi>(await File.ReadAllTextAsync(k1Yol), Json)!;
+
+        var harita = await HaritaAsync(p);
+        var map = Map(harita);
+        var (plan, info) = await PlanAsync(p);
+        var bayrak = ZonesFlag(plan.Codec);
+
+        var satirlar = new List<string> { "aday;parametre;mae_pp;bilinmiyor" };
+        if (bayrak is null || plan.ModeEnum == EncodeMode.PassThrough)
+        {
+            var not = plan.ModeEnum == EncodeMode.PassThrough
+                ? $"plan passthrough ({plan.Codec})"
+                : $"{plan.Codec} parametre yolu yok";
+            satirlar.Add($"zones;-;;{not}");
+            satirlar.Add($"qcomp;-;;{not}");
+            await File.WriteAllLinesAsync(hedef, satirlar);
+            Console.WriteLine($"{Kol}/{p.Ad}: k4b BILINMIYOR — {not}");
+            return;
+        }
+
+        var hak = k1.HakEdilen.ToArray();
+        satirlar.Add($"taban;-;{Kabuk.Inv(Butce.MeanAbsoluteError(k1.Verilen.ToArray(), hak) * 100, "0.000")};");
+
+        var gamma = Butce.Gamma(Butce.DefaultQcomp);
+        var zones = Butce.ZonesArg(map, Butce.ZoneCarpanlari(map, gamma), harita.Fps);
+        var adaylar = new (string Ad, string Param)[]
+        {
+            ("zones", $"zones={zones}"),
+            ("qcomp", "qcomp=1.0")
+        };
+
+        foreach (var (ad, param) in adaylar)
+        {
+            var cikti = Path.Combine(Is, $"k4b-{Kol}-{p.Ad}-{ad}.mkv");
+            if (!File.Exists(cikti))
+            {
+                var used = plan.Clone();
+                used.ExtraArgs.AddRange(new[] { bayrak, param });
+                used.ExtraArgs.AddRange(IsParcacigiArgs(used.Codec));
+                used.ExtraArgs.AddRange(new[] { "-threads", Threads.ToString(CultureInfo.InvariantCulture) });
+                var log = Path.Combine(Is, "gecis", Path.GetFileNameWithoutExtension(cikti));
+                Directory.CreateDirectory(Path.GetDirectoryName(log)!);
+                var a1 = FfmpegArguments.Build(info, used, cikti, 1, log, EncoderCapabilities.Instance, map);
+                var r1 = Kabuk.Kos(ToolLocator.Ffmpeg, a1);
+                if (r1.Code == 0)
+                {
+                    var a2 = FfmpegArguments.Build(info, used, cikti, 2, log, EncoderCapabilities.Instance, map);
+                    Kabuk.Kos(ToolLocator.Ffmpeg, a2);
+                }
+            }
+            if (!File.Exists(cikti)) { satirlar.Add($"{ad};{param};;kodlama cikti uretmedi"); continue; }
+            var pay = Normalize(SahneBitleri(cikti, map));
+            var mae = Butce.MeanAbsoluteError(pay, hak) * 100;
+            satirlar.Add($"{ad};{(ad == "zones" ? "zones=<harita>" : param)};{Kabuk.Inv(mae, "0.000")};");
+            Console.WriteLine($"{Kol}/{p.Ad}/{ad}: MAE {Kabuk.Inv(mae, "0.000")} pp");
+        }
+
+        await File.WriteAllLinesAsync(hedef, satirlar);
     }
 
     private static bool AyniHarita(SceneMap a, SceneMap b)
