@@ -401,15 +401,11 @@ public sealed class EncodeRunnerTests
         await process.WaitForExitAsync();
         return stdout.Split('\n').Count(line => line.Trim().TrimEnd(',') == "I");
     }
-}
 
-/// <summary>
-/// Teslim yolunun basari kapisi. ffmpeg taninmayan bir kodlayici anahtarini dusurup
-/// <b>cikis kodu 0</b> ile donuyor; motorun sectigi psikogorsel ayar sessizce kayboluyor.
-/// Olcumler `docs/olcumler/cikis-kodu-yalan.md` altinda.
-/// </summary>
-public sealed class EncodeRunnerDroppedOptionTests
-{
+    // --- Teslim yolunun basari kapisi ---
+    // ffmpeg taninmayan bir kodlayici anahtarini dusurup cikis kodu 0 ile donuyor;
+    // motorun sectigi psikogorsel ayar sessizce kayboluyor. Olcumler:
+    // docs/olcumler/cikis-kodu-yalan.md
     [Fact]
     public void ExitZeroWithADroppedOptionDoesNotFailButTheDropIsCarried()
     {

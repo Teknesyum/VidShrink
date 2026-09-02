@@ -272,3 +272,45 @@ verilen stderr metninin ürettiği kararı pimliyor.
 
 Mutasyon koşumu bitince çalışma ağacı geri alındı; `git status --short` boş, taban 16/16
 yeşil.
+
+## K6 — Her verify kolu gerçekten test buluyor
+
+`dotnet test -c Release --list-tests --filter "<kol>"`, kol başına bulunan test sayısı:
+
+| Kol | Sözleşme öncesi | Teslimde |
+|---|---|---|
+| `EncodeRunnerTests` | 13 | **19** |
+| `FfmpegRunnerTests` | **0** (dosya yoktu) | **10** |
+| `SegmentEncoderTests` | 8 | **8** (dokunulmadı) |
+
+Sıfır bulan kol yok.
+
+### Kol sayımı bir kusur yakaladı
+
+Yeni `EncodeRunner` ölçülerini önce ayrı bir sınıfa (`EncodeRunnerDroppedOptionTests`)
+yazmıştım. `--list-tests` bunu gösterdi:
+
+```
+=== EncodeRunnerTests ===
+13
+=== EncodeRunnerDroppedOptionTests kolda gorunuyor mu ===
+0
+```
+
+vstest'in varsayılan operatörü tam ada değil, `FullyQualifiedName` üzerinde **alt dizeye**
+bakıyor. `VidShrink.Tests.EncodeRunnerDroppedOptionTests.…` dizgisi `EncodeRunnerTests`
+alt dizesini **içermiyor**; dolayısıyla altı yeni ölçü verify kolunun tamamen dışında
+kalıyordu — ve kol yine de exit 0 ile geçtiği için bu sessizce olurdu. Ölçüler mevcut
+`EncodeRunnerTests` sınıfına taşındı; kol 13'ten 19'a çıktı.
+
+Aynı tuzağın ters yönü de var: `EncodeRunnerTests` koluna `EncodeRunnerAtomicOutputTests`
+sınıfı **girmiyor**, çünkü o adın içinde de `EncodeRunnerTests` alt dizesi yok. Kolun
+adı sınıf adının aynısı olmadıkça hangi testleri kapsadığı tahmin edilemiyor; sayım
+zorunlu.
+
+### Sözleşme verify'ının tamamı
+
+```
+dotnet test -c Release --filter "EncodeRunnerTests|FfmpegRunnerTests|SegmentEncoderTests"
+→ Başarısız: 0, Başarılı: 37, Atlanan: 0, Toplam: 37
+```
