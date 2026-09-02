@@ -53,10 +53,23 @@ public static class Program
     public const int Threads = 8;
 
     /// Uretimdeki iki yazilim kolu: MaxCompression varsayilani libsvtav1, Compatible libx264.
+    /// MaxCompression'in yedek kodlayicisi: libsvtav1 yokmus gibi davranan sarmalayici.
+    /// K4 libsvtav1'in zones'u sessizce yok saydigini gosterdi; sikistirma ailesinde
+    /// zone denenebilen tek kodlayici bu yoldan cikiyor.
+    private sealed class SvtavYok(IEncoderAvailability ic) : IEncoderAvailability
+    {
+        public bool HasEncoder(string name)
+            => !name.Contains("svtav1", StringComparison.OrdinalIgnoreCase) && ic.HasEncoder(name);
+
+        public bool WorksAsEncoder(string codec)
+            => !codec.Contains("svtav1", StringComparison.OrdinalIgnoreCase) && ic.WorksAsEncoder(codec);
+    }
+
     public static readonly Dictionary<string, CodecPreference> Kollar = new()
     {
         ["maks"] = CodecPreference.MaxCompression,
-        ["uyumlu"] = CodecPreference.Compatible
+        ["uyumlu"] = CodecPreference.Compatible,
+        ["yedek"] = CodecPreference.MaxCompression
     };
 
     private static string Kok = string.Empty;
@@ -175,7 +188,10 @@ public static class Program
             FillPolicy = FillPolicy.FillTarget,
             SpeedMode = SpeedMode.Quality
         };
-        var plan = PlanCalculator.Build(info, options, EncoderCapabilities.Instance);
+        IEncoderAvailability caps = Kol == "yedek"
+            ? new SvtavYok(EncoderCapabilities.Instance)
+            : EncoderCapabilities.Instance;
+        var plan = PlanCalculator.Build(info, options, caps);
         return (plan, info);
     }
 
@@ -224,11 +240,16 @@ public static class Program
                 {
                     "-hide_banner", "-v", "error", "-y",
                     "-ss", Kabuk.Inv(s.Start, "0.######"), "-t", Kabuk.Inv(s.Duration, "0.######"),
-                    "-i", Kaynak(p), "-an",
+                    "-i", Kaynak(p), "-an"
+                };
+                if (plan.Width != info.Width || plan.Height != info.Height)
+                    argv.AddRange(new[] { "-vf", FormattableString.Invariant($"scale={plan.Width}:{plan.Height}:flags=lanczos") });
+                argv.AddRange(new[]
+                {
                     "-c:v", plan.Codec, "-preset", plan.Preset,
                     "-crf", ReferansCrf.ToString(CultureInfo.InvariantCulture),
                     "-pix_fmt", plan.PixelFormat
-                };
+                });
                 argv.AddRange(IsParcacigiArgs(plan.Codec));
                 argv.AddRange(new[] { "-threads", Threads.ToString(CultureInfo.InvariantCulture), cikti });
                 var r = Kabuk.Kos(ToolLocator.Ffmpeg, argv);
