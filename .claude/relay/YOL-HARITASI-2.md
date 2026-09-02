@@ -264,6 +264,39 @@ açıklayan cümle yanlıştı. "Harmonik ortalama yalan söylüyor" tanısı ü
 sözleşmenin sınırına yazıldı ve hiçbirinde ölçülmedi. Bir tanının kendisi de
 ölçülür.
 
+## Alet kendi adlandirdigi kusuru tekrarladi (T106 denetimi, 2026-09-02)
+
+T106 denetimden **KALDI** dondu — ama teshis onaylandi. Duseren sey su:
+
+T106'nin K4 listesi `tools/auto-mod-olcumu/tablolar.py:24`'u "sutun adi
+saydigiyla uyusmuyor" diye isaretledi. **Ayni commit'te bench'in kendi
+ciktisinda ayni kusuru uretti:** `peak-curve` tablosunun baslik satiri 10 sutun,
+veri satiri 11 hucre. Markdown isleyicisi fazlayi atar, yani T106'nin ekledigi
+kelepce uyarisi aletin rapora sayi ureten asil isinde sessizce kaybolur.
+
+Denetci bunu iddiadan degil **gercek kosumdan** cikardi. Ders bu:
+
+**Bir kusuru adlandirmak ondan bagisiklik vermez.** Cikti bicimini degistiren her
+commit, ciktinin kendisine sorulmadan kapanmaz. "Uc yerin ucu de artik damgayi
+yaziyor" cumlesi kod okunarak yazilmisti; alet kosturulsaydi bir satirda
+gorunurdu.
+
+Ayrica denetci iki olcunun **davranis degil dizgi** olctugunu buldu:
+`Assert.Contains("settb=AVTB,setpts=N", …)` — `setpts=N+1` mutasyonu 10/10 yesil
+geciyor. Yani **bir kare kaydiran kilit**, yani T106'nin kapattigi kusurun tam
+kendisi, olcuye takilmiyor. Bu projenin adi konmus kusuru: sabit karsilastiran
+test davranis olcmez.
+
+### Ayni acik uretim kodunda duruyor — T110
+
+`src/VidShrink.Ffmpeg/QualityMeter.cs:278` grafiginde kare kilidi yok ve
+`--measured-quality` ile **kalibrasyon cipalari** o yoldan geciyor. Alet duzeldi,
+urun duzelmedi; ikisi ayrisirsa bir sonraki yanlis karar oradan cikar.
+
+**T110 acildi.** Kalibrasyon cipalarinin hepsi kaymis olcuyle konmus olabilir —
+o zaman hepsi gecersiz. `docs/olcumler/algi-olcusu.md:171` bir x264 kosumunda
+`VMAF-NEG min 0,0000` gosteriyor; belge de kirlenmis.
+
 ## Aynı kusuru iki tur birden düzeltiyor (T98 × T105)
 
 T98 anahtar kare üst sınırını `SceneMap` ortalamasından türetiyor ve
@@ -372,9 +405,108 @@ calisiyor.** Sabit kalir ama sessizce yanlislasamaz.
 8. **T108** — tepe eğrisi. T98 ölçtü ve eğrinin şekli ölçümle ters göründü:
    aşma kanıtının geldiği ~11,4×'te geniş, açmanın +3,665 puan kazançlı
    ölçüldüğü ~4,6×'te 1,02'ye kilitli. T98 mühürlenince açılır.
-9. **Eşik içerikten türetilir.** T105 ölçtü: durgun ve hareketli pencere ters
+9. **T111** — T102'nin sekiz sayısı kaymış eşlemeyle ölçüldü. Uzman açığı
+   (+0,400) ayakta, HandBrake karşılaştırması değil. T110 kilidi inince
+   yeniden ölçülür.
+10. **Eşik içerikten türetilir.** T105 ölçtü: durgun ve hareketli pencere ters
    yöne çekiyor, sabit tek eşik üçünün hiçbirinde en iyi değil. Ürünün
    dinamiklik ilkesinin en somut adayı.
+
+## Ilk adil A/B: geridiyiz (T95, 2026-09-02, denetimde)
+
+Aylardır HandBrake'i çıktısından tanıyorduk. T95 ilk **adillik kapılı** A/B
+aletini kurdu ve altı çift ölçtü. Sonuç ürünün hedefine ters:
+
+| Hedef | HandBrake | VidShrink |
+|---|---:|---:|
+| 60 MB (harmonik) | 28,70 | 18,98 |
+| 600 MB (harmonik) | 67,96 | 58,83 |
+
+**Altı çiftin beşinde HandBrake önde.** Bu sayıya güvenmeden önce üç çekince var
+ve üçü de denetimde:
+
+1. **Manşet ölçüt harmonik ortalama** ve harmonik ortalama T106'da soruşturma
+   altında. Ajanın kendi tablosunda bir satırda kare minimumu **0,00** duruyor —
+   matematiksel olarak tek sıfır harmonik ortalamayı sıfıra çeker, demek ki bir
+   taban kıskacı var. Kıskacın manşeti ne kadar biçimlendirdiği ölçülmedi.
+2. **60 MB satırları kendi eş boyut kapısını geçmiyor.** Kapı ±%2, VidShrink'in
+   üç satırı da −%3,13 / −%8,61 / −%3,17. Kapı kendi kuralına göre o
+   karşılaştırmayı geçersiz sayar.
+3. **Parça kipi iyimser.** 600 MB'da parça kestirimi 58,83, tam koşum 47,78 —
+   sapma **+11,05**. K6'nın sayıları parça kipinden geliyorsa mutlak iddia
+   kurulamaz.
+
+Yine de **yön haber değeri taşıyor** ve ölçüm iki gerçek tuzağı yakaladıktan
+sonra alındı: HandBrake preset'inin otomatik kırpması 1920x1072 üretiyordu (aynı
+satır düzeltilince 20,27 → 93,70), ve parçaların biri ses taşırken öteki
+taşımıyordu — bütçe eşitsiz bölünüyordu. İkisi de ölçüyü haksız yapıyordu, ikisi
+de ajanın kendi bulgusu.
+
+**Bütçeyi bitirmiyoruz.** 60 MB hedefinde üç satırın üçü de hedefin altında
+kalıyor. Daha az bit harcayıp daha düşük puan almak, kalite açığının bir kısmını
+tek başına açıklayabilir — ama **bu bir hipotez, ölçülmedi.** Nedensel bağı
+kurmak için eş boyutta yeniden ölçmek gerekir.
+
+Bu bulgu T112'yle kavuşuyor: bir taraf HandBrake'in **çıktısını** ölçüyor, öteki
+**kaynağını** okuyor. Açığın büyüklüğünü T95, sebebini T112 verecek.
+
+## Duzenek tools'a ulasamiyor — ikinci tekrar (T105, T98)
+
+`AGENTS.md` diyor ki: ölçümü üreten düzenek `tools/` altına taşınır. Ama `owns`
+disiplini diyor ki: sahiplenmediğin yola yazamazsın. **İki sözleşme arka arkaya
+bu iki kuralın arasında sıkıştı** — T105 sahne yer gerçeği üretecini, T98 atlama
+ölçüm düzeneğini `tools/`a koyamadı. İkisi de `.calisma/` altında kaldı;
+`.calisma/` gitignore'lu, yani **düzenekler depoda yok.**
+
+Sonuç: rapora giren sayı kalıcı, onu üreten alet değil. Sayı bir gün
+sorgulandığında yeniden üretilemez. T111'in varlık sebebi tam olarak budur —
+T102'nin sayıları sorgulandı ve arşivi olduğu için kurtarılabildi.
+
+**Kural: her sözleşmenin `owns` satırı kendi düzenek yolunu içerir.**
+`tools/<is-adi>/**` biçiminde, sözleşme yazılırken. Sonradan eklenmez; ajan
+duvara çarptığında iş zaten bitmiştir. T111 bunu taşıyor
+(`tools/auto-mod-olcumu/**`), T112'nin düzeneği yok.
+
+**Sahipsiz kalan iki düzenek** — bir sahip bulunana kadar borç:
+- T105'in sahne yer gerçeği üreteci (`.calisma/` altında, T109'un ağacında)
+- T98'in atlama ölçüm düzeneği (`.calisma/t98/atlama/`, ham veri 840+120 satır)
+
+Genel biçimi: **bir kural ihlali iki ayrı kuralın kesişiminden doğuyorsa,
+suçlu ajan değil kesişimdir.** İkinci tekrarda ajanı uyarmak değil, sözleşme
+şablonunu düzeltmek gerekir.
+
+## Muhurlenmis bir olcum kirli cikti (T102 x T106, 2026-09-02)
+
+T102 mühürlendi ve iyi iş yaptı. **Ama ölçüldüğü boru hattı kaymış** ve bunu
+ölçen T106'ydı — T102 kapandıktan sonra.
+
+T106 denetçisi T102'nin ham verisinden doğrudan saydı (`.calisma/t102/vmaf/*.json`):
+**altı AV1 koşumunun `<1,0` kümesi birebir özdeş, iki x265/HandBrake koşumunda boş.**
+Sebep T110'un konusu: kaynağın video akışı `0,020000 s`'de başlıyor, bizim ffmpeg
+çağrımız çıktıyı `0,016667 s`'ye taşıyor, framesync her kareyi komşusuyla eşliyor.
+HandBrake `start_time`'ı düşürmüyor — o yüzden temiz.
+
+Yani T102'nin tablosunda **iki ayrı sınıf koşum yan yana duruyor**:
+
+| Karşılaştırma | Durum |
+|---|---|
+| auto ↔ uzman-biz (ikisi de AV1) | muhtemelen sağlam — yanlılık iki tarafta da var |
+| y1 ↔ y2 ↔ y3 (üçü de AV1) | muhtemelen sağlam — aynı gerekçe |
+| auto ↔ uzman-handbrake | **sağlam değil** — bir taraf kaymış, öteki değil |
+
+Bu, iki sonucu ayırıyor. **+0,400'lük uzman açığı ayakta** — AV1 ile AV1
+karşılaştırılıyor, ceza iki tarafta da aynı. Ama **auto 94,462 ↔ uzman-hb2 95,731**
+karşılaştırması ayakta değil; o 1,269 puanın içinde yalnız bizim tarafın ödediği
+bir ceza var ve **düzeltmenin büyüklüğü ölçülmedi.** İddia edilmez.
+
+"Muhtemelen" kelimesi bilerek duruyor: kümenin özdeş olması yanlılığın **aynı
+yönde** olduğunu gösterir, **aynı büyüklükte** olduğunu göstermez. **T111** bunu
+ölçüyor.
+
+Kural: **bir ölçümün mührü, ölçen aletin geçerliliğini mühürlemez.** T102 kendi
+kabul kriterlerinin hepsini geçti; kusur kriterlerde değil, hepsinin altındaki
+alettteydi. Alet sonradan sorgulandığında **mühürlenmiş sayılar yeniden açılır** —
+mühür geriye dönük bir doğruluk garantisi değil, o günkü kanıtın kaydıdır.
 
 ## Değişmeyen kurallar
 

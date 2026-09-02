@@ -109,3 +109,5 @@
 {"id":"T106","result":"stale","at":"2026-09-02T00:06:11.553Z"}
 {"id":"T100","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncodeRunnerTests|ComplexityProbeTests|SegmentEncoderTests","code":0}],"auditorRunId":null,"headSha":"7551de089516a55e656a1e73c0b0eed193c25b05","at":"2026-09-02T00:14:09.956Z"}
 {"id":"T105","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SceneMapTests","code":0}],"auditorRunId":null,"headSha":"4e05fac38ffa094a6a775fe4b7714fb1b32243d2","at":"2026-09-02T00:54:17.345Z"}
+{"id":"T109","result":"stale","at":"2026-09-02T01:01:25.341Z"}
+{"id":"T102","round":"3","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SettingsTabTests","code":0}],"auditorRunId":null,"headSha":"b862dba882b1c9381397055fac6c954687655bbb","at":"2026-09-02T01:15:08.149Z"}

@@ -76,7 +76,7 @@ khb = enyakin(["hb", "hb2"])
 out = []
 w = out.append
 
-w(u"| satır | boyut | ortalama | p10 | harmonik | sıfır puanlı kare | en düşük kare |")
+w(u"| satır | boyut | ortalama | p10 | harmonik | 1 puan altı kare | en düşük kare |")
 w("|---|---|---|---|---|---|---|")
 def k3sat(etiket, k):
     if not d.get(k):
