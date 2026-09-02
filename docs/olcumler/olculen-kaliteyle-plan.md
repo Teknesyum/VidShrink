@@ -683,9 +683,13 @@ Kilitli ölçerde dört hücrenin dördü de tamamlandı:
 Üç şey okunuyor:
 
 1. **Kol yalnız planı değiştirdiğinde bir şey yapıyor.** İki SDR hücresinde plan
-   alan alan özdeş çıktı; oradaki ±0,03'lük oynama koşumdan koşuma gürültüdür —
-   aynı planın iki koşumu §11.4'te 0,0083 MB farklı dosya üretti, yani gürültü
-   tabanı bu mertebede.
+   sekiz alanın sekizinde de özdeş çıktı (genişlik, yükseklik, fps, kodlayıcı,
+   kip, crf, bit hızı, preset). Kolun oradaki etkisi **tam olarak sıfırdır** ve
+   bu sayıdan değil **plan özdeşliğinden** okunur; tabloda görünen ±0,03 mean ve
+   −0,63 p10, aynı planın iki ayrı kodlamasından gelir. Aynı planın iki koşumu
+   §11.4'te 0,0083 MB farklı dosya ve 0,0014 dB farklı XPSNR üretti — yani
+   kodlama yeniden üretilebilir değil. **Bu değişkenliğin mean VMAF cinsinden
+   büyüklüğü ölçülmedi.**
 2. **Planı değiştirdiği yerde kazanç garantili değil.** İki HDR ikamesinin
    **birinde** kazanç var (+1,60 mean, +3,32 p10) ve **üstelik dosya 1,59 MB
    daha küçük**; diğerinde hiçbir şey yok (−0,01). HDR olmak yeterli koşul değil.
@@ -702,8 +706,9 @@ kaynaklar farklı (§11.1), aynı ölçek üzerinde durmuyorlar.
 
 **Karar: kol kapatılmaz.** Gerekçe ölçüdür, tercih değil:
 
-- Ölçülen en kötü sonuç −0,01 mean; bu gürültü tabanının altında. **Ölçülmüş
-  zarar yok.**
+- Ölçülen en kötü sonuç −0,01 mean, ve o da planın özdeş olduğu bir hücrede,
+  yani koldan gelmiyor. Planı değiştirdiği iki hücrede sonuç +1,60 ve −0,01.
+  **Ölçülmüş zarar yok.**
 - Ölçülen en iyi sonuç +1,60 mean / +3,32 p10 ve 1,59 MB daha küçük dosya.
   **Ölçülmüş kazanç var.**
 - Kol zaten sevk edilmiş ve varsayılan (§11.3). Kapatmak bir ürün değişikliğidir
