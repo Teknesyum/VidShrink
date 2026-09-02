@@ -667,6 +667,12 @@ auto'ya artık eşlenmiyor: yeni auto **15 496 155** bayt teslim etti, T102'nin
 belgelediği 15 766 933'ten **%1,72 küçük** — kalibrasyon sondası bu turda farklı
 karar verdi. Eski eşleşme çifti bu yüzden %1,75 ve %1,59 yukarıda kaldı.
 
+**Neden elle:** T112 mühürlendi ve HandBrake'in **hedef boyut yolu olmadığını**
+kaynaktan doğruladı (`TargetSize` okuyan yok; `muxcommon.c:564-568` yalnız günlük
+satırı). Bizim tarafta da karşılaştırma sabit bit hızıyla yapıldı. Yani iki taraf
+da hedef boyuta nişan almıyor; boyut eşlemesi ancak istenen bit hızını elle
+yoklayarak kuruluyor.
+
 **Yöntem:** istenen bit hızı üzerinde ikiye bölme. Ölçüt teslim edilen dosya
 boyutu, hedef yeni auto'nun 15 496 155 baytı. Her deneme tam bir iki geçişli
 kodlama; ayarlar sabit (preset 4, `-g 300`, `lp=4`), yalnız `-b:v` değişiyor.
