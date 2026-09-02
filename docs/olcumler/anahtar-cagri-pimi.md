@@ -1,11 +1,20 @@
 # T148 — Yerelleştirme ölçüsü çağrı yerlerini okumaya başladı
 
 **Tarih:** 02.09.2026 · **Sözleşme:** `.claude/relay/contracts/T148.md` ·
-**Dal:** `T148-anahtar-cagri-pimi` · **Taban:** `origin/main` = `d74a57f`
+**Dal:** `T148-anahtar-cagri-pimi` · **Taban:** `origin/main` = `de3475f`
 
 Bu sözleşme kod düzeltmedi. `tests/VidShrink.Tests/LocalizationTests.cs` içine
 beş ölçü ekledi; ölçülen şey, Serkan'ın 2 Eylül'de gerçek Mac'te gördüğü
 kusur sınıfının neden statik olarak yakalanmadığı.
+
+**Sözleşmenin öncülü yanlıştı.** Sözleşme, anahtar tüketiminin `Say("`
+deseniyle sayılabileceğini ve XAML tarafında "0 eşleşme" olduğunu yazıyor.
+Kapalı küme desenle değil **türden** çıkarıldı: `VidShrink.App.Localization`
+ad alanında `string key` parametresi alan üyeler tohum, onları çağıran üyeler
+sabit noktaya kadar büyütülerek 11 kapı bulundu; Avalonia'nın derlediği XAML
+aynı derlemede IL olduğu için `{loc:Text ...}` yolu da aynı taramaya düştü.
+Sonuç: XAML uygulamanın **en büyük** tüketim yolu (196 çağrı yeri), `Say`
+(141) değil. Desenle sayıp mutlak cümle kurmak K2'nin yasakladığı şeydi.
 
 Sözleşme düzeltmenin `b692684` ile girdiğini yazıyor; o commit `.DS_Store`
 temizliği. Üç anahtar düzeltmesi `b2f2c62`, `main`e `a2b9664` birleştirmesiyle
@@ -156,10 +165,10 @@ değişince kırmızı verir.
 |---|---|---:|
 | 1. Çağrılan ama katalogda olmayan | **kırmızı** — `KodunCagirdigiHerAnahtarIkiKatalogdaDaVar` | 0 |
 | 1b. Çağrı yerine bağlanamayan, derlemede geçen anahtar biçimli dize | **kırmızı** — `CagriYerineBaglanamayanAnahtarBicimliDizelerDeKatalogdaVar` | 0 |
-| 2. Katalogda var, hiçbir çağrı yerine bağlanmadı | **kırmızı yapılmadı** | 34 |
-| 2b. Katalogda var, derlemenin hiçbir yerinde geçmiyor | **kırmızı** — `KatalogdaBirikenOluCeviriListesiBuyumuyor` | **1** |
+| 2. Katalogda var, hiçbir çağrı yerine bağlanmadı | **kırmızı yapılmadı** | 33 |
+| 2b. Katalogda var, derlemenin hiçbir yerinde geçmiyor | **kırmızı** — `KatalogdaBirikenOluCeviriListesiBuyumuyor` | **0** |
 
-Yön 2'nin ham hâli (34) kırmızı yapılamaz, çünkü sayının 33'ü meşru: dizide
+Yön 2 kırmızı yapılamaz, çünkü 33'ünün tamamı meşru: dizide
 ya da sözlükte duran, çalışma anında seçilen anahtarlar. Ham liste:
 
 ```
@@ -180,19 +189,30 @@ Cagri yerine baglanamayan ama derlemede gecen: 33
   settings.update.no-self-effect
 ```
 
-Bu 33'ü çıkarınca **tek bir gerçek ölü anahtar** kalıyor:
+Bu 33'ü çıkarınca ilk ölçümde **tek bir gerçek ölü anahtar** kalmıştı:
 
 ```
 Yon 2b - katalogda var, derlemenin hicbir yerinde yok (OLU): 1
   main.plan.reasons-count
 ```
 
-`main.plan.reasons-count` iki katalogda da duruyor (`main.json:118`), koda
+`main.plan.reasons-count` iki katalogda da duruyordu (`main.json:118`), koda
 `b976332` (T83) ile girdi ve o günden beri hiçbir yerden çağrılmadı — doğduğu
-gün ölüydü. **Silinmedi:** sözleşmenin K4 maddesi "gerçek bir kusur bulursan
-bildir, kendin düzeltme" diyor. Bunun yerine ölçünün `KnownDead` listesine
-yazıldı; liste iki yönlü çalışıyor, yani anahtar kullanılmaya başlarsa ya da
-katalogdan çıkarsa ölçü yine kırmızı verir ve pim bayatlamaz.
+gün ölüydü. İlk teslimde silinmemiş, ölçünün `KnownDead` listesine yazılmıştı.
+**T0 bu kararı bozdu:** ölü anahtarı listede tutmak, sözleşmenin kapatmaya
+çalıştığı şeyi kalıcı hale getiriyor. Anahtar iki katalogdan da silindi
+(`main.plan.reasons` zaten kullanımda; `-count` varyantının bağlanacağı dosya
+bu sözleşmenin `owns`u dışında). Katalog dosyaları `owns` içinde olduğu için
+silme bu sözleşmede yapılabildi.
+
+`KnownDead` mekanizması duruyor, listesi **boş**. Boş listeyle ölçünün hâlâ bir
+şey ölçtüğü K5'in (f) mutasyonuyla gösterildi: kataloğa çağrılmayan bir anahtar
+eklenince ölçü kırmızı veriyor. Liste iki yönlü çalışıyor — kayıtta duran bir
+anahtar canlanırsa da kırmızı verir, yani pim bayatlamıyor.
+
+Silmeden sonra bugünkü durum: `en` ve `tr` kataloglarında 389'ar anahtar,
+derlemedeki anahtar biçimli dize kümesi de 389; ikisi **birebir eşit**, ölü
+sayısı 0.
 
 Yön 1b'nin bilinen riski: ilk parçası bir alan adıyla (`main`, `playback`,
 `performance`, `settings`) çakışan ama anahtar olmayan bir dize — örneğin
@@ -213,14 +233,15 @@ Başarılı!  - Başarısız:     0, Başarılı:    15, Atlanan:     0, Toplam:
 alan öneklerine daraltılınca üçü de düştü; sayı uydurulmadı, kataloğun ilk
 parçalarından üretiliyor.
 
-Bulunan gerçek kusur: yukarıdaki tek ölü anahtar. Üretim kodunda kırık anahtar
-kalmadı.
+Bulunan gerçek kusur: yukarıdaki tek ölü anahtar; T0 kararıyla katalogdan
+silindi. Üretim kodunda kırık anahtar kalmadı, sahte pozitif yok.
 
 ## K5 — Mutasyon ızgarası
 
-Beş mutasyon, teker teker, her biri kendi `dotnet build -c Release
---no-incremental` derlemesiyle. Sütunlar yeni beş ölçü; `E` sütunu bugünkü on
-testten etkilenen.
+Altı mutasyon, teker teker, her biri kendi `dotnet build -c Release
+--no-incremental` derlemesiyle ve tamamı **teslim edilen kodun** üstünde
+(ölü anahtar silindikten, `KnownDead` boşaltıldıktan sonra) yeniden koşturuldu.
+Sütunlar yeni beş ölçü; `E` sütunu bugünkü on testten etkilenen.
 
 | Mutasyon | 1 Çağrılan⊄katalog | 1b Dize⊄katalog | 2b Ölü | Kapı pimi | 5c Kaynak alt sınırı | E (eski) |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -229,6 +250,7 @@ testten etkilenen.
 | (c) küme üretimi boş döndürüldü (`Grow` yerine boş küme) | yeşil | yeşil | yeşil | yeşil | **KIRMIZI** | yeşil |
 | (d) `Strings`'e yeni kapı eklendi (`Ask(string key)`) | yeşil | yeşil | yeşil | **KIRMIZI** | yeşil | yeşil |
 | (e) dizideki anahtar bozuldu (`main.stage.pass` → `pas`) | yeşil | **KIRMIZI** | **KIRMIZI** | yeşil | yeşil | yeşil |
+| (f) kataloğa çağrılmayan anahtar eklendi (`main.plan.zzz-hic-cagrilmayan`, iki dile) | yeşil | yeşil | **KIRMIZI** | yeşil | yeşil | yeşil |
 
 Beş ölçünün beşi de en az bir mutasyonda kırmızı verdi; ölü kol yok.
 
@@ -240,10 +262,13 @@ beklenen, çünkü anahtar gerçekten yalnız `tr`'den silindi.
 (c) ölçünün kendi kör kalmasını yakalıyor. Ham çıktısı:
 
 ```
-[xUnit.net 00:00:08.37]     VidShrink.Tests.LocalizationTests.OlcuKaynaktaGorunenCagriYerlerininTamaminiBuluyor [FAIL]
+[xUnit.net 00:00:07.80]     VidShrink.Tests.LocalizationTests.OlcuKaynaktaGorunenCagriYerlerininTamaminiBuluyor [FAIL]
   Hata İletisi:
    Kaynakta görünen 281 anahtarın 281 tanesi ölçünün çağrı yeri kümesinde yok; ölçü kör kalmış:
-Başarısız! - Başarısız:     1, Başarılı:    14, Atlanan:     0, Toplam:    15
+  main.about.ai.body
+  main.about.ai.title
+  ...
+Başarısız! - Başarısız:     1, Başarılı:    14, Atlanan:     0, Toplam:    15, Süre: 1 s
 ```
 
 Bu kolun dayanağı bağımsız bir alt sınır: `*.axaml` dosyalarındaki 196
@@ -251,6 +276,24 @@ Bu kolun dayanağı bağımsız bir alt sınır: `*.axaml` dosyalarındaki 196
 geçişi, birlikte 281 ayrı anahtar. IL'den çıkan küme bunun üst kümesi olmak
 zorunda. Sayı toplam iddiası için kullanılmıyor — yalnız "ölçü boş dönerse
 kırmızı olsun" diye.
+
+(f) boş `KnownDead` listesinin ölü kol olmadığını gösteriyor: liste boşken de
+kataloğa yeni bir ölü anahtar girdiği anda ölçü kırmızı veriyor. Ham çıktısı:
+
+```
+[xUnit.net 00:00:09.17]     VidShrink.Tests.LocalizationTests.KatalogdaBirikenOluCeviriListesiBuyumuyor [FAIL]
+  Başarısız VidShrink.Tests.LocalizationTests.KatalogdaBirikenOluCeviriListesiBuyumuyor [210 ms]
+  Hata İletisi:
+   Ölü çeviri sayımı kaydıyla uyuşmuyor:
+'main.plan.zzz-hic-cagrilmayan' iki katalogda da var ama derlemenin hiçbir yerinde geçmiyor.
+Başarısız! - Başarısız:     1, Başarılı:    14, Atlanan:     0, Toplam:    15, Süre: 1 s - VidShrink.Tests.dll (net8.0)
+```
+
+Mutasyon geri alındıktan sonraki doğrulama:
+
+```
+Başarılı!  - Başarısız:     0, Başarılı:    15, Atlanan:     0, Toplam:    15, Süre: 1 s - VidShrink.Tests.dll (net8.0)
+```
 
 ## K6 — Verify kolu gerçekten test buluyor
 

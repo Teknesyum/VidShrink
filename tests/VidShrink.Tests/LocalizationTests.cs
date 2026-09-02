@@ -360,7 +360,7 @@ public sealed class LocalizationTests : IDisposable
             $"kümesinde yok; ölçü kör kalmış:\n  " + string.Join("\n  ", lost));
     }
 
-    private static readonly string[] KnownDead = { "main.plan.reasons-count" };
+    private static readonly string[] KnownDead = Array.Empty<string>();
 
     private static KeyScan Measure()
         => KeyCallSites.Scan(

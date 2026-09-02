@@ -115,7 +115,6 @@
   "main.plan.title": "Yapılacak işlem",
   "main.plan.empty": "Bir dosya yükleyin; motorun verdiği her karar burada madde madde listelenir.",
   "main.plan.reasons": "Neden böyle",
-  "main.plan.reasons-count": "Neden böyle · {0}",
   "main.plan.fact.plan": "Plan türü",
   "main.plan.automatic": "Otomatik",
   "main.plan.fact.encoder": "Kodlayıcı",

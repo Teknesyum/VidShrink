@@ -115,7 +115,6 @@
   "main.plan.title": "What it will do",
   "main.plan.empty": "Load a file and every decision the engine makes is listed here.",
   "main.plan.reasons": "Why these choices",
-  "main.plan.reasons-count": "Why these choices · {0}",
   "main.plan.fact.plan": "Plan",
   "main.plan.automatic": "Automatic",
   "main.plan.fact.encoder": "Encoder",
