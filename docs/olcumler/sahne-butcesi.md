@@ -40,6 +40,7 @@ Ikili her seferinde `--no-incremental` derlenir; `--no-build` kullanilmaz.
 | Tekrar gurultusu | `SahneButcesi tekrar <kol> <pencere>` | `tekrar-<kol>-<pencere>.csv` |
 | K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |
 | Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |
+| Yorum cumlesi denemesi | `bash tools/sahne-butcesi/06-tekrar-denemesi.sh` | `tekrar-denemesi.csv` |
 | Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |
 | K9 | `bash tools/sahne-butcesi/02-mutasyon.sh` | `k9-mutasyon.txt` |
 | bu sayfa | `SahneButcesi rapor` | — |
@@ -622,6 +623,13 @@ sayilirlar. Sebep sutunu olcumun kendi ciktisindan gelir, elle yazilmadi.
 | K7 | yedek/p3-hareketli | kosulmadi: `k7-*.json` yok |
 
 Toplam 28 satir, 4 bolumde: K1/K2 2, K4 eki 9, K5/K6 8, K7 9.
+
+"Kosulmadi" diyen 18 satirin sebebi tek: olcum penceresi
+icinde sira gelmedi. Kapasite eksigi degil, sure eksigi.
+Olculen 1 K5 hucresinin gozlenen suresi (ilk kodlama
+dosyasindan sonuc JSON'una) en fazla 36 dk
+(`uyumlu-p1-karisik`); hucre basina iki tam iki gecisli kodlama arti iki VMAF
+kosumu vardir. Bu sure dosya zaman damgalarindan hesaplandi.
 
 ## K9 — kural koda girdiyse mutasyon kaniti
 

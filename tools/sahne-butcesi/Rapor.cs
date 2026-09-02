@@ -194,6 +194,7 @@ public static class Rapor
         sb.AppendLine("| Tekrar gurultusu | `SahneButcesi tekrar <kol> <pencere>` | `tekrar-<kol>-<pencere>.csv` |");
         sb.AppendLine("| K7 | `SahneButcesi k7 <kol> <pencere>` | `k7-<kol>-<pencere>.json`, `.zones.txt` |");
         sb.AppendLine("| Karar kodu denemesi | `bash tools/sahne-butcesi/04-kapi-denemesi.sh` | `kapi-denemesi.csv` |");
+        sb.AppendLine("| Yorum cumlesi denemesi | `bash tools/sahne-butcesi/06-tekrar-denemesi.sh` | `tekrar-denemesi.csv` |");
         sb.AppendLine("| Dosya tamligi | `bash tools/sahne-butcesi/05-cikti-denetimi.sh` | `cikti-denetimi.csv` |");
         sb.AppendLine("| K9 | `bash tools/sahne-butcesi/02-mutasyon.sh` | `k9-mutasyon.txt` |");
         sb.AppendLine("| bu sayfa | `SahneButcesi rapor` | — |");
@@ -1100,6 +1101,34 @@ public static class Rapor
         var bolumler = satirlar.GroupBy(x => x.Bolum).OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
         sb.AppendLine($"Toplam {satirlar.Count} satir, {bolumler.Count} bolumde: " +
                       string.Join(", ", bolumler.Select(g => $"{g.Key} {g.Count()}")) + ".");
+        sb.AppendLine();
+        Maliyet(sb, isKok, satirlar.Count(x => x.Sebep.StartsWith("kosulmadi")));
+    }
+
+    private static void Maliyet(StringBuilder sb, string isKok, int kosulmayan)
+    {
+        if (kosulmayan == 0) return;
+        var sureler = new List<(string Hucre, double Dk)>();
+        foreach (var y in Directory.GetFiles(isKok, "k5-*.json"))
+        {
+            var ad = Path.GetFileNameWithoutExtension(y)[3..];
+            var parcalar = Directory.GetFiles(isKok, $"k5-{ad}-*.mkv").ToList();
+            if (parcalar.Count == 0) continue;
+            var bas = parcalar.Min(f => File.GetLastWriteTimeUtc(f));
+            var son = File.GetLastWriteTimeUtc(y);
+            if (son <= bas) continue;
+            sureler.Add((ad, (son - bas).TotalMinutes));
+        }
+        sb.AppendLine($"\"Kosulmadi\" diyen {kosulmayan} satirin sebebi tek: olcum penceresi");
+        sb.AppendLine("icinde sira gelmedi. Kapasite eksigi degil, sure eksigi.");
+        if (sureler.Count > 0)
+        {
+            var en = sureler.OrderByDescending(x => x.Dk).First();
+            sb.AppendLine($"Olculen {sureler.Count} K5 hucresinin gozlenen suresi (ilk kodlama");
+            sb.AppendLine($"dosyasindan sonuc JSON'una) en fazla {Kabuk.Inv(en.Dk, "0")} dk");
+            sb.AppendLine($"(`{en.Hucre}`); hucre basina iki tam iki gecisli kodlama arti iki VMAF");
+            sb.AppendLine("kosumu vardir. Bu sure dosya zaman damgalarindan hesaplandi.");
+        }
         sb.AppendLine();
     }
 
