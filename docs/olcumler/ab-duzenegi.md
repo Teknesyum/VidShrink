@@ -278,7 +278,7 @@ girmiyor) ve her koşumun **ölçtüğü commit**. Ölçtüğü commit = koşumu
 
 600 MB tablosu tur 1'in commit'inden geliyor ve **yeniden ölçülmedi**: eşitleyici
 o tabloya dokunmuyor, çünkü altı satırın altısı zaten kapının içindeydi. 60 MB
-tablosu ise dalın ucuyla (`381e8ab`) ölçüldü. Yani bu belgede iki farklı commit
+tablosu ise dalın son kod commit'i `381e8ab` ile ölçüldü. Yani bu belgede iki farklı commit
 ölçülmüş durumda. İki commit'in sayısı tek tabloda yan yana geldiği tek yer
 **Özet** tablosu; orada satır başına `ölçülen commit` sütunu var.
 
@@ -296,7 +296,7 @@ basamaklı bir fonksiyonu, ve yalnız oranla düzeltme basamak fonksiyonunda
 yakınsamıyor, iki basamak arasında salınıyor (ölçüldü, aşağıda). Aşağıdaki
 tablo ikiye bölmeli eşitleyicinin koşumundan.
 
-**Ölçülen commit: `381e8ab` (dalın ucu).**
+**Ölçülen commit: `381e8ab` — dalın son kod commit'i.**
 
 | girdi | yarışmacı | yerleşim | bayt | fark % | eş boyut | harm | p10 | kare min | ort | XPSNR |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -663,5 +663,8 @@ açılmadı. **Geçti/kaldı/atlandı dökümü yakalanamadı — ölçülmedi**
 |---|---|---|
 | CI (`ci`, `T95-ab-duzenegi`) | `381e8ab` | _(koşum kimliği ve sonucu buraya)_ |
 
-CI koşumunun `headSha`'sı ile dalın ucu aynı olmalı: dalın ucu **`381e8ab`**.
-Farklıysa yukarıdaki bütün "ölçülen commit" damgaları CI için geçersizdir.
+`headSha` ile dalın ucu **aynı değil**, ve bu bilerek böyle: izlenen CI koşumunun
+`headSha`'sı `381e8ab`; dalın ucu ondan sonraki, yalnız bu belgeyi değiştiren
+commit'ler. Dalın **son kod commit'i `381e8ab`** — `git log --oneline 381e8ab..HEAD
+-- src tests tools` boş dönmelidir. Dönmüyorsa CI ölçülen kodu koşturmamıştır ve
+yukarıdaki damgalar CI için geçersizdir.
