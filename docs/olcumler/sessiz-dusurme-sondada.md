@@ -168,7 +168,7 @@ hangi karar çıkarsa çıksın geçerli kalır.
 Çağrı yeri, ham çıktı:
 
 ```
-src/VidShrink.Ffmpeg/EncoderCapabilities.cs:359:        => exitCode == 0 && FfmpegDiagnostics.DroppedOptionLines(diagnostic).Count == 0;
+src/VidShrink.Ffmpeg/EncoderCapabilities.cs:358:        => exitCode == 0 && FfmpegDiagnostics.DroppedOptionLines(diagnostic).Count == 0;
 ```
 
 `RunOptionProbe`un satır içi üç desenlik kopyası kaldırıldı; karar artık tek sözlükten
@@ -218,3 +218,37 @@ Sözleşme piksel biçimine özgü iki desenin kalabileceğini söylüyor. Kald�
 HDR10 piksel biçimi yoklamasını değerlendiriyor ve argümanlarında kodlayıcı parametre
 dizgisi (`-*-params`) yok — sessiz düşürmenin ölçülen yolu orada geçmiyor. Farklı soru,
 ayrı liste.
+
+## K3 — Yanlış pozitif ölçüsü
+
+Sözlük fazla genişse çalışan yoklamayı düşürür ve kodlayıcı "desteklenmiyor" diye elenir.
+Ölçü, **hiçbir seçeneği düşmemiş**, çıkış kodu 0 ile biten gerçek yoklama çıktılarını
+`OptionAccepted`tan geçirip kabul edildiklerini pimliyor (`ACleanProbeIsNeverRejected`,
+dört korpus).
+
+| # | Korpus | Kaynak | İçindeki tuzak |
+|---|---|---|---|
+| 1 | `libx265`, **motorun gerçekten sorduğu** `psy-rd=2:psy-rdoq=1:aq-mode=2` | bu makinede ölçüldü, çıkış 0, 37 satır | `x265 [warning]: Source height < 720p; …`, `tools: rd=3 psy-rd=2.00 …`, `muxing overhead: unknown` |
+| 2 | `libsvtav1`, temiz `enable-variance-boost=1:variance-boost-strength=2` | bu makinede ölçüldü, çıkış 0 | `Svt[info]: SVT [config]: …`, `muxing overhead: unknown` |
+| 3 | `libx264`, `-pix_fmt yuvj420p` ile `deprecated` uyarısı | bu makinede ölçüldü, çıkış 0 | `[swscaler @ …] deprecated pixel format used, make sure you did set range correctly` |
+| 4 | `Past duration 0.999992 too large` | **bu makinede üretilemedi**, sözleşmeden alındı | muxer uyarısı |
+
+Birinci korpus en önemlisi: `FfmpegArguments.cs:528-530`'un x265 için sorduğu **gerçek**
+dizgi. Bu kurulumda temiz geçiyor, yani yoklama doğru şekilde `Accepted` diyor. Sözlük
+bunu reddetseydi motor psikogörsel ayarları hiç üretemezdi — sessiz düşürmenin tersi ve
+daha pahalı hâli.
+
+Dördüncü korpus için dürüst olmak gerekiyor: `Past duration … too large` satırını bu
+ffmpeg 9.0 derlemesinde üretemedim (T144'te iki tetikleyici denenmişti). Korpusa yine
+konuldu, çünkü bu ölçüde satırların hepsi *negatif*: listeye girmesi yalnızca "buna da
+takılmıyoruz"un kapsamını genişletir. Ölçülmüş gibi göstermemek için tabloda ayrı
+işaretlendi.
+
+`TheWordUnknownOnItsOwnDoesNotRejectAProbe` üç satırı tek tek pimliyor. En kritiği
+`muxing overhead: unknown`: **her başarılı yoklamanın son satırlarında geçiyor.**
+Sözlükteki desen `Unknown option:` — iki nokta dahil. Desen `Unknown`a kısaltılsaydı
+ölçülen üç temiz yoklamanın **üçü de** reddedilirdi. K5'te bu tam olarak mutasyonla
+kırıldı.
+
+`ANonZeroExitIsRejectedWhateverTheTextSays` kapının diğer yarısını tutuyor: çıkış kodu
+sıfırdan farklıysa metin ne derse desin yoklama kabul etmiyor.
