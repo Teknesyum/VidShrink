@@ -87,12 +87,16 @@ tıklamayı araya sokamaz, `SetRunning(true)` (539) düğmeyi kapatır. **Fakat 
 - **Katalog dengeli, XAML tarafı tam:** 112 anahtar, 112 farklı değer — `TurkishToEnglish` ters
   sözlüğü (`LanguageCatalog.cs:121`) çakışma vermiyor. XAML'deki 152 metin sabitinin katalog dışında
   kalanların hepsi marka/kısaltma/sayı (`VidShrink`, `FPS`, `MP4`, `1080`); çevrilmemiş prose yok.
-- **Ölü anahtarlar (3):** `main.plan.fact.estimated-size`, `main.plan.reasons-count`, `main.quality.loss-points`
-  (`Locales/en/main.json:126,117,70`) tanımlı ama `src/VidShrink.App` altında hiçbir `.axaml`/`.cs`
-  dosyasında çağrılmıyor; kod yerine benzer adlı aktif anahtarları kullanıyor (`main.plan.fact.estimate`,
-  `main.plan.reasons`, `main.quality.loss`+`main.quality.points` — `MainWindow.xaml.cs:1788,1796,1704`).
-  `LanguageCatalog.cs` çeviri sözlüğü değil, yalnız başlık büyütme yardımcısı (`Title`/`Names`); bu
-  anahtarlarla ilgisi yok.
+- **Düzeltme notu (T126):** Bu madde eskiden `LanguageCatalog.cs:7`'yi bir çeviri sözlüğündeki ölü
+  bileşik anahtar (`"Target Size Media Compression & Media Converter"`) olarak gösteriyordu — o dizge
+  kaynakta hiç yok, `LanguageCatalog.cs:7` bir `// T27:` yorum satırı. **`LanguageCatalog.cs` hiçbir
+  zaman çeviri sözlüğü olmadı**, yalnız başlık büyütme yardımcısı (`Title(text, turkish)`, sabit-yazım
+  tablosu `Names`); çeviriler gerçekte `src/VidShrink.App/Locales/{en,tr}/*.json` altındaki JSON
+  dosyalarında yaşıyor. O dosyalarda gerçekten ölü olan 3 anahtar var:
+  `main.plan.fact.estimated-size`, `main.plan.reasons-count`, `main.quality.loss-points`
+  (`Locales/en/main.json:126,117,70`) — hiçbir `.axaml`/`.cs` dosyasında çağrılmıyor, kod yerine
+  benzer adlı aktif anahtarları kullanıyor: `main.plan.fact.estimate`, `main.plan.reasons`,
+  `main.quality.loss`+`main.quality.points` (`MainWindow.xaml.cs:1788,1796,1704`).
 - **Kod içinde gömülü İngilizce (4 yer):** `MainWindow.xaml.cs:522` `"Trim times must use HH:MM:SS
   format."`; `524` `ConversionArguments.Validate` çıktısı (`ConversionArguments.cs:10-31`, hepsi
   yalnız İngilizce); `312` `plan.Reason` (`PlanCalculator.cs:216`); `462`/`466`/`526`/`536` istisna.
