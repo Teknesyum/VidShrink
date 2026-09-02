@@ -1,3 +1,4 @@
+using System.Text.Json;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -187,5 +188,44 @@ public sealed class TurboFirstPassTests
         Assert.Equal(9, bilinen.Count(CodecModel.IsHardware));
         Assert.Equal(4, bilinen.Count(FfmpegArguments.NeedsTwoPasses));
         Assert.Equal(2, bilinen.Count(CodecModel.SupportsTurboFirstPass));
+    }
+
+    [Fact]
+    public void Varsayilan_kapali()
+    {
+        Assert.False(new EncodePlan().TurboFirstPass);
+        Assert.False(Plan().TurboFirstPass);
+    }
+
+    [Theory]
+    [MemberData(nameof(BilinenKodekler))]
+    public void Anahtara_dokunulmadiginda_ilk_gecis_son_gecisin_on_ayarini_kosmaya_devam_ediyor(string kodek)
+    {
+        var onAyar = FfmpegArguments.DefaultPreset(kodek);
+        var plan = Plan(kodek, onAyar);
+
+        Assert.Equal(onAyar, OnAyar(FfmpegArguments.Build(Kaynak(), plan, "cikti.mp4", 1, "gunluk")));
+        Assert.Equal(onAyar, FfmpegArguments.FirstPassPreset(kodek, onAyar, turbo: false));
+    }
+
+    [Fact]
+    public void Disaridan_gelen_plan_json_u_turboyu_acamaz()
+    {
+        var json = """{"codec":"libx264","mode":"2pass","preset":"slow","turboFirstPass":true}""";
+
+        var plan = JsonSerializer.Deserialize<EncodePlan>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        Assert.NotNull(plan);
+        Assert.False(plan!.TurboFirstPass);
+    }
+
+    [Fact]
+    public void Anahtar_klonda_tasiniyor()
+    {
+        var plan = Plan();
+        plan.TurboFirstPass = true;
+
+        Assert.True(plan.Clone().TurboFirstPass);
+        Assert.False(Plan().Clone().TurboFirstPass);
     }
 }
