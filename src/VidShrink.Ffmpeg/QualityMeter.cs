@@ -66,13 +66,18 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
                 score.WorstSceneStartSeconds, score.SceneWindowSeconds);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (QualityMeasurementFailedException failure)
+        {
+            return new VidShrink.Core.WindowQualityMeasurement(
+                referenceStartSeconds, null, null, null, false, watch.ElapsedMilliseconds, failure.Message);
+        }
         catch { return null; }
     }
 }
 
 public static class MeasureFilterGraph
 {
-    public const string FrameLock = "settb=AVTB,setpts=N";
+    public static readonly string FrameLock = "settb=AVTB,setpts=N";
 
     public static string Build(string testChain, string referenceChain, string comparisonFilter)
     {
@@ -87,6 +92,11 @@ public static class MeasureFilterGraph
                $"[1:v]{referenceChain},{FrameLock}[r];" +
                $"[t][r]{comparisonFilter}";
     }
+}
+
+public sealed class QualityMeasurementFailedException : InvalidOperationException
+{
+    public QualityMeasurementFailedException(string message) : base(message) { }
 }
 
 public static class QualityMeter
@@ -212,7 +222,39 @@ public static class QualityMeter
     private readonly record struct VmafAggregate(
         double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds);
 
-    private static async Task<VmafAggregate?> MeasureVmafAsync(
+    public static async Task<IReadOnlyList<double>> ReadVmafScoresAsync(string logPath, CancellationToken ct = default)
+    {
+        if (!File.Exists(logPath))
+            throw new QualityMeasurementFailedException(
+                $"libvmaf gunlugu yazilmadi: {logPath}. Filtre zinciri kosdu ama olcum uretmedi; bu olculmedi degil, olcum basarisiz.");
+
+        var scores = new List<double>();
+        try
+        {
+            await using var stream = File.OpenRead(logPath);
+            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
+            foreach (var frame in doc.RootElement.GetProperty("frames").EnumerateArray())
+            {
+                var metrics = frame.GetProperty("metrics");
+                if (metrics.TryGetProperty("vmaf", out var v) || metrics.TryGetProperty("vmaf_neg", out v))
+                    scores.Add(v.GetDouble());
+            }
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException and not QualityMeasurementFailedException)
+        {
+            throw new QualityMeasurementFailedException(
+                $"libvmaf gunlugu okunamadi: {logPath}. {ex.Message}");
+        }
+
+        if (scores.Count == 0)
+            throw new QualityMeasurementFailedException(
+                $"libvmaf gunlugu kare puani icermiyor: {logPath}. Olcum basarisiz.");
+
+        return scores;
+    }
+
+    private static async Task<VmafAggregate> MeasureVmafAsync(
         string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, double frameRate, CancellationToken ct)
     {
         var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
@@ -221,21 +263,7 @@ public static class QualityMeter
             var filter = $"libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json:log_path={EscapeFilterPath(logPath)}";
             await RunFilterAsync(testPath, referencePath, reference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, filter, ct);
 
-            if (!File.Exists(logPath)) return null;
-
-            var scores = new List<double>();
-            await using (var stream = File.OpenRead(logPath))
-            {
-                using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
-                foreach (var frame in doc.RootElement.GetProperty("frames").EnumerateArray())
-                {
-                    var metrics = frame.GetProperty("metrics");
-                    if (metrics.TryGetProperty("vmaf", out var v) || metrics.TryGetProperty("vmaf_neg", out v))
-                        scores.Add(v.GetDouble());
-                }
-            }
-
-            if (scores.Count == 0) return null;
+            var scores = await ReadVmafScoresAsync(logPath, ct);
 
             var mean = scores.Average();
             var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));

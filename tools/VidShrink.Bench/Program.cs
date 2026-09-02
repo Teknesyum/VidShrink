@@ -2544,7 +2544,7 @@ public static class VmafPooling
 
 public static class MeasureFilterGraph
 {
-    public const string FrameLock = "settb=AVTB,setpts=N";
+    public static string FrameLock => VidShrink.Ffmpeg.MeasureFilterGraph.FrameLock;
 
     public static string Build(int width, int height, string filterChain)
     {

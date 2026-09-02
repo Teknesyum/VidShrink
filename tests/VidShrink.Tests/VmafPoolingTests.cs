@@ -194,6 +194,102 @@ public class VmafPoolingTests
             $"en dusuk psnr_y={frames.Min():0.##} dB");
     }
 
+    [FfmpegFact]
+    public async Task UretimKilidi_ZamanTabanlariFarkliGirdileri_BireBir_Esler()
+    {
+        var dir = YeniKlasor();
+        try
+        {
+            var kabaTaban = Path.Combine(dir, "kaynak.mkv");
+            var inceTaban = Path.Combine(dir, "kaynak.nut");
+            await KaynakUretAsync(dir, kabaTaban);
+            await FfmpegAsync(dir, "-v", "error", "-y", "-nostdin", "-i", kabaTaban, "-c:v", "copy", inceTaban);
+
+            Assert.NotEqual(await ZamanTabaniAsync(dir, kabaTaban), await ZamanTabaniAsync(dir, inceTaban));
+
+            var kareler = await PsnrSerisiAsync(
+                dir, UretimGrafigi("psnr=stats_file=psnr.log"), "-i", inceTaban, "-i", kabaTaban);
+
+            Assert.Equal(BeklenenKareSayisi, kareler.Count);
+            Assert.All(kareler, y => Assert.True(y >= TamEslesmeEsigi,
+                $"ayni goruntu iki zaman tabanindan okundu ama tam eslesmedi; en dusuk psnr_y={kareler.Min():0.##} dB"));
+        }
+        finally { Sil(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task UretimKilidi_AltKareKaymasinda_KareleriDamgayaDegil_IndekseEsler()
+    {
+        var dir = YeniKlasor();
+        try
+        {
+            var kaynak = Path.Combine(dir, "kaynak.mkv");
+            await KaynakUretAsync(dir, kaynak);
+
+            var kareler = await PsnrSerisiAsync(
+                dir, UretimGrafigi("psnr=stats_file=psnr.log"),
+                "-i", kaynak, "-itsoffset", KaymaSaniye, "-i", kaynak);
+
+            Assert.Equal(BeklenenKareSayisi, kareler.Count);
+            Assert.All(kareler, y => Assert.True(y >= TamEslesmeEsigi,
+                $"kaynak kendisiyle karsilastirildi ama {KaymaSaniye}s kayma tam eslesmeyi bozdu; " +
+                $"en dusuk psnr_y={kareler.Min():0.##} dB"));
+        }
+        finally { Sil(dir); }
+    }
+
+    [Fact]
+    public async Task OlcumGunlugu_Yoksa_YaDaBossa_SessizceNullDonmez()
+    {
+        var dir = YeniKlasor();
+        try
+        {
+            var yok = Path.Combine(dir, "yok.json");
+            var hata = await Assert.ThrowsAsync<QualityMeasurementFailedException>(
+                () => QualityMeter.ReadVmafScoresAsync(yok));
+            Assert.Contains(yok, hata.Message);
+
+            var bos = Path.Combine(dir, "bos.json");
+            await File.WriteAllTextAsync(bos, "{\"frames\":[]}");
+            await Assert.ThrowsAsync<QualityMeasurementFailedException>(
+                () => QualityMeter.ReadVmafScoresAsync(bos));
+
+            var bozuk = Path.Combine(dir, "bozuk.json");
+            await File.WriteAllTextAsync(bozuk, "{\"frames\":");
+            await Assert.ThrowsAsync<QualityMeasurementFailedException>(
+                () => QualityMeter.ReadVmafScoresAsync(bozuk));
+
+            var dolu = Path.Combine(dir, "dolu.json");
+            await File.WriteAllTextAsync(
+                dolu, "{\"frames\":[{\"metrics\":{\"vmaf_neg\":91.5}},{\"metrics\":{\"vmaf_neg\":88.25}}]}");
+            Assert.Equal(new[] { 91.5, 88.25 }, await QualityMeter.ReadVmafScoresAsync(dolu));
+        }
+        finally { Sil(dir); }
+    }
+
+    [FfmpegFact]
+    public async Task GunlukUretmeyenZincir_Olculmedi_Degil_Basarisiz_DiyeOkunur()
+    {
+        var dir = YeniKlasor();
+        try
+        {
+            var kaynak = Path.Combine(dir, "kaynak.mkv");
+            await KaynakUretAsync(dir, kaynak);
+            var gunluk = Path.Combine(dir, "vmaf.json");
+
+            await FfmpegAsync(dir, "-v", "error", "-y", "-nostdin", "-i", kaynak, "-i", kaynak,
+                "-lavfi", UretimGrafigi("libvmaf=model=version=vmaf_v0.6.1neg:log_fmt=json"),
+                "-f", "null", "-");
+
+            Assert.False(File.Exists(gunluk), "zincir gunluk yazmamaliydi; olcu kendi onculunu dogrulayamadi");
+
+            var hata = await Assert.ThrowsAsync<QualityMeasurementFailedException>(
+                () => QualityMeter.ReadVmafScoresAsync(gunluk));
+            Assert.Contains(gunluk, hata.Message);
+        }
+        finally { Sil(dir); }
+    }
+
     [Fact]
     public void KodekTercihi_AutoIleCompatible_AgresifHedefte_FarkliKodlayiciSecer()
     {
@@ -255,6 +351,74 @@ public class VmafPoolingTests
     private const int BeklenenKareSayisi = 60;
     private const double TamEslesmeEsigi = 80.0;
     private const string KaymaSaniye = "0.004";
+
+    private const string OlcekZinciri = "scale=w=160:h=120:flags=lanczos";
+
+    private static string UretimGrafigi(string karsilastirma)
+        => VidShrink.Ffmpeg.MeasureFilterGraph.Build(OlcekZinciri, "null", karsilastirma);
+
+    private static string YeniKlasor()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_kilit_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
+
+    private static void Sil(string dir)
+    {
+        try { Directory.Delete(dir, true); } catch { }
+    }
+
+    private static Task KaynakUretAsync(string dir, string hedef)
+        => FfmpegAsync(dir, "-v", "error", "-y", "-nostdin", "-f", "lavfi",
+            "-i", $"testsrc2=size=160x120:rate=30:duration={BeklenenKareSayisi / 30.0:0.###}",
+            "-c:v", "ffv1", hedef);
+
+    private static async Task<IReadOnlyList<double>> PsnrSerisiAsync(
+        string dir, string graph, params string[] girdiler)
+    {
+        var log = Path.Combine(dir, "psnr.log");
+        if (File.Exists(log)) File.Delete(log);
+
+        var args = new List<string> { "-v", "error", "-y", "-nostdin" };
+        args.AddRange(girdiler);
+        args.AddRange(new[] { "-lavfi", graph, "-f", "null", "-" });
+        await FfmpegAsync(dir, args.ToArray());
+
+        Assert.True(File.Exists(log), "psnr gunlugu uretilmedi");
+        return PsnrOku(await File.ReadAllLinesAsync(log));
+    }
+
+    private static IReadOnlyList<double> PsnrOku(IEnumerable<string> lines)
+    {
+        var values = new List<double>();
+        foreach (var line in lines)
+        {
+            var m = Regex.Match(line, @"psnr_y:(inf|[0-9.]+)");
+            if (m.Success)
+                values.Add(m.Groups[1].Value == "inf"
+                    ? double.PositiveInfinity
+                    : double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture));
+        }
+        return values;
+    }
+
+    private static async Task<string> ZamanTabaniAsync(string dir, string path)
+    {
+        var psi = ToolLocator.StartInfo(ToolLocator.Ffprobe, new[]
+        {
+            "-v", "error", "-select_streams", "v", "-show_entries", "stream=time_base", "-of", "csv=p=0", path
+        });
+        psi.WorkingDirectory = dir;
+        using var process = new Process { StartInfo = psi };
+        process.Start();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
+        await Task.WhenAll(stdout, stderr);
+        Assert.True(process.ExitCode == 0, await stderr);
+        return (await stdout).Trim();
+    }
 
     private static async Task<IReadOnlyList<double>> OlcumSerisiAsync(string graph)
     {
