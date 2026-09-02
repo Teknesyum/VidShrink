@@ -280,6 +280,12 @@ Başarılı!  - Başarısız:     0, Başarılı:    11, Atlanan:     0, Toplam:
 - **`WindowLayoutTests.ThePageContentStaysAtItsPinnedHeight(True, True)` `main`de
   kırmızı**: ölçülen 956, pin 1002–1102. Bu turdan önce geliyor, bu turda
   dokunulmadı.
+- **`owns` listesinde bir eksik var.** Sözleşme `src/VidShrink.Core/PlanParser.cs`i
+  ve `tests/VidShrink.Tests/CodecModelTests.cs`i sayıyor ama
+  `tests/VidShrink.Tests/PlanParserTests.cs`i saymıyor; öte yandan verify komutu
+  `PlanParserTests` kolunu açıkça filtreliyor. K1'in ikinci kırmızısı ve K4'ün pimi
+  o dosyaya yazıldı — parser testinin yeri orası. T0'ın onayına açık; alternatifi
+  aynı ölçüyü `CodecModelTests.cs`e koymaktı, o da testi yanlış dosyaya koyardı.
 - **CI koşum kapısının alt sınırı** `-MinimumTotal 1134` (`ci.yml`). Süit bu
   dalda 1487 test sayıyor ve bu sayı turun eklediği sekiz testi zaten içeriyor.
   Alt sınır geçiliyor ama gerçek sayının çok altında. `ci.yml` `owns` dışında.
