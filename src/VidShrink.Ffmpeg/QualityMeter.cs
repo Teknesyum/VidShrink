@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -168,18 +168,24 @@ public static class QualityMeter
     }
 
     public static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, false, null, null, null, ct);
+        => await MeasureAsync(referencePath, testPath, false, null, null, null, null, ct);
+
+    public static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, false, null, null, null, sceneMap, ct);
 
     public static async Task<QualityScore> MeasureTonemappedReferenceAsync(string referencePath, string testPath, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, true, null, null, null, ct);
+        => await MeasureAsync(referencePath, testPath, true, null, null, null, null, ct);
 
     public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double startSeconds, double durationSeconds, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, false, startSeconds, startSeconds, durationSeconds, ct);
+        => await MeasureAsync(referencePath, testPath, false, startSeconds, startSeconds, durationSeconds, null, ct);
 
     public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double referenceStartSeconds, double testStartSeconds, double durationSeconds, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, false, referenceStartSeconds, testStartSeconds, durationSeconds, ct);
+        => await MeasureAsync(referencePath, testPath, false, referenceStartSeconds, testStartSeconds, durationSeconds, null, ct);
 
-    private static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, CancellationToken ct)
+    public static async Task<QualityScore> MeasureWindowAsync(string referencePath, string testPath, double referenceStartSeconds, double testStartSeconds, double durationSeconds, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct = default)
+        => await MeasureAsync(referencePath, testPath, false, referenceStartSeconds, testStartSeconds, durationSeconds, sceneMap, ct);
+
+    private static async Task<QualityScore> MeasureAsync(string referencePath, string testPath, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct)
     {
         var reference = await FfprobeClient.ProbeAsync(referencePath, ct);
         var test = await FfprobeClient.ProbeAsync(testPath, ct);
@@ -210,7 +216,7 @@ public static class QualityMeter
         {
             try
             {
-                vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, ct);
+                vmaf = await MeasureVmafAsync(testPath, referencePath, measuredReference, test, tonemapReference, referenceStartSeconds, testStartSeconds, durationSeconds, frameRate, sceneMap, ct);
             }
             catch (QualityMeasurementFailedException failure)
             {
@@ -239,7 +245,7 @@ public static class QualityMeter
             vmaf is null ? null : SceneWindowSeconds, tonemapReference, alignment);
     }
 
-    private readonly record struct VmafAggregate(
+    public readonly record struct VmafAggregate(
         double Mean, double Harmonic, double P10, double Min, double WorstScene, double WorstSceneStartSeconds);
 
     public static async Task<IReadOnlyList<double>> ReadVmafScoresAsync(string logPath, CancellationToken ct = default)
@@ -275,7 +281,7 @@ public static class QualityMeter
     }
 
     private static async Task<VmafAggregate> MeasureVmafAsync(
-        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, double frameRate, CancellationToken ct)
+        string testPath, string referencePath, VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test, bool tonemapReference, double? referenceStartSeconds, double? testStartSeconds, double? durationSeconds, double frameRate, VidShrink.Core.SceneMap? sceneMap, CancellationToken ct)
     {
         var logPath = Path.Combine(Path.GetTempPath(), "vidshrink_vmaf_" + Guid.NewGuid().ToString("N") + ".json");
         try
@@ -285,13 +291,19 @@ public static class QualityMeter
 
             var scores = await ReadVmafScoresAsync(logPath, ct);
 
-            var mean = scores.Average();
-            var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
-            var sorted = scores.OrderBy(x => x).ToList();
-            var (worstScene, worstSceneStart) = WorstScene(scores, frameRate, referenceStartSeconds ?? 0);
-            return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], worstScene, worstSceneStart);
+            return AggregateVmaf(scores, frameRate, referenceStartSeconds ?? 0, sceneMap);
         }
         finally { TryDelete(logPath); }
+    }
+
+    public static VmafAggregate AggregateVmaf(
+        IReadOnlyList<double> scores, double frameRate, double offsetSeconds, VidShrink.Core.SceneMap? sceneMap = null)
+    {
+        var mean = scores.Average();
+        var harmonic = scores.Count / scores.Sum(x => 1.0 / Math.Max(x, 1.0));
+        var sorted = scores.OrderBy(x => x).ToList();
+        var (worstScene, worstSceneStart) = WorstScene(scores, frameRate, offsetSeconds, sceneMap);
+        return new VmafAggregate(mean, harmonic, Percentile(sorted, 10), sorted[0], worstScene, worstSceneStart);
     }
 
     public const double SceneWindowSeconds = 2.0;

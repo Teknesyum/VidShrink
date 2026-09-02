@@ -478,6 +478,22 @@ public sealed class QualityMeterTests
     }
 
     [Fact]
+    public void TheProductionAggregationHonoursTheMapItIsGiven()
+    {
+        var scores = Enumerable.Repeat(100.0, 600).ToArray();
+        for (var i = 150; i < 330; i++) scores[i] = 40.0;
+
+        var withoutMap = QualityMeter.AggregateVmaf(scores, 60, 0);
+        var withMap = QualityMeter.AggregateVmaf(scores, 60, 0, MapWithCuts(10.0, 2.5, 5.5));
+
+        Assert.Equal(withoutMap.Mean, withMap.Mean, 6);
+        Assert.Equal(55.0, withoutMap.WorstScene, 6);
+        Assert.Equal(40.0, withMap.WorstScene, 6);
+        Assert.Equal(2.0, withoutMap.WorstSceneStartSeconds, 6);
+        Assert.Equal(2.5, withMap.WorstSceneStartSeconds, 6);
+    }
+
+    [Fact]
     public void TheWorstUnitReportsItsOwnLengthNotTheFixedWindow()
     {
         var reporters = typeof(QualityMeter)
