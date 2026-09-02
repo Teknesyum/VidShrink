@@ -7,10 +7,12 @@ Cevapların dağılımı: **(a) hiçbiri, (b) üç iddia, (c) bir iddia**; beşi
 bandıyla (c) idi, daraltıldıktan sonra (b) oldu. K0 ayrı: sayaç enjekte edilmedi,
 yarışın kendisi kapatıldı.
 
-Bu üç dosyada assert edilen duvar saati bantlarının **toplamı beş değil sekiz.**
-Sınıflanan beşi aşağıda; kalan üçü (`UpdaterTests.cs:915`, `:916`, `:1141`) tur 1'in
-eksik tarama deseni yüzünden gözden kaçtı ve üstüne "başka yok" yazıldı. O cümle geri
-çekildi, üç bant K5'te listelendi; bu turda düzeltilmeleri istenmedi.
+Bu üç dosyada duvar saatinden türeyen assert sayısı **yirmi üç**, bunların **on biri**
+bant. Sınıflanan beşi aşağıda; kalan altı bant (`UpdaterTests.cs:890`, `:915`, `:916`,
+`:1141`, `PerformanceCheckTests.cs:462`, `:542`) tur 1'in ve tur 2'nin tarama deseni
+yüzünden gözden kaçtı. Sayı bu turda **metin deseniyle değil türden** çıkarıldı ve bir
+ölçüyle koda pimlendi (K5); tur 1'in "başka yok" cümlesiyle tur 2'nin "sekiz" sayımı
+geri çekildi. Altı bandın düzeltilmesi bu turda istenmedi.
 
 ## K0 — `ComplexityProbeTests.cs:63`, bugün düşen iddia
 
@@ -267,13 +269,17 @@ edilmiş bant hiç görünmedi ve bölümün altına şu cümle yazıldı:
 
 **Bu cümle geri çekildi; yanlıştı.** Yerine geçen cümle bölümün sonunda.
 
-### Düzeltilmiş tarama
+### İki tarama, iki yöntem
 
-```
-grep -n -E -f desen.txt PerformanceCheckTests.cs UpdaterTests.cs ComplexityProbeTests.cs
-```
+Tur 1 "yok" dedi, tur 2 "sekiz" dedi; ikisi de anahtar kelime deseniyle sayıyordu ve
+ikisi de eksikti. Anahtar kelime listesi **kapalı bir küme değil**, o yüzden deseni
+genişletmek bu hatayı bitirmiyor. Bu turda sayım iki bağımsız yöntemle üretildi;
+ikisinin de ham çıktısı aşağıda.
 
-`desen.txt`, satır başına bir desen:
+#### Tarama A — genişletilmiş anahtar kelime deseni
+
+Tur 2'nin desenine `WaitForExit(`, `WaitForExitAsync(`, `WaitAsync(` ve `.Wait(`
+eklendi. Desen `.calisma/t132/t3/desen-a.txt`, satır başına bir desen:
 
 ```
 Thread\.Sleep
@@ -288,15 +294,17 @@ ElapsedMilliseconds
 TimeSpan\.From
 \.Join\(
 \.WaitOne\(
+\.Wait\(
+WaitForExit\(
+WaitForExitAsync\(
+WaitAsync\(
 Timeout
 ```
 
-Ham çıktı (63 satır) aşağıda; yerel kopyaları `.calisma/t132/k5-tarama.txt` ve
-`.calisma/t132/k5-desen.txt` (`.calisma/` git'e girmiyor, o yüzden çıktı belgeye
-gömülü). `string.Join(` eşleşmeleri metin biçimleme, zamanla ilgisi yok; aşağıdaki
-sayımın dışında.
+Komut ve ham çıktı — 73 satır, `.calisma/t132/t3/tarama-a.txt`:
 
 ```
+$ grep -n -E -f desen-a.txt PerformanceCheckTests.cs UpdaterTests.cs ComplexityProbeTests.cs
 PerformanceCheckTests.cs:152:        Assert.True(eksik.Length == 0, "hic uretilmeyen bulgu kodu: " + string.Join(", ", eksik));
 PerformanceCheckTests.cs:335:                string.Join(",", result.Findings.Select(f => f.Code)));
 PerformanceCheckTests.cs:426:            $"bos okumalar: {string.Join(" ", okumalar.Select(r => $"{r.Impact}/{N(r.SoftwareRealtimeCores)}/olculdu={r.SoftwareMeasured}/butce={r.BudgetExhausted}"))} | " +
@@ -319,9 +327,14 @@ PerformanceCheckTests.cs:735:        var saat = System.Diagnostics.Stopwatch.Sta
 PerformanceCheckTests.cs:739:            $"yakim-duvar={saat.ElapsedMilliseconds}ms (1 = saglam sayac, 0 = olculemedi)");
 PerformanceCheckTests.cs:757:        if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 5_000);
 PerformanceCheckTests.cs:838:        var clock = System.Diagnostics.Stopwatch.StartNew();
+PerformanceCheckTests.cs:843:        p.WaitForExit();
 PerformanceCheckTests.cs:850:        Log($"[sayac] {etiket} cikis={p.ExitCode} cpu={N(cpu)}ms duvar={clock.ElapsedMilliseconds}ms " +
 PerformanceCheckTests.cs:851:            $"cpu/duvar={N(clock.ElapsedMilliseconds > 0 ? cpu / clock.ElapsedMilliseconds : 0)}");
 PerformanceCheckTests.cs:854:        Assert.True(clock.ElapsedMilliseconds > 0, $"{etiket} olculebilir bir sure kosmadi");
+PerformanceCheckTests.cs:890:        "Stopwatch", "Elapsed", "WaitForExit", "WaitOne", "WaitAsync", ".Join(", ".Wait("
+PerformanceCheckTests.cs:905:        new(@"^ {4}(?:public|private|internal|protected)[^\r\n=;]*?\b(?:TimeSpan|Stopwatch|long|double|int)\s+(\w+)\s*\(",
+PerformanceCheckTests.cs:926:            + string.Join(" ", bulunan));
+PerformanceCheckTests.cs:1033:        var sade = metin.Replace("string.Join(", " ", StringComparison.Ordinal);
 UpdaterTests.cs:127:        var manifest = new ReleaseManifest("1.1.0", "abc", DateTimeOffset.UtcNow, "win-x64", new[]
 UpdaterTests.cs:147:        var manifest = new ReleaseManifest("1.1.0", "abc", DateTimeOffset.UtcNow, "win-x64",
 UpdaterTests.cs:299:    public async Task AnUnreachableSourceIsGivenUpWithinTheManifestTimeout()
@@ -341,12 +354,15 @@ UpdaterTests.cs:796:        var deadline = DateTime.UtcNow + TimeSpan.FromSecond
 UpdaterTests.cs:798:        while (rounds < minimumRounds || (untilCaught && misses == 0 && DateTime.UtcNow < deadline))
 UpdaterTests.cs:821:                    Thread.Sleep(25);
 UpdaterTests.cs:853:            _thread.Join();
+UpdaterTests.cs:890:        Assert.True(process.WaitForExit(60_000), "geçiş süreci çıkmadı");
 UpdaterTests.cs:901:    public void EveryLaunchChecksAndStaysWithinTheTimeout()
 UpdaterTests.cs:915:        Assert.True(offlineFirst < TimeSpan.FromSeconds(3), $"ağsız açılış çok uzun: {offlineFirst}");
 UpdaterTests.cs:916:        Assert.True(offlineSecond < TimeSpan.FromSeconds(3), $"ağsız ikinci açılış çok uzun: {offlineSecond}");
 UpdaterTests.cs:947:        var stopwatch = Stopwatch.StartNew();
+UpdaterTests.cs:949:        process.WaitForExit();
 UpdaterTests.cs:956:        return stopwatch.Elapsed;
 UpdaterTests.cs:1057:        var routine = string.Join("\n", knobs) + "\n\n"
+UpdaterTests.cs:1098:        process.WaitForExit();
 UpdaterTests.cs:1126:            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(30);
 UpdaterTests.cs:1127:            while (DateTime.UtcNow < deadline)
 UpdaterTests.cs:1131:                Thread.Sleep(5);
@@ -360,54 +376,139 @@ UpdaterTests.cs:1242:        var manifest = new ReleaseManifest("0.2.2", "abc", 
 UpdaterTests.cs:1277:        var manifest = new ReleaseManifest("0.2.2", "abc", DateTimeOffset.UtcNow, "win-x64", new[] { appFile })
 UpdaterTests.cs:1293:        var entries = string.Join(",", files.Select(file =>
 ComplexityProbeTests.cs:48:            await Task.Delay(Timeout.InfiniteTimeSpan, ct);
+ComplexityProbeTests.cs:470:        await process.WaitForExitAsync();
+ComplexityProbeTests.cs:516:        await process.WaitForExitAsync();
 ```
 
-### Assert edilen duvar saati bantları — sekiz
+`PerformanceCheckTests.cs:890,905,926,1033` bu turda eklenen sayım ölçüsünün kendi
+gövdesi — desen kendi tohum listesini eşliyor, iddia değil.
 
-| # | yer | bant | durum |
-|---|---|---|---|
-| 1 | `PerformanceCheckTests.cs:618` | `basladi < genisSaat / 2` | iddia 2, kapsamda |
-| 2 | `PerformanceCheckTests.cs:757` | `InRange(1500, 5_000)` | iddia 1, kapsamda |
-| 3 | `PerformanceCheckTests.cs:854` | `> 0` | iddia 3, kapsamda |
-| 4 | `UpdaterTests.cs:316` | `< ManifestTimeout + 250 ms` | iddia 4, kapsamda |
-| 5 | `UpdaterTests.cs:1173` | `> 5 s` | iddia 5, kapsamda |
-| 6 | `UpdaterTests.cs:915` | `offlineFirst < 3 s` | **tur 1'de listelenmedi** |
-| 7 | `UpdaterTests.cs:916` | `offlineSecond < 3 s` | **tur 1'de listelenmedi** |
-| 8 | `UpdaterTests.cs:1141` | `release.Join(10 s)` | **tur 1'de listelenmedi** |
+**Tarama A dokuzuncu bandı buldu** (`UpdaterTests.cs:890`, tur 2'de listede yoktu)
+**ama iki iddiayı hâlâ bulmuyor:** `PerformanceCheckTests.cs:462` ve `:542`. O iki
+satırda `Elapsed`, `Stopwatch`, `TimeSpan`, `Timeout`, `Wait` ya da `Join` geçmiyor;
+iddia duvar saatinden **türetilmiş** bir üretim üyesine konmuş: `SoftwareRealtimeCores`,
+yani `RealtimeCores => VideoMs <= 0 ? 0 : WallMs / VideoMs`
+(`src/VidShrink.Core/PerformanceCheck.cs:37`). Desen ne kadar genişletilirse
+genişletilsin bulunamazlar. Tarama A bu yüzden tek başına yeterli değil.
 
-Denetçinin sayımı sekiz; kendi taramam da sekiz buluyor, fazlası çıkmadı.
+#### Tarama B — türden çıkarılan kapalı küme
 
-**`:915` / `:916` — `EveryLaunchChecksAndStaysWithinTheTimeout`.** Gerçek bir süreç
-açılışına (`MeasureLaunch` → `Process.Start` + `WaitForExit`) konmuş **3 saniyelik
-sabit tavan**. Ölçülen dağılımdan türetilmemiş; sözleşmenin aradığı "yük altında
-düşecek yüzey" tarifinin tam örneği ve daraltılan iddia 4'ten (1050 ms) daha
-kırılgan, çünkü tavan bir süreç açılışının tamamını kapsıyor. İki satır
-`[LiveLauncherFact]` altında: `VIDSHRINK_LAUNCHER_EXE` var olan bir dosyayı
-göstermiyorsa test atlanıyor, CI iş akışı bu değişkeni kurmuyor — yani bantlar
-bugün CI'da hiç değerlendirilmiyor, ama değişkeni kuran her yerel koşumda
-değerlendiriliyor. **Bu turda düzeltilmedi; listelenmesi istendi.**
+Sayım metinden değil **türden** çıkarılıyor. Küme üç kuralla tanımlı:
 
-**`:1141` — `TheDeletionStepWaitsOutATransientLock`.** `release.Join(TimeSpan.FromSeconds(10))`
-gerçek bir iş parçacığının bitmesine konmuş 10 sn'lik tavan; `[Fact]`, Windows'ta
-koşuyor. **Bu turda düzeltilmedi; listelenmesi istendi.**
+1. Üretimde saatten türeyen üyeler: `WallMs`, `ElapsedMs`, `RealtimeCores`,
+   `RealtimeFactor`, `ReportedCpuParallelism`, artı BCL'nin `Stopwatch` ve `Elapsed`i.
+2. Zaman aşımı argümanı alan bekleme çağrıları: `WaitForExit`, `WaitOne`, `WaitAsync`,
+   `.Join(`, `.Wait(`.
+3. Bunlardan türeyenler: gövdesinde (1) ya da (2) geçen ve `TimeSpan` / `Stopwatch` /
+   `long` / `double` / `int` döndüren yardımcı metotların adları, ve sağ tarafında bir
+   tohum geçen yerel değişkenler — metot bloğu içinde, sabit noktaya kadar.
+
+Sonra bu kümeye **dokunan** her `Assert` ifadesi listeleniyor. `string.Join(`
+eşleşmeleri metin biçimlemedir, sayımdan düşülüyor.
+
+Küme kaynaktan türetilebiliyor, dolayısıyla **sonlanıyor**: anahtar kelime listesi gibi
+"bir tane daha eklemeyi akıl et" demiyor. Kural belgede değil,
+`PerformanceCheckTests.SaatTureviIddialarinSayisiBelgedekiyleAyni` ölçüsünün içinde kod
+olarak duruyor. Ham çıktı ölçünün kendi hata iletisi:
+
+```
+saat turevi iddia sayisi 23, belge 24 diyor: PerformanceCheckTests.cs:165
+PerformanceCheckTests.cs:221 PerformanceCheckTests.cs:253 PerformanceCheckTests.cs:290
+PerformanceCheckTests.cs:302 PerformanceCheckTests.cs:303 PerformanceCheckTests.cs:341
+PerformanceCheckTests.cs:450 PerformanceCheckTests.cs:462 PerformanceCheckTests.cs:542
+PerformanceCheckTests.cs:566 PerformanceCheckTests.cs:618 PerformanceCheckTests.cs:629
+PerformanceCheckTests.cs:646 PerformanceCheckTests.cs:751 PerformanceCheckTests.cs:757
+PerformanceCheckTests.cs:854 UpdaterTests.cs:316 UpdaterTests.cs:890 UpdaterTests.cs:915
+UpdaterTests.cs:916 UpdaterTests.cs:1141 UpdaterTests.cs:1173
+```
+
+Kayıt `.calisma/t132/t3/sayim-mutasyon.txt`; ölçü 23'e eşitlendiğindeki yeşil koşum
+`.calisma/t132/t3/sayim-yesil.txt`.
+
+Tarama B, tarama A'nın bulduğu her bandı buluyor **ve** `:462`, `:542`, `:629`u da
+getiriyor. Tersi doğru değil: tarama A'nın `Thread.Sleep` / `Task.Delay` satırları
+iddia olmadıkları için B'de yok, aşağıdaki "assert edilmeyen" listesinde duruyorlar.
+
+### Saat türevi 23 iddianın tamamı — 11 bant, 12 elenmiş
+
+Tarama B'nin verdiği 23 satırın hepsi burada. Sessiz bırakılan satır yok.
+
+| # | yer | iddia | sınıf | gerekçe |
+|---|---|---|---|---|
+| 1 | `PerformanceCheckTests.cs:462` | `yuklu.SoftwareRealtimeCores >= taban * YonPayi` | **bant** | `RealtimeCores = WallMs / VideoMs`; canlı okumaya sabit katsayılı (`YonPayi = 0,8`, `:358`) alt sınır. Hiçbir metin deseninin bulamadığı iddia. Bu turda daraltılmadı. |
+| 2 | `PerformanceCheckTests.cs:542` | `yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores` | **bant** | İki duvar saati okumasının karşılaştırması; sabit yok ama iki ölçüm de makinenin o anki yüküne bağlı. `[QuietMachineFact]` geçidi altında. Bu turda daraltılmadı. |
+| 3 | `PerformanceCheckTests.cs:618` | `basladi.ElapsedMilliseconds < genisSaat.ElapsedMilliseconds / 2` | **bant** | İddia 2; K1'de (b) olarak daraltıldı ve pimlendi. |
+| 4 | `PerformanceCheckTests.cs:629` | `butce.WallMs > dar` | elenmiş | Üretimin kendi koruyucusundan totolojik çıkıyor: `:627` bulgunun varlığını şart koşuyor, bulgu ancak `elapsedMs > budgetMs` iken üretiliyor (`PerformanceCheck.cs:237,243-244`), `:628` `budgetMs == dar`ı çiviliyor. Kararsızlaşma yönü yok — makine yavaşladıkça iddia sağlamlaşır. "Hiçbir şey ölçmüyor" da değil: taşıma iddiası, aşağıda mutasyonla gösterildi. |
+| 5 | `PerformanceCheckTests.cs:757` | `InRange(saat.ElapsedMilliseconds, 1500, 5_000)` | **bant** | İddia 1; tavan 15.000 → 5.000 daraltıldı, iki mutasyonla pimlendi. |
+| 6 | `PerformanceCheckTests.cs:854` | `clock.ElapsedMilliseconds > 0` | **bant** | İddia 3; K1'de (c) — bant biçiminde ama pratikte hiçbir şey ölçmüyor, kayda geçirildi. |
+| 7 | `UpdaterTests.cs:316` | `stopwatch.Elapsed < ManifestTimeout + 250 ms` | **bant** | İddia 4; tavan 1300 → 1050 ms daraltıldı, mutasyonla pimlendi. |
+| 8 | `UpdaterTests.cs:890` | `process.WaitForExit(60_000)` | **bant** | Gerçek süreç açılışına (`Process.Start`, `:889`) konmuş 60 sn'lik sabit tavan; `TheIncomingBinaryRenamesItselfOntoTheTargetName`, `[LiveLauncherFact]`. Tur 1'de de tur 2'de de listelenmedi — dokuzuncu bant. Bu turda daraltılmadı. |
+| 9 | `UpdaterTests.cs:915` | `offlineFirst < TimeSpan.FromSeconds(3)` | **bant** | Gerçek süreç açılışının süresine (`MeasureLaunch`, `:946-957`) konmuş 3 sn'lik sabit tavan; `[LiveLauncherFact]`. Tur 1'de listelenmedi. |
+| 10 | `UpdaterTests.cs:916` | `offlineSecond < TimeSpan.FromSeconds(3)` | **bant** | Aynısı, ikinci açılış. |
+| 11 | `UpdaterTests.cs:1141` | `release.Join(TimeSpan.FromSeconds(10))` | **bant** | Gerçek bir iş parçacığının bitmesine konmuş 10 sn'lik tavan; sade `[Fact]`, Windows'ta koşuyor. Tur 1'de listelenmedi. |
+| 12 | `UpdaterTests.cs:1173` | `stopwatch.Elapsed > TimeSpan.FromSeconds(5)` | **bant** | İddia 5; taban 1 → 5 sn daraltıldı, mutasyonla pimlendi. |
+| 13 | `PerformanceCheckTests.cs:165` | `Equal(1.4, result.SoftwareRealtimeCores, 3)` | elenmiş | `Cost()` kurgusundan gelen sabit sayı; sade `[Fact]`, saat hiç okunmuyor. |
+| 14 | `PerformanceCheckTests.cs:221` | `f.RealtimeCores > 0` | elenmiş | Aynı kurgu, sade `[Fact]`. |
+| 15 | `PerformanceCheckTests.cs:253` | `Equal(cabuk.SoftwareRealtimeCores, yavas.SoftwareRealtimeCores, 6)` | elenmiş | İki kurgu değerlendirmesinin karşılaştırması; saat yok. |
+| 16 | `PerformanceCheckTests.cs:290` | `Equal(12_000, finding.WallMs)` | elenmiş | `gecen: 12_000` testin kendi verdiği sabit. |
+| 17 | `PerformanceCheckTests.cs:302` | `Equal(1400, net.WallMs)` | elenmiş | Kurgu `EncoderCost` aritmetiği. |
+| 18 | `PerformanceCheckTests.cs:303` | `Equal(0.7, net.RealtimeCores, 6)` | elenmiş | Aynı aritmetik. |
+| 19 | `PerformanceCheckTests.cs:341` | `result.SoftwareRealtimeCores > 0` | elenmiş | Canlı okuma ama totolojik: `:333`teki `if (!result.SoftwareMeasured) return;`den sonra geliyor, `Usable` da yalnız `VideoMs > 0, WallMs > 0` olan maliyeti geçiriyor (`PerformanceCheck.cs:345`) — ölçülmüş bacakta `RealtimeCores > 0` zorunlu. `:629` ile aynı sınıf. |
+| 20 | `PerformanceCheckTests.cs:450` | `beklenen == okuma.Impact` | elenmiş | `beklenen` de karar da **aynı** okumadan türüyor; eşik tutarlılığı iddiası, duvar saati bandı değil. |
+| 21 | `PerformanceCheckTests.cs:566` | `sebep.Length > 0` | elenmiş | Veri akışı yanlış pozitifi: `sebep` `ElapsedMs`i yalnız ileti metninde geçiriyor. İddia "sebep bulundu mu", süre değil. |
+| 22 | `PerformanceCheckTests.cs:646` | `Equal(12_000, bulgu.WallMs)` | elenmiş | Sade `[Fact]`, `gecen: 12_000` sabiti. |
+| 23 | `PerformanceCheckTests.cs:751` | `Equal(saglam.SoftwareRealtimeCores, buMakine.SoftwareRealtimeCores, 6)` | elenmiş | Aynı kurgu maliyetin iki sayaç katsayısıyla değerlendirmesi; kararın sayaca kaymadığını tutuyor, süre tutmuyor. |
+
+**Bantların sayısı on bir, saat türevi assert'lerin sayısı yirmi üç.** Tur 1 "beş, başka
+yok" dedi, tur 2 "sekiz" dedi; ikisi de eksikti. Sayı artık belgede değil **kodda**
+tutuluyor — yirmi dördüncü saat türevi assert eklendiği anda CI kırmızıya döner,
+bir sonraki turun raporuna kalmaz.
+
+### Sayımı tutan ölçü
+
+`PerformanceCheckTests.SaatTureviIddialarinSayisiBelgedekiyleAyni` üç test dosyasını
+kaynak metin olarak okuyor, yukarıdaki kapalı kümeyi kuruyor ve bulduğu assert sayısını
+`SaatTureviIddiaSayisi = 23` sabitine eşitliyor. Kalıp bu depoda zaten var:
+`UpdaterTests.cs:1185-1196` `Program.cs`i kaynak metin olarak okuyup `IndexOf` ile iddia
+kuruyor.
+
+Sayı tutmazsa hata iletisi bulunan bütün satırları basıyor; bir sonraki okuyan farkı
+listeyle karşılaştırıp doğrudan görüyor.
+
+| mutasyon | sonuç |
+|---|---|
+| `SaatTureviIddiaSayisi` 23 → 24 | **kırıldı** — `saat turevi iddia sayisi 23, belge 24 diyor: ...` |
+| mutasyonsuz | **yeşil** — `Başarısız: 0, Başarılı: 1, Toplam: 1` |
+
+Ölçünün bilinen sınırı: `Assert` ifadesinin sonu "sonu `;` olan ilk satır" kuralıyla
+bulunuyor. Bu depodaki biçimlendirmede tutuyor; bir `Assert`in içine çok ifadeli bir
+lambda konursa ifade erken kesilebilir. O durumda sayı değişir ve ölçü kırmızıya döner —
+sessizce yanlış saymaz.
 
 ### Assert edilmeyen zaman kullanımları
 
-- `PerformanceCheckTests.cs:594,598,602,735,838` — iddiaların kendi saatleri.
+Tarama A'nın getirdiği, tarama B'nin haklı olarak getirmediği satırlar:
+
+- `PerformanceCheckTests.cs:594,598,602,735,838` — iddiaların kendi saatlerinin kurulumu.
 - `PerformanceCheckTests.cs:607-609,739,850-851` — yalnız `Log`.
+- `PerformanceCheckTests.cs:843` — `p.WaitForExit()`, zaman aşımı argümanı yok.
+- `PerformanceCheckTests.cs:881` — `Task.WaitAll(_workers, 5000)`, yapay yükün
+  kapatılması; üzerinde assert yok.
 - `UpdaterTests.cs:311,1143,1165` — yalnız `_output.WriteLine`.
-- `UpdaterTests.cs:947,956` — `MeasureLaunch` süreyi döndürüyor; çağıran `:938-939`
-  onu yalnız günlüğe yazıyor (`:915/:916` ise assert ediyor, yukarıda).
+- `UpdaterTests.cs:947,956` — `MeasureLaunch`in kendi saati; onu assert eden `:915/:916`
+  yukarıda bant olarak listelendi.
 - `UpdaterTests.cs:781,821,1131` — `Thread.Sleep(25)` / `Thread.Sleep(5)`, sınırlı
   yoklama gecikmeleri; üzerlerinde bant iddiası yok.
-- `UpdaterTests.cs:796` (`DateTime.UtcNow + 20 s`), `:1126` (`+30 s`) — döngü son
-  tarihleri; süre dolduğunda döngü sessizce çıkıyor, assert yok. `:1126`'nın
-  çıkışını `:1141`'in 10 sn'lik `Join`i yakalıyor.
-- `UpdaterTests.cs:853` — `_thread.Join()`, süresiz; bant değil.
+- `UpdaterTests.cs:796` (`DateTime.UtcNow + 20 sn`), `:1126` (`+30 sn`) — döngü son
+  tarihleri; süre dolduğunda döngü sessizce çıkıyor, assert yok. `:1126`nın sessiz
+  çıkışını `:1141`in 10 sn'lik `Join`i yakalıyor.
+- `UpdaterTests.cs:853,949,1098` — süresiz `Join()` / `WaitForExit()`; bant değil.
 - `UpdaterTests.cs:127,147,325,653,709,1242,1277` — `DateTimeOffset.UtcNow` manifest
   kurgusunda; zaman iddiası yok.
 - `ComplexityProbeTests.cs:48` — `Task.Delay(Timeout.InfiniteTimeSpan, ct)`, iptal
   testinde bilerek sonsuz bekleme.
+- `ComplexityProbeTests.cs:470,516` — `await process.WaitForExitAsync()`, zaman aşımı
+  argümanı yok.
 
 ### Üç dosyanın dışı — K5'in kapsamı değil, yine de bakıldı
 
@@ -422,9 +523,11 @@ olsun diye yazılıyor:
 - `ComparisonPanelTests.cs:322,692`, `ShareProviderTests.cs:462`, `SplashTests.cs:149`
   — sabit `TimeSpan` karşılaştırmaları; duvar saati değil.
 
-**Bu sözleşmenin üç dosyasında assert edilen duvar saati bantlarının sayısı sekiz.
-Beşi kapsamdaydı, üçü tur 1'de gözden kaçtı ve bu bölümde listelendi. Tur 1'in
-"başka yok" cümlesi geri çekildi.**
+**Bu sözleşmenin üç dosyasında saat türevi assert sayısı yirmi üç; bunların on biri
+duvar saati bandı.** Beşi tur 1 kapsamındaydı, üçü tur 1'de gözden kaçtı, biri
+(`UpdaterTests.cs:890`) tur 2'de de gözden kaçtı, ikisi (`:462`, `:542`) hiçbir metin
+deseninin bulamayacağı yerdeydi. Sayım artık bir ölçüyle tutuluyor; tur 1'in "başka
+yok" cümlesi ve tur 2'nin "sekiz" sayımı geri çekildi.
 
 ## Üretimde görülen, düzeltilmeyen
 

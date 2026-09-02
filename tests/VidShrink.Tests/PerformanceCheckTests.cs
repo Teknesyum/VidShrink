@@ -882,4 +882,168 @@ public sealed class PerformanceCheckTests
         }
     }
 
+    private const int SaatTureviIddiaSayisi = 23;
+
+    private static readonly string[] SaatCekirdegi =
+    {
+        "WallMs", "ElapsedMs", "RealtimeCores", "RealtimeFactor", "ReportedCpuParallelism",
+        "Stopwatch", "Elapsed", "WaitForExit", "WaitOne", "WaitAsync", ".Join(", ".Wait("
+    };
+
+    private static readonly string[] SaatliDosyalar =
+        { "PerformanceCheckTests.cs", "UpdaterTests.cs", "ComplexityProbeTests.cs" };
+
+    private static readonly System.Text.RegularExpressions.Regex UyeBasi =
+        new(@"^ {4}(?:\[[A-Za-z]|public |private |internal |protected )",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+    private static readonly System.Text.RegularExpressions.Regex YerelAtama =
+        new(@"^\s+(?:var|[\w.<>?\[\]]+)\s+(\w+)\s*=\s*([^\r\n]*)$",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+    private static readonly System.Text.RegularExpressions.Regex MetotBasligi =
+        new(@"^ {4}(?:public|private|internal|protected)[^\r\n=;]*?\b(?:TimeSpan|Stopwatch|long|double|int)\s+(\w+)\s*\(",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+    /// <summary>
+    /// <c>docs/olcumler/duvar-saati-iddialari.md</c>'deki saat turevi iddia sayimini
+    /// kaynaktan yeniden uretir ve belgedeki sayiya esitler. Sayim uc turda bir kez
+    /// eksik cikti (once "yok", sonra "sekiz", sonra "dokuz"); anahtar kelime listesi
+    /// kapali bir kume olmadigi icin desen genisletmek bunu bitirmiyor. Bu olcu kumeyi
+    /// <b>turden</b> cikariyor: uretimde saatten tureyen uyeler, zaman asimi argumani
+    /// alan bekleme cagrilari, ve bu ikisinden tureyen yereller.
+    ///
+    /// Onuncu bant eklendigi anda burasi kirmiziya doner; sayim bir sonraki turun
+    /// raporuna kalmaz. Kirmizi gorursen once belgeyi guncelle, sonra sayiyi.
+    /// </summary>
+    [Fact]
+    public void SaatTureviIddialarinSayisiBelgedekiyleAyni()
+    {
+        var bulunan = SaatTureviIddialar();
+
+        Assert.True(bulunan.Count == SaatTureviIddiaSayisi,
+            $"saat turevi iddia sayisi {bulunan.Count}, belge {SaatTureviIddiaSayisi} diyor: "
+            + string.Join(" ", bulunan));
+    }
+
+    private static List<string> SaatTureviIddialar()
+    {
+        var bulunan = new List<string>();
+
+        foreach (var ad in SaatliDosyalar)
+        {
+            var metin = File.ReadAllText(Path.Combine(TipSources.Root, "tests", "VidShrink.Tests", ad))
+                .Replace("\r\n", "\n", StringComparison.Ordinal);
+            var bloklar = Bloklar(metin);
+            var kureseller = KureselTohumlar(metin, bloklar);
+            var koruma = KorumaAraligi(metin);
+
+            foreach (var blok in bloklar)
+            {
+                var govde = metin[blok.Item1..blok.Item2];
+                var tohumlar = new List<string>(kureseller);
+                YerelleriEkle(govde, tohumlar);
+
+                for (var i = govde.IndexOf("Assert.", StringComparison.Ordinal); i >= 0;
+                     i = govde.IndexOf("Assert.", i + 1, StringComparison.Ordinal))
+                {
+                    var mutlak = blok.Item1 + i;
+                    if (mutlak >= koruma.Item1 && mutlak < koruma.Item2) continue;
+                    if (!Tasiyor(Ifade(govde, i), tohumlar)) continue;
+                    bulunan.Add($"{ad}:{SatirNo(metin, mutlak)}");
+                }
+            }
+        }
+
+        return bulunan;
+    }
+
+    private static List<(int, int)> Bloklar(string metin)
+    {
+        var sinirlar = new List<int>();
+        foreach (System.Text.RegularExpressions.Match m in UyeBasi.Matches(metin)) sinirlar.Add(m.Index);
+        if (sinirlar.Count == 0) return new List<(int, int)> { (0, metin.Length) };
+
+        var bloklar = new List<(int, int)>();
+        for (var i = 0; i < sinirlar.Count; i++)
+            bloklar.Add((sinirlar[i], i + 1 < sinirlar.Count ? sinirlar[i + 1] : metin.Length));
+        return bloklar;
+    }
+
+    private static List<string> KureselTohumlar(string metin, List<(int, int)> bloklar)
+    {
+        var tohumlar = new List<string>(SaatCekirdegi);
+        for (var tur = 0; tur < 3; tur++)
+        {
+            var eklendi = false;
+            foreach (var blok in bloklar)
+            {
+                var govde = metin[blok.Item1..blok.Item2];
+                var basi = MetotBasligi.Match(govde);
+                if (!basi.Success) continue;
+
+                var ad = basi.Groups[1].Value;
+                if (tohumlar.Contains(ad) || !Tasiyor(govde, tohumlar)) continue;
+
+                tohumlar.Add(ad);
+                eklendi = true;
+            }
+
+            if (!eklendi) break;
+        }
+
+        return tohumlar;
+    }
+
+    private static void YerelleriEkle(string govde, List<string> tohumlar)
+    {
+        for (var tur = 0; tur < 3; tur++)
+        {
+            var eklendi = false;
+            foreach (System.Text.RegularExpressions.Match m in YerelAtama.Matches(govde))
+            {
+                var ad = m.Groups[1].Value;
+                if (tohumlar.Contains(ad) || !Tasiyor(m.Groups[2].Value, tohumlar)) continue;
+
+                tohumlar.Add(ad);
+                eklendi = true;
+            }
+
+            if (!eklendi) break;
+        }
+    }
+
+    private static string Ifade(string metin, int baslangic)
+    {
+        var son = baslangic;
+        while (son < metin.Length)
+        {
+            var satirSonu = metin.IndexOf('\n', son);
+            if (satirSonu < 0) satirSonu = metin.Length;
+            if (metin[son..satirSonu].TrimEnd().EndsWith(";", StringComparison.Ordinal))
+                return metin[baslangic..satirSonu];
+            son = satirSonu + 1;
+        }
+
+        return metin[baslangic..];
+    }
+
+    private static bool Tasiyor(string metin, List<string> tohumlar)
+    {
+        var sade = metin.Replace("string.Join(", " ", StringComparison.Ordinal);
+        return tohumlar.Any(t => sade.Contains(t, StringComparison.Ordinal));
+    }
+
+    private static (int, int) KorumaAraligi(string metin)
+    {
+        var basi = metin.IndexOf("public void " + nameof(SaatTureviIddialarinSayisiBelgedekiyleAyni),
+            StringComparison.Ordinal);
+        if (basi < 0) return (-1, -1);
+
+        var sonu = metin.IndexOf("\n    }", basi, StringComparison.Ordinal);
+        return (basi, sonu < 0 ? metin.Length : sonu);
+    }
+
+    private static int SatirNo(string metin, int konum) =>
+        metin[..konum].Count(c => c == '\n') + 1;
 }
