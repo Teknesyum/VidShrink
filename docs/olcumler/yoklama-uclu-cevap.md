@@ -365,3 +365,39 @@ Koşum dalın ucunda (`b0b571c`), tam derlemeden sonra: `dotnet build VidShrink.
 Filtrenin üç kolu `--list-tests` ile tek tek sayıldı — sıfır eşleşmeli ölü kol yok:
 `EncoderAvailabilityTests` 12, `PlanCalculatorTests` 32, `PlanCalculatorProbeTests` 25.
 Toplamı 69, koşum sayısıyla uyuşuyor.
+
+## T10 — CI kanıtı
+
+| Alan | Değer |
+| --- | --- |
+| Koşum kimliği | `33647517701` |
+| Durum | `completed` |
+| Sonuç | `success` |
+| Koştuğu sha | `d150801` |
+| Dal | `T137-tur2-uclu-cevap` |
+
+`d150801` bu dalın **son kod commit'i.** Ondan sonraki üç commit (`431c1ae`,
+`b0b571c`, `69aada7`) yalnız `docs/olcumler/yoklama-uclu-cevap.md`ye dokunuyor;
+`.github/workflows/ci.yml`in `paths-ignore` listesi `docs/**` ve `**/*.md` içerdiği
+için bunlar tasarım gereği koşum başlatmıyor. Yani yeşil koşum dalın kodunun
+tamamını kapsıyor: "son commit'te koşum görünmüyor" durumu değil, "docs commit'i
+koşum tetiklemiyor" durumu.
+
+Tur 1'in `4fae7e7`si için main'de koşum başlamamıştı; o commit'i içeren sonraki main
+koşumu `33641313520` `completed success` (sha `5fdc023`, `4fae7e7` onun atası).
+
+## Kriter durumu
+
+| Kriter | Durum | Commit | Tutan ölçü / kanıt |
+| --- | --- | --- | --- |
+| T1 | kapandı | `879c88b` → `7555059` | `TheGateEntranceKeepsTheUnmeasuredAnswer`, mutasyon M5 |
+| T2 | kapandı | `879c88b` → `7555059` | `WorksAsEncoderOlcemediyiCalismiyordanAyiriyor` + `OlcemeyenYoklamaListedeOlmayanKodlayiciyiVarSaymiyor`, mutasyon M6 |
+| T3 | kapandı | `b2299bb` | Kayıt noktaları tablosu; kırmızı commit `879c88b` ayrı |
+| T4 | kapandı | `879c88b` → `7555059` | `TheRetryCeilingStopsTheProbeStorm`, mutasyon M7 |
+| T5 | kapandı | `7555059` | Eski/yeni docstring metni (T5 bölümü) |
+| T6 | kapandı | `879c88b` → `7555059` | `TheProbeStatusDoesNotEraseAnUnrelatedMessage`, mutasyon M8 |
+| T7 | kapandı | `b2299bb` | 13 satırlık gerçek `grep` çıktısı |
+| T8 | kapandı | `e7246f0`, `b2299bb` | Yedi satırlık tam tablo + sütun etiketi düzeltmesi |
+| T9 | kapandı | `e7246f0` | `TheGateSettlesOnTheMeasuredDurationNotTheKillLimit` + `ATLANDI` izi, mutasyon M9 |
+| T10 | kapandı | `d150801` | Koşum `33647517701`, `completed success` |
+| T11 | kapandı | `b2299bb` | `baslat-kilidi.md` k3 satırı yeniden koşturuldu |
