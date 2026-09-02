@@ -17,12 +17,12 @@ commit `eb9165c`. Sonradan secilen esik kanit degildir.
   is parcacigi sabitken yukten etkilenmez. Sayfadaki tek sure sayisi
   "Olculemeyenler" altindaki hucre maliyetidir: paylasimli makinede
   olculdugu icin **karsilastirma degil, buyukluk mertebesi** olarak okunur.
-- Dal `T114-sahne-butcesi`. Olculen **uretim kodu**: `src/`in son commit'i
-  `f542dc22efeaa6ace0522e8d41eeed6f56526f87 T135 ve T130 borclari: manset sayilari, verify filtresi, stdout utf-8, kapanmayan etiket`. Butun kodlamalar bu koddan `--no-incremental`
+- Dal `T138-rapor-etiketleri`. Olculen **uretim kodu**: `src/`in son commit'i
+  `ccd2abd46538a738d23e1cccbcedc4ab90019608 T128 K2/K4/K6: PickCodec gercek yoklamaya baglandi, gerekce cumlesi duzeltildi`. Butun kodlamalar bu koddan `--no-incremental`
   derlenmis ikiliyle kosuldu; `--no-build` kullanilmadi. Bu commit'ten
   sonraki degisiklikler yalniz `tools/` ve `docs/` icindedir, plani
   etkilemez.
-- Ham cikti: `C:/Users/Administrator/Desktop/Projeler/Vidshrink/.claude/worktrees/T114/.calisma/T114` (gitignore'lu).
+- Ham cikti: `C:/Users/Administrator/Desktop/Projeler/Vidshrink/.claude/worktrees/T138/.calisma/T114` (gitignore'lu).
 
 ## Hangi sayi hangi komuttan cikti
 
@@ -77,16 +77,22 @@ dizilerinden bastan hesaplandi.
 | kodlayici en az esit | 5 | 5 | tuttu |
 | sahne >= 4 hucre | 5 | 5 | tuttu |
 | sahne >= 4, harita onde | 3 | 3 | tuttu |
+| manset olculen hucre | 5 | 5 | tuttu |
+| manset zones tabani gecen | 3 | 3 | tuttu |
+| manset zones en iyi aday | 1 | 1 | tuttu |
+| manset zones en iyi kazanc | 0.044 | 0.044 | tuttu |
+| K4 destek gerekcesi yalniz %1 kolu | 2 | 2 | tuttu |
 | K4 eki olculen hucre | 5 | 5 | tuttu |
 | tabani gecen hucre | 4 | 4 | tuttu |
 | zones kazandi | 1 | 1 | tuttu |
 | qcomp kazandi | 3 | 3 | tuttu |
+| K7 en buyuk p10 kaybi | -0.014 | -0.014 | tuttu |
 | K7 karsilastirilan kosum | 2 | 2 | tuttu |
 | K7 geri dusmeyen kosum | 2 | 2 | tuttu |
 | K7 en iyi bozuk ustunluk | 0.050 | 0.050 | tuttu |
 | olculemeyen satir | 26 | 26 | tuttu |
 
-Denetlenen iddia 12, tutmayan **0**. Uretim:
+Denetlenen iddia 18, tutmayan **0**. Uretim:
 `bash tools/sahne-butcesi/07-sayim-denetimi.sh`, ham dosya
 `sayim-denetimi.csv`. Betik sayfayi da okur; sayfa degisirse tekrar kosar.
 
@@ -410,9 +416,9 @@ destek yazilmaz.
 | `libx265` | qcomp | evet | 407044 | 439695 | 32651 | 0 | iki deger belirgin farkli cikti uretti |
 | `libx264` | zones | evet | 674048 | 240681 | 433367 | 0 | iki deger belirgin farkli cikti uretti |
 | `libx264` | qcomp | evet | 404471 | 444705 | 40234 | 0 | iki deger belirgin farkli cikti uretti |
-| `libsvtav1` | zones | hayir | 761333 | 756503 | 4830 | 1104 | fark tekrar gurultusunun icinde — parametre etkisiz ya da yok sayildi |
+| `libsvtav1` | zones | hayir | 761333 | 756503 | 4830 | 1104 | fark tekrar gurultusunun iki katini asiyor ama ciktinin %1'ini asmiyor — parametre etkisiz ya da yok sayildi |
 | `libsvtav1` | qcomp | evet | 755279 | 720981 | 34298 | 1104 | iki deger belirgin farkli cikti uretti |
-| `libsvtav1` | aq | hayir | 751182 | 755908 | 4726 | 1104 | fark tekrar gurultusunun icinde — parametre etkisiz ya da yok sayildi |
+| `libsvtav1` | aq | hayir | 751182 | 755908 | 4726 | 1104 | fark tekrar gurultusunun iki katini asiyor ama ciktinin %1'ini asmiyor — parametre etkisiz ya da yok sayildi |
 | `hevc_nvenc` | zones | hayir |  |  |  |  | kodlayicida zone parametresi yok |
 | `hevc_nvenc` | aq | evet | 410646 | 399896 | 10750 | 0 | iki deger belirgin farkli cikti uretti |
 | `av1_nvenc` | zones | hayir |  |  |  |  | kodlayicida zone parametresi yok |
@@ -598,7 +604,7 @@ olcu kendi hucresinin kazancidir.
 | uyumlu | `p1-karisik` | eksik-kesim | -0.014 | +0.007 | hayir |
 | uyumlu | `p1-karisik` | fazla-kesim | -0.050 | +0.007 | hayir |
 
-**Bozuk haritanin bedeli**: karsilastirilan 2 kosum, en buyuk p10 kaybi 0.000 puan, kaybi kendi hucresinin K5 kazancini asan 0 kosum.
+**Bozuk haritanin bedeli**: karsilastirilan 2 kosum, en buyuk p10 kaybi -0.014 puan, kaybi kendi hucresinin K5 kazancini asan 0 kosum.
 
 Kapi "kayip kazanci asmiyor" diyor, ama tablo bundan daha fazlasini
 soyluyor: karsilastirilan 2 kosumun 2 tanesinde bozuk harita dogru
@@ -652,13 +658,13 @@ uydurma; olculen sey yorumun **yon degistirip degistirmedigi**.
 
 - K2 (kodlayici zaten dogru dagitiyor mu): kapanmadi
 - K5/K6 (kalite kazanci ve hedef boyut): **gecmedi** — olculen cift 1; p10 esigini (>= +0,50) gecen 0, en kotu sahne esigini (>= +1,00) gecen 0, esikten fazla p10 kaybeden 0; olculen 2 kosumdan hedefi **asan** 0, bandin **altinda** kalan 0
-- K7 (bozuk harita bedeli): kabul edilebilir — karsilastirilan 2 kosum, en buyuk p10 kaybi 0.000 puan, kaybi kendi hucresinin K5 kazancini asan 0 kosum; 2 kosumun tamaminda bozuk harita dogru haritanin altina dusmedi (en iyi bozuk kol 0.050 puan onde)
+- K7 (bozuk harita bedeli): kabul edilebilir — karsilastirilan 2 kosum, en buyuk p10 kaybi -0.014 puan, kaybi kendi hucresinin K5 kazancini asan 0 kosum; 2 kosumun tamaminda bozuk harita dogru haritanin altina dusmedi (en iyi bozuk kol 0.050 puan onde)
 
 **Sozlesmenin sorusu "haritayi plana baglamali miyiz" idi. Olculen 8 hucrenin 5 tanesinde harita kodlayiciyi geride birakmiyor**: `MAE(verilen) <= MAE(harita)` (K2 tablosu), yani o hucrelerde kodlayicinin kendi dagitimi haritanin onerisi kadar ya da ondan daha dogru. Plana baglanacak sey haritanin sahne basina sayilaridir; o sayilar cogunlukta kodlayicinin kendi kararindan daha iyi degilse, baglamanin tasiyacagi bilgi de yoktur. Sozlesmenin "olculdu, kodlayici zaten daha iyi dagitiyor" secenegi bu satirdan okunur.
 
 
 **Bu sayi sahne sayisina gore ikiye ayrilir ve yon degistirir.** Dort sahneden az olan pencerede dagitilacak sahne neredeyse yoktur; o hucreler sayfada zaten `anlamsiz` diye isaretli. Sahne sayisi dort ve ustu olan 5 hucreye bakildiginda harita 3 tanesinde kodlayiciyi geciyor, 2 tanesinde gecmiyor. Yani "5/8" cogunlugunu kucuk pencereler tasiyor. Ikisi de dogru ve ikisi de burada: genis pencerede harita daha sik onde, ama K5'in kalite kapisi bu onculugun kullaniciya bir sey kazandirdigini gostermedi.
-Dagitim parametresinin kendisi ayri bir sorudur ve ayri olculdu. **Sahne basina dagitim 5 hucrenin 1 tanesinde tabani gecti; kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 5 hucrenin tabani gecen 4 tanesinde `zones` 1 kez kazandi, `qcomp` 3 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones` 5 hucreden 1 tanesinde kazandi ve en buyuk kazanc 0.044 pp; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
+Dagitim parametresinin kendisi ayri bir sorudur ve ayri olculdu. **Sahne basina dagitimi tasiyan `zones`, olculen 5 hucrenin 3 tanesinde tabani gecti; bunlarin 1 tanesinde de hucrenin en iyi adayi oldu. En iyi aday oldugu hucredeki kazanc 0.044 pp (yedek/p1-karisik), K1 aciginin %18.0'i.** Haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; olculen 5 hucrenin tabani gecen 4 tanesinde `zones` 1 kez kazandi, `qcomp` 3 kez. `qcomp` tek bir kuresel skalerdir, `SceneMap` olmadan da verilebilir — kazandigi hucre dagitimin degil, iki gecis yanliliginin bugunku varsayilaninin bu icerikte en iyi olmadiginin kanitidir. `zones` 5 hucreden 1 tanesinde kazandi ve en buyuk kazanc 0.044 pp; bu buyukluk tek basina karar tasimaz, karari K5'in kalite kapisi verir.
 
 **Bu kazanci bugunku varsayilan yol alamaz:** uretimin varsayilan kodlayicisi `libsvtav1` `zones` parametresini hic okumuyor (K4 izgarasi). Yani olculen kazanc, kullanicinin varsayilan ayarlarla yaptigi sikistirmaya ulasmiyor; ancak kodlayici elle `libx265` ya da `libx264` secildiginde gorunur.
 
