@@ -517,6 +517,45 @@ public sealed class PlanCalculatorProbeTests
         Assert.Equal(EncoderProbeState.Unmeasured, hicOlculmemis.EncoderState("av1_nvenc"));
     }
 
+    [Fact]
+    public void FirstFailureCooldownSonrasiYerlesenYoklamaylaTemizleniyor()
+    {
+        var kodlayici = "av1_nvenc";
+        var makine = new FlakyThenWorkingAvailability(failCount: MainWindow.DeferredEncoderAvailability.MaxAttempts);
+        var gate = new MainWindow.DeferredEncoderAvailability(makine, () => { });
+
+        Drain(gate, kodlayici);
+        Assert.Equal(FlakyThenWorkingAvailability.Message, gate.FirstFailure);
+        Assert.True(gate.Unsettled);
+
+        Thread.Sleep(MainWindow.DeferredEncoderAvailability.RetryAfterFailureMs + 200);
+        Drain(gate, kodlayici);
+
+        Assert.Null(gate.FirstFailure);
+        Assert.False(gate.Unsettled);
+        Assert.True(gate.WorksAsEncoder(kodlayici));
+        Assert.Equal(EncoderProbeState.Working, gate.EncoderState(kodlayici));
+    }
+
+    private sealed class FlakyThenWorkingAvailability : IEncoderAvailability
+    {
+        internal const string Message = "gecici yoklama hatasi";
+
+        private readonly int _failCount;
+        private int _calls;
+
+        internal FlakyThenWorkingAvailability(int failCount) => _failCount = failCount;
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec)
+        {
+            var call = Interlocked.Increment(ref _calls);
+            if (call <= _failCount) throw new InvalidOperationException(Message);
+            return true;
+        }
+    }
+
     /// <summary>
     /// T136/K1. Yoklama surekli yerlesmezken plan <c>HardwareNotMeasured</c> kaliyor ama
     /// Baslat calisiyor. Donanim sorusuna cevap alamamak yazilim kodlayicisiyla

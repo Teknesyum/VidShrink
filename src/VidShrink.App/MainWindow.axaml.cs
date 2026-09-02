@@ -75,6 +75,7 @@ public partial class MainWindow : Window
     private SizeEstimate? _estimate;
     private IEncoderAvailability? _encoders;
     private DeferredEncoderAvailability? _planEncoders;
+    private bool _probeStatusShown;
     private double _predictedQuality;
     private StrategyAdvice? _advice;
     private string? _lastOutput;
@@ -1235,6 +1236,8 @@ public partial class MainWindow : Window
         /// </summary>
         internal const int MaxAttempts = 2;
 
+        internal const int RetryAfterFailureMs = 5000;
+
         private sealed class Answer
         {
             internal bool Works;
@@ -1243,6 +1246,7 @@ public partial class MainWindow : Window
             internal int Attempts;
             internal string? Failure;
             internal long ElapsedMs = -1;
+            internal long LastAttemptTicks;
         }
 
         /// <summary>
@@ -1381,7 +1385,9 @@ public partial class MainWindow : Window
                 if (_answers.TryGetValue(key, out var answer))
                 {
                     if (answer.Settled) return true;
-                    if (answer.Attempts >= MaxAttempts) return false;
+                    var stuck = answer.Attempts >= MaxAttempts;
+                    var cooling = stuck && Environment.TickCount64 - answer.LastAttemptTicks < RetryAfterFailureMs;
+                    if (cooling) return false;
                 }
                 if (!_running.Add(key)) return false;
                 _probes++;
@@ -1414,6 +1420,7 @@ public partial class MainWindow : Window
                 {
                     if (!_answers.TryGetValue(key, out var answer)) _answers[key] = answer = new Answer();
                     answer.Attempts++;
+                    answer.LastAttemptTicks = Environment.TickCount64;
                     answer.Failure = failure?.Message;
                     answer.ElapsedMs = clock.ElapsedMilliseconds;
                     if (failure is null)
@@ -1899,12 +1906,20 @@ public partial class MainWindow : Window
     {
         if (_planEncoders is null) return;
 
-        string text;
+        string? text = null;
         if (_planEncoders.FirstFailure is { } failure) text = Say("main.status.probe-failed", failure);
         else if (_planEncoders.Unsettled) text = Say("main.status.probe-unsettled");
-        else return;
 
-        if (TxtSystemStatus.Text != text) TxtSystemStatus.Text = text;
+        if (text is not null)
+        {
+            if (TxtSystemStatus.Text != text) TxtSystemStatus.Text = text;
+            _probeStatusShown = true;
+        }
+        else if (_probeStatusShown)
+        {
+            TxtSystemStatus.Text = string.Empty;
+            _probeStatusShown = false;
+        }
     }
 
     /// <summary>
