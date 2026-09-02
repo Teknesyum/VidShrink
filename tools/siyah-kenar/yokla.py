@@ -21,7 +21,7 @@ KIRP = re.compile(r"crop=(\d+):(\d+):(\d+):(\d+)")
 def kos(kaynak, ss, kare, limit=24):
     yol = KAYNAK + "/" + kaynak + ".mkv"
     a = ["ffmpeg", "-hide_banner", "-nostdin", "-ss", str(ss), "-i", yol,
-         "-vf", "cropdetect=limit=%d:round=2:reset=0" % limit,
+         "-vf", "cropdetect=limit=%d:round=2:reset=0:skip=0" % limit,
          "-frames:v", str(kare), "-f", "null", "-"]
     t0 = time.perf_counter()
     p = subprocess.run(a, capture_output=True, text=True, errors="replace")
