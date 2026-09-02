@@ -121,3 +121,18 @@ icin puanlar yalniz kol icinde karsilastirilabilir; A/B kol icindedir.
 boler. Bozulma haritayi degistirmediyse o kol kosulmaz: `AbAsync` `bilinmiyor`
 yazar. Aksi halde tabloda "bozuk harita" diye duran satir aslinda dogru
 haritanin kendisi olur ve K7'nin kaybi yapay olarak sifir cikardi.
+
+## K4'un ikinci adayi neden `qcomp = 1,0`
+
+Kabul kriteri iki aday istiyor: `zones` ve "iki gecis yanliligi". Ikincisi bir
+serbest katsayi degil. Iki gecis hiz denetimi biti kabaca `karmasiklik^qcomp`
+ile dagitir; harita `karmasiklik^1` (tam oranli) onerir. Ikisini esitleyen
+deger `qcomp = 1,0`dir — haritanin onerisinin ayni denklemdeki karsiligi,
+uydurulmus bir sabit degil.
+
+Iki adayin farki hedefleme cozunurlugu: `zones` sahne araligina ayri carpan
+verir, `qcomp` butun klip icin tek egri degistirir. Bu yuzden ikisi ayni
+olcuyle — `MAE(verilen, hak edilen)` — ve ayni hedef boyutta karsilastirilir;
+kazanan tabana gore MAE'yi daha cok dusurendir. Kalite olcusu (K5) degil,
+K1'in kendi olcusudur: soru "kazandiriyor mu" degil, "K1'deki farki hangisi
+kapatiyor".
