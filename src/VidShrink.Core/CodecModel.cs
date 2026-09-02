@@ -17,7 +17,7 @@ public static class CodecModel
     public const double HardwareQualityCeiling = 96.0;
     public const double HardwareAv1QualityCeiling = 98.0;
     public const double HardwareBitrateYield = 0.877;
-    public const double HardwareFloorFactor = 1.25;
+    public const double HardwareFloorFactor = 1.52;
 
     // A hardware encoder refuses to go below a floor of its own and ignores -b:v and -maxrate
     // under it. Measured on av1_nvenc (-rc vbr -multipass fullres) with -b:v 32k -maxrate 33k,
@@ -59,7 +59,7 @@ public static class CodecModel
     {
         var baseFloor = Family(codec) switch
         {
-            "av1" => 0.020,
+            "av1" => 0.0095,
             "hevc" => 0.025,
             _ => 0.035
         };

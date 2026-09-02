@@ -269,6 +269,31 @@ public sealed class SpeedModeTests
         Assert.True(FfmpegArguments.NeedsTwoPasses(plan.Codec));
     }
 
+    /// <summary>
+    /// Altın parmak izi: hız kipi Quality'de bugünün planları. Liste T99 turu 2'de
+    /// yenilendi, on sekiz satırın <b>on ikisi</b> değişti. Değişimin tamamı tek sabitten
+    /// geliyor: <c>ComplexityProfile.DefaultMotionExponent</c> 0,25'ten 0,871'e çıktı
+    /// (T89'un ölçtüğü on üç noktanın hepsi 0,25'in üstündeydi). 0,25'te kare hızını
+    /// yarıya indirmek bitlerin %40,5'ini kurtarıyor gibi görünüyordu; ölçülen 0,871'de
+    /// kurtardığı %8,6, yani kare hızı kesmek artık yer açmıyor ve arama kesmiyor.
+    /// Taban değişikliği (av1 0,020 -> 0,0095, donanım çarpanı 1,25 -> 1,52) bu listede
+    /// <b>tek satır</b> bile oynatmadı; ikisi ayrı ayrı geri alınıp ölçüldü.
+    ///
+    /// <para>Değişen satırlar, hepsi kare hızının kaynakta (30) kalması yönünde:</para>
+    /// <list type="bullet">
+    /// <item>Compatible|25 (iki satır): 806x454@20 -> 806x454@30</item>
+    /// <item>Compatible|8 (iki satır): 576x324@6 -> 576x324@30</item>
+    /// <item>MaxCompression|25 (iki satır): 806x454@20 -> 806x454@30</item>
+    /// <item>MaxCompression|8|FillTarget: 614x346@6 -> 576x324@30</item>
+    /// <item>MaxCompression|8|QualityCeiling: crf 32 / 433k / 614x346@6 -> 2pass / 470k / 576x324@30</item>
+    /// <item>Auto|25 (iki satır): 806x454@20 -> 806x454@30</item>
+    /// <item>Auto|8|FillTarget: 614x346@6 -> 576x324@30</item>
+    /// <item>Auto|8|QualityCeiling: crf 32 / 433k / 614x346@6 -> 2pass / 470k / 576x324@30</item>
+    /// </list>
+    ///
+    /// <para>Değişmeyen altı satır 180 MB hedefinin hepsi: o bütçede zaten kare hızı
+    /// kesilmiyordu.</para>
+    /// </summary>
     [Fact]
     public void QualityModeLeavesTodaysPlansUntouched()
     {
@@ -276,22 +301,22 @@ public sealed class SpeedModeTests
         {
             "Compatible|180|FillTarget|libx264|2pass||12217|128|1190x670@30|slow",
             "Compatible|180|QualityCeiling|libx264|crf|20|11958|128|1190x670@30|slow",
-            "Compatible|25|FillTarget|libx264|2pass||1567|128|806x454@20|slow",
-            "Compatible|25|QualityCeiling|libx264|2pass||1567|128|806x454@20|slow",
-            "Compatible|8|FillTarget|libx264|2pass||470|64|576x324@6|slow",
-            "Compatible|8|QualityCeiling|libx264|2pass||470|64|576x324@6|slow",
+            "Compatible|25|FillTarget|libx264|2pass||1567|128|806x454@30|slow",
+            "Compatible|25|QualityCeiling|libx264|2pass||1567|128|806x454@30|slow",
+            "Compatible|8|FillTarget|libx264|2pass||470|64|576x324@30|slow",
+            "Compatible|8|QualityCeiling|libx264|2pass||470|64|576x324@30|slow",
             "MaxCompression|180|FillTarget|libsvtav1|2pass||12217|128|1498x842@30|6",
             "MaxCompression|180|QualityCeiling|libsvtav1|crf|32|11798|128|1498x842@30|6",
-            "MaxCompression|25|FillTarget|libsvtav1|2pass||1567|128|806x454@20|6",
-            "MaxCompression|25|QualityCeiling|libsvtav1|2pass||1567|128|806x454@20|6",
-            "MaxCompression|8|FillTarget|libsvtav1|2pass||470|64|614x346@6|6",
-            "MaxCompression|8|QualityCeiling|libsvtav1|crf|32|433|64|614x346@6|6",
+            "MaxCompression|25|FillTarget|libsvtav1|2pass||1567|128|806x454@30|6",
+            "MaxCompression|25|QualityCeiling|libsvtav1|2pass||1567|128|806x454@30|6",
+            "MaxCompression|8|FillTarget|libsvtav1|2pass||470|64|576x324@30|6",
+            "MaxCompression|8|QualityCeiling|libsvtav1|2pass||470|64|576x324@30|6",
             "Auto|180|FillTarget|libx264|2pass||12217|128|1190x670@30|slow",
             "Auto|180|QualityCeiling|libx264|crf|20|11958|128|1190x670@30|slow",
-            "Auto|25|FillTarget|libsvtav1|2pass||1567|128|806x454@20|6",
-            "Auto|25|QualityCeiling|libsvtav1|2pass||1567|128|806x454@20|6",
-            "Auto|8|FillTarget|libsvtav1|2pass||470|64|614x346@6|6",
-            "Auto|8|QualityCeiling|libsvtav1|crf|32|433|64|614x346@6|6"
+            "Auto|25|FillTarget|libsvtav1|2pass||1567|128|806x454@30|6",
+            "Auto|25|QualityCeiling|libsvtav1|2pass||1567|128|806x454@30|6",
+            "Auto|8|FillTarget|libsvtav1|2pass||470|64|576x324@30|6",
+            "Auto|8|QualityCeiling|libsvtav1|2pass||470|64|576x324@30|6"
         };
 
         var actual = new List<string>();
@@ -320,4 +345,5 @@ public sealed class SpeedModeTests
 
         Assert.Equal(expected, actual);
     }
+
 }
