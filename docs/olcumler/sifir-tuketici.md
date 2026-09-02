@@ -282,7 +282,20 @@ altinda. Ikisi `VideoToolboxDoesNotFallIntoTheCrfArm` kodek durumu, ucu
 bir kol cikis kodu 0 ile sessizce gecer. Sayi bu yuzden yazildi: kolun bos olmadigi
 `--list-tests` ile dogrulandi, `Toplam: 11` ile koseleri tutuyor.
 
-CI kosumu: RUNID-PLACEHOLDER
+CI kosumu **`33688802430`** — `completed success`, commit `fd46868`
+(dalin kod tasiyan son commit'i; `.claude/**`, `docs/**` ve `*.md` degisiklikleri
+is akisinin `paths-ignore` listesinde, kosum acmiyorlar). Kosum kapisi adimi
+`-MinimumTotal 1134 -MaximumSkipped 30` esigiyle gecti.
+
+Yerel tam suit, guncel `main` birlestirilmis agacta:
+
+```
+Basarisiz: 0  Basarili: 1480  Atlanan: 23  Toplam: 1503  Sure: 19 m 52 s
+```
+
+Birlestirmeden once ayni sayilar cikmisti (17 m 32 s); `main`in aradaki bes commit'i
+`src/` ve `tests/` altina dokunmadigi icin olcu etkilenmedi
+(`git diff HEAD...origin/main -- src/ tests/` bos).
 
 ## Kalan borc
 
