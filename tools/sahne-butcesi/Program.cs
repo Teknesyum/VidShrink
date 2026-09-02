@@ -706,7 +706,7 @@ public static class Program
             satirlar.Add($"{h.Codec};{h.Aday};{(etkili ? "evet" : "hayir")};{lenA};{lenB};{fark};{noise};" +
                          (etkili
                              ? "iki deger belirgin farkli cikti uretti"
-                             : "fark tekrar gurultusunun icinde — parametre etkisiz ya da yok sayildi"));
+                             : Rapor.DestekGerekcesi(fark, noise, lenA)));
         }
         File.WriteAllLines(hedef, satirlar);
         foreach (var s in satirlar) Console.WriteLine(s);
