@@ -245,9 +245,17 @@ kimliklenemedi**.
 
 `parca-1` uzerinde tam ucluyu de kosturdum (4,636'da p10 40,609 / 46,385 / 48,266):
 **yon ve buyukluk T98'inkiyle uyusuyor** (+7,657, tek yonlu), yalnizca seviye uyusmuyor.
-Ayni nominal kodlamanin teslim boyutu tutup kalite seviyesi 29 puan ayrilmasi, farkin
-kodlamada degil **kalite olcumunde** oldugunu soyler; hangi olcum farki oldugu
-**olculmedi** (T98 `tools/VidShrink.Bench measure` kullanmis, ben dogrudan libvmaf).
+
+Olcum farki adayi **elendi**. T98 sayilarini `tools/VidShrink.Bench measure` ile almis,
+ben dogrudan libvmaf ile aliyorum. Ayni dosyayi (`t98parca1-av1_nvenc-2gecis-4_636-t1_02.mp4`)
+T98'in kendi aletine verdim:
+
+    VmafNegMean 67,552  VmafNegP10 41,256  Comparable true
+
+Benim duzenegim ayni dosyada 67,097 / 40,609. Iki alet 0,6 puan icinde uyusuyor; 29 puanlik
+farki aciklamiyor. Yani fark aletlerde degil **klipte**: T98'in klibi `parca-1`, `parca-2`
+ve `parca-3`'un hicbiri degil. Hangi klip oldugu **olculmedi** ve bu duzenekten
+olculemez — T98 kaynagini adiyla yazmamis.
 
 Sure varsayimi kapandi: `parca-1` 1200 kare / 20,000 sn, `parca-2` 1199 / 20,002 sn,
 `parca-3` 1199 / 19,999 sn. 20,401 sn bu klip ailesinde yok (o benim kendi kliplerimin
