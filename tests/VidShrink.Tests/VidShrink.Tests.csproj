@@ -28,5 +28,7 @@
     <ProjectReference Include="..\..\src\VidShrink.App\VidShrink.App.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />
+    <!-- T106: VMAF havuzlama ve olcum filtresi bench icinde yasiyor; olcu oraya basvurur. -->
+    <ProjectReference Include="..\..\tools\VidShrink.Bench\VidShrink.Bench.csproj" />
   </ItemGroup>
 </Project>
