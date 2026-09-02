@@ -216,10 +216,10 @@ internal static class Program
             {
                 var p1 = TepeyiDegistir(FfmpegArguments.Build(bilgi, plan, cikti, 1, passLog, kap), bitrateK, tepe, crf is not null, out _, out _);
                 Yaz(gunluk, etiket + " [1]", p1);
-                if (FfKos("ffmpeg", p1, out var h1) is null) throw new InvalidOperationException($"pass1 hata {etiket}: {h1}");
+                if (FfKosDayanikli(p1, out var h1, gunluk, etiket + " [1]") is null) throw new InvalidOperationException($"pass1 hata {etiket}: {h1}");
             }
             Yaz(gunluk, etiket, son);
-            if (FfKos("ffmpeg", son, out var h2) is null) throw new InvalidOperationException($"kodlama hata {etiket}: {h2}");
+            if (FfKosDayanikli(son, out var h2, gunluk, etiket) is null) throw new InvalidOperationException($"kodlama hata {etiket}: {h2}");
             File.WriteAllText(imzaYolu, imza);
             if (File.Exists(vmafJson)) File.Delete(vmafJson);
         }
@@ -359,15 +359,33 @@ internal static class Program
     private static void Yaz(string gunluk, string etiket, IEnumerable<string> args)
         => File.AppendAllText(gunluk, $"### {etiket}\n{FfmpegArguments.ToCommandLine(args)}\n\n");
 
+    private static int yeniden;
+
+    private static string? FfKosDayanikli(IReadOnlyList<string> args, out string hata, string gunluk, string etiket)
+    {
+        var baslat = new List<string> { "-nostdin" };
+        baslat.AddRange(args);
+        var ilk = FfKos("ffmpeg", baslat, out hata);
+        if (ilk is not null) return ilk;
+        yeniden++;
+        File.AppendAllText(gunluk, "### YENIDEN " + yeniden + ": " + etiket + Environment.NewLine + hata + Environment.NewLine + Environment.NewLine);
+        Console.Error.WriteLine($"yeniden deneniyor ({yeniden}): {etiket}");
+        Thread.Sleep(30000);
+        return FfKos("ffmpeg", baslat, out hata);
+    }
+
     private static string? FfKos(string arac, IEnumerable<string> args, out string hata, string? calismaDizini = null)
     {
         var psi = new ProcessStartInfo(arac) { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
         if (calismaDizini is not null) psi.WorkingDirectory = calismaDizini;
         foreach (var a in args) psi.ArgumentList.Add(a);
         using var proc = Process.Start(psi)!;
-        var cikti = proc.StandardOutput.ReadToEnd();
-        hata = proc.StandardError.ReadToEnd();
+        var ciktiGorevi = proc.StandardOutput.ReadToEndAsync();
+        var hataGorevi = proc.StandardError.ReadToEndAsync();
         proc.WaitForExit();
+        var cikti = ciktiGorevi.GetAwaiter().GetResult();
+        var ham = hataGorevi.GetAwaiter().GetResult();
+        hata = ham.Length > 4000 ? ham[^4000..] : ham;
         return proc.ExitCode == 0 ? cikti : null;
     }
 }
