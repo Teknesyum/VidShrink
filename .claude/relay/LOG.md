@@ -457,3 +457,21 @@ eskimis mutasyon toplami).
 
 T139 daraltildi: `MainWindow.axaml.cs` tur 2'ye gecti, T139'un owns'undan ve K4'unden
 cikarildi. Ayni dosya iki aktif sozlesmeye atanmaz.
+
+## T139 Sole'ye, T140 acildi (ProClaude) — 2 Eylul 2026
+
+Iki yardimci disaridan devreye alindi; ana oturumun iki paralel ajan tavani degismedi
+(T137 tur 2 + T132 kosuyor).
+
+- **T139 → Sole.** `owns` catismasi duzeltildi: `PlanCalculatorProbeTests.cs` T137 tur
+  2'nin T9 kriterinde, ayni dosya iki aktif sozlesmede olamazdi. T139'un olculeri yeni
+  `EncoderStateConsumptionTests.cs` dosyasina tasindi, verify kolu da o ada cevrildi.
+  `status: active`.
+- **T140 → ProClaude (Pro hesabi, ilk acilis).** HandBrake taramasinin (§6 madde 6)
+  bekleyen isi: iki gecisli kodlamada ilk gecis son gecisle ayni preset'te kosuyor
+  (`FfmpegArguments.cs:408-414` preset'e hic dokunmuyor). Turbo ilk gecis kurulur,
+  **varsayilan kapali** — kalite etkisi bu depoda olculmedi. ffmpeg gerektirmez,
+  birim testiyle kapanir; Pro hesabinin dar butcesine gore secildi.
+
+Catisma taramasi: T140'in owns kumesi (`FfmpegArguments.cs`, `CodecModel.cs`,
+`EncodePlan.cs`, yeni test, yeni belge) hicbir aktif sozlesmede yok.

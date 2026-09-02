@@ -175,3 +175,4 @@
 {"id":"T132","result":"stale","at":"2026-09-02T13:11:56.173Z"}
 {"id":"T136","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|LanguageTests","code":0}],"auditorRunId":null,"headSha":"b3377a2aa789752a52bc3e98649607c88f2d28b3","at":"2026-09-02T13:20:22.546Z"}
 {"id":"T138","round":"1","risk":"low","verify":[{"step":"dotnet build -c Release tools/sahne-butcesi/SahneButcesi.csproj","code":0}],"auditorRunId":null,"headSha":"3bb5706351100a42fef14f78873e47608e832e2d","at":"2026-09-02T13:40:30.557Z"}
+{"id":"T137","result":"stale","at":"2026-09-02T14:46:35.084Z"}
