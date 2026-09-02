@@ -39,6 +39,12 @@ kırpma **varsayılan açık gelemez**:
 
 Vetolar tetiklenirse üst sınır "kullanıcı onaylı seçenek"tir, varsayılan değil.
 
+**Hangi hedef boyutta.** Üç bitrate noktası koşulur: **1000k, 2000k, 4000k**
+(1920x1080@60, libx264, 2 geçiş, preset slow, sessiz). **Karar noktası
+2000k'dir**; 1000k ve 4000k duyarlılık satırıdır ve hükmü değiştirmez, yalnız
+hükmün bitrate'e ne kadar bağlı olduğunu gösterir. Bu satır da K3
+koşulmadan önce yazıldı.
+
 **+1,00 ve +0,30 nereden geliyor.** +0,30 alt sınırı, uygulama maliyetinin
 karşılığı: kırpma yeni bir yoklama geçişi, yeni bir plan alanı ve yeni bir
 hata sınıfı (yanlış kırpma) getiriyor; bundan küçük bir kazanç bu bedeli
