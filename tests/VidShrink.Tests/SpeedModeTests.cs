@@ -11,6 +11,8 @@ public sealed class SpeedModeTests
         public FakeAvailability(params string[] encoders) => _encoders = new HashSet<string>(encoders, StringComparer.OrdinalIgnoreCase);
         public bool HasEncoder(string name) => _encoders.Contains(name);
         public bool WorksAsEncoder(string codec) => _encoders.Contains(codec);
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
     }
 
     private static readonly string[] FastHardwareCodecs =

@@ -81,7 +81,7 @@ Rebase tabanı `e0eee12`; T137 tur 2 bu tabanda `EncoderCapabilities.WorksAsEnco
 
 Regresyon riski ölçülmemiş kodeğin sonraki gerçek yoklamada çalışmadığının anlaşılmasıdır. Plan ve HDR yolları bunu `HardwareNotMeasured` / `NotMeasured` ile geçici işaretleyip ölçüm sonrası yeniden hesaplamaya bırakıyor. Performans yolunda ise ölçülmemiş aday gerçekten başarısız olup daha sonraki aday çalışıyor olabilir; eski iki değerli yol aktif yoklamayla sonraki çalışan adayı seçtiğinde o tek koşum için doğru sonuca ulaşabiliyordu. Yeni yol kanıtsız eleme yapmıyor ve seçilen adayı performans koşumunun sınamasına bırakıyor; başarısızlık `HardwareEncoderFailed` olarak görünür.
 
-## K6 — Verify kolları ve açık engel
+## K6 — Verify kolları ve teslim kapısı
 
 Her kol ayrı `dotnet test -c Release --list-tests --filter "FullyQualifiedName~..."` çağrısıyla sayıldı:
 
@@ -100,6 +100,12 @@ Sıfır test bulan kol yok. Genişletilen sahiplik kapsamında yalnız şu üç 
 2. `PlanCalculatorTests.SurucusuzMakine`
 3. `EncoderAvailabilityTests.Makine`
 
+Tam suitin gösterdiği kalan üç eski sahte için genişletilen sahiplikte yine yalnız `EncoderState` eklendi:
+
+4. `SpeedModeTests.FakeAvailability`
+5. `HardwareRateControlTests.FixedAvailability`
+6. `PlanCalculatorProbeTests.RecordingAvailability`
+
 `OlculmemisMakine` değiştirilmedi. Bu sahte `IEncoderMeasurementState` ile ölçülmüşlük kanıtı taşıdığı için ortak `KnownState` köprüsü, üçlü cevap hâlâ `Unmeasured` ise ve eski arayüz “ölçüldü” diyorsa iki değerli sonucu okuyor. Böylece test iddiası ve K2'nin kanıtsız varsayılanı birlikte korunuyor.
 
 `DonanimYoluKapatilincaKararDegisiyor` tek başına yeniden çalıştırıldığında `14 s` içinde `1/1` yeşil geçti; önceki `30231 ms` sonucu eşzamanlı yük yapıntısıydı. Zaman aşımı sabiti değiştirilmedi.
@@ -109,15 +115,6 @@ Son doğrulama:
 - `dotnet build VidShrink.sln -c Release --no-incremental`: başarılı, 0 uyarı, 0 hata.
 - Birleşik verify: `70/70` başarılı, 0 atlanan, süre `3 dk 50 sn`.
 - Test çağrılarında `--no-build` kullanılmadı.
-- Rebase sonrası kod ucu CI koşumu `33657686105` (`e768faa`): ilk ve tek kontrolde sürüyordu; sözleşme gereği beklenmedi.
+- Son push'ın CI koşum kimliği ve sonucu aşağıya eklenecek.
 
-Depo kapısı olan filtresiz `dotnet test VidShrink.sln -c Release` de çalıştırıldı: `1330 başarılı / 14 başarısız / 18 atlanan`, süre `35 dk 43 sn`. On dört kırmızı üç izin dışı eski iki değerli sahteye dağılıyor:
-
-| Sahte | Kırmızı ölçü sayısı |
-|---|---:|
-| `SpeedModeTests.FakeAvailability` | 7 |
-| `HardwareRateControlTests.FixedAvailability` | 1 |
-| `PlanCalculatorProbeTests.RecordingAvailability` | 6 |
-| Toplam | 14 |
-
-Bu ölçülerin iddiaları değiştirilmedi. Üç sahteye `EncoderState` eklemek ölçülerin temsilini üçlü sözleşmeyle hizalar; ancak dosyaları verilen genişletilmiş sahiplikte değildir ve `PlanCalculatorProbeTests.cs` için ayrıca dokunmama sınırı vardır. Bu nedenle sözleşme filtresi yeşil olsa da depo tam suit kapısı yeşil değildir; T139 teslim edilmiş sayılmaz.
+Depo kapısı `tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134` ile filtresiz çalıştırıldı: `1345 başarılı / 0 başarısız / 17 atlanan / toplam 1362`, süre `17 dk 49 sn`. Kapı `başarısız=0 toplam=1362 alt-sınır=1134` sonucu ile geçti. Üç dosyada test iddiası, bandı, eşiği veya test adı değiştirilmedi.
