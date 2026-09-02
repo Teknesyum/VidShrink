@@ -51,7 +51,7 @@ mesajı da aynı gizli alana gider; yalnız Hakkında sekmesindeki `TxtSystemSta
 - `_probeCts`: `202-205` bir öncekini iptal edip atıyor, fakat **son örnek hiç atılmıyor** —
   dosya başına bir CTS sızıntısı. `438` iptal ediyor ama atmıyor/null'lamıyor. `Closing` işleyicisi
   de yok: kodlama sürerken uygulama kapatılırsa `_cts` iptal edilmez,
-  `EncodeRunner.cs:185`'teki `ct.Register(TryKill)` tetiklenmez, ffmpeg süreci öksüz kalır.
+  `EncodeRunner.cs:269`'daki `ct.Register(() => TryKill(process))` tetiklenmez, ffmpeg süreci öksüz kalır.
 
 **İki kere Başlat.** Güvenli: `429`–`439` arası tamamen eşzamanlı, ilk `await` `443`'te; WPF ikinci
 tıklamayı araya sokamaz, `SetRunning(true)` (539) düğmeyi kapatır. **Fakat üç gerçek boşluk var:**
@@ -87,9 +87,12 @@ tıklamayı araya sokamaz, `SetRunning(true)` (539) düğmeyi kapatır. **Fakat 
 - **Katalog dengeli, XAML tarafı tam:** 112 anahtar, 112 farklı değer — `TurkishToEnglish` ters
   sözlüğü (`LanguageCatalog.cs:121`) çakışma vermiyor. XAML'deki 152 metin sabitinin katalog dışında
   kalanların hepsi marka/kısaltma/sayı (`VidShrink`, `FPS`, `MP4`, `1080`); çevrilmemiş prose yok.
-- **Ölü anahtarlar (2):** `LanguageCatalog.cs:7` (`"Target Size Media Compression & Media Converter"`)
-  XAML'de üç `<Run>` olarak parçalı (`MainWindow.xaml:29`), bileşik anahtar hiç eşleşmiyor; Türkçesi
-  `MainWindow.xaml.cs:80`'de gömülü, `TaglineConverter` (82) iki dilde de İngilizce. `:114` (`"FFmpeg: Checking..."`) XAML'de hiç geçmiyor.
+- **Ölü anahtarlar (3):** `main.plan.fact.estimated-size`, `main.plan.reasons-count`, `main.quality.loss-points`
+  (`Locales/en/main.json:126,117,70`) tanımlı ama `src/VidShrink.App` altında hiçbir `.axaml`/`.cs`
+  dosyasında çağrılmıyor; kod yerine benzer adlı aktif anahtarları kullanıyor (`main.plan.fact.estimate`,
+  `main.plan.reasons`, `main.quality.loss`+`main.quality.points` — `MainWindow.xaml.cs:1788,1796,1704`).
+  `LanguageCatalog.cs` çeviri sözlüğü değil, yalnız başlık büyütme yardımcısı (`Title`/`Names`); bu
+  anahtarlarla ilgisi yok.
 - **Kod içinde gömülü İngilizce (4 yer):** `MainWindow.xaml.cs:522` `"Trim times must use HH:MM:SS
   format."`; `524` `ConversionArguments.Validate` çıktısı (`ConversionArguments.cs:10-31`, hepsi
   yalnız İngilizce); `312` `plan.Reason` (`PlanCalculator.cs:216`); `462`/`466`/`526`/`536` istisna.
