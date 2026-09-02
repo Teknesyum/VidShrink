@@ -303,6 +303,169 @@ Süpürme yalnız `parca-1-20sn` üzerinde tamamlandı. `parca-2` ve `parca-3` i
 süpürmesi **ölçülmedi** — makine paylaşımlı olduğu için süpürme kesilip zorunlu üç rejim
 karşılaştırmasına (K3) geçildi.
 
+**Bölen neden sabit yazılmadı.** 2,8 bir ayar sabiti değil, haritanın ölçülen duyarlılığı;
+koda ölçüldüğü iki sayı olarak (`SceneMapGroundTruthCuts = 28`, `SceneMapReportedScenes = 10`)
+girdi. Bunun nedeni somut: T105 şu anda `SceneMap.DefaultThreshold`'u ölçüye göre yeniden
+koyuyor ve kaçan 18 kesimin 18'i tam o eleğe takılıyordu. Eşik düşerse harita daha çok sahne
+bulur, ortalama sahne uzunluğu kendiliğinden kısalır — ve sabit bir bölen o düzeltmeyi **ikinci
+kez** uygular, üst sınır olması gerekenin yarısına iner. Bölen tümden atılsaydı da işlemezdi:
+T101'in penceresinde haritanın ham ortalaması 18,91 saniye, yani kıskacın 10 saniyelik üst
+ucunun üstünde; bölensiz harita üst sınırı hiç oynatmazdı ve K2 lafta kalırdı. Seçilen yol
+üçüncüsü: bölen kalıyor ama **ölçüldüğü eşiğe bağlanıyor**. `SceneMapThresholdOfRecord`
+ile `SceneMap.DefaultThreshold` ayrışırsa `Az_bolme_duzeltmesi_olculdugu_esikte_kalir`
+kırmızıya döner ve duyarlılık yeniden ölçülmeden geçilemez.
+
+### K3 — üç rejim yan yana
+
+`parca-1-20sn`, libx264, 2 geçiş, 20 MiB hedef, `preset=slow`, VMAF-NEG tüm klipte. Sahne
+haritası bu klipte 2 sahne bildiriyor (ortalama 10 sn); duyarlılık düzeltmesiyle üst sınır
+3,57 sn çıkıyor ve kıskacın alt ucuna, 5 saniyeye oturuyor. Üç rejim gerçekten üç ayrı
+`-g` üretiyor: 120 / 600 / 300.
+
+| Rejim | `-g` | `keyint_min` | Teslim MiB | Hedef oranı | mean | p10 | harmonic* | I-kare | Gerçekleşen aralık |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| sabit `-g fps*2` (bugünkü) | 120 | — | 19,1169 | 0,95584 | 88,6303 | 86,0416 | 86,4510 | 13 | 1,54 sn |
+| HandBrake 1–10 sn | 600 | 60 | 19,1387 | 0,95693 | 88,9187 | 86,7402 | 86,7383 | 3 | 6,67 sn |
+| **dinamik (harita, 1–5 sn)** | **300** | **60** | **19,1247** | **0,95623** | **88,9580** | **86,6304** | **86,7669** | **6** | **3,33 sn** |
+
+\* Harmonik sütunu bilgi içindir, karara girmedi: **T106** bench'in harmonik ortalamasındaki
+`max(x,1)` katlamasını soruşturuyor ve SVT-AV1 çıktısında 1'in altına düşen kare kümesi
+bulundu. Karar `mean` ve `p10` üzerinden verildi.
+
+Kapılar üç satırda da geçti: renk `bt2020nc/smpte2084/bt2020` → aynı, akış 1→1,
+`pix_fmt yuv420p10le` → aynı, ölçü 1920×1080, `Comparable=True`.
+
+Teslim boyutu üç rejimde %0,11 içinde. Yani 2 geçişte kazanç boyuta değil kaliteye gidiyor;
+T102'nin CRF yolunda gördüğü %24,5'lik küçülme burada görünmüyor, görünmesi de beklenmiyor.
+
+### K4 — atlama gecikmesi
+
+K3'ün üç çıktısı üzerinde, dosya başına **120** rastgele nokta, her noktada
+`ffmpeg -ss T -i dosya -frames:v 1 -f null -`. Süreç açılış tabanı aynı koşumda ölçüldü
+(`nullsrc`, çözme yok): **30,5 ms**. Tablodaki net değer bu taban düşülmüş hâlidir.
+
+| Rejim | I-kare | Gerçekleşen aralık | p50 | p90 | ortalama | p50 − taban |
+|---|---:|---:|---:|---:|---:|---:|
+| sabit 2 sn | 13 | 1,54 sn | 158,4 ms | 218,7 ms | 162,7 ms | **128,0 ms** |
+| dinamik 1–5 sn | 6 | 3,33 sn | 219,8 ms | 356,5 ms | 236,5 ms | **189,4 ms** |
+| HandBrake 1–10 sn | 3 | 6,67 sn | 358,7 ms | 558,5 ms | 379,9 ms | **328,3 ms** |
+
+**Makine paylaşımlıydı** (koşum boyunca altı ajan); bu damga tablodaki bütün süre sayıları
+için geçerlidir. Kalite ve boyut sayıları süreye bağlı değil, o damga onlara işlemez. Gecikme
+sıralaması I-kare yoğunluğuyla birebir uyumlu ve üç ölçütte de (p50, p90, ortalama) aynı
+sırada; yön bu yüzden kararlı sayıldı, mutlak milisaniye değeri sayılmadı.
+
+Karar: HandBrake rejimi p10'da sabit rejime göre +0,699 kazandırıyor ama atlama bedelini
+**2,6 katına** çıkarıyor. Dinamik rejim aynı kazancın %84'ünü (+0,589) alıyor ve bedeli
+1,5 katta tutuyor; üstelik ortalamada üçünün en iyisi. Aralık bu yüzden kısaltıldı: üst
+sınırın kıskacı 10 saniyeye kadar açık ama harita kısa sahne bildirdiğinde 5 saniyeye
+iniyor ve gecikme oraya değil buraya yaslanıyor.
+
+### K5 — CRF yolunda maxrate
+
+`parca-1-20sn`, libx264, CRF 23, tek geçiş, hedef 20 MiB. Tek fark `-maxrate`/`-bufsize`
+çiftinin varlığı; başka hiçbir argüman değişmedi.
+
+| VBV | Teslim MiB | Hedef oranı | mean | p10 |
+|---|---:|---:|---:|---:|
+| var (2× / 4×) | 14,7310 | 0,73655 | 86,9770 | 84,9990 |
+| yok | 15,3120 | 0,76560 | 87,2870 | 85,5980 |
+| yok − var | +0,5810 (+%3,9) | +0,02905 | +0,3100 | +0,5990 |
+
+**Yargı: ölçüldü, gerekli — kalıyor.** Sözleşmenin öngörüsü doğrulandı, kuyruk açığının bir
+parçası gerçekten orada: kaldırınca p10 +0,599 geliyor ve bu ortalamadaki kazancın iki katı.
+Ama aynı CRF'te dosya %3,9 büyüyor. HandBrake bunu göze alabiliyor çünkü onun CRF'i ucu açık
+bir kalite kipi; bizde CRF **hedefe inen** bir kip — `PlanCalculator`'ın doldurma politikası
+bandın ortasına nişan alan bir CRF seçiyor (`PlanCalculator.cs:280-284`). Sistematik %3,9
+o bandı yer. Donanım yoluna dokunulmadı.
+
+Ara bir değer (2× ile tümden kaldırma arasında bir gevşetme) **ölçülmedi**; kuyruk açığı için
+en güçlü açık aday bu ve ayrı bir tur hak ediyor.
+
+### K6 — tepe eğrisi
+
+Sözleşmenin sorduğu şikâyet durumu taban oranı ≈4,7. Klibin 20 MiB hedefindeki oranı 10,236
+çıktığı için hedef 9,2 MiB'a indirilerek **4,636** oranına inildi; her iki oran da ölçüldü.
+`av1_nvenc`, 2 geçiş, tek fark `-maxrate`/`-bufsize` çarpanı.
+
+| Taban oranı | Tepe | Teslim MiB | Hedef oranı | mean | p10 |
+|---:|---:|---:|---:|---:|---:|
+| 4,636 | 1,02 | 8,895 | 0,9669 | 82,372 | 69,812 |
+| 4,636 | 1,10 | 8,594 | 0,9341 | 82,290 | 71,241 |
+| 4,636 | 1,50 | 8,723 | 0,9482 | 82,609 | **73,477** |
+| 10,236 | 1,02 | 19,637 | 0,9818 | 89,334 | 84,211 |
+| 10,236 | 1,10 | 18,902 | 0,9451 | 89,144 | 83,705 |
+| 10,236 | 1,50 | 19,128 | 0,9564 | 89,318 | 84,108 |
+
+Sözleşmenin sorusunun cevabı: **4,6 oranında tepeyi açmak boyutu aşırmıyor** — üç değerin
+üçü de hedefin altında, üstelik 1,50 (0,9482) 1,02'den (0,9669) küçük çıkıyor. Ve kazanç
+var: p10 69,812 → 71,241 → 73,477, üç noktada tek yönlü, toplam **+3,665**. 10,2 oranında
+aynı sıralama yok ve fark 0,1 mertebesinde — yani VBV yalnız bütçe sıkışıkken bağlıyor,
+bu da mekanizmayla tutarlı.
+
+**Karar: eğri değişmedi — ölçüldü, değişmedi.** Gerekçe: kazancı almanın yolu açılma
+noktasını indirmek değil `TightPeakFactor`'ı yükseltmek. Açılma noktasını ölçülen 4,6'ya
+çekmek 4,636'da çarpanı 1,0204 yapardı; ölçülen kazancın hemen hiçbiri gelmezdi, yani
+göstermelik bir değişiklik olurdu. `TightPeakFactor` ise bütün düşük oranlı planları
+değiştirir ve güvenli aralığı bu belgede birden çok kaynakla kurulmuştu; tek klipte,
+tek kodlayıcıda ölçülen bir sonuçla oynatılmaz. Bulgu bu turun en güçlü açık ipucudur
+ve kendi turunu hak ediyor: **eğrinin şekli ölçümle ters görünüyor** — aşma kanıtının
+geldiği yüksek oranda (11,4×) geniş açılıyor, açmanın güvenli ve kazançlı ölçüldüğü
+düşük oranda (4,6×) 1,02'ye kilitli.
+
+### K8 — boyut garantisi
+
+Anahtar kare değişikliği boyutu **sistematik olarak aşırmıyor**. İki geçişte üç rejimin
+teslim oranı 0,95584 / 0,95623 / 0,95693 — aralarındaki fark %0,11 ve üçü de hedefin
+altında. CRF yolunda uzun aralık dosyayı **küçültüyor** (T102: %24,5), yani o yönde de
+aşma riski yok. Aşma riski taşıyan tek aday K5'teki VBV kaldırma idi (+%3,9); ölçüldü ve
+tam bu nedenle uygulanmadı. Donanım yolunda üst sınır 5 saniyede tutuldu ve tepe eğrisine
+dokunulmadı, dolayısıyla bu belgenin önceki aşma kanıtı geçerliliğini koruyor.
+
+### K9 — mutasyon tablosu
+
+Düzenek her mutasyonu üretim kaynağına uyguluyor, `FfmpegArgumentsTests` filtresini
+koşuyor, kaynağı geri alıyor. Taban yeşil koşum: **Başarısız 0, Başarılı 58, Atlanan 0**.
+Hiçbir mutasyon testin kendi sabitini değiştirmiyor.
+
+| # | Mutasyon | Sonuç | Kırılan ölçü (ilk üç) |
+|---|---|---|---|
+| N1 | aralık tek sayıya geri çevrildi, alt sınır silindi | Başarısız 4 / 58 | `Anahtar_kare_araligi_alt_ve_ust_siniri_ayri_yazar`, `Parca_argumanlari_tam_kodlamadan_yalniz_uc_baslikta_ayrilir` |
+| N2 | üst sınır haritayı yok sayıyor | Başarısız 5 / 58 | `Ust_sinir_ortalama_sahne_uzunluguyla_birlikte_uzar`, `Haritanin_az_bolmesi_ust_sinirdan_dusulur`, `Uzun_ust_sinir_kesimsiz_kaynakta_daha_az_anahtar_kare_uretir` |
+| N3 | az bölme düzeltmesi kaldırıldı (28/10 → 10/10) | Başarısız 2 / 58 | `Az_bolme_duzeltmesi_T101_penceresinde_gercek_ortalamayi_uretir`, `Haritanin_az_bolmesi_ust_sinirdan_dusulur` |
+| N4 | düzeltmenin eşik bağı koparıldı (0,2 → 0,15) | Başarısız 1 / 58 | `Az_bolme_duzeltmesi_olculdugu_esikte_kalir` |
+| N5 | x265 sahne kesimi kapatıldı (`scenecut=0`) | Başarısız 2 / 58 | `Sahne_kesimi_kodlayicinin_kendi_diliyle_acik_yazilir` |
+| N6 | SVT-AV1 sahne kesimi kapatıldı (`scd=0`) | Başarısız 2 / 58 | `Sahne_kesimi_kodlayicinin_kendi_diliyle_acik_yazilir` |
+| N7 | donanım üst sınırı yazılım varsayılanına eşitlendi | Başarısız 3 / 58 | `Donanimda_ust_sinir_haritadan_etkilenmez` |
+| N8 | CRF yolundaki VBV tavanı kaldırıldı | Başarısız 2 / 58 | `Crf_yolunda_VBV_tavani_bit_hiziyla_olcekleniyor` |
+| N9 | CRF VBV arabelleği tavana eşitlendi (4× → 2×) | Başarısız 2 / 58 | `Crf_yolunda_VBV_tavani_bit_hiziyla_olcekleniyor` |
+| N10 | tepe eğrisi açılma noktası 6,0 → 2,0 | Başarısız 8 / 58 | `Donanim_tepe_carpani_taban_oraninda_beklenen_degeri_uretir`, `Tepe_carpani_olculen_guvenli_degerlerin_disina_cikmaz` |
+
+Onunun onu da kırmızıya döndü. İki ölçü ffmpeg gerektiriyor ve `[FfmpegFact]` ile
+işaretli; ikisi de koşuyor, atlanmıyor. Süitte `Skip` yok, atlanan test yok.
+
+### Ölçülmeyenler
+
+- **`tools/VidShrink.Ab` kullanılamadı** — T95 bu tur boyunca `main`e inmedi. Renk kapısı,
+  akış sayısı kapısı ve boyut karşılaştırılabilirliği elle uygulandı ve her satırda
+  raporlandı; aletin sağladığı **duyarlılık kanıtı** (ölçünün gerçek bir farkı ayırt
+  edecek çözünürlükte olduğunun gösterimi) bu turda **yok**.
+- K3, K5 ve K6 **tek klipte** (`parca-1-20sn`) ölçüldü, genellenmedi. `parca-2` ve
+  `parca-3` üzerinde hiçbir rejim, maxrate ya da tepe koşumu **ölçülmedi**.
+- Üst sınır süpürmesi yalnız `parca-1-20sn`'de tamamlandı; `parca-2`/`parca-3` **ölçülmedi**.
+- CRF yolunda VBV'nin **ara değerleri ölçülmedi**; yalnız 2×/4× ile tümden kaldırma
+  karşılaştırıldı.
+- `TightPeakFactor` yükseltmenin boyut etkisi **ölçülmedi**; K6 kararı bu yüzden
+  değişiklik değil.
+- Donanım yolunda gerçekleşen aralık ve atlama gecikmesi **ölçülmedi**; oradaki 5 saniye
+  ölçüm değil, atlama bütçesi kararıdır ve mekanizma gerekçesi `-h encoder=hevc_nvenc`
+  çıktısına dayanır.
+- İş parçacığı sayısı **sabitlenmedi** (`-threads` verilmedi). Üst sınır süpürmesi
+  sabitlemeden koşmuştu; sonraki koşumları sabitlemek iki tabloyu kıyaslanamaz yapardı.
+  Sonuç: bütün süre sayıları paylaşımlı makine damgalıdır, kalite ve boyut sayıları değil.
+- Tam süit koşturulmadı; sözleşme yalnız `FfmpegArgumentsTests` filtresini istiyor.
+
+
 ### Donanım ayrı bir mekanizma
 
 NVENC sahne kesimini yalnız lookahead açıkken uyguluyor (`ffmpeg -h encoder=hevc_nvenc`:
