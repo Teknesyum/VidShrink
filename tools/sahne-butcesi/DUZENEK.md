@@ -136,3 +136,20 @@ olcuyle — `MAE(verilen, hak edilen)` — ve ayni hedef boyutta karsilastirilir
 kazanan tabana gore MAE'yi daha cok dusurendir. Kalite olcusu (K5) degil,
 K1'in kendi olcusudur: soru "kazandiriyor mu" degil, "K1'deki farki hangisi
 kapatiyor".
+
+## K4 ekinde "kazanan" cumlesi tek basina yaniltir
+
+Iki adaydan hangisinin MAE'si dusuk diye sormak, farkin buyuklugunu gizler.
+`uyumlu/p1-karisik`'te taban 1,552, `zones` 1,553, `qcomp` 1,546 pp cikti:
+`qcomp` "kazandi" ama kazanci 0,006 pp, ayni hucredeki K1 acigi 0,262 pp.
+Bu yuzden K4 ekine ikinci bir tablo eklendi — acik, kazanc ve acigin kapanan
+orani. Ucu de tablodan hesaplanir; ozet cumlesi hucreleri sayar.
+
+## Sifir cikis koduyla sessiz dusen kosum
+
+Ilk `k4b` toplu kosumu `arac3` dizinindeki ikiliyi cagiriyordu; o dizin bir
+sonraki derlemede uzerine yazilinca `hostpolicy.dll` kayboldu. Alti cagrinin
+besi "Failed to run as a self-contained app" ile dustu, dongu devam etti,
+toplam cikis kodu 0 kaldi. Kosumun bittigini cikis kodundan degil, beklenen
+cikti dosyasinin varligindan anla. Ayri kosumlara ayri `-o` dizini verilir;
+calisan bir ikilinin dizinine derleme yapilmaz.

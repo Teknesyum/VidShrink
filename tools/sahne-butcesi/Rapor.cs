@@ -43,7 +43,7 @@ public static class Rapor
         K3(sb);
         K3Denetim(sb, isKok);
         K4(sb, isKok);
-        K4b(sb, isKok, kollar);
+        K4b(sb, isKok, kollar, k1);
         var k5 = K5K6(sb, isKok, json, kollar);
         var k7 = K7(sb, isKok, json, kollar, k5);
         Sonuc(sb, k2, k5, k7);
@@ -468,7 +468,8 @@ public static class Rapor
 
     public sealed record AbSonuc(bool Gecti, IReadOnlyList<Satir> Kayitlar, string Ozet);
 
-    private static void K4b(StringBuilder sb, string isKok, string[] kollar)
+    private static void K4b(StringBuilder sb, string isKok, string[] kollar,
+        Dictionary<(string Kol, string Pencere), K1Kaydi> k1)
     {
         var satirlar = new List<(string Kol, string Pencere, string Aday, string Param, double? Mae, string Not)>();
         foreach (var kol in kollar)
@@ -529,6 +530,44 @@ public static class Rapor
             var sirali = kazanan.OrderByDescending(x => x.Value).ToList();
             sb.AppendLine($"Iki adayin da olculdugu hucre {hucre}; hucre basina dusuk MAE'yi veren aday: " +
                           string.Join(", ", sirali.Select(x => $"`{x.Key}` {x.Value}")) + ".");
+            sb.AppendLine();
+        }
+
+        sb.AppendLine("Hangi adayin kazandigi tek basina bir sey soylemez: kazanc, kapatilmasi");
+        sb.AppendLine("istenen K1 acigi ile yan yana konmadan okunamaz. Acik, ayni hucrede");
+        sb.AppendLine("`MAE(verilen) - MAE(harita)`; kazanc, `MAE(taban) - MAE(en iyi aday)`.");
+        sb.AppendLine();
+        sb.AppendLine("| Yazilim kolu | Pencere | K1 acigi (pp) | En iyi aday | Kazanc (pp) | Acigin kapanan orani |");
+        sb.AppendLine("|--------------|---------|---------------|-------------|-------------|----------------------|");
+        var kapanmaVar = 0;
+        var kapanmaHucre = 0;
+        double? enBuyukKazanc = null;
+        foreach (var g in satirlar.GroupBy(x => (x.Kol, x.Pencere)))
+        {
+            var taban = g.FirstOrDefault(x => x.Aday == "taban").Mae;
+            var olculen = g.Where(x => x.Aday != "taban" && x.Mae is not null).ToList();
+            if (taban is null || olculen.Count == 0) continue;
+            if (!k1.TryGetValue((g.Key.Kol, g.Key.Pencere), out var k) || k.ReferansToplamBit == 0) continue;
+            var maeV = Butce.MeanAbsoluteError(k.Verilen, k.HakEdilen) * 100;
+            var maeH = Butce.MeanAbsoluteError(k.Harita, k.HakEdilen) * 100;
+            var acik = maeV - maeH;
+            var en = olculen.MinBy(x => x.Mae!.Value);
+            var kazanc = taban.Value - en.Mae!.Value;
+            kapanmaHucre++;
+            if (kazanc > 0) kapanmaVar++;
+            if (enBuyukKazanc is null || kazanc > enBuyukKazanc) enBuyukKazanc = kazanc;
+            var oran = acik > 0 ? Kabuk.Inv(kazanc / acik * 100, "0.0") + "%" : "acik yok";
+            sb.AppendLine($"| {g.Key.Kol} | `{g.Key.Pencere}` | {Kabuk.Inv(acik, "+0.000;-0.000;0.000")} | " +
+                          $"{en.Aday} | {Kabuk.Inv(kazanc, "+0.000;-0.000;0.000")} | {oran} |");
+        }
+        sb.AppendLine();
+        if (kapanmaHucre > 0)
+        {
+            sb.AppendLine($"Olculen {kapanmaHucre} hucrenin {kapanmaVar} tanesinde en iyi aday tabani");
+            sb.AppendLine($"gecti; gorulen en buyuk kazanc {Kabuk.Inv(enBuyukKazanc!.Value, "0.000")} pp.");
+            sb.AppendLine("Bu sutunlar kazancin buyuklugunu soyler, isaretini degil: kucuk ama");
+            sb.AppendLine("pozitif bir fark da olcum gurultusu icinde kalabilir. K5'in kalite");
+            sb.AppendLine("kapisi bu sayfada karari veren yerdir, bu tablo degil.");
             sb.AppendLine();
         }
     }
