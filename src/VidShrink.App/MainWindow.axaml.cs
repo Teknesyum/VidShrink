@@ -2284,6 +2284,8 @@ public partial class MainWindow : Window
         && fillPolicy == FillPolicy.FillTarget
         && note.Mb >= FillBand.For(note.TargetMb).HardFloorMb;
 
+    internal static string EncoderFallbackReasonKey(ReasonNote note) => "main.reason.encoder-fallback";
+
     private List<string> ReasonLines(EncodePlan plan)
     {
         var parts = new List<string>();
@@ -2308,7 +2310,7 @@ public partial class MainWindow : Window
                 ReasonCode.PredictedQualityEstimated => Say("main.reason.quality-estimated", Num(note.Score, "0.#")),
                 ReasonCode.RetryScaled => Say("main.reason.retry-scaled",
                     Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"), Num(note.AudioMb, "0.00"), Num(note.Factor, "0.###")),
-                ReasonCode.EncoderFallback => Say("main.reason.encoder-fallback", note.RequestedCodec, note.FallbackCodec),
+                ReasonCode.EncoderFallback => Say(EncoderFallbackReasonKey(note), note.RequestedCodec, note.FallbackCodec),
                 ReasonCode.HdrTonemapped => Say("main.reason.hdr-tonemapped"),
                 ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
                     Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),

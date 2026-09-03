@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using VidShrink.App;
 using VidShrink.Core;
@@ -755,28 +755,68 @@ public sealed class PlanCalculatorProbeTests
         Assert.True(durum.IsEnabled, "yoklama yerlesmedigi icin Baslat kalici kilitli kaldi");
     }
 
-    /// <summary>
-    /// T136/K6. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle ayni seyi
-    /// soyluyor. T128 Core'u duzeltti, arayuzdeki dort kopya eski metinde kaldi ve bunu
-    /// hicbir olcu gormedi; burasi o ayrilmayi bir daha sessiz birakmiyor.
-    /// </summary>
-    [Fact]
-    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor()
-    {
-        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new RecordingAvailability(TimeSpan.Zero));
-        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+    internal const string DerlemedeYok = "derlemede yok";
+    internal const string Olculmedi = "olculmedi";
+    internal const string OlculduCalismiyor = "olculdu, calismiyor";
 
-        var kalip = Locales.Values("en")["main.reason.encoder-fallback"];
+    /// <summary>
+    /// Uc dusme durumunun ucunu de kuran girdiler. Tek sahte nesne yetmiyor: ucuncu
+    /// durumu (aday derleme listesinde hic yok) yalniz <see cref="MissingCodecAvailability"/>
+    /// uretebiliyor, kalan ikisi <see cref="FastOrderAvailability"/> ile kuruluyor.
+    /// <see cref="MissingCodecAvailability"/> eksik aday icin <c>HasEncoder</c> false
+    /// dondururken <c>EncoderState</c> icin <c>NotWorking</c> donuyor (T152 borc 4);
+    /// bu girdi o ayrilmaya yaslanmiyor, cunku <c>PreferredCodecInBuild</c> yanlisken
+    /// durum sorusuna hic bakilmiyor.
+    /// </summary>
+    public static TheoryData<string> DusmeDurumlari() => new() { DerlemedeYok, Olculmedi, OlculduCalismiyor };
+
+    private static IEncoderAvailability YetenekIcin(string durum) => durum switch
+    {
+        DerlemedeYok => new MissingCodecAvailability("av1_nvenc", ("hevc_nvenc", EncoderProbeState.Working)),
+        Olculmedi => new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working)),
+        _ => new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Working))
+    };
+
+    internal static ReasonNote DusmeNotu(string durum) =>
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, YetenekIcin(durum))
+            .Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+
+    internal static (string Anahtar, string Cumle) ArayuzCumlesi(string durum, string dil)
+    {
+        var note = DusmeNotu(durum);
+        var anahtar = MainWindow.EncoderFallbackReasonKey(note);
+        var kalip = Locales.Values(dil)[anahtar];
+        return (anahtar, string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec));
+    }
+
+    /// <summary>
+    /// T136/K6, T157/K1. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle
+    /// ayni seyi soyluyor — <b>uc durumun ucunde de</b>.
+    ///
+    /// Olcu T157'ye kadar tek girdi geziyordu (<see cref="RecordingAvailability"/>) ve o
+    /// girdi tam da arayuzun ayrismadigi ucuncu duruma dusuyordu; pim bosluğu ortuyordu.
+    /// Arayuz uc durum icin tek yerellestirme anahtari cagirdigi surece bu olcu
+    /// <see cref="DerlemedeYok"/> ve <see cref="Olculmedi"/> kollarinda kirmizi verir.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DusmeDurumlari))]
+    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor(string durum)
+    {
+        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, YetenekIcin(durum));
+        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+        var anahtar = MainWindow.EncoderFallbackReasonKey(note);
+        var kalip = Locales.Values("en")[anahtar];
         var arayuz = string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec);
 
-        Assert.Contains(arayuz, detailed.Plan.Reason, StringComparison.Ordinal);
-
-        Assert.Contains("could not be used on this machine",
-            Locales.Values("en")["main.advice.encoder-fallback"], StringComparison.Ordinal);
-        Assert.Contains("bu makinede kullanılamadı",
-            Locales.Values("tr")["main.reason.encoder-fallback"], StringComparison.Ordinal);
-        Assert.Contains("bu makinede kullanılamadı",
-            Locales.Values("tr")["main.advice.encoder-fallback"], StringComparison.Ordinal);
+        Assert.True(
+            detailed.Plan.Reason.Contains(arayuz, StringComparison.Ordinal),
+            $"durum \"{durum}\" | anahtar {anahtar}" + Environment.NewLine +
+            $"  arayuz : {arayuz}" + Environment.NewLine +
+            $"  core   : {FallbackNote(detailed.Plan, "av1_nvenc")}");
     }
 
     // --- K1: gercek ffmpeg ---
