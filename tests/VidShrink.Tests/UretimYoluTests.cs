@@ -1,4 +1,4 @@
-using VidShrink.App;
+﻿using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using Xunit;
@@ -270,5 +270,101 @@ public sealed class UretimYoluTests
         Assert.Equal(
             Baslangiclar(CalibrationProbe.Windows(kaynak, SpeedMode.Quality, null)),
             Baslangiclar(CalibrationProbe.Windows(kaynak, SpeedMode.Quality, yok)));
+    }
+
+    /// <summary>
+    /// K5 gerileme tablosu 1: kalibrasyon yerlesimi. Her satirda eski (harita yok) ve yeni
+    /// (uretimin verdigi harita) pencere baslangiclari yan yana.
+    /// </summary>
+    [Fact]
+    public void TabloKalibrasyonYerlesimi()
+    {
+        var satirlar = new (string Ad, MediaInfo Kaynak, SpeedMode Kip, SceneMapAttempt Deneme)[]
+        {
+            ("240sn kalite / 8 sahne", Kaynak(240), SpeedMode.Quality, Deneme(DegiskenHarita(240, 8))),
+            ("240sn hizli  / 8 sahne", Kaynak(240), SpeedMode.Fast, Deneme(DegiskenHarita(240, 8))),
+            ("60sn hizli   / 6 sahne", Kaynak(60), SpeedMode.Fast, Deneme(DegiskenHarita(60, 6))),
+            ("20sn kalite  / 4 sahne", Kaynak(20), SpeedMode.Quality, Deneme(DegiskenHarita(20, 4))),
+            ("240sn kalite / harita yok", Kaynak(240), SpeedMode.Quality,
+                new SceneMapAttempt(null, TimeSpan.Zero, SceneMapFallback.ScanFailed, "tarama yok"))
+        };
+
+        var degisen = 0;
+        foreach (var (ad, kaynak, kip, deneme) in satirlar)
+        {
+            var eski = Baslangiclar(CalibrationProbe.Windows(kaynak, kip, null));
+            var yeni = Baslangiclar(CalibrationProbe.Windows(kaynak, kip, MainWindow.CalibrationScenes(deneme)));
+            var ayni = eski.SequenceEqual(yeni);
+            if (!ayni) degisen++;
+            _cikti.WriteLine($"{ad,-26} | eski [{string.Join(" ", eski)}] | yeni [{string.Join(" ", yeni)}] | {(ayni ? "AYNI" : "DEGISTI")}");
+        }
+
+        _cikti.WriteLine($"degisen satir: {degisen}/{satirlar.Length}");
+        Assert.True(degisen > 0 && degisen < satirlar.Length);
+    }
+
+    /// <summary>
+    /// K5 gerileme tablosu 2: kalite olcumunun en kotu birimi. Eski sabit iki saniyelik
+    /// izgara ile yeni sahne sinirli birim yan yana.
+    /// </summary>
+    [Fact]
+    public void TabloKaliteEnKotuBirim()
+    {
+        var duz = Enumerable.Repeat(100.0, 600).ToArray();
+        var satirlar = new (string Ad, double[] Skorlar, SceneMapAttempt Deneme)[]
+        {
+            ("dip 2,5-5,5 / kesik 2,5;5,5", DipliSkorlar(), Deneme(KesikliHarita(10.0, 2.5, 5.5))),
+            ("dip 2,5-5,5 / kesik 2;4;6;8", DipliSkorlar(), Deneme(KesikliHarita(10.0, 2.0, 4.0, 6.0, 8.0))),
+            ("duz 100     / kesik 2,5;5,5", duz, Deneme(KesikliHarita(10.0, 2.5, 5.5))),
+            ("dip 2,5-5,5 / harita yok", DipliSkorlar(),
+                new SceneMapAttempt(null, TimeSpan.Zero, SceneMapFallback.NoDuration, "sure yok"))
+        };
+
+        var degisen = 0;
+        foreach (var (ad, skorlar, deneme) in satirlar)
+        {
+            var eski = QualityMeter.AggregateVmaf(skorlar, 60, 0, null);
+            var yeni = QualityMeter.AggregateVmaf(skorlar, 60, 0, MainWindow.QualityScenes(deneme));
+            var ayni = eski.WorstScene == yeni.WorstScene
+                       && eski.WorstSceneStartSeconds == yeni.WorstSceneStartSeconds
+                       && eski.WorstSceneUnitSeconds == yeni.WorstSceneUnitSeconds;
+            if (!ayni) degisen++;
+            _cikti.WriteLine($"{ad,-27} | eski {eski.WorstScene}@{eski.WorstSceneStartSeconds}/{eski.WorstSceneUnitSeconds}sn | yeni {yeni.WorstScene}@{yeni.WorstSceneStartSeconds}/{yeni.WorstSceneUnitSeconds}sn | {(ayni ? "AYNI" : "DEGISTI")}");
+        }
+
+        _cikti.WriteLine($"degisen satir: {degisen}/{satirlar.Length}");
+        Assert.True(degisen > 0 && degisen < satirlar.Length);
+    }
+
+    /// <summary>
+    /// K5 gerileme tablosu 3: turbo ilk gecis. Eski (bayrak hic kurulmuyordu) ve yeni ilk
+    /// gecis on ayari yan yana; son gecis her satirda degismeden kaliyor.
+    /// </summary>
+    [Fact]
+    public void TabloTurboIlkGecis()
+    {
+        var kaynak = Kaynak();
+        var satirlar = new (string Ad, SpeedMode Kip, CodecPreference Tercih, IEncoderAvailability? Makine)[]
+        {
+            ("hizli  / azami sikistirma", SpeedMode.Fast, CodecPreference.MaxCompression, new DonanimsizMakine()),
+            ("hizli  / uyumlu", SpeedMode.Fast, CodecPreference.Compatible, new DonanimsizMakine()),
+            ("kalite / azami sikistirma", SpeedMode.Quality, CodecPreference.MaxCompression, new DonanimsizMakine()),
+            ("kalite / uyumlu", SpeedMode.Quality, CodecPreference.Compatible, new DonanimsizMakine()),
+            ("hizli  / donanim var", SpeedMode.Fast, CodecPreference.Compatible, null)
+        };
+
+        var degisen = 0;
+        foreach (var (ad, kip, tercih, makine) in satirlar)
+        {
+            var plan = PlanCalculator.Build(kaynak, Secenekler(kip, kodek: tercih), makine);
+            var eski = FfmpegArguments.FirstPassPreset(plan.Codec, plan.Preset, false);
+            var yeni = FfmpegArguments.FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass);
+            var ayni = eski == yeni;
+            if (!ayni) degisen++;
+            _cikti.WriteLine($"{ad,-25} | {plan.Codec,-11} {plan.Mode,-11} son={plan.Preset,-6} | eski ilk={eski,-9} | yeni ilk={yeni,-9} | {(ayni ? "AYNI" : "DEGISTI")}");
+        }
+
+        _cikti.WriteLine($"degisen satir: {degisen}/{satirlar.Length}");
+        Assert.True(degisen > 0 && degisen < satirlar.Length);
     }
 }
