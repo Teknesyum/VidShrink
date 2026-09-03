@@ -125,7 +125,9 @@ ve iki kolu birden okur. Koşumun yazdığı satırlar:
 ## K3 — Sayı iddiası taraması
 
 `tests/VidShrink.Tests/OluUyeTests.cs`te **bugünkü kaynaktan doğrulanabilir 24 sayı
-iddiası** tek tek sayıldı: 18'i tuttu, 6'sı bayattı. Ayrıca 3 iddia tarihsel — bugünkü
+iddiası** tek tek sayıldı: 17'si tuttu, 7'si sorunluydu. Sorunlu yedinin altısı bayat,
+biri yanıltıcı (aşağıdaki tablo, `docs/olcumler/uc-kucuk-borc.md:142-167`; 17 + 7 = 24,
+6 + 1 = 7). Ayrıca 3 iddia tarihsel — bugünkü
 kaynakta karşılığı yok, onlara dokunulmadı.
 
 Yer gerçeği, ölçünün kendi dökümü
