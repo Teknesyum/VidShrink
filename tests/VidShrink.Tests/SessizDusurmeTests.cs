@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using VidShrink.App.Playback;
 using VidShrink.Ffmpeg;
 
@@ -184,4 +185,70 @@ public sealed class SessizDusurmeTests
         Assert.True(at >= 0, "kaynak parca kosumu -loglevel vermeyi birakmis");
         Assert.Equal("error", args[at + 1]);
     }
+
+    /// <summary>
+    /// Tasimanin parcaya <b>gercekten baglandigini</b> pimler. DroppedAcross'u tek basina
+    /// olcmek yetmiyor: mutasyon izgarasinda parca kurulumundaki bagi kesmek (M4) hicbir
+    /// olcuyu kirmadan hayatta kalmisti.
+    /// </summary>
+    [Fact]
+    public void TheClipIsWiredToTheDropNotJustAbleToComputeIt()
+    {
+        var segment = PreviewSegment.For(
+            SampleInfo(), SamplePlan(), startSeconds: 0, outputPath: "kodlanmis.mp4");
+        var runs = new[]
+        {
+            new FfmpegRun(true, 0, string.Empty, TimeSpan.Zero),
+            FfmpegRunner.Decide(0, X265DroppedKeyAtProbeShape, TimeSpan.Zero)
+        };
+
+        var clip = SegmentEncoder.BuildClip(
+            segment, "kaynak.mp4", "kodlanmis.mp4", startSeconds: 0, runs, TimeSpan.FromSeconds(1));
+
+        Assert.True(clip.DroppedAnOption, "dusurulen ayar parcaya baglanmamis");
+        Assert.Contains(clip.DroppedOptions, line => line.Contains("zzznotreal"));
+    }
+
+    /// <summary>Temiz kosumlarda parca bos donuyor; bag her zaman dolu degil.</summary>
+    [Fact]
+    public void ACleanRunLeavesTheClipEmpty()
+    {
+        var segment = PreviewSegment.For(
+            SampleInfo(), SamplePlan(), startSeconds: 0, outputPath: "kodlanmis.mp4");
+        var runs = new[]
+        {
+            new FfmpegRun(true, 0, string.Empty, TimeSpan.Zero),
+            FfmpegRunner.Decide(0, "x265 [warning]: Source height < 720p; disabling lookahead-slices", TimeSpan.Zero)
+        };
+
+        var clip = SegmentEncoder.BuildClip(
+            segment, "kaynak.mp4", "kodlanmis.mp4", startSeconds: 0, runs, TimeSpan.FromSeconds(1));
+
+        Assert.False(clip.DroppedAnOption);
+        Assert.Empty(clip.DroppedOptions);
+    }
+
+    private static MediaInfo SampleInfo() => new()
+    {
+        FilePath = "kaynak.mp4",
+        FileSizeBytes = 1024 * 1024,
+        DurationSeconds = 30,
+        Width = 640,
+        Height = 360,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 800_000
+    };
+
+    private static EncodePlan SamplePlan() => new()
+    {
+        Codec = "libx265",
+        Mode = "CRF",
+        Crf = 28,
+        VideoBitrateK = 800,
+        AudioBitrateK = 96,
+        Width = 640,
+        Height = 360,
+        Fps = 30
+    };
 }
