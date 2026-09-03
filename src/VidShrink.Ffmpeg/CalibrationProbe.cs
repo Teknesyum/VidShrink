@@ -7,15 +7,12 @@ namespace VidShrink.Ffmpeg;
 
 public static class CalibrationProbe
 {
-    private const double WindowSeconds = 2.0;
-    private const int MaxWindows = 3;
-    private const int MinWindows = 2;
     private const double CrfGap = 4.0;
     private const int SoftwareConcurrency = 4;
     private const int HardwareConcurrency = 2;
     private static readonly TimeSpan SampleTimeout = TimeSpan.FromSeconds(90);
 
-    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, SpeedMode speed, CancellationToken ct = default)
+    public static async Task<ComplexityProfile> RunAsync(MediaInfo info, EncodePlan draft, ComplexityProfile profile, SpeedMode speed, CancellationToken ct = default, SceneMap? scenes = null)
     {
         try
         {
@@ -39,14 +36,14 @@ public static class CalibrationProbe
             long lowBytes = 0, highBytes = 0;
             long lowFrames = 0, highFrames = 0;
 
-            var windows = Windows(info, speed).ToArray();
-            var pending = new List<Task<Sample>>(windows.Length * 2);
+            var windows = Windows(info, speed, scenes);
+            var pending = new List<Task<Sample>>(windows.Count * 2);
             using var gate = new SemaphoreSlim(CodecModel.IsHardware(draft.Codec) ? HardwareConcurrency : SoftwareConcurrency);
             var batch = Stopwatch.StartNew();
-            foreach (var start in windows)
+            foreach (var window in windows)
             {
-                pending.Add(GatedSampleAsync(gate, info, draft, start, lowCrf, speed, ct));
-                pending.Add(GatedSampleAsync(gate, info, draft, start, highCrf, speed, ct));
+                pending.Add(GatedSampleAsync(gate, info, draft, window, lowCrf, speed, ct));
+                pending.Add(GatedSampleAsync(gate, info, draft, window, highCrf, speed, ct));
             }
 
             var samples = await Task.WhenAll(pending);
@@ -131,27 +128,73 @@ public static class CalibrationProbe
         return CodecModel.ReferenceCrf(draft.Codec);
     }
 
-    private static IEnumerable<double> Windows(MediaInfo info, SpeedMode speed)
+    internal static IReadOnlyList<SampleWindow> Windows(MediaInfo info, SpeedMode speed, SceneMap? scenes = null)
     {
         var duration = info.DurationSeconds;
-        if (duration <= WindowSeconds * 1.5)
-        {
-            yield return 0;
-            yield break;
-        }
+        var secondBits = SecondBits(scenes, duration);
+        if (secondBits is null) return SignallessWindows(duration, speed);
 
-        var usable = Math.Max(0.0, duration - WindowSeconds);
-        var count = duration < WindowSeconds * 6 || speed == SpeedMode.Fast ? MinWindows : MaxWindows;
-        for (var i = 0; i < count; i++)
-            yield return usable * (i + 0.5) / count;
+        var count = ComplexityProbe.PlanWindowCount(duration, ComplexityProbe.Heterogeneity(secondBits));
+        if (speed == SpeedMode.Fast) count = Math.Min(count, ComplexityProbe.MinWindows);
+
+        var planned = ComplexityProbe.PlanWindows(
+            SamplingPlan.Scene, duration, secondBits, CutTimes(scenes!, duration), count);
+        return planned.Count == 0 ? SignallessWindows(duration, speed) : planned;
     }
 
-    private static async Task<Sample> GatedSampleAsync(SemaphoreSlim gate, MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
+    private static IReadOnlyList<SampleWindow> SignallessWindows(double duration, SpeedMode speed)
+    {
+        var plan = ComplexityProbe.PlanWindows(SamplingPlan.Fixed, duration);
+        if (speed != SpeedMode.Fast || plan.Count <= ComplexityProbe.MinWindows) return plan;
+
+        var length = plan[0].Length;
+        var usable = Math.Max(0.0, duration - length);
+        var count = ComplexityProbe.MinWindows;
+        var capped = new List<SampleWindow>(count);
+        for (var i = 0; i < count; i++)
+            capped.Add(new SampleWindow(usable * (i + 0.5) / count, length, 1.0));
+        return capped;
+    }
+
+    private static IReadOnlyList<double>? SecondBits(SceneMap? scenes, double duration)
+    {
+        if (scenes is null || !double.IsFinite(duration) || duration <= 0) return null;
+
+        var seconds = (int)Math.Floor(duration);
+        if (seconds <= 0) return null;
+
+        var bits = new double[seconds];
+        var filled = false;
+        foreach (var scene in scenes.Scenes)
+        {
+            var rate = scene.BitsPerSecond;
+            if (!double.IsFinite(rate) || rate <= 0) continue;
+
+            var first = Math.Max(0, (int)Math.Floor(scene.Start));
+            var last = Math.Min(seconds - 1, (int)Math.Ceiling(Math.Min(duration, scene.End)) - 1);
+            for (var i = first; i <= last; i++)
+            {
+                bits[i] = rate;
+                filled = true;
+            }
+        }
+
+        return filled ? bits : null;
+    }
+
+    private static IReadOnlyList<double> CutTimes(SceneMap scenes, double duration)
+        => scenes.Scenes
+            .Skip(1)
+            .Select(scene => scene.Start)
+            .Where(cut => cut > 0 && cut < duration)
+            .ToArray();
+
+    private static async Task<Sample> GatedSampleAsync(SemaphoreSlim gate, MediaInfo info, EncodePlan draft, SampleWindow window, double crf, SpeedMode speed, CancellationToken ct)
     {
         await gate.WaitAsync(ct);
         try
         {
-            return await SampleAsync(info, draft, start, crf, speed, ct);
+            return await SampleAsync(info, draft, window, crf, speed, ct);
         }
         finally
         {
@@ -179,17 +222,18 @@ public static class CalibrationProbe
         return new[] { "-crf", exact };
     }
 
-    private static async Task<Sample> SampleAsync(MediaInfo info, EncodePlan draft, double start, double crf, SpeedMode speed, CancellationToken ct)
+    internal static IReadOnlyList<string> TrimArgs(SampleWindow window) => new[]
+    {
+        "-ss", window.Start.ToString("0.###", CultureInfo.InvariantCulture),
+        "-t", window.Length.ToString("0.###", CultureInfo.InvariantCulture)
+    };
+
+    private static async Task<Sample> SampleAsync(MediaInfo info, EncodePlan draft, SampleWindow window, double crf, SpeedMode speed, CancellationToken ct)
     {
         var args = new List<string> { "-hide_banner", "-nostdin" };
         if (speed == SpeedMode.Fast) args.AddRange(new[] { "-hwaccel", "auto" });
-        args.AddRange(new[]
-        {
-            "-ss", start.ToString("0.###", CultureInfo.InvariantCulture),
-            "-t", WindowSeconds.ToString("0.###", CultureInfo.InvariantCulture),
-            "-i", info.FilePath,
-            "-an", "-sn", "-dn"
-        });
+        args.AddRange(TrimArgs(window));
+        args.AddRange(new[] { "-i", info.FilePath, "-an", "-sn", "-dn" });
 
         var filter = BuildFilter(info, draft);
         if (filter is not null)

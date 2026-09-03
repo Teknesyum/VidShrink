@@ -70,9 +70,12 @@ public partial class MainWindow : Window
     private EncodePlan? _aiPlan;
     private CancellationTokenSource? _cts;
     private ComplexityProfile? _profile;
+    private SceneMapAttempt? _sceneMap;
     private CancellationTokenSource? _probeCts;
     private SizeEstimate? _estimate;
     private IEncoderAvailability? _encoders;
+    private DeferredEncoderAvailability? _planEncoders;
+    private string? _probeStatusText;
     private double _predictedQuality;
     private StrategyAdvice? _advice;
     private string? _lastOutput;
@@ -1203,6 +1206,298 @@ public partial class MainWindow : Window
             FfmpegArguments.PsychovisualArgs(codec, capabilities);
     }
 
+    /// <summary>
+    /// Yoklamayı arayüz iş parçacığından ayıran geçit.
+    ///
+    /// Okuma tarafı süreç doğurmaz: yalnız ısıtılmış cevabı verir. Sorulan kodlayıcı henüz
+    /// ölçülmemişse <see cref="IEncoderMeasurementState"/> üzerinden "ölçülmedi" der —
+    /// "çalışmıyor" demez — ve ölçümü arka planda kuyruğa alır. Ölçüm bitince
+    /// <c>onMeasured</c> çağrılır ve hesap yenilenir. Aynı kodlayıcı aynı anda iki kez
+    /// kuyruğa girmez; N yeniden hesap N yoklama doğurmaz.
+    ///
+    /// <see cref="FfmpegArguments.CachedPsychovisualArgs"/> ile
+    /// <see cref="FfmpegArguments.WarmPsychovisual"/> ayrımının aynısı: ölçen yol ayrı,
+    /// okuyan yol saf.
+    /// </summary>
+    internal sealed class DeferredEncoderAvailability
+        : IEncoderAvailability, IHdr10EncoderAvailability, IEncoderOptionAvailability, IEncoderMeasurementState
+    {
+        /// <summary>
+        /// Bu süreden uzun süren yoklama yerleşmiş sayılmaz. Yükün altında aynı komut
+        /// 3625-14855 ms sürebiliyor (docs/olcumler/handbrake-acigi.md); o anki cevabı
+        /// kalıcı kabul etmek T94'ün kaldırdığı "geçici düşüş kalıcı donanım yok kararı"
+        /// kusurunu geri getirirdi.
+        /// </summary>
+        internal const int UnsettledProbeMs = 2000;
+
+        /// <summary>
+        /// Yerleşmeyen bir yoklama art arda en çok bu kadar denenir; sonrası
+        /// <see cref="RetryAfterFailureMs"/> beklemeye tabidir.
+        /// </summary>
+        internal const int MaxAttempts = 2;
+
+        /// <summary>
+        /// Bir kodlayıcı için toplam yoklama tavanı. Bekleme sonrası yeniden deneme kolu
+        /// <see cref="MaxAttempts"/>i aşabiliyordu ve <b>tavanı yoktu</b>: yerleşmeyen bir
+        /// yoklama oturum boyunca her <see cref="RetryAfterFailureMs"/> ms'de bir yeni
+        /// ffmpeg doğuruyordu. Tavan, geçici bir arızadan bir kez toparlanmaya izin verir
+        /// (iki hızlı deneme + bir beklemeli deneme); ondan sonra cevap <b>bilinmeyen</b>
+        /// kalır ve <see cref="Unsettled"/> ile arayüze taşınır.
+        /// </summary>
+        internal const int MaxTotalAttempts = 3;
+
+        internal const int RetryAfterFailureMs = 5000;
+
+        private sealed class Answer
+        {
+            internal EncoderProbeState State = EncoderProbeState.Unmeasured;
+            internal bool Works;
+            internal string? PixelFormat;
+            internal bool Settled;
+            internal int Attempts;
+            internal string? Failure;
+            internal long ElapsedMs = -1;
+            internal long LastAttemptTicks;
+        }
+
+        /// <summary>
+        /// Bir kodlayicinin yoklama cevabinin hangi durumda oldugu. <c>NotWorking</c> ile
+        /// <c>Failed</c> ayri: birincisi olculmus bir cevap, ikincisi yoklamanin hic cevap
+        /// uretememesi. Ikisini ayni yere yazmak ucuncu durumu yok ediyordu.
+        /// </summary>
+        internal enum ProbeAnswer
+        {
+            Unknown,
+            Working,
+            NotWorking,
+            Unsettled,
+            Failed,
+
+            /// <summary>
+            /// Yoklama koştu, hızlı döndü ve <b>sonuca varamadı</b>: ffmpeg zaman aşımına
+            /// uğradı ya da süreç hiç başlayamadı. <c>Unsettled</c>dan ayrı, çünkü o "çok
+            /// uzun sürdü" demek; bu, süresi ne olursa olsun "cevap yok" demek.
+            /// </summary>
+            Unmeasured
+        }
+
+        private readonly IEncoderAvailability _source;
+        private readonly Action _onMeasured;
+        private readonly object _gate = new();
+        private readonly Dictionary<string, Answer> _answers = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _running = new(StringComparer.OrdinalIgnoreCase);
+        private int _probes;
+
+        internal DeferredEncoderAvailability(IEncoderAvailability source, Action onMeasured)
+        {
+            _source = source;
+            _onMeasured = onMeasured;
+        }
+
+        /// <summary>Ölçümün gerçekten koştuğu yetenek nesnesi. Kodlama yolu bunu kullanır.</summary>
+        internal IEncoderAvailability Source => _source;
+
+        /// <summary>Arka planda koşan yoklama var mı.</summary>
+        internal bool Pending
+        {
+            get { lock (_gate) return _running.Count > 0; }
+        }
+
+        /// <summary>Bu geçidin bugüne kadar kaç yoklama başlattığı. Ölçü bunu pinler.</summary>
+        internal int Probes
+        {
+            get { lock (_gate) return _probes; }
+        }
+
+        /// <summary>
+        /// Denemesi bittiği hâlde yerleşmemiş bir yoklama var mı. Varsa hesap bilinmeyen
+        /// bir cevapla çalışıyor ve bunun kullanıcıya görünmesi gerekiyor.
+        /// </summary>
+        internal bool Unsettled
+        {
+            get
+            {
+                lock (_gate)
+                    return _answers.Values.Any(a => !a.Settled && a.Attempts >= MaxAttempts);
+            }
+        }
+
+        public bool HasEncoder(string name) => _source.HasEncoder(name);
+
+        public bool SupportsEncoderOption(string codec, string option, string value)
+            => _source is IEncoderOptionAvailability options && options.SupportsEncoderOption(codec, option, value);
+
+        public bool IsMeasured(string codec) => Ready(Key("works", codec), codec, hdr10: false);
+
+        public bool IsHdr10Measured(string codec) => Ready(Key("hdr10", codec), codec, hdr10: true);
+
+        public bool WorksAsEncoder(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) && answer.Works;
+        }
+
+        public EncoderProbeState EncoderState(string codec) => AnswerFor(codec) switch
+        {
+            ProbeAnswer.Working => EncoderProbeState.Working,
+            ProbeAnswer.NotWorking => EncoderProbeState.NotWorking,
+            _ => EncoderProbeState.Unmeasured
+        };
+
+        public string? Hdr10PixelFormat(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("hdr10", codec), out var answer) ? answer.PixelFormat : null;
+        }
+
+        /// <summary>Kodlayicinin bugunku yoklama durumu. Olcu bunu okur, arayuz de.</summary>
+        internal ProbeAnswer AnswerFor(string codec)
+        {
+            lock (_gate)
+            {
+                if (!_answers.TryGetValue(Key("works", codec), out var answer)) return ProbeAnswer.Unknown;
+                if (answer.Failure is not null) return ProbeAnswer.Failed;
+                if (answer.State == EncoderProbeState.Unmeasured) return ProbeAnswer.Unmeasured;
+                if (!answer.Settled) return ProbeAnswer.Unsettled;
+                return answer.State == EncoderProbeState.Working ? ProbeAnswer.Working : ProbeAnswer.NotWorking;
+            }
+        }
+
+        /// <summary>
+        /// Kodlayicinin son yoklamasinin gercekten kac ms surdugu, hic yoklanmadiysa -1.
+        /// Yerlesme karari bu sureden turuyor; olcu ikisini yuzlestiriyor.
+        /// </summary>
+        internal long ElapsedMsFor(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) ? answer.ElapsedMs : -1;
+        }
+
+        /// <summary>Yoklama firlattiysa istisnanin metni, yoksa <c>null</c>.</summary>
+        internal string? FailureFor(string codec)
+        {
+            lock (_gate) return _answers.TryGetValue(Key("works", codec), out var answer) ? answer.Failure : null;
+        }
+
+        /// <summary>
+        /// Yoklamasi istisnayla dusen ilk kodlayicinin istisna metni. Arayuz durum satiri
+        /// bunu gosterir; istisna sessizce kaybolmaz.
+        /// </summary>
+        internal string? FirstFailure
+        {
+            get
+            {
+                lock (_gate) return _answers.Values.Select(a => a.Failure).FirstOrDefault(f => f is not null);
+            }
+        }
+
+        private static string Key(string kind, string codec) => $"{kind}:{codec}";
+
+        /// <summary>
+        /// Yoklama yerleşmediyse cevap "ölçüldü" sayılmaz. Deneme sırası şu:
+        /// <see cref="MaxAttempts"/> kadar art arda denenir, sonra
+        /// <see cref="RetryAfterFailureMs"/> beklenip <b>bir kez daha</b> denenir
+        /// (<see cref="MaxTotalAttempts"/>), ondan sonra deneme <b>durur</b> ama cevap
+        /// yine <b>bilinmeyen</b> kalır. Yerleşmeyen bir yoklamayı ölçüm gibi kabul etmek,
+        /// öldürülmüş bir denemeyi "bu kodlayıcı 10 bit taşıyamıyor" cümlesine çevirmek
+        /// demekti; <see cref="Unsettled"/> bunun yerine durumu arayüze taşır.
+        /// </summary>
+        private bool Ready(string key, string codec, bool hdr10)
+        {
+            lock (_gate)
+            {
+                if (_answers.TryGetValue(key, out var answer))
+                {
+                    if (answer.Settled) return true;
+                    if (answer.Attempts >= MaxTotalAttempts) return false;
+                    var stuck = answer.Attempts >= MaxAttempts;
+                    var cooling = stuck && Environment.TickCount64 - answer.LastAttemptTicks < RetryAfterFailureMs;
+                    if (cooling) return false;
+                }
+                if (!_running.Add(key)) return false;
+                _probes++;
+            }
+
+            Measure(key, codec, hdr10);
+            return false;
+        }
+
+        /// <summary>
+        /// Geçidin <b>girişi</b>. Ölçen çağrı üç değerli cevabı taşıyabiliyorsa oradan
+        /// alınır; iki değerli <c>WorksAsEncoder</c>den geçirmek <c>Unmeasured</c>ı geçit
+        /// daha <see cref="Answer"/>a yazmadan yok ediyordu ve "ölçemedik" ile "çalışmıyor"
+        /// geçitten birebir aynı çıkıyordu. Üç değerli yüzü olmayan bir kaynak (ölçülerin
+        /// sahteleri) iki değerli koldan geçer; o kolda üçüncü durum zaten yok.
+        /// </summary>
+        private EncoderProbeState ProbedEncoderState(string codec)
+            => _source is IEncoderProbeState prober
+                ? prober.WorksAsEncoderState(codec)
+                : _source.WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+
+        private void Measure(string key, string codec, bool hdr10)
+        {
+            Task.Run(() =>
+            {
+                var clock = Stopwatch.StartNew();
+                var state = EncoderProbeState.Unmeasured;
+                string? pixelFormat = null;
+                Exception? failure = null;
+                try
+                {
+                    if (hdr10)
+                    {
+                        pixelFormat = (_source as IHdr10EncoderAvailability)?.Hdr10PixelFormat(codec);
+                        state = pixelFormat is null ? EncoderProbeState.NotWorking : EncoderProbeState.Working;
+                    }
+                    else state = ProbedEncoderState(codec);
+                }
+                catch (Exception ex)
+                {
+                    failure = ex;
+                }
+                clock.Stop();
+
+                lock (_gate)
+                {
+                    if (!_answers.TryGetValue(key, out var answer)) _answers[key] = answer = new Answer();
+                    answer.Attempts++;
+                    answer.LastAttemptTicks = Environment.TickCount64;
+                    answer.Failure = failure?.Message;
+                    answer.ElapsedMs = clock.ElapsedMilliseconds;
+                    if (failure is null)
+                    {
+                        answer.State = state;
+                        answer.Works = state == EncoderProbeState.Working;
+                        answer.PixelFormat = pixelFormat;
+                        answer.Settled = state != EncoderProbeState.Unmeasured
+                                         && clock.ElapsedMilliseconds < UnsettledProbeMs;
+                    }
+                    else
+                    {
+                        answer.State = EncoderProbeState.Unmeasured;
+                        answer.Works = false;
+                        answer.PixelFormat = null;
+                        answer.Settled = false;
+                    }
+                    _running.Remove(key);
+                }
+
+                _onMeasured();
+            });
+        }
+    }
+
+    /// <summary>
+    /// Yoklamanın "bu makinede donanım kodlayıcı var" cevabı. Plandaki kodlayıcı adı tek
+    /// başına yetmez: <see cref="PlanCalculator"/> ölçülmemiş bir adayı geçici cevap olarak
+    /// da döndürebiliyor ve o cevap ölçülmüş bir evet gibi okunursa sürücüsüz makine
+    /// hızlı kipi açık görüyor. Geçici cevap bu yüzden aynı gövdenin çalıştırdığı gerçek
+    /// yoklamayla doğrulanır; ölçülmüş bir seçim yeniden sınanmaz.
+    /// </summary>
+    internal static bool HardwareAvailableFrom(EncodePlan plan, EncoderProbeResult probe)
+        => CodecModel.IsHardware(plan.Codec)
+           && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
+
+    /// <summary>Ölçü için: yoklamanın arayüze taşıdığı donanım cevabı.</summary>
+    internal bool HardwareEncoderAvailable => _hardwareEncoderAvailable;
+
     private async Task ProbeHardwareEncodersAsync()
     {
         var available = false;
@@ -1219,7 +1514,7 @@ public partial class MainWindow : Window
                 var plan = PlanCalculator.Build(HardwareProbeSource, options, capabilities);
                 var probe = capabilities.Probe(plan.Codec);
                 var decision = HardwareVerdict.Decide(probe, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
-                return ((IEncoderAvailability?)capabilities, CodecModel.IsHardware(plan.Codec), decision);
+                return ((IEncoderAvailability?)capabilities, HardwareAvailableFrom(plan, probe), decision);
             });
         }
         catch (Exception ex)
@@ -1246,6 +1541,9 @@ public partial class MainWindow : Window
     internal void ApplyHardwareVerdict(IEncoderAvailability? encoders, bool available, HardwareVerdict verdict)
     {
         _encoders = encoders;
+        _planEncoders = encoders is null
+            ? null
+            : new DeferredEncoderAvailability(encoders, () => Dispatcher.UIThread.Post(ScheduleRecalculate));
         if (_preview is not null) _preview.Availability = encoders;
         _hardwareProbed = true;
         _hardwareEncoderAvailable = available;
@@ -1474,6 +1772,7 @@ public partial class MainWindow : Window
 
         _aiPlan = null;
         _profile = null;
+        _sceneMap = null;
         BtnRevert.IsVisible = false;
         TxtAiStatus.Text = "";
         SetAiDetails(false);
@@ -1508,6 +1807,29 @@ public partial class MainWindow : Window
         return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
     }
 
+    /// <summary>
+    /// Kalibrasyon yoklamasinin ornekleme penceresini yerlestirirken okudugu harita.
+    /// Tarama basarisiz olduysa <c>null</c> doner ve yoklama esit arali yedek yerlesimde
+    /// kalir.
+    /// </summary>
+    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => attempt?.Map;
+
+    /// <summary>
+    /// Kalite olcumunun en kotu birimi ararken sahne sinirlarini okudugu harita. Tarama
+    /// basarisiz olduysa <c>null</c> doner ve olcum sabit iki saniyelik izgarada kalir.
+    /// </summary>
+    public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => attempt?.Map;
+
+    /// <summary>
+    /// Yoklamanin kalite olceri. Olcum govdesi tek yerde, <see cref="QualityMeasurement"/>
+    /// icinde; harita o govdenin opsiyonel alanidir. Harita geldiginde govde
+    /// <see cref="QualityMeter.MeasureWindowAsync(string, string, double, double, double, SceneMap?, CancellationToken)"/>
+    /// asiri yuklemesine gecer; gelmediginde <see cref="QualityMeasurement.Instance"/> ile
+    /// bugunku yolda kalir.
+    /// </summary>
+    public static IQualityMeasurement ProbeMeter(SceneMap? scenes)
+        => scenes is null ? QualityMeasurement.Instance : new QualityMeasurement(scenes);
+
     private async Task MeasureComplexityAsync(MediaInfo info)
     {
         _probeCts?.Cancel();
@@ -1519,27 +1841,31 @@ public partial class MainWindow : Window
         try
         {
             var speed = CurrentOptions().SpeedMode;
-            var profile = await ProbeWithMeasuredQualityAsync(info, speed, null, cts.Token);
+            _sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);
+            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            Recalculate();
+
+            var profile = await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(QualityScenes(_sceneMap)), cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             _profile = profile;
             Recalculate();
 
             TxtEstimateNote.Text = Say("main.estimate.calibrating");
-            var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, _encoders).Plan;
+            var draft = PlanCalculator.BuildDetailed(info, CurrentOptions(), profile, _planEncoders).Plan;
 
             // The calibration is keyed to the plan it measured, and feeding it back changes the plan,
             // which would throw the measurement away. Measure again on the plan the calibration
             // produced, until the two agree.
             for (var round = 0; round < CalibrationRounds; round++)
             {
-                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token);
+                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, CalibrationScenes(_sceneMap));
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
                 _profile = calibrated;
                 Recalculate();
 
                 if (!calibrated.Calibrated) break;
 
-                var settled = PlanCalculator.BuildDetailed(info, CurrentOptions(), calibrated, _encoders).Plan;
+                var settled = PlanCalculator.BuildDetailed(info, CurrentOptions(), calibrated, _planEncoders).Plan;
                 if (calibrated.AppliesTo(settled.Codec, PlanScale(info, settled), settled.Fps)) break;
 
                 draft = settled;
@@ -1604,8 +1930,9 @@ public partial class MainWindow : Window
     private void Recalculate()
     {
         if (_info is null) return;
-        var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, _encoders);
+        var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, _planEncoders);
         _autoPlan = detailed.Plan;
+        PlanHardwareNotMeasured = detailed.HardwareNotMeasured;
         _predictedQuality = detailed.PredictedQuality;
         _advice = detailed.Advice;
         _profile ??= detailed.Profile;
@@ -1625,9 +1952,66 @@ public partial class MainWindow : Window
         RefreshPlanView();
         RefreshQualityPanels();
         BtnStart.IsEnabled = _cts is null && ToolLocator.IsAvailable(out _);
+        ReportUnsettledProbe();
 
         // T48/K1: plan tazelendi. Panel gecikmesini kendi kurar; burası yalnız haber verir.
+        if (_preview is not null) _preview.Scenes = _sceneMap?.Map;
         _preview?.SetPlan(_info, ActivePlan, _profile);
+    }
+
+    /// <summary>Ölçü için: arka planda koşan yoklama var mı.</summary>
+    internal bool PlanProbePending => _planEncoders?.Pending ?? false;
+
+    /// <summary>Ölçü için: geçidin bugüne kadar başlattığı yoklama sayısı.</summary>
+    internal int PlanProbeCount => _planEncoders?.Probes ?? 0;
+
+    /// <summary>Ölçü için: son hesabın donanım cevabını ölçülmemiş sayıp saymadığı.</summary>
+    internal bool PlanHardwareNotMeasured { get; private set; }
+
+    /// <summary>Ölçü için: geçitte denemesi bitmiş ama yerleşmemiş bir yoklama var mı.</summary>
+    internal bool PlanProbeUnsettled => _planEncoders?.Unsettled ?? false;
+
+    /// <summary>Ölçü için: geçitte istisnayla düşmüş bir yoklamanın metni.</summary>
+    internal string? PlanProbeFailure => _planEncoders?.FirstFailure;
+
+    /// <summary>Ölçü için: durum satırı raporlamasını tek başına koşturur.</summary>
+    internal void ReportProbeStatusForMeasurement() => ReportUnsettledProbe();
+
+    /// <summary>
+    /// Yerleşmeyen yoklamayı kullanıcıya söyler. Yoklama bir cevap üretemediğinde bu bir
+    /// sonuç değil bilinmeyendir; sessizce varsayılana düşmek — HDR kaynakta tonemap'e —
+    /// aynı dosyanın iki koşumda iki farklı çıktı vermesi demekti ve kullanıcı nedenini
+    /// hiçbir yerde göremiyordu.
+    ///
+    /// İki ayrı cümle, çünkü iki ayrı durum: yoklama koşup sonuca varamadıysa
+    /// <c>main.status.probe-unsettled</c>, hiç koşamayıp istisna fırlattıysa
+    /// <c>main.status.probe-failed</c> — istisnanın metniyle birlikte. İkisi de
+    /// başarısızlık değil bilinmezlik bildiriyor; <c>main.error.probe</c> gerçek
+    /// başarısızlık için açılışta duruyor (<see cref="ProbeHardwareEncodersAsync"/>).
+    ///
+    /// Temizlik yalnız <b>yoklamanın kendi yazdığı metni</b> siler. Önceki hâli "yoklama
+    /// bir kez yazdı mı" tutan bir bayraktı ve "şu anki metin yoklamanın mı" tutmuyordu:
+    /// durum satırını <see cref="UpdateToolStatus"/>, bağlantı, ayar ve araç hataları da
+    /// yazıyor; yoklama yerleştiğinde o metinler de siliniyordu.
+    /// </summary>
+    private void ReportUnsettledProbe()
+    {
+        if (_planEncoders is null) return;
+
+        string? text = null;
+        if (_planEncoders.FirstFailure is { } failure) text = Say("main.status.probe-failed", failure);
+        else if (_planEncoders.Unsettled) text = Say("main.status.probe-unsettled");
+
+        if (text is not null)
+        {
+            if (TxtSystemStatus.Text != text) TxtSystemStatus.Text = text;
+            _probeStatusText = text;
+        }
+        else if (_probeStatusText is not null)
+        {
+            if (TxtSystemStatus.Text == _probeStatusText) TxtSystemStatus.Text = string.Empty;
+            _probeStatusText = null;
+        }
     }
 
     /// <summary>
@@ -1649,11 +2033,16 @@ public partial class MainWindow : Window
     /// <summary>
     /// Her yonganın balonuna tahmini kalite paneli koyar.
     ///
-    /// Hesap <see cref="PlanCalculator.BuildDetailed"/>'dır ve ffmpeg çağırmaz: ölçülmüş
-    /// karmaşıklık profili varsa o kullanılır, yoksa <c>BuildDetailed</c> kendi içinde
-    /// <see cref="ComplexityProfile.FromSourceBitrate"/>'a düşer. İkisi de saf aritmetik,
-    /// bu yüzden panel fare üstüne gelince beklemeden çıkar. Profilin ölçülmüş olup
-    /// olmadığını panel ayrıca yazar; tahmin ölçüm gibi sunulmaz.
+    /// Hesap <see cref="PlanCalculator.BuildDetailed"/>'dır. Karmaşıklık tarafı saf aritmetik:
+    /// ölçülmüş profil varsa o kullanılır, yoksa <c>BuildDetailed</c> kendi içinde
+    /// <see cref="ComplexityProfile.FromSourceBitrate"/>'a düşer.
+    ///
+    /// Kodlayıcı tarafı saf değildi ve T130'a kadar bu cümle yanlıştı: <c>BuildDetailed</c>
+    /// donanım adaylarını ve HDR piksel biçimini yetenek nesnesine soruyor, o da ffmpeg
+    /// süreci doğuruyordu. Artık arayüz yolu gerçek yetenek nesnesini değil
+    /// <see cref="DeferredEncoderAvailability"/> geçidini görüyor; geçit yalnız ısıtılmış
+    /// cevabı okur, süreç doğurmaz. Bu yüzden panel fare üstüne gelince beklemeden çıkar.
+    /// Profilin ölçülmüş olup olmadığını panel ayrıca yazar; tahmin ölçüm gibi sunulmaz.
     /// </summary>
     private void RefreshQualityPanels()
     {
@@ -1669,7 +2058,7 @@ public partial class MainWindow : Window
 
     private Control QualityBody(double? targetMb)
     {
-        var hint = QualityHint.For(_info, CurrentOptions(), targetMb, _profile, _encoders);
+        var hint = QualityHint.For(_info, CurrentOptions(), targetMb, _profile, _planEncoders);
 
         // Video yüklü değilken skor hesaplanamaz. Sıfır ya da uydurma bir sayı yerine alan
         // boş kalır ve yonganın ne işe yaradığı yukarıdaki maddelerde durmaya devam eder.
@@ -1701,7 +2090,7 @@ public partial class MainWindow : Window
 
         AddQualityRow(grid, Say("main.quality.target"), $"{Num(target, "0.##")} MB");
         AddQualityRow(grid, Say("main.quality.predicted"), $"{score:0.#}/100");
-        AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.points", Num(hint.LossPoints, "0.#")));
+        AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", Num(hint.LossPoints, "0.#")));
         AddQualityRow(grid, Say("main.quality.basis"), basis);
         return grid;
     }
@@ -1785,7 +2174,7 @@ public partial class MainWindow : Window
         AddPlanFact(Say("main.plan.fact.frame-rate"), $"{Num(plan.Fps, "0.##")} FPS");
         AddPlanFact(Say("main.plan.fact.audio"), plan.AudioCodec is null ? Say("main.info.none") : $"{plan.AudioCodec} {plan.AudioBitrateK}k{channels}");
         AddPlanFact(Say("main.plan.fact.preset"), plan.Preset);
-        AddPlanFact(Say("main.plan.fact.estimate"), _estimate is { } size ? $"{Num(size.ExpectedMb, "0.0")} MB" : "-");
+        AddPlanFact(Say("main.plan.fact.estimated-size"), _estimate is { } size ? $"{Num(size.ExpectedMb, "0.0")} MB" : "-");
 
         foreach (var line in StrategyLines()) AddPlanReason(line);
         foreach (var line in ReasonLines(plan)) AddPlanReason(line);
@@ -1799,13 +2188,17 @@ public partial class MainWindow : Window
         RefreshEstimateView();
         RefreshDurationView();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
-            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders));
+            BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders, _sceneMap?.Map));
     }
 
+    /// <summary>
+    /// Ekranda gosterilen komut. <paramref name="scenes"/> kodlamaya giden haritanin ta kendisidir;
+    /// ayri gecilmezse gosterilen komut kosan komuttan anahtar kare araliginda ayrisirdi.
+    /// </summary>
     public static IReadOnlyList<string> DisplayedEncodeArguments(MediaInfo info, EncodePlan plan,
-        string outputPath, IEncoderAvailability? availability)
+        string outputPath, IEncoderAvailability? availability, SceneMap? scenes = null)
         => FfmpegArguments.Build(info, plan, outputPath,
-            plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability);
+            plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0, null, availability, scenes);
 
     private void RefreshEstimateView()
     {
@@ -1891,6 +2284,33 @@ public partial class MainWindow : Window
         && fillPolicy == FillPolicy.FillTarget
         && note.Mb >= FillBand.For(note.TargetMb).HardFloorMb;
 
+    /// <summary>
+    /// Dusme cumlesinin yerellestirme anahtari. Core uc ayri sebep uretiyor
+    /// (<see cref="EncoderFallbackCause"/>) ve ucu de kullaniciya ayri cumleyle gidiyor:
+    /// olculmemis ya da derlemede hic olmayan bir aday icin "bu makinede kullanilamadi"
+    /// demek, yapilmamis bir olcumun sonucunu bildirmektir.
+    /// </summary>
+    internal static string EncoderFallbackReasonKey(ReasonNote note) => note.FallbackCause switch
+    {
+        EncoderFallbackCause.NotInBuild => "main.reason.encoder-fallback-not-in-build",
+        EncoderFallbackCause.NotMeasured => "main.reason.encoder-fallback-not-measured",
+        EncoderFallbackCause.NotWorking => "main.reason.encoder-fallback-not-working",
+        _ => "main.reason.encoder-fallback-not-working"
+    };
+
+    /// <summary>Ayni ayrimin tavsiye satirindaki karsiligi; GPU kolu kendi anahtarini korur.</summary>
+    internal static string EncoderFallbackAdviceKey(EncoderFallbackCause cause) => cause switch
+    {
+        EncoderFallbackCause.NotInBuild => "main.advice.encoder-fallback-not-in-build",
+        EncoderFallbackCause.NotMeasured => "main.advice.encoder-fallback-not-measured",
+        EncoderFallbackCause.NotWorking => "main.advice.encoder-fallback-not-working",
+        _ => "main.advice.encoder-fallback-not-working"
+    };
+
+    internal static EncoderFallbackCause EncoderFallbackCauseOf(EncodePlan? plan) =>
+        plan?.ReasonCodes.FirstOrDefault(note => note.Code == ReasonCode.EncoderFallback)?.FallbackCause
+        ?? EncoderFallbackCause.NotWorking;
+
     private List<string> ReasonLines(EncodePlan plan)
     {
         var parts = new List<string>();
@@ -1915,7 +2335,7 @@ public partial class MainWindow : Window
                 ReasonCode.PredictedQualityEstimated => Say("main.reason.quality-estimated", Num(note.Score, "0.#")),
                 ReasonCode.RetryScaled => Say("main.reason.retry-scaled",
                     Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"), Num(note.AudioMb, "0.00"), Num(note.Factor, "0.###")),
-                ReasonCode.EncoderFallback => Say("main.reason.encoder-fallback", note.RequestedCodec, note.FallbackCodec),
+                ReasonCode.EncoderFallback => Say(EncoderFallbackReasonKey(note), note.RequestedCodec, note.FallbackCodec),
                 ReasonCode.HdrTonemapped => Say("main.reason.hdr-tonemapped"),
                 ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
                     Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),
@@ -1958,7 +2378,8 @@ public partial class MainWindow : Window
 
         foreach (var note in advice.Notes.Distinct())
         {
-            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true);
+            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true,
+                EncoderFallbackCauseOf(ActivePlan));
             if (text is not null) lines.Add(text);
         }
 
@@ -1967,7 +2388,8 @@ public partial class MainWindow : Window
 
     internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
 
-    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu)
+    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu,
+        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking)
     {
 
         return note switch
@@ -1993,7 +2415,7 @@ public partial class MainWindow : Window
             AdviceCode.AudioDropped => Speak(language, "main.advice.audio-dropped"),
             AdviceCode.EncoderFallback => fastGpu
                 ? Speak(language, "main.advice.encoder-fallback-gpu")
-                : Speak(language, "main.advice.encoder-fallback"),
+                : Speak(language, EncoderFallbackAdviceKey(fallbackCause)),
             AdviceCode.HdrTonemapped => Speak(language, "main.advice.hdr-tonemapped"),
             _ => null
         };
@@ -2077,7 +2499,7 @@ public partial class MainWindow : Window
         if (_info is null) { RefreshQualityTargetAvailability(); return; }
 
         QualityDerivedTargets++;
-        var result = PlanCalculator.TargetMbForQuality(_info, CurrentOptions(), ParseQualityTarget(), _profile, _encoders);
+        var result = PlanCalculator.TargetMbForQuality(_info, CurrentOptions(), ParseQualityTarget(), _profile, _planEncoders);
         var mb = Math.Round(result.TargetMb, 1);
 
         _targetIsDerived = true;
@@ -2098,7 +2520,7 @@ public partial class MainWindow : Window
     {
         if (_info is null) { RefreshQualityTargetAvailability(); return; }
 
-        var hint = QualityHint.For(_info, CurrentOptions(), ParseTargetMb(), _profile, _encoders);
+        var hint = QualityHint.For(_info, CurrentOptions(), ParseTargetMb(), _profile, _planEncoders);
         if (hint.Score is not { } score) return;
 
         TargetDerivedQualities++;
@@ -2399,7 +2821,7 @@ public partial class MainWindow : Window
                 if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB";
             });
 
-            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync);
+            var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
 
@@ -2770,9 +3192,14 @@ internal enum QualityBasis
 /// Bir yonganın kalite paneline giren veri. Denetim burada bitiyor: panel yalnız bu
 /// kaydı çizer, karar vermez.
 ///
-/// <see cref="For"/> ffmpeg ya da ffprobe çağırmaz. Ölçülmüş bir profil verilmişse o
-/// kullanılır, verilmemişse <see cref="PlanCalculator.BuildDetailed"/> kendi içinde
+/// <see cref="For"/> ffprobe çağırmaz: ölçülmüş bir profil verilmişse o kullanılır,
+/// verilmemişse <see cref="PlanCalculator.BuildDetailed"/> kendi içinde
 /// <see cref="ComplexityProfile.FromSourceBitrate"/>'a düşer; ikisi de saf aritmetik.
+///
+/// "ffmpeg de çağırmaz" cümlesi T130'a kadar yanlıştı — <c>BuildDetailed</c> kodlayıcı
+/// yeteneğini soruyor, o da süreç doğuruyordu. Artık arayüz bu çağrıya gerçek yetenek
+/// nesnesini değil <see cref="MainWindow.DeferredEncoderAvailability"/> geçidini
+/// veriyor; geçit yalnız ısıtılmış cevabı okur.
 /// </summary>
 internal readonly record struct QualityHint(double? TargetMb, double? Score, QualityBasis Basis)
 {

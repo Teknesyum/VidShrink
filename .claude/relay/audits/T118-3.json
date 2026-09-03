@@ -1,0 +1,16 @@
+{
+  "contractId": "T118",
+  "auditorRunId": "a1b5b7b6c5a31db96",
+  "headSha": "890af6e93f5e070b56422dad39a9e3386cf56045",
+  "diffHash": "be355e8dd1a0efc4ff0e03a0133a47b394ffe344ed45c2c9de0822a2a87400d0",
+  "owns": [
+    "tools/ci-gibi-kos.sh",
+    "docs/olcumler/ci-benzetimi.md",
+    "docs/inceleme/handbrake-motoru.md"
+  ],
+  "verification": [
+    "Sifir dotnet test ile denetlendi. CI tarafi bagimsiz okundu: 33589639249 headSha 0e122f2, gunluk satir 265 Failed 1 / Passed 1162 / Skipped 17 / Total 1180. Betik tarafi ajanin raporundan bagimsiz olarak kosum gunlugunden okundu: 0 / 1163 / 17 / 1180. Agac denkligi dogrulandi: 361b96e ile 90bc3de arasinda src ve tests bos, --no-build yok. Sapma yakalayici mutasyonla sinandi: kapi satirina aciklama eklenince GATE_LINE kayiyor ve self-test guvenli yonde exit 1 veriyor. --self-test kendi kosuldu, exit 0. Kanit etiketleri git ls-remote ile dogrulandi, ikisi de annotated. Sekiz borc kaydedildi; birlestirme sarti T115 ucuyla birlikte olmasiydi ve oyle yapildi. Muhur oncesi verify adimi iki kez duzeltildi: node cocuk sureci PATH'te bash bulamiyordu, tam yol da tirnak yuzunden bozuldu; komut simdi bosluksuz kisa yol C:/PROGRA~1/Git/bin/bash.exe. Kendi-sinama T0 tarafindan elle de kosuldu, exit 0, ve pwsh eksikligi uyarisini basiyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:52:35.171Z"
+}

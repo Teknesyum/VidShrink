@@ -1378,5 +1378,29 @@
     "effort": "high",
     "t": "2026-08-27 22:41:32",
     "ajan": "ana oturum"
+  },
+  "docs/olcumler/kalibre-pencere.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-09-02 16:42:23",
+    "ajan": "ana oturum"
+  },
+  "tests/VidShrink.Tests/T141Kesif.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-09-02 20:27:46",
+    "ajan": "ana oturum"
+  },
+  "tests/VidShrink.Tests/T141Dokum.cs": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-09-02 20:36:31",
+    "ajan": "ana oturum"
+  },
+  "docs/olcumler/yedek-yolda-kalite.md": {
+    "model": "claude-opus-5",
+    "effort": "high",
+    "t": "2026-09-02 20:55:26",
+    "ajan": "ana oturum"
   }
 }

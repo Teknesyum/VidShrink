@@ -299,7 +299,7 @@ public sealed class UpdaterTests : IDisposable
     public async Task AnUnreachableSourceIsGivenUpWithinTheManifestTimeout()
     {
         const string unreachable = "http://10.255.255.1/vidshrink/manifest-win-x64.json";
-        var ceiling = UpdateCheck.ManifestTimeout + TimeSpan.FromMilliseconds(500);
+        var ceiling = UpdateCheck.ManifestTimeout + TimeSpan.FromMilliseconds(250);
 
         await UpdateCheck.FetchManifestAsync(unreachable, CancellationToken.None);
 
@@ -865,6 +865,18 @@ public sealed class UpdaterTests : IDisposable
     }
 
     /// <summary>
+    /// Geçiş sürecine verilen duvar saati tavanı. Süreç tek bir yeniden adlandırma yapıp
+    /// çıkıyor; ölçülen değer tek parçalı kendi kendine açılan ikilinin açılış payıdır.
+    ///
+    /// Eski tavan 60 sn idi ve neye dayandığı yazılı değildi. Ölçüldü: yayımlanmış
+    /// başlatıcıyla, on dört ajanın koştuğu meşgul bir makinede beş koşum
+    /// 101/81/84/117/82 ms verdi. Tavan en yüksek okumanın kırk katına indirildi; tek
+    /// parçalı ikilinin ilk açılışta ödediği açma payı da bu aralığın içinde kalır.
+    /// Ölçüm <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// </summary>
+    private const int GecisTavaniMs = 5_000;
+
+    /// <summary>
     /// Geçişin üretimdeki hâli, gerçek bir süreçle. Yerine geçecek ikili kendi süreci içinde
     /// açılır ve kendi adını hedefin üstüne alır; ölçü kurulu bir başlatıcı gösterildiğinde
     /// koşar. Yukarıdaki ölçüler adın hiç boşalmadığını süreç içinde gösteriyor, bu ölçü de
@@ -887,8 +899,13 @@ public sealed class UpdaterTests : IDisposable
         var start = new ProcessStartInfo { FileName = incoming, WorkingDirectory = root, UseShellExecute = false };
         start.ArgumentList.Add(LauncherUpdate.CommitArgument);
         using var process = Process.Start(start)!;
-        Assert.True(process.WaitForExit(60_000), "geçiş süreci çıkmadı");
+        var stopwatch = Stopwatch.StartNew();
+        var exited = process.WaitForExit(GecisTavaniMs);
+        stopwatch.Stop();
+        Assert.True(exited, $"geçiş süreci {GecisTavaniMs} ms içinde çıkmadı");
 
+        _output.WriteLine(
+            $"geçiş süresi: {stopwatch.Elapsed.TotalMilliseconds:F0} ms, tavan {GecisTavaniMs} ms");
         _output.WriteLine($"çıkış kodu: {process.ExitCode}, kökte: {RootListing(root)}");
         Assert.Equal(0, process.ExitCode);
         Assert.True(LauncherUpdate.Matches(target, file), "hedef, inen ikilinin özetine oturmadı");
@@ -896,6 +913,28 @@ public sealed class UpdaterTests : IDisposable
         Assert.Equal("0.2.2", LauncherUpdate.ReadVersionMarker(root));
         Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
     }
+
+    /// <summary>
+    /// Ağsız açılışa verilen tavan. Sayı serbest bir tahmin değil, başlatıcının kendi
+    /// bütçelerinin toplamı; T145'te ölçüldü ve <b>daraltılamaz</b> çıktı:
+    ///
+    /// <list type="bullet">
+    /// <item>süreç açılışı 81–117 ms — yayımlanmış başlatıcının geçiş kipinde beş koşum;</item>
+    /// <item>manifest bekleyişi 806–832 ms — yönlendirilemeyen adrese sekiz çağrı,
+    /// <see cref="UpdateCheck.ManifestTimeout"/> (800 ms) ile pimli;</item>
+    /// <item>bekleme panelinin kapanış payı 2 000 ms — panel eşiği 400 ms, ağsız bacak
+    /// hep 800 ms'i geçtiği için panel her ağsız açılışta çiziliyor ve kapanışta iş
+    /// parçacığı bu tavanla bekleniyor.</item>
+    /// </list>
+    ///
+    /// Toplam 2 887–2 949 ms; 3 sn'lik tavanın altında yalnız 51–113 ms pay var. Tavanı
+    /// küçültmek ölçüyü ürünün kendi izin verdiği en kötü hâlde kırmızıya düşürür.
+    ///
+    /// Uçtan uca ölçüm bu makinede yapılamaz: panel eşiği (400 ms) manifest bütçesinden
+    /// (800 ms) küçük olduğu için ağsız bacak kullanıcının masaüstüne pencere çizer.
+    /// Ayrıntı <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// </summary>
+    private static readonly TimeSpan AgsizAcilisTavani = TimeSpan.FromSeconds(3);
 
     [LiveLauncherFact]
     public void EveryLaunchChecksAndStaysWithinTheTimeout()
@@ -912,8 +951,8 @@ public sealed class UpdaterTests : IDisposable
         _output.WriteLine($"ağsız ilk açılış: {offlineFirst.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
-        Assert.True(offlineFirst < TimeSpan.FromSeconds(3), $"ağsız açılış çok uzun: {offlineFirst}");
-        Assert.True(offlineSecond < TimeSpan.FromSeconds(3), $"ağsız ikinci açılış çok uzun: {offlineSecond}");
+        Assert.True(offlineFirst < AgsizAcilisTavani, $"ağsız açılış çok uzun: {offlineFirst}");
+        Assert.True(offlineSecond < AgsizAcilisTavani, $"ağsız ikinci açılış çok uzun: {offlineSecond}");
     }
 
     [LiveLauncherFact]
@@ -1112,6 +1151,17 @@ exit $code
         return (installRoot, locked, WriteRemovalProbe(work), Path.Combine(work, "gunluk.txt"));
     }
 
+    /// <summary>
+    /// Kilidi bırakan iş parçacığına verilen tavan. İş parçacığı sonda süreci çıktığı anda
+    /// döngüden çıkıyor; beklenen süre bir <c>Thread.Sleep(5)</c> turudur.
+    ///
+    /// Eski tavan 10 sn idi. Ölçüldü: meşgul bir makinede beş koşumun beşinde de
+    /// <c>Join</c> 0 ms sürdü — iş parçacığı çağrıdan önce bitmişti. Tavan 1 sn'ye
+    /// indirildi; iki yüz yoklama turuna denk gelir. Ölçüm
+    /// <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// </summary>
+    private static readonly TimeSpan KilidiBirakanIsParcacigiTavani = TimeSpan.FromSeconds(1);
+
     [Fact]
     public void TheDeletionStepWaitsOutATransientLock()
     {
@@ -1138,8 +1188,14 @@ exit $code
         var stopwatch = Stopwatch.StartNew();
         var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
         stopwatch.Stop();
-        Assert.True(release.Join(TimeSpan.FromSeconds(10)), "kilidi bırakan iş parçacığı bitmedi");
+        var joinSuresi = Stopwatch.StartNew();
+        var bitti = release.Join(KilidiBirakanIsParcacigiTavani);
+        joinSuresi.Stop();
+        Assert.True(bitti,
+            $"kilidi bırakan iş parçacığı {KilidiBirakanIsParcacigiTavani.TotalMilliseconds:F0} ms içinde bitmedi");
 
+        _output.WriteLine($"kilidi bırakan iş parçacığı: {joinSuresi.Elapsed.TotalMilliseconds:F0} ms, " +
+                          $"tavan {KilidiBirakanIsParcacigiTavani.TotalMilliseconds:F0} ms");
         _output.WriteLine($"geçici kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
         _output.WriteLine(log.Trim());
 
@@ -1170,7 +1226,7 @@ exit $code
         Assert.Contains("başka bir süreçte açık", log, StringComparison.Ordinal);
         Assert.Contains(installRoot, log, StringComparison.Ordinal);
         Assert.True(File.Exists(locked), "kilitli dosya silinmiş görünüyor");
-        Assert.True(stopwatch.Elapsed > TimeSpan.FromSeconds(1), $"hiç beklenmedi: {stopwatch.Elapsed}");
+        Assert.True(stopwatch.Elapsed > TimeSpan.FromSeconds(5), $"geri çekilme adımları koşmadı: {stopwatch.Elapsed}");
     }
 
     /// <summary>
@@ -1314,4 +1370,5 @@ exit $code
             return bytes;
         }
     }
+
 }

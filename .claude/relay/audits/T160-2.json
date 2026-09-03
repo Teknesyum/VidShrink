@@ -1,0 +1,18 @@
+{
+  "contractId": "T160",
+  "auditorRunId": "ad81313471c9a1500",
+  "headSha": "0a5816e093ca09cb4aee2751a67680da5e2251fb",
+  "diffHash": "2454c5fd4cd1212f673aacfc02a4cff4b5baa7249c6d63fcfb9a7f31a9ce36bc",
+  "owns": [
+    "docs/olcumler/uc-kucuk-borc.md",
+    "src/VidShrink.Core/CodecModel.cs",
+    "tests/VidShrink.Tests/UretimYoluTests.cs",
+    "tests/VidShrink.Tests/IddiaPimiTests.cs",
+    "docs/olcumler/iddia-pimi.md"
+  ],
+  "verification": [
+    "Owns temiz, K3 kirmizi/yesil bizzat kuruldu, K4 iki mutasyon oldurdu, K5 18/18, CI 33764744027 success. KRITIK yok."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T14:38:10.947Z"
+}

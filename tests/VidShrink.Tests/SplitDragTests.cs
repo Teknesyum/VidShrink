@@ -31,12 +31,32 @@ public sealed class SplitDragTests
     /// koşma bayrağı doğrudan açılıyor. Tur elle çevriliyor: gerçek uygulamada onu
     /// <c>RequestAnimationFrame</c> çeviriyor.
     /// </summary>
-    private static ComparisonSurface Ready()
+    private static ComparisonSurface Ready() => Ready(new ComparisonSurface());
+
+    private static ComparisonSurface Ready(SahteSaat saat) => Ready(new ComparisonSurface(saat.Now));
+
+    private static ComparisonSurface Ready(ComparisonSurface surface)
     {
-        var surface = new ComparisonSurface();
         surface.Configure(Combined);
         RunningField.SetValue(surface, true);
         return surface;
+    }
+
+    /// <summary>
+    /// T127: yüzeyin boşta çizim açma kararı iki süre eşiğine bakıyor. Ölçü kendi
+    /// <see cref="Stopwatch"/>unu açtığında iki saat bağımsızdı ve aralarına giren her
+    /// duraklama kararı değiştiriyordu — ölçü CI'da üç kez düştü. Süre artık burada
+    /// ilerliyor; ölçünün gördüğü tek zaman bu.
+    /// </summary>
+    private sealed class SahteSaat
+    {
+        private readonly long _origin = Stopwatch.GetTimestamp();
+
+        public TimeSpan Elapsed { get; private set; }
+
+        public long Now() => _origin + (long)(Elapsed.TotalSeconds * Stopwatch.Frequency);
+
+        public void Advance(TimeSpan span) => Elapsed += span;
     }
 
     private static void Round(ComparisonSurface surface) => RoundMethod.Invoke(surface, new object?[] { TimeSpan.Zero });
@@ -65,10 +85,14 @@ public sealed class SplitDragTests
                 Round(surface);
             }
 
-            return surface.Repaints - before;
+            return (surface.Repaints - before, surface.IdleRounds);
         });
 
-        Assert.Equal(20, repaints);
+        Assert.Equal(20, repaints.Item1);
+
+        // Süreye bakan tek dal boş turun içinde; her turda kare beslendiği için o dala
+        // hiç girilmedi. Ölçünün duvar saatinden bağımsızlığı bu sayıyla kanıtlanıyor.
+        Assert.Equal(0, repaints.Item2);
     }
 
     /// <summary>
@@ -78,25 +102,29 @@ public sealed class SplitDragTests
     [Fact]
     public void Kare_arasindaki_bos_turda_ayirici_cizim_acmaz()
     {
-        var repaints = AppHost.Run(() =>
+        var saat = new SahteSaat();
+
+        var (repaints, moves) = AppHost.Run(() =>
         {
-            var surface = Ready();
+            var surface = Ready(saat);
             Feed(surface);
             Round(surface);
 
             var before = surface.Repaints;
-            var clock = Stopwatch.StartNew();
-            var moves = 0;
-            while (clock.Elapsed < TimeSpan.FromMilliseconds(50))
+            var count = 0;
+
+            // Akış duraksadı sayılmasına 1 ms kala dur: 0,2 ms'lik adımlarla 99 ms.
+            while (saat.Elapsed < TimeSpan.FromMilliseconds(99))
             {
-                surface.Split = 0.2 + 0.6 * (++moves % 400) / 400.0;
+                saat.Advance(TimeSpan.FromMilliseconds(0.2));
+                surface.Split = 0.2 + 0.6 * (++count % 400) / 400.0;
                 Round(surface);
             }
 
-            Assert.True(moves > 100, $"Ölçüm yeterince hareket üretmedi: {moves}");
-            return surface.Repaints - before;
+            return (surface.Repaints - before, count);
         });
 
+        Assert.Equal(495, moves);
         Assert.Equal(0, repaints);
     }
 
@@ -108,35 +136,36 @@ public sealed class SplitDragTests
     [Fact]
     public void Kare_gelmezken_ayirici_cizimi_ekran_araliginda_bir_kez_acar()
     {
-        var (repaints, seconds, moves) = AppHost.Run(() =>
-        {
-            var surface = Ready();
+        var saat = new SahteSaat();
 
-            // Akışın durduğuna karar verilecek kadar bekle, sonra ölçmeye başla.
-            var idle = Stopwatch.StartNew();
-            while (idle.Elapsed < TimeSpan.FromMilliseconds(150)) Round(surface);
+        var (repaints, moves) = AppHost.Run(() =>
+        {
+            var surface = Ready(saat);
+
+            // Akışın durduğuna karar verilecek kadar ilerlet, sonra ölçmeye başla.
+            saat.Advance(TimeSpan.FromMilliseconds(150));
+            Round(surface);
 
             var before = surface.Repaints;
-            var clock = Stopwatch.StartNew();
             var count = 0;
-            while (clock.Elapsed < TimeSpan.FromMilliseconds(250))
+            var son = saat.Elapsed + TimeSpan.FromMilliseconds(250);
+
+            while (saat.Elapsed < son)
             {
+                saat.Advance(TimeSpan.FromMilliseconds(0.5));
                 surface.Split = 0.2 + 0.6 * (++count % 400) / 400.0;
                 Round(surface);
             }
 
-            return (surface.Repaints - before, clock.Elapsed.TotalSeconds, count);
+            return (surface.Repaints - before, count);
         });
 
-        Assert.True(moves > 500, $"Ölçüm yeterince hareket üretmedi: {moves}");
-        Assert.True(repaints >= 1, "Kare gelmiyorken ayırıcı hiç çizim açmadı; sınır takılı kalır.");
+        Assert.Equal(500, moves);
 
-        // Ekran aralığı 60 Hz; kenar turu için bir tolerans.
-        var ceiling = (int)Math.Ceiling(seconds * 60) + 2;
-        Assert.True(repaints <= ceiling, $"Ayırıcı {moves} harekette {repaints} çizim açtı, tavan {ceiling}.");
+        // 250 ms'de 60 Hz tavanı: adım 0,5 ms olduğu için çizimler 16,5-17 ms'de bir
+        // düşüyor. Sayı artık bant değil, tek bir tam sayı.
+        Assert.Equal(15, repaints);
     }
-
-    // ---- K4: ayırıcının kendisi bozulmuyor ------------------------------------------
 
     [Fact]
     public void Ayirici_yazilan_konuma_gider_ve_uclarda_kirpilir()

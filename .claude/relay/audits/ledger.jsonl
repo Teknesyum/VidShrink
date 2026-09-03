@@ -137,3 +137,80 @@
 {"id":"T123","result":"stale","at":"2026-09-02T05:48:41.051Z"}
 {"id":"T116","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|MeasuredQualityTests","code":0}],"auditorRunId":"aed396e0910fc44af","headSha":"c856ee406e4d4d68e4c28825906bc4ee2f1bc705","at":"2026-09-02T06:08:51.809Z"}
 {"id":"T124","result":"stale","at":"2026-09-02T06:15:12.753Z"}
+{"id":"T124","round":"1","risk":"low","verify":[{"step":"powershell -NoProfile -Command \"python tools/alinti-denetimi/alinti-denetimi.py --self-test","code":0}],"auditorRunId":null,"headSha":"f009e03619dccfbe32e2729e3f43d360a3d841f7","at":"2026-09-02T06:53:39.527Z"}
+{"id":"T119","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T123","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T125","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T126","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T127","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T128","result":"stale","at":"2026-09-02T06:54:52.482Z"}
+{"id":"T94","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"HdrArgumentsTests|EncoderCapabilitiesTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:04:57.811Z"}
+{"id":"T120","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"AbTests","code":0}],"auditorRunId":null,"headSha":"2d6dd407e28a8c88c954732ac10e2add5f1b68cb","at":"2026-09-02T07:05:12.820Z"}
+{"id":"T129","result":"stale","at":"2026-09-02T07:15:19.440Z"}
+{"id":"T130","result":"stale","at":"2026-09-02T07:15:19.440Z"}
+{"id":"T117","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|FrameGrabberTests","code":0}],"auditorRunId":null,"headSha":"e673d2048206054c02b4d3ec62e837dfc1a52cb5","at":"2026-09-02T07:45:20.587Z"}
+{"id":"T119","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"VmafPoolingTests|QualityMeterTests","code":0}],"auditorRunId":null,"headSha":"e673d2048206054c02b4d3ec62e837dfc1a52cb5","at":"2026-09-02T07:46:06.645Z"}
+{"id":"T122","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"VmafPoolingTests","code":0}],"auditorRunId":"aeec64989210612ce","headSha":"e673d2048206054c02b4d3ec62e837dfc1a52cb5","at":"2026-09-02T07:47:12.197Z"}
+{"id":"T113","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"EncodeRunnerTests|PreviewSegmentTests|FfmpegArgumentsTests","code":0}],"auditorRunId":"a1137321645fa0a91","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:49:49.991Z"}
+{"id":"T115","round":"3","risk":"high","verify":[{"step":"dotnet build VidShrink.sln -c Release -warnaserror","code":0}],"auditorRunId":"a28b324e74dd6bc22","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:49:53.111Z"}
+{"id":"T103","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests|ComplexityScanTests","code":0}],"auditorRunId":"a73dd0238e5579797","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:50:34.913Z"}
+{"id":"T107","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|ExtremeCompressionTests","code":0}],"auditorRunId":"ac609e23c8ccb05cd","headSha":"9011aa716090ed5fdcf1ae60c725915e81f9a0a4","at":"2026-09-02T07:50:48.147Z"}
+{"id":"T118","round":"3","risk":"low","verify":[{"step":"C:/PROGRA~1/Git/bin/bash.exe tools/ci-gibi-kos.sh --self-test","code":0}],"auditorRunId":null,"headSha":"890af6e93f5e070b56422dad39a9e3386cf56045","at":"2026-09-02T07:52:35.599Z"}
+{"id":"T114","result":"stale","at":"2026-09-02T07:55:43.497Z"}
+{"id":"T121","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests","code":0}],"auditorRunId":"ae0d74ee80c50fb7a","headSha":"890af6e93f5e070b56422dad39a9e3386cf56045","at":"2026-09-02T07:57:05.724Z"}
+{"id":"T127","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"SplitDragTests","code":0}],"auditorRunId":null,"headSha":"890af6e93f5e070b56422dad39a9e3386cf56045","at":"2026-09-02T07:57:34.837Z"}
+{"id":"T126","round":"4","risk":"low","verify":[{"step":"C:/Users/Administrator/AppData/Local/Python/pythoncore-3.14-64/python.exe tools/alinti-denetimi/alinti-denetimi.py docs/inceleme/argumanlar.md docs/inceleme/handbrake-motoru.md docs/inceleme/model-strateji.md docs/inceleme/plancalculator.md docs/inceleme/uygulama-katmani.md docs/olcumler/surecler-arasi-olcu-yalitimi.md docs/olcumler/alinti-kaymalari.md","code":0}],"auditorRunId":null,"headSha":"73d4f9dadee2e1bf2ea86352725daa4c8b2af867","at":"2026-09-02T08:30:18.403Z"}
+{"id":"T133","result":"stale","at":"2026-09-02T08:36:30.868Z"}
+{"id":"T134","result":"stale","at":"2026-09-02T08:36:30.868Z"}
+{"id":"T135","result":"stale","at":"2026-09-02T08:36:30.868Z"}
+{"id":"T108","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":"ab15530a9e22a8a11","headSha":"2b6746a0c985aeb763c53b36d52ff3981547a186","at":"2026-09-02T08:55:07.953Z"}
+{"id":"T131","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests","code":0}],"auditorRunId":null,"headSha":"df3f8965a86144bb7b33ca8647a55357862bf66c","at":"2026-09-02T09:00:29.054Z"}
+{"id":"T129","round":"1","risk":"low","verify":[{"step":"dotnet test tests/VidShrink.Tests -c Release --filter \"EncoderCapabilitiesTests|EncoderAvailabilityTests|HdrArgumentsTests","code":0}],"auditorRunId":null,"headSha":"540915c6b69aec2c77e84daaab21a9b35f3e0c68","at":"2026-09-02T09:47:29.841Z"}
+{"id":"T123","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderAvailabilityTests|PerformanceCheckTests","code":0}],"auditorRunId":null,"headSha":"540915c6b69aec2c77e84daaab21a9b35f3e0c68","at":"2026-09-02T09:49:24.537Z"}
+{"id":"T130","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|PlanCalculatorProbeTests|HdrResolverTests|EncoderCapabilitiesTests","code":0}],"auditorRunId":null,"headSha":"f542dc22efeaa6ace0522e8d41eeed6f56526f87","at":"2026-09-02T10:04:27.079Z"}
+{"id":"T135","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"b360baf91bdcce4563157d7c28e0c1bd63d4c1b2","at":"2026-09-02T10:08:04.283Z"}
+{"id":"T134","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests","code":0}],"auditorRunId":"a5d4d26a060ba136a","headSha":"d0c95b936ef564df3245744661f80689d8bfc04e","at":"2026-09-02T10:34:37.419Z"}
+{"id":"T128","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|EncoderAvailabilityTests","code":0}],"auditorRunId":null,"headSha":"cf65efc9e07bda38d9d00e9450d85a211ed4f415","at":"2026-09-02T12:04:49.063Z"}
+{"id":"T114","round":"1","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests","code":0}],"auditorRunId":"acbb87089e8f3c111","headSha":"91ec6d4b42baf68e5fba30e74cdeaae6315fdaec","at":"2026-09-02T12:53:29.643Z"}
+{"id":"T132","result":"stale","at":"2026-09-02T13:11:56.173Z"}
+{"id":"T136","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|LanguageTests","code":0}],"auditorRunId":null,"headSha":"b3377a2aa789752a52bc3e98649607c88f2d28b3","at":"2026-09-02T13:20:22.546Z"}
+{"id":"T138","round":"1","risk":"low","verify":[{"step":"dotnet build -c Release tools/sahne-butcesi/SahneButcesi.csproj","code":0}],"auditorRunId":null,"headSha":"3bb5706351100a42fef14f78873e47608e832e2d","at":"2026-09-02T13:40:30.557Z"}
+{"id":"T137","result":"stale","at":"2026-09-02T14:46:35.084Z"}
+{"id":"T139","result":"stale","at":"2026-09-02T15:03:38.688Z"}
+{"id":"T137","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderAvailabilityTests|PlanCalculatorTests|PlanCalculatorProbeTests","code":0}],"auditorRunId":null,"headSha":"27ae5f2810ab7780d40daedfd8d040de4dc5d232","at":"2026-09-02T15:56:16.852Z"}
+{"id":"T132","round":"3","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|UpdaterTests|ComplexityProbeTests","code":0}],"auditorRunId":null,"headSha":"8075ed0618bbc2c7fe3e0afa3fbef5f1e8c74f3c","at":"2026-09-02T17:27:25.604Z"}
+{"id":"T142","result":"stale","at":"2026-09-02T17:33:37.262Z"}
+{"id":"T143","result":"stale","at":"2026-09-02T17:39:14.433Z"}
+{"id":"T144","result":"stale","at":"2026-09-02T17:39:14.433Z"}
+{"id":"T140","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"FfmpegArgumentsTests|TurboFirstPassTests|ConversionArgumentsTests","code":0}],"auditorRunId":null,"headSha":"fb20ebdd2a62465ce5faaf6e8cf8f481fc277b10","at":"2026-09-02T17:46:47.289Z"}
+{"id":"T142","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"CalibrationProbeTests|KalibrePencereTests","code":0}],"auditorRunId":null,"headSha":"c88b69ff7dffa4163e250754c34621f8acd47369","at":"2026-09-02T17:49:23.011Z"}
+{"id":"T145","result":"stale","at":"2026-09-02T17:59:04.079Z"}
+{"id":"T143","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|VmafPoolingTests","code":0}],"auditorRunId":null,"headSha":"65a7f1938517fae1c61e9992e527118b6bb0897d","at":"2026-09-02T18:23:49.764Z"}
+{"id":"T147","result":"stale","at":"2026-09-02T18:26:48.309Z"}
+{"id":"T144","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncodeRunnerTests|FfmpegRunnerTests|SegmentEncoderTests","code":0}],"auditorRunId":null,"headSha":"317ed9f4fffefe1e3f81d7e46dd357cb2cafb7b1","at":"2026-09-02T18:53:55.309Z"}
+{"id":"T141","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T145","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T147","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T148","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T139","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|EncoderStateConsumptionTests|HdrResolverTests|PerformanceCheckTests|EncoderAvailabilityTests","code":0}],"auditorRunId":"ab121208d67ab1368","headSha":"c26879b312bf6e21fdc06c040c2020914386375e","at":"2026-09-02T22:28:52.512Z"}
+{"id":"T150","result":"stale","at":"2026-09-02T22:51:55.468Z"}
+{"id":"T149","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"CodecModelTests|PlanParserTests","code":0}],"auditorRunId":null,"headSha":"af974072e7c9627994965d18c65628767ebbd5ae","at":"2026-09-02T23:06:01.843Z"}
+{"id":"T150","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"OluUyeTests","code":0}],"auditorRunId":null,"headSha":"460ba733f10028cef7c0d0bfc16a3c23191f5033","at":"2026-09-03T08:09:10.383Z"}
+{"id":"T141","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests|ComplexityScanTests|PlanCalculatorProbeTests","code":0}],"auditorRunId":null,"headSha":"bb28b239b23b9c0e97ad742f001cd6c1c690cabd","at":"2026-09-03T08:12:26.252Z"}
+{"id":"T151","result":"stale","at":"2026-09-03T08:14:23.998Z"}
+{"id":"T145","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|UpdaterTests","code":0}],"auditorRunId":null,"headSha":"bbedef1c15eefb0c2f7ecaa29e46a9a09a711102","at":"2026-09-03T09:08:28.704Z"}
+{"id":"T151","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|EncoderStateConsumptionTests","code":0}],"auditorRunId":null,"headSha":"871d5dc5622ef61bdba3203fe034e3c67e41111e","at":"2026-09-03T09:10:18.587Z"}
+{"id":"T146","result":"stale","at":"2026-09-03T09:17:27.282Z"}
+{"id":"T147","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderCapabilitiesTests|SegmentEncoderTests|SessizDusurmeTests","code":0}],"auditorRunId":null,"headSha":"2fcc2e22853b372f74c59f8d0f98d8540b429b09","at":"2026-09-03T10:10:58.157Z"}
+{"id":"T146","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"ce647e66d32a7ac48d4a210062a0a067fdf82559","at":"2026-09-03T10:25:43.181Z"}
+{"id":"T152","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T153","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T154","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T153","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"TurboTavanTests|FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"956ea147117203dc1523d9cafa9619b289772e3f","at":"2026-09-03T11:16:03.463Z"}
+{"id":"T152","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"dde523ce24490802321fb00d318e5a8f1955b2f9","at":"2026-09-03T11:27:34.581Z"}
+{"id":"T154","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|QualityMeterTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/harita-kablosu-pim.md\"","code":0}],"auditorRunId":null,"headSha":"dde523ce24490802321fb00d318e5a8f1955b2f9","at":"2026-09-03T11:28:29.205Z"}
+{"id":"T156","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|UretimYoluTests|OluUyeTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/uc-kucuk-borc.md\"","code":0}],"auditorRunId":null,"headSha":"d0afd3bbde4b27ae301fbd60bdda4a2a28837a15","at":"2026-09-03T12:32:01.315Z"}
+{"id":"T155","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"TurboTavanTests|TurboFirstPassTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/x264-turbo-acilis.md\"","code":0}],"auditorRunId":null,"headSha":"4004296c92bbcbc3d3a319f6e2978998a630b5fe","at":"2026-09-03T12:40:34.162Z"}
+{"id":"T157","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|LocalizationTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/uc-cumle-arayuze.md\"","code":0}],"auditorRunId":null,"headSha":"2a14e29e7a37e3d24433089329fd431d236b1554","at":"2026-09-03T14:03:10.471Z"}
+{"id":"T160","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"IddiaPimiTests|UretimYoluTests|TurboTavanTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/uc-kucuk-borc.md\" \"docs/olcumler/iddia-pimi.md\"","code":0}],"auditorRunId":null,"headSha":"0a5816e093ca09cb4aee2751a67680da5e2251fb","at":"2026-09-03T14:38:30.072Z"}
+{"id":"T159","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"KestirimPlanTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/kestirim-plan-bagi.md\"","code":0}],"auditorRunId":null,"headSha":"f0de838027eae0aa84c5c117e75b760583a641aa","at":"2026-09-03T15:34:59.344Z"}

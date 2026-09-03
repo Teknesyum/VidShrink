@@ -1,0 +1,15 @@
+{
+  "contractId": "T151",
+  "auditorRunId": "ae92fd320c18e4324",
+  "headSha": "871d5dc5622ef61bdba3203fe034e3c67e41111e",
+  "diffHash": "aa429ce6945a69c9e1f8effda41d856e82e25daf6a362002aa8036bc6ded87ae",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs"
+  ],
+  "verification": [
+    "Bagimsiz klonda 1f439d5: K1'in merkezi iddiasi kaynaktan izlendi (IEncoderAvailability.cs:27-29 -> MainWindow.axaml.cs:1330 -> :1414-1418 Measure arka planda baslar), eski davranista yoklamaya gitmeyen alti aday isimleriyle listelendi, K2'nin iki kolu kendi kosturuldu --no-incremental ile (kirmizi 3/35/38, yesil 38/38), K3'un uc mutasyonundan ikisi kendi uygulanip kosturuldu ucer olcu kirdi, K4 kollari --list-tests ile 7+31=38 sayildi, T150'nin pimi kendi kosturuldu 11/11 yesil sifir tuketici 26 degismedi, owns temiz MainWindow ve EncodePlan dokunulmamis FastHardwareOrder diffte yok, CI 33733955371 success headSha denetlenen commit. KRITIK yok, GECTI, dort borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T09:09:28.834Z"
+}

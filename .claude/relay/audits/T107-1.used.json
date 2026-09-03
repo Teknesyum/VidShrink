@@ -1,0 +1,26 @@
+{
+  "contractId": "T107",
+  "auditorRunId": "ac609e23c8ccb05cd",
+  "headSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4",
+  "diffHash": "53e79948c81b025b6bf9074a96418fd8c0cdbf35df76f558f8e9eadf82943e39",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/CompressionStrategy.cs",
+    "src/VidShrink.Core/CodecModel.cs",
+    "tests/VidShrink.Tests/PlanCalculatorTests.cs",
+    "tests/VidShrink.Tests/ExtremeCompressionTests.cs",
+    "tests/VidShrink.Tests/FillBandTests.cs",
+    "tests/VidShrink.Tests/QualityTargetUiTests.cs",
+    "tests/VidShrink.Tests/SpeedModeTests.cs",
+    "tests/VidShrink.Tests/QualityTargetTests.cs",
+    "docs/olcumler/yerlesim-skoru.md",
+    "docs/olcumler/bppf-tabani.md"
+  ],
+  "verification": [
+    "Tur 2 denetimi depo disinda yapildi. Kol ayrimi gercekten tek satir: PlanCalculator.cs:655 onSourceGrid = !CodecModel.IsHardware(codec), yeni bayrak ve yeni sabit yok, CodecModel.cs tur 2'de hic degismedi. Denetci iki yonlu mutasyonu kendi kosturdu, her koseumdan once --no-incremental derledi: onSourceGrid=true -> 2 basarisiz, onSourceGrid=false -> 8 basarisiz, ad listesi teslimle birebir. En kritik nokta temiz: bolum 9'un yeni skor sutunu teslim edilen kodla uretilemez ve belge bunu iki yerde yaziyor; denetci olcume gitmeden dogruladi, onSourceGrid yanlisken iki uclu islec birim donusume cokuyor ve donanim kolu T107 oncesi modelle bit-birebir ayni. Dort kirmizinin kapanisinda dordunde de beklenen sayi elle yazilmamis; QualityTarget'ta 20.0 alt siniri turetilmis hale gelmis. CI 33601165873 headSha 0d13a48 success, Failed 0 / Passed 1080 / Skipped 105. owns ihlali yok. Sekiz borc kaydedildi; birincisi bu deponun kronik kusurunun bu turdaki ornegi: SpeedModeTests docstring'i Ses ve video bit hizi da degismedi diyor, oysa iki satir yukaridaki madde 18 satirin ucunde video bit hizinin 11958k'dan 12217k'ya ciktigini yaziyor. Dizi dogru, maddeler dogru, ozetleyen cumle yanlis."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:50:35.668Z",
+  "usedAt": "2026-09-02T07:50:48.144Z",
+  "completedSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4"
+}

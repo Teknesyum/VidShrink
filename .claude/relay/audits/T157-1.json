@@ -1,0 +1,20 @@
+{
+  "contractId": "T157",
+  "auditorRunId": "a7220e3db11da087f",
+  "headSha": "2a14e29e7a37e3d24433089329fd431d236b1554",
+  "diffHash": "78854887aae94246b4b0b75373b3acbcd3c0a6097ee477901ef63bf102356ed4",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/EncodePlan.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/Locales/en/main.json",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs",
+    "docs/olcumler/uc-cumle-arayuze.md"
+  ],
+  "verification": [
+    "K1-K6 bagimsiz olculdu, GECTI, borc yok, CI 33758709273 success"
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T14:01:26.800Z"
+}

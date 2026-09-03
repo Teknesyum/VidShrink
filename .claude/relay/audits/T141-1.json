@@ -1,0 +1,16 @@
+{
+  "contractId": "T141",
+  "auditorRunId": "a015e9f116fddd2f6",
+  "headSha": "bb28b239b23b9c0e97ad742f001cd6c1c690cabd",
+  "diffHash": "3fe1d94a76202da2a37c6ceb74e8f38a2483760aa6dce340e5efb22600bfd6e7",
+  "owns": [
+    "src/VidShrink.Ffmpeg/ComplexityProbe.cs",
+    "tests/VidShrink.Tests/ComplexityProbeTests.cs",
+    "docs/olcumler/yedek-yolda-kalite.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 0ec4633: K1'in iki kolu mutasyonla canli dogrulandi (:737 ve :746-748 bozulunca olculer kirmizi), kusur commit'i 1c87aaf kendi derlenip kosturuldu (Basarisiz 3 Basarili 32 Toplam 35), K5'in alti tuketen yeri kendi sayildi, K6'nin iki mutasyonu kendi uygulandi --no-incremental ile (M1 iki olcuyu M2 bir olcuyu kirdi capraz bulasma yok), K7'nin uc kolu tek tek sayildi 35/42/25 toplam 102 yesil atlanan 0, owns temiz yasakli iki dosya dokunulmamis, satir atiflari taze. KRITIK yok, GECTI, yedi borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T08:10:38.612Z"
+}

@@ -2,14 +2,13 @@
 
 namespace VidShrink.Core;
 
-public enum EncoderVendor { Software, Nvenc, Qsv, Amf }
+public enum EncoderVendor { Software, Nvenc, Qsv, Amf, VideoToolbox }
 
 public static class CodecModel
 {
     public const double PriorQualityAtReference = 93.0;
     public const double PriorQualityPerHalving = 6.0;
     public const double DetailConcentrationExponent = 0.25;
-    public const double FpsBitrateExponent = 0.75;
     public const double ScalePenaltyScale = 10.0;
     public const double ScalePenaltyExponent = 1.1;
     public const double FpsPenaltyPerHalving = 5.0;
@@ -68,7 +67,9 @@ public static class CodecModel
 
     /// <summary>
     /// The lowest video bitrate the encoder will actually deliver at this layout, in kbit/s.
-    /// Zero for software encoders: libx264 and its siblings follow -b:v all the way down.
+    /// Zero for every encoder off the hardware path: libx264 and its siblings follow -b:v all the
+    /// way down, and VideoToolbox reads zero too because <see cref="IsHardware"/> keeps it out,
+    /// not because its floor was measured.
     /// Only av1_nvenc was measured; QSV and AMF carry the same line, which is not measured.
     /// </summary>
     public static int MinBitrateK(string codec, int width, int height, double fps)
@@ -129,22 +130,110 @@ public static class CodecModel
         if (c.Contains("nvenc")) return EncoderVendor.Nvenc;
         if (c.Contains("qsv")) return EncoderVendor.Qsv;
         if (c.Contains("amf")) return EncoderVendor.Amf;
+        if (c.Contains("videotoolbox")) return EncoderVendor.VideoToolbox;
         return EncoderVendor.Software;
     }
 
-    public static bool IsHardware(string codec) => Vendor(codec) != EncoderVendor.Software;
+    /// <summary>
+    /// Whether the encoder is sent down the hardware path. Everything behind this gate - the
+    /// floor factor, the delivered-bitrate yield, the delivery reserve, the peak ceiling and the
+    /// lower quality ceiling - was measured on NVENC, so the gate names the vendors those numbers
+    /// are carried to instead of asking whether the vendor is a chip.
+    /// VideoToolbox is a chip and is still false here: nothing behind this gate has been measured
+    /// on it. docs/olcumler/videotoolbox.md gives one bitrate per arm on one Apple M1, which is not
+    /// enough for any of them. Opening this gate for VideoToolbox is a measurement, not an edit.
+    /// </summary>
+    public static bool IsHardware(string codec) => Vendor(codec) switch
+    {
+        EncoderVendor.Nvenc or EncoderVendor.Qsv or EncoderVendor.Amf => true,
+        _ => false
+    };
+
+    private readonly record struct TurboFirstPassEntry(string Ceiling, bool Safe);
+
+    /// <summary>
+    /// Ilk gecisin inebilecegi en hizli on ayar, kodek basina. Tavanin varligi turbonun
+    /// acilabilecegi anlamina gelmez; onu <see cref="TurboFirstPassIsSafe"/> soyler.
+    /// <para>
+    /// <c>libx264</c> tavani <c>veryfast</c>, guvenli degil: <c>veryfast</c> ilk gecis
+    /// <c>weightp=1</c>, <c>slow</c> ikinci gecis <c>weightp=2</c> kosar ve x264 ikinci gecisi
+    /// <c>different weightp setting than first pass (2 vs 1)</c> diyerek hic acmaz — kullanici
+    /// sifir bayt cikti alir. Iki kaynak parcasinda olculdu, ikisinde de ikinci gecis
+    /// <c>exit=127</c> ve cikti 0 bayt; ayni girdide <c>libx265</c> turbo 745,2K ve 677,3K
+    /// uretti. Olcum: <c>docs/olcumler/turbo-x264-mayini.md</c>.
+    /// </para>
+    /// <para>
+    /// Satir tablodan cikarilmiyor cunku olculen sey tavanin yoklugu degil, tavanin
+    /// <b>kullanilamazligi</b>: iki gecise ayni <c>weightp</c> verilirse x264 turbosu calisiyor.
+    /// O engel olculdu ve asilabilir oldugu goruldu; <c>Safe</c> yine de <c>false</c>, artik
+    /// baska bir sebeple: esitleme yapildiginda bile turbo uretim borusunda toplam sureyi
+    /// yalniz %0,58 - %4,44 kisaltiyor ve VMAF'tan 0,35 - 0,83 puan goturuyor; ayni olcumde
+    /// <c>libx265</c> turbosu %29,6 - %33,5 kazandirip VMAF'i dusurmuyor. x264'te ikinci
+    /// gecis toplamin buyuk yarisidir (2,38 - 2,80 sn); klip 35'te ilk gecisin suresini
+    /// agirlikli olarak cozme ve olcekleme belirliyor, on ayar farki yalniz 39,7 ms / toplamin
+    /// %1,0'i (<c>docs/olcumler/x264-turbo-acilis.md:127-131</c>). Bu oran yalniz olculen
+    /// parca icin gecerli; kazanc parca basina %0,58 - %4,44 arasinda degisiyor, tek yonlu
+    /// bir genelleme kurulamaz. Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+    /// </para>
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, TurboFirstPassEntry> TurboFirstPassCeilings =
+        new Dictionary<string, TurboFirstPassEntry>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["libx264"] = new("veryfast", Safe: false),
+            ["libx265"] = new("veryfast", Safe: true)
+        };
+
+    /// <summary>
+    /// Tabloda tavani olan kodekler. Hepsi turboya acilabilir demek <b>degildir</b> —
+    /// acilabilenler icin <see cref="TurboFirstPassIsSafe"/>.
+    /// </summary>
+    public static IReadOnlyCollection<string> TurboFirstPassCodecs
+        => (IReadOnlyCollection<string>)TurboFirstPassCeilings.Keys;
+
+    /// <summary>
+    /// Kodegin tabloda olculmus bir ilk gecis tavani var mi. Turbo acilacaksa ilk gecisin
+    /// nereye kadar hizlanacagini bu belirler; <b>acilip acilmayacagini</b> belirlemez.
+    /// </summary>
+    public static bool SupportsTurboFirstPass(string codec)
+        => TurboFirstPassCeilings.ContainsKey(codec);
+
+    public static string? TurboFirstPassCeiling(string codec)
+        => TurboFirstPassCeilings.TryGetValue(codec, out var entry) ? entry.Ceiling : null;
+
+    /// <summary>
+    /// Kodegin tavani uretim yolunda acilabilir mi. <see cref="SupportsTurboFirstPass"/>
+    /// tavanin varligini, bu tavanin <b>kullanilabilirligini</b> soyler; ikisi <c>libx264</c>
+    /// icin ayrisir.
+    /// </summary>
+    public static bool TurboFirstPassIsSafe(string codec)
+        => TurboFirstPassCeilings.TryGetValue(codec, out var entry) && entry.Safe;
 
     public static bool CostsQualityInHardware(string codec)
         => IsHardware(codec)
            && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
            && !codec.Equals("av1_qsv", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Kalite hedefinin kodlayici olcegindeki karsiligi. Son kol <c>-crf</c> uretir, cunku
+    /// yazilim kodlayicilarinin hepsi onu kabul eder.
+    /// <para>
+    /// VideoToolbox o kola dusemez: <c>-crf</c> kabul etmiyor, kendi olcegi <c>-q:v</c> ise bu
+    /// depoda olculmedi — <c>docs/olcumler/videotoolbox.md</c> bir Apple M1'de kol basina tek
+    /// bir bit hizi veriyor, bir olcek cikarmaya yetmiyor. Olculmemis bir olcek yazmak yerine
+    /// kol acikca patliyor: bugun <c>PlanParser.AllowedCodecs</c> videotoolbox kodeklerini
+    /// gecirmedigi icin buraya ulasan yok, ama kapiyi acan sozlesme sessiz bir gecersiz bayrak
+    /// yerine bu istisnayi gorur.
+    /// </para>
+    /// </summary>
     public static IReadOnlyList<string> QualityArgs(string codec, double quality)
     {
         var exact = quality.ToString("0.#", CultureInfo.InvariantCulture);
         var whole = Math.Round(quality).ToString("0", CultureInfo.InvariantCulture);
         return Vendor(codec) switch
         {
+            EncoderVendor.VideoToolbox => throw new NotSupportedException(
+                $"VideoToolbox hiz kontrolu olculmedi ({codec}): -crf kabul edilmiyor ve -q:v olceginin "
+                + "bu depoda dayanagi yok. Kapiyi acan sozlesme olcegi olcup bu kolu yazar."),
             EncoderVendor.Nvenc => new[] { "-rc", "vbr", "-multipass", "fullres", "-cq", exact },
             EncoderVendor.Qsv => codec.Equals("h264_qsv", StringComparison.OrdinalIgnoreCase)
                 ? new[] { "-global_quality", whole, "-look_ahead", "1" }

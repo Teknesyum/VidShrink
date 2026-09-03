@@ -20,8 +20,9 @@ public sealed class BasarimOlculeri
 /// <summary>
 /// Basarim denetcisinin olculeri. VidShrink kayit yapmaz; burada olculen sey kayit
 /// araci degil, bu makinede kodlamanin nereye dustugu ve maliyeti. Saf karar olculeri
-/// <c>[Fact]</c>, gercek kodlama kosturanlar <c>[FfmpegFact]</c>: CI makinesinde ne
-/// ffmpeg ne de donanim kodlayicisi var.
+/// <c>[Fact]</c>, gercek kodlama kosturanlar <c>[FfmpegFact]</c>, donanim kodlayicisi
+/// isteyenler <c>[HardwareEncoderFact]</c>. T115'ten sonra CI makinesinde ffmpeg **var**,
+/// donanim kodlayicisi hala yok — iki gecit bu yuzden ayri.
 /// </summary>
 [Collection(BasarimOlculeri.Ad)]
 public sealed class PerformanceCheckTests
@@ -351,24 +352,34 @@ public sealed class PerformanceCheckTests
     private const long YukOlcumButcesiMs = 60_000;
 
     /// <summary>
-    /// Iki bagimsiz bos okumanin ayni sessiz makineden geldigi sayilan bant. Disaridan
-    /// gelen yuk okumayi yalniz yukari iter; bandi asan bir fark, iki okumadan en az
-    /// birinin kirlendigini soyler.
-    /// </summary>
-    private const double TabanUyumBandi = 1.25;
-
-    /// <summary>
     /// Yuk altinda maliyetin bos okumanin altina dusmedigi sayilan alt sinir.
-    /// Olcum gurultusune pay; yon hatasi bu payin cok otesinde durur.
+    ///
+    /// Eski deger 0,8 idi ve nereden geldigi yazili degildi: iddia "yuk maliyeti yalniz
+    /// artirabilir" diyor ama olcu %20'lik bir dususu sessizce geciriyordu. T145'te
+    /// olculdu: on uc kosumda <c>yuklu / taban</c> orani 1,781 - 2,156 (medyan 1,893)
+    /// cikti, hem de on dort ajanin kostugu mesgul bir makinede. Gurultunun payi
+    /// gozlenen en dusuk oranin 2,2 kati kadardi.
+    ///
+    /// Pay 1,0'e cekildi: artik gurultu payi yok, olcu tam olarak docstring'in soyledigi
+    /// seyi siniyor — yuklu okuma en dusuk bos okumanin altina inemez. Gozlenen en dusuk
+    /// oran 1,781 oldugu icin sinira %78 mesafe var. Olcum ve mutasyon izgarasi
+    /// <c>docs/olcumler/kalan-alti-bant.md</c> icinde.
     /// </summary>
-    private const double YonPayi = 0.8;
+    private const double YonPayi = 1.0;
 
     /// <summary>
     /// K1: olcum makine yukune ne kadar dayanikli, ve <b>nerede dayanmiyor</b>.
     ///
-    /// Iddia edilen sey <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir,
-    /// dolayisiyla karar ancak agirlasabilir. Yuk altinda "daha hafif" bir karar,
-    /// olcunun bozuldugu anlamina gelir.
+    /// Iddia edilen sey <b>yonun dogru olmasi</b>: yuk maliyeti yalniz artirabilir, yani
+    /// yuklu okuma en dusuk bos okumanin <see cref="YonPayi"/> kati altina inemez.
+    ///
+    /// <b>Karar sinifi</b> iddiasi (yuk altinda karar hafiflemez) T117'de buradan cikti ve
+    /// <see cref="YukAltindaKararHafiflemiyorMu"/> olcusune, <c>[QuietMachineFact]</c>
+    /// gecidinin arkasina tasindi. Sebebi: iddia yalnizca bos okumalar zaten
+    /// <c>SoftwareHeavyLoad</c> ciktiginda — yani tabanin bos olmadigi durumda —
+    /// kurulabiliyordu; bos bir makinede vakuftu, dolu bir makinede ise olctugu sey urun
+    /// degil makinenin o anki gurultusuydu. On dort ajanin ayni makinede kostugu bu
+    /// depoda bu, yalitilmis bes kosumda 1 kirmizi 4 yesil olarak olculdu.
     ///
     /// Iddianin dayandigi bos okuma <b>dogrulanmadan</b> kullanilamaz. Olcunun para
     /// birimi tek is parcacikli gecisin duvar saati; makinede baska bir is kosuyorsa
@@ -376,8 +387,17 @@ public sealed class PerformanceCheckTests
     /// okuma dusuk gorunur ve olcu, gercekte olmayan bir gerilemeyi bildirir. Bu
     /// yuzden bos okuma birden fazla kez, biri de yuk kalktiktan sonra aliniyor:
     /// kirlenme sayiyi yalniz yukari itebildigi icin en dusuk okuma gercege en yakin
-    /// olanidir, ve okumalar birbirini <see cref="TabanUyumBandi"/> icinde
-    /// dogrulamiyorsa makine olcum boyunca sessiz degildi.
+    /// olanidir.
+    ///
+    /// Okumalarin birbirini bir <b>bant</b> icinde dogrulamasi ve ayni karar sinifina
+    /// dusmesi de T117'de kaldirildi. Karar sinifi esigin kesikli bir fonksiyonudur:
+    /// sayica %25 bandinda anlasan iki okuma esigi ortasina alirsa farkli sinifa duser.
+    /// Olculdu — 1,023 / 1,052 / 0,916 okumalari bandin icindeydi ama esik 1,0 aralarindan
+    /// geciyordu, ve olcu bu yuzden kirmizi dustu. Yerine konan iddia esigin kendisini
+    /// sinar ve yuke duyarli degil: her canli okuma icin sinif, sayinin
+    /// <see cref="PerformanceCheck.HeavyLoadCores"/> ile karsilastirmasindan
+    /// <b>tam olarak</b> cikmali. Siniflandiricinin canli veri uzerinde de saf
+    /// oldugunu soyler; makinenin o an ne kadar mesgul oldugunu sormaz.
     ///
     /// Olculmeyen bacak da dusmus maliyet sayilmiyor. Bacak butce doldugu icin
     /// eksikse bu ortamin haberidir: iddia kurulmaz, sebebi yazilir. Butce dolmadan
@@ -430,18 +450,16 @@ public sealed class PerformanceCheckTests
         }
 
         var taban = olculen.Min(r => r.SoftwareRealtimeCores);
-        var sessizler = olculen.Where(r => r.SoftwareRealtimeCores <= taban * TabanUyumBandi).ToArray();
 
-        if (sessizler.Length < 2)
+        foreach (var okuma in olculen)
         {
-            Atlandi($"bos okumalar birbirini dogrulamadi, makine sessiz degildi: " +
-                    string.Join(" ", olculen.Select(r => N(r.SoftwareRealtimeCores))));
-        }
-        else
-        {
-            Assert.True(sessizler.Select(r => r.Impact).Distinct().Count() == 1,
-                "ayni sessiz makinede art arda alinan okumalar farkli karar verdi: " +
-                string.Join(" ", sessizler.Select(r => $"{r.Impact}/{N(r.SoftwareRealtimeCores)}")));
+            var beklenen = okuma.SoftwareRealtimeCores >= PerformanceCheck.HeavyLoadCores
+                ? RecordingImpact.SoftwareHeavyLoad
+                : RecordingImpact.SoftwareLightLoad;
+
+            Assert.True(beklenen == okuma.Impact,
+                $"canli okuma {N(okuma.SoftwareRealtimeCores)} icin karar {okuma.Impact}, " +
+                $"esik {N(PerformanceCheck.HeavyLoadCores)} ile {beklenen} olmaliydi");
         }
 
         if (!yuklu.SoftwareMeasured)
@@ -455,9 +473,6 @@ public sealed class PerformanceCheckTests
                 $"yuk altinda maliyet dustu: en dusuk bos okuma {N(taban)}, yuklu {N(yuklu.SoftwareRealtimeCores)}");
 
             Assert.NotEqual(RecordingImpact.Unknown, yuklu.Impact);
-            Assert.False(sessizler.Any(r => r.Impact == RecordingImpact.SoftwareHeavyLoad)
-                         && yuklu.Impact == RecordingImpact.SoftwareLightLoad,
-                "yuk altinda karar hafifledi");
         }
 
         if (!bosDonanim.HardwareMeasured)
@@ -478,6 +493,74 @@ public sealed class PerformanceCheckTests
                 DonanimAtla("yuk altinda", yukluDonanim, "yuk karsilastirmasi kurulmadi");
             }
         }
+    }
+
+    /// <summary>
+    /// <b>Bos makine iddiasi.</b> Yukaridaki olcunun kaybettigi karar-sinifi iddiasi burada,
+    /// varsayimini ilan eden bir gecidin arkasinda: <c>[QuietMachineFact]</c> yalnizca bos
+    /// okuma alinabildiginde <b>ve</b> o okuma <see cref="RecordingImpact.SoftwareLightLoad"/>
+    /// ciktiginda kosar. Makine mesgulse olcu kirmizi dusmez, <b>sayilabilir sekilde atlanir</b>
+    /// ve sebebi konsola sebebiyle yazilir.
+    ///
+    /// Gecidin verdigi taban uzerine kurulan iddia: kendi yarattigimiz
+    /// <see cref="CpuLoad"/> — mantiksal cekirdek sayisi eksi bir kadar donen is parcacigi —
+    /// olcumde <b>gorunmek zorundadir</b>. Iki okuma da ayni kosumda alindigi icin iddia
+    /// mutlak sureye degil ikisinin farkina bakar; gecit olmasa disaridan gelen yuk bu farki
+    /// ters cevirebilirdi, ve olculdu: dolu bir makinede 1,177 taban 1,041 yuklu okuma
+    /// uretti, yani yuk kendi isaretini kaybetti.
+    ///
+    /// <b>Karar sinifinin degismesi burada iddia edilmiyor</b>, cunku o urunun degil
+    /// makinenin ozelligi: bos okumasi 0,573 olan hizli bir anda ayni onbes is parcacigi
+    /// okumayi yalniz 0,868'e tasidi, esigi (1,0) hic gecmedi. Sinif ile sayinin
+    /// tutarliligi zaten <see cref="OlcumYukAltindaYalnizAgirlasiyor"/> icinde her canli
+    /// okuma icin ayri ayri sinaniyor.
+    ///
+    /// <b>Bant neden daraltilmadi.</b> T145 alti duvar saati bandini gozden gecirirken
+    /// buraya da bakti. Asagidaki <c>yuklu &gt; bos</c> karsilastirmasi bir yon iddiasinin
+    /// **en dar** halidir: kabul edilen bolge zaten yarim dogru, ve daraltmak ancak
+    /// <c>yuklu &gt; bos * K</c> (K &gt; 1) yazmakla, yani iddiayi degistirmekle olur —
+    /// bu da olcuyu kararsizlastirir, cunku K'nin ustunde bir pay iddia etmedigimiz bir
+    /// sey olur. Eldeki pay olculdu: sekiz kosumda <c>yuklu / bos</c> orani
+    /// 1,441 - 1,888 (medyan 1,690), on dort ajanin kostugu mesgul bir makinede.
+    /// Bant oldugu gibi birakildi; olcum <c>docs/olcumler/kalan-alti-bant.md</c> icinde.
+    /// </summary>
+    [QuietMachineFact]
+    public async Task YukAltindaKararHafiflemiyorMu()
+    {
+        var yukleyici = Math.Max(1, Environment.ProcessorCount - 1);
+        var kapali = new FakeAvailability();
+
+        var bos = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+
+        PerformanceCheckResult yuklu;
+        using (new CpuLoad(yukleyici))
+            yuklu = await PerformanceProbe.RunAsync(kapali, YukOlcumButcesiMs);
+
+        Log($"[bos-makine] yukleyici={yukleyici} esik={N(PerformanceCheck.HeavyLoadCores)} | " +
+            $"bos: {bos.Impact}/{N(bos.SoftwareRealtimeCores)}/olculdu={bos.SoftwareMeasured} | " +
+            $"yuklu: {yuklu.Impact}/{N(yuklu.SoftwareRealtimeCores)}/olculdu={yuklu.SoftwareMeasured}");
+
+        if (!bos.SoftwareMeasured || bos.Impact != RecordingImpact.SoftwareLightLoad)
+        {
+            Atlandi("gecit ile kosum arasinda makine doldu: bos okuma " +
+                    $"{bos.Impact}/{N(bos.SoftwareRealtimeCores)} (olculdu={bos.SoftwareMeasured}), " +
+                    "bos taban kalmadi, karar-sinifi iddiasi kurulmadi");
+            return;
+        }
+
+        if (!yuklu.SoftwareMeasured)
+        {
+            Assert.True(yuklu.BudgetExhausted,
+                "yuk altinda yazilim bacagi butce dolmadan olculemedi: " +
+                string.Join(",", yuklu.Findings.Select(f => f.Code)));
+            Atlandi($"yuk altinda yazilim bacagi butce doldugu icin alinamadi (gecen {yuklu.ElapsedMs}ms), " +
+                    "karar-sinifi iddiasi kurulmadi");
+            return;
+        }
+
+        Assert.True(yuklu.SoftwareRealtimeCores > bos.SoftwareRealtimeCores,
+            $"{yukleyici} is parcacigi olcumde gorunmedi: bos {N(bos.SoftwareRealtimeCores)}, " +
+            $"yuklu {N(yuklu.SoftwareRealtimeCores)} gercek zaman cekirdegi");
     }
 
     /// <summary>
@@ -690,7 +773,7 @@ public sealed class PerformanceCheckTests
             Atlandi($"bu makinenin islemci zamani sayaci is parcacigi duzeyinde guvenilir okumadi " +
                     $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi");
 
-        if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 15_000);
+        if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 5_000);
 
         var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t63tani_" + Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(dir);
@@ -707,24 +790,50 @@ public sealed class PerformanceCheckTests
             for (var i = 0; i < 2; i++)
                 Kos($"(c) x264 serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
                     "-an", "-c:v", "libx264", "-preset", "veryfast", "-f", "null", "-" });
-            if (EncoderCapabilities.Instance.HasEncoder("h264_nvenc"))
-            {
-                for (var i = 0; i < 2; i++)
-                    Kos($"(d) nvenc -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
-                        "-an", "-c:v", "h264_nvenc", "-threads", "1", "-f", "null", "-" });
-                for (var i = 0; i < 2; i++)
-                    Kos($"(e) nvenc serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
-                        "-an", "-c:v", "h264_nvenc", "-f", "null", "-" });
-            }
-            else
-            {
-                Log("[sayac] (d)(e) h264_nvenc bu makinede yok, nvenc gecisleri kosulmadi");
-            }
             for (var i = 0; i < 2; i++)
                 Kos($"(f) taban -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample, "-f", "null", "-" });
 
             for (var i = 0; i < 3; i++)
                 Log($"[sayac] (g) tekrar {i}: is parcacigi duzeltmesi={N(PerformanceProbe.CalibrateCpuClock(1500))}x");
+        }
+        finally
+        {
+            try { Directory.Delete(dir, true); } catch { }
+        }
+    }
+
+    /// <summary>
+    /// Sayac olcumunun (d)/(e) bacaklari: ayni kodlama donanim kodlayicisiyla, once tek is
+    /// parcacigiyla sonra serbest. Yazilim bacaklarindan ayri bir olcu, cunku ayri bir sey
+    /// varsayiyor: bu makinede acilan bir <c>h264_nvenc</c>. O varsayim
+    /// <see cref="HardwareEncoderFactAttribute"/> ile sinaniyor; kodlayici acilmiyorsa olcu
+    /// dusmez, sebebini yazarak atlanir. Yazilim bacaklari
+    /// <see cref="IslemciZamaniSayaciDogruOkuyorMu"/> icinde kalir ve donanimdan bagimsiz kosar.
+    ///
+    /// Ayrim T117'de yapildi: bacaklar tek olcudeydi ve geçit yalnizca
+    /// <c>HasEncoder("h264_nvenc")</c> soruyordu. Ad CI'daki ffmpeg derlemesinin listesinde
+    /// gectigi icin geçit aciliyor, acilis surucu yoklugundan dusuyor ve olcunun donanimdan
+    /// bagimsiz kismi da onunla birlikte kirmiziya gidiyordu.
+    /// </summary>
+    [HardwareEncoderFact]
+    public void DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu()
+    {
+        var codec = HardwareEncoderFactAttribute.Codec;
+        var dir = Path.Combine(Path.GetTempPath(), "vidshrink_t117donanim_" + Guid.NewGuid().ToString("N")[..8]);
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var sample = Path.Combine(dir, "ornek.mp4");
+            Kos("uretim", new[] { "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i",
+                $"testsrc2=size={PerformanceProbe.SampleWidth}x{PerformanceProbe.SampleHeight}:rate=60:duration=6",
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18", "-pix_fmt", "yuv420p", sample });
+
+            for (var i = 0; i < 2; i++)
+                Kos($"(d) {codec} -threads 1 #{i}", new[] { "-hide_banner", "-loglevel", "error", "-threads", "1", "-i", sample,
+                    "-an", "-c:v", codec, "-threads", "1", "-f", "null", "-" });
+            for (var i = 0; i < 2; i++)
+                Kos($"(e) {codec} serbest  #{i}", new[] { "-hide_banner", "-loglevel", "error", "-i", sample,
+                    "-an", "-c:v", codec, "-f", "null", "-" });
         }
         finally
         {
@@ -791,4 +900,169 @@ public sealed class PerformanceCheckTests
             _stop.Dispose();
         }
     }
+
+    private const int SaatTureviIddiaSayisi = 23;
+
+    private static readonly string[] SaatCekirdegi =
+    {
+        "WallMs", "ElapsedMs", "RealtimeCores", "RealtimeFactor", "ReportedCpuParallelism",
+        "Stopwatch", "Elapsed", "WaitForExit", "WaitOne", "WaitAsync", ".Join(", ".Wait("
+    };
+
+    private static readonly string[] SaatliDosyalar =
+        { "PerformanceCheckTests.cs", "UpdaterTests.cs", "ComplexityProbeTests.cs" };
+
+    private static readonly System.Text.RegularExpressions.Regex UyeBasi =
+        new(@"^ {4}(?:\[[A-Za-z]|public |private |internal |protected )",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+    private static readonly System.Text.RegularExpressions.Regex YerelAtama =
+        new(@"^\s+(?:var|[\w.<>?\[\]]+)\s+(\w+)\s*=\s*([^\r\n]*)$",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+    private static readonly System.Text.RegularExpressions.Regex MetotBasligi =
+        new(@"^ {4}(?:public|private|internal|protected)[^\r\n=;]*?\b(?:TimeSpan|Stopwatch|long|double|int)\s+(\w+)\s*\(",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+    /// <summary>
+    /// <c>docs/olcumler/duvar-saati-iddialari.md</c>'deki saat turevi iddia sayimini
+    /// kaynaktan yeniden uretir ve belgedeki sayiya esitler. Sayim uc turda bir kez
+    /// eksik cikti (once "yok", sonra "sekiz", sonra "dokuz"); anahtar kelime listesi
+    /// kapali bir kume olmadigi icin desen genisletmek bunu bitirmiyor. Bu olcu kumeyi
+    /// <b>turden</b> cikariyor: uretimde saatten tureyen uyeler, zaman asimi argumani
+    /// alan bekleme cagrilari, ve bu ikisinden tureyen yereller.
+    ///
+    /// Onuncu bant eklendigi anda burasi kirmiziya doner; sayim bir sonraki turun
+    /// raporuna kalmaz. Kirmizi gorursen once belgeyi guncelle, sonra sayiyi.
+    /// </summary>
+    [Fact]
+    public void SaatTureviIddialarinSayisiBelgedekiyleAyni()
+    {
+        var bulunan = SaatTureviIddialar();
+
+        Assert.True(bulunan.Count == SaatTureviIddiaSayisi,
+            $"saat turevi iddia sayisi {bulunan.Count}, belge {SaatTureviIddiaSayisi} diyor: "
+            + string.Join(" ", bulunan));
+    }
+
+    private static List<string> SaatTureviIddialar()
+    {
+        var bulunan = new List<string>();
+
+        foreach (var ad in SaatliDosyalar)
+        {
+            var metin = File.ReadAllText(Path.Combine(TipSources.Root, "tests", "VidShrink.Tests", ad))
+                .Replace("\r\n", "\n", StringComparison.Ordinal);
+            var bloklar = Bloklar(metin);
+            var kureseller = KureselTohumlar(metin, bloklar);
+            var koruma = KorumaAraligi(metin);
+
+            foreach (var blok in bloklar)
+            {
+                var govde = metin[blok.Item1..blok.Item2];
+                var tohumlar = new List<string>(kureseller);
+                YerelleriEkle(govde, tohumlar);
+
+                for (var i = govde.IndexOf("Assert.", StringComparison.Ordinal); i >= 0;
+                     i = govde.IndexOf("Assert.", i + 1, StringComparison.Ordinal))
+                {
+                    var mutlak = blok.Item1 + i;
+                    if (mutlak >= koruma.Item1 && mutlak < koruma.Item2) continue;
+                    if (!Tasiyor(Ifade(govde, i), tohumlar)) continue;
+                    bulunan.Add($"{ad}:{SatirNo(metin, mutlak)}");
+                }
+            }
+        }
+
+        return bulunan;
+    }
+
+    private static List<(int, int)> Bloklar(string metin)
+    {
+        var sinirlar = new List<int>();
+        foreach (System.Text.RegularExpressions.Match m in UyeBasi.Matches(metin)) sinirlar.Add(m.Index);
+        if (sinirlar.Count == 0) return new List<(int, int)> { (0, metin.Length) };
+
+        var bloklar = new List<(int, int)>();
+        for (var i = 0; i < sinirlar.Count; i++)
+            bloklar.Add((sinirlar[i], i + 1 < sinirlar.Count ? sinirlar[i + 1] : metin.Length));
+        return bloklar;
+    }
+
+    private static List<string> KureselTohumlar(string metin, List<(int, int)> bloklar)
+    {
+        var tohumlar = new List<string>(SaatCekirdegi);
+        for (var tur = 0; tur < 3; tur++)
+        {
+            var eklendi = false;
+            foreach (var blok in bloklar)
+            {
+                var govde = metin[blok.Item1..blok.Item2];
+                var basi = MetotBasligi.Match(govde);
+                if (!basi.Success) continue;
+
+                var ad = basi.Groups[1].Value;
+                if (tohumlar.Contains(ad) || !Tasiyor(govde, tohumlar)) continue;
+
+                tohumlar.Add(ad);
+                eklendi = true;
+            }
+
+            if (!eklendi) break;
+        }
+
+        return tohumlar;
+    }
+
+    private static void YerelleriEkle(string govde, List<string> tohumlar)
+    {
+        for (var tur = 0; tur < 3; tur++)
+        {
+            var eklendi = false;
+            foreach (System.Text.RegularExpressions.Match m in YerelAtama.Matches(govde))
+            {
+                var ad = m.Groups[1].Value;
+                if (tohumlar.Contains(ad) || !Tasiyor(m.Groups[2].Value, tohumlar)) continue;
+
+                tohumlar.Add(ad);
+                eklendi = true;
+            }
+
+            if (!eklendi) break;
+        }
+    }
+
+    private static string Ifade(string metin, int baslangic)
+    {
+        var son = baslangic;
+        while (son < metin.Length)
+        {
+            var satirSonu = metin.IndexOf('\n', son);
+            if (satirSonu < 0) satirSonu = metin.Length;
+            if (metin[son..satirSonu].TrimEnd().EndsWith(";", StringComparison.Ordinal))
+                return metin[baslangic..satirSonu];
+            son = satirSonu + 1;
+        }
+
+        return metin[baslangic..];
+    }
+
+    private static bool Tasiyor(string metin, List<string> tohumlar)
+    {
+        var sade = metin.Replace("string.Join(", " ", StringComparison.Ordinal);
+        return tohumlar.Any(t => sade.Contains(t, StringComparison.Ordinal));
+    }
+
+    private static (int, int) KorumaAraligi(string metin)
+    {
+        var basi = metin.IndexOf("public void " + nameof(SaatTureviIddialarinSayisiBelgedekiyleAyni),
+            StringComparison.Ordinal);
+        if (basi < 0) return (-1, -1);
+
+        var sonu = metin.IndexOf("\n    }", basi, StringComparison.Ordinal);
+        return (basi, sonu < 0 ? metin.Length : sonu);
+    }
+
+    private static int SatirNo(string metin, int konum) =>
+        metin[..konum].Count(c => c == '\n') + 1;
 }

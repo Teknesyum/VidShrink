@@ -1,0 +1,18 @@
+{
+  "contractId": "T117",
+  "auditorRunId": "ad8b93ee25dfbc1b9",
+  "headSha": "e673d2048206054c02b4d3ec62e837dfc1a52cb5",
+  "diffHash": "fce7ab48447a8429875355d0367d61b4abc95f321ebf132236cb4ae94aa88247",
+  "owns": [
+    "tests/VidShrink.Tests/PerformanceCheckTests.cs",
+    "tests/VidShrink.Tests/FrameGrabberTests.cs",
+    "src/VidShrink.Ffmpeg/TempCleanup.cs",
+    "tests/VidShrink.Tests/AppHost.cs",
+    "docs/olcumler/ortam-gecidi.md"
+  ],
+  "verification": [
+    "Yedi kriterin yedisi de birinci elden dogrulandi. CI 33589639249 gunlugu cekildi: Failed 1 / Passed 1162 / Skipped 17 / Total 1180, dusen cagri PerformanceCheckTests.cs:763, sebep nvcuda.dll yuklenemedi. Gecidin iki yonu de olculdu: mutasyon A 33591455814 -> Failed 1 / Skipped 17, gercek gecit 33591434219 -> Failed 0 / Skipped 18. On yedi atlananin adi CI gunlugunden cikarildi ve tabloyla birebir tuttu. Teslim ucunun kendi kosumu denetim sirasinda bitti: 33602685158, headSha 9f25f08, Failed 0 / Passed 1163 / Skipped 19 / Total 1182. EncoderCapabilities.cs dalda hic degismedi, gecit mevcut Probe yolundan turetildi. owns ihlali yok. Sekiz borc kaydedildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:39:33.984Z"
+}

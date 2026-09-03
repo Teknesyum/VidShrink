@@ -53,7 +53,7 @@ seçilebilir olursa değil.
 **K7 — kare hızı düşürme iki yolda iki yöntem.** `FfmpegArguments.cs:56-57` `-r` (çerçeve atar/kopyalar),
 `ConversionArguments.cs:97` `fps=` filtresi (zaman damgasını yeniden kurar). Aynı plandan iki farklı sonuç.
 
-**K8 — küçük noktalar.** `ConversionArguments.cs:56`'da `palettePath = outputPath` ataması dizi başlatıcısı
+**K8 — küçük noktalar.** `ConversionArguments.cs:62`'de `palettePath = outputPath` ataması dizi başlatıcısı
 içinde değer olarak kullanılıyor (ölü atama); `:87` listesindeki `"m4a"` erişilemez çünkü `AudioOnly` dalı
 `:49`'da erken dönüyor; `Validate` `plan.End`'in kaynak süresini aşmasını denetlemiyor (`:10-13`).
 

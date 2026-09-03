@@ -85,20 +85,35 @@ public sealed class FillBandTests
             $"Fill target ({fillEstimate:0.0} MB) should never land below quality ceiling ({ceilingEstimate:0.0} MB) for the same source and target.");
     }
 
+    /// <summary>
+    /// T107: bu olcunun on kosulu -- seffaflik tavaninin bandin altinda kalmasi -- olculmemis
+    /// profille artik hicbir hedefte kurulmuyor. 1920x1080@30 ornegi 2-35 Mbit/s arasi yedi
+    /// kaynak bit hizinda ve 60-400 MB arasi alti hedefte tarandi; tavanin bandin altinda
+    /// kaldigi tek satirlar kaynagin kendisi hedefin altinda oldugu (PassThrough) satirlardi,
+    /// yani sinanmak istenen rejim degil. Tarama <c>.calisma/T107/fillband-tarama.tsv</c>.
+    ///
+    /// <para>Rejim <b>olculmus</b> profille yasiyor: ayni ornek ve ayni 120 MB hedefiyle,
+    /// sikayet kaynaginin olculmus profiliyle (<c>ReferenceBppf = 0,06244</c>,
+    /// <c>docs/olcumler/bppf-tabani.md:125</c>) tavan 80,8 MB, bandin alt kenari 116,6 MB;
+    /// doldurma 118,3 MB'a cikiyor ve <c>FillTwoPassBandTooNarrowForCrf</c> gerekcesini
+    /// birakiyor. Degisen sey beklenen sayi degil, duzenegin profili: sabit bir MB degeri
+    /// yerine profil olculmus hale getirildi.</para>
+    /// </summary>
     [Fact]
     public void FillTargetReachesTheBandWhenTheCeilingWouldLeaveItUnfilled()
     {
         var info = SampleInfo();
+        var complexity = MeasuredComplaintProfile();
         var ceilingOptions = new PlanOptions { TargetMb = 120, Intent = Intent.Sharing, FillPolicy = FillPolicy.QualityCeiling };
-        var ceilingResult = PlanCalculator.BuildDetailed(info, ceilingOptions, null);
+        var ceilingResult = PlanCalculator.BuildDetailed(info, ceilingOptions, complexity);
         var ceilingEstimate = PlanCalculator.Estimate(ceilingResult.Plan, info, ceilingResult.Profile).ExpectedMb;
         var band = FillBand.For(120);
 
         Assert.True(ceilingEstimate < band.LowerMb,
-            $"This fixture is expected to hit the transparency ceiling below the band ({ceilingEstimate:0.0} MB < {band.LowerMb:0.0} MB); adjust the fixture if the model changes.");
+            $"This fixture is expected to hit the transparency ceiling below the band ({ceilingEstimate:0.0} MB < {band.LowerMb:0.0} MB). The measured complaint profile puts the ceiling at 80,8 MB against a 116,6 MB lower edge; if this precondition stops holding the fill path below is no longer being exercised at all, which is how T107 found it - with an unmeasured profile the regime had silently disappeared.");
 
         var fillOptions = new PlanOptions { TargetMb = 120, Intent = Intent.Sharing, FillPolicy = FillPolicy.FillTarget };
-        var fillResult = PlanCalculator.BuildDetailed(info, fillOptions, null);
+        var fillResult = PlanCalculator.BuildDetailed(info, fillOptions, complexity);
         var fillEstimate = PlanCalculator.Estimate(fillResult.Plan, info, fillResult.Profile).ExpectedMb;
 
         Assert.True(fillEstimate >= band.LowerMb - 1.5,
@@ -106,6 +121,22 @@ public sealed class FillBandTests
         Assert.Equal(EncodeMode.TwoPass, fillResult.Plan.ModeEnum);
         Assert.Contains(fillResult.Plan.ReasonCodes, n => n.Code == ReasonCode.FillTwoPassBandTooNarrowForCrf);
     }
+
+    /// <summary>
+    /// Sikayet kaynaginin olculmus karmasiklik profili. Sayilar <c>docs/olcumler/bppf-tabani.md:125</c>
+    /// ile ayni ve <c>PlanCalculatorTests.ComplaintProfile</c> ile birebir; burada uydurulmus
+    /// bir deger yok.
+    /// </summary>
+    private static ComplexityProfile MeasuredComplaintProfile() => new()
+    {
+        ReferenceBppf = 0.06244,
+        Measured = true,
+        MotionExponent = 1.163,
+        MotionMeasured = true,
+        DetailExponent = 0.55,
+        SampledSeconds = 6,
+        SampledFrames = 360
+    };
 
     [Fact]
     public void FillTargetFallsBackToTwoPassWhenTheCrfFloorCannotReachTheBand()

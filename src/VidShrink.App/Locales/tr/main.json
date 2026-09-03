@@ -1,4 +1,4 @@
-{
+﻿{
   "main.language.name": "Türkçe",
 
   "main.tagline.lead": "Boyut hedefli medya sıkıştırma",
@@ -65,6 +65,7 @@
   "main.quality.below-floor": "İstenen kalite tabanın altında: {0} MB'dan küçük bir hedef üretilmiyor, o hedef zaten {1}/100 veriyor.",
   "main.quality.above-ceiling": "İstenen kalite kaynağın kendisinden iyi: tavan {0} MB ve orada ulaşılan kalite {1}/100.",
   "main.quality.tip.empty": "Bir video yükleyin; bu hedefin tahmini kalite skoru burada çıkar.",
+  "main.quality.target": "Hedef",
   "main.quality.predicted": "Tahmini kalite",
   "main.quality.loss": "Kaynağa göre kayıp",
   "main.quality.loss-points": "{0} puan",
@@ -114,7 +115,6 @@
   "main.plan.title": "Yapılacak işlem",
   "main.plan.empty": "Bir dosya yükleyin; motorun verdiği her karar burada madde madde listelenir.",
   "main.plan.reasons": "Neden böyle",
-  "main.plan.reasons-count": "Neden böyle · {0}",
   "main.plan.fact.plan": "Plan türü",
   "main.plan.automatic": "Otomatik",
   "main.plan.fact.encoder": "Kodlayıcı",
@@ -259,6 +259,8 @@
   "main.error.folder": "Klasör açılamadı",
   "main.error.setting": "Ayar yazılamadı",
   "main.error.probe": "Donanım kodlayıcı yoklaması başarısız",
+  "main.status.probe-unsettled": "Donanım kodlayıcı yoklaması sonuca varamadı, plan yazılım kodlayıcısına düştü. Sıkıştırma yine de çalışıyor.",
+  "main.status.probe-failed": "Donanım kodlayıcı yoklaması koşturulamadı: {0}. Plan yazılım kodlayıcısına düştü; sıkıştırma yine de çalışıyor.",
   "main.error.pick": "Dosya seçilemedi",
   "main.error.unusable": "Bu dosya kullanılamıyor",
   "main.error.generic": "İşlem tamamlanamadı. Ffmpeg'in bildirdiği ayrıntı aşağıda.",
@@ -280,7 +282,9 @@
   "main.reason.quality-measured": "öngörülen kalite {0}/100, ölçülen bir örnekten (bppf {1}, ayrıntı düşüşü {2})",
   "main.reason.quality-estimated": "öngörülen kalite {0}/100, kaynak bit hızından tahmin",
   "main.reason.retry-scaled": "yeniden deneme: önceki girişim {1} MB hedefe karşı {0} MB üretti; ses için {2} MB ayrıldıktan sonra video bit hızı {3} ile ölçeklendi ve kalan bütçeyle sınırlandı",
-  "main.reason.encoder-fallback": "{0} kodlayıcısı bu ffmpeg sürümünde yok, bu yüzden {1}'e düşüldü",
+  "main.reason.encoder-fallback-not-in-build": "{0} kodlayıcısı bu ffmpeg derlemesinde yok, bu yüzden {1}'e düşüldü",
+  "main.reason.encoder-fallback-not-measured": "{0} kodlayıcısı bu makinede henüz ölçülmedi, bu yüzden {1}'e düşüldü",
+  "main.reason.encoder-fallback-not-working": "{0} kodlayıcısı bu makinede kullanılamadı, bu yüzden {1}'e düşüldü",
   "main.reason.hdr-tonemapped": "kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi",
   "main.reason.fill-crf-lowered": "hedefi doldur politikası CRF'yi {0}'e düşürdü; şeffaflık tavanında durmak yerine {2}-{3} MB bandına, {1} MB bant merkezine yaklaşıldı",
   "main.reason.fill-band-center": "CRF {0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {1} MB bant merkezini hedefliyor",
@@ -309,7 +313,9 @@
   "main.advice.audio-mono": "Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.",
   "main.advice.audio-dropped": "Bu boyutta ses tutulamıyor, çıkarıldı.",
   "main.advice.encoder-fallback-gpu": "Hızlı düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.",
-  "main.advice.encoder-fallback": "Tercih edilen kodlayıcı bu ffmpeg sürümünde yok; yazılım karşılığına düşüldü.",
+  "main.advice.encoder-fallback-not-in-build": "Tercih edilen kodlayıcı bu ffmpeg derlemesinde yok; yazılım karşılığına düşüldü.",
+  "main.advice.encoder-fallback-not-measured": "Tercih edilen kodlayıcı bu makinede henüz ölçülmedi; yazılım karşılığına düşüldü.",
+  "main.advice.encoder-fallback-not-working": "Tercih edilen kodlayıcı bu makinede kullanılamadı; yazılım karşılığına düşüldü.",
   "main.advice.hdr-tonemapped": "Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.",
 
   "main.validation.trim-format": "Kırpma zamanları SS:DD:SS biçiminde yazılmalı.",

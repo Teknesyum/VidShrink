@@ -1,0 +1,17 @@
+{
+  "contractId": "T148",
+  "auditorRunId": "a988d4a64efb8681f",
+  "headSha": "f8b33ee26ca05372e631fb51fc25838853bc6e9e",
+  "diffHash": "be6155ed8257516dd00fb967acd0f2260ddd8203899c9330f39aa1d0f8765a60",
+  "owns": [
+    "tests/VidShrink.Tests/LocalizationTests.cs",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "src/VidShrink.App/Locales/en/main.json",
+    "docs/olcumler/anahtar-cagri-pimi.md"
+  ],
+  "verification": [
+    "Denetci bagimsiz kopyada olctu: SITES=435 KEYED=416 BLIND=19 EN_KEYS=389 TR_KEYS=389, en buyuk tuketici TextExtension::.ctor=196. Alti mutasyonun dordunu kendi kurdu; (c) Grow bos donunce olcu KIRMIZI, (f) cagrilmayan anahtar eklenince bos KnownDead kolu kirmizi. GECTI, KRITIK yok. CI 33680321592 completed success. Muhurden once uc rapor cumlesi duzeltildi: satir numarasi duzeltmesi geri alindi (2054/2056/2140 dogru, git show ile iki kez olculdu); kor nokta dagilimi (13 mi 11 mi) ve K4 15/15 iddiasi olculemedigi icin cekinceyle isaretlendi ve T146'ya borc yazildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T21:10:27.229Z"
+}

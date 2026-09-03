@@ -9,8 +9,53 @@ public sealed record EncodeProgress(double Fraction, TimeSpan Elapsed, TimeSpan?
 
 public sealed record EncodeAttempt(int Number, string Branch, double AimMb, double ActualMb, int VideoBitrateK, string Mode, double? MeasuredEfficiency = null);
 
-public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null);
+/// <summary>
+/// Bir kodlama kosumunun sonucu. <see cref="DroppedOptions"/> ffmpeg'in kabul etmeyip
+/// sessizce dusurdugu ayarlarin tanili satirlaridir: teslim edilen dosya motorun sectigi
+/// ayarlarin tamamini tasimiyorsa cagiran bunu buradan ogrenir. Dolu olmasi
+/// <see cref="Success"/> degerini dusurmez.
+/// </summary>
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null)
+{
+    /// <summary>Teslim edilen kodlamada motorun verdigi ayarlardan en az biri dusurulmus.</summary>
+    public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
+}
 public sealed record ConversionResult(string OutputPath, double OutputMb);
+
+/// <summary>
+/// Sahne haritasi uretilemedigi zaman hangi yoldan dusuldugu. <see cref="None"/> disindaki her
+/// deger anahtar kare tavaninin <see cref="FfmpegArguments.KeyframeCeilingDefaultSeconds"/>
+/// varsayilanina dustugunu soyler; cagiran bunu sessizce gecmemek icin okur.
+/// </summary>
+public enum SceneMapFallback
+{
+    /// <summary>Harita uretildi.</summary>
+    None,
+
+    /// <summary>Kaynagin suresi bilinmiyor; sahne uzunlugu hesaplanamaz.</summary>
+    NoDuration,
+
+    /// <summary>Yoklama kosmadi ya da sifirdan farkli kodla dondu. ffmpeg yoklugu da buraya duser.</summary>
+    ScanFailed,
+
+    /// <summary>Yoklama kostu ama tek sonda karesi vermedi; kare hizi turetilecek zemin yok.</summary>
+    NoProbeFrames
+}
+
+/// <summary>
+/// Bir sahne haritasi uretme denemesinin sonucu. <see cref="Map"/> <c>null</c> ise
+/// <see cref="Fallback"/> nedeni tasir; <see cref="Detail"/> ffmpeg'in kendi metnidir.
+/// </summary>
+public sealed record SceneMapAttempt(SceneMap? Map, TimeSpan Elapsed, SceneMapFallback Fallback, string Detail)
+{
+    public bool Ok => Map is not null;
+}
+
+/// <summary>
+/// Sahne yoklamasini calistiran taraf. Varsayilani <see cref="SceneDetector.ScanAsync"/>;
+/// ayri verilebilmesinin sebebi dusus yollarinin ffmpeg olmadan da olculebilmesidir.
+/// </summary>
+public delegate Task<SceneScan> SceneScanAsync(string path, CancellationToken ct);
 
 /// <summary>
 /// What the caller is told when an attempt lands over the target and another attempt is still allowed.
@@ -48,7 +93,8 @@ public sealed class EncodeRunner
         CancellationToken ct = default,
         FillPolicy fillPolicy = FillPolicy.QualityCeiling,
         ComplexityProfile? profile = null,
-        RetryDecisionAsync? askBeforeRetry = null)
+        RetryDecisionAsync? askBeforeRetry = null,
+        SceneMap? scenes = null)
     {
         if (plan.ModeEnum == EncodeMode.PassThrough)
             return PassThrough(info, plan, outputPath);
@@ -65,6 +111,7 @@ public sealed class EncodeRunner
         var fallbackPath = PartialPathFor(outputPath);
         var fallbackMb = 0.0;
         EncodePlan? fallbackPlan = null;
+        IReadOnlyList<string> fallbackDropped = Array.Empty<string>();
 
         try
         {
@@ -73,15 +120,16 @@ public sealed class EncodeRunner
                 attempt++;
                 var twoPass = current.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(current.Codec);
                 var attemptClock = Stopwatch.StartNew();
+                var dropped = new List<string>();
 
                 if (twoPass)
                 {
-                    await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, ct);
-                    await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, ct);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 1, passLogPrefix, progress, $"pass 1/2 (attempt {attempt})", 0.0, 0.5, scenes, ct)).DroppedOptions);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 2, passLogPrefix, progress, $"pass 2/2 (attempt {attempt})", 0.5, 1.0, scenes, ct)).DroppedOptions);
                 }
                 else
                 {
-                    await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, ct);
+                    dropped.AddRange((await RunOneAsync(info, current, partialPath, 0, null, progress, $"encoding (attempt {attempt})", 0.0, 1.0, scenes, ct)).DroppedOptions);
                 }
 
                 attemptClock.Stop();
@@ -100,7 +148,7 @@ public sealed class EncodeRunner
                 {
                     trace.Add(new EncodeAttempt(attempt, stoppedOnPurpose ? "below band, the plan stopped there on purpose" : "in band", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                     File.Move(partialPath, outputPath, overwrite: true);
-                    return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace);
+                    return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: false, Trace: trace, DroppedOptions: dropped);
                 }
 
                 if (retryUnderBand)
@@ -112,6 +160,7 @@ public sealed class EncodeRunner
                     File.Move(partialPath, fallbackPath, overwrite: true);
                     fallbackMb = actualMb;
                     fallbackPlan = current;
+                    fallbackDropped = dropped;
                     current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds, fillUnderBand: true);
                     continue;
                 }
@@ -131,12 +180,12 @@ public sealed class EncodeRunner
                         {
                             trace.Add(new EncodeAttempt(attempt, "fallback to the last under-band result", aimMb, fallbackMb, fallbackPlan.VideoBitrateK, fallbackPlan.Mode));
                             File.Move(fallbackPath, outputPath, overwrite: true);
-                            return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace);
+                            return new EncodeResult(true, outputPath, fallbackMb, fallbackPlan, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: fallbackDropped);
                         }
 
                         return new EncodeResult(false, outputPath, actualMb, current, attempt,
                             $"Stayed over the {effectiveTargetMb:0.##} MB target after {attempt} attempts (last result: {actualMb:0.0} MB); no file was written.",
-                            UnderBand: false, CeilingExceeded: true, Trace: trace);
+                            UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: dropped);
                     }
 
                     if (attempt >= MaxAttempts)
@@ -166,7 +215,7 @@ public sealed class EncodeRunner
 
                 trace.Add(new EncodeAttempt(attempt, "under band accepted", aimMb, actualMb, current.VideoBitrateK, current.Mode, efficiency));
                 File.Move(partialPath, outputPath, overwrite: true);
-                return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace);
+                return new EncodeResult(true, outputPath, actualMb, current, attempt, null, UnderBand: true, Trace: trace, DroppedOptions: dropped);
             }
 
             return new EncodeResult(false, outputPath, 0, current, attempt, "Encoding loop ended unexpectedly.", Trace: trace);
@@ -234,27 +283,79 @@ public sealed class EncodeRunner
     }
 
     /// <summary>
+    /// Kaynagin sahne haritasini uretir. Basarisiz olursa <b>atmaz</b>: haritasiz bir deneme
+    /// dondurur ve nedenini soyler. Haritasiz kodlama gecerli bir kodlamadir — anahtar kare
+    /// tavani <see cref="FfmpegArguments.KeyframeCeilingDefaultSeconds"/> varsayilanina duser.
+    /// </summary>
+    public static async Task<SceneMapAttempt> TryBuildSceneMapAsync(
+        MediaInfo info, SceneScanAsync? scan = null, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(info);
+        var clock = Stopwatch.StartNew();
+
+        if (!double.IsFinite(info.DurationSeconds) || info.DurationSeconds <= 0)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.NoDuration,
+                $"sure={info.DurationSeconds.ToString("0.###", CultureInfo.InvariantCulture)}");
+        }
+
+        var runner = scan ?? ((path, token) => SceneDetector.ScanAsync(path, ct: token));
+        SceneScan result;
+        try
+        {
+            result = await runner(info.FilePath, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.ScanFailed, ex.Message);
+        }
+
+        if (!result.Ok)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.ScanFailed, result.Error);
+        }
+
+        if (result.Frames.Count == 0)
+        {
+            clock.Stop();
+            return new SceneMapAttempt(null, clock.Elapsed, SceneMapFallback.NoProbeFrames, "sonda karesi yok");
+        }
+
+        var map = SceneMap.BuildDerived(info.DurationSeconds, result.Candidates, result.Frames, ThresholdRule.Measured);
+        clock.Stop();
+        return new SceneMapAttempt(map, clock.Elapsed, SceneMapFallback.None, string.Empty);
+    }
+
+    /// <summary>
     /// Kodlama komutunu üretir. Önce psy/AQ yoklamasını ısıtır: <c>FfmpegArguments.Build</c> saf
     /// kaldığı için ısıtılmamış bir seçeneği desteklenmiyor sayar, ve ısıtmayan bir çağıran
     /// bayrakları sessizce kaybederdi. Kodlayan her yol buradan geçer; ölçüm aracı da dahil.
     /// </summary>
     public static IReadOnlyList<string> EncodeArguments(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
-        IEncoderAvailability availability)
+        IEncoderAvailability availability, SceneMap? scenes = null)
     {
         FfmpegArguments.WarmPsychovisual(plan.Codec, availability);
-        return FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, availability);
+        return FfmpegArguments.Build(info, plan, outputPath, pass, passLogPrefix, availability, scenes);
     }
 
-    private static async Task RunOneAsync(
+    private static async Task<EncodeCommandOutcome> RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
-        IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo, CancellationToken ct)
+        IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo,
+        SceneMap? scenes, CancellationToken ct)
     {
-        var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance);
-        await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
+        var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
+        return await RunCommandAsync(args, info.DurationSeconds, progress, stage, spanFrom, spanTo, ct);
     }
 
-    private static async Task RunCommandAsync(
+    internal static async Task<EncodeCommandOutcome> RunCommandAsync(
         IReadOnlyList<string> commandArgs, double durationSeconds, IProgress<EncodeProgress>? progress,
         string stage, double spanFrom, double spanTo, CancellationToken ct)
     {
@@ -263,7 +364,7 @@ public sealed class EncodeRunner
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
         var stopwatch = Stopwatch.StartNew();
-        var tail = new ConcurrentQueue<string>();
+        var watch = new StderrWatch();
 
         process.Start();
         using var cancellationRegistration = ct.Register(() => TryKill(process));
@@ -272,10 +373,7 @@ public sealed class EncodeRunner
         {
             string? line;
             while ((line = await process.StandardError.ReadLineAsync()) is not null)
-            {
-                tail.Enqueue(line);
-                while (tail.Count > 15) tail.TryDequeue(out _);
-            }
+                watch.Line(line);
         }, CancellationToken.None);
 
         double outMb = 0;
@@ -304,10 +402,53 @@ public sealed class EncodeRunner
 
         await stderrTask;
 
-        if (process.ExitCode != 0)
-            throw new InvalidOperationException($"ffmpeg failed ({process.ExitCode}):{Environment.NewLine}{string.Join(Environment.NewLine, tail)}");
+        var outcome = watch.Close(process.ExitCode);
+        ThrowIfFailed(outcome);
 
         progress?.Report(new EncodeProgress(spanTo, stopwatch.Elapsed, TimeSpan.Zero, outMb, stage));
+        return outcome;
+    }
+
+    /// <summary>
+    /// Bitmis bir ffmpeg kosumunun teslim yolundaki karari. <see cref="DroppedOptions"/> dolu
+    /// olmasi kosumun basarisiz oldugu anlamina gelmez; cikis kodu 0 iken de dolabilir.
+    /// </summary>
+    internal sealed record EncodeCommandOutcome(
+        int ExitCode,
+        IReadOnlyList<string> Tail,
+        IReadOnlyList<string> DroppedOptions);
+
+    /// <summary>
+    /// stderr akisini satir satir izler. Tanili satir akisin herhangi bir yerinde
+    /// gecebildigi icin <see cref="Tail"/> penceresinden bagimsiz toplanir: olculen
+    /// ornekte satir 35'in 12.'sindeydi ve 15 satirlik kuyruga hic girmiyordu.
+    /// </summary>
+    internal sealed class StderrWatch
+    {
+        private const int TailLines = 15;
+
+        private readonly ConcurrentQueue<string> tail = new();
+        private readonly List<string> dropped = new();
+
+        public void Line(string line)
+        {
+            tail.Enqueue(line);
+            while (tail.Count > TailLines) tail.TryDequeue(out _);
+            if (FfmpegDiagnostics.ReportsADroppedOption(line)) dropped.Add(line);
+        }
+
+        public EncodeCommandOutcome Close(int exitCode)
+            => new(exitCode, tail.ToArray(), dropped.ToArray());
+    }
+
+    /// <summary>
+    /// Teslim yolunun basarisizlik kapisi. Surec baslatmaktan ayri durur: olcu, verilen
+    /// cikis kodunun ve stderr metninin uretecegi karari surec kosturmadan pimler.
+    /// </summary>
+    internal static void ThrowIfFailed(EncodeCommandOutcome outcome)
+    {
+        if (outcome.ExitCode != 0)
+            throw new InvalidOperationException($"ffmpeg failed ({outcome.ExitCode}):{Environment.NewLine}{string.Join(Environment.NewLine, outcome.Tail)}");
     }
 
     private static double EffectiveDuration(MediaInfo info, ConversionPlan plan)

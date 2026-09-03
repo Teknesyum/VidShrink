@@ -1,0 +1,16 @@
+{
+  "contractId": "T127",
+  "auditorRunId": "ad837609ac9734be9",
+  "headSha": "890af6e93f5e070b56422dad39a9e3386cf56045",
+  "diffHash": "01f407ac5e5127c3363ed476c4ef45939423d40168f5cfed0c672837f3b5c278",
+  "owns": [
+    "tests/VidShrink.Tests/SplitDragTests.cs",
+    "src/VidShrink.App/Playback/ComparisonSurface.cs",
+    "docs/olcumler/ayirici-olcusu-kararsizligi.md"
+  ],
+  "verification": [
+    "Denetci kusurun modelini kendi turetti ve tuttu: gecici olcu kare besleyip Round cagirinca _lastPresentTicks damgalaniyor, sayi = bosluk 50'den kucukse 0, aksi halde floor((bosluk-50)/16,667)+1 - belgedeki formulle birebir. T116 kaydiyla eslesme gercek. Iddia siktirildi, gevsetilmedi: Assert.True(repaints >= 1) ve ceiling bandi gitti, yerine Assert.Equal(15, repaints) geldi; pencere kisalmadi, uzadi. Teslim edilen dosyada Skip, Sleep, StartNew yok. Saat enjeksiyonu uretimi bozmuyor: yuzeyi XAML kuruyor, internal kurucunun derleme icinde tek cagri yeri yok, bes saat okumasi da Since/_now'a bagli. K4 mutasyonu denetci kendi kosturdu (SplitPaintInterval 1/60 -> 1/50, --no-incremental): Expected 15 / Actual 13, belgedeki satirla birebir, ve eski bandin bunu kacircagi da dogru cunku 13 bandin icinde. CI 33601659638 c3da7a9 success, degisen dosya tam olarak uc. Alti borc kaydedildi; en dikkat cekeni 40 ms bir cizim, 60 ms iki cizim ciftinin nominal Sleep degeriyle verilmis olmasi - model olculen boslukla besleniyor ve o bosluklar hicbir yere kaydedilmemis, yani bu deponun kronik kusurunun hafif hali. Muhur oncesi verify alani duzeltildi: liste bicimi degildi, o yuzden adim hic kosulmuyordu."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:57:06.294Z"
+}

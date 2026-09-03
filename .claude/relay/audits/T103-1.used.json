@@ -1,0 +1,25 @@
+{
+  "contractId": "T103",
+  "auditorRunId": "a73dd0238e5579797",
+  "headSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4",
+  "diffHash": "f6c2f3183cfa83839052833d8606def2fe0ee2eaebd2cda0489ed8eb925084d8",
+  "owns": [
+    "src/VidShrink.Ffmpeg/ComplexityProbe.cs",
+    "tests/VidShrink.Tests/ComplexityProbeTests.cs",
+    "docs/olcumler/ornekleme.md",
+    "tools/ornekleme/Ornekleme.csproj",
+    "tools/ornekleme/Program.cs",
+    "tools/ornekleme/cozumle.py",
+    "tools/ornekleme/korpus-kur-2.sh",
+    "tools/ornekleme/korpus-kur.sh",
+    "tools/ornekleme/mutasyon.sh",
+    "tools/ornekleme/plan-kazanci.sh"
+  ],
+  "verification": [
+    "Denetci cozumle.py'yi kendi kosturdu ve K1 tablosunu birebir uretti: -42,96 ila +20,32, aralik 63,28, ortalama mutlak 15,75 yuzde. K2 aile tablosu da birebir: pencere 0,144 / sahne 0,395 / bugun 0,4296. K3 kurali N = clamp(2+3*cv, 2, 8) ComplexityProbe.cs:193-196'da; egim 3'un baglayicisi k3-tepeli. K5'in geri almasi kodda gercek: ComplexityProbe.cs:31 ProductionPlan = SamplingPlan.Fixed ve :76 plan sabitken SecondProfileAsync hic cagrilmiyor. K8'de denetci kendi mutasyonunu uyguladi (ProfileWindows -> FixedWindows) ve uc olcu oldu; sabit-karsilastiran-test tuzagi yok. owns temiz, CI d79be40 icin success, temiz agacta 71/71 yesil. On borc kaydedildi. En agirlari: K5'in ham kanitinin yeniden uretilemez olmasi (betik sayilardan sonra yazilmis, ab-taban/ab-dal agaclari silinmis), Pearson tablosunun ureten komutunun olmamasi (denetci sayilari onbellekten kendi hesapladi ve 11'i de tuttu), ve Sonuc bolumunun 4,21 sayisini kurala atfetmesi - o sayi sabit N=8'in, kuralin kendi N'leriyle yayilim 6,51. Yon degismiyor, sayi yanlis atfediliyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:49:55.257Z",
+  "usedAt": "2026-09-02T07:50:34.911Z",
+  "completedSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4"
+}

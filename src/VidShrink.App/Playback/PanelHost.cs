@@ -245,6 +245,16 @@ internal sealed class PanelHost : IDisposable
     }
 
     /// <summary>
+    /// Önizlemenin anahtar kare tavanını aldığı sahne haritası. Parça kodlayıcısında durur;
+    /// nihai kodlama ile önizleme aynı tavanı görsün diye burada yalnız iletilir.
+    /// </summary>
+    internal SceneMap? Scenes
+    {
+        get => _segments.Scenes;
+        set => _segments.Scenes = value;
+    }
+
+    /// <summary>
     /// Sağ yarının <b>şu an hedeflediği</b> pencere. Bir kodlama bekliyor ya da koşuyorsa
     /// hedef odur; hiçbiri yoksa hedef ekrandaki parçadır. Yeni istek bununla karşılaştırılır:
     /// aynıysa yapılacak iş yok.

@@ -1,0 +1,41 @@
+{
+  "contractId": "T113",
+  "auditorRunId": "a1137321645fa0a91",
+  "headSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4",
+  "diffHash": "390315a23d14fec573cafff6d30d1ac5e1ff63a9078cc11611a0ebb29f0b49af",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.Core/PreviewSegment.cs",
+    "src/VidShrink.Ffmpeg/EncodeRunner.cs",
+    "src/VidShrink.App/Playback/SegmentEncoder.cs",
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "tests/VidShrink.Tests/EncodeRunnerTests.cs",
+    "tests/VidShrink.Tests/PreviewSegmentTests.cs",
+    "docs/olcumler/harita-baglantisi.md",
+    "docs/olcumler/sahne-haritasi.md",
+    "tools/harita-baglantisi/Baglanti.csproj",
+    "tools/harita-baglantisi/Program.cs",
+    "tools/harita-baglantisi/mutasyon/mutasyon-b.sh",
+    "tools/harita-baglantisi/mutasyon/mutasyon-c.sh",
+    "tools/harita-baglantisi/mutasyon/mutasyon.sh",
+    "tools/sahne-yer-gercegi/AGENTS.md",
+    "tools/sahne-yer-gercegi/CLAUDE.md",
+    "tools/sahne-yer-gercegi/av1-crf-kontrol.ps1",
+    "tools/sahne-yer-gercegi/ciftler.ps1",
+    "tools/sahne-yer-gercegi/gercek-kesimler.txt",
+    "tools/sahne-yer-gercegi/klip-dene.ps1",
+    "tools/sahne-yer-gercegi/kodla.ps1",
+    "tools/sahne-yer-gercegi/kodlayici-olcum.csv",
+    "tools/sahne-yer-gercegi/maliyet.ps1",
+    "tools/sahne-yer-gercegi/pencere.ps1",
+    "tools/sahne-yer-gercegi/sahneler.csv",
+    "tools/sahne-yer-gercegi/tara.ps1"
+  ],
+  "verification": [
+    "Zincir kaynagindan ciktisina kadar bagimsiz izlendi; sekiz cagirma noktasinin hicbirinde null dusmuyor, RunAsync'in iki kodlama kolu da haritayi tasiyor. Baglanti gercekten ciktiyi degistiriyor: haritali 5,0 sn -> -g 150, haritasiz 10,0 sn -> -g 300. Denetci iki mutasyonu kendi uyguladi (EncodeRunner.cs:341 scenes->null, SegmentEncoder.cs:126 dusuruldu), ikisi de oldu ve iddia edilen olculeri kirdi; temiz agacta 0 kirmizi / 98 yesil. Olctugu commit dogru: 97ae59f ile 06c1e97 arasinda kaynak ve testler bayt bayt ayni. CI 33597703249 basarili, Failed 0 / Passed 1080 / Skipped 107 / Total 1187. Kronik kusur taramasi: iki bolumun her yuzdesi yeniden hesaplandi, sapma yok. Dokuz borc kaydedildi; owns ihlali (FfmpegArgumentsTests.cs:408) T0 karariyla korundu. Muhur oncesi owns yollari duzeltildi: SegmentEncoder.cs ve PanelHost.cs gercekte src/VidShrink.App/Playback altinda, iki glob 17 somut yola acildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:49:25.480Z",
+  "usedAt": "2026-09-02T07:49:49.990Z",
+  "completedSha": "9011aa716090ed5fdcf1ae60c725915e81f9a0a4"
+}

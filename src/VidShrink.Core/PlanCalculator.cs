@@ -32,7 +32,40 @@ public readonly record struct FillBand(double LowerMb, double HardFloorMb, doubl
     }
 }
 
-public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice);
+public sealed record PlanResult(EncodePlan Plan, SizeEstimate Estimate, double PredictedQuality, ComplexityProfile Profile, StrategyAdvice Advice)
+{
+    /// <summary>
+    /// Donanim yoklamasi henuz bitmedi; plandaki kodlayici ve HDR karari gecici. Cagiran
+    /// bu plana bakip "donanim yok" dememeli, olcum gelince yeniden hesap yapmali.
+    /// </summary>
+    public bool HardwareNotMeasured { get; init; }
+}
+
+/// <summary>
+/// Yoklamanin ucuncu durumu: "henuz olculmedi". <see cref="IEncoderAvailability"/> yalniz
+/// evet/hayir soyleyebiliyor ve olculmemis bir kodlayici orada "hayir" gorunuyor; bu, henuz
+/// sorulmamis bir donanimi yokmus gibi gostermek demek. Bu arayuz o ayrimi tasiyor.
+///
+/// Gecici: T129 ayni ayrimi <c>EncoderProbeResult</c> uzerinde aciyor. O is birlestiginde
+/// buradaki temsil oraya devredilir ve bu arayuz kalkar.
+/// </summary>
+public interface IEncoderMeasurementState
+{
+    /// <summary>Kodlayicinin calisip calismadigi olculdu mu.</summary>
+    bool IsMeasured(string codec);
+
+    /// <summary>Kodlayicinin HDR10 piksel bicimi olculdu mu.</summary>
+    bool IsHdr10Measured(string codec);
+}
+
+public readonly record struct LayoutScoreParts(
+    double Required,
+    double Provided,
+    double Rate,
+    double ScalePenalty,
+    double FpsPenalty,
+    double Hysteresis,
+    double Score);
 
 public enum QualityTargetBound { Matched, AboveSourceCeiling, BelowFloor }
 
@@ -101,6 +134,43 @@ public static class PlanCalculator
 
     public static PlanResult BuildDetailed(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability = null)
     {
+        var probe = new ProbeState();
+        var result = BuildDetailedCore(info, options, profile, availability, probe);
+        result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
+        return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
+    }
+
+    /// <summary>
+    /// Hesap boyunca "yoklama henuz bitmedi" isaretini tasiyan kap. Cikis noktalari cok
+    /// oldugu icin isaret <c>out</c> ile degil buradan geciriliyor.
+    /// </summary>
+    private sealed class ProbeState
+    {
+        internal bool NotMeasured;
+
+        /// <summary>
+        /// İşaretin dar hâli: <b>kodlayıcı seçimi</b> ölçülmemiş bir adaydan geldi.
+        /// <see cref="NotMeasured"/> HDR yolunun ölçülmemişliğini de topladığı için
+        /// "seçilen kodek geçici mi" sorusunun cevabı ayrı taşınıyor.
+        /// </summary>
+        internal bool CodecNotMeasured;
+
+        /// <summary>
+        /// Tercih edilen kodlayicinin secim aninda okunan durumu. Yedege dusme notu bunu
+        /// kullanir: not <b>olculmedi</b> ile <b>olculdu, calismiyor</b>u ayirmak zorunda
+        /// ve durumu ikinci kez sormak yoklama sayisini artirirdi.
+        /// </summary>
+        internal EncoderProbeState PreferredCodecState = EncoderProbeState.NotWorking;
+
+        /// <summary>
+        /// Tercih edilen kodlayici bu ffmpeg derlemesinde var mi. Yoklukta durum sorusu
+        /// hic sorulmaz, o yuzden <see cref="PreferredCodecState"/> ile ayri tasiniyor.
+        /// </summary>
+        internal bool PreferredCodecInBuild = true;
+    }
+
+    private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
+    {
         var complexity = (profile ?? ComplexityProfile.FromSourceBitrate(info)).WithoutSampleContainerBias(info.Width, info.Height);
         var regime = CompressionStrategy.RegimeFor(info.FileSizeMb, options.TargetMb);
         var ratio = CompressionStrategy.Ratio(info.FileSizeMb, options.TargetMb);
@@ -112,10 +182,11 @@ public static class PlanCalculator
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
         var fast = options.SpeedMode == SpeedMode.Fast;
-        var codec = fast ? PickFastCodec(preference, availability) : PickCodec(preference, availability);
+        var codec = fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability, probe);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
+        if (hdr.NotMeasured) probe.NotMeasured = true;
 
         if (CanPassThrough(info, options, codec, hdr))
             return PassThroughResult(info, options, complexity, regime, ratio, suggestedPreference, availability, notes);
@@ -140,9 +211,14 @@ public static class PlanCalculator
         var preferredCodec = fast ? FastHardwareOrder[0] : PreferredCodecFor(preference);
         if (codec != preferredCodec)
         {
+            var fallbackCause = EncoderFallbackCauseFor(probe);
             notes.Add(AdviceCode.EncoderFallback);
-            reason.Add($"the {preferredCodec} encoder is not available on this ffmpeg build, so encoding falls back to {codec}");
-            reasonCodes.Add(new ReasonNote(ReasonCode.EncoderFallback, RequestedCodec: preferredCodec, FallbackCodec: codec));
+            reason.Add(EncoderFallbackReason(preferredCodec, codec, fallbackCause));
+            reasonCodes.Add(new ReasonNote(
+                ReasonCode.EncoderFallback,
+                RequestedCodec: preferredCodec,
+                FallbackCodec: codec,
+                FallbackCause: fallbackCause));
         }
 
         if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
@@ -310,6 +386,27 @@ public static class PlanCalculator
             AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
         }
 
+        if (best.MeetsFloor && plan.ModeEnum == EncodeMode.TwoPass)
+        {
+            var floorBppf = complexity.FloorBppf(codec, best.Fps, info.Fps);
+            var floorK = (int)Math.Ceiling(VideoBitrateK(floorBppf, best.Width, best.Height, best.Fps));
+            var deliverK = Math.Max(floorK, CodecModel.UsableBitrateK(codec, best.Width, best.Height, best.Fps));
+            if (plan.VideoBitrateK < deliverK)
+            {
+                var liftedMb = SizeMb(deliverK, audioK, info.DurationSeconds);
+                if (liftedMb <= effectiveTargetMb)
+                {
+                    reason.Add($"the search cleared {best.Width}x{best.Height}@{best.Fps:0.##} against the {floorBppf:0.0000} bits per pixel per frame floor, but the whole-kbit bitrate rounded to {plan.VideoBitrateK}k and landed under it, so it was raised to {deliverK}k, still inside the {effectiveTargetMb:0.##} MB target");
+                    plan.VideoBitrateK = deliverK;
+                }
+                else
+                {
+                    notes.Add(AdviceCode.TargetBelowCodecFloor);
+                    reason.Add($"the whole-kbit bitrate for {best.Width}x{best.Height}@{best.Fps:0.##} rounds to {plan.VideoBitrateK}k, under the {deliverK}k the {floorBppf:0.0000} bits per pixel per frame floor needs, and raising it to {deliverK}k would deliver {liftedMb:0.##} MB against a {effectiveTargetMb:0.##} MB target; the target wins and the plan runs under the floor");
+                }
+            }
+        }
+
         reason.Add($"predicted quality {best.Score:0.#}/100{(complexity.Measured ? $" from a measured sample (bppf {complexity.ReferenceBppf:0.0000}, detail falloff {complexity.DetailExponent:0.00})" : " estimated from the source bitrate")}");
         reasonCodes.Add(complexity.Measured
             ? new ReasonNote(ReasonCode.PredictedQualityMeasured, Score: best.Score, Bppf: complexity.ReferenceBppf, DetailExponent: complexity.DetailExponent)
@@ -333,10 +430,30 @@ public static class PlanCalculator
         Height = best.Height,
         Fps = best.Fps,
         Preset = PickPreset(codec, options.Codec, options.SpeedMode),
+        TurboFirstPass = options.SpeedMode == SpeedMode.Fast && TurboFirstPassIsSafe(codec),
         PixelFormat = hdr.PixelFormat,
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
+
+    /// <summary>
+    /// <see cref="CodecModel.SupportsTurboFirstPass"/> hem <c>libx264</c> hem <c>libx265</c>
+    /// icin tavan tanimlar, ama plan turboyu yalniz <c>libx265</c>'te aciyor. libx264'te ikinci
+    /// gecis birinci gecisin <c>weightp</c> ayarina uymak zorundadir: <c>veryfast</c> weightp=1,
+    /// <c>slow</c> weightp=2 kosar ve x264 ikinci gecisi
+    /// <c>different weightp setting than first pass (2 vs 1)</c> diyerek hic acmaz —
+    /// kullanici sifir bayt cikti alir. Olcum: <c>docs/olcumler/uretim-yolu.md</c>.
+    /// <para>
+    /// O uyusmazlik iki gecise ayni <c>weightp</c> yazilarak asilabiliyor ve bu kol yine de
+    /// x264'u acmiyor: esitlenmis turbo uretim borusunda toplam sureyi %0,58 - %4,44
+    /// kisaltip VMAF'tan 0,35 - 0,83 puan goturuyor, ayni olcumde <c>libx265</c> %29,6 - %33,5
+    /// kazandirip VMAF'i dusurmuyor. Kazanc ilk gecisin on ayarindan degil, kodlayicinin
+    /// toplam sure icindeki payindan geliyor; x264'te o pay kucuk.
+    /// Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+    /// </para>
+    /// </summary>
+    private static bool TurboFirstPassIsSafe(string codec)
+        => codec.Equals("libx265", StringComparison.OrdinalIgnoreCase);
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
@@ -427,7 +544,7 @@ public static class PlanCalculator
     // worst case. 1% steps would cost half that and answer 1,002x; the cheaper grid was not
     // taken because K5 asks for expensive and right over cheap and wrong.
     // ScanResolutionIsChosenByConvergence in QualityTargetTests is that measurement.
-    private const double QualityScanStep = 1.005;
+    public const double QualityScanStep = 1.005;
     private const int QualityBisectionMaxSteps = 4;
     private const int QualityBracketEvaluations = 2;
     public const int QualitySearchMaxEvaluations = 1400;
@@ -616,12 +733,30 @@ public static class PlanCalculator
     }
 
     private static double LayoutScore(ComplexityProfile complexity, string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
+        => Decompose(complexity, codec, required, provided, scale, fps, sourceFps, regime).Score;
+
+    private static LayoutScoreParts Decompose(ComplexityProfile complexity, string codec, double required, double provided, double scale, double fps, double sourceFps, CompressionRegime regime)
     {
         var weights = CompressionStrategy.PenaltyWeights(regime);
         var level = complexity.Level;
-        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(required, 1e-9) / Math.Max(provided, 1e-9));
+        var onSourceGrid = !CodecModel.IsHardware(codec);
+        var rateRequired = onSourceGrid ? required / Math.Max(complexity.ScaleFactor(scale), 1e-9) : required;
+        var rateProvided = onSourceGrid ? provided * scale * scale : provided;
+        var rate = level.AtReference - level.PerHalving * Math.Log2(Math.Max(rateRequired, 1e-9) / Math.Max(rateProvided, 1e-9));
         rate = Math.Min(rate, CodecModel.QualityLimit(codec));
-        return rate - ScalePenalty(scale, weights) - FpsPenalty(fps, sourceFps, weights);
+        var scalePenalty = ScalePenalty(scale, weights);
+        var fpsPenalty = FpsPenalty(fps, sourceFps, weights);
+        return new LayoutScoreParts(required, provided, rate, scalePenalty, fpsPenalty, 0, rate - scalePenalty - fpsPenalty);
+    }
+
+    public static LayoutScoreParts ScoreLayout(ComplexityProfile complexity, string codec, double videoK, int width, int height, double fps, double sourceFps, int sourceHeight, CompressionRegime regime)
+    {
+        var scale = (double)height / Math.Max(1, sourceHeight);
+        var required = complexity.RequiredBppf(codec, scale, fps, sourceFps);
+        var provided = BitsPerPixel(videoK, width, height, fps);
+        var parts = Decompose(complexity, codec, required, provided, scale, fps, sourceFps, regime);
+        var hysteresis = complexity.AppliesTo(codec, scale, fps) ? CalibratedShapeHysteresis : 0;
+        return parts with { Hysteresis = hysteresis, Score = parts.Score + hysteresis };
     }
 
     private static (Layout Best, bool SourceFpsViable) SearchLayout(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, double videoK, CompressionRegime regime)
@@ -773,20 +908,112 @@ public static class PlanCalculator
         _ => "libx264"
     };
 
+    /// <summary>
+    /// Hesabin sonunda okunan yoklama isaretlerini tek bir sebebe cevirir. Sebep hem
+    /// Core'un cumlesine hem <see cref="ReasonNote.FallbackCause"/> ile arayuze gidiyor;
+    /// T157'ye kadar yalniz cumleye gidiyordu ve arayuz uc durumun ucune de tek
+    /// yerellestirme anahtari veriyordu.
+    /// </summary>
+    private static EncoderFallbackCause EncoderFallbackCauseFor(ProbeState probe) =>
+        !probe.PreferredCodecInBuild ? EncoderFallbackCause.NotInBuild
+        : probe.PreferredCodecState == EncoderProbeState.Unmeasured ? EncoderFallbackCause.NotMeasured
+        : EncoderFallbackCause.NotWorking;
+
+    /// <summary>
+    /// Yedege dusme notu uc ayri durumu anlatir ve karistirmaz: aday <b>bu derlemede
+    /// yok</b>, aday <b>hic olculmedi</b>, aday <b>olculdu ve calismiyor</b>.
+    ///
+    /// T151'e kadar ikinci durum kullaniciya hic ulasmiyordu: tarama ilk olculmemis
+    /// adayda duruyor, o aday geri donuyor ve <c>codec == preferredCodec</c> oldugu icin
+    /// not cikmiyordu. Tarama sonraki adaya gecince not ilk kez cikti ve tek cumle
+    /// olculmemis bir donanim icin "bu makinede kullanilamadi" dedi. Olcum yokken boyle
+    /// bir iddiada bulunulamaz — bu deponun <see cref="EncoderProbeState.Unmeasured"/>
+    /// ile ayirdigi sey tam olarak budur.
+    /// </summary>
+    private static string EncoderFallbackReason(string preferredCodec, string codec, EncoderFallbackCause cause) => cause switch
+    {
+        EncoderFallbackCause.NotInBuild =>
+            $"the {preferredCodec} encoder is not part of this ffmpeg build, so encoding falls back to {codec}",
+        EncoderFallbackCause.NotMeasured =>
+            $"the {preferredCodec} encoder has not been measured on this machine, so encoding falls back to {codec}",
+        _ =>
+            $"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}"
+    };
+
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
+        => PickCodec(pref, availability, null);
+
+    /// <summary>
+    /// Tercih edileni <b>gercekten kodluyor mu</b> diye secer, derleme listesinde
+    /// gorunuyor mu diye degil — <see cref="PickFastCodec"/> ile ayni soru.
+    ///
+    /// Yoklama surec doguruyor, o yuzden sira onemli: listede olmayan yoklanmadan
+    /// elenir, henuz olculmemis de yoklanmaz — gecici cevap olarak doner ve
+    /// <paramref name="probe"/> ile isaretlenir. <paramref name="probe"/> <c>null</c>
+    /// iken secim ayni, isaret yok: tavsiye kodlayicisinin olculmemisligi baslat
+    /// dugmesini kapatmamali.
+    /// </summary>
+    private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState? probe)
     {
         var preferred = PreferredCodecFor(pref);
         if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
-        if (availability is null || availability.HasEncoder(preferred)) return preferred;
+        if (availability is null) return preferred;
+        if (!availability.HasEncoder(preferred))
+        {
+            if (probe is not null) probe.PreferredCodecInBuild = false;
+            return FallbackCodecFor(pref);
+        }
+        var state = availability.KnownState(preferred);
+        if (probe is not null) probe.PreferredCodecState = state;
+        if (state == EncoderProbeState.Unmeasured)
+        {
+            if (probe is not null)
+            {
+                probe.NotMeasured = true;
+                probe.CodecNotMeasured = true;
+            }
+            return preferred;
+        }
+        if (state == EncoderProbeState.Working) return preferred;
         return FallbackCodecFor(pref);
     }
 
-    private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability)
+    /// <summary>
+    /// Adaylari sirayla dener. Bir aday <b>henuz olculmemisse</b> tarama durmaz: aday
+    /// hatirlanir ve siradakilere bakilir. Calisan bir aday bulunursa <b>o</b> doner ve
+    /// isaret konmaz; hicbiri calismiyorsa hatirlanan olculmemis aday gecici cevap olarak
+    /// doner, cunku olculmemis bir donanimi "yok" saymak yanlis olurdu.
+    ///
+    /// Tarama T151'e kadar ilk olculmemis adayda duruyordu. Yoklamasi hic yerlesmeyen bir
+    /// aday (`Unsettled` kalici olarak <see cref="EncoderProbeState.Unmeasured"/> demektir)
+    /// sirayi kalici kilitliyor ve sirada calisan donanim varken plan "olculmedi" isaretiyle
+    /// donuyordu; T139'un dogrulamasi o isareti "donanim yok"a ceviriyordu. Olcum
+    /// <c>docs/olcumler/ilk-olculmemis-aday.md</c>'de.
+    ///
+    /// Devam etmek olculmemis adayi yoklamasiz birakmiyor: <see cref="EncoderAvailabilityState.KnownState"/>
+    /// sorunun kendisiyle yoklamayi sirayla koyar, yani tarama bir adayi gecerken de onu
+    /// olcume yollar.
+    /// </summary>
+    private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
+        probe.PreferredCodecInBuild = availability.HasEncoder(FastHardwareOrder[0]);
+        string? unmeasured = null;
         foreach (var candidate in FastHardwareOrder)
-            if (availability.WorksAsEncoder(candidate)) return candidate;
-        return FallbackCodecFor(pref);
+        {
+            var state = availability.KnownState(candidate);
+            if (candidate == FastHardwareOrder[0]) probe.PreferredCodecState = state;
+            if (state == EncoderProbeState.Unmeasured)
+            {
+                unmeasured ??= candidate;
+                continue;
+            }
+            if (state == EncoderProbeState.Working) return candidate;
+        }
+        if (unmeasured is null) return FallbackCodecFor(pref);
+        probe.NotMeasured = true;
+        probe.CodecNotMeasured = true;
+        return unmeasured;
     }
 
     public static double HardwareBitrateYield(string codec, ComplexityProfile complexity, double scale, double fps)

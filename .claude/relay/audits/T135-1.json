@@ -1,0 +1,17 @@
+{
+  "contractId": "T135",
+  "auditorRunId": "aa34c48f1e3a54693",
+  "headSha": "b360baf91bdcce4563157d7c28e0c1bd63d4c1b2",
+  "diffHash": "499e113ffd93cb50645732df58428b32b9119a9263a9147e76c3628d2a12bf37",
+  "owns": [
+    "docs/inceleme/handbrake-motoru.md",
+    "tools/harita-tazeleme/harita-tazeleme.py",
+    "tools/harita-tazeleme/AGENTS.md",
+    "tools/harita-tazeleme/CLAUDE.md"
+  ],
+  "verification": [
+    "Denetci depo disinda calisti (git archive cc5b0fa), sifir dotnet test kosturdu, depoya hicbir dosya yazmadi. VERDIKT GECTI, KRITIK yok, dokuz borc. K1: bayat ciktisi yeniden uretildi, 27 iddia satiri, sifir bos hucre, eski haritadaki 23 kunye 890af6e'ye karsi acildi, atif kaymasi yok. K2: on bes kunye dogrulandi, sekiz turetilmis oran elle yeniden hesaplandi, +0,135 = 95,272-95,137 kaynaktan dogrulandi. K3: sira ciktisi yedi satir, olcut haritada yazili, p10 birinci sirada. K4: eski cikarimin alintisi kelimesi kelimesine ayni. K5: sekiz sozlesmenin status alani daldan okundu. K6: dogrula sifir bulgu, denetci uc mutasyon kosturdu, ucu de yakalandi. owns temiz. Muhurden once T0 dort borcu kapatti: stdout utf-8 (kullanicinin kabugunda cikis 1 ve tablo 16. satirda kesiliyordu), :483'teki elle yazilmis 30 kendi araciyla celisiyordu, rapor besi degil altisi yer degistirdi, K1 ozeti ucu degil ikisi yanlis pozitif. Kalan borclar: dogrula capayi degil dosyanin tamamini ariyor (harita-tazeleme.py:518), K5 durum tablosu bayatladi, K1 tablosu rapora yapistirilmamis, :398'deki 15,02 MiB kendi satirini almamis, §4 T102 donemi 15,04 MiB'i kullaniyor. owns muhur aninda somutlandi: glob uc gercek dosyaya acildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T10:07:50.246Z"
+}

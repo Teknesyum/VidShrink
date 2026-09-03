@@ -1,0 +1,19 @@
+{
+  "contractId": "T156",
+  "auditorRunId": "ae69a91a0b070dd3d",
+  "headSha": "d0afd3bbde4b27ae301fbd60bdda4a2a28837a15",
+  "diffHash": "c704ae561b65611d01c2b3e4dcf640e2f89d447fb7fd1902164ad28ea771b93b",
+  "owns": [
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "tests/VidShrink.Tests/QualityMeterTests.cs",
+    "tests/VidShrink.Tests/UretimYoluTests.cs",
+    "tests/VidShrink.Tests/OluUyeTests.cs",
+    "docs/olcumler/uc-kucuk-borc.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 368bbf8: K1 cikarilan yardimci internal (QualityMeter.cs:78), mutasyon Assert.Null FAIL 1/24/25, geri alinca 25/25; (a) yolunun imkansizligi dogrulandi (Comparable:false ureten :220 ve :252 ilk dort alani null veriyor). K2 T154 mutasyonu hala oluyor (UretimYoluTests.cs:330, NotEqual 55==55); tek satir silmek CS1501 ile derlemeyi kiriyor. K3 duzeltilen alti cumlenin altisi da bugunku kaynakla tutuyor, dogru cumle yanlisla degistirilmemis, pim 31'de duruyor (gecmis: ab2557a 31, 073a43a 31, 89b00dd 31, 008033a 32). K5 --list-tests 33+13+11=57, cakisan kol yok, sifir bulan kol yok, klonda 57/57 yesil. owns tam bes dosya, CI 33752378032 success ab2557a. T0 birlesme sonrasi main'de --no-incremental derledi, 57/57 yesil. KRITIK yok, bes borc.",
+    "NOT: contract.js audit bu kaydi yazamadi - denetcinin live kaydi proje kokunun .claude/relay/live/ altina dustu, audit ise T0 worktree'sinden okuyor. Kayit T0 tarafindan elle yazildi; live/ae69a91a0b070dd3d.json role=auditor files=[] dogrulandi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T12:33:20.917010Z"
+}
