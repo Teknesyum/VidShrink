@@ -224,6 +224,15 @@ eklenen taşıma bugünkü tek tüketicisi için **atıl** — kod doğru, ama �
 göreceği bir şey yok. `SegmentEncoder.cs` bu sözleşmenin `owns` kümesi dışında,
 loglevel'ine dokunulmadı. Borç.
 
+**Düzeltme (T147, sözleşme T0 kararı — Karar 2):** yukarıdaki cümle yanlış. `SegmentEncoder`
+tek değil **iki** ffmpeg koşturuyor (`SegmentEncoder.cs:259-261`) ve `-loglevel error`
+yalnız kayıpsız kaynak kesitinde (`BuildSourceClipArguments`), motorun psy/AQ ayarlarını
+hiç taşımayan koşumda geçiyor. Ayarları taşıyan kodlanmış parça (`FfmpegArguments.BuildSegment`)
+`-loglevel` hiç vermiyor, yani ffmpeg'in varsayılan `info` seviyesinde koşuyor ve tanı
+satırını **basıyor** (39 satırın 7'si, bu makinede T147'de ölçüldü). Taşıma bu koşum için
+atıl değil; hangi koşumun hangi ayarı taşıdığı ayrılmadan yazıldığı için cümle yanlış yere
+işaret ediyordu. Ayrıntı ve ham çıktı: `docs/olcumler/sessiz-dusurme-sondada.md`.
+
 `EncodeRunner` bu sorunu taşımıyor: `FfmpegArguments.cs:364` `-loglevel` vermiyor, yani
 varsayılan `info` seviyesinde koşuyor ve tanıyı görüyor. Gerçek ffmpeg koşumuyla pimlendi
 (`ARealEncodeThatDropsAnOptionReportsTheDrop`).
