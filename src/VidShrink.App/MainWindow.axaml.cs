@@ -1807,7 +1807,12 @@ public partial class MainWindow : Window
         return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
     }
 
-    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => null;
+    /// <summary>
+    /// Kalibrasyon yoklamasinin ornekleme penceresini yerlestirirken okudugu harita.
+    /// Tarama basarisiz olduysa <c>null</c> doner ve yoklama esit arali yedek yerlesimde
+    /// kalir.
+    /// </summary>
+    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => attempt?.Map;
 
     public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => null;
 
