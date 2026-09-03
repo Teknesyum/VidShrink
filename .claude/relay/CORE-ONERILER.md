@@ -274,3 +274,42 @@ Claude surecinin kendi ortamina koyabilirsin, tur ortasinda koyamazsin.
    (`359f37c`) ve muhurlu T149'u `submitted` gosterdi; kok `origin/main`e hizalanana
    kadar yanlis liste bastirdi. Onceki oneri hala gecerli: relay dizini
    `git rev-parse --git-common-dir` ile cozulsun, kokun HEAD'ine guvenilmesin.
+
+## Denetci depo disinda calisinca `live/` kaydi hicbir yere yazilmiyor
+
+**Belirti.** T150 tur 2 denetcisi isini bitirdi, GECTI verdi. `contract.js audit` ise
+reddetti:
+
+```
+Refused - no live record for run-id: <id> - the auditor must be an agent that actually ran
+```
+
+Ajan gercekten kostu (52 arac cagrisi, 9 dakika). Kayit ortada yok: ne
+`.claude/relay/live/` altinda, ne klonun icinde. Sebep olculdu — kanca relay dizinini
+**cwd'den** cozuyor; denetci ilk komutunda scratchpad'deki klona `cd` etti, klonda
+`.claude/relay/live/` **yok** (gitignore'da, klonlanmiyor) ve kanca sessizce yaziyi
+dusurdu. Ayni oturumdaki oteki denetcinin (`a015e9f1...`) kaydi var, cunku o ilk
+komutunu depo kokunden kosturdu. Fark yalnizca **ilk komutun cwd'si.**
+
+**Neden onemli.** Kural denetciyi depo disinda calismaya **tesvik ediyor** — dogru bir
+tesvik, cunku ayni kural denetcinin dosyaya yazmasini yasakliyor. Yani protokolun
+istedigi davranis, protokolun mühür kapisini kiriyor. Iki dogru kural birbirini yiyor.
+
+**Bugunku maliyet.** T149'da ayni sey olmustu ve denetim **bastan kosuldu** (41 dakika,
+ikinci bir tam denetim). Bugun tekrarladi. Iki sozlesmede iki kez, ayni kok.
+
+**Cozum yolu bugun kullanildi ama kalici degil:** denetciye `SendMessage` ile proje
+kokunden **tek bir salt-okuma komutu** kosturuldu; kanca o an kaydi yazdi, `files` bos
+kaldi, mühür gecti. Bu bir yama, kural degil.
+
+**Oneri.**
+
+1. Kanca relay dizinini cwd'den degil **oturumun proje kokunden** cozsun. Kok zaten
+   biliniyor (Claude oturumunun `cwd`'si degil, `--project` koku). Cwd'ye bakmak ajanin
+   nereye `cd` ettigine bagimlilik yaratiyor; ayni kusurun worktree yuzu daha once
+   bildirildi (`git rev-parse --git-common-dir` onerisi).
+2. Hedef dizin yoksa kanca **sessizce dusurmesin**: `_sorun.log`a tek satir yazsin.
+   Bugun kayit kaybi ancak muhur reddedilince fark edildi.
+3. `contract.js audit` reddederken **ne yapilacagini** soylesin: "kaydi olusturmak icin
+   ajana kokten tek salt-okuma komutu kosturun" satiri, bastan denetim kosturmanin
+   onune gecer. Bugunku metin cozumu degil yalniz reddi bildiriyor.
