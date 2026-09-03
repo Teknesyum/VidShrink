@@ -966,3 +966,19 @@ olc), sec ve dayanagini yaz.
 - **T150** teslim edildi. Sifir tuketici sinifi olculebilir oldu: kume yansimayla turden turetiliyor, sayi 31 satirla pimlendi (26 sifir tuketici + 5 hic kullanilmayan -- tur 2'de birlesik agacta yeniden temellendi), iki mutasyon kirmizi. T0 onculunun 63/1 ikilemi kapandi. K5 ile `QualityArgs` mayini kapandi; VideoToolbox kapisi acilmadi. Dal `T150-sifir-tuketici`.
 - T150 tur 2 tamamlandi: K8-K11 kapandi, pim 26, tam suit 1511 yesil (yerel), CI yok — uzak dal ayrismasi.
 - **T145** teslim edildi (tur 1). Kalan alti bandin hepsi karara baglandi: uc daraltildi (`UpdaterTests.cs:890` 60->5 sn, `:1141` 10->1 sn, `PerformanceCheckTests.cs:462` `YonPayi` 0,8->1,0), uc olculmus gerekceyle birakildi (`:915`/`:916` agsiz acilis 3 sn -- urun butceleri toplami 2887-2949 ms, daraltmak `src/**` ister; `:542` yon iddiasinin en dar hali). Uc daraltma mutasyonla sinandi, kol basina ayri gunluk. Sayim pimi 23'te kaldi. `:890` pencere acmadan olculdu (gecis kipi `Alert`ten once donuyor) -- DURDURULDU notunun tuzagi karsilandi. **Dal cakismasi:** `origin/T145-kalan-alti-bant` bos degildi, baska bir kosumun bes commit'i orada; zorla itilmedi, bu tur `T145-kalan-alti-bant-tur2` dalinda. Kararlar ayrisiyor, T0 secmeli. CI 33733262807.
+- **T147** teslim edildi. Devraldigim dal `origin/T147-sessiz-dusurme-sondada`da tek commit vardi
+  (task metninin "bes commit" iddiasi yanlisti, `git log b4161d7..5d4e563` ile dogrulandi), K1(a)nin
+  kirmizi olcumunu tasiyordu. Rebase `cea77e3` uzerine temiz gecti, K2'yi acan `FfmpegDiagnostics`i
+  main'den getirdi. K2: `EncoderCapabilities.OptionAccepted` artik tek sozluge (`FfmpegDiagnostics.
+  ReportsADroppedOption`) devrediyor, iki olu desen (`Option not found`, `Unrecognized option`) dustu
+  — ikisi de yalniz cikis kodu sifirdan farkliyken goruluyordu, kapi zaten onlari eliyordu (T144'un
+  kendi olcumu + bugunku taze dogrulama). K3: uc gercek temiz kosum (x265/x264/svtav1) yanlis-pozitif
+  korpusu. K4: T0 Karar 2 sonrasi kod degisikligi gerekmedi — `SegmentEncoder` iki ayri ffmpeg kosturuyor,
+  yalniz kayipsiz kaynak-parca `-loglevel error` kullaniyor ve dusurulebilir secenek tasimiyor (pinlendi),
+  kodlanmis-parca varsayilan seviyede tanıyı zaten basiyor; kuyruk (`ErrorTailLines=8`, sozlesmenin "15"i
+  yanlis) disinda kalsa da `DroppedOptionLines` tam metinden okudugu icin yakaliyor. K5: uc mutasyon,
+  ucu de beklenen testi/testleri tek tek oldurdu, ham cikti raporda. K6: 15/8/7=30 test, hepsi yesil.
+  Karar 2'nin zorunlu kildigi duzeltme `docs/olcumler/cikis-kodu-yalan.md`ye islendi (owns disinda,
+  T0 mandatiyla). Sinir asilmadi: `FfmpegDiagnostics` yalniz cagrildi, duzenlenmedi. Rapor
+  `docs/olcumler/sessiz-dusurme-sondada.md`de, ham ciktilarla. CI 33740071847 (yesil, 27dk). Dal
+  `T147-sessiz-dusurme-sondada`, uc `b2ee5f4`.
