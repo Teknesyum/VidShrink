@@ -1,0 +1,17 @@
+{
+  "contractId": "T121",
+  "auditorRunId": "ae0d74ee80c50fb7a",
+  "headSha": "890af6e93f5e070b56422dad39a9e3386cf56045",
+  "diffHash": "4a156fa82668d398d8b05103350c856cc1c25190768f64b59f221990c5212239",
+  "owns": [
+    ".github/workflows/ci.yml",
+    "docs/olcumler/ci-maliyeti.md"
+  ],
+  "verification": [
+    "Denetci depo disinda calisti ve sifir dotnet test kullandi. K1'in sayilarini kendi yeniden hesapladi: ayni pencerede gh run list yine 210 dondu, her headSha icin siniflandirmayi kendi kosturdu ve meaningful 38 / docsonly 172 / toplam 210 birebir tuttu; benzersiz SHA 37 + 171 = 208 ve iki mukerrer SHA de dogrulandi. Aritmetik ve etiket ayri ayri sinandi: 172/210 = yuzde 81,90 paydasi tum kosumlar ve etiketi kosum sayisinda; 2007,9/2557,6 = yuzde 78,51 paydasi tamamlanmis kosum dakikasi ve etiketi ona uyuyor. Bu denetimin can alici noktasi geciti gecti: yuzde 81,9 hicbir yerde tasarrufa donusturulmemis - belgede, sozlesmede ve yedi commit mesajinin hicbirinde iki kavrami karistiran cumle yok, ve 42aa210 commit mesaji acikca yuzde 15,5, yuzde 81,9 degil diyor. Izdusum de bagimsiz yeniden hesaplandi: main disi 42 cift / 396,6 dakika, main 74 cift, dordu de birebir. Uretim ayari dogru geri cevrilmis: ci.yml uctra cancel-in-progress refs/heads/main karsilastirmasini tasiyor, gecici dal adi kalmamis. K2 ve K3 kosum kanitlari gh run view ile teker teker dogrulandi; 33603335567 icin jobs bos dondu, yani gercekten kuyrukta kaldi. owns temiz. Uc borc: izdusumun ureten betigi depoda yok (denetci kurali prozadan yeniden yazip ayni sayiyi uretti), 396,6 tum 210 kosumdan ama 2557,6 yalniz 194 tamamlanandan geliyor ve tam paydayla oran yuzde 14,2 cikiyor (1,3 puan fark, hukmu degistirmiyor), ve K3 (a) basliginin ilk cumlesi ayni kapali pencereyi tekrar kosuldu diye tarif ediyor ama iki satir sonra kendisi duzeltiyor. Uc commit uctaki 42aa210 kosumu denetim aninda in_progress idi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T07:52:35.907Z",
+  "usedAt": "2026-09-02T07:57:05.722Z",
+  "completedSha": "890af6e93f5e070b56422dad39a9e3386cf56045"
+}

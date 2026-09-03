@@ -344,8 +344,7 @@ sonucu doğuruyor:
 **Hiçbiri.** Komut (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Koşum adı uzman-hb2: HandBrakeCLI -e x265_10bit…", şu an `:231`):
 
 ```
-HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo \
-  -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900
+HandBrakeCLI -e x265_10bit --encoder-preset slow --multi-pass --turbo -E ca_aac -B 128 -w 1920 -l 1080 --crop-mode none -r 60 --cfr -b 1900
 ```
 
 Preset adı verilmemiş; alanlar tek tek bayrakla kurulmuş. Bayrakların preset
@@ -384,7 +383,7 @@ Karşılaştırmanın bizim yakamızdaki künyeleri (yukarıda geçenler tekrar 
 | Karmaşıklık profili | `ComplexityProbe.cs:62-95`, `ComplexityProfile.cs:251-276` | üretimde, **3 × 2 s pencere** |
 | Pencere yanlılığı taraması | `ComplexityProbe.cs:20-27` (40 nokta × 1 s), `:293-301` | üretimde |
 | Psikogörsel sabitleri | `FfmpegArguments.cs:264-269` | üretimde, **sabit** |
-| Anahtar kare aralığı | `FfmpegArguments.cs:162` — `-g = max(2, round(fps × 2))` | üretimde, **sabit formül** |
+| Anahtar kare aralığı | `FfmpegArguments.KeyframeArgs` | üretimde, **aralık**: taban 1 s, tavan sahne haritasından 5-10 s'ye kelepçeli. T112'de burada `-g = max(2, round(fps × 2))` sabiti yazıyordu; T98 (`8ea80c4`) dinamiğe çevirdi |
 | Sahne haritası | `SceneMap.cs:20-46`, `SceneDetector.cs:123-131` | **plana bağlı değil**; yalnız `QualityMeter.cs:177,219` |
 
 ---
@@ -394,102 +393,266 @@ Karşılaştırmanın bizim yakamızdaki künyeleri (yukarıda geçenler tekrar 
 Her madde: ne, hangi dosyaya, hangi ölçüyle sınanır. Sözleşme açmıyorum; liste
 sözleşme yazılabilecek somutlukta.
 
-**Öncelik sırası hakkında bir uyarı.** Elimizdeki tek ölçülmüş açık T102'nin
-auto 94,462 ↔ uzman-hb2 95,731 farkı (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — tablo satırları "auto | 15,04 MiB … | 94,462" ve "uzman-handbrake | 15,02 MiB … | 95,731", şu an `:235,237`).
-**O sayı kirli:** T111 sebebini yazıyor — bizim AV1 koşumlarımızda kaymış kare
-eşlemesi var, HandBrake koşumunda yok (`.claude/relay/contracts/T111.md:25-39`).
-Düzeltmenin büyüklüğü henüz ölçülmedi. Aşağıdaki her "beklenir" cümlesi
-**beklentidir, ölçü değildir** ve T111 kapandığında sıra yeniden çizilmelidir.
+### Sıra neye göre çizildi
+
+Bu bölümün önceki sürümü sırayı **tek bir sayıdan** türetmişti — T102'nin
+auto ↔ uzman-hb2 farkından — ve kendi uyarısını da yazmıştı: o sayı kirliydi,
+"T111 kapandığında sıra yeniden çizilmelidir". **T111 kapandı**
+(`.claude/relay/contracts/done/T111.md`, `status: done`) ve sıra burada, T135'te
+yeniden çizildi.
+
+Aşağıdaki toplu hüküm cümleleri **elle yazılmadı.**
+`python tools/harita-tazeleme/harita-tazeleme.py hukum` çıktısından birebir
+alındı; aynı betiğin `dogrula` alt komutu her cümlenin bu belgede birebir durduğunu
+ve her düzeltilmiş sayının kaynağında bulunduğunu denetliyor.
+
+Ölçülmüş HandBrake açığı bugün ortalamada +0,097, p10'da +0,477, harmonikte
++0,099; bu belgenin sırayı çizdiği eski ortalama açığı +1,269 idi, yani 13,1 kat
+büyük okunmuş. (`docs/olcumler/auto-mod.md` § "K3 — AV1 ↔ HandBrake yeniden
+ölçüldü" — tablo satırı "HandBrake açığı | T111 yeni (**kilitli**)", şu an `:672`)
+
+Eski cümlenin taşıdığı iki ham ortalamanın kilitli karşılığı: auto **95,647**,
+uzman-hb2 **95,743** (aynı belge § "Boyut eşlemesi — band yoklandı, yöntem ve
+deneme sayısı" — tablo başlığı "açık (auto = 95,647)" ve tablo satırı
+"`uzman-hb2` | 1900 kbps", şu an `:703` ve `:711`). Bu çift T111'in yeniden
+ürettiği auto'ya eşlendi; o auto **15 496 155** bayt teslim etti, T102'nin
+belgelediğinden %1,72 küçük. Yani eski `94,462 ↔ 95,731` çifti yalnız bayat
+değil, başka bir auto'ya ait.
+
+Açığın ayakta kaldığı eksen p10: +0,477, yeniden üretim sınırının (0,023) 20,7
+katı. Ortalamadaki +0,097 kendi sınırının (0,013) 7,5 katı — sıfır değil, ama
+p10'un 4,9 katı küçüğü. (Yeniden üretim sınırı: aynı belge § "Kilidin tek başına
+etkisi — aynı dosya, iki ölçüm" — tablo satırı "on bir koşumun hepsi", şu an
+`:604`.)
+
+Harmonik artık ayrı bir eksen değil: kilitli ölçümde harmonik açığı (+0,099)
+ortalama açığından (+0,097) 0,002 uzakta.
+
+Auto'nun bugünkü en büyük ölçülmüş açığı HandBrake'e karşı değil, kendi uzman
+ayarlarımıza karşı: uzman açığı ortalamada +0,437, HandBrake açığının 4,5 katı;
+p10'da +0,673, 1,4 katı. (Aynı belge § "K2 — yanlılığın büyüklüğü: eski fark,
+yeni fark" — tablo satırı "uzman açığı | T111 yeni (**kilitli**)", şu an `:656`.)
+
+**Ölçüt — sıra artık neye bakıyor.** Sırayla:
+
+1. **Ölçülmüş p10 etkisi.** Açığın ayakta kaldığı tek eksen orası.
+2. **Ölçülmüş ortalama etkisi.** Ayakta ama küçük; birinciyi bozmadan ayırıyor.
+3. Ölçülmemiş maddelerde: **ölçümü yürüyen bir sözleşme var mı.** Ölçülecek olan,
+   ölçülmesi planlanmayanın üstünde.
+4. Kalanda: kuyruğa herhangi bir kaynak sınıfında dokunabiliyor mu.
+5. Ürün kapsamı ve süre maddeleri sonda.
+
+Harmonik ölçüt **değil** — yukarıdaki üçüncü cümle sebebini söylüyor. Ortalama
+tek başına da ölçüt değil; eski sıra ortalamaya bakarak çizilmişti ve bu bölümün
+düzeltmesi tam olarak budur.
+
+Yedi maddenin 1'inde ölçülmüş bir etki var, 6'sında yok.
+
+En büyük ölçülmüş kalem eski 1. madde: p10'da +0,235, HandBrake p10 açığının
+(+0,477) %49'u; ortalamada +0,181, ortalama açığının (+0,097) 1,9 katı.
+
+Yeni sıra, eski numaralarıyla: 1, 3, 5, 2, 4, 7, 6. 3 madde yürüyen bir
+sözleşmeye değiyor — eski 1. madde T133, eski 3. madde T114, eski 5. madde T134.
+
+2 madde iki basamak oynadı: eski 5. madde 3. sıraya, 2 basamak yukarı; eski 2.
+madde 4. sıraya, 2 basamak aşağı.
+
+Ölçülmemiş altı maddenin beklentilerinden 4'i düzeltilmemiş — karşılığı ne
+kilitten önce ne sonra ölçüldü: eski 2, 3, 4, 7. maddeler.
+
+Madde madde gerekçe `harita-tazeleme.py sira` çıktısında; bayat sayının tam
+listesi, düzeltilmiş karşılığı ve her karşılığın bölüm çapası
+`harita-tazeleme.py bayat` çıktısında.
+
+### Maddeler hangi sözleşmeyi bekliyor
+
+Aşağıdaki `status` alanları `.claude/relay/contracts/` altından okundu.
+
+| madde (yeni sıra) | sözleşme | bugünkü `status` | ne demek |
+|---|---|---|---|
+| bölüm girişi | T111 | `done` | **Kapı kaldırıldı** — "T111 kapandığında sıra yeniden çizilmelidir". Sıra yukarıda çizildi. |
+| 1 | T98 | `done` | İş uygulandı (`8ea80c4`); madde artık öneri değil. |
+| 1 | T133 | `open` | `-g` ızgarasını **şu anda ölçüyor**. Hangi `-g` değerinin en iyi olduğu hâlâ ölçülmedi. |
+| 1 | T108 | `submitted` | Aynı dosyaya (`FfmpegArguments.cs`) değiyor ama konusu tepe tavanı eğrisi, `-g` değil. |
+| 2 | T111 | `done` | **Kapı kaldırıldı** — "T111 kapanmadan bu maddeye yatırım yapılmamalı". Sonucu maddenin içinde. |
+| 2 | T114 | `active` | Sahne başına bit dağıtımı (`SceneBudget.cs`) — bu maddenin ta kendisi, yürüyor. |
+| 3 | T134 | `active` | Siyah kenarlı kaynak sınıfını ölçüyor; bu madde ilk sayısını oradan alacak. |
+| 4 | T131 | `submitted` | Aynı dosyaya (`ComplexityProbe.cs`) değiyor ama konusu iptal yolu, pencere sayısı değil. |
+| 5, 6, 7 | — | — | Yürüyen sözleşme yok. |
+
+Bu belgenin kendisi de T126'nın (`submitted`) `owns` listesinde; bu bölüm
+değişirse orayla çakışma ihtimali var.
 
 ### 1. Anahtar kare aralığı içerikten türesin
 
-- **Ne:** `-g` bugün `fps × 2` sabiti. HandBrake `fps × 10` kullanıyor
+**Sıra: yeni 1, eski 1 — değişmedi.** Yedi maddenin ölçülmüş etkisi olan tek
+maddesi: kilitli ölçümde p10 +0,235, ortalama +0,181.
+
+- **Ne:** bu madde yazıldığında `-g` sabitti (`fps × 2`). **T98'de uygulandı**
+  (`8ea80c4`): `FfmpegArguments.KeyframeArgs` bugün bir **aralık** üretiyor —
+  taban 1 s, tavan sahne haritasından çıkıp 5-10 s'ye kelepçeleniyor, harita
+  yoksa HandBrake'in 10 s'si. HandBrake `fps × 10` kullanıyor
   (`libhb/encx264.c:391`, `libhb/encx265.c:190`).
-- **Nereye:** `src/VidShrink.Core/FfmpegArguments.cs:162`, kararı
-  `PlanCalculator`'a taşıyarak.
-- **Ölçü:** `tools/auto-mod-olcumu`, aynı kaynak, `-g` ızgarası, boyut eşitlenmiş.
-- **Açığın hangi kısmını kapatması beklenir:** en büyüğü. Bu zaten ölçüldü —
-  `-g 300` dosyayı **%24,5 küçültürken** ortalamayı **+0,155**, p10'u **+0,333**
-  artırdı (`docs/olcumler/auto-mod.md` § "K6 — Sıradaki adım" — "-g 300 dosyayı %24,5 küçültürken puanı yükseltiyor…", şu an `:448`). Tek yönlü kazanç. HandBrake'in bizim
-  önümüzde olduğu 1,269 puanın kayda değer bir kısmının burada olması beklenir.
-- **Not (çapa hedefinin içeriği de kaymış, yalnız satırı değil):** aynı belge
-  (§ "K4 — Açığın ayar başına ayrıştırması" > "Yerleşimin payı ölçüldü: sıfır
-  değil, negatif" — "Sonuç: hizalamanın payı ortalamada negatif, p10'da değil.",
-  şu an `:342`) anahtar kareyi sahne kesmesine hizalamanın payını **ortalamada
-  negatif ama p10'da pozitif** (+0,135) ölçmüş. Bu cümle T111'in kilit
-  düzeltmesinden önce yalnız "negatif" diyordu (eski alıntı: "Sonuç:
-  hizalamanın payı negatif."); T111 sonrası ölçüm kuyrukta (p10) küçük bir
-  kazanç bulmuş. Yani kazanç aralığın uzunluğundan geliyor iddiası **ortalama**
-  için hâlâ geçerli; "hizalamaya yatırım yapılmamalı" sonucu da ortalama
-  içindir — p10'da tam tersini gösteren güncel bir veri var, bu maddeye
-  yatırım kararı verilecekse bu nüans hesaba katılmalı.
+  (`docs/olcumler/auto-mod.md` § "K6'nın önerileri bugünkü `main`e karşı
+  denetlendi" — "Madde 1 — anahtar kare aralığını uzat: T98'de uygulandı.",
+  şu an `:755`)
+- **Nereye:** yapıldı — `src/VidShrink.Core/FfmpegArguments.cs`, `KeyframeArgs`.
+- **Ölçü:** `-g` ızgarası, aynı kaynak, boyut eşitlenmiş. **T133 şu anda
+  ölçüyor** (`.claude/relay/contracts/T133.md`, `status: open`). Ölçülen tek
+  nokta bugüne kadar 120 → 300; hangi `-g` değerinin en iyi olduğu taranmadı.
+- **Açığın hangi kısmını kapattığı ölçüldü:** `-g 300` dosyayı **%24,5
+  küçültürken** kilitli ortalamayı **+0,181**, p10'u **+0,235** artırdı
+  (`docs/olcumler/auto-mod.md` § "K4 — Açığın ayar başına ayrıştırması" — tablo
+  satırı "anahtar kare aralığı (-g)", şu an `:276`). İki eksende birden kazanan
+  tek satır. Yukarıdaki hüküm cümlesi bu kalemi p10 açığının %49'u diye
+  ölçüyor — "en büyüğü" artık bir beklenti değil, oranı yazılı bir ölçü.
 
-### 2. Örnekleme penceresi içeriğe göre büyüsün
+- **Not — yerleşimin payı ve 6.1'in eski çıkarımı.** Bu maddenin eski notu
+  ortalamaya bakarak sonuç çıkarıyordu; ortalama artık geriliğimizin olduğu yer
+  değil. Not düzeltildi, **veri değişmedi.**
 
-- **Ne:** `MaxWindows = 3`, `WindowSeconds = 2.0` sabitleri. Bir saatlik video
-  6 saniyeden planlanıyor.
-- **Nereye:** `src/VidShrink.Ffmpeg/ComplexityProbe.cs:14,17,131-143`.
-- **Ölçü:** pencere sayısını 3 / 6 / 12 yapıp aynı kaynakta tahmin edilen
-  bppf ile teslim edilen bppf arasındaki hatayı karşılaştır; ek ölçüm süresi
-  de raporlansın.
-- **Beklenen:** tek başına kaliteyi artırmaz; **ilk deneme isabetini** artırır,
-  yani `EncodeRunner`'ın yeniden kodlama sayısını düşürür. Puan açığına katkısı
-  dolaylı ve muhtemelen küçük. Ama "dinamik analiz" iddiasının ayağa kalkması
-  bu maddeden geçiyor.
+  Eski hâli:
 
-### 3. `SceneMap` plana bağlansın
+  > Yani kazanç aralığın uzunluğundan geliyor iddiası **ortalama** için hâlâ
+  > geçerli; "hizalamaya yatırım yapılmamalı" sonucu da ortalama içindir —
+  > p10'da tam tersini gösteren güncel bir veri var, bu maddeye yatırım kararı
+  > verilecekse bu nüans hesaba katılmalı.
+
+  Yeni hâli: anahtar kareyi sahne kesmesine hizalamanın payı kilitli ölçümde
+  **ortalamada -1,231, p10'da +0,135** (`docs/olcumler/auto-mod.md` § "K4 —
+  Açığın ayar başına ayrıştırması" > "Yerleşimin payı ölçüldü: sıfır değil,
+  negatif" — "ama p10'da **+0,135**", şu an `:344`). Eski çıkarım — "hizalamaya
+  yatırım yapılmamalı" — **ortalamaya bakıyordu.** Ölçüt p10'a geçince aynı veri
+  ters yöne işaret ediyor: p10'daki +0,135'in işareti **lehimize**, ve p10 açığın
+  ayakta kaldığı tek eksen. Yani hizalamayı dışlayan gerekçe düştü; onun yerine
+  **ölçülmemiş bir soru** kaldı.
+
+  **Bu sözleşme maddenin kaderine karar vermiyor.** Üç sebeple: (a) +0,135 tek
+  kaynakta, tek `-g` değerinde, tek koşumda ölçüldü ve başka içerikte tekrarı
+  ölçülmedi; (b) aynı iki koşumun kilitli en düşük kareleri tablonun en
+  düşükleri (72,574 / 71,940) ve p10'un neden ters yöne gittiği **ölçülmedi**;
+  (c) `-g` ızgarasını **T133 şu anda ölçüyor**. Karar T133'ün.
+
+  Bir uyarı daha, ölçüm sınırı: bu belgenin "hizalama" ölçtüğü şey
+  `-force_key_frames`'tir. T98'in yazdığı `scd=1` kodlayıcının kendi sahne kesme
+  algılamasıdır ve **ölçülmedi** (aynı belge § "K6'nın önerileri bugünkü `main`e
+  karşı denetlendi" — "T98'in `scd=1`'i, T111'in ölçtüğü şey değil.", şu an
+  `:770`).
+
+### 2. `SceneMap` plana bağlansın
+
+**Sıra: yeni 2, eski 3 — 1 basamak yukarı.** Ölçülmüş değeri yok; ama
+müdahalenin şekli açığın kaldığı eksene (p10) oturuyor ve ölçümü yürüyen bir
+sözleşmede.
 
 - **Ne:** sahne haritası bugün yalnız VMAF örneklemesinde kullanılıyor.
-- **Nereye:** `src/VidShrink.Core/PlanCalculator.cs`, `SearchLayout` (`:622`)
-  girdisi olarak; `SceneMap.cs:20-46` zaten sahne başına `BitsPerSecond` üretiyor.
-- **Ölçü:** sahne başına karmaşıklık dağılımının varyansı yüksek olan bir kaynakta
-  tek-CRF ile sahne-farkındalıklı planın aynı boyutta p10 farkı.
-- **Beklenen:** p10 ve harmonik ortalamada kazanç, ortalamada az. T102'de
-  auto'nun harmonik ortalaması **56,313**, HandBrake'in **95,727** —
-  ama bu fark T111'in kaymış eşlemesinin en çok bozduğu metrik
-  (26 kare 1 puan altında, en düşük kare 0,00; `docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — tablo satırı "auto | 15,04 MiB … | 94,462 | … | 26 | 0,00", şu an `:235`).
-  **T111 kapanmadan bu maddeye yatırım yapılmamalı.**
+- **Nereye:** `src/VidShrink.Core/PlanCalculator.cs`, `SearchLayout` girdisi
+  olarak; `SceneMap.cs:20-46` zaten sahne başına `BitsPerSecond` üretiyor.
+- **Ölçü:** sahne başına karmaşıklık dağılımının varyansı yüksek olan bir
+  kaynakta tek-CRF ile sahne-farkındalıklı planın aynı boyutta p10 farkı.
+- **Beklenen:** p10'da kazanç — ve **bu bir beklenti, ölçü değil.**
+- **Kapı kaldırıldı.** Bu maddede "T111 kapanmadan bu maddeye yatırım
+  yapılmamalı" yazıyordu. T111 kapandı; sonucu şu: maddenin eski gerekçesi
+  T102'de auto'nun harmonik ortalamasının **56,313**, HandBrake'inkinin
+  **95,727** olmasıydı — aradaki ~39 puan. **O 39 puanın tamamı ölçüm
+  kusuruymuş:** kilitli harmonik açığı **+0,099**
+  (`docs/olcumler/auto-mod.md` § "K3 — AV1 ↔ HandBrake yeniden ölçüldü" — tablo
+  satırı "HandBrake açığı | T111 yeni (**kilitli**)", şu an `:672`). Aynı
+  kilitle auto'nun 1 puan altındaki 26 karesi de sıfırlandı, en düşük kare
+  0,000 → **92,376** (aynı belge § "Kilidin tek başına etkisi — aynı dosya, iki
+  ölçüm" — tablo satırı "`auto`", şu an `:611`).
+- **Yani bu madde başlığındaki sayıyı kaybetti, sırasını kaybetmedi.** Harmonik
+  ayağı düştü; p10 ayağı ölçülmedi ama açığın kaldığı eksen orası.
+- **Yürüyen sözleşme:** T114 (`active`) sahne başına bit dağıtımını yazıyor.
 
-### 4. Kare hızı modu `pfr` olsun
+### 3. Otomatik kırpma
 
-- **Ne:** HandBrake preset'leri `pfr` kullanıyor
-  (`preset/preset_builtin.json:1009`); biz fps düşürdüğümüzde CFR yazıyoruz.
-  `pfr`, tavanı aşmayan yerlerde kaynağın kendi zamanlamasını koruyor
-  (`libhb/vfr.c:198-205`).
-- **Nereye:** `src/VidShrink.Core/FfmpegArguments.cs`, fps düşürme dalı.
-- **Ölçü:** fps düşürmenin devreye girdiği bir hedefte CFR ↔ PFR, boyut eşitlenmiş.
-- **Beklenen:** küçük. Fark yalnız fps düşürülen koşumlarda görünür.
-
-### 5. Otomatik kırpma
+**Sıra: yeni 3, eski 5 — 2 basamak yukarı.** Bu kaynakta yapısal olarak sıfır;
+ama ölçülen kaynakta kalan açık zaten küçük ve hiç ölçmediğimiz kaynak sınıfını
+yürüyen bir sözleşme ölçüyor.
 
 - **Ne:** siyah kenar kırpma bizde hiç yok; HandBrake varsayılan olarak yapıyor
   (`preset/preset_builtin.json` `PictureCropMode: 0`, `libhb/scan.c:1279-1313`).
 - **Nereye:** yeni bir yoklama; `ComplexityProbe` ile aynı geçişte ölçülebilir.
 - **Ölçü:** letterbox'lı bir kaynakta aynı hedef boyutta kırpmalı/kırpmasız p10.
 - **Beklenen:** T102'nin kaynağında **sıfır** — o koşum `--crop-mode none` ile
-  yapıldı, yani kırpma o karşılaştırmada iki tarafta da yoktu. Letterbox'lı
-  kaynaklarda büyük olabilir; bu kaynak sınıfını hiç ölçmedik.
+  yapıldı, yani kırpma o karşılaştırmada iki tarafta da yoktu. Bu yapısal bir
+  sıfır, kilitten etkilenmez.
+- **Neden yukarı taşındı:** ölçülen kaynakta kalan açık artık ortalamada +0,097.
+  Orada kazanılacak yer küçük; hiç ölçmediğimiz kaynak sınıfları ise ölçülmemiş
+  olmaya devam ediyor. **T134 (`active`) tam bu sınıfı ölçüyor** — bu maddenin
+  ilk gerçek sayısı oradan gelecek.
 
-### 6. Taramalı içerik
+### 4. Örnekleme penceresi içeriğe göre büyüsün
 
-- **Ne:** deinterlace hiç yapmıyoruz. HandBrake'in yaptığı
-  (`comb-detect` → seçici `decomb`) kare başına uyarlamadır ve bizde karşılığı yok.
-- **Nereye:** `src/VidShrink.Core/FfmpegArguments.cs` filtre zinciri; tespiti
-  probe'a.
-- **Ölçü:** taramalı bir kaynakta VMAF; ama asıl ölçü **kabul edilebilirlik** —
-  taraklı çıktı puandan bağımsız olarak kusurlu.
-- **Beklenen:** T102 açığına katkısı **sıfır** (kaynak taramalı değil). Ürün
-  kapsamı sorusu, açık sorusu değil. Öncelik sırasında en sonda durmasının
-  sebebi bu.
+**Sıra: yeni 4, eski 2 — 2 basamak aşağı.** Ölçülmedi, yürüyen sözleşmesi yok;
+kendi metni puan açığına katkısını dolaylı ve küçük diyor.
 
-### 7. Turbo ilk geçiş
+- **Ne:** `MaxWindows = 3`, `WindowSeconds = 2.0` sabitleri. Bir saatlik video
+  6 saniyeden planlanıyor.
+- **Nereye:** `src/VidShrink.Ffmpeg/ComplexityProbe.cs`.
+- **Ölçü:** pencere sayısını 3 / 6 / 12 yapıp aynı kaynakta tahmin edilen bppf
+  ile teslim edilen bppf arasındaki hatayı karşılaştır; ek ölçüm süresi de
+  raporlansın.
+- **Beklenen:** tek başına kaliteyi artırmaz; **ilk deneme isabetini** artırır,
+  yani `EncodeRunner`'ın yeniden kodlama sayısını düşürür. **Düzeltilmemiş:** bu
+  beklenti ne kilitten önce ne sonra ölçüldü.
+- **Neden aşağı indi — ve karşı argüman.** Eski sırada ikinciydi; oraya "dinamik
+  analiz iddiasının ayağa kalkması bu maddeden geçiyor" gerekçesiyle konmuştu, o
+  gerekçe bir ölçü değil. Ölçüt ölçülmüş p10 etkisine geçince, kendi metni
+  katkısını "dolaylı ve muhtemelen küçük" diyen bir madde ölçümü yürüyen
+  maddelerin üstünde duramaz. **Karşı argüman kayıtta:** açık ortalamada
+  neredeyse kapandığı için geriye kalan asıl kayıp puan değil **yer** olabilir —
+  auto teslim ettiği dosyada kendi doldurma bandının altında kalıyor (15,04 MiB
+  teslim, band alt kenarı 15,20 MiB) ve bu sapmanın modellenmesi hâlâ açık.
+  O açık bu yedi maddenin içinde değil; `docs/olcumler/auto-mod.md` § "K6 —
+  Sıradaki adım" madde 2'de duruyor.
+
+### 5. Kare hızı modu `pfr` olsun
+
+**Sıra: yeni 5, eski 4 — 1 basamak aşağı.** Ölçülmedi, yürüyen sözleşmesi yok;
+yalnız fps düşürülen koşumlarda görünür.
+
+- **Ne:** HandBrake preset'leri `pfr` kullanıyor
+  (`preset/preset_builtin.json:1009`); biz fps düşürdüğümüzde CFR yazıyoruz.
+  `pfr`, tavanı aşmayan yerlerde kaynağın kendi zamanlamasını koruyor
+  (`libhb/vfr.c:198-205`).
+- **Nereye:** `src/VidShrink.Core/FfmpegArguments.cs`, fps düşürme dalı.
+- **Ölçü:** fps düşürmenin devreye girdiği bir hedefte CFR ↔ PFR, boyut
+  eşitlenmiş.
+- **Beklenen:** küçük. Fark yalnız fps düşürülen koşumlarda görünür.
+  **Düzeltilmemiş:** ölçülmedi.
+
+### 6. Turbo ilk geçiş
+
+**Sıra: yeni 6, eski 7 — 1 basamak yukarı.** Kalite maddesi değil, süre
+maddesi; puan açığına katkısı yok ya da hafif negatif.
 
 - **Ne:** HandBrake iki geçişli ABR'de ilk geçişi hızlandırıyor
   (`libhb/encx264.c:604-608`, preset alanı `VideoTurboMultiPass`).
 - **Nereye:** `src/VidShrink.Core/FfmpegArguments.cs`, geçiş 1 argümanları.
 - **Ölçü:** aynı hedefte toplam kodlama süresi ve teslim edilen puan.
 - **Beklenen:** puan açığına katkısı yok ya da hafif negatif; **süre** kazancı.
-  Bu bir hız maddesi, kalite maddesi değil.
+  **Düzeltilmemiş:** ne puan ne süre ölçüldü — ve süre bu projede hiç
+  ölçülmedi, ölçümler paylaşımlı makinede koştu.
+- **Neden taramalı içeriğin üstüne çıktı:** ikisinin de puan açığına katkısı
+  sıfır sayılıyor, ama bu bir mühendislik maddesi; taramalı içerik bir ürün
+  kapsamı sorusu ve ölçütün dışında.
+
+### 7. Taramalı içerik
+
+**Sıra: yeni 7, eski 6 — 1 basamak aşağı.** Ürün kapsamı sorusu, açık sorusu
+değil — ölçütün dışında kaldığı için sonda.
+
+- **Ne:** deinterlace hiç yapmıyoruz. HandBrake'in yaptığı
+  (`comb-detect` → seçici `decomb`) kare başına uyarlamadır ve bizde karşılığı
+  yok.
+- **Nereye:** `src/VidShrink.Core/FfmpegArguments.cs` filtre zinciri; tespiti
+  probe'a.
+- **Ölçü:** taramalı bir kaynakta VMAF; ama asıl ölçü **kabul edilebilirlik** —
+  taraklı çıktı puandan bağımsız olarak kusurlu.
+- **Beklenen:** T102 açığına katkısı **sıfır** (kaynak taramalı değil). Yapısal
+  bir sıfır, kilitten etkilenmez.
 
 ---
 

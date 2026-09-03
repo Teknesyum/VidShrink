@@ -113,7 +113,7 @@ denemeyle. Burada durduruldu.
 ## `TEMP`/`TMP` bağımlılığı artık testte yazılı
 
 `OlcumArtikBirakmiyor` ortam değişkenlerini süreç genelinde değiştiriyor; bu yalnız
-`LanguageTests.cs:13`'teki `[assembly: CollectionBehavior(DisableTestParallelization = true)]`
+`LanguageTests.cs:17`'deki `[assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]`
 durduğu sürece güvenli. Bağımlılık artık ölçünün ilk iddiası: özniteliğin varlığı
 doğrulanıyor ve iddia mesajı neden gerektiğini söylüyor.
 

@@ -100,6 +100,51 @@ public static class FfmpegArguments
     // highest ratio where the tight peak was still right (5,6x) and the lowest where it was not.
     // Above the widest ratio nothing was measured, so the peak stays at the widest value that was:
     // 1.50 is known to overshoot there and the ceiling is the guarantee this may not break.
+    //
+    // T108 widened that measurement: two sources (one moving, one still) x two hardware
+    // encoders (av1_nvenc, hevc_nvenc) x five floor ratios (2.6, 4.636, 7.5, 10.236, 16.0) x
+    // three peaks (1.02, 1.10, 1.50), 60 cells, 1920x1080@60 HDR PQ, VMAF-NEG p10. The full
+    // table is docs/olcumler/tepe-egrisi.md.
+    //
+    // On the hardware encoders, what the peak buys is not set by the floor ratio. It is set
+    // by how much the source moves. On the moving clip the p10 spread across the three peaks is 11.46 at ratio 2.6
+    // and 0.28 at ratio 16.0, falling all the way; on the still clip it never exceeds 1.61
+    // at any ratio. Both encoders give the same shape (av1_nvenc 11.46 -> 0.28, hevc_nvenc
+    // 11.68 -> 0.50). At ratio 4.636 the same encoder gives 7.385 on the moving clip and
+    // 0.236 on the still one - thirty times apart.
+    //
+    // So the curve reads the wrong axis, and it reads it backwards: it holds the peak tight
+    // below ratio 6.0, which is exactly where opening it pays most on moving content, and
+    // opens it toward 11.4, where the measurement finds the spread already gone. The premise
+    // that the tight peak undershoots at high ratio did not repeat on either source: at ratio
+    // 10.236 the tight peak delivers 1.0330 of the video budget on the moving clip and 0.9809
+    // on the still one.
+    //
+    // The tight peak's size benefit survives only at the lowest ratio: at 2.6 the moving clip
+    // gives 1.0351 tight against 1.1116 at 1.10, but at 4.636 the three peaks are 1.0305 /
+    // 1.0305 / 1.0380, so opening there costs 0.7% of size and buys 7.385 p10. Across all 60
+    // cells 34 overshoot the video budget (moving 29/30, still 5/30 - the one moving cell that
+    // stays under is av1_nvenc at ratio 16.000 with the tight peak, 0.9931) and in 12 of the 20 rows
+    // the size does not move one way with the peak at all.
+    //
+    // That agitation rule belongs to the hardware encoders only. A software grid (libx265
+    // medium, two-pass, 12 cells, ratios 4.636 and 10.236) reverses the sign: the still clip
+    // gains 1.559 p10 from opening the peak while the moving clip loses 0.389, monotonically.
+    // None of the 12 software cells overshoot the video budget (largest 0.9926), so the
+    // overshoot above is a property of hardware rate control, not of this curve.
+    //
+    // The constants are NOT changed here, and that is a scope decision, not a measurement
+    // result: the value the measurement asks for is content agitation, which PeakRateFactor
+    // never receives, and the curve is pinned at five ratios by HardwareRateControlTests
+    // (:122-141), which is outside this contract's owns. Per constant - WidePeakFactor:
+    // measured on the software path, unchanged - but 1.50 wins only two of the four software
+    // rows (both still-clip rows). On the moving clip 1.02 wins at both ratios, by 0.389 at
+    // 4.636 and by 0.066 at 10.236. The winning peak follows the source, not the ratio, and
+    // PeakRateFactor does not receive that input either - same reason as below.
+    // TightPeakFactor, HardwarePeakCeiling,
+    // PeakOpensAtFloorRatio, PeakWidestAtFloorRatio: measured, unchanged, and the reason is
+    // above. BufferFactor: NOT measured on its own - every cell moved bufsize with the peak,
+    // so no cell separates the buffer's effect from the peak's.
     public const double WidePeakFactor = 1.5;
     public const double TightPeakFactor = 1.02;
     public const double HardwarePeakCeiling = 1.10;
@@ -145,19 +190,34 @@ public static class FfmpegArguments
     //
     // SceneMapMergeFactor is not a tuning constant; it is the map's measured recall, written as
     // the two counts it was measured from, both counted in the same unit - cuts inside the
-    // ground-truth window (144.117, 333.300]. At the threshold of record the map finds 28 of
-    // the 28 hand-marked cuts with zero false positives, so the recall is 1.000 and the divider
-    // is 1.0: at this threshold the map no longer under-segments and no correction is owed.
-    // It was not always so - at the previous threshold of 0.2 the same window gave 10 of 28,
-    // and the divider was 2.8.
+    // ground-truth window (144.117, 333.300]. T108 re-counted them against the map production
+    // actually builds, which since T109 is the DERIVED one (SceneDetector.BuildMapAsync ->
+    // SceneMap.BuildDerived with ThresholdRule.Measured), not the fixed-threshold one: over the
+    // full source the derived rule finds 28 of the 28 hand-marked cuts with zero false
+    // positives, so the recall is 1.000 and the divider is 1.0. The fixed 0.105 path was run
+    // beside it in the same window and gave the same 28/28, which is why replacing the
+    // threshold with the rule did not move the divider. It was not always so - at the earlier
+    // fixed threshold of 0.2 the same window gave 10 of 28, and the divider was 2.8.
     //
     // Because the divider is 1.0 today it is arithmetically inert, and no behaviour test can
-    // tell it from having no divider at all. What is testable is where it comes from: the two
-    // counts are pinned to what was counted, and SceneMapThresholdOfRecord is pinned to
-    // SceneMap.DefaultThreshold, which is owned elsewhere. If that threshold moves again the
-    // map splits differently, the recall is no longer 1.000, and
-    // Az_bolme_duzeltmesi_olculdugu_esikte_kalir turns red before a stale divider can be
-    // applied on top of a corrected threshold.
+    // tell it from having no divider at all. What is testable is where it comes from. The two
+    // counts are pinned to what was counted. The threshold cannot be pinned any more: the
+    // derived map reports SceneMap.Threshold = NaN and carries SceneMap.Rule instead, so
+    // SceneMapThresholdOfRecord pinned a number production no longer decides by. What replaces
+    // it is SceneMapRuleOfRecord, the whole six-number identity of the rule, not its endpoints:
+    // Floor and Ceiling alone would let Offset, Slope, NeighbourhoodSeconds and Percentile drift
+    // while the pin stayed green, and each of those four changes where the map splits. The trap
+    // is behavioural rather than constant-against-constant - it derives the cut list twice, once
+    // under the rule of record and once under the rule production defaults to, and compares the
+    // lists - so it also covers a rule whose numbers were shuffled between fields.
+    //
+    // Five of the six numbers carry load and are measured to: on a low-agitation candidate set
+    // Offset, Slope, NeighbourhoodSeconds and Percentile each change the cut list when moved in
+    // either direction, and on a high-agitation set Ceiling does. Floor does not, in either
+    // direction, and cannot: agitation is never negative and Slope is positive, so
+    // Offset + Slope * agitation >= Offset = 0.08 > Floor = 0.05 and the lower clamp is
+    // unreachable. That is an equivalent mutation, not a test gap, and
+    // Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor states it as a measure rather than a claim.
     //
     // What the map is trusted for is the range, not the boundaries: the placement is left to
     // the encoder's scene cut. That the encoder actually places on content, and what the
@@ -209,13 +269,18 @@ public static class FfmpegArguments
     // costs 3.9% more file at the same CRF. HandBrake can afford that because its CRF is an
     // open-ended quality mode; here CRF is a target-landing mode - PlanCalculator's fill policy
     // picks a CRF aimed at the band centre - so a systematic +3.9% eats the band. Measured and
-    // needed, therefore kept. Loosening it to something between 2x and off was not measured.
+    // needed, therefore kept. Loosening it to something between 2x and off WAS measured, on
+    // libx265 at CRF 23 (T108 K5, docs/olcumler/tepe-egrisi.md): the VBV stops binding above
+    // 1.25 - peaks 1.25, 1.50 and 2.00 give a byte-identical file on the moving clip - so there
+    // is no intermediate setting between 2x and off that buys anything; the only real choice is
+    // 1.10 or off. On the still clip CRF 23 lands at 5% of target and the VBV never binds at
+    // all. Not measured on libx264, which is where the two rows above come from.
     public const double CrfVbvPeakFactor = 2.0;
     public const double CrfVbvBufferFactor = 4.0;
 
     public const double KeyframeFloorSeconds = 1.0;
     public const double KeyframeCeilingDefaultSeconds = 10.0;
-    public const double SceneMapThresholdOfRecord = 0.105;
+    public static readonly ThresholdRule SceneMapRuleOfRecord = new(0.05, 0.15, 0.08, 2.09, 40.0, 0.90);
     public const double SceneMapGroundTruthCutsInWindow = 28.0;
     public const double SceneMapMappedCutsInWindow = 28.0;
     public const double SceneMapMergeFactor = SceneMapGroundTruthCutsInWindow / SceneMapMappedCutsInWindow;
@@ -291,6 +356,29 @@ public static class FfmpegArguments
 
     public static bool NeedsTwoPasses(string codec) => !CodecModel.IsHardware(codec);
 
+    public static IReadOnlyList<string> PresetLadder(string codec)
+        => Presets.TryGetValue(codec, out var ladder) ? ladder : Array.Empty<string>();
+
+    public static string FirstPassPreset(string codec, string preset, bool turbo)
+    {
+        if (!turbo) return preset;
+        var ceiling = CodecModel.TurboFirstPassCeiling(codec);
+        if (ceiling is null) return preset;
+        if (!Presets.TryGetValue(codec, out var ladder)) return preset;
+
+        var at = RungOf(ladder, preset);
+        var cap = RungOf(ladder, ceiling);
+        if (at < 0 || cap < 0) return preset;
+        return at <= cap ? preset : ladder[cap];
+    }
+
+    private static int RungOf(IReadOnlyList<string> ladder, string preset)
+    {
+        for (var i = 0; i < ladder.Count; i++)
+            if (ladder[i].Equals(preset, StringComparison.OrdinalIgnoreCase)) return i;
+        return -1;
+    }
+
     public static bool IsValidPreset(string codec, string preset)
         => Presets.TryGetValue(codec, out var values) && values.Contains(preset, StringComparer.OrdinalIgnoreCase);
 
@@ -309,7 +397,7 @@ public static class FfmpegArguments
             a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
         a.AddRange(new[] { "-c:v", plan.Codec });
-        a.AddRange(new[] { "-preset", plan.Preset });
+        a.AddRange(new[] { "-preset", pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset });
         var psychovisualArgs = CachedPsychovisualArgs(plan.Codec, availability);
 
         if (plan.ModeEnum == EncodeMode.Crf)

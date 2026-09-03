@@ -18,13 +18,15 @@ public sealed class ComplexityProbeTests
 {
     private sealed class FakeMeter(bool available, bool fail = false, bool comparable = true) : IQualityMeasurement
     {
+        private int _calls;
+
         public bool IsAvailable => available;
-        public int Calls { get; private set; }
+        public int Calls => Volatile.Read(ref _calls);
 
         public Task<WindowQualityMeasurement?> MeasureWindowAsync(string referencePath, string samplePath, double referenceStartSeconds, double durationSeconds, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
-            Calls++;
+            Interlocked.Increment(ref _calls);
             if (fail) throw new InvalidOperationException("measurement failed");
             return Task.FromResult<WindowQualityMeasurement?>(new(
                 referenceStartSeconds, comparable ? 91.0 : null, comparable ? 90.0 : null,
@@ -32,14 +34,17 @@ public sealed class ComplexityProbeTests
         }
     }
 
-    private sealed class BlockingMeter : IQualityMeasurement
+    private sealed class CancellingMeter(CancellationTokenSource source) : IQualityMeasurement
     {
+        private int _calls;
+
         public bool IsAvailable => true;
-        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public int Calls => Volatile.Read(ref _calls);
 
         public async Task<WindowQualityMeasurement?> MeasureWindowAsync(string referencePath, string samplePath, double referenceStartSeconds, double durationSeconds, CancellationToken ct)
         {
-            Entered.TrySetResult();
+            Interlocked.Increment(ref _calls);
+            await source.CancelAsync();
             await Task.Delay(Timeout.InfiniteTimeSpan, ct);
             return null;
         }
@@ -55,7 +60,7 @@ public sealed class ComplexityProbeTests
 
             Assert.True(result.Profile.Measured);
             Assert.True(result.HasQuality);
-            Assert.True(meter.Calls >= 2, $"{meter.Calls} pencere olculdu");
+            Assert.True(meter.Calls == 2, $"8 sn klip 2 sn'lik iki pencereye bolunuyor, {meter.Calls} pencere olculdu");
             Assert.Equal(meter.Calls, result.QualityMeasurements.Count);
             Assert.All(result.QualityMeasurements, q => Assert.Equal(91.0, q.VmafNegMean));
         });
@@ -158,15 +163,16 @@ public sealed class ComplexityProbeTests
     [FfmpegFact]
     public async Task CancellationReachesQualityMeasurement()
     {
+        using var cts = new CancellationTokenSource();
+        var meter = new CancellingMeter(cts);
+
         await WithClipAsync(async info =>
         {
-            using var cts = new CancellationTokenSource();
-            var meter = new BlockingMeter();
-            var pending = ComplexityProbe.RunDetailedAsync(info, SpeedMode.Fast, true, meter, cts.Token);
-            await meter.Entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
-            cts.Cancel();
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pending);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => ComplexityProbe.RunDetailedAsync(info, SpeedMode.Fast, true, meter, cts.Token));
         });
+
+        Assert.True(meter.Calls > 0, "olcer hic cagrilmadi; iptal yolu sinanmadan gecti");
     }
 
 
@@ -511,4 +517,5 @@ public sealed class ComplexityProbeTests
         await Task.WhenAll(stdout, stderr);
         Assert.Equal(0, process.ExitCode);
     }
+
 }

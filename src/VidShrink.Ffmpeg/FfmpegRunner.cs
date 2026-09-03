@@ -3,6 +3,51 @@ using System.Diagnostics;
 namespace VidShrink.Ffmpeg;
 
 /// <summary>
+/// ffmpeg'in <b>cikis kodu 0 ile</b> dondugu halde verilen ayari kabul etmedigini soyleyen
+/// tanili satirlar. Kodlayici parametre dizgilerinde (<c>-svtav1-params</c>,
+/// <c>-x265-params</c>, <c>-x264-params</c>) taninmayan bir anahtar kodlamayi durdurmuyor:
+/// anahtar dusuruluyor, kodlama devam ediyor, surec 0 donuyor. Bu yuzden ne yetenek ne de
+/// basari donus koduyla olculebilir.
+/// <para>
+/// Sozluk dar tutuluyor. Iceri yalnizca bu makinede <b>cikis kodu 0</b> ile olculmus
+/// ifadeler giriyor; olculmus ama sifirdan farkli kodla gelen ifadeler disarida, cunku
+/// cagiran onlari zaten cikis koduyla yakaliyor. Gerekce ve ham cikti:
+/// <c>docs/olcumler/cikis-kodu-yalan.md</c>.
+/// </para>
+/// </summary>
+public static class FfmpegDiagnostics
+{
+    /// <summary>
+    /// Cikis kodu 0 iken bir ayarin dusuruldugunu bildiren ifadeler.
+    /// <list type="bullet">
+    /// <item><c>Error parsing option</c> — libsvtav1 ve libx264, cikis kodu 0 ile olculdu.</item>
+    /// <item><c>Unknown option:</c> — libx265, cikis kodu 0 ile olculdu.</item>
+    /// </list>
+    /// </summary>
+    public static readonly IReadOnlyList<string> DroppedOptionPatterns = new[]
+    {
+        "Error parsing option",
+        "Unknown option:"
+    };
+
+    /// <summary>Tek bir stderr satiri bir ayarin dusuruldugunu soyluyor mu.</summary>
+    public static bool ReportsADroppedOption(string line)
+        => !string.IsNullOrEmpty(line)
+           && DroppedOptionPatterns.Any(pattern => line.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Tam bir stderr metnindeki tanili satirlar; sirasi korunur.</summary>
+    public static IReadOnlyList<string> DroppedOptionLines(string standardError)
+    {
+        if (string.IsNullOrEmpty(standardError)) return Array.Empty<string>();
+        return standardError
+            .Split('\n')
+            .Select(line => line.TrimEnd('\r'))
+            .Where(ReportsADroppedOption)
+            .ToArray();
+    }
+}
+
+/// <summary>
 /// Tek seferlik bir ffmpeg kosusunun sonucu. Hata metni yutulmaz: cagiran
 /// <see cref="StandardError"/> ile kullaniciya sebep gosterebilir.
 /// </summary>
@@ -10,7 +55,20 @@ namespace VidShrink.Ffmpeg;
 /// <param name="ExitCode">Surec cikis kodu; surec hic kosmadiysa -1.</param>
 /// <param name="StandardError">ffmpeg'in son hata satirlari.</param>
 /// <param name="Elapsed">Duvar saati.</param>
-public sealed record FfmpegRun(bool Ok, int ExitCode, string StandardError, TimeSpan Elapsed);
+/// <param name="DroppedOptions">
+/// ffmpeg'in kabul etmeyip sessizce dusurdugu ayarlarin tanili satirlari. Cikis kodu 0
+/// olsa da dolu olabilir; <see cref="Ok"/> bundan etkilenmez.
+/// </param>
+public sealed record FfmpegRun(
+    bool Ok,
+    int ExitCode,
+    string StandardError,
+    TimeSpan Elapsed,
+    IReadOnlyList<string>? DroppedOptions = null)
+{
+    /// <summary>Kosum bittiginde ffmpeg'e verilen ayarlardan en az biri dusurulmus.</summary>
+    public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
+}
 
 /// <summary>
 /// Hazir bir arguman listesini kosturur ve bitmesini bekler. Arguman uretmez — ne
@@ -57,7 +115,7 @@ public static class FfmpegRunner
                 var text = await stderr;
                 clock.Stop();
                 ct.ThrowIfCancellationRequested();
-                return new FfmpegRun(process.ExitCode == 0, process.ExitCode, Tail(text), clock.Elapsed);
+                return Decide(process.ExitCode, text, clock.Elapsed);
             }
             catch (OperationCanceledException)
             {
@@ -70,6 +128,14 @@ public static class FfmpegRunner
             }
         }
     }
+
+    /// <summary>
+    /// Bitmis bir kosumun ham cikis kodunu ve tam stderr metnini sonuca cevirir. Surec
+    /// baslatmaktan ayri durur: olcu, verilen metnin uretecegi karari surec kosturmadan pimler.
+    /// </summary>
+    internal static FfmpegRun Decide(int exitCode, string standardError, TimeSpan elapsed)
+        => new(exitCode == 0, exitCode, Tail(standardError), elapsed,
+               FfmpegDiagnostics.DroppedOptionLines(standardError));
 
     /// <summary>Uzun hata akisindan yalnizca son satirlar; sebep hep sonda durur.</summary>
     public static string Tail(string text)

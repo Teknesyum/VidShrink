@@ -1,0 +1,27 @@
+{
+  "contractId": "T134",
+  "auditorRunId": "a5d4d26a060ba136a",
+  "headSha": "d0c95b936ef564df3245744661f80689d8bfc04e",
+  "diffHash": "360faf69ddb4ae3b0ee438a5434a9ba21a73f7556088a6d3cb70b5df525cc34f",
+  "owns": [
+    "docs/olcumler/siyah-kenar.md",
+    "tools/siyah-kenar/esik.py",
+    "tools/siyah-kenar/kanit.py",
+    "tools/siyah-kenar/kaynak.sh",
+    "tools/siyah-kenar/kos.sh",
+    "tools/siyah-kenar/olc.py",
+    "tools/siyah-kenar/ortak.sh",
+    "tools/siyah-kenar/oz.py",
+    "tools/siyah-kenar/sure.py",
+    "tools/siyah-kenar/yokla.py",
+    "tools/siyah-kenar/zarar.sh",
+    ".gitignore"
+  ],
+  "verification": [
+    "Denetci depo disinda (git archive 4567048) calisti, depoya yazmadi. HUKUM GECTI, KRITIK yok. Kendi kosumu: dotnet test -c Release --filter FfmpegArgumentsTests -> 62/62 basarili, cikis 0. Hukumdeki her sayi K3 izgarasindan yeniden hesaplandi ve birebir tuttu: ortalama 0,083, pozitif 2/4, erisilebilir ortalama -0,025, KD +0,408, 12 hucrenin tamami, K5(c) -1,030/-0,934, bant yuzdeleri 25,56/19,26/4,07, limit pencereleri 8..56 kesisim 48..96 = 48..56. K4 on kayit dogrulandi: esik eabe75a 11:12:31 ve bitrate noktalari ee37fcb 11:17:44, ilk olcum duzenegi afdd51d 11:33:05 - esik metni ve oz.py sabitleri yedi commit boyunca degismedi. Hukmun dayandigi asil iddia kanitli: varsayilan limit=24 ile cropdetect KD icin 1920:1080:0:0 donuyor yani hic kirpmiyor, KA/KB/KC bulunuyor. oz.py sabit metin basmiyor, ort ile ESIK_TABAN karsilastirip dallaniyor. src ve tests altina dokunulmamis. Sekiz borc kayitli."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T10:34:15.390Z",
+  "usedAt": "2026-09-02T10:34:37.418Z",
+  "completedSha": "d0c95b936ef564df3245744661f80689d8bfc04e"
+}

@@ -133,6 +133,22 @@ public static class CodecModel
 
     public static bool IsHardware(string codec) => Vendor(codec) != EncoderVendor.Software;
 
+    private static readonly IReadOnlyDictionary<string, string> TurboFirstPassCeilings =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["libx264"] = "veryfast",
+            ["libx265"] = "veryfast"
+        };
+
+    public static IReadOnlyCollection<string> TurboFirstPassCodecs
+        => (IReadOnlyCollection<string>)TurboFirstPassCeilings.Keys;
+
+    public static bool SupportsTurboFirstPass(string codec)
+        => TurboFirstPassCeilings.ContainsKey(codec);
+
+    public static string? TurboFirstPassCeiling(string codec)
+        => TurboFirstPassCeilings.TryGetValue(codec, out var preset) ? preset : null;
+
     public static bool CostsQualityInHardware(string codec)
         => IsHardware(codec)
            && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)

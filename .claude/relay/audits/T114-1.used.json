@@ -1,0 +1,35 @@
+{
+  "contractId": "T114",
+  "auditorRunId": "acbb87089e8f3c111",
+  "headSha": "91ec6d4b42baf68e5fba30e74cdeaae6315fdaec",
+  "diffHash": "79140b513bb0eb81416b2bad25ca5190a4eb0d58cd3aede482c82b37d1469565",
+  "owns": [
+    "docs/olcumler/sahne-butcesi.md",
+    "tools/sahne-butcesi/00-pencereleri-kes.sh",
+    "tools/sahne-butcesi/01-olcumu-kos.sh",
+    "tools/sahne-butcesi/02-mutasyon.sh",
+    "tools/sahne-butcesi/03-duzenek-mutasyonu.sh",
+    "tools/sahne-butcesi/04-kapi-denemesi.sh",
+    "tools/sahne-butcesi/05-cikti-denetimi.sh",
+    "tools/sahne-butcesi/06-tekrar-denemesi.sh",
+    "tools/sahne-butcesi/07-sayim-denetimi.sh",
+    "tools/sahne-butcesi/Butce.cs",
+    "tools/sahne-butcesi/DUZENEK.md",
+    "tools/sahne-butcesi/ESIKLER.md",
+    "tools/sahne-butcesi/Kabuk.cs",
+    "tools/sahne-butcesi/Program.cs",
+    "tools/sahne-butcesi/Rapor.cs",
+    "tools/sahne-butcesi/SahneButcesi.csproj",
+    "tools/sahne-butcesi/cikti-denetimi.py",
+    "tools/sahne-butcesi/kapi-fikstur.py",
+    "tools/sahne-butcesi/sayim-denetimi.py",
+    "tools/sahne-butcesi/tekrar-fikstur.py"
+  ],
+  "verification": [
+    "GECTI, KRITIK yok. Denetci arsiv kopyasinda calisti, depoya yazmadi. Kendi kosturduklari: dalin src/ ve tests/ altinda sifir satir degistirdigi (f542dc2..bfea1b6 diff bos); sifirdan derleme + PlanCalculatorTests 23/0; raporu ham veriden yeniden uretip teslim edilenle karsilastirma (fark 10 satir, hepsi ortam/zaman damgasi, elle tasinmis sayi yok); sekiz MAE cifti ham .json dizilerinden yeniden hesaplandi (5/8, sahne>=4 olan 5 hucrede harita 3'unde onde); sayim-denetimi.py bagimsiz kosuldu 12/12 ve saydigi ile sutun adinin uyustugu dogrulandi; K7'nin uc p10 sayisi ham dosyada birebir; tekrar gurultusu 0,002 pp ve 22,0 carpani; 130 dosya / sapan 0; olculmeyen 26 satir; esiklerin olcumden once yazildigi zaman damgalariyla. Dokuz borc kaydedildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T12:53:16.468Z",
+  "usedAt": "2026-09-02T12:53:29.642Z",
+  "completedSha": "91ec6d4b42baf68e5fba30e74cdeaae6315fdaec"
+}

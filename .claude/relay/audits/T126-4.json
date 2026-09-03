@@ -1,0 +1,20 @@
+{
+  "contractId": "T126",
+  "auditorRunId": "a03e2533ec2f05468",
+  "headSha": "73d4f9dadee2e1bf2ea86352725daa4c8b2af867",
+  "diffHash": "bcfba6c7d69e9a0d9205ab45c06763ce28c739059508e9515738aa2ae834c867",
+  "owns": [
+    "docs/inceleme/argumanlar.md",
+    "docs/inceleme/handbrake-motoru.md",
+    "docs/inceleme/model-strateji.md",
+    "docs/inceleme/plancalculator.md",
+    "docs/inceleme/uygulama-katmani.md",
+    "docs/olcumler/surecler-arasi-olcu-yalitimi.md",
+    "docs/olcumler/alinti-kaymalari.md"
+  ],
+  "verification": [
+    "Denetci depo disinda calisti, sifir dotnet test kullandi (belge sozlesmesi). Tur 4'un uc maddesi de birinci elden dogrulandi. (a) Dizge ve mekanizma ayrimi denetcinin kendi git grep -c olcumuyle kuruldu: dizge terimi 774b187 oncesinde 1, sonrasinda yok; EnglishToTurkish 774b187'de hala 4, b976332 sonrasinda 0. Yani dizgeyi dusuren 774b187, mekanizmayi kaldiran b976332, ve rev-list --count b976332..774b187 = 0 ile ata sirasi da dogrulandi. Teslim ikisini ayri cumlelere bolmus. (b) 283-286 silinmemis: diff hunk saf ekleme, tek satir kaybi yok; yanlis cumle yerinde duruyor ve altina K12 bicimli curutme bloku eklenmis, dogru kronolojiye satir numarasiyla degil bolum adiyla baglanmis - sozlesmenin kendi konusu olan atif kaymasina karsi daha dayanikli, sapma lehte. (c) Bu turun asil isi olan mekanik tarama denetci tarafindan yeniden kosuldu: 326be1d agacinda 36 satir, tablodaki 36 konumla sira ve satir numarasi olarak birebir; etiket dagilimi dizge 28 mekanizma 8, toplam 36, birebir tuttu. Denetci etiketleri rastgele degil hash ile ozne uyusmazligi riski tasiyan dokuz noktadan ornekledi ve dokuzunu da commit kanitiyla teyit etti. Ajanin bu turda buldugunu bildirdigi iki yanlis iddia (satir 11 ve 15-18) bagimsiz olarak yanlis dogrulandi: 135'teki sozluk 774b187'de kaldirildi iddiasi yanlis cunku sozluk o commit'te iki dosyada 4 eslesmeyle duruyor, ve 283-286'nin kronolojisi ters yazilmis. Bu sozlesmenin tarihcesindeki asil risk sarkacin ters uca savrulmasiydi: T0'in tur 2 talimati yanlisti, ajan duzeltmeyi fazla uygulayip 774b187 bilgisini sozluk cumlesine de tasimisti. Denetcinin hukmu net: 36/36 etiket tutuyor, tek yonlu sistematik kayma yok, danismanin korktugu ucuncu salinim olmamis. owns temiz: 890af6e ile d5d7ff7 arasinda yalniz yedi sahiplenilen dosya, tur 4 commit'i yalnizca alinti-kaymalari.md'ye dokunmus, catisma cozumu kayip uretmemis. Alti borc kaydedildi, KRITIK yok. En dikkat cekeni tablo 12: dogru isaretli ama cumle tur 2'nin birlestirmesini tasiyor - kunyeyi bayatlatan b976332 degil 774b187; denetci KRITIK saymadi cunku K13'un yazili urunu etiket ve etiket dogru, ayrica ayni belge 96 satir asagida bunu curutuyor, ama 132 ve 289'a uygulanan geri cekildi isareti burada yok. Muhur oncesi T0 uc duzeltme yapti: verify liste bicimine alindi (duz satir hic adim uretmiyordu, T127'deki ayni kusur), python tam yola cevrildi (node cocuk surecinin PATH'inde python yok), ve hedef dosyalar owns'taki yedi belgeye daraltildi cunku genis tarama T126'nin sahiplenmedigi uc bulguyu (ortam-gecidi.md:292, ab-duzenegi.md:556, olculen-kaliteyle-plan.md:792) kapiya sokuyordu ve sozlesmeyi kendi sucu olmayan bulgular yuzunden kapali tutuyordu. Sahiplenilen dosyalardaki uc SATIR KAYDI T0 tarafindan duzeltildi, ucu de aracin kendisinin yazdigi degeri alan tek satirlik kunye degisimi: plancalculator.md:94 EncodeRunner.cs:92 -> :128, uygulama-katmani.md:54 ve alinti-kaymalari.md:80 EncodeRunner.cs:269 -> :357. Kaymanin sebebi tur 4'un kendi birlestirmesi, EncodeRunner.cs main'de buyudu. Daraltilmis verify bu uc duzeltmeden sonra KAYMA 0 SATIR KAYDI 0 ve cikis 0 veriyor. Kayitli fark: arac bulgu varken cikis 1 veriyor ama denetci arsiv kopyasinda cikis 0 gormus, aciklanmadi, borc olarak duruyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T08:30:05.261Z"
+}

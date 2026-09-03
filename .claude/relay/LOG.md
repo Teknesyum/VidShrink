@@ -129,3 +129,729 @@ T122 · builder · p10 kuyrugu tek sayidan haritaya oturtuldu, uretim kodu degis
 T115 · builder · ffmpeg CI'da körlüğü kaldırdı: `ci.yml` `GyanD/codexffmpeg` 9.0'ı (yerelle birebir aynı sürüm) sha256 doğrulamalı kuruyor, hash uyuşmazsa/binary eksikse sert düşüyor (K7, gerçek kanıt `33582680807` — sabitin ilk yazımında eksik karakterle hiç test koşmadan düştü) · libvmaf CI'da da var, 0 ek atlama (K2) · öncesi (`33582206982`, `68cb3c93`) / sonrası (`33584487781`, `5694bc6d`) aynı dalda: Skipped 95 → 17, **78 ölçü** artık gerçekten koşuyor (~80 beklentisiyle örtüşüyor); T110'un 5 kare-kilidi ölçüsü ayrı doğrulandı, öncesi hepsi `[SKIP]` sonrası hepsi geçti — bugün kilidi kaldıran bir değişiklik CI'da yeşil kalırdı, artık kalmaz · tek yeni kırmızı `PerformanceCheckTests.IslemciZamaniSayaciDogruOkuyorMu` (`:713`, `Kos()` `:763`), iki bağımsız koşumda aynı: CI'da NVIDIA sürücüsü yok, `EncoderCapabilities.HasEncoder` listede-var mı bakıp gerçek kullanılabilirliği doğrulamıyor, `h264_nvenc` seçiliyor ve `Cannot load nvcuda.dll` ile düşüyor — **düzeltilmedi**, kaynağı T63 (kapalı), aynı mekanizma `PerformanceProbe.cs:81`'de de var, T0 yeni tur açmalı · süre 12dk29 → 17dk48 (+5dk19, ~1.43x), kurulum 9sn, artış neredeyse tamamı 78 yeni ölçünün gerçek ffmpeg çağırmasından, kabul edilebilir · `kosum-kapisi.ps1 -MinimumTotal` 950 → 1000, eski eşiğin oranı (~%85, tarihsel Total kesin ölçülemedi) yeni Total'e (1174) uygulanarak türetildi · `tools/ci-gibi-kos.sh` (owns dışı, T66 mirası) artık CI'ı temsil etmiyor, ffmpeg'i PATH'ten siliyor ama CI artık ffmpeg görüyor, ayrı tur gerekiyor · rapor `docs/olcumler/ci-ffmpeg.md`, tüm sayılar üreten komut + koşum kimliğiyle · dal T115-ci-ffmpeg, commit 545d8ef
 T115 · builder · tur 2 · KRITIK kapandi — esik olculmemis 1119 yerine denetcinin olctugu taban (CI 33525816911, 9ae6dce, Total 983) uzerine kondu, oran yon hatasi duzeltildi (950/983 ~ %96,6 alt sinir, ust sinir degil): -MinimumTotal 1000 -> 1134 · yapisal delik (Total=Passed+Failed+Skipped, MinimumTotal tek basina sessiz atlama-korlugunu hicbir degerde yakalayamaz) icin secim (a): kosum-kapisi.ps1'e opsiyonel -MaximumSkipped eklendi (kod 69), test-kapi.ps1 + yeni fixture korluk-geri-en.txt ile kilitlendi, yerelde 10/10 gecti · denetcinin iki sahte-gecme senaryosu (Skipped 95/Total 1174 ve Skipped 17/Total 1096) yeniden uretildi: eskiden GECTI, simdi DUSTU (kod=69, kod=68) · "gevsetmez" iddiasi hem ci-ffmpeg.md K6'da hem sozlesmenin kendi Rapor'unda duzeltildi · 78 vs 83 ayristirildi (78=genis aralik 33582206982->33584487781, 83=dar/neredeyse-ayni-agac 33582483001->33582768395, T110'un 5 kare-kilidi 83'un icinde) ve sozlesmenin "bunlarin icinde" kaymasi duzeltildi · K4 onerisi duzeltildi: yeni prob yazilmayacak, EncoderCapabilities.cs:30 WorksAsEncoder zaten var, PerformanceProbe.cs:81 ona baglanacak, is T117'de · duzeltilmis ci.yml gercek bir kosumla tamamlandi: 33589639249 (0e122f2), Failed 1/Passed 1162/Skipped 17/Total 1180/18m59s, kod=66 (bilinen K4 kirmizisi, esiklere gelmeden reddediyor) · yan bulgu: guard.js owns esleme hatasi (glob `**` hicbir yolu eslemiyor) ayri arka plan gorevi olarak isaretlendi · dal T115-ci-ffmpeg, commit 0e122f2
 T126 · builder · tur 3 · K12: madde 90daki yanlis kaldirici commit iddiasi (b976332) curutuldu, silinmedi — bagimsiz git log -S/git grep -c koşumu dizgeyi asil dusuren commitin 774b187 (2026-08-22 Avalonia gecisi) oldugunu gosterdi, b976332/T83 (2026-08-30) o noktada zaten 488 commit gecikmis, dizge sekiz gun once zaten yoktu · genel kural eklendi: commiti kaldirici ilan etmeden once git log -S ciktisinda gormek zorunlu, ayrica git grep -c <commit>^ (var)/git grep -c <commit> (yok) ciftiyle dogrulanmali · dokunulmadi: 87-88deki sozluk-mekanizmasi cumlesi dogru, uc olu JSON anahtari ve Locales yeri dogru, K9/K11 gecti, owns temiz, commit hijyeni temiz, aracin mansheti tutuyor (KAYMA: 0 SATIR KAYDI: 1, T125in bulgusu) · iki kucuk madde kapandi: K11 icindeki EncodeRunner.cs:271/:269 transkripsiyon hatasi duzeltildi, tur 1in geri cekilen "hicbir zaman" ifadesine 100 satir asagidaki geri cekmeye isaret eden not eklendi · rapor docs/olcumler/alinti-kaymalari.md Tur 3 bolumu, dal itildi 170e6d0, main birlesmedi
+T126 · builder · tur 4 · K13 kapandi (dizge/mekanizma ayristirildi, K10 curutuldu, 36 satirlik mekanik tarama tablosu) · d5d7ff7 itildi, merge origin/main sonrasi yeni SATIR KAYDI bulgusu raporlandi (duzeltilmedi)
+T131 · builder · TESHIS: (b) dogru, kurulum boguluyor; (a) olcumle curutuldu, urun kusuru yok · K1 iki sayi ayri: bos makinede klip kurulumu 103-348 ms / iptalin ulasmasi 1-104 ms, 32 iplik yuk altinda kurulum 7,6-9,0 s / sondanin kendi pencere kodlamasi 19,1-23,4 s / iptalin ulasmasi 93-427 ms; toplam 29-32 s, T115'in 31 s'si bu, iptalin payi binde 7 · T115 kosumunun kendi dagilimi olculmedi (T115 yalniz toplami bildirmis) · K2 UYGULANMADI, yutan catch yok: iptal ComplexityProbe.cs:477 (olcer cagrisi) ve :101 (RunDetailedAsync disi) olmak uzere iki yerde yeniden firlatiliyor · T115 denetcisinin "10 s siniri yalniz Entered'i koruyor, ~20 s Cancel sonrasina dusuyor, istisnayi dogal bitis atiyor" okumasi CURUTULDU: enstrumantasyon iki araligi ayri saydi (20 s Cancel'dan ONCE), ve iptalsiz denetim kosumunda RunDetailedAsync olcere girdikten sonra 30 s icinde bitmedi (3/3) — BlockingMeter Task.Delay(Infinite, ct) ile sonsuz bekler, iptalsiz tek cikis SampleTimeout 90 s, yani 92 ms sonra gelen istisna dogal bitisten gelemez · ffmpeg sureç sayaci kirli cikti (makinedeki TUM ffmpeg'leri goruyor, baska worktree'ler kosuyordu), kanit olarak kullanilmadi ve belgede boyle yazildi · K3/K4 duvar saati tamamen kaldirildi: BlockingMeter + WaitAsync(10 s) yerine CancellingMeter, iptali olcerin kendisi tetikliyor; testte hicbir sure siniri/Stopwatch/Task.Delay kalmadi, kurulum testin suresini belirliyor sonucunu belirlemiyor; meter.Calls > 0 olcere hic ugramadan gecen kosumu yakalar · kurulumu kucultmek ise yaramiyordu, 1/7,5 piksel hacimli klip ayni 21-28 s'yi verdi (darbogaz piksel degil surec baslatma/zamanlama) · K5 tablo: M1 (ComplexityProbe.cs:477 ic yeniden firlatma silindi) YESIL — YAKALANMIYOR, iki koruma yedekli, aradaki tek gozlenebilir fark sure ve K4 geregi sure iddiasi koyulmadi, boşluk belgede acikca yazili; M2 (:101 dis yeniden firlatma silindi) kirmizi 481 ms; M3 (M1+M2) kirmizi 479 ms; M4 (olcu eski haline dondurulup 32 iplik yuk altinda) kirmizi 17 s ve WaitAsync(10 s) satirinda dusuyor — (b)'nin dogrudan kaniti; duzeltilmis olcu yuk altinda yesil 24 s, bos makinede yesil 1 s · K6 uc madde listelendi hicbiri duzeltilmedi: WithClipAsync:176-187 (10 kosumun 9'u icin iptalsiz/sinirsiz 8 s'lik klip, yuk altinda her biri 8-11 s), RunFfmpegAsync:189-198 (zaman sinirsiz ve iptalsiz ffmpeg beklemesi), WindowAndMotionSamplesCountTheSameByteUnit:107-108 (gerekcesiz drift < 0.08) · SOZLESMEDE IKI YANLIS ONCUL: (1) owns'ta src/VidShrink.Core/ComplexityProbe.cs yaziyor, dosya src/VidShrink.Ffmpeg/ComplexityProbe.cs; (2) sozlesme suiti paralel saniyor, LanguageTests.cs:17 CollectionBehavior(DisableTestParallelization = true) paralelligi kapatiyor — yavaslatan makinenin genel yuku · ikisi de _sorun.log'a yazildi · urun kodu degismedi, yalniz tests/VidShrink.Tests/ComplexityProbeTests.cs ve docs/olcumler/iptal-ulasmiyor.md · dogrulama: filtreli 10/10 yesil, tam suit 1223/0/23 yesil 21dk52, CI kosum 33605520327 success · dal T131-iptal-ulasmiyor itildi, bes commit (706126b, 94367b6, f22ec3b, 1989361, 790441d), main birlesmedi
+T108 · builder · tur 2 · dort maddenin dordu kapandi, yeni kodlama kosulmadi; iki sayim ham CSV'den yeniden uretildi, iki iddia testle olculdu · **K4 kirilimi duzeltildi**: `.calisma/t108/donanim/olcum.csv` (kaynak,kodlayici,oran,tepe) dortlusunde tekillestirilince — dosyada yeniden kosulmus hucrelerin eski satirlari sayimi sisiriyordu — **hareketli 29/30, durgun 5/30**, toplam 34 degismedi; asmayan tek hareketli hucre av1_nvenc/16,000/1,02 = 0,9931, asan bes durgun hucre av1 2,600@1,10 · av1 7,500@1,02 · hevc 2,600@1,10 · hevc 2,600@1,50 · hevc 4,636@1,50; **tablonun kendi "asan" sutunu bastan beri dogruydu (14+15 ve 2+3), yanlis olan onu ozetleyen cumleydi** — bu deponun sayilmis kusurunun tam bicimi · uc yerde duzeltildi: tepe-egrisi.md K4, FfmpegArguments.cs:126, sozlesmenin K4 satiri · **WidePeakFactor gerekcesi duzeltildi**: 1,50 dort yazilim satirinin ucunde degil **ikisinde** kazaniyor (durgun/4,636 +1,559, durgun/10,236 +0,213); diger ikisinde 1,02 kazaniyor (hareketli/4,636 +0,389, hareketli/10,236 +0,066 — istisna iki satir, biri degil); sabit yine degismedi ama gerekce degisti: tablo "1,5 en iyi" demiyor "kazanan tepe kaynaga gore degisiyor" diyor ve PeakRateFactor o girdiyi almiyor, yani K6'nin ana gerekcesiyle ayni sebep; iki kayip kucuk iki kazanc buyuk, bu bir **takas** tek yonlu ustunluk degil · tepe-egrisi.md (K2 ve K6 tablosu) ve FfmpegArguments.cs:139 duzeltildi · **Floor iddiasi daraltildi, ve daraltirken denetimin cumlesi de duzeldi**: denetimin onerdigi "Floor = 0,12 ile kesim listesi bosaldi" oldugu gibi yazilmadi, once olculdu ve tam boyle cikmadi — yeni olcu `Kayitli_kuralin_alt_ucu_bolusu_erisilebilir_ucta_degisiyor` sunu buluyor: **durgun** adaylarda esik kiskacin ortasinda (~0,109) durdugu icin Floor=0,12 butun kesimleri siliyor (liste bosaliyor), **hareketli** adaylarda kipirti yuksek oldugu icin esik zaten Ceiling'e (0,15) yapisik ve alt kiskac hicbir degerde baglamiyor, yani 0,12 **hicbir seyi degistirmiyor**; ilk yazdigim "ikisi de bosaliyor" hali kirmizi dondu ve duzeltildi · dogru cumle: Floor kayitli degerinde **erisilemez ama olu degil**, olu olup olmadigi kaynaga bagli; `Kayitli_kuralin_alt_ucu_bolusu_degistirmiyor` docstring'i bunu soyluyor ve korumanin `Az_bolme_duzeltmesi_olculdugu_kuralda_kalir`'da oldugunu isaret ediyor · **FfmpegArguments.cs:269** "between 2x and off was not measured" kalkti; yerine K5'in olctugu yazildi: libx265/CRF 23'te 1,25 ustunde VBV baglamiyor (1,25·1,50·2,00 bayt bayt ayni dosya) yani 2x ile kapali arasinda kazandiran ara ayar yok, gercek secim 1,10 ya da kapali; durgun klipte CRF 23 hedefin %5'ine indigi icin VBV hic baglamiyor; **libx264'te olculmedi** ve ustteki iki satir (14,731 / 15,312 MiB) oradan geliyor · **FfmpegArgumentsTests.cs:408**: dal origin/main'den guncellendi (929d6fc), **catisma cikmadi** cunku T113'un kod degisikligi henuz main'de degil — MainWindow.axaml.cs:1802 hala `..., _encoders));` ve dosyada `_sceneMap` gecmiyor, main'de T113 adina yalnizca sozlesme commit'leri var; pim iki tarafta da yesil, T113'un kolu girdiginde T113'un tarafi alinacak · **CI kirmizi cikti ve sebep yalitildi, benim degil**: kosum 33605278420 (7bc3be0) Failed 1 / Passed 1144 / Skipped 109 / Total 1254, dusen tek olcu `SplitDragTests.Kare_arasindaki_bos_turda_ayirici_cizim_acmaz`; uc bagimsiz kontrol — (1) 7bc3be0'in FfmpegArguments.cs diff'inde **yorum disi tek satir yok**, uretim davranisi bu turda hic degismedi, (2) olcu ayni commit'te yerelde tek basina gecti, (3) olcu duvar saatine bagli (SplitDragTests.cs:78-100, Stopwatch ile 50 ms) ve duzeltmesi T127'nin dalinda hazir ama main'de degil (c3da7a9 dalimin atalari arasinda yok); dosya owns'umda degil, **dokunmadim**; `--failed` ile yeniden denenince ayni kosum **success** dondu, yani olcu kararsiz — yesil de kalicilik kaniti degil · onceki iki kosum bbefecc 33603365325 ve e91660f 33602094218 success · verify (`--filter FfmpegArgumentsTests`, Release, --no-incremental derleme sonrasi) **0 basarisiz / 66 basarili / 0 atlanan** (tur 1'de 65; artan olcu yeni sinir olcusu) · dal T108-tepe-egrisi itildi (7bc3be0), **main birlesmedi**
+T129 · builder · "olculemedi" cagirana gorunur oldu: EncoderProbeState (Working/NotWorking/Unmeasured) + EncoderProbeResult.Measured init alani, pozisyonel imza korundu (HardwareVerdictTests owns disi), IEncoderAvailability.EncoderState varsayilan gerceklestirmeli uye ile on test sahtesi kirilmadan eklendi · K1 dort kacak + sozlesmenin uc kacagi origin/main 13a8507'de satir satir dogrulandi, tutmayan yok · T130 ICIN KRITIK: EncoderState ve Hdr10State SUREC DOGURMUYOR, yalnizca onbellegi okuyor, Unmeasured "henuz bakmadik" demek ve arayuz is parcacigindan cagrilabilir · K5 dort kacak kapandi (catch -> Unmeasured, WarmEncoderOption olculemeyeni yazmiyor, RunCapture asenkron okuma + gercek 5000 ms sinir ve Instance basarisiz acilisi 5 sn sonra yeniden deniyor, HDR dongusunde kabul edilen bicim muhurlenmeden donuyor); KAPATILAMAYAN: HdrResolver.cs:58'in null'i "HDR10 yok" okumasi T130'un dosyasinda, IHdr10ProbeAvailability.Hdr10State sunuldu tuketilmedi · K6 kilit ffmpeg suresince tutulmuyor, cift kontrolle yazi yarisi kapali, 16 es zamanli cagri ayni ornegi goruyor · SEKIZ MUTASYON dalin ucundeki agaca karsi kosturuldu, sekizi de tam hedefledigi olcuyu kirdi (A/B kova, C/D kilit, E/F HDR dongusu, G/H surec dogurmama) · K7 CI 33605884286 (5ee8408) yesil: Failed 0 / Passed 1150 / Skipped 106 / Total 1256, onceki 33604326223 (0df815b) Total 1252 — fark T129'un dort yeni olcusu; SplitDragTests bu dalda hic kirmizi cikmadi · YEREL TAM SUIT KASITLI KESILDI: yedi kardes ajan es zamanli dotnet test kosturuyordu (47 dotnet sureci), K6'nin 750 ms butceli yaris olculeri o yukte kararsiz olurdu; tam suit kaniti yalniz CI · OLCUSUZ KAPANIS: Load/RunCapture/Instance uclusu okunarak dogrulandi, olcuyle tutulmuyor · T0'A NOT: kullaniciya ayri "olculemedi" cumlesi MainWindow.axaml.cs gerektirir (App kapsam disi); HardwareVerdictReason'a yeni uye eklemek :676'daki _ kolu yuzunden YANLIS cumle yazdirirdi, yerine HardwareVerdict.Measured kondu; onbellegi isitacak arka plan cagrisi T129'da yok, T130'un · rapor docs/olcumler/ucuncu-durum.md, dal T129-ucuncu-durum itildi (5ee8408), main birlesmedi
+T135 · builder · yol haritasi kendi verisine baglandi: § 6'nin sirasi 13 kat buyuk bir sayidan (eski ortalama acik +1,269) cizilmisti, kilitli olcumun +0,097'siyle yeniden cizildi · **sira degisti**, eski numaralariyla 1, 3, 5, 2, 4, 7, 6; iki madde 2 basamak oynadi (eski 5 -> 3. sira, eski 2 -> 4. sira) · siralama olcutu artik belgede yazili bes maddelik kural (olculmus p10 etkisi > olculmus ortalama etkisi > yuruyen sozlesme olcuyor mu > kuyruga dokunabilir mi > urun kapsami en sonda) ve harmonik eksen olarak dusuruldu (H3: kilitli olcumde harmonik acigi +0,099, ortalamadan 0,002 uzakta) · K1 tablosu **27 satir** (uc gecisli tarama 30 satir yakaladi, uc yanlis pozitif tabloda tutuldu — sessiz atlama yok), 4 iddia "duzeltilmemis" cunku karsiligi ne kilitten once ne sonra olculdu (eski 2, 3, 4, 7) · K5'te **2 kapi kaldirildi**, ikisi de T111 kapisi (eski :402 "T111 kapandiginda sira yeniden cizilmelidir", eski :451 "T111 kapanmadan bu maddeye yatirim yapilmamali"); K5 tablosu maddeleri yuruyen sozlesmelere bagladi: eski 1 -> T133, eski 3 -> T114, eski 5 -> T134 · K4: 6.1'in cikarimi duzeltildi ama **maddenin kaderine karar verilmedi** — `-g` izgarasini T133 su anda olcuyor, karar T133'un; § 5'teki `FfmpegArguments.cs:162 -g = max(2, round(fps × 2))` satiri artik yanlisti (T98/8ea80c4 formulu araliga cevirdi), simge capasiyla (`FfmpegArguments.KeyframeArgs`) yeniden yazildi · K6 mekaniklestirildi: `tools/harita-tazeleme/harita-tazeleme.py` (tara/bayat/sira/hukum/dogrula, bagimlilik yok), H1..H9 hukum cumleleri elle yazilmadi, `hukum` ciktisindan birebir kopyalandi; `dogrula` her cumlenin belgede durdugunu ve her duzeltilmis sayinin docs/olcumler/auto-mod.md'de bulundugunu denetliyor · **kendi dogrulayicim kronik kusuru yakaladi**: `dogrula` uc bulgu dondu (95,647 / 95,743 / 15 496 155 haritada yok) — duzeltilmis ham ortalamalar veride vardi ama belgeye hic yazilmamisti; eklendi, sonra 0 bulgu · yeni bulgu belgeye girdi (H4): auto'nun en buyuk olculmus acigi HandBrake'e karsi degil **kendi uzman ayarlarimiza** karsi, ortalamada +0,437, HandBrake acigin 4,5 kati · capalar satir numarasi degil bolum basligi + tablo satirinin ilk hucresi ("su an :NNN" olarak) · KALAN BORC, duzeltilmedi (kapsam disi): § 5 tablosunun kod capalari genis olcude kaymis — psy :264-269 gercekte ~430-445, SearchLayout :622 gercekte 675, PlanCalculator.cs:154-156 / :225-226 / :399-407 hicbirine cozulmuyor; ayri sozlesme ister · T126 (submitted) ayni belgeyi sahipleniyor, yeni bir turu carpisabilir · docs/olcumler'e dokunulmadi (kaynak) · origin/main (73d4f9d, T126 kunye duzeltmeleri) 2b36f14'te alindi, catisma cikmadi · verify 62 basarili / 0 basarisiz (tam derleme) · dal T135-yol-haritasi-tazeleme itildi (cc5b0fa), main birlesmedi
+T113 · builder · tur 1 · harita üretimde uçtan uca bağlandı: `MainWindow.axaml.cs:1808` (gösterilen komut), `:2412` (gerçek kodlama), `PreviewSegment.cs:170`, `EncodeRunner.cs:333` — harita `:1529`'da kaynak yüklenince bir kez üretiliyor · **turun asıl bulgusu K3'te çıktı ve KRİTİK'ti**: arayüzde `SegmentEncoder` haritayı hiç almıyordu, yani ön izleme kullanıcıya nihai çıktıdan **farklı** bir anahtar kare yerleşimi gösteriyordu; T0 owns'u genişletince zincir tamamlandı (`src/VidShrink.App/Playback/SegmentEncoder.cs:116,126` → `PanelHost.cs:251` → `MainWindow.axaml.cs:1636`, `SetPlan`in yanına konuldu ki her yeniden hesapta eşitlensin ve `_sceneMap` boşalınca kendiliğinden varsayılana düşsün) · ayrışmanın büyüklüğü **sayıyla**: çok kesimli kaynakta ön izleme `-g` 300 (10,0 sn) ↔ nihai 150 (5,0 sn) = **2,00×**, tam klip çerçevesinde ön izlemenin rejimi 7 I-kare, teslim edilen dosya 13 → ön izleme **%46,2 daha az** anahtar kare; öteki iki klipte tavan zaten aynı çıktığı için 1,00× (ayrışma her kaynakta değil, tavanı kıskacın alt ucuna iten kaynakta) · dürüst kayıt: 5 sn'lik ön izleme penceresi iki rejimde de tek anahtar kare taşıyor, o yüzden **pencere içi sayıyla ayrışma gösterilemedi** — 2,00× argüman seviyesinde, 7↔13 aynı argümanların tam klipte koşturulması; teslim edilen dosya aynı 5 sn penceresinde 2 anahtar kare taşıyor (t=0,000 ve 5,000) · K2 ızgarası üç kaynak × bağlı/bağsız (hedef 12 MB, `-threads 2`, Sharing/Quality): çok kesimli 11,614 MB / 13 I / net atlama 97,0 ms ↔ 11,609 MB / 7 I / 124,8 ms (**%22,3 hızlı**), durgun ve tek sahnelik klipte tavan aynı çıktığı için fark yok (0,6% ve 3,4% taban gürültüsünün içinde) · **takas gizlenmedi**: çok kesimli klipte VMAF renk uzayı reddi yüzünden ölçülemedi, fps kilitli ek koşumda ölçüldü ve **kalite kaybı çıktı** — atlama %47,1 hızlı ama VMAF ortalama **0,085**, p10 **0,449** düşük, ikisi de gürültü tabanının (0,0005 / 0,0011) çok üstünde; boyut farkı 0,007 MB, tabanın iki katı ama 12 MB hedefin binde biri · K4 yoklama maliyeti: kaynak süresinin %24,1/%30,6/%26,8'i (yüklü makine), %11,6'sı (boş); bağlı kodlama süresinin %10,5/%12,6/%29,8'i (yüklü), %20,9'u (boş) — süre sayıları paylaşımlı makine damgalı, kalite/boyut damgasız · K7 **dokuz mutasyon, dokuzu da kırmızı**; M7–M9 (ön izleme zincirinin üç halkası) her biri 35 geçti / 1 kaldı — M7 ve M8 **davranışla** pimli (`SegmentEncoder` ve `PanelHost` başsız kurulabiliyor, gerçekten `Describe` çağrılıp `-g` karşılaştırılıyor), M1–M3 ve M9 `MainWindow` başsız kurulamadığı için kaynak metniyle · **T108'in `FfmpegArgumentsTests.cs:408` kaynak-metin pimini bu dal kırdı**: `origin/main`de geçiyordu (`MainWindow.axaml.cs:1802` hâlâ `_encoders));`), kıran `_sceneMap?.Map` eklemem; T0 talimatıyla **beklenen dize** düzeltildi, iddia değil — T108 ile birleşme çakışması riski var · iki kararsız kırmızı ayrıştırıldı ve **dokunulmadı**: `PerformanceCheckTests.OlcumYukAltindaYalnizAgirlasiyor:458` (T117) tek başına beş koşumda 1 kırmızı/4 yeşil, `PanelHostTests.Pencere_sinirindaki_oynatma_boslugu_olculur` (**sahipsiz**) `git stash` + `--no-incremental` denetim koşumunda aynı kırmızıyı verdi yani bu dalın değil; ikisi de teslim koşumunda yeşil, **yeşilleri düzeldiklerinin kanıtı değil** · K6 künyeler düzeltilmedi rapora yazıldı (T108'in belgesi `MainWindow.axaml.cs:1796` ve `EncodeRunner.cs:244` diyor, bugün 1808/2412 ve 333) ve o belgedeki **'harita yolu üretimde bağlı değil' cümlesi artık yanlış** · K8: `SceneMap? scenes = null` varsayılanının kaldırılması öneriliyor, `FfmpegArguments.cs` T108'in, dokunulmadı · ölçülmedi: düşüşün arayüzde kullanıcıya söylenmesi, ön izleme ayrışmasının kalite/atlama etkisi, daha uzun ön izleme penceresi, donanım kodlayıcı yolu (`HardwareKeyframeCeilingSeconds` hiç ölçülmedi), uzun kaynakta yoklama maliyeti, iki kararsız kırmızının kökü, CI/yerel toplam farkının sebebi; `SceneMap.Threshold` `NaN`'ı üretimde okunmuyor ama bu **`grep` ile bakıldı, ölçülmedi** · owns künyesi gerçek yolla uyuşmuyor: sözleşme `src/VidShrink.Ffmpeg/SegmentEncoder.cs` ve `src/VidShrink.App/PanelHost.cs` diyor, dosyalar `src/VidShrink.App/Playback/` altında · dal `T113-harita-baglantisi` itildi, `main`e birleştirilmedi · yerel tam süit `97ae59f` **Basarisiz 0, Basarili 1172, Atlanan 17, Toplam 1189** (44 dk 47 sn, paylaşımlı makine on bir ajan) · CI **33597703249** (`97ae59f`, success) **0 / 1080 / 107 / 1187** (9 dk 40 sn) · teslim itmesi (`6f091b9`, yalnız belge) CI **33601722961** · **CI yeşili iki kabul kriterini doğrulamıyor**: `TheMapChangesTheIFrameCountOfTheDeliveredFile` (K2/K7, M6'yı yakalayan tek ölçü) ve `ABrokenSourceFallsBackInsteadOfThrowing` (K5) CI'da ffmpeg yokluğundan atlanıyor, ikisi de yerelde geçti
+
+T130 · builder · zincir dogrulandi, oncul uc yerden duzeltildi, yoklama arayuz is parcacigindan ayrildi · K1 dort katmanda olculdu (cagri dizisi tam 8 cagri, senkronluk, bekleyen tarafin arayuz is parcacigi olmasi, gercek ffmpeg PID sayimi 1-3 surec / 173-599 ms); DUZELTMELER: (1) tekrar kosullu — EncoderCapabilities.cs:89 zaman asimina ugramayan sonucu onbellege yaziyor, (2) 15-45 s donma bu makinede olculmedi, olculen en kotu 599 ms, (3) acilis isitmasi SDR yolunu isitiyor HDR piksel bicimini isitmiyor · T125'in HDR kararsizligi kod duzeyinde yeniden uretildi ve pinlendi, ama OKUNAN IKI SAYI TUTMADI: 'EncoderCapabilities.cs:110-114te 4 sn duvar saati butcesi' bu agacta YOK (ProbeKillMs = 15000, :103); src/ icindeki tek 4000 HardwareVerdict.cs:48'deki ESKIMIS ACIKLAMA SATIRI (T94 sabiti buyutmus, cumle kalmis, dosya T129'un owns'unda dokunmadim) · dusus tamamen sessiz de degil: AdviceCode/ReasonCode.HdrTonemapped bir satir gosteriyor ama metni 'secilen kodlayici 10 bit koruyamiyor' — yoklama oldurulduyse o cumle YANLIS, kusur 'uyari yok' degil 'uyari yanlis nedeni gosteriyor' · libsvtav1 yoklamasi 24 tekrarla 75-232 ms, sinirin %1,5'i · K2/K3/K5 duzeltme: MainWindow.DeferredEncoderAvailability, depodaki CachedPsychovisualArgs/WarmPsychovisual ayriminin aynisi — okuma tarafi surec dogurmaz, olculmemis kodlayici icin 'calismiyor' degil 'olculmedi' der, olcumu arka plana alir, sonuc gelince hesabi yeniler; ucuncu durum PlanResult.HardwareNotMeasured / HdrResolution.NotMeasured; yerlesmeyen (>=2000 ms) yoklama olcum SAYILMIYOR, en cok bir kez daha denenir ve cevap bilinmeyen kalir (T94'un kaldirdigi kusur geri gelmesin), main.error.probe ile arayuze cikar · dort yasagin hicbiri kullanilmadi · K5'te IKI eskimis cumle vardi (Recalculate ve QualityHint ustunde), ikisi de duzeltildi ve artik dogru · K4 on tur yeniden hesap, yoklama sayisi sabitle sinirli (16 anahtar x MaxAttempts), coalescing olmasa 160 olurdu · K6 ALTI MUTASYON, her biri kaynak sha256 dogrulamasiyla geri alindi: M1 K2+K4 olculerini kirdi, M3 iki HDR olcusunu, M4 hizli yol olcusunu, M5 yerlesmeme olcusunu, M6 K4'u — **M2 KIRILMADI** ve bu bir bulgu: HDR karari iki daldan geciyor (yazilim WorksAsEncoder, donanim Hdr10PixelFormat) ve olculer yalniz yazilim dalini tutuyordu, yani av1_nvenc + HDR'de sessiz tonemap hicbir olcunun gormedigi bir delikti; olcu eklendi, M2 tekrar kosuldu, kirildi · OLCULMEYENLER: 15 s sinirinin asildigi durum burada uretilmedi (T123'un olcumu T129 sozlesmesinde aktariliyor, yeniden uretilmedi); surec sayan dort gercek ffmpeg olcusu makinede paralel ajanlarin ffmpeg'i kostugu icin son turlarda ATLANDI — olcu artik mesgul makinede kirmizi vermiyor, atliyor ve atladigini kanit dosyasina yaziyor; 'heniz olculmedi' icin ayri bir yerellestirme cumlesi EKLENEMEDI (Locales/*.json owns disi), var olan main.error.probe kullanildi · T129 ILE HIZALANMA: onun EncoderProbeState/EncoderState'i benim IEncoderMeasurementState'imin kalici hali, imzalar birebir ortusuyor (EncoderState != Unmeasured == IsMeasured), birlestirmede benimki kaldirilmali; T129'un bana biraktigi iki is (HdrResolver'in null'u 'HDR10 yok' okumasi, onbellegi isitacak arka plan cagrisi) bu dalda yapildi · verify yesil (PlanCalculatorTests|HdrResolverTests|EncoderCapabilitiesTests 19/19), yeni olcu PlanCalculatorProbeTests 16/16 · dal T130-ui-yoklama-donmasi, uc commit, main birlesmedi
+
+T134 - builder - siyah kenar kirpma olculdu, **degmez** cikti - K4 esigi olcumden once iki commit'te kilitlendi (eabe75a 11:12, ee37fcb 11:17): ortalama p10 kazanci >= +1,00 deger, +0,30..+1,00 sinif, < +0,30 degmez; iki veto (kenarsiz kaynakta yanlis kirpma, yoklama > 2,0 sn) - havuzda letterbox'li kaynak YOKTU, sinif havuzdan uretildi (crop ile gercek icerik, sonra pad; havuza yazilmadi): KA 2,39:1 + 1,5 sn acilis karartmasi, KB 2,20:1, KC 1,85:1, KD 2,39:1 gurultulu asimetrik bant, NA/NB kenarsiz denetim, VD bant sahne icinde kalkiyor, KE agir gurultulu bant (yalniz limit taramasi) - **iki kolun ozdesligi yapisal olarak kapatildi**: tek kaynak dosya, kirpma kolu yalnizca crop filtresi ekliyor; ayri kesim/-ss/ara kodlama yok; kanit tablosu sha256 + 1200 kare + PTS 0..1199 + aktif alanin iki kez alinan framemd5'i (yedi kaynakta esit) - K3 adil karsilastirma yontemi OLCMEDEN ONCE yazildi ve neyi kacirdigi soylendi: A yontemi (iki kol da aktif alanda, karar buna bagli, bandin icindekini gormez), B yontemi (kirpmali cikti pad ile geri doldurulup tam karede, kolay siyah dortte bir farki seyreltir) - 30 kodlama libx264 preset slow 2 gecis, boyut farki en fazla %0,72 - **K3 (2000k, p10 kazanci): KA +0,102 / KB -0,048 / KC -0,130 / KD +0,408, ortalama +0,083** - bitrate yukseldikce kazanc yalniz KD'de artiyor (duz bantlilarda azaliyor) - **asil bulgu**: varsayilan limit=24'te cropdetect KA/KB/KC'yi buluyor ama onlarin ortalamasi -0,025; hukmu pozitife tasiyan tek kaynak KD ve o varsayilan ayarla HIC bulunmuyor - K2: t=0 tek nokta ornekleme KA'nin acilis karartmasina dusuyor, on tekil karenin BIRLESIMI tek siyah kareye karsi kirilgan (KA'da kirpmayi iptal ediyor), MOD kurtariyor; limit taramasi 10 deger: kenarsiz kaynaklari bozmayan aralik 8..56, KD'yi bulan aralik 48..96, kesisim 48..56; KE (bant YAVG 95,7) icin kesisim BOS - sureler ilk turda kirli cikti (baska ajanlarin ffmpeg'i), makine bosken (es zamanli ffmpeg = 0) 3 tekrarla yeniden olculdu, en kotu yayilmis yoklama medyan 1,88 sn, veto tetiklenmedi - K5: varsayilan ayarla kenarsiz kaynaklarda yanlis kirpma yok, limit 64'ten sonra var (NA 1920:1042:0:4); yanlis kirpmanin bedeli p10'da -1,030 ve -0,934 (NB'nin yanlis kolu %2,33 buyuk, es boyut degil, damgalandi) - **metrik kusuru bulundu**: VD'nin ikinci yarisinda 276 satir GERCEK GORUNTU kesilmesine ragmen klip p10'u yukseliyor (10,837 -> 12,211); kare farki ilk yarida +6,806 son yarida -2,761, son yaridaki 600 karenin 413'unde kirpmali kol daha kotu - yani kirpmanin guvenligi tek bir VMAF sayisiyla denetlenemez - K6 elle yazilmis hukum yok: butun tablolar ve hukum cumlesi tools/siyah-kenar/oz.py tarafindan isaretciler arasina basiliyor, betik stdout'a yalniz hukmu basiyor, rapordaki blokla birebir ayni (1023 bayt) ve bu denetim satirini da betik yaziyor - kusur duzeltmeleri: libvmaf log_path'indeki surucu harfi filtre grafigini bozuyordu (40 olcumun tamami sessizce basarisiz olmustu, cwd ile duzeltildi ve yeniden kosuldu); cropdetect'in skip varsayilani 2, tek kare yoklamalari None donduruyordu (skip=0); noise filtresinin genligi duzlemin bit derinligine gore, KD'nin bandi 10 bitte YAVG 6,8/1023 kalmisti, 8 bitte uretilip 10 bite cevrildi (YAVG 44,65) ve KD'nin butun kodlamalari/yoklamalari bastan kosuldu - OLCULMEYENLER: gercek bir DVD/Blu-ray aktarimi (sinif uretildi, bulunmadi), 4K/24fps/libx265/uzun klip, ses, oynatma tarafi, uctan uca boru hatti (kazanclar GERCEK bant sinirina gore olculdu, cropdetect'in onerisine gore degil - K3 tavani olcuyor) - src ve tests'e dokunulmadi - verify 62 basarili / 0 basarisiz - dal T134-siyah-kenar itildi, main birlestirilmedi
+
+## T134 — Siyah kenar (muhur, denetim GECTI, KRITIK yok)
+
+Hukum: kirpma degmez. Karar noktasinda (2000k) p10 kazanci +0,083, esigin (+0,30)
+altinda, 4 kaynagin 2'sinde negatif. Varsayilan limit=24 ile cropdetect kazancin
+oldugu tek kaynagi (KD, +0,408) hic bulmuyor; buldugu ucun ortalamasi -0,025.
+Esik olcumden once kilitlendi (eabe75a 11:12, ee37fcb 11:17 < afdd51d 11:33).
+
+Borclar (mühürde acik birakildi):
+1. siyah-kenar.md:246,251-252 — OLCEK HATASI. signalstats 10 bit girdide 10 bit
+   raporluyor; sutun basligi "8 bit olcek" diyor. Bant YAVG (44,65 / 95,72) 10 bit,
+   limit degerleri (8..96) 8 bit — cumle 4 kat uyusmazlik tasiyor. oz.py'den duzeltilecek.
+2. siyah-kenar.md:15 — "3 tanesinde buluyor" hangi birlestirmeyi okudugunu soylemiyor;
+   sayi yalniz mod sutununda dogru (birlesim sutununda 2/4). oz.py:465 mod_kutu kullaniyor.
+3. siyah-kenar.md:313 — "3 kaynakta azaliyor" uc nokta karsilastirmasi; KC monoton degil
+   (-0,032 -> -0,130 -> -0,080), cumle monotonluk ima ediyor.
+4. oz.py:531 — "birebir ayni" karari betigin kendi yazdigi blogu kendi kaynak dizgesiyle
+   karsilastirmasi; totolojiye yakin. Denetci 1023 bayti bagimsiz olctu.
+5. siyah-kenar.md:153 — "YAVG 6,8/1023" atilan ilk KD uretiminden; ureten komut yok.
+6. Havuzda gercek letterbox'li aktarim yok (cinlama, egik sinir olculmedi).
+7. Kazanclar gercek bant sinirina gore olculdu, cropdetect'in onerisine gore degil —
+   K3 tavani olcuyor; uctan uca borunun gercek kazanci yok.
+8. Tek cozunurluk/kodek/sure (1920x1080, 60 fps, libx264, 20 sn), ses yok, oynatma yok.
+
+YAN BULGU (motoru ilgilendirir): VD kaynaginda 276 satir gercek goruntu kesilmesine
+ragmen klip p10'u yukseliyor (10,837 -> 12,211); son yarinin 600 karesinin 413'unde
+kirpilmis kol daha kotu. Kirpma benzeri her ozelligin guvenligi tek bir toplu VMAF
+sayisiyla denetlenemez — kabul kriteri kare dagilimina bakmali.
+
+## T128 — PickCodec gercek yoklamaya baglandi (teslim, dal `T128-pickcodec`)
+
+T123'un bilerek yazmadigi duzeltme yazildi. `PickCodec` artik `PickFastCodec` ile ayni
+soruyu soruyor, ama `WorksAsEncoder`a ciplak baglanmadi: onunde iki kapi var — derleme
+listesinde olmayan yoklanmadan elenir, henuz olculmemis yoklanmaz (gecici cevap +
+`HardwareNotMeasured`). Kalan `WorksAsEncoder` ile okunur.
+
+K1 on kosulu bagimsiz dogrulandi: `_probed`e yazan iki yer (`:180`, `:191`), zaman asimi
+`if (!result.Measured) return result;` ile erken donuyor, `Hdr10Probe` ayni desen. Kacak
+dal yok. Nuans: `WorksAsEncoder` iki durumlu, `Unmeasured`i false'a katliyor ve zaman
+asimi onbellege yazilmadigi icin olculmemis kodlayici her cagrida yeniden yoklaniyor.
+Tasarim bu nuanstan cikti.
+
+K3: ham `EncoderCapabilities` yolunda soguk 9,56 -> 279,45 ms, sicak 0,1693 -> 0,1658 ms.
+Plan hesabi basina en cok 2 yoklama (olcuyle pimli), en kotu durum 2 x `ProbeKillMs` =
+30 000 ms. Kabul edilebilir, cunku arayuzun yeniden hesabi bu yolu kullanmiyor: bes plan
+cagrisinin dordu `DeferredEncoderAvailability` gecidini goruyor, besincisi ham nesneyi ve
+o da `Task.Run` icinde acilista — ustelik `SpeedMode.Fast` verdigi icin plan kodlayicisi
+`PickFastCodec`ten geciyor, T128'in oraya ekledigi en cok bir yoklama. Gecitli yolda
+sifir surec.
+
+K5 iki yonde de kirmizi: (a) 5 olcu, (b) 2 olcu.
+
+BULGU: "Uyumlu" secmek yoklamadan kurtarmiyor. Plan kodlayicisi (`libx264`) yoklanmiyor
+ama tavsiye kodlayicisi yoklaniyor, cunku `suggestedPreference` `MaxCompression`.
+`Compatible` yolu "hic degismedi" degil.
+
+BULGU: `verify` filtresi yetmedi. Tam suit `PlanCalculatorProbeTests`in iki cagri-sirasi
+pimini kirdi (`works:libsvtav1` eklendi); filtre o dosyayi hic kosturmuyordu.
+
+T0 KARARI GEREKLI:
+1. `src/VidShrink.App/Locales/{en,tr}/main.json:283` ve `:312` — dort satir, `owns`
+   disinda, dokunulmadi. Core cumlesi duzeltildigi icin iki kopya ayristi; kullanici hala
+   yanlis sebebi ("not available on this ffmpeg build") goruyor.
+2. `owns` boslugu, iki dosya: `EncoderAvailabilityTests.cs` (`verify`de var, `owns`da yok;
+   T123'un kusur kaydi cevrildi) ve `PlanCalculatorProbeTests.cs` (ikisinde de yok; iki
+   cagri-sirasi pimi guncellendi). Ikisi de bilerek yapildi.
+3. `WorksAsEncoder`in iki durumlu imzasi kaldirilmadi, gecidin arkasina alindi. Ham nesne
+   veren her cagiran (`:1377`, `tools/`) olculemeyen yoklamayi hala "calismiyor" okuyor.
+   T129 ayni ayrimi `EncoderProbeResult` uzerinde aciyor; birlesince tek temsile inmeli.
+
+K7: CI 33623785112 (`1d4a259`) success, 0/1326/19/1345. Tam suit yerelde
+`PerformanceCheckTests.YukAltindaKararHafiflemiyorMu`yu kirmizi verdi; ayni commit'te
+uc kez kosuldu, kirmizi-yesil-kirmizi — makine yukune bagli, T128'e degil. CI'da o
+olcu `[SKIP]`, yani CI yesili onu dogrulamiyor. `SplitDragTests`ten sonra bu depoda
+zamana bagli ikinci olcu.
+
+## T128 — muhur (GECTI, KRITIK yok, yedi borc)
+
+Denetci arsiv kopyasinda uc kosum yapti. Mutasyon (a) `PlanCalculator.cs:889`
+`WorksAsEncoder`->`HasEncoder`: 5 kirmizi, kirilan olculerin ADLARI raporla birebir.
+Mutasyon (b) `:909`: 2 kirmizi, yine birebir. K2'nin kusuru gercekten uretilmis
+(kusur olcusu `80686a2`, duzeltme `ccd2abd` — sira dogru), olculer davranis olcuyor.
+
+BORCLAR (mühür notunda kalir, tur acmaz):
+
+1. "Arayuzun plan hesabi hic surec dogurmuyor" cumlesi fazla soyluyor. Gecit sureci
+   kaldirmiyor, ERTELIYOR: `MainWindow.axaml.cs:1292 -> :1315 -> :1325 -> :1342`
+   gercek bir ffmpeg sureci, `Task.Run` icinde. Pimlenen sey senkron surecin
+   dogmamasi. Sonuc dogru, cumle yanlis — bu deponun kronik kusuru.
+2. Ucuncu durum yalniz `IEncoderMeasurementState` uygulayan cagirianda uc durum.
+   Ham `EncoderCapabilities.WorksAsEncoder` (`:70`) `Unmeasured`i hala false'a katliyor.
+   `docs/olcumler/surucu-yoklugu.md:322`: yuklu makinede 9/12 yoklama 15 000 ms'yi
+   asiyor ama 12/12 cikis 0 veriyor — `tools/` cagiranlari calisan kodlayiciya
+   "kullanilamadi" diyor. Arayuzde ulasilmiyor.
+3. `HardwareNotMeasured` Baslat dugmesini SURESIZ kapatabilir (`:1322` -> `:1793`).
+   T128 bu yolu Quality kipine de acti. -> **T136 K1**
+4. `owns` bosluguydu: `EncoderAvailabilityTests.cs` `verify` filtresinde vardi ama
+   `owns`ta yoktu — sozlesme kendisiyle celisiyordu. Geriye donuk genisletildi.
+5. K6 yarim: Core cumlesi duzeldi, kullanicinin gordugu dort satir eski kaldi
+   (`Locales/{en,tr}/main.json:283,312`). -> **T136 K6**
+6. K4 raporu olcunun bir adim onunde: iki iddia yalniz `MaxCompression` ve `Fast`
+   icin pimli, `Compatible` icin pimli degil.
+7. Atif kaymasi: hukum "(§3)" diyor, belgede §3 yok, kastedilen K3. K3'un yuk
+   damgasi "1 ffmpeg + 6 dotnet" diyor, ureten komut yalniz ffmpeg sayiyor.
+
+SUREC KUSURU (Core'a): denetim kaydi REDDEDILDI — "auditorRunId points at a
+non-auditor agent record: worker". Denetciyi `teknesyum-core:worker` tipiyle actim,
+oysa oturumda ayri bir `auditor` ajan tipi var. Risk `low` oldugu icin `complete`
+yine de gecti; yuksek riskli bir sozlesmede muhur duserdi ve sebebi ancak o an
+gorulurdu. Denetim FIILEN yapildi ve gecti; kayit tutulamadi.
+
+## Bulgu — muhurlenmis iki sozlesmede olu verify kolu (2 Eylul 2026)
+
+Tur acilmiyor, sozlesmeler kapali kaliyor. Kayit, kusurun tekrarini gormek icin.
+
+vstest'in `--filter` varsayilani `FullyQualifiedName~`, yani alt dizi eslemesi.
+**Hicbir teste denk gelmeyen bir filtre kolu hata vermez, sessizce gecer.** Sayilan
+olcu sayisi dusuk cikar ama kimse bakmaz.
+
+Iki muhurlu sozlesmede bu var. Depoda `grep -rl "class <ad>" tests/` ile sayildi:
+
+| sozlesme | filtre kolu | eslesen sinif |
+|---|---|---:|
+| T116 | `MeasuredQualityTests` | 0 |
+| T130 | `HdrResolverTests` | 0 |
+
+Ayni sozlesmelerin oteki kollari gercek: `QualityMeterTests` 1, `PlanCalculatorTests` 1,
+`PlanCalculatorProbeTests` 1, `EncoderCapabilitiesTests` 1.
+
+Ikinci kusur T130'da ayrica duruyor: `verify` satirinin kapanis tirnagi eksik —
+`...|EncoderCapabilitiesTests]`. Betik yine de kabul etti.
+
+Alinan onlem: yeni sozlesmelerin dagitim metnine "kurdugun her filtre kolunun
+gercekten test buldugunu dogrula" satiri kondu (T132, T137). Sozlesme sablonuna
+kalici madde olarak gecmesi Core'a borc.
+T114 · builder · **sonuc: "olculdu, kodlayici zaten daha iyi dagitiyor" — dagitim koda girmedi, `src/` ve `tests/` altinda tek satir degismedi** · sozlesmenin sorusu "haritayi plana baglamali miyiz"di ve cevabi K2 verdi: olculen 8 hucrenin 5'inde `MAE(verilen) <= MAE(harita)`, yani kodlayicinin kendi dagitimi haritanin onerisi kadar ya da ondan dogru · bu cogunluk kucuk pencerelerin tasidigi bir cogunluk ve rapor bunu gizlemiyor: sahne sayisi >= 4 olan 5 hucrede harita 3'unde ONDE, iki sayi da hukum cumlesinde yan yana · haritanin sahne basina sayilarini kodlayiciya tasiyan tek aday `zones`; 5 hucrenin 3'unde tabani gecti (uyumlu/p3, yedek/p1, yedek/p3); **en iyi aday olarak** kazandigi tek hucre `yedek/p1-karisik` (0,044 pp) ve **gurultu tabani olculdu**: ayni kol ayni pencerede ikinci kez kosuldu, iki gecisli x265 bit-birebir tekrarlanabilir degil (sha256 farkli, -60 414 bayt) ama MAE farki 1,273 -> 1,275 = **0,002 pp**, yani 0,044 gurultunun 22 kati · tabani gecen 4 hucrenin 3'unu `qcomp` kazandi, `qcomp` `SceneMap` gerektirmeyen tek kuresel skaler — kazandigi yerde kanitladigi sey dagitim degil, iki gecis yanliliginin varsayilaninin bu icerikte en iyi olmadigi · **kazanci alan yok**: uretimin varsayilan kodlayicisi `libsvtav1` `zones`i hic okumuyor (K4 izgarasi: 5 kodlayicinin 2'sinde calisiyor, nvenc kollarinda parametre yok), yani olculen kazanc varsayilan ayarli kullaniciya ulasmiyor; iki cumle raporda yan yana duruyor · K5 GECMEDI: olculen tek hucrede (`uyumlu/p1-karisik`, 28 sahne) p10 kazanci **+0,007** (esik +0,50), en kotu sahne **-0,099** (esik +1,00); K6 gecti, iki kosum da bandin icinde · **K7 hukmun govdesine girdi**: haritayi kasten bozup ayni hucre yeniden kodlandi, `eksik-kesim` p10 69,0952 ve `fazla-kesim` 69,1309, ikisi de dogru haritanin 69,0809'unun USTUNDE (kayip -0,014 ve -0,050) — kapinin "kayip kazanci asmiyor" hukmunden daha guclu bir ifade: dagitimin **icerigi** bu hucrede olculebilir fark yaratmiyor · UC KATMANLI OZ-DENETIM: (1) karari veren kod uydurma girdiyle kosuldu, dort sart saglaninca "girer", her sart tek tek bozulunca "girmez", dosya yokken "karar verilemedi" — 5/5; (2) gurultu hukmunu veren cumle uc senaryoyla sinandi, yon degistirdi — 3/3; (3) ayri bir betik 12 iddiayi ham `.json`/`.csv`den yeniden saydi, MAE'leri rapordan almayip dizilerden bastan hesapladi — 12/12, cikti raporda tablo · **iki kez yanlis hukum kurulacakti, ikisi de durduruldu**: `yedek/p3-hareketli` kosumu disaridan oldurulmustu ve gunlugunde yalniz `zones 0.800` satiri vardi; o satir tasinsa "zones iki hucrede kazandi" yazilacakti — hucre bastan kosuldu ve gercek sonuc `qcomp 0,215` cikti, yani hucreyi `zones` degil `qcomp` kaziyor; ayni sekilde oldurulen bir K5 kosumunun gunlugundeki `taban 35.96 MB / vmaf 95,643` de tasinmadi · SOZLESMENIN IKI KUSURU DUZELTILDI: `verify` filtresindeki `SceneBudgetTests` kolu sifir test esliyor ve sessizce geciyordu (dosya agacta yok, dagitim koda girmedigi icin de yazilmayacakti), filtreden cikarildi; `owns`daki `tools/sahne-butcesi/**` globu `contract.js complete` tarafindan reddediliyordu, 20 owns girdisinin (19 duzenek dosyasi + rapor) tam yolu tek tek yazildi · DOSYA TAMLIGI: kosum bir kez disaridan durdurulup yarim bir 20 MB'lik `.mkv` birakti ve duzenek onu tam sayacakti — kodlamalar `.yarim.mkv`e yazilip basarida tasiniyor, her dosyanin suresi `ffprobe` ile denetleniyor; 130 dosya, sapan 0, ardakalan 0 · OLCULMEYEN 26 SATIR ayri baslikta sebebiyle: 8 K5/K6 + 8 K7 hucresi "kosulmadi" — sebep tek ve yazili, olcum penceresi icinde sira gelmedi (gozlenen hucre maliyeti en fazla 36 dk, paylasimli makine, sayi dosya zaman damgalarindan); `yedek/p2-durgun` her bolumde `bilinmiyor` cunku plani passthrough (hevc), kodlama yok; `maks/*` `qcomp` hucrelerini duzenek olcmedi (her iki adayi da ZonesFlag bayragindan geciriyor) · hicbiri varsayilana dusurulmedi, hicbiri ortalamaya karistirilmadi, hepsi kapilarda "gecmedi" degil `bilinmiyor` sayildi · K9: K5 kapisi gecmedigi icin `SceneBudget.cs` yazilmadi, mutasyon kaniti uretilmedi — yeni olcu yok, kural `tools/sahne-butcesi/Butce.cs` icinde kaldi · verify yesil (`PlanCalculatorTests` 23/23, `--no-incremental` derlemeden sonra) ama bu sozlesme uretim kodunu degistirmedigi icin yesil olmasi **beklenen** sonuctur, hicbir kabul kriterini dogrulamaz · rapor `docs/olcumler/sahne-butcesi.md`, duzenek `tools/sahne-butcesi/` 19 dosya, esikler olcumden ONCEKI commit'te sabitlendi, her bolumun ustunde onu ureten komut ve olculen commit sha'si yazili · dal `T114-sahne-butcesi` itildi, `main` birlesmedi
+
+## T114 — Sahne butcesi (muhur, denetim GECTI, KRITIK yok)
+
+Hukum: **dagitim koda girmedi.** `src/` ve `tests/` altinda sifir satir degisti.
+Kodlayicinin kendi hiz denetimi olculen 8 hucrenin 5'inde haritanin onerisi kadar
+ya da ondan dogru dagitiyor; bu cogunlugu kucuk pencereler tasiyor (sahne sayisi
+>= 4 olan 5 hucrede harita 3'unde onde) ve iki sayi hukum cumlesinde yan yana duruyor.
+K5 gecmedi ve gecmedigi yazili: olculen tek hucrede p10 kazanci +0,007, esik +0,50.
+
+Kazanci alan yok: uretimin varsayilan kodlayicisi `libsvtav1` `zones`i hic okumuyor.
+
+**Denetim bu kez kayda gecti.** T128'de denetciyi `worker` tipiyle actigim icin
+`audit` reddetmisti; bu turda `auditor` tipiyle acildi ve kayit kabul edildi
+(`audits/T114-1.json`). Kusur F'in pratik onlemi budur.
+
+Denetci arsiv kopyasinda calisti, depoya yazmadi ve **raporu ham veriden yeniden
+uretip** teslim edilenle karsilastirdi: fark 10 satir, hepsi ortam satiri ya da
+dosya zaman damgasindan tureyen blok, elle tasinmis sayi yok. Sekiz MAE ciftini,
+K7'nin uc p10 sayisini, tekrar gurultusunu (0,002 pp) ve dosya tamligini (130 dosya,
+sapan 0) bagimsiz yeniden hesapladi. Esiklerin olcumden once yazildigini zaman
+damgalariyla dogruladi (`eb9165c` 10:48 < ilk ham cikti 11:43).
+
+### Dokuz borc
+
+1. **Manset cumlesinin fiili yanlis** (`tools/sahne-butcesi/Rapor.cs:1320`).
+   `ZonesKazandi` degiskeni "zones en iyi aday oldu **ve** tabani gecti" sayiyor (=1),
+   cumle ise "5 hucrenin 1 tanesinde tabani gecti" diyor. Ham veride `zones` tabani
+   **3/5** hucrede geciyor (uyumlu/p3, yedek/p1, yedek/p3). Sonraki cumle dogru ve
+   tanimi veriyor, hukum degismiyor — ama sayim denetcisinin regex'i bu mansete hic
+   bakmiyor, yani 12/12 bu cumleyi kapsamiyor. **Bu satirin LOG'daki hali duzeltildi;
+   `docs/olcumler/sahne-butcesi.md` icindeki hali duruyor** — T138.
+2. **K4 "destek=hayir" gerekce metni yanlis** (`tools/sahne-butcesi/Program.cs`).
+   Kosul `fark > gurultu*2 && fark > lenA/100`; `libsvtav1/zones`ta 4830 > 2208
+   (gurultuyu geciyor) ama 4830 < 7613 (%1'i gecmiyor). Yazilan not "fark tekrar
+   gurultusunun icinde" — hangi kolun dustugunu ayirmayan tek else metni. `libsvtav1/aq`
+   satirinda da ayni. Sayi ve `destek` sutunu dogru, etiket yanlis — T138.
+3. **`k4-izgara.csv` birlestirmeden once uretilmis** (11:48 < olculen uretim commit'i
+   `f542dc2` 13:04). Rapordaki "butun kodlamalar bu koddan derlenmis ikiliyle kosuldu"
+   cumlesi o satirlar icin dogru degil. Esasa etkisi yok (K4 `PlanCalculator`i hic
+   cagirmiyor, sabit 2 sn / 2000k), ama `K4()` basindaki `if (File.Exists(hedef)) return;`
+   yeniden kosumu tazelemiyor.
+4. **"22,0 kati" sahte hassasiyet.** Hem 0,044 hem 0,002 uc ondaliga yuvarlanmis CSV
+   degerlerinden cikiyor; gercek oran ~17-30 araliginda. Ustelik gurultu tabani n=1
+   ve rapor bunu soyluyor.
+5. **`.calisma/T114/k1-*.csv` bayat.** Basligi `sahne;bas;...`, degerleri sahne **sonu**;
+   teslimdeki `Butce.cs:176` dogru (`son`), yani diskteki CSV'ler duzeltme oncesi
+   ikiliden kalma. Rapor bu sutunu kullanmiyor (JSON'dan okuyor) ama ham veri tek
+   kosumdan degil.
+6. **Yapici kendi sozlesmesini duzenledi.** `verify`ten olu `SceneBudgetTests` kolu
+   cikarildi, `owns` globu 20 tam yola acildi. Ikisi de raporda ve LOG'da yazili ve
+   ikisi de kapsami daraltmiyor — ama sozlesme dosyasi `owns` disi. Ayni olu kol
+   kusuru bu turda T116 ve T130'da da bulundu; Core'a Kusur G olarak gitti.
+7. **`01-olcumu-kos.sh` bastan kosmuyor.** Cikti dizinini silmiyor, her asama
+   `zaten var` deyip donuyor. "Butun olcum tek komutla bastan kosar" yalniz bos
+   dizinde dogru. Betik 9 hucrelik K5/K7 dongusu iceriyor, diskte 1 K5 + 1 K7 var.
+8. **"tools/sahne-butcesi/ 20 dosya"** — gercek 19 (20, rapor dahil `owns` girdisi
+   sayisi). **LOG'da duzeltildi.**
+9. **K7 ozetindeki "en buyuk p10 kaybi 0.000 puan"** kirpilmis bir sayi; iki kol da
+   dogru haritanin ustunde. Rapor hemen ardindan dogru acikliyor ama `Sonuc`
+   maddesinde 0.000 tek basina yaniltici — T138.
+2026-09-02 T136 builder: submitted, T130'un uc borcu kapandi. Baslat artik donanim olcumune bakmiyor (yoklama cevapsizken de sikistirilabiliyor), yoklama istisnasi ucuncu durumda kaliyor (ProbeAnswer bes durumlu, istisna metni durum satirina cikiyor), d>=0 iddiasi gecidin olctugu sureyi kendi yerlesme karariyla yuzlestiriyor. Yerlesmemis yoklamaya iki yeni anahtar (probe-unsettled / probe-failed), T128'in Core cumlesinin dort arayuz kopyasi hizalandi ve ilk kez bir olcuyle bagli. Dort K'nin dordu mutasyonla kirildi (k1:1, k2:1, k3:3, k6:1 kirmizi / 70). Yerel tam suit 1331/1348 yesil, CI 33631540902 success 1330/1348, kosum kapisi gecti. Dal T136-baslat-kilidi (702d2a0), main'e birlestirilmedi. Kapsam disi: EncoderCapabilities.WorksAsEncoder:70 hala Unmeasured'i false'a katliyor (denetci borc 2). DENETIM BEKLIYOR.
+
+## T136 — Baslat kilidi (muhur, denetim GECTI, KRITIK yok)
+
+Uc urun kusuru da kapandi: donanim hic olculemeyince Baslat dugmesinin **kalici**
+kilitlenmesi, yoklama istisnasinin bos `catch` ile yutulmasi, `Unsettled`in yapiskan
+olmasi. Ucuncu durum artik bes durumlu `ProbeAnswer` ile tasiniyor ve kullaniciya
+iki dilde ayri cumleyle cikiyor (`main.status.probe-unsettled` / `probe-failed`).
+
+**Denetci mutasyonlari kendi kosturdu.** Temiz agac 70/70; K1+K2 mutasyonu tam
+hedefledigi iki olcuyu kirdi (2/70), K3 mutasyonu ucu (3/70). CI `33631540902`
+success, 1330/1348, kosum kapisi gecti, `702d2a0..18dec9f` arasi `src`/`tests`
+degisikligi yok — yani CI teslim edilen kodu olctu.
+
+**Iki kronik tuzak bu turda gorunur oldu ve ikisi de kapatildi.** Yapicinin ilk
+K2 mutasyonu `-warnaserror` altinda `CS0162` verip **derlemeyi dusurdu**, ama
+`dotnet test` eski ikiliyi kosturup `Basarisiz: 0` yazdi — `--no-build` yazmasan
+da ayni tuzak. Ikincisi: K3'un ilk pini `MachineIsQuiet` kapisinin **altindaydi**,
+hic kosmadan yesil sayiliyordu. Denetci ikisinin de duzeltilmis halini bagimsiz
+dogruladi.
+
+### On borc
+
+1. `docs/olcumler/baslat-kilidi.md:12` — "kullanici sikistirabiliyor" olculmedi.
+   K1'in yazili ilk cumlesi "bir dosya sikistiriliyor" diyor; kriterin kendi verdigi
+   olcu (`BtnStart.IsEnabled`) tutuyor ama uctan uca kosum yok.
+2. `MainWindow.axaml.cs:1364` `FirstFailure` **yapiskan**: bir kez istisna dusen kayit
+   hic temizlenmiyor, sonraki yerlesmis yoklamalardan sonra da durum satiri
+   `probe-failed` kaliyor. Ayrica `hdr10:` anahtarlarini da tariyor — T137.
+3. K4 yalniz kodla dogrulandi; `ReportUnsettledProbe`un sectigi anahtarin
+   `TxtSystemStatus`a ciktigini tutan olcu yok (rapor kabul ediyor).
+4. **`PlanCalculatorProbeTests.cs:448` olcmuyor ve rapor olcmus gibi sunuyor.**
+   `Assert.True(d < ProbeKillMs)`: gercek sureler 60-100 ms, sinir 15 000 ms;
+   pratikte kirilamaz ve `MachineIsQuiet` kapisinin altinda. Kanit dosyasinda
+   "8 tekrar" satiri **yok**, yani bu kol bu sozlesmede hic kosmadi; rapor 159-161.
+   satirlarda T130'un ana agactaki sayilarini aliyor. Kronik "ozet veriden kayiyor"
+   kusurunun bu turdaki hali — T137.
+5. K6'da yalniz `en/main.reason.encoder-fallback` Core'a bagli; kalan uc satir duz
+   metin `Assert.Contains` ile tutuluyor. Core cumlesi degisirse `tr` sessizce kayar.
+6. Rapor yerel `1331/17` ile CI `1330/18` farkini uzlastirmiyor (fark CI'da atlanan
+   bir `Live*` olcusu; zararsiz ama aciklanmamis).
+7. Rapor 277-278'in gerekcesi gecersiz: "ucu de CI'da kostu" delili SKIP satirlarinin
+   yoklugu, oysa ikisi `if (!ToolLocator.IsAvailable(out _)) return;` ile erken donuyor
+   ve xUnit bunu SKIP degil PASS yazar. Iddia dogru cikiyor, gerekce yanlis.
+8. `owns` disi iki dosya degisti: `LOG.md` ve `contracts/T136.md`. Depo teamulu
+   (T128, T130, T134 aynisini yapti) ama `side_effects: []` ile celisiyor.
+9. `MaxAttempts` dolduktan sonra yoklama bir daha denenmiyor; K1 yalniz dugmeyi
+   serbest birakiyor (rapor kabul ediyor).
+10. **`MainWindow.DeferredEncoderAvailability.WorksAsEncoder` (`:1312`) `Failed`/
+    `Unsettled`i hala `false`a katliyor** — `EncoderCapabilities.cs:70` ile ayni
+    daralmanin arayuz tarafindaki ikizi. T137 acildiginda yalniz Ffmpeg tarafini
+    kapsiyordu; App tarafi da T137'ye eklendi.
+- T138 submitted — uc etiket cumlesi veriye hizalandi (manset zones 3/5 tabani gecti + 1/5 en iyi aday, K4 destek=hayir gerekcesi iki kola ayrildi, K7 en buyuk p10 kaybi -0.014); sayim denetcisi 12 -> 18 iddia, 5 mutasyonun hepsi hedefledigi iddiayi kirdi; T114'un hukmu ('Dagitim koda girmez.') degismedi. Dal T138-rapor-etiketleri 37bae0d.
+
+## T138 — Sahne butcesi etiketleri (muhur, denetim GECTI, KRITIK yok)
+
+131. sozlesme. Denetci izole kopyada (`git archive 3bb5706`) calisti, depoya yazmadi.
+
+Kriterlerin besi de bagimsiz olcumle tuttu. Denetci ajanin sayilarina guvenmedi:
+manset iddiasinin 3/5 ve 1/5 degerlerini ham `k4b-*.csv`den kendi saydi, K7 kaybini
+iki json'dan yeniden hesapladi, bes mutasyonun **besini de** `--no-incremental`
+derlemeyle kendisi kosturdu. Her mutasyon yalniz kendi iddiasini kirdi, 17 iddia yasadi.
+
+K2'nin asil kaniti: denetci mansetteki her sayiyi tek tek elle bozdu, altisinda da
+denetci `TUTMADI` dondu; manset cumlesi tumden yeniden yazilinca `exit=1`. Eski
+betigin dokuz regex'i cikarildi — hicbiri manseti taramiyordu, teshis dogru.
+
+K4: rapor yeniden uretildi, farkli cikan uc satirin ucu de cevre degeri (dal adi,
+`git log -1 -- src`, ham cikti yolu). **Olcum sayisi farki 0.** `src/` ve `tests/`
+diffi bos.
+
+Borclar:
+
+1. `Olculen uretim kodu` satiri olcum anini degil **rapor uretim anini** okuyor.
+   T114 olcumleri `f542dc2` ile kosuldu, `ccd2abd` o dala hic girmedi; T138
+   birlesince satir `ccd2abd` oldu. Yani birlesmis belgede su an olcumun hic gormedigi
+   bir koken iddiasi duruyor ve sonraki uretim ucuncu bir commit yazacak
+   (`main`in `src` basi artik `7ad8ffa`) — `tools/sahne-butcesi/Rapor.cs:135`.
+2. `sayim-denetimi.py`de K7 iddiasinin `if m:` kolunun `else`i yok: K7 cumlesi
+   yeniden yazilirsa iddia sessizce kayboluyor. Olculdu: 17 iddia, exit 0 —
+   `tools/sahne-butcesi/sayim-denetimi.py:130`.
+3. Ayni sessiz dusme `k4-izgara.csv` yoksa da oluyor (dosya gecici tasindi: 17 iddia,
+   exit 0) — `tools/sahne-butcesi/sayim-denetimi.py:83`.
+4. Verify paragrafi iki yolda da bulunamazsa hicbir uyari vermeden atlaniyor —
+   `tools/sahne-butcesi/Rapor.cs:1279`.
+5. **Sozlesmenin `verify` kolu yalniz `dotnet build`.** K2/K3'u kanitlayan
+   `sayim-denetimi.py` muhur kapisinda hic kosmuyor; sozlesmenin asil olcusunu kapi
+   calistirmiyor. Kusur G'nin (olu verify kolu) kardesi: kol olu degil, **eksik** —
+   `.claude/relay/contracts/T138.md:9`.
+6. Ham `k4-izgara.csv` satir 11 ve 13'un `not` sutunu hala eski yanlis gerekceyi
+   tasiyor; sayfa dogru cunku etiket uretimde yeniden hesaplaniyor, ham dosyayi okuyan
+   yanlis cumleyi gorur.
+7. Bir ajan gecici dosyayi `AGENTS.md`in dedigi depo kokundeki `.calisma/` yerine
+   `.claude/.calisma/T114` altina yazmis (T0 sildi).
+8. T138 worktree'si birlesme sonrasi duruyordu (T0 kaldirdi).
+9. "en buyuk p10 kaybi -0.014" `Math.Max` anlaminda dogru ama iki kayiptan buyuk dusus
+   olan -0.050'yi adlandirmiyor; isaretli bicim ve alttaki tablo kurtariyor, ustunluk
+   sifati tek basina okundugunda kaygan — `tools/sahne-butcesi/Rapor.cs:1022`.
+
+Borc 1 ve 5 T0'da kaldi; ikisi de tek sozlesmelik degil, sablon isi.
+
+## T137 — tur 2 acildi (denetim KALDI, uc KRITIK)
+
+2 Eylul 2026. Denetci `ac658ba72aa77692a` (opus), izole kopya `git archive 4fae7e7`.
+
+Mutasyon izgarasi, K4, K8, K9 tuttu; **isin ozu tutmadi.** Uc KRITIK, ucu de `owns` icinde:
+
+1. `MainWindow.axaml.cs:1411` gecidin girisinde iki degerli API'yi cagiriyor — ucuncu
+   cevap App yolunda hala yok ediliyor, ustelik olculmemis kodek icin `IsMeasured=True`
+   donuyor. Sozlesmenin kapatmak icin acildigi kusurun ta kendisi.
+2. `EncoderCapabilities.cs:70` degismedi. Sozlesme iki bicim kabul ediyordu; teslim
+   edilen ucuncusu — cagirani sifir olan bir kardes metot.
+3. K1'in CHECK'i saglanmadi ve rapor saglandigini soyluyor; `yoklama-uclu-cevap.md:29`
+   var olmayan bir bolume yonlendiriyor.
+
+Tur 2'ye T1-T11 yazildi; sekizi borctan yukseldi (tavansiz yeniden deneme, kod ile
+celisen belge, `_probeStatusShown` iddiasi, uretilemeyen grep satirlari, kesit demeyen
+tablo, ffmpeg'siz ortamda sessizce yesil sayilan K9, main'de hic baslamayan CI kosumu,
+eskimis mutasyon toplami).
+
+T139 daraltildi: `MainWindow.axaml.cs` tur 2'ye gecti, T139'un owns'undan ve K4'unden
+cikarildi. Ayni dosya iki aktif sozlesmeye atanmaz.
+
+## T139 Sole'ye, T140 acildi (ProClaude) — 2 Eylul 2026
+
+Iki yardimci disaridan devreye alindi; ana oturumun iki paralel ajan tavani degismedi
+(T137 tur 2 + T132 kosuyor).
+
+- **T139 → Sole.** `owns` catismasi duzeltildi: `PlanCalculatorProbeTests.cs` T137 tur
+  2'nin T9 kriterinde, ayni dosya iki aktif sozlesmede olamazdi. T139'un olculeri yeni
+  `EncoderStateConsumptionTests.cs` dosyasina tasindi, verify kolu da o ada cevrildi.
+  `status: active`.
+- **T140 → ProClaude (Pro hesabi, ilk acilis).** HandBrake taramasinin (§6 madde 6)
+  bekleyen isi: iki gecisli kodlamada ilk gecis son gecisle ayni preset'te kosuyor
+  (`FfmpegArguments.cs:408-414` preset'e hic dokunmuyor). Turbo ilk gecis kurulur,
+  **varsayilan kapali** — kalite etkisi bu depoda olculmedi. ffmpeg gerektirmez,
+  birim testiyle kapanir; Pro hesabinin dar butcesine gore secildi.
+
+Catisma taramasi: T140'in owns kumesi (`FfmpegArguments.cs`, `CodecModel.cs`,
+`EncodePlan.cs`, yeni test, yeni belge) hicbir aktif sozlesmede yok.
+
+- T132 teslim edildi (builder, tur 1): K0 sebebi (i) sayac yarisi olarak olculdu; bes iddia (b,b,c,b,b) siniflandi, uc bant daraltildi. Dal `T132-duvar-saati` itildi, CI `33637321742` success.
+
+## T132 teslim edildi, denetime verildi; T141 acildi — 2 Eylul 2026
+
+Dal `T132-duvar-saati`, dort commit, dordu de `owns` icinde (uc test dosyasi + belge).
+Uretim kodu degismedi. Yapicinin K0 cevabi: sorun yuk degil sayac yarisi —
+`FakeMeter.Calls++` atomik degil, iki pencere `Task.WhenAll` ile esanli olculuyor;
+200.000 denemede 156 kayip artis (%0,078), iki cekirdege sabitlenince sifir. Diger iki
+hipotez 45 kosumda elendi. Uc zamanlama bandi daraldi, genisleyen yok.
+
+Denetci acildi. Ozellikle arattiklarim: manset kaymasi, CI kosumunun (`33637321742`)
+gercekten `7952308`e ait olup olmadigi, daraltilan bantlarin testlerinin sabit mi
+davranis mi olctugu, verify kollarinin kac test buldugu. **Tam suiti yeniden
+kosturmasi yasaklandi** — makinede T137 tur 2 kosuyor, paralel kosum bu deponun
+zamanlama olcusunu kendisi bozuyor.
+
+**T141 acildi** — T132 yapicisinin bulup kapsam disi biraktigi uretim kusuru.
+`ComplexityProbe.WindowSample` bes alanli, sonuncusu kalite; uc kurulum yerinden
+**yalniz biri** kaliteyi tasiyor (`:793`). `half is null` kolu (`:740`) ve yedek yol
+(`:748`) `Quality = null` donuyor, tuketen taraf (`:98`) `null`i sessizce atliyor.
+Yani yedek yola dusen pencerenin kalitesi olculmemis oluyor ve hicbir yere
+"olculmedi" diye yazilmiyor. Bulgu bagimsiz dogrulandi, yapicinin sozune
+dayanmiyor.
+
+`depends: [T132]` — `ComplexityProbeTests.cs` T132 muhurlenene kadar onun.
+Yedek yolun ne siklikta kostugu **olculmedi**; K1 once onu olcuyor ve iki kol da
+olu cikarsa sozlesme orada duruyor.
+
+## Ajan dali yine ana agacta acildi — T0 kendine worktree acti (2 Eylul 2026)
+
+Sole `sole/T139-uclu-cevap-uretimde` dalini **depo kokunde** acti; depo koku artik
+`main`de degil. T141 sozlesme commit'i (`c3ffda1`) farkinda olmadan Sole'nin dalina
+dustu. Ayni kusur ayni gun T125'te de olmustu.
+
+Sebep: ajana verilen kalipta "dal ac, `main`e itme" var, **worktree yok**. Yasak yazma
+eylemine bagli; `git switch -c` yazma gibi gorunmuyor ve sessizce geciyor.
+
+Toparlama Sole'nin calisan agacina dokunmadan yapildi: `git worktree add
+.claude/worktrees/T0 main`, oraya `cherry-pick c3ffda1`, `main` oradan itildi
+(`b88bb66..df72725`). Sole'nin dalindaki `c3ffda1` yerinde birakildi — ayni icerik,
+birlesmede kendiliginden dusecek.
+
+**Bundan sonra butun role commit'leri `.claude/worktrees/T0` uzerinden atilir.**
+Depo koku ajanlara birakildi. Ajan kaliplarina worktree satiri eklenecek — Core borcu.
+
+## T132 — tur 2 acildi (denetim KALDI, bir KRITIK)
+
+Denetci yerel kosum yapmadi (0 kosum) ve gerekcesini yazdi: CI `33637321742` filtresiz
+tam suiti kosuyor, yukte tekrar kosturmak hem T137'yi hem olcuyu bozardi. Bunun yerine
+K2'nin on iki dagilim satirinin **hepsini** ham CSV'den yeniden hesapladi — birebir
+tuttu. Manset kaymasi yok. Isin govdesi saglam; dusen tek sey bir yokluk beyani.
+
+**KRITIK:** `duvar-saati-iddialari.md:147` "besin disinda assert edilen yeni bant
+bulunmadi" diyor; ayni iki dosyada uc bant daha var (`UpdaterTests.cs:915,916,1141`).
+`:915/:916` gercek surec acilisina konmus 3 sn'lik sabit tavan — iddia 4'ten (1050 ms)
+daha kirilgan. Sebep: K5'in yazili tarama komutu `TimeSpan.From`, `DateTime.UtcNow` ve
+`Join(` desenlerini icermiyor. Kusur eksik bulmak degil, **eksik bulup "yok" demek.**
+
+Tur 2 kriterleri T1-T8: KRITIK'i kapatmak, daralan iki tavani mutasyonla pimlemek
+(denetcinin yapisal gozlemi: dort mutasyondan yalniz biri eski bandi yasatip yenisini
+olduruyor, yani iki daralmanin daralma olmasi hicbir olcuyle tutulmuyor), K0'in (iii)
+belirsizligini yazmak ve T141'e baglamak, eskiyen satir numarasi, adi yalan soyleyen
+`verify-final.log`, olu ham veri, yaris ifadesinin daraltilmasi, K1'in eksik sutunu.
+
+Borc (tur acmaz): iddia 4'un 1050 ms tavani en riskli daralma — `ManifestTimeout=800`
+ustune 250 ms pay, dagilim yalniz bu makinede olculdu.
+
+Denetci T141'in gerekcesini de bagimsiz dogruladi ve ek bir sey soyledi: yedek yol
+`SampleTimeout` ile tetiklendiginde **tam olarak `Calls=1`** uretir — yani K0'in (iii)
+adayinin mekanizmasi bu. T141 artik iki sozlesmeye birden hizmet ediyor.
+
+## 2 Eylul 2026 — T137 muhurlendi (tur 2, GECTI)
+
+Denetci izole kopyada olctu, tur 1'in uc KRITIK'inin ucu de kapandi. Gecit girisi artik
+`Unmeasured / IsMeasured=False` donuyor; `EncoderCapabilities.WorksAsEncoder` olcemedigi
+kodek icin `false` yerine `HasEncoder(codec)` donuyor, yani uretim cagirani sifirdan
+bire cikti ve `HdrResolver`, `PlanCalculator`, `PerformanceProbe` hic dokunulmadan yeni
+davranisi aldi. `main` `27ae5f2`.
+
+Muhur notuna gecen borclar (tur acmadi):
+
+- Rapor `:379-381` yanlis commit kimligi (`431c1ae` aslinda `d150801`den once).
+- Rapor `:32-33` kendi kayit noktalari tablosuyla celisiyor.
+- T5'in satir atfi `:1229-1233` degil `:1233-1236` — "pin degisti, docstring degismedi".
+- T6'nin `OrdinalIgnoreCase` gerekcesi yanlis; olcu dogru, aciklamasi degil.
+- `baslat-kilidi.md` k1/k2/k6 hala atifsiz `Toplam: 70` diyor; suit 76.
+- `tools/surucu-yoklugu/Program.cs:26` T2'den sonra sessizce anlam degistirdi; `Ayrisma()`
+  tablosunu etkilemiyor ama aracin `:105-118` simulasyonu artik farkli davraniyor.
+- M5-M9 mutasyon ciktilari yapicinin kendi olcumu; denetci kosum siniri yuzunden
+  tekrarlamadi, yalniz olculerin davranis olctugunu koddan dogruladi.
+
+## 2 Eylul 2026 — T132 tur 2 teslim edildi
+
+`cdc7853`. T1 sekiz bandi ham ciktisiyla belgeye gomdu, yokluk beyani geri cekildi.
+T2'de iki mutasyondan **yalnizca biri** pimledi: iddia 1'in bandi `PerformanceCheckTests.cs:757`
+oncesindeki `if (!guvenilir) Atlandi(...)` kapisi yuzunden yuklu kosucuda hic
+degerlendirilmiyor. Bu, "sabit karsilastiran test davranis olcmez" ailesinin yeni yuzu:
+test kirmizi olamiyor cunku hic kosmuyor. Denetci acildi.
+
+## 2 Eylul 2026 — T142 acildi, ProClaude'un ikinci isi
+
+`CalibrationProbe` kendi sabit pencere kopyasini tasiyor: esit aralikli yerlesim, sureye
+bakan sayim, tavan uc. `ComplexityProbe.PlanWindowCount` / `PlanWindows` sahne kesigine ve
+heterojenlige bakan duzenegi zaten tasiyor ama bu yol onu cagirmiyor. `owns` T140 ile
+kesismiyor, es zamanli kosar.
+
+Yan bulgu, bu sozlesmenin disinda: `ComplexityProbe.cs:31`
+`public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;` — sahne farkindali
+ornekleme uretimde **kapali** pimlenmis. Kullanicinin "dinamiklik" hedefinin onundeki en
+buyuk tek satir. Ayri sozlesme gerekiyor; dosya T141'in.
+
+## 2 Eylul 2026 — T139 owns genisletildi
+
+K2 arayuz varsayilanini degistirince `WorksAsEncoder`i override edip `EncoderState`i
+etmeyen sahteler kirildi. Uc sahte iki dosyada: `PlanCalculatorTests.cs` (sahipsizdi) ve
+`EncoderAvailabilityTests.cs` (T137'nindi, muhurlenince serbest kaldi). Ikisi de T139'a
+acildi, **yalniz uc sahteye `EncoderState` override'i** siniriyla.
+
+- T132 tur 2 teslim edildi: KRITIK kapandi (uc bant listelendi, yokluk beyani geri cekildi), sekiz kriterden yedisi kapali; T2 yarim — iddia 4 pimlendi, iddia 1 testin kendi kapisi yuzunden pimlenemedi. Commit 0c371f7/eec17e7/cdc7853.
+
+## T132 tur 3 acildi — 2 Eylul 2026
+
+Denetim KALDI, iki KRITIK. T3-T8 gecti.
+
+- **K-1:** yapici T2'yi "`Atlandi` bir kapi, `:757` hic kosmuyor" diye kapatti. Yanlis —
+  `Atlandi` `private void` gunlukcu, `return` yok. Denetci `:757`'yi
+  `InRange(999_000, 999_999)` yapip kosturdu: `[atlandi]` basildi **ve** assert patladi.
+  Pim uretilebilirdi; yeni bant kolu hic kosulmamis (iki gunluk de `eski-bant` adli).
+- **K-2:** `UpdaterTests.cs:890` dokuzuncu bant, listede yok; ustune uc yerde "sekiz"
+  mutlak sayimi yazili. Kronik kusur ucuncu kez, bicim degistirerek: "yok" -> "sekiz".
+
+Tur 3 kriterleri U1/U2/U3 sozlesmeye yazildi. Protokol geregi **advisor zorunlu**;
+yapici ve danisman es zamanli acildi. Danismana sorulan uc soru: iki KRITIK dogru mu
+siniflanmis, desen genisletmek dorduncu tekrari onler mi, `PerformanceCheckTests.cs:629`
+bant mi.
+
+Borc kayda gecti: `Atlandi` cagri yerlerinde tek `return`suz olan `:753`; `Atlandi`nin
+gercek SKIP olmamasi (xUnit 2, T117'nin ayni borcu); `T132.md:68`'in hala `:61` demesi.
+
+## T143 ve T144 acildi — 2 Eylul 2026
+
+ProClaude'un ucuncu ve dorduncu isi. T140/T142 ile birlikte dort sozlesme es zamanli;
+`owns` kumeleri kesismiyor.
+
+**T143 — en kotu sahne olcusu uretimde sabit izgarada.** `QualityMeter.WorstScene`in
+`SceneMap` alan asiri yuklemesinin **sifir uretim cagirani** var; tek uretim cagrisi
+`QualityMeter.cs:291`, uc argumanli, `map = null`. Haritali her cagri
+`QualityMeterTests.cs` icinde. Yani algiyi olcen metrik her zaman sabit 2 sn izgarada
+kosuyor. T137'nin KRITIK 2'siyle ayni sinif: duzenek yazilmis, olculmus, uretimde olu.
+Ikinci kusur: `:239` raporlanan pencere uzunlugunu **kosulsuz** 2.0 basiyor. Ucuncu:
+`MinimumUnitSeconds` sabit pencereden turetilmis ve kisa artik parca olcunun disinda.
+
+**T144 — kodlama basarisi yalniz cikis koduna bakiyor.** `EncodeRunner.cs:395` ve
+`FfmpegRunner.cs:60` basariyi `ExitCode == 0` ile karar veriyor. Depo bu dersi
+`EncoderCapabilities.PixelFormatAccepted` (`:316-318`) ile **bir yerde** ogrenmis; gercek
+teslim yolu ogrenmemis. Kanit dort belgede olculmus: `zzznotreal=1` icin ffmpeg cikis
+kodu 0, stderr `Error parsing option` (`docs/olcumler/handbrake-acigi.md:139`,
+`docs/taramalar/lav-filters.md:23`, `mpv.md:23`, `svt-av1-psy.md:25`). Sonuc: motorun
+sectigi psikogorsel parametre sessizce dusuyor, kullanici uyari almiyor.
+
+Yan bulgu (ayri sozlesme gerekiyor): `ComplexityProbe.cs:31`
+`public const SamplingPlan ProductionPlan = SamplingPlan.Fixed;` — sahne farkindali
+ornekleme uretimde pimli olarak kapali.
+
+## T140 teslim edildi, denetimde (2 Eylul 2026)
+
+Dal `T140-turbo-ilk-gecis` @ `6f64593`. Diff tamamen `owns` icinde. CI `33652799954`
+(`ba1f6be`) success. Denetci acildi.
+
+Yapicinin uc sorusu, T0 cevabi:
+
+1. **Atlanan 18 -> 19, hangi olcunun kaydigi bilinmiyor.** Borc. Yapici bunun bir cikarim
+   oldugunu acikca yazdi — dogru davranis. Denetci dalin yeni bir `Skip` getirip
+   getirmedigine bakiyor.
+2. **Merdiven yonu kumeye bagli** (`libvpx-vp9`, `libsvtav1` ters yonlu). **Ucuncu
+   kodlayici girdiginde.** Bugun kume iki ve ikisi de ayni yonde; koruma kume olcusunun
+   kirmiziya donmesi. Veriye tasimak bugun olu alan ekler.
+3. **Turbo anahtarini uretimde kimse acmiyor.** Ayri sozlesme. `CompressionStrategy`,
+   `PlanCalculator` ve ayarlar tarafi T140'in `owns`unda degil; dokunmamakla dogru yapti.
+
+### Ayni sinif dorduncu kez: duzenek var, uretim cagirani sifir
+
+T137 (ucuncu cevap uretilmis, tuketilmemis), T142 K3 (harita uretiliyor, cagriya
+verilmiyor), T143 (`WorstScene`in haritali kolu yalniz testlerden cagriliyor), T140
+(turbo anahtari kimse acmiyor). Dordu de ayni: yeni yetenek yazildi, olculdu, muhurlendi
+— ve kullaniciya ulasan yolda **kosmuyor.**
+
+Kok neden `owns` disiplini: yetenegi yazan sozlesme onu **cagiran** dosyaya sahip degil,
+o yuzden bagalamak her seferinde borc olarak devrediliyor ve borc hicbir sozlesmeye
+donmuyor. Cozum: bu dort borcu tek bir "uretim yolunu bagla" sozlesmesinde toplamak;
+`owns` tam da cagiran dosyalar olur (`src/VidShrink.App/MainWindow.axaml.cs`,
+`src/VidShrink.Core/PlanCalculator.cs`, `CompressionStrategy`).
+
+## T132 muhurlendi (2 Eylul 2026, tur 3)
+
+Denetim GECTI, KRITIK yok. `main` @ `8075ed0`. CI `33658444761` (`46d9d48`) success.
+Dal ve worktree kaldirildi.
+
+Denetci taint taramasini bagimsiz yeniden kurdu: **tam olarak 23**, ayni satir kumesi.
+Fazla kapsayici 65 assert'lik elek ek saat turevi iddia bulmadi. Pimleyen olcunun gercek
+oldugunu izole kopyada **24. bandi kendi ekleyerek** dogruladi — test kirmizi dondu ve
+yeni satiri adiyla soyledi. Dort U1 gunlugu derleme ciktisiyla basliyor (`--no-build` yok),
+her biri `Toplam: 1` (olu kol yok). `--list-tests` 22 + 54 + 29 = 105.
+
+Bes borc:
+1. `duvar-saati-iddialari.md:463` "yirmi dorduncu saat turevi assert CI'i kirmizi yapar"
+   diyor; `DateTime.UtcNow` bandi yesil kaliyor. Yazili kapali kume uretim saat turevi
+   uyeleri + zaman asimi alan beklemelerle sinirli, olcu spec'e uyuyor. Tek cumle fazla
+   iddia ediyor.
+2. `:511-515` arasinda "bilinen sinirlar" paragrafi yok.
+3. Tur 3 icin saklanmis yerel verify gunlugu yok.
+4. `PerformanceCheckTests.cs:455-462` gercek bir `else` kapisinin arkasinda. Tur 2'nin
+   `:757` icin **uydurdugu** mekanizma burada gercek — ve bant tablosu bunu soylemiyor.
+5. `KorumaAraligi` olu savunma.
+
+Devredilen borc: kalan alti bant sayildi, daraltilmadi -> **T145**. Artik `depends`i
+karsilandi, acilabilir. **T141** de acildi (ayni bagimlilik).
+
+## T142 tur 2 acildi — iki KRITIK, ikisi de belge
+
+Kod bagimsiz olarak dogrulandi: K1, K2, K4, K6, K7 ve K3'un **karari** gecti. Denetci
+mutasyon izgarasini kendi kosturdu (dort mutasyon, her biri yalniz kendi olcusunu kirdi),
+K1'in uc kirmizisini `b5f1750`i ayri agaca acip birebir uretti, `--list-tests` ile 46 + 22
+saydi, `ComplexityProbe.cs`in **degistirilmedigini** diff'ten dogruladi.
+
+KRITIK 1: `kalibre-pencere.md:118`, `8 | Fast | degisken harita` hucresi `2: [4 6]` yaziyor.
+4000 fixture supuruldu; `Fast == [4 6]` **hicbirinde cikmiyor**. Ayni satirin Quality
+hucresini ureten fixture'larin hepsinde Fast `[0 2]`. Fark onemsiz degil: `[4 6]` klibin
+ikinci yarisina yayilmis yerlesim, `[0 2]` iki ornegin de ilk dort saniyeye yigildigi hal
+— raporun kendi borc 2'sinde tarif ettigi tehlike. Yanlis hucre tehlikenin ornegini
+gizliyor.
+
+KRITIK 2: `:68-69` "sceneCuts'i dolduran tek yer ... `:383`, yani bir olcu". Yedi yer var
+ve `:383` bir cagri bile degil, metot basligi. `tools/ornekleme` de olcu degil, olcum araci.
+
+Kalan 13 satir ve K5'in tasiyici cumlesi dogrulandi. Tur 2 **belge turu**; kod degismiyor.
+Yerel yapici acildi, dal `T142-tur2`.
+
+## T143 muhurlendi (2 Eylul 2026)
+
+Denetci `a0d2d12375e3e973a`. Cagri sayimi **ucuncu kez ve tur turetimli yontemle** uretildi:
+imzalardan `map`in 4. arguman oldugu okundu, agactaki 16 `WorstScene(` satiri
+bildirim/metot-adi/cagri diye ayrildi, cagrilar arguman sayisina bolundu. 2+1+13=16,
+6+5=11, 1+1+11=13 — toplamlar tutuyor. Yapicinin 11/5/4/1 tablosu dogru; **sozlesmenin
+yazdigi 12 yanlisti** ve yapici bunu kendisi buldu.
+
+K4'un iki sayisi denetcinin kendi kosumunda uretildi: duzeltilmis `88.888889 @ 14.0 unit
+2.25`, eski davranis `100.0 @ 0.0 unit 2.0`. Eski testin yeniden yazilmasi mesru:
+`MinimumUnitSeconds` 0,5 sn olarak **duruyor**, degisen yalniz sonuc (dusur -> kat). Yeni
+test daha siki. Bant genisletilmedi.
+
+Dort mutasyonun ucu denetcide kosuldu, izgara birebir tuttu. Izgara daraltmasinin olcuyu
+zayiflatmadigi ayrica dogrulandi.
+
+Yedi borc, KRITIK yok. **En onemlisi dorduncusu:** `WorstScene`in iki asiri yuklemesinin
+**artik uretim cagirani sifir.** Uretim `AggregateVmaf` -> `WorstSceneUnit` yolundan
+geciyor; `WorstScene` yalniz 10 test satirindan cagriliyor. Yani sozlesmenin actigi kusur
+sinifi kapanmadi, **eski giris noktasina kaydi** — ve rapor bunu anmiyor.
+
+Bu, "uretim cagirani sifir" sinifinin **besinci** gorunumu (T137, T142 K3, T143 map kolu,
+T140 turbo anahtari, simdi `WorstScene`). Kok neden ayni: yetenegi yazan sozlesme onu
+cagiran dosyayi sahiplenmiyor. T146 bu sinifi kapatmak icin acildi ve `PlanCalculator.cs`
+T139'da oldugu icin bekliyor.
+
+Ikinci onemli borc: uygulama **haritayi olcumden sonra kuruyor**
+(`MainWindow.axaml.cs:1807` olcum, `:1812` harita). Yapici buldu, denetci gozle dogruladi.
+Imza bugun degistirilse bile gecirilecek harita o noktada **yok**. Ayri sozlesme; T141 ve
+T143 muhurlenince acilir.
+
+## Serkan — macOS kosumu ve VideoToolbox olcumu (2 Eylul 2026)
+
+Numarasiz is; gorev paketi disaridan verildi, dal `serkan/macos-olcum`, `main`e
+`a2b9664` ile birlesti. Dort commit, on dosya.
+
+**Ne getirdi.**
+
+1. **Uc gercek yerellestirme kusuru** — Release'te arayuzde ham anahtar dizesi
+   gorunuyordu. T0 ucunu de `origin/main` uzerinde bagimsiz dogruladi:
+   `MainWindow.axaml.cs:2054` `main.quality.target` (hicbir dilde yoktu),
+   `:2056` `main.quality.points` (gercegi `main.quality.loss-points`),
+   `:2140` `main.plan.fact.estimate` (gercegi `main.plan.fact.estimated-size`).
+   Duzeltme dort satir; `dotnet build -c Release -warnaserror` temiz,
+   `LocalizationTests` 10/10 yesil.
+
+2. **VideoToolbox olcumu** — Apple M1, uc parca x uc kol = dokuz kosum.
+   `hevc_videotoolbox` `libx265 -preset slow`tan **16,1x–37,7x** hizli;
+   ayni `-b:v 5500k`ta VMAF p10'u **6,383 / 17,365 / 33,357** puan geride.
+   `grep -rn videotoolbox --include=*.cs src/` → **0 satir**; depo bu yolu hic
+   tanimiyor. `CodecModel.Vendor` yalniz `nvenc|qsv|amf` dizgilerine bakiyor,
+   dolayisiyla `hevc_videotoolbox` **yazilim** sayiliyor.
+
+3. **macOS suit kosumu** — 1339 gecen, 9 kirmizi, 6 atlanan, 1354 toplam, 2 sa 44 dk.
+   Yerellestirme duzeltmeleri kirmiziyi 56 → 37 → 9'a dusurdu; kalan 9'un hicbiri
+   yerellestirme degil.
+
+**Ne getirmedi, kendi yaziyor.** Kalan 9 kirmizinin kok nedeni cozumlenmedi
+("tahmin uydurmadim"). Is 3'un GUI maddeleri (K2/K3/K4) acik kaldi: **ekran izni
+iki kez reddedildi**, `_sorun.log`da kayitli. Canli kaynak olarak 60 sn'lik 1080p60
+HDR parca secmek suresi sisiren karardi ve bunu kendi kararı olarak yaziyor.
+
+**Acilan sozlesmeler.**
+
+- **T148** — `LocalizationTests` on test tasiyor ve hepsi yesildi, cunku hepsi anahtar
+  **kumelerini birbirine** karsilastiriyor; hicbiri kaynak kodun ne **cagirdigina**
+  bakmiyor. Uc anahtar iki dilde de yoktu, dolayisiyla iki kume esitti. Kume esitligi,
+  kumenin dogru olmasini olcmez. `Strings.AssertOnMissingKey` mekanizmasi zaten var
+  (`LocalizationTests.cs:171` onu kapatiyor) — kusur mekanizmanin yoklugu degil,
+  **statik olarak kosturulmamasi**.
+- **T149** — VideoToolbox saticisinin tanimlanmasi. Bagla-gec degil: `IsHardware`
+  kapisinin arkasindaki dort sabit (1,52 / 0,877 / 11 / 1,10) **NVENC'te olculdu** ve
+  `bppf-tabani.md` §5.3 bunlarin olculmemis QSV ve AMF'ye de uygulandigini kendi
+  yaziyor. VideoToolbox'i ayni kapinin arkasina koymak kusuru **dorduncu kez** tekrar
+  eder. Sozlesme saticiyi tanimlar, `IsHardware`i acmaz; acmak icin Mac'te kol basina
+  sekiz noktali bppf egrisi gerekiyor ve o olcum yok.
+
+**`.DS_Store`** git'e sizmisti; `b692684` ile cikarildi ve `.gitignore`a eklendi.
+
+## T144 muhurlendi (2 Eylul 2026)
+
+`docs/olcumler/cikis-kodu-yalan.md`. Denetim **GECTI**, KRITIK yok. Ledger `317ed9f4`,
+risk low, verify 37/37.
+
+**Ne kapandi.** ffmpeg tanili bir hata basip **cikis kodu 0** dondugunde depo bunu
+"basarili" sayiyordu. Artik iki kosucu da ayni sozlugu okuyor: tek tanim
+`FfmpegRunner.cs:18` `FfmpegDiagnostics`, iki desen, iki cagri yeri
+(`EncodeRunner.cs:437`, `FfmpegRunner.cs:138`).
+
+**Denetim neyi kendi uretti.** Yapicinin fixture'larina hic guvenmedi. Iki desenin
+kanitini kendi makinesinde yeniden uretti: `libsvtav1` → `Error parsing option`
+(35 satirin 12.si, raporunkiyle birebir), `libx264` → ayni desen, `libx265` →
+`Unknown option:`; ucu de EXIT=0. Yanlis pozitif olcusunu de taze ciktiyla kurdu:
+114 satir temiz stderr, **sifir eslesme**. Dort mutasyonu kendisi kosturdu; M1/M3/M4
+kumeleri birebir tuttu, M6'daki tek fazlalik paralel gercek ffmpeg kararsizligi
+(test tek basina kosunca geciyor).
+
+**Denetci sayimi ucuncu kez yeniden uretti ve raporu duzeltti.** K1'in "dokuz kapi,
+tam liste" iddiasi tutmuyor: `EncodeRunner.cs:141` (`stoppedOnPurpose`,
+`band.HardFloorMb` — ucuncu boyut kapisi), `:147` (`if (!over && !underBand)`,
+teslimin asil kapisi) ve `:121` (`twoPass`) tabloda yok. **En az on iki.** Dokuz,
+secilmis bir grep'ti. Kritik degil cunku sayidan hicbir karar turetilmiyor ve
+cikarilan sonuc paydadan bagimsiz dogru — ama bu, **kronik kusur 1'in 24. tekrari**:
+tablo dogru, onu ozetleyen cumle yanlis.
+
+### Sifir uretim cagirani: **altinci** ornek
+
+`EncodeResult.DroppedOptions` her donus yolunda dolduruluyor
+(`EncodeRunner.cs:151,183,188,218`) — ve `src/` altinda onu **okuyan kod yok**.
+Kusurun kullaniciya dokunan yarisi acik kaldi.
+
+Simdiye kadar ayni sinifin altisi: T137 (ucuncu cevap), T142 K3 (harita),
+T143 (`WorstScene` harita kolu), T143 (`WorstScene`in kendi iki asiri yuklemesi),
+T140 (turbo anahtari), **T144 (`DroppedOptions`)**.
+
+Kok neden her seferinde ayni: **yetenegi yazan sozlesme, onu cagiracak dosyayi
+sahiplenmiyor.** T146 bu sinifi kapatmak icin acik; tablosu artik alti satir.
+
+### Borclar (tur acmaz)
+
+1. K1 kapi listesi eksik (yukarida).
+2. `FfmpegRun.DroppedOptions` tek tuketicisi icin olu — `SegmentEncoder.cs:176`
+   `-loglevel error` kullaniyor, uc kodlayicinin tanisi da o seviyede basilmiyor.
+3. `EncoderCapabilities.cs:343-346` sozlugu `Unknown option:` icermiyor; x265
+   secenek sondasi bugun dusurulen anahtari kaciriyor.
+4. Izgaranin ham ciktisi agacta yok (`.calisma/T144/K5-izgara.txt` silinmis);
+   M2, M5, M7 bagimsiz dogrulanmadi.
+5. `EncodeRunnerTests` kolu `EncodeRunnerAtomicOutputTests`i kapsamiyor (alt dize
+   eslesmiyor). T144'un getirdigi degil, onceden var.
+6. `EncodeRunnerTests.cs`e BOM eklendi.
+
+**Borc 2 ve 3 zaten T147'nin kapsaminda** (T144 teslimindeki kapsam disi bulgulardan
+acilmisti). Borc 6 mekanik; ayri sozlesme acmiyorum.
+
+### Ortam bulgusu
+
+Yerel takim bir kez **87 testte durup exit code 0** dondu. Denetci ayni seyi
+bagimsiz gordu: askida kalan test host'unu `taskkill` ile oldurdugunde arka plan
+isi **exit 0** raporladi. Bu, "yesil okuma gercekti ama olctugu sey yanlis"
+ailesinin yeni bir yuzu — kosum yarida kesilse bile kapi gecer. `kosum-kapisi.ps1`
+`-MinimumTotal` tam bunun icin var ve CI'da devrede; yerel kosumda degil.

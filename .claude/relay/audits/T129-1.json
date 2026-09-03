@@ -1,0 +1,18 @@
+{
+  "contractId": "T129",
+  "auditorRunId": "a35ab42af1fbca8bb",
+  "headSha": "540915c6b69aec2c77e84daaab21a9b35f3e0c68",
+  "diffHash": "0bb57378dd5da7c492c75f2eadd41031882df6d34a03f32fe9b86c6f2a767dff",
+  "owns": [
+    "src/VidShrink.Core/HardwareVerdict.cs",
+    "src/VidShrink.Core/IEncoderAvailability.cs",
+    "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
+    "tests/VidShrink.Tests/EncoderCapabilitiesTests.cs",
+    "docs/olcumler/ucuncu-durum.md"
+  ],
+  "verification": [
+    "Denetci depo disinda calisti (git archive 2979f7c), tek dotnet test kosturdu: EncoderCapabilitiesTests|HdrArgumentsTests, cikis 0. KRITIK yok. owns temiz: dokunulan bes dosyanin hepsi listede, kapsam disi test dosyalarina tek satir yazilmamis. Ucuncu durum gercekten cagirana acildi: EncoderProbeResult'a State eklendi, HardwareVerdict.Measured eklendi, varsayilan gerceklestirme on test sahtesini de kirmadan derledi (denetci onunu tek tek saydi). Karar degismedi: olculemeyen yoklama Succeeded == false donduruyor, cagiran yazilima dusuyor, kullaniciya gorunen cumle ayni. Reddedilen uc secenegin gerekcesi birinci elden dogrulandi: HardwareVerdictTests.cs owns disinda ve pozisyonel EncoderProbeResult cagiriyor, MainWindow.axaml.cs:676 switch'inde dusme kolu var. Mutasyon kanitlari yeniden kosuldu: E mutasyonu AnHdr10AcceptanceAfterAnUnmeasuredFormatIsNotCached'i kirdi (1/15), F mutasyonu iki olcuyu birden kirdi (2/15). Borclar: raporun uc kayan cumlesi vardi ve muhurden once T0 tarafindan duzeltildi - :94 on sahneye dokuz diyordu, :187 uc olcu sayip ikisi de diyordu (mutasyon tablosu ucuncusu icin kiran mutasyon gostermiyor), EncoderCapabilitiesTests.cs:295 butce onun ucte birinden az diyordu oysa ReaderBudgetMs 750 ve SlowProbeMs 2000, ucte biri 666,7 - yarisindan az olarak duzeltildi. Bu bu deponun olculmus kronik kusuru: tablo dogru, tabloyu ozetleyen cumle yanlis. Denetcinin ucuncu borcu (EncoderAvailabilityTests depoda yok, 33 olcu 32 cikiyor) GECERSIZ sayildi: o sinif T123 ile main'e girdi, denetci T129 dalinin arsivinde baktigi icin gormedi - worktree-yerel dosyayi bayat gorme kusuru. Kanonik verify koseli paranteze alindi: duz metin haliyle sifir dogrulama adimi olarak ayristiriliyordu."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T09:47:13.791Z"
+}
