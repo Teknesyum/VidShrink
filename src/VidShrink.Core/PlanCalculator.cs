@@ -904,25 +904,39 @@ public static class PlanCalculator
     }
 
     /// <summary>
-    /// Adaylari sirayla dener. Bir aday <b>henuz olculmemisse</b> tarama orada durur ve o
-    /// aday gecici cevap olarak doner: olculmemis bir donanimi "yok" saymak yanlis olurdu.
-    /// Isaret <paramref name="probe"/> ile yukari tasinir, olcum gelince hesap yenilenir.
+    /// Adaylari sirayla dener. Bir aday <b>henuz olculmemisse</b> tarama durmaz: aday
+    /// hatirlanir ve siradakilere bakilir. Calisan bir aday bulunursa <b>o</b> doner ve
+    /// isaret konmaz; hicbiri calismiyorsa hatirlanan olculmemis aday gecici cevap olarak
+    /// doner, cunku olculmemis bir donanimi "yok" saymak yanlis olurdu.
+    ///
+    /// Tarama T151'e kadar ilk olculmemis adayda duruyordu. Yoklamasi hic yerlesmeyen bir
+    /// aday (`Unsettled` kalici olarak <see cref="EncoderProbeState.Unmeasured"/> demektir)
+    /// sirayi kalici kilitliyor ve sirada calisan donanim varken plan "olculmedi" isaretiyle
+    /// donuyordu; T139'un dogrulamasi o isareti "donanim yok"a ceviriyordu. Olcum
+    /// <c>docs/olcumler/ilk-olculmemis-aday.md</c>'de.
+    ///
+    /// Devam etmek olculmemis adayi yoklamasiz birakmiyor: <see cref="EncoderAvailabilityState.KnownState"/>
+    /// sorunun kendisiyle yoklamayi sirayla koyar, yani tarama bir adayi gecerken de onu
+    /// olcume yollar.
     /// </summary>
     private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
+        string? unmeasured = null;
         foreach (var candidate in FastHardwareOrder)
         {
             var state = availability.KnownState(candidate);
             if (state == EncoderProbeState.Unmeasured)
             {
-                probe.NotMeasured = true;
-                probe.CodecNotMeasured = true;
-                return candidate;
+                unmeasured ??= candidate;
+                continue;
             }
             if (state == EncoderProbeState.Working) return candidate;
         }
-        return FallbackCodecFor(pref);
+        if (unmeasured is null) return FallbackCodecFor(pref);
+        probe.NotMeasured = true;
+        probe.CodecNotMeasured = true;
+        return unmeasured;
     }
 
     public static double HardwareBitrateYield(string codec, ComplexityProfile complexity, double scale, double fps)
