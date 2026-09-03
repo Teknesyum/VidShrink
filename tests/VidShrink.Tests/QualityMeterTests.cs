@@ -99,6 +99,29 @@ public sealed class QualityMeterTests
         finally { Cleanup(dir); }
     }
 
+    /// <summary>
+    /// <c>Comparable: false</c> "bu iki klip karsilastirilamaz" demektir; o durumda tasinan
+    /// <c>VmafNegMean</c> degeri anlamsizdir ve uretim yoluna cikmamalidir. Kapinin iki kolu
+    /// var, bu olcu yalniz <c>Comparable</c> kolunu pimler: skor bir ortalama tasiyor, tek
+    /// dusuren sey kiyaslanamazligi.
+    /// </summary>
+    [Fact]
+    public void AnIncomparableScoreNeverLeavesTheWindowMeasurement()
+    {
+        var incomparable = new QualityScore(
+            94.25, 93.5, 88.0, 71.0, 42.5, 0.987, false,
+            "Renk uzayi uyusmuyor; HDR ve SDR/tonemap edilmis goruntu karsilastirilamaz.");
+        var comparable = incomparable with { Comparable = true };
+
+        Assert.Null(QualityMeasurement.ToWindowMeasurement(incomparable, 12.0, 340));
+
+        var carried = QualityMeasurement.ToWindowMeasurement(comparable, 12.0, 340);
+        Assert.NotNull(carried);
+        Assert.Equal(94.25, carried!.VmafNegMean);
+        Assert.Equal(12.0, carried.StartSeconds);
+        Assert.True(carried.Comparable);
+    }
+
     [TonemapFact]
     public async Task TonemappedReferenceSeparatesTwoSdrQualities()
     {

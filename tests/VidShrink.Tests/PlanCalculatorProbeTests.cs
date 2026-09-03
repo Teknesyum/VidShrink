@@ -1,8 +1,9 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
@@ -17,6 +18,10 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class PlanCalculatorProbeTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public PlanCalculatorProbeTests(ITestOutputHelper output) => _output = output;
+
     private static readonly MediaInfo HdrSource = new()
     {
         FilePath = "hdr.mp4",
@@ -82,6 +87,9 @@ public sealed class PlanCalculatorProbeTests
             Record($"works:{codec}");
             return _works(codec);
         }
+
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
 
         public string? Hdr10PixelFormat(string codec)
         {
@@ -243,8 +251,9 @@ public sealed class PlanCalculatorProbeTests
 
     /// <summary>
     /// K3, hizli yol. Hicbir aday olculmemisken cevap "donanim yok" degil "heniz
-    /// olculmedi": tarama ilk adayda duruyor, yazilim yedegine dusmuyor ve plan
-    /// <c>HardwareNotMeasured</c> ile isaretleniyor. Isaret olmasa
+    /// olculmedi": tarama sirayi sonuna kadar gezip calisan bulamiyor, yazilim yedegine
+    /// dusmuyor ve hatirladigi ilk olculmemis adayi <c>HardwareNotMeasured</c> isaretiyle
+    /// donduruyor (T151'e kadar ilk adayda duruyordu). Isaret olmasa
     /// arayuz gecici bir cevabi kesin cevap gibi gosterirdi.
     /// </summary>
     [Fact]
@@ -751,28 +760,191 @@ public sealed class PlanCalculatorProbeTests
         Assert.True(durum.IsEnabled, "yoklama yerlesmedigi icin Baslat kalici kilitli kaldi");
     }
 
-    /// <summary>
-    /// T136/K6. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle ayni seyi
-    /// soyluyor. T128 Core'u duzeltti, arayuzdeki dort kopya eski metinde kaldi ve bunu
-    /// hicbir olcu gormedi; burasi o ayrilmayi bir daha sessiz birakmiyor.
-    /// </summary>
-    [Fact]
-    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor()
-    {
-        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new RecordingAvailability(TimeSpan.Zero));
-        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+    internal const string DerlemedeYok = "derlemede yok";
+    internal const string Olculmedi = "olculmedi";
+    internal const string OlculduCalismiyor = "olculdu, calismiyor";
 
-        var kalip = Locales.Values("en")["main.reason.encoder-fallback"];
+    /// <summary>
+    /// Uc dusme durumunun ucunu de kuran girdiler. Tek sahte nesne yetmiyor: ucuncu
+    /// durumu (aday derleme listesinde hic yok) yalniz <see cref="MissingCodecAvailability"/>
+    /// uretebiliyor, kalan ikisi <see cref="FastOrderAvailability"/> ile kuruluyor.
+    /// <see cref="MissingCodecAvailability"/> eksik aday icin <c>HasEncoder</c> false
+    /// dondururken <c>EncoderState</c> icin <c>NotWorking</c> donuyor (T152 borc 4);
+    /// bu girdi o ayrilmaya yaslanmiyor, cunku <c>PreferredCodecInBuild</c> yanlisken
+    /// durum sorusuna hic bakilmiyor.
+    /// </summary>
+    public static TheoryData<string> DusmeDurumlari() => new() { DerlemedeYok, Olculmedi, OlculduCalismiyor };
+
+    private static IEncoderAvailability YetenekIcin(string durum) => durum switch
+    {
+        DerlemedeYok => new MissingCodecAvailability("av1_nvenc", ("hevc_nvenc", EncoderProbeState.Working)),
+        Olculmedi => new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working)),
+        _ => new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Working))
+    };
+
+    internal static ReasonNote DusmeNotu(string durum) =>
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, YetenekIcin(durum))
+            .Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+
+    internal static (string Anahtar, string Cumle) ArayuzCumlesi(string durum, string dil)
+    {
+        var note = DusmeNotu(durum);
+        var anahtar = MainWindow.EncoderFallbackReasonKey(note);
+        var kalip = Locales.Values(dil)[anahtar];
+        return (anahtar, string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec));
+    }
+
+    /// <summary>
+    /// T136/K6, T157/K1. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle
+    /// ayni seyi soyluyor — <b>uc durumun ucunde de</b>.
+    ///
+    /// Olcu T157'ye kadar tek girdi geziyordu (<see cref="RecordingAvailability"/>) ve o
+    /// girdi tam da arayuzun ayrismadigi ucuncu duruma dusuyordu; pim bosluğu ortuyordu.
+    /// Arayuz uc durum icin tek yerellestirme anahtari cagirdigi surece bu olcu
+    /// <see cref="DerlemedeYok"/> ve <see cref="Olculmedi"/> kollarinda kirmizi verir.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DusmeDurumlari))]
+    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor(string durum)
+    {
+        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, YetenekIcin(durum));
+        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+        var anahtar = MainWindow.EncoderFallbackReasonKey(note);
+        var kalip = Locales.Values("en")[anahtar];
         var arayuz = string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec);
 
-        Assert.Contains(arayuz, detailed.Plan.Reason, StringComparison.Ordinal);
+        Assert.True(
+            detailed.Plan.Reason.Contains(arayuz, StringComparison.Ordinal),
+            $"durum \"{durum}\" | anahtar {anahtar}" + Environment.NewLine +
+            $"  arayuz : {arayuz}" + Environment.NewLine +
+            $"  core   : {FallbackNote(detailed.Plan, "av1_nvenc")}");
+    }
 
-        Assert.Contains("could not be used on this machine",
-            Locales.Values("en")["main.advice.encoder-fallback"], StringComparison.Ordinal);
-        Assert.Contains("bu makinede kullanılamadı",
-            Locales.Values("tr")["main.reason.encoder-fallback"], StringComparison.Ordinal);
-        Assert.Contains("bu makinede kullanılamadı",
-            Locales.Values("tr")["main.advice.encoder-fallback"], StringComparison.Ordinal);
+    /// <summary>
+    /// K2. Uc durum uc <b>ayri</b> yerellestirme anahtarina gidiyor ve uc anahtarin ucu de
+    /// iki katalogda birden var. Anahtarlar olcuye elle yazilmiyor, arayuzun kendi
+    /// esleyicisinden okunuyor; esleyici iki durumu ayni anahtara verirse burasi kirmizi olur.
+    /// </summary>
+    [Fact]
+    public void UcDurumUcAyriYerellestirmeAnahtarinaGidiyor()
+    {
+        var anahtarlar = new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor }
+            .Select(durum => MainWindow.EncoderFallbackReasonKey(DusmeNotu(durum)))
+            .ToArray();
+
+        _output.WriteLine(string.Join(Environment.NewLine, anahtarlar));
+        Assert.Equal(3, anahtarlar.Distinct(StringComparer.Ordinal).Count());
+        foreach (var dil in Locales.Languages)
+            foreach (var anahtar in anahtarlar)
+                Assert.True(Locales.Values(dil).ContainsKey(anahtar), $"{dil} kataloğunda {anahtar} yok");
+    }
+
+    /// <summary>
+    /// K2/K3. Kullanicinin gordugu cumle iki dilde de uc durumda uc ayri sey soyluyor.
+    /// Metin olcuye yazilmiyor: uc cumlenin ortak onu ve ortak sonu atilip geriye kalan
+    /// <b>iddia</b> parcasi hesaplaniyor, uc iddianin farkli olmasi araniyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void ArayuzunUcCumlesiIkiDildeDeAyriIddiaTasiyor(string dil)
+    {
+        var cumleler = UcCumle(dil);
+        var iddialar = Iddialar(cumleler);
+
+        _output.WriteLine(string.Join(Environment.NewLine, cumleler.Zip(iddialar, (c, i) => $"{i}  <=  {c}")));
+        Assert.Equal(3, cumleler.Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal(3, iddialar.Distinct(StringComparer.Ordinal).Count());
+        Assert.All(iddialar, iddia => Assert.NotEqual(string.Empty, iddia));
+    }
+
+    /// <summary>
+    /// K2/4. Tavsiye satiri da ayni ayrimi tasiyor: her durumun tavsiye cumlesi, o durumun
+    /// dusme cumlesindeki iddia parcasini iceriyor. Iki durumun anahtari yer degistirirse
+    /// tavsiye baska bir durumun iddiasini tasir ve burasi kirmizi olur. Karsilastirma
+    /// buyuk-kucuk harfe bakmiyor: tavsiye satiri <c>Speak</c> uzerinden gectigi icin
+    /// bastan sona baslik bicimine cevriliyor, dusme cumlesi ise <c>Say</c> ile gelip
+    /// oldugu gibi kaliyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void TavsiyeSatiriDusmeCumlesiyleAyniIddiayiTasiyor(string dil)
+    {
+        var sebepler = new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor }
+            .Select(durum => DusmeNotu(durum).FallbackCause)
+            .ToArray();
+        var iddialar = Iddialar(UcCumle(dil));
+
+        for (var i = 0; i < sebepler.Length; i++)
+        {
+            var tavsiye = MainWindow.AdviceLine(AdviceCode.EncoderFallback, dil, fastGpu: false, sebepler[i]);
+            _output.WriteLine($"{sebepler[i]} | {iddialar[i]} | {tavsiye}");
+            Assert.NotNull(tavsiye);
+            Assert.Contains(iddialar[i], tavsiye!, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>
+    /// K2/4. GPU kolu bugunku davranisini koruyor: hizli mod acikken uc durumun ucu de
+    /// tek <c>-gpu</c> cumlesine gidiyor.
+    /// </summary>
+    [Fact]
+    public void GpuKoluUcDurumdaDaAyniCumleyiVeriyor()
+    {
+        var satirlar = new[] { EncoderFallbackCause.NotInBuild, EncoderFallbackCause.NotMeasured, EncoderFallbackCause.NotWorking }
+            .Select(sebep => MainWindow.AdviceLine(AdviceCode.EncoderFallback, "tr", fastGpu: true, sebep))
+            .ToArray();
+
+        _output.WriteLine(string.Join(Environment.NewLine, satirlar!));
+        Assert.Single(satirlar.Distinct(StringComparer.Ordinal));
+    }
+
+    /// <summary>K3'un iki dilli tablosunu koddan uretir; rapora giren satirlar budur.</summary>
+    [Fact]
+    public void UcCumleTablosunuYazar()
+    {
+        var durumlar = new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor };
+        _output.WriteLine("| durum | en | tr |");
+        _output.WriteLine("|---|---|---|");
+        foreach (var durum in durumlar)
+            _output.WriteLine($"| {durum} | {ArayuzCumlesi(durum, "en").Cumle} | {ArayuzCumlesi(durum, "tr").Cumle} |");
+
+        _output.WriteLine("");
+        _output.WriteLine("| durum | anahtar | tavsiye en | tavsiye tr |");
+        _output.WriteLine("|---|---|---|---|");
+        foreach (var durum in durumlar)
+        {
+            var sebep = DusmeNotu(durum).FallbackCause;
+            _output.WriteLine(
+                $"| {durum} | {MainWindow.EncoderFallbackReasonKey(DusmeNotu(durum))} | " +
+                $"{MainWindow.AdviceLine(AdviceCode.EncoderFallback, "en", fastGpu: false, sebep)} | " +
+                $"{MainWindow.AdviceLine(AdviceCode.EncoderFallback, "tr", fastGpu: false, sebep)} |");
+        }
+    }
+
+    private static string[] UcCumle(string dil) => new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor }
+        .Select(durum => ArayuzCumlesi(durum, dil).Cumle)
+        .ToArray();
+
+    /// <summary>
+    /// Uc cumlenin ortak onu ve ortak sonu atilir; geriye kalan, o durumun tasidigi
+    /// <b>iddiadir</b>. Metin olcuye yazilmadigi icin cumleler yeniden yazilinca olcu
+    /// bozulmaz; bozulan tek sey ayrimin kendisidir.
+    /// </summary>
+    private static string[] Iddialar(string[] cumleler)
+    {
+        var onek = 0;
+        while (cumleler.All(c => c.Length > onek && c[onek] == cumleler[0][onek])) onek++;
+
+        var sonek = 0;
+        while (cumleler.All(c => c.Length > onek + sonek && c[^(sonek + 1)] == cumleler[0][^(sonek + 1)])) sonek++;
+
+        return cumleler.Select(c => c[onek..^sonek]).ToArray();
     }
 
     // --- K1: gercek ffmpeg ---
@@ -983,5 +1155,276 @@ public sealed class PlanCalculatorProbeTests
         var folder = TestPaths.LiveOut("t130-yoklama");
         Directory.CreateDirectory(folder);
         File.AppendAllText(Path.Combine(folder, "olcum.txt"), line + Environment.NewLine);
+    }
+
+    // --- T151: ilk olculmemis aday sirayi kilitlemiyor ---
+
+    /// <summary>
+    /// Aday basina uc durumdan birini veren yetenek nesnesi. Listede olmayan aday
+    /// <see cref="EncoderProbeState.NotWorking"/> sayilir, yani tarama onunla durmaz.
+    /// </summary>
+    private sealed class FastOrderAvailability(params (string Codec, EncoderProbeState State)[] answers)
+        : IEncoderAvailability
+    {
+        private readonly Dictionary<string, EncoderProbeState> _answers = answers.ToDictionary(
+            answer => answer.Codec, answer => answer.State, StringComparer.OrdinalIgnoreCase);
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec) =>
+            _answers.TryGetValue(codec, out var state) && state == EncoderProbeState.Working;
+
+        public EncoderProbeState EncoderState(string codec) =>
+            _answers.TryGetValue(codec, out var state) ? state : EncoderProbeState.NotWorking;
+    }
+
+    /// <summary>
+    /// Bir adayin yoklamasi istisnayla duser, oteki calisir. Gercek gecidin altina
+    /// konuldugunda ilki kalici <c>Unmeasured</c>, ikincisi <c>Working</c> olur —
+    /// T151'in tarif ettigi makinenin ta kendisi.
+    /// </summary>
+    private sealed class UnsettledFirstAvailability(string unsettled, string working) : IEncoderAvailability
+    {
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec)
+        {
+            if (string.Equals(codec, unsettled, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("yoklama surecine erisilemedi");
+            return string.Equals(codec, working, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>
+    /// K2. <c>av1_nvenc</c> olculmemis, <c>hevc_nvenc</c> calisiyor. Tarama ilkinde durursa
+    /// plan calisan donanimi hic gormez ve <c>CodecNotMeasured</c> ile doner; T139'un
+    /// dogrulamasi o isareti "donanim yok"a cevirir. Duzeltmeden once bu olcu kirmizi.
+    /// </summary>
+    [Fact]
+    public void OlculmemisIlkAdayCalisanSonrakiAdayinOnunuKesmiyor()
+    {
+        var availability = new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working));
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+
+        Assert.Equal("hevc_nvenc", result.Plan.Codec);
+        Assert.False(result.Plan.CodecNotMeasured);
+        Assert.False(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// K2'nin oteki yuzu ve sozlesmedeki "ucuz cevap" riskinin pimi: olculmemisi atlamak
+    /// onu <b>elemek</b> degil. Calisan aday yoksa hatirlanan ilk olculmemis aday geri
+    /// doner ve isaret durur — yazilim yedegine dusulmez.
+    /// </summary>
+    [Fact]
+    public void CalisanAdayYokkenHatirlananOlculmemisAdayDonuyor()
+    {
+        var availability = new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Unmeasured),
+            ("av1_qsv", EncoderProbeState.Unmeasured));
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+
+        Assert.Equal("hevc_nvenc", result.Plan.Codec);
+        Assert.True(result.Plan.CodecNotMeasured);
+        Assert.True(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// Hicbir aday olculmemis <b>degil</b> ve hicbiri calismiyorsa cevap yine yazilim
+    /// yedegi. Taramanin devam etmesi bu kolu degistirmemeli.
+    /// </summary>
+    [Fact]
+    public void HicOlculmemisAdayYokkenYaziliYedegeDusuluyor()
+    {
+        var availability = new FastOrderAvailability();
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+
+        Assert.Equal("libx265", result.Plan.Codec);
+        Assert.False(result.Plan.CodecNotMeasured);
+        Assert.False(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// K1'in birinci olcumu: devam etmek olculmemis adayi yoklamasiz birakmiyor.
+    /// <see cref="EncoderAvailabilityState.KnownState"/> sormakla yoklamayi ayni adima
+    /// koyuyor — gecit <c>IsMeasured</c> cagrisinda arka plan yoklamasini baslatiyor —
+    /// bu yuzden bir adayin uzerinden <b>gecmek</b> de onu olcume yolluyor. Sozlesmenin
+    /// "sira hep calisan eski kodege duser, yeni donanim hic denenmez" riski bu yuzden
+    /// gerceklesmiyor.
+    /// </summary>
+    [Fact]
+    public void GecilenOlculmemisAdayYoklamayaYollaniyor()
+    {
+        var source = new RecordingAvailability(TimeSpan.Zero);
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, gate);
+        var clock = Stopwatch.StartNew();
+        while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(5);
+
+        var asked = new[]
+        {
+            "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
+        };
+        var missing = asked.Where(c => !source.Calls.Contains($"works:{c}")).ToArray();
+
+        Assert.True(missing.Length == 0, $"yoklamaya gitmeyen aday: {string.Join(", ", missing)}");
+        Assert.True(gate.Probes >= asked.Length, $"gecit {gate.Probes} yoklama baslatti, {asked.Length} aday var");
+    }
+
+    /// <summary>
+    /// K1'in ikinci olcumu ve secimin asil gerekcesi: yerlesmeyen bir yoklama sirayi
+    /// <b>kalici</b> kilitliyordu. <c>av1_nvenc</c> yoklamasi istisnayla duser ve
+    /// <see cref="AnUnsettledProbeIsNeverPromotedToAMeasurement"/> geregi kalici
+    /// <c>Unmeasured</c> kalir; <c>hevc_nvenc</c> olculur ve calisir. Tarama ilkinde
+    /// dururken bu makine <b>hicbir turda</b> calisan donanima ulasamiyordu. Bugun
+    /// ikinci turda ulasiyor.
+    /// </summary>
+    [Fact]
+    public void YerlesmeyenAdaySirayiKaliciKilitlemiyor()
+    {
+        var source = new UnsettledFirstAvailability("av1_nvenc", "hevc_nvenc");
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        Drain(gate, "av1_nvenc");
+        Drain(gate, "hevc_nvenc");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, gate.KnownState("av1_nvenc"));
+        Assert.Equal(EncoderProbeState.Working, gate.KnownState("hevc_nvenc"));
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, gate);
+
+        Assert.Equal("hevc_nvenc", result.Plan.Codec);
+        Assert.False(result.Plan.CodecNotMeasured);
+        Assert.False(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// K1'in ucuncu olcumu: "olc, sonra karar ver" secenegi neden reddedildi.
+    /// Yoklama senkron ve aday basina; tarama uzadikca cagiranin uzerine binen sure
+    /// aday sayisiyla carpiliyor. Olcu bu carpimi gosteriyor — gercek yoklamanin
+    /// olculmus suresi <c>docs/olcumler/ui-yoklama-donmasi.md</c>'de 173-469 ms.
+    /// </summary>
+    [Fact]
+    public void AdayBasinaYoklamaMaliyetiTaramaBoyuncaCarpiliyor()
+    {
+        var delay = TimeSpan.FromMilliseconds(20);
+        var availability = new RecordingAvailability(delay);
+
+        var clock = Stopwatch.StartNew();
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+        clock.Stop();
+
+        var calls = availability.Calls.Count;
+        WriteEvidence($"t151 tarama maliyeti: {calls} yoklama x {delay.TotalMilliseconds} ms = {clock.ElapsedMilliseconds} ms");
+        Assert.True(calls >= 7, $"tarama {calls} adaya sordu");
+        Assert.True(
+            clock.Elapsed >= delay * (calls - 1),
+            $"{calls} yoklama, {clock.ElapsedMilliseconds} ms gecti; beklenen alt sinir {delay.TotalMilliseconds * (calls - 1)} ms");
+    }
+
+    // --- T152: yedege dusme notu uc durumu ayirir ---
+
+    /// <summary>
+    /// Bir aday derleme listesinde <b>yok</b>, geri kalanlar verilen duruma sahip.
+    /// <see cref="FastOrderAvailability"/> her adayi listede sayar; ucuncu durumu
+    /// (aday hic derlenmemis) ancak bu nesne uretebilir.
+    /// </summary>
+    private sealed class MissingCodecAvailability(string missing, params (string Codec, EncoderProbeState State)[] answers)
+        : IEncoderAvailability
+    {
+        private readonly Dictionary<string, EncoderProbeState> _answers = answers.ToDictionary(
+            answer => answer.Codec, answer => answer.State, StringComparer.OrdinalIgnoreCase);
+
+        public bool HasEncoder(string name) => !string.Equals(name, missing, StringComparison.OrdinalIgnoreCase);
+
+        public bool WorksAsEncoder(string codec) =>
+            _answers.TryGetValue(codec, out var state) && state == EncoderProbeState.Working;
+
+        public EncoderProbeState EncoderState(string codec) =>
+            _answers.TryGetValue(codec, out var state) ? state : EncoderProbeState.NotWorking;
+    }
+
+    private static string FallbackNote(EncodePlan plan, string preferredCodec) =>
+        plan.Reason
+            .Split("; ", StringSplitOptions.RemoveEmptyEntries)
+            .Single(part => part.StartsWith($"the {preferredCodec} encoder ", StringComparison.Ordinal));
+
+    private static string FallbackNoteFor(IEncoderAvailability availability) =>
+        FallbackNote(PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability).Plan, "av1_nvenc");
+
+    /// <summary>
+    /// K2. T151 yedege dusme notuna yeni bir yol acti: <c>av1_nvenc</c> olculmemis ve
+    /// <c>hevc_nvenc</c> calisan makinede tarama artik sonraki adaya geciyor, yani
+    /// <c>codec != preferredCodec</c> oluyor ve not <b>ilk kez</b> cikiyor. Tek cumle
+    /// varken o not olculmemis bir donanim icin "bu makinede kullanilamadi" diyordu;
+    /// olcum yokken boyle bir iddiada bulunulamaz.
+    ///
+    /// Olcu cumlenin metnini sabitle karsilastirmiyor: iki girdi yan yana kuruluyor ve
+    /// yalniz <b>ayrimin</b> durup durmadigina bakiliyor.
+    /// </summary>
+    [Fact]
+    public void OlculmemisAdayinNotuBuMakinedeKullanilamadiDemiyor()
+    {
+        var unmeasured = FallbackNoteFor(new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working)));
+
+        var notWorking = FallbackNoteFor(new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Working)));
+
+        Assert.Contains("could not be used", notWorking, StringComparison.Ordinal);
+        Assert.DoesNotContain("could not be used", unmeasured, StringComparison.Ordinal);
+        Assert.NotEqual(notWorking, unmeasured);
+    }
+
+    /// <summary>
+    /// K1. Uc durum uc ayri cumle uretir ve her cumle hala iki kodegi de adlandirir:
+    /// hangi kodlayici secilemedi, yerine ne kondu.
+    /// </summary>
+    [Fact]
+    public void UcDurumUcFarkliCumleUretiyor()
+    {
+        var notes = new[]
+        {
+            FallbackNoteFor(new FastOrderAvailability(
+                ("av1_nvenc", EncoderProbeState.NotWorking),
+                ("hevc_nvenc", EncoderProbeState.Working))),
+            FallbackNoteFor(new FastOrderAvailability(
+                ("av1_nvenc", EncoderProbeState.Unmeasured),
+                ("hevc_nvenc", EncoderProbeState.Working))),
+            FallbackNoteFor(new MissingCodecAvailability(
+                "av1_nvenc",
+                ("hevc_nvenc", EncoderProbeState.Working)))
+        };
+
+        Assert.Equal(3, notes.Distinct(StringComparer.Ordinal).Count());
+        Assert.All(notes, note =>
+        {
+            Assert.Contains("av1_nvenc", note, StringComparison.Ordinal);
+            Assert.Contains("hevc_nvenc", note, StringComparison.Ordinal);
+        });
+    }
+
+    /// <summary>
+    /// K1'in ucuncu kolu: derleme listesinde hic olmayan aday icin "bu makinede
+    /// kullanilamadi" da yanlis — olcum degil, yokluk soz konusu.
+    /// </summary>
+    [Fact]
+    public void DerlemedeOlmayanAdayinNotuOlcumIddiasiTasimiyor()
+    {
+        var note = FallbackNoteFor(new MissingCodecAvailability(
+            "av1_nvenc",
+            ("hevc_nvenc", EncoderProbeState.Working)));
+
+        Assert.DoesNotContain("could not be used", note, StringComparison.Ordinal);
+        Assert.DoesNotContain("measured", note, StringComparison.Ordinal);
     }
 }

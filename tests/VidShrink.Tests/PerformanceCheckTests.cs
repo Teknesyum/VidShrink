@@ -353,9 +353,19 @@ public sealed class PerformanceCheckTests
 
     /// <summary>
     /// Yuk altinda maliyetin bos okumanin altina dusmedigi sayilan alt sinir.
-    /// Olcum gurultusune pay; yon hatasi bu payin cok otesinde durur.
+    ///
+    /// Eski deger 0,8 idi ve nereden geldigi yazili degildi: iddia "yuk maliyeti yalniz
+    /// artirabilir" diyor ama olcu %20'lik bir dususu sessizce geciriyordu. T145'te
+    /// olculdu: on uc kosumda <c>yuklu / taban</c> orani 1,781 - 2,156 (medyan 1,893)
+    /// cikti, hem de on dort ajanin kostugu mesgul bir makinede. Gurultunun payi
+    /// gozlenen en dusuk oranin 2,2 kati kadardi.
+    ///
+    /// Pay 1,0'e cekildi: artik gurultu payi yok, olcu tam olarak docstring'in soyledigi
+    /// seyi siniyor — yuklu okuma en dusuk bos okumanin altina inemez. Gozlenen en dusuk
+    /// oran 1,781 oldugu icin sinira %78 mesafe var. Olcum ve mutasyon izgarasi
+    /// <c>docs/olcumler/kalan-alti-bant.md</c> icinde.
     /// </summary>
-    private const double YonPayi = 0.8;
+    private const double YonPayi = 1.0;
 
     /// <summary>
     /// K1: olcum makine yukune ne kadar dayanikli, ve <b>nerede dayanmiyor</b>.
@@ -504,6 +514,15 @@ public sealed class PerformanceCheckTests
     /// okumayi yalniz 0,868'e tasidi, esigi (1,0) hic gecmedi. Sinif ile sayinin
     /// tutarliligi zaten <see cref="OlcumYukAltindaYalnizAgirlasiyor"/> icinde her canli
     /// okuma icin ayri ayri sinaniyor.
+    ///
+    /// <b>Bant neden daraltilmadi.</b> T145 alti duvar saati bandini gozden gecirirken
+    /// buraya da bakti. Asagidaki <c>yuklu &gt; bos</c> karsilastirmasi bir yon iddiasinin
+    /// **en dar** halidir: kabul edilen bolge zaten yarim dogru, ve daraltmak ancak
+    /// <c>yuklu &gt; bos * K</c> (K &gt; 1) yazmakla, yani iddiayi degistirmekle olur —
+    /// bu da olcuyu kararsizlastirir, cunku K'nin ustunde bir pay iddia etmedigimiz bir
+    /// sey olur. Eldeki pay olculdu: sekiz kosumda <c>yuklu / bos</c> orani
+    /// 1,441 - 1,888 (medyan 1,690), on dort ajanin kostugu mesgul bir makinede.
+    /// Bant oldugu gibi birakildi; olcum <c>docs/olcumler/kalan-alti-bant.md</c> icinde.
     /// </summary>
     [QuietMachineFact]
     public async Task YukAltindaKararHafiflemiyorMu()

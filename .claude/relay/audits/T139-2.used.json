@@ -1,0 +1,31 @@
+{
+  "contractId": "T139",
+  "auditorRunId": "ab121208d67ab1368",
+  "headSha": "c26879b312bf6e21fdc06c040c2020914386375e",
+  "diffHash": "c5bf8fb5c0698b7361ad4f7a7374f3d2c019bd48da3a084ac4d1917e4f9bce5d",
+  "owns": [
+    "src/VidShrink.Core/IEncoderAvailability.cs",
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/HdrResolver.cs",
+    "src/VidShrink.Ffmpeg/PerformanceProbe.cs",
+    "tests/VidShrink.Tests/EncoderStateConsumptionTests.cs",
+    "tests/VidShrink.Tests/PlanCalculatorTests.cs",
+    "tests/VidShrink.Tests/EncoderAvailabilityTests.cs",
+    "tests/VidShrink.Tests/SpeedModeTests.cs",
+    "tests/VidShrink.Tests/HardwareRateControlTests.cs",
+    "src/VidShrink.Core/EncodePlan.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs",
+    "docs/olcumler/uclu-cevap-uretimde.md"
+  ],
+  "verification": [
+    "dotnet test -c Release (bagimsiz klon, denetci) -> mutasyonsuz 74/74; mutasyon A ve B -> Basarisiz 3, Basarili 71, ayni uc test",
+    "git diff --numstat -- MainWindow.axaml.cs -> 15 ekleme / 1 silme = 16 satir",
+    "CI 33687394637 -> completed success, Failed 0, Passed 1473, Total 1492"
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-02T22:25:07.328Z",
+  "usedAt": "2026-09-02T22:28:52.510Z",
+  "completedSha": "c26879b312bf6e21fdc06c040c2020914386375e"
+}

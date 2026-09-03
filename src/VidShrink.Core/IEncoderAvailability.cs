@@ -16,11 +16,19 @@ public interface IEncoderAvailability
     /// çağırır; bu yol yalnızca zaten bilineni okur, bu yüzden arayüz iş parçacığından
     /// çağrılabilir. <see cref="EncoderProbeState.Unmeasured"/> "bu makinede çalışmıyor"
     /// değil "henüz bakmadık" demektir; ölçüm arka planda yaptırılır.
-    /// Varsayılan gerçekleştirme, yoklaması olmayan sahteleri kırmadan iki durumu korur;
-    /// gerçekten yoklayan taraf (<c>EncoderCapabilities</c>) bunu ezer.
     /// </summary>
-    EncoderProbeState EncoderState(string codec) =>
-        WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+    EncoderProbeState EncoderState(string codec) => EncoderProbeState.Unmeasured;
+}
+
+public static class EncoderAvailabilityState
+{
+    public static EncoderProbeState KnownState(this IEncoderAvailability availability, string codec)
+    {
+        var state = availability.EncoderState(codec);
+        if (state != EncoderProbeState.Unmeasured) return state;
+        if (availability is not IEncoderMeasurementState measured || !measured.IsMeasured(codec)) return state;
+        return availability.WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
+    }
 }
 
 public interface IEncoderOptionAvailability

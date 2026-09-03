@@ -1,0 +1,18 @@
+{
+  "contractId": "T147",
+  "auditorRunId": "aea675ba322fc6a6b",
+  "headSha": "2fcc2e22853b372f74c59f8d0f98d8540b429b09",
+  "diffHash": "fa56d9587c49228b3925e588c878cc897fd98ae7da852cc2da491a55fd9610ce",
+  "owns": [
+    "src/VidShrink.Ffmpeg/EncoderCapabilities.cs",
+    "src/VidShrink.App/Playback/SegmentEncoder.cs",
+    "tests/VidShrink.Tests/EncoderCapabilitiesTests.cs",
+    "tests/VidShrink.Tests/SessizDusurmeTests.cs",
+    "docs/olcumler/sessiz-dusurme-sondada.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda b2ee5f4te olculdu, depoya yazilmadi (files: []). K1 kirmizisi ve uc mutasyon denetci tarafindan --no-incremental ile kosturuldu; kusur gercek ffmpeg ile yeniden uretildi (libx265 Unknown option, EXIT=0). Dusurulen iki desenin olu oldugu EXIT=8 olcumuyle dogrulandi, Error parsing option sozlukte birakildi (libsvtav1 EXIT=0). K6 kollari 15+8+7=30, sifir bulan kol yok. CI 33740071847 success, headSha b2ee5f4. KRITIK yok, yedi borc kayitli."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T10:10:31.994Z"
+}

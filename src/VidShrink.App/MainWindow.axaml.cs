@@ -1484,6 +1484,20 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Yoklamanın "bu makinede donanım kodlayıcı var" cevabı. Plandaki kodlayıcı adı tek
+    /// başına yetmez: <see cref="PlanCalculator"/> ölçülmemiş bir adayı geçici cevap olarak
+    /// da döndürebiliyor ve o cevap ölçülmüş bir evet gibi okunursa sürücüsüz makine
+    /// hızlı kipi açık görüyor. Geçici cevap bu yüzden aynı gövdenin çalıştırdığı gerçek
+    /// yoklamayla doğrulanır; ölçülmüş bir seçim yeniden sınanmaz.
+    /// </summary>
+    internal static bool HardwareAvailableFrom(EncodePlan plan, EncoderProbeResult probe)
+        => CodecModel.IsHardware(plan.Codec)
+           && (!plan.CodecNotMeasured || (probe.Measured && probe.Succeeded));
+
+    /// <summary>Ölçü için: yoklamanın arayüze taşıdığı donanım cevabı.</summary>
+    internal bool HardwareEncoderAvailable => _hardwareEncoderAvailable;
+
     private async Task ProbeHardwareEncodersAsync()
     {
         var available = false;
@@ -1500,7 +1514,7 @@ public partial class MainWindow : Window
                 var plan = PlanCalculator.Build(HardwareProbeSource, options, capabilities);
                 var probe = capabilities.Probe(plan.Codec);
                 var decision = HardwareVerdict.Decide(probe, plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
-                return ((IEncoderAvailability?)capabilities, CodecModel.IsHardware(plan.Codec), decision);
+                return ((IEncoderAvailability?)capabilities, HardwareAvailableFrom(plan, probe), decision);
             });
         }
         catch (Exception ex)
@@ -1793,6 +1807,29 @@ public partial class MainWindow : Window
         return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
     }
 
+    /// <summary>
+    /// Kalibrasyon yoklamasinin ornekleme penceresini yerlestirirken okudugu harita.
+    /// Tarama basarisiz olduysa <c>null</c> doner ve yoklama esit arali yedek yerlesimde
+    /// kalir.
+    /// </summary>
+    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => attempt?.Map;
+
+    /// <summary>
+    /// Kalite olcumunun en kotu birimi ararken sahne sinirlarini okudugu harita. Tarama
+    /// basarisiz olduysa <c>null</c> doner ve olcum sabit iki saniyelik izgarada kalir.
+    /// </summary>
+    public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => attempt?.Map;
+
+    /// <summary>
+    /// Yoklamanin kalite olceri. Olcum govdesi tek yerde, <see cref="QualityMeasurement"/>
+    /// icinde; harita o govdenin opsiyonel alanidir. Harita geldiginde govde
+    /// <see cref="QualityMeter.MeasureWindowAsync(string, string, double, double, double, SceneMap?, CancellationToken)"/>
+    /// asiri yuklemesine gecer; gelmediginde <see cref="QualityMeasurement.Instance"/> ile
+    /// bugunku yolda kalir.
+    /// </summary>
+    public static IQualityMeasurement ProbeMeter(SceneMap? scenes)
+        => scenes is null ? QualityMeasurement.Instance : new QualityMeasurement(scenes);
+
     private async Task MeasureComplexityAsync(MediaInfo info)
     {
         _probeCts?.Cancel();
@@ -1804,13 +1841,13 @@ public partial class MainWindow : Window
         try
         {
             var speed = CurrentOptions().SpeedMode;
-            var profile = await ProbeWithMeasuredQualityAsync(info, speed, null, cts.Token);
-            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
-            _profile = profile;
-            Recalculate();
-
             _sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            Recalculate();
+
+            var profile = await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(QualityScenes(_sceneMap)), cts.Token);
+            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            _profile = profile;
             Recalculate();
 
             TxtEstimateNote.Text = Say("main.estimate.calibrating");
@@ -1821,7 +1858,7 @@ public partial class MainWindow : Window
             // produced, until the two agree.
             for (var round = 0; round < CalibrationRounds; round++)
             {
-                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token);
+                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, CalibrationScenes(_sceneMap));
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
                 _profile = calibrated;
                 Recalculate();
@@ -2247,6 +2284,33 @@ public partial class MainWindow : Window
         && fillPolicy == FillPolicy.FillTarget
         && note.Mb >= FillBand.For(note.TargetMb).HardFloorMb;
 
+    /// <summary>
+    /// Dusme cumlesinin yerellestirme anahtari. Core uc ayri sebep uretiyor
+    /// (<see cref="EncoderFallbackCause"/>) ve ucu de kullaniciya ayri cumleyle gidiyor:
+    /// olculmemis ya da derlemede hic olmayan bir aday icin "bu makinede kullanilamadi"
+    /// demek, yapilmamis bir olcumun sonucunu bildirmektir.
+    /// </summary>
+    internal static string EncoderFallbackReasonKey(ReasonNote note) => note.FallbackCause switch
+    {
+        EncoderFallbackCause.NotInBuild => "main.reason.encoder-fallback-not-in-build",
+        EncoderFallbackCause.NotMeasured => "main.reason.encoder-fallback-not-measured",
+        EncoderFallbackCause.NotWorking => "main.reason.encoder-fallback-not-working",
+        _ => "main.reason.encoder-fallback-not-working"
+    };
+
+    /// <summary>Ayni ayrimin tavsiye satirindaki karsiligi; GPU kolu kendi anahtarini korur.</summary>
+    internal static string EncoderFallbackAdviceKey(EncoderFallbackCause cause) => cause switch
+    {
+        EncoderFallbackCause.NotInBuild => "main.advice.encoder-fallback-not-in-build",
+        EncoderFallbackCause.NotMeasured => "main.advice.encoder-fallback-not-measured",
+        EncoderFallbackCause.NotWorking => "main.advice.encoder-fallback-not-working",
+        _ => "main.advice.encoder-fallback-not-working"
+    };
+
+    internal static EncoderFallbackCause EncoderFallbackCauseOf(EncodePlan? plan) =>
+        plan?.ReasonCodes.FirstOrDefault(note => note.Code == ReasonCode.EncoderFallback)?.FallbackCause
+        ?? EncoderFallbackCause.NotWorking;
+
     private List<string> ReasonLines(EncodePlan plan)
     {
         var parts = new List<string>();
@@ -2271,7 +2335,7 @@ public partial class MainWindow : Window
                 ReasonCode.PredictedQualityEstimated => Say("main.reason.quality-estimated", Num(note.Score, "0.#")),
                 ReasonCode.RetryScaled => Say("main.reason.retry-scaled",
                     Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##"), Num(note.AudioMb, "0.00"), Num(note.Factor, "0.###")),
-                ReasonCode.EncoderFallback => Say("main.reason.encoder-fallback", note.RequestedCodec, note.FallbackCodec),
+                ReasonCode.EncoderFallback => Say(EncoderFallbackReasonKey(note), note.RequestedCodec, note.FallbackCodec),
                 ReasonCode.HdrTonemapped => Say("main.reason.hdr-tonemapped"),
                 ReasonCode.FillCrfLowered => Say("main.reason.fill-crf-lowered",
                     Num(note.Crf, "0.#"), Num(note.Mb, "0.0"), Num(note.BandLowerMb, "0.0"), Num(note.TargetMb, "0.0")),
@@ -2314,7 +2378,8 @@ public partial class MainWindow : Window
 
         foreach (var note in advice.Notes.Distinct())
         {
-            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true);
+            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true,
+                EncoderFallbackCauseOf(ActivePlan));
             if (text is not null) lines.Add(text);
         }
 
@@ -2323,7 +2388,8 @@ public partial class MainWindow : Window
 
     internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
 
-    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu)
+    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu,
+        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking)
     {
 
         return note switch
@@ -2349,7 +2415,7 @@ public partial class MainWindow : Window
             AdviceCode.AudioDropped => Speak(language, "main.advice.audio-dropped"),
             AdviceCode.EncoderFallback => fastGpu
                 ? Speak(language, "main.advice.encoder-fallback-gpu")
-                : Speak(language, "main.advice.encoder-fallback"),
+                : Speak(language, EncoderFallbackAdviceKey(fallbackCause)),
             AdviceCode.HdrTonemapped => Speak(language, "main.advice.hdr-tonemapped"),
             _ => null
         };

@@ -57,10 +57,25 @@ public sealed class PlanParserTests
         Assert.Contains(result.Errors, error => error.Contains("aspect ratio", StringComparison.Ordinal));
     }
 
-    private static string ValidPlan(string[] extraArgs, int width = 1920, int height = 1080, double fps = 30)
+    [Theory]
+    [InlineData("hevc_videotoolbox")]
+    [InlineData("h264_videotoolbox")]
+    public void ParserStillRejectsVideoToolboxEncoders(string codec)
+    {
+        var json = ValidPlan(Array.Empty<string>(), codec: codec);
+
+        var result = PlanParser.Parse(json, Source, new PlanOptions());
+
+        Assert.False(result.Ok);
+        Assert.Contains(result.Errors, error =>
+            error.Contains("Unsupported codec", StringComparison.Ordinal)
+            && error.Contains(codec, StringComparison.Ordinal));
+    }
+
+    private static string ValidPlan(string[] extraArgs, int width = 1920, int height = 1080, double fps = 30, string codec = "libx264")
         => JsonSerializer.Serialize(new
         {
-            codec = "libx264",
+            codec,
             mode = "2pass",
             videoBitrateK = 1200,
             crf = (int?)null,

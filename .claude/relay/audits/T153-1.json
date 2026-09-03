@@ -1,0 +1,16 @@
+{
+  "contractId": "T153",
+  "auditorRunId": "a4869ca8fb5ee97db",
+  "headSha": "956ea147117203dc1523d9cafa9619b289772e3f",
+  "diffHash": "65b3c389f0f2964d89fc60573a1ed0ed993a8b1506e4014144680c1d8666b3eb",
+  "owns": [
+    "src/VidShrink.Core/CodecModel.cs",
+    "tests/VidShrink.Tests/TurboTavanTests.cs",
+    "docs/olcumler/turbo-x264-mayini.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 40387ac'te olctu. K1 kirmizisini kendi kosturdu (4/0). Mayini uc parcada uretti: x264 p2exit=127 0 bayt, x265 calisiyor. K2 gerekcesini sembolle dogruladi: TurboFirstPassTests.cs 62/71/190 kumeyi pimliyor, -preset uretimi FfmpegArguments.cs:400, src altinda weightp argumani hic uretilmiyor. K3 tasma yok, PlanCalculator.cs diff bos. K4 mutasyonu (Safe:true) dort kolu da oldurdu, geri alinca 70/70. K5 kollari 4+66=70, sifir bulan kol yok. CI 33745907561 success headSha 40387ac. KRITIK yok, dort borc."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T11:15:44.342Z"
+}

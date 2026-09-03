@@ -136,6 +136,7 @@ public static class PlanCalculator
     {
         var probe = new ProbeState();
         var result = BuildDetailedCore(info, options, profile, availability, probe);
+        result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         return probe.NotMeasured ? result with { HardwareNotMeasured = true } : result;
     }
 
@@ -146,6 +147,26 @@ public static class PlanCalculator
     private sealed class ProbeState
     {
         internal bool NotMeasured;
+
+        /// <summary>
+        /// İşaretin dar hâli: <b>kodlayıcı seçimi</b> ölçülmemiş bir adaydan geldi.
+        /// <see cref="NotMeasured"/> HDR yolunun ölçülmemişliğini de topladığı için
+        /// "seçilen kodek geçici mi" sorusunun cevabı ayrı taşınıyor.
+        /// </summary>
+        internal bool CodecNotMeasured;
+
+        /// <summary>
+        /// Tercih edilen kodlayicinin secim aninda okunan durumu. Yedege dusme notu bunu
+        /// kullanir: not <b>olculmedi</b> ile <b>olculdu, calismiyor</b>u ayirmak zorunda
+        /// ve durumu ikinci kez sormak yoklama sayisini artirirdi.
+        /// </summary>
+        internal EncoderProbeState PreferredCodecState = EncoderProbeState.NotWorking;
+
+        /// <summary>
+        /// Tercih edilen kodlayici bu ffmpeg derlemesinde var mi. Yoklukta durum sorusu
+        /// hic sorulmaz, o yuzden <see cref="PreferredCodecState"/> ile ayri tasiniyor.
+        /// </summary>
+        internal bool PreferredCodecInBuild = true;
     }
 
     private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
@@ -190,9 +211,14 @@ public static class PlanCalculator
         var preferredCodec = fast ? FastHardwareOrder[0] : PreferredCodecFor(preference);
         if (codec != preferredCodec)
         {
+            var fallbackCause = EncoderFallbackCauseFor(probe);
             notes.Add(AdviceCode.EncoderFallback);
-            reason.Add($"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}");
-            reasonCodes.Add(new ReasonNote(ReasonCode.EncoderFallback, RequestedCodec: preferredCodec, FallbackCodec: codec));
+            reason.Add(EncoderFallbackReason(preferredCodec, codec, fallbackCause));
+            reasonCodes.Add(new ReasonNote(
+                ReasonCode.EncoderFallback,
+                RequestedCodec: preferredCodec,
+                FallbackCodec: codec,
+                FallbackCause: fallbackCause));
         }
 
         if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
@@ -404,10 +430,30 @@ public static class PlanCalculator
         Height = best.Height,
         Fps = best.Fps,
         Preset = PickPreset(codec, options.Codec, options.SpeedMode),
+        TurboFirstPass = options.SpeedMode == SpeedMode.Fast && TurboFirstPassIsSafe(codec),
         PixelFormat = hdr.PixelFormat,
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
+
+    /// <summary>
+    /// <see cref="CodecModel.SupportsTurboFirstPass"/> hem <c>libx264</c> hem <c>libx265</c>
+    /// icin tavan tanimlar, ama plan turboyu yalniz <c>libx265</c>'te aciyor. libx264'te ikinci
+    /// gecis birinci gecisin <c>weightp</c> ayarina uymak zorundadir: <c>veryfast</c> weightp=1,
+    /// <c>slow</c> weightp=2 kosar ve x264 ikinci gecisi
+    /// <c>different weightp setting than first pass (2 vs 1)</c> diyerek hic acmaz —
+    /// kullanici sifir bayt cikti alir. Olcum: <c>docs/olcumler/uretim-yolu.md</c>.
+    /// <para>
+    /// O uyusmazlik iki gecise ayni <c>weightp</c> yazilarak asilabiliyor ve bu kol yine de
+    /// x264'u acmiyor: esitlenmis turbo uretim borusunda toplam sureyi %0,58 - %4,44
+    /// kisaltip VMAF'tan 0,35 - 0,83 puan goturuyor, ayni olcumde <c>libx265</c> %29,6 - %33,5
+    /// kazandirip VMAF'i dusurmuyor. Kazanc ilk gecisin on ayarindan degil, kodlayicinin
+    /// toplam sure icindeki payindan geliyor; x264'te o pay kucuk.
+    /// Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+    /// </para>
+    /// </summary>
+    private static bool TurboFirstPassIsSafe(string codec)
+        => codec.Equals("libx265", StringComparison.OrdinalIgnoreCase);
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {
@@ -862,6 +908,38 @@ public static class PlanCalculator
         _ => "libx264"
     };
 
+    /// <summary>
+    /// Hesabin sonunda okunan yoklama isaretlerini tek bir sebebe cevirir. Sebep hem
+    /// Core'un cumlesine hem <see cref="ReasonNote.FallbackCause"/> ile arayuze gidiyor;
+    /// T157'ye kadar yalniz cumleye gidiyordu ve arayuz uc durumun ucune de tek
+    /// yerellestirme anahtari veriyordu.
+    /// </summary>
+    private static EncoderFallbackCause EncoderFallbackCauseFor(ProbeState probe) =>
+        !probe.PreferredCodecInBuild ? EncoderFallbackCause.NotInBuild
+        : probe.PreferredCodecState == EncoderProbeState.Unmeasured ? EncoderFallbackCause.NotMeasured
+        : EncoderFallbackCause.NotWorking;
+
+    /// <summary>
+    /// Yedege dusme notu uc ayri durumu anlatir ve karistirmaz: aday <b>bu derlemede
+    /// yok</b>, aday <b>hic olculmedi</b>, aday <b>olculdu ve calismiyor</b>.
+    ///
+    /// T151'e kadar ikinci durum kullaniciya hic ulasmiyordu: tarama ilk olculmemis
+    /// adayda duruyor, o aday geri donuyor ve <c>codec == preferredCodec</c> oldugu icin
+    /// not cikmiyordu. Tarama sonraki adaya gecince not ilk kez cikti ve tek cumle
+    /// olculmemis bir donanim icin "bu makinede kullanilamadi" dedi. Olcum yokken boyle
+    /// bir iddiada bulunulamaz — bu deponun <see cref="EncoderProbeState.Unmeasured"/>
+    /// ile ayirdigi sey tam olarak budur.
+    /// </summary>
+    private static string EncoderFallbackReason(string preferredCodec, string codec, EncoderFallbackCause cause) => cause switch
+    {
+        EncoderFallbackCause.NotInBuild =>
+            $"the {preferredCodec} encoder is not part of this ffmpeg build, so encoding falls back to {codec}",
+        EncoderFallbackCause.NotMeasured =>
+            $"the {preferredCodec} encoder has not been measured on this machine, so encoding falls back to {codec}",
+        _ =>
+            $"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}"
+    };
+
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
         => PickCodec(pref, availability, null);
 
@@ -880,35 +958,62 @@ public static class PlanCalculator
         var preferred = PreferredCodecFor(pref);
         if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
         if (availability is null) return preferred;
-        if (!availability.HasEncoder(preferred)) return FallbackCodecFor(pref);
-        if (availability is IEncoderMeasurementState state && !state.IsMeasured(preferred))
+        if (!availability.HasEncoder(preferred))
         {
-            if (probe is not null) probe.NotMeasured = true;
+            if (probe is not null) probe.PreferredCodecInBuild = false;
+            return FallbackCodecFor(pref);
+        }
+        var state = availability.KnownState(preferred);
+        if (probe is not null) probe.PreferredCodecState = state;
+        if (state == EncoderProbeState.Unmeasured)
+        {
+            if (probe is not null)
+            {
+                probe.NotMeasured = true;
+                probe.CodecNotMeasured = true;
+            }
             return preferred;
         }
-        if (availability.WorksAsEncoder(preferred)) return preferred;
+        if (state == EncoderProbeState.Working) return preferred;
         return FallbackCodecFor(pref);
     }
 
     /// <summary>
-    /// Adaylari sirayla dener. Bir aday <b>henuz olculmemisse</b> tarama orada durur ve o
-    /// aday gecici cevap olarak doner: olculmemis bir donanimi "yok" saymak yanlis olurdu.
-    /// Isaret <paramref name="probe"/> ile yukari tasinir, olcum gelince hesap yenilenir.
+    /// Adaylari sirayla dener. Bir aday <b>henuz olculmemisse</b> tarama durmaz: aday
+    /// hatirlanir ve siradakilere bakilir. Calisan bir aday bulunursa <b>o</b> doner ve
+    /// isaret konmaz; hicbiri calismiyorsa hatirlanan olculmemis aday gecici cevap olarak
+    /// doner, cunku olculmemis bir donanimi "yok" saymak yanlis olurdu.
+    ///
+    /// Tarama T151'e kadar ilk olculmemis adayda duruyordu. Yoklamasi hic yerlesmeyen bir
+    /// aday (`Unsettled` kalici olarak <see cref="EncoderProbeState.Unmeasured"/> demektir)
+    /// sirayi kalici kilitliyor ve sirada calisan donanim varken plan "olculmedi" isaretiyle
+    /// donuyordu; T139'un dogrulamasi o isareti "donanim yok"a ceviriyordu. Olcum
+    /// <c>docs/olcumler/ilk-olculmemis-aday.md</c>'de.
+    ///
+    /// Devam etmek olculmemis adayi yoklamasiz birakmiyor: <see cref="EncoderAvailabilityState.KnownState"/>
+    /// sorunun kendisiyle yoklamayi sirayla koyar, yani tarama bir adayi gecerken de onu
+    /// olcume yollar.
     /// </summary>
     private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
-        var state = availability as IEncoderMeasurementState;
+        probe.PreferredCodecInBuild = availability.HasEncoder(FastHardwareOrder[0]);
+        string? unmeasured = null;
         foreach (var candidate in FastHardwareOrder)
         {
-            if (state is not null && !state.IsMeasured(candidate))
+            var state = availability.KnownState(candidate);
+            if (candidate == FastHardwareOrder[0]) probe.PreferredCodecState = state;
+            if (state == EncoderProbeState.Unmeasured)
             {
-                probe.NotMeasured = true;
-                return candidate;
+                unmeasured ??= candidate;
+                continue;
             }
-            if (availability.WorksAsEncoder(candidate)) return candidate;
+            if (state == EncoderProbeState.Working) return candidate;
         }
-        return FallbackCodecFor(pref);
+        if (unmeasured is null) return FallbackCodecFor(pref);
+        probe.NotMeasured = true;
+        probe.CodecNotMeasured = true;
+        return unmeasured;
     }
 
     public static double HardwareBitrateYield(string codec, ComplexityProfile complexity, double scale, double fps)

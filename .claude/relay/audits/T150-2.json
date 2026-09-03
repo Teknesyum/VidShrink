@@ -1,0 +1,18 @@
+{
+  "contractId": "T150",
+  "auditorRunId": "a484a8b6c5001b670",
+  "headSha": "460ba733f10028cef7c0d0bfc16a3c23191f5033",
+  "diffHash": "8ae1af7c215eb410d0b799785c8da32055c7a68fa7dd0a06b83744cdf55b0f70",
+  "owns": [
+    "tests/VidShrink.Tests/OluUyeTests.cs",
+    "docs/olcumler/sifir-tuketici.md",
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/PlanParser.cs",
+    "src/VidShrink.Core/PreviewSegment.cs"
+  ],
+  "verification": [
+    "Bagimsiz klonda FETCH_HEAD=9d58afd: pim 26 kendi kosumuyla dogrulandi (mesru 9 + borc 22 = 31 = 26+5), iki mutasyon kendi klonunda --no-incremental ile kosuldu (26->27 ve 26->25, ikisi de Gecti 10 Basarisiz 1 EXIT=1, geri alinca 11/11 EXIT=0), kume yansimadan geliyor (OluUyeTests.cs:96-119, gizli desen listesi yok), verify kolu --list-tests ile 11 test buluyor, kapi kapali (PlanParser.cs:13 ve PreviewSegment.cs:48 dal diffinde yok), birlesik agac diffi bos, ucuncu satir atfi 2494-2496 olarak yeniden olculdu. KRITIK yok, GECTI, yedi borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T08:08:53.776Z"
+}

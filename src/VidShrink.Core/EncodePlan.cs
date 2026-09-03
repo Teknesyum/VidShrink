@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace VidShrink.Core;
 
@@ -9,6 +9,23 @@ public enum Intent { Archive, Sharing, SocialMedia }
 public enum CodecPreference { Compatible, MaxCompression, Fast, Auto }
 
 public enum HdrPolicy { Preserve, TonemapToSdr }
+
+/// <summary>
+/// Tercih edilen kodlayicidan yedege dusmenin sebebi. Ucu ayri tutuluyor cunku ucu
+/// kullaniciya ayri sey soyler: <see cref="NotInBuild"/> ve <see cref="NotMeasured"/>
+/// hicbir olcume dayanmaz, yalniz <see cref="NotWorking"/> "denendi ve olmadi" der.
+/// </summary>
+public enum EncoderFallbackCause
+{
+    /// <summary>Aday bu ffmpeg derlemesinde hic yok; yoklama sorusu sorulmadi bile.</summary>
+    NotInBuild,
+
+    /// <summary>Aday derlemede var ama yoklamasi sonuca varmadi; makine hakkinda bir sey bilinmiyor.</summary>
+    NotMeasured,
+
+    /// <summary>Yoklama kostu ve aday kodlayamadi: olculmus bir olumsuzluk.</summary>
+    NotWorking
+}
 
 public enum ReasonCode
 {
@@ -47,7 +64,8 @@ public sealed record ReasonNote(
     double DetailExponent = 0,
     string? RequestedCodec = null,
     string? FallbackCodec = null,
-    double BandLowerMb = 0);
+    double BandLowerMb = 0,
+    EncoderFallbackCause FallbackCause = EncoderFallbackCause.NotWorking);
 
 public sealed class EncodePlan
 {
@@ -69,6 +87,13 @@ public sealed class EncodePlan
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();
     [JsonIgnore] public bool TurboFirstPass { get; set; }
+
+    /// <summary>
+    /// Plandaki kodlayıcı <b>ölçülmemiş</b> bir adaydan geldi: yoklama henüz cevap
+    /// vermediği için aday elenmeden geçirildi ve seçim geçicidir. Bu plana bakıp
+    /// "bu makinede donanım kodlayıcı var" denemez; ölçüm gelince hesap yenilenir.
+    /// </summary>
+    [JsonIgnore] public bool CodecNotMeasured { get; set; }
     [JsonIgnore] public double BitrateBias { get; set; } = 1.0;
     [JsonIgnore] public double? EffectiveTargetMb { get; set; }
 

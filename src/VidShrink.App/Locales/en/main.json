@@ -1,4 +1,4 @@
-{
+﻿{
   "main.language.name": "English",
 
   "main.tagline.lead": "Target size media compression",
@@ -115,7 +115,6 @@
   "main.plan.title": "What it will do",
   "main.plan.empty": "Load a file and every decision the engine makes is listed here.",
   "main.plan.reasons": "Why these choices",
-  "main.plan.reasons-count": "Why these choices · {0}",
   "main.plan.fact.plan": "Plan",
   "main.plan.automatic": "Automatic",
   "main.plan.fact.encoder": "Encoder",
@@ -283,7 +282,9 @@
   "main.reason.quality-measured": "predicted quality {0}/100 from a measured sample (bppf {1}, detail falloff {2})",
   "main.reason.quality-estimated": "predicted quality {0}/100 estimated from the source bitrate",
   "main.reason.retry-scaled": "retry: the previous attempt produced {0} MB against a {1} MB target; after reserving {2} MB for audio, video bitrate was scaled by {3} and capped to the remaining budget",
-  "main.reason.encoder-fallback": "the {0} encoder could not be used on this machine, so encoding falls back to {1}",
+  "main.reason.encoder-fallback-not-in-build": "the {0} encoder is not part of this ffmpeg build, so encoding falls back to {1}",
+  "main.reason.encoder-fallback-not-measured": "the {0} encoder has not been measured on this machine, so encoding falls back to {1}",
+  "main.reason.encoder-fallback-not-working": "the {0} encoder could not be used on this machine, so encoding falls back to {1}",
   "main.reason.hdr-tonemapped": "the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709",
   "main.reason.fill-crf-lowered": "the fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band",
   "main.reason.fill-band-center": "CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly",
@@ -312,7 +313,9 @@
   "main.advice.audio-mono": "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture.",
   "main.advice.audio-dropped": "Audio cannot fit at this size and was removed.",
   "main.advice.encoder-fallback-gpu": "Fast shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.",
-  "main.advice.encoder-fallback": "The preferred encoder could not be used on this machine; falling back to a software encoder.",
+  "main.advice.encoder-fallback-not-in-build": "The preferred encoder is not part of this ffmpeg build; falling back to a software encoder.",
+  "main.advice.encoder-fallback-not-measured": "The preferred encoder has not been measured on this machine; falling back to a software encoder.",
+  "main.advice.encoder-fallback-not-working": "The preferred encoder could not be used on this machine; falling back to a software encoder.",
   "main.advice.hdr-tonemapped": "The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709.",
 
   "main.validation.trim-format": "Trim times must use HH:MM:SS format.",

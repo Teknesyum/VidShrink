@@ -188,6 +188,29 @@
 {"id":"T143","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|VmafPoolingTests","code":0}],"auditorRunId":null,"headSha":"65a7f1938517fae1c61e9992e527118b6bb0897d","at":"2026-09-02T18:23:49.764Z"}
 {"id":"T147","result":"stale","at":"2026-09-02T18:26:48.309Z"}
 {"id":"T144","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncodeRunnerTests|FfmpegRunnerTests|SegmentEncoderTests","code":0}],"auditorRunId":null,"headSha":"317ed9f4fffefe1e3f81d7e46dd357cb2cafb7b1","at":"2026-09-02T18:53:55.309Z"}
-{"id":"T141","result":"stale","at":"2026-09-02T18:57:06.071Z"}
-{"id":"T148","result":"stale","at":"2026-09-02T18:57:06.071Z"}
-{"id":"T149","result":"stale","at":"2026-09-02T18:57:06.071Z"}
+{"id":"T141","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T145","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T147","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T148","result":"stale","at":"2026-09-02T20:42:05.722Z"}
+{"id":"T139","round":"2","risk":"high","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorTests|EncoderStateConsumptionTests|HdrResolverTests|PerformanceCheckTests|EncoderAvailabilityTests","code":0}],"auditorRunId":"ab121208d67ab1368","headSha":"c26879b312bf6e21fdc06c040c2020914386375e","at":"2026-09-02T22:28:52.512Z"}
+{"id":"T150","result":"stale","at":"2026-09-02T22:51:55.468Z"}
+{"id":"T149","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"CodecModelTests|PlanParserTests","code":0}],"auditorRunId":null,"headSha":"af974072e7c9627994965d18c65628767ebbd5ae","at":"2026-09-02T23:06:01.843Z"}
+{"id":"T150","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"OluUyeTests","code":0}],"auditorRunId":null,"headSha":"460ba733f10028cef7c0d0bfc16a3c23191f5033","at":"2026-09-03T08:09:10.383Z"}
+{"id":"T141","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests|ComplexityScanTests|PlanCalculatorProbeTests","code":0}],"auditorRunId":null,"headSha":"bb28b239b23b9c0e97ad742f001cd6c1c690cabd","at":"2026-09-03T08:12:26.252Z"}
+{"id":"T151","result":"stale","at":"2026-09-03T08:14:23.998Z"}
+{"id":"T145","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|UpdaterTests","code":0}],"auditorRunId":null,"headSha":"bbedef1c15eefb0c2f7ecaa29e46a9a09a711102","at":"2026-09-03T09:08:28.704Z"}
+{"id":"T151","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|EncoderStateConsumptionTests","code":0}],"auditorRunId":null,"headSha":"871d5dc5622ef61bdba3203fe034e3c67e41111e","at":"2026-09-03T09:10:18.587Z"}
+{"id":"T146","result":"stale","at":"2026-09-03T09:17:27.282Z"}
+{"id":"T147","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderCapabilitiesTests|SegmentEncoderTests|SessizDusurmeTests","code":0}],"auditorRunId":null,"headSha":"2fcc2e22853b372f74c59f8d0f98d8540b429b09","at":"2026-09-03T10:10:58.157Z"}
+{"id":"T146","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"ce647e66d32a7ac48d4a210062a0a067fdf82559","at":"2026-09-03T10:25:43.181Z"}
+{"id":"T152","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T153","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T154","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T153","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"TurboTavanTests|FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"956ea147117203dc1523d9cafa9619b289772e3f","at":"2026-09-03T11:16:03.463Z"}
+{"id":"T152","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"dde523ce24490802321fb00d318e5a8f1955b2f9","at":"2026-09-03T11:27:34.581Z"}
+{"id":"T154","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|QualityMeterTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/harita-kablosu-pim.md\"","code":0}],"auditorRunId":null,"headSha":"dde523ce24490802321fb00d318e5a8f1955b2f9","at":"2026-09-03T11:28:29.205Z"}
+{"id":"T156","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"QualityMeterTests|UretimYoluTests|OluUyeTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/uc-kucuk-borc.md\"","code":0}],"auditorRunId":null,"headSha":"d0afd3bbde4b27ae301fbd60bdda4a2a28837a15","at":"2026-09-03T12:32:01.315Z"}
+{"id":"T155","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"TurboTavanTests|TurboFirstPassTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/x264-turbo-acilis.md\"","code":0}],"auditorRunId":null,"headSha":"4004296c92bbcbc3d3a319f6e2978998a630b5fe","at":"2026-09-03T12:40:34.162Z"}
+{"id":"T157","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|LocalizationTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/uc-cumle-arayuze.md\"","code":0}],"auditorRunId":null,"headSha":"2a14e29e7a37e3d24433089329fd431d236b1554","at":"2026-09-03T14:03:10.471Z"}
+{"id":"T160","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"IddiaPimiTests|UretimYoluTests|TurboTavanTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/uc-kucuk-borc.md\" \"docs/olcumler/iddia-pimi.md\"","code":0}],"auditorRunId":null,"headSha":"0a5816e093ca09cb4aee2751a67680da5e2251fb","at":"2026-09-03T14:38:30.072Z"}
+{"id":"T159","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"KestirimPlanTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/kestirim-plan-bagi.md\"","code":0}],"auditorRunId":null,"headSha":"f0de838027eae0aa84c5c117e75b760583a641aa","at":"2026-09-03T15:34:59.344Z"}

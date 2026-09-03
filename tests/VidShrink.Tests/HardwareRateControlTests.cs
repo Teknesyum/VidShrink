@@ -430,6 +430,8 @@ public sealed class HardwareRateControlTests
         public bool HasEncoder(string codec) => string.Equals(codec, _codec, StringComparison.OrdinalIgnoreCase) || !CodecModel.IsHardware(codec);
 
         public bool WorksAsEncoder(string codec) => string.Equals(codec, _codec, StringComparison.OrdinalIgnoreCase);
+        public EncoderProbeState EncoderState(string codec) =>
+            WorksAsEncoder(codec) ? EncoderProbeState.Working : EncoderProbeState.NotWorking;
     }
 
     /// <summary>

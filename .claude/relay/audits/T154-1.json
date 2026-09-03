@@ -1,0 +1,17 @@
+{
+  "contractId": "T154",
+  "auditorRunId": "a2da5438f1c386e0c",
+  "headSha": "dde523ce24490802321fb00d318e5a8f1955b2f9",
+  "diffHash": "b5c6fead112b192440ee9b92c01c5ff8af10d5697e21fadcace478f6c535d208",
+  "owns": [
+    "src/VidShrink.Ffmpeg/QualityMeter.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/UretimYoluTests.cs",
+    "docs/olcumler/harita-kablosu-pim.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 5d55c20: davranis korundu (Instance varsayilan ctor -> Scenes null -> eski asiri yukleme; Assert.Same ile pimli); K1 kirmizisi cagri yerini pimliyor, kapi adini kaynaktan cikariyor, T146 denetcisinin 44/44 yesil birakan mutasyonu artik kirmizi; K3'te silinen dort test satirinin dokumu cikarildi, tek degisen iddia mutasyon (b) ile tasiyici oldugu kanitlandi; izgara a-oldu b-oldu c-hayatta; SceneAwareQualityMeasurement grep sifir, 17/50 numstat birebir; --list-tests 13+32=45, OluUyeTests pimi 31 ve dosyaya dokunulmamis; CI 33746293827 success headSha a999645; owns dort dosya. KRITIK yok, uc borc."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T11:28:14.055Z"
+}
