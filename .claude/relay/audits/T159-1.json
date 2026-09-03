@@ -1,0 +1,21 @@
+{
+  "contractId": "T159",
+  "auditorRunId": "a8d93847f7926ea25",
+  "headSha": "f0de838027eae0aa84c5c117e75b760583a641aa",
+  "diffHash": "5aa9620d5b751825d3d2437404698148e8bfa9fdc59895bb4b967af60fb874e3",
+  "owns": [
+    "tools/kestirim-plan/KestirimPlan.csproj",
+    "tools/kestirim-plan/Program.cs",
+    "tools/kestirim-plan/proxy/ffmpeg/ffmpeg.csproj",
+    "tools/kestirim-plan/proxy/ffmpeg/Program.cs",
+    "tools/kestirim-plan/proxy/ffprobe/ffprobe.csproj",
+    "tools/kestirim-plan/proxy/ffprobe/Program.cs",
+    "tests/VidShrink.Tests/KestirimPlanTests.cs",
+    "docs/olcumler/kestirim-plan-bagi.md"
+  ],
+  "verification": [
+    "K1 kimligi, K3 tablo okumasi, K4 karar noktasi, K5 mutasyon bizzat uygulandi/geri alindi, K6 3 test, src/ bos diff, CI 33770482964 success. KRITIK yok."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T15:34:40.679Z"
+}
