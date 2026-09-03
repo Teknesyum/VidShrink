@@ -535,3 +535,61 @@ harfiyen uygulayan bir ajan projenin motorunu cope tasir.
 **Onerilen.** Ya dil bazli tarama (C#'ta `using` + tip adi gecisi, `.csproj` referansi),
 ya da tarama dili tanimadiginda **hic bildirme.** Yanlis pozitif "sil" onerisi,
 hic oneri vermemekten kotudur.
+
+
+## Kancalar bayat calisma agacini okuyor — muhurlenmis sozlesme "atanmamis is" diye geri geliyor
+
+**Olcum, 3 Eylul 2026.** T152 muhurlendi, `contracts/done/T152.md` altina tasindi ve `main`e
+itildi. Hemen ardindan `Stop` kancasi soyle dedi:
+
+```
+Unassigned work is queued: T152 - and this turn is ending.
+Hand it to an agent before you close.
+```
+
+Sebep olculdu. T0 kendi worktree'sinde calisiyor; **`main` orada cikik**, proje kokunun
+kendi calisma agaci ise cok eski bir commit'te ayrik duruyordu:
+
+```
+kok  (C:/.../Vidshrink)                f337e88  (detached)  contracts/T152.md  status: open
+T0   (.claude/worktrees/T0)            201bb4e  [main]      contracts/done/T152.md  status: done
+```
+
+Kanca **kokteki** kopyayi okudu. O kopyada T152 hala `open`, cunku o agac muhur
+commit'lerini hic gormedi. Yani kanca, kapanmis bir sozlesmeyi kapanmamis gordu ve turu
+engelledi.
+
+Bu tek bir yanlis alarm degil, **sistematik**: T0 worktree'de calistigi surece kokun
+calisma agaci her muhurde bir commit daha geride kalir ve `relayRoot(cwd)` cozumu hep o
+bayat kopyaya bakar. Ayni kor nokta daha once denetcide de olculmustu (bu belgede
+"denetci worktree-yerel dosyayi eski gorur" bolumu) — orada yanlis KRITIK uretmisti.
+
+**Ne yapildi.** Kok agac `201bb4e`e ileri sarildi (temizdi, hedef commit atasinin
+soyundandi). Yanlis alarm kesildi. Ama bu **elle bakim**; her muhurden sonra tekrar
+gerekecek.
+
+**Onerilen.** Kanca sozlesme durumunu **calisma agacindan degil, `main`in ucundan** okusun:
+`git show <main>:.claude/relay/contracts/...` ya da `git ls-tree`. Sozlesme durumu bir depo
+gercegi, bir dosya sistemi gercegi degil. En azindan kokun `HEAD`i `main`in gerisindeyse
+uyarsin.
+
+## Kapi salt-okunur `git` komutlarini da durduruyor
+
+Ayni turda, **hicbir sey yazmayan** iki komut engellendi:
+
+```
+git status --short                       -> BLOCKED (merdivende sozlesme var)
+git merge-base --is-ancestor f337e88 201bb4e  -> BLOCKED (ayni metin)
+```
+
+Ikisi de depoyu okuyor, hicbiri `main`e ulasmiyor. Kapi komutun **etkisini** degil
+**metnini** esliyor. Ayni kusur izin katmaninda da olculmustu: duz yazilan `rm -rf`
+reddediliyor, `for` dongusu icindekisi geciyor.
+
+Zarari: T0 kapinin etrafindan dolasmayi **oğreniyor.** Bugun kok agacin temiz olup
+olmadigini anlamak icin proje disina cikip `git -C` kullanmak zorunda kaldim — yani
+kapinin varligi, kapiyi asma aliskanligini uretiyor.
+
+**Onerilen.** Salt-okunur `git` alt komutlarini beyaz listeye al: `status`, `log`, `show`,
+`diff`, `rev-parse`, `merge-base`, `ls-tree`, `branch --list`, `worktree list`. Kapi
+yalniz agaci degistiren ya da uzaga yazan komutlara baksin.
