@@ -357,3 +357,49 @@ Yani kancanin urettigi durum ozeti, kancanin kendi yanilgisinin kaydi haline gel
 **Gecici cozum (uygulandi):** kok agac temizlenip guncel `origin/main`e (`cea77e3`)
 yeniden ayrildi. Bu elle yapilan bir istir ve her muhur turundan sonra tekrar gerekir —
 kalici cozum (1)'dir.
+
+## `Stop` kapisi sira bagimliligini goremiyor: dagitilamaz sozlesmeyi her turda isaretliyor
+
+**3 Eylul 2026, olculdu.** T152 yazildi ve `owns` cakismasi nedeniyle dagitilamaz durumda
+bekliyordu (`PlanCalculator.cs` aktif T146'nin). `Stop` kapisi turu **uc kez** kesip
+"Unassigned work is queued: T152" dedi.
+
+Kaynak okundu — `teknesyum-core/0.7.3/hooks/watch.js`:
+
+```
+228: for (const f of files) {
+235:   const s = status(body);
+237:   if (s === 'submitted') submitted.push(id);
+238:   else if (s === 'open') open.push(id);
+249: const idle = open.filter((id) => !heldContracts(liveDir(r.relay)).has(id));
+250: if (idle.length) ... 'Unassigned work is queued: '
+```
+
+Kapi **yalniz iki seye bakiyor**: `status` alani ve `live/` altinda o sozlesmeyi tutan
+canli ajan var mi. **`depends` alanini hic okumuyor** ve `owns` kesisimini hic hesaplamiyor.
+Bu yuzden `depends: [T151, T146]` yazmak sesi kesmedi — dogru bilgi dosyada duruyor, kapi
+o satiri gormuyor.
+
+Sema de yardim etmiyor: `open | active | submitted | done` disinda deger yok. "Yazildi ama
+sirasi gelmedi" durumunun temsili yok; ya yalan soyleyeceksin (`active` = dagitildi) ya
+her turda kapiyi yiyeceksin.
+
+### Oneri
+
+1. **Kapi `depends` okusun.** `depends` icindeki bir kimlik `done/` altinda degilse o
+   sozlesme `idle` sayilmasin. Tek satirlik filtre, bes dakikalik is.
+2. **`owns` kesisimi hesaplansin.** Daha dogrusu bu: `depends` yazmayi unutan T0 da
+   korunur. Aktif bir sozlesmeyle `owns` kesisen `open` sozlesme dagitilamaz, kapi da
+   onu bilir.
+3. **Semaya `blocked` eklensin** — ya da `open`in yani sira `queued`. Durumu dosyanin
+   kendisi soylesin.
+4. **Mesaj neden dagitilamadigini yazsin.** "Unassigned work is queued: T152" yerine
+   "T152 open ama owns'u T146 ile kesisiyor" deseydi ilk turda anlasilirdi.
+
+**Gecici cozum (uygulandi):** T152 `contracts/beklemede/` altina tasindi. `readdirSync`
+ozyinelemeli olmadigi icin kapi alt klasoru gormuyor; sozlesme kaybolmuyor, T146
+muhurlenince geri tasiniyor. Bu bir **kaciniktir**, cozum degil — `/report` de artik o
+sozlesmeyi saymiyor.
+
+Not: `watch.js:217` de `relayRoot(j.cwd ...)` ile cwd'den cozuyor; bu dosyada zaten bes
+kez yazili olan bayat-agac sinifinin ayni koku.

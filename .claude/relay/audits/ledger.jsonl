@@ -200,3 +200,4 @@
 {"id":"T151","result":"stale","at":"2026-09-03T08:14:23.998Z"}
 {"id":"T145","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PerformanceCheckTests|UpdaterTests","code":0}],"auditorRunId":null,"headSha":"bbedef1c15eefb0c2f7ecaa29e46a9a09a711102","at":"2026-09-03T09:08:28.704Z"}
 {"id":"T151","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|EncoderStateConsumptionTests","code":0}],"auditorRunId":null,"headSha":"871d5dc5622ef61bdba3203fe034e3c67e41111e","at":"2026-09-03T09:10:18.587Z"}
+{"id":"T146","result":"stale","at":"2026-09-03T09:17:27.282Z"}

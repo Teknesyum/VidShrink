@@ -21,22 +21,22 @@ right-click menu.
 
 ## Contracts open
 
-- `T86` — open, round 2 — Düzeltme turu 2
-- `T87` — open, round 3 — Düzeltme turu 2
-- `T88` — open, round 3 — Düzeltme turu 2
-- `T89` — open, round 1
-- `T90` — open, round 1
+- `T125` — active, round 1 — T125 — A/B'nin bizim tarafimiz auto modu kosmuyor
+- `T133` — active, round 1
+- `T146` — active, round 1
+- `T147` — active, round 1
+- `T152` — open, round 1
 
 ## Closed last
 
-- `T85` — done — 2026-09-01 16:52
-- `T84` — done — 2026-09-01 11:31
-- `T83` — done — 2026-09-01 07:48
-- `T82` — done — 2026-08-30 12:08
-- `T81` — done — 2026-08-30 11:30
+- `T146` — stale — 2026-09-03 09:17
+- `T151` — done — 2026-09-03 09:10
+- `T145` — done — 2026-09-03 09:08
+- `T151` — stale — 2026-09-03 08:14
+- `T141` — done — 2026-09-03 08:12
 
 ## Tree
 
 - branch: `main`
-- head: `86c56b5 muhur: T85 kapandi — kosum kapisi ve olcum yalitimi`
-- uncommitted files: 1
+- head: `263f963 T152 depends'e T146 eklendi: ayni dosyaya sahipler, sira bagimliligi makinece okunsun`
+- uncommitted files: 2
