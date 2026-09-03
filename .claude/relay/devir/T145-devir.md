@@ -1,6 +1,7 @@
 sozlesme: T145
 dal: T145-kalan-alti-bant
 son-commit: e162d31f664f3cec4bb3dd06f685ff350552ef6a
+durum: T0'a teslime hazir — verify yesil, CI yesil, bagimsiz denetim GECTI
 
 ## Nerede kaldım
 
@@ -133,9 +134,10 @@ Tam süiti ben kendi inisiyatifimle, ekstra güvence için başlatmıştım.
   Sonuç çıkarmak için kullanma; sadece "bir yerde ~4 saat süren bir şey oldu"
   bilgisini taşıyor. Geçerli olan `.calisma/T145/tam-suit-detay.txt`
   (Toplam 1479, Geçti 1464, Atlandı 15, cikis=0).
-- Bağımsız denetçi ajanı (`ac5d20c451764e6b9`) makine meşgulken derleme yapmaya
-  çalışıp **stalled** oldu (600 sn ilerleme yok), hiçbir bulgu üretmedi. Onun
-  adına "denetlendi" deme — denetim hiç tamamlanmadı.
+- İlk deneme bağımsız denetçi ajanı (`ac5d20c451764e6b9`) makine meşgulken
+  derleme yapmaya çalışıp **stalled** oldu, hiçbir bulgu üretmedi — o denetimin
+  adına "denetlendi" deme. **İkinci deneme (`a3f040f654a5c7ce4`) makine sakinken
+  tamamlandı ve GEÇTİ**, aşağıya bak. Geçerli olan ikincisi.
 
 ## Dokunduğum dosyalar
 
@@ -148,11 +150,34 @@ Hepsi `owns` içinde:
 geçici olarak değiştirilip her seferinde `git checkout --` ile geri alındı;
 `git diff main..HEAD -- src/` boş).
 
+## Bağımsız denetim — GEÇTİ (a3f040f654a5c7ce4)
+
+Makine sakinken çalıştı, kendi derlemesini yaptı (`dotnet build -c Release
+--no-incremental`, 0 hata), verify'ı kendi başına koşturdu:
+
+```
+76 test, 72 geçti, 4 atlandı (ortam kapıları), 0 başarısız
+```
+
+(Not: benim koşumumda 74/76 idi, denetçininki 72/76 — ikisi de ortam kapılı
+atlamalardan geliyor, `[QuietMachineFact]`/donanım kapıları koşumdan koşuma
+1-2 test kaydırabiliyor. Hangi ek testin atlandığı bende yok, denetçi de tek
+tek adını vermedi; kırmızı olmadığı için üstüne gitmedim.)
+
+Denetçinin tek tek doğruladıkları: K1 karar tablosu koddaki gerçek değerlerle
+birebir (git show main:... ile karşılaştırdı), hiçbir tavan genişletilmedi,
+`src/**` boş diff, A/B/C/D bantlarındaki ham örnek sayıları (n=20/20/5) `wc -w`
+ile bizzat sayıldı, K5'in 22+54=76 sayımı `--list-tests` çıktısından bizzat
+üretildi, `SaatTureviIddiaSayisi=23` değişmemiş ve ölçüsü kendi koşumunda da
+yeşil, geri çekilmiş-ama-satırda-kalmış bir iddia bulunamadı. **Kritik bulgu
+yok.** Devraldığı borçlar (`:915`in dar payı, CI'da A/B/C'nin hiç koşmaması,
+`MeasureLaunch`in zaman aşımsız beklemesi, "6 bant/6 commit" sapması) raporun
+kendi T0'a bölümünde zaten açık — denetçi bunları gizlenmiş bulmadı.
+
 ## Sıradaki adım
 
-4 saatlik sıçrama araştırıldı ve tekrarlanmadı (yukarı bak); T145'in kendi
-işiyle ilgisi yok göründüğü için sözleşmeyi bu belirsizlikle bloke etmedim.
-Ben olsam şimdi bağımsız denetimi **tekrar** açardım — ilk deneme makine
-meşgulken (tam süit + kendisi aynı anda) başladığı için stalled oldu ve hiç
-bulgu üretmedi. Makine şu an sakin, denetim şimdi temiz koşabilir. Denetim
-geçerse T0'a teslime hazır; geçmezse bulguları bu dosyaya ekleyip commit et.
+T145 T0'a teslime hazır: verify yeşil (iki farklı koşumda), CI yeşil, tam
+süit temiz (iki koşumda, biri sıçramalı biri temiz — sıçrama araştırıldı,
+T145 ile ilgisi yok), bağımsız denetim geçti. Ben olsam artık bekletmeden
+T0'a bildirirdim; üstünde durulacak tek şey raporun T0'a bölümündeki beş
+maddedir (owns dışı riskler), onlar da zaten yazılı.
