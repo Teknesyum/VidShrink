@@ -1,8 +1,9 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
@@ -17,6 +18,10 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class PlanCalculatorProbeTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public PlanCalculatorProbeTests(ITestOutputHelper output) => _output = output;
+
     private static readonly MediaInfo HdrSource = new()
     {
         FilePath = "hdr.mp4",
@@ -755,28 +760,191 @@ public sealed class PlanCalculatorProbeTests
         Assert.True(durum.IsEnabled, "yoklama yerlesmedigi icin Baslat kalici kilitli kaldi");
     }
 
-    /// <summary>
-    /// T136/K6. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle ayni seyi
-    /// soyluyor. T128 Core'u duzeltti, arayuzdeki dort kopya eski metinde kaldi ve bunu
-    /// hicbir olcu gormedi; burasi o ayrilmayi bir daha sessiz birakmiyor.
-    /// </summary>
-    [Fact]
-    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor()
-    {
-        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, new RecordingAvailability(TimeSpan.Zero));
-        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+    internal const string DerlemedeYok = "derlemede yok";
+    internal const string Olculmedi = "olculmedi";
+    internal const string OlculduCalismiyor = "olculdu, calismiyor";
 
-        var kalip = Locales.Values("en")["main.reason.encoder-fallback"];
+    /// <summary>
+    /// Uc dusme durumunun ucunu de kuran girdiler. Tek sahte nesne yetmiyor: ucuncu
+    /// durumu (aday derleme listesinde hic yok) yalniz <see cref="MissingCodecAvailability"/>
+    /// uretebiliyor, kalan ikisi <see cref="FastOrderAvailability"/> ile kuruluyor.
+    /// <see cref="MissingCodecAvailability"/> eksik aday icin <c>HasEncoder</c> false
+    /// dondururken <c>EncoderState</c> icin <c>NotWorking</c> donuyor (T152 borc 4);
+    /// bu girdi o ayrilmaya yaslanmiyor, cunku <c>PreferredCodecInBuild</c> yanlisken
+    /// durum sorusuna hic bakilmiyor.
+    /// </summary>
+    public static TheoryData<string> DusmeDurumlari() => new() { DerlemedeYok, Olculmedi, OlculduCalismiyor };
+
+    private static IEncoderAvailability YetenekIcin(string durum) => durum switch
+    {
+        DerlemedeYok => new MissingCodecAvailability("av1_nvenc", ("hevc_nvenc", EncoderProbeState.Working)),
+        Olculmedi => new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working)),
+        _ => new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Working))
+    };
+
+    internal static ReasonNote DusmeNotu(string durum) =>
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, YetenekIcin(durum))
+            .Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+
+    internal static (string Anahtar, string Cumle) ArayuzCumlesi(string durum, string dil)
+    {
+        var note = DusmeNotu(durum);
+        var anahtar = MainWindow.EncoderFallbackReasonKey(note);
+        var kalip = Locales.Values(dil)[anahtar];
+        return (anahtar, string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec));
+    }
+
+    /// <summary>
+    /// T136/K6, T157/K1. Kullanicinin gordugu dusme cumlesi ile Core'un urettigi cumle
+    /// ayni seyi soyluyor — <b>uc durumun ucunde de</b>.
+    ///
+    /// Olcu T157'ye kadar tek girdi geziyordu (<see cref="RecordingAvailability"/>) ve o
+    /// girdi tam da arayuzun ayrismadigi ucuncu duruma dusuyordu; pim bosluğu ortuyordu.
+    /// Arayuz uc durum icin tek yerellestirme anahtari cagirdigi surece bu olcu
+    /// <see cref="DerlemedeYok"/> ve <see cref="Olculmedi"/> kollarinda kirmizi verir.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DusmeDurumlari))]
+    public void ArayuzunDusmeCumlesiCoreunkiyleAyniSeyiSoyluyor(string durum)
+    {
+        var detailed = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, YetenekIcin(durum));
+        var note = detailed.Plan.ReasonCodes.Single(n => n.Code == ReasonCode.EncoderFallback);
+        var anahtar = MainWindow.EncoderFallbackReasonKey(note);
+        var kalip = Locales.Values("en")[anahtar];
         var arayuz = string.Format(CultureInfo.InvariantCulture, kalip, note.RequestedCodec, note.FallbackCodec);
 
-        Assert.Contains(arayuz, detailed.Plan.Reason, StringComparison.Ordinal);
+        Assert.True(
+            detailed.Plan.Reason.Contains(arayuz, StringComparison.Ordinal),
+            $"durum \"{durum}\" | anahtar {anahtar}" + Environment.NewLine +
+            $"  arayuz : {arayuz}" + Environment.NewLine +
+            $"  core   : {FallbackNote(detailed.Plan, "av1_nvenc")}");
+    }
 
-        Assert.Contains("could not be used on this machine",
-            Locales.Values("en")["main.advice.encoder-fallback"], StringComparison.Ordinal);
-        Assert.Contains("bu makinede kullanılamadı",
-            Locales.Values("tr")["main.reason.encoder-fallback"], StringComparison.Ordinal);
-        Assert.Contains("bu makinede kullanılamadı",
-            Locales.Values("tr")["main.advice.encoder-fallback"], StringComparison.Ordinal);
+    /// <summary>
+    /// K2. Uc durum uc <b>ayri</b> yerellestirme anahtarina gidiyor ve uc anahtarin ucu de
+    /// iki katalogda birden var. Anahtarlar olcuye elle yazilmiyor, arayuzun kendi
+    /// esleyicisinden okunuyor; esleyici iki durumu ayni anahtara verirse burasi kirmizi olur.
+    /// </summary>
+    [Fact]
+    public void UcDurumUcAyriYerellestirmeAnahtarinaGidiyor()
+    {
+        var anahtarlar = new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor }
+            .Select(durum => MainWindow.EncoderFallbackReasonKey(DusmeNotu(durum)))
+            .ToArray();
+
+        _output.WriteLine(string.Join(Environment.NewLine, anahtarlar));
+        Assert.Equal(3, anahtarlar.Distinct(StringComparer.Ordinal).Count());
+        foreach (var dil in Locales.Languages)
+            foreach (var anahtar in anahtarlar)
+                Assert.True(Locales.Values(dil).ContainsKey(anahtar), $"{dil} kataloğunda {anahtar} yok");
+    }
+
+    /// <summary>
+    /// K2/K3. Kullanicinin gordugu cumle iki dilde de uc durumda uc ayri sey soyluyor.
+    /// Metin olcuye yazilmiyor: uc cumlenin ortak onu ve ortak sonu atilip geriye kalan
+    /// <b>iddia</b> parcasi hesaplaniyor, uc iddianin farkli olmasi araniyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void ArayuzunUcCumlesiIkiDildeDeAyriIddiaTasiyor(string dil)
+    {
+        var cumleler = UcCumle(dil);
+        var iddialar = Iddialar(cumleler);
+
+        _output.WriteLine(string.Join(Environment.NewLine, cumleler.Zip(iddialar, (c, i) => $"{i}  <=  {c}")));
+        Assert.Equal(3, cumleler.Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal(3, iddialar.Distinct(StringComparer.Ordinal).Count());
+        Assert.All(iddialar, iddia => Assert.NotEqual(string.Empty, iddia));
+    }
+
+    /// <summary>
+    /// K2/4. Tavsiye satiri da ayni ayrimi tasiyor: her durumun tavsiye cumlesi, o durumun
+    /// dusme cumlesindeki iddia parcasini iceriyor. Iki durumun anahtari yer degistirirse
+    /// tavsiye baska bir durumun iddiasini tasir ve burasi kirmizi olur. Karsilastirma
+    /// buyuk-kucuk harfe bakmiyor: tavsiye satiri <c>Speak</c> uzerinden gectigi icin
+    /// bastan sona baslik bicimine cevriliyor, dusme cumlesi ise <c>Say</c> ile gelip
+    /// oldugu gibi kaliyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void TavsiyeSatiriDusmeCumlesiyleAyniIddiayiTasiyor(string dil)
+    {
+        var sebepler = new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor }
+            .Select(durum => DusmeNotu(durum).FallbackCause)
+            .ToArray();
+        var iddialar = Iddialar(UcCumle(dil));
+
+        for (var i = 0; i < sebepler.Length; i++)
+        {
+            var tavsiye = MainWindow.AdviceLine(AdviceCode.EncoderFallback, dil, fastGpu: false, sebepler[i]);
+            _output.WriteLine($"{sebepler[i]} | {iddialar[i]} | {tavsiye}");
+            Assert.NotNull(tavsiye);
+            Assert.Contains(iddialar[i], tavsiye!, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>
+    /// K2/4. GPU kolu bugunku davranisini koruyor: hizli mod acikken uc durumun ucu de
+    /// tek <c>-gpu</c> cumlesine gidiyor.
+    /// </summary>
+    [Fact]
+    public void GpuKoluUcDurumdaDaAyniCumleyiVeriyor()
+    {
+        var satirlar = new[] { EncoderFallbackCause.NotInBuild, EncoderFallbackCause.NotMeasured, EncoderFallbackCause.NotWorking }
+            .Select(sebep => MainWindow.AdviceLine(AdviceCode.EncoderFallback, "tr", fastGpu: true, sebep))
+            .ToArray();
+
+        _output.WriteLine(string.Join(Environment.NewLine, satirlar!));
+        Assert.Single(satirlar.Distinct(StringComparer.Ordinal));
+    }
+
+    /// <summary>K3'un iki dilli tablosunu koddan uretir; rapora giren satirlar budur.</summary>
+    [Fact]
+    public void UcCumleTablosunuYazar()
+    {
+        var durumlar = new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor };
+        _output.WriteLine("| durum | en | tr |");
+        _output.WriteLine("|---|---|---|");
+        foreach (var durum in durumlar)
+            _output.WriteLine($"| {durum} | {ArayuzCumlesi(durum, "en").Cumle} | {ArayuzCumlesi(durum, "tr").Cumle} |");
+
+        _output.WriteLine("");
+        _output.WriteLine("| durum | anahtar | tavsiye en | tavsiye tr |");
+        _output.WriteLine("|---|---|---|---|");
+        foreach (var durum in durumlar)
+        {
+            var sebep = DusmeNotu(durum).FallbackCause;
+            _output.WriteLine(
+                $"| {durum} | {MainWindow.EncoderFallbackReasonKey(DusmeNotu(durum))} | " +
+                $"{MainWindow.AdviceLine(AdviceCode.EncoderFallback, "en", fastGpu: false, sebep)} | " +
+                $"{MainWindow.AdviceLine(AdviceCode.EncoderFallback, "tr", fastGpu: false, sebep)} |");
+        }
+    }
+
+    private static string[] UcCumle(string dil) => new[] { DerlemedeYok, Olculmedi, OlculduCalismiyor }
+        .Select(durum => ArayuzCumlesi(durum, dil).Cumle)
+        .ToArray();
+
+    /// <summary>
+    /// Uc cumlenin ortak onu ve ortak sonu atilir; geriye kalan, o durumun tasidigi
+    /// <b>iddiadir</b>. Metin olcuye yazilmadigi icin cumleler yeniden yazilinca olcu
+    /// bozulmaz; bozulan tek sey ayrimin kendisidir.
+    /// </summary>
+    private static string[] Iddialar(string[] cumleler)
+    {
+        var onek = 0;
+        while (cumleler.All(c => c.Length > onek && c[onek] == cumleler[0][onek])) onek++;
+
+        var sonek = 0;
+        while (cumleler.All(c => c.Length > onek + sonek && c[^(sonek + 1)] == cumleler[0][^(sonek + 1)])) sonek++;
+
+        return cumleler.Select(c => c[onek..^sonek]).ToArray();
     }
 
     // --- K1: gercek ffmpeg ---
