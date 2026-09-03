@@ -202,7 +202,8 @@ Sıfır bulan kol yok; 4 + 75 = 79, birleşik kolun bulduğu sayıyla tutuyor.
 
 Yerel koşum: `Başarılı! - Başarısız: 0, Başarılı: 79, Atlanan: 0, Toplam: 79`.
 
-CI: <!-- CI -->
+CI: koşum `33752128362` (`T155-x264-turbo-acilis`, commit `a10743a`),
+`completed success` — https://github.com/Teknesyum/VidShrink/actions/runs/33752128362
 
 ## Sapmalar ve sınırlar
 
