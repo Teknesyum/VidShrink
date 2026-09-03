@@ -25,7 +25,6 @@ right-click menu.
 - `T133` — active, round 1
 - `T146` — active, round 1
 - `T147` — active, round 1
-- `T152` — open, round 1
 
 ## Closed last
 
@@ -38,5 +37,5 @@ right-click menu.
 ## Tree
 
 - branch: `main`
-- head: `263f963 T152 depends'e T146 eklendi: ayni dosyaya sahipler, sira bagimliligi makinece okunsun`
-- uncommitted files: 2
+- head: `2c32465 T152 beklemede/ altina parkedildi; kapi depends okumuyor, olcumu core kaydina`
+- uncommitted files: 0
