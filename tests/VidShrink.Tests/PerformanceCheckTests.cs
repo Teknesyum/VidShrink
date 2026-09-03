@@ -514,6 +514,15 @@ public sealed class PerformanceCheckTests
     /// okumayi yalniz 0,868'e tasidi, esigi (1,0) hic gecmedi. Sinif ile sayinin
     /// tutarliligi zaten <see cref="OlcumYukAltindaYalnizAgirlasiyor"/> icinde her canli
     /// okuma icin ayri ayri sinaniyor.
+    ///
+    /// <b>Bant neden daraltilmadi.</b> T145 alti duvar saati bandini gozden gecirirken
+    /// buraya da bakti. Asagidaki <c>yuklu &gt; bos</c> karsilastirmasi bir yon iddiasinin
+    /// **en dar** halidir: kabul edilen bolge zaten yarim dogru, ve daraltmak ancak
+    /// <c>yuklu &gt; bos * K</c> (K &gt; 1) yazmakla, yani iddiayi degistirmekle olur —
+    /// bu da olcuyu kararsizlastirir, cunku K'nin ustunde bir pay iddia etmedigimiz bir
+    /// sey olur. Eldeki pay olculdu: sekiz kosumda <c>yuklu / bos</c> orani
+    /// 1,441 - 1,888 (medyan 1,690), on dort ajanin kostugu mesgul bir makinede.
+    /// Bant oldugu gibi birakildi; olcum <c>docs/olcumler/kalan-alti-bant.md</c> icinde.
     /// </summary>
     [QuietMachineFact]
     public async Task YukAltindaKararHafiflemiyorMu()
