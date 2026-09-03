@@ -1807,6 +1807,12 @@ public partial class MainWindow : Window
         return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
     }
 
+    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => null;
+
+    public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => null;
+
+    public static IQualityMeasurement ProbeMeter(SceneMap? scenes) => QualityMeasurement.Instance;
+
     private async Task MeasureComplexityAsync(MediaInfo info)
     {
         _probeCts?.Cancel();
@@ -1818,7 +1824,7 @@ public partial class MainWindow : Window
         try
         {
             var speed = CurrentOptions().SpeedMode;
-            var profile = await ProbeWithMeasuredQualityAsync(info, speed, null, cts.Token);
+            var profile = await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(QualityScenes(_sceneMap)), cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
             _profile = profile;
             Recalculate();
@@ -1835,7 +1841,7 @@ public partial class MainWindow : Window
             // produced, until the two agree.
             for (var round = 0; round < CalibrationRounds; round++)
             {
-                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token);
+                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, CalibrationScenes(_sceneMap));
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
                 _profile = calibrated;
                 Recalculate();
