@@ -887,3 +887,68 @@ sayılarıdır ve o taban bugünkü kodla yeniden üretilemiyor (üstteki T125
 bölümü) — ama kapanış **bayta** dayandığı için puandaki kaymadan etkilenmiyor;
 (2) `parca-3 / vidshrink @ 600 MB` satırı kapıya 2.802 bayt uzakta ve tek koşuma
 dayanıyor, kararlılığı **ölçülmedi**.
+
+## T125 tur 2 — altı çiftin tamamı bugünkü tabanla ölçüldü
+
+T0 kararı üzerine kalan beş çift de bugünkü tabanla (`fcf377f` sonrası,
+`Codec = CodecPreference.Auto` düzeltmesiyle) koşuldu. On iki ölçümün (5 satır
+× 3 sütun, 1 satır zaten üstteki bölümde ölçülüydü) on ikisinde de `SizeEqual`
+doğru ve `ColorGate=Direct` — eş boyut kapısından geçmeyen ya da HDR yoluna
+düşen satır yok, sayıma giren hepsi.
+
+Sütunların üçü de aynı gün, aynı taban: aralarında sürüm sınırı yok.
+
+| parça / hedef | HandBrake | biz — Compatible | biz — Auto |
+|---|---|---|---|
+| parça-1 @ 3,4975 MB | 48,56 | 33,44 | 45,97 |
+| parça-1 @ 34,9745 MB | 83,64 | 72,82 | 72,80 |
+| parça-2 @ 3,4999 MB | 93,73 | 71,01 | 82,25 |
+| parça-2 @ 34,9994 MB | 95,79 | 96,10 | **96,12** |
+| parça-3 @ 3,4994 MB | 17,88 | 13,75 | **22,29** |
+| parça-3 @ 34,9936 MB | 74,96 | 65,75 | 66,11 |
+
+(harmonik VMAF-NEG, iki ondalık; kaynak: `.calisma/ab/t125/tur2/json/`.)
+
+### Manşet — yeniden sayıldı
+
+Kural (`ab-kodek-kolu.md`, "Taban yeniden kuruluyor"): manşet Auto sütununda
+satır satır sayılır. Yukarıdaki tablonun Auto sütununu HandBrake'e karşı
+okursak:
+
+- HandBrake önde: parça-1@3,50 MB, parça-1@34,97 MB, parça-2@3,50 MB,
+  parça-3@34,99 MB → **4 satır**.
+- VidShrink önde: parça-2@35,00 MB, parça-3@3,50 MB → **2 satır**.
+
+**Yeni manşet: "Altı parça-hedef çiftinin dördünde HandBrake önde."** Eski
+metnin "beşinde" sayısı bu tabloda tutmuyor — düzeltildi. Yön aynı kaldı
+(HandBrake hâlâ çoğunlukta) ama pay değişti: 5/6 değil 4/6, ve iki satırda
+(parça-2@35 MB, parça-3@3,5 MB) VidShrink önde çıktı.
+
+### Kodek kolunun payı — Compatible ↔ Auto
+
+Aynı tabanda ölçülmüş iki VidShrink sütunu doğrudan kıyaslanabilir (sürüm
+sınırı yok):
+
+| satır | Compatible | Auto | fark | kodek değişti mi |
+|---|---|---|---|---|
+| parça-1 @ 3,50 MB | 33,44 | 45,97 | **+12,53** | evet (libx264→libsvtav1) |
+| parça-1 @ 34,97 MB | 72,82 | 72,80 | −0,02 | hayır (libx264) |
+| parça-2 @ 3,50 MB | 71,01 | 82,25 | **+11,24** | evet (libx264→libsvtav1) |
+| parça-2 @ 35,00 MB | 96,10 | 96,12 | +0,02 | hayır (libx264) |
+| parça-3 @ 3,50 MB | 13,75 | 22,29 | **+8,54** | evet (libx264→libsvtav1) |
+| parça-3 @ 34,99 MB | 65,75 | 66,11 | +0,36 | hayır (libx264, K4 notu:
+  bayt farkı %2,05 — `ab-kodek-kolu.md`'deki K4 bölümüne bakın) |
+
+Desen net: düzeltmenin (`Auto`'nun düşük hedeflerde `libsvtav1`'e geçmesi)
+kazancı **yalnız 3,5 MB hedefli üç satırda** var (+8,5 ile +12,5 puan arası);
+35 MB hedefli üç satırda kodek zaten değişmiyor ve fark gürültü seviyesinde
+(K4 kapısına bakın). Yani düzeltme küçük-hedef rejiminde işliyor, büyük-hedef
+rejiminde nötr — beklenen: `CompressionStrategy.RegimeFor` büyük hedefte zaten
+Balanced/Compatible seçiyordu, düzeltmenin oraya etkisi yok.
+
+### K6 — yerleşim ayrıştırması
+
+Sayılar ve karar `ab-kodek-kolu.md`'nin "K6 — zorunlu-1080p eşiği yeni tabanla
+yeniden kuruldu" bölümünde. Özet: zorunlu 1080p (89,67), alt sınır (VidShrink
+serbest yerleşim, 71,01) ile üst sınır (HandBrake, 93,73) arasındaki açığın
+**%82,1**'ini kapatıyor → yerleşim hipotezi **yaşıyor**.

@@ -292,3 +292,69 @@ Fark **0,04 puan** (bayt farkı 558). Kalibrasyon yoklaması ve eşitleyici koş
 bağlı olduğu için bizim kolda küçük ama sıfır olmayan bir yayılım var; ölçer
 tarafı gürültüsüz (K1), yayılım kodlayıcı tarafından geliyor. Yeni tablodaki
 0,04'ten küçük farklar bu yüzden ayırt edici sayılmaz. n = 2, makine yüklü.
+
+## T125 tur 2 — K4 kapısı ve K6 eşiği kapandı
+
+175. satırdaki kurallar koşum bitmeden yazılmıştı. Aşağıdaki sayılar o kurallara
+göre okunuyor, sıra bozulmadı.
+
+### K4 — kodek değişmeyen satırlarda skor da değişmemeli mi
+
+600 MB hedefli üç satırın üçü de `CompressionStrategy.RegimeFor` üzerinden
+Balanced rejime düşüyor, yani hem Auto hem Compatible kolu **aynı kodeği**
+seçiyor (`libx264`, `Settings` alanında doğrulandı). Bu üç satır K4'ün doğal
+test kümesi — ayrı bir koşum kurulmadı, mevcut Auto/Compatible çiftinden okundu.
+
+| satır | çözünürlük (ikisi de) | Auto harm | Compat harm | fark | bayt farkı |
+|---|---|---|---|---|---|
+| parça-1 @ 34,97 MB | 1382x778 | 72,80 | 72,82 | 0,02 | %0,03 |
+| parça-2 @ 35,00 MB | 1920x1080 | 96,12 | 96,10 | 0,02 | %2,65 |
+| parça-3 @ 34,99 MB | 1190x670 | 66,11 | 65,75 | **0,36** | %2,05 |
+
+İlk iki satır 0,04 puanlık doğal yayılım bandının (K1'deki n=2 ölçüm) içinde —
+kodek sabit, skor da fiilen sabit. Üçüncü satır bandın dışına çıkıyor.
+
+**KRİTİK değil.** Sebep izlendi: parça-3 satırında iki kol aynı hedefe
+kilitlenmiş olsa da (34,99 MB), gerçekleşen bayt %2,05 ayrıştı — bu, doğal
+yayılımın ölçüldüğü referans çiftin (%0,03 bayt farkı) yaklaşık 70 katı. K4'ün
+0,04 puanlık eşiği *bayt eşit* iki koşumdan geliyordu; burada bayt eşit değil,
+±%2 `SizeEqual` toleransının iki ucuna düşmüş iki bağımsız kalibrasyon. Skor
+farkı kodek seçiminden değil, bu bayt farkından geliyor — parça-2 satırı da
+%2,65 bayt farkı taşıyor ama 96 puanlık tavana yakın bölgede ek bitin getirisi
+düşük olduğundan skor farkı yine 0,02'de kalıyor; parça-3 orta bantta (65-66
+puan) olduğundan aynı büyüklükteki bayt farkı skoru daha çok oynatıyor.
+
+Kapıyı sıkılaştıran not: K4'ün 0,04 puanlık eşiği yalnız *bayt de eşit* olan
+çiftlerde geçerli. Bayt farkı %2'ye yaklaştığında eşik kendisi geçersiz —
+yeniden kurulmadı, gözlem olarak burada kayıtlı.
+
+### K6 — zorunlu-1080p eşiği yeni tabanla yeniden kuruldu
+
+Kural (175. satır): zorunlu-1080p skoru, aynı tabandaki düşük çözünürlüklü
+VidShrink satırıyla (alt sınır) ve HandBrake satırıyla (üst sınır) kıyaslanır.
+Üçü de `parça-2 @ 3,4999 MB`, üçü de Compatible kodek (K6 koşumu da kodek kolu
+Compatible'a sabitliyken koşuldu, yerleşimi izole etmek için):
+
+| satır | yerleşim | harm |
+|---|---|---|
+| alt sınır — VidShrink serbest yerleşim | 1152x648 | 71,01 |
+| K6 — VidShrink zorunlu 1080p | 1920x1080 | **89,67** |
+| üst sınır — HandBrake | 1920x1080 | 93,73 |
+
+Açık (üst − alt) = 22,72 puan. K6 alt sınırın üstünde kapattığı pay =
+89,67 − 71,01 = 18,66 puan → açığın **%82,1**'i.
+
+Kural yarıdan fazla kapamayı "yaşıyor" sayıyordu. %82,1 > %50, dolayısıyla
+**yerleşim hipotezi yaşıyor**: zorunlu 1080p'ye kilitlemek skor açığının
+büyük kısmını kapatıyor, tek başına yerleşim düşüşü açığın küçük bir parçası.
+
+### K4 ile K6'nın 1,72 puanlık HDR kararsızlığı arasındaki ilişki
+
+230. satırda ölçülen HDR bayrağı (`ColorGate`, `EncoderCapabilities.Probe`'un
+4 sn'lik yoklama bütçesi) K4 ve K6'nın hiçbirini bu turda etkilemedi —
+tur 2'nin on beş ölçümünün (5 yeni satır × 3 sütun) tamamında `ColorGate=Direct`
+kaydedildi, hiçbiri `ReferenceTransformed`e düşmedi. Yani bu turda gözlenen K4
+sapması (parça-3, 0,36 puan) o hatayla **ilgisiz** — kaynağı ayrı ve yukarıda
+izlendi (bayt yayılımı). İki bulgu birbirini açıklamıyor, ikisi de ayrı ayrı
+gerçek: HDR yolu hâlâ riskli (kod düzeltilmedi, `owns` dışında), K4'ün
+0,04 puanlık eşiği hâlâ yalnız bayt-eşit çiftlerde geçerli.
