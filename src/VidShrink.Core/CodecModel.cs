@@ -165,6 +165,9 @@ public static class CodecModel
     public static string? TurboFirstPassCeiling(string codec)
         => TurboFirstPassCeilings.TryGetValue(codec, out var preset) ? preset : null;
 
+    public static bool TurboFirstPassIsSafe(string codec)
+        => SupportsTurboFirstPass(codec);
+
     public static bool CostsQualityInHardware(string codec)
         => IsHardware(codec)
            && !codec.Equals("av1_nvenc", StringComparison.OrdinalIgnoreCase)
