@@ -952,3 +952,4 @@ T150 tur 2 muhurlenir, sonra T151.
 
 Bosalan yuvaya **T145** acildi (alti duvar saati bandi) — `owns` yalniz iki test dosyasi
 ve bir olcum belgesi, hicbiri T150 ile kesismiyor.
+- **T145** teslim edildi (tur 1). Kalan alti bandin hepsi karara baglandi: uc daraltildi (`UpdaterTests.cs:890` 60->5 sn, `:1141` 10->1 sn, `PerformanceCheckTests.cs:462` `YonPayi` 0,8->1,0), uc olculmus gerekceyle birakildi (`:915`/`:916` agsiz acilis 3 sn -- urun butceleri toplami 2887-2949 ms, daraltmak `src/**` ister; `:542` yon iddiasinin en dar hali). Uc daraltma mutasyonla sinandi, kol basina ayri gunluk. Sayim pimi 23'te kaldi. `:890` pencere acmadan olculdu (gecis kipi `Alert`ten once donuyor) -- DURDURULDU notunun tuzagi karsilandi. **Dal cakismasi:** `origin/T145-kalan-alti-bant` bos degildi, baska bir kosumun bes commit'i orada; zorla itilmedi, bu tur `T145-kalan-alti-bant-tur2` dalinda. Kararlar ayrisiyor, T0 secmeli. CI 33733262807.
