@@ -164,8 +164,13 @@ public static class CodecModel
     /// </para>
     /// <para>
     /// Satir tablodan cikarilmiyor cunku olculen sey tavanin yoklugu degil, tavanin
-    /// <b>kullanilamazligi</b>: iki gecise ayni <c>weightp</c> verilirse x264 turbosu calisiyor,
-    /// ama o argumani <c>FfmpegArguments</c> uretir ve bu tablo onu tasiyamaz.
+    /// <b>kullanilamazligi</b>: iki gecise ayni <c>weightp</c> verilirse x264 turbosu calisiyor.
+    /// O engel olculdu ve asilabilir oldugu goruldu; <c>Safe</c> yine de <c>false</c>, artik
+    /// baska bir sebeple: esitleme yapildiginda bile turbo uretim borusunda toplam sureyi
+    /// yalniz %0,58 - %4,44 kisaltiyor ve VMAF'tan 0,35 - 0,83 puan goturuyor; ayni olcumde
+    /// <c>libx265</c> turbosu %29,6 - %33,5 kazandirip VMAF'i dusurmuyor. x264'te ikinci gecis
+    /// toplamin buyuk yarisi ve ilk gecisin suresini cozme ile olcekleme belirliyor, on ayar
+    /// degil. Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
     /// </para>
     /// </summary>
     private static readonly IReadOnlyDictionary<string, TurboFirstPassEntry> TurboFirstPassCeilings =
