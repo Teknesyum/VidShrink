@@ -952,3 +952,14 @@ T150 tur 2 muhurlenir, sonra T151.
 
 Bosalan yuvaya **T145** acildi (alti duvar saati bandi) — `owns` yalniz iki test dosyasi
 ve bir olcum belgesi, hicbiri T150 ile kesismiyor.
+
+## Devam — 3 Eylul 2026
+
+T150 tur 2 ve T145 yeniden acildi. T150 kendi worktree'sinde 073a43a uzerinden K8'den
+devam ediyor, rebase yok. Uzak dal ayrisik oldugu icin yapiciya **itme yok** dendi;
+birlestirme ve itme T0'da, K9'un kaniti yerel tam suit.
+
+T145 bastan basliyor ama onceki kosumun bulgusu prompt'a gomuldu: canli baslatici
+bandlari (:890, :915, :916) modal kutu aciyor ve kutu aciklken olculen sey baslaticinin
+suresi degil. Yapiciya iki mesru kol verildi (saatten kurtar / kurulumu tamamlayip bassiz
+olc), sec ve dayanagini yaz.
