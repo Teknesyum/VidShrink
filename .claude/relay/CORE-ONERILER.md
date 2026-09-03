@@ -239,3 +239,38 @@ Kullaniciyi kesen sey ayni zamanda olcuyu de yalanci yapiyor.
 3. Bu depoya ozel: `LiveLauncherFact` bandlari kurulum eksikken **atlanmali**, kutu
    acmamali. `VIDSHRINK_LAUNCHER_EXE` var ama yanindaki `VidShrink.App.exe` yoksa
    `Skip` yine devreye girsin. Bugun oznitelik yalniz baslaticinin varligina bakiyor.
+
+## 0.8.0 kapiyi PowerShell'e de acti — dogru, ama T0'in defteri main'e ulasamiyor
+
+**Ne degisti.** 0.7.x'te `guard.js` yalniz Bash aracina bagliydi; PowerShell araci
+kancasizdi ve T0 butun birlestirme/itme islerini oradan yapiyordu. Bu bir acikti ve
+0.8.0 kapatti — dogru karar, kapinin sozu artik iki kabukta da geciyor.
+
+**Kalan sorun.** Kapi "main'e ulasan komut"u engelliyor ve acik sozlesme varken hicbir
+itme gecmiyor. Ama T0'in ittigi seylerin buyuk cogunlugu **uretim kodu degil, defterin
+kendisi**: `.claude/relay/contracts/*.md` durum notlari, `LOG.md` girdileri,
+`CORE-ONERILER.md`. Bunlar hicbir sozlesmenin `owns` kumesine girmez ve tam olarak
+"sozlesme aciktir" durumunu kaydeder.
+
+Bugun somut olarak: iki sozlesme yeniden acildi, durum notlari yazildi, commit yerelde
+kaldi. Oturum simdi kesilse **kesilen oturumdan kurtarma bilgisi uzakta yok** — kapinin
+korumak istedigi seyin tam tersi.
+
+**Kacamak yol da kapandi ve kapanmali.** `$env:TEKNESYUM_GATE_OPEN = "1"` komutun icinde
+atandiginda PreToolUse kancasina ulasmiyor (kanca komuttan once kosuyor). Yani belgedeki
+"run it with TEKNESYUM_GATE_OPEN=1" talimati pratikte uygulanamiyor: degiskeni ancak
+Claude surecinin kendi ortamina koyabilirsin, tur ortasinda koyamazsin.
+
+**Oneri.**
+
+1. Kapi `.claude/relay/**` disina cikmayan itmeyi gecirsin. Kural etkiye baksin: itilen
+   diff'te `src/`, `tests/`, `tools/` altinda **tek satir** yoksa bu defter itmesidir,
+   sozlesmeyi delmez. Bugun kapi komutun **metnine** bakiyor, dokundugu dosyalara degil —
+   ayni kusurun baska bir yuzu `izin-kurali-yazima-bakiyor` olarak zaten kayitli.
+2. `TEKNESYUM_GATE_OPEN` yerine kancanin okuyabilecegi bir isaret olsun: tek kullanimlik
+   bir dosya (`live/_kapi-acik`) ya da `contract.js` uzerinden verilen bir jeton. Ortam
+   degiskeni tur ortasinda kurulamadigi icin belgedeki cikis yolu bugun sahte.
+3. Kanca deponun **kokunu** okumaya devam ediyor. Kok bugun yine geride kaldi
+   (`359f37c`) ve muhurlu T149'u `submitted` gosterdi; kok `origin/main`e hizalanana
+   kadar yanlis liste bastirdi. Onceki oneri hala gecerli: relay dizini
+   `git rev-parse --git-common-dir` ile cozulsun, kokun HEAD'ine guvenilmesin.
