@@ -6,16 +6,23 @@ izgarasindan cikiyor.
 Her satirdaki sayi yukaridaki tablolarin bir hucresidir; recete kendi sayisini
 uretmiyor.
 
+**Satir numaralari `origin/main` `55f245a`ta okundu.** Bu olcumun dali daha eski
+bir tabandan ayrildigi icin ayni sabitler burada 65 satir yukarida duruyor;
+uygulama sozlesmesi once **sembol adiyla** arasin, satir numarasi yalniz
+kolaylik icindir. Sabitlerin **degerleri** iki agacta da ayni, yani olcum
+gecerli.
+
 ### R1 — haritanin `-g` kolu kaldirilir, tavan tek degere sabitlenir
 
 | ne | deger |
 |---|---|
 | dosya | `src/VidShrink.Core/FfmpegArguments.cs` |
-| satir | 233-253 (`KeyframeCeilingSeconds(SceneMap?)` govdesi) |
+| satir | 298-318 (`KeyframeCeilingSeconds(SceneMap?)` govdesi) |
 | eski | `Math.Clamp(mappedMedianSeconds / SceneMapMergeFactor, KeyframeCeilingMinSeconds, KeyframeCeilingMaxSeconds)` |
 | yeni | `KeyframeCeilingDefaultSeconds` (govde tek satira iner, `scenes` parametresi dusler) |
-| birlikte olen sabitler | 218 `SceneMapThresholdOfRecord`, 219 `SceneMapGroundTruthCutsInWindow`, 220 `SceneMapMappedCutsInWindow`, 221 `SceneMapMergeFactor`, 222 `KeyframeCeilingMinSeconds`, 223 `KeyframeCeilingMaxSeconds` |
-| birlikte olen dal | 263 `fromMap` her zaman `false` olur; `KeyframeRange.FromSceneMap` yalniz donanim/yazilim ayrimini tasir hale gelir |
+| birlikte olen sabitler | 284 `SceneMapGroundTruthCutsInWindow`, 285 `SceneMapMappedCutsInWindow`, 286 `SceneMapMergeFactor`, 287 `KeyframeCeilingMinSeconds`, 288 `KeyframeCeilingMaxSeconds` |
+| **olmeyen** sabit | 283 `SceneMapRuleOfRecord` — sahne **tarama** esigi, tavan koluyla ilgisi yok; bes olcu ve `OluUyeTests.cs:428` ona bakiyor |
+| birlikte olen dal | 328 `fromMap` her zaman `false` olur; `KeyframeRange.FromSceneMap` yalniz donanim/yazilim ayrimini tasir hale gelir |
 
 **Dayanak.** Kolun butun erisim alani `[5,0 ; 10,0]`. Izgarada 5 sn ile 10 sn
 arasindaki fark sekiz hucrenin sekizinde de esigin (0,20 p10) altinda kaliyor,
@@ -61,20 +68,20 @@ pimliyor; R1 onlari yapisi geregi kizartir, uygulama sozlesmesi bunlari
 **silmez, yeniden temellendirir** ve her birinin ustundeki gerekce cumlesini de
 yeniler:
 
-| olcu | yer |
-|---|---|
-| `Kiskacin_alt_ucu_bes_saniyede_bagliyor` | `FfmpegArgumentsTests.cs:763` |
-| `Kiskacin_ust_ucu_on_saniyede_bagliyor` | `FfmpegArgumentsTests.cs:778` |
-| `Duzeltme_olculen_pencerede_gercek_cekim_uzunlugunu_uretir` | `FfmpegArgumentsTests.cs:747` |
-| harita/haritasiz `-g` cifti | `EncodeRunnerTests.cs:237-238`, `:382-383` |
-| onizleme parcasinin haritali araligi | `PreviewSegmentTests.cs:270` |
+| olcu | yer | R1'den sonra ne olur |
+|---|---|---|
+| `Kiskacin_alt_ucu_bes_saniyede_bagliyor` | `FfmpegArgumentsTests.cs:894` | 60 fps'te `-g 300` yerine `600` gelir; ikinci iddia (`KeyframeCeilingMinSeconds == 5.0`) derlenmez |
+| `Kiskacin_ust_ucu_on_saniyede_bagliyor` | `FfmpegArgumentsTests.cs:909` | deger dogru kalir (`600`) ama `KeyframeCeilingMaxSeconds` iddiasi derlenmez |
+| `Duzeltme_olculen_pencerede_gercek_cekim_uzunlugunu_uretir` | `FfmpegArgumentsTests.cs:878` | `SceneMapGroundTruthCutsInWindow` ustunden kuruluyor; kol olunce iddiasi kalmaz |
+| harita/haritasiz `-g` cifti | `EncodeRunnerTests.cs:237`, `:382` | ikisi de `KeyframeCeilingMinSeconds`i okuyor |
+| onizleme parcasinin haritali araligi | `PreviewSegmentTests.cs:270`, `:342` | ayni sabiti okuyor |
 
 ### R2 — yazilim tavani 10 sn'nin ustune, **kapili**
 
 | ne | deger |
 |---|---|
 | dosya | `src/VidShrink.Core/FfmpegArguments.cs` |
-| satir | 217 |
+| satir | 282 |
 | sabit | `KeyframeCeilingDefaultSeconds` |
 | eski | `10.0` |
 | aday yeni | `15.0` |
@@ -109,7 +116,7 @@ yeniden temellendirilir: medyani 30 sn olan harita 60 fps'te `-g 900` uretmeli.
 kizarir.
 
 **Yan etki uyarisi.** `Donanimda_ust_sinir_haritadan_etkilenmez`
-(`FfmpegArgumentsTests.cs:812`) donanim tavaninin yazilim varsayilanindan
+(`FfmpegArgumentsTests.cs:942`) donanim tavaninin yazilim varsayilanindan
 **kisa** oldugunu iddia ediyor. R2 ile R3 birlikte uygulanirsa 10,0 < 15,0
 olarak dogru kalir; yalniz R3 uygulanirsa (10,0 vs 10,0) bu olcu kizarir.
 
@@ -118,7 +125,7 @@ olarak dogru kalir; yalniz R3 uygulanirsa (10,0 vs 10,0) bu olcu kizarir.
 | ne | deger |
 |---|---|
 | dosya | `src/VidShrink.Core/FfmpegArguments.cs` |
-| satir | 224 |
+| satir | 289 |
 | sabit | `HardwareKeyframeCeilingSeconds` |
 | eski | `5.0` |
 | yeni | `10.0` |
@@ -142,7 +149,7 @@ dogrudan atlama butcesini secmek demek; bugunku 5,0 o butceyi kalitenin
 belirgin zararina daraltiyor.
 
 **Sabitleyecek olcu.** `Donanim_ust_siniri_bes_saniyede_sabit`
-(`FfmpegArgumentsTests.cs:793`) yeniden temellendirilir: uzun sahneli harita
+(`FfmpegArgumentsTests.cs:924`) yeniden temellendirilir: uzun sahneli harita
 60 fps'te `-g 600` almali, 300 degil. **Kirmasi gereken mutasyon:** sabiti
 5,0'da birakmak `-g 300` verir ve olcu kizarir.
 
@@ -153,7 +160,7 @@ sozlesmesi kararini bu iki sayiya birlikte bakarak verir.
 
 ### Degistirilmeyecekler
 
-- `KeyframeFloorSeconds = 1.0` (satir 216). Izgara alt ucu 2 sn; 2 sn'nin 10
+- `KeyframeFloorSeconds = 1.0` (satir 281). Izgara alt ucu 2 sn; 2 sn'nin 10
   sn'ye gore farki sekiz hucrenin sekizinde de negatif ve buyuk
   (`-0,481` ile `-30,717` arasi). Kisa uc icin degisiklik onerilmiyor.
 - Kiskacin **alt** ucunun 2 sn'ye indirilmesi. Ayni sayilar bunu dogrudan

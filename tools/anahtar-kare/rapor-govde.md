@@ -227,13 +227,13 @@ sinifta degil:
    Ayni deger bagimsiz olarak dogrulanmis olmaz; yalniz ayni degeri secen bir
    ikinci uygulama vardir.
 4. **Atlama maliyeti** — **tavanin ucu icin olculmemis.** Ayni dosyada bir
-   atlama sayisi var (`FfmpegArguments.cs:139-140`: ortalama kuralinda 202,6 ms,
+   atlama sayisi var (`FfmpegArguments.cs:184-185`, `origin/main` `55f245a`: ortalama kuralinda 202,6 ms,
    medyan kuralinda 154,9 ms, "%24 less seek"), ama o sayi **baska bir secimi**
    temellendiriyor — tavanin ortalamadan mi medyandan mi okunacagini. Kiskacin
-   ust ucunun neden 10,0 oldugunu anlatan paragrafta (`:189-192`) atlama gecmiyor;
+   ust ucunun neden 10,0 oldugunu anlatan paragrafta (`:249-252`) atlama gecmiyor;
    orada gerekce "5 s zaten kazancin %87'sini tasiyor" ve "10 s'in ustunde tavan
    artik baglamiyor". `HardwareKeyframeCeilingSeconds`in "the seek budget itself"
-   cumlesinin (`:194-199`) altinda ise hic sayi yok.
+   cumlesinin (`:255-260`) altinda ise hic sayi yok.
 
    T113 atlamayi olctu ama sordugu soru bu degildi (haritali/haritasiz cift), ve o
    olcum bu sabitlerden **sonra** yapildi.
