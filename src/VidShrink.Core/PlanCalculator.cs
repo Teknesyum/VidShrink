@@ -438,6 +438,14 @@ public static class PlanCalculator
     /// <c>slow</c> weightp=2 kosar ve x264 ikinci gecisi
     /// <c>different weightp setting than first pass (2 vs 1)</c> diyerek hic acmaz —
     /// kullanici sifir bayt cikti alir. Olcum: <c>docs/olcumler/uretim-yolu.md</c>.
+    /// <para>
+    /// O uyusmazlik iki gecise ayni <c>weightp</c> yazilarak asilabiliyor ve bu kol yine de
+    /// x264'u acmiyor: esitlenmis turbo uretim borusunda toplam sureyi %0,58 - %4,44
+    /// kisaltip VMAF'tan 0,35 - 0,83 puan goturuyor, ayni olcumde <c>libx265</c> %29,6 - %33,5
+    /// kazandirip VMAF'i dusurmuyor. Kazanc ilk gecisin on ayarindan degil, kodlayicinin
+    /// toplam sure icindeki payindan geliyor; x264'te o pay kucuk.
+    /// Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+    /// </para>
     /// </summary>
     private static bool TurboFirstPassIsSafe(string codec)
         => codec.Equals("libx265", StringComparison.OrdinalIgnoreCase);

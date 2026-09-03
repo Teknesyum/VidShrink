@@ -12,6 +12,13 @@ namespace VidShrink.Tests;
 /// bayt olur. Bu olculer tablonun vaadini degil <b>karari</b> pimler: hangi kodek turboya
 /// gercekten acilabilir ve uretim yolu tam olarak o kumeyi mi aciyor.
 /// Olcum: <c>docs/olcumler/turbo-x264-mayini.md</c>.
+/// <para>
+/// Sifir bayt duvari asilabilir — iki gecise ayni <c>weightp</c> yazmak yetiyor — ve x264
+/// yine acilmadi: esitlenmis turbo uretim borusunda %0,58 - %4,44 kazandirip VMAF'tan
+/// 0,35 - 0,83 puan goturuyor, <c>libx265</c> ayni olcumde %29,6 - %33,5 kazandirip VMAF'i
+/// dusurmuyor. Bu olculer o karari pimler; kararla birlikte dusmeleri beklenir.
+/// Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+/// </para>
 /// </summary>
 public sealed class TurboTavanTests
 {
