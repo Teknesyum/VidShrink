@@ -233,6 +233,14 @@ $ sed 's/^ *//' list-FfmpegArgumentsTests.txt | awk -F'.' '{print $1"."$2"."$3}'
 
 Sıfır bulan kol yok. 4 + 66 = 70, birleşik koşumun bulduğu sayıyla aynı.
 
+CI: koşum `33745907561`, `sha 40387acd4f676578e3a294fb1c241a5b1a0a57bc`,
+`completed success` (`test in 27m58s`, iş kimliği `100618196109`).
+https://github.com/Teknesyum/VidShrink/actions/runs/33745907561
+
+Bu satırın eklendiği commit yalnız `docs/**` değiştiriyor; `ci.yml` `paths-ignore` o yolu
+dışarıda bıraktığı için yeni koşum başlamaz. Yukarıdaki yeşil okuma dalın kod ucunun
+okumasıdır ve kod o commit'ten sonra değişmedi.
+
 ## Kalan borç
 
 - `PlanCalculator`ın `private static bool TurboFirstPassIsSafe(string codec)` metodu artık
