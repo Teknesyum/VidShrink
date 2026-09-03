@@ -313,3 +313,47 @@ kaldi, mühür gecti. Bu bir yama, kural degil.
 3. `contract.js audit` reddederken **ne yapilacagini** soylesin: "kaydi olusturmak icin
    ajana kokten tek salt-okuma komutu kosturun" satiri, bastan denetim kosturmanin
    onune gecer. Bugunku metin cozumu degil yalniz reddi bildiriyor.
+
+## Bayat agac kusuru besinci kez: `Stop` kapisi muhurlenmis sozlesmeyi "submitted" sandi
+
+**3 Eylul 2026, olculdu.** `Stop` kancasi turu kesip "T145, T151 is submitted and still
+waiting on you" dedi. Ikisi de o anda **muhurluydu**; uc kaynaktan dogrulandi:
+
+```
+git ls-tree --name-only origin/main .claude/relay/contracts/done/
+  -> .claude/relay/contracts/done/T145.md
+  -> .claude/relay/contracts/done/T151.md
+depo kokunde  .claude/relay/contracts/done/T145.md  -> YOK
+T0 worktree'sinde                                    -> VAR
+```
+
+**Neden.** Kanca depo **kokunun** calisma agacini okuyor. Kok `79adefa`ta **ayrik HEAD**te
+duruyordu — muhurlerden onceki bir commit. T0 kendi worktree'sinde calisiyor ve muhurler
+oraya, oradan da `origin/main`e gitti; kok hicbir zaman ilerletilmedi. Kokte ayrica dort
+bayat yerel degisiklik birikmisti (`HANDOFF.md`, `LOG.md`, `T145.md`, `T151.md`) — hepsi
+`main`deki halin eskimis kopyasi.
+
+`HANDOFF.md` de ayni agactan uretildigi icin **kendisi de yanlisti**: "Contracts open"
+listesi T145 ve T151'i `active` gosteriyordu, "Tree" bolumu `branch: HEAD` yaziyordu.
+Yani kancanin urettigi durum ozeti, kancanin kendi yanilgisinin kaydi haline geldi.
+
+**Bu sinifin besinci yuzu.** Digerleri: (1) ayni `Stop` kancasi T148'i "submitted" sandi;
+(2) `contract.js audit` `live/` kaydini cwd'den cozup yanlis worktree'de aradi;
+(3) denetci gitignore'daki worktree-yerel dosyayi goremedi (T141, T145, T151);
+(4) canli kayit kancasi cwd depo disindayken yazmayi sessizce dusurdu;
+(5) bu.
+
+### Oneri
+
+1. **Kanca `.claude/relay/`yi cwd'den ya da depo kokunden degil, oturumun proje
+   kokunden cozsun.** Ayni oneri (2) ve (4)'te de yazildi; ucuncu kez ayni tek satirlik
+   kok neden. Tek yerde cozulurse bes yuz birden kapanir.
+2. **Kanca okudugu agacin HEAD'ini kendi mesajina bassin.** "T145 submitted" yerine
+   "T145 submitted (79adefa agacinda okundu)" deseydi kusur ilk turda gorulurdu; bes tur
+   surdu.
+3. **Ayrik HEAD uyarisi.** Kok ayrik HEAD'deyse ve `origin/main` ilerideyse kanca durum
+   uretmeden once bunu soylesin. Bugun sessizce bayat veri uretti.
+
+**Gecici cozum (uygulandi):** kok agac temizlenip guncel `origin/main`e (`cea77e3`)
+yeniden ayrildi. Bu elle yapilan bir istir ve her muhur turundan sonra tekrar gerekir —
+kalici cozum (1)'dir.
