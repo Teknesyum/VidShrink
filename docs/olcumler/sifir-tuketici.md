@@ -177,22 +177,28 @@ Izgara **tur 2'de bastan kosuldu**: pim 27'den 26'ya temellendigi icin tur 1'in 
 kanitlari gecersizdi. Her hucrede once `dotnet build -c Release --no-incremental`, sonra
 duz `dotnet test -c Release --filter "OluUyeTests"` kosuldu. **`--no-build` hicbir kolda
 kullanilmadi** (tur 1 onu derlemeden hemen sonraki kosumda kullanmisti; tur 2 bunu da
-kaldirdi). Derleme hatasi sayisi her kosumda 0, agac `HEAD` = rebase sonrasi dal.
+kaldirdi). Derleme hatasi sayisi her kosumda 0, agac `073a43a` (rebase sonrasi dal tepesi).
 
 | # | mutasyon | beklenen | eski kol | yeni kol |
 |---|---|---|---|---|
-| 1 | `EncoderVendor`e `Rkmpp` uyesi + `CodecModel.Vendor`da `c.Contains("rkmpp")` uretici satiri | kirmizi (sayi 26 → 27) | 11/11 yesil, `sifir tuketici: 26` | `Basarisiz: 1, Basarili: 10`, `sifir tuketici: 27`, cikis kodu 1 |
-| 2 | `QualityArgs`a acik `EncoderVendor.Software => new[] { "-crf", exact }` kolu | kirmizi (sayi 26 → 25) | 11/11 yesil, `sifir tuketici: 26` | `Basarisiz: 1, Basarili: 10`, `sifir tuketici: 25`, cikis kodu 1 |
+| 1 | `EncoderVendor`e `Rkmpp` uyesi + `CodecModel.Vendor`da `c.Contains("rkmpp")` uretici satiri | kirmizi (sayi 26 → 27) | `Geçti: 11`, `sifir tuketici: 26`, cikis kodu 0 | `Geçti: 10  Başarısız: 1`, `sifir tuketici: 27`, cikis kodu 1 |
+| 2 | `QualityArgs`a acik `EncoderVendor.Software => new[] { "-crf", exact }` kolu | kirmizi (sayi 26 → 25) | `Geçti: 11`, `sifir tuketici: 26`, cikis kodu 0 | `Geçti: 10  Başarısız: 1`, `sifir tuketici: 25`, cikis kodu 1 |
 
 **Eski kol (iki mutasyon icin de ayni taban).** Rebase sonrasi, mutasyonsuz agac:
 
 ```
+$ dotnet build -c Release --no-incremental        → 0 Hata
+$ dotnet test -c Release --filter "OluUyeTests" --logger "console;verbosity=detailed"
+
 dosya: 70  uye: 129
 sifir tuketici: 26  hic kullanilmayan: 5
 uye: 129  bu dosyada adi gecmeyen: 93  pimlenen: 31
-Test Calistirmasi Basarili.
-Toplam test sayisi: 11
-     Gecti: 11
+mesru: 9  borc: 22
+
+Test Çalıştırması Başarılı.
+Toplam test sayısı: 11
+     Geçti: 11
+cikis kodu: 0
 ```
 
 **Mutasyon 1 — yeni sifir tuketicili uye.** `Rkmpp` uretiliyor, hicbir yerde okunmuyor.
@@ -204,9 +210,18 @@ dosya: 70  uye: 130
 sifir tuketici: 27  hic kullanilmayan: 5
 uye: 130  bu dosyada adi gecmeyen: 94  pimlenen: 31
 
-Expected: [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ...]
-Actual:   [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Rkmpp  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", ...]
-Basarisiz! - Basarisiz: 1, Basarili: 10, Atlanan: 0, Toplam: 11
+EncoderVendor.Rkmpp [enum] SIFIR-TUKETICI uretim=1 tuketim=0 disarida=0 maskeli=0
+    U uretim               src/VidShrink.Core/CodecModel.cs:134  if (c.Contains(       )) return EncoderVendor.Rkmpp;
+
+  Başarısız VidShrink.Tests.OluUyeTests.TheZeroConsumerSetIsThePinnedSet [244 ms]
+   Assert.Equal() Failure: Collections differ
+Expected: [···, "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"···, "FillPolicy.QualityCeiling  varsayilan-kol", ···]
+Actual:   [···, "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Rkmpp  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"···, ···]
+
+Test Çalıştırması Başarısız.
+Toplam test sayısı: 11
+     Geçti: 10
+     Başarısız: 1
 cikis kodu: 1
 ```
 
@@ -219,10 +234,17 @@ kume yansimadan buyudu, pim listesi 31'de kaldi.
 ```
 dosya: 70  uye: 129
 sifir tuketici: 25  hic kullanilmayan: 5
+uye: 129  bu dosyada adi gecmeyen: 93  pimlenen: 31
 
-Expected: [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"...]
-Actual:   [..., "ConversionQualityMode.Bitrate  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"..., "FillPolicy.QualityCeiling  varsayilan-kol", ...]
-Basarisiz! - Basarisiz: 1, Basarili: 10, Atlanan: 0, Toplam: 11
+  Başarısız VidShrink.Tests.OluUyeTests.TheZeroConsumerSetIsThePinnedSet [215 ms]
+   Assert.Equal() Failure: Collections differ
+Expected: [···, "ConversionQualityMode.Bitrate  varsayilan-kol", "EncoderVendor.Software  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"···, "FillPolicy.QualityCeiling  varsayilan-kol", ···]
+Actual:   [···, "ConversionQualityMode.Bitrate  varsayilan-kol", "FfmpegArguments.SceneMapRuleOfRecord  yalniz-disar"···, "FillPolicy.QualityCeiling  varsayilan-kol", "HardwareVerdictReason.BitrateFloorTooHigh  varsayi"···, ···]
+
+Test Çalıştırması Başarısız.
+Toplam test sayısı: 11
+     Geçti: 10
+     Başarısız: 1
 cikis kodu: 1
 ```
 
@@ -232,11 +254,16 @@ yuklendi; sonra yeniden derlenip kosuldu:
 ```
 $ git diff src/VidShrink.Core/CodecModel.cs
 (cikti bos)
-$ git diff --stat src/VidShrink.Core/CodecModel.cs
-(cikti bos)
+$ dotnet build -c Release --no-incremental        → 0 Hata
+$ dotnet test -c Release --filter "OluUyeTests" --logger "console;verbosity=detailed"
+
 dosya: 70  uye: 129
 sifir tuketici: 26  hic kullanilmayan: 5
-     Gecti: 11
+uye: 129  bu dosyada adi gecmeyen: 93  pimlenen: 31
+
+Test Çalıştırması Başarılı.
+Toplam test sayısı: 11
+     Geçti: 11
 cikis kodu: 0
 ```
 
@@ -254,7 +281,7 @@ cumlesi tasidigini ve kararin taninan iki degerden biri oldugunu dogruluyor.
 - **`mesru`** — uyenin okuma tarafinda adlandirilmamasi kasitli, gerekcesi kodda ya da
   bir olcumde yazili. Bugun 9 satir.
 - **`borc`** — T150 bu uyeyi **siniflamadi**. Mesru oldugu gosterilmedi, kaza oldugu da
-  gosterilmedi. Bugun 23 satir. Bu satirlar "gerekcesiz" degil; gerekce yerine **neyin
+  gosterilmedi. Bugun 22 satir. Bu satirlar "gerekcesiz" degil; gerekce yerine **neyin
   olculmedigi** yaziyor. Dusurmek uretim davranisini degistirdigi ve cogu bu sozlesmenin
   `owns` listesi disinda oldugu icin karar ayri bir sozlesmenin isi.
 
@@ -419,22 +446,116 @@ Toplam test sayisi: 11
      Gecti: 11
 ```
 
+## K8 — Eskiyen sayilar cikarildi
+
+Pim 27'den 26'ya temellendi. Rapordaki her sayi tarandi; iddia olarak duran 27'ler
+cikarildi, geriye yalniz **tarihi anlatan** ya da **mutasyonun urettigi** 27'ler kaldi.
+
+```
+$ grep -n "27" docs/olcumler/sifir-tuketici.md
+176:Izgara **tur 2'de bastan kosuldu**: pim 27'den 26'ya temellendigi icin ...
+184:| 1 | ... | kirmizi (sayi 26 → 27) | ... | `sifir tuketici: 27`, cikis kodu 1 |
+210:sifir tuketici: 27  hic kullanilmayan: 5
+272:dustu (28 → 27; ikisi de K5-oncesi/K5-sonrasi olculmus, rebase oncesi degerlerdir ...
+429:listesinden cikarildi (32 → 31 satir), sayi 27 → 26. ...
+```
+
+Bes eslesmenin hicbiri "bugunku sayi 27" demiyor:
+
+| satir | ne diyor | neden mesru |
+|---|---|---|
+| 176 | pimin **eski** degeri | Izgaranin neden bastan kosuldugunu anlatiyor; cumlenin kendisi 26'yi soyluyor. |
+| 184 | mutasyon 1'in **beklentisi** ve yeni kolun ham sayisi | Mutasyon sayiyi 26'dan 27'ye cikariyor; 27 mutasyonlu agacin degeri. |
+| 210 | mutasyon 1'in **ham ciktisi** | Kosumdan birebir kopya. Degistirilirse kanit olmaktan cikar. |
+| 272 | K5'in kendi olcumu (28 → 27) | Rebase oncesi agacin degerleri; ayni cumle "bugunku taban 26" diyerek isaretliyor. |
+| 429 | K7'nin karar cumlesi | Degisimin kendisini yaziyor: 27 → 26. |
+
+Ayni tarama iki eskiyen sayi daha buldu ve ikisi de duzeltildi: `mesru`/`borc` dagilimi
+"9 + 23" yaziyordu, olcunun bugunku ciktisi `mesru: 9  borc: 22` (pim 32'den 31 satira
+indi). Mutasyon izgarasinin dort hucresi tur 1'in `Basarisiz: 1, Basarili: 10` ozetini
+tasiyordu; hepsi bu turun kendi kosumlarindan yeniden yazildi (K10).
+
 ## K9 — Tam suit, birlesik agacta
 
 Agac: rebase edilmis `T150-sifir-tuketici`, tum kod ve rapor degisiklikleri uygulanmis.
 
 ```
 $ git rev-parse HEAD
-K9_HEAD
+073a43a21b4c5a5985202b92055c2c8068e5d605
 
 $ git diff HEAD...origin/main -- src/ tests/
-K9_DIFF
+(cikti bos)
+
+$ git diff --stat HEAD...origin/main -- src/ tests/
+(cikti bos)
 
 $ dotnet test -c Release
-K9_SUIT
+Basarili!  - Basarisiz:     0, Basarili:  1494, Atlanan:    17, Toplam:  1511, Sure: 12 m 40 s - VidShrink.Tests.dll (net8.0)
+cikis kodu: 0
 ```
+
+Toplam **1511**. Tur 1'in beyan ettigi 1503 dalin tek basina toplamiydi; aradaki 8 test
+`main`in getirdigi `EncoderStateConsumptionTests` (T139, `5df0a98`). Suit `073a43a`
+tepesinde kosuldu; o commit'ten sonra yalnizca bu rapor duzenlendi, `src/` ve `tests/`
+altinda tek bayt degismedi. Kosumda `VIDSHRINK_LAUNCHER_EXE` **kurulmadi**, yani
+`UpdaterTests`in canli baslatici bantlari uyandirilmadi — 17 atlanan testin kaynagi bu ve
+donanim/ffmpeg isteyen canli bantlar.
+
+**CI kosumu bu turda yok.** Uzaktaki `T150-sifir-tuketici` dali tur 2'nin rebase'inden
+once itilmisti; yerel tarih ayristi ve `git push` non-fast-forward reddediyor. Uzak dalin
+tarihini yeniden yazmak T0'in kullanicidan onay alacagi bir is oldugu icin bu tur **hic
+itilmedi**; K9'un kaniti yukaridaki yerel kosumdur. Tur 1'in CI kosumu (`33688802430`,
+`completed success`) rebase oncesi agacindir, bu agacin kaniti degildir.
 
 `git diff HEAD...origin/main` ucuncu nokta bicimidir: `main`in ortak atadan sonra
 tasidigi ve bu agacta **olmayan** her sey. Bos olmasi `main`de olup dalda bulunmayan
 `src/`/`tests/` degisikligi kalmadigi anlamina gelir — tur 1'in yanlis beyani tam
 buradan cikmisti, o zaman diff bos degildi (12 dosya, +286).
+
+
+## K11 — Iki borc kapandi
+
+### 1. `alan-okumasi` kolu tabloya girdi
+
+Tuketici kurallari tablosunda sekizinci satir yok gorunuyordu: `MemberScan.Classify`
+(`OluUyeTests.cs:189-190`) `Kind == "alan"` gorunce dilbilgisi kurallarina hic bakmadan
+`(true, "alan-okumasi")` donuyor. Kural tabloya yazildi ve altindaki "bunlarin hicbirine
+uymayan her gorunum uretimdir" cumlesi **enum uyeleriyle sinirlandi** — alan uyeleri icin
+yanlisti. Ayni yerde olcunun bu yuzden neyi kaciracagi da yazildi: bir alan uyesi `src/**`
+altinda bir kez bile gorulurse tuketilmis sayilir, dolayisiyla hicbir alan uyesi
+`varsayilan-kol` bicimine dusemez; uretimde yalnizca **yazilan** bir alan olcuden kacar.
+Bu bir yanlis negatif kaynagidir, kalan borcun 1. maddesi.
+
+### 2. Uc bayat satir atfi — her biri yeniden olculdu
+
+Denetci uc atfin bayat oldugunu bildirdi. Ucu de bu turda kendim olculdu; **ikisi
+denetcinin verdigi sayiyla ayni cikti, ucuncusu cikmadi.**
+
+```
+$ grep -n "" src/VidShrink.Core/CodecModel.cs | sed -n '141,145p'
+141:    /// are carried to instead of asking whether the vendor is a chip.
+142:    /// VideoToolbox is a chip and is still false here: nothing behind this gate has been measured
+143:    /// on it. docs/olcumler/videotoolbox.md gives one bitrate per arm on one Apple M1, which is not
+144:    /// enough for any of them. Opening this gate for VideoToolbox is a measurement, not an edit.
+145:    /// </summary>
+
+$ grep -n "sceneMap" src/VidShrink.Ffmpeg/QualityMeter.cs
+294:            return AggregateVmaf(scores, frameRate, referenceStartSeconds ?? 0, sceneMap);
+
+$ grep -n "BelowFloor\|AboveSourceCeiling" src/VidShrink.App/MainWindow.axaml.cs
+2494:            QualityTargetBound.BelowFloor => Say("main.quality.below-floor", target, reached),
+2495:            QualityTargetBound.AboveSourceCeiling => Say("main.quality.above-ceiling", target, reached),
+
+$ grep -n "" src/VidShrink.App/MainWindow.axaml.cs | sed -n '2496p'
+2496:            _ => ""
+```
+
+| atif | eski | denetcinin verdigi | olculen | yazilan |
+|---|---|---|---|---|
+| VideoToolbox docstring'i (`CodecModel.cs`) | 142-146 | 142-144 | 142-144 | 142-144 |
+| `sceneMap` tasimasi (`QualityMeter.cs`) | 295 | 294 | 294 | 294 |
+| `QualityTargetBound` kollari (`MainWindow.axaml.cs`) | 2480-2482 | 2481-2483 | **2494-2496** | 2494-2496 |
+
+Ucuncusunde denetcinin sayisi da bayatti: `BelowFloor` 2494, `AboveSourceCeiling` 2495,
+`_ => ""` 2496. `OluUyeTests.cs`'deki `QualityTargetBound.Reached` gerekcesi olculen
+sayiyla yazildi, denetcinin sayisiyla degil.

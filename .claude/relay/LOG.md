@@ -923,3 +923,4 @@ Iki kapi kusuru yakaladi ve ikisi de gercekti:
 T139'un sonraki sozlesmesi **T151** (`PickFastCodec` ilk olculmemis adayda duruyor),
 denetcinin altinci borcundan dogdu. T146'nin engeli kalkti.
 - **T150** teslim edildi. Sifir tuketici sinifi olculebilir oldu: kume yansimayla turden turetiliyor, sayi 32 satirla pimlendi (27 sifir tuketici + 5 hic kullanilmayan), iki mutasyon kirmizi. T0 onculunun 63/1 ikilemi kapandi. K5 ile `QualityArgs` mayini kapandi; VideoToolbox kapisi acilmadi. Dal `T150-sifir-tuketici`.
+- T150 tur 2 tamamlandi: K8-K11 kapandi, pim 26, tam suit 1511 yesil (yerel), CI yok — uzak dal ayrismasi.
