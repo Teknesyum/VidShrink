@@ -207,3 +207,5 @@
 {"id":"T153","result":"stale","at":"2026-09-03T10:56:07.232Z"}
 {"id":"T154","result":"stale","at":"2026-09-03T10:56:07.232Z"}
 {"id":"T153","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"TurboTavanTests|FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"956ea147117203dc1523d9cafa9619b289772e3f","at":"2026-09-03T11:16:03.463Z"}
+{"id":"T152","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"dde523ce24490802321fb00d318e5a8f1955b2f9","at":"2026-09-03T11:27:34.581Z"}
+{"id":"T154","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|QualityMeterTests","code":0},{"step":"node \"C:\\Users\\Administrator\\.claude\\plugins\\cache\\teknesyum\\teknesyum-core\\0.8.0\\scripts\\manset.js\" \"docs/olcumler/harita-kablosu-pim.md\"","code":0}],"auditorRunId":null,"headSha":"dde523ce24490802321fb00d318e5a8f1955b2f9","at":"2026-09-03T11:28:29.205Z"}

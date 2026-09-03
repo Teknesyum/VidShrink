@@ -1,0 +1,15 @@
+{
+  "contractId": "T152",
+  "auditorRunId": "a050c041c904d306d",
+  "headSha": "dde523ce24490802321fb00d318e5a8f1955b2f9",
+  "diffHash": "f4e1a21dc03e5fc2fc8241ac07f54c81ec375fec4d2f3a115aa30bc5932f2e1a",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs"
+  ],
+  "verification": [
+    "Bagimsiz klonda 0fa30a7: uc dal uc ayri dizge (PlanCalculator.cs:909); K2 kirmizisi --no-incremental ile yeniden uretildi (3/31/34); uc mutasyonun izgarasi birebir tuttu; tasarim gerekcesi ikinci-sorgu yeniden yazimiyla dogrulandi (dusen dort olcu tam olarak adlandirilanlar); --list-tests 34+32=66, olu kol yok; CI 33746360125 success headSha 0fa30a7; owns temiz. KRITIK yok, dort borc."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T11:26:46.241Z"
+}

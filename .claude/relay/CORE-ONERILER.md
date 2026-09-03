@@ -467,3 +467,71 @@ Ayni kor nokta `Stop` kapisinda da olculmustu (bu belgede bir ust bolum).
 4. **cwd deligini kapat.** `unfinished` relay kokunu cwd'den cozuyor; komutta `git -C`
    varsa onun hedefinden coz. Bugun kapinin etrafindan dolasmak icin proje disindan
    kosmak yetiyor.
+
+
+## `complete` denetim kaydini gormezden gelip "kimse okumadi" diyor
+
+**Olcum, 3 Eylul 2026.** Core 0.8.0. T152 ve T154 icin `audit` ile `complete` arka arkaya,
+aralarinda commit olmadan kosturuldu. Ikisinde de:
+
+```
+Audit record written: .claude\relay\audits\T152-1.json
+T152 complete -> contracts/done/T152.md
+  risk low
+  Sealed with no audit record: nobody but the builder read this work.
+```
+
+Kayit **yaninda duruyor** ve dogru turu tasiyor. `contract.js:883`:
+
+```js
+if (level.level === 'high') {
+  recordFile = seal.recordPath(c.relay, c.id, round);
+  record = require('../hooks/lib.js').read(recordFile);
+  ...
+}
+```
+
+Kayit yalniz **yuksek riskte** okunuyor. Dusuk riskte `record` null kaliyor ve `:938`
+"kimse okumadi" cumlesini basiyor. Yani cumle riskin degil **denetimin** yoklugunu
+soyluyor, oysa olctugu sey risk seviyesi.
+
+Zarari somut: T152'yi bagimsiz bir denetci klonda olctu, uc mutasyon kosturdu, CI'yi
+dogruladi — ve mühür ciktisi "yalniz yapici okudu" dedi. Bu depoda mühür notlarina
+bakan bir sonraki ajan o cumleyi okur ve **denetlenmis isi denetlenmemis sanir.**
+Ayrica kayit `consume` edilmiyor (`:914` yalniz `recordFile` doluyken calisiyor), yani
+`audits/T152-1.json` `.used` isaretlenmeden duruyor ve ikinci kez kullanilabilir.
+
+**Onerilen.** Kaydi her seviyede **oku**; yalniz **zorunlulugu** yuksek riske bagli tut.
+Kayit varsa ledger'a `auditorRunId`i yaz, dosyayi `consume` et ve cumleyi degistir:
+`audit record consumed`. Kayit gercekten yoksa bugunku cumle dogru kalir.
+
+## `orphans()` uretimin en cok kullanilan dosyalarini oksuz sayiyor
+
+**Ayni kosumda**, `complete` sunlari bildirdi:
+
+```
+Nothing in the tree imports these files. Is that right?
+  src/VidShrink.Core/PlanCalculator.cs
+  src/VidShrink.Ffmpeg/QualityMeter.cs
+  src/VidShrink.App/MainWindow.axaml.cs
+If their work is done, move them under trash/. Do not delete them.
+```
+
+Ucu de yanlis. Olculdu — adin gectigi dosya sayisi:
+
+```
+PlanCalculator      37
+QualityMeasurement  12
+MainWindow          30
+```
+
+`PlanCalculator` bu projenin **motoru**; `MainWindow` tek penceresi. Tarama muhtemelen
+JS/TS `import`/`require` kalibi ariyor ve C#'ta ad **namespace uzerinden** cozuldugu icin
+hicbir sey bulamiyor.
+
+Bu yalniz gurultu degil: ciktinin son satiri **`trash/`a tasimayi oneriyor.** Talimati
+harfiyen uygulayan bir ajan projenin motorunu cope tasir.
+
+**Onerilen.** Ya dil bazli tarama (C#'ta `using` + tip adi gecisi, `.csproj` referansi),
+ya da tarama dili tanimadiginda **hic bildirme.** Yanlis pozitif "sil" onerisi,
+hic oneri vermemekten kotudur.
