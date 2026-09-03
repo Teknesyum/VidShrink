@@ -1,6 +1,9 @@
 sozlesme: T133
 dal: T133-anahtar-kare-tavani
-son-commit: af75556
+son-commit: f4689b2
+
+> `son-commit` devir dosyasinin commit'i. Dal ucu bu satiri duzelten tek
+> commit kadar ilerideyse dogru uc `git rev-parse T133-anahtar-kare-tavani`.
 
 ## Nerede kaldim
 
