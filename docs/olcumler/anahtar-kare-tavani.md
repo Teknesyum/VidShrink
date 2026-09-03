@@ -111,24 +111,161 @@ hücrede yazılır. Makinede eş zamanlı başka sözleşmeler koştuğu için �
 
 ---
 
+## Kaynaklar
+
+T0 kararı (`T133.md` § "T0 kararı — kaynak havuzu"), sınıfı ad değil **ölçülmüş
+zorluk** ayırıyor; dayanak `docs/olcumler/ab-duzenegi.md:324-328` (hepsi aynı
+kodlayıcı, 483k):
+
+| kaynak | kesit | HandBrake 483k VMAF | sınıf |
+|---|---|---|---|
+| `parca-2.mkv` | 00:07:30'dan 2 dk | **93,70** | durgun / kolay |
+| `parca-1.mkv` | 00:02:00'dan 2 dk | **47,71** | hareketli / orta |
+| `parca-3.mkv` | 00:13:00'dan 2 dk | **13,72** | kesik-çok / zor |
+| `kaynak-1080p60-hdr-17dk-yalniz-video.mkv` | tam, 17 dk | — | yüksek çözünürlüklü / uzun |
+
+**Ses akışı — zorunlu düzeltme uygulanacak.** `parca-1` ses taşımıyor, `parca-2` ve
+`parca-3` taşıyor; bu asimetri bu depoda bir A/B'yi haksız yaptı
+(`ab-duzenegi.md:169-180`). Izgaradan önce üçünün de sesi atılacak:
+`ffmpeg -i parca-N.mkv -an -c:v copy parca-N-video.mkv`. Tam kaynak için havuzdaki
+`-yalniz-video.mkv` olduğu gibi kullanılacak. Düzenek bunu `hazirla.sh` içinde yapıyor
+ve kare sayısı eşitliğini kapı olarak doğruluyor.
+
+> **Izgara henüz koşulmadı — kaynak havuzu bu makineden erişilemiyor.** Ayrıntı en
+> altta, "Tıkanma" başlığında.
+
+---
+
+## K2 — Tavanın yazılı gerekçesi: ölçülmüş mü, varsayım mı
+
+**Cevap: ölçülmüş.** Hem kalite hem atlama tarafı ölçülmüş; ikisi de kodda yazılı.
+Ama iki ölçüm **n=1** ve **birbiriyle işaret olarak çelişiyor.**
+
+**1. Medyan/ortalama kararı** — `FfmpegArguments.cs:184-185`, tavanın gerçekten
+bağladığı bir klipte (libx264, 2 geçiş, `-b:v 8000k`, preset slow):
+
+| tavan | boyut | ortalama | p10 | I-kare | atlama |
+|---|---|---|---|---|---|
+| 10,00 sn (ortalama kuralı) | 18,2533 MiB | 88,525 | 86,496 | 3 | 202,6 ms |
+| 5,62 sn (medyan kuralı) | 18,2600 MiB | **88,603** | **86,516** | 5 | **154,9 ms** |
+
+Burada **kısa tavan iki kalite ekseninde de kötü değil** ve %24 daha ucuz atlıyor.
+
+**2. Tavan taraması** — `FfmpegArguments.cs:243-252`, `parca-1-20sn`:
+
+| tavan | ortalama | p10 | I-kare | gerçekleşen aralık |
+|---|---|---|---|---|
+| 2 sn | 88,637 | 85,933 | 13 | 1,539 sn |
+| 5 sn | 88,878 | 86,641 | 6 | 3,334 sn |
+| 10 sn | **88,951** | **86,674** | 3 | 6,667 sn |
+| 20 sn | 88,954 | 86,751 | 3 | 6,667 sn |
+
+Burada **uzun tavan hafifçe iyi.**
+
+### Bu iki ölçümün birlikte söylediği
+
+İkisi 5 sn ile 10 sn arasında **ters işaret** veriyor: (1) kısa lehine +0,078
+ortalama / +0,020 p10; (2) uzun lehine +0,073 ortalama / +0,033 p10. **Her dördü de
+K4'te ölçüm öncesi kilitlenen anlamlılık eşiğinin altında** (p10 ≥ +0,20, ortalama ≥
++0,10). Yani bugünkü 5–10 sn seçimini destekleyen kanıt, kendi eşiğime göre
+**gürültüden ayırt edilemiyor** — ve iki kaynakta ters yöne bakıyor.
+
+Bu, K1 ızgarasının neden gerektiğini de gösteriyor: karar tek klipten, eşiğin
+altındaki farklarla verilmiş.
+
+**Tavanın 10 sn'de durmasının gerekçesi ayrıca ölçülmüş ve sağlam:** taramada 10 sn ile
+20 sn **aynı üç I-kareyi aynı yerlere** koyuyor — yani 10 sn üstünde tavan artık
+bağlamıyor. Bu, sözleşmenin (c) şıkkını (`-g 450`, `-g 600` ölçülmemiş) tek kaynakta
+zaten yanıtlıyor: ölçülmemiş değil, **etkisiz.** Izgara bunu üç kaynakta daha sınayacak;
+K4'ün bağlayıcılık şartı tam olarak bunun için kondu.
+
+## K6 — Donanım kolu: kapsam dışı, gerekçesiyle
+
+**Karar: kapsam dışı.** Üç sebep, üçü de yazılı:
+
+1. **Soruya değmiyor.** Bu sözleşmenin sorusu "harita kolu neden var?". Donanımda
+   harita **hiç devreye girmiyor**: `FfmpegArguments.cs:328`,
+   `fromMap = !hardware && ...`. `HardwareKeyframeCeilingSeconds = 5.0` haritadan
+   değil, sabit bir atlama bütçesinden geliyor.
+2. **Gerekçesi zaten türetilmiş, ölçülecek bir iddia değil.** `:255-259`: NVENC
+   lookahead kapalıyken sahne kesmesine I-kare koymuyor, dolayısıyla gerçekleşen
+   aralık tam olarak tavana eşit ve atlama maliyeti tavanın söylediği şey. Bu bir
+   ölçüm sorusu değil, mekanizma sonucu.
+3. **Bu makinede ölçülemez.** Yazılı gerekçe **NVENC'e özgü**; bu makinede NVENC yok.
+   Sınandı, varsayılmadı:
+
+   ```
+   h264_nvenc   yok
+   h264_amf     CALISIYOR
+   h264_qsv     yok
+   ```
+
+   AMF farklı bir yerleştirme mekanizması; onun üzerinde ölçülen sayı NVENC gerekçesini
+   ne doğrular ne çürütür.
+
+Ölçülmesi istenirse NVENC'li bir makine gerekir ve ayrı sözleşmedir.
+
 ## K1 — Izgara
 
-*Koşulmadı.*
-
-## K2 — Atlama maliyeti
-
-*Koşulmadı.* Tavanın yazılı gerekçesinin ölçülmüş mü varsayım mı olduğu sorusunun
-cevabı yukarıda kısmen görünüyor (`FfmpegArguments.cs:243-252` bir tarama içeriyor,
-yani gerekçe **ölçülmüş**); atlama gecikmesi tarafı ayrıca ölçülecek.
+*Koşulmadı — kaynak havuzuna erişilemiyor.* Düzenek hazır ve uçtan uca sınandı
+(`4f43ba3`).
 
 ## K3 — Haritanın kolu ızgaranın neresine düşüyor
 
-*Koşulmadı.*
+*Koşulmadı — K1'e bağlı.*
 
 ## K5 — Reçete
 
-*Yazılmadı.*
+*Yazılmadı — K1 ve K3'e bağlı.* K4'ün kuralı gereği reçeteye giren hiçbir sayı
+ölçülmeden yazılmayacak.
 
-## K6 — Donanım kolu
+---
 
-*Karar verilmedi.*
+## Tıkanma — kaynak havuzu bu makineden erişilemiyor
+
+T0 kararı havuzu şuraya koyuyor ve sebebini "ajan worktree'de, `.calisma/`
+gitignore'da" diye açıklıyor:
+
+```
+C:\Users\Administrator\Desktop\Projeler\Vidshrink\.calisma\kaynak\
+```
+
+**Bu teşhis doğrulanmıyor.** Üç ölçüm:
+
+**1. `Administrator` diye bir profil bu makinede yok.**
+
+```
+$ ls /c/Users/
+All Users
+Default
+Default User
+Public
+Teknesyum
+desktop.ini
+
+$ whoami
+Teknesyum
+```
+
+**2. Tek sürücü var (C:), hiçbirinde `Users/Administrator` yok.**
+
+**3. Gitignore/worktree teşhisi yanlış.** Worktree içinden ana deponun `.calisma/`
+klasörü sorunsuz listeleniyor — `ls` gitignore'a bakmaz:
+
+```
+$ ls /c/Users/Teknesyum/Desktop/Projeler/VidShrink/.calisma/
+T140
+T145
+t57
+```
+
+Havuz orada olsaydı bu listede görünürdü. Görünen tek video kaynağı `.calisma/t57/`
+altındaki iki dosya (hareketli 1080p30 ve 720p60) ve ikisi de aynı içerik sınıfı.
+
+**Muhtemel sebep:** `C:\Users\Administrator\...` **başka bir makinenin** yolu. Bu
+oturumun ilk brifingi rol dosyasını da `C:\Users\Administrator\.claude\plugins\...`
+diye vermiş ve "sende yoksa yoluna bakma" demişti — aynı profil, aynı yokluk.
+
+Havuz bu makineye gelene ya da erişilebilir bir yol verilene kadar K1/K3/K5 koşamaz.
+Sentetik kaynak T0 tarafından reddedildi ve o ret yerinde; ölçülmeyen sayı reçeteye
+girmeyecek.
