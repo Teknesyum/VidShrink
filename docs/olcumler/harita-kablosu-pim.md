@@ -128,9 +128,14 @@ public static IQualityMeasurement ProbeMeter(SceneMap? scenes)
 5	3	tests/VidShrink.Tests/UretimYoluTests.cs
 ```
 
-**Silinen satır sayısı: 50.** Bunun 45'i `MainWindow.axaml.cs`ten — silinen sınıfın
-gövdesi ve altı satırlık `///` docstring'i. Toplam net değişim: -33 satır.
-`MainWindow.axaml.cs` 3477 satırdan 3435 satıra indi.
+**Silinen satır sayısı: 50.** Bunun 45'i `MainWindow.axaml.cs`ten. Bu 45'in dökümü:
+
+- 43 satır — silinen blok: `SceneAwareQualityMeasurement` sınıfı (36 satır), üstündeki
+  `///` docstring'i (6 satır), aralarındaki boş satır (1).
+- 2 satır — `ProbeMeter`in yerine yenisi yazılan iki satırı (docstring'in ilk satırı ve
+  gövde satırı).
+
+Toplam net değişim: -33 satır. `MainWindow.axaml.cs` 3477 satırdan 3435 satıra indi.
 
 ### Geçersiz kalan docstring'ler
 
@@ -174,7 +179,11 @@ tipini soruyordu; K2 o tipi sildi, ölçü derlenmez hale geldi. Sorduğu soru a
 — "üretimin kurduğu ölçer haritayı gerçekten taşıyor mu" — yalnız taşıyıcının adı
 değişti. `Assert.NotNull(tasinan)` **eklendi**: eski satırda `Scenes` tipi `SceneMap`
 (nullable değil) idi, yeni gövdede `SceneMap?`; eksik kalan boşluk kontrolü kapatıldı.
-İddia gevşemedi, sıkılaştı. Geri kalan 12 ölçünün iddia satırlarına dokunulmadı.
+İddia gevşemedi, sıkılaştı.
+
+Tabandaki 12 ölçünün dökümü: 1'inin iddiası değişti (yukarıdaki), 1'inin yalnız
+docstring'i güncellendi (`HaritaGelmedigindeOlcerBugunkuYoldaKaliyor`, iddiası aynı),
+10'una hiç dokunulmadı. Hiçbir iddia gevşetilmedi, hiçbir eşik oynatılmadı.
 
 ## K4 — Mutasyon ızgarası
 
@@ -224,7 +233,33 @@ artık; yani borç bir yerde duruyor, iki yerde değil.
 
 ## K5 — Pim sayıları ve kollar
 
-### `OluUyeTests` pimi: 26'da kaldı
+### `OluUyeTests` pimi: değişmedi — ama sözleşmedeki sayı yanlış
+
+**Sözleşme "pim 26'da" diyor; pim 26'da değil, 31'de.** Sayıyı ben saydım:
+
+```
+$ awk '/private static readonly PinnedFinding\[\] Pinned/,/^    };/' tests/VidShrink.Tests/OluUyeTests.cs | grep -c "^        new("
+31
+```
+
+Ölçünün kendi çıktısı da aynı sayıyı veriyor:
+
+```
+ uye: 129  bu dosyada adi gecmeyen: 93  pimlenen: 31
+ mesru: 9  borc: 22
+```
+
+Taban commit'i `8798553`te de 31:
+
+```
+$ git show 8798553:tests/VidShrink.Tests/OluUyeTests.cs | grep -c "^        new("
+31
+```
+
+Yani **T154 sayıyı oynatmadı**; sözleşmenin öncülü baştan bayattı. `OluUyeTests.cs:363`
+docstring'i hâlâ "Sayı 27'den 26'ya indi (T150 tur 2)" diyor; o cümleden sonra pime beş
+kayıt daha eklenmiş ve cümle güncellenmemiş. Bu dosya T154'ün `owns` kümesinde değil,
+düzeltilmedi — **T0'a bildirilen bulgu.**
 
 **Önce okundu, sonra koşuldu.** `OluUyeTests.Members()` yansımayla yalnız
 `type.Namespace.StartsWith("VidShrink.Core")` olan türleri geziyor; bunların enum
@@ -234,13 +269,13 @@ büyüyen sınıf `QualityMeasurement` ise `VidShrink.Ffmpeg` içinde. İkisi de
 dışında. T154 `VidShrink.Core`a ne enum üyesi ekledi ne de `public static readonly`
 alan. Bu yüzden sayının değişmesi beklenmiyordu.
 
-Okuma böyle dedi, koşum da onayladı:
+Okuma böyle dedi, koşum da onayladı (`OluUyeTests` 11 ölçü, hepsi yeşil):
 
 ```
 Başarılı!  - Başarısız:     0, Başarılı:    11, Atlanan:     0, Toplam:    11, Süre: 670 ms - VidShrink.Tests.dll (net8.0)
 ```
 
-Pim satırına dokunulmadı.
+Pim listesine dokunulmadı; sayı ne 26 ne de başka bir yere kaydı, 31'de duruyor.
 
 ### Doğrulama kollarının test sayıları
 
@@ -310,7 +345,20 @@ VidShrink.Tests.QualityMeterTests.WorstSceneUsesSceneBoundariesWhenTheMapIsPrese
 
 ### CI koşumu
 
-CI-KOSUMU-YERI
+Koşum kimliği **33746293827**, commit `a999645`, dal `T154-harita-kablosu-pim`,
+iş akışı `ci`.
+
+```
+$ gh run view 33746293827 --json status,conclusion,databaseId,headSha
+33746293827 a999645111fe0f263df1d4372620049d1e56e507 completed success
+```
+
+`-warnaserror` derlemesi geçti; filtresiz tam süit CI'da yeşil:
+
+```
+Passed!  - Failed:     0, Passed:  1525, Skipped:    18, Total:  1543, Duration: 18 m 42 s - VidShrink.Tests.dll (net8.0)
+KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=1543 alt-sınır=1134 atlanan=18 ust-sinir=30
+```
 
 ## Kalan borç
 
@@ -323,3 +371,6 @@ CI-KOSUMU-YERI
    ölçüyor (geçen haritanın yerleşimi değiştirdiğini), diğer yarısını metinden
    çıkarıyor. Çağrı yerini gerçekten koşturan bir ölçü, `MeasureComplexityAsync`in
    ayrılabilir bir parçaya bölünmesini ister; bu T154'ün kapsamı değildi.
+3. **`OluUyeTests` docstring'i bayat.** `tests/VidShrink.Tests/OluUyeTests.cs:363`
+   "Sayı 27'den 26'ya indi" diyor, pim listesi 31 kayıt taşıyor. Sözleşmenin K5 öncülü
+   bu bayat cümleden gelmiş. Dosya T154'ün `owns` kümesinde değil; düzeltilmedi.
