@@ -149,21 +149,56 @@ public static class CodecModel
         _ => false
     };
 
-    private static readonly IReadOnlyDictionary<string, string> TurboFirstPassCeilings =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    private readonly record struct TurboFirstPassEntry(string Ceiling, bool Safe);
+
+    /// <summary>
+    /// Ilk gecisin inebilecegi en hizli on ayar, kodek basina. Tavanin varligi turbonun
+    /// acilabilecegi anlamina gelmez; onu <see cref="TurboFirstPassIsSafe"/> soyler.
+    /// <para>
+    /// <c>libx264</c> tavani <c>veryfast</c>, guvenli degil: <c>veryfast</c> ilk gecis
+    /// <c>weightp=1</c>, <c>slow</c> ikinci gecis <c>weightp=2</c> kosar ve x264 ikinci gecisi
+    /// <c>different weightp setting than first pass (2 vs 1)</c> diyerek hic acmaz — kullanici
+    /// sifir bayt cikti alir. Iki kaynak parcasinda olculdu, ikisinde de ikinci gecis
+    /// <c>exit=127</c> ve cikti 0 bayt; ayni girdide <c>libx265</c> turbo 745,2K ve 677,3K
+    /// uretti. Olcum: <c>docs/olcumler/turbo-x264-mayini.md</c>.
+    /// </para>
+    /// <para>
+    /// Satir tablodan cikarilmiyor cunku olculen sey tavanin yoklugu degil, tavanin
+    /// <b>kullanilamazligi</b>: iki gecise ayni <c>weightp</c> verilirse x264 turbosu calisiyor,
+    /// ama o argumani <c>FfmpegArguments</c> uretir ve bu tablo onu tasiyamaz.
+    /// </para>
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, TurboFirstPassEntry> TurboFirstPassCeilings =
+        new Dictionary<string, TurboFirstPassEntry>(StringComparer.OrdinalIgnoreCase)
         {
-            ["libx264"] = "veryfast",
-            ["libx265"] = "veryfast"
+            ["libx264"] = new("veryfast", Safe: false),
+            ["libx265"] = new("veryfast", Safe: true)
         };
 
+    /// <summary>
+    /// Tabloda tavani olan kodekler. Hepsi turboya acilabilir demek <b>degildir</b> —
+    /// acilabilenler icin <see cref="TurboFirstPassIsSafe"/>.
+    /// </summary>
     public static IReadOnlyCollection<string> TurboFirstPassCodecs
         => (IReadOnlyCollection<string>)TurboFirstPassCeilings.Keys;
 
+    /// <summary>
+    /// Kodegin tabloda olculmus bir ilk gecis tavani var mi. Turbo acilacaksa ilk gecisin
+    /// nereye kadar hizlanacagini bu belirler; <b>acilip acilmayacagini</b> belirlemez.
+    /// </summary>
     public static bool SupportsTurboFirstPass(string codec)
         => TurboFirstPassCeilings.ContainsKey(codec);
 
     public static string? TurboFirstPassCeiling(string codec)
-        => TurboFirstPassCeilings.TryGetValue(codec, out var preset) ? preset : null;
+        => TurboFirstPassCeilings.TryGetValue(codec, out var entry) ? entry.Ceiling : null;
+
+    /// <summary>
+    /// Kodegin tavani uretim yolunda acilabilir mi. <see cref="SupportsTurboFirstPass"/>
+    /// tavanin varligini, bu tavanin <b>kullanilabilirligini</b> soyler; ikisi <c>libx264</c>
+    /// icin ayrisir.
+    /// </summary>
+    public static bool TurboFirstPassIsSafe(string codec)
+        => TurboFirstPassCeilings.TryGetValue(codec, out var entry) && entry.Safe;
 
     public static bool CostsQualityInHardware(string codec)
         => IsHardware(codec)
