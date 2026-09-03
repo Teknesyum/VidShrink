@@ -223,6 +223,17 @@ dokunmuyor — iki çöküş de arayüz/zamanlama testlerinde, `ComplexityProbe`
 zincirinin dışında. K7'nin "tamamı yeşil olmadan teslim yok" şartı bu makinede
 **bu dalla sağlanamıyor**; sağlanamamasının nedeni dalda değil. T0'a bildirildi.
 
+### CI
+
+Dalın son commit'i (`0ec4633`) için CI koşumu **`33682771946` — `completed success`**,
+26 dk 32 sn. Aynı dalda daha önceki koşum `33681585349`, yeni push onu geçtiği için
+`cancelled` göründü; bir başarısızlık değil, üzerine yazılmış bir koşum.
+
+Yani filtresiz `dotnet test` **CI'da yeşil bitiyor.** Yukarıdaki çöküş bu geliştirme
+makinesine özgü: burada aynı anda başka sözleşmeler koşuyor ve Avalonia arayüz
+testleri yük altında test ana işlemini düşürüyor. CI temiz bir makinede tek başına
+koştuğu için o çöküş orada oluşmuyor.
+
 ## Açık borç
 
 1. **`SplitSampleAsync` ölçere kodlama son teslim tarihinin artığını veriyor.**
@@ -235,8 +246,9 @@ zincirinin dışında. K7'nin "tamamı yeşil olmadan teslim yok" şartı bu mak
    davranışı; K1–K7'nin hiçbiri istemedi, kapsam büyütülmedi. Kapatmak
    `ProbeResult`a ölçülemeyen pencere sayısı eklemeyi gerektirir ve o dosya
    `owns` dışında.
-3. **Filtresiz `dotnet test` bu makinede çöküyor, `main`de de çöküyor.** Yukarıda
-   ölçüldü. Ayrı bir iş; T141'in değiştirdiği dosyalarla ilgisi yok.
+3. **Filtresiz `dotnet test` bu geliştirme makinesinde çöküyor, `main`de de çöküyor.**
+   Yukarıda ölçüldü; CI'da aynı koşum yeşil bitiyor, yani kusur yükün altındaki
+   arayüz testlerinde. Ayrı bir iş; T141'in değiştirdiği dosyalarla ilgisi yok.
 4. **Yedek yolun üretimdeki sıklığı hâlâ bilinmiyor.** Beş tetikleyicinin hepsi
    ortam kaynaklı; ne kadar sık olduğunu söyleyecek bir alan verisi yok.
    Sayaç eklemek bu sözleşmenin işi değildi.
