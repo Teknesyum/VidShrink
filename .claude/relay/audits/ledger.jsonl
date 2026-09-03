@@ -203,3 +203,7 @@
 {"id":"T146","result":"stale","at":"2026-09-03T09:17:27.282Z"}
 {"id":"T147","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderCapabilitiesTests|SegmentEncoderTests|SessizDusurmeTests","code":0}],"auditorRunId":null,"headSha":"2fcc2e22853b372f74c59f8d0f98d8540b429b09","at":"2026-09-03T10:10:58.157Z"}
 {"id":"T146","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"ce647e66d32a7ac48d4a210062a0a067fdf82559","at":"2026-09-03T10:25:43.181Z"}
+{"id":"T152","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T153","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T154","result":"stale","at":"2026-09-03T10:56:07.232Z"}
+{"id":"T153","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"TurboTavanTests|FfmpegArgumentsTests","code":0}],"auditorRunId":null,"headSha":"956ea147117203dc1523d9cafa9619b289772e3f","at":"2026-09-03T11:16:03.463Z"}
