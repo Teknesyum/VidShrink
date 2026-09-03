@@ -865,6 +865,18 @@ public sealed class UpdaterTests : IDisposable
     }
 
     /// <summary>
+    /// Geçiş sürecine verilen duvar saati tavanı. Süreç tek bir yeniden adlandırma yapıp
+    /// çıkıyor; ölçülen değer tek parçalı kendi kendine açılan ikilinin açılış payıdır.
+    ///
+    /// Eski tavan 60 sn idi ve neye dayandığı yazılı değildi. Ölçüldü: yayımlanmış
+    /// başlatıcıyla, on dört ajanın koştuğu meşgul bir makinede beş koşum
+    /// 101/81/84/117/82 ms verdi. Tavan en yüksek okumanın kırk katına indirildi; tek
+    /// parçalı ikilinin ilk açılışta ödediği açma payı da bu aralığın içinde kalır.
+    /// Ölçüm <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// </summary>
+    private const int GecisTavaniMs = 5_000;
+
+    /// <summary>
     /// Geçişin üretimdeki hâli, gerçek bir süreçle. Yerine geçecek ikili kendi süreci içinde
     /// açılır ve kendi adını hedefin üstüne alır; ölçü kurulu bir başlatıcı gösterildiğinde
     /// koşar. Yukarıdaki ölçüler adın hiç boşalmadığını süreç içinde gösteriyor, bu ölçü de
@@ -887,8 +899,13 @@ public sealed class UpdaterTests : IDisposable
         var start = new ProcessStartInfo { FileName = incoming, WorkingDirectory = root, UseShellExecute = false };
         start.ArgumentList.Add(LauncherUpdate.CommitArgument);
         using var process = Process.Start(start)!;
-        Assert.True(process.WaitForExit(60_000), "geçiş süreci çıkmadı");
+        var stopwatch = Stopwatch.StartNew();
+        var exited = process.WaitForExit(GecisTavaniMs);
+        stopwatch.Stop();
+        Assert.True(exited, $"geçiş süreci {GecisTavaniMs} ms içinde çıkmadı");
 
+        _output.WriteLine(
+            $"geçiş süresi: {stopwatch.Elapsed.TotalMilliseconds:F0} ms, tavan {GecisTavaniMs} ms");
         _output.WriteLine($"çıkış kodu: {process.ExitCode}, kökte: {RootListing(root)}");
         Assert.Equal(0, process.ExitCode);
         Assert.True(LauncherUpdate.Matches(target, file), "hedef, inen ikilinin özetine oturmadı");
