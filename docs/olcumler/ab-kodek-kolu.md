@@ -174,11 +174,16 @@ kendi koşumunda karıştırıcı **tam güçte** duruyor.
 
 ## Taban yeniden kuruluyor — karar kuralları sayılardan önce yazıldı
 
-T0 kararı: `ab-duzenegi.md`nin on iki satırının **tamamı** bugünkü kodla yeniden
-ölçülüyor, kalan beş çiftle sınırlanmıyor. Gerekçe K1'in bulgusu: 0,86 bir
-varyans değil sabit sürüm ofseti, ve on iki satırın hepsi `381e8ab`de ölçülmüş.
-Beşini yenileyip yedisini eskide bırakmak, tek tabloda iki ayrı ölçer demek
-olurdu — düzeltilmeye çalışılan kusurun daha kötü hali.
+Round-1 önerisi buydu: on iki satırın tamamını yeniden ölçmek, kalan beş
+çiftle sınırlamamak — gerekçe K1'in bulgusu (0,86 bir varyans değil sabit
+sürüm ofseti, on iki satırın hepsi `381e8ab`de ölçülmüş).
+
+**T0'ın tur-2 kararı bunu daraltı:** yalnız kalan beş çift bugünkü tabanda
+koşuldu (bkz. `T125.md`, "## T0 kararı — tur 2"). Zaten ölçülmüş yedi satır
+yeniden koşulmadı; sürüm ofseti onlarda da geçerli olduğu için tabloya
+kıyaslama uyarısı düşüldü, iki ayrı ölçerin karıştığı iddiası kalkmadı ama
+tur-2'nin manşeti bu on iki satırın hepsini değil yalnız yeni altı satırı
+sayıyor.
 
 Aşağıdaki kurallar **koşum bitmeden** yazıldı; yeni sayılar geldiğinde
 eşiklerin sayıya göre seçilmediği bu sırayla belli olsun.
