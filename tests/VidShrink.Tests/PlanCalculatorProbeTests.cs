@@ -246,8 +246,9 @@ public sealed class PlanCalculatorProbeTests
 
     /// <summary>
     /// K3, hizli yol. Hicbir aday olculmemisken cevap "donanim yok" degil "heniz
-    /// olculmedi": tarama ilk adayda duruyor, yazilim yedegine dusmuyor ve plan
-    /// <c>HardwareNotMeasured</c> ile isaretleniyor. Isaret olmasa
+    /// olculmedi": tarama sirayi sonuna kadar gezip calisan bulamiyor, yazilim yedegine
+    /// dusmuyor ve hatirladigi ilk olculmemis adayi <c>HardwareNotMeasured</c> isaretiyle
+    /// donduruyor (T151'e kadar ilk adayda duruyordu). Isaret olmasa
     /// arayuz gecici bir cevabi kesin cevap gibi gosterirdi.
     /// </summary>
     [Fact]
@@ -986,5 +987,177 @@ public sealed class PlanCalculatorProbeTests
         var folder = TestPaths.LiveOut("t130-yoklama");
         Directory.CreateDirectory(folder);
         File.AppendAllText(Path.Combine(folder, "olcum.txt"), line + Environment.NewLine);
+    }
+
+    // --- T151: ilk olculmemis aday sirayi kilitlemiyor ---
+
+    /// <summary>
+    /// Aday basina uc durumdan birini veren yetenek nesnesi. Listede olmayan aday
+    /// <see cref="EncoderProbeState.NotWorking"/> sayilir, yani tarama onunla durmaz.
+    /// </summary>
+    private sealed class FastOrderAvailability(params (string Codec, EncoderProbeState State)[] answers)
+        : IEncoderAvailability
+    {
+        private readonly Dictionary<string, EncoderProbeState> _answers = answers.ToDictionary(
+            answer => answer.Codec, answer => answer.State, StringComparer.OrdinalIgnoreCase);
+
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec) =>
+            _answers.TryGetValue(codec, out var state) && state == EncoderProbeState.Working;
+
+        public EncoderProbeState EncoderState(string codec) =>
+            _answers.TryGetValue(codec, out var state) ? state : EncoderProbeState.NotWorking;
+    }
+
+    /// <summary>
+    /// Bir adayin yoklamasi istisnayla duser, oteki calisir. Gercek gecidin altina
+    /// konuldugunda ilki kalici <c>Unmeasured</c>, ikincisi <c>Working</c> olur —
+    /// T151'in tarif ettigi makinenin ta kendisi.
+    /// </summary>
+    private sealed class UnsettledFirstAvailability(string unsettled, string working) : IEncoderAvailability
+    {
+        public bool HasEncoder(string name) => true;
+
+        public bool WorksAsEncoder(string codec)
+        {
+            if (string.Equals(codec, unsettled, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("yoklama surecine erisilemedi");
+            return string.Equals(codec, working, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>
+    /// K2. <c>av1_nvenc</c> olculmemis, <c>hevc_nvenc</c> calisiyor. Tarama ilkinde durursa
+    /// plan calisan donanimi hic gormez ve <c>CodecNotMeasured</c> ile doner; T139'un
+    /// dogrulamasi o isareti "donanim yok"a cevirir. Duzeltmeden once bu olcu kirmizi.
+    /// </summary>
+    [Fact]
+    public void OlculmemisIlkAdayCalisanSonrakiAdayinOnunuKesmiyor()
+    {
+        var availability = new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working));
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+
+        Assert.Equal("hevc_nvenc", result.Plan.Codec);
+        Assert.False(result.Plan.CodecNotMeasured);
+        Assert.False(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// K2'nin oteki yuzu ve sozlesmedeki "ucuz cevap" riskinin pimi: olculmemisi atlamak
+    /// onu <b>elemek</b> degil. Calisan aday yoksa hatirlanan ilk olculmemis aday geri
+    /// doner ve isaret durur — yazilim yedegine dusulmez.
+    /// </summary>
+    [Fact]
+    public void CalisanAdayYokkenHatirlananOlculmemisAdayDonuyor()
+    {
+        var availability = new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Unmeasured),
+            ("av1_qsv", EncoderProbeState.Unmeasured));
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+
+        Assert.Equal("hevc_nvenc", result.Plan.Codec);
+        Assert.True(result.Plan.CodecNotMeasured);
+        Assert.True(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// Hicbir aday olculmemis <b>degil</b> ve hicbiri calismiyorsa cevap yine yazilim
+    /// yedegi. Taramanin devam etmesi bu kolu degistirmemeli.
+    /// </summary>
+    [Fact]
+    public void HicOlculmemisAdayYokkenYaziliYedegeDusuluyor()
+    {
+        var availability = new FastOrderAvailability();
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+
+        Assert.Equal("libx265", result.Plan.Codec);
+        Assert.False(result.Plan.CodecNotMeasured);
+        Assert.False(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// K1'in birinci olcumu: devam etmek olculmemis adayi yoklamasiz birakmiyor.
+    /// <see cref="EncoderAvailabilityState.KnownState"/> sormakla yoklamayi ayni adima
+    /// koyuyor — gecit <c>IsMeasured</c> cagrisinda arka plan yoklamasini baslatiyor —
+    /// bu yuzden bir adayin uzerinden <b>gecmek</b> de onu olcume yolluyor. Sozlesmenin
+    /// "sira hep calisan eski kodege duser, yeni donanim hic denenmez" riski bu yuzden
+    /// gerceklesmiyor.
+    /// </summary>
+    [Fact]
+    public void GecilenOlculmemisAdayYoklamayaYollaniyor()
+    {
+        var source = new RecordingAvailability(TimeSpan.Zero);
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, gate);
+        var clock = Stopwatch.StartNew();
+        while (gate.Pending && clock.ElapsedMilliseconds < 15000) Thread.Sleep(5);
+
+        var asked = new[]
+        {
+            "av1_nvenc", "hevc_nvenc", "av1_qsv", "hevc_qsv", "av1_amf", "hevc_amf", "h264_nvenc"
+        };
+        var missing = asked.Where(c => !source.Calls.Contains($"works:{c}")).ToArray();
+
+        Assert.True(missing.Length == 0, $"yoklamaya gitmeyen aday: {string.Join(", ", missing)}");
+        Assert.True(gate.Probes >= asked.Length, $"gecit {gate.Probes} yoklama baslatti, {asked.Length} aday var");
+    }
+
+    /// <summary>
+    /// K1'in ikinci olcumu ve secimin asil gerekcesi: yerlesmeyen bir yoklama sirayi
+    /// <b>kalici</b> kilitliyordu. <c>av1_nvenc</c> yoklamasi istisnayla duser ve
+    /// <see cref="AnUnsettledProbeIsNeverPromotedToAMeasurement"/> geregi kalici
+    /// <c>Unmeasured</c> kalir; <c>hevc_nvenc</c> olculur ve calisir. Tarama ilkinde
+    /// dururken bu makine <b>hicbir turda</b> calisan donanima ulasamiyordu. Bugun
+    /// ikinci turda ulasiyor.
+    /// </summary>
+    [Fact]
+    public void YerlesmeyenAdaySirayiKaliciKilitlemiyor()
+    {
+        var source = new UnsettledFirstAvailability("av1_nvenc", "hevc_nvenc");
+        var gate = new MainWindow.DeferredEncoderAvailability(source, () => { });
+
+        Drain(gate, "av1_nvenc");
+        Drain(gate, "hevc_nvenc");
+
+        Assert.Equal(EncoderProbeState.Unmeasured, gate.KnownState("av1_nvenc"));
+        Assert.Equal(EncoderProbeState.Working, gate.KnownState("hevc_nvenc"));
+
+        var result = PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, gate);
+
+        Assert.Equal("hevc_nvenc", result.Plan.Codec);
+        Assert.False(result.Plan.CodecNotMeasured);
+        Assert.False(result.HardwareNotMeasured);
+    }
+
+    /// <summary>
+    /// K1'in ucuncu olcumu: "olc, sonra karar ver" secenegi neden reddedildi.
+    /// Yoklama senkron ve aday basina; tarama uzadikca cagiranin uzerine binen sure
+    /// aday sayisiyla carpiliyor. Olcu bu carpimi gosteriyor — gercek yoklamanin
+    /// olculmus suresi <c>docs/olcumler/ui-yoklama-donmasi.md</c>'de 173-469 ms.
+    /// </summary>
+    [Fact]
+    public void AdayBasinaYoklamaMaliyetiTaramaBoyuncaCarpiliyor()
+    {
+        var delay = TimeSpan.FromMilliseconds(20);
+        var availability = new RecordingAvailability(delay);
+
+        var clock = Stopwatch.StartNew();
+        PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability);
+        clock.Stop();
+
+        var calls = availability.Calls.Count;
+        WriteEvidence($"t151 tarama maliyeti: {calls} yoklama x {delay.TotalMilliseconds} ms = {clock.ElapsedMilliseconds} ms");
+        Assert.True(calls >= 7, $"tarama {calls} adaya sordu");
+        Assert.True(
+            clock.Elapsed >= delay * (calls - 1),
+            $"{calls} yoklama, {clock.ElapsedMilliseconds} ms gecti; beklenen alt sinir {delay.TotalMilliseconds * (calls - 1)} ms");
     }
 }
