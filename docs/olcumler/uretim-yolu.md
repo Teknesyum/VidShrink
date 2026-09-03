@@ -260,7 +260,9 @@ Ek koşum `dotnet test -c Release --filter "OluUyeTests"` sonucu
 `tests/VidShrink.Tests/OluUyeTests.cs` bu dalda `origin/main` ile bit bit aynı.
 (31, `Pinned` dizisindeki bulgu sayısıdır — 22 borç, 9 meşru — 26 ile karıştırılmamalı.)
 
-CI: `gh run list --branch T146-uretim-yolu` koşum kimliği **33740299463**.
+CI: koşum kimliği **33740299463**, durumu **`completed` / `success`**, koştuğu commit
+`0eaa5fb`. Dalın ucu `04b8b0f` yalnız bu raporu ekliyor ve iş akışının yol süzgecine
+takıldığı için ayrı bir koşum başlatmadı; CI'ın ölçtüğü ağaç kodun tamamını içeriyor.
 
 ## Sınırda durulan yer
 
