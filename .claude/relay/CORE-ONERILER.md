@@ -650,3 +650,27 @@ sozlesmeyi okumadigi icin komutla yazilamadi (`Cannot read contracts/T156.md`).
    klasorlerine baksin (`git worktree list`).
 3. `audit`, `done/` altindaki sozlesmeyi de okuyabilsin. Bugun muhur sonrasi kayit yazmak
    imkansiz; oysa kayit tam da muhurden sonra eksik kaldigi anlasiliyor.
+
+
+## Muhur kapisi owns icindeki dizin yolunu reddediyor
+
+**Olcum, 3 Eylul 2026, T159.** Sozlesme owns'a `tools/kestirim-plan/` (sonda /, dizin)
+yazmisti — bu deponun kendi AGENTS.md'si ve pek cok gecmis sozlesme bu bicimi kullaniyor
+(tek dosyayla degil, butun bir klasorle sahiplenme). `contract.js audit` calistirilinca:
+
+```
+Refused - owns contains a directory path: tools/kestirim-plan/
+```
+
+Kaynak `hooks/seal.js` `ownsFault()`: sonu `/` ile bitiyorsa ya da `fs.statSync` dizin
+donduruyorsa reddediyor. `guard.js` da ayni kontrolu tasiyor. Yani dizin bicimli owns
+**hicbir zaman** `audit`/`complete`'ten gecemiyor — bu depoda oncesinde fark edilmemis
+cunku hicbir onceki sozlesme `complete` asamasina dizin owns'la gelmemis olmali.
+
+**Ne yapildi.** T159'un owns'unu dizinin altindaki alti dosyaya elle actim, commit/push
+ettim, ardindan audit/complete gecti.
+
+**Onerilen.** Ya `seal.js` dizin owns'u kabul edip icindeki dosyalari otomatik genisletsin,
+ya da `contract.js precheck`/`submit` asamasi dizin owns'u erken reddedip yapicidan dosya
+listesi istesin — bugun bu hata yalniz `complete` asamasinda, iş tamamen bittikten sonra
+cikiyor.
