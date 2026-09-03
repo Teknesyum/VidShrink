@@ -963,3 +963,5 @@ T145 bastan basliyor ama onceki kosumun bulgusu prompt'a gomuldu: canli baslatic
 bandlari (:890, :915, :916) modal kutu aciyor ve kutu aciklken olculen sey baslaticinin
 suresi degil. Yapiciya iki mesru kol verildi (saatten kurtar / kurulumu tamamlayip bassiz
 olc), sec ve dayanagini yaz.
+- **T150** teslim edildi. Sifir tuketici sinifi olculebilir oldu: kume yansimayla turden turetiliyor, sayi 31 satirla pimlendi (26 sifir tuketici + 5 hic kullanilmayan -- tur 2'de birlesik agacta yeniden temellendi), iki mutasyon kirmizi. T0 onculunun 63/1 ikilemi kapandi. K5 ile `QualityArgs` mayini kapandi; VideoToolbox kapisi acilmadi. Dal `T150-sifir-tuketici`.
+- T150 tur 2 tamamlandi: K8-K11 kapandi, pim 26, tam suit 1511 yesil (yerel), CI yok — uzak dal ayrismasi.
