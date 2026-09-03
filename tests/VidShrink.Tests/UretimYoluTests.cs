@@ -267,9 +267,11 @@ public sealed class UretimYoluTests
     }
 
     /// <summary>
-    /// K4. Turbo libx264'te acilmiyor: ikinci gecis birinci gecisin <c>weightp</c> ayarina
-    /// uymak zorundadir, <c>veryfast</c> ile <c>slow</c> farkli deger kosar ve x264 ikinci
-    /// gecisi hic acmaz. Olculdu: iki klipte de cikti sifir bayt.
+    /// K4. Turbo libx264'te <c>weightp</c> esitlenmeden acilmiyor: ikinci gecis birinci
+    /// gecisin <c>weightp</c> ayarina uymak zorundadir, <c>veryfast</c> ile <c>slow</c>
+    /// farkli deger kosar ve x264 ikinci gecisi acmaz. Olculdu
+    /// (<c>docs/olcumler/x264-turbo-acilis.md:43-49</c>): weightp esitlenmeyen kolda cikti
+    /// sifir bayt, esitlenen dort kolun dordu de ~3,7 MB uretti.
     /// </summary>
     [Fact]
     public void Libx264HizliKiptedeTurboyaAcilmiyor()
