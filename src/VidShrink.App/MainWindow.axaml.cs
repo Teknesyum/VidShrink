@@ -1900,7 +1900,7 @@ public partial class MainWindow : Window
             // produced, until the two agree.
             for (var round = 0; round < CalibrationRounds; round++)
             {
-                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, (SceneMap?)null);
+                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, CalibrationScenes(_sceneMap));
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
                 _profile = calibrated;
                 Recalculate();
