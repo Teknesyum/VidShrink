@@ -154,6 +154,19 @@ public static class PlanCalculator
         /// "seçilen kodek geçici mi" sorusunun cevabı ayrı taşınıyor.
         /// </summary>
         internal bool CodecNotMeasured;
+
+        /// <summary>
+        /// Tercih edilen kodlayicinin secim aninda okunan durumu. Yedege dusme notu bunu
+        /// kullanir: not <b>olculmedi</b> ile <b>olculdu, calismiyor</b>u ayirmak zorunda
+        /// ve durumu ikinci kez sormak yoklama sayisini artirirdi.
+        /// </summary>
+        internal EncoderProbeState PreferredCodecState = EncoderProbeState.NotWorking;
+
+        /// <summary>
+        /// Tercih edilen kodlayici bu ffmpeg derlemesinde var mi. Yoklukta durum sorusu
+        /// hic sorulmaz, o yuzden <see cref="PreferredCodecState"/> ile ayri tasiniyor.
+        /// </summary>
+        internal bool PreferredCodecInBuild = true;
     }
 
     private static PlanResult BuildDetailedCore(MediaInfo info, PlanOptions options, ComplexityProfile? profile, IEncoderAvailability? availability, ProbeState probe)
@@ -199,7 +212,7 @@ public static class PlanCalculator
         if (codec != preferredCodec)
         {
             notes.Add(AdviceCode.EncoderFallback);
-            reason.Add($"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}");
+            reason.Add(EncoderFallbackReason(preferredCodec, codec, probe));
             reasonCodes.Add(new ReasonNote(ReasonCode.EncoderFallback, RequestedCodec: preferredCodec, FallbackCodec: codec));
         }
 
@@ -882,6 +895,27 @@ public static class PlanCalculator
         _ => "libx264"
     };
 
+    /// <summary>
+    /// Yedege dusme notu uc ayri durumu anlatir ve karistirmaz: aday <b>bu derlemede
+    /// yok</b>, aday <b>hic olculmedi</b>, aday <b>olculdu ve calismiyor</b>.
+    ///
+    /// T151'e kadar ikinci durum kullaniciya hic ulasmiyordu: tarama ilk olculmemis
+    /// adayda duruyor, o aday geri donuyor ve <c>codec == preferredCodec</c> oldugu icin
+    /// not cikmiyordu. Tarama sonraki adaya gecince not ilk kez cikti ve tek cumle
+    /// olculmemis bir donanim icin "bu makinede kullanilamadi" dedi. Olcum yokken boyle
+    /// bir iddiada bulunulamaz — bu deponun <see cref="EncoderProbeState.Unmeasured"/>
+    /// ile ayirdigi sey tam olarak budur.
+    /// </summary>
+    private static string EncoderFallbackReason(string preferredCodec, string codec, ProbeState probe)
+    {
+        if (!probe.PreferredCodecInBuild)
+            return $"the {preferredCodec} encoder is not part of this ffmpeg build, so encoding falls back to {codec}";
+
+        return probe.PreferredCodecState == EncoderProbeState.Unmeasured
+            ? $"the {preferredCodec} encoder has not been measured on this machine, so encoding falls back to {codec}"
+            : $"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}";
+    }
+
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
         => PickCodec(pref, availability, null);
 
@@ -900,8 +934,13 @@ public static class PlanCalculator
         var preferred = PreferredCodecFor(pref);
         if (pref is not (CodecPreference.MaxCompression or CodecPreference.Fast)) return preferred;
         if (availability is null) return preferred;
-        if (!availability.HasEncoder(preferred)) return FallbackCodecFor(pref);
+        if (!availability.HasEncoder(preferred))
+        {
+            if (probe is not null) probe.PreferredCodecInBuild = false;
+            return FallbackCodecFor(pref);
+        }
         var state = availability.KnownState(preferred);
+        if (probe is not null) probe.PreferredCodecState = state;
         if (state == EncoderProbeState.Unmeasured)
         {
             if (probe is not null)
@@ -934,10 +973,12 @@ public static class PlanCalculator
     private static string PickFastCodec(CodecPreference pref, IEncoderAvailability? availability, ProbeState probe)
     {
         if (availability is null) return FastHardwareOrder[0];
+        probe.PreferredCodecInBuild = availability.HasEncoder(FastHardwareOrder[0]);
         string? unmeasured = null;
         foreach (var candidate in FastHardwareOrder)
         {
             var state = availability.KnownState(candidate);
+            if (candidate == FastHardwareOrder[0]) probe.PreferredCodecState = state;
             if (state == EncoderProbeState.Unmeasured)
             {
                 unmeasured ??= candidate;
