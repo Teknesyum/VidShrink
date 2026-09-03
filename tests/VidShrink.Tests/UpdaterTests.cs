@@ -1129,6 +1129,17 @@ exit $code
         return (installRoot, locked, WriteRemovalProbe(work), Path.Combine(work, "gunluk.txt"));
     }
 
+    /// <summary>
+    /// Kilidi bırakan iş parçacığına verilen tavan. İş parçacığı sonda süreci çıktığı anda
+    /// döngüden çıkıyor; beklenen süre bir <c>Thread.Sleep(5)</c> turudur.
+    ///
+    /// Eski tavan 10 sn idi. Ölçüldü: meşgul bir makinede beş koşumun beşinde de
+    /// <c>Join</c> 0 ms sürdü — iş parçacığı çağrıdan önce bitmişti. Tavan 1 sn'ye
+    /// indirildi; iki yüz yoklama turuna denk gelir. Ölçüm
+    /// <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// </summary>
+    private static readonly TimeSpan KilidiBirakanIsParcacigiTavani = TimeSpan.FromSeconds(1);
+
     [Fact]
     public void TheDeletionStepWaitsOutATransientLock()
     {
@@ -1155,8 +1166,14 @@ exit $code
         var stopwatch = Stopwatch.StartNew();
         var (code, log) = RunRemovalProbe(probe, installRoot, logPath);
         stopwatch.Stop();
-        Assert.True(release.Join(TimeSpan.FromSeconds(10)), "kilidi bırakan iş parçacığı bitmedi");
+        var joinSuresi = Stopwatch.StartNew();
+        var bitti = release.Join(KilidiBirakanIsParcacigiTavani);
+        joinSuresi.Stop();
+        Assert.True(bitti,
+            $"kilidi bırakan iş parçacığı {KilidiBirakanIsParcacigiTavani.TotalMilliseconds:F0} ms içinde bitmedi");
 
+        _output.WriteLine($"kilidi bırakan iş parçacığı: {joinSuresi.Elapsed.TotalMilliseconds:F0} ms, " +
+                          $"tavan {KilidiBirakanIsParcacigiTavani.TotalMilliseconds:F0} ms");
         _output.WriteLine($"geçici kilit: çıkış {code}, {stopwatch.Elapsed.TotalMilliseconds:F0} ms");
         _output.WriteLine(log.Trim());
 
