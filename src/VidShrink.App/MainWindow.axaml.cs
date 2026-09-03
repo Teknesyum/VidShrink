@@ -1807,6 +1807,71 @@ public partial class MainWindow : Window
         return anchors.Length > 0 ? probed.Profile.WithProbeQuality(anchors) : probed.Profile;
     }
 
+    /// <summary>
+    /// Kalibrasyon yoklamasinin ornekleme penceresini yerlestirirken okudugu harita.
+    /// Tarama basarisiz olduysa <c>null</c> doner ve yoklama esit arali yedek yerlesimde
+    /// kalir.
+    /// </summary>
+    public static SceneMap? CalibrationScenes(SceneMapAttempt? attempt) => attempt?.Map;
+
+    /// <summary>
+    /// Kalite olcumunun en kotu birimi ararken sahne sinirlarini okudugu harita. Tarama
+    /// basarisiz olduysa <c>null</c> doner ve olcum sabit iki saniyelik izgarada kalir.
+    /// </summary>
+    public static SceneMap? QualityScenes(SceneMapAttempt? attempt) => attempt?.Map;
+
+    /// <summary>
+    /// Yoklamanin kalite olceri. Harita geldiginde olcum
+    /// <see cref="QualityMeter.MeasureWindowAsync(string, string, double, double, double, SceneMap?, CancellationToken)"/>
+    /// asiri yuklemesine gecer; gelmediginde <see cref="QualityMeasurement.Instance"/> ile
+    /// bugunku yolda kalir.
+    /// </summary>
+    public static IQualityMeasurement ProbeMeter(SceneMap? scenes)
+        => scenes is null ? QualityMeasurement.Instance : new SceneAwareQualityMeasurement(scenes);
+
+    /// <summary>
+    /// <see cref="QualityMeasurement"/> ile ayni olcumu yapar, tek farki tasidigi haritayi
+    /// olcume vermesidir. <see cref="IQualityMeasurement"/> harita parametresi tasimiyor ve
+    /// o arayuz bu sozlesmenin owns kumesinin disinda; harita bu yuzden gerceklemenin
+    /// icinde tasiniyor.
+    /// </summary>
+    internal sealed class SceneAwareQualityMeasurement : IQualityMeasurement
+    {
+        private readonly SceneMap _scenes;
+
+        internal SceneAwareQualityMeasurement(SceneMap scenes) => _scenes = scenes;
+
+        internal SceneMap Scenes => _scenes;
+
+        public bool IsAvailable => QualityMeasurement.Instance.IsAvailable;
+
+        public async Task<WindowQualityMeasurement?> MeasureWindowAsync(
+            string referencePath, string samplePath, double referenceStartSeconds,
+            double durationSeconds, CancellationToken ct)
+        {
+            if (!IsAvailable) return null;
+            var watch = Stopwatch.StartNew();
+            try
+            {
+                var score = await QualityMeter.MeasureWindowAsync(
+                    referencePath, samplePath, referenceStartSeconds, 0, durationSeconds, _scenes, ct);
+                if (!score.Comparable || score.VmafNegMean is null) return null;
+                return new WindowQualityMeasurement(
+                    referenceStartSeconds, score.VmafNegMean, score.VmafNegHarmonic,
+                    score.VmafNegP10, true, watch.ElapsedMilliseconds, score.Message,
+                    score.VmafNegMin, score.VmafNegWorstScene,
+                    score.WorstSceneStartSeconds, score.SceneWindowSeconds);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+            catch (QualityMeasurementFailedException failure)
+            {
+                return new WindowQualityMeasurement(
+                    referenceStartSeconds, null, null, null, false, watch.ElapsedMilliseconds, failure.Message);
+            }
+            catch { return null; }
+        }
+    }
+
     private async Task MeasureComplexityAsync(MediaInfo info)
     {
         _probeCts?.Cancel();
@@ -1818,13 +1883,13 @@ public partial class MainWindow : Window
         try
         {
             var speed = CurrentOptions().SpeedMode;
-            var profile = await ProbeWithMeasuredQualityAsync(info, speed, null, cts.Token);
-            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
-            _profile = profile;
-            Recalculate();
-
             _sceneMap = await EncodeRunner.TryBuildSceneMapAsync(info, ct: cts.Token);
             if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            Recalculate();
+
+            var profile = await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(QualityScenes(_sceneMap)), cts.Token);
+            if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
+            _profile = profile;
             Recalculate();
 
             TxtEstimateNote.Text = Say("main.estimate.calibrating");
@@ -1835,7 +1900,7 @@ public partial class MainWindow : Window
             // produced, until the two agree.
             for (var round = 0; round < CalibrationRounds; round++)
             {
-                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token);
+                var calibrated = await CalibrationProbe.RunAsync(info, draft, profile, speed, cts.Token, CalibrationScenes(_sceneMap));
                 if (cts.IsCancellationRequested || !ReferenceEquals(_info, info)) return;
                 _profile = calibrated;
                 Recalculate();
