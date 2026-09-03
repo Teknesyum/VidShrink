@@ -192,8 +192,7 @@ Basarili! - Basarisiz: 0, Basarili: 3, Atlanan: 0, Toplam: 3, Sure: 11 ms
 `--list-tests` ile doğrulanan gerçek test sayısı: **3** (yukarıdaki üç isim). Vstest'in alt-dize
 filtre boş-eşleşme tuzağına düşülmedi.
 
-CI koşum kimliği: **bu bölüm dal `origin`'e itildikten sonra `gh run list` ile doldurulacak** —
-henüz push edilmedi (rapor push öncesi yazılıyor).
+CI koşum kimliği: **33770482964** — `gh run view 33770482964` → `completed success`.
 
 ## Yol açıklaması — HDR/SDR karşılaştırma tuzağı
 
@@ -212,7 +211,6 @@ Duman testinde doğrulandı: `VMAF-NEG ort=68,769 p10=42,454 (ok)`. Bu yolun tek
 
 ## Borçlar
 
-- CI koşum kimliği push sonrası eklenecek.
 - `VmafNegWorstScene`/sahne-ağırlıklı en kötü pencere, HDR kaynaklarda
   `MeasureTonemappedReferenceAsync`in sahne haritası almaması nedeniyle ölçülemedi (SDR
   kaynak olsaydı ölçülebilirdi — bu üç kaynağın hepsi HDR olduğu için K2 kapsamı dışında kaldı,
