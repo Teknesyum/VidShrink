@@ -736,16 +736,38 @@ public static class ComplexityProbe
     {
         if (half is null)
         {
-            var (bytes, frames) = await SampleAsync(path, start, WindowSeconds, null, preset, speed, ct);
-            return new WindowSample(bytes, frames, 0, 0);
+            var lone = await MeasuredSampleAsync(path, start, preset, speed, qualityMeasurement, ct);
+            return new WindowSample(lone.Bytes, lone.Frames, 0, 0, lone.Quality);
         }
 
         var split = await SplitSampleAsync(path, start, half.Value, preset, speed, qualityMeasurement, ct);
         if (split is { } measured) return measured;
 
-        var (fullBytes, fullFrames) = await SampleAsync(path, start, WindowSeconds, null, preset, speed, ct);
+        var full = await MeasuredSampleAsync(path, start, preset, speed, qualityMeasurement, ct);
         var (halfBytes, halfFrames) = await SampleAsync(path, start, WindowSeconds, $"scale={half.Value.Width}:{half.Value.Height}", preset, speed, ct);
-        return new WindowSample(fullBytes, fullFrames, halfBytes, halfFrames);
+        return new WindowSample(full.Bytes, full.Frames, halfBytes, halfFrames, full.Quality);
+    }
+
+    private static async Task<(long Bytes, long Frames, WindowQualityMeasurement? Quality)> MeasuredSampleAsync(
+        string path, double start, string preset, SpeedMode speed, IQualityMeasurement? qualityMeasurement, CancellationToken ct)
+    {
+        var target = Path.Combine(Path.GetTempPath(), "vidshrink_probe_" + Guid.NewGuid().ToString("N") + "_full" + SampleExtension);
+        try
+        {
+            var (bytes, frames) = await SampleToFileAsync(path, start, WindowSeconds, null, preset, speed, target, ct);
+            if (bytes <= 0 || frames <= 0 || qualityMeasurement is null) return (bytes, frames, null);
+
+            try
+            {
+                return (bytes, frames, await qualityMeasurement.MeasureWindowAsync(path, target, start, WindowSeconds, ct));
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+            catch { return (bytes, frames, null); }
+        }
+        finally
+        {
+            try { File.Delete(target); } catch { }
+        }
     }
 
     private static async Task<WindowSample?> SplitSampleAsync(string path, double start, (int Width, int Height) half, string preset, SpeedMode speed, IQualityMeasurement? qualityMeasurement, CancellationToken ct)
@@ -810,6 +832,18 @@ public static class ComplexityProbe
     public static async Task<(long Bytes, long Frames)> SampleAsync(string path, double start, double length, string? filter, string? preset, SpeedMode speed, CancellationToken ct)
     {
         var target = Path.Combine(Path.GetTempPath(), "vidshrink_probe_" + Guid.NewGuid().ToString("N") + "_one" + SampleExtension);
+        try
+        {
+            return await SampleToFileAsync(path, start, length, filter, preset, speed, target, ct);
+        }
+        finally
+        {
+            try { File.Delete(target); } catch { }
+        }
+    }
+
+    private static async Task<(long Bytes, long Frames)> SampleToFileAsync(string path, double start, double length, string? filter, string? preset, SpeedMode speed, string target, CancellationToken ct)
+    {
         var args = SampleArgs(path, start, length, filter, preset, speed, target);
 
         using var deadline = Deadline(ct, SampleTimeout);
@@ -836,10 +870,6 @@ public static class ComplexityProbe
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
             return (0, 0);
-        }
-        finally
-        {
-            try { File.Delete(target); } catch { }
         }
     }
 
