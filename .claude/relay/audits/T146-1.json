@@ -1,0 +1,18 @@
+{
+  "contractId": "T146",
+  "auditorRunId": "a46b2f22f08284cc1",
+  "headSha": "ce647e66d32a7ac48d4a210062a0a067fdf82559",
+  "diffHash": "9e6d5973b00381f6d9ee8c24d4bb9298b5d719558118ccddbd6ea9d2ef4c4753",
+  "owns": [
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/CompressionStrategy.cs",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "tests/VidShrink.Tests/UretimYoluTests.cs",
+    "docs/olcumler/uretim-yolu.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 9544c54te olculdu, depoya yazilmadi (files: []). K1'in uc kirmizisi ve K6'nin alti mutasyonundan ucu denetci tarafindan --no-incremental ile kosturuldu. K4'un asil bulgusu bizzat uretildi: libx264 turbo ikinci gecisi weightp catismasiyla sifir bayt dosya birakiyor (pass2 exit=127), libx265 ayni girdide 918K uretiyor; T140 muhurlenirken bu kol kosturulmamis. Karar kodda dar: PlanCalculator.cs:415 SpeedMode.Fast && libx265. K7 kollari 12/32/0, olu MainWindowPlanTests kolu T0 kusuru olarak kayda gecti ve verify satirindan cikarildi. OluUyeTests pimi 26'da kaldi, nedeni olculdu (tarama yalniz enum ve static readonly sayiyor). CI 33740299463 success. KRITIK yok, alti borc."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T10:25:29.345Z"
+}

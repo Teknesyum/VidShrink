@@ -202,3 +202,4 @@
 {"id":"T151","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"PlanCalculatorProbeTests|EncoderStateConsumptionTests","code":0}],"auditorRunId":null,"headSha":"871d5dc5622ef61bdba3203fe034e3c67e41111e","at":"2026-09-03T09:10:18.587Z"}
 {"id":"T146","result":"stale","at":"2026-09-03T09:17:27.282Z"}
 {"id":"T147","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"EncoderCapabilitiesTests|SegmentEncoderTests|SessizDusurmeTests","code":0}],"auditorRunId":null,"headSha":"2fcc2e22853b372f74c59f8d0f98d8540b429b09","at":"2026-09-03T10:10:58.157Z"}
+{"id":"T146","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"UretimYoluTests|PlanCalculatorTests","code":0}],"auditorRunId":null,"headSha":"ce647e66d32a7ac48d4a210062a0a067fdf82559","at":"2026-09-03T10:25:43.181Z"}
