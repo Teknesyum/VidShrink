@@ -412,11 +412,22 @@ public static class PlanCalculator
         Height = best.Height,
         Fps = best.Fps,
         Preset = PickPreset(codec, options.Codec, options.SpeedMode),
-        TurboFirstPass = options.SpeedMode == SpeedMode.Fast,
+        TurboFirstPass = options.SpeedMode == SpeedMode.Fast && TurboFirstPassIsSafe(codec),
         PixelFormat = hdr.PixelFormat,
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
     };
+
+    /// <summary>
+    /// <see cref="CodecModel.SupportsTurboFirstPass"/> hem <c>libx264</c> hem <c>libx265</c>
+    /// icin tavan tanimlar, ama plan turboyu yalniz <c>libx265</c>'te aciyor. libx264'te ikinci
+    /// gecis birinci gecisin <c>weightp</c> ayarina uymak zorundadir: <c>veryfast</c> weightp=1,
+    /// <c>slow</c> weightp=2 kosar ve x264 ikinci gecisi
+    /// <c>different weightp setting than first pass (2 vs 1)</c> diyerek hic acmaz —
+    /// kullanici sifir bayt cikti alir. Olcum: <c>docs/olcumler/uretim-yolu.md</c>.
+    /// </summary>
+    private static bool TurboFirstPassIsSafe(string codec)
+        => codec.Equals("libx265", StringComparison.OrdinalIgnoreCase);
 
     private static bool CanPassThrough(MediaInfo info, PlanOptions options, string codec, HdrResolution hdr)
     {

@@ -90,10 +90,11 @@ public sealed class UretimYoluTests
             => CodecModel.IsHardware(codec) ? EncoderProbeState.NotWorking : EncoderProbeState.Working;
     }
 
-    private static PlanOptions Secenekler(SpeedMode kip, double hedefMb = 25) => new()
+    private static PlanOptions Secenekler(SpeedMode kip, double hedefMb = 25,
+        CodecPreference kodek = CodecPreference.MaxCompression) => new()
     {
         TargetMb = hedefMb,
-        Codec = CodecPreference.Compatible,
+        Codec = kodek,
         SpeedMode = kip
     };
 
@@ -159,7 +160,7 @@ public sealed class UretimYoluTests
         var kaynak = Kaynak();
         var plan = PlanCalculator.Build(kaynak, Secenekler(SpeedMode.Fast), new DonanimsizMakine());
 
-        Assert.Equal("libx264", plan.Codec);
+        Assert.Equal("libx265", plan.Codec);
         Assert.Equal(EncodeMode.TwoPass, plan.ModeEnum);
 
         var (ilk, son) = GecisOnAyarlari(kaynak, plan);
@@ -167,6 +168,27 @@ public sealed class UretimYoluTests
 
         Assert.Equal("slow", son);
         Assert.NotEqual(son, ilk);
+    }
+
+    /// <summary>
+    /// K4. Turbo libx264'te acilmiyor: ikinci gecis birinci gecisin <c>weightp</c> ayarina
+    /// uymak zorundadir, <c>veryfast</c> ile <c>slow</c> farkli deger kosar ve x264 ikinci
+    /// gecisi hic acmaz. Olculdu: iki klipte de cikti sifir bayt.
+    /// </summary>
+    [Fact]
+    public void Libx264HizliKiptedeTurboyaAcilmiyor()
+    {
+        var kaynak = Kaynak();
+        var plan = PlanCalculator.Build(kaynak,
+            Secenekler(SpeedMode.Fast, kodek: CodecPreference.Compatible), new DonanimsizMakine());
+
+        Assert.Equal("libx264", plan.Codec);
+        Assert.Equal(EncodeMode.TwoPass, plan.ModeEnum);
+
+        var (ilk, son) = GecisOnAyarlari(kaynak, plan);
+        _cikti.WriteLine($"kodek={plan.Codec} kip={plan.Mode} ilk={ilk} son={son}");
+
+        Assert.Equal(son, ilk);
     }
 
     /// <summary>
