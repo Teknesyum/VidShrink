@@ -336,6 +336,9 @@ Birlesik verify kosumu:
 Başarılı!  - Başarısız: 0, Başarılı: 73, Atlanan: 3, Toplam: 76, Süre: 2 m 4 s
 ```
 
+CI kosumu: **33733262807** (dal `T145-kalan-alti-bant-tur2`), `completed / success`.
+https://github.com/Teknesyum/VidShrink/actions/runs/33733262807
+
 76 = 22 + 54. Atlanan uc test `[LiveLauncherFact]` gecidinin arkasindaki uclu
 (`VIDSHRINK_LAUNCHER_EXE` kurulu degil); bant 1'in kosumu bu gecit acilarak ayrica
 yapildi.
