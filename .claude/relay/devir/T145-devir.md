@@ -17,8 +17,9 @@ son-commit: e162d31f664f3cec4bb3dd06f685ff350552ef6a
   gösterildi ve katsayı konmadı.
 - **K4 (sayım ölçüsü) — bitti.** `SaatTureviIddiaSayisi = 23` değişmedi,
   `SaatTureviIddialarinSayisiBelgedekiyleAyni` yeşil.
-- **K5 (kol başına test sayısı + CI) — büyük ölçüde bitti, bir açık var.**
-  Aşağıya bak.
+- **K5 (kol başına test sayısı + CI) — bitti.** Verify kolları yeşil (74/76,
+  2 atlanan ortam kapılı), CI yeşil. Ek olarak tam süit de (bu sözleşmenin
+  verify'ı değil, kendi inisiyatifimle) artık temiz koşuyor — aşağıya bak.
 
 ## Ölçtüğüm sayılar
 
@@ -53,26 +54,56 @@ CI `VIDSHRINK_LAUNCHER_EXE` set etmiyor, yani A/B/C bantları CI'da atlanır
 (rapordaki T0 maddesi 2'de bu zaten yazılı). CI `kosum-kapisi.ps1
 -MinimumTotal 1134 -MaximumSkipped 30` ile tam süiti koşturuyor ve yeşil döndü.
 
-### Tam süit — bu makinede, VIDSHRINK_LAUNCHER_EXE kurulu — TAMAMLANMADI
+### Tam süit — bu makinede, VIDSHRINK_LAUNCHER_EXE kurulu — ARAŞTIRILDI VE ÇÖZÜLDÜ
+
+İlk koşum (`.calisma/T145/tam-suit.txt`) 23 satırda kesilmiş, "Toplam:" yok,
+xUnit iç saatinde 00:05:06 → 04:08:40 arası ~4 saatlik açıklanamayan bir sıçrama
+vardı, `cikis=1`.
+
+**Araştırma:** aynı komut `--logger "console;verbosity=detailed"` ile, makine
+tamamen sakinken (`tasklist` içinde testhost/ffmpeg/VidShrink sıfır), başka
+hiçbir eşzamanlı iş yokken tekrar koşuldu:
+`.calisma/T145/tam-suit-detay.txt`.
 
 ```
-$ VIDSHRINK_LAUNCHER_EXE=... dotnet test -c Release > .calisma/T145/tam-suit.txt 2>&1
-cikis=1
+Test Çalıştırması Başarılı.
+Toplam test sayısı: 1479
+     Geçti: 1464
+    Atlandı: 15
+ Toplam süre: 18,9454 Dakika
+cikis=0
 ```
 
-`.calisma/T145/tam-suit.txt` 23 satırda kesiliyor, "Toplam:" satırı yok.
-Dosyanın içindeki xUnit iç saati şurada bir sıçrama gösteriyor:
+**Sıçrama tekrarlanmadı.** 18,9 dakikada, sıfır kırmızı, sıfır durgunluk
+(180 sn eşikli bir izleyici tüm koşum boyunca dosyayı izledi, hiç tetiklenmedi).
+15 atlanan test tek tek sayıldı, hepsi `Live*`/donanım ortam kapılı
+(`CalibrationProbeTests` 3, `ExtremeCompressionTests` 3, `FillBandTests` 1,
+`HardwareEncoderTests`/`HardwareFlagTests`/`HardwareRateControlTests`/
+`HardwareVerdictTests` toplam 7, `PerformanceCheckTests` 1,
+`PlaybackFrameSourceTests` 2 — üstü kapalı ilan, T145'in bandlarıyla ilgisi yok).
 
-```
-[xUnit.net 00:05:06.90]  DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu [SKIP]
-[xUnit.net 04:08:40.17]  ExtremeCompressionTests.LiveQualityCurveShowsWhereTheCodecStopsCarryingThePicture [SKIP]
-```
+**Sıçramanın en olası sebebi — dolaylı kanıt, kesin kanıt değil.** İlk koşumla
+tam eşzamanlı olarak bağımsız denetçi ajanı (`ac5d20c451764e6b9`) açılmıştı ve
+kendi sonuç metninde şunu bırakmıştı: *"The machine is busy — another agent's
+testhost holds the Release binaries. I'll build to an isolated output path
+instead of disturbing it."* — yani iki ayrı süreç aynı anda aynı Release
+ikililerine (`bin/Release/net8.0`) erişmeye çalışıyordu. Bu, MSBuild/testhost
+dosya kilidi çekişmesiyle uzun bloklanmalar üretebilecek bilinen bir desendir.
+Ayrıca o oturum tam bu sırada devir protokolüyle kesilip model değişimi
+(`/model claude-sonnet-5`) yapıldı — arka plan sürecinin bu kesinti sırasında
+işletim sistemi tarafından askıya alınmış olması da mümkün, dışlanamadı.
 
-00:05 ile 04:08 arası ~4 saat. Ardından üç `ExtremeCompressionTests.Live*` SKIP
-satırı ve dosya orada kesiliyor. `cikis=1` — `dotnet test` başarısız döndü.
-Süreç şu an makinede koşmuyor (`tasklist` içinde testhost/VidShrink/ffmpeg yok),
-yani ya çöktü ya da bu oturumun kesilmesiyle birlikte öldürüldü — hangisi
-olduğunu **ayırt edemedim**.
+**Kesin teşhis yok.** Ne bir çökme kaydı (event log, crash dump) ne de hangi
+testin sıçramadan hemen önce/sonra çalıştığına dair güvenilir bir iz var —
+sıçramadan hemen önceki satır bir `[SKIP]`'ti (anlık, süre almaz), yani asıl
+tıkanma bir testin İÇİNDE değil, `dotnet test`/MSBuild seviyesinde bir yerde
+olmalı. Temiz tekrar koşum (yalnız süreç, başka rakip iş yok) sorunu hiç
+göstermedi; bu da eşzamanlı-erişim teşhisini destekliyor ama kanıtlamıyor.
+
+**Sonuç:** T145'in kendi kodunda ya da testlerinde bir hata değil. Verify
+zaten temiz koşuyordu (yukarı bak), şimdi tam süit de temiz koşuyor. Riskli
+olan şey — iki ajanın aynı makinede aynı Release ikililerine eşzamanlı
+erişmesi — bu sözleşmenin kapsamı dışında bir altyapı/orkestrasyon konusu.
 
 Bu koşum T145'in `verify` alanındaki komut **değil** — sözleşmenin verify'ı
 sadece `PerformanceCheckTests|UpdaterTests` filtresi ve o yeşil (yukarıya bak).
@@ -89,11 +120,9 @@ Tam süiti ben kendi inisiyatifimle, ekstra güvence için başlatmıştım.
 - CI'ın success dönmesi
 
 **Ölçülmeyen / varsayılan:**
-- Tam süitin bu dalda tam olarak yeşil olup olmadığı — CI yeşil ama CI
-  `VIDSHRINK_LAUNCHER_EXE` set etmiyor, yani A/B/C bantlarını hiç koşturmuyor.
-  Bu makinedeki `VIDSHRINK_LAUNCHER_EXE` kurulu tam süit koşumu tamamlanmadı.
-- 4 saatlik sıçramanın hangi testten kaynaklandığı — dosyada o testin adı yok,
-  sadece ondan sonraki üç SKIP satırı var. Tahmin bile üretmedim.
+- 4 saatlik sıçramanın **kesin** sebebi — bulunamadı, dolaylı kanıtla en olası
+  açıklama yazıldı (yukarı bak). Tahmin bile üretmedim, sadece gözlenen
+  eşzamanlılığı ve tekrarlanmadığını kaydettim.
 
 ## Güvenilmeyecek şeyler
 
@@ -102,7 +131,8 @@ Tam süiti ben kendi inisiyatifimle, ekstra güvence için başlatmıştım.
   yazılmış bir açık.
 - `.calisma/T145/tam-suit.txt` yarım kalmış bir dosya, "Toplam:" satırı yok.
   Sonuç çıkarmak için kullanma; sadece "bir yerde ~4 saat süren bir şey oldu"
-  bilgisini taşıyor.
+  bilgisini taşıyor. Geçerli olan `.calisma/T145/tam-suit-detay.txt`
+  (Toplam 1479, Geçti 1464, Atlandı 15, cikis=0).
 - Bağımsız denetçi ajanı (`ac5d20c451764e6b9`) makine meşgulken derleme yapmaya
   çalışıp **stalled** oldu (600 sn ilerleme yok), hiçbir bulgu üretmedi. Onun
   adına "denetlendi" deme — denetim hiç tamamlanmadı.
@@ -120,14 +150,9 @@ geçici olarak değiştirilip her seferinde `git checkout --` ile geri alındı;
 
 ## Sıradaki adım
 
-Ben olsam önce tam süitin neden ~4 saatte tıkandığını netleştirirdim: makineyi
-tamamen sakinleştirip (`tasklist` sıfır testhost/ffmpeg/VidShrink), tek başına
-`VIDSHRINK_LAUNCHER_EXE=... dotnet test -c Release --logger "console;verbosity=detailed" > tam-suit-2.txt 2>&1`
-koşturur ve hangi testin sıçramadan hemen önce başladığını (log'daki son
-timestamp'ten önceki satır) kaydederdim. Bu T145'in verify'ını etkilemiyor
-(o zaten yeşil ve CI de yeşil), ama sözleşmeyi T0'a teslim etmeden önce bu
-belirsizliği raporun T0'a bölümüne madde olarak eklemek gerekir — şu an
-raporda yok, sadece bu devir dosyasında var.
-
-Bağımsız denetimi de yeniden açmak gerekir; ilk deneme makine meşgulken
-başladığı için stalled oldu, bulgu yok.
+4 saatlik sıçrama araştırıldı ve tekrarlanmadı (yukarı bak); T145'in kendi
+işiyle ilgisi yok göründüğü için sözleşmeyi bu belirsizlikle bloke etmedim.
+Ben olsam şimdi bağımsız denetimi **tekrar** açardım — ilk deneme makine
+meşgulken (tam süit + kendisi aynı anda) başladığı için stalled oldu ve hiç
+bulgu üretmedi. Makine şu an sakin, denetim şimdi temiz koşabilir. Denetim
+geçerse T0'a teslime hazır; geçmezse bulguları bu dosyaya ekleyip commit et.
