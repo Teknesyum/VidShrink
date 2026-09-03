@@ -952,7 +952,7 @@ public sealed class UpdaterTests : IDisposable
         _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
         Assert.True(offlineFirst < AgsizAcilisTavani, $"ağsız açılış çok uzun: {offlineFirst}");
-        Assert.True(offlineSecond < TimeSpan.FromSeconds(3), $"ağsız ikinci açılış çok uzun: {offlineSecond}");
+        Assert.True(offlineSecond < AgsizAcilisTavani, $"ağsız ikinci açılış çok uzun: {offlineSecond}");
     }
 
     [LiveLauncherFact]
