@@ -40,6 +40,17 @@ internal sealed record PreviewClip
     /// <summary>İki dosyanın birlikte kodlanma süresi.</summary>
     public required TimeSpan Elapsed { get; init; }
 
+    /// <summary>
+    /// ffmpeg'in kabul etmeyip sessizce düşürdüğü ayarların tanılı satırları. Dolu olması
+    /// önizlemenin başarısız olduğu anlamına <b>gelmez</b>: parça kodlandı, yalnız motorun
+    /// seçtiği ayarların tamamını taşımıyor. Sağ yarı bu yüzden planın anlattığı kaliteyi
+    /// göstermeyebilir; okuyan taraf farkı buradan öğrenir.
+    /// </summary>
+    public IReadOnlyList<string> DroppedOptions { get; init; } = Array.Empty<string>();
+
+    /// <summary>Parçayı üretirken motorun verdiği ayarlardan en az biri düşürülmüş.</summary>
+    public bool DroppedAnOption => DroppedOptions.Count > 0;
+
     public double EndSeconds => StartSeconds + DurationSeconds;
 }
 
@@ -281,7 +292,8 @@ internal sealed class SegmentEncoder : IDisposable
                 DurationSeconds = segment.DurationSeconds,
                 IsApproximate = segment.IsApproximate,
                 Crf = segment.Plan.Crf,
-                Elapsed = clock.Elapsed
+                Elapsed = clock.Elapsed,
+                DroppedOptions = DroppedAcross(runs)
             };
 
             Register(clip);
@@ -361,6 +373,16 @@ internal sealed class SegmentEncoder : IDisposable
     /// anahtardan gelen sebebi görür.
     /// </summary>
     internal const string WindowOutOfRangeKey = "playback.error.window";
+
+    /// <summary>
+    /// Parçayı üreten koşumlarda düşürülen ayarların birleşimi, sıra korunarak. Bugün
+    /// yalnız kodlanmış parça motorun ayarlarını taşıyor; kaynak çıkarması kayıpsız ve
+    /// <c>-loglevel error</c> ile koşuyor, yani düşecek bir ayarı yok. Birleşim yine de
+    /// iki koşumu birden okuyor: soru "bu önizleme üretilirken bir ayar düştü mü", tek bir
+    /// koşumun durumu değil.
+    /// </summary>
+    internal static IReadOnlyList<string> DroppedAcross(FfmpegRun[] runs)
+        => runs.SelectMany(run => run.DroppedOptions ?? Array.Empty<string>()).ToArray();
 
     internal static EncodeFailure FirstFailure(FfmpegRun[] runs)
     {

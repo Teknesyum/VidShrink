@@ -252,3 +252,60 @@ kırıldı.
 
 `ANonZeroExitIsRejectedWhateverTheTextSays` kapının diğer yarısını tutuyor: çıkış kodu
 sıfırdan farklıysa metin ne derse desin yoklama kabul etmiyor.
+
+## K4 — Önizleme: loglevel kararı ve taşımanın tüketilmesi
+
+### Karar
+
+| Soru | Karar | Gerekçe |
+|---|---|---|
+| Kaynak parça koşumunun `-loglevel error` seviyesi yükseltilsin mi | **Hayır, olduğu gibi kalıyor** | O koşum `libx264 -preset ultrafast -qp 0` ile kayıpsız çıkarma; motorun hiçbir ayarını taşımıyor, dolayısıyla düşecek bir ayarı da yok. Yükseltmenin bedeli ölçüldü |
+| Kodlanmış parça koşumunun seviyesi değiştirilsin mi | **Hayır, zaten `-loglevel` almıyor** | `FfmpegArguments.Build` hiç `-loglevel` vermiyor; koşum varsayılan `info` seviyesinde ve tanıyı **basıyor**. Değiştirilecek bir şey yok |
+| Öyleyse asıl iş ne | **`SegmentEncoder` taşımayı okumuyordu; artık okuyor** | `FfmpegRun.DroppedOptions` doluyordu ama `:265`'te yalnız `.Ok`a bakılıyordu. Düşen ayar önizlemede de sessizce kayboluyordu |
+
+Sözleşmenin sunduğu üç seçenekten ikincisi seçildi — "seviyeyi bırak" — ama üçüncü bir iş
+ortaya çıktı: taşımanın tüketilmemesi. Açık 2'nin gerçek gövdesi buymuş.
+
+### Seviyeyi yükseltmenin ölçülen bedeli
+
+Önizlemenin kaynak parça koşumu, aynı komut iki seviyede:
+
+```
+-loglevel error   çıkış kodu 0   0 satır      0 bayt
+-loglevel info    çıkış kodu 0   39 satır  2747 bayt
+```
+
+İstek başına 2747 bayt, hiçbir tanı kazancı olmadan — o koşumda düşecek ayar yok.
+Üstüne `FfmpegRunner.ErrorTailLines` **8**: seviye yükseltilseydi gerçek bir hatanın
+sebebi 39 satırlık banner tarafından 8 satırlık kuyruğun dışına itilirdi. Yani yükseltmek
+yalnız gereksiz değil, **teşhis kaybettirirdi**.
+
+### Kuyruk ölçümü — kodlanmış parça
+
+`Build` şeklinde koşan ffmpeg: çıkış kodu 0, 38 satır, tanı satır 7'de. `ErrorTailLines`
+8 olduğu için son 8 satır 31-38; **tanı kuyrukta değil.** Ama `FfmpegRunner.Decide`
+`DroppedOptions`ı kuyruktan değil **tam metinden** hesaplıyor, dolayısıyla kuyruk penceresi
+bu yolu kesmiyor. `StandardError`da sebep görünmez, `DroppedOptions`ta görünür — taşımanın
+ayrı alan olmasının nedeni tam olarak bu.
+
+### Karar öldürmüyor, bildiriyor
+
+Düşürülen ayar `PreviewClip.DroppedOptions`a taşınıyor; `LastFailure`a **değil**.
+Kodlanmış parça diskte ve izlenebilir — onu başarısız saymak çalışan bir önizlemeyi
+atmak olurdu, K3'ün uyardığı zarar. T144'ün teslim yolunda verdiği kararla aynı yönde.
+
+Birleşim iki koşumu birden okuyor (`DroppedAcross`). Bugün yalnız kodlanmış parça dolu
+dönebiliyor, ama soru "bu önizleme üretilirken bir ayar düştü mü" — tek bir koşumun
+durumu değil.
+
+### Kararı tutan ölçüler
+
+- `ThePreviewCarriesTheDropFromTheRunThatHoldsTheEngineSettings` — ölçülen stderr metni `FfmpegRunner.Decide`tan geçip parçaya taşınıyor; koşum `Ok` kalıyor.
+- `ACleanPreviewCarriesNothing` — `x265 [warning]` satırı taşımaya girmiyor.
+- `TheUnionReadsBothRuns` — birleşim tek koşuma sabitlenmiş değil.
+- `TheSourceClipRunStaysAtLogLevelError` — kaynak koşumunun seviyesi `error` olarak pimlendi; ileride sessizce yükseltilirse ölçü kırılır.
+
+### Kullanıcıya gösterim bu sözleşmede yok
+
+`PreviewClip.DroppedOptions` paneli barındıran tarafa kadar geliyor; ekranda gösterilmesi
+`MainWindow`/`PanelHost` işi ve `owns` dışında. Sözleşme bunu açıkça kapsam dışı bırakıyor.

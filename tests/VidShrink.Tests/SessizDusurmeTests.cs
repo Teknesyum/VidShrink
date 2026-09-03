@@ -1,3 +1,4 @@
+using VidShrink.App.Playback;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Tests;
@@ -118,5 +119,69 @@ public sealed class SessizDusurmeTests
     {
         Assert.False(EncoderCapabilities.OptionAccepted(8, string.Empty));
         Assert.False(EncoderCapabilities.OptionAccepted(8, "x265 [info]: tools: rd=3 psy-rd=2.00"));
+    }
+
+    /// <summary>
+    /// K4 karari: dusurulen ayar onizlemeyi <b>oldurmez</b>, parcaya tasinir. Kodlanmis
+    /// parca motorun ayarlarini tasiyan kosum; kaynak cikarmasinin tasiyacagi ayar yok.
+    /// </summary>
+    [Fact]
+    public void ThePreviewCarriesTheDropFromTheRunThatHoldsTheEngineSettings()
+    {
+        var runs = new[]
+        {
+            new FfmpegRun(true, 0, string.Empty, TimeSpan.Zero),
+            FfmpegRunner.Decide(0, X265DroppedKeyAtProbeShape, TimeSpan.Zero)
+        };
+
+        var dropped = SegmentEncoder.DroppedAcross(runs);
+
+        Assert.Contains(dropped, line => line.Contains("zzznotreal"));
+        Assert.True(runs[1].Ok, "Calisan onizleme dusurulmus ayar yuzunden oldurulmez.");
+    }
+
+    /// <summary>Temiz bir onizlemede tasinacak bir sey yok.</summary>
+    [Fact]
+    public void ACleanPreviewCarriesNothing()
+    {
+        var runs = new[]
+        {
+            new FfmpegRun(true, 0, string.Empty, TimeSpan.Zero),
+            FfmpegRunner.Decide(0, "x265 [warning]: Source height < 720p; disabling lookahead-slices", TimeSpan.Zero)
+        };
+
+        Assert.Empty(SegmentEncoder.DroppedAcross(runs));
+    }
+
+    /// <summary>Birlesim iki kosumu birden okuyor; tek kosuma sabitlenmis degil.</summary>
+    [Fact]
+    public void TheUnionReadsBothRuns()
+    {
+        var runs = new[]
+        {
+            FfmpegRunner.Decide(0, "[libx264 @ 0] Error parsing option 'aaa = 1'.", TimeSpan.Zero),
+            FfmpegRunner.Decide(0, "[libx265 @ 0] Unknown option: bbb.", TimeSpan.Zero)
+        };
+
+        var dropped = SegmentEncoder.DroppedAcross(runs);
+
+        Assert.Contains(dropped, line => line.Contains("aaa"));
+        Assert.Contains(dropped, line => line.Contains("bbb"));
+    }
+
+    /// <summary>
+    /// Onizlemenin kaynak parcasi <c>-loglevel error</c> ile kosuyor ve oyle kaliyor:
+    /// o kosum motorun ayarlarini hic tasimadigi icin seviyeyi yukseltmek istek basina
+    /// 2747 bayt gurultu ekler ve <see cref="FfmpegRunner.ErrorTailLines"/> kadarlik
+    /// kuyrugu doldurup gercek hata sebebini disari iter.
+    /// </summary>
+    [Fact]
+    public void TheSourceClipRunStaysAtLogLevelError()
+    {
+        var args = SegmentEncoder.BuildSourceClipArguments("girdi.mp4", 1.0, 2.0, "cikti.mp4").ToList();
+
+        var at = args.IndexOf("-loglevel");
+        Assert.True(at >= 0, "kaynak parca kosumu -loglevel vermeyi birakmis");
+        Assert.Equal("error", args[at + 1]);
     }
 }
