@@ -593,3 +593,60 @@ kapinin varligi, kapiyi asma aliskanligini uretiyor.
 **Onerilen.** Salt-okunur `git` alt komutlarini beyaz listeye al: `status`, `log`, `show`,
 `diff`, `rev-parse`, `merge-base`, `ls-tree`, `branch --list`, `worktree list`. Kapi
 yalniz agaci degistiren ya da uzaga yazan komutlara baksin.
+
+
+## `live/` iki yerde: denetim kaydi yazilamiyor, denetcinin "yazmadi" guvencesi dogrulanamiyor
+
+**Olcum, 3 Eylul 2026.** T156'nin denetcisi (`ae69a91a0b070dd3d`) isini bitirdi, GECTI dedi.
+Mühürlemek icin:
+
+```
+contract.js audit --id T156 --run-id ae69a91a0b070dd3d --verification "..."
+-> Refused - no live record for run-id: ae69a91a0b070dd3d - the auditor must be an
+   agent that actually ran, not a name
+```
+
+Ajan gercekten kostu. Kayit da var — **baska bir agacta**:
+
+```
+.claude/worktrees/T0/.claude/relay/live/   -> ae69... YOK
+Vidshrink/.claude/relay/live/              -> ae69a91a0b070dd3d.json  VAR
+                                              a353525fa4b02d361.json  VAR
+                                              ab67ee26327b03a4a.json  VAR
+```
+
+Ajanlar canli kaydi **proje kokunun** `live/` klasorune yaziyor; `contract.js` ise
+calistirildigi yerden (`relayRoot(cwd)`) cozuyor ve T0 worktree'sindeki bos klasore bakiyor.
+Iki klasor birbirini hic gormuyor — `live/` gitignore'da, birlesmiyor da.
+
+Bu, bu belgede daha once yazilan **"kancalar bayat calisma agacini okuyor"** kusurunun
+ayni kokten ikinci meyvesi: `relayRoot(cwd)` cozumu, T0 worktree'de calisirken **iki ayri
+relay koku** uretiyor.
+
+**Zarari tek bir kayit degil.** Muhur kapisinin denetci guvencesi tam da bu dosyaya
+dayaniyor: `live/<auditor_id>.json` icindeki `files` dizisi doluysa denetim dusuyor. Kayit
+bulunamayan bir denetcide **o guvence hic calismiyor** — kapi "yazmis mi" sorusunu
+soramiyor. Elle actigimda dogru cevabi gordum:
+
+```json
+{"id": "ae69a91a0b070dd3d", "role": "auditor", "files": []}
+```
+
+Ama bunu kapinin degil benim okumam gerekti.
+
+**Ikinci sira etki.** Kayit reddedilince `complete` yine de mühürledi ve sunu yazdi:
+"Sealed with no audit record: nobody but the builder read this work." Cumle yanlis —
+denetci okudu, kayit baska agacta. Bu belgede yazili "`complete` denetim kaydini gormezden
+gelip 'kimse okumadi' diyor" kusuruyla birlesince sonuc su: **denetimsiz muhurle
+denetlenmis muhur ayirt edilemiyor.**
+
+**Ne yapildi.** `audits/T156-1.json` elle yazildi; `audit` alt komutu `done/` altindaki
+sozlesmeyi okumadigi icin komutla yazilamadi (`Cannot read contracts/T156.md`).
+
+**Onerilen, uc madde:**
+1. Canli kayit ve sozlesme **ayni koku** kullansin. Kok, cwd'den degil `git rev-parse
+   --git-common-dir` ile bulunsun — worktree'ler icin tek ortak nokta odur.
+2. `audit`, kayit bulunamayinca reddetmeden once **kardes worktree'lerin** `live/`
+   klasorlerine baksin (`git worktree list`).
+3. `audit`, `done/` altindaki sozlesmeyi de okuyabilsin. Bugun muhur sonrasi kayit yazmak
+   imkansiz; oysa kayit tam da muhurden sonra eksik kaldigi anlasiliyor.
