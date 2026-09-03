@@ -1160,4 +1160,103 @@ public sealed class PlanCalculatorProbeTests
             clock.Elapsed >= delay * (calls - 1),
             $"{calls} yoklama, {clock.ElapsedMilliseconds} ms gecti; beklenen alt sinir {delay.TotalMilliseconds * (calls - 1)} ms");
     }
+
+    // --- T152: yedege dusme notu uc durumu ayirir ---
+
+    /// <summary>
+    /// Bir aday derleme listesinde <b>yok</b>, geri kalanlar verilen duruma sahip.
+    /// <see cref="FastOrderAvailability"/> her adayi listede sayar; ucuncu durumu
+    /// (aday hic derlenmemis) ancak bu nesne uretebilir.
+    /// </summary>
+    private sealed class MissingCodecAvailability(string missing, params (string Codec, EncoderProbeState State)[] answers)
+        : IEncoderAvailability
+    {
+        private readonly Dictionary<string, EncoderProbeState> _answers = answers.ToDictionary(
+            answer => answer.Codec, answer => answer.State, StringComparer.OrdinalIgnoreCase);
+
+        public bool HasEncoder(string name) => !string.Equals(name, missing, StringComparison.OrdinalIgnoreCase);
+
+        public bool WorksAsEncoder(string codec) =>
+            _answers.TryGetValue(codec, out var state) && state == EncoderProbeState.Working;
+
+        public EncoderProbeState EncoderState(string codec) =>
+            _answers.TryGetValue(codec, out var state) ? state : EncoderProbeState.NotWorking;
+    }
+
+    private static string FallbackNote(EncodePlan plan, string preferredCodec) =>
+        plan.Reason
+            .Split("; ", StringSplitOptions.RemoveEmptyEntries)
+            .Single(part => part.StartsWith($"the {preferredCodec} encoder ", StringComparison.Ordinal));
+
+    private static string FallbackNoteFor(IEncoderAvailability availability) =>
+        FallbackNote(PlanCalculator.BuildDetailed(SdrSource, FastPreserve, null, availability).Plan, "av1_nvenc");
+
+    /// <summary>
+    /// K2. T151 yedege dusme notuna yeni bir yol acti: <c>av1_nvenc</c> olculmemis ve
+    /// <c>hevc_nvenc</c> calisan makinede tarama artik sonraki adaya geciyor, yani
+    /// <c>codec != preferredCodec</c> oluyor ve not <b>ilk kez</b> cikiyor. Tek cumle
+    /// varken o not olculmemis bir donanim icin "bu makinede kullanilamadi" diyordu;
+    /// olcum yokken boyle bir iddiada bulunulamaz.
+    ///
+    /// Olcu cumlenin metnini sabitle karsilastirmiyor: iki girdi yan yana kuruluyor ve
+    /// yalniz <b>ayrimin</b> durup durmadigina bakiliyor.
+    /// </summary>
+    [Fact]
+    public void OlculmemisAdayinNotuBuMakinedeKullanilamadiDemiyor()
+    {
+        var unmeasured = FallbackNoteFor(new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.Unmeasured),
+            ("hevc_nvenc", EncoderProbeState.Working)));
+
+        var notWorking = FallbackNoteFor(new FastOrderAvailability(
+            ("av1_nvenc", EncoderProbeState.NotWorking),
+            ("hevc_nvenc", EncoderProbeState.Working)));
+
+        Assert.Contains("could not be used", notWorking, StringComparison.Ordinal);
+        Assert.DoesNotContain("could not be used", unmeasured, StringComparison.Ordinal);
+        Assert.NotEqual(notWorking, unmeasured);
+    }
+
+    /// <summary>
+    /// K1. Uc durum uc ayri cumle uretir ve her cumle hala iki kodegi de adlandirir:
+    /// hangi kodlayici secilemedi, yerine ne kondu.
+    /// </summary>
+    [Fact]
+    public void UcDurumUcFarkliCumleUretiyor()
+    {
+        var notes = new[]
+        {
+            FallbackNoteFor(new FastOrderAvailability(
+                ("av1_nvenc", EncoderProbeState.NotWorking),
+                ("hevc_nvenc", EncoderProbeState.Working))),
+            FallbackNoteFor(new FastOrderAvailability(
+                ("av1_nvenc", EncoderProbeState.Unmeasured),
+                ("hevc_nvenc", EncoderProbeState.Working))),
+            FallbackNoteFor(new MissingCodecAvailability(
+                "av1_nvenc",
+                ("hevc_nvenc", EncoderProbeState.Working)))
+        };
+
+        Assert.Equal(3, notes.Distinct(StringComparer.Ordinal).Count());
+        Assert.All(notes, note =>
+        {
+            Assert.Contains("av1_nvenc", note, StringComparison.Ordinal);
+            Assert.Contains("hevc_nvenc", note, StringComparison.Ordinal);
+        });
+    }
+
+    /// <summary>
+    /// K1'in ucuncu kolu: derleme listesinde hic olmayan aday icin "bu makinede
+    /// kullanilamadi" da yanlis — olcum degil, yokluk soz konusu.
+    /// </summary>
+    [Fact]
+    public void DerlemedeOlmayanAdayinNotuOlcumIddiasiTasimiyor()
+    {
+        var note = FallbackNoteFor(new MissingCodecAvailability(
+            "av1_nvenc",
+            ("hevc_nvenc", EncoderProbeState.Working)));
+
+        Assert.DoesNotContain("could not be used", note, StringComparison.Ordinal);
+        Assert.DoesNotContain("measured", note, StringComparison.Ordinal);
+    }
 }
