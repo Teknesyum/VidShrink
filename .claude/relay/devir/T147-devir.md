@@ -1,6 +1,6 @@
 sozlesme: T147
 dal: T147-sessiz-dusurme-sondada
-son-commit: 6ed1ec4
+son-commit: 9dca031
 
 # T147 devir
 
