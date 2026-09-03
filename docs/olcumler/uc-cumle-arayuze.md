@@ -175,6 +175,12 @@ noktali virgulle ayrilmis duz metin, bicimi degismedi. Proje ayrica derlendi, 0 
 
 Sifir bulan kol yok.
 
-CI kosumu: rapor sonunda `gh run list` ile dogrulandi; kimlik ve sonuc asagida.
+CI kosumu: run `33758709273`, `conclusion: success`, headSha `f0e15d30e40073cd83bd0325d99b7f5a6b93abe1` (`gh run view 33758709273 --json status,conclusion,headSha,url`).
+https://github.com/Teknesyum/VidShrink/actions/runs/33758709273
 
-<!-- CI -->
+## Not
+
+`EncoderFallbackCause`un uc uyesi de arayuzdeki iki `switch`te **adiyla** geciyor. Sondaki
+`_` kolu derleyicinin tamlik uyarisi icin duruyor, uyeyi gizlemek icin degil: `OluUyeTests`
+bir enum uyesini yalniz `_` kolunun arkasina koyunca onu "sifir uretim tuketicili" sayip
+kirmizi verirdi.
