@@ -914,6 +914,28 @@ public sealed class UpdaterTests : IDisposable
         Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
     }
 
+    /// <summary>
+    /// Ağsız açılışa verilen tavan. Sayı serbest bir tahmin değil, başlatıcının kendi
+    /// bütçelerinin toplamı; T145'te ölçüldü ve <b>daraltılamaz</b> çıktı:
+    ///
+    /// <list type="bullet">
+    /// <item>süreç açılışı 81–117 ms — yayımlanmış başlatıcının geçiş kipinde beş koşum;</item>
+    /// <item>manifest bekleyişi 806–832 ms — yönlendirilemeyen adrese sekiz çağrı,
+    /// <see cref="UpdateCheck.ManifestTimeout"/> (800 ms) ile pimli;</item>
+    /// <item>bekleme panelinin kapanış payı 2 000 ms — panel eşiği 400 ms, ağsız bacak
+    /// hep 800 ms'i geçtiği için panel her ağsız açılışta çiziliyor ve kapanışta iş
+    /// parçacığı bu tavanla bekleniyor.</item>
+    /// </list>
+    ///
+    /// Toplam 2 887–2 949 ms; 3 sn'lik tavanın altında yalnız 51–113 ms pay var. Tavanı
+    /// küçültmek ölçüyü ürünün kendi izin verdiği en kötü hâlde kırmızıya düşürür.
+    ///
+    /// Uçtan uca ölçüm bu makinede yapılamaz: panel eşiği (400 ms) manifest bütçesinden
+    /// (800 ms) küçük olduğu için ağsız bacak kullanıcının masaüstüne pencere çizer.
+    /// Ayrıntı <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// </summary>
+    private static readonly TimeSpan AgsizAcilisTavani = TimeSpan.FromSeconds(3);
+
     [LiveLauncherFact]
     public void EveryLaunchChecksAndStaysWithinTheTimeout()
     {
@@ -929,7 +951,7 @@ public sealed class UpdaterTests : IDisposable
         _output.WriteLine($"ağsız ilk açılış: {offlineFirst.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.TotalMilliseconds:F0} ms");
         _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
-        Assert.True(offlineFirst < TimeSpan.FromSeconds(3), $"ağsız açılış çok uzun: {offlineFirst}");
+        Assert.True(offlineFirst < AgsizAcilisTavani, $"ağsız açılış çok uzun: {offlineFirst}");
         Assert.True(offlineSecond < TimeSpan.FromSeconds(3), $"ağsız ikinci açılış çok uzun: {offlineSecond}");
     }
 
