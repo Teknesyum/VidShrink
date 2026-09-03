@@ -1,0 +1,16 @@
+{
+  "contractId": "T145",
+  "auditorRunId": "a159bb99809c7fb21",
+  "headSha": "bbedef1c15eefb0c2f7ecaa29e46a9a09a711102",
+  "diffHash": "a797de49d9fd3312ea9f9beb16bbc76d2f46b7e3cf9320a1a5162229609587ae",
+  "owns": [
+    "tests/VidShrink.Tests/PerformanceCheckTests.cs",
+    "tests/VidShrink.Tests/UpdaterTests.cs",
+    "docs/olcumler/kalan-alti-bant.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 79412ac: :1141 mutasyonu kendi kosturuldu --no-incremental ile (yeni bant 1 sn oldu, eski bant 10 sn yasadi), :915/:916 gerekcesinin uc terimi kodda bulundu (Splash.cs:24 400ms, UpdateCheck.cs:177 800ms, Splash.cs:105 2sn Join; toplam iddia edilen 2887-2949 ms'i tutuyor), YonPayi 0,8->1,0 yon kontrolu ile daraltma oldugu dogrulandi, SaatTureviIddiaSayisi 23 dokunulmamis, verify kollari --list-tests ile 22/54 sayildi taze derlemeyle 73 gecti 3 atlandi 76 EXITCODE=0, owns temiz src altinda tek satir yok, eski sabitler grep'te yok. :890'in penceresizligi koddan dogrulandi (Program.cs:36-37 Alert'ten once return). KRITIK yok, GECTI, sekiz borc muhur notunda."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T09:06:19.899Z"
+}
