@@ -312,7 +312,8 @@ public sealed class UretimYoluTests
     public void UretimOlceriHaritayiOlcumeTasiyor()
     {
         var olcer = MainWindow.ProbeMeter(MainWindow.QualityScenes(Deneme(KesikliHarita(10.0, 2.5, 5.5))));
-        var tasinan = Assert.IsType<MainWindow.SceneAwareQualityMeasurement>(olcer).Scenes;
+        var tasinan = Assert.IsType<QualityMeasurement>(olcer).Scenes;
+        Assert.NotNull(tasinan);
 
         var skorlar = DipliSkorlar();
         var haritali = QualityMeter.AggregateVmaf(skorlar, 60, 0, tasinan);
@@ -326,8 +327,9 @@ public sealed class UretimYoluTests
     }
 
     /// <summary>
-    /// K5. Harita gelmediginde olcer bugunku yolda kaliyor: <see cref="QualityMeasurement"/>
-    /// degistirilmedi, yerine bir sey konmadi.
+    /// K5. Harita gelmediginde olcer bugunku yolda kaliyor: <c>ProbeMeter</c> yeni bir
+    /// govde kurmuyor, <see cref="QualityMeasurement.Instance"/> tekilini donduruyor.
+    /// (T154: govde tek yere indi, tekilin haritasi <c>null</c>.)
     /// </summary>
     [Fact]
     public void HaritaGelmedigindeOlcerBugunkuYoldaKaliyor()

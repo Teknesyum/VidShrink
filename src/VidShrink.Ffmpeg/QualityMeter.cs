@@ -44,6 +44,10 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
 {
     public static QualityMeasurement Instance { get; } = new();
 
+    public QualityMeasurement(VidShrink.Core.SceneMap? scenes = null) => Scenes = scenes;
+
+    internal VidShrink.Core.SceneMap? Scenes { get; }
+
     public bool IsAvailable
         => EncoderCapabilities.Instance.HasFilter("libvmaf")
            && EncoderCapabilities.Instance.HasFilter("zscale");
@@ -56,8 +60,11 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
         var watch = Stopwatch.StartNew();
         try
         {
-            var score = await QualityMeter.MeasureWindowAsync(
-                referencePath, samplePath, referenceStartSeconds, 0, durationSeconds, ct);
+            var score = Scenes is null
+                ? await QualityMeter.MeasureWindowAsync(
+                    referencePath, samplePath, referenceStartSeconds, 0, durationSeconds, ct)
+                : await QualityMeter.MeasureWindowAsync(
+                    referencePath, samplePath, referenceStartSeconds, 0, durationSeconds, Scenes, ct);
             if (!score.Comparable || score.VmafNegMean is null) return null;
             return new VidShrink.Core.WindowQualityMeasurement(
                 referenceStartSeconds, score.VmafNegMean, score.VmafNegHarmonic,
