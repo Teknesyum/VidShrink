@@ -1,0 +1,19 @@
+{
+  "contractId": "T155",
+  "auditorRunId": "ab67ee26327b03a4a",
+  "headSha": "4004296c92bbcbc3d3a319f6e2978998a630b5fe",
+  "diffHash": "e38fb44742de078fb69b82ea2904f55d6ba198d50ff33cb967f4fcacc43f917e",
+  "owns": [
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "src/VidShrink.Core/CodecModel.cs",
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "tests/VidShrink.Tests/TurboTavanTests.cs",
+    "tests/VidShrink.Tests/TurboFirstPassTests.cs",
+    "docs/olcumler/x264-turbo-acilis.md"
+  ],
+  "verification": [
+    "Bagimsiz klonda 4230f91 olculdu, ham TSV'lerden yeniden turetildi. K1: k1.tsv bes kol, weightpsiz p2exit=127 boyut=0, dort yazim da 0/0 ~3,71MB; 'than first pass' tek eslesme. K2: iki betigin girdi satiri farkli (k2.sh proxy, k2-kaynak.sh parca-1.mkv+scale), kodlayici ayarlari ayni, her sure TSV'de bulundu, 160 surec dogrulandi. K5 denetci kendi kostu iki koldan: CodecModel Safe true -> 4/4 oldu; TurboFirstPassIsSafe||libx264 -> 2/4 oldu; geri alindi, agac temiz. K6: --list-tests 4+75=79, sifir bulan kol yok, CI 33752128362 success a10743a. Davranis degismedi: git diff -U0 -- src/ tests/ icinde /// disi degisen satir sayisi 0. Uc docstring'in sayilari tam duyarlikla tabloyla tutuyor. KRITIK yok, alti borc."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-03T12:40:24.853Z"
+}
