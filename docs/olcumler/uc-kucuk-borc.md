@@ -265,4 +265,16 @@ koşturuyordu.
 
 ### CI
 
-Dal `origin/T156-uc-kucuk-borc`; koşum kimliği ve sonucu aşağıda.
+| Alan | Değer |
+| --- | --- |
+| Koşum kimliği | `33752378032` |
+| İş akışı | `ci` |
+| Commit | `ab2557ab628c718c1aa24f78562a8c8f73abe7d0` |
+| Sonuç | `completed` / `success` |
+
+Koşum kapısının ham satırı:
+
+```
+Passed!  - Failed:     0, Passed:  1533, Skipped:    18, Total:  1551, Duration: 18 m 14 s - VidShrink.Tests.dll (net8.0)
+KOŞUM KAPISI GEÇTİ: başarısız=0 toplam=1551 alt-sınır=1134 atlanan=18 ust-sinir=30
+```
