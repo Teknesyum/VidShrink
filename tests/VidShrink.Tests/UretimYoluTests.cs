@@ -1,4 +1,6 @@
-﻿using VidShrink.App;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
+using VidShrink.App;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 using Xunit;
@@ -70,6 +72,58 @@ public sealed class UretimYoluTests
             SceneMap.DefaultThreshold,
             Array.Empty<ProbeFrame>());
 
+    private static string CagriArgumanMetni(string kaynak, string cagri)
+    {
+        var yer = kaynak.IndexOf(cagri, StringComparison.Ordinal);
+        Assert.True(yer >= 0, $"cagri yeri bulunamadi: {cagri}");
+        var bas = yer + cagri.Length;
+        var derinlik = 1;
+        var son = bas;
+        while (son < kaynak.Length && derinlik > 0)
+        {
+            if (kaynak[son] == '(') derinlik++;
+            else if (kaynak[son] == ')') derinlik--;
+            if (derinlik > 0) son++;
+        }
+
+        Assert.True(derinlik == 0, $"cagrinin kapanis parantezi bulunamadi: {cagri}");
+        return kaynak[bas..son];
+    }
+
+    private static string[] UstDuzeyArgumanlar(string metin)
+    {
+        var parcalar = new List<string>();
+        var derinlik = 0;
+        var bas = 0;
+        for (var i = 0; i < metin.Length; i++)
+        {
+            var c = metin[i];
+            if (c is '(' or '[') derinlik++;
+            else if (c is ')' or ']') derinlik--;
+            else if (c == ',' && derinlik == 0)
+            {
+                parcalar.Add(metin[bas..i].Trim());
+                bas = i + 1;
+            }
+        }
+
+        parcalar.Add(metin[bas..].Trim());
+        return parcalar.ToArray();
+    }
+
+    private static int Adet(string kaynak, string parca)
+    {
+        var sayi = 0;
+        var yer = 0;
+        while ((yer = kaynak.IndexOf(parca, yer, StringComparison.Ordinal)) >= 0)
+        {
+            sayi++;
+            yer += parca.Length;
+        }
+
+        return sayi;
+    }
+
     private static double[] Baslangiclar(IReadOnlyList<SampleWindow> pencereler)
         => pencereler.Select(p => Math.Round(p.Start, 3)).ToArray();
 
@@ -125,6 +179,48 @@ public sealed class UretimYoluTests
 
         _cikti.WriteLine($"uretim  : [{string.Join(" ", haritali)}]");
         _cikti.WriteLine($"sabit   : [{string.Join(" ", sabit)}]");
+
+        Assert.NotEqual(sabit, haritali);
+    }
+
+    /// <summary>
+    /// T154 K1. Yukaridaki olcu dikis fonksiyonunu pimliyor, cagri yerini degil: T146
+    /// denetcisi <c>CalibrationProbe.RunAsync</c>nin son argumanini <c>(SceneMap?)null</c>
+    /// yapip derledi ve 44/44 yesil kaldi. Bu olcu cagri yerinin kendisini okur:
+    /// <c>MainWindow.axaml.cs</c> icindeki tek <c>CalibrationProbe.RunAsync(</c> cagrisinin
+    /// arguman listesini ayirir, altinci argumanin <c>&lt;kapi&gt;(_sceneMap)</c> seklinde
+    /// oldugunu arar, o kapiyi yansimayla dolu bir denemeyle cagirir ve donen haritanin
+    /// yerlesimi sabit izgaradan gercekten ayirdigini olcer. Arguman <c>null</c>lanirsa
+    /// arguman metni artik bu sekle uymaz ve olcu duser.
+    /// </summary>
+    [Fact]
+    public void KalibrasyonCagriYeriHaritayiYoklamayaGeciriyor()
+    {
+        var kaynak = File.ReadAllText(TipSources.WindowCodePath);
+        Assert.Equal(1, Adet(kaynak, "CalibrationProbe.RunAsync("));
+
+        var parcalar = UstDuzeyArgumanlar(CagriArgumanMetni(kaynak, "CalibrationProbe.RunAsync("));
+        for (var i = 0; i < parcalar.Length; i++) _cikti.WriteLine($"arg[{i}] = {parcalar[i]}");
+        Assert.Equal(6, parcalar.Length);
+
+        var haritaArgumani = parcalar[5];
+        var eslesme = Regex.Match(haritaArgumani, @"^(\w+)\(\s*_sceneMap\s*\)$");
+        Assert.True(eslesme.Success,
+            $"kalibrasyon cagri yeri _sceneMap'i gecirmiyor; gecirdigi arguman: {haritaArgumani}");
+
+        var kapi = typeof(MainWindow).GetMethod(
+            eslesme.Groups[1].Value, BindingFlags.Public | BindingFlags.Static);
+        Assert.True(kapi is not null, $"cagri yerindeki kapi bulunamadi: {eslesme.Groups[1].Value}");
+
+        var gecen = kapi!.Invoke(null, new object?[] { Deneme(DegiskenHarita(240, 8)) }) as SceneMap;
+        Assert.True(gecen is not null, "cagri yerinin gecirdigi kapi dolu denemede null dondu");
+
+        var kaynakBilgi = Kaynak();
+        var haritali = Baslangiclar(CalibrationProbe.Windows(kaynakBilgi, SpeedMode.Quality, gecen));
+        var sabit = Baslangiclar(CalibrationProbe.Windows(kaynakBilgi, SpeedMode.Quality, null));
+
+        _cikti.WriteLine($"cagri yerinden gecen harita ile : [{string.Join(" ", haritali)}]");
+        _cikti.WriteLine($"harita gecmezse                 : [{string.Join(" ", sabit)}]");
 
         Assert.NotEqual(sabit, haritali);
     }
