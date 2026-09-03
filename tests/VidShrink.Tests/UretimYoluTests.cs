@@ -306,24 +306,30 @@ public sealed class UretimYoluTests
 
     /// <summary>
     /// K3. Uretimin kurdugu olcer haritayi gercekten tasiyor ve tasidigi harita en kotu
-    /// birimi degistiriyor.
+    /// birimi degistiriyor. T154'te iki kolun govdesi birlesti, ikisi de ayni tipi donduruyor;
+    /// ayrimi artik tip degil <b>tasinan harita</b> yapiyor. O yuzden iki kol burada ayni
+    /// olcude yan yana kuruluyor ve tek iddia ikisini birden okuyor: haritasiz kolun sonucu
+    /// haritali kolunkine esit olamaz. Iddia tek deyimdir, satiri silmek olcuyu susturmaz,
+    /// derlemeyi kirar.
     /// </summary>
     [Fact]
     public void UretimOlceriHaritayiOlcumeTasiyor()
     {
-        var olcer = MainWindow.ProbeMeter(MainWindow.QualityScenes(Deneme(KesikliHarita(10.0, 2.5, 5.5))));
-        var tasinan = Assert.IsType<QualityMeasurement>(olcer).Scenes;
-        Assert.NotNull(tasinan);
+        var haritaliOlcer = MainWindow.ProbeMeter(MainWindow.QualityScenes(Deneme(KesikliHarita(10.0, 2.5, 5.5))));
+        var haritasizOlcer = MainWindow.ProbeMeter(MainWindow.QualityScenes(
+            new SceneMapAttempt(null, TimeSpan.Zero, SceneMapFallback.NoDuration, "sure yok")));
+
+        var haritali = Assert.IsType<QualityMeasurement>(haritaliOlcer).Scenes;
+        var haritasiz = Assert.IsType<QualityMeasurement>(haritasizOlcer).Scenes;
 
         var skorlar = DipliSkorlar();
-        var haritali = QualityMeter.AggregateVmaf(skorlar, 60, 0, tasinan);
-        var sabit = QualityMeter.AggregateVmaf(skorlar, 60, 0, null);
 
-        _cikti.WriteLine($"olcerin tasidigi harita: {tasinan.Scenes.Count} sahne");
-        _cikti.WriteLine($"uretim  : enkotu={haritali.WorstScene} at={haritali.WorstSceneStartSeconds}");
-        _cikti.WriteLine($"sabit   : enkotu={sabit.WorstScene} at={sabit.WorstSceneStartSeconds}");
+        _cikti.WriteLine($"haritali kol : {haritali?.Scenes.Count.ToString() ?? "harita yok"} sahne, enkotu={QualityMeter.AggregateVmaf(skorlar, 60, 0, haritali).WorstScene}");
+        _cikti.WriteLine($"haritasiz kol: {haritasiz?.Scenes.Count.ToString() ?? "harita yok"} sahne, enkotu={QualityMeter.AggregateVmaf(skorlar, 60, 0, haritasiz).WorstScene}");
 
-        Assert.NotEqual(sabit.WorstScene, haritali.WorstScene);
+        Assert.NotEqual(
+            QualityMeter.AggregateVmaf(skorlar, 60, 0, haritasiz).WorstScene,
+            QualityMeter.AggregateVmaf(skorlar, 60, 0, haritali).WorstScene);
     }
 
     /// <summary>

@@ -360,12 +360,14 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Sayi 27'den 26'ya indi (T150 tur 2). Cikan uye <c>EncoderProbeState.NotWorking</c>:
+    /// Kume bugun 31 satir: 26 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// (<c>Flagged = ZeroConsumer || Unused</c>). T150 tur 2'de sifir tuketici sayisi 27'den
+    /// 26'ya, kumenin tamami 32 satirdan 31'e indi. Cikan uye <c>EncoderProbeState.NotWorking</c>:
     /// T139 <c>src/VidShrink.Ffmpeg/PerformanceProbe.cs:97</c> satirini yazdi
     /// (<c>2caff96</c> ekledi, <c>cf009f0</c> cagriyi <c>KnownState</c> olarak yeniden adlandirdi)
     /// ve satir <c>main</c>e <c>5df0a98</c> birlesmesiyle geldi. Satir
     /// <c>if (availability.KnownState(candidate) != EncoderProbeState.NotWorking) return candidate;</c>
-    /// olcunun <c>esitlik-sag</c> kuralina dusuyor: uye artik sekiz yerde uretilip bir yerde
+    /// olcunun <c>esitlik-sag</c> kuralina dusuyor: uye artik dokuz yerde uretilip bir yerde
     /// tuketiliyor, sifir uretim tuketicisi degil. Pimden dusuruldu, uye dusurulmedi.
     /// </para>
     /// </summary>
@@ -382,7 +384,7 @@ public sealed class OluUyeTests
         new("EncoderVendor.Software", "varsayilan-kol", Legitimate,
             "Vendor()'in son satiri; IsHardware olculmus uc saticiyi adiyla sayip '_ => false' diyor, QualityArgs son kolda -crf veriyor. Software'i ayrica adlandirmak ayni davranisi iki yere yazardi."),
         new("FillPolicy.QualityCeiling", "varsayilan-kol", Legitimate,
-            "Iki degerli siyasetin olumsuz kolu. Iki okuyan da (PlanCalculator.cs:321, MainWindow.axaml.cs:2247) 'fillPolicy == FillPolicy.FillTarget' soruyor; tavan kolu o kosulun else'i."),
+            "Iki degerli siyasetin olumsuz kolu. Uc okuyan da (PlanCalculator.cs:342, MainWindow.axaml.cs:2284, EncodeRunner.cs:140) 'fillPolicy == FillPolicy.FillTarget' soruyor; tavan kolu o kosulun else'i."),
         new("HardwareVerdictReason.BitrateFloorTooHigh", "varsayilan-kol", Debt,
             "Alti gerekceden biri; uretiliyor, hicbir kol bu gerekceyi ayirmiyor. Digerlerinin okunup bunun okunmamasi kasitli mi olculmedi."),
         new("PreviewQuality.Desteklenmiyor", "varsayilan-kol", Debt,
@@ -396,7 +398,7 @@ public sealed class OluUyeTests
         new("PreviewState.TamKodlama", "varsayilan-kol", Debt,
             "Ayni tur, ayni bulgu: uretiliyor, okuma tarafinda adi gecmiyor."),
         new("QualityTargetBound.Matched", "varsayilan-kol", Legitimate,
-            "Hedefe varildi demek; arayuz yalniz sapmalari yaziyor (MainWindow.axaml.cs:2494-2496: BelowFloor, AboveSourceCeiling, '_ => \"\"'). Varildiginda gosterilecek bir cumle yok, o yuzden okuyan da yok."),
+            "Hedefe varildi demek; arayuz yalniz sapmalari yaziyor (MainWindow.axaml.cs:2517-2519: BelowFloor, AboveSourceCeiling, '_ => \"\"'). Varildiginda gosterilecek bir cumle yok, o yuzden okuyan da yok."),
         new("RecordingImpact.HardwareOffload", "varsayilan-kol", Legitimate,
             "PerformanceReportText.cs:22-26 mansetin Impact uzerinden kurulmadigini olcumle yaziyor: makine mesgulken Impact yazilim dalina kayiyor, dogru bilgi bulgularda. Alan raporda tasiniyor, karar vermiyor."),
         new("RecordingImpact.SoftwareHeavyLoad", "varsayilan-kol", Legitimate,
@@ -404,7 +406,7 @@ public sealed class OluUyeTests
         new("RecordingImpact.SoftwareLightLoad", "varsayilan-kol", Legitimate,
             "Ayni olcum: Impact karar alani degil, rapor alani. PerformanceReportText mansetini PerformanceFindingCode uzerinden kuruyor."),
         new("ShareFailure.FileTooLarge", "varsayilan-kol", Debt,
-            "ShareErrorClassifier on bir hatadan sekizini uretip hicbirini ayirmiyor; arayuz yalniz Cancelled, None, TokenExpired ve Unknown soruyor. Ayrimin kullaniciya ulasip ulasmadigi olculmedi."),
+            "ShareErrorClassifier on bir hatanin hepsini uretiyor, sekizini hicbir kol ayirmiyor. Okunan dort uye: Cancelled ve TokenExpired arayuzde (MainWindow.axaml.cs:1033, :3415), None ShareResult.cs:103'te, Unknown siniflandiricinin kendi sayacinda (ShareErrorClassifier.cs:227). Ayrimin kullaniciya ulasip ulasmadigi olculmedi."),
         new("ShareFailure.FileUnreadable", "varsayilan-kol", Debt,
             "Ayni bulgu, uzerine bir tane daha: uretim disinda da hic gorunmuyor (disarida=0), yani onu ayakta tutan bir test bile yok."),
         new("ShareFailure.LocalDiskFull", "varsayilan-kol", Debt,
@@ -420,7 +422,7 @@ public sealed class OluUyeTests
         new("ShareFailure.ServiceError", "varsayilan-kol", Debt,
             "Ayni bulgu: uc yerde uretiliyor, servis hatasini ayiran kol yok; kullanici genel hata cumlesini goruyor."),
         new("SpeedMode.Quality", "varsayilan-kol", Legitimate,
-            "Iki degerli kipin olumsuz kolu ve varsayilani. Sekiz okuma yerinin hepsi 'speed == SpeedMode.Fast' soruyor; Quality o kosulun else'i."),
+            "Iki degerli kipin olumsuz kolu ve varsayilani. On okuma yerinin hepsi 'speed == SpeedMode.Fast' kalibinda soruyor (dokuzu ==, CalibrationProbe.cs:148 !=); Quality o kosulun else'i."),
         new("WindowBiasSource.None", "varsayilan-kol", Legitimate,
             "Pencere sapmasinin 'kaynak yok' hali. ComplexityProfile.cs:128-132 Scan ve Packets'i adlandirip '_ => MeasuredBand' diyor; None olculmemis bandin ta kendisi, ayri bir kol ayni degeri verirdi."),
         new("FfmpegArguments.SceneMapRuleOfRecord", "yalniz-disarida", Debt,

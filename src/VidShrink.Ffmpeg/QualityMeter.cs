@@ -65,12 +65,7 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
                     referencePath, samplePath, referenceStartSeconds, 0, durationSeconds, ct)
                 : await QualityMeter.MeasureWindowAsync(
                     referencePath, samplePath, referenceStartSeconds, 0, durationSeconds, Scenes, ct);
-            if (!score.Comparable || score.VmafNegMean is null) return null;
-            return new VidShrink.Core.WindowQualityMeasurement(
-                referenceStartSeconds, score.VmafNegMean, score.VmafNegHarmonic,
-                score.VmafNegP10, true, watch.ElapsedMilliseconds, score.Message,
-                score.VmafNegMin, score.VmafNegWorstScene,
-                score.WorstSceneStartSeconds, score.SceneWindowSeconds);
+            return ToWindowMeasurement(score, referenceStartSeconds, watch.ElapsedMilliseconds);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         catch (QualityMeasurementFailedException failure)
@@ -79,6 +74,17 @@ public sealed class QualityMeasurement : VidShrink.Core.IQualityMeasurement
                 referenceStartSeconds, null, null, null, false, watch.ElapsedMilliseconds, failure.Message);
         }
         catch { return null; }
+    }
+
+    internal static VidShrink.Core.WindowQualityMeasurement? ToWindowMeasurement(
+        QualityScore score, double referenceStartSeconds, long elapsedMilliseconds)
+    {
+        if (!score.Comparable || score.VmafNegMean is null) return null;
+        return new VidShrink.Core.WindowQualityMeasurement(
+            referenceStartSeconds, score.VmafNegMean, score.VmafNegHarmonic,
+            score.VmafNegP10, true, elapsedMilliseconds, score.Message,
+            score.VmafNegMin, score.VmafNegWorstScene,
+            score.WorstSceneStartSeconds, score.SceneWindowSeconds);
     }
 }
 
