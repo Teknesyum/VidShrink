@@ -187,6 +187,55 @@ public sealed class UretimYoluTests
     }
 
     /// <summary>
+    /// K3. Uretimin kurdugu olcer haritayi gercekten tasiyor ve tasidigi harita en kotu
+    /// birimi degistiriyor.
+    /// </summary>
+    [Fact]
+    public void UretimOlceriHaritayiOlcumeTasiyor()
+    {
+        var olcer = MainWindow.ProbeMeter(MainWindow.QualityScenes(Deneme(KesikliHarita(10.0, 2.5, 5.5))));
+        var tasinan = Assert.IsType<MainWindow.SceneAwareQualityMeasurement>(olcer).Scenes;
+
+        var skorlar = DipliSkorlar();
+        var haritali = QualityMeter.AggregateVmaf(skorlar, 60, 0, tasinan);
+        var sabit = QualityMeter.AggregateVmaf(skorlar, 60, 0, null);
+
+        _cikti.WriteLine($"olcerin tasidigi harita: {tasinan.Scenes.Count} sahne");
+        _cikti.WriteLine($"uretim  : enkotu={haritali.WorstScene} at={haritali.WorstSceneStartSeconds}");
+        _cikti.WriteLine($"sabit   : enkotu={sabit.WorstScene} at={sabit.WorstSceneStartSeconds}");
+
+        Assert.NotEqual(sabit.WorstScene, haritali.WorstScene);
+    }
+
+    /// <summary>
+    /// K5. Harita gelmediginde olcer bugunku yolda kaliyor: <see cref="QualityMeasurement"/>
+    /// degistirilmedi, yerine bir sey konmadi.
+    /// </summary>
+    [Fact]
+    public void HaritaGelmedigindeOlcerBugunkuYoldaKaliyor()
+    {
+        var yok = new SceneMapAttempt(null, TimeSpan.Zero, SceneMapFallback.NoDuration, "sure yok");
+
+        Assert.Same(QualityMeasurement.Instance, MainWindow.ProbeMeter(MainWindow.QualityScenes(yok)));
+    }
+
+    /// <summary>
+    /// K3'un onkosulu. Olcere verilecek harita, olcum kosarken hazir olmali; T143 borcu
+    /// tam buradan dogmustu: harita kalite olcumunden sonra kuruluyordu.
+    /// </summary>
+    [Fact]
+    public void HaritaKaliteOlcumundenOnceKuruluyor()
+    {
+        var kaynak = File.ReadAllText(TipSources.WindowCodePath);
+        var haritaYeri = kaynak.IndexOf("_sceneMap = await EncodeRunner.TryBuildSceneMapAsync", StringComparison.Ordinal);
+        var olcumYeri = kaynak.IndexOf("await ProbeWithMeasuredQualityAsync(info, speed, ProbeMeter(", StringComparison.Ordinal);
+
+        Assert.True(haritaYeri > 0, "harita kurulumu bulunamadi");
+        Assert.True(olcumYeri > 0, "kalite olcumu cagrisi bulunamadi");
+        Assert.True(haritaYeri < olcumYeri, "harita kalite olcumundan sonra kuruluyor; olcere verilecek harita o noktada yok");
+    }
+
+    /// <summary>
     /// K5. Harita gelmediginde kalibrasyon bugunku esit arali yerlesimde kaliyor: yedek
     /// kol silinmedi.
     /// </summary>
