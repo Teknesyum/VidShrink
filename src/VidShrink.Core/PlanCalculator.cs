@@ -211,9 +211,14 @@ public static class PlanCalculator
         var preferredCodec = fast ? FastHardwareOrder[0] : PreferredCodecFor(preference);
         if (codec != preferredCodec)
         {
+            var fallbackCause = EncoderFallbackCauseFor(probe);
             notes.Add(AdviceCode.EncoderFallback);
-            reason.Add(EncoderFallbackReason(preferredCodec, codec, probe));
-            reasonCodes.Add(new ReasonNote(ReasonCode.EncoderFallback, RequestedCodec: preferredCodec, FallbackCodec: codec));
+            reason.Add(EncoderFallbackReason(preferredCodec, codec, fallbackCause));
+            reasonCodes.Add(new ReasonNote(
+                ReasonCode.EncoderFallback,
+                RequestedCodec: preferredCodec,
+                FallbackCodec: codec,
+                FallbackCause: fallbackCause));
         }
 
         if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
@@ -904,6 +909,17 @@ public static class PlanCalculator
     };
 
     /// <summary>
+    /// Hesabin sonunda okunan yoklama isaretlerini tek bir sebebe cevirir. Sebep hem
+    /// Core'un cumlesine hem <see cref="ReasonNote.FallbackCause"/> ile arayuze gidiyor;
+    /// T157'ye kadar yalniz cumleye gidiyordu ve arayuz uc durumun ucune de tek
+    /// yerellestirme anahtari veriyordu.
+    /// </summary>
+    private static EncoderFallbackCause EncoderFallbackCauseFor(ProbeState probe) =>
+        !probe.PreferredCodecInBuild ? EncoderFallbackCause.NotInBuild
+        : probe.PreferredCodecState == EncoderProbeState.Unmeasured ? EncoderFallbackCause.NotMeasured
+        : EncoderFallbackCause.NotWorking;
+
+    /// <summary>
     /// Yedege dusme notu uc ayri durumu anlatir ve karistirmaz: aday <b>bu derlemede
     /// yok</b>, aday <b>hic olculmedi</b>, aday <b>olculdu ve calismiyor</b>.
     ///
@@ -914,15 +930,15 @@ public static class PlanCalculator
     /// bir iddiada bulunulamaz — bu deponun <see cref="EncoderProbeState.Unmeasured"/>
     /// ile ayirdigi sey tam olarak budur.
     /// </summary>
-    private static string EncoderFallbackReason(string preferredCodec, string codec, ProbeState probe)
+    private static string EncoderFallbackReason(string preferredCodec, string codec, EncoderFallbackCause cause) => cause switch
     {
-        if (!probe.PreferredCodecInBuild)
-            return $"the {preferredCodec} encoder is not part of this ffmpeg build, so encoding falls back to {codec}";
-
-        return probe.PreferredCodecState == EncoderProbeState.Unmeasured
-            ? $"the {preferredCodec} encoder has not been measured on this machine, so encoding falls back to {codec}"
-            : $"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}";
-    }
+        EncoderFallbackCause.NotInBuild =>
+            $"the {preferredCodec} encoder is not part of this ffmpeg build, so encoding falls back to {codec}",
+        EncoderFallbackCause.NotMeasured =>
+            $"the {preferredCodec} encoder has not been measured on this machine, so encoding falls back to {codec}",
+        _ =>
+            $"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}"
+    };
 
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
         => PickCodec(pref, availability, null);

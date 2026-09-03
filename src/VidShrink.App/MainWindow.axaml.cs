@@ -2284,7 +2284,32 @@ public partial class MainWindow : Window
         && fillPolicy == FillPolicy.FillTarget
         && note.Mb >= FillBand.For(note.TargetMb).HardFloorMb;
 
-    internal static string EncoderFallbackReasonKey(ReasonNote note) => "main.reason.encoder-fallback";
+    /// <summary>
+    /// Dusme cumlesinin yerellestirme anahtari. Core uc ayri sebep uretiyor
+    /// (<see cref="EncoderFallbackCause"/>) ve ucu de kullaniciya ayri cumleyle gidiyor:
+    /// olculmemis ya da derlemede hic olmayan bir aday icin "bu makinede kullanilamadi"
+    /// demek, yapilmamis bir olcumun sonucunu bildirmektir.
+    /// </summary>
+    internal static string EncoderFallbackReasonKey(ReasonNote note) => note.FallbackCause switch
+    {
+        EncoderFallbackCause.NotInBuild => "main.reason.encoder-fallback-not-in-build",
+        EncoderFallbackCause.NotMeasured => "main.reason.encoder-fallback-not-measured",
+        EncoderFallbackCause.NotWorking => "main.reason.encoder-fallback-not-working",
+        _ => "main.reason.encoder-fallback-not-working"
+    };
+
+    /// <summary>Ayni ayrimin tavsiye satirindaki karsiligi; GPU kolu kendi anahtarini korur.</summary>
+    internal static string EncoderFallbackAdviceKey(EncoderFallbackCause cause) => cause switch
+    {
+        EncoderFallbackCause.NotInBuild => "main.advice.encoder-fallback-not-in-build",
+        EncoderFallbackCause.NotMeasured => "main.advice.encoder-fallback-not-measured",
+        EncoderFallbackCause.NotWorking => "main.advice.encoder-fallback-not-working",
+        _ => "main.advice.encoder-fallback-not-working"
+    };
+
+    internal static EncoderFallbackCause EncoderFallbackCauseOf(EncodePlan? plan) =>
+        plan?.ReasonCodes.FirstOrDefault(note => note.Code == ReasonCode.EncoderFallback)?.FallbackCause
+        ?? EncoderFallbackCause.NotWorking;
 
     private List<string> ReasonLines(EncodePlan plan)
     {
@@ -2353,7 +2378,8 @@ public partial class MainWindow : Window
 
         foreach (var note in advice.Notes.Distinct())
         {
-            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true);
+            var text = AdviceLine(note, Strings.Language, ChkFastGpu.IsChecked == true,
+                EncoderFallbackCauseOf(ActivePlan));
             if (text is not null) lines.Add(text);
         }
 
@@ -2362,7 +2388,8 @@ public partial class MainWindow : Window
 
     internal static readonly AdviceCode[] AdviceCodesWithoutText = Array.Empty<AdviceCode>();
 
-    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu)
+    internal static string? AdviceLine(AdviceCode note, string language, bool fastGpu,
+        EncoderFallbackCause fallbackCause = EncoderFallbackCause.NotWorking)
     {
 
         return note switch
@@ -2388,7 +2415,7 @@ public partial class MainWindow : Window
             AdviceCode.AudioDropped => Speak(language, "main.advice.audio-dropped"),
             AdviceCode.EncoderFallback => fastGpu
                 ? Speak(language, "main.advice.encoder-fallback-gpu")
-                : Speak(language, "main.advice.encoder-fallback"),
+                : Speak(language, EncoderFallbackAdviceKey(fallbackCause)),
             AdviceCode.HdrTonemapped => Speak(language, "main.advice.hdr-tonemapped"),
             _ => null
         };
