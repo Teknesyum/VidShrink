@@ -168,9 +168,12 @@ public static class CodecModel
     /// O engel olculdu ve asilabilir oldugu goruldu; <c>Safe</c> yine de <c>false</c>, artik
     /// baska bir sebeple: esitleme yapildiginda bile turbo uretim borusunda toplam sureyi
     /// yalniz %0,58 - %4,44 kisaltiyor ve VMAF'tan 0,35 - 0,83 puan goturuyor; ayni olcumde
-    /// <c>libx265</c> turbosu %29,6 - %33,5 kazandirip VMAF'i dusurmuyor. x264'te ikinci gecis
-    /// toplamin buyuk yarisi ve ilk gecisin suresini cozme ile olcekleme belirliyor, on ayar
-    /// degil. Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
+    /// <c>libx265</c> turbosu %29,6 - %33,5 kazandirip VMAF'i dusurmuyor. x264'te ikinci
+    /// gecis toplamin buyuk yarisidir (2,38 - 2,80 sn); klip 35'te ilk gecisin suresini
+    /// agirlikli olarak cozme ve olcekleme belirliyor, on ayar farki yalniz 39,7 ms / toplamin
+    /// %1,0'i (<c>docs/olcumler/x264-turbo-acilis.md:127-131</c>). Bu oran yalniz olculen
+    /// parca icin gecerli; kazanc parca basina %0,58 - %4,44 arasinda degisiyor, tek yonlu
+    /// bir genelleme kurulamaz. Olcum: <c>docs/olcumler/x264-turbo-acilis.md</c>.
     /// </para>
     /// </summary>
     private static readonly IReadOnlyDictionary<string, TurboFirstPassEntry> TurboFirstPassCeilings =
