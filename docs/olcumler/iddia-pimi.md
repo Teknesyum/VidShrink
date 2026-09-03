@@ -163,8 +163,11 @@ Toplam test sayısı: 18
      Geçti: 18
 ```
 
-CI koşum kimliği: `.claude/relay/LOG.md`e T0 tarafından dal itildikten sonra eklenecek —
-bu ajan `origin`e itmeyi ve `gh run list` sonucunu Çıktı'ya ekledi (aşağıya bakınız).
+CI koşum kimliği: `33760325360` (`T160-iddia-pimi` dalı, `gh run watch 33760325360
+--exit-status` → çıkış kodu 0, `completed success`). Tek iş (`test`), süre 25dk 9sn;
+`dotnet build VidShrink.sln -c Release -warnaserror` ve
+`tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30` adımlarının
+ikisi de yeşil.
 
 ## Borçlar / açık uçlar
 
