@@ -23,19 +23,18 @@ right-click menu.
 
 - `T125` — active, round 1 — T125 — A/B'nin bizim tarafimiz auto modu kosmuyor
 - `T133` — active, round 1
-- `T146` — active, round 1
-- `T147` — active, round 1
+- `T152` — open, round 1
 
 ## Closed last
 
+- `T146` — done — 2026-09-03 10:25
+- `T147` — done — 2026-09-03 10:10
 - `T146` — stale — 2026-09-03 09:17
 - `T151` — done — 2026-09-03 09:10
 - `T145` — done — 2026-09-03 09:08
-- `T151` — stale — 2026-09-03 08:14
-- `T141` — done — 2026-09-03 08:12
 
 ## Tree
 
 - branch: `main`
-- head: `2c32465 T152 beklemede/ altina parkedildi; kapi depends okumuyor, olcumu core kaydina`
+- head: `f337e88 rele: T146 muhur kaydi, T152 beklemeden cikti`
 - uncommitted files: 0
