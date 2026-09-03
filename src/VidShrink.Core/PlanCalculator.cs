@@ -412,6 +412,7 @@ public static class PlanCalculator
         Height = best.Height,
         Fps = best.Fps,
         Preset = PickPreset(codec, options.Codec, options.SpeedMode),
+        TurboFirstPass = options.SpeedMode == SpeedMode.Fast,
         PixelFormat = hdr.PixelFormat,
         HdrVideoFilter = hdr.VideoFilter,
         HdrColorArgs = new List<string>(hdr.ColorArgs)
