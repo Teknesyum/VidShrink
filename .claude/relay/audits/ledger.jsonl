@@ -197,3 +197,4 @@
 {"id":"T149","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"CodecModelTests|PlanParserTests","code":0}],"auditorRunId":null,"headSha":"af974072e7c9627994965d18c65628767ebbd5ae","at":"2026-09-02T23:06:01.843Z"}
 {"id":"T150","round":"2","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"OluUyeTests","code":0}],"auditorRunId":null,"headSha":"460ba733f10028cef7c0d0bfc16a3c23191f5033","at":"2026-09-03T08:09:10.383Z"}
 {"id":"T141","round":"1","risk":"low","verify":[{"step":"dotnet test -c Release --filter \"ComplexityProbeTests|ComplexityScanTests|PlanCalculatorProbeTests","code":0}],"auditorRunId":null,"headSha":"bb28b239b23b9c0e97ad742f001cd6c1c690cabd","at":"2026-09-03T08:12:26.252Z"}
+{"id":"T151","result":"stale","at":"2026-09-03T08:14:23.998Z"}
