@@ -1,0 +1,58 @@
+{
+  "Source": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-2.mkv",
+  "Mode": "tam",
+  "TolerancePercent": 2,
+  "FfmpegVersion": "9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "StartedUtc": "2026-09-03 20:26:52",
+  "Targets": [
+    3.4999414297465723
+  ],
+  "Measurements": [
+    {
+      "Competitor": "vidshrink",
+      "Input": "parca-2-yalniz-video.mkv",
+      "TargetMb": 3.4999414297465723,
+      "Bytes": 3488830,
+      "BaselineBytes": 3488830,
+      "SizeDeltaPercent": 0,
+      "SizeEqual": true,
+      "SizeStamp": "",
+      "ColorGate": "Direct",
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "ColorReason": "Referans ve çıktı aynı bt2020/smpte2084/bt2020nc uzayında.",
+      "RateReason": "kare hızı eşit (60 fps); en boy oranı uyuyor (1,7778 ~ 1,7778)",
+      "Measured": true,
+      "Error": null,
+      "VmafNegMean": 89.89359851462478,
+      "VmafNegHarmonic": 89.67181157434966,
+      "VmafNegP10": 84.80082970000001,
+      "VmafNegMin": 47.677248,
+      "Xpsnr": 41.10075,
+      "Ssim": 0.986676,
+      "FrameWeight": 3624,
+      "Settings": "1920x1080@60, libx264/2pass, 464k, pix=p010le, hdr=Preserve, deneme=1",
+      "CommandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-2-yalniz-video.mkv -c:v libx264 -preset slow -b:v 464k -maxrate 696k -bufsize 928k -pass 2 -passlogfile C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\k6-cikti\\pass -g 600 -keyint_min 60 -pix_fmt p010le -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -an -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\k6-cikti\\parca-2-yalniz-video_vidshrink_3.5mb.mp4",
+      "LogPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\k6-gunluk\\parca-2-yalniz-video_vidshrink_3.5mb.log",
+      "OutputPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\k6-cikti\\parca-2-yalniz-video_vidshrink_3.5mb.mp4"
+    }
+  ],
+  "Summaries": [
+    {
+      "Competitor": "vidshrink",
+      "TargetMb": 3.4999414297465723,
+      "TotalBytes": 3488830,
+      "AllSizesEqual": true,
+      "AllMeasured": true,
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "VmafNegMean": 89.89359851462478,
+      "VmafNegHarmonic": 89.67181157434966,
+      "VmafNegWorstP10": 84.80082970000001,
+      "VmafNegMin": 47.677248,
+      "Xpsnr": 41.10075,
+      "Ssim": 0.986676,
+      "Inputs": [
+        "parca-2-yalniz-video.mkv"
+      ]
+    }
+  ]
+}

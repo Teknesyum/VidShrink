@@ -1,0 +1,58 @@
+{
+  "Source": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\k6-deneme\\uc-sn.mkv",
+  "Mode": "tam",
+  "TolerancePercent": 2,
+  "FfmpegVersion": "9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "StartedUtc": "2026-09-02 07:19:06",
+  "Targets": [
+    0.35
+  ],
+  "Measurements": [
+    {
+      "Competitor": "vidshrink",
+      "Input": "uc-sn.mkv",
+      "TargetMb": 0.35,
+      "Bytes": 362102,
+      "BaselineBytes": 362102,
+      "SizeDeltaPercent": 0,
+      "SizeEqual": true,
+      "SizeStamp": "",
+      "ColorGate": "ReferenceTransformed",
+      "ColorLabel": "SDR uzayında karşılaştırma — HDR kaybı hariç",
+      "ColorReason": "Çıktı SDR bt709; referans aynı dönüşümden (zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p) geçirilip öyle ölçüldü.",
+      "RateReason": "kare hızı eşit (60 fps); en boy oranı uyuyor (1,7778 ~ 1,7782)",
+      "Measured": true,
+      "Error": null,
+      "VmafNegMean": 28.476435861111103,
+      "VmafNegHarmonic": 25.8500370563483,
+      "VmafNegP10": 16.4948387,
+      "VmafNegMin": 10.419365,
+      "Xpsnr": 28.858683333333335,
+      "Ssim": 0.795435,
+      "FrameWeight": 180,
+      "Settings": "882x496@60, libsvtav1/2pass, 1063k, pix=yuv420p, hdr=Preserve, deneme=2",
+      "CommandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\k6-deneme\\uc-sn.mkv -vf scale=882:496:flags=lanczos,zscale=t=linear:npl=100,tonemap=hable:desat=0,zscale=p=bt709:t=bt709:m=bt709:r=limited,format=yuv420p -c:v libsvtav1 -preset 6 -b:v 935k -pass 2 -passlogfile C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\k6-deneme\\serbest-cikti\\pass -g 600 -svtav1-params keyint=600:scd=1:tune=0:enable-variance-boost=1:variance-boost-strength=2 -pix_fmt yuv420p -color_primaries bt709 -color_trc bt709 -colorspace bt709 -an -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\k6-deneme\\serbest-cikti\\uc-sn_vidshrink_0.35mb.mp4",
+      "LogPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\k6-deneme\\serbest-gunluk\\uc-sn_vidshrink_0.35mb.log",
+      "OutputPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\k6-deneme\\serbest-cikti\\uc-sn_vidshrink_0.35mb.mp4"
+    }
+  ],
+  "Summaries": [
+    {
+      "Competitor": "vidshrink",
+      "TargetMb": 0.35,
+      "TotalBytes": 362102,
+      "AllSizesEqual": true,
+      "AllMeasured": true,
+      "ColorLabel": "SDR uzayında karşılaştırma — HDR kaybı hariç",
+      "VmafNegMean": 28.476435861111103,
+      "VmafNegHarmonic": 25.8500370563483,
+      "VmafNegWorstP10": 16.4948387,
+      "VmafNegMin": 10.419365,
+      "Xpsnr": 28.858683333333335,
+      "Ssim": 0.795435,
+      "Inputs": [
+        "uc-sn.mkv"
+      ]
+    }
+  ]
+}

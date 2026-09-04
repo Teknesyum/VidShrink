@@ -1,0 +1,103 @@
+{
+  "Source": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-3.mkv",
+  "Mode": "tam",
+  "TolerancePercent": 2,
+  "FfmpegVersion": "9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "StartedUtc": "2026-09-03 20:30:11",
+  "Targets": [
+    3.4993623719010767,
+    34.99362371901077
+  ],
+  "Measurements": [
+    {
+      "Competitor": "vidshrink",
+      "Input": "parca-3-yalniz-video.mkv",
+      "TargetMb": 3.4993623719010767,
+      "Bytes": 3563483,
+      "BaselineBytes": 3563483,
+      "SizeDeltaPercent": 0,
+      "SizeEqual": true,
+      "SizeStamp": "",
+      "ColorGate": "Direct",
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "ColorReason": "Referans ve çıktı aynı bt2020/smpte2084/bt2020nc uzayında.",
+      "RateReason": "kare hızı eşit (60 fps); en boy oranı uyuyor (1,7778 ~ 1,7814)",
+      "Measured": true,
+      "Error": null,
+      "VmafNegMean": 14.586042300137931,
+      "VmafNegHarmonic": 13.745007370379566,
+      "VmafNegP10": 10.594464,
+      "VmafNegMin": 4.246534,
+      "Xpsnr": 27.121133333333333,
+      "Ssim": 0.831603,
+      "FrameWeight": 3625,
+      "Settings": "652x366@60, libx264/2pass, 464k, pix=p010le, hdr=Preserve, deneme=1",
+      "CommandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-3-yalniz-video.mkv -vf scale=652:366:flags=lanczos -c:v libx264 -preset slow -b:v 464k -maxrate 696k -bufsize 928k -pass 2 -passlogfile C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-cikti\\pass -g 600 -keyint_min 60 -pix_fmt p010le -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -an -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-cikti\\parca-3-yalniz-video_vidshrink_3.499mb.mp4",
+      "LogPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-gunluk\\parca-3-yalniz-video_vidshrink_3.499mb.log",
+      "OutputPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-cikti\\parca-3-yalniz-video_vidshrink_3.499mb.mp4"
+    },
+    {
+      "Competitor": "vidshrink",
+      "Input": "parca-3-yalniz-video.mkv",
+      "TargetMb": 34.99362371901077,
+      "Bytes": 35546007,
+      "BaselineBytes": 35546007,
+      "SizeDeltaPercent": 0,
+      "SizeEqual": true,
+      "SizeStamp": "",
+      "ColorGate": "Direct",
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "ColorReason": "Referans ve çıktı aynı bt2020/smpte2084/bt2020nc uzayında.",
+      "RateReason": "kare hızı eşit (60 fps); en boy oranı uyuyor (1,7778 ~ 1,7761)",
+      "Measured": true,
+      "Error": null,
+      "VmafNegMean": 66.01959563420695,
+      "VmafNegHarmonic": 65.75369311738052,
+      "VmafNegP10": 61.4456616,
+      "VmafNegMin": 55.396956,
+      "Xpsnr": 35.8216,
+      "Ssim": 0.93607,
+      "FrameWeight": 3625,
+      "Settings": "1190x670@60, libx264/2pass, 4714k, pix=p010le, hdr=Preserve, deneme=1",
+      "CommandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-3-yalniz-video.mkv -vf scale=1190:670:flags=lanczos -c:v libx264 -preset slow -b:v 4714k -maxrate 7071k -bufsize 9428k -pass 2 -passlogfile C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-cikti\\pass -g 600 -keyint_min 60 -pix_fmt p010le -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -an -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-cikti\\parca-3-yalniz-video_vidshrink_34.994mb.mp4",
+      "LogPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-gunluk\\parca-3-yalniz-video_vidshrink_34.994mb.log",
+      "OutputPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\tur2\\compat-cikti\\parca-3-yalniz-video_vidshrink_34.994mb.mp4"
+    }
+  ],
+  "Summaries": [
+    {
+      "Competitor": "vidshrink",
+      "TargetMb": 3.4993623719010767,
+      "TotalBytes": 3563483,
+      "AllSizesEqual": true,
+      "AllMeasured": true,
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "VmafNegMean": 14.586042300137931,
+      "VmafNegHarmonic": 13.745007370379566,
+      "VmafNegWorstP10": 10.594464,
+      "VmafNegMin": 4.246534,
+      "Xpsnr": 27.121133333333333,
+      "Ssim": 0.831603,
+      "Inputs": [
+        "parca-3-yalniz-video.mkv"
+      ]
+    },
+    {
+      "Competitor": "vidshrink",
+      "TargetMb": 34.99362371901077,
+      "TotalBytes": 35546007,
+      "AllSizesEqual": true,
+      "AllMeasured": true,
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "VmafNegMean": 66.01959563420695,
+      "VmafNegHarmonic": 65.75369311738052,
+      "VmafNegWorstP10": 61.4456616,
+      "VmafNegMin": 55.396956,
+      "Xpsnr": 35.8216,
+      "Ssim": 0.93607,
+      "Inputs": [
+        "parca-3-yalniz-video.mkv"
+      ]
+    }
+  ]
+}

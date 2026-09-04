@@ -1,0 +1,102 @@
+{
+  "Source": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-1.mkv",
+  "Mode": "tam",
+  "TolerancePercent": 2,
+  "FfmpegVersion": "9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "StartedUtc": "2026-09-02 06:47:22",
+  "Targets": [
+    3.4974511806023365
+  ],
+  "Measurements": [
+    {
+      "Competitor": "handbrake",
+      "Input": "parca-1.mkv",
+      "TargetMb": 3.4974511806023365,
+      "Bytes": 3531037,
+      "BaselineBytes": 3531037,
+      "SizeDeltaPercent": 0,
+      "SizeEqual": true,
+      "SizeStamp": "",
+      "ColorGate": "Direct",
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "ColorReason": "Referans ve çıktı aynı bt2020/smpte2084/bt2020nc uzayında.",
+      "RateReason": "kare hızı eşit (60 fps); en boy oranı uyuyor (1,7778 ~ 1,7778)",
+      "Measured": true,
+      "Error": null,
+      "VmafNegMean": 52.326031802704215,
+      "VmafNegHarmonic": 48.564643568602555,
+      "VmafNegP10": 34.555593900000005,
+      "VmafNegMin": 16.423202,
+      "Xpsnr": 30.952233333333336,
+      "Ssim": 0.920894,
+      "FrameWeight": 3624,
+      "Settings": "H.265 MKV 1080p30 + x265 slow, 483 kbit/s ABR, çoklu geçiş, turbo ilk geçiş, ses yok, 60 fps CFR",
+      "CommandLine": "HandBrakeCLI -i C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-1.mkv -o C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\cikti\\parca-1_handbrake_3.497mb.mkv -Z \"H.265 MKV 1080p30\" -e x265 -b 483 --multi-pass --turbo --encoder-preset slow -a none -r 60 --cfr --crop 0:0:0:0 --non-anamorphic",
+      "LogPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\gunluk\\parca-1_handbrake_3.497mb.log",
+      "OutputPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\cikti\\parca-1_handbrake_3.497mb.mkv"
+    },
+    {
+      "Competitor": "vidshrink",
+      "Input": "parca-1.mkv",
+      "TargetMb": 3.4974511806023365,
+      "Bytes": 3525089,
+      "BaselineBytes": 3531037,
+      "SizeDeltaPercent": -0.16844909866421678,
+      "SizeEqual": true,
+      "SizeStamp": "",
+      "ColorGate": "Direct",
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "ColorReason": "Referans ve çıktı aynı bt2020/smpte2084/bt2020nc uzayında.",
+      "RateReason": "kare hızı eşit (60 fps); en boy oranı uyuyor (1,7778 ~ 1,7778)",
+      "Measured": true,
+      "Error": null,
+      "VmafNegMean": 40.354517235927105,
+      "VmafNegHarmonic": 33.440801417209535,
+      "VmafNegP10": 18.5668956,
+      "VmafNegMin": 5.525209,
+      "Xpsnr": 29.063399999999998,
+      "Ssim": 0.915947,
+      "FrameWeight": 3624,
+      "Settings": "768x432@60, libx264/2pass, 481k, pix=p010le, hdr=Preserve, deneme=1",
+      "CommandLine": "ffmpeg -hide_banner -y -hwaccel auto -i C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\kaynak\\parca-1.mkv -vf scale=768:432:flags=lanczos -c:v libx264 -preset slow -b:v 481k -maxrate 721k -bufsize 962k -pass 2 -passlogfile C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\cikti\\pass -g 600 -keyint_min 60 -pix_fmt p010le -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -an -movflags +faststart C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\cikti\\parca-1_vidshrink_3.628mb.mp4",
+      "LogPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\gunluk\\parca-1_vidshrink_3.628mb.log",
+      "OutputPath": "C:\\Users\\Administrator\\Desktop\\Projeler\\Vidshrink\\.calisma\\ab\\t125\\cikti\\parca-1_vidshrink_3.628mb.mp4"
+    }
+  ],
+  "Summaries": [
+    {
+      "Competitor": "handbrake",
+      "TargetMb": 3.4974511806023365,
+      "TotalBytes": 3531037,
+      "AllSizesEqual": true,
+      "AllMeasured": true,
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "VmafNegMean": 52.326031802704215,
+      "VmafNegHarmonic": 48.564643568602555,
+      "VmafNegWorstP10": 34.555593900000005,
+      "VmafNegMin": 16.423202,
+      "Xpsnr": 30.952233333333336,
+      "Ssim": 0.920894,
+      "Inputs": [
+        "parca-1.mkv"
+      ]
+    },
+    {
+      "Competitor": "vidshrink",
+      "TargetMb": 3.4974511806023365,
+      "TotalBytes": 3525089,
+      "AllSizesEqual": true,
+      "AllMeasured": true,
+      "ColorLabel": "aynı renk uzayında doğrudan karşılaştırma",
+      "VmafNegMean": 40.354517235927105,
+      "VmafNegHarmonic": 33.440801417209535,
+      "VmafNegWorstP10": 18.5668956,
+      "VmafNegMin": 5.525209,
+      "Xpsnr": 29.063399999999998,
+      "Ssim": 0.915947,
+      "Inputs": [
+        "parca-1.mkv"
+      ]
+    }
+  ]
+}
