@@ -14,6 +14,20 @@ public sealed class PlanOptions
     public HdrPolicy HdrPolicy { get; set; } = HdrPolicy.Preserve;
     public FillPolicy FillPolicy { get; set; } = FillPolicy.FillTarget;
     public SpeedMode SpeedMode { get; set; } = SpeedMode.Quality;
+
+    /// <summary>
+    /// Kullanicinin acikca sectigi kodlayici. <c>null</c> "secim yok" demektir ve motor
+    /// <see cref="Codec"/>/<see cref="CompressionStrategy.AutoPreference"/> yolundan gectigi
+    /// gibi gecmeye devam eder. Dolu oldugunda kodek kilitlenir; bitrate, preset, cozunurluk,
+    /// fps ve ses karari yine otomatik hesaplanir, degisen tek sey hangi kodlayicinin
+    /// kullanildigidir.
+    ///
+    /// Aile degil kodlayici adi tutuluyor ("libsvtav1", "av1_nvenc"): motorun yedege dusme
+    /// mekanizmasi (<see cref="EncoderFallbackCause"/>) zaten kodlayici adi uzerinden calisiyor,
+    /// bir aile secilseydi "bu ailede hangi kodlayici" sorusunu ikinci kez cozmek gerekirdi.
+    /// Adlar <see cref="PlanParser.Parse"/>'in kabul ettigi kume ile ayni tutuluyor.
+    /// </summary>
+    public string? LockedCodec { get; set; } = null;
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -182,7 +196,10 @@ public static class PlanCalculator
             ? CompressionStrategy.AutoPreference(regime)
             : options.Codec;
         var fast = options.SpeedMode == SpeedMode.Fast;
-        var codec = fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability, probe);
+        var lockedCodec = NormalizeLockedCodec(options.LockedCodec);
+        var codec = lockedCodec is not null
+            ? PickLockedCodec(lockedCodec, availability, probe)
+            : fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability, probe);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
@@ -208,7 +225,7 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.HdrTonemapped));
         }
 
-        var preferredCodec = fast ? FastHardwareOrder[0] : PreferredCodecFor(preference);
+        var preferredCodec = lockedCodec ?? (fast ? FastHardwareOrder[0] : PreferredCodecFor(preference));
         if (codec != preferredCodec)
         {
             var fallbackCause = EncoderFallbackCauseFor(probe);
@@ -221,7 +238,7 @@ public static class PlanCalculator
                 FallbackCause: fallbackCause));
         }
 
-        if (options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
+        if (lockedCodec is null && options.Codec != CodecPreference.Auto && suggestedPreference == CodecPreference.MaxCompression && preference == CodecPreference.Compatible)
             notes.Add(AdviceCode.CodecUpgradeRecommended);
         if (CodecModel.CostsQualityInHardware(codec) && regime is CompressionRegime.Aggressive or CompressionRegime.Extreme)
             notes.Add(AdviceCode.HardwareCodecCostsQuality);
@@ -939,6 +956,82 @@ public static class PlanCalculator
         _ =>
             $"the {preferredCodec} encoder could not be used on this machine, so encoding falls back to {codec}"
     };
+
+    /// <summary>
+    /// <see cref="PlanOptions.LockedCodec"/>'in kabul ettigi kume. <see cref="PlanParser"/>'in
+    /// <c>AllowedCodecs</c> listesiyle ayni tutuluyor cunku ikisi de "bu motorun tanidigi
+    /// kodlayici" sorusunu soruyor; <c>PlanParser.cs</c> bu sozlesmenin alani disinda kaldigi
+    /// icin liste burada ayrica tutuluyor.
+    /// </summary>
+    private static readonly string[] KnownLockableCodecs =
+    {
+        "libx264", "libx265", "libsvtav1",
+        "h264_nvenc", "hevc_nvenc", "av1_nvenc",
+        "h264_qsv", "hevc_qsv", "av1_qsv",
+        "h264_amf", "hevc_amf", "av1_amf"
+    };
+
+    /// <summary>
+    /// Bos/bosluk kilidi "secim yok" sayar; dolu kilit tanidik kodlayicilardan biri degilse
+    /// aciyor patlar. Uydurma bir ad sessizce libx264'e dusseydi K1'in "varsayilan hicbir sey
+    /// secmemektir" iddiasi bu yolla delinirdi.
+    /// </summary>
+    private static string? NormalizeLockedCodec(string? locked)
+    {
+        if (string.IsNullOrWhiteSpace(locked)) return null;
+        var trimmed = locked.Trim();
+        var known = KnownLockableCodecs.FirstOrDefault(c => c.Equals(trimmed, StringComparison.OrdinalIgnoreCase));
+        if (known is null)
+            throw new ArgumentException($"bilinmeyen kilitli kodlayici: {trimmed}", nameof(PlanOptions.LockedCodec));
+        return known;
+    }
+
+    /// <summary>
+    /// Kilitlenen kodlayici NotWorking/NotInBuild ise dusulecek yer: ayni ailenin yazilim
+    /// kodlayicisi. Yazilim kodlayicilar bu motorda hep var/calisir sayiliyor —
+    /// <see cref="PickCodec"/>'in <c>Compatible</c> kolu da libx264'u hic yoklamadan donuyor.
+    /// Kilitlenen zaten o yazilim kodlayicinin kendisiyse (ör. libx265 NotWorking cikarsa)
+    /// bir alt basamak, libx264'e inilir; aksi halde tavsiyeyi kendine dusurup sonsuz
+    /// donguye benzer bir "dusme" uretmis oluruz.
+    /// </summary>
+    private static string LockedFallbackCodecFor(string codec)
+    {
+        var fallback = CodecModel.SourceFamily(codec) switch
+        {
+            "av1" => "libsvtav1",
+            "hevc" => "libx265",
+            _ => "libx264"
+        };
+        return fallback.Equals(codec, StringComparison.OrdinalIgnoreCase) ? "libx264" : fallback;
+    }
+
+    /// <summary>
+    /// <see cref="PickCodec"/> ile ayni yoklama sirasini kilitli, tek adayli kodlayiciya
+    /// uygular: derlemede yoksa <see cref="EncoderFallbackCause.NotInBuild"/>, olculmemisse
+    /// gecici olarak kendisi doner ve <paramref name="probe"/> isaretlenir, calisiyorsa
+    /// kendisi doner, calismiyorsa <see cref="LockedFallbackCodecFor"/>'a duser. Yazilim
+    /// kodlayicilar da <see cref="PickCodec"/>'in aksine buradan yoklaniyor: kilit acik bir
+    /// secim, "secim yok" degil, o yuzden Compatible'in yoklamasiz kisayolu burada yok.
+    /// </summary>
+    private static string PickLockedCodec(string locked, IEncoderAvailability? availability, ProbeState probe)
+    {
+        if (availability is null) return locked;
+        if (!availability.HasEncoder(locked))
+        {
+            probe.PreferredCodecInBuild = false;
+            return LockedFallbackCodecFor(locked);
+        }
+        var state = availability.KnownState(locked);
+        probe.PreferredCodecState = state;
+        if (state == EncoderProbeState.Unmeasured)
+        {
+            probe.NotMeasured = true;
+            probe.CodecNotMeasured = true;
+            return locked;
+        }
+        if (state == EncoderProbeState.Working) return locked;
+        return LockedFallbackCodecFor(locked);
+    }
 
     private static string PickCodec(CodecPreference pref, IEncoderAvailability? availability)
         => PickCodec(pref, availability, null);
