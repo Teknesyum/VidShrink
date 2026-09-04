@@ -28,13 +28,13 @@ kurulan `PlanOptions`ten geliyor, ikisi bit bit ayni.)
 
 ## K2 — uc kilit izgarasi
 
-Kaynak: 1920x1080@30, 500 MB, h264. Hedef: 6 MB (Extreme rejim). Kilit: libx264/libx265/libsvtav1.
+Ayni kaynak ve ayni hedef, degisen tek sey kilit.
 
-| kilit | secilen | mode | videoK | cozunurluk | fps |
-|---|---|---|---|---|---|
-| libx264 | libx264 | 2pass | 353 | 768x432 | 30 |
-| libx265 | libx265 | 2pass | 353 | 922x518 | 25 |
-| libsvtav1 | libsvtav1 | 2pass | 353 | 1458x820 | 30 |
+| kilit | kaynak | hedef | rejim | secilen | mode | videoK | cozunurluk | fps |
+|---|---|---|---|---|---|---|---|---|
+| libx264 | 1920x1080@30, 500 MB, h264 | 6 MB | Extreme | libx264 | 2pass | 353 | 768x432 | 30 |
+| libx265 | 1920x1080@30, 500 MB, h264 | 6 MB | Extreme | libx265 | 2pass | 353 | 922x518 | 25 |
+| libsvtav1 | 1920x1080@30, 500 MB, h264 | 6 MB | Extreme | libsvtav1 | 2pass | 353 | 1458x820 | 30 |
 
 Kodlayici degisince cozunurluk (ve libx265'te fps) degisiyor — `ComplexityProfile`nin
 `RelativeBitrateNeed(codec)` uzerinden aldigi kodek etkisi arama yoluna geciyor.
