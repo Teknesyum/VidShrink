@@ -21,21 +21,19 @@ right-click menu.
 
 ## Contracts open
 
-- `T125` — active, round 1 — T125 — A/B'nin bizim tarafimiz auto modu kosmuyor
+- `T125` — submitted, round 1 — T125 — A/B'nin bizim tarafimiz auto modu kosmuyor
 - `T133` — active, round 1
-- `T152` — submitted, round 1
-- `T154` — submitted, round 1
 
 ## Closed last
 
-- `T153` — done — 2026-09-03 11:16
-- `T154` — stale — 2026-09-03 10:56
-- `T153` — stale — 2026-09-03 10:56
-- `T152` — stale — 2026-09-03 10:56
-- `T146` — done — 2026-09-03 10:25
+- `T133` — stale — 2026-09-03 20:51
+- `T159` — done — 2026-09-03 15:34
+- `T160` — done — 2026-09-03 14:38
+- `T157` — done — 2026-09-03 14:03
+- `T155` — done — 2026-09-03 12:40
 
 ## Tree
 
-- branch: `main`
-- head: `3fdbe93 rele: T153 muhur kaydi, dort borc`
-- uncommitted files: 0
+- branch: `T125-ab-kodek-kolu`
+- head: `6f55d48 manset kapisi: 32 bulgunun tamami duzeltildi (T125)`
+- uncommitted files: 1
