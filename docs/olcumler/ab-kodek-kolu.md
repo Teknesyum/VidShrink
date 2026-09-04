@@ -95,10 +95,11 @@ Düzeltme tek satır: `tools/VidShrink.Ab/Competitors.cs`de `PlanOptions`a
 değerin aynısı (`CodecFromIndex(0)`).
 
 Kolu yanlışa çevirmek düzeneğin çıktısını **dört yerden** değiştiriyor. İki yön
-de koşuldu, aynı satırda (`parca-1` @ `3,4975` MB), aynı gün, aynı tabanda:
+de koşuldu, aynı satırda (`parca-1` @ 3,4975 MB), aynı gün, aynı tabanda:
 
 | düzeneğin çıktısı | `Codec` atanmadan (Compatible) | `Codec = Auto` |
 |---|---|---|
+| hedef (MB) | 3,4975 | 3,4975 |
 | ffmpeg kodek argümanı | `-c:v libx264 -preset slow` | `-c:v libsvtav1 -preset 6` |
 | kodek özel parametreler | yok | `-svtav1-params keyint=600:scd=1:tune=0:…` |
 | seçilen yerleşim | 768x432 | **882x496** |
@@ -234,8 +235,11 @@ koşumu `AllowFpsDrop = true`, buradaki A/B `AllowFpsDrop = false`. Öteki alanl
 
 ## K6 düzeneği sınandı — ve sınarken bir kararsızlık ölçüldü
 
-Anahtar iki yönde de çalışıyor. Aynı girdi (3 sn'lik 1080p60 HDR kesit), aynı
-hedef (`0,35` MB), aynı ikili, tek fark ortam değişkeni:
+Anahtar iki yönde de çalışıyor. Koşum künyesi:
+
+- girdi: 3 sn'lik 1080p60 HDR kesit
+- hedef: 0,35 MB
+- ikili ve ortam aynı; tek fark `T125_YERLESIM_KILIT` ortam değişkeni
 
 | koşum | `T125_YERLESIM_KILIT` | plan | sonuç |
 |---|---|---|---|

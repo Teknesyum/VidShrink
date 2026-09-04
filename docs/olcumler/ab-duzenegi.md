@@ -426,7 +426,9 @@ HandBrakeCLI -i parca-1.mkv -o parca-1_handbrake_3.497mb.mkv \
 ```
 
 600 MB hedefinde tek fark `-b 4833`. Bit hızı hedeften türetiliyor:
-`hedef_bayt x 8 x (1 - 0,005) / süre / 1000`, kapsayıcı payı `%0,5`.
+
+- formül: `hedef_bayt x 8 x (1 - 0,005) / süre / 1000`
+- kapsayıcı payı: %0,5
 
 VidShrink tarafı ürünün kendi borusunu koşuyor — `ComplexityProbe` →
 `PlanCalculator` → iki tur `CalibrationProbe` → `EncodeRunner` — ve kendi kararını
@@ -534,7 +536,11 @@ bakmadım; ölçülen davranış bu.
 
 **Üçüncü gözlem — çözünürlük basamağı hedef-bayt eğrisini kesintili yapıyor.**
 Hedefi büyütmek bir noktada plana çözünürlük atlatıyor ve teslim edilen bayt
-sıçrıyor. `parca-2` @ `60 MB`'de ölçülen dört nokta:
+sıçrıyor. Koşum künyesi:
+
+- girdi: `parca-2`
+- hedef ailesi: 60 MB
+- yoklanan nokta sayısı: dört
 
 | hedef | seçilen çözünürlük | teslim | tabana fark |
 |---|---|---|---|
@@ -904,23 +910,49 @@ dayanıyor, kararlılığı **ölçülmedi**.
 ## T125 tur 2 — altı çiftin tamamı bugünkü tabanla ölçüldü
 
 T0 kararı üzerine kalan beş çift de bugünkü tabanla (`fcf377f` sonrası,
-`Codec = CodecPreference.Auto` düzeltmesiyle) koşuldu. On iki ölçümün (5 satır
-× 3 sütun, 1 satır zaten üstteki bölümde ölçülüydü) on ikisinde de `SizeEqual`
-doğru ve `ColorGate=Direct` — eş boyut kapısından geçmeyen ya da HDR yoluna
-düşen satır yok, sayıma giren hepsi.
+`Codec = CodecPreference.Auto` düzeltmesiyle) koşuldu. Tur 2'nin JSON'larında
+**on beş ölçüm** var (5 satır × 3 sütun; parça-1 satırı zaten üstteki bölümde
+ölçülüydü). On beşinin de `ColorGate` alanı `Direct` — HDR yoluna düşen satır
+yok.
+
+**Eş boyut ise sütuna göre değişiyor, ve Compatible sütunu geçerli bir
+eşitlemeden geçmedi.** JSON'ların `SizeEqual` alanı her satırda `true` yazıyor
+ama bu alan tek başına HandBrake'e karşı bir damga değil.
+`tools/VidShrink.Ab/AbRunner.cs:118-124` eşitleyiciyi yalnız `outcomes.Count > 0`
+iken çağırıyor ve tabanı `outcomes[0].Bytes`ten alıyor. Tur 2'nin Compatible
+koşumları **tek yarışmacıyla** koşuldu — `parca-2-compat.json`,
+`parca-3-compat.json` ve `parca-1-600-compat.json` künyelerinde tek bir
+`vidshrink` ölçümü var — yani eşitleyici hiç çağrılmadı ve her satırın tabanı
+kendi baytı oldu. O künyelerdeki `fark % = 0,00` değeri kendi kendine kıyastır,
+HandBrake'e karşı eşitlik damgası değil. **Bu düzeneğin kendi kusurudur**, ölçülen
+kolun değil.
+
+Baytlar aynı satırın HandBrake baytına karşı ham JSON'dan yeniden hesaplandığında
+tablo şu: Auto sütununun altı satırının altısı da eşitlendi ve bandın içinde;
+Compatible sütununun altı satırının **dördü ±%2 bandını deliyor**. Delen satırlar
+tabloda duruyor, atılmadı.
 
 Sütunların üçü de aynı gün, aynı taban: aralarında sürüm sınırı yok.
 
-| parça / hedef | HandBrake | biz — Compatible | biz — Auto |
-|---|---|---|---|
-| parça-1 @ 3,4975 MB | 48,56 | 33,44 | 45,97 |
-| parça-1 @ 34,9745 MB | 83,64 | 72,82 | 72,80 |
-| parça-2 @ 3,4999 MB | 93,73 | 71,01 | 82,25 |
-| parça-2 @ 34,9994 MB | 95,79 | 96,10 | **96,12** |
-| parça-3 @ 3,4994 MB | 17,88 | 13,75 | **22,29** |
-| parça-3 @ 34,9936 MB | 74,96 | 65,75 | 66,11 |
+| parça / hedef | HandBrake | Compatible | Compatible Δbayt | Auto | Auto Δbayt |
+|---|---|---|---|---|---|
+| parça-1 @ 3,4975 MB | 48,56 | 33,44 | −%0,17 | 45,97 | +%0,02 |
+| parça-1 @ 34,9745 MB | 83,64 | 72,82 | +%1,35 | 72,80 | +%1,32 |
+| parça-2 @ 3,4999 MB | 93,73 | 71,01 | **−%5,17 — band delindi** | 82,25 | +%1,89 |
+| parça-2 @ 34,9994 MB | 95,79 | 96,10 | **−%2,54 — band delindi** | **96,12** | +%0,04 |
+| parça-3 @ 3,4994 MB | 17,88 | 13,75 | **−%3,19 — band delindi** | **22,29** | +%0,92 |
+| parça-3 @ 34,9936 MB | 74,96 | 65,75 | **−%2,03 — band delindi** | 66,11 | −%0,02 |
 
-(harmonik VMAF-NEG, iki ondalık; kaynak: `.calisma/ab/t125/tur2/json/`.)
+(harmonik VMAF-NEG, iki ondalık; Δbayt = o sütunun teslim ettiği baytın aynı
+satırdaki HandBrake baytına yüzde farkı; kaynak: `.calisma/ab/t125/tur2/json/`
+ve `.calisma/ab/t125/k1-parca-1-compatible.json`,
+`.calisma/ab/t125/k2-parca-1-auto.json`.)
+
+İlk satır ayrık: parça-1 @ 3,4975 MB'nin Compatible ölçümü HandBrake ile aynı
+koşumda alınmıştı, eşitleyici orada çalıştı ve o yüzden bandın içinde. Alttaki
+beş satırın Compatible ölçümü ayrı, tek yarışmacılı koşumlardan geliyor.
+Compatible sütununun puanları bu yüzden **HandBrake'e karşı eş boyutta
+ölçülmüş sayılamaz**; Auto sütununun puanları sayılır.
 
 ### Manşet — yeniden sayıldı
 
@@ -942,21 +974,33 @@ metnin "beşinde" sayısı bu tabloda tutmuyor — düzeltildi. Yön aynı kald�
 Aynı tabanda ölçülmüş iki VidShrink sütunu doğrudan kıyaslanabilir (sürüm
 sınırı yok):
 
-| satır | Compatible | Auto | fark | kodek değişti mi |
-|---|---|---|---|---|
-| parça-1 @ 3,50 MB | 33,44 | 45,97 | **+12,53** | evet (libx264→libsvtav1) |
-| parça-1 @ 34,97 MB | 72,82 | 72,80 | −0,02 | hayır (libx264) |
-| parça-2 @ 3,50 MB | 71,01 | 82,25 | **+11,24** | evet (libx264→libsvtav1) |
-| parça-2 @ 35,00 MB | 96,10 | 96,12 | +0,02 | hayır (libx264) |
-| parça-3 @ 3,50 MB | 13,75 | 22,29 | **+8,54** | evet (libx264→libsvtav1) |
-| parça-3 @ 34,99 MB | 65,75 | 66,11 | +0,36 | hayır (libx264, K4 notu: bayt farkı büyük — `ab-kodek-kolu.md`'deki K4 bölümüne bakın) |
+| satır | Compatible | Auto | fark | Δbayt (auto↔compat) | kodek değişti mi |
+|---|---|---|---|---|---|
+| parça-1 @ 3,50 MB | 33,44 | 45,97 | **+12,53** | +%0,19 | evet (libx264→libsvtav1) |
+| parça-1 @ 34,97 MB | 72,82 | 72,80 | −0,02 | −%0,03 | hayır (libx264) |
+| parça-2 @ 3,50 MB | 71,01 | 82,25 | **+11,24** | **+%7,44** | evet (libx264→libsvtav1) |
+| parça-2 @ 35,00 MB | 96,10 | 96,12 | +0,02 | +%2,66 | hayır (libx264) |
+| parça-3 @ 3,50 MB | 13,75 | 22,29 | **+8,54** | **+%4,25** | evet (libx264→libsvtav1) |
+| parça-3 @ 34,99 MB | 65,75 | 66,11 | +0,36 | +%2,05 | hayır (libx264, K4 notu — `ab-kodek-kolu.md`'deki K4 bölümüne bakın) |
 
-Desen net: düzeltmenin (`Auto`'nun düşük hedeflerde `libsvtav1`'e geçmesi)
-kazancı **yalnız 3,5 MB hedefli üç satırda** var (+8,5 ile +12,5 puan arası);
-35 MB hedefli üç satırda kodek zaten değişmiyor ve fark gürültü seviyesinde
-(K4 kapısına bakın). Yani düzeltme küçük-hedef rejiminde işliyor, büyük-hedef
-rejiminde nötr — beklenen: `CompressionStrategy.RegimeFor` büyük hedefte zaten
-Balanced/Compatible seçiyordu, düzeltmenin oraya etkisi yok.
+Kodek değişimi yalnız 3,5 MB hedefli üç satırda gerçekleşiyor; 35 MB hedefli üç
+satırda kodek libx264'te kalıyor ve puan farkı 0,36'yı geçmiyor. Buraya kadar
+beklenen: `CompressionStrategy.RegimeFor` büyük hedefte zaten Balanced/Compatible
+seçiyordu, düzeltmenin oraya etkisi yok.
+
+**Ama puanın tamamı kodek değişimine yazılamaz.** Δbayt sütunu gösteriyor: aynı
+satırlarda Auto kolu Compatible koluna göre daha fazla bayt harcamış — parça-2 @
+3,50 MB'de +%7,44, parça-3 @ 3,50 MB'de +%4,25. İki kol eş boyutta değil, yani
++11,24 ve +8,54 puanın içinde bilinmeyen büyüklükte bir **bayt payı** var.
+Sebebi üstteki bölümde yazılı: Compatible kolu HandBrake tabanı olmadan koşuldu,
+eşitleyici hiç çağrılmadı ve o kol kendi baytına razı oldu. Kodek payı ile bayt
+payı bu tabloda **ayrıştırılmadı**; ayrıştırmak Compatible kolunun aynı taban
+bayta karşı yeniden koşulmasını gerektirir ve bu turda koşulmadı.
+
+K4 notunun tetiklendiği parça-3 @ 34,99 MB satırında iki kolun baytı +%2,05
+ayrışıyor. Aynı tablodaki parça-2 @ 35,00 MB satırı bundan daha büyük bir bayt
+farkı taşıyor (+%2,66) ama puan farkı 0,02'de kalıyor; 96 puanlık tavana yakın
+bölgede ek bitin getirisi düşük, parça-3 ise 65-66 puanlık orta bantta.
 
 ### K6 — yerleşim ayrıştırması
 
