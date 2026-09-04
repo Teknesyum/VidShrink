@@ -1,0 +1,34 @@
+{
+  "contractId": "T133",
+  "auditorRunId": "a01d13bc489959fab",
+  "headSha": "68e9d1caeb65bfaadb488930b7f4b60361c38068",
+  "diffHash": "2795ee767af29a0d91d45ecd2a2dbd2463d2b4b996f0eb3318e096a316b9bd77",
+  "owns": [
+    "docs/olcumler/anahtar-kare-tavani.md",
+    "tools/anahtar-kare/atlama-hepsi.sh",
+    "tools/anahtar-kare/atlama.sh",
+    "tools/anahtar-kare/harita-hepsi.sh",
+    "tools/anahtar-kare/harita.py",
+    "tools/anahtar-kare/hazirla.sh",
+    "tools/anahtar-kare/hizalama.sh",
+    "tools/anahtar-kare/izgara.sh",
+    "tools/anahtar-kare/kalibre-s4.sh",
+    "tools/anahtar-kare/kalibre-sec.py",
+    "tools/anahtar-kare/kalibre.sh",
+    "tools/anahtar-kare/ortak.sh",
+    "tools/anahtar-kare/oz.py",
+    "tools/anahtar-kare/rapor-govde.md",
+    "tools/anahtar-kare/rapor-k4.md",
+    "tools/anahtar-kare/rapor-recete.md",
+    "tools/anahtar-kare/rapor.py",
+    "tools/anahtar-kare/tablo.py",
+    "tools/anahtar-kare/tara-hareket.sh"
+  ],
+  "verification": [
+    "Raporu ureticiden bagimsiz yeniden urettim: rapor.py birlestirme adimini ham .calisma/t133/izgara-{bpp,zorluk,nvenc,svtav1}.csv, harita.json, hizalama.txt uzerinde stdout'a kosturup git show HEAD:docs/olcumler/anahtar-kare-tavani.md ile diff'ledim, fark sifir satir, doldurulmamis yer tutucu yok. Tur 2'de eklenen iki elle yazilmis tabloyu ham CSV'den yeniden hesapladim: R1 dayanaginin sekiz satiri (+0,109 / -0,347 / -0,138 / -0,190 / -0,012 / -6,115 / -0,148 / -0,139) ve ikinci-kodlayici satirlarinin ucu (-1,297 / -1,421 / -1,424) 11/11 tuttu. K4 kilidini 59011c6 tarihi (2026-09-02T11:06:12+03:00, duzenek commit'i 89c9f68 11:30:12) ve esik metni diff'i ile dogruladim: baslik paragrafi disinda bayt bayt ayni. K5 satir referanslarini 55f245a:FfmpegArguments.cs uzerinde okudum (281, 282, 283-289, 298-318, 328 tuttu). owns disiplini: git diff --name-only origin/main HEAD -- . ':!docs' ':!tools/anahtar-kare' ':!.claude' bos. CI 33805053969 cfa9da5'te success. KRITIK yok, 11 borc. Tek somut sayi hatasi :763 'on dordunde' idi (gercek 13/2/1); T0 tarafindan uretici govde ile birlikte duzeltildi."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-04T16:41:20.333Z",
+  "usedAt": "2026-09-04T16:41:43.112Z",
+  "completedSha": "68e9d1caeb65bfaadb488930b7f4b60361c38068"
+}

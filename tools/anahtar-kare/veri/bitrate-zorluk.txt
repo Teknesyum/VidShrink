@@ -1,0 +1,4 @@
+s1-kesikli 4250
+s2-durgun 80
+s3-hareketli 2850
+s4-yuksek 13740

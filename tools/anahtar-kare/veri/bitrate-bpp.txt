@@ -1,0 +1,4 @@
+s1-kesikli 1864
+s2-durgun 1864
+s3-hareketli 1864
+s4-yuksek 8390
