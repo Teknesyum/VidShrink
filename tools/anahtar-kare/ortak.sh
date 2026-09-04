@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # T133 ortak kodlama/olcum parcalari. Butun hucreler ayni fonksiyondan gecer.
-ROOT="C:/Users/Administrator/Desktop/Projeler/Vidshrink/.claude/worktrees/T133"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 KAY="$ROOT/.calisma/t133/kaynak"
 ISI="$ROOT/.calisma/t133/cikti"
 VMD="$ROOT/.calisma/t133/vmaf"
