@@ -1,0 +1,4 @@
+s1-kesikli kaynak_kare=600 psnr=inf vmaf(kare mean p10 worst)=600 98.837 97.486 97.421
+s2-durgun kaynak_kare=600 psnr=inf vmaf(kare mean p10 worst)=600 97.438 97.429 97.425
+s3-hareketli kaynak_kare=600 psnr=inf vmaf(kare mean p10 worst)=600 99.435 98.165 97.426
+s4-yuksek kaynak_kare=1200 psnr=inf vmaf(kare mean p10 worst)=1200 99.232 97.571 97.426

@@ -1,0 +1,6 @@
+{
+"s1-kesikli": {"aday": 212, "kesim": 4, "sahne": 5, "medyan": 2.4, "tavan": 5.0, "kaynaktan": "harita", "kesim_zamanlari": [2.4, 14.633, 16.433, 18.933], "sahne_sureleri": [2.4, 12.233, 1.8, 2.5, 1.067]},
+"s2-durgun": {"aday": 0, "kesim": 0, "sahne": 1, "medyan": 20.0, "tavan": 10.0, "kaynaktan": "harita", "kesim_zamanlari": [], "sahne_sureleri": [20.0]},
+"s3-hareketli": {"aday": 185, "kesim": 1, "sahne": 2, "medyan": 10.0, "tavan": 10.0, "kaynaktan": "harita", "kesim_zamanlari": [13.867], "sahne_sureleri": [13.867, 6.133]},
+"s4-yuksek": {"aday": 365, "kesim": 3, "sahne": 4, "medyan": 5.349, "tavan": 5.349, "kaynaktan": "harita", "kesim_zamanlari": [7.932, 9.033, 17.234], "sahne_sureleri": [7.932, 1.101, 8.201, 2.766]}
+}
