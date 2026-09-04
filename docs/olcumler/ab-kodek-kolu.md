@@ -95,7 +95,7 @@ Düzeltme tek satır: `tools/VidShrink.Ab/Competitors.cs`de `PlanOptions`a
 değerin aynısı (`CodecFromIndex(0)`).
 
 Kolu yanlışa çevirmek düzeneğin çıktısını **dört yerden** değiştiriyor. İki yön
-de koşuldu, aynı satırda (`parca-1` @ 3,4975 MB), aynı gün, aynı tabanda:
+de koşuldu, aynı satırda (`parca-1` @ `3,4975` MB), aynı gün, aynı tabanda:
 
 | düzeneğin çıktısı | `Codec` atanmadan (Compatible) | `Codec = Auto` |
 |---|---|---|
@@ -235,7 +235,7 @@ koşumu `AllowFpsDrop = true`, buradaki A/B `AllowFpsDrop = false`. Öteki alanl
 ## K6 düzeneği sınandı — ve sınarken bir kararsızlık ölçüldü
 
 Anahtar iki yönde de çalışıyor. Aynı girdi (3 sn'lik 1080p60 HDR kesit), aynı
-hedef (0,35 MB), aynı ikili, tek fark ortam değişkeni:
+hedef (`0,35` MB), aynı ikili, tek fark ortam değişkeni:
 
 | koşum | `T125_YERLESIM_KILIT` | plan | sonuç |
 |---|---|---|---|

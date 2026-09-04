@@ -328,11 +328,16 @@ tablo ikiye bölmeli eşitleyicinin koşumundan.
 | parca-3 | handbrake | 1920x1080 @483k | 3.680.998 | 0,00 | evet | 13,72 | 11,79 | 0,00 | 17,46 | 28,21 |
 | parca-3 | vidshrink | 652x366 @479k | 3.677.261 | -0,10 | evet | 9,35 | 6,99 | 0,00 | 13,53 | 27,17 |
 
-**Üç parçanın üçü de kapının içinde** (-%0,13, +%1,04, -%0,10). Toplam bayt
-10.973.204 ↔ 10.942.726, yani **+%0,28**. Bu tabloda damga yok.
+**Üç parçanın üçü de kapının içinde** (-0,13%, +1,04%, -0,10% — yukarıdaki
+tablonun `fark %` sütunu). Toplam bayt karşılaştırması ve yüzdesi Özet
+tablosunda; bu tabloda damga yok.
 
 `parca-2`nin kapıya girmesi ikiye bölmeyle oldu; tur 2'de yalnız oranlı düzeltme
-vardı ve o parça -%3,69'da takılmıştı. Ölçülen yoklama dizisi:
+vardı ve o parça bandın dışında takılmıştı (aşağıya bakın).
+
+#### Eşitleme yoklaması
+
+Ölçülen yoklama dizisi:
 
 | deneme | kip | hedef | seçilen yerleşim | teslim | tabana fark |
 |---|---|---|---|---|---|
@@ -376,38 +381,40 @@ okunmalı (aşağıda "kıl payı satır" başlığında pimlendi).
 | handbrake | 600 | `af7a0fe` | 108.326.915 | evet | **67,96** | 64,62 | 0,00 | 83,03 | 40,49 |
 | vidshrink | 600 | `af7a0fe` | 107.433.177 | evet | **58,83** | 54,59 | 0,00 | 76,17 | 40,77 |
 
-**Geridiyiz.** İki hedefte de eş boyutta ölçüldü ve ikisinde de HandBrake önde:
-600 MB'de harmonik ortalamada **9,13 puan** (67,96 ↔ 58,83), 60 MB'de
-**9,04 puan** (28,70 ↔ 19,66). On iki satırın on ikisi ±%2 kapısının içinde.
+**Geridiyiz.** İki hedefte de eş boyutta ölçüldü ve ikisinde de HandBrake önde.
+Açık, aynı satırlar eşitliğe yaklaştıkça daraldı:
 
-Bir koşula bağlı: 600 MB'deki `parca-3 / vidshrink` satırı kapıya **0,008 puan**
-uzakta (-%1,9923) ve o satır tek koşuma dayanıyor. Aşağıdaki kararsızlık bölümü
-kalibrasyonun koşumdan koşuma 2.728 bayt oynadığını ölçüyor; o satırda 2.802
-baytlık bir oynama damgayı devirir. Yani "on ikinin on ikisi" cümlesi bir satırı
-kıl payına borçlu ve o satırın kararlılığı **ölçülmedi.**
+| aşama | hedef MB | açık (harm, HandBrake − VidShrink) |
+|---|---|---|
+| eşitleme öncesi | 60 | 9,72 |
+| yalnız oranlı düzeltme | 60 | 9,11 |
+| bugünkü (eş boyutta, ikiye bölme) | 60 | 9,04 |
+| bugünkü (eş boyutta) | 600 | 9,13 |
 
-60 MB'nin eş boyuta girmesi bu turda oldu. Tur 2'de üç parçanın biri -%3,69 ile
-dışarıda kalmıştı ve bunun sebebi ürüne değil **alete** yazıldı: eşitleyici yalnız
-oranlı düzeltme yapıyordu ve teslim edilen bayt hedefin basamaklı bir fonksiyonu
-olduğu için iki basamak arasında salınıyordu. İkiye bölme eklendi, o parça
-üçüncü denemede +%1,04 ile kapının içine girdi. Açığın seyri, aynı satırlar
-eşitliğe yaklaştıkça: **9,72 → 9,11 → 9,04.** Yön beklendiği gibi daralma
-çıktı, çünkü dışarıda kalan satırda VidShrink daha az bayt harcıyordu.
+On iki satırın on ikisi ±%2 kapısının içinde, ama bir koşula bağlı: 600 MB'deki
+`parca-3 / vidshrink` satırı kapıya kıl payı uzakta ve tek koşuma dayanıyor
+(ayrıntı ve baytlar "Kıl payı satır" başlığında). Yani "on ikinin on ikisi"
+cümlesi bir satırı kıl payına borçlu ve o satırın kararlılığı **ölçülmedi.**
+
+60 MB'nin eş boyuta girmesi bu turda oldu; sebebi ve yoklama dizisi "60 MB
+hedefinde" bölümünün "Eşitleme yoklaması" alt başlığında. Yön beklendiği gibi
+daralma çıktı, çünkü dışarıda kalan satırda VidShrink daha az bayt harcıyordu.
 
 Altı parça-hedef çiftinin beşinde HandBrake kazandı. Kazandığımız tek çift
-`parca-2` @ 600 MB (95,84'e 95,78 — bu fark gürültü sayılır; XPSNR ise belirgin
-yüksek, 51,25'e 47,11) ve bu, **çözünürlüğü düşürmediğimiz tek çift**: orada
-VidShrink 1920x1080'de kaldı. Cümle "kazandık" diye kurulamaz — kurulacaksa
-**çözünürlük düşürmediğimiz yerde kazandık** diye kurulur. Çözünürlük düşüren
-beş çiftin beşinde kaybettik. Yönün ötesinde bir şey iddia edilmiyor; büyüklüğün
-düşürme oranıyla gitmediği aşağıda ayrı başlıkta ölçüldü.
+`parca-2` @ 600 MB (harmonik farkı gürültü sayılır; XPSNR farkı ise belirgin
+yüksek — bkz. "600 MB hedefinde" tablosu) ve bu, **çözünürlüğü düşürmediğimiz
+tek çift**: orada VidShrink 1920x1080'de kaldı. Cümle "kazandık" diye kurulamaz
+— kurulacaksa **çözünürlük düşürmediğimiz yerde kazandık** diye kurulur.
+Çözünürlük düşüren beş çiftin beşinde kaybettik. Yönün ötesinde bir şey iddia
+edilmiyor; büyüklüğün düşürme oranıyla gitmediği aşağıda ayrı başlıkta ölçüldü.
 
 Bir gözlem daha, o da sayıdan çıkıyor:
 
 - **Kare minimumu tek başına ayırt etmiyor.** `parca-3`'te iki taraf da her hedefte
   0,00 kare minimumu veriyor; oradaki farkı ancak harmonik ortalama ve p10 gösteriyor.
-  Tersi de var: `parca-1` @ 600 MB'de harmonik 81,48'ken kare minimumu 4,12. Tek
-  sayıya indirgenmiş bir başlık bu tabloyu anlatamaz.
+  Tersi de var: `parca-1` @ 600 MB'de harmonik yüksekken kare minimumu çok düşük
+  çıkıyor (bkz. "600 MB hedefinde" tablosu). Tek sayıya indirgenmiş bir başlık bu
+  tabloyu anlatamaz.
 
 HandBrake'in tam komut satırı (parça 1, 60 MB hedefi; bit hızı dışında bütün
 satırlarda aynı):
@@ -419,7 +426,7 @@ HandBrakeCLI -i parca-1.mkv -o parca-1_handbrake_3.497mb.mkv \
 ```
 
 600 MB hedefinde tek fark `-b 4833`. Bit hızı hedeften türetiliyor:
-`hedef_bayt x 8 x (1 - 0,005) / süre / 1000`, kapsayıcı payı %0,5.
+`hedef_bayt x 8 x (1 - 0,005) / süre / 1000`, kapsayıcı payı `%0,5`.
 
 VidShrink tarafı ürünün kendi borusunu koşuyor — `ComplexityProbe` →
 `PlanCalculator` → iki tur `CalibrationProbe` → `EncodeRunner` — ve kendi kararını
@@ -442,7 +449,7 @@ Altı çiftin içinde VidShrink'in önde bitirdiği tek satır `parca-2 @ 600 MB
 (95,84 ↔ 95,78 harmonik; XPSNR 51,25 ↔ 47,11, bu ikincisi gürültü sayılamayacak
 kadar büyük). Bu satır aynı zamanda **1920x1080'de kaldığımız tek satır.**
 
-Sıralama piksel oranına göre (1920x1080 = 2.073.600 piksel taban):
+Sıralama piksel oranına göre (`1920x1080 = 2.073.600` piksel taban):
 
 | girdi @ hedef | yerleşim | piksel oranı | harm (vs ↔ hb) | açık | kazanan | ölçülen commit |
 |---|---|---|---|---|---|---|
@@ -483,8 +490,14 @@ başına verdiği cevap:
 | parca-2 | 3,4986 MB | 3,2449 MB (3.402.466 bayt) | **-%7,25** |
 | parca-3 | 3,4994 MB | 3,3993 MB (3.564.378 bayt) | **-%2,86** |
 
-(Tur 2'nin koşumunda aynı üç sayı -%6,75 / -%7,23 / -%2,83 çıkmıştı; aradaki
-fark kalibrasyonun koşum gürültüsü, aşağıdaki kararsızlık bölümüne bakın.)
+Tur 2'nin koşumunda aynı üç sayı biraz farklıydı; aradaki fark kalibrasyonun
+koşum gürültüsü (aşağıdaki kararsızlık bölümüne bakın):
+
+| girdi | tur 2 fark | bugünkü fark |
+|---|---|---|
+| parca-1 | -%6,75 | -%6,81 |
+| parca-2 | -%7,23 | -%7,25 |
+| parca-3 | -%2,83 | -%2,86 |
 
 Kodlayıcı günlüğü açığın iki katmandan geldiğini gösteriyor. Aşağıdaki iki tablo
 tur 2'nin kodlayıcı günlüklerinden okundu (`.calisma/ab/gunluk/`); ikiye bölme
@@ -521,7 +534,7 @@ bakmadım; ölçülen davranış bu.
 
 **Üçüncü gözlem — çözünürlük basamağı hedef-bayt eğrisini kesintili yapıyor.**
 Hedefi büyütmek bir noktada plana çözünürlük atlatıyor ve teslim edilen bayt
-sıçrıyor. `parca-2` @ 60 MB'de ölçülen dört nokta:
+sıçrıyor. `parca-2` @ `60 MB`'de ölçülen dört nokta:
 
 | hedef | seçilen çözünürlük | teslim | tabana fark |
 |---|---|---|---|
@@ -936,8 +949,7 @@ sınırı yok):
 | parça-2 @ 3,50 MB | 71,01 | 82,25 | **+11,24** | evet (libx264→libsvtav1) |
 | parça-2 @ 35,00 MB | 96,10 | 96,12 | +0,02 | hayır (libx264) |
 | parça-3 @ 3,50 MB | 13,75 | 22,29 | **+8,54** | evet (libx264→libsvtav1) |
-| parça-3 @ 34,99 MB | 65,75 | 66,11 | +0,36 | hayır (libx264, K4 notu:
-  bayt farkı %2,05 — `ab-kodek-kolu.md`'deki K4 bölümüne bakın) |
+| parça-3 @ 34,99 MB | 65,75 | 66,11 | +0,36 | hayır (libx264, K4 notu: bayt farkı büyük — `ab-kodek-kolu.md`'deki K4 bölümüne bakın) |
 
 Desen net: düzeltmenin (`Auto`'nun düşük hedeflerde `libsvtav1`'e geçmesi)
 kazancı **yalnız 3,5 MB hedefli üç satırda** var (+8,5 ile +12,5 puan arası);
