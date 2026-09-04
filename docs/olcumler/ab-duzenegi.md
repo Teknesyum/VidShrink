@@ -333,7 +333,7 @@ tablonun `fark %` sütunu). Toplam bayt karşılaştırması ve yüzdesi Özet
 tablosunda; bu tabloda damga yok.
 
 `parca-2`nin kapıya girmesi ikiye bölmeyle oldu; tur 2'de yalnız oranlı düzeltme
-vardı ve o parça bandın dışında takılmıştı (aşağıya bakın).
+vardı ve o parça -%3,69'da takılmıştı; aşağıdaki dizi tur 3'ün yoklamasıdır.
 
 #### Eşitleme yoklaması
 
