@@ -7,6 +7,34 @@ Kabuk **Windows PowerShell**. Komutlar Run düğmesinden koşacak şekilde yazı
 
 ---
 
+## 0. Hazır paket — `D:\!Tmp\VidShrink`
+
+Masaüstünde bu yola **çalışmaya hazır bir kopya bırakıldı**: depo klonlandı ve git ile
+taşınamayan öncelikli ölçüm kaynakları içine kondu. Toplam 491 MB.
+
+```
+D:\!Tmp\VidShrink\
+  (deponun tamamı)
+  .calisma\kaynak\        parca-1.mkv, parca-2-yalniz-video.mkv, parca-3-yalniz-video.mkv
+  .calisma\kaynak-genis\  genis-1-animasyon.mkv, genis-3-hareket.mkv
+  .calisma\kodek-matris\  (boş — betiklerin çıktısı buraya yazılır)
+```
+
+Bu klasörü olduğu gibi laptopa taşırsan §1 ve §4 düşer; doğrudan §2'den (araç denetimi)
+devam edilir. Taşıdıktan sonra tek komut:
+
+```powershell
+cd 'D:\!Tmp\VidShrink'; git pull; git log --oneline -1
+```
+
+Gren sınıfı ölçülecekse `genis-4-gren2.mkv` (1,15 GB) ayrıca kopyalanmalı — pakete
+boyutu yüzünden konmadı. Kaynağı masaüstünde
+`...\Vidshrink\.calisma\kaynak-genis\` altında.
+
+Paket yoksa ya da sıfırdan kurulacaksa aşağıdan devam et.
+
+---
+
 ## 1. Depoyu al
 
 ```powershell
