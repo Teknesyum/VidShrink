@@ -1,0 +1,7 @@
+### CRF63 taban: p3_p6_vbsiz  preset=6  params=keyint=600:scd=1:tune=0 ###
+p3_p6_vbsiz bayt=3077395 bitrate=407489
+### CRF63 taban: p3_p6_vb  preset=6  params=keyint=600:scd=1:tune=0:enable-variance-boost=1:variance-boost-strength=2 ###
+p3_p6_vb bayt=7746135 bitrate=1025695
+### CRF63 taban: p3_p4_vbsiz  preset=4  params=keyint=600:scd=1:tune=0 ###
+p3_p4_vbsiz bayt=3288052 bitrate=435383
+TABAN TAMAM

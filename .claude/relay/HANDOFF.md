@@ -21,17 +21,18 @@ right-click menu.
 
 ## Contracts open
 
+None.
 
 ## Closed last
 
+- `T125` — done — 2026-09-04 17:02
 - `T133` — stale — 2026-09-03 20:51
+- `T133` — done — 2026-09-04 16:41
 - `T159` — done — 2026-09-03 15:34
 - `T160` — done — 2026-09-03 14:38
-- `T157` — done — 2026-09-03 14:03
-- `T155` — done — 2026-09-03 12:40
 
 ## Tree
 
-- branch: `T125-ab-kodek-kolu`
-- head: `6f55d48 manset kapisi: 32 bulgunun tamami duzeltildi (T125)`
-- uncommitted files: 1
+- branch: `HEAD`
+- head: `5aae56a T125 ham olcum verisi tools/VidShrink.Ab/veri/t125 altina alindi`
+- uncommitted files: 2

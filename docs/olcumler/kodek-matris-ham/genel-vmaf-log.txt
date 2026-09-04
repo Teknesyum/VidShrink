@@ -1,0 +1,10 @@
+### VMAF: .calisma/kodek-matris/p3_av1_p4_4811.mp4 ###
+### VMAF: .calisma/kodek-matris/p3_av1_p2_4811.mp4 ###
+### VMAF: .calisma/kodek-matris/p2_av1_p6_484.mp4 ###
+### VMAF: .calisma/kodek-matris/p2_x265_484.mp4 ###
+### VMAF: .calisma/kodek-matris/p2_x264_484.mp4 ###
+### VMAF: .calisma/kodek-matris/p3_av1_p6_483.mp4 ###
+### VMAF: .calisma/kodek-matris/p3_x265_483.mp4 ###
+### VMAF: .calisma/kodek-matris/p3_x264_483.mp4 ###
+### VMAF: .calisma/kodek-matris/p2_av1_p6_4837.mp4 ###
+VMAF TAMAM

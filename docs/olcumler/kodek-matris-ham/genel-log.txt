@@ -1,0 +1,19 @@
+### AV1 preset 4 p3_av1p4_A @ 4811 ###
+SANIYE=132
+### AV1 preset 2 p3_av1p2_A @ 4811 ###
+SANIYE=574
+### AV1 preset 6 p2_av1p6_B @ 484 ###
+SANIYE=30
+### x265 slow p2_x265_B @ 484 ###
+SANIYE=87
+### x264 slow p2_x264_B @ 484 ###
+SANIYE=20
+### AV1 preset 6 p3_av1p6_B @ 483 ###
+SANIYE=54
+### x265 slow p3_x265_B @ 483 ###
+SANIYE=182
+### x264 slow p3_x264_B @ 483 ###
+SANIYE=28
+### AV1 preset 6 p2_av1p6_C @ 4837 ###
+SANIYE=40
+TUM KOSUMLAR TAMAM

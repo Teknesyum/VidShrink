@@ -1,0 +1,21 @@
+### p3_882  bitrate=483  vf=882:496 ###
+p3_882 saniye=52 bayt=3653588 bitrate=483785
+### p3_1280  bitrate=483  vf=1280:720 ###
+p3_1280 saniye=59 bayt=3654094 bitrate=483852
+### p2_882  bitrate=484  vf=882:496 ###
+p2_882 saniye=25 bayt=2517404 bitrate=333430
+### p2_1280  bitrate=484  vf=1280:720 ###
+p2_1280 saniye=38 bayt=3255248 bitrate=431158
+### p2_1080  bitrate=484  vf=yok ###
+p2_1080 saniye=62 bayt=3514541 bitrate=465502
+### VMAF: p3_882 ###
+harm=26.01
+### VMAF: p3_1280 ###
+harm=27.63
+### VMAF: p2_882 ###
+harm=60.13
+### VMAF: p2_1280 ###
+harm=74.54
+### VMAF: p2_1080 ###
+harm=95.15
+KUCULTME TAMAM

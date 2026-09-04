@@ -1,0 +1,7 @@
+### p6_vbsiz preset=6 params=keyint=600:scd=1:tune=0 ###
+p6_vbsiz  saniye=50  bayt=3179817  bitrate=421051
+### p4_vb preset=4 params=keyint=600:scd=1:tune=0:enable-variance-boost=1:variance-boost-strength=2 ###
+p4_vb  saniye=99  bayt=6338983  bitrate=839368
+### p4_vbsiz preset=4 params=keyint=600:scd=1:tune=0 ###
+p4_vbsiz  saniye=94  bayt=2968823  bitrate=393113
+RC TAMAM
