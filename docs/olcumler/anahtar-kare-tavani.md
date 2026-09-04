@@ -760,7 +760,7 @@ tekrarlandi. Bu ana izgaranin karari degildir.
   **0,29 ile 10,73 kat** arasinda degisti (yukaridaki tekrar tablolari,
   `net p50 orani` kolonu). Isaretin kendisi de tam tekrar etmiyor: sekiz
   kaynak-kosum cifti icin `-g 2`'den `-g 20`'ye giden uctan uca degisim on alti
-  kolun **on dordunde** artiyor, `bpp-s3-hareketli` kosum 1'de (551,5 -> 454,9
+  kolun **on ucunde** artiyor, `bpp-s3-hareketli` kosum 1'de (551,5 -> 454,9
   ms) ve `zorluk-s2-durgun` kosum 1'de (109,5 -> 69,2 ms) **azaliyor**,
   `zorluk-s1-kesikli` kosum 2'de basladigi yere donuyor (45,8 -> 45,8 ms).
 - **`s2-durgun` iki noktada da karar disinda.** Es bit/piksel noktasinda bes
