@@ -498,12 +498,22 @@ gecerli.
 | **olmeyen** sabit | 283 `SceneMapRuleOfRecord` — sahne **tarama** esigi, tavan koluyla ilgisi yok; bes olcu ve `OluUyeTests.cs:428` ona bakiyor |
 | birlikte olen dal | 328 `fromMap` her zaman `false` olur; `KeyframeRange.FromSceneMap` yalniz donanim/yazilim ayrimini tasir hale gelir |
 
-**Dayanak.** Kolun butun erisim alani `[5,0 ; 10,0]`. Izgarada 5 sn ile 10 sn
-arasindaki fark sekiz hucrenin sekizinde de esigin (0,20 p10) altinda kaliyor,
-ve sekizin yedisinde **negatif**: es bit/piksel `+0,109 / -0,347 / -0,138 /
--0,190`, zorluk esitlenmis `-0,012 / -6,115 / -0,148 / -0,139` (K1 izgaralari,
-`VMAF-NEG p10` kolonu; 10 sn hucresine gore). Tek pozitif hucre `s1-kesikli`
-es bit/piksel, `+0,109` — esigin yarisindan az.
+**Dayanak.** Kolun butun erisim alani `[5,0 ; 10,0]`. Izgarada bu araligin iki
+ucu arasindaki fark sekiz hucrenin sekizinde de esigi gecemiyor, ve sekizin
+yedisinde **negatif** (K1 izgaralari, `VMAF-NEG p10` kolonu):
+
+| kaynak | calisma noktasi | 5 sn p10 | 10 sn p10 | fark (p10) | esigi (0,20 p10) geciyor mu |
+|---|---|---|---|---|---|
+| `s1-kesikli` | es bit/piksel | 70,700 | 70,591 | +0,109 | hayir |
+| `s2-durgun` | es bit/piksel | 96,491 | 96,838 | -0,347 | hayir |
+| `s3-hareketli` | es bit/piksel | 81,731 | 81,869 | -0,138 | hayir |
+| `s4-yuksek` | es bit/piksel | 73,891 | 74,081 | -0,190 | hayir |
+| `s1-kesikli` | zorluk esitlenmis | 84,585 | 84,597 | -0,012 | hayir |
+| `s2-durgun` | zorluk esitlenmis | 76,123 | 82,238 | -6,115 | hayir |
+| `s3-hareketli` | zorluk esitlenmis | 86,236 | 86,384 | -0,148 | hayir |
+| `s4-yuksek` | zorluk esitlenmis | 85,044 | 85,183 | -0,139 | hayir |
+
+Tek pozitif hucre `s1-kesikli` es bit/piksel, `+0,109` — esigin yarisi kadar.
 
 Iki hucre boyut bandinin disindaki `s2-durgun`dan geliyor (`-0,347` ve
 `-6,115`); onlari atsak bile kalan alti hucrenin besi negatif ve altisi da
@@ -518,9 +528,14 @@ Sekiz kaynak-nokta cifti icin: **altisinda** harita hucresi en iyi hucre degil,
 icin kiyas kurulamiyor. Kolun **kazandirdigi** tek bir hucre yok: fark kolonu
 hicbir satirda negatif degil.
 
-Isaret ikinci bir kodlayicida da ayni: `libsvtav1` preset 4'te 5 sn'nin 10 sn'ye
-gore farki **-1,297 p10**; `av1_nvenc` p5'te **-1,421** (`s1-kesikli`) ve
-**-1,424** (`s3-hareketli`) p10 (ikinci kodlayici ve donanim tablolari).
+Isaret ikinci bir kodlayicida da ayni — 5 sn'nin 10 sn'ye gore farki (ikinci
+kodlayici ve donanim tablolari, `VMAF-NEG p10` kolonu):
+
+| kodlayici | kaynak | 5 sn p10 | 10 sn p10 | fark (p10) |
+|---|---|---|---|---|
+| `libsvtav1` preset 4 | `s1-kesikli` | 64,495 | 65,792 | -1,297 |
+| `av1_nvenc` p5 | `s1-kesikli` | 63,324 | 64,745 | -1,421 |
+| `av1_nvenc` p5 | `s3-hareketli` | 82,222 | 83,646 | -1,424 |
 
 **Sabitleyecek olcu.** `tests/VidShrink.Tests/FfmpegArgumentsTests.cs`e yeni bir
 olcu: medyan sahne uzunlugu **2,4 sn** olan bir harita (`s1-kesikli`in bugun
