@@ -921,8 +921,9 @@ ama bu alan tek başına HandBrake'e karşı bir damga değil.
 `tools/VidShrink.Ab/AbRunner.cs:118-124` eşitleyiciyi yalnız `outcomes.Count > 0`
 iken çağırıyor ve tabanı `outcomes[0].Bytes`ten alıyor. Tur 2'nin Compatible
 koşumları **tek yarışmacıyla** koşuldu — `parca-2-compat.json`,
-`parca-3-compat.json` ve `parca-1-600-compat.json` künyelerinde tek bir
-`vidshrink` ölçümü var — yani eşitleyici hiç çağrılmadı ve her satırın tabanı
+`parca-3-compat.json` ve `parca-1-600-compat.json` künyelerinde yalnız
+`vidshrink` ölçümü var, karşısında HandBrake satırı yok (ilk ikisi iki hedefi
+birden taşıdığı için ikişer ölçüm) — yani eşitleyici hiç çağrılmadı ve tabanı
 kendi baytı oldu. O künyelerdeki `fark % = 0,00` değeri kendi kendine kıyastır,
 HandBrake'e karşı eşitlik damgası değil. **Bu düzeneğin kendi kusurudur**, ölçülen
 kolun değil.
