@@ -230,6 +230,10 @@ Her şey bitince ana depoda en güncel sürüm dursun.
 
 ## 7. Laptopta ilk adımlar
 
+Makine hazırlığı ayrı dosyada: **`KURULUM-LAPTOP.md`** — `D:\!Tmp\VidShrink` yoluna
+klonlama, araç sürümleri ve denetimi, taşınacak kaynak dosyaların listesi, betiklerin
+nasıl koşturulacağı.
+
 1. `git pull`
 2. Bu dosyayı ve `docs/olcumler/kodek-matris.md`'yi oku.
 3. Ölçüme devam edilecekse kaynakları yerleştir: `.calisma/kaynak/` (parça-1/2/3, HDR)
