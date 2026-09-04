@@ -1,0 +1,18 @@
+{
+  "contractId": "T125",
+  "auditorRunId": "aa909d081d70d1424",
+  "headSha": "89c92104cf1365945455b61206bcf06b467c7030",
+  "diffHash": "2efc4745364ef3c0341887e7343e826de7ee5fb680ebab3d5b8919614057a215",
+  "owns": [
+    "tools/VidShrink.Ab/Competitors.cs",
+    "docs/olcumler/ab-duzenegi.md",
+    "docs/olcumler/ab-kodek-kolu.md"
+  ],
+  "verification": [
+    "Iki bagimsiz denetim turu. Tur 2 tam denetim: dotnet build tools/VidShrink.Ab/VidShrink.Ab.csproj cikis 0; manset kapisi iki belgede EXIT=0; owns tasmasi yok; alti atif hedefinin altisi canli (olu atif yok); nitel sozler belgenin kendi gurultu bandina (:625-626) karsi destekleniyor; yayimlanan on bes harmonik deger, K6'nin uc esigi ve K4'un uc bayt farki ham .calisma/ab/t125/tur2/json ile dogrulandi. Bir KRITIK bulundu: Compatible kolu tek yarismaciyla kosuldugu icin AbRunner.cs:118-124'teki 'if (outcomes.Count > 0)' kolu esitleyiciyi hic cagirmamis, taban kendi bayti olmus, ve belge bunu 'es boyut kapisindan gecmeyen satir yok' diye yazmis; HandBrake tabanina karsi hesaplandiginda alti satirin dordu +-%2 bandini deliyor. Tur 3'te duzeltildi. Tur 3 dar kapsamli denetim: on iki Delta-bayt hucresi ve mutasyon tablosunun alti hucresi ham Bytes/BaselineBytes alanlarindan node ile yeniden hesaplandi, 18/18 tuttu; esitleyici iddiasi AbRunner.cs:110-130 kaynagindan dogrulandi; ilk satirin ayrikligi k1-parca-1-compatible.json'da handbrake+vidshrink ciftiyle ve vidshrink'in BaselineBytes=3531037 alaniyla pimlendi; backtick cozumunde sayi kaybi arandi, eski/yeni ondalik kumeleri karsilastirildi ve yalniz 8,5 ile 12,5 yuvarlamalari dustu (tam degerleri 8,54 ve 12,53 tabloda duruyor); manset EXIT=0, build EXIT=0, owns tasmasi yok. Denetci ayrica ayni belgedeki ikinci 'on iki satirin on ikisinde SizeEqual dogru' cumlesini kendiliginden kontrol etti, o kosumlar iki yarismacili, cumle saglam. Karar GECTI, KRITIK yok, bes borc."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-04T17:02:49.660Z",
+  "usedAt": "2026-09-04T17:02:53.783Z",
+  "completedSha": "89c92104cf1365945455b61206bcf06b467c7030"
+}
