@@ -1,0 +1,2466 @@
+{
+ "_map": {
+  "schema": 2,
+  "head": "6615570d481c37824e378caaf9f4e03a9f5c00a9",
+  "at": "2026-09-04T23:31:14.451Z",
+  "files": 240,
+  "edges": 200
+ },
+ "src/VidShrink.App/App.axaml.cs": {
+  "lines": 54,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.App/LanguageCatalog.cs": {
+  "lines": 239,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Localization/Strings.cs": {
+  "lines": 291,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Localization/Text.cs": {
+  "lines": 81,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.App/MainWindow.axaml.cs": {
+  "lines": 3465,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization",
+   "VidShrink.App.Performance",
+   "VidShrink.App.Playback",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg",
+   "VidShrink.Ffmpeg.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Performance/PerformanceReportText.cs": {
+  "lines": 165,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Platform.cs": {
+  "lines": 36,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Playback/ComparisonPanel.axaml.cs": {
+  "lines": 939,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "src/VidShrink.App/Playback/ComparisonSurface.cs": {
+  "lines": 469,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Playback/ControlStrip.axaml.cs": {
+  "lines": 409,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "src/VidShrink.App/Playback/HoverZone.cs": {
+  "lines": 251,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Playback/PanelHost.cs": {
+  "lines": 997,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization",
+   "VidShrink.Core",
+   "VidShrink.Core.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Playback/SegmentEncoder.cs": {
+  "lines": 409,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.App/Playback/ZoomGesture.cs": {
+  "lines": 291,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.App/Program.cs": {
+  "lines": 20,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/AppliedUpdateNotice.cs": {
+  "lines": 47,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/CodecModel.cs": {
+  "lines": 288,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/ComplexityProfile.cs": {
+  "lines": 396,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/CompressionStrategy.cs": {
+  "lines": 99,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/ConversionArguments.cs": {
+  "lines": 159,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/ConversionPlan.cs": {
+  "lines": 23,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/EncodePlan.cs": {
+  "lines": 142,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/FfmpegArguments.cs": {
+  "lines": 578,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/HardwareVerdict.cs": {
+  "lines": 163,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/HdrResolver.cs": {
+  "lines": 97,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/IEncoderAvailability.cs": {
+  "lines": 48,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/IQualityMeasurement.cs": {
+  "lines": 23,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/MediaInfo.cs": {
+  "lines": 31,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/PerformanceCheck.cs": {
+  "lines": 347,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/PlanCalculator.cs": {
+  "lines": 1064,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/PlanParser.cs": {
+  "lines": 171,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/Playback/ComparisonFrameRequest.cs": {
+  "lines": 55,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Playback/FramePool.cs": {
+  "lines": 87,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Playback/FrameRing.cs": {
+  "lines": 132,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Playback/IComparisonFrameSource.cs": {
+  "lines": 74,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Playback/PlaybackFrame.cs": {
+  "lines": 58,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/PreviewSegment.cs": {
+  "lines": 174,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/PreviewTimeline.cs": {
+  "lines": 186,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/ProbeResult.cs": {
+  "lines": 9,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/PromptBuilder.cs": {
+  "lines": 53,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/SceneMap.cs": {
+  "lines": 257,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Share/HttpTransport.cs": {
+  "lines": 70,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/Share/IShareProvider.cs": {
+  "lines": 86,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Share/MultipartUploadProvider.cs": {
+  "lines": 151,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/Share/PresignedUploadProvider.cs": {
+  "lines": 230,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/Share/ShareErrorClassifier.cs": {
+  "lines": 281,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/Share/ShareResult.cs": {
+  "lines": 212,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/Share/ShareTargets.cs": {
+  "lines": 165,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/Share/UploadContent.cs": {
+  "lines": 75,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Core/ShellIntegration.cs": {
+  "lines": 51,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Core/UpdateCheck.cs": {
+  "lines": 1645,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/CalibrationProbe.cs": {
+  "lines": 320,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/ComplexityProbe.cs": {
+  "lines": 1026,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/DiskSpaceGuard.cs": {
+  "lines": 35,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "src/VidShrink.Ffmpeg/EncodeRunner.cs": {
+  "lines": 490,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/EncoderCapabilities.cs": {
+  "lines": 440,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/FfmpegRunner.cs": {
+  "lines": 157,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/FfprobeClient.cs": {
+  "lines": 186,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/FrameGrabber.cs": {
+  "lines": 522,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/KeyframeIndex.cs": {
+  "lines": 108,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/PerformanceProbe.cs": {
+  "lines": 345,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/Playback/ComparisonGraph.cs": {
+  "lines": 171,
+  "to": [],
+  "ns": [
+   "VidShrink.Core.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/Playback/PipeComparisonFrameSource.cs": {
+  "lines": 495,
+  "to": [],
+  "ns": [
+   "VidShrink.Core.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/QualityMeter.cs": {
+  "lines": 553,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/SceneDetector.cs": {
+  "lines": 168,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/TempCleanup.cs": {
+  "lines": 148,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Ffmpeg/ToolLocator.cs": {
+  "lines": 87,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Launcher/Program.cs": {
+  "lines": 191,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Launcher/Splash.cs": {
+  "lines": 755,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "src/VidShrink.Launcher/Updater.cs": {
+  "lines": 180,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/AbTests.cs": {
+  "lines": 604,
+  "to": [],
+  "ns": [
+   "VidShrink.Ab"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/AdviceCoverageTests.cs": {
+  "lines": 78,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/AppHost.cs": {
+  "lines": 101,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/AppliedUpdateTests.cs": {
+  "lines": 116,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/BulletPaintingTests.cs": {
+  "lines": 126,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/CalibrationProbeTests.cs": {
+  "lines": 470,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/CasingTests.cs": {
+  "lines": 134,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ChipTests.cs": {
+  "lines": 245,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "tests/VidShrink.Tests/CodecModelTests.cs": {
+  "lines": 50,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/ComparisonPanelTests.cs": {
+  "lines": 1212,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.App.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "tests/VidShrink.Tests/ComplexityProbeTests.cs": {
+  "lines": 622,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ComplexityScanTests.cs": {
+  "lines": 415,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/ConversionArgumentsTests.cs": {
+  "lines": 95,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/DiskSpaceGuardTests.cs": {
+  "lines": 24,
+  "to": [],
+  "ns": [
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/EncodeRunnerAtomicOutputTests.cs": {
+  "lines": 124,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/EncodeRunnerTests.cs": {
+  "lines": 496,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/EncoderAvailabilityTests.cs": {
+  "lines": 215,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/EncoderCapabilitiesTests.cs": {
+  "lines": 378,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/EncoderStateConsumptionTests.cs": {
+  "lines": 214,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ExtremeCompressionTests.cs": {
+  "lines": 375,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/FfmpegArgumentsTests.cs": {
+  "lines": 1140,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/FfmpegRunnerTests.cs": {
+  "lines": 203,
+  "to": [],
+  "ns": [
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/FillBandTests.cs": {
+  "lines": 539,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/FpsDropTests.cs": {
+  "lines": 340,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/FrameGrabberTests.cs": {
+  "lines": 531,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/GlobalUsings.cs": {
+  "lines": 2,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/HardwareEncoderTests.cs": {
+  "lines": 196,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/HardwareFlagTests.cs": {
+  "lines": 210,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/HardwareRateControlTests.cs": {
+  "lines": 509,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/HardwareVerdictTests.cs": {
+  "lines": 625,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/HdrArgumentsTests.cs": {
+  "lines": 331,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/IddiaPimiTests.cs": {
+  "lines": 380,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/InstallerTests.cs": {
+  "lines": 311,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/KalibrePencereTests.cs": {
+  "lines": 185,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/KestirimPlanTests.cs": {
+  "lines": 86,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/LanguageTests.cs": {
+  "lines": 1019,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.App.Localization",
+   "VidShrink.App.Performance",
+   "VidShrink.App.Playback",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/LocalizationTests.cs": {
+  "lines": 688,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Localization"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/MacOsBundleTests.cs": {
+  "lines": 171,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/MacOsStartupTests.cs": {
+  "lines": 81,
+  "to": [],
+  "ns": [
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/MacUpdateTests.cs": {
+  "lines": 258,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/OluUyeTests.cs": {
+  "lines": 586,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/PanelHostTests.cs": {
+  "lines": 690,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.App.Playback",
+   "VidShrink.Core",
+   "VidShrink.Core.Playback",
+   "VidShrink.Ffmpeg.Playback"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/PerformanceCheckTests.cs": {
+  "lines": 1069,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/PerformanceCheckUiTests.cs": {
+  "lines": 500,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.App.Performance",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/PlanCalculatorProbeTests.cs": {
+  "lines": 1431,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/PlanCalculatorTests.cs": {
+  "lines": 694,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/PlanParserTests.cs": {
+  "lines": 92,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/PlaybackFrameSourceTests.cs": {
+  "lines": 433,
+  "to": [],
+  "ns": [
+   "VidShrink.Core.Playback",
+   "VidShrink.Ffmpeg",
+   "VidShrink.Ffmpeg.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/PreviewSegmentTests.cs": {
+  "lines": 383,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/PreviewSyncTests.cs": {
+  "lines": 445,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.App.Playback",
+   "VidShrink.Core",
+   "VidShrink.Core.Playback",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/PreviewTimelineTests.cs": {
+  "lines": 182,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/QualityHintTests.cs": {
+  "lines": 224,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/QualityMeterTests.cs": {
+  "lines": 695,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/QualityTargetTests.cs": {
+  "lines": 610,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/QualityTargetUiTests.cs": {
+  "lines": 326,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/RetryPromptTests.cs": {
+  "lines": 199,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/SceneMapTests.cs": {
+  "lines": 580,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/SegmentEncoderTests.cs": {
+  "lines": 353,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Playback",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/SessizDusurmeTests.cs": {
+  "lines": 213,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Playback",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/SettingsTabTests.cs": {
+  "lines": 255,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/SettingsTests.cs": {
+  "lines": 334,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ShareFlowTests.cs": {
+  "lines": 443,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Core.Share"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ShareProviderTests.cs": {
+  "lines": 819,
+  "to": [],
+  "ns": [
+   "VidShrink.Core.Share"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ShellIntegrationTests.cs": {
+  "lines": 138,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "tests/VidShrink.Tests/ShellMenuTests.cs": {
+  "lines": 250,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/SpeedModeTests.cs": {
+  "lines": 360,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/SplashTests.cs": {
+  "lines": 240,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/SplitDragTests.cs": {
+  "lines": 218,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TempCleanupTests.cs": {
+  "lines": 176,
+  "to": [],
+  "ns": [
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TestPaths.cs": {
+  "lines": 24,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/ThemeBackdropTests.cs": {
+  "lines": 901,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/ThemeTokenTests.cs": {
+  "lines": 280,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TipLineMetrics.cs": {
+  "lines": 175,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TipOverflowTests.cs": {
+  "lines": 102,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TipSources.cs": {
+  "lines": 140,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TipTranslationTests.cs": {
+  "lines": 69,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/TurboFirstPassTests.cs": {
+  "lines": 232,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/TurboTavanTests.cs": {
+  "lines": 179,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/UpdateCheckTests.cs": {
+  "lines": 14,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/UpdaterTests.cs": {
+  "lines": 1375,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/UretimYoluTests.cs": {
+  "lines": 477,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/VisibleTextTests.cs": {
+  "lines": 89,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "tests/VidShrink.Tests/VmafPoolingTests.cs": {
+  "lines": 522,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/WindowChromeTests.cs": {
+  "lines": 81,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "tests/VidShrink.Tests/WindowLayoutTests.cs": {
+  "lines": 1304,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System",
+   "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/WindowOpacityTests.cs": {
+  "lines": 53,
+  "to": [],
+  "ns": [
+   "VidShrink.App"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/WindowSamplingTests.cs": {
+  "lines": 176,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tests/VidShrink.Tests/Windows11ShellMenuTests.cs": {
+  "lines": 239,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ZoomGestureTests.cs": {
+  "lines": 436,
+  "to": [],
+  "ns": [
+   "VidShrink.App",
+   "VidShrink.App.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
+ "tools/VidShrink.Ab/AbRunner.cs": {
+  "lines": 369,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Ab/AbSettings.cs": {
+  "lines": 105,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Ab/ChunkAggregate.cs": {
+  "lines": 78,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "tools/VidShrink.Ab/ChunkCutter.cs": {
+  "lines": 63,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Ab/ColorGate.cs": {
+  "lines": 137,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tools/VidShrink.Ab/Competitors.cs": {
+  "lines": 176,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Ab/ProcessLauncher.cs": {
+  "lines": 35,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Ab/Program.cs": {
+  "lines": 131,
+  "to": [],
+  "ns": [
+   "VidShrink.Ab"
+  ],
+  "from": [],
+  "ext": []
+ },
+ "tools/VidShrink.Ab/Reporting.cs": {
+  "lines": 120,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Ab/Sensitivity.cs": {
+  "lines": 42,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "tools/VidShrink.Ab/SizeParity.cs": {
+  "lines": 29,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": []
+ },
+ "tools/VidShrink.Ab/TargetSearch.cs": {
+  "lines": 71,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Bench/Program.cs": {
+  "lines": 2584,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.Manifest/Program.cs": {
+  "lines": 193,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.PresentBench/Program.cs": {
+  "lines": 388,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "Avalonia",
+   "System"
+  ]
+ },
+ "tools/VidShrink.SplashGen/Program.cs": {
+  "lines": 377,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/alinti-denetimi/alinti-denetimi.py": {
+  "lines": 619,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "argparse",
+   "os",
+   "pathlib",
+   "re",
+   "subprocess",
+   "sys",
+   "tempfile"
+  ]
+ },
+ "tools/anahtar-kare/harita.py": {
+  "lines": 63,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "subprocess"
+  ]
+ },
+ "tools/anahtar-kare/kalibre-sec.py": {
+  "lines": 70,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "os"
+  ]
+ },
+ "tools/anahtar-kare/oz.py": {
+  "lines": 16,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/anahtar-kare/rapor.py": {
+  "lines": 138,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "os",
+   "tablo"
+  ]
+ },
+ "tools/anahtar-kare/tablo.py": {
+  "lines": 247,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "csv"
+  ]
+ },
+ "tools/auto-mod-olcumu/birlestir.py": {
+  "lines": 35,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "io"
+  ]
+ },
+ "tools/auto-mod-olcumu/harness/Program.cs": {
+  "lines": 88,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/auto-mod-olcumu/t111-oz.py": {
+  "lines": 27,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/auto-mod-olcumu/t111-tablolar.py": {
+  "lines": 231,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/auto-mod-olcumu/tablo.py": {
+  "lines": 54,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/auto-mod-olcumu/tablolar.py": {
+  "lines": 127,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/cipa-yeniden/Program.cs": {
+  "lines": 83,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/cipa-yeniden/duzenek/ab-tablo.py": {
+  "lines": 65,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/cipa-yeniden/duzenek/adcozum/Probe.cs": {
+  "lines": 21,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/cipa-yeniden/duzenek/bolum-11-5.py": {
+  "lines": 129,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "io"
+  ]
+ },
+ "tools/cipa-yeniden/duzenek/esc.py": {
+  "lines": 5,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "sys"
+  ]
+ },
+ "tools/harita-baglantisi/Program.cs": {
+  "lines": 380,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/harita-tazeleme/harita-tazeleme.py": {
+  "lines": 553,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "argparse",
+   "pathlib",
+   "re",
+   "sys"
+  ]
+ },
+ "tools/kararsiz.js": {
+  "lines": 131,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "child_process",
+   "fs",
+   "os",
+   "path"
+  ]
+ },
+ "tools/kestirim-plan/Program.cs": {
+  "lines": 218,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/kestirim-plan/proxy/ffmpeg/Program.cs": {
+  "lines": 58,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/kestirim-plan/proxy/ffprobe/Program.cs": {
+  "lines": 58,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/kuyruk-anatomisi/bitler.py": {
+  "lines": 41,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "subprocess"
+  ]
+ },
+ "tools/kuyruk-anatomisi/hareket.py": {
+  "lines": 14,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "os"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k1-konum.py": {
+  "lines": 21,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k2-kesisim.py": {
+  "lines": 23,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k2b-cozunurluk.py": {
+  "lines": 26,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k3-gop-fazi.py": {
+  "lines": 37,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k3b-kume-faz.py": {
+  "lines": 22,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k4-icerik.py": {
+  "lines": 49,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "bitler",
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k4-sahne.py": {
+  "lines": 54,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k4b-yapi.py": {
+  "lines": 41,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "bitler",
+   "hareket",
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k4c-hareket.py": {
+  "lines": 36,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "hareket",
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k5-bit.py": {
+  "lines": 31,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "bitler",
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k5b-ayrisan.py": {
+  "lines": 48,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "bitler",
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/k6-ozet.py": {
+  "lines": 25,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "bitler",
+   "kuyruk",
+   "sys"
+  ]
+ },
+ "tools/kuyruk-anatomisi/kuyruk.py": {
+  "lines": 76,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/muhur.js": {
+  "lines": 63,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "child_process",
+   "fs",
+   "path"
+  ]
+ },
+ "tools/ornekleme/Program.cs": {
+  "lines": 535,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/ornekleme/cozumle.py": {
+  "lines": 396,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/sahne-butcesi/Butce.cs": {
+  "lines": 197,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/sahne-butcesi/Kabuk.cs": {
+  "lines": 71,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/sahne-butcesi/Program.cs": {
+  "lines": 822,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/sahne-butcesi/Rapor.cs": {
+  "lines": 1439,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/sahne-butcesi/cikti-denetimi.py": {
+  "lines": 58,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "glob",
+   "json",
+   "os",
+   "subprocess",
+   "sys"
+  ]
+ },
+ "tools/sahne-butcesi/kapi-fikstur.py": {
+  "lines": 46,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/sahne-butcesi/sayim-denetimi.py": {
+  "lines": 154,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "glob"
+  ]
+ },
+ "tools/sahne-butcesi/tekrar-fikstur.py": {
+  "lines": 21,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "io"
+  ]
+ },
+ "tools/siyah-kenar/derinlik.py": {
+  "lines": 50,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/siyah-kenar/esik.py": {
+  "lines": 75,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/siyah-kenar/kanit.py": {
+  "lines": 104,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "hashlib"
+  ]
+ },
+ "tools/siyah-kenar/olc.py": {
+  "lines": 90,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/siyah-kenar/oz.py": {
+  "lines": 620,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/siyah-kenar/sure.py": {
+  "lines": 61,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/siyah-kenar/yokla.py": {
+  "lines": 84,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ },
+ "tools/surucu-yoklugu/Dagilim.cs": {
+  "lines": 202,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/surucu-yoklugu/Program.cs": {
+  "lines": 271,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/temizle.js": {
+  "lines": 79,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "fs",
+   "path"
+  ]
+ },
+ "tools/tepe-egrisi/Program.cs": {
+  "lines": 392,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/tepe-egrisi/ozet.py": {
+  "lines": 65,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "csv"
+  ]
+ },
+ "tools/yerlesim-skoru/Program.cs": {
+  "lines": 88,
+  "to": [],
+  "ns": [
+   "VidShrink.Core",
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/yerlesim-skoru/analiz.py": {
+  "lines": 155,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "collections",
+   "sys"
+  ]
+ },
+ "tools/yerlesim-skoru/ayristir.py": {
+  "lines": 233,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "analiz",
+   "sys"
+  ]
+ },
+ "tools/yerlesim-skoru/ozet.py": {
+  "lines": 16,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "json"
+  ]
+ }
+}

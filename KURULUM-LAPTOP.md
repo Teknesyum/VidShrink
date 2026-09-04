@@ -207,7 +207,7 @@ mükemmelleştirme sonraya bırakıldı.
 `main`e yalnız T0 birleştirir. Laptopta iş dalı aç:
 
 ```powershell
-cd 'D:\!Tmp\VidShrink'; git switch -c serkan/laptop-devam
+cd 'D:\!Tmp\VidShrink'; git switch -c mustafa/laptop-devam
 ```
 
 Masaüstünde `main`, ana ağaçta değil `.claude\worktrees\T0` altında duruyor. Laptopta

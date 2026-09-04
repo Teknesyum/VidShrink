@@ -33,6 +33,6 @@ None.
 
 ## Tree
 
-- branch: `HEAD`
-- head: `5aae56a T125 ham olcum verisi tools/VidShrink.Ab/veri/t125 altina alindi`
-- uncommitted files: 2
+- branch: `mustafa/laptop-devam`
+- head: `6615570 Kurulum talimatina hazir paket bolumu eklendi`
+- uncommitted files: 1
