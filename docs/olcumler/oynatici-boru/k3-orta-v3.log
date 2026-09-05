@@ -1,0 +1,5 @@
+== K3 yeni boru (DecoderPipe) == orta C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\.calisma\T175\kaynaklar\orta-180s.mkv
+[orta/uniform] n=30 ham_ms=[135.8,143.0,123.3,127.8,127.7,145.1,153.2,143.0,133.5,165.9,151.2,139.2,131.4,144.7,174.7,147.8,140.1,155.9,135.0,137.1,144.7,131.3,156.0,150.8,137.7,137.9,170.5,172.7,143.5,134.3]
+[orta/uniform] medyan=143.0ms p95=172.7ms maks=174.7ms surec_baslatma=30
+[orta/mixed] n=30 ham_ms=[133.0,31.1,144.0,23.2,151.5,54.6,50.6,69.7,134.2,55.0,17.4,130.6,14.9,133.4,157.5,38.1,68.7,170.1,108.6,172.4,59.2,24.3,145.9,42.4,136.9,20.7,156.8,16.4,85.2,40.5]
+[orta/mixed] medyan=69.2ms p95=170.1ms maks=172.4ms surec_baslatma=12

@@ -1,0 +1,2 @@
+dotnet publish src/VidShrink.App/VidShrink.App.csproj -c Release -r win-x64 --self-contained true -o .calisma/T175/publish-k5
+dosya_sayisi=234 toplam_bayt=101418259

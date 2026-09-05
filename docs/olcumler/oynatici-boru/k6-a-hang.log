@@ -1,0 +1,14 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  VidShrink.Core -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\src\VidShrink.Core\bin\Release\net8.0\VidShrink.Core.dll
+  VidShrink.Ffmpeg -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\src\VidShrink.Ffmpeg\bin\Release\net8.0\VidShrink.Ffmpeg.dll
+  VidShrink.Ab -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tools\VidShrink.Ab\bin\Release\net8.0\VidShrink.Ab.dll
+  VidShrink.Bench -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tools\VidShrink.Bench\bin\Release\net8.0\VidShrink.Bench.dll
+  VidShrink.App -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.dll
+  VidShrink.Tests -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.11.1 (x64)
+
+Test yürütmesi başlatılıyor, lütfen bekleyin...
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+Etkin test çalıştırması iptal edildi. Nedeni: Test ana işlemi kilitlendi

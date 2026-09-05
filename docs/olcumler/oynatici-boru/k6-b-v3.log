@@ -1,0 +1,24 @@
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.11.1 (x64)
+
+Test yürütmesi başlatılıyor, lütfen bekleyin...
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:08.94]     VidShrink.Tests.OynaticiBoruTests_AudioSink.BytesToSeconds_format_hizinda_dogru_donusum_yapar [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_AudioSink.BytesToSeconds_format_hizinda_dogru_donusum_yapar [48 ms]
+  Hata İletisi:
+   Assert.Equal() Failure: Values are not within 6 decimal places
+Expected: 1 (rounded from 1)
+Actual:   1,1499999999999999 (rounded from 1,1499999999999999)
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_AudioSink.BytesToSeconds_format_hizinda_dogru_donusum_yapar() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 188
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:16.72]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surekli_oynatmada_ses_goruntu_kaymasi_zamanla_buyumez [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surekli_oynatmada_ses_goruntu_kaymasi_zamanla_buyumez [3 s]
+  Hata İletisi:
+   kayma 3 sn'de asiri buyudu: erken=-80,5ms gec=-497,1ms
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surekli_oynatmada_ses_goruntu_kaymasi_zamanla_buyumez() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 348
+--- End of stack trace from previous location ---
+
+Başarısız! - Başarısız:     2, Başarılı:    15, Atlanan:     0, Toplam:    17, Süre: 7 s - VidShrink.Tests.dll (net8.0)
