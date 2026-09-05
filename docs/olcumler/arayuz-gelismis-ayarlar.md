@@ -61,13 +61,13 @@ Sınır dışı bir `planPanelHeight` `layout.json`'a yazılır, `RestoreSplitte
 **Sürükleme yolu** — `TheGridRowHoldsAnOutOfRangeDragRequest`.
 `MainWindow.axaml.cs:1778` hiçbir sınır uygulamıyor: sınır dışı istek satırın `Height`
 değerinde **ham** kalıyor. Sınırı yerleşim tutuyor — satırın gerçekten aldığı yükseklik
-ölçüldü (`RowDefinition.ActualHeight` kendisinden önceki `RowSpacing`'i de taşıdığı için
-`SpaceMd` = 12 px düşüldü):
+ölçüldü (`RowDefinition.ActualHeight` kendisinden önceki `RowSpacing`'i de taşıyor, o
+yüzden ham değerden `SpaceMd` belirteci okunup düşüldü):
 
-| istek | satırda saklanan | satırın aldığı boy | PlanPanel |
-|---|---|---|---|
-| 1 px | 1 px | **320 px** | 320 px |
-| 5000 px | 5000 px | **512 px** | 512 px |
+| istek | satırda saklanan | ham `ActualHeight` | düşülen `SpaceMd` | satırın aldığı boy | PlanPanel |
+|---|---|---|---|---|---|
+| 1 px | 1 px | 332 px | 12 px | **320 px** | 320 px |
+| 5000 px | 5000 px | 524 px | 12 px | **512 px** | 512 px |
 
 Tutan **hangisi?** `PlanPanel` Border'ının kendi `MinHeight`/`MaxHeight`'i mutasyonla
 silindiğinde iki ölçü de değişmedi (yine 320 / 512) — sınırı **`RowDefinition`
