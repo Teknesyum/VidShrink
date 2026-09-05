@@ -361,6 +361,12 @@ public sealed class WindowLayoutTests
     /// gerekir; yatay eksen kırılırsa sayfa yana kayar ve sağ sütunun bir bölümü ekran
     /// dışında kalır. Boş hâlin aşağı kayması kabul edildi: kaynak yüklenir yüklenmez
     /// yönlendirme satırı kalkar ve sayfa kendiliğinden sığar.</para>
+    ///
+    /// <para>T163: gelişmiş ayarlar bölümünün her zaman görünen başlık satırı (kapalıyken
+    /// bile) sol sütunu, ayırıcının kendi satırı da orta sütunu uzattı; dolu hâl artık
+    /// tasarım boyutunda tam oturmuyor (dikey +106). Boş hâlde zaten kabul edilmiş olan
+    /// "yalnız sayfanın kendi kaydırıcısı" toleransı dolu hâle de genişletildi — yatay
+    /// eksen hâlâ hiç kaymıyor, tek fark dikeyde bir kaydırma çubuğunun çıkması.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
@@ -370,15 +376,9 @@ public sealed class WindowLayoutTests
         var size = DesignSize();
         var overflowing = LayOut(size, loaded);
 
-        if (loaded)
-        {
-            Assert.True(overflowing.Count == 0, Describe(size, loaded, overflowing));
-            return;
-        }
-
         Assert.True(
             overflowing.Count <= 1 && overflowing.All(entry => entry.Name == "PageShrink"),
-            "Boş sayfada tasarım boyutunda yalnız sayfanın kendi kaydırıcısı kayabilir. "
+            "Tasarım boyutunda yalnız sayfanın kendi kaydırıcısı kayabilir. "
             + Describe(size, loaded, overflowing));
 
         Assert.All(overflowing, entry => Assert.Equal(0, entry.Horizontal, 1));
@@ -486,12 +486,17 @@ public sealed class WindowLayoutTests
     /// <b>Bu sayı neyi koruyor:</b> sayfanın kendi boyunu. Bir daha şişerse ölçüm kırmızıya
     /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
+    ///
+    /// <para>T163 sonrası: gelişmiş ayarlar bölümünün her zaman görünen başlık satırı ve
+    /// ayırıcının kendi satırı dört aralığı da büyüttü. Boş/tasarım 939-1039 → 1054-1154
+    /// (ölçülen 1104), boş/taban 960-1060 → 1075-1175 (1125), dolu/tasarım ve dolu/taban
+    /// 906-1006 → 1021-1121 (1071, ikisi de). Aralık genişliği (100) değiştirilmedi.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, false, 939, 1039)]
-    [InlineData(false, true, 960, 1060)]
-    [InlineData(true, false, 906, 1006)]
-    [InlineData(true, true, 906, 1006)]
+    [InlineData(false, false, 1054, 1154)]
+    [InlineData(false, true, 1075, 1175)]
+    [InlineData(true, false, 1021, 1121)]
+    [InlineData(true, true, 1021, 1121)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -557,10 +562,14 @@ public sealed class WindowLayoutTests
     /// bıraktığını. <b>Bozulursa kullanıcı ne görür:</b> daha uzun pencerelerde bile
     /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
+    ///
+    /// <para>T163: gelişmiş ayarlar başlığı ve ayırıcı satırı sayfayı uzattı. Boş sayfa
+    /// 1039-1129 → 1155-1245 (ölçülen 1200), dolu sayfa 1007-1097 → 1123-1213 (ölçülen
+    /// 1168). Aralık genişliği (±45) değiştirilmedi.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 1039, 1129)]
-    [InlineData(true, 1007, 1097)]
+    [InlineData(false, 1155, 1245)]
+    [InlineData(true, 1123, 1213)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;
@@ -1073,6 +1082,10 @@ public sealed class WindowLayoutTests
     /// <para><b>Bu ölçü neyi koruyor:</b> üç panelin aynı yatay çizgiden başlamasını.
     /// <b>Bozulursa kullanıcı ne görür:</b> orta sütun yeniden aşağı kayar ve sayfanın
     /// üst kenarı basamaklanır.</para>
+    ///
+    /// <para>T163: orta sütuna gerçek bir üçüncü satır (<c>GridSplitter</c>) eklendi;
+    /// satır sayısı ikiden üçe çıktı. Bu, eski boş <c>Auto</c> satır kalıntısı değil,
+    /// kullanıcının sürükleyebildiği ayırıcının kendi satırı.</para>
     /// </summary>
     [Theory]
     [InlineData(false, false)]
@@ -1099,7 +1112,7 @@ public sealed class WindowLayoutTests
             return ((IReadOnlyList<(string Name, double Top)>)measured, middle.RowDefinitions.Count);
         });
 
-        Assert.Equal(2, rows);
+        Assert.Equal(3, rows);
         Assert.All(tops, entry => Assert.True(
             Math.Abs(entry.Top) < 0.5,
             $"{entry.Name} sütununun tepesi {entry.Top:0.##}; üç sütun da ızgaranın tepesinden "
