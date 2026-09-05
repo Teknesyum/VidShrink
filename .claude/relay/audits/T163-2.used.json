@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T163",
+  "round": "2",
+  "auditorRunId": "a75d6c8846ef73a6e",
+  "dispatchId": "toolu_01MHTkhmYWezg4ufhxY5Sw7d",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "34208c5cc17dac1dea048f65a1a27423205c109f9257d421a8c6c3d1d2861e6d",
+  "transcriptHash": "2d9a45e5fcc074b2eb587e27320bfb5dc78ce41ef66b48440e91a2bfbe551609",
+  "headSha": "a5279c9678c11350107d0798ae48d7e0f449f531",
+  "diffHash": "fc90a9bfb325c2edb159a024ae421b0e86f196b8e83cbd481e4128360e429df7",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/Themes/Theme.axaml",
+    "src/VidShrink.App/Themes/Controls.axaml",
+    "src/VidShrink.App/Locales/en/main.json",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "tests/VidShrink.Tests/AdvancedPanelTests.cs",
+    "docs/olcumler/arayuz-gelismis-ayarlar.md",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs"
+  ],
+  "verification": [
+    "Dorduncu bagimsiz denetim, proje kokunde, denetlenen surumun (a5279c9) uzerinde, sozlesme submitted iken. verdict: passed, findings: none. Denetci verify adimlarini kendi kosturdu: build 0 uyari 0 hata; AdvancedPanelTests 24/24; --list-tests 24; manset temiz. owns: git diff --name-only 8da585f a5279c9 sekiz dosya, hepsi owns icinde; Theme.axaml diff'te hic yok; OluUyeTests dal boyunca dokunulmamis. R1 Click bagli, grep'te .Click += yok, tek abone XAML. R2 ClickAdvancedToggle RaiseEvent ile gercek tiklama yukseltiyor, kanca yalniz K1 olcusunde, Click silinince tam iki kol duser. R3 PlanBodyHeight>0 bekcisi ve Ceiling>=PlanBodyHeight. S1 Math.Clamp urun tarafinda MainWindow.axaml.cs:1763, test dosyasinda Math.Clamp YOK; kol diske yazip RestoreSplitterSettingsForTest cagiriyor ve donen degeri olcuyor, floor>0 ve IsFinite(ceiling) bekcisi bos esitlige karsi duruyor; surukleme kolu SpaceMd'yi kaynaktan okuyor, spacing>0 bekcisi var, siniri RowDefinition'in uyguladigini actualRow ve panel.Bounds.Height ile olcuyor. K4 denetcinin kendi saydigi ham cikti: dokuz CmbAdv ve dokuz eslesen TxtAdvNow. K6 en 348 / tr 348, iki taraf da bos fark, manual anahtar sayisi 19. T165 borcu: Core'daki Manual uyeler ile MainWindow switch kollari diff ile birebir esit (19 = 19); ham grep'te 20 cikan fazla ad ManualOverrideValue, bir note ozelligi, enum uyesi degil. K7 eklenen satirlarda ciplak olcu yalniz Padding=0. Son commit kapsami: git diff --stat 1ce1280 a5279c9 yalniz olcum belgesi 6+/6-; kod, olcu ve pin dokunulmamis. WindowLayoutTests bu commit'te degismedi, onceki uc denetimde 40/40 gorulmustu."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T13:50:53.878Z",
+  "usedAt": "2026-09-05T13:51:27.185Z",
+  "completedSha": "a5279c9678c11350107d0798ae48d7e0f449f531"
+}

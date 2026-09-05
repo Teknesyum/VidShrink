@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T163",
+  "round": "1",
+  "auditorRunId": "ae9313c04f4435590",
+  "dispatchId": "toolu_017xRtL9cWTwuxXwvn2DGQZ3",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "a884e7fd36217a1c12c62d3753340c4d1ef5f330e1955eaef1d2465b61d73c73",
+  "transcriptHash": "d0b511f440df699cf68ce96f4fe67eb4e2b34286545bb328a7842476ad9f4216",
+  "headSha": "1ce1280f243885e617b6b75590e08c9827aabce7",
+  "diffHash": "0decf10a3618347172cf9a5d48719d191d0fa84b4454fba2ab482e3b735b169f",
+  "owns": [
+    "src/VidShrink.App/MainWindow.axaml",
+    "src/VidShrink.App/MainWindow.axaml.cs",
+    "src/VidShrink.App/Themes/Theme.axaml",
+    "src/VidShrink.App/Themes/Controls.axaml",
+    "src/VidShrink.App/Locales/en/main.json",
+    "src/VidShrink.App/Locales/tr/main.json",
+    "tests/VidShrink.Tests/AdvancedPanelTests.cs",
+    "docs/olcumler/arayuz-gelismis-ayarlar.md",
+    "tests/VidShrink.Tests/WindowLayoutTests.cs"
+  ],
+  "verification": [
+    "Bagimsiz denetim proje kokunde, denetlenen surumun (1ce1280) uzerinde, sozlesme submitted iken kosuldu. verdict: passed, findings: none. Denetci verify adimlarini kendi kosturdu: build 0/0; AdvancedPanelTests 24/24; WindowLayoutTests 40/40. S1 kapandi: eski kol DraggingTheSplitterStaysWithinFloorAndCeiling diff'te tamamen silinmis; yeni kolda Math.Clamp yok, beklenen deger floor/ceiling/same etiketinden turuyor, olculen deger urunun dondurdugu; yol gercek cunku okunmasaydi satir Auto kalir ve SplitterIsPixelForTest duserdi. Iki mutasyonun sayilari statik olarak dogrulandi: Math.Clamp -> height yapilinca tam 2 kol (1 ve 5000 satirlari; 420 degismez, aralik ortasi yazan kol kirpma yolunu hic calistirmaz), RowDefinition sinirlari silinince tam 6 kol (uc kolda floor>0 bekcisi, iki kolda ayni bekci, bir kolda sonsuz ortalama) — yazicinin bildirdigiyle birebir. Eski kolda ikisinde de sifir duserdi. Madde 4 cikarimi dogru: surukleme yolu sinir uygulamiyor ve test bunu Assert.Equal ile dogruluyor, tutanin RowDefinition oldugu testin kendisiyle kanitli, Border'inki yedek cunku ayni belirtecleri kullaniyor; RowSpacing TryFindResource ile OKUNUYOR ve sifira karsi bekci var, Theme.axaml SpaceMd=12 belgeyle uyusuyor, ayrica panel.Bounds.Height bagimsiz ikinci olcu. Belge duzeltildi: yanlis cumle kaldirildi, yerine yanlis oldugunun kaydi, iki yol icin ayri tablolar ve mutasyon izgarasi kondu; ozet cumlesi tabloyla celismiyor. Urun tarafi tek satir: son tur uc dosya, MainWindow.axaml.cs +1 satir; MainWindow.axaml, Themes, iki dil dosyasi ve WindowLayoutTests diff'te 0 satir. Dorduncu bos olcu yok: 24 kolun dagilimi sayildi ve hepsi urun tarafindan gelen bir sayiya bakiyor. owns ihlali yok; OluUyeTests dal boyunca hic commit almamis, beklenen kirilmasi disarida birakilmis."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T13:27:59.257Z"
+}
