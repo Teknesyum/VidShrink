@@ -170,11 +170,13 @@ AtlananIddiaEsigiAsilincaKirmiziyaDoner, AtlandiCagriYeriSayisiSabitMi). Sifir
 eslesen kol yok. Bu worktree'deki dogrulama kosumu (T158-atlanan-iddia dali,
 origin/main tepesinden acildi): Basarili!  - Basarisiz: 0, Basarili: 23, Atlanan: 1, Toplam: 24.
 
-CI kimligi (bu sozlesmenin degisikligi oncesi, main'deki en son basarili kosum):
-gh run view 33979447267 - main, ci, completed / success, is test
-(ID 101341904857), Passed! - Failed: 0, Passed: 1704, Skipped: 19, Total: 1723.
-Bu dal main'e henuz birlesmedi; birlestikten sonraki kosum bu sayilarin 2 fazlasini
-(1725 toplam) gormeli - T0'in birlestirme sonrasi dogrulamasina birakildi.
+CI kimligi - bu dalin kendi pushu (commit 7124b62): gh run view 33983975390 ->
+T158-atlanan-iddia, ci, completed / success, is test (ID 101354050093), 24m32s,
+tum adimlar yesil (build -warnaserror dahil, kosum-kapisi.ps1 -MinimumTotal 1134
+-MaximumSkipped 30 dahil). Onceki referans - bu sozlesmenin degisikligi oncesi,
+maindeki en son basarili kosum: gh run view 33979447267 - main, ci,
+completed / success, is test (ID 101341904857), Passed! - Failed: 0, Passed: 1704,
+Skipped: 19, Total: 1723. Bu dal maine henuz birlesmedi - onu T0 yapar.
 
 ## Docstring guncellemesi
 
