@@ -93,12 +93,12 @@ public sealed class CodecLockTests
     // --- K2 ---
 
     /// <summary>
-    /// K2/K5(a-b) kilidi: uc kilit ayni kaynak ve ayni hedefte farkli kodlayici, ve en az
-    /// bitrate ya da cozunurlukten biri farkli olmali. Aksi halde kilit gorunuste var, isleve
-    /// yok demektir.
+    /// K2 kilidi: uc yazilim kilidi ayni kaynak ve ayni hedefte farkli cozunurluk uretmeli.
+    /// Bitrate ayrisma iddiasi burada yok — yazilim kilitleri arasinda ayrismaz, bkz.
+    /// <see cref="DonanimKilidiYazilimdanFarkliBitrateUretiyor"/>.
     /// </summary>
     [Fact]
-    public void UcKilitFarkliBitrateVeCozunurlukUretiyor()
+    public void UcYazilimKilidiFarkliCozunurlukUretiyor()
     {
         var locks = new[] { "libx264", "libx265", "libsvtav1" };
         var availability = AllWorking();
@@ -120,10 +120,43 @@ public sealed class CodecLockTests
         Assert.Equal(3, rows.Length);
         Assert.Equal(locks, rows.Select(r => r.Plan.Codec));
 
-        var bitrates = rows.Select(r => r.Plan.VideoBitrateK).Distinct().Count();
         var resolutions = rows.Select(r => (r.Plan.Width, r.Plan.Height)).Distinct().Count();
-        Assert.True(bitrates > 1 || resolutions > 1,
-            $"uc kilit ayni bitrate/cozunurluk uretti (videoK={rows[0].Plan.VideoBitrateK}, {rows[0].Plan.Width}x{rows[0].Plan.Height}), kilit isleve etki etmiyor");
+        Assert.True(resolutions > 1,
+            $"uc yazilim kilidi ayni cozunurluk uretti ({rows[0].Plan.Width}x{rows[0].Plan.Height}), kilit isleve etki etmiyor");
+    }
+
+    /// <summary>
+    /// K1/K2: yazilim kilitleri ayni <c>DeliveryReserveK</c>'i (0) paylastigi icin bitrate
+    /// hicbir zaman ayrisamaz (bkz. T166 denetim bulgusu). Ayrisma yalniz donanim kilidiyle
+    /// kanitlanabilir: <see cref="PlanCalculator.HardwareDeliveryReserveK"/> yalniz donanim
+    /// kodlayicida devreye giriyor, bu saf hesap oldugu icin gercek GPU gerekmiyor.
+    /// </summary>
+    [Fact]
+    public void DonanimKilidiYazilimdanFarkliBitrateUretiyor()
+    {
+        var locks = new[] { "libx264", "libx265", "libsvtav1", "av1_nvenc" };
+        var availability = AllWorking();
+
+        var rows = locks
+            .Select(codec =>
+            {
+                var options = new PlanOptions { TargetMb = 6, Intent = Intent.Sharing, Codec = CodecPreference.Auto, LockedCodec = codec };
+                var result = PlanCalculator.BuildDetailed(SampleInfo(), options, null, availability);
+                return (Lock: codec, result.Plan);
+            })
+            .ToArray();
+
+        _output.WriteLine("| kilit | secilen | mode | videoK | cozunurluk | fps |");
+        _output.WriteLine("|---|---|---|---|---|---|");
+        foreach (var row in rows)
+            _output.WriteLine($"| {row.Lock} | {row.Plan.Codec} | {row.Plan.Mode} | {row.Plan.VideoBitrateK} | {row.Plan.Width}x{row.Plan.Height} | {row.Plan.Fps:0.##} |");
+
+        Assert.Equal(4, rows.Length);
+        Assert.Equal(locks, rows.Select(r => r.Plan.Codec));
+
+        var bitrates = rows.Select(r => r.Plan.VideoBitrateK).Distinct().Count();
+        Assert.True(bitrates > 1,
+            $"donanim kilidi de yazilim kilitleriyle ayni bitrate uretti (videoK={rows[0].Plan.VideoBitrateK}), DeliveryReserveK ayrimi kayboldu");
     }
 
     [Theory]
@@ -234,7 +267,6 @@ public sealed class CodecLockTests
         Assert.Equal(EncoderFallbackCause.NotInBuild, sebepler[0]);
         Assert.Null(sebepler[1]);
         Assert.Equal(EncoderFallbackCause.NotWorking, sebepler[2]);
-        Assert.Equal(3, new object?[] { sebepler[0], (object?)"unmeasured-marker", sebepler[2] }.Distinct().Count());
     }
 
     // --- Kilit gecersiz ad ---
