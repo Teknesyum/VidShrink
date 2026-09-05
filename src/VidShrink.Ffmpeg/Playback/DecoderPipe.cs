@@ -186,7 +186,7 @@ public sealed class DecoderPipe : IDisposable
             "-ss", startAt.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture),
             "-skip_frame", "nokey",
             "-i", _path,
-            "-vsync", "0", "-an", "-sn", "-dn",
+            "-fps_mode", "passthrough", "-an", "-sn", "-dn",
             "-f", "rawvideo", "-pix_fmt", "bgra", "-"
         };
 
@@ -195,6 +195,7 @@ public sealed class DecoderPipe : IDisposable
         {
             process.Start();
             Interlocked.Increment(ref _processesStarted);
+            StartStderrDrain(process);
         }
         catch
         {
@@ -272,6 +273,25 @@ public sealed class DecoderPipe : IDisposable
         }
     }
 
+    private static void StartStderrDrain(Process process)
+    {
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                var stream = process.StandardError.BaseStream;
+                var sink = new byte[4096];
+                while (stream.Read(sink, 0, sink.Length) > 0) { }
+            }
+            catch { }
+        })
+        {
+            IsBackground = true,
+            Name = "vidshrink-decoder-stderr"
+        };
+        thread.Start();
+    }
+
     private static bool ReadFull(Stream stream, byte[] buffer, CancellationToken ct)
     {
         var offset = 0;
@@ -322,7 +342,7 @@ public sealed class DecoderPipe : IDisposable
         };
 
         var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
-        try { process.Start(); } catch { return; }
+        try { process.Start(); StartStderrDrain(process); } catch { return; }
 
         lock (_gate) _audioProcess = process;
         var reader = new Thread(() => PumpAudio(process, life.Token, sink)) { IsBackground = true, Name = "vidshrink-audio-pipe" };

@@ -17,6 +17,7 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
 {
     public string? ClipPath { get; private set; }
     public string? SessizClipPath { get; private set; }
+    public string? UzunSessizKlipPath { get; private set; }
 
     public async Task InitializeAsync()
     {
@@ -27,6 +28,7 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
 
         ClipPath = Path.Combine(dir, "sentetik-ses.mkv");
         SessizClipPath = Path.Combine(dir, "sentetik-sessiz.mkv");
+        UzunSessizKlipPath = Path.Combine(dir, "sentetik-uzun-sessiz.mkv");
 
         await RunFfmpegAsync(new[]
         {
@@ -43,6 +45,17 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
             "-force_key_frames", "expr:gte(t,n_forced*1)",
             "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast",
             "-an", SessizClipPath
+        });
+
+        // Buyuk cozunurluk + her kare anahtar: skip_frame nokey ile cikan ham veri
+        // OS borusunun tampon boyutunu asar, boru surecin canli kalmasini garantiler
+        // (Surec_disaridan_oldurulunce testi icin — kucuk klipte surec Kill'den once biter).
+        await RunFfmpegAsync(new[]
+        {
+            "-y", "-f", "lavfi", "-i", "testsrc=size=640x480:rate=30:duration=6",
+            "-force_key_frames", "expr:gte(t,n_forced*0.1)",
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast",
+            "-an", UzunSessizKlipPath
         });
     }
 
@@ -157,6 +170,7 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
 
     private string SesliKlip => _fixture.ClipPath ?? throw new InvalidOperationException("ffmpeg yok");
     private string SessizKlip => _fixture.SessizClipPath ?? throw new InvalidOperationException("ffmpeg yok");
+    private string UzunSessizKlip => _fixture.UzunSessizKlipPath ?? throw new InvalidOperationException("ffmpeg yok");
 
     [FfmpegAvailableFact]
     public async Task Acilinca_suresi_ve_ses_varligi_dogru_okunur()
@@ -247,7 +261,7 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
     public async Task Surec_disaridan_oldurulunce_boru_Faulted_yayar_ve_kendini_kurar()
     {
         using var pipe = new DecoderPipe();
-        await pipe.OpenAsync(SessizKlip);
+        await pipe.OpenAsync(UzunSessizKlip);
 
         var faulted = new TaskCompletionSource<PipeFault>();
         pipe.Faulted += (_, f) => faulted.TrySetResult(f);
