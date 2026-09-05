@@ -1,3 +1,4 @@
+using System.Linq;
 using VidShrink.Ffmpeg;
 using VidShrink.Ffmpeg.Playback;
 using Xunit;
@@ -186,7 +187,6 @@ public sealed class OynaticiBoruTests_AudioSink
 
         Assert.Equal(1.0, AudioSink.BytesToSeconds(birSaniyelikBayt), 6);
         Assert.Equal(2.0, AudioSink.BytesToSeconds(birSaniyelikBayt * 2), 6);
-        Assert.NotEqual(1.15, AudioSink.BytesToSeconds(birSaniyelikBayt), 2);
     }
 }
 
@@ -317,5 +317,35 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
 
         pipe.Dispose();
         pipe.Dispose();
+    }
+
+    [FfmpegAvailableFact]
+    public async Task Surekli_oynatmada_ses_goruntu_kaymasi_zamanla_buyumez()
+    {
+        using var pipe = new DecoderPipe();
+        await pipe.OpenAsync(SesliKlip);
+        using var sink = new AudioSink(pipe.HasAudio);
+        pipe.AttachAudioSink(sink);
+
+        using var playback = pipe.StartContinuousPlayback(0);
+        pipe.SeekAudio(0);
+
+        var samples = new List<double>();
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        long lastFrames = -1;
+        while (sw.Elapsed.TotalSeconds < 3.0)
+        {
+            await Task.Delay(20);
+            var frames = playback.FramesDecoded;
+            if (frames == 0 || frames == lastFrames) continue;
+            lastFrames = frames;
+            samples.Add((playback.LatestVideoPts - sink.PositionSeconds) * 1000.0);
+        }
+
+        Assert.True(samples.Count > 10, $"cok az ornek: {samples.Count}");
+        var erken = samples.Take(5).Average();
+        var gec = samples.TakeLast(5).Average();
+        Assert.True(Math.Abs(gec - erken) < 200.0,
+            $"kayma 3 sn'de asiri buyudu: erken={erken:F1}ms gec={gec:F1}ms");
     }
 }

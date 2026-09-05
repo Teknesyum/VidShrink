@@ -15,6 +15,7 @@ switch (args[0])
     case "prep": return await PrepAsync();
     case "k1": return await K1Async(args[1], args[2], double.Parse(args[3], CultureInfo.InvariantCulture));
     case "k3": return await K3Async(args[1], args[2], double.Parse(args[3], CultureInfo.InvariantCulture));
+    case "k2": return await K2Async(args[1], args[2], double.Parse(args[3], CultureInfo.InvariantCulture));
     case "k4": return await K4Async(args[1], double.Parse(args[2], CultureInfo.InvariantCulture));
     case "rep": return await RepAsync(args[1]);
     default:
@@ -111,6 +112,28 @@ static async Task<int> K1Async(string etiket, string yol, double sure)
     return 0;
 }
 
+static async Task<int> K2Async(string etiket, string yol, double sure)
+{
+    yol = Path.GetFullPath(yol);
+    Console.WriteLine("== K2 surec kalicilik (video + ses tetiklenerek) == " + etiket + " " + yol);
+    using var pipe = new DecoderPipe();
+    await pipe.OpenAsync(yol);
+    var sink = new AudioSink(pipe.HasAudio);
+    pipe.AttachAudioSink(sink);
+    foreach (var mode in new[] { "uniform", "mixed" })
+    {
+        var targets = Targets(sure, 42, mode);
+        var startedBefore = pipe.ProcessesStarted;
+        foreach (var t in targets)
+        {
+            await pipe.SeekAsync(t);
+            if (pipe.HasAudio) pipe.SeekAudio(t);
+        }
+        Console.WriteLine($"[{etiket}/{mode}] n={targets.Count} surec_baslatma={pipe.ProcessesStarted - startedBefore} ses_var={pipe.HasAudio}");
+    }
+    return 0;
+}
+
 static async Task<int> K3Async(string etiket, string yol, double sure)
 {
     yol = Path.GetFullPath(yol);
@@ -139,41 +162,42 @@ static async Task<int> K3Async(string etiket, string yol, double sure)
 static async Task<int> K4Async(string yol, double sure)
 {
     yol = Path.GetFullPath(yol);
-    Console.WriteLine("== K4 senkron kayma (videoPts - audioPts, T167 olcusu) == " + yol + " sure=" + sure);
+    Console.WriteLine("== K4 senkron kayma (surekli oynatma, videoPts bagimsiz ilerliyor, T167 olcusu) == " + yol + " sure=" + sure);
 
     using var pipe = new DecoderPipe();
     await pipe.OpenAsync(yol);
     var sink = new AudioSink(pipe.HasAudio);
     pipe.AttachAudioSink(sink);
 
-    var ilkKare = await pipe.SeekAsync(0);
+    using var playback = pipe.StartContinuousPlayback(0);
     pipe.SeekAudio(0);
-    var videoPts = ilkKare?.PresentationSeconds ?? 0.0;
 
     var samples = new List<(double videoPts, double audioPts, double driftMs)>();
     var sw = Stopwatch.StartNew();
+    long lastFrames = -1;
     while (sw.Elapsed.TotalSeconds < sure)
     {
-        await Task.Delay(2000);
-        if (pipe.HasAudio)
-        {
-            var hedef = sink.PositionSeconds;
-            var kare = await pipe.SeekAsync(hedef);
-            if (kare is not null) videoPts = kare.PresentationSeconds;
-        }
+        await Task.Delay(5);
+        var frames = playback.FramesDecoded;
+        if (frames == 0 || frames == lastFrames) continue;
+        lastFrames = frames;
+        var videoPts = playback.LatestVideoPts;
         var audioPts = sink.PositionSeconds;
         var driftMs = pipe.HasAudio ? (videoPts - audioPts) * 1000.0 : 0;
         samples.Add((videoPts, audioPts, driftMs));
     }
 
-    Console.WriteLine($"ses_var={pipe.HasAudio} n={samples.Count} sure_s={sw.Elapsed.TotalSeconds:F1}");
+    Console.WriteLine($"ses_var={pipe.HasAudio} n={samples.Count} sure_s={sw.Elapsed.TotalSeconds:F1} kare_sayisi={lastFrames + 1}");
     Console.WriteLine("ham_kayma_ms=[" + string.Join(",", samples.Select(s => s.driftMs.ToString("F2", CultureInfo.InvariantCulture))) + "]");
     Console.WriteLine("videoPts=[" + string.Join(",", samples.Select(s => s.videoPts.ToString("F3", CultureInfo.InvariantCulture))) + "]");
     Console.WriteLine("audioPts=[" + string.Join(",", samples.Select(s => s.audioPts.ToString("F3", CultureInfo.InvariantCulture))) + "]");
     if (samples.Count > 0)
     {
         var maxAbs = samples.Max(s => Math.Abs(s.driftMs));
+        var baslangic = samples[0].driftMs;
+        var son = samples[^1].driftMs;
         Console.WriteLine($"maksimum_mutlak_kayma_ms={maxAbs:F2}");
+        Console.WriteLine($"baslangic_kayma_ms={baslangic:F2} son_kayma_ms={son:F2} degisim_ms={(son - baslangic):F2}");
     }
     return 0;
 }

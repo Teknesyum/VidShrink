@@ -1,0 +1,3 @@
+== K2 surec kalicilik (video + ses tetiklenerek) == senkron C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\.calisma\T175\kaynaklar\senkron-130s.mkv
+[senkron/uniform] n=30 surec_baslatma=37 ses_var=True
+[senkron/mixed] n=30 surec_baslatma=30 ses_var=True

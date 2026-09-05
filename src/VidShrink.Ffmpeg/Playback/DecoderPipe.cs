@@ -25,6 +25,7 @@ public sealed class DecoderPipe : IDisposable
     private int _height;
     private long _frameBytes;
     private double _durationSeconds;
+    private double _fps = 30;
 
     private Process? _videoProcess;
     private Thread? _videoReader;
@@ -85,6 +86,7 @@ public sealed class DecoderPipe : IDisposable
             _height = info.Height;
             _frameBytes = (long)_width * _height * 4;
             _durationSeconds = info.DurationSeconds;
+            _fps = info.Fps > 0 ? info.Fps : 30;
             HasAudio = info.HasAudio;
             _cache.Clear();
             _lru.Clear();
@@ -95,6 +97,102 @@ public sealed class DecoderPipe : IDisposable
     public void AttachAudioSink(AudioSink sink)
     {
         lock (_gate) _sink = sink;
+    }
+
+    public ContinuousPlayback StartContinuousPlayback(double fromSeconds)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        string path;
+        long frameBytes;
+        double fps;
+        lock (_gate)
+        {
+            path = _path;
+            frameBytes = _frameBytes > 0 ? _frameBytes : 1;
+            fps = _fps > 0 ? _fps : 30;
+        }
+
+        var args = new[]
+        {
+            "-hide_banner", "-nostdin", "-loglevel", "error",
+            "-re",
+            "-ss", fromSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture),
+            "-i", path,
+            "-an", "-sn", "-dn",
+            "-fps_mode", "passthrough",
+            "-f", "rawvideo", "-pix_fmt", "bgra", "-"
+        };
+
+        var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+        process.Start();
+        Interlocked.Increment(ref _processesStarted);
+        StartStderrDrain(process);
+
+        var life = new CancellationTokenSource();
+        var playback = new ContinuousPlayback(process, life, fromSeconds, fps, frameBytes);
+        var reader = new Thread(playback.Pump) { IsBackground = true, Name = "vidshrink-continuous-playback" };
+        playback.AttachReader(reader);
+        reader.Start();
+        return playback;
+    }
+
+    public sealed class ContinuousPlayback : IDisposable
+    {
+        private readonly Process _process;
+        private readonly CancellationTokenSource _life;
+        private readonly double _fromSeconds;
+        private readonly double _fps;
+        private readonly byte[] _buffer;
+        private long _framesDecoded;
+        private Thread? _reader;
+        private bool _disposed;
+
+        internal ContinuousPlayback(Process process, CancellationTokenSource life, double fromSeconds, double fps, long frameBytes)
+        {
+            _process = process;
+            _life = life;
+            _fromSeconds = fromSeconds;
+            _fps = fps;
+            _buffer = new byte[frameBytes];
+        }
+
+        internal void AttachReader(Thread reader) => _reader = reader;
+
+        public long FramesDecoded => Volatile.Read(ref _framesDecoded);
+
+        public double LatestVideoPts
+        {
+            get
+            {
+                var n = Volatile.Read(ref _framesDecoded);
+                return n <= 0 ? _fromSeconds : _fromSeconds + (n - 1) / _fps;
+            }
+        }
+
+        internal void Pump()
+        {
+            var stream = _process.StandardOutput.BaseStream;
+            try
+            {
+                while (!_life.IsCancellationRequested)
+                {
+                    if (!ReadFull(stream, _buffer, _life.Token)) break;
+                    Interlocked.Increment(ref _framesDecoded);
+                }
+            }
+            catch { }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            _life.Cancel();
+            try { if (!_process.HasExited) _process.Kill(true); } catch { }
+            _reader?.Join(2000);
+            _life.Dispose();
+            try { _process.Dispose(); } catch { }
+        }
     }
 
     private const int MaxForwardCatchupFrames = 3;

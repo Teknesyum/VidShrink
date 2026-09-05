@@ -1,0 +1,21 @@
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.11.1 (x64)
+
+Şu Testler kullanılabilir:
+    VidShrink.Tests.OynaticiBoruTests_PlaybackClock.Baslamamis_saat_baz_saniyesinde_durur
+    VidShrink.Tests.OynaticiBoruTests_PlaybackClock.Baslatilinca_zaman_ilerler
+    VidShrink.Tests.OynaticiBoruTests_PlaybackClock.Duraklat_konumu_donduruyor_ilerletmiyor
+    VidShrink.Tests.OynaticiBoruTests_PlaybackClock.Atlama_calisirken_de_calismazken_de_konumu_degistirir
+    VidShrink.Tests.OynaticiBoruTests_PlaybackClock.Hiz_carpani_ilerlemeyi_olcekler
+    VidShrink.Tests.OynaticiBoruTests_AudioSink.Ses_yoksa_butun_cagrilar_sessizce_no_op
+    VidShrink.Tests.OynaticiBoruTests_AudioSink.Cihaz_acilamasa_bile_cokmez
+    VidShrink.Tests.OynaticiBoruTests_AudioSink.BytesToSeconds_format_hizinda_dogru_donusum_yapar
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Acilinca_suresi_ve_ses_varligi_dogru_okunur
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Sessiz_kaynakta_HasAudio_false_ve_SeekAudio_cokmez
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Ilk_arama_tek_surec_baslatir_ve_kare_teslim_eder
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Yakin_ileri_aramalar_sureci_yeniden_baslatmaz
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellekteki_hedefe_geri_donus_de_surec_baslatmaz
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellek_disina_dusen_uzak_geri_atlama_sureci_yeniden_baslatir
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surec_disaridan_oldurulunce_boru_Faulted_yayar_ve_kendini_kurar
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Dispose_iki_kere_cagrilinca_da_cokmez
+    VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surekli_oynatmada_ses_goruntu_kaymasi_zamanla_buyumez

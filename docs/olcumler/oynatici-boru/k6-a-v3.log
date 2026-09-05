@@ -1,0 +1,44 @@
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.11.1 (x64)
+
+Test yürütmesi başlatılıyor, lütfen bekleyin...
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:00:11.62]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surec_disaridan_oldurulunce_boru_Faulted_yayar_ve_kendini_kurar [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surec_disaridan_oldurulunce_boru_Faulted_yayar_ve_kendini_kurar [885 ms]
+  Hata İletisi:
+   Assert.NotNull() Failure: Value is null
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Surec_disaridan_oldurulunce_boru_Faulted_yayar_ve_kendini_kurar() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 307
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:13.00]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellekteki_hedefe_geri_donus_de_surec_baslatmaz [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellekteki_hedefe_geri_donus_de_surec_baslatmaz [1 s]
+  Hata İletisi:
+   Assert.NotNull() Failure: Value is null
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellekteki_hedefe_geri_donus_de_surec_baslatmaz() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 265
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:14.84]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Yakin_ileri_aramalar_sureci_yeniden_baslatmaz [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Yakin_ileri_aramalar_sureci_yeniden_baslatmaz [1 s]
+  Hata İletisi:
+   Assert.Equal() Failure: Values differ
+Expected: 8
+Actual:   32
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Yakin_ileri_aramalar_sureci_yeniden_baslatmaz() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 250
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:16.79]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Ilk_arama_tek_surec_baslatir_ve_kare_teslim_eder [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Ilk_arama_tek_surec_baslatir_ve_kare_teslim_eder [1 s]
+  Hata İletisi:
+   Assert.NotNull() Failure: Value is null
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Ilk_arama_tek_surec_baslatir_ve_kare_teslim_eder() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 231
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:19.35]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellek_disina_dusen_uzak_geri_atlama_sureci_yeniden_baslatir [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellek_disina_dusen_uzak_geri_atlama_sureci_yeniden_baslatir [2 s]
+  Hata İletisi:
+   Assert.NotNull() Failure: Value is null
+  Yığın İzleme:
+     at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Onbellek_disina_dusen_uzak_geri_atlama_sureci_yeniden_baslatir() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 284
+--- End of stack trace from previous location ---
+
+Başarısız! - Başarısız:     5, Başarılı:    12, Atlanan:     0, Toplam:    17, Süre: 12 s - VidShrink.Tests.dll (net8.0)
