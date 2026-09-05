@@ -1,4 +1,4 @@
-# T175 - Kalici Kodcozucu Borusu Olcumleri (3. tur)
+# T175 - Kalici Kodcozucu Borusu Olcumleri (4. tur)
 
 Makine: bu depo. Olcumler tools/VidShrink.PlaybackProbe/Program.cs ile
 uretildi (1. tur .calisma/T175/olcum/Program.cs'in yerini aldi, ayni
@@ -154,9 +154,9 @@ sayisinin (12 surec / 30 arama) her yeniden baslatmayi orantili olarak daha
 agir kildigi bir yan etki, ayrica dokumante ediliyor.
 
 T167'nin geri donus kriteri baglayici: p95 uc kaynagin hepsinde 150 ms
-altina inmedigi icin bu sozlesme K3'te kirmizi teslim ediliyor. LibVLC'ye
-gecis bu veriyle mesru bir secenek; ama bu sozlesme kapsaminda paket
-eklenmedi, karar T0'a birakildi.
+altina inmedigi icin bu sozlesme K3'te kirmizi teslim ediliyor. Bu bolum yazildiginda LibVLC'ye gecis mesru bir
+secenek gorunuyordu; **karar sonradan verildi ve gecilmiyor** - gerekcesi
+asagida "T0 karari - LibVLC'ye gecilmiyor" basliginda, sayilariyla.
 
 Borc bulgusu (K1/K3 esdeger is yapmiyor): K1 her aramada -frames:v 1 ile
 tam kodcozme yapip TAM OLARAK hedeflenen kareyi dondurur. K3 -skip_frame
@@ -206,16 +206,22 @@ baslangic_kayma_ms=-40.00 son_kayma_ms=-60.00 degisim_ms=-20.00
 mutlak ofset degil **ofsetin degisimi** (T167: 3701 ornek, 123 s, 1,9 ms
 degisim - docs/olcumler/oynatici-hatti.md:252-254,287).
 
-4. turde bu bolumun mansetiydi hukmu bozan asil kusur bulundu: `baslangic_kayma_ms`
-ve `son_kayma_ms` ham dizinin **ilk ve son tek ornegi**, ve sinyal +-37 ms genlikli
-bir testere disi (video 33,33 ms, ses 40,00 ms kuantasindan dogan aliasing) - tek
-orneklik uc deger yontemi bu veride gecersiz. T167'de ayni yontem tutuyordu cunku
+4. turde bu bolumun mansetini bozan asil kusur bulundu: `baslangic_kayma_ms`
+ve `son_kayma_ms` ham dizinin **ilk ve son tek ornegi**, ve deger dagilimi 6,67 ms
+adimli 12 ayrik seviyeye oturuyor (video 33,33 ms ile ses 40,00 ms kuantasinin
+farki; ses tarafi `AudioSink.cs:29` `DesiredLatency = 80` ve NAudio'nun iki
+tamponundan geliyor). Dagilim duzenli bir testere disi degil, bu 12 seviye
+uzerinde can bicimli: -100,00 ve -26,67 birer ornek, kutle -73,33 ile -46,67
+arasinda. Tek orneklik uc deger yontemi bu veride gecersiz. T167'de ayni yontem tutuyordu cunku
 gurultu tabani ~12 ms'ti; burada gurultu tabani (maks-min) **73,33 ms**
 (-26,67 ms ile -100,00 ms arasi), yani tek ornek uc deger farki (-20,00 ms) gercek
 egilimden degil, hangi fazda yakalandigindan geliyor.
 
 Ham diziden (`docs/olcumler/oynatici-boru/k4-senkron-v5.log`, n=3778) ucu de
-kendim yeniden hesapladim, ham cikti:
+kendim yeniden hesapladim. Asagidaki blok **ham cikti degil**, ham diziden
+turetilmis hesaptir (logun `kayma_ms=` alanlari ayristirilip en kucuk kareler
+egimi, 300'luk pencere ortalamasi ve 12 kova ortalamasi hesaplandi; kova bolmesi
+`n//12`, kalan son kovaya eklenir):
 
 ```
 n=3778   min=-100,00  maks=-26,67  ortalama=-57,63  sigma=13,41
@@ -225,10 +231,14 @@ ilk 300 ornek ort. -58,40  ->  son 300 ornek ort. -60,13  = -1,73 ms
                               -57,9 -56,9 -58,2 -57,0 -55,8 -60,2   (trend yok)
 ```
 
-Bu sayilar denetcinin `k4-senkron-v5.log`'dan hesapladigi sayilarla (min/maks/
-ortalama/sigma/egim/pencere birebir, 12. kova -60,5 yerine -60,2 - kova sinirinin
-hangi tam sayiya yuvarlandigina bagli ~0,3 ms fark, egilim yorumunu degistirmiyor)
-tutuyor. Uc yontem de (egim, 300'luk pencere, 12 kova) ayni sonucu veriyor: kayma
+Bu sayilar bagimsiz denetimin ayni logdan hesapladigi sayilarla min/maks/
+ortalama/sigma/egim/pencere kolonlarinda **birebir** tutuyor. Tek fark 12. kova
+ortalamasi: burada -60,2, onceki denetim raporunda -60,5. Fark kova bolmesinin
+seciminden geliyor - `n//12` + kalan son kovada -60,2, esit 314 / esit 315 /
+`array_split` / zaman tabanli 10,5 s bolmelerinin hepsi -60,4 veriyor. **-60,5
+degeri denetimde yeniden uretilemedi**; 250-420 orneklik hicbir kuyruk penceresi
+onu vermiyor. Sapma 0,3 ms ve 12 kovanin hicbirinde egilim yok, yani "trend yok"
+hukmu etkilenmiyor - ama uzlastirma dogrulanmis degil, oldugu gibi yaziliyor. Uc yontem de (egim, 300'luk pencere, 12 kova) ayni sonucu veriyor: kayma
 **birikmiyor**, 12 kovada gorunur bir trend yok. Toplam degisim -0,52 ms ile -1,73
 ms arasinda, T167'nin kendi hattindaki 1,9 ms'nin ayni mertebesinde, LibVLC'nin
 2,1 ms'sinin de icinde.
@@ -337,8 +347,9 @@ verir ama `null`'u yakalamanin yerini tutmaz - olay asenkron yayilir,
 - K3: hala kirmizi (p95 uc kaynagin hepsinde 150 ms altina inmiyor).
   Ozet cumle artik kendi tablosuyla tutarli: p95 alti kaynak+moddan
   **besinde** iyilesti, **uzun/uniform'da kotulesti** (179,2 -> 194,4).
-  LibVLC gecisi bu sozlesme kapsaminda oneriliyordu, ama 4. turde
-  senkron sutunu duzgun olculunce T0 karari LibVLC'ye gecmemek yonunde
+  LibVLC gecisi bu sozlesme kapsaminda oneriliyordu; senkron olcumu
+  3. turde alindi (`k4-senkron-v5.log`), 4. turde **yeniden cozumlendi**
+  ve manseti tersine cevirdi - T0 karari LibVLC'ye gecmemek yonunde
   (asagida "T0 karari" basligi).
 - K4: T167'nin yontemiyle (surekli oynatma, videoPts kare sayisindan
   bagimsiz ilerliyor) yeniden olculdu: n=3778, 126,0 s. En kucuk kareler
@@ -382,7 +393,7 @@ verir ama `null`'u yakalamanin yerini tutmaz - olay asenkron yayilir,
 
 ## T176 devri
 
-Yukaridaki uc borc kalemi T176'nin (arayuz) devraldigi bilinen kusurlar:
+T176'nin (arayuz) devraldigi bilinen kusurlar:
 
 - K2 ayristirmasinin (video/ses) olculmemis oldugu ve mixed kosumunun
   onbellek isitmasindan yararlandigi - T176 gercek kullanicida ayri
@@ -398,10 +409,18 @@ Yukaridaki uc borc kalemi T176'nin (arayuz) devraldigi bilinen kusurlar:
 - (Onceki turlerden tasinan, hala acik) `SeekAsync`'in `MaxRestartAttemptsPerSeek`
   asildiginda `null` donmesi - cagiran taraf `null` kontrolu yapmak
   zorunda (yukarida "SeekAsync'in null donme sozlesmesi" basligi).
+- (3. tur denetiminden tasinan) Surekli oynatma senkron testinin esigi
+  (`OynaticiBoruTests.cs:344-348`, 200 ms) olculen gurultu tabaninin
+  (73,33 ms) ancak **2,7 kati**. Kaba saat ayrilmasini yakalar, asamali
+  kaymayi yakalamaz; testin duyarliligi bu oranla sinirlidir.
+- (3. tur denetiminden tasinan) `k5-v3.log` "ham cikti" degil, komut ve
+  turetilmis sayidan olusan iki satirlik ozet. Sonuc bagimsiz olarak
+  yeniden yayimlanip dogrulandi, ama kanit dosyasi ham degil.
 
 ## T0 karari - LibVLC'ye gecilmiyor
 
-Karari ceviren sutun senkrondu (K4) ve bu turde gercekten olculdu: 3778
+Karari ceviren sutun senkrondu (K4). Olcum 3. turde alindi, 4. turde
+dogru cozumlendi: 3778
 ornek, 126 s, en kucuk kareler egimiyle toplam **-0,52 ms**, ilk/son 300
 ornek penceresiyle **-1,7 ms**, 12 zaman kovasinda trend yok - T167'nin
 kendi hattindaki **1,9 ms** ile ayni mertebede, LibVLC'nin **2,1 ms**'siyle
