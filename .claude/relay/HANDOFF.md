@@ -21,22 +21,20 @@ right-click menu.
 
 ## Contracts open
 
-- `T158` — submitted, round 2
 - `T171` — active, round 1
 - `T172` — active, round 1
-- `T173` — submitted, round 2
 - `T175` — active, round 1
 
 ## Closed last
 
+- `T173` — passed — 2026-09-05 20:32
+- `T158` — passed — 2026-09-05 20:17
 - `T174` — passed — 2026-09-05 19:33
 - `T175` — stale — 2026-09-05 18:10
 - `T172` — stale — 2026-09-05 18:10
-- `T171` — stale — 2026-09-05 18:10
-- `T171` — stale — 2026-09-05 17:31
 
 ## Tree
 
 - branch: `main`
-- head: `7614d7d T158 birlestirildi: Atlandi() cagri-basi mesru kanit istiyor`
-- uncommitted files: 6
+- head: `ea373fa T175 teslimi reddedildi: alti kabul kriteri de ham ciktisiz`
+- uncommitted files: 0
