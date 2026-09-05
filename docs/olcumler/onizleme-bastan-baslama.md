@@ -107,10 +107,18 @@ Fark tam bir kare (30 fps'te 0,033 sn). Esik iki yonlu: geriye dusen damga basta
 baslamadir, bir saniyeden fazla ileri atlayan damga icerik atlamasidir.
 
 **Olculmeyen:** ekrandaki serit konumu (`ComparisonPanel.Controls.Position`). O deger
-`PanelHost.Drain` icinde, gercek `RequestAnimationFrame` dongusu akarken yaziliyor;
-basli olmayan bir pencerede o dongu hic donmuyor. Yukaridaki iki olcu, seridi besleyen
-iki girdinin (ayakta kalan boru + ilerleyen kare damgasi) korundugunu gosteriyor,
-seridin kendi metnini degil.
+`PanelHost.Drain` icinde, `:747-749`da yaziliyor.
+
+Tur 3 bunun gerekcesini *"basli olmayan bir pencerede `RequestAnimationFrame` dongusu hic
+donmuyor"* diye yazmisti. **Gerekce yanlisti** — asagidaki iki olcum de dongunun bu
+konakta dondugunu gosteriyor (`709` sondasi kollari dusuruyor, kapsam olcumu `Pump` ve
+`Drain`i gecilmis sayiyor). Dogru gerekce: `SessizKaynak` hic kare vermiyor, `Drain`
+`:720`de `TakeNewestReady` bos donunce erken cikiyor ve `Position` yazan kuyruk
+(`:743-759`) hic kosmuyor.
+
+**Sonuc degismedi:** serit konumu olculmedi. Yukaridaki iki olcu, seridi besleyen iki
+girdinin (ayakta kalan boru + ilerleyen kare damgasi) korundugunu gosteriyor, seridin
+kendi metnini degil.
 
 ## K4 — Mesru yeniden kurulumlar bozulmadi
 
@@ -179,7 +187,11 @@ imza zinciri hic kosmuyordu. Kol yeniden adlandirildi, plan degisimi ayrica olcu
 `_settle` ve `_segmentDelay` birer `DispatcherTimer`. Olcum konagi
 (`tests/VidShrink.Tests/AppHost.cs`) kendi is parcaciginda ileti dongusu calistirmiyor,
 bu yuzden **hicbir `DispatcherTimer` bu olcumlerde atesenmiyor** (ayni sinirlama
-`PanelHostTests` belgesinde de yazili). Tikin yaptigi is bu turda iki adlandirilmis
+`PanelHostTests` belgesinde de yazili). Gecilmeyen sey **abonelik ifadesi degil** —
+`:116` ve `:121`deki `+=` yapicida yedi kolun hepsinde kosuyor, kapsam olcumu yapiciyi
+%94,44 gecilmis sayiyor — **tik geri cagrisidir**; olculen o. `SettleElapsed` (`:136-140`)
+ve `SegmentDelayElapsed` (`:150-154`) govdeleri ise kollar tarafindan **dogrudan**
+cagriliyor, ikisi de %100 gecilmis. Tikin yaptigi is bu turda iki adlandirilmis
 yonteme alindi — `PanelHost.SettleElapsed` ve `PanelHost.SegmentDelayElapsed` — ve olcum
 onlari cagiriyor. Sayaclarin **kurulmus oldugu** ayrica olculuyor
 (`ResizeSettling`, `ClipScheduled`), yoksa yalniz tiki surmek `OnResized`in ve `SetPlan`in
@@ -187,46 +199,104 @@ kapilari tumden kaldirilsa bile yesil kalirdi.
 
 ### Yedi kolun gecmedigi uretim satirlari
 
-Onceki turda burada *"olculmeyen tek halka `DispatcherTimer`'in kendi OS tiki"* yaziyordu.
-**Yanlisti.** Olculmeyen halka bundan buyuk ve asagidaki liste sondayla sayildi: her satira
-`throw new InvalidOperationException("KAPSAM <satir>")` konup `dotnet build -c Release
---no-incremental` sonrasi yedi kol kosuldu; **hicbiri dusmediyse** o satir hicbir kol
-tarafindan gecilmiyor demektir. Duzenek: `.calisma/T161/kapsam.py` + `.calisma/T161/sonda.sh`.
+Tur 3 burada *"olculmeyen tek halka `DispatcherTimer`'in kendi OS tiki"* yaziyordu;
+**yanlisti.** Tur 4 sondayla bes satir sayip listeyi *"tek tek"* diye sunmustu; o liste de
+**eksikti.** Bu turda olcum iki bagimsiz yoldan alindi.
 
-| sonda | satir | sonuc |
+#### (1) Sonda — secili satir kol tarafindan geciliyor mu
+
+Duzenek `tools/VidShrink.CoverageProbe/kapsam.py`, kullanimi yanindaki `AGENTS.md`de.
+Secili satira `throw new InvalidOperationException("KAPSAM <satir>")` konur,
+`dotnet build -c Release --no-incremental` sonrasi yedi kol kosulur; **hicbir kol
+dusmediyse** o satiri hicbir kol gecmiyor demektir.
+
+| sonda | satir | sonuc (7 kol) |
 |---|---|---|
-| `116` | `_settle.Tick += (_, _) => SettleElapsed();` | 7/7 yesil — **gecilmiyor** |
-| `121` | `_segmentDelay.Tick += (_, _) => { _ = SegmentDelayElapsed(); };` | 7/7 yesil — **gecilmiyor** |
-| `709` | `Drain()`in ilk satiri | Basarisiz 6 / Basarili 1 — **geciliyor** |
-| `743` | `Drain()`in kare-konuldu kuyrugu (`_submitted++`den itibaren) | 7/7 yesil — **gecilmiyor** |
-| `766` | `Follow()` govdesinin ilk satiri | 7/7 yesil — **gecilmiyor** |
+| `116` | `_settle.Tick` geri cagrisinin govdesi (`SettleElapsed()`) | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `121` | `_segmentDelay.Tick` geri cagrisinin govdesi | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `709` | `Drain()`in ilk satiri | Basarisiz 5 / Basarili 2, tekrarinda 6 / 1 — **geciliyor** |
+| `743` | `Drain()`in kare-konuldu kuyrugu (`_submitted++`) | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `750` | `Drain()` icindeki `Follow(clip, position)` cagrisi | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `766` | `Follow()` govdesinin ilk satiri (`:768`) | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `772` | `Follow` -> `PrepareAheadAsync()` tetigi | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `773` | `Follow` -> `BeginHandover()` tetigi | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
+| `778` | `Follow` -> `SwapToStandby()` / `AdvanceClip()` | Basarisiz 0 / Basarili 7 — **gecilmiyor** |
 
-Yani sunum dongusu (`Tick` -> `Drain`) bu olcum konaginda **donuyor**, ama `SessizKaynak`
-hic kare vermedigi icin `Drain` kareyi alamadan geri donuyor. Gecilmeyen uretim satirlari,
-tek tek:
+`709`un dusen kol sayisi **kararsiz** (iki kosumda 5 ve 6); kararli olan, hep dusmesi —
+`Drain` bu konakta kosuyor. Sondanin okudugu sey budur, kac kolun dustugu degil.
 
-- `PanelHost.cs:116` — `_settle` tikinin abonelik satiri (1 satir).
-- `PanelHost.cs:121` — `_segmentDelay` tikinin abonelik satiri (1 satir).
-- `PanelHost.cs:743-758` — `Drain`in kare panoya kondugunda kosan kuyrugu: `_submitted++`,
-  `Controls.Position` yazimi (`:747-749`), `Follow` cagrisi (`:750`), bos-durum kaldirma
-  bloku (`:752-757`), `SampleRate()` (`:758`).
-- Yalniz o kuyruktan ulasilan bes yontemin **tamami**: `Follow` (`:766-780`),
-  `AdvanceClip` (`:658-676`), `BeginHandover` (`:805-815`), `OpenStandbyAsync`
-  (`:817-845`), `SwapToStandby` (`:859-880`). Bunlarin uretimdeki tek cagirani
-  `Follow` zinciridir (`AdvanceClip` yalniz `:779`, `BeginHandover` yalniz `:773`,
-  `SwapToStandby` yalniz `:778`, `OpenStandbyAsync` yalniz `:814`).
+#### (2) Kapsam olcumu — dosyanin tamami
+
+Sonda tek satir sorar; *"gecilmeyen satirlar, tek tek"* diyen bir cumle icin dosyanin
+tamami gerekiyordu:
+
+```
+dotnet test -c Release --no-build --filter "FullyQualifiedName~PlaybackResumeTests" \
+  --collect:"Code Coverage"
+dotnet-coverage merge -f xml -o kapsam.xml <sonuc>.coverage
+```
+
+`PanelHost.cs`: **gecilen 240 satir, gecilmeyen 179 satir.** Gecilmeyen araliklar:
+
+```
+160  163  166  174  177  180  186  221-223  256  258  271-272  281-282
+341-349  351-354  362-365  421  423-424  542-544  546  596-601  611  613-615
+647  649-650  660-661  663  665-670  673-676  717-718  722-724  728-733  736
+740-741  743-744  747-750  753  755-757  759-760  768-770  772-774  778-780
+796  799  807-810  812-815  819  822-833  837-838  841  843-845  849-852
+861-864  866-868  870-875  877-880  908  910-911  913-914  921-927  944-946
+950-951  970  972-975  978-983
+```
+
+Hicbir kol tarafindan **hic** cagrilmayan uyeler (kapsam olcumunun yontem izgarasindan,
+`blocks_covered=0`):
+
+| uye | satir |
+|---|---|
+| `_settle.Tick` geri cagrisi (`<.ctor>b__46_0`) | `:116` |
+| `_segmentDelay.Tick` geri cagrisi (`<.ctor>b__46_1`) | `:121` |
+| `RestartRequested` geri cagrisi (`<.ctor>b__46_4`) | `:125` |
+| `SeekRequested` geri cagrisi (`<.ctor>b__46_5`) | `:126` |
+| `IsOpen`, `PresentedFrames`, `ScreenFps` | `:160`, `:163`, `:166` |
+| `PreparedClip`, `Handovers`, `HasStandby`, `Segments` | `:174`, `:177`, `:180`, `:186` |
+| `Availability` al/ver, `Scenes` al/ver | `:271-272`, `:281-282` |
+| `Close()` | `:341-354` |
+| `SetLanguage(bool)` | `:362-365` |
+| `SampleFailureText` | `:542-546` |
+| `AdvanceClip` | `:660-676` |
+| `Follow` | `:768-780` |
+| `SwapAt`, `HandoverLead` | `:796`, `:799` |
+| `BeginHandover` | `:807-815` |
+| `Abandon` | `:849-852` |
+| `SwapToStandby` | `:861-880` |
+| `SampleRate` | `:921-927` |
+| `Seek` govdesi (`async void`, ayri durum makinesi) | `:970-983` |
+
+Kismen gecilen ve **kuyrugu** gecilmeyen yontemler: `Drain` (`:711-720` geciliyor,
+`:722`den `:760`a kadar gecilmiyor), `OpenStandbyAsync` (`:819-845` gecilmiyor),
+`RestartCore` (`:421-424`), `LoadClipAsync` (`:596-615`), `PrepareAheadAsync`
+(`:647-650`), `SetPlan` (`:221-223`), `TakeNewestReady` (`:908-914`), `Report`
+(`:944-951`).
+
+Tur 5'in sozlesmesi `DropStandby`yi (`:883`) de gecilmeyenler arasinda saymisti; **olcum
+bunu dogrulamiyor.** `DropStandby` `Teardown` (`:994`) uzerinden cagriliyor, `Teardown`
+kapsami %100 ve `DropStandby`nin satir kapsami %83,33 — yontem geciliyor. Gecilmeyen tek
+sey icindeki `Task.Run(standby.Dispose)` dali (`:890`in bekleyen-boru yarisi).
 
 `PrepareAheadAsync`in **kendisi** olculuyor (K1 kolu onu dogrudan cagiriyor); olculmeyen,
-onu oynatma sirasinda tetikleyen `:772` satiridir.
-
-`Drain`in kuyrugunun hic kosmamasi, bu belgede geri cekilen iddiayi
-(`Controls.Position` olculmedi) sondayla bir kez daha dogruluyor.
+onu oynatma sirasinda tetikleyen `:772` satiridir. `AdvanceClip`, `BeginHandover`,
+`SwapToStandby` ve `OpenStandbyAsync`in uretimdeki tek cagirani `Follow` zinciridir
+(`AdvanceClip` yalniz `:779`, `BeginHandover` yalniz `:773`, `SwapToStandby` yalniz
+`:778`, `OpenStandbyAsync` yalniz `:814`), o zincir de gecilmiyor.
 
 ## K5 — Mutasyon izgarasi
 
 Sekiz mutasyon. Her birinden **once** `dotnet build -c Release --no-incremental`, sonra
 `dotnet test -c Release --no-build --filter "FullyQualifiedName~PlaybackResumeTests"`.
-Duzenek: `.calisma/T161/mutasyon.py` + `.calisma/T161/kos.sh`.
+Mutasyon duzenegi (`mutasyon.py` + `kos.sh`) tur 3'un `.calisma/T161/`sinde kaldi ve
+`.calisma/` `.gitignore`da — **depoya girmedi.** Tabloda mutasyonlarin ne yaptigi tek tek
+yazili, ama yeniden uretmek icin duzenek elle kurulur. Sonda duzenegi
+(`tools/VidShrink.CoverageProbe/`) depoda.
 
 | # | mutasyon | beklenen | sonuc (7 kol) |
 |---|---|---|---|
@@ -237,12 +307,13 @@ Duzenek: `.calisma/T161/mutasyon.py` + `.calisma/T161/kos.sh`.
 | 3 | `ApplyPlayState` devam ederken `Restart()` cagiriyor (bastan baslatma) | `Durdur_baslat_boruyu_yeniden_kurmaz` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Durdur_baslat_boruyu_yeniden_kurmaz` |
 | 4 | `PipeComparisonFrameSource.Play()` `_resume.Set()` yerine `SeekAsync(TimeSpan.Zero)` | `Duraklatilan_boru_kaldigi_karenin_ardindan_surer` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Duraklatilan_boru_kaldigi_karenin_ardindan_surer` |
 | 5 | `LoadClipAsync`in basari dalindaki `Restart()` kaldirildi | `Ilk_parca_hazir_olunca_yeniden_kurar` FAIL | Basarisiz **2** / Basarili 5 — dusen: `Ilk_parca_hazir_olunca_yeniden_kurar` **ve** `Plan_degisimi_hala_yeniden_kurar` |
-| 6 | `SetPlan`deki imza esitlik kapisi (`PanelHost.cs:232-233`) kaldirildi — ayni plan da `ScheduleClip`e dusuyor | `Plan_degisimi_hala_yeniden_kurar`in **negatif** yarisi FAIL | Basarisiz 1 / Basarili 6 — dusen: `Plan_degisimi_hala_yeniden_kurar`, `Assert.Equal() Expected: 1, Actual: 2` (`:370`) |
+| 6 | `SetPlan`deki imza esitlik kapisi (`PanelHost.cs:232-233`) kaldirildi — ayni plan da `ScheduleClip`e dusuyor | `Plan_degisimi_hala_yeniden_kurar`in **negatif** yarisi FAIL | Basarisiz 1 / Basarili 6 — dusen: `Plan_degisimi_hala_yeniden_kurar`, `Assert.Equal() Expected: 1, Actual: 2` (`:373`) |
 
 6 numara **negatif kontrolu** hedefliyor: kapi kalkinca ayni plan da siraya giriyor,
 `ayni plan verildi : sira 2, gecikme kurulu True` olarak kayda dusuyor ve
-`Assert.Equal(oncekiSira, ayniPlanSira)` (`PlaybackResumeTests.cs:370`) dusuyor. 2 numara
-yalniz pozitif yariyi dusurdugu icin bu iki mutasyon ayni seyi olcmuyor.
+`Assert.Equal(oncekiSira, ayniPlanSira)` (`PlaybackResumeTests.cs:373`, hemen altindaki
+`Assert.False(ayniPlanGecikme...)` `:374`) dusuyor. 2 numara yalniz pozitif yariyi
+dusurdugu icin bu iki mutasyon ayni seyi olcmuyor.
 
 5 numarada iki kolun birden dusmesi beklenen: plan degisimi zinciri de son adiminda
 ayni `Restart`tan geciyor ve fabrika cagrisini o sayiyor. Kollar ayni satiri paylasiyor
