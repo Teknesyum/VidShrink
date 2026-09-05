@@ -356,3 +356,88 @@ sayfanın boyunu belirlemiyor (940 > 906), o yüzden sayfaya yansımıyor.
 
 `OluUyeTests`in beklenen kırılması (`owns` dışı) tur 3'te **ele alınmadı** — dokunulmadı,
 T0'ın ayrı sözleşmesinde kalıyor.
+
+---
+
+# Tur 4 — R1, R2, R3
+
+## R1 — Katlama düğmesi bağlı değildi
+
+Tur 3 düğmeyi hedef panelinin var olan başlık satırına taşırken (Q1'in "kapalı bedel
+0 px" kazancı) **olay bağlantısını birlikte taşımadı**. `9580bb5`'te
+`MainWindow.axaml:299-313` içindeki `BtnAdvancedToggle`da `Click` yok; tur 2'de
+(`9f740f1:src/VidShrink.App/MainWindow.axaml:486`) `Click="OnToggleAdvanced"` vardı.
+
+Sonuç: çalışan uygulamada `AdvancedBody.IsVisible` sonsuza dek `False` — dokuz gelişmiş
+kontrolün hiçbirine kullanıcı erişemiyordu. K4'ün "bölüm katlanır" yarısı
+karşılanmıyordu.
+
+Düzeltme tek satır: `MainWindow.axaml:302` `Click="OnToggleAdvanced"`. Yeni renk, yeni
+ölçü, yeni belirteç yok; `Theme.axaml` tur 4 diff'inde de **hiç yok**.
+
+Bu, bu deponun ölçülmüş kusur sınıfının bu sözleşmedeki **ikinci** tekrarı: ölçüyü
+düzeltirken açılan yeni giriş noktası kusuru kapatmaz, taşır.
+
+## R2 — Yirmi bir kolun hiçbiri R1'i göremiyordu
+
+Bütün kollar bölümü `window.ExpandAdvanced()` **test kancasıyla** açıyordu, düğmeye
+basarak değil. Düğme tümden silinse 21/21 yeşil kalırdı.
+
+Üç değişiklik:
+
+- Yeni yardımcı `ClickAdvancedToggle(window)` — kancayı hiç kullanmıyor, gerçek
+  `Button.ClickEvent` yükseltiyor. Bağlantı kopuksa hiçbir şey olmuyor.
+- Yeni kol `TheAdvancedSectionOpensAndClosesFromItsButton` — kapalı başlıyor, birinci
+  tıklamada açılıyor, ikincide kapanıyor; yön oku da ölçülüyor.
+- `TheCollapsedAdvancedSectionCostsThePageNoHeight`in üçüncü ölçüsü artık düğmeye
+  tıklayarak açıyor, kancayla değil.
+
+Ham çıktı (bağlantı yerinde):
+
+```
+baslangic: gorunur=False, ok=▾
+birinci tiklama: gorunur=True, ok=▴
+ikinci tiklama: gorunur=False, ok=▾
+sol sutun, bolum kapali: 940 px
+sol sutun, bolum yerlesimden cikarilmis: 940 px
+sol sutun, bolum acik: 1822 px
+```
+
+**Mutasyon** — `Click="OnToggleAdvanced"` silindi,
+`dotnet build -c Release --no-incremental` (0 hata), sonra filtreli koşum:
+
+```
+Başarısız VidShrink.Tests.AdvancedPanelTests.TheAdvancedSectionOpensAndClosesFromItsButton [321 ms]
+   R1: düğmeye basıldı ama gelişmiş bölüm açılmadı — Click bağlantısı yok, çalışan uygulamada dokuz kontrole erişilemez.
+Başarısız VidShrink.Tests.AdvancedPanelTests.TheCollapsedAdvancedSectionCostsThePageNoHeight [612 ms]
+   Ölçü boşa düşüyor: bölüm açılınca sol sütun büyümedi (kapalı 940, açık 940).
+Başarısız! - Başarısız: 2, Başarılı: 20, Atlanan: 0, Toplam: 22
+```
+
+`Click` kalktığında **iki kol** düşüyor. Tur 3'te sıfır kol düşerdi.
+
+## R3 — `TheCeilingFitsTheMostReasonProducingContent` boş geçiyordu
+
+Assert yalnız `Ceiling >= Floor` (512 >= 320) kıyaslıyordu; `MeasureMaxReasonLayout`
+pahalı yerleşim ölçüsünü kurup **atıyordu**. Kolun adı ve K2 iddiası ise "tavan, ölçülen
+içeriğe sığar" diyor.
+
+Assert artık ölçülen yüksekliği tavanla karşılaştırıyor (`Ceiling >= PlanBodyHeight`),
+ve boş ölçüye karşı `PlanBodyHeight > 0` bekçisi var. Ham çıktı:
+
+```
+olculen icerik: 232 px, taban: 320 px, tavan: 512 px
+```
+
+512 >= 232 — K1'in sayısı değişmedi, iddia artık gerçekten ölçülüyor.
+
+## Tur 4 koşumları
+
+| kol kümesi | sonuç | süre |
+|---|---|---|
+| `dotnet build -c Release --no-incremental` | 0 uyarı 0 hata | ~3 sn |
+| `--filter "FullyQualifiedName~AdvancedPanelTests" --list-tests` | **22 kol** (sıfır-kol riski yok) | — |
+| `--filter "FullyQualifiedName~AdvancedPanelTests"` | **22/22 yeşil** | 10 sn |
+| `--filter "FullyQualifiedName~WindowLayoutTests"` | **40/40 yeşil** | 6 dk 35 sn |
+
+`OluUyeTests`in beklenen kırılması `owns` dışında; tur 4'te de dokunulmadı.

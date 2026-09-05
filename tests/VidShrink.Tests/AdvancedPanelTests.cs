@@ -86,6 +86,18 @@ public sealed class AdvancedPanelTests
         LayOutAt(window, size);
     }
 
+    /// <summary>
+    /// T163/R2: bölümü <b>düğmeye basarak</b> açar. Test kancası (<c>ExpandAdvanced</c>)
+    /// XAML'deki <c>Click</c> bağlantısını atlıyor; yirmi bir kol tam da bu yüzden düğmenin
+    /// hiç bağlı olmadığını göremedi. Burada gerçek <c>Button.ClickEvent</c> yükseliyor —
+    /// bağlantı kopuksa hiçbir şey olmuyor ve ölçü düşüyor.
+    /// </summary>
+    private static void ClickAdvancedToggle(MainWindow window)
+    {
+        var button = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "BtnAdvancedToggle");
+        button.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+    }
+
     private static ComboBox FindCombo(MainWindow window, string name) =>
         window.GetVisualDescendants().OfType<ComboBox>().Single(c => c.Name == name);
 
@@ -176,8 +188,15 @@ public sealed class AdvancedPanelTests
     public void TheCeilingFitsTheMostReasonProducingContent()
     {
         var layout = MeasureMaxReasonLayout();
+
+        _output.WriteLine($"olculen icerik: {layout.PlanBodyHeight:0.#} px, taban: {layout.Floor:0} px, tavan: {layout.Ceiling:0} px");
+
+        Xunit.Assert.True(layout.PlanBodyHeight > 0, "PlanBody hiç ölçülmedi; kıyas boşa düşerdi.");
         Xunit.Assert.True(layout.Ceiling >= layout.Floor,
             $"Tavan ({layout.Ceiling}) taban ({layout.Floor}) altında kalamaz.");
+        Xunit.Assert.True(layout.Ceiling >= layout.PlanBodyHeight,
+            $"K2: tavan ({layout.Ceiling:0} px) en çok gerekçe üreten planın ölçülen "
+            + $"yüksekliğini ({layout.PlanBodyHeight:0.#} px) taşımıyor.");
     }
 
     /// <summary>K3a: sürükleme taban/tavan içinde kalır — sınırların dışına çıkan bir talep
@@ -366,7 +385,7 @@ public sealed class AdvancedPanelTests
             var withoutIt = SettingsColumnHeight(window);
 
             toggle.IsVisible = true;
-            window.ExpandAdvanced();
+            ClickAdvancedToggle(window);
             Relayout(window, DesignSize());
             var open = SettingsColumnHeight(window);
 
@@ -390,6 +409,55 @@ public sealed class AdvancedPanelTests
             expanded > withSection + 0.5,
             $"Ölçü boşa düşüyor: bölüm açılınca sol sütun büyümedi (kapalı {withSection:0.##}, "
             + $"açık {expanded:0.##}).");
+    }
+
+    /// <summary>
+    /// <para>K4/R1: bölüm <b>gerçek düğmeyle</b> açılıp kapanıyor. Tur 3 düğmeyi hedef
+    /// panelinin başlık satırına taşırken <c>Click</c> bağlantısını birlikte taşımadı ve
+    /// çalışan uygulamada dokuz gelişmiş kontrole hiç erişilemedi; yirmi bir kolun hiçbiri
+    /// bunu göremedi, çünkü hepsi <c>ExpandAdvanced</c> kancasını çağırıyordu.</para>
+    ///
+    /// <para>Bu kol kancayı hiç kullanmıyor: <c>Button.ClickEvent</c> yükseltiyor ve
+    /// bağlantıyı ölçüyor. Düğmedeki <c>Click="OnToggleAdvanced"</c> silinirse düşer.
+    /// Yön oku da ölçülüyor — olay bağlıysa üçü birden döner.</para>
+    /// </summary>
+    [Fact]
+    public void TheAdvancedSectionOpensAndClosesFromItsButton()
+    {
+        var (start, afterFirst, afterSecond, glyphStart, glyphOpen, glyphClosed) = Fresh(window =>
+        {
+            window.UseTurkish();
+            LayOutAt(window, DesignSize());
+
+            var body = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "AdvancedBody");
+            var button = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "BtnAdvancedToggle");
+
+            var s0 = body.IsVisible;
+            var g0 = button.Content as string;
+
+            ClickAdvancedToggle(window);
+            var s1 = body.IsVisible;
+            var g1 = button.Content as string;
+
+            ClickAdvancedToggle(window);
+            var s2 = body.IsVisible;
+            var g2 = button.Content as string;
+
+            return (s0, s1, s2, g0, g1, g2);
+        });
+
+        _output.WriteLine($"baslangic: gorunur={start}, ok={glyphStart}");
+        _output.WriteLine($"birinci tiklama: gorunur={afterFirst}, ok={glyphOpen}");
+        _output.WriteLine($"ikinci tiklama: gorunur={afterSecond}, ok={glyphClosed}");
+
+        Xunit.Assert.False(start, "K4: bölüm varsayılan kapalı açılmalı.");
+        Xunit.Assert.True(afterFirst,
+            "R1: düğmeye basıldı ama gelişmiş bölüm açılmadı — Click bağlantısı yok, "
+            + "çalışan uygulamada dokuz kontrole erişilemez.");
+        Xunit.Assert.False(afterSecond, "R1: ikinci tıklama bölümü geri kapatmalı.");
+        Xunit.Assert.Equal("▾", glyphStart);
+        Xunit.Assert.Equal("▴", glyphOpen);
+        Xunit.Assert.Equal("▾", glyphClosed);
     }
 
     /// <summary>K5: CRF sabitlenince hedef alanı artık zorlamadığını tek satırda söylüyor.</summary>

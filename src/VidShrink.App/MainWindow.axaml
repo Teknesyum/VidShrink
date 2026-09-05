@@ -299,6 +299,7 @@
                       <Button Grid.Column="1"
                               x:Name="BtnAdvancedToggle"
                               Content="▾"
+                              Click="OnToggleAdvanced"
                               Theme="{StaticResource GhostButton}"
                               FontFamily="{StaticResource FontMono}"
                               FontSize="{StaticResource FontSizeSm}"
