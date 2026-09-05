@@ -21,18 +21,23 @@ right-click menu.
 
 ## Contracts open
 
-None.
+- `T161` — open, round 4 — Tur 3 — bagimsiz denetim `verdict: failed` dondu
+- `T163` — open, round 1
+- `T165` — open, round 4 — Tur 2 — bagimsiz denetim `verdict: failed` dondu
+- `T167` — open, round 1
+- `T169` — open, round 4 — T0 DUZELTMESI — tur 1'in baglami yanlisti
+- `T170` — open, round 1
 
 ## Closed last
 
+- `T166` — passed — 2026-09-05 00:08
+- `T162` — passed — 2026-09-04 23:52
+- `T161` — stale — 2026-09-04 23:46
 - `T125` — done — 2026-09-04 17:02
 - `T133` — stale — 2026-09-03 20:51
-- `T133` — done — 2026-09-04 16:41
-- `T159` — done — 2026-09-03 15:34
-- `T160` — done — 2026-09-03 14:38
 
 ## Tree
 
-- branch: `mustafa/laptop-devam`
-- head: `6615570 Kurulum talimatina hazir paket bolumu eklendi`
-- uncommitted files: 1
+- branch: `main`
+- head: `36adcf3 T166 birlestirildi: denetim bulgulari kapatildi`
+- uncommitted files: 17
