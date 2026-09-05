@@ -1,0 +1,5 @@
+== K3 yeni boru (DecoderPipe) == kisa C:\Users\Teknesyum\Desktop\Projeler\VidShrink\.calisma\kaynak\parca-1.mkv
+[kisa/uniform] n=30 ham_ms=[127.5,178.9,930.2,128.2,150.2,159.5,142.4,133.3,0.9,142.5,159.9,1.8,1.4,130.2,123.5,0.4,130.1,161.8,139.3,136.3,127.2,163.5,150.8,135.5,1.5,139.4,154.9,2.6,178.4,158.2]
+[kisa/uniform] medyan=137.8ms p95=178.9ms maks=930.2ms surec_baslatma=25
+[kisa/mixed] n=30 ham_ms=[0.9,154.1,160.6,75.7,62.6,83.8,51.7,59.6,702.5,49.9,15.4,137.7,13.8,172.8,133.3,34.6,49.7,152.6,51.5,146.6,33.7,0.3,142.9,24.3,138.6,26.6,67.3,15.5,120.4,30.7]
+[kisa/mixed] medyan=61.1ms p95=172.8ms maks=702.5ms surec_baslatma=12

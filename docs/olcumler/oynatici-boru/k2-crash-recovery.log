@@ -1,0 +1,10 @@
+  VidShrink.Ab -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tools\VidShrink.Ab\bin\Debug\net8.0\VidShrink.Ab.dll
+  VidShrink.App -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\src\VidShrink.App\bin\Debug\net8.0\VidShrink.App.dll
+  VidShrink.Tests -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Debug\net8.0\VidShrink.Tests.dll
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\tests\VidShrink.Tests\bin\Debug\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.11.1 (x64)
+
+Test yürütmesi başlatılıyor, lütfen bekleyin...
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:     1, Atlanan:     0, Toplam:     1, Süre: < 1 ms - VidShrink.Tests.dll (net8.0)

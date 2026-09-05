@@ -1,0 +1,5 @@
+== K3 yeni boru (DecoderPipe) == uzun C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T175\.calisma\T175\kaynaklar\uzun-600s.mkv
+[uzun/uniform] n=30 ham_ms=[132.6,155.8,158.9,166.5,140.1,143.5,182.7,160.8,128.1,137.3,123.2,139.5,145.8,164.5,130.3,132.4,206.0,130.8,194.4,146.1,166.9,140.2,181.1,157.0,173.8,132.6,144.9,146.8,153.7,173.6]
+[uzun/uniform] medyan=146.4ms p95=194.4ms maks=206.0ms surec_baslatma=30
+[uzun/mixed] n=30 ham_ms=[142.5,26.6,62.0,35.0,136.7,60.9,47.5,46.2,135.9,47.9,36.9,822.3,30.7,139.9,136.8,42.1,42.1,152.2,80.2,885.3,35.5,18.0,165.3,89.6,143.9,42.7,80.3,18.7,142.6,44.4]
+[uzun/mixed] medyan=61.4ms p95=822.3ms maks=885.3ms surec_baslatma=13
