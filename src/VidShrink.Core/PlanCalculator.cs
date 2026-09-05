@@ -28,6 +28,55 @@ public sealed class PlanOptions
     /// Adlar <see cref="PlanParser.Parse"/>'in kabul ettigi kume ile ayni tutuluyor.
     /// </summary>
     public string? LockedCodec { get; set; } = null;
+
+    /// <summary>
+    /// Kullanicinin acikca sectigi kodlama kipi. <c>null</c> "secim yok" demektir; motor
+    /// bugunku gibi butce/tavan karsilastirmasiyla crf/2pass arasinda kendi secer. Doluysa
+    /// nihai kip zorlanir, kalan her sey (cozunurluk, fps, ses, bitrate tahmini) yine
+    /// otomatik hesaplanir.
+    /// </summary>
+    public EncodeMode? LockedMode { get; set; } = null;
+
+    /// <summary>
+    /// Kullanicinin acikca verdigi CRF degeri. Doluysa hedef boyut artik zorlanmaz: CRF
+    /// kazanir, hedef boyut bir tahmine doner (<see cref="EncodePlan.EffectiveTargetMb"/>
+    /// degismez ama uretilen boyut artik bir butce degil bir kestirimdir). <see cref="LockedMode"/>
+    /// doluysa bile bu alan onceliklidir, cunku acik bir sayi acik bir kipten daha az belirsiz.
+    /// </summary>
+    public double? LockedCrf { get; set; } = null;
+
+    /// <summary>
+    /// Kullanicinin acikca sectigi kodlayici on ayari (ör. "veryslow", "p2", "7").
+    /// <see cref="FfmpegArguments.IsValidPreset"/>'in kabul ettigi kumeden olmali; degilse
+    /// acik bir <see cref="ArgumentException"/> firlar, sessizce yakina yuvarlanmaz.
+    /// </summary>
+    public string? LockedPreset { get; set; } = null;
+
+    /// <summary>Kullanicinin acikca verdigi ses hedefi (kbps). Doluysa <see cref="PickAudio"/>'nun hesabi yerine gecer.</summary>
+    public int? LockedAudioKbps { get; set; } = null;
+
+    /// <summary>Kullanicinin acikca sectigi ses kanal politikasi. <see cref="AudioChannelOverride.Auto"/> "secim yok" demektir.</summary>
+    public AudioChannelOverride AudioChannels { get; set; } = AudioChannelOverride.Auto;
+
+    /// <summary>
+    /// Kullanicinin "en az bu cozunurluk" olarak verdigi taban (piksel yukseklik). Rejimin
+    /// kendi tabanindan (<see cref="RegimeFloors.MinHeight"/>) dusukse yok sayilir — taban
+    /// yalniz yukselebilir, motorun olculmus tabanini asagi cekemez.
+    /// </summary>
+    public int? MinResolutionHeight { get; set; } = null;
+
+    /// <summary>
+    /// Kullanicinin "en az bu kare hizi" olarak verdigi taban. <see cref="MinResolutionHeight"/>
+    /// ile ayni kural: rejimin tabanini yalniz yukseltebilir.
+    /// </summary>
+    public double? MinFps { get; set; } = null;
+
+    /// <summary>
+    /// Kullanicinin kodlayici yolunu zorlamasi: yazilim ya da donanim. <see cref="LockedCodec"/>
+    /// tek bir kodlayici adi seciyor, bu ise aile secmeden "yalniz yazilim" / "yalniz donanim"
+    /// diyor — <see cref="LockedCodec"/> doluyken bu alan etkisizdir, cunku ad zaten yolu belirler.
+    /// </summary>
+    public EncoderPathOverride EncoderPath { get; set; } = EncoderPathOverride.Auto;
 }
 
 public readonly record struct FillBand(double LowerMb, double HardFloorMb, double UpperMb)
@@ -202,6 +251,21 @@ public static class PlanCalculator
             : fast ? PickFastCodec(preference, availability, probe) : PickCodec(preference, availability, probe);
         var suggestedPreference = CompressionStrategy.AutoPreference(regime);
 
+        if (lockedCodec is null && options.EncoderPath != EncoderPathOverride.Auto)
+        {
+            var engineCodec = codec;
+            if (options.EncoderPath == EncoderPathOverride.Software && CodecModel.IsHardware(codec))
+                codec = LockedFallbackCodecFor(codec);
+            else if (options.EncoderPath == EncoderPathOverride.Hardware && !CodecModel.IsHardware(codec))
+                codec = PickFastCodec(preference, availability, probe);
+
+            if (codec != engineCodec)
+            {
+                reason.Add($"kullanici kodlayici yolunu {options.EncoderPath} olarak sabitledi; motor {engineCodec} secmisti, kullanilan {codec}");
+                reasonCodes.Add(new ReasonNote(ReasonCode.ManualEncoderPathOverride, ManualOverrideValue: options.EncoderPath.ToString(), EngineWouldHaveChosen: engineCodec, FallbackCodec: codec));
+            }
+        }
+
         var hdr = HdrResolver.Resolve(info, options.HdrPolicy, codec, availability);
         if (hdr.NotMeasured) probe.NotMeasured = true;
 
@@ -247,6 +311,34 @@ public static class PlanCalculator
 
         var totalK = aimMb * KbitPerMib / Math.Max(info.DurationSeconds, 0.1);
         var (audioK, audioChannels) = PickAudio(info, options, regime, totalK, notes);
+
+        if (info.HasAudio && options.LockedAudioKbps is int manualAudioK)
+        {
+            reason.Add($"kullanici ses hedefini {manualAudioK}kbps olarak sabitledi; motor {audioK}kbps secmisti");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualAudioBitrateOverride, ManualOverrideValue: manualAudioK.ToString(CultureInfo.InvariantCulture), EngineWouldHaveChosen: audioK.ToString(CultureInfo.InvariantCulture)));
+            audioK = manualAudioK;
+        }
+
+        if (info.HasAudio && options.AudioChannels != AudioChannelOverride.Auto)
+        {
+            var engineChannels = audioChannels?.ToString(CultureInfo.InvariantCulture) ?? "source";
+            switch (options.AudioChannels)
+            {
+                case AudioChannelOverride.Stereo:
+                    audioChannels = 2;
+                    break;
+                case AudioChannelOverride.Mono:
+                    audioChannels = 1;
+                    break;
+                case AudioChannelOverride.None:
+                    audioK = 0;
+                    audioChannels = null;
+                    break;
+            }
+            reason.Add($"kullanici ses kanalini {options.AudioChannels} olarak sabitledi; motor {engineChannels} secmisti");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualAudioChannelsOverride, ManualOverrideValue: options.AudioChannels.ToString(), EngineWouldHaveChosen: engineChannels));
+        }
+
         var videoK = Math.Max(MinVideoBitrateK, totalK * ContainerOverhead - audioK - DeliveryReserveK(codec));
 
         var effective = new PlanOptions
@@ -256,10 +348,26 @@ public static class PlanCalculator
             Codec = preference,
             AllowResolutionDrop = options.AllowResolutionDrop && CompressionStrategy.AllowsResolutionDrop(regime),
             AllowFpsDrop = options.AllowFpsDrop && CompressionStrategy.AllowsFpsDrop(regime),
-            SpeedMode = options.SpeedMode
+            SpeedMode = options.SpeedMode,
+            MinResolutionHeight = options.MinResolutionHeight,
+            MinFps = options.MinFps
         };
 
         var (best, sourceFpsViable) = SearchLayout(info, effective, complexity, codec, videoK, regime);
+
+        if (options.MinResolutionHeight is int requestedMinHeight)
+        {
+            var engineFloor = CompressionStrategy.FloorsFor(regime).MinHeight;
+            reason.Add($"kullanici cozunurluk tabanini en az {requestedMinHeight}p olarak sabitledi; rejimin kendi tabani {engineFloor}p idi");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinResolutionOverride, Height: requestedMinHeight, ManualOverrideValue: requestedMinHeight.ToString(CultureInfo.InvariantCulture), EngineWouldHaveChosen: engineFloor.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        if (options.MinFps is double requestedMinFps)
+        {
+            var engineFloor = CompressionStrategy.FloorsFor(regime).MinFps;
+            reason.Add($"kullanici kare hizi tabanini en az {requestedMinFps:0.##} olarak sabitledi; rejimin kendi tabani {engineFloor:0.##} idi");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinFpsOverride, Fps: requestedMinFps, ManualOverrideValue: requestedMinFps.ToString("0.##", CultureInfo.InvariantCulture), EngineWouldHaveChosen: engineFloor.ToString("0.##", CultureInfo.InvariantCulture)));
+        }
 
         if (complexity.Measured)
         {
@@ -428,6 +536,50 @@ public static class PlanCalculator
         reasonCodes.Add(complexity.Measured
             ? new ReasonNote(ReasonCode.PredictedQualityMeasured, Score: best.Score, Bppf: complexity.ReferenceBppf, DetailExponent: complexity.DetailExponent)
             : new ReasonNote(ReasonCode.PredictedQualityEstimated, Score: best.Score));
+
+        if (options.LockedCrf is double manualCrf)
+        {
+            var (minCrf, maxCrf) = CodecModel.CrfRange(codec);
+            var clampedCrf = Math.Clamp(manualCrf, minCrf, maxCrf);
+            var engineMode = plan.Mode;
+            var engineCrf = plan.Crf?.ToString(CultureInfo.InvariantCulture) ?? $"{plan.Mode}@{plan.VideoBitrateK}k";
+            var bppfAtCrf = complexity.BppfAtCrf(codec, clampedCrf, best.Scale, best.Fps, info.Fps);
+            plan.Mode = "crf";
+            plan.Crf = (int)Math.Round(clampedCrf);
+            plan.VideoBitrateK = (int)Math.Round(Math.Max(VideoBitrateK(bppfAtCrf, best.Width, best.Height, best.Fps), MinVideoBitrateK));
+            reason.Add($"kullanici CRF'i {plan.Crf} olarak sabitledi; hedef boyut artik zorlanmiyor, {plan.VideoBitrateK}k yalniz bir tahmin — motor {engineMode} kipinde {engineCrf} secmisti");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualCrfOverride, Crf: clampedCrf, Mb: SizeMb(plan.VideoBitrateK, audioK, info.DurationSeconds), ManualOverrideValue: plan.Crf.ToString(), EngineWouldHaveChosen: engineCrf));
+        }
+        else if (options.LockedMode is EncodeMode requestedMode && plan.ModeEnum != requestedMode && plan.ModeEnum != EncodeMode.PassThrough)
+        {
+            var engineMode = plan.Mode;
+            if (requestedMode == EncodeMode.TwoPass)
+            {
+                plan.Mode = "2pass";
+                plan.Crf = null;
+            }
+            else if (requestedMode == EncodeMode.Crf)
+            {
+                var (minCrf, maxCrf) = CodecModel.CrfRange(codec);
+                var currentBppf = BitsPerPixel(plan.VideoBitrateK, plan.Width, plan.Height, plan.Fps);
+                var derivedCrf = complexity.CrfForBppf(codec, currentBppf, best.Scale, best.Fps, info.Fps);
+                plan.Mode = "crf";
+                plan.Crf = (int)Math.Round(Math.Clamp(derivedCrf, minCrf, maxCrf));
+            }
+            reason.Add($"kullanici kodlama kipini {requestedMode} olarak sabitledi; motor {engineMode} secmisti");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualModeOverride, ManualOverrideValue: requestedMode.ToString(), EngineWouldHaveChosen: engineMode));
+        }
+
+        if (options.LockedPreset is string manualPreset)
+        {
+            if (!FfmpegArguments.IsValidPreset(codec, manualPreset))
+                throw new ArgumentException($"{codec} icin bilinmeyen on ayar: {manualPreset}", nameof(PlanOptions.LockedPreset));
+            var enginePreset = plan.Preset;
+            plan.Preset = manualPreset;
+            reason.Add($"kullanici on ayari {manualPreset} olarak sabitledi; motor {enginePreset} secmisti");
+            reasonCodes.Add(new ReasonNote(ReasonCode.ManualPresetOverride, ManualOverrideValue: manualPreset, EngineWouldHaveChosen: enginePreset));
+        }
+
         plan.Reason = string.Join("; ", reason);
         plan.ReasonCodes = reasonCodes;
         plan.EffectiveTargetMb = effectiveTargetMb;
@@ -645,7 +797,16 @@ public static class PlanCalculator
         AllowFpsDrop = options.AllowFpsDrop,
         HdrPolicy = options.HdrPolicy,
         FillPolicy = options.FillPolicy,
-        SpeedMode = options.SpeedMode
+        SpeedMode = options.SpeedMode,
+        LockedCodec = options.LockedCodec,
+        LockedMode = options.LockedMode,
+        LockedCrf = options.LockedCrf,
+        LockedPreset = options.LockedPreset,
+        LockedAudioKbps = options.LockedAudioKbps,
+        AudioChannels = options.AudioChannels,
+        MinResolutionHeight = options.MinResolutionHeight,
+        MinFps = options.MinFps,
+        EncoderPath = options.EncoderPath
     };
 
     public static double RetryAimMb(double targetMb, double? measuredEfficiency)
@@ -704,10 +865,23 @@ public static class PlanCalculator
 
     private sealed record Layout(int Width, int Height, double Fps, double Scale, double Score, double Bppf = 0, bool MeetsFloor = true, bool Deliverable = true);
 
+    /// <summary>
+    /// Rejimin kendi tabanini kullanicinin "en az" istegiyle birlestirir. Taban yalniz
+    /// yukselebilir: kullanicinin istegi rejimin olculmus tabanindan dusukse yok sayilir,
+    /// motorun kalibre ettigi taban asagi cekilemez.
+    /// </summary>
+    private static RegimeFloors EffectiveFloors(PlanOptions options, CompressionRegime regime)
+    {
+        var floors = CompressionStrategy.FloorsFor(regime);
+        var minHeight = options.MinResolutionHeight is int h ? Math.Max(floors.MinHeight, h) : floors.MinHeight;
+        var minFps = options.MinFps is double f ? Math.Max(floors.MinFps, f) : floors.MinFps;
+        return floors with { MinHeight = minHeight, MinFps = minFps };
+    }
+
     private static Layout RecoverLayoutAtCeiling(MediaInfo info, PlanOptions options, ComplexityProfile complexity, string codec, Layout fallback, double ceilingCrf, int audioK, double capMb, double budgetVideoK, CompressionRegime regime)
     {
         Layout? best = null;
-        var floors = CompressionStrategy.FloorsFor(regime);
+        var floors = EffectiveFloors(options, regime);
 
         foreach (var fps in FpsCandidates(info, options, regime))
         foreach (var scale in ScaleCandidates(options, regime))
@@ -781,7 +955,7 @@ public static class PlanCalculator
         Layout? best = null;
         Layout? densest = null;
         var sourceFpsViable = false;
-        var floors = CompressionStrategy.FloorsFor(regime);
+        var floors = EffectiveFloors(options, regime);
 
         foreach (var fps in FpsCandidates(info, options, regime))
         foreach (var scale in ScaleCandidates(options, regime))
@@ -821,14 +995,14 @@ public static class PlanCalculator
             yield return 1.0;
             yield break;
         }
-        var floors = CompressionStrategy.FloorsFor(regime);
+        var floors = EffectiveFloors(options, regime);
         for (var scale = 1.0; scale >= floors.MinScale - 1e-9; scale -= ScaleStep)
             yield return Math.Round(scale, 4);
     }
 
     public static IEnumerable<double> FpsCandidates(MediaInfo info, PlanOptions options, CompressionRegime regime)
     {
-        var floors = CompressionStrategy.FloorsFor(regime);
+        var floors = EffectiveFloors(options, regime);
         var source = info.Fps <= 0 ? 30 : info.Fps;
         yield return source;
         if (!options.AllowFpsDrop) yield break;
