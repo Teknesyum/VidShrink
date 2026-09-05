@@ -1,10 +1,10 @@
 {
  "_map": {
   "schema": 2,
-  "head": "743ae8780d1106d4f10fabd2ff31ab1934db4ac2",
-  "at": "2026-09-05T08:32:36.527Z",
-  "files": 241,
-  "edges": 201
+  "head": "261ab7fa13cf6c78165ebf2a8aba1ba347d9947a",
+  "at": "2026-09-05T08:50:28.784Z",
+  "files": 242,
+  "edges": 202
  },
  "src/VidShrink.App/App.axaml.cs": {
   "lines": 54,
@@ -281,7 +281,7 @@
   "ext": []
  },
  "src/VidShrink.Core/PlanCalculator.cs": {
-  "lines": 1064,
+  "lines": 1157,
   "to": [],
   "ns": [],
   "from": [],
@@ -734,6 +734,17 @@
   "from": [],
   "ext": [
    "Avalonia"
+  ]
+ },
+ "tests/VidShrink.Tests/CodecLockTests.cs": {
+  "lines": 281,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Xunit"
   ]
  },
  "tests/VidShrink.Tests/CodecModelTests.cs": {
