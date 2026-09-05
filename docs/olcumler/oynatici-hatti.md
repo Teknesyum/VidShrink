@@ -169,8 +169,10 @@ taban	GRID	0	medyan_ms=51,6	en_kotu_ms=61,4	n=10
   67,9 < 215,0; 84,5 < 819,2; 51,2 < 181,0.
 - own'un ortancasindan 51,6 ms'lik surec baslatma tabani dusulse bile LibVLC dort
   aralikta da onde kalir: 2,03 / 2,39 / 2,59 / 2,33 kat. Yani fark yalniz surec
-  baslatmadan gelmiyor; **kalici bir kodcozucu boru kurulsa da LibVLC iki katin uzerinde
-  onde**.
+  baslatmadan gelmiyor; **51,6 ms bir alt sinirdir** — kalici boru dosya acmayi,
+  kodcozucu kurulumunu ve boru aktarimini da amorti eder, bu yuzden kalan
+  **91-141 ms bir ust sinirdir**: kalici bir kodcozucu boru kurulsa fark bundan
+  daha kucuk olabilir.
 - own'un 700 ms'i asan tek orneklemi var: 20 orneklemden **1 tanesi** (60 sn araligi,
   4 numarali tekrar, 819,2 ms). Diger uc aralikta boyle bir sicrama yok.
 - LibVLC 20 orneklemin **hepsinde** (20/20) sar isteginden sonra degerlendirilen 1. veya
@@ -347,8 +349,9 @@ kazaniyor" degil, bir tercih:
 
 **Sonuc**: own hat'i genislet, ses icin NAudio'yu ekle. Sar gecikmesi kabul edilebilir
 sinirdadir ama **serbest degildir** — sonraki sozlesme, sar basina yeni ffmpeg sureci
-acmayi birakip kalici bir kodcozucu boru uzerinden sar yapmali; K1 tabani bunun 51,6
-ms'lik bir kazanc oldugunu soyluyor ve kalan 91-141 ms'i de dusurmek gerekir.
+acmayi birakip kalici bir kodcozucu boru uzerinden sar yapmali; K1 tabani bunun en az
+51,6 ms'lik bir kazanc oldugunu soyluyor, kalan 91-141 ms ise bir ust sinir — kalici
+boru kurulunca gercek fark bundan daha kucuk cikabilir.
 
 **Bu karar geri alinabilir olmali.** Sar gecikmesi urunde 150 ms'in altina inmezse
 LibVLC'yi acmak, K1'in sayilariyla **mesru** bir secenektir; bu belge onu kapatmiyor.
