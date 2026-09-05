@@ -132,13 +132,15 @@ onbellek/ileri-yakalama isliyor). Ama p95 altimi kaynagin altisinda da hala
 
 Onemli fark, 1. turun kirmizi karariyla ayni degil, ama 2. turda buraya
 yazilan "dort kaynakta p95 ve maksimum esit ya da daha iyi" cumlesi kendi
-tablosuyla celisiyordu ve 3. turda duzeltildi (borc bulgusu 4): tabloyu
-tek tek sayarsan **uc** kaynak+modda K3'un p95'i K1'e esit ya da daha iyi
-(kisa/uniform 802,9 -> 178,9; orta/uniform 179,2 -> 172,7; orta/mixed
-183,0 -> 170,1), ama **uzun/uniform'da p95 kotulesiyor**: K1 179,2 -> K3
-194,4 (tablo, K3 - K1 - Yeni boru gecikmesi bolumu). Bunu gizlemiyorum:
-uzun/uniform bu turde K1'e gore daha kotu bir p95 veriyor, iyilesme
-evrensel degil.
+tablosuyla celisiyordu; 3. turde "uc" olarak duzeltildi ama bu da yanlisti
+(iki kaynak+mod atlanmis, borc bulgusu 2). Karsilastirma tablosundaki alti
+kaynak+modu tek tek sayarsan **bes** kaynak+modda K3'un p95'i K1'e esit ya
+da daha iyi (kisa/uniform 802,9 -> 178,9; kisa/mixed 228,9 -> 172,8;
+orta/uniform 179,2 -> 172,7; orta/mixed 183,0 -> 170,1; uzun/mixed
+836,8 -> 822,3), ve **yalniz uzun/uniform'da p95 kotulesiyor**: K1 179,2
+-> K3 194,4 (tablo, K3 - K1 - Yeni boru gecikmesi bolumu). Bunu
+gizlemiyorum: uzun/uniform bu turde K1'e gore daha kotu bir p95 veriyor,
+iyilesme alti kaynak+moddan besinde, evrensel degil.
 
 Kalan kuyrugun cogu yine de borunun kendi kusurundan degil, K1'in de
 tasidigi ffmpeg surec-baslatma varyansindan geliyor (orta uniform p95
@@ -202,13 +204,38 @@ baslangic_kayma_ms=-40.00 son_kayma_ms=-60.00 degisim_ms=-20.00
 
 **Yontem T167 ile ayni bicimde**: 3778 ornek, 126,0 saniye, sonuc
 mutlak ofset degil **ofsetin degisimi** (T167: 3701 ornek, 123 s, 1,9 ms
-degisim - docs/olcumler/oynatici-hatti.md:252-254,287). T175'te 126,0
-saniyede kayma -40,00 ms'den -60,00 ms'ye, yani **20 ms degisiyor**.
-Bu, T167'nin kendi hattindaki 1,9 ms'den kotu (yaklasik 10 kat), ama
-1000 ms'de doyan eski olcunun aksine artik gercek bir olcu: kayma dar
-bir bantta (-33..-93 ms araliginda) titriyor ve anahtar kare araligina
-(2 s) kilitlenmiyor - ham dizideki degerler 30 fps'in 33,3 ms'lik kare
-adimlariyla uyumlu, keyframe-only doyum izi yok.
+degisim - docs/olcumler/oynatici-hatti.md:252-254,287).
+
+4. turde bu bolumun mansetiydi hukmu bozan asil kusur bulundu: `baslangic_kayma_ms`
+ve `son_kayma_ms` ham dizinin **ilk ve son tek ornegi**, ve sinyal +-37 ms genlikli
+bir testere disi (video 33,33 ms, ses 40,00 ms kuantasindan dogan aliasing) - tek
+orneklik uc deger yontemi bu veride gecersiz. T167'de ayni yontem tutuyordu cunku
+gurultu tabani ~12 ms'ti; burada gurultu tabani (maks-min) **73,33 ms**
+(-26,67 ms ile -100,00 ms arasi), yani tek ornek uc deger farki (-20,00 ms) gercek
+egilimden degil, hangi fazda yakalandigindan geliyor.
+
+Ham diziden (`docs/olcumler/oynatici-boru/k4-senkron-v5.log`, n=3778) ucu de
+kendim yeniden hesapladim, ham cikti:
+
+```
+n=3778   min=-100,00  maks=-26,67  ortalama=-57,63  sigma=13,41
+en kucuk kareler egimi -> tum kosumda toplam degisim  = -0,52 ms
+ilk 300 ornek ort. -58,40  ->  son 300 ornek ort. -60,13  = -1,73 ms
+12 kova (~10,5 s) ortalamasi: -58,1 -55,4 -58,0 -59,8 -55,3 -59,0
+                              -57,9 -56,9 -58,2 -57,0 -55,8 -60,2   (trend yok)
+```
+
+Bu sayilar denetcinin `k4-senkron-v5.log`'dan hesapladigi sayilarla (min/maks/
+ortalama/sigma/egim/pencere birebir, 12. kova -60,5 yerine -60,2 - kova sinirinin
+hangi tam sayiya yuvarlandigina bagli ~0,3 ms fark, egilim yorumunu degistirmiyor)
+tutuyor. Uc yontem de (egim, 300'luk pencere, 12 kova) ayni sonucu veriyor: kayma
+**birikmiyor**, 12 kovada gorunur bir trend yok. Toplam degisim -0,52 ms ile -1,73
+ms arasinda, T167'nin kendi hattindaki 1,9 ms'nin ayni mertebesinde, LibVLC'nin
+2,1 ms'sinin de icinde.
+
+**K4 hukmu: GECTI.** Onceki turde "10 kat kotu" diyen manset, ilk/son tek ornek
+yonteminin bu sinyalde gecersiz olmasindan kaynaklaniyordu; dogru yontemle (egim/
+pencere/kova) olculdugunde senkron T167'nin kendi hattiyla ayni yerde duruyor.
 
 2. turun K4 bolumunde T0'a bildirilen "n=63, -138,17..-98,95 ms" sayilari
 bu turde **kullanilmadi**: onlar tur 1'in reddedilen Stopwatch tabanli
@@ -309,17 +336,98 @@ verir ama `null`'u yakalamanin yerini tutmaz - olay asenkron yayilir,
   karsilanmadi. Cokme kurtarmasi geciyor.
 - K3: hala kirmizi (p95 uc kaynagin hepsinde 150 ms altina inmiyor).
   Ozet cumle artik kendi tablosuyla tutarli: p95 alti kaynak+moddan
-  ucunde iyilesti, **uzun/uniform'da kotulesti** (179,2 -> 194,4).
-  LibVLC gecisi onerilir, paket eklenmedi (T0 karari).
+  **besinde** iyilesti, **uzun/uniform'da kotulesti** (179,2 -> 194,4).
+  LibVLC gecisi bu sozlesme kapsaminda oneriliyordu, ama 4. turde
+  senkron sutunu duzgun olculunce T0 karari LibVLC'ye gecmemek yonunde
+  (asagida "T0 karari" basligi).
 - K4: T167'nin yontemiyle (surekli oynatma, videoPts kare sayisindan
-  bagimsiz ilerliyor) yeniden olculdu: n=3778, 126,0 s, kayma -40,00 ms'den
-  -60,00 ms'ye, yani **126 saniyede 20 ms degisim** - T167'nin kendi
-  hattindaki 1,9 ms'den kotu ama artik gercek bir olcu (1000 ms'de doyan
-  eski olcunun aksine dar bir bantta titresiyor, anahtar kare araligina
-  kilitlenmiyor). Sessiz kaynakla cokme yok.
+  bagimsiz ilerliyor) yeniden olculdu: n=3778, 126,0 s. En kucuk kareler
+  egimiyle toplam degisim **-0,52 ms**, ilk/son 300 ornek penceresiyle
+  **-1,73 ms**, 12 zaman kovasinda trend yok - T167'nin kendi hattindaki
+  1,9 ms ile ayni mertebede. Ilk/son tek ornekten hesaplanan onceki
+  "20 ms degisim" mansetti; o yontem 73,33 ms genlikli testere disi
+  sinyalde gecersiz (bkz. K4 bolumu). **K4: GECTI.** Sessiz kaynakla
+  cokme yok.
 - K5: gecti, +6 dosya / +0,56 MiB (T167 tabanina gore), ham cikti bu
   turde commit edildi.
 - K6: iki mutasyon da 17 testin tam suitiyle, dogru "once/sonra"
   dosyalariyla yeniden uretildi; mutasyona ozel gomulu sabit silindi,
   yerine gercek bir senkron-koruma testi eklendi.
 - K7: verify satiri tek kollu, 17/17 test eslesiyor, sifir bulan kol yok.
+
+## Borc
+
+1. K2'nin "37 = 30 ses + 7 video" ayristirmasi olculmemis, cikarim:
+   `k2-senkron-v1.log` yalniz toplami basiyor, video/ses kirilimi ayri
+   sayilmiyor. Ayrica `K2Async` (`tools/VidShrink.PlaybackProbe/Program.cs`)
+   boruyu bir kez acip iki modu (uniform, mixed) **ayni `pipe` uzerinde**
+   art arda kosuyor; `DecoderPipe._cache` yalniz `OpenAsync`'te
+   temizleniyor, yani mixed kosumu onundeki 30 uniform aramanin isittigi
+   onbellekten yararlaniyor. Bu belgenin daha onceki "video kalicilik
+   burada tam calisti" cumlesi (K2 bolumu basi) bu kosumdan **cikarilamaz**
+   - isaretliyorum.
+2. `ContinuousPlayback.Pump` govdesi (`DecoderPipe.cs`) `catch { }` ile
+   bitiyor: ffmpeg sureci olurse akis sessizce donuyor, `Faulted` olayi
+   yayilmiyor. K2'nin baglayici sarti olan "surec olurse boru sessizce
+   olmez" arama yoluna (`SeekAsync`) uygulanmis, 3. turde eklenen yeni
+   surekli oynatma yoluna tasinmamis.
+3. `ContinuousPlayback.LatestVideoPts` CFR (sabit kare hizi) varsayiyor
+   (`_fromSeconds + (n-1)/_fps`); VFR (degisken kare hizi) kaynakta bu
+   hesap yanlis ilerler ve K4 sessizce bozulur - varsayim raporun onceki
+   turlerinde yazili degildi, burada isaretliyorum. Ayrica
+   `StartContinuousPlayback` `_processesStarted` sayacini artiriyor
+   (`DecoderPipe.cs:128`), yani oynatma baslatmalari K2'nin "arama basina
+   surec" sayacina karisiyor - K2 tablosundaki sayilar saf arama-baslatma
+   degil, oynatma baslatmalarini da iceriyor olabilir.
+
+## T176 devri
+
+Yukaridaki uc borc kalemi T176'nin (arayuz) devraldigi bilinen kusurlar:
+
+- K2 ayristirmasinin (video/ses) olculmemis oldugu ve mixed kosumunun
+  onbellek isitmasindan yararlandigi - T176 gercek kullanicida ayri
+  olcum yapmadan bu sayilara guvenmemeli.
+- `ContinuousPlayback.Pump`'in `catch { }` ile sessiz kaldigi, yani
+  ffmpeg cokmesinde oynatma donuyor ve arayuz bunu fark etmiyor - T176
+  bu yolu `Faulted` yayacak sekilde tamamlamali.
+- `LatestVideoPts`'in CFR varsaydigi, VFR kaynakta K4'un sessizce
+  gecersizlesecegi, ve `_processesStarted` sayacinin arama ile oynatma
+  baslatmalarini ayirt etmedigi.
+- (Onceki turlerden tasinan, hala acik) `SeekAudio` kalicilik
+  mekanizmasindan yoksun - her cagrida yeni ses sureci acar.
+- (Onceki turlerden tasinan, hala acik) `SeekAsync`'in `MaxRestartAttemptsPerSeek`
+  asildiginda `null` donmesi - cagiran taraf `null` kontrolu yapmak
+  zorunda (yukarida "SeekAsync'in null donme sozlesmesi" basligi).
+
+## T0 karari - LibVLC'ye gecilmiyor
+
+Karari ceviren sutun senkrondu (K4) ve bu turde gercekten olculdu: 3778
+ornek, 126 s, en kucuk kareler egimiyle toplam **-0,52 ms**, ilk/son 300
+ornek penceresiyle **-1,7 ms**, 12 zaman kovasinda trend yok - T167'nin
+kendi hattindaki **1,9 ms** ile ayni mertebede, LibVLC'nin **2,1 ms**'siyle
+de esdeger. Diger sutunlar zaten kendi hattimizin lehineydi:
+
+- Kurulum bedeli: kendi hattimiz **+6 dosya / +0,56 MiB** (K5), LibVLC
+  **+100-280 MB** (T167, `docs/olcumler/oynatici-hatti.md`).
+- Gercekci erisim deseninde (mixed) K3 medyanlari **61,1 / 69,2 / 61,5
+  ms** (kisa/orta/uzun), T167'nin LibVLC icin olctugu 38,9-57,2 ms
+  bandinin hemen ustunde.
+- p95'in 150 ms'i asmasi mimari bir kusurdan degil, ffmpeg'in kendi
+  surec-baslatma varyansindan geliyor: kaynak+mod eslestirilerek
+  >250 ms ornek sayimi **taban 7/180, boru 4/180** - kuyruk K1 tabanina
+  eslenmis, boru onu buyutmuyor.
+- **LibVLC'nin p95'i bu depoda hic olculmedi** (T167'de n=5); p95
+  olcutuyle LibVLC'ye gecmek, olculmemis bir alternatife gecmek olurdu.
+
+Kendi hattimizda kapatilacak iki somut kusur duruyor, ikisi de p95'in
+kaynagi ve T176'nin degil, ayri bir sozlesmenin isi:
+
+- (a) `SeekAudio` kalicilik mekanizmasindan tumuyle yoksun - 30 aramada
+  her zaman 30 ses sureci; K2'nin kirmizi olmasinin asil nedeni bu.
+- (b) rastgele erisimde `MaxForwardCatchupFrames=3` sinirini asan uzak
+  hedefler video tarafini restart'a dusuruyor (uniform'da 7/30).
+
+**Karar: LibVLC paketine gecilmiyor, kendi ffmpeg + NAudio boru hattimiz
+kaliyor.** T167'nin karari bu sekilde teyit edildi; K2 ve K3'un kalan
+kirmizilari LibVLC gecisini degil, `SeekAudio` kaliciligi ve ileri-yakalama
+sinirinin genisletilmesini gerektiriyor - ayri bir sozlesme konusu.
