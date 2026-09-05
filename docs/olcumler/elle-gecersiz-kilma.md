@@ -641,9 +641,9 @@ RegimeFloors: MinScale, MinHeight, MinFps
 
 ## K6 — Mutasyon ızgarası
 
-Yirmi iki mutasyon, her birinden önce `dotnet build -c Release --no-incremental`;
-`--no-build` kullanılmadı. M1-M12 tur 3'ün, M13-M22 tur 4'ün. Tur 3'ün ham çıktısı bu
-bölümün sonunda; tur 4'ünki M22'den sonraki blokta.
+Yirmi yedi mutasyon, her birinden önce `dotnet build -c Release --no-incremental`;
+`--no-build` kullanılmadı. M1-M12 tur 3'ün, M13-M22 tur 4'ün, M23-M27 tur 5'in. Tur 3'ün
+ham çıktısı bu bölümün sonunda; tur 4'ünki M22'den sonraki blokta.
 
 M8 tur 4'te yeniden koşuldu: ses bloğu H1 için yeniden yapılandırıldı, eski formül artık
 ağaçta yok. Aşağıdaki M8 satırı **yeni şekle karşı** koşulan mutasyondur.
@@ -678,7 +678,7 @@ ağaçta yok. Aşağıdaki M8 satırı **yeni şekle karşı** koşulan mutasyon
 | M26 (tur 5) mono kaynakta Stereo istegi yok sayilir | `case AudioChannelOverride.Stereo: audioChannels = 2;` -> kaynak zaten >= 2 degilse dokunma | H1_MonoKaynaktaStereoIstegiKarsilaniyor (1) |
 | M27 (tur 5) `EncoderPathOverride.Software` pimi silinir | `OluUyeTests.Pinned` satiri kaldirildi | TheZeroConsumerSetIsThePinnedSet (1) |
 
-Yirmi ikisinin de en az bir kolu düşüyor; sıfır ölçü düşüren mutasyon yok. Tur 3'ün ham
+Yirmi yedisinin de en az bir kolu düşüyor; sıfır ölçü düşüren mutasyon yok. Tur 3'ün ham
 çıktısı:
 
 ```
@@ -756,7 +756,7 @@ dusen kollar: F2_KaynagiAsanCozunurlukTabaniYenidenKodlamaYolundaKarsilanmadiDen
 ```
 
 Tur 2'nin ızgarasında **sıfır kol düşüren bir mutasyon** vardı (F1); yerini yukarıdaki
-ızgara aldı ve yirmi ikisi de düşürüyor.
+ızgara aldı ve yirmi yedisi de düşürüyor.
 
 Tur 4'ün ham çıktısı (`dotnet test -c Release --no-build --filter
 "FullyQualifiedName~ManualOverrideTests"`, her mutasyondan önce `--no-incremental` build):
