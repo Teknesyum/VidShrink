@@ -156,7 +156,11 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         // (_panel.Controls.* vb.) başka bir iş parçacığından "Call from invalid thread"
         // ile düşer. Devam eden Teardown/StartAsync bekleyişi Bekle() içindeki
         // Dispatcher.UIThread.RunJobs() ile akıtılır (bkz. ShellIntegrationTests.Drain).
-        var clipTask = AppHost.Run(() => host.LoadClipAsync(4));
+        //
+        // Parca 2 sn'den baslar: dosya 12 sn, pencere 5 sn, SegmentEncoder.Clamp'in son
+        // baslangici 12 - 5 = 7. [2,7] penceresinin ardili Clamp(12, 7) = 7, yani dosyanin
+        // icinde kaliyor ve PrepareAheadAsync'in tekillik kontrolu kirpilmadan gecebiliyor.
+        var clipTask = AppHost.Run(() => host.LoadClipAsync(2));
         await Bekle(() => clipTask.IsCompleted);
         await clipTask;
         Assert.NotNull(host.ActiveClip);
@@ -185,10 +189,9 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
     public async Task Durdur_baslat_onden_hazirligi_bastan_baslatmaz()
     {
         Assert.True(_clips.Ready);
-        // 12 sn'lik gercek dosyaya bilerek uzun sure verildi: kisa surede SegmentEncoder.Clamp
-        // pencereyi WindowSeconds (5 sn) kadar geri cekip PrepareAheadAsync'in kendi tekillik
-        // kontrolunu (ActiveClip.EndSeconds karsilastirmasi) her cagrida bozuyordu.
-        var info = Source(_clips.Kaynak, duration: 30);
+        // Sure gercek dosyanin suresi: 12 sn. Kirpilma karistiricisi pencereyi 4 yerine
+        // 2 sn'den baslatarak kaldirildi (bkz. Hazirla), sureyi buyuterek degil.
+        var info = Source(_clips.Kaynak);
 
         // ---- Kosum B (kontrol): durdur/baslat yok ----
         var dirB = Temp();
@@ -338,7 +341,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         Assert.True(_clips.Ready);
         var dir = Temp();
         using var encoder = new SegmentEncoder(dir);
-        var info = Source(_clips.Kaynak, duration: 30);
+        var info = Source(_clips.Kaynak);
         var sayac = 0;
         var (_, host, _) = await Hazirla(encoder, info, () => { Interlocked.Increment(ref sayac); return new SessizKaynak(); });
 
@@ -449,7 +452,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         Assert.True(_clips.Ready);
         var dir = Temp();
         using var encoder = new SegmentEncoder(dir);
-        var info = Source(_clips.Kaynak, duration: 30);
+        var info = Source(_clips.Kaynak);
         var kaynaklar = new List<SessizKaynak>();
         var (panel, host, _) = await Hazirla(encoder, info, () =>
         {

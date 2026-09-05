@@ -1,4 +1,4 @@
-# T161 — Önizleme durdur/baslat yapinca bastan basliyor
+﻿# T161 — Önizleme durdur/baslat yapinca bastan basliyor
 
 Belirti: oynatirken durdur/baslat yapilinca, ayar degismedigi halde is bastan basliyor.
 
@@ -86,7 +86,7 @@ T161 K3 durdur/baslat -- boru ayakta mi
   kaynak ornegi (fabrika cagrisi): once 2, sonra 2
   ayakta duran boru StartAsync   : once 1, sonra 1
   Pause/Play/Seek                : 1/1/0
-  pencere baslangici (sn)        : once 4, sonra 4
+  pencere baslangici (sn)        : once 2, sonra 2
 ```
 
 ### K3.3 — Konum: borunun kare damgasi devam ediyor
@@ -183,12 +183,48 @@ bu yuzden **hicbir `DispatcherTimer` bu olcumlerde atesenmiyor** (ayni sinirlama
 yonteme alindi — `PanelHost.SettleElapsed` ve `PanelHost.SegmentDelayElapsed` — ve olcum
 onlari cagiriyor. Sayaclarin **kurulmus oldugu** ayrica olculuyor
 (`ResizeSettling`, `ClipScheduled`), yoksa yalniz tiki surmek `OnResized`in ve `SetPlan`in
-kapilari tumden kaldirilsa bile yesil kalirdi. Olculmeyen tek halka
-`DispatcherTimer`in kendi OS tiki, yani cerceve kodu.
+kapilari tumden kaldirilsa bile yesil kalirdi.
+
+### Yedi kolun gecmedigi uretim satirlari
+
+Onceki turda burada *"olculmeyen tek halka `DispatcherTimer`'in kendi OS tiki"* yaziyordu.
+**Yanlisti.** Olculmeyen halka bundan buyuk ve asagidaki liste sondayla sayildi: her satira
+`throw new InvalidOperationException("KAPSAM <satir>")` konup `dotnet build -c Release
+--no-incremental` sonrasi yedi kol kosuldu; **hicbiri dusmediyse** o satir hicbir kol
+tarafindan gecilmiyor demektir. Duzenek: `.calisma/T161/kapsam.py` + `.calisma/T161/sonda.sh`.
+
+| sonda | satir | sonuc |
+|---|---|---|
+| `116` | `_settle.Tick += (_, _) => SettleElapsed();` | 7/7 yesil — **gecilmiyor** |
+| `121` | `_segmentDelay.Tick += (_, _) => { _ = SegmentDelayElapsed(); };` | 7/7 yesil — **gecilmiyor** |
+| `709` | `Drain()`in ilk satiri | Basarisiz 6 / Basarili 1 — **geciliyor** |
+| `743` | `Drain()`in kare-konuldu kuyrugu (`_submitted++`den itibaren) | 7/7 yesil — **gecilmiyor** |
+| `766` | `Follow()` govdesinin ilk satiri | 7/7 yesil — **gecilmiyor** |
+
+Yani sunum dongusu (`Tick` -> `Drain`) bu olcum konaginda **donuyor**, ama `SessizKaynak`
+hic kare vermedigi icin `Drain` kareyi alamadan geri donuyor. Gecilmeyen uretim satirlari,
+tek tek:
+
+- `PanelHost.cs:116` — `_settle` tikinin abonelik satiri (1 satir).
+- `PanelHost.cs:121` — `_segmentDelay` tikinin abonelik satiri (1 satir).
+- `PanelHost.cs:743-758` — `Drain`in kare panoya kondugunda kosan kuyrugu: `_submitted++`,
+  `Controls.Position` yazimi (`:747-749`), `Follow` cagrisi (`:750`), bos-durum kaldirma
+  bloku (`:752-757`), `SampleRate()` (`:758`).
+- Yalniz o kuyruktan ulasilan bes yontemin **tamami**: `Follow` (`:766-780`),
+  `AdvanceClip` (`:658-676`), `BeginHandover` (`:805-815`), `OpenStandbyAsync`
+  (`:817-845`), `SwapToStandby` (`:859-880`). Bunlarin uretimdeki tek cagirani
+  `Follow` zinciridir (`AdvanceClip` yalniz `:779`, `BeginHandover` yalniz `:773`,
+  `SwapToStandby` yalniz `:778`, `OpenStandbyAsync` yalniz `:814`).
+
+`PrepareAheadAsync`in **kendisi** olculuyor (K1 kolu onu dogrudan cagiriyor); olculmeyen,
+onu oynatma sirasinda tetikleyen `:772` satiridir.
+
+`Drain`in kuyrugunun hic kosmamasi, bu belgede geri cekilen iddiayi
+(`Controls.Position` olculmedi) sondayla bir kez daha dogruluyor.
 
 ## K5 — Mutasyon izgarasi
 
-Yedi mutasyon. Her birinden **once** `dotnet build -c Release --no-incremental`, sonra
+Sekiz mutasyon. Her birinden **once** `dotnet build -c Release --no-incremental`, sonra
 `dotnet test -c Release --no-build --filter "FullyQualifiedName~PlaybackResumeTests"`.
 Duzenek: `.calisma/T161/mutasyon.py` + `.calisma/T161/kos.sh`.
 
@@ -201,6 +237,12 @@ Duzenek: `.calisma/T161/mutasyon.py` + `.calisma/T161/kos.sh`.
 | 3 | `ApplyPlayState` devam ederken `Restart()` cagiriyor (bastan baslatma) | `Durdur_baslat_boruyu_yeniden_kurmaz` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Durdur_baslat_boruyu_yeniden_kurmaz` |
 | 4 | `PipeComparisonFrameSource.Play()` `_resume.Set()` yerine `SeekAsync(TimeSpan.Zero)` | `Duraklatilan_boru_kaldigi_karenin_ardindan_surer` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Duraklatilan_boru_kaldigi_karenin_ardindan_surer` |
 | 5 | `LoadClipAsync`in basari dalindaki `Restart()` kaldirildi | `Ilk_parca_hazir_olunca_yeniden_kurar` FAIL | Basarisiz **2** / Basarili 5 — dusen: `Ilk_parca_hazir_olunca_yeniden_kurar` **ve** `Plan_degisimi_hala_yeniden_kurar` |
+| 6 | `SetPlan`deki imza esitlik kapisi (`PanelHost.cs:232-233`) kaldirildi — ayni plan da `ScheduleClip`e dusuyor | `Plan_degisimi_hala_yeniden_kurar`in **negatif** yarisi FAIL | Basarisiz 1 / Basarili 6 — dusen: `Plan_degisimi_hala_yeniden_kurar`, `Assert.Equal() Expected: 1, Actual: 2` (`:370`) |
+
+6 numara **negatif kontrolu** hedefliyor: kapi kalkinca ayni plan da siraya giriyor,
+`ayni plan verildi : sira 2, gecikme kurulu True` olarak kayda dusuyor ve
+`Assert.Equal(oncekiSira, ayniPlanSira)` (`PlaybackResumeTests.cs:370`) dusuyor. 2 numara
+yalniz pozitif yariyi dusurdugu icin bu iki mutasyon ayni seyi olcmuyor.
 
 5 numarada iki kolun birden dusmesi beklenen: plan degisimi zinciri de son adiminda
 ayni `Restart`tan geciyor ve fabrika cagrisini o sayiyor. Kollar ayni satiri paylasiyor
@@ -249,7 +291,13 @@ duzeltilen) 3 test-altyapisi kusuru, olcumlerin dogru cikmasi icin gerekliydi:
    `InvalidOperationException: Call from invalid thread` ile sessizce dusuyordu.
    `LoadClipAsync` artik konak is parcacigindan baslatiliyor ve tamamlanmasi
    `Dispatcher.UIThread.RunJobs()` pompasiyla bekleniyor.
-3. K1/K3 testi 12 saniyelik gercek dosyaya varsayilan 12 sn `MediaInfo.DurationSeconds`
-   veriyordu; `SegmentEncoder.Clamp` pencereyi kaynagin son `WindowSeconds`ina (5 sn)
-   kadar geri cekince onden hazirligin kendi tekillik kontrolu her cagrida bozuluyordu.
-   Test artik 30 sn sure veriyor, kirpilma devre disi.
+3. K1/K3 testi parcayi 4 sn'den baslatiyordu: pencere `[4,9]`, ardili istek 9 sn, ama
+   `SegmentEncoder.Clamp` son baslangici `12 - WindowSeconds = 7`ye kirpiyor, boylece
+   `PrepareAheadAsync`in tekillik kontrolu (`prepared.StartSeconds == ActiveClip.EndSeconds`)
+   her cagrida sasiyordu. **Duzeltme sureyi buyutmek degil, baslangici indirmektir:** parca
+   artik 2 sn'den basliyor, pencere `[2,7]`, ardil `Clamp(12, 7) = 7` — dosyanin icinde.
+   `MediaInfo.DurationSeconds` gercek dosyanin suresine (12 sn) esit.
+
+   Tur 3 bunun yerine 12 sn'lik dosyaya 30 sn sure vermisti; sayilan pencere dosyanin
+   disina tasiyordu. O sunum kaldirildi: dosyayla celisen bir `MediaInfo` uzerinden
+   olcum alinmiyor.
