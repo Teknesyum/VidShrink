@@ -776,6 +776,36 @@ public sealed class ManualOverrideTests
     }
 
     /// <summary>
+    /// H1'in besinci kalemindeki "kaynak mono iken Stereo isteniyor" kosulunu **kosan** kol.
+    /// Tur 4'te bu satirin gosterdigi olcu <c>Info()</c> kullaniyordu ve <c>Info()</c>un
+    /// <c>audioChannels</c> varsayilani 2'dir; yani belirtilen kosul hic kosulmuyordu.
+    /// Burada kaynak gercekten tek kanalli: <c>PlanCalculator.cs:375-377</c> kosulsuz
+    /// <c>audioChannels = 2</c> yaziyor, komut satirinda <c>-ac 2</c> gorunuyor.
+    /// </summary>
+    [Fact]
+    public void H1_MonoKaynaktaStereoIstegiKarsilaniyor()
+    {
+        var info = Info(audioChannels: 1);
+        var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, AudioChannels = AudioChannelOverride.Stereo }, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"kaynak kanal: {info.AudioChannels}");
+        _output.WriteLine($"motor kendiliginden: {dogal.Plan.AudioChannels?.ToString() ?? "kaynak"}");
+        _output.WriteLine($"Stereo sabitlenince : {result.Plan.AudioChannels?.ToString() ?? "kaynak"}");
+        _output.WriteLine($"args: {args}");
+
+        Assert.Equal(1, info.AudioChannels);
+        Assert.NotEqual(2, dogal.Plan.AudioChannels);
+        Assert.Equal(2, result.Plan.AudioChannels);
+        Assert.Contains("-ac 2", args);
+
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsOverride);
+        Assert.Equal("Stereo", not.ManualOverrideValue);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsUnmet);
+    }
+
+    /// <summary>
     /// H1 negatif kontrolu: ses akisi olan kaynakta "karsilanmadi" notu yazilmamali.
     /// Bu kol olmadan H1 duzeltmesi kosulsuz Unmet yazarak yesile donebilirdi.
     /// </summary>

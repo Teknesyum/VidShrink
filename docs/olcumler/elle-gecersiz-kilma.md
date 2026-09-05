@@ -1,10 +1,13 @@
 # Elle geçersiz kılma — ölçümler
 
-T165, tur 4. Tur 1 bağımsız denetimde `verdict: failed` döndü ve belge baştan yazıldı;
+T165, tur 5. Tur 1 bağımsız denetimde `verdict: failed` döndü ve belge baştan yazıldı;
 tur 2 denetimi dört bulgu (F1-F4), tur 3 denetimi dört bulgu daha (H1-H4) döndürdü.
-Bu sürüm H1-H4'ü kapatıyor.
+Tur 4 H1-H4'ü kapattı; tur 5'in denetimi üç bulgu bıraktı ve bu sürüm üçünü de kapatıyor:
+yanlış "düşen kol T165'in değil" cümlesi, koşulmayan mono ses koşulu, ve CI'yı kıran
+`OluUyeTests`.
 
-Ölçü dosyası: `tests/VidShrink.Tests/ManualOverrideTests.cs`.
+Ölçü dosyaları: `tests/VidShrink.Tests/ManualOverrideTests.cs`,
+`tests/VidShrink.Tests/OluUyeTests.cs`.
 Ham çıktı: `dotnet test -c Release --filter "FullyQualifiedName~ManualOverrideTests" --logger "console;verbosity=detailed"`.
 
 Bu belgedeki ham çıktının tamamı belgenin kendi içinde; kanıt olarak `.calisma/` altına
@@ -460,7 +463,7 @@ Hepsi kapatıldı.
 | 4 | ses hedefi (kbps) | kaynakta ses akışı yok (`HasAudio == false`) ⚠ | hiçbir şey; `HasReencodeOverride` kopyalama yolunu da kapattığı için `AddPassThroughDropNotes` de koşmuyordu | `ManualAudioBitrateUnmet` | `H1_SessizKaynaktaSesHedefiKarsilanmadiDeniyor` |
 | 4 | ses hedefi (kbps) | aynı anda `AudioChannels = None` ⚠ | "96 kbps sabitlendi" diyip sesi atıyordu | `ManualAudioBitrateSupersededByChannels` | `H2_SesHedefiKanalNoneIleCelistigindeHangisiKazandiYaziliyor` |
 | 5 | ses kanalı | kaynakta ses akışı yok ⚠ | hiçbir şey | `ManualAudioChannelsUnmet` | `H1_SessizKaynaktaSesKanaliKarsilanmadiDeniyor` (3 kol) |
-| 5 | ses kanalı | kaynak mono iken `Stereo` isteniyor | istek karşılanıyor: `-ac 2`, ffmpeg upmix ediyor | değişmedi | `K2_...(ses-stereo)` |
+| 5 | ses kanalı | kaynak mono iken `Stereo` isteniyor | istek karşılanıyor: `-ac 2`, ffmpeg upmix ediyor | değişmedi | `H1_MonoKaynaktaStereoIstegiKarsilaniyor` |
 | 6 | çözünürlük tabanı | taban kaynağın üstünde (motor yukarı ölçeklemiyor) | F2'de kapatıldı | `ManualMinResolutionUnmet` | `F2_KaynagiAsanCozunurlukTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor` |
 | 6 | çözünürlük tabanı | kopyalama yolu | D3'te kapatıldı | `ManualOverrideDroppedOnPassThrough` | `D3_KopyaYolundaUygulanamayanIstekSessizceDusmuyor` |
 | 7 | kare hızı tabanı | taban kaynağın üstünde | F2'de kapatıldı | `ManualMinFpsUnmet` | `F2_KaynagiAsanFpsTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor` |
@@ -481,6 +484,26 @@ koşuyor ve her birinde sabitlenen ön ayarın komut satırında olduğunu doğr
 | libsvtav1 | 3 | -preset 3 | kip=2pass |
 | h264_nvenc | p7 | -preset p7 | kip=2pass |
 ```
+
+**5. kalemin mono satırı, tur 5'te düzeltildi.** Tur 4'te bu satırın ölçü sütununda
+`K2_...(ses-stereo)` yazıyordu; o kol `Info()` kuruyor ve `Info()`un `audioChannels`
+varsayılanı **2**, yani kaynak stereo. Belirtilen koşul — kaynak mono — hiç koşulmuyordu.
+Artık koşan bir kol var: `H1_MonoKaynaktaStereoIstegiKarsilaniyor`, `Info(audioChannels: 1)`
+ile. Ham çıktı:
+
+```
+kaynak kanal: 1
+motor kendiliginden: kaynak
+Stereo sabitlenince : 2
+args: ffmpeg -hide_banner -y -hwaccel auto -i sample.mp4 -vf scale=1612:906:flags=lanczos
+      -c:v libx264 -preset slow -b:v 1599k -maxrate 2398k -bufsize 3198k -g 300
+      -keyint_min 30 -pix_fmt yuv420p -c:a aac -b:a 96k -ac 2 -movflags +faststart out.mp4
+```
+
+Kolun boş olmadığı mutasyonla gösterildi (M26, aşağıdaki ızgarada): `PlanCalculator.cs:376`
+koşulsuz `audioChannels = 2` yerine "kaynak zaten en az stereo değilse dokunma" derse
+**yalnız yeni kol düşüyor**, eski `K2_...(ses-stereo)` kolu ayakta kalıyor — eski kolun
+mono koşulunu koşmadığının ölçüsü de budur.
 
 Sessiz kaynakta ses hedefi — ham çıktı:
 
@@ -649,6 +672,11 @@ ağaçta yok. Aşağıdaki M8 satırı **yeni şekle karşı** koşulan mutasyon
 | M20 (H1 negatif) ses istegi kosulsuz "karsilanmadi" yazar | iki ses dalında `if (!info.HasAudio)` -> `if (!info.HasAudio \|\| info.DurationSeconds > 0)` | D3_KopyaYolunda... (2), K2_Sabitlenen... (4), K4_HerKalem... (4), H1_SesliKaynaktaKarsilanmadiNotuYazilmiyor, H2_SesHedefiKanalNone... (12) |
 | M21 (H1 negatif) kirpma notu kosulsuz yazilir | `if (crfClamped)` -> `if (crfClamped \|\| info.DurationSeconds > 0)` | H1_AraliktakiCrfKirpilmaNotuUretmiyor (1) |
 | M22 (H2 negatif) yol/kodek uyumu denetlenmez | `&& CodecModel.IsHardware(codec) != (options.EncoderPath == EncoderPathOverride.Hardware))` -> `&& info.DurationSeconds > 0)` | H2_KodekKilidiKodlayiciYoluIleUyumluysaCelismeNotuYok (1) |
+| M23 (tur 5) yol istegi hep donanim sayilir | `var wantsHardware = options.EncoderPath == EncoderPathOverride.Hardware;` -> `var wantsHardware = true;` | TheSoftwareEncoderPathIsReachedWithoutBeingNamed (1) |
+| M24 (tur 5) kilit celiskisi yalniz Hardware icin bakilir | `if (lockedCodec is not null && options.EncoderPath != EncoderPathOverride.Auto` -> `... == EncoderPathOverride.Hardware` | TheSoftwarePathValueReachesBothOtherProductionGates (1) |
+| M25 (tur 5) kopya yolunda yalniz Hardware dusurulur | `if (options.EncoderPath != EncoderPathOverride.Auto)` (`AddPassThroughDropNotes`) -> `if (options.EncoderPath == EncoderPathOverride.Hardware)` | TheSoftwarePathValueReachesBothOtherProductionGates (1) |
+| M26 (tur 5) mono kaynakta Stereo istegi yok sayilir | `case AudioChannelOverride.Stereo: audioChannels = 2;` -> kaynak zaten >= 2 degilse dokunma | H1_MonoKaynaktaStereoIstegiKarsilaniyor (1) |
+| M27 (tur 5) `EncoderPathOverride.Software` pimi silinir | `OluUyeTests.Pinned` satiri kaldirildi | TheZeroConsumerSetIsThePinnedSet (1) |
 
 Yirmi ikisinin de en az bir kolu düşüyor; sıfır ölçü düşüren mutasyon yok. Tur 3'ün ham
 çıktısı:
@@ -798,20 +826,65 @@ Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
 dusen kol: H2_KodekKilidiKodlayiciYoluIleUyumluysaCelismeNotuYok
 ```
 
-Mutasyonların hepsi geri alındı; `PlanCalculator.cs` mutasyonsuz hâline döndü ve
-76/76 + 14/14 yeşil koştu.
+### M23 (tur 5) yol istegi hep donanim sayilir
+```
+PlanCalculator.cs:274  var wantsHardware = options.EncoderPath == EncoderPathOverride.Hardware;
+  ->  var wantsHardware = true;
+Basarisiz! - Basarisiz: 1, Basarili: 12, Atlanan: 0, Toplam: 13
+dusen kol: OluUyeTests.TheSoftwareEncoderPathIsReachedWithoutBeingNamed
+  Assert.False() Failure  Expected: False  Actual: True   (OluUyeTests.cs:676)
+```
+
+### M24 (tur 5) kilit celiskisi yalniz Hardware icin bakilir
+```
+PlanCalculator.cs:263  lockedCodec is not null && options.EncoderPath != EncoderPathOverride.Auto
+  ->  lockedCodec is not null && options.EncoderPath == EncoderPathOverride.Hardware
+Basarisiz! - Basarisiz: 1, Basarili: 12, Atlanan: 0, Toplam: 13
+dusen kol: OluUyeTests.TheSoftwarePathValueReachesBothOtherProductionGates
+```
+
+### M25 (tur 5) kopya yolunda yalniz Hardware dusurulur
+```
+PlanCalculator.cs:799  if (options.EncoderPath != EncoderPathOverride.Auto)
+  ->  if (options.EncoderPath == EncoderPathOverride.Hardware)
+Basarisiz! - Basarisiz: 1, Basarili: 12, Atlanan: 0, Toplam: 13
+dusen kol: OluUyeTests.TheSoftwarePathValueReachesBothOtherProductionGates
+```
+
+### M26 (tur 5) mono kaynakta Stereo istegi yok sayilir
+```
+PlanCalculator.cs:376  audioChannels = 2;
+  ->  audioChannels = Math.Max(info.AudioChannels, 2) == 2 && info.AudioChannels >= 2 ? 2 : info.AudioChannels;
+Basarisiz! - Basarisiz: 1, Basarili: 76, Atlanan: 0, Toplam: 77
+dusen kol: ManualOverrideTests.H1_MonoKaynaktaStereoIstegiKarsilaniyor
+  (K2_SabitlenenDegerFfmpegKomutSatirindaGorunuyor(ses-stereo) ayakta kaldi — o kol
+   stereo kaynakla kosuyor, mono kosulunu hic gormuyor)
+```
+
+### M27 (tur 5) `EncoderPathOverride.Software` pimi silinir
+```
+OluUyeTests.Pinned  new("EncoderPathOverride.Software", "yalniz-disarida", Legitimate, ...) satiri silindi
+Basarisiz! - Basarisiz: 1, Basarili: 12, Atlanan: 0, Toplam: 13
+dusen kol: OluUyeTests.TheZeroConsumerSetIsThePinnedSet
+```
+
+Mutasyonların hepsi geri alındı; `PlanCalculator.cs` ve `OluUyeTests.cs` mutasyonsuz
+hâllerine döndü ve 77/77 + 14/14 + 13/13 yeşil koştu.
 
 ---
 
 ## K7 — Kol sayısı
 
 ```
-dotnet test -c Release --filter "FullyQualifiedName~ManualOverrideTests" --list-tests   ->  76
+dotnet test -c Release --filter "FullyQualifiedName~ManualOverrideTests" --list-tests   ->  77
 dotnet test -c Release --filter "FullyQualifiedName~CodecLockTests"      --list-tests   ->  14
+dotnet test -c Release --filter "FullyQualifiedName~OluUyeTests"         --list-tests   ->  13
 ```
 
-İkisi de koşuldu: 76/76 ve 14/14 geçti. Sıfır bulan kol yok. (Tur 3'te 55 idi; tur 4
-yirmi bir kol ekledi.)
+Üçü de koşuldu: 77/77, 14/14 ve 13/13 geçti. Sıfır bulan kol yok. (Tur 3'te 55 idi; tur 4
+yirmi bir kol ekledi, tur 5 bir kol daha: `H1_MonoKaynaktaStereoIstegiKarsilaniyor`.
+`OluUyeTests` tur 5'te ilk kez bu belgede sayılıyor — tur 4'te düşüyordu, artık iki yeni
+kolla birlikte 13/13.)
 
 Ayrıca `PlanCalculator`a dokunan yirmi sınıf üç öbekte koşuldu:
 
@@ -822,17 +895,25 @@ ExtremeCompression, FillBand
 
 FpsDrop, HardwareFlag, HardwareRateControl, HdrArguments, KestirimPlan,
 ManualOverride, OluUye
-  -> Basarisiz: 1, Basarili: 172, Atlanan: 3, Toplam: 176
+  -> Basarisiz: 0, Basarili: 176, Atlanan: 3, Toplam: 179
 
 PlanCalculatorProbe, PlanCalculator, QualityHint, QualityTarget, SpeedMode,
 TurboTavan, UretimYolu
   -> Basarisiz: 0, Basarili: 144, Atlanan: 0, Toplam: 144
 ```
 
-Toplam 406 geçti, 1 düştü. **Düşen kol T165'in değil**: `OluUyeTests` `cfad38e`de de
-düşüyor (o commit'te `git stash` ile doğrulandı, 1 düştü / 10 geçti). Ayrıntı aşağıda.
+Toplam 410 geçti, **hiçbiri düşmedi**. Tur 4'te bu öbeklerde bir kol düşüyordu
+(`OluUyeTests.TheZeroConsumerSetIsThePinnedSet`); tur 5'te kapatıldı, aşağıda.
 
-### Kapatılamayan bulgu: `OluUyeTests` `cfad38e`de kırık
+---
+
+## Kapatılan bulgu: `OluUyeTests`in pimi T165'in eklediği üyelerle güncellendi
+
+Tur 4 bu bulguyu **"düşen kol T165'in değil"** diye yazmıştı. Cümle yanlıştı ve aynı
+bölümün kendi devamı onu çürütüyordu ("üye T165 tur 1'de eklendi"). Kırılmayı açan
+T165'tir; tur 4 değil. Doğru cümle **"düşen kol tur 4'ün değil"**. Tur 5 kolu kapattı.
+
+Tur 4'ün ham çıktısı:
 
 ```
 OluUyeTests.TheZeroConsumerSetIsThePinnedSet
@@ -840,10 +921,87 @@ Expected: [..., "EncoderVendor.Software  varsayilan-kol", ...]
 Actual:   [..., "EncoderPathOverride.Software  yalniz-disarida", "EncoderVendor.Software ...
 ```
 
-`EncoderPathOverride.Software` üretimde hiçbir yerde okunmuyor — motor yolu yalnız
-`== EncoderPathOverride.Hardware` ile sınıyor, `Software` ise ikili kararın öbür yarısı
-olduğu için ada gerek kalmıyor. Üye T165 tur 1'de eklendi ve `OluUyeTests`in pinli ölü
-üye kümesi güncellenmedi.
+Pim ile taranan küme arasındaki fark **bir üye değil, yirmi üye**. Fark tek tek sayıldı:
 
-`tests/VidShrink.Tests/OluUyeTests.cs` bu sözleşmenin `owns` listesinde **değil**;
-düzeltilmedi, bildiriliyor.
+```
+$ pimlenen: 31   taranan (Flagged): 51   eksik: 0   fazla: 20
+
+EncoderPathOverride.Software
+ReasonCode.ManualAudioBitrateOverride
+ReasonCode.ManualAudioBitrateSupersededByChannels
+ReasonCode.ManualAudioBitrateUnmet
+ReasonCode.ManualAudioChannelsOverride
+ReasonCode.ManualAudioChannelsUnmet
+ReasonCode.ManualCrfClamped
+ReasonCode.ManualCrfOverride
+ReasonCode.ManualEncoderPathOverride
+ReasonCode.ManualEncoderPathSupersededByCodec
+ReasonCode.ManualEncoderPathUnmet
+ReasonCode.ManualMinFpsOverride
+ReasonCode.ManualMinFpsUnmet
+ReasonCode.ManualMinResolutionOverride
+ReasonCode.ManualMinResolutionUnmet
+ReasonCode.ManualModeOverride
+ReasonCode.ManualModeSupersededByCrf
+ReasonCode.ManualOverrideDroppedOnPassThrough
+ReasonCode.ManualPresetFirstPassRelaxed
+ReasonCode.ManualPresetOverride
+```
+
+Yirmisi de T165'in eklediği üyeler: bir yol değeri ve on dokuz gerekçe kodu. Hiçbiri
+silinmedi, ölçü de gevşetilmedi; **yirmisi de gerekçesiyle pime tanıtıldı.**
+
+### `EncoderPathOverride.Software` — `mesru`, çünkü işlevsel olarak ulaşılıyor
+
+Üye üretimde **adıyla** hiç geçmiyor. Motor yolu iki adımda soruyor:
+
+```
+PlanCalculator.cs:263-264   lockedCodec is not null && options.EncoderPath != EncoderPathOverride.Auto
+                            && CodecModel.IsHardware(codec) != (options.EncoderPath == EncoderPathOverride.Hardware)
+PlanCalculator.cs:271       lockedCodec is null && options.EncoderPath != EncoderPathOverride.Auto
+PlanCalculator.cs:274       var wantsHardware = options.EncoderPath == EncoderPathOverride.Hardware;
+PlanCalculator.cs:799       options.EncoderPath != EncoderPathOverride.Auto
+```
+
+`Software` bu karşılaştırmaların **else** tarafı. Ada göre görünmemesi taramanın sınırı,
+üyenin değil. İşlevsel olarak çalıştığı iki ölçüyle gösteriliyor.
+
+`OluUyeTests.TheSoftwareEncoderPathIsReachedWithoutBeingNamed` — aynı girdide üç değer,
+üç farklı plan:
+
+```
+Auto     -> av1_nvenc  (donanim=True)
+Software -> libsvtav1  (donanim=False)
+Hardware -> av1_nvenc  (donanim=True)
+```
+
+`OluUyeTests.TheSoftwarePathValueReachesBothOtherProductionGates` — `Software` değeri
+öteki iki üretim kapısında **adıyla** nota giriyor:
+
+```
+kilit: codec=hevc_nvenc
+gerekce=kullanici kodlayici yolunu Software olarak sabitledi ama ayni anda kodegi
+        hevc_nvenc olarak kilitledi; kodek kilidi onceliklidir, yol istegi uygulanmadi
+        ve kullanilan hevc_nvenc; ...
+
+kopya: mode=passthrough
+gerekce=the source is already 10,0 MB, under the 25 MB target, so it is copied as it is
+        instead of being re-encoded; kullanicinin sabitledigi kodlayici yolu (Software)
+        kopyalama yolunda uygulanamadi; gecerli olan kopya, kodlayici hic calismiyor
+```
+
+İki ölçü de boş değil: M23, M24 ve M25 mutasyonlarında (yukarıdaki ızgara) her biri düşüyor.
+
+### On dokuz gerekçe kodu — `borc`, arayüz kolu T163'ün alanında
+
+Kodlar üretiliyor ve `PlanResult.ReasonCodes` içinde taşınıyor; ölçüleri
+`ManualOverrideTests`te. Okunmamalarının tek nedeni `MainWindow.axaml.cs:2319-2354`teki
+"kod -> kullanıcı cümlesi" switch'i: T165 öncesi on altı kodun her birinin kolu var,
+T165'in eklediği on dokuzun hiçbirinin yok, hepsi `_ => null`'a düşüyor.
+
+Sayı iddia değil, ölçü — `ReasonCode` üyelerinin toplamı 35, switch'te kolu olan 16,
+kolu olmayan 19; taranan küme de tam bu 19'u işaretliyor.
+
+O kolu yazmak `src/VidShrink.App/**` altına yazmak demek ve orası T163'ün alanı;
+T165'in "Sınırlar" bölümü açıkça yasaklıyor. Bu yüzden karar `borc`: kullanıcı gerekçeyi
+**henüz** görmüyor, arayüz kolunun gerekip gerekmediği ölçülmedi.
