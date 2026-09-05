@@ -628,7 +628,10 @@ internal partial class ComparisonPanel : UserControl
         overlay.SizeChanged += OnOverlayResized;
 
         if (TopLevel.GetTopLevel(this) is { } top)
+        {
             top.AddHandler(KeyDownEvent, OnTopLevelKey, RoutingStrategies.Tunnel);
+            top.AddHandler(PointerPressedEvent, OnTopLevelPointerPressed, RoutingStrategies.Tunnel);
+        }
 
         // K5: geçiş kabuğa uygulanıyor, görüntüye değil. Yüzey kendi turunda çizmeye
         // devam eder; geçişin kare hızıyla ilgisi yoktur.
@@ -813,7 +816,10 @@ internal partial class ComparisonPanel : UserControl
         _stage = ShelterStage.Band;
 
         if (TopLevel.GetTopLevel(this) is { } top)
+        {
             top.RemoveHandler(KeyDownEvent, OnTopLevelKey);
+            top.RemoveHandler(PointerPressedEvent, OnTopLevelPointerPressed);
+        }
 
         Shell.Transitions = null;
         Shell.ClearValue(WidthProperty);
@@ -861,6 +867,43 @@ internal partial class ComparisonPanel : UserControl
         if (e.Key != Key.Escape || !_promoted) return;
         Leave();
         e.Handled = true;
+    }
+
+    /// <summary>
+    /// K2: dışarı tıklama. Tünel dinleyici kök katmanda, yani terfi etmiş panel görsel
+    /// ağaçtan çıkmış olsa bile yakalar. Kabuğun sınırı ekran koordinatına
+    /// <see cref="Visual.TranslatePoint"/> ile çevrilir; mantıksal ağaç ebeveynliğine
+    /// güvenilmiyor, çünkü terfi eden panel için o ilişki artık yok.
+    ///
+    /// Karar: tıklama yutulur. Altındaki denetim aynı tıklamayla kendi işini de yapmaz;
+    /// ilk dışarı tıklama yalnız küçültür. Gerekçe: kullanıcı büyütülmüş paneli
+    /// kapatmaya çalışıyor, aynı tıklamanın arkadaki bir düğmeyi de tetiklemesi
+    /// (ör. arkada duran başka bir kontrol) niyet dışı bir yan etki olurdu — kapatma ve
+    /// asıl eylem iki ayrı niyettir, iki ayrı tıklama olmalı.
+    /// </summary>
+    private void OnTopLevelPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is not Visual root) return;
+        if (TryDismissOnOutsideClick(e.GetPosition(root))) e.Handled = true;
+    }
+
+    /// <summary>
+    /// K2/K3: verilen noktanın (kök katman koordinatında) kabuğun dışında kalıp
+    /// kalmadığına bakar. Dışarıdaysa bir kademe küçültür ve <c>true</c> döner.
+    /// Bandda ya da terfi etmemişken hiçbir şey yapmaz.
+    /// </summary>
+    internal bool TryDismissOnOutsideClick(Point pointOnTopLevel)
+    {
+        if (!_promoted) return false;
+        if (TopLevel.GetTopLevel(this) is not { } top) return false;
+
+        var origin = Shell.TranslatePoint(new Point(0, 0), top) ?? new Point(0, 0);
+        var rect = new Rect(origin, Shell.Bounds.Size);
+        if (rect.Contains(pointOnTopLevel)) return false;
+
+        Leave();
+        top.FocusManager?.ClearFocus();
+        return true;
     }
 
     /// <summary>
