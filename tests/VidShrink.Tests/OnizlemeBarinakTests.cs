@@ -1,16 +1,23 @@
 using Avalonia;
+using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Playback;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
 public sealed class OnizlemeBarinakTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public OnizlemeBarinakTests(ITestOutputHelper output) => _output = output;
+
     private static readonly Size WindowSize = new(1560, 1060);
 
     private static void LayOutAt(MainWindow window, Size size)
@@ -69,6 +76,38 @@ public sealed class OnizlemeBarinakTests
         return new Rect(origin, panel.Shell.Bounds.Size);
     }
 
+    private static Rect IndependentShellRect(MainWindow window, ComparisonPanel panel)
+    {
+        var size = panel.Shell.Bounds.Size;
+        var matrix = panel.Shell.TransformToVisual(window);
+        Point origin;
+        if (matrix is { } m)
+        {
+            var corners = new[]
+            {
+                new Point(0, 0).Transform(m),
+                new Point(size.Width, 0).Transform(m),
+                new Point(0, size.Height).Transform(m),
+                new Point(size.Width, size.Height).Transform(m),
+            };
+            origin = new Point(corners.Min(p => p.X), corners.Min(p => p.Y));
+        }
+        else
+        {
+            origin = new Point(0, 0);
+        }
+
+        var fromMatrix = new Rect(origin, size);
+        var fromShell = ShellOnWindow(window, panel);
+
+        Assert.Equal(fromMatrix.X, fromShell.X, 3);
+        Assert.Equal(fromMatrix.Y, fromShell.Y, 3);
+        Assert.Equal(fromMatrix.Width, fromShell.Width, 3);
+        Assert.Equal(fromMatrix.Height, fromShell.Height, 3);
+
+        return fromShell;
+    }
+
     private static void Tap(MainWindow window, Point atWindow)
     {
         window.RaiseEvent(Click(window, atWindow));
@@ -88,6 +127,8 @@ public sealed class OnizlemeBarinakTests
             return (beforeStage, panel.Shelter);
         });
 
+        _output.WriteLine($"K2FULL before={before} after={after}");
+
         Assert.Equal(ShelterStage.Full, before);
         Assert.Equal(ShelterStage.Band, after);
     }
@@ -106,7 +147,34 @@ public sealed class OnizlemeBarinakTests
             return (beforeStage, panel.Shelter, rect);
         });
 
+        _output.WriteLine($"K2MID before={before} after={after} shellRect={shell}");
+
         Assert.False(shell.Contains(new Point(-5, -5)));
+        Assert.Equal(ShelterStage.Mid, before);
+        Assert.Equal(ShelterStage.Band, after);
+    }
+
+    [Fact]
+    public void K2_Mid_kademede_pencere_ici_panel_disi_noktayla_disari_tiklama_bandin_iner()
+    {
+        var outside = new Point(1000, 500);
+
+        var (before, after, shell) = Read((window, panel) =>
+        {
+            WheelTo(window, panel, ShelterStage.Mid);
+            var beforeStage = panel.Shelter;
+            var rect = ShellOnWindow(window, panel);
+
+            Tap(window, outside);
+
+            return (beforeStage, panel.Shelter, rect);
+        });
+
+        _output.WriteLine($"K2MID_ICERI before={before} after={after} shellRect={shell} nokta={outside}");
+
+        Assert.True(outside.X >= 0 && outside.X <= WindowSize.Width);
+        Assert.True(outside.Y >= 0 && outside.Y <= WindowSize.Height);
+        Assert.False(shell.Contains(outside));
         Assert.Equal(ShelterStage.Mid, before);
         Assert.Equal(ShelterStage.Band, after);
     }
@@ -114,16 +182,22 @@ public sealed class OnizlemeBarinakTests
     [Fact]
     public void K2_Band_kademede_disari_tiklama_hicbir_sey_yapmaz()
     {
-        var (before, after, promoted) = Read((window, panel) =>
+        var far = new Point(5000, 5000);
+
+        var (before, dismissed, after, promoted) = Read((window, panel) =>
         {
             var beforeStage = panel.Shelter;
+            var handled = panel.TryDismissOnOutsideClick(far);
 
             Tap(window, new Point(0, 0));
 
-            return (beforeStage, panel.Shelter, panel.IsPromoted);
+            return (beforeStage, handled, panel.Shelter, panel.IsPromoted);
         });
 
+        _output.WriteLine($"K2BAND before={before} dismissed={dismissed} after={after} promoted={promoted}");
+
         Assert.Equal(ShelterStage.Band, before);
+        Assert.False(dismissed);
         Assert.Equal(ShelterStage.Band, after);
         Assert.False(promoted);
     }
@@ -134,7 +208,7 @@ public sealed class OnizlemeBarinakTests
         var results = Read((window, panel) =>
         {
             WheelTo(window, panel, ShelterStage.Mid);
-            var rect = ShellOnWindow(window, panel);
+            var rect = IndependentShellRect(window, panel);
 
             var points = new[]
             {
@@ -154,6 +228,8 @@ public sealed class OnizlemeBarinakTests
 
             return stages;
         });
+
+        foreach (var (point, stage) in results) _output.WriteLine($"K3PT point=({point.X:0.##},{point.Y:0.##}) stage={stage}");
 
         Assert.Equal(5, results.Count);
         Assert.All(results, r => Assert.Equal(ShelterStage.Mid, r.Stage));
@@ -177,8 +253,83 @@ public sealed class OnizlemeBarinakTests
             return (first, second);
         });
 
+        _output.WriteLine($"K4ESC first={afterFirstEscape} second={afterSecondEscape}");
+
         Assert.Equal(ShelterStage.Band, afterFirstEscape);
         Assert.Equal(ShelterStage.Band, afterSecondEscape);
+    }
+
+    [Fact]
+    public void K4_Esc_Full_kademede_tekerlekle_ulasilmissa_bandin_iner()
+    {
+        var (before, after, enlarged) = Read((window, panel) =>
+        {
+            WheelTo(window, panel, ShelterStage.Full);
+            var beforeEnlarged = panel.IsEnlarged;
+            var beforeStage = panel.Shelter;
+
+            window.RaiseEvent(Escape(window));
+            Settle(window);
+
+            return (beforeStage, panel.Shelter, beforeEnlarged);
+        });
+
+        _output.WriteLine($"K4ESCFULL_WHEEL before={before} after={after} enlarged={enlarged}");
+
+        Assert.False(enlarged);
+        Assert.Equal(ShelterStage.Full, before);
+        Assert.Equal(ShelterStage.Band, after);
+    }
+
+    [Fact]
+    public void K4_Esc_dugmeyle_buyutulmus_Full_kademede_saklanan_boya_doner()
+    {
+        var (viaButton, afterEscape, enlargedBeforeEscape) = Read((window, panel) =>
+        {
+            WheelTo(window, panel, ShelterStage.Mid);
+
+            var fullButton = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "BtnPanelFullScreen");
+            fullButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            Settle(window);
+            var stageViaButton = panel.Shelter;
+            var enlarged = panel.IsEnlarged;
+
+            window.RaiseEvent(Escape(window));
+            Settle(window);
+
+            return (stageViaButton, panel.Shelter, enlarged);
+        });
+
+        _output.WriteLine($"K4ESCFULL_BUTTON viaButton={viaButton} enlarged={enlargedBeforeEscape} afterEscape={afterEscape}");
+
+        Assert.True(enlargedBeforeEscape);
+        Assert.Equal(ShelterStage.Full, viaButton);
+        Assert.Equal(ShelterStage.Mid, afterEscape);
+    }
+
+    [Fact]
+    public void K2_dugmeyle_buyutulmus_Full_kademede_disari_tiklama_da_bandin_iner()
+    {
+        var (viaButton, afterOutsideClick, enlargedBeforeClick) = Read((window, panel) =>
+        {
+            WheelTo(window, panel, ShelterStage.Mid);
+
+            var fullButton = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "BtnPanelFullScreen");
+            fullButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            Settle(window);
+            var stageViaButton = panel.Shelter;
+            var enlarged = panel.IsEnlarged;
+
+            Tap(window, new Point(-5, -5));
+
+            return (stageViaButton, panel.Shelter, enlarged);
+        });
+
+        _output.WriteLine($"K2FULL_BUTTON viaButton={viaButton} enlarged={enlargedBeforeClick} afterOutsideClick={afterOutsideClick}");
+
+        Assert.True(enlargedBeforeClick);
+        Assert.Equal(ShelterStage.Full, viaButton);
+        Assert.Equal(ShelterStage.Band, afterOutsideClick);
     }
 
     [Fact]
@@ -196,6 +347,8 @@ public sealed class OnizlemeBarinakTests
 
             return (onPromote, released);
         });
+
+        _output.WriteLine($"K4FOCUS onPromote={focusedOnPromote} released={focusReleasedAfterOutsideClick}");
 
         Assert.True(focusedOnPromote);
         Assert.True(focusReleasedAfterOutsideClick);
