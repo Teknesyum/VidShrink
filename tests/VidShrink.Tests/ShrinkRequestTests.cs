@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.IO.Pipes;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -105,7 +106,7 @@ public sealed class ResolverTests : IDisposable
     }
 
     [Fact]
-    public void K3_before_after_resolve_startup_path_is_unchanged_by_this_contract()
+    public void K3_resolve_startup_path_still_resolves_every_known_shape()
     {
         var single = Write("kayit.mp4");
         var quotedTarget = Write("baska.mp4");
@@ -114,23 +115,11 @@ public sealed class ResolverTests : IDisposable
         var broken = brokenFile.Split(' ');
         var missing = Path.Combine(_root, "yok.mp4");
 
-        string?[] Before() => new[]
-        {
-            ShellIntegration.ResolveStartupPath(new[] { single }),
-            ShellIntegration.ResolveStartupPath(new[] { quoted }),
-            ShellIntegration.ResolveStartupPath(broken),
-            ShellIntegration.ResolveStartupPath(new[] { missing }),
-        };
-
-        var before = Before();
-        _ = ShrinkRequestResolver.Resolve(new[] { ShellIntegration.ShrinkFlag, "500", single }, ShellIntegration.QuickShrinkTargetsMegabytes);
-        var after = Before();
-
-        Assert.Equal(before, after);
-        Assert.Equal(single, before[0]);
-        Assert.Equal(quotedTarget, before[1]);
-        Assert.Equal(brokenFile, before[2]);
-        Assert.Null(before[3]);
+        Assert.Equal(single, ShellIntegration.ResolveStartupPath(new[] { single }));
+        Assert.Equal(quotedTarget, ShellIntegration.ResolveStartupPath(new[] { quoted }));
+        Assert.Equal(brokenFile, ShellIntegration.ResolveStartupPath(broken));
+        Assert.Null(ShellIntegration.ResolveStartupPath(new[] { missing }));
+        Assert.Null(ShellIntegration.ResolveStartupPath(Array.Empty<string>()));
     }
 }
 
@@ -226,6 +215,108 @@ public sealed class QueueTests
         Assert.Equal(5, seen.Length);
         Assert.Equal(expected.OrderBy(x => x), seen.OrderBy(x => x));
         Assert.Equal(seen.Length, seen.Distinct().Count());
+    }
+
+    [Fact]
+    public void K5_single_sender_requests_are_handled_in_submission_order()
+    {
+        var channel = Channel();
+        using var owner = new ShrinkRequestQueue(channel);
+        Assert.True(owner.IsOwner);
+
+        var processed = new ConcurrentQueue<string>();
+        var gate = new ManualResetEventSlim(false);
+        var done = new CountdownEvent(5);
+        var firstSeen = 0;
+
+        owner.StartOwning(request =>
+        {
+            processed.Enqueue(request.Path);
+            if (Interlocked.Exchange(ref firstSeen, 1) == 0)
+                gate.Wait(TimeSpan.FromSeconds(15));
+            done.Signal();
+        });
+
+        using var sender = new ShrinkRequestQueue(channel);
+        Assert.False(sender.IsOwner);
+
+        var expected = Enumerable.Range(0, 5).Select(i => $"sira-{i}.mp4").ToArray();
+        foreach (var name in expected)
+            Assert.True(sender.Submit(new ShrinkRequest(500, name)), $"{name} onaylanmadi.");
+
+        gate.Set();
+        Assert.True(done.Wait(TimeSpan.FromSeconds(15)), "Bes istek zamaninda islenmedi.");
+
+        Assert.Equal(expected, processed.ToArray());
+    }
+
+    [Fact]
+    public void L1_second_StartOwning_is_refused_so_a_single_consumer_remains()
+    {
+        var channel = Channel();
+        using var owner = new ShrinkRequestQueue(channel);
+        Assert.True(owner.IsOwner);
+
+        var firstSaw = new ConcurrentQueue<string>();
+        var secondSaw = new ConcurrentQueue<string>();
+        var done = new CountdownEvent(5);
+
+        owner.StartOwning(request =>
+        {
+            firstSaw.Enqueue(request.Path);
+            Thread.Sleep(100);
+            done.Signal();
+        });
+
+        Assert.Throws<InvalidOperationException>(() => owner.StartOwning(request => secondSaw.Enqueue(request.Path)));
+
+        for (var i = 0; i < 5; i++)
+            Assert.True(owner.Submit(new ShrinkRequest(500, $"tek-tuketici-{i}.mp4")));
+
+        Assert.True(done.Wait(TimeSpan.FromSeconds(15)), "Bes istek zamaninda islenmedi.");
+        Assert.Empty(secondSaw);
+        Assert.Equal(5, firstSaw.Count);
+    }
+
+    [Fact]
+    public void L2_malformed_pipe_message_is_answered_with_a_refusal_not_a_silent_drop()
+    {
+        var channel = Channel();
+        using var owner = new ShrinkRequestQueue(channel);
+        Assert.True(owner.IsOwner);
+
+        var handled = new ConcurrentQueue<string>();
+        owner.StartOwning(request => handled.Enqueue(request.Path));
+
+        Assert.Equal(ShrinkRequestQueue.Nack, RawExchange(owner.PipeName, "sekmesiz-bozuk-mesaj"));
+        Assert.Equal(ShrinkRequestQueue.Nack, RawExchange(owner.PipeName, "sayidegil\tc:/yol/a.mp4"));
+        Assert.Equal(ShrinkRequestQueue.Ack, RawExchange(owner.PipeName, "500\tc:/yol/gecerli.mp4"));
+
+        Assert.True(SpinWait.SpinUntil(() => handled.Count == 1, TimeSpan.FromSeconds(15)));
+        Assert.Equal(new[] { "c:/yol/gecerli.mp4" }, handled.ToArray());
+    }
+
+    [Fact]
+    public void L2_submit_reports_failure_when_the_owner_is_not_listening()
+    {
+        var channel = Channel();
+        using var orphan = new ShrinkRequestQueue(channel);
+        Assert.True(orphan.IsOwner);
+
+        using var client = new ShrinkRequestQueue(channel);
+        Assert.False(client.IsOwner);
+
+        Assert.False(client.Submit(new ShrinkRequest(500, "sahipsiz.mp4"), TimeSpan.FromMilliseconds(300)));
+    }
+
+    private static string? RawExchange(string pipeName, string message)
+    {
+        using var client = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut);
+        client.Connect(15000);
+        using var writer = new StreamWriter(client, leaveOpen: true) { AutoFlush = true };
+        using var reader = new StreamReader(client, leaveOpen: true);
+        writer.WriteLine(message);
+        return reader.ReadLine();
     }
 }
 

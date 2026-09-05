@@ -62,15 +62,21 @@ public static class ShrinkRequestResolver
 
 public sealed class ShrinkRequestQueue : IDisposable
 {
+    public const string Ack = "TAMAM";
+    public const string Nack = "HATA";
+
     private readonly string _pipeName;
     private readonly Mutex _ownerLock;
     private readonly BlockingCollection<ShrinkRequest> _pending = new();
     private CancellationTokenSource? _cancel;
     private Task? _listenTask;
     private Task? _processTask;
+    private int _started;
     private int _disposed;
 
     public bool IsOwner { get; }
+
+    public string PipeName => _pipeName;
 
     public ShrinkRequestQueue(string channelName)
     {
@@ -84,6 +90,9 @@ public sealed class ShrinkRequestQueue : IDisposable
     {
         if (!IsOwner) throw new InvalidOperationException("Bu örnek kuyruğun sahibi değil.");
 
+        if (Interlocked.Exchange(ref _started, 1) == 1)
+            throw new InvalidOperationException("Kuyruk zaten başlatıldı; ikinci tüketici açılamaz.");
+
         _cancel = new CancellationTokenSource();
         _listenTask = Task.Run(() => ListenLoop(_cancel.Token));
         _processTask = Task.Run(() => ProcessLoop(handler, _cancel.Token));
@@ -93,19 +102,28 @@ public sealed class ShrinkRequestQueue : IDisposable
     {
         if (IsOwner)
         {
-            _pending.Add(request);
-            return true;
+            try
+            {
+                _pending.Add(request);
+                return true;
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException)
+            {
+                return false;
+            }
         }
 
         try
         {
-            using var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.Out);
+            using var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut);
             client.Connect((int)(timeout ?? TimeSpan.FromSeconds(5)).TotalMilliseconds);
-            using var writer = new StreamWriter(client) { AutoFlush = true };
+            using var writer = new StreamWriter(client, leaveOpen: true) { AutoFlush = true };
+            using var reader = new StreamReader(client, leaveOpen: true);
             writer.WriteLine($"{request.TargetMegabytes}\t{request.Path}");
-            return true;
+            var reply = reader.ReadLine();
+            return string.Equals(reply, Ack, StringComparison.Ordinal);
         }
-        catch (Exception ex) when (ex is TimeoutException or IOException)
+        catch (Exception ex) when (ex is TimeoutException or IOException or ObjectDisposedException)
         {
             return false;
         }
@@ -116,7 +134,7 @@ public sealed class ShrinkRequestQueue : IDisposable
         while (!token.IsCancellationRequested)
         {
             using var server = new NamedPipeServerStream(
-                _pipeName, PipeDirection.In, NamedPipeServerStream.MaxAllowedServerInstances);
+                _pipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances);
             try
             {
                 server.WaitForConnectionAsync(token).GetAwaiter().GetResult();
@@ -130,15 +148,42 @@ public sealed class ShrinkRequestQueue : IDisposable
                 continue;
             }
 
-            using var reader = new StreamReader(server);
-            var line = reader.ReadLine();
-            if (line is null) continue;
-
-            var parts = line.Split('\t', 2);
-            if (parts.Length == 2 && int.TryParse(parts[0], out var target))
+            try
             {
-                _pending.Add(new ShrinkRequest(target, parts[1]));
+                using var reader = new StreamReader(server, leaveOpen: true);
+                using var writer = new StreamWriter(server, leaveOpen: true) { AutoFlush = true };
+
+                var line = reader.ReadLine();
+                if (line is null) continue;
+
+                var parts = line.Split('\t', 2);
+                if (parts.Length == 2 && int.TryParse(parts[0], out var target) && Accept(target, parts[1]))
+                {
+                    writer.WriteLine(Ack);
+                }
+                else
+                {
+                    writer.WriteLine(Nack);
+                }
+
+                if (OperatingSystem.IsWindows()) server.WaitForPipeDrain();
             }
+            catch (Exception ex) when (ex is IOException or ObjectDisposedException)
+            {
+            }
+        }
+    }
+
+    private bool Accept(int target, string path)
+    {
+        try
+        {
+            _pending.Add(new ShrinkRequest(target, path));
+            return true;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException)
+        {
+            return false;
         }
     }
 
