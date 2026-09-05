@@ -97,6 +97,10 @@ public sealed class DecoderPipe : IDisposable
         lock (_gate) _sink = sink;
     }
 
+    private const int MaxForwardCatchupFrames = 3;
+
+    private const int MaxRestartAttemptsPerSeek = 8;
+
     public async Task<DecoderPipeFrame?> SeekAsync(double atSeconds, CancellationToken ct = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -107,6 +111,7 @@ public sealed class DecoderPipe : IDisposable
         var targetIndex = FloorIndex(stamps, atSeconds);
 
         var deadline = DateTime.UtcNow + ForwardWaitTimeout;
+        var restartAttempts = 0;
         while (true)
         {
             bool needRestart;
@@ -118,19 +123,37 @@ public sealed class DecoderPipe : IDisposable
                     return FrameFor(hit, stamps[targetIndex]);
                 }
 
-                needRestart = !_videoAlive || targetIndex < _decodeStartIndex || targetIndex < _decodeCursorIndex - 0;
-                if (_videoAlive && targetIndex >= _decodeStartIndex && targetIndex >= _decodeCursorIndex)
-                    needRestart = false;
+                var canCatchUp = _videoAlive
+                    && targetIndex >= _decodeStartIndex
+                    && targetIndex >= _decodeCursorIndex
+                    && targetIndex - _decodeCursorIndex <= MaxForwardCatchupFrames;
+                needRestart = !canCatchUp;
             }
 
             if (needRestart)
             {
+                if (restartAttempts >= MaxRestartAttemptsPerSeek)
+                {
+                    RaiseFault(
+                        $"arama {MaxRestartAttemptsPerSeek} yeniden baslatmadan sonra kare teslim edemedi, birakiliyor.",
+                        $"seek gave up after {MaxRestartAttemptsPerSeek} restarts without delivering a frame.");
+                    return null;
+                }
                 RestartVideo(targetIndex, stamps);
+                restartAttempts++;
                 deadline = DateTime.UtcNow + ForwardWaitTimeout;
             }
             else if (DateTime.UtcNow >= deadline)
             {
+                if (restartAttempts >= MaxRestartAttemptsPerSeek)
+                {
+                    RaiseFault(
+                        $"arama {MaxRestartAttemptsPerSeek} yeniden baslatmadan sonra kare teslim edemedi, birakiliyor.",
+                        $"seek gave up after {MaxRestartAttemptsPerSeek} restarts without delivering a frame.");
+                    return null;
+                }
                 RestartVideo(targetIndex, stamps);
+                restartAttempts++;
                 deadline = DateTime.UtcNow + ForwardWaitTimeout;
             }
 
@@ -343,7 +366,13 @@ public sealed class DecoderPipe : IDisposable
         };
 
         var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
-        try { process.Start(); StartStderrDrain(process); } catch { return; }
+        try
+        {
+            process.Start();
+            Interlocked.Increment(ref _processesStarted);
+            StartStderrDrain(process);
+        }
+        catch { return; }
 
         lock (_gate) _audioProcess = process;
         var reader = new Thread(() => PumpAudio(process, life.Token, sink)) { IsBackground = true, Name = "vidshrink-audio-pipe" };

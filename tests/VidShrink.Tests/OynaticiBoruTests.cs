@@ -19,12 +19,23 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
     public string? SessizClipPath { get; private set; }
     public string? UzunSessizKlipPath { get; private set; }
 
+    private string? _dir;
+
+    private static string FindRepoRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "VidShrink.sln")))
+            dir = dir.Parent;
+        return dir?.FullName ?? AppContext.BaseDirectory;
+    }
+
     public async Task InitializeAsync()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
 
-        var dir = Path.Combine(Path.GetTempPath(), "vidshrink-calisma", "T175");
+        var dir = Path.Combine(FindRepoRoot(), ".calisma", "T175", "test-klip");
         Directory.CreateDirectory(dir);
+        _dir = dir;
 
         ClipPath = Path.Combine(dir, "sentetik-ses.mkv");
         SessizClipPath = Path.Combine(dir, "sentetik-sessiz.mkv");
@@ -49,7 +60,7 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
 
         // Buyuk cozunurluk + her kare anahtar: skip_frame nokey ile cikan ham veri
         // OS borusunun tampon boyutunu asar, boru surecin canli kalmasini garantiler
-        // (Surec_disaridan_oldurulunce testi icin — kucuk klipte surec Kill'den once biter).
+        // (Surec_disaridan_oldurulunce testi icin — kucuk klipte surec Kill’den once biter).
         await RunFfmpegAsync(new[]
         {
             "-y", "-f", "lavfi", "-i", "testsrc=size=640x480:rate=30:duration=6",
@@ -59,7 +70,14 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
         });
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        if (_dir is not null && Directory.Exists(_dir))
+        {
+            try { Directory.Delete(_dir, recursive: true); } catch { }
+        }
+        return Task.CompletedTask;
+    }
 
     private static async Task RunFfmpegAsync(string[] args)
     {
@@ -159,6 +177,16 @@ public sealed class OynaticiBoruTests_AudioSink
         using var sink = new AudioSink(hasAudio: true);
         sink.Write(new byte[256]);
         sink.Dispose();
+    }
+
+    [Fact]
+    public void BytesToSeconds_format_hizinda_dogru_donusum_yapar()
+    {
+        var birSaniyelikBayt = (long)AudioSink.Format.AverageBytesPerSecond;
+
+        Assert.Equal(1.0, AudioSink.BytesToSeconds(birSaniyelikBayt), 6);
+        Assert.Equal(2.0, AudioSink.BytesToSeconds(birSaniyelikBayt * 2), 6);
+        Assert.NotEqual(1.15, AudioSink.BytesToSeconds(birSaniyelikBayt), 2);
     }
 }
 

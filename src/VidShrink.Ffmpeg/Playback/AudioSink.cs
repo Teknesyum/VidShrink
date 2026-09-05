@@ -44,6 +44,8 @@ public sealed class AudioSink : IDisposable
     public (string Tr, string En)? DeviceFailure =>
         _deviceFailureTr is null ? null : (_deviceFailureTr, _deviceFailureEn!);
 
+    internal static double BytesToSeconds(long bytes) => bytes / (double)Format.AverageBytesPerSecond;
+
     public double PositionSeconds
     {
         get
@@ -52,7 +54,7 @@ public sealed class AudioSink : IDisposable
             {
                 var bytes = Interlocked.Read(ref _bytesWritten) - (_buffer?.BufferedBytes ?? 0);
                 if (bytes < 0) bytes = 0;
-                return bytes / (double)Format.AverageBytesPerSecond;
+                return BytesToSeconds(bytes);
             }
         }
     }
