@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T167",
+  "round": "1",
+  "auditorRunId": "acdf6d089bb56cc78",
+  "dispatchId": "toolu_01AEfebZkAutz6fLWTwVdFyz",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "008d5ada1f37578da8e0ced162f794e3f27c22da3b730b7108d77e4e55b0a924",
+  "transcriptHash": "31ac53057306779bc9457344e0d8ba52df61f684b2c989844fd7ff1f472404bc",
+  "headSha": "21fe47d47d1cac27b6b55e3713f5cbc51cb396aa",
+  "diffHash": "623013c53937f0117e5206b51d75373164f11da455899c3afd0e336ada32a2af",
+  "owns": [
+    "tools/VidShrink.PlayerProbe/VidShrink.PlayerProbe.csproj",
+    "tools/VidShrink.PlayerProbe/Program.cs",
+    "tools/VidShrink.PlayerProbe/AGENTS.md",
+    "docs/olcumler/oynatici-hatti.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim proje kokunde, denetlenen surumun (21fe47d) uzerinde, sozlesme submitted iken kosuldu. verdict: passed, findings: none. Fark tek dosya tek amac: git diff --stat c9d5a59 21fe47d yalniz olcum belgesi, 7 ekleme 4 silme, iki blok (Okuma ve Sonuc); baska satir, sayi ya da iddia oynamadi. Yeni sayi yok: gecen iki sayi da zaten belgedeydi — 51,6 ms taban GRID medyani, 91-141 ms own ortancalari eksi taban (116,3 / 115,0 / 141,1 / 90,7) ve oranlar 2,033 / 2,386 / 2,589 / 2,331 metindeki degerlerle tutuyor. Yon dogru: 51,6 ms yalniz surec acilisi, kalici boru bunun ustune dosya acma, kodcozucu kurulumu ve boru aktarimini da amorti eder, dolayisiyla kazanc alt sinir ve kalan ust sinir; onceki turun kesin iddiasi gitti. K5 etkilenmiyor: tavsiye sutun sayimindan (1 LibVLC / 2 own / 1 berabere) turuyor, izgara ve sayim ayni, 103-138 ms hala dogru, geri-alinabilirlik maddesi guclendi. Kalan karsi-olgu cumlesi yok: tarama uc satir veriyor, ucu de ya olculmus cikarma ya acikca sinir olarak isaretli. owns disina yazim yok: src bos, sln bos, calisma agaci temiz. Verify denetci tarafindan kosuldu: build 0/0, PlayerProbe csproj build 0/0, manset temiz. Onceki denetim k1-vlc'nin gercekten kare icerigini olctugunu, esigin atil oldugunu, pencerenin LibVLC lehine calismadigini, K3'un inandiriciligini, K5 turetimini ve butun sayimlarin ham ciktidan yeniden uretilebildigini zaten dogrulamisti."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T11:32:13.427Z",
+  "usedAt": "2026-09-05T11:32:20.639Z",
+  "completedSha": "21fe47d47d1cac27b6b55e3713f5cbc51cb396aa"
+}

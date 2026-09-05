@@ -1,10 +1,10 @@
 {
  "_map": {
   "schema": 2,
-  "head": "e47974bd2624147921798695bcf19c81b5f6ba1a",
-  "at": "2026-09-05T10:07:52.449Z",
-  "files": 244,
-  "edges": 203
+  "head": "21fe47d47d1cac27b6b55e3713f5cbc51cb396aa",
+  "at": "2026-09-05T11:30:31.913Z",
+  "files": 249,
+  "edges": 210
  },
  "src/VidShrink.App/App.axaml.cs": {
   "lines": 54,
@@ -130,7 +130,7 @@
   ]
  },
  "src/VidShrink.App/Playback/PanelHost.cs": {
-  "lines": 997,
+  "lines": 1024,
   "to": [],
   "ns": [
    "VidShrink.App.Localization",
@@ -221,7 +221,7 @@
   "ext": []
  },
  "src/VidShrink.Core/EncodePlan.cs": {
-  "lines": 142,
+  "lines": 167,
   "to": [],
   "ns": [],
   "from": [],
@@ -281,7 +281,7 @@
   "ext": []
  },
  "src/VidShrink.Core/PlanCalculator.cs": {
-  "lines": 1157,
+  "lines": 1493,
   "to": [],
   "ns": [],
   "from": [],
@@ -1118,8 +1118,20 @@
    "Xunit"
   ]
  },
+ "tests/VidShrink.Tests/ManualOverrideTests.cs": {
+  "lines": 1084,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
  "tests/VidShrink.Tests/OluUyeTests.cs": {
-  "lines": 586,
+  "lines": 740,
   "to": [],
   "ns": [
    "VidShrink.Core"
@@ -1217,6 +1229,20 @@
   "from": [],
   "ext": [
    "Xunit"
+  ]
+ },
+ "tests/VidShrink.Tests/PlaybackResumeTests.cs": {
+  "lines": 575,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Playback",
+   "VidShrink.Core",
+   "VidShrink.Core.Playback",
+   "VidShrink.Ffmpeg.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
   ]
  },
  "tests/VidShrink.Tests/PreviewSegmentTests.cs": {
@@ -1817,12 +1843,45 @@
    "System"
   ]
  },
+ "tools/VidShrink.CoverageProbe/kapsam.py": {
+  "lines": 73,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "io"
+  ]
+ },
  "tools/VidShrink.Manifest/Program.cs": {
   "lines": 193,
   "to": [],
   "ns": [],
   "from": [],
   "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.PlanBaseline/Program.cs": {
+  "lines": 68,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.PlayerProbe/Program.cs": {
+  "lines": 605,
+  "to": [],
+  "ns": [
+   "VidShrink.Ffmpeg"
+  ],
+  "from": [],
+  "ext": [
+   "LibVLCSharp",
+   "NAudio",
    "System"
   ]
  },
