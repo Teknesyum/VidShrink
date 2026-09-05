@@ -708,6 +708,315 @@ public sealed class ManualOverrideTests
         Assert.DoesNotContain(cozunurluk.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionUnmet);
     }
 
+    // --- H1/H2: sekiz kalemin kalem kalem taramasi ---
+    //
+    // Her kalem icin sorulan soru: bu kalem hangi kosulda karsilanamaz, ve o kosulda plan
+    // bunu soyluyor mu? Taramanin tamami docs/olcumler/elle-gecersiz-kilma.md'deki
+    // tabloda; asagidaki kollar o tablonun "hangi olcu tutuyor" sutunudur.
+
+    private static MediaInfo SessizKaynak() => new()
+    {
+        FilePath = "sessiz.mp4",
+        FileSizeBytes = 500L * 1024 * 1024,
+        DurationSeconds = 120,
+        Width = 1920,
+        Height = 1080,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 35_000_000,
+        AudioCodec = null,
+        AudioBitrateBps = 0,
+        AudioChannels = 0
+    };
+
+    [Fact]
+    public void H1_SessizKaynaktaSesHedefiKarsilanmadiDeniyor()
+    {
+        var info = SessizKaynak();
+        Assert.False(info.HasAudio);
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedAudioKbps = 96 }, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"sessiz kaynak + LockedAudioKbps=96 -> ses {result.Plan.AudioBitrateK}k codec={result.Plan.AudioCodec ?? "-"}");
+        _output.WriteLine($"args: {args}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateUnmet);
+        Assert.Equal("96", not.ManualOverrideValue);
+        Assert.Equal("kaynakta ses akisi yok", not.EngineWouldHaveChosen);
+        Assert.Contains(not.EngineWouldHaveChosen!, result.Plan.Reason);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateOverride);
+        Assert.Equal(0, result.Plan.AudioBitrateK);
+        Assert.Null(result.Plan.AudioCodec);
+        Assert.Contains("-an", args);
+        Assert.DoesNotContain("-b:a", args);
+    }
+
+    [Theory]
+    [InlineData(AudioChannelOverride.Stereo)]
+    [InlineData(AudioChannelOverride.Mono)]
+    [InlineData(AudioChannelOverride.None)]
+    public void H1_SessizKaynaktaSesKanaliKarsilanmadiDeniyor(AudioChannelOverride kanal)
+    {
+        var info = SessizKaynak();
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, AudioChannels = kanal }, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"sessiz kaynak + AudioChannels={kanal} -> kanal {result.Plan.AudioChannels?.ToString() ?? "kaynak"} codec={result.Plan.AudioCodec ?? "-"}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsUnmet);
+        Assert.Equal(kanal.ToString(), not.ManualOverrideValue);
+        Assert.Equal("kaynakta ses akisi yok", not.EngineWouldHaveChosen);
+        Assert.Contains(not.EngineWouldHaveChosen!, result.Plan.Reason);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsOverride);
+        Assert.Null(result.Plan.AudioChannels);
+        Assert.Contains("-an", args);
+        Assert.DoesNotContain("-ac", args);
+    }
+
+    /// <summary>
+    /// H1 negatif kontrolu: ses akisi olan kaynakta "karsilanmadi" notu yazilmamali.
+    /// Bu kol olmadan H1 duzeltmesi kosulsuz Unmet yazarak yesile donebilirdi.
+    /// </summary>
+    [Fact]
+    public void H1_SesliKaynaktaKarsilanmadiNotuYazilmiyor()
+    {
+        var info = Info();
+        Assert.True(info.HasAudio);
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedAudioKbps = 96, AudioChannels = AudioChannelOverride.Mono }, null, AllWorking());
+
+        _output.WriteLine($"sesli kaynak + 96k/Mono -> ses {result.Plan.AudioBitrateK}k kanal {result.Plan.AudioChannels}");
+
+        Assert.Equal(96, result.Plan.AudioBitrateK);
+        Assert.Equal(1, result.Plan.AudioChannels);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateUnmet);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsUnmet);
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateOverride);
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsOverride);
+    }
+
+    [Fact]
+    public void H2_SesHedefiKanalNoneIleCelistigindeHangisiKazandiYaziliyor()
+    {
+        var info = Info();
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedAudioKbps = 96, AudioChannels = AudioChannelOverride.None }, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"96k + None -> ses {result.Plan.AudioBitrateK}k codec={result.Plan.AudioCodec ?? "-"}");
+        _output.WriteLine($"args: {args}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateSupersededByChannels);
+        Assert.Equal("96", not.ManualOverrideValue);
+        Assert.Equal("ses kanali=None", not.EngineWouldHaveChosen);
+        Assert.Contains(not.EngineWouldHaveChosen!, result.Plan.Reason);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateOverride);
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsOverride);
+        Assert.Equal(0, result.Plan.AudioBitrateK);
+        Assert.Contains("-an", args);
+        Assert.DoesNotContain("96k", args);
+    }
+
+    [Fact]
+    public void H2_CrfKipIleCelistigindeCrfKazandigiYaziliyor()
+    {
+        var info = Info();
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 19, LockedMode = EncodeMode.TwoPass };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"LockedCrf=19 + LockedMode=TwoPass -> kip={result.Plan.Mode} crf={result.Plan.Crf}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualModeSupersededByCrf);
+        Assert.Equal("TwoPass", not.ManualOverrideValue);
+        Assert.Equal("crf", not.EngineWouldHaveChosen);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualModeOverride);
+        Assert.Equal("crf", result.Plan.Mode);
+        Assert.Equal(19, result.Plan.Crf);
+        Assert.Contains("-crf 19", args);
+    }
+
+    /// <summary>
+    /// H2 negatif kontrolu: iki kalem ayni seyi istiyorsa celiski notu yazilmamali.
+    /// </summary>
+    [Fact]
+    public void H2_CrfKipIleUyumluysaCelismeNotuYok()
+    {
+        var info = Info();
+        var uyumlu = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 19, LockedMode = EncodeMode.Crf }, null, AllWorking());
+        var yalnizCrf = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 19 }, null, AllWorking());
+
+        _output.WriteLine($"crf+Crf -> {uyumlu.Plan.Mode}/{uyumlu.Plan.Crf}; yalniz crf -> {yalnizCrf.Plan.Mode}/{yalnizCrf.Plan.Crf}");
+
+        Assert.DoesNotContain(uyumlu.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualModeSupersededByCrf);
+        Assert.DoesNotContain(yalnizCrf.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualModeSupersededByCrf);
+    }
+
+    [Fact]
+    public void H2_KodekKilidiKodlayiciYoluIleCelistigindeKodekKazandigiYaziliyor()
+    {
+        var info = Info();
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCodec = "libx264", EncoderPath = EncoderPathOverride.Hardware };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"LockedCodec=libx264 + EncoderPath=Hardware -> codec={result.Plan.Codec}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathSupersededByCodec);
+        Assert.Equal("Hardware", not.ManualOverrideValue);
+        Assert.Equal("libx264", not.EngineWouldHaveChosen);
+        Assert.Equal("libx264", result.Plan.Codec);
+        Assert.False(CodecModel.IsHardware(result.Plan.Codec));
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathOverride);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathUnmet);
+        Assert.Contains("-c:v libx264", args);
+    }
+
+    /// <summary>
+    /// H2 negatif kontrolu: kilitlenen kodek istenen yoldaysa celiski yoktur, not yazilmaz.
+    /// </summary>
+    [Fact]
+    public void H2_KodekKilidiKodlayiciYoluIleUyumluysaCelismeNotuYok()
+    {
+        var info = Info();
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCodec = "hevc_nvenc", EncoderPath = EncoderPathOverride.Hardware }, null, AllWorking());
+
+        _output.WriteLine($"LockedCodec=hevc_nvenc + EncoderPath=Hardware -> codec={result.Plan.Codec}");
+
+        Assert.True(CodecModel.IsHardware(result.Plan.Codec));
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathSupersededByCodec);
+    }
+
+    [Theory]
+    [InlineData(4.0, 10)]
+    [InlineData(60.0, 45)]
+    public void H1_KodekAraliginiAsanCrfKirpildigiYaziliyor(double istenen, int beklenen)
+    {
+        var info = Info();
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = istenen };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"codec={result.Plan.Codec} aralik={CodecModel.CrfRange(result.Plan.Codec)} istek={istenen} -> crf={result.Plan.Crf}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        Assert.Equal("libx264", result.Plan.Codec);
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualCrfClamped);
+        Assert.Equal(istenen.ToString("0.##", CultureInfo.InvariantCulture), not.ManualOverrideValue);
+        Assert.Equal("10-45", not.EngineWouldHaveChosen);
+        Assert.Equal(beklenen, (int)Math.Round(not.Crf));
+        Assert.Equal(beklenen, result.Plan.Crf);
+        Assert.Contains($"-crf {beklenen}", args);
+        Assert.Contains("karsilanmadi", result.Plan.Reason);
+        Assert.DoesNotContain($"kullanici CRF'i {beklenen} olarak sabitledi", result.Plan.Reason);
+        Assert.Contains($"plan kirpilmis CRF {beklenen} ile cikiyor", result.Plan.Reason);
+    }
+
+    /// <summary>
+    /// H1 negatif kontrolu: aralik icindeki CRF istegi "kirpildi" diye yazilmamali.
+    /// </summary>
+    [Fact]
+    public void H1_AraliktakiCrfKirpilmaNotuUretmiyor()
+    {
+        var info = Info();
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 19 }, null, AllWorking());
+
+        _output.WriteLine($"istek 19 -> crf={result.Plan.Crf}");
+        Assert.Equal(19, result.Plan.Crf);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualCrfClamped);
+        Assert.Contains("kullanici CRF'i 19 olarak sabitledi", result.Plan.Reason);
+    }
+
+    [Fact]
+    public void H1_TurboIlkGecisteOnAyarinGevsedigiYaziliyor()
+    {
+        var info = Info();
+        var options = new PlanOptions
+        {
+            TargetMb = 25,
+            Codec = CodecPreference.Compatible,
+            SpeedMode = SpeedMode.Fast,
+            LockedCodec = "libx265",
+            LockedPreset = "veryslow",
+            LockedMode = EncodeMode.TwoPass
+        };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var ilkGecis = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 1, "log"));
+        var ikinciGecis = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 2, "log"));
+
+        _output.WriteLine($"codec={result.Plan.Codec} turbo={result.Plan.TurboFirstPass} preset={result.Plan.Preset}");
+        _output.WriteLine($"1. gecis: {ilkGecis}");
+        _output.WriteLine($"2. gecis: {ikinciGecis}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        Assert.True(result.Plan.TurboFirstPass, "turbo ilk gecis kapaliysa bu senaryo bir sey olcmez");
+        Assert.Equal("2pass", result.Plan.Mode);
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualPresetFirstPassRelaxed);
+        Assert.Equal("veryslow", not.ManualOverrideValue);
+        Assert.Equal("veryfast", not.EngineWouldHaveChosen);
+        Assert.Contains("-preset veryfast", ilkGecis);
+        Assert.Contains("-preset veryslow", ikinciGecis);
+    }
+
+    /// <summary>
+    /// H1 negatif kontrolu: turbo kapaliyken sabitlenen on ayar iki geciste de gecerlidir
+    /// ve gevseme notu yazilmaz.
+    /// </summary>
+    [Fact]
+    public void H1_TurboKapaliykenOnAyarIkiGecisteDeGecerli()
+    {
+        var info = Info();
+        var options = new PlanOptions
+        {
+            TargetMb = 25,
+            Codec = CodecPreference.Compatible,
+            SpeedMode = SpeedMode.Quality,
+            LockedCodec = "libx265",
+            LockedPreset = "veryslow",
+            LockedMode = EncodeMode.TwoPass
+        };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var ilkGecis = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 1, "log"));
+        var ikinciGecis = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 2, "log"));
+
+        _output.WriteLine($"turbo={result.Plan.TurboFirstPass}; iki gecisin on ayari ayni olmali");
+
+        Assert.False(result.Plan.TurboFirstPass);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualPresetFirstPassRelaxed);
+        Assert.Contains("-preset veryslow", ilkGecis);
+        Assert.Contains("-preset veryslow", ikinciGecis);
+    }
+
+    /// <summary>
+    /// H1 taramasinin "on ayar" satirinin kaniti: kodek kilidiyle secilen her kodlayicida
+    /// sabitlenen on ayar ciktinin uretildigi geciste komut satirinda gorunuyor. Bir
+    /// kodlayicida on ayar dusuruluyorsa bu kol duser.
+    /// </summary>
+    [Theory]
+    [InlineData("libx264", "veryslow")]
+    [InlineData("libx265", "slower")]
+    [InlineData("libsvtav1", "3")]
+    [InlineData("h264_nvenc", "p7")]
+    [InlineData("hevc_nvenc", "p6")]
+    [InlineData("av1_nvenc", "p5")]
+    public void H1_SabitlenenOnAyarHerKodlayicidaCiktiGecisindeGorunuyor(string kodek, string onAyar)
+    {
+        var info = Info();
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Fast, LockedCodec = kodek, LockedPreset = onAyar };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var pass = result.Plan.ModeEnum == EncodeMode.TwoPass ? 2 : 0;
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", pass, pass == 2 ? "log" : null));
+
+        _output.WriteLine($"| {kodek} | {onAyar} | -preset {result.Plan.Preset} | kip={result.Plan.Mode} |");
+
+        Assert.Equal(kodek, result.Plan.Codec);
+        Assert.Equal(onAyar, result.Plan.Preset);
+        Assert.Contains($"-preset {onAyar}", args);
+    }
+
     // --- K5: kapali kalanlar disaridan degistirilemiyor ---
 
     private static readonly HashSet<string> IzinliPlanOptionsAlanlari = new()

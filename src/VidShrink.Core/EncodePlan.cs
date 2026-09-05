@@ -52,14 +52,21 @@ public enum ReasonCode
     ManualModeOverride,
     ManualCrfOverride,
     ManualPresetOverride,
+    ManualCrfClamped,
+    ManualModeSupersededByCrf,
+    ManualPresetFirstPassRelaxed,
     ManualAudioBitrateOverride,
+    ManualAudioBitrateUnmet,
+    ManualAudioBitrateSupersededByChannels,
     ManualAudioChannelsOverride,
+    ManualAudioChannelsUnmet,
     ManualMinResolutionOverride,
     ManualMinResolutionUnmet,
     ManualMinFpsOverride,
     ManualMinFpsUnmet,
     ManualEncoderPathOverride,
     ManualEncoderPathUnmet,
+    ManualEncoderPathSupersededByCodec,
     ManualOverrideDroppedOnPassThrough
 }
 

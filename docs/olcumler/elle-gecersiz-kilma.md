@@ -1,13 +1,15 @@
 # Elle geçersiz kılma — ölçümler
 
-T165, tur 3. Tur 1 bağımsız denetimde `verdict: failed` döndü ve belge baştan yazıldı;
-tur 2 denetimi dört bulgu (F1-F4) döndürdü ve bu sürüm onları kapatıyor.
+T165, tur 4. Tur 1 bağımsız denetimde `verdict: failed` döndü ve belge baştan yazıldı;
+tur 2 denetimi dört bulgu (F1-F4), tur 3 denetimi dört bulgu daha (H1-H4) döndürdü.
+Bu sürüm H1-H4'ü kapatıyor.
 
 Ölçü dosyası: `tests/VidShrink.Tests/ManualOverrideTests.cs`.
 Ham çıktı: `dotnet test -c Release --filter "FullyQualifiedName~ManualOverrideTests" --logger "console;verbosity=detailed"`.
 
-Bu belgedeki ham çıktının tamamı belgenin kendi içinde; `.calisma/` altına atıf yok
-(F4: `.calisma/` `.gitignore`da, dal birleşince kanıt kaybolur).
+Bu belgedeki ham çıktının tamamı belgenin kendi içinde; kanıt olarak `.calisma/` altına
+atıf yok (F4: `.calisma/` `.gitignore`da, dal birleşince kanıt kaybolur). `.calisma/`
+yalnız aşağıdaki tarifte **geçici dizin** olarak geçiyor; oradan hiçbir sayı okunmuyor.
 
 ---
 
@@ -17,34 +19,67 @@ Beklenen değerler bu ağaçtan değil, **T165 öncesi motordan** ölçüldü ve
 ölçüm gerçekten koşuldu (F3: tur 2'de iddia doğruydu ama gösterilen kanıt aynı süreçten
 çıkıyordu, iki motoru ayırt edemiyordu).
 
-Taban koşumu şöyle üretildi — depoya girmeyen, tek kullanımlık bir düzenek:
+Taban koşumunu üreten düzenek **depoda**: `tools/VidShrink.PlanBaseline` (H3; tur 3'te
+düzenek "tek kullanımlık" diye atılmıştı, AGENTS.md ise ölçümü üreten düzeneğin `tools/`a
+taşınmasını istiyor). Tarif ve alan listesi `tools/VidShrink.PlanBaseline/AGENTS.md`de.
+
+Girdi eksiksiz — beş bileşimin `MediaInfo` alanlarının hepsi, `ManualOverrideTests.Info()`
+ile birebir aynı:
+
+| alan | değer |
+|---|---|
+| `FilePath` | `sample.mp4` |
+| `FileSizeBytes` | 500 MB (`500L * 1024 * 1024`) |
+| `DurationSeconds` | bileşime göre 120 / 300 / 45 / 600 / 30 |
+| `Width` x `Height` @ `Fps` | bileşime göre (tablodaki kaynak sütunu) |
+| `VideoCodec` | `h264` |
+| `TotalBitrateBps` | `35_000_000` |
+| `AudioCodec` | `aac` |
+| `AudioBitrateBps` | `128_000` |
+| `AudioChannels` | `2` |
+
+`PlanOptions`ta yalnız `TargetMb` ve `Codec = Auto` var; hiçbir `Locked*` alanı
+kullanılmıyor — bu yüzden düzenek T165 öncesi ağaçta da derleniyor. Kodlayıcı yoklaması
+`AllWorking`: altı kodlayıcının altısı da çalışır durumda.
+
+Koşum (bu ağaç ve 9b092e9, ayrı çalışma ağacı):
 
 ```
-git archive 9b092e9 src/VidShrink.Core > taban.tar     # T165'in ebeveyni, sözleşme öncesi motor
-tar -xf taban.tar -C <ayri-dizin>                      # yalnız Core; bağımlılığı yok
-# <ayri-dizin>/harness: net8.0 konsol projesi, VidShrink.Core'a ProjectReference,
-# aynı beş bileşimi FakeAvailability(hepsi Working) ile koşup tek satır basıyor
-dotnet run --project harness -c Release
+dotnet run -c Release --project tools/VidShrink.PlanBaseline
+
+git worktree add .calisma/taban 9b092e9
+cp -r tools/VidShrink.PlanBaseline .calisma/taban/tools/
+dotnet run -c Release --project .calisma/taban/tools/VidShrink.PlanBaseline
+git worktree remove .calisma/taban --force
 ```
 
-Ayrı dizindeki ağacın gerçekten T165 öncesi olduğu doğrulandı: o `PlanOptions` içinde
-`LockedCrf`, `LockedMode`, `LockedPreset`, `LockedAudioKbps`, `AudioChannels`,
-`MinResolutionHeight`, `MinFps`, `EncoderPath` alanlarının **hiçbiri yok**.
-
-Taban koşumunun ham çıktısı (T165 öncesi motor, ayrı dizin):
+Ham çıktı — **bu ağaç** (T165 tur 4):
 
 ```
-1920x1080@30 -> 25MB
-  taban (9b092e9): libsvtav1|2pass|1567k|crf=-|1920x1080@30|ses 128k/kaynak|preset 6
-1280x720@24 -> 8MB
-  taban (9b092e9): libsvtav1|2pass|188k|crf=-|1202x676@24|ses 26k/1|preset 6
-3840x2160@60 -> 50MB
-  taban (9b092e9): libsvtav1|2pass|9016k|crf=-|3840x2160@60|ses 128k/kaynak|preset 6
-1920x1080@30 -> 6MB
-  taban (9b092e9): libsvtav1|2pass|80k|crf=-|690x388@30|ses 0k/kaynak|preset 6
-1280x720@30 -> 100MB
-  taban (9b092e9): libx264|2pass|27305k|crf=-|1280x720@30|ses 128k/kaynak|preset slow
+# VidShrink.PlanBaseline
+# kaynak|hedefMB -> kodek|kip|videoK|crf|WxH@fps|sesK/kanal|preset
+1920x1080@30|25 -> libsvtav1|2pass|1567k|crf=-|1920x1080@30|ses 128k/kaynak|preset 6
+1280x720@24|8 -> libsvtav1|2pass|188k|crf=-|1202x676@24|ses 26k/1|preset 6
+3840x2160@60|50 -> libsvtav1|2pass|9016k|crf=-|3840x2160@60|ses 128k/kaynak|preset 6
+1920x1080@30|6 -> libsvtav1|2pass|80k|crf=-|690x388@30|ses 0k/kaynak|preset 6
+1280x720@30|100 -> libx264|2pass|27305k|crf=-|1280x720@30|ses 128k/kaynak|preset slow
 ```
+
+Ham çıktı — **ayrı çalışma ağacı, 9b092e9** (T165'in ebeveyni, sözleşme öncesi motor):
+
+```
+# VidShrink.PlanBaseline
+# kaynak|hedefMB -> kodek|kip|videoK|crf|WxH@fps|sesK/kanal|preset
+1920x1080@30|25 -> libsvtav1|2pass|1567k|crf=-|1920x1080@30|ses 128k/kaynak|preset 6
+1280x720@24|8 -> libsvtav1|2pass|188k|crf=-|1202x676@24|ses 26k/1|preset 6
+3840x2160@60|50 -> libsvtav1|2pass|9016k|crf=-|3840x2160@60|ses 128k/kaynak|preset 6
+1920x1080@30|6 -> libsvtav1|2pass|80k|crf=-|690x388@30|ses 0k/kaynak|preset 6
+1280x720@30|100 -> libx264|2pass|27305k|crf=-|1280x720@30|ses 128k/kaynak|preset slow
+```
+
+İki çıktı satır satır aynı. 9b092e9 ağacının gerçekten T165 öncesi olduğu doğrulandı:
+o `PlanOptions` içinde `LockedCrf`, `LockedMode`, `LockedPreset`, `LockedAudioKbps`,
+`AudioChannels`, `MinResolutionHeight`, `MinFps`, `EncoderPath` alanlarının **hiçbiri yok**.
 
 Bu on satır `K1_VarsayilanT165OncesiMotorlaBirebirAyni`'ye `InlineData` olarak
 sabitlendi. Karşılaştırma iki farklı motor arasında.
@@ -401,6 +436,148 @@ sözleşmenin işi.
 
 ---
 
+## H1 — Sekiz kalemin kalem kalem taraması
+
+Aynı kusur sınıfı — *karşılanmamış isteği sessizce düşürmek* — bu sözleşmede dört ayrı
+giriş noktasında çıktı (D2 kodlayıcı yolu, D3 kopyalama yolu, F2 tabanlar, H1 ses).
+Tur 4'te tek tek kovalamak bırakıldı: **sekiz kalemin her biri** için soru soruldu —
+bu kalem hangi koşulda karşılanamaz, ve o koşulda plan bunu söylüyor mu?
+
+Tarama sekiz kalemi de kapsıyor ve **beş yeni açık koşul** buldu (tabloda ⚠ ile).
+Hepsi kapatıldı.
+
+| # | kalem | karşılanamayacağı koşul | önce plan ne diyordu | şimdi | ölçü |
+|---|---|---|---|---|---|
+| 1 | EncodeMode | `LockedCrf` de verilmiş (CRF öncelikli, `else if` kip dalını hiç görmüyor) ⚠ | hiçbir şey | `ManualModeSupersededByCrf` | `H2_CrfKipIleCelistigindeCrfKazandigiYaziliyor` |
+| 1 | EncodeMode | plan zaten istenen kipte | not yok (D4 gereği doğru; istek etkisiz) | değişmedi | `H2_CrfKipIleUyumluysaCelismeNotuYok` |
+| 1 | EncodeMode | kopyalama yolu | yol `HasReencodeOverride` ile kapanıyor, istek uygulanıyor | değişmedi | `D3_KopyaYolundaYenidenKodlamaIsteyenGecersizKilmaUygulaniyor(kip)` |
+| 2 | CRF değeri | istenen değer kodeğin `CrfRange` aralığının dışında (x264 10-45, av1 18-55) ⚠ | `Math.Clamp` sessizce kırpıyor **ve** gerekçe kırpılmış değeri "kullanıcı sabitledi" diye yazıyordu | `ManualCrfClamped`; cümle de "plan kırpılmış CRF ... ile çıkıyor"a döndü | `H1_KodekAraliginiAsanCrfKirpildigiYaziliyor` (2 kol) |
+| 2 | CRF değeri | aralık içindeyse | — | kırpma notu yazılmıyor | `H1_AraliktakiCrfKirpilmaNotuUretmiyor` |
+| 3 | preset / hız | geçersiz ad | `ArgumentException` fırlıyor — sessiz değil | değişmedi | `PlanCalculator.cs:LockedPreset` dalı, `IsValidPreset` |
+| 3 | preset / hız | turbo ilk geçiş (`SpeedMode.Fast` + libx265 + 2pass) birinci geçişi tavana indiriyor ⚠ | hiçbir şey | `ManualPresetFirstPassRelaxed` | `H1_TurboIlkGecisteOnAyarinGevsedigiYaziliyor` |
+| 3 | preset / hız | turbo kapalıyken | iki geçişte de kullanıcının ön ayarı | değişmedi | `H1_TurboKapaliykenOnAyarIkiGecisteDeGecerli` |
+| 3 | preset / hız | **başka koşul yok** — altı kodlayıcının altısında da çıktı geçişinde görünüyor | — | — | `H1_SabitlenenOnAyarHerKodlayicidaCiktiGecisindeGorunuyor` (6 kol) |
+| 4 | ses hedefi (kbps) | kaynakta ses akışı yok (`HasAudio == false`) ⚠ | hiçbir şey; `HasReencodeOverride` kopyalama yolunu da kapattığı için `AddPassThroughDropNotes` de koşmuyordu | `ManualAudioBitrateUnmet` | `H1_SessizKaynaktaSesHedefiKarsilanmadiDeniyor` |
+| 4 | ses hedefi (kbps) | aynı anda `AudioChannels = None` ⚠ | "96 kbps sabitlendi" diyip sesi atıyordu | `ManualAudioBitrateSupersededByChannels` | `H2_SesHedefiKanalNoneIleCelistigindeHangisiKazandiYaziliyor` |
+| 5 | ses kanalı | kaynakta ses akışı yok ⚠ | hiçbir şey | `ManualAudioChannelsUnmet` | `H1_SessizKaynaktaSesKanaliKarsilanmadiDeniyor` (3 kol) |
+| 5 | ses kanalı | kaynak mono iken `Stereo` isteniyor | istek karşılanıyor: `-ac 2`, ffmpeg upmix ediyor | değişmedi | `K2_...(ses-stereo)` |
+| 6 | çözünürlük tabanı | taban kaynağın üstünde (motor yukarı ölçeklemiyor) | F2'de kapatıldı | `ManualMinResolutionUnmet` | `F2_KaynagiAsanCozunurlukTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor` |
+| 6 | çözünürlük tabanı | kopyalama yolu | D3'te kapatıldı | `ManualOverrideDroppedOnPassThrough` | `D3_KopyaYolundaUygulanamayanIstekSessizceDusmuyor` |
+| 7 | kare hızı tabanı | taban kaynağın üstünde | F2'de kapatıldı | `ManualMinFpsUnmet` | `F2_KaynagiAsanFpsTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor` |
+| 7 | kare hızı tabanı | kopyalama yolu | D3'te kapatıldı | `ManualOverrideDroppedOnPassThrough` | `D3_KopyaYolundaUygulanamayanIstekSessizceDusmuyor` |
+| 8 | kodlayıcı yolu | makinede o yolda çalışan kodlayıcı yok | D2'de kapatıldı | `ManualEncoderPathUnmet` | `D2_DonanimYokkenIstekKarsilanmadiDeniyor` |
+| 8 | kodlayıcı yolu | aynı anda `LockedCodec` verilmiş ve kilitli kodek karşı yolda ⚠ | hiçbir şey — `lockedCodec is null` kapısı bütün bloğu atlıyordu | `ManualEncoderPathSupersededByCodec` | `H2_KodekKilidiKodlayiciYoluIleCelistigindeKodekKazandigiYaziliyor` |
+| 8 | kodlayıcı yolu | kopyalama yolu | D3'te kapatıldı | `ManualOverrideDroppedOnPassThrough` | `D3_KopyaYolundaUygulanamayanIstekSessizceDusmuyor` |
+
+**"Karşılanamayacağı koşul yok" diyen tek satır 3. kalemin son satırı** ve iddia değil,
+ölçü: `H1_SabitlenenOnAyarHerKodlayicidaCiktiGecisindeGorunuyor` altı kodlayıcıyı tek tek
+koşuyor ve her birinde sabitlenen ön ayarın komut satırında olduğunu doğruluyor. Ham çıktı:
+
+```
+| hevc_nvenc | p6 | -preset p6 | kip=2pass |
+| av1_nvenc | p5 | -preset p5 | kip=2pass |
+| libx264 | veryslow | -preset veryslow | kip=2pass |
+| libx265 | slower | -preset slower | kip=2pass |
+| libsvtav1 | 3 | -preset 3 | kip=2pass |
+| h264_nvenc | p7 | -preset p7 | kip=2pass |
+```
+
+Sessiz kaynakta ses hedefi — ham çıktı:
+
+```
+sessiz kaynak + LockedAudioKbps=96 -> ses 0k codec=-
+args: ffmpeg -hide_banner -y -hwaccel auto -i sessiz.mp4 -vf scale=1690:950:flags=lanczos
+      -c:v libx264 -preset slow -b:v 1695k -maxrate 2542k -bufsize 3390k -g 300
+      -keyint_min 30 -pix_fmt yuv420p -an -movflags +faststart out.mp4
+gerekce: kullanici ses hedefini 96kbps olarak sabitledi ama kaynakta ses akisi yok;
+         istek karsilanmadi, cikti sessiz; ...
+```
+
+Sessiz kaynakta ses kanalı — üç halin ham çıktısı:
+
+```
+sessiz kaynak + AudioChannels=Stereo -> kanal kaynak codec=-
+gerekce: kullanici ses kanalini Stereo olarak sabitledi ama kaynakta ses akisi yok; ...
+sessiz kaynak + AudioChannels=Mono -> kanal kaynak codec=-
+gerekce: kullanici ses kanalini Mono olarak sabitledi ama kaynakta ses akisi yok; ...
+sessiz kaynak + AudioChannels=None -> kanal kaynak codec=-
+gerekce: kullanici ses kanalini None olarak sabitledi ama kaynakta ses akisi yok; ...
+```
+
+Aralık dışı CRF — ham çıktı (kırpma notu **önce**, uygulanan değeri anlatan cümle sonra):
+
+```
+codec=libx264 aralik=(10, 45) istek=4 -> crf=10
+gerekce: ... istenen CRF 4 libx264 icin gecerli 10-45 araliginin disinda; istek
+         karsilanmadi ve aralik ucuna, CRF 10'e kirpildi; plan kirpilmis CRF 10 ile
+         cikiyor; hedef boyut artik zorlanmiyor, 82097k yalniz bir tahmin — motor
+         2pass kipinde 2pass@1567k secmisti
+codec=libx264 aralik=(10, 45) istek=60 -> crf=45
+gerekce: ... istenen CRF 60 libx264 icin gecerli 10-45 araliginin disinda; istek
+         karsilanmadi ve aralik ucuna, CRF 45'e kirpildi; plan kirpilmis CRF 45 ile
+         cikiyor; ...
+```
+
+Turbo ilk geçiş — iki geçişin ham komut satırı:
+
+```
+codec=libx265 turbo=True preset=veryslow
+1. gecis: ... -c:v libx265 -preset veryfast -b:v 1567k ... -pass 1 ...
+2. gecis: ... -c:v libx265 -preset veryslow -b:v 1567k ... -pass 2 ...
+gerekce: ... kullanici on ayari veryslow olarak sabitledi; motor slow secmisti;
+         turbo ilk gecis libx265 icin birinci gecisi veryfast ile kosuyor; sabitlenen
+         veryslow yalniz ciktinin uretildigi ikinci geciste gecerli
+```
+
+---
+
+## H2 — Kalemler arası çelişki: hangisinin kazandığı yazılıyor
+
+İki kalem birbirini geçersiz kıldığında plan artık **hangisinin kazandığını** söylüyor.
+Üç çelişki bulundu; üçü de aynı kalıpta kapatıldı (`...SupersededBy...` sebep kodu,
+kaybeden isteğin değeri `ManualOverrideValue`da, kazananın adı `EngineWouldHaveChosen`de).
+
+| çelişki | kazanan | önce | sonra | negatif kontrol |
+|---|---|---|---|---|
+| `LockedAudioKbps` + `AudioChannels = None` | kanal isteği (çıktı sessiz) | "96 kbps sabitlendi" + `-an` | `ManualAudioBitrateSupersededByChannels` | `H1_SesliKaynaktaKarsilanmadiNotuYazilmiyor` |
+| `LockedCrf` + `LockedMode` (kip ≠ Crf) | CRF | kip isteği hiç görülmüyordu | `ManualModeSupersededByCrf` | `H2_CrfKipIleUyumluysaCelismeNotuYok` |
+| `LockedCodec` + `EncoderPath` (kilitli kodek karşı yolda) | kodek kilidi | yol isteği hiç görülmüyordu | `ManualEncoderPathSupersededByCodec` | `H2_KodekKilidiKodlayiciYoluIleUyumluysaCelismeNotuYok` |
+
+Ham çıktı:
+
+```
+96k + None -> ses 0k codec=-
+args: ... -c:v libx264 -preset slow -b:v 1695k ... -an -movflags +faststart out.mp4
+gerekce: kullanici ses hedefini 96kbps olarak sabitledi ama ayni anda ses kanali=None
+         dedi; kanal istegi kazandi, cikti sessiz ve 96kbps uygulanmadi; kullanici ses
+         kanalini None olarak sabitledi; motor source secmisti; ...
+
+LockedCrf=19 + LockedMode=TwoPass -> kip=crf crf=19
+gerekce: ... kullanici CRF'i 19 olarak sabitledi; hedef boyut artik zorlanmiyor, 29026k
+         yalniz bir tahmin — motor 2pass kipinde 2pass@1567k secmisti; kullanici kodlama
+         kipini TwoPass olarak da sabitlemisti ama acik CRF sayisi onceliklidir; kip crf
+         oldu ve TwoPass istegi uygulanmadi
+
+LockedCodec=libx264 + EncoderPath=Hardware -> codec=libx264
+gerekce: kullanici kodlayici yolunu Hardware olarak sabitledi ama ayni anda kodegi
+         libx264 olarak kilitledi; kodek kilidi onceliklidir, yol istegi uygulanmadi ve
+         kullanilan libx264; ...
+```
+
+Negatif kontroller boş değil: M20 (koşulsuz "karşılanmadı") on iki kolu, M21 (koşulsuz
+kırpma notu) ve M22 (yol/kodek uyumunu denetlemeyen not) birer kolu düşürüyor.
+
+---
+
+## H4 — Üst üste iki docstring
+
+`PlanCalculator.cs`te `WithoutManualFloors`un başında iki `<summary>` bloğu üst üste
+duruyordu; birincisi `EffectiveFloors`a aitti ve o metot belgesiz kalmıştı. Birinci blok
+`EffectiveFloors`ın başına taşındı, ikincisi `WithoutManualFloors`ta kaldı. İki metodun
+da tek ve kendi docstring'i var.
+
+---
+
 ## D5 / D6 — Üç boş ölçü ve dayanaksız kanıt
 
 | tur 1'deki boş ölçü | yerine ne var | hangi mutasyon düşürüyor |
@@ -441,8 +618,12 @@ RegimeFloors: MinScale, MinHeight, MinFps
 
 ## K6 — Mutasyon ızgarası
 
-On iki mutasyon, her birinden önce `dotnet build -c Release --no-incremental`;
-`--no-build` kullanılmadı. Ham çıktı bu bölümün sonunda, tam metniyle.
+Yirmi iki mutasyon, her birinden önce `dotnet build -c Release --no-incremental`;
+`--no-build` kullanılmadı. M1-M12 tur 3'ün, M13-M22 tur 4'ün. Tur 3'ün ham çıktısı bu
+bölümün sonunda; tur 4'ünki M22'den sonraki blokta.
+
+M8 tur 4'te yeniden koşuldu: ses bloğu H1 için yeniden yapılandırıldı, eski formül artık
+ağaçta yok. Aşağıdaki M8 satırı **yeni şekle karşı** koşulan mutasyondur.
 
 | # | mutasyon | düşen kollar (sayı) |
 |---|---|---|
@@ -453,13 +634,24 @@ On iki mutasyon, her birinden önce `dotnet build -c Release --no-incremental`;
 | M5 (D3) kopya yolu yeniden kodlama istegini yine yutar | `if (HasReencodeOverride(options)) return false;` -> `if (HasReencodeOverride(options) && info.Width < 0) return false;` | D3_KopyaYolundaYenidenKodlamaIsteyenGecersizKilmaUygulaniyor (5) |
 | M6 (D4) etkisiz cozunurluk istegi yine not uretir | `else if (plan.Height > enginePlan.Height)` -> `else if (plan.Height > 0)` | D4_EtkisizTabanIstegiNotUretmiyor (1) |
 | M7 (D1) kullanicinin fps tabani yok sayilir | `var minFps = options.MinFps is double f ? Math.Max(floors.MinFps, f) : floors.MinFps;` -> `var minFps = floors.MinFps;` | D1_KareHiziTabaniFfmpegKomutSatirindakiFpsiDegistiriyor, D4_EtkiliFpsTabanNotuPlaninGercekFpsiniTasiyor, F2_KarsilanabilenTabanIstegiKarsilanmadiDemiyor, K2_SabitlenenDegerFfmpegKomutSatirindaGorunuyor, K4_HerKalemNotuIkiAlaniDolduruyor (5) |
-| M8 (K1) ses kanali gecersiz kilmasi varsayilana sizar | `if (info.HasAudio && options.AudioChannels != AudioChannelOverride.Auto)` -> `if (info.HasAudio)` | K1_VarsayilanT165OncesiMotorlaBirebirAyni (5) |
+| M8 (K1) ses kanali gecersiz kilmasi varsayilana sizar | `if (options.AudioChannels != AudioChannelOverride.Auto)` -> `if (info.DurationSeconds > 0)` | K1_VarsayilanT165OncesiMotorlaBirebirAyni (5) |
 | M9 (K1) varsayilan bitrate hesabi degisir | `totalK * ContainerOverhead - audioK` -> `totalK - audioK` | K1_VarsayilanT165OncesiMotorlaBirebirAyni (5) |
 | M10 (F1) kaynak ustu hedef kirpma orani degisir | `SourceSizeCap = 0.95` -> `SourceSizeCap = 0.80` | F1_KaynakUstuHedefKaynaginYuzde95ineKirpiliyor (1) |
 | M11 (F2) karsilanmayan fps tabani susar | `if (plan.Fps < requestedMinFps - 0.01)` -> `if (plan.Fps < 0)` | F2_KaynagiAsanFpsTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor (1) |
 | M12 (F2) karsilanmayan cozunurluk tabani susar | `if (plan.Height < requestedMinHeight)` -> `if (plan.Height < 0)` | F2_KaynagiAsanCozunurlukTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor (1) |
+| M13 (H1) sessiz kaynakta ses hedefi istegi susar | `if (!info.HasAudio)` -> `if (!info.HasAudio && info.DurationSeconds < 0)` (ses hedefi dalı) | H1_SessizKaynaktaSesHedefiKarsilanmadiDeniyor (1) |
+| M14 (H1) sessiz kaynakta ses kanali istegi susar | `if (!info.HasAudio)` -> `if (!info.HasAudio && info.DurationSeconds < 0)` (ses kanalı dalı) | H1_SessizKaynaktaSesKanaliKarsilanmadiDeniyor (3) |
+| M15 (H2) ses hedefi/kanal celiskisi susar | `else if (audioSilenced)` -> `else if (audioSilenced && info.DurationSeconds < 0)` | H2_SesHedefiKanalNoneIleCelistigindeHangisiKazandiYaziliyor (1) |
+| M16 (H2) crf/kip celiskisi susar | `if (options.LockedMode is EncodeMode supersededMode && supersededMode != EncodeMode.Crf)` -> `... && info.DurationSeconds < 0)` | H2_CrfKipIleCelistigindeCrfKazandigiYaziliyor (1) |
+| M17 (H2) kodek kilidi/yol celiskisi susar | `if (lockedCodec is not null && options.EncoderPath != ... )` -> `if (lockedCodec is not null && info.DurationSeconds < 0 && ...)` | H2_KodekKilidiKodlayiciYoluIleCelistigindeKodekKazandigiYaziliyor (1) |
+| M18 (H1) crf kirpma susar | `if (crfClamped)` -> `if (crfClamped && info.DurationSeconds < 0)` | H1_KodekAraliginiAsanCrfKirpildigiYaziliyor (2) |
+| M19 (H1) turbo ilk gecis gevsemesi susar | `if (plan.TurboFirstPass && plan.ModeEnum == EncodeMode.TwoPass)` -> `if (plan.TurboFirstPass && info.DurationSeconds < 0 && ...)` | H1_TurboIlkGecisteOnAyarinGevsedigiYaziliyor (1) |
+| M20 (H1 negatif) ses istegi kosulsuz "karsilanmadi" yazar | iki ses dalında `if (!info.HasAudio)` -> `if (!info.HasAudio \|\| info.DurationSeconds > 0)` | D3_KopyaYolunda... (2), K2_Sabitlenen... (4), K4_HerKalem... (4), H1_SesliKaynaktaKarsilanmadiNotuYazilmiyor, H2_SesHedefiKanalNone... (12) |
+| M21 (H1 negatif) kirpma notu kosulsuz yazilir | `if (crfClamped)` -> `if (crfClamped \|\| info.DurationSeconds > 0)` | H1_AraliktakiCrfKirpilmaNotuUretmiyor (1) |
+| M22 (H2 negatif) yol/kodek uyumu denetlenmez | `&& CodecModel.IsHardware(codec) != (options.EncoderPath == EncoderPathOverride.Hardware))` -> `&& info.DurationSeconds > 0)` | H2_KodekKilidiKodlayiciYoluIleUyumluysaCelismeNotuYok (1) |
 
-On ikisinin de en az bir kolu düşüyor. Ham çıktı:
+Yirmi ikisinin de en az bir kolu düşüyor; sıfır ölçü düşüren mutasyon yok. Tur 3'ün ham
+çıktısı:
 
 ```
 ### M1 (K6a) sabitlenen on ayar yok sayilir
@@ -535,27 +727,123 @@ Basarisiz! - Basarisiz:     1, Basarili:    54, Atlanan:     0, Toplam:    55, S
 dusen kollar: F2_KaynagiAsanCozunurlukTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor
 ```
 
-Tur 2'nin ızgarasında **sıfır kol düşüren bir mutasyon** vardı (F1); yerini yukarıdaki on iki
-mutasyonluk ızgara aldı ve on ikisi de düşürüyor.
+Tur 2'nin ızgarasında **sıfır kol düşüren bir mutasyon** vardı (F1); yerini yukarıdaki
+ızgara aldı ve yirmi ikisi de düşürüyor.
+
+Tur 4'ün ham çıktısı (`dotnet test -c Release --no-build --filter
+"FullyQualifiedName~ManualOverrideTests"`, her mutasyondan önce `--no-incremental` build):
+
+```
+### M8 (K1) ses kanali gecersiz kilmasi varsayilana sizar   [yeni sekle karsi]
+if (options.AudioChannels != AudioChannelOverride.Auto)  ->  if (info.DurationSeconds > 0)
+Basarisiz! - Basarisiz: 5, Basarili: 71, Atlanan: 0, Toplam: 76
+dusen kollar: K1_VarsayilanT165OncesiMotorlaBirebirAyni (bes bilesimin besi de)
+
+### M13 (H1) sessiz kaynakta ses hedefi istegi susar
+if (!info.HasAudio)  ->  if (!info.HasAudio && info.DurationSeconds < 0)
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H1_SessizKaynaktaSesHedefiKarsilanmadiDeniyor
+
+### M14 (H1) sessiz kaynakta ses kanali istegi susar
+if (!info.HasAudio)  ->  if (!info.HasAudio && info.DurationSeconds < 0)
+Basarisiz! - Basarisiz: 3, Basarili: 73, Atlanan: 0, Toplam: 76
+dusen kollar: H1_SessizKaynaktaSesKanaliKarsilanmadiDeniyor (Stereo, Mono, None)
+
+### M15 (H2) ses hedefi/kanal celiskisi susar
+else if (audioSilenced)  ->  else if (audioSilenced && info.DurationSeconds < 0)
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H2_SesHedefiKanalNoneIleCelistigindeHangisiKazandiYaziliyor
+
+### M16 (H2) crf/kip celiskisi susar
+if (options.LockedMode is EncodeMode supersededMode && supersededMode != EncodeMode.Crf)
+  ->  ... && info.DurationSeconds < 0)
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H2_CrfKipIleCelistigindeCrfKazandigiYaziliyor
+
+### M17 (H2) kodek kilidi/yol celiskisi susar
+if (lockedCodec is not null && options.EncoderPath != EncoderPathOverride.Auto
+  ->  if (lockedCodec is not null && info.DurationSeconds < 0 && options.EncoderPath != ...
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H2_KodekKilidiKodlayiciYoluIleCelistigindeKodekKazandigiYaziliyor
+
+### M18 (H1) crf kirpma susar
+if (crfClamped)  ->  if (crfClamped && info.DurationSeconds < 0)
+Basarisiz! - Basarisiz: 2, Basarili: 74, Atlanan: 0, Toplam: 76
+dusen kollar: H1_KodekAraliginiAsanCrfKirpildigiYaziliyor (istek 4 ve istek 60)
+
+### M19 (H1) turbo ilk gecis gevsemesi susar
+if (plan.TurboFirstPass && plan.ModeEnum == EncodeMode.TwoPass)
+  ->  if (plan.TurboFirstPass && info.DurationSeconds < 0 && plan.ModeEnum == ...)
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H1_TurboIlkGecisteOnAyarinGevsedigiYaziliyor
+
+### M20 (H1 negatif) ses istegi kosulsuz "karsilanmadi" yazar
+iki ses dalinda if (!info.HasAudio)  ->  if (!info.HasAudio || info.DurationSeconds > 0)
+Basarisiz! - Basarisiz: 12, Basarili: 64, Atlanan: 0, Toplam: 76
+dusen kollar: D3_KopyaYolundaYenidenKodlamaIsteyenGecersizKilmaUygulaniyor (ses-kanali,
+  ses-kbps), K2_SabitlenenDegerFfmpegKomutSatirindaGorunuyor (ses-mono, ses-stereo,
+  ses-kbps, ses-yok), K4_HerKalemNotuIkiAlaniDolduruyor (ses-mono, ses-stereo, ses-yok,
+  ses-kbps), H1_SesliKaynaktaKarsilanmadiNotuYazilmiyor,
+  H2_SesHedefiKanalNoneIleCelistigindeHangisiKazandiYaziliyor
+
+### M21 (H1 negatif) kirpma notu kosulsuz yazilir
+if (crfClamped)  ->  if (crfClamped || info.DurationSeconds > 0)
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H1_AraliktakiCrfKirpilmaNotuUretmiyor
+
+### M22 (H2 negatif) yol/kodek uyumu denetlenmez
+&& CodecModel.IsHardware(codec) != (options.EncoderPath == EncoderPathOverride.Hardware))
+  ->  && info.DurationSeconds > 0)
+Basarisiz! - Basarisiz: 1, Basarili: 75, Atlanan: 0, Toplam: 76
+dusen kol: H2_KodekKilidiKodlayiciYoluIleUyumluysaCelismeNotuYok
+```
+
+Mutasyonların hepsi geri alındı; `PlanCalculator.cs` mutasyonsuz hâline döndü ve
+76/76 + 14/14 yeşil koştu.
 
 ---
 
 ## K7 — Kol sayısı
 
 ```
-dotnet test -c Release --filter "FullyQualifiedName~ManualOverrideTests" --list-tests   ->  55
+dotnet test -c Release --filter "FullyQualifiedName~ManualOverrideTests" --list-tests   ->  76
 dotnet test -c Release --filter "FullyQualifiedName~CodecLockTests"      --list-tests   ->  14
 ```
 
-İkisi de koşuldu: 55/55 ve 14/14 geçti. Sıfır bulan kol yok.
+İkisi de koşuldu: 76/76 ve 14/14 geçti. Sıfır bulan kol yok. (Tur 3'te 55 idi; tur 4
+yirmi bir kol ekledi.)
 
-Ayrıca plan hesabına ve argüman üretimine dokunan on altı sınıf (`PlanCalculatorTests`,
-`PlanCalculatorProbeTests`, `KestirimPlanTests`, `AdviceCoverageTests`, `FillBandTests`,
-`FpsDropTests`, `ExtremeCompressionTests`, `SessizDusurmeTests`, `SpeedModeTests`,
-`QualityTargetTests`, `TurboTavanTests`, `HardwareRateControlTests`, `CodecLockTests`,
-`ManualOverrideTests`, `FfmpegArgumentsTests`, `ConversionArgumentsTests`) birlikte
-koşuldu:
+Ayrıca `PlanCalculator`a dokunan yirmi sınıf üç öbekte koşuldu:
 
 ```
-Basarili! - Basarisiz: 0, Basarili: 354, Atlanan: 6, Toplam: 360, Sure: 4 m 7 s
+CodecLock, EncoderAvailability, EncoderCapabilities, EncoderStateConsumption,
+ExtremeCompression, FillBand
+  -> Basarisiz: 0, Basarili: 90, Atlanan: 4, Toplam: 94
+
+FpsDrop, HardwareFlag, HardwareRateControl, HdrArguments, KestirimPlan,
+ManualOverride, OluUye
+  -> Basarisiz: 1, Basarili: 172, Atlanan: 3, Toplam: 176
+
+PlanCalculatorProbe, PlanCalculator, QualityHint, QualityTarget, SpeedMode,
+TurboTavan, UretimYolu
+  -> Basarisiz: 0, Basarili: 144, Atlanan: 0, Toplam: 144
 ```
+
+Toplam 406 geçti, 1 düştü. **Düşen kol T165'in değil**: `OluUyeTests` `cfad38e`de de
+düşüyor (o commit'te `git stash` ile doğrulandı, 1 düştü / 10 geçti). Ayrıntı aşağıda.
+
+### Kapatılamayan bulgu: `OluUyeTests` `cfad38e`de kırık
+
+```
+OluUyeTests.TheZeroConsumerSetIsThePinnedSet
+Expected: [..., "EncoderVendor.Software  varsayilan-kol", ...]
+Actual:   [..., "EncoderPathOverride.Software  yalniz-disarida", "EncoderVendor.Software ...
+```
+
+`EncoderPathOverride.Software` üretimde hiçbir yerde okunmuyor — motor yolu yalnız
+`== EncoderPathOverride.Hardware` ile sınıyor, `Software` ise ikili kararın öbür yarısı
+olduğu için ada gerek kalmıyor. Üye T165 tur 1'de eklendi ve `OluUyeTests`in pinli ölü
+üye kümesi güncellenmedi.
+
+`tests/VidShrink.Tests/OluUyeTests.cs` bu sözleşmenin `owns` listesinde **değil**;
+düzeltilmedi, bildiriliyor.
