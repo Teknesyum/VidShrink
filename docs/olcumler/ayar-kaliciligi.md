@@ -10,8 +10,13 @@ Kaynaktan sayim komutu:
 grep -noE x:Name=(Cmb|Chk|Chip|Sldr|Slider|Txt) MainWindow.axaml
 grep -n Watch( MainWindow.axaml.cs
 
-40 adet kullanicinin degistirebildigi denetim bulundu (yonga ve gezinme dugmeleri haric,
-onlar asagida ayrica listeli). Her satir kaynaktaki Watch(...) kaydiyla dogrulandi.
+Bu iki grep ham haliyle 113 satir dondurur (isim tekrarlari, salt okunur kutular ve
+gezinme dugmeleri dahil). Elenerek kalan, kullanicinin degistirebildigi denetim sayisi
+41; bunlarin 40 tanesi hatirlaniyor. Hatirlanmayan tek denetim
+MainWindow.axaml:1178 TxtAiJson: duzenlenebilir bir metin kutusu, settings.json
+anahtari yok, kapaninca icerigi gider. Bu bilincli birakildi, tek seferlik plan
+yapistirma alanidir; yine de manset 40/40 degil 40/41'dir.
+Her satir kaynaktaki Watch(...) kaydiyla dogrulandi.
 
 | Denetim | settings.json anahtari | Hatirlaniyor mu |
 |---|---|---|
@@ -120,7 +125,9 @@ metinle yeniden yazilmisti. Ayni yerde, MainWindow.axaml satir 285-289, hala dur
 basina T163 e ait, baska goreve karismamis olu yorum, T163/K4 gelismis ayarlarin
 katlama kolu, bu turda silindi.
 
-MainWindow.axaml yorum sayisi 9 dan 8 e dustu, silinen T163/K4 tek blok.
+MainWindow.axaml yorum blogu sayisi 11 den 8 e dustu, uc blok silindi
+(grep -c "<!--" ile: birlestirme oncesi 11, sonrasi 8). Belgenin onceki surumu
+bunu "9 dan 8 e, tek blok" diye yaziyordu; sayim yanlisti.
 
 Kalan 8 yorum baska sozlesmelere ait, T43, T46, T54, T61, T74, ikon path notu, panel
 girinti notu, ve karisik coklu gorev icerik tasidiklarindan bu sozlesmenin kapsami
