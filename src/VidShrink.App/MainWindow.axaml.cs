@@ -106,6 +106,17 @@ public partial class MainWindow : Window
     private CoreShare.IHttpTransport? _shareTransport;
     private ShareFlow? _shareFlow;
     private PanelHost? _preview;
+    private bool _advancedExpanded;
+    internal static readonly string[] AdvancedPresetCandidates =
+    {
+        "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
+        "p1", "p2", "p3", "p4", "p5", "p6", "p7",
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"
+    };
+    internal static readonly int[] AdvancedCrfCandidates = { 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 40, 44 };
+    internal static readonly int[] AdvancedAudioKbpsCandidates = { 64, 96, 128, 160, 192, 256, 320 };
+    internal static readonly int[] AdvancedMinResolutionCandidates = { 480, 540, 720, 900, 1080, 1440, 2160 };
+    internal static readonly double[] AdvancedMinFpsCandidates = { 24, 25, 30, 48, 50, 60 };
 
     private readonly string? _startupFile;
 
@@ -158,6 +169,16 @@ public partial class MainWindow : Window
         foreach (var check in new[] { ChkResolution, ChkFps, ChkFastGpu })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
+
+        Watch(PlanPanelRow, RowDefinition.HeightProperty, OnSplitterMoved);
+
+        InitializeAdvancedUi();
+        foreach (var box in new[]
+                 {
+                     CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+                     CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
+                 })
+            Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
@@ -397,6 +418,7 @@ public partial class MainWindow : Window
             var settings = UpdateSettings.Load(SettingsPathOverride);
             _settingsSyncing = true;
             UseLanguage(ResolveLanguage(settings.Language, CultureInfo.CurrentUICulture.Name));
+            RestoreSplitterSettings();
             InitializeShareUi();
             RestoreSettings(settings);
             InitializeUpdateUi(settings);
@@ -588,6 +610,7 @@ public partial class MainWindow : Window
         RefreshUpdateTexts();
         RefreshSettingsTexts();
         RefreshShareTarget();
+        RefreshAdvancedTexts();
         UpdateToolStatus();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
         ApplyDropText();
@@ -859,6 +882,163 @@ public partial class MainWindow : Window
 
     private void RefreshUpdateTexts()
         => TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
+
+    /// <summary>
+    /// T163/K4: dokuz gelişmiş kalemin liste içerikleri. Kodek kilidi listesi
+    /// <see cref="FfmpegArguments.KnownCodecs"/>'ten geliyor — burada ikinci bir kodek
+    /// adı kümesi elle yazılmıyor. Ön ayar listesi ffmpeg'in kendi terimleri
+    /// (<see cref="AdvancedPresetCandidates"/>); geçerliliği kodeğe göre değişir ve o
+    /// kontrol <see cref="FfmpegArguments.IsValidPreset"/> ile plan kurulurken yapılır,
+    /// burada önceden filtrelenmiyor.
+    /// </summary>
+    private void InitializeAdvancedUi()
+    {
+        var automatic = Say("main.plan.automatic");
+
+        CmbAdvMode.ItemsSource = new[] { automatic, Say("main.advanced.mode.crf"), Say("main.advanced.mode.two-pass") };
+        CmbAdvMode.SelectedIndex = 0;
+
+        CmbAdvCrf.ItemsSource = new[] { automatic }.Concat(AdvancedCrfCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
+        CmbAdvCrf.SelectedIndex = 0;
+
+        CmbAdvPreset.ItemsSource = new[] { automatic }.Concat(AdvancedPresetCandidates).ToList();
+        CmbAdvPreset.SelectedIndex = 0;
+
+        CmbAdvAudioKbps.ItemsSource = new[] { automatic }.Concat(AdvancedAudioKbpsCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
+        CmbAdvAudioKbps.SelectedIndex = 0;
+
+        CmbAdvAudioChannels.ItemsSource = new[]
+        {
+            automatic, Say("main.advanced.audio-channels.stereo"), Say("main.advanced.audio-channels.mono"), Say("main.advanced.audio-channels.none")
+        };
+        CmbAdvAudioChannels.SelectedIndex = 0;
+
+        CmbAdvMinResolution.ItemsSource = new[] { automatic }.Concat(AdvancedMinResolutionCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
+        CmbAdvMinResolution.SelectedIndex = 0;
+
+        CmbAdvMinFps.ItemsSource = new[] { automatic }.Concat(AdvancedMinFpsCandidates.Select(c => c.ToString("0.##", CultureInfo.InvariantCulture))).ToList();
+        CmbAdvMinFps.SelectedIndex = 0;
+
+        CmbAdvEncoderPath.ItemsSource = new[] { automatic, Say("main.advanced.encoder-path.software"), Say("main.advanced.encoder-path.hardware") };
+        CmbAdvEncoderPath.SelectedIndex = 0;
+
+        CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.KnownCodecs.OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
+        CmbAdvCodecLock.SelectedIndex = 0;
+    }
+
+    /// <summary>Dil değişince "Otomatik" ve enum etiketleri yeniden kurulur, seçim korunur.</summary>
+    private void RefreshAdvancedTexts()
+    {
+        var indices = new[]
+        {
+            CmbAdvMode.SelectedIndex, CmbAdvCrf.SelectedIndex, CmbAdvPreset.SelectedIndex,
+            CmbAdvAudioKbps.SelectedIndex, CmbAdvAudioChannels.SelectedIndex, CmbAdvMinResolution.SelectedIndex,
+            CmbAdvMinFps.SelectedIndex, CmbAdvEncoderPath.SelectedIndex, CmbAdvCodecLock.SelectedIndex
+        };
+        var wasSyncing = _syncing;
+        _syncing = true;
+        InitializeAdvancedUi();
+        var boxes = new SelectingItemsControl[]
+        {
+            CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+            CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
+        };
+        for (var i = 0; i < boxes.Length; i++)
+            if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
+        _syncing = wasSyncing;
+    }
+
+    private void OnToggleAdvanced(object? sender, RoutedEventArgs e)
+    {
+        _advancedExpanded = !_advancedExpanded;
+        AdvancedBody.IsVisible = _advancedExpanded;
+        BtnAdvancedToggle.Content = _advancedExpanded ? "▴" : "▾";
+    }
+
+    internal void ExpandAdvanced()
+    {
+        _advancedExpanded = true;
+        AdvancedBody.IsVisible = true;
+        BtnAdvancedToggle.Content = "▴";
+    }
+
+    private static string? AdvancedText(ComboBox box) => box.SelectedIndex > 0 ? box.SelectedItem as string : null;
+
+    /// <summary>
+    /// Dokuz gelişmiş kalemi <see cref="PlanOptions"/>'a taşır. Kutu 0. sırada durduğu
+    /// sürece "Otomatik" demektir ve alan <c>null</c>/varsayılan kalır.
+    /// </summary>
+    private void ApplyAdvancedOptions(PlanOptions options)
+    {
+        if (AdvancedText(CmbAdvMode) is { } modeText)
+            options.LockedMode = CmbAdvMode.SelectedIndex == 1 ? EncodeMode.Crf : EncodeMode.TwoPass;
+
+        if (AdvancedText(CmbAdvCrf) is { } crfText
+            && double.TryParse(crfText, NumberStyles.Float, CultureInfo.InvariantCulture, out var crf))
+            options.LockedCrf = crf;
+
+        if (AdvancedText(CmbAdvPreset) is { } presetText)
+            options.LockedPreset = presetText;
+
+        if (AdvancedText(CmbAdvAudioKbps) is { } audioKbpsText
+            && int.TryParse(audioKbpsText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var audioKbps))
+            options.LockedAudioKbps = audioKbps;
+
+        options.AudioChannels = CmbAdvAudioChannels.SelectedIndex switch
+        {
+            1 => AudioChannelOverride.Stereo,
+            2 => AudioChannelOverride.Mono,
+            3 => AudioChannelOverride.None,
+            _ => AudioChannelOverride.Auto
+        };
+
+        if (AdvancedText(CmbAdvMinResolution) is { } minResText
+            && int.TryParse(minResText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var minRes))
+            options.MinResolutionHeight = minRes;
+
+        if (AdvancedText(CmbAdvMinFps) is { } minFpsText
+            && double.TryParse(minFpsText, NumberStyles.Float, CultureInfo.InvariantCulture, out var minFps))
+            options.MinFps = minFps;
+
+        options.EncoderPath = CmbAdvEncoderPath.SelectedIndex switch
+        {
+            1 => EncoderPathOverride.Software,
+            2 => EncoderPathOverride.Hardware,
+            _ => EncoderPathOverride.Auto
+        };
+
+        options.LockedCodec = AdvancedText(CmbAdvCodecLock);
+    }
+
+    /// <summary>
+    /// Her kalemin yanındaki "şu an" satırı — motorun az önce hesapladığı plandan okunur,
+    /// kalem "Otomatik" dursa da doluysa da aynı yerden gelir (K4 CHECK).
+    /// </summary>
+    private void RefreshAdvancedHints()
+    {
+        var plan = ActivePlan;
+        var has = plan is not null;
+        TxtAdvModeNow.Text = has ? Say("main.advanced.now", plan!.ModeEnum switch
+        {
+            EncodeMode.Crf => Say("main.advanced.mode.crf"),
+            EncodeMode.PassThrough => Say("main.plan.mode.copy"),
+            _ => Say("main.advanced.mode.two-pass")
+        }) : "";
+        TxtAdvCrfNow.Text = has ? Say("main.advanced.now", plan!.Crf is { } crf ? crf.ToString(CultureInfo.InvariantCulture) : "-") : "";
+        TxtAdvPresetNow.Text = has ? Say("main.advanced.now", plan!.Preset) : "";
+        TxtAdvAudioKbpsNow.Text = has ? Say("main.advanced.now", plan!.AudioBitrateK.ToString(CultureInfo.InvariantCulture)) : "";
+        TxtAdvAudioChannelsNow.Text = has
+            ? Say("main.advanced.now", plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))
+            : "";
+        TxtAdvMinResolutionNow.Text = has ? Say("main.advanced.now", $"{plan!.Width}x{plan.Height}") : "";
+        TxtAdvMinFpsNow.Text = has ? Say("main.advanced.now", Num(plan!.Fps, "0.##")) : "";
+        TxtAdvEncoderPathNow.Text = has ? Say("main.advanced.now", CodecModel.IsHardware(plan!.Codec)
+            ? Say("main.advanced.encoder-path.hardware")
+            : Say("main.advanced.encoder-path.software")) : "";
+        TxtAdvCodecLockNow.Text = has ? Say("main.advanced.now", plan!.Codec) : "";
+
+        TxtTargetCrfLockedNotice.IsVisible = has && plan!.ReasonCodes.Any(note => note.Code == ReasonCode.ManualCrfOverride);
+    }
 
     /// <summary>
     /// Hedef listesi <c>paylasim-hedefleri.json</c>'dan gelir. Dosya yoksa şema
@@ -1535,6 +1715,73 @@ public partial class MainWindow : Window
     internal string? SettingsPathOverride { get; set; }
 
     /// <summary>
+    /// T163/K3: ayırıcının konumu kullanıcı verisidir, ölçü belirteci değil — bu yüzden
+    /// <c>Theme.axaml</c>'e değil buraya, <see cref="UpdateSettings"/>'in yanına gider.
+    /// <see cref="UpdateSettings"/>'in kendisi <c>VidShrink.Core</c>'da (bu sözleşmenin
+    /// alanı dışında) durduğu için ayrı, küçük bir dosyaya yazılıyor; kayıt yeri yine
+    /// aynı ayar klasörü.
+    /// </summary>
+    /// <summary>
+    /// Avalonia'nın XAML derleyicisi <c>RowDefinition</c>'a bir NameScope girişi vermiyor
+    /// (yalnız <see cref="Control"/> alt sınıfları isimle bulunabiliyor), bu yüzden satır
+    /// çevreleyen <c>PreviewPlanGrid</c> üzerinden 3. sıra olarak bulunuyor.
+    /// </summary>
+    private RowDefinition PlanPanelRow => PreviewPlanGrid.RowDefinitions[2];
+
+    private string SplitterSettingsPath => Path.Combine(
+        Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
+        "layout.json");
+
+    private void SaveSplitterSettings()
+    {
+        if (_settingsSyncing || _syncing) return;
+        if (PlanPanelRow.Height.GridUnitType != GridUnitType.Pixel) return;
+        try
+        {
+            var json = $"{{\"planPanelHeight\":{PlanPanelRow.Height.Value.ToString(CultureInfo.InvariantCulture)}}}";
+            Directory.CreateDirectory(Path.GetDirectoryName(SplitterSettingsPath)!);
+            File.WriteAllText(SplitterSettingsPath, json);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
+        }
+    }
+
+    private void RestoreSplitterSettings()
+    {
+        try
+        {
+            if (!File.Exists(SplitterSettingsPath)) return;
+            using var document = JsonDocument.Parse(File.ReadAllText(SplitterSettingsPath));
+            if (!document.RootElement.TryGetProperty("planPanelHeight", out var element) || !element.TryGetDouble(out var height))
+                return;
+
+            var floor = PlanPanelRow.MinHeight;
+            var ceiling = double.IsFinite(PlanPanelRow.MaxHeight) ? PlanPanelRow.MaxHeight : height;
+            _settingsSyncing = true;
+            PlanPanelRow.Height = new GridLength(Math.Clamp(height, floor, ceiling), GridUnitType.Pixel);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
+        }
+        finally { _settingsSyncing = false; }
+    }
+
+    private void OnSplitterMoved() => SaveSplitterSettings();
+
+    internal void RecalculateForTest() => Recalculate();
+    internal EncodePlan? ActivePlanForTest => ActivePlan;
+    internal string? AdvancedErrorForTest => TxtAdvancedError.IsVisible ? TxtAdvancedError.Text : null;
+    internal void RestoreSplitterSettingsForTest() => RestoreSplitterSettings();
+    internal void SetSplitterHeightForTest(double pixels) => PlanPanelRow.Height = new GridLength(pixels, GridUnitType.Pixel);
+    internal double SplitterHeightForTest => PlanPanelRow.Height.Value;
+    internal bool SplitterIsPixelForTest => PlanPanelRow.Height.GridUnitType == GridUnitType.Pixel;
+    internal double SplitterFloorForTest => PlanPanelRow.MinHeight;
+    internal double SplitterCeilingForTest => PlanPanelRow.MaxHeight;
+
+    /// <summary>
     /// Yoklamanın sonucunu arayüze ve ayara bağlar. Yoklamadan ayrı durur ki açılış yolu
     /// ffmpeg çağrılmadan da sınanabilsin.
     /// </summary>
@@ -1597,17 +1844,22 @@ public partial class MainWindow : Window
         ApplyFastGpuTip();
     }
 
-    private PlanOptions CurrentOptions() => new()
+    private PlanOptions CurrentOptions()
     {
-        TargetMb = ParseTargetMb(),
-        Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex),
-        Codec = CodecFromIndex(CmbCodec.SelectedIndex),
-        AllowResolutionDrop = ChkResolution.IsChecked == true,
-        AllowFpsDrop = ChkFps.IsChecked == true,
-        HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
-        FillPolicy = CmbFillPolicy.SelectedIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
-        SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality
-    };
+        var options = new PlanOptions
+        {
+            TargetMb = ParseTargetMb(),
+            Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex),
+            Codec = CodecFromIndex(CmbCodec.SelectedIndex),
+            AllowResolutionDrop = ChkResolution.IsChecked == true,
+            AllowFpsDrop = ChkFps.IsChecked == true,
+            HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
+            FillPolicy = CmbFillPolicy.SelectedIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
+            SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality
+        };
+        ApplyAdvancedOptions(options);
+        return options;
+    }
 
     private double ParseTargetMb()
         => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : WhatsAppTargetMb;
@@ -1930,7 +2182,24 @@ public partial class MainWindow : Window
     private void Recalculate()
     {
         if (_info is null) return;
-        var detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, _planEncoders);
+
+        PlanResult detailed;
+        try
+        {
+            detailed = PlanCalculator.BuildDetailed(_info, CurrentOptions(), _profile, _planEncoders);
+        }
+        catch (ArgumentException ex)
+        {
+            // T163/K4: gelismis ayarlardan gecen gecersiz bir deger (orn. kodegin kabul
+            // etmedigi bir on ayar). Cikti hicbir zaman crash olmuyor; onceki gecerli plan
+            // ekranda kalir ve baslatma kilitlenir.
+            TxtAdvancedError.Text = Say("main.advanced.error", ex.Message);
+            TxtAdvancedError.IsVisible = true;
+            BtnStart.IsEnabled = false;
+            return;
+        }
+
+        TxtAdvancedError.IsVisible = false;
         _autoPlan = detailed.Plan;
         PlanHardwareNotMeasured = detailed.HardwareNotMeasured;
         _predictedQuality = detailed.PredictedQuality;
@@ -2187,6 +2456,7 @@ public partial class MainWindow : Window
 
         RefreshEstimateView();
         RefreshDurationView();
+        RefreshAdvancedHints();
         TxtCommand.Text = FfmpegArguments.ToCommandLine(DisplayedEncodeArguments(_info, plan,
             BuildUniqueOutputPath(_info.FilePath, "shrunk", "mp4"), _encoders, _sceneMap?.Map));
     }
@@ -2351,6 +2621,44 @@ public partial class MainWindow : Window
                     Num(note.Mb, "0.0"), Num(note.TargetMb, "0.##")),
                 ReasonCode.TargetCappedToSource => Say("main.reason.target-capped",
                     Num(note.Mb, "0.##"), Num(note.TargetMb, "0.##")),
+                ReasonCode.ManualEncoderPathSupersededByCodec => Say("main.reason.manual-encoder-path-superseded",
+                    note.ManualOverrideValue, note.FallbackCodec),
+                ReasonCode.ManualEncoderPathUnmet => Say("main.reason.manual-encoder-path-unmet",
+                    note.ManualOverrideValue, note.FallbackCodec),
+                ReasonCode.ManualEncoderPathOverride => Say("main.reason.manual-encoder-path-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen, note.FallbackCodec),
+                ReasonCode.ManualAudioBitrateUnmet => Say("main.reason.manual-audio-bitrate-unmet",
+                    note.ManualOverrideValue),
+                ReasonCode.ManualAudioBitrateSupersededByChannels => Say("main.reason.manual-audio-bitrate-superseded",
+                    note.ManualOverrideValue),
+                ReasonCode.ManualAudioBitrateOverride => Say("main.reason.manual-audio-bitrate-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.ManualAudioChannelsUnmet => Say("main.reason.manual-audio-channels-unmet",
+                    note.ManualOverrideValue),
+                ReasonCode.ManualAudioChannelsOverride => Say("main.reason.manual-audio-channels-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.ManualMinResolutionUnmet => Say("main.reason.manual-min-resolution-unmet",
+                    note.ManualOverrideValue, note.Width, note.Height),
+                ReasonCode.ManualMinResolutionOverride => Say("main.reason.manual-min-resolution-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen, note.Width, note.Height),
+                ReasonCode.ManualMinFpsUnmet => Say("main.reason.manual-min-fps-unmet",
+                    note.ManualOverrideValue, Num(note.Fps, "0.##")),
+                ReasonCode.ManualMinFpsOverride => Say("main.reason.manual-min-fps-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen, Num(note.Fps, "0.##")),
+                ReasonCode.ManualCrfClamped => Say("main.reason.manual-crf-clamped",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen, Num(note.Crf, "0")),
+                ReasonCode.ManualCrfOverride => Say("main.reason.manual-crf-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen, Num(note.Crf, "0"), Num(note.Mb, "0.0")),
+                ReasonCode.ManualModeSupersededByCrf => Say("main.reason.manual-mode-superseded-by-crf",
+                    note.ManualOverrideValue),
+                ReasonCode.ManualModeOverride => Say("main.reason.manual-mode-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.ManualPresetOverride => Say("main.reason.manual-preset-override",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.ManualPresetFirstPassRelaxed => Say("main.reason.manual-preset-first-pass-relaxed",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen),
+                ReasonCode.ManualOverrideDroppedOnPassThrough => Say("main.reason.manual-override-dropped-on-pass-through",
+                    note.ManualOverrideValue, note.EngineWouldHaveChosen),
                 _ => null
             };
             if (text is not null) parts.Add(text);

@@ -116,6 +116,16 @@
         <Setter Property="LineHeight" Value="{StaticResource LineHeightBody}"/>
       </ControlTheme>
 
+      <!--
+        T163/K3: onizleme ile plan paneli arasindaki surukleneblir ayirici. Boy ve renk
+        var olan belirteclerden — yeni bir olcu uydurulmadi.
+      -->
+      <ControlTheme x:Key="PlanSplitter" TargetType="GridSplitter">
+        <Setter Property="Height" Value="{StaticResource SpaceMd}"/>
+        <Setter Property="Background" Value="{StaticResource NeonBlueBorder}"/>
+        <Setter Property="Cursor" Value="SizeNorthSouth"/>
+      </ControlTheme>
+
       <ControlTheme x:Key="PanelRule" TargetType="Border">
         <Setter Property="Height" Value="{StaticResource BorderThinScalar}"/>
         <Setter Property="Background" Value="{StaticResource NeonBlueBorder}"/>
