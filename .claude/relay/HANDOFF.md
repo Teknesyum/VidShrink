@@ -21,23 +21,22 @@ right-click menu.
 
 ## Contracts open
 
-- `T158` — active, round 2
+- `T158` — submitted, round 2
 - `T171` — active, round 1
 - `T172` — active, round 1
-- `T173` — active, round 2
-- `T174` — active, round 2
+- `T173` — submitted, round 2
 - `T175` — active, round 1
 
 ## Closed last
 
+- `T174` — passed — 2026-09-05 19:33
 - `T175` — stale — 2026-09-05 18:10
 - `T172` — stale — 2026-09-05 18:10
 - `T171` — stale — 2026-09-05 18:10
 - `T171` — stale — 2026-09-05 17:31
-- `T163` — passed — 2026-09-05 13:51
 
 ## Tree
 
 - branch: `main`
-- head: `de34494 T158/T173: bayat submit geri alindi, ikisi de tur 2'de calisiliyor`
-- uncommitted files: 2
+- head: `7614d7d T158 birlestirildi: Atlandi() cagri-basi mesru kanit istiyor`
+- uncommitted files: 6
