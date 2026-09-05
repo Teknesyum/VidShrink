@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T170",
+  "round": "1",
+  "auditorRunId": "a90c712a5eeca59a4",
+  "dispatchId": "toolu_01HHvfFqRYwrhz3F9WGt8aPT",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "6ea0ffd7ce783d01a34a8176d55826c5f64431c727ae0c8085e34f18fda6d244",
+  "transcriptHash": "f3044a916c330f5bc3cab2cbc7172a2dcddb8f3e81c8eae86b8041f5e2df7774",
+  "headSha": "e47974bd2624147921798695bcf19c81b5f6ba1a",
+  "diffHash": "f8112daa431f51d501e53c7ec6f05b399b2cf746d0e3735c735b20a377b57cd5",
+  "owns": [
+    "src/VidShrink.Core/ShrinkRequest.cs",
+    "tests/VidShrink.Tests/ShrinkRequestTests.cs",
+    "docs/olcumler/kabuk-istegi.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim proje kokunde, denetlenen surumun (e47974b) uzerinde, sozlesme submitted iken kosuldu. verdict: passed, findings: none. Denetci verify adimlarini kendi kosturdu: build 0 uyari 0 hata; ShrinkRequestTests 19/19 uc kez ust uste, ucu de yesil; manset temiz; ek kanit ShellIntegrationTests 9/9; --list-tests 19 kol. L1 kapandi ve yaris penceresi yok: Interlocked.Exchange atomik, iki is parcacigi ayni anda cagirsa bile kaybeden atamalara hic ulasmadan atiyor, ikinci ProcessLoop acilmiyor; mutasyon (d) muhafizi silince Assert.Throws duser. L2 sessiz dusme yolu kapandi: ListenLoop artik else'li, ayristirilamayan mesaj ya da Accept false donerse Nack yaziliyor, Submit yalniz TAMAM'da true; line is null dali yalniz istemci yazmadan kapandiginda olusur ve o istemcinin okuyacagi yanit zaten yoktur; CompleteAdding sonrasi Accept InvalidOperationException yakalayip false donuyor yani kapanis anindaki istek de onaysiz gecmiyor; istemci onayi okumadan cikarsa IOException yakalaniyor, asili okuma yok. Belgedeki Mutex cumlesi duzeltilmis, kod gercekten hicbir yerde WaitOne cagirmiyor. L3 geri cekme durust ve yeni kol gercekten sirayi olcuyor: Assert.Equal(expected, processed.ToArray()) iki tarafta da OrderBy yok, dizi tam sirayla karsilastiriliyor; mutasyon (f) ConcurrentStack LIFO yapinca sira-0,4,3,2,1 cikip kol duser. L4 bos olcu gitti, yerine bes somut cozum geldi ve besi de dusebilir. On dokuz kolun tamami tarandi, yapisal olarak hep gecen tek satir bulunamadi. Zamanlama: uc ardisik kosumda kararsizlik yok, beklemeler 15 sn toleransli. WaitForPipeDrain OperatingSystem.IsWindows() ile korunuyor, bu CA1416'nin tanidigi dogru koruma, susturma degil. owns disina yazim yok, ShellIntegration.cs diff'te hic yok. Belgedeki her sayi denetcinin kosumuyla ya da kaynakla birebir eslesiyor."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T10:11:29.190Z",
+  "usedAt": "2026-09-05T10:11:48.112Z",
+  "completedSha": "e47974bd2624147921798695bcf19c81b5f6ba1a"
+}
