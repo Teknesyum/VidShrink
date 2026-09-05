@@ -21,11 +21,11 @@ right-click menu.
 
 ## Contracts open
 
-- `T158` — active, round 1
+- `T158` — active, round 2
 - `T171` — active, round 1
 - `T172` — active, round 1
-- `T173` — active, round 1
-- `T174` — active, round 1
+- `T173` — active, round 2
+- `T174` — active, round 2
 - `T175` — active, round 1
 
 ## Closed last
@@ -39,5 +39,5 @@ right-click menu.
 ## Tree
 
 - branch: `main`
-- head: `c303bd8 T172-T176 sozlesmeleri acildi: ses tabani, ayar kaliciligi, onizleme barinagi, oynatici boru ve girdi`
+- head: `de34494 T158/T173: bayat submit geri alindi, ikisi de tur 2'de calisiliyor`
 - uncommitted files: 2
