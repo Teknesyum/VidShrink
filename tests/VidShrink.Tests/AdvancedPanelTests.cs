@@ -199,13 +199,76 @@ public sealed class AdvancedPanelTests
             + $"yüksekliğini ({layout.PlanBodyHeight:0.#} px) taşımıyor.");
     }
 
-    /// <summary>K3a: sürükleme taban/tavan içinde kalır — sınırların dışına çıkan bir talep
-    /// dahi <c>RowDefinition.MinHeight/MaxHeight</c> tarafından bağlanır (GridSplitter onlara bakar).</summary>
+    /// <summary>
+    /// T163/S1: kırpmayı <b>ürün</b> yapıyor mu? Eski kol <c>Math.Clamp</c>'ı testin
+    /// içinde çağırıp kendi hesapladığı sayıyı kendi kıyaslıyordu; sınırlar tümden
+    /// silinse bile geçerdi. Burada sınır dışı istek <c>layout.json</c>'a yazılır,
+    /// <c>RestoreSplitterSettings</c> çağrılır ve <b>dönen</b> değer ölçülür — testte
+    /// hiçbir kırpma yok.
+    /// </summary>
+    [Theory]
+    [InlineData(1.0, "floor")]
+    [InlineData(5000.0, "ceiling")]
+    [InlineData(420.0, "same")]
+    public void AnOutOfRangeSavedPositionIsClampedByTheProductOnRestore(double saved, string expected)
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"vidshrink-clamp-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        File.WriteAllText(
+            Path.Combine(directory, "layout.json"),
+            $"{{\"planPanelHeight\":{saved.ToString(CultureInfo.InvariantCulture)}}}");
+
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = Path.Combine(directory, "settings.json") };
+                try
+                {
+                    window.UseTurkish();
+                    LayOutAt(window, DesignSize());
+
+                    var floor = window.SplitterFloorForTest;
+                    var ceiling = window.SplitterCeilingForTest;
+
+                    window.RestoreSplitterSettingsForTest();
+
+                    var restored = window.SplitterHeightForTest;
+                    _output.WriteLine($"diskteki istek {saved:0.#} px -> geri yuklenen {restored:0.#} px (taban {floor:0}, tavan {ceiling:0})");
+
+                    Xunit.Assert.True(floor > 0 && double.IsFinite(ceiling) && ceiling > floor,
+                        $"Sinirlar kalkmis (taban {floor}, tavan {ceiling}); kiyas bosa duserdi.");
+                    Xunit.Assert.True(window.SplitterIsPixelForTest, "Geri yukleme satiri piksele cevirmedi.");
+
+                    var wanted = expected switch
+                    {
+                        "floor" => floor,
+                        "ceiling" => ceiling,
+                        _ => saved
+                    };
+                    Xunit.Assert.Equal(wanted, restored, 1);
+                    Xunit.Assert.InRange(restored, floor, ceiling);
+                }
+                finally { window.Close(); }
+            });
+        }
+        finally
+        {
+            try { Directory.Delete(directory, recursive: true); } catch (IOException) { }
+        }
+    }
+
+    /// <summary>
+    /// T163/S1 (sürükleme yolu): <c>SetSplitterHeight</c> hiçbir sınır uygulamıyor —
+    /// sınır dışı bir istek satırın <c>Height</c> değerinde <b>ham</b> kalıyor. Soru,
+    /// yerleşimin onu tutup tutmadığı: satırın gerçekten aldığı yükseklik ölçülür.
+    /// <c>RowDefinition.ActualHeight</c> kendisinden önceki <c>RowSpacing</c>'i de
+    /// taşıdığı için o boşluk ölçüden düşülür — belirteç okunur, sayı elle yazılmaz.
+    /// </summary>
     [Theory]
     [InlineData(1.0)]
     [InlineData(5000.0)]
-    [InlineData(420.0)]
-    public void DraggingTheSplitterStaysWithinFloorAndCeiling(double requested)
+    public void TheGridRowHoldsAnOutOfRangeDragRequest(double requested)
     {
         Fresh(window =>
         {
@@ -214,10 +277,24 @@ public sealed class AdvancedPanelTests
             var floor = window.SplitterFloorForTest;
             var ceiling = window.SplitterCeilingForTest;
 
-            window.SetSplitterHeightForTest(Math.Clamp(requested, floor, ceiling));
+            window.SetSplitterHeightForTest(requested);
+            Relayout(window, DesignSize());
 
-            Xunit.Assert.True(window.SplitterIsPixelForTest);
-            Xunit.Assert.InRange(window.SplitterHeightForTest, floor, ceiling);
+            var spacing = (double)(window.TryFindResource("SpaceMd", out var gap) ? gap! : 0.0);
+            var stored = window.SplitterHeightForTest;
+            var actualRow = window.SplitterRowActualHeightForTest - spacing;
+            var panel = window.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PlanPanel");
+
+            _output.WriteLine($"istek {requested:0.#} px -> satirda saklanan {stored:0.#} px, "
+                + $"satirin aldigi boy {actualRow:0.#} px (+{spacing:0} px RowSpacing), "
+                + $"PlanPanel {panel.Bounds.Height:0.#} px (taban {floor:0}, tavan {ceiling:0})");
+
+            Xunit.Assert.True(floor > 0 && double.IsFinite(ceiling) && ceiling > floor,
+                $"Sinirlar kalkmis (taban {floor}, tavan {ceiling}); kiyas bosa duserdi.");
+            Xunit.Assert.True(spacing > 0, "SpaceMd belirteci okunamadi; dusum bosa duserdi.");
+            Xunit.Assert.Equal(requested, stored, 1);
+            Xunit.Assert.InRange(actualRow, floor, ceiling);
+            Xunit.Assert.InRange(panel.Bounds.Height, floor, ceiling);
             return true;
         });
     }

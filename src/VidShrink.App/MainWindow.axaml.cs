@@ -1780,6 +1780,7 @@ public partial class MainWindow : Window
     internal bool SplitterIsPixelForTest => PlanPanelRow.Height.GridUnitType == GridUnitType.Pixel;
     internal double SplitterFloorForTest => PlanPanelRow.MinHeight;
     internal double SplitterCeilingForTest => PlanPanelRow.MaxHeight;
+    internal double SplitterRowActualHeightForTest => PlanPanelRow.ActualHeight;
 
     /// <summary>
     /// Yoklamanın sonucunu arayüze ve ayara bağlar. Yoklamadan ayrı durur ki açılış yolu

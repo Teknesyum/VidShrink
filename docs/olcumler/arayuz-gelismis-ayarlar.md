@@ -39,13 +39,58 @@ arasında, sürüklenmemiş satır `Auto` kalıyor (bkz. K3).
 
 ## K3 — Ayırıcı
 
-Üç ölçü, `DraggingTheSplitterStaysWithinFloorAndCeiling` / `TheSplitterPositionSurvivesAReopen`
-/ `UntouchedSplitterRowStaysContentDriven` (21/21 yeşil, bkz. K9 çıktısı):
+**Tur 5 düzeltmesi (S1).** Bu bölümün eski cümlesi — *"1, 5000, 420 istekleri hepsi
+kırpılıyor"* — yanlıştı: kırpmayı ürün değil **testin kendisi** yapıyordu.
+`DraggingTheSplitterStaysWithinFloorAndCeiling` `Math.Clamp`'ı kendi içinde çağırıp
+kendi hesapladığı sayıyı kendi kıyaslıyordu; sınırlar `RowDefinition`'dan tümden
+silinse bile geçerdi. Kol kaldırıldı, yerine ürünün gerçek iki yolunu ölçen iki kol
+kondu.
 
-- Sürükleme taban/tavan içinde kalıyor (1, 5000, 420 istekleri hepsi kırpılıyor).
-- Konum `layout.json`'a yazılıyor, yeniden açılışta geri yükleniyor.
-- Sürüklenmemiş satır içerik güdümlü kalıyor (piksele dönmüyor) — T54/K4'ün "sabit
-  oran yok, içeriğe göre büyüme hiç yok" kuralı korunuyor.
+Ölçüler (`AdvancedPanelTests`, 24/24 yeşil):
+
+**Geri yükleme yolu** — `AnOutOfRangeSavedPositionIsClampedByTheProductOnRestore`.
+Sınır dışı bir `planPanelHeight` `layout.json`'a yazılır, `RestoreSplitterSettings()`
+çağrılır, **dönen** değer ölçülür. Testte kırpma yok:
+
+| diskteki istek | geri yüklenen | taban | tavan |
+|---|---|---|---|
+| 1 px | **320 px** | 320 | 512 |
+| 5000 px | **512 px** | 320 | 512 |
+| 420 px | **420 px** (dokunulmuyor) | 320 | 512 |
+
+**Sürükleme yolu** — `TheGridRowHoldsAnOutOfRangeDragRequest`.
+`MainWindow.axaml.cs:1778` hiçbir sınır uygulamıyor: sınır dışı istek satırın `Height`
+değerinde **ham** kalıyor. Sınırı yerleşim tutuyor — satırın gerçekten aldığı yükseklik
+ölçüldü (`RowDefinition.ActualHeight` kendisinden önceki `RowSpacing`'i de taşıdığı için
+`SpaceMd` = 12 px düşüldü):
+
+| istek | satırda saklanan | satırın aldığı boy | PlanPanel |
+|---|---|---|---|
+| 1 px | 1 px | **320 px** | 320 px |
+| 5000 px | 5000 px | **512 px** | 512 px |
+
+Tutan **hangisi?** `PlanPanel` Border'ının kendi `MinHeight`/`MaxHeight`'i mutasyonla
+silindiğinde iki ölçü de değişmedi (yine 320 / 512) — sınırı **`RowDefinition`
+tutuyor**, Border'ınki yedek. Ürün tarafında ek bir kırpmaya gerek yok.
+
+Kalan iki ölçü:
+
+- Konum `layout.json`'a yazılıyor, yeniden açılışta geri yükleniyor
+  (`TheSplitterPositionSurvivesAReopen`).
+- Sürüklenmemiş satır içerik güdümlü kalıyor (piksele dönmüyor) —
+  `UntouchedSplitterRowStaysContentDriven`; T54/K4'ün "sabit oran yok, içeriğe göre
+  büyüme hiç yok" kuralı korunuyor.
+
+### S1 mutasyonları
+
+Her birinden önce `dotnet build -c Release --no-incremental`.
+
+| mutasyon | düşen kol | sonuç |
+|---|---|---|
+| `MainWindow.axaml.cs:1763` `Math.Clamp(height, floor, ceiling)` -> `height` | `AnOutOfRangeSavedPositionIsClampedByTheProductOnRestore` (1 ve 5000) | Başarısız 2, Başarılı 22 |
+| `RowDefinition` `MinHeight`/`MaxHeight` silindi | yukarıdaki üç kol + `TheGridRowHoldsAnOutOfRangeDragRequest` (1, 5000) + `TheSplitterPositionSurvivesAReopen` | Başarısız 6, Başarılı 18 |
+
+Eski kolda **iki mutasyonda da sıfır kol düşerdi.**
 
 ## K4 — Gelişmiş ayarlar bölümü, dokuz kalem
 
@@ -441,3 +486,27 @@ olculen icerik: 232 px, taban: 320 px, tavan: 512 px
 | `--filter "FullyQualifiedName~WindowLayoutTests"` | **40/40 yeşil** | 6 dk 35 sn |
 
 `OluUyeTests`in beklenen kırılması `owns` dışında; tur 4'te de dokunulmadı.
+
+## Tur 5 koşumları
+
+`--list-tests` **24 kol** buldu (sıfır-kol riski yok). Yukarıdaki K9 listesi tur 1'in
+21 kollu halidir; ayırıcı satırları artık şunlar:
+
+```
+AnOutOfRangeSavedPositionIsClampedByTheProductOnRestore(saved: 1, expected: "floor")
+AnOutOfRangeSavedPositionIsClampedByTheProductOnRestore(saved: 5000, expected: "ceiling")
+AnOutOfRangeSavedPositionIsClampedByTheProductOnRestore(saved: 420, expected: "same")
+TheGridRowHoldsAnOutOfRangeDragRequest(requested: 1)
+TheGridRowHoldsAnOutOfRangeDragRequest(requested: 5000)
+```
+
+| kol kümesi | sonuç | süre |
+|---|---|---|
+| `dotnet build -c Release --no-incremental` | 0 uyarı 0 hata | ~3 sn |
+| `--filter "FullyQualifiedName~AdvancedPanelTests" --list-tests` | **24 kol** | — |
+| `--filter "FullyQualifiedName~AdvancedPanelTests"` | **24/24 yeşil** | 13 sn |
+| `--filter "FullyQualifiedName~WindowLayoutTests"` | **40/40 yeşil** | 4 dk 59 sn |
+
+`OluUyeTests`in beklenen kırılması `owns` dışında; tur 5'te de dokunulmadı.
+Yeni renk/ölçü uydurulmadı: ürün tarafına yalnız `SplitterRowActualHeightForTest`
+okuyucusu eklendi, `Theme.axaml` ve `Controls.axaml` diff'te yok.
