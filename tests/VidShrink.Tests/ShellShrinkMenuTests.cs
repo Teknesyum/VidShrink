@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 
@@ -20,6 +20,9 @@ public sealed record OpenEntry(string Extension, string Label, string Icon, stri
 /// T169 ölçüsünün tek düzeneği: kurulum betiği bir kez koşar, dökümler bir kez okunur,
 /// bütün kollar aynı çıktıyı okur. Gerçek <c>HKCU:\Software\Classes</c> ağacına
 /// dokunulmaz; betiğe <c>-RegistryRoot</c> ile geçici bir kök verilir ve sonunda silinir.
+/// Koşum başında, aynı desene uyan (<c>VidShrinkKucult-Test-&lt;pid&gt;-&lt;guid&gt;</c>) ve ölü
+/// bir PID taşıyan artık kökler toplanır: düşen bir koşumun bıraktığı kök bir sonrakinde
+/// silinir, canlı PID taşıyan kök ise dokunulmadan bırakılır.
 /// </summary>
 public sealed class ShellShrinkMenuFixture : IDisposable
 {
@@ -59,9 +62,26 @@ if (Test-Path -LiteralPath $associations) {
 Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
 ";
 
+    private const string ReapProbe = @"param([string]$Prefix, [string]$Out)
+$removed = @()
+foreach ($item in Get-ChildItem -LiteralPath 'HKCU:\Software' -ErrorAction SilentlyContinue) {
+    $name = $item.PSChildName
+    if (-not $name.StartsWith($Prefix)) { continue }
+    $owner = ($name.Substring($Prefix.Length) -split '-')[0]
+    if ($owner -notmatch '^\d+$') { continue }
+    if (Get-Process -Id ([int]$owner) -ErrorAction SilentlyContinue) { continue }
+    Remove-Item -LiteralPath $item.PSPath -Recurse -Force -ErrorAction SilentlyContinue
+    $removed += $name
+}
+Set-Content -LiteralPath $Out -Value ($removed -join ""`n"") -Encoding UTF8
+";
+
+    public const string RootPrefix = "VidShrinkKucult-Test-";
+
     private readonly string _work;
     private readonly string _shrinkProbe;
     private readonly string _openProbe;
+    private readonly string _reapProbe;
 
     public bool OnWindows { get; }
     public string Executable { get; }
@@ -78,6 +98,13 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
     public int ExtensionKeysAfterWrite { get; }
     public int ExtensionKeysAfterRemoval { get; }
 
+    public string AbandonedRootName { get; } = "";
+    public int AbandonedRootKeysBeforeReap { get; }
+    public bool AbandonedRootExistsAfterReap { get; }
+    public string LiveRootName { get; } = "";
+    public bool LiveRootExistsAfterReap { get; }
+    public IReadOnlyList<string> ReapedRoots { get; } = Array.Empty<string>();
+
     public IReadOnlyList<ShrinkEntry> ShrinkEntries { get; } = Array.Empty<ShrinkEntry>();
     public IReadOnlyList<OpenEntry> OpenEntries { get; } = Array.Empty<OpenEntry>();
     public IReadOnlyList<ShrinkEntry> ShrinkEntriesAfterRemoval { get; } = Array.Empty<ShrinkEntry>();
@@ -91,15 +118,28 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         Executable = Path.Combine(installRoot, "VidShrink.exe");
         _shrinkProbe = Path.Combine(_work, "oku-kucult.ps1");
         _openProbe = Path.Combine(_work, "oku-ac.ps1");
-        RegistryRoot = $@"HKCU:\Software\VidShrinkKucult-Test-{Environment.ProcessId}-{id}";
+        _reapProbe = Path.Combine(_work, "topla.ps1");
+        RegistryRoot = $@"HKCU:\Software\{RootPrefix}{Environment.ProcessId}-{id}";
 
         Directory.CreateDirectory(installRoot);
         File.WriteAllText(Executable, "kurulu baslatici");
         File.WriteAllText(_shrinkProbe, ShrinkProbe);
         File.WriteAllText(_openProbe, OpenProbe);
+        File.WriteAllText(_reapProbe, ReapProbe);
 
         OnWindows = OperatingSystem.IsWindows();
         if (!OnWindows) return;
+
+        AbandonedRootName = $"{RootPrefix}{FindDeadProcessId()}-{Guid.NewGuid():n}";
+        LiveRootName = $"{RootPrefix}{Environment.ProcessId}-{Guid.NewGuid():n}";
+        SeedRoot(AbandonedRootName);
+        SeedRoot(LiveRootName);
+        AbandonedRootKeysBeforeReap = CountRootKeys(AbandonedRootName);
+
+        ReapedRoots = ReapAbandonedRoots();
+        AbandonedRootExistsAfterReap = RootExists(AbandonedRootName);
+        LiveRootExistsAfterReap = RootExists(LiveRootName);
+        RemoveRoot(LiveRootName);
 
         KeysBeforeWrite = CountKeys();
 
@@ -130,6 +170,8 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         {
             PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
                 $"Remove-Item -LiteralPath '{RegistryRoot}' -Recurse -Force -ErrorAction SilentlyContinue");
+            RemoveRoot(AbandonedRootName);
+            RemoveRoot(LiveRootName);
         }
 
         try { Directory.Delete(_work, true); } catch (IOException) { }
@@ -158,6 +200,53 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         var all = new List<string> { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", InstallerScript };
         all.AddRange(arguments);
         return PowerShell(all.ToArray());
+    }
+
+    private static int FindDeadProcessId()
+    {
+        var live = Process.GetProcesses().Select(process => process.Id).ToHashSet();
+        for (var candidate = 65532; candidate > 4; candidate -= 4)
+        {
+            if (!live.Contains(candidate)) return candidate;
+        }
+        throw new InvalidOperationException("Olculebilir olu PID bulunamadi.");
+    }
+
+    private static void SeedRoot(string name)
+        => PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+            $@"New-Item -Path 'HKCU:\Software\{name}\SystemFileAssociations\.mp4\shell\VidShrinkKucult' -Force | Out-Null");
+
+    private static void RemoveRoot(string name)
+    {
+        if (name.Length == 0) return;
+        PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+            $@"Remove-Item -LiteralPath 'HKCU:\Software\{name}' -Recurse -Force -ErrorAction SilentlyContinue");
+    }
+
+    private static bool RootExists(string name)
+    {
+        var run = PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+            $@"Write-Output (Test-Path -LiteralPath 'HKCU:\Software\{name}')");
+        return run.Output.Trim() == "True";
+    }
+
+    private static int CountRootKeys(string name)
+    {
+        var run = PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+            $@"$r = 'HKCU:\Software\{name}'; " +
+            "if (-not (Test-Path -LiteralPath $r)) { Write-Output 0; return } " +
+            "$n = 0; Get-ChildItem -LiteralPath $r -Recurse | ForEach-Object { $n++ }; Write-Output $n");
+        return int.Parse(run.Output.Trim());
+    }
+
+    private IReadOnlyList<string> ReapAbandonedRoots()
+    {
+        var listing = Path.Combine(_work, "toplanan-kokler.txt");
+        var run = PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", _reapProbe,
+            "-Prefix", RootPrefix, "-Out", listing);
+        if (run.Code != 0) throw new InvalidOperationException(run.Output);
+
+        return File.ReadAllLines(listing).Where(line => line.Length > 0).ToList();
     }
 
     private int CountKeys()
@@ -353,10 +442,55 @@ public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
     }
 
     [Fact]
-    public void Measurement_root_is_never_the_real_shell_root()
+    public void Registry_writers_never_hard_code_the_real_shell_root()
     {
-        Assert.StartsWith(@"HKCU:\Software\VidShrinkKucult-Test-", _fixture.RegistryRoot, StringComparison.Ordinal);
-        Assert.DoesNotContain("Classes", _fixture.RegistryRoot, StringComparison.OrdinalIgnoreCase);
+        var source = File.ReadAllText(ShellShrinkMenuFixture.InstallerScript);
+        foreach (var name in new[] { "Write-ShellMenu", "Write-ShellShrinkMenu", "Remove-ShellMenu" })
+        {
+            var body = FunctionBody(source, name);
+            Assert.DoesNotContain("HKCU:", body, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("$Root", body, StringComparison.Ordinal);
+        }
+    }
+
+    private static string FunctionBody(string source, string name)
+    {
+        var start = source.IndexOf($"function {name}(", StringComparison.Ordinal);
+        Assert.True(start >= 0, $"Install-VidShrink.ps1 icinde {name} fonksiyonu bulunamadi.");
+
+        var open = source.IndexOf('{', start);
+        Assert.True(open >= 0, $"{name} govdesi acilmiyor.");
+
+        var depth = 0;
+        for (var index = open; index < source.Length; index++)
+        {
+            if (source[index] == '{') depth++;
+            else if (source[index] == '}' && --depth == 0)
+            {
+                return source[open..(index + 1)];
+            }
+        }
+        throw new InvalidOperationException($"{name} govdesi kapanmiyor.");
+    }
+
+    [Fact]
+    public void Abandoned_root_from_a_dead_process_is_reaped_at_run_start()
+    {
+        if (Skip) return;
+        Assert.True(_fixture.AbandonedRootKeysBeforeReap > 0,
+            $"Yapay artik kok kurulamadi: {_fixture.AbandonedRootName}");
+        Assert.Contains(_fixture.AbandonedRootName, _fixture.ReapedRoots);
+        Assert.False(_fixture.AbandonedRootExistsAfterReap,
+            $"Olu PID tasiyan artik kok toplanmadi: {_fixture.AbandonedRootName}");
+    }
+
+    [Fact]
+    public void Reaping_leaves_the_root_of_a_live_process_alone()
+    {
+        if (Skip) return;
+        Assert.DoesNotContain(_fixture.LiveRootName, _fixture.ReapedRoots);
+        Assert.True(_fixture.LiveRootExistsAfterReap,
+            $"Canli PID tasiyan kok yanlislikla silindi: {_fixture.LiveRootName}");
     }
 
     [Fact]
