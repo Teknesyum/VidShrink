@@ -282,11 +282,6 @@
 
                 <Border x:Name="TargetPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <!--
-                      T163/K4: gelismis ayarlarin katlama kolu hedef panelinin var olan
-                      baslik satirina giriyor, kendi paneline degil. Kapali bolumun sayfa
-                      yuksekligine katkisi boylece sifir: satir zaten vardi.
-                    -->
                     <Grid ColumnDefinitions="*,Auto">
                       <StackPanel Grid.Column="0" Orientation="Horizontal">
                         <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
@@ -327,16 +322,18 @@
                       balonun ilk satırı yonganın eski etiketidir — etiket ekrandan kalktı,
                       bilgi kalkmadı.
                     -->
-                    <!--
-                      T163/K5: CRF sabitlenince cikan satir yongalarla ayni izgara satirini
-                      paylasir; izgaraya yeni bir satir eklenmiyor. Gizliyken StackPanel
-                      araligi da olusmuyor, yani kapali halin yuksekligi degismiyor.
-                    -->
                     <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Spacing="{StaticResource SpaceMd}">
                     <TextBlock x:Name="TxtTargetCrfLockedNotice"
                                Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                Text="{loc:Text main.target.crf-locked}"/>
                     <WrapPanel>
+                      <Button x:Name="Chip8" Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
+                        <ToolTip.Tip>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.8.tip}"/>
+                          </StackPanel>
+                        </ToolTip.Tip>
+                      </Button>
                       <Button x:Name="ChipWhatsApp" Content="16" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -344,13 +341,6 @@
                               <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.whatsapp.label}"/>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.whatsapp.tip}"/>
                             </StackPanel>
-                          </StackPanel>
-                        </ToolTip.Tip>
-                      </Button>
-                      <Button x:Name="Chip8" Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
-                        <ToolTip.Tip>
-                          <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.8.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -488,12 +478,6 @@
                         <ComboBoxItem Content="{loc:Text main.hdr.sdr}"/>
                       </ComboBox>
                     </StackPanel>
-                    <!--
-                      T163/K4: dokuz gelismis kalem (LockedMode, LockedCrf, LockedPreset,
-                      LockedAudioKbps, AudioChannels, MinResolutionHeight, MinFps,
-                      EncoderPath ve T162 kodek kilidi LockedCodec). Hepsi "Otomatik"
-                      varsayilanli; govde varsayilan kapali ve kapaliyken hic yer kaplamaz.
-                    -->
                     <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False">
                       <StackPanel>
                         <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}"/>
@@ -994,6 +978,52 @@
         <TabItem Header="{loc:Text main.tab.settings}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+
+              <Border x:Name="GeneralSettingsPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <TextBlock Text="{loc:Text settings-tab.general.title}" Theme="{StaticResource H2}"/>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
+                    <StackPanel x:Name="SettingsLangSwitch" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.language.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
+                    <TextBox x:Name="TxtDefaultTargetMb" Width="120" HorizontalAlignment="Left" MaxLines="1" TextAlignment="Center"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}"/>
+                    <ComboBox x:Name="CmbOutputFolderMode" HorizontalAlignment="Stretch"/>
+                    <StackPanel x:Name="OutputFolderPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <TextBox x:Name="TxtOutputFolder" Width="360" MaxLines="1" IsReadOnly="True"/>
+                      <Button x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
+                    </StackPanel>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-folder.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <StackPanel Orientation="Horizontal">
+                      <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.advanced-default-open.label}"/>
+                    </StackPanel>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
+                    <ComboBox x:Name="CmbFfmpegPathMode" HorizontalAlignment="Stretch"/>
+                    <StackPanel x:Name="FfmpegPathPickerRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <TextBox x:Name="TxtFfmpegPath" Width="360" MaxLines="1"/>
+                      <Button x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtFfmpegPathError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
 
               <Border x:Name="SharePanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">

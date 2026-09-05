@@ -136,6 +136,7 @@ public partial class MainWindow : Window
         // panel hangi motorun kare ürettiğini bilmez.
         _preview = new PanelHost(Preview, () => new PipeComparisonFrameSource());
 
+        RefreshOutputAndFfmpegChoiceLists();
         BuildLanguageSwitch();
         Strings.Changed += OnLanguageChanged;
 
@@ -179,6 +180,12 @@ public partial class MainWindow : Window
                      CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
                  })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
+        foreach (var box in new[]
+                 {
+                     CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+                     CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
+                 })
+            Watch(box, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
@@ -190,6 +197,12 @@ public partial class MainWindow : Window
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
+        Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
+        Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
+        Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
+        Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(CmbFfmpegPathMode, SelectingItemsControl.SelectedIndexProperty, OnFfmpegPathModeChanged);
+        Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
@@ -421,6 +434,8 @@ public partial class MainWindow : Window
             RestoreSplitterSettings();
             InitializeShareUi();
             RestoreSettings(settings);
+            var appSettings = AppSettings.Load(SettingsPathOverride);
+            RestoreAppSettings(appSettings);
             InitializeUpdateUi(settings);
             _ = CheckForUpdateAsync();
             PlayPanelEntrance();
@@ -535,19 +550,23 @@ public partial class MainWindow : Window
     private void BuildLanguageSwitch()
     {
         LangSwitch.Children.Clear();
+        SettingsLangSwitch.Children.Clear();
 
         foreach (var language in Strings.Languages)
         {
-            var button = new Button
+            foreach (var panel in new[] { LangSwitch, SettingsLangSwitch })
             {
-                Content = Strings.GetIn(language, "main.language.name"),
-                Theme = Look("LanguageButton"),
-                Tag = language
-            };
+                var button = new Button
+                {
+                    Content = Strings.GetIn(language, "main.language.name"),
+                    Theme = Look("LanguageButton"),
+                    Tag = language
+                };
 
-            AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
-            button.Click += (_, _) => UseLanguage(language);
-            LangSwitch.Children.Add(button);
+                AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
+                button.Click += (_, _) => UseLanguage(language);
+                panel.Children.Add(button);
+            }
         }
 
         MarkChosenLanguage();
@@ -580,7 +599,7 @@ public partial class MainWindow : Window
 
     private void MarkChosenLanguage()
     {
-        foreach (var button in LangSwitch.Children.OfType<Button>())
+        foreach (var button in LangSwitch.Children.OfType<Button>().Concat(SettingsLangSwitch.Children.OfType<Button>()))
             button.Classes.Set(
                 "selected",
                 string.Equals(button.Tag as string, Strings.Language, StringComparison.OrdinalIgnoreCase));
@@ -609,6 +628,7 @@ public partial class MainWindow : Window
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshSettingsTexts();
+        RefreshOutputAndFfmpegChoiceLists();
         RefreshShareTarget();
         RefreshAdvancedTexts();
         UpdateToolStatus();
@@ -626,6 +646,28 @@ public partial class MainWindow : Window
         TxtResetSettingsConfirm.Text = Strings.Get("settings.reset-confirm");
         BtnConfirmResetSettings.Content = Strings.Get("settings.reset-confirm-button");
         BtnCancelResetSettings.Content = Strings.Get("settings.reset-cancel");
+    }
+
+    private void RefreshOutputAndFfmpegChoiceLists()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        var outputIndex = CmbOutputFolderMode.SelectedIndex;
+        CmbOutputFolderMode.ItemsSource = new[]
+        {
+            Say("settings-tab.output-folder.beside-source"),
+            Say("settings-tab.output-folder.fixed")
+        };
+        CmbOutputFolderMode.SelectedIndex = outputIndex >= 0 ? outputIndex : 0;
+
+        var ffmpegIndex = CmbFfmpegPathMode.SelectedIndex;
+        CmbFfmpegPathMode.ItemsSource = new[]
+        {
+            Say("settings-tab.ffmpeg-path.auto"),
+            Say("settings-tab.ffmpeg-path.manual")
+        };
+        CmbFfmpegPathMode.SelectedIndex = ffmpegIndex >= 0 ? ffmpegIndex : 0;
+        _syncing = wasSyncing;
     }
 
     internal static string ResolveLanguage(string? saved, string? operatingSystem)
@@ -814,7 +856,21 @@ public partial class MainWindow : Window
     private void SaveSettings()
     {
         if (_settingsSyncing || _syncing) return;
-        try { CaptureSettings().Save(SettingsPathOverride); }
+        try
+        {
+            CaptureSettings().Save(SettingsPathOverride);
+            CaptureAppSettings().Save(SettingsPathOverride);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
+        }
+    }
+
+    private void SaveAppSettings()
+    {
+        if (_settingsSyncing || _syncing) return;
+        try { CaptureAppSettings().Save(SettingsPathOverride); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
@@ -836,6 +892,7 @@ public partial class MainWindow : Window
             _settingsSyncing = true;
             UseLanguage(ResolveLanguage(null, CultureInfo.CurrentUICulture.Name));
             RestoreSettings(defaults);
+            RestoreAppSettings(new AppSettings());
             ResetSettingsConfirm.IsVisible = false;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -846,6 +903,149 @@ public partial class MainWindow : Window
 
     internal void RestoreSettingsForTest(UpdateSettings settings) => RestoreSettings(settings);
     internal void ConfirmResetSettingsForTest() => OnConfirmResetSettings(null, new RoutedEventArgs());
+    internal void RestoreAppSettingsForTest(AppSettings settings) => RestoreAppSettings(settings);
+    internal AppSettings CaptureAppSettingsForTest() => CaptureAppSettings();
+
+    private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
+    {
+        CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+        CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
+    };
+
+    private AppSettings CaptureAppSettings()
+    {
+        var boxes = AdvBoxes();
+        return new AppSettings
+        {
+            AdvMode = boxes[0].SelectedIndex,
+            AdvCrf = boxes[1].SelectedIndex,
+            AdvPreset = boxes[2].SelectedIndex,
+            AdvAudioKbps = boxes[3].SelectedIndex,
+            AdvAudioChannels = boxes[4].SelectedIndex,
+            AdvMinResolution = boxes[5].SelectedIndex,
+            AdvMinFps = boxes[6].SelectedIndex,
+            AdvEncoderPath = boxes[7].SelectedIndex,
+            AdvCodecLock = boxes[8].SelectedIndex,
+            OutputFolderMode = CmbOutputFolderMode.SelectedIndex,
+            OutputFolder = TxtOutputFolder.Text ?? "",
+            AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
+            FfmpegPathMode = CmbFfmpegPathMode.SelectedIndex,
+            FfmpegPath = TxtFfmpegPath.Text ?? ""
+        };
+    }
+
+    private void RestoreAppSettings(AppSettings settings)
+    {
+        var wasSyncing = _syncing;
+        _settingsSyncing = _syncing = true;
+        try
+        {
+            var indices = new[]
+            {
+                settings.AdvMode, settings.AdvCrf, settings.AdvPreset, settings.AdvAudioKbps,
+                settings.AdvAudioChannels, settings.AdvMinResolution, settings.AdvMinFps,
+                settings.AdvEncoderPath, settings.AdvCodecLock
+            };
+            var boxes = AdvBoxes();
+            for (var i = 0; i < boxes.Length; i++)
+                if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
+
+            CmbOutputFolderMode.SelectedIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
+            TxtOutputFolder.Text = settings.OutputFolder;
+            OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
+
+            ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
+            if (settings.AdvancedDefaultOpen) ExpandAdvanced();
+
+            CmbFfmpegPathMode.SelectedIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
+            TxtFfmpegPath.Text = settings.FfmpegPath;
+            FfmpegPathPickerRow.IsVisible = settings.FfmpegPathMode == 1;
+            ValidateFfmpegPath();
+
+            TxtDefaultTargetMb.Text = TxtTarget.Text;
+        }
+        finally
+        {
+            _settingsSyncing = false;
+            _syncing = wasSyncing;
+        }
+        Recalculate();
+    }
+
+    private void OnDefaultTargetMbChanged()
+    {
+        if (_settingsSyncing || _syncing) return;
+        TxtTarget.Text = TxtDefaultTargetMb.Text;
+    }
+
+    private void OnOutputFolderModeChanged()
+    {
+        OutputFolderPickerRow.IsVisible = CmbOutputFolderMode.SelectedIndex == 1;
+        SaveAppSettings();
+    }
+
+    private void OnFfmpegPathModeChanged()
+    {
+        FfmpegPathPickerRow.IsVisible = CmbFfmpegPathMode.SelectedIndex == 1;
+        ValidateFfmpegPath();
+        SaveAppSettings();
+    }
+
+    private void OnFfmpegPathTextChanged()
+    {
+        ValidateFfmpegPath();
+        SaveAppSettings();
+    }
+
+    private void ValidateFfmpegPath()
+    {
+        if (CmbFfmpegPathMode.SelectedIndex != 1)
+        {
+            TxtFfmpegPathError.IsVisible = false;
+            return;
+        }
+        var path = TxtFfmpegPath.Text ?? "";
+        var valid = path.Length > 0 && File.Exists(path);
+        TxtFfmpegPathError.IsVisible = !valid;
+        TxtFfmpegPathError.Text = valid ? "" : Say("settings-tab.ffmpeg-path.error");
+    }
+
+    private async void OnBrowseOutputFolder(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions { AllowMultiple = false });
+            var path = folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+            if (path is not null)
+            {
+                TxtOutputFolder.Text = path;
+                SaveAppSettings();
+            }
+        }
+        catch (Exception ex)
+        {
+            ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
+        }
+    }
+
+    private async void OnBrowseFfmpegPath(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions { AllowMultiple = false });
+            var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
+            if (path is not null)
+            {
+                TxtFfmpegPath.Text = path;
+                ValidateFfmpegPath();
+                SaveAppSettings();
+            }
+        }
+        catch (Exception ex)
+        {
+            ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
+        }
+    }
 
     private void InitializeUpdateUi(UpdateSettings? settings = null)
     {
