@@ -593,9 +593,10 @@ internal sealed class PanelHost : IDisposable
 
     /// <summary>
     /// Bir sonraki pencereyi oynatma sürerken kodlar. En çok bir pencere ileriye bakılır;
-    /// kuyruk kurulmaz.
+    /// kuyruk kurulmaz. T161/K1 ölçümü bunu doğrudan çağırır: gerçek animasyon çerçevesi
+    /// olmadan <see cref="Follow"/>'un tetiklediği çağrıyı elle üretmek için internal.
     /// </summary>
-    private async Task PrepareAheadAsync()
+    internal async Task PrepareAheadAsync()
     {
         var info = _info;
         var plan = _plan;
@@ -927,13 +928,11 @@ internal sealed class PanelHost : IDisposable
     {
         var source = _source;
         if (source is null) return;
+        // Duraklatma yalnız oynatmayı durdurur. Önden hazırlığı iptal etmek, sürüyorsa
+        // kodladığı pencereyi atardı; baştan başlatma ayar değişmediği halde iş bastan
+        // başlıyordu (T161). Hazırlık duraklatmada da arkada bitmeye bırakılır.
         if (_panel.Controls.IsPlaying) source.Play();
-        else
-        {
-            source.Pause();
-            // Duraklatıldığında ileri hazırlık durur; duran oynatma için parça kodlanmaz.
-            if (_aheadRunning) _segments.Cancel();
-        }
+        else source.Pause();
     }
 
     private async void Seek(TimeSpan position)
