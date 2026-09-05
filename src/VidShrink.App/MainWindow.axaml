@@ -282,14 +282,37 @@
 
                 <Border x:Name="TargetPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <StackPanel Orientation="Horizontal">
-                      <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
-                      <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.target.title}">
+                    <!--
+                      T163/K4: gelismis ayarlarin katlama kolu hedef panelinin var olan
+                      baslik satirina giriyor, kendi paneline degil. Kapali bolumun sayfa
+                      yuksekligine katkisi boylece sifir: satir zaten vardi.
+                    -->
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.target.title}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.target.tip}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </StackPanel>
+                      <Button Grid.Column="1"
+                              x:Name="BtnAdvancedToggle"
+                              Content="▾"
+                              Click="OnToggleAdvanced"
+                              Theme="{StaticResource GhostButton}"
+                              FontFamily="{StaticResource FontMono}"
+                              FontSize="{StaticResource FontSizeSm}"
+                              Width="{StaticResource TargetMinSize}"
+                              Height="{StaticResource TargetMinSize}"
+                              Padding="0"
+                              VerticalAlignment="Center"
+                              auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.target.tip}"/>
+                          <TextBlock Theme="{StaticResource TipText}" Text="{loc:Text main.advanced.title}"/>
                         </ToolTip.Tip>
                       </Button>
-                    </StackPanel>
+                    </Grid>
                     <!--
                       T61: hedef ve kalite tek Grid'de. İkinci sayı kutusunun genişliği
                       birinciyle aynı sütundan gelir; yeni bir piksel sayısı yazılmadı.
@@ -304,7 +327,16 @@
                       balonun ilk satırı yonganın eski etiketidir — etiket ekrandan kalktı,
                       bilgi kalkmadı.
                     -->
-                    <WrapPanel Grid.Row="1" Grid.ColumnSpan="3">
+                    <!--
+                      T163/K5: CRF sabitlenince cikan satir yongalarla ayni izgara satirini
+                      paylasir; izgaraya yeni bir satir eklenmiyor. Gizliyken StackPanel
+                      araligi da olusmuyor, yani kapali halin yuksekligi degismiyor.
+                    -->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Spacing="{StaticResource SpaceMd}">
+                    <TextBlock x:Name="TxtTargetCrfLockedNotice"
+                               Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                               Text="{loc:Text main.target.crf-locked}"/>
+                    <WrapPanel>
                       <Button x:Name="ChipWhatsApp" Content="16" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -364,6 +396,7 @@
                         </ToolTip.Tip>
                       </Button>
                     </WrapPanel>
+                    </StackPanel>
 
                       <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
                       <Slider x:Name="SliderQualityTarget" Grid.Row="3" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
@@ -455,6 +488,60 @@
                         <ComboBoxItem Content="{loc:Text main.hdr.sdr}"/>
                       </ComboBox>
                     </StackPanel>
+                    <!--
+                      T163/K4: dokuz gelismis kalem (LockedMode, LockedCrf, LockedPreset,
+                      LockedAudioKbps, AudioChannels, MinResolutionHeight, MinFps,
+                      EncoderPath ve T162 kodek kilidi LockedCodec). Hepsi "Otomatik"
+                      varsayilanli; govde varsayilan kapali ve kapaliyken hic yer kaplamaz.
+                    -->
+                    <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False">
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvMode" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvCrf" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvPreset" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvAudioKbps" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvAudioChannels" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvMinResolution" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvMinFps" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvEncoderPath" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <StackPanel>
+                        <TextBlock Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}"/>
+                        <ComboBox x:Name="CmbAdvCodecLock" SelectedIndex="0" HorizontalAlignment="Stretch"/>
+                        <TextBlock x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}"/>
+                      </StackPanel>
+                      <TextBlock x:Name="TxtAdvancedError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
+                    </StackPanel>
                   </StackPanel>
                 </Border>
 
@@ -467,20 +554,38 @@
               -->
               <!--
                 T54/K4: artan yer önizlemeye gider. Önizleme esneyen satırdadır, plan
-                paneli Auto satırda — istediği kadarını alır, kalanını önizlemeye bırakır.
-                Eski düzende esneyen satır MaxHeight'lı plan panelindeydi ve artan yer
-                kimseye gitmiyordu.
+                paneli varsayılan olarak içeriği kadar büyür — istediği kadarını alır,
+                kalanını önizlemeye bırakır. Eski düzende esneyen satır MaxHeight'lı plan
+                panelindeydi ve artan yer kimseye gitmiyordu.
 
                 T74/K1: "Preview" başlığı ve onu taşıyan Auto satır kaldırıldı. Yan
                 sütunlar panelle başlıyor, orta sütun başlıkla başlıyordu; başlık gidince
                 üç sütunun tepesi de aynı hizaya oturuyor.
+
+                T163/K3: kullanıcının sürüklediği yer artık kalıcı. İkinci satırdaki
+                GridSplitter üçüncü satırın (plan paneli) yüksekliğini değiştirir; hiç
+                sürüklenmemişse satır Auto kalır ve K1/K2'nin ölçtüğü içerik-güdümlü
+                boy geçerli olmaya devam eder — eski ölçüm burada bozulmuyor. Sürüklenince
+                satır piksele döner, taban ve tavan PlanPanelRow üzerinde durur (GridSplitter
+                onlara bakar), konum ApplySplitterSettings/OnSplitterMoved ile diske yazılır.
               -->
-              <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="{StaticResource SpaceMd}">
+              <Grid Grid.Column="1" x:Name="PreviewPlanGrid" RowSpacing="{StaticResource SpaceMd}">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*"/>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="Auto"
+                                 MinHeight="{StaticResource PlanPanelMinHeight}"
+                                 MaxHeight="{StaticResource PlanPanelMaxHeight}"/>
+                </Grid.RowDefinitions>
 
                 <playback:ComparisonPanel Grid.Row="0" x:Name="Preview" VerticalAlignment="Stretch"/>
 
+                <GridSplitter Grid.Row="1" x:Name="PlanSplitter" Theme="{StaticResource PlanSplitter}"
+                              HorizontalAlignment="Stretch" ResizeDirection="Rows"
+                              auto:AutomationProperties.Name="{loc:Text main.plan.splitter}"/>
+
               <Border x:Name="PlanPanel"
-                      Grid.Row="1"
+                      Grid.Row="2"
                       Theme="{StaticResource Panel}"
                       MinHeight="{StaticResource PlanPanelMinHeight}"
                       MaxHeight="{StaticResource PlanPanelMaxHeight}">

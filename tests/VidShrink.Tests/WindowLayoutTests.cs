@@ -361,6 +361,16 @@ public sealed class WindowLayoutTests
     /// gerekir; yatay eksen kırılırsa sayfa yana kayar ve sağ sütunun bir bölümü ekran
     /// dışında kalır. Boş hâlin aşağı kayması kabul edildi: kaynak yüklenir yüklenmez
     /// yönlendirme satırı kalkar ve sayfa kendiliğinden sığar.</para>
+    ///
+    /// <para>T163 tur 2 bu ayrımı gevşetmişti: gelişmiş ayarlar bölümü kendi panelinde
+    /// duruyordu, her zaman görünen başlık satırı sol sütunu +103 uzatıyordu ve K5'in
+    /// uyarı satırı ızgaraya altıncı bir satır açıp <c>RowSpacing</c> yüzünden +12 daha
+    /// ekliyordu; dolu hâl tasarım boyutunda +106 taşıyordu ve boş hâlin toleransı dolu
+    /// hâle genişletilmişti. <b>Tur 3'te tolerans geri alındı</b> — dolu hâl yine hiç
+    /// kaymıyor. Kazanç yerleşimden geldi: katlama kolu hedef panelinin var olan başlık
+    /// satırına girdi ve <c>TargetMinSize</c> ile o satırın boyuna sabitlendi, uyarı satırı
+    /// da yongalarla aynı ızgara satırını paylaşıyor. Ölçülen: sol sütun 940 — T163
+    /// öncesiyle (8da585f) <b>birebir aynı</b>.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
@@ -486,6 +496,12 @@ public sealed class WindowLayoutTests
     /// <b>Bu sayı neyi koruyor:</b> sayfanın kendi boyunu. Bir daha şişerse ölçüm kırmızıya
     /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
+    ///
+    /// <para>T163: tur 2 dört aralığı da ~115 px yukarı taşımıştı. <b>Tur 3'te dördü de
+    /// eski değerlerine döndü</b> ve öyle geçiyor — gelişmiş ayarlar bölümünün kapalı hâli
+    /// sayfaya hiçbir şey eklemiyor. Sayfayı tasarım boyutunda sol ayar sütunu belirliyor
+    /// (940); ayırıcının satırı orta sütunu 882'den 906'ya çıkardı ama orta sütun sayfanın
+    /// boyunu belirlemiyor.</para>
     /// </summary>
     [Theory]
     [InlineData(false, false, 939, 1039)]
@@ -557,6 +573,10 @@ public sealed class WindowLayoutTests
     /// bıraktığını. <b>Bozulursa kullanıcı ne görür:</b> daha uzun pencerelerde bile
     /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
+    ///
+    /// <para>T163: tur 2 iki aralığı da ~116 px yukarı taşımıştı; <b>tur 3'te ikisi de eski
+    /// değerlerine döndü</b>. Gelişmiş ayarlar bölümü sayfanın boyunu yalnız açıkken
+    /// değiştiriyor.</para>
     /// </summary>
     [Theory]
     [InlineData(false, 1039, 1129)]
@@ -1073,6 +1093,10 @@ public sealed class WindowLayoutTests
     /// <para><b>Bu ölçü neyi koruyor:</b> üç panelin aynı yatay çizgiden başlamasını.
     /// <b>Bozulursa kullanıcı ne görür:</b> orta sütun yeniden aşağı kayar ve sayfanın
     /// üst kenarı basamaklanır.</para>
+    ///
+    /// <para>T163: orta sütuna gerçek bir üçüncü satır (<c>GridSplitter</c>) eklendi;
+    /// satır sayısı ikiden üçe çıktı. Bu, eski boş <c>Auto</c> satır kalıntısı değil,
+    /// kullanıcının sürükleyebildiği ayırıcının kendi satırı.</para>
     /// </summary>
     [Theory]
     [InlineData(false, false)]
@@ -1099,7 +1123,7 @@ public sealed class WindowLayoutTests
             return ((IReadOnlyList<(string Name, double Top)>)measured, middle.RowDefinitions.Count);
         });
 
-        Assert.Equal(2, rows);
+        Assert.Equal(3, rows);
         Assert.All(tops, entry => Assert.True(
             Math.Abs(entry.Top) < 0.5,
             $"{entry.Name} sütununun tepesi {entry.Top:0.##}; üç sütun da ızgaranın tepesinden "
