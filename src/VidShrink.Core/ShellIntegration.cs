@@ -1,9 +1,9 @@
 namespace VidShrink.Core;
 
 /// <summary>
-/// Uygulamanın kabukla paylaştığı yüzey: açtığı uzantı listesi ve kendisine argüman
-/// olarak verilen yolun çözümü. Liste burada tek kopya durur; dosya seçici de kayıt
-/// defteri girdileri de buradan beslenir.
+/// Uygulamanın kabukla paylaştığı yüzey: açtığı uzantı listesi, sağ tık menüsündeki
+/// hızlı küçültme hedefleri ve kendisine argüman olarak verilen yolun çözümü. Listeler
+/// burada tek kopya durur; dosya seçici de kayıt defteri girdileri de buradan beslenir.
 /// </summary>
 public static class ShellIntegration
 {
@@ -13,6 +13,22 @@ public static class ShellIntegration
         "mp4", "mkv", "mov", "avi", "webm", "wmv", "flv", "m4v", "mpg", "mpeg", "ts", "m2ts",
         "3gp", "ogv", "vob", "asf", "rm", "rmvb", "divx", "mxf", "f4v", "mts", "dav", "gif"
     };
+
+    /// <summary>
+    /// "VidShrink ile Küçült" alt menüsünün hızlı hedefleri, megabayt cinsinden. Kurulum
+    /// betiği kendi dizisinden yazar; iki liste ölçüde karşılaştırılır.
+    /// </summary>
+    public static IReadOnlyList<int> QuickShrinkTargetsMegabytes { get; } =
+        new[] { 100, 250, 500, 1024, 2048 };
+
+    /// <summary>Hızlı küçültme isteğini uygulamaya taşıyan komut satırı bayrağı.</summary>
+    public const string ShrinkFlag = "--kucult";
+
+    /// <summary>Hedef boyutun menü etiketi: 1024'ün tam katları GB, diğerleri MB.</summary>
+    public static string FormatQuickShrinkLabel(int megabytes)
+        => megabytes >= 1024 && megabytes % 1024 == 0
+            ? $"{megabytes / 1024} GB"
+            : $"{megabytes} MB";
 
     /// <summary>
     /// Argümanlardan var olan ilk dosya yolunu döndürür, bulamazsa <c>null</c>. Tırnağı
