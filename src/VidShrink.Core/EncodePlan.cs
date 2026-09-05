@@ -10,6 +10,10 @@ public enum CodecPreference { Compatible, MaxCompression, Fast, Auto }
 
 public enum HdrPolicy { Preserve, TonemapToSdr }
 
+public enum AudioChannelOverride { Auto, Stereo, Mono, None }
+
+public enum EncoderPathOverride { Auto, Software, Hardware }
+
 /// <summary>
 /// Tercih edilen kodlayicidan yedege dusmenin sebebi. Ucu ayri tutuluyor cunku ucu
 /// kullaniciya ayri sey soyler: <see cref="NotInBuild"/> ve <see cref="NotMeasured"/>
@@ -44,7 +48,26 @@ public enum ReasonCode
     FillTwoPassBandTooNarrowForCrf,
     HardwareBitrateBias,
     SourceAlreadyUnderTarget,
-    TargetCappedToSource
+    TargetCappedToSource,
+    ManualModeOverride,
+    ManualCrfOverride,
+    ManualPresetOverride,
+    ManualCrfClamped,
+    ManualModeSupersededByCrf,
+    ManualPresetFirstPassRelaxed,
+    ManualAudioBitrateOverride,
+    ManualAudioBitrateUnmet,
+    ManualAudioBitrateSupersededByChannels,
+    ManualAudioChannelsOverride,
+    ManualAudioChannelsUnmet,
+    ManualMinResolutionOverride,
+    ManualMinResolutionUnmet,
+    ManualMinFpsOverride,
+    ManualMinFpsUnmet,
+    ManualEncoderPathOverride,
+    ManualEncoderPathUnmet,
+    ManualEncoderPathSupersededByCodec,
+    ManualOverrideDroppedOnPassThrough
 }
 
 public sealed record ReasonNote(
@@ -65,7 +88,9 @@ public sealed record ReasonNote(
     string? RequestedCodec = null,
     string? FallbackCodec = null,
     double BandLowerMb = 0,
-    EncoderFallbackCause FallbackCause = EncoderFallbackCause.NotWorking);
+    EncoderFallbackCause FallbackCause = EncoderFallbackCause.NotWorking,
+    string? ManualOverrideValue = null,
+    string? EngineWouldHaveChosen = null);
 
 public sealed class EncodePlan
 {

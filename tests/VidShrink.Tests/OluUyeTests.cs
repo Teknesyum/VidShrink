@@ -360,9 +360,12 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 31 satir: 26 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
-    /// (<c>Flagged = ZeroConsumer || Unused</c>). T150 tur 2'de sifir tuketici sayisi 27'den
-    /// 26'ya, kumenin tamami 32 satirdan 31'e indi. Cikan uye <c>EncoderProbeState.NotWorking</c>:
+    /// Kume bugun 51 satir: 45 sifir uretim tuketicili uye + 6 hic kullanilmayan uye
+    /// (<c>Flagged = ZeroConsumer || Unused</c>). T165 son turunda kume 31 satirdan 51'e cikti:
+    /// T165 <c>ReasonCode</c>'a on dokuz gerekce kodu ve <c>EncoderPathOverride</c>'a ucuncu bir
+    /// deger ekledi, yirmisi de pime yeni girdi. Bundan onceki degisim T150 tur 2'deydi: sifir
+    /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
+    /// <c>EncoderProbeState.NotWorking</c>:
     /// T139 <c>src/VidShrink.Ffmpeg/PerformanceProbe.cs:97</c> satirini yazdi
     /// (<c>2caff96</c> ekledi, <c>cf009f0</c> cagriyi <c>KnownState</c> olarak yeniden adlandirdi)
     /// ve satir <c>main</c>e <c>5df0a98</c> birlesmesiyle geldi. Satir
@@ -434,8 +437,41 @@ public sealed class OluUyeTests
         new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Debt,
             "public static readonly, hicbir yerde okunmuyor. Ayni dosya, ayni sinir."),
         new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,
-            "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir.")
+            "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir."),
+        new("EncoderPathOverride.Software", "yalniz-disarida", Legitimate,
+            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
+        new("ReasonCode.ManualModeOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualCrfOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualPresetOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualCrfClamped", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualModeSupersededByCrf", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualPresetFirstPassRelaxed", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualAudioBitrateOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualAudioBitrateUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualAudioBitrateSupersededByChannels", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualAudioChannelsOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualAudioChannelsUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualMinResolutionOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualMinResolutionUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualMinFpsOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualMinFpsUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualEncoderPathOverride", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualEncoderPathUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualEncoderPathSupersededByCodec", "varsayilan-kol", Debt, ManualReasonDebt),
+        new("ReasonCode.ManualOverrideDroppedOnPassThrough", "varsayilan-kol", Debt, ManualReasonDebt)
     };
+
+    /// <summary>
+    /// T165'in ekledigi on dokuz gerekce kodunun ortak borcu. Kodlarin kendisi uretiliyor ve
+    /// <c>PlanResult.ReasonCodes</c> icinde tasiniyor (olculeri
+    /// <c>ManualOverrideTests</c>'te), ama <c>MainWindow.axaml.cs:2319-2354</c>'teki
+    /// "kod -> kullanici cumlesi" switch'inde kollari yok; hepsi <c>_ => null</c>'a dusuyor.
+    /// Kol yazmak <c>src/VidShrink.App/**</c>'a yazmak demek ve orasi T163'un alani, T165'in
+    /// sinirlar bolumu acikca yasakliyor. Yani kodlar okunmuyor degil, **henuz** okunmuyor;
+    /// karar bir sonraki sozlesmenin.
+    /// </summary>
+    private const string ManualReasonDebt =
+        "T165'in acilan sekiz kalem icin urettigi gerekce kodu. Cekirdek onu ReasonNote olarak tasiyor ve olcusu ManualOverrideTests'te var, ama MainWindow.axaml.cs:2319-2354'teki kod->cumle switch'inde kolu yok, '_ => null'a dusuyor; kullanici gerekceyi henuz gormuyor. Kolu yazmak src/VidShrink.App altina yazmak demek ve orasi T163'un alani, T165 oraya yazamaz. Arayuz kolunun gerekip gerekmedigi olculmedi.";
 
     private readonly ITestOutputHelper _output;
 
@@ -483,7 +519,7 @@ public sealed class OluUyeTests
 
     /// <summary>
     /// K2: kume anahtar kelime listesinden degil turden cikiyor. Kanit, olcunun bu dosyada
-    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 31 satir 129 uyelik kumenin bir parcasi,
+    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 51 satir 158 uyelik kumenin bir parcasi,
     /// kumenin kendisi degil.
     /// </summary>
     [Fact]
@@ -558,6 +594,124 @@ public sealed class OluUyeTests
 
         Assert.DoesNotContain("videotoolbox", parser, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("videotoolbox", preview, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private sealed class FakeAvailability : IEncoderAvailability
+    {
+        private readonly Dictionary<string, EncoderProbeState> _states;
+
+        public FakeAvailability(params (string Codec, EncoderProbeState State)[] states)
+            => _states = states.ToDictionary(s => s.Codec, s => s.State, StringComparer.OrdinalIgnoreCase);
+
+        public bool HasEncoder(string name) => _states.ContainsKey(name);
+        public bool WorksAsEncoder(string codec) => _states.TryGetValue(codec, out var s) && s == EncoderProbeState.Working;
+        public EncoderProbeState EncoderState(string codec) => _states.TryGetValue(codec, out var s) ? s : EncoderProbeState.NotWorking;
+    }
+
+    private static FakeAvailability AllWorking() => new(
+        ("libx264", EncoderProbeState.Working),
+        ("libx265", EncoderProbeState.Working),
+        ("libsvtav1", EncoderProbeState.Working),
+        ("h264_nvenc", EncoderProbeState.Working),
+        ("hevc_nvenc", EncoderProbeState.Working),
+        ("av1_nvenc", EncoderProbeState.Working));
+
+    private static MediaInfo Kaynak() => new()
+    {
+        FilePath = "sample.mp4",
+        FileSizeBytes = 500L * 1024 * 1024,
+        DurationSeconds = 120,
+        Width = 1920,
+        Height = 1080,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 35_000_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 128_000,
+        AudioChannels = 2
+    };
+
+    private static MediaInfo HedefinAltindaKaynak() => new()
+    {
+        FilePath = "zaten-kucuk.mp4",
+        FileSizeBytes = 10L * 1024 * 1024,
+        DurationSeconds = 60,
+        Width = 1280,
+        Height = 720,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 1_400_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 128_000,
+        AudioChannels = 2
+    };
+
+    /// <summary>
+    /// <c>EncoderPathOverride.Software</c>'in pimi neden <c>mesru</c>: uye uretimde ada gore
+    /// hic gecmiyor ama islevsel olarak ulasiliyor. Motor yolu iki adimda soruyor —
+    /// <c>PlanCalculator.cs:271</c> kapiyi <c>!= Auto</c> ile acar, <c>:274</c>
+    /// <c>wantsHardware = EncoderPath == Hardware</c> der. <c>Software</c> ikinci sorunun
+    /// else'idir. Uc degerin ucu de ayni girdide farkli plan uretirse uye canlidir.
+    /// </summary>
+    [Fact]
+    public void TheSoftwareEncoderPathIsReachedWithoutBeingNamed()
+    {
+        var info = Kaynak();
+        PlanResult Kur(EncoderPathOverride yol) => PlanCalculator.BuildDetailed(
+            info,
+            new PlanOptions { TargetMb = 25, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Fast, EncoderPath = yol },
+            null,
+            AllWorking());
+
+        var auto = Kur(EncoderPathOverride.Auto);
+        var software = Kur(EncoderPathOverride.Software);
+        var hardware = Kur(EncoderPathOverride.Hardware);
+
+        _output.WriteLine($"Auto     -> {auto.Plan.Codec} (donanim={CodecModel.IsHardware(auto.Plan.Codec)})");
+        _output.WriteLine($"Software -> {software.Plan.Codec} (donanim={CodecModel.IsHardware(software.Plan.Codec)})");
+        _output.WriteLine($"Hardware -> {hardware.Plan.Codec} (donanim={CodecModel.IsHardware(hardware.Plan.Codec)})");
+
+        Assert.True(CodecModel.IsHardware(auto.Plan.Codec),
+            $"motor kendiliginden donanim secmezse bu olcu bir sey kanitlamaz (bulunan {auto.Plan.Codec})");
+        Assert.False(CodecModel.IsHardware(software.Plan.Codec));
+        Assert.True(CodecModel.IsHardware(hardware.Plan.Codec));
+        Assert.NotEqual(auto.Plan.Codec, software.Plan.Codec);
+
+        var not = Assert.Single(software.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathOverride);
+        Assert.Equal("Software", not.ManualOverrideValue);
+        Assert.DoesNotContain(auto.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathOverride);
+    }
+
+    /// <summary>
+    /// Ayni uyenin oteki iki uretim kapisi: <c>PlanCalculator.cs:263-264</c> (kodek kilidiyle
+    /// celisme) ve <c>:799</c> (kopyalama yolunda dusme). Ikisinde de <c>Software</c> degeri
+    /// nota <b>adiyla</b> giriyor — yani ada gore gorunmemesi taramanin siniri, uyenin degil.
+    /// </summary>
+    [Fact]
+    public void TheSoftwarePathValueReachesBothOtherProductionGates()
+    {
+        var kilit = PlanCalculator.BuildDetailed(
+            Kaynak(),
+            new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCodec = "hevc_nvenc", EncoderPath = EncoderPathOverride.Software },
+            null,
+            AllWorking());
+
+        var kopya = PlanCalculator.BuildDetailed(
+            HedefinAltindaKaynak(),
+            new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto, EncoderPath = EncoderPathOverride.Software },
+            null,
+            AllWorking());
+
+        _output.WriteLine($"kilit: codec={kilit.Plan.Codec} gerekce={kilit.Plan.Reason}");
+        _output.WriteLine($"kopya: mode={kopya.Plan.Mode} gerekce={kopya.Plan.Reason}");
+
+        var kilitNotu = Assert.Single(kilit.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathSupersededByCodec);
+        Assert.Equal("Software", kilitNotu.ManualOverrideValue);
+        Assert.Equal("hevc_nvenc", kilit.Plan.Codec);
+
+        var kopyaNotu = Assert.Single(kopya.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualOverrideDroppedOnPassThrough);
+        Assert.Equal("passthrough", kopya.Plan.Mode);
+        Assert.Equal("kodlayici yolu=Software", kopyaNotu.ManualOverrideValue);
     }
 
     [Fact]
