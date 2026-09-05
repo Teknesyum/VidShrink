@@ -56,7 +56,9 @@ public enum ReasonCode
     ManualAudioChannelsOverride,
     ManualMinResolutionOverride,
     ManualMinFpsOverride,
-    ManualEncoderPathOverride
+    ManualEncoderPathOverride,
+    ManualEncoderPathUnmet,
+    ManualOverrideDroppedOnPassThrough
 }
 
 public sealed record ReasonNote(

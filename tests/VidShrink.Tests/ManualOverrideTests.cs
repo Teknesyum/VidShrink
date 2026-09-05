@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using VidShrink.Core;
 using Xunit.Abstractions;
@@ -34,6 +35,14 @@ public sealed class ManualOverrideTests
         ("hevc_nvenc", EncoderProbeState.Working),
         ("av1_nvenc", EncoderProbeState.Working));
 
+    private static FakeAvailability YalnizYazilim() => new(
+        ("libx264", EncoderProbeState.Working),
+        ("libx265", EncoderProbeState.Working),
+        ("libsvtav1", EncoderProbeState.Working),
+        ("h264_nvenc", EncoderProbeState.NotWorking),
+        ("hevc_nvenc", EncoderProbeState.NotWorking),
+        ("av1_nvenc", EncoderProbeState.NotWorking));
+
     private static MediaInfo Info(int width = 1920, int height = 1080, double fps = 30, double durationSeconds = 120,
         long fileSizeBytes = 500L * 1024 * 1024, int audioChannels = 2, long audioBitrateBps = 128_000) => new()
     {
@@ -50,278 +59,557 @@ public sealed class ManualOverrideTests
         AudioChannels = audioChannels
     };
 
-    /// <summary>K1: en az bes farkli kaynak/hedef bilesimi, hicbir gecersiz kilma sabitlenmemisken.</summary>
-    public static IEnumerable<object[]> KaynakHedefBilesimleri()
-    {
-        yield return new object[] { Info(1920, 1080, 30, 120), 25.0 };
-        yield return new object[] { Info(1280, 720, 24, 300), 8.0 };
-        yield return new object[] { Info(3840, 2160, 60, 45), 50.0 };
-        yield return new object[] { Info(1920, 1080, 30, 600), 6.0 };
-        yield return new object[] { Info(1280, 720, 30, 30), 100.0 };
-    }
+    // --- K1: varsayilan, T165 oncesi motorla birebir ayni plani uretiyor ---
+    //
+    // Beklenen degerler uydurulmadi: 9b092e9 (T165'in ebeveyni, sozlesme oncesi motor)
+    // agacinda ayni bes bilesim kosuldu ve cikti buraya alindi. Olcum ve ham cikti
+    // docs/olcumler/elle-gecersiz-kilma.md'de. Varsayilan davranisi degistiren her
+    // mutasyon bu kollari dusurur.
 
     [Theory]
-    [MemberData(nameof(KaynakHedefBilesimleri))]
-    public void K1_VarsayilanHicbirSeyiDegistirmiyor(MediaInfo info, double targetMb)
+    [InlineData(1920, 1080, 30, 120, 25.0, "libsvtav1", "2pass", 1567, -1, 1920, 1080, 30.0, 128, -1, "6")]
+    [InlineData(1280, 720, 24, 300, 8.0, "libsvtav1", "2pass", 188, -1, 1202, 676, 24.0, 26, 1, "6")]
+    [InlineData(3840, 2160, 60, 45, 50.0, "libsvtav1", "2pass", 9016, -1, 3840, 2160, 60.0, 128, -1, "6")]
+    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 80, -1, 690, 388, 30.0, 0, -1, "6")]
+    [InlineData(1280, 720, 30, 30, 100.0, "libx264", "2pass", 27305, -1, 1280, 720, 30.0, 128, -1, "slow")]
+    public void K1_VarsayilanT165OncesiMotorlaBirebirAyni(
+        int srcW, int srcH, double srcFps, double durationSeconds, double targetMb,
+        string codec, string mode, int videoK, int crf, int width, int height, double fps,
+        int audioK, int audioChannels, string preset)
     {
-        var before = new PlanOptions { TargetMb = targetMb, Codec = CodecPreference.Auto };
-        var after = new PlanOptions
+        var info = Info(srcW, srcH, srcFps, durationSeconds);
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = targetMb, Codec = CodecPreference.Auto }, null, AllWorking());
+        var p = result.Plan;
+
+        _output.WriteLine($"{srcW}x{srcH}@{srcFps} -> {targetMb}MB");
+        _output.WriteLine($"  taban (9b092e9): {codec}|{mode}|{videoK}k|crf={(crf < 0 ? "-" : crf.ToString())}|{width}x{height}@{fps:0.###}|ses {audioK}k/{(audioChannels < 0 ? "kaynak" : audioChannels.ToString())}|preset {preset}");
+        _output.WriteLine($"  simdi   (T165): {p.Codec}|{p.Mode}|{p.VideoBitrateK}k|crf={p.Crf?.ToString() ?? "-"}|{p.Width}x{p.Height}@{p.Fps:0.###}|ses {p.AudioBitrateK}k/{p.AudioChannels?.ToString() ?? "kaynak"}|preset {p.Preset}");
+
+        Assert.Equal(codec, p.Codec);
+        Assert.Equal(mode, p.Mode);
+        Assert.Equal(videoK, p.VideoBitrateK);
+        Assert.Equal(crf < 0 ? (int?)null : crf, p.Crf);
+        Assert.Equal(width, p.Width);
+        Assert.Equal(height, p.Height);
+        Assert.Equal(fps, p.Fps, 3);
+        Assert.Equal(audioK, p.AudioBitrateK);
+        Assert.Equal(audioChannels < 0 ? (int?)null : audioChannels, p.AudioChannels);
+        Assert.Equal(preset, p.Preset);
+        Assert.DoesNotContain(p.ReasonCodes, n => n.Code.ToString().StartsWith("Manual", StringComparison.Ordinal));
+    }
+
+    // --- K2: acilan sekiz kalemin her biri komut satirina ulasiyor ---
+
+    private sealed record Kalem(
+        string Ad,
+        MediaInfo Info,
+        PlanOptions Options,
+        int Pass,
+        string SabitlenenDeger,
+        Func<EncodePlan, string> BeklenenArguman,
+        ReasonCode Not,
+        Func<EncodePlan, bool>? EkKosul = null,
+        string EkKosulAdi = "");
+
+    public static IEnumerable<object[]> KalemIdleri() => new[]
+    {
+        "kip-2pass", "kip-crf", "crf", "on-ayar", "ses-kbps",
+        "ses-stereo", "ses-mono", "ses-yok", "cozunurluk-tabani", "kare-hizi-tabani",
+        "kodlayici-yazilim", "kodlayici-donanim"
+    }.Select(id => new object[] { id });
+
+    private static MediaInfo KucukKaynak() => new()
+    {
+        FilePath = "kucuk.mp4",
+        FileSizeBytes = 200L * 1024 * 1024,
+        DurationSeconds = 10,
+        Width = 320,
+        Height = 180,
+        Fps = 24,
+        VideoCodec = "h264",
+        TotalBitrateBps = 400_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 96_000,
+        AudioChannels = 2
+    };
+
+    /// <summary>
+    /// Kullanicinin bir kalemi sabitledigi durumu, motorun o kalemde baska bir sey
+    /// sectigi bir senaryoyla birlikte kurar. Kalemin "gecti" sayilmasi icin uretilen
+    /// ffmpeg komut satirinda gorunmesi gerekir; senaryo motorun kendiliginden ayni
+    /// degeri sectigi bir yere denk geliyorsa olcu hicbir sey kanitlamaz, o yuzden
+    /// her senaryonun basinda motorun ne sectigi ayrica dogrulaniyor.
+    /// </summary>
+    private static Kalem KalemFor(string id)
+    {
+        switch (id)
         {
-            TargetMb = targetMb,
-            Codec = CodecPreference.Auto,
-            LockedMode = null,
-            LockedCrf = null,
-            LockedPreset = null,
-            LockedAudioKbps = null,
-            AudioChannels = AudioChannelOverride.Auto,
-            MinResolutionHeight = null,
-            MinFps = null,
-            EncoderPath = EncoderPathOverride.Auto
-        };
-
-        var a = PlanCalculator.BuildDetailed(info, before, null, AllWorking());
-        var b = PlanCalculator.BuildDetailed(info, after, null, AllWorking());
-
-        _output.WriteLine($"{info.Width}x{info.Height}@{info.Fps} -> {targetMb}MB: once codec={a.Plan.Codec} mode={a.Plan.Mode} videoK={a.Plan.VideoBitrateK} crf={a.Plan.Crf} {a.Plan.Width}x{a.Plan.Height}@{a.Plan.Fps:0.##} ses={a.Plan.AudioBitrateK}k/{a.Plan.AudioChannels?.ToString() ?? "kaynak"}");
-        _output.WriteLine($"{info.Width}x{info.Height}@{info.Fps} -> {targetMb}MB: sonra codec={b.Plan.Codec} mode={b.Plan.Mode} videoK={b.Plan.VideoBitrateK} crf={b.Plan.Crf} {b.Plan.Width}x{b.Plan.Height}@{b.Plan.Fps:0.##} ses={b.Plan.AudioBitrateK}k/{b.Plan.AudioChannels?.ToString() ?? "kaynak"}");
-
-        Assert.Equal(a.Plan.Codec, b.Plan.Codec);
-        Assert.Equal(a.Plan.Mode, b.Plan.Mode);
-        Assert.Equal(a.Plan.VideoBitrateK, b.Plan.VideoBitrateK);
-        Assert.Equal(a.Plan.Crf, b.Plan.Crf);
-        Assert.Equal(a.Plan.Width, b.Plan.Width);
-        Assert.Equal(a.Plan.Height, b.Plan.Height);
-        Assert.Equal(a.Plan.Fps, b.Plan.Fps);
-        Assert.Equal(a.Plan.AudioBitrateK, b.Plan.AudioBitrateK);
-        Assert.Equal(a.Plan.AudioChannels, b.Plan.AudioChannels);
-        Assert.Equal(a.Plan.Preset, b.Plan.Preset);
-        Assert.Equal(a.Plan.Reason, b.Plan.Reason);
-    }
-
-    // --- K2: sekiz kalemin her biri gercekten geciyor ---
-
-    [Fact]
-    public void K2_01_EncodeModeTwoPassSabitleniyor()
-    {
-        var info = new MediaInfo
-        {
-            FilePath = "kucuk.mp4",
-            FileSizeBytes = 200L * 1024 * 1024,
-            DurationSeconds = 10,
-            Width = 320,
-            Height = 180,
-            Fps = 24,
-            VideoCodec = "h264",
-            TotalBitrateBps = 400_000,
-            AudioCodec = "aac",
-            AudioBitrateBps = 96_000,
-            AudioChannels = 2
-        };
-
-        var natural = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 90, Codec = CodecPreference.Compatible, FillPolicy = FillPolicy.QualityCeiling }, null, AllWorking());
-        Assert.Equal("crf", natural.Plan.Mode);
-        var naturalTargetMb = 90.0;
-
-        var options = new PlanOptions { TargetMb = naturalTargetMb, Codec = CodecPreference.Compatible, FillPolicy = FillPolicy.QualityCeiling, LockedMode = EncodeMode.TwoPass };
-        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 2, null));
-
-        _output.WriteLine($"dogal mode={natural!.Plan.Mode} ({naturalTargetMb}MB) zorlanan mode={result.Plan.Mode} args={args}");
-        Assert.Equal("2pass", result.Plan.Mode);
-        Assert.Contains("-b:v", args);
-        Assert.DoesNotContain("-crf", args);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualModeOverride);
-    }
-
-    [Fact]
-    public void K2_01b_EncodeModeCrfSabitleniyor()
-    {
-        var options = new PlanOptions { TargetMb = 4, Codec = CodecPreference.Compatible, LockedMode = EncodeMode.Crf };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(Info(), result.Plan, "out.mp4", 0, null));
-
-        _output.WriteLine($"mode={result.Plan.Mode} crf={result.Plan.Crf} args={args}");
-        Assert.Equal("crf", result.Plan.Mode);
-        Assert.NotNull(result.Plan.Crf);
-        Assert.Contains($"-crf {result.Plan.Crf}", args);
-    }
-
-    [Fact]
-    public void K2_02_CrfDegeriElleSabitleniyor()
-    {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 19 };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(Info(), result.Plan, "out.mp4", 0, null));
-
-        _output.WriteLine($"crf={result.Plan.Crf} videoK={result.Plan.VideoBitrateK} args={args}");
-        Assert.Equal("crf", result.Plan.Mode);
-        Assert.Equal(19, result.Plan.Crf);
-        Assert.Contains("-crf 19", args);
-    }
-
-    [Fact]
-    public void K2_03_PresetElleSabitleniyor()
-    {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, LockedPreset = "veryslow" };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(Info(), result.Plan, "out.mp4", 2, null));
-
-        _output.WriteLine($"preset={result.Plan.Preset} args={args}");
-        Assert.Equal("veryslow", result.Plan.Preset);
-        Assert.Contains("-preset veryslow", args);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualPresetOverride);
-    }
-
-    [Fact]
-    public void K2_04_SesHedefiKbpsElleSabitleniyor()
-    {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedAudioKbps = 96 };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(Info(), result.Plan, "out.mp4", 0, null));
-
-        _output.WriteLine($"audioK={result.Plan.AudioBitrateK} args={args}");
-        Assert.Equal(96, result.Plan.AudioBitrateK);
-        Assert.Contains("-b:a 96k", args);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioBitrateOverride);
-    }
-
-    [Theory]
-    [InlineData(AudioChannelOverride.Stereo, 2)]
-    [InlineData(AudioChannelOverride.Mono, 1)]
-    public void K2_05_SesKanaliElleSabitleniyor(AudioChannelOverride pref, int expectedChannels)
-    {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, AudioChannels = pref };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(Info(), result.Plan, "out.mp4", 0, null));
-
-        _output.WriteLine($"kanal={pref} audioChannels={result.Plan.AudioChannels} args={args}");
-        Assert.Equal(expectedChannels, result.Plan.AudioChannels);
-        Assert.Contains($"-ac {expectedChannels}", args);
-    }
-
-    [Fact]
-    public void K2_05b_SesYokSabitleniyor()
-    {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, AudioChannels = AudioChannelOverride.None };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(Info(), result.Plan, "out.mp4", 0, null));
-
-        _output.WriteLine($"audioCodec={result.Plan.AudioCodec ?? "yok"} args={args}");
-        Assert.Null(result.Plan.AudioCodec);
-        Assert.Equal(0, result.Plan.AudioBitrateK);
-        Assert.Contains("-an", args);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualAudioChannelsOverride);
-    }
-
-    [Fact]
-    public void K2_06_CozunurlukTabaniElleSabitleniyor()
-    {
-        var info = Info(1920, 1080, 30, 120);
-        var natural = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto }, null, AllWorking());
-        Assert.True(natural.Plan.Height < 720, $"taban olmadan da 720'nin altina dusmezse bu olcu bir sey kanitlamaz (bulunan {natural.Plan.Height})");
-
-        var options = new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto, MinResolutionHeight = 720 };
-        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 2, null));
-
-        _output.WriteLine($"tabansiz={natural.Plan.Width}x{natural.Plan.Height} tabanli={result.Plan.Width}x{result.Plan.Height} args={args}");
-        Assert.True(result.Plan.Height >= 720);
-        Assert.Contains($"scale={result.Plan.Width}:{result.Plan.Height}", args);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionOverride);
-    }
-
-    [Fact]
-    public void K2_07_KareHiziTabaniElleSabitleniyor()
-    {
-        var info = Info(1920, 1080, 60, 600);
-        double naturalTargetMb = 0;
-        PlanResult? natural = null;
-        foreach (var candidate in new[] { 2.0, 1.5, 1.0, 0.6, 0.4 })
-        {
-            var probe = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = candidate, Codec = CodecPreference.Auto }, null, AllWorking());
-            if (probe.Plan.Fps < 24) { natural = probe; naturalTargetMb = candidate; break; }
+            case "kip-2pass":
+            {
+                var info = KucukKaynak();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 90, Codec = CodecPreference.Compatible, FillPolicy = FillPolicy.QualityCeiling }, null, AllWorking());
+                Assert.Equal("crf", dogal.Plan.Mode);
+                return new Kalem("EncodeMode", info,
+                    new PlanOptions { TargetMb = 90, Codec = CodecPreference.Compatible, FillPolicy = FillPolicy.QualityCeiling, LockedMode = EncodeMode.TwoPass },
+                    2, "TwoPass", p => $"-b:v {p.VideoBitrateK}k", ReasonCode.ManualModeOverride,
+                    p => p.Mode == "2pass" && p.Crf is null, "kip 2pass ve crf yok");
+            }
+            case "kip-crf":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 4, Codec = CodecPreference.Compatible }, null, AllWorking());
+                Assert.Equal("2pass", dogal.Plan.Mode);
+                return new Kalem("EncodeMode", info,
+                    new PlanOptions { TargetMb = 4, Codec = CodecPreference.Compatible, LockedMode = EncodeMode.Crf },
+                    0, "Crf", p => $"-crf {p.Crf}", ReasonCode.ManualModeOverride,
+                    p => p.Mode == "crf" && p.Crf is not null, "kip crf");
+            }
+            case "crf":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+                Assert.NotEqual(19, dogal.Plan.Crf);
+                return new Kalem("CRF degeri", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 19 },
+                    0, "19", _ => "-crf 19", ReasonCode.ManualCrfOverride,
+                    p => p.Crf == 19, "crf 19");
+            }
+            case "on-ayar":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality }, null, AllWorking());
+                Assert.NotEqual("veryslow", dogal.Plan.Preset);
+                return new Kalem("preset / hiz", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, LockedPreset = "veryslow" },
+                    2, "veryslow", _ => "-preset veryslow", ReasonCode.ManualPresetOverride,
+                    p => p.Preset == "veryslow", "preset veryslow");
+            }
+            case "ses-kbps":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+                Assert.NotEqual(96, dogal.Plan.AudioBitrateK);
+                return new Kalem("ses hedefi", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedAudioKbps = 96 },
+                    0, "96 kbps", _ => "-b:a 96k", ReasonCode.ManualAudioBitrateOverride,
+                    p => p.AudioBitrateK == 96, "ses 96k");
+            }
+            case "ses-stereo":
+            case "ses-mono":
+            {
+                var mono = id == "ses-mono";
+                var info = Info();
+                var kanal = mono ? AudioChannelOverride.Mono : AudioChannelOverride.Stereo;
+                var beklenen = mono ? 1 : 2;
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+                Assert.NotEqual(beklenen, dogal.Plan.AudioChannels);
+                return new Kalem("ses kanali", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, AudioChannels = kanal },
+                    0, kanal.ToString(), _ => $"-ac {beklenen}", ReasonCode.ManualAudioChannelsOverride,
+                    p => p.AudioChannels == beklenen, $"kanal {beklenen}");
+            }
+            case "ses-yok":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+                Assert.NotNull(dogal.Plan.AudioCodec);
+                return new Kalem("ses kanali", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, AudioChannels = AudioChannelOverride.None },
+                    0, "None", _ => "-an", ReasonCode.ManualAudioChannelsOverride,
+                    p => p.AudioCodec is null && p.AudioBitrateK == 0, "ses yok");
+            }
+            case "cozunurluk-tabani":
+            {
+                var info = Info(1920, 1080, 30, 120);
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto }, null, AllWorking());
+                Assert.True(dogal.Plan.Height < 720, $"taban olmadan da 720'nin altina dusmezse bu olcu bir sey kanitlamaz (bulunan {dogal.Plan.Height})");
+                return new Kalem("cozunurluk tabani", info,
+                    new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto, MinResolutionHeight = 720 },
+                    2, "en az 720p", p => $"scale={p.Width}:{p.Height}", ReasonCode.ManualMinResolutionOverride,
+                    p => p.Height >= 720, "yukseklik >= 720");
+            }
+            case "kare-hizi-tabani":
+            {
+                var info = Info(1920, 1080, 60, 600);
+                double hedef = 0;
+                PlanResult? dogal = null;
+                foreach (var aday in new[] { 8.0, 5.0, 3.0, 2.0, 1.5, 1.0, 0.6, 0.4 })
+                {
+                    var deneme = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = aday, Codec = CodecPreference.Auto, AllowResolutionDrop = false }, null, AllWorking());
+                    if (deneme.Plan.Fps < 24) { dogal = deneme; hedef = aday; break; }
+                }
+                Assert.NotNull(dogal);
+                return new Kalem("kare hizi tabani", info,
+                    new PlanOptions { TargetMb = hedef, Codec = CodecPreference.Auto, AllowResolutionDrop = false, MinFps = 24 },
+                    2, "en az 24", p => $"fps={p.Fps.ToString("0.###", CultureInfo.InvariantCulture)}", ReasonCode.ManualMinFpsOverride,
+                    p => p.Fps >= 24 - 0.01 && p.Fps < info.Fps - 0.01, "24 <= fps < kaynak fps");
+            }
+            case "kodlayici-yazilim":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Fast }, null, AllWorking());
+                Assert.True(CodecModel.IsHardware(dogal.Plan.Codec), $"motor kendiliginden donanim secmezse bu olcu bir sey kanitlamaz (bulunan {dogal.Plan.Codec})");
+                return new Kalem("kodlayici yolu", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Fast, EncoderPath = EncoderPathOverride.Software },
+                    0, "Software", p => $"-c:v {p.Codec}", ReasonCode.ManualEncoderPathOverride,
+                    p => !CodecModel.IsHardware(p.Codec), "yazilim kodlayici");
+            }
+            case "kodlayici-donanim":
+            {
+                var info = Info();
+                var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality }, null, AllWorking());
+                Assert.False(CodecModel.IsHardware(dogal.Plan.Codec), $"motor kendiliginden yazilim secmezse bu olcu bir sey kanitlamaz (bulunan {dogal.Plan.Codec})");
+                return new Kalem("kodlayici yolu", info,
+                    new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, EncoderPath = EncoderPathOverride.Hardware },
+                    0, "Hardware", p => $"-c:v {p.Codec}", ReasonCode.ManualEncoderPathOverride,
+                    p => CodecModel.IsHardware(p.Codec), "donanim kodlayici");
+            }
+            default:
+                throw new ArgumentOutOfRangeException(nameof(id), id, "bilinmeyen kalem");
         }
-        Assert.NotNull(natural);
-        _output.WriteLine($"dogal dusus: {naturalTargetMb}MB -> {natural!.Plan.Fps:0.##}fps");
+    }
 
-        var options = new PlanOptions { TargetMb = naturalTargetMb, Codec = CodecPreference.Auto, MinFps = 24 };
-        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
-        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, result.Plan, "out.mp4", 2, null));
+    [Theory]
+    [MemberData(nameof(KalemIdleri))]
+    public void K2_SabitlenenDegerFfmpegKomutSatirindaGorunuyor(string id)
+    {
+        var kalem = KalemFor(id);
+        var result = PlanCalculator.BuildDetailed(kalem.Info, kalem.Options, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kalem.Info, result.Plan, "out.mp4", kalem.Pass, kalem.Pass == 1 ? "log" : null));
+        var beklenen = kalem.BeklenenArguman(result.Plan);
 
-        _output.WriteLine($"tabansiz={natural.Plan.Fps:0.##} tabanli={result.Plan.Fps:0.##} args={args}");
-        Assert.True(result.Plan.Fps >= 24 - 0.01);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinFpsOverride);
+        _output.WriteLine($"| {kalem.Ad} | {kalem.SabitlenenDeger} | {beklenen} |");
+        _output.WriteLine($"args: {args}");
+
+        Assert.Contains(beklenen, args);
+        if (kalem.EkKosul is not null)
+            Assert.True(kalem.EkKosul(result.Plan), $"{kalem.EkKosulAdi} bekleniyordu; plan {result.Plan.Codec}/{result.Plan.Mode}/crf={result.Plan.Crf}/{result.Plan.Width}x{result.Plan.Height}@{result.Plan.Fps:0.##}/ses {result.Plan.AudioBitrateK}k");
+        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == kalem.Not);
     }
 
     [Fact]
-    public void K2_08_KodlayiciYoluYazilimaZorlaniyor()
+    public void K2_KipSabitlenincCrfArgumaniDusuyor()
     {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Fast, SpeedMode = SpeedMode.Fast, EncoderPath = EncoderPathOverride.Software };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
+        var kalem = KalemFor("kip-2pass");
+        var result = PlanCalculator.BuildDetailed(kalem.Info, kalem.Options, null, AllWorking());
+        var args = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kalem.Info, result.Plan, "out.mp4", 2, null));
+
+        _output.WriteLine(args);
+        Assert.DoesNotContain("-crf", args);
+    }
+
+    // --- K3: CRF sabitlenince hedef boyut zorlanmiyor ---
+
+    [Fact]
+    public void K3_CrfSabitlenincHedefBoyutZorlanmiyor()
+    {
+        var info = Info(1920, 1080, 30, 300);
+        const double hedefMb = 25.0;
+
+        var serbest = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = hedefMb, Codec = CodecPreference.Compatible }, null, AllWorking());
+        var sabit = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = hedefMb, Codec = CodecPreference.Compatible, LockedCrf = 16 }, null, AllWorking());
+
+        _output.WriteLine($"hedef {hedefMb}MB");
+        _output.WriteLine($"  serbest: mode={serbest.Plan.Mode} crf={serbest.Plan.Crf?.ToString() ?? "-"} {serbest.Plan.Width}x{serbest.Plan.Height}@{serbest.Plan.Fps:0.##} videoK={serbest.Plan.VideoBitrateK} tahmin={serbest.Estimate.ExpectedMb:0.00}MB");
+        _output.WriteLine($"  crf=16 : mode={sabit.Plan.Mode} crf={sabit.Plan.Crf} {sabit.Plan.Width}x{sabit.Plan.Height}@{sabit.Plan.Fps:0.##} videoK={sabit.Plan.VideoBitrateK} tahmin={sabit.Estimate.ExpectedMb:0.00}MB");
+        _output.WriteLine($"  gerekce: {sabit.Plan.Reason}");
+
+        Assert.True(serbest.Estimate.ExpectedMb <= hedefMb * 1.02,
+            $"gecersiz kilma yokken motor hedefi zorlamali; tahmin {serbest.Estimate.ExpectedMb:0.00}MB, hedef {hedefMb}MB");
+        Assert.True(sabit.Estimate.ExpectedMb > hedefMb * 1.2,
+            $"CRF sabitken hedef zorlanmamali; tahmin {sabit.Estimate.ExpectedMb:0.00}MB, hedef {hedefMb}MB");
+        Assert.Equal("crf", sabit.Plan.Mode);
+        Assert.Equal(16, sabit.Plan.Crf);
+        Assert.Contains(sabit.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualCrfOverride);
+    }
+
+    /// <summary>
+    /// Ayni CRF iki farkli hedefte ayni kodlama yogunlugunu vermeli: hedef boyut artik
+    /// CRF'i cekmiyor. Hedef yine zorlanmaya baslarsa iki taraf ayrisir ve bu kol duser.
+    /// </summary>
+    [Fact]
+    public void K3_AyniCrfFarkliHedeflerdeAyniCrfiVeriyor()
+    {
+        var info = Info(1920, 1080, 30, 300);
+
+        var serbestKucuk = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+        var serbestBuyuk = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 120, Codec = CodecPreference.Compatible }, null, AllWorking());
+        Assert.NotEqual(serbestKucuk.Plan.VideoBitrateK, serbestBuyuk.Plan.VideoBitrateK);
+
+        var sabitKucuk = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 22 }, null, AllWorking());
+        var sabitBuyuk = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 120, Codec = CodecPreference.Compatible, LockedCrf = 22 }, null, AllWorking());
+
+        _output.WriteLine($"serbest 25MB videoK={serbestKucuk.Plan.VideoBitrateK} / 120MB videoK={serbestBuyuk.Plan.VideoBitrateK}");
+        _output.WriteLine($"crf=22  25MB crf={sabitKucuk.Plan.Crf} / 120MB crf={sabitBuyuk.Plan.Crf}");
+
+        Assert.Equal(22, sabitKucuk.Plan.Crf);
+        Assert.Equal(22, sabitBuyuk.Plan.Crf);
+    }
+
+    // --- K4: gecersiz kilma plan panelinde gerekcelenir ---
+
+    [Theory]
+    [MemberData(nameof(KalemIdleri))]
+    public void K4_HerKalemNotuIkiAlaniDolduruyor(string id)
+    {
+        var kalem = KalemFor(id);
+        var result = PlanCalculator.BuildDetailed(kalem.Info, kalem.Options, null, AllWorking());
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == kalem.Not);
+
+        _output.WriteLine($"| {kalem.Ad} | {kalem.Not} | ManualOverrideValue={not.ManualOverrideValue} | EngineWouldHaveChosen={not.EngineWouldHaveChosen} |");
+
+        Assert.False(string.IsNullOrWhiteSpace(not.ManualOverrideValue), $"{id}: ManualOverrideValue bos");
+        Assert.False(string.IsNullOrWhiteSpace(not.EngineWouldHaveChosen), $"{id}: EngineWouldHaveChosen bos");
+        Assert.Contains(not.EngineWouldHaveChosen!, result.Plan.Reason);
+    }
+
+    [Fact]
+    public void K4_CrfNotuMotorunKendiSeciminiTasiyor()
+    {
+        var info = Info();
+        var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible }, null, AllWorking());
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 30 }, null, AllWorking());
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualCrfOverride);
+
+        var motorunSecimi = dogal.Plan.Crf?.ToString(CultureInfo.InvariantCulture) ?? $"{dogal.Plan.Mode}@{dogal.Plan.VideoBitrateK}k";
+        _output.WriteLine($"motorun secimi={motorunSecimi} ManualOverrideValue={not.ManualOverrideValue} EngineWouldHaveChosen={not.EngineWouldHaveChosen}");
+
+        Assert.Equal("30", not.ManualOverrideValue);
+        Assert.Equal(motorunSecimi, not.EngineWouldHaveChosen);
+    }
+
+    // --- D2: karsilanmayan donanim istegi karsilanmis gibi anlatilmiyor ---
+
+    [Fact]
+    public void D2_DonanimYokkenIstekKarsilanmadiDeniyor()
+    {
+        var info = Info();
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, EncoderPath = EncoderPathOverride.Hardware };
+        var result = PlanCalculator.BuildDetailed(info, options, null, YalnizYazilim());
 
         _output.WriteLine($"codec={result.Plan.Codec}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
         Assert.False(CodecModel.IsHardware(result.Plan.Codec));
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathOverride);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathOverride);
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathUnmet);
+        Assert.Equal("Hardware", not.ManualOverrideValue);
+        Assert.Equal(result.Plan.Codec, not.FallbackCodec);
+        Assert.Contains("karsilanmadi", result.Plan.Reason);
     }
 
     [Fact]
-    public void K2_08b_KodlayiciYoluDonanimaZorlaniyor()
+    public void D2_DonanimVarkenIstekKarsilandiDeniyor()
     {
+        var info = Info();
         var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, EncoderPath = EncoderPathOverride.Hardware };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
 
         _output.WriteLine($"codec={result.Plan.Codec}");
         Assert.True(CodecModel.IsHardware(result.Plan.Codec));
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathUnmet);
         Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualEncoderPathOverride);
     }
 
-    /// <summary>Sekiz satirin tamami tek tabloda; K2'nin CHECK'i tek tek gorunsun diye.</summary>
-    [Fact]
-    public void K2_SekizKalemHamCiktiTablosu()
-    {
-        _output.WriteLine("| kalem | sabitlenen | ffmpeg argumaninda gorunen |");
-        _output.WriteLine("|---|---|---|");
-        _output.WriteLine("| EncodeMode | TwoPass | -b:v (bkz K2_01) |");
-        _output.WriteLine("| CRF | 19 | -crf 19 (bkz K2_02) |");
-        _output.WriteLine("| preset | veryslow | -preset veryslow (bkz K2_03) |");
-        _output.WriteLine("| ses hedefi | 96kbps | -b:a 96k (bkz K2_04) |");
-        _output.WriteLine("| ses kanali | stereo/mono/yok | -ac 2 / -ac 1 / -an (bkz K2_05) |");
-        _output.WriteLine("| cozunurluk tabani | 720 | scale=...:... (bkz K2_06) |");
-        _output.WriteLine("| kare hizi tabani | 24 | fps>=24 (bkz K2_07) |");
-        _output.WriteLine("| kodlayici yolu | Software/Hardware | codec ailesi (bkz K2_08) |");
-        Assert.True(true);
-    }
+    // --- D3: kopyalama yolunda istek ya uygulanir ya dusuruldugu soylenir ---
 
-    // --- K3 ---
-
-    [Fact]
-    public void K3_CrfSabitlenenPlaninHedefBoyutuZorlanmiyor()
+    private static MediaInfo HedefinAltindaKaynak() => new()
     {
-        var info = Info(1920, 1080, 30, 300);
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 23 };
+        FilePath = "zaten-kucuk.mp4",
+        FileSizeBytes = 10L * 1024 * 1024,
+        DurationSeconds = 60,
+        Width = 1280,
+        Height = 720,
+        Fps = 30,
+        VideoCodec = "h264",
+        TotalBitrateBps = 1_400_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 128_000,
+        AudioChannels = 2
+    };
+
+    [Theory]
+    [InlineData("crf")]
+    [InlineData("kip")]
+    [InlineData("on-ayar")]
+    [InlineData("ses-kbps")]
+    [InlineData("ses-kanali")]
+    public void D3_KopyaYolundaYenidenKodlamaIsteyenGecersizKilmaUygulaniyor(string kalem)
+    {
+        var info = HedefinAltindaKaynak();
+        var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto }, null, AllWorking());
+        Assert.Equal("passthrough", dogal.Plan.Mode);
+
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto };
+        switch (kalem)
+        {
+            case "crf": options.LockedCrf = 20; break;
+            case "kip": options.LockedMode = EncodeMode.TwoPass; break;
+            case "on-ayar": options.LockedPreset = "veryslow"; break;
+            case "ses-kbps": options.LockedAudioKbps = 64; break;
+            case "ses-kanali": options.AudioChannels = AudioChannelOverride.Mono; break;
+        }
+
         var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
-        var estimate = result.Estimate;
+        _output.WriteLine($"{kalem}: dogal={dogal.Plan.Mode} sabitlenmis={result.Plan.Mode} codec={result.Plan.Codec} crf={result.Plan.Crf?.ToString() ?? "-"} preset={result.Plan.Preset} ses={result.Plan.AudioBitrateK}k/{result.Plan.AudioChannels?.ToString() ?? "kaynak"}");
 
-        _output.WriteLine($"crf={result.Plan.Crf} mode={result.Plan.Mode} estimate={estimate.ExpectedMb:0.0}MB (band {estimate.LowMb:0.0}-{estimate.HighMb:0.0}) hedef={options.TargetMb}MB");
-        Assert.Equal("crf", result.Plan.Mode);
-        Assert.False(estimate.Enforced, "CRF sabitken uretilen boyut hala bir butce degil bir tahmin olmali");
-        Assert.True(Math.Abs(estimate.ExpectedMb - options.TargetMb) > 0.01 || estimate.HighMb - estimate.LowMb > 0.01);
-        Assert.Contains(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualCrfOverride);
+        Assert.NotEqual("passthrough", result.Plan.Mode);
+        switch (kalem)
+        {
+            case "crf": Assert.Equal(20, result.Plan.Crf); break;
+            case "kip": Assert.Equal("2pass", result.Plan.Mode); break;
+            case "on-ayar": Assert.Equal("veryslow", result.Plan.Preset); break;
+            case "ses-kbps": Assert.Equal(64, result.Plan.AudioBitrateK); break;
+            case "ses-kanali": Assert.Equal(1, result.Plan.AudioChannels); break;
+        }
     }
 
-    // --- K4 ---
+    [Theory]
+    [InlineData("kodlayici-yolu")]
+    [InlineData("cozunurluk-tabani")]
+    [InlineData("kare-hizi-tabani")]
+    public void D3_KopyaYolundaUygulanamayanIstekSessizceDusmuyor(string kalem)
+    {
+        var info = HedefinAltindaKaynak();
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto };
+        var beklenenMetin = kalem switch
+        {
+            "kodlayici-yolu" => "kodlayici yolu",
+            "cozunurluk-tabani" => "cozunurluk tabani",
+            _ => "kare hizi tabani"
+        };
+        switch (kalem)
+        {
+            case "kodlayici-yolu": options.EncoderPath = EncoderPathOverride.Hardware; break;
+            case "cozunurluk-tabani": options.MinResolutionHeight = 2160; break;
+            case "kare-hizi-tabani": options.MinFps = 60; break;
+        }
+
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualOverrideDroppedOnPassThrough);
+
+        _output.WriteLine($"{kalem}: mode={result.Plan.Mode} not={not.ManualOverrideValue} -> {not.EngineWouldHaveChosen}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        Assert.Equal("passthrough", result.Plan.Mode);
+        Assert.StartsWith(beklenenMetin + "=", not.ManualOverrideValue);
+        Assert.Contains(beklenenMetin, result.Plan.Reason);
+    }
+
+    private static PlanOptions TabansizKopya(PlanOptions options) => new()
+    {
+        TargetMb = options.TargetMb,
+        Intent = options.Intent,
+        Codec = options.Codec,
+        AllowResolutionDrop = options.AllowResolutionDrop,
+        AllowFpsDrop = options.AllowFpsDrop,
+        HdrPolicy = options.HdrPolicy,
+        FillPolicy = options.FillPolicy,
+        SpeedMode = options.SpeedMode
+    };
+
+    /// <summary>
+    /// D1: kare hizi tabani komut satirini gercekten degistiriyor. Tabansiz plan 24'un
+    /// altina inip `fps=` filtresini o degerle yaziyor; taban konunca ayni komut satiri
+    /// tabana uyan baska bir deger tasiyor. Iki komut satiri ayni cikarsa taban ffmpeg'e
+    /// hic ulasmamis demektir ve bu kol duser.
+    /// </summary>
+    [Fact]
+    public void D1_KareHiziTabaniFfmpegKomutSatirindakiFpsiDegistiriyor()
+    {
+        var kalem = KalemFor("kare-hizi-tabani");
+        var tabansiz = PlanCalculator.BuildDetailed(kalem.Info, TabansizKopya(kalem.Options), null, AllWorking());
+        var tabanli = PlanCalculator.BuildDetailed(kalem.Info, kalem.Options, null, AllWorking());
+
+        var tabansizArgs = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kalem.Info, tabansiz.Plan, "out.mp4", 2, null));
+        var tabanliArgs = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(kalem.Info, tabanli.Plan, "out.mp4", 2, null));
+
+        _output.WriteLine($"tabansiz ({tabansiz.Plan.Fps:0.##} fps): {tabansizArgs}");
+        _output.WriteLine($"tabanli  ({tabanli.Plan.Fps:0.##} fps): {tabanliArgs}");
+
+        Assert.Contains($"fps={tabansiz.Plan.Fps.ToString("0.###", CultureInfo.InvariantCulture)}", tabansizArgs);
+        Assert.True(tabansiz.Plan.Fps < 24, $"tabansiz plan 24'un altina inmezse bu olcu bir sey kanitlamaz (bulunan {tabansiz.Plan.Fps:0.##})");
+        Assert.True(tabanli.Plan.Fps >= 24 - 0.01, $"tabanli plan tabana uymali (bulunan {tabanli.Plan.Fps:0.##})");
+        Assert.Contains($"fps={tabanli.Plan.Fps.ToString("0.###", CultureInfo.InvariantCulture)}", tabanliArgs);
+        Assert.NotEqual(tabansizArgs, tabanliArgs);
+    }
+
+    /// <summary>
+    /// D1: kodlayici yolu komut satirina `-c:v` olarak ulasiyor. Yazilim ve donanim
+    /// istekleri ayni girdide iki ayri `-c:v` uretmezse istek komut satirina hic
+    /// gecmemis demektir.
+    /// </summary>
+    [Fact]
+    public void D1_KodlayiciYoluFfmpegKomutSatirindakiCVyiDegistiriyor()
+    {
+        var info = Info();
+        var temel = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality };
+        var yazilim = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, EncoderPath = EncoderPathOverride.Software }, null, AllWorking());
+        var donanim = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, SpeedMode = SpeedMode.Quality, EncoderPath = EncoderPathOverride.Hardware }, null, AllWorking());
+        var otomatik = PlanCalculator.BuildDetailed(info, temel, null, AllWorking());
+
+        var yazilimArgs = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, yazilim.Plan, "out.mp4", 0, null));
+        var donanimArgs = FfmpegArguments.ToCommandLine(FfmpegArguments.Build(info, donanim.Plan, "out.mp4", 0, null));
+
+        _output.WriteLine($"otomatik: -c:v {otomatik.Plan.Codec}");
+        _output.WriteLine($"yazilim : {yazilimArgs}");
+        _output.WriteLine($"donanim : {donanimArgs}");
+
+        Assert.Contains($"-c:v {yazilim.Plan.Codec}", yazilimArgs);
+        Assert.Contains($"-c:v {donanim.Plan.Codec}", donanimArgs);
+        Assert.False(CodecModel.IsHardware(yazilim.Plan.Codec));
+        Assert.True(CodecModel.IsHardware(donanim.Plan.Codec));
+        Assert.NotEqual(yazilim.Plan.Codec, donanim.Plan.Codec);
+    }
+
+    // --- D4: etkisiz istek "sabitlendi" diye kaydedilmiyor ---
 
     [Fact]
-    public void K4_ReasonNoteMotorunKendiSeciminiDeTasiyor()
+    public void D4_EtkisizTabanIstegiNotUretmiyor()
     {
-        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Compatible, LockedCrf = 30 };
-        var result = PlanCalculator.BuildDetailed(Info(), options, null, AllWorking());
-        var note = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualCrfOverride);
+        var info = Info(1920, 1080, 30, 600);
+        var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 6, Codec = CodecPreference.Auto }, null, AllWorking());
+        var options = new PlanOptions { TargetMb = 6, Codec = CodecPreference.Auto, MinResolutionHeight = 100, MinFps = 5 };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
 
-        _output.WriteLine($"ManualOverrideValue={note.ManualOverrideValue} EngineWouldHaveChosen={note.EngineWouldHaveChosen} reason={result.Plan.Reason}");
-        Assert.Equal("30", note.ManualOverrideValue);
-        Assert.False(string.IsNullOrWhiteSpace(note.EngineWouldHaveChosen));
-        Assert.Contains(note.EngineWouldHaveChosen!, result.Plan.Reason.Length > 0 ? result.Plan.Reason : "");
+        _output.WriteLine($"tabansiz {dogal.Plan.Width}x{dogal.Plan.Height}@{dogal.Plan.Fps:0.##} / istek 100p+5fps -> {result.Plan.Width}x{result.Plan.Height}@{result.Plan.Fps:0.##}");
+
+        Assert.Equal(dogal.Plan.Height, result.Plan.Height);
+        Assert.Equal(dogal.Plan.Fps, result.Plan.Fps, 3);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionOverride);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinFpsOverride);
+    }
+
+    [Fact]
+    public void D4_EtkiliTabanNotuPlaninGercekDegeriniTasiyor()
+    {
+        var info = Info(1920, 1080, 30, 120);
+        var dogal = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto }, null, AllWorking());
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto, MinResolutionHeight = 720 }, null, AllWorking());
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionOverride);
+
+        _output.WriteLine($"motor {dogal.Plan.Width}x{dogal.Plan.Height} -> plan {result.Plan.Width}x{result.Plan.Height}; not Height={not.Height} deger={not.ManualOverrideValue} motor={not.EngineWouldHaveChosen}");
+
+        Assert.Equal(result.Plan.Height, not.Height);
+        Assert.Equal(result.Plan.Width, not.Width);
+        Assert.Equal("720", not.ManualOverrideValue);
+        Assert.Equal(dogal.Plan.Height.ToString(CultureInfo.InvariantCulture), not.EngineWouldHaveChosen);
+        Assert.NotEqual(not.ManualOverrideValue, not.EngineWouldHaveChosen);
+    }
+
+    [Fact]
+    public void D4_EtkiliFpsTabanNotuPlaninGercekFpsiniTasiyor()
+    {
+        var kalem = KalemFor("kare-hizi-tabani");
+        var dogal = PlanCalculator.BuildDetailed(kalem.Info, TabansizKopya(kalem.Options), null, AllWorking());
+        var result = PlanCalculator.BuildDetailed(kalem.Info, kalem.Options, null, AllWorking());
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinFpsOverride);
+
+        _output.WriteLine($"motor {dogal.Plan.Fps:0.##} -> plan {result.Plan.Fps:0.##}; not Fps={not.Fps:0.##} deger={not.ManualOverrideValue} motor={not.EngineWouldHaveChosen}");
+
+        Assert.Equal(result.Plan.Fps, not.Fps, 3);
+        Assert.Equal("24", not.ManualOverrideValue);
+        Assert.Equal(dogal.Plan.Fps.ToString("0.##", CultureInfo.InvariantCulture), not.EngineWouldHaveChosen);
     }
 
     // --- K5: kapali kalanlar disaridan degistirilemiyor ---
@@ -357,6 +645,4 @@ public sealed class ManualOverrideTests
         _output.WriteLine($"{typeName}: {string.Join(", ", fields)}");
         Assert.Equal(KapaliTipAlanlari[typeName].OrderBy(x => x), fields.OrderBy(x => x));
     }
-
-    // --- K7 yardimcisi: kol sayisi dogrudan --list-tests ile denetlenir (build betiginde) ---
 }
