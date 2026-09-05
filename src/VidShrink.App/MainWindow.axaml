@@ -282,37 +282,60 @@
 
                 <Border x:Name="TargetPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <StackPanel Orientation="Horizontal">
-                      <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
-                      <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.target.title}">
+                    <!--
+                      T163/K4: gelismis ayarlarin katlama kolu hedef panelinin var olan
+                      baslik satirina giriyor, kendi paneline degil. Kapali bolumun sayfa
+                      yuksekligine katkisi boylece sifir: satir zaten vardi.
+                    -->
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
+                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.target.title}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.target.tip}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </StackPanel>
+                      <Button Grid.Column="1"
+                              x:Name="BtnAdvancedToggle"
+                              Content="▾"
+                              Theme="{StaticResource GhostButton}"
+                              FontFamily="{StaticResource FontMono}"
+                              FontSize="{StaticResource FontSizeSm}"
+                              Width="{StaticResource TargetMinSize}"
+                              Height="{StaticResource TargetMinSize}"
+                              Padding="0"
+                              VerticalAlignment="Center"
+                              auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.target.tip}"/>
+                          <TextBlock Theme="{StaticResource TipText}" Text="{loc:Text main.advanced.title}"/>
                         </ToolTip.Tip>
                       </Button>
-                    </StackPanel>
+                    </Grid>
                     <!--
                       T61: hedef ve kalite tek Grid'de. İkinci sayı kutusunun genişliği
                       birinciyle aynı sütundan gelir; yeni bir piksel sayısı yazılmadı.
                     -->
-                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                           ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
                       <Slider x:Name="SliderTarget" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
                       <TextBox x:Name="TxtTarget" Grid.Column="1" Text="16" Width="96" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                       <TextBlock Grid.Column="2" Text="MB" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      <!--
-                        T163/K5: CRF gelismis ayardan sabitlenince hedef boyut artik bir
-                        butce degil bir tahmindir (PlanCalculator.cs:636 ManualCrfOverride).
-                        Kullanici hangisinin kazandigini tahmin etmesin diye tek satir.
-                      -->
-                      <TextBlock x:Name="TxtTargetCrfLockedNotice" Grid.Row="1" Grid.ColumnSpan="3"
-                                 Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
-                                 Text="{loc:Text main.target.crf-locked}"/>
                     <!--
                       T46/K1: yonga yalnız sayıyı gösterir. Açıklamanın tek yeri balondur ve
                       balonun ilk satırı yonganın eski etiketidir — etiket ekrandan kalktı,
                       bilgi kalkmadı.
                     -->
-                    <WrapPanel Grid.Row="2" Grid.ColumnSpan="3">
+                    <!--
+                      T163/K5: CRF sabitlenince cikan satir yongalarla ayni izgara satirini
+                      paylasir; izgaraya yeni bir satir eklenmiyor. Gizliyken StackPanel
+                      araligi da olusmuyor, yani kapali halin yuksekligi degismiyor.
+                    -->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Spacing="{StaticResource SpaceMd}">
+                    <TextBlock x:Name="TxtTargetCrfLockedNotice"
+                               Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                               Text="{loc:Text main.target.crf-locked}"/>
+                    <WrapPanel>
                       <Button x:Name="ChipWhatsApp" Content="16" Tag="16" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -372,12 +395,13 @@
                         </ToolTip.Tip>
                       </Button>
                     </WrapPanel>
+                    </StackPanel>
 
-                      <TextBlock Grid.Row="3" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
-                      <Slider x:Name="SliderQualityTarget" Grid.Row="4" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
-                      <TextBox x:Name="TxtQualityTarget" Grid.Row="4" Grid.Column="1" Text="60" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                      <TextBlock Grid.Row="4" Grid.Column="2" Text="/100" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                      <TextBlock x:Name="TxtQualityTargetNotice" Grid.Row="5" Grid.ColumnSpan="3" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
+                      <Slider x:Name="SliderQualityTarget" Grid.Row="3" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
+                      <TextBox x:Name="TxtQualityTarget" Grid.Row="3" Grid.Column="1" Text="60" MaxLines="1" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                      <TextBlock Grid.Row="3" Grid.Column="2" Text="/100" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <TextBlock x:Name="TxtQualityTargetNotice" Grid.Row="4" Grid.ColumnSpan="3" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </Grid>
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
@@ -463,28 +487,12 @@
                         <ComboBoxItem Content="{loc:Text main.hdr.sdr}"/>
                       </ComboBox>
                     </StackPanel>
-                  </StackPanel>
-                </Border>
-
-                <!--
-                  T163/K4: gelismis ayarlar. Sekiz T165 kalemi (LockedMode, LockedCrf,
-                  LockedPreset, LockedAudioKbps, AudioChannels, MinResolutionHeight,
-                  MinFps, EncoderPath) ve T162 kodek kilidi (LockedCodec) — dokuzu da
-                  "Otomatik" varsayilanli, katlanir bolum varsayilan kapali.
-                -->
-                <Border x:Name="AdvancedPanel" Theme="{StaticResource Panel}">
-                  <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.title}" Theme="{StaticResource H2}"/>
-                      <Button Grid.Column="1"
-                              x:Name="BtnAdvancedToggle"
-                              Content="▾"
-                              Theme="{StaticResource GhostButton}"
-                              FontFamily="{StaticResource FontMono}"
-                              VerticalAlignment="Center"
-                              auto:AutomationProperties.Name="{loc:Text main.advanced.title}"
-                              Click="OnToggleAdvanced"/>
-                    </Grid>
+                    <!--
+                      T163/K4: dokuz gelismis kalem (LockedMode, LockedCrf, LockedPreset,
+                      LockedAudioKbps, AudioChannels, MinResolutionHeight, MinFps,
+                      EncoderPath ve T162 kodek kilidi LockedCodec). Hepsi "Otomatik"
+                      varsayilanli; govde varsayilan kapali ve kapaliyken hic yer kaplamaz.
+                    -->
                     <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False">
                       <StackPanel>
                         <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}"/>

@@ -362,11 +362,15 @@ public sealed class WindowLayoutTests
     /// dışında kalır. Boş hâlin aşağı kayması kabul edildi: kaynak yüklenir yüklenmez
     /// yönlendirme satırı kalkar ve sayfa kendiliğinden sığar.</para>
     ///
-    /// <para>T163: gelişmiş ayarlar bölümünün her zaman görünen başlık satırı (kapalıyken
-    /// bile) sol sütunu, ayırıcının kendi satırı da orta sütunu uzattı; dolu hâl artık
-    /// tasarım boyutunda tam oturmuyor (dikey +106). Boş hâlde zaten kabul edilmiş olan
-    /// "yalnız sayfanın kendi kaydırıcısı" toleransı dolu hâle de genişletildi — yatay
-    /// eksen hâlâ hiç kaymıyor, tek fark dikeyde bir kaydırma çubuğunun çıkması.</para>
+    /// <para>T163 tur 2 bu ayrımı gevşetmişti: gelişmiş ayarlar bölümü kendi panelinde
+    /// duruyordu, her zaman görünen başlık satırı sol sütunu +103 uzatıyordu ve K5'in
+    /// uyarı satırı ızgaraya altıncı bir satır açıp <c>RowSpacing</c> yüzünden +12 daha
+    /// ekliyordu; dolu hâl tasarım boyutunda +106 taşıyordu ve boş hâlin toleransı dolu
+    /// hâle genişletilmişti. <b>Tur 3'te tolerans geri alındı</b> — dolu hâl yine hiç
+    /// kaymıyor. Kazanç yerleşimden geldi: katlama kolu hedef panelinin var olan başlık
+    /// satırına girdi ve <c>TargetMinSize</c> ile o satırın boyuna sabitlendi, uyarı satırı
+    /// da yongalarla aynı ızgara satırını paylaşıyor. Ölçülen: sol sütun 940 — T163
+    /// öncesiyle (8da585f) <b>birebir aynı</b>.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
@@ -376,9 +380,15 @@ public sealed class WindowLayoutTests
         var size = DesignSize();
         var overflowing = LayOut(size, loaded);
 
+        if (loaded)
+        {
+            Assert.True(overflowing.Count == 0, Describe(size, loaded, overflowing));
+            return;
+        }
+
         Assert.True(
             overflowing.Count <= 1 && overflowing.All(entry => entry.Name == "PageShrink"),
-            "Tasarım boyutunda yalnız sayfanın kendi kaydırıcısı kayabilir. "
+            "Boş sayfada tasarım boyutunda yalnız sayfanın kendi kaydırıcısı kayabilir. "
             + Describe(size, loaded, overflowing));
 
         Assert.All(overflowing, entry => Assert.Equal(0, entry.Horizontal, 1));
@@ -487,16 +497,17 @@ public sealed class WindowLayoutTests
     /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
     ///
-    /// <para>T163 sonrası: gelişmiş ayarlar bölümünün her zaman görünen başlık satırı ve
-    /// ayırıcının kendi satırı dört aralığı da büyüttü. Boş/tasarım 939-1039 → 1054-1154
-    /// (ölçülen 1104), boş/taban 960-1060 → 1075-1175 (1125), dolu/tasarım ve dolu/taban
-    /// 906-1006 → 1021-1121 (1071, ikisi de). Aralık genişliği (100) değiştirilmedi.</para>
+    /// <para>T163: tur 2 dört aralığı da ~115 px yukarı taşımıştı. <b>Tur 3'te dördü de
+    /// eski değerlerine döndü</b> ve öyle geçiyor — gelişmiş ayarlar bölümünün kapalı hâli
+    /// sayfaya hiçbir şey eklemiyor. Sayfayı tasarım boyutunda sol ayar sütunu belirliyor
+    /// (940); ayırıcının satırı orta sütunu 882'den 906'ya çıkardı ama orta sütun sayfanın
+    /// boyunu belirlemiyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, false, 1054, 1154)]
-    [InlineData(false, true, 1075, 1175)]
-    [InlineData(true, false, 1021, 1121)]
-    [InlineData(true, true, 1021, 1121)]
+    [InlineData(false, false, 939, 1039)]
+    [InlineData(false, true, 960, 1060)]
+    [InlineData(true, false, 906, 1006)]
+    [InlineData(true, true, 906, 1006)]
     public void ThePageContentStaysAtItsPinnedHeight(bool loaded, bool narrow, double least, double most)
     {
         var size = narrow ? MinimumSize() : DesignSize();
@@ -563,13 +574,13 @@ public sealed class WindowLayoutTests
     /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
     ///
-    /// <para>T163: gelişmiş ayarlar başlığı ve ayırıcı satırı sayfayı uzattı. Boş sayfa
-    /// 1039-1129 → 1155-1245 (ölçülen 1200), dolu sayfa 1007-1097 → 1123-1213 (ölçülen
-    /// 1168). Aralık genişliği (±45) değiştirilmedi.</para>
+    /// <para>T163: tur 2 iki aralığı da ~116 px yukarı taşımıştı; <b>tur 3'te ikisi de eski
+    /// değerlerine döndü</b>. Gelişmiş ayarlar bölümü sayfanın boyunu yalnız açıkken
+    /// değiştiriyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 1155, 1245)]
-    [InlineData(true, 1123, 1213)]
+    [InlineData(false, 1039, 1129)]
+    [InlineData(true, 1007, 1097)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;

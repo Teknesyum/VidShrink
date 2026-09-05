@@ -75,6 +75,17 @@ public sealed class AdvancedPanelTests
         foreach (var node in window.GetVisualDescendants().OfType<Visual>()) node.RenderTransform = null;
     }
 
+    /// <summary>Bir gorunurluk degisikliginden sonra yerlesimi <b>gercekten</b> yeniden
+    /// kurar. Duz <c>LayOutAt</c> yetmiyor: bassiz pencerede olcum onbellegi gecerli
+    /// kaldigi icin <c>IsVisible</c> degisiminden sonra hicbir Measure kosmuyor ve ucu de
+    /// ayni eski sayiyi veriyor.</summary>
+    private static void Relayout(MainWindow window, Size size)
+    {
+        foreach (var node in window.GetVisualDescendants().OfType<Layoutable>()) node.InvalidateMeasure();
+        window.InvalidateMeasure();
+        LayOutAt(window, size);
+    }
+
     private static ComboBox FindCombo(MainWindow window, string name) =>
         window.GetVisualDescendants().OfType<ComboBox>().Single(c => c.Name == name);
 
@@ -302,18 +313,83 @@ public sealed class AdvancedPanelTests
         });
     }
 
-    /// <summary>K4: bölüm katlanır, varsayılan kapalı; kapalıyken bugünkü sayfa görünümü
-    /// değişmez (K1'in ölçtüğü sol sütun yüksekliği aynı kalır).</summary>
-    [Fact]
-    public void TheAdvancedSectionIsCollapsedByDefault()
+    /// <summary>Sayfanın sol ayar sütununun istediği yükseklik. Gelişmiş ayarlar bölümü bu
+    /// sütunda yaşıyor ve tasarım boyutunda sayfanın boyunu bu sütun belirliyor
+    /// (ölçüldü: sol 940, orta 906, sağ 512).</summary>
+    private static double SettingsColumnHeight(MainWindow window)
     {
-        Fresh(window =>
+        var page = window.GetVisualDescendants().OfType<ScrollViewer>().Single(v => v.Name == "PageShrink");
+        var grid = (Control)page.Content!;
+        return grid.GetVisualChildren().OfType<Control>().Single(c => Grid.GetColumn(c) == 0).DesiredSize.Height;
+    }
+
+    /// <summary>
+    /// K4'ün <b>iki</b> yarısı. Birinci yarı: bölüm varsayılan kapalı. İkinci yarı:
+    /// kapalıyken sayfa yüksekliğine katkısı <b>sıfır</b> — sözleşmenin "kapalıyken
+    /// bugünkü sayfa görünümü değişmez" cümlesi budur ve tur 2'ye kadar hiç ölçülmüyordu.
+    ///
+    /// <para>Tur 2'de ölçülen hâl bu cümleyi karşılamıyordu: bölüm kendi <c>Border</c>
+    /// panelindeydi ve yalnız her zaman görünen başlık satırı sol sütunu 940'tan 1043'e
+    /// çıkarıyordu (+103). Tur 3'te katlama kolu hedef panelinin var olan başlık satırına
+    /// taşındı ve <c>TargetMinSize</c> ile o satırın boyuna sabitlendi; K5'in uyarı satırı
+    /// da ızgaraya yeni bir satır açmak yerine yongalarla aynı satırı paylaşıyor (yeni
+    /// satır <c>RowSpacing</c> yüzünden tek başına +12 idi).</para>
+    ///
+    /// <para><b>Ölçme yöntemi:</b> sütun iki kez ölçülüyor — olduğu gibi (bölüm kapalı) ve
+    /// katlama kolu yerleşimden tümüyle çıkarılmış hâlde. İki sayı eşitse kapalı bölümün
+    /// bedeli sıfırdır. Üçüncü ölçü bölümü açıyor: sütun büyümüyorsa ilk iki sayının
+    /// eşitliği boş bir eşitliktir ve ölçü o zaman da düşer.</para>
+    ///
+    /// <para>Sayfanın mutlak boyu ayrıca <c>WindowLayoutTests</c>'te pinli
+    /// (<c>ThePageContentStaysAtItsPinnedHeight</c>,
+    /// <c>ThePageScrollsAtMostDownAtTheDesignSize</c>); bu ölçü onun yerine geçmiyor,
+    /// kapalı bölümün payını ayrıca ölçüyor.</para>
+    /// </summary>
+    [Fact]
+    public void TheCollapsedAdvancedSectionCostsThePageNoHeight()
+    {
+        var (collapsedByDefault, withSection, withoutSection, expanded) = Fresh(window =>
         {
+            window.UseTurkish();
             LayOutAt(window, DesignSize());
+            window.LoadWithoutProbing(SamplePath, Sample());
+            window.SettleFades();
+            Relayout(window, DesignSize());
+
             var body = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "AdvancedBody");
-            Xunit.Assert.False(body.IsVisible);
-            return true;
+            var toggle = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "BtnAdvancedToggle");
+            var closed = body.IsVisible;
+            var withIt = SettingsColumnHeight(window);
+
+            toggle.IsVisible = false;
+            Relayout(window, DesignSize());
+            var withoutIt = SettingsColumnHeight(window);
+
+            toggle.IsVisible = true;
+            window.ExpandAdvanced();
+            Relayout(window, DesignSize());
+            var open = SettingsColumnHeight(window);
+
+            return (closed, withIt, withoutIt, open);
         });
+
+        _output.WriteLine($"sol sutun, bolum kapali: {withSection:0.##} px");
+        _output.WriteLine($"sol sutun, bolum yerlesimden cikarilmis: {withoutSection:0.##} px");
+        _output.WriteLine($"sol sutun, bolum acik: {expanded:0.##} px");
+        _output.WriteLine($"kapali bolumun bedeli: {withSection - withoutSection:0.##} px");
+
+        Xunit.Assert.False(collapsedByDefault, "K4: gelişmiş ayarlar bölümü varsayılan kapalı açılmalı.");
+
+        Xunit.Assert.True(
+            Math.Abs(withSection - withoutSection) < 0.5,
+            $"K4: kapalı bölümün sayfa yüksekliğine katkısı sıfır olmalı. Sol sütun bölümle "
+            + $"{withSection:0.##}, bölüm yerleşimden çıkarılınca {withoutSection:0.##} "
+            + $"(fark {withSection - withoutSection:0.##} px).");
+
+        Xunit.Assert.True(
+            expanded > withSection + 0.5,
+            $"Ölçü boşa düşüyor: bölüm açılınca sol sütun büyümedi (kapalı {withSection:0.##}, "
+            + $"açık {expanded:0.##}).");
     }
 
     /// <summary>K5: CRF sabitlenince hedef alanı artık zorlamadığını tek satırda söylüyor.</summary>

@@ -1,6 +1,6 @@
 # T163 — Arayüz: gelişmiş ayarlar bölümü ve önizleme/plan yer paylaşımı
 
-**Tarih:** 05.09.2026 · **Sözleşme:** `.claude/relay/contracts/T163.md` (tur 2)
+**Tarih:** 05.09.2026 · **Sözleşme:** `.claude/relay/contracts/T163.md` (tur 2, tur 3 eklemeleriyle)
 
 Ölçüm yöntemi: `tests/VidShrink.Tests/AdvancedPanelTests.cs` ve
 `tests/VidShrink.Tests/WindowLayoutTests.cs` içindeki başsız yerleşim tekniği —
@@ -58,14 +58,9 @@ biri için ayrı kol olarak koşuyor (9 InlineData) ve doğruluyor: varsayılan 
 `Otomatik` (index 0), hint satırı motorun seçtiği değeri boş bırakmıyor.
 `TheAdvancedSectionIsCollapsedByDefault` bölümün kapalı açıldığını doğruluyor.
 
-**Bulgu (K1'in bir uzantısı):** `TheAdvancedSectionIsCollapsedByDefault`'un kendi
-yorumu "kapalıyken bugünkü sayfa görünümü değişmez" diyor ama bunu hiç ölçmüyor —
-yalnız `AdvancedBody.IsVisible == false`'u kontrol ediyor. P4'ün ölçtüğü
-`WindowLayoutTests` bunun **doğru olmadığını** gösterdi: bölümün her zaman görünen
-başlık satırı (başlık + katlama düğmesi) tek başına sayfayı ~106-115 px uzattı
-(bkz. aşağıdaki P4 bölümü). Cümle tabloyla çelişiyor — bu depoda tekrarlayan kusur
-sınıfı. Düzeltme bu turun kapsamı dışında (yeni bir ölçü/tasarım kararı gerektirir);
-**bildiriliyor**, T0 karar verir.
+**Tur 3'te kapatıldı — aşağıdaki "Q1" bölümüne bakın.** Tur 2'nin bulgusu şuydu:
+`TheAdvancedSectionIsCollapsedByDefault` "kapalıyken bugünkü sayfa görünümü değişmez"
+diyor ama bunu hiç ölçmüyordu; ölçülünce cümlenin **doğru olmadığı** çıktı.
 
 ## K5 — CRF sabitken hedef alanı
 
@@ -229,3 +224,135 @@ gerekçe→cümle anahtarında tüketiliyor (K4/K6), bu yüzden "sıfır tüketi
 kümesinden düşüyorlar; ayrıca `EncoderPathOverride.Software` yan etkiyle
 `yalniz-disarida`'dan `varsayilan-kol`'a geçti. Beklenen kırılma bu — **düzeltilmedi**,
 T0 ayrı bir sözleşmeyle kapatır.
+
+
+---
+
+# Tur 3 — Q1 ve Q2
+
+Tur 3'te iki bulgu kapatıldı. Aşağıdaki bütün sayılar `dotnet test -c Release` ile
+ölçüldü; her ölçümden önce `dotnet build -c Release --no-incremental` koştu.
+
+## Q1 — Kapalı bölümün sayfa yüksekliğine katkısı artık sıfır
+
+### Neyin ölçüldüğü
+
+Sayfanın boyunu tasarım boyutunda (1560x1060) **sol ayar sütunu** belirliyor. Üç sütunun
+istediği yükseklik, dolu sayfa, tur 3 sonrası:
+
+| sütun | istenen yükseklik |
+|---|---|
+| sol (kaynak + hedef panelleri) | **940 px** |
+| orta (önizleme + ayırıcı + plan) | 906 px |
+| sağ (çıktı) | 512 px |
+
+Sayfa içeriği = 940 + 16 (üst kenar boşluğu) = 956; tasarım boyutunun görüş alanı 965.
+Yani dolu sayfa tasarım boyutunda **tam oturuyor**.
+
+### T163 öncesiyle karşılaştırma
+
+`main` üzerindeki T163 öncesi commit `8da585f` aynı düzenekle ölçüldü:
+
+| ölçü | 8da585f (T163 öncesi) | T163 tur 2 | T163 tur 3 |
+|---|---|---|---|
+| sol sütun (dolu) | 940 | 1043 | **940** |
+| hedef paneli | 657 | 669 | **657** |
+| orta sütun (dolu) | 882 | 906 | 906 |
+| `PageShrink` dikey taşma (dolu, tasarım boyutu) | 0 | +106 | **0** |
+
+Tur 3'ün sol sütunu T163 öncesiyle **birebir aynı**. Yani "kapalıyken bugünkü sayfa
+görünümü değişmez" (K4) artık ölçüyle karşılanıyor.
+
+### Fark nereden geliyordu — iki ayrı kaynak
+
+Tur 2'nin +115'i tek bir şey değildi, iki şeydi:
+
+1. **+103 px — gelişmiş ayarlar kendi `Border` panelindeydi.** Panelin dolgusu, her zaman
+   görünen `H2` başlığı, katlama düğmesi ve sol sütunun `SpaceLg` (16) aralığı birlikte
+   sol sütunu 940'tan 1043'e çıkarıyordu. Kapalı bir bölümün her zaman görünen başlığı
+   olduğu sürece bu bedelin sıfır olmasının tek yolu, başlığın **zaten var olan** bir
+   satıra girmesidir.
+
+   **Yapılan:** katlama düğmesi hedef panelinin başlık satırına (`main.target.title` +
+   bilgi rozeti) taşındı; gövde (`AdvancedBody`) aynı panelin en altına girdi. Satır zaten
+   vardı, bedel sıfır oldu. Düğmenin kendi boyu satırı büyütmesin diye
+   `Width`/`Height` = `TargetMinSize` (24) ve `Padding="0"` verildi — ikisi de var olan
+   belirteç/sıfır, **yeni ölçü uydurulmadı** (K7).
+
+   Ölçü: bu sabitleme olmadan `GhostButton`'ın `ButtonPaddingSm` dolgusu satırı 24'ten
+   35'e çıkarıyor ve sol sütun 951 oluyordu (+11).
+
+2. **+12 px — K5'in uyarı satırı ızgaraya altıncı bir satır açıyordu.** `TxtTargetCrfLockedNotice`
+   gizliyken bile `RowDefinitions` beş satırdan altıya çıkmıştı; `RowSpacing` (`SpaceMd`
+   = 12) beşinci aralığı ekliyordu. Gizli `TextBlock`'un kendi yüksekliği sıfırdı, bedeli
+   ödeyen **satır aralığıydı**.
+
+   **Yapılan:** uyarı satırı, yonga (`WrapPanel`) satırıyla aynı ızgara satırını paylaşan
+   bir `StackPanel`'e alındı; ızgara beş satıra döndü. `StackPanel` aralığı görünmeyen
+   çocuk için oluşmuyor, yani gizliyken bedel yine sıfır.
+
+### Kriterin iki yarısını da ölçen kol
+
+`AdvancedPanelTests.TheCollapsedAdvancedSectionCostsThePageNoHeight` —
+`TheAdvancedSectionIsCollapsedByDefault`'un yerine geçti. Üç ölçü:
+
+```
+sol sutun, bolum kapali: 940 px
+sol sutun, bolum yerlesimden cikarilmis: 940 px
+sol sutun, bolum acik: 1822 px
+kapali bolumun bedeli: 0 px
+```
+
+- **Birinci yarı:** `AdvancedBody.IsVisible == false`.
+- **İkinci yarı:** sol sütun iki kez ölçülüyor — bölüm olduğu gibi (kapalı) ve katlama
+  kolu yerleşimden tümüyle çıkarılmış hâlde. Fark 0.
+- **Üçüncü ölçü, boş eşitliğe karşı:** bölüm açılınca sütun büyümeli (940 → 1822).
+  Büyümüyorsa ilk iki sayının eşitliği hiçbir şey söylemiyordur ve kol düşer.
+
+Üçüncü ölçü bir kez **gerçekten kurtardı**: ilk yazımda `LayOutAt` bir görünürlük
+değişikliğinden sonra hiç yeniden ölçüm koşturmuyordu (başsız pencerede ölçüm önbelleği
+geçerli kalıyor), üç sayı da 973 çıkıyordu ve "fark 0" boş bir eşitlikti. Kol bunu
+yakaladı; düzeltme `Relayout(...)` yardımcısı — ölçümden önce bütün alt düğümlerde
+`InvalidateMeasure()`.
+
+### Bu kol hangi mutasyonla düşer
+
+| # | mutasyon | sonuç | düşen kol |
+|---|---|---|---|
+| M1 | Katlama düğmesinden `Width`/`Height`/`Padding` sabitlemesini kaldır | sol sütun 940 → **951** | `TheCollapsedAdvancedSectionCostsThePageNoHeight`: *"kapalı bölümün sayfa yüksekliğine katkısı sıfır olmalı. Sol sütun bölümle 951, bölüm yerleşimden çıkarılınca 940 (fark 11 px)."* |
+| M2 | K5 uyarısını yeniden kendi ızgara satırına al (altıncı `RowDefinition`) | dolu sayfa **+3 px** taşar | `ThePageScrollsAtMostDownAtTheDesignSize(loaded: True)`: *"Dolu pencerede 1560x1060: PageShrink: dikey +3, yatay +0"* |
+| M3 | (tur 2'de koşuldu) Ayırıcı konumunun kaydını kaldır | — | `TheSplitterPositionSurvivesAReopen` |
+
+M1 ve M3 aynı kolu vurmuyor; ikisi Q1'in iki ayrı kaynağına karşılık geliyor. Her ikisinden
+önce `dotnet build -c Release --no-incremental` koştu, `--no-build` kullanılmadı.
+
+## Q2 — Gevşetilen tolerans geri alındı, pinler eski değerlerine döndü
+
+Tur 2 dört ölçüyü yeniden temellendirmiş ve bir toleransı genişletmişti. **Tur 3'te
+beşinin dördü tümüyle geri alındı**, biri (satır sayısı) meşru olarak kaldı:
+
+| ölçü | tur 2'de | tur 3'te | durum |
+|---|---|---|---|
+| `ThePageScrollsAtMostDownAtTheDesignSize(loaded: true)` | dolu hâl için tolerans genişletildi (+106 kabul) | **eski katı hâli**: dolu sayfa hiç kaymaz | geri alındı |
+| `ThePageContentStaysAtItsPinnedHeight` (4 kol) | 939-1039 → 1054-1154 vb. | **939-1039, 960-1060, 906-1006, 906-1006** | geri alındı |
+| `ThePageStopsScrollingAtThisHeight` (2 kol) | 1039-1129 → 1155-1245 vb. | **1039-1129, 1007-1097** | geri alındı |
+| `TheThreeColumnsStartAtTheSameTop` orta sütun satır sayısı | 2 → 3 | **3 kalıyor** | meşru: `GridSplitter` gerçek bir satır (K3), boş kalıntı değil |
+
+Koşum: `dotnet test -c Release --filter "FullyQualifiedName~WindowLayoutTests"` →
+**40/40 yeşil**, 4 dk 39 sn. Yani iddia zayıflatılarak değil, **yerleşim düzeltilerek**
+geçti.
+
+Orta sütun ayırıcı yüzünden 882'den 906'ya çıktı ve bu **kalıyor** — ama orta sütun
+sayfanın boyunu belirlemiyor (940 > 906), o yüzden sayfaya yansımıyor.
+
+## Tur 3 koşumları
+
+| kol kümesi | sonuç | süre |
+|---|---|---|
+| `dotnet build -c Release --no-incremental` | 0 uyarı 0 hata | ~3 sn |
+| `--filter "FullyQualifiedName~AdvancedPanelTests" --list-tests` | **21 kol** (sıfır-kol riski yok) | — |
+| `--filter "FullyQualifiedName~AdvancedPanelTests"` | **21/21 yeşil** | 10 sn |
+| `--filter "FullyQualifiedName~WindowLayoutTests"` | **40/40 yeşil** | 4 dk 39 sn |
+
+`OluUyeTests`in beklenen kırılması (`owns` dışı) tur 3'te **ele alınmadı** — dokunulmadı,
+T0'ın ayrı sözleşmesinde kalıyor.
