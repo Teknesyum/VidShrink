@@ -185,8 +185,11 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
 }
 
 $shellMenuKeyName = 'VidShrink'
+$shellShrinkMenuKeyName = 'VidShrinkKucult'
 $shellPackageName = 'Teknesyum.VidShrink.Shell'
 $shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
+$shellShrinkTargets = @(100, 250, 500, 1024, 2048)
+$shellShrinkFlag = '--kucult'
 
 $shellMenuExtensions = @(
     'mp4', 'mkv', 'mov', 'avi', 'webm', 'wmv', 'flv', 'm4v', 'mpg', 'mpeg', 'ts', 'm2ts',
@@ -251,6 +254,22 @@ function Get-ShellMenuAssociationRoot([string]$Root) {
     return (Join-Path $Root 'SystemFileAssociations')
 }
 
+function Get-ShellShrinkMenuLabel([string]$Language) {
+    $choice = $Language
+    if ($choice -eq 'auto') {
+        $interface = ''
+        try { $interface = (Get-UICulture).TwoLetterISOLanguageName } catch { }
+        if ($interface -eq 'tr') { $choice = 'tr' } else { $choice = 'en' }
+    }
+    if ($choice -eq 'tr') { return 'VidShrink ile K' + [char]0x00FC + [char]0x00E7 + [char]0x00FC + 'lt' }
+    return 'Shrink with VidShrink'
+}
+
+function Get-QuickShrinkLabel([int]$Megabytes) {
+    if ($Megabytes -ge 1024 -and ($Megabytes % 1024) -eq 0) { return "$($Megabytes / 1024) GB" }
+    return "$Megabytes MB"
+}
+
 function Remove-ShellMenu([string]$Root) {
     $associations = Get-ShellMenuAssociationRoot $Root
     if (-not (Test-Path -LiteralPath $associations)) { return 0 }
@@ -258,11 +277,14 @@ function Remove-ShellMenu([string]$Root) {
     $removed = 0
     foreach ($association in Get-ChildItem -LiteralPath $associations) {
         $shell = Join-Path $association.PSPath 'shell'
-        $key = Join-Path $shell $shellMenuKeyName
-        if (-not (Test-Path -LiteralPath $key)) { continue }
-
-        Remove-Item -LiteralPath $key -Recurse -Force
-        $removed++
+        $touched = $false
+        foreach ($menuKeyName in @($shellMenuKeyName, $shellShrinkMenuKeyName)) {
+            $key = Join-Path $shell $menuKeyName
+            if (-not (Test-Path -LiteralPath $key)) { continue }
+            Remove-Item -LiteralPath $key -Recurse -Force
+            $touched = $true
+        }
+        if ($touched) { $removed++ }
 
         foreach ($parent in $shell, $association.PSPath) {
             if (-not (Test-Path -LiteralPath $parent)) { break }
@@ -288,12 +310,38 @@ function Write-ShellMenu([string]$Root, [string]$Executable, [string]$Label) {
     return $shellMenuExtensions.Count
 }
 
+function Write-ShellShrinkMenu([string]$Root, [string]$Executable, [string]$Label) {
+    $written = 0
+    foreach ($extension in $shellMenuExtensions) {
+        $verbKey = Join-Path (Get-ShellMenuAssociationRoot $Root) ".$extension\shell\$shellShrinkMenuKeyName"
+        New-Item -Path $verbKey -Force | Out-Null
+        Set-ItemProperty -LiteralPath $verbKey -Name 'MUIVerb' -Value $Label -Type String
+        Set-ItemProperty -LiteralPath $verbKey -Name 'Icon' -Value $Executable -Type String
+        Set-ItemProperty -LiteralPath $verbKey -Name 'SubCommands' -Value '' -Type String
+        Set-ItemProperty -LiteralPath $verbKey -Name 'MultiSelectModel' -Value 'Player' -Type String
+
+        foreach ($target in $shellShrinkTargets) {
+            $targetKey = Join-Path $verbKey "shell\$target"
+            New-Item -Path $targetKey -Force | Out-Null
+            Set-ItemProperty -LiteralPath $targetKey -Name 'MUIVerb' -Value (Get-QuickShrinkLabel $target) -Type String
+            Set-ItemProperty -LiteralPath $targetKey -Name 'MultiSelectModel' -Value 'Player' -Type String
+
+            $command = Join-Path $targetKey 'command'
+            New-Item -Path $command -Force | Out-Null
+            Set-Item -LiteralPath $command -Value ('"{0}" {1} {2} "%1"' -f $Executable, $shellShrinkFlag, $target)
+            $written++
+        }
+    }
+    return $written
+}
+
 function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language) {
     Remove-ShellMenu $Root | Out-Null
     $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $Language)
+    $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $Language)
     $modern = Write-Windows11ShellMenu $Root (Split-Path -Parent $Executable)
     $path = if ($modern) { 'Windows 11 birincil ve klasik' } else { 'Windows 10 klasik' }
-    Write-Host "Sağ tık menüsü $written uzantıya yazıldı ($path menü)." -ForegroundColor Green
+    Write-Host "Sağ tık menüsü $written uzantıya, küçültme alt menüsü $shrinkWritten girdiye yazıldı ($path menü)." -ForegroundColor Green
 }
 
 function Get-InstallRootHolder([string]$Root) {
