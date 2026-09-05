@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using System.Threading;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -10,9 +11,13 @@ namespace VidShrink.Tests;
 /// duvar saati okuyor: oteki olculerle ayni anda kosarsa onlarin yukunu kendi sonucuna
 /// yaziyor ve ayni makinede ard arda iki okuma esigin iki yanina dusebiliyor. Olcen
 /// sey olctugu ortami kirletmesin diye koleksiyon tek basina kosar.
+///
+/// <see cref="PerformanceCheckTests.AtlananIddiaGuvencesi"/> koleksiyon armagani olarak
+/// eklendi: son testten sonra <c>Dispose</c> ile kosum boyunca atlanan iddia sayisini
+/// denetler. Olcum ve gerekce docs/olcumler/atlanan-iddia.md icinde.
 /// </summary>
 [CollectionDefinition(BasarimOlculeri.Ad, DisableParallelization = true)]
-public sealed class BasarimOlculeri
+public sealed class BasarimOlculeri : ICollectionFixture<PerformanceCheckTests.AtlananIddiaGuvencesi>
 {
     public const string Ad = "basarim-olculeri";
 }
@@ -40,15 +45,77 @@ public sealed class PerformanceCheckTests
         lock (MeasurementLog) File.AppendAllText(MeasurementLog, line + Environment.NewLine);
     }
 
+    private static int _atlananSayisi;
+
     /// <summary>
-    /// Kurulamayan bir iddianin sebebi. xunit 2 kosum sirasinda test atlayamiyor, bu
-    /// yuzden sebep hem testin kendi ciktisina hem ham olcum gunlugune yaziliyor:
-    /// atlanan iddia sessiz kalmiyor.
+    /// Kurulamayan bir iddianin sebebi. xunit 2 kosum sirasinda test atlayamiyor
+    /// (docs/olcumler/atlanan-iddia.md K2'de deneyle dogrulandi: govde basladiktan sonra
+    /// firlatilan bir istisna Skipped degil Failed sayiliyor), bu yuzden bu cagri artik
+    /// yesile donmuyor: sebep hem testin kendi ciktisina hem ham olcum gunlugune
+    /// yaziliyor, hem de sinif duzeyinde sayiliyor. Toplam <see
+    /// cref="AtlananIddiaGuvencesi.Esik"/>'i asarsa koleksiyon kapanisinda kosum
+    /// kirmiziya doner — o esik bu dosyadaki sekiz cagri yerinin (bkz. <see
+    /// cref="AtlandiCagriYeriSayisiSabitMi"/>) tek bir kosumda yapisal olarak
+    /// ulasabildigi tavan, yani makine yuku onu asamaz; asilmasi ancak olcumun kendisi
+    /// bozulunca olur.
     /// </summary>
     private void Atlandi(string sebep)
     {
+        Interlocked.Increment(ref _atlananSayisi);
         _cikti.WriteLine("[atlandi] " + sebep);
         Log("[atlandi] " + sebep);
+    }
+
+    /// <summary>
+    /// K2'nin secimi: xunit 2'de govde basladiktan sonra dinamik atlama yok, o yuzden
+    /// "Atlandi cagirilan test yesil doner" sessiz kalmiyor — sinif duzeyinde sayiliyor
+    /// ve <see cref="Esik"/> asilirsa koleksiyonun son testinden sonra <see
+    /// cref="Dispose"/> kosumu kirmiziya cevirir. Esik, sekiz cagri yerinin (<see
+    /// cref="AtlandiCagriYeriSayisiSabitMi"/>) mumkun tum dallariyla tek kosumda
+    /// yapisal olarak ulasabildigi en yuksek sayidir: <c>BuMakinedeKodlamaNereyeDusuyor</c>
+    /// 1, <c>OlcumYukAltindaYalnizAgirlasiyor</c> 2 (yazilim dali 1 + donanim dali 1,
+    /// aralarinda erken donus yok), <c>YukAltindaKararHafiflemiyorMu</c> 1,
+    /// <c>ButceGercektenBagliyorVeSebebiniSoyluyor</c> 1,
+    /// <c>IslemciZamaniSayaciDogruOkuyorMu</c> 1 — toplam 6. Makine ne kadar yuklu
+    /// olursa olsun bu sayidan fazla yol yok; asilmasi olcumun kendisinin bozuldugunun
+    /// kanitidir.
+    /// </summary>
+    internal sealed class AtlananIddiaGuvencesi : IDisposable
+    {
+        public const int Esik = 6;
+
+        public static void Kontrol(int sayi)
+        {
+            if (sayi > Esik)
+                throw new Xunit.Sdk.XunitException(
+                    $"atlanan iddia sayisi {sayi}, esik {Esik}: bu sekiz cagri yerinin tek " +
+                    "kosumda yapisal olarak ulasabildigi tavanin ustunde, olcum bozulmus olabilir");
+        }
+
+        public void Dispose() => Kontrol(_atlananSayisi);
+    }
+
+    /// <summary>K4(a): esik denetimi kendi basina, gercek donanim/butce kosullarindan bagimsiz.</summary>
+    [Fact]
+    public void AtlananIddiaEsigiAsilincaKirmiziyaDoner()
+    {
+        AtlananIddiaGuvencesi.Kontrol(AtlananIddiaGuvencesi.Esik);
+        Assert.Throws<Xunit.Sdk.XunitException>(() => AtlananIddiaGuvencesi.Kontrol(AtlananIddiaGuvencesi.Esik + 1));
+    }
+
+    private const int AtlandiCagriYeriSayisi = 8;
+
+    /// <summary>K4(b): bir Atlandi cagrisi silinip yerine sessiz return konursa bu olcu kirilir.</summary>
+    [Fact]
+    public void AtlandiCagriYeriSayisiSabitMi()
+    {
+        var metin = File.ReadAllText(Path.Combine(TipSources.Root, "tests", "VidShrink.Tests", "PerformanceCheckTests.cs"));
+        var tumu = System.Text.RegularExpressions.Regex.Matches(metin, @"\bAtlandi\(").Count;
+        var tanim = metin.Contains("private void " + "Atlandi" + "(string sebep)", StringComparison.Ordinal) ? 1 : 0;
+        var cagrilar = tumu - tanim;
+
+        Assert.True(cagrilar == AtlandiCagriYeriSayisi,
+            $"Atlandi cagri yeri sayisi {cagrilar}, beklenen {AtlandiCagriYeriSayisi}");
     }
 
     private static string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
