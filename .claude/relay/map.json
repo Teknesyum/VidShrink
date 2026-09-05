@@ -1,10 +1,10 @@
 {
  "_map": {
   "schema": 2,
-  "head": "16c28b7a453abb62a3bd8c3db59b4b9bfb296590",
-  "at": "2026-09-05T08:55:48.209Z",
-  "files": 242,
-  "edges": 204
+  "head": "e6a1589dd5dcebd0debbe672417ee0f86f076c4e",
+  "at": "2026-09-05T09:57:59.374Z",
+  "files": 243,
+  "edges": 203
  },
  "src/VidShrink.App/App.axaml.cs": {
   "lines": 54,
@@ -130,7 +130,7 @@
   ]
  },
  "src/VidShrink.App/Playback/PanelHost.cs": {
-  "lines": 1024,
+  "lines": 997,
   "to": [],
   "ns": [
    "VidShrink.App.Localization",
@@ -221,7 +221,7 @@
   "ext": []
  },
  "src/VidShrink.Core/EncodePlan.cs": {
-  "lines": 142,
+  "lines": 167,
   "to": [],
   "ns": [],
   "from": [],
@@ -281,7 +281,7 @@
   "ext": []
  },
  "src/VidShrink.Core/PlanCalculator.cs": {
-  "lines": 1064,
+  "lines": 1493,
   "to": [],
   "ns": [],
   "from": [],
@@ -736,6 +736,17 @@
    "Avalonia"
   ]
  },
+ "tests/VidShrink.Tests/CodecLockTests.cs": {
+  "lines": 249,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "Xunit"
+  ]
+ },
  "tests/VidShrink.Tests/CodecModelTests.cs": {
   "lines": 50,
   "to": [],
@@ -1098,8 +1109,20 @@
    "Xunit"
   ]
  },
+ "tests/VidShrink.Tests/ManualOverrideTests.cs": {
+  "lines": 1084,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System",
+   "Xunit"
+  ]
+ },
  "tests/VidShrink.Tests/OluUyeTests.cs": {
-  "lines": 586,
+  "lines": 740,
   "to": [],
   "ns": [
    "VidShrink.Core"
@@ -1197,20 +1220,6 @@
   "from": [],
   "ext": [
    "Xunit"
-  ]
- },
- "tests/VidShrink.Tests/PlaybackResumeTests.cs": {
-  "lines": 575,
-  "to": [],
-  "ns": [
-   "VidShrink.App.Playback",
-   "VidShrink.Core",
-   "VidShrink.Core.Playback",
-   "VidShrink.Ffmpeg.Playback"
-  ],
-  "from": [],
-  "ext": [
-   "Avalonia"
   ]
  },
  "tests/VidShrink.Tests/PreviewSegmentTests.cs": {
@@ -1789,19 +1798,21 @@
    "System"
   ]
  },
- "tools/VidShrink.CoverageProbe/kapsam.py": {
-  "lines": 73,
-  "to": [],
-  "ns": [],
-  "from": [],
-  "ext": [
-   "io"
-  ]
- },
  "tools/VidShrink.Manifest/Program.cs": {
   "lines": 193,
   "to": [],
   "ns": [],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tools/VidShrink.PlanBaseline/Program.cs": {
+  "lines": 68,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
   "from": [],
   "ext": [
    "System"

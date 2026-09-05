@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T165",
+  "round": "1",
+  "auditorRunId": "a8db9e8c3ec427c1f",
+  "dispatchId": "toolu_016zSmuKsbMQCaN3jj1v6XGn",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "356441a9a61b5067648d8e5e8ff2cda42b67953fea4fd176468146713bc2b25a",
+  "transcriptHash": "80745ef7454685c12b2006434562c0bef692d6b37e065a4af24eb983a2c8b07d",
+  "headSha": "e6a1589dd5dcebd0debbe672417ee0f86f076c4e",
+  "diffHash": "17019b04fe9098c1e7d84e60be1ae562e09dc1eb0196a0468228b1763a349223",
+  "owns": [
+    "src/VidShrink.Core/EncodePlan.cs",
+    "src/VidShrink.Core/PlanCalculator.cs",
+    "src/VidShrink.Core/FfmpegArguments.cs",
+    "tests/VidShrink.Tests/ManualOverrideTests.cs",
+    "docs/olcumler/elle-gecersiz-kilma.md",
+    "tools/VidShrink.PlanBaseline/VidShrink.PlanBaseline.csproj",
+    "tools/VidShrink.PlanBaseline/Program.cs",
+    "tools/VidShrink.PlanBaseline/AGENTS.md",
+    "tests/VidShrink.Tests/OluUyeTests.cs"
+  ],
+  "verification": [
+    "Bagimsiz denetim proje kokunde, denetlenen surumun (e6a1589) uzerinde, sozlesme submitted iken kosuldu. verdict: passed, findings: none. Denetci verify adimlarini kendi kosturdu: build 0 uyari 0 hata, ManualOverrideTests 77/77, CodecLockTests 14/14, OluUyeTests 13/13, sifir bulan filtre kolu yok. T0 ayrica bagimsiz kendi kosumunu yapti, ayni ucu ayni sayilarla. owns siniri: git diff --stat 9b092e9 e6a1589 tam sekiz dosya, hepsi owns icinde; FfmpegArguments.cs hic degismemis ve bu mesru cunku D1 olcuyle kapatildi. Son turun kapsami: git diff ac2a202 e6a1589 -- src tests tools BOS, yalniz belge degismis. Izgara sayimi denetcinin kendi sayimiyla: 28 baslik, M1..M27 kesintisiz, M8 iki kez ve belgede bildirilmis, benzersiz 27; uc ozet cumlesi yirmi yediye cekilmis, kalan uc yirmi farkli olcu (55+21+1=77 kol, 6+7+7=20 sinif, 31+20=51 uye) ve hepsi dogrulandi; sifirli izgara satiri yok. K3 siniflamasi denetci tarafindan yeniden sayildi: ReasonCode 35 uye, 16 kollu, 19 kolsuz ve comm ile o 19'un tamami tam olarak Manual kumesi. Olcu gevsetilmedi: pim iki yonlu kume esitligi, fazla satir da kirar. Software'in islevsel erisimi gercek, on kosullar senaryo kendiliginden yesile donerse kolu dusuruyor. K2 mono kolu gercek: Info(audioChannels 1) ve iki on kosul. K1 tabani bagimsiz uretilebilir: denetci PlanBaseline'i kosturdu, bes satir belgeyle birebir; tabanin T165 oncesi oldugu git grep ile dogrulandi (9b092e9'da tek eslesme, HEAD'de 44). Bos olcu yok. Sayilar tutuyor: 176/3/179 denetcinin kosumuyla birebir, 90+176+144=410. CI engeli kalkti."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T10:06:01.561Z",
+  "usedAt": "2026-09-05T10:06:29.907Z",
+  "completedSha": "e6a1589dd5dcebd0debbe672417ee0f86f076c4e"
+}
