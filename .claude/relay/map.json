@@ -1,8 +1,8 @@
 {
  "_map": {
   "schema": 2,
-  "head": "36adcf3b5440906a088754f235412d0af9a13279",
-  "at": "2026-09-05T00:28:05.621Z",
+  "head": "743ae8780d1106d4f10fabd2ff31ab1934db4ac2",
+  "at": "2026-09-05T08:32:36.527Z",
   "files": 241,
   "edges": 201
  },
@@ -281,7 +281,7 @@
   "ext": []
  },
  "src/VidShrink.Core/PlanCalculator.cs": {
-  "lines": 1157,
+  "lines": 1064,
   "to": [],
   "ns": [],
   "from": [],
@@ -439,7 +439,7 @@
   ]
  },
  "src/VidShrink.Core/ShellIntegration.cs": {
-  "lines": 51,
+  "lines": 67,
   "to": [],
   "ns": [],
   "from": [],
@@ -734,17 +734,6 @@
   "from": [],
   "ext": [
    "Avalonia"
-  ]
- },
- "tests/VidShrink.Tests/CodecLockTests.cs": {
-  "lines": 281,
-  "to": [],
-  "ns": [
-   "VidShrink.Core"
-  ],
-  "from": [],
-  "ext": [
-   "Xunit"
   ]
  },
  "tests/VidShrink.Tests/CodecModelTests.cs": {
@@ -1403,6 +1392,17 @@
  },
  "tests/VidShrink.Tests/ShellMenuTests.cs": {
   "lines": 250,
+  "to": [],
+  "ns": [
+   "VidShrink.Core"
+  ],
+  "from": [],
+  "ext": [
+   "System"
+  ]
+ },
+ "tests/VidShrink.Tests/ShellShrinkMenuTests.cs": {
+  "lines": 503,
   "to": [],
   "ns": [
    "VidShrink.Core"

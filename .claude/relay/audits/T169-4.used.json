@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T169",
+  "round": "4",
+  "auditorRunId": "a4834df1064e00915",
+  "dispatchId": "toolu_01KEHGA8uqAJD2Axs25VpSg7",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "20bd94c5886730b66d045d953e287eeb66ba4ca4aea883aea75b64376a91da10",
+  "transcriptHash": "e81530adfda4a80a55c96abbddd24714ed9f9b643621100bb72e55e666d77cc9",
+  "headSha": "743ae8780d1106d4f10fabd2ff31ab1934db4ac2",
+  "diffHash": "5c1bb41a46e869bcf18760b44da24ab7fb104e1386b966ef5d7e3e7d751d4bef",
+  "owns": [
+    "Install-VidShrink.ps1",
+    "src/VidShrink.Core/ShellIntegration.cs",
+    "tests/VidShrink.Tests/ShellShrinkMenuTests.cs",
+    "docs/olcumler/kabuk-menusu.md"
+  ],
+  "verification": [
+    "Ucuncu bagimsiz denetim, proje kokunde denetlenen surumun (743ae87) uzerinde. verdict: passed, findings: none. Denetci butun verify adimlarini kendi kosturdu: build exit 0; ShellShrinkMenuTests 15/15; ShellMenuTests 15/15; Windows11ShellMenuTests 7/7; manset temiz. T0 ayrica kendi kosumunu yapti: ShellShrinkMenuTests 15/15. Kapsam: git diff --name-only 6615570..743ae87 dort dosya, hepsi owns icinde; T68'in ShellMenuTests.cs ve Windows11ShellMenuTests.cs diffte yok; src/VidShrink.Core/ShellMenu.cs dalda yok. G1: ReapProbe uc kapidan geciyor (VidShrinkKucult-Test- oneki, PID sayi mi, Get-Process bos mu); T68'in VidShrink-Test- koku onek kapisini gecemez; canli PID'li kok korunuyor; fixture yapay olu-PID ve canli-PID kokunu kurup ikisini de olcuyor ve AbandonedRootKeysBeforeReap sifirdan buyuk diyerek bos kok toplayip yesile boyamayi engelliyor. G2: iki dokum bloku uzanti adi notrlenip diff'lendi, cikti yok, 40'ar satir; Icon, ara anahtar ve bes hedefin besi iki blokta da yerinde. G3: uc yazicinin govdesi FunctionBody ile cikariliyor, Assert.True(start >= 0) ve Assert.Contains(dolar Root) bos donusu yakaliyor, uretimde govdeye HKCU: gomulmesi kolu dusurur. K3 aritmetigi: ShellIntegration 24 uzanti, 24 x 16 = 384 tabloyla tutuyor. K6: uc test kosumundan sonra HKCU Software altinda VidShrink kok bos, gercek SystemFileAssociations altinda VidShrink anahtar 0; agac yalniz okundu. Bos olcu yok: 15 kolun tumu okundu, sabit aritmetik ya da kendi urettigini karsilastirma yok. Kayda gecen bulgu-disi gozlem: Install-VidShrink.ps1:288-293 ust-anahtar temizleme dongusu touched yanlisken de kosuyor ama yalniz tamamen bos anahtari siliyor, islevsel etkisi yok."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T08:44:35.523Z",
+  "usedAt": "2026-09-05T08:48:26.593Z",
+  "completedSha": "743ae8780d1106d4f10fabd2ff31ab1934db4ac2"
+}
