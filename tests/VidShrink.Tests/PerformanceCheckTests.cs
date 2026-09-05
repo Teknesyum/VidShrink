@@ -11,13 +11,9 @@ namespace VidShrink.Tests;
 /// duvar saati okuyor: oteki olculerle ayni anda kosarsa onlarin yukunu kendi sonucuna
 /// yaziyor ve ayni makinede ard arda iki okuma esigin iki yanina dusebiliyor. Olcen
 /// sey olctugu ortami kirletmesin diye koleksiyon tek basina kosar.
-///
-/// <see cref="PerformanceCheckTests.AtlananIddiaGuvencesi"/> koleksiyon armagani olarak
-/// eklendi: son testten sonra <c>Dispose</c> ile kosum boyunca atlanan iddia sayisini
-/// denetler. Olcum ve gerekce docs/olcumler/atlanan-iddia.md icinde.
 /// </summary>
 [CollectionDefinition(BasarimOlculeri.Ad, DisableParallelization = true)]
-public sealed class BasarimOlculeri : ICollectionFixture<PerformanceCheckTests.AtlananIddiaGuvencesi>
+public sealed class BasarimOlculeri
 {
     public const string Ad = "basarim-olculeri";
 }
@@ -50,57 +46,43 @@ public sealed class PerformanceCheckTests
     /// <summary>
     /// Kurulamayan bir iddianin sebebi. xunit 2 kosum sirasinda test atlayamiyor
     /// (docs/olcumler/atlanan-iddia.md K2'de deneyle dogrulandi: govde basladiktan sonra
-    /// firlatilan bir istisna Skipped degil Failed sayiliyor), bu yuzden bu cagri artik
-    /// yesile donmuyor: sebep hem testin kendi ciktisina hem ham olcum gunlugune
-    /// yaziliyor, hem de sinif duzeyinde sayiliyor. Toplam <see
-    /// cref="AtlananIddiaGuvencesi.Esik"/>'i asarsa koleksiyon kapanisinda kosum
-    /// kirmiziya doner — o esik bu dosyadaki sekiz cagri yerinin (bkz. <see
-    /// cref="AtlandiCagriYeriSayisiSabitMi"/>) tek bir kosumda yapisal olarak
-    /// ulasabildigi tavan, yani makine yuku onu asamaz; asilmasi ancak olcumun kendisi
-    /// bozulunca olur.
+    /// firlatilan bir istisna Skipped degil Failed sayiliyor), bu yuzden bu cagri sessiz
+    /// yesile donmez: cagiran taraf atlamanin mesru oldugunu (butce dolmus, donanim yok,
+    /// makine olcumu bozmus gibi zaten dogrulanmis bir olguyu) <paramref name="mesru"/>
+    /// ile kanitlamak zorunda. Kanit yoksa (<paramref name="mesru"/> false) cagri kirmiziya
+    /// doner; eski esik yaklasimi (docs/olcumler/atlanan-iddia.md K3) terk edildi cunku
+    /// bes test metodunun yapisal tavani (6), mumkun tum atlamalarin toplamiyla ayni
+    /// sayiya denk geliyordu - esik hicbir kosumda atesleyemezdi. Mesru kabul edilen her
+    /// atlama sinif duzeyinde <see cref="_atlananSayisi"/>'na sayiliyor; bu sayac K1'in
+    /// "kac tanesi atlaniyor" sorusuna cevap verir, savunma sayacin kendisinde degil her
+    /// cagrida tekrarlanan kanit zorunlulugundadir.
     /// </summary>
-    private void Atlandi(string sebep)
+    private void Atlandi(string sebep, bool mesru)
     {
+        if (!mesru)
+            throw new Xunit.Sdk.XunitException("mesru olmayan atlama iddiasi: " + sebep);
+
         Interlocked.Increment(ref _atlananSayisi);
         _cikti.WriteLine("[atlandi] " + sebep);
         Log("[atlandi] " + sebep);
     }
 
     /// <summary>
-    /// K2'nin secimi: xunit 2'de govde basladiktan sonra dinamik atlama yok, o yuzden
-    /// "Atlandi cagirilan test yesil doner" sessiz kalmiyor — sinif duzeyinde sayiliyor
-    /// ve <see cref="Esik"/> asilirsa koleksiyonun son testinden sonra <see
-    /// cref="Dispose"/> kosumu kirmiziya cevirir. Esik, sekiz cagri yerinin (<see
-    /// cref="AtlandiCagriYeriSayisiSabitMi"/>) mumkun tum dallariyla tek kosumda
-    /// yapisal olarak ulasabildigi en yuksek sayidir: <c>BuMakinedeKodlamaNereyeDusuyor</c>
-    /// 1, <c>OlcumYukAltindaYalnizAgirlasiyor</c> 2 (yazilim dali 1 + donanim dali 1,
-    /// aralarinda erken donus yok), <c>YukAltindaKararHafiflemiyorMu</c> 1,
-    /// <c>ButceGercektenBagliyorVeSebebiniSoyluyor</c> 1,
-    /// <c>IslemciZamaniSayaciDogruOkuyorMu</c> 1 — toplam 6. Makine ne kadar yuklu
-    /// olursa olsun bu sayidan fazla yol yok; asilmasi olcumun kendisinin bozuldugunun
-    /// kanitidir.
+    /// K4(a) ve B2: korumanin kendisini ve sayacin gercekten okundugunu dogrudan sinar.
+    /// Mesru olmayan bir cagri (mesru: false) kirmiziya donmeli - <see cref="Atlandi"/>
+    /// icindeki <c>if (!mesru) throw</c> silinirse ya da mesru her zaman true'ya
+    /// sabitlenirse bu olcu Assert.Throws basarisizligiyla kirilir. Mesru bir cagri ise
+    /// <see cref="_atlananSayisi"/>'ni artirmali - sayac sifirlanirsa ya da artirim
+    /// satiri silinirse bu olcu kirilir.
     /// </summary>
-    internal sealed class AtlananIddiaGuvencesi : IDisposable
-    {
-        public const int Esik = 6;
-
-        public static void Kontrol(int sayi)
-        {
-            if (sayi > Esik)
-                throw new Xunit.Sdk.XunitException(
-                    $"atlanan iddia sayisi {sayi}, esik {Esik}: bu sekiz cagri yerinin tek " +
-                    "kosumda yapisal olarak ulasabildigi tavanin ustunde, olcum bozulmus olabilir");
-        }
-
-        public void Dispose() => Kontrol(_atlananSayisi);
-    }
-
-    /// <summary>K4(a): esik denetimi kendi basina, gercek donanim/butce kosullarindan bagimsiz.</summary>
     [Fact]
-    public void AtlananIddiaEsigiAsilincaKirmiziyaDoner()
+    public void AtlandiKorumasiVeSayaciDogruCalisiyorMu()
     {
-        AtlananIddiaGuvencesi.Kontrol(AtlananIddiaGuvencesi.Esik);
-        Assert.Throws<Xunit.Sdk.XunitException>(() => AtlananIddiaGuvencesi.Kontrol(AtlananIddiaGuvencesi.Esik + 1));
+        Assert.Throws<Xunit.Sdk.XunitException>(() => Atlandi("mesru olmayan deneme", false));
+
+        var oncesi = _atlananSayisi;
+        Atlandi("mesru deneme", true);
+        Assert.Equal(oncesi + 1, _atlananSayisi);
     }
 
     private const int AtlandiCagriYeriSayisi = 8;
@@ -110,8 +92,15 @@ public sealed class PerformanceCheckTests
     public void AtlandiCagriYeriSayisiSabitMi()
     {
         var metin = File.ReadAllText(Path.Combine(TipSources.Root, "tests", "VidShrink.Tests", "PerformanceCheckTests.cs"));
-        var tumu = System.Text.RegularExpressions.Regex.Matches(metin, @"\bAtlandi\(").Count;
-        var tanim = metin.Contains("private void " + "Atlandi" + "(string sebep)", StringComparison.Ordinal) ? 1 : 0;
+
+        var korumaBaslangic = metin.IndexOf("public void " + nameof(AtlandiKorumasiVeSayaciDogruCalisiyorMu), StringComparison.Ordinal);
+        var korumaBitis = korumaBaslangic >= 0 ? metin.IndexOf("\n    }", korumaBaslangic, StringComparison.Ordinal) : -1;
+        var uretimMetni = korumaBaslangic >= 0 && korumaBitis >= 0
+            ? metin.Remove(korumaBaslangic, korumaBitis - korumaBaslangic)
+            : metin;
+
+        var tumu = System.Text.RegularExpressions.Regex.Matches(uretimMetni, @"\bAtlandi\(").Count;
+        var tanim = metin.Contains("private void " + "Atlandi" + "(string sebep, bool mesru)", StringComparison.Ordinal) ? 1 : 0;
         var cagrilar = tumu - tanim;
 
         Assert.True(cagrilar == AtlandiCagriYeriSayisi,
@@ -400,7 +389,9 @@ public sealed class PerformanceCheckTests
             Assert.True(result.BudgetExhausted,
                 "yazilim yolu butce dolmadan olculemedi: " +
                 string.Join(",", result.Findings.Select(f => f.Code)));
-            Atlandi($"yazilim yolu butce doldugu icin olculemedi, gecen {result.ElapsedMs}ms");
+            Atlandi($"yazilim yolu butce doldugu icin olculemedi, gecen {result.ElapsedMs}ms " +
+                    "(bulgular: " + string.Join(",", result.Findings.Select(f => f.Code)) + ")",
+                    mesru: result.BudgetExhausted);
             return;
         }
 
@@ -512,7 +503,8 @@ public sealed class PerformanceCheckTests
         if (olculen.Length == 0)
         {
             Atlandi("hicbir bos okuma alinamadi, ucunde de butce doldu: gecen " +
-                    string.Join(" ", okumalar.Select(r => r.ElapsedMs + "ms")));
+                    string.Join(" ", okumalar.Select(r => r.ElapsedMs + "ms")),
+                    mesru: okumalar.All(r => r.BudgetExhausted));
             return;
         }
 
@@ -532,7 +524,8 @@ public sealed class PerformanceCheckTests
         if (!yuklu.SoftwareMeasured)
         {
             Atlandi($"yuk altinda yazilim bacagi butce doldugu icin alinamadi (gecen {yuklu.ElapsedMs}ms), " +
-                    "yon iddiasi kurulmadi");
+                    "yon iddiasi kurulmadi",
+                    mesru: yuklu.BudgetExhausted);
         }
         else
         {
@@ -611,7 +604,8 @@ public sealed class PerformanceCheckTests
         {
             Atlandi("gecit ile kosum arasinda makine doldu: bos okuma " +
                     $"{bos.Impact}/{N(bos.SoftwareRealtimeCores)} (olculdu={bos.SoftwareMeasured}), " +
-                    "bos taban kalmadi, karar-sinifi iddiasi kurulmadi");
+                    "bos taban kalmadi, karar-sinifi iddiasi kurulmadi",
+                    mesru: !bos.SoftwareMeasured ? bos.BudgetExhausted : true);
             return;
         }
 
@@ -621,7 +615,8 @@ public sealed class PerformanceCheckTests
                 "yuk altinda yazilim bacagi butce dolmadan olculemedi: " +
                 string.Join(",", yuklu.Findings.Select(f => f.Code)));
             Atlandi($"yuk altinda yazilim bacagi butce doldugu icin alinamadi (gecen {yuklu.ElapsedMs}ms), " +
-                    "karar-sinifi iddiasi kurulmadi");
+                    "karar-sinifi iddiasi kurulmadi",
+                    mesru: yuklu.BudgetExhausted);
             return;
         }
 
@@ -650,7 +645,9 @@ public sealed class PerformanceCheckTests
             : string.Empty;
 
         Assert.True(sebep.Length > 0, $"{nerede} donanim bacagi sebepsiz kayboldu: {kodlar}");
-        Atlandi($"{nerede} donanim bacagi alinamadi ({sebep}), {neKurulmadi}");
+        Atlandi($"{nerede} donanim bacagi alinamadi " +
+                $"({(sebep.Length > 0 ? sebep : "sebepsiz, kodlar: " + kodlar)}), {neKurulmadi}",
+                mesru: sebep.Length > 0);
     }
 
     /// <summary>
@@ -706,7 +703,8 @@ public sealed class PerformanceCheckTests
                 $"genis butceyle {genisSaat.ElapsedMilliseconds}ms");
         else
             Atlandi($"genis butceyle de hicbir bacak olculemedi ({string.Join(",", genis.Findings.Select(f => f.Code))}), " +
-                    "sure karsilastirmasi kurulmadi");
+                    "sure karsilastirmasi kurulmadi",
+                    mesru: genis.BudgetExhausted);
 
         Assert.True(taban.BudgetExhausted, "gecise zaman birakmayan kosum butceyi bildirmedi");
 
@@ -838,7 +836,8 @@ public sealed class PerformanceCheckTests
 
         if (!guvenilir)
             Atlandi($"bu makinenin islemci zamani sayaci is parcacigi duzeyinde guvenilir okumadi " +
-                    $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi");
+                    $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi",
+                    mesru: true);
 
         if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 5_000);
 
