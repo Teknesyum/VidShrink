@@ -2,6 +2,8 @@
 
 Belirti: oynatirken durdur/baslat yapilinca, ayar degismedigi halde is bastan basliyor.
 
+Butun satir numaralari **bu belgeyi tasiyan commit'teki** dosyalara aittir.
+
 ## K1 — Iki kosum izgarasi
 
 Olcum `tests/VidShrink.Tests/PlaybackResumeTests.cs`, `Durdur_baslat_onden_hazirligi_bastan_baslatmaz`.
@@ -23,7 +25,7 @@ onden hazirlanmis pencerenin durdur/baslat sirasinda atilip yeniden kodlanmasi.
 
 ## K2 — Neden
 
-Kod yolu: `src/VidShrink.App/Playback/PanelHost.cs:927` `ApplyPlayState()`.
+Kod yolu: `src/VidShrink.App/Playback/PanelHost.cs:955` `ApplyPlayState()`.
 
 Duzeltmeden onceki hali:
 
@@ -49,12 +51,21 @@ Baslat'a basildiginda `_ahead` hala `null` oldugu icin bir sonraki `PrepareAhead
 cagrisi (ya da pencere dolup `AdvanceClip()` cagirdiginda) ayni pencereyi **sifirdan**
 yeniden kodluyordu — ayar hic degismemesine ragmen.
 
-## K3 — Duzeltme
+Duraklatma kendi isini hala yapiyor: `Follow` (`PanelHost.cs:766`) ilk satirinda
+`if (!_panel.Controls.IsPlaying) return;` ile donuyor, yani duraklamisken **yeni** bir
+onden hazirlik hic baslamiyor. `Cancel()` mesru yerlerinde (dosya degisimi, plan
+gecersizlesmesi, atlama, kapanma) duruyor.
 
-`ApplyPlayState()`, duraklatmada artik `_segments.Cancel()` cagirmiyor; onden hazirlik
+## K3 — Duzeltme, iki yarisi da olculdu
+
+Kriter iki sey soyluyor: durdur/baslat **kodlamayi yeniden tetiklemez** ve **oynatma
+kaldigi konumdan surer**. Uc olcu var, ucu de ayri sey sayiyor.
+
+### K3.1 — Kodlama yeniden tetiklenmiyor
+
+`ApplyPlayState()` duraklatmada artik `_segments.Cancel()` cagirmiyor; onden hazirlik
 arka planda bitmeye birakiliyor, boylece Baslat'a basildiginda pencere zaten hazir olur.
-
-Duzeltme sonrasi ayni izgara (`.calisma/T161/K3-K4-duzeltme-sonrasi.txt`):
+Ayni K1 izgarasi, duzeltme sonrasi:
 
 ```
 T161 K1 durdur/baslat izgarasi -- onden hazirligin bastan baslama sayisi
@@ -63,50 +74,170 @@ T161 K1 durdur/baslat izgarasi -- onden hazirligin bastan baslama sayisi
   fark (fazladan cagri)      : 0
 ```
 
+### K3.2 — Konum: konak boruyu yeniden kurmuyor
+
+`Durdur_baslat_boruyu_yeniden_kurmaz`. "Kaldigi konumdan surer"in konak icin olculebilir
+karsiligi: durdur/baslat sonrasi **yeni kaynak ornegi uretilmedi** (yani `Teardown` +
+`_factory()` kosmadi), ayakta duran boruya **ikinci bir `StartAsync` gitmedi**,
+**`SeekAsync` hic cagrilmadi** ve `ActiveClip` **ayni ornek**, ayni baslangic aninda.
+
+```
+T161 K3 durdur/baslat -- boru ayakta mi
+  kaynak ornegi (fabrika cagrisi): once 2, sonra 2
+  ayakta duran boru StartAsync   : once 1, sonra 1
+  Pause/Play/Seek                : 1/1/0
+  pencere baslangici (sn)        : once 4, sonra 4
+```
+
+### K3.3 — Konum: borunun kare damgasi devam ediyor
+
+`Duraklatilan_boru_kaldigi_karenin_ardindan_surer`. Gercek `PipeComparisonFrameSource`
+uzerinde, konak hic isin icinde degil. Kareler alinir; `Pause()` sonrasi halka bosaltilir
+(bekleyen kare kalsaydi "devam etti" sonucu `Play()` hic calismadan da cikardi); `Play()`
+sonrasi gelen ilk karenin damgasi duraklamadaki son damgayla karsilastirilir.
+
+```
+T161 K3 duraklatilan boru -- kare damgasi (sn)
+  duraklamadaki son kare : 0,133
+  devam eden ilk kare    : 0,167
+  fark                   : 0,033
+```
+
+Fark tam bir kare (30 fps'te 0,033 sn). Esik iki yonlu: geriye dusen damga bastan
+baslamadir, bir saniyeden fazla ileri atlayan damga icerik atlamasidir.
+
+**Olculmeyen:** ekrandaki serit konumu (`ComparisonPanel.Controls.Position`). O deger
+`PanelHost.Drain` icinde, gercek `RequestAnimationFrame` dongusu akarken yaziliyor;
+basli olmayan bir pencerede o dongu hic donmuyor. Yukaridaki iki olcu, seridi besleyen
+iki girdinin (ayakta kalan boru + ilerleyen kare damgasi) korundugunu gosteriyor,
+seridin kendi metnini degil.
+
 ## K4 — Mesru yeniden kurulumlar bozulmadi
 
-Ayni ham ciktida (`.calisma/T161/K3-K4-duzeltme-sonrasi.txt`) iki yol da olculdu:
+Sozlesmenin istedigi uc yol — boyut degisimi, dosya degisimi, plan degisimi — ucu de
+kendi olcusuyle asagida. Dorduncu bir kol (ilk parca hazir olunca) tur 2'den kaldi ve
+kendi adiyla duruyor; sozlesmenin uc yolundan biri degil, ayri bir yol.
 
 ```
 T161 K4 dosya degisimi -- fabrika cagrisi: acilista 1, dosya degisince 2
-T161 K4 plan degisimi -- fabrika cagrisi: parca oncesi 1, parca sonrasi 2
+
+T161 K4 boyut degisimi -- yerlesme sayaci ve fabrika cagrisi
+  acilista       : fabrika 1, yerlesme sayaci kurulu False
+  pano kuculunce : yerlesme sayaci kurulu True
+  tik sonrasi    : fabrika 2
+
+T161 K4 plan degisimi -- imza zinciri
+  baslangic         : sira 1, fabrika 2, kodlama 1
+  ayni plan verildi : sira 1, gecikme kurulu False
+  yeni plan verildi : sira 2, gecikme kurulu True
+  gecikme sonrasi   : fabrika 3, kodlama 2
+
+T161 K4 ilk parca hazir -- fabrika cagrisi: parca oncesi 1, parca sonrasi 2
 ```
 
-- Dosya degisimi: `PanelHost.SetFiles` (`PanelHost.cs:299`) — kaynak fabrikasi acilista
-  1, yeni dosya verilince 2 kez cagrildi (`Restart` kosun).
-- Plan degisimi (ilk parca hazir olunca): `PanelHost.LoadClipAsync` (`PanelHost.cs:581`)
-  — fabrika parca hazir olmadan once 1, hazir olunca 2 kez cagrildi.
-- Panel yeniden boyutlanma yolu (`OnResized` -> `Restart`, `PanelHost.cs:385`) koda
-  dokunulmadi; K3'un duzeltmesi yalniz `ApplyPlayState` icinde.
+**Dosya degisimi** — `Dosya_degisimi_hala_yeniden_kurar`. Zincir `PanelHost.SetFiles`
+(`PanelHost.cs:297`) `if (_open) { RefreshRight(); Restart(); }` (`:327`). Kaynak
+fabrikasi acilista 1, yeni dosya verilince 2 kez cagrildi.
+
+**Boyut degisimi** — `Boyut_degisimi_hala_yeniden_kurar`. Zincir:
+
+```
+PanelHost.cs:123  _panel.Frames.SizeChanged += (_, _) => OnResized();
+PanelHost.cs:506  OnResized  -> terfi / MinPanelEdge / ResizeTolerance kapilari -> _settle.Start()  (:519)
+PanelHost.cs:116  _settle.Tick -> SettleElapsed()
+PanelHost.cs:136  SettleElapsed -> _settle.Stop(); Restart();
+```
+
+`OnResized` `Restart`i **dogrudan cagirmiyor**, yerlesme sayaci (`_settle`) uzerinden
+cagiriyor. Olcum pencereyi 640x480'den 320x240'a gercekten kucultuyor, `SizeChanged`
+olayi elle atilmiyor. Iki ayri sey olculuyor: kapilarin gecildigi (sayac acilista kurulu
+degil, kucultmeden sonra kurulu) ve tik gelince akisin yeniden kuruldugu (fabrika 1 -> 2).
+
+**Plan degisimi** — `Plan_degisimi_hala_yeniden_kurar`. Ekranda calisan bir pencere
+varken **ikinci bir plan** veriliyor (bit hizi 300 -> 900) ve imza zinciri gercekten
+kosuyor:
+
+```
+PanelHost.cs:212  SetPlan -> ClipSignature(...) == TargetSignature ise erken don  (:232)
+PanelHost.cs:235  ScheduleClip(_clipStart) -> _segmentDelay.Start()  (:570)
+PanelHost.cs:150  SegmentDelayElapsed -> LoadClipAsync(_clipStart)
+PanelHost.cs:577  LoadClipAsync -> _segments.RequestAsync -> if (_open) { RefreshRight(); Restart(); }  (:609)
+```
+
+Olcu iki yonlu: **ayni** plan yeniden verilince sira 1'de kaldi ve gecikme kurulmadi
+(imza esitligi calisiyor); **farkli** plan verilince sira 2'ye cikti, gecikme kuruldu,
+gecikme surunce kodlama 1 -> 2 ve fabrika 2 -> 3.
+
+**Ilk parca hazir olunca** — `Ilk_parca_hazir_olunca_yeniden_kurar`. Ayri bir yol, ayri
+bir olcu: ilk pencere kodlanip bitince `LoadClipAsync`in basari dalindaki `Restart`
+kosuyor mu. Tur 2'de bu kol `Plan_degisimi_hala_yeniden_kurar` adiyla duruyordu ve
+**adi olctugu seyi soylemiyordu** — `SetPlan` bir kez ve `Open()`tan once cagriliyordu,
+imza zinciri hic kosmuyordu. Kol yeniden adlandirildi, plan degisimi ayrica olculdu.
+
+### Zamanlayici tikleri hakkinda
+
+`_settle` ve `_segmentDelay` birer `DispatcherTimer`. Olcum konagi
+(`tests/VidShrink.Tests/AppHost.cs`) kendi is parcaciginda ileti dongusu calistirmiyor,
+bu yuzden **hicbir `DispatcherTimer` bu olcumlerde atesenmiyor** (ayni sinirlama
+`PanelHostTests` belgesinde de yazili). Tikin yaptigi is bu turda iki adlandirilmis
+yonteme alindi — `PanelHost.SettleElapsed` ve `PanelHost.SegmentDelayElapsed` — ve olcum
+onlari cagiriyor. Sayaclarin **kurulmus oldugu** ayrica olculuyor
+(`ResizeSettling`, `ClipScheduled`), yoksa yalniz tiki surmek `OnResized`in ve `SetPlan`in
+kapilari tumden kaldirilsa bile yesil kalirdi. Olculmeyen tek halka
+`DispatcherTimer`in kendi OS tiki, yani cerceve kodu.
 
 ## K5 — Mutasyon izgarasi
 
-Her mutasyondan once `dotnet build -c Release --no-incremental` calistirildi, sonra
-`dotnet test -c Release --filter "FullyQualifiedName~PlaybackResumeTests"` kosturuldu.
+Yedi mutasyon. Her birinden **once** `dotnet build -c Release --no-incremental`, sonra
+`dotnet test -c Release --no-build --filter "FullyQualifiedName~PlaybackResumeTests"`.
+Duzenek: `.calisma/T161/mutasyon.py` + `.calisma/T161/kos.sh`.
 
-| mutasyon | beklenen | sonuc |
-|---|---|---|
-| (a) `ApplyPlayState`teki duzeltme geri alindi (`_segments.Cancel()` yeniden eklendi) | `Durdur_baslat_onden_hazirligi_bastan_baslatmaz` FAIL | FAIL — `Assert.Equal() Expected:1 Actual:2` |
-| (b) `SetFiles`ta dosya degisince `Restart()` cagrisi kaldirildi | yalniz `Dosya_degisimi_hala_yeniden_kurar` FAIL, digerleri yesil | FAIL yalniz o test (`dosya degisince Restart kosmadi`); `Plan_degisimi_hala_yeniden_kurar` ve `Durdur_baslat_onden_hazirligi_bastan_baslatmaz` yesil |
+| # | mutasyon | beklenen | sonuc (7 kol) |
+|---|---|---|---|
+| a | `ApplyPlayState`teki duzeltme geri alindi (`_segments.Cancel()` yeniden eklendi) | `Durdur_baslat_onden_hazirligi_bastan_baslatmaz` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Durdur_baslat_onden_hazirligi_bastan_baslatmaz` |
+| b | `SetFiles`ta dosya degisince `Restart()` kaldirildi | `Dosya_degisimi_hala_yeniden_kurar` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Dosya_degisimi_hala_yeniden_kurar` |
+| 1 | `OnResized`daki `_settle.Start()` kaldirildi | `Boyut_degisimi_hala_yeniden_kurar` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Boyut_degisimi_hala_yeniden_kurar` |
+| 2 | `SetPlan`in son satiri `ScheduleClip(_clipStart)` kaldirildi | `Plan_degisimi_hala_yeniden_kurar` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Plan_degisimi_hala_yeniden_kurar` |
+| 3 | `ApplyPlayState` devam ederken `Restart()` cagiriyor (bastan baslatma) | `Durdur_baslat_boruyu_yeniden_kurmaz` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Durdur_baslat_boruyu_yeniden_kurmaz` |
+| 4 | `PipeComparisonFrameSource.Play()` `_resume.Set()` yerine `SeekAsync(TimeSpan.Zero)` | `Duraklatilan_boru_kaldigi_karenin_ardindan_surer` FAIL | Basarisiz 1 / Basarili 6 — dusen: `Duraklatilan_boru_kaldigi_karenin_ardindan_surer` |
+| 5 | `LoadClipAsync`in basari dalindaki `Restart()` kaldirildi | `Ilk_parca_hazir_olunca_yeniden_kurar` FAIL | Basarisiz **2** / Basarili 5 — dusen: `Ilk_parca_hazir_olunca_yeniden_kurar` **ve** `Plan_degisimi_hala_yeniden_kurar` |
 
-Her iki mutasyondan sonra kod geri alindi (`.calisma/T161/PanelHost.cs.fixed` ile
-karsilastirilip `SAME` dogrulandi), yeniden build edilip uc test de yesile dondu.
+5 numarada iki kolun birden dusmesi beklenen: plan degisimi zinciri de son adiminda
+ayni `Restart`tan geciyor ve fabrika cagrisini o sayiyor. Kollar ayni satiri paylasiyor
+ama ayni sey**i** olcmuyor — 2 numarali mutasyon (imza zinciri kesildi) yalniz plan
+kolunu dusuruyor, ilk-parca kolu yesil kaliyor.
+
+Her mutasyondan sonra iki uretim dosyasi da yedekten geri alindi
+(`.calisma/T161/PanelHost.cs.saglam`, `.calisma/T161/Pipe.cs.saglam`), `diff` ile
+`SAME` dogrulandi, yeniden build edilip yedi kol da yesile dondu.
 
 ## K6 — Kol sayisi
 
 ```
-dotnet test -c Release --filter "FullyQualifiedName~PlaybackResumeTests" --list-tests
+dotnet test -c Release --no-build --filter "FullyQualifiedName~PlaybackResumeTests" --list-tests
 ```
 
-3 test buluyor: `Durdur_baslat_onden_hazirligi_bastan_baslatmaz`,
-`Dosya_degisimi_hala_yeniden_kurar`, `Plan_degisimi_hala_yeniden_kurar`. Sifir eslesen
-kol yok.
+```
+    VidShrink.Tests.PlaybackResumeTests.Durdur_baslat_onden_hazirligi_bastan_baslatmaz
+    VidShrink.Tests.PlaybackResumeTests.Dosya_degisimi_hala_yeniden_kurar
+    VidShrink.Tests.PlaybackResumeTests.Ilk_parca_hazir_olunca_yeniden_kurar
+    VidShrink.Tests.PlaybackResumeTests.Plan_degisimi_hala_yeniden_kurar
+    VidShrink.Tests.PlaybackResumeTests.Boyut_degisimi_hala_yeniden_kurar
+    VidShrink.Tests.PlaybackResumeTests.Durdur_baslat_boruyu_yeniden_kurmaz
+    VidShrink.Tests.PlaybackResumeTests.Duraklatilan_boru_kaldigi_karenin_ardindan_surer
+```
+
+7 kol; sifir eslesen kol yok. Son kosum:
+
+```
+Başarılı!  - Başarısız: 0, Başarılı: 7, Atlanan: 0, Toplam: 7, Süre: 7 s
+```
 
 ## Test altyapisinda bulunan 3 ayri kusur
 
 `tests/VidShrink.Tests/PlaybackResumeTests.cs` bu sozlesmenin ilk turunda yazilmis ama
 hic derlenip kosturulmamisti. Calisir hale getirirken bulunan (ve dosyanin kendisinde
-duzeltilen) 3 test-altyapisi kusuru, K1-K4 olcumlerinin dogru cikmasi icin gerekliydi:
+duzeltilen) 3 test-altyapisi kusuru, olcumlerin dogru cikmasi icin gerekliydi:
 
 1. `Yerlestir()` cıplak `panel.Measure/Arrange` cagiriyordu; StaticResource/tema cozumu
    gercek bir `Window` koku olmadan calismiyor. Panel artik bir `Window` icine konup

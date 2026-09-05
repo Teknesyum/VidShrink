@@ -113,12 +113,12 @@ internal sealed class PanelHost : IDisposable
 
         // K3: pencere sürüklenirken her pikselde akış kurulmaz; yerleşme beklenir.
         _settle = new DispatcherTimer { Interval = Motion("MotionSlow", 360) };
-        _settle.Tick += (_, _) => { _settle.Stop(); Restart(); };
+        _settle.Tick += (_, _) => SettleElapsed();
 
         // K1: ayar değişimi ile kodlamanın başlaması arasındaki gecikme. Recalculate'in kendi
         // 160 ms'i kodlamadan kısa; kaydırıcı sürüklenirken her ara değer bir ffmpeg açardı.
         _segmentDelay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(SegmentEncoder.DebounceMilliseconds) };
-        _segmentDelay.Tick += (_, _) => { _segmentDelay.Stop(); _ = LoadClipAsync(_clipStart); };
+        _segmentDelay.Tick += (_, _) => { _ = SegmentDelayElapsed(); };
 
         _panel.Frames.SizeChanged += (_, _) => OnResized();
         _panel.Controls.PlayPauseRequested += (_, _) => ApplyPlayState();
@@ -127,6 +127,34 @@ internal sealed class PanelHost : IDisposable
 
         _panel.SetCompact(true);
     }
+
+    /// <summary>
+    /// Yerleşme sayacı doldu: ölçü değişimi durulduğuna göre akış yeni ölçüyle kurulur.
+    /// Ayrı bir yöntem, çünkü <see cref="DispatcherTimer"/> ileti döngüsü olmayan bir iş
+    /// parçacığında hiç ateşlenmiyor ve T161/K4'ün boyut kolu tiki buradan sürüyor.
+    /// </summary>
+    internal void SettleElapsed()
+    {
+        _settle.Stop();
+        Restart();
+    }
+
+    /// <summary>Ölçü değişimi yerleşme sayacını kurdu mu — <see cref="OnResized"/>'ın çıktısı.</summary>
+    internal bool ResizeSettling => _settle.IsEnabled;
+
+    /// <summary>
+    /// Kodlama gecikmesi doldu: sıraya konan pencere kodlanır. <see cref="SettleElapsed"/>
+    /// ile aynı sebeple ayrı yöntem; sıraya konan başlangıç anını burada okumak, gecikme
+    /// boyunca gelen son isteğin kazanmasını sağlar.
+    /// </summary>
+    internal Task SegmentDelayElapsed()
+    {
+        _segmentDelay.Stop();
+        return LoadClipAsync(_clipStart);
+    }
+
+    /// <summary>Kodlama gecikmesi kurulu mu — <see cref="ScheduleClip"/>'in çıktısı.</summary>
+    internal bool ClipScheduled => _segmentDelay.IsEnabled;
 
     /// <summary>Panel açık mı. Kapalıyken ayakta hiçbir ffmpeg süreci yoktur.</summary>
     internal bool IsOpen => _open;
