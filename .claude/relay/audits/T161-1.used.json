@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "contractId": "T161",
+  "round": "1",
+  "auditorRunId": "af3cd1322bf46c53b",
+  "dispatchId": "toolu_01VdEQ9RbATuJhpToCkMFsS2",
+  "checkoutRoot": "C:\\Users\\Teknesyum\\Desktop\\Projeler\\VidShrink",
+  "contractHash": "6be0a5147f064c331f65e6fa6519f664ffa4a0b9d3606118c2e047e3b5e307ae",
+  "transcriptHash": "9d344b7dedf355330c963cb8dd242adb3d852f4a2e34e0d418adca7ee0403ada",
+  "headSha": "16c28b7a453abb62a3bd8c3db59b4b9bfb296590",
+  "diffHash": "db4457b4496df74ec3ad1f596a45b27130549f3d77027f5168baae90bff1481b",
+  "owns": [
+    "src/VidShrink.App/Playback/PanelHost.cs",
+    "src/VidShrink.App/Playback/SegmentEncoder.cs",
+    "src/VidShrink.Ffmpeg/Playback/PipeComparisonFrameSource.cs",
+    "tests/VidShrink.Tests/PlaybackResumeTests.cs",
+    "docs/olcumler/onizleme-bastan-baslama.md",
+    "tools/VidShrink.CoverageProbe/kapsam.py",
+    "tools/VidShrink.CoverageProbe/AGENTS.md"
+  ],
+  "verification": [
+    "Bagimsiz denetim proje kokunde, denetlenen surumun (16c28b7) uzerinde. verdict: passed, findings: none. Kod yazilmadi: git diff --stat 093dae7 16c28b7 -- src tests bos; tur farki tam uc dosya (olcum belgesi +149/-39, kapsam.py +72, AGENTS.md +21), ucu de owns icinde. 709 sondasi denetci tarafindan kosuldu: iki ardisik kosumda 6 basarisiz / 1 basarili, belgenin 'kararsiz ama hep dusuyor' ifadesi tutuyor, Drain bu konakta kosuyor; --geri sonrasi agac temiz, yeniden build ve 7/7 yesil. DropStandby :883 gercekten geciliyor (tek cagrilan yerleri Teardown :994 ve Seek :973) — T0'in iddiasi yanlisti, yazicinin duzeltmesi dogru; Seek :966, Abandon :849-852, SampleRate :921-927 dogru. Kapsam aritmetigi: 179 satirlik aralik listesi sayildi, toplam 179 ve benzersiz 179, cakisma yok. Belge celiskisi kalkti: tek anlati, geri cekilen iddianin sonucu korunmus gerekcesi duzeltilmis, celisen cumle silinmis. Altmis yedi satir numarasi tek tek dogrulandi, hatali numara yok; tek-cagiran iddialari da grep ile dogrulandi. Duzenek tek basina kosuyor: git ls-files iki dosyayi tasiyor, kapsam.py dokuz dal, --geri git checkout kullaniyor, .saglam yedegine bagimlilik yok, her ikame assert ile capayi dogruluyor. Iki acik kalem (mutasyon duzenegi ve CLAUDE.md) owns disinda, belgede acikca yazili, kabul kriterini dusurmuyor. E2 hala kapali: duration 30 gecen cagri yok. Verify: build 0 uyari 0 hata, PlaybackResumeTests 0 basarisiz / 7 basarili; sonda kosumundan sonra tekrarlandi, yine 0/7."
+  ],
+  "result": "passed",
+  "createdAt": "2026-09-05T09:10:30.549Z",
+  "usedAt": "2026-09-05T09:11:01.030Z",
+  "completedSha": "16c28b7a453abb62a3bd8c3db59b4b9bfb296590"
+}

@@ -1,10 +1,10 @@
 {
  "_map": {
   "schema": 2,
-  "head": "261ab7fa13cf6c78165ebf2a8aba1ba347d9947a",
-  "at": "2026-09-05T08:50:28.784Z",
+  "head": "16c28b7a453abb62a3bd8c3db59b4b9bfb296590",
+  "at": "2026-09-05T08:55:48.209Z",
   "files": 242,
-  "edges": 202
+  "edges": 204
  },
  "src/VidShrink.App/App.axaml.cs": {
   "lines": 54,
@@ -130,7 +130,7 @@
   ]
  },
  "src/VidShrink.App/Playback/PanelHost.cs": {
-  "lines": 997,
+  "lines": 1024,
   "to": [],
   "ns": [
    "VidShrink.App.Localization",
@@ -281,7 +281,7 @@
   "ext": []
  },
  "src/VidShrink.Core/PlanCalculator.cs": {
-  "lines": 1157,
+  "lines": 1064,
   "to": [],
   "ns": [],
   "from": [],
@@ -439,7 +439,7 @@
   ]
  },
  "src/VidShrink.Core/ShellIntegration.cs": {
-  "lines": 67,
+  "lines": 51,
   "to": [],
   "ns": [],
   "from": [],
@@ -734,17 +734,6 @@
   "from": [],
   "ext": [
    "Avalonia"
-  ]
- },
- "tests/VidShrink.Tests/CodecLockTests.cs": {
-  "lines": 281,
-  "to": [],
-  "ns": [
-   "VidShrink.Core"
-  ],
-  "from": [],
-  "ext": [
-   "Xunit"
   ]
  },
  "tests/VidShrink.Tests/CodecModelTests.cs": {
@@ -1210,6 +1199,20 @@
    "Xunit"
   ]
  },
+ "tests/VidShrink.Tests/PlaybackResumeTests.cs": {
+  "lines": 575,
+  "to": [],
+  "ns": [
+   "VidShrink.App.Playback",
+   "VidShrink.Core",
+   "VidShrink.Core.Playback",
+   "VidShrink.Ffmpeg.Playback"
+  ],
+  "from": [],
+  "ext": [
+   "Avalonia"
+  ]
+ },
  "tests/VidShrink.Tests/PreviewSegmentTests.cs": {
   "lines": 383,
   "to": [],
@@ -1403,17 +1406,6 @@
  },
  "tests/VidShrink.Tests/ShellMenuTests.cs": {
   "lines": 250,
-  "to": [],
-  "ns": [
-   "VidShrink.Core"
-  ],
-  "from": [],
-  "ext": [
-   "System"
-  ]
- },
- "tests/VidShrink.Tests/ShellShrinkMenuTests.cs": {
-  "lines": 503,
   "to": [],
   "ns": [
    "VidShrink.Core"
@@ -1795,6 +1787,15 @@
   "from": [],
   "ext": [
    "System"
+  ]
+ },
+ "tools/VidShrink.CoverageProbe/kapsam.py": {
+  "lines": 73,
+  "to": [],
+  "ns": [],
+  "from": [],
+  "ext": [
+   "io"
   ]
  },
  "tools/VidShrink.Manifest/Program.cs": {
