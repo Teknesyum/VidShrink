@@ -55,7 +55,9 @@ public enum ReasonCode
     ManualAudioBitrateOverride,
     ManualAudioChannelsOverride,
     ManualMinResolutionOverride,
+    ManualMinResolutionUnmet,
     ManualMinFpsOverride,
+    ManualMinFpsUnmet,
     ManualEncoderPathOverride,
     ManualEncoderPathUnmet,
     ManualOverrideDroppedOnPassThrough

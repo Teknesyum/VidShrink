@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using VidShrink.Core;
 using Xunit.Abstractions;
@@ -340,10 +340,14 @@ public sealed class ManualOverrideTests
         var sabitBuyuk = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 120, Codec = CodecPreference.Compatible, LockedCrf = 22 }, null, AllWorking());
 
         _output.WriteLine($"serbest 25MB videoK={serbestKucuk.Plan.VideoBitrateK} / 120MB videoK={serbestBuyuk.Plan.VideoBitrateK}");
-        _output.WriteLine($"crf=22  25MB crf={sabitKucuk.Plan.Crf} / 120MB crf={sabitBuyuk.Plan.Crf}");
+        _output.WriteLine($"crf=22  25MB crf={sabitKucuk.Plan.Crf} videoK={sabitKucuk.Plan.VideoBitrateK} / 120MB crf={sabitBuyuk.Plan.Crf} videoK={sabitBuyuk.Plan.VideoBitrateK}");
 
         Assert.Equal(22, sabitKucuk.Plan.Crf);
         Assert.Equal(22, sabitBuyuk.Plan.Crf);
+        Assert.NotEqual(serbestKucuk.Plan.VideoBitrateK, sabitKucuk.Plan.VideoBitrateK);
+        Assert.NotEqual(serbestBuyuk.Plan.VideoBitrateK, sabitBuyuk.Plan.VideoBitrateK);
+        Assert.True(sabitKucuk.Plan.VideoBitrateK > serbestKucuk.Plan.VideoBitrateK,
+            $"CRF sabitken bitrate butceden degil CRF'ten turemeli (butce {serbestKucuk.Plan.VideoBitrateK}k, plan {sabitKucuk.Plan.VideoBitrateK}k)");
     }
 
     // --- K4: gecersiz kilma plan panelinde gerekcelenir ---
@@ -610,6 +614,98 @@ public sealed class ManualOverrideTests
         Assert.Equal(result.Plan.Fps, not.Fps, 3);
         Assert.Equal("24", not.ManualOverrideValue);
         Assert.Equal(dogal.Plan.Fps.ToString("0.##", CultureInfo.InvariantCulture), not.EngineWouldHaveChosen);
+    }
+
+    // --- F1: hicbir kolun olcmedigi varsayilan kapi ---
+    //
+    // Tur 2'de bir mutasyon (bu belgede M9'un ilk varyanti) hicbir kolu dusurmeden gecti;
+    // formulu kaydedilmemisti. Aranan yer bulundu: EffectiveTargetMb'nin
+    // `Math.Min(targetMb, sourceMb * SourceSizeCap)` kapisi. `SourceSizeCap = 0.95 -> 0.80`
+    // mutasyonu ManualOverrideTests'in 54 kolunu **ve** plan hesabina dokunan 14 sinifin
+    // 280 kolunu hic dusurmeden geciyordu; kapiyi olcen tek kol yoktu. Bu kol o kapiyi
+    // ucundan tutuyor: kaynagin 500 MB'inin %95'i 475 MB, kullanicinin 490 MB'lik hedefi
+    // oraya kirpiliyor ve not kirpilan degeri tasiyor.
+
+    [Fact]
+    public void F1_KaynakUstuHedefKaynaginYuzde95ineKirpiliyor()
+    {
+        var info = Info(1920, 1080, 30, 120, fileSizeBytes: 500L * 1024 * 1024);
+        var result = PlanCalculator.BuildDetailed(info, new PlanOptions { TargetMb = 490, Codec = CodecPreference.Auto }, null, AllWorking());
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.TargetCappedToSource);
+
+        _output.WriteLine($"kaynak {info.FileSizeMb:0.##} MB, hedef 490 MB -> kirpilan {not.Mb:0.####} MB (not TargetMb={not.TargetMb:0.##})");
+        _output.WriteLine($"EffectiveTargetMb(490, {info.FileSizeMb:0.##}) = {PlanCalculator.EffectiveTargetMb(490, info.FileSizeMb):0.####}");
+
+        Assert.NotEqual(EncodeMode.PassThrough, result.Plan.ModeEnum);
+        Assert.Equal(490.0, not.TargetMb, 6);
+        Assert.Equal(info.FileSizeMb * 0.95, not.Mb, 6);
+        Assert.Equal(475.0, not.Mb, 6);
+        Assert.Equal(475.0, PlanCalculator.EffectiveTargetMb(490, info.FileSizeMb), 6);
+    }
+
+    // --- F2: kaynagin ustundeki taban istegi yeniden kodlama yolunda da soyleniyor ---
+    //
+    // Motor hicbir yolda yukari olcekleme yapmiyor: ScaleCandidates 1.0'dan baslayip
+    // asagi iniyor, FpsCandidates kaynak fps'in ustune cikmiyor. Kaynagin ustundeki
+    // taban istegi bu yuzden karsilanamaz; karsilanmadigi **yazilmak** zorunda.
+
+    [Fact]
+    public void F2_KaynagiAsanFpsTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor()
+    {
+        var info = Info(1920, 1080, 30, 120);
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto, MinFps = 60 };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+
+        _output.WriteLine($"kaynak 1920x1080@30, istek MinFps=60 -> plan {result.Plan.Width}x{result.Plan.Height}@{result.Plan.Fps:0.##} kip={result.Plan.Mode}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        Assert.NotEqual(EncodeMode.PassThrough, result.Plan.ModeEnum);
+        Assert.True(result.Plan.Fps < 60 - 0.01, $"motor 60 fps'e cikabiliyorsa bu senaryo bir sey olcmez (bulunan {result.Plan.Fps:0.##})");
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinFpsUnmet);
+        Assert.Equal("60", not.ManualOverrideValue);
+        Assert.Equal(result.Plan.Fps, not.Fps, 3);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinFpsOverride);
+        Assert.Contains("karsilanmadi", result.Plan.Reason);
+    }
+
+    [Fact]
+    public void F2_KaynagiAsanCozunurlukTabaniYenidenKodlamaYolundaKarsilanmadiDeniyor()
+    {
+        var info = Info(1920, 1080, 30, 120);
+        var options = new PlanOptions { TargetMb = 25, Codec = CodecPreference.Auto, MinResolutionHeight = 2160 };
+        var result = PlanCalculator.BuildDetailed(info, options, null, AllWorking());
+
+        _output.WriteLine($"kaynak 1920x1080@30, istek MinResolutionHeight=2160 -> plan {result.Plan.Width}x{result.Plan.Height}@{result.Plan.Fps:0.##} kip={result.Plan.Mode}");
+        _output.WriteLine($"gerekce: {result.Plan.Reason}");
+
+        Assert.NotEqual(EncodeMode.PassThrough, result.Plan.ModeEnum);
+        Assert.True(result.Plan.Height < 2160, $"motor 2160p'ye cikabiliyorsa bu senaryo bir sey olcmez (bulunan {result.Plan.Height})");
+        var not = Assert.Single(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionUnmet);
+        Assert.Equal("2160", not.ManualOverrideValue);
+        Assert.Equal(result.Plan.Height, not.Height);
+        Assert.Equal(result.Plan.Width, not.Width);
+        Assert.DoesNotContain(result.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionOverride);
+        Assert.Contains("karsilanmadi", result.Plan.Reason);
+    }
+
+    /// <summary>
+    /// F2 negatif kontrolu: karsilanabilen taban istegi "karsilanmadi" diye yazilmamali.
+    /// Bu kol olmadan F2 duzeltmesi kosulsuz not yazarak yesile donebilirdi.
+    /// </summary>
+    [Fact]
+    public void F2_KarsilanabilenTabanIstegiKarsilanmadiDemiyor()
+    {
+        var kalem = KalemFor("kare-hizi-tabani");
+        var fps = PlanCalculator.BuildDetailed(kalem.Info, kalem.Options, null, AllWorking());
+        var cozunurluk = PlanCalculator.BuildDetailed(Info(1920, 1080, 30, 120),
+            new PlanOptions { TargetMb = 3, Codec = CodecPreference.Auto, MinResolutionHeight = 720 }, null, AllWorking());
+
+        _output.WriteLine($"fps istegi 24 -> plan {fps.Plan.Fps:0.##}; cozunurluk istegi 720p -> plan {cozunurluk.Plan.Width}x{cozunurluk.Plan.Height}");
+
+        Assert.True(fps.Plan.Fps >= 24 - 0.01);
+        Assert.True(cozunurluk.Plan.Height >= 720);
+        Assert.DoesNotContain(fps.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinFpsUnmet);
+        Assert.DoesNotContain(cozunurluk.Plan.ReasonCodes, n => n.Code == ReasonCode.ManualMinResolutionUnmet);
     }
 
     // --- K5: kapali kalanlar disaridan degistirilemiyor ---

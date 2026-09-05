@@ -533,20 +533,40 @@ public static class PlanCalculator
         {
             var enginePlan = BuildDetailedCore(info, WithoutManualFloors(options), profile, availability, new ProbeState()).Plan;
 
-            if (options.MinResolutionHeight is int requestedMinHeight && plan.Height > enginePlan.Height)
+            if (options.MinResolutionHeight is int requestedMinHeight)
             {
-                reason.Add($"kullanici cozunurluk tabanini en az {requestedMinHeight}p olarak sabitledi; motor {enginePlan.Width}x{enginePlan.Height} secmisti, plan {plan.Width}x{plan.Height} ile cikiyor");
-                reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinResolutionOverride, Width: plan.Width, Height: plan.Height,
-                    ManualOverrideValue: requestedMinHeight.ToString(CultureInfo.InvariantCulture),
-                    EngineWouldHaveChosen: enginePlan.Height.ToString(CultureInfo.InvariantCulture)));
+                if (plan.Height < requestedMinHeight)
+                {
+                    reason.Add($"kullanici cozunurluk tabanini en az {requestedMinHeight}p olarak sabitledi ama kaynak {info.Height}p ve motor yukari olcekleme yapmiyor; istek karsilanmadi, plan {plan.Width}x{plan.Height} ile cikiyor");
+                    reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinResolutionUnmet, Width: plan.Width, Height: plan.Height,
+                        ManualOverrideValue: requestedMinHeight.ToString(CultureInfo.InvariantCulture),
+                        EngineWouldHaveChosen: enginePlan.Height.ToString(CultureInfo.InvariantCulture)));
+                }
+                else if (plan.Height > enginePlan.Height)
+                {
+                    reason.Add($"kullanici cozunurluk tabanini en az {requestedMinHeight}p olarak sabitledi; motor {enginePlan.Width}x{enginePlan.Height} secmisti, plan {plan.Width}x{plan.Height} ile cikiyor");
+                    reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinResolutionOverride, Width: plan.Width, Height: plan.Height,
+                        ManualOverrideValue: requestedMinHeight.ToString(CultureInfo.InvariantCulture),
+                        EngineWouldHaveChosen: enginePlan.Height.ToString(CultureInfo.InvariantCulture)));
+                }
             }
 
-            if (options.MinFps is double requestedMinFps && plan.Fps > enginePlan.Fps + 0.01)
+            if (options.MinFps is double requestedMinFps)
             {
-                reason.Add($"kullanici kare hizi tabanini en az {requestedMinFps:0.##} olarak sabitledi; motor {enginePlan.Fps:0.##} secmisti, plan {plan.Fps:0.##} ile cikiyor");
-                reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinFpsOverride, Fps: plan.Fps,
-                    ManualOverrideValue: requestedMinFps.ToString("0.##", CultureInfo.InvariantCulture),
-                    EngineWouldHaveChosen: enginePlan.Fps.ToString("0.##", CultureInfo.InvariantCulture)));
+                if (plan.Fps < requestedMinFps - 0.01)
+                {
+                    reason.Add($"kullanici kare hizi tabanini en az {requestedMinFps:0.##} olarak sabitledi ama kaynak {info.Fps:0.##} fps ve motor kaynagin ustune cikmiyor; istek karsilanmadi, plan {plan.Fps:0.##} fps ile cikiyor");
+                    reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinFpsUnmet, Fps: plan.Fps,
+                        ManualOverrideValue: requestedMinFps.ToString("0.##", CultureInfo.InvariantCulture),
+                        EngineWouldHaveChosen: enginePlan.Fps.ToString("0.##", CultureInfo.InvariantCulture)));
+                }
+                else if (plan.Fps > enginePlan.Fps + 0.01)
+                {
+                    reason.Add($"kullanici kare hizi tabanini en az {requestedMinFps:0.##} olarak sabitledi; motor {enginePlan.Fps:0.##} secmisti, plan {plan.Fps:0.##} ile cikiyor");
+                    reasonCodes.Add(new ReasonNote(ReasonCode.ManualMinFpsOverride, Fps: plan.Fps,
+                        ManualOverrideValue: requestedMinFps.ToString("0.##", CultureInfo.InvariantCulture),
+                        EngineWouldHaveChosen: enginePlan.Fps.ToString("0.##", CultureInfo.InvariantCulture)));
+                }
             }
         }
 
@@ -929,8 +949,9 @@ public static class PlanCalculator
     /// </summary>
     /// <summary>
     /// Ayni secenekler, yalniz kullanicinin taban istekleri cikarilmis. Motorun o istek
-    /// olmasaydi ne sececegini olcmek icin kullaniliyor: gecersiz kilma notu ancak bu
-    /// karsilastirma bir fark gosterirse yazilir, yoksa istek etkisizdir ve boyle bir sey
+    /// olmasaydi ne sececegini olcmek icin kullaniliyor. Uc hal ayriliyor: plan istegin
+    /// altinda kaldiysa istek **karsilanmadi** ve `...Unmet` yazilir; plan motorun
+    /// secimini asmissa gecersiz kilma yazilir; ikisi de degilse istek etkisizdir ve
     /// olmus gibi kaydedilmez.
     /// </summary>
     private static PlanOptions WithoutManualFloors(PlanOptions options)
