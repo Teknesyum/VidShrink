@@ -11,7 +11,7 @@ public sealed class DecoderPipe : IDisposable
 {
     public const long DefaultCacheByteCeiling = 128L * 1024 * 1024;
 
-    public static readonly TimeSpan ForwardWaitTimeout = TimeSpan.FromSeconds(4);
+    public static readonly TimeSpan ForwardWaitTimeout = TimeSpan.FromMilliseconds(250);
 
     private readonly long _cacheByteCeiling;
     private readonly object _gate = new();
@@ -335,6 +335,7 @@ public sealed class DecoderPipe : IDisposable
         var args = new[]
         {
             "-hide_banner", "-nostdin", "-loglevel", "error",
+            "-re",
             "-ss", atSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture),
             "-i", _path,
             "-vn", "-sn", "-dn",
