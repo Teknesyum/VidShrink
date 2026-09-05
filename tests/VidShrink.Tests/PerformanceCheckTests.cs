@@ -837,7 +837,7 @@ public sealed class PerformanceCheckTests
         if (!guvenilir)
             Atlandi($"bu makinenin islemci zamani sayaci is parcacigi duzeyinde guvenilir okumadi " +
                     $"(duzeltme={N(katsayi)}x), sayacin dogrulugu iddia edilmedi",
-                    mesru: true);
+                    mesru: !guvenilir);
 
         if (OperatingSystem.IsWindows()) Assert.InRange(saat.ElapsedMilliseconds, 1500, 5_000);
 

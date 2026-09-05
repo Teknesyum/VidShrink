@@ -123,10 +123,14 @@ Uygulama:
 
 ## K3 - Yanlis kirmizi uretme: hangi atlama mesru, hangisi degil
 
-Ayrim artik esikte degil, her cagrinin kendi mesru: argumaninda - her sekiz cagri
-yeri, cagirdigi anda elindeki olculmus bir gercekle (BudgetExhausted, donanim
-bulgu kodu, sabit is-parcacigi-guvenilirligi olgusu gibi) kendi mesruiyetini
-kanitliyor:
+Ayrim artik esikte degil, her cagrinin kendi mesru: argumaninda. Sekiz cagri
+yerinin her biri, cagirdigi anda elindeki olculmus bir gercegi (BudgetExhausted,
+donanim bulgu kodu, sabit is-parcacigi-guvenilirligi olgusu gibi) mesru:
+argumanina yaziyor. Ama bu sekizin tamami mesru:false'a **ulasabilir** demek
+degildir: alti cagri yeri hemen ustunde ayni olguyu sinayan bir Assert.True ile
+korunuyor, yani oraya varildiginda mesru zaten true'dur. Gercekten mesru:false
+uretebilecek iki yer var: :608 ve :707. Asagidaki tablo kaniti gosterir,
+ulasilabilirligi degil:
 
 | Cagri yeri (uretim, satir) | mesru kaniti |
 |---|---|
@@ -162,8 +166,10 @@ mantiksal cekirdekleri doldururken; ham cikti
 
 Yuklu kosumda YukAltindaKararHafiflemiyorMu QuietMachineFact gecidiyle (discovery
 oncesi, makine bos degil) tamamen atlandi - govdesi hic calismadi, dolayisiyla
-Atlandi() hic cagrilmadi. Iki kosumda da 0 basarisiz: mesru kaniti tasiyan sekiz
-cagri yeri, ne sakin ne yuklu makinede yanlis kirmizi uretmedi.
+Atlandi() hic cagrilmadi. Iki kosumda da 0 basarisiz: sekiz cagri yerinin hicbiri
+ne sakin ne yuklu makinede yanlis kirmizi uretmedi. Bu kosumlar mesru:false
+kolunu **kanitlamaz** - onu K4 mutasyonu kanitlar; alti cagri yeri onceki
+Assert.True'lar yuzunden zaten oraya varmaz.
 
 ## K4 - Mutasyon izgarasi
 
@@ -190,16 +196,15 @@ diff temiz, sifir fark); dosya mutasyon oncesiyle birebir ayni.
 Bu worktree'deki dogrulama kosumu (T158-atlanan-iddia dali):
 Basarili! - Basarisiz: 0, Basarili: 23, Atlanan: 1, Toplam: 24.
 
-CI kimligi - bu dalin kendi tamamlanan kosumu (tur 2 teslimi oncesi son push,
-commit b22f740): gh run view 33983975390 -> T158-atlanan-iddia, ci,
-completed / success, is test (ID 101354050093), 24m32s, tum adimlar yesil
-(build -warnaserror dahil, kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30
-dahil). Bu tur 2'nin kendi commit'i push'landiktan sonra dalin CI kosumu yeniden
-tetiklenip sonucu bu belgeye islenecek (asagida "Kayit" bakiniz). Onceki referans -
-bu sozlesmenin degisikligi oncesi, maindeki en son basarili kosum: gh run view
-33979447267 - main, ci, completed / success, is test (ID 101341904857),
-Passed! - Failed: 0, Passed: 1704, Skipped: 19, Total: 1723. Bu dal maine henuz
-birlesmedi - onu T0 yapar.
+CI kimligi - tur 2'nin teslim edilen commit'i (85e7170) uzerindeki kosum:
+gh run view 33987555625 -> T158-atlanan-iddia, ci, completed / success,
+Failed: 0, Passed: 1706, Skipped: 19, Total: 1725. Kabul edilen sonuc budur.
+
+Tur 1'in reddedilen kodu (b22f740) uzerindeki kosum 33983975390 idi; bu belgenin
+onceki surumu yanlislikla o kimligi tur 2'nin kaniti diye gosteriyordu. Referans
+olarak, bu sozlesmenin degisikligi oncesi maindeki son basarili kosum:
+gh run view 33979447267 - main, ci, completed / success,
+Failed: 0, Passed: 1704, Skipped: 19, Total: 1723.
 
 ## Docstring guncellemesi
 
