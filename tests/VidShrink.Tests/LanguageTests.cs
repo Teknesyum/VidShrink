@@ -505,12 +505,16 @@ public sealed class LanguageTests : IDisposable
     // ---- K3: Türkçe eksiksiz -------------------------------------------------------
 
     /// <summary>
-    /// Gerçekten iki dilde aynı olan girdiler. Marka ve ürün adları çevrilmez; listeye
-    /// yeni bir ad eklemek tek tek karar vermeyi gerektirir, örüntü yok.
+    /// Gerçekten iki dilde aynı olan girdiler. İki sebep var ve ikisi de tek tek karar
+    /// gerektirir, örüntü yok: marka/ürün adları (<c>VidShrink</c>, <c>FFmpeg</c>, <c>.NET</c>)
+    /// çevrilmez; teknik terimin Türkçesi İngilizcesiyle aynı yazılıyorsa (<c>CRF</c> ffmpeg
+    /// kısaltması, <c>Stereo</c> ve <c>Mono</c> TDK'nın da yazdığı hâlleriyle) uydurma
+    /// karşılık yazmaktansa aynı bırakılır. T163 gelişmiş ayarlar paneliyle son üçünü getirdi.
     /// </summary>
     private static readonly string[] SameInEveryLanguage =
     {
         "VidShrink", "FFmpeg", ".NET",
+        "CRF", "Stereo", "Mono",
         "{0} ms"
     };
 

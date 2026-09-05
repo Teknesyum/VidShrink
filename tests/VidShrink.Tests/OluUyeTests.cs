@@ -360,10 +360,18 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 51 satir: 45 sifir uretim tuketicili uye + 6 hic kullanilmayan uye
-    /// (<c>Flagged = ZeroConsumer || Unused</c>). T165 son turunda kume 31 satirdan 51'e cikti:
-    /// T165 <c>ReasonCode</c>'a on dokuz gerekce kodu ve <c>EncoderPathOverride</c>'a ucuncu bir
-    /// deger ekledi, yirmisi de pime yeni girdi. Bundan onceki degisim T150 tur 2'deydi: sifir
+    /// Kume bugun 37 satir: 32 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// (<c>Flagged = ZeroConsumer || Unused</c>). T163 kumeyi 51 satirdan 37'ye indirdi ve
+    /// kalan bir satirin bicimini degistirdi. Dusen 19 satir T165'in <c>ReasonCode.Manual*</c>
+    /// kodlariydi: T165 onlari uretmis ama okuyamamisti, cunku okuma tarafi
+    /// <c>src/VidShrink.App/**</c> ve orasi T163'un alaniydi; T163
+    /// <c>MainWindow.axaml.cs:2625-2661</c>'e on dokuz kolun hepsini yazdi, kodlar artik
+    /// tuketiliyor ve pimde isleri kalmadi. Bicimi degisen satir
+    /// <c>EncoderPathOverride.Software</c>: T163 (<c>64125dc</c>) <c>MainWindow.axaml.cs:1005</c>
+    /// ile uyeye uretimde ilk ureticiyi yazdi, uye
+    /// <c>yalniz-disarida</c>'dan <c>varsayilan-kol</c>'a gecti. Pime T170 bes yeni satir
+    /// getirdi: <c>ShrinkArgumentProblem</c>'in bes uyesi de uretiliyor, hicbiri okunmuyor.
+    /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
     /// T139 <c>src/VidShrink.Ffmpeg/PerformanceProbe.cs:97</c> satirini yazdi
@@ -438,40 +446,24 @@ public sealed class OluUyeTests
             "public static readonly, hicbir yerde okunmuyor. Ayni dosya, ayni sinir."),
         new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,
             "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir."),
-        new("EncoderPathOverride.Software", "yalniz-disarida", Legitimate,
-            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
-        new("ReasonCode.ManualModeOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualCrfOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualPresetOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualCrfClamped", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualModeSupersededByCrf", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualPresetFirstPassRelaxed", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualAudioBitrateOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualAudioBitrateUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualAudioBitrateSupersededByChannels", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualAudioChannelsOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualAudioChannelsUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualMinResolutionOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualMinResolutionUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualMinFpsOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualMinFpsUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualEncoderPathOverride", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualEncoderPathUnmet", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualEncoderPathSupersededByCodec", "varsayilan-kol", Debt, ManualReasonDebt),
-        new("ReasonCode.ManualOverrideDroppedOnPassThrough", "varsayilan-kol", Debt, ManualReasonDebt)
+        new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
+            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
+        new("ShrinkArgumentProblem.NoPath", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
+        new("ShrinkArgumentProblem.NoTarget", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
+        new("ShrinkArgumentProblem.TargetNotANumber", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
+        new("ShrinkArgumentProblem.TargetNotInQuickList", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
+        new("ShrinkArgumentProblem.TargetNotPositive", "hic-okunmayan-tur", Debt, ShrinkProblemDebt)
     };
 
     /// <summary>
-    /// T165'in ekledigi on dokuz gerekce kodunun ortak borcu. Kodlarin kendisi uretiliyor ve
-    /// <c>PlanResult.ReasonCodes</c> icinde tasiniyor (olculeri
-    /// <c>ManualOverrideTests</c>'te), ama <c>MainWindow.axaml.cs:2319-2354</c>'teki
-    /// "kod -> kullanici cumlesi" switch'inde kollari yok; hepsi <c>_ => null</c>'a dusuyor.
-    /// Kol yazmak <c>src/VidShrink.App/**</c>'a yazmak demek ve orasi T163'un alani, T165'in
-    /// sinirlar bolumu acikca yasakliyor. Yani kodlar okunmuyor degil, **henuz** okunmuyor;
-    /// karar bir sonraki sozlesmenin.
+    /// T170'in <c>--kucult</c> arguman cozumunun urettigi bes ret gerekcesi. <c>ShrinkRequest.cs</c>
+    /// hepsini <c>ShrinkArgumentResult.Failure</c> ile uretiyor, ama <c>src/**</c> altinda
+    /// <c>Problem</c> alanini okuyan tek bir satir yok — turun hicbir uyesi tuketilmedigi icin
+    /// bicim <c>hic-okunmayan-tur</c>. Yani kabuk menusunden gelen bozuk arguman adiyla
+    /// reddediliyor ama kullanici o adi hicbir yerde gormuyor.
     /// </summary>
-    private const string ManualReasonDebt =
-        "T165'in acilan sekiz kalem icin urettigi gerekce kodu. Cekirdek onu ReasonNote olarak tasiyor ve olcusu ManualOverrideTests'te var, ama MainWindow.axaml.cs:2319-2354'teki kod->cumle switch'inde kolu yok, '_ => null'a dusuyor; kullanici gerekceyi henuz gormuyor. Kolu yazmak src/VidShrink.App altina yazmak demek ve orasi T163'un alani, T165 oraya yazamaz. Arayuz kolunun gerekip gerekmedigi olculmedi.";
+    private const string ShrinkProblemDebt =
+        "T170'in --kucult arguman cozumunun urettigi ret gerekcesi. ShrinkRequest.cs onu ShrinkArgumentResult.Failure ile uretiyor ve olcusu ShrinkRequestTests'te var, ama src/** altinda ShrinkArgumentResult.Problem alanini okuyan hicbir satir yok; turun hicbir uyesi tuketilmiyor. Bozuk arguman adlandirilmis bir gerekceyle reddediliyor, kullaniciya gerekce gosterilmiyor. Gerekcenin kullaniciya ulasmasi gerekip gerekmedigi olculmedi.";
 
     private readonly ITestOutputHelper _output;
 
@@ -519,7 +511,7 @@ public sealed class OluUyeTests
 
     /// <summary>
     /// K2: kume anahtar kelime listesinden degil turden cikiyor. Kanit, olcunun bu dosyada
-    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 51 satir 158 uyelik kumenin bir parcasi,
+    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 37 satir 163 uyelik kumenin bir parcasi,
     /// kumenin kendisi degil.
     /// </summary>
     [Fact]
