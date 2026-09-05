@@ -21,23 +21,23 @@ right-click menu.
 
 ## Contracts open
 
-- `T161` — open, round 4 — Tur 3 — bagimsiz denetim `verdict: failed` dondu
-- `T163` — open, round 1
-- `T165` — open, round 4 — Tur 2 — bagimsiz denetim `verdict: failed` dondu
-- `T167` — open, round 1
-- `T169` — open, round 4 — T0 DUZELTMESI — tur 1'in baglami yanlisti
-- `T170` — open, round 1
+- `T158` — active, round 1
+- `T171` — active, round 1
+- `T172` — active, round 1
+- `T173` — active, round 1
+- `T174` — active, round 1
+- `T175` — active, round 1
 
 ## Closed last
 
-- `T166` — passed — 2026-09-05 00:08
-- `T162` — passed — 2026-09-04 23:52
-- `T161` — stale — 2026-09-04 23:46
-- `T125` — done — 2026-09-04 17:02
-- `T133` — stale — 2026-09-03 20:51
+- `T175` — stale — 2026-09-05 18:10
+- `T172` — stale — 2026-09-05 18:10
+- `T171` — stale — 2026-09-05 18:10
+- `T171` — stale — 2026-09-05 17:31
+- `T163` — passed — 2026-09-05 13:51
 
 ## Tree
 
 - branch: `main`
-- head: `36adcf3 T166 birlestirildi: denetim bulgulari kapatildi`
-- uncommitted files: 17
+- head: `c303bd8 T172-T176 sozlesmeleri acildi: ses tabani, ayar kaliciligi, onizleme barinagi, oynatici boru ve girdi`
+- uncommitted files: 2
