@@ -405,5 +405,18 @@
   "settings-tab.ffmpeg-path.manual": "Manual",
   "settings-tab.ffmpeg-path.browse": "Browse…",
   "settings-tab.ffmpeg-path.hint": "Manual overrides the bundled ffmpeg with a path you choose.",
-  "settings-tab.ffmpeg-path.error": "This path does not point to a valid ffmpeg executable."
+  "settings-tab.ffmpeg-path.error": "This path does not point to a valid ffmpeg executable.",
+
+  "main.tab.player": "Player",
+  "main.player.title": "Player",
+  "main.player.menu": "Player menu",
+  "main.player.menu.playpause": "Play / pause",
+  "main.player.menu.fullscreen": "Full screen",
+  "main.player.menu.reset": "Reset zoom",
+  "main.player.empty": "No file loaded",
+  "main.player.playing": "playing",
+  "main.player.paused": "paused",
+  "main.player.state": "position {0} s - {1} - zoom {2}%",
+  "main.player.stalled": "Playback stopped advancing; the decoder pipe is not producing frames.",
+  "main.player.seekfailed": "Seek failed: the decoder pipe could not be restarted."
 }

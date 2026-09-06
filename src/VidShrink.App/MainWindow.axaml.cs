@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -135,6 +135,10 @@ public partial class MainWindow : Window
         // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
         // panel hangi motorun kare ürettiğini bilmez.
         _preview = new PanelHost(Preview, () => new PipeComparisonFrameSource());
+
+        Player.PlayerTabIndex = () => PlayerTabIndex;
+        Player.CurrentTabIndex = () => Tabs.SelectedIndex;
+        Player.SelectTab = index => Tabs.SelectedIndex = index;
 
         RefreshOutputAndFfmpegChoiceLists();
         BuildLanguageSwitch();
@@ -2201,7 +2205,19 @@ public partial class MainWindow : Window
     /// Yol yoksa hiçbir şey yapmaz; kötü dosyanın hatasını o yükleyici bildirir.
     /// </summary>
     internal Task LoadStartupFileAsync()
-        => _startupFile is null ? Task.CompletedTask : LoadAsync(_startupFile);
+        => _startupFile is null ? Task.CompletedTask : LoadStartupFileAsync(_startupFile);
+
+    internal int PlayerTabIndex => Tabs.Items.IndexOf(TabPlayer);
+
+    internal PlayerView PlayerTab => Player;
+
+    internal async Task LoadStartupFileAsync(string path)
+    {
+        Tabs.SelectedIndex = PlayerTabIndex;
+        await LoadAsync(path);
+        try { await Player.OpenAsync(path); }
+        catch (Exception) { }
+    }
 
     /// <summary>
     /// Açılış ölçümü için yoklamayı elle başlatır. <c>OnWindowLoaded</c> yalnız gerçek
