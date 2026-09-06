@@ -1,7 +1,8 @@
 # Kabuk Küçültme İsteğinin Tüketimi
 
 T171. Dal `T171-kabuk-istegi-tuketimi`. Bütün ham çıktılar `.calisma/T171/` altında.
-Tur 2'de üretilen dosyalar `t2-` önekiyle durur; tur 1'in dosyaları eski adlarıyla yerinde.
+Tur 2'de üretilen dosyalar `t2-`, tur 3'ünkiler `t3-` önekiyle durur; tur 1'in dosyaları
+eski adlarıyla yerinde.
 
 Ölçüm makinesi: Windows 11 Pro 26100, .NET 8, Release yapı
 (`src/VidShrink.App/bin/Release/net8.0/VidShrink.App.exe`). Kurulu uygulama kullanılmadı.
@@ -260,10 +261,13 @@ Sıkılaşmanın işe yaradığı mutasyonla gösterildi — aşağıdaki ızgar
 ### Pim
 
 Beş satır tüketilmeye başlayınca `OluUyeTests` kırmızıya dönmüştü; tur 1 pimi düzeltti.
-Tur 2'de pim yeniden koşuldu ve sayılar aynı çıktı — `.calisma/T171/t2-k5-kol2-kosum.txt`:
+Pim tur 3'te ayrıntılı günlükle yeniden koşuldu ve sayılar aynı çıktı —
+`.calisma/T171/t3-k15-pim.txt`, satır 45, 104-105 ve 776 (13/13 geçti):
 
 ```
 uye: 162  bu dosyada adi gecmeyen: 116  pimlenen: 32
+dosya: 76  uye: 162
+sifir tuketici: 27  hic kullanilmayan: 5
 mesru: 10  borc: 22
 ```
 
@@ -319,7 +323,9 @@ kullanılmadı. Ölçü kolu:
 | (g) beş gerekçe de aynı cümleyi bassın | `ShowProblem` içinde `TxtMessage.Text = Say(ShrinkProblemText.NoTarget)` | 5 / 43 | `GerekcePencereyeYazilir` dört kolu (`TargetNotANumber`, `TargetNotPositive`, `TargetNotInQuickList`, `NoPath`) ve `BesGerekceBesAyriCumleBasar` | `t2-k4-mutasyon-g.txt` |
 
 Yedi mutasyonun yedisi de ölçü öldürdü. Mutasyonlar geri alınıp temiz Release yapı
-kurulduktan sonra kol **48/48** yeşil (`.calisma/T171/t2-k5-kol1-kosum.txt`).
+kurulduktan sonra kol **48/48** yeşil (`.calisma/T171/t2-k5-kol1-kosum.txt`) — **bu tek bir
+koşumun ifadesidir**. Tur 2 denetimi aynı kolun kararsız olduğunu gösterdi (aşağıda K11);
+bu ızgaranın sayıları o gürültüyü taşıyor, ızgara tur 3'te yeniden koşuldu.
 
 (d) tur 2'nin kapattığı kusuru, (e) borç 4'ü, (g) borç 5'i doğrudan tutuyor. **(g) tur 1'in
 gevşek ölçüsünde hiçbir şey öldürmezdi**: beş cümle de boş olmayan bir metin basıyor ve
@@ -353,7 +359,10 @@ kaydedince gerçek sebep çıktı ve **tahmin edilenden de başkaydı**: ikinci 
 süreçleriydi** (`Desktop\Projeler\VideoEdit\...`, `Temp\pytest-of-Teknesyum\...`).
 `.calisma/T171/t2-k7-tek-dosya.txt` bunu satır satır gösteriyor: 6 farklı ffmpeg komut
 satırının **1'i** `BIZIM`, **5'i** `YABANCI`. VidShrink'in kendi eş zamanlı ffmpeg sayısı
-üç koşumun üçünde de **1**.
+tur 2'nin üç koşumunda da **1**; ama o koşumlardaki `gozle.ps1` komut satırı okunamayan bir
+ffmpeg'i sessizce `YABANCI` kovasına atıyordu, bu yüzden **tur 2'nin bu sayısı bir alt
+sınırdır**. Betik tur 3'te ayrı bir `BILINMEYEN` kovası kazandı ve koşumlar yenilendi;
+kesin/alt sınır ayrımı artık ham çıktının kendisinde yazıyor (aşağıda K15 borç 6).
 
 Statik sayım da yapıldı (`.calisma/T171/t2-borc1-ffmpeg-cagri-satirlari.txt`): `src/**`
 altında `ToolLocator.StartInfo(ToolLocator.Ffmpeg, ...)` ile ffmpeg başlatan **20 satır**
@@ -384,6 +393,222 @@ gösterildi.
 
 **Borç 6 — artık dosyalar.** `.calisma/T171/cikti.txt` (0 bayt) ve `hata.txt` (bugünkü koda
 karşılığı olmayan bir geliştirme çökmesi) `trash/T171/` altına taşındı.
+
+## Tur 3 — K11-K15
+
+Bu turun bütün ham çıktıları `t3-` önekli. Kod tur 3'e `c6604cb` ile geldi; K11-K14'ün
+kodu önceki yapıcı tarafından yazılmış ama **hiçbiri ölçülmemişti**. Aşağıdaki sayıların
+hepsi bu turda üretildi.
+
+### K11 — Kararsız ölçü kapandı
+
+Kusur: `GerekcePencereyeYazilir` beklenen metni test iş parçacığında süreç geneli
+`Strings.Get` ile hesaplıyor, görülen metni arayüz iş parçacığında okuyordu. Pencere
+dili (teslim commit'i `3618cf8`te `ShrinkJobWindow.axaml.cs:96`) süreç genelindeki dili
+değiştirdiği için iki taraf farklı dile düşebiliyordu.
+
+Çözüm: pencere dili kuruluşta bir kez çözülüp `ShrinkJobWindow.Language`e sabitlendi
+(`ShrinkJobWindow.axaml.cs:98,103,125`), `Say` artık `Strings.GetIn(_language, ...)` okuyor
+(`:353-357`). Ölçü beklenen metni **o örneğin dilinden** hesaplıyor
+(`KabukIstegiTests.cs:127-150` ve `:156-169`).
+
+Pencere dilinin koşumdan koşuma gerçekten değiştiği ham çıktıda görülüyor: temiz ağaçta
+`pencere dili: tr` (`.calisma/T171/t3-k13-k14-sonda.txt`), mutasyon (i) koşumunda
+`pencere dili: en` (`.calisma/T171/t3-k4-mutasyon-i.txt:39`). Sebep `UpdateSettings.Load()`
+— sıra bağımlı. Ölçü artık buna bakmadığı için bu değişkenlik onu düşürmüyor.
+
+**CHECK — 10 koşum.** `dotnet test -c Release --no-build --filter
+"KabukIstegiTests|LocalizationTests|LanguageTests"`, arka arkaya, her biri ayrı çağrıda.
+Onunun da ham çıktısı tek dosyada: `.calisma/T171/t3-k11-kararlilik.txt`.
+
+| koşum | sonuç | dosyadaki satır |
+|---|---|---|
+| 1 | 98/98 başarılı, 0 başarısız | 8 |
+| 2 | 98/98 | 17 |
+| 3 | 98/98 | 26 |
+| 4 | 98/98 | 35 |
+| 5 | 98/98 | 44 |
+| 6 | 98/98 | 53 |
+| 7 | 98/98 | 62 |
+| 8 | 98/98 | 71 |
+| 9 | 98/98 | 80 |
+| 10 | 98/98 | 89 |
+
+On koşumun onunda da `exit=0`. Izgara koşulduktan sonra temiz yapıyla bir **11. doğrulama
+koşumu** daha yapıldı, o da 98/98 (aynı dosya, satır 115). Bu yüzden dosyadaki
+`grep -c "^exit=0"` **11** verir: 10 kararlılık koşumu + 1 ızgara sonrası doğrulama.
+
+Kolun dolu olduğu `--list-tests` ile ayrıca sayıldı (`.calisma/T171/t3-k11-list.txt`):
+`KabukIstegiTests` 27, `LanguageTests` 56, `LocalizationTests` 15 — toplam **98**, sıfır
+eşleşen kol yok.
+
+**Aynı desen başka ölçülerde.** `Strings.Get`/`Strings.Use`i süreç genelinden okuyan test
+kolları arandı. `tests/` altında kalan tek benzer yer `WindowLayoutTests.cs:867`
+(`Strings.Get("main.tab.advanced")` test iş parçacığında, başlıklar arayüz iş parçacığında
+toplanmışken). Bugün kırmızıya dönmüyor — paralellik kapalı (`LanguageTests.cs:17`,
+`[assembly: CollectionBehavior(DisableTestParallelization = true)]`) ve `MainWindow`
+kuruluşta dili değiştirmiyor. **`WindowLayoutTests.cs` bu sözleşmenin `owns` listesinde
+değil; dokunulmadı, T0'a bildiriliyor.**
+
+### K12 — Kısmî teslimde çifte kodlama
+
+`Program.Handoff` (`Program.cs:155-171`, gövde `:161-171`) eklendi: bayrak istek başına. Teslim edilen istek
+geri dönmez, geriye yalnız teslim edilemeyenler kalır; hepsi teslim edildiyse `null` döner
+ve süreç pencere açmadan çıkar.
+
+**CHECK — önce/sonra.** Mutasyon (h) `Handoff`u eski tek-bayrak anlamına geri çevirir
+(`startup with { Requests = leftovers }` → `startup`). Ham çıktı
+`.calisma/T171/t3-k4-mutasyon-h.txt`:
+
+| | denenen | geri kalan |
+|---|---|---|
+| eski davranış (mutasyon h, dosya satır 39-40) | `a.mp4, b.mp4, c.mp4` | `a.mp4, b.mp4, c.mp4` |
+| bugünkü davranış (`t3-k13-k14-sonda.txt`) | `a.mp4, b.mp4, c.mp4` | `b.mp4` |
+
+Eski kolda `a.mp4` sahibe teslim edilmiş **ve** bu süreçte yeniden kodlanacaktı. Ölçü adı:
+`KabukIstegiTests.TeslimEdilenIstekGeriDonmez`; mutasyon (h) altında 1/54 ile tek başına
+düşüyor.
+
+### K13 — Bulunamayan yol sessizce düşmüyor
+
+`ShellShrinkStartup.ScanPaths` artık iki kova döndürüyor (`Program.cs:69-70` kayıt tipi,
+`:73-104` tarama); bulunamayan
+parçalar `Missing` içinde durur ve `ShrinkJobWindow.ShowMissing`
+(`ShrinkJobWindow.axaml.cs:175-186`) bunları `TxtNotice` satırına yazar. Docstring de
+gerçekle hizalandı (`Program.cs:31-39`).
+
+**CHECK — sonda.** Ham çıktı `.calisma/T171/t3-k13-k14-sonda.txt`. Gerçek dosyalarla
+kurulan geçici dizinde `--kucult 100 <a.mp4> <yok.mp4> <b.mp4>`:
+
+```
+istek: 2  bulunamayan: 1
+  eksik: C:\Users\Teknesyum\AppData\Local\Temp\vidshrink-t171-b25ef53094e34a30bfc01295df265947\yok.mp4
+```
+
+Kullanıcıya giden tam metin, iki dilde (aynı dosyadan):
+
+```
+en: 1 of the paths in the shell request were not found on disk and were skipped: yok.mp4
+tr: Kabuk isteğindeki 1 yol diskte bulunamadı ve atlandı: yok.mp4
+```
+
+Pencereye gerçekten basılan hali (Title Case, depo geneli biçim — borç 7 hâlâ açık):
+
+```
+dil: tr
+  Kabuk İsteğindeki 1 Yol Diskte Bulunamadı ve Atlandı: C:\...\yok.mp4
+```
+
+Ölçü adları: `BulunamayanYolSessizceDusmez`, `BulunamayanYolPencereyeYazilir`,
+`BulunamayanYolCumlesiIkiDilde`. Mutasyon (j) `Missing` kovasını boşaltır ve
+`BulunamayanYolSessizceDusmez` tek başına düşer (1/54,
+`.calisma/T171/t3-k4-mutasyon-j.txt`).
+
+**Ölçülmedi:** kurulu uygulamayla, gerçek sağ menü tıklamasıyla uçtan uca sonda yine
+yapılmadı. Sonda `Program.StartupFor` ve `ShrinkJobWindow` seviyesindedir.
+
+### K14 — Sezgiselin bedeli
+
+En-uzun-eşleşme sezgiseli göreli adlarda yanlış dosya seçebiliyor. Bedel artık ölçüyle
+**yazılı**: `KabukIstegiTests.SezgiselGoreliAdlardaYanlisDosyayiSecebilir`. Ham çıktı
+`.calisma/T171/t3-k13-k14-sonda.txt`:
+
+```
+goreli adlar -> bulunan: a.mp4 b.mp4  eksik: 0
+mutlak yollar -> bulunan: C:\Klip\a.mp4 | C:\Klip\b.mp4
+```
+
+Yani dizinde `a.mp4`, `b.mp4` ve adı `a.mp4 b.mp4` olan üçüncü bir dosya varken göreli
+adlarla gelen iki istek tek yanlış isteğe çöküyor; mutlak yollarla gelince iki istek de
+doğru çıkıyor.
+
+**Üretimde erişilemez olduğunun kanıtı.** Kayıt defteri şablonu her zaman tırnaklı `"%1"`
+veriyor — `Install-VidShrink.ps1:331`:
+
+```
+Set-Item -LiteralPath $command -Value ('"{0}" {1} {2} "%1"' -f $Executable, $shellShrinkFlag, $target)
+```
+
+Bu makinede kurulu gerçek değerler de okundu (`.calisma/T171/t3-k14-uretim-yolu.txt`),
+beş hedefin beşi de mutlak yol taşıyor:
+
+```
+HKCU\...\SystemFileAssociations\.mp4\shell\VidShrinkKucult\shell\100\command
+  (Default) = "C:\Users\Teknesyum\AppData\Local\Programs\VidShrink\VidShrink.exe" --kucult 100 "%1"
+```
+
+`%1` Explorer tarafından tam nitelikli yola açılır; birleştirilen aday o zaman
+`C:\Klip\a.mp4 C:\Klip\b.mp4` olur ve Windows'ta böyle bir dosya adı kurulamaz (içinde
+`:` ve dizin ayıracı var). **Karar: sezgisel düzeltilmedi, bedeli yazıldı** — tırnağı
+kaybolmuş boşluklu yolu geri toplamak (K1'in `UnquotedPathBrokenIntoThreePieces` kolu)
+üretimde gerçekten oluyor; yanlış seçim üretimde oluşamıyor.
+
+### K15 — Borç temizliği
+
+**Borç 1 (pim künyesi).** Pim tur 3'te gerçekten koşuldu, kendi ham dosyasına yazıldı:
+`.calisma/T171/t3-k15-pim.txt` (13/13 geçti). Yukarıdaki "Pim" bloğunun künyesi bu dosyaya
+ve satır numaralarına çevrildi.
+
+**Borç 2 (yapı kanıtı).** On mutasyon dosyasının **onunda da** `dotnet build -c Release
+--no-incremental` çıktısı var; her birinde `=== dotnet build -c Release --no-incremental ===`
+başlığı ve `Oluşturma başarılı oldu` satırı bulunuyor (dosya başına birer kez).
+
+**Borç 6 (`gozle.ps1` kovası).** Betik artık komut satırı okunamayan ffmpeg'i ayrı bir
+`BILINMEYEN` kovasında sayıyor ve özet satırı kesin mi alt sınır mı olduğunu **kendisi**
+söylüyor. K7 ve K6 yeni betikle yeniden koşuldu:
+
+| koşum | bizim | yabancı | bilinmeyen | özetin dediği | ham çıktı |
+|---|---|---|---|---|---|
+| K7 tek dosya | 1 | 0 | 0 | `'bizim' sayisi KESIN` | `t3-k7-tek-dosya.txt` |
+| K6 tek süreç tek argv üç yol | 1 | 0 | 1 | `'bizim' sayisi ALT SINIR` | `t3-k6-tek-surec-uc-yol.txt` |
+
+Çıktı baytları (aynı dosyalardan):
+
+| koşum | çıktı | bayt |
+|---|---|---|
+| K7 | `buyuk-1_shrunk.mp4` | 103082515 |
+| K6 | `buyuk-1_shrunk.mp4` | 103034935 |
+| K6 | `buyuk-2_shrunk.mp4` | 103234937 |
+| K6 | `buyuk-3_shrunk.mp4` | 103130742 |
+
+K6'da tek görünür pencere pid'i (`pid: 9336`), üç çıktı, en çok eş zamanlı kendi ffmpeg'i
+**1**, süre `t=100s`.
+
+**Borç 7 (`trash/T171/` içindeki iki dosya).** `owns` dışında; **dokunulmadı**, T0'a
+bırakıldı.
+
+### K4 ızgarası — tur 3'te yeniden
+
+Ölçü kolu: `dotnet test -c Release --no-build --filter
+"ShrinkRequestTests|ShellIntegrationTests|KabukIstegiTests"` — bugün **55** ölçü
+(`.calisma/T171/t3-verify-kollar.txt`: `KabukIstegiTests` 27, `ShellIntegrationTests` 9,
+`ShrinkRequestTests+ResolverTests` 12, `ShrinkRequestTests+QueueTests` 7; 27+9+12+7 = 55).
+Temiz ağaçta kol **55/55** yeşil, ikinci `verify` kolu `OluUyeTests` **13/13** (aynı dosya).
+
+Her mutasyon ayrı bir çağrıda uygulandı, öncesinde `dotnet build -c Release
+--no-incremental` koşuldu ve **yapı çıktısı ham dosyaya girdi**; sonrasında `git checkout
+-- src/` ile geri alındı. Mutasyon betiği: `.calisma/T171/mutasyon.py` (desen tam olarak
+bir kez bulunmazsa uygulamayı reddeder).
+
+| mutasyon | değişiklik | sonuç | ölen ölçü | ham çıktı |
+|---|---|---|---|---|
+| (a) tüketen kol kaldırıldı | `Program.StartupFor(...) => null` | 6 / 49 | `BayrakliBaslangicIstegiCozer`, `BayrakliBaslangicGerekceyiTasir`, `TekArgvdekiUcYolUcIstekUretir`, `PencereUcIstegiDeKabulEder`, `KabukIstegiAnaPencereyiAcmaz`, `BulunamayanYolSessizceDusmez` | `t3-k4-mutasyon-a.txt` |
+| (b) gerekçe cümlesi susturuldu | `ShowProblem` içinde `TargetNotInQuickList` için erken `return` | 3 / 52 | `GerekcePencereyeYazilir(TargetNotInQuickList)`, `GerekceOlcusuSurecDilindenEtkilenmez` iki kolu (`en`, `tr`) | `t3-k4-mutasyon-b.txt` |
+| (c) sahiplik kapısı hep açık | `Program.OwnsQueue(...) => true` | 1 / 54 | `IkinciSurecKuyrugunSahibiDegil` | `t3-k4-mutasyon-c.txt` |
+| (d) yalnız ilk yol tüketilsin | `ScanPaths` döngüsünde `if (advanced) continue` → `break` | 4 / 51 | `TekArgvdekiUcYolUcIstekUretir`, `PencereUcIstegiDeKabulEder`, `BulunamayanYolSessizceDusmez`, `SezgiselGoreliAdlardaYanlisDosyayiSecebilir` | `t3-k4-mutasyon-d.txt` |
+| (e) kabuk kolu ana pencereye dönsün | `StartupWindow() => new MainWindow(...)` | 1 / 54 | `KabukIstegiAnaPencereyiAcmaz` | `t3-k4-mutasyon-e.txt` |
+| (f) iki gerekçe aynı anahtara | `TargetNotPositive => NoTarget` | 3 / 52 | `BesGerekceninHepsiAyriAnahtaraGider`, `GerekcePencereyeYazilir(TargetNotPositive)`, `BesGerekceBesAyriCumleBasar` | `t3-k4-mutasyon-f.txt` |
+| (g) beş gerekçe de aynı cümleyi bassın | `ShowProblem` içinde `TxtMessage.Text = Say(ShrinkProblemText.NoTarget)` | 7 / 48 | `GerekcePencereyeYazilir` dört kolu (`TargetNotANumber`, `TargetNotPositive`, `TargetNotInQuickList`, `NoPath`), `GerekceOlcusuSurecDilindenEtkilenmez` iki kolu, `BesGerekceBesAyriCumleBasar` | `t3-k4-mutasyon-g.txt` |
+| (h) teslim bayrağı yine tek | `startup with { Requests = leftovers }` → `startup` | 1 / 54 | `TeslimEdilenIstekGeriDonmez` | `t3-k4-mutasyon-h.txt` |
+| (i) pencere dili yine süreç geneli | `Say` → `LanguageCatalog.Display(Strings.Get(...))` | 1 / 54 | `GerekceOlcusuSurecDilindenEtkilenmez(tr)` | `t3-k4-mutasyon-i.txt` |
+| (j) bulunamayan yol yine sessiz | `ScanPaths` içinde `missing.Add(token)` kaldırıldı | 1 / 54 | `BulunamayanYolSessizceDusmez` | `t3-k4-mutasyon-j.txt` |
+
+On mutasyonun onu da ölçü öldürdü ve **hiçbirinde rastgele düşen kol görülmedi** — tur 2'nin
+ızgarasındaki gürültü kapandı. (a)-(g) tur 2'nin ızgarasının aynısı; (h), (i), (j) sırasıyla
+K12, K11 ve K13'ün gerileme kolları.
+
+Sayı farkları tur 2'ye göre iki sebepten: kolun toplamı 48 → 55 (yedi yeni ölçü) ve tur 2'de
+kararsız olan `GerekcePencereyeYazilir` artık deterministik.
 
 ## Kapanmayanlar
 
