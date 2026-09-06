@@ -497,6 +497,11 @@ public sealed class WindowLayoutTests
     /// düşer ve yeniden konuşulur. <b>Bozulursa kullanıcı ne görür:</b> sayfa uzar, kısa
     /// pencerelerde dikey kaydırma çubuğu daha erken çıkar.</para>
     ///
+    /// <para>T177: <b>boş/tasarım</b> aralığı 939-1039 → 865-965 (ölçülen 915). Küçült
+    /// sekmesinin ayar sütunu üç satırlık kalıptan tek satıra indi, açılır listelerin
+    /// dördü anahtar/şeride döndü ve kalite, ses, kırpma bölümleri katlandı. Öteki üç
+    /// aralık değişmedi — onları orta sütun
+    /// (oynatma paneli) tutuyor ve ona dokunulmadı.</para>
     /// <para>T163: tur 2 dört aralığı da ~115 px yukarı taşımıştı. <b>Tur 3'te dördü de
     /// eski değerlerine döndü</b> ve öyle geçiyor — gelişmiş ayarlar bölümünün kapalı hâli
     /// sayfaya hiçbir şey eklemiyor. Sayfayı tasarım boyutunda sol ayar sütunu belirliyor
@@ -504,7 +509,7 @@ public sealed class WindowLayoutTests
     /// boyunu belirlemiyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, false, 939, 1039)]
+    [InlineData(false, false, 865, 965)]
     [InlineData(false, true, 960, 1060)]
     [InlineData(true, false, 906, 1006)]
     [InlineData(true, true, 906, 1006)]
@@ -574,12 +579,15 @@ public sealed class WindowLayoutTests
     /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
     ///
+    /// <para>T177: <b>boş</b> eşiği 1039-1129 → 962-1062 (ölçülen 1012). Ayar sütunu
+    /// kısaldı, boş sayfa 77 piksel daha erken sığıyor. Dolu eşiği değişmedi.</para>
+    ///
     /// <para>T163: tur 2 iki aralığı da ~116 px yukarı taşımıştı; <b>tur 3'te ikisi de eski
     /// değerlerine döndü</b>. Gelişmiş ayarlar bölümü sayfanın boyunu yalnız açıkken
     /// değiştiriyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 1039, 1129)]
+    [InlineData(false, 962, 1062)]
     [InlineData(true, 1007, 1097)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
@@ -626,6 +634,11 @@ public sealed class WindowLayoutTests
     /// burada <c>WorkspaceMargin</c> okunuyordu; iki belirteç aynı sayıyı (24) taşıdığı için
     /// eşitlik tutuyordu, T74/K5 <c>SectionMargin</c>'i 16'ya indirince ayrıştılar.</para>
     ///
+    /// <para>T177: <b>dolu</b> sayfayı tutan sütun 0'dan 1'e geçti — ölçülen sol 866,
+    /// orta 906, sağ 512. Ayar sütunu kısalınca sayfayı artık oynatma/plan sütunu geriyor;
+    /// dolu sayfayı kısaltmak isteyen iş bundan sonra oraya bakmalı. Boş sayfayı hâlâ sol
+    /// sütun tutuyor; orada yönlendirme satırları sütunu uzatıyor.</para>
+    ///
     /// <para><b>Bu sayı neyi koruyor:</b> sayfayı hangi sütunun gerdiğini — kısaltma işi
     /// yanlış sütuna harcanmasın diye. <b>Bozulursa kullanıcı ne görür:</b> doğrudan bir
     /// şey görmez; bu bir yön tabelasıdır, yanlış olduğunda sonraki düzen işi boşa gider.
@@ -633,7 +646,7 @@ public sealed class WindowLayoutTests
     /// </summary>
     [Theory]
     [InlineData(false, 0)]
-    [InlineData(true, 0)]
+    [InlineData(true, 1)]
     public void TheTallestColumnIsWhatHoldsThePage(bool loaded, int holder)
     {
         var (columns, content) = Read(DesignSize(), loaded, window =>
@@ -958,13 +971,17 @@ public sealed class WindowLayoutTests
             return (found, faults);
         });
 
-        // Sayım donduruldu: ölçüm sekme seçimi ya da görünürlük yüzünden rozetleri
-        // görmez olursa sessizce yeşile dönmesin. Sayı MainWindow.axaml'deki rozet
-        // sayısıdır — ölçümün kendi çıktısı değil; rozet eklendiğinde elle güncellenir.
+        // Beklenen sayı biçimlemeden okunur: elle tutulan sabit, rozet eklenip
+        // silindikçe eskiyordu (T177 sekiz rozeti kaldırdı, sabit 23'te kalmıştı).
+        // Ölçüm yine de bir sayıya bağlı: rozetleri görmez olursa sessizce yeşile dönmez.
+        var declared = Regex.Matches(
+            File.ReadAllText(TipSources.WindowXamlPath), "StaticResource InfoButton").Count;
+
+        Assert.True(declared > 0, "Biçimlemede hiç bilgi rozeti bulunamadı; sayaç ölü.");
         Assert.True(
-            counted == 23,
-            $"Ölçülen bilgi rozeti {counted}, beklenen 23. Rozet eklendiyse sayıyı güncelle; "
-            + "eklenmediyse ölçüm rozetleri göremiyor.");
+            counted == declared,
+            $"Ölçülen bilgi rozeti {counted}, biçimlemede yazılı {declared}. Aradaki fark "
+            + "ya görünmeyen bir rozet ya da ölçümün göremediği bir rozet.");
         Assert.True(
             problems.Count == 0,
             $"{problems.Count} bilgi rozeti hatalı:" + Environment.NewLine
@@ -1259,7 +1276,7 @@ public sealed class WindowLayoutTests
             + $"kutu yazısı {labels.Count}; payı en dar üçü: "
             + string.Join(" | ", labels.OrderBy(label => label.Room - label.Needed).Take(3)));
 
-        Assert.Contains(labels, label => label.Control.StartsWith("CmbFillPolicy", StringComparison.Ordinal));
+        Assert.Contains(labels, label => label.Control.StartsWith("CmbContainer", StringComparison.Ordinal));
 
         Assert.True(
             clipped.Count == 0,

@@ -282,32 +282,9 @@
 
                 <Border x:Name="TargetPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.target.title}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.target.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </StackPanel>
-                      <Button Grid.Column="1"
-                              x:Name="BtnAdvancedToggle"
-                              Content="▾"
-                              Click="OnToggleAdvanced"
-                              Theme="{StaticResource GhostButton}"
-                              FontFamily="{StaticResource FontMono}"
-                              FontSize="{StaticResource FontSizeSm}"
-                              Width="{StaticResource TargetMinSize}"
-                              Height="{StaticResource TargetMinSize}"
-                              Padding="0"
-                              VerticalAlignment="Center"
-                              auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
-                        <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" Text="{loc:Text main.advanced.title}"/>
-                        </ToolTip.Tip>
-                      </Button>
-                    </Grid>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
+                    </StackPanel>
                     <!--
                       T61: hedef ve kalite tek Grid'de. İkinci sayı kutusunun genişliği
                       birinciyle aynı sütundan gelir; yeni bir piksel sayısı yazılmadı.
@@ -327,6 +304,13 @@
                                Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                Text="{loc:Text main.target.crf-locked}"/>
                     <WrapPanel>
+                      <Button x:Name="ChipArchive" Content="{loc:Text main.intent.archive}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetArchive">
+                        <ToolTip.Tip>
+                          <StackPanel Spacing="{StaticResource SpaceSm}">
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.archive.tip}"/>
+                          </StackPanel>
+                        </ToolTip.Tip>
+                      </Button>
                       <Button x:Name="Chip8" Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -386,6 +370,7 @@
                         </ToolTip.Tip>
                       </Button>
                     </WrapPanel>
+                    <TextBlock x:Name="TxtChipDerivation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>
 
                       <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
@@ -394,137 +379,177 @@
                       <TextBlock Grid.Row="3" Grid.Column="2" Text="/100" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       <TextBlock x:Name="TxtQualityTargetNotice" Grid.Row="4" Grid.ColumnSpan="3" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </Grid>
-                    <StackPanel>
-                      <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{loc:Text main.intent.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.intent.label}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.intent.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </StackPanel>
-                      <ComboBox x:Name="CmbIntent" SelectedIndex="1" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="{loc:Text main.intent.archive}"/>
-                        <ComboBoxItem Content="{loc:Text main.intent.sharing}"/>
-                        <ComboBoxItem Content="{loc:Text main.intent.social}"/>
-                      </ComboBox>
-                    </StackPanel>
-                    <StackPanel>
-                      <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.codec.label}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.codec.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </StackPanel>
-                      <ComboBox x:Name="CmbCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="{loc:Text main.codec.automatic}"/>
-                        <ComboBoxItem Content="{loc:Text main.codec.compatible}"/>
-                        <ComboBoxItem Content="{loc:Text main.codec.smallest}"/>
-                      </ComboBox>
-                    </StackPanel>
-                    <WrapPanel>
-                      <StackPanel Orientation="Horizontal" Margin="{StaticResource WrapItemMargin}">
-                        <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.allow.resolution}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.allow.resolution.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </StackPanel>
-                      <StackPanel Orientation="Horizontal" Margin="{StaticResource WrapItemMargin}">
-                        <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.allow.fps}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.allow.fps.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </StackPanel>
-                      <StackPanel Orientation="Horizontal" Margin="{StaticResource WrapItemMargin}">
-                        <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" Content="{loc:Text main.fast-gpu}"/>
-                        <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text main.fast-gpu}">
+                    <Border Theme="{StaticResource PanelRule}"/>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                      <TextBlock Grid.Column="0" Text="{loc:Text main.section.outcome}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" x:Name="TxtOutcomeSummary" Theme="{StaticResource MonoValue}" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <StackPanel x:Name="SecQuality">
+                      <Button x:Name="BtnQualityToggle"
+                              Click="OnToggleQuality"
+                              Theme="{StaticResource GhostButton}"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Left"
+                              Padding="{StaticResource ButtonPaddingSm}"
+                              auto:AutomationProperties.Name="{loc:Text main.section.quality}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                          <TextBlock x:Name="GlyphQuality" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <TextBlock Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                      </Button>
+                      <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                            <RadioButton x:Name="RbCodecAuto" GroupName="ShrinkCodec" IsChecked="True" Content="{loc:Text main.codec.automatic}"/>
+                            <RadioButton x:Name="RbCodecCompatible" GroupName="ShrinkCodec" Content="{loc:Text main.codec.compatible}"/>
+                            <RadioButton x:Name="RbCodecSmallest" GroupName="ShrinkCodec" Content="{loc:Text main.codec.smallest}"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.fill.target}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <ToggleSwitch Grid.Column="1" x:Name="TglFillTarget" IsChecked="True" OnContent="" OffContent="" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Grid>
+                        <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" HorizontalAlignment="Left" Content="{loc:Text main.fast-gpu}">
                           <ToolTip.Tip>
                             <TextBlock x:Name="TipFastGpu" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fast-gpu.tip}"/>
                           </ToolTip.Tip>
-                        </Button>
+                        </CheckBox>
+                        <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
+                          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                            <TextBlock Grid.Column="0" Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                              <RadioButton x:Name="RbHdrPreserve" GroupName="ShrinkHdr" IsChecked="True" Content="{loc:Text main.hdr.preserve}"/>
+                              <RadioButton x:Name="RbHdrSdr" GroupName="ShrinkHdr" Content="{loc:Text main.hdr.sdr}"/>
+                            </StackPanel>
+                          </Grid>
+                        </StackPanel>
                       </StackPanel>
-                    </WrapPanel>
-                    <StackPanel>
-                      <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.fill.label}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fill.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </StackPanel>
-                      <ComboBox x:Name="CmbFillPolicy" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="{loc:Text main.fill.target}"/>
-                        <ComboBoxItem Content="{loc:Text main.fill.ceiling}"/>
-                      </ComboBox>
                     </StackPanel>
-                    <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
-                      <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}"/>
-                        <Button Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.hdr.label}">
-                          <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.hdr.tip}"/>
-                          </ToolTip.Tip>
-                        </Button>
+
+                    <StackPanel x:Name="SecAudio">
+                      <Button x:Name="BtnAudioToggle"
+                              Click="OnToggleAudio"
+                              Theme="{StaticResource GhostButton}"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Left"
+                              Padding="{StaticResource ButtonPaddingSm}"
+                              auto:AutomationProperties.Name="{loc:Text main.section.audio}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                          <TextBlock x:Name="GlyphAudio" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <TextBlock Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                      </Button>
+                      <StackPanel x:Name="AudioBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvAudioKbps" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvAudioChannels" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
                       </StackPanel>
-                      <ComboBox x:Name="CmbHdrPolicy" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="{loc:Text main.hdr.preserve}"/>
-                        <ComboBoxItem Content="{loc:Text main.hdr.sdr}"/>
-                      </ComboBox>
                     </StackPanel>
-                    <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False">
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvMode" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}"/>
+
+                    <StackPanel x:Name="SecFrame">
+                      <Button x:Name="BtnFrameToggle"
+                              Click="OnToggleFrame"
+                              Theme="{StaticResource GhostButton}"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Left"
+                              Padding="{StaticResource ButtonPaddingSm}"
+                              auto:AutomationProperties.Name="{loc:Text main.section.frame}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                          <TextBlock x:Name="GlyphFrame" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <TextBlock Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                      </Button>
+                      <StackPanel x:Name="FrameBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+                          <CheckBox x:Name="ChkResolution" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.resolution}"/>
+                          <CheckBox x:Name="ChkFps" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text main.allow.fps}"/>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvMinResolution" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvMinFps" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
                       </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvCrf" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="SecAdvanced">
+                      <Button x:Name="BtnAdvancedToggle"
+                              Click="OnToggleAdvanced"
+                              Theme="{StaticResource GhostButton}"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Left"
+                              Padding="{StaticResource ButtonPaddingSm}"
+                              auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                          <TextBlock x:Name="GlyphAdvanced" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <TextBlock Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                      </Button>
+                      <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvMode" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvCrf" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvPreset" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvEncoderPath" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
+                            <ComboBox x:Name="CmbAdvCodecLock" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                          </StackPanel>
+                        </Grid>
+                        <TextBlock x:Name="TxtAdvancedError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
                       </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvPreset" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvAudioKbps" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvAudioChannels" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvMinResolution" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvMinFps" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvEncoderPath" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <StackPanel>
-                        <TextBlock Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}"/>
-                        <ComboBox x:Name="CmbAdvCodecLock" SelectedIndex="0" HorizontalAlignment="Stretch"/>
-                        <TextBlock x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}"/>
-                      </StackPanel>
-                      <TextBlock x:Name="TxtAdvancedError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
                     </StackPanel>
                   </StackPanel>
                 </Border>
