@@ -1,167 +1,254 @@
+<!-- lang -->
+
+[<img src="docs/gorseller/badge-lang.svg" alt="English selected, switch to Türkçe" width="124" height="44">](README.tr.md)
+
 # VidShrink
 
-Free, offline desktop app for Windows, macOS and Linux that shrinks a video to a target file size — and loses the least of what a person can actually see while doing it.
+Target size in, video out.
 
-Give it a file and a ceiling in megabytes. It never returns a file larger than you asked for, and it tells you the expected size before you press start.
+Free, offline desktop app for Windows, macOS and Linux that shrinks a video to a target
+file size and loses the least of what a person can actually see while doing it. Give it a
+file and a ceiling in megabytes. It never returns a file larger than you asked for, and it
+tells you the expected size before you press start. Turkish and English are both
+first-class: the whole window switches with the `TR` / `EN` buttons in the corner.
 
-The interface starts in Turkish and switches to English instantly with the `TR` / `EN` buttons.
+![VidShrink main window in English: the Source drop zone on the left with the Target slider and its chips below it, the What It Will Do panel in the middle, and the Output panel with the size estimate on the right](docs/gorseller/T25-ana-en.png)
 
-![VidShrink current interface](docs/assets/vidshrink-current.png)
+## Doesn't ffmpeg already do this?
 
-### Measured compression flow
+It does, if you already know the answer. `ffmpeg` will happily encode to any bitrate you
+name. What it will not do is work out which bitrate, which resolution and which frame rate
+land you *just under* 25 MB on this particular clip, and it will not tell you beforehand
+what will come out.
 
-![VidShrink measured compression engine](docs/assets/vidshrink-neon.svg)
+- **It measures your file instead of guessing from its bitrate.** Short samples are
+  encoded at two resolutions and at two CRFs before any decision is made.
+- **It answers the resolution question per clip.** Keep the pixels and encode them worse,
+  or drop the pixels and encode them well — that trade-off is measured, not assumed.
+- **It shows the plan and the estimate before the run**, with the reasoning in plain
+  language, in your language.
+- **It never overshoots the target.** Not "usually". A result over the ceiling is not
+  delivered at all.
 
-## One-command installation
+## Features
 
-### Windows
+- **Target-size shrink with a measured plan.** Chips for the sizes people actually need,
+  a slider for everything else, and a size estimate with a stated range up front.
+- **Convert tab.** MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265, VP9, AV1
+  or stream copy; trimming and audio extraction.
+- **Advanced tab.** The exact ffmpeg command, selectable and copyable, plus the optional
+  AI-plan prompt. No summary, the command itself.
+- **Player tab.** The window plays the source through a decoder pipe that stays open
+  between seeks instead of launching ffmpeg for every scrub.
+- **Twelve encoders, probed not trusted.** Software, NVENC, Quick Sync and AMF candidates
+  are each tested on your machine before the engine will name one.
+- **Windows right-click menu and self-update.** "Shrink with VidShrink" in the Explorer
+  menu, and a launcher that patches the installation before the app loads.
 
-Open PowerShell and run:
+## What it does not do
+
+- **No HDR10+ or Dolby Vision passthrough.** An HDR10+ source is delivered as static HDR10.
+- **No right-click menu on macOS or Linux.** Windows only, and nothing equivalent is
+  installed elsewhere.
+- **No FFmpeg in the box.** The installers fetch it from your package manager or tell you
+  the command; releases do not carry it.
+- **No perceptual planner yet.** VMAF judges the plan afterwards in the bench harness; it
+  does not yet set the planner's constants. See the roadmap.
+- **No hardware win at small targets yet.** `av1_amf` still needs a second attempt at
+  8 MB and 25 MB. The numbers are below.
+- **No telemetry, no account, no paid tier.** There is nothing to sign up for.
+
+## Install
+
+### Windows — one line
 
 ```powershell
 irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
 ```
 
-The installer needs no administrator rights and no .NET SDK. It asks GitHub for the latest release, downloads the `win-x64` archive and the launcher beside it, checks both against the release's own SHA-256 list and refuses to continue if either digest differs. What lands on your machine is the same binary the release pipeline tested — nothing is compiled here. It installs under `%LOCALAPPDATA%\Programs\VidShrink`, fetches FFmpeg and FFprobe from WinGet, creates Desktop and Start Menu shortcuts pointing at the launcher, and adds the right-click menu entry described below. Running the same command again replaces the installed app with the newest release.
+No administrator rights and no .NET SDK. The installer asks GitHub for the latest release,
+downloads the `win-x64` archive and the launcher beside it, checks both against the
+release's own SHA-256 list, and refuses to continue if either digest differs.
 
-Only `win-x64` is published for Windows. If your machine is positively identified as ARM64 or 32-bit, the installer stops and says so, rather than installing an architecture whose updates would never be found — the launcher looks for a release asset named after its own architecture, and there is none. Download an `x64` build from the [releases page](https://github.com/Teknesyum/VidShrink/releases) only if you know your machine can run it.
+It installs under `%LOCALAPPDATA%\Programs\VidShrink`, fetches FFmpeg and FFprobe from
+WinGet, creates Desktop and Start Menu shortcuts pointing at the launcher, and adds the
+right-click entry. Running the same command again replaces the app with the newest release.
 
-An architecture that cannot be *read* is a different case, and the installer no longer treats it as an unsupported one. It reads the architecture from four places in turn — .NET's `RuntimeInformation.OSArchitecture`, then `PROCESSOR_ARCHITEW6432`, then `PROCESSOR_ARCHITECTURE`, then the operating system's bit width — because the first of them is unavailable on Windows PowerShell 5.1 running on .NET Framework older than 4.7.1, and blocked outright under constrained language mode. If none of them yields a name, a 64-bit Windows continues as `win-x64` and prints one line saying that this was assumed.
+Only `win-x64` is published. A machine positively identified as ARM64 or 32-bit stops the
+installer rather than getting an architecture whose updates would never be found. An
+architecture that cannot be *read* is different: the installer tries
+`RuntimeInformation.OSArchitecture`, then `PROCESSOR_ARCHITEW6432`, then
+`PROCESSOR_ARCHITECTURE`, then the OS bit width, and if none of them answers, a 64-bit
+Windows continues as `win-x64` and prints one line saying so.
 
-The command needs no change to your execution policy. `irm | iex` runs the installer from memory rather than from a file, so Windows' default `Restricted` policy does not block it. If a stricter organizational policy blocks the command outright, download and inspect [`Install-VidShrink.ps1`](Install-VidShrink.ps1), then run it from an allowed PowerShell session with the command below. Read the file explicitly as UTF-8 rather than passing `-File`: the script is stored as UTF-8 without a byte order mark, and Windows PowerShell 5.1 reads a mark-less script file in the system ANSI code page, which turns every non-ASCII character in the installer's messages into mojibake.
+`irm | iex` runs from memory, so the default `Restricted` execution policy does not block
+it. If an organizational policy does, download
+[`Install-VidShrink.ps1`](Install-VidShrink.ps1), read it, and run it like this — as UTF-8,
+not with `-File`, because Windows PowerShell 5.1 reads a mark-less script in the system
+ANSI code page and turns every non-ASCII character into mojibake:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllText('C:\path\to\Install-VidShrink.ps1',[Text.Encoding]::UTF8))"
 ```
 
-### The right-click menu
+### macOS / Linux — one line
 
-Right-click a video in Explorer and **Open this video with VidShrink** is in the menu. **On Windows 11 it is in the primary menu, not behind "Show more options."** That placement is only available to a packaged application, so the installer registers a sparse package — a manifest that carries the menu, pointing at the ordinary installation on disk — and writes the classic entry alongside it. A release that does not carry the package, or a Windows 10 machine, gets the classic entry alone and says so during install. Uninstalling removes both.
-
-The entry appears on the same 24 extensions the application itself opens — the list lives once, in `VidShrink.Core.ShellIntegration.MediaExtensions`, and a test fails if the installer and the application ever disagree about it. Choosing it starts VidShrink with that file already loaded.
-
-The entry is written per user, under `HKCU\Software\Classes\SystemFileAssociations`, so it needs no administrator rights. It does **not** change your file associations: your default player stays your default player, and double-clicking a video does what it did before. What it points at is `VidShrink.exe`, the launcher, for the same reason the shortcuts do — an entry aimed straight at the application would leave a copy that never updates.
-
-The label follows the system interface language, Turkish on a Turkish Windows and English everywhere else. There is no third language. Pass `-MenuLanguage tr` or `-MenuLanguage en` to force one.
-
-Two switches control the menu on its own, without reinstalling:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File C:\path\to\Install-VidShrink.ps1 -RemoveShellMenu
-```
-
-`-RemoveShellMenu` deletes every VidShrink entry in one pass, including entries from an older release whose extension list was longer. `-ShellMenuOnly` rewrites the entries against the installed launcher and touches nothing else. `-SkipShortcuts` means the shell is not touched at all: no shortcuts, no menu entry.
-
-The menu is Windows only. Nothing equivalent is installed on macOS or Linux.
-
-### macOS and Linux
-
-Open a terminal and run:
-
-```sh
+```bash
 curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
 ```
 
-The installer needs no root and no .NET SDK. It asks GitHub for the latest release, picks the target from `uname` — `osx-arm64`, `osx-x64` or `linux-x64` — downloads that archive, verifies its SHA-256 against the release's own checksum list, installs it under `~/.local/share/vidshrink`, and links it as `~/.local/bin/vidshrink`. Running the same command again replaces the installed app with the newest release. Any other architecture stops the installer with a message naming it; nothing else is published. If `uname` reports nothing at all, Linux continues as `linux-x64` — the only Linux target published — and says that it assumed it, while macOS stops, because `osx-arm64` and `osx-x64` cannot be guessed between.
+No root and no .NET SDK. The target comes from `uname` — `osx-arm64`, `osx-x64` or
+`linux-x64` — the archive is verified against the release's checksum list, installed under
+`~/.local/share/vidshrink` and linked as `~/.local/bin/vidshrink`. Any other architecture
+stops the installer with a message naming it.
 
-**On macOS the installer leaves a real application bundle.** It wraps the download in an ad-hoc signed `~/Applications/VidShrink.app` that opens from Finder with its own name and icon, and `--uninstall` removes the bundle, the payload and the shortcut together. On Linux there is no bundle; the launcher link is the whole of it.
+On macOS you get a real application bundle: an ad-hoc signed `~/Applications/VidShrink.app`
+that opens from Finder with its own name and icon, and `--uninstall` removes the bundle,
+the payload and the shortcut together. On Linux there is no bundle; the launcher link is
+the whole of it.
 
-FFmpeg is the one thing this installer will not put on your machine for you. If `ffmpeg` or `ffprobe` is missing it prints the command for your package manager — `brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading anything else.
+FFmpeg is the one thing this installer will not put on your machine. If `ffmpeg` or
+`ffprobe` is missing it prints your package manager's command — `brew install ffmpeg`,
+`sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading
+anything else.
 
-### Staying up to date
+### Requirements
 
-**On Windows the application updates itself while it opens, without asking.** The Desktop and Start Menu shortcuts point at `VidShrink.exe`, a small launcher that sits above the application. Before the application is loaded, the launcher fetches the release manifest, compares the SHA-256 of every file under `app\` with the published one, downloads only the files whose digest differs, verifies each download against the manifest, and applies them in one step. A typical release changes about 1.7 MB of a 519 MB installation, so that is what comes down the wire.
+- Windows 10 or 11, macOS 12 or newer, or a Linux desktop on X11 or Wayland
+- `ffmpeg` and `ffprobe` in a `tools/ffmpeg` folder beside the application, or on `PATH`
+- No .NET runtime and no .NET SDK. Releases are self-contained
 
-**The check runs at most once a day.** The launcher records when it last looked and, until twenty-four hours have passed, does not go to the network at all — no manifest fetch, no waiting, the application simply starts. The time of the last check is kept next to the setting in `%APPDATA%\VidShrink`. An update that was interrupted is exempt from the limit: it is finished on the next launch whenever that happens.
+Hardware encoding is optional. A missing or broken GPU encoder is reported and the engine
+moves to the next candidate; it is never fatal.
 
-The launcher never blocks the application from opening. No network, unresolved DNS, a rate limit, a broken manifest, a full disk: in all of them it gives up silently and starts the installed version as it is. Fetching the manifest has an 800 ms timeout, and on a machine with no network only the first launch of the day pays it at all.
+## How it works
 
-Downloaded files are verified before anything is replaced. A file whose digest does not match is discarded and the update is cancelled for that round, which is what catches a half-downloaded file. Files land in a staging folder first and move into `app\` only after all of them verify, so a half-updated `app\` folder never becomes visible. FFmpeg does not travel with releases and is never downloaded again; the launcher only checks that `ffmpeg.exe` and `ffprobe.exe` are still there and tells you the install command if they are not.
+Nothing here is a lookup table. Every step that says *measure* runs ffmpeg against your
+actual file before a decision is made.
 
-**Automatic updates are on by default and can be switched off.** The switch lives in the application's settings and is stored in `%APPDATA%\VidShrink\settings.json`, next to your other settings rather than next to the executable, so reinstalling does not reset it. With it off the launcher does not even fetch the manifest and downloads nothing, and Windows behaves like macOS and Linux: the application itself asks once, at startup, whether a newer version exists, and tells you — you update by running the install command again. That one question is the only network request left; dismissing a version stops it being mentioned again.
-
-**On macOS the application updates itself too, by swapping the whole bundle.** A bundle's signature covers every file inside it, so a file-by-file update of the kind Windows gets would break the signature and the application would then refuse to open at all. The unit of update is therefore the bundle: the new one is built beside the installed one while you work, its signature is verified *before* anything moves, and only then do the two swap places atomically. An update that is interrupted at any point leaves the working old bundle in place — there is no intermediate state in which the bundle is missing or half-written. The swap happens as the application exits, so it is never pulled out from under a running process, and the old bundle is removed on the next launch rather than during the swap.
-
-Self-updating is only offered where it can be done safely: the application must be running from inside a bundle it can replace. A plain payload install under `~/.local/share`, or a bundle macOS has translocated to a read-only path, keeps the switch closed and is told about new versions instead.
-
-**On Linux the application only tells you that a new version exists.** Update by running the install command again:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+```mermaid
+flowchart TD
+    A["Drop or browse to a file"] --> B["FfprobeClient reads the source"]
+    B --> C["Pick a target size, chip or slider"]
+    C --> D["ComplexityProbe encodes short samples of your clip"]
+    D --> E["SceneDetector builds a scene map"]
+    E --> F["PlanCalculator builds a draft plan"]
+    F --> G["CalibrationProbe re-encodes the same windows at two CRFs"]
+    G --> H["PlanCalculator settles the plan"]
+    H --> I["What It Will Do: codec, CRF, resolution, fps, size estimate"]
+    I --> J["Shrink"]
+    J --> K{"Landed under the target?"}
+    K -->|yes| L["Deliver"]
+    K -->|no| M["Stop, show the overshoot and what the attempt cost"]
+    M -->|retry| J
+    M -->|end| N["Deliver the last result under the target, or nothing at all"]
 ```
 
-### README image portability
+### Why measurement beats a table
 
-The screenshot above is committed at `docs/assets/vidshrink-current.png` and referenced with a repository-relative path. Do not replace it with a path such as `C:\Users\...`, a temporary Codex attachment path, or a `file://` URL: those addresses exist only on the computer that created them. On GitHub, also keep filename capitalization identical and make sure the image file is committed and pushed rather than merely present in the local working folder.
+Most size-target compressors apply a lookup table: so many megabytes per minute becomes so
+much resolution, whether you handed it a static screen recording or a handheld night shot.
+That table is wrong for every clip that is not average, which is most clips.
 
-## Why this one
+Two numbers come off the sample encodes. The first is how many bits this content really
+costs — a gradient and a confetti cannon at the same 1080p30 are not the same encoding
+problem, and the source bitrate does not tell you which one you have.
 
-Most size-target compressors apply a lookup table. So many megabytes per minute becomes so much resolution, regardless of whether you handed it a static screen recording or a handheld night shot. That table is wrong for every clip that is not average — which is most clips.
-
-**VidShrink measures your actual file instead of guessing from its bitrate.**
-
-Before planning anything, it encodes short samples of your clip at two different resolutions and reads two numbers off the result:
-
-- **How many bits this content really costs.** A gradient and a confetti cannon at the same 1080p30 are not the same encoding problem. The source bitrate does not tell you which one you have — the source could have been encoded badly, or with a different codec, or twice.
-- **How much of that cost disappears when the picture is scaled down.** This varies enormously between clips. On real measurements taken during development, one test clip lost 87% of its per-pixel cost when halved; another lost 22%. A fixed assumption is wrong for both.
-
-That second number is the one nearly nobody measures, and it is what decides the single most consequential question in size-target compression: *is it better to keep the resolution and encode it worse, or drop the resolution and encode it well?* VidShrink answers that per clip, from measurement, instead of from a rule.
-
-### What follows from measuring
+The second is how much of that cost disappears when the picture is scaled down. On
+measurements taken during development, one test clip lost 87% of its per-pixel cost when
+halved; another lost 22%. A fixed assumption is wrong for both.
 
 | | Typical size-target tool | VidShrink |
 |---|---|---|
 | Content complexity | inferred from source bitrate | measured by encoding samples of your file |
 | Detail falloff on downscale | fixed assumption, or ignored | measured per clip at two resolutions |
-| Resolution choice | fixed ladder (1080 → 720 → 480) | continuous search, any scale that fits |
+| Resolution choice | fixed ladder, 1080 to 720 to 480 | continuous search, any scale that fits |
 | Frame rate choice | applied after resolution, if at all | searched jointly with resolution |
-| Codec choice | whatever you picked | can be chosen from how hard the target actually is |
+| Codec choice | whatever you picked | can follow how hard the target actually is |
 | Audio budget | fixed bitrate | share that shrinks as the target tightens |
-| Size estimate | often none for quality mode | measured number with a stated range, shown up front |
-| Overshoot handling | retry loop | plan lands in one pass; retry is the fallback, not the plan |
+| Size estimate | often none for quality mode | measured number with a stated range, up front |
+| Overshoot handling | retry loop | plan lands in one pass; retry is the fallback |
+
+### Calibration and the two passes
+
+The engine does not assume how the bit cost moves when the CRF moves. It encodes the same
+sample windows twice, four CRF steps apart, and reads the curve off the two results.
+
+```mermaid
+flowchart TD
+    D["Draft plan: codec, resolution, frame rate"] --> A["Anchor CRF for this content"]
+    A --> B["low = anchor, high = anchor + 4"]
+    B --> C["Encode the same sample windows at both CRFs,<br/>on scene boundaries where a scene map exists"]
+    C --> E["Bytes per frame at each CRF"]
+    E --> F["ComplexityProfile carries the measured calibration"]
+    F --> G["PlanCalculator runs again and settles the CRF"]
+    G --> H{"Software encoder?"}
+    H -->|yes| P1["Pass 1: turbo preset, -passlogfile, output discarded"]
+    P1 --> P2["Pass 2: final preset, target bitrate"]
+    H -->|"no, hardware"| VBR["Single VBR pass"]
+    P2 --> V["Check what ffmpeg actually applied,<br/>not just the exit code"]
+    VBR --> V
+```
+
+Two details that are easy to get wrong. The first pass runs at a turbo preset, so the
+analysis does not cost as much as the encode. And ffmpeg returns `0` while silently
+dropping a parameter it did not understand, so success is checked against what was applied
+rather than against the exit code.
 
 ### It knows when to stop
 
-Filling the target is not the goal — hitting the quality ceiling is. Once more bits stop buying anything a viewer could see, VidShrink hands back a smaller file rather than padding it out to the number you typed. Ask for 25 MB on an easy clip and you may get 9 MB that looks identical to the source.
+Filling the target is not the goal, hitting the quality ceiling is. Once more bits stop
+buying anything a viewer could see, VidShrink hands back a smaller file rather than padding
+it out to the number you typed. Ask for 25 MB on an easy clip and you may get 9 MB that
+looks identical to the source.
 
-The reverse also holds: when the target genuinely constrains quality, it spends the whole budget rather than leaving a third of it unused.
+The reverse also holds. When the target genuinely constrains quality, the whole budget gets
+spent rather than a third of it going unused.
 
 ### It adapts to how hard you are pushing
 
-A 1.2× reduction and a 600× reduction are different problems and get different treatment:
+`CompressionRegime` has four values, and the reduction ratio picks one.
 
-| Scenario | Reduction | Engine behaviour |
+| Regime | Reduction | Engine behaviour |
 |---|---|---|
 | Light | under 1.5× | keeps resolution and frame rate, simply spends the budget |
 | Balanced | 1.5–6× | allows resolution scaling |
 | Aggressive | 6–30× | unlocks frame-rate reduction, moves to H.265, trims audio share |
-| Extreme | over 30× | maximum compression, mono or dropped audio, and it says so |
+| Extreme | over 30× | maximum compression, mono audio, and it says so |
 
-Whatever it changes, it explains — in plain language, in the app, before you start.
+Below a certain bit budget something has to give, and the loss goes where the eye is least
+sensitive: softness before blocking, fewer pixels before broken pixels, mono audio before a
+starved picture. No target, however tight, silences the audio track.
 
 ### HDR stays HDR when it can
 
-An HDR source keeps its wide colour and its ten bits whenever the encoder that will run can actually write them. Which encoders those are is not a list of names in the source code — the application encodes a frame with each candidate on your machine and keeps the ones that come back as genuine 10-bit HDR. A codec that is present but cannot deliver HDR on your hardware is not trusted because of its name.
+An HDR source keeps its wide colour and its ten bits whenever the encoder that will run can
+actually write them. Which encoders those are is not a list of names in the source code:
+the application encodes a frame with each candidate on your machine and keeps the ones that
+come back as genuine 10-bit HDR.
 
-When nothing available can carry it, the picture is tone-mapped down to SDR rather than failing, and the app says that this is what happened and why. Tone-mapping is a visible loss and is never silent.
+When nothing available can carry it, the picture is tone-mapped down to SDR rather than
+failing, and the app says that this is what happened. Tone-mapping is a visible loss and is
+never silent.
 
-### Quality is measured perceptually, across a stated colour space — or not at all
+### Quality is measured perceptually, or not at all
 
-Results are scored with **VMAF-NEG**, **XPSNR** and **SSIM**, and reported as four VMAF numbers rather than one: the mean, the harmonic mean, the 10th percentile and the minimum. The average hides the frames that actually look bad, and those are the frames a viewer notices, so the tail is carried separately all the way into the reports.
+Results are scored with **VMAF-NEG**, **XPSNR** and **SSIM**, and reported as four VMAF
+numbers rather than one: mean, harmonic mean, 10th percentile and minimum. The average
+hides the frames that actually look bad, and those are the frames a viewer notices.
 
-Comparing two files means bringing both into one explicitly stated colour space and range first; an untagged source is given a documented assumption rather than a silent one. Where the two sides genuinely cannot be brought together — an HDR original against a tone-mapped result, for instance — the comparison returns *not comparable* instead of a number. A single quality score that quietly mixes a colour conversion with a compression loss is worse than no score, because it reads as if it meant one thing.
+Comparing two files means bringing both into one explicitly stated colour space and range
+first. Where the two sides cannot honestly be brought together — an HDR original against a
+tone-mapped result — the comparison returns *not comparable* instead of a number.
 
-**Be clear about where this sits today.** Perceptual scoring is the measurement rig, not the planner: the engine plans from the two bit-cost measurements above, and VMAF is what the plan is *judged* by afterwards, in `tools/VidShrink.Bench`. Closing that loop — letting measured perceptual quality set the planner's own constants — is the first item on the list below.
-
-### Where the loss goes
-
-Below a certain bit budget something has to give. VidShrink spends the loss where the eye is least sensitive: softness before blocking, fewer pixels before broken pixels, mono audio before a starved picture.
+Be clear about where this sits today. Perceptual scoring is the measurement rig, not the
+planner: the engine plans from the two bit-cost measurements above, and VMAF is what the
+plan is judged by afterwards, in `tools/VidShrink.Bench`.
 
 ### Measured results
 
-Measured end to end on real footage rather than synthetic clips.
-
-Software encoding, 400 s of 1080p60:
+Measured end to end on real footage rather than synthetic clips. Software encoding, 400 s
+of 1080p60:
 
 | Target | Result | Attempts |
 |---|---|---|
@@ -170,108 +257,316 @@ Software encoding, 400 s of 1080p60:
 | 25 MB | 24.63 MB | 1 |
 | 8 MB | 7.85 MB | 1 |
 
-All four landed inside the fill band on the first attempt and the ceiling was never crossed.
+All four landed inside the fill band on the first attempt and the ceiling was never
+crossed. Size estimates came out within 8%, typically within 4%, and budget fill ran
+92–99% on constrained targets.
 
-Hardware encoding (`av1_amf`) is not there yet. Large targets reach the band on the first attempt — 100 MB in 99.01, 50 MB in 49.97 — but small ones still take a second: 25 MB in 24.43 and 8 MB in 7.80, both after two attempts. The overshoot comes from the peak rate being pinned to a fixed multiple of the source regardless of target size.
+Hardware encoding (`av1_amf`) is not there yet. Large targets reach the band on the first
+attempt, 100 MB in 99.01 and 50 MB in 49.97, but small ones still take a second: 25 MB in
+24.43 and 8 MB in 7.80. The overshoot comes from the peak rate being pinned to a fixed
+multiple of the source regardless of target size.
 
-- **Size estimate accurate to within 8%**, typically within 4%
-- **Budget fill 92–99%** on constrained targets
+A result that lands over the target does not start a second run on its own. The run stops,
+shows what came out, how far over it went and how long that attempt took, and asks whether
+to try again or end there. Ending is not the same as accepting an oversized file: it
+delivers the last result that came in under the target, and writes nothing at all if there
+is none.
 
-## When a run overshoots
+## What it looks like in use
 
-A result that lands over the target does not start a second run on its own. The run stops, shows what came out and how far over it went, says how long that attempt took, and asks whether to try again or end there. A retry costs roughly what the first attempt cost, which is why the number is on screen before you decide.
+Once a file is loaded, every decision is on screen with the reasoning behind it, before you
+start — the codec, the CRF, the resolution, the frame rate, the estimate and its range.
 
-Ending there is not the same as accepting an oversized file. VidShrink never hands back a file larger than the target: ending the run delivers the last result that came in under the target, and writes nothing at all if there isn't one. The question says so in as many words, because "leave it as is" reads like the opposite.
+![The Shrink tab with a file loaded: source details across the top, the target set to 17 MB, and the What It Will Do panel spelling out the chosen encoder, CRF, resolution and the reason the engine stopped at the quality ceiling](docs/gorseller/T8-hizli-en.png)
 
-In practice the question only appears on hardware encoding at small targets. Software encoding reaches the band on the first attempt at every target measured above.
+Each target chip is a real limit somewhere, and its `?` badge says which.
 
-## Shrink
+| Chip | Why that number |
+|---|---|
+| **8** | Discord without Nitro, older forums, strict e-mail gateways |
+| **16** *(WhatsApp recommended)* | WhatsApp re-encodes in-chat video with its own weak encoder; under 16 MB it usually passes yours through instead |
+| **25** | Gmail attachments, Discord Nitro Basic, most ticket systems |
+| **100** | Archiving and uploads where quality matters more than transfer time |
+| **128** *(sharing maximum)* | The measured ceiling of uguu.se, the narrower of the two anonymous share targets |
+| **180** *(WhatsApp Web maximum)* | WhatsApp Web takes 180 MB per file, a user-reported number rather than a published one |
+| **Half** | Half the source size; a mild request, so resolution and frame rate usually survive |
 
-Drop or browse to any file `ffprobe` recognizes as containing a video stream. The filename extension is never an acceptance gate. Silent video, variable frame rate, animated GIF, rotation metadata, and uncommon containers all work whenever the installed ffmpeg can decode them.
+Any file `ffprobe` recognizes as containing a video stream is accepted. The filename
+extension is never a gate: silent video, variable frame rate, animated GIF, rotation
+metadata and uncommon containers all work whenever the installed ffmpeg can decode them.
 
-Defaults are set for the most common case: **16 MB, Sharing intent, automatic codec.** WhatsApp accepts files up to 2 GB, but it re-compresses any video you send in chat with its own weak encoder. Staying at or below 16 MB usually gets your file through with far less damage, so the other side sees VidShrink's quality rather than WhatsApp's. To bypass WhatsApp's re-encode entirely, send the result as a document.
+AI mode is optional and not embedded. VidShrink writes a prompt you paste into any chat AI,
+then validates the JSON you paste back against the current source and options. It stays
+offline, needs no API key, and falls back to the automatic plan when a response is
+malformed or stale.
 
-Every technical control carries a `?` badge explaining, in both languages, what it does, whether it affects sending to WhatsApp, and whether phones support the result.
+![The Advanced tab, holding the FFmpeg command box and the AI settings box; window shown in Turkish](docs/gorseller/T25-gelismis-sekmesi.png)
 
-AI mode is optional and not embedded. VidShrink writes a prompt you can paste into any chat AI, then validates the JSON you paste back against the current source and options. It stays offline, needs no API key, and falls back to the automatic plan when a response is malformed or stale.
+The Convert tab is the manual side: container, video codec, CRF or bitrate, resolution,
+frame rate, audio codec and bitrate, and a start and end time. Stream copy uses real
+`-c:v copy` and `-c:a copy`, and incompatible container and source-codec pairs are blocked
+before execution. GIF conversion goes through `palettegen` then `paletteuse`.
 
-## Convert
+![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command panel beside them; window shown in Turkish](docs/gorseller/t26-pencere-tr.png)
 
-The CONVERT tab supports MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, and WAV. Choose H.264, H.265, VP9, AV1, or stream copy; CRF or fixed bitrate; source, preset, or custom resolution and frame rate; audio encoding, copy, or removal; and optional trimming. MP3, M4A, and WAV extract audio only. GIF conversion uses `palettegen` followed by `paletteuse`.
+The Player tab plays the source in the window, through a decoder pipe that stays open
+between seeks.
 
-Stream copy uses real `-c:v copy` and `-c:a copy`. Incompatible container and source-codec combinations are blocked before execution. The exact ffmpeg command is visible for every operation.
+| Input | Effect |
+|---|---|
+| Wheel | step one second |
+| Ctrl + wheel | step ten seconds |
+| Shift + wheel | step sixty seconds |
+| Ctrl + Shift + wheel | step five minutes |
+| Alt + wheel | zoom |
+| Right-click, or Space | toggle playback |
+| Middle-click | toggle full screen, and put the window back where it was |
 
-## Advanced
+The context menu carries the same three actions.
 
-Two things live on their own tab rather than in the way of the main flow.
+### Encoders
 
-The **FFmpeg command** is the exact command the engine will run. It sits on one line and
-expands when you want to read it; it is selectable and copyable either way. Nothing here
-is a summary — it is the command itself, so you can take it elsewhere or check what the
-engine decided.
+Twelve encoders can carry a shrink plan. Availability is not taken on trust: each candidate
+is probed on your machine, the next one is tried when a probe fails, and an untested
+candidate is never labelled unusable.
 
-**AI settings** are optional. Copy the prompt into any chat AI, paste the JSON it answers
-with, and the plan is applied. VidShrink makes no network request of its own for this;
-you carry the text both ways.
+| Codec | Software | NVENC | Quick Sync | AMF |
+|---|---|---|---|---|
+| H.264 | `libx264` | `h264_nvenc` | `h264_qsv` | `h264_amf` |
+| H.265 | `libx265` | `hevc_nvenc` | `hevc_qsv` | `hevc_amf` |
+| AV1 | `libsvtav1` | `av1_nvenc` | `av1_qsv` | `av1_amf` |
 
-Scrollbars on both boxes appear only while the pointer is over them.
+VideoToolbox is recognized as a vendor in `CodecModel` but is not in the shrink path's
+allowed list today. VP9 lives on the Convert tab.
 
-## Codec guidance
+![The codec tooltip in English, explaining that H.264 is universal and never re-encoded by WhatsApp, that H.265 needs roughly a third fewer bits but is refused by older phones and some web players, that Automatic picks between them by how tight the target is, and that speed is chosen with the Fast Shrink GPU switch instead](docs/gorseller/t27-kodek-en.png)
 
 - **H.264** plays on essentially every device ever made and is what WhatsApp expects.
-- **H.265** needs roughly a third fewer bits for the same picture; every phone since about 2016 decodes it in hardware, but older handsets and some web players will not.
+- **H.265** needs roughly a third fewer bits for the same picture; every phone since about
+  2016 decodes it in hardware, older handsets and some web players do not.
 - **VP9** is a browser and WebM format.
 - **AV1** compresses best and encodes slowest; only recent phones decode it.
 - **Stream copy** is instant and lossless when the destination accepts the source streams.
 
-## What is being worked on next
+### The right-click menu
 
-The engine is the current job. These are measured, open, and in that order:
+Right-click a video in Explorer and **Open this video with VidShrink** is in the menu. On
+Windows 11 it is in the primary menu, not behind "Show more options". That placement is
+only available to a packaged application, so the installer registers a sparse package — a
+manifest that carries the menu and points at the ordinary installation on disk — and writes
+the classic entry alongside it. A Windows 10 machine, or a release without the package,
+gets the classic entry alone and is told so during install. Uninstalling removes both.
 
-- **Calibrating the trade-offs against measured quality.** The penalties the planner applies for scaling down and for dropping frame rate are fixed constants that were never tied to a quality measurement. The measurement rig that can replace them now exists.
-- **Opening the peak-rate ceiling.** On a 17-minute 1080p60 HDR source encoded to 117 MB, widening the rate ceiling from 1.02× to 1.50× of the average gained 5.87 harmonic and 7.22 p10 VMAF-NEG **at the same delivered size** — the cheapest gain measured so far, and it costs nothing but a wider buffer.
-- **Psycho-visual encoder settings.** HandBrake's x265 preset runs psy-rd, psy-rdoq and adaptive quantisation; VidShrink's arguments do not carry their equivalents yet. Measured against HandBrake at an equal delivered size, with colour handled correctly on both sides, HandBrake is currently ahead by 8.79 mean and 14.60 p10 VMAF-NEG. That gap is the target.
-- **Encoding by scene instead of by clip.** Today one plan covers the whole file: one resolution, one frame rate, one bitrate target from the first frame to the last. A clip that opens on a static title and ends in a chase is given the settings that suit its average, which suit neither. Detecting shot boundaries and letting the budget move between scenes is the largest single structural gain still on the table, and the biggest piece of work on this list.
-- **Longer keyframe intervals.** The current two-second GOP spends bits on keyframes that a longer interval would give back to the picture.
-- **The hardware overshoot at small targets**, described under *Measured results* above.
+The entry covers the same 24 extensions the application itself opens. That list lives once,
+in `VidShrink.Core.ShellIntegration.MediaExtensions`, and a test fails if the installer and
+the application ever disagree about it.
 
-Known and not yet handled: HDR10+ dynamic metadata and Dolby Vision are not carried through — an HDR10+ source is delivered as static HDR10. There is no right-click menu on macOS or Linux.
+It is written per user under `HKCU\Software\Classes\SystemFileAssociations`, so it needs no
+administrator rights, and it does not change your file associations — your default player
+stays your default player. It points at `VidShrink.exe`, the launcher, for the same reason
+the shortcuts do: an entry aimed straight at the application would leave a copy that never
+updates.
 
-A fuller README with diagrams of the measurement and planning flow will follow this one.
+The label follows the system interface language. Pass `-MenuLanguage tr` or
+`-MenuLanguage en` to force one. `-RemoveShellMenu` deletes every VidShrink entry in one
+pass, including entries from an older release with a longer extension list;
+`-ShellMenuOnly` rewrites them against the installed launcher and touches nothing else;
+`-SkipShortcuts` leaves the shell alone entirely.
 
-## Requirements and development build
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\path\to\Install-VidShrink.ps1 -RemoveShellMenu
+```
 
-- Windows 10 or 11, macOS 12 or newer, or a Linux desktop running X11 or Wayland
-- `ffmpeg` and `ffprobe` in a `tools/ffmpeg` folder beside the application, or on `PATH`
-- No .NET runtime and no .NET SDK. Releases are self-contained, so the runtime travels inside the downloaded application and the installers compile nothing
+### Staying up to date
 
-Building from a clone needs the .NET 8 SDK:
+On Windows the application updates itself while it opens, without asking. The shortcuts
+point at `VidShrink.exe`, a small launcher above the application. A typical release changes
+about 1.7 MB of a 519 MB installation, and that is all that comes down the wire.
+
+```mermaid
+flowchart TD
+    S["Shortcut"] --> LA["VidShrink.exe launcher"]
+    LA --> Q{"Checked in the last 24 hours?"}
+    Q -->|yes| RUN["Start the installed app"]
+    Q -->|no| MF["Fetch the manifest, 800 ms timeout"]
+    MF -->|"offline, rate-limited or broken"| RUN
+    MF --> DIFF["Compare SHA-256 file by file"]
+    DIFF -->|"no difference"| RUN
+    DIFF --> DL["Download only the changed files into staging"]
+    DL --> VER{"Every digest verifies?"}
+    VER -->|no| DISC["Discard, cancel this round"]
+    DISC --> RUN
+    VER -->|yes| SWAP["Move into place in one step"]
+    SWAP --> RUN
+```
+
+The check runs at most once a day; until twenty-four hours have passed the launcher does
+not go to the network at all. The time of the last check sits next to the setting in
+`%APPDATA%\VidShrink`. An interrupted update is exempt and is finished on the next launch.
+
+The launcher never blocks the application from opening. No network, unresolved DNS, a rate
+limit, a broken manifest, a full disk: it gives up silently and starts the installed
+version as it is. FFmpeg never travels with a release and is never re-downloaded; the
+launcher only checks that `ffmpeg.exe` and `ffprobe.exe` are still there.
+
+Automatic updates are on by default and can be switched off in the settings. The switch is
+stored in `%APPDATA%\VidShrink\settings.json`, next to your other settings rather than next
+to the executable, so reinstalling does not reset it. With it off, Windows behaves like the
+others: the application asks once at startup whether a newer version exists and tells you.
+
+On macOS the update swaps the whole bundle. A bundle's signature covers every file inside
+it, so a file-by-file update would break the signature and the application would refuse to
+open. The new bundle is built beside the installed one while you work, its signature is
+verified before anything moves, and only then do the two swap atomically — as the
+application exits, so it is never pulled out from under a running process. Self-updating is
+offered only where it is safe: a plain payload install under `~/.local/share`, or a bundle
+macOS has translocated to a read-only path, keeps the switch closed and is told about new
+versions instead.
+
+On Linux the application only tells you a new version exists. Update by running the install
+command again.
+
+| | Windows | macOS | Linux |
+|---|---|---|---|
+| Published target | `win-x64` | `osx-arm64`, `osx-x64` | `linux-x64` |
+| Installer | `Install-VidShrink.ps1` | `install-vidshrink.sh` | `install-vidshrink.sh` |
+| Right-click menu | yes | no | no |
+| Self-update | file-level, via the launcher | whole-bundle swap | notice only |
+| FFmpeg comes from | WinGet `Gyan.FFmpeg` | your `brew` | your `apt` or `dnf` |
+
+![VidShrink open on macOS, running from its own application bundle with the Dock below it; window shown in Turkish](docs/gorseller/macos-paket-uygulama.png)
+
+## Development
+
+Building from a clone needs the .NET 8 SDK.
 
 ```sh
 dotnet build VidShrink.sln -c Release
+```
+
+```sh
 dotnet test VidShrink.sln
 ```
 
-## Project layout
+Four shipped projects and one shell integration. Decisions live in `Core`, processes live
+in `Ffmpeg`, and the interface reads a decision rather than making one.
 
-```text
-src/VidShrink.Core     complexity model, strategy, planning, ffmpeg argument construction
-src/VidShrink.Ffmpeg   ffprobe, complexity probe, encode execution
-src/VidShrink.App      Avalonia user interface, one source tree for all three platforms
-src/VidShrink.Launcher Windows launcher, applies the file-level update before the app loads
-tests/VidShrink.Tests  engine and argument-generation regression tests
+```mermaid
+flowchart LR
+    L["VidShrink.Launcher<br/>verifies the manifest,<br/>applies the update"] --> APP
+    SE["VidShrink.ShellExtension<br/>right-click entry"] --> APP
+
+    subgraph APP["VidShrink.App, Avalonia"]
+        UI["Shrink · Convert · Advanced<br/>Settings · About · Player"]
+        LOC["Locales/en · Locales/tr"]
+    end
+
+    subgraph CORE["VidShrink.Core, the decisions"]
+        PC["PlanCalculator"]
+        CM["CodecModel"]
+        FA["FfmpegArguments"]
+        HR["HdrResolver"]
+        SM["SceneMap"]
+    end
+
+    subgraph FF["VidShrink.Ffmpeg, the processes"]
+        FP["FfprobeClient"]
+        CP["ComplexityProbe"]
+        CAL["CalibrationProbe"]
+        EC["EncoderCapabilities"]
+        ER["EncodeRunner"]
+        DP["Playback/DecoderPipe"]
+    end
+
+    APP --> CORE
+    APP --> FF
+    FF --> CORE
+    FF --> BIN["ffmpeg · ffprobe<br/>external processes"]
 ```
 
-Release history is in [`CHANGELOG.md`](CHANGELOG.md). The engine audit, fixed defects and benchmark requirements are in [`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md); the measurements behind the roadmap above are in [`docs/olcumler/`](docs/olcumler/). Two of that report's three gates are now met — HDR and 10-bit are carried, and the perceptual metrics are measured across a normalised colour space. The competitor benchmark is met in the sense that the comparison has been run honestly; it does not yet come out in this project's favour, and a market-leading claim stays deferred until it does.
+```text
+src/VidShrink.Core            complexity model, strategy, planning, ffmpeg argument construction
+src/VidShrink.Ffmpeg          ffprobe, probes, encode execution, playback pipe
+src/VidShrink.App             Avalonia interface, one source tree for all three platforms
+src/VidShrink.Launcher        Windows launcher, applies the file-level update before the app loads
+src/VidShrink.ShellExtension  the Explorer right-click entry
+tests/VidShrink.Tests         engine and argument-generation regression tests
+tools/VidShrink.Bench         the measurement harness behind every published number
+docs/gorseller/               every screenshot and badge this README and its Turkish twin use
+```
+
+Design notes worth knowing before you send a patch. Colours and measurements come only from
+`src/VidShrink.App/Themes/Theme.axaml`; nothing is hard-coded at the call site. Every string
+on screen comes from `Locales/<language>/<area>.json` and is read by key. Any number that
+reaches a document comes out of `tools/VidShrink.Bench`, not out of an estimate.
+
+Images are all under `docs/gorseller/` and referenced with repository-relative paths. Keep
+it that way: a `C:\Users\...` path or a `file://` URL exists only on the machine that made
+it, and GitHub is case-sensitive about filenames.
+
+Release history is in [`CHANGELOG.md`](CHANGELOG.md). The engine audit and the benchmark
+requirements are in
+[`docs/claude-engine-audit-report.md`](docs/claude-engine-audit-report.md); the measurements
+behind the roadmap are in [`docs/olcumler/`](docs/olcumler/).
+
+## Roadmap
+
+The engine is the current job. These are measured, open, and in that order.
+
+- **Calibrating the trade-offs against measured quality.** The penalties the planner
+  applies for scaling down and for dropping frame rate are fixed constants never tied to a
+  quality measurement. The rig that can replace them now exists.
+- **Opening the peak-rate ceiling.** On a 17-minute 1080p60 HDR source encoded to 117 MB,
+  widening the ceiling from 1.02× to 1.50× of the average gained 5.87 harmonic and 7.22 p10
+  VMAF-NEG at the same delivered size. The cheapest gain measured so far.
+- **Psycho-visual encoder settings.** HandBrake's x265 preset runs psy-rd, psy-rdoq and
+  adaptive quantisation; VidShrink's arguments carry no equivalent yet. At an equal
+  delivered size, with colour handled correctly on both sides, HandBrake is ahead by 8.79
+  mean and 14.60 p10 VMAF-NEG. That gap is the target.
+- **Encoding by scene instead of by clip.** The scene map already drives the per-scene bit
+  budget; letting resolution and frame rate move with it is the largest structural gain
+  left.
+- **Longer keyframe intervals.** The current GOP spends bits on keyframes that a longer
+  interval would give back to the picture.
+- **The hardware overshoot at small targets**, described under *Measured results*.
+
+## Contributing
+
+Open an issue before writing code, so nobody spends an evening on something already in
+progress. Keep the pull request to one concern — a licence fix and a feature do not belong
+in the same branch — and match the surrounding code.
+
+The repository language is English: code, commit messages, README and issues. Run
+`dotnet test VidShrink.sln` before opening the pull request; nothing merges red.
+
+Contributions are accepted under the project's own licence, AGPL-3.0-or-later. Every commit
+must be signed off under the Developer Certificate of Origin 1.1, reproduced in
+[`DCO`](DCO) — add it with `git commit -s`. The longer version of all this is in
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+If VidShrink saved you an afternoon, sponsorship is welcome and entirely optional.
 
 ## License
 
-AGPL-3.0-or-later — see [LICENSE](LICENSE).
+[AGPL-3.0-or-later](LICENSE). Copyright (C) 2026 Teknesyum.
 
-Copyright (C) 2026 Teknesyum
+FFmpeg is a separate program under its own license and VidShrink does not redistribute it.
+On Windows the installer asks WinGet for `Gyan.FFmpeg`, whose builds are GPLv3; on macOS
+and Linux the installer installs nothing and prints your package manager's command. Either
+way the binary arrives on your own machine, under its own terms, at install time. VidShrink
+runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the AGPL-3.0
+application.
 
-**FFmpeg is a separate program under its own license, and VidShrink does not redistribute it.** On Windows the installer asks WinGet for `Gyan.FFmpeg`, whose builds are GPLv3. On macOS and Linux the installer installs nothing — it prints your package manager's command and you fetch FFmpeg yourself. Either way the binary arrives on your own machine, under its own terms, at install time. It is not in this repository and not inside anything this repository hands out. VidShrink runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the AGPL-3.0 application.
+Releases do not carry FFmpeg, and the reason is size rather than licensing: FFmpeg and
+FFprobe are 424 MB of a 519 MB installation and do not change when VidShrink does. Anyone
+preparing a packaged release that does include FFmpeg should work the licensing through for
+that specific build rather than rely on this paragraph.
 
-Releases do not carry FFmpeg either, and the reason is size rather than licensing. FFmpeg and FFprobe are 424 MB of a 519 MB installation and do not change when VidShrink does; shipping them with every release would send 424 MB down the wire to replace nothing. They are fetched once, at install time, from your package manager.
+<!-- signature -->
+<div align="center">
 
-The licence note above was first written when VidShrink was MIT, where bundling a GPLv3 build would have been the problem. Under AGPL-3.0-or-later the question is a different one — AGPLv3 and GPLv3 are written to be compatible, and a copyleft source obligation is already what this project carries. Anyone preparing a packaged release that includes FFmpeg should work the licensing through for that specific build rather than rely on this paragraph.
+<a href="https://github.com/sponsors/Teknesyum"><img src="docs/gorseller/badge-sponsor.svg" alt="Support Teknesyum" height="38"></a>
+&nbsp;
+<a href="LICENSE"><img src="docs/gorseller/badge-license.svg" alt="License AGPL-3.0" height="38"></a>
+
+</div>
