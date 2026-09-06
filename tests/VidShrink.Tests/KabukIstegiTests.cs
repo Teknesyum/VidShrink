@@ -132,11 +132,12 @@ public sealed class KabukIstegiTests
     /// dondurur. Dil de olcuye tasiniyor, cunku <c>Strings.Language</c> surec genelinde
     /// degisen bir durum: beklenen metni ondan okuyan olcu koşudan koşuya renk degistirir.
     /// </summary>
-    private static PencereCiktisi PencereMetni(ShrinkArgumentProblem problem) => AppHost.Run(() =>
+    private static PencereCiktisi PencereMetni(ShrinkArgumentProblem problem, string? araDil = null) => AppHost.Run(() =>
     {
         var window = new ShrinkJobWindow(new ShellShrinkStartup(null, problem, null), null);
         try
         {
+            if (araDil is not null) Strings.Use(araDil);
             window.Begin();
             var metin = window.State == ShrinkJobState.Gerekce
                 ? window.MessageText
@@ -168,10 +169,10 @@ public sealed class KabukIstegiTests
     }
 
     /// <summary>
-    /// K11: olcunun kendisi surec genelindeki dilden bagimsiz mi. Beklenen metin pencerenin
-    /// <b>kendi</b> dilinden hesaplandigi icin, olcu kosarken <c>Strings.Use</c> iki yone de
-    /// cevrilse sonuc degismez. Eski surumde beklenen <c>Strings.Get</c> ile okunuyordu:
-    /// asagidaki iki koldan biri her zaman kirmizi olurdu.
+    /// K11: pencere kuruldiktan <b>sonra</b> surec genelindeki dil degisirse metin kaymamali.
+    /// Kararsizligin gercek bicimi buydu: <c>Strings.Use</c> surec genelinde, pencerenin
+    /// kurulusu ile cumleyi basmasi arasinda baska bir olcu tarafindan cevrilebiliyor.
+    /// Pencere dili artik ornege sabit; iki yone de cevrilse sonuc degismez.
     /// </summary>
     [Theory]
     [InlineData("en")]
@@ -182,7 +183,7 @@ public sealed class KabukIstegiTests
         try
         {
             Strings.Use(surecDili);
-            var gorulen = PencereMetni(ShrinkArgumentProblem.TargetNotInQuickList);
+            var gorulen = PencereMetni(ShrinkArgumentProblem.TargetNotInQuickList, surecDili);
             var beklenen = LanguageCatalog.Title(
                 Strings.GetIn(gorulen.Dil, ShrinkProblemText.TargetNotInQuickList, ShrinkProblemText.QuickList()),
                 ShrinkJobWindow.Turkish(gorulen.Dil));
