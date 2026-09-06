@@ -360,7 +360,7 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 37 satir: 32 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// Kume bugun 32 satir: 27 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
     /// (<c>Flagged = ZeroConsumer || Unused</c>). T163 kumeyi 51 satirdan 37'ye indirdi ve
     /// kalan bir satirin bicimini degistirdi. Dusen 19 satir T165'in <c>ReasonCode.Manual*</c>
     /// kodlariydi: T165 onlari uretmis ama okuyamamisti, cunku okuma tarafi
@@ -369,8 +369,13 @@ public sealed class OluUyeTests
     /// tuketiliyor ve pimde isleri kalmadi. Bicimi degisen satir
     /// <c>EncoderPathOverride.Software</c>: T163 (<c>64125dc</c>) <c>MainWindow.axaml.cs:1005</c>
     /// ile uyeye uretimde ilk ureticiyi yazdi, uye
-    /// <c>yalniz-disarida</c>'dan <c>varsayilan-kol</c>'a gecti. Pime T170 bes yeni satir
-    /// getirdi: <c>ShrinkArgumentProblem</c>'in bes uyesi de uretiliyor, hicbiri okunmuyor.
+    /// <c>yalniz-disarida</c>'dan <c>varsayilan-kol</c>'a gecti. Kumeyi 37'den 32'ye indiren
+    /// T171: T170'in pime getirdigi bes <c>ShrinkArgumentProblem</c> satiri artik uretimde
+    /// tuketiliyor. <c>ShrinkJobWindow.ShowProblem</c> bes uyenin her birini adiyla okuyup
+    /// kullanicinin gordugu bir cumleye ceviriyor
+    /// (<c>ShrinkProblemText.Key</c>, bes ayri yerellestirme anahtari), bicim
+    /// <c>hic-okunmayan-tur</c>'den <c>tuketiliyor</c>'a gecti ve satirlarin pimde isi kalmadi.
+    /// Olcunun kendi ciktisi: <c>uye: 162  bu dosyada adi gecmeyen: 116  pimlenen: 32</c>.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -447,23 +452,8 @@ public sealed class OluUyeTests
         new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,
             "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir."),
         new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
-            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
-        new("ShrinkArgumentProblem.NoPath", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
-        new("ShrinkArgumentProblem.NoTarget", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
-        new("ShrinkArgumentProblem.TargetNotANumber", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
-        new("ShrinkArgumentProblem.TargetNotInQuickList", "hic-okunmayan-tur", Debt, ShrinkProblemDebt),
-        new("ShrinkArgumentProblem.TargetNotPositive", "hic-okunmayan-tur", Debt, ShrinkProblemDebt)
+            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli.")
     };
-
-    /// <summary>
-    /// T170'in <c>--kucult</c> arguman cozumunun urettigi bes ret gerekcesi. <c>ShrinkRequest.cs</c>
-    /// hepsini <c>ShrinkArgumentResult.Failure</c> ile uretiyor, ama <c>src/**</c> altinda
-    /// <c>Problem</c> alanini okuyan tek bir satir yok — turun hicbir uyesi tuketilmedigi icin
-    /// bicim <c>hic-okunmayan-tur</c>. Yani kabuk menusunden gelen bozuk arguman adiyla
-    /// reddediliyor ama kullanici o adi hicbir yerde gormuyor.
-    /// </summary>
-    private const string ShrinkProblemDebt =
-        "T170'in --kucult arguman cozumunun urettigi ret gerekcesi. ShrinkRequest.cs onu ShrinkArgumentResult.Failure ile uretiyor ve olcusu ShrinkRequestTests'te var, ama src/** altinda ShrinkArgumentResult.Problem alanini okuyan hicbir satir yok; turun hicbir uyesi tuketilmiyor. Bozuk arguman adlandirilmis bir gerekceyle reddediliyor, kullaniciya gerekce gosterilmiyor. Gerekcenin kullaniciya ulasmasi gerekip gerekmedigi olculmedi.";
 
     private readonly ITestOutputHelper _output;
 
@@ -511,7 +501,7 @@ public sealed class OluUyeTests
 
     /// <summary>
     /// K2: kume anahtar kelime listesinden degil turden cikiyor. Kanit, olcunun bu dosyada
-    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 37 satir 163 uyelik kumenin bir parcasi,
+    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 32 satir 162 uyelik kumenin bir parcasi,
     /// kumenin kendisi degil.
     /// </summary>
     [Fact]

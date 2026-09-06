@@ -48,7 +48,7 @@ internal static class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        var startup = ShellShrinkStartup.From(args);
+        var startup = StartupFor(args);
         if (startup is null)
         {
             Build(ShellIntegration.ResolveStartupPath(args)).StartWithClassicDesktopLifetime(args);
@@ -67,6 +67,13 @@ internal static class Program
 
         BuildShrink(startup, queue).StartWithClassicDesktopLifetime(args);
     }
+
+    /// <summary>
+    /// Kabuk istegini tuketen kol. Ayri durmasinin sebebi olculebilir olmasi: burasi
+    /// her zaman <c>null</c> derse uygulama eski <c>ResolveStartupPath</c> davranisina doner.
+    /// </summary>
+    internal static ShellShrinkStartup? StartupFor(IReadOnlyList<string>? args)
+        => ShellShrinkStartup.From(args);
 
     /// <summary>
     /// Bu surec kuyrugun sahibi mi. Ayri durmasinin sebebi olculebilir olmasi: bu kapi
