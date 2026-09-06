@@ -1,6 +1,7 @@
 # Devir notu - 2026-09-06, dizustunden masaustune
 
 Bu dosya "devam" yazildigi anda okunacak. Kaybolmamasi gereken her sey burada.
+Son guncelleme: T176 tur 1 teslimi geldikten sonra.
 
 ## Nerede duruyoruz
 
@@ -12,26 +13,53 @@ birlestirilseydi bayat test esikleri ve derlenmeyen bir agac (T147) geri gelecek
 `dotnet test` en son yesildi: `LanguageTests|LocalizationTests` 84/84,
 `KabukIstegiTests|OluUyeTests` 40/40, `WindowLayoutTests` 21/21.
 
-## Su anda kosan is - T176 (oynatici sekmesi)
+## Bekleyen is - T176 (oynatici sekmesi), tur 1 TESLIM EDILDI
 
 Sozlesme `.claude/relay/contracts/T176.md`, durum `active`, model opus.
-Yapici ajan **hala calisiyordu** ve worktree'si burada:
+Yapici ajan tur 1'i bitirdi ve isini itti: `origin/T176-oynatici-girdi` = **d2e9937**,
+worktree `..\VidShrink-T176` temiz, commit'lenmemis is yok.
 
-    C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T176   (dal T176-oynatici-girdi)
+**Siradaki adim denetci.** Bilerek dagitmadim - kullanici masaustune geciyordu ve bir
+denetim turu yeni bir kosum demek. Masaustunde ilk is: `auditor` ajanini T176 tur 1'e
+dagit, sonra hukume gore muhurle ya da tur 2 kapsami yaz.
 
-Dalda itilmis son commit `c159e23`; worktree yerelde `1392350`'e kadar ilerlemis ve
-`MainWindow.axaml.cs`, `PlayerView.axaml(.cs)`, `OynaticiGirdiTests.cs` uzerinde
-commit'lenmemis degisiklik birakmis olabilir. **Masaustunde ilk is bu worktree'nin
-durumuna bakmak**: ya ajanin isini toplayip teslimi tamamlat, ya sozlesmeyi tur 1
-kaldi sayip yeniden dagit.
+Yapicinin K -> ham dosya -> sayi tablosu (hepsi `.calisma/T176/` altinda, gitignore'lu,
+gizli depoya **kopyalanmadi** - ajan onlari devirden sonra yazdi):
 
-Girdi haritasi (kullanicinin verdigi, degistirilemez):
+| K | ham dosya | sayi |
+|---|---|---|
+| K1 izgara | `k1-izgara.txt` | 9 satir, dokuz girdinin dokuzu oncesi->sonrasi |
+| K1 sekme | `k1-sekme.txt` | sekme sayisi 6, oynatici 5. sirada, en `Player` / tr `Oynatici` |
+| K1+K2 | `k1-pencere-yoneticisi.txt` | 10 jest gonderildi, 10 iz satiri |
+| K3 sahte | `k3-birikme.txt` | 10 tik -> hedef 10 sn, 2 arama |
+| K3 gercek boru | `k3-gercek-boru.txt` | konum 10 sn, 2 arama, 63,4 + 76,7 ms, toplam 141,7 ms, 150 ms asan 0 |
+| K4 | `k4-tam-ekran.txt` | once/tam ekran/geri donus uc satir birebir |
+| K5 | `k5-menu.txt` | iki dilde uc satir, `menu acildi: True` |
+| K6 | `k6-kabuk.txt` | `startup tab=5`, acilistaki sekme 0 -> 5 |
+| K7 | `k7-mutasyon.txt` | (a) 2 kaldi/6 gecti, (b) 2/6, (c) 1/7; geri alinca 69/69 yesil |
+| K8 | `k8-kol-sayisi.txt` | `OynaticiGirdiTests` 7, `PlayerTabTests` 1, `LanguageTests` 61; sifir bulan kol yok |
+
+Rapor `docs/olcumler/oynatici-girdi.md` (211 satir, d2e9937).
+
+Girdi haritasi degistirilmedi (kullanicinin verdigi, degistirilemez):
 tekerlek 1 sn, ctrl+tekerlek 10 sn, shift+tekerlek 60 sn, ctrl+shift+tekerlek 300 sn,
 alt+tekerlek yerel yakinlastirma, sag tik ve bosluk oynat/duraklat,
-orta tik tam ekran <-> onceki, sol tik simdilik bos.
+orta tik tam ekran <-> onceki, sol tik simdilik bos (olay geliyor, durum degismiyor - sayacla kanitli).
 
-T176'nin devraldigi kusurlar `docs/olcumler/oynatici-boru.md` icindeki "T176 devri"
-bolumunde yaziyor - dagitmadan once oku.
+**Yapicinin duzeltmedigi, bildirdigi Ffmpeg kusurlari** - denetciye ve sonraki tura girdi:
+
+1. `ContinuousPlayback.Pump` hala `catch { }`; ffmpeg cokunce `Faulted` yayilmiyor.
+   Arayuz tarafinda `StallWatch` ile ortuldu, kaynak duruyor.
+2. `SeekAudio` arama basina yeni surec aciyor. K3 sessiz klipte olculdu, bu maliyet sayiya girmedi.
+3. `LatestVideoPts` CFR varsayiyor; VFR kaynakta konum sessizce kayar (VFR olculmedi).
+4. `ProcessesStarted` arama ile oynatma baslatmalarini ayirmiyor; `0 -> 2` sayisi hangi
+   surecin ne icin acildigini soylemiyor.
+
+**Olculmedi**: sesli kaynakta arama maliyeti ve senkron; VFR kaynak; tam ekranda isletim
+sisteminin verdigi fiziksel dikdortgen; Explorer'da gercek cift tiklama (T169'un alani);
+alt+tekerlegin ikinci makinede tekrari.
+
+T176'nin devraldigi kusurlar ayrica `docs/olcumler/oynatici-boru.md` "T176 devri"nde.
 
 ## Kapanmamis borclar
 
