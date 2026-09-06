@@ -1,5 +1,11 @@
 # Elle geçersiz kılma — ölçümler
 
+> **Ad değişikliği (T172, tur 4).** Bu belgede geçen
+> `K1_VarsayilanT165OncesiMotorlaBirebirAyni` ölçüsünün adı
+> `K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni` oldu; dördüncü `InlineData` satırı da
+> T172 motorundan geliyor. Aşağıdaki ham çıktı blokları ölçüm anındaki adı taşıyor ve
+> **kasten değiştirilmedi** — ham çıktı aynen durur.
+
 T165, tur 5. Tur 1 bağımsız denetimde `verdict: failed` döndü ve belge baştan yazıldı;
 tur 2 denetimi dört bulgu (F1-F4), tur 3 denetimi dört bulgu daha (H1-H4) döndürdü.
 Tur 4 H1-H4'ü kapattı; tur 5'in denetimi üç bulgu bıraktı ve bu sürüm üçünü de kapatıyor:

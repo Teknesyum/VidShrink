@@ -1,6 +1,6 @@
 # VidShrink.PlanBaseline
 
-`ManualOverrideTests.K1_VarsayilanT165OncesiMotorlaBirebirAyni` kolunun bekledigi taban
+`ManualOverrideTests.K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni` kolunun bekledigi taban
 izgarasini uretir. Tek isi var: **hicbir sey sabitlenmemisken** motorun ne urettigini,
 iki farkli commit'te ayni komutla yazdirmak.
 
