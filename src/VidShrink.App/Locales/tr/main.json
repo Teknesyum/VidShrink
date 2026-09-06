@@ -1,7 +1,7 @@
 ﻿{
 
   "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur: motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.",
-  "main.derivation.size": "{0} MB",
+  "main.derivation.size": "Hedef {0} MB",
   "main.derivation.no-cap": "Boyut tavanı yok",
   "main.section.outcome": "Ne çıkacak",
   "main.section.quality": "Kalite ve uyumluluk",
@@ -10,6 +10,7 @@
   "main.section.frame.resolution-locked": "Çözünürlük sabit",
   "main.section.frame.fps-locked": "Kare hızı sabit",
   "main.section.advanced.overrides": "{0} ayar elle",
+  "main.section.advanced.none": "Hepsi otomatik",
   "main.language.name": "Türkçe",
 
   "main.tagline.lead": "Boyut hedefli medya sıkıştırma",
@@ -106,7 +107,6 @@
   "main.fast-gpu.on-against-advice": "• {0}; ölçüm kapalı öneriyordu, kutu elle açıldı.",
   "main.fast-gpu.off-as-advised": "• {0}, hızlı düşür kapalı kaldı.",
 
-  "main.fill.label": "Doldurma politikası",
   "main.fill.target": "Hedefi doldur",
   "main.fill.ceiling": "Kalite tavanında dur",
 

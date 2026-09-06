@@ -37,11 +37,16 @@ public sealed class QualityHintTests
     public static TheoryData<double> ChipTargets() => new() { 8, 16, 25, 100, 128, 180 };
 
     /// <summary>
-    /// K: yedi yonganın her birinde panel açılıyor. Yongalar ve balonları XAML'den,
-    /// hesaba giren liste koddan okunuyor; ikisi ayrışırsa bir yonga sessizce panelsiz kalır.
+    /// K: şeritteki her yongada balon açılıyor. Yongalar ve balonları XAML'den, kalite
+    /// hesabına giren liste koddan okunuyor; ikisi ayrışırsa bir yonga sessizce panelsiz kalır.
+    ///
+    /// <para>T177: şeride <c>ChipArchive</c> eklendi ve yonga sayısı sekize çıktı. Arşiv
+    /// yongasının <b>boyut hedefi yoktur</b> — kısıtı kalite tavanıdır — bu yüzden
+    /// <c>QualityChips()</c> listesine bilerek girmiyor; ölçü bunu tahmin etmiyor, listenin
+    /// dışında kalan tek yonganın o olduğunu doğruluyor.</para>
     /// </summary>
     [Fact]
-    public void EverySevenChipsCarryATooltipPanelAndAreListedInTheCode()
+    public void EveryChipCarriesATooltipPanelAndTheSizedOnesAreListedInTheCode()
     {
         var xaml = File.ReadAllText(TipSources.WindowXamlPath);
         var anchor = xaml.IndexOf("x:Name=\"ChipWhatsApp\"", StringComparison.Ordinal);
@@ -53,7 +58,7 @@ public sealed class QualityHintTests
         var chips = Regex.Matches(block, "x:Name=\"(Chip\\w+)\"").Select(match => match.Groups[1].Value).Distinct().ToList();
 
         Assert.Equal(
-            new[] { "ChipWhatsApp", "Chip8", "Chip25", "Chip100", "Chip128", "Chip180", "ChipHalf" }.Order(),
+            new[] { "ChipArchive", "ChipWhatsApp", "Chip8", "Chip25", "Chip100", "Chip128", "Chip180", "ChipHalf" }.Order(),
             chips.Order());
 
         // Her yonganın balonu bir StackPanel: ilk çocuk ipucu, kalanını panel dolduruyor.
@@ -61,7 +66,10 @@ public sealed class QualityHintTests
 
         var code = File.ReadAllText(TipSources.WindowCodePath);
         var listed = Regex.Match(code, """\(ChipWhatsApp, 16\), \(Chip8, 8\), \(Chip25, 25\), \(Chip100, 100\),\s*\(Chip128, 128\), \(Chip180, 180\), \(ChipHalf, null\)""");
-        Assert.True(listed.Success, "QualityChips() yedi yongayı listelemiyor.");
+        Assert.True(listed.Success, "QualityChips() boyut hedefi olan yedi yongayı listelemiyor.");
+
+        var sized = Regex.Matches(listed.Value, @"\((Chip\w+),").Select(match => match.Groups[1].Value).ToList();
+        Assert.Equal(new[] { "ChipArchive" }, chips.Except(sized).ToArray());
     }
 
     /// <summary>

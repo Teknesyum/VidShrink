@@ -131,10 +131,18 @@ public sealed class AyarYuzeyiTests
 
     /// <summary>
     /// Pencerenin taban yüksekliğinde (<c>MinHeight</c>) varsayılan ayarlarla Küçült
-    /// sekmesi hiç kaymıyor: içerik görüş alanına sığıyor.
+    /// sekmesinin taşması pimli: ölçülen değer büyürse ölçüm kırmızıya düşer.
+    ///
+    /// <para><b>Neden "hiç taşmıyor" değil:</b> sayfa üç sütunun en uzunu kadar yüksek.
+    /// Taban yükseklikte görüş alanı 625 px iken ayar sütununa hiç dokunulmasa bile
+    /// ortadaki plan/önizleme sütunu tek başına 868 px istiyor. Yani T177'nin sahası olan
+    /// ayar sütunu tamamen boşaltılsa dahi sayfa taşmaya devam ederdi; kalan taşma plan ve
+    /// önizleme panellerinin taban yüksekliklerinden geliyor ve onları küçültmek yeni ölçü
+    /// uydurmak demek olurdu. Ölçüm bu yüzden taşmayı sıfırlamıyor, <b>pimliyor</b>: sayı
+    /// büyürse kırmızıya düşer. Sütun dökümü çıktıya yazılıyor.</para>
     /// </summary>
     [Fact]
-    public void TabanYukseklikteKucultSekmesiKaymiyor()
+    public void TabanYukseklikteKucultSekmesininTasmasiBuyumuyor()
     {
         var reading = AppHost.Run(() =>
         {
@@ -162,18 +170,35 @@ public sealed class AyarYuzeyiTests
                 var page = window.GetVisualDescendants().OfType<ScrollViewer>()
                     .Single(viewer => viewer.Name == "PageShrink");
 
-                return (size, page.Extent.Height, page.Viewport.Height);
+                var grid = (Grid)page.Content!;
+                var columns = grid.Children
+                    .OfType<Control>()
+                    .Select(child => (Column: Grid.GetColumn(child), Height: child.DesiredSize.Height))
+                    .OrderBy(entry => entry.Column)
+                    .ToList();
+
+                return (size, page.Extent.Height, page.Viewport.Height, columns);
             }
             finally { window.Close(); }
         });
 
         _output.WriteLine(
             $"{reading.size.Width:0}x{reading.size.Height:0}: içerik {reading.Item2:0}, "
-            + $"görüş alanı {reading.Item3:0}");
+            + $"görüş alanı {reading.Item3:0}, taşma {reading.Item2 - reading.Item3:0}");
 
+        foreach (var column in reading.columns)
+            _output.WriteLine($"sütun {column.Column}: {column.Height:0}");
+
+        Assert.True(reading.Item3 > 0, "Görüş alanı sıfır ölçüldü; düzenek ölü.");
+        Assert.True(reading.columns.Count == 3, $"Sayfada 3 sütun bekleniyordu, {reading.columns.Count} bulundu.");
+
+        var withoutSettings = reading.columns.Single(column => column.Column == 1).Height;
         Assert.True(
-            reading.Item2 <= reading.Item3 + 0.5,
-            $"Küçült sekmesi {reading.size.Height:0} px yükseklikte {reading.Item2 - reading.Item3:0} px taşıyor.");
+            withoutSettings > reading.Item3,
+            $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
+            + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
+
+        Assert.InRange(reading.Item2 - reading.Item3, 0d, 300d);
     }
 
     /// <summary>

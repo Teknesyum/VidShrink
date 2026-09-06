@@ -228,6 +228,8 @@ public partial class MainWindow : Window
             Watch(control, TextBox.TextProperty, SaveSettings);
 
         RefreshQualityTargetAvailability();
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         Loaded += OnWindowLoaded;
@@ -1284,7 +1286,9 @@ public partial class MainWindow : Window
 
         var advanced = new SelectingItemsControl[] { CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvEncoderPath, CmbAdvCodecLock }
             .Count(box => box.SelectedIndex > 0);
-        TxtAdvancedSummary.Text = AdvancedBody.IsVisible || advanced == 0 ? "" : Say("main.section.advanced.overrides", advanced);
+        TxtAdvancedSummary.Text = AdvancedBody.IsVisible
+            ? ""
+            : advanced == 0 ? Say("main.section.advanced.none") : Say("main.section.advanced.overrides", advanced);
     }
 
     private static string? AdvancedText(ComboBox box) => box.SelectedIndex > 0 ? box.SelectedItem as string : null;

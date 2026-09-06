@@ -1,7 +1,7 @@
 ﻿{
 
-  "main.chip.archive.tip": "• The archive chip has no size ceiling: the engine spends bits up to visually lossless quality and stops there.\n• The file does get smaller, but how much smaller is decided by the source, not by you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.",
-  "main.derivation.size": "{0} MB",
+  "main.chip.archive.tip": "• The archive chip has no size ceiling: the engine spends bits up to visually lossless quality.\n• The file does get smaller, but how much smaller is decided by the source, not by you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.",
+  "main.derivation.size": "Target {0} MB",
   "main.derivation.no-cap": "No size ceiling",
   "main.section.outcome": "What comes out",
   "main.section.quality": "Quality and compatibility",
@@ -10,6 +10,7 @@
   "main.section.frame.resolution-locked": "Resolution fixed",
   "main.section.frame.fps-locked": "Frame rate fixed",
   "main.section.advanced.overrides": "{0} set by hand",
+  "main.section.advanced.none": "All automatic",
   "main.language.name": "English",
 
   "main.tagline.lead": "Target size media compression",
@@ -106,7 +107,6 @@
   "main.fast-gpu.on-against-advice": "• {0}; the measurement advised leaving it off, but the box was turned on by hand.",
   "main.fast-gpu.off-as-advised": "• {0}, so fast shrink stayed off.",
 
-  "main.fill.label": "Fill policy",
   "main.fill.target": "Fill target",
   "main.fill.ceiling": "Stay at quality ceiling",
 
