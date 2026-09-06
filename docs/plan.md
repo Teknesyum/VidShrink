@@ -32,7 +32,10 @@ Sıra: T177 → T178 → T179; T180 bağımsız, paralel koşabilir.
 - Kaynak okuyan test: seçenek sayısı ≤3 olan `ComboBox` sayısı **0**.
 - Kaynak okuyan test: `HorizontalAlignment="Stretch"` taşıyan `ComboBox` sayısı **0**.
 - `CmbIntent` referansı **0**; her yonga için yonga→plan eşleme testi.
-- Varsayılan ayarlarla `MinHeight = 720`'de `ScrollViewer.Extent ≤ Viewport`.
+- Varsayılan ayarlarla `MinHeight = 720`'de `ScrollViewer.Extent ≤ Viewport` — **T180'de**.
+  T177'de ulaşılamaz: taşmayı orta sütun tutuyor (`PlanPanelMinHeight` 868 px, görüş alanı
+  625 px), onu küçültmek karşılaştırma alanının A/B kareye inmesi demek. T177 yalnız
+  ölçülen taşmayı pinler.
 - Katlı bölüm başlığı güncel değerleri yazar (ses bit hızını değiştir → başlık metni değişir).
 - Taşma panelinin dört seçeneğinin **her biri bir sayı içerir**; "Kes"e tıklamak pencere
   sayısını değiştirmez; kesilecek saniye = süre × taşma oranı birim testi; Arşiv hedefinde
