@@ -142,13 +142,13 @@ kapsama boslugu bulundu ve `tests/VidShrink.Tests/SesTabaniTests.cs` (owns icind
 
 | verify filtresi | test sayisi |
 |---|---|
-| `PlanCalculatorTests\|SesTabaniTests\|ManualOverrideTests` | 122 (ham: `.calisma/T172/final-verify1.txt`; K6 testi eklenmeden once 121 idi, `.calisma/T172/k7-liste1.txt`) |
+| `PlanCalculatorTests\|SesTabaniTests\|ManualOverrideTests` | **tur 1 anindaki sayim** 122 (ham: `.calisma/T172/final-verify1.txt`; K6 testi eklenmeden once 121 idi, `.calisma/T172/k7-liste1.txt`). Guncel sayi tur 4 bolumunde. |
 | `OluUyeTests\|LanguageTests` | 66 (ham: `.calisma/T172/k7-liste2.txt`) |
 
 ## Tur 1 verify sonucu
 
 - `PlanCalculatorTests|SesTabaniTests|ManualOverrideTests`: **121/122 yesil, 1 kirmizi.**
-  Kirmizi: `ManualOverrideTests.K1_VarsayilanT165OncesiMotorlaBirebirAyni` (1920x1080@30,
+  Kirmizi: `ManualOverrideTests.K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni` (1920x1080@30,
   600s, 6MB hedef satiri) - bu dosya `owns` disinda (`tests/VidShrink.Tests/ManualOverrideTests.cs`
   bu sozlesmenin sahip oldugu dosyalar arasinda degil). Test, 9b092e9 baz alinarak
   "ses 0k/kaynak" (o zamanki `AudioDropped` davranisi) bekliyor; T172'nin motor karari bu
@@ -188,7 +188,7 @@ olarak bu dal. Bu tur (K11) 505/511/520/528'i de 391/545/980/988 ile ayni yaklas
 |---|---|---|---|
 | 159 | private const int MinVideoBitrateK = 48 (tanim) | - | - |
 | 391 | videoK - SearchLayout'a giden ana butce | evet (tur1) | bu deger cozunurluk/fps aramasinin butcesi; floor burada durursa arama gercek butceyi degil, yapay olarak sisirilmis 48k'yi gorup daha buyuk bir duzen seciyor, sonra kodlayici o duzeni bu kadar dusuk bitrate'te tutamiyor |
-| 505 | ceilingVideoK - "butce comert" (CRF tavanina takilan) dalinda son deger | **evet (tur3, K11)** | K11 supurmesinde bu dal gercekten tetikleniyordu (30-120dk/10-50MB araliginda 11 satir); floor kaldirilinca ayni yaklasimla 0.0'a indirildi |
+| 505 | ceilingVideoK - "butce comert" (CRF tavanina takilan) dalinda son deger | **evet (tur3, K11)** | K11 supurmesinde bu dal gercekten tetikleniyordu (20-120dk/10-50MB araliginda 11 satir; en kisa satir 20dk/10MB); floor kaldirilinca ayni yaklasimla 0.0'a indirildi |
 | 511 | desiredVideoK - FillPolicy.FillTarget ince ayari, 505'in dalinin icinde | **evet (tur3, K11)** | ayni gerekce |
 | 520 | desiredVideoK fill-CRF kolunda son deger | **evet (tur3, K11)** | ayni gerekce |
 | 528 | desiredVideoK fill-iki-pas kolunda son deger | **evet (tur3, K11)** | ayni gerekce - K11 sweep'inde 11 cakili satirin tumu bu kola (`FillTwoPassBandTooNarrowForCrf`) giriyordu |
@@ -266,7 +266,7 @@ bu turda yesile gecti.
 
 ### K9 - ManualOverrideTests golden guncellemesi
 
-ManualOverrideTests.K1_VarsayilanT165OncesiMotorlaBirebirAyni teorisinin 5 satirindan biri
+ManualOverrideTests.K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni teorisinin 5 satirindan biri
 (1920x1080@30, 600s, 6MB hedef) tur1'in K3 bulgusunda kirmizi kalmisti (dosya owns disinda
 kaldigi icin tur1 duzeltmedi, bildirdi). Bu tur bu gorevin metninde acikca kapsama alinan
 tests/VidShrink.Tests/ManualOverrideTests.cs dosyasindaki satirin golden degeri guncellendi:
@@ -285,7 +285,7 @@ kod geriye sarilmadi. InlineData satiri: tests/VidShrink.Tests/ManualOverrideTes
 
 | verify filtresi | test sayisi | ham |
 |---|---|---|
-| PlanCalculatorTests\|SesTabaniTests\|ManualOverrideTests | 122 | .calisma/T172/tur2-k7-liste1.txt |
+| PlanCalculatorTests\|SesTabaniTests\|ManualOverrideTests | **tur 2 anindaki sayim** 122 | .calisma/T172/tur2-k7-liste1.txt |
 | OluUyeTests\|LanguageTests | 66 | .calisma/T172/tur2-k7-liste2.txt |
 
 Calistirma sonucu:
@@ -338,11 +338,13 @@ kullanilan ayni yaklasim). Supurme yeniden kosuldu (`.calisma/T172/analiz/Progra
 
 Kendi saydim (python `csv.DictReader` ile her iki dosyayi ayristirdim, `videoK==48` ve
 `fark_MB>0` satirlarini tek tek listeledim): ONCE'deki 11 cakili satirin tumu ayni zamanda
-hedefi asan 62'nin icinde (30-120dk, 10-50MB araliginda, en fazla +%55: 120dk/40MB
+hedefi asan 62'nin icinde (20-120dk, 10-50MB araliginda, en fazla +%55: 120dk/40MB
 tahmini=62,109 fark=+22,109). SONRA'da cakili satir **kalmadi** (0/171) - floor'a
 carpan hicbir satir yok, gerekce yazacak bir satir da yok.
 
-Kalan 51 asan satirin **tamami** `videoK=0` ve tek notu `BudgetBelowCeilingTwoPass` -
+Kalan 51 asan satirin **tamami** `videoK=0` ve 51'inin de not sutunu ayni iki koddan
+olusuyor: `BudgetBelowCeilingTwoPass,PredictedQualityEstimated` (kendi saydim:
+`awk -F'	' '$3==0 {print $8}' | sort | uniq -c` -> tek kume, 51 satir) -
 bunlar K11'in kapsami disinda, tur1'de kabul edilen ses-tabani odul: hedef, ses icin
 ayrilan 24 kbps taban + konteyner payindan bile kucuk (ornegin 60dk/0,5MB -> totalK~1,1,
 audioK zaten 24 dahil), videoK 0'a inse bile ses payi tek basina hedefi asiyor. Bu,
@@ -368,9 +370,9 @@ K8'in de kullandigi ayni harness) ile kosuldu:
 
 | kombinasyon (gercek) | kesit/hedef (orani korunmus) | plan | basarili | gercekMB | hedefi asti mi | ffprobe ses |
 |---|---|---|---|---|---|---|
-| 30dk/10MB | 180s/1,0MB | videoK=21(->18) audioK=24 mono, notlar: FrameRateCutForFloor,TargetEnforcedTwoPass | Evet (2 deneme) | 0,984 | Hayir | codec_type=audio codec_name=aac channels=1 |
-| 60dk/15MB | 180s/0,75MB | videoK=9(->7) audioK=24 mono, notlar: TargetBelowCodecFloor,TargetEnforcedTwoPass | Evet (2 deneme) | 0,729 | Hayir | codec_type=audio codec_name=aac channels=1 |
-| 120dk/40MB | 180s/1,0MB | videoK=21(->18) audioK=24 mono, notlar: FrameRateCutForFloor,TargetEnforcedTwoPass | Evet (2 deneme) | 0,984 | Hayir | codec_type=audio codec_name=aac channels=1 |
+| 30dk/10MB | 180s/1,0MB | videoK=21(->18) audioK=24 mono; notlarin **tamami** (8): CodecUpgradeRecommended,ExtremeRatioWarning,AudioReduced,AudioMono,FrameRateCutForFloor,ResolutionReduced,FrameRateReduced,TargetEnforcedTwoPass | Evet (2 deneme) | 0,984 | Hayir | codec_type=audio codec_name=aac channels=1 |
+| 60dk/15MB | 180s/0,75MB | videoK=9(->7) audioK=24 mono; notlarin **tamami** (8): CodecUpgradeRecommended,ExtremeRatioWarning,AudioReduced,AudioMono,TargetBelowCodecFloor,ResolutionReduced,FrameRateReduced,TargetEnforcedTwoPass | Evet (2 deneme) | 0,729 | Hayir | codec_type=audio codec_name=aac channels=1 |
+| 120dk/40MB | 180s/1,0MB | videoK=21(->18) audioK=24 mono; notlarin **tamami** (8): CodecUpgradeRecommended,ExtremeRatioWarning,AudioReduced,AudioMono,FrameRateCutForFloor,ResolutionReduced,FrameRateReduced,TargetEnforcedTwoPass | Evet (2 deneme) | 0,984 | Hayir | codec_type=audio codec_name=aac channels=1 |
 
 Ham cikti: `.calisma/T172/tur3-k12-30dk.txt`, `tur3-k12-60dk.txt`, `tur3-k12-120dk.txt`,
 ffprobe: `.calisma/T172/tur3-k12-ffprobe.txt`. Kendi saydim: 3 kosumun 3'unde de dosya
@@ -387,7 +389,7 @@ sozlesmenin K12 CHECK'i (dosya var, ffprobe'da ses var, hedefi asmiyor) 3 kosumu
 
 ### K13 - Floor kaldirmayi pimleyen olcu eklendi
 
-`tests/VidShrink.Tests/SesTabaniTests.cs`'e `K11_BuceTavanaCakiliKalanDalHedefiAsmaz`
+`tests/VidShrink.Tests/SesTabaniTests.cs`'e `K11_UzunKaynaktaKucukHedefVideoBitrateFloorunaCakilmiyor`
 eklendi: 30dk/10MB icin `result.Estimate.ExpectedMb <= 10.5` bekliyor (floor donerse
 tahmini ~15,5 MB'a cikiyor). Mutasyon: 505/511/520/528'deki `Math.Max(..., 0.0)` ->
 `Math.Max(..., MinVideoBitrateK)` geri koyuldu (`dotnet build -c Release --no-incremental`
@@ -404,7 +406,8 @@ Basarisiz! - Basarisiz: 1, Basarili: 122, Toplam: 123
 ```
 
 Mutasyondan once 123/123 yesildi; mutasyonla tam olcunun kendisi kirildi, baska hicbir
-olcu etkilenmedi.
+olcu etkilenmedi. (Yukaridaki blok tur 3'un ham ciktisidir ve olcunun **o gunku** adini
+tasiyor; ad tur 4'te `K11_UzunKaynaktaKucukHedefVideoBitrateFloorunaCakilmiyor` oldu.)
 
 ### K14 - Belge duzeltmeleri (bu tur)
 
@@ -420,7 +423,7 @@ olcu etkilenmedi.
 
 ### Borclar (gizlenmedi, tasindi)
 
-1. **`ManualOverrideTests.cs:62-67` yorumu ve `K1_VarsayilanT165OncesiMotorlaBirebirAyni`
+1. **`ManualOverrideTests.cs:62-67` yorumu ve `K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni`
    test adi hala yanıltici** (tur2 denetim borc bulgusu 4): yorum "beklenen degerler
    uydurulmadi, 9b092e9 agacinda ayni bes bilesim kosuldu" diyor ama dorduncu InlineData
    satiri artik T172 sonrasi motordan geliyor (K9'da guncellendi); test adi da "T165
@@ -431,3 +434,315 @@ olcu etkilenmedi.
    duzeltilmis olan `TargetEnforcedTwoPass` (545) dalini tetikledi - K11'in kendisi
    yalniz analiz-tabanli 171 satirlik supurmede sayisal olarak dogrulandi, gercek
    kodlamada degil. Yukarida (K12) acikca yazildi, saklanmadi.
+
+---
+
+# Tur 4 - denetim bulgularinin kapatilmasi (K15-K18)
+
+Tur 3 denetcisi tek bir agir bulgu birakti: `videoK=0` uretilen planlar ffmpeg'e
+kosturulamayan bir komut veriyordu. Bu bolum K15-K18'in olcumleridir.
+
+## K15 - `videoK=0` plani kaldirildi
+
+### Secilen yol ve gerekcesi
+
+Sozlesme iki yol birakmisti: (a) kodlayicinin kosabildigi bir tabana yukseltmek ve plana
+not dusmek, (b) plani tumden reddetmek. **(a) secildi.** Gerekce:
+
+- (b) reddi uygulamak icin denetim akisinin `EncodeRunner` ya da `MainWindow` tarafinda
+  kesilmesi gerekirdi; ikisi de bu sozlesmenin `owns` listesi disinda, salt okunur.
+- (a) duzeltmeyi tumuyle `PlanCalculator.cs` icinde tutuyor. Taban yukseltildikten sonra
+  `EncodeRunner`'in **zaten var olan** "hedefin uzerinde kaldi" dali devreye giriyor ve
+  kullaniciya durust bir cumle ile donuyor (K16'da ham cikti ile gosterildi). Yani (b)'nin
+  istedigi sonuc - kullaniciya durust cumle - (a) ile de aliniyor, kod sinirini asmadan.
+
+### Taban neden sabit degil, olculdu
+
+Ilk deneme sabit bir alt sinirdi (mutlak 8k, sonra 2k). **2k gercek kodlamada patladi:**
+640x360@24 icin ffmpeg `requested bitrate is too low. estimated minimum is 3 kbps` dedi
+(`-542398533`). libx264'un alt siniri cozunurluk ve fps'e bagli. 12 noktali izgara
+olculdu - her nokta icin ffmpeg'in gercekten actigi en kucuk `-b:v`:
+
+```
+$ cat .calisma/T172/tur4/x264-taban.tsv
+genislik	yukseklik	fps	mbps	enKucukKosanK
+230	130	6	810	1
+320	180	12	2880	2
+384	216	10	3360	2
+480	270	15	7650	2
+640	360	24	22080	4
+640	360	30	27600	5
+854	480	30	48600	5
+1280	720	30	108000	8
+1920	1080	30	244800	12
+1920	1080	60	489600	25
+2560	1440	30	432000	20
+3840	2160	60	1944000	80
+```
+
+`mbps` = saniyedeki makroblok = `ceil(w/16) * ceil(h/16) * fps`. Egri ne sabit ne saf
+dogrusal: kucuk yerlesimlerde sabit terim, buyuklerde dogrusal terim baskin. Modelin
+`PlanCalculator.RunnableVideoBitrateK`'de aldigi hal:
+
+```
+ceil(mbps * 0.05 / 1000) + 4
+```
+
+12 noktanin **hepsinde** olculen degerin uzerinde kaliyor. En dar pay 640x360@30'da:
+model 6k, olculen 5k. Dogru sabit yok, bu bir emniyet payli ust zarf.
+
+Ikinci sifir sabit noktasi `Correct()` yeniden-deneme kolundaydi (`Math.Max(0, ...)`);
+o da ayni tabana baglandi.
+
+### Once/sonra supurme
+
+Ayni 171 satirlik izgara, tur 3 motoru ve tur 4 motoru:
+
+- ham tur 3: `.calisma/T172/tur3-after-sweep.tsv`
+- ham tur 4: `.calisma/T172/tur4/tur4-after-sweep.tsv`
+- ham tur 4 (genislik/yukseklik/fps/mod/runnableK/notlar sutunlu): `.calisma/T172/tur4/tur4-detay-sweep.tsv`
+
+Kendi saydigim ham cikti:
+
+```
+tur3 satir: 171 tur4 satir: 171
+tur3 videoK==0: 51  tur4 videoK==0: 0
+tur3 fark>0: 51  tur4 fark>0: 57
+yeni asan: 6
+  5 dk / 1 MB : tur3 videoK=3 fark=-0,03 -> tur4 videoK=5 fark=0,042
+  10 dk / 2 MB : tur3 videoK=3 fark=-0,059 -> tur4 videoK=5 fark=0,085
+  20 dk / 4 MB : tur3 videoK=3 fark=-0,118 -> tur4 videoK=5 fark=0,169
+  30 dk / 6 MB : tur3 videoK=3 fark=-0,177 -> tur4 videoK=5 fark=0,254
+  60 dk / 12 MB : tur3 videoK=3 fark=-0,355 -> tur4 videoK=5 fark=0,508
+  120 dk / 25 MB : tur3 videoK=4 fark=-0,847 -> tur4 videoK=5 fark=0,016
+asandan altina donen: 0
+tur4 videoK==runnableK: 57
+bunlardan TargetBelowCodecFloor tasimayan: 0
+tur3'te sifir olan 51 satirin tur4'te TBCF tasimayani: 0
+```
+
+**51 -> 0.** Sifir plan kalmadi. Tabana cakilan 57 satirin **hepsi**
+`AdviceCode.TargetBelowCodecFloor` tasiyor (yukarida sayildi: TBCF tasimayan 0).
+
+**6 satir "hedefin altinda" tahminden "hedefin ustunde" tahmine gecti** - saklamiyorum,
+olctum. Bunlar teslimat gerilemesi degil, tahmin duzeltmesi: 5dk/1MB satiri gercek
+kodlamada zaten hedefi tutmuyordu.
+
+```
+$ cat .calisma/T172/tur4/k15-gerileme-5dk-1mb.txt
+[probe] sure=300,01s hasAudio=True kanal=2 audioBps=127972 boyutMB=50,64
+[plan] codec=libx264 mode=2pass yerlesim=218x122@6 runnableK=5 videoK=5 audioK=24 audioCodec=aac kanal=1 regime=Extreme notlar=CodecUpgradeRecommended,ExtremeRatioWarning,AudioReduced,AudioMono,TargetBelowCodecFloor,ResolutionReduced,FrameRateReduced,TargetEnforcedTwoPass
+[encode] basarili=False ciktiMB=1,14 denemeler=3 hata=Stayed over the 1 MB target after 3 attempts (last result: 1,1 MB); no file was written.
+[deneme 1] over ceiling hedefMB=0,96 gercekMB=1,14 videoK=5 mod=2pass
+[deneme 2] over ceiling hedefMB=0,96 gercekMB=1,14 videoK=5 mod=2pass
+[deneme 3] over ceiling hedefMB=0,96 gercekMB=1,14 videoK=5 mod=2pass
+```
+
+Ayni satirin tur3 plani (218x122@6, `-b:v 3k`, 24k mono AAC, 300 s) elle ffmpeg'e
+kosuldugunda **1,067 MB** verdi - o da hedefin ustunde. Yani tur3'un `-0,03` tahmini
+yanlisti; tur4'un `+0,042`'si dogru yone dondu. Ters yonde hareket eden satir yok
+(`asandan altina donen: 0`).
+
+## K16 - gercek kodlama kosumlari
+
+Iki kosum, ikisi de eski `videoK=0` bandindan, sure/hedef orani korunarak kisaltildi:
+
+| kosum | oran | kaynak | hedef |
+| --- | --- | --- | --- |
+| 1 | 60dk / 10MB (Discord) | `kesit-60dk-orani.mp4` (120 s) | 0,33 MB |
+| 2 | 120dk / 20MB | `kesit-20dk-orani.mp4` (120 s) | 0,30 MB |
+
+### Onceki hal (tur 3 motoru, ayni kesit)
+
+```
+$ head -3 .calisma/T172/tur4/k16-tur3-oncesi-60dk.txt
+[probe] sure=120s hasAudio=True kanal=2 audioBps=127982 boyutMB=20,25
+[plan] codec=libx264 mode=2pass yerlesim=640x360@24 videoK=0 audioK=24 ... notlar=...,TargetBelowCodecFloor,TargetEnforcedTwoPass
+Unhandled exception. System.InvalidOperationException: ffmpeg failed (-542398533):
+...
+[libx264 @ ...] CRF/CQP is incompatible with 2pass.
+[vost#0:0/libx264 @ ...] Task finished with error code: -22 (Invalid argument)
+[out#0/mp4 @ ...] Nothing was written into output file, because at least one of its streams received no packets.
+frame=    0 fps=0.0 q=0.0 Lsize=       0KiB
+Conversion failed!
+```
+
+Ayni sey 20dk kesitinde de: `.calisma/T172/tur4/k16-tur3-oncesi-20dk.txt`. Yani denetcinin
+tarifi birebir dogrulandi - **islenmemis istisna, 0 baytlik dosya**.
+
+### Sonraki hal (tur 4 motoru)
+
+```
+$ cat .calisma/T172/tur4/k16-kosum1.txt
+[probe] sure=120s hasAudio=True kanal=2 audioBps=127982 boyutMB=20,25
+[plan] codec=libx264 mode=2pass yerlesim=640x360@24 runnableK=6 videoK=6 audioK=24 audioCodec=aac kanal=1 regime=Extreme notlar=CodecUpgradeRecommended,ExtremeRatioWarning,AudioReduced,AudioMono,TargetBelowCodecFloor,TargetEnforcedTwoPass
+[encode] basarili=False ciktiMB=0,517 denemeler=3 hata=Stayed over the 0,33 MB target after 3 attempts (last result: 0,5 MB); no file was written.
+[deneme 1] over ceiling hedefMB=0,32 gercekMB=0,516 videoK=6 mod=2pass
+[deneme 2] over ceiling hedefMB=0,32 gercekMB=0,515 videoK=6 mod=2pass
+[deneme 3] over ceiling hedefMB=0,32 gercekMB=0,517 videoK=6 mod=2pass
+
+$ cat .calisma/T172/tur4/k16-kosum2.txt
+[probe] sure=120s hasAudio=True kanal=2 audioBps=127982 boyutMB=20,25
+[plan] codec=libx264 mode=2pass yerlesim=640x360@24 runnableK=6 videoK=6 audioK=24 audioCodec=aac kanal=1 regime=Extreme notlar=CodecUpgradeRecommended,ExtremeRatioWarning,AudioReduced,AudioMono,TargetBelowCodecFloor,TargetEnforcedTwoPass
+[encode] basarili=False ciktiMB=0,515 denemeler=3 hata=Stayed over the 0,3 MB target after 3 attempts (last result: 0,5 MB); no file was written.
+[deneme 1] over ceiling hedefMB=0,288 gercekMB=0,516 videoK=6 mod=2pass
+[deneme 2] over ceiling hedefMB=0,288 gercekMB=0,515 videoK=6 mod=2pass
+[deneme 3] over ceiling hedefMB=0,288 gercekMB=0,515 videoK=6 mod=2pass
+```
+
+Sozlesmenin kabul ettigi iki sonuctan **ikincisi** gerceklesti: dosya yok, ama cikan sey
+ham ffmpeg hatasi degil. **ffprobe yok cunku dosya yok** - olculmedi, olculemezdi.
+
+### Kullaniciya giden tam metin
+
+ffmpeg cikti uretmedigi icin sozlesme "kullaniciya giden tam metni" istiyor. Uc parca:
+
+**1. Hata cumlesi** (`EncodeResult.Error`, kosum 1):
+
+> Stayed over the 0,33 MB target after 3 attempts (last result: 0,5 MB); no file was written.
+
+**2. Plan gerekcesi** (`plan.Reason`, ham cikti `.calisma/T172/tur4/k16-reason-60dk.txt`):
+
+> no layout reaches the 0,0350 bits per pixel per frame that libx264 needs for a meaningful
+> picture; the densest layout (0,0000) was taken, but this target is genuinely too small
+> for this source; the budget lands near CRF 128,3, short of the CRF 20 ceiling, so
+> two-pass VBR spends 0,32 MB, the band center of the 0,33 MB target; predicted quality
+> -72,1/100 estimated from the source bitrate; **the budget left 0k for video, under the 6k
+> the encoder still opens a two-pass run at 640x360@24; the bitrate was raised to 6k, so
+> the smallest file this source can deliver with its 24k audio is about 0,43 MB against the
+> 0,33 MB target**
+
+Kalin kisim K15'te eklenen cumledir.
+
+**3. `TargetBelowCodecFloor` ogudu** (`Locales/*/main.json:342`):
+
+> **tr:** Bu hedef bu kaynak icin gercekten cok kucuk: hicbir duzen kodlayicinin anlamli bir
+> goruntu icin gereken piksel basina bit yogunluguna ulasmiyor. En yogun duzen secildi ama
+> sonuc belirgin sekilde bozuk cikacak; hedefi buyutmek tek gercek care.
+
+> **en:** This target is genuinely too small for this source: no layout reaches the bits per
+> pixel the encoder needs for a meaningful picture. The densest layout was taken, but the
+> result will look visibly broken; raising the target is the only real fix.
+
+## K17 - `videoK != 0` pimlendi
+
+`SesTabaniTests.cs`'e iki olcu eklendi:
+
+- `K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir` - 7 satirlik
+  Theory (300s/0,5MB, 600s/1,5MB, 1200s/3MB, 1800s/5MB, 3600s/10MB, 5400s/15MB,
+  7200s/20MB). Her satirda `ModeEnum == TwoPass`, `VideoBitrateK >= RunnableVideoBitrateK(...)`
+  ve notlarda `TargetBelowCodecFloor` bekleniyor.
+- `K17_YenidenDenemeSifirdaCakilmiyor` - `Correct()` yeniden-deneme kolu, 3600s/10MB'de
+  iki kez ust uste; ikisi de tabanin altina dusmemeli.
+
+### Mutasyon izgarasi
+
+Her mutasyon oncesi `dotnet build -c Release --no-incremental`.
+
+| mutasyon | ne bozuldu | sonuc | dusen olcu |
+| --- | --- | --- | --- |
+| A | plandaki taban kelepcesi silindi (`videoK` yine 0 olabiliyor) | 7 basarisiz / 131 | `K17_SesTabaniButceyiYediginde_...` (7 satirin hepsi) |
+| B | `Correct()` yine `Math.Max(0, ...)` | 1 basarisiz / 131 | `K17_YenidenDenemeSifirdaCakilmiyor` |
+
+Ham cikti: `.calisma/T172/tur4/k17-mutasyonA.txt`, `k17-mutasyonB.txt`.
+
+```
+$ cat .calisma/T172/tur4/k17-mutasyonA-adlar.txt
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 5400, targetMb: 15) [1 ms]
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 3600, targetMb: 10) [< 1 ms]
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 300, targetMb: 0,5) [< 1 ms]
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 7200, targetMb: 20) [< 1 ms]
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 600, targetMb: 1,5) [< 1 ms]
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 1800, targetMb: 5) [< 1 ms]
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(durationSeconds: 1200, targetMb: 3) [< 1 ms]
+```
+
+(Ham dosyada "Başarısız" Turkce yaziliyor; buraya ASCII'ye cevrilerek alindi, satir sayisi
+ve adlar aynen.) Yedi ad, hepsi K17 - kendim saydim, listesi yukarida.
+
+```
+$ cat .calisma/T172/tur4/k17-mutasyonB.txt
+  Basarisiz VidShrink.Tests.SesTabaniTests.K17_YenidenDenemeSifirdaCakilmiyor [< 1 ms]
+  Hata Iletisi:
+   1. duzeltme videoK=0, taban 17k
+```
+
+**Sozlesmenin sordugu soru:** mevcut `K11_...` olcusu bunu zaten kapsiyor mu?
+**Hayir.** Iki mutasyonda da K11 yesil kaldi - A'da dusen 7 adin, B'de dusen 1 adin
+hicbiri K11 degil (yukaridaki ad listeleri). K11 tavana cakili dalin hedefi asmadigina
+bakiyor, video bitrate'inin sifir olup olmadigina degil.
+
+## K18 - tur 3'un sekiz borcu
+
+| # | borc | ne yapildi |
+| --- | --- | --- |
+| 1 | K11 dal atfi fazla kesin | yumusatildi - K11'in yalniz supurmede dogrulandigi, gercek kodlamada K12'nin baska dali tetikledigi zaten yaziliydi; ifade "dogrulandi" yerine kapsamla birlikte veriliyor |
+| 2 | "30-120dk" yanlis | **yerinde duzeltildi** -> "20-120dk". Sayildi: 11 `videoK==48` satiri 20dk/10MB ile 120dk/50MB arasinda |
+| 3 | "tek notu `BudgetBelowCeilingTwoPass`" eksik | **yerinde duzeltildi** - not sutunu iki koda cikti (`BudgetBelowCeilingTwoPass,PredictedQualityEstimated`), altina `uniq -c` oz-sayimi kondu: 51 satirda tek ayrik kume |
+| 4 | K12 tablosunun `notlar:` sutunu eksik | **yerinde duzeltildi** - her satir icin ham dosyadaki **8** ogut kodunun tamami yazildi |
+| 5 | `122` sayisi guncelligini yitirmis | **yerinde etiketlendi** - iki gecis "tur 1 anindaki sayim" / "tur 2 anindaki sayim" olarak isaretlendi, guncel sayim icin bu bolume yonlendirildi |
+| 6 | K11 test adi yaniltici | ad degistirildi: `K11_BuceTavanaCakiliKalanDalHedefiAsmaz` -> `K11_UzunKaynaktaKucukHedefVideoBitrateFloorunaCakilmiyor`. Belgedeki **duz metin** referanslar guncellendi; tur 3'un kod blogu icindeki **ham cikti eski adi koruyor** (kanit degistirilmez), altina adin tur 4'te degistigi notu dusuldu |
+| 7 | `ManualOverrideTests.cs` yorumu/adi yaniltici | duzeltildi - yorum artik "bes InlineData satirinin dordu 9b092e9'dan, dorduncusu (1920x1080@30, 600s, 6MB) T172 motorundan, T172 tur2 K9'da guncellendi" diyor; test adi `K1_VarsayilanT165OncesiMotorlaBirebirAyni` -> `K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni` |
+| 8 | `PlanCalculator.cs:868` tutarsizligi | **kapatilmadi - acik borc.** Olculdu, asagida |
+
+### Borc 8 - olculdu, kapatilmadi
+
+`QualityFloorTargetMb = SizeMb(MinVideoBitrateK, 0, dur)` hala **0 kbps ses** varsayiyor;
+ses tabani geldikten sonra 0 kbps ses imkansiz. Ayrica `MinVideoBitrateK = 48` artik
+motorun gercek video tabani degil (o `RunnableVideoBitrateK`, cozunurluge bagli).
+Olculen fark (1920x1080@30 kaynak, gercek taban `SizeMb(17, 24, dur)`):
+
+```
+300 s: QualityFloorTargetMb(=SizeMb(48,0)) = 1,725 MB, gercek taban SizeMb(17,24) = 1,474 MB, fark -0,252
+600 s: QualityFloorTargetMb(=SizeMb(48,0)) = 3,450 MB, gercek taban SizeMb(17,24) = 2,947 MB, fark -0,503
+3600 s: QualityFloorTargetMb(=SizeMb(48,0)) = 20,703 MB, gercek taban SizeMb(17,24) = 17,684 MB, fark -3,019
+```
+
+**Denetcinin bekledigi yon ters cikti:** beyan edilen taban gercek tabanin **altinda**
+degil, **ustunde** (0,25-3,02 MB). Yani kalite-hedefli tarama gereginden ihtiyatli -
+gercekten teslim edilebilir 1,47-20,70 MB araligini hic incelemiyor. Bu bir dogruluk
+deligi degil, bir korluk. Sozlesmenin K maddeleri bu satiri kapsamadigi icin
+**dokunulmadi**; takip gerekir.
+
+### Borc 7'nin yan etkisi - `owns` disinda kalan referanslar
+
+`K1_VarsayilanT165OncesiMotorlaBirebirAyni` adi bu sozlesmenin `owns` listesi disindaki
+iki dosyada gecmeye devam ediyor, elleyemedim:
+
+```
+docs/olcumler/elle-gecersiz-kilma.md:87,660,661,731,737,768   (6 gecis)
+tools/VidShrink.PlanBaseline/AGENTS.md:3                       (1 gecis)
+```
+
+Kendim saydim: 2 dosya, 7 satir gecisi. **Acik borc, takip gerekir.**
+
+## Dogrulama
+
+Iki `verify` kolu, once `--list-tests` ile sayildi, sonra kosuldu:
+
+```
+$ dotnet test -c Release --no-build --filter "PlanCalculatorTests|SesTabaniTests|ManualOverrideTests" --list-tests | grep -c "^    "
+131
+$ dotnet test -c Release --no-build --filter "OluUyeTests|LanguageTests" --list-tests | grep -c "^    "
+66
+$ dotnet test -c Release --no-build --filter "PlanCalculatorTests|SesTabaniTests|ManualOverrideTests"
+Basarili!  - Basarisiz: 0, Basarili: 131, Atlanan: 0, Toplam: 131, Sure: 594 ms
+$ dotnet test -c Release --no-build --filter "OluUyeTests|LanguageTests"
+Basarili!  - Basarisiz: 0, Basarili: 66, Atlanan: 0, Toplam: 66, Sure: 6 s
+```
+
+Sifir eslesen filtre yok: her iki kol da `--list-tests`'te sifirdan buyuk sayildi
+(131 ve 66) ve kosum sayilari birebir tuttu.
+
+## Olculmeyenler
+
+Durustluk icin: **olculmedi** diye yazilmasi gerekenler.
+
+- K16'da **ffprobe kosulmadi** - iki kosumda da dosya uretilmedi, ffprobe'lanacak sey yoktu.
+- Tabana cakilan bandin **gorsel kalitesi** olculmedi; taban "kodlayici komutu aciyor mu"
+  olcusudur, "goruntu izlenebilir mi" olcusu degil. `TargetBelowCodecFloor` ogudu zaten
+  "sonuc belirgin sekilde bozuk cikacak" diyor.
+- Yeni asan 6 satirin **5dk/1MB disindakileri** gercek kodlamayla dogrulanmadi; yalniz
+  o satir kosuldu ve tur3 planinin elle emulasyonu (1,067 MB) ile karsilastirildi.
+- `RunnableVideoBitrateK` modeli **libx264 icin** olculdu. Diger kodekler (hevc, av1,
+  donanim kodlayicilari) olculmedi.
