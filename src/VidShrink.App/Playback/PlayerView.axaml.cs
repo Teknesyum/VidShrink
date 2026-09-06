@@ -166,6 +166,7 @@ internal partial class PlayerView : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        Strings.Changed -= OnLanguageChanged;
         Strings.Changed += OnLanguageChanged;
         if (TopLevel.GetTopLevel(this) is { } top)
             top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
@@ -365,7 +366,11 @@ internal partial class PlayerView : UserControl
         RefreshState();
     }
 
-    private void OnLanguageChanged(object? sender, EventArgs e) => RefreshState();
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        if (Dispatcher.UIThread.CheckAccess()) RefreshState();
+        else Dispatcher.UIThread.Post(RefreshState);
+    }
 
     internal void RefreshState()
     {
