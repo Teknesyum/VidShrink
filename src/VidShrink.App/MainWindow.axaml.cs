@@ -179,18 +179,14 @@ public partial class MainWindow : Window
         Watch(PlanPanelRow, RowDefinition.HeightProperty, OnSplitterMoved);
 
         InitializeAdvancedUi();
-        foreach (var box in new[]
-                 {
-                     CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-                     CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
-                 })
+        foreach (var box in AdvBoxes())
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
-        foreach (var box in new[]
-                 {
-                     CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-                     CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
-                 })
+        foreach (var box in AdvBoxes())
             Watch(box, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
+        foreach (var toggle in AdvStripToggles())
+            Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        foreach (var toggle in AdvStripToggles())
+            Watch(toggle, ToggleButton.IsCheckedProperty, SaveSettings);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
@@ -803,6 +799,7 @@ public partial class MainWindow : Window
             TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
             TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
             _intent = (Intent)Math.Clamp(settings.Intent, 0, 2);
+            _chipSizeCapped = settings.ChipSizeCapped;
             SetCodecIndex(settings.Codec);
             ChkResolution.IsChecked = settings.MayLowerResolution;
             ChkFps.IsChecked = settings.MayLowerFps;
@@ -831,6 +828,9 @@ public partial class MainWindow : Window
         {
             _updateUiSyncing = _syncing = _settingsSyncing = false;
         }
+
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
     }
 
     private UpdateSettings CaptureSettings() => new()
@@ -841,6 +841,7 @@ public partial class MainWindow : Window
         TargetMb = ParseTargetMb(),
         QualityTarget = ParseQualityTarget(),
         Intent = SelectedIntentIndex,
+        ChipSizeCapped = _chipSizeCapped,
         Codec = CodecIndex,
         MayLowerResolution = ChkResolution.IsChecked == true,
         MayLowerFps = ChkFps.IsChecked == true,
@@ -917,24 +918,52 @@ public partial class MainWindow : Window
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
-        CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-        CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
+        CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+        CmbAdvMinResolution, CmbAdvMinFps, CmbAdvCodecLock
     };
+
+    internal ToggleButton[] AdvStripToggles() => new ToggleButton[]
+    {
+        RbAdvModeAuto, RbAdvModeCrf, RbAdvModeTwoPass,
+        RbAdvPathAuto, RbAdvPathSoftware, RbAdvPathHardware
+    };
+
+    internal int AdvModeIndex
+    {
+        get => RbAdvModeCrf.IsChecked == true ? 1 : RbAdvModeTwoPass.IsChecked == true ? 2 : 0;
+        set
+        {
+            RbAdvModeCrf.IsChecked = value == 1;
+            RbAdvModeTwoPass.IsChecked = value == 2;
+            RbAdvModeAuto.IsChecked = value is not (1 or 2);
+        }
+    }
+
+    internal int AdvEncoderPathIndex
+    {
+        get => RbAdvPathSoftware.IsChecked == true ? 1 : RbAdvPathHardware.IsChecked == true ? 2 : 0;
+        set
+        {
+            RbAdvPathSoftware.IsChecked = value == 1;
+            RbAdvPathHardware.IsChecked = value == 2;
+            RbAdvPathAuto.IsChecked = value is not (1 or 2);
+        }
+    }
 
     private AppSettings CaptureAppSettings()
     {
         var boxes = AdvBoxes();
         return new AppSettings
         {
-            AdvMode = boxes[0].SelectedIndex,
-            AdvCrf = boxes[1].SelectedIndex,
-            AdvPreset = boxes[2].SelectedIndex,
-            AdvAudioKbps = boxes[3].SelectedIndex,
-            AdvAudioChannels = boxes[4].SelectedIndex,
-            AdvMinResolution = boxes[5].SelectedIndex,
-            AdvMinFps = boxes[6].SelectedIndex,
-            AdvEncoderPath = boxes[7].SelectedIndex,
-            AdvCodecLock = boxes[8].SelectedIndex,
+            AdvMode = AdvModeIndex,
+            AdvCrf = boxes[0].SelectedIndex,
+            AdvPreset = boxes[1].SelectedIndex,
+            AdvAudioKbps = boxes[2].SelectedIndex,
+            AdvAudioChannels = boxes[3].SelectedIndex,
+            AdvMinResolution = boxes[4].SelectedIndex,
+            AdvMinFps = boxes[5].SelectedIndex,
+            AdvEncoderPath = AdvEncoderPathIndex,
+            AdvCodecLock = boxes[6].SelectedIndex,
             OutputFolderMode = CmbOutputFolderMode.SelectedIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
@@ -949,11 +978,13 @@ public partial class MainWindow : Window
         _settingsSyncing = _syncing = true;
         try
         {
+            AdvModeIndex = settings.AdvMode;
+            AdvEncoderPathIndex = settings.AdvEncoderPath;
             var indices = new[]
             {
-                settings.AdvMode, settings.AdvCrf, settings.AdvPreset, settings.AdvAudioKbps,
+                settings.AdvCrf, settings.AdvPreset, settings.AdvAudioKbps,
                 settings.AdvAudioChannels, settings.AdvMinResolution, settings.AdvMinFps,
-                settings.AdvEncoderPath, settings.AdvCodecLock
+                settings.AdvCodecLock
             };
             var boxes = AdvBoxes();
             for (var i = 0; i < boxes.Length; i++)
@@ -1104,9 +1135,6 @@ public partial class MainWindow : Window
     {
         var automatic = Say("main.plan.automatic");
 
-        CmbAdvMode.ItemsSource = new[] { automatic, Say("main.advanced.mode.crf"), Say("main.advanced.mode.two-pass") };
-        CmbAdvMode.SelectedIndex = 0;
-
         CmbAdvCrf.ItemsSource = new[] { automatic }.Concat(AdvancedCrfCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
         CmbAdvCrf.SelectedIndex = 0;
 
@@ -1128,9 +1156,6 @@ public partial class MainWindow : Window
         CmbAdvMinFps.ItemsSource = new[] { automatic }.Concat(AdvancedMinFpsCandidates.Select(c => c.ToString("0.##", CultureInfo.InvariantCulture))).ToList();
         CmbAdvMinFps.SelectedIndex = 0;
 
-        CmbAdvEncoderPath.ItemsSource = new[] { automatic, Say("main.advanced.encoder-path.software"), Say("main.advanced.encoder-path.hardware") };
-        CmbAdvEncoderPath.SelectedIndex = 0;
-
         CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.KnownCodecs.OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
         CmbAdvCodecLock.SelectedIndex = 0;
     }
@@ -1138,20 +1163,11 @@ public partial class MainWindow : Window
     /// <summary>Dil değişince "Otomatik" ve enum etiketleri yeniden kurulur, seçim korunur.</summary>
     private void RefreshAdvancedTexts()
     {
-        var indices = new[]
-        {
-            CmbAdvMode.SelectedIndex, CmbAdvCrf.SelectedIndex, CmbAdvPreset.SelectedIndex,
-            CmbAdvAudioKbps.SelectedIndex, CmbAdvAudioChannels.SelectedIndex, CmbAdvMinResolution.SelectedIndex,
-            CmbAdvMinFps.SelectedIndex, CmbAdvEncoderPath.SelectedIndex, CmbAdvCodecLock.SelectedIndex
-        };
+        var boxes = AdvBoxes();
+        var indices = boxes.Select(box => box.SelectedIndex).ToArray();
         var wasSyncing = _syncing;
         _syncing = true;
         InitializeAdvancedUi();
-        var boxes = new SelectingItemsControl[]
-        {
-            CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-            CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
-        };
         for (var i = 0; i < boxes.Length; i++)
             if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
         _syncing = wasSyncing;
@@ -1290,8 +1306,10 @@ public partial class MainWindow : Window
         };
         TxtFrameSummary.Text = FrameBody.IsVisible ? "" : string.Join(" · ", frame);
 
-        var advanced = new SelectingItemsControl[] { CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvEncoderPath, CmbAdvCodecLock }
-            .Count(box => box.SelectedIndex > 0);
+        var advanced = new SelectingItemsControl[] { CmbAdvCrf, CmbAdvPreset, CmbAdvCodecLock }
+            .Count(box => box.SelectedIndex > 0)
+            + (AdvModeIndex > 0 ? 1 : 0)
+            + (AdvEncoderPathIndex > 0 ? 1 : 0);
         TxtAdvancedSummary.Text = AdvancedBody.IsVisible
             ? ""
             : advanced == 0 ? Say("main.section.advanced.none") : Say("main.section.advanced.overrides", advanced);
@@ -1305,8 +1323,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void ApplyAdvancedOptions(PlanOptions options)
     {
-        if (AdvancedText(CmbAdvMode) is { } modeText)
-            options.LockedMode = CmbAdvMode.SelectedIndex == 1 ? EncodeMode.Crf : EncodeMode.TwoPass;
+        if (AdvModeIndex > 0)
+            options.LockedMode = AdvModeIndex == 1 ? EncodeMode.Crf : EncodeMode.TwoPass;
 
         if (AdvancedText(CmbAdvCrf) is { } crfText
             && double.TryParse(crfText, NumberStyles.Float, CultureInfo.InvariantCulture, out var crf))
@@ -1335,7 +1353,7 @@ public partial class MainWindow : Window
             && double.TryParse(minFpsText, NumberStyles.Float, CultureInfo.InvariantCulture, out var minFps))
             options.MinFps = minFps;
 
-        options.EncoderPath = CmbAdvEncoderPath.SelectedIndex switch
+        options.EncoderPath = AdvEncoderPathIndex switch
         {
             1 => EncoderPathOverride.Software,
             2 => EncoderPathOverride.Hardware,

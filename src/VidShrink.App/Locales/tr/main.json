@@ -1,6 +1,6 @@
 ﻿{
 
-  "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur: motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur; hedef kutusundaki sayı bu yonga seçiliyken plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin ya da hedefi kendiniz yazın; hedefe dokunduğunuz anda boyut tavanı geri gelir.",
+  "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur.\n• Motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Bu yonga seçiliyken hedef kutusundaki sayı plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.\n• Hedefe dokunduğunuz anda boyut tavanı geri gelir.",
   "main.derivation.size": "Hedef {0} MB",
   "main.derivation.no-cap": "Boyut tavanı yok",
   "main.section.outcome": "Ne çıkacak",

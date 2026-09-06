@@ -144,7 +144,8 @@ public sealed class YongaPlanTests
         Assert.Equal("8", reading.Box);
         Assert.Contains("tavanı yok", reading.Line, StringComparison.OrdinalIgnoreCase);
 
-        Assert.Single(Plans(), plan => !plan.SizeCapped);
+        var uncapped = Plans().Where(plan => !plan.SizeCapped).Select(plan => plan.Chip).ToList();
+        Assert.Equal(new[] { "ChipArchive" }, uncapped);
     }
 
     /// <summary>

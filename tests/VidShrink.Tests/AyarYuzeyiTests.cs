@@ -54,16 +54,73 @@ public sealed class AyarYuzeyiTests
         (string?)box.Attribute(X + "Name") ?? "(adsız)";
 
     /// <summary>
-    /// Biçimlemeye yazılmış seçenekleri olan kutular. Arka koddan doldurulan
-    /// <c>CmbAdv*</c> kutularının gövdesi boştur; onları "sıfır seçenekli" sayıp
-    /// üç eşiğinin altına almak ölçümü yalancı yapardı.
+    /// Arka koddan beslenen kutuların seçenek sayısı. <c>CmbAdv*</c> kutularının
+    /// gövdesi biçimlemede boştur; seçenekleri <c>MainWindow.axaml.cs</c> içindeki
+    /// <c>ItemsSource = new[] { ... }</c> atamasından gelir. Yalnız biçimlemeye bakan
+    /// bir sayaç bu kutuların hiçbirini göremez ve sıfır iddiası yanlış negatif verir —
+    /// tur 1'de tam bu oldu. Atamanın kuyruğunda <c>Concat</c> varsa liste açık uçludur
+    /// (aday dizileri); sayısı bilinmiyor sayılır ve eşiğin dışında kalır.
     /// </summary>
-    private static IReadOnlyList<XElement> SmallBoxes(XElement scope) =>
-        Boxes(scope)
-            .Select(box => (Box: box, Items: box.Elements(Xaml + "ComboBoxItem").Count()))
+    private static readonly Regex CodeFedItems = new(
+        @"(?<name>Cmb\w+)\.ItemsSource\s*=\s*new\[\]\s*\{(?<body>[^;{}]*)\}(?<tail>[^;]*);",
+        RegexOptions.Compiled | RegexOptions.Singleline);
+
+    private static IReadOnlyDictionary<string, int> CodeFedCounts()
+    {
+        var code = File.ReadAllText(TipSources.WindowCodePath);
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (Match match in CodeFedItems.Matches(code))
+        {
+            if (match.Groups["tail"].Value.Contains("Concat", StringComparison.Ordinal)) continue;
+
+            var body = match.Groups["body"].Value;
+            var depth = 0;
+            var items = 1;
+            foreach (var ch in body)
+            {
+                if (ch is '(' or '[') depth++;
+                else if (ch is ')' or ']') depth--;
+                else if (ch == ',' && depth == 0) items++;
+            }
+
+            if (string.IsNullOrWhiteSpace(body)) items = 0;
+            counts[match.Groups["name"].Value] = items;
+        }
+
+        return counts;
+    }
+
+    /// <summary>
+    /// Seçenek sayısı bilinen ve üçü aşmayan açılır listeler. Seçenekler iki yerden
+    /// gelebilir: biçimlemedeki <c>ComboBoxItem</c> çocukları ya da arka koddaki
+    /// <c>ItemsSource</c> ataması. İkisi de yoksa kutu sayıma girmez.
+    /// </summary>
+    private static IReadOnlyList<XElement> SmallBoxes(XElement scope)
+    {
+        var fromCode = CodeFedCounts();
+
+        return Boxes(scope)
+            .Select(box => (Box: box, Items: OptionCount(box, fromCode)))
             .Where(entry => entry.Items is > 0 and <= 3)
             .Select(entry => entry.Box)
             .ToList();
+    }
+
+    private static int OptionCount(XElement box, IReadOnlyDictionary<string, int> fromCode)
+    {
+        var markup = box.Elements(Xaml + "ComboBoxItem").Count();
+        if (markup > 0) return markup;
+        return fromCode.TryGetValue(Name(box), out var coded) ? coded : 0;
+    }
+
+    /// <summary>Sayacın arka kod kolu ölü değil: bu kapsamda kaç kutuyu koddan çözdü.</summary>
+    private static int CodeFedBoxCount(XElement scope)
+    {
+        var fromCode = CodeFedCounts();
+        return Boxes(scope).Count(box =>
+            box.Elements(Xaml + "ComboBoxItem").Count() == 0 && fromCode.ContainsKey(Name(box)));
+    }
 
     private static IReadOnlyList<XElement> StretchedBoxes(XElement scope) =>
         Boxes(scope)
@@ -78,11 +135,17 @@ public sealed class AyarYuzeyiTests
     [Fact]
     public void KucultSekmesindeUcVeAzSecenekliAcilirListeKalmadi()
     {
-        var small = SmallBoxes(ShrinkTab());
+        var tab = ShrinkTab();
+        var small = SmallBoxes(tab);
         var elsewhere = SmallBoxes(Document()).Count;
+        var codeFed = CodeFedBoxCount(tab);
 
         Assert.True(elsewhere > 0, "Tarayıcı belgenin hiçbir yerinde küçük kutu bulamadı; süzgeç ölü.");
+        Assert.True(
+            codeFed > 0,
+            "Sayacın arka kod kolu Küçült sekmesinde tek bir kutu çözemedi; kol ölü ve sıfır sessizce doğru görünürdü.");
         _output.WriteLine($"Belgenin tamamında {elsewhere} küçük kutu var (olumlu denetim).");
+        _output.WriteLine($"Küçült sekmesinde seçenekleri arka koddan çözülen {codeFed} kutu var (olumlu denetim).");
 
         Assert.True(
             small.Count == 0,

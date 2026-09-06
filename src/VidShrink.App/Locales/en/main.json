@@ -1,6 +1,6 @@
 ﻿{
 
-  "main.chip.archive.tip": "• The archive chip has no size ceiling: the engine spends bits up to visually lossless quality and stops there; the number in the target box does not build the plan while this chip is on.\n• The file does get smaller, but how much smaller is decided by the source, not by you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure or set the target yourself; touching the target brings the size ceiling back.",
+  "main.chip.archive.tip": "• The archive chip has no size ceiling.\n• The engine spends bits up to visually lossless quality and stops there.\n• While this chip is on, the number in the target box does not build the plan.\n• The file does get smaller, but the source decides how much, not you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.\n• Touching the target brings the size ceiling back.",
   "main.derivation.size": "Target {0} MB",
   "main.derivation.no-cap": "No size ceiling",
   "main.section.outcome": "What comes out",

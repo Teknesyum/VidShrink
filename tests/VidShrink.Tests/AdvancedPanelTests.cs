@@ -108,14 +108,14 @@ public sealed class AdvancedPanelTests
     /// </summary>
     private static void ApplyMaximalAdvancedSelection(MainWindow window)
     {
-        FindCombo(window, "CmbAdvMode").SelectedIndex = 2; // İki geçiş — CRF onu geçersiz kılacak (ModeSupersededByCrf)
+        window.AdvModeIndex = 2; // İki geçiş — CRF onu geçersiz kılacak (ModeSupersededByCrf)
         FindCombo(window, "CmbAdvCrf").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedCrfCandidates, 30); // CrfOverride
         FindCombo(window, "CmbAdvPreset").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedPresetCandidates, "faster"); // PresetOverride (libx264 icin gecerli)
         FindCombo(window, "CmbAdvAudioKbps").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedAudioKbpsCandidates, 96); // AudioBitrateOverride
         FindCombo(window, "CmbAdvAudioChannels").SelectedIndex = 2; // Mono — AudioChannelsOverride
         FindCombo(window, "CmbAdvMinResolution").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedMinResolutionCandidates, 1080); // MinResolutionOverride
         FindCombo(window, "CmbAdvMinFps").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedMinFpsCandidates, 48.0); // MinFpsOverride
-        FindCombo(window, "CmbAdvEncoderPath").SelectedIndex = 2; // Donanım — kodek kilidiyle çakışıp SupersededByCodec üretir
+        window.AdvEncoderPathIndex = 2; // Donanım — kodek kilidiyle çakışıp SupersededByCodec üretir
         FindCombo(window, "CmbAdvCodecLock").SelectedIndex = 1 + FfmpegArguments.KnownCodecs
             .OrderBy(c => c, StringComparer.OrdinalIgnoreCase).ToList().IndexOf("libx264");
     }
@@ -358,17 +358,17 @@ public sealed class AdvancedPanelTests
         });
     }
 
-    /// <summary>K4: dokuz kalemin her biri gerçekten var, "Otomatik" varsayılan ve motorun
-    /// seçtiği değeri bir hint satırında gösteriyor.</summary>
+    /// <summary>K4: açılır liste kalan yedi kalemin her biri gerçekten var, "Otomatik"
+    /// varsayılan ve motorun seçtiği değeri bir hint satırında gösteriyor. Şeride dönen
+    /// iki kalem <see cref="ModeAndEncoderPathAreThreeSegmentStripsThatStillShowWhatTheEngineChose"/>
+    /// içinde denetleniyor.</summary>
     [Theory]
-    [InlineData("CmbAdvMode", "TxtAdvModeNow")]
     [InlineData("CmbAdvCrf", "TxtAdvCrfNow")]
     [InlineData("CmbAdvPreset", "TxtAdvPresetNow")]
     [InlineData("CmbAdvAudioKbps", "TxtAdvAudioKbpsNow")]
     [InlineData("CmbAdvAudioChannels", "TxtAdvAudioChannelsNow")]
     [InlineData("CmbAdvMinResolution", "TxtAdvMinResolutionNow")]
     [InlineData("CmbAdvMinFps", "TxtAdvMinFpsNow")]
-    [InlineData("CmbAdvEncoderPath", "TxtAdvEncoderPathNow")]
     [InlineData("CmbAdvCodecLock", "TxtAdvCodecLockNow")]
     public void EachAdvancedControlDefaultsToAutomaticAndShowsWhatTheEngineChose(string comboName, string hintName)
     {
@@ -389,22 +389,64 @@ public sealed class AdvancedPanelTests
         });
     }
 
+    /// <summary>
+    /// T177: mod ve kodlayıcı yolu artık açılır liste değil üç bölmeli şerit. Kalem
+    /// sayısı değişmedi; iki kalemin bileşeni değişti, o yüzden varsayılan ve "şu an"
+    /// satırı denetimi ayrı bir olguda sürüyor.
+    /// </summary>
+    [Fact]
+    public void ModeAndEncoderPathAreThreeSegmentStripsThatStillShowWhatTheEngineChose()
+    {
+        Fresh(window =>
+        {
+            window.UseTurkish();
+            window.LoadWithoutProbing(SamplePath, Sample());
+            window.SettleFades();
+            window.RecalculateForTest();
+            LayOutAt(window, DesignSize());
+
+            Xunit.Assert.Equal(6, window.AdvStripToggles().Length);
+            Xunit.Assert.Equal(0, window.AdvModeIndex);
+            Xunit.Assert.Equal(0, window.AdvEncoderPathIndex);
+
+            foreach (var hintName in new[] { "TxtAdvModeNow", "TxtAdvEncoderPathNow" })
+            {
+                var hint = window.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == hintName);
+                Xunit.Assert.False(string.IsNullOrWhiteSpace(hint.Text), $"{hintName} motorun seçtiği değeri göstermiyor.");
+            }
+
+            window.AdvModeIndex = 2;
+            window.AdvEncoderPathIndex = 1;
+            Xunit.Assert.Equal(2, window.AdvModeIndex);
+            Xunit.Assert.Equal(1, window.AdvEncoderPathIndex);
+            return true;
+        });
+    }
+
     /// <summary>K4: dokuz kalemin tamamı bu sayımdadır — liste elle özetlenmiyor.</summary>
     [Fact]
     public void ThereAreExactlyNineAdvancedControls()
     {
-        var names = new[]
+        var boxes = new[]
         {
-            "CmbAdvMode", "CmbAdvCrf", "CmbAdvPreset", "CmbAdvAudioKbps", "CmbAdvAudioChannels",
-            "CmbAdvMinResolution", "CmbAdvMinFps", "CmbAdvEncoderPath", "CmbAdvCodecLock"
+            "CmbAdvCrf", "CmbAdvPreset", "CmbAdvAudioKbps", "CmbAdvAudioChannels",
+            "CmbAdvMinResolution", "CmbAdvMinFps", "CmbAdvCodecLock"
         };
-        Xunit.Assert.Equal(9, names.Length);
+        var strips = new[]
+        {
+            new[] { "RbAdvModeAuto", "RbAdvModeCrf", "RbAdvModeTwoPass" },
+            new[] { "RbAdvPathAuto", "RbAdvPathSoftware", "RbAdvPathHardware" }
+        };
+        Xunit.Assert.Equal(9, boxes.Length + strips.Length);
 
         Fresh(window =>
         {
             LayOutAt(window, DesignSize());
-            foreach (var name in names)
+            foreach (var name in boxes)
                 Xunit.Assert.NotNull(window.GetVisualDescendants().OfType<ComboBox>().SingleOrDefault(c => c.Name == name));
+            foreach (var strip in strips)
+                foreach (var name in strip)
+                    Xunit.Assert.NotNull(window.GetVisualDescendants().OfType<RadioButton>().SingleOrDefault(r => r.Name == name));
             return true;
         });
     }

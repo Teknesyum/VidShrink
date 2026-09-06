@@ -519,7 +519,11 @@
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
-                            <ComboBox x:Name="CmbAdvMode" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}" VerticalAlignment="Center">
+                              <RadioButton x:Name="RbAdvModeAuto" GroupName="AdvMode" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
+                              <RadioButton x:Name="RbAdvModeCrf" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.crf}"/>
+                              <RadioButton x:Name="RbAdvModeTwoPass" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.two-pass}"/>
+                            </StackPanel>
                             <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </StackPanel>
                         </Grid>
@@ -540,7 +544,11 @@
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                           <TextBlock Grid.Column="0" Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceMd}">
-                            <ComboBox x:Name="CmbAdvEncoderPath" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}" VerticalAlignment="Center">
+                              <RadioButton x:Name="RbAdvPathAuto" GroupName="AdvEncoderPath" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
+                              <RadioButton x:Name="RbAdvPathSoftware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.software}"/>
+                              <RadioButton x:Name="RbAdvPathHardware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.hardware}"/>
+                            </StackPanel>
                             <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </StackPanel>
                         </Grid>
