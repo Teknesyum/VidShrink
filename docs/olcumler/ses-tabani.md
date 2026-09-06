@@ -20,9 +20,12 @@ Tetikleme siniri (son `AudioDropped=True` hedef -> ilk `AudioDropped=False` hede
 | 5 dk  | 3,0 MB | 3,5 MB | totalK 81,9->95,6 kbit/s |
 | 10 dk | 6,0 MB | 7,0 MB | totalK 81,9->95,6 kbit/s |
 
-Kendi saydim: `grep -c True .calisma/T172/k1-ham.txt` = 44 satir `AudioDropped=True`
-(taranan 4x28=112 satirin 44'unde tetikliyor); tam liste ham dosyada satir satir
-gorulebilir.
+Kendi saydim (duzeltme, tur 3): `awk -F'\t' 'NR>1 && $6=="True"' .calisma/T172/k1-ham.txt | wc -l`
+= **55** satir `AudioDropped=True` (taranan 4x28=112 satirin 55'inde tetikliyor), dakika
+bazinda dagilim `awk -F'\t' 'NR>1 && $6=="True" {c[$1]++} END{for (k in c) print k, c[k]}'`
+ile: 1dk=5, 2dk=11, 5dk=17, 10dk=22 (toplam 5+11+17+22=55). Onceki turda buraya yanlislikla
+44 yazilmisti (`grep -c True` deseni satirin tamamini eslestirmeye calisiyordu, sutun
+bazli degil); esik tablosu (`:16-21`, alttaki) hep dogruydu, yalniz bu ozet cumle yanlisti.
 
 Test amacli secilen 5 kombinasyon (K2/K3'te kullanilan): 1dk/0,3MB, 2dk/0,8MB, 5dk/2MB,
 10dk/5MB (dordu de tetikliyor) ve 10dk/8MB (tetiklemiyor, kontrol grubu).
@@ -90,10 +93,14 @@ dusurmek, container overhead'i yeniden olcmek) bu sozlesmenin olcum butcesinin d
 
 `sessiz-kaynak.mkv` (15s, `hasAudio=False`), hedef 0,4MB. Ham cikti: `.calisma/T172/k4-ham.txt`.
 
+Ham cikti aynen (`.calisma/T172/k4-ham.txt`, duzeltme: onceki surum bu bloku kirpmisti,
+`boyutMB` ve `[deneme 1]` satirini atlamisti):
+
 ```
-[probe] hasAudio=False kanal=0 audioBps=0
-[plan] audioK=0 audioCodec=null notlar=CodecUpgradeRecommended,ExtremeRatioWarning,ResolutionReduced,TargetEnforcedTwoPass
-[encode] basarili=True ciktiMB=0,39
+[probe] sure=15s hasAudio=False kanal=0 audioBps=0 boyutMB=24,73
+[plan] codec=libx264 mode=2pass videoK=214 audioK=0 audioCodec=null kanal=kaynak regime=Extreme notlar=CodecUpgradeRecommended,ExtremeRatioWarning,ResolutionReduced,TargetEnforcedTwoPass
+[encode] basarili=True ciktiMB=0,39 denemeler=1 hata=
+[deneme 1] in band hedefMB=0,384 gercekMB=0,39 videoK=214 mod=2pass
 ```
 
 `notlar` listesinde ses ile ilgili **hicbir** kod yok (kendi saydim: 4 not, hicbiri
@@ -164,25 +171,35 @@ Tur 1'in bakiyesi: PlanCalculator.cs satir 391/545/980/988'de Math.Max(MinVideoB
 duruyordu, K3'un kirmizi bulgusuna cevaben denenmis ama olculmemisti. Bu tur o dort satiri
 oldugu gibi kabul etmedi; once MinVideoBitrateK'in tum kullanim yerleri sayildi.
 
-### MinVideoBitrateK sayimi (K8 on-kosul)
+### MinVideoBitrateK sayimi (K8 on-kosul, tur 3'te duzeltildi)
 
-grep -n MinVideoBitrateK src/VidShrink.Core/PlanCalculator.cs -> tanim + 6 kullanim:
+**Duzeltme (tur 3, denetim KRITIK 1 ve KRITIK 3):** bu bolum onceki turda "tanim + 6
+kullanim" diyordu ve 4 kullanimin (505, 511, 520, 528) "hic tetiklenmedi" oldugunu
+soyleyerek duzeltmiyordu. Gercek diff (`ba705cf`, main'e karsi) **dort** yerde floor
+kaldirmisti: 391, 545, **980, 988** - 980/988 (`Correct()` yeniden-deneme kolu) o turde
+tabloya hic girmemisti. Ayrica 505/511/520/528'in "tetiklenmiyor" iddiasi kendi supurme
+dosyasiyla (`tur2-baseline-sweep-v2.tsv`) yalanlaniyordu: 171 satirin 11'i videoK=48'e
+cakiliydi, notlar sutunu `BudgetExceedsCeiling,FillTwoPassBandTooNarrowForCrf` - tam
+olarak bu dal. Bu tur (K11) 505/511/520/528'i de 391/545/980/988 ile ayni yaklasimla
+(`Math.Max(MinVideoBitrateK, X)` -> `Math.Max(0.0, X)`) duzeltti. Guncel envanter,
+`grep -n MinVideoBitrateK src/VidShrink.Core/PlanCalculator.cs` -> tanim + 2 kullanim:
 
-| satir | baglam | bu turda degisti mi | gerekce |
+| satir | baglam | floor'suz mu | gerekce |
 |---|---|---|---|
 | 159 | private const int MinVideoBitrateK = 48 (tanim) | - | - |
-| 391 | videoK - SearchLayout'a giden ana butce | evet (tur1'de yapilmis, bu turda dogrulandi) | bu deger cozunurluk/fps aramasinin butcesi; floor burada durursa arama gercek butceyi degil, yapay olarak sisirilmis 48k'yi gorup daha buyuk bir duzen seciyor, sonra kodlayici o duzeni bu kadar dusuk bitrate'te tutamiyor |
-| 505 | ceilingVideoK - "butce comert" (CRF tavanina takilan) dalinda son deger | hayir | bu dal budgetCrf<=ceilingCrf && ceilingSizeMb<band.LowerMb sartiyla girilir; K1'in test araligindaki 5 kombinasyonun 5'i de TargetEnforcedTwoPass notuyla diger dala (satir 538) giriyor, bu dal hic tetiklenmedi (asagidaki K8 tablosunun notlar sutunu) |
-| 511 | desiredVideoK - FillPolicy.FillTarget ince ayari, 505'in dalinin icinde | hayir | ayni gerekce - dal tetiklenmedi |
-| 520 | desiredVideoK fill-CRF kolunda son deger | hayir | ayni gerekce |
-| 528 | desiredVideoK fill-iki-pas kolunda son deger | hayir | ayni gerekce |
+| 391 | videoK - SearchLayout'a giden ana butce | evet (tur1) | bu deger cozunurluk/fps aramasinin butcesi; floor burada durursa arama gercek butceyi degil, yapay olarak sisirilmis 48k'yi gorup daha buyuk bir duzen seciyor, sonra kodlayici o duzeni bu kadar dusuk bitrate'te tutamiyor |
+| 505 | ceilingVideoK - "butce comert" (CRF tavanina takilan) dalinda son deger | **evet (tur3, K11)** | K11 supurmesinde bu dal gercekten tetikleniyordu (30-120dk/10-50MB araliginda 11 satir); floor kaldirilinca ayni yaklasimla 0.0'a indirildi |
+| 511 | desiredVideoK - FillPolicy.FillTarget ince ayari, 505'in dalinin icinde | **evet (tur3, K11)** | ayni gerekce |
+| 520 | desiredVideoK fill-CRF kolunda son deger | **evet (tur3, K11)** | ayni gerekce |
+| 528 | desiredVideoK fill-iki-pas kolunda son deger | **evet (tur3, K11)** | ayni gerekce - K11 sweep'inde 11 cakili satirin tumu bu kola (`FillTwoPassBandTooNarrowForCrf`) giriyordu |
 | 545 | videoK - TargetEnforcedTwoPass dalinin son videoK'si | evet (tur1) | bu tam olarak K1-K3'un dustugu dal; 391'deki gercek butce burada da uygulanmazsa arama dogru duzeni secse bile son atama yapay 48'e zaplanirdi |
 | 625 | LockedCrf (elle CRF sabitleme) dalinda tahmini videoK | hayir | sozlesmenin "elle gecersiz kilma kollari degismez" siniri (T165 alani) - kullanici CRF'i sabitledikten sonra hedef boyut zaten zorlanmiyor, plan.VideoBitrateK yalniz bir goruntu tahmini |
 | 868 | QualityFloorTargetMb - kalite-hedefli mod (TargetMbForQuality) icin taban MB hesabi | hayir | ayri bir ozellik (kalite hedefi girilen mod), K1-K3'un test ettigi boyut-hedefli mod degil |
+| 980/988 | `Correct()` yeniden-deneme kolu: `videoBudgetK` ve `corrected.VideoBitrateK` | evet (tur1'de yapilmis, tur2 denetiminde saklanmis, tur3'te envantere eklendi) | K8'in bes kosumunun **besi de 2. denemede** basarili oldu (asagidaki K8 tablosu) ve o denemelerin videoK'lari **14/26/26/40/78** - dordu 48'in altinda; bu kol 48'e cakili kalsaydi 2. deneme de hedefi asardi |
 
-Kendi saydim: 6 kullanimin 2'si (391, 545) bu turda floor'suz; 4'u (505, 511, 520, 528) ayni
-"butce comert" dalinda ve K1'in test araliginda hic tetiklenmedi; 1'i (625) elle-CRF override,
-sinirlarin disinda; 1'i (868) farkli bir ozellik (kalite-hedef modu).
+Kendi saydim: 2 kullanim (159 tanim disinda) floor tasiyor (625, 868 - her ikisi de bu
+sozlesmenin kapsami disinda, yukarida gerekceli); geri kalan tum butce-hesabi kollari
+(391, 505, 511, 520, 528, 545, 980, 988 - **8 yer**) artik floor'suz.
 
 Asil is cozunurluk/fps secimi sorusuna cevap: floor'u 391'de kaldirmak SearchLayout'un gercek
 (0'a kadar inebilen) butceyi gormesini sagliyor; arama bu butceye gore daha kucuk cozunurluk/
@@ -219,6 +236,15 @@ tur2-10dk-8.mp4:  codec_type=audio codec_name=aac channels=1
 bakiyeye biraktigi kirmizi, SearchLayout'un gercek butceyle calismasi (floor kaldirma, satir
 391/545) sonucu duzeldi.
 
+**Duzeltme (tur 3, denetim KRITIK 1):** yukaridaki tablonun "(->N)" oklari K8 ham
+ciktisindaki (`.calisma/T172/tur2-k8-ham.txt`) `[deneme 2]` satirlarindan geliyor ve
+gercekte `PlanCalculator.cs:988` `Correct()` yeniden-deneme kolundan gecer - onceki tur
+bu kolu envanterde hic saymamis ve duzeltmeyi tumuyle 391/545'e yazmisti. Kendi saydim:
+5 kombinasyonun **5'i de 2. denemede** basarili oldu (`denemeler=2`) ve o denemelerin
+videoK'lari sirasiyla **14, 26, 26, 40, 78** - dordu (14/26/26/40) 48'in altinda. Eski
+`MinVideoBitrateK` floor'u 988'de dursaydi bu 2. deneme de 48'e cakilir, hedefi asar,
+K8'in "5/5 basarili" sonucu tutmazdi.
+
 K4 (sessiz kaynak) bu turda da dogrulandi: .calisma/T172/tur2-k4-ham.txt - sessiz-kaynak.mkv,
 hedef 0,4MB, audioK=0 audioCodec=null, notlarda Audio* kod yok (4 not, hicbiri Audio* degil),
 basarili=True, ciktiMB=0,39. ffprobe (.calisma/T172/tur2-k4-ffprobe.txt): sadece
@@ -228,7 +254,7 @@ codec_type=video - ses akisi yok, beklenen, degismedi.
 
 | kombinasyon | hedef MB | ESKI (AudioDropped var): gercek MB / basari / ses | TUR 1 (AudioDropped yok, floor 48 sabit): gercek MB / basari / ses | TUR 2 (floor 391/545'te kaldirildi): gercek MB / basari / ses |
 |---|---|---|---|---|
-| 1dk/0,3MB  | 0,3 | 0,342 / basarili / ses YOK | 0,547 / basarisiz / - (dosya yok) | 0,29 / basarili / ses VAR (aac, mono) |
+| 1dk/0,3MB  | 0,3 | 0,342 / **basarisiz** / - (dosya yok, duzeltme: `.calisma/T172/eski-k2k3.txt` ilk blok "no file was written" diyor, onceki surum bu hucreye yanlislikla "basarili/ses YOK" yazmisti) | 0,547 / basarisiz / - (dosya yok) | 0,29 / basarili / ses VAR (aac, mono) |
 | 2dk/0,8MB  | 0,8 | 0,762 / basarili / ses YOK | 1,105 / basarisiz / - (dosya yok) | 0,771 / basarili / ses VAR (aac, mono) |
 | 5dk/2MB    | 2   | 1,95  / basarili / ses YOK | 2,787 / basarisiz / - (dosya yok) | 1,927 / basarili / ses VAR (aac, mono) |
 | 10dk/5MB   | 5   | 4,962 / basarili / ses YOK | 5,587 / basarisiz / - (dosya yok) | 4,855 / basarili / ses VAR (aac, mono) |
@@ -287,3 +313,121 @@ EncodeRunner.cs, ConversionArguments.cs, FfmpegArguments.cs okunuyor, yazilmadi 
 guvenlik agi (satir 549-568) zaten owns icindeki PlanCalculator.cs'de, disariya cikilmadi.
 LockedCrf/LockedAudioKbps/AudioChannels elle-gecersiz-kilma kollari (satir 625 dahil)
 degismedi. Mutasyonlar .calisma/T172/ disina yazilmadi, .calisma/kaynak/ okunuyor, yazilmadi.
+
+## Tur 3 - K11/K12/K13/K14 (denetimin 4 kritik bulgusu kapatildi)
+
+Tur 2 denetimi KALDI dedi (9 bulgu, 4 kritik) - motor dogruydu, belge kendi ham
+verisiyle 4 yerde celisiyordu ve biri (KRITIK 3) duzeltilmemis bir kusuru "olculdu,
+temiz" diye kapatiyordu. Bu tur o kusuru gercekten kapatti (K11), 20-120dk araligini
+gercek kodlamayla dogruladi (K12), duzeltmeyi pimleyen bir olcu ekledi (K13) ve
+yukaridaki K1/K3/K4/envanter/kok-neden duzeltmeleriyle belgeyi kendi verisiyle uyumlu
+hale getirdi (K14).
+
+### K11 - `505/511/520/528` dalindaki floor kapatildi
+
+`src/VidShrink.Core/PlanCalculator.cs` satir 505, 511, 520, 528'deki
+`Math.Max(..., MinVideoBitrateK)` -> `Math.Max(..., 0.0)` (391/545/980/988 icin tur1/tur2'de
+kullanilan ayni yaklasim). Supurme yeniden kosuldu (`.calisma/T172/analiz/Program.cs`,
+9 sure x 19 hedef = 171 satir), once/sonra:
+
+| | ONCE (`.calisma/T172/tur2-baseline-sweep-v2.tsv`) | SONRA (`.calisma/T172/tur3-after-sweep.tsv`) |
+|---|---|---|
+| toplam satir | 171 | 171 |
+| videoK=48'e cakili | **11** | **0** |
+| hedefi asan (fark_MB>0) | 62 | 51 |
+
+Kendi saydim (python `csv.DictReader` ile her iki dosyayi ayristirdim, `videoK==48` ve
+`fark_MB>0` satirlarini tek tek listeledim): ONCE'deki 11 cakili satirin tumu ayni zamanda
+hedefi asan 62'nin icinde (30-120dk, 10-50MB araliginda, en fazla +%55: 120dk/40MB
+tahmini=62,109 fark=+22,109). SONRA'da cakili satir **kalmadi** (0/171) - floor'a
+carpan hicbir satir yok, gerekce yazacak bir satir da yok.
+
+Kalan 51 asan satirin **tamami** `videoK=0` ve tek notu `BudgetBelowCeilingTwoPass` -
+bunlar K11'in kapsami disinda, tur1'de kabul edilen ses-tabani odul: hedef, ses icin
+ayrilan 24 kbps taban + konteyner payindan bile kucuk (ornegin 60dk/0,5MB -> totalK~1,1,
+audioK zaten 24 dahil), videoK 0'a inse bile ses payi tek basina hedefi asiyor. Bu,
+"ses her zaman olmali" karari geregi kabul edilen bir odun (ses tabani video butcesinden
+once garanti ediliyor); K11'in duzelttigi "video floor'a cakilma" kusuruyla ayni degil ve
+30dk/12MB, 30dk/15MB gibi K11'in asagidaki (`tur2-baseline-sweep-v2.tsv`) 11 cakili
+satirinin tumu SONRA'da bu 51'in disinda.
+
+Ornek satirlar (once -> sonra, ayni sure/hedef):
+
+```
+30dk  10MB  ONCE videoK=48 tahmini=15,527 fark=+5,527   SONRA videoK=21 tahmini=9,704  fark=-0,296
+60dk  15MB  ONCE videoK=48 tahmini=31,054 fark=+16,054  SONRA videoK=10 tahmini=14,665 fark=-0,335
+120dk 40MB  ONCE videoK=48 tahmini=62,109 fark=+22,109  SONRA videoK=21 tahmini=38,818 fark=-1,182
+```
+
+### K12 - 20-120dk araligi gercek `EncodeRunner` ile dogrulandi
+
+`.calisma/T172/kaynak-ses/kaynak-{30,60,120}dk.mp4`'ten oran korunarak (sure/hedef
+orani ayni kalacak sekilde) 180 saniyelik kesitler alindi (`.calisma/T172/kosum/tur3-*-kesit.mp4`,
+`ffmpeg -ss 0 -t 180 -c copy`) ve gercek `EncodeRunner` (`.calisma/T172/calistir/Program.cs`,
+K8'in de kullandigi ayni harness) ile kosuldu:
+
+| kombinasyon (gercek) | kesit/hedef (orani korunmus) | plan | basarili | gercekMB | hedefi asti mi | ffprobe ses |
+|---|---|---|---|---|---|---|
+| 30dk/10MB | 180s/1,0MB | videoK=21(->18) audioK=24 mono, notlar: FrameRateCutForFloor,TargetEnforcedTwoPass | Evet (2 deneme) | 0,984 | Hayir | codec_type=audio codec_name=aac channels=1 |
+| 60dk/15MB | 180s/0,75MB | videoK=9(->7) audioK=24 mono, notlar: TargetBelowCodecFloor,TargetEnforcedTwoPass | Evet (2 deneme) | 0,729 | Hayir | codec_type=audio codec_name=aac channels=1 |
+| 120dk/40MB | 180s/1,0MB | videoK=21(->18) audioK=24 mono, notlar: FrameRateCutForFloor,TargetEnforcedTwoPass | Evet (2 deneme) | 0,984 | Hayir | codec_type=audio codec_name=aac channels=1 |
+
+Ham cikti: `.calisma/T172/tur3-k12-30dk.txt`, `tur3-k12-60dk.txt`, `tur3-k12-120dk.txt`,
+ffprobe: `.calisma/T172/tur3-k12-ffprobe.txt`. Kendi saydim: 3 kosumun 3'unde de dosya
+uretildi, 3'unde de ses akisi var, 3'unde de gercekMB hedefin altinda.
+
+**Durustce bildiriyorum:** bu 3 gercek kosum, K11'in duzelttigi `505/511/520/528`
+("butce comert" / CRF tavanina takilan) dalina degil, `TargetEnforcedTwoPass` dalina
+(satir 545, tur1'de zaten duzeltilmisti) girdi - gercek test icerigi bu bitrate
+araliginda transparanlik tavanina degil once dogrudan iki-pasa dusuyor. K11'in ozel
+dalinin kendisi (505/511/520/528), sadece analiz-tabanli 171 satirlik supurmede (yukarida)
+sayisal olarak dogrulandi; K12 gercek kodlamada bu spesifik dali tetiklemedi, ama
+sozlesmenin K12 CHECK'i (dosya var, ffprobe'da ses var, hedefi asmiyor) 3 kosumun
+3'unde de karsilandi.
+
+### K13 - Floor kaldirmayi pimleyen olcu eklendi
+
+`tests/VidShrink.Tests/SesTabaniTests.cs`'e `K11_BuceTavanaCakiliKalanDalHedefiAsmaz`
+eklendi: 30dk/10MB icin `result.Estimate.ExpectedMb <= 10.5` bekliyor (floor donerse
+tahmini ~15,5 MB'a cikiyor). Mutasyon: 505/511/520/528'deki `Math.Max(..., 0.0)` ->
+`Math.Max(..., MinVideoBitrateK)` geri koyuldu (`dotnet build -c Release --no-incremental`
+sonrasi), test kosuldu, `git checkout --` ile geri alindi (`git diff HEAD --stat` sadece
+`SesTabaniTests.cs`i gosterdi, `PlanCalculator.cs` temiz).
+
+Ham cikti (`.calisma/T172/tur3-k13-mutasyon.txt`):
+
+```
+[xUnit.net]     VidShrink.Tests.SesTabaniTests.K11_BuceTavanaCakiliKalanDalHedefiAsmaz [FAIL]
+Hata Iletisi: tahminiMB=15,527 hedefi asti (30dk/10MB) - MinVideoBitrateK florou
+505/511/520/528'e geri donduyse videoK 48'e cakilir ve tahmini ~15,5 MB'a cikar
+Basarisiz! - Basarisiz: 1, Basarili: 122, Toplam: 123
+```
+
+Mutasyondan once 123/123 yesildi; mutasyonla tam olcunun kendisi kirildi, baska hicbir
+olcu etkilenmedi.
+
+### K14 - Belge duzeltmeleri (bu tur)
+
+| duzeltilen | eski deger | yeni deger | ham dosya |
+|---|---|---|---|
+| K1 sayimi | 44 | **55** (1dk=5, 2dk=11, 5dk=17, 10dk=22) | `.calisma/T172/k1-ham.txt` |
+| Envanter (MinVideoBitrateK kullanimlari) | "6 kullanim, 2'si floor'suz" | tanim + 2 kalan floor (625, 868), **8 yer floor'suz** (391,505,511,520,528,545,980,988) | `git show ba705cf`, K11 diff'i, kod satirlari |
+| Kok neden anlatisi | yalniz 391/545 | + `Correct()` yeniden-deneme kolu (988): 5/5 kosum 2. denemede basarili, videoK 14/26/26/40/78 | `.calisma/T172/tur2-k8-ham.txt` |
+| K3 tablosu ESKI hucresi (1dk/0,3MB) | "basarili / ses YOK" | **basarisiz / dosya yok** | `.calisma/T172/eski-k2k3.txt` (ilk blok) |
+| K4 ham blogu | kirpilmis (3 satir) | aynen (4 satir, `boyutMB` ve `[deneme 1]` dahil) | `.calisma/T172/k4-ham.txt` |
+| "505/511/520/528 tetiklenmiyor" iddiasi | dogru degildi | K11'de duzeltildi, envanterde isaretli | `.calisma/T172/tur2-baseline-sweep-v2.tsv` |
+| 5 bos TSV (`tur2-mut-505*.tsv`, `tur2-fix-511-520-528.tsv`, `tur2-k8ek-fixed-sweep.tsv`) | kanit gibi duruyordu, baseline ile bayt bayt ayniydi | **silindi** (`.calisma/T172/` icinden) | - |
+
+### Borclar (gizlenmedi, tasindi)
+
+1. **`ManualOverrideTests.cs:62-67` yorumu ve `K1_VarsayilanT165OncesiMotorlaBirebirAyni`
+   test adi hala yanıltici** (tur2 denetim borc bulgusu 4): yorum "beklenen degerler
+   uydurulmadi, 9b092e9 agacinda ayni bes bilesim kosuldu" diyor ama dorduncu InlineData
+   satiri artik T172 sonrasi motordan geliyor (K9'da guncellendi); test adi da "T165
+   Oncesi Motorla Birebir Ayni" diyor, artik dogru degil. `ManualOverrideTests.cs`
+   `owns` icinde ama bu sozlesmenin K maddeleri bu ismi/yorumu kapsamiyor - duzeltmedim,
+   bildiriyorum, takip gerekir.
+2. K12'nin 3 gercek kosumu K11'in ozel dalini (505/511/520/528) degil, tur1'de zaten
+   duzeltilmis olan `TargetEnforcedTwoPass` (545) dalini tetikledi - K11'in kendisi
+   yalniz analiz-tabanli 171 satirlik supurmede sayisal olarak dogrulandi, gercek
+   kodlamada degil. Yukarida (K12) acikca yazildi, saklanmadi.
