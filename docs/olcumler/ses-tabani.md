@@ -1,4 +1,4 @@
-# T172 - Ses tabani: AudioDropped kolu kaldirildi
+﻿# T172 - Ses tabani: AudioDropped kolu kaldirildi
 
 Dal: `T172-ses-tabani`. Motor karari: kaynakta ses varsa ciktida da ses olmali;
 `audioK < 16 && totalK < 96` kosulu ses akisini tamamen dusuren yolu artik **kaldirilmis**
@@ -283,3 +283,135 @@ testi bu turun PlanCalculatorTests|SesTabaniTests|ManualOverrideTests kosumunun
 (122 test) icinde yesil; ayri mutasyon kosumu bu turda tekrarlanmadi cunku K8'in kendi
 degisikligi (391/545) mutasyon testinin hedefledigi 24kbps tabanini etkilemiyor -
 taban hala Math.Max(24, audioK) (PlanCalculator.cs, K8'in disinda kalan satir).
+
+
+## Tur 2 - K8/K9/K10 (devralinan floor duzeltmesi olculdu)
+
+Tur 1'in bakiyesi: PlanCalculator.cs satir 391/545/980/988'de Math.Max(MinVideoBitrateK, ...)
+-> Math.Max(0.0, ...) (ve satir 988'de Math.Max(0, ...)) mutasyonu commit'lenmemis halde
+duruyordu, K3'un kirmizi bulgusuna cevaben denenmis ama olculmemisti. Bu tur o dort satiri
+oldugu gibi kabul etmedi; once MinVideoBitrateK'in tum kullanim yerleri sayildi.
+
+### MinVideoBitrateK sayimi (K8 on-kosul)
+
+grep -n MinVideoBitrateK src/VidShrink.Core/PlanCalculator.cs -> tanim + 6 kullanim:
+
+| satir | baglam | bu turda degisti mi | gerekce |
+|---|---|---|---|
+| 159 | private const int MinVideoBitrateK = 48 (tanim) | - | - |
+| 391 | videoK - SearchLayout'a giden ana butce | evet (tur1'de yapilmis, bu turda dogrulandi) | bu deger cozunurluk/fps aramasinin butcesi; floor burada durursa arama gercek butceyi degil, yapay olarak sisirilmis 48k'yi gorup daha buyuk bir duzen seciyor, sonra kodlayici o duzeni bu kadar dusuk bitrate'te tutamiyor |
+| 505 | ceilingVideoK - "butce comert" (CRF tavanina takilan) dalinda son deger | hayir | bu dal budgetCrf<=ceilingCrf && ceilingSizeMb<band.LowerMb sartiyla girilir; K1'in test araligindaki 5 kombinasyonun 5'i de TargetEnforcedTwoPass notuyla diger dala (satir 538) giriyor, bu dal hic tetiklenmedi (asagidaki K8 tablosunun notlar sutunu) |
+| 511 | desiredVideoK - FillPolicy.FillTarget ince ayari, 505'in dalinin icinde | hayir | ayni gerekce - dal tetiklenmedi |
+| 520 | desiredVideoK fill-CRF kolunda son deger | hayir | ayni gerekce |
+| 528 | desiredVideoK fill-iki-pas kolunda son deger | hayir | ayni gerekce |
+| 545 | videoK - TargetEnforcedTwoPass dalinin son videoK'si | evet (tur1) | bu tam olarak K1-K3'un dustugu dal; 391'deki gercek butce burada da uygulanmazsa arama dogru duzeni secse bile son atama yapay 48'e zaplanirdi |
+| 625 | LockedCrf (elle CRF sabitleme) dalinda tahmini videoK | hayir | sozlesmenin "elle gecersiz kilma kollari degismez" siniri (T165 alani) - kullanici CRF'i sabitledikten sonra hedef boyut zaten zorlanmiyor, plan.VideoBitrateK yalniz bir goruntu tahmini |
+| 868 | QualityFloorTargetMb - kalite-hedefli mod (TargetMbForQuality) icin taban MB hesabi | hayir | ayri bir ozellik (kalite hedefi girilen mod), K1-K3'un test ettigi boyut-hedefli mod degil |
+
+Kendi saydim: 6 kullanimin 2'si (391, 545) bu turda floor'suz; 4'u (505, 511, 520, 528) ayni
+"butce comert" dalinda ve K1'in test araliginda hic tetiklenmedi; 1'i (625) elle-CRF override,
+sinirlarin disinda; 1'i (868) farkli bir ozellik (kalite-hedef modu).
+
+Asil is cozunurluk/fps secimi sorusuna cevap: floor'u 391'de kaldirmak SearchLayout'un gercek
+(0'a kadar inebilen) butceyi gormesini sagliyor; arama bu butceye gore daha kucuk cozunurluk/
+kare hizi seciyor (asagidaki K8 tablosunda TargetBelowCodecFloor notu 4/5 kombinasyonda
+goruluyor - bu, best.MeetsFloor=false demek, yani secilen duzen kod motorunun "anlamli goruntu"
+esiginin altinda, ama teslimat basarili ve hedefi asmiyor). Floor'u 0'a indirmek "48'e cakmamak"
+degil, "videoK'yi olceklendirmenin dogru butceyle yapilmasini saglamak" oldu; alt satirda zaten
+var olan guvenlik agi (satir 549-568, deliverK kontrolu) liftedMb hedefi asarsa videoK'yi 48'e
+zorlamiyor, TargetBelowCodecFloor notuyla oldugu gibi birakiyor.
+
+### K8 - Bes kombinasyonun besi de dosya/ses/hedef sartini karsiliyor mu
+
+.calisma/T172/kaynak-ses/ kaynaklariyla, floor duzeltmesi build'e alinmis halde, ayni 5
+kombinasyon gercek EncodeRunner ile kosuldu. Ham cikti: .calisma/T172/tur2-k8-ham.txt.
+
+| kombinasyon | hedef MB | plan (videoK/audioK/notlar) | basarili mi | gercek MB | hedefi asti mi |
+|---|---|---|---|---|---|
+| 1dk/0,3MB  | 0,3 | videoK=16(->14) audioK=24 mono, notlar iceriyor: TargetBelowCodecFloor | Evet (2 deneme) | 0,29 | Hayir |
+| 2dk/0,8MB  | 0,8 | videoK=29(->26) audioK=24 mono, notlar iceriyor: TargetBelowCodecFloor | Evet (2 deneme) | 0,771 | Hayir |
+| 5dk/2MB    | 2   | videoK=29(->26) audioK=24 mono, notlar iceriyor: TargetBelowCodecFloor | Evet (2 deneme) | 1,927 | Hayir |
+| 10dk/5MB   | 5   | videoK=43(->40) audioK=24 mono, notlar iceriyor: TargetBelowCodecFloor | Evet (2 deneme) | 4,855 | Hayir |
+| 10dk/8MB   | 8   | videoK=83(->78) audioK=24 mono, (floor notu yok, kontrol grubu) | Evet (2 deneme) | 7,712 | Hayir |
+
+Kendi saydim: 5 kombinasyonun 5'i de basarili dosya teslim etti, 5'i de hedefi asmadi. ffprobe
+ile dogrulanan ses akisi (ham: .calisma/T172/tur2-k8-ffprobe.txt):
+
+tur2-1dk-03.mp4:  codec_type=audio codec_name=aac channels=1
+tur2-2dk-08.mp4:  codec_type=audio codec_name=aac channels=1
+tur2-5dk-2.mp4:   codec_type=audio codec_name=aac channels=1
+tur2-10dk-5.mp4:  codec_type=audio codec_name=aac channels=1
+tur2-10dk-8.mp4:  codec_type=audio codec_name=aac channels=1
+
+5 dosyanin 5'inde de ses akisi var. K8 ve K3 (hedef hala tutuyor) bu turda YESIL - tur1'in
+bakiyeye biraktigi kirmizi, SearchLayout'un gercek butceyle calismasi (floor kaldirma, satir
+391/545) sonucu duzeldi.
+
+K4 (sessiz kaynak) bu turda da dogrulandi: .calisma/T172/tur2-k4-ham.txt - sessiz-kaynak.mkv,
+hedef 0,4MB, audioK=0 audioCodec=null, notlarda Audio* kod yok (4 not, hicbiri Audio* degil),
+basarili=True, ciktiMB=0,39. ffprobe (.calisma/T172/tur2-k4-ffprobe.txt): sadece
+codec_type=video - ses akisi yok, beklenen, degismedi.
+
+### K3 - uc sutunlu ozet (ESKI / TUR 1 / TUR 2)
+
+| kombinasyon | hedef MB | ESKI (AudioDropped var): gercek MB / basari / ses | TUR 1 (AudioDropped yok, floor 48 sabit): gercek MB / basari / ses | TUR 2 (floor 391/545'te kaldirildi): gercek MB / basari / ses |
+|---|---|---|---|---|
+| 1dk/0,3MB  | 0,3 | 0,342 / basarili / ses YOK | 0,547 / basarisiz / - (dosya yok) | 0,29 / basarili / ses VAR (aac, mono) |
+| 2dk/0,8MB  | 0,8 | 0,762 / basarili / ses YOK | 1,105 / basarisiz / - (dosya yok) | 0,771 / basarili / ses VAR (aac, mono) |
+| 5dk/2MB    | 2   | 1,95  / basarili / ses YOK | 2,787 / basarisiz / - (dosya yok) | 1,927 / basarili / ses VAR (aac, mono) |
+| 10dk/5MB   | 5   | 4,962 / basarili / ses YOK | 5,587 / basarisiz / - (dosya yok) | 4,855 / basarili / ses VAR (aac, mono) |
+| 10dk/8MB   | 8   | 7,71  / basarili / ses VAR (aac, mono) | 7,71  / basarili / ses VAR (aac, mono) | 7,712 / basarili / ses VAR (aac, mono) |
+
+Kendi saydim: TUR 1 sutununda 5 kombinasyonun 4'unde basarisizlik (dosya yok); TUR 2 sutununda
+5 kombinasyonun 5'inde basari, hedefin altinda, ses akisiyla. K3 tur1'in biraktigi kirmizidan
+bu turda yesile gecti.
+
+### K9 - ManualOverrideTests golden guncellemesi
+
+ManualOverrideTests.K1_VarsayilanT165OncesiMotorlaBirebirAyni teorisinin 5 satirindan biri
+(1920x1080@30, 600s, 6MB hedef) tur1'in K3 bulgusunda kirmizi kalmisti (dosya owns disinda
+kaldigi icin tur1 duzeltmedi, bildirdi). Bu tur bu gorevin metninde acikca kapsama alinan
+tests/VidShrink.Tests/ManualOverrideTests.cs dosyasindaki satirin golden degeri guncellendi:
+
+- eski beklenti (9b092e9/T165-oncesi): libsvtav1|2pass|80k|crf=-|690x388@30|ses 0k/kaynak|preset 6
+- yeni dogru davranis (T172): libsvtav1|2pass|56k|crf=-|614x346@15|ses 24k/1|preset 6
+
+Degisen davranis tek satirla: ses artik otomatik dusurulmedigi (24k mono) icin video butcesi
+kuculdu, arama daha kucuk cozunurluk (690x388->614x346) ve daha dusuk kare hizi (30->15) secti
+- bu, T172'nin motor kararinin (ses her zaman var, video butcesinden dusulur) dogrudan sonucu,
+kod geriye sarilmadi. InlineData satiri: tests/VidShrink.Tests/ManualOverrideTests.cs:73.
+
+### K10 - Nihai verify (uc kol, sifir bulan yok)
+
+--list-tests ile dogrulandi:
+
+| verify filtresi | test sayisi | ham |
+|---|---|---|
+| PlanCalculatorTests\|SesTabaniTests\|ManualOverrideTests | 122 | .calisma/T172/tur2-k7-liste1.txt |
+| OluUyeTests\|LanguageTests | 66 | .calisma/T172/tur2-k7-liste2.txt |
+
+Calistirma sonucu:
+
+- PlanCalculatorTests|SesTabaniTests|ManualOverrideTests: 122/122 yesil (tur1'de 121/122'ydi,
+  K9'daki golden guncellemesiyle 122/122'ye cikti). Ham: .calisma/T172/tur2-final-verify1.txt.
+- OluUyeTests|LanguageTests: 66/66 yesil, K5 sayimlari degismedi (uye: 162, pimlenen: 37 -
+  .calisma/T172/tur2-k5-detay.txt). Ham: .calisma/T172/tur2-final-verify2.txt.
+
+### K6 - mutasyon izgarasi (tur 2'de yeniden kosuldu)
+
+Ayni iki mutasyon, git checkout -- ile geri alinip her defasinda dotnet build -c Release
+--no-incremental ile derlendi:
+
+| mutasyon | ham cikti | kirilan olcu |
+|---|---|---|
+| (a) 24 kbps tabani -> 0 (Math.Max(24, audioK) -> Math.Max(0, audioK)) | .calisma/T172/tur2-k6-mutasyonA.txt | SesTabaniTests filtresinde 13 testten 1'i FAIL: K6_SesTabaniYirmiDortKbpsAltinaDusmez ("audioK=8, taban 24 olmali") |
+| (b) dusurme kolu geri (if (audioK < 16 && totalK < 96) return (0, null); eklendi - AdviceCode.AudioDropped K5'te silindigi icin not eklenmeden) | .calisma/T172/tur2-k6-mutasyonB.txt | SesTabaniTests filtresinde 13 testten 10'u FAIL |
+
+Her iki mutasyon da beklenen olculeri kirdi, tur1'deki sonuclarla tutarli.
+
+### Sinir ihlali yok (tur 2)
+
+EncodeRunner.cs, ConversionArguments.cs, FfmpegArguments.cs okunuyor, yazilmadi - mevcut
+guvenlik agi (satir 549-568) zaten owns icindeki PlanCalculator.cs'de, disariya cikilmadi.
+LockedCrf/LockedAudioKbps/AudioChannels elle-gecersiz-kilma kollari (satir 625 dahil)
+degismedi. Mutasyonlar .calisma/T172/ disina yazilmadi, .calisma/kaynak/ okunuyor, yazilmadi.
