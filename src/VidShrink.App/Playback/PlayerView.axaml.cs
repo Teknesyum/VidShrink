@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -117,6 +118,15 @@ internal partial class PlayerView : UserControl
         }
 
         RefreshState();
+        Echo(_trace.Count > 0 ? _trace[^1] : "");
+    }
+
+    internal static void Echo(string line)
+    {
+        var path = Environment.GetEnvironmentVariable("VIDSHRINK_T176_TRACE");
+        if (string.IsNullOrEmpty(path) || line.Length == 0) return;
+        try { File.AppendAllText(path, line + Environment.NewLine); }
+        catch (IOException) { }
     }
 
     internal void FeedWheel(double notches, PlayerModifiers modifiers)
