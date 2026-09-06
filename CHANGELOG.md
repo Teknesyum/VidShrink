@@ -5,6 +5,73 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.3.0] - 2026-09-06
+
+The engine stopped guessing. Where 0.2.x picked constants that looked reasonable, this
+release measures the source and lets the measurement decide - and where a decision still
+cannot be measured, it now says so instead of pretending.
+
+### Added
+
+- **A player tab.** The window plays the source itself, through a decoder pipe that stays
+  open between seeks instead of launching ffmpeg for every scrub. Wheel steps one second,
+  Ctrl ten, Shift sixty, Ctrl+Shift five minutes; Alt+wheel zooms; right-click and space
+  toggle playback; middle-click toggles full screen and returns the window to where it
+  was. The context menu carries the same three actions.
+- **Shrink from the shell.** The installer adds "Shrink with VidShrink" to the right-click
+  menu, with a submenu of quick target sizes. The request is consumed by the running
+  instance through a single queue, so several files selected together arrive as several
+  jobs rather than one truncated argument.
+- **Manual override on every engine decision.** A deliberate user can take the mode, the
+  CRF, the preset and the audio bitrate away from the engine. Each override is recorded
+  with what the engine would have chosen, so the plan panel shows both numbers.
+- **Codec lock.** Picking a codec no longer drags the rest of the plan with it - the user
+  chooses the codec, the engine keeps the decisions that depend on measurement.
+- **An advanced-settings section and a reasons overlay** on the preview panel, so the
+  numbers behind a plan are reachable without leaving the tab.
+- **The settings tab is populated** and remembers the advanced choices across restarts.
+- **Scene-aware bit allocation.** The scene map is built from the source and drives the
+  per-scene bit budget in production, not only in the measurement harness.
+
+### Changed
+
+- **Quality is measured, not assumed.** The plan reads a measured quality score for the
+  candidate settings instead of the hand-picked constants that stood in for it. The
+  sampling loop that produces the score samples on scene boundaries rather than a fixed
+  two-second grid.
+- **Hardware encoders are tested, not trusted.** Selection used to accept an encoder
+  because ffmpeg listed it. It now probes it, moves to the next candidate when the probe
+  fails, and never labels an untested candidate as unusable on this machine.
+- **"Could not measure" reaches the user.** The probe used to answer yes or no; a failed
+  measurement collapsed into "no encoder". The third answer now survives the whole chain
+  and the screen says which of the three it is.
+- **The first pass of a two-pass run is a real turbo pass.** It used to run at the same
+  preset as the final pass, so the analysis cost as much as the encode.
+- **GOP length and the CRF ceiling follow the content** instead of sitting at fixed
+  values, and the peak-rate ceiling and the psy/AQ flags carry the values that were
+  measured rather than the ones that were guessed.
+- **Audio is never dropped.** No target, however tight, silences the track any more; the
+  audio floor was removed and the video bitrate carries the shortfall.
+- **Encoding success is no longer just an exit code.** ffmpeg returns 0 while silently
+  dropping a parameter it did not understand; the run is now checked against what was
+  actually applied.
+
+### Fixed
+
+- **A failed probe locked the Start button permanently** and swallowed the exception.
+- **The preview restarted from the beginning** whenever playback was paused and resumed,
+  even though no setting had changed.
+- **A maximized preview panel did not shrink** when the user clicked outside it.
+- **A shrink request from the shell lost its target size** on the way into the engine.
+- **Frame-rate reduction shifted the output's duration.**
+- **Text that no locale key reached** - embedded strings, English keys and sample errors
+  that came out Turkish in an English window - is bound and translated. The title-case
+  rule no longer rewrites body sentences: a sentence stays as the locale file wrote it.
+- **Three tests were red on CI for six pushes.** The chip scan started from a name that a
+  later commit moved above it, six tooltip lines overflowed onto a single orphan word,
+  and the audio-video drift measure ran against a sound device that does not exist on a
+  CI runner - measuring the raw video timestamp against a clock stuck at zero.
+
 ## [0.2.5] - 2026-08-30
 
 ### Added
