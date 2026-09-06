@@ -72,6 +72,17 @@ public sealed class SesTabaniTests
     }
 
     [Fact]
+    public void K11_BuceTavanaCakiliKalanDalHedefiAsmaz()
+    {
+        var info = Info(1800);
+        var options = new PlanOptions { TargetMb = 10, Intent = Intent.Sharing, Codec = CodecPreference.Compatible };
+
+        var result = PlanCalculator.BuildDetailed(info, options, null);
+
+        Assert.True(result.Estimate.ExpectedMb <= 10.5, $"tahminiMB={result.Estimate.ExpectedMb:0.###} hedefi asti (30dk/10MB) - MinVideoBitrateK florou 505/511/520/528'e geri donduyse videoK 48'e cakilir ve tahmini ~15,5 MB'a cikar");
+    }
+
+    [Fact]
     public void K5_AudioDroppedArtikUretilmiyor()
     {
         var codes = Enum.GetNames(typeof(AdviceCode));
