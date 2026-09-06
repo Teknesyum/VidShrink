@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 using VidShrink.App;
 using VidShrink.Core;
@@ -44,14 +44,13 @@ public sealed class QualityHintTests
     public void EverySevenChipsCarryATooltipPanelAndAreListedInTheCode()
     {
         var xaml = File.ReadAllText(TipSources.WindowXamlPath);
-        var start = xaml.IndexOf("x:Name=\"ChipWhatsApp\"", StringComparison.Ordinal);
-        var end = xaml.IndexOf("</WrapPanel>", start, StringComparison.Ordinal);
+        var anchor = xaml.IndexOf("x:Name=\"ChipWhatsApp\"", StringComparison.Ordinal);
+        var start = anchor < 0 ? -1 : xaml.LastIndexOf("<WrapPanel", anchor, StringComparison.Ordinal);
+        var end = start < 0 ? -1 : xaml.IndexOf("</WrapPanel>", start, StringComparison.Ordinal);
         Assert.True(start >= 0 && end > start, "Hedef yongalarının WrapPanel'i bulunamadı.");
 
         var block = xaml[start..end];
-        var chips = Regex.Matches(block, "x:Name=\"(Chip\\w+)\"").Select(match => match.Groups[1].Value).ToList();
-        chips.Insert(0, "ChipWhatsApp");
-        chips = chips.Distinct().ToList();
+        var chips = Regex.Matches(block, "x:Name=\"(Chip\\w+)\"").Select(match => match.Groups[1].Value).Distinct().ToList();
 
         Assert.Equal(
             new[] { "ChipWhatsApp", "Chip8", "Chip25", "Chip100", "Chip128", "Chip180", "ChipHalf" }.Order(),

@@ -1,4 +1,4 @@
-{
+﻿{
   "main.language.name": "English",
 
   "main.tagline.lead": "Target size media compression",
@@ -82,7 +82,7 @@
   "main.intent.social": "Social media",
 
   "main.codec.label": "Compression algorithm",
-  "main.codec.tip": "• H.264 is universal: every phone made in the last fifteen years plays it, and WhatsApp never re-encodes it.\n• H.265 needs roughly a third fewer bits for the same picture, so it wins badly compressed targets — but some older Android phones and some web players refuse it.\n• Automatic picks H.264 for mild targets and H.265 once the target is tight enough that the quality gain outweighs the compatibility risk.\n• Speed is not chosen here: turn on fast shrink (GPU) below to let the graphics card encode.",
+  "main.codec.tip": "• H.264 is universal: every phone from the last fifteen years plays it, and WhatsApp never re-encodes it.\n• H.265 needs roughly a third fewer bits for the same picture, so it wins badly compressed targets — but some older Android phones and some web players refuse it.\n• Automatic picks H.264 for mild targets and H.265 once the target is tight enough that the quality gain outweighs the compatibility risk.\n• Speed is not chosen here: turn on fast shrink (GPU) below to let the graphics card encode.",
   "main.codec.automatic": "Automatic",
   "main.codec.compatible": "H.264 (compatible)",
   "main.codec.smallest": "H.265 (smallest)",
@@ -166,7 +166,7 @@
   "main.output.current-size": "Current output size",
   "main.output.remaining": "Remaining",
   "main.output.estimated-time": "Estimated time",
-  "main.output.estimated-time.tip": "• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.\n• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.\n• When the plan moves to settings the samples were not encoded with, the time is left blank instead of guessed.",
+  "main.output.estimated-time.tip": "• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table.\n• Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured.\n• If the plan moves to settings the samples were not encoded with, the time is left blank, not guessed.",
   "main.output.estimated-output": "Estimated output",
   "main.output.estimated-output.tip": "• Before planning, VidShrink encodes short samples of this clip at two resolutions and measures how many bits it needs — it does not guess from the source bitrate.\n• That is why the estimate is a measured number with a narrow range rather than a rule of thumb.\n• Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see.",
   "main.output.waiting": "Waiting for your decision",
@@ -211,7 +211,7 @@
   "main.convert.container": "Container",
   "main.convert.container.tip": "• The container is the file type.\n• MP4 is the safest general choice and the only one WhatsApp reliably sends as a playable video — every phone opens it.\n• MKV supports many stream types but WhatsApp and most phone galleries treat it as a document.\n• WebM is for browsers and is not a phone format.\n• MOV suits Apple workflows and plays on iPhone, but Android support is uneven.\n• AVI is for older software only.\n• MP3, M4A, and WAV create audio-only files.",
   "main.convert.video-codec": "Video codec",
-  "main.convert.video-codec.tip": "• H.264 plays on nearly every device made and is what WhatsApp expects; pick it when the file must just work.\n• H.265 makes files a third smaller at the same picture; phones since 2016 decode it in hardware.\n• But older handsets, some smart TVs, and several web players will not open it, and WhatsApp may re-encode it.\n• VP9 is a browser and WebM format; phones play it in apps but rarely in the gallery.\n• AV1 compresses best and is the slowest to encode, and only recent phones decode it.\n• Copy keeps the original video untouched — no quality loss, no waiting — whenever the container accepts it.",
+  "main.convert.video-codec.tip": "• H.264 plays on nearly every device and is what WhatsApp expects; pick it when the file must just work.\n• H.265 makes files a third smaller at the same picture; phones since 2016 decode it in hardware.\n• But older handsets, some smart TVs, and several web players will not open it, and WhatsApp may re-encode it.\n• VP9 is a browser and WebM format; phones play it in apps but rarely in the gallery.\n• AV1 compresses best and is the slowest to encode, and only recent phones decode it.\n• Copy keeps the original video untouched — no quality loss, no waiting — if the container accepts it.",
   "main.convert.quality-mode": "Quality mode",
   "main.convert.quality-mode.tip": "• CRF targets visual quality, so final size can vary.\n• Fixed bitrate targets a data rate, so size is predictable.\n• Use CRF for normal viewing quality and fixed bitrate when size or bandwidth matters more.",
   "main.convert.fixed-bitrate": "Fixed bitrate",
