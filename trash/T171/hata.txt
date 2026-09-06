@@ -1,0 +1,8 @@
+Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.
+   at VidShrink.App.ShrinkJobWindow..ctor(ShellShrinkStartup startup, ShrinkRequestQueue queue) in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T171\src\VidShrink.App\ShrinkJobWindow.axaml.cs:line 103
+   at VidShrink.App.App.OnFrameworkInitializationCompleted() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T171\src\VidShrink.App\App.axaml.cs:line 45
+   at Avalonia.AppBuilder.SetupUnsafe()
+   at Avalonia.AppBuilder.Setup()
+   at Avalonia.AppBuilder.SetupWithLifetime(IApplicationLifetime lifetime)
+   at Avalonia.ClassicDesktopStyleApplicationLifetimeExtensions.StartWithClassicDesktopLifetime(AppBuilder builder, String[] args, Action`1 lifetimeBuilder)
+   at VidShrink.App.Program.Main(String[] args) in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T171\src\VidShrink.App\Program.cs:line 68
