@@ -72,7 +72,7 @@ public sealed class SesTabaniTests
     }
 
     [Fact]
-    public void K11_BuceTavanaCakiliKalanDalHedefiAsmaz()
+    public void K11_UzunKaynaktaKucukHedefVideoBitrateFloorunaCakilmiyor()
     {
         var info = Info(1800);
         var options = new PlanOptions { TargetMb = 10, Intent = Intent.Sharing, Codec = CodecPreference.Compatible };
@@ -80,6 +80,49 @@ public sealed class SesTabaniTests
         var result = PlanCalculator.BuildDetailed(info, options, null);
 
         Assert.True(result.Estimate.ExpectedMb <= 10.5, $"tahminiMB={result.Estimate.ExpectedMb:0.###} hedefi asti (30dk/10MB) - MinVideoBitrateK florou 505/511/520/528'e geri donduyse videoK 48'e cakilir ve tahmini ~15,5 MB'a cikar");
+    }
+
+    public static IEnumerable<object[]> VideoKSifirBandi => new[]
+    {
+        new object[] { 300.0, 0.5 },
+        new object[] { 600.0, 1.5 },
+        new object[] { 1200.0, 3.0 },
+        new object[] { 1800.0, 5.0 },
+        new object[] { 3600.0, 10.0 },
+        new object[] { 5400.0, 15.0 },
+        new object[] { 7200.0, 20.0 }
+    };
+
+    [Theory]
+    [MemberData(nameof(VideoKSifirBandi))]
+    public void K17_SesTabaniButceyiYediginde_VideoBitrateKodlayiciTabaninaYukselir(double durationSeconds, double targetMb)
+    {
+        var info = Info(durationSeconds);
+        var options = new PlanOptions { TargetMb = targetMb, Intent = Intent.Sharing, Codec = CodecPreference.Compatible };
+
+        var result = PlanCalculator.BuildDetailed(info, options, null);
+        var plan = result.Plan;
+        var runnableK = PlanCalculator.RunnableVideoBitrateK(plan.Width, plan.Height, plan.Fps);
+
+        Assert.Equal(EncodeMode.TwoPass, plan.ModeEnum);
+        Assert.True(plan.VideoBitrateK >= runnableK,
+            $"sure={durationSeconds}s target={targetMb}MB: videoK={plan.VideoBitrateK}, kodlayicinin actigi taban {runnableK}k ({plan.Width}x{plan.Height}@{plan.Fps:0.##}). videoK=0 iki geciste 'CRF/CQP is incompatible with 2pass' verip sifir baytlik dosya birakiyor.");
+        Assert.Contains(AdviceCode.TargetBelowCodecFloor, result.Advice.Notes);
+    }
+
+    [Fact]
+    public void K17_YenidenDenemeSifirdaCakilmiyor()
+    {
+        var info = Info(3600);
+        var options = new PlanOptions { TargetMb = 10, Intent = Intent.Sharing, Codec = CodecPreference.Compatible };
+        var plan = PlanCalculator.BuildDetailed(info, options, null).Plan;
+        var runnableK = PlanCalculator.RunnableVideoBitrateK(plan.Width, plan.Height, plan.Fps);
+
+        var once = PlanCalculator.Correct(plan, 30.0, 10, info.DurationSeconds);
+        var sonra = PlanCalculator.Correct(once, 30.0, 10, info.DurationSeconds);
+
+        Assert.True(once.VideoBitrateK >= runnableK, $"1. duzeltme videoK={once.VideoBitrateK}, taban {runnableK}k");
+        Assert.True(sonra.VideoBitrateK >= runnableK, $"2. duzeltme videoK={sonra.VideoBitrateK}, taban {runnableK}k - Correct() 0 sabit noktasina duserse ffmpeg hic acilmaz");
     }
 
     [Fact]
