@@ -388,7 +388,7 @@ public static class PlanCalculator
             }
         }
 
-        var videoK = Math.Max(MinVideoBitrateK, totalK * ContainerOverhead - audioK - DeliveryReserveK(codec));
+        var videoK = Math.Max(0.0, totalK * ContainerOverhead - audioK - DeliveryReserveK(codec));
 
         var effective = new PlanOptions
         {
@@ -542,7 +542,7 @@ public static class PlanCalculator
             reasonCodes.Add(new ReasonNote(ReasonCode.BudgetBelowCeilingTwoPass, BudgetCrf: budgetCrf, Crf: ceilingCrf, TargetMb: effectiveTargetMb));
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "2pass";
-            plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK, MinVideoBitrateK));
+            plan.VideoBitrateK = (int)Math.Round(Math.Max(videoK, 0.0));
             AddHardwareYieldNote(codec, complexity, best, reason, reasonCodes);
         }
 
@@ -977,7 +977,7 @@ public static class PlanCalculator
         var aimedVideoMb = Math.Max(aimMb - audioMb, 0.01);
         var factor = aimedVideoMb / deliveredVideoMb;
         var requestedVideoMb = aimedVideoMb / (efficiency ?? 1.0);
-        var videoBudgetK = Math.Max(MinVideoBitrateK, requestedVideoMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1));
+        var videoBudgetK = Math.Max(0.0, requestedVideoMb * KbitPerMib * ContainerOverhead / Math.Max(durationSeconds, 0.1));
         var aimSource = efficiency is double e
             ? $"aimed at the {aimMb:0.0} MB band center and divided by the {e:0.###} encoder yield measured on the previous attempt"
             : $"aimed at {aimMb:0.0} MB, the band center held back by the +{TwoPassUncertainty * 100:0.#}% two-pass spread because no encoder yield was measured yet";
@@ -985,7 +985,7 @@ public static class PlanCalculator
         corrected.Mode = "2pass";
         corrected.Crf = null;
         corrected.BitrateBias = HardwareDeliveryBias(efficiency);
-        corrected.VideoBitrateK = Math.Max(MinVideoBitrateK, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
+        corrected.VideoBitrateK = Math.Max(0, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
 
         corrected.Reason = fillUnderBand
             ? $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.LowerMb:0.0} MB lower edge of the fill band for a {targetMb:0.##} MB target; video bitrate was scaled by {factor:0.###} and {aimSource}"
