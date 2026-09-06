@@ -4,7 +4,7 @@ Tur 1 ve tur 2. Bütün sayılar `.calisma/T176/` altındaki ham dosyalardan gel
 dosya adı yazılı. Ölçülmeyen yere "ölçülmedi" yazıldı.
 
 Girdi haritası kullanıcının cümlesinin dökümüdür. **Tablodaki dokuz satır değiştirilmedi.**
-Tablonun dışında iki klavye tuşu eklendi (`PlayerInputMap.cs:80-86`): `Apps` bağlam menüsünü
+Tablonun dışında iki klavye tuşu eklendi (`PlayerInputMap.cs:88-94`): `Apps` bağlam menüsünü
 açar (K5'in seçtiği ikinci yol), `Escape` tam ekrandan çıkar. İkisi de haritadaki bir satırın
 anlamını değiştirmiyor, ona ek geliyor. Tur 1 raporu "değiştirilmedi, eklenmedi" diyordu;
 bu cümle yanlıştı ve Escape'ten hiç söz etmiyordu.
@@ -41,7 +41,7 @@ Kapalı programdan açılan gerçek `VidShrink.App.exe`, imleç pencerenin ortas
 Windows'un girdi yığınına gönderildi. Uygulamanın kendi yazdığı ham iz:
 
 ```
-startup tab=5 header=Oynatıcı
+startup-tab=5|header=Oynatıcı
 seek 1 -> 1
 seek 10 -> 11
 seek 60 -> 20
@@ -52,10 +52,11 @@ play -> False
 fullscreen -> True
 fullscreen -> False
 none
+menu
 ```
 
-Gönderilen on jest, izdeki on satır: tekerlek, ctrl, shift, ctrl+shift, alt, sağ tık,
-boşluk, orta tık, ikinci orta tık, sol tık. Kaybolan jest yok. `seek 60` ve `seek 300`
+Gönderilen on bir jest, izdeki on bir satır: tekerlek, ctrl, shift, ctrl+shift, alt, sağ tık,
+boşluk, orta tık, ikinci orta tık, sol tık, menu tuşu (Apps). Kaybolan jest yok. `seek 60` ve `seek 300`
 20 saniyede duruyor çünkü ölçüm klibi 20 saniye — bu kırpma, kaybolma değil.
 
 ### Sekme — `.calisma/T176/k1-sekme.txt`
@@ -66,7 +67,7 @@ oynatıcı 5. sırada; başlık her iki dilde de pencerenin kendi dilinden okund
 
 ## K2 — Alt + tekerlek gerçekten bize geliyor mu
 
-**Geliyor.** Windows 11 Pro 10.0.26100, Win32 pencere, uygulama ön planda, imleç
+**Geliyor.** Windows 11 Pro 10.0.22631, Win32 pencere, uygulama ön planda, imleç
 pencerenin ortasında: ALT basılıyken gönderilen tekerlek çentiği uygulamaya ulaştı ve
 `zoom 1 -> 1,24` satırını yazdırdı (`.calisma/T176/k1-pencere-yoneticisi.txt`).
 
@@ -146,7 +147,7 @@ menu izi: menu
 
 Kapalı programdan koşum (`.calisma/T176/k1-pencere-yoneticisi.txt`): `VidShrink.App.exe`
 tek argümanla (dosya yolu) başlatıldı, açılan pencerenin ilk yazdığı satır
-`startup tab=5 header=Oynatıcı`. Yani kabuk yolundan gelen dosya oynatıcı sekmesini açıyor.
+`startup-tab=5|header=Oynatıcı`. Yani kabuk yolundan gelen dosya oynatıcı sekmesini açıyor.
 
 Süreç içi koşum aynı yolu ayrıca ölçüyor:
 
@@ -330,8 +331,8 @@ decoded; it may be damaged, or this ffmpeg build does not know the format. ...'
 İki değişiklik:
 
 1. `PlayerView.Echo` artık `Conditional("DEBUG")` niteliği taşıyor. Aynı derleme
-   birimindeki bütün çağrı yerleri Release derlemesinde kayboluyor; `VIDSHRINK_T176_TRACE`
-   yolu ürün ikilisinde yok.
+   birimindeki bütün çağrı yerleri Release derlemesinde kayboluyor; çağrı yerleri Release'te
+   derlenmiyor, `VIDSHRINK_T176_TRACE` yolu asla koşulmuyor.
 2. `PlayerView.OpenedMenu` kaldırıldı — yalnız testin okuduğu ölü alandı. K5 ölçüsü artık
    `Trace`'in son satırına bakıyor.
 
@@ -500,3 +501,13 @@ Yedi tane; `OynaticiGirdiTests` kolunun 7 → 14 farkı bu yedi:
 - Menü satırlarının fare ile tıklanması: ölçü `Click` yönlendirilmiş olayını kaldırıyor,
   gerçek fare tıklaması değil. Menünün açık hâli ekran görüntüsüyle var (K17), ama
   görüntüdeki bir satıra fareyle tıklama ölçülmedi.
+
+## Bilinen sınır — 150 ms tavanı
+
+`OnHizliTikGercekBoruyaKarsiBirikirVeAramalarSinirdaKalir` içindeki 150 ms tavanı bir
+türetilmiş sabit değil, `docs/olcumler/oynatici-boru.md`'deki bir cümleden geliyor.
+Yapıcı koşumu 32.1/51.2 ms, denetçi koşumu aynı makinede 77.2/110.4 ms ölçtü — aynı pim,
+aynı makinede iki kat fark. `docs/olcumler/oynatici-boru.md:347` T175'in kendi ölçümünde bu
+metriğin gerçek kaynaklarda 170-822 ms olduğunu söylüyor. Bu turun assert'i tek bir 20
+saniyelik sessiz sentetik klibe dayanıyor; daha yavaş bir makinede ya da gerçek bir
+kaynakla kırmızıya dönebilir.
