@@ -1019,4 +1019,104 @@ public sealed class LanguageTests : IDisposable
         foreach (var node in window.GetVisualDescendants().OfType<Visual>())
             node.RenderTransform = null;
     }
+
+    /// <summary>
+    /// Baslik kurali govde cumlesine uygulanmaz: cumle isareti tasiyan metin dil dosyasinda
+    /// yazildigi gibi kalir, yalniz satir basi buyur. Basliklarda kelime kelime buyutme surer.
+    /// </summary>
+    [Theory]
+    [InlineData("tr", "Arayüz dilini değiştirir ve bir sonraki açılışta hatırlanır.")]
+    [InlineData("tr", "Sabit klasör her çıktıyı kaynağın yanı yerine hep aynı yere gönderir.")]
+    [InlineData("tr", "Bir dosya yükleyin; motorun verdiği her karar burada madde madde listelenir.")]
+    [InlineData("en", "Changes the interface language and is remembered next time.")]
+    [InlineData("en", "Load a file and every decision the engine makes is listed here.")]
+    public void GovdeCumlesiKelimeKelimeBuyutulmez(string language, string sentence)
+    {
+        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
+
+        Assert.True(LanguageCatalog.ReadsAsProse(sentence));
+        Assert.Equal(sentence, LanguageCatalog.Title(sentence, turkish));
+    }
+
+    [Theory]
+    [InlineData("tr", "doldurma politikası", "Doldurma Politikası")]
+    [InlineData("tr", "ses hedefi (kbps)", "Ses Hedefi (kbps)")]
+    [InlineData("en", "fill policy", "Fill Policy")]
+    public void BaslikKelimeKelimeBuyutulmeyeDevamEder(string language, string heading, string expected)
+    {
+        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
+
+        Assert.False(LanguageCatalog.ReadsAsProse(heading));
+        Assert.Equal(expected, LanguageCatalog.Title(heading, turkish));
+    }
+
+    /// <summary>
+    /// Nokta her zaman cumle isareti degil: <c>H.264</c> ve <c>storage.to</c> bir sozcugun
+    /// icinde durur, olcu bunlari govde saymamali.
+    /// </summary>
+    [Theory]
+    [InlineData("H.264")]
+    [InlineData("storage.to")]
+    [InlineData("1280x720")]
+    public void SozcukIcindekiNoktaGovdeSaymaz(string text) => Assert.False(LanguageCatalog.ReadsAsProse(text));
+
+    /// <summary>
+    /// Her iki dil dosyasindaki cumle isaretli her deger icin: satir basindaki sozcuk
+    /// disinda **hicbir sozcuk degismemeli**. Satir basi Names/Verbatim kurallarina tabi
+    /// oldugu icin (ffmpeg -> FFmpeg, storage.to -> storage.to) olcu onu disarida birakiyor;
+    /// tuttugu sey kelime kelime buyutmenin govdeye geri gelmemesi. Sayi ekranda: kac deger
+    /// govde sayildi, kac sozcuk karsilastirildi.
+    /// </summary>
+    [Theory]
+    [InlineData("tr")]
+    [InlineData("en")]
+    public void DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(string language)
+    {
+        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
+
+        var prose = Locales.Values(language)
+            .Where(pair => LanguageCatalog.ReadsAsProse(pair.Value))
+            .ToList();
+
+        Assert.NotEmpty(prose);
+
+        var bozulan = new List<string>();
+        var karsilastirilan = 0;
+
+        foreach (var (key, value) in prose)
+        {
+            var shown = LanguageCatalog.Title(value, turkish);
+
+            foreach (var (kaynak, ekran) in value.Split('\n').Zip(shown.Split('\n')))
+            {
+                var kaynakSozcukler = kaynak.Split(' ');
+                var ekranSozcukler = ekran.Split(' ');
+
+                if (kaynakSozcukler.Length != ekranSozcukler.Length)
+                {
+                    bozulan.Add($"{key}: sozcuk sayisi degisti");
+                    continue;
+                }
+
+                var basAtlandi = false;
+                for (var i = 0; i < kaynakSozcukler.Length; i++)
+                {
+                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetter))
+                    {
+                        basAtlandi = true;
+                        continue;
+                    }
+
+                    karsilastirilan++;
+                    if (!string.Equals(kaynakSozcukler[i], ekranSozcukler[i], StringComparison.Ordinal))
+                        bozulan.Add($"{key}: '{kaynakSozcukler[i]}' -> '{ekranSozcukler[i]}'");
+                }
+            }
+        }
+
+        Assert.True(karsilastirilan > 1000, $"Karsilastirilan sozcuk sayisi cok dusuk: {karsilastirilan}");
+        Assert.True(bozulan.Count == 0,
+            $"Dil '{language}': {prose.Count} govde degeri, {karsilastirilan} sozcuk; "
+            + $"{bozulan.Count} sozcuk bozuldu:\n" + string.Join("\n", bozulan));
+    }
 }

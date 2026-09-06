@@ -93,16 +93,59 @@ internal static class LanguageCatalog
         };
 
     /// <summary>
+    /// Başlık kuralı yalnız başlıklara uygulanır. Cümle işareti (<c>.</c> <c>;</c> <c>!</c>
+    /// <c>?</c>) taşıyan metin gövdedir: yalnız satır başındaki harf büyütülür, gerisi dil
+    /// dosyasında yazıldığı gibi kalır. Başlık kolunda ise:
     /// Capitalises the first letter of every word. Words that already carry a capital anywhere
     /// (MP4, GPU, H.264, WhatsApp, FFmpeg, VidShrink) and words that do not start with a letter
     /// (8, 1280x720, 00:01:30) are handed back untouched, so nothing is invented and nothing is
     /// flattened. Applying it twice changes nothing.
     /// </summary>
+    internal static bool ReadsAsProse(string text)
+    {
+        for (var index = 0; index < text.Length; index++)
+        {
+            if (text[index] is not ('.' or ';' or '!' or '?')) continue;
+            if (index + 1 == text.Length || char.IsWhiteSpace(text[index + 1])) return true;
+        }
+
+        return false;
+    }
+
+    private static string Sentence(string text, CultureInfo culture)
+    {
+        var builder = new StringBuilder(text.Length);
+        var index = 0;
+        var lineStart = true;
+
+        while (index < text.Length)
+        {
+            if (char.IsWhiteSpace(text[index]))
+            {
+                if (text[index] == '\n') lineStart = true;
+                builder.Append(text[index]);
+                index++;
+                continue;
+            }
+
+            var end = index;
+            while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+            var word = text[index..end];
+
+            builder.Append(lineStart ? CapitaliseWord(word, culture, true) : word);
+            if (word.Any(char.IsLetter)) lineStart = false;
+            index = end;
+        }
+
+        return builder.ToString();
+    }
+
     internal static string Title(string text, bool turkish)
     {
         if (string.IsNullOrEmpty(text)) return text;
         if (Brands.TryGetValue(text, out var brand)) return brand;
         var culture = turkish ? TurkishCulture : CultureInfo.InvariantCulture;
+        if (ReadsAsProse(text)) return Sentence(text, culture);
         var builder = new StringBuilder(text.Length);
         var index = 0;
         var lineStart = true;

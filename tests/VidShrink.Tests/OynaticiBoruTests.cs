@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using VidShrink.Ffmpeg;
 using VidShrink.Ffmpeg.Playback;
 using Xunit;
@@ -11,6 +11,22 @@ public sealed class FfmpegAvailableFactAttribute : FactAttribute
     {
         if (!ToolLocator.IsAvailable(out var missing))
             Skip = $"{missing} bulunamadi, T175 boru testleri atlandi.";
+    }
+}
+
+public sealed class SesCihaziVarFactAttribute : FactAttribute
+{
+    public SesCihaziVarFactAttribute()
+    {
+        if (!ToolLocator.IsAvailable(out var missing))
+        {
+            Skip = $"{missing} bulunamadi, T175 boru testleri atlandi.";
+            return;
+        }
+
+        using var probe = new AudioSink(true);
+        if (probe.DeviceFailure is { } failure)
+            Skip = $"Calisan ses cihazi yok, ses-goruntu kaymasi olculemez: {failure.Tr}";
     }
 }
 
@@ -319,12 +335,14 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
         pipe.Dispose();
     }
 
-    [FfmpegAvailableFact]
+    [SesCihaziVarFact]
     public async Task Surekli_oynatmada_ses_goruntu_kaymasi_zamanla_buyumez()
     {
         using var pipe = new DecoderPipe();
         await pipe.OpenAsync(SesliKlip);
         using var sink = new AudioSink(pipe.HasAudio);
+        Assert.Null(sink.DeviceFailure);
+        Assert.True(sink.HasAudio, "ses yolu kapali; olcu video ptsini bos bir saate karsi okur");
         pipe.AttachAudioSink(sink);
 
         using var playback = pipe.StartContinuousPlayback(0);
