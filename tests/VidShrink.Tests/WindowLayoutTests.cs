@@ -976,9 +976,6 @@ public sealed class WindowLayoutTests
 
             return (found, faults);
         });
-
-        // Beklenen sayı biçimlemeden okunur: elle tutulan sabit, rozet eklenip
-        // silindikçe eskiyordu (T177 sekiz rozeti kaldırdı, sabit 23'te kalmıştı).
         // Ölçüm yine de bir sayıya bağlı: rozetleri görmez olursa sessizce yeşile dönmez.
         var declared = Regex.Matches(
             File.ReadAllText(TipSources.WindowXamlPath), "StaticResource InfoButton").Count;
