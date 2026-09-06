@@ -1213,6 +1213,11 @@
           </ScrollViewer>
         </TabItem>
 
+
+          <TabItem x:Name="TabPlayer" Header="{loc:Text main.tab.player}" Theme="{StaticResource NeonTabItem}">
+            <playback:PlayerView x:Name="Player"/>
+          </TabItem>
+
       </TabControl>
 
       </Grid>

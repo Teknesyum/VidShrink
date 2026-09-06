@@ -405,5 +405,18 @@
   "settings-tab.ffmpeg-path.manual": "Elle",
   "settings-tab.ffmpeg-path.browse": "Seç…",
   "settings-tab.ffmpeg-path.hint": "Elle, birlikte gelen ffmpeg yerine seçtiğiniz yolu kullanır.",
-  "settings-tab.ffmpeg-path.error": "Bu yol geçerli bir ffmpeg çalıştırılabilirine işaret etmiyor."
+  "settings-tab.ffmpeg-path.error": "Bu yol geçerli bir ffmpeg çalıştırılabilirine işaret etmiyor.",
+
+  "main.tab.player": "Oynatıcı",
+  "main.player.title": "Oynatıcı",
+  "main.player.menu": "Oynatıcı menüsü",
+  "main.player.menu.playpause": "Oynat / duraklat",
+  "main.player.menu.fullscreen": "Tam ekran",
+  "main.player.menu.reset": "Yakınlaştırmayı sıfırla",
+  "main.player.empty": "Yüklü dosya yok",
+  "main.player.playing": "oynuyor",
+  "main.player.paused": "duraklatıldı",
+  "main.player.state": "konum {0} sn - {1} - yakınlaştırma {2}%",
+  "main.player.stalled": "Oynatma ilerlemiyor; çözücü borusu kare üretmiyor.",
+  "main.player.seekfailed": "Arama başarısız: çözücü borusu yeniden başlatılamadı."
 }
