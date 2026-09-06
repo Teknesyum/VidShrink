@@ -357,6 +357,28 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
             p => p.Id == pid);
     }
 
+    [Fact]
+    public void Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        System.Diagnostics.Process korumali;
+        try { korumali = System.Diagnostics.Process.GetProcessById(4); }
+        catch { return; }
+
+        using (korumali)
+        {
+            Assert.False(korumali.HasExited, "korumali surec zaten olmus, olcu anlamsiz");
+
+            var oldu = DecoderPipe.KillTree(korumali, DecoderPipe.KillWaitMs, DecoderPipe.KillAttempts);
+
+            Assert.False(
+                oldu,
+                "oldurulemeyen surec icin KillTree basarili dedi: cagiran taraf sizintiyi bildiremez");
+            Assert.False(korumali.HasExited);
+        }
+    }
+
     [FfmpegAvailableFact]
     public async Task StopAsync_donunce_kod_cozucu_ffmpeg_sureci_kalmaz()
     {
