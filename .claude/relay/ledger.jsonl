@@ -1,1 +1,2 @@
 {"id":"T176","title":"Oynatici sekmesi ve girdi haritasi","status":"done","result":"passed","rounds":3,"merge":"c92d7a06","sealedAt":"2026-09-06","coreVersion":"manual-0.16-no-contract-js","debts":5}
+{"id":"T181","title":"PlayerView dil aboneligi sizintisi ve BtnMaximize kirpilmasi","role":"builder","model":"opus","result":"passed","rounds":1,"audit":"passed","sha":"54fcbb09","sealedAt":"2026-09-06","coreVersion":"manual-0.16-no-contract-js"}
