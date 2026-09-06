@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.ShrinkJobWindow"
+        Title="VidShrink"
+        Width="{StaticResource TipMaxWidth}"
+        SizeToContent="Height"
+        CanResize="False"
+        ShowInTaskbar="True"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource AppBg}"
+        FontFamily="{StaticResource FontSans}"
+        Foreground="{StaticResource TextBody}">
+
+  <Border Background="{StaticResource PanelSurface}"
+          BorderBrush="{StaticResource NeonBlueBorder}"
+          BorderThickness="{StaticResource BorderThin}"
+          CornerRadius="{StaticResource RadiusPanel}"
+          Padding="{StaticResource PanelPadding}">
+    <StackPanel Spacing="{StaticResource SpaceMd}">
+
+      <TextBlock x:Name="TxtHeadline"
+                 FontSize="{StaticResource FontSizeMd}"
+                 TextTrimming="CharacterEllipsis"/>
+
+      <TextBlock x:Name="TxtTarget"
+                 FontSize="{StaticResource FontSizeSm}"
+                 Foreground="{StaticResource TextDisabled}"/>
+
+      <ProgressBar x:Name="Progress"
+                   Minimum="0" Maximum="1"
+                   Height="{StaticResource ProgressBarHeight}"/>
+
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto" x:Name="RowFacts">
+        <TextBlock Grid.Column="0"
+                   Text="{loc:Text main.output.stage}"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextDisabled}"
+                   Margin="{StaticResource ChipMargin}"/>
+        <TextBlock Grid.Column="1" x:Name="TxtStage"
+                   FontSize="{StaticResource FontSizeSm}"
+                   TextTrimming="CharacterEllipsis"/>
+        <TextBlock Grid.Column="2"
+                   Text="{loc:Text main.output.remaining}"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextDisabled}"
+                   Margin="{StaticResource ChipMargin}"/>
+        <TextBlock Grid.Column="3" x:Name="TxtRemaining"
+                   FontSize="{StaticResource FontSizeSm}"/>
+      </Grid>
+
+      <TextBlock x:Name="TxtMessage"
+                 FontSize="{StaticResource FontSizeSm}"
+                 TextWrapping="Wrap"
+                 MaxWidth="{StaticResource TipMaxWidth}"/>
+
+      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+        <Button x:Name="BtnOpenInApp"
+                Content="{loc:Text main.shrink-job.open-in-app}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                IsVisible="False"/>
+        <Button x:Name="BtnReveal"
+                Content="{loc:Text main.action.show-in-folder}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                IsVisible="False"/>
+        <Button x:Name="BtnClose"
+                Content="{loc:Text main.action.cancel}"
+                Padding="{StaticResource ButtonPaddingSm}"/>
+      </StackPanel>
+
+    </StackPanel>
+  </Border>
+</Window>

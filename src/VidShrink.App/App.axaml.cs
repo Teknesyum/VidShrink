@@ -13,12 +13,20 @@ namespace VidShrink.App;
 public partial class App : Application
 {
     private readonly string? _startupFile;
+    private readonly ShellShrinkStartup? _shrink;
+    private readonly ShrinkRequestQueue? _queue;
 
     public App() : this(null)
     {
     }
 
     public App(string? startupFile) => _startupFile = startupFile;
+
+    internal App(ShellShrinkStartup startup, ShrinkRequestQueue? queue)
+    {
+        _shrink = startup;
+        _queue = queue;
+    }
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -31,8 +39,15 @@ public partial class App : Application
             MacUpdate.Begin();
             desktop.Exit += (_, _) => MacUpdate.Finish();
 
-            var window = new MainWindow(_startupFile) { Icon = LoadAppIcon() };
-            desktop.MainWindow = window;
+            if (_shrink is not null)
+            {
+                desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
+                desktop.MainWindow = new ShrinkJobWindow(_shrink, _queue) { Icon = LoadAppIcon() };
+            }
+            else
+            {
+                desktop.MainWindow = new MainWindow(_startupFile) { Icon = LoadAppIcon() };
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
