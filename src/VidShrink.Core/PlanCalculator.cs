@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -502,13 +502,13 @@ public static class PlanCalculator
             plan = NewPlan(codec, effective, info, best, audioK, audioChannels, hdr);
             plan.Mode = "crf";
             plan.Crf = (int)Math.Round(ceilingCrf);
-            plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, MinVideoBitrateK));
+            plan.VideoBitrateK = (int)Math.Round(Math.Max(ceilingVideoK, 0.0));
 
             if (options.FillPolicy == FillPolicy.FillTarget && !qualityStopBinding)
             {
                 var (minCrf, _) = CodecModel.CrfRange(codec);
                 var totalBudgetK = aimMb * KbitPerMib * ContainerOverhead / Math.Max(info.DurationSeconds, 0.1);
-                var desiredVideoK = Math.Max(MinVideoBitrateK, totalBudgetK - audioK - DeliveryReserveK(codec));
+                var desiredVideoK = Math.Max(0.0, totalBudgetK - audioK - DeliveryReserveK(codec));
                 var desiredBppf = BitsPerPixel(desiredVideoK, best.Width, best.Height, best.Fps);
                 var fillCrf = complexity.CrfForBppf(codec, desiredBppf, best.Scale, best.Fps, info.Fps);
                 var crfStep = complexity.CrfStepSizeEffect(codec, best.Scale, best.Fps);
@@ -517,7 +517,7 @@ public static class PlanCalculator
                 if (fillCrf >= minCrf && !gridIsCoarserThanBand)
                 {
                     plan.Crf = (int)Math.Round(fillCrf);
-                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
+                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, 0.0));
                     reason.Add($"the fill target policy lowered CRF to {fillCrf:0.#} instead of stopping at the transparency ceiling, landing near {aimMb:0.0} MB inside the {band.LowerMb:0.0}-{band.UpperMb:0.0} MB band");
                     reasonCodes.Add(new ReasonNote(ReasonCode.FillCrfLowered, Crf: fillCrf, Mb: aimMb, TargetMb: band.UpperMb, BandLowerMb: band.LowerMb));
                 }
@@ -525,7 +525,7 @@ public static class PlanCalculator
                 {
                     plan.Mode = "2pass";
                     plan.Crf = null;
-                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, MinVideoBitrateK));
+                    plan.VideoBitrateK = (int)Math.Round(Math.Max(desiredVideoK, 0.0));
                     reason.Add(gridIsCoarserThanBand
                         ? $"one CRF step moves the file by {crfStep * 100:0.#}%, wider than the {band.RelativeWidth * 100:0.#}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {aimMb:0.0} MB directly"
                         : $"CRF floor {minCrf} was reached before the fill band, so two-pass VBR targets the {aimMb:0.0} MB band center directly");
