@@ -1,4 +1,4 @@
-﻿{
+{
   "main.language.name": "English",
 
   "main.tagline.lead": "Target size media compression",
@@ -353,7 +353,6 @@
   "main.advice.quality-ceiling": "The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see.",
   "main.advice.audio-reduced": "The audio bitrate was lowered so more bits are left for the picture.",
   "main.advice.audio-mono": "Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture.",
-  "main.advice.audio-dropped": "Audio cannot fit at this size and was removed.",
   "main.advice.encoder-fallback-gpu": "Fast shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.",
   "main.advice.encoder-fallback-not-in-build": "The preferred encoder is not part of this ffmpeg build; falling back to a software encoder.",
   "main.advice.encoder-fallback-not-measured": "The preferred encoder has not been measured on this machine; falling back to a software encoder.",

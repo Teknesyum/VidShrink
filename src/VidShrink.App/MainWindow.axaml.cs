@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -2921,7 +2921,6 @@ public partial class MainWindow : Window
             AdviceCode.QualityCeilingReached => Speak(language, "main.advice.quality-ceiling"),
             AdviceCode.AudioReduced => Speak(language, "main.advice.audio-reduced"),
             AdviceCode.AudioMono => Speak(language, "main.advice.audio-mono"),
-            AdviceCode.AudioDropped => Speak(language, "main.advice.audio-dropped"),
             AdviceCode.EncoderFallback => fastGpu
                 ? Speak(language, "main.advice.encoder-fallback-gpu")
                 : Speak(language, EncoderFallbackAdviceKey(fallbackCause)),

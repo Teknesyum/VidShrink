@@ -14,7 +14,6 @@ public enum AdviceCode
     FrameRateReduced,
     AudioReduced,
     AudioMono,
-    AudioDropped,
     TargetEnforcedTwoPass,
     ExtremeRatioWarning,
     ContentIsSimple,

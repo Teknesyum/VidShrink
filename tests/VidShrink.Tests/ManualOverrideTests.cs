@@ -59,20 +59,26 @@ public sealed class ManualOverrideTests
         AudioChannels = audioChannels
     };
 
-    // --- K1: varsayilan, T165 oncesi motorla birebir ayni plani uretiyor ---
+    // --- K1: varsayilan plan, pimlenmis golden degerlerle birebir ayni ---
     //
-    // Beklenen degerler uydurulmadi: 9b092e9 (T165'in ebeveyni, sozlesme oncesi motor)
-    // agacinda ayni bes bilesim kosuldu ve cikti buraya alindi. Olcum ve ham cikti
-    // docs/olcumler/elle-gecersiz-kilma.md'de. Varsayilan davranisi degistiren her
-    // mutasyon bu kollari dusurur.
+    // Bes kolun dordu (1., 2., 3., 5.) uydurulmadi: 9b092e9 (T165'in ebeveyni, sozlesme
+    // oncesi motor) agacinda kosuldu ve cikti buraya alindi. Olcum ve ham cikti
+    // docs/olcumler/elle-gecersiz-kilma.md'de.
+    //
+    // Dorduncu kol (1920x1080@30, 600 s, 6 MB) artik T165 oncesi motordan gelmiyor:
+    // T172 sesi hicbir hedefte dusurmuyor, o kolda ses 0k yerine 24k mono cikiyor ve
+    // video butcesi ona gore dustu. Golden T172 turu 2'de (K9) yeni dogru davranisla
+    // guncellendi; olcusu docs/olcumler/ses-tabani.md'de.
+    //
+    // Varsayilan davranisi degistiren her mutasyon bu kollari dusurur.
 
     [Theory]
     [InlineData(1920, 1080, 30, 120, 25.0, "libsvtav1", "2pass", 1567, -1, 1920, 1080, 30.0, 128, -1, "6")]
     [InlineData(1280, 720, 24, 300, 8.0, "libsvtav1", "2pass", 188, -1, 1202, 676, 24.0, 26, 1, "6")]
     [InlineData(3840, 2160, 60, 45, 50.0, "libsvtav1", "2pass", 9016, -1, 3840, 2160, 60.0, 128, -1, "6")]
-    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 80, -1, 690, 388, 30.0, 0, -1, "6")]
+    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 56, -1, 614, 346, 15.0, 24, 1, "6")]
     [InlineData(1280, 720, 30, 30, 100.0, "libx264", "2pass", 27305, -1, 1280, 720, 30.0, 128, -1, "slow")]
-    public void K1_VarsayilanT165OncesiMotorlaBirebirAyni(
+    public void K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni(
         int srcW, int srcH, double srcFps, double durationSeconds, double targetMb,
         string codec, string mode, int videoK, int crf, int width, int height, double fps,
         int audioK, int audioChannels, string preset)
