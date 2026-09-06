@@ -427,9 +427,9 @@ tasiyor; ad tur 4'te `K11_UzunKaynaktaKucukHedefVideoBitrateFloorunaCakilmiyor` 
    test adi hala yanıltici** (tur2 denetim borc bulgusu 4): yorum "beklenen degerler
    uydurulmadi, 9b092e9 agacinda ayni bes bilesim kosuldu" diyor ama dorduncu InlineData
    satiri artik T172 sonrasi motordan geliyor (K9'da guncellendi); test adi da "T165
-   Oncesi Motorla Birebir Ayni" diyor, artik dogru degil. `ManualOverrideTests.cs`
-   `owns` icinde ama bu sozlesmenin K maddeleri bu ismi/yorumu kapsamiyor - duzeltmedim,
-   bildiriyorum, takip gerekir.
+   Oncesi Motorla Birebir Ayni" diyordu. **Tur 4'te kapatildi** (K18 borc 7): yorum ve
+   test adi duzeltildi, yeni ad `K1_VarsayilanPlanGoldenDegerleriyleBirebirAyni`.
+   Bu paragraf tur 3 anindaki hali anlatiyor.
 2. K12'nin 3 gercek kosumu K11'in ozel dalini (505/511/520/528) degil, tur1'de zaten
    duzeltilmis olan `TargetEnforcedTwoPass` (545) dalini tetikledi - K11'in kendisi
    yalniz analiz-tabanli 171 satirlik supurmede sayisal olarak dogrulandi, gercek
@@ -526,7 +526,9 @@ tur3'te sifir olan 51 satirin tur4'te TBCF tasimayani: 0
 
 **6 satir "hedefin altinda" tahminden "hedefin ustunde" tahmine gecti** - saklamiyorum,
 olctum. Bunlar teslimat gerilemesi degil, tahmin duzeltmesi: 5dk/1MB satiri gercek
-kodlamada zaten hedefi tutmuyordu.
+kodlamada zaten hedefi tutmuyordu. **Gercek kodlama yalniz o bir satir icin var**;
+kalan bes satir icin genelleme, tur 4 denetiminin `main` karsilastirmasiyla ayrica
+dogrulandi (main'e gore kotulesen satir 0, iyilesen 14).
 
 ```
 $ cat .calisma/T172/tur4/k15-gerileme-5dk-1mb.txt
@@ -545,12 +547,14 @@ yanlisti; tur4'un `+0,042`'si dogru yone dondu. Ters yonde hareket eden satir yo
 
 ## K16 - gercek kodlama kosumlari
 
-Iki kosum, ikisi de eski `videoK=0` bandindan, sure/hedef orani korunarak kisaltildi:
+Iki kosum, ikisi de eski `videoK=0` bandindan, sure/hedef orani korunarak kisaltildi.
+**120dk/20MB orani gercek kodlamayla kosulmadi** - K16'nin "en az biri 60dk/10MB ya da
+120dk/20MB" sarti kosum 1 ile karsilaniyor:
 
 | kosum | oran | kaynak | hedef |
 | --- | --- | --- | --- |
 | 1 | 60dk / 10MB (Discord) | `kesit-60dk-orani.mp4` (120 s) | 0,33 MB |
-| 2 | 120dk / 20MB | `kesit-20dk-orani.mp4` (120 s) | 0,30 MB |
+| 2 | 20dk / 3MB | `kesit-20dk-orani.mp4` (120 s) | 0,30 MB |
 
 ### Onceki hal (tur 3 motoru, ayni kesit)
 
@@ -676,7 +680,7 @@ bakiyor, video bitrate'inin sifir olup olmadigina degil.
 
 | # | borc | ne yapildi |
 | --- | --- | --- |
-| 1 | K11 dal atfi fazla kesin | yumusatildi - K11'in yalniz supurmede dogrulandigi, gercek kodlamada K12'nin baska dali tetikledigi zaten yaziliydi; ifade "dogrulandi" yerine kapsamla birlikte veriliyor |
+| 1 | K11 dal atfi fazla kesin | **metin degistirilmedi** - borcun ozu tur 3'te zaten `:381-388` ve `:433-436`te aciktan yaziliydi (K11 yalniz supurmede dogrulandi, gercek kodlama baska dali tetikledi). Tur 4'te yalniz borc 2'nin `30-120` -> `20-120` duzeltmesi girdi |
 | 2 | "30-120dk" yanlis | **yerinde duzeltildi** -> "20-120dk". Sayildi: 11 `videoK==48` satiri 20dk/10MB ile 120dk/50MB arasinda |
 | 3 | "tek notu `BudgetBelowCeilingTwoPass`" eksik | **yerinde duzeltildi** - not sutunu iki koda cikti (`BudgetBelowCeilingTwoPass,PredictedQualityEstimated`), altina `uniq -c` oz-sayimi kondu: 51 satirda tek ayrik kume |
 | 4 | K12 tablosunun `notlar:` sutunu eksik | **yerinde duzeltildi** - her satir icin ham dosyadaki **8** ogut kodunun tamami yazildi |
