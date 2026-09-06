@@ -42,7 +42,7 @@ else {
     New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
     $oncekiEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $lines = & dotnet test -c Release --no-restore --logger 'trx;LogFileName=kosum-kapisi.trx' --results-directory $resultsDir 2>&1 | ForEach-Object {
+    $lines = & dotnet test -c Release --no-restore --blame-hang --blame-hang-timeout 10m --logger 'trx;LogFileName=kosum-kapisi.trx' --results-directory $resultsDir 2>&1 | ForEach-Object {
         $line = $_.ToString()
         Write-Host $line
         $line
