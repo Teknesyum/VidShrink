@@ -403,6 +403,34 @@ public sealed class KabukIstegiTests
         _output.WriteLine($"tr: {tr}");
     }
 
+    /// <summary>
+    /// K14 / borc 5: en-uzun-eslesme sezgiselinin bedeli. Tirnagi kaybolmus bosluklu yolu
+    /// geri toplayabilmek icin parcalar once en uzun birlesimden denenir; ayni dizinde
+    /// <c>a.mp4</c>, <c>b.mp4</c> ve adi <c>"a.mp4 b.mp4"</c> olan ucuncu bir dosya varsa
+    /// goreli adlarla gelen iki istek tek yanlis isteğe cokuyor. Bu olcu bedeli <b>yaziyor</b>:
+    /// kayit defteri sablonu her zaman mutlak <c>%1</c> verdigi icin uretimde erisilemez —
+    /// birlestirilen aday o zaman <c>C:\Klip\a.mp4 C:\Klip\b.mp4</c> olur ve Windows'ta
+    /// boyle bir dosya adi kurulamaz (icinde <c>:</c> ve ayirac var). Davranis degisirse
+    /// burasi kirmizi olur.
+    /// </summary>
+    [Fact]
+    public void SezgiselGoreliAdlardaYanlisDosyayiSecebilir()
+    {
+        var dosyalar = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "a.mp4", "b.mp4", "a.mp4 b.mp4" };
+        var goreli = ShellShrinkStartup.ScanPaths(new[] { ShellIntegration.ShrinkFlag, "100", "a.mp4", "b.mp4" }, 2, dosyalar.Contains);
+
+        _output.WriteLine($"goreli adlar -> bulunan: {string.Join(" | ", goreli.Found)}  eksik: {goreli.Missing.Count}");
+        Assert.Equal(new[] { "a.mp4 b.mp4" }, goreli.Found.ToArray());
+
+        var kok = OperatingSystem.IsWindows() ? @"C:\Klip\" : "/klip/";
+        var mutlak = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { kok + "a.mp4", kok + "b.mp4" };
+        var tam = ShellShrinkStartup.ScanPaths(
+            new[] { ShellIntegration.ShrinkFlag, "100", kok + "a.mp4", kok + "b.mp4" }, 2, mutlak.Contains);
+
+        _output.WriteLine($"mutlak yollar -> bulunan: {string.Join(" | ", tam.Found)}");
+        Assert.Equal(new[] { kok + "a.mp4", kok + "b.mp4" }, tam.Found.ToArray());
+    }
+
     [Fact]
     public void HizliListeSozlesmedekiBesDeger()
     {

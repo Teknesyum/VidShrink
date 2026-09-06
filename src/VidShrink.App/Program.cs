@@ -75,8 +75,9 @@ internal sealed record ShellShrinkStartup(
     /// toplar. Her konumda en uzun birlesim once denenir — tirnagi kaybolmus bosluklu yol
     /// birden cok parca olarak geldigi icin — ve eslesen parcalar tuketilerek ilerlenir.
     /// </summary>
-    internal static PathScan ScanPaths(IReadOnlyList<string> args, int start)
+    internal static PathScan ScanPaths(IReadOnlyList<string> args, int start, Func<string, bool>? exists = null)
     {
+        var probe = exists ?? Exists;
         var found = new List<string>();
         var missing = new List<string>();
         var i = start;
@@ -86,7 +87,7 @@ internal sealed record ShellShrinkStartup(
             for (var end = args.Count - 1; end >= i; end--)
             {
                 var candidate = Join(args, i, end);
-                if (candidate.Length == 0 || !Exists(candidate)) continue;
+                if (candidate.Length == 0 || !probe(candidate)) continue;
                 found.Add(candidate);
                 i = end + 1;
                 advanced = true;
