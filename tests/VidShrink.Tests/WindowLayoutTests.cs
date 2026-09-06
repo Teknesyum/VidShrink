@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
@@ -579,16 +579,22 @@ public sealed class WindowLayoutTests
     /// kaydırma çubuğu kalır — 1052'nin üstüne çıkan her yeni piksel, dizüstü ekranlarda
     /// sayfanın tamamının bir bakışta görünmemesi demek.</para>
     ///
-    /// <para>T177: <b>boş</b> eşiği 1039-1129 → 962-1062 (ölçülen 1012). Ayar sütunu
-    /// kısaldı, boş sayfa 77 piksel daha erken sığıyor. Dolu eşiği değişmedi.</para>
+    /// <para>T177: <b>boş</b> eşiği 1039-1129 → 967-1057 (ölçülen 1012). Ayar sütunu
+    /// kısaldı, boş sayfa 77 piksel daha erken sığıyor.</para>
+    ///
+    /// <para>T177 turu 1: iki aralık da yeniden ölçüldü ve <b>ikisinin de genişliği 90
+    /// piksel</b> (±45) — tur 0'da boş aralık gerekçesiz 100 piksele açılmıştı. <b>Dolu</b>
+    /// eşiği 1007-1097 → 975-1065: ölçülen değer 1052 değil <b>1020</b>. Bu sayı tur 1'in
+    /// düzeltmeleriyle değişmedi; aynı ölçüm tur 0 commit'inde (0918cfb0) de 1020 veriyor,
+    /// yani "dolu eşiği değişmedi" cümlesi yazıldığı anda bayattı.</para>
     ///
     /// <para>T163: tur 2 iki aralığı da ~116 px yukarı taşımıştı; <b>tur 3'te ikisi de eski
     /// değerlerine döndü</b>. Gelişmiş ayarlar bölümü sayfanın boyunu yalnız açıkken
     /// değiştiriyor.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 962, 1062)]
-    [InlineData(true, 1007, 1097)]
+    [InlineData(false, 967, 1057)]
+    [InlineData(true, 975, 1065)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;

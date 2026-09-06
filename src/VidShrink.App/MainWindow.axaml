@@ -410,8 +410,11 @@
                           </StackPanel>
                         </Grid>
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                          <TextBlock Grid.Column="0" Text="{loc:Text main.fill.target}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <ToggleSwitch Grid.Column="1" x:Name="TglFillTarget" IsChecked="True" OnContent="" OffContent="" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                          <TextBlock Grid.Column="0" Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                            <RadioButton x:Name="RbFillTarget" GroupName="ShrinkFill" IsChecked="True" Content="{loc:Text main.fill.target}"/>
+                            <RadioButton x:Name="RbFillCeiling" GroupName="ShrinkFill" Content="{loc:Text main.fill.ceiling}"/>
+                          </StackPanel>
                         </Grid>
                         <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" HorizontalAlignment="Left" Content="{loc:Text main.fast-gpu}">
                           <ToolTip.Tip>

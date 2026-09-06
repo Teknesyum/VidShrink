@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -140,6 +140,14 @@ public sealed class AyarYuzeyiTests
     /// önizleme panellerinin taban yüksekliklerinden geliyor ve onları küçültmek yeni ölçü
     /// uydurmak demek olurdu. Ölçüm bu yüzden taşmayı sıfırlamıyor, <b>pimliyor</b>: sayı
     /// büyürse kırmızıya düşer. Sütun dökümü çıktıya yazılıyor.</para>
+    ///
+    /// <para>T177 turu 1: pim ölçülen değere çekildi. Bugünkü ölçü içerik 915, görüş alanı
+    /// 625, <b>taşma 290</b>; aralık 285-295, yani ±5 piksel. Eskiden 0-300 yazıyordu ve
+    /// taşmanın 10 piksel daha büyümesine sessizce izin veriyordu.</para>
+    ///
+    /// <para><b>720 pikselde sığma T180'e bağlı:</b> taşmayı orta sütunun taban boyu
+    /// (<c>PlanPanelMinHeight</c>) tutuyor ve onu küçültmek karşılaştırma alanının yeniden
+    /// tasarımı demek.</para>
     /// </summary>
     [Fact]
     public void TabanYukseklikteKucultSekmesininTasmasiBuyumuyor()
@@ -198,7 +206,7 @@ public sealed class AyarYuzeyiTests
             $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
             + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
 
-        Assert.InRange(reading.Item2 - reading.Item3, 0d, 300d);
+        Assert.InRange(reading.Item2 - reading.Item3, 285d, 295d);
     }
 
     /// <summary>

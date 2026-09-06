@@ -1,6 +1,6 @@
 ﻿{
 
-  "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur: motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.",
+  "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur: motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur; hedef kutusundaki sayı bu yonga seçiliyken plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin ya da hedefi kendiniz yazın; hedefe dokunduğunuz anda boyut tavanı geri gelir.",
   "main.derivation.size": "Hedef {0} MB",
   "main.derivation.no-cap": "Boyut tavanı yok",
   "main.section.outcome": "Ne çıkacak",
@@ -107,6 +107,7 @@
   "main.fast-gpu.on-against-advice": "• {0}; ölçüm kapalı öneriyordu, kutu elle açıldı.",
   "main.fast-gpu.off-as-advised": "• {0}, hızlı düşür kapalı kaldı.",
 
+  "main.fill.label": "Bit bütçesi",
   "main.fill.target": "Hedefi doldur",
   "main.fill.ceiling": "Kalite tavanında dur",
 

@@ -807,7 +807,7 @@ public partial class MainWindow : Window
             ChkResolution.IsChecked = settings.MayLowerResolution;
             ChkFps.IsChecked = settings.MayLowerFps;
             ChkFastGpu.IsChecked = settings.FastGpu ?? false;
-            TglFillTarget.IsChecked = settings.FillPolicy != 1;
+            SetFillIndex(settings.FillPolicy);
             SetHdrIndex(settings.HdrPolicy);
             CmbQualityMode.SelectedIndex = settings.QualityMode;
             TxtQuality.Text = settings.QualityValue.ToString(CultureInfo.InvariantCulture);
@@ -1176,14 +1176,14 @@ public partial class MainWindow : Window
 
     internal IReadOnlyList<ToggleButton> ShrinkChoiceToggles() => new ToggleButton[]
     {
-        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, TglFillTarget
+        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, RbFillTarget, RbFillCeiling
     };
 
     internal int SelectedIntentIndex => (int)_intent;
 
     internal int CodecIndex => RbCodecCompatible.IsChecked == true ? 1 : RbCodecSmallest.IsChecked == true ? 2 : 0;
 
-    internal int FillPolicyIndex => TglFillTarget.IsChecked == true ? 0 : 1;
+    internal int FillPolicyIndex => RbFillCeiling.IsChecked == true ? 1 : 0;
 
     internal int HdrPolicyIndex => RbHdrSdr.IsChecked == true ? 1 : 0;
 
@@ -1192,6 +1192,12 @@ public partial class MainWindow : Window
         RbCodecCompatible.IsChecked = index == 1;
         RbCodecSmallest.IsChecked = index == 2;
         RbCodecAuto.IsChecked = index is not (1 or 2);
+    }
+
+    private void SetFillIndex(int index)
+    {
+        RbFillCeiling.IsChecked = index == 1;
+        RbFillTarget.IsChecked = index != 1;
     }
 
     private void SetHdrIndex(int index)
@@ -1231,7 +1237,7 @@ public partial class MainWindow : Window
             CodecPreference.MaxCompression => 2,
             _ => 0
         });
-        TglFillTarget.IsChecked = plan.Fill == FillPolicy.FillTarget;
+        SetFillIndex(plan.Fill == FillPolicy.FillTarget ? 0 : 1);
 
         if (plan.TargetMb is { } fixedMb)
         {
@@ -2178,7 +2184,7 @@ public partial class MainWindow : Window
     {
         var options = new PlanOptions
         {
-            TargetMb = ParseTargetMb(),
+            TargetMb = PlanTargetMb(),
             Intent = _intent,
             Codec = CodecFromIndex(CodecIndex),
             AllowResolutionDrop = ChkResolution.IsChecked == true,
@@ -2193,6 +2199,16 @@ public partial class MainWindow : Window
 
     private double ParseTargetMb()
         => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : WhatsAppTargetMb;
+
+    /// <summary>
+    /// Boyut tavani olmayan yonga secildiginde hedef kutusundaki sayi plani kurmaz:
+    /// motor kalite tavanina kadar bit harcar. Tavansizligin sayisal karsiligi
+    /// <see cref="PlanCalculator.QualityCeilingTargetMb"/>; yeni bir olcu uydurulmadi.
+    /// </summary>
+    internal double PlanTargetMb()
+        => _chipSizeCapped || _info is null ? ParseTargetMb() : PlanCalculator.QualityCeilingTargetMb(_info);
+
+    internal PlanOptions PlanOptionsForTest() => CurrentOptions();
 
     private static string? SelectedTag(SelectingItemsControl box)
         => (box.SelectedItem as Control)?.Tag as string;
@@ -3108,6 +3124,7 @@ public partial class MainWindow : Window
         _syncing = true;
         TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
+        RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
     }
@@ -3120,8 +3137,21 @@ public partial class MainWindow : Window
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
         _syncing = false;
+        RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
+    }
+
+    /// <summary>
+    /// Hedefe elle dokunmak boyut tavanini geri getirir: kutuya yazilan sayi motora
+    /// ulasmiyorsa turetme satiri da yalan soyluyor demektir.
+    /// </summary>
+    private void RestoreSizeCap()
+    {
+        if (_chipSizeCapped) return;
+        _chipSizeCapped = true;
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
     }
 
     private void OnQualityTargetSliderChanged()
