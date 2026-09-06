@@ -131,7 +131,7 @@ başlatıldı.
 | ölçü | değer | ham çıktıdaki satır |
 |---|---|---|
 | başlatılan süreç | 3 | üç `baslat:` satırı |
-| aynı anda görülen `VidShrink.App` süreci | 101 örnekte 99 kez 1, 2 kez 0; hiç 2 görülmedi | `VidShrink.App sureci:` satırları |
+| aynı anda görülen `VidShrink.App` süreci | 100 örnekte 99 kez 1, 1 kez 0; hiç 2 görülmedi | `VidShrink.App sureci:` satırları |
 | pencere taşıyan farklı pid | 1 (pid 16548) | `pencere tasiyan farkli pid: 1` |
 | en çok eş zamanlı `ffmpeg` (kendi) | 1 — sıra sıra kodlandı | `... (bizim): 1` |
 | toplam süre | 99 s | `t=99s butun surecler cikti` |
