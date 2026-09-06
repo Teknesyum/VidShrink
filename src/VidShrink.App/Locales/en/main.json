@@ -154,6 +154,7 @@
   "main.shrink-job.rejected": "The shrink request was not accepted",
   "main.shrink-job.target": "Target {0} — file {1} of {2}",
   "main.shrink-job.open-in-app": "Open in the app",
+  "main.shrink-job.missing-paths": "{0} of the paths in the shell request were not found on disk and were skipped: {1}",
   "main.shrink-job.reason.no-target": "The shell menu did not pass a target size after the shrink flag, so there is nothing to shrink to.",
   "main.shrink-job.reason.not-a-number": "The target size that came from the shell menu is not a number, so it cannot be used as a size budget.",
   "main.shrink-job.reason.not-positive": "The target size that came from the shell menu is zero or negative, and a file cannot be shrunk to that.",

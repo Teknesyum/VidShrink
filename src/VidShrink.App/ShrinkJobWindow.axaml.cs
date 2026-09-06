@@ -72,6 +72,7 @@ public partial class ShrinkJobWindow : Window
 
     private readonly ShellShrinkStartup _startup;
     private readonly ShrinkRequestQueue? _queue;
+    private readonly string _language;
     private readonly Queue<ShrinkRequest> _pending = new();
     private readonly List<string> _outputs = new();
     private CancellationTokenSource? _cts;
@@ -90,12 +91,16 @@ public partial class ShrinkJobWindow : Window
         _startup = startup;
         _queue = queue;
 
+        var language = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);
         try
         {
             var settings = UpdateSettings.Load();
-            Strings.Use(MainWindow.ResolveLanguage(settings.Language, CultureInfo.CurrentUICulture.Name));
+            language = MainWindow.ResolveLanguage(settings.Language, CultureInfo.CurrentUICulture.Name);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+
+        _language = language;
+        Strings.Use(_language);
 
         InitializeComponent();
 
@@ -108,7 +113,16 @@ public partial class ShrinkJobWindow : Window
         TxtStage.Text = "-";
         TxtRemaining.Text = "-";
         TxtMessage.Text = "";
+        TxtNotice.Text = "";
     }
+
+    /// <summary>
+    /// Bu pencerenin metinlerini urettigi dil. Kurulusta bir kez cozulur ve bir daha
+    /// degismez: <see cref="Say(string)"/> surec genelindeki <see cref="Strings.Language"/>
+    /// degerini okumaz, yoksa baska bir is parcaciginda kosan bir olcu dili degistirdiginde
+    /// pencerenin metni koşudan koşuya kayar.
+    /// </summary>
+    internal string Language => _language;
 
     /// <summary>Pencerenin gorunur durumu; olcu buna bakar, piksele degil.</summary>
     internal ShrinkJobState State { get; private set; } = ShrinkJobState.Bekliyor;
@@ -120,6 +134,9 @@ public partial class ShrinkJobWindow : Window
     internal int AcceptedCount => _accepted;
 
     internal string MessageText => TxtMessage.Text ?? "";
+
+    /// <summary>Bulunamayan yollar icin basilan uyari satiri; bos ise satir gorunmez.</summary>
+    internal string NoticeText => TxtNotice.Text ?? "";
 
     protected override void OnOpened(EventArgs e)
     {
@@ -137,6 +154,8 @@ public partial class ShrinkJobWindow : Window
         if (_started) return;
         _started = true;
 
+        ShowMissing();
+
         if (_startup.Problem is { } problem)
         {
             ShowProblem(problem);
@@ -151,6 +170,19 @@ public partial class ShrinkJobWindow : Window
             _queue.StartOwning(incoming => Dispatcher.UIThread.Post(() => Accept(incoming)));
         }
         catch (InvalidOperationException) { }
+    }
+
+    /// <summary>
+    /// Diskte bulunamayan argv parcalari. Kodlama satirinin ustunde ayri bir satirda durur:
+    /// <c>TxtMessage</c> her istekte silindigi icin uyari orada kaybolurdu.
+    /// </summary>
+    private void ShowMissing()
+    {
+        if (_startup.Missing.Count == 0) return;
+        TxtNotice.Text = Say("main.shrink-job.missing-paths",
+            _startup.Missing.Count,
+            string.Join(", ", _startup.Missing));
+        TxtNotice.IsVisible = true;
     }
 
     private void Accept(ShrinkRequest request)
@@ -318,8 +350,12 @@ public partial class ShrinkJobWindow : Window
         return candidate;
     }
 
-    private static string Say(string key) => LanguageCatalog.Display(Strings.Get(key));
+    private string Say(string key)
+        => LanguageCatalog.Title(Strings.GetIn(_language, key), Turkish(_language));
 
-    private static string Say(string key, params object?[] args)
-        => LanguageCatalog.Display(Strings.Get(key, args));
+    private string Say(string key, params object?[] args)
+        => LanguageCatalog.Title(Strings.GetIn(_language, key, args), Turkish(_language));
+
+    internal static bool Turkish(string language)
+        => language.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
 }

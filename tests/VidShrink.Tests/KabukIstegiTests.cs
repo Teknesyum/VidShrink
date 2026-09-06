@@ -124,15 +124,24 @@ public sealed class KabukIstegiTests
         _ => throw new ArgumentOutOfRangeException(nameof(problem))
     };
 
-    private static string PencereMetni(ShrinkArgumentProblem problem) => AppHost.Run(() =>
+    /// <summary>Pencerenin bastigi cumle ve onu bastigi dil, ayni ornekten okunmus hali.</summary>
+    private readonly record struct PencereCiktisi(string Metin, string Dil);
+
+    /// <summary>
+    /// Pencereyi arayuz is parcaciginda kurar ve gorulen cumleyi <b>bastigi dille birlikte</b>
+    /// dondurur. Dil de olcuye tasiniyor, cunku <c>Strings.Language</c> surec genelinde
+    /// degisen bir durum: beklenen metni ondan okuyan olcu koşudan koşuya renk degistirir.
+    /// </summary>
+    private static PencereCiktisi PencereMetni(ShrinkArgumentProblem problem) => AppHost.Run(() =>
     {
         var window = new ShrinkJobWindow(new ShellShrinkStartup(null, problem, null), null);
         try
         {
             window.Begin();
-            return window.State == ShrinkJobState.Gerekce
+            var metin = window.State == ShrinkJobState.Gerekce
                 ? window.MessageText
                 : $"<durum:{window.State}>";
+            return new PencereCiktisi(metin, window.Language);
         }
         finally { window.Close(); }
     });
@@ -146,21 +155,49 @@ public sealed class KabukIstegiTests
     public void GerekcePencereyeYazilir(ShrinkArgumentProblem problem)
     {
         var anahtar = BeklenenAnahtar(problem);
-        var beklenen = LanguageCatalog.Display(Strings.Get(anahtar, ShrinkProblemText.QuickList()));
+        var gorulen = PencereMetni(problem);
+        var beklenen = LanguageCatalog.Title(
+            Strings.GetIn(gorulen.Dil, anahtar, ShrinkProblemText.QuickList()),
+            ShrinkJobWindow.Turkish(gorulen.Dil));
 
         Assert.Equal(anahtar, ShrinkProblemText.Key(problem));
         Assert.False(string.IsNullOrWhiteSpace(beklenen), $"{anahtar} karsiligi bos.");
+        Assert.Equal(beklenen, gorulen.Metin);
+        _output.WriteLine($"{problem} -> {anahtar}  dil: {gorulen.Dil}");
+        _output.WriteLine($"  {gorulen.Metin}");
+    }
 
-        var gorulen = PencereMetni(problem);
-        Assert.Equal(beklenen, gorulen);
-        _output.WriteLine($"{problem} -> {anahtar}");
-        _output.WriteLine($"  {gorulen}");
+    /// <summary>
+    /// K11: olcunun kendisi surec genelindeki dilden bagimsiz mi. Beklenen metin pencerenin
+    /// <b>kendi</b> dilinden hesaplandigi icin, olcu kosarken <c>Strings.Use</c> iki yone de
+    /// cevrilse sonuc degismez. Eski surumde beklenen <c>Strings.Get</c> ile okunuyordu:
+    /// asagidaki iki koldan biri her zaman kirmizi olurdu.
+    /// </summary>
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    public void GerekceOlcusuSurecDilindenEtkilenmez(string surecDili)
+    {
+        var onceki = Strings.Language;
+        try
+        {
+            Strings.Use(surecDili);
+            var gorulen = PencereMetni(ShrinkArgumentProblem.TargetNotInQuickList);
+            var beklenen = LanguageCatalog.Title(
+                Strings.GetIn(gorulen.Dil, ShrinkProblemText.TargetNotInQuickList, ShrinkProblemText.QuickList()),
+                ShrinkJobWindow.Turkish(gorulen.Dil));
+
+            _output.WriteLine($"surec dili: {surecDili}  pencere dili: {gorulen.Dil}");
+            _output.WriteLine($"  {gorulen.Metin}");
+            Assert.Equal(beklenen, gorulen.Metin);
+        }
+        finally { Strings.Use(onceki); }
     }
 
     [Fact]
     public void BesGerekceBesAyriCumleBasar()
     {
-        var cumleler = ShrinkProblemText.All.Select(PencereMetni).ToArray();
+        var cumleler = ShrinkProblemText.All.Select(p => PencereMetni(p).Metin).ToArray();
         var ayri = cumleler.Distinct(StringComparer.Ordinal).Count();
 
         _output.WriteLine($"gerekce: {cumleler.Length}  ayri cumle: {ayri}");
@@ -255,6 +292,115 @@ public sealed class KabukIstegiTests
         _output.WriteLine($"acilan pencere turu: {ad}");
         Assert.Equal(nameof(ShrinkJobWindow), ad);
         Assert.NotEqual(nameof(MainWindow), ad);
+    }
+
+    /// <summary>
+    /// K12: sahibe teslim edilen istek bu surecte yeniden kodlanmaz. Ikinci teslim
+    /// basarisiz olunca geriye <b>yalniz o istek</b> kalir; eski tek bayrakli kolda ucu de
+    /// geri geliyor ve ilk dosya iki kez kodlaniyordu.
+    /// </summary>
+    [Fact]
+    public void TeslimEdilenIstekGeriDonmez()
+    {
+        var istekler = new[]
+        {
+            new ShrinkRequest(100, "a.mp4"),
+            new ShrinkRequest(100, "b.mp4"),
+            new ShrinkRequest(100, "c.mp4")
+        };
+        var startup = new ShellShrinkStartup(istekler, null, null);
+
+        var denenen = new List<string>();
+        var kalan = Program.Handoff(startup, request =>
+        {
+            denenen.Add(request.Path);
+            return request.Path != "b.mp4";
+        });
+
+        _output.WriteLine($"denenen: {string.Join(", ", denenen)}");
+        _output.WriteLine($"kalan: {(kalan is null ? "<yok>" : string.Join(", ", kalan.Items.Select(r => r.Path)))}");
+
+        Assert.Equal(3, denenen.Count);
+        Assert.NotNull(kalan);
+        Assert.Equal(new[] { "b.mp4" }, kalan!.Items.Select(r => r.Path).ToArray());
+
+        Assert.Null(Program.Handoff(startup, _ => true));
+
+        var gerekce = new ShellShrinkStartup(null, ShrinkArgumentProblem.NoPath, null);
+        Assert.Same(gerekce, Program.Handoff(gerekce, _ => true));
+    }
+
+    /// <summary>
+    /// K13: bulunamayan yol istek uretmez ama sessizce de dusmez — argv taramasinin ikinci
+    /// kovasinda adiyla durur.
+    /// </summary>
+    [Fact]
+    public void BulunamayanYolSessizceDusmez()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"vidshrink-t171-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var a = Path.Combine(dir, "a.mp4");
+        var b = Path.Combine(dir, "b.mp4");
+        var yok = Path.Combine(dir, "yok.mp4");
+        File.WriteAllBytes(a, new byte[16]);
+        File.WriteAllBytes(b, new byte[16]);
+
+        var startup = Program.StartupFor(new[] { ShellIntegration.ShrinkFlag, "100", a, yok, b });
+
+        Assert.NotNull(startup);
+        Assert.Equal(new[] { a, b }, startup!.Items.Select(r => r.Path).ToArray());
+        Assert.Equal(new[] { yok }, startup.Missing.ToArray());
+        _output.WriteLine($"istek: {startup.Items.Count}  bulunamayan: {startup.Missing.Count}");
+        foreach (var eksik in startup.Missing) _output.WriteLine($"  eksik: {eksik}");
+    }
+
+    /// <summary>K13: bulunamayan yolun cumlesi gercekten pencereye yaziliyor mu.</summary>
+    [Fact]
+    public void BulunamayanYolPencereyeYazilir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"vidshrink-t171-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var yok = Path.Combine(dir, "yok.mp4");
+        var startup = new ShellShrinkStartup(null, ShrinkArgumentProblem.NoPath, null)
+        {
+            Missing = new[] { yok }
+        };
+
+        var okunan = AppHost.Run(() =>
+        {
+            var window = new ShrinkJobWindow(startup, null);
+            try
+            {
+                window.Begin();
+                return (window.NoticeText, window.Language);
+            }
+            finally { window.Close(); }
+        });
+
+        var beklenen = LanguageCatalog.Title(
+            Strings.GetIn(okunan.Language, "main.shrink-job.missing-paths", 1, yok),
+            ShrinkJobWindow.Turkish(okunan.Language));
+
+        _output.WriteLine($"dil: {okunan.Language}");
+        _output.WriteLine($"  {okunan.NoticeText}");
+        Assert.Equal(beklenen, okunan.NoticeText);
+        Assert.Contains(Path.GetFileName(yok), okunan.NoticeText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BulunamayanYolCumlesiIkiDilde()
+    {
+        const string key = "main.shrink-job.missing-paths";
+        var en = Strings.GetIn("en", key, 1, "yok.mp4");
+        var tr = Strings.GetIn("tr", key, 1, "yok.mp4");
+
+        Assert.False(string.IsNullOrWhiteSpace(en));
+        Assert.False(string.IsNullOrWhiteSpace(tr));
+        Assert.NotEqual(en, tr);
+        Assert.DoesNotContain(key, en, StringComparison.Ordinal);
+        Assert.DoesNotContain(key, tr, StringComparison.Ordinal);
+        _output.WriteLine($"en: {en}");
+        _output.WriteLine($"tr: {tr}");
     }
 
     [Fact]

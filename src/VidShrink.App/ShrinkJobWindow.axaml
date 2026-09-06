@@ -49,6 +49,13 @@
                    FontSize="{StaticResource FontSizeSm}"/>
       </Grid>
 
+      <TextBlock x:Name="TxtNotice"
+                 FontSize="{StaticResource FontSizeSm}"
+                 Foreground="{StaticResource NeonPink}"
+                 TextWrapping="Wrap"
+                 MaxWidth="{StaticResource TipMaxWidth}"
+                 IsVisible="False"/>
+
       <TextBlock x:Name="TxtMessage"
                  FontSize="{StaticResource FontSizeSm}"
                  TextWrapping="Wrap"

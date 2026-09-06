@@ -154,6 +154,7 @@
   "main.shrink-job.rejected": "Küçültme isteği kabul edilmedi",
   "main.shrink-job.target": "Hedef {0} — {2} dosyadan {1}.",
   "main.shrink-job.open-in-app": "Uygulamada aç",
+  "main.shrink-job.missing-paths": "Kabuk isteğindeki {0} yol diskte bulunamadı ve atlandı: {1}",
   "main.shrink-job.reason.no-target": "Kabuk menüsü küçültme bayrağından sonra bir hedef boyut geçirmedi; küçültülecek bir ölçü yok.",
   "main.shrink-job.reason.not-a-number": "Kabuk menüsünden gelen hedef boyut sayı değil; boyut bütçesi olarak kullanılamıyor.",
   "main.shrink-job.reason.not-positive": "Kabuk menüsünden gelen hedef boyut sıfır ya da negatif; bir dosya o ölçüye küçültülemez.",
