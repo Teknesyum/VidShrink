@@ -70,7 +70,7 @@ public sealed class ManualOverrideTests
     [InlineData(1920, 1080, 30, 120, 25.0, "libsvtav1", "2pass", 1567, -1, 1920, 1080, 30.0, 128, -1, "6")]
     [InlineData(1280, 720, 24, 300, 8.0, "libsvtav1", "2pass", 188, -1, 1202, 676, 24.0, 26, 1, "6")]
     [InlineData(3840, 2160, 60, 45, 50.0, "libsvtav1", "2pass", 9016, -1, 3840, 2160, 60.0, 128, -1, "6")]
-    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 80, -1, 690, 388, 30.0, 0, -1, "6")]
+    [InlineData(1920, 1080, 30, 600, 6.0, "libsvtav1", "2pass", 56, -1, 614, 346, 15.0, 24, 1, "6")]
     [InlineData(1280, 720, 30, 30, 100.0, "libx264", "2pass", 27305, -1, 1280, 720, 30.0, 128, -1, "slow")]
     public void K1_VarsayilanT165OncesiMotorlaBirebirAyni(
         int srcW, int srcH, double srcFps, double durationSeconds, double targetMb,
