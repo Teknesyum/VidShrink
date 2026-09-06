@@ -86,4 +86,15 @@ jobs:
       # exits 0. -MinimumTotal reads the output and refuses a run that never finished.
       # -MaximumSkipped catches the other blind spot: Total stays the same when a test
       # silently flips from Passed to Skipped, so Total alone can't see it (T115 tur 2).
-      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
+
+      # Kosum asilirsa blame'in aldigi hang dump buraya duser. Yukarilmazsa asilmanin
+      # hangi is parcaciginda oldugu gorulemiyor; koda=65 kirmizisi sebepsiz kaliyor.
+      - name: Kosum ciktisi ve hang dump
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kosum-sonuc
+          path: .calisma/kosum-sonuc/**
+          if-no-files-found: ignore
+          retention-days: 7

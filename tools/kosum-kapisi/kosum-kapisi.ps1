@@ -7,7 +7,8 @@ param(
     [Nullable[int]]$MaximumSkipped,
 
     [string]$InputFile,
-    [string]$OutputFile
+    [string]$OutputFile,
+    [string]$ResultsDir
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,7 +39,7 @@ if ($InputFile) {
     $commandExit = 0
 }
 else {
-    $resultsDir = Join-Path ([System.IO.Path]::GetTempPath()) ('kosum-kapisi-' + [Guid]::NewGuid().ToString('N'))
+    $resultsDir = if ($ResultsDir) { $ResultsDir } else { Join-Path ([System.IO.Path]::GetTempPath()) ('kosum-kapisi-' + [Guid]::NewGuid().ToString('N')) }
     New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
     $oncekiEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
