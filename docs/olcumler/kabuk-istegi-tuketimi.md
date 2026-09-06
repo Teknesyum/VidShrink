@@ -397,8 +397,18 @@ karşılığı olmayan bir geliştirme çökmesi) `trash/T171/` altına taşınd
 ## Tur 3 — K11-K15
 
 Bu turun bütün ham çıktıları `t3-` önekli. Kod tur 3'e `c6604cb` ile geldi; K11-K14'ün
-kodu önceki yapıcı tarafından yazılmış ama **hiçbiri ölçülmemişti**. Aşağıdaki sayıların
-hepsi bu turda üretildi.
+kodu önceki (durdurulan) yapıcı tarafından yazılmış ama teslim edilen bir ölçüsü yoktu.
+Aşağıdaki sayıların **hepsi bu turda yeniden üretildi**; hiçbiri devralınan bir dosyadan
+alınmadı.
+
+**Devralınan ham dosyalar.** Durdurulan yapıcı `.calisma/T171/` altında on tane `t3-`
+dosyası bırakmıştı. Hiçbiri bu belgede kaynak gösterilmiyor ve karışmasınlar diye
+`.calisma/T171/devralinan/` altına alındılar. En az biri kendi künyesiyle çelişiyor —
+`devralinan/t3-k6-k13-tek-surec.txt` başlığında *"uc var olan yol + bir bulunamayan yol"*
+diyor, başlatma satırı ise `baslat (tek surec, 1 yol)` ve dökümde tek çıktı var. Ayrıca
+`devralinan/t3-k4-taban-son.txt` `git status` satırında ağacın kirli olduğunu gösteriyor
+(`M tests/VidShrink.Tests/KabukIstegiTests.cs`), yani o ızgaranın tabanı teslim ağacı
+değil. Bu yüzden o koşumların hiçbiri kabul edilmedi.
 
 ### K11 — Kararsız ölçü kapandı
 
