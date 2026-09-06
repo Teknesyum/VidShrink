@@ -325,6 +325,56 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
     }
 
     [FfmpegAvailableFact]
+    public void KillTree_dondugunde_ffmpeg_sureci_gercekten_olmustur()
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo(ToolLocator.Ffmpeg)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var a in new[]
+        {
+            "-hide_banner", "-nostdin", "-loglevel", "error",
+            "-f", "lavfi", "-i", "testsrc=size=1920x1080:rate=30",
+            "-f", "rawvideo", "-pix_fmt", "bgra", "-"
+        }) psi.ArgumentList.Add(a);
+
+        using var process = new System.Diagnostics.Process { StartInfo = psi };
+        process.Start();
+        var pid = process.Id;
+        Assert.False(process.HasExited, "surec baslar baslamaz olmus, olcu anlamsiz");
+
+        var oldu = DecoderPipe.KillTree(process, DecoderPipe.KillWaitMs, DecoderPipe.KillAttempts);
+
+        Assert.True(oldu, "KillTree oldurulemedi dedi");
+        Assert.True(
+            process.HasExited,
+            "KillTree dondu ama surec hala yasiyor: cikisi beklemeden donuyor");
+        Assert.DoesNotContain(
+            System.Diagnostics.Process.GetProcessesByName("ffmpeg"),
+            p => p.Id == pid);
+    }
+
+    [FfmpegAvailableFact]
+    public async Task StopAsync_donunce_kod_cozucu_ffmpeg_sureci_kalmaz()
+    {
+        using var pipe = new DecoderPipe();
+        await pipe.OpenAsync(UzunSessizKlip);
+        await pipe.SeekAsync(0);
+
+        var pid = pipe.TestOnly_VideoProcessId();
+        Assert.NotNull(pid);
+
+        await pipe.StopAsync();
+
+        Assert.DoesNotContain(
+            System.Diagnostics.Process.GetProcessesByName("ffmpeg"),
+            p => p.Id == pid!.Value);
+    }
+
+    [FfmpegAvailableFact]
     public async Task Dispose_iki_kere_cagrilinca_da_cokmez()
     {
         var pipe = new DecoderPipe();

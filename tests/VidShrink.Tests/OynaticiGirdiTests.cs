@@ -360,6 +360,8 @@ public sealed class PlayerTabTests
 
 public sealed class GirdiKlipFixture : IAsyncLifetime
 {
+    public const int UretimTavaniMs = 60_000;
+
     public string? ClipPath { get; private set; }
 
     public async Task InitializeAsync()
@@ -370,11 +372,17 @@ public sealed class GirdiKlipFixture : IAsyncLifetime
         ClipPath = path;
         if (File.Exists(path)) return;
 
+        await UretAsync(path, UretimTavaniMs);
+    }
+
+    public static async Task<int> UretAsync(string path, int timeoutMs)
+    {
         var psi = new ProcessStartInfo(ToolLocator.Ffmpeg)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            UseShellExecute = false
+            UseShellExecute = false,
+            CreateNoWindow = true
         };
 
         foreach (var arg in new[]
@@ -386,10 +394,50 @@ public sealed class GirdiKlipFixture : IAsyncLifetime
         }) psi.ArgumentList.Add(arg);
 
         using var process = Process.Start(psi)!;
-        await process.WaitForExitAsync();
+        var stdout = process.StandardOutput.ReadToEndAsync();
+        var stderr = process.StandardError.ReadToEndAsync();
+
+        if (!process.WaitForExit(timeoutMs))
+        {
+            try { process.Kill(true); } catch { }
+            throw new TimeoutException(
+                $"klip uretimi {timeoutMs} ms icinde bitmedi: {Path.GetFileName(path)}");
+        }
+
+        await stdout;
+        return (await stderr).Length;
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
+}
+
+public sealed class OynaticiGirdiTestsKlipUretimi
+{
+    [FfmpegAvailableFact]
+    public async Task Klip_uretimi_stderr_borusu_dolsa_da_zamaninda_biter()
+    {
+        var yol = Path.Combine(GirdiKanit.Folder, "kalip-kanit-20sn.mkv");
+        if (File.Exists(yol)) File.Delete(yol);
+
+        var saat = Stopwatch.StartNew();
+        var stderrBayt = await GirdiKlipFixture.UretAsync(yol, 30_000);
+        saat.Stop();
+
+        var body = new StringBuilder();
+        body.AppendLine($"klip: {Path.GetFileName(yol)}");
+        body.AppendLine($"uretim suresi: {saat.Elapsed.TotalMilliseconds:0.#} ms");
+        body.AppendLine($"stderr bayt sayisi: {stderrBayt}");
+        body.AppendLine("windows anonim boru tamponu: 4096 bayt");
+        GirdiKanit.Write("k4-klip-uretimi.txt", body.ToString());
+
+        Assert.True(File.Exists(yol), "klip uretilmedi");
+        Assert.True(
+            stderrBayt > 4096,
+            $"stderr yalnizca {stderrBayt} bayt; boru tamponu dolmadan bu test kusuru yakalayamaz");
+        Assert.True(
+            saat.Elapsed.TotalSeconds < 30,
+            $"klip uretimi {saat.Elapsed.TotalSeconds:0.#} sn surdu");
+    }
 }
 
 public sealed class OynaticiGirdiTestsGercekBoru : IClassFixture<GirdiKlipFixture>

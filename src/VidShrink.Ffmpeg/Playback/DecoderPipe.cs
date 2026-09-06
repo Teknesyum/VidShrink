@@ -13,6 +13,12 @@ public sealed class DecoderPipe : IDisposable
 
     public static readonly TimeSpan ForwardWaitTimeout = TimeSpan.FromMilliseconds(250);
 
+    public static readonly TimeSpan SeekAbsoluteTimeout = TimeSpan.FromMilliseconds(3000);
+
+    internal const int KillWaitMs = 500;
+
+    internal const int KillAttempts = 2;
+
     private readonly long _cacheByteCeiling;
     private readonly object _gate = new();
     private readonly Dictionary<int, byte[]> _cache = new();
@@ -188,7 +194,7 @@ public sealed class DecoderPipe : IDisposable
             if (_disposed) return;
             _disposed = true;
             _life.Cancel();
-            try { if (!_process.HasExited) _process.Kill(true); } catch { }
+            KillTree(_process, KillWaitMs, KillAttempts);
             _reader?.Join(2000);
             _life.Dispose();
             try { _process.Dispose(); } catch { }
@@ -209,9 +215,18 @@ public sealed class DecoderPipe : IDisposable
         var targetIndex = FloorIndex(stamps, atSeconds);
 
         var deadline = DateTime.UtcNow + ForwardWaitTimeout;
+        var hardDeadline = DateTime.UtcNow + SeekAbsoluteTimeout;
         var restartAttempts = 0;
         while (true)
         {
+            if (DateTime.UtcNow >= hardDeadline)
+            {
+                RaiseFault(
+                    $"arama {SeekAbsoluteTimeout.TotalMilliseconds:0} ms icinde kare teslim edemedi, birakiliyor.",
+                    $"seek did not deliver a frame within {SeekAbsoluteTimeout.TotalMilliseconds:0} ms, giving up.");
+                return null;
+            }
+
             bool needRestart;
             lock (_gate)
             {
@@ -389,7 +404,7 @@ public sealed class DecoderPipe : IDisposable
                     "the decoder process died unexpectedly; the pipe will rebuild itself on the next seek.");
             }
 
-            try { if (!process.HasExited) process.Kill(true); } catch { }
+            KillTree(process, KillWaitMs, KillAttempts);
             process.Dispose();
         }
     }
@@ -495,7 +510,7 @@ public sealed class DecoderPipe : IDisposable
         catch { }
         finally
         {
-            try { if (!process.HasExited) process.Kill(true); } catch { }
+            KillTree(process, KillWaitMs, KillAttempts);
             process.Dispose();
         }
     }
@@ -516,9 +531,38 @@ public sealed class DecoderPipe : IDisposable
             _videoLife = null;
         }
         life?.Cancel();
-        try { if (process is { HasExited: false }) process.Kill(true); } catch { }
+        var killed = KillTree(process, KillWaitMs, KillAttempts);
         reader?.Join(2000);
         life?.Dispose();
+        try { process?.Dispose(); } catch { }
+        if (process is not null && !killed)
+        {
+            RaiseFault(
+                "kod cozucu ffmpeg sureci oldurulemedi, arka planda kalmis olabilir.",
+                "the decoder ffmpeg process could not be killed and may still be running.");
+        }
+    }
+
+    internal static bool KillTree(Process? process, int waitMs, int attempts)
+    {
+        if (process is null) return true;
+        for (var i = 0; i < attempts; i++)
+        {
+            try
+            {
+                if (process.HasExited) return true;
+                process.Kill(true);
+            }
+            catch
+            {
+                try { if (process.HasExited) return true; } catch { return false; }
+            }
+
+            try { if (process.WaitForExit(waitMs)) return true; }
+            catch { return false; }
+        }
+
+        try { return process.HasExited; } catch { return false; }
     }
 
     private void StopAudioOnly()
@@ -536,9 +580,16 @@ public sealed class DecoderPipe : IDisposable
             _audioLife = null;
         }
         life?.Cancel();
-        try { if (process is { HasExited: false }) process.Kill(true); } catch { }
+        var killed = KillTree(process, KillWaitMs, KillAttempts);
         reader?.Join(2000);
         life?.Dispose();
+        try { process?.Dispose(); } catch { }
+        if (process is not null && !killed)
+        {
+            RaiseFault(
+                "ses ffmpeg sureci oldurulemedi, arka planda kalmis olabilir.",
+                "the audio ffmpeg process could not be killed and may still be running.");
+        }
     }
 
     public Task StopAsync()
@@ -546,6 +597,13 @@ public sealed class DecoderPipe : IDisposable
         StopVideoOnly();
         StopAudioOnly();
         return Task.CompletedTask;
+    }
+
+    internal int? TestOnly_VideoProcessId()
+    {
+        Process? process;
+        lock (_gate) process = _videoProcess;
+        try { return process is null ? null : process.Id; } catch { return null; }
     }
 
     internal bool TestOnly_KillVideoProcess()
