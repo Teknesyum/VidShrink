@@ -1,4 +1,4 @@
-﻿{
+{
   "main.language.name": "Türkçe",
 
   "main.tagline.lead": "Boyut hedefli medya sıkıştırma",
@@ -353,7 +353,6 @@
   "main.advice.quality-ceiling": "Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.",
   "main.advice.audio-reduced": "Görüntüye bit kalsın diye ses bit hızı düşürüldü.",
   "main.advice.audio-mono": "Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.",
-  "main.advice.audio-dropped": "Bu boyutta ses tutulamıyor, çıkarıldı.",
   "main.advice.encoder-fallback-gpu": "Hızlı düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.",
   "main.advice.encoder-fallback-not-in-build": "Tercih edilen kodlayıcı bu ffmpeg derlemesinde yok; yazılım karşılığına düşüldü.",
   "main.advice.encoder-fallback-not-measured": "Tercih edilen kodlayıcı bu makinede henüz ölçülmedi; yazılım karşılığına düşüldü.",

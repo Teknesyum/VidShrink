@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -1227,12 +1227,6 @@ public static class PlanCalculator
         var cap = totalK * CompressionStrategy.AudioBudgetShare(regime);
         var audioK = baseK;
         if (audioK > cap) audioK = (int)Math.Round(cap);
-
-        if (audioK < 16 && totalK < 96)
-        {
-            notes.Add(AdviceCode.AudioDropped);
-            return (0, null);
-        }
 
         audioK = Math.Max(24, audioK);
         if (audioK < baseK) notes.Add(AdviceCode.AudioReduced);
