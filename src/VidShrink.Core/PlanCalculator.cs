@@ -158,6 +158,30 @@ public static class PlanCalculator
     private static readonly double MotionCutIsExpensiveAbove = Math.Log2(2 * (1 - MotionCutExpensiveSavingShare));
     private const int MinVideoBitrateK = 48;
 
+    private const double RunnableBitsPerMacroblock = 0.06;
+    private const int AbsoluteRunnableVideoBitrateK = 2;
+
+    /// <summary>
+    /// Iki gecisli kodlamanin acilabildigi en dusuk video bit hizi. Sifir bit hizi
+    /// <c>-b:v 0k</c> demektir ve libx264 onu iki geciste <c>CRF/CQP is incompatible with
+    /// 2pass</c> diye reddeder (exit -22, sifir baytlik dosya); tek paste ise sessizce
+    /// CRF 23'e duser. Katsayi olculdu: libx264 <c>requested bitrate is too low, estimated
+    /// minimum is N kbps</c> satirini 1920x1080@30 icin 11, 1280x720@30 icin 6,
+    /// 854x480@30 icin 4, 3840x2160@60 icin 77 kbps veriyor - saniyedeki makroblok basina
+    /// en fazla 0,0555 kbit. 0,06 katsayisi hepsini asiyor. Mutlak taban 2k: planin
+    /// sectigi en kucuk yerlesimlerde (230x130@6, 384x216@10, 320x180@12) formul 1k veriyor,
+    /// 1k'da libx264 hala reddediyor, 2k'da kosuyor.
+    /// Olcum: <c>docs/olcumler/ses-tabani.md</c>, Tur 4 / K15.
+    /// </summary>
+    public static int RunnableVideoBitrateK(int width, int height, double fps)
+    {
+        var macroblocksPerSecond = Math.Ceiling(Math.Max(1, width) / 16.0)
+            * Math.Ceiling(Math.Max(1, height) / 16.0)
+            * Math.Max(1.0, fps);
+        return Math.Max(AbsoluteRunnableVideoBitrateK,
+            (int)Math.Ceiling(macroblocksPerSecond * RunnableBitsPerMacroblock / 1000.0));
+    }
+
     /// <summary>
     /// Karsilanamayan ses istegini anlatan iki sabit metin. Hem gerekce cumlesine hem
     /// <see cref="ReasonNote.EngineWouldHaveChosen"/> alanina ayni dizge gidiyor: not ile
@@ -683,6 +707,18 @@ public static class PlanCalculator
             }
         }
 
+        if (plan.ModeEnum == EncodeMode.TwoPass)
+        {
+            var runnableK = RunnableVideoBitrateK(plan.Width, plan.Height, plan.Fps);
+            if (plan.VideoBitrateK < runnableK)
+            {
+                var floorMb = SizeMb(runnableK, plan.AudioBitrateK, info.DurationSeconds);
+                if (!notes.Contains(AdviceCode.TargetBelowCodecFloor)) notes.Add(AdviceCode.TargetBelowCodecFloor);
+                reason.Add($"the budget left {plan.VideoBitrateK}k for video, under the {runnableK}k the encoder still opens a two-pass run at {plan.Width}x{plan.Height}@{plan.Fps:0.##}; the bitrate was raised to {runnableK}k, so the smallest file this source can deliver with its {plan.AudioBitrateK}k audio is about {floorMb:0.##} MB against the {effectiveTargetMb:0.##} MB target");
+                plan.VideoBitrateK = runnableK;
+            }
+        }
+
         plan.Reason = string.Join("; ", reason);
         plan.ReasonCodes = reasonCodes;
         plan.EffectiveTargetMb = effectiveTargetMb;
@@ -985,7 +1021,7 @@ public static class PlanCalculator
         corrected.Mode = "2pass";
         corrected.Crf = null;
         corrected.BitrateBias = HardwareDeliveryBias(efficiency);
-        corrected.VideoBitrateK = Math.Max(0, (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
+        corrected.VideoBitrateK = Math.Max(RunnableVideoBitrateK(corrected.Width, corrected.Height, corrected.Fps), (int)Math.Round(Math.Min(previousVideoK * factor, videoBudgetK)));
 
         corrected.Reason = fillUnderBand
             ? $"retry: the previous attempt produced {actualMb:0.0} MB, below the {band.LowerMb:0.0} MB lower edge of the fill band for a {targetMb:0.##} MB target; video bitrate was scaled by {factor:0.###} and {aimSource}"
