@@ -39,19 +39,25 @@ public partial class App : Application
             MacUpdate.Begin();
             desktop.Exit += (_, _) => MacUpdate.Finish();
 
-            if (_shrink is not null)
-            {
-                desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
-                desktop.MainWindow = new ShrinkJobWindow(_shrink, _queue) { Icon = LoadAppIcon() };
-            }
-            else
-            {
-                desktop.MainWindow = new MainWindow(_startupFile) { Icon = LoadAppIcon() };
-            }
+            if (_shrink is not null) desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
+
+            var window = StartupWindow();
+            window.Icon = LoadAppIcon();
+            desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    /// <summary>
+    /// Baslangicta acilan pencere. Ayri durmasinin sebebi olculebilir olmasi: kabuk istegi
+    /// varken burasi <see cref="MainWindow"/> dondururse ana pencere geri gelir ve
+    /// <c>KabukIstegiTests.KabukIstegiAnaPencereyiAcmaz</c> kirmizi olur.
+    /// </summary>
+    internal Window StartupWindow()
+        => _shrink is not null
+            ? new ShrinkJobWindow(_shrink, _queue)
+            : new MainWindow(_startupFile);
 
     private static WindowIcon? LoadAppIcon()
     {

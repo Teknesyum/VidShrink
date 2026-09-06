@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -109,6 +109,34 @@ public sealed class KabukIstegiTests
         _output.WriteLine($"{problem}\n  en: {en}\n  tr: {tr}");
     }
 
+    /// <summary>
+    /// Bes gerekcenin ekran anahtari, olcunun kendi icinde harfi harfine yazili. Uretim
+    /// tarafindaki <c>ShrinkProblemText.Key</c> degisirse beklenti onunla birlikte kaymaz;
+    /// iki gerekce ayni anahtara baglanirsa bu tablo kirmizi olur.
+    /// </summary>
+    private static string BeklenenAnahtar(ShrinkArgumentProblem problem) => problem switch
+    {
+        ShrinkArgumentProblem.NoTarget => "main.shrink-job.reason.no-target",
+        ShrinkArgumentProblem.TargetNotANumber => "main.shrink-job.reason.not-a-number",
+        ShrinkArgumentProblem.TargetNotPositive => "main.shrink-job.reason.not-positive",
+        ShrinkArgumentProblem.TargetNotInQuickList => "main.shrink-job.reason.not-in-quick-list",
+        ShrinkArgumentProblem.NoPath => "main.shrink-job.reason.no-path",
+        _ => throw new ArgumentOutOfRangeException(nameof(problem))
+    };
+
+    private static string PencereMetni(ShrinkArgumentProblem problem) => AppHost.Run(() =>
+    {
+        var window = new ShrinkJobWindow(new ShellShrinkStartup(null, problem, null), null);
+        try
+        {
+            window.Begin();
+            return window.State == ShrinkJobState.Gerekce
+                ? window.MessageText
+                : $"<durum:{window.State}>";
+        }
+        finally { window.Close(); }
+    });
+
     [Theory]
     [InlineData(ShrinkArgumentProblem.NoTarget)]
     [InlineData(ShrinkArgumentProblem.TargetNotANumber)]
@@ -117,20 +145,116 @@ public sealed class KabukIstegiTests
     [InlineData(ShrinkArgumentProblem.NoPath)]
     public void GerekcePencereyeYazilir(ShrinkArgumentProblem problem)
     {
-        var text = AppHost.Run(() =>
+        var anahtar = BeklenenAnahtar(problem);
+        var beklenen = LanguageCatalog.Display(Strings.Get(anahtar, ShrinkProblemText.QuickList()));
+
+        Assert.Equal(anahtar, ShrinkProblemText.Key(problem));
+        Assert.False(string.IsNullOrWhiteSpace(beklenen), $"{anahtar} karsiligi bos.");
+
+        var gorulen = PencereMetni(problem);
+        Assert.Equal(beklenen, gorulen);
+        _output.WriteLine($"{problem} -> {anahtar}");
+        _output.WriteLine($"  {gorulen}");
+    }
+
+    [Fact]
+    public void BesGerekceBesAyriCumleBasar()
+    {
+        var cumleler = ShrinkProblemText.All.Select(PencereMetni).ToArray();
+        var ayri = cumleler.Distinct(StringComparer.Ordinal).Count();
+
+        _output.WriteLine($"gerekce: {cumleler.Length}  ayri cumle: {ayri}");
+        foreach (var (problem, cumle) in ShrinkProblemText.All.Zip(cumleler))
+            _output.WriteLine($"  {problem} -> {cumle}");
+
+        Assert.Equal(5, cumleler.Length);
+        Assert.Equal(cumleler.Length, ayri);
+    }
+
+    /// <summary>
+    /// K6: tek argv'de gelen her var olan yol icin bir istek. Kusur sinifi tam burada
+    /// kapaniyor — ilk yol kucultulup kalanlarin sessizce dusmesi bu olcuyle kirmizi olur.
+    /// </summary>
+    [Fact]
+    public void TekArgvdekiUcYolUcIstekUretir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"vidshrink-t171-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var yollar = new[] { "a.mp4", "b.mp4", "c.mp4" }
+            .Select(ad => Path.Combine(dir, ad))
+            .ToArray();
+        foreach (var yol in yollar) File.WriteAllBytes(yol, new byte[16]);
+
+        var args = new List<string> { ShellIntegration.ShrinkFlag, "100" };
+        args.AddRange(yollar);
+
+        var startup = Program.StartupFor(args);
+
+        Assert.NotNull(startup);
+        Assert.Null(startup!.Problem);
+        Assert.Equal(3, startup.Items.Count);
+        Assert.Equal(yollar, startup.Items.Select(r => r.Path).ToArray());
+        Assert.All(startup.Items, r => Assert.Equal(100, r.TargetMegabytes));
+        _output.WriteLine($"argv yolu: {yollar.Length}  uretilen istek: {startup.Items.Count}");
+        foreach (var istek in startup.Items)
+            _output.WriteLine($"  {istek.TargetMegabytes} MB -> {istek.Path}");
+    }
+
+    /// <summary>
+    /// K6/K7: pencere uc istegin ucunu de kabul etti mi. "Ucu de islendi" iddiasi surec
+    /// sayimindan degil bu sayilan degerden gelir.
+    /// </summary>
+    [Fact]
+    public void PencereUcIstegiDeKabulEder()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"vidshrink-t171-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var yollar = new[] { "a.mp4", "b.mp4", "c.mp4" }
+            .Select(ad => Path.Combine(dir, ad))
+            .ToArray();
+        foreach (var yol in yollar) File.WriteAllBytes(yol, new byte[16]);
+
+        var args = new List<string> { ShellIntegration.ShrinkFlag, "100" };
+        args.AddRange(yollar);
+        var startup = Program.StartupFor(args);
+        Assert.NotNull(startup);
+
+        var kabul = AppHost.Run(() =>
         {
-            var window = new ShrinkJobWindow(new ShellShrinkStartup(null, problem, null), null);
+            var window = new ShrinkJobWindow(startup!, null);
             try
             {
                 window.Begin();
-                return (window.State, window.MessageText);
+                return window.AcceptedCount;
             }
             finally { window.Close(); }
         });
 
-        Assert.Equal(ShrinkJobState.Gerekce, text.State);
-        Assert.False(string.IsNullOrWhiteSpace(text.MessageText), $"{problem} icin ekranda cumle yok.");
-        _output.WriteLine($"{problem} -> {text.MessageText}");
+        _output.WriteLine($"AcceptedCount: {kabul}");
+        Assert.Equal(3, kabul);
+    }
+
+    /// <summary>
+    /// K8: kabuk istegi varken acilan pencere ilerleme penceresidir. Piksel genisligine
+    /// degil, <c>App.StartupWindow</c>un dondurdugu turun kendisine bakar.
+    /// </summary>
+    [Fact]
+    public void KabukIstegiAnaPencereyiAcmaz()
+    {
+        var file = SampleFile();
+        var startup = Program.StartupFor(new[] { ShellIntegration.ShrinkFlag, "100", file });
+        Assert.NotNull(startup);
+
+        var ad = AppHost.Run(() =>
+        {
+            var window = new VidShrink.App.App(startup!, null).StartupWindow();
+            try { return window.GetType().Name; }
+            finally { window.Close(); }
+        });
+
+        _output.WriteLine($"acilan pencere turu: {ad}");
+        Assert.Equal(nameof(ShrinkJobWindow), ad);
+        Assert.NotEqual(nameof(MainWindow), ad);
     }
 
     [Fact]

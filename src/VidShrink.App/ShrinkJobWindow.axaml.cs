@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -128,8 +128,9 @@ public partial class ShrinkJobWindow : Window
     }
 
     /// <summary>
-    /// Istegin tuketildigi yer. Gerekce varsa pencere kalir; istek varsa kuyruga girer ve
-    /// kuyrugun sahibiysek boru da acilir, ikinci surecin istegi buraya duser.
+    /// Isteklerin tuketildigi yer. Gerekce varsa pencere kalir; ayni argv'den gelen her
+    /// istek kuyruga girer ve kuyrugun sahibiysek boru da acilir, ikinci surecin istegi
+    /// buraya duser.
     /// </summary>
     internal void Begin()
     {
@@ -142,7 +143,7 @@ public partial class ShrinkJobWindow : Window
             return;
         }
 
-        if (_startup.Request is { } request) Accept(request);
+        foreach (var request in _startup.Items) Accept(request);
 
         if (_queue is null) return;
         try
