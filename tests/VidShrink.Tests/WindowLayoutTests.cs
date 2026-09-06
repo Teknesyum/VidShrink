@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
@@ -1194,6 +1194,38 @@ public sealed class WindowLayoutTests
     /// <see cref="Clips"/>) — ikisi de yerleşimin verdiği genişliğe kırpılır. Kırpılmayan tek
     /// sayı, metnin dizgiden çıkan kendi genişliğidir.</para>
     /// </summary>
+    /// <summary>
+    /// Yazı tipi yedekleme önbelleğini ölçümden <b>önce</b> ısıtır.
+    ///
+    /// <para>Ölçülen sorun: pencerenin ilk yerleşimi soğuk önbellekle koşuyor ve
+    /// <c>BtnMaximize</c> yazısı <c>□</c> için <see cref="Visual.Bounds"/> 10 px çıkıyordu.
+    /// Aynı sekmedeki <c>⋮</c> düğmesinin <see cref="NeededWidth"/> çağrısı yedeklemeyi
+    /// ısıtınca <b>sonraki</b> <c>□</c> ölçümü 9,66'dan 13,78'e sıçrıyor; test bayat
+    /// <c>Bounds</c> ile ısınmış <see cref="FormattedText"/>'i karşılaştırıp kırpılma
+    /// uyduruyordu. Taze ölçümde metin 14 px, düğme 42 px — kırpılma yok.</para>
+    ///
+    /// <para>Isıtma yerleşimin kendisini değiştirmez, yalnız iki tarafın aynı önbellekten
+    /// okumasını sağlar: çağrıdan sonra <see cref="RelayoutAt"/> tekrarlanır ve
+    /// <c>Bounds</c> ısınmış genişliği gösterir. Gerçekten kutusuna sığmayan bir yazı
+    /// hâlâ kırmızı verir — dar düğmede blok düğmenin genişliğiyle sınırlanır.</para>
+    /// </summary>
+    private static void WarmTextShaping(MainWindow window)
+    {
+        foreach (var block in window.GetVisualDescendants().OfType<TextBlock>().Where(b => b.IsEffectivelyVisible))
+            if (!string.IsNullOrEmpty(block.Text))
+                NeededWidth(block, block.Text!);
+
+        foreach (var box in window.GetVisualDescendants().OfType<ComboBox>().Where(b => b.IsEffectivelyVisible))
+        {
+            if (box.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault() is not { } shown) continue;
+
+            foreach (var option in box.Items.OfType<ComboBoxItem>()
+                         .Select(item => item.Content?.ToString())
+                         .Where(text => !string.IsNullOrWhiteSpace(text)))
+                NeededWidth(shown, option!);
+        }
+    }
+
     private static double NeededWidth(TextBlock face, string text) =>
         new FormattedText(
             text,
@@ -1290,6 +1322,8 @@ public sealed class WindowLayoutTests
             for (var index = 0; index < tabs.ItemCount; index++)
             {
                 tabs.SelectedIndex = index;
+                RelayoutAt(window, size);
+                WarmTextShaping(window);
                 RelayoutAt(window, size);
 
                 var tab = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";

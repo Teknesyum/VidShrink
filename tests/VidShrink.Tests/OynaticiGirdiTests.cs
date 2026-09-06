@@ -693,4 +693,55 @@ public sealed class OynaticiGirdiTestsKabukHatasi
 
         GirdiKanit.Write("k12-acilis-hatasi.txt", rapor);
     }
+
+    private static int DilAboneSayisi()
+    {
+        var alan = typeof(Strings).GetField(
+            nameof(Strings.Changed),
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        return (alan?.GetValue(null) as Delegate)?.GetInvocationList().Length ?? 0;
+    }
+
+    /// <summary>
+    /// T181: <see cref="Strings.Use"/> surec genelinde ve arayuz is parcaciginin disindan
+    /// cagrilabiliyor. Iki sey olculuyor: gorsel agactan ayrilan oynatici aboneligini
+    /// gercekten birakiyor mu (abone sayisi kurulus seviyesine doner), ve hala ekliyken
+    /// olay baska bir is parcacigindan gelirse <c>RefreshState</c> istisna atiyor mu.
+    /// </summary>
+    [Fact]
+    public void AyrilanOynaticiDilAboneliginiBirakir()
+    {
+        var onceki = Strings.Language;
+        Window? pencere = null;
+
+        try
+        {
+            var (kurulus, ekli) = AppHost.Run(() =>
+            {
+                var view = new PlayerView();
+                pencere = new Window { Width = 640, Height = 480, Content = view };
+                var a = DilAboneSayisi();
+                pencere.Show();
+                return (a, DilAboneSayisi());
+            });
+
+            Strings.Use("tr");
+
+            var ayrik = AppHost.Run(() =>
+            {
+                pencere!.Close();
+                return DilAboneSayisi();
+            });
+
+            Strings.Use("tr");
+
+            Assert.Equal(kurulus + 1, ekli);
+            Assert.Equal(kurulus, ayrik);
+        }
+        finally
+        {
+            AppHost.Run(() => pencere?.Close());
+            Strings.Use(onceki);
+        }
+    }
 }
