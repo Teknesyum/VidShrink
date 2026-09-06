@@ -14,7 +14,7 @@
                  VerticalAlignment="Center"/>
       <Button Grid.Column="1"
               x:Name="BtnPlayerMenu"
-              Content="&#x22EE;"
+              Content="⋮"
               Theme="{StaticResource GhostButton}"
               FontFamily="{StaticResource FontMono}"
               VerticalAlignment="Center"

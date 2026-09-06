@@ -42,7 +42,6 @@ internal partial class PlayerView : UserControl
         AddHandler(PointerPressedEvent, OnPressed, RoutingStrategies.Tunnel);
         AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
 
-        Strings.Changed += (_, _) => RefreshState();
         RefreshState();
     }
 
@@ -161,8 +160,26 @@ internal partial class PlayerView : UserControl
         if (button != PlayerButton.Left) e.Handled = true;
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        Strings.Changed += OnLanguageChanged;
+        if (TopLevel.GetTopLevel(this) is { } top)
+            top.AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        Strings.Changed -= OnLanguageChanged;
+        if (TopLevel.GetTopLevel(this) is { } top)
+            top.RemoveHandler(KeyDownEvent, OnKey);
+        base.OnDetachedFromVisualTree(e);
+    }
+
     private void OnKey(object? sender, KeyEventArgs e)
     {
+        if (!IsEffectivelyVisible) return;
+
         var key = e.Key switch
         {
             Key.Space => PlayerKey.Space,
@@ -335,6 +352,8 @@ internal partial class PlayerView : UserControl
         TxtEmpty.IsVisible = false;
         RefreshState();
     }
+
+    private void OnLanguageChanged(object? sender, EventArgs e) => RefreshState();
 
     internal void RefreshState()
     {

@@ -392,11 +392,11 @@ public sealed class GirdiKlipFixture : IAsyncLifetime
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public sealed class OynaticiGercekBoruTests : IClassFixture<GirdiKlipFixture>
+public sealed class OynaticiGirdiTestsGercekBoru : IClassFixture<GirdiKlipFixture>
 {
     private readonly GirdiKlipFixture _klip;
 
-    public OynaticiGercekBoruTests(GirdiKlipFixture klip) => _klip = klip;
+    public OynaticiGirdiTestsGercekBoru(GirdiKlipFixture klip) => _klip = klip;
 
     [FfmpegAvailableFact]
     public async Task OnHizliTikGercekBoruyaKarsiBirikirVeAramalarSinirdaKalir()

@@ -2214,7 +2214,7 @@ public partial class MainWindow : Window
     internal async Task LoadStartupFileAsync(string path)
     {
         Tabs.SelectedIndex = PlayerTabIndex;
-        PlayerView.Echo("startup tab=" + Tabs.SelectedIndex + " header=" + ((TabItem)Tabs.Items[Tabs.SelectedIndex]!).Header);
+        PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + ((TabItem)Tabs.Items[Tabs.SelectedIndex]!).Header);
         await LoadAsync(path);
         try { await Player.OpenAsync(path); }
         catch (Exception) { }
