@@ -418,14 +418,19 @@ dili (teslim commit'i `3618cf8`te `ShrinkJobWindow.axaml.cs:96`) süreç genelin
 değiştirdiği için iki taraf farklı dile düşebiliyordu.
 
 Çözüm: pencere dili kuruluşta bir kez çözülüp `ShrinkJobWindow.Language`e sabitlendi
-(`ShrinkJobWindow.axaml.cs:98,103,125`), `Say` artık `Strings.GetIn(_language, ...)` okuyor
+(`ShrinkJobWindow.axaml.cs:98,102,125`), `Say` artık `Strings.GetIn(_language, ...)` okuyor
 (`:353-357`). Ölçü beklenen metni **o örneğin dilinden** hesaplıyor
 (`KabukIstegiTests.cs:127-150` ve `:156-169`).
 
 Pencere dilinin koşumdan koşuma gerçekten değiştiği ham çıktıda görülüyor: temiz ağaçta
 `pencere dili: tr` (`.calisma/T171/t3-k13-k14-sonda.txt`), mutasyon (i) koşumunda
-`pencere dili: en` (`.calisma/T171/t3-k4-mutasyon-i.txt:39`). Sebep `UpdateSettings.Load()`
-— sıra bağımlı. Ölçü artık buna bakmadığı için bu değişkenlik onu düşürmüyor.
+`pencere dili: en` (`.calisma/T171/t3-k4-mutasyon-i.txt:39`). **Sebep ölçülmedi.**
+Sanık `UpdateSettings.Load()`'un sıra bağımlılığı ama bu tur bunu ayrıştıran bir koşum
+yapmadı; ham çıktı yalnız iki koşumda dilin farklı çıktığını gösteriyor, nedenini değil.
+Ölçü artık pencerenin kendi dilinden okuduğu için bu değişkenlik onu düşürmüyor.
+
+Seam duruyor: `ShrinkJobWindow.axaml.cs:103` hâlâ `Strings.Use(_language)` ile süreç
+genelindeki dili değiştiriyor. Ölçü oradan okumadığı için kırmızı vermiyor.
 
 **CHECK — 10 koşum.** `dotnet test -c Release --no-build --filter
 "KabukIstegiTests|LocalizationTests|LanguageTests"`, arka arkaya, her biri ayrı çağrıda.
@@ -540,14 +545,18 @@ Set-Item -LiteralPath $command -Value ('"{0}" {1} {2} "%1"' -f $Executable, $she
 ```
 
 Bu makinede kurulu gerçek değerler de okundu (`.calisma/T171/t3-k14-uretim-yolu.txt`),
-beş hedefin beşi de mutlak yol taşıyor:
+beş hedefin beşinde de yürütülebilir **mutlak yolla** yazılı ve yol argümanı
+**tırnak içinde tek `"%1"` yer tutucusu**:
 
 ```
 HKCU\...\SystemFileAssociations\.mp4\shell\VidShrinkKucult\shell\100\command
   (Default) = "C:\Users\Teknesyum\AppData\Local\Programs\VidShrink\VidShrink.exe" --kucult 100 "%1"
 ```
 
-`%1` Explorer tarafından tam nitelikli yola açılır; birleştirilen aday o zaman
+`%1`'in Explorer tarafından tam nitelikli yola açılması **bu depoda ölçülmedi**, Windows
+davranışı olarak alındı; ölçülen şey tırnak ve tek yer tutucu. Sonuç yine de ayakta: tur 1
+komut satırı başına `%1` sayısını 120/120 **1** ölçmüştü, tek yol tokenıyla birleştirme
+hatası doğamaz. Tam nitelikli açılırsa birleştirilen aday
 `C:\Klip\a.mp4 C:\Klip\b.mp4` olur ve Windows'ta böyle bir dosya adı kurulamaz (içinde
 `:` ve dizin ayıracı var). **Karar: sezgisel düzeltilmedi, bedeli yazıldı** — tırnağı
 kaybolmuş boşluklu yolu geri toplamak (K1'in `UnquotedPathBrokenIntoThreePieces` kolu)
