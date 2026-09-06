@@ -976,7 +976,7 @@ public sealed class WindowLayoutTests
 
             return (found, faults);
         });
-        // Ölçüm yine de bir sayıya bağlı: rozetleri görmez olursa sessizce yeşile dönmez.
+
         var declared = Regex.Matches(
             File.ReadAllText(TipSources.WindowXamlPath), "StaticResource InfoButton").Count;
 
