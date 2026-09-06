@@ -3,6 +3,46 @@
 Bu dosya "devam" yazildigi anda okunacak. Kaybolmamasi gereken her sey burada.
 Son guncelleme: T176 tur 1 teslimi geldikten sonra.
 
+## "devam" DENDIGINDE - once bunlari yap, sorma
+
+Kullanici masaustunde yalnizca `git pull` yapip **devam** yazacak. Gerisi senin.
+Asagidaki dort adim sirayla, onay istemeden:
+
+**1) Kaniti geri getir.** Butun ham olcum dosyalari `.calisma/` altinda ve gitignore'lu;
+gizli depoda duruyorlar. Depo yoksa klonla, varsa cek, sonra `.calisma/`ye ac:
+
+    git -C %USERPROFILE%\.claude	eknesyum-ozel pull
+    (yoksa: git clone https://github.com/Teknesyum/teknesyum-ozel.git %USERPROFILE%\.claude	eknesyum-ozel)
+    (sparse ise: git -C ... sparse-checkout add vidshrink)
+    robocopy %USERPROFILE%\.claude	eknesyum-ozelidshrink\calisma .calisma /E
+
+**2) T176 worktree'sini kur.** Dizustundeki `..\VidShrink-T176` bu makinede yok, ama dal
+uzakta duruyor:
+
+    git worktree add ..\VidShrink-T176 T176-oynatici-girdi
+
+**3) Yapiyi ve olcuyu bir kez dogrula** (yesil degilse denetciyi dagitma, once sebebi bul):
+
+    dotnet test -c Release --filter "OynaticiGirdiTests|PlayerTabTests|LanguageTests"
+
+**4) T176 tur 1 denetcisini dagit.** Yapici teslim etti, sira denetcide. `auditor` ajanina
+Turkce, soyle bir dagitim ver - ozetleme, sozlesmeyi ve raporu kendisi okusun:
+
+> T176 sozlesmesinin tur 1 teslimini denetle. Sozlesme `.claude/relay/contracts/T176.md`,
+> teslim `origin/T176-oynatici-girdi` = d2e9937, rapor `docs/olcumler/oynatici-girdi.md`,
+> ham kanit `.calisma/T176/`. Her K maddesinin sayisini ham dosyaya karsi dogrula; en az
+> uc olcumu repo disi temiz bir kopyada kendin kos. Bu deponun imza kusuru "tablo dogru,
+> onu ozetleyen cumle yanlis" - rapordaki her mutlak nicelik cumlesini ayri dene.
+> Kod yazma, duzeltme. GECTI/KALDI hukmu, kritik sayisi ve borc listesi ver.
+> Bash cagrilarinda timeout: 600000 kullan, run_in_background kullanma.
+
+Hukum GECTI ise: yapici dalini `TEKNESYUM_GATE_OPEN=1 git merge --no-ff d2e9937` ile
+`main`e al, elle muhurle (`contracts/done/`, `status: done` + `result: passed`,
+`ledger.jsonl`'a `coreVersion: manual-0.16-no-contract-js`), it, worktree'yi kaldir.
+KALDI ise tur 2 kapsamini sozlesmeye yaz ve yapiciyi yeniden dagit.
+
+Bunlar bitmeden yeni sozlesme acma. T176'dan sonraki sira asagidaki borc listesi.
+
 ## Nerede duruyoruz
 
 Surum **v0.3.0** (`Directory.Build.props:7`), etiket `v0.3.0` itildi, `main` = `fd6fe0c`.
@@ -23,8 +63,8 @@ worktree `..\VidShrink-T176` temiz, commit'lenmemis is yok.
 denetim turu yeni bir kosum demek. Masaustunde ilk is: `auditor` ajanini T176 tur 1'e
 dagit, sonra hukume gore muhurle ya da tur 2 kapsami yaz.
 
-Yapicinin K -> ham dosya -> sayi tablosu (hepsi `.calisma/T176/` altinda, gitignore'lu,
-gizli depoya **kopyalanmadi** - ajan onlari devirden sonra yazdi):
+Yapicinin K -> ham dosya -> sayi tablosu (hepsi `.calisma/T176/` altinda, gitignore'lu;
+gizli depoya kopyalandi, yukaridaki 1. adim geri getiriyor - iki kucuk ornek klip dahil):
 
 | K | ham dosya | sayi |
 |---|---|---|
@@ -98,13 +138,19 @@ Dort sabitleme eklendi, biri iki dilde tum dil dosyasini suzuyor (tr 199, en 191
 
 ## Kanit nerede
 
-`.calisma/` gitignore'lu ve **3.5 GB** (T171 tek basina 3.0 GB video). Git'e girmez.
-Kucuk metin kaniti ve ekran goruntuleri (98 dosya, 4.4 MB) gizli depoya kopyalandi:
+`.calisma/` gitignore'lu ve bu makinede **3.5 GB** (T171 tek basina 3.0 GB video).
+Git'e girmez. Kucuk metin kaniti, olcum betikleri ve ekran goruntuleri (112 dosya, 4.8 MB)
+gizli depoda:
 
     ~/.claude/teknesyum-ozel/vidshrink/calisma/
 
-Buyuk medya (`.calisma/kaynak`, `kaynak-genis`, `t57`, T171 video klasorleri) **yalniz bu
-makinede**. Masaustunde bir olcum tekrarlanacaksa kaynak videolar yeniden uretilmeli.
+Icinde: T171 ve T158 ham kosumlari + `devralinan/`, T176 tur 1'in on ham dosyasi ve iki
+kucuk ornek klibi, `gorunum/` alti dokuz ekran goruntusu ve yakalama betikleri,
+`test-ciktilari/`. Yukaridaki 1. adim bunu `.calisma/`ye geri aciyor.
+
+Gitmeyen tek sey buyuk medya: `.calisma/kaynak`, `kaynak-genis`, `t57` ve T171'in video
+klasorleri **yalniz dizustunde**. Bunlara dayanan bir olcum tekrarlanacaksa kaynak
+videolar yeniden uretilmeli; T176'nin ihtiyaci olan klip kopyada var.
 
 ## Makine kurallari (unutulmasin)
 
