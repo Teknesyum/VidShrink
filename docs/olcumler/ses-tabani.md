@@ -1,4 +1,4 @@
-﻿# T172 - Ses tabani: AudioDropped kolu kaldirildi
+# T172 - Ses tabani: AudioDropped kolu kaldirildi
 
 Dal: `T172-ses-tabani`. Motor karari: kaynakta ses varsa ciktida da ses olmali;
 `audioK < 16 && totalK < 96` kosulu ses akisini tamamen dusuren yolu artik **kaldirilmis**
@@ -46,7 +46,10 @@ hic dosya yok. Tek uretilen dosyada (10dk/8MB) ses akisi var. Dosya uretmeyen 4
 kombinasyon K3'te ele aliniyor: bunlar **eskiden basariyla (sessiz) teslim oluyordu**,
 yeni kodda "hic teslim yok"a donuyor.
 
-## K3 - Hedef hala tutuyor mu: KIRMIZI (3/5 kombinasyonda regresyon)
+## K3 - Hedef hala tutuyor mu: TUR 1'de KIRMIZI (3/5 kombinasyonda regresyon)
+
+**Bu bolum tur 1'in sonucudur ve tur 2'de duzeldi** - guncel durum icin asagidaki
+"Tur 2 - K8/K9/K10" basligina ve uc sutunlu K3 tablosuna bak.
 
 Ayni 5 kombinasyon, ayni harness, **eski kod** (`git stash` ile `AudioDropped` geri
 getirilip `dotnet build -c Release --no-incremental` ile derlendi, olculdu, sonra
@@ -135,7 +138,7 @@ kapsama boslugu bulundu ve `tests/VidShrink.Tests/SesTabaniTests.cs` (owns icind
 | `PlanCalculatorTests\|SesTabaniTests\|ManualOverrideTests` | 122 (ham: `.calisma/T172/final-verify1.txt`; K6 testi eklenmeden once 121 idi, `.calisma/T172/k7-liste1.txt`) |
 | `OluUyeTests\|LanguageTests` | 66 (ham: `.calisma/T172/k7-liste2.txt`) |
 
-## Verify sonucu (nihai)
+## Tur 1 verify sonucu
 
 - `PlanCalculatorTests|SesTabaniTests|ManualOverrideTests`: **121/122 yesil, 1 kirmizi.**
   Kirmizi: `ManualOverrideTests.K1_VarsayilanT165OncesiMotorlaBirebirAyni` (1920x1080@30,
@@ -154,138 +157,7 @@ kapsama boslugu bulundu ve `tests/VidShrink.Tests/SesTabaniTests.cs` (owns icind
 Mutasyonlar sadece `owns` icindeki `PlanCalculator.cs`'de yapildi ve geri alindi.
 `.calisma/kaynak/` okunuyor, yazilmadi/silinmedi. Tum olcumler `.calisma/T172/` altinda.
 
-## Tur 2 - K8: Floor'a carpan planda hedef tutuyor, ses de kaliyor
-
-Kok neden (tur 1'de teshis edildi): `PlanCalculator.cs:391` ve `:545` videoK'yi
-`MinVideoBitrateK=48`'e sabitliyordu; ses payi dusulunce butce 48'in altina dusen
-aralikta plan butceden fazlasini istiyor, iki-pas kodlama hedefi asiyordu. Duzeltme:
-`videoK = Math.Max(0.0, totalK*ContainerOverhead - audioK - DeliveryReserveK(codec))`
-(satir 391) ve `plan.VideoBitrateK = Math.Max(videoK, 0.0)` (satir 545) - artik butcenin
-gercekten gerektirdigi deger kullaniliyor, SearchLayout bu dusuk videoK'ya gore
-cozunurluk/kare hizini gercekten kisiyor (ResolutionReduced/FrameRateReduced notlari).
-
-Ayni 5 kombinasyon, ayni harness (.calisma/T172/calistir/Program.cs) ile tekrar
-kosuldu. Ham cikti: .calisma/T172/tur2-k8-ham.txt, ffprobe: .calisma/T172/tur2-k8-ffprobe.txt.
-
-| kombinasyon | hedef MB | TUR2: gercek MB / basari / denemeler | ffprobe ses akisi |
-|---|---|---|---|
-| 1dk/0,3MB  | 0,3 | 0,29   / basarili / 2 | codec_name=aac codec_type=audio channels=1 |
-| 2dk/0,8MB  | 0,8 | 0,771  / basarili / 2 | codec_name=aac codec_type=audio channels=1 |
-| 5dk/2MB    | 2   | 1,927  / basarili / 2 | codec_name=aac codec_type=audio channels=1 |
-| 10dk/5MB   | 5   | 4,855  / basarili / 2 | codec_name=aac codec_type=audio channels=1 |
-| 10dk/8MB   | 8   | 7,712  / basarili / 2 | codec_name=aac codec_type=audio channels=1 |
-
-Kendi saydim: 5 kombinasyonun 5'i de dosya teslim ediyor, 5'i de ffprobe'da ses
-akisi tasiyor, 5'i de hedefi asmiyor (fark: -0,01 / -0,029 / -0,073 / -0,145 / -0,288 MB,
-hepsi hedefin altinda). Sifir istisna.
-
-Motorun bu aralikta yaptigi: ilk 4 kombinasyonda TargetBelowCodecFloor, hepsinde
-ResolutionReduced, ilk 4'unde ayrica FrameRateReduced notu var - bit hizi 48'e
-sabitlenmiyor, dusuk butceye gore katman (layout) yeniden araniyor.
-
-### K8-ek - MinVideoBitrateK'nin diger 4 kullanim yerinin olcumu
-
-Onceki ajanin iddiasi ("505/511/520/528 dusuk butcede tetiklenmiyor, 625 elle-CRF yolu,
-868 kalite-hedef modu") mutasyonla olculdu. Yontem: .calisma/T172/analiz/Program.cs
-harness'i (9 sure x 19 hedef = 171 satirlik, tumu Aggressive/Extreme rejimde) temiz
-`dotnet build -c Release --no-incremental` sonrasi kosuldu (.calisma/T172/tur2-baseline-sweep-v2.tsv).
-
-- Satir 505 (ceilingVideoK ilk atama): degeri 999999.0'a mutasyonlayip tam
-  surupmeyi tekrar kostum - 0 satir fark. Neden: bu atama hemen ardindan gelen
-  FillPolicy.FillTarget blogu (varsayilan politika, analiz'de degistirilmiyor)
-  tarafindan her zaman eziliyor (511/520/528'den biri calisiyor). Satir gercekten
-  olu - kendi degeri hicbir ciktiya ulasmiyor.
-- Satir 511/520/528 (FillTarget dalindaki desiredVideoK): 999999.0 mutasyonu
-  56 satirda fark verdi (buyuk sure/hedef kombinasyonlarinda, ornek: 30dk/10MB,
-  60dk/15MB) - yani bu uc satir calisiyor, satir 505'in aksine olu degil. Ama bu
-  asiri deger her Math.Max cagrisini kendi lehine cekiyor, gercek floor'un (48)
-  baglayici olup olmadigini GOSTERMIYOR. Floor'u gercek deger olan 0.0'a indirip
-  (K8'deki 391/545 ile ayni desen) ayni 171 satirlik surupmeyi tekrar kostum:
-  0 satir fark (.calisma/T172/tur2-k8ek-fixed-sweep.tsv, .calisma/T172/tur2-baseline-sweep-v2.tsv
-  ile birebir ayni). Sonuc: yol calisiyor ama 48 sabiti bu alanda hicbir zaman baglayici
-  degil - desiredVideoK zaten 48'in ustunde hesaplaniyor. Onceki ajanin "tetiklenmiyor"
-  iddiasi yanlisti (yol calisiyor), ama "davranisi degistirmiyor" sonucu dogru cikti.
-  NOT: bu 0.0 degisikligi guncel PlanCalculator.cs'e commit edilemedi - bu turda calisma
-  agacinda es zamanli baska bir surecin (asagida) dosyayi surekli HEAD'e sifirlamasi
-  yuzunden kalici olarak commit edilemedi; olcum sonucu (davranis degismiyor) gecerliligini
-  koruyor, sadece kozmetik temizlik uygulanamadi.
-- Satir 625 (options.LockedCrf manuel yol): analiz/calistir harness'leri LockedCrf
-  set etmiyor, bu satir bu olcum alaninda hic cagrilmiyor - koddan dogrulandi
-  (if (options.LockedCrf is double manualCrf) disina hicbir cagri yok). T165'in
-  elle-CRF alani, K8'in dusuk-butce-otomatik aralik iddiasinin disinda.
-- Satir 868 (QualityFloorTargetMb): grep ile PlanCalculator.cs icinde bu
-  fonksiyonun sadece kalite-hedef bisection metodunda (satir 886-887, Intent.Quality
-  akisi) cagrildigi dogrulandi; BuildDetailedCore'un TargetMb-tabanli 391-568 akisi bu
-  fonksiyonu hic cagirmiyor - ayri bir kod yolu, K8'in kapsamindaki senaryolarla
-  kesismiyor.
-
-UYARI - es zamanli surec: Bu tur sirasinda git log uzerinde beklenmedik bir K9
-commit'i (4dd7766) ortaya cikti ve PlanCalculator.cs'e yapilan sed mutasyonlari
-commit edilmeden once sessizce HEAD durumuna donuyordu (calisma agaci git status
-"clean" gosteriyordu, benim degisikligim olmadan). Bu, ayni worktree uzerinde
-baska bir ajan/surecin es zamanli calistigini gosteriyor. Guvenlik icin
-PlanCalculator.cs uzerinde daha fazla mutasyon denemedim; K8-ek'in olcum sonuclari
-(505 olu, 511/520/528 calisiyor-ama-floor-baglayici-degil, 625/868 kapsam disi) ham
-.tsv dosyalariyla .calisma/T172/ altinda kayitli ve tekrarlanabilir.
-
-## Tur 2 - K9: ManualOverrideTests golden degeri guncellendi
-
-ManualOverrideTests.K1_VarsayilanT165OncesiMotorlaBirebirAyni satiri
-(1920x1080@30, 600s, 6MB hedef) tur 1'de kirmizi kalmisti: eski golden deger
-"ses 0k" (T172 oncesi AudioDropped davranisi) bekliyordu. Guncel davranis: ses
-tabani (24k mono) artik dusmuyor, videoK butceden geriye kalanla hesaplaniyor.
-Golden deger degisikligi (commit 4dd7766):
-
-| alan | ESKI (T172 oncesi) | YENI (T172 sonrasi) |
-|---|---|---|
-| videoK | 80 | 56 |
-| genislik/yukseklik | 690x388 | 614x346 |
-| fps | 30,0 | 15,0 |
-| audioK | 0 | 24 |
-| kanal | -1 (yok) | 1 (mono) |
-
-Degisen davranis tek satirla: ses tabani (24k mono) artik butceden dusuluyor, geriye
-kalan video butcesi dusunce katman arama fps'i 30'dan 15'e kisiyor - bu T172'nin motor
-karari degisikliginin dogrudan sonucu, uretim kodu geri sarilmadi.
-
-## Tur 2 - K10: Verify sonucu (guncel)
-
-- PlanCalculatorTests|SesTabaniTests|ManualOverrideTests: 122/122 yesil
-  (bu turda tekrar kosuldu: dotnet test -c Release --no-build --filter
-  "PlanCalculatorTests|SesTabaniTests|ManualOverrideTests" -> Basarili: 122, Toplam: 122).
-  Tur 1'in kirmizisi (ManualOverrideTests) K9 ile kapatildi.
-- OluUyeTests|LanguageTests: 66/66 yesil (ayni kosum, Basarili: 66, Toplam: 66).
-
-## K3 - Uc sutunlu ozet (ESKI / TUR 1 / TUR 2)
-
-| kombinasyon | hedef MB | ESKI: gercek/basari/ses | TUR 1: gercek/basari/ses | TUR 2: gercek/basari/ses |
-|---|---|---|---|---|
-| 1dk/0,3MB  | 0,3 | 0,342 / basarisiz / dosya yok | 0,547 / basarisiz / dosya yok | 0,29   / basarili / ses VAR |
-| 2dk/0,8MB  | 0,8 | 0,762 / basarili / ses YOK    | 1,105 / basarisiz / dosya yok | 0,771  / basarili / ses VAR |
-| 5dk/2MB    | 2   | 1,95  / basarili / ses YOK    | 2,787 / basarisiz / dosya yok | 1,927  / basarili / ses VAR |
-| 10dk/5MB   | 5   | 4,962 / basarili / ses YOK    | 5,587 / basarisiz / dosya yok | 4,855  / basarili / ses VAR |
-| 10dk/8MB   | 8   | 7,71  / basarili / ses VAR    | 7,71  / basarili / ses VAR    | 7,712  / basarili / ses VAR |
-
-Kendi saydim: 5 kombinasyonun 5'i de TUR 2'de basarili, 5'i de ses tasiyor,
-5'i de hedefi asmiyor. TUR 1'de kirmizi olan 3 satir (2dk/0,8MB, 5dk/2MB, 10dk/5MB)
-TUR 2'de duzeldi.
-
-## K4/K6 - Tur 2 tekrari
-
-K4 (sessiz kaynak): Kod yolu bu turda degismedi (info.HasAudio==false kolu
-PlanCalculator.cs'de dokunulmadi, K8 sadece videoK'nin butce dalini degistirdi).
-Kontrol: sessiz kaynakla .calisma/T172/ciktilar-yeni/k4-sessiz.mp4 (409000 bayt, bu
-turda uretildi) ffprobe'da sadece codec_type=video gosteriyor, ses ile ilgili hicbir
-uyari notu yok.
-
-K6 (mutasyon): Tur 1'de eklenen SesTabaniTests.K6_SesTabaniYirmiDortKbpsAltinaDusmez
-testi bu turun PlanCalculatorTests|SesTabaniTests|ManualOverrideTests kosumunun
-(122 test) icinde yesil; ayri mutasyon kosumu bu turda tekrarlanmadi cunku K8'in kendi
-degisikligi (391/545) mutasyon testinin hedefledigi 24kbps tabanini etkilemiyor -
-taban hala Math.Max(24, audioK) (PlanCalculator.cs, K8'in disinda kalan satir).
-
-
-## Tur 2 - K8/K9/K10 (devralinan floor duzeltmesi olculdu)
+## Tur 2 - K8/K9/K10 (floor duzeltmesi olculdu): K3 YESIL
 
 Tur 1'in bakiyesi: PlanCalculator.cs satir 391/545/980/988'de Math.Max(MinVideoBitrateK, ...)
 -> Math.Max(0.0, ...) (ve satir 988'de Math.Max(0, ...)) mutasyonu commit'lenmemis halde
