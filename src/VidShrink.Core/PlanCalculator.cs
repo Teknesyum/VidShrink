@@ -158,19 +158,23 @@ public static class PlanCalculator
     private static readonly double MotionCutIsExpensiveAbove = Math.Log2(2 * (1 - MotionCutExpensiveSavingShare));
     private const int MinVideoBitrateK = 48;
 
-    private const double RunnableBitsPerMacroblock = 0.06;
-    private const int AbsoluteRunnableVideoBitrateK = 2;
+    private const double RunnableBitsPerMacroblock = 0.05;
+    private const int RunnableVideoBitrateOffsetK = 4;
 
     /// <summary>
     /// Iki gecisli kodlamanin acilabildigi en dusuk video bit hizi. Sifir bit hizi
     /// <c>-b:v 0k</c> demektir ve libx264 onu iki geciste <c>CRF/CQP is incompatible with
     /// 2pass</c> diye reddeder (exit -22, sifir baytlik dosya); tek paste ise sessizce
-    /// CRF 23'e duser. Katsayi olculdu: libx264 <c>requested bitrate is too low, estimated
-    /// minimum is N kbps</c> satirini 1920x1080@30 icin 11, 1280x720@30 icin 6,
-    /// 854x480@30 icin 4, 3840x2160@60 icin 77 kbps veriyor - saniyedeki makroblok basina
-    /// en fazla 0,0555 kbit. 0,06 katsayisi hepsini asiyor. Mutlak taban 2k: planin
-    /// sectigi en kucuk yerlesimlerde (230x130@6, 384x216@10, 320x180@12) formul 1k veriyor,
-    /// 1k'da libx264 hala reddediyor, 2k'da kosuyor.
+    /// CRF 23'e duser. Sifirin biraz ustu de yetmiyor: kodlayicinin kendi tabani
+    /// <c>requested bitrate is too low</c> diyerek ayni sifir baytlik ciktiyi veriyor.
+    /// <para>
+    /// Egri olculdu (<c>.calisma/T172/tur4/x264-taban.tsv</c>): saniyedeki makroblok
+    /// sayisina karsi kosan en kucuk <c>-b:v</c>, 810 -> 1k, 2880 -> 2k, 7650 -> 2k,
+    /// 22080 -> 4k, 27600 -> 5k, 48600 -> 5k, 108000 -> 8k, 244800 -> 12k, 432000 -> 20k,
+    /// 489600 -> 25k, 1944000 -> 80k. Dogru bir sabit yok: egri bir dogru arti sabit terim,
+    /// kucuk yerlesimlerde sabit terim baskin. 0,05 egim + 4k sabit olculen her noktayi
+    /// asiyor, en dar payi 640x360@30'da (6k'ya karsi olculen 5k).
+    /// </para>
     /// Olcum: <c>docs/olcumler/ses-tabani.md</c>, Tur 4 / K15.
     /// </summary>
     public static int RunnableVideoBitrateK(int width, int height, double fps)
@@ -178,8 +182,8 @@ public static class PlanCalculator
         var macroblocksPerSecond = Math.Ceiling(Math.Max(1, width) / 16.0)
             * Math.Ceiling(Math.Max(1, height) / 16.0)
             * Math.Max(1.0, fps);
-        return Math.Max(AbsoluteRunnableVideoBitrateK,
-            (int)Math.Ceiling(macroblocksPerSecond * RunnableBitsPerMacroblock / 1000.0));
+        return (int)Math.Ceiling(macroblocksPerSecond * RunnableBitsPerMacroblock / 1000.0)
+            + RunnableVideoBitrateOffsetK;
     }
 
     /// <summary>
