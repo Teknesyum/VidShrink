@@ -37,7 +37,15 @@ internal enum PlayerCommandKind
     TogglePlay,
     ToggleFullscreen,
     ContextMenu,
-    LeaveFullscreen
+    LeaveFullscreen,
+    ResetZoom
+}
+
+internal enum PlayerMenuRow
+{
+    PlayPause,
+    Fullscreen,
+    ResetZoom
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)
@@ -86,6 +94,21 @@ internal static class PlayerInputMap
     };
 
     internal static PlayerCommand MenuButton() => new(PlayerCommandKind.ContextMenu, 0);
+
+    internal static PlayerCommand MenuRow(PlayerMenuRow row) => row switch
+    {
+        PlayerMenuRow.PlayPause => new PlayerCommand(PlayerCommandKind.TogglePlay, 0),
+        PlayerMenuRow.Fullscreen => new PlayerCommand(PlayerCommandKind.ToggleFullscreen, 0),
+        PlayerMenuRow.ResetZoom => new PlayerCommand(PlayerCommandKind.ResetZoom, 0),
+        _ => PlayerCommand.None
+    };
+
+    internal static readonly IReadOnlyList<(PlayerMenuRow Row, string Key)> MenuRows = new[]
+    {
+        (PlayerMenuRow.PlayPause, "main.player.menu.playpause"),
+        (PlayerMenuRow.Fullscreen, "main.player.menu.fullscreen"),
+        (PlayerMenuRow.ResetZoom, "main.player.menu.reset")
+    };
 }
 
 internal sealed class SeekCoalescer

@@ -67,8 +67,6 @@ internal partial class PlayerView : UserControl
 
     internal string? LoadedPath => _path;
 
-    internal MenuFlyout? OpenedMenu { get; private set; }
-
     internal Func<int> PlayerTabIndex { get; set; } = () => 0;
 
     internal Func<int> CurrentTabIndex { get; set; } = () => 0;
@@ -108,6 +106,10 @@ internal partial class PlayerView : UserControl
                 OpenMenu();
                 _trace.Add("menu");
                 break;
+            case PlayerCommandKind.ResetZoom:
+                _zoom.Reset();
+                _trace.Add("zoomreset -> " + _zoom.PanelScale.ToString("0.###"));
+                break;
             case PlayerCommandKind.LeaveFullscreen:
                 if (_fullscreen.IsFullscreen) ToggleFullscreen();
                 break;
@@ -120,6 +122,7 @@ internal partial class PlayerView : UserControl
         Echo(_trace.Count > 0 ? _trace[^1] : "");
     }
 
+    [Conditional("DEBUG")]
     internal static void Echo(string line)
     {
         var path = Environment.GetEnvironmentVariable("VIDSHRINK_T176_TRACE");
@@ -199,16 +202,25 @@ internal partial class PlayerView : UserControl
     internal MenuFlyout BuildMenu()
     {
         var flyout = new MenuFlyout();
-        flyout.Items.Add(new MenuItem { Header = Strings.Get("main.player.menu.playpause") });
-        flyout.Items.Add(new MenuItem { Header = Strings.Get("main.player.menu.fullscreen") });
-        flyout.Items.Add(new MenuItem { Header = Strings.Get("main.player.menu.reset") });
+        foreach (var (row, key) in PlayerInputMap.MenuRows)
+        {
+            var item = new MenuItem { Header = Strings.Get(key), Tag = row };
+            item.Click += OnMenuRow;
+            flyout.Items.Add(item);
+        }
+
         return flyout;
+    }
+
+    private void OnMenuRow(object? sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: PlayerMenuRow row })
+            Apply(PlayerInputMap.MenuRow(row));
     }
 
     private void OpenMenu()
     {
         var flyout = BuildMenu();
-        OpenedMenu = flyout;
         try { flyout.ShowAt(BtnPlayerMenu); }
         catch (InvalidOperationException) { }
     }

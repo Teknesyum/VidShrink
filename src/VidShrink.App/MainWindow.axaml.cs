@@ -2217,7 +2217,20 @@ public partial class MainWindow : Window
         PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + ((TabItem)Tabs.Items[Tabs.SelectedIndex]!).Header);
         await LoadAsync(path);
         try { await Player.OpenAsync(path); }
-        catch (Exception) { }
+        catch (Exception ex) { ReportPlayerOpenFailure(ex); }
+    }
+
+    internal Exception? PlayerOpenFailure { get; private set; }
+
+    internal string SourceStatusText => TxtSourceStatus.Text ?? "";
+
+    internal bool SourceStatusVisible => TxtSourceStatus.IsVisible;
+
+    internal void ReportPlayerOpenFailure(Exception ex)
+    {
+        PlayerOpenFailure = ex;
+        PlayerView.Echo("startup-open-failed=" + ex.GetType().Name);
+        ReportSourceError($"{Say("main.error.unusable")}: {DescribeFailure(ex)}");
     }
 
     /// <summary>

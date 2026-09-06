@@ -274,8 +274,8 @@ public sealed class OynaticiGirdiTests
 
             Strings.Use("en");
             view.Apply(PlayerInputMap.MenuButton());
-            body.AppendLine($"menu acildi: {view.OpenedMenu is not null}");
-            Assert.NotNull(view.OpenedMenu);
+            body.AppendLine($"menu izi: {view.Trace[^1]}");
+            Assert.Equal("menu", view.Trace[^1]);
 
             window.Close();
             return body.ToString();
@@ -435,5 +435,262 @@ public sealed class OynaticiGirdiTestsGercekBoru : IClassFixture<GirdiKlipFixtur
         Assert.Equal(10, coalescer.Target);
         Assert.Equal(10, coalescer.Position);
         Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
+
+        Assert.NotEmpty(coalescer.LatenciesMs);
+        var asan = coalescer.LatenciesMs.Where(ms => ms > 150).ToList();
+        Assert.True(
+            asan.Count == 0,
+            "T175 150 ms sinirini asan arama: " + string.Join(", ", asan.Select(ms => ms.ToString("0.#", CultureInfo.InvariantCulture))));
+    }
+}
+
+public sealed class OynaticiGirdiTestsMenuSatirlari
+{
+    private static MenuItem Satir(PlayerView view, int sira)
+        => view.BuildMenu().Items.OfType<MenuItem>().ElementAt(sira);
+
+    private static void Tikla(MenuItem item)
+        => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = item });
+
+    [Fact]
+    public void MenuSatiriOynatDuraklatOynatmayiCevirir()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            var window = new Window { Width = 640, Height = 480, Content = view };
+
+            var once = view.IsPlaying;
+            var item = Satir(view, 0);
+            Tikla(item);
+            var sonra = view.IsPlaying;
+            Tikla(Satir(view, 0));
+            var geri = view.IsPlaying;
+
+            var body = $"satir 0 basligi: {item.Header}{Environment.NewLine}"
+                     + $"oynatma {once} -> {sonra} -> {geri}{Environment.NewLine}"
+                     + $"iz: {string.Join(" | ", view.Trace)}{Environment.NewLine}";
+
+            Assert.False(once);
+            Assert.True(sonra);
+            Assert.False(geri);
+            Assert.Equal(new[] { "play -> True", "play -> False" }, view.Trace);
+
+            window.Close();
+            return body;
+        });
+
+        GirdiKanit.Write("k9-menu-oynat.txt", rapor);
+    }
+
+    [Fact]
+    public void MenuSatiriTamEkranIkiYondeCalisir()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            view.CurrentTabIndex = () => 2;
+            view.PlayerTabIndex = () => 5;
+            var secilen = new List<int>();
+            view.SelectTab = index => secilen.Add(index);
+            var window = new Window { Width = 640, Height = 480, Content = view };
+
+            var once = view.Fullscreen.IsFullscreen;
+            var item = Satir(view, 1);
+            Tikla(item);
+            var acik = view.Fullscreen.IsFullscreen;
+            Tikla(Satir(view, 1));
+            var kapali = view.Fullscreen.IsFullscreen;
+
+            var body = $"satir 1 basligi: {item.Header}{Environment.NewLine}"
+                     + $"tam ekran {once} -> {acik} -> {kapali}{Environment.NewLine}"
+                     + $"secilen sekmeler: {string.Join(",", secilen)}{Environment.NewLine}"
+                     + $"iz: {string.Join(" | ", view.Trace)}{Environment.NewLine}";
+
+            Assert.False(once);
+            Assert.True(acik);
+            Assert.False(kapali);
+            Assert.Equal(new[] { 5, 2 }, secilen);
+
+            window.Close();
+            return body;
+        });
+
+        GirdiKanit.Write("k9-menu-tam-ekran.txt", rapor);
+    }
+
+    [Fact]
+    public void MenuSatiriYakinlastirmayiSifirlar()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            var window = new Window { Width = 640, Height = 480, Content = view };
+
+            GirdiSurucu.Wheel(view, 3, KeyModifiers.Alt);
+            var buyutulmus = view.ZoomScale;
+            var item = Satir(view, 2);
+            Tikla(item);
+            var sifirlanmis = view.ZoomScale;
+
+            var body = FormattableString.Invariant(
+                $"satir 2 basligi: {item.Header}{Environment.NewLine}yakinlastirma 1 -> {buyutulmus:0.###} -> {sifirlanmis:0.###}{Environment.NewLine}iz: {string.Join(" | ", view.Trace)}{Environment.NewLine}");
+
+            Assert.True(buyutulmus > 1, $"alt+tekerlek buyutmedi: {buyutulmus}");
+            Assert.Equal(1, sifirlanmis);
+            Assert.Equal("zoomreset -> 1", view.Trace[^1]);
+
+            window.Close();
+            return body;
+        });
+
+        GirdiKanit.Write("k9-menu-sifirla.txt", rapor);
+    }
+
+    [Fact]
+    public void UcMenuSatirininUcuDeAyriBirEtkiUretir()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            var window = new Window { Width = 640, Height = 480, Content = view };
+            var menu = view.BuildMenu();
+            var satirlar = menu.Items.OfType<MenuItem>().ToList();
+            var body = new StringBuilder();
+
+            foreach (var (item, sira) in satirlar.Select((item, sira) => (item, sira)))
+            {
+                var oncekiIz = view.Trace.Count;
+                Tikla(item);
+                var uretilen = view.Trace.Skip(oncekiIz).ToList();
+                body.AppendLine($"satir {sira} '{item.Header}' -> {(uretilen.Count == 0 ? "ETKI YOK" : string.Join(" | ", uretilen))}");
+                Assert.NotEmpty(uretilen);
+                Assert.DoesNotContain("none", uretilen);
+            }
+
+            body.AppendLine($"satir sayisi: {satirlar.Count}");
+            Assert.Equal(3, satirlar.Count);
+
+            window.Close();
+            return body.ToString();
+        });
+
+        GirdiKanit.Write("k9-menu-uc-satir.txt", rapor);
+        Assert.Contains("satir sayisi: 3", rapor);
+    }
+
+    [Fact]
+    public void OlcumKancasiUrunIkilisindeDerlenmez()
+    {
+        var yontem = typeof(PlayerView).GetMethod(
+            "Echo",
+            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)!;
+        var kosullar = yontem.GetCustomAttributes(typeof(ConditionalAttribute), false)
+            .Cast<ConditionalAttribute>()
+            .Select(a => a.ConditionString)
+            .ToList();
+
+        var alanlar = typeof(PlayerView).GetProperties(
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
+            .Select(p => p.Name)
+            .ToList();
+
+        GirdiKanit.Write(
+            "k13-olcum-kancasi.txt",
+            $"PlayerView.Echo kosullari: {string.Join(", ", kosullar)}{Environment.NewLine}"
+            + $"OpenedMenu ozelligi duruyor mu: {alanlar.Contains("OpenedMenu")}{Environment.NewLine}");
+
+        Assert.Equal(new[] { "DEBUG" }, kosullar);
+        Assert.DoesNotContain("OpenedMenu", alanlar);
+    }
+}
+
+public sealed class OynaticiGirdiTestsPencereYazma
+{
+    [Fact]
+    public void TamEkranGercekPencereDikdortgeniniGeriYazar()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = new PlayerView();
+            var window = new Window { Width = 900, Height = 700, Content = view };
+            window.Show();
+            window.Position = new PixelPoint(140, 90);
+            window.Width = 900;
+            window.Height = 700;
+
+            string Oku(string ad) => FormattableString.Invariant(
+                $"{ad}: durum {(int)window.WindowState} dikdortgen {window.Position.X},{window.Position.Y} {window.Width:0.###}x{window.Height:0.###}");
+
+            var body = new StringBuilder();
+            body.AppendLine(Oku("once     "));
+            var once = ((int)window.WindowState, window.Position.X, window.Position.Y, window.Width, window.Height);
+
+            GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
+            body.AppendLine(Oku("tam ekran"));
+            var tamEkranDurumu = (int)window.WindowState;
+
+            window.WindowState = WindowState.Normal;
+            window.Position = new PixelPoint(500, 480);
+            window.Width = 400;
+            window.Height = 300;
+            body.AppendLine(Oku("kaydirildi"));
+
+            GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
+            body.AppendLine(Oku("geri     "));
+            var geri = ((int)window.WindowState, window.Position.X, window.Position.Y, window.Width, window.Height);
+            body.AppendLine($"arka uc: {AppHost.Backend}");
+
+            Assert.Equal((int)WindowState.FullScreen, tamEkranDurumu);
+            Assert.Equal(once, geri);
+
+            window.Close();
+            return body.ToString();
+        });
+
+        GirdiKanit.Write("k16-pencere-geri-yazma.txt", rapor);
+        Assert.Contains("geri     ", rapor);
+    }
+}
+
+public sealed class OynaticiGirdiTestsKabukHatasi
+{
+    [Fact]
+    public void OynaticiAcilisHatasiSessizceYutulmaz()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var bozuk = Path.Combine(GirdiKanit.Folder, "bozuk-ornek.mp4");
+            File.WriteAllBytes(bozuk, new byte[] { 0, 1, 2, 3 });
+
+            var window = new MainWindow(bozuk);
+            var oncekiMetin = window.SourceStatusText;
+            var oncekiHata = window.PlayerOpenFailure;
+
+            var is_ = window.LoadStartupFileAsync();
+            var saat = Stopwatch.StartNew();
+            while (!is_.IsCompleted && saat.Elapsed < TimeSpan.FromSeconds(60))
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                Thread.Sleep(10);
+            }
+
+            var body = $"dosya: {Path.GetFileName(bozuk)} ({new FileInfo(bozuk).Length} bayt){Environment.NewLine}"
+                     + $"LoadStartupFileAsync bitti mi: {is_.IsCompleted} ({saat.ElapsedMilliseconds} ms){Environment.NewLine}"
+                     + $"once  : istisna {oncekiHata?.GetType().Name ?? "yok"} metin '{oncekiMetin}'{Environment.NewLine}"
+                     + $"sonra : istisna {window.PlayerOpenFailure?.GetType().Name ?? "yok"}: {window.PlayerOpenFailure?.Message}{Environment.NewLine}"
+                     + $"kaynak durumu gorunur {window.SourceStatusVisible}, metin '{window.SourceStatusText}'{Environment.NewLine}";
+
+            Assert.True(is_.IsCompleted, "LoadStartupFileAsync 60 sn icinde bitmedi");
+            Assert.Null(oncekiHata);
+            Assert.NotNull(window.PlayerOpenFailure);
+            Assert.True(window.SourceStatusVisible);
+            Assert.NotEqual("", window.SourceStatusText);
+
+            window.Close();
+            return body;
+        });
+
+        GirdiKanit.Write("k12-acilis-hatasi.txt", rapor);
     }
 }
