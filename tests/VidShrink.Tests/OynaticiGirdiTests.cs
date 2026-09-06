@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
@@ -316,5 +317,123 @@ public sealed class OynaticiGirdiTests
 
         GirdiKanit.Write("k6-kabuk.txt", rapor);
         Assert.Contains("sekme basligi:", rapor);
+    }
+}
+
+public sealed class PlayerTabTests
+{
+    [Fact]
+    public void OynaticiSekmesiSekmeSeridindeVeIkiDildeBasligiVar()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            var index = window.PlayerTabIndex;
+            var tab = (TabItem)window.Tabs.Items[index]!;
+            var body = new StringBuilder();
+            body.AppendLine($"sekme sayisi: {window.Tabs.ItemCount}");
+            body.AppendLine($"oynatici sirasi: {index}");
+
+            foreach (var dil in new[] { "en", "tr" })
+            {
+                Strings.Use(dil);
+                var beklenen = Strings.Get("main.tab.player");
+                var goruldu = tab.Header?.ToString();
+                body.AppendLine($"{dil}: beklenen '{beklenen}' goruldu '{goruldu}'");
+                Assert.Equal(beklenen, goruldu);
+            }
+
+            Strings.Use("en");
+            var digerleri = window.Tabs.Items.OfType<TabItem>().Select(item => item.Theme?.ToString() ?? "yok").Distinct().ToList();
+            body.AppendLine("sekme temalari: " + string.Join(" | ", digerleri));
+            Assert.Single(digerleri);
+            Assert.IsType<PlayerView>(tab.Content);
+
+            window.Close();
+            return body.ToString();
+        });
+
+        GirdiKanit.Write("k1-sekme.txt", rapor);
+        Assert.Contains("oynatici sirasi:", rapor);
+    }
+}
+
+public sealed class GirdiKlipFixture : IAsyncLifetime
+{
+    public string? ClipPath { get; private set; }
+
+    public async Task InitializeAsync()
+    {
+        if (!ToolLocator.IsAvailable(out _)) return;
+
+        var path = Path.Combine(GirdiKanit.Folder, "girdi-20sn.mkv");
+        ClipPath = path;
+        if (File.Exists(path)) return;
+
+        var psi = new ProcessStartInfo(ToolLocator.Ffmpeg)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false
+        };
+
+        foreach (var arg in new[]
+        {
+            "-y", "-f", "lavfi", "-i", "testsrc=size=320x180:rate=30:duration=20",
+            "-force_key_frames", "expr:gte(t,n_forced*1)",
+            "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast",
+            "-an", path
+        }) psi.ArgumentList.Add(arg);
+
+        using var process = Process.Start(psi)!;
+        await process.WaitForExitAsync();
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
+}
+
+public sealed class OynaticiGercekBoruTests : IClassFixture<GirdiKlipFixture>
+{
+    private readonly GirdiKlipFixture _klip;
+
+    public OynaticiGercekBoruTests(GirdiKlipFixture klip) => _klip = klip;
+
+    [FfmpegAvailableFact]
+    public async Task OnHizliTikGercekBoruyaKarsiBirikirVeAramalarSinirdaKalir()
+    {
+        var path = _klip.ClipPath!;
+        using var pipe = new DecoderPipe();
+        await pipe.OpenAsync(path);
+
+        var bosKare = 0;
+        var coalescer = new SeekCoalescer(async at =>
+        {
+            var frame = await pipe.SeekAsync(at);
+            if (frame is null) Interlocked.Increment(ref bosKare);
+        })
+        { Duration = pipe.DurationSeconds };
+
+        var oncekiSurec = pipe.ProcessesStarted;
+        var saat = Stopwatch.StartNew();
+        for (var i = 0; i < 10; i++) coalescer.Nudge(PlayerInputMap.WheelStepSeconds);
+        await coalescer.Idle;
+        saat.Stop();
+
+        var body = new StringBuilder();
+        body.AppendLine($"klip: {Path.GetFileName(path)} sure {pipe.DurationSeconds:0.###} sn");
+        body.AppendLine($"10 hizli tik (tik basi 1 sn) -> hedef {coalescer.Target} sn, ulasilan konum {coalescer.Position} sn");
+        body.AppendLine($"tetiklenen arama sayisi: {coalescer.SeekCalls}");
+        body.AppendLine("arama hedefleri: " + string.Join(", ", coalescer.IssuedTargets));
+        body.AppendLine("arama gecikmeleri (ms): " + string.Join(", ", coalescer.LatenciesMs.Select(ms => ms.ToString("0.#", CultureInfo.InvariantCulture))));
+        body.AppendLine($"toplam sure: {saat.Elapsed.TotalMilliseconds:0.#} ms");
+        body.AppendLine($"ffmpeg surec sayisi: {oncekiSurec} -> {pipe.ProcessesStarted}");
+        body.AppendLine($"T175 150 ms sinirini asan arama: {coalescer.LatenciesMs.Count(ms => ms > 150)}");
+        body.AppendLine($"null donen arama (T175 yeniden baslatma tavani): {bosKare}");
+        body.AppendLine("arama hatalari: " + (coalescer.Failures.Count == 0 ? "yok" : string.Join(" | ", coalescer.Failures)));
+        GirdiKanit.Write("k3-gercek-boru.txt", body.ToString());
+
+        Assert.Equal(10, coalescer.Target);
+        Assert.Equal(10, coalescer.Position);
+        Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
     }
 }

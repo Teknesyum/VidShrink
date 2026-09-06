@@ -94,6 +94,7 @@ internal sealed class SeekCoalescer
     private readonly object _gate = new();
     private readonly List<double> _latencies = new();
     private readonly List<double> _targets = new();
+    private readonly List<string> _failures = new();
 
     private double _target;
     private bool _pending;
@@ -113,6 +114,8 @@ internal sealed class SeekCoalescer
     internal IReadOnlyList<double> LatenciesMs { get { lock (_gate) return _latencies.ToArray(); } }
 
     internal IReadOnlyList<double> IssuedTargets { get { lock (_gate) return _targets.ToArray(); } }
+
+    internal IReadOnlyList<string> Failures { get { lock (_gate) return _failures.ToArray(); } }
 
     internal Task Idle { get { lock (_gate) return _pump; } }
 
@@ -154,6 +157,10 @@ internal sealed class SeekCoalescer
             try
             {
                 await _seek(at).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                lock (_gate) _failures.Add(ex.GetType().Name + ": " + ex.Message);
             }
             finally
             {
