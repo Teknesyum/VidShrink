@@ -55,6 +55,14 @@ yuvarlaması karede yok. Uygulama kendi başlık çubuğunu çizdiği için
     T189-oynatici-tr.png	225114
     toplam	14
 
+### Süit ve CI
+
+    $ dotnet test
+    Basarili!  - Basarisiz:     0, Basarili:  1898, Atlanan:    23, Toplam:  1921, Sure: 15 m 56 s - VidShrink.Tests.dll (net8.0)
+
+    $ gh run list --branch T189-ekran-goruntusu -L 3
+    completed	success	T189: on dort kare cekildi, duzenek belgelendi, olcum belgesi yazildi	ci	T189-ekran-goruntusu	push	34162652621	19m6s	2026-09-07T21:18:22Z
+
 ### Dosya sayısı (K2 CHECK)
 
     $ ls docs/gorseller/T189-*.png | wc -l
