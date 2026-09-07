@@ -419,12 +419,140 @@ public sealed class UpdaterTests : IDisposable
         Assert.Contains(".launcher = (", workflow, StringComparison.Ordinal);
         Assert.Contains($"select(.path == \"{LauncherUpdate.ExecutableName}\")", workflow, StringComparison.Ordinal);
 
+        Assert.Contains(".shell = (", workflow, StringComparison.Ordinal);
+        Assert.Contains($"startswith(\"{ShellUpdate.FolderPrefix}\")", workflow, StringComparison.Ordinal);
+
         // Katlama arşivlemeden önce olmalı: manifest hem arşivin içine hem yanına gidiyor.
         var merge = workflow.IndexOf("merged-manifest.json", StringComparison.Ordinal);
         var archive = workflow.IndexOf("Archive, copy the manifest out", StringComparison.Ordinal);
         Assert.True(merge >= 0, "manifest katlama adımı release.yml'de yok");
         Assert.True(archive > merge, "manifest arşivlendikten sonra katlanıyor");
     }
+
+    /// <summary>
+    /// Kabuk klasörü manifestte kendi üst alanında sayılır. Gerekçe <c>launcher</c>
+    /// alanındakinin aynısı: <c>files</c> dizisine önekli satır girseydi kurulu her eski
+    /// güncelleyici o yolu uygulama arşivinde arar, bulamaz ve güncellemenin tamamından
+    /// vazgeçerdi.
+    /// </summary>
+    [Fact]
+    public void TheManifestCountsTheShellFolderInItsOwnField()
+    {
+        const string json = """
+        {
+          "version": "0.3.1",
+          "rid": "win-x64",
+          "files": [
+            { "path": "VidShrink.App.dll", "sha256": "e3b0c442", "size": 123456 }
+          ],
+          "launcher": [
+            { "path": "VidShrink.exe", "sha256": "AB12", "size": 7788 }
+          ],
+          "shell": [
+            { "path": "shell/VidShrink.ShellExtension.dll", "sha256": "CD34", "size": 120832 }
+          ]
+        }
+        """;
+
+        var manifest = UpdateCheck.ParseManifest(json);
+
+        Assert.Single(manifest.Shell);
+        Assert.Equal("shell/VidShrink.ShellExtension.dll", manifest.Shell[0].Path);
+        Assert.Equal("cd34", manifest.Shell[0].Sha256);
+
+        Assert.Single(manifest.Files);
+        Assert.DoesNotContain(manifest.Files, file => file.Path.StartsWith("shell/", StringComparison.Ordinal));
+        Assert.DoesNotContain(manifest.Launcher, file => file.Path.StartsWith("shell/", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AManifestWithoutAShellFieldIsStillRead()
+    {
+        var manifest = UpdateCheck.ParseManifest("""
+        { "version": "0.3.0", "rid": "win-x64", "files": [ { "path": "a.dll", "sha256": "aa", "size": 1 } ],
+          "launcher": [ { "path": "VidShrink.exe", "sha256": "bb", "size": 2 } ] }
+        """);
+
+        Assert.Empty(manifest.Shell);
+        Assert.Single(manifest.Launcher);
+    }
+
+    /// <summary>
+    /// Belirtinin kendisi: güncelleyiciyle gelen kurulum kabuk klasörünü almıyordu. Kurulum
+    /// kökünde shell/ hiç yokken bir tur koşuluyor ve klasörün yerleştiği ölçülüyor.
+    /// </summary>
+    [Fact]
+    public void AnUpdateInstallsTheShellFolderIntoAnInstallThatNeverHadOne()
+    {
+        var stage = Folder("stage");
+        var install = Folder("install");
+        var app = Path.Combine(install, "app");
+        Directory.CreateDirectory(app);
+
+        const string extension = "shell/VidShrink.ShellExtension.dll";
+        const string template = "shell/AppxManifest.template.xml";
+        WriteRandom(ShellStage(stage), extension, 4096);
+        WriteRandom(ShellStage(stage), template, 512);
+        var shellFiles = new[] { Describe(ShellStage(stage), extension), Describe(ShellStage(stage), template) };
+        WriteRandom(stage, "VidShrink.App.dll", 2048);
+        var staged = Describe(stage, "VidShrink.App.dll");
+
+        var manifest = new ReleaseManifest("0.3.1", "abc1234", DateTimeOffset.UtcNow, "win-x64", new[] { staged })
+        {
+            Shell = shellFiles
+        };
+
+        Assert.False(File.Exists(UpdateCheck.LocalPath(install, extension)));
+        Assert.NotEmpty(UpdateCheck.Diff(install, manifest.Shell));
+        Assert.False(UpdateCheck.AlreadyCurrent(install, app, manifest));
+
+        UpdateRollout.Apply(stage, install, app, new[] { staged }, Array.Empty<ManifestFile>(), manifest, shellFiles);
+
+        foreach (var file in shellFiles)
+        {
+            var landed = UpdateCheck.LocalPath(install, file.Path);
+            Assert.True(File.Exists(landed), $"kabuk dosyası yerleşmedi: {file.Path}");
+            Assert.Equal(file.Sha256, UpdateCheck.HashFile(landed));
+        }
+
+        _output.WriteLine(string.Join(Environment.NewLine,
+            Directory.EnumerateFiles(install, "*", SearchOption.AllDirectories)
+                .Select(path => Path.GetRelativePath(install, path))));
+
+        Assert.Empty(UpdateCheck.Diff(install, manifest.Shell));
+        Assert.True(UpdateCheck.AlreadyCurrent(install, app, manifest));
+    }
+
+    /// <summary>
+    /// Kabuk klasörü yerleşmediği sürece kapı kapanmamalı. Sürüm işareti yazılmış olsa bile
+    /// eksik bir shell/ "zaten güncel" saydırmıyor; saydırsaydı düzeltme bir daha hiç denenmezdi.
+    /// </summary>
+    [Fact]
+    public void AMissingShellFolderKeepsTheUpdateGateOpen()
+    {
+        var install = Folder("install");
+        var app = Path.Combine(install, "app");
+        Directory.CreateDirectory(app);
+
+        const string extension = "shell/VidShrink.ShellExtension.dll";
+        WriteRandom(install, extension, 4096);
+        var shellFile = Describe(install, extension);
+
+        var manifest = new ReleaseManifest("0.3.1", "abc1234", DateTimeOffset.UtcNow, "win-x64", Array.Empty<ManifestFile>())
+        {
+            Shell = new[] { shellFile }
+        };
+
+        UpdateCheck.WriteVersionMarker(app, manifest.Version);
+        LauncherUpdate.WriteVersionMarker(install, manifest.Version);
+        Assert.True(UpdateCheck.AlreadyCurrent(install, app, manifest));
+
+        File.Delete(UpdateCheck.LocalPath(install, extension));
+        Assert.False(UpdateCheck.AlreadyCurrent(install, app, manifest));
+    }
+
+    private static string ShellStage(string stageDirectory) =>
+        Path.Combine(stageDirectory, ShellUpdate.StageFolderName);
 
     [Fact]
     public void TheLauncherComesOutOfTheArchiveTheReleaseAlreadyCarries()
