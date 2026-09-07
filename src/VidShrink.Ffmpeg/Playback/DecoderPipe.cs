@@ -606,6 +606,15 @@ public sealed class DecoderPipe : IDisposable
         try { return process is null ? null : process.Id; } catch { return null; }
     }
 
+    internal bool TestOnly_CacheHasStampAt(double atSeconds)
+    {
+        lock (_gate)
+        {
+            if (_stamps.Count == 0) return false;
+            return _cache.ContainsKey(FloorIndex(_stamps, atSeconds));
+        }
+    }
+
     internal bool TestOnly_KillVideoProcess()
     {
         Process? process;

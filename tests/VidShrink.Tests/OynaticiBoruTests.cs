@@ -75,13 +75,10 @@ public sealed class SentetikKlipFixture : IAsyncLifetime
             "-an", SessizClipPath
         });
 
-        // Buyuk cozunurluk + her kare anahtar: skip_frame nokey ile cikan ham veri
-        // OS borusunun tampon boyutunu asar, boru surecin canli kalmasini garantiler
-        // (Surec_disaridan_oldurulunce testi icin — kucuk klipte surec Kill’den once biter).
         await RunFfmpegAsync(new[]
         {
-            "-y", "-f", "lavfi", "-i", "testsrc=size=640x480:rate=30:duration=6",
-            "-force_key_frames", "expr:gte(t,n_forced*0.1)",
+            "-y", "-f", "lavfi", "-i", "testsrc=size=1280x720:rate=30:duration=20",
+            "-force_key_frames", "expr:gte(t,n_forced*0.05)",
             "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "ultrafast",
             "-an", UzunSessizKlipPath
         });
@@ -301,6 +298,10 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
         Assert.True(pipe.ProcessesStarted > startedAfterForward);
     }
 
+    private const double IleriBaslangicSaniye = 1.0;
+
+    private const double GeriHedefSaniye = 0.0;
+
     [FfmpegAvailableFact]
     public async Task Surec_disaridan_oldurulunce_boru_Faulted_yayar_ve_kendini_kurar()
     {
@@ -310,18 +311,25 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
         var faulted = new TaskCompletionSource<PipeFault>();
         pipe.Faulted += (_, f) => faulted.TrySetResult(f);
 
-        await pipe.SeekAsync(0);
+        await pipe.SeekAsync(IleriBaslangicSaniye);
         var startedBeforeCrash = pipe.ProcessesStarted;
 
         var killed = pipe.TestOnly_KillVideoProcess();
-        Assert.True(killed);
+        Assert.True(killed, "oldurulecegi sirada kod cozucu surec zaten olmustu, olcu anlamsiz");
 
         var completed = await Task.WhenAny(faulted.Task, Task.Delay(3000));
         Assert.Same(faulted.Task, completed);
 
-        var frame = await pipe.SeekAsync(2);
+        Assert.False(
+            pipe.TestOnly_CacheHasStampAt(GeriHedefSaniye),
+            $"{GeriHedefSaniye:0.##} sn onbellege girmis; kurtarma olcusu onbellek isabetiyle karisir");
+
+        var frame = await pipe.SeekAsync(GeriHedefSaniye);
+
         Assert.NotNull(frame);
-        Assert.True(pipe.ProcessesStarted > startedBeforeCrash);
+        Assert.True(
+            pipe.ProcessesStarted > startedBeforeCrash,
+            $"boru kendini kurmadi: onbellekte olmayan {GeriHedefSaniye:0.##} sn icin yeni surec baslatilmadi");
     }
 
     [FfmpegAvailableFact]
