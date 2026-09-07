@@ -473,7 +473,8 @@ dosyayi gosterecegi icin bu tazeleme gerekli.
 Yazma basarisiz olursa not dusulmuyor: sonraki acilis yeniden deniyor.
 
 **Olculen.** `dotnet test --filter FullyQualifiedName~KabukEntegrasyonTests` 21 test,
-hepsi yesil. Serit davranisi bassiz Avalonia konagi ile olculdu: kurulan seritte iki
+hepsi yesil. Filtresiz tam suit: 1921 test, 1903 basarili, 0 basarisiz, 18 atlanan,
+21 dk 17 sn. Serit davranisi bassiz Avalonia konagi ile olculdu: kurulan seritte iki
 dugme var, "bir daha sorma" dugmesine basilinca `IsVisible` yanlisa donuyor ve ret
 gecici `settings.json` dosyasinda kalici oluyor.
 
