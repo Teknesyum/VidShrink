@@ -213,11 +213,15 @@ public class ZoomGestureTests
     }
 
     /// <summary>
-    /// T52: çıpanın yeri artık sonucu değiştirmez. Görüntü ölçeklenmediği için imlecin
-    /// altındaki nokta zaten sabittir ve pano hep ortalı kalır.
+    /// T184/K2: bandda cipanin yeri sonucu degistirir. Goruntu o araligta gercekten
+    /// buyudugu icin imlecin altindaki nokta yerinde tutulur - eskiden goruntu hic
+    /// olceklenmedigi icin cipa olu bir parametreydi.
+    ///
+    /// Terfi eden kademelerde eski davranis duruyor: goruntu panoya geri sigar,
+    /// surukleneek yer kalmaz ve iki jest ayni yere oturur.
     /// </summary>
     [Fact]
-    public void Cipa_nerede_olursa_olsun_sonuc_aynidir()
+    public void Cipa_bandda_sonucu_degistirir_terfide_degistirmez()
     {
         var corner = Fitted();
         var centre = Fitted();
@@ -226,6 +230,12 @@ public class ZoomGestureTests
         centre.Wheel(2, 400, 225);
 
         Assert.Equal(corner.T, centre.T, 9);
+        Assert.Equal(ShelterStage.Band, corner.Shelter);
+        Assert.NotEqual(corner.OffsetX, centre.OffsetX, 6);
+
+        while (corner.Wheel(1, 0, 0)) { }
+        while (centre.Wheel(1, 400, 225)) { }
+
         Assert.Equal(corner.OffsetX, centre.OffsetX, 6);
         Assert.Equal(corner.OffsetY, centre.OffsetY, 6);
     }

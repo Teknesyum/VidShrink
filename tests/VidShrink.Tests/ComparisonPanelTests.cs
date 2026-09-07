@@ -1140,7 +1140,7 @@ public sealed class ComparisonPanelTests
     {
         var turkish = Locales.Values("tr");
 
-        Assert.Equal("Yakla\u015f\u0131k \u00f6nizleme", turkish["playback.approximate-preview"]);
+        Assert.Equal("\u0130\u015eLENM\u0130\u015e", turkish["playback.badge.processed"]);
         Assert.Equal("\u00d6nizleme \u00f6rne\u011fi kodlanamad\u0131", turkish["playback.sample-failed"]);
     }
 

@@ -81,6 +81,18 @@ public sealed class CasingTests
     }
 
     /// <summary>
+    /// T184/K3: kurala bilerek açılmış iki delik. Karşılaştırma panelinin iki rozeti —
+    /// solda kaynağın, sağda çıktının etiketi — kullanıcının istediği biçimde, tümü büyük
+    /// harfle yazılıyor. Liste tam bu iki anahtarla sınırlı; üçüncü bir bağıran metin
+    /// eklenirse ölçü yine düşer.
+    /// </summary>
+    private static readonly HashSet<string> ShoutedByDesign = new()
+    {
+        "playback.badge.original",
+        "playback.badge.processed"
+    };
+
+    /// <summary>
     /// Sözlükteki hiçbir çeviri bağırmayacak. Rozetler kaynağı değil sözlüğü okuyor;
     /// yalnız XAML'e bakan bir ölçüm onları göremezdi.
     /// </summary>
@@ -89,7 +101,7 @@ public sealed class CasingTests
     {
         var offenders = Locales.Languages
             .SelectMany(language => Locales.Values(language)
-                .Where(pair => ShoutedWord.IsMatch(pair.Value))
+                .Where(pair => !ShoutedByDesign.Contains(pair.Key) && ShoutedWord.IsMatch(pair.Value))
                 .Select(pair => $"{language}/{pair.Key} -> {pair.Value}"))
             .ToList();
 

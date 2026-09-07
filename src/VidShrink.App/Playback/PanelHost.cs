@@ -66,6 +66,7 @@ internal sealed class PanelHost : IDisposable
     private readonly DispatcherTimer _settle;
     private readonly DispatcherTimer _segmentDelay;
     private readonly SegmentEncoder _segments;
+    private readonly PreviewAudio _audio = new();
 
     private IComparisonFrameSource? _source;
     private string? _left;
@@ -200,7 +201,7 @@ internal sealed class PanelHost : IDisposable
         {
             var clip = ActiveClip;
             if (clip is null || !clip.IsApproximate) return null;
-            var text = PlaybackText("playback.approximate-preview");
+            var text = PlaybackText("playback.badge.processed");
             return clip.Crf is { } crf ? $"{text} · CRF {crf}" : text;
         }
     }
@@ -342,13 +343,13 @@ internal sealed class PanelHost : IDisposable
         _segmentDelay.Stop();
         _segments.Cancel();
         _ = Teardown();
+        _audio.Close();
         _open = false;
         _panel.SetCompact(true);
         _panel.SetRightNotice(null);
         _panel.SetRightBadge(null);
         _panel.SetNotice(null);
-        // Configure panoyu boşaltır: kapalı panel son kareyi donuk göstermez, boş duruma döner.
-        if (_panelSize.Width > 0) _panel.Frames.Configure(new PixelSize(_panelSize.Width * 2, _panelSize.Height));
+        _panel.Frames.Blank();
         _panel.Controls.IsPlaying = false;
         _panel.RefreshEmptyState();
     }
@@ -432,6 +433,7 @@ internal sealed class PanelHost : IDisposable
         _windowStart = Environment.TickCount64;
         Report(source.Status);
         Pump(generation);
+        _ = SyncAudioAsync(generation, _left, ActiveClip?.StartSeconds ?? 0);
     }
 
     /// <summary>
@@ -706,6 +708,13 @@ internal sealed class PanelHost : IDisposable
         top.RequestAnimationFrame(Tick);
     }
 
+    /// <summary>
+    /// Tek sunum turu. <see cref="Pump"/> bunu <c>RequestAnimationFrame</c> ile suruyor;
+    /// olcum turu elle cevirebilsin diye ayri bir giris var — T161'in olcemedigi sey
+    /// (<see cref="ControlStrip.Position"/>) ancak boyle deterministik okunuyor.
+    /// </summary>
+    internal void DrainOnce() => Drain();
+
     private void Drain()
     {
         var source = _source;
@@ -875,6 +884,7 @@ internal sealed class PanelHost : IDisposable
         _handovers++;
 
         if (old is not null) _ = Task.Run(old.Dispose);
+        if (_left is { } path) _ = SyncAudioAsync(_generation, path, clip.StartSeconds);
         RefreshRight();
         Report(next.Status);
     }
@@ -952,6 +962,30 @@ internal sealed class PanelHost : IDisposable
         }
     }
 
+    /// <summary>Onizlemenin ses yolu — olcum kuyunun takilip takilmadigini buradan okur.</summary>
+    internal PreviewAudio Audio => _audio;
+
+    /// <summary>
+    /// Ses borusunu acik pencerenin anina getirir. Kaynak dosya bir kez baglanir; her
+    /// pencere yenilenmesinde yalniz atlama yapilir. Sessiz klipte iki adim da sessizce
+    /// hicbir sey yapmaz.
+    /// </summary>
+    private async Task SyncAudioAsync(int generation, string path, double atSeconds)
+    {
+        try
+        {
+            await _audio.AttachAsync(path).ConfigureAwait(false);
+            if (_disposed || !_open || generation != _generation) return;
+            if (!_audio.HasAudio) return;
+
+            _audio.SeekTo(atSeconds);
+            if (!_panel.Controls.IsPlaying) _audio.Pause();
+        }
+        catch
+        {
+        }
+    }
+
     private void ApplyPlayState()
     {
         var source = _source;
@@ -959,8 +993,8 @@ internal sealed class PanelHost : IDisposable
         // Duraklatma yalnız oynatmayı durdurur. Önden hazırlığı iptal etmek, sürüyorsa
         // kodladığı pencereyi atardı; baştan başlatma ayar değişmediği halde iş bastan
         // başlıyordu (T161). Hazırlık duraklatmada da arkada bitmeye bırakılır.
-        if (_panel.Controls.IsPlaying) source.Play();
-        else source.Pause();
+        if (_panel.Controls.IsPlaying) { source.Play(); _audio.Play(); }
+        else { source.Pause(); _audio.Pause(); }
     }
 
     private async void Seek(TimeSpan position)
@@ -1016,6 +1050,7 @@ internal sealed class PanelHost : IDisposable
         DropStandby().Wait(TimeSpan.FromSeconds(3));
         // Uygulama kapanıyor: kalan parça dosyaları burada silinir (K5).
         _segments.Dispose();
+        _audio.Dispose();
         // Pencere kapanıyor: süreç gerçekten ölene kadar beklenir, öksüz ffmpeg kalmaz.
         // Bekleme havuz kuyruğunda olduğu için arayüz kuyruğunu kilitlemez.
         Teardown().Wait(TimeSpan.FromSeconds(3));

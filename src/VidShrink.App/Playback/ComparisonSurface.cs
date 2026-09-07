@@ -36,6 +36,10 @@ internal sealed class ComparisonSurface : Control
 
     private WriteableBitmap? _bitmap;
     private PixelSize _frame = PixelSize.Empty;
+
+    /// <summary>Ekranda duran panonun ölçüsü. İstenen ölçü değişse de ilk yeni kare gelene
+    /// kadar bu durur — kaynak dikdörtgeni buradan hesaplanır.</summary>
+    private PixelSize _shown = PixelSize.Empty;
     private int _bufferBytes;
     private bool _hasFrame;
     private bool _running;
@@ -118,6 +122,15 @@ internal sealed class ComparisonSurface : Control
     /// <summary>Elinde yeni kare bulamadan geçen tur sayısı — kopyalama yapılmayan turlar.</summary>
     internal long IdleRounds => Interlocked.Read(ref _idleRounds);
 
+    /// <summary>
+    /// Panoyu istenen kare ölçüsüne kurar.
+    ///
+    /// T184/K2: aynı ölçüye yeniden yapılandırma hiçbir şey yapmaz — yakınlaştırma pano
+    /// ölçüsünü sık sık aynı sayıya geri getiriyor ve her seferinde eldeki kareyi atmak
+    /// ekranı boşuna karartıyordu. Ölçü gerçekten değiştiğinde de eldeki kare ve panosu
+    /// yerinde kalır; yeni ölçüdeki pano ilk kare gelince <see cref="Blit"/> içinde kurulur.
+    /// Ekranda o ana kadar eski kare durur, siyah kutu değil.
+    /// </summary>
     internal void Configure(PixelSize combined)
     {
         if (combined.Width <= 1 || combined.Height <= 0) throw new ArgumentOutOfRangeException(nameof(combined));
@@ -125,16 +138,32 @@ internal sealed class ComparisonSurface : Control
 
         lock (_gate)
         {
+            if (_frame == combined) return;
+
             _frame = combined;
             _bufferBytes = combined.Width * 4 * combined.Height;
             _pool.Clear();
             _ring.Clear();
-            _hasFrame = false;
-            _bitmap?.Dispose();
-            _bitmap = new WriteableBitmap(combined, new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Opaque);
         }
 
         Gesture.SetSource(SideSize.Width, SideSize.Height);
+        Repaint();
+    }
+
+    /// <summary>
+    /// Panoyu boşaltır: elde kare yokmuş gibi davranılır ve boş durum geri gelir. Kapanan
+    /// panel son kareyi donuk göstermesin diye var. <see cref="Configure"/> bunu artık
+    /// kendiliğinden yapmıyor — yakınlaştırma ölçü değiştirdiğinde ekran kararıyordu
+    /// (T184/K2); boşaltma isteyen yer bunu açıkça söyler.
+    /// </summary>
+    internal void Blank()
+    {
+        lock (_gate)
+        {
+            _hasFrame = false;
+            _ring.Clear();
+        }
+
         Repaint();
     }
 
@@ -260,7 +289,17 @@ internal sealed class ComparisonSurface : Control
     private void Blit(byte[] source)
     {
         WriteableBitmap? bitmap;
-        lock (_gate) bitmap = _bitmap;
+        lock (_gate)
+        {
+            if (_bitmap is null || _shown != _frame)
+            {
+                _bitmap?.Dispose();
+                _bitmap = new WriteableBitmap(_frame, new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Opaque);
+                _shown = _frame;
+            }
+
+            bitmap = _bitmap;
+        }
         if (bitmap is null) return;
 
         using var locked = bitmap.Lock();
@@ -274,6 +313,9 @@ internal sealed class ComparisonSurface : Control
     ///
     /// Bu çizim kod çözme tetiklemez. Ayırıcı sürükleme ve yakınlaştırma yalnız buradaki
     /// dikdörtgenleri oynatır, yeni kare istemez.
+    ///
+    /// Kaynak dikdörtgeni ekranda duran panonun ölçüsünden geliyor, istenen ölçüden değil:
+    /// ikisi ilk yeni kareye kadar ayrışabiliyor (T184/K2).
     /// </summary>
     public override void Render(DrawingContext context)
     {
@@ -281,17 +323,21 @@ internal sealed class ComparisonSurface : Control
 
         WriteableBitmap? bitmap;
         bool ready;
+        PixelSize shown;
         lock (_gate)
         {
             bitmap = _bitmap;
             ready = _hasFrame;
+            shown = _shown;
         }
         if (bitmap is null || !ready) return;
 
         var viewport = Bounds.Size;
         if (viewport.Width <= 0 || viewport.Height <= 0) return;
 
-        var side = SideSize;
+        var side = shown == PixelSize.Empty
+            ? PixelSize.Empty
+            : new PixelSize(shown.Width / 2, shown.Height);
         if (side.Width <= 0 || side.Height <= 0) return;
 
         Gesture.SetViewport(viewport.Width, viewport.Height);

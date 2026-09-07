@@ -139,10 +139,22 @@ internal sealed class ZoomGesture
     }
 
     /// <summary>
-    /// Görüntünün çizim ölçeği. Yakınlaştırma paneli büyüttüğü için görüntü hep sığdırma
-    /// ölçeğinde durur: panel büyüyünce pano da büyür, görüntü onunla birlikte büyür.
+    /// Görüntünün çizim ölçeği.
+    ///
+    /// Terfi etmiş kademelerde görüntü sığdırma ölçeğinde durur: panel büyüyünce pano da
+    /// büyür, görüntü onunla birlikte büyür — ikinci bir büyütme çift sayardı.
+    ///
+    /// T184/K2: bandda öyle değil. Panelin bandındaki yuvası yıldız ölçülü
+    /// (<c>MainWindow.axaml</c> PreviewPlanGrid, satır 0), yani kabuk kendi boyunu
+    /// isteyerek büyüyemez; %100 ile %200 arasındaki her çentik yalnız yüzde okumasını
+    /// oynatıyordu. Bu aralıkta büyüyen şey görüntüdür: sığdırma ölçeği panel ölçeğiyle
+    /// çarpılır, taşan kısım panoda kırpılır ve sürüklenebilir hâle gelir.
+    ///
+    /// İki taraf terfi eşiğinde birbirine değiyor: eşiğin hemen altında görüntü bandın
+    /// yaklaşık iki katı, hemen üstünde panel bandın iki katı ve görüntü ona sığmış. Yani
+    /// ekrandaki görünür boy sıçramıyor.
     /// </summary>
-    internal double Scale => FitScale;
+    internal double Scale => Shelter == ShelterStage.Band ? FitScale * PanelScale : FitScale;
 
     internal double ContentWidth => SourceWidth * Scale;
 
