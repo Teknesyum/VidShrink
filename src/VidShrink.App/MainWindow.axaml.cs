@@ -106,7 +106,8 @@ public partial class MainWindow : Window
     private CoreShare.IHttpTransport? _shareTransport;
     private ShareFlow? _shareFlow;
     private PanelHost? _preview;
-    private bool _advancedExpanded;
+    private Intent _intent = Intent.Sharing;
+    private bool _chipSizeCapped = true;
     internal static readonly string[] AdvancedPresetCandidates =
     {
         "ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
@@ -169,27 +170,23 @@ public partial class MainWindow : Window
         Watch(TxtTarget, TextBox.TextProperty, OnTargetTextChanged);
         Watch(SliderQualityTarget, RangeBase.ValueProperty, OnQualityTargetSliderChanged);
         Watch(TxtQualityTarget, TextBox.TextProperty, OnQualityTargetTextChanged);
-        foreach (var box in new[] { CmbIntent, CmbCodec, CmbFillPolicy, CmbHdrPolicy })
-            Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
-        foreach (var check in new[] { ChkResolution, ChkFps, ChkFastGpu })
+        foreach (var toggle in ShrinkChoiceToggles())
+            Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        foreach (var check in new ToggleButton[] { ChkResolution, ChkFps, ChkFastGpu })
             Watch(check, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkFastGpu, ToggleButton.IsCheckedProperty, OnFastGpuChanged);
 
         Watch(PlanPanelRow, RowDefinition.HeightProperty, OnSplitterMoved);
 
         InitializeAdvancedUi();
-        foreach (var box in new[]
-                 {
-                     CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-                     CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
-                 })
+        foreach (var box in AdvBoxes())
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
-        foreach (var box in new[]
-                 {
-                     CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-                     CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
-                 })
+        foreach (var box in AdvBoxes())
             Watch(box, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
+        foreach (var toggle in AdvStripToggles())
+            Watch(toggle, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        foreach (var toggle in AdvStripToggles())
+            Watch(toggle, ToggleButton.IsCheckedProperty, SaveSettings);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
@@ -211,10 +208,12 @@ public partial class MainWindow : Window
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
                  {
-                     CmbIntent, CmbCodec, CmbFillPolicy, CmbHdrPolicy, CmbQualityMode,
+                     CmbQualityMode,
                      CmbContainer, CmbConvertCodec, CmbResolution, CmbConvertFps, CmbConvertAudio
                  })
             Watch(control, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
+        foreach (var control in ShrinkChoiceToggles())
+            Watch(control, ToggleButton.IsCheckedProperty, SaveSettings);
         foreach (var control in new ToggleButton[] { ChkResolution, ChkFps })
             Watch(control, ToggleButton.IsCheckedProperty, SaveSettings);
         foreach (var control in new TextBox[]
@@ -225,6 +224,8 @@ public partial class MainWindow : Window
             Watch(control, TextBox.TextProperty, SaveSettings);
 
         RefreshQualityTargetAvailability();
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         Loaded += OnWindowLoaded;
@@ -797,13 +798,14 @@ public partial class MainWindow : Window
         {
             TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
             TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
-            CmbIntent.SelectedIndex = settings.Intent;
-            CmbCodec.SelectedIndex = settings.Codec;
+            _intent = (Intent)Math.Clamp(settings.Intent, 0, 2);
+            _chipSizeCapped = settings.ChipSizeCapped;
+            SetCodecIndex(settings.Codec);
             ChkResolution.IsChecked = settings.MayLowerResolution;
             ChkFps.IsChecked = settings.MayLowerFps;
             ChkFastGpu.IsChecked = settings.FastGpu ?? false;
-            CmbFillPolicy.SelectedIndex = settings.FillPolicy;
-            CmbHdrPolicy.SelectedIndex = settings.HdrPolicy;
+            SetFillIndex(settings.FillPolicy);
+            SetHdrIndex(settings.HdrPolicy);
             CmbQualityMode.SelectedIndex = settings.QualityMode;
             TxtQuality.Text = settings.QualityValue.ToString(CultureInfo.InvariantCulture);
             CmbContainer.SelectedIndex = settings.Container;
@@ -826,6 +828,9 @@ public partial class MainWindow : Window
         {
             _updateUiSyncing = _syncing = _settingsSyncing = false;
         }
+
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
     }
 
     private UpdateSettings CaptureSettings() => new()
@@ -835,12 +840,13 @@ public partial class MainWindow : Window
         FastGpu = ChkFastGpu.IsChecked == true,
         TargetMb = ParseTargetMb(),
         QualityTarget = ParseQualityTarget(),
-        Intent = CmbIntent.SelectedIndex,
-        Codec = CmbCodec.SelectedIndex,
+        Intent = SelectedIntentIndex,
+        ChipSizeCapped = _chipSizeCapped,
+        Codec = CodecIndex,
         MayLowerResolution = ChkResolution.IsChecked == true,
         MayLowerFps = ChkFps.IsChecked == true,
-        FillPolicy = CmbFillPolicy.SelectedIndex,
-        HdrPolicy = CmbHdrPolicy.SelectedIndex,
+        FillPolicy = FillPolicyIndex,
+        HdrPolicy = HdrPolicyIndex,
         QualityMode = CmbQualityMode.SelectedIndex,
         QualityValue = int.TryParse(TxtQuality.Text, out var quality) ? quality : 23,
         Container = CmbContainer.SelectedIndex,
@@ -912,24 +918,52 @@ public partial class MainWindow : Window
 
     private SelectingItemsControl[] AdvBoxes() => new SelectingItemsControl[]
     {
-        CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-        CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
+        CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
+        CmbAdvMinResolution, CmbAdvMinFps, CmbAdvCodecLock
     };
+
+    internal ToggleButton[] AdvStripToggles() => new ToggleButton[]
+    {
+        RbAdvModeAuto, RbAdvModeCrf, RbAdvModeTwoPass,
+        RbAdvPathAuto, RbAdvPathSoftware, RbAdvPathHardware
+    };
+
+    internal int AdvModeIndex
+    {
+        get => RbAdvModeCrf.IsChecked == true ? 1 : RbAdvModeTwoPass.IsChecked == true ? 2 : 0;
+        set
+        {
+            RbAdvModeCrf.IsChecked = value == 1;
+            RbAdvModeTwoPass.IsChecked = value == 2;
+            RbAdvModeAuto.IsChecked = value is not (1 or 2);
+        }
+    }
+
+    internal int AdvEncoderPathIndex
+    {
+        get => RbAdvPathSoftware.IsChecked == true ? 1 : RbAdvPathHardware.IsChecked == true ? 2 : 0;
+        set
+        {
+            RbAdvPathSoftware.IsChecked = value == 1;
+            RbAdvPathHardware.IsChecked = value == 2;
+            RbAdvPathAuto.IsChecked = value is not (1 or 2);
+        }
+    }
 
     private AppSettings CaptureAppSettings()
     {
         var boxes = AdvBoxes();
         return new AppSettings
         {
-            AdvMode = boxes[0].SelectedIndex,
-            AdvCrf = boxes[1].SelectedIndex,
-            AdvPreset = boxes[2].SelectedIndex,
-            AdvAudioKbps = boxes[3].SelectedIndex,
-            AdvAudioChannels = boxes[4].SelectedIndex,
-            AdvMinResolution = boxes[5].SelectedIndex,
-            AdvMinFps = boxes[6].SelectedIndex,
-            AdvEncoderPath = boxes[7].SelectedIndex,
-            AdvCodecLock = boxes[8].SelectedIndex,
+            AdvMode = AdvModeIndex,
+            AdvCrf = boxes[0].SelectedIndex,
+            AdvPreset = boxes[1].SelectedIndex,
+            AdvAudioKbps = boxes[2].SelectedIndex,
+            AdvAudioChannels = boxes[3].SelectedIndex,
+            AdvMinResolution = boxes[4].SelectedIndex,
+            AdvMinFps = boxes[5].SelectedIndex,
+            AdvEncoderPath = AdvEncoderPathIndex,
+            AdvCodecLock = boxes[6].SelectedIndex,
             OutputFolderMode = CmbOutputFolderMode.SelectedIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
@@ -944,11 +978,13 @@ public partial class MainWindow : Window
         _settingsSyncing = _syncing = true;
         try
         {
+            AdvModeIndex = settings.AdvMode;
+            AdvEncoderPathIndex = settings.AdvEncoderPath;
             var indices = new[]
             {
-                settings.AdvMode, settings.AdvCrf, settings.AdvPreset, settings.AdvAudioKbps,
+                settings.AdvCrf, settings.AdvPreset, settings.AdvAudioKbps,
                 settings.AdvAudioChannels, settings.AdvMinResolution, settings.AdvMinFps,
-                settings.AdvEncoderPath, settings.AdvCodecLock
+                settings.AdvCodecLock
             };
             var boxes = AdvBoxes();
             for (var i = 0; i < boxes.Length; i++)
@@ -1099,9 +1135,6 @@ public partial class MainWindow : Window
     {
         var automatic = Say("main.plan.automatic");
 
-        CmbAdvMode.ItemsSource = new[] { automatic, Say("main.advanced.mode.crf"), Say("main.advanced.mode.two-pass") };
-        CmbAdvMode.SelectedIndex = 0;
-
         CmbAdvCrf.ItemsSource = new[] { automatic }.Concat(AdvancedCrfCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
         CmbAdvCrf.SelectedIndex = 0;
 
@@ -1123,9 +1156,6 @@ public partial class MainWindow : Window
         CmbAdvMinFps.ItemsSource = new[] { automatic }.Concat(AdvancedMinFpsCandidates.Select(c => c.ToString("0.##", CultureInfo.InvariantCulture))).ToList();
         CmbAdvMinFps.SelectedIndex = 0;
 
-        CmbAdvEncoderPath.ItemsSource = new[] { automatic, Say("main.advanced.encoder-path.software"), Say("main.advanced.encoder-path.hardware") };
-        CmbAdvEncoderPath.SelectedIndex = 0;
-
         CmbAdvCodecLock.ItemsSource = new[] { automatic }.Concat(FfmpegArguments.KnownCodecs.OrderBy(c => c, StringComparer.OrdinalIgnoreCase)).ToList();
         CmbAdvCodecLock.SelectedIndex = 0;
     }
@@ -1133,37 +1163,156 @@ public partial class MainWindow : Window
     /// <summary>Dil değişince "Otomatik" ve enum etiketleri yeniden kurulur, seçim korunur.</summary>
     private void RefreshAdvancedTexts()
     {
-        var indices = new[]
-        {
-            CmbAdvMode.SelectedIndex, CmbAdvCrf.SelectedIndex, CmbAdvPreset.SelectedIndex,
-            CmbAdvAudioKbps.SelectedIndex, CmbAdvAudioChannels.SelectedIndex, CmbAdvMinResolution.SelectedIndex,
-            CmbAdvMinFps.SelectedIndex, CmbAdvEncoderPath.SelectedIndex, CmbAdvCodecLock.SelectedIndex
-        };
+        var boxes = AdvBoxes();
+        var indices = boxes.Select(box => box.SelectedIndex).ToArray();
         var wasSyncing = _syncing;
         _syncing = true;
         InitializeAdvancedUi();
-        var boxes = new SelectingItemsControl[]
-        {
-            CmbAdvMode, CmbAdvCrf, CmbAdvPreset, CmbAdvAudioKbps, CmbAdvAudioChannels,
-            CmbAdvMinResolution, CmbAdvMinFps, CmbAdvEncoderPath, CmbAdvCodecLock
-        };
         for (var i = 0; i < boxes.Length; i++)
             if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
         _syncing = wasSyncing;
     }
 
-    private void OnToggleAdvanced(object? sender, RoutedEventArgs e)
+    private void OnToggleAdvanced(object? sender, RoutedEventArgs e) => SetSection(AdvancedBody, GlyphAdvanced, !AdvancedBody.IsVisible);
+
+    private void OnToggleQuality(object? sender, RoutedEventArgs e) => SetSection(QualitySectionBody, GlyphQuality, !QualitySectionBody.IsVisible);
+
+    private void OnToggleAudio(object? sender, RoutedEventArgs e) => SetSection(AudioBody, GlyphAudio, !AudioBody.IsVisible);
+
+    private void OnToggleFrame(object? sender, RoutedEventArgs e) => SetSection(FrameBody, GlyphFrame, !FrameBody.IsVisible);
+
+    private void SetSection(Control body, TextBlock glyph, bool open)
     {
-        _advancedExpanded = !_advancedExpanded;
-        AdvancedBody.IsVisible = _advancedExpanded;
-        BtnAdvancedToggle.Content = _advancedExpanded ? "▴" : "▾";
+        body.IsVisible = open;
+        glyph.Text = open ? "▴" : "▾";
+        RefreshSectionSummaries();
     }
 
-    internal void ExpandAdvanced()
+    internal void ExpandAdvanced() => SetSection(AdvancedBody, GlyphAdvanced, true);
+
+    internal IReadOnlyList<ToggleButton> ShrinkChoiceToggles() => new ToggleButton[]
     {
-        _advancedExpanded = true;
-        AdvancedBody.IsVisible = true;
-        BtnAdvancedToggle.Content = "▴";
+        RbCodecAuto, RbCodecCompatible, RbCodecSmallest, RbHdrPreserve, RbHdrSdr, RbFillTarget, RbFillCeiling
+    };
+
+    internal int SelectedIntentIndex => (int)_intent;
+
+    internal int CodecIndex => RbCodecCompatible.IsChecked == true ? 1 : RbCodecSmallest.IsChecked == true ? 2 : 0;
+
+    internal int FillPolicyIndex => RbFillCeiling.IsChecked == true ? 1 : 0;
+
+    internal int HdrPolicyIndex => RbHdrSdr.IsChecked == true ? 1 : 0;
+
+    private void SetCodecIndex(int index)
+    {
+        RbCodecCompatible.IsChecked = index == 1;
+        RbCodecSmallest.IsChecked = index == 2;
+        RbCodecAuto.IsChecked = index is not (1 or 2);
+    }
+
+    private void SetFillIndex(int index)
+    {
+        RbFillCeiling.IsChecked = index == 1;
+        RbFillTarget.IsChecked = index != 1;
+    }
+
+    private void SetHdrIndex(int index)
+    {
+        RbHdrSdr.IsChecked = index == 1;
+        RbHdrPreserve.IsChecked = index != 1;
+    }
+
+    /// <summary>
+    /// Yonga seridinin tamami: her yonga bir hedefi ve o hedefin plan karsiligini tasir.
+    /// <c>SizeCapped</c> false olan tek yonga <c>ChipArchive</c>'dir; onun kisiti boyut
+    /// degil kalitedir.
+    /// </summary>
+    internal readonly record struct ChipPlan(
+        string Chip, double? TargetMb, bool SizeCapped, Intent Intent, CodecPreference Codec, FillPolicy Fill);
+
+    internal static IReadOnlyList<ChipPlan> ChipPlans() => new ChipPlan[]
+    {
+        new("ChipArchive", null, false, Intent.Archive, CodecPreference.MaxCompression, FillPolicy.QualityCeiling),
+        new("Chip8", 8, true, Intent.SocialMedia, CodecPreference.Compatible, FillPolicy.FillTarget),
+        new("ChipWhatsApp", 16, true, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget),
+        new("Chip25", 25, true, Intent.Sharing, CodecPreference.Compatible, FillPolicy.FillTarget),
+        new("Chip100", 100, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
+        new("Chip128", 128, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
+        new("Chip180", 180, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.FillTarget),
+        new("ChipHalf", null, true, Intent.Sharing, CodecPreference.Auto, FillPolicy.QualityCeiling)
+    };
+
+    private void ApplyChipPlan(string chip)
+    {
+        var plan = ChipPlans().Single(candidate => candidate.Chip == chip);
+        _intent = plan.Intent;
+        _chipSizeCapped = plan.SizeCapped;
+        SetCodecIndex(plan.Codec switch
+        {
+            CodecPreference.Compatible => 1,
+            CodecPreference.MaxCompression => 2,
+            _ => 0
+        });
+        SetFillIndex(plan.Fill == FillPolicy.FillTarget ? 0 : 1);
+
+        if (plan.TargetMb is { } fixedMb)
+        {
+            if (fixedMb > SliderTarget.Maximum) SliderTarget.Maximum = fixedMb;
+            TxtTarget.Text = fixedMb.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+        else if (plan.SizeCapped && _info is not null)
+        {
+            TxtTarget.Text = Math.Round(_info.FileSizeMb / 2, 1).ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
+    }
+
+    private string CodecLabel() => CodecIndex switch
+    {
+        1 => Say("main.codec.compatible"),
+        2 => Say("main.codec.smallest"),
+        _ => Say("main.codec.automatic")
+    };
+
+    private string FillLabel() => FillPolicyIndex == 1 ? Say("main.fill.ceiling") : Say("main.fill.target");
+
+    private void RefreshChipDerivation()
+    {
+        var size = _chipSizeCapped
+            ? Say("main.derivation.size", TxtTarget.Text ?? "")
+            : Say("main.derivation.no-cap");
+        TxtChipDerivation.Text = string.Join(" · ", size, CodecLabel(), FillLabel());
+    }
+
+    /// <summary>
+    /// Katlanmis her bolum basligi kendi degerlerini yazar; katlamak durumu gizlemez.
+    /// </summary>
+    private void RefreshSectionSummaries()
+    {
+        var quality = new List<string> { CodecLabel(), FillLabel() };
+        if (HdrPolicyPanel.IsVisible) quality.Add(HdrPolicyIndex == 1 ? Say("main.hdr.sdr") : Say("main.hdr.preserve"));
+        TxtQualitySummary.Text = QualitySectionBody.IsVisible ? "" : string.Join(" · ", quality);
+
+        TxtAudioSummary.Text = AudioBody.IsVisible
+            ? ""
+            : string.Join(" · ", CmbAdvAudioKbps.SelectedItem as string ?? "", CmbAdvAudioChannels.SelectedItem as string ?? "");
+
+        var frame = new List<string>
+        {
+            ChkResolution.IsChecked == true ? Say("main.allow.resolution") : Say("main.section.frame.resolution-locked"),
+            ChkFps.IsChecked == true ? Say("main.allow.fps") : Say("main.section.frame.fps-locked")
+        };
+        TxtFrameSummary.Text = FrameBody.IsVisible ? "" : string.Join(" · ", frame);
+
+        var advanced = new SelectingItemsControl[] { CmbAdvCrf, CmbAdvPreset, CmbAdvCodecLock }
+            .Count(box => box.SelectedIndex > 0)
+            + (AdvModeIndex > 0 ? 1 : 0)
+            + (AdvEncoderPathIndex > 0 ? 1 : 0);
+        TxtAdvancedSummary.Text = AdvancedBody.IsVisible
+            ? ""
+            : advanced == 0 ? Say("main.section.advanced.none") : Say("main.section.advanced.overrides", advanced);
     }
 
     private static string? AdvancedText(ComboBox box) => box.SelectedIndex > 0 ? box.SelectedItem as string : null;
@@ -1174,8 +1323,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void ApplyAdvancedOptions(PlanOptions options)
     {
-        if (AdvancedText(CmbAdvMode) is { } modeText)
-            options.LockedMode = CmbAdvMode.SelectedIndex == 1 ? EncodeMode.Crf : EncodeMode.TwoPass;
+        if (AdvModeIndex > 0)
+            options.LockedMode = AdvModeIndex == 1 ? EncodeMode.Crf : EncodeMode.TwoPass;
 
         if (AdvancedText(CmbAdvCrf) is { } crfText
             && double.TryParse(crfText, NumberStyles.Float, CultureInfo.InvariantCulture, out var crf))
@@ -1204,7 +1353,7 @@ public partial class MainWindow : Window
             && double.TryParse(minFpsText, NumberStyles.Float, CultureInfo.InvariantCulture, out var minFps))
             options.MinFps = minFps;
 
-        options.EncoderPath = CmbAdvEncoderPath.SelectedIndex switch
+        options.EncoderPath = AdvEncoderPathIndex switch
         {
             1 => EncoderPathOverride.Software,
             2 => EncoderPathOverride.Hardware,
@@ -2053,13 +2202,13 @@ public partial class MainWindow : Window
     {
         var options = new PlanOptions
         {
-            TargetMb = ParseTargetMb(),
-            Intent = (Intent)Math.Max(0, CmbIntent.SelectedIndex),
-            Codec = CodecFromIndex(CmbCodec.SelectedIndex),
+            TargetMb = PlanTargetMb(),
+            Intent = _intent,
+            Codec = CodecFromIndex(CodecIndex),
             AllowResolutionDrop = ChkResolution.IsChecked == true,
             AllowFpsDrop = ChkFps.IsChecked == true,
-            HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
-            FillPolicy = CmbFillPolicy.SelectedIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
+            HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
+            FillPolicy = FillPolicyIndex == 1 ? FillPolicy.QualityCeiling : FillPolicy.FillTarget,
             SpeedMode = ChkFastGpu.IsChecked == true ? SpeedMode.Fast : SpeedMode.Quality
         };
         ApplyAdvancedOptions(options);
@@ -2068,6 +2217,16 @@ public partial class MainWindow : Window
 
     private double ParseTargetMb()
         => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : WhatsAppTargetMb;
+
+    /// <summary>
+    /// Boyut tavani olmayan yonga secildiginde hedef kutusundaki sayi plani kurmaz:
+    /// motor kalite tavanina kadar bit harcar. Tavansizligin sayisal karsiligi
+    /// <see cref="PlanCalculator.QualityCeilingTargetMb"/>; yeni bir olcu uydurulmadi.
+    /// </summary>
+    internal double PlanTargetMb()
+        => _chipSizeCapped || _info is null ? ParseTargetMb() : PlanCalculator.QualityCeilingTargetMb(_info);
+
+    internal PlanOptions PlanOptionsForTest() => CurrentOptions();
 
     private static string? SelectedTag(SelectingItemsControl box)
         => (box.SelectedItem as Control)?.Tag as string;
@@ -2384,6 +2543,8 @@ public partial class MainWindow : Window
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
         TxtHdr.Text = info.IsHdr ? Say("main.info.yes") : Say("main.info.no");
         Fade(HdrPolicyPanel, info.IsHdr);
+        SecAudio.IsVisible = info.HasAudio;
+        RefreshSectionSummaries();
     }
 
     /// <summary>
@@ -2981,6 +3142,7 @@ public partial class MainWindow : Window
         _syncing = true;
         TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
+        RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
     }
@@ -2993,8 +3155,21 @@ public partial class MainWindow : Window
         if (mb > SliderTarget.Maximum) SliderTarget.Maximum = Math.Ceiling(mb);
         SliderTarget.Value = mb;
         _syncing = false;
+        RestoreSizeCap();
         if (!_targetIsDerived) DeriveQualityFromTarget();
         ScheduleRecalculate();
+    }
+
+    /// <summary>
+    /// Hedefe elle dokunmak boyut tavanini geri getirir: kutuya yazilan sayi motora
+    /// ulasmiyorsa turetme satiri da yalan soyluyor demektir.
+    /// </summary>
+    private void RestoreSizeCap()
+    {
+        if (_chipSizeCapped) return;
+        _chipSizeCapped = true;
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
     }
 
     private void OnQualityTargetSliderChanged()
@@ -3112,20 +3287,17 @@ public partial class MainWindow : Window
 
     private void OnPreset(object? sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: string tag } && double.TryParse(tag, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
-        {
-            if (value > SliderTarget.Maximum) SliderTarget.Maximum = value;
-            TxtTarget.Text = tag;
-        }
+        if (sender is Control { Name: { } name }) ApplyChipPlan(name);
     }
 
-    private void OnPresetHalf(object? sender, RoutedEventArgs e)
-    {
-        if (_info is not null) TxtTarget.Text = Math.Round(_info.FileSizeMb / 2, 1).ToString("0.##", CultureInfo.InvariantCulture);
-    }
+    private void OnPresetHalf(object? sender, RoutedEventArgs e) => ApplyChipPlan("ChipHalf");
+
+    private void OnPresetArchive(object? sender, RoutedEventArgs e) => ApplyChipPlan("ChipArchive");
 
     private void OnOptionChanged()
     {
+        RefreshChipDerivation();
+        RefreshSectionSummaries();
         if (_syncing) return;
         ScheduleRecalculate();
     }
@@ -3502,7 +3674,7 @@ public partial class MainWindow : Window
             AudioBitrateK = audioK > 0 ? audioK : ConversionDefaults.AudioBitrateK,
             Start = ParseTime(TxtTrimStart.Text),
             End = ParseTime(TxtTrimEnd.Text),
-            HdrPolicy = CmbHdrPolicy.SelectedIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve
+            HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve
         };
     }
 

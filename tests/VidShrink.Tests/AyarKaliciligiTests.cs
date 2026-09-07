@@ -1,5 +1,8 @@
 using System.Text.RegularExpressions;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
 using VidShrink.App;
+using VidShrink.Core;
 
 namespace VidShrink.Tests;
 
@@ -75,14 +78,19 @@ public sealed class AyarKaliciligiTests
         var code = File.ReadAllText(TipSources.WindowCodePath);
         var boxes = new[]
         {
-            "CmbAdvMode", "CmbAdvCrf", "CmbAdvPreset", "CmbAdvAudioKbps", "CmbAdvAudioChannels",
-            "CmbAdvMinResolution", "CmbAdvMinFps", "CmbAdvEncoderPath", "CmbAdvCodecLock"
+            "CmbAdvCrf", "CmbAdvPreset", "CmbAdvAudioKbps", "CmbAdvAudioChannels",
+            "CmbAdvMinResolution", "CmbAdvMinFps", "CmbAdvCodecLock",
+            "RbAdvModeAuto", "RbAdvModeCrf", "RbAdvModeTwoPass",
+            "RbAdvPathAuto", "RbAdvPathSoftware", "RbAdvPathHardware"
         };
         var missing = boxes.Where(box => !code.Contains(box)).ToList();
-        Assert.True(missing.Count == 0, "Kod arkasinda gecmeyen kutu: " + string.Join(", ", missing));
+        Assert.True(missing.Count == 0, "Kod arkasinda gecmeyen kalem: " + string.Join(", ", missing));
 
         var count = Regex.Matches(code, "Watch\\(box, SelectingItemsControl.SelectedIndexProperty, SaveSettings\\);").Count;
-        Assert.True(count >= 1, "Dokuz gelismis kutuyu SaveSettings uzerinden kaydeden foreach dongusu bulunamadi.");
+        Assert.True(count >= 1, "Gelismis kutulari SaveSettings uzerinden kaydeden foreach dongusu bulunamadi.");
+
+        var strips = Regex.Matches(code, "Watch" + Regex.Escape("(toggle, ToggleButton.IsCheckedProperty, SaveSettings);")).Count;
+        Assert.True(strips >= 1, "Gelismis seritleri SaveSettings uzerinden kaydeden foreach dongusu bulunamadi.");
     }
 
     [Fact]
@@ -138,6 +146,77 @@ public sealed class AyarKaliciligiTests
             Assert.Equal(0, result.afterReset.AdvMinFps);
             Assert.Equal(0, result.afterReset.AdvEncoderPath);
             Assert.Equal(0, result.afterReset.AdvCodecLock);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    /// <summary>
+    /// T177 tur 2 borcu: <c>Intent</c> kaydediliyordu, tavansızlık bayrağı kaydedilmiyordu.
+    /// Arşiv seçip uygulamayı kapatan kullanıcı, niyeti Arşiv ama türetme satırı
+    /// "Hedef X MB" olan bir pencereyle açılıyordu. İki alan da aynı dosyadan dönmeli.
+    /// </summary>
+    [Fact]
+    public void ArsivSeciliKapananUygulamaArsivIleAciliyor()
+    {
+        var file = SettingsFile();
+        try
+        {
+            var reading = AppHost.Run(() =>
+            {
+                var first = new MainWindow { SettingsPathOverride = file };
+                try
+                {
+                    first.UseTurkish();
+                    first.ChipArchive.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                }
+                finally { first.Close(); }
+
+                var saved = UpdateSettings.Load(file);
+
+                var second = new MainWindow { SettingsPathOverride = file };
+                try
+                {
+                    second.UseTurkish();
+                    second.RestoreSettingsForTest(saved);
+                    return (Saved: saved, second.SelectedIntentIndex, Line: second.TxtChipDerivation.Text ?? "");
+                }
+                finally { second.Close(); }
+            });
+
+            Assert.False(
+                reading.Saved.ChipSizeCapped,
+                "Arşiv seçiliyken tavansızlık bayrağı ayar dosyasına yazılmadı.");
+            Assert.Equal((int)Intent.Archive, reading.SelectedIntentIndex);
+            Assert.Contains("tavanı yok", reading.Line, StringComparison.OrdinalIgnoreCase);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    /// <summary>
+    /// Tavansızlık kalıcı değil: hedefe dokunan kullanıcı tavanı geri getirir ve o hâl de
+    /// kaydedilir. Tek yönlü kaydeden bir alan Arşiv'i hapse çevirirdi.
+    /// </summary>
+    [Fact]
+    public void HedefeDokunulduktanSonraTavanKaydediliyor()
+    {
+        var file = SettingsFile();
+        try
+        {
+            var saved = AppHost.Run(() =>
+            {
+                var window = new MainWindow { SettingsPathOverride = file };
+                try
+                {
+                    window.UseTurkish();
+                    window.ChipArchive.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    window.TxtTarget.Text = "12";
+                }
+                finally { window.Close(); }
+
+                return UpdateSettings.Load(file);
+            });
+
+            Assert.True(saved.ChipSizeCapped, "Hedefe dokunulduktan sonra tavan ayara geri yazılmadı.");
         }
         finally { if (File.Exists(file)) File.Delete(file); }
     }

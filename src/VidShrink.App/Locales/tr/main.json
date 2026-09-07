@@ -1,4 +1,16 @@
 ﻿{
+
+  "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur.\n• Motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Bu yonga seçiliyken hedef kutusundaki sayı plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.\n• Hedefe dokunduğunuz anda boyut tavanı geri gelir.",
+  "main.derivation.size": "Hedef {0} MB",
+  "main.derivation.no-cap": "Boyut tavanı yok",
+  "main.section.outcome": "Ne çıkacak",
+  "main.section.quality": "Kalite ve uyumluluk",
+  "main.section.audio": "Ses",
+  "main.section.frame": "Kırpma ve çözünürlük",
+  "main.section.frame.resolution-locked": "Çözünürlük sabit",
+  "main.section.frame.fps-locked": "Kare hızı sabit",
+  "main.section.advanced.overrides": "{0} ayar elle",
+  "main.section.advanced.none": "Hepsi otomatik",
   "main.language.name": "Türkçe",
 
   "main.tagline.lead": "Boyut hedefli medya sıkıştırma",
@@ -47,7 +59,6 @@
 
   "main.target.title": "Hedef",
   "main.target.crf-locked": "CRF gelişmiş ayardan sabitlendi; hedef boyut artık zorlanmıyor, bir tahmine dönüştü.",
-  "main.target.tip": "• Hedef katı bir tavandır: VidShrink size bundan büyük bir dosya vermez.\n• WhatsApp 2 GB'a kadar dosya kabul eder, ancak sohbette gönderdiğiniz her videoyu yeniden sıkıştırır ve kendi kodlayıcısı buradakinden çok daha zayıftır.\n• 16 MB'ın altında kalmak WhatsApp'ın değil VidShrink'in kalitesini korur.\n• 25 MB Discord'a ve çoğu e-postaya, 8 MB eski forumlara ve sohbet uygulamalarına uyar.",
 
   "main.chip.half": "Yarısı",
   "main.chip.half.tip": "• Kaynağın yarısı.\n• Yumuşak bir istek olduğu için motor genellikle özgün çözünürlüğü ve kare hızını korur.",
@@ -75,22 +86,15 @@
   "main.quality.basis.estimated": "Kaynak bit hızından tahmin edildi",
   "main.quality.basis.under-target": "Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır",
 
-  "main.intent.label": "Amaç",
-  "main.intent.tip": "• Amaç, motorun bit harcamayı ne kadar erken keseceğidir.\n• Arşiv yalnızca gözle kayıpsız kalitede durur, bu yüzden hedefin büyük kısmını kullanmadan bırakabilir.\n• Paylaşım, normal bir izleyicinin farkı sezmeyi bıraktığı noktada durur — WhatsApp için doğrusu budur.\n• Sosyal medya daha da erken durur, çünkü platform dosyayı zaten yeniden kodlayacaktır.",
   "main.intent.archive": "Arşiv",
-  "main.intent.sharing": "Paylaşım",
-  "main.intent.social": "Sosyal medya",
 
   "main.codec.label": "Sıkıştırma algoritması",
-  "main.codec.tip": "• H.264 evrenseldir: son on beş yılda üretilmiş her telefon oynatır ve WhatsApp onu yeniden kodlamaz.\n• H.265 aynı görüntü için kabaca üçte bir daha az bit ister, bu yüzden sıkışık hedeflerde kazanır — ancak bazı eski Android telefonlar ve bazı web oynatıcılar kabul etmez.\n• Otomatik, yumuşak hedeflerde H.264'ü, kalite kazancı uyumluluk riskini aştığında H.265'i seçer.\n• Hız artık buradan seçilmiyor: kodlamayı ekran kartının yapmasını istiyorsanız aşağıdaki hızlı düşür (GPU) seçeneğini açın.",
   "main.codec.automatic": "Otomatik",
   "main.codec.compatible": "H.264 (uyumlu)",
   "main.codec.smallest": "H.265 (en küçük)",
 
   "main.allow.resolution": "Çözünürlük düşürülebilir",
-  "main.allow.resolution.tip": "• Hedef sıkışıkken iyi kodlanmış az piksel, kötü kodlanmış çok pikseli yener — bulanıklık, bloklaşmadan çok daha az rahatsız eder.\n• Motor bu klibin çözünürlük düşürmekle gerçekte ne kadar kazandığını ölçer, sonra bütçenin temiz taşıyabileceği en büyük çözünürlüğü seçer.\n• Telefon ekranında iyi kodlanmış 720p, 1080p'den ayırt edilemez; bunu açık bırakmak neredeyse her zaman daha iyi bir takastır.",
   "main.allow.fps": "Kare hızı düşürülebilir",
-  "main.allow.fps.tip": "• Kare hızını yarıya indirmek kalan karelere bit kazandırır.\n• Motor bunu yalnızca zor hedeflerde yapar ve hareketin takılmaya başladığı seviyenin altına asla inmez.\n• Her telefon düşük kare hızını sorunsuz oynatır; bedeli akıcılıktır, uyumluluk değil.",
 
   "main.fast-gpu": "Hızlı düşür (GPU)",
   "main.fast-gpu.tip": "• Ekran kartı kodlamayı işlemciye göre kat kat hızlandırır.\n• VidShrink kartınızın sunduğu en iyi kodlayıcıyı seçer; modern kartlarda AV1 kodlayıcısı yazılım kodlayıcısıyla neredeyse aynı kaliteyi yaklaşık yedi kat hızlı verir.\n• Daha eski kartlarda hız yine gelir, ama bedeli megabayt başına bir miktar kalitedir.",
@@ -103,13 +107,11 @@
   "main.fast-gpu.on-against-advice": "• {0}; ölçüm kapalı öneriyordu, kutu elle açıldı.",
   "main.fast-gpu.off-as-advised": "• {0}, hızlı düşür kapalı kaldı.",
 
-  "main.fill.label": "Doldurma politikası",
-  "main.fill.tip": "• Hedefi doldur, hedef boyuta yakın durur ve bütçenin izin verdiği en iyi kaliteyi sıkar.\n• Kalite tavanında dur, kalite artmayı bıraktığında durur; dosyayı şişirmez ama küçük kalabilir.",
+  "main.fill.label": "Bit bütçesi",
   "main.fill.target": "Hedefi doldur",
   "main.fill.ceiling": "Kalite tavanında dur",
 
   "main.hdr.label": "HDR biçimi",
-  "main.hdr.tip": "• HDR'yi korumak kaynağın daha geniş renk ve parlaklık aralığını saklar, ancak dosya daha büyük 10-bit olur ve yalnızca yeni cihazlar ve uygulamalar doğru oynatır.\n• SDR'ye çevirmek görüntüyü standart aralığa indirger — daha küçük, her telefonda güvenli.",
   "main.hdr.preserve": "HDR'yi koru",
   "main.hdr.sdr": "SDR'ye çevir",
 

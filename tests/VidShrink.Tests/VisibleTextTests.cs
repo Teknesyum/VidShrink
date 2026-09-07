@@ -20,7 +20,8 @@ public sealed class VisibleTextTests
         "TxtConvertResult",
         "TxtShareCeiling",
         "TxtShareDeleteNote",
-        "TxtSystemStatus"
+        "TxtSystemStatus",
+        "TxtOutcomeSummary"
     ];
 
     private static readonly HashSet<string> EmptyButtonExemptions =

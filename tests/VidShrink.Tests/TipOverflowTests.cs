@@ -48,6 +48,63 @@ public sealed class TipOverflowTests
     }
 
     /// <summary>
+    /// Tavanı aşan satır sayısının tavanı. Tabloyu yeniden yazmak tek başına bekçi değil:
+    /// dosya sessizce büyüyor, koşum yeşil dönüyordu (T177 tur 2, KRİTİK 2). Bu sayı
+    /// ölçülen değere pimlenmez, <b>eşik</b>tir: iyileşme serbest, artış kırmızıdır.
+    /// Bir metin uzayıp bu sayıyı geçtiğinde eşik yükseltilmeden önce metin kısaltılır.
+    /// </summary>
+    private const int OverflowBudget = 20;
+
+    /// <summary>
+    /// Taşan satır sayısı bütçeyi aşamaz. Tablo yazıcısı bunu yakalamıyordu — dosyayı
+    /// yeni sayıyla yeniden yazıp yeşil dönüyor, artış yalnız diff'e bakan bir insana
+    /// görünüyordu. CI diff'e bakmaz.
+    /// </summary>
+    [Fact]
+    public void TheNumberOfLinesOverTheCeilingDoesNotGrow()
+    {
+        var measurements = TipLineMetrics.MeasureAll();
+        Assert.NotEmpty(measurements);
+
+        var over = measurements.Where(line => line.Overflow > 0).ToList();
+
+        Assert.True(
+            over.Count <= OverflowBudget,
+            $"Tavanı aşan satır sayısı {over.Count}; bütçe {OverflowBudget}. "
+            + $"Bütçeyi yükseltmeden önce metni kısaltın. Aşanlar:"
+            + Environment.NewLine
+            + string.Join(Environment.NewLine, over
+                .OrderByDescending(line => line.Overflow)
+                .Select(line => $"[{line.Language}] {line.Source} · satır {line.LineIndex}: "
+                    + $"{line.Width:F0} px, taşma {line.Overflow:F0} px")));
+    }
+
+    /// <summary>
+    /// T177 tur 1'de eklenen <c>main.chip.archive.tip</c> tavanı dört satırda birden
+    /// aşıyordu, biri 528 px ile. Bu ipucu artık hiç sarmıyor: her maddesi tek görsel
+    /// satır. İki dilde birden denetlenir.
+    /// </summary>
+    [Fact]
+    public void TheArchiveChipTipFitsUnderTheCeilingInBothLanguages()
+    {
+        var over = TipLineMetrics.MeasureAll()
+            .Where(line => line.Source.StartsWith("main.chip.archive.tip", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.True(over.Count > 0, "main.chip.archive.tip hiç ölçülmedi; süzgeç ölü.");
+
+        var offenders = over.Where(line => line.Overflow > 0).ToList();
+
+        Assert.True(
+            offenders.Count == 0,
+            $"main.chip.archive.tip {offenders.Count} satırda tavanı aşıyor:"
+            + Environment.NewLine
+            + string.Join(Environment.NewLine, offenders.Select(line =>
+                $"[{line.Language}] satır {line.LineIndex}: {line.Width:F0} px, "
+                + $"tavan {TipLineMetrics.Ceiling:F0} px, taşma {line.Overflow:F0} px")));
+    }
+
+    /// <summary>
     /// K4: ölçüm bir kereye mahsus betik olmayacak. Bu, tabloyu her koşuda yeniden yazar;
     /// metin değiştiğinde tablo da değişir ve fark diff'te görünür.
     /// </summary>

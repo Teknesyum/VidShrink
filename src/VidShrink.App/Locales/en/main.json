@@ -1,4 +1,16 @@
 ﻿{
+
+  "main.chip.archive.tip": "• The archive chip has no size ceiling.\n• The engine spends bits up to visually lossless quality and stops there.\n• While this chip is on, the number in the target box does not build the plan.\n• The file does get smaller, but the source decides how much, not you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.\n• Touching the target brings the size ceiling back.",
+  "main.derivation.size": "Target {0} MB",
+  "main.derivation.no-cap": "No size ceiling",
+  "main.section.outcome": "What comes out",
+  "main.section.quality": "Quality and compatibility",
+  "main.section.audio": "Audio",
+  "main.section.frame": "Cropping and resolution",
+  "main.section.frame.resolution-locked": "Resolution fixed",
+  "main.section.frame.fps-locked": "Frame rate fixed",
+  "main.section.advanced.overrides": "{0} set by hand",
+  "main.section.advanced.none": "All automatic",
   "main.language.name": "English",
 
   "main.tagline.lead": "Target size media compression",
@@ -47,7 +59,6 @@
 
   "main.target.title": "Target",
   "main.target.crf-locked": "CRF is fixed from the advanced settings; the target size no longer forces the plan, it is now only an estimate.",
-  "main.target.tip": "• The target is a hard ceiling: VidShrink never hands you a file larger than this.\n• WhatsApp accepts files up to 2 GB, but it re-compresses any video you send in chat, and its own encoder is far weaker than this one.\n• Staying at or below 16 MB keeps VidShrink's quality instead of WhatsApp's.\n• 25 MB fits Discord and most e-mail, 8 MB fits older forums and chat apps.",
 
   "main.chip.half": "Half",
   "main.chip.half.tip": "• Half of the source size.\n• A mild request, so the engine usually keeps the original resolution and frame rate.",
@@ -75,22 +86,15 @@
   "main.quality.basis.estimated": "Estimated from the source bitrate",
   "main.quality.basis.under-target": "The source is already under this target and is copied as it is",
 
-  "main.intent.label": "Intent",
-  "main.intent.tip": "• Intent sets how early the engine stops spending bits.\n• Archive stops only at visually lossless quality, so it can leave a lot of the target unused.\n• Sharing stops at the point where a normal viewer stops noticing — the right choice for WhatsApp.\n• Social media stops earlier still, because the platform will re-encode the file anyway.",
   "main.intent.archive": "Archive",
-  "main.intent.sharing": "Sharing",
-  "main.intent.social": "Social media",
 
   "main.codec.label": "Compression algorithm",
-  "main.codec.tip": "• H.264 is universal: every phone from the last fifteen years plays it, and WhatsApp never re-encodes it.\n• H.265 needs roughly a third fewer bits for the same picture, so it wins badly compressed targets — but some older Android phones and some web players refuse it.\n• Automatic picks H.264 for mild targets and H.265 once the target is tight enough that the quality gain outweighs the compatibility risk.\n• Speed is not chosen here: turn on fast shrink (GPU) below to let the graphics card encode.",
   "main.codec.automatic": "Automatic",
   "main.codec.compatible": "H.264 (compatible)",
   "main.codec.smallest": "H.265 (smallest)",
 
   "main.allow.resolution": "May lower resolution",
-  "main.allow.resolution.tip": "• When the target is tight, fewer pixels encoded well beat many pixels encoded badly — blur is far less objectionable than blocking.\n• The engine measures how much this particular clip actually saves by scaling down, then picks the largest resolution the budget can still hold cleanly.\n• On a phone screen a well-encoded 720p is indistinguishable from 1080p; leaving this on is almost always the better trade.",
   "main.allow.fps": "May lower frame rate",
-  "main.allow.fps.tip": "• Halving the frame rate frees bits for the frames left.\n• The engine does this only on hard targets, never below the level where motion starts to stutter.\n• Every phone plays reduced frame rates without trouble; the cost is smoothness, not compatibility.",
 
   "main.fast-gpu": "Fast shrink (GPU)",
   "main.fast-gpu.tip": "• Graphics cards encode many times faster than the CPU.\n• VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed.\n• On older cards the speed still arrives, but it costs some quality per megabyte.",
@@ -103,13 +107,11 @@
   "main.fast-gpu.on-against-advice": "• {0}; the measurement advised leaving it off, but the box was turned on by hand.",
   "main.fast-gpu.off-as-advised": "• {0}, so fast shrink stayed off.",
 
-  "main.fill.label": "Fill policy",
-  "main.fill.tip": "• Fill target lands close to the target size and squeezes out the best quality the budget allows.\n• Stay at quality ceiling stops when quality stops improving: no padding, but the file can be smaller.",
+  "main.fill.label": "Bit budget",
   "main.fill.target": "Fill target",
   "main.fill.ceiling": "Stay at quality ceiling",
 
   "main.hdr.label": "HDR",
-  "main.hdr.tip": "• Preserving HDR keeps the source's wider color and brightness range, but the file is larger 10-bit and only recent devices and apps play it correctly.\n• Converting to SDR maps the picture to the standard range — smaller, safe on any phone.",
   "main.hdr.preserve": "Preserve HDR",
   "main.hdr.sdr": "Convert to SDR",
 

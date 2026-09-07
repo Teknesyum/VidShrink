@@ -108,14 +108,14 @@ public sealed class AdvancedPanelTests
     /// </summary>
     private static void ApplyMaximalAdvancedSelection(MainWindow window)
     {
-        FindCombo(window, "CmbAdvMode").SelectedIndex = 2; // İki geçiş — CRF onu geçersiz kılacak (ModeSupersededByCrf)
+        window.AdvModeIndex = 2; // İki geçiş — CRF onu geçersiz kılacak (ModeSupersededByCrf)
         FindCombo(window, "CmbAdvCrf").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedCrfCandidates, 30); // CrfOverride
         FindCombo(window, "CmbAdvPreset").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedPresetCandidates, "faster"); // PresetOverride (libx264 icin gecerli)
         FindCombo(window, "CmbAdvAudioKbps").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedAudioKbpsCandidates, 96); // AudioBitrateOverride
         FindCombo(window, "CmbAdvAudioChannels").SelectedIndex = 2; // Mono — AudioChannelsOverride
         FindCombo(window, "CmbAdvMinResolution").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedMinResolutionCandidates, 1080); // MinResolutionOverride
         FindCombo(window, "CmbAdvMinFps").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedMinFpsCandidates, 48.0); // MinFpsOverride
-        FindCombo(window, "CmbAdvEncoderPath").SelectedIndex = 2; // Donanım — kodek kilidiyle çakışıp SupersededByCodec üretir
+        window.AdvEncoderPathIndex = 2; // Donanım — kodek kilidiyle çakışıp SupersededByCodec üretir
         FindCombo(window, "CmbAdvCodecLock").SelectedIndex = 1 + FfmpegArguments.KnownCodecs
             .OrderBy(c => c, StringComparer.OrdinalIgnoreCase).ToList().IndexOf("libx264");
     }
@@ -358,17 +358,17 @@ public sealed class AdvancedPanelTests
         });
     }
 
-    /// <summary>K4: dokuz kalemin her biri gerçekten var, "Otomatik" varsayılan ve motorun
-    /// seçtiği değeri bir hint satırında gösteriyor.</summary>
+    /// <summary>K4: açılır liste kalan yedi kalemin her biri gerçekten var, "Otomatik"
+    /// varsayılan ve motorun seçtiği değeri bir hint satırında gösteriyor. Şeride dönen
+    /// iki kalem <see cref="ModeAndEncoderPathAreThreeSegmentStripsThatStillShowWhatTheEngineChose"/>
+    /// içinde denetleniyor.</summary>
     [Theory]
-    [InlineData("CmbAdvMode", "TxtAdvModeNow")]
     [InlineData("CmbAdvCrf", "TxtAdvCrfNow")]
     [InlineData("CmbAdvPreset", "TxtAdvPresetNow")]
     [InlineData("CmbAdvAudioKbps", "TxtAdvAudioKbpsNow")]
     [InlineData("CmbAdvAudioChannels", "TxtAdvAudioChannelsNow")]
     [InlineData("CmbAdvMinResolution", "TxtAdvMinResolutionNow")]
     [InlineData("CmbAdvMinFps", "TxtAdvMinFpsNow")]
-    [InlineData("CmbAdvEncoderPath", "TxtAdvEncoderPathNow")]
     [InlineData("CmbAdvCodecLock", "TxtAdvCodecLockNow")]
     public void EachAdvancedControlDefaultsToAutomaticAndShowsWhatTheEngineChose(string comboName, string hintName)
     {
@@ -389,22 +389,64 @@ public sealed class AdvancedPanelTests
         });
     }
 
+    /// <summary>
+    /// T177: mod ve kodlayıcı yolu artık açılır liste değil üç bölmeli şerit. Kalem
+    /// sayısı değişmedi; iki kalemin bileşeni değişti, o yüzden varsayılan ve "şu an"
+    /// satırı denetimi ayrı bir olguda sürüyor.
+    /// </summary>
+    [Fact]
+    public void ModeAndEncoderPathAreThreeSegmentStripsThatStillShowWhatTheEngineChose()
+    {
+        Fresh(window =>
+        {
+            window.UseTurkish();
+            window.LoadWithoutProbing(SamplePath, Sample());
+            window.SettleFades();
+            window.RecalculateForTest();
+            LayOutAt(window, DesignSize());
+
+            Xunit.Assert.Equal(6, window.AdvStripToggles().Length);
+            Xunit.Assert.Equal(0, window.AdvModeIndex);
+            Xunit.Assert.Equal(0, window.AdvEncoderPathIndex);
+
+            foreach (var hintName in new[] { "TxtAdvModeNow", "TxtAdvEncoderPathNow" })
+            {
+                var hint = window.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == hintName);
+                Xunit.Assert.False(string.IsNullOrWhiteSpace(hint.Text), $"{hintName} motorun seçtiği değeri göstermiyor.");
+            }
+
+            window.AdvModeIndex = 2;
+            window.AdvEncoderPathIndex = 1;
+            Xunit.Assert.Equal(2, window.AdvModeIndex);
+            Xunit.Assert.Equal(1, window.AdvEncoderPathIndex);
+            return true;
+        });
+    }
+
     /// <summary>K4: dokuz kalemin tamamı bu sayımdadır — liste elle özetlenmiyor.</summary>
     [Fact]
     public void ThereAreExactlyNineAdvancedControls()
     {
-        var names = new[]
+        var boxes = new[]
         {
-            "CmbAdvMode", "CmbAdvCrf", "CmbAdvPreset", "CmbAdvAudioKbps", "CmbAdvAudioChannels",
-            "CmbAdvMinResolution", "CmbAdvMinFps", "CmbAdvEncoderPath", "CmbAdvCodecLock"
+            "CmbAdvCrf", "CmbAdvPreset", "CmbAdvAudioKbps", "CmbAdvAudioChannels",
+            "CmbAdvMinResolution", "CmbAdvMinFps", "CmbAdvCodecLock"
         };
-        Xunit.Assert.Equal(9, names.Length);
+        var strips = new[]
+        {
+            new[] { "RbAdvModeAuto", "RbAdvModeCrf", "RbAdvModeTwoPass" },
+            new[] { "RbAdvPathAuto", "RbAdvPathSoftware", "RbAdvPathHardware" }
+        };
+        Xunit.Assert.Equal(9, boxes.Length + strips.Length);
 
         Fresh(window =>
         {
             LayOutAt(window, DesignSize());
-            foreach (var name in names)
+            foreach (var name in boxes)
                 Xunit.Assert.NotNull(window.GetVisualDescendants().OfType<ComboBox>().SingleOrDefault(c => c.Name == name));
+            foreach (var strip in strips)
+                foreach (var name in strip)
+                    Xunit.Assert.NotNull(window.GetVisualDescendants().OfType<RadioButton>().SingleOrDefault(r => r.Name == name));
             return true;
         });
     }
@@ -421,20 +463,18 @@ public sealed class AdvancedPanelTests
 
     /// <summary>
     /// K4'ün <b>iki</b> yarısı. Birinci yarı: bölüm varsayılan kapalı. İkinci yarı:
-    /// kapalıyken sayfa yüksekliğine katkısı <b>sıfır</b> — sözleşmenin "kapalıyken
-    /// bugünkü sayfa görünümü değişmez" cümlesi budur ve tur 2'ye kadar hiç ölçülmüyordu.
+    /// kapalıyken sayfaya ödettiği yer <b>bir bölüm başlığı kadar</b>.
     ///
-    /// <para>Tur 2'de ölçülen hâl bu cümleyi karşılamıyordu: bölüm kendi <c>Border</c>
-    /// panelindeydi ve yalnız her zaman görünen başlık satırı sol sütunu 940'tan 1043'e
-    /// çıkarıyordu (+103). Tur 3'te katlama kolu hedef panelinin var olan başlık satırına
-    /// taşındı ve <c>TargetMinSize</c> ile o satırın boyuna sabitlendi; K5'in uyarı satırı
-    /// da ızgaraya yeni bir satır açmak yerine yongalarla aynı satırı paylaşıyor (yeni
-    /// satır <c>RowSpacing</c> yüzünden tek başına +12 idi).</para>
+    /// <para>T177'ye kadar iddia "katkısı sıfır" idi: katlama kolu hedef panelinin var
+    /// olan başlık satırında oturuyordu, dolayısıyla kendi satırı yoktu. T177 gelişmiş
+    /// bölümü kalite, ses ve kırpma bölümleriyle <b>aynı düzeye</b> aldı; dördü de kendi
+    /// başlık satırında duruyor ve o satır artık kendi değerlerini yazıyor. Sıfır iddiası
+    /// bu yerleşimde yanlış olurdu, bedelin diğer bölümlerle eşitliği doğru olan iddiadır.</para>
     ///
-    /// <para><b>Ölçme yöntemi:</b> sütun iki kez ölçülüyor — olduğu gibi (bölüm kapalı) ve
-    /// katlama kolu yerleşimden tümüyle çıkarılmış hâlde. İki sayı eşitse kapalı bölümün
-    /// bedeli sıfırdır. Üçüncü ölçü bölümü açıyor: sütun büyümüyorsa ilk iki sayının
-    /// eşitliği boş bir eşitliktir ve ölçü o zaman da düşer.</para>
+    /// <para><b>Ölçme yöntemi:</b> sütun üç kez ölçülüyor — olduğu gibi, gelişmiş bölüm
+    /// yerleşimden çıkarılmış hâlde, kalite bölümü çıkarılmış hâlde. Son iki sayı eşitse
+    /// gelişmiş bölümün kapalı bedeli bir bölüm başlığından fazla değildir. Dördüncü ölçü
+    /// bölümü açıyor: sütun büyümüyorsa eşitlik boş bir eşitliktir ve ölçü o zaman da düşer.</para>
     ///
     /// <para>Sayfanın mutlak boyu ayrıca <c>WindowLayoutTests</c>'te pinli
     /// (<c>ThePageContentStaysAtItsPinnedHeight</c>,
@@ -442,9 +482,9 @@ public sealed class AdvancedPanelTests
     /// kapalı bölümün payını ayrıca ölçüyor.</para>
     /// </summary>
     [Fact]
-    public void TheCollapsedAdvancedSectionCostsThePageNoHeight()
+    public void TheCollapsedAdvancedSectionCostsNoMoreThanASectionHeader()
     {
-        var (collapsedByDefault, withSection, withoutSection, expanded) = Fresh(window =>
+        var (collapsedByDefault, withSection, withoutAdvanced, withoutQuality, expanded) = Fresh(window =>
         {
             window.UseTurkish();
             LayOutAt(window, DesignSize());
@@ -453,34 +493,42 @@ public sealed class AdvancedPanelTests
             Relayout(window, DesignSize());
 
             var body = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "AdvancedBody");
-            var toggle = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "BtnAdvancedToggle");
+            var advanced = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "SecAdvanced");
+            var quality = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "SecQuality");
             var closed = body.IsVisible;
             var withIt = SettingsColumnHeight(window);
 
-            toggle.IsVisible = false;
+            advanced.IsVisible = false;
             Relayout(window, DesignSize());
-            var withoutIt = SettingsColumnHeight(window);
+            var withoutAdv = SettingsColumnHeight(window);
 
-            toggle.IsVisible = true;
+            advanced.IsVisible = true;
+            quality.IsVisible = false;
+            Relayout(window, DesignSize());
+            var withoutQua = SettingsColumnHeight(window);
+
+            quality.IsVisible = true;
             ClickAdvancedToggle(window);
             Relayout(window, DesignSize());
             var open = SettingsColumnHeight(window);
 
-            return (closed, withIt, withoutIt, open);
+            return (closed, withIt, withoutAdv, withoutQua, open);
         });
 
-        _output.WriteLine($"sol sutun, bolum kapali: {withSection:0.##} px");
-        _output.WriteLine($"sol sutun, bolum yerlesimden cikarilmis: {withoutSection:0.##} px");
-        _output.WriteLine($"sol sutun, bolum acik: {expanded:0.##} px");
-        _output.WriteLine($"kapali bolumun bedeli: {withSection - withoutSection:0.##} px");
+        _output.WriteLine($"sol sutun, dort bolum de kapali: {withSection:0.##} px");
+        _output.WriteLine($"gelismis bolum yerlesimden cikarilmis: {withoutAdvanced:0.##} px");
+        _output.WriteLine($"kalite bolumu yerlesimden cikarilmis: {withoutQuality:0.##} px");
+        _output.WriteLine($"sol sutun, gelismis bolum acik: {expanded:0.##} px");
+        _output.WriteLine($"kapali gelismis bolumun bedeli: {withSection - withoutAdvanced:0.##} px");
+        _output.WriteLine($"kapali kalite bolumunun bedeli: {withSection - withoutQuality:0.##} px");
 
         Xunit.Assert.False(collapsedByDefault, "K4: gelişmiş ayarlar bölümü varsayılan kapalı açılmalı.");
 
         Xunit.Assert.True(
-            Math.Abs(withSection - withoutSection) < 0.5,
-            $"K4: kapalı bölümün sayfa yüksekliğine katkısı sıfır olmalı. Sol sütun bölümle "
-            + $"{withSection:0.##}, bölüm yerleşimden çıkarılınca {withoutSection:0.##} "
-            + $"(fark {withSection - withoutSection:0.##} px).");
+            Math.Abs(withoutAdvanced - withoutQuality) < 0.5,
+            $"T177/K4: kapalı gelişmiş bölüm sayfaya bir bölüm başlığından fazlasına mal "
+            + $"oluyor. Gelişmiş çıkarılınca sütun {withoutAdvanced:0.##}, kalite "
+            + $"çıkarılınca {withoutQuality:0.##} px.");
 
         Xunit.Assert.True(
             expanded > withSection + 0.5,
@@ -508,17 +556,18 @@ public sealed class AdvancedPanelTests
 
             var body = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "AdvancedBody");
             var button = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "BtnAdvancedToggle");
+            var glyph = button.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "GlyphAdvanced");
 
             var s0 = body.IsVisible;
-            var g0 = button.Content as string;
+            var g0 = glyph.Text;
 
             ClickAdvancedToggle(window);
             var s1 = body.IsVisible;
-            var g1 = button.Content as string;
+            var g1 = glyph.Text;
 
             ClickAdvancedToggle(window);
             var s2 = body.IsVisible;
-            var g2 = button.Content as string;
+            var g2 = glyph.Text;
 
             return (s0, s1, s2, g0, g1, g2);
         });

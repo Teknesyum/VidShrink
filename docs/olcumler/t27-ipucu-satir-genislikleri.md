@@ -10,29 +10,15 @@ dotnet test VidShrink.sln -c Release --filter TipOverflowTests
 16 px). Tavan `Themes/Theme.axaml` belirteçlerinden
 hesaplanır: `TooltipMaxWidth` eksi iki yanın dolgusu ve kenarlığı = **746 px**.
 
-Ölçülen satır: **204** · tavanı aşan: **34** ·
+Ölçülen satır: **172** · tavanı aşan: **20** ·
 tek kelimeyle aşan: **0**
 
 | Dil | İpucu | Satır | Genişlik | Taşma | Görsel satır | Alt satır | Tek kelime |
 | --- | --- | ---: | ---: | ---: | ---: | --- | :-: |
-| EN | main.target.tip · The target is a hard ceiling: VidShrink neve… | 1 | 939 | 193 | 2 | encoder is far weaker than this one. |  |
-| TR | main.target.tip · The target is a hard ceiling: VidShrink neve… | 1 | 1080 | 334 | 2 | kendi kodlayıcısı buradakinden çok daha zayıftır. |  |
 | EN | main.chip.whatsapp.tip · WhatsApp re-encodes in-chat video with its o… | 1 | 960 | 214 | 2 | VidShrink's quality, not WhatsApp's. |  |
 | TR | main.chip.whatsapp.tip · WhatsApp re-encodes in-chat video with its o… | 1 | 957 | 211 | 2 | değil VidShrink'in kalitesi olur. |  |
-| EN | main.codec.tip · H.264 is universal: every phone from the las… | 1 | 1155 | 409 | 2 | some older Android phones and some web players refuse it. |  |
-| EN | main.codec.tip · H.264 is universal: every phone from the las… | 2 | 957 | 211 | 2 | outweighs the compatibility risk. |  |
-| TR | main.codec.tip · H.264 is universal: every phone from the las… | 1 | 1179 | 433 | 2 | bazı eski Android telefonlar ve bazı web oynatıcılar kabul etmez. |  |
-| TR | main.codec.tip · H.264 is universal: every phone from the las… | 3 | 856 | 110 | 2 | seçeneğini açın. |  |
-| EN | main.allow.resolution.tip · When the target is tight, fewer pixels encod… | 0 | 918 | 172 | 2 | objectionable than blocking. |  |
-| EN | main.allow.resolution.tip · When the target is tight, fewer pixels encod… | 1 | 1056 | 310 | 2 | largest resolution the budget can still hold cleanly. |  |
-| EN | main.allow.resolution.tip · When the target is tight, fewer pixels encod… | 2 | 871 | 125 | 2 | always the better trade. |  |
-| TR | main.allow.resolution.tip · When the target is tight, fewer pixels encod… | 0 | 906 | 160 | 2 | çok daha az rahatsız eder. |  |
-| TR | main.allow.resolution.tip · When the target is tight, fewer pixels encod… | 1 | 993 | 247 | 2 | taşıyabileceği en büyük çözünürlüğü seçer. |  |
-| TR | main.allow.resolution.tip · When the target is tight, fewer pixels encod… | 2 | 899 | 153 | 2 | zaman daha iyi bir takastır. |  |
 | EN | main.fast-gpu.tip · Graphics cards encode many times faster than… | 1 | 1158 | 412 | 2 | software encoder's quality at about seven times the speed. |  |
 | TR | main.fast-gpu.tip · Graphics cards encode many times faster than… | 1 | 1116 | 370 | 2 | kodlayıcısıyla neredeyse aynı kaliteyi yaklaşık yedi kat hızlı verir. |  |
-| EN | main.hdr.tip · Preserving HDR keeps the source's wider colo… | 0 | 1037 | 291 | 2 | recent devices and apps play it correctly. |  |
-| TR | main.hdr.tip · Preserving HDR keeps the source's wider colo… | 0 | 1136 | 390 | 2 | olur ve yalnızca yeni cihazlar ve uygulamalar doğru oynatır. |  |
 | EN | main.output.estimated-time.tip · VidShrink times the sample encodes it alread… | 0 | 1116 | 370 | 2 | from this machine and this file, not from a preset table. |  |
 | EN | main.output.estimated-time.tip · VidShrink times the sample encodes it alread… | 1 | 1057 | 311 | 2 | second, and how much less is not measured. |  |
 | TR | main.output.estimated-time.tip · VidShrink times the sample encodes it alread… | 0 | 1115 | 369 | 2 | tablosundan değil, bu makineden ve bu dosyadan gelir. |  |

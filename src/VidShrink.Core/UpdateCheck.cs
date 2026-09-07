@@ -402,6 +402,7 @@ public sealed class UpdateSettings
     public double TargetMb { get; set; } = 16;
     public double QualityTarget { get; set; } = 60;
     public int Intent { get; set; } = 1;
+    public bool ChipSizeCapped { get; set; } = true;
     public int Codec { get; set; }
     public bool MayLowerResolution { get; set; } = true;
     public bool MayLowerFps { get; set; } = true;
@@ -465,6 +466,7 @@ public sealed class UpdateSettings
             ReadDouble(document.RootElement, "targetMb", value => settings.TargetMb = value);
             ReadDouble(document.RootElement, "qualityTarget", value => settings.QualityTarget = value);
             ReadInt(document.RootElement, "intent", value => settings.Intent = value);
+            ReadBool(document.RootElement, "chipSizeCapped", value => settings.ChipSizeCapped = value);
             ReadInt(document.RootElement, "codec", value => settings.Codec = value);
             ReadBool(document.RootElement, "mayLowerResolution", value => settings.MayLowerResolution = value);
             ReadBool(document.RootElement, "mayLowerFps", value => settings.MayLowerFps = value);
@@ -527,6 +529,7 @@ public sealed class UpdateSettings
         writer.WriteNumber("targetMb", TargetMb);
         writer.WriteNumber("qualityTarget", QualityTarget);
         writer.WriteNumber("intent", Intent);
+        writer.WriteBoolean("chipSizeCapped", ChipSizeCapped);
         writer.WriteNumber("codec", Codec);
         writer.WriteBoolean("mayLowerResolution", MayLowerResolution);
         writer.WriteBoolean("mayLowerFps", MayLowerFps);
