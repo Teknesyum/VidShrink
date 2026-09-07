@@ -17,7 +17,7 @@ testleri bu isle birlikte yeniden temellendirilmeli.
 | A2 | Tekerlek zoom %100→200 olu, zoom'da kararma | T184 | **muhurlendi** |
 | A3 | Rozet: sol ORIJINAL / sag ISLENMIS · CRF x, ustte | T184 | **muhurlendi** |
 | A4 | Duraklat/devam basa sariyor | T184 | **muhurlendi** |
-| B | Oynaticinin kendi sekmesi — en solda, video acilabilir, kisayollar | T185 | acilacak |
+| B | Oynatici sekmesi en sola tasinir (sekme ve kisayollar zaten var) | T185 | acilacak |
 | D | Ayar arayuzu yeniden tasarimi (danismanlarin asil isi) | T186 | acilacak |
 | E | Tasma teklifi — %3, dort secenek, sayfa ici serit | T187 | acilacak |
 | C | Varsayilan program onerisi + sag menu kisayolu | T188 | acilacak |
@@ -53,12 +53,18 @@ onizleme en bastan isleme giriyor.
 
 ## B — Oynatici sekmesi (T185)
 
-Bugun **hic yok**. `MainWindow.axaml` icinde bes sekme var
-(`main.tab.shrink`, `.convert`, `.settings`, `.about`, `.advanced`) ve
-`grep PlayerView` bos donuyor. Yani "en sola tasi" degil, "sifirdan ac".
+> **Duzeltme (7 Eylul).** Bu bolumun ilk hali "sekme bugun hic yok, sifirdan acilacak"
+> diyordu. **Yanlisti.** Sekme `MainWindow.axaml:1253` icinde `TabPlayer` adiyla duruyor,
+> icinde `PlayerView` mounted. Kisayollar da calisiyor: T176 dokuz girdinin dokuzunu
+> olcup pinledi (`docs/olcumler/oynatici-girdi.md`) ve "birlikte ac" ile acilan dosya
+> zaten Oynatici sekmesini seciyor (`startup-tab=5|header=Oynatici` izi).
 
-Kullanicinin sabitledigi davranis: acilista **Kucult** secili gelir; ama mp4 dosyasi
-"birlikte ac" ile acildiginda **Oynatici** secili gelir. Kisayollarin hepsi calisir.
+Geriye kalan **tek** is sira: sekme bugun **en sagda** (indeks 5), kullanici **en solda**
+istiyor. Acilis varsayilani **Kucult** kalmali — yani sekme en solda durur ama secili
+gelmez. Tasarimcinin uyarisi tam burada: serit basinda durup varsayilan olmayan bir sekme
+celiskili okunuyor; cozum bir ayirici ve ikonla Oynatici'yi **mod** gibi okutmak.
+
+Sirasi degisince `startup-tab=5` izi ve ona bagli pimler yeniden temellendirilecek.
 
 Tasarimcinin uyarisi: sekme seridinde en solda durup varsayilan olmayan bir sekme
 celiskili okunuyor. Cozum sekme sirasini degistirmek degil, Oynatici'yi bir ayirici ve
