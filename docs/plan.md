@@ -134,6 +134,11 @@ uzantisi, hepsi HKCU); `UserChoice`'a dokunulmadi, dokunulamaz.
 5. **Oneri seridi olu kod.** `DefaultAppSuggestionBar` yazildi ama hicbir yerden
    cagrilmiyor; bagli olacagi `MainWindow.axaml.cs` T188'in `owns` listesi disindaydi.
    T188 tur 2'de baglanir — `owns` genisletildi.
+6. **ProgID kaydi da olu.** Denetcinin buldugu, K4'ten daha buyuk delik:
+   `FileAssociation.Register` uretim kodunda hicbir yerden cagrilmiyor. Tur 1'in canli
+   `HKCU` kaydi yalnizca olcumun yansima ile elle tetiklemesiyle olustu; gercek kullanici
+   uygulamayi kurup calistirdiginda "Birlikte ac" listesinde hala gorunmez. Ayni kok
+   neden: `owns` bagla noktasini kapsamiyordu. Tur 2 K8'de baglanir.
 
 ## F2 — Pim yeniden temellendirmesi
 
