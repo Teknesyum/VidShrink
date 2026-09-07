@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>VidShrink.Shot</AssemblyName>
+    <RootNamespace>VidShrink.Shot</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VidShrink.App\VidShrink.App.csproj" />
+    <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Headless" Version="11.3.20" />
+  </ItemGroup>
+
+</Project>
