@@ -119,7 +119,71 @@ ayri sozlesmeye birakilirsa main iki kosum kirmizi kalir — bu depoda daha once
 
 ## Raftakiler
 
-- **Max sikistirma modu** — 6 Eylul 2026'da kullanici erteledi ve hatirlatilmasini
-  istedi. Bu tur bittiginde gundeme gelir.
+- **Test paralelligi (B secenegi)** — asagida.
 - **Test paralelligi (B secenegi)** — kullanici 0.3.0 sonrasina erteledi. Onunde
   dokuz olculmemis yerel `Call from invalid thread` hatasi duruyor.
+
+
+## Max sikistirma modu — acilis (7 Eylul 2026)
+
+Kullanici 6 Eylul'de rafa kaldirmis ve hatirlatilmasini istemisti; "yavastan giriselim"
+dedigi is budur. Once **ne oldugunu degil, motorun bugun nerede durdugunu** yazdim,
+cunku rafa kalkan tarifin dayandigi varsayimlarin bir kismi bu arada **olculup elendi**.
+
+### Elenmis olan: sahne basina bit dagitimi
+
+T114 bunu olctu ve **koda girmemesine** karar verdi (`docs/olcumler/sahne-butcesi.md`,
+"Sonuc"). Uc bagimsiz olcu ayni yone bakiyor:
+
+- K2 — olculen 8 hucrenin 5'inde kodlayicinin kendi dagitimi haritanin onerisi kadar
+  ya da ondan daha dogru.
+- K5/K6 — kalite kapisi **gecmedi**: p10 esigini gecen hucre 0, en kotu sahne esigini
+  gecen 0.
+- K7 — harita kasten bozuldugunda sonuc **kotulesmedi**; en iyi bozuk kol dogru haritayi
+  0,050 puan gecti, dogru haritanin tabana kazanci ise +0,007 puandi.
+
+Ustune: dagitimi tasiyan tek parametre `zones` ve denenen bes kodlayicinin yalniz
+ikisinde (`libx265`, `libx264`) calisiyor. **Uretimin varsayilani `libsvtav1` onu sessizce
+yok sayiyor.** Yani bu yoldan gidilen max modu, kullanicinin varsayilan ayarina hic
+dokunmazdi.
+
+**Sonuc: max modu sahne butcesi uzerine kurulmaz.** Rafa kaldirilan tarifin bes
+kalibrasyon stratejisinden ucu (sabit 10/80/10, uzatilmis ilk %10, her %10'da bir) zaten
+bugunku motorun gerisinde — `CalibrationProbe.Windows` pencere sayisini kaynagin
+heterojenligine gore seciyor ve `SceneMap` alabiliyor.
+
+### Ayakta kalan tek olculmus isaret: `qcomp`
+
+Ayni izgarada tabani gecen 4 hucrenin **3'unde kazanan `zones` degil `qcomp` oldu.
+`qcomp` tek bir kuresel skaler; `SceneMap` istemiyor ve `libsvtav1`'de calisiyor.**
+T114 raporunun kendi cumlesi: kazandigi hucre "iki gecis yanliliginin bugunku
+varsayilaninin bu icerikte en iyi olmadiginin kaniti".
+
+Yani elde, varsayilan kodlayicida gecerli, olculmus ve **hic pesine dusulmemis** bir
+ayar var.
+
+### Ikinci acik: `maks` kolunun kalite kapisi hic kosulmadi
+
+Ayni raporun "Olculemeyenler" tablosu: `maks/p1-karisik`, `maks/p2-durgun`,
+`maks/p3-hareketli` icin K5/K6 hucreleri **kosulmadi** (`k5-*.json` yok). Duzenegin
+`maks` kolu var ama max modunun kalite kazanci bu depoda **hic olculmedi**.
+
+### Acilis adimi — tek sozlesme, yeni duzenek yok
+
+`tools/sahne-butcesi/` zaten bu isi yapiyor; kurulacak bir sey yok, **kosulacak** bir sey
+var. Tek sozlesme iki soruyu kapatir:
+
+1. `maks` kolunun K5/K6 hucrelerini kos — max modunun kalite kazanci ilk kez sayiya doner.
+2. `libsvtav1` uzerinde `qcomp` taramasi — T114'un tek hucrelik isareti gercek mi, hangi
+   deger, ve varsayilan yolda gorunuyor mu.
+
+ffmpeg **sirayla** kosar; bu depoda iki es zamanli kodlama sure ve kalite sayilarini
+bozdu. Duzenek `--no-build` kullanmaz.
+
+**Fiyat.** Model tarafi ucuz — bir sozlesme, bir denetim, ~60-90k token. Pahali olan
+duvar saati: kodlama kosumlari **4-8 saat**, makine bu sure boyunca baska olcum
+kosturamaz. Onceki 400-700k'lik tahmin **butun modun** fiyatiydi; bu adim onun onunde
+duran ve sonrakini gereksiz kilabilecek olan olcum.
+
+Bu adim bitmeden mod tasarlanmaz. Cikan sayi "kazanc yok" derse mod **acilmaz** ve bu da
+bir sonuctur.
