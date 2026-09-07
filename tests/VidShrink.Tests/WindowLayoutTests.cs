@@ -594,11 +594,11 @@ public sealed class WindowLayoutTests
     /// <para>T183: dörtlü piksel adımıyla ilerleyen doğrusal tarama ikili aramaya
     /// döndü — CI'da bu testin iki kolu birlikte 456 saniye tutuyordu. İkili arama,
     /// artan yükseklikle sığma durumunun tekdüze değiştiğini (bir kez sığdıktan sonra
-    /// bir daha taşmadığını) varsayar; bulunan yükseklik bu varsayımı sınamak için iki
-    /// komşusuyla pimleniyor: kendisinde <c>LayOut(...).Count == 0</c> (sığıyor), 4
-    /// piksel altında <c>LayOut(...).Count != 0</c> (sığmıyor). Doğrusal taramanın hiç
-    /// doğrulamadığı bu ikinci pim, sınırın altının gerçekten sığmadığını da ölçüme
-    /// katıyor.</para>
+    /// bir daha taşmadığını) varsayar. Bu varsayımı test <b>sınamıyor</b>; tekdüzeliği
+    /// veren şey <c>MainWindow.axaml</c> içindeki sayfa <c>ScrollViewer</c>'ının
+    /// içeriğini sonsuz yükseklikle ölçmesi ve yatay çubuğun kapalı olması. O yapı
+    /// değişirse arama sessizce başka bir yükseklik bulur ve test yeşil kalır —
+    /// aralık 90 piksel geniş, 90 pikselden dar bir delik görünmez.</para>
     /// </summary>
     [Theory]
     [InlineData(false, 967, 1057)]
