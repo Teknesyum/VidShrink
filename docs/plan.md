@@ -13,10 +13,10 @@ testleri bu isle birlikte yeniden temellendirilmeli.
 | # | Is | Sozlesme | Durum |
 |---|---|---|---|
 | F1 | Yerlesim testi ikili arama (132,16 sn → 7,76 sn) | T183 | **muhurlendi** |
-| A1 | Onizleme sesi — `AttachAudioSink` baglanmis degil | T184 | kosuyor |
-| A2 | Tekerlek zoom %100→200 olu, zoom'da kararma | T184 | kosuyor |
-| A3 | Rozet: sol ORIJINAL / sag ISLENMIS · CRF x, ustte | T184 | kosuyor |
-| A4 | Duraklat/devam basa sariyor | T184 | kosuyor |
+| A1 | Onizleme sesi — `AttachAudioSink` baglanmis degil | T184 | **muhurlendi** |
+| A2 | Tekerlek zoom %100→200 olu, zoom'da kararma | T184 | **muhurlendi** |
+| A3 | Rozet: sol ORIJINAL / sag ISLENMIS · CRF x, ustte | T184 | **muhurlendi** |
+| A4 | Duraklat/devam basa sariyor | T184 | **muhurlendi** |
 | B | Oynaticinin kendi sekmesi — en solda, video acilabilir, kisayollar | T185 | acilacak |
 | D | Ayar arayuzu yeniden tasarimi (danismanlarin asil isi) | T186 | acilacak |
 | E | Tasma teklifi — %3, dort secenek, sayfa ici serit | T187 | acilacak |
