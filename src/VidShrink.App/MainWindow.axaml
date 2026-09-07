@@ -259,35 +259,35 @@
 
                     <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" IsVisible="False">
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtSize" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtResolution" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtFps" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtVideoCodec" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtAudio" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtBitrate" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}"/>
                         <TextBlock x:Name="TxtHdr" Theme="{StaticResource MonoValue}"/>
                       </StackPanel>
                     </UniformGrid>
@@ -408,11 +408,11 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                           <TextBlock x:Name="GlyphQuality" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="2" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        </Grid>
+                          <TextBlock Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
                       </Button>
                       <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
@@ -455,11 +455,11 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                           <TextBlock x:Name="GlyphAudio" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="2" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        </Grid>
+                          <TextBlock Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
                       </Button>
                       <StackPanel x:Name="AudioBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
@@ -487,11 +487,11 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                           <TextBlock x:Name="GlyphFrame" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="2" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        </Grid>
+                          <TextBlock Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
                       </Button>
                       <StackPanel x:Name="FrameBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
@@ -523,11 +523,11 @@
                               HorizontalContentAlignment="Left"
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
-                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                           <TextBlock x:Name="GlyphAdvanced" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="2" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        </Grid>
+                          <TextBlock Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <TextBlock x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        </StackPanel>
                       </Button>
                       <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
