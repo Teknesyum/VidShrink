@@ -228,7 +228,6 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
-        ShowDefaultAppSuggestion();
         Loaded += OnWindowLoaded;
     }
 
@@ -238,6 +237,11 @@ public partial class MainWindow : Window
     /// Windows olacak, uzantilari baska bir program aciyor olacak ve oneri daha once
     /// reddedilmemis olacak. "Bir daha sorma" dendiginde ret <c>settings.json</c>'a yazilir,
     /// dolayisiyla bir sonraki acilista bu kosul tutmaz ve serit hic uretilmez.
+    ///
+    /// <para>Cagri <c>OnWindowLoaded</c> icinde durur, yapicida degil: yerlesimi pimleyen
+    /// bassiz olcum pencereyi hic gostermedigi icin o olay orada ates almaz ve pimlenen
+    /// yukseklik bu seritten etkilenmez. Serit gercek kullanicinin gordugu acilista
+    /// eklenir.</para>
     /// </summary>
     private void ShowDefaultAppSuggestion()
     {
@@ -245,10 +249,10 @@ public partial class MainWindow : Window
 
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable)) return;
-        if (!Integration.DefaultAppSuggestionBar.Wanted(executable, ShellIntegration.MediaExtensions)) return;
+        if (!Integration.DefaultAppSuggestionBar.Wanted(executable, ShellIntegration.MediaExtensions, SettingsPathOverride)) return;
         if (AppliedNotice.Parent is not Panel host) return;
 
-        host.Children.Add(new Integration.DefaultAppSuggestionBar());
+        host.Children.Add(new Integration.DefaultAppSuggestionBar(SettingsPathOverride));
     }
 
     [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
@@ -462,6 +466,7 @@ public partial class MainWindow : Window
             var appSettings = AppSettings.Load(SettingsPathOverride);
             RestoreAppSettings(appSettings);
             InitializeUpdateUi(settings);
+            ShowDefaultAppSuggestion();
             _ = CheckForUpdateAsync();
             PlayPanelEntrance();
             await LoadStartupFileAsync();

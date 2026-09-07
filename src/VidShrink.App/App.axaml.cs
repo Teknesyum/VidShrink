@@ -33,10 +33,10 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); } catch { }
-        RegisterFileTypes();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            RegisterFileTypes();
             MacUpdate.Begin();
             desktop.Exit += (_, _) => MacUpdate.Finish();
 
@@ -62,9 +62,11 @@ public partial class App : Application
 
     /// <summary>
     /// "Birlikte ac" kaydini uretimde tetikleyen tek nokta. Uygulama nasil acilirsa acilsin
-    /// — ana pencere ya da kabuk istegi — burasi kosar. Kayit yalnizca <c>HKEY_CURRENT_USER</c>
-    /// altina yazilir, yonetici hakki istemez ve <see cref="Integration.FileAssociationSetup"/>
-    /// ayni yol icin bir kez yazdigi icin her acilista kayit defterine dokunulmaz.
+    /// — ana pencere ya da kabuk istegi — burasi kosar. Cagri masaustu omru kolunun icinde
+    /// durur: omur kurulmadan calisan bir konak (olcumdeki bassiz kurulum gibi) kayit
+    /// defterine hic dokunmaz. Kayit yalnizca <c>HKEY_CURRENT_USER</c> altina yazilir,
+    /// yonetici hakki istemez ve <see cref="Integration.FileAssociationSetup"/> ayni yol
+    /// icin bir kez yazdigi icin her acilista kayit defterine dokunulmaz.
     /// </summary>
     private static void RegisterFileTypes()
     {

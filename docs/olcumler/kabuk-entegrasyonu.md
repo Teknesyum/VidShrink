@@ -442,8 +442,13 @@ sinirdir; sessizce dogru sonuc veriyor.
 
 Tur 1'de yazilan iki parca da uretimde hicbir yerden cagrilmiyordu. Tur 2'de baglandi.
 
-**Serit.** `MainWindow` kurucusunda `ShowDefaultAppSuggestion()` cagriliyor
-(`src/VidShrink.App/MainWindow.axaml.cs`). Serit XAML'e yazilmadi — `MainWindow.axaml`
+**Serit.** `MainWindow.OnWindowLoaded` icinde `ShowDefaultAppSuggestion()` cagriliyor
+(`src/VidShrink.App/MainWindow.axaml.cs`). Once yapiciya konmustu; oradan tam suit alti
+yerlesim pimini kirdi (`WindowLayoutTests` uc kol, `AyarYuzeyiTests`, `QualityTargetUiTests`,
+`PerformanceCheckTests`). Sebep dogru olculdu: pimler pencereyi hic gostermeden kuruyor,
+serit bildirim satirina fazladan yukseklik ekliyor ve sayfa kayiyordu. `OnWindowLoaded`
+bassiz kosumda hic ates almadigi icin pim etkilenmiyor, gercek kullanici acilista seridi
+goruyor. Serit XAML'e yazilmadi — `MainWindow.axaml`
 bu sozlesmenin `owns` listesinde degil — bunun yerine var olan bildirim yigini
 `AppliedNotice.Parent` uzerinden bulunup sonuna ekleniyor. Yigin, `AppliedNotice` ve
 `UpdateNotice` bildirimlerini tasiyan `Grid.Row="1"` altindaki `StackPanel`.
@@ -455,7 +460,10 @@ ve serit hic uretilmez.
 
 **Kayit.** `App.OnFrameworkInitializationCompleted` icinde `RegisterFileTypes()`
 cagriliyor (`src/VidShrink.App/App.axaml.cs`). Uygulama nasil acilirsa acilsin — ana
-pencere ya da kabuk istegi — bu yol kosuyor. Kayit her acilista tekrarlanmiyor:
+pencere ya da kabuk istegi — bu yol kosuyor. Cagri masaustu omru kolunun icinde: omur
+kurulmadan calisan bir konak kayit defterine dokunmuyor. Olculdu — 21 testlik kosumdan
+sonra gercek `HKCU:\Software\Classes\Applications` altinda `testhost.exe` yok ve gercek
+`settings.json` icinde `fileAssociationRegisteredFor` anahtari yok. Kayit her acilista tekrarlanmiyor:
 `FileAssociationSetup` yazilan calistirilabilirin yolunu `settings.json` icindeki
 `fileAssociationRegisteredFor` anahtarina not dusuyor ve ayni yol gorulurse
 `FileAssociation.Register` hic cagrilmiyor. Yol degisirse (tasinan kurulum, baska

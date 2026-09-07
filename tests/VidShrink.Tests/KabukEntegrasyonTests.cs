@@ -215,7 +215,8 @@ public sealed class KabukEntegrasyonTests
         var window = File.ReadAllText(Path.Combine(app, "MainWindow.axaml.cs"));
         var entry = File.ReadAllText(Path.Combine(app, "App.axaml.cs"));
 
-        Assert.Contains("new Integration.DefaultAppSuggestionBar()", window, StringComparison.Ordinal);
+        Assert.Contains("new Integration.DefaultAppSuggestionBar(", window, StringComparison.Ordinal);
+        Assert.Contains("ShowDefaultAppSuggestion();", window, StringComparison.Ordinal);
         Assert.Contains("FileAssociationSetup.Ensure", entry, StringComparison.Ordinal);
     }
 
