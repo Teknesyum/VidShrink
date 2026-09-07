@@ -1,7 +1,6 @@
 {
-  "playback.badge.original": "Orijinal",
-  "playback.badge.processed": "İşlenmiş",
-  "playback.approximate-preview": "Yaklaşık önizleme",
+  "playback.badge.original": "ORİJİNAL",
+  "playback.badge.processed": "İŞLENMİŞ",
   "playback.player-failed": "Karşılaştırma oynatıcısı başlayamadı",
   "playback.sample-failed": "Önizleme örneği kodlanamadı",
   "playback.error.exit-code": "ffmpeg {0} çıkış koduyla sonlandı.",

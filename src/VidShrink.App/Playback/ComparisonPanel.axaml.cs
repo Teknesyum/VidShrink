@@ -290,6 +290,28 @@ internal partial class ComparisonPanel : UserControl
             // istediği genişliği büyütmez.
             ApproxBadge.MaxWidth = Math.Max(0, right - Inset("PlaybackBadgeMargin", 24));
         }
+
+        RefreshBadgeFade();
+    }
+
+    /// <summary>
+    /// T184/K3: iki rozet de perde hareket ederken yerinden kıpırdamaz — konumları panonun
+    /// köşelerine bağlı, ayırıcıya değil. Perdeyle değişen tek şey görünürlük: bir yarı
+    /// tümüyle örtüldüğünde o yarının etiketi söner, çünkü işaret ettiği görüntü ekranda
+    /// kalmamıştır.
+    ///
+    /// Sağ üstte tek yonga durur: birleşik metin (İŞLENMİŞ · CRF x) geldiyse o, gelmediyse
+    /// yalın taraf etiketi. İkisi birden görünmez.
+    /// </summary>
+    private void RefreshBadgeFade()
+    {
+        var live = Surface.HasFrame;
+        var leftShown = _split > SplitKeyStep;
+        var rightShown = _split < 1 - SplitKeyStep;
+
+        LeftBadge.IsVisible = live && leftShown;
+        RightBadge.IsVisible = live && rightShown && _rightNotice is null && _rightBadge is null;
+        ApproxBadge.IsVisible = live && rightShown && _rightNotice is null && _rightBadge is not null;
     }
 
     /// <summary>
@@ -522,14 +544,12 @@ internal partial class ComparisonPanel : UserControl
     {
         var empty = !Surface.HasFrame;
         EmptyState.IsVisible = empty;
-        LeftBadge.IsVisible = !empty;
         // Perde varken sağ tarafta "işlenmiş" diye bir şey yok; yonga da sebebi söyleyen
         // perdenin üstünde durmaz.
         RightCurtain.IsVisible = !empty && _rightNotice is not null;
-        RightBadge.IsVisible = !empty && _rightNotice is null;
         // Rozet yalnız gerçekten yaklaşık bir parça gösterilirken var: tam çıktıda
         // metin gelmez, perde inmişken sağ tarafta işaret edilecek bir görüntü yoktur.
-        ApproxBadge.IsVisible = !empty && _rightNotice is null && _rightBadge is not null;
+        RefreshBadgeFade();
         ZoomRow.IsVisible = !empty;
         SeparatorGrip.IsVisible = !empty;
         Strip.IsVisible = !empty;

@@ -1,7 +1,6 @@
 {
-  "playback.badge.original": "Original",
-  "playback.badge.processed": "Processed",
-  "playback.approximate-preview": "Approximate preview",
+  "playback.badge.original": "ORIGINAL",
+  "playback.badge.processed": "PROCESSED",
   "playback.player-failed": "The comparison player could not start",
   "playback.sample-failed": "The preview sample could not be encoded",
   "playback.error.exit-code": "ffmpeg returned exit code {0}.",
