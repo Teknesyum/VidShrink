@@ -183,7 +183,21 @@
                     ZIndex="1">
         </StackPanel>
 
-        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}">
+        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
+        <TabItem x:Name="TabPlayer" Theme="{StaticResource NeonTabItem}">
+          <TabItem.Header>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
+              <TextBlock Text="▷"/>
+              <TextBlock Text="{loc:Text main.tab.player}"/>
+              <Border Width="{StaticResource BorderThinScalar}"
+                      Background="{StaticResource NeonBlueBorderStrong}"
+                      Margin="{StaticResource ChipMargin}"
+                      VerticalAlignment="Stretch"/>
+            </StackPanel>
+          </TabItem.Header>
+          <playback:PlayerView x:Name="Player"/>
+        </TabItem>
+
 
         <TabItem Header="{loc:Text main.tab.shrink}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
@@ -1249,10 +1263,6 @@
           </ScrollViewer>
         </TabItem>
 
-
-          <TabItem x:Name="TabPlayer" Header="{loc:Text main.tab.player}" Theme="{StaticResource NeonTabItem}">
-            <playback:PlayerView x:Name="Player"/>
-          </TabItem>
 
       </TabControl>
 

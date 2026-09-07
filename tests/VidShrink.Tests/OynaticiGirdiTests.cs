@@ -302,7 +302,7 @@ public sealed class OynaticiGirdiTests
             var basta = window.Tabs.SelectedIndex;
             var yukleme = window.LoadStartupFileAsync();
             var sonra = window.Tabs.SelectedIndex;
-            var baslik = ((TabItem)window.Tabs.Items[oynaticiIndex]!).Header?.ToString();
+            var baslik = MainWindow.TabHeaderText((TabItem)window.Tabs.Items[oynaticiIndex]!);
             _ = yukleme.ContinueWith(_ => { }, TaskScheduler.Default);
             Assert.NotEqual(basta, sonra);
             Assert.Equal(oynaticiIndex, sonra);
@@ -338,7 +338,7 @@ public sealed class PlayerTabTests
             {
                 Strings.Use(dil);
                 var beklenen = Strings.Get("main.tab.player");
-                var goruldu = tab.Header?.ToString();
+                var goruldu = MainWindow.TabHeaderText(tab);
                 body.AppendLine($"{dil}: beklenen '{beklenen}' goruldu '{goruldu}'");
                 Assert.Equal(beklenen, goruldu);
             }
