@@ -28,13 +28,17 @@ testleri bu isle birlikte yeniden temellendirilmeli.
 
 Kullanici bunu uc ayri turda soyledi; en gorunur eksik bu.
 
-**A1 ses.** Kok neden bulundu ve teknik bir engel degil: ses yolu
-`VidShrink.Ffmpeg` icinde bastan sona yazilmis — `AudioSink.cs` NAudio ile
-48 kHz/16 bit/stereo bir cikis kuruyor, `DecoderPipe.SeekAudio` ffmpeg'den ayri bir
-PCM borusu aciyor. Yani kullanicinin tarif ettigi "ses dosyasini eszamanli calsan bile
-cozulur" yaklasimi zaten kodlanmis. Eksik olan tek sey: `VidShrink.App` hicbir yerde
-`AttachAudioSink` cagirmiyor (`grep` bos donuyor), bu yuzden `_sink` her zaman null ve
-`SeekAudio` ilk satirda geri donuyor. Bu bir **baglanti bosluğu**, olcum isi degil.
+**A1 ses.** Ses yolu `VidShrink.Ffmpeg` icinde bastan sona yazilmis — `AudioSink.cs`
+NAudio ile 48 kHz/16 bit/stereo bir cikis kuruyor, `DecoderPipe.SeekAudio` ffmpeg'den
+ayri bir PCM borusu aciyor. Kullanicinin tarif ettigi "ses dosyasini eszamanli calsan
+bile cozulur" yaklasimi zaten kodlanmis.
+
+> **Duzeltme (7 Eylul, T184 yapicisinin bulgusu).** Bu bolumun ilk hali "VidShrink.App
+> hicbir yerde AttachAudioSink cagirmiyor, grep bos donuyor" diyordu. **Yanlisti.**
+> `PlayerView.axaml.cs:292` zaten cagiriyordu. Gercek bosluk oynaticida degil
+> **karsilastirma panelindeydi**: `PipeComparisonFrameSource` yalniz ham video tasiyor,
+> ses hic gecmiyordu. Cozum kaynak dosyaya ayri bir `DecoderPipe` acip `AudioSink`'i
+> ona takmak oldu (`PreviewAudio.cs`).
 
 **A2 zoom.** Tekerlek olayi %100 ile %200 arasinda bir sey yapmiyor; ayrica zoom
 girip cikarken kare kararip geliyor. Ikisi ayni sozlesmede.
