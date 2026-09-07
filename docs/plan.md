@@ -187,3 +187,8 @@ duran ve sonrakini gereksiz kilabilecek olan olcum.
 
 Bu adim bitmeden mod tasarlanmaz. Cikan sayi "kazanc yok" derse mod **acilmaz** ve bu da
 bir sonuctur.
+
+**7 Eylul 2026 — ikinci kez ertelendi.** Kullanicinin cumlesi: "bekle 4-8 saat olmaz gece
+calismani istemiyorum sonra musait zamanda bakalim hatirlatta". Olcum gunduz musait bir
+saatte kosulur ve **hatirlatmayi T0 yapar**, kullanici sormaz. Hazirlik bitti; kosulacak
+sey `tools/sahne-butcesi/`, yeni duzenek yok.
