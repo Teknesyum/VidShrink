@@ -1,4 +1,7 @@
 using System.Text.Json;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using VidShrink.App.Integration;
 using VidShrink.Core;
 using Xunit;
@@ -159,5 +162,87 @@ public sealed class KabukEntegrasyonTests
                 Assert.False(string.IsNullOrWhiteSpace(value.GetString()), $"{language}: {key}");
             }
         }
+    }
+
+    [Fact]
+    public void KayitAyniYolIcinIkinciKezYazilmiyor()
+    {
+        var folder = Path.Combine(TestPaths.OutputRoot, "t188", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, "settings.json");
+
+        Assert.Null(FileAssociationSetup.Recorded(file));
+        Assert.True(FileAssociationSetup.Needed(null, Executable));
+
+        FileAssociationSetup.Record(Executable, file);
+
+        Assert.Equal(Executable, FileAssociationSetup.Recorded(file));
+        Assert.False(FileAssociationSetup.Needed(FileAssociationSetup.Recorded(file), Executable));
+        Assert.True(FileAssociationSetup.Needed(FileAssociationSetup.Recorded(file), @"D:\Baska\VidShrink.exe"));
+
+        Directory.Delete(folder, recursive: true);
+    }
+
+    [Fact]
+    public void KayitNotuDosyadakiDigerAnahtarlariSilmiyor()
+    {
+        var folder = Path.Combine(TestPaths.OutputRoot, "t188", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, "settings.json");
+        File.WriteAllText(file, @"{ ""advCrf"": 23 }");
+
+        FileAssociationSetup.Record(Executable, file);
+        DefaultAppSuggestion.Dismiss(file);
+
+        using var document = JsonDocument.Parse(File.ReadAllText(file));
+        Assert.Equal(23, document.RootElement.GetProperty("advCrf").GetInt32());
+        Assert.Equal(Executable, document.RootElement.GetProperty(FileAssociationSetup.RegisteredKey).GetString());
+        Assert.True(document.RootElement.GetProperty("defaultAppSuggestionDismissed").GetBoolean());
+
+        Directory.Delete(folder, recursive: true);
+    }
+
+    [Fact]
+    public void BosYolIcinKayitIstenmiyor()
+    {
+        Assert.False(FileAssociationSetup.Needed(null, ""));
+    }
+
+    [Fact]
+    public void SeritVeKayitUretimYolundanCagriliyor()
+    {
+        var app = Path.Combine(TipSources.Root, "src", "VidShrink.App");
+        var window = File.ReadAllText(Path.Combine(app, "MainWindow.axaml.cs"));
+        var entry = File.ReadAllText(Path.Combine(app, "App.axaml.cs"));
+
+        Assert.Contains("new Integration.DefaultAppSuggestionBar()", window, StringComparison.Ordinal);
+        Assert.Contains("FileAssociationSetup.Ensure", entry, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SeritKapatilinca_Kayboluyor_Ve_Ret_Kalici_Kaliyor()
+    {
+        var folder = Path.Combine(TestPaths.OutputRoot, "t188", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, "settings.json");
+
+        AppHost.Run(() =>
+        {
+            var bar = new DefaultAppSuggestionBar(file);
+            var buttons = bar.GetLogicalDescendants().OfType<Button>().ToList();
+
+            Assert.Equal(2, buttons.Count);
+            Assert.True(bar.IsVisible);
+
+            buttons[1].RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+            Assert.False(bar.IsVisible);
+        });
+
+        Assert.True(DefaultAppSuggestion.Dismissed(file));
+        Assert.False(DefaultAppSuggestion.ShouldShow(onWindows: true, alreadyDefault: false,
+            dismissed: DefaultAppSuggestion.Dismissed(file)));
+
+        Directory.Delete(folder, recursive: true);
     }
 }

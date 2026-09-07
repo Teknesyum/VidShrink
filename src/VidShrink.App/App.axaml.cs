@@ -33,6 +33,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); } catch { }
+        RegisterFileTypes();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -58,6 +59,26 @@ public partial class App : Application
         => _shrink is not null
             ? new ShrinkJobWindow(_shrink, _queue)
             : new MainWindow(_startupFile);
+
+    /// <summary>
+    /// "Birlikte ac" kaydini uretimde tetikleyen tek nokta. Uygulama nasil acilirsa acilsin
+    /// — ana pencere ya da kabuk istegi — burasi kosar. Kayit yalnizca <c>HKEY_CURRENT_USER</c>
+    /// altina yazilir, yonetici hakki istemez ve <see cref="Integration.FileAssociationSetup"/>
+    /// ayni yol icin bir kez yazdigi icin her acilista kayit defterine dokunulmaz.
+    /// </summary>
+    private static void RegisterFileTypes()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        try
+        {
+            var executable = Environment.ProcessPath;
+            if (!string.IsNullOrEmpty(executable)) Integration.FileAssociationSetup.Ensure(executable);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or DllNotFoundException or EntryPointNotFoundException)
+        {
+        }
+    }
 
     private static WindowIcon? LoadAppIcon()
     {

@@ -1,0 +1,9 @@
+T188 tur 2: oneri seridi ve ProgID kaydi uretim yoluna baglandi
+
+Serit MainWindow kurucusundan bildirim yiginina ekleniyor; kayit
+App.OnFrameworkInitializationCompleted icinden bir kez tetikleniyor.
+FileAssociationSetup yazilan yolu settings.json'a not dusuyor, ayni yol
+icin kayit defterine tekrar yazilmiyor. Ortak JSON anahtar okuma/yazma
+SettingsEntry'ye alindi.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

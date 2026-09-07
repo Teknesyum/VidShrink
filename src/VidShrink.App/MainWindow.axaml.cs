@@ -228,7 +228,27 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
+        ShowDefaultAppSuggestion();
         Loaded += OnWindowLoaded;
+    }
+
+    /// <summary>
+    /// "VidShrink varsayilan degil" onerisini bildirim yiginina ekler. Serit yalniz
+    /// <see cref="Integration.DefaultAppSuggestionBar.Wanted"/> dogru derse eklenir: makine
+    /// Windows olacak, uzantilari baska bir program aciyor olacak ve oneri daha once
+    /// reddedilmemis olacak. "Bir daha sorma" dendiginde ret <c>settings.json</c>'a yazilir,
+    /// dolayisiyla bir sonraki acilista bu kosul tutmaz ve serit hic uretilmez.
+    /// </summary>
+    private void ShowDefaultAppSuggestion()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var executable = Environment.ProcessPath;
+        if (string.IsNullOrEmpty(executable)) return;
+        if (!Integration.DefaultAppSuggestionBar.Wanted(executable, ShellIntegration.MediaExtensions)) return;
+        if (AppliedNotice.Parent is not Panel host) return;
+
+        host.Children.Add(new Integration.DefaultAppSuggestionBar());
     }
 
     [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]

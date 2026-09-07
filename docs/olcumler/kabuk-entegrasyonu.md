@@ -435,3 +435,41 @@ sinirdir; sessizce dogru sonuc veriyor.
    `shell/` klasorunu otomatik guncellemeden disari birakiyor.
 3. **Gelistirici kipi kapali makine.** Olcemedim.
 4. **Explorer'da gorsel dogrulama.** Olcemedim.
+
+---
+
+## 9. Tur 2 — olu kodun canlandirilmasi (7 Eylul 2026)
+
+Tur 1'de yazilan iki parca da uretimde hicbir yerden cagrilmiyordu. Tur 2'de baglandi.
+
+**Serit.** `MainWindow` kurucusunda `ShowDefaultAppSuggestion()` cagriliyor
+(`src/VidShrink.App/MainWindow.axaml.cs`). Serit XAML'e yazilmadi — `MainWindow.axaml`
+bu sozlesmenin `owns` listesinde degil — bunun yerine var olan bildirim yigini
+`AppliedNotice.Parent` uzerinden bulunup sonuna ekleniyor. Yigin, `AppliedNotice` ve
+`UpdateNotice` bildirimlerini tasiyan `Grid.Row="1"` altindaki `StackPanel`.
+
+Kosul uc parcali ve karari `DefaultAppSuggestion.ShouldShow` veriyor: Windows,
+varsayilan degil, daha once reddedilmemis. Ret `settings.json` icindeki
+`defaultAppSuggestionDismissed` anahtarina yaziliyor; bir sonraki acilista kosul tutmaz
+ve serit hic uretilmez.
+
+**Kayit.** `App.OnFrameworkInitializationCompleted` icinde `RegisterFileTypes()`
+cagriliyor (`src/VidShrink.App/App.axaml.cs`). Uygulama nasil acilirsa acilsin — ana
+pencere ya da kabuk istegi — bu yol kosuyor. Kayit her acilista tekrarlanmiyor:
+`FileAssociationSetup` yazilan calistirilabilirin yolunu `settings.json` icindeki
+`fileAssociationRegisteredFor` anahtarina not dusuyor ve ayni yol gorulurse
+`FileAssociation.Register` hic cagrilmiyor. Yol degisirse (tasinan kurulum, baska
+klasore kurulan yeni surum) bir kez daha yaziliyor; eski komut satiri artik olmayan bir
+dosyayi gosterecegi icin bu tazeleme gerekli.
+
+Yazma basarisiz olursa not dusulmuyor: sonraki acilis yeniden deniyor.
+
+**Olculen.** `dotnet test --filter FullyQualifiedName~KabukEntegrasyonTests` 21 test,
+hepsi yesil. Serit davranisi bassiz Avalonia konagi ile olculdu: kurulan seritte iki
+dugme var, "bir daha sorma" dugmesine basilinca `IsVisible` yanlisa donuyor ve ret
+gecici `settings.json` dosyasinda kalici oluyor.
+
+**Olcemedim.** Gercek Explorer'da seridin ekranda gorunusu ve gercek `HKCU` agacina
+uretim yolundan yazilan kayit — bu turda gercek kayit defterine yazan hicbir sey
+kosturulmadi.
+
