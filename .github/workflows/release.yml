@@ -67,6 +67,7 @@ jobs:
     # stays where the windows really open: that way the release is checked against the
     # same suite the developer sees, not a subset of it.
     runs-on: windows-latest
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -77,6 +78,7 @@ jobs:
   shell-extension:
     needs: [version, test]
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: microsoft/setup-msbuild@v2
@@ -110,6 +112,7 @@ jobs:
   publish:
     needs: [version, test, shell-extension]
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -219,6 +222,7 @@ jobs:
   release:
     needs: [version, publish]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
