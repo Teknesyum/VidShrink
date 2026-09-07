@@ -1,4 +1,4 @@
- Danisma 002 — UI Bitis Kapisi Denetcisi# Danisma 002 — UI Bitis Kapisi Denetcisi
+ Danisma 002 — UI Bitis Kapisi Denetcisi# Danisma 009 — UI Bitis Kapisi Denetcisi
  Danisma 002 — UI Bitis Kapisi Denetcisi
  Danisma 002 — UI Bitis Kapisi Denetcisi- Koltuk: `.calisma/koltuk-denetci.md` (agency.js show, 178 satir)
  Danisma 002 — UI Bitis Kapisi Denetcisi- Ajana verilen olgular: `.calisma/ui-olgular.md` (ayni dosya, tasarimciyla ortak)

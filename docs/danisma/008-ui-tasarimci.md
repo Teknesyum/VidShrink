@@ -1,4 +1,4 @@
- Danisma 001 — UI Tasarimci# Danisma 001 — UI Tasarimci
+ Danisma 001 — UI Tasarimci# Danisma 008 — UI Tasarimci
  Danisma 001 — UI Tasarimci
  Danisma 001 — UI Tasarimci- Koltuk: `.calisma/koltuk-tasarimci.md` (agency.js show, 342 satir)
  Danisma 001 — UI Tasarimci- Ajana verilen olgular: `.calisma/ui-olgular.md` (76 satir)
