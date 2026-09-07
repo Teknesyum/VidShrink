@@ -34,5 +34,9 @@
   "settings.update.title": "Güncelleme",
   "settings.update.auto": "Kendiliğinden güncelle",
   "settings.update.auto-effect": "Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir.",
-  "settings.update.no-self-effect": "VidShrink bu sistemde kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir."
+  "settings.update.no-self-effect": "VidShrink bu sistemde kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir.",
+
+  "settings.default-app.suggestion": "VidShrink videolar için varsayılan program değil. Windows'un Varsayılan uygulamalar sayfasından seçebilirsiniz.",
+  "settings.default-app.open": "Varsayılan uygulamalar",
+  "settings.default-app.dismiss": "Bir daha sorma"
 }
