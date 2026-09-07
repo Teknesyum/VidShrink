@@ -176,6 +176,43 @@ public sealed class WindowLayoutTests
     }
 
     /// <summary>
+    /// T185 K1: Oynatıcı sekmesi şeridin en solunda durur. Kısayollar
+    /// <c>window.Tabs.SelectedIndex</c> üzerinden çalıştığı için sıra kaydırmalı ancak
+    /// <c>TabPlayer</c> ilk <see cref="TabItem"/> olmalı.
+    /// </summary>
+    [Fact]
+    public void ThePlayerTabIsFirstInTheStrip()
+    {
+        Fresh(window =>
+        {
+            var items = window.Tabs.Items.OfType<TabItem>().ToList();
+
+            Assert.NotEmpty(items);
+            Assert.Equal("TabPlayer", items[0].Name);
+            Assert.Equal(0, window.PlayerTabIndex);
+            return true;
+        });
+    }
+
+    /// <summary>
+    /// T185 K2: Oynatıcı en sola taşınsa da açılış varsayılanı değişmez —
+    /// uygulama hâlâ Küçült sekmesiyle açılır.
+    /// </summary>
+    [Fact]
+    public void TheDefaultStartupTabIsStillShrink()
+    {
+        Fresh(window =>
+        {
+            var shrinkHeader = VidShrink.App.Localization.Strings.Get("main.tab.shrink");
+            var selected = (TabItem)window.Tabs.Items[window.Tabs.SelectedIndex]!;
+
+            Assert.NotEqual(0, window.Tabs.SelectedIndex);
+            Assert.Equal(shrinkHeader, MainWindow.TabHeaderText(selected));
+            return true;
+        });
+    }
+
+    /// <summary>
     /// Tema dosyasında doğrudan yazılmış opaklık kalmaz — <c>Opacity="0"</c> dışında,
     /// o bir ton değil "hiç görünme" demek. T84 birinci turu dört fırçaya
     /// <c>0.18/0.12/0.13/0.62</c> yazmıştı; sekizinin tamamı belirtece taşındı.

@@ -2373,11 +2373,18 @@ public partial class MainWindow : Window
     internal async Task LoadStartupFileAsync(string path)
     {
         Tabs.SelectedIndex = PlayerTabIndex;
-        PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + ((TabItem)Tabs.Items[Tabs.SelectedIndex]!).Header);
+        PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
         await LoadAsync(path);
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
     }
+
+    internal static string TabHeaderText(TabItem tab) => tab.Header switch
+    {
+        string text => text,
+        StackPanel panel => panel.Children.OfType<TextBlock>().LastOrDefault()?.Text ?? "",
+        _ => tab.Header?.ToString() ?? "",
+    };
 
     internal Exception? PlayerOpenFailure { get; private set; }
 
