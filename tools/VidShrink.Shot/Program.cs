@@ -7,12 +7,14 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.Core;
+using VidShrink.Core.Playback;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.Shot;
@@ -90,9 +92,7 @@ public static class Program
                 LoadClip(window, clip);
                 SelectTab(window, "main.tab.shrink");
                 Relayout(window);
-                Pump(() => Named(window, "Preview").GetVisualDescendants()
-                    .OfType<Image>()
-                    .Any(image => image.Source is not null), PanelWaitSeconds);
+                FreezePreview(window);
             }),
 
             Shot(language, outDir, "oynatici", window =>
@@ -124,6 +124,16 @@ public static class Program
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// <see cref="Pump"/>'in bekleyen bicimi. Sure dolarsa cekim yarim kareyle surmez,
+    /// durur: sure asimini yutan bir bekleme bos panel cizip cikis kodunu 0 birakiyordu.
+    /// </summary>
+    private static void Await(Func<bool> until, string what, int seconds = PanelWaitSeconds)
+    {
+        if (!Pump(until, seconds))
+            throw new TimeoutException($"{what}: {seconds} saniyede gelmedi.");
     }
 
     /// <summary>Tum pencereyi cizer.</summary>
@@ -251,11 +261,22 @@ public static class Program
     /// <summary>
     /// Giris canlandirmasi panellere <c>translateY</c> uyguluyor ve bassiz kosumda geri
     /// alinmiyor; her blok on piksel asagida cizilirdi.
+    ///
+    /// <para>Temizlik <b>secici</b>. Giris bicemi degeri <c>TransformOperations</c> olarak
+    /// kuruyor (<c>Themes/Controls.axaml</c>, <c>^.enter</c>), kalici konum tasiyicilari ise
+    /// kod arkasinda tutulan <see cref="TranslateTransform"/> ornekleri: karsilastirma
+    /// panelinin ayiricisi (<c>ComparisonPanel.SeparatorGrip</c>) ile serit tutamagi ve
+    /// kodlama imleci (<c>ControlStrip.Thumb</c>, <c>ControlStrip.EncodeCursor</c>)
+    /// konumlarini bunlardan aliyor. Hepsini birden silmek ayiriciyi panonun soluna,
+    /// x=0'a dusuruyordu; kare kullanicinin hic gormedigi bir durumu gosteriyordu.</para>
     /// </summary>
     private static void ClearEntrance(MainWindow window)
     {
         foreach (var node in window.GetVisualDescendants().OfType<Visual>())
+        {
+            if (node.RenderTransform is TranslateTransform) continue;
             node.RenderTransform = null;
+        }
     }
 
     /// <summary>
@@ -311,13 +332,67 @@ public static class Program
 
         var task = (Task)open.Invoke(player, new object?[] { clip, CancellationToken.None })!;
 
-        if (!Pump(() => task.IsCompleted, PanelWaitSeconds))
-            throw new TimeoutException($"Oynatici klibi {PanelWaitSeconds} saniyede acamadi.");
+        Await(() => task.IsCompleted, "Oynatici klibi acamadi");
 
         task.GetAwaiter().GetResult();
 
-        Pump(() => player.GetVisualDescendants().OfType<Image>().Any(image => image.Source is not null),
-            PanelWaitSeconds);
+        Await(() => player.GetVisualDescendants().OfType<Image>().Any(image => image.Source is not null),
+            "Oynaticinin ilk karesi");
+    }
+
+    /// <summary>
+    /// Sunum sayacinin degismeden gecmesi gereken yoklama sayisi. Yoklama araligi
+    /// <see cref="Pump"/>'te 25 ms; kirk yoklama bir saniye eder ve bassiz kosumun
+    /// yaklasik 5 Hz'lik sunum turundan rahatca uzundur.
+    /// </summary>
+    private const int PreviewIdleTicks = 40;
+
+    /// <summary>
+    /// Onizleme panelini penceresinin <b>son karesinde</b> dondurur.
+    ///
+    /// <para>Eski bekleme "kare gelir gelmez" ciziyordu; hangi alt-kare oldugunu makinenin
+    /// o anki yuku belirliyordu ve ayni ikiliyle yapilan uc kosumun ikincisi farkli bir kare
+    /// uretti. Sayarak da belirlenimli olmuyor: bassiz kosumda sunum turu ~5 Hz, boru 30 fps
+    /// besliyor, aradaki fark kare dusuruyor (olculdu: 150 karenin 69'u dusuruldu) ve hangi
+    /// karenin dusecegi yuke bagli.</para>
+    ///
+    /// <para>Belirlenimli olan tek nokta pencerenin sonu: boru pencereyi bitirdiginde son
+    /// kare halkanin en yenisidir, dusurulmez ve tuketici onu almadan halka bosalmaz. O
+    /// yuzden burada oynatma once <b>durdurulur</b> — <c>PanelHost.Follow</c> yalniz
+    /// oynatilirken sonraki pencereye geciyor, boylece pencere [0, 5) sabit kalir — sonra
+    /// sunum sayaci duruncaya kadar beklenir ve <c>_generation</c> artirilarak
+    /// <c>RequestAnimationFrame</c> dongusu kapatilir; cizime kadar panoya baska kare
+    /// konmaz. Yakalanan kare her kosumda ayni: pencerenin 150. karesi.</para>
+    ///
+    /// <para><c>Controls.IsPlaying</c> dogrudan yaziliyor, dugmeye basilmis gibi degil:
+    /// <c>PanelHost.ApplyPlayState</c> boruyu da duraklatirdi ve pencere hic bitmezdi.</para>
+    /// </summary>
+    private static void FreezePreview(MainWindow window)
+    {
+        var host = FieldValue(window, "_preview")
+            ?? throw new InvalidOperationException("Onizleme barindiricisi kurulmamis.");
+
+        Await(() => Read(host, "SourceStatus") is ComparisonSourceStatus { State: ComparisonSourceState.Oynuyor },
+            "Onizleme borusu");
+
+        SetProperty(Read(Named(window, "Preview"), "Controls"), "IsPlaying", false);
+
+        var last = -1L;
+        var idle = 0;
+        Await(() =>
+        {
+            var frames = (long)Read(host, "PresentedFrames");
+            if (frames != last)
+            {
+                last = frames;
+                idle = 0;
+                return false;
+            }
+
+            return ++idle >= PreviewIdleTicks;
+        }, "Onizleme penceresinin son karesi");
+
+        SetField(host, "_generation", (int)FieldValue(host, "_generation")! + 1);
     }
 
     /// <summary>
@@ -424,6 +499,24 @@ public static class Program
     /// </summary>
     private static void Invoke(object target, string method, params object?[] arguments)
         => Call(target, method, arguments);
+
+    private static FieldInfo FieldOf(object target, string name)
+        => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+           ?? throw new MissingFieldException(target.GetType().Name, name);
+
+    private static object? FieldValue(object target, string name) => FieldOf(target, name).GetValue(target);
+
+    private static void SetField(object target, string name, object value)
+        => FieldOf(target, name).SetValue(target, value);
+
+    private static PropertyInfo PropertyOf(object target, string name)
+        => target.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+           ?? throw new MissingMemberException(target.GetType().Name, name);
+
+    private static object Read(object target, string property) => PropertyOf(target, property).GetValue(target)!;
+
+    private static void SetProperty(object target, string property, object value)
+        => PropertyOf(target, property).SetValue(target, value);
 
     private static object Call(object target, string method, params object?[] arguments)
     {

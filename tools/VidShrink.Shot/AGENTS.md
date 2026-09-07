@@ -36,4 +36,17 @@ Masaüstünde saniyenin üçte biri süren geçişler başsız koşumda hiç bit
 üyeleri `internal`/`private` ve görünürlük yalnız `VidShrink.Tests`'e açık; üretim kodunu
 bu araç için genişletmemek adına yansımayla çağrılıyor.
 
-`.sln`e eklenmedi; CI'a Avalonia.Headless taşımaz.
+## Önizleme karesi belirlenimli
+
+Karşılaştırma paneli canlı bir borudan besleniyor; "kare gelir gelmez çiz" koşumdan
+koşuma farklı alt-kare yakalıyordu. `FreezePreview` bunun yerine oynatmayı durdurup
+pencerenin **son** karesini bekliyor: son kare halkanın en yenisi olduğu için
+düşürülmüyor. Yakalanan kare her koşumda aynı — üç koşumluk sha256 tablosu
+`docs/olcumler/ekran-goruntusu.md` içinde.
+
+Bekleme süreleri de sessiz değil: süre dolarsa `Await` `TimeoutException` atar,
+yarım kare teslim edilmez.
+
+`.sln`e eklenmedi; CI'a Avalonia.Headless taşımaz. Sonucu: `dotnet build
+tools/VidShrink.Shot` hiçbir otomatik koşumda çalışmıyor, düzenek yalnız elle
+derleniyor.

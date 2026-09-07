@@ -18,8 +18,9 @@ Gerekçe — (b) gerçek pencere yerine (a):
 - Ekran kapısı gerekmiyor. Düzenek kapı kapalıyken de koşar.
 - Sonuç makineden bağımsız: ekran çözünürlüğü, masaüstü ölçeklemesi ve pencere
   yöneticisi kareye karışmıyor. Ölçüsü sabit 1600x1000.
-- Tekrarlanabilir. İki ardışık koşumun on dört karesinin de sha256'sı aynı çıktı
-  (aşağıda ham çıktı).
+- Tekrarlanabilir. Üç ardışık tam koşumun on dört karesinin de sha256'sı aynı çıktı
+  (aşağıda ham çıktı). Tur 1'de bu doğru değildi: önizleme karesi koşumdan koşuma
+  değişiyordu. Sebebi ve düzeltmesi “Tur 2'de düzeltilen iki kusur” başlığında.
 
 Bedeli: kare pencerenin **istemci alanı**; işletim sisteminin pencere gölgesi ve köşe
 yuvarlaması karede yok. Uygulama kendi başlık çubuğunu çizdiği için
@@ -38,24 +39,34 @@ yuvarlaması karede yok. Uygulama kendi başlık çubuğunu çizdiği için
 ### Çekim
 
     $ dotnet run --project tools/VidShrink.Shot
-    klip	C:\Users\Administrator\Desktop\Projeler\Vidshrink\.claude\worktrees\T189\.calisma\T189\klip.mp4
+    klip	C:\Users\Administrator\Desktop\Projeler\Vidshrink\.claude\worktrees\T189t2\.calisma\T189\klip.mp4
     T189-kucult-en.png	368669
     T189-donustur-en.png	361631
     T189-ayarlar-en.png	233923
     T189-gelismis-en.png	432494
     T189-hakkinda-en.png	357185
-    T189-onizleme-en.png	63179
+    T189-onizleme-en.png	62627
     T189-oynatici-en.png	223370
     T189-kucult-tr.png	363894
     T189-donustur-tr.png	361678
     T189-ayarlar-tr.png	232601
     T189-gelismis-tr.png	433466
     T189-hakkinda-tr.png	366178
-    T189-onizleme-tr.png	63165
+    T189-onizleme-tr.png	62600
     T189-oynatici-tr.png	225114
     toplam	14
 
+    real	0m39.128s
+
+Tur 1'de aynı koşum 2 dakika 5 saniye sürüyordu: önizleme beklemesi hiçbir zaman
+gerçekleşmeyen bir koşula bakıyor ve iki dil için de 60 saniyelik üst sınırı doldurup
+sessizce geçiyordu.
+
 ### Süit ve CI
+
+Aşağıdaki iki çıktı **tur 1'e ait**; tur 2 süiti yeniden koşturmadı.
+Bu turun dokunduğu üç dosyanın ikisi belge, üçüncüsü `tools/VidShrink.Shot/Program.cs`
+— düzenek `.sln`de değil, `dotnet test` onu ne derliyor ne koşuyor.
 
     $ dotnet test
     Basarili!  - Basarisiz:     0, Basarili:  1898, Atlanan:    23, Toplam:  1921, Sure: 15 m 56 s - VidShrink.Tests.dll (net8.0)
@@ -89,26 +100,135 @@ panelinin kendi ölçüsünde kesilmiş bir parça — README'de yan yana duraca
     T189-oynatici-en.png 1600 1000
     T189-oynatici-tr.png 1600 1000
 
-### Tekrarlanabilirlik
+### Tekrarlanabilirlik (K9 CHECK)
 
-İki ardışık tam koşum, aynı ikili, farklı çıkış klasörleri. sha256'nın ilk 12 hanesi:
+Üç ardışık tam koşum, aynı ikili, farklı çıkış klasörleri. sha256'nın ilk 12 hanesi:
 
-    T189-ayarlar-en.png 7ccf5b1207fa 7ccf5b1207fa ayni
-    T189-ayarlar-tr.png 01a1cd8ffacb 01a1cd8ffacb ayni
-    T189-donustur-en.png d278e611294e d278e611294e ayni
-    T189-donustur-tr.png fe10bac06c48 fe10bac06c48 ayni
-    T189-gelismis-en.png 9a939670f88c 9a939670f88c ayni
-    T189-gelismis-tr.png af80c77a92ed af80c77a92ed ayni
-    T189-hakkinda-en.png f2c3b1246fec f2c3b1246fec ayni
-    T189-hakkinda-tr.png fb2f244270ed fb2f244270ed ayni
-    T189-kucult-en.png e198b42b0693 e198b42b0693 ayni
-    T189-kucult-tr.png 5047aaa648f2 5047aaa648f2 ayni
-    T189-onizleme-en.png 5f51b70f5cf6 5f51b70f5cf6 ayni
-    T189-onizleme-tr.png 7adbb318834f 7adbb318834f ayni
-    T189-oynatici-en.png 03b62757a8b1 03b62757a8b1 ayni
-    T189-oynatici-tr.png a867cf3cfb67 a867cf3cfb67 ayni
+    T189-kucult-en.png       e198b42b0693 e198b42b0693 e198b42b0693 ayni
+    T189-kucult-tr.png       5047aaa648f2 5047aaa648f2 5047aaa648f2 ayni
+    T189-donustur-en.png     d278e611294e d278e611294e d278e611294e ayni
+    T189-donustur-tr.png     fe10bac06c48 fe10bac06c48 fe10bac06c48 ayni
+    T189-ayarlar-en.png      7ccf5b1207fa 7ccf5b1207fa 7ccf5b1207fa ayni
+    T189-ayarlar-tr.png      01a1cd8ffacb 01a1cd8ffacb 01a1cd8ffacb ayni
+    T189-gelismis-en.png     9a939670f88c 9a939670f88c 9a939670f88c ayni
+    T189-gelismis-tr.png     af80c77a92ed af80c77a92ed af80c77a92ed ayni
+    T189-hakkinda-en.png     f2c3b1246fec f2c3b1246fec f2c3b1246fec ayni
+    T189-hakkinda-tr.png     fb2f244270ed fb2f244270ed fb2f244270ed ayni
+    T189-onizleme-en.png     926ee200a1f1 926ee200a1f1 926ee200a1f1 ayni
+    T189-onizleme-tr.png     3d24b52e68a4 3d24b52e68a4 3d24b52e68a4 ayni
+    T189-oynatici-en.png     03b62757a8b1 03b62757a8b1 03b62757a8b1 ayni
+    T189-oynatici-tr.png     a867cf3cfb67 a867cf3cfb67 a867cf3cfb67 ayni
 
 On dörtte on dört aynı.
+
+## Tur 2'de düzeltilen iki kusur
+
+### 1. Ayırıcı panonun soluna düşüyordu (K8)
+
+`ClearEntrance` ağacın **bütün** `RenderTransform`'larını `null` yapıyordu. Giriş
+canlandırması için doğru, ama karşılaştırma panelinin ayırıcısı canlandırma değil
+**kalıcı konum taşıyıcısı**: `ComparisonPanel` konumu kod arkasında tuttuğu bir
+`TranslateTransform` örneğinden veriyor (`ComparisonPanel.axaml.cs:43,82,282`) ve çizim
+sırası `Settle → Relayout → ClearEntrance` olduğu için temizlik en son konumu siliyordu.
+Teslim edilen kare kullanıcının hiçbir zaman görmediği bir durumu gösteriyordu.
+
+Aynı tuzak `ControlStrip.Thumb` ve `ControlStrip.EncodeCursor` için de geçerli
+(`ControlStrip.axaml.cs:57-58`); bugün görünür etkisi yok çünkü ikisi de başlangıçta
+sıfırda duruyor. Temizlik artık **seçici**: `RenderTransform` değeri
+`TranslateTransform` olan düğüm atlanıyor. Giriş biçemi değeri `TransformOperations`
+olarak kuruyor (`Themes/Controls.axaml`, `^.enter`), dolayısıyla giriş temizliği
+eskisi gibi çalışıyor — kanıtı aşağıdaki iki ölçüm.
+
+**Ölçü: ayırıcının sütunu.** Kare 506x512, ortası 253. Panonun dikey yönde bir renkte
+kalan parlak sütunları (üst %5 – alt %85 aralığının %90'ından fazlası):
+
+Ölçen betik (`.calisma/` altında koşuldu, iş bitince silindi; burada tam metniyle
+duruyor ki sayı yeniden üretilebilsin):
+
+    from PIL import Image
+    im = Image.open(path).convert('RGB'); w, h = im.size; px = im.load()
+    top, bottom = int(h * 0.05), int(h * 0.85)
+    for x in range(w):
+        first = px[x, top]
+        same = sum(1 for y in range(top, bottom)
+                   if sum(abs(a - b) for a, b in zip(px[x, y], first)) < 40
+                   and sum(px[x, y]) > 240)
+        if same > (bottom - top) * 0.9: print(x)
+
+    $ python ayirici.py .calisma/T189/base/T189-onizleme-*.png .calisma/T189/r3/T189-onizleme-*.png
+    .calisma/T189/base/T189-onizleme-en.png	olcu=506x512	orta=253	dikey-cizgi-sutunlari=[0, 12, 13, 505]
+    .calisma/T189/base/T189-onizleme-tr.png	olcu=506x512	orta=253	dikey-cizgi-sutunlari=[0, 12, 13, 505]
+    .calisma/T189/r3/T189-onizleme-en.png	olcu=506x512	orta=253	dikey-cizgi-sutunlari=[0, 252, 253, 505]
+    .calisma/T189/r3/T189-onizleme-tr.png	olcu=506x512	orta=253	dikey-cizgi-sutunlari=[0, 252, 253, 505]
+
+`base` değişiklikten önceki koşum, `r3` sonraki. 0 ve 505 panonun kendi kenarları. Ayırıcı x=12'den x=252'ye taşındı; `_split = 0.5`'in
+karşılığı tam olarak burada.
+
+**Ölçü: giriş temizliği bozulmadı.** Değişiklikten önceki ve sonraki koşumun on iki
+tam pencere karesi bayt bayt aynı — seçici temizlik hiçbir giriş dönüşümünü ayakta
+bırakmamış. Yalnız iki önizleme karesi değişti:
+
+    T189-kucult-en.png       eski=e198b42b0693 yeni=e198b42b0693 ayni
+    T189-kucult-tr.png       eski=5047aaa648f2 yeni=5047aaa648f2 ayni
+    T189-donustur-en.png     eski=d278e611294e yeni=d278e611294e ayni
+    T189-donustur-tr.png     eski=fe10bac06c48 yeni=fe10bac06c48 ayni
+    T189-ayarlar-en.png      eski=7ccf5b1207fa yeni=7ccf5b1207fa ayni
+    T189-ayarlar-tr.png      eski=01a1cd8ffacb yeni=01a1cd8ffacb ayni
+    T189-gelismis-en.png     eski=9a939670f88c yeni=9a939670f88c ayni
+    T189-gelismis-tr.png     eski=af80c77a92ed yeni=af80c77a92ed ayni
+    T189-hakkinda-en.png     eski=f2c3b1246fec yeni=f2c3b1246fec ayni
+    T189-hakkinda-tr.png     eski=fb2f244270ed yeni=fb2f244270ed ayni
+    T189-oynatici-en.png     eski=03b62757a8b1 yeni=03b62757a8b1 ayni
+    T189-oynatici-tr.png     eski=a867cf3cfb67 yeni=a867cf3cfb67 ayni
+
+### 2. Önizleme karesi koşumdan koşuma değişiyordu (K9)
+
+Seçilen yol (a): çekim gerçekten belirlenimli hale getirildi, iddia geri alınmadı.
+
+Eski bekleme `Preview` ağacında kaynağı dolu bir `Image` arıyordu. **Böyle bir
+`Image` hiç yok**: karşılaştırma paneli kareyi `ComparisonSurface.Render` içinde tek bir
+`WriteableBitmap`'ten çiziyor. Koşul hiçbir zaman doğru olmuyor, bekleme 60 saniyelik
+üst sınırı dolduruyor ve o an panoda hangi kare varsa o çiziliyordu.
+
+Saymak da belirlenimli değil. Başsız koşumda sunum turu (`RequestAnimationFrame`)
+ölçüldü: saniyede ~5 kare sunuluyor, boru 30 fps besliyor ve aradaki fark kare
+düşürüyor. Aynı anda pencere de ilerliyor — `[0,5)` biterken `[5,10)`'a geçiliyor ve
+sunum sayacı sıfırlanıyor. Yoklamanın çıktısından üç satır — `ComparisonSourceStatus`
+kaydının okunmayan alanları (`FeedFps`, `ReadErrors`, `PoolAllocations`, mesajlar) ve
+`PreviewClip`'in yol alanları satır boyu için atıldı, sayılar olduğu gibi:
+
+    probe frames=25 State = Oynuyor, ProducedFrames = 150, DroppedFrames = 69 clip=StartSeconds = 0, EndSeconds = 5
+    probe frames=1  State = Oynuyor, ProducedFrames = 1,   DroppedFrames = 0  clip=StartSeconds = 5, EndSeconds = 10
+    probe frames=18 State = Durdu,   ProducedFrames = 150, DroppedFrames = 81 clip=StartSeconds = 7, EndSeconds = 12
+
+Belirlenimli olan tek nokta pencerenin **sonu**: son kare halkanın en yenisi olduğu için
+düşürülmüyor ve tüketici onu almadan halka boşalmıyor. `FreezePreview` şunu yapıyor:
+
+1. Boru `Oynuyor` durumuna gelene kadar bekler.
+2. `Controls.IsPlaying`'i **doğrudan** `false` yapar. `PanelHost.Follow` yalnız
+   oynatılırken sonraki pencereye geçiyor; böylece pencere `[0,5)` sabit kalıyor.
+   Düğmeye basılmış gibi değil, çünkü `ApplyPlayState` boruyu da duraklatırdı ve
+   pencere hiç bitmezdi.
+3. Sunum sayacı bir saniye boyunca değişmeyene kadar bekler — pencere bitmiş,
+   halka boşalmıştır.
+4. `_generation`'ı artırıp `RequestAnimationFrame` döngüsünü kapatır; çizime kadar
+   panoya başka kare konmaz.
+
+Yakalanan kare her koşumda aynı: pencerenin 150. karesi. Üç koşumluk tablo yukarıda.
+
+### Borçlar (K10)
+
+1. **Sessiz zaman aşımı kapatıldı.** `Pump`'ın `bool` dönüşü yutuluyordu: 60 saniyede
+   kare gelmezse boş panel çizilip çıkış kodu 0 kalıyordu. Artık bütün beklemeler
+   `Await` üzerinden geçiyor ve süre dolarsa `TimeoutException` atıyor — `OpenInPlayer`
+   zaten öyle yapıyordu, iki yol artık tutarlı.
+2. **Düzenek `.sln`e eklenmedi.** Gerekçesi `AGENTS.md:39`'da yazılı: CI'a
+   `Avalonia.Headless` taşınmıyor. **Sonucu:** K1'in CHECK'i (`dotnet build
+   tools/VidShrink.Shot`) hiçbir otomatik koşumda çalışmıyor; düzenek yalnız elle
+   derleniyor ve kırıldığında CI sessiz kalır. Bu tur çözülmedi, borç olarak duruyor.
+3. **Karelerdeki arayüz kusurları T192'nin işi.** `T189-kucult-tr.png`'de “Video
+   Kodegi” ile “Ses” sütun başlıkları üst üste biniyor ve “Kare Hızı D...” kırpılıyor.
+   Kare kusuru gizlemiyor; düzeltme arayüzde yapılacak.
 
 ## Karelerde ne var
 
