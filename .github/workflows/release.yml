@@ -73,7 +73,41 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - run: dotnet test VidShrink.sln -c Release
+      # Ayni ffmpeg, ayni kapi: ci.yml ne olcuyorsa yayin da onu olcsun. ffmpeg
+      # olmadan [FfmpegFact] olculeri sessizce atlaniyordu, yani yayin suiti CI'nin
+      # gordugunun bir alt kumesini goruyordu.
+      - name: ffmpeg kur (GyanD/codexffmpeg surum 9.0, ci.yml ile ayni)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/GyanD/codexffmpeg/releases/download/9.0/ffmpeg-9.0-full_build.zip'
+          $expectedSha256 = 'F42F0C4B04EAE3AC918707FF66E3E0FF0CEE527BFA6D322624D4BC1160D5055E'
+          $zip = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
+
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          $actual = (Get-FileHash -Path $zip -Algorithm SHA256).Hash
+          if ($actual -ne $expectedSha256) {
+            Write-Error "ffmpeg indirmesi sha256 uyusmuyor: beklenen=$expectedSha256 gelen=$actual"
+            exit 1
+          }
+
+          Expand-Archive -Path $zip -DestinationPath $env:RUNNER_TEMP -Force
+          $bin = Join-Path (Join-Path $env:RUNNER_TEMP 'ffmpeg-9.0-full_build') 'bin'
+          if (-not (Test-Path (Join-Path $bin 'ffmpeg.exe')) -or -not (Test-Path (Join-Path $bin 'ffprobe.exe'))) {
+            Write-Error "ffmpeg.exe/ffprobe.exe beklenen yolda yok: $bin"
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_PATH -Value $bin
+      # Asilan bir testhost "Failed: 0" basip cikis kodu 0 dondurur. Duz `dotnet test`
+      # bunu goremiyordu; yayin asilmis bir suitin uzerine yayinlanabilirdi.
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
+      - name: Kosum ciktisi ve hang dump
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kosum-sonuc-yayin
+          path: .calisma/kosum-sonuc/**
+          if-no-files-found: ignore
+          retention-days: 7
 
   shell-extension:
     needs: [version, test]
