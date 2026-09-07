@@ -93,6 +93,26 @@ internal static class LanguageCatalog
         };
 
     /// <summary>
+    /// Baglaclar, ilgecler, tanimliklar, adillar, yardimci fiiller ve soru sozcukleri.
+    /// Bunlardan biri gecen metin cumledir; baslik kurali ona uygulanmaz. Liste bilerek
+    /// dar: icerik sozcugu (ad, sifat, asil fiil) buraya girmez, cunku o zaman her
+    /// baslik cumle sayilirdi.
+    /// </summary>
+    private static readonly HashSet<string> FunctionWords =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            "a", "an", "the", "and", "or", "but", "nor", "of", "to", "in", "into", "on",
+            "at", "by", "for", "from", "with", "without", "than", "as", "if", "so",
+            "it", "its", "this", "that", "these", "those", "they", "them", "you", "your",
+            "is", "are", "was", "were", "be", "will", "would", "can", "may", "does", "do",
+            "what", "why", "how", "when", "where", "which", "who",
+
+            "ve", "veya", "ile", "ki", "da", "de", "ya", "ama", "ancak", "cunku", "çünkü",
+            "icin", "için", "gibi", "kadar", "gore", "göre", "her", "bir", "bu", "su", "şu",
+            "ne", "neden", "niye", "nasil", "nasıl", "hangi", "kim", "nerede", "hep", "daha",
+        };
+
+    /// <summary>
     /// Başlık kuralı yalnız başlıklara uygulanır. Cümle işareti (<c>.</c> <c>;</c> <c>!</c>
     /// <c>?</c>) taşıyan metin gövdedir: yalnız satır başındaki harf büyütülür, gerisi dil
     /// dosyasında yazıldığı gibi kalır. Başlık kolunda ise:
@@ -107,6 +127,30 @@ internal static class LanguageCatalog
         {
             if (text[index] is not ('.' or ';' or '!' or '?')) continue;
             if (index + 1 == text.Length || char.IsWhiteSpace(text[index + 1])) return true;
+        }
+
+        return CarriesFunctionWord(text);
+    }
+
+    /// <summary>
+    /// Cumle isareti tek belirti degildi. "Load a file to see the two sides" nokta
+    /// tasimadigi icin baslik kolundan geciyor ve ekranda
+    /// "Load A File To See The Two Sides" oluyordu. Ayirt eden sey noktalama degil
+    /// dilbilgisi: baglac, ilgec, tanimlik, adil ya da soru sozcugu tasiyan metin bir
+    /// tamlama degil bir cumledir. Sinav <b>butun sozcuge</b> bakar, sozcugun icindeki
+    /// harf obegine degil: <c>storage.to</c> tek bir sozcuktur ve listede yoktur, oysa
+    /// icindeki <c>to</c> aransaydi govde sayilirdi. Listede sozcuk yoksa metin baslik
+    /// kolunda kalir ("Video codec", "Current output size", "Fill policy").
+    /// </summary>
+    private static bool CarriesFunctionWord(string text)
+    {
+        foreach (var token in text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var start = 0;
+            var end = token.Length;
+            while (start < end && !char.IsLetter(token[start])) start++;
+            while (end > start && !char.IsLetter(token[end - 1])) end--;
+            if (end > start && FunctionWords.Contains(token[start..end])) return true;
         }
 
         return false;

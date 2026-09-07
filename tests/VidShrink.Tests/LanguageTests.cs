@@ -810,7 +810,7 @@ public sealed class LanguageTests : IDisposable
             return (first, second);
         });
 
-        Assert.Contains("Back To The Start", english);
+        Assert.Contains("Back to the start", english);
         Assert.Contains("Control Strip", english);
         Assert.Contains("Başa Dön", turkish);
         Assert.Contains("Denetim Şeridi", turkish);
