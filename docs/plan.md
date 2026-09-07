@@ -2,7 +2,7 @@
 
 Kaynak: kullanicinin son 30 girdisi (`.calisma/son-girdiler.md`), 7 Eylul 2026 mesaji,
 ve iki danisman raporu:
-[007 UI tasarimci](danisma/007-ui-tasarimci.md) · [008 UI denetcisi](danisma/008-ui-denetci.md).
+[007 UI tasarimci](danisma/008-ui-tasarimci.md) · [008 UI denetcisi](danisma/009-ui-denetci.md).
 
 Denetcinin karari **HOLD**. Iki danisman bagimsiz olarak ayni seyi soyledi: arayuz
 sikistirmanin ne yapacagini dugmeye basmadan once soylemiyor, ve yerlesim pimi
