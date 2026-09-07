@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
@@ -591,6 +591,14 @@ public sealed class WindowLayoutTests
     /// <para>T163: tur 2 iki aralığı da ~116 px yukarı taşımıştı; <b>tur 3'te ikisi de eski
     /// değerlerine döndü</b>. Gelişmiş ayarlar bölümü sayfanın boyunu yalnız açıkken
     /// değiştiriyor.</para>
+    /// <para>T183: dörtlü piksel adımıyla ilerleyen doğrusal tarama ikili aramaya
+    /// döndü — CI'da bu testin iki kolu birlikte 456 saniye tutuyordu. İkili arama,
+    /// artan yükseklikle sığma durumunun tekdüze değiştiğini (bir kez sığdıktan sonra
+    /// bir daha taşmadığını) varsayar. Bu varsayımı test <b>sınamıyor</b>; tekdüzeliği
+    /// veren şey <c>MainWindow.axaml</c> içindeki sayfa <c>ScrollViewer</c>'ının
+    /// içeriğini sonsuz yükseklikle ölçmesi ve yatay çubuğun kapalı olması. O yapı
+    /// değişirse arama sessizce başka bir yükseklik bulur ve test yeşil kalır —
+    /// aralık 90 piksel geniş, 90 pikselden dar bir delik görünmez.</para>
     /// </summary>
     [Theory]
     [InlineData(false, 967, 1057)]
@@ -598,13 +606,25 @@ public sealed class WindowLayoutTests
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;
-        var fitting = double.NaN;
+        const double start = 700.0;
+        const double end = 1600.0;
+        const double step = 4.0;
+        var stepCount = (int)((end - start) / step);
 
-        for (var height = 700.0; height <= 1600.0; height += 4)
+        bool Fits(int index) => LayOut(new Size(width, start + index * step), loaded).Count == 0;
+
+        var fitting = double.NaN;
+        if (Fits(stepCount))
         {
-            if (LayOut(new Size(width, height), loaded).Count != 0) continue;
-            fitting = height;
-            break;
+            var low = 0;
+            var high = stepCount;
+            while (low < high)
+            {
+                var mid = low + (high - low) / 2;
+                if (Fits(mid)) high = mid; else low = mid + 1;
+            }
+
+            fitting = start + high * step;
         }
 
         Assert.True(
