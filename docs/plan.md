@@ -108,8 +108,32 @@ zaman cizgisinde onizlenir.
 
 ## C — Kabuk entegrasyonu (T188)
 
-Ikisi de bugun yok denecek durumda: dosya iliskilendirme kodu hic yok; sag menu icin
-`VidShrink.ShellExtension` C++ seyrek paketi var ama calismiyor.
+**Olculdu, kok neden bulundu** — `docs/olcumler/kabuk-entegrasyonu.md` (T188 tur 1).
+
+Uzantinin kendisi **saglam**: derleniyor, kayit oluyor, paketli COM uzerinden aktive
+oluyor (`CoCreateInstance` `0x00000000`) ve basligini donduruyor. Calismayan sey
+**teslimat**: kurulu agacta `shell/` klasoru hic yok, kurulum betigi de dosya yoksa
+sessizce donuyor. Sebep `release.yml` icindeki `map(select(.path == "VidShrink.exe"))`
+suzgeci — `shell/` otomatik guncellemeye hic girmiyor.
+
+Uretim yolu ayrica **imza istiyor**: imzasiz `.msix` kurulumu `0x800B0100` ile
+reddediliyor. Bu makinede calisan `-Register` yolu yalniz gelistirici kipi acik oldugu
+icin acildi.
+
+Varsayilan program tarafinda ProgID ve `OpenWithProgids` kaydi yazildi (24 medya
+uzantisi, hepsi HKCU); `UserChoice`'a dokunulmadi, dokunulamaz.
+
+### C borclari
+
+1. **Imzalama.** Uretimde sag menu icin `.msix` imzalanmali. Imzasiz kurulum
+   `0x800B0100` ile reddediliyor.
+2. **Teslimat.** `release.yml` suzgeci `shell/` klasorunu otomatik guncellemeden
+   disari birakiyor.
+3. **Gelistirici kipi kapali makine.** Olcemedim.
+4. **Explorer'da gorsel dogrulama.** Olcemedim.
+5. **Oneri seridi olu kod.** `DefaultAppSuggestionBar` yazildi ama hicbir yerden
+   cagrilmiyor; bagli olacagi `MainWindow.axaml.cs` T188'in `owns` listesi disindaydi.
+   T188 tur 2'de baglanir — `owns` genisletildi.
 
 ## F2 — Pim yeniden temellendirmesi
 
