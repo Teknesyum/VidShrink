@@ -10,9 +10,16 @@ namespace VidShrink.Tests;
 ///
 /// Aynı kriter kısaltmaları ve özel adları muaf tutuyor (<c>MP4</c>, <c>GPU</c>,
 /// <c>H.264</c>). Ölçüm bu ikisini uzunlukla ayırıyor: bu kod tabanındaki kısaltmaların
-/// en uzunu dört harf, bağırılan kelimeler ise (<c>ORİJİNAL</c>, <c>İŞLENMİŞ</c>) sekiz
-/// harften uzun. Eşik beş harfte; daha uzun bir kısaltma gelirse ölçüm onu yakalar ve
-/// eşiğin yeniden düşünülmesi gerekir — sessizce geçirmez.
+/// en uzunu dört harf, eşik beş harfte. Daha uzun bir kısaltma gelirse ölçüm onu
+/// yakalar ve eşiğin yeniden düşünülmesi gerekir — sessizce geçirmez.
+///
+/// <para>T184: <c>ORİJİNAL</c> ve <c>İŞLENMİŞ</c> artık bu eşiğin yakaladığı örnekler
+/// <b>değil</b>, <see cref="ShoutedByDesign"/> ile muaf tutulan iki anahtar. Kullanıcı
+/// rozetlerin büyük harf olmasını istedi; ev kuralıyla çelişti ve cümle kazandı. Muafiyet
+/// anahtar düzeyinde ve jokersiz, ama anahtarın <b>değerini</b> sınırlamıyor: o iki
+/// anahtarın altına ne yazılırsa yazılsın burası susar. Değerleri
+/// <c>PlaybackPanelTests</c> birebir pimliyor; o pim kalkarsa bu delik sessizce
+/// genişler.</para>
 /// </summary>
 public sealed class CasingTests
 {

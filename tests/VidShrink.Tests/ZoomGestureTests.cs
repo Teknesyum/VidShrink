@@ -241,8 +241,9 @@ public class ZoomGestureTests
     }
 
     /// <summary>
-    /// T52/K1: jest görüntüyü büyütmez. Panel ölçeği tavana çıksa da görüntü panoya sığmış
-    /// hâlde kalır, bu yüzden sürüklenecek bir yer de oluşmaz.
+    /// T52/K1, T184 ile daraldı: jest görüntüyü <b>tavanda</b> büyütmez. Panel ölçeği
+    /// tavana çıkınca görüntü panoya sığmış hâlde kalır, bu yüzden sürüklenecek bir yer
+    /// de oluşmaz. Band kademesinde artık büyütüyor (T184/K2); bu ölçüm oraya bakmıyor.
     /// </summary>
     [Fact]
     public void Olcek_buyurken_goruntu_panoya_sigmis_kalir()
