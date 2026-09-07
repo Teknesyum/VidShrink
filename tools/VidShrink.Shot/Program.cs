@@ -134,6 +134,14 @@ public static class Program
     private static string Part(string language, string outDir, string topic, string name, Action<MainWindow> arrange)
         => Draw(language, outDir, topic, arrange, window => Named(window, name));
 
+    /// <summary>
+    /// Pencereyi kurar, istenen hale getirir ve secilen gorseli dosyaya cizer.
+    ///
+    /// <para>Pencere once <b>karsi</b> dilde kurulup sonra istenen dile geciriliyor:
+    /// <c>Strings.Changed</c> yalniz deger degisince atesleniyor ve karsilastirma paneli
+    /// metnini yalniz o olayda tazeliyor. Dogrudan hedef dilde kurulursa panel Ingilizce
+    /// kalir.</para>
+    /// </summary>
     private static string Draw(
         string language,
         string outDir,
@@ -145,9 +153,6 @@ public static class Program
 
         Host.Run(() =>
         {
-            // Pencere once karsi dilde kurulur, sonra istenen dile gecirilir: dil olayi
-            // ancak deger degisince atesleniyor ve karsilastirma paneli metnini yalniz o
-            // olayda tazeliyor. Dogrudan kurulursa panel Ingilizce kalir.
             Strings.Use(language == "tr" ? "en" : "tr");
 
             var window = new MainWindow { Width = double.NaN, Height = double.NaN };
@@ -256,13 +261,15 @@ public static class Program
     /// <summary>
     /// Sekmeyi baslik metninden secer. Oynatici sekmesinin basligi metin degil bir
     /// yerlesim oldugu icin o sekme kendi <c>x:Name</c>'inden bulunur.
+    ///
+    /// <para>Sekme icerigi bir <see cref="TransitioningContentControl"/> icinde degisiyor
+    /// ve gecis bassiz kosumda hic bitmiyor: eski sekme yeninin altinda cizili kaliyordu.
+    /// Gecis o yuzden secimden once bosaltilir.</para>
     /// </summary>
     private static void SelectTab(MainWindow window, string headerKey)
     {
         var tabs = (TabControl)Named(window, "Tabs");
 
-        // Sekme icerigi bir TransitioningContentControl icinde degisiyor; gecis bassiz
-        // kosumda hic bitmediginden eski sekme yenisinin altinda cizili kaliyordu.
         foreach (var host in tabs.GetVisualDescendants().OfType<TransitioningContentControl>())
             host.PageTransition = null;
 
@@ -291,6 +298,8 @@ public static class Program
     /// Oynatici sekmesindeki kareyi uretim yolundan alir: <c>PlayerView.OpenAsync</c> ayni
     /// ffmpeg borusunu acar, ilk kareyi cozer ve <c>Frame</c> gorseline yazar. Bekleme
     /// suresince kuyruk elle surulur; bassiz kosumda arayuz is parcacigini kimse surmuyor.
+    /// Ilk kare acilisin kendisinden degil, onun ardindan gelen sar isleminden dogar; o
+    /// yuzden goruntu kaynagi dolana kadar ikinci bir bekleme var.
     /// </summary>
     private static void OpenInPlayer(MainWindow window, string clip)
     {
@@ -307,7 +316,6 @@ public static class Program
 
         task.GetAwaiter().GetResult();
 
-        // Ilk kare acilistan sonraki sar isleminden geliyor.
         Pump(() => player.GetVisualDescendants().OfType<Image>().Any(image => image.Source is not null),
             PanelWaitSeconds);
     }
