@@ -447,6 +447,31 @@ public sealed class BaslikKapsamiTests
     private static bool Turkce(string dil)
         => dil.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Sozcugun bas tarafi <c>Names</c>'de bildirilmis bir ad mi? Sinir kurali
+    /// <c>LanguageCatalog.KnownSpelling</c> ile ayni: bastaki harf disi imler atlanir,
+    /// once bir rakam gelirse sozcuk olcudur ve ada bakilmaz, ad yalniz <b>bastaki</b>
+    /// harf/rakam dizisinde aranir. Boylece <c>tools/ffmpeg</c> bir yoldur, ad degil.
+    /// </summary>
+    private static (string Govde, string? Dogru) AdiCagriliyorsa(string sozcuk)
+    {
+        var offset = 0;
+        while (offset < sozcuk.Length && !char.IsLetter(sozcuk[offset]))
+        {
+            if (char.IsDigit(sozcuk[offset])) return (sozcuk, null);
+            offset++;
+        }
+
+        if (offset == sozcuk.Length) return (sozcuk, null);
+
+        var govde = sozcuk[offset..];
+        var token = new string(govde.TakeWhile(char.IsLetterOrDigit).ToArray());
+        var bare = new string(govde.TakeWhile(char.IsLetter).ToArray());
+        if (LanguageCatalog.Names.TryGetValue(token, out var ad)) return (govde, ad);
+        if (LanguageCatalog.Names.TryGetValue(bare, out var isim)) return (govde, isim);
+        return (govde, null);
+    }
+
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
     {
@@ -464,7 +489,7 @@ public sealed class BaslikKapsamiTests
 
                 toplam++;
                 dilBasina[dil]++;
-                _cikti.WriteLine($"KOL\t{dil}\t{anahtar}\t{LanguageCatalog.Title(ham, Turkce(dil))}");
+                _cikti.WriteLine($"KOL\t{dil}\t{anahtar}\t{ham.ReplaceLineEndings(" ")}\t{LanguageCatalog.Title(ham, Turkce(dil)).ReplaceLineEndings(" ")}");
             }
         }
 
@@ -481,6 +506,46 @@ public sealed class BaslikKapsamiTests
     /// tabani bu dokum: ayni test <c>origin/main</c>'in <c>LanguageCatalog.cs</c>'siyle
     /// bir kez daha kosuluyor ve iki dokum <c>diff</c>'leniyor.
     /// </summary>
+    /// <summary>
+    /// T192 tur 3 K11 — ad ve birim yazimi metnin neresinde durursa dursun korunur.
+    ///
+    /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
+    /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
+    /// kolundan govde koluna gecen 124 metinde ilk sozcuk disindaki <c>ffmpeg</c>
+    /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu 950 anahtarin
+    /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
+    /// </summary>
+    [Fact]
+    public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
+    {
+        var kayip = new List<string>();
+        var gezilen = 0;
+
+        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
+        {
+            foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
+            {
+                var cikti = LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil));
+                gezilen++;
+
+                foreach (var sozcuk in cikti.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var (govde, dogru) = AdiCagriliyorsa(sozcuk);
+                    if (dogru is null || govde.StartsWith(dogru, StringComparison.Ordinal)) continue;
+                    kayip.Add($"{dil}	{anahtar}	{govde[..dogru.Length]} yerine {dogru}	{cikti}");
+                }
+            }
+        }
+
+        foreach (var satir in kayip) _cikti.WriteLine("KAYIP	" + satir);
+        _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
+        _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
+
+        Assert.Equal(950, gezilen);
+        Assert.Empty(kayip);
+    }
+
     [Fact]
     public void TumCiktiDokulur()
     {

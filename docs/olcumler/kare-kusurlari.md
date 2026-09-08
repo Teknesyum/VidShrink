@@ -11,6 +11,15 @@ yerler" karar tablosu; 5. maddeye olcunun mutasyona olu olmasinin duzeltilmesi v
 kosumunun parametrelenmesi; "Tam kosu"ya kirmizi/yesil tabaninin ne oldugu. K6 cumlesi
 kapsamiyla sinirlandi.
 
+**Tur 3 (8 Eylul 2026).** Denetim tur 2'yi bir kritikle geri cevirdi: tur 2'nin butun
+sayilari tuttu, ama "124 kalem gozden gecirildi" denip 28'i okunmustu ve okunmayan 96'nin
+icinde uc gerileme vardi. Bu turda degisenler: 2. maddedeki gozden gecirme bolumu 124'un
+**tamamini** kapsayacak sekilde yeniden yazildi, iki gerileme kalibi (ad yazimi ve yer
+tutucu) bulunup kapatildi, `LanguageTests` pimi gerekcesiyle yeniden temellendirildi;
+1. maddedeki `InvariantCulture` sayisi bayattan (36) olculmuse (33) cevrildi ve karar
+tablosuna eksik iki satir (570, 3742) eklendi; "Tam kosu" bolumune kirpilmamis cikti ve
+kirmizilarin adlari yazildi. Tur 3'un ham ciktilari `.calisma/T192-tur3/` altinda.
+
 ## 1. Sayi bicimi Turkce kalmis - kusur, duzeltildi
 
 Iki ayri yanlis vardi, ikisi de ayni karede gorunuyordu.
@@ -57,8 +66,14 @@ satir gercek ekran yolundan geciyor (`KareYerlesimTests.TahminAraligiSatiriEkran
 
 ### Sabit invariant kalan yerler - satir basina karar (T192 tur 2, K9)
 
-`grep -n InvariantCulture src/VidShrink.App/MainWindow.axaml.cs` otuz alti satir veriyor;
-ham cikti `.calisma/T192/k9-invariant-grep.txt`. Karar dort kumede toplaniyor:
+`grep -n InvariantCulture src/VidShrink.App/MainWindow.axaml.cs` **otuz uc** satir
+veriyor; ham cikti `.calisma/T192-tur3/k12-invariant-grep.txt`.
+
+Tur 2 buraya **otuz alti** yazmisti. Sayi bayatti: grep duzeltmelerden **once**
+alinmisti ve kulture baglanan uc satir (1655, 2586, 3305-3306) o dokumde hala
+`InvariantCulture` geciyordu. Satir numaralari dogruydu, sayi degil; tur 3'te teslim
+ucunde yeniden sayildi. Karar alti kumede toplaniyor ve **otuz ucun her satiri** bir
+kumede duruyor:
 
 | Kume | Satirlar | Karar |
 |---|---|---|
@@ -66,6 +81,8 @@ ham cikti `.calisma/T192/k9-invariant-grep.txt`. Karar dort kumede toplaniyor:
 | **Invariant kalir - ayristirma simetrisi.** `TxtTarget`, `TxtQualityTarget`, `TxtQuality`, gelismis ayar acilir listeleri | 837, 838, 848, 1176, 1182, 1191, 1194, 1299, 1303, 2476, 3191, 3230, 3272, 3293, 3751 | ayni metin geri **okunuyor**: 1368-1391, 2257, 3251, 3685-3686, 3704-3706, 3772 hepsi `NumberStyles` + `InvariantCulture` ile `TryParse` ediyor. Yaziyi kulture cevirip okumayi invariant birakmak Turkce arayuzde kutuyu bozardi; ikisini birden cevirmek bu sozlesmenin isi degil, ayri bir is |
 | **Invariant kalir - kulture duyarli ogesi yok.** `TxtAdvCrfNow`, `TxtAdvAudioKbpsNow`, ses kanali, `mm:ss` | 1418, 1420, 1422, 3662 | tam sayi ve zaman bicimi; ondalik ayirici da grup ayirici da cikmiyor. Ayrica ilk ucu yukaridaki kutularin **yansimasi** |
 | **Invariant kalir - ekrana cikmiyor.** ayar JSON'u | 2132 | diske yazilan bicim; kulture baglanirsa dosya makineden makineye degisir |
+| **Cagri degil, belge.** `Num` gecidinin `<summary>`'sindeki `<see cref>` | 570 | grep'in yakaladigi tek dokumantasyon satiri; bir bicimlendirme yapmiyor, gecidin **neden** kuruldugunu anlatiyor |
+| **Invariant kalir - yazma/okuma simetrisi.** `ParseTime` | 3742 | 3662'de `mm\:ss` diye **invariant yazilan** metnin geri okunmasi; yazan taraf invariant oldugu icin okuyan taraf da oyle olmak zorunda. Kulture duyarli ogesi yok |
 
 `DescribeBytes` icin pim var (`SettingsTabTests`, 128 MiB / 25 GiB / 1 GiB); ucu de tam
 ikilik kat, ondalik tasimiyor, dolayisiyla degisiklikten etkilenmedi ve **yeniden
@@ -143,10 +160,103 @@ Sayi **pimli**: `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir` 124/88/36'yi
 Dil dosyasina metin eklenince pim kirilir; kirilinca yapilacak sey susturmak degil, yeni
 sayiyi buraya yazmak.
 
-### Istenmeyen var mi - 124'un gozden gecirilmesi
+### Istenmeyen var mi - 124'un **tamaminin** gozden gecirilmesi (tur 3)
 
-`<=3` sozcukluk 27 kalemin tamami elle okundu (`.calisma/T192/k8-kisa-kalemler.txt`);
-sozlesmede adi gecen dort surpriz kalem ve ayni aileden besinci:
+Tur 2 bu basligi tasiyordu ama govdesi yalnizca kisa kalemleri okumustu. Basligin kapsami
+govdenin kapsamina esit degildi ve **okunmayanin icinde uc gerileme vardi**.
+
+Tur 3'te 124 kalemin **tamami** ham deger ve ekran degeriyle yan yana dokuldu, satir satir
+okundu. Dokum `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir`in kendi ciktisindan
+geliyor, elle yazilmadi: `.calisma/T192-tur3/kol-124-tur3.txt`, 124 satir, her satiri
+`dil / anahtar / HAM / CIKTI`. Kapsam artik basliga esit.
+
+#### Iki kume ayrilir
+
+Tur 2 "27 kalemin tamami okundu" dedikten sonra bes kalem listeliyordu; **ucu o kumenin
+icinde degildi**. Sinir ham degerin sozcuk sayisidir ve simdi olculdu:
+
+| Kume | Sayi | Nerede okundu |
+|---|---|---|
+| `<=3` sozcuklu ham deger | **28** | tur 2 (`main.action.show-in-folder`, `main.chip.whatsapp.label` bu kumede) |
+| `4+` sozcuklu ham deger | **96** | tur 3 (`main.drop.title` 5, `main.chip.128.label` 4, `main.chip.180.label` 5 sozcuk - bu kumede) |
+| Toplam | **124** | |
+
+Tur 2'nin "27" sayisi da bir eksikti; ayrim ham degerin bosluga gore bolunmesiyle yeniden
+sayildi (`awk -F'	' '{n=split($4,a," ")...}'`, ham dosya yukarida).
+
+#### Gerileme: ad yazimi cumle ortasinda kayboluyordu
+
+96'nin icinde uc kalem, ekranda **adin yazimini kaybediyordu**:
+
+| Anahtar | Tur 2 ciktisi | Tur 3 ciktisi |
+|---|---|---|
+| `en / main.drop.hint` | `Any format ffmpeg can open` | `Any format FFmpeg can open` |
+| `en / main.reason.encoder-fallback-not-in-build` | `...part of this ffmpeg build...` | `...part of this FFmpeg build...` |
+| `tr / main.reason.encoder-fallback-not-in-build` | `...bu ffmpeg derlemesinde yok...` | `...bu FFmpeg derlemesinde yok...` |
+
+Kok neden `LanguageCatalog.cs`: `Names` sozlugu (`["ffmpeg"] = "FFmpeg"`) yalniz
+`CapitaliseWord` icinde uygulaniyordu, `Sentence()` ise onu **sadece satir basi sozcugu**
+icin cagiriyordu:
+
+```
+:179   builder.Append(lineStart ? CapitaliseWord(word, culture, true) : word);
+```
+
+Sonuc, ayni sozcugun cumlenin neresinde durduguna gore farkli yazilmasiydi:
+`tr / main.error.generic` icindeki `Ffmpeg'in` satir basinda oldugu icin `FFmpeg'in`
+oluyordu, `main.reason.encoder-fallback-not-in-build` icindeki ayni sozcuk ortada
+oldugu icin `ffmpeg` kaliyordu. Bu, `CasingTests.UnitsAndEncoderNamesKeepTheirSpelling`in
+belgelenmis amacina dogrudan aykiriydi.
+
+**Cozum, `CarriesFunctionWord`u daraltmak degil.** Daraltmanin tek makul olcutu anahtar
+adi olurdu (`*.title` haric tut) ve o zaman T0'in kusur dedigi `What It Will Do`
+(`main.plan.title`) geri gelirdi. Bunun yerine `Names` gecidi `KnownSpelling` adiyla
+disari alindi ve **her sozcukte** gecerli oldu - baslik kolunda da govde kolunda da:
+
+| Nerede | Satir |
+|---|---|
+| `src/VidShrink.App/LanguageCatalog.cs` | `KnownSpelling` cikarildi; `CapitaliseWord` onunla basliyor, `Sentence` govde sozcugunde onu cagiriyor |
+
+#### Ikinci gerileme: yer tutucu satir basini tuketmiyordu
+
+96'yi okurken cikan ikinci kalip: `Sentence` satir basi sayacini yalnizca **harfe** gore
+dusuruyordu (`if (word.Any(char.IsLetter)) lineStart = false;`). `{0}` harf tasimadigi
+icin satir basi olmaya devam ediyor, ondan **sonraki** sozcuk buyuyordu:
+
+| Anahtar | Dil dosyasinda | Tur 2 ciktisi | Tur 3 ciktisi |
+|---|---|---|---|
+| `en / main.section.advanced.overrides` | `{0} set by hand` | `{0} Set by hand` | `{0} set by hand` |
+| `en / main.fast-gpu.bitrate-floor` | `{0} only follows...` | `{0} Only follows...` | `{0} only follows...` |
+| `tr / main.reason.encoder-fallback-not-working` | `{0} kodlayicisi bu makinede...` | `{0} Kodlayicisi bu makinede...` | `{0} kodlayicisi bu makinede...` |
+| `en / settings.share.can-delete` | `{0} hands out a delete token...` | `{0} Hands out a delete token...` | `{0} hands out a delete token...` |
+
+Yer tutucunun yerine kodlayici adi, servis adi ya da sayi geliyor; o bir **icerik
+sozcugudur**. Sayac harfe degil harf ya da rakama bakacak sekilde duzeltildi. Noktalama
+(madde imi `•`, tirnak) satir basini hala tuketmiyor, cunku gercekten sozcuk degil - madde
+imiyle baslayan `settings.share.tip` satirlarinda ilk gercek sozcuk buyumeye devam ediyor.
+
+#### Iki duzeltmenin ekrandaki toplam etkisi
+
+950 anahtarin ciktisi tur 2 ve tur 3 kodlariyla ayri ayri dokuldu ve `diff`lendi
+(`.calisma/T192-tur3/dokum-tur2.txt`, `dokum-tur3.txt`, fark `k11-fark.txt`):
+
+| Degisen | Sayi |
+|---|---|
+| Ad yazimi geri geldi (`ffmpeg` -> `FFmpeg`, `crf` -> `CRF`) | **15** (en 8, tr 7) |
+| Yer tutucudan sonraki sozcuk kucuk kaldi | **29** (en 10, tr 19) |
+| **Toplam** | **44** |
+
+Onemli olan: **ad yazimi duzeltmesinin 15'inden yalnizca 3'u 124'un icinde.** Kalan 12
+kalem cumle isareti tasiyor, yani `fd6fe0c1`'den **once de** govde kolundaydi; kusur
+T192'den eskiydi ve ayni duzeltmeyle kapandi. Kesisim ham olarak olculdu
+(`comm -12 kol124-anahtar.txt degisen16.txt`).
+
+Iki duzeltmenin **istenmeyen** bir yan etkisi yok: 44 satirin tamami elle okundu, hepsinde
+yeni cikti dil dosyasindaki yazima daha yakin.
+
+#### Kalan 124'un karari
+
+Tur 2'nin dort surpriz kalemi ve ayni ailenin besincisi (karar degismedi):
 
 | Anahtar | Once | Simdi | Karar |
 |---|---|---|---|
@@ -154,17 +264,28 @@ sozlesmede adi gecen dort surpriz kalem ve ayni aileden besinci:
 | `main.drop.title` (en/tr) | `Drop A Media File Here` | `Drop a media file here` | **istenen.** Acik bir cumle, baslik degil |
 | `main.chip.whatsapp.label` (tr) | `WhatsApp Icin Onerilen` | `WhatsApp icin onerilen` | **istenen.** Bir yonga etiketi, tamlama degil cumle parcasi |
 | `main.chip.128.label` (tr) | `Paylasim Icin En Fazla` | `Paylasim icin en fazla` | **istenen.** Ayni aile |
-| `main.chip.180.label` (tr) | `WhatsApp Web Icin En Fazla` | `WhatsApp Web icin en fazla` | sozlesmede yoktu, ayni ailenin **ucuncu** uyesi |
+| `main.chip.180.label` (tr) | `WhatsApp Web Icin En Fazla` | `WhatsApp Web icin en fazla` | ayni ailenin **ucuncu** uyesi |
 
 Sinirdaki tek kalem `main.retry.title` (en): `Over The Target` -> `Over the target`. Bir
-iletisim basligi ve artik cumle bicimde. Kural **daraltilmadi**, cunku daraltmanin tek
-makul olcutu anahtar adi olurdu (`*.title` haric tut) ve T0'in kusur diye isaretledigi
-`What It Will Do` tam da `main.plan.title`. Anahtar adina gore daraltmak, duzeltilmesi
-istenen satiri geri getirirdi.
+iletisim basligi ve artik cumle bicimde; kural yine de daraltilmadi, gerekcesi yukarida.
 
 Bolum basliklarinin (`main.section.*`) iki dilde de cumle bicimine gecmesi ayni sekilde
 istenen sonuc: T0 `Quality And Compatibility` ve `Cropping And Resolution` satirlarini
 kusur diye isaretlemisti.
+
+Geri kalan kalemlerin hepsi ayni desende: `main.reason.*` gerekce cumleleri, `main.error.*`
+hata cumleleri, `playback.panel.*` bos panel metinleri. Hicbiri baslik degil; hepsinde yeni
+cikti dil dosyasindaki yazimin kendisi.
+
+#### Pim
+
+Uc olcu birlikte tutuyor:
+
+| Olcu | Ne tutuyor |
+|---|---|
+| `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir` | 124 / 88 / 36 |
+| `BaslikKapsamiTests.AdVeBirimYazimiCumleOrtasindaDaKorunur` | 950 anahtarin **tamamini** gezer; `Names`'de bildirilmis bir ad kendi yazimiyla cikmazsa kirmizi. Bugun: 950 gezildi, **0 kayip** |
+| `LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir` | govde sozcukleri dil dosyasindaki gibi kalir, **ad duzeltmesi haric** |
 
 ### Testlerde yeniden temellendirilen yedi beklenen deger
 
@@ -180,6 +301,30 @@ Uc test dosyasinda yedi beklenen deger degisti. Hicbiri pim susturmasi degil; he
 | `CasingTests` | `hevc_qsv beats libsvtav1 on aac` | `hevc_qsv Beats libsvtav1 On aac` | `hevc_qsv beats libsvtav1 on aac` | `on` ilgec; satir basindaki `hevc_qsv` zaten `Verbatim` |
 | `ChipTests` | `Why these choices` + sayi | `Why These Choices - 7` | `Why these choices - 7` | `why` soru sozcugu; T0'in kusur dedigi `What It Will Do` ile ayni desen |
 | `LanguageTests` | `Back to the start` | `Back To The Start` | `Back to the start` | `to` ve `the` |
+
+#### Tur 3'te yeniden temellendirilen sekizinci olcu: `DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir`
+
+Bu bir beklenen deger degil, bir **kural** degisikligi; K6 disiplini geregi susturulmadi,
+gerekcesiyle yeniden temellendirildi.
+
+Olcu once soyle diyordu: cumle isaretli her degerde, satir basi disinda hicbir sozcuk
+degismeyecek. Satir basini disarida birakiyordu, cunku `Names` yalniz orada uygulaniyordu.
+K11'in duzeltmesi `Names`i her sozcuge yaydigi icin olcu iki dilde de kirmiziya dondu -
+**dogru sekilde**, cunku eski kural tam da kusuru kodluyordu:
+
+```
+Dil 'en': 276 govde degeri, 4327 sozcuk; 8 sozcuk bozuldu:
+main.drop.hint: 'ffmpeg' -> 'FFmpeg'
+...
+Dil 'tr': 232 govde degeri, 3074 sozcuk; 7 sozcuk bozuldu:
+main.error.generic: 'Ffmpeg'in' -> 'FFmpeg'in'
+```
+
+Yeni kural: govde sozcugu dil dosyasindaki gibi kalir, **bildirilmis ad yazimi haric**.
+Ayrim olcunun icinde `AdYazimiDuzeltmesi` ile yapiliyor ve dar tutuldu - iki sozcuk
+yalnizca buyuk/kucuk harfte ayrilacak **ve** ekrandaki sozcugun bas tarafi `Names`'deki
+yazimla baslayacak. Baska her fark hala bozulmadir. Olcu iki sayiyi da basiyor: kac sozcuk
+bozuldu, kac sozcuk ad olarak duzeldi (bugun 0 ve 8/7).
 
 Testin **tuttugu sey** degismedi. `CasingTests.UnitsAndEncoderNamesKeepTheirSpelling`
 birim ve kodlayici yazimini olcuyor (`ms`, `fps`, `libx264`, `h264_nvenc`, `libsvtav1`,
@@ -362,6 +507,13 @@ yoktu, madde 5'te yazdigi gibi.
 |---|---|---|---|---|---|
 | Tur 1 sonu | 1949 | 1930 | 1 | 18 | `.calisma/T192/test-son.txt` |
 | Tur 2 sonu | 1960 | 1941 | 1 | 18 | `.calisma/T192/test-son-tur2.txt` |
+| Denetcinin kosusu (`4c8246d`) | 1960 | 1939 | 2 | 19 | `.calisma/T192-denetim-tur2/tam-kosu-benim.txt` |
+| **Tur 3 sonu** | **1961** | **1942** | **1** | **18** | `.calisma/T192-tur3/test-son-tur3.txt` - **kirpilmamis** |
+
+Tur 3'un kosusu `dotnet test -c Release --logger "console;verbosity=normal"`, ciktisi 2042
+satir ve **tail'lenmedi**; basarisiz testin adi, hata iletisi ve yigin izi dosyanin 237-247
+satirlarinda duruyor. Toplam 1961; tur 2'den bir fazla olmasinin sebebi K11'in yeni olcusu
+(`AdVeBirimYazimiCumleOrtasindaDaKorunur`).
 
 **Bu sayilar makineye ve o andaki yuke bagli.** Denetci ayni `a843711` uzerinde
 1928/3 aldi; fazladan iki kirmizi ortam kaynakliydi (tek baslarina kosunca yesil,
@@ -369,6 +521,11 @@ gecici klasorde dosya kilidi). Ayni makinede baska ajanlarin ffmpeg kodlamasi ko
 bu kume buyuyebilir. Sayiya bakarken kosul sudur: **T192'nin dokundugu hicbir olcu
 kirmizi degil**; K6 pimleri ve T192 olculeri ayri ayri kosuldugunda 55/55 ve 35/35
 yesil (`.calisma/T192/k10-yesil-tur2.txt`).
+
+Tur 3'te bu kosul yeniden olculdu: K6 pimleri + T192'nin dokundugu metin olculeri birlikte
+(`WindowLayoutTests`, `AyarYuzeyiTests`, `QualityTargetUiTests`, `CasingTests`, `ChipTests`,
+`LanguageTests`, `BiciminTests`, `KareYerlesimTests`) **201/201 yesil** -
+`.calisma/T192-tur3/k6-pimler.txt`.
 
 Kapanan alti kirmizinin hepsi ayni sebepten degildi; ikisi yerlesim kusuru degil,
 olcunun kendi kusuruydu:
@@ -379,11 +536,17 @@ olcunun kendi kusuruydu:
 | `TuretmeSatiriHedefKutusunuIzler` | gercek kusur, madde 4 | erken donus kaldirildi |
 | `KaynakBilgiEtiketleriKendiHucresindeKalir` (2 dil) | **olcu yarim kalmisti**: sinav `.Where(pair => true)` idi, yani her hucreyi tasmis sayiyordu | gercek tasma kosulu yazildi; madde 5'te goruldugu gibi ortada tasma yok |
 
-Tur 2'nin tam kosusunda da kirmizi sayisi 1. **Adini o kosudan okuyamadim**: gunluk
-kuyruguyla kaydedildi, basarisiz satiri kirpildi (`.calisma/T192/test-son-tur2.txt`).
-Asagidaki testin tur 2'de de kirmizi oldugu ayrica kosularak dogrulandi
-(`.calisma/T192/tek-kirmizi-tur2.txt`); tam kosudaki tek kirmizinin ayni test oldugu
-ise cikarim, olcum degil.
+Tur 2'nin tam kosusunda da kirmizi sayisi 1 idi ama **adi okunamiyordu**: cikti gunluk
+kuyruguyla kaydedilmis, basarisiz satiri kirpilmisti. Tur 3'te bu borc kapandi - kosu
+kirpilmadan yazildi ve **iki kirmizinin da adi artik olculmus**, cikarim degil:
+
+| Kirmizi | Tur 3 kosusunda | Neden | T192 ile ilgisi |
+|---|---|---|---|
+| `OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir` | **kirmizi** (`test-son-tur3.txt:237-247`) | `Win32Exception: Erisim engellendi` - test Windows'un `System` surecini (PID 4) aliyor, yukseltilmemis oturumda `HasExited` firlatiyor | **yok** |
+| `PanelHostTests.Parca_hazir_olunca_sag_yari_parcayi_gosterir` | **yesil** | denetcinin kosusunda kirmiziydi, tek basina yesil; yuk kaynakli | **yok** |
+
+Ikisi de T192'nin dokunmadigi yollarda; `git diff origin/main...HEAD` o dosyalarda bos.
+Tur 2'nin "cikarim, olcum degil" kaydi dogru cikti, ama artik cikarim degil.
 
 **`OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
 - T192 disi, duzeltilmedi.** Test Windows'un `System` surecini (PID 4) aliyor ve
@@ -402,3 +565,8 @@ Cumle yalniz bu uc sinif icin gecerlidir; genele yayilmaz. **Suitin baska yerind
 beklenen deger yeniden temellendirildi** (`CasingTests` 5, `ChipTests` 1,
 `LanguageTests` 1); tek tek gerekcesi 2. maddedeki "Testlerde yeniden temellendirilen
 yedi beklenen deger" tablosunda.
+
+Tur 3'te bunlara **bir sekizincisi** eklendi ve o bir beklenen deger degil bir kural:
+`LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir`. Gerekcesi ayni
+bolumun "Tur 3'te yeniden temellendirilen sekizinci olcu" alt basliginda; K6'nin uc
+sinifina yine dokunulmadi.

@@ -27,7 +27,7 @@ internal static class LanguageCatalog
     /// Names and abbreviations that are written a fixed way. A word typed in lower case here is
     /// restored to its own spelling instead of getting a single capital.
     /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> Names =
+    internal static readonly IReadOnlyDictionary<string, string> Names =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["ffmpeg"] = "FFmpeg",
@@ -156,6 +156,16 @@ internal static class LanguageCatalog
         return false;
     }
 
+    /// <summary>
+    /// Govde kolu: yalniz satir basi sozcugu buyutulur, geri kalan dil dosyasinda
+    /// yazildigi gibi kalir — ad ve birim yazimlari (<see cref="KnownSpelling"/>) haric.
+    ///
+    /// <para>Satir basi sayaci harfe degil <b>harf ya da rakama</b> bakar. Yer tutucu
+    /// (<c>{0}</c>) bir icerik sozcugudur: yerine kodlayici adi ya da sayi gelir. Yalniz
+    /// harfe bakildiginda yer tutucu satir basini tuketmiyordu ve ondan sonraki sozcuk
+    /// buyuyordu — "{0} Kodlayicisi bu FFmpeg derlemesinde yok". Noktalama (madde imi
+    /// <c>&#8226;</c>, tirnak) satir basini tuketmez, cunku o gercekten sozcuk degil.</para>
+    /// </summary>
     private static string Sentence(string text, CultureInfo culture)
     {
         var builder = new StringBuilder(text.Length);
@@ -176,8 +186,8 @@ internal static class LanguageCatalog
             while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
             var word = text[index..end];
 
-            builder.Append(lineStart ? CapitaliseWord(word, culture, true) : word);
-            if (word.Any(char.IsLetter)) lineStart = false;
+            builder.Append(lineStart ? CapitaliseWord(word, culture, true) : KnownSpelling(word) ?? word);
+            if (word.Any(char.IsLetterOrDigit)) lineStart = false;
             index = end;
         }
 
@@ -215,8 +225,45 @@ internal static class LanguageCatalog
         return builder.ToString();
     }
 
+    /// <summary>
+    /// Sozcugun <see cref="Verbatim"/> ya da <see cref="Names"/> listesinde bildirilmis
+    /// yazimi. Yoksa <c>null</c> doner.
+    ///
+    /// <para>Bu gecit hem baslik hem govde kolunda gecerlidir: bir adin yazimi metnin
+    /// neresinde durduguna bagli olamaz. Once yalniz <see cref="CapitaliseWord"/> icinde
+    /// duruyordu, <see cref="Sentence"/> ise onu sadece satir basi sozcugu icin
+    /// cagiriyordu; boylece "Any format ffmpeg can open" gibi govde cumlelerinde ortadaki
+    /// <c>ffmpeg</c> dil dosyasindaki yazimiyla kaliyordu (T192 tur 3, K11).</para>
+    /// </summary>
+    private static string? KnownSpelling(string word)
+    {
+        var offset = 0;
+        while (offset < word.Length && !char.IsLetter(word[offset]))
+        {
+            if (char.IsDigit(word[offset])) return null;
+            offset++;
+        }
+
+        if (offset == word.Length) return null;
+
+        var body = word[offset..];
+        var bare = new string(body.TakeWhile(char.IsLetter).ToArray());
+        var token = new string(body.TakeWhile(char.IsLetterOrDigit).ToArray());
+
+        var identifier = new string(body.TakeWhile(letter => char.IsLetterOrDigit(letter) || letter == '_').ToArray());
+        if (Verbatim.Contains(identifier) || Verbatim.Contains(token) || Verbatim.Contains(bare)) return word;
+        if (Names.TryGetValue(token, out var known))
+            return string.Concat(word.AsSpan(0, offset), known, body.AsSpan(token.Length));
+        if (Names.TryGetValue(bare, out var name))
+            return string.Concat(word.AsSpan(0, offset), name, body.AsSpan(bare.Length));
+
+        return null;
+    }
+
     private static string CapitaliseWord(string word, CultureInfo culture, bool lineStart)
     {
+        if (KnownSpelling(word) is { } spelled) return spelled;
+
         var offset = 0;
         while (offset < word.Length && !char.IsLetter(word[offset]))
         {
@@ -229,14 +276,6 @@ internal static class LanguageCatalog
 
         var body = word[offset..];
         var bare = new string(body.TakeWhile(char.IsLetter).ToArray());
-        var token = new string(body.TakeWhile(char.IsLetterOrDigit).ToArray());
-
-        var identifier = new string(body.TakeWhile(letter => char.IsLetterOrDigit(letter) || letter == '_').ToArray());
-        if (Verbatim.Contains(identifier) || Verbatim.Contains(token) || Verbatim.Contains(bare)) return word;
-        if (Names.TryGetValue(token, out var known))
-            return string.Concat(word.AsSpan(0, offset), known, body.AsSpan(token.Length));
-        if (Names.TryGetValue(bare, out var name))
-            return string.Concat(word.AsSpan(0, offset), name, body.AsSpan(bare.Length));
 
         foreach (var letter in body)
             if (char.IsUpper(letter))
