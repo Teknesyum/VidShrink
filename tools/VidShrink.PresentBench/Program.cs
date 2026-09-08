@@ -278,7 +278,7 @@ internal sealed class BenchWindow : Window
             var s = _source.Status;
             line += $" state={s.State} produced={s.ProducedFrames} dropped={s.DroppedFrames}" +
                     $" feedFps={s.FeedFps:F1} readErrors={s.ReadErrors} poolAlloc={s.PoolAllocations}" +
-                    (s.MessageTr is null ? "" : $" msg={s.MessageTr}");
+                    (s.MessageKey is null ? "" : $" msg={s.MessageKey}");
         }
 
         Console.Error.WriteLine(line);

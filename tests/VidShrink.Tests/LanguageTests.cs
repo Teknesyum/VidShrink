@@ -614,18 +614,17 @@ public sealed class LanguageTests : IDisposable
     [Fact]
     public void KodlamaImleciMetniDilAnahtarindanGelir()
     {
-        Assert.Equal(Marker("en", 1, 2, 3), LanguageCatalog.EncodeMarker(false, 1, 2, 3));
-        Assert.Equal(Marker("tr", 1, 2, 3), LanguageCatalog.EncodeMarker(true, 1, 2, 3));
+        Assert.Equal(Marker("en", 1, 2, 3), LanguageCatalog.EncodeMarker("en", 1, 2, 3));
+        Assert.Equal(Marker("tr", 1, 2, 3), LanguageCatalog.EncodeMarker("tr", 1, 2, 3));
     }
 
     private static string Marker(string language, int pass, int passCount, int attempt)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
         var pattern = Locales.Values(language)["main.playback.encode-marker"];
 
         return LanguageCatalog.Title(
             string.Format(CultureInfo.GetCultureInfo(language), pattern, pass, passCount, attempt),
-            turkish);
+            language);
     }
 
     /// <summary>
@@ -653,9 +652,9 @@ public sealed class LanguageTests : IDisposable
                 new ComparisonPanel(),
                 () => throw new NotSupportedException("The frame source is not needed by this measurement."));
 
-            host.SetLanguage(false);
+            host.SetLanguage("en");
             var first = failures.Select(host.SampleFailureText).ToList();
-            host.SetLanguage(true);
+            host.SetLanguage("tr");
             var second = failures.Select(host.SampleFailureText).ToList();
             host.Dispose();
             return (first, second);
@@ -704,7 +703,7 @@ public sealed class LanguageTests : IDisposable
     /// arıyor, üretimin ürettiği dizgeyi yeniden kurmuyor.
     /// </summary>
     private static IReadOnlyList<string> Shown(string language, string pattern)
-        => Regex.Split(LanguageCatalog.Title(pattern, string.Equals(language, "tr", StringComparison.Ordinal)), @"\{\d+\}")
+        => Regex.Split(LanguageCatalog.Title(pattern, language), @"\{\d+\}")
             .Select(piece => piece.Trim())
             .Where(piece => piece.Length >= 3)
             .ToList();
@@ -794,14 +793,14 @@ public sealed class LanguageTests : IDisposable
         var (english, turkish) = AppHost.Run(() =>
         {
             var strip = new ControlStrip();
-            strip.SetLanguage(false);
+            strip.SetLanguage("en");
             var first = new[]
             {
                 AutomationProperties.GetName(strip.FindControl<Button>("Restart")!),
                 AutomationProperties.GetName(strip.FindControl<Grid>("Timeline")!),
                 AutomationProperties.GetName(strip.FindControl<Border>("Bar")!)
             };
-            strip.SetLanguage(true);
+            strip.SetLanguage("tr");
             var second = new[]
             {
                 AutomationProperties.GetName(strip.FindControl<Button>("Restart")!),
@@ -916,7 +915,7 @@ public sealed class LanguageTests : IDisposable
             // Dil düğmesi kasten öteki dilin adını taşıyor: her dil kendi adını yazar.
             if (key == "main.language.name") continue;
             if (mine.TryGetValue(key, out var same) && string.Equals(same, value, StringComparison.Ordinal)) continue;
-            foreign.Add(LanguageCatalog.Title(value, !string.Equals(language, "tr", StringComparison.Ordinal)));
+            foreign.Add(LanguageCatalog.Title(value, string.Equals(language, "tr", StringComparison.Ordinal) ? "en" : "tr"));
         }
 
         var caught = shown.Where(foreign.Contains).Distinct().ToList();
@@ -955,9 +954,7 @@ public sealed class LanguageTests : IDisposable
     // ---- ortak düzenek --------------------------------------------------------------
 
     private static string Cased(string language, string key)
-        => LanguageCatalog.Title(
-            Locales.Values(language)[key],
-            string.Equals(language, "tr", StringComparison.Ordinal));
+        => LanguageCatalog.Title(Locales.Values(language)[key], language);
 
     private static T OnScreen<T>(Func<MainWindow, T> read) =>
         AppHost.Run(() =>
@@ -1033,10 +1030,8 @@ public sealed class LanguageTests : IDisposable
     [InlineData("en", "Load a file and every decision the engine makes is listed here.")]
     public void GovdeCumlesiKelimeKelimeBuyutulmez(string language, string sentence)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
-
         Assert.True(LanguageCatalog.ReadsAsProse(sentence));
-        Assert.Equal(sentence, LanguageCatalog.Title(sentence, turkish));
+        Assert.Equal(sentence, LanguageCatalog.Title(sentence, language));
     }
 
     [Theory]
@@ -1045,10 +1040,8 @@ public sealed class LanguageTests : IDisposable
     [InlineData("en", "fill policy", "Fill Policy")]
     public void BaslikKelimeKelimeBuyutulmeyeDevamEder(string language, string heading, string expected)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
-
         Assert.False(LanguageCatalog.ReadsAsProse(heading));
-        Assert.Equal(expected, LanguageCatalog.Title(heading, turkish));
+        Assert.Equal(expected, LanguageCatalog.Title(heading, language));
     }
 
     /// <summary>
@@ -1073,8 +1066,6 @@ public sealed class LanguageTests : IDisposable
     [InlineData("en")]
     public void DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(string language)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
-
         var prose = Locales.Values(language)
             .Where(pair => LanguageCatalog.ReadsAsProse(pair.Value))
             .ToList();
@@ -1086,7 +1077,7 @@ public sealed class LanguageTests : IDisposable
 
         foreach (var (key, value) in prose)
         {
-            var shown = LanguageCatalog.Title(value, turkish);
+            var shown = LanguageCatalog.Title(value, language);
 
             foreach (var (kaynak, ekran) in value.Split('\n').Zip(shown.Split('\n')))
             {

@@ -351,11 +351,8 @@ public partial class ShrinkJobWindow : Window
     }
 
     private string Say(string key)
-        => LanguageCatalog.Title(Strings.GetIn(_language, key), Turkish(_language));
+        => LanguageCatalog.Title(Strings.GetIn(_language, key), _language);
 
     private string Say(string key, params object?[] args)
-        => LanguageCatalog.Title(Strings.GetIn(_language, key, args), Turkish(_language));
-
-    internal static bool Turkish(string language)
-        => language.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
+        => LanguageCatalog.Title(Strings.GetIn(_language, key, args), _language);
 }

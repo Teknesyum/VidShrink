@@ -41,8 +41,8 @@ public sealed class PipeComparisonFrameSource : IComparisonFrameSource
     private EventHandler? _processExitHook;
 
     private ComparisonSourceState _state = ComparisonSourceState.Bosta;
-    private string? _messageTr;
-    private string? _messageEn;
+    private string? _messageKey;
+    private string? _messageArg;
     private long _produced;
     private long _discarded;
     private int _readErrors;
@@ -74,8 +74,8 @@ public sealed class PipeComparisonFrameSource : IComparisonFrameSource
                     _feedFps,
                     Volatile.Read(ref _readErrors),
                     _pool?.Allocations ?? 0,
-                    _messageTr,
-                    _messageEn);
+                    _messageKey,
+                    _messageArg);
             }
         }
     }
@@ -93,26 +93,20 @@ public sealed class PipeComparisonFrameSource : IComparisonFrameSource
 
         if (!ToolLocator.IsAvailable(out var missing))
         {
-            SetUnavailable(
-                $"{missing} bulunamadi; karsilastirma oynaticisi calisamaz.",
-                $"{missing} was not found, so the comparison player cannot run.");
+            SetUnavailable("playback.source.tool-missing", missing);
             return;
         }
 
         var outcome = await Task.Run(ComparisonGraph.ProbeHstack, ct);
         if (outcome == ComparisonGraph.ProbeOutcome.Calismiyor)
         {
-            SetUnavailable(
-                "Bu ffmpeg yapisinda hstack filtresi calismiyor; karsilastirma oynaticisi acilamaz.",
-                "The hstack filter does not work in this ffmpeg build, so the comparison player cannot open.");
+            SetUnavailable("playback.source.hstack-broken");
             return;
         }
 
         if (outcome == ComparisonGraph.ProbeOutcome.Belirsiz)
         {
-            SetUnavailable(
-                "Kontrol tamamlanamadi, makine mesgul olabilir; oynaticiyi yeniden acmayi deneyin.",
-                "The check could not finish, the machine may be busy; try opening the player again.");
+            SetUnavailable("playback.source.probe-inconclusive");
             return;
         }
 
@@ -122,8 +116,8 @@ public sealed class PipeComparisonFrameSource : IComparisonFrameSource
             // Havuz halkadan iki fazla: bir kare tuketicinin elinde, bir kare okunmakta olabilir.
             _pool = new FramePool(_ringCapacity + 2, request.FrameBytes);
             _ring = new FrameRing(_ringCapacity, _pool);
-            _messageTr = null;
-            _messageEn = null;
+            _messageKey = null;
+            _messageArg = null;
             Interlocked.Exchange(ref _produced, 0);
             Interlocked.Exchange(ref _discarded, 0);
             Volatile.Write(ref _readErrors, 0);
@@ -449,13 +443,17 @@ public sealed class PipeComparisonFrameSource : IComparisonFrameSource
         life?.Dispose();
     }
 
-    private void SetUnavailable(string tr, string en)
+    /// <summary>
+    /// Kaynak neden acilamadigini anahtarla soyler, cumleyle degil. Cumleyi arayuz
+    /// kendi dilinde kuruyor; motor katmani dil tasimaz.
+    /// </summary>
+    private void SetUnavailable(string key, string? arg = null)
     {
         lock (_gate)
         {
             _state = ComparisonSourceState.Kullanilamiyor;
-            _messageTr = tr;
-            _messageEn = en;
+            _messageKey = key;
+            _messageArg = arg;
         }
         RaiseStatus();
     }

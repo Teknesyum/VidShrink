@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -546,10 +546,6 @@ public partial class MainWindow : Window
         catch (Exception ex) { TxtSystemStatus.Text = $"{Say("main.error.link")}: {ex.Message}"; }
     }
 
-    /// <summary>Yürürlükteki dilin Türkçe olup olmadığı; yalnız büyük harf kuralı için.</summary>
-    private static bool IsTurkish
-        => Strings.Language.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
-
     /// <summary>
     /// Koddan yazılan her metnin geçtiği kapı: karşılık sözlükten anahtarla okunur, sonra
     /// yürürlükteki dilin büyük harf kuralından geçer. Biçimlemedeki <c>{loc:Text}</c> bağı
@@ -568,9 +564,7 @@ public partial class MainWindow : Window
     private static string Num(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
 
     private static string Speak(string language, string key, params object?[] args)
-        => LanguageCatalog.Title(
-            Strings.GetIn(language, key, args),
-            language.StartsWith("tr", StringComparison.OrdinalIgnoreCase));
+        => LanguageCatalog.Title(Strings.GetIn(language, key, args), language);
 
     /// <summary>
     /// Dil düğmeleri <c>Locales</c> altındaki klasörlerden kuruluyor; kodda hiçbir dil adı
@@ -654,7 +648,7 @@ public partial class MainWindow : Window
         MarkChosenLanguage();
         RefreshChoiceLabels();
         ApplyFastGpuTip();
-        _preview?.SetLanguage(IsTurkish);
+        _preview?.SetLanguage(Strings.Language);
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshSettingsTexts();

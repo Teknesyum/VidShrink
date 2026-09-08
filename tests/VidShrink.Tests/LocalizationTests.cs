@@ -274,7 +274,7 @@ public sealed class LocalizationTests : IDisposable
         var domains = Domains(english);
 
         var seen = new HashSet<string>(
-            scan.Literals.Where(text => LooksLikeKey(text, domains)),
+            scan.Literals.Concat(ShippedLiterals()).Where(text => LooksLikeKey(text, domains)),
             StringComparer.Ordinal);
 
         var dead = english.Where(key => !seen.Contains(key)).ToArray();
@@ -362,6 +362,35 @@ public sealed class LocalizationTests : IDisposable
 
     private static readonly string[] KnownDead = Array.Empty<string>();
 
+    /// <summary>
+    /// Anahtar yalnız arayüzde geçmez: motor katmanı da neden açılamadığını cümleyle değil
+    /// anahtarla söylüyor. Ölü anahtar sayımı bu yüzden sevkiyattaki bütün derlemelerin
+    /// dizgelerine bakar; yalnız arayüze bakan bir sayım motorun kullandığı anahtarı ölü sanır.
+    /// </summary>
+    private static IReadOnlyCollection<string> ShippedLiterals()
+    {
+        var shape = LooksLikeKeyShape();
+        var all = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var assembly in new[]
+                 {
+                     typeof(Strings).Assembly,
+                     typeof(VidShrink.Core.Playback.ComparisonSourceStatus).Assembly,
+                     typeof(VidShrink.Ffmpeg.ToolLocator).Assembly
+                 })
+        {
+            foreach (var text in KeyCallSites.LiteralsOf(assembly, shape)) all.Add(text);
+        }
+
+        return all;
+    }
+
+    private static Func<string, bool> LooksLikeKeyShape()
+    {
+        var domains = Domains(Catalog(Strings.FallbackLanguage));
+        return text => LooksLikeKey(text, domains);
+    }
+
     private static KeyScan Measure()
         => KeyCallSites.Scan(
             typeof(Strings).Assembly,
@@ -437,6 +466,13 @@ internal static class KeyCallSites
             if (value < 0x100) Single[value] = code;
             else Double[value & 0xFF] = code;
         }
+    }
+
+    /// <summary>Bir derlemedeki anahtar biçimli dizgeler; çağrı yerine bakmaz.</summary>
+    internal static IReadOnlyCollection<string> LiteralsOf(Assembly assembly, Func<string, bool> keyShape)
+    {
+        Bodies(assembly.Location, keyShape, out var literals);
+        return literals;
     }
 
     internal static KeyScan Scan(Assembly assembly, Func<string, bool> keyShape)

@@ -54,7 +54,8 @@ internal partial class ComparisonPanel : UserControl
     // ilk kademe uygulandığı anda üstüne yazılır.
     private Size _band;
 
-    private bool _turkish;
+    private string _language = Strings.FallbackLanguage;
+    private string? _noticeArg;
     private string? _notice;
     private string? _rightNotice;
     private string? _rightBadge;
@@ -109,7 +110,7 @@ internal partial class ComparisonPanel : UserControl
         };
         Stage.PointerExited += (_, _) => Strip.PointerGone();
 
-        SetLanguage(false);
+        SetLanguage(Strings.FallbackLanguage);
         ApplySplit();
         ClipStage();
         RefreshReadout();
@@ -177,9 +178,10 @@ internal partial class ComparisonPanel : UserControl
     /// açılamadı) o sebep buraya yazılır; boş bırakılınca panel kendi varsayılanına döner.
     /// Metin İngilizce verilir, ekrana çalışan dilde çıkar.
     /// </summary>
-    internal void SetNotice(string? english)
+    internal void SetNotice(string? english, string? arg = null)
     {
         _notice = string.IsNullOrWhiteSpace(english) ? null : english;
+        _noticeArg = arg;
         RefreshTexts();
     }
 
@@ -242,11 +244,11 @@ internal partial class ComparisonPanel : UserControl
     /// bulamaz — sözlük bu sözleşmenin alanında değil — bu yüzden dil geçidi burada.
     /// Barındıran taraf dil değişiminde bunu çağırır.
     /// </summary>
-    internal void SetLanguage(bool turkish)
+    internal void SetLanguage(string language)
     {
-        _turkish = turkish;
+        _language = language;
         RefreshTexts();
-        Strip.SetLanguage(turkish);
+        Strip.SetLanguage(language);
         RefreshReadout();
     }
 
@@ -257,18 +259,18 @@ internal partial class ComparisonPanel : UserControl
     private void RefreshTexts()
     {
         EmptyTitle.Text = Text("playback.panel.title");
-        EmptyHint.Text = Text(_notice ?? "playback.panel.hint");
+        EmptyHint.Text = _notice is null
+            ? Text("playback.panel.hint")
+            : Text(_notice, _noticeArg);
         PlaceholderText.Text = Text("playback.panel.moved");
         LeftBadgeText.Text = Text("playback.badge.original");
         RightBadgeText.Text = Text("playback.badge.processed");
         RightCurtainText.Text = _rightNotice is null ? string.Empty : Text(_rightNotice);
     }
 
-    private string Text(string key)
+    private string Text(string key, params object?[] args)
         => key.StartsWith("playback.", StringComparison.Ordinal)
-            ? LanguageCatalog.Title(
-                Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
-                _turkish)
+            ? LanguageCatalog.Title(Strings.GetIn(_language, key, args), _language)
             : key;
 
     // ---- ayırıcı (K2) -------------------------------------------------------------
@@ -535,7 +537,7 @@ internal partial class ComparisonPanel : UserControl
     {
         // T52: okunan yüzde panelin boy ölçeği. %100 taban boy, %200 iki katı.
         var percent = _gesture.PanelScale * 100.0;
-        ZoomText.Text = _turkish ? $"%{percent:0}" : $"{percent:0}%";
+        ZoomText.Text = Text("playback.zoom-readout", percent.ToString("0", Strings.CultureOf(_language)));
         BtnZoomIn.IsEnabled = !_gesture.AtCeiling;
         BtnZoomOut.IsEnabled = !_gesture.AtFloor;
     }

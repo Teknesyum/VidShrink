@@ -276,7 +276,11 @@ public static class Strings
             : (trimmed[..cut], trimmed[(cut + 1)..]);
     }
 
-    private static CultureInfo CultureOf(string language)
+    /// <summary>
+    /// Bir dil kodunun kültürü. Tanınmayan kod değişmez kültüre düşer, program durmaz.
+    /// Sayı biçimi ve büyük harf kuralı bu tek çeviriden geçer; ikinci bir tablo yok.
+    /// </summary>
+    internal static CultureInfo CultureOf(string language)
     {
         try
         {

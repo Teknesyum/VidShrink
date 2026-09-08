@@ -134,7 +134,7 @@ public sealed class CasingTests
     [InlineData("hardware encoder h264_nvenc", "Hardware Encoder h264_nvenc")]
     [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv Beats libsvtav1 On aac")]
     public void UnitsAndEncoderNamesKeepTheirSpelling(string text, string expected)
-        => Assert.Equal(expected, LanguageCatalog.Title(text, false));
+        => Assert.Equal(expected, LanguageCatalog.Title(text, "en"));
 
     /// <summary>
     /// T65 K3: birim ve tanımlayıcı listesi tek bir bildirimde durur. İkinci bir kopya
