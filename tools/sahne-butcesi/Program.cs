@@ -41,12 +41,14 @@ public sealed record OlcumKaydi(
 
 public static class Program
 {
-    public static readonly Pencere[] Pencereler =
+    private static readonly Pencere[] VarsayilanPencereler =
     {
         new("p1-karisik", "p1-karisik.mkv", "144,117-333,300 — oyun + menu + diyalog, 28 gercek kesim"),
         new("p2-durgun", "p2-durgun.mkv", "333,300-519,666 — menu / egitim ekrani, 7 gercek kesim"),
         new("p3-hareketli", "p3-hareketli.mkv", "600,000-789,000 — kesintisiz dovus, 0 gercek kesim")
     };
+
+    public static Pencere[] Pencereler { get; private set; } = VarsayilanPencereler;
 
     public const int ReferansCrf = 26;
     public const double HedefMb = 60.0;
@@ -98,8 +100,10 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Kok = KokBul();
-        Is = Path.Combine(Kok, ".calisma", "T114");
+        var isAdi = Environment.GetEnvironmentVariable("VIDSHRINK_IS");
+        Is = Path.Combine(Kok, ".calisma", string.IsNullOrWhiteSpace(isAdi) ? "T114" : isAdi.Trim());
         Directory.CreateDirectory(Is);
+        PencereleriYukle();
 
         if (args.Length == 0) { Console.Error.WriteLine("kullanim: <harita|k1|k4|k5|k7> <maks|uyumlu> [pencere]"); return 2; }
 
@@ -313,6 +317,14 @@ public static class Program
         if (hata.Count == 0) { Console.WriteLine($"{p.Ad}: DOGRULAMA GECTI"); return true; }
         foreach (var h in hata) Console.Error.WriteLine($"{p.Ad}: KIRILDI — {h}");
         return false;
+    }
+
+    private static void PencereleriYukle()
+    {
+        var manifest = Path.Combine(Is, "pencereler.json");
+        if (!File.Exists(manifest)) return;
+        var okunan = JsonSerializer.Deserialize<Pencere[]>(File.ReadAllText(manifest), Json);
+        if (okunan is { Length: > 0 }) Pencereler = okunan;
     }
 
     private static string Kaynak(Pencere p) => Path.Combine(Is, "kaynak", p.Dosya);
