@@ -1,11 +1,16 @@
 using System.Diagnostics;
+using System.Globalization;
 using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg.Playback;
 
 public sealed record DecoderPipeFrame(byte[] Bgra, int Width, int Height, double PresentationSeconds);
 
-public sealed record PipeFault(string ReasonTr, string ReasonEn);
+/// <summary>
+/// Boru hatası. Cümle burada kurulmuyor: motor anahtarı ve varsa tek argümanı
+/// bildiriyor, cümleyi arayüz kendi dilinde çözüyor.
+/// </summary>
+public sealed record PipeFault(string MessageKey, string? MessageArg = null);
 
 public sealed class DecoderPipe : IDisposable
 {
@@ -222,8 +227,8 @@ public sealed class DecoderPipe : IDisposable
             if (DateTime.UtcNow >= hardDeadline)
             {
                 RaiseFault(
-                    $"arama {SeekAbsoluteTimeout.TotalMilliseconds:0} ms icinde kare teslim edemedi, birakiliyor.",
-                    $"seek did not deliver a frame within {SeekAbsoluteTimeout.TotalMilliseconds:0} ms, giving up.");
+                    "playback.pipe.seek-timeout",
+                    SeekAbsoluteTimeout.TotalMilliseconds.ToString("0", CultureInfo.InvariantCulture));
                 return null;
             }
 
@@ -248,8 +253,8 @@ public sealed class DecoderPipe : IDisposable
                 if (restartAttempts >= MaxRestartAttemptsPerSeek)
                 {
                     RaiseFault(
-                        $"arama {MaxRestartAttemptsPerSeek} yeniden baslatmadan sonra kare teslim edemedi, birakiliyor.",
-                        $"seek gave up after {MaxRestartAttemptsPerSeek} restarts without delivering a frame.");
+                        "playback.pipe.seek-restarts",
+                        MaxRestartAttemptsPerSeek.ToString(CultureInfo.InvariantCulture));
                     return null;
                 }
                 RestartVideo(targetIndex, stamps);
@@ -261,8 +266,8 @@ public sealed class DecoderPipe : IDisposable
                 if (restartAttempts >= MaxRestartAttemptsPerSeek)
                 {
                     RaiseFault(
-                        $"arama {MaxRestartAttemptsPerSeek} yeniden baslatmadan sonra kare teslim edemedi, birakiliyor.",
-                        $"seek gave up after {MaxRestartAttemptsPerSeek} restarts without delivering a frame.");
+                        "playback.pipe.seek-restarts",
+                        MaxRestartAttemptsPerSeek.ToString(CultureInfo.InvariantCulture));
                     return null;
                 }
                 RestartVideo(targetIndex, stamps);
@@ -336,7 +341,7 @@ public sealed class DecoderPipe : IDisposable
         catch
         {
             lock (_gate) _videoAlive = false;
-            RaiseFault("ffmpeg baslatilamadi, boru bosta kaldi.", "ffmpeg could not start, the pipe is idle.");
+            RaiseFault("playback.pipe.no-start");
             return;
         }
 
@@ -399,9 +404,7 @@ public sealed class DecoderPipe : IDisposable
 
             if (expectedMore && !ct.IsCancellationRequested && exitCode != 0)
             {
-                RaiseFault(
-                    "kod cozucu surec beklenmeden dustu; bir sonraki aramada boru kendini yeniden kuracak.",
-                    "the decoder process died unexpectedly; the pipe will rebuild itself on the next seek.");
+                RaiseFault("playback.pipe.decoder-died");
             }
 
             KillTree(process, KillWaitMs, KillAttempts);
@@ -456,7 +459,7 @@ public sealed class DecoderPipe : IDisposable
         _cacheBytes += bytes.LongLength;
     }
 
-    private void RaiseFault(string tr, string en) => Faulted?.Invoke(this, new PipeFault(tr, en));
+    private void RaiseFault(string key, string? arg = null) => Faulted?.Invoke(this, new PipeFault(key, arg));
 
     public void SeekAudio(double atSeconds)
     {
@@ -537,9 +540,7 @@ public sealed class DecoderPipe : IDisposable
         try { process?.Dispose(); } catch { }
         if (process is not null && !killed)
         {
-            RaiseFault(
-                "kod cozucu ffmpeg sureci oldurulemedi, arka planda kalmis olabilir.",
-                "the decoder ffmpeg process could not be killed and may still be running.");
+            RaiseFault("playback.pipe.decoder-unkillable");
         }
     }
 
@@ -586,9 +587,7 @@ public sealed class DecoderPipe : IDisposable
         try { process?.Dispose(); } catch { }
         if (process is not null && !killed)
         {
-            RaiseFault(
-                "ses ffmpeg sureci oldurulemedi, arka planda kalmis olabilir.",
-                "the audio ffmpeg process could not be killed and may still be running.");
+            RaiseFault("playback.pipe.audio-unkillable");
         }
     }
 

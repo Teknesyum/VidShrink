@@ -20,5 +20,11 @@
   "playback.control.timeline": "Zaman çizgisi",
   "playback.control.strip": "Denetim şeridi",
   "playback.control.pause": "Duraklat",
-  "playback.control.play": "Oynat"
+  "playback.control.play": "Oynat",
+  "playback.pipe.seek-timeout": "Arama {0} ms içinde kare teslim edemedi, bırakıldı.",
+  "playback.pipe.seek-restarts": "Arama {0} yeniden başlatmadan sonra kare teslim edemedi, bırakıldı.",
+  "playback.pipe.no-start": "ffmpeg başlatılamadı, boru boşta kaldı.",
+  "playback.pipe.decoder-died": "Kod çözücü süreç beklenmeden düştü; boru bir sonraki aramada kendini yeniden kuracak.",
+  "playback.pipe.decoder-unkillable": "Kod çözücü ffmpeg süreci öldürülemedi, arka planda kalmış olabilir.",
+  "playback.pipe.audio-unkillable": "Ses ffmpeg süreci öldürülemedi, arka planda kalmış olabilir."
 }

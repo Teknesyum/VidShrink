@@ -302,7 +302,8 @@ internal partial class PlayerView : UserControl
         => Dispatcher.UIThread.Post(() =>
         {
             TxtStall.IsVisible = true;
-            TxtStall.Text = Strings.Language == "tr" ? fault.ReasonTr : fault.ReasonEn;
+            TxtStall.Text = LanguageCatalog.Display(
+                Strings.Get(fault.MessageKey, fault.MessageArg ?? string.Empty));
         });
 
     private void StartWatchdog()
