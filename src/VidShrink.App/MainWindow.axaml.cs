@@ -2583,7 +2583,7 @@ public partial class MainWindow : Window
         TxtDuration.Text = TimeSpan.FromSeconds(info.DurationSeconds).ToString(@"hh\:mm\:ss");
         TxtSize.Text = $"{Num(info.FileSizeMb, "0.0")} MB";
         TxtResolution.Text = $"{info.Width}x{info.Height}";
-        TxtFps.Text = info.Fps.ToString("0.##", CultureInfo.InvariantCulture);
+        TxtFps.Text = Num(info.Fps, "0.##");
         TxtVideoCodec.Text = info.VideoCodec;
         TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : Say("main.info.none");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";

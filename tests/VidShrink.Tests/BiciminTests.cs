@@ -1,10 +1,13 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
+using VidShrink.Core;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
@@ -71,13 +74,18 @@ public sealed class BiciminTests : IDisposable
     }
 
     /// <summary>
-    /// Ekranda gorunen aralik satiri: <c>15.4 - 15.8 MB</c> ve yuzde. Tek tek sayi degil,
-    /// satirin kendisi olculuyor.
+    /// <b>Ne olculuyor:</b> aralik satirinin <b>bilesenleri</b> ve bunlarin yan yana
+    /// gelmis hali — ekran yolu degil. Bicim dizgesi burada kopyalanmis durumda,
+    /// dolayisiyla bu olcu <c>RefreshEstimateView</c>'deki bir degisikligi yakalamaz.
+    /// Ekranin kendi satiri
+    /// <see cref="KareYerlesimTests.TahminAraligiSatiriEkrandaDileUyar"/> ile olculuyor;
+    /// T192 tur 2'ye kadar bu ayrim rapor tablosunda yaziyordu ama testin adinda
+    /// yazmiyordu.
     /// </summary>
     [Theory]
     [InlineData("en", "15.4 - 15.8 MB · 3.7%")]
     [InlineData("tr", "15,4 - 15,8 MB · %3,7")]
-    public void TahminAraligiSatiriDileUyar(string dil, string beklenen)
+    public void AralikSatirininBilesenleriDileUyar(string dil, string beklenen)
     {
         Strings.Use(dil);
 
@@ -142,9 +150,27 @@ public sealed class BiciminTests : IDisposable
 /// </summary>
 public sealed class KareYerlesimTests
 {
-    private static readonly Size WindowSize = new(1600, 1000);
+    /// <summary>
+    /// Olculen iki gorus alani. <c>Genis</c> karenin cekildigi olcu, <c>Dar</c> pencerenin
+    /// izin verdigi en dar olcu (<c>MainWindow.axaml</c>, <c>MinWidth="1040"</c>). T192
+    /// tur 1'de dar olcu dosya elle degistirilip bir kez kosulmustu; tur 2'de olcu
+    /// parametreye cevrildi, boylece iddia tekrarlanabilir.
+    /// </summary>
+    public static readonly Size Genis = new(1600, 1000);
 
-    private static T Read<T>(string dil, Func<MainWindow, T> read) =>
+    public static readonly Size Dar = new(1040, 720);
+
+    public static TheoryData<string, double, double> IkiDilIkiOlcu() => new()
+    {
+        { "tr", 1600, 1000 },
+        { "en", 1600, 1000 },
+        { "tr", 1040, 720 },
+        { "en", 1040, 720 }
+    };
+
+    private static T Read<T>(string dil, Func<MainWindow, T> read) => Read(dil, Genis, read);
+
+    private static T Read<T>(string dil, Size olcu, Func<MainWindow, T> read) =>
         AppHost.Run(() =>
         {
             var onceki = Strings.Language;
@@ -157,8 +183,8 @@ public sealed class KareYerlesimTests
                     Height = double.NaN
                 };
 
-                window.Measure(WindowSize);
-                window.Arrange(new Rect(WindowSize));
+                window.Measure(olcu);
+                window.Arrange(new Rect(olcu));
                 window.UpdateLayout();
 
                 Visual? node = window.GetVisualDescendants().OfType<UniformGrid>()
@@ -169,8 +195,8 @@ public sealed class KareYerlesimTests
                     node = node.GetVisualParent();
                 }
 
-                window.Measure(WindowSize);
-                window.Arrange(new Rect(WindowSize));
+                window.Measure(olcu);
+                window.Arrange(new Rect(olcu));
                 window.UpdateLayout();
                 return read(window);
             }
@@ -183,25 +209,62 @@ public sealed class KareYerlesimTests
     private static T Named<T>(MainWindow window, string name) where T : Control =>
         window.GetVisualDescendants().OfType<T>().Single(control => control.Name == name);
 
+    /// <summary>
+    /// Etiketin <b>sarilmamis</b> genisligi olculuyor. T192 tur 1'de olcu
+    /// <c>label.TextLayout.Width</c>'e bakiyordu, ama etiketlerde
+    /// <c>TextWrapping="Wrap"</c> var (<c>MainWindow.axaml:262-291</c>): sarilan metnin
+    /// yerlesim genisligi hucreyi <b>hic asamaz</b>, dolayisiyla kosul her zaman yanlis
+    /// donuyordu ve olcu mutasyona oluydu. Sarma kapatilip yeniden olculuyor; boylece
+    /// etiket uzarsa olcu kirmiziya doner.
+    /// <see cref="OlcuUzunEtiketiYakalar"/> bunu ayrica kanitliyor.
+    /// </summary>
     [Theory]
-    [InlineData("tr")]
-    [InlineData("en")]
-    public void KaynakBilgiEtiketleriKendiHucresindeKalir(string dil)
+    [MemberData(nameof(IkiDilIkiOlcu))]
+    public void KaynakBilgiEtiketleriKendiHucresindeKalir(string dil, double genislik, double yukseklik)
     {
-        var tasan = Read(dil, window =>
-        {
-            var grid = window.GetVisualDescendants().OfType<UniformGrid>()
-                .Single(g => g.Name == "InfoGrid");
-
-            return grid.Children
-                .OfType<StackPanel>()
-                .Select(cell => (cell, label: cell.Children.OfType<TextBlock>().First()))
-                .Where(pair => pair.label.TextLayout.Width > pair.cell.Bounds.Width + 0.5)
-                .Select(pair => $"{pair.label.Text}: metin {pair.label.TextLayout.Width:0.#} px, hucre {pair.cell.Bounds.Width:0.#} px")
-                .ToList();
-        });
+        var tasan = Read(dil, new Size(genislik, yukseklik), window => Tasanlar(window, new Size(genislik, yukseklik), null));
 
         Assert.True(tasan.Count == 0, string.Join(Environment.NewLine, tasan));
+    }
+
+    /// <summary>
+    /// Olcunun mutasyon sinavi: hucreye sigmayacak kadar uzun bir etiket verildiginde
+    /// olcu <b>kirmizi</b> donmeli. Donmezse yukaridaki yesil bir sey soylemiyor demektir.
+    /// </summary>
+    [Fact]
+    public void OlcuUzunEtiketiYakalar()
+    {
+        var tasan = Read("tr", Genis, window => Tasanlar(window, Genis, "Cok Uzun Bir Kaynak Bilgi Etiketi Ornegi"));
+
+        Assert.NotEmpty(tasan);
+    }
+
+    /// <summary>
+    /// Her hucrenin ilk metnini alir, sarmayi kapatir, yeniden yerlestirir ve metin
+    /// genisligini hucre genisligiyle karsilastirir. <paramref name="mutasyon"/> verilirse
+    /// ilk etiketin metni onunla degistirilir.
+    /// </summary>
+    private static List<string> Tasanlar(MainWindow window, Size olcu, string? mutasyon)
+    {
+        var grid = window.GetVisualDescendants().OfType<UniformGrid>()
+            .Single(g => g.Name == "InfoGrid");
+
+        var hucreler = grid.Children
+            .OfType<StackPanel>()
+            .Select(cell => (cell, label: cell.Children.OfType<TextBlock>().First()))
+            .ToList();
+
+        foreach (var (_, label) in hucreler) label.TextWrapping = TextWrapping.NoWrap;
+        if (mutasyon is not null) hucreler[0].label.Text = mutasyon;
+
+        window.Measure(olcu);
+        window.Arrange(new Rect(olcu));
+        window.UpdateLayout();
+
+        return hucreler
+            .Where(pair => pair.label.TextLayout.Width > pair.cell.Bounds.Width + 0.5)
+            .Select(pair => $"{pair.label.Text}: metin {pair.label.TextLayout.Width:0.#} px, hucre {pair.cell.Bounds.Width:0.#} px")
+            .ToList();
     }
 
     /// <summary>
@@ -220,8 +283,8 @@ public sealed class KareYerlesimTests
             var ozet = Named<TextBlock>(window, ad);
             ozet.Text = "Çözünürlük Düşürülebilir · Kare Hızı Düşürülebilir · Ses Yeniden Kodlanabilir";
 
-            window.Measure(WindowSize);
-            window.Arrange(new Rect(WindowSize));
+            window.Measure(Genis);
+            window.Arrange(new Rect(Genis));
             window.UpdateLayout();
 
             var satir = (Layoutable)ozet.GetVisualParent()!;
@@ -230,6 +293,86 @@ public sealed class KareYerlesimTests
 
         Assert.True(ozetSagi <= satirGenisligi + 0.5,
             $"ozet metni {ozetSagi:0.#} px'te bitiyor, satir {satirGenisligi:0.#} px");
+    }
+
+    private const string OrnekYol = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";
+
+    /// <summary>
+    /// <c>WindowLayoutTests.Sample</c> ile ayni tasiyici kaynak. Yoklama cagrilmiyor;
+    /// olcum diskteki hicbir dosyaya ve hicbir dis araca bagli degil.
+    /// </summary>
+    private static MediaInfo Ornek() => new()
+    {
+        FilePath = OrnekYol,
+        FileSizeBytes = 420L * 1024 * 1024,
+        DurationSeconds = 187.5,
+        Width = 3840,
+        Height = 2160,
+        Fps = 59.94,
+        VideoCodec = "hevc",
+        TotalBitrateBps = 18_800_000,
+        AudioCodec = "aac",
+        AudioBitrateBps = 192_000,
+        AudioChannels = 2,
+        PixelFormat = "yuv420p"
+    };
+
+    /// <summary>
+    /// Gercek yukleme yolu: <c>LoadWithoutProbing</c> -> <c>ApplyLoaded</c> -> <c>ShowInfo</c>
+    /// ve <c>Recalculate</c>. Ekrana yazan kod bu yoldan geciyor, dolayisiyla bicim dizgesi
+    /// testte kopyalanmiyor.
+    /// </summary>
+    private static T Yuklu<T>(string dil, Func<MainWindow, T> read) =>
+        AppHost.Run(() =>
+        {
+            var onceki = Strings.Language;
+            Strings.Use(dil);
+            try
+            {
+                var window = new MainWindow
+                {
+                    Width = double.NaN,
+                    Height = double.NaN
+                };
+
+                window.LoadWithoutProbing(OrnekYol, Ornek());
+                window.SettleFades();
+                window.Measure(Genis);
+                window.Arrange(new Rect(Genis));
+                window.UpdateLayout();
+                return read(window);
+            }
+            finally
+            {
+                Strings.Use(onceki);
+            }
+        });
+
+    /// <summary>
+    /// T192 tur 2 K9. <c>TxtFps</c> sabit <see cref="System.Globalization.CultureInfo.InvariantCulture"/>
+    /// ile yaziliyordu; Turkce arayuzde kare hizi <c>29.97</c> gorunuyordu. Olcu gercek
+    /// yukleme yolundan geciyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en", "59.94")]
+    [InlineData("tr", "59,94")]
+    public void KaynakBilgiKareHiziDileUyar(string dil, string beklenen)
+        => Assert.Equal(beklenen, Yuklu(dil, window => Named<TextBlock>(window, "TxtFps").Text));
+
+    /// <summary>
+    /// T192 tur 2, tur 1 borcu 3: tahmin araligi satirinin <b>ekrandaki</b> hali.
+    /// <c>RefreshEstimateView</c> gercekten kosuyor; bicim dizgesi testte kopyalanmiyor.
+    /// </summary>
+    [Theory]
+    [InlineData("en", ".", ",")]
+    [InlineData("tr", ",", ".")]
+    public void TahminAraligiSatiriEkrandaDileUyar(string dil, string ayirici, string yabanci)
+    {
+        var satir = Yuklu(dil, window => Named<TextBlock>(window, "TxtEstimateRange").Text ?? "");
+
+        Assert.Contains("MB", satir);
+        Assert.Contains(ayirici, satir);
+        Assert.DoesNotContain(yabanci, satir);
     }
 
     [Fact]
@@ -244,5 +387,97 @@ public sealed class KareYerlesimTests
 
         Assert.Contains("24", satir);
         Assert.DoesNotContain("16", satir);
+    }
+}
+
+/// <summary>
+/// T192 tur 2 K8 — baslik kuralinin kapsami.
+///
+/// <para>Tur 1'de <c>ReadsAsProse</c> genisletildi ve rapor dort satirlik bir tablo
+/// verdi. Yan etkinin <b>olcusu</b> yoktu: dil dosyasindaki her metin ayni geciten
+/// geciyor, dolayisiyla degisen satir sayisi dortten cok fazla. Bu olcu butun dil
+/// dosyalarini gercek <c>LanguageCatalog.Title</c> uzerinden gezer, kol degistiren her
+/// anahtari sayar ve doker.</para>
+///
+/// <para><b>Kol degistiren</b> = <c>fd6fe0c1</c>'in kuralina (yalniz cumle isareti) gore
+/// baslik, bugunku kurala gore govde. Eski kural burada tek yerde, alti satirda
+/// tekrarlanir — kurulan mekanizma degil, <b>karsilastirma tabani</b> odur.
+/// Ciktinin gercekten degistigi ayrica olculdu: ayni dokum bir de
+/// <c>origin/main</c>'in <c>LanguageCatalog.cs</c>'siyle alinip <c>diff</c>'lendi,
+/// ham cikti <c>.calisma/T192/k8-fark.txt</c>.</para>
+///
+/// <para>Sayi <b>pimlidir</b>. Dil dosyasina metin eklendiginde ya da bir metin
+/// degistiginde bu pim kirilir; kirilinca yapilacak sey susturmak degil, yeni sayiyi
+/// <c>docs/olcumler/kare-kusurlari.md</c>'ye yazmaktir.</para>
+/// </summary>
+public sealed class BaslikKapsamiTests
+{
+    private readonly ITestOutputHelper _cikti;
+
+    public BaslikKapsamiTests(ITestOutputHelper cikti) => _cikti = cikti;
+
+    /// <summary><c>fd6fe0c1</c>'in kurali: yalniz cumle isareti.</summary>
+    private static bool EskiKuralaGoreGovde(string metin)
+    {
+        for (var index = 0; index < metin.Length; index++)
+        {
+            if (metin[index] is not ('.' or ';' or '!' or '?')) continue;
+            if (index + 1 == metin.Length || char.IsWhiteSpace(metin[index + 1])) return true;
+        }
+
+        return false;
+    }
+
+    private static bool Turkce(string dil)
+        => dil.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
+
+    [Fact]
+    public void KolDegistirenAnahtarlarSayilir()
+    {
+        var toplam = 0;
+        var dilBasina = new SortedDictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
+        {
+            dilBasina[dil] = 0;
+            foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
+            {
+                var ham = Strings.GetIn(dil, anahtar);
+                if (EskiKuralaGoreGovde(ham)) continue;
+                if (!LanguageCatalog.ReadsAsProse(ham)) continue;
+
+                toplam++;
+                dilBasina[dil]++;
+                _cikti.WriteLine($"KOL\t{dil}\t{anahtar}\t{LanguageCatalog.Title(ham, Turkce(dil))}");
+            }
+        }
+
+        foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
+        _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
+
+        Assert.Equal(124, toplam);
+        Assert.Equal(88, dilBasina["en"]);
+        Assert.Equal(36, dilBasina["tr"]);
+    }
+
+    /// <summary>
+    /// Butun anahtarlarin gercek <c>Title</c> ciktisini doker. Eski/yeni farkinin ham
+    /// tabani bu dokum: ayni test <c>origin/main</c>'in <c>LanguageCatalog.cs</c>'siyle
+    /// bir kez daha kosuluyor ve iki dokum <c>diff</c>'leniyor.
+    /// </summary>
+    [Fact]
+    public void TumCiktiDokulur()
+    {
+        var satir = 0;
+        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
+        {
+            foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
+            {
+                _cikti.WriteLine($"DOKUM\t{dil}\t{anahtar}\t{LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil))}");
+                satir++;
+            }
+        }
+
+        Assert.True(satir > 0);
     }
 }
