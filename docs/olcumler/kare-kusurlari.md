@@ -20,6 +20,15 @@ tutucu) bulunup kapatildi, `LanguageTests` pimi gerekcesiyle yeniden temellendir
 tablosuna eksik iki satir (570, 3742) eklendi; "Tam kosu" bolumune kirpilmamis cikti ve
 kirmizilarin adlari yazildi. Tur 3'un ham ciktilari `.calisma/T192-tur3/` altinda.
 
+**Tur 4 (8 Eylul 2026).** Denetim tur 3'u **gecirdi** (0 kritik); bu tur iki borcu kapatir.
+Birincisi olcunun kendisiydi: yer tutucu/rakam duzeltmesini hicbir test tutmuyordu, cunku
+`LanguageTests.cs:1110` uretimin biraktigi yuklemi kullaniyordu - test duzeltildi ve
+mutasyon artik kirmizi. Ikincisi bir sayi: "44" aslinda **49**; dokumu ureten
+`BiciminTests.TumCiktiDokulur` `ReplaceLineEndings` cagirmadigi icin cok satirli degerlerin
+yalniz ilk satiri sayiliyordu. Ayrica iki cumle kapsamina cekildi (rakam kaynakli alti
+kalem, `.title`/`.label` ile biten alti kalem). Tur 4'un ham ciktilari
+`.calisma/T192-tur4/` altinda.
+
 ## 1. Sayi bicimi Turkce kalmis - kusur, duzeltildi
 
 Iki ayri yanlis vardi, ikisi de ayni karede gorunuyordu.
@@ -237,22 +246,47 @@ imiyle baslayan `settings.share.tip` satirlarinda ilk gercek sozcuk buyumeye dev
 
 #### Iki duzeltmenin ekrandaki toplam etkisi
 
-950 anahtarin ciktisi tur 2 ve tur 3 kodlariyla ayri ayri dokuldu ve `diff`lendi
-(`.calisma/T192-tur3/dokum-tur2.txt`, `dokum-tur3.txt`, fark `k11-fark.txt`):
+950 anahtarin ciktisi tur 2 ve tur 3 kodlariyla ayri ayri dokuldu ve `diff`lendi. Dokum
+tur 4'te duzeltilmis olcuyle **yeniden** alindi
+(`.calisma/T192-tur4/dokum-taban.txt`, `dokum-yeni.txt`, fark `fark.txt`):
 
 | Degisen | Sayi |
 |---|---|
 | Ad yazimi geri geldi (`ffmpeg` -> `FFmpeg`, `crf` -> `CRF`) | **15** (en 8, tr 7) |
 | Yer tutucudan sonraki sozcuk kucuk kaldi | **29** (en 10, tr 19) |
-| **Toplam** | **44** |
+| Ciplak sayidan sonraki sozcuk kucuk kaldi | **6** (en 2, tr 4) |
+| Ayni anahtar iki sinifta birden (`tr / main.reason.encoder-fallback-not-in-build`) | **-1** |
+| **Toplam ayri anahtar** | **49** |
+
+Tablonun ucuncu satiri ayri duruyor cunku duzeltme yalnizca yer tutucuyu degil **ciplak
+sayiyi** da satir basi sayiyor (`char.IsLetterOrDigit`); `• 128 Kompakt` -> `• 128 kompakt`
+kalemlerinin kaynagi rakam, yer tutucu degil.
+
+Bu tablo tur 3'te **44** diyordu ve yanlisti. Sayim degil, sayimi besleyen dokum bozuktu:
+`BiciminTests.TumCiktiDokulur` `ReplaceLineEndings` cagirmiyordu, cok satirli her degerin
+yalniz **ilk satiri** dosyaya dusuyordu; devam satirlarindaki bes degisiklik farkta hic
+gorunmedi. Ayni kusur `KolDegistirenAnahtarlarSayilir`de zaten duzeltilmisti, dokumde
+duruyordu. Dokum duzeltildi (`BiciminTests.cs:557`), fark yeniden alindi.
 
 Onemli olan: **ad yazimi duzeltmesinin 15'inden yalnizca 3'u 124'un icinde.** Kalan 12
 kalem cumle isareti tasiyor, yani `fd6fe0c1`'den **once de** govde kolundaydi; kusur
 T192'den eskiydi ve ayni duzeltmeyle kapandi. Kesisim ham olarak olculdu
 (`comm -12 kol124-anahtar.txt degisen16.txt`).
 
-Iki duzeltmenin **istenmeyen** bir yan etkisi yok: 44 satirin tamami elle okundu, hepsinde
-yeni cikti dil dosyasindaki yazima daha yakin.
+Iki duzeltmenin **istenmeyen** bir yan etkisi yok: 49 satirin tamami elle okundu, hepsinde
+yeni cikti dil dosyasindaki yazima daha yakin. Dokum duzeltilince gorunur olan bes kalem
+de ayni yonde:
+
+| Dil | Anahtar | Once | Sonra |
+|---|---|---|---|
+| en | `main.convert.audio-bitrate.tip` | `• 128 Is a compact...` | `• 128 is a compact...` |
+| en | `main.convert.frame-rate.tip` | `• 60 Is smoother`, `• 30 Suits`, `• 24 Gives` | `• 60 is smoother`, `• 30 suits`, `• 24 gives` |
+| tr | `main.convert.audio-bitrate.tip` | `• 128 Kompakt genel ayardir` | `• 128 kompakt genel ayardir` |
+| tr | `main.convert.custom-fps.tip` | `• 25 Veya 29.97 gibi` | `• 25 veya 29.97 gibi` |
+| tr | `main.convert.frame-rate.tip` | `• 60 Daha akicidir`, `• 30 Cogu videoya`, `• 24 Sinema benzeri` | `• 60 daha akicidir`, `• 30 cogu videoya`, `• 24 sinema benzeri` |
+
+Besi de madde iminden sonra gelen ciplak sayinin ardindaki sozcuk; hepsinde yeni cikti dil
+dosyasindaki yazimin kendisi.
 
 #### Kalan 124'un karari
 
@@ -266,16 +300,33 @@ Tur 2'nin dort surpriz kalemi ve ayni ailenin besincisi (karar degismedi):
 | `main.chip.128.label` (tr) | `Paylasim Icin En Fazla` | `Paylasim icin en fazla` | **istenen.** Ayni aile |
 | `main.chip.180.label` (tr) | `WhatsApp Web Icin En Fazla` | `WhatsApp Web icin en fazla` | ayni ailenin **ucuncu** uyesi |
 
-Sinirdaki tek kalem `main.retry.title` (en): `Over The Target` -> `Over the target`. Bir
+Sinirdaki en acik kalem `main.retry.title` (en): `Over The Target` -> `Over the target`. Bir
 iletisim basligi ve artik cumle bicimde; kural yine de daraltilmadi, gerekcesi yukarida.
+Yaninda iki taban etiketi de sinirda sayilabilirdi: `main.advanced.min-fps.label`
+(`Frame-rate floor (at least)`) ve `main.advanced.min-resolution.label`
+(`Resolution floor (at least)`). Ikisi de alan etiketi, ikisinde de yeni cikti dil
+dosyasindaki yazimin kendisi; ayni gerekceyle kural daraltilmadi.
 
 Bolum basliklarinin (`main.section.*`) iki dilde de cumle bicimine gecmesi ayni sekilde
 istenen sonuc: T0 `Quality And Compatibility` ve `Cropping And Resolution` satirlarini
 kusur diye isaretlemisti.
 
-Geri kalan kalemlerin hepsi ayni desende: `main.reason.*` gerekce cumleleri, `main.error.*`
-hata cumleleri, `playback.panel.*` bos panel metinleri. Hicbiri baslik degil; hepsinde yeni
-cikti dil dosyasindaki yazimin kendisi.
+Geri kalanin buyuk cogunlugu ayni desende: `main.reason.*` gerekce cumleleri,
+`main.error.*` hata cumleleri, `playback.panel.*` bos panel metinleri. Bu uc ailenin
+**disinda** alti kalem var ve adlari `.title` / `.label` ile bitiyor:
+
+| Anahtar | Yeni cikti |
+|---|---|
+| `en\|tr / main.about.engine.title` | `How the engine thinks` / `Motor nasil dusunuyor` |
+| `en / main.about.loss.title` | `Where the loss goes` |
+| `en / main.advanced.min-fps.label` | `Frame-rate floor (at least)` |
+| `en / main.advanced.min-resolution.label` | `Resolution floor (at least)` |
+| `en / settings-tab.advanced-default-open.label` | `Show advanced options expanded by default` |
+
+Altisi da tek tek okundu: adi `.title` olsa da metnin kendisi cumle bicimindedir (`How the
+engine thinks` bir tamlama degil, bir cumledir). Yani hukum degismiyor - hicbiri baslik
+gibi yazilmasi gereken bir metin degil - ama "hepsi `main.reason.*`, `main.error.*`,
+`playback.panel.*`" cumlesi kapsam olarak eksikti; duzeltildi.
 
 #### Pim
 
@@ -286,6 +337,27 @@ Uc olcu birlikte tutuyor:
 | `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir` | 124 / 88 / 36 |
 | `BaslikKapsamiTests.AdVeBirimYazimiCumleOrtasindaDaKorunur` | 950 anahtarin **tamamini** gezer; `Names`'de bildirilmis bir ad kendi yazimiyla cikmazsa kirmizi. Bugun: 950 gezildi, **0 kayip** |
 | `LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir` | govde sozcukleri dil dosyasindaki gibi kalir, **ad duzeltmesi haric** |
+
+Ucuncu olcunun pimi **tur 3'te calismiyordu**. `LanguageTests.cs:1110` kendi satir-basi
+atlamasinda uretimin biraktigi yuklemi kullaniyordu:
+
+```csharp
+if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetter))
+```
+
+`{0}` ve ciplak sayi harf tasimadigi icin atlanmiyor, onlardan **sonraki** sozcuk
+atlaniyordu - yani duzeltmenin dokundugu tek sozcuk olcunun kor noktasindaydi.
+`LanguageCatalog.cs:190`i `IsLetterOrDigit` -> `IsLetter` yapan mutasyonda 135 testin
+135'i yesil kaliyordu. Testin yuklemi de `IsLetterOrDigit` yapildi; ayni mutasyon artik
+iki dilde de kirmizi:
+
+```
+Dil 'en': 276 govde degeri, 4327 sozcuk; 14 sozcuk bozuldu
+Dil 'tr': 232 govde degeri, 3074 sozcuk; 25 sozcuk bozuldu
+```
+
+Toplam **39 sozcuk**. Dogru uretimde ayni olcu yesil (2/2). Ham ciktilar:
+`.calisma/T192-tur4/k14-mutasyon.txt` ve `k14-dogru-uretim.txt`.
 
 ### Testlerde yeniden temellendirilen yedi beklenen deger
 
@@ -508,7 +580,13 @@ yoktu, madde 5'te yazdigi gibi.
 | Tur 1 sonu | 1949 | 1930 | 1 | 18 | `.calisma/T192/test-son.txt` |
 | Tur 2 sonu | 1960 | 1941 | 1 | 18 | `.calisma/T192/test-son-tur2.txt` |
 | Denetcinin kosusu (`4c8246d`) | 1960 | 1939 | 2 | 19 | `.calisma/T192-denetim-tur2/tam-kosu-benim.txt` |
-| **Tur 3 sonu** | **1961** | **1942** | **1** | **18** | `.calisma/T192-tur3/test-son-tur3.txt` - **kirpilmamis** |
+| Tur 3 sonu | 1961 | 1942 | 1 | 18 | `.calisma/T192-tur3/test-son-tur3.txt` - kirpilmamis |
+| **Tur 4 sonu** | **1961** | **1942** | **1** | **18** | `.calisma/T192-tur4/test-tam-tur4.txt` - **kirpilmamis** |
+
+Tur 4'un kosusu `dotnet test -c Release`, 21 dk 52 sn surdu; tek kirmizi yine
+`OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
+(adi, `Win32Exception: Erisim engellendi` iletisi ve yigin izi dosyanin 44-56
+satirlarinda). Tur 4'un dokundugu iki dosya da test dosyasi; toplam degismedi.
 
 Tur 3'un kosusu `dotnet test -c Release --logger "console;verbosity=normal"`, ciktisi 2042
 satir ve **tail'lenmedi**; basarisiz testin adi, hata iletisi ve yigin izi dosyanin 237-247

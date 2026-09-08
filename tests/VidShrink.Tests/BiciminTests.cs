@@ -554,7 +554,7 @@ public sealed class BaslikKapsamiTests
         {
             foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
             {
-                _cikti.WriteLine($"DOKUM\t{dil}\t{anahtar}\t{LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil))}");
+                _cikti.WriteLine($"DOKUM\t{dil}\t{anahtar}\t{LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil)).ReplaceLineEndings(" ")}");
                 satir++;
             }
         }

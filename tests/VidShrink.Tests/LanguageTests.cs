@@ -1107,7 +1107,7 @@ public sealed class LanguageTests : IDisposable
                 var basAtlandi = false;
                 for (var i = 0; i < kaynakSozcukler.Length; i++)
                 {
-                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetter))
+                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetterOrDigit))
                     {
                         basAtlandi = true;
                         continue;
