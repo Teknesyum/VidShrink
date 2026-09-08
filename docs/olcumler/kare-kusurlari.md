@@ -1,4 +1,4 @@
-# T192 - Karelerde Gorunen Arayuz Kusurlari
+﻿# T192 - Karelerde Gorunen Arayuz Kusurlari
 
 Kaynak kare: `docs/gorseller/T189-kucult-en.png`. Olcum basiz pencerede, uygulamanin
 kendi yerlesim motoruyla (`AppHost.Run` + `Measure`/`Arrange`/`UpdateLayout`) alindi.
@@ -188,7 +188,7 @@ git checkout HEAD -- src/VidShrink.App/LanguageCatalog.cs
 tabanda ayni sozluk `private`. Gorunurluk `Title`'in davranisini degistirmiyor.
 
 Tur 5'te bu kosum yeniden alindi: 950 anahtarin **163**'unun ciktisi tabandan farkli.
-Bunlarin **123**'u 124'luk kol degistiren kumede, kalan **40**'i baslik kolunda kalip
+Bunlarin **123**'u 124'luk kol degistiren kumede, kalan **40**'i govde kolunda kalip
 yalnizca ad/birim yazimi ya da yer tutucu duzeltmesinden etkilenen anahtarlar. Bu 40,
 124'un **disinda** duruyor; asagida uc ailenin toplami olarak gecen 40 ile ayni sayi,
 ayni kume degil.
@@ -718,6 +718,10 @@ firlatiyor. Bu oturum yukseltilmemis - `WindowsPrincipal.IsInRole(Administrator)
 `DecoderPipe`'a T192 dokundu; `git diff origin/main...HEAD` o yollarda bos. Test
 dosyasina en son T182 dokunmus (`9bb92ba`, `main` uzerinde). Makine ve izin kosuluna
 bagli, ayri bir is.
+
+Tur 5'ten sonra T0 bunu `main`de kapatti (`712c196`): `HasExited` yoklamasi
+`Win32Exception`a karsi korundu, okunamayan fikstur yok sayiliyor. Olcu artik yalnizca
+yukseltilmis oturumda gercekten kosuyor.
 
 **K6 pimleri** (`WindowLayoutTests`, `AyarYuzeyiTests`, `QualityTargetUiTests`): 55/55
 yesil, **bu uc sinifta** hicbir pim yeniden temellendirilmedi - ham cikti
