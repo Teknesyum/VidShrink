@@ -1,0 +1,36 @@
+{
+  "performance.title": "Suorituskykytesti",
+  "performance.run": "Suorita testi",
+  "performance.running": "Mitataan — ajetaan muutama lyhyt koodaus, kestää enintään kaksikymmentä sekuntia.",
+  "performance.failed": "Testi ei valmistunut",
+
+  "performance.headline.hardware-offloaded": "Tässä koneessa on toimiva laitteistokooderi, eikä sen ajo kuormita suoritinta.",
+  "performance.headline.hardware": "Tässä koneessa on toimiva laitteistokooderi, mutta suorittimen kuormaa sen ajossa ei mitattu.",
+  "performance.headline.software-heavy": "Toimivaa laitteistokooderia ei löytynyt, ja ohjelmistokoodaus vaatii kokonaisen suoritinytimen pysyäkseen reaaliajassa.",
+  "performance.headline.software-light": "Toimivaa laitteistokooderia ei löytynyt, mutta ohjelmistokoodaus pysyy alle yhden suoritinytimen reaaliajassa.",
+  "performance.headline.not-enough": "Mittaustuloksia ei ole tarpeeksi kysymykseen vastaamiseksi.",
+
+  "performance.line.not-measured": "Tällä koneella ei ole vielä mitattu mitään.",
+  "performance.line.no-hardware": "Laitteistovideokooderia ei ole saatavilla, joten koodaus ajetaan suorittimella.",
+  "performance.line.hardware-failed": "Koneessa on lueteltu laitteistokooderi, mutta sen testikoodaus epäonnistui.",
+  "performance.line.hardware-works": "Laitteistokoodaus toimii tällä koneella.",
+  "performance.line.hardware-not-cpu-bound": "Laitteistoajo ei kuormita suoritinta: yksi säie tai vapaat säikeet veivät saman ajan, {0}× sisällä.",
+  "performance.line.hardware-cost-unknown": "Laitteistoajon suoritinkustannusta ei mitattu, joten sitä ei saa pitää ilmaisena.",
+  "performance.line.hardware-headroom": "Laitteistoajo kulki {0}× reaaliaikaa.",
+  "performance.line.software-realtime": "Ohjelmistokoodaus vaatii {0} ydintä pysyäkseen reaaliajassa, {1} loogisella ytimellä.",
+  "performance.line.software-costs-cores": "Se on kokonainen ydin tai enemmän ({0} ydintä), joten ohjelmistokoodaus varaa yhden ytimen koko ajokseen.",
+  "performance.line.software-small": "Se jää alle yhden ytimen ({0} ydintä), joten se mahtuu muun työn väliin.",
+  "performance.line.cpu-unreliable": "Koneen suoritinaikalaskuri ei ole luotettava ({0}× seinäkelloon nähden), joten suoritinajat näytetään, mutta niistä ei päätetä mitään.",
+  "performance.line.budget-exhausted": "Mittausbudjetti loppui ({0} ms / {1} ms), joten yksi testin osa puuttuu.",
+  "performance.boundary": "VidShrink ei tallenna videota. Tässä mitataan, mitä koodaus maksaa tällä koneella, ei sitä, mitä tallennustyökalu sille tekee — sen oma kooderiasetus on ensimmäinen tarkistuskohde.",
+
+  "performance.fact.hardware-encoder": "Laitteistokooderi",
+  "performance.fact.hardware-pipeline": "Laitteistoputki",
+  "performance.fact.software-encoder": "Ohjelmistokooderi",
+  "performance.fact.software-cost": "Ohjelmistokustannus",
+  "performance.fact.logical-cores": "Loogiset ytimet",
+  "performance.fact.measured-in": "Mittausaika",
+  "performance.value.realtime": "{0}× reaaliaikaa",
+  "performance.value.cores": "{0} ydintä",
+  "performance.value.ms": "{0} ms"
+}

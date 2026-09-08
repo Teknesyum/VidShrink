@@ -1,0 +1,36 @@
+{
+  "performance.title": "בדיקת ביצועים",
+  "performance.run": "הרץ את הבדיקה",
+  "performance.running": "מודד — מריץ כמה קידודים קצרים ואורך עד עשרים שניות.",
+  "performance.failed": "הבדיקה לא הצליחה להסתיים",
+
+  "performance.headline.hardware-offloaded": "במחשב זה יש מקודד חומרה עובד והמעבר הזה אינו נשען על המעבד.",
+  "performance.headline.hardware": "במחשב זה יש מקודד חומרה עובד, אבל האם המעבד נושא את המעבר הזה לא נמדד כאן.",
+  "performance.headline.software-heavy": "לא נמצא מקודד חומרה עובד, וקידוד תוכנתי דורש ליבת מעבד שלמה כדי לעמוד בזמן אמת.",
+  "performance.headline.software-light": "לא נמצא מקודד חומרה עובד, אבל קידוד תוכנתי נשאר מתחת לליבת מעבד אחת בזמן אמת.",
+  "performance.headline.not-enough": "לא נמדד כאן מספיק כדי לענות על השאלה.",
+
+  "performance.line.not-measured": "עדיין לא נמדד דבר במחשב זה.",
+  "performance.line.no-hardware": "אין כאן מקודד וידאו חומרתי, ולכן הקידוד רץ על המעבד.",
+  "performance.line.hardware-failed": "מקודד חומרה רשום במחשב זה, אבל קידוד הבדיקה שלו נכשל.",
+  "performance.line.hardware-works": "קידוד חומרה עובד במחשב זה.",
+  "performance.line.hardware-not-cpu-bound": "המעבר החומרתי אינו נשען על המעבד: מתן שרשור אחד או השארת השרשורים פנויים ארכו אותו זמן, בטווח של {0}×.",
+  "performance.line.hardware-cost-unknown": "עלות המעבד של המעבר החומרתי לא נמדדה, ולכן אין לקרוא אותה כחינם.",
+  "performance.line.hardware-headroom": "המעבר החומרתי רץ ב-{0}× זמן אמת.",
+  "performance.line.software-realtime": "קידוד תוכנתי דורש {0} ליבות כדי לעמוד בזמן אמת, מתוך {1} ליבות לוגיות.",
+  "performance.line.software-costs-cores": "זו ליבה שלמה או יותר ({0} ליבות), ולכן קידוד תוכנתי תופס ליבה אחת כל עוד הוא רץ.",
+  "performance.line.software-small": "זה נשאר מתחת לליבה אחת ({0} ליבות), ולכן אפשר לפזר אותו ברווחים שעבודה אחרת משאירה.",
+  "performance.line.cpu-unreliable": "מונה זמן המעבד במחשב זה אינו אמין ({0}× מול שעון הקיר), ולכן זמני המעבד מוצגים אבל לא מוכרע מהם דבר.",
+  "performance.line.budget-exhausted": "תקציב המדידה אזל ({0} ms מתוך {1} ms), ולכן חלק אחד של הבדיקה חסר.",
+  "performance.boundary": "VidShrink אינו מקליט וידאו. מה שנמדד כאן הוא כמה עולה הקידוד במחשב זה, לא מה כלי הקלטה עושה איתו — הגדרת המקודד שלו היא המקום הראשון לבדוק.",
+
+  "performance.fact.hardware-encoder": "מקודד חומרה",
+  "performance.fact.hardware-pipeline": "צינור חומרה",
+  "performance.fact.software-encoder": "מקודד תוכנה",
+  "performance.fact.software-cost": "עלות תוכנה",
+  "performance.fact.logical-cores": "ליבות לוגיות",
+  "performance.fact.measured-in": "נמדד תוך",
+  "performance.value.realtime": "{0}× זמן אמת",
+  "performance.value.cores": "{0} ליבות",
+  "performance.value.ms": "{0} ms"
+}

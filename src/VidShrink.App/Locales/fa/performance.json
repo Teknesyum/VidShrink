@@ -1,0 +1,36 @@
+{
+  "performance.title": "بررسی کارایی",
+  "performance.run": "اجرای بررسی",
+  "performance.running": "در حال اندازه‌گیری — چند رمزگذاری کوتاه اجرا می‌شود و تا بیست ثانیه طول می‌کشد.",
+  "performance.failed": "بررسی به پایان نرسید",
+
+  "performance.headline.hardware-offloaded": "این دستگاه رمزگذار سخت‌افزاری کارآمدی دارد و آن گذر بار روی پردازنده نمی‌گذارد.",
+  "performance.headline.hardware": "این دستگاه رمزگذار سخت‌افزاری کارآمدی دارد، اما اینکه پردازنده بار آن گذر را می‌کشد یا نه اینجا اندازه‌گیری نشد.",
+  "performance.headline.software-heavy": "رمزگذار سخت‌افزاری کارآمدی پیدا نشد و رمزگذاری نرم‌افزاری برای رسیدن به سرعت واقعی یک هستهٔ کامل پردازنده می‌خواهد.",
+  "performance.headline.software-light": "رمزگذار سخت‌افزاری کارآمدی پیدا نشد، اما رمزگذاری نرم‌افزاری در سرعت واقعی زیر یک هستهٔ پردازنده می‌ماند.",
+  "performance.headline.not-enough": "اندازه‌گیری‌های اینجا برای پاسخ به این پرسش کافی نیست.",
+
+  "performance.line.not-measured": "هنوز چیزی روی این دستگاه اندازه‌گیری نشده است.",
+  "performance.line.no-hardware": "رمزگذار ویدیوی سخت‌افزاری در اینجا در دسترس نیست، پس رمزگذاری روی پردازنده اجرا می‌شود.",
+  "performance.line.hardware-failed": "رمزگذار سخت‌افزاری در این دستگاه فهرست شده، اما رمزگذاری آزمایشی آن ناموفق بود.",
+  "performance.line.hardware-works": "رمزگذاری سخت‌افزاری روی این دستگاه کار می‌کند.",
+  "performance.line.hardware-not-cpu-bound": "گذر سخت‌افزاری بار روی پردازنده نمی‌گذارد: با یک رشته یا با رشته‌های آزاد، زمان یکسانی گرفت، در محدودهٔ {0}×.",
+  "performance.line.hardware-cost-unknown": "هزینهٔ پردازندهٔ گذر سخت‌افزاری اندازه‌گیری نشد، پس نباید رایگان تلقی شود.",
+  "performance.line.hardware-headroom": "گذر سخت‌افزاری با {0}× سرعت واقعی اجرا شد.",
+  "performance.line.software-realtime": "رمزگذاری نرم‌افزاری برای رسیدن به سرعت واقعی {0} هسته می‌خواهد، از {1} هستهٔ منطقی.",
+  "performance.line.software-costs-cores": "این یک هستهٔ کامل یا بیشتر است ({0} هسته)، پس رمزگذاری نرم‌افزاری تا وقتی اجرا می‌شود یک هسته را اشغال می‌کند.",
+  "performance.line.software-small": "این زیر یک هسته می‌ماند ({0} هسته)، پس می‌تواند در فاصله‌های کارهای دیگر پخش شود.",
+  "performance.line.cpu-unreliable": "شمارندهٔ زمان پردازنده در این دستگاه قابل اتکا نیست ({0}× نسبت به ساعت واقعی)، پس زمان‌های پردازنده نمایش داده می‌شوند اما تصمیمی بر پایهٔ آن‌ها گرفته نمی‌شود.",
+  "performance.line.budget-exhausted": "بودجهٔ اندازه‌گیری تمام شد ({0} از {1} میلی‌ثانیه)، پس یک بخش از بررسی ناقص است.",
+  "performance.boundary": "VidShrink ویدیو ضبط نمی‌کند. آنچه اینجا اندازه‌گیری می‌شود هزینهٔ رمزگذاری روی این دستگاه است، نه کاری که ابزار ضبط با آن می‌کند — تنظیم رمزگذار خود آن ابزار اولین جایی است که باید نگاه کرد.",
+
+  "performance.fact.hardware-encoder": "رمزگذار سخت‌افزاری",
+  "performance.fact.hardware-pipeline": "خط لولهٔ سخت‌افزاری",
+  "performance.fact.software-encoder": "رمزگذار نرم‌افزاری",
+  "performance.fact.software-cost": "هزینهٔ نرم‌افزاری",
+  "performance.fact.logical-cores": "هسته‌های منطقی",
+  "performance.fact.measured-in": "زمان اندازه‌گیری",
+  "performance.value.realtime": "{0}× سرعت واقعی",
+  "performance.value.cores": "{0} هسته",
+  "performance.value.ms": "{0} میلی‌ثانیه"
+}
