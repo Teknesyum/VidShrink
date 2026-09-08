@@ -1,0 +1,22 @@
+{
+  "Pencere": "p3-hareketli",
+  "Duration": 60,
+  "Fps": 60,
+  "Scenes": [
+    {
+      "Index": 0,
+      "Start": 0,
+      "End": 32.317,
+      "Bits": 120209224,
+      "Complexity": 1.0368440922915894
+    },
+    {
+      "Index": 1,
+      "Start": 32.317,
+      "End": 60,
+      "Bits": 95041464,
+      "Complexity": 0.9569883852693966
+    }
+  ],
+  "TaramaSaniye": 15.8029831
+}

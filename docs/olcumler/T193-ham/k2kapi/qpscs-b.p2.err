@@ -1,0 +1,53 @@
+Input #0, matroska,webm, from 'C:/Users/Teknesyum/Desktop/Projeler/VidShrink-T193/.calisma/T193/kaynak/p1-karisik.mkv':
+  Metadata:
+    COMPATIBLE_BRANDS: isommp42
+    DATE            : 2026
+    MAJOR_BRAND     : mp42
+    MINOR_VERSION   : 0
+    ENCODER         : Lavf63.1.100
+  Duration: 00:01:00.00, start: 0.000000, bitrate: 30219 kb/s
+  Stream #0:0: Video: hevc (Main 10), yuv420p10le(pc, bt2020nc/bt2020/smpte2084, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 60 fps, 60 tbr, 1k tbn (default)
+    Metadata:
+      ENCODER         : Lavc63.1.100 libx265
+      HANDLER_NAME    : VideoHandle
+      DURATION        : 00:01:00.000000000
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> av1 (libsvtav1))
+Press [q] to stop, [?] for help
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [version]:	SVT-AV1 Encoder Lib v4.2.0-68-gc1e79b04f
+Svt[info]: SVT [build]  :	GCC 16.1.0	 64 bit
+Svt[info]: LIB Build date: Aug  2 2026 11:16:16
+Svt[info]: -------------------------------------------
+Svt[warn]: For CRF or 2PASS RC mode, the maximum needed Lookahead distance is 42. Force the look_ahead_distance to be 42
+Svt[info]: Level of Parallelism: 6
+Svt[info]: Number of PPCS 161
+Svt[info]: [asm level on system : up to avx512icl]
+Svt[info]: [asm level selected : up to avx512icl]
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [config]: main profile	tier (auto)	level (auto)
+Svt[info]: SVT [config]: width / height / fps numerator / fps denominator 		: 1920 / 1080 / 60 / 1
+Svt[info]: SVT [config]: bit-depth / color format 					: 10 / YUV420
+Svt[info]: SVT [config]: preset / tune / pred struct 					: 6 / PSNR / random access
+Svt[info]: SVT [config]: gop size / mini-gop size / key-frame type 			: 321 / 16 / key frame
+Svt[info]: SVT [config]: BRC mode / target bitrate (kbps)				: VBR / 8230 
+Svt[info]: SVT [config]: AQ mode / Variance Boost 					: 2 / 0
+Svt[info]: SVT [config]: sharpness / luminance-based QP bias 				: 0 / 0
+Svt[info]: SVT [config]: QP scale compress strength 					: 3
+Svt[info]: -------------------------------------------
+Output #0, matroska, to 'C:/Users/Teknesyum/Desktop/Projeler/VidShrink-T193/.calisma/T193/k2kapi/qpscs-b.mkv.yarim.mkv':
+  Metadata:
+    COMPATIBLE_BRANDS: isommp42
+    DATE            : 2026
+    MAJOR_BRAND     : mp42
+    MINOR_VERSION   : 0
+    encoder         : Lavf63.1.100
+  Stream #0:0: Video: av1 (AV01 / 0x31305641), yuv420p10le(pc, bt2020nc/bt2020/smpte2084, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 8230 kb/s, 60 fps, 1k tbn (default)
+    Metadata:
+      encoder         : Lavc63.1.100 libsvtav1
+      HANDLER_NAME    : VideoHandle
+      DURATION        : 00:01:00.000000000
+    Side data:
+      CPB properties: bitrate max/min/avg: 0/0/8230000 buffer size: 8230000 vbv_delay: N/A
+frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.50    frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:01.03    frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:01.55    frame=    1 fps=0.5 q=19.0 size=       1KiB time=00:00:00.00 bitrate=N/A speed=   0x elapsed=0:00:02.08    frame=    6 fps=2.3 q=37.0 size=       1KiB time=00:00:00.08 bitrate=  67.2kbits/s speed=0.0319x elapsed=0:00:02.61    frame=   20 fps=6.4 q=39.0 size=       1KiB time=00:00:00.31 bitrate=  17.7kbits/s speed=0.101x elapsed=0:00:03.13    frame=   33 fps=9.0 q=26.0 size=       1KiB time=00:00:00.53 bitrate=  10.5kbits/s speed=0.146x elapsed=0:00:03.65    frame=   49 fps= 12 q=28.0 size=       1KiB time=00:00:00.80 bitrate=   7.0kbits/s speed=0.192x elapsed=0:00:04.17    frame=   65 fps= 14 q=28.0 size=       1KiB time=00:00:01.06 bitrate=   5.2kbits/s speed=0.228x elapsed=0:00:04.68    frame=   81 fps= 16 q=32.0 size=       1KiB time=00:00:01.33 bitrate=   4.2kbits/s speed=0.256x elapsed=0:00:05.20    frame=   96 fps= 17 q=40.0 size=       1KiB time=00:00:01.58 bitrate=   3.5kbits/s speed=0.277x elapsed=0:00:05.70    frame=  115 fps= 18 q=38.0 size=       1KiB time=00:00:01.90 bitrate=   2.9kbits/s speed=0.305x elapsed=0:00:06.22    frame=  133 fps= 20 q=38.0 size=       1KiB time=00:00:02.20 bitrate=   2.5kbits/s speed=0.326x elapsed=0:00:06.74    frame=  151 fps= 21 q=38.0 size=       1KiB time=00:00:02.50 bitrate=   2.2kbits/s speed=0.344x elapsed=0:00:07.27    frame=  168 fps= 22 q=39.0 size=       1KiB time=00:00:02.81 bitrate=   2.0kbits/s speed=0.361x elapsed=0:00:07.79    frame=  185 fps= 22 q=35.0 size=       1KiB time=00:00:03.06 bitrate=   1.8kbits/s speed=0.369x elapsed=0:00:08.30    frame=  193 fps= 22 q=25.0 size=       1KiB time=00:00:03.20 bitrate=   1.8kbits/s speed=0.363x elapsed=0:00:08.82    frame=  205 fps= 22 q=37.0 size=       1KiB time=00:00:03.40 bitrate=   1.6kbits/s speed=0.364x elapsed=0:00:09.34    frame=  213 fps= 22 q=36.0 size=       1KiB time=00:00:03.53 bitrate=   1.6kbits/s speed=0.358x elapsed=0:00:09.85    frame=  229 fps= 22 q=36.0 size=       1KiB time=00:00:03.80 bitrate=   1.5kbits/s speed=0.366x elapsed=0:00:10.37    frame=  241 fps= 22 q=27.0 size=       1KiB time=00:00:04.00 bitrate=   1.4kbits/s speed=0.368x elapsed=0:00:10.87    frame=  253 fps= 22 q=32.0 size=       1KiB time=00:00:04.20 bitrate=   1.3kbits/s speed=0.369x elapsed=0:00:11.39    frame=  265 fps= 22 q=32.0 size=       1KiB time=00:00:04.40 bitrate=   1.3kbits/s speed=0.369x elapsed=0:00:11.92    frame=  273 fps= 22 q=26.0 size=       1KiB time=00:00:04.53 bitrate=   1.2kbits/s speed=0.365x elapsed=0:00:12.42    frame=  281 fps= 22 q=33.0 size=    5120KiB time=00:00:04.66 bitrate=8987.8kbits/s speed=0.361x elapsed=0:00:12.94    frame=  289 fps= 21 q=27.0 size=    5120KiB time=00:00:04.80 bitrate=8738.1kbits/s speed=0.356x elapsed=0:00:13.47    frame=  305 fps= 22 q=25.0 size=    5120KiB time=00:00:05.06 bitrate=8278.2kbits/s speed=0.362x elapsed=0:00:13.99    frame=  319 fps= 22 q=38.0 size=    5120KiB time=00:00:05.30 bitrate=7913.8kbits/s speed=0.365x elapsed=0:00:14.50    [out#0/matroska @ 000001c978e27b40] video:6118KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.039793%
+frame=  360 fps= 25 q=36.0 Lsize=    6120KiB time=00:00:05.98 bitrate=8379.8kbits/s speed=0.412x elapsed=0:00:14.52    

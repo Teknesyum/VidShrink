@@ -1,0 +1,30 @@
+[
+  {
+    "Pencere": "p3-hareketli",
+    "Kol": "taban",
+    "GerceklesenMb": 58.94532585144043,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": true,
+    "VmafMean": 86.10668550055564,
+    "VmafP10": 81.7763608,
+    "VmafMin": 75.70087,
+    "VmafWorstScene": 82.793618475,
+    "Bilinmiyor": null
+  },
+  {
+    "Pencere": "p3-hareketli",
+    "Kol": "dagitim",
+    "GerceklesenMb": 58.95331382751465,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": true,
+    "VmafMean": 86.09489646666655,
+    "VmafP10": 81.75507590000001,
+    "VmafMin": 76.04828,
+    "VmafWorstScene": 82.67424337500003,
+    "Bilinmiyor": null
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "Pencere": "p2-durgun",
+    "Kol": "taban",
+    "GerceklesenMb": 11.03392219543457,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": false,
+    "VmafMean": 95.92930721333323,
+    "VmafP10": 95.32307109999999,
+    "VmafMin": 93.980241,
+    "VmafWorstScene": 95.31726857500003,
+    "Bilinmiyor": null
+  },
+  {
+    "Pencere": "p2-durgun",
+    "Kol": "dagitim",
+    "GerceklesenMb": 10.84907341003418,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": false,
+    "VmafMean": 95.91818459666635,
+    "VmafP10": 95.31818,
+    "VmafMin": 94.005519,
+    "VmafWorstScene": 95.30483058333333,
+    "Bilinmiyor": null
+  }
+]

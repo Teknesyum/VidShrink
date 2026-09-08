@@ -1,0 +1,64 @@
+{
+  "Pencere": "p1-karisik",
+  "Duration": 60,
+  "Fps": 60,
+  "Scenes": [
+    {
+      "Index": 0,
+      "Start": 0,
+      "End": 7.65,
+      "Bits": 36074304,
+      "Complexity": 2.0703937326421253
+    },
+    {
+      "Index": 1,
+      "Start": 7.65,
+      "End": 9.033,
+      "Bits": 6655392,
+      "Complexity": 2.112846171964382
+    },
+    {
+      "Index": 2,
+      "Start": 9.033,
+      "End": 17.233,
+      "Bits": 27727552,
+      "Complexity": 1.4846158565295111
+    },
+    {
+      "Index": 3,
+      "Start": 17.233,
+      "End": 21.583,
+      "Bits": 6759664,
+      "Complexity": 0.6822637090442806
+    },
+    {
+      "Index": 4,
+      "Start": 21.583,
+      "End": 24.517,
+      "Bits": 4168240,
+      "Complexity": 0.6237477989538299
+    },
+    {
+      "Index": 5,
+      "Start": 24.517,
+      "End": 39.367,
+      "Bits": 27169704,
+      "Complexity": 0.8032946454316345
+    },
+    {
+      "Index": 6,
+      "Start": 39.367,
+      "End": 50.417,
+      "Bits": 16028392,
+      "Complexity": 0.6368601809927995
+    },
+    {
+      "Index": 7,
+      "Start": 50.417,
+      "End": 60,
+      "Bits": 12074680,
+      "Complexity": 0.5532106860915835
+    }
+  ],
+  "TaramaSaniye": 11.4346677
+}

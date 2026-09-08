@@ -1,0 +1,6 @@
+anahtar;a_deger;b_deger;a_bayt;b_bayt;fark_bayt;gurultu_bayt;esik_gurultu2;esik_yuzde1;destek
+kontrol;lp=6 x8 (min);lp=6 x8 (max);6085018;6118325;33307;33307;;;-
+qcomp;-svtav1-params qcomp=0.40;-svtav1-params qcomp=0.75;6101726;6097414;4312;33307;66614;61017;hayir
+qcomp-ffmpeg;-qcomp 0.40;-qcomp 0.95;6075743;6098429;22686;33307;66614;60757;hayir
+qp-scale-compress-strength;=0;=3;6091645;6267380;175735;33307;66614;60916;evet
+zones;b=2.00;b=0.50;6090445;6098105;7660;33307;66614;60904;hayir

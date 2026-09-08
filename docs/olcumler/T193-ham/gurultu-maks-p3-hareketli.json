@@ -1,0 +1,44 @@
+[
+  {
+    "Pencere": "p3-hareketli",
+    "Kol": "taban-1",
+    "GerceklesenMb": 58.94532585144043,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": true,
+    "VmafMean": 86.10668550055564,
+    "VmafP10": 81.7763608,
+    "VmafMin": 75.70087,
+    "VmafWorstScene": 82.793618475,
+    "Bilinmiyor": null
+  },
+  {
+    "Pencere": "p3-hareketli",
+    "Kol": "taban-2",
+    "GerceklesenMb": 58.954989433288574,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": true,
+    "VmafMean": 86.11850900555584,
+    "VmafP10": 81.7690351,
+    "VmafMin": 76.252103,
+    "VmafWorstScene": 82.64580975833336,
+    "Bilinmiyor": null
+  },
+  {
+    "Pencere": "p3-hareketli",
+    "Kol": "taban-3",
+    "GerceklesenMb": 58.95542526245117,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": true,
+    "VmafMean": 86.11377583527792,
+    "VmafP10": 81.8303366,
+    "VmafMin": 76.07933,
+    "VmafWorstScene": 82.73659406666668,
+    "Bilinmiyor": null
+  }
+]
