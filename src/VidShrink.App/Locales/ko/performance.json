@@ -1,0 +1,36 @@
+{
+  "performance.title": "성능 검사",
+  "performance.run": "검사 실행",
+  "performance.running": "측정 중 — 짧은 인코딩 몇 번을 실행하며 최대 20초 걸립니다.",
+  "performance.failed": "검사를 끝낼 수 없습니다",
+
+  "performance.headline.hardware-offloaded": "이 컴퓨터에는 작동하는 하드웨어 인코더가 있고 그 패스는 프로세서에 의존하지 않습니다.",
+  "performance.headline.hardware": "이 컴퓨터에는 작동하는 하드웨어 인코더가 있지만, 프로세서가 그 패스를 떠맡는지는 여기서 측정되지 않았습니다.",
+  "performance.headline.software-heavy": "작동하는 하드웨어 인코더가 없고, 소프트웨어 인코딩은 실시간을 따라가려면 프로세서 코어 하나를 통째로 요구합니다.",
+  "performance.headline.software-light": "작동하는 하드웨어 인코더가 없지만, 소프트웨어 인코딩은 실시간에서 프로세서 코어 하나 미만에 머뭅니다.",
+  "performance.headline.not-enough": "질문에 답하기에는 측정된 것이 충분하지 않습니다.",
+
+  "performance.line.not-measured": "이 컴퓨터에서 아직 아무것도 측정되지 않았습니다.",
+  "performance.line.no-hardware": "여기에는 하드웨어 비디오 인코더가 없어 인코딩이 프로세서에서 실행됩니다.",
+  "performance.line.hardware-failed": "이 컴퓨터에 하드웨어 인코더가 나열되어 있지만 테스트 인코딩이 실패했습니다.",
+  "performance.line.hardware-works": "이 컴퓨터에서 하드웨어 인코딩이 작동합니다.",
+  "performance.line.hardware-not-cpu-bound": "하드웨어 패스는 프로세서에 의존하지 않습니다. 스레드 하나를 주든 자유롭게 두든 {0}× 이내로 같은 시간이 걸렸습니다.",
+  "performance.line.hardware-cost-unknown": "하드웨어 패스의 프로세서 비용은 측정되지 않았으므로 무료로 읽어서는 안 됩니다.",
+  "performance.line.hardware-headroom": "하드웨어 패스는 실시간의 {0}× 속도로 실행되었습니다.",
+  "performance.line.software-realtime": "소프트웨어 인코딩은 논리 코어 {1}개 중 {0}개가 있어야 실시간을 따라갑니다.",
+  "performance.line.software-costs-cores": "코어 하나 이상({0}개)이므로 소프트웨어 인코딩은 실행되는 동안 코어 하나를 차지합니다.",
+  "performance.line.software-small": "코어 하나 미만({0}개)에 머무르므로 다른 작업이 남긴 틈에 분산할 수 있습니다.",
+  "performance.line.cpu-unreliable": "이 컴퓨터의 프로세서 시간 카운터는 신뢰할 수 없어(벽시계 대비 {0}×) 프로세서 시간은 표시하지만 그것으로 아무것도 결정하지 않습니다.",
+  "performance.line.budget-exhausted": "측정 예산이 소진되어({1} ms 중 {0} ms) 검사의 한 부분이 빠졌습니다.",
+  "performance.boundary": "VidShrink는 영상을 캡처하지 않습니다. 여기서 측정하는 것은 이 컴퓨터에서 인코딩에 드는 비용이지 캡처 도구가 하는 일이 아닙니다. 캡처 도구 자체의 인코더 설정을 먼저 살펴보세요.",
+
+  "performance.fact.hardware-encoder": "하드웨어 인코더",
+  "performance.fact.hardware-pipeline": "하드웨어 파이프라인",
+  "performance.fact.software-encoder": "소프트웨어 인코더",
+  "performance.fact.software-cost": "소프트웨어 비용",
+  "performance.fact.logical-cores": "논리 코어",
+  "performance.fact.measured-in": "측정 시간",
+  "performance.value.realtime": "실시간 {0}×",
+  "performance.value.cores": "코어 {0}개",
+  "performance.value.ms": "{0} ms"
+}

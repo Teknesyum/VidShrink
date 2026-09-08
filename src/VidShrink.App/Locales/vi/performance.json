@@ -1,0 +1,36 @@
+{
+  "performance.title": "Kiểm tra hiệu năng",
+  "performance.run": "Chạy kiểm tra",
+  "performance.running": "Đang đo — chạy vài lần mã hóa ngắn, mất tới hai mươi giây.",
+  "performance.failed": "Kiểm tra không hoàn tất được",
+
+  "performance.headline.hardware-offloaded": "Máy này có bộ mã hóa phần cứng hoạt động và lượt đó không dựa vào bộ xử lý.",
+  "performance.headline.hardware": "Máy này có bộ mã hóa phần cứng hoạt động, nhưng chưa đo được bộ xử lý có gánh lượt đó hay không.",
+  "performance.headline.software-heavy": "Không tìm thấy bộ mã hóa phần cứng hoạt động, và mã hóa phần mềm cần trọn một lõi xử lý để theo kịp thời gian thực.",
+  "performance.headline.software-light": "Không tìm thấy bộ mã hóa phần cứng hoạt động, nhưng mã hóa phần mềm dưới một lõi xử lý ở thời gian thực.",
+  "performance.headline.not-enough": "Chưa đo đủ ở đây để trả lời câu hỏi.",
+
+  "performance.line.not-measured": "Chưa đo gì trên máy này.",
+  "performance.line.no-hardware": "Không có bộ mã hóa video phần cứng ở đây, nên mã hóa chạy trên bộ xử lý.",
+  "performance.line.hardware-failed": "Máy này có liệt kê bộ mã hóa phần cứng, nhưng lần mã hóa thử của nó thất bại.",
+  "performance.line.hardware-works": "Mã hóa phần cứng hoạt động trên máy này.",
+  "performance.line.hardware-not-cpu-bound": "Lượt phần cứng không dựa vào bộ xử lý: giao một luồng hay để luồng tự do đều mất thời gian như nhau, trong khoảng {0}×.",
+  "performance.line.hardware-cost-unknown": "Chi phí bộ xử lý của lượt phần cứng chưa được đo, nên không được coi là miễn phí.",
+  "performance.line.hardware-headroom": "Lượt phần cứng chạy ở {0}× thời gian thực.",
+  "performance.line.software-realtime": "Mã hóa phần mềm cần {0} lõi để theo kịp thời gian thực, trên {1} lõi logic.",
+  "performance.line.software-costs-cores": "Đó là trọn một lõi trở lên ({0} lõi), nên mã hóa phần mềm chiếm một lõi suốt lúc chạy.",
+  "performance.line.software-small": "Mức đó dưới một lõi ({0} lõi), nên có thể chen vào khoảng trống của việc khác.",
+  "performance.line.cpu-unreliable": "Bộ đếm thời gian xử lý trên máy này không đáng tin ({0}× so với đồng hồ thực), nên thời gian xử lý được hiển thị nhưng không quyết định gì từ đó.",
+  "performance.line.budget-exhausted": "Ngân sách đo đã hết ({0} ms trên {1} ms), nên thiếu một nhánh kiểm tra.",
+  "performance.boundary": "VidShrink không quay video. Thứ đo ở đây là chi phí mã hóa trên máy này, không phải công cụ quay làm gì với nó — cài đặt bộ mã hóa của chính công cụ đó là nơi cần xem trước.",
+
+  "performance.fact.hardware-encoder": "Bộ mã hóa phần cứng",
+  "performance.fact.hardware-pipeline": "Đường phần cứng",
+  "performance.fact.software-encoder": "Bộ mã hóa phần mềm",
+  "performance.fact.software-cost": "Chi phí phần mềm",
+  "performance.fact.logical-cores": "Lõi logic",
+  "performance.fact.measured-in": "Đo trong",
+  "performance.value.realtime": "{0}× thời gian thực",
+  "performance.value.cores": "{0} lõi",
+  "performance.value.ms": "{0} ms"
+}

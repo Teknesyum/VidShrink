@@ -1,0 +1,36 @@
+{
+  "performance.title": "Pemeriksaan performa",
+  "performance.run": "Jalankan pemeriksaan",
+  "performance.running": "Mengukur — menjalankan beberapa encode singkat, hingga dua puluh detik.",
+  "performance.failed": "Pemeriksaan tidak dapat diselesaikan",
+
+  "performance.headline.hardware-offloaded": "Mesin ini punya encoder perangkat keras yang berfungsi dan jalur itu tidak membebani prosesor.",
+  "performance.headline.hardware": "Mesin ini punya encoder perangkat keras yang berfungsi, tetapi beban prosesor pada jalur itu tidak diukur di sini.",
+  "performance.headline.software-heavy": "Tidak ada encoder perangkat keras yang berfungsi, dan encoding perangkat lunak butuh satu inti prosesor penuh untuk mengejar waktu nyata.",
+  "performance.headline.software-light": "Tidak ada encoder perangkat keras yang berfungsi, tetapi encoding perangkat lunak tetap di bawah satu inti prosesor pada waktu nyata.",
+  "performance.headline.not-enough": "Pengukuran di sini belum cukup untuk menjawab pertanyaan itu.",
+
+  "performance.line.not-measured": "Belum ada yang diukur di mesin ini.",
+  "performance.line.no-hardware": "Tidak ada encoder video perangkat keras di sini, jadi encoding berjalan di prosesor.",
+  "performance.line.hardware-failed": "Ada encoder perangkat keras terdaftar di mesin ini, tetapi encode ujinya gagal.",
+  "performance.line.hardware-works": "Encoding perangkat keras berfungsi di mesin ini.",
+  "performance.line.hardware-not-cpu-bound": "Jalur perangkat keras tidak membebani prosesor: memberi satu thread atau membiarkan thread bebas memakan waktu yang sama, dalam {0}×.",
+  "performance.line.hardware-cost-unknown": "Beban prosesor jalur perangkat keras tidak diukur, jadi jangan dianggap gratis.",
+  "performance.line.hardware-headroom": "Jalur perangkat keras berjalan pada {0}× waktu nyata.",
+  "performance.line.software-realtime": "Encoding perangkat lunak butuh {0} inti untuk mengejar waktu nyata, dari {1} inti logis.",
+  "performance.line.software-costs-cores": "Itu satu inti penuh atau lebih ({0} inti), jadi encoding perangkat lunak menguasai satu inti selama berjalan.",
+  "performance.line.software-small": "Itu tetap di bawah satu inti ({0} inti), jadi bisa disebar ke celah yang ditinggalkan pekerjaan lain.",
+  "performance.line.cpu-unreliable": "Penghitung waktu prosesor di mesin ini tidak andal ({0}× terhadap jam dinding), jadi waktu prosesor ditampilkan tetapi tidak dijadikan dasar keputusan.",
+  "performance.line.budget-exhausted": "Anggaran pengukuran habis ({0} ms dari {1} ms), jadi satu bagian pemeriksaan hilang.",
+  "performance.boundary": "VidShrink tidak merekam video. Yang diukur di sini adalah biaya encoding di mesin ini, bukan apa yang dilakukan alat perekam — pengaturan encoder alat itu adalah tempat pertama untuk dicek.",
+
+  "performance.fact.hardware-encoder": "Encoder perangkat keras",
+  "performance.fact.hardware-pipeline": "Jalur perangkat keras",
+  "performance.fact.software-encoder": "Encoder perangkat lunak",
+  "performance.fact.software-cost": "Biaya perangkat lunak",
+  "performance.fact.logical-cores": "Inti logis",
+  "performance.fact.measured-in": "Diukur dalam",
+  "performance.value.realtime": "{0}× waktu nyata",
+  "performance.value.cores": "{0} inti",
+  "performance.value.ms": "{0} ms"
+}

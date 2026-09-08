@@ -1,0 +1,36 @@
+{
+  "performance.title": "فحص الأداء",
+  "performance.run": "تشغيل الفحص",
+  "performance.running": "جارٍ القياس — يجري بضعة ترميزات قصيرة ويستغرق حتى عشرين ثانية.",
+  "performance.failed": "تعذر إتمام الفحص",
+
+  "performance.headline.hardware-offloaded": "هذا الجهاز فيه مرمّز عتادي يعمل وتلك التمريرة لا تعتمد على المعالج.",
+  "performance.headline.hardware": "هذا الجهاز فيه مرمّز عتادي يعمل، لكن لم يُقس هنا إن كان المعالج يحمل تلك التمريرة.",
+  "performance.headline.software-heavy": "لم يُعثر على مرمّز عتادي يعمل، والترميز البرمجي يحتاج نواة معالج كاملة لمجاراة الوقت الفعلي.",
+  "performance.headline.software-light": "لم يُعثر على مرمّز عتادي يعمل، لكن الترميز البرمجي يبقى تحت نواة معالج واحدة بالوقت الفعلي.",
+  "performance.headline.not-enough": "القياسات هنا لا تكفي للإجابة عن السؤال.",
+
+  "performance.line.not-measured": "لم يُقس شيء على هذا الجهاز بعد.",
+  "performance.line.no-hardware": "لا مرمّز فيديو عتادي متاح هنا، فيجري الترميز على المعالج.",
+  "performance.line.hardware-failed": "مرمّز عتادي مدرج على هذا الجهاز، لكن ترميزه الاختباري فشل.",
+  "performance.line.hardware-works": "الترميز العتادي يعمل على هذا الجهاز.",
+  "performance.line.hardware-not-cpu-bound": "التمريرة العتادية لا تعتمد على المعالج: إعطاؤها خيطاً واحداً أو ترك الخيوط حرة استغرق الوقت نفسه، ضمن {0}×.",
+  "performance.line.hardware-cost-unknown": "لم تُقس كلفة التمريرة العتادية على المعالج، فلا يجوز عدّها مجانية.",
+  "performance.line.hardware-headroom": "جرت التمريرة العتادية بسرعة {0}× الوقت الفعلي.",
+  "performance.line.software-realtime": "الترميز البرمجي يحتاج {0} نواة لمجاراة الوقت الفعلي، من {1} نواة منطقية.",
+  "performance.line.software-costs-cores": "هذه نواة كاملة أو أكثر ({0} نواة)، فالترميز البرمجي يستأثر بنواة ما دام يعمل.",
+  "performance.line.software-small": "هذا يبقى تحت نواة واحدة ({0} نواة)، فيمكن توزيعه في الفجوات التي يتركها عمل آخر.",
+  "performance.line.cpu-unreliable": "عدّاد وقت المعالج على هذا الجهاز غير موثوق ({0}× مقابل ساعة الحائط)، فتُعرض أوقات المعالج لكن لا يُقرر منها شيء.",
+  "performance.line.budget-exhausted": "نفدت ميزانية القياس ({0} م.ث من {1} م.ث)، فأحد أطراف الفحص ناقص.",
+  "performance.boundary": "VidShrink لا يلتقط الفيديو. ما يُقاس هنا هو كلفة الترميز على هذا الجهاز، لا ما تفعله أداة الالتقاط به — إعداد مرمّزها هو أول مكان للنظر.",
+
+  "performance.fact.hardware-encoder": "المرمّز العتادي",
+  "performance.fact.hardware-pipeline": "خط الأنابيب العتادي",
+  "performance.fact.software-encoder": "المرمّز البرمجي",
+  "performance.fact.software-cost": "الكلفة البرمجية",
+  "performance.fact.logical-cores": "الأنوية المنطقية",
+  "performance.fact.measured-in": "قيس في",
+  "performance.value.realtime": "{0}× الوقت الفعلي",
+  "performance.value.cores": "{0} نواة",
+  "performance.value.ms": "{0} م.ث"
+}

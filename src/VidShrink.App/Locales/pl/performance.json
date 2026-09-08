@@ -1,0 +1,36 @@
+{
+  "performance.title": "Test wydajności",
+  "performance.run": "Uruchom test",
+  "performance.running": "Pomiar — wykonuje kilka krótkich kodowań i trwa do dwudziestu sekund.",
+  "performance.failed": "Test nie mógł się zakończyć",
+
+  "performance.headline.hardware-offloaded": "Ta maszyna ma działający koder sprzętowy, a ten przebieg nie obciąża procesora.",
+  "performance.headline.hardware": "Ta maszyna ma działający koder sprzętowy, ale nie zmierzono tu, czy procesor dźwiga ten przebieg.",
+  "performance.headline.software-heavy": "Nie znaleziono działającego kodera sprzętowego, a kodowanie programowe potrzebuje całego rdzenia, by nadążyć w czasie rzeczywistym.",
+  "performance.headline.software-light": "Nie znaleziono działającego kodera sprzętowego, ale kodowanie programowe mieści się poniżej jednego rdzenia w czasie rzeczywistym.",
+  "performance.headline.not-enough": "Zmierzono tu za mało, by odpowiedzieć na pytanie.",
+
+  "performance.line.not-measured": "Na tej maszynie nic jeszcze nie zmierzono.",
+  "performance.line.no-hardware": "Nie ma tu sprzętowego kodera wideo, więc kodowanie działa na procesorze.",
+  "performance.line.hardware-failed": "Na tej maszynie widnieje koder sprzętowy, ale jego kodowanie testowe nie powiodło się.",
+  "performance.line.hardware-works": "Kodowanie sprzętowe działa na tej maszynie.",
+  "performance.line.hardware-not-cpu-bound": "Przebieg sprzętowy nie obciąża procesora: jeden wątek lub wolne wątki dały ten sam czas, w granicach {0}×.",
+  "performance.line.hardware-cost-unknown": "Koszt procesora przebiegu sprzętowego nie został zmierzony, więc nie można go uznać za darmowy.",
+  "performance.line.hardware-headroom": "Przebieg sprzętowy działał z prędkością {0}× czasu rzeczywistego.",
+  "performance.line.software-realtime": "Kodowanie programowe potrzebuje {0} rdzeni, by nadążyć w czasie rzeczywistym, na {1} rdzeniach logicznych.",
+  "performance.line.software-costs-cores": "To cały rdzeń lub więcej ({0} rdzeni), więc kodowanie programowe zajmuje jeden rdzeń przez cały czas działania.",
+  "performance.line.software-small": "To mniej niż jeden rdzeń ({0} rdzeni), więc można je rozłożyć w przerwach po innej pracy.",
+  "performance.line.cpu-unreliable": "Licznik czasu procesora na tej maszynie nie jest wiarygodny ({0}× wobec zegara ściennego), więc czasy procesora są pokazane, ale nic się z nich nie rozstrzyga.",
+  "performance.line.budget-exhausted": "Budżet pomiaru wyczerpał się ({0} ms z {1} ms), więc brakuje jednej części testu.",
+  "performance.boundary": "VidShrink nie nagrywa wideo. Mierzone jest tu, ile kosztuje kodowanie na tej maszynie, nie to, co robi z nim narzędzie do nagrywania — jego własne ustawienie kodera to pierwsze miejsce do sprawdzenia.",
+
+  "performance.fact.hardware-encoder": "Koder sprzętowy",
+  "performance.fact.hardware-pipeline": "Potok sprzętowy",
+  "performance.fact.software-encoder": "Koder programowy",
+  "performance.fact.software-cost": "Koszt programowy",
+  "performance.fact.logical-cores": "Rdzenie logiczne",
+  "performance.fact.measured-in": "Zmierzono w",
+  "performance.value.realtime": "{0}× czasu rzecz.",
+  "performance.value.cores": "{0} rdzeni",
+  "performance.value.ms": "{0} ms"
+}
