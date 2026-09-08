@@ -121,7 +121,10 @@ Ham cikti: `.calisma/T192/k4-kirmizi.txt` (`TuretmeSatiriHedefKutusunuIzler`).
 
 ## 5. Kaynak bilgi etiketleri - kusur degil
 
-Sirasinda "Turkce etiket kendi hucresinden tasiyor" diye bir suphe vardi. Olculdu:
+Sirasinda "Turkce etiket kendi hucresinden tasiyor" diye bir suphe vardi ve olcusu
+yarim birakilmisti: sinav `.Where(pair => true)` yaziyordu, yani hucre genisligine hic
+bakmadan her etiketi tasmis sayiyordu ve iki dilde de kirmizi doner, hicbir sey
+soylemezdi. Gercek kosul (`metin genisligi > hucre genisligi`) yazildi ve olculdu:
 tasmiyor. `InfoGrid` bir `UniformGrid` ve hucre genisligi **her iki pencere olcusunde
 de 140 px** - ayar paneli sabit genislikte, pencereyle buyuyup kuculmuyor. En genis
 etiket `Video Kodegi` 112,6 px; 27,4 px bosluk kaliyor.
@@ -145,6 +148,13 @@ Etiketlerdeki `TextWrapping="Wrap"` yerinde birakildi. Olculen bir kusuru kapatm
 daha uzun bir cevirinin ileride tasmasina karsi onlem; boyle isaretlendi ki sonradan
 "bu bir duzeltmeydi" diye okunmasin.
 
+## K7 - temizlik
+
+T192 hicbir `//` satir yorumu eklemedi (`git diff origin/main...HEAD -- src tests |
+grep '^\+\s*//'` bos). `MainWindow.axaml` ve `MainWindow.axaml.cs` BOM tasiyor ama bu
+BOM `origin/main`den geliyor, T192 getirmedi; ayni dosyalar main'de de ayni sekilde
+duruyor, silmek bu sozlesmenin isi degil. `owns` disina yazilmadi.
+
 ## Kalan
 
 **K5 - kareler yenilenmedi, T0'a birakildi.** `tools/VidShrink.Shot` ve
@@ -158,15 +168,30 @@ arayuzun gercek bir ekran goruntusune bakilmadi; onu K5 ile birlikte T0 gorecek.
 
 `dotnet build -c Release`: 0 uyari, 0 hata.
 
-Duzeltmelerden onceki tam kosu (`.calisma/T192/test-taban.txt`): 1949 testten 7'si
-kirmizi - 6'si bu sozlesmenin gosterim icin bilerek geri alinmis duzeltmeleri, 1'i
-asagidaki.
+| Tam kosu | Toplam | Gecti | Kaldi | Atlandi | Ham cikti |
+|---|---|---|---|---|---|
+| Duzeltmelerden **once** | 1949 | 1924 | 7 | 18 | `.calisma/T192/test-taban.txt` |
+| Duzeltmelerden **sonra** | 1949 | 1930 | 1 | 18 | `.calisma/T192/test-son.txt` |
+
+Kapanan alti kirmizinin hepsi ayni sebepten degildi; ikisi yerlesim kusuru degil,
+olcunun kendi kusuruydu:
+
+| Kirmizi olcu | Neden kirmiziydi | Nasil kapandi |
+|---|---|---|
+| `KatlanmisBolumOzetiSatirinIcindeKalir` (3 ozet) | gercek kusur, madde 3 | satir `Grid`e cevrildi |
+| `TuretmeSatiriHedefKutusunuIzler` | gercek kusur, madde 4 | erken donus kaldirildi |
+| `KaynakBilgiEtiketleriKendiHucresindeKalir` (2 dil) | **olcu yarim kalmisti**: sinav `.Where(pair => true)` idi, yani her hucreyi tasmis sayiyordu | gercek tasma kosulu yazildi; madde 5'te goruldugu gibi ortada tasma yok |
+
+Geriye kalan tek kirmizi asagidaki.
 
 **`OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
 - T192 disi, duzeltilmedi.** Test Windows'un `System` surecini (PID 4) aliyor ve
 `HasExited` okuyor; yukseltilmemis oturumda `Win32Exception: Erisim engellendi`
-firlatiyor. Ne test dosyasina ne `DecoderPipe`'a T192 dokundu; `git diff
-origin/main...HEAD` o yollarda bos. Makine ve izin kosuluna bagli, ayri bir is.
+firlatiyor. Bu oturum yukseltilmemis - `WindowsPrincipal.IsInRole(Administrator)`
+`False` donuyor (`.calisma/T192/yukseltilmis-mi.txt`). Ne test dosyasina ne
+`DecoderPipe`'a T192 dokundu; `git diff origin/main...HEAD` o yollarda bos. Test
+dosyasina en son T182 dokunmus (`9bb92ba`, `main` uzerinde). Makine ve izin kosuluna
+bagli, ayri bir is.
 
 K6 pimleri (`WindowLayoutTests`, `AyarYuzeyiTests`, `QualityTargetUiTests`): 55/55
 yesil, hicbiri yeniden temellendirilmedi - ham cikti `.calisma/T192/k6-pimler.txt`.
