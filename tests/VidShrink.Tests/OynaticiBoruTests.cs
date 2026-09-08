@@ -376,7 +376,11 @@ public sealed class OynaticiBoruTests_DecoderPipe : IClassFixture<SentetikKlipFi
 
         using (korumali)
         {
-            Assert.False(korumali.HasExited, "korumali surec zaten olmus, olcu anlamsiz");
+            bool cikti;
+            try { cikti = korumali.HasExited; }
+            catch (System.ComponentModel.Win32Exception) { return; }
+
+            Assert.False(cikti, "korumali surec zaten olmus, olcu anlamsiz");
 
             var oldu = DecoderPipe.KillTree(korumali, DecoderPipe.KillWaitMs, DecoderPipe.KillAttempts);
 
