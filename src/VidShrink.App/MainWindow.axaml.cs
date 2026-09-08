@@ -1652,7 +1652,7 @@ public partial class MainWindow : Window
         double size = bytes;
         var unit = 0;
         while (size >= 1024 && unit < units.Length - 1) { size /= 1024; unit++; }
-        return $"{size.ToString("0.##", CultureInfo.InvariantCulture)} {units[unit]}";
+        return $"{Num(size, "0.##")} {units[unit]}";
     }
 
     private void OnAutoUpdateChanged()
@@ -3302,8 +3302,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowQualityTargetBound(QualityTargetResult result, double mb)
     {
-        var target = mb.ToString("0.##", CultureInfo.InvariantCulture);
-        var reached = result.PredictedQuality.ToString("0.#", CultureInfo.InvariantCulture);
+        var target = Num(mb, "0.##");
+        var reached = Num(result.PredictedQuality, "0.#");
 
         SetQualityTargetNotice(result.Bound switch
         {

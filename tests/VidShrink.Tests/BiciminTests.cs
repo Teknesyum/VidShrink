@@ -96,6 +96,22 @@ public sealed class BiciminTests : IDisposable
         Assert.Equal(beklenen, satir);
     }
 
+    /// <summary>
+    /// T192 tur 2 K9: <c>DescribeBytes</c> paylasim tavanini ekrana yaziyor
+    /// (<c>TxtShareCeiling</c>). Tam ikilik katlar (128 MiB, 25 GiB) ondalik tasimadigi
+    /// icin <c>SettingsTabTests</c>'teki pimler bu degisiklikten etkilenmiyor; ondalikli
+    /// bir tavan ise dile uyar.
+    /// </summary>
+    [Theory]
+    [InlineData("en", "1.5 GiB")]
+    [InlineData("tr", "1,5 GiB")]
+    public void PaylasimTavaniDileUyar(string dil, string beklenen)
+    {
+        Strings.Use(dil);
+
+        Assert.Equal(beklenen, MainWindow.DescribeBytes(1_610_612_736L));
+    }
+
     [Theory]
     [InlineData("playback.panel.hint", false)]
     [InlineData("main.plan.title", false)]
