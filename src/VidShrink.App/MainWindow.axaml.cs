@@ -3218,7 +3218,6 @@ public partial class MainWindow : Window
     /// </summary>
     private void RestoreSizeCap()
     {
-        if (_chipSizeCapped) return;
         _chipSizeCapped = true;
         RefreshChipDerivation();
         RefreshSectionSummaries();

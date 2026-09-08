@@ -196,7 +196,7 @@ public sealed class KareYerlesimTests
             return grid.Children
                 .OfType<StackPanel>()
                 .Select(cell => (cell, label: cell.Children.OfType<TextBlock>().First()))
-                .Where(pair => true)
+                .Where(pair => pair.label.TextLayout.Width > pair.cell.Bounds.Width + 0.5)
                 .Select(pair => $"{pair.label.Text}: metin {pair.label.TextLayout.Width:0.#} px, hucre {pair.cell.Bounds.Width:0.#} px")
                 .ToList();
         });
