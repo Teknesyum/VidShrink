@@ -1,0 +1,36 @@
+{
+  "performance.title": "パフォーマンス確認",
+  "performance.run": "確認を実行",
+  "performance.running": "測定中 — 短いエンコードを数回行い、最大20秒かかります。",
+  "performance.failed": "確認を完了できませんでした",
+
+  "performance.headline.hardware-offloaded": "このマシンには動作するハードウェアエンコーダーがあり、その処理はプロセッサに負荷をかけません。",
+  "performance.headline.hardware": "このマシンには動作するハードウェアエンコーダーがありますが、その処理がプロセッサに負荷をかけるかはここでは測定されていません。",
+  "performance.headline.software-heavy": "動作するハードウェアエンコーダーは見つからず、ソフトウェアエンコードはリアルタイムに追いつくためにプロセッサコアを丸ごと1つ必要とします。",
+  "performance.headline.software-light": "動作するハードウェアエンコーダーは見つかりませんでしたが、ソフトウェアエンコードはリアルタイムでもプロセッサコア1つ未満に収まります。",
+  "performance.headline.not-enough": "この問いに答えるには測定結果が足りません。",
+
+  "performance.line.not-measured": "このマシンではまだ何も測定されていません。",
+  "performance.line.no-hardware": "ここではハードウェアビデオエンコーダーが利用できないため、エンコードはプロセッサで実行されます。",
+  "performance.line.hardware-failed": "このマシンにはハードウェアエンコーダーが列挙されていますが、テストエンコードに失敗しました。",
+  "performance.line.hardware-works": "このマシンではハードウェアエンコードが動作します。",
+  "performance.line.hardware-not-cpu-bound": "ハードウェア処理はプロセッサに負荷をかけません: スレッド1つに制限しても、スレッドを制限しなくても、所要時間は{0}×以内で同じでした。",
+  "performance.line.hardware-cost-unknown": "ハードウェア処理のプロセッサ負荷は測定されていないため、無料とみなしてはいけません。",
+  "performance.line.hardware-headroom": "ハードウェア処理はリアルタイムの{0}×で実行されました。",
+  "performance.line.software-realtime": "ソフトウェアエンコードはリアルタイムに追いつくために{0}コアを必要とします(論理コア数 {1})。",
+  "performance.line.software-costs-cores": "これはコア1つ以上({0}コア)にあたるため、ソフトウェアエンコードは実行中ずっとコア1つを占有します。",
+  "performance.line.software-small": "これはコア1つ未満({0}コア)に収まるため、他の作業の隙間に分散できます。",
+  "performance.line.cpu-unreliable": "このマシンのプロセッサ時間カウンターは信頼できません(実時間に対して{0}×)。プロセッサ時間は表示されますが、そこからは何も判断されません。",
+  "performance.line.budget-exhausted": "測定予算を使い切ったため({1} ms中{0} ms)、確認の一部が欠けています。",
+  "performance.boundary": "VidShrinkは映像をキャプチャしません。ここで測定されるのはこのマシンでのエンコードコストであり、キャプチャツールの挙動ではありません — まずはそのツール自身のエンコーダー設定を確認してください。",
+
+  "performance.fact.hardware-encoder": "ハードウェアエンコーダー",
+  "performance.fact.hardware-pipeline": "ハードウェアパイプライン",
+  "performance.fact.software-encoder": "ソフトウェアエンコーダー",
+  "performance.fact.software-cost": "ソフトウェア負荷",
+  "performance.fact.logical-cores": "論理コア",
+  "performance.fact.measured-in": "測定時間",
+  "performance.value.realtime": "リアルタイムの{0}×",
+  "performance.value.cores": "{0}コア",
+  "performance.value.ms": "{0} ms"
+}

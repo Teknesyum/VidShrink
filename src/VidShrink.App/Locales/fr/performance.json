@@ -1,0 +1,36 @@
+{
+  "performance.title": "Test de performance",
+  "performance.run": "Lancer le test",
+  "performance.running": "Mesure en cours — quelques encodages courts, jusqu'à vingt secondes.",
+  "performance.failed": "Le test n'a pas pu se terminer",
+
+  "performance.headline.hardware-offloaded": "Cette machine a un encodeur matériel fonctionnel et cette passe ne sollicite pas le processeur.",
+  "performance.headline.hardware": "Cette machine a un encodeur matériel fonctionnel, mais la charge de cette passe sur le processeur n'a pas été mesurée ici.",
+  "performance.headline.software-heavy": "Aucun encodeur matériel fonctionnel trouvé, et l'encodage logiciel a besoin d'un cœur entier pour suivre le temps réel.",
+  "performance.headline.software-light": "Aucun encodeur matériel fonctionnel trouvé, mais l'encodage logiciel reste sous un cœur en temps réel.",
+  "performance.headline.not-enough": "Les mesures ne suffisent pas pour répondre à la question.",
+
+  "performance.line.not-measured": "Rien n'a encore été mesuré sur cette machine.",
+  "performance.line.no-hardware": "Aucun encodeur vidéo matériel n'est disponible ici, l'encodage tourne donc sur le processeur.",
+  "performance.line.hardware-failed": "Un encodeur matériel est présent sur cette machine, mais son encodage de test a échoué.",
+  "performance.line.hardware-works": "L'encodage matériel fonctionne sur cette machine.",
+  "performance.line.hardware-not-cpu-bound": "La passe matérielle ne sollicite pas le processeur : avec un seul thread ou sans limite, le temps est resté le même, à {0}× près.",
+  "performance.line.hardware-cost-unknown": "Le coût processeur de la passe matérielle n'a pas été mesuré ; il ne doit pas être considéré comme nul.",
+  "performance.line.hardware-headroom": "La passe matérielle a tourné à {0}× le temps réel.",
+  "performance.line.software-realtime": "L'encodage logiciel a besoin de {0} cœurs pour suivre le temps réel, sur {1} cœurs logiques.",
+  "performance.line.software-costs-cores": "C'est un cœur entier ou plus ({0} cœurs) : l'encodage logiciel occupe un cœur tant qu'il tourne.",
+  "performance.line.software-small": "Cela reste sous un cœur ({0} cœurs) : il peut se glisser dans les creux laissés par les autres tâches.",
+  "performance.line.cpu-unreliable": "Le compteur de temps processeur de cette machine n'est pas fiable ({0}× par rapport à l'horloge) ; les temps sont affichés mais rien n'en est déduit.",
+  "performance.line.budget-exhausted": "Le budget de mesure est épuisé ({0} ms sur {1} ms) ; une partie du test manque.",
+  "performance.boundary": "VidShrink ne capture pas de vidéo. Ce qui est mesuré ici est le coût de l'encodage sur cette machine, pas ce qu'en fait un outil de capture — son propre réglage d'encodeur est le premier endroit à vérifier.",
+
+  "performance.fact.hardware-encoder": "Encodeur matériel",
+  "performance.fact.hardware-pipeline": "Chaîne matérielle",
+  "performance.fact.software-encoder": "Encodeur logiciel",
+  "performance.fact.software-cost": "Coût logiciel",
+  "performance.fact.logical-cores": "Cœurs logiques",
+  "performance.fact.measured-in": "Mesuré en",
+  "performance.value.realtime": "{0}× temps réel",
+  "performance.value.cores": "{0} cœurs",
+  "performance.value.ms": "{0} ms"
+}

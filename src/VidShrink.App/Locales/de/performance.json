@@ -1,0 +1,36 @@
+{
+  "performance.title": "Leistungsprüfung",
+  "performance.run": "Prüfung starten",
+  "performance.running": "Messung läuft — einige kurze Encodes, bis zu zwanzig Sekunden.",
+  "performance.failed": "Die Prüfung konnte nicht abgeschlossen werden",
+
+  "performance.headline.hardware-offloaded": "Dieser Rechner hat einen funktionierenden Hardware-Encoder, und dieser Durchlauf belastet den Prozessor nicht.",
+  "performance.headline.hardware": "Dieser Rechner hat einen funktionierenden Hardware-Encoder, aber ob der Prozessor diesen Durchlauf trägt, wurde hier nicht gemessen.",
+  "performance.headline.software-heavy": "Kein funktionierender Hardware-Encoder gefunden; Software-Encoding braucht einen ganzen Prozessorkern, um Echtzeit zu halten.",
+  "performance.headline.software-light": "Kein funktionierender Hardware-Encoder gefunden, aber Software-Encoding bleibt in Echtzeit unter einem Prozessorkern.",
+  "performance.headline.not-enough": "Es wurde nicht genug gemessen, um die Frage zu beantworten.",
+
+  "performance.line.not-measured": "Auf diesem Rechner wurde noch nichts gemessen.",
+  "performance.line.no-hardware": "Hier ist kein Hardware-Video-Encoder verfügbar, daher läuft das Encoding auf dem Prozessor.",
+  "performance.line.hardware-failed": "Auf diesem Rechner ist ein Hardware-Encoder gelistet, aber sein Test-Encode ist fehlgeschlagen.",
+  "performance.line.hardware-works": "Hardware-Encoding funktioniert auf diesem Rechner.",
+  "performance.line.hardware-not-cpu-bound": "Der Hardware-Durchlauf belastet den Prozessor nicht: mit einem Thread oder freien Threads dauerte er gleich lang, innerhalb von {0}×.",
+  "performance.line.hardware-cost-unknown": "Die Prozessorlast des Hardware-Durchlaufs wurde nicht gemessen, sie darf also nicht als kostenlos gelten.",
+  "performance.line.hardware-headroom": "Der Hardware-Durchlauf lief mit {0}× Echtzeit.",
+  "performance.line.software-realtime": "Software-Encoding braucht {0} Kerne für Echtzeit, bei {1} logischen Kernen.",
+  "performance.line.software-costs-cores": "Das ist ein ganzer Kern oder mehr ({0} Kerne), also belegt Software-Encoding einen Kern, solange es läuft.",
+  "performance.line.software-small": "Das bleibt unter einem Kern ({0} Kerne), es lässt sich also in die Lücken anderer Arbeit verteilen.",
+  "performance.line.cpu-unreliable": "Der Prozessorzeit-Zähler dieses Rechners ist nicht verlässlich ({0}× gegenüber der Uhrzeit); Prozessorzeiten werden angezeigt, aber nichts wird daraus entschieden.",
+  "performance.line.budget-exhausted": "Das Messbudget ist aufgebraucht ({0} ms von {1} ms), daher fehlt ein Teil der Prüfung.",
+  "performance.boundary": "VidShrink nimmt kein Video auf. Gemessen wird, was Encoding auf diesem Rechner kostet, nicht was ein Aufnahmeprogramm damit macht — dessen eigene Encoder-Einstellung ist der erste Anhaltspunkt.",
+
+  "performance.fact.hardware-encoder": "Hardware-Encoder",
+  "performance.fact.hardware-pipeline": "Hardware-Pipeline",
+  "performance.fact.software-encoder": "Software-Encoder",
+  "performance.fact.software-cost": "Software-Last",
+  "performance.fact.logical-cores": "Logische Kerne",
+  "performance.fact.measured-in": "Gemessen in",
+  "performance.value.realtime": "{0}× Echtzeit",
+  "performance.value.cores": "{0} Kerne",
+  "performance.value.ms": "{0} ms"
+}

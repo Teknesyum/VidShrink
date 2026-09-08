@@ -64,6 +64,42 @@ public sealed class LocalizationTests : IDisposable
         Assert.True(complaints.Length == 0, complaints.ToString());
     }
 
+    /// <summary>
+    /// Yer tutucu çeviride kaybolursa cümle sayıyı yutar, fazladan gelirse program
+    /// biçimlemede patlar. Ölçü her dilin her anahtarında <c>{0}</c> kümesini
+    /// İngilizcesiyle karşılaştırıyor.
+    /// </summary>
+    [Fact]
+    public void HerDildeYerTutucularIngilizcesiyleAyni()
+    {
+        var shape = new Regex(@"\{(\d+)[^}]*\}", RegexOptions.Compiled);
+        var complaints = new StringBuilder();
+
+        SortedSet<string> SlotsOf(string language, string key)
+            => new(shape.Matches(Strings.GetIn(language, key)).Select(hit => hit.Groups[1].Value),
+                StringComparer.Ordinal);
+
+        foreach (var language in Strings.Languages)
+        {
+            if (string.Equals(language, Strings.FallbackLanguage, StringComparison.OrdinalIgnoreCase)) continue;
+
+            foreach (var key in Strings.KeysOf(Strings.FallbackLanguage))
+            {
+                var wanted = SlotsOf(Strings.FallbackLanguage, key);
+                var found = SlotsOf(language, key);
+
+                if (!wanted.SetEquals(found))
+                {
+                    complaints.AppendLine(
+                        $"'{key}' ({language}): beklenen {{{string.Join(",", wanted)}}}, " +
+                        $"bulunan {{{string.Join(",", found)}}}.");
+                }
+            }
+        }
+
+        Assert.True(complaints.Length == 0, "Yer tutucu uyuşmuyor:\n" + complaints);
+    }
+
     [Fact]
     public void SevkiyatDosyalariDuzSozlukVeAnahtarlarNoktaAyrilmisKucukHarf()
     {
