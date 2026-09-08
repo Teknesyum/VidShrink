@@ -29,6 +29,16 @@ public sealed record ReleaseManifest(
     /// eskisi gibi yalnız <c>app/</c> klasörünü günceller.
     /// </summary>
     public IReadOnlyList<ManifestFile> Launcher { get; init; } = Array.Empty<ManifestFile>();
+
+    /// <summary>
+    /// Kurulum kökünde uygulamanın yanında duran, çalışan hiçbir sürecin tutmadığı dosyalar;
+    /// bugün yalnız <c>shell/</c> klasörü. Satırları <see cref="Launcher"/> gibi kurulum
+    /// köküne göreli ve aynı başlatıcı arşivinden iniyorlar, ama yan ad + günlük + geçiş
+    /// dansına girmiyorlar: geçen sürecin kendi görüntüsü değiller, üstlerine doğrudan
+    /// yazılır. Ayrı alan olmasının sebebi <see cref="Launcher"/> ile aynı: bilinmeyen bir
+    /// üst alanı eski güncelleyici hiç görmez, <c>files</c> dizisinin şekli değişmez.
+    /// </summary>
+    public IReadOnlyList<ManifestFile> Shell { get; init; } = Array.Empty<ManifestFile>();
 }
 
 /// <summary>Mimarinin nasıl belirlendiği. Kullanıcıya ne söyleneceğini bu ayırıyor.</summary>
@@ -213,7 +223,8 @@ public static class UpdateCheck
         ReadVersionMarker(appDirectory) == manifest.Version
         && (manifest.Launcher.Count == 0
             || LauncherUpdate.ReadVersionMarker(baseDirectory) == manifest.Version
-            || LauncherUpdate.Armed(baseDirectory, manifest));
+            || LauncherUpdate.Armed(baseDirectory, manifest))
+        && ShellUpdate.Installed(baseDirectory, manifest);
 
     /// <summary>Kendini güncelleyemeyen platformlarda kullanıcıya gösterilecek komut.</summary>
     public static string UpdateInstruction()
@@ -297,7 +308,8 @@ public static class UpdateCheck
                 root.TryGetProperty("rid", out var rid) ? rid.GetString() ?? "" : "",
                 ReadFileList(root, "files"))
             {
-                Launcher = ReadFileList(root, "launcher")
+                Launcher = ReadFileList(root, "launcher"),
+                Shell = ReadFileList(root, "shell")
             };
         }
         catch (Exception exception) when (exception is JsonException or KeyNotFoundException or FormatException or InvalidOperationException)
@@ -1200,6 +1212,70 @@ public static class LauncherUpdate
 }
 
 /// <summary>
+/// Kurulum kökündeki kabuk klasörünün güncellenmesi. Bu dosyalar başlatıcıyla aynı arşivde
+/// geliyor ama başlatıcının geçiş dansına girmiyorlar: çalışan süreç onları tutmuyor, o
+/// yüzden yan ad, günlük ve çıkışta geçiş gerekmez — doğrulanan dosya doğrudan üstüne yazılır.
+///
+/// Manifestte ayrı bir <c>shell</c> alanında sayılırlar. <c>files</c> dizisine önekli satır
+/// eklemek seçenek değil: kurulu her eski güncelleyici o satırı uygulama arşivinde arar,
+/// bulamaz ve güncellemenin tamamından vazgeçer. Bilinmeyen bir üst alanı ise görmez.
+///
+/// Kopyalama başarısızlığı yutulur ve o tur hiçbir şey bozulmaz: dosya kurulu kalmadığı
+/// sürece <see cref="Installed"/> yanlış döner, kapı açık kalır ve iş sonraki açılışa kalır.
+/// </summary>
+public static class ShellUpdate
+{
+    /// <summary>Manifestin <c>shell</c> alanına giren satırların yol öneki.</summary>
+    public const string FolderPrefix = "shell/";
+
+    /// <summary>Kabuk dosyalarının uygulama dosyalarına karışmadığı yan klasör.</summary>
+    public const string StageFolderName = "shell-incoming";
+
+    public static string StagePath(string stageDirectory, string relativePath) =>
+        UpdateCheck.LocalPath(Path.Combine(stageDirectory, StageFolderName), relativePath);
+
+    public static string Target(string baseDirectory, string relativePath) =>
+        UpdateCheck.LocalPath(baseDirectory, relativePath);
+
+    /// <summary>
+    /// Manifestin saydığı kabuk dosyalarının hepsi kurulum kökünde ve özetleri tutuyor mu.
+    /// Sürüm işareti bu soruyu cevaplayamaz: işaret uygulamanın ve başlatıcının, kabuk
+    /// klasörünün yerleşmesi ise ayrı bir adım ve düşebiliyor.
+    /// </summary>
+    public static bool Installed(string baseDirectory, ReleaseManifest manifest) =>
+        manifest.Shell.Count == 0
+        || manifest.Shell.All(file => LauncherUpdate.Matches(Target(baseDirectory, file.Path), file));
+
+    /// <summary>
+    /// Doğrulanan kabuk dosyalarını kurulum köküne yazar; yerleşenlerin listesini döndürür.
+    /// Özeti tutmayan dosya atlanır, yazılamayan dosya sessizce düşer — çağıran adımın
+    /// tamamı iptal olmaz.
+    /// </summary>
+    public static IReadOnlyList<ManifestFile> Apply(string stageDirectory, string baseDirectory, IReadOnlyList<ManifestFile> files)
+    {
+        var installed = new List<ManifestFile>();
+        foreach (var file in files)
+        {
+            var staged = StagePath(stageDirectory, file.Path);
+            if (!LauncherUpdate.Matches(staged, file)) continue;
+
+            var target = Target(baseDirectory, file.Path);
+            try
+            {
+                var folder = Path.GetDirectoryName(target);
+                if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+                File.Copy(staged, target, overwrite: true);
+                installed.Add(file);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+            }
+        }
+        return installed;
+    }
+}
+
+/// <summary>
 /// Bir güncellemenin diske inen kısmının sırası. Sıra kararı burada duruyor ki ölçülebilsin:
 /// uygulama dosyaları önce yerleşir, başlatıcı ancak ondan sonra kurulur. Ters sırada yeni
 /// bir başlatıcı eski bir uygulamayı açardı; uygulama adımı düşerse başlatıcı hiç kurulmaz.
@@ -1210,6 +1286,10 @@ public static class UpdateRollout
 {
     /// <summary>
     /// Döndürdüğü değer, çıkışta başlatıcı geçişinin çağrılması gerektiğidir.
+    ///
+    /// Kabuk klasörü uygulama adımından <em>önce</em> yerleşir: uygulama adımı yan klasörün
+    /// tamamını siliyor, sonrasında kopyalanacak dosya kalmazdı. Sıranın kendisi burada
+    /// bağlayıcı değil, çünkü kabuk uzantısı uygulamayı yalnız yoldan çağırıyor.
     /// </summary>
     public static bool Apply(
         string stageDirectory,
@@ -1217,8 +1297,11 @@ public static class UpdateRollout
         string appDirectory,
         IReadOnlyList<ManifestFile> appFiles,
         IReadOnlyList<ManifestFile> launcherFiles,
-        ReleaseManifest manifest)
+        ReleaseManifest manifest,
+        IReadOnlyList<ManifestFile>? shellFiles = null)
     {
+        ShellUpdate.Apply(stageDirectory, baseDirectory, shellFiles ?? Array.Empty<ManifestFile>());
+
         if (appFiles.Count > 0) UpdateStage.Apply(stageDirectory, appDirectory, appFiles);
         else UpdateStage.Discard(stageDirectory);
         UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);

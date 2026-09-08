@@ -14,6 +14,10 @@ namespace VidShrink.Launcher;
 /// dosyaları önce yerleşir, başlatıcı en son kurulur: sıra tersine dönerse yeni başlatıcı
 /// eski uygulamayı açar. Sıranın kendisi <see cref="UpdateRollout"/> içinde.
 ///
+/// Manifestin <c>shell</c> alanı kurulum kökündeki kabuk klasörünü sayar. O satırlar da
+/// başlatıcının arşivinden iner ama geçiş dansına girmez: çalışan süreç onları tutmadığı
+/// için <see cref="ShellUpdate"/> doğrudan üstlerine yazar.
+///
 /// Başlatıcı geçişi burada yapılmaz, yalnız kurulur. Geçişi çıkışta yerine geçecek ikili
 /// yapar; döndürülen değer o çağrının gerekip gerekmediğidir.
 /// </summary>
@@ -55,8 +59,9 @@ internal static class Updater
         var cache = new HashCache(Path.Combine(appDirectory, HashCacheName));
         var changed = UpdateCheck.Diff(appDirectory, manifest, cache);
         var launcherChanged = UpdateCheck.Diff(baseDirectory, manifest.Launcher, cache);
+        var shellChanged = UpdateCheck.Diff(baseDirectory, manifest.Shell, cache);
         cache.Save();
-        if (changed.Count == 0 && launcherChanged.Count == 0)
+        if (changed.Count == 0 && launcherChanged.Count == 0 && shellChanged.Count == 0)
         {
             UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
             LauncherUpdate.MarkVerified(baseDirectory, manifest);
@@ -75,11 +80,13 @@ internal static class Updater
                     await StageFileAsync(archive, file, UpdateCheck.LocalPath(stage, file.Path), cancellationToken);
             }
 
-            if (launcherChanged.Count > 0)
+            if (launcherChanged.Count > 0 || shellChanged.Count > 0)
             {
                 var archive = await RemoteZip.OpenAsync(LauncherArchiveSource(rid, source), cancellationToken);
                 foreach (var file in launcherChanged)
                     await StageFileAsync(archive, file, LauncherUpdate.StagePath(stage, file.Path), cancellationToken);
+                foreach (var file in shellChanged)
+                    await StageFileAsync(archive, file, ShellUpdate.StagePath(stage, file.Path), cancellationToken);
             }
 
             // Başlatıcı yan klasörden çıkarılıyor: bir alttaki Apply yan klasörü siliyor.
@@ -91,7 +98,7 @@ internal static class Updater
             throw;
         }
 
-        return UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest);
+        return UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest, shellChanged);
     }
 
     private static async Task StageFileAsync(RemoteZip archive, ManifestFile file, string target, CancellationToken cancellationToken)
