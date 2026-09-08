@@ -43,6 +43,27 @@ for a in adlar:
 
 ffv = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True).stdout.splitlines()[0]
 
+kontrol_bayt = {}
+for i in (1, 2, 3, 4):
+    p = os.path.join(IS, "k2kapi", "kontrol-%d.mkv" % i)
+    if os.path.exists(p):
+        kontrol_bayt[i] = os.path.getsize(p)
+ilk_cift = abs(kontrol_bayt[1] - kontrol_bayt[2]) if 1 in kontrol_bayt and 2 in kontrol_bayt else None
+
+planlar = {}
+pp = os.path.join(IS, "planlar.txt")
+if os.path.exists(pp):
+    with io.open(pp, encoding="utf-8") as f:
+        for satir in f:
+            satir = satir.strip()
+            if not satir or ":" not in satir:
+                continue
+            sol, sag = satir.split(":", 1)
+            ad = sol.split("/")[-1]
+            alan = sag.split()
+            planlar[ad] = {"kodlayici": alan[0], "mod": alan[1], "bit": alan[2],
+                           "cozunurluk": alan[3].split("@")[0]}
+
 P10_ESIK, ENKOTU_ESIK, KAYIP_ESIK = 0.50, 1.00, 0.30
 kazanc = {}
 for a in adlar:
@@ -103,9 +124,20 @@ for p in pencereler:
       (str(len(h["Scenes"])) if h else "olculmedi") + " |")
 w("")
 w("**Sapma.** Pencereler ~189 sn yerine ~60 sn. Hedef boyut (60 MB) degismedigi icin")
-w("bit hizi ucuyor: T114'te `p1` plani `806x454`e dusuyordu, burada uc pencere de")
-w("`1920x1080` kaliyor. Bu kosumun sayilari T114'un hucreleriyle **dogrudan")
-w("karsilastirilamaz**; taban bu kosumda yeniden olculdu.")
+w("bit hizi ucuyor. T114'te `p1` plani `806x454`e dusuyordu; bu kosumun `maks` planlari:")
+w("")
+w("| Pencere | Kodlayici | Mod | Bit hizi | Plan cozunurlugu |")
+w("|---------|-----------|-----|----------|------------------|")
+for a in adlar:
+    pl = planlar.get(a)
+    if pl is None:
+        w("| `" + a + "` | olculmedi | | | |")
+        continue
+    w("| `" + a + "` | `" + pl["kodlayici"] + "` | " + pl["mod"] + " | " + pl["bit"] +
+      " | " + pl["cozunurluk"] + " |")
+w("")
+w("Bu kosumun sayilari T114'un hucreleriyle **dogrudan karsilastirilamaz**; taban bu")
+w("kosumda yeniden olculdu.")
 w("")
 w("## K2 — `libsvtav1` Destek Kapisi")
 w("")
@@ -124,9 +156,12 @@ for r in kapi:
           r["gurultu_bayt"] + " | " + r["esik_gurultu2"] + " | " + r["esik_yuzde1"] +
           " | **" + r["destek"] + "** |")
 w("")
-w("Tekrar gurultusu **dort** ayni-parametre kosumunun araligidir: " + str(gurultu) + " bayt.")
-w("Ayni dort kosumun ilk cifti 456 bayt veriyordu; T114 gurultuyu tek ciftten oluyordu")
-w("ve bu, sinirdaki bir adayi yanlislikla gecirebilirdi.")
+w("Tekrar gurultusu **dort** ayni-parametre kosumunun araligidir: " + str(gurultu) + " bayt")
+w("(kosum baytlari: " + ", ".join(str(kontrol_bayt[i]) for i in sorted(kontrol_bayt)) + ").")
+if ilk_cift is not None:
+    w("Ayni dort kosumun ilk **cifti** " + str(ilk_cift) + " bayt veriyor — gercek araligin")
+    w(("%.0f" % (float(gurultu) / ilk_cift)) + " kati kucuk. T114 gurultuyu tek ciftten oluyordu;")
+    w("bu, sinirdaki bir adayi yanlislikla gecirebilirdi.")
 w("")
 w("**Ucuncu soru — `qcomp` varsayilan yolda gorunuyor mu: hayir.** ffmpeg anahtari")
 w("ayristiramiyor (`[libsvtav1] Error parsing option qcomp: 0.40.`) ama **cikis kodu 0**")
@@ -195,12 +230,52 @@ w("3. Hicbir pencerede p10 kaybi > " + vir(KAYIP_ESIK, 2) + " — **asan pencere
 w("4. K6: her kosum hedef bandin icinde — **band disi kosum: " + str(len(band_disi)) +
   "** -> " + ("saglandi" if sart4 else "**saglanmadi**"))
 w("")
+if band_disi:
+    bd_pencere = sorted(set(a for a, _ in band_disi))
+    ciftli = [a for a in bd_pencere if len([1 for x, _ in band_disi if x == a]) == 2]
+    w("Band disi " + str(len(band_disi)) + " kosumun hepsi " +
+      ", ".join("`" + a + "`" for a in bd_pencere) + " penceresinde, ve o pencerede")
+    w("**her iki kol da** band disinda. Sart 4 bu yuzden kollari ayirt etmez.")
+    w("")
+    for a in bd_pencere:
+        pl = planlar.get(a)
+        if pl is None:
+            continue
+        digerleri = sorted(set(planlar[x]["bit"] for x in adlar if x != a and x in planlar))
+        w("Sebep plan seviyesinde: `" + a + "` icin plan bit hizi " + pl["bit"] +
+          ", diger pencerelerde " + ", ".join(digerleri) + ".")
+        w("60 sn'lik pencerede " + pl["bit"] + " hedef bandin (" +
+          vir(k5[a]["taban"]["BandAltMb"], 1) + "–" + vir(k5[a]["taban"]["BandUstMb"], 1) +
+          " MB) altinda kalir; olculen " + vir(k5[a]["taban"]["GerceklesenMb"], 2) + " MB.")
+        w("")
+    w("Kollari ayirt eden ve karari veren sayi sart 1 ve 2'dir.")
+    w("")
 w("**K5 kapisi: " + ("gecti" if gecti else "gecmedi") + ".**")
 w("")
-w("Sebep tabloda gorunuyor: `libsvtav1` `zones` anahtarini yok saydigi icin `dagitim`")
-w("kolu `taban` ile ayni kodlamadir. Bayt farklari yukaridaki tekrar gurultusunun")
-w("(" + str(gurultu) + " bayt) mertebesinde, VMAF farklari da oyle. Bu bir \"az kazandi\"")
-w("degil, **tasiyicinin yoklugudur**.")
+w("Sebep: `libsvtav1` `zones` anahtarini yok sayiyor, yani `dagitim` kolu `taban` ile")
+mutlak = [abs(kazanc[a]["p10"]) for a in adlar if a in kazanc and kazanc[a]["p10"] is not None]
+w("ayni kodlamadir. Kolun p10 kazanci uc pencerede de **sifirin altinda**; mutlak")
+w("degerlerin en buyugu **" + vir(max(mutlak)) + " puan**, esik +" + vir(P10_ESIK, 2) + ".")
+w("")
+w("Bayt tarafinda ayrimi tek cumleye sigdirmamak gerekiyor. Olculen tekrar gurultusu")
+w(str(gurultu) + " bayt, ama o gurultu `p1`in bit hizinda (`8230k`, 6 sn) olculdu:")
+alt = [a for a in adlar if (a, "taban") in boyut and (a, "dagitim") in boyut
+       and abs(boyut[(a, "taban")] - boyut[(a, "dagitim")]) <= gurultu]
+ust = [a for a in adlar if (a, "taban") in boyut and (a, "dagitim") in boyut
+       and abs(boyut[(a, "taban")] - boyut[(a, "dagitim")]) > gurultu]
+w("")
+w("- Gurultunun **altinda** kalan pencere: " +
+  (", ".join("`" + a + "`" for a in alt) if alt else "yok") + ".")
+w("- Gurultunun **ustunde** kalan pencere: " +
+  (", ".join("`" + a + "`" for a in ust) if ust else "yok") + ".")
+w("")
+if ust:
+    w("Ustte kalan pencerede tekrar gurultusu **kendi bit hizinda olculmedi**, o yuzden")
+    w("\"gurultunun icinde\" denemez. Ama o pencerede de VMAF kazanci sifirin altinda")
+    w("(" + ", ".join("`" + a + "` p10 " + vir(kazanc[a]["p10"]) for a in ust if a in kazanc) + "),")
+    w("yani bayt farki kaliteye kazanc olarak donmemistir.")
+    w("")
+w("Bu bir \"az kazandi\" degil, **tasiyicinin yoklugudur**.")
 w("")
 w("## K3 — Sure Sayilari")
 w("")
@@ -235,8 +310,8 @@ else:
       ", en kotu sahne esigini gecen pencere " + str(len(enkotu_gecen)) + "/" + str(olculen) + " cikti —")
     w("cunku uretimin varsayilan kodlayicisi `libsvtav1` hem dagitimi tasiyacak anahtari")
     w("(`zones`, fark " + kapi_zones["fark_bayt"] + " bayt) hem ayakta kalan tek isareti")
-    w("(`qcomp`, fark " + kapi_qcomp["fark_bayt"] + " bayt) tekrar gurultusunun (" +
-      str(gurultu) + " bayt) altinda birakiyor.")
+    w("(`qcomp`, fark " + kapi_qcomp["fark_bayt"] + " bayt) destek esiginin (gurultu x 2 = " +
+      kapi_qcomp["esik_gurultu2"] + " bayt) altinda birakiyor.")
 
 os.makedirs(os.path.dirname(HEDEF), exist_ok=True)
 with io.open(HEDEF, "w", encoding="utf-8", newline="\n") as f:

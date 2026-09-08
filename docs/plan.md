@@ -221,3 +221,47 @@ bir sonuctur.
 calismani istemiyorum sonra musait zamanda bakalim hatirlatta". Olcum gunduz musait bir
 saatte kosulur ve **hatirlatmayi T0 yapar**, kullanici sormaz. Hazirlik bitti; kosulacak
 sey `tools/sahne-butcesi/`, yeni duzenek yok.
+
+### Acilis olcumu kosuldu — T193 (8 Eylul 2026)
+
+Rapor: `docs/olcumler/max-mod-acilis.md` (sayfanin butun sayilari `.calisma/T193/`
+altindaki ham dosyalardan `tools/sahne-butcesi/09-max-mod-raporu.py` ile uretilir).
+
+**Hukum: max sikistirma modu acilmaz.**
+
+Iki acik da kapandi:
+
+1. **`maks` kolunun kalite kapisi ilk kez kosuldu.** T114'te kol sessizce atlaniyordu
+   (kapi `ZonesFlag` uzerindeydi, `libsvtav1` icin `null` donuyordu); kapi
+   `ParamsFlag`e cevrildi ve uc pencerede de kosuldu. p10 esigini gecen pencere
+   **0/3**, en kotu sahne esigini gecen pencere **0/3**. Kazanclar sifirin altinda,
+   mutlak degerlerin en buyugu 0,021 puan; esik +0,50.
+
+2. **`qcomp` `libsvtav1`'de yok.** ffmpeg anahtari ayristiramiyor
+   (`Error parsing option qcomp`) ama cikis kodu 0 donuyor. Iki deger arasindaki
+   15.332 baytlik fark, destek esiginin (tekrar gurultusu x 2 = 26.846 bayt) altinda.
+   Bu yuzden deger taramasi (`0,40 / 0,50 / 0,60 / 0,75`) **kosulmadi**; koşulsa
+   olculecek bir sey olmayacakti.
+
+Ayakta kalan isaretin nereden geldigi de anlasildi: T114 izgarasinin
+`libsvtav1 / qcomp` satiri `qcomp` degil **`qp-scale-compress-strength`** deniyordu,
+ve K4 ekinde "qcomp kazandi" denen hucreler `libx264` / `libx265` kollarindaydi.
+Yani "varsayilan kodlayicida gecerli, olculmus bir ayar" hic olmadi.
+
+Bunun tersi de olculdu: SVT-AV1'in kendi karsiligi `qp-scale-compress-strength`
+**calisiyor** (162.703 bayt fark, gurultunun cok ustunde). Kalite ve boyut etkisi
+olculmedi — bu sozlesmenin sorusu degildi.
+
+Yan bulgu, duzenegin kendisinde: T114 tekrar gurultusunu **tek kontrol ciftinden**
+oluyordu. Ayni cift bu kosumda 456 bayt verdi; dort kosumun araligi 13.423 bayt.
+Yirmi dokuz kat. Gurultu artik dort kosumdan olculur (`08-svtav1-kapisi.sh`).
+
+**Sirada ne var.** Sahne butcesi yolu kapandi, `qcomp` yolu kapandi. Max modu icin
+geriye olculebilir tek aday `qp-scale-compress-strength` (ve `variance-boost`
+ailesi): varsayilan kodlayicida calistigi olculu, ama **kalite kazanci olculmedi**.
+Mod tasarlanmadan once o olculur — ya da mod bu depoda kapanir. Karar kullanicinin.
+
+**Kosum sapmasi.** T114'un 17 dakikalik kaynagi bu makinede yok; pencereler elde olan
+uc 60 sn'lik parcadan uretildi (~189 sn yerine ~60 sn, plan cozunurlugu `806x454`
+yerine `1920x1080`). Bu koşumun sayilari T114'un hucreleriyle dogrudan
+karsilastirilamaz; taban bu kosumda yeniden olculdu. Ayrinti raporun K0 bolumunde.

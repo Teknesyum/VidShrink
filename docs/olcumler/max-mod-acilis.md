@@ -19,9 +19,16 @@ olan uc 60 sn'lik 1080p60 HDR parcadan uretildi.
 | `p3-hareketli` | parca-3 0-60 sn (T193 sapmasi: T114'un 189 sn'lik penceresi degil) | 60,0 | 2 |
 
 **Sapma.** Pencereler ~189 sn yerine ~60 sn. Hedef boyut (60 MB) degismedigi icin
-bit hizi ucuyor: T114'te `p1` plani `806x454`e dusuyordu, burada uc pencere de
-`1920x1080` kaliyor. Bu kosumun sayilari T114'un hucreleriyle **dogrudan
-karsilastirilamaz**; taban bu kosumda yeniden olculdu.
+bit hizi ucuyor. T114'te `p1` plani `806x454`e dusuyordu; bu kosumun `maks` planlari:
+
+| Pencere | Kodlayici | Mod | Bit hizi | Plan cozunurlugu |
+|---------|-----------|-----|----------|------------------|
+| `p1-karisik` | `libsvtav1` | 2pass | 8230k | 1920x1080 |
+| `p2-durgun` | `libsvtav1` | 2pass | 1823k | 1920x1080 |
+| `p3-hareketli` | `libsvtav1` | 2pass | 8230k | 1920x1080 |
+
+Bu kosumun sayilari T114'un hucreleriyle **dogrudan karsilastirilamaz**; taban bu
+kosumda yeniden olculdu.
 
 ## K2 — `libsvtav1` Destek Kapisi
 
@@ -35,9 +42,11 @@ Destek ancak `fark > gurultu x 2` **ve** `fark > cikti/100` iken yazilir.
 | `qp-scale-compress-strength` | =0 | =3 | 6094997 | 6257700 | 162703 | 13423 | 26846 | 60949 | **evet** |
 | `zones` | b=2.00 | b=0.50 | 6091965 | 6091235 | 730 | 13423 | 26846 | 60919 | **hayir** |
 
-Tekrar gurultusu **dort** ayni-parametre kosumunun araligidir: 13423 bayt.
-Ayni dort kosumun ilk cifti 456 bayt veriyordu; T114 gurultuyu tek ciftten oluyordu
-ve bu, sinirdaki bir adayi yanlislikla gecirebilirdi.
+Tekrar gurultusu **dort** ayni-parametre kosumunun araligidir: 13423 bayt
+(kosum baytlari: 6092918, 6093374, 6101470, 6088047).
+Ayni dort kosumun ilk **cifti** 456 bayt veriyor — gercek araligin
+29 kati kucuk. T114 gurultuyu tek ciftten oluyordu;
+bu, sinirdaki bir adayi yanlislikla gecirebilirdi.
 
 **Ucuncu soru — `qcomp` varsayilan yolda gorunuyor mu: hayir.** ffmpeg anahtari
 ayristiramiyor (`[libsvtav1] Error parsing option qcomp: 0.40.`) ama **cikis kodu 0**
@@ -66,8 +75,8 @@ kuruluydu, `libsvtav1` icin `null` donuyor ve kol sessizce atlaniyordu. Kapi
 | `p1-karisik` | dagitim | 59,33 | 58,3–60,0 | evet | 91,202 | 89,064 | 79,302 | 88,874 |
 | `p2-durgun` | taban | 11,03 | 58,3–60,0 | **hayir** | 95,929 | 95,323 | 93,980 | 95,317 |
 | `p2-durgun` | dagitim | 10,85 | 58,3–60,0 | **hayir** | 95,918 | 95,318 | 94,006 | 95,305 |
-| `p3-hareketli` | taban | olculmedi | | | | | | |
-| `p3-hareketli` | dagitim | olculmedi | | | | | | |
+| `p3-hareketli` | taban | 58,95 | 58,3–60,0 | evet | 86,107 | 81,776 | 75,701 | 82,794 |
+| `p3-hareketli` | dagitim | 58,95 | 58,3–60,0 | evet | 86,095 | 81,755 | 76,048 | 82,674 |
 
 Kazanc = `dagitim - taban`, VMAF-NEG puani:
 
@@ -75,23 +84,43 @@ Kazanc = `dagitim - taban`, VMAF-NEG puani:
 |---------|-------------|-----------------------|------------|------------|--------------|------------|
 | `p1-karisik` | -0,019 | -0,161 | -0,001 | 62221002 | 62209607 | 11395 |
 | `p2-durgun` | -0,005 | -0,012 | -0,011 | 11569906 | 11376078 | 193828 |
-| `p3-hareketli` | olculmedi | olculmedi | olculmedi | yok | yok | yok |
+| `p3-hareketli` | -0,021 | -0,119 | -0,012 | 61808654 | 61817030 | 8376 |
 
 ### K5 Kapisinin Sayimi
 
-`ESIKLER.md`'nin dort sarti, `maks` kolu icinde, olculen 2 pencere uzerinden:
+`ESIKLER.md`'nin dort sarti, `maks` kolu icinde, olculen 3 pencere uzerinden:
 
-1. p10 kazanci >= +0,50, en az iki pencerede — **gecen pencere: 0/2** (yok) -> **saglanmadi**
-2. En kotu sahne kazanci >= +1,00, ayni pencerelerde — **gecen pencere: 0/2** (yok) -> **saglanmadi**
+1. p10 kazanci >= +0,50, en az iki pencerede — **gecen pencere: 0/3** (yok) -> **saglanmadi**
+2. En kotu sahne kazanci >= +1,00, ayni pencerelerde — **gecen pencere: 0/3** (yok) -> **saglanmadi**
 3. Hicbir pencerede p10 kaybi > 0,30 — **asan pencere: 0** -> saglandi
 4. K6: her kosum hedef bandin icinde — **band disi kosum: 2** -> **saglanmadi**
 
+Band disi 2 kosumun hepsi `p2-durgun` penceresinde, ve o pencerede
+**her iki kol da** band disinda. Sart 4 bu yuzden kollari ayirt etmez.
+
+Sebep plan seviyesinde: `p2-durgun` icin plan bit hizi 1823k, diger pencerelerde 8230k.
+60 sn'lik pencerede 1823k hedef bandin (58,3–60,0 MB) altinda kalir; olculen 11,03 MB.
+
+Kollari ayirt eden ve karari veren sayi sart 1 ve 2'dir.
+
 **K5 kapisi: gecmedi.**
 
-Sebep tabloda gorunuyor: `libsvtav1` `zones` anahtarini yok saydigi icin `dagitim`
-kolu `taban` ile ayni kodlamadir. Bayt farklari yukaridaki tekrar gurultusunun
-(13423 bayt) mertebesinde, VMAF farklari da oyle. Bu bir "az kazandi"
-degil, **tasiyicinin yoklugudur**.
+Sebep: `libsvtav1` `zones` anahtarini yok sayiyor, yani `dagitim` kolu `taban` ile
+ayni kodlamadir. Kolun p10 kazanci uc pencerede de **sifirin altinda**; mutlak
+degerlerin en buyugu **0,021 puan**, esik +0,50.
+
+Bayt tarafinda ayrimi tek cumleye sigdirmamak gerekiyor. Olculen tekrar gurultusu
+13423 bayt, ama o gurultu `p1`in bit hizinda (`8230k`, 6 sn) olculdu:
+
+- Gurultunun **altinda** kalan pencere: `p1-karisik`, `p3-hareketli`.
+- Gurultunun **ustunde** kalan pencere: `p2-durgun`.
+
+Ustte kalan pencerede tekrar gurultusu **kendi bit hizinda olculmedi**, o yuzden
+"gurultunun icinde" denemez. Ama o pencerede de VMAF kazanci sifirin altinda
+(`p2-durgun` p10 -0,005),
+yani bayt farki kaliteye kazanc olarak donmemistir.
+
+Bu bir "az kazandi" degil, **tasiyicinin yoklugudur**.
 
 ## K3 — Sure Sayilari
 
@@ -118,7 +147,7 @@ butun hukumler yalniz onlara dayanir. **Sure sayisi bu sayfada hic raporlanmamis
 ## Hukum
 
 **Max sikistirma modu acilmaz**: `maks` kolunun kalite kapisi bu depoda ilk kez
-kosuldu ve p10 esigini gecen pencere 0/2, en kotu sahne esigini gecen pencere 0/2 cikti —
+kosuldu ve p10 esigini gecen pencere 0/3, en kotu sahne esigini gecen pencere 0/3 cikti —
 cunku uretimin varsayilan kodlayicisi `libsvtav1` hem dagitimi tasiyacak anahtari
 (`zones`, fark 730 bayt) hem ayakta kalan tek isareti
-(`qcomp`, fark 15332 bayt) tekrar gurultusunun (13423 bayt) altinda birakiyor.
+(`qcomp`, fark 15332 bayt) destek esiginin (gurultu x 2 = 26846 bayt) altinda birakiyor.
