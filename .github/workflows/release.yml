@@ -208,9 +208,17 @@ jobs:
           # top-level field is simply ignored by those older clients, so they keep
           # updating app/ exactly as before.
           #
-          # Only VidShrink.exe is listed. The .pdb beside it is in the archive but is not
-          # part of the swap, and the name is pinned by a test against
+          # Only VidShrink.exe is listed under "launcher". The .pdb beside it is in the
+          # archive but is not part of the swap, and the name is pinned by a test against
           # LauncherUpdate.ExecutableName.
+          #
+          # The shell/ folder next to it goes into a second top-level array, "shell". Those
+          # files live at the install root like the launcher, and travel in the same launcher
+          # archive, but no running process holds them, so they are copied straight over
+          # rather than going through the rename-on-exit swap. Before this array existed the
+          # folder shipped in the archive and was picked up by a fresh install, while an
+          # install that arrived through the updater never received it: the updater only
+          # swaps the rows the manifest lists. Older clients ignore the unknown field.
           if [ -d publish-launcher ]; then
             dotnet $tool write publish-launcher \
               --version ${{ needs.version.outputs.version }} \
@@ -219,10 +227,12 @@ jobs:
               --built ${{ needs.version.outputs.built }} \
               --out launcher-manifest.json
             jq --slurpfile launcher launcher-manifest.json \
-              '.launcher = ($launcher[0].files | map(select(.path == "VidShrink.exe")))' \
+              '.launcher = ($launcher[0].files | map(select(.path == "VidShrink.exe")))
+               | .shell = ($launcher[0].files | map(select(.path | startswith("shell/"))))' \
               publish/${{ matrix.rid }}/manifest.json > merged-manifest.json
             mv merged-manifest.json publish/${{ matrix.rid }}/manifest.json
             jq -r '.launcher[] | "manifest launcher: \(.path) \(.size)"' publish/${{ matrix.rid }}/manifest.json
+            jq -r '.shell[] | "manifest shell: \(.path) \(.size)"' publish/${{ matrix.rid }}/manifest.json
           fi
 
       - name: Archive, copy the manifest out, checksum both
