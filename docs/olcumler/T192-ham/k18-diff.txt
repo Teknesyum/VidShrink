@@ -1,0 +1,1144 @@
+diff --git a/src/VidShrink.App/LanguageCatalog.cs b/src/VidShrink.App/LanguageCatalog.cs
+index d75f33e..ff1d7a3 100644
+--- a/src/VidShrink.App/LanguageCatalog.cs
++++ b/src/VidShrink.App/LanguageCatalog.cs
+@@ -27,7 +27,7 @@ internal static class LanguageCatalog
+     /// Names and abbreviations that are written a fixed way. A word typed in lower case here is
+     /// restored to its own spelling instead of getting a single capital.
+     /// </summary>
+-    private static readonly IReadOnlyDictionary<string, string> Names =
++    internal static readonly IReadOnlyDictionary<string, string> Names =
+         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+         {
+             ["ffmpeg"] = "FFmpeg",
+@@ -92,6 +92,26 @@ internal static class LanguageCatalog
+             ["Buy me a coffee"] = "Buy Me a Coffee",
+         };
+ 
++    /// <summary>
++    /// Baglaclar, ilgecler, tanimliklar, adillar, yardimci fiiller ve soru sozcukleri.
++    /// Bunlardan biri gecen metin cumledir; baslik kurali ona uygulanmaz. Liste bilerek
++    /// dar: icerik sozcugu (ad, sifat, asil fiil) buraya girmez, cunku o zaman her
++    /// baslik cumle sayilirdi.
++    /// </summary>
++    private static readonly HashSet<string> FunctionWords =
++        new(StringComparer.OrdinalIgnoreCase)
++        {
++            "a", "an", "the", "and", "or", "but", "nor", "of", "to", "in", "into", "on",
++            "at", "by", "for", "from", "with", "without", "than", "as", "if", "so",
++            "it", "its", "this", "that", "these", "those", "they", "them", "you", "your",
++            "is", "are", "was", "were", "be", "will", "would", "can", "may", "does", "do",
++            "what", "why", "how", "when", "where", "which", "who",
++
++            "ve", "veya", "ile", "ki", "da", "de", "ya", "ama", "ancak", "cunku", "çünkü",
++            "icin", "için", "gibi", "kadar", "gore", "göre", "her", "bir", "bu", "su", "şu",
++            "ne", "neden", "niye", "nasil", "nasıl", "hangi", "kim", "nerede", "hep", "daha",
++        };
++
+     /// <summary>
+     /// Başlık kuralı yalnız başlıklara uygulanır. Cümle işareti (<c>.</c> <c>;</c> <c>!</c>
+     /// <c>?</c>) taşıyan metin gövdedir: yalnız satır başındaki harf büyütülür, gerisi dil
+@@ -109,9 +129,43 @@ internal static class LanguageCatalog
+             if (index + 1 == text.Length || char.IsWhiteSpace(text[index + 1])) return true;
+         }
+ 
++        return CarriesFunctionWord(text);
++    }
++
++    /// <summary>
++    /// Cumle isareti tek belirti degildi. "Load a file to see the two sides" nokta
++    /// tasimadigi icin baslik kolundan geciyor ve ekranda
++    /// "Load A File To See The Two Sides" oluyordu. Ayirt eden sey noktalama degil
++    /// dilbilgisi: baglac, ilgec, tanimlik, adil ya da soru sozcugu tasiyan metin bir
++    /// tamlama degil bir cumledir. Sinav <b>butun sozcuge</b> bakar, sozcugun icindeki
++    /// harf obegine degil: <c>storage.to</c> tek bir sozcuktur ve listede yoktur, oysa
++    /// icindeki <c>to</c> aransaydi govde sayilirdi. Listede sozcuk yoksa metin baslik
++    /// kolunda kalir ("Video codec", "Current output size", "Fill policy").
++    /// </summary>
++    private static bool CarriesFunctionWord(string text)
++    {
++        foreach (var token in text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
++        {
++            var start = 0;
++            var end = token.Length;
++            while (start < end && !char.IsLetter(token[start])) start++;
++            while (end > start && !char.IsLetter(token[end - 1])) end--;
++            if (end > start && FunctionWords.Contains(token[start..end])) return true;
++        }
++
+         return false;
+     }
+ 
++    /// <summary>
++    /// Govde kolu: yalniz satir basi sozcugu buyutulur, geri kalan dil dosyasinda
++    /// yazildigi gibi kalir — ad ve birim yazimlari (<see cref="KnownSpelling"/>) haric.
++    ///
++    /// <para>Satir basi sayaci harfe degil <b>harf ya da rakama</b> bakar. Yer tutucu
++    /// (<c>{0}</c>) bir icerik sozcugudur: yerine kodlayici adi ya da sayi gelir. Yalniz
++    /// harfe bakildiginda yer tutucu satir basini tuketmiyordu ve ondan sonraki sozcuk
++    /// buyuyordu — "{0} Kodlayicisi bu FFmpeg derlemesinde yok". Noktalama (madde imi
++    /// <c>&#8226;</c>, tirnak) satir basini tuketmez, cunku o gercekten sozcuk degil.</para>
++    /// </summary>
+     private static string Sentence(string text, CultureInfo culture)
+     {
+         var builder = new StringBuilder(text.Length);
+@@ -132,8 +186,8 @@ internal static class LanguageCatalog
+             while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+             var word = text[index..end];
+ 
+-            builder.Append(lineStart ? CapitaliseWord(word, culture, true) : word);
+-            if (word.Any(char.IsLetter)) lineStart = false;
++            builder.Append(lineStart ? CapitaliseWord(word, culture, true) : KnownSpelling(word) ?? word);
++            if (word.Any(char.IsLetterOrDigit)) lineStart = false;
+             index = end;
+         }
+ 
+@@ -171,17 +225,26 @@ internal static class LanguageCatalog
+         return builder.ToString();
+     }
+ 
+-    private static string CapitaliseWord(string word, CultureInfo culture, bool lineStart)
++    /// <summary>
++    /// Sozcugun <see cref="Verbatim"/> ya da <see cref="Names"/> listesinde bildirilmis
++    /// yazimi. Yoksa <c>null</c> doner.
++    ///
++    /// <para>Bu gecit hem baslik hem govde kolunda gecerlidir: bir adin yazimi metnin
++    /// neresinde durduguna bagli olamaz. Once yalniz <see cref="CapitaliseWord"/> icinde
++    /// duruyordu, <see cref="Sentence"/> ise onu sadece satir basi sozcugu icin
++    /// cagiriyordu; boylece "Any format ffmpeg can open" gibi govde cumlelerinde ortadaki
++    /// <c>ffmpeg</c> dil dosyasindaki yazimiyla kaliyordu (T192 tur 3, K11).</para>
++    /// </summary>
++    private static string? KnownSpelling(string word)
+     {
+         var offset = 0;
+         while (offset < word.Length && !char.IsLetter(word[offset]))
+         {
+-            // A digit before the first letter means the word is a measurement, not a name.
+-            if (char.IsDigit(word[offset])) return word;
++            if (char.IsDigit(word[offset])) return null;
+             offset++;
+         }
+ 
+-        if (offset == word.Length) return word;
++        if (offset == word.Length) return null;
+ 
+         var body = word[offset..];
+         var bare = new string(body.TakeWhile(char.IsLetter).ToArray());
+@@ -194,6 +257,26 @@ internal static class LanguageCatalog
+         if (Names.TryGetValue(bare, out var name))
+             return string.Concat(word.AsSpan(0, offset), name, body.AsSpan(bare.Length));
+ 
++        return null;
++    }
++
++    private static string CapitaliseWord(string word, CultureInfo culture, bool lineStart)
++    {
++        if (KnownSpelling(word) is { } spelled) return spelled;
++
++        var offset = 0;
++        while (offset < word.Length && !char.IsLetter(word[offset]))
++        {
++            // A digit before the first letter means the word is a measurement, not a name.
++            if (char.IsDigit(word[offset])) return word;
++            offset++;
++        }
++
++        if (offset == word.Length) return word;
++
++        var body = word[offset..];
++        var bare = new string(body.TakeWhile(char.IsLetter).ToArray());
++
+         foreach (var letter in body)
+             if (char.IsUpper(letter))
+                 return word;
+diff --git a/src/VidShrink.App/MainWindow.axaml b/src/VidShrink.App/MainWindow.axaml
+index 3036ecf..b0c56de 100644
+--- a/src/VidShrink.App/MainWindow.axaml
++++ b/src/VidShrink.App/MainWindow.axaml
+@@ -259,35 +259,35 @@
+ 
+                     <UniformGrid x:Name="InfoGrid" Columns="4" Rows="2" IsVisible="False">
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtSize" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtResolution" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtFps" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtVideoCodec" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtAudio" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtBitrate" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                       <StackPanel>
+-                        <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}"/>
++                        <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                         <TextBlock x:Name="TxtHdr" Theme="{StaticResource MonoValue}"/>
+                       </StackPanel>
+                     </UniformGrid>
+@@ -408,11 +408,11 @@
+                               HorizontalContentAlignment="Left"
+                               Padding="{StaticResource ButtonPaddingSm}"
+                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
+-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
++                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                           <TextBlock x:Name="GlyphQuality" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+-                          <TextBlock Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+-                          <TextBlock x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+-                        </StackPanel>
++                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
++                          <TextBlock Grid.Column="2" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
++                        </Grid>
+                       </Button>
+                       <StackPanel x:Name="QualitySectionBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+@@ -455,11 +455,11 @@
+                               HorizontalContentAlignment="Left"
+                               Padding="{StaticResource ButtonPaddingSm}"
+                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
+-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
++                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                           <TextBlock x:Name="GlyphAudio" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+-                          <TextBlock Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+-                          <TextBlock x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+-                        </StackPanel>
++                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
++                          <TextBlock Grid.Column="2" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
++                        </Grid>
+                       </Button>
+                       <StackPanel x:Name="AudioBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+@@ -487,11 +487,11 @@
+                               HorizontalContentAlignment="Left"
+                               Padding="{StaticResource ButtonPaddingSm}"
+                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
+-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
++                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                           <TextBlock x:Name="GlyphFrame" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+-                          <TextBlock Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+-                          <TextBlock x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+-                        </StackPanel>
++                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
++                          <TextBlock Grid.Column="2" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
++                        </Grid>
+                       </Button>
+                       <StackPanel x:Name="FrameBody" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
+                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+@@ -523,11 +523,11 @@
+                               HorizontalContentAlignment="Left"
+                               Padding="{StaticResource ButtonPaddingSm}"
+                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
+-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
++                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                           <TextBlock x:Name="GlyphAdvanced" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+-                          <TextBlock Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+-                          <TextBlock x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+-                        </StackPanel>
++                          <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
++                          <TextBlock Grid.Column="2" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
++                        </Grid>
+                       </Button>
+                       <StackPanel x:Name="AdvancedBody" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
+                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
+diff --git a/src/VidShrink.App/MainWindow.axaml.cs b/src/VidShrink.App/MainWindow.axaml.cs
+index 76da0e7..ac3a804 100644
+--- a/src/VidShrink.App/MainWindow.axaml.cs
++++ b/src/VidShrink.App/MainWindow.axaml.cs
+@@ -564,8 +564,21 @@ public partial class MainWindow : Window
+     /// Aynı geçit, ama dili çağıran seçiyor. Ölçüler iki dilin satırını yan yana koyabilsin
+     /// diye var; arayüz her zaman yürürlükteki dili geçiriyor.
+     /// </summary>
+-    /// <summary>Sayı biçimlemesi dile göre kaymasın diye tek yerden geçiyor.</summary>
+-    private static string Num(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
++    /// <summary>
++    /// Sayı biçimlemesi tek yerden geçiyor. Kültür yürürlükteki dilden gelir:
++    /// İngilizce arayüzde <c>15.6 MB</c>, Türkçe arayüzde <c>15,6 MB</c>. Sabit
++    /// <see cref="CultureInfo.InvariantCulture"/> ikisini de noktaya çeviriyordu; C#
++    /// ara değer dizgesi (<c>$"{x:0.0}"</c>) ise makinenin kültürünü kullandığı için
++    /// İngilizce arayüzde bile virgül yazıyordu. İki yanlış da bu geçitle kapanıyor.
++    /// </summary>
++    internal static string Num(double value, string format) => value.ToString(format, Strings.Culture);
++
++    /// <summary>
++    /// Yüzde işaretinin yeri de kültürden gelir: İngilizcede sayının sağında
++    /// (<c>3.7%</c>), Türkçede solunda (<c>%3,7</c>). Oran verilir, yüzle çarpmayı
++    /// biçim yapar.
++    /// </summary>
++    internal static string Percent(double ratio) => ratio.ToString("P1", Strings.Culture);
+ 
+     private static string Speak(string language, string key, params object?[] args)
+         => LanguageCatalog.Title(
+@@ -1639,7 +1652,7 @@ public partial class MainWindow : Window
+         double size = bytes;
+         var unit = 0;
+         while (size >= 1024 && unit < units.Length - 1) { size /= 1024; unit++; }
+-        return $"{size.ToString("0.##", CultureInfo.InvariantCulture)} {units[unit]}";
++        return $"{Num(size, "0.##")} {units[unit]}";
+     }
+ 
+     private void OnAutoUpdateChanged()
+@@ -2462,6 +2475,7 @@ public partial class MainWindow : Window
+         SliderTarget.Value = suggested;
+         TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
+         _syncing = false;
++        RefreshChipDerivation();
+ 
+         UpdateToolStatus();
+         Recalculate();
+@@ -2567,9 +2581,9 @@ public partial class MainWindow : Window
+     {
+         Fade(InfoGrid, true);
+         TxtDuration.Text = TimeSpan.FromSeconds(info.DurationSeconds).ToString(@"hh\:mm\:ss");
+-        TxtSize.Text = $"{info.FileSizeMb:0.0} MB";
++        TxtSize.Text = $"{Num(info.FileSizeMb, "0.0")} MB";
+         TxtResolution.Text = $"{info.Width}x{info.Height}";
+-        TxtFps.Text = info.Fps.ToString("0.##", CultureInfo.InvariantCulture);
++        TxtFps.Text = Num(info.Fps, "0.##");
+         TxtVideoCodec.Text = info.VideoCodec;
+         TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : Say("main.info.none");
+         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
+@@ -2782,7 +2796,7 @@ public partial class MainWindow : Window
+         };
+ 
+         AddQualityRow(grid, Say("main.quality.target"), $"{Num(target, "0.##")} MB");
+-        AddQualityRow(grid, Say("main.quality.predicted"), $"{score:0.#}/100");
++        AddQualityRow(grid, Say("main.quality.predicted"), $"{Num(score, "0.#")}/100");
+         AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", Num(hint.LossPoints, "0.#")));
+         AddQualityRow(grid, Say("main.quality.basis"), basis);
+         return grid;
+@@ -2904,10 +2918,12 @@ public partial class MainWindow : Window
+             return;
+         }
+ 
+-        var reading = $"{estimate.ExpectedMb:0.0} MB";
++        var reading = $"{Num(estimate.ExpectedMb, "0.0")} MB";
+         if (TxtEstimateValue.Text != reading) Pulse(TxtEstimateValue, true);
+         TxtEstimateValue.Text = reading;
+-        TxtEstimateRange.Text = $"{estimate.LowMb:0.0} - {estimate.HighMb:0.0} MB · {Say("main.estimate.of-source")} %{estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01) * 100:0.#}";
++        TxtEstimateRange.Text =
++            $"{Num(estimate.LowMb, "0.0")} - {Num(estimate.HighMb, "0.0")} MB · {Say("main.estimate.of-source")} "
++            + Percent(estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01));
+ 
+         var basis = estimate.Measured
+             ? Say("main.estimate.basis.measured")
+@@ -2915,7 +2931,7 @@ public partial class MainWindow : Window
+         var mode = estimate.Enforced
+             ? Say("main.estimate.mode.enforced")
+             : Say("main.estimate.mode.ceiling");
+-        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {_predictedQuality:0.#}/100";
++        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {Num(_predictedQuality, "0.#")}/100";
+     }
+ 
+     private void RefreshDurationView()
+@@ -2949,18 +2965,18 @@ public partial class MainWindow : Window
+         TxtDurationValue.Text = reading;
+ 
+         var rate = profile.Speed!.FramesPerSecond;
+-        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {Say("main.duration.measured")} {rate:0} {Say("main.duration.frames-per-second")}";
++        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {Say("main.duration.measured")} {Num(rate, "0")} {Say("main.duration.frames-per-second")}";
+     }
+ 
+     private string HumanDuration(double seconds)
+     {
+-        if (seconds < 60) return $"{Math.Max(5, Math.Round(seconds / 5.0) * 5.0):0} {Say("main.duration.seconds")}";
++        if (seconds < 60) return $"{Num(Math.Max(5, Math.Round(seconds / 5.0) * 5.0), "0")} {Say("main.duration.seconds")}";
+ 
+         if (seconds < 3600)
+         {
+             var minutes = seconds / 60.0;
+-            if (minutes < 10) return $"{Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0):0.#} {Say("main.duration.minutes")}";
+-            return $"{Math.Round(minutes):0} {Say("main.duration.minutes")}";
++            if (minutes < 10) return $"{Num(Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0), "0.#")} {Say("main.duration.minutes")}";
++            return $"{Num(Math.Round(minutes), "0")} {Say("main.duration.minutes")}";
+         }
+ 
+         var hours = (int)(seconds / 3600);
+@@ -3195,10 +3211,13 @@ public partial class MainWindow : Window
+     /// <summary>
+     /// Hedefe elle dokunmak boyut tavanini geri getirir: kutuya yazilan sayi motora
+     /// ulasmiyorsa turetme satiri da yalan soyluyor demektir.
++    ///
++    /// <para>Turetme satiri <c>TxtTarget.Text</c>'i okuyor, dolayisiyla tavan zaten
++    /// aciksa da yenilenmesi gerekiyor. Eski surumde <c>_chipSizeCapped</c> true iken
++    /// bastan donuluyordu; kutuda 24 yazarken satir "Hedef 16 MB" diye kaliyordu.</para>
+     /// </summary>
+     private void RestoreSizeCap()
+     {
+-        if (_chipSizeCapped) return;
+         _chipSizeCapped = true;
+         RefreshChipDerivation();
+         RefreshSectionSummaries();
+@@ -3283,8 +3302,8 @@ public partial class MainWindow : Window
+     /// </summary>
+     private void ShowQualityTargetBound(QualityTargetResult result, double mb)
+     {
+-        var target = mb.ToString("0.##", CultureInfo.InvariantCulture);
+-        var reached = result.PredictedQuality.ToString("0.#", CultureInfo.InvariantCulture);
++        var target = Num(mb, "0.##");
++        var reached = Num(result.PredictedQuality, "0.#");
+ 
+         SetQualityTargetNotice(result.Bound switch
+         {
+@@ -3560,7 +3579,7 @@ public partial class MainWindow : Window
+                 Progress.Value = p.Fraction;
+                 SetStage(TxtStage, LocalizeStage(p.Stage));
+                 TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-";
+-                if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB";
++                if (p.OutputMb > 0) TxtOutSize.Text = $"{Num(p.OutputMb, "0.0")} MB";
+             });
+ 
+             var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
+@@ -3569,7 +3588,7 @@ public partial class MainWindow : Window
+ 
+             if (result.Success)
+             {
+-                TxtOutSize.Text = $"{result.OutputMb:0.0} MB";
++                TxtOutSize.Text = $"{Num(result.OutputMb, "0.0")} MB";
+                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
+                 TxtResult.Text = Say("main.run.done",
+                     result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
+diff --git a/tests/VidShrink.Tests/BiciminTests.cs b/tests/VidShrink.Tests/BiciminTests.cs
+new file mode 100644
+index 0000000..d753924
+--- /dev/null
++++ b/tests/VidShrink.Tests/BiciminTests.cs
+@@ -0,0 +1,564 @@
++using Avalonia;
++using Avalonia.Controls;
++using Avalonia.Controls.Primitives;
++using Avalonia.Layout;
++using Avalonia.Media;
++using Avalonia.VisualTree;
++using VidShrink.App;
++using VidShrink.App.Localization;
++using VidShrink.Core;
++using Xunit.Abstractions;
++
++namespace VidShrink.Tests;
++
++/// <summary>
++/// T192 K2 ve K3.
++///
++/// <para><b>K2 — sayi bicimi kulturden gelir.</b> Iki yanlis vardi. <c>MainWindow.Num</c>
++/// sabit <see cref="System.Globalization.CultureInfo.InvariantCulture"/> kullaniyordu, yani
++/// Turkce arayuzde de nokta yaziyordu; buna karsilik ekranin bir bolumu <c>Num</c>'dan hic
++/// gecmiyor, C# ara deger dizgesiyle (<c>$"{x:0.0}"</c>) yaziliyordu ve o dizge
++/// <b>makinenin</b> kulturunu kullandigi icin Ingilizce arayuzde <c>15,6 MB</c> ciktisi
++/// veriyordu. Olcu sabiti sabitle karsilastirmiyor: gercek bicimlendiriciyi iki dilde
++/// cagirip ciktilarin birbirinden <b>farkli</b> oldugunu da tutuyor, boylece kulturu yeniden
++/// sabitlemek bu olcuyu kirar.</para>
++///
++/// <para><b>K3 — baslik kurali cumleye uygulanmaz.</b> <c>fd6fe0c1</c>'in kurdugu
++/// <c>ReadsAsProse</c> yalniz cumle isaretine bakiyordu; nokta tasimayan govde cumleleri
++/// ("Load a file to see the two sides") baslik kolundan geciyordu. Ayni mekanizma
++/// genisletildi: islev sozcugu tasiyan metin de govde sayilir.</para>
++/// </summary>
++public sealed class BiciminTests : IDisposable
++{
++    private readonly string _onceki = Strings.Language;
++
++    public void Dispose() => Strings.Use(_onceki);
++
++    [Theory]
++    [InlineData("en", "15.6")]
++    [InlineData("tr", "15,6")]
++    public void OndalikAyiriciDildenGelir(string dil, string beklenen)
++    {
++        Strings.Use(dil);
++
++        Assert.Equal(beklenen, MainWindow.Num(15.6, "0.0"));
++    }
++
++    [Theory]
++    [InlineData("en", "3.7%")]
++    [InlineData("tr", "%3,7")]
++    public void YuzdeIsaretininYeriDildenGelir(string dil, string beklenen)
++    {
++        Strings.Use(dil);
++
++        Assert.Equal(beklenen, MainWindow.Percent(0.037));
++    }
++
++    /// <summary>
++    /// Sabit bir kulture geri donulurse iki dilin ciktisi esitlenir. Bu olcu esitligi
++    /// reddediyor, dolayisiyla kulturu sabitleyen bir mutasyon kirmizi doner.
++    /// </summary>
++    [Fact]
++    public void IkiDilinBicimiAyniDegildir()
++    {
++        Strings.Use("en");
++        var ingilizceSayi = MainWindow.Num(15.6, "0.0");
++        var ingilizceYuzde = MainWindow.Percent(0.037);
++
++        Strings.Use("tr");
++        var turkceSayi = MainWindow.Num(15.6, "0.0");
++        var turkceYuzde = MainWindow.Percent(0.037);
++
++        Assert.NotEqual(ingilizceSayi, turkceSayi);
++        Assert.NotEqual(ingilizceYuzde, turkceYuzde);
++    }
++
++    /// <summary>
++    /// <b>Ne olculuyor:</b> aralik satirinin <b>bilesenleri</b> ve bunlarin yan yana
++    /// gelmis hali — ekran yolu degil. Bicim dizgesi burada kopyalanmis durumda,
++    /// dolayisiyla bu olcu <c>RefreshEstimateView</c>'deki bir degisikligi yakalamaz.
++    /// Ekranin kendi satiri
++    /// <see cref="KareYerlesimTests.TahminAraligiSatiriEkrandaDileUyar"/> ile olculuyor;
++    /// T192 tur 2'ye kadar bu ayrim rapor tablosunda yaziyordu ama testin adinda
++    /// yazmiyordu.
++    /// </summary>
++    [Theory]
++    [InlineData("en", "15.4 - 15.8 MB · 3.7%")]
++    [InlineData("tr", "15,4 - 15,8 MB · %3,7")]
++    public void AralikSatirininBilesenleriDileUyar(string dil, string beklenen)
++    {
++        Strings.Use(dil);
++
++        var dusuk = MainWindow.Num(15.4, "0.0");
++        var yuksek = MainWindow.Num(15.8, "0.0");
++        var satir = $"{dusuk} - {yuksek} MB · " + MainWindow.Percent(0.037);
++
++        Assert.Equal(beklenen, satir);
++    }
++
++    /// <summary>
++    /// T192 tur 2 K9: <c>DescribeBytes</c> paylasim tavanini ekrana yaziyor
++    /// (<c>TxtShareCeiling</c>). Tam ikilik katlar (128 MiB, 25 GiB) ondalik tasimadigi
++    /// icin <c>SettingsTabTests</c>'teki pimler bu degisiklikten etkilenmiyor; ondalikli
++    /// bir tavan ise dile uyar.
++    /// </summary>
++    [Theory]
++    [InlineData("en", "1.5 GiB")]
++    [InlineData("tr", "1,5 GiB")]
++    public void PaylasimTavaniDileUyar(string dil, string beklenen)
++    {
++        Strings.Use(dil);
++
++        Assert.Equal(beklenen, MainWindow.DescribeBytes(1_610_612_736L));
++    }
++
++    [Theory]
++    [InlineData("playback.panel.hint", false)]
++    [InlineData("main.plan.title", false)]
++    [InlineData("main.section.quality", false)]
++    [InlineData("main.section.frame", false)]
++    [InlineData("playback.panel.hint", true)]
++    [InlineData("main.section.quality", true)]
++    public void GovdeCumlesiDilDosyasindakiGibiKalir(string anahtar, bool turkce)
++    {
++        var ham = Strings.GetIn(turkce ? "tr" : "en", anahtar);
++
++        Assert.True(LanguageCatalog.ReadsAsProse(ham), $"'{ham}' govde sayilmadi");
++        Assert.Equal(ham, LanguageCatalog.Title(ham, turkce));
++    }
++
++    /// <summary>
++    /// Karsi yon: gercek basliklar kelime kelime buyutulmeye devam eder. Bu olmasa
++    /// <c>ReadsAsProse</c>'u her zaman <c>true</c> dondurmek yesil kalirdi.
++    /// </summary>
++    [Theory]
++    [InlineData("main.info.video-codec", false, "Video Codec")]
++    [InlineData("main.info.fps", false, "FPS")]
++    [InlineData("main.output.current-size", false, "Current Output Size")]
++    [InlineData("main.info.video-codec", true, "Video Kodeği")]
++    public void BaslikKelimeKelimeBuyutulmeyeDevamEder(string anahtar, bool turkce, string beklenen)
++    {
++        var ham = Strings.GetIn(turkce ? "tr" : "en", anahtar);
++
++        Assert.False(LanguageCatalog.ReadsAsProse(ham), $"'{ham}' yanlislikla govde sayildi");
++        Assert.Equal(beklenen, LanguageCatalog.Title(ham, turkce));
++    }
++}
++
++/// <summary>
++/// T192 K4 ve dorduncu madde. Olcum basiz pencerede, gercek yerlesim motoruyla.
++///
++/// <para><b>Kaynak bilgi izgarasi.</b> <c>InfoGrid</c> bir <see cref="UniformGrid"/>:
++/// dort sutun esit genislikte ve hucre kirpmiyor. Turkce etiket Ingilizceden uzun
++/// oldugu icin "Video kodeği" kendi hucresinden tasip yanindaki "Ses" etiketinin
++/// uzerine biniyordu. Olcu her etiketin genisligini kendi hucresinin genisligiyle
++/// karsilastirir; tasma varsa kirmizi doner.</para>
++///
++/// <para><b>Katlanmis bolum ozeti.</b> Baslik satiri yatay bir <see cref="StackPanel"/>
++/// idi; yatay yigin cocuguna sonsuz genislik verir, dolayisiyla ozet kendi istedigi
++/// genislikte olculur ve panel kenarinda dumduz kesilirdi ("Kare Hızı D…" degil,
++/// harfin ortasindan). Satir <see cref="Grid"/>'e cevrildi ve ozet yildiz sutunda
++/// ucnoktayla kisaliyor.</para>
++///
++/// <para><b>Turetme satiri.</b> Satir <c>TxtTarget.Text</c>'i okur ama yalnizca boyut
++/// tavani kapaliyken yenileniyordu; kutuda 24 yazarken satir "Hedef 16 MB" diye
++/// kaliyordu.</para>
++/// </summary>
++public sealed class KareYerlesimTests
++{
++    /// <summary>
++    /// Olculen iki gorus alani. <c>Genis</c> karenin cekildigi olcu, <c>Dar</c> pencerenin
++    /// izin verdigi en dar olcu (<c>MainWindow.axaml</c>, <c>MinWidth="1040"</c>). T192
++    /// tur 1'de dar olcu dosya elle degistirilip bir kez kosulmustu; tur 2'de olcu
++    /// parametreye cevrildi, boylece iddia tekrarlanabilir.
++    /// </summary>
++    public static readonly Size Genis = new(1600, 1000);
++
++    public static readonly Size Dar = new(1040, 720);
++
++    public static TheoryData<string, double, double> IkiDilIkiOlcu() => new()
++    {
++        { "tr", 1600, 1000 },
++        { "en", 1600, 1000 },
++        { "tr", 1040, 720 },
++        { "en", 1040, 720 }
++    };
++
++    private static T Read<T>(string dil, Func<MainWindow, T> read) => Read(dil, Genis, read);
++
++    private static T Read<T>(string dil, Size olcu, Func<MainWindow, T> read) =>
++        AppHost.Run(() =>
++        {
++            var onceki = Strings.Language;
++            Strings.Use(dil);
++            try
++            {
++                var window = new MainWindow
++                {
++                    Width = double.NaN,
++                    Height = double.NaN
++                };
++
++                window.Measure(olcu);
++                window.Arrange(new Rect(olcu));
++                window.UpdateLayout();
++
++                Visual? node = window.GetVisualDescendants().OfType<UniformGrid>()
++                    .Single(grid => grid.Name == "InfoGrid");
++                while (node is not null)
++                {
++                    if (node is Control control) control.IsVisible = true;
++                    node = node.GetVisualParent();
++                }
++
++                window.Measure(olcu);
++                window.Arrange(new Rect(olcu));
++                window.UpdateLayout();
++                return read(window);
++            }
++            finally
++            {
++                Strings.Use(onceki);
++            }
++        });
++
++    private static T Named<T>(MainWindow window, string name) where T : Control =>
++        window.GetVisualDescendants().OfType<T>().Single(control => control.Name == name);
++
++    /// <summary>
++    /// Etiketin <b>sarilmamis</b> genisligi olculuyor. T192 tur 1'de olcu
++    /// <c>label.TextLayout.Width</c>'e bakiyordu, ama etiketlerde
++    /// <c>TextWrapping="Wrap"</c> var (<c>MainWindow.axaml:262-291</c>): sarilan metnin
++    /// yerlesim genisligi hucreyi <b>hic asamaz</b>, dolayisiyla kosul her zaman yanlis
++    /// donuyordu ve olcu mutasyona oluydu. Sarma kapatilip yeniden olculuyor; boylece
++    /// etiket uzarsa olcu kirmiziya doner.
++    /// <see cref="OlcuUzunEtiketiYakalar"/> bunu ayrica kanitliyor.
++    /// </summary>
++    [Theory]
++    [MemberData(nameof(IkiDilIkiOlcu))]
++    public void KaynakBilgiEtiketleriKendiHucresindeKalir(string dil, double genislik, double yukseklik)
++    {
++        var tasan = Read(dil, new Size(genislik, yukseklik), window => Tasanlar(window, new Size(genislik, yukseklik), null));
++
++        Assert.True(tasan.Count == 0, string.Join(Environment.NewLine, tasan));
++    }
++
++    /// <summary>
++    /// Olcunun mutasyon sinavi: hucreye sigmayacak kadar uzun bir etiket verildiginde
++    /// olcu <b>kirmizi</b> donmeli. Donmezse yukaridaki yesil bir sey soylemiyor demektir.
++    /// </summary>
++    [Fact]
++    public void OlcuUzunEtiketiYakalar()
++    {
++        var tasan = Read("tr", Genis, window => Tasanlar(window, Genis, "Cok Uzun Bir Kaynak Bilgi Etiketi Ornegi"));
++
++        Assert.NotEmpty(tasan);
++    }
++
++    /// <summary>
++    /// Her hucrenin ilk metnini alir, sarmayi kapatir, yeniden yerlestirir ve metin
++    /// genisligini hucre genisligiyle karsilastirir. <paramref name="mutasyon"/> verilirse
++    /// ilk etiketin metni onunla degistirilir.
++    /// </summary>
++    private static List<string> Tasanlar(MainWindow window, Size olcu, string? mutasyon)
++    {
++        var grid = window.GetVisualDescendants().OfType<UniformGrid>()
++            .Single(g => g.Name == "InfoGrid");
++
++        var hucreler = grid.Children
++            .OfType<StackPanel>()
++            .Select(cell => (cell, label: cell.Children.OfType<TextBlock>().First()))
++            .ToList();
++
++        foreach (var (_, label) in hucreler) label.TextWrapping = TextWrapping.NoWrap;
++        if (mutasyon is not null) hucreler[0].label.Text = mutasyon;
++
++        window.Measure(olcu);
++        window.Arrange(new Rect(olcu));
++        window.UpdateLayout();
++
++        return hucreler
++            .Where(pair => pair.label.TextLayout.Width > pair.cell.Bounds.Width + 0.5)
++            .Select(pair => $"{pair.label.Text}: metin {pair.label.TextLayout.Width:0.#} px, hucre {pair.cell.Bounds.Width:0.#} px")
++            .ToList();
++    }
++
++    /// <summary>
++    /// Uzun bir ozet metni panelin disina tasmaz. Metin dogrudan yaziliyor cunku olculen
++    /// sey ozetin icerigi degil, satirin uzun metni nasil tasidigi.
++    /// </summary>
++    [Theory]
++    [InlineData("TxtFrameSummary")]
++    [InlineData("TxtQualitySummary")]
++    [InlineData("TxtAudioSummary")]
++    [InlineData("TxtAdvancedSummary")]
++    public void KatlanmisBolumOzetiSatirinIcindeKalir(string ad)
++    {
++        var (ozetSagi, satirGenisligi) = Read("tr", window =>
++        {
++            var ozet = Named<TextBlock>(window, ad);
++            ozet.Text = "Çözünürlük Düşürülebilir · Kare Hızı Düşürülebilir · Ses Yeniden Kodlanabilir";
++
++            window.Measure(Genis);
++            window.Arrange(new Rect(Genis));
++            window.UpdateLayout();
++
++            var satir = (Layoutable)ozet.GetVisualParent()!;
++            return (ozet.Bounds.Left + ozet.TextLayout.Width, satir.Bounds.Width);
++        });
++
++        Assert.True(ozetSagi <= satirGenisligi + 0.5,
++            $"ozet metni {ozetSagi:0.#} px'te bitiyor, satir {satirGenisligi:0.#} px");
++    }
++
++    private const string OrnekYol = @"C:\Kayitlar\tatil-cekimi-2160p60.mkv";
++
++    /// <summary>
++    /// <c>WindowLayoutTests.Sample</c> ile ayni tasiyici kaynak. Yoklama cagrilmiyor;
++    /// olcum diskteki hicbir dosyaya ve hicbir dis araca bagli degil.
++    /// </summary>
++    private static MediaInfo Ornek() => new()
++    {
++        FilePath = OrnekYol,
++        FileSizeBytes = 420L * 1024 * 1024,
++        DurationSeconds = 187.5,
++        Width = 3840,
++        Height = 2160,
++        Fps = 59.94,
++        VideoCodec = "hevc",
++        TotalBitrateBps = 18_800_000,
++        AudioCodec = "aac",
++        AudioBitrateBps = 192_000,
++        AudioChannels = 2,
++        PixelFormat = "yuv420p"
++    };
++
++    /// <summary>
++    /// Gercek yukleme yolu: <c>LoadWithoutProbing</c> -> <c>ApplyLoaded</c> -> <c>ShowInfo</c>
++    /// ve <c>Recalculate</c>. Ekrana yazan kod bu yoldan geciyor, dolayisiyla bicim dizgesi
++    /// testte kopyalanmiyor.
++    /// </summary>
++    private static T Yuklu<T>(string dil, Func<MainWindow, T> read) =>
++        AppHost.Run(() =>
++        {
++            var onceki = Strings.Language;
++            Strings.Use(dil);
++            try
++            {
++                var window = new MainWindow
++                {
++                    Width = double.NaN,
++                    Height = double.NaN
++                };
++
++                window.LoadWithoutProbing(OrnekYol, Ornek());
++                window.SettleFades();
++                window.Measure(Genis);
++                window.Arrange(new Rect(Genis));
++                window.UpdateLayout();
++                return read(window);
++            }
++            finally
++            {
++                Strings.Use(onceki);
++            }
++        });
++
++    /// <summary>
++    /// T192 tur 2 K9. <c>TxtFps</c> sabit <see cref="System.Globalization.CultureInfo.InvariantCulture"/>
++    /// ile yaziliyordu; Turkce arayuzde kare hizi <c>29.97</c> gorunuyordu. Olcu gercek
++    /// yukleme yolundan geciyor.
++    /// </summary>
++    [Theory]
++    [InlineData("en", "59.94")]
++    [InlineData("tr", "59,94")]
++    public void KaynakBilgiKareHiziDileUyar(string dil, string beklenen)
++        => Assert.Equal(beklenen, Yuklu(dil, window => Named<TextBlock>(window, "TxtFps").Text));
++
++    /// <summary>
++    /// T192 tur 2, tur 1 borcu 3: tahmin araligi satirinin <b>ekrandaki</b> hali.
++    /// <c>RefreshEstimateView</c> gercekten kosuyor; bicim dizgesi testte kopyalanmiyor.
++    /// </summary>
++    [Theory]
++    [InlineData("en", ".", ",")]
++    [InlineData("tr", ",", ".")]
++    public void TahminAraligiSatiriEkrandaDileUyar(string dil, string ayirici, string yabanci)
++    {
++        var satir = Yuklu(dil, window => Named<TextBlock>(window, "TxtEstimateRange").Text ?? "");
++
++        Assert.Contains("MB", satir);
++        Assert.Contains(ayirici, satir);
++        Assert.DoesNotContain(yabanci, satir);
++    }
++
++    [Fact]
++    public void TuretmeSatiriHedefKutusunuIzler()
++    {
++        var satir = Read("en", window =>
++        {
++            Named<TextBox>(window, "TxtTarget").Text = "24";
++            window.UpdateLayout();
++            return Named<TextBlock>(window, "TxtChipDerivation").Text ?? "";
++        });
++
++        Assert.Contains("24", satir);
++        Assert.DoesNotContain("16", satir);
++    }
++}
++
++/// <summary>
++/// T192 tur 2 K8 — baslik kuralinin kapsami.
++///
++/// <para>Tur 1'de <c>ReadsAsProse</c> genisletildi ve rapor dort satirlik bir tablo
++/// verdi. Yan etkinin <b>olcusu</b> yoktu: dil dosyasindaki her metin ayni geciten
++/// geciyor, dolayisiyla degisen satir sayisi dortten cok fazla. Bu olcu butun dil
++/// dosyalarini gercek <c>LanguageCatalog.Title</c> uzerinden gezer, kol degistiren her
++/// anahtari sayar ve doker.</para>
++///
++/// <para><b>Kol degistiren</b> = <c>fd6fe0c1</c>'in kuralina (yalniz cumle isareti) gore
++/// baslik, bugunku kurala gore govde. Eski kural burada tek yerde, alti satirda
++/// tekrarlanir — kurulan mekanizma degil, <b>karsilastirma tabani</b> odur.
++/// Ciktinin gercekten degistigi ayrica olculdu: ayni dokum bir de
++/// <c>origin/main</c>'in <c>LanguageCatalog.cs</c>'siyle alinip <c>diff</c>'lendi,
++/// ham cikti <c>.calisma/T192/k8-fark.txt</c>.</para>
++///
++/// <para>Sayi <b>pimlidir</b>. Dil dosyasina metin eklendiginde ya da bir metin
++/// degistiginde bu pim kirilir; kirilinca yapilacak sey susturmak degil, yeni sayiyi
++/// <c>docs/olcumler/kare-kusurlari.md</c>'ye yazmaktir.</para>
++/// </summary>
++public sealed class BaslikKapsamiTests
++{
++    private readonly ITestOutputHelper _cikti;
++
++    public BaslikKapsamiTests(ITestOutputHelper cikti) => _cikti = cikti;
++
++    /// <summary><c>fd6fe0c1</c>'in kurali: yalniz cumle isareti.</summary>
++    private static bool EskiKuralaGoreGovde(string metin)
++    {
++        for (var index = 0; index < metin.Length; index++)
++        {
++            if (metin[index] is not ('.' or ';' or '!' or '?')) continue;
++            if (index + 1 == metin.Length || char.IsWhiteSpace(metin[index + 1])) return true;
++        }
++
++        return false;
++    }
++
++    private static bool Turkce(string dil)
++        => dil.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
++
++    /// <summary>
++    /// Sozcugun bas tarafi <c>Names</c>'de bildirilmis bir ad mi? Sinir kurali
++    /// <c>LanguageCatalog.KnownSpelling</c> ile ayni: bastaki harf disi imler atlanir,
++    /// once bir rakam gelirse sozcuk olcudur ve ada bakilmaz, ad yalniz <b>bastaki</b>
++    /// harf/rakam dizisinde aranir. Boylece <c>tools/ffmpeg</c> bir yoldur, ad degil.
++    /// </summary>
++    private static (string Govde, string? Dogru) AdiCagriliyorsa(string sozcuk)
++    {
++        var offset = 0;
++        while (offset < sozcuk.Length && !char.IsLetter(sozcuk[offset]))
++        {
++            if (char.IsDigit(sozcuk[offset])) return (sozcuk, null);
++            offset++;
++        }
++
++        if (offset == sozcuk.Length) return (sozcuk, null);
++
++        var govde = sozcuk[offset..];
++        var token = new string(govde.TakeWhile(char.IsLetterOrDigit).ToArray());
++        var bare = new string(govde.TakeWhile(char.IsLetter).ToArray());
++        if (LanguageCatalog.Names.TryGetValue(token, out var ad)) return (govde, ad);
++        if (LanguageCatalog.Names.TryGetValue(bare, out var isim)) return (govde, isim);
++        return (govde, null);
++    }
++
++    [Fact]
++    public void KolDegistirenAnahtarlarSayilir()
++    {
++        var toplam = 0;
++        var dilBasina = new SortedDictionary<string, int>(StringComparer.Ordinal);
++
++        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
++        {
++            dilBasina[dil] = 0;
++            foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
++            {
++                var ham = Strings.GetIn(dil, anahtar);
++                if (EskiKuralaGoreGovde(ham)) continue;
++                if (!LanguageCatalog.ReadsAsProse(ham)) continue;
++
++                toplam++;
++                dilBasina[dil]++;
++                _cikti.WriteLine($"KOL\t{dil}\t{anahtar}\t{ham.ReplaceLineEndings(" ")}\t{LanguageCatalog.Title(ham, Turkce(dil)).ReplaceLineEndings(" ")}");
++            }
++        }
++
++        foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
++        _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
++
++        Assert.Equal(124, toplam);
++        Assert.Equal(88, dilBasina["en"]);
++        Assert.Equal(36, dilBasina["tr"]);
++    }
++
++    /// <summary>
++    /// Butun anahtarlarin gercek <c>Title</c> ciktisini doker. Eski/yeni farkinin ham
++    /// tabani bu dokum: ayni test <c>origin/main</c>'in <c>LanguageCatalog.cs</c>'siyle
++    /// bir kez daha kosuluyor ve iki dokum <c>diff</c>'leniyor.
++    /// </summary>
++    /// <summary>
++    /// T192 tur 3 K11 — ad ve birim yazimi metnin neresinde durursa dursun korunur.
++    ///
++    /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
++    /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
++    /// kolundan govde koluna gecen 124 metinde ilk sozcuk disindaki <c>ffmpeg</c>
++    /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
++    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu 950 anahtarin
++    /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
++    /// </summary>
++    [Fact]
++    public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
++    {
++        var kayip = new List<string>();
++        var gezilen = 0;
++
++        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
++        {
++            foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
++            {
++                var cikti = LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil));
++                gezilen++;
++
++                foreach (var sozcuk in cikti.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
++                {
++                    var (govde, dogru) = AdiCagriliyorsa(sozcuk);
++                    if (dogru is null || govde.StartsWith(dogru, StringComparison.Ordinal)) continue;
++                    kayip.Add($"{dil}	{anahtar}	{govde[..dogru.Length]} yerine {dogru}	{cikti}");
++                }
++            }
++        }
++
++        foreach (var satir in kayip) _cikti.WriteLine("KAYIP	" + satir);
++        _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
++        _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
++
++        Assert.Equal(950, gezilen);
++        Assert.Empty(kayip);
++    }
++
++    [Fact]
++    public void TumCiktiDokulur()
++    {
++        var satir = 0;
++        foreach (var dil in Strings.Languages.OrderBy(d => d, StringComparer.Ordinal))
++        {
++            foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
++            {
++                _cikti.WriteLine($"DOKUM\t{dil}\t{anahtar}\t{LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil)).ReplaceLineEndings(" ")}");
++                satir++;
++            }
++        }
++
++        Assert.True(satir > 0);
++    }
++}
+diff --git a/tests/VidShrink.Tests/CasingTests.cs b/tests/VidShrink.Tests/CasingTests.cs
+index fa152d2..076dc70 100644
+--- a/tests/VidShrink.Tests/CasingTests.cs
++++ b/tests/VidShrink.Tests/CasingTests.cs
+@@ -121,18 +121,24 @@ public sealed class CasingTests
+ 
+     /// <summary>
+     /// T65 K1: ölçü birimi ve kodlayıcı tanımlayıcısı büyük harf geçidinden yazıldığı gibi
+-    /// çıkar, cümlenin geri kalanı başlık biçiminde kalır. <c>Ms</c> SI'da megasaniyedir ve
+-    /// <c>Libx264</c> diye bir ffmpeg kodlayıcısı yoktur — kullanıcı kodlayıcı adını
+-    /// kaydedicisinin ayarlarında arıyor.
++    /// çıkar. <c>Ms</c> SI'da megasaniyedir ve <c>Libx264</c> diye bir ffmpeg kodlayıcısı
++    /// yoktur — kullanıcı kodlayıcı adını kaydedicisinin ayarlarında arıyor.
++    ///
++    /// <para>T192: beklenen değerlerin yarısı yeniden temellendirildi. Ölçünün tuttuğu şey
++    /// birim ve kodlayıcı yazımıdır ve o hiç değişmedi; değişen, <b>cümlenin geri kalanının</b>
++    /// nasıl büyütüldüğü. <c>ReadsAsProse</c> artık işlev sözcüğü (<c>the</c>, <c>of</c>,
++    /// <c>is</c>, <c>on</c>) taşıyan metni gövde sayıyor, dolayısıyla "the probe took 120 ms"
++    /// bir başlık değil bir cümle ve yalnız satır başı büyüyor. Pim susturulmadı: birim
++    /// yazımını bozan bir mutasyon hâlâ kırmızıya döndürür.</para>
+     /// </summary>
+     [Theory]
+-    [InlineData("the probe took 120 ms", "The Probe Took 120 ms")]
+-    [InlineData("budget of 20000 ms", "Budget Of 20000 ms")]
+-    [InlineData("target is 16 MB", "Target Is 16 MB")]
+-    [InlineData("halve the fps", "Halve The fps")]
++    [InlineData("the probe took 120 ms", "The probe took 120 ms")]
++    [InlineData("budget of 20000 ms", "Budget of 20000 ms")]
++    [InlineData("target is 16 MB", "Target is 16 MB")]
++    [InlineData("halve the fps", "Halve the fps")]
+     [InlineData("software encoder libx264", "Software Encoder libx264")]
+     [InlineData("hardware encoder h264_nvenc", "Hardware Encoder h264_nvenc")]
+-    [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv Beats libsvtav1 On aac")]
++    [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv beats libsvtav1 on aac")]
+     public void UnitsAndEncoderNamesKeepTheirSpelling(string text, string expected)
+         => Assert.Equal(expected, LanguageCatalog.Title(text, false));
+ 
+diff --git a/tests/VidShrink.Tests/ChipTests.cs b/tests/VidShrink.Tests/ChipTests.cs
+index e2e312f..58d9d00 100644
+--- a/tests/VidShrink.Tests/ChipTests.cs
++++ b/tests/VidShrink.Tests/ChipTests.cs
+@@ -239,6 +239,6 @@ public sealed class ChipTests
+ 
+         Assert.False(visible);
+         Assert.Equal(7, count);
+-        Assert.Equal($"Why These Choices · {count}", head);
++        Assert.Equal($"Why these choices · {count}", head);
+     }
+ }
+diff --git a/tests/VidShrink.Tests/LanguageTests.cs b/tests/VidShrink.Tests/LanguageTests.cs
+index 32a20ad..a996899 100644
+--- a/tests/VidShrink.Tests/LanguageTests.cs
++++ b/tests/VidShrink.Tests/LanguageTests.cs
+@@ -810,7 +810,7 @@ public sealed class LanguageTests : IDisposable
+             return (first, second);
+         });
+ 
+-        Assert.Contains("Back To The Start", english);
++        Assert.Contains("Back to the start", english);
+         Assert.Contains("Control Strip", english);
+         Assert.Contains("Başa Dön", turkish);
+         Assert.Contains("Denetim Şeridi", turkish);
+@@ -1062,10 +1062,15 @@ public sealed class LanguageTests : IDisposable
+ 
+     /// <summary>
+     /// Her iki dil dosyasindaki cumle isaretli her deger icin: satir basindaki sozcuk
+-    /// disinda **hicbir sozcuk degismemeli**. Satir basi Names/Verbatim kurallarina tabi
+-    /// oldugu icin (ffmpeg -> FFmpeg, storage.to -> storage.to) olcu onu disarida birakiyor;
+-    /// tuttugu sey kelime kelime buyutmenin govdeye geri gelmemesi. Sayi ekranda: kac deger
+-    /// govde sayildi, kac sozcuk karsilastirildi.
++    /// disinda **hicbir sozcuk degismemeli** — bildirilmis ad yazimlari haric.
++    /// Tuttugu sey kelime kelime buyutmenin govdeye geri gelmemesi.
++    ///
++    /// <para>T192 tur 3'te yeniden temellendirildi. Once satir basi <c>Names</c> kuralina
++    /// tabiydi, govde degildi; sonuc, ayni sozcugun cumlenin neresinde durduguna gore
++    /// farkli yazilmasiydi ("Ffmpeg'in" satir basinda "FFmpeg'in", ortada "ffmpeg").
++    /// Ad yazimi konuma bagli olamaz, bu yuzden <c>Names</c> gecidi artik her sozcukte
++    /// gecerli ve olcu onu bozulma degil <b>ad duzeltmesi</b> diye sayiyor. Iki sayi da
++    /// ekranda: kac sozcuk bozuldu, kac sozcuk ad olarak duzeldi.</para>
+     /// </summary>
+     [Theory]
+     [InlineData("tr")]
+@@ -1081,6 +1086,7 @@ public sealed class LanguageTests : IDisposable
+         Assert.NotEmpty(prose);
+ 
+         var bozulan = new List<string>();
++        var adDuzelen = new List<string>();
+         var karsilastirilan = 0;
+ 
+         foreach (var (key, value) in prose)
+@@ -1101,15 +1107,21 @@ public sealed class LanguageTests : IDisposable
+                 var basAtlandi = false;
+                 for (var i = 0; i < kaynakSozcukler.Length; i++)
+                 {
+-                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetter))
++                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetterOrDigit))
+                     {
+                         basAtlandi = true;
+                         continue;
+                     }
+ 
+                     karsilastirilan++;
+-                    if (!string.Equals(kaynakSozcukler[i], ekranSozcukler[i], StringComparison.Ordinal))
+-                        bozulan.Add($"{key}: '{kaynakSozcukler[i]}' -> '{ekranSozcukler[i]}'");
++                    if (string.Equals(kaynakSozcukler[i], ekranSozcukler[i], StringComparison.Ordinal))
++                        continue;
++
++                    var kayit = $"{key}: '{kaynakSozcukler[i]}' -> '{ekranSozcukler[i]}'";
++                    if (AdYazimiDuzeltmesi(kaynakSozcukler[i], ekranSozcukler[i]))
++                        adDuzelen.Add(kayit);
++                    else
++                        bozulan.Add(kayit);
+                 }
+             }
+         }
+@@ -1117,6 +1129,35 @@ public sealed class LanguageTests : IDisposable
+         Assert.True(karsilastirilan > 1000, $"Karsilastirilan sozcuk sayisi cok dusuk: {karsilastirilan}");
+         Assert.True(bozulan.Count == 0,
+             $"Dil '{language}': {prose.Count} govde degeri, {karsilastirilan} sozcuk; "
+-            + $"{bozulan.Count} sozcuk bozuldu:\n" + string.Join("\n", bozulan));
++            + $"{bozulan.Count} sozcuk bozuldu:\n" + string.Join("\n", bozulan)
++            + $"\nAd duzeltmesi ({adDuzelen.Count}):\n" + string.Join("\n", adDuzelen));
++    }
++
++    /// <summary>
++    /// Iki sozcuk yalnizca bildirilmis ad yazimi yuzunden mi ayriliyor? Fark buyuk/kucuk
++    /// harften ibaret olmali ve ekrandaki sozcugun bas tarafi <c>Names</c>'deki yazimla
++    /// baslamali. Baska her fark bozulmadir.
++    /// </summary>
++    private static bool AdYazimiDuzeltmesi(string kaynak, string ekran)
++    {
++        if (!string.Equals(kaynak, ekran, StringComparison.OrdinalIgnoreCase)) return false;
++
++        var offset = 0;
++        while (offset < ekran.Length && !char.IsLetter(ekran[offset]))
++        {
++            if (char.IsDigit(ekran[offset])) return false;
++            offset++;
++        }
++
++        if (offset == ekran.Length) return false;
++
++        var govde = ekran[offset..];
++        var token = new string(govde.TakeWhile(char.IsLetterOrDigit).ToArray());
++        var bare = new string(govde.TakeWhile(char.IsLetter).ToArray());
++        if (LanguageCatalog.Names.TryGetValue(token, out var ad))
++            return govde.StartsWith(ad, StringComparison.Ordinal);
++        if (LanguageCatalog.Names.TryGetValue(bare, out var isim))
++            return govde.StartsWith(isim, StringComparison.Ordinal);
++        return false;
+     }
+ }

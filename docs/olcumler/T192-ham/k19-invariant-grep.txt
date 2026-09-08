@@ -1,0 +1,33 @@
+570:    /// <see cref="CultureInfo.InvariantCulture"/> ikisini de noktaya çeviriyordu; C#
+837:            TxtTarget.Text = settings.TargetMb.ToString("0.##", CultureInfo.InvariantCulture);
+838:            TxtQualityTarget.Text = settings.QualityTarget.ToString("0.##", CultureInfo.InvariantCulture);
+848:            TxtQuality.Text = settings.QualityValue.ToString(CultureInfo.InvariantCulture);
+1176:        CmbAdvCrf.ItemsSource = new[] { automatic }.Concat(AdvancedCrfCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
+1182:        CmbAdvAudioKbps.ItemsSource = new[] { automatic }.Concat(AdvancedAudioKbpsCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
+1191:        CmbAdvMinResolution.ItemsSource = new[] { automatic }.Concat(AdvancedMinResolutionCandidates.Select(c => c.ToString(CultureInfo.InvariantCulture))).ToList();
+1194:        CmbAdvMinFps.ItemsSource = new[] { automatic }.Concat(AdvancedMinFpsCandidates.Select(c => c.ToString("0.##", CultureInfo.InvariantCulture))).ToList();
+1299:            TxtTarget.Text = fixedMb.ToString("0.##", CultureInfo.InvariantCulture);
+1303:            TxtTarget.Text = Math.Round(_info.FileSizeMb / 2, 1).ToString("0.##", CultureInfo.InvariantCulture);
+1368:            && double.TryParse(crfText, NumberStyles.Float, CultureInfo.InvariantCulture, out var crf))
+1375:            && int.TryParse(audioKbpsText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var audioKbps))
+1387:            && int.TryParse(minResText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var minRes))
+1391:            && double.TryParse(minFpsText, NumberStyles.Float, CultureInfo.InvariantCulture, out var minFps))
+1418:        TxtAdvCrfNow.Text = has ? Say("main.advanced.now", plan!.Crf is { } crf ? crf.ToString(CultureInfo.InvariantCulture) : "-") : "";
+1420:        TxtAdvAudioKbpsNow.Text = has ? Say("main.advanced.now", plan!.AudioBitrateK.ToString(CultureInfo.InvariantCulture)) : "";
+1422:            ? Say("main.advanced.now", plan!.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Say("main.advanced.audio-channels.none"))
+2132:            var json = $"{{\"planPanelHeight\":{PlanPanelRow.Height.Value.ToString(CultureInfo.InvariantCulture)}}}";
+2257:        => double.TryParse(TxtTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mb) && mb > 0 ? mb : WhatsAppTargetMb;
+2476:        TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
+3191:        TxtTarget.Text = Math.Round(SliderTarget.Value, 1).ToString("0.##", CultureInfo.InvariantCulture);
+3230:        TxtQualityTarget.Text = Math.Round(SliderQualityTarget.Value).ToString("0.##", CultureInfo.InvariantCulture);
+3251:        var value = double.TryParse(TxtQualityTarget.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var score)
+3272:        TxtTarget.Text = mb.ToString("0.##", CultureInfo.InvariantCulture);
+3293:        TxtQualityTarget.Text = Math.Round(score, 1).ToString("0.##", CultureInfo.InvariantCulture);
+3662:            prompt.AttemptDuration.ToString(@"mm\:ss", CultureInfo.InvariantCulture));
+3685:        int.TryParse(TxtQuality.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var quality);
+3686:        int.TryParse(TxtAudioBitrate.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var audioK);
+3704:            if (double.TryParse(TxtCustomFps.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var custom)) fps = custom;
+3706:        else if (fpsTag is not null && double.TryParse(fpsTag, NumberStyles.Float, CultureInfo.InvariantCulture, out var fixedFps))
+3742:            : TimeSpan.TryParse(text, CultureInfo.InvariantCulture, out var value) ? value : TimeSpan.MinValue;
+3751:        TxtQuality.Text = Math.Round(SliderQuality.Value).ToString(CultureInfo.InvariantCulture);
+3772:        if (!int.TryParse(TxtQuality.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value)) return;
