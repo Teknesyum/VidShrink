@@ -1,4 +1,4 @@
-﻿# T192 - Karelerde Gorunen Arayuz Kusurlari
+# T192 - Karelerde Gorunen Arayuz Kusurlari
 
 Kaynak kare: `docs/gorseller/T189-kucult-en.png`. Olcum basiz pencerede, uygulamanin
 kendi yerlesim motoruyla (`AppHost.Run` + `Measure`/`Arrange`/`UpdateLayout`) alindi.
