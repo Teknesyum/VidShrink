@@ -12,7 +12,7 @@ Kod yorumu yasak; duzenegin gerekceleri burada durur.
 | `uyumlu` | `Compatible` | `libx264` | Uyumluluk kolu |
 | `yedek` | `MaxCompression`, `libsvtav1` gizli | `libx265` | K4 `libsvtav1`in `zones`u sessizce yok saydigini gosterdi; sikistirma ailesinde zone denenebilen tek kodlayici bu yoldan cikar |
 
-`SvtavYok` sarmalayicisi yalniz `IEncoderAvailability`yi ezer; argüman uretimi
+`SvtavYok` sarmalayicisi yalniz `IEncoderAvailability`yi ezer; arguman uretimi
 gercek yeteneklerle calisir.
 
 ## Referans (hak edilen)
@@ -279,13 +279,13 @@ butun surucu harfleri, `.calisma` disi klasorler; `C:/Users` altinda 400 MB ustu
 video dosyasi yok). Pencereler elde olan uc 60 sn'lik parcadan uretildi. Pencere
 suresi ~189 sn yerine ~60 sn oldugu icin **hedef boyut ayni (60 MB) kalirken bit hizi
 ucti**: T114'te `p1` plani `806x454`e dusuyordu, T193'te uc pencere de `1920x1080`
-kaliyor. Bu koşumun sayilari T114'un hucreleriyle **dogrudan karsilastirilamaz**;
+kaliyor. Bu kosumun sayilari T114'un hucreleriyle **dogrudan karsilastirilamaz**;
 taban bu kosumda yeniden olculur.
 
 ## T193 — SVT-AV1'de `lp=8` sessizce dusuyordu
 
 `IsParcacigiArgs` SVT-AV1 icin `lp=8` yaziyordu; SVT-AV1'in `lp` araligi **0-6**.
-ffmpeg uyari basip azami paralellige duşuyor (`Level of parallelism supports levels
+ffmpeg uyari basip azami paralellige dusuyor (`Level of parallelism supports levels
 [0-6]. Setting maximum parallelism level.`), cikis kodu 0. DUZENEK'in "yanlis bayrak
 sessizce kaybolur" uyarisinin kendi icinde bir ornegi. `lp` artik `SvtLpTavan = 6` ile
 kiskaclanir. Davranis degismedi (8 zaten 6'ya dusuyordu), kaybolan uyari ve belirsizlik.
@@ -294,7 +294,7 @@ kiskaclanir. Davranis degismedi (8 zaten 6'ya dusuyordu), kaybolan uyari ve beli
 
 `AbAsync` (K5/K7) ve `Kodla` kapiyi `ZonesFlag` uzerinden kuruyordu; `libsvtav1` icin
 `null` donuyor ve `maks` kolu **hic kosulmuyordu** — T114'un "Olculemeyenler"
-tablosundaki uc bos K5 hucresinin sebebi budur. Kapı `ParamsFlag`e cevrildi:
+tablosundaki uc bos K5 hucresinin sebebi budur. Kapi `ParamsFlag`e cevrildi:
 `libsvtav1` icin `-svtav1-params` doner, dagitim parametresi o yoldan gecer.
 
 Bu, `zones`u `libsvtav1`de **calisir** yapmaz — kodlayici anahtari yok sayiyor
@@ -307,10 +307,20 @@ kolunun kazanci artik "olculmedi" degil, "olculdu ve sifir".
 (iki deger, cikti baytlari, `fark > gurultu x 2` **ve** `fark > cikti/100`).
 
 Kritik duzeltme: T114'un K4 izgarasi tekrar gurultusunu **tek kontrol ciftinden**
-oluyordu. T193'te ayni cift 456 bayt verdi; **dort** kontrol kosumunun araligi ise
-13.423 bayt. Tek cift gurultuyu otuz kat kucuk gosterebiliyor ve `qcomp` gibi
-sinirdaki bir adayi yanlislikla "destekleniyor" yapardi. Gurultu artik dort kosumun
-`max - min`idir.
+oluyordu. T193'te ayni cift 456 bayt verdi; **dort** kontrol kosumunun araligi 13.423
+bayt; **sekiz** kosumunki 33.307 bayt. Yani tek cift olculen gurultuyu 73 kat, dort
+kosum 2,5 kat kucuk gosteriyor — ikisi de `qcomp` gibi sinirdaki bir adayi
+yanlislikla "destekleniyor" yapabilir.
+
+Gurultu artik **sekiz** kosumun `max - min`idir: `08-svtav1-kapisi.sh` icinde
+`KONTROL=8`, ve olculen deger `33.307 bayt` (destek esigi 66.614 bayt). Betik kontrol
+ciktilarini `kontrol-*.mkv` kalibiyla sayar, sayi degisirse aralik ve esik kendiliginden
+yeniden hesaplanir; kaynak dokumu `.calisma/T193/k2kapi/KAYNAK.txt`.
+
+Ucuncu duzeltme kanittadir: her kodlamanin stderr'i `<ad>.p1.err` / `<ad>.p2.err`
+olarak saklanir. `-v error` kaldirildi; `Error parsing option qcomp` ve
+`Error parsing option zones` satirlari artik ham dosyada durur, rapor cumlesi de
+onlari gosterir.
 
 Ikinci duzeltme adlandirmada: T114 izgarasinin `libsvtav1 / qcomp` satiri `qcomp`
 degil `qp-scale-compress-strength` deniyordu. "qcomp `libsvtav1`'de calisiyor"

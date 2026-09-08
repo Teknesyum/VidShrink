@@ -74,6 +74,7 @@ public static class Program
     private static string Kok = string.Empty;
     private static string Is = string.Empty;
     private static string Kol = "maks";
+    private static bool YalnizKodla;
 
     private static readonly JsonSerializerOptions Json = new()
     {
@@ -132,6 +133,8 @@ public static class Program
                 case "harita": await HaritaAsync(p); break;
                 case "k1": await K1Async(p); break;
                 case "k5": await K5Async(p); break;
+                case "k12": await K12Async(p); break;
+                case "k12kodla": YalnizKodla = true; await K12Async(p); break;
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
                 case "k4b": await K4bAsync(p); break;
@@ -528,16 +531,17 @@ public static class Program
         return total > 0 ? values.Select(v => v / total).ToArray() : values;
     }
 
-    private static void Kodla(MediaInfo info, EncodePlan plan, SceneMap? map, string hedefCikti, string? zones)
+    /// <summary>ekParam: params bayragina gecen tam "anahtar=deger" dizgesi (zones=... ya da qp-scale-compress-strength=N).</summary>
+    private static void Kodla(MediaInfo info, EncodePlan plan, SceneMap? map, string hedefCikti, string? ekParam)
     {
         var cikti = hedefCikti + ".yarim.mkv";
         if (File.Exists(cikti)) File.Delete(cikti);
         var used = plan.Clone();
-        if (zones is not null)
+        if (ekParam is not null)
         {
             var flag = ParamsFlag(used.Codec)
                 ?? throw new InvalidOperationException($"{used.Codec} icin params bayragi yok.");
-            used.ExtraArgs.AddRange(new[] { flag, $"zones={zones}" });
+            used.ExtraArgs.AddRange(new[] { flag, ekParam });
         }
         used.ExtraArgs.AddRange(IsParcacigiArgs(used.Codec));
         used.ExtraArgs.AddRange(new[] { "-threads", Threads.ToString(CultureInfo.InvariantCulture) });
@@ -759,6 +763,12 @@ public static class Program
 
     private static async Task K7Async(Pencere p) => await AbAsync(p, "k7", new[] { "eksik-kesim", "fazla-kesim" });
 
+    /// <summary>K12: dagitim kolu zones yerine qp-scale-compress-strength ile kurulur.</summary>
+    private static async Task K12Async(Pencere p) => await AbAsync(p, "k12", new[] { "taban", "dagitim" });
+
+    private const string K12Taban = "qp-scale-compress-strength=0";
+    private const string K12Dagitim = "qp-scale-compress-strength=3";
+
     private static async Task AbAsync(Pencere p, string asama, string[] kollar)
     {
         var hedef = Yol($"{asama}-{Kol}-{p.Ad}.json");
@@ -787,7 +797,11 @@ public static class Program
         {
             var cikti = Path.Combine(Is, $"{asama}-{Kol}-{p.Ad}-{kol}.mkv");
             string? zones = null;
-            if (kol != "taban")
+            if (asama == "k12")
+            {
+                zones = kol == "taban" ? K12Taban : K12Dagitim;
+            }
+            else if (kol != "taban")
             {
                 var kullanilan = kol switch
                 {
@@ -804,16 +818,20 @@ public static class Program
                     Console.WriteLine($"{Kol}/{p.Ad}/{kol}: BILINMIYOR — {not}");
                     continue;
                 }
-                zones = Butce.ZonesArg(kullanilan, Butce.ZoneCarpanlari(kullanilan, gamma), harita.Fps);
+                var zonesHam = Butce.ZonesArg(kullanilan, Butce.ZoneCarpanlari(kullanilan, gamma), harita.Fps);
+                zones = "zones=" + zonesHam;
                 await File.WriteAllTextAsync(Yol($"{asama}-{Kol}-{p.Ad}-{kol}.zones.txt"),
-                    $"gamma={Kabuk.Inv(gamma)}\nsahne={kullanilan.Scenes.Count}\nzones={zones}\n");
+                    $"gamma={Kabuk.Inv(gamma)}\nsahne={kullanilan.Scenes.Count}\nzones={zonesHam}\n");
             }
-            if (!File.Exists(cikti) && asama == "k5" && kol == "taban")
+            if (!File.Exists(cikti) && kol == "taban" && (asama == "k5" || asama == "k12"))
             {
-                var planCikti = Yol($"plan-{Kol}-{p.Ad}.mkv");
-                if (File.Exists(planCikti)) File.Copy(planCikti, cikti);
+                var kaynakCikti = asama == "k12"
+                    ? Yol($"k5-{Kol}-{p.Ad}-taban.mkv")
+                    : Yol($"plan-{Kol}-{p.Ad}.mkv");
+                if (File.Exists(kaynakCikti)) File.Copy(kaynakCikti, cikti);
             }
             if (!File.Exists(cikti)) Kodla(info, plan, map, cikti, zones);
+            if (YalnizKodla) { Console.WriteLine($"{Kol}/{p.Ad}/{kol}: kodlandi, kalite olculmedi"); continue; }
             if (!File.Exists(cikti))
             {
                 sonuclar.Add(new OlcumKaydi(p.Ad, kol, 0, HedefMb, band.LowerMb, band.UpperMb, false, null, null, null, null, "kodlama cikti uretmedi"));
@@ -837,6 +855,7 @@ public static class Program
                               (bilinmiyor is null ? string.Empty : $" BILINMIYOR: {bilinmiyor}"));
         }
 
+        if (YalnizKodla) return;
         await File.WriteAllTextAsync(hedef, JsonSerializer.Serialize(sonuclar, Json));
     }
 }
