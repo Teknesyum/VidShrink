@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -54,6 +54,8 @@ public static class Program
         var clip = EnsureClip(given);
         Console.WriteLine($"klip\t{clip}");
 
+        Warm();
+
         var written = new List<string>();
         foreach (var language in Languages)
             written.AddRange(Capture(language, outDir, clip));
@@ -75,12 +77,14 @@ public static class Program
                 Load(window);
                 SetTarget(window, "24");
                 SelectTab(window, "main.tab.shrink");
+                SettlePlan(window, "kucult");
             }),
 
             Shot(language, outDir, "donustur", window =>
             {
                 Load(window);
                 SelectTab(window, "main.tab.convert");
+                SettlePlan(window, "donustur");
             }),
 
             Shot(language, outDir, "ayarlar", window => SelectTab(window, "main.tab.settings")),
@@ -348,34 +352,40 @@ public static class Program
     private const int PreviewIdleTicks = 40;
 
     /// <summary>
-    /// Onizleme panelini penceresinin <b>son karesinde</b> dondurur.
+    /// Onizleme panelini kaynagin <b>terminal penceresinin son karesinde</b> dondurur.
     ///
-    /// <para>Eski bekleme "kare gelir gelmez" ciziyordu; hangi alt-kare oldugunu makinenin
-    /// o anki yuku belirliyordu ve ayni ikiliyle yapilan uc kosumun ikincisi farkli bir kare
-    /// uretti. Sayarak da belirlenimli olmuyor: bassiz kosumda sunum turu ~5 Hz, boru 30 fps
-    /// besliyor, aradaki fark kare dusuruyor (olculdu: 150 karenin 69'u dusuruldu) ve hangi
-    /// karenin dusecegi yuke bagli.</para>
+    /// <para>Tur 2'nin yolu pencereyi <c>[0, 5)</c>'te sabit tuttugunu soyluyordu ve
+    /// tutmuyordu. Olculdu (<c>.calisma/T189/oncesi/iz.txt</c>): donan kare bir kosumda
+    /// <c>[5, 10)</c> penceresinin 9,967 sn'lik karesi, digerinde <c>[7, 12)</c>
+    /// penceresinin 11,967 sn'lik karesi. Ilk kare gelene kadar gecen surede boru bir ya da
+    /// iki pencere devrediyor; kacinci pencerede yakalandigi makinenin o anki yukune bagli
+    /// ve <c>IsPlaying</c>'i sonradan <c>false</c> yapmak yalniz devri o noktada kesiyor.</para>
     ///
-    /// <para>Belirlenimli olan tek nokta pencerenin sonu: boru pencereyi bitirdiginde son
-    /// kare halkanin en yenisidir, dusurulmez ve tuketici onu almadan halka bosalmaz. O
-    /// yuzden burada oynatma once <b>durdurulur</b> — <c>PanelHost.Follow</c> yalniz
-    /// oynatilirken sonraki pencereye geciyor, boylece pencere [0, 5) sabit kalir — sonra
-    /// sunum sayaci duruncaya kadar beklenir ve <c>_generation</c> artirilarak
-    /// <c>RequestAnimationFrame</c> dongusu kapatilir; cizime kadar panoya baska kare
-    /// konmaz. Yakalanan kare her kosumda ayni: pencerenin 150. karesi.</para>
+    /// <para>Belirlenimli olan nokta borunun <b>terminal penceresi</b>:
+    /// <c>PanelHost.FreezesAtWindowEnd</c> dogruyken ilerlenecek pencere yoktur — ne devir
+    /// ne on hazirlik. O yuzden oynatma erken durdurulmaz, kaynak terminal pencereye
+    /// varana kadar birakilir; sonra sunum sayaci duruncaya kadar beklenir. Pencerenin son
+    /// karesi halkanin en yenisidir, dusurulmez ve tuketici onu almadan halka bosalmaz.</para>
+    ///
+    /// <para>En sonda oynatma durdurulur ve denetim seridi elle yerlestirilir: serit
+    /// <c>!IsPlaying</c> iken aciliyor, ama acilmasi bir zamanlayici gecikmesi ve 360 ms'lik
+    /// opaklik gecisi uzerinden yuruyor. Kare bu gecisin ortasina dustugu icin serit bir
+    /// kosumda kareye giriyor digerinde girmiyordu; gecis silinip opaklik dogrudan yaziliyor.</para>
     ///
     /// <para><c>Controls.IsPlaying</c> dogrudan yaziliyor, dugmeye basilmis gibi degil:
-    /// <c>PanelHost.ApplyPlayState</c> boruyu da duraklatirdi ve pencere hic bitmezdi.</para>
+    /// <c>PanelHost.ApplyPlayState</c> boruyu da duraklatirdi.</para>
     /// </summary>
     private static void FreezePreview(MainWindow window)
     {
         var host = FieldValue(window, "_preview")
             ?? throw new InvalidOperationException("Onizleme barindiricisi kurulmamis.");
 
+        var strip = Read(Named(window, "Preview"), "Controls");
+
         Await(() => Read(host, "SourceStatus") is ComparisonSourceStatus { State: ComparisonSourceState.Oynuyor },
             "Onizleme borusu");
 
-        SetProperty(Read(Named(window, "Preview"), "Controls"), "IsPlaying", false);
+        Await(() => (bool)Read(host, "FreezesAtWindowEnd"), "Onizlemenin terminal penceresi");
 
         var last = -1L;
         var idle = 0;
@@ -390,9 +400,83 @@ public static class Program
             }
 
             return ++idle >= PreviewIdleTicks;
-        }, "Onizleme penceresinin son karesi");
+        }, "Terminal pencerenin son karesi");
 
+        SetProperty(strip, "IsPlaying", false);
         SetField(host, "_generation", (int)FieldValue(host, "_generation")! + 1);
+        RevealStrip(strip);
+        TracePreview(window, host, strip);
+    }
+
+    /// <summary>
+    /// Denetim seridini gecise birakmadan acar. Opaklik gecisi silinip deger dogrudan
+    /// yazilir; boylece kare gecisin neresine denk gelirse gelsin serit ayni cikar.
+    /// </summary>
+    private static void RevealStrip(object strip)
+    {
+        var bar = (Control)FieldValue(strip, "Bar")!;
+        bar.Transitions = null;
+        bar.Opacity = 1;
+    }
+
+    /// <summary>
+    /// Olcum izi: donmus karenin gercekte hangi kare oldugunu stderr'e yazar. K9 iki tur
+    /// boyunca bu satir olmadigi icin yanlis anlatildi.
+    /// </summary>
+    private static void TracePreview(MainWindow window, object host, object strip)
+    {
+        var bar = (Control)FieldValue(strip, "Bar")!;
+        Console.Error.WriteLine(
+            $"iz	onizleme	pozisyon={Read(strip, "Position")}	sunulan={Read(host, "PresentedFrames")}"
+            + $"	terminal={Read(host, "FreezesAtWindowEnd")}	seritGorunur={Read(strip, "IsRevealed")}"
+            + $"	seritOpaklik={bar.Opacity}	pencere={Read(host, "ActiveClip")}	durum={Read(host, "SourceStatus")}");
+    }
+
+    /// <summary>
+    /// Yetenek onbellegini ilk kareden <b>once</b> isitir. <c>EncoderCapabilities</c>
+    /// yoklamalarini <c>ProbeKillMs</c> ile kesiyor: sogukta yavas donen ilk ffmpeg cagrisi
+    /// olduruluyor ve cevap <c>Unmeasured</c> kaliyor, isinmis cagri gercek cevabi veriyor.
+    /// Ilk cizilen kare (<c>T189-kucult-en.png</c>) bu yarisi kaybedebilecek tek kareydi:
+    /// denetcinin ilk kosumunda ayni kare %0,19 farkli, ikinciden besinciye kadar ayniydi.
+    /// Isinma cagrisi donene kadar beklenir, cizim ondan sonra baslar.
+    /// </summary>
+    private static void Warm()
+    {
+        var warm = typeof(MainWindow).GetMethod(
+            "WarmPsychovisualProbe",
+            BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+            ?? throw new MissingMethodException(nameof(MainWindow), "WarmPsychovisualProbe");
+
+        var clock = Stopwatch.StartNew();
+        warm.Invoke(null, new object?[] { EncoderCapabilities.Instance });
+        Console.Error.WriteLine($"iz	isinma	sure={clock.ElapsedMilliseconds}ms");
+    }
+
+    /// <summary>
+    /// Plan kartini <b>yerlestirir</b>: gecikmeli yeniden hesabi zorlar, sonra zamanlayiciyi
+    /// durdurur ve kartin hangi cevapla cizildigini stderr'e yazar.
+    ///
+    /// <para>K9'un ucuncu kaynagi buydu. Hedef kutusuna yazmak plani hemen degil,
+    /// <c>MainWindow.ScheduleRecalculate</c>'in 160 ms'lik <c>DispatcherTimer</c>'i
+    /// uzerinden yeniliyor; bassiz kosumda o zamanlayici ancak kuyruk suruldugunde ilerliyor
+    /// ve cizime kadar surulen sure makinenin yukune bagli. Zamanlayici cizimden once
+    /// tiklarsa kart yeni hedefin planini, tiklamazsa bir onceki plani gosteriyordu — ayni
+    /// ikilinin ilk kosumunda <c>T189-kucult-en.png</c> %0,19 boyle farkliydi. Hesap
+    /// dogrudan kosturulunca iki kol da ayni sonuca varir ve zamanlayicinin tiklamasi
+    /// kareye giren hicbir seyi degistirmez.</para>
+    ///
+    /// <para>Bassiz kosumda <c>MainWindow.ProbeHardwareEncodersAsync</c> hic calismiyor —
+    /// <c>_hardwareProbed</c> her kosumda <c>false</c>, <c>_planEncoders</c> geciti her
+    /// kosumda yok — yani kart yalniz <see cref="Warm"/>'in isittigi onbellege bakiyor.</para>
+    /// </summary>
+    private static void SettlePlan(MainWindow window, string topic)
+    {
+        Invoke(window, "RecalculateForTest");
+        (FieldValue(window, "_recalculateTimer") as DispatcherTimer)?.Stop();
+        Console.Error.WriteLine(
+            $"iz	plan	kare={topic}	donanimKarari={FieldValue(window, "_hardwareProbed")}"
+            + $"	gecit={(FieldValue(window, "_planEncoders") is null ? "yok" : "var")}"
+            + $"	yoklamaSayaci={Read(window, "PlanProbeCount")}	yerlesmedi={Read(window, "PlanProbeUnsettled")}");
     }
 
     /// <summary>
