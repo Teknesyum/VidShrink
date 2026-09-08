@@ -347,10 +347,11 @@ internal static string Percent(double ratio) => "%" + (ratio * 100).ToString("0.
 
 | Kosu | Toplam | Gecti | Kaldi | Ham cikti |
 |---|---|---|---|---|
-| T192 olculeri, davranis `main`de | 33 | 15 | **18** | `.calisma/T192/k10-kirmizi-taban.txt` |
-| T192 olculeri, davranis T192'de | 33 | **33** | 0 | ayni kosu, yesil |
+| T192 olculeri, davranis `main`de | 35 | 16 | **19** | `.calisma/T192/k10-kirmizi-taban.txt` |
+| T192 olculeri, davranis T192'de | 35 | **35** | 0 | ayni kosu, yesil |
 
-Kirmizi donen 18'in icinde K9'un yeni olcusu de var
+Kirmizi donen 19'un icinde K9'un iki yeni olcusu de var
+(`PaylasimTavaniDileUyar(tr)`, `DescribeBytes` gecidi)
 (`KaynakBilgiKareHiziDileUyar(tr)` kirmizi, `(en)` yesil - kusur tam olarak buydu).
 `KaynakBilgiEtiketleriKendiHucresindeKalir` iki tabanda da **yesil**: orada bir kusur
 yoktu, madde 5'te yazdigi gibi.
@@ -360,14 +361,14 @@ yoktu, madde 5'te yazdigi gibi.
 | Tam kosu | Toplam | Gecti | Kaldi | Atlandi | Ham cikti |
 |---|---|---|---|---|---|
 | Tur 1 sonu | 1949 | 1930 | 1 | 18 | `.calisma/T192/test-son.txt` |
-| Tur 2 sonu | TOPLAM_SAYISI | GECTI_SAYISI | KALDI_SAYISI | ATLANDI_SAYISI | `.calisma/T192/test-son-tur2.txt` |
+| Tur 2 sonu | 1960 | 1941 | 1 | 18 | `.calisma/T192/test-son-tur2.txt` |
 
 **Bu sayilar makineye ve o andaki yuke bagli.** Denetci ayni `a843711` uzerinde
 1928/3 aldi; fazladan iki kirmizi ortam kaynakliydi (tek baslarina kosunca yesil,
 gecici klasorde dosya kilidi). Ayni makinede baska ajanlarin ffmpeg kodlamasi kosarken
 bu kume buyuyebilir. Sayiya bakarken kosul sudur: **T192'nin dokundugu hicbir olcu
-kirmizi degil**; K6 pimleri ve T192 olculeri ayri ayri kosuldugunda 55/55 ve 33/33
-yesil.
+kirmizi degil**; K6 pimleri ve T192 olculeri ayri ayri kosuldugunda 55/55 ve 35/35
+yesil (`.calisma/T192/k10-yesil-tur2.txt`).
 
 Kapanan alti kirmizinin hepsi ayni sebepten degildi; ikisi yerlesim kusuru degil,
 olcunun kendi kusuruydu:
@@ -378,7 +379,11 @@ olcunun kendi kusuruydu:
 | `TuretmeSatiriHedefKutusunuIzler` | gercek kusur, madde 4 | erken donus kaldirildi |
 | `KaynakBilgiEtiketleriKendiHucresindeKalir` (2 dil) | **olcu yarim kalmisti**: sinav `.Where(pair => true)` idi, yani her hucreyi tasmis sayiyordu | gercek tasma kosulu yazildi; madde 5'te goruldugu gibi ortada tasma yok |
 
-Geriye kalan tek kirmizi asagidaki.
+Tur 2'nin tam kosusunda da kirmizi sayisi 1. **Adini o kosudan okuyamadim**: gunluk
+kuyruguyla kaydedildi, basarisiz satiri kirpildi (`.calisma/T192/test-son-tur2.txt`).
+Asagidaki testin tur 2'de de kirmizi oldugu ayrica kosularak dogrulandi
+(`.calisma/T192/tek-kirmizi-tur2.txt`); tam kosudaki tek kirmizinin ayni test oldugu
+ise cikarim, olcum degil.
 
 **`OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
 - T192 disi, duzeltilmedi.** Test Windows'un `System` surecini (PID 4) aliyor ve
