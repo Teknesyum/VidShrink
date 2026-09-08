@@ -53,6 +53,7 @@ public static class Program
     public const int ReferansCrf = 26;
     public const double HedefMb = 60.0;
     public const int Threads = 8;
+    public const int SvtLpTavan = 6;
 
     private sealed class SvtavYok(IEncoderAvailability ic) : IEncoderAvailability
     {
@@ -390,7 +391,7 @@ public static class Program
         var c when c.Contains("x264", StringComparison.Ordinal)
             => new[] { "-x264-params", $"threads={Threads}" },
         var c when c.Contains("svtav1", StringComparison.Ordinal)
-            => new[] { "-svtav1-params", $"lp={Threads}" },
+            => new[] { "-svtav1-params", $"lp={Math.Min(Threads, SvtLpTavan)}" },
         _ => Array.Empty<string>()
     };
 
@@ -398,6 +399,14 @@ public static class Program
     {
         var c when c.Contains("x265", StringComparison.Ordinal) => "-x265-params",
         var c when c.Contains("x264", StringComparison.Ordinal) => "-x264-params",
+        _ => null
+    };
+
+    public static string? ParamsFlag(string codec) => codec.ToLowerInvariant() switch
+    {
+        var c when c.Contains("x265", StringComparison.Ordinal) => "-x265-params",
+        var c when c.Contains("x264", StringComparison.Ordinal) => "-x264-params",
+        var c when c.Contains("svtav1", StringComparison.Ordinal) => "-svtav1-params",
         _ => null
     };
 
@@ -526,8 +535,8 @@ public static class Program
         var used = plan.Clone();
         if (zones is not null)
         {
-            var flag = ZonesFlag(used.Codec)
-                ?? throw new InvalidOperationException($"{used.Codec} zones desteklemiyor.");
+            var flag = ParamsFlag(used.Codec)
+                ?? throw new InvalidOperationException($"{used.Codec} icin params bayragi yok.");
             used.ExtraArgs.AddRange(new[] { flag, $"zones={zones}" });
         }
         used.ExtraArgs.AddRange(IsParcacigiArgs(used.Codec));
@@ -758,11 +767,11 @@ public static class Program
         var harita = await HaritaAsync(p);
         var map = Map(harita);
         var (plan, info) = await PlanAsync(p);
-        if (ZonesFlag(plan.Codec) is null || plan.ModeEnum == EncodeMode.PassThrough)
+        if (ParamsFlag(plan.Codec) is null || plan.ModeEnum == EncodeMode.PassThrough)
         {
             var not = plan.ModeEnum == EncodeMode.PassThrough
                 ? $"plan passthrough ({plan.Codec}); kodlama yok, {asama} bu kolda kosulamaz."
-                : $"{plan.Codec} zones desteklemiyor; {asama} bu kolda kosulamaz.";
+                : $"{plan.Codec} icin params bayragi yok; {asama} bu kolda kosulamaz.";
             await File.WriteAllTextAsync(hedef, JsonSerializer.Serialize(new[]
             {
                 new OlcumKaydi(p.Ad, "yok", 0, HedefMb, 0, 0, false, null, null, null, null, not)
