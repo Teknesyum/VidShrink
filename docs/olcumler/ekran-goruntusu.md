@@ -1,6 +1,8 @@
 # Ekran görüntüsü düzeneği ve çekimler
 
-T189. Ölçüm makinesi: Windows 11 Pro 10.0.22631, .NET 8, Avalonia 11.3.20.
+T189. Tur 1-2 ölçüm makinesi: Windows 11 Pro 10.0.22631. Tur 3'ün bütün ölçümleri
+(beş koşumluk sha256 tablosu dahil) Windows 11 Pro 10.0.26100 üzerinde alındı.
+.NET 8, Avalonia 11.3.20.
 Düzenek: `tools/VidShrink.Shot`. Çıktı: `docs/gorseller/T189-<konu>-<dil>.png`.
 
 ## Seçilen yöntem: ekran dışı (offscreen) render
