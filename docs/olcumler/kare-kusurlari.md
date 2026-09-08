@@ -1,8 +1,15 @@
-# T192 - Karelerde Gorunen Arayuz Kusurlari
+﻿# T192 - Karelerde Gorunen Arayuz Kusurlari
 
 Kaynak kare: `docs/gorseller/T189-kucult-en.png`. Olcum basiz pencerede, uygulamanin
 kendi yerlesim motoruyla (`AppHost.Run` + `Measure`/`Arrange`/`UpdateLayout`) alindi.
 Ham ciktilarin tamami `.calisma/T192/` altinda; her sayinin yaninda dosya adi var.
+
+**Tur 2 (8 Eylul 2026).** Denetim tur 1'i iki kritikle geri cevirdi. Bu belgede tur 2'de
+degisenler: 2. maddeye "Kuralin kapsami - dort satir degil, 124 anahtar" ve "Testlerde
+yeniden temellendirilen yedi beklenen deger" bolumleri; 1. maddeye "Sabit invariant kalan
+yerler" karar tablosu; 5. maddeye olcunun mutasyona olu olmasinin duzeltilmesi ve 1040 px
+kosumunun parametrelenmesi; "Tam kosu"ya kirmizi/yesil tabaninin ne oldugu. K6 cumlesi
+kapsamiyla sinirlandi.
 
 ## 1. Sayi bicimi Turkce kalmis - kusur, duzeltildi
 
@@ -24,7 +31,9 @@ isaretin yeri kulturle degisir.
 | `src/VidShrink.App/MainWindow.axaml.cs` | 2924 - tahmin araligi satiri `Num`/`Percent`'ten geciyor |
 
 Ayni desen `HumanDuration`, `TxtSize`, `TxtOutSize`, `TxtEstimateNote` ve kalite
-satirlarinda da vardi; hepsi ayni gecide baglandi.
+satirlarinda da vardi; **tur 1'de bunlar** ayni gecide baglandi. Tur 1'de baglanmayan
+uc yer kaldi ve tur 2'de kapandi - asagidaki "Sabit invariant kalan yerler" bolumu
+her `InvariantCulture` satirinin kararini tek tek yaziyor.
 
 Olcu sabiti sabitle karsilastirmiyor: gercek bicimlendiriciyi iki dilde cagirip
 ciktilarin birbirinden **farkli** oldugunu da tutuyor
@@ -37,7 +46,35 @@ Ham cikti: `.calisma/T192/k2k3k4-yesil-liste.txt`
 |---|---|---|
 | `Num(15.6, "0.0")` | `15.6` | `15,6` |
 | `Percent(0.037)` | `3.7%` | `%3,7` |
-| tahmin araligi satiri | `15.4 - 15.8 MB` + `3.7%` | `15,4 - 15,8 MB` + `%3,7` |
+| aralik satirinin bilesenleri (`Num`+`Percent`, ekran yolu degil) | `15.4 - 15.8 MB` + `3.7%` | `15,4 - 15,8 MB` + `%3,7` |
+| `TxtEstimateRange` - **ekranin kendi satiri**, `RefreshEstimateView` kosarak | nokta, virgul yok | virgul, nokta yok |
+| `TxtFps` - kaynak bilgi kutusu, `LoadWithoutProbing` yolundan | `59.94` | `59,94` |
+
+Ilk satir bicim dizesini test icinde kuruyor, dolayisiyla `RefreshEstimateView`'deki bir
+degisikligi yakalamaz; adi tur 2'de `AralikSatirininBilesenleriDileUyar` oldu. Alt iki
+satir gercek ekran yolundan geciyor (`KareYerlesimTests.TahminAraligiSatiriEkrandaDileUyar`,
+`KareYerlesimTests.KaynakBilgiKareHiziDileUyar`).
+
+### Sabit invariant kalan yerler - satir basina karar (T192 tur 2, K9)
+
+`grep -n InvariantCulture src/VidShrink.App/MainWindow.axaml.cs` otuz alti satir veriyor;
+ham cikti `.calisma/T192/k9-invariant-grep.txt`. Karar dort kumede toplaniyor:
+
+| Kume | Satirlar | Karar |
+|---|---|---|
+| **Baglandi (tur 2'de)** `TxtFps`, `DescribeBytes`, kalite siniri uyarisi | 2586, 1655, 3305-3306 | ekrana **cumle/deger** olarak cikiyor, kultur gecidine (`Num`) alindi |
+| **Invariant kalir - ayristirma simetrisi.** `TxtTarget`, `TxtQualityTarget`, `TxtQuality`, gelismis ayar acilir listeleri | 837, 838, 848, 1176, 1182, 1191, 1194, 1299, 1303, 2476, 3191, 3230, 3272, 3293, 3751 | ayni metin geri **okunuyor**: 1368-1391, 2257, 3251, 3685-3686, 3704-3706, 3772 hepsi `NumberStyles` + `InvariantCulture` ile `TryParse` ediyor. Yaziyi kulture cevirip okumayi invariant birakmak Turkce arayuzde kutuyu bozardi; ikisini birden cevirmek bu sozlesmenin isi degil, ayri bir is |
+| **Invariant kalir - kulture duyarli ogesi yok.** `TxtAdvCrfNow`, `TxtAdvAudioKbpsNow`, ses kanali, `mm:ss` | 1418, 1420, 1422, 3662 | tam sayi ve zaman bicimi; ondalik ayirici da grup ayirici da cikmiyor. Ayrica ilk ucu yukaridaki kutularin **yansimasi** |
+| **Invariant kalir - ekrana cikmiyor.** ayar JSON'u | 2132 | diske yazilan bicim; kulture baglanirsa dosya makineden makineye degisir |
+
+`DescribeBytes` icin pim var (`SettingsTabTests`, 128 MiB / 25 GiB / 1 GiB); ucu de tam
+ikilik kat, ondalik tasimiyor, dolayisiyla degisiklikten etkilenmedi ve **yeniden
+temellendirilmedi**. Ondalikli tavan olcusu yeni: `BiciminTests.PaylasimTavaniDileUyar`
+(`1,5 GiB` / `1.5 GiB`).
+
+**Olcemedigim:** kalite siniri uyarisinin (`main.quality.below-floor`) ekrandaki hali
+gercek yoldan kosturulmadi; bu satir bir planin sinira dayanmasini gerektiriyor.
+Degisiklik `Num` gecidini kullaniyor ve gecidin kendisi olculu, ama satirin kendisi degil.
 
 ## 2. Baslik kurali govde cumlesine uygulaniyor - kusur, duzeltildi
 
@@ -67,6 +104,88 @@ cumledir. Sinav **butun sozcuge** bakar, sozcugun icindeki harf obegine degil
 Karsi yon de olculuyor: gercek basliklar kelime kelime buyutulmeye devam ediyor
 (`Video Codec`, `FPS`, `Current Output Size`, `Video Kodegi`). Bu olcu olmasa
 `ReadsAsProse`'u her zaman dogru dondurmek yesil kalirdi.
+
+### Kuralin kapsami - dort satir degil, 124 anahtar (T192 tur 2, K8)
+
+Yukaridaki dort satirlik tablo **karede gorunen** satirlar. Kuralin kendisi dort satira
+degil, dil dosyasindaki her metne uygulaniyor. Tur 1 bu yan etkiyi olcmemisti; tur 2
+olctu.
+
+**Nasil olculdu.** `BaslikKapsamiTests` (`tests/VidShrink.Tests/BiciminTests.cs`) her dil
+dosyasindaki her degeri gercek `LanguageCatalog.Title` uzerinden geziyor. Simulasyon yok;
+gecit gercek. "Kol degistiren" tanimi: `fd6fe0c1`'in kuralina (yalniz cumle isareti) gore
+**baslik**, bugunku kurala gore **govde**.
+
+| Olcu | Sayi | Ham cikti |
+|---|---|---|
+| Dil dosyasindaki toplam anahtar | 950 (en 475, tr 475) | `.calisma/T192/k8-yeni-dokum.txt` |
+| Kol degisteren | **124** | `.calisma/T192/k8-supurme-ham.txt` |
+| bunlardan Ingilizce | 88 | ayni dosya, `SAYIM` satiri |
+| bunlardan Turkce | 36 | ayni dosya, `SAYIM` satiri |
+| **Ekrandaki ciktisi gercekten degisen** | **123** | `.calisma/T192/k8-fark.txt` |
+| bunlardan uzunlugu <=3 sozcuk olan | 27 | `.calisma/T192/k8-kisa-kalemler.txt` |
+
+Son satirdaki 123 bir tahmin degil, **iki kosunun farki**: ayni dokum testi bir de
+`origin/main`'in `LanguageCatalog.cs`'siyle kosuldu ve iki dokum `diff`lendi. Yani
+"gorunur cikti farki" bir olcut degil, olculmus bir sayi. Tekrarlanmasi:
+
+```
+git checkout origin/main -- src/VidShrink.App/LanguageCatalog.cs
+dotnet test -c Release --filter "FullyQualifiedName~BaslikKapsamiTests.TumCiktiDokulur" --logger "console;verbosity=detailed"
+git checkout HEAD -- src/VidShrink.App/LanguageCatalog.cs
+```
+
+Kol degistirdigi halde ciktisi **ayni kalan** tek anahtar var (124 - 123):
+`tr / main.convert.drop`, degeri `At`. Tek sozcuk ve bas harfi zaten buyuk, iki kol da
+ayni dizgeyi uretiyor.
+
+Sayi **pimli**: `BaslikKapsamiTests.KolDegistirenAnahtarlarSayilir` 124/88/36'yi tutuyor.
+Dil dosyasina metin eklenince pim kirilir; kirilinca yapilacak sey susturmak degil, yeni
+sayiyi buraya yazmak.
+
+### Istenmeyen var mi - 124'un gozden gecirilmesi
+
+`<=3` sozcukluk 27 kalemin tamami elle okundu (`.calisma/T192/k8-kisa-kalemler.txt`);
+sozlesmede adi gecen dort surpriz kalem ve ayni aileden besinci:
+
+| Anahtar | Once | Simdi | Karar |
+|---|---|---|---|
+| `main.action.show-in-folder` (en) | `Show In Folder` | `Show in folder` | **istenen.** Dil dosyasinda `Show in folder` yaziyor; K3'un istedigi sey de tam olarak "dil dosyasindaki gibi kalir" |
+| `main.drop.title` (en/tr) | `Drop A Media File Here` | `Drop a media file here` | **istenen.** Acik bir cumle, baslik degil |
+| `main.chip.whatsapp.label` (tr) | `WhatsApp Icin Onerilen` | `WhatsApp icin onerilen` | **istenen.** Bir yonga etiketi, tamlama degil cumle parcasi |
+| `main.chip.128.label` (tr) | `Paylasim Icin En Fazla` | `Paylasim icin en fazla` | **istenen.** Ayni aile |
+| `main.chip.180.label` (tr) | `WhatsApp Web Icin En Fazla` | `WhatsApp Web icin en fazla` | sozlesmede yoktu, ayni ailenin **ucuncu** uyesi |
+
+Sinirdaki tek kalem `main.retry.title` (en): `Over The Target` -> `Over the target`. Bir
+iletisim basligi ve artik cumle bicimde. Kural **daraltilmadi**, cunku daraltmanin tek
+makul olcutu anahtar adi olurdu (`*.title` haric tut) ve T0'in kusur diye isaretledigi
+`What It Will Do` tam da `main.plan.title`. Anahtar adina gore daraltmak, duzeltilmesi
+istenen satiri geri getirirdi.
+
+Bolum basliklarinin (`main.section.*`) iki dilde de cumle bicimine gecmesi ayni sekilde
+istenen sonuc: T0 `Quality And Compatibility` ve `Cropping And Resolution` satirlarini
+kusur diye isaretlemisti.
+
+### Testlerde yeniden temellendirilen yedi beklenen deger
+
+Uc test dosyasinda yedi beklenen deger degisti. Hicbiri pim susturmasi degil; hepsi
+**eski degerin yanlis oldugu** kalemler. `Once` sutunu eski beklenen degerdir.
+
+| Dosya | Girdi | Once | Simdi | Gerekce |
+|---|---|---|---|---|
+| `CasingTests` | `the probe took 120 ms` | `The Probe Took 120 ms` | `The probe took 120 ms` | `the` tanimlik; metin cumle |
+| `CasingTests` | `budget of 20000 ms` | `Budget Of 20000 ms` | `Budget of 20000 ms` | `of` ilgec; eski deger Ingilizce baslik kuralina gore de yanlisti (`Of` hicbir kuralda buyuk yazilmaz) |
+| `CasingTests` | `target is 16 MB` | `Target Is 16 MB` | `Target is 16 MB` | `is` yardimci fiil; metin cumle |
+| `CasingTests` | `halve the fps` | `Halve The fps` | `Halve the fps` | `the` tanimlik |
+| `CasingTests` | `hevc_qsv beats libsvtav1 on aac` | `hevc_qsv Beats libsvtav1 On aac` | `hevc_qsv beats libsvtav1 on aac` | `on` ilgec; satir basindaki `hevc_qsv` zaten `Verbatim` |
+| `ChipTests` | `Why these choices` + sayi | `Why These Choices - 7` | `Why these choices - 7` | `why` soru sozcugu; T0'in kusur dedigi `What It Will Do` ile ayni desen |
+| `LanguageTests` | `Back to the start` | `Back To The Start` | `Back to the start` | `to` ve `the` |
+
+Testin **tuttugu sey** degismedi. `CasingTests.UnitsAndEncoderNamesKeepTheirSpelling`
+birim ve kodlayici yazimini olcuyor (`ms`, `fps`, `libx264`, `h264_nvenc`, `libsvtav1`,
+`aac`); o yazimlarin hicbiri degismedi ve iki satir (`software encoder libx264`,
+`hardware encoder h264_nvenc`) **oldugu gibi** kaldi. `LanguageTests`'teki ayni onermede
+`Control Strip` ve `Denetim Seridi` de degismeden duruyor - yani karsi yon hala olculu.
 
 ## 3. Kesilen satir - kusur, duzeltildi
 
@@ -132,6 +251,20 @@ etiket `Video Kodegi` 112,6 px; 27,4 px bosluk kaliyor.
 Olculen iki pencere: 1600x1000 ve izin verilen en dar 1040x720
 (`MainWindow.axaml:8`, `MinWidth="1040"`). Ikisinde de ayni sayilar cikti.
 
+**Tur 2 duzeltmesi - olcu mutasyona oluydu.** Tur 1'de kosul
+`label.TextLayout.Width > cell.Bounds.Width` idi, ama etiketlerde `TextWrapping="Wrap"`
+var (`MainWindow.axaml:262-291`): sarilan metnin yerlesim genisligi hucreyi **hic
+asamaz**, dolayisiyla kosul her girdide yanlis donerdi. Karar dogruydu, korumasi yoktu.
+Olcu artik sarmayi kapatip (`TextWrapping.NoWrap`) yeniden yerlestiriyor. Yanina bir
+mutasyon sinavi kondu: `KareYerlesimTests.OlcuUzunEtiketiYakalar` hucreye sigmayan bir
+etiket verir ve olcunun **kirmizi** dondugunu tutar. Iki testten biri olmadan digeri bir
+sey soylemiyor.
+
+**Tur 2 duzeltmesi - 1040 px artik tekrarlanabilir.** Tur 1'de dar olcu dosya elle
+degistirilip bir kez kosulmustu; iddia kosuya bagli degildi. Pencere olcusu parametreye
+cevrildi (`KareYerlesimTests.IkiDilIkiOlcu`), olcu dort kosumda kosuyor:
+tr/en x 1600x1000 / 1040x720. Dordu de yesil.
+
 Ham cikti: `.calisma/T192/infogrid-genislikler.txt` ve
 `.calisma/T192/infogrid-genislikler-1040.txt`
 
@@ -144,9 +277,15 @@ Ham cikti: `.calisma/T192/infogrid-genislikler.txt` ve
 | `Resolution` (en) | 90,9 px | 140 px | 49,1 px |
 | `Kare Hizi` (tr) | 78,5 px | 140 px | 61,5 px |
 
-Etiketlerdeki `TextWrapping="Wrap"` yerinde birakildi. Olculen bir kusuru kapatmiyor -
-daha uzun bir cevirinin ileride tasmasina karsi onlem; boyle isaretlendi ki sonradan
-"bu bir duzeltmeydi" diye okunmasin.
+Etiketlerdeki `TextWrapping="Wrap"` arayuzde yerinde birakildi. Olculen bir kusuru
+kapatmiyor - daha uzun bir cevirinin ileride tasmasina karsi onlem; boyle isaretlendi ki
+sonradan "bu bir duzeltmeydi" diye okunmasin. Sarma yalniz **olcunun** icinde, o da tek
+bir yerlesim kosumu icin kapatiliyor.
+
+**Yukaridaki px tablosu tur 1 kosumundan geliyor** (`.calisma/T192/infogrid-*.txt`,
+sarma acikken). Tur 2'de sayilar yeniden dokulmedi; yeniden kosulan sey **kosulun
+kendisi**, dort kosumda da tasma yok. Tablodaki sayilarin sarma acik/kapali ayni olmasi
+beklenir cunku hicbir etiket sarmiyor - ama bu bir cikarim, tur 2'de olculmedi.
 
 ## K7 - temizlik
 
@@ -164,14 +303,71 @@ henuz birlesmedi. Duzeltmeler yazildi, kareler tazelenmedi.
 **Olcemedigim.** Yukaridaki sayilarin hepsi basiz yerlesimden geliyor. Duzeltilmis
 arayuzun gercek bir ekran goruntusune bakilmadi; onu K5 ile birlikte T0 gorecek.
 
+Tur 2'de olcemediklerim, tek tek:
+
+- Kalite siniri uyarisinin (`main.quality.below-floor` / `above-ceiling`) ekrandaki hali.
+  Kultur gecidine baglandi, gecit olculu, satirin kendisi degil.
+- `InfoGrid` px tablosunun sarma kapaliyken yeniden dokulmesi. Kosul dort kosumda yesil,
+  ama tablodaki 112,6 / 140 px sayilari tur 1 kosumundan.
+- Ayar kutularinin (`TxtTarget`, `TxtQualityTarget`, `TxtQuality`) kulture cevrilmesi.
+  Yazma ve okuma birlikte cevrilmeli; ayri bir is olarak birakildi, gerekcesi 1. maddede.
+
 ## Tam kosu
 
 `dotnet build -c Release`: 0 uyari, 0 hata.
 
+### Kirmizi/yesil tabani - ne uzerinde kosuldu (T192 tur 2 duzeltmesi)
+
+Tur 1'de "duzeltmelerden **once**" diye etiketlenen kosu `origin/main` uzerinde
+degildi; WIP'in kismen geri alinmis hali uzerinde kosmustu. Etiket yanlisti.
+
+**`origin/main` bir taban olamaz** ve bu bir tercih degil, bir olgu: T192'nin olculeri
+(`BiciminTests`, `KareYerlesimTests`, `BaslikKapsamiTests`) `main`de **yok**, ustelik
+`MainWindow.Num`/`Percent` orada `private`. Depoyu `main`e alip bu olculeri kosmak
+derlenmiyor bile:
+
+```
+error CS0117: 'MainWindow' bir 'Num' tanimi icermiyor
+```
+
+Dogru taban su: **olculer T192'de kalir, davranis `main`e geri alinir.** Tur 2'de bu
+kosuldu ve tekrarlanabilir:
+
+```
+git checkout origin/main -- src/VidShrink.App/LanguageCatalog.cs src/VidShrink.App/MainWindow.axaml src/VidShrink.App/MainWindow.axaml.cs
+```
+
+sonra `MainWindow.axaml.cs`'teki `private static string Num` satiri `internal` yapilir ve
+yanina eski yuzde davranisi eklenir (eski kodda `Percent` diye bir gecit yoktu, isaret
+elle sola yaziliyordu):
+
+```csharp
+internal static string Percent(double ratio) => "%" + (ratio * 100).ToString("0.#");
+```
+
+| Kosu | Toplam | Gecti | Kaldi | Ham cikti |
+|---|---|---|---|---|
+| T192 olculeri, davranis `main`de | 33 | 15 | **18** | `.calisma/T192/k10-kirmizi-taban.txt` |
+| T192 olculeri, davranis T192'de | 33 | **33** | 0 | ayni kosu, yesil |
+
+Kirmizi donen 18'in icinde K9'un yeni olcusu de var
+(`KaynakBilgiKareHiziDileUyar(tr)` kirmizi, `(en)` yesil - kusur tam olarak buydu).
+`KaynakBilgiEtiketleriKendiHucresindeKalir` iki tabanda da **yesil**: orada bir kusur
+yoktu, madde 5'te yazdigi gibi.
+
+### Tam suit
+
 | Tam kosu | Toplam | Gecti | Kaldi | Atlandi | Ham cikti |
 |---|---|---|---|---|---|
-| Duzeltmelerden **once** | 1949 | 1924 | 7 | 18 | `.calisma/T192/test-taban.txt` |
-| Duzeltmelerden **sonra** | 1949 | 1930 | 1 | 18 | `.calisma/T192/test-son.txt` |
+| Tur 1 sonu | 1949 | 1930 | 1 | 18 | `.calisma/T192/test-son.txt` |
+| Tur 2 sonu | TOPLAM_SAYISI | GECTI_SAYISI | KALDI_SAYISI | ATLANDI_SAYISI | `.calisma/T192/test-son-tur2.txt` |
+
+**Bu sayilar makineye ve o andaki yuke bagli.** Denetci ayni `a843711` uzerinde
+1928/3 aldi; fazladan iki kirmizi ortam kaynakliydi (tek baslarina kosunca yesil,
+gecici klasorde dosya kilidi). Ayni makinede baska ajanlarin ffmpeg kodlamasi kosarken
+bu kume buyuyebilir. Sayiya bakarken kosul sudur: **T192'nin dokundugu hicbir olcu
+kirmizi degil**; K6 pimleri ve T192 olculeri ayri ayri kosuldugunda 55/55 ve 33/33
+yesil.
 
 Kapanan alti kirmizinin hepsi ayni sebepten degildi; ikisi yerlesim kusuru degil,
 olcunun kendi kusuruydu:
@@ -193,5 +389,11 @@ firlatiyor. Bu oturum yukseltilmemis - `WindowsPrincipal.IsInRole(Administrator)
 dosyasina en son T182 dokunmus (`9bb92ba`, `main` uzerinde). Makine ve izin kosuluna
 bagli, ayri bir is.
 
-K6 pimleri (`WindowLayoutTests`, `AyarYuzeyiTests`, `QualityTargetUiTests`): 55/55
-yesil, hicbiri yeniden temellendirilmedi - ham cikti `.calisma/T192/k6-pimler.txt`.
+**K6 pimleri** (`WindowLayoutTests`, `AyarYuzeyiTests`, `QualityTargetUiTests`): 55/55
+yesil, **bu uc sinifta** hicbir pim yeniden temellendirilmedi - ham cikti
+`.calisma/T192/k6-pimler.txt` ve tur 2 icin `.calisma/T192/k6-pimler-tur2.txt`.
+
+Cumle yalniz bu uc sinif icin gecerlidir; genele yayilmaz. **Suitin baska yerinde yedi
+beklenen deger yeniden temellendirildi** (`CasingTests` 5, `ChipTests` 1,
+`LanguageTests` 1); tek tek gerekcesi 2. maddedeki "Testlerde yeniden temellendirilen
+yedi beklenen deger" tablosunda.
