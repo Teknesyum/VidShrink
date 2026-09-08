@@ -1,223 +1,54 @@
-# Yol haritasi — 0.3.1 arayuz turu
+# Plan — Tüm Diller, Dil Seçici Ve Yirmi Hazır Tema
 
-Kaynak: kullanicinin son 30 girdisi (`.calisma/son-girdiler.md`), 7 Eylul 2026 mesaji,
-ve iki danisman raporu:
-[008 UI tasarimci](danisma/008-ui-tasarimci.md) · [009 UI denetcisi](danisma/009-ui-denetci.md).
+Kullanıcının isteği (2026-09-09): tüm diller; üstteki EN/TR kısayolu kalsın, sağına bir
+ayar tekerleği gelsin ve ayarlardaki dil bölümüne götürsün; oradan istenen dil seçilsin.
+Ayrıca yirmi hazır tema ayarlardan seçilebilsin, tema özellikleri dil gibi ayrı bir yerde
+saklansın.
 
-Denetcinin karari **HOLD**. Iki danisman bagimsiz olarak ayni seyi soyledi: arayuz
-sikistirmanin ne yapacagini dugmeye basmadan once soylemiyor, ve yerlesim pimi
-testleri bu isle birlikte yeniden temellendirilmeli.
+## Sıra Ve Gerekçesi
 
-## Sira ve durum
+Kullanıcı sırayı dilden başlatıyor, ama üst şeritteki düğme listesi bugün
+`Locales` altındaki **her** dil için bir düğme basıyor. Yüz dil klasörü eklendiği anda üst
+şeride yüz düğme dizilir. Bu yüzden seçici önce yazılır; dil klasörleri ondan sonra dolar.
 
-| # | Is | Sozlesme | Durum |
-|---|---|---|---|
-| F1 | Yerlesim testi ikili arama (132,16 sn → 7,76 sn) | T183 | **muhurlendi** |
-| A1 | Onizleme sesi — `AttachAudioSink` baglanmis degil | T184 | **muhurlendi** |
-| A2 | Tekerlek zoom %100→200 olu, zoom'da kararma | T184 | **muhurlendi** |
-| A3 | Rozet: sol ORIJINAL / sag ISLENMIS · CRF x, ustte | T184 | **muhurlendi** |
-| A4 | Duraklat/devam basa sariyor | T184 | **muhurlendi** |
-| B | Oynatici sekmesi en sola tasinir (sekme ve kisayollar zaten var) | T185 | acilacak |
-| D | Ayar arayuzu yeniden tasarimi (danismanlarin asil isi) | T186 | acilacak |
-| E | Tasma teklifi — %3, dort secenek, sayfa ici serit | T187 | acilacak |
-| C | Varsayilan program onerisi + sag menu kisayolu | T188 | acilacak |
-| F2 | Yerlesim pimlerinin yeniden temellendirilmesi | D ile ayni dalda | acilacak |
-| F3 | README ekran goruntuleri (T177 sonrasi) | — | acilacak |
+1. **A — Dil seçici.** Üst şeritte yalnız EN/TR + tekerlek. Tekerlek Ayarlar sekmesine
+   geçip dil bölümünü gösterir. Ayarlarda tam liste açılır kutuda.
+2. **B — Yirmi tema.** Palet dosyaları, ayarda seçim, seçimin kalıcılığı, çalışırken değişim.
+3. **C — Diller.** Küme küme çeviri, her küme kendi commit'i.
 
-## A — Onizleme (T184)
+## A — Dil Seçici
 
-Kullanici bunu uc ayri turda soyledi; en gorunur eksik bu.
+| Dosya | Değişiklik |
+|---|---|
+| `MainWindow.axaml:179` | `LangSwitch` yalnız kısayol dilleri + tekerlek düğmesi |
+| `MainWindow.axaml:1042` | `SettingsLangSwitch` yerine tam liste açılır kutusu |
+| `MainWindow.axaml.cs:574` | `BuildLanguageSwitch` ikiye ayrılır: kısayol / tam liste |
+| `Locales/*/settings-tab.json` | tekerlek için ad, açılır kutu için etiket |
 
-**A1 ses.** Ses yolu `VidShrink.Ffmpeg` icinde bastan sona yazilmis — `AudioSink.cs`
-NAudio ile 48 kHz/16 bit/stereo bir cikis kuruyor, `DecoderPipe.SeekAudio` ffmpeg'den
-ayri bir PCM borusu aciyor. Kullanicinin tarif ettigi "ses dosyasini eszamanli calsan
-bile cozulur" yaklasimi zaten kodlanmis.
+Kısayol kümesi kodda sabit iki ad değil: `Strings.ShortcutLanguages` — bugün `en`, `tr`.
 
-> **Duzeltme (7 Eylul, T184 yapicisinin bulgusu).** Bu bolumun ilk hali "VidShrink.App
-> hicbir yerde AttachAudioSink cagirmiyor, grep bos donuyor" diyordu. **Yanlisti.**
-> `PlayerView.axaml.cs:292` zaten cagiriyordu. Gercek bosluk oynaticida degil
-> **karsilastirma panelindeydi**: `PipeComparisonFrameSource` yalniz ham video tasiyor,
-> ses hic gecmiyordu. Cozum kaynak dosyaya ayri bir `DecoderPipe` acip `AudioSink`'i
-> ona takmak oldu (`PreviewAudio.cs`).
+## B — Yirmi Tema
 
-**A2 zoom.** Tekerlek olayi %100 ile %200 arasinda bir sey yapmiyor; ayrica zoom
-girip cikarken kare kararip geliyor. Ikisi ayni sozlesmede.
+Palet bugün `Themes/Palette/Neon.axaml`, `App.axaml` hangisinin yürürlükte olduğunu
+bildiriyor. Yirmi palet aynı klasöre girer, aynı 32 anahtarı taşır.
 
-**A3 rozet.** `playback.approximate-preview` ("Yaklasik onizleme") kalkiyor. Yerine
-orta panelin **solunda ustte** `ORIJINAL`, **saginda ustte** `ISLENMIS · CRF <x>`.
-Rozetler perde hareket ederken sabit durur, ortulen tarafin etiketi soner.
-Denetci bunu bagimsiz olarak dogruladi: bugunku rozet "bir ozur cumlesi".
+- Seçim `AppSettings.Theme` alanında saklanır (dil `settings.json`'da; tema da orada).
+- Çalışırken değişim: `App.Current.Resources.MergedDictionaries` içindeki palet sözlüğü
+  yenisiyle değiştirilir. Ölçüler ve fırça tanımları yerinde kalır.
+- Açılış görüntüsü `App.axaml`'deki **varsayılan** paletten üretilmeye devam eder.
+- Ölçü: her palet aynı anahtar kümesini taşır (eksik anahtar = boş ekran), ve hiçbir
+  paletin metni ekrana çıkmaz.
 
-**A4 basa sarma.** 4 Eylul'den kalma borc: ayar degismeden durdur/baslat yapilinca
-onizleme en bastan isleme giriyor.
+## C — Diller
 
-## B — Oynatici sekmesi (T185)
+Bir dil = `Locales/<kod>/` altında dört dosya, 475 anahtar, ~4976 sözcük.
+Ölçüm: `docs/olcumler/dil-ekleme-fiyati.md`.
 
-> **Duzeltme (7 Eylul).** Bu bolumun ilk hali "sekme bugun hic yok, sifirdan acilacak"
-> diyordu. **Yanlisti.** Sekme `MainWindow.axaml:1253` icinde `TabPlayer` adiyla duruyor,
-> icinde `PlayerView` mounted. Kisayollar da calisiyor: T176 dokuz girdinin dokuzunu
-> olcup pinledi (`docs/olcumler/oynatici-girdi.md`) ve "birlikte ac" ile acilan dosya
-> zaten Oynatici sekmesini seciyor (`startup-tab=5|header=Oynatici` izi).
+Küme küme yazılır; her küme kendi commit'inde ve `dotnet test` yeşil kalır. Sığdırma
+turu (`TipOverflowTests`) bugün yalnız EN/TR ölçüyor; yeni dillerde balon taşması
+göründükçe metin kısaltılır, ölçü genişletilir.
 
-Geriye kalan **tek** is sira: sekme bugun **en sagda** (indeks 5), kullanici **en solda**
-istiyor. Acilis varsayilani **Kucult** kalmali — yani sekme en solda durur ama secili
-gelmez. Tasarimcinin uyarisi tam burada: serit basinda durup varsayilan olmayan bir sekme
-celiskili okunuyor; cozum bir ayirici ve ikonla Oynatici'yi **mod** gibi okutmak.
+## Kalan İki Dilli Dikiş
 
-Sirasi degisince `startup-tab=5` izi ve ona bagli pimler yeniden temellendirilecek.
-
-Tasarimcinin uyarisi: sekme seridinde en solda durup varsayilan olmayan bir sekme
-celiskili okunuyor. Cozum sekme sirasini degistirmek degil, Oynatici'yi bir ayirici ve
-ikonla **mod** gibi okutmak (tasarimcinin A plani). Kullanici "en solda olsun" dedigi
-icin B plani (serit disi ayri mod dugmesi) uygulanmiyor.
-
-## D — Ayar arayuzu (T186)
-
-Tasarimcinin dort bolgesi: A baglam (birakma alani + tek satira saran bilgi seridi,
-bugunku dokuz satir yerine), B **Hedef** (birincil: sayi kutusu + Doldurma modu ona
-yapisik bir operator + cip seridi), C **Kalite ve uyumluluk** (kodek, HDR yalniz HDR
-kaynakta, izinler, GPU), D **Gelismis** kapali.
-
-Bilesen kurali: adlandirilmis durum secimi → **segment kontrolu** (Kodek 3, HDR 2,
-Doldurma 2); gercek ac/kapa → **anahtar** (Izinler, GPU). Iki ve uc secenek icin ayni
-bilesen. Etiket ustte, tam genislikte segment seridi altta — cunku Turkce etiketler
-sariyor. En fazla uc segment.
-
-**Amac kontrol olmaktan cikiyor**, cip seridinin basinda `( Arsiv ) ( Paylasim )`
-hazir ayarina donuyor. Motorda karsiligi duruyor ve olculebilir:
-`CompressionStrategy.cs:91` Arsiv icin -6.0, Paylasim icin -3.0 CRF ofseti suruyor.
-Yani secim gercekten plani degistiriyor; bugun eksik olan bu etkinin ekranda hic
-gorunmemesi.
-
-Denetcinin tek onerisi ayni yeri gosteriyor: Kucult'un ilk okumasi **plan + onizleme**
-olsun, ayarlar etrafina dizilsin, ayar degisince ikisi de canli guncellensin.
-
-Izinler iki bagimsiz onay kutusu degil, bir **feda sirasi** olarak sunulur.
-Bilgi satirlari **once → sonra** bicimine gecer.
-
-## E — Tasma teklifi (T187)
-
-Esik **%3**. Asla sessiz yapilmaz. Dort secenek: tekrar render, iptal, buyuk
-surumu kabul, ve sondan / bastan / her ikisinden ~%3 kesintiyi kabul.
-
-Tasarimcinin bicimi: kalici pencere degil, sonuc kartinin icinde **sayfa ici serit**.
-Bir birincil oneri + iki guvenli secenek + kapali bir yikici grup. Ayirt edici bes
-katman: konum, belirtec, somut sonuc metni ("4:12 → 4:05, sondan ~7 sn"), klavye
-varsayilani **asla** yikici secenek olmaz, ve yerinde iki adimli onay. Kesim once
-zaman cizgisinde onizlenir.
-
-## C — Kabuk entegrasyonu (T188)
-
-**Olculdu, kok neden bulundu** — `docs/olcumler/kabuk-entegrasyonu.md` (T188 tur 1).
-
-Uzantinin kendisi **saglam**: derleniyor, kayit oluyor, paketli COM uzerinden aktive
-oluyor (`CoCreateInstance` `0x00000000`) ve basligini donduruyor. Calismayan sey
-**teslimat**: kurulu agacta `shell/` klasoru hic yok, kurulum betigi de dosya yoksa
-sessizce donuyor. Sebep `release.yml` icindeki `map(select(.path == "VidShrink.exe"))`
-suzgeci — `shell/` otomatik guncellemeye hic girmiyor.
-
-Uretim yolu ayrica **imza istiyor**: imzasiz `.msix` kurulumu `0x800B0100` ile
-reddediliyor. Bu makinede calisan `-Register` yolu yalniz gelistirici kipi acik oldugu
-icin acildi.
-
-Varsayilan program tarafinda ProgID ve `OpenWithProgids` kaydi yazildi (24 medya
-uzantisi, hepsi HKCU); `UserChoice`'a dokunulmadi, dokunulamaz.
-
-### C borclari
-
-1. **Imzalama.** Uretimde sag menu icin `.msix` imzalanmali. Imzasiz kurulum
-   `0x800B0100` ile reddediliyor.
-2. **Teslimat.** `release.yml` suzgeci `shell/` klasorunu otomatik guncellemeden
-   disari birakiyor.
-3. **Gelistirici kipi kapali makine.** Olcemedim.
-4. **Explorer'da gorsel dogrulama.** Olcemedim.
-5. **Oneri seridi olu kod.** `DefaultAppSuggestionBar` yazildi ama hicbir yerden
-   cagrilmiyor; bagli olacagi `MainWindow.axaml.cs` T188'in `owns` listesi disindaydi.
-   T188 tur 2'de baglanir — `owns` genisletildi.
-6. **ProgID kaydi da olu.** Denetcinin buldugu, K4'ten daha buyuk delik:
-   `FileAssociation.Register` uretim kodunda hicbir yerden cagrilmiyor. Tur 1'in canli
-   `HKCU` kaydi yalnizca olcumun yansima ile elle tetiklemesiyle olustu; gercek kullanici
-   uygulamayi kurup calistirdiginda "Birlikte ac" listesinde hala gorunmez. Ayni kok
-   neden: `owns` bagla noktasini kapsamiyordu. Tur 2 K8'de baglanir.
-
-## F2 — Pim yeniden temellendirmesi
-
-Iki danisman da bagimsiz uyardi: D isi yerlesim pimi testlerini kirmizya dondurur.
-Bu bir surpriz degil, isin parcasi. Pimler D ile **ayni dalda** yeniden temellendirilir;
-ayri sozlesmeye birakilirsa main iki kosum kirmizi kalir — bu depoda daha once oldu.
-
-## Raftakiler
-
-- **Test paralelligi (B secenegi)** — asagida.
-- **Test paralelligi (B secenegi)** — kullanici 0.3.0 sonrasina erteledi. Onunde
-  dokuz olculmemis yerel `Call from invalid thread` hatasi duruyor.
-
-
-## Max sikistirma modu — acilis (7 Eylul 2026)
-
-Kullanici 6 Eylul'de rafa kaldirmis ve hatirlatilmasini istemisti; "yavastan giriselim"
-dedigi is budur. Once **ne oldugunu degil, motorun bugun nerede durdugunu** yazdim,
-cunku rafa kalkan tarifin dayandigi varsayimlarin bir kismi bu arada **olculup elendi**.
-
-### Elenmis olan: sahne basina bit dagitimi
-
-T114 bunu olctu ve **koda girmemesine** karar verdi (`docs/olcumler/sahne-butcesi.md`,
-"Sonuc"). Uc bagimsiz olcu ayni yone bakiyor:
-
-- K2 — olculen 8 hucrenin 5'inde kodlayicinin kendi dagitimi haritanin onerisi kadar
-  ya da ondan daha dogru.
-- K5/K6 — kalite kapisi **gecmedi**: p10 esigini gecen hucre 0, en kotu sahne esigini
-  gecen 0.
-- K7 — harita kasten bozuldugunda sonuc **kotulesmedi**; en iyi bozuk kol dogru haritayi
-  0,050 puan gecti, dogru haritanin tabana kazanci ise +0,007 puandi.
-
-Ustune: dagitimi tasiyan tek parametre `zones` ve denenen bes kodlayicinin yalniz
-ikisinde (`libx265`, `libx264`) calisiyor. **Uretimin varsayilani `libsvtav1` onu sessizce
-yok sayiyor.** Yani bu yoldan gidilen max modu, kullanicinin varsayilan ayarina hic
-dokunmazdi.
-
-**Sonuc: max modu sahne butcesi uzerine kurulmaz.** Rafa kaldirilan tarifin bes
-kalibrasyon stratejisinden ucu (sabit 10/80/10, uzatilmis ilk %10, her %10'da bir) zaten
-bugunku motorun gerisinde — `CalibrationProbe.Windows` pencere sayisini kaynagin
-heterojenligine gore seciyor ve `SceneMap` alabiliyor.
-
-### Ayakta kalan tek olculmus isaret: `qcomp`
-
-Ayni izgarada tabani gecen 4 hucrenin **3'unde kazanan `zones` degil `qcomp` oldu.
-`qcomp` tek bir kuresel skaler; `SceneMap` istemiyor ve `libsvtav1`'de calisiyor.**
-T114 raporunun kendi cumlesi: kazandigi hucre "iki gecis yanliliginin bugunku
-varsayilaninin bu icerikte en iyi olmadiginin kaniti".
-
-Yani elde, varsayilan kodlayicida gecerli, olculmus ve **hic pesine dusulmemis** bir
-ayar var.
-
-### Ikinci acik: `maks` kolunun kalite kapisi hic kosulmadi
-
-Ayni raporun "Olculemeyenler" tablosu: `maks/p1-karisik`, `maks/p2-durgun`,
-`maks/p3-hareketli` icin K5/K6 hucreleri **kosulmadi** (`k5-*.json` yok). Duzenegin
-`maks` kolu var ama max modunun kalite kazanci bu depoda **hic olculmedi**.
-
-### Acilis adimi — tek sozlesme, yeni duzenek yok
-
-`tools/sahne-butcesi/` zaten bu isi yapiyor; kurulacak bir sey yok, **kosulacak** bir sey
-var. Tek sozlesme iki soruyu kapatir:
-
-1. `maks` kolunun K5/K6 hucrelerini kos — max modunun kalite kazanci ilk kez sayiya doner.
-2. `libsvtav1` uzerinde `qcomp` taramasi — T114'un tek hucrelik isareti gercek mi, hangi
-   deger, ve varsayilan yolda gorunuyor mu.
-
-ffmpeg **sirayla** kosar; bu depoda iki es zamanli kodlama sure ve kalite sayilarini
-bozdu. Duzenek `--no-build` kullanmaz.
-
-**Fiyat.** Model tarafi ucuz — bir sozlesme, bir denetim, ~60-90k token. Pahali olan
-duvar saati: kodlama kosumlari **4-8 saat**, makine bu sure boyunca baska olcum
-kosturamaz. Onceki 400-700k'lik tahmin **butun modun** fiyatiydi; bu adim onun onunde
-duran ve sonrakini gereksiz kilabilecek olan olcum.
-
-Bu adim bitmeden mod tasarlanmaz. Cikan sayi "kazanc yok" derse mod **acilmaz** ve bu da
-bir sonuctur.
-
-**7 Eylul 2026 — ikinci kez ertelendi.** Kullanicinin cumlesi: "bekle 4-8 saat olmaz gece
-calismani istemiyorum sonra musait zamanda bakalim hatirlatta". Olcum gunduz musait bir
-saatte kosulur ve **hatirlatmayi T0 yapar**, kullanici sormaz. Hazirlik bitti; kosulacak
-sey `tools/sahne-butcesi/`, yeni duzenek yok.
+`Playback/PlayerView.axaml.cs:305` — `fault.ReasonTr` / `ReasonEn`. Motor iletisi
+anahtara taşınacak; C adımından önce kapanır.

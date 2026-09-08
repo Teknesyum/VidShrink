@@ -176,11 +176,17 @@
       </StackPanel>
 
       <Grid Grid.Row="2" Margin="{StaticResource WorkspaceMargin}">
-        <StackPanel x:Name="LangSwitch"
-                    Orientation="Horizontal"
+        <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     ZIndex="1">
+          <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
+          <Button x:Name="BtnLanguageSettings"
+                  Content="⚙"
+                  Theme="{StaticResource LanguageButton}"
+                  auto:AutomationProperties.Name="{loc:Text main.language.settings}"
+                  ToolTip.Tip="{loc:Text main.language.settings}"
+                  Click="OnOpenLanguageSettings"/>
         </StackPanel>
 
         <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
@@ -1029,7 +1035,7 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="{loc:Text main.tab.settings}" Theme="{StaticResource NeonTabItem}">
+        <TabItem Header="{loc:Text main.tab.settings}" x:Name="TabSettings" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
 
@@ -1039,7 +1045,7 @@
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
-                    <StackPanel x:Name="SettingsLangSwitch" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}"/>
+                    <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.language.hint}"/>
                   </StackPanel>
 

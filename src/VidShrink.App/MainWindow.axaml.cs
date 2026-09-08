@@ -81,6 +81,7 @@ public partial class MainWindow : Window
     private string? _lastOutput;
     private string? _ffmpegVersion;
     private bool _syncing;
+    private IReadOnlyList<string> _languageOrder = Array.Empty<string>();
 
     // T61/K1: iki denetim birbirini sürüyor. Bayrak "bu değeri kullanıcı değil program
     // yazıyor" demektir; yazılan tarafın işleyicisi o turda hiçbir şey türetmez, böylece
@@ -199,6 +200,7 @@ public partial class MainWindow : Window
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
+        Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
         Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -574,26 +576,64 @@ public partial class MainWindow : Window
     private void BuildLanguageSwitch()
     {
         LangSwitch.Children.Clear();
-        SettingsLangSwitch.Children.Clear();
 
-        foreach (var language in Strings.Languages)
+        foreach (var language in Strings.ShortcutLanguages)
         {
-            foreach (var panel in new[] { LangSwitch, SettingsLangSwitch })
+            var button = new Button
             {
-                var button = new Button
-                {
-                    Content = Strings.GetIn(language, "main.language.name"),
-                    Theme = Look("LanguageButton"),
-                    Tag = language
-                };
+                Content = Strings.GetIn(language, "main.language.name"),
+                Theme = Look("LanguageButton"),
+                Tag = language
+            };
 
-                AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
-                button.Click += (_, _) => UseLanguage(language);
-                panel.Children.Add(button);
-            }
+            AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
+            button.Click += (_, _) => UseLanguage(language);
+            LangSwitch.Children.Add(button);
         }
 
+        BuildLanguageList();
         MarkChosenLanguage();
+    }
+
+    /// <summary>
+    /// Ayarlardaki tam liste. Üst şerit yalnız kısayolu taşır; kurulumdaki her dil buradan
+    /// seçilir ve her satır dilin kendi adını kendi dosyasından yazar. Liste dosya
+    /// klasörlerinden kuruluyor, kodda hiçbir dil adı yazılı değil.
+    /// </summary>
+    private void BuildLanguageList()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            _languageOrder = Strings.Languages;
+            CmbLanguage.ItemsSource = _languageOrder
+                .Select(language => Strings.GetIn(language, "main.language.name"))
+                .ToArray();
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+    }
+
+    /// <summary>
+    /// Tekerlek düğmesi. Dil ayarı ayarlar sekmesinde durur; üst şeritteki kısayol yalnız
+    /// iki dile kestirme, geri kalanı buradan seçiliyor.
+    /// </summary>
+    private void OnOpenLanguageSettings(object? sender, RoutedEventArgs e)
+    {
+        Tabs.SelectedIndex = SettingsTabIndex;
+        CmbLanguage.BringIntoView();
+        CmbLanguage.Focus();
+    }
+
+    private void OnLanguageChosen()
+    {
+        if (_syncing) return;
+        var chosen = CmbLanguage.SelectedIndex;
+        if (chosen < 0 || chosen >= _languageOrder.Count) return;
+        UseLanguage(_languageOrder[chosen]);
     }
 
     /// <summary>
@@ -623,10 +663,29 @@ public partial class MainWindow : Window
 
     private void MarkChosenLanguage()
     {
-        foreach (var button in LangSwitch.Children.OfType<Button>().Concat(SettingsLangSwitch.Children.OfType<Button>()))
+        foreach (var button in LangSwitch.Children.OfType<Button>())
             button.Classes.Set(
                 "selected",
                 string.Equals(button.Tag as string, Strings.Language, StringComparison.OrdinalIgnoreCase));
+
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            var index = -1;
+            for (var at = 0; at < _languageOrder.Count; at++)
+                if (string.Equals(_languageOrder[at], Strings.Language, StringComparison.OrdinalIgnoreCase))
+                {
+                    index = at;
+                    break;
+                }
+
+            CmbLanguage.SelectedIndex = index;
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
     }
 
     private void UseLanguage(string language) => Strings.Use(language);
@@ -2386,6 +2445,8 @@ public partial class MainWindow : Window
         => _startupFile is null ? Task.CompletedTask : LoadStartupFileAsync(_startupFile);
 
     internal int PlayerTabIndex => Tabs.Items.IndexOf(TabPlayer);
+
+    private int SettingsTabIndex => Tabs.Items.IndexOf(TabSettings);
 
     internal PlayerView PlayerTab => Player;
 

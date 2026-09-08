@@ -97,9 +97,11 @@ public sealed class AyarKaliciligiTests
     public void AyarlarSekmesiDilDenetimiKalicidir()
     {
         var code = File.ReadAllText(TipSources.WindowCodePath);
-        Assert.Contains("SettingsLangSwitch.Children.Clear()", code);
-        Assert.Contains("panel.Children.Add(button)", code);
-        Assert.Contains("new[] { LangSwitch, SettingsLangSwitch }", code);
+        Assert.Contains("LangSwitch.Children.Clear()", code);
+        Assert.Contains("LangSwitch.Children.Add(button)", code);
+        Assert.Contains("Strings.ShortcutLanguages", code);
+        Assert.Contains("CmbLanguage.ItemsSource", code);
+        Assert.Contains("Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);", code);
         Assert.Contains("SaveSettings();", code);
     }
 

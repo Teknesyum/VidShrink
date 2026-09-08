@@ -538,6 +538,40 @@ public sealed class LanguageTests : IDisposable
         Assert.True(complaints.Length == 0, "Türkçesi yazılmamış anahtarlar:\n" + complaints);
     }
 
+    /// <summary>
+    /// Üst şeritteki tekerlek. Kısayol iki dili taşıyor, geri kalanı ayarlarda; tekerleğin
+    /// tek işi kullanıcıyı oraya götürmek. Ölçü düğmeye basıp hangi sekmenin açıldığına
+    /// bakıyor — sekme numarasını sabit yazmıyor, sekmeyi kendi başlığından buluyor.
+    /// </summary>
+    [Fact]
+    public void DilTekerlegiAyarlarSekmesindekiDilSecicisineGoturur()
+    {
+        var (chosenTab, settingsTab, shortcuts, listed) = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            Relayout(window, new Size(1400, 1000));
+
+            window.BtnLanguageSettings.RaiseEvent(
+                new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+
+            var settings = window.Tabs.Items
+                .OfType<TabItem>()
+                .Select((item, at) => (item, at))
+                .Single(pair => pair.item.Name == "TabSettings")
+                .at;
+
+            return (
+                window.Tabs.SelectedIndex,
+                settings,
+                window.LangSwitch.Children.OfType<Button>().Select(b => (string)b.Tag!).ToList(),
+                window.CmbLanguage.ItemsSource!.Cast<object?>().Count());
+        });
+
+        Assert.Equal(settingsTab, chosenTab);
+        Assert.Equal(Strings.ShortcutLanguages, shortcuts);
+        Assert.Equal(Strings.Languages.Count, listed);
+    }
+
     // ---- K7: üçüncü dil kod değişmeden ---------------------------------------------
 
     private readonly record struct Reading(IReadOnlyList<string> Offered, string Chosen);
@@ -579,16 +613,17 @@ public sealed class LanguageTests : IDisposable
                 var window = new MainWindow();
                 Relayout(window, new Size(1400, 1000));
 
-                var buttons = window.GetVisualDescendants().OfType<Button>()
-                    .Where(button => button.Tag is string tag && Strings.Languages.Contains(tag, StringComparer.Ordinal))
-                    .Select(button => button.Content?.ToString() ?? string.Empty)
+                // Üst şerit yalnız kısayolu taşır; üçüncü dil ayarlardaki tam listede
+                // görünür ve oradan seçilir. Ölçü listeyi okuyup seçimi oradan yapıyor.
+                var picker = window.CmbLanguage;
+
+                var offered = picker.ItemsSource!.Cast<object?>()
+                    .Select(item => item?.ToString() ?? string.Empty)
                     .ToList();
 
-                var third = window.GetVisualDescendants().OfType<Button>()
-                    .Single(button => (button.Tag as string) == "zz");
-                third.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+                picker.SelectedIndex = offered.IndexOf("Zzyzx");
 
-                return new Reading(buttons, window.TxtDropTitle.Text ?? string.Empty);
+                return new Reading(offered, window.TxtDropTitle.Text ?? string.Empty);
             });
 
             var (offered, chosen) = (read.Offered, read.Chosen);
