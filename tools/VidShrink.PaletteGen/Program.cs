@@ -70,12 +70,12 @@ static string Build(Seed seed)
           <Color x:Key="NeonEmberColor">{Solid(seed.Ember)}</Color>
           <Color x:Key="EmberFlameColor">{Solid(seed.Flame)}</Color>
           <Color x:Key="EmberBlazeColor">{Solid(seed.Blaze)}</Color>
-          <Color x:Key="EmberDeepColor">{Solid(Mix(seed.Bg, seed.Ember, 0.02))}</Color>
-          <Color x:Key="EmberMidColor">{Solid(Mix(seed.Bg, seed.Ember, 0.035))}</Color>
-          <Color x:Key="EmberEdgeColor">{Solid(Mix(seed.Bg, seed.Ember, 0.05))}</Color>
-          <Color x:Key="EmberBarDeepColor">{Solid(Mix(seed.Surface, seed.Ember, 0.03))}</Color>
-          <Color x:Key="EmberBarMidColor">{Solid(Mix(seed.Surface, seed.Ember, 0.05))}</Color>
-          <Color x:Key="EmberBarEdgeColor">{Solid(Mix(seed.Surface, seed.Ember, 0.07))}</Color>
+          <Color x:Key="EmberDeepColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.02)))}</Color>
+          <Color x:Key="EmberMidColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.035)))}</Color>
+          <Color x:Key="EmberEdgeColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.05)))}</Color>
+          <Color x:Key="EmberBarDeepColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.03)))}</Color>
+          <Color x:Key="EmberBarMidColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.05)))}</Color>
+          <Color x:Key="EmberBarEdgeColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.07)))}</Color>
 
           <Color x:Key="PlaybackScrimColor">{Alpha(seed.Bg, 0xCC)}</Color>
           <Color x:Key="PlaybackScrimEdgeColor">{Alpha(seed.Bg, 0x00)}</Color>
@@ -106,6 +106,15 @@ static string Alpha(string hex, int alpha)
 {
     var (r, g, b) = Parse(hex);
     return $"#{alpha:X2}{r:X2}{g:X2}{b:X2}";
+}
+
+// Ateş şeridi zeminin üstünde ısınır ama koyulaşır: karışım tek başına rengi
+// açıyor ve başlık çubuğundaki yazı kontrastını düşürüyordu. Ölçü:
+// ThemeBackdropTests.WarmingTheTitleBarDoesNotCostBodyTextContrast.
+static string Dim(string hex)
+{
+    var (r, g, b) = Parse(hex);
+    return $"#{(int)Math.Round(r * 0.78):X2}{(int)Math.Round(g * 0.78):X2}{(int)Math.Round(b * 0.78):X2}";
 }
 
 static string Mix(string first, string second, double weight)

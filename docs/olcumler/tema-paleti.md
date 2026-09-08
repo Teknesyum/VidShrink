@@ -48,3 +48,29 @@ yazılmazsa ölçü kırmızı yanar.
 
 İlgili aile ölçümü (`Localization|Language|SettingsTab|AyarKaliciligi|Palette`):
 **160/160 yeşil**, 12 sn.
+
+## Tam Koşum
+
+İlk tam koşum yeni paletlerle bir ölçüyü kırdı — kanıt olduğu gibi:
+
+```
+[xUnit.net] ThemeBackdropTests.WarmingTheTitleBarDoesNotCostBodyTextContrast [FAIL]
+   Başlık çubuğu kontrastı 18,67 → 18,03 düştü.
+[xUnit.net] OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir [FAIL]
+Başarısız: 2, Başarılı: 1933, Atlanan: 18, Toplam: 1953, Süre: 19 m 33 s
+```
+
+Sebep: ateş şeridi zeminle `ember` karışımından üretiliyordu, karışım rengi **açıyordu**.
+Üreteçteki `Dim` (×0,78) eklendi; şerit ısınırken koyuluğunu koruyor. Neon'un üretilen
+değerleri elle yazılmış eskisinin bir iki birim yakınında:
+
+```
+üretilen  #FF080406 #FF0B0407 #FF0E0407 | #FF140D12 #FF170D12 #FF1B0D13
+eski      #FF070306 #FF080407 #FF0B0407 | #FF130D10 #FF150E11 #FF170F12
+```
+
+`ThemeBackdropTests` + `PaletteTests` → **29/29 yeşil**.
+
+`Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir` bu işten önce de kırmızıydı
+(`git stash` ile kanıtlandı): `Process.HasExited` "Erişim engellendi" atıyor, süreç
+koduna dokunulmadı.

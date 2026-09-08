@@ -28,12 +28,12 @@
   <Color x:Key="NeonEmberColor">#FFFF5555</Color>
   <Color x:Key="EmberFlameColor">#FFFFB86C</Color>
   <Color x:Key="EmberBlazeColor">#FFF1FA8C</Color>
-  <Color x:Key="EmberDeepColor">#FF2C2B37</Color>
-  <Color x:Key="EmberMidColor">#FF302C37</Color>
-  <Color x:Key="EmberEdgeColor">#FF332C38</Color>
-  <Color x:Key="EmberBarDeepColor">#FF3A3846</Color>
-  <Color x:Key="EmberBarMidColor">#FF3E3847</Color>
-  <Color x:Key="EmberBarEdgeColor">#FF423947</Color>
+  <Color x:Key="EmberDeepColor">#FF22222B</Color>
+  <Color x:Key="EmberMidColor">#FF25222B</Color>
+  <Color x:Key="EmberEdgeColor">#FF28222C</Color>
+  <Color x:Key="EmberBarDeepColor">#FF2D2C37</Color>
+  <Color x:Key="EmberBarMidColor">#FF302C37</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF332C37</Color>
 
   <Color x:Key="PlaybackScrimColor">#CC282A36</Color>
   <Color x:Key="PlaybackScrimEdgeColor">#00282A36</Color>
