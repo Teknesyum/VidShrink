@@ -363,8 +363,10 @@ public static class Program
     ///
     /// <para>Belirlenimli olan nokta borunun <b>terminal penceresi</b>:
     /// <c>PanelHost.FreezesAtWindowEnd</c> dogruyken ilerlenecek pencere yoktur — ne devir
-    /// ne on hazirlik. O yuzden oynatma erken durdurulmaz, kaynak terminal pencereye
-    /// varana kadar birakilir; sonra sunum sayaci duruncaya kadar beklenir. Pencerenin son
+    /// ne on hazirlik. O pencereye devirleri bekleyerek degil, <c>LoadClipAsync</c> ile
+    /// dogrudan gecilir: yurumeyi beklemek hem yavas hem kirilgan, bir kosumda 60 saniyede
+    /// terminal pencereye varilamadi (<c>.calisma/T189/kosumlar/r3.stderr.txt</c>, atilan
+    /// kol). Pencere kurulduktan sonra sunum sayaci duruncaya kadar beklenir; pencerenin son
     /// karesi halkanin en yenisidir, dusurulmez ve tuketici onu almadan halka bosalmaz.</para>
     ///
     /// <para>En sonda oynatma durdurulur ve denetim seridi elle yerlestirilir: serit
@@ -385,7 +387,15 @@ public static class Program
         Await(() => Read(host, "SourceStatus") is ComparisonSourceStatus { State: ComparisonSourceState.Oynuyor },
             "Onizleme borusu");
 
-        Await(() => (bool)Read(host, "FreezesAtWindowEnd"), "Onizlemenin terminal penceresi");
+        var load = (Task)Call(host, "LoadClipAsync", (double)ClipSeconds);
+        Await(() => load.IsCompleted, "Terminal pencerenin kodlanmasi");
+        load.GetAwaiter().GetResult();
+
+        if (!(bool)Read(host, "FreezesAtWindowEnd"))
+            throw new InvalidOperationException($"Terminal pencere kurulamadi: {Read(host, "ActiveClip")}");
+
+        Await(() => Read(host, "SourceStatus") is ComparisonSourceStatus { State: ComparisonSourceState.Oynuyor },
+            "Terminal pencerenin borusu");
 
         var last = -1L;
         var idle = 0;
@@ -404,8 +414,34 @@ public static class Program
 
         SetProperty(strip, "IsPlaying", false);
         SetField(host, "_generation", (int)FieldValue(host, "_generation")! + 1);
+        DrainSurface(Read(Named(window, "Preview"), "Frames"));
         RevealStrip(strip);
         TracePreview(window, host, strip);
+    }
+
+    /// <summary>
+    /// Yuzeyin kendi halkasini bosaltir.
+    ///
+    /// <para>Iki ayri sunum turu var: <c>PanelHost.Drain</c> kareyi
+    /// <c>ComparisonSurface</c>'in halkasina <b>birakir</b>, yuzeyin kendi turu
+    /// (<c>Round</c>) onu bitmap'e <b>cizer</b>. Barindiriciyi durdurmak yalniz birakmayi
+    /// durduruyor; halkada cizilmemis kare kalirsa kareye giren goruntu son birakilan degil
+    /// son <i>cizilen</i> oluyor ve kacinin cizildigi kuyrugun ne kadar suruldugune bagli.
+    /// Olculdu: bes kosumun besinde de son birakilan kare 11,967 sn'ydi (iz satirlari ayni)
+    /// ama ilk kosumun karesinde kaynagin kendi damgasi 11,167 sn goruyordu.</para>
+    ///
+    /// <para>Beklemek ise yaramiyor: yuzeyin turunu <c>RequestAnimationFrame</c> suruyor ve
+    /// bassiz kosumda o dongu kendiliginden donmuyor (60 saniye beklendi, sayaclar hic
+    /// artmadi). Tur bir kez elle cevriliyor — <c>Round</c> halkadaki butun kareleri bir
+    /// seferde tuketip en yenisini ciziyor — ve halkanin bosaldigi dogrulaniyor.</para>
+    /// </summary>
+    private static void DrainSurface(object surface)
+    {
+        Call(surface, "Round", TimeSpan.Zero);
+
+        var ring = FieldValue(surface, "_ring")!;
+        var left = (int)Read(ring, "Count");
+        if (left > 0) throw new InvalidOperationException($"Yuzeyin halkasi bosalmadi: {left} kare.");
     }
 
     /// <summary>
@@ -429,7 +465,8 @@ public static class Program
         Console.Error.WriteLine(
             $"iz	onizleme	pozisyon={Read(strip, "Position")}	sunulan={Read(host, "PresentedFrames")}"
             + $"	terminal={Read(host, "FreezesAtWindowEnd")}	seritGorunur={Read(strip, "IsRevealed")}"
-            + $"	seritOpaklik={bar.Opacity}	pencere={Read(host, "ActiveClip")}	durum={Read(host, "SourceStatus")}");
+            + $"	seritOpaklik={bar.Opacity}	yuzeyCizen={Read(Read(Named(window, "Preview"), "Frames"), "PresentedFrames")}"
+            + $"	pencere={Read(host, "ActiveClip")}	durum={Read(host, "SourceStatus")}");
     }
 
     /// <summary>
