@@ -131,8 +131,6 @@
   <StreamGeometry x:Key="PlaybackMaximizeIcon">M0,0 H12 V12 H0 Z</StreamGeometry>
   <StreamGeometry x:Key="PlaybackFullScreenIcon">M0,4 V0 H4 M8,0 H12 V4 M12,8 V12 H8 M4,12 H0 V8</StreamGeometry>
 
-  <Color x:Key="PlaybackScrimColor">#CC050507</Color>
-  <Color x:Key="PlaybackScrimEdgeColor">#00050507</Color>
   <x:Double x:Key="PlaybackScrimEdge">0.25</x:Double>
   <SolidColorBrush x:Key="PlaybackScrim" Color="{StaticResource PlaybackScrimColor}"/>
 

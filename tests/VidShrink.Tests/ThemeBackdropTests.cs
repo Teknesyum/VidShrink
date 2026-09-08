@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Avalonia;
@@ -22,8 +22,6 @@ public sealed class ThemeBackdropTests
     private static readonly XNamespace Ui = "https://github.com/avaloniaui";
     private static readonly XNamespace X = "http://schemas.microsoft.com/winfx/2006/xaml";
 
-    private static readonly string ThemePath = TipSources.ThemePath;
-
     /// <summary>T55 öncesi <c>WorkspaceBackground</c>'un durakları.</summary>
     private static readonly string[] BaselineWorkspaceStops =
     {
@@ -45,7 +43,7 @@ public sealed class ThemeBackdropTests
         "M 800,166 C 812,118 838,82 872,50 C 862,102 846,138 826,174 Z M 330,192 C 306,132 296,86 300,36 C 328,90 348,140 360,190 Z M 470,246 C 452,196 448,158 456,116 C 478,164 492,206 500,246 Z M 1270,192 C 1294,132 1304,86 1300,36 C 1272,90 1252,140 1240,190 Z M 1130,246 C 1148,196 1152,158 1144,116 C 1122,164 1108,206 1100,246 Z"
     };
 
-    private static XElement Theme() => XDocument.Load(ThemePath).Root!;
+
 
     private static readonly string ControlsPath =
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Controls.axaml");
@@ -87,15 +85,13 @@ public sealed class ThemeBackdropTests
 
     private static readonly Regex MirrorPoint = new(@"(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)");
 
-    private static XElement Resource(string key) => Theme()
-        .Elements()
-        .Single(element => (string?)element.Attribute(X + "Key") == key);
+    private static XElement Resource(string key) => ThemeSources.Resource(key);
 
-    private static string Token(string key) => Resource(key).Value.Trim();
+    private static string Token(string key) => ThemeSources.Token(key);
 
     private static IEnumerable<string> StopColours(string brushKey)
     {
-        var colours = Theme().Elements()
+        var colours = ThemeSources.Resources()
             .Single(element => (string?)element.Attribute(X + "Key") == brushKey)
             .Elements(Ui + "GradientStop")
             .Select(stop => (string)stop.Attribute("Color")!);

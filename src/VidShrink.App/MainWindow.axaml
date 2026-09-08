@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -235,8 +235,12 @@
                               StrokeLineCap="Round"
                               StrokeJoin="Round"
                               RenderTransform="none"
-                              Effect="drop-shadow(0 0 6 #FF00F3FF)"
                               Data="M 24 6 L 24 31 M 14 21 L 24 31 L 34 21 M 8 33 L 8 42 L 40 42 L 40 33">
+                          <Path.Effect>
+                            <DropShadowEffect OffsetX="0" OffsetY="0"
+                                              BlurRadius="{StaticResource DropIconGlowRadius}"
+                                              Color="{StaticResource NeonBlueColor}"/>
+                          </Path.Effect>
                           <Path.Transitions>
                             <Transitions>
                               <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>

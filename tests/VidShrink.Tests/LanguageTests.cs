@@ -214,6 +214,7 @@ public sealed class LanguageTests : IDisposable
     {
         "NeonBlueColor", "NeonPinkColor", "NeonPurpleColor", "NeonSuccessColor",
         "SurfaceToneColor", "AppBgColor", "TextBodyColor", "TextDisabledColor",
+        "OnNeonColor", "PinkTextColor",
         "NeonBlueFillColor", "NeonBlueHoverColor", "NeonBlueActiveColor",
         "NeonBlueBorderColor", "NeonBlueBorderStrongColor", "NeonPinkFillColor",
         "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor",

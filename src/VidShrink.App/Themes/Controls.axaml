@@ -3,6 +3,7 @@
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://VidShrink.App/Themes/Palette/Neon.axaml"/>
         <ResourceInclude Source="avares://VidShrink.App/Themes/Theme.axaml"/>
       </ResourceDictionary.MergedDictionaries>
 
@@ -353,7 +354,7 @@
 
       <!-- Readable pink for text. The fill pink measures 4.57:1 on the surface and misses the
            floor; this one measures 7.72:1, so coloured words use it and fills keep NeonPink. -->
-      <SolidColorBrush x:Key="PinkText" Color="#FFFF54EB"/>
+      <SolidColorBrush x:Key="PinkText" Color="{StaticResource PinkTextColor}"/>
 
       <ControlTheme x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
         <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
