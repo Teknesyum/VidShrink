@@ -77,6 +77,11 @@ ilk_cift = abs(kontrol_bayt[1] - kontrol_bayt[2]) if 1 in kontrol_bayt and 2 in 
 ilk_dort = [kontrol_bayt[i] for i in kontrol_sira if i <= 4]
 dort_aralik = (max(ilk_dort) - min(ilk_dort)) if len(ilk_dort) >= 2 else None
 
+kapi_mkv = sorted(glob.glob(os.path.join(IS, "k2kapi", "*.mkv")))
+kapi_err_dosya = sorted(glob.glob(os.path.join(IS, "k2kapi", "*.err")))
+kapi_errli = [m for m in kapi_mkv if os.path.exists(m[:-4] + ".p1.err")]
+kapi_errsiz = [os.path.basename(m)[:-4] for m in kapi_mkv if m not in kapi_errli]
+
 parse_hatalari = []
 for p in sorted(glob.glob(os.path.join(IS, "k2kapi", "*.err"))):
     with io.open(p, encoding="utf-8", errors="replace") as f:
@@ -152,19 +157,41 @@ kapi_qpscs = [r for r in kapi if r["anahtar"] == "qp-scale-compress-strength"][0
 kontrol = [r for r in kapi if r["anahtar"] == "kontrol"][0]
 gurultu = int(kontrol["fark_bayt"])
 
+gurultu_pencere = None
+gurultu_kayit = []
+for a in adlar:
+    gp = os.path.join(IS, "gurultu-maks-" + a + ".json")
+    if os.path.exists(gp):
+        gurultu_pencere = a
+        gurultu_kayit = oku(gp)
+        break
+gurultu_p10 = [r["VmafP10"] for r in gurultu_kayit if r["VmafP10"] is not None]
+vmaf_tabani = (max(gurultu_p10) - min(gurultu_p10)) if len(gurultu_p10) > 1 else None
+
 k12adlar = [a for a in adlar if a in k12kazanc]
 k12band_disi = [(a, kol) for a in k12adlar for kol in ("taban", "dagitim")
                 if kol in k12[a] and not k12[a][kol]["BandIcinde"]]
 k12p10 = [a for a in k12adlar if k12kazanc[a]["p10"] is not None and k12kazanc[a]["p10"] >= P10_ESIK]
 k12enkotu = [a for a in k12adlar if k12kazanc[a]["enkotu"] is not None and k12kazanc[a]["enkotu"] >= ENKOTU_ESIK]
+k12esli = [a for a in k12adlar if k12[a]["taban"]["BandIcinde"] and k12[a]["dagitim"]["BandIcinde"]]
+k12eslenmemis = [a for a in k12adlar if a not in k12esli]
 if not k12adlar:
     k12yol = "olculmedi"
-elif k12band_disi:
+elif not k12esli:
     k12yol = "belirsiz"
-elif len(k12p10) == len(k12adlar) and len(k12enkotu) == len(k12adlar):
+elif all(a in k12p10 and a in k12enkotu for a in k12esli):
     k12yol = "acilabilir"
 else:
     k12yol = "kapanir"
+
+k12esli_p10 = [k12kazanc[a]["p10"] for a in k12esli if k12kazanc[a]["p10"] is not None]
+en_buyuk_esli_p10 = max(k12esli_p10) if k12esli_p10 else None
+if vmaf_tabani is None or en_buyuk_esli_p10 is None:
+    k12dayanak = "olculmedi"
+elif vmaf_tabani >= en_buyuk_esli_p10:
+    k12dayanak = "isaret yok"
+else:
+    k12dayanak = "yol 2"
 
 s = []
 w = s.append
@@ -181,8 +208,11 @@ w("## K0 — Kaynak Sapmasi")
 w("")
 w("T114'un `kaynak-1080p60-hdr-17dk-yalniz-video.mkv` dosyasi bu makinede **yok**")
 w("(`VIDSHRINK_KAYNAK`, butun surucu harfleri ve `.calisma` disi klasorler arandi;")
-w("`C:/Users` altinda 400 MB ustu tek bir video dosyasi bulunamadi). Pencereler elde")
-w("olan uc 60 sn'lik 1080p60 HDR parcadan uretildi.")
+w("`C:/Users` altinda 400 MB ustu tek bir video dosyasi bulunamadi). Bu arama **8 Eylul")
+w("2026'da bir kez** yapildi; sonucu ureticin govdesine yazili sabittir, her rapor")
+w("kosumunda yeniden olculmez.")
+w("")
+w("Pencereler elde olan uc 60 sn'lik 1080p60 HDR parcadan uretildi.")
 w("")
 w("| Pencere | Kaynak | Sure (sn) | Harita sahnesi |")
 w("|---------|--------|-----------|----------------|")
@@ -261,8 +291,13 @@ w("")
 ad_q, satir_q = ilk_hata("qcomp")
 ad_z, satir_z = ilk_hata("zones")
 if satir_q:
-    w("Nitel yari da ham dosyada duruyor. `08-svtav1-kapisi.sh` her kodlamanin stderr'ini")
-    w("`.calisma/" + os.path.basename(IS) + "/k2kapi/<ad>.p1.err` ve `<ad>.p2.err` olarak saklar;")
+    w("Nitel yari da ham dosyada duruyor. `08-svtav1-kapisi.sh` kodlamanin stderr'ini")
+    w("`.calisma/" + os.path.basename(IS) + "/k2kapi/<ad>.p1.err` ve `<ad>.p2.err` olarak saklar —")
+    w("ama **her kodlamanin degil**: " + str(len(kapi_mkv)) + " kodlamanin " + str(len(kapi_errli)) +
+      "'sinde `.err` var (" + str(len(kapi_err_dosya)) + " dosya).")
+    if kapi_errsiz:
+        w("Eksik olanlar: " + ", ".join("`" + x + "`" for x in kapi_errsiz) +
+          " — stderr yakalama bu kosumlardan sonra eklendi, geriye donuk uretilmedi.")
     w("`Error parsing option` dizgesi " + str(len(set(x[0] for x in parse_hatalari))) +
       " dosyada, toplam " + str(len(parse_hatalari)) + " kez gecer:")
     w("")
@@ -423,6 +458,11 @@ else:
     w("kapida olculen ikilidir, tarama yok. `p2-durgun` disarida: iki kolu da bant disi")
     w("oldugu icin kalite satiri boy eslenmemis olurdu.")
     w("")
+    w("Uretecin `K12Taban = \"qp-scale-compress-strength=0\"` sabiti **silindi**")
+    w("(`tools/sahne-butcesi/Program.cs`): taban kol o parametreyle hicbir zaman")
+    w("kodlanmadi, K5'in taban ciktisi kopyalaniyordu. Kod artik olculen davranisi")
+    w("anlatiyor; ciktilar degismedi.")
+    w("")
     w("| Pencere | Kol | Boyut (MB) | Band (MB) | Band ici | VMAF-NEG ort | p10 | min | En kotu sahne |")
     w("|---------|-----|------------|-----------|----------|--------------|-----|-----|---------------|")
     for a in k12adlar:
@@ -456,24 +496,76 @@ else:
     w("4. K6: her kosum hedef bandin icinde — **band disi kosum: " + str(len(k12band_disi)) + "**" +
       ((" (" + ", ".join("`" + a + "`/" + kol for a, kol in k12band_disi) + ")") if k12band_disi else ""))
     w("")
-    if k12yol == "belirsiz":
-        w("**Sonuc: belirsiz.** Bant disina cikan kosum var, yani iki kol **esit boyda")
-        w("karsilastirilmadi**; bu haliyle kalite farki kazanc olarak okunamaz.")
-        for a, kol in k12band_disi:
-            r = k12[a][kol]
-            w("`" + a + "`/" + kol + ": " + vir(r["GerceklesenMb"], 2) + " MB, band " +
-              vir(r["BandAltMb"], 1) + "–" + vir(r["BandUstMb"], 1) + " MB.")
+    w("### Pencere Pencere — Her Cumle Kendi Penceresini Konusur")
+    w("")
+    w("Iki pencere ayni hukumde degil; asagidaki her cumle yalniz basindaki pencere")
+    w("icin gecerlidir.")
+    w("")
+    for a in k12eslenmemis:
+        disi = [kol for kol in ("taban", "dagitim") if not k12[a][kol]["BandIcinde"]]
+        bt, bd2 = k12boyut.get((a, "taban")), k12boyut.get((a, "dagitim"))
+        w("**`" + a + "` — boy eslenmedi.** " +
+          ", ".join("`" + kol + "` " + vir(k12[a][kol]["GerceklesenMb"], 2) + " MB" for kol in disi) +
+          ", band " + vir(k12[a]["taban"]["BandAltMb"], 1) + "–" +
+          vir(k12[a]["taban"]["BandUstMb"], 1) + " MB" +
+          ((" (bagil boy farki %" + vir(abs(bd2 - bt) * 100.0 / max(bt, bd2), 3) + ")") if (bt and bd2) else "") + ".")
+        w("Bu pencerede iki kol **esit boyda karsilastirilmadi**; kalite farki kazanc")
+        w("olarak okunamaz. Anahtar calisiyor — bayt farki bunu soyluyor — ama `=3` ile")
+        w("cikan dosya hedef bandi asiyor: onunde duran soru kalite degil hedef boyuttur.")
         w("")
-        w("Anahtar calisiyor — bayt farki bunu soyluyor — ama `=3` ile cikan dosya hedef")
-        w("bandi asiyor: kalite kazanci sorusu once bir hedef boyut sorusudur. Uydurma")
-        w("yapilmaz; mod bu anahtar icin ne acilir ne kapanir.")
+    for a in k12esli:
+        k = k12kazanc[a]
+        bt, bd2 = k12boyut.get((a, "taban")), k12boyut.get((a, "dagitim"))
+        w("**`" + a + "` — boy eslendi.** Iki kol da bant icinde" +
+          ((", bagil boy farki **%" + vir(abs(bd2 - bt) * 100.0 / max(bt, bd2), 3) + "**") if (bt and bd2) else "") + ".")
+        w("p10 kazanci **" + isaretli(k["p10"]) + "** < +" + vir(P10_ESIK, 2) +
+          "; en kotu sahne kazanci **" + isaretli(k["enkotu"]) + "** < +" + vir(ENKOTU_ESIK, 2) +
+          " (isaret ayrica ters).")
+        w("Yani bu pencerede esitlik kurulu ve kapi yine de gecilmiyor.")
+        w("")
+    w("### K17 — Taban Kolunun VMAF Gurultu Tabani")
+    w("")
+    if vmaf_tabani is None:
+        w("Olculmedi.")
+        w("")
+    else:
+        w("Yukaridaki kazanc sayilarinin bu duzenegin kendi gurultusunden ayirt edilip")
+        w("edilmedigi olculdu: `" + gurultu_pencere + "` penceresinin **taban** kolu ayni")
+        w("komutla " + str(len(gurultu_p10)) + " kez kosuldu (ayni plan, ayni parametreler, ek")
+        w("param yok). Ham kayit: `.calisma/" + os.path.basename(IS) + "/gurultu-maks-" +
+          gurultu_pencere + ".json`.")
+        w("")
+        w("| Kosum | Boyut (MB) | VMAF-NEG ort | p10 | En kotu sahne |")
+        w("|-------|------------|--------------|-----|---------------|")
+        for r in gurultu_kayit:
+            w("| " + r["Kol"] + " | " + vir(r["GerceklesenMb"], 2) + " | " + vir(r["VmafMean"]) +
+              " | " + vir(r["VmafP10"]) + " | " + vir(r["VmafWorstScene"]) + " |")
+        w("")
+        w("**VMAF gurultu tabani = max p10 − min p10 = " + vir(vmaf_tabani) + " puan.**")
+        w("")
+        if k12dayanak == "isaret yok":
+            w("Bu taban `" + k12esli[0] + "`nin p10 kazancina (" + isaretli(en_buyuk_esli_p10) +
+              ") **esit ya da ondan buyuk**:")
+            w("kazanc duzenegin kendi tekrar gurultusunden ayirt edilmis degil. Bu pencere icin")
+            w("hukum belirsiz degil, **isaret yok** — ve `p1-karisik`i yeniden kosmak bu")
+            w("sonucu degistirmez.")
+        else:
+            w("Bu taban `" + k12esli[0] + "`nin p10 kazancinin (" + isaretli(en_buyuk_esli_p10) +
+              ") **altinda**: isaret")
+            w("gurultuden ayirt ediliyor, ama esigin (+" + vir(P10_ESIK, 2) + ") altinda kaliyor.")
+            w("Bu pencere icin hukum **yol 2 — kanitli kapanis**.")
+        w("")
+    if k12yol == "belirsiz":
+        w("**Sonuc: belirsiz.** Boy eslenmis tek pencere yok; uydurma yapilmaz, mod bu")
+        w("anahtar icin ne acilir ne kapanir.")
     elif k12yol == "acilabilir":
         w("**Sonuc: mod acilabilir** — ama tasiyici `zones` degil `qp-scale-compress-strength`.")
     elif k12yol == "kapanir":
-        w("**Sonuc: mod kapanir.** Kazanc esigin altinda; bu sefer her iki anahtar icin de")
-        w("kanitli. En buyuk p10 kazanci **" +
-          vir(max(k12kazanc[a]["p10"] for a in k12adlar if k12kazanc[a]["p10"] is not None)) +
-          " puan**, esik +" + vir(P10_ESIK, 2) + ".")
+        w("**Sonuc: mod bu anahtar icin kapanir**, dayanak `" + k12esli[0] + "`: " +
+          ("gurultu tabani kazanci yutuyor, **isaret yok**." if k12dayanak == "isaret yok"
+           else "isaret gercek ama esigin altinda, **yol 2**."))
+        w("`" + "`, `".join(k12eslenmemis) + "` icin ayri duran not: boy eslenmedi, o pencerenin")
+        w("kalite satiri hukme girmiyor.")
     w("")
 w("## K3 — Sure Sayilari")
 w("")
@@ -512,7 +604,10 @@ else:
     w("**Max sikistirma modu sahne dagitimi uzerine acilmaz**: `maks` kolunun kalite")
     w("kapisi bu depoda ilk kez kosuldu ve p10 esigini gecen pencere " + str(len(p10_gecen)) +
       "/" + str(olculen) + ", en kotu sahne esigini gecen pencere " + str(len(enkotu_gecen)) +
-      "/" + str(olculen) + " cikti —")
+      "/" + str(olculen) + " cikti")
+    w("(boy eslenmis — iki kolu da bant icinde — pencereler uzerinden ayni sayilar " +
+      str(len([a for a in p10_gecen if a in boy_esli])) + "/" + str(len(boy_esli)) + " ve " +
+      str(len([a for a in enkotu_gecen if a in boy_esli])) + "/" + str(len(boy_esli)) + ") —")
     w("cunku uretimin varsayilan kodlayicisi `libsvtav1` hem dagitimi tasiyacak anahtari")
     w("(`zones`, fark " + kapi_zones["fark_bayt"] + " bayt) hem ayakta kalan tek isareti")
     w("(`qcomp`, `-svtav1-params` yolunda " + kapi_qcomp["fark_bayt"] + " bayt, `-qcomp` yolunda " +
@@ -521,15 +616,27 @@ else:
 if k12adlar:
     w("")
     if k12yol == "belirsiz":
-        w("Ayakta kalan tek anahtar `qp-scale-compress-strength` icin sonuc **belirsiz**:")
-        w("kalite olculdu ama `=3` kolu hedef bandin disina cikti (" +
-          ", ".join("`" + a + "`/" + kol for a, kol in k12band_disi) +
-          "), yani iki kol esit boyda degil.")
-        w("Bu anahtar icin mod ne acilir ne kapanir; onunde duran soru kalite degil hedef")
-        w("boyuttur.")
+        w("Ayakta kalan tek anahtar `qp-scale-compress-strength` icin boy eslenmis pencere")
+        w("yok; o anahtar icin mod ne acilir ne kapanir.")
     elif k12yol == "kapanir":
-        w("Ayakta kalan tek anahtar `qp-scale-compress-strength` de esigi gecemedi; mod bu")
-        w("depoda her iki anahtar icin de kanitli olarak **kapanir**.")
+        w("Ayakta kalan tek anahtar `qp-scale-compress-strength` de esigi gecemedi. Bu hukum")
+        w("**boy eslenmis** pencereye dayaniyor — `" + k12esli[0] + "`, bagil boy farki %" +
+          vir(abs(k12boyut[(k12esli[0], "dagitim")] - k12boyut[(k12esli[0], "taban")]) * 100.0 /
+              max(k12boyut[(k12esli[0], "taban")], k12boyut[(k12esli[0], "dagitim")]), 3) + ":")
+        w("p10 kazanci " + isaretli(k12kazanc[k12esli[0]]["p10"]) + " < +" + vir(P10_ESIK, 2) +
+          ", en kotu sahne kazanci " + isaretli(k12kazanc[k12esli[0]]["enkotu"]) + " < +" +
+          vir(ENKOTU_ESIK, 2) + ",")
+        if vmaf_tabani is not None:
+            w("VMAF gurultu tabani " + vir(vmaf_tabani) + " (" + str(len(gurultu_p10)) +
+              " taban kosumu) " +
+              ("kazanci yutuyor — **isaret yok**." if k12dayanak == "isaret yok"
+               else "kazancin altinda — isaret gercek ama esigin altinda: **yol 2**."))
+        w("Mod bu depoda her iki anahtar icin de kanitli olarak **kapanir**.")
+        if k12eslenmemis:
+            w("")
+            w("Ayri duran not, yalniz `" + "`, `".join(k12eslenmemis) + "` icin: o pencerede `=3`")
+            w("kolu hedef bandin disina cikti, boy eslenmedi; o pencerenin kalite satiri hukme")
+            w("girmiyor. Bu olgu digerine tasinmaz.")
     elif k12yol == "acilabilir":
         w("Ayakta kalan anahtar `qp-scale-compress-strength` esigi gecti: mod **acilabilir**,")
         w("ama tasiyici `zones` degil bu anahtardir.")

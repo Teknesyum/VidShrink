@@ -11,8 +11,11 @@ ffmpeg: `ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the 
 
 T114'un `kaynak-1080p60-hdr-17dk-yalniz-video.mkv` dosyasi bu makinede **yok**
 (`VIDSHRINK_KAYNAK`, butun surucu harfleri ve `.calisma` disi klasorler arandi;
-`C:/Users` altinda 400 MB ustu tek bir video dosyasi bulunamadi). Pencereler elde
-olan uc 60 sn'lik 1080p60 HDR parcadan uretildi.
+`C:/Users` altinda 400 MB ustu tek bir video dosyasi bulunamadi). Bu arama **8 Eylul
+2026'da bir kez** yapildi; sonucu ureticin govdesine yazili sabittir, her rapor
+kosumunda yeniden olculmez.
+
+Pencereler elde olan uc 60 sn'lik 1080p60 HDR parcadan uretildi.
 
 | Pencere | Kaynak | Sure (sn) | Harita sahnesi |
 |---------|--------|-----------|----------------|
@@ -71,8 +74,10 @@ Ikisinde de fark tekrar gurultusunun iki katinin (66614 bayt) altinda:
 Kapi iki yolda da **desteklenmiyor** diyor; bu yuzden K2'nin geri kalani — deger
 taramasi — **kosulmadi**.
 
-Nitel yari da ham dosyada duruyor. `08-svtav1-kapisi.sh` her kodlamanin stderr'ini
-`.calisma/T193/k2kapi/<ad>.p1.err` ve `<ad>.p2.err` olarak saklar;
+Nitel yari da ham dosyada duruyor. `08-svtav1-kapisi.sh` kodlamanin stderr'ini
+`.calisma/T193/k2kapi/<ad>.p1.err` ve `<ad>.p2.err` olarak saklar —
+ama **her kodlamanin degil**: 16 kodlamanin 12'sinde `.err` var (24 dosya).
+Eksik olanlar: `kontrol-1`, `kontrol-2`, `kontrol-3`, `kontrol-4` — stderr yakalama bu kosumlardan sonra eklendi, geriye donuk uretilmedi.
 `Error parsing option` dizgesi 8 dosyada, toplam 8 kez gecer:
 
 ```
@@ -180,6 +185,11 @@ kuruldu; `taban` kol K5'in taban ciktisidir (SVT varsayilani `=0`). Deger ikilis
 kapida olculen ikilidir, tarama yok. `p2-durgun` disarida: iki kolu da bant disi
 oldugu icin kalite satiri boy eslenmemis olurdu.
 
+Uretecin `K12Taban = "qp-scale-compress-strength=0"` sabiti **silindi**
+(`tools/sahne-butcesi/Program.cs`): taban kol o parametreyle hicbir zaman
+kodlanmadi, K5'in taban ciktisi kopyalaniyordu. Kod artik olculen davranisi
+anlatiyor; ciktilar degismedi.
+
 | Pencere | Kol | Boyut (MB) | Band (MB) | Band ici | VMAF-NEG ort | p10 | min | En kotu sahne |
 |---------|-----|------------|-----------|----------|--------------|-----|-----|---------------|
 | `p1-karisik` | taban | 59,34 | 58,3–60,0 | evet | 91,203 | 89,083 | 79,146 | 89,035 |
@@ -199,13 +209,42 @@ Ayni dort sart, olculen 2 pencere uzerinden:
 3. Hicbir pencerede p10 kaybi > 0,30 — **asan pencere: 0**
 4. K6: her kosum hedef bandin icinde — **band disi kosum: 1** (`p1-karisik`/dagitim)
 
-**Sonuc: belirsiz.** Bant disina cikan kosum var, yani iki kol **esit boyda
-karsilastirilmadi**; bu haliyle kalite farki kazanc olarak okunamaz.
-`p1-karisik`/dagitim: 61,50 MB, band 58,3–60,0 MB.
+### Pencere Pencere — Her Cumle Kendi Penceresini Konusur
 
-Anahtar calisiyor — bayt farki bunu soyluyor — ama `=3` ile cikan dosya hedef
-bandi asiyor: kalite kazanci sorusu once bir hedef boyut sorusudur. Uydurma
-yapilmaz; mod bu anahtar icin ne acilir ne kapanir.
+Iki pencere ayni hukumde degil; asagidaki her cumle yalniz basindaki pencere
+icin gecerlidir.
+
+**`p1-karisik` — boy eslenmedi.** `dagitim` 61,50 MB, band 58,3–60,0 MB (bagil boy farki %3,512).
+Bu pencerede iki kol **esit boyda karsilastirilmadi**; kalite farki kazanc
+olarak okunamaz. Anahtar calisiyor — bayt farki bunu soyluyor — ama `=3` ile
+cikan dosya hedef bandi asiyor: onunde duran soru kalite degil hedef boyuttur.
+
+**`p3-hareketli` — boy eslendi.** Iki kol da bant icinde, bagil boy farki **%0,225**.
+p10 kazanci **+0,471** < +0,50; en kotu sahne kazanci **-0,248** < +1,00 (isaret ayrica ters).
+Yani bu pencerede esitlik kurulu ve kapi yine de gecilmiyor.
+
+### K17 — Taban Kolunun VMAF Gurultu Tabani
+
+Yukaridaki kazanc sayilarinin bu duzenegin kendi gurultusunden ayirt edilip
+edilmedigi olculdu: `p3-hareketli` penceresinin **taban** kolu ayni
+komutla 3 kez kosuldu (ayni plan, ayni parametreler, ek
+param yok). Ham kayit: `.calisma/T193/gurultu-maks-p3-hareketli.json`.
+
+| Kosum | Boyut (MB) | VMAF-NEG ort | p10 | En kotu sahne |
+|-------|------------|--------------|-----|---------------|
+| taban-1 | 58,95 | 86,107 | 81,776 | 82,794 |
+| taban-2 | 58,95 | 86,119 | 81,769 | 82,646 |
+| taban-3 | 58,96 | 86,114 | 81,830 | 82,737 |
+
+**VMAF gurultu tabani = max p10 − min p10 = 0,061 puan.**
+
+Bu taban `p3-hareketli`nin p10 kazancinin (+0,471) **altinda**: isaret
+gurultuden ayirt ediliyor, ama esigin (+0,50) altinda kaliyor.
+Bu pencere icin hukum **yol 2 — kanitli kapanis**.
+
+**Sonuc: mod bu anahtar icin kapanir**, dayanak `p3-hareketli`: isaret gercek ama esigin altinda, **yol 2**.
+`p1-karisik` icin ayri duran not: boy eslenmedi, o pencerenin
+kalite satiri hukme girmiyor.
 
 ## K3 — Sure Sayilari
 
@@ -238,12 +277,18 @@ butun hukumler yalniz onlara dayanir. **Sure sayisi bu sayfada hic raporlanmamis
 ## Hukum
 
 **Max sikistirma modu sahne dagitimi uzerine acilmaz**: `maks` kolunun kalite
-kapisi bu depoda ilk kez kosuldu ve p10 esigini gecen pencere 0/3, en kotu sahne esigini gecen pencere 0/3 cikti —
+kapisi bu depoda ilk kez kosuldu ve p10 esigini gecen pencere 0/3, en kotu sahne esigini gecen pencere 0/3 cikti
+(boy eslenmis — iki kolu da bant icinde — pencereler uzerinden ayni sayilar 0/2 ve 0/2) —
 cunku uretimin varsayilan kodlayicisi `libsvtav1` hem dagitimi tasiyacak anahtari
 (`zones`, fark 7660 bayt) hem ayakta kalan tek isareti
 (`qcomp`, `-svtav1-params` yolunda 4312 bayt, `-qcomp` yolunda 22686 bayt) destek esiginin (gurultu x 2 = 66614 bayt) altinda birakiyor.
 
-Ayakta kalan tek anahtar `qp-scale-compress-strength` icin sonuc **belirsiz**:
-kalite olculdu ama `=3` kolu hedef bandin disina cikti (`p1-karisik`/dagitim), yani iki kol esit boyda degil.
-Bu anahtar icin mod ne acilir ne kapanir; onunde duran soru kalite degil hedef
-boyuttur.
+Ayakta kalan tek anahtar `qp-scale-compress-strength` de esigi gecemedi. Bu hukum
+**boy eslenmis** pencereye dayaniyor — `p3-hareketli`, bagil boy farki %0,225:
+p10 kazanci +0,471 < +0,50, en kotu sahne kazanci -0,248 < +1,00,
+VMAF gurultu tabani 0,061 (3 taban kosumu) kazancin altinda — isaret gercek ama esigin altinda: **yol 2**.
+Mod bu depoda her iki anahtar icin de kanitli olarak **kapanir**.
+
+Ayri duran not, yalniz `p1-karisik` icin: o pencerede `=3`
+kolu hedef bandin disina cikti, boy eslenmedi; o pencerenin kalite satiri hukme
+girmiyor. Bu olgu digerine tasinmaz.

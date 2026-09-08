@@ -75,6 +75,7 @@ public static class Program
     private static string Is = string.Empty;
     private static string Kol = "maks";
     private static bool YalnizKodla;
+    public const int GurultuKosum = 3;
 
     private static readonly JsonSerializerOptions Json = new()
     {
@@ -135,6 +136,8 @@ public static class Program
                 case "k5": await K5Async(p); break;
                 case "k12": await K12Async(p); break;
                 case "k12kodla": YalnizKodla = true; await K12Async(p); break;
+                case "gurultu": await GurultuAsync(p); break;
+                case "gurultukodla": YalnizKodla = true; await GurultuAsync(p); break;
                 case "k7": await K7Async(p); break;
                 case "k4": K4(p); break;
                 case "k4b": await K4bAsync(p); break;
@@ -766,8 +769,66 @@ public static class Program
     /// <summary>K12: dagitim kolu zones yerine qp-scale-compress-strength ile kurulur.</summary>
     private static async Task K12Async(Pencere p) => await AbAsync(p, "k12", new[] { "taban", "dagitim" });
 
-    private const string K12Taban = "qp-scale-compress-strength=0";
     private const string K12Dagitim = "qp-scale-compress-strength=3";
+
+    /// <summary>K17: taban kolunun ayni komutla yinelenmesi; VMAF gurultu tabani icin.</summary>
+    private static async Task GurultuAsync(Pencere p)
+    {
+        var hedef = Yol($"gurultu-{Kol}-{p.Ad}.json");
+        var harita = await HaritaAsync(p);
+        var map = Map(harita);
+        var (plan, info) = await PlanAsync(p);
+        var ilk = Yol($"k5-{Kol}-{p.Ad}-taban.mkv");
+
+        var yollar = new List<(int Kosum, string Dosya)>();
+        for (var n = 1; n <= GurultuKosum; n++)
+        {
+            var dosya = n == 1 ? ilk : Yol($"gurultu-{Kol}-{p.Ad}-{n}.mkv");
+            yollar.Add((n, dosya));
+            if (File.Exists(dosya)) continue;
+            if (n == 1)
+            {
+                Console.Error.WriteLine($"kosum 1 dosyasi yok: {dosya}");
+                return;
+            }
+            Kodla(info, plan, map, dosya, null);
+            if (YalnizKodla)
+            {
+                Console.WriteLine($"{Kol}/{p.Ad}: gurultu kosum {n} kodlandi");
+                return;
+            }
+        }
+        if (YalnizKodla) { Console.WriteLine($"{Kol}/{p.Ad}: gurultu kodlamalari tam"); return; }
+
+        var band = FillBand.For(HedefMb);
+        var sonuclar = new List<OlcumKaydi>();
+        foreach (var (n, dosya) in yollar)
+        {
+            if (!File.Exists(dosya))
+            {
+                sonuclar.Add(new OlcumKaydi(p.Ad, $"taban-{n}", 0, HedefMb, band.LowerMb, band.UpperMb, false, null, null, null, null, "kodlama cikti uretmedi"));
+                continue;
+            }
+            var mb = new FileInfo(dosya).Length / 1024.0 / 1024.0;
+            QualityScore? skor = null;
+            string? bilinmiyor = null;
+            try { skor = await QualityMeter.MeasureAsync(Kaynak(p), dosya); }
+            catch (QualityMeasurementFailedException ex) { bilinmiyor = ex.Message; }
+            sonuclar.Add(new OlcumKaydi(
+                p.Ad, $"taban-{n}", mb, HedefMb, band.LowerMb, band.UpperMb,
+                mb >= band.LowerMb && mb <= band.UpperMb,
+                skor?.VmafNegMean, skor?.VmafNegP10, skor?.VmafNegMin, skor?.VmafNegWorstScene,
+                bilinmiyor));
+            Console.WriteLine($"{p.Ad}/taban-{n}: {Kabuk.Inv(mb, "0.00")} MB " +
+                              $"p10={Kabuk.Inv(skor?.VmafNegP10 ?? double.NaN, "0.000")}" +
+                              (bilinmiyor is null ? string.Empty : $" BILINMIYOR: {bilinmiyor}"));
+        }
+
+        var p10lar = sonuclar.Where(s => s.VmafP10 is not null).Select(s => s.VmafP10!.Value).ToArray();
+        if (p10lar.Length > 1)
+            Console.WriteLine($"{Kol}/{p.Ad}: gurultu tabani = {Kabuk.Inv(p10lar.Max() - p10lar.Min(), "0.000")} VMAF-NEG p10 puani ({p10lar.Length} kosum)");
+        await File.WriteAllTextAsync(hedef, JsonSerializer.Serialize(sonuclar, Json));
+    }
 
     private static async Task AbAsync(Pencere p, string asama, string[] kollar)
     {
@@ -799,7 +860,7 @@ public static class Program
             string? zones = null;
             if (asama == "k12")
             {
-                zones = kol == "taban" ? K12Taban : K12Dagitim;
+                if (kol != "taban") zones = K12Dagitim;
             }
             else if (kol != "taban")
             {
