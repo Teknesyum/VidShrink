@@ -20,13 +20,23 @@ public static class PaletteCatalog
 
     public const string Default = "Neon";
 
-    /// <summary>Renk çemberi sırasıyla: ayarlardaki liste tondan tona yürüsün.</summary>
+    /// <summary>Sıra <c>seeds.json</c> ile aynı: varsayılan başta, ötekiler tanınırlık sırasında.</summary>
     public static IReadOnlyList<string> Names { get; } = new[]
     {
-        "Neon", "Lagoon", "Azure", "Cobalt", "Indigo", "Violet", "Orchid", "Magenta",
-        "Rose", "Crimson", "Scarlet", "Flare", "Amber", "Gold", "Citron", "Lime",
-        "Fern", "Emerald", "Jade", "Teal"
+        "Neon", "Dracula", "Nord", "Gruvbox",
+        "TokyoNight", "Catppuccin", "OneDark", "Monokai",
+        "Solarized", "Everforest", "RosePine", "Ayu",
+        "NightOwl", "Synthwave", "Cobalt", "MaterialOcean",
+        "Github", "Kanagawa", "Horizon", "Moonlight"
     };
+
+    /// <summary>
+    /// Listede görünen ad: dosya adı tek kelime, burada büyük harften bölünür —
+    /// <c>TokyoNight</c> ekranda <c>Tokyo Night</c> olur.
+    /// </summary>
+    public static string Label(string name)
+        => string.Concat(name.Select((letter, at) =>
+            at > 0 && char.IsUpper(letter) && !char.IsUpper(name[at - 1]) ? " " + letter : letter.ToString()));
 
     /// <summary>
     /// Adı verilen paleti yürürlüğe koyar ve gerçekten uygulanan adı döndürür. Tanınmayan

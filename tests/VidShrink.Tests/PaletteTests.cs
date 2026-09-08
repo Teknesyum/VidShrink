@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Xml.Linq;
 using VidShrink.App;
 using VidShrink.App.Themes;
@@ -61,6 +62,37 @@ public sealed class PaletteTests
 
         Assert.True(complaints.Count == 0,
             $"{files.Count} palet, {reference.Count} anahtar:\n" + string.Join("\n", complaints));
+    }
+
+    /// <summary>
+    /// Palet dosyaları elle yazılmadı: kaynak <c>seeds.json</c>. Ölçü her paletin
+    /// zeminini ve üç vurgusunu kendi çekirdeğiyle karşılaştırıyor — dosya elle
+    /// düzenlenip çekirdekten koparsa burada yakalanır.
+    /// </summary>
+    [Fact]
+    public void HerPaletKendiCekirdeginiTasir()
+    {
+        using var seeds = JsonDocument.Parse(File.ReadAllText(Path.Combine(Folder, "seeds.json")));
+        var listed = seeds.RootElement.EnumerateArray().ToList();
+
+        Assert.Equal(PaletteCatalog.Names, listed.Select(seed => seed.GetProperty("name").GetString()));
+
+        foreach (var seed in listed)
+        {
+            var name = seed.GetProperty("name").GetString()!;
+            var body = File.ReadAllText(Path.Combine(Folder, name + ".axaml"));
+
+            foreach (var (field, key) in new[]
+                     {
+                         ("bg", "AppBgColor"), ("surface", "SurfaceToneColor"),
+                         ("accent1", "NeonBlueColor"), ("accent2", "NeonPinkColor"),
+                         ("accent3", "NeonPurpleColor"), ("textBody", "TextBodyColor")
+                     })
+            {
+                var wanted = "#FF" + seed.GetProperty(field).GetString()![1..].ToUpperInvariant();
+                Assert.Contains($"<Color x:Key=\"{key}\">{wanted}</Color>", body, StringComparison.Ordinal);
+            }
+        }
     }
 
     /// <summary>

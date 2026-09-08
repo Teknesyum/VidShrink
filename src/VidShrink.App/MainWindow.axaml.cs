@@ -617,7 +617,7 @@ public partial class MainWindow : Window
         try
         {
             _themeOrder = PaletteCatalog.Names;
-            CmbTheme.ItemsSource = _themeOrder.ToArray();
+            CmbTheme.ItemsSource = _themeOrder.Select(PaletteCatalog.Label).ToArray();
             MarkChosenTheme();
         }
         finally

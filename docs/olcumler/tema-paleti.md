@@ -5,22 +5,18 @@ Tarih: 2026-09-09. Dal: `claude/tema-paleti`.
 ## Ne Ölçüldü
 
 Yirmi palet `src/VidShrink.App/Themes/Palette/` altında, her biri **32 anahtar**
-(28 `Color` + 4 `BoxShadows`):
+(28 `Color` + 4 `BoxShadows`).
 
-```
-Amber 32  Azure 32  Citron 32  Cobalt 32  Crimson 32  Emerald 32  Fern 32
-Flare 32  Gold 32   Indigo 32  Jade 32    Lagoon 32   Lime 32     Magenta 32
-Neon 32   Orchid 32 Rose 32    Scarlet 32 Teal 32     Violet 32
-```
+Renk uydurulmadı: on dokuzu **tanınmış açık şemaların gerçek renkleri** (Dracula, Nord,
+Gruvbox, Tokyo Night, Catppuccin Mocha, One Dark, Monokai Pro, Solarized Dark,
+Everforest, Rosé Pine, Ayu, Night Owl, SynthWave '84, Cobalt2, Material Ocean,
+GitHub Dark, Kanagawa, Horizon, Moonlight), yirmincisi programın kendi Neon'u.
+Seçimi fable ajanı yaptı; girdi ve dönen JSON `docs/danisma/` yerine doğrudan
+`src/VidShrink.App/Themes/Palette/seeds.json` içine yazıldı — kayıt orada, ham hâliyle.
 
-Renk uydurulmadı, **türetildi**: `tools/VidShrink.PaletteGen` Neon'un kendi renklerini
-HSL'de 18°'lik adımlarla döndürür, doygunluk ve açıklık yerinde kalır. Neon değişirse
-yirmisi de yeniden üretilir.
-
-```
-Neon  NeonBlueColor #FF00F3FF   NeonPinkColor #FFFF00EA
-Teal  NeonBlueColor #FF00FFBE   NeonPinkColor #FFC800FF
-```
+Palet dosyaları elle yazılmıyor: kaynak **`seeds.json`**, tema başına **on bir çekirdek
+renk**. Kalan 21 anahtar alfa ve karışım kuralıyla türetiliyor
+(`tools/VidShrink.PaletteGen`). Elle boyama yolu `docs/tema.md`.
 
 ## Liste Neden Elle Yazılı
 
@@ -40,14 +36,15 @@ yazılmazsa ölçü kırmızı yanar.
 
 ## Ölçüler
 
-`dotnet test --filter PaletteTests` → **4/4 yeşil**.
+`dotnet test --filter PaletteTests` → **5/5 yeşil**.
 
 | Ölçü | Ne söylüyor |
 | --- | --- |
 | `HerPaletAyniAnahtarKumesiniTasir` | 20 dosya, 32 anahtar, liste klasörle bire bir |
+| `HerPaletKendiCekirdeginiTasir` | Her dosyanın zemini, yüzeyi, üç vurgusu ve yazısı `seeds.json`'daki çekirdekle bire bir |
 | `PaletlerBirbirinindenFarkli` | Yirmi seçenek yirmi ayrı görünüş, kopya yok |
 | `PaletDegisince_AyniAnahtarBaskaRengiVerir` | `NeonBlueColor` palet değişince değişiyor, geri dönünce eskiye oturuyor |
 | `SecilenTemaAyarDosyasindaSaklanir` | Seçim `settings.json` içindeki `theme` anahtarında, açılışta okunuyor |
 
 İlgili aile ölçümü (`Localization|Language|SettingsTab|AyarKaliciligi|Palette`):
-**159/159 yeşil**, 13 sn.
+**160/160 yeşil**, 12 sn.

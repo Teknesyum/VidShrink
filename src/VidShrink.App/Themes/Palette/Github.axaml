@@ -1,0 +1,46 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- GitHub'ın koyu arayüzü; nötr, kurumsal, herkesin alışık olduğu renkler. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki on bir çekirdek renkten
+       üretildi. Değiştirmek için çekirdeği düzenle ve VidShrink.PaletteGen
+       aracını çalıştır; komut docs/tema.md içinde. -->
+
+  <Color x:Key="NeonBlueColor">#FF58A6FF</Color>
+  <Color x:Key="NeonPinkColor">#FF3FB950</Color>
+  <Color x:Key="NeonPurpleColor">#FFD2A8FF</Color>
+  <Color x:Key="NeonSuccessColor">#FF56D364</Color>
+  <Color x:Key="SurfaceToneColor">#FF161B22</Color>
+  <Color x:Key="AppBgColor">#FF0D1117</Color>
+  <Color x:Key="TextBodyColor">#FFE6EDF3</Color>
+  <Color x:Key="TextDisabledColor">#FF8B949E</Color>
+  <Color x:Key="OnNeonColor">#FFFFFFFF</Color>
+  <Color x:Key="PinkTextColor">#FF7ED08A</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1A58A6FF</Color>
+  <Color x:Key="NeonBlueHoverColor">#3358A6FF</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D58A6FF</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D58A6FF</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#8058A6FF</Color>
+  <Color x:Key="NeonPinkFillColor">#1A3FB950</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80D2A8FF</Color>
+
+  <Color x:Key="NeonEmberColor">#FFF85149</Color>
+  <Color x:Key="EmberFlameColor">#FFF0883E</Color>
+  <Color x:Key="EmberBlazeColor">#FFE3B341</Color>
+  <Color x:Key="EmberDeepColor">#FF121218</Color>
+  <Color x:Key="EmberMidColor">#FF151319</Color>
+  <Color x:Key="EmberEdgeColor">#FF19141A</Color>
+  <Color x:Key="EmberBarDeepColor">#FF1D1D23</Color>
+  <Color x:Key="EmberBarMidColor">#FF211E24</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF261F25</Color>
+
+  <Color x:Key="PlaybackScrimColor">#CC0D1117</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#000D1117</Color>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #4058A6FF</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #403FB950</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40D2A8FF</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+</ResourceDictionary>

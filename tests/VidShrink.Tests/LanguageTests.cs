@@ -223,7 +223,8 @@ public sealed class LanguageTests : IDisposable
         "FontSans", "FontMono",
         "GlowBlue", "GlowPink", "GlowPurple",
         "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
-        "PlaybackMaximizeIcon", "PlaybackFullScreenIcon", "PlaybackScrimColor"
+        "PlaybackMaximizeIcon", "PlaybackFullScreenIcon",
+        "PlaybackScrimColor", "PlaybackScrimEdgeColor"
     };
 
     private static readonly Regex KeyAttribute = new(
