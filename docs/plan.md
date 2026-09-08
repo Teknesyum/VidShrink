@@ -221,3 +221,58 @@ bir sonuctur.
 calismani istemiyorum sonra musait zamanda bakalim hatirlatta". Olcum gunduz musait bir
 saatte kosulur ve **hatirlatmayi T0 yapar**, kullanici sormaz. Hazirlik bitti; kosulacak
 sey `tools/sahne-butcesi/`, yeni duzenek yok.
+
+### Acilis olcumu kosuldu — T193 (8 Eylul 2026)
+
+Rapor: `docs/olcumler/max-mod-acilis.md` (sayfanin butun sayilari `.calisma/T193/`
+altindaki ham dosyalardan `tools/sahne-butcesi/09-max-mod-raporu.py` ile uretilir).
+
+**Hukum: max sikistirma modu acilmaz.**
+
+Iki acik da kapandi:
+
+1. **`maks` kolunun kalite kapisi ilk kez kosuldu.** T114'te kol sessizce atlaniyordu
+   (kapi `ZonesFlag` uzerindeydi, `libsvtav1` icin `null` donuyordu); kapi
+   `ParamsFlag`e cevrildi ve uc pencerede de kosuldu. p10 esigini gecen pencere
+   **0/3**, en kotu sahne esigini gecen pencere **0/3**. Kazanclar sifirin altinda,
+   mutlak degerlerin en buyugu 0,021 puan; esik +0,50.
+
+2. **`qcomp` `libsvtav1`'de yok — iki ad alaninda da.** ffmpeg anahtari
+   ayristiramiyor (`Error parsing option qcomp`, ham dosya
+   `.calisma/T193/k2kapi/qcomp-a.p1.err`) ama cikis kodu 0 donuyor. Fark
+   `-svtav1-params qcomp=...` yolunda **4.312 bayt**, ffmpeg'in kendi `-qcomp`
+   secenegiyle **22.686 bayt**; ikisi de destek esiginin (tekrar gurultusu x 2 =
+   **66.614 bayt**) altinda. Bu yuzden deger taramasi (`0,40 / 0,50 / 0,60 / 0,75`)
+   **kosulmadi**; kosulsa olculecek bir sey olmayacakti.
+
+Ayakta kalan isaretin nereden geldigi de anlasildi: T114 izgarasinin
+`libsvtav1 / qcomp` satiri `qcomp` degil **`qp-scale-compress-strength`** deniyordu,
+ve K4 ekinde "qcomp kazandi" denen hucreler `libx264` / `libx265` kollarindaydi.
+Yani "varsayilan kodlayicida gecerli, olculmus bir ayar" hic olmadi.
+
+Bunun tersi de olculdu: SVT-AV1'in kendi karsiligi `qp-scale-compress-strength`
+**calisiyor** (175.735 bayt fark, gurultunun cok ustunde; stderr'inde ayristirma
+hatasi yok, SVT'nin kendi dokumu `QP scale compress strength` degerini basiyor).
+
+Kalite kazanci da olculdu (T193 tur 2, raporun K12 bolumu) ve sonuc **belirsiz**:
+`=3` kolu `p1-karisik`te 61,50 MB ile hedef bandin (58,3-60,0 MB) disina cikti, yani
+iki kol esit boyda karsilastirilmadi. `p3-hareketli`de iki kol da band icinde ama p10
+kazanci +0,471 — esik +0,50 — ve en kotu sahne kazanci -0,248. Bu anahtar icin mod ne
+acilir ne kapanir; onunde duran soru kalite degil hedef boyuttur.
+
+Yan bulgu, duzenegin kendisinde: T114 tekrar gurultusunu **tek kontrol ciftinden**
+oluyordu. Ayni cift bu kosumda 456 bayt verdi; dort kosumun araligi 13.423 bayt,
+**sekiz** kosumunki 33.307 bayt. Tek cift olculen gurultuyu 73 kat, dort kosum 2,5 kat
+kucuk gosteriyor. Gurultu artik sekiz kosumdan olculur (`08-svtav1-kapisi.sh`,
+`KONTROL=8`); kosum 5-8 denetcinin bagimsiz kosumudur.
+
+**Sirada ne var.** Sahne butcesi yolu kapandi, `qcomp` yolu kapandi.
+`qp-scale-compress-strength` icin kalite olculdu ama hukum **belirsiz** kaldi: once o
+anahtarin ciktisini hedef banda oturtan bir plan gerekiyor (iki kolu esit boyda
+karsilastirmak icin), sonra kalite sorusu tekrar sorulabilir. Ondan once mod
+tasarlanmaz. Karar kullanicinin.
+
+**Kosum sapmasi.** T114'un 17 dakikalik kaynagi bu makinede yok; pencereler elde olan
+uc 60 sn'lik parcadan uretildi (~189 sn yerine ~60 sn, plan cozunurlugu `806x454`
+yerine `1920x1080`). Bu kosumun sayilari T114'un hucreleriyle dogrudan
+karsilastirilamaz; taban bu kosumda yeniden olculdu. Ayrinti raporun K0 bolumunde.

@@ -15,3 +15,6 @@
 *.ttf  binary
 *.otf  binary
 *.mp4  binary
+
+# Uretecin ciktisiyla md5 karsilastirilan belge: LF, checkout makinesine bakmaz.
+docs/olcumler/max-mod-acilis.md text eol=lf
