@@ -393,6 +393,8 @@
   "main.playback.encode-marker": "analysis {0}/{1} · attempt {2}",
   "settings-tab.general.title": "General",
   "settings-tab.language.label": "Language",
+  "settings-tab.theme.label": "Theme",
+  "settings-tab.theme.hint": "Changes every colour in the program and is remembered on next launch.",
   "settings-tab.language.hint": "Changes the interface language and is remembered on next launch.",
   "settings-tab.default-target.label": "Default target size (MB)",
   "settings-tab.default-target.hint": "Sets the target size the Shrink tab opens with.",

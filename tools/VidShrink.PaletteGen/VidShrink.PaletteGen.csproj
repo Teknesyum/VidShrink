@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>vidshrink-palettegen</AssemblyName>
+    <RootNamespace>VidShrink.PaletteGen</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Uygulama koduna basvuru yok: arac Neon.axaml'i metin olarak okur ve kardes
+       palet dosyalarini yazar. Urettigi hicbir sey program koduna bagli degil. -->
+
+</Project>

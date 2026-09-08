@@ -1,0 +1,41 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Color x:Key="NeonBlueColor">#FFC0FF00</Color>
+  <Color x:Key="NeonPinkColor">#FF00B7FF</Color>
+  <Color x:Key="NeonPurpleColor">#FF26FFDB</Color>
+  <Color x:Key="NeonSuccessColor">#FFD3B934</Color>
+  <Color x:Key="SurfaceToneColor">#FF121613</Color>
+  <Color x:Key="AppBgColor">#FF050705</Color>
+  <Color x:Key="TextBodyColor">#FFFFFFFF</Color>
+  <Color x:Key="TextDisabledColor">#FF717A73</Color>
+  <Color x:Key="OnNeonColor">#FF000000</Color>
+  <Color x:Key="PinkTextColor">#FF54C9FF</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1AC0FF00</Color>
+  <Color x:Key="NeonBlueHoverColor">#33C0FF00</Color>
+  <Color x:Key="NeonBlueActiveColor">#4DC0FF00</Color>
+  <Color x:Key="NeonBlueBorderColor">#4DC0FF00</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#80C0FF00</Color>
+  <Color x:Key="NeonPinkFillColor">#1A00B7FF</Color>
+  <Color x:Key="NeonPurpleBorderColor">#8026FFDB</Color>
+
+  <Color x:Key="NeonEmberColor">#FF0000FF</Color>
+  <Color x:Key="EmberFlameColor">#FF9900FF</Color>
+  <Color x:Key="EmberBlazeColor">#FFFF00CC</Color>
+  <Color x:Key="EmberDeepColor">#FF030507</Color>
+  <Color x:Key="EmberMidColor">#FF040608</Color>
+  <Color x:Key="EmberEdgeColor">#FF04060B</Color>
+  <Color x:Key="EmberBarDeepColor">#FF0D0F13</Color>
+  <Color x:Key="EmberBarMidColor">#FF0E1015</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF0F1017</Color>
+
+  <Color x:Key="PlaybackScrimColor">#CC050705</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#00050705</Color>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #40C0FF00</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #4000B7FF</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #4026FFDB</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+</ResourceDictionary>

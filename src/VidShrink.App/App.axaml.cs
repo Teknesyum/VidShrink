@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using VidShrink.App.Themes;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -33,6 +34,10 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); } catch { }
+
+        // Palet pencereden once yurutuluyor: sonra uygulanirsa program bir kare
+        // varsayilan renklerle cizilir ve acilista goz alan bir sicrama olur.
+        try { PaletteCatalog.Use(AppSettings.Load().Theme); } catch { }
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

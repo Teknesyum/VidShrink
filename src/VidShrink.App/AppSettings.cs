@@ -31,6 +31,9 @@ public sealed class AppSettings
 
     public bool AdvancedDefaultOpen { get; set; }
 
+    /// <summary>Yürürlükteki paletin adı; boş kalırsa varsayılan palet açılır.</summary>
+    public string Theme { get; set; } = "";
+
     /// <summary>0 = otomatik, 1 = elle.</summary>
     public int FfmpegPathMode { get; set; }
     public string FfmpegPath { get; set; } = "";
@@ -57,6 +60,7 @@ public sealed class AppSettings
             ReadInt(root, "advCodecLock", value => settings.AdvCodecLock = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
+            ReadString(root, "theme", value => settings.Theme = value);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
             ReadString(root, "ffmpegPath", value => settings.FfmpegPath = value);
@@ -114,6 +118,7 @@ public sealed class AppSettings
         root["advMinFps"] = AdvMinFps;
         root["advEncoderPath"] = AdvEncoderPath;
         root["advCodecLock"] = AdvCodecLock;
+        root["theme"] = Theme;
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;

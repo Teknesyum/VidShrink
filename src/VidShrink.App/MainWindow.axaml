@@ -1050,6 +1050,12 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
+                    <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.theme.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
                     <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
                     <TextBox x:Name="TxtDefaultTargetMb" Width="120" HorizontalAlignment="Left" MaxLines="1" TextAlignment="Center"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>

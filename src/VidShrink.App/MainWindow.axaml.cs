@@ -25,6 +25,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App.Localization;
+using VidShrink.App.Themes;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
 using VidShrink.Core;
@@ -82,6 +83,8 @@ public partial class MainWindow : Window
     private string? _ffmpegVersion;
     private bool _syncing;
     private IReadOnlyList<string> _languageOrder = Array.Empty<string>();
+    private IReadOnlyList<string> _themeOrder = Array.Empty<string>();
+    private string _theme = PaletteCatalog.Default;
 
     // T61/K1: iki denetim birbirini sürüyor. Bayrak "bu değeri kullanıcı değil program
     // yazıyor" demektir; yazılan tarafın işleyicisi o turda hiçbir şey türetmez, böylece
@@ -144,6 +147,7 @@ public partial class MainWindow : Window
 
         RefreshOutputAndFfmpegChoiceLists();
         BuildLanguageSwitch();
+        BuildThemeList();
         Strings.Changed += OnLanguageChanged;
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
@@ -201,6 +205,7 @@ public partial class MainWindow : Window
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
         Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
+        Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
         Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -600,6 +605,50 @@ public partial class MainWindow : Window
     /// seçilir ve her satır dilin kendi adını kendi dosyasından yazar. Liste dosya
     /// klasörlerinden kuruluyor, kodda hiçbir dil adı yazılı değil.
     /// </summary>
+    /// <summary>
+    /// Ayarlardaki tema listesi. Adlar palet dosyalarının kendi adları; çeviriye girmezler,
+    /// her dilde aynı yazılırlar — marka adı gibi. Seçim <see cref="PaletteCatalog"/>
+    /// üzerinden yürürlüğe girer ve ayar dosyasında saklanır.
+    /// </summary>
+    private void BuildThemeList()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            _themeOrder = PaletteCatalog.Names;
+            CmbTheme.ItemsSource = _themeOrder.ToArray();
+            MarkChosenTheme();
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+    }
+
+    private void MarkChosenTheme()
+    {
+        var index = -1;
+        for (var at = 0; at < _themeOrder.Count; at++)
+            if (string.Equals(_themeOrder[at], _theme, StringComparison.OrdinalIgnoreCase))
+            {
+                index = at;
+                break;
+            }
+
+        CmbTheme.SelectedIndex = index;
+    }
+
+    private void OnThemeChosen()
+    {
+        if (_syncing) return;
+        var chosen = CmbTheme.SelectedIndex;
+        if (chosen < 0 || chosen >= _themeOrder.Count) return;
+
+        _theme = PaletteCatalog.Use(_themeOrder[chosen]);
+        SaveAppSettings();
+    }
+
     private void BuildLanguageList()
     {
         var wasSyncing = _syncing;
@@ -1046,7 +1095,8 @@ public partial class MainWindow : Window
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FfmpegPathMode = CmbFfmpegPathMode.SelectedIndex,
-            FfmpegPath = TxtFfmpegPath.Text ?? ""
+            FfmpegPath = TxtFfmpegPath.Text ?? "",
+            Theme = _theme
         };
     }
 
@@ -1071,6 +1121,9 @@ public partial class MainWindow : Window
             CmbOutputFolderMode.SelectedIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
             OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
+
+            _theme = PaletteCatalog.Use(settings.Theme);
+            MarkChosenTheme();
 
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
