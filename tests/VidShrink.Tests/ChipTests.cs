@@ -239,6 +239,6 @@ public sealed class ChipTests
 
         Assert.False(visible);
         Assert.Equal(7, count);
-        Assert.Equal($"Why These Choices · {count}", head);
+        Assert.Equal($"Why these choices · {count}", head);
     }
 }

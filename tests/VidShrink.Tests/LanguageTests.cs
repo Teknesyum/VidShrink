@@ -810,7 +810,7 @@ public sealed class LanguageTests : IDisposable
             return (first, second);
         });
 
-        Assert.Contains("Back To The Start", english);
+        Assert.Contains("Back to the start", english);
         Assert.Contains("Control Strip", english);
         Assert.Contains("Başa Dön", turkish);
         Assert.Contains("Denetim Şeridi", turkish);
@@ -1062,10 +1062,15 @@ public sealed class LanguageTests : IDisposable
 
     /// <summary>
     /// Her iki dil dosyasindaki cumle isaretli her deger icin: satir basindaki sozcuk
-    /// disinda **hicbir sozcuk degismemeli**. Satir basi Names/Verbatim kurallarina tabi
-    /// oldugu icin (ffmpeg -> FFmpeg, storage.to -> storage.to) olcu onu disarida birakiyor;
-    /// tuttugu sey kelime kelime buyutmenin govdeye geri gelmemesi. Sayi ekranda: kac deger
-    /// govde sayildi, kac sozcuk karsilastirildi.
+    /// disinda **hicbir sozcuk degismemeli** — bildirilmis ad yazimlari haric.
+    /// Tuttugu sey kelime kelime buyutmenin govdeye geri gelmemesi.
+    ///
+    /// <para>T192 tur 3'te yeniden temellendirildi. Once satir basi <c>Names</c> kuralina
+    /// tabiydi, govde degildi; sonuc, ayni sozcugun cumlenin neresinde durduguna gore
+    /// farkli yazilmasiydi ("Ffmpeg'in" satir basinda "FFmpeg'in", ortada "ffmpeg").
+    /// Ad yazimi konuma bagli olamaz, bu yuzden <c>Names</c> gecidi artik her sozcukte
+    /// gecerli ve olcu onu bozulma degil <b>ad duzeltmesi</b> diye sayiyor. Iki sayi da
+    /// ekranda: kac sozcuk bozuldu, kac sozcuk ad olarak duzeldi.</para>
     /// </summary>
     [Theory]
     [InlineData("tr")]
@@ -1081,6 +1086,7 @@ public sealed class LanguageTests : IDisposable
         Assert.NotEmpty(prose);
 
         var bozulan = new List<string>();
+        var adDuzelen = new List<string>();
         var karsilastirilan = 0;
 
         foreach (var (key, value) in prose)
@@ -1101,15 +1107,21 @@ public sealed class LanguageTests : IDisposable
                 var basAtlandi = false;
                 for (var i = 0; i < kaynakSozcukler.Length; i++)
                 {
-                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetter))
+                    if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetterOrDigit))
                     {
                         basAtlandi = true;
                         continue;
                     }
 
                     karsilastirilan++;
-                    if (!string.Equals(kaynakSozcukler[i], ekranSozcukler[i], StringComparison.Ordinal))
-                        bozulan.Add($"{key}: '{kaynakSozcukler[i]}' -> '{ekranSozcukler[i]}'");
+                    if (string.Equals(kaynakSozcukler[i], ekranSozcukler[i], StringComparison.Ordinal))
+                        continue;
+
+                    var kayit = $"{key}: '{kaynakSozcukler[i]}' -> '{ekranSozcukler[i]}'";
+                    if (AdYazimiDuzeltmesi(kaynakSozcukler[i], ekranSozcukler[i]))
+                        adDuzelen.Add(kayit);
+                    else
+                        bozulan.Add(kayit);
                 }
             }
         }
@@ -1117,6 +1129,35 @@ public sealed class LanguageTests : IDisposable
         Assert.True(karsilastirilan > 1000, $"Karsilastirilan sozcuk sayisi cok dusuk: {karsilastirilan}");
         Assert.True(bozulan.Count == 0,
             $"Dil '{language}': {prose.Count} govde degeri, {karsilastirilan} sozcuk; "
-            + $"{bozulan.Count} sozcuk bozuldu:\n" + string.Join("\n", bozulan));
+            + $"{bozulan.Count} sozcuk bozuldu:\n" + string.Join("\n", bozulan)
+            + $"\nAd duzeltmesi ({adDuzelen.Count}):\n" + string.Join("\n", adDuzelen));
+    }
+
+    /// <summary>
+    /// Iki sozcuk yalnizca bildirilmis ad yazimi yuzunden mi ayriliyor? Fark buyuk/kucuk
+    /// harften ibaret olmali ve ekrandaki sozcugun bas tarafi <c>Names</c>'deki yazimla
+    /// baslamali. Baska her fark bozulmadir.
+    /// </summary>
+    private static bool AdYazimiDuzeltmesi(string kaynak, string ekran)
+    {
+        if (!string.Equals(kaynak, ekran, StringComparison.OrdinalIgnoreCase)) return false;
+
+        var offset = 0;
+        while (offset < ekran.Length && !char.IsLetter(ekran[offset]))
+        {
+            if (char.IsDigit(ekran[offset])) return false;
+            offset++;
+        }
+
+        if (offset == ekran.Length) return false;
+
+        var govde = ekran[offset..];
+        var token = new string(govde.TakeWhile(char.IsLetterOrDigit).ToArray());
+        var bare = new string(govde.TakeWhile(char.IsLetter).ToArray());
+        if (LanguageCatalog.Names.TryGetValue(token, out var ad))
+            return govde.StartsWith(ad, StringComparison.Ordinal);
+        if (LanguageCatalog.Names.TryGetValue(bare, out var isim))
+            return govde.StartsWith(isim, StringComparison.Ordinal);
+        return false;
     }
 }

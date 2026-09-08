@@ -564,8 +564,21 @@ public partial class MainWindow : Window
     /// Aynı geçit, ama dili çağıran seçiyor. Ölçüler iki dilin satırını yan yana koyabilsin
     /// diye var; arayüz her zaman yürürlükteki dili geçiriyor.
     /// </summary>
-    /// <summary>Sayı biçimlemesi dile göre kaymasın diye tek yerden geçiyor.</summary>
-    private static string Num(double value, string format) => value.ToString(format, CultureInfo.InvariantCulture);
+    /// <summary>
+    /// Sayı biçimlemesi tek yerden geçiyor. Kültür yürürlükteki dilden gelir:
+    /// İngilizce arayüzde <c>15.6 MB</c>, Türkçe arayüzde <c>15,6 MB</c>. Sabit
+    /// <see cref="CultureInfo.InvariantCulture"/> ikisini de noktaya çeviriyordu; C#
+    /// ara değer dizgesi (<c>$"{x:0.0}"</c>) ise makinenin kültürünü kullandığı için
+    /// İngilizce arayüzde bile virgül yazıyordu. İki yanlış da bu geçitle kapanıyor.
+    /// </summary>
+    internal static string Num(double value, string format) => value.ToString(format, Strings.Culture);
+
+    /// <summary>
+    /// Yüzde işaretinin yeri de kültürden gelir: İngilizcede sayının sağında
+    /// (<c>3.7%</c>), Türkçede solunda (<c>%3,7</c>). Oran verilir, yüzle çarpmayı
+    /// biçim yapar.
+    /// </summary>
+    internal static string Percent(double ratio) => ratio.ToString("P1", Strings.Culture);
 
     private static string Speak(string language, string key, params object?[] args)
         => LanguageCatalog.Title(
@@ -1639,7 +1652,7 @@ public partial class MainWindow : Window
         double size = bytes;
         var unit = 0;
         while (size >= 1024 && unit < units.Length - 1) { size /= 1024; unit++; }
-        return $"{size.ToString("0.##", CultureInfo.InvariantCulture)} {units[unit]}";
+        return $"{Num(size, "0.##")} {units[unit]}";
     }
 
     private void OnAutoUpdateChanged()
@@ -2462,6 +2475,7 @@ public partial class MainWindow : Window
         SliderTarget.Value = suggested;
         TxtTarget.Text = suggested.ToString("0.##", CultureInfo.InvariantCulture);
         _syncing = false;
+        RefreshChipDerivation();
 
         UpdateToolStatus();
         Recalculate();
@@ -2567,9 +2581,9 @@ public partial class MainWindow : Window
     {
         Fade(InfoGrid, true);
         TxtDuration.Text = TimeSpan.FromSeconds(info.DurationSeconds).ToString(@"hh\:mm\:ss");
-        TxtSize.Text = $"{info.FileSizeMb:0.0} MB";
+        TxtSize.Text = $"{Num(info.FileSizeMb, "0.0")} MB";
         TxtResolution.Text = $"{info.Width}x{info.Height}";
-        TxtFps.Text = info.Fps.ToString("0.##", CultureInfo.InvariantCulture);
+        TxtFps.Text = Num(info.Fps, "0.##");
         TxtVideoCodec.Text = info.VideoCodec;
         TxtAudio.Text = info.HasAudio ? $"{info.AudioCodec} {info.AudioBitrateBps / 1000}k" : Say("main.info.none");
         TxtBitrate.Text = $"{info.TotalBitrateBps / 1000} kbps";
@@ -2782,7 +2796,7 @@ public partial class MainWindow : Window
         };
 
         AddQualityRow(grid, Say("main.quality.target"), $"{Num(target, "0.##")} MB");
-        AddQualityRow(grid, Say("main.quality.predicted"), $"{score:0.#}/100");
+        AddQualityRow(grid, Say("main.quality.predicted"), $"{Num(score, "0.#")}/100");
         AddQualityRow(grid, Say("main.quality.loss"), Say("main.quality.loss-points", Num(hint.LossPoints, "0.#")));
         AddQualityRow(grid, Say("main.quality.basis"), basis);
         return grid;
@@ -2904,10 +2918,12 @@ public partial class MainWindow : Window
             return;
         }
 
-        var reading = $"{estimate.ExpectedMb:0.0} MB";
+        var reading = $"{Num(estimate.ExpectedMb, "0.0")} MB";
         if (TxtEstimateValue.Text != reading) Pulse(TxtEstimateValue, true);
         TxtEstimateValue.Text = reading;
-        TxtEstimateRange.Text = $"{estimate.LowMb:0.0} - {estimate.HighMb:0.0} MB · {Say("main.estimate.of-source")} %{estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01) * 100:0.#}";
+        TxtEstimateRange.Text =
+            $"{Num(estimate.LowMb, "0.0")} - {Num(estimate.HighMb, "0.0")} MB · {Say("main.estimate.of-source")} "
+            + Percent(estimate.ExpectedMb / Math.Max(_info.FileSizeMb, 0.01));
 
         var basis = estimate.Measured
             ? Say("main.estimate.basis.measured")
@@ -2915,7 +2931,7 @@ public partial class MainWindow : Window
         var mode = estimate.Enforced
             ? Say("main.estimate.mode.enforced")
             : Say("main.estimate.mode.ceiling");
-        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {_predictedQuality:0.#}/100";
+        TxtEstimateNote.Text = $"{basis} · {mode} · {Say("main.estimate.predicted-quality")} {Num(_predictedQuality, "0.#")}/100";
     }
 
     private void RefreshDurationView()
@@ -2949,18 +2965,18 @@ public partial class MainWindow : Window
         TxtDurationValue.Text = reading;
 
         var rate = profile.Speed!.FramesPerSecond;
-        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {Say("main.duration.measured")} {rate:0} {Say("main.duration.frames-per-second")}";
+        TxtDurationRange.Text = $"{HumanDuration(duration.LowSeconds)} - {HumanDuration(duration.HighSeconds)} · {Say("main.duration.measured")} {Num(rate, "0")} {Say("main.duration.frames-per-second")}";
     }
 
     private string HumanDuration(double seconds)
     {
-        if (seconds < 60) return $"{Math.Max(5, Math.Round(seconds / 5.0) * 5.0):0} {Say("main.duration.seconds")}";
+        if (seconds < 60) return $"{Num(Math.Max(5, Math.Round(seconds / 5.0) * 5.0), "0")} {Say("main.duration.seconds")}";
 
         if (seconds < 3600)
         {
             var minutes = seconds / 60.0;
-            if (minutes < 10) return $"{Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0):0.#} {Say("main.duration.minutes")}";
-            return $"{Math.Round(minutes):0} {Say("main.duration.minutes")}";
+            if (minutes < 10) return $"{Num(Math.Max(1.0, Math.Round(minutes * 2.0) / 2.0), "0.#")} {Say("main.duration.minutes")}";
+            return $"{Num(Math.Round(minutes), "0")} {Say("main.duration.minutes")}";
         }
 
         var hours = (int)(seconds / 3600);
@@ -3195,10 +3211,13 @@ public partial class MainWindow : Window
     /// <summary>
     /// Hedefe elle dokunmak boyut tavanini geri getirir: kutuya yazilan sayi motora
     /// ulasmiyorsa turetme satiri da yalan soyluyor demektir.
+    ///
+    /// <para>Turetme satiri <c>TxtTarget.Text</c>'i okuyor, dolayisiyla tavan zaten
+    /// aciksa da yenilenmesi gerekiyor. Eski surumde <c>_chipSizeCapped</c> true iken
+    /// bastan donuluyordu; kutuda 24 yazarken satir "Hedef 16 MB" diye kaliyordu.</para>
     /// </summary>
     private void RestoreSizeCap()
     {
-        if (_chipSizeCapped) return;
         _chipSizeCapped = true;
         RefreshChipDerivation();
         RefreshSectionSummaries();
@@ -3283,8 +3302,8 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowQualityTargetBound(QualityTargetResult result, double mb)
     {
-        var target = mb.ToString("0.##", CultureInfo.InvariantCulture);
-        var reached = result.PredictedQuality.ToString("0.#", CultureInfo.InvariantCulture);
+        var target = Num(mb, "0.##");
+        var reached = Num(result.PredictedQuality, "0.#");
 
         SetQualityTargetNotice(result.Bound switch
         {
@@ -3560,7 +3579,7 @@ public partial class MainWindow : Window
                 Progress.Value = p.Fraction;
                 SetStage(TxtStage, LocalizeStage(p.Stage));
                 TxtRemaining.Text = p.Remaining?.ToString(@"mm\:ss") ?? "-";
-                if (p.OutputMb > 0) TxtOutSize.Text = $"{p.OutputMb:0.0} MB";
+                if (p.OutputMb > 0) TxtOutSize.Text = $"{Num(p.OutputMb, "0.0")} MB";
             });
 
             var result = await new EncodeRunner().RunAsync(_info, ActivePlan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
@@ -3569,7 +3588,7 @@ public partial class MainWindow : Window
 
             if (result.Success)
             {
-                TxtOutSize.Text = $"{result.OutputMb:0.0} MB";
+                TxtOutSize.Text = $"{Num(result.OutputMb, "0.0")} MB";
                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
                 TxtResult.Text = Say("main.run.done",
                     result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));

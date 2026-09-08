@@ -121,18 +121,24 @@ public sealed class CasingTests
 
     /// <summary>
     /// T65 K1: ölçü birimi ve kodlayıcı tanımlayıcısı büyük harf geçidinden yazıldığı gibi
-    /// çıkar, cümlenin geri kalanı başlık biçiminde kalır. <c>Ms</c> SI'da megasaniyedir ve
-    /// <c>Libx264</c> diye bir ffmpeg kodlayıcısı yoktur — kullanıcı kodlayıcı adını
-    /// kaydedicisinin ayarlarında arıyor.
+    /// çıkar. <c>Ms</c> SI'da megasaniyedir ve <c>Libx264</c> diye bir ffmpeg kodlayıcısı
+    /// yoktur — kullanıcı kodlayıcı adını kaydedicisinin ayarlarında arıyor.
+    ///
+    /// <para>T192: beklenen değerlerin yarısı yeniden temellendirildi. Ölçünün tuttuğu şey
+    /// birim ve kodlayıcı yazımıdır ve o hiç değişmedi; değişen, <b>cümlenin geri kalanının</b>
+    /// nasıl büyütüldüğü. <c>ReadsAsProse</c> artık işlev sözcüğü (<c>the</c>, <c>of</c>,
+    /// <c>is</c>, <c>on</c>) taşıyan metni gövde sayıyor, dolayısıyla "the probe took 120 ms"
+    /// bir başlık değil bir cümle ve yalnız satır başı büyüyor. Pim susturulmadı: birim
+    /// yazımını bozan bir mutasyon hâlâ kırmızıya döndürür.</para>
     /// </summary>
     [Theory]
-    [InlineData("the probe took 120 ms", "The Probe Took 120 ms")]
-    [InlineData("budget of 20000 ms", "Budget Of 20000 ms")]
-    [InlineData("target is 16 MB", "Target Is 16 MB")]
-    [InlineData("halve the fps", "Halve The fps")]
+    [InlineData("the probe took 120 ms", "The probe took 120 ms")]
+    [InlineData("budget of 20000 ms", "Budget of 20000 ms")]
+    [InlineData("target is 16 MB", "Target is 16 MB")]
+    [InlineData("halve the fps", "Halve the fps")]
     [InlineData("software encoder libx264", "Software Encoder libx264")]
     [InlineData("hardware encoder h264_nvenc", "Hardware Encoder h264_nvenc")]
-    [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv Beats libsvtav1 On aac")]
+    [InlineData("hevc_qsv beats libsvtav1 on aac", "hevc_qsv beats libsvtav1 on aac")]
     public void UnitsAndEncoderNamesKeepTheirSpelling(string text, string expected)
         => Assert.Equal(expected, LanguageCatalog.Title(text, false));
 
