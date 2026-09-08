@@ -41,8 +41,18 @@ bu araç için genişletmemek adına yansımayla çağrılıyor.
 Karşılaştırma paneli canlı bir borudan besleniyor; "kare gelir gelmez çiz" koşumdan
 koşuma farklı alt-kare yakalıyordu. `FreezePreview` bunun yerine oynatmayı durdurup
 pencerenin **son** karesini bekliyor: son kare halkanın en yenisi olduğu için
-düşürülmüyor. Yakalanan kare her koşumda aynı — üç koşumluk sha256 tablosu
+düşürülmüyor. Yakalanan kare her koşumda aynı — on dört koşumluk sha256 tablosu
 `docs/olcumler/ekran-goruntusu.md` içinde.
+
+Statik kare de öyle değildi: `MainWindow.Recalculate` tahmin metni değişince `Pulse`
+vuruyor, opaklığı 160 ms `0,35`te tutuyor ve kare atımın ortasına denk gelebiliyordu.
+`StillPulses` çizimden hemen önce `TxtEstimateValue` ile `TxtDurationValue`'nun geçişini
+silip opaklığı `1` yazar; çizimden önceki değer stderr'e `iz atim` satırı olarak düşer.
+
+Çekim yük altında kırılabiliyor (`Oynaticinin ilk karesi: 60 saniyede gelmedi`). Her kare
+kendi taze penceresinde en çok üç kez çizilir (`DrawAttempts`); denemeler stderr'e
+`iz yeniden` satırı olarak düşer, üçü de düşerse çekim durur. Kısmi çıktı silinmez:
+çıkış klasörü çoğu zaman `docs/gorseller`.
 
 Bekleme süreleri de sessiz değil: süre dolarsa `Await` `TimeoutException` atar,
 yarım kare teslim edilmez.

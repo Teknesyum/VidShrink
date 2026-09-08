@@ -167,37 +167,75 @@ public static class Program
 
         Host.Run(() =>
         {
-            Strings.Use(language == "tr" ? "en" : "tr");
-
-            var window = new MainWindow { Width = double.NaN, Height = double.NaN };
-            try
+            for (var attempt = 1; ; attempt++)
             {
-                Invoke(window, "UseLanguage", language);
-
-                LayOut(window);
-                arrange(window);
-                Settle(window);
-                Relayout(window);
-                ClearEntrance(window);
-
-                var target = pick(window);
-                var bounds = target.Bounds;
-                var w = (int)Math.Round(bounds.Width);
-                var h = (int)Math.Round(bounds.Height);
-                if (w <= 0 || h <= 0)
-                    throw new InvalidOperationException($"{topic}/{language}: cizilecek alan {w}x{h}.");
-
-                using var bitmap = new RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));
-                bitmap.Render(target);
-                bitmap.Save(path);
-            }
-            finally
-            {
-                window.Close();
+                try
+                {
+                    DrawOnce(language, topic, path, arrange, pick);
+                    if (attempt > 1)
+                        Console.Error.WriteLine($"iz	yeniden	kare={topic}/{language}	deneme={attempt}	sonuc=cizildi");
+                    return;
+                }
+                catch (Exception hata) when (attempt < DrawAttempts)
+                {
+                    Console.Error.WriteLine(
+                        $"iz	yeniden	kare={topic}/{language}	deneme={attempt}"
+                        + $"	hata={hata.GetType().Name}: {hata.Message}");
+                }
             }
         });
 
         return path;
+    }
+
+    /// <summary>
+    /// Bir karenin kac kez denenecegi. Duzenek yuk altinda kirilabiliyor: on dort kosumun
+    /// ikisi <c>Oynaticinin ilk karesi: 60 saniyede gelmedi</c> ile coktu ve cikis
+    /// klasorunde on dort kareden altisi kaldi. Kismi ciktiyi silmek yol degil — cekim
+    /// cogu zaman <c>docs/gorseller</c>'e, yani depodaki kareleri tasiyan klasore yaziyor;
+    /// oradaki dosyalari silmek bir cokmeyi veri kaybina cevirirdi. O yuzden yeniden
+    /// deneme: her kare kendi taze penceresinde en cok uc kez cizilir, her deneme stderr'e
+    /// yazilir, ucu de duserse cekim yine gurultuyle durur.
+    /// </summary>
+    private const int DrawAttempts = 3;
+
+    /// <summary>Tek bir cizim denemesi. Pencere her denemede yeniden kurulur.</summary>
+    private static void DrawOnce(
+        string language,
+        string topic,
+        string path,
+        Action<MainWindow> arrange,
+        Func<MainWindow, Visual> pick)
+    {
+        Strings.Use(language == "tr" ? "en" : "tr");
+
+        var window = new MainWindow { Width = double.NaN, Height = double.NaN };
+        try
+        {
+            Invoke(window, "UseLanguage", language);
+
+            LayOut(window);
+            arrange(window);
+            Settle(window);
+            Relayout(window);
+            ClearEntrance(window);
+            StillPulses(window, topic, language);
+
+            var target = pick(window);
+            var bounds = target.Bounds;
+            var w = (int)Math.Round(bounds.Width);
+            var h = (int)Math.Round(bounds.Height);
+            if (w <= 0 || h <= 0)
+                throw new InvalidOperationException($"{topic}/{language}: cizilecek alan {w}x{h}.");
+
+            using var bitmap = new RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));
+            bitmap.Render(target);
+            bitmap.Save(path);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>
@@ -260,6 +298,38 @@ public static class Program
         Dispatcher.UIThread.RunJobs();
         Invoke(window, "SettleFades");
         Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
+    /// Atim vuran denetimler. <c>MainWindow.Recalculate</c> tahmini boyut ve sure
+    /// metinleri degistiginde bunlara <c>Pulse</c> uyguluyor.
+    /// </summary>
+    private static readonly string[] Pulsed = { "TxtEstimateValue", "TxtDurationValue" };
+
+    /// <summary>
+    /// <c>MainWindow.Pulse</c>'in atimini kareye girmeden soker.
+    ///
+    /// <para>Atim denetimin opakligini <c>0,35</c>'e yazip <c>DispatcherTimer.RunOnce</c>
+    /// ile 160 ms sonra geri aliyor (<c>MainWindow.axaml.cs</c>, <c>Pulse</c>). Bassiz
+    /// kosumda o zamanlayici ancak kuyruk suruldugunde ilerledigi icin kare atimin
+    /// ortasina denk gelebiliyordu: <c>T189-kucult-en.png</c> on dort kosumun dordunde
+    /// tahmini boyut sayisini %35 opaklikta gosterdi. Bu <c>ScheduleRecalculate</c>'in
+    /// 160 ms'si degil, <c>Recalculate</c>'in kendi baslattigi ikinci 160 ms.</para>
+    ///
+    /// <para>Cozum denetim seridinde uygulananin ayni (<see cref="RevealStrip"/>): gecis
+    /// silinir, deger dogrudan yazilir. Zamanlayici sonradan tiklarsa yine <c>1</c>
+    /// yazacagi icin kareye giren hicbir sey degismez.</para>
+    /// </summary>
+    private static void StillPulses(MainWindow window, string topic, string language)
+    {
+        foreach (var name in Pulsed)
+        {
+            var control = (Control)Named(window, name);
+            Console.Error.WriteLine(
+                $"iz	atim	kare={topic}/{language}	denetim={name}	oncesi={control.Opacity}");
+            control.Transitions = null;
+            control.Opacity = 1;
+        }
     }
 
     /// <summary>

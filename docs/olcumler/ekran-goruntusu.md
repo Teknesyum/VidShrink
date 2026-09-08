@@ -20,10 +20,14 @@ Gerekçe — (b) gerçek pencere yerine (a):
 - Ekran kapısı gerekmiyor. Düzenek kapı kapalıyken de koşar.
 - Sonuç makineden bağımsız: ekran çözünürlüğü, masaüstü ölçeklemesi ve pencere
   yöneticisi kareye karışmıyor. Ölçüsü sabit 1600x1000.
-- Tekrarlanabilir. **Beş** ardışık tam koşumun on dört karesinin de sha256'sı aynı çıktı
-  (aşağıda ham çıktı; `.calisma/T189/k9-bes-kosum-tur3.txt`). Üç koşum bunu ölçmeye
-  yetmiyordu: tur 2'nin üç koşumu farkı kaçırdı, denetçinin beş koşumu yakaladı. Tur 1 ve
-  tur 2'de önizleme karesi koşumdan koşuma değişiyordu; dört ayrı kaynağı ve kapatılması
+- Tekrarlanabilir. **Tur 4'ün on dört ardışık tam koşumunda** on dört karenin de
+  sha256'sı aynı çıktı (`.calisma/T189-tur4/sha256-14-kosum.txt`). Tur 3'ün beş koşumluk
+  tablosu (aşağıda, `.calisma/T189/k9-bes-kosum-tur3.txt`) **o beş koşumda** aynıydı ama
+  genel bir belirlenimlilik ölçüsü değildi: denetçinin on dört koşumunun dördünde
+  `T189-kucult-en.png` sapıyordu, sebebi tur 4'te kapatılan `Pulse` atımıydı. Ölçünün
+  boyu kusuru buluyor: üç koşum tur 2'nin farkını kaçırdı, beş koşum atımı kaçırdı, on
+  dört koşum yakaladı. Tur 1 ve tur 2'de önizleme karesi koşumdan koşuma değişiyordu;
+  dört ayrı kaynağı ve kapatılması
   “Tur 3: önizleme karesi belirlenimli değildi (K9)” başlığında.
 
 Bedeli: kare pencerenin **istemci alanı**; işletim sisteminin pencere gölgesi ve köşe
@@ -131,8 +135,15 @@ sha256'nın ilk 12 hanesi:
     T189-oynatici-en.png      03b62757a8b1   03b62757a8b1   03b62757a8b1   03b62757a8b1   03b62757a8b1   ayni
     T189-oynatici-tr.png      a867cf3cfb67   a867cf3cfb67   a867cf3cfb67   a867cf3cfb67   a867cf3cfb67   ayni
 
-On dört kareden on dördü beş koşumun beşinde de aynı, farklı çıkan kare yok. Altıncı bir
-koşum daha alındı (`.calisma/T189/r6`) ve beşinci koşumla bayt bayt aynı çıktı.
+On dört kareden on dördü **bu beş koşumun beşinde de** aynı, bu ölçüde farklı çıkan kare
+yok. Altıncı bir koşum daha alındı (`.calisma/T189/r6`) ve beşinci koşumla bayt bayt aynı
+çıktı.
+
+Bu tablo beş koşumun kaydı olarak doğru, genel bir iddia olarak değil: denetçi aynı
+düzenekle on dört koşum yaptı ve `T189-kucult-en.png` dördünde saptı. Sebep ve düzeltmesi
+“Tur 4: atım karenin ortasına denk geliyordu (K13)” başlığında; oradaki tablo on dört
+koşumluk. Yukarıdaki `T189-kucult-en/tr` sha256'ları tur 3'ün karelerine ait; tur 4 iki
+kareyi de yeniledi.
 
 ## Tur 2'de düzeltilen iki kusur
 
@@ -281,8 +292,10 @@ Denetçi üç kaynak ayırdı (`.calisma/T189-denetim/k9-fark-ayrimi.txt`); öl�
 7. Yüzeyin turunu bir kez elle çevirip halkayı boşaltır.
 8. Şeridin opaklık geçişini silip şeridi açar.
 
-Yakalanan kare her koşumda aynı: terminal pencerenin (`[7, 12)`) son karesi, kaynak
-ekseninde 11,967 sn. Beş koşumluk tablo yukarıda; kareyi çizen sayılar
+Yakalanan kare **ölçülen üç ayrı seride de** aynı: terminal pencerenin
+(`[7, 12)`) son karesi, kaynak ekseninde 11,967 sn. Beş koşumluk tablo yukarıda,
+denetçinin on dört koşumu `.calisma/T189-denetim-tur3/`, tur 4'ün on dört koşumu
+`.calisma/T189-tur4/sha256-14-kosum.txt` içinde; kareyi çizen sayılar
 `.calisma/T189/izler/` altındaki iz satırlarında.
 
 ### Ölçülmedi
@@ -290,8 +303,11 @@ ekseninde 11,967 sn. Beş koşumluk tablo yukarıda; kareyi çizen sayılar
 - Kaynakların dördü de **bu makinede** kapatıldı. Başka bir makinede aynı on dört karenin
   çıkacağı ölçülmedi; ölçülen şey aynı makinede koşumdan koşuma değişmediği.
 - Denetçinin ilk koşumundaki `T189-kucult-en.png` farkı (%0,19) doğrudan tekrar
-  üretilemedi; yalnız o farkı üretebilen yarış (160 ms'lik yeniden hesap zamanlayıcısı)
-  bulunup kapatıldı. “Kapandı” değil, “yarış artık yok” denebilir.
+  üretilemedi. Tur 3'ün teşhisi — “o farkı üretebilen yarış 160 ms'lik yeniden hesap
+  zamanlayıcısıydı, bulunup kapatıldı” — **yanlıştı**: yarış duruyordu ve onu
+  `ScheduleRecalculate` değil `MainWindow.Recalculate`'in başlattığı ikinci 160 ms, yani
+  `Pulse` atımı çıkarıyordu. Ölçüsü ve kapatılması “Tur 4” başlığında; bu maddede tur 3'ün
+  kapattığı tek şey `ScheduleRecalculate` kolu.
 
 ### Borçlar (K10)
 
@@ -306,6 +322,98 @@ ekseninde 11,967 sn. Beş koşumluk tablo yukarıda; kareyi çizen sayılar
 3. **Karelerdeki arayüz kusurları T192'nin işi.** `T189-kucult-tr.png`'de “Video
    Kodegi” ile “Ses” sütun başlıkları üst üste biniyor ve “Kare Hızı D...” kırpılıyor.
    Kare kusuru gizlemiyor; düzeltme arayüzde yapılacak.
+
+## Tur 4: atım karenin ortasına denk geliyordu (K13)
+
+Denetçi on dört tam koşum yaptı: on üç kare belirlenimliydi, `T189-kucult-en.png` değildi
+(`.calisma/T189-denetim-tur3/kendi-14-kosum.txt`).
+
+    T189-kucult-en.png   81925dbd2865 -> r2 r3 r4 r5 r6 r9 r10 r11 r12 r13   (10 koşum)
+                         c82f0eeb74f8 -> r1 r7 r8 r14                        (4 koşum)
+
+Fark 270 piksel, `x=[1085..1138] y=[369..379]`: “Estimated Output” başlığının altındaki
+sayı. Sayı iki kolda da aynı, **opaklığı** farklı.
+
+### Teşhis
+
+`MainWindow.Recalculate` tahmin metni değişince `Pulse(TxtEstimateValue, true)` çağırıyor
+(`src/VidShrink.App/MainWindow.axaml.cs:2908`). `Pulse` denetimin opaklığını `0,35`e yazıp
+`DispatcherTimer.RunOnce(..., 160 ms)` ile geri alıyor (aynı dosya, 403-411).
+
+Bu, tur 3'ün kapattığı 160 ms **değil**. İki ayrı zamanlayıcı var:
+
+| Zamanlayıcı | Kuran | Tur 3'te ne oldu |
+| --- | --- | --- |
+| `ScheduleRecalculate`'in 160 ms'si | hedef kutusuna yazmak | `SettlePlan` durdurdu |
+| `Pulse`'ın 160 ms'si | `Recalculate`'in kendisi | dokunulmadı |
+
+Başsız koşumda ikinci zamanlayıcı ancak kuyruk sürüldüğünde ilerliyor; kare atımın
+ortasına denk gelirse sayı %35 opaklıkta çiziliyor. Teslim edilen iki kare de bu
+durumdaydı — `T189-kucult-en.png` ve `-tr.png` içinde ölçülen en parlak piksel **101**
+(`.calisma/T189-tur4/atim-opaklik-olcum.txt`).
+
+### Düzeltme
+
+Denetim şeridinde uygulanan çözümün aynısı (`RevealStrip`): geçiş silinir, değer doğrudan
+yazılır. `tools/VidShrink.Shot/Program.cs`, `StillPulses`; çizimden hemen önce, her karede,
+`TxtEstimateValue` ve `TxtDurationValue` için. `src/VidShrink.App/` diff'i 0 satır —
+düzeltme yalnız düzenekte.
+
+İkinci denetim `MainWindow.axaml.cs:2948`'de `TxtDurationValue`'ya vuruyor; bugün kareye
+girmese de aynı listede.
+
+Atım gerçekten vuruyordu ve rastgele vuruyordu: düzenek artık her karede çizimden önceki
+opaklığı stderr'e yazıyor, on dört koşumun 392 iz satırının **54'ü** `öncesi=0,35`
+(`.calisma/T189-tur4/kosumlar/r*.stderr.txt`).
+
+### On dört koşumluk sha256 (K13 CHECK)
+
+Tam tablo `.calisma/T189-tur4/sha256-14-kosum.txt`; koşum çıktıları
+`.calisma/T189-tur4/kosumlar/r1..r14`.
+
+    kare            r1..r14 (on dördü de)   depo (tur 3)   durum
+    kucult-en       c82f0eeb74f8            81925dbd2865   yenilendi
+    kucult-tr       ff4ca8b99b88            844be8bf8d76   yenilendi
+    donustur-en     d278e611294e            aynı           değişmedi
+    donustur-tr     fe10bac06c48            aynı           değişmedi
+    ayarlar-en      7ccf5b1207fa            aynı           değişmedi
+    ayarlar-tr      01a1cd8ffacb            aynı           değişmedi
+    gelismis-en     9a939670f88c            aynı           değişmedi
+    gelismis-tr     af80c77a92ed            aynı           değişmedi
+    hakkinda-en     f2c3b1246fec            aynı           değişmedi
+    hakkinda-tr     fb2f244270ed            aynı           değişmedi
+    onizleme-en     046f005c202a            aynı           değişmedi
+    onizleme-tr     67e8c4c77cb6            aynı           değişmedi
+    oynatici-en     03b62757a8b1            aynı           değişmedi
+    oynatici-tr     a867cf3cfb67            aynı           değişmedi
+
+On dört karenin on dördü on dört koşumun on dördünde de aynı. `kucult` kareleri depoda
+yenilendi; ölçülen en parlak piksel 101'den **255**'e çıktı, yani sayı artık tam opak.
+
+### Düzenek yük altında kırılıyordu (K15 borç 1)
+
+Denetçinin on dört koşumunun ikisi `TimeoutException: Oynaticinin ilk karesi: 60 saniyede
+gelmedi` ile çöktü (`Program.cs:343 OpenInPlayer`) ve çıkış klasöründe on dört kareden
+altısı kaldı.
+
+**Seçilen yol: yeniden deneme.** Kısmi çıktıyı silmek yol değil — çekim çoğu zaman
+`docs/gorseller`'e, yani depodaki kareleri taşıyan klasöre yazıyor; oradaki dosyaları
+silmek bir çökmeyi veri kaybına çevirirdi. Artık her kare kendi taze penceresinde en çok
+**üç** kez çiziliyor (`Draw`/`DrawOnce`, `DrawAttempts`), her deneme stderr'e
+`iz yeniden` satırı olarak düşüyor, üçü de düşerse çekim yine gürültüyle duruyor.
+
+Bu turun on dört koşumunda hiç yeniden deneme tetiklenmedi (`grep yeniden` boş); yani
+düzeltme ölçüldü ama **tetiklendiği görülmedi**. Kırılmanın kendisi bu makinede
+üretilemedi.
+
+### Süit (tur 4)
+
+    dotnet test -c Release
+    Başarısız! - Başarısız: 1, Başarılı: 1900, Atlanan: 24, Toplam: 1925, Süre: 19 m 19 s
+
+Düşen tek test `OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`;
+makineye bağlı, bu turdan önce de düşüyordu ve düzeneğe dokunmuyor. Ham çıktı
+`.calisma/T189-tur4/dotnet-test.txt`.
 
 ## Karelerde ne var
 
