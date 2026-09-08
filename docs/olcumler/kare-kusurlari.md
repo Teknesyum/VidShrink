@@ -28,6 +28,15 @@ mutasyon artik kirmizi. Ikincisi bir sayi: "44" aslinda **49**; dokumu ureten
 yalniz ilk satiri sayiliyordu. Ayrica iki cumle kapsamina cekildi (rakam kaynakli alti
 kalem, `.title`/`.label` ile biten alti kalem). Tur 4'un ham ciktilari
 `.calisma/T192-tur4/` altinda.
+**Tur 5 (8 Eylul 2026).** Denetim tur 4'u bir kritikle geri cevirdi ve kritik ayni
+sinifin ucuncu tekrariydi: tablo dogru, onu anlatan kapsam cumlesi olcuyu asiyor. Bu
+turda 2. maddedeki kapsam cumlesi olculebilen bir bolmeye cevrildi (124 = 40 + 84),
+1. maddedeki `InvariantCulture` karar tablosunun numaralari 33 satira esitlendi,
+K7'nin "komut bos doner" cumlesi komutun gercek ciktisiyla degistirildi ve
+tekrarlanamayan bir mutasyon sayisi kaldirildi. Belgedeki her sayisal cumle bastan
+tarandi; dokum, kol dagilimi ve ad yazimi kesisimi yeniden olculdu. Tur 5'in ham
+ciktilari `.calisma/T192-tur5/` altinda.
+
 
 ## 1. Sayi bicimi Turkce kalmis - kusur, duzeltildi
 
@@ -76,22 +85,31 @@ satir gercek ekran yolundan geciyor (`KareYerlesimTests.TahminAraligiSatiriEkran
 ### Sabit invariant kalan yerler - satir basina karar (T192 tur 2, K9)
 
 `grep -n InvariantCulture src/VidShrink.App/MainWindow.axaml.cs` **otuz uc** satir
-veriyor; ham cikti `.calisma/T192-tur3/k12-invariant-grep.txt`.
+veriyor; ham cikti `.calisma/T192-tur3/k12-invariant-grep.txt`, tur 5'te yeniden
+alinan hali `.calisma/T192-tur5/k19-invariant-grep.txt` (ayni 33 satir).
 
 Tur 2 buraya **otuz alti** yazmisti. Sayi bayatti: grep duzeltmelerden **once**
-alinmisti ve kulture baglanan uc satir (1655, 2586, 3305-3306) o dokumde hala
+alinmisti ve kulture baglanan dort satir (1655, 2586, 3305, 3306) o dokumde hala
 `InvariantCulture` geciyordu. Satir numaralari dogruydu, sayi degil; tur 3'te teslim
-ucunde yeniden sayildi. Karar alti kumede toplaniyor ve **otuz ucun her satiri** bir
-kumede duruyor:
+ucunde yeniden sayildi.
+
+Tur 3'un karar tablosu da sayiya esit degildi: 33 satirlik listeye **37 numara**
+tasiyordu. Fazlalik, kulture **baglanmis** dort satir (1655, 2586, 3305-3306) - onlar
+artik `InvariantCulture` gecmiyor, dolayisiyla grep listesinde de yoklar. Eksik olan
+ise 11 okuma satiriydi: metinde adi geciyor ama kendi kumesi yoktu. Numaralar tur 5'te
+yeniden uretildi; asagidaki alti kumede **otuz ucun her satiri** bir kez ve yalniz bir
+kez duruyor (15 + 11 + 4 + 1 + 1 + 1 = 33). Kulture baglanan dort satir tabloda
+**gecmis kaydi** olarak, ayri bir satirda duruyor.
 
 | Kume | Satirlar | Karar |
 |---|---|---|
-| **Baglandi (tur 2'de)** `TxtFps`, `DescribeBytes`, kalite siniri uyarisi | 2586, 1655, 3305-3306 | ekrana **cumle/deger** olarak cikiyor, kultur gecidine (`Num`) alindi |
-| **Invariant kalir - ayristirma simetrisi.** `TxtTarget`, `TxtQualityTarget`, `TxtQuality`, gelismis ayar acilir listeleri | 837, 838, 848, 1176, 1182, 1191, 1194, 1299, 1303, 2476, 3191, 3230, 3272, 3293, 3751 | ayni metin geri **okunuyor**: 1368-1391, 2257, 3251, 3685-3686, 3704-3706, 3772 hepsi `NumberStyles` + `InvariantCulture` ile `TryParse` ediyor. Yaziyi kulture cevirip okumayi invariant birakmak Turkce arayuzde kutuyu bozardi; ikisini birden cevirmek bu sozlesmenin isi degil, ayri bir is |
-| **Invariant kalir - kulture duyarli ogesi yok.** `TxtAdvCrfNow`, `TxtAdvAudioKbpsNow`, ses kanali, `mm:ss` | 1418, 1420, 1422, 3662 | tam sayi ve zaman bicimi; ondalik ayirici da grup ayirici da cikmiyor. Ayrica ilk ucu yukaridaki kutularin **yansimasi** |
-| **Invariant kalir - ekrana cikmiyor.** ayar JSON'u | 2132 | diske yazilan bicim; kulture baglanirsa dosya makineden makineye degisir |
-| **Cagri degil, belge.** `Num` gecidinin `<summary>`'sindeki `<see cref>` | 570 | grep'in yakaladigi tek dokumantasyon satiri; bir bicimlendirme yapmiyor, gecidin **neden** kuruldugunu anlatiyor |
-| **Invariant kalir - yazma/okuma simetrisi.** `ParseTime` | 3742 | 3662'de `mm\:ss` diye **invariant yazilan** metnin geri okunmasi; yazan taraf invariant oldugu icin okuyan taraf da oyle olmak zorunda. Kulture duyarli ogesi yok |
+| **Baglandi (tur 2'de) - artik listede degil** `TxtFps`, `DescribeBytes`, kalite siniri uyarisi | 1655, 2586, 3305, 3306 (**33'un disinda**) | ekrana **cumle/deger** olarak cikiyor, kultur gecidine (`Num`) alindi; `InvariantCulture` bu satirlardan kalktigi icin grep artik onlari gormuyor |
+| **Invariant kalir - ayristirma simetrisi (yazan taraf, 15 satir).** `TxtTarget`, `TxtQualityTarget`, `TxtQuality`, gelismis ayar acilir listeleri | 837, 838, 848, 1176, 1182, 1191, 1194, 1299, 1303, 2476, 3191, 3230, 3272, 3293, 3751 | ayni metin geri **okunuyor** (asagidaki kume). Yaziyi kulture cevirip okumayi invariant birakmak Turkce arayuzde kutuyu bozardi; ikisini birden cevirmek bu sozlesmenin isi degil, ayri bir is |
+| **Invariant kalir - ayristirma simetrisi (okuyan taraf, 11 satir).** `TryParse` cagrilari | 1368, 1375, 1387, 1391, 2257, 3251, 3685, 3686, 3704, 3706, 3772 | hepsi `NumberStyles` + `InvariantCulture` ile ayristiriyor; yukaridaki 15 satirin karsiligi. Tur 3'un tablosunda bu satirlar yalniz metin icinde geciyordu, kendi kumeleri yoktu |
+| **Invariant kalir - kulture duyarli ogesi yok (4 satir).** `TxtAdvCrfNow`, `TxtAdvAudioKbpsNow`, ses kanali, `mm:ss` | 1418, 1420, 1422, 3662 | tam sayi ve zaman bicimi; ondalik ayirici da grup ayirici da cikmiyor. Ayrica ilk ucu yukaridaki kutularin **yansimasi** |
+| **Invariant kalir - ekrana cikmiyor (1 satir).** ayar JSON'u | 2132 | diske yazilan bicim; kulture baglanirsa dosya makineden makineye degisir |
+| **Cagri degil, belge (1 satir).** `Num` gecidinin `<summary>`'sindeki `<see cref>` | 570 | grep'in yakaladigi tek dokumantasyon satiri; bir bicimlendirme yapmiyor, gecidin **neden** kuruldugunu anlatiyor |
+| **Invariant kalir - yazma/okuma simetrisi (1 satir).** `ParseTime` | 3742 | 3662'de `mm\:ss` diye **invariant yazilan** metnin geri okunmasi; yazan taraf invariant oldugu icin okuyan taraf da oyle olmak zorunda. Kulture duyarli ogesi yok |
 
 `DescribeBytes` icin pim var (`SettingsTabTests`, 128 MiB / 25 GiB / 1 GiB); ucu de tam
 ikilik kat, ondalik tasimiyor, dolayisiyla degisiklikten etkilenmedi ve **yeniden
@@ -148,18 +166,32 @@ gecit gercek. "Kol degistiren" tanimi: `fd6fe0c1`'in kuralina (yalniz cumle isar
 | Kol degisteren | **124** | `.calisma/T192/k8-supurme-ham.txt` |
 | bunlardan Ingilizce | 88 | ayni dosya, `SAYIM` satiri |
 | bunlardan Turkce | 36 | ayni dosya, `SAYIM` satiri |
-| **Ekrandaki ciktisi gercekten degisen** | **123** | `.calisma/T192/k8-fark.txt` |
-| bunlardan uzunlugu <=3 sozcuk olan | 27 | `.calisma/T192/k8-kisa-kalemler.txt` |
+| **Ekrandaki ciktisi gercekten degisen** | **123** | `.calisma/T192-tur5/dokum-fark.txt` |
+| bunlardan ham degeri <=3 sozcuk olan | **28** | `.calisma/T192-tur5/kisa-28.txt` |
 
 Son satirdaki 123 bir tahmin degil, **iki kosunun farki**: ayni dokum testi bir de
-`origin/main`'in `LanguageCatalog.cs`'siyle kosuldu ve iki dokum `diff`lendi. Yani
-"gorunur cikti farki" bir olcut degil, olculmus bir sayi. Tekrarlanmasi:
+T192 oncesi `LanguageCatalog.cs` ile kosuldu ve iki dokum anahtar anahtar karsilastirildi.
+Taban **`ef5131b`** (T192'nin acildigi commit). `origin/main` de ayni tabani veriyor:
+tur 5'te iki agacin `LanguageCatalog.cs` blob'u ayni cikti (`git rev-parse` ikisi icin de
+`d75f33e`), yani T192'nin uretim degisikligi main'e **girmedi** ve iki taban ayni dosya.
+Asagida `ef5131b` yazili, cunku sozlesme boyunca degismeyecek olan taban odur.
+Tekrarlanmasi:
 
 ```
-git checkout origin/main -- src/VidShrink.App/LanguageCatalog.cs
+git checkout ef5131b -- src/VidShrink.App/LanguageCatalog.cs
+sed -i 's/^    private static readonly IReadOnlyDictionary<string, string> Names =/    internal static readonly IReadOnlyDictionary<string, string> Names =/' src/VidShrink.App/LanguageCatalog.cs
 dotnet test -c Release --filter "FullyQualifiedName~BaslikKapsamiTests.TumCiktiDokulur" --logger "console;verbosity=detailed"
 git checkout HEAD -- src/VidShrink.App/LanguageCatalog.cs
 ```
+
+`sed` satiri gerekli cunku bugunku testler `LanguageCatalog.Names`'i disaridan okuyor;
+tabanda ayni sozluk `private`. Gorunurluk `Title`'in davranisini degistirmiyor.
+
+Tur 5'te bu kosum yeniden alindi: 950 anahtarin **163**'unun ciktisi tabandan farkli.
+Bunlarin **123**'u 124'luk kol degistiren kumede, kalan **40**'i baslik kolunda kalip
+yalnizca ad/birim yazimi ya da yer tutucu duzeltmesinden etkilenen anahtarlar. Bu 40,
+124'un **disinda** duruyor; asagida uc ailenin toplami olarak gecen 40 ile ayni sayi,
+ayni kume degil.
 
 Kol degistirdigi halde ciktisi **ayni kalan** tek anahtar var (124 - 123):
 `tr / main.convert.drop`, degeri `At`. Tek sozcuk ve bas harfi zaten buyuk, iki kol da
@@ -186,12 +218,13 @@ icinde degildi**. Sinir ham degerin sozcuk sayisidir ve simdi olculdu:
 
 | Kume | Sayi | Nerede okundu |
 |---|---|---|
-| `<=3` sozcuklu ham deger | **28** | tur 2 (`main.action.show-in-folder`, `main.chip.whatsapp.label` bu kumede) |
+| `<=3` sozcuklu ham deger | **28** | tur 2 (`main.action.show-in-folder`, `main.chip.whatsapp.label` bu kumede); tur 5'te yeniden sayildi, ayni |
 | `4+` sozcuklu ham deger | **96** | tur 3 (`main.drop.title` 5, `main.chip.128.label` 4, `main.chip.180.label` 5 sozcuk - bu kumede) |
 | Toplam | **124** | |
 
 Tur 2'nin "27" sayisi da bir eksikti; ayrim ham degerin bosluga gore bolunmesiyle yeniden
-sayildi (`awk -F'	' '{n=split($4,a," ")...}'`, ham dosya yukarida).
+sayildi (`awk -F'	' '{n=split($4,a," ")...}'`, ham dosya yukarida). Yukaridaki kapsam
+tablosunda da tur 4'e kadar "27" yaziyordu; tur 5'te **28**'e cekildi.
 
 #### Gerileme: ad yazimi cumle ortasinda kayboluyordu
 
@@ -208,7 +241,8 @@ Kok neden `LanguageCatalog.cs`: `Names` sozlugu (`["ffmpeg"] = "FFmpeg"`) yalniz
 icin cagiriyordu:
 
 ```
-:179   builder.Append(lineStart ? CapitaliseWord(word, culture, true) : word);
+28bffb7 (T192 tur 2) LanguageCatalog.cs:179
+       builder.Append(lineStart ? CapitaliseWord(word, culture, true) : word);
 ```
 
 Sonuc, ayni sozcugun cumlenin neresinde durduguna gore farkli yazilmasiydi:
@@ -270,8 +304,13 @@ duruyordu. Dokum duzeltildi (`BiciminTests.cs:557`), fark yeniden alindi.
 
 Onemli olan: **ad yazimi duzeltmesinin 15'inden yalnizca 3'u 124'un icinde.** Kalan 12
 kalem cumle isareti tasiyor, yani `fd6fe0c1`'den **once de** govde kolundaydi; kusur
-T192'den eskiydi ve ayni duzeltmeyle kapandi. Kesisim ham olarak olculdu
-(`comm -12 kol124-anahtar.txt degisen16.txt`).
+T192'den eskiydi ve ayni duzeltmeyle kapandi. Bolme tur 5'te iki dokumden yeniden
+uretildi (`.calisma/T192-tur5/dokum-taban.txt` ve `dokum-yeni.txt` anahtar anahtar
+karsilastirilir, yalnizca `Names`'deki bir adin buyuk/kucuk harfinde ayrilan anahtarlar
+suzulur): boyle **12** anahtar var ve **hicbiri** 124'un icinde degil; 124'un icindeki uc
+kalem (`en / main.drop.hint`, `en|tr / main.reason.encoder-fallback-not-in-build`) ad
+yazimi disinda da degistigi icin bu suzgece takilmiyor. 12 + 3 = 15, dil dagilimi
+en 6 + 2 = 8, tr 6 + 1 = 7.
 
 Iki duzeltmenin **istenmeyen** bir yan etkisi yok: 49 satirin tamami elle okundu, hepsinde
 yeni cikti dil dosyasindaki yazima daha yakin. Dokum duzeltilince gorunur olan bes kalem
@@ -311,9 +350,19 @@ Bolum basliklarinin (`main.section.*`) iki dilde de cumle bicimine gecmesi ayni 
 istenen sonuc: T0 `Quality And Compatibility` ve `Cropping And Resolution` satirlarini
 kusur diye isaretlemisti.
 
-Geri kalanin buyuk cogunlugu ayni desende: `main.reason.*` gerekce cumleleri,
-`main.error.*` hata cumleleri, `playback.panel.*` bos panel metinleri. Bu uc ailenin
-**disinda** alti kalem var ve adlari `.title` / `.label` ile bitiyor:
+Bu bolumun sayilari 124 kalemin uzerinde, pimin kendi ciktisindan olculdu
+(`.calisma/T192-tur5/kol124.tsv`, 124 satir). Ailelere gore dagilim: `main.reason.*`
+gerekce cumleleri **27**, `main.error.*` hata cumleleri **7**, `playback.panel.*` bos
+panel metinleri **6** - toplam **40**, yani 124'un %32'si. Geri kalan **84** kalem
+(124 - 40) bu uc ailenin **disinda** ve tek bir desende toplanmiyor.
+
+Bu 84'un icinden dar bir kesit ayrica okundu: adi `.title` ya da `.label` ile biten
+kalemler. Boyle **13** kalem var. Asagidaki tablo bunlardan bu belgede baska bir yerde
+tartisilmayan **alti**sini gosteriyor; kalan yedisi zaten yukarida geciyor -
+`main.drop.title` (en/tr), `main.chip.whatsapp.label`, `main.chip.128.label`,
+`main.chip.180.label`, `main.retry.title` bu bolumun tablolarinda, `main.plan.title`
+ise `KnownSpelling` gerekcesinde (`:254`). 6 + 7 = 13. Tablo uc ailenin disindaki
+**butun** kalemleri degil, bu dar kesitin tartisilmamis yarisini listeliyor.
 
 | Anahtar | Yeni cikti |
 |---|---|
@@ -323,10 +372,23 @@ Geri kalanin buyuk cogunlugu ayni desende: `main.reason.*` gerekce cumleleri,
 | `en / main.advanced.min-resolution.label` | `Resolution floor (at least)` |
 | `en / settings-tab.advanced-default-open.label` | `Show advanced options expanded by default` |
 
-Altisi da tek tek okundu: adi `.title` olsa da metnin kendisi cumle bicimindedir (`How the
-engine thinks` bir tamlama degil, bir cumledir). Yani hukum degismiyor - hicbiri baslik
-gibi yazilmasi gereken bir metin degil - ama "hepsi `main.reason.*`, `main.error.*`,
-`playback.panel.*`" cumlesi kapsam olarak eksikti; duzeltildi.
+Tablodaki alti kalem tek tek okundu: adi `.title` olsa da metnin kendisi cumle
+bicimindedir (`How the engine thinks` bir tamlama degil, bir cumledir). Hukum -
+**hicbiri baslik gibi yazilmasi gereken bir metin degil** - bu alti okumaya degil,
+asagidaki pime dayaniyor: `DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir` 950
+anahtarin tamamini gezer, alti kalemi degil.
+
+Kapsam cumlesinin tarihcesi, cunku bu belgede uc kez ayni yerde bozuldu. Tur 3 "geri
+kalanin buyuk cogunlugu" ve "uc ailenin disinda alti kalem var" diyordu; uc ailenin
+disinda 84 kalem oldugu icin ikisi de yanlisti. Tur 5'in ilk denemesi bunu "tek tek
+tartisilan 16 kalem cikinca 108 kalir, 108'in 68'i uc ailenin disinda" diye yazdi; o da
+olcuye esit degildi, cunku "tek tek tartisilan" sayilabilir bir kume degil: ayni kalem
+iki tabloda birden geciyor (`main.advanced.min-fps.label`,
+`main.advanced.min-resolution.label`) ve tek tek adi gecen kalemlerin dordu
+(`main.reason.encoder-fallback-not-in-build` ve `-not-working`, iki dilde) uc ailenin
+**icinde** - yani cikarilan kume ile uc aile kumesi kesisiyor, cikarma islemi tanimsiz.
+Belge artik yalnizca olculebilen bolmeyi kullaniyor: **124 = 40 + 84**, ve 84'un
+**13**'u `.title`/`.label`, 13'un **6**'si yukaridaki tabloda.
 
 #### Pim
 
@@ -347,8 +409,10 @@ if (!basAtlandi && kaynakSozcukler[i].Any(char.IsLetter))
 
 `{0}` ve ciplak sayi harf tasimadigi icin atlanmiyor, onlardan **sonraki** sozcuk
 atlaniyordu - yani duzeltmenin dokundugu tek sozcuk olcunun kor noktasindaydi.
-`LanguageCatalog.cs:190`i `IsLetterOrDigit` -> `IsLetter` yapan mutasyonda 135 testin
-135'i yesil kaliyordu. Testin yuklemi de `IsLetterOrDigit` yapildi; ayni mutasyon artik
+`LanguageCatalog.cs:190`i `IsLetterOrDigit` -> `IsLetter` yapan mutasyonda olcu yesil
+kaliyordu; tur 3'te bu "135 testin 135'i yesil" diye yazilmisti, ama hangi suzgecle
+kosuldugu belgeye yazilmadigi icin sayi tekrarlanamaz - kaldirildi. Tekrarlanabilir
+olan sey mutasyonun kendisi, asagida. Testin yuklemi de `IsLetterOrDigit` yapildi; ayni mutasyon artik
 iki dilde de kirmizi:
 
 ```
@@ -506,8 +570,21 @@ beklenir cunku hicbir etiket sarmiyor - ama bu bir cikarim, tur 2'de olculmedi.
 
 ## K7 - temizlik
 
-T192 hicbir `//` satir yorumu eklemedi (`git diff origin/main...HEAD -- src tests |
-grep '^\+\s*//'` bos). `MainWindow.axaml` ve `MainWindow.axaml.cs` BOM tasiyor ama bu
+T192 hicbir `//` satir yorumu **eklemedi** - ama komut bos donmuyor, bir satir donuyor:
+
+```
+git diff origin/main...HEAD -- src tests | grep -P '^\+\s*//[^/]'
++            // A digit before the first letter means the word is a measurement, not a name.
+```
+
+Ayni satir eksi tarafinda da duruyor (`grep -P '^-\s*//[^/]'` ayni metni veriyor):
+yorum eklenmedi, `KnownSpelling` disari alinirken **tasindi**. Sayimla: `src` + `tests`
+altinda `//` satir yorumu `origin/main`de **872**, bu dalin ucunda **872**;
+`LanguageCatalog.cs`te iki tarafta da **5**. (`\s*//` deseni `///` XML dokumantasyonunu da
+yakaliyor - o yuzden `[^/]` eklendi; `[^/]`siz ayni komut 223 satir veriyor, 222'si
+`///`.) Ham cikti: `.calisma/T192-tur5/k18-yorum-satirlari.txt`.
+
+`MainWindow.axaml` ve `MainWindow.axaml.cs` BOM tasiyor ama bu
 BOM `origin/main`den geliyor, T192 getirmedi; ayni dosyalar main'de de ayni sekilde
 duruyor, silmek bu sozlesmenin isi degil. `owns` disina yazilmadi.
 
@@ -581,7 +658,14 @@ yoktu, madde 5'te yazdigi gibi.
 | Tur 2 sonu | 1960 | 1941 | 1 | 18 | `.calisma/T192/test-son-tur2.txt` |
 | Denetcinin kosusu (`4c8246d`) | 1960 | 1939 | 2 | 19 | `.calisma/T192-denetim-tur2/tam-kosu-benim.txt` |
 | Tur 3 sonu | 1961 | 1942 | 1 | 18 | `.calisma/T192-tur3/test-son-tur3.txt` - kirpilmamis |
-| **Tur 4 sonu** | **1961** | **1942** | **1** | **18** | `.calisma/T192-tur4/test-tam-tur4.txt` - **kirpilmamis** |
+| Tur 4 sonu | 1961 | 1942 | 1 | 18 | `.calisma/T192-tur4/test-tam-tur4.txt` - kirpilmamis |
+| **Tur 5 sonu** | **1961** | **1942** | **1** | **18** | `.calisma/T192-tur5/test-tam-tur5.txt` - **kirpilmamis** |
+
+Tur 5'in kosusu `dotnet test -c Release --no-build --logger "console;verbosity=normal"`,
+19 dk 17 sn surdu, ciktisi 2034 satir ve **tail'lenmedi**. Tek kirmizi yine
+`OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
+(adi ve yigin izi dosyanin 24-34 satirlarinda). Tur 5 hicbir uretim ya da test dosyasina
+dokunmadi - `git diff da72a19 -- src/ tests/` bos - ve toplam tur 4'le ayni.
 
 Tur 4'un kosusu `dotnet test -c Release`, 21 dk 52 sn surdu; tek kirmizi yine
 `OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
