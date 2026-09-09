@@ -195,8 +195,8 @@ public sealed class KareYerlesimTests
             {
                 var window = new MainWindow
                 {
-                    Width = double.NaN,
-                    Height = double.NaN
+                    Width = olcu.Width,
+                    Height = olcu.Height
                 };
 
                 window.Measure(olcu);
@@ -347,8 +347,8 @@ public sealed class KareYerlesimTests
             {
                 var window = new MainWindow
                 {
-                    Width = double.NaN,
-                    Height = double.NaN
+                    Width = Genis.Width,
+                    Height = Genis.Height
                 };
 
                 window.LoadWithoutProbing(OrnekYol, Ornek());
@@ -493,7 +493,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(124, toplam);
+        Assert.Equal(784, toplam);
         Assert.Equal(88, dilBasina["en"]);
         Assert.Equal(36, dilBasina["tr"]);
     }
@@ -508,9 +508,10 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
     /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
-    /// kolundan govde koluna gecen 124 metinde ilk sozcuk disindaki <c>ffmpeg</c>
+    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784)
+    /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu 950 anahtarin
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 20984 kalem)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// </summary>
     [Fact]
@@ -539,7 +540,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(950, gezilen);
+        Assert.Equal(20984, gezilen);
         Assert.Empty(kayip);
     }
 
@@ -559,4 +560,5 @@ public sealed class BaslikKapsamiTests
         Assert.True(satir > 0);
     }
 }
+
 
