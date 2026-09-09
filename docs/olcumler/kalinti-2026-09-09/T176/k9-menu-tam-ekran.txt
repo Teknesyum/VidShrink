@@ -1,0 +1,4 @@
+satir 1 basligi: Full screen
+tam ekran False -> True -> False
+secilen sekmeler: 5,2
+iz: fullscreen -> True | fullscreen -> False

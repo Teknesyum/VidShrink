@@ -1,0 +1,93 @@
+T161 K4 dosya degisimi -- fabrika cagrisi: acilista 1, dosya degisince 2
+
+T161 K4 plan degisimi -- imza zinciri
+  baslangic         : sira 1, fabrika 2, kodlama 1
+  ayni plan verildi : sira 1, gecikme kurulu False
+  yeni plan verildi : sira 2, gecikme kurulu True
+  gecikme sonrasi   : fabrika 3, kodlama 2
+
+T161 K4 ilk parca hazir -- fabrika cagrisi: parca oncesi 1, parca sonrasi 2
+
+T161 K1 durdur/baslat izgarasi -- onden hazirligin bastan baslama sayisi
+  kontrol (durdur/baslat YOK): 1
+  durdur/baslat kosumu       : 1
+  fark (fazladan cagri)      : 0
+
+T161 K4 boyut degisimi -- yerlesme sayaci ve fabrika cagrisi
+  acilista       : fabrika 1, yerlesme sayaci kurulu False
+  pano kuculunce : yerlesme sayaci kurulu True
+  tik sonrasi    : fabrika 2
+
+T161 K3 duraklatilan boru -- kare damgasi (sn)
+  duraklamadaki son kare : 0,133
+  devam eden ilk kare    : 0,167
+  fark                   : 0,033
+
+T161 K3 durdur/baslat -- boru ayakta mi
+  kaynak ornegi (fabrika cagrisi): once 2, sonra 2
+  ayakta duran boru StartAsync   : once 1, sonra 1
+  Pause/Play/Seek                : 1/1/0
+  pencere baslangici (sn)        : once 2, sonra 2
+
+T161 K4 dosya degisimi -- fabrika cagrisi: acilista 1, dosya degisince 2
+
+T161 K4 plan degisimi -- imza zinciri
+  baslangic         : sira 1, fabrika 2, kodlama 1
+  ayni plan verildi : sira 1, gecikme kurulu False
+  yeni plan verildi : sira 2, gecikme kurulu True
+  gecikme sonrasi   : fabrika 3, kodlama 2
+
+T161 K4 ilk parca hazir -- fabrika cagrisi: parca oncesi 1, parca sonrasi 2
+
+T161 K1 durdur/baslat izgarasi -- onden hazirligin bastan baslama sayisi
+  kontrol (durdur/baslat YOK): 1
+  durdur/baslat kosumu       : 1
+  fark (fazladan cagri)      : 0
+
+T161 K4 boyut degisimi -- yerlesme sayaci ve fabrika cagrisi
+  acilista       : fabrika 1, yerlesme sayaci kurulu False
+  pano kuculunce : yerlesme sayaci kurulu True
+  tik sonrasi    : fabrika 2
+
+T161 K3 duraklatilan boru -- kare damgasi (sn)
+  duraklamadaki son kare : 0,133
+  devam eden ilk kare    : 0,167
+  fark                   : 0,033
+
+T161 K3 durdur/baslat -- boru ayakta mi
+  kaynak ornegi (fabrika cagrisi): once 2, sonra 2
+  ayakta duran boru StartAsync   : once 1, sonra 1
+  Pause/Play/Seek                : 1/1/0
+  pencere baslangici (sn)        : once 2, sonra 2
+
+T161 K4 dosya degisimi -- fabrika cagrisi: acilista 1, dosya degisince 2
+
+T161 K4 plan degisimi -- imza zinciri
+  baslangic         : sira 1, fabrika 2, kodlama 1
+  ayni plan verildi : sira 1, gecikme kurulu False
+  yeni plan verildi : sira 2, gecikme kurulu True
+  gecikme sonrasi   : fabrika 3, kodlama 2
+
+T161 K4 ilk parca hazir -- fabrika cagrisi: parca oncesi 1, parca sonrasi 2
+
+T161 K1 durdur/baslat izgarasi -- onden hazirligin bastan baslama sayisi
+  kontrol (durdur/baslat YOK): 1
+  durdur/baslat kosumu       : 1
+  fark (fazladan cagri)      : 0
+
+T161 K4 boyut degisimi -- yerlesme sayaci ve fabrika cagrisi
+  acilista       : fabrika 1, yerlesme sayaci kurulu False
+  pano kuculunce : yerlesme sayaci kurulu True
+  tik sonrasi    : fabrika 2
+
+T161 K3 duraklatilan boru -- kare damgasi (sn)
+  duraklamadaki son kare : 0,133
+  devam eden ilk kare    : 0,167
+  fark                   : 0,033
+
+T161 K3 durdur/baslat -- boru ayakta mi
+  kaynak ornegi (fabrika cagrisi): once 2, sonra 2
+  ayakta duran boru StartAsync   : once 1, sonra 1
+  Pause/Play/Seek                : 1/1/0
+  pencere baslangici (sn)        : once 2, sonra 2
+

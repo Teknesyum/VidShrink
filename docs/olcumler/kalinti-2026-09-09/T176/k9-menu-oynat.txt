@@ -1,0 +1,3 @@
+satir 0 basligi: Play / pause
+oynatma False -> True -> False
+iz: play -> True | play -> False

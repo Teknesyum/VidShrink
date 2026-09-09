@@ -1,0 +1,9 @@
+K1 panel-karari kare=120 bas-medyan=-0,5 son-medyan=0,0 buyume=0,5 kaynak karesi (tavan=2)
+K3 esitsiz-girdi kaynak=4,000 kisa=3,800 ilk-tur-medyan=0,0 son-tur-medyan=24,0 buyume=24,0 kaynak karesi
+K2 sure kaynak=4,000 cikti=4,000 fark=0,000 sn (tolerans=0,067)
+K1 panel-karari kare=120 bas-medyan=-0,5 son-medyan=0,0 buyume=0,5 kaynak karesi (tavan=2)
+K3 esitsiz-girdi kaynak=4,000 kisa=3,800 ilk-tur-medyan=0,0 son-tur-medyan=24,0 buyume=24,0 kaynak karesi
+K2 sure kaynak=4,000 cikti=4,000 fark=0,000 sn (tolerans=0,067)
+K1 panel-karari kare=120 bas-medyan=-0,5 son-medyan=0,0 buyume=0,5 kaynak karesi (tavan=2)
+K3 esitsiz-girdi kaynak=4,000 kisa=3,800 ilk-tur-medyan=0,0 son-tur-medyan=24,0 buyume=24,0 kaynak karesi
+K2 sure kaynak=4,000 cikti=4,000 fark=0,000 sn (tolerans=0,067)

@@ -1,0 +1,2 @@
+PlayerView.Echo kosullari: DEBUG
+OpenedMenu ozelligi duruyor mu: False

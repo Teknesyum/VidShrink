@@ -1,0 +1,8 @@
+dosya: bozuk-ornek.mp4 (4 bayt)
+LoadStartupFileAsync bitti mi: True (2543 ms)
+once  : istisna yok metin ''
+sonra : istisna InvalidOperationException: ffprobe failed (1): [mov,mp4,m4a,3gp,3g2,mj2 @ 0000027710f12f40] moov atom not found
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\T176\bozuk-ornek.mp4: Invalid data found when processing input
+kaynak durumu gorunur True, metin 'This file cannot be used: The source file could not be decoded; it may be damaged, or this FFmpeg build does not know the format.
+ffprobe failed (1): [mov,mp4,m4a,3gp,3g2,mj2 @ 0000027710f12f40] moov atom not found
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\T176\bozuk-ornek.mp4: Invalid data found when processing input'

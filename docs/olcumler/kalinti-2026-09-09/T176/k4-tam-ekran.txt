@@ -1,0 +1,5 @@
+once      : durum 0 dikdortgen 40,60 900x700 sekme 2
+tam ekran : durum 3 dikdortgen 40,60 900x700 sekme 5
+geri donus: durum 0 dikdortgen 40,60 900x700 sekme 2
+tam ekranda tekerlek: konum 0 -> 1 sn, bosluk: oynatma True
+ikinci orta tik: tam ekran False, secilen sekmeler 5,2

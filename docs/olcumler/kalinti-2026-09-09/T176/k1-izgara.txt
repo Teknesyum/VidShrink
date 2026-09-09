@@ -1,0 +1,9 @@
+tekerlek	konum 0 -> 1 sn
+ctrl+tekerlek	konum 1 -> 11 sn
+shift+tekerlek	konum 11 -> 71 sn
+ctrl+shift+tekerlek	konum 71 -> 371 sn
+alt+tekerlek	yakinlastirma 1 -> 1.24 (konum 371 -> 371 sn)
+sag tik	oynatma False -> True
+bosluk	oynatma True -> False
+orta tik	tam ekran False -> True
+sol tik	durum 371|1.24|False|True -> 371|1.24|False|True (tiklama sayaci 0 -> 1)

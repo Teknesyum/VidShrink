@@ -1,0 +1,4 @@
+10 hizli tik, tik basi 1 sn
+hedef konum: 10 sn
+tetiklenen arama sayisi: 2
+arama hedefleri: 1, 10

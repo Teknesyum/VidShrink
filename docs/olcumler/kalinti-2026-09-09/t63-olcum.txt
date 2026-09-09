@@ -1,0 +1,69 @@
+[sayac] (a) is parcacigi duzeyi: duzeltme=1.157x yakim-duvar=1501ms (1 = saglam sayac, 0 = olculemedi)
+[sayac] uretim cikis=0 cpu=3140.625ms duvar=694ms cpu/duvar=4.525
+[sayac] (b) x264 -threads 1 #0 cikis=0 cpu=7125ms duvar=6370ms cpu/duvar=1.119
+[sayac] (b) x264 -threads 1 #1 cikis=0 cpu=7062.5ms duvar=6254ms cpu/duvar=1.129
+[sayac] (c) x264 serbest  #0 cikis=0 cpu=8578.125ms duvar=1010ms cpu/duvar=8.493
+[sayac] (c) x264 serbest  #1 cikis=0 cpu=8921.875ms duvar=1520ms cpu/duvar=5.87
+[sayac] (f) taban -threads 1 #0 cikis=0 cpu=843.75ms duvar=937ms cpu/duvar=0.9
+[sayac] (f) taban -threads 1 #1 cikis=0 cpu=781.25ms duvar=1321ms cpu/duvar=0.591
+[sayac] (g) tekrar 0: is parcacigi duzeltmesi=1.011x
+[sayac] (g) tekrar 1: is parcacigi duzeltmesi=1.011x
+[sayac] (g) tekrar 2: is parcacigi duzeltmesi=1x
+[artik] kok=C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\test-ciktilari\performance-temp\32600\ccbfe85dd62d42e9a918a10ac4d16337 once=0 sonra=0
+[bos-makine] yukleyici=15 esik=1 | bos: SoftwareLightLoad/0.957/olculdu=True | yuklu: SoftwareHeavyLoad/2.819/olculdu=True
+[gercek] cekirdek=16 karar=SoftwareLightLoad yazilim=libx264:0.872 cekirdek donanim=h264_amf:13.544x gercek zaman sure=12487ms sayac=1.923x sayac-guvenilir=False
+[bulgu] HardwarePathWorks h264_amf cekirdek=0 gercekzaman=0x katsayi=0 cpu=0ms duvar=0ms
+[bulgu] HardwarePipelineHeadroom h264_amf cekirdek=0 gercekzaman=13.544x katsayi=0 cpu=0ms duvar=443ms
+[bulgu] SoftwareRealtimeCost libx264 cekirdek=0.872 gercekzaman=0x katsayi=0 cpu=5984.375ms duvar=5229ms
+[bulgu] SoftwareCostIsSmall libx264 cekirdek=0.872 gercekzaman=0x katsayi=0 cpu=0ms duvar=0ms
+[bulgu] CpuAccountingUnreliable  cekirdek=0 gercekzaman=0x katsayi=1.923 cpu=0ms duvar=0ms
+[mutasyon] acik=HardwareOffload/h264_amf kapali=SoftwareLightLoad/ yazilim acik=0.923 kapali=0.879 donanim-gercekzaman acik=16.086x
+[atlandi] mesru deneme
+[butce] sinir=900ms gecen=955ms gecissiz taban gecen=603ms genis=60000ms gecen=11721ms karar=Unknown bulgular=NotMeasured,BudgetExhausted olculdu: dar yazilim=False donanim=False genis yazilim=True donanim=True
+[yuk] yukleyici=15 esik=1 | bos okumalar: SoftwareHeavyLoad/1.007/olculdu=True/butce=False SoftwareHeavyLoad/1.812/olculdu=True/butce=False SoftwareHeavyLoad/1.338/olculdu=True/butce=False | yuklu: SoftwareHeavyLoad/2.314/olculdu=True/butce=False | donanim: bos=Unknown/olculdu=False/butce=True yuklu=Unknown/olculdu=True/butce=True
+[atlandi] bos kosumda donanim bacagi alinamadi (butce doldu, gecen 60175ms), donanim iddiasi kurulmadi
+[sayac] (a) is parcacigi duzeyi: duzeltme=1x yakim-duvar=1500ms (1 = saglam sayac, 0 = olculemedi)
+[sayac] uretim cikis=0 cpu=2625ms duvar=1035ms cpu/duvar=2.536
+[sayac] (b) x264 -threads 1 #0 cikis=0 cpu=6375ms duvar=5806ms cpu/duvar=1.098
+[sayac] (b) x264 -threads 1 #1 cikis=0 cpu=6281.25ms duvar=5783ms cpu/duvar=1.086
+[sayac] (c) x264 serbest  #0 cikis=0 cpu=8562.5ms duvar=1319ms cpu/duvar=6.492
+[sayac] (c) x264 serbest  #1 cikis=0 cpu=9343.75ms duvar=1019ms cpu/duvar=9.17
+[sayac] (f) taban -threads 1 #0 cikis=0 cpu=796.875ms duvar=1283ms cpu/duvar=0.621
+[sayac] (f) taban -threads 1 #1 cikis=0 cpu=953.125ms duvar=788ms cpu/duvar=1.21
+[sayac] (g) tekrar 0: is parcacigi duzeltmesi=1x
+[sayac] (g) tekrar 1: is parcacigi duzeltmesi=1x
+[sayac] (g) tekrar 2: is parcacigi duzeltmesi=1x
+[artik] kok=C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\test-ciktilari\performance-temp\23804\cc25938334104a55a1708a7c1ed237db once=0 sonra=0
+[bos-makine] yukleyici=15 esik=1 | bos: SoftwareLightLoad/0.732/olculdu=True | yuklu: SoftwareHeavyLoad/1.618/olculdu=True
+[gercek] cekirdek=16 karar=SoftwareLightLoad yazilim=libx264:0.705 cekirdek donanim=:0x gercek zaman sure=8725ms sayac=1.038x sayac-guvenilir=True
+[bulgu] HardwareEncoderFailed h264_qsv cekirdek=0 gercekzaman=0x katsayi=0 cpu=0ms duvar=0ms
+[bulgu] SoftwareRealtimeCost libx264 cekirdek=0.705 gercekzaman=0x katsayi=0 cpu=5046.875ms duvar=4232ms
+[bulgu] SoftwareCostIsSmall libx264 cekirdek=0.705 gercekzaman=0x katsayi=0 cpu=0ms duvar=0ms
+[mutasyon] acik=SoftwareLightLoad/ kapali=SoftwareLightLoad/ yazilim acik=0.637 kapali=0.648 donanim-gercekzaman acik=0x
+[atlandi] mesru deneme
+[butce] sinir=900ms gecen=1127ms gecissiz taban gecen=604ms genis=60000ms gecen=8919ms karar=Unknown bulgular=NotMeasured,BudgetExhausted olculdu: dar yazilim=False donanim=False genis yazilim=True donanim=False
+[yuk] yukleyici=15 esik=1 | bos okumalar: SoftwareLightLoad/0.844/olculdu=True/butce=False SoftwareLightLoad/0.719/olculdu=True/butce=False SoftwareLightLoad/0.714/olculdu=True/butce=False | yuklu: SoftwareHeavyLoad/1.476/olculdu=True/butce=False | donanim: bos=SoftwareLightLoad/olculdu=False/butce=False yuklu=SoftwareHeavyLoad/olculdu=False/butce=False
+[atlandi] bos kosumda donanim bacagi alinamadi (kodlayici listede var ama gecisi basarisiz dondu), donanim iddiasi kurulmadi
+[sayac] (a) is parcacigi duzeyi: duzeltme=1.011x yakim-duvar=1500ms (1 = saglam sayac, 0 = olculemedi)
+[sayac] uretim cikis=0 cpu=2812.5ms duvar=2032ms cpu/duvar=1.384
+[sayac] (b) x264 -threads 1 #0 cikis=0 cpu=5203.125ms duvar=4980ms cpu/duvar=1.045
+[sayac] (b) x264 -threads 1 #1 cikis=0 cpu=5218.75ms duvar=4861ms cpu/duvar=1.074
+[sayac] (c) x264 serbest  #0 cikis=0 cpu=7578.125ms duvar=1221ms cpu/duvar=6.206
+[sayac] (c) x264 serbest  #1 cikis=0 cpu=7546.875ms duvar=1214ms cpu/duvar=6.217
+[sayac] (f) taban -threads 1 #0 cikis=0 cpu=578.125ms duvar=1017ms cpu/duvar=0.568
+[sayac] (f) taban -threads 1 #1 cikis=0 cpu=546.875ms duvar=1002ms cpu/duvar=0.546
+[sayac] (g) tekrar 0: is parcacigi duzeltmesi=1.011x
+[sayac] (g) tekrar 1: is parcacigi duzeltmesi=1.055x
+[sayac] (g) tekrar 2: is parcacigi duzeltmesi=1.021x
+[artik] kok=C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\test-ciktilari\performance-temp\3416\6957c8d0fdbc4f6982372c64c2b137d0 once=0 sonra=0
+[bos-makine] yukleyici=15 esik=1 | bos: SoftwareLightLoad/0.635/olculdu=True | yuklu: SoftwareHeavyLoad/1.26/olculdu=True
+[gercek] cekirdek=16 karar=SoftwareLightLoad yazilim=libx264:0.585 cekirdek donanim=h264_amf:15.075x gercek zaman sure=9812ms sayac=0.985x sayac-guvenilir=True
+[bulgu] HardwarePathWorks h264_amf cekirdek=0 gercekzaman=0x katsayi=0 cpu=0ms duvar=0ms
+[bulgu] HardwarePipelineHeadroom h264_amf cekirdek=0 gercekzaman=15.075x katsayi=0 cpu=0ms duvar=398ms
+[bulgu] SoftwareRealtimeCost libx264 cekirdek=0.585 gercekzaman=0x katsayi=0 cpu=4859.375ms duvar=3507ms
+[bulgu] SoftwareCostIsSmall libx264 cekirdek=0.585 gercekzaman=0x katsayi=0 cpu=0ms duvar=0ms
+[mutasyon] acik=SoftwareLightLoad/ kapali=SoftwareLightLoad/ yazilim acik=0.551 kapali=0.644 donanim-gercekzaman acik=0x
+[atlandi] mesru deneme
+[butce] sinir=900ms gecen=1105ms gecissiz taban gecen=604ms genis=60000ms gecen=9144ms karar=Unknown bulgular=NotMeasured,BudgetExhausted olculdu: dar yazilim=False donanim=False genis yazilim=True donanim=True
+[yuk] yukleyici=15 esik=1 | bos okumalar: SoftwareLightLoad/0.555/olculdu=True/butce=False SoftwareLightLoad/0.73/olculdu=True/butce=False SoftwareLightLoad/0.751/olculdu=True/butce=False | yuklu: SoftwareHeavyLoad/1.037/olculdu=True/butce=False | donanim: bos=SoftwareLightLoad/olculdu=True/butce=False yuklu=SoftwareHeavyLoad/olculdu=False/butce=False
+[atlandi] yuk altinda donanim bacagi alinamadi (kodlayici listede var ama gecisi basarisiz dondu), yuk karsilastirmasi kurulmadi

@@ -1,0 +1,4 @@
+satir 0 'Play / pause' -> play -> True
+satir 1 'Full screen' -> fullscreen -> True
+satir 2 'Reset zoom' -> zoomreset -> 1
+satir sayisi: 3

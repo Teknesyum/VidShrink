@@ -1,0 +1,36 @@
+T50 K3 ayni planla bes SetPlan -> siraya konan kodlama: 0; plan degisince: 1
+T50 sinir maliyeti, eski surecin olumu ms: 26 61 74 64 53
+T50 sinir maliyeti, yeni surecin acilisi ms: 7 23 16 11 9
+T50 sinir maliyeti, ilk karenin beklenmesi ms: 908 204 932 229 131
+T50 ESKI YOL boru yeniden kurulmasi (640x360 kaynak), ms: 512 478 514 412 652
+T50 devirle sinir boslugu (640x360 kaynak, pay 0,16 sn), ms: 202 1817 324 699 112
+T50 devirde atlanan icerik (640x360 kaynak, pay 0,16 sn), ms: 0 67 0 0 0
+T50 ESKI YOL boru yeniden kurulmasi (1080p kaynak), ms: 578 1081 896 805 280
+T50 devirle sinir boslugu (1080p kaynak, pay 0,16 sn), ms: 534 597 1073 954 200
+T50 devirde atlanan icerik (1080p kaynak, pay 0,16 sn), ms: 0 0 133 0 0
+T50 K1 rozet: parca=[PROCESSED · CRF 22]
+T50 K1 rozet: dil degisince=[İŞLENMİŞ · CRF 22]
+T50 K3 ayni planla bes SetPlan -> siraya konan kodlama: 0; plan degisince: 1
+T50 sinir maliyeti, eski surecin olumu ms: 19 26 32 15 17
+T50 sinir maliyeti, yeni surecin acilisi ms: 3 3 4 5 4
+T50 sinir maliyeti, ilk karenin beklenmesi ms: 124 139 126 123 138
+T50 ESKI YOL boru yeniden kurulmasi (640x360 kaynak), ms: 158 181 146 139 167
+T50 devirle sinir boslugu (640x360 kaynak, pay 0,16 sn), ms: 118 633 571 627 624
+T50 devirde atlanan icerik (640x360 kaynak, pay 0,16 sn), ms: 0 0 0 0 0
+T50 ESKI YOL boru yeniden kurulmasi (1080p kaynak), ms: 158 161 745 165 161
+T50 devirle sinir boslugu (1080p kaynak, pay 0,16 sn), ms: 584 108 631 133 125
+T50 devirde atlanan icerik (1080p kaynak, pay 0,16 sn), ms: 0 0 0 0 0
+T50 K1 rozet: parca=[PROCESSED · CRF 22]
+T50 K1 rozet: dil degisince=[İŞLENMİŞ · CRF 22]
+T50 K3 ayni planla bes SetPlan -> siraya konan kodlama: 0; plan degisince: 1
+T50 sinir maliyeti, eski surecin olumu ms: 26 22 22 22 21
+T50 sinir maliyeti, yeni surecin acilisi ms: 5 5 5 5 5
+T50 sinir maliyeti, ilk karenin beklenmesi ms: 139 138 132 140 131
+T50 ESKI YOL boru yeniden kurulmasi (640x360 kaynak), ms: 152 149 156 160 157
+T50 devirle sinir boslugu (640x360 kaynak, pay 0,16 sn), ms: 100 589 103 108 567
+T50 devirde atlanan icerik (640x360 kaynak, pay 0,16 sn), ms: 0 0 0 0 0
+T50 ESKI YOL boru yeniden kurulmasi (1080p kaynak), ms: 166 150 167 172 153
+T50 devirle sinir boslugu (1080p kaynak, pay 0,16 sn), ms: 104 542 552 550 547
+T50 devirde atlanan icerik (1080p kaynak, pay 0,16 sn), ms: 0 0 0 0 0
+T50 K1 rozet: parca=[PROCESSED · CRF 22]
+T50 K1 rozet: dil degisince=[İŞLENMİŞ · CRF 22]

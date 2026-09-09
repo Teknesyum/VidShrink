@@ -1,0 +1,4 @@
+klip: kalip-kanit-20sn.mkv
+uretim suresi: 763 ms
+stderr bayt sayisi: 4719
+windows anonim boru tamponu: 4096 bayt

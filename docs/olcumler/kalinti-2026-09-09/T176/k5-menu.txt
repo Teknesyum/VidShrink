@@ -1,0 +1,3 @@
+en: Play / pause | Full screen | Reset zoom
+tr: Oynat / duraklat | Tam ekran | Yakınlaştırmayı sıfırla
+menu izi: menu

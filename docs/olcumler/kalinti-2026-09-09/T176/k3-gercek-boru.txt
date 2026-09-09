@@ -1,0 +1,10 @@
+klip: girdi-20sn.mkv sure 20 sn
+10 hizli tik (tik basi 1 sn) -> hedef 10 sn, ulasilan konum 10 sn
+tetiklenen arama sayisi: 2
+arama hedefleri: 1, 10
+arama gecikmeleri (ms): 58.3, 76.9
+toplam sure: 135,3 ms
+ffmpeg surec sayisi: 0 -> 2
+T175 150 ms sinirini asan arama: 0
+null donen arama (T175 yeniden baslatma tavani): 0
+arama hatalari: yok

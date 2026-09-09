@@ -1,0 +1,5 @@
+sekme sayisi: 6
+oynatici sirasi: 0
+en: beklenen 'Player' goruldu 'Player'
+tr: beklenen 'Oynatıcı' goruldu 'Oynatıcı'
+sekme temalari: TabItem

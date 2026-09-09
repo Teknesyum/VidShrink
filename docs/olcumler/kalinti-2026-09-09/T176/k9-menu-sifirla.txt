@@ -1,0 +1,3 @@
+satir 2 basligi: Reset zoom
+yakinlastirma 1 -> 1.72 -> 1
+iz: zoom 3 -> 1,72 | zoomreset -> 1

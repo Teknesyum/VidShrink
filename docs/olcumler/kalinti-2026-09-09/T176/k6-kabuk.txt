@@ -1,0 +1,5 @@
+argv: C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\T176\kabuk-ornek.mp4
+ResolveStartupPath: C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T0main\.calisma\T176\kabuk-ornek.mp4
+oynatici sekme sirasi: 0
+acilistaki sekme: 1 -> 0
+sekme basligi: Player

@@ -1,0 +1,28 @@
+T137/T1 App gecidi olcemeyen : Unmeasured / IsMeasured=False
+T137/T1 App gecidi calismayan: NotWorking / IsMeasured=True
+PlanCalculatorProbeTests: atlandi, makinede baska ffmpeg kosuyor
+PlanCalculatorProbeTests: atlandi, makinede baska ffmpeg kosuyor
+t151 tarama maliyeti: 8 yoklama x 20 ms = 220 ms
+gecit libsvtav1: 351 ms, esik 2000 ms, karar Working, beklenen Working
+libsvtav1 dogrudan yoklama: Working, 272 ms
+PlanCalculatorProbeTests: atlandi, makinede baska ffmpeg kosuyor
+T137/T1 App gecidi olcemeyen : Unmeasured / IsMeasured=False
+T137/T1 App gecidi calismayan: NotWorking / IsMeasured=True
+isitma sirasi: SDR ilk 0 surec 0 ms | SDR ikinci 0 surec 0 ms | HDR ilk 2 surec 136 ms | HDR ikinci 0 surec 0 ms
+gercek ffmpeg SDR: 0 surec, 0 ms
+gercek ffmpeg HDR: 2 surec, 143 ms
+t151 tarama maliyeti: 8 yoklama x 20 ms = 204 ms
+gecit libsvtav1: 121 ms, esik 2000 ms, karar Working, beklenen Working
+libsvtav1 dogrudan yoklama: Working, 120 ms
+libsvtav1 yoklamasi 8 tekrar: 178, 121, 122, 170, 122, 114, 121, 118 ms
+gercek ffmpeg HDR tek olcu: 2 surec, 140 ms, secilen kodlayici av1_nvenc
+T137/T1 App gecidi olcemeyen : Unmeasured / IsMeasured=False
+T137/T1 App gecidi calismayan: NotWorking / IsMeasured=True
+isitma sirasi: SDR ilk 0 surec 0 ms | SDR ikinci 0 surec 0 ms | HDR ilk 2 surec 128 ms | HDR ikinci 0 surec 0 ms
+gercek ffmpeg SDR: 0 surec, 0 ms
+gercek ffmpeg HDR: 2 surec, 121 ms
+t151 tarama maliyeti: 8 yoklama x 20 ms = 260 ms
+gecit libsvtav1: 104 ms, esik 2000 ms, karar Working, beklenen Working
+libsvtav1 dogrudan yoklama: Working, 103 ms
+libsvtav1 yoklamasi 8 tekrar: 102, 109, 111, 102, 116, 106, 99, 102 ms
+gercek ffmpeg HDR tek olcu: 2 surec, 121 ms, secilen kodlayici av1_nvenc

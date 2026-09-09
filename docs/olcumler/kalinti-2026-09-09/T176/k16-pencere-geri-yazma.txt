@@ -1,0 +1,5 @@
+once     : durum 0 dikdortgen 140,90 900x700
+tam ekran: durum 3 dikdortgen 0,0 1920x1080
+kaydirildi: durum 0 dikdortgen 500,480 400x300
+geri     : durum 0 dikdortgen 140,90 900x700
+arka uc: Win32

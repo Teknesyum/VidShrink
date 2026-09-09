@@ -1,0 +1,14 @@
+K9 pencere sinirinda boru yeniden kurulmasi (640x360 kaynak), ms: 523 389 311 275 849
+K9 pencere sinirinda boru yeniden kurulmasi (1080p kaynak), ms: 179 249 491 299 917
+K1 1080p 5 sn pencere, ms: 1454 1405 1892 1511 1569
+K2 MAD hizali=1,15 pencere-ortasi=1,48 hizasiz=12,52
+K6 bozuk kaynak sebebi: playback.error.engine · tani: [in#0 @ 000001f1fc33d600] moov atom not found  [in#0 @ 000001f1fc2a43c0] Error opening input: Invalid data found when pr
+K5 20 istek sonrasi kalan dosya: 4
+K9 pencere sinirinda boru yeniden kurulmasi (640x360 kaynak), ms: 149 146 169 154 717
+K9 pencere sinirinda boru yeniden kurulmasi (1080p kaynak), ms: 179 174 258 208 160
+K1 1080p 5 sn pencere, ms: 1329 843 1407 1554 1222
+K2 MAD hizali=1,15 pencere-ortasi=1,48 hizasiz=12,52
+K6 bozuk kaynak sebebi: playback.error.engine · tani: [in#0 @ 000001c0637895c0] moov atom not found  [in#0 @ 000001c0636f65c0] Error opening input: Invalid data found when pr
+K5 20 istek sonrasi kalan dosya: 4
+K9 pencere sinirinda boru yeniden kurulmasi (640x360 kaynak), ms: 166 152 152 150 159
+K9 pencere sinirinda boru yeniden kurulmasi (1080p kaynak), ms: 157 155 152 156 166

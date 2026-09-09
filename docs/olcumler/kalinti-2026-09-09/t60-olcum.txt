@@ -1,0 +1,78 @@
+# K2 ses eszamani — 2026-09-08 20:52:11
+kaynak 30: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 60: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 25: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 30000/1001: goruntu 4 sn, ses 4 sn, fark 0 sn
+# K2 iki gecis — 2026-09-08 20:52:14
+ilk gecis 60 kare, ikinci gecis 60 kare
+# K2 boyut tahmini — 2026-09-08 20:52:15
+tahmin 0,349 MB, gercek 0,34 MB, oran 0,975
+# K1 kare sayisi ve sure — 2026-09-08 20:52:15
+kaynak 30 (30 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 30 (30 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 30: kare 120 (beklenen 120), sure 4 sn, sapma 0 sn
+kaynak 25 (25 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 25 (25 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 30000/1001 (29,97 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 30000/1001 (29,97 fps, 4 sn) -> hedef 24: kare 95 (beklenen 96), sure 3,958 sn, sapma -0,042 sn
+# K2 donanim yollari — 2026-09-08 20:52:21
+h264_nvenc: yok, atlandi
+hevc_nvenc: yok, atlandi
+av1_nvenc: yok, atlandi
+h264_qsv: yok, atlandi
+h264_amf: kare 60 (beklenen 60)
+denenen donanim kodlayici: 1
+# K2 ses eszamani — 2026-09-09 00:37:12
+kaynak 30: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 60: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 25: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 30000/1001: goruntu 4 sn, ses 4 sn, fark 0 sn
+# K2 iki gecis — 2026-09-09 00:37:17
+ilk gecis 60 kare, ikinci gecis 60 kare
+# K2 boyut tahmini — 2026-09-09 00:37:19
+tahmin 0,349 MB, gercek 0,34 MB, oran 0,975
+# K1 kare sayisi ve sure — 2026-09-09 00:37:20
+kaynak 30 (30 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 30 (30 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 30: kare 120 (beklenen 120), sure 4 sn, sapma 0 sn
+kaynak 25 (25 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 25 (25 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 30000/1001 (29,97 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 30000/1001 (29,97 fps, 4 sn) -> hedef 24: kare 95 (beklenen 96), sure 3,958 sn, sapma -0,042 sn
+# K2 donanim yollari — 2026-09-09 00:37:31
+h264_nvenc: yok, atlandi
+hevc_nvenc: yok, atlandi
+av1_nvenc: yok, atlandi
+h264_qsv: yok, atlandi
+h264_amf: kare 60 (beklenen 60)
+denenen donanim kodlayici: 1
+# K2 ses eszamani — 2026-09-09 00:49:08
+kaynak 30: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 60: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 25: goruntu 4 sn, ses 4 sn, fark 0 sn
+kaynak 30000/1001: goruntu 4 sn, ses 4 sn, fark 0 sn
+# K2 iki gecis — 2026-09-09 00:49:11
+ilk gecis 60 kare, ikinci gecis 60 kare
+# K2 boyut tahmini — 2026-09-09 00:49:12
+tahmin 0,349 MB, gercek 0,34 MB, oran 0,975
+# K1 kare sayisi ve sure — 2026-09-09 00:49:13
+kaynak 30 (30 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 30 (30 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 60 (60 fps, 4 sn) -> hedef 30: kare 120 (beklenen 120), sure 4 sn, sapma 0 sn
+kaynak 25 (25 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 25 (25 fps, 4 sn) -> hedef 24: kare 96 (beklenen 96), sure 4 sn, sapma 0 sn
+kaynak 30000/1001 (29,97 fps, 4 sn) -> hedef 15: kare 60 (beklenen 60), sure 4 sn, sapma 0 sn
+kaynak 30000/1001 (29,97 fps, 4 sn) -> hedef 24: kare 95 (beklenen 96), sure 3,958 sn, sapma -0,042 sn
+# K2 donanim yollari — 2026-09-09 00:49:19
+h264_nvenc: yok, atlandi
+hevc_nvenc: yok, atlandi
+av1_nvenc: yok, atlandi
+h264_qsv: yok, atlandi
+h264_amf: kare 60 (beklenen 60)
+denenen donanim kodlayici: 1
