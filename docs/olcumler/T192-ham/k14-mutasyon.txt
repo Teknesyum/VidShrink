@@ -1,0 +1,85 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+  VidShrink.Core -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\src\VidShrink.Core\bin\Release\net8.0\VidShrink.Core.dll
+  VidShrink.Ffmpeg -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\src\VidShrink.Ffmpeg\bin\Release\net8.0\VidShrink.Ffmpeg.dll
+  VidShrink.Ab -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\tools\VidShrink.Ab\bin\Release\net8.0\VidShrink.Ab.dll
+  VidShrink.Bench -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\tools\VidShrink.Bench\bin\Release\net8.0\VidShrink.Bench.dll
+  VidShrink.App -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.dll
+  VidShrink.Tests -> C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+VSTest sürümü 17.11.1 (x64)
+
+Test yürütmesi başlatılıyor, lütfen bekleyin...
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+  Başarısız VidShrink.Tests.LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(language: "en") [34 ms]
+  Hata İletisi:
+   Dil 'en': 276 govde degeri, 4327 sozcuk; 14 sozcuk bozuldu:
+main.section.advanced.overrides: 'set' -> 'Set'
+main.fast-gpu.off-usable: 'passed' -> 'Passed'
+main.fast-gpu.bitrate-floor: 'only' -> 'Only'
+main.fast-gpu.on-against-advice: 'the' -> 'The'
+main.fast-gpu.off-as-advised: 'so' -> 'So'
+main.shrink-job.missing-paths: 'of' -> 'Of'
+main.convert.frame-rate.tip: 'is' -> 'Is'
+main.convert.frame-rate.tip: 'suits' -> 'Suits'
+main.convert.frame-rate.tip: 'gives' -> 'Gives'
+main.convert.audio-bitrate.tip: 'is' -> 'Is'
+main.about.tool-missing: 'not' -> 'Not'
+settings.share.can-delete: 'hands' -> 'Hands'
+settings.share.no-delete-window: 'hands' -> 'Hands'
+settings.share.no-delete: 'hands' -> 'Hands'
+Ad duzeltmesi (8):
+main.drop.hint: 'ffmpeg' -> 'FFmpeg'
+main.error.generic: 'ffmpeg' -> 'FFmpeg'
+main.error.undecodable: 'ffmpeg' -> 'FFmpeg'
+main.reason.encoder-fallback-not-in-build: 'ffmpeg' -> 'FFmpeg'
+main.reason.manual-mode-superseded-by-crf: 'crf' -> 'CRF'
+main.advice.encoder-fallback-not-in-build: 'ffmpeg' -> 'FFmpeg'
+settings-tab.ffmpeg-path.hint: 'ffmpeg' -> 'FFmpeg'
+settings-tab.ffmpeg-path.error: 'ffmpeg' -> 'FFmpeg'
+  Yığın İzleme:
+     at VidShrink.Tests.LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(String language) in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\tests\VidShrink.Tests\LanguageTests.cs:line 1130
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+  Başarısız VidShrink.Tests.LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(language: "tr") [10 ms]
+  Hata İletisi:
+   Dil 'tr': 232 govde degeri, 3074 sozcuk; 25 sozcuk bozuldu:
+main.fast-gpu.off-usable: 'ölçümü' -> 'Ölçümü'
+main.fast-gpu.bitrate-floor: 'ancak' -> 'Ancak'
+main.fast-gpu.on-against-advice: 'ölçüm' -> 'Ölçüm'
+main.fast-gpu.off-as-advised: 'hızlı' -> 'Hızlı'
+main.retry.outcome: 'deneme' -> 'Deneme'
+main.run.done: 'denemede' -> 'Denemede'
+main.run.over-ceiling: 'denemede' -> 'Denemede'
+main.convert.frame-rate.tip: 'daha' -> 'Daha'
+main.convert.frame-rate.tip: 'çoğu' -> 'Çoğu'
+main.convert.frame-rate.tip: 'sinema' -> 'Sinema'
+main.convert.custom-fps.tip: 'veya' -> 'Veya'
+main.convert.audio-bitrate.tip: 'kompakt' -> 'Kompakt'
+main.about.scenario.body: 'katlık' -> 'Katlık'
+main.about.tool-missing: 'bulunamadı.' -> 'Bulunamadı.'
+main.reason.encoder-fallback-not-in-build: 'kodlayıcısı' -> 'Kodlayıcısı'
+main.reason.encoder-fallback-not-measured: 'kodlayıcısı' -> 'Kodlayıcısı'
+main.reason.encoder-fallback-not-working: 'kodlayıcısı' -> 'Kodlayıcısı'
+main.reason.hardware-bitrate-bias: 'donanım' -> 'Donanım'
+main.validation.container-video-encoder: 'kapsayıcısı' -> 'Kapsayıcısı'
+main.validation.container-audio-encoder: 'kapsayıcısı' -> 'Kapsayıcısı'
+main.validation.container-video-copy: 'kapsayıcısı' -> 'Kapsayıcısı'
+main.validation.container-audio-copy: 'kapsayıcısı' -> 'Kapsayıcısı'
+settings.share.can-delete: 'silme' -> 'Silme'
+settings.share.no-delete-window: 'gönderene' -> 'Gönderene'
+settings.share.no-delete: 'gönderene' -> 'Gönderene'
+Ad duzeltmesi (7):
+main.error.generic: 'Ffmpeg'in' -> 'FFmpeg'in'
+main.error.undecodable: 'ffmpeg' -> 'FFmpeg'
+main.reason.encoder-fallback-not-in-build: 'ffmpeg' -> 'FFmpeg'
+main.reason.manual-mode-superseded-by-crf: 'crf' -> 'CRF'
+main.advice.encoder-fallback-not-in-build: 'ffmpeg' -> 'FFmpeg'
+settings-tab.ffmpeg-path.hint: 'ffmpeg' -> 'FFmpeg'
+settings-tab.ffmpeg-path.error: 'ffmpeg' -> 'FFmpeg'
+  Yığın İzleme:
+     at VidShrink.Tests.LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(String language) in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T192\tests\VidShrink.Tests\LanguageTests.cs:line 1130
+   at InvokeStub_LanguageTests.DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+Başarısız! - Başarısız:     2, Başarılı:     0, Atlanan:     0, Toplam:     2, Süre: 8 ms - VidShrink.Tests.dll (net8.0)

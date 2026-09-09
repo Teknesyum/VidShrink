@@ -1,65 +1,96 @@
-# Handoff — 2026-09-09
+# Devir notu — 9 Eylul 2026
 
-Önce task, sonra changed_files oku. İlk bitmemiş parçadan sür; diff'in gösterdiğini yeniden
-yapma, yeniden doğrulama.
+Bir onceki devir notundaki dort adimin **ilk ikisi bitti ve muhurlendi**. `main` ilk kez
+tumuyle yesil. Kalan is: kareler, README, 0.3.1.
 
-## changed_files
-Bu devirde eklenenler (hepsi commit'li):
-- `docs/inceleme/ui-denetim-2026-09-08.md` — arayüz denetim raporu, §8 geçerlilik bölümü eklendi
-- `docs/inceleme/ui-denetim-2026-09-08/` — 5 ham ajan çıktısı + 15 ekran görüntüsü
-- `tools/gorunum-yakalama/` — ss/click/kirp betikleri + AGENTS.md
+## Durum
 
-## tests_run
-- `dotnet test` — **1946 başarılı, 1 başarısız, 18 atlanan, 17 dk 35 sn.**
-- Düşen ölçü: `OynaticiBoruTests.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`.
-  Bu dalın işiyle ilgisi yok — yükseltilmemiş oturumda PID 4 üzerinde `HasExited` okuyan
-  bir fikstür kusuru. `main`de `712c196` ile çözülmüş, bu dal 55 commit geride olduğu için
-  düzeltme burada yok. **Dal `main`e güncellenince kendiliğinden yeşile döner**; ayrı bir
-  düzeltme yazma.
+`main` = `aa03efc`. Acik sozlesme **yok** (`.claude/relay/contracts/` altinda yalniz
+`done/`). Calisan ajan yok. Worktree birikintisi yok — `VidShrink-T192` ve
+`VidShrink-T193` kaldirildi.
 
-## plan
-`docs/plan.md`. Uygulanmış dil/tema planı `trash/plan-diller-tema-2026-09-09.md`.
+Tam suit, T192 ve T193 birlestikten sonra, `VidShrink-T0main` agacinda:
 
-## task
-İki iş açık, ikisi de karar bekliyor:
+```
+Basarisiz: 0, Basarili: 1937, Atlanan: 24, Toplam: 1961, Sure: 21 dk 47 sn
+```
 
-**1. `claude/tema-paleti` dalı `main`e birleşmedi.** 18 commit: palet ayrı dosyaya alındı,
-20 hazır tema, dil altyapısı n dile açıldı, 40 dil, sağdan sola akış, oynatıcı açılış yolu.
-Dal `origin` ile eşitli (0/0). `main`in 55 commit'i (T192/T193 motor işleri) bu dalda yok.
-**Yalnız T0 `main`e birleştirir** — birleştirmeyi kendi başına yapma, kullanıcıya sor.
+## Bugun kapananlar
 
-**2. Arayüz denetim raporunun 56 bulgusundan hiçbiri uygulanmadı.** Rapor 8 Eylül'de
-`44f4593` üzerinde yazıldı, sonrasındaki 18 commit bazılarını çoktan kapattı.
-Raporun **§8 Geçerlilik** bölümü hangisinin açık hangisinin kapalı olduğunu grep kanıtıyla
-söyler. Uygulamaya oradan başla, raporun gövdesindeki satır numaralarına körlemesine güvenme.
+**T189 — ekran goruntusu duzenegi.** Dort tur. 14/14 kare belirlenimli. Son fark kaynagi
+`Pulse`'un 160 ms'lik opaklik zamanlayicisiydi; duzeltme yalnizca duzenek tarafinda
+(`src/VidShrink.App/` diff = 0 satir), bagimsiz piksel olcumuyle dogrulandi.
 
-## steer
-- Denetim salt okumaydı; kod değiştirilmedi. Düzeltmeye geçmek ayrı bir karar.
-- **Sırayı kullanıcı seçer.** Raporun 7. bölümünde bir öneri var, emir değil.
-- Renk ve ölçü uydurma: renk `Themes/Palette/`, ölçü `Themes/Theme.axaml`.
-- Git'e giremeyen dosyalar `D:\!Tmp\Projeler\VidShrink-devir-2026-09-09\` altında,
-  yanında `OKU.md` neyin neden orada olduğunu yazar. `.calisma/` (6,2 GB) kopyalanmadı.
+**T192 — ad ve birim yazimi.** Bes tur. Kok sebep `LanguageCatalog.cs`'in `Sentence()`
+govdesi: ad sozlugu yalnizca satir basi sozcugune uygulaniyordu, `FFmpeg` cumle
+ortasinda `ffmpeg`e dusuyordu. 950 anahtarin 163'unun ciktisi degisti, 124'u kol
+degistirdi. Uretim degisikligi pimlendi (`LanguageTests.cs:1110`; mutasyon en 14 + tr 25
+= 39 sozcuk kirmizi).
 
-## decisions
-- Denetimin ham kanıtı gizlenmedi: beş ajanın çıktısı ve seçilen kareler `docs/` altında,
-  rapor onlara bağ veriyor. Toplam maliyet 719.607 token, en uzun ajan 304 sn.
-- Dört bulgu kanıtla çürütüldü ve rapordan düşürüldü (§4): sekme hayalet metni (çapraz geçiş
-  artefaktı), oynatıcının sahte desen göstermesi (kaynak klibin kendisi sınama deseni),
-  iş penceresinin İngilizce açılması (dili denetim sırasında ben değiştirmiştim),
-  16 MB'ın reddi (doğrulama doğru çalışıyor).
-- 9 Eylül geçerlilik denetiminde **1.2 ve 1.3 kapandı**: `MainWindow.axaml.cs:2513-2519`
-  dosyayla açılışta Oynatıcı sekmesine geçip `Player.OpenAsync(path)` çağırıyor.
-  Gözlemim ("Yüklü Dosya Yok") doğruydu, teşhisim ("sekme ezileniyor") yanlıştı.
-- **1.7 de kapandı**: ayar yazımları `Save(SettingsPathOverride)`e çevrilmiş.
-- Hâlâ açık ve doğrulanmış: 1.1, 1.4, 1.5, 1.6, 1.8, 1.10, 1.11, 1.14 ve `RadioButton`
-  teması. 1.9/1.12/1.13/1.15 ve 2. bölümün tamamı yeniden doğrulanmadı.
-- `.calisma/` 6,2 GB; kopyalamak pahalı ve içeriği yeniden üretilebilir — kopyalanmadı,
-  `OKU.md` içinde tek satırlık `robocopy` komutu duruyor.
+**T193 — max sikistirma modu. Acilmiyor, ve bu artik olculmus bir hukum.** Uc anahtar:
+`qcomp` 4312 bayt (gurultu esigi 66614), `zones` 7660 bayt, `qp-scale-compress-strength`
+p10 **+0,471** (esik +0,50) ve en kotu sahne **-0,248** (esik +1,00, isaret ters). Son
+anahtar gercekten calisiyor — VMAF gurultu tabani 0,061 olculdu, kazanc gurultu degil —
+ama esige yetmiyor. Denetci "olcumu genisletmek acar mi" sorusuna sayiyla hayir dedi.
 
-## next_action
-1. Kullanıcıya iki soruyu sor (dal birleştirme, düzeltme sırası) ve cevabı bekle.
-2. Sıra gelirse: raporun §8'inden başla, açık bulguyu uygula, `dotnet test` yeşil tut,
-   her bulgu kendi commit'inde.
-3. §8'de "bakmadım" diyen maddelere dokunmadan önce grep'le doğrula — özellikle 2.9
-   (`Locales/` 2 dilden 42 dile çıktı, satır numaraları kaydı) ve 2.16-2.18 (palet
-   mimarisi tümden değişti).
+**Yan is:** `KillTree` olcusu main'de kirmiziydi (T192/T193 disi). `712c196` ile kapatildi:
+PID 4 uzerinde `HasExited` yoklamasi `Win32Exception`a karsi korundu. **Bedeli:** olcu
+artik yalnizca yukseltilmis oturumda gercekten kosuyor.
+
+## Devam dendiginde kosulacak uc adim
+
+1. **Kareleri yenile.** `dotnet run --project tools/VidShrink.Shot`. T192'nin K5'inde
+   "T0'a birakildi" diye isaretli; T189 ve T192 birlestigi icin artik onu bekleyen yok.
+   Cikan kareler `docs/gorseller/` altina.
+
+2. **T190 README** — EN + TR, mermaid semalari, yeni kareler. Bittiginde fable gorusu al
+   (`advice.js`), donen metni `docs/danisma/` altina tam metin yaz.
+
+3. **0.3.1'i kes.** Girecekler: T176 (oynatici girdisi), T185 (oynatici sekmesi en sola),
+   T188 (kabuk entegrasyonu), T191 (kabuk klasoru), T189, T192, T193, `712c196`.
+   `v0.3.0` etiketi `3a6351a7`'de; bunlarin hicbiri yayindaki ikilide yok.
+
+## Kapanmayan borc — surum notunda soylenmeli
+
+Kabuk paketini isletim sistemine tanitan tek yer `Install-VidShrink.ps1`. Uygulamada ya
+da baslaticida `Add-AppxPackage -Register` cagiran kod yok. **Asil kilit imzalama** —
+T188 uretimde `0x800B0100` olctu. 0.3.1 bunu kapatmiyor.
+
+## Muhurlerde duran acik borclar
+
+**T192:** `:169`'un gosterdigi `dokum-fark.txt` 163 kayit tasiyor ama cumle 123 diyor;
+`:5` ham ciktilarin yerini eksik veriyor; `:26`/`:300` `BiciminTests.TumCiktiDokulur`
+yaziyor, metot `BaslikKapsamiTests` sinifinda. Ayrica `ShrinkJobWindow.axaml.cs:274`
+hala `InvariantCulture` ile kullaniciya gorunen metin uretiyor (ayri is).
+
+**T193:** gurultu tabani n=3 ile olculdu ve bu kisit belgede yazili degil (daha genis
+tabanla ~0,15 cikardi, hukum donmezdi); uclunun 1. kosumu taze degil, K5'ten devralinmis
+dosya; `.gitattributes` sozlesmenin `owns` listesi disindaydi, T0 riski olcup kabul etti.
+
+**T189:** alti muhurlu borc — `oynatici-en` yuk altinda 1/14, ucuncu `Pulse` cagri yeri
+(`MainWindow.axaml.cs:413-418`) kapsamsiz, `Program.cs` BOM tasiyor, kosuma bagli "54",
+capraz makine tekrarlanabilirligi, `.sln`.
+
+## Raftakiler
+
+T186 (ayar arayuzu yeniden tasarimi), T187 (tasma teklifi, %3, dort secenek).
+T172'nin `QualityFloorTargetMb` (`PlanCalculator.cs:868`) hala kodek kor.
+T171'in acik borclari 3-6.
+
+## Bu oturumun ogrettigi iki sey
+
+**Deponun imza kusuru dorduncu kez cikti** ve dorduncusunu T0 uretti: T192 tur 5
+sozlesmesine yazdigim 16/108/68 bolmesi hem olculemezdi hem aritmetigi yanlisti. Yapici
+reddetti, denetci reddi dogruladi. Sayiyi sozlesmeye yazmadan once bolmenin **sayilabilir**
+oldugunu dogrula.
+
+**Worktree'yi denetci icindeyken kaldirdim.** Denetcinin tam suit kosumu bozuldu (toplam
+test 1925'ten 1867'ye dustu, 58 test yok oldu). Denetci bunu kendi yakalayip sayilarini
+gecersiz ilan etti. `git worktree remove` yalnizca o agactaki butun ajanlar bittikten
+sonra.
+
+## Git disindaki dosyalar
+
+`.calisma/` birikintisi (134 MB, cogu `t57`) `D:\!Tmp\Projeler\VidShrink-calisma`
+altina tasindi. Rapora giren her sayi zaten depoda: `docs/olcumler/T192-ham/` (17 dosya)
+ve `docs/olcumler/T193-ham/` (JSON'lar + 24 stderr dokumu).

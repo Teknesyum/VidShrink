@@ -1,0 +1,29 @@
+{
+  "Pencere": "p2-durgun",
+  "Duration": 60,
+  "Fps": 60,
+  "Scenes": [
+    {
+      "Index": 0,
+      "Start": 0,
+      "End": 28.333,
+      "Bits": 4323544,
+      "Complexity": 0.6501772430743447
+    },
+    {
+      "Index": 1,
+      "Start": 28.333,
+      "End": 56.85,
+      "Bits": 8555856,
+      "Complexity": 1.2783332171206552
+    },
+    {
+      "Index": 2,
+      "Start": 56.85,
+      "End": 60,
+      "Bits": 1202680,
+      "Complexity": 1.6267618474110703
+    }
+  ],
+  "TaramaSaniye": 5.4323859
+}

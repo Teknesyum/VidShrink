@@ -1,0 +1,950 @@
+DOKUM	en	main.about.ai.body	• AI mode only creates a prompt and validates pasted JSON. • No AI is embedded, so VidShrink works offline, asks for no API key, and falls back to the complete automatic engine when an answer is malformed or incompatible.
+DOKUM	en	main.about.ai.title	AI Mode
+DOKUM	en	main.about.codecs.body	• H.264 offers the broadest compatibility. • H.265 compresses more efficiently. • VP9 is a strong WebM choice. • AV1 maximizes modern compression at higher CPU cost. • Stream copy is fastest and lossless when the destination supports the source streams.
+DOKUM	en	main.about.codecs.title	Codecs
+DOKUM	en	main.about.engine.body	• Most size-target compressors apply a fixed table: this many megabytes per minute becomes that resolution. • That table is wrong for every clip that is not average. • VidShrink measures instead. It encodes short samples of your actual file at two resolutions and reads how many bits it really costs, and how much of that cost disappears when the picture is scaled down. • Those two measurements make the plan specific to this clip rather than to video in general.
+DOKUM	en	main.about.engine.title	How the engine thinks
+DOKUM	en	main.about.intro	• VidShrink is an offline tool for target-size video compression and format conversion. • Give it a file and a size ceiling; it works out the settings that lose the least of what a person can actually see, and never returns a file larger than you asked for.
+DOKUM	en	main.about.loss.body	• Below a certain bit budget something has to give. • The engine spends the loss where the eye is least sensitive: softness before blocking, fewer pixels before broken pixels, mono audio before a starved picture. • It also knows when to stop — once quality reaches the point where more bits buy nothing you could see, it hands back a smaller file instead of padding it to the target.
+DOKUM	en	main.about.loss.title	Where the loss goes
+DOKUM	en	main.about.measured.table	Complexity      measured from your file, not its bitrate Detail falloff  measured; decides if scaling down is worth it Resolution      continuous search, not a fixed ladder Frame rate      searched alongside resolution, not after it Codec           chosen from how hard the target actually is Audio           share of budget shrinks as the target tightens Estimate        a measured number with a range, shown up front
+DOKUM	en	main.about.measured.title	Measured, Not Assumed
+DOKUM	en	main.about.reading	Reading...
+DOKUM	en	main.about.scenario.body	• A 1.2x reduction and a 600x reduction are not the same problem, so they do not get the same treatment. • Light targets keep everything and simply spend the budget. • Balanced targets allow scaling. • Aggressive and extreme targets unlock frame-rate reduction, move to H.265, and cut the audio share — and the app tells you what it changed and why, in plain language, before you press start.
+DOKUM	en	main.about.scenario.title	Scenario Awareness
+DOKUM	en	main.about.status.title	System Status
+DOKUM	en	main.about.title	About VidShrink
+DOKUM	en	main.about.tool-missing	{0} not found. Put it in tools/ffmpeg next to VidShrink, or install it on PATH.
+DOKUM	en	main.about.unavailable	Unavailable
+DOKUM	en	main.about.version	Version
+DOKUM	en	main.action.browse	Browse
+DOKUM	en	main.action.cancel	Cancel
+DOKUM	en	main.action.cancel-upload	Cancel the upload
+DOKUM	en	main.action.convert	Convert
+DOKUM	en	main.action.copy	Copy
+DOKUM	en	main.action.share	Share the file
+DOKUM	en	main.action.show-in-folder	Show in folder
+DOKUM	en	main.action.shrink	Shrink
+DOKUM	en	main.advanced.audio-channels.label	Audio Channels
+DOKUM	en	main.advanced.audio-channels.mono	Mono
+DOKUM	en	main.advanced.audio-channels.none	Silent
+DOKUM	en	main.advanced.audio-channels.stereo	Stereo
+DOKUM	en	main.advanced.audio-kbps.label	Audio Target (kbps)
+DOKUM	en	main.advanced.codec-lock.label	Codec Lock
+DOKUM	en	main.advanced.crf.label	CRF
+DOKUM	en	main.advanced.encoder-path.hardware	Hardware
+DOKUM	en	main.advanced.encoder-path.label	Encoder Path
+DOKUM	en	main.advanced.encoder-path.software	Software
+DOKUM	en	main.advanced.error	Advanced setting could not be applied: {0}
+DOKUM	en	main.advanced.min-fps.label	Frame-rate floor (at least)
+DOKUM	en	main.advanced.min-resolution.label	Resolution floor (at least)
+DOKUM	en	main.advanced.mode.crf	CRF
+DOKUM	en	main.advanced.mode.label	Encode Mode
+DOKUM	en	main.advanced.mode.two-pass	Two-pass
+DOKUM	en	main.advanced.now	Now: {0}
+DOKUM	en	main.advanced.preset.label	Preset / Speed
+DOKUM	en	main.advanced.title	Advanced Settings
+DOKUM	en	main.advice.audio-mono	Audio was folded to mono — inaudible on a phone speaker, and it buys bits for the picture.
+DOKUM	en	main.advice.audio-reduced	The audio bitrate was lowered so more bits are left for the picture.
+DOKUM	en	main.advice.below-codec-floor	This target is genuinely too small for this source: no layout reaches the bits per pixel the encoder needs for a meaningful picture. The densest layout was taken, but the result will look visibly broken; raising the target is the only real fix.
+DOKUM	en	main.advice.budget-generous	The target is generous for this source, so the engine meets it without strain.
+DOKUM	en	main.advice.codec-upgrade	At this pressure H.265 gives a visibly better result at the same size; consider switching the compression algorithm to automatic or H.265.
+DOKUM	en	main.advice.content-complex	The content measured as detail-heavy, which is why the bit budget is tight.
+DOKUM	en	main.advice.content-simple	The content measured as simple, so the target is met with room to spare.
+DOKUM	en	main.advice.encoder-fallback-gpu	Fast shrink (GPU) is on but no working hardware encoder was found, so encoding fell back to a software encoder and there is no speed gain.
+DOKUM	en	main.advice.encoder-fallback-not-in-build	The preferred encoder is not part of this FFmpeg build; falling back to a software encoder.
+DOKUM	en	main.advice.encoder-fallback-not-measured	The preferred encoder has not been measured on this machine; falling back to a software encoder.
+DOKUM	en	main.advice.encoder-fallback-not-working	The preferred encoder could not be used on this machine; falling back to a software encoder.
+DOKUM	en	main.advice.extreme-ratio	Extreme compression: loss is unavoidable, so the engine pushes it where it is least noticeable.
+DOKUM	en	main.advice.frame-rate-for-floor	At the source frame rate every frame would fall below the density the encoder needs, so the frame rate was cut and the freed bits went to the frames that remain.
+DOKUM	en	main.advice.frame-rate-reduced	Frame rate was lowered to free bits for the frames that remain.
+DOKUM	en	main.advice.hardware-costs-quality	The hardware encoder is fast but loses noticeable quality per megabyte at a target this tight; the result looks better with fast shrink (GPU) turned off.
+DOKUM	en	main.advice.hdr-tonemapped	The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709.
+DOKUM	en	main.advice.motion-cut-cheap	The measurement shows little motion in this clip, so cutting the frame rate frees a lot of bits and the loss is hard to notice.
+DOKUM	en	main.advice.motion-cut-expensive	The measurement shows heavy motion in this clip, so dropping frames buys little and resolution is cut before the frame rate is.
+DOKUM	en	main.advice.quality-ceiling	The quality ceiling was reached; the remaining budget is left unspent because it would buy nothing you could see.
+DOKUM	en	main.advice.resolution-reduced	Resolution was lowered so the picture fits the budget.
+DOKUM	en	main.advice.scale-saves-little	Scaling down frees little on this clip, so resolution is preserved.
+DOKUM	en	main.advice.scale-saves-much	Scaling down frees a lot of bits on this particular clip.
+DOKUM	en	main.advice.two-pass	Two-pass encoding is used so the target size is actually hit.
+DOKUM	en	main.ai.apply-json	Apply Pasted JSON
+DOKUM	en	main.ai.changes	Changes Vs Automatic: • 
+DOKUM	en	main.ai.clipboard-failed	The clipboard is unavailable
+DOKUM	en	main.ai.copy-prompt	Copy Prompt
+DOKUM	en	main.ai.load-first	Load a video first.
+DOKUM	en	main.ai.no-clipboard	There is no clipboard provider.
+DOKUM	en	main.ai.prompt-copied	The prompt was copied. Paste its JSON answer below.
+DOKUM	en	main.ai.rejected	Rejected; the automatic plan is in use: • 
+DOKUM	en	main.ai.revert	Back to automatic
+DOKUM	en	main.ai.reverted	Back on the automatic plan.
+DOKUM	en	main.ai.same-decision	The AI agreed with the automatic plan.
+DOKUM	en	main.ai.stale	The AI plan no longer matches the current options; the automatic plan is in use.
+DOKUM	en	main.ai.tip	• This step is optional. • Copy a prompt to any chat AI, then paste and validate its JSON answer.
+DOKUM	en	main.ai.title	AI Settings
+DOKUM	en	main.ai.warnings	 Warnings: • 
+DOKUM	en	main.allow.fps	May lower frame rate
+DOKUM	en	main.allow.resolution	May lower resolution
+DOKUM	en	main.chip.100.tip	100 MB suits archiving and uploads where quality matters more than transfer time.
+DOKUM	en	main.chip.128.label	Sharing Maximum
+DOKUM	en	main.chip.128.tip	• 128 MiB is the measured ceiling of uguu.se, the anonymous share target with the smallest limit. • A file at or under this size can be handed to either share target without being refused. • The other target, storage.to, carries far more, so this chip is the safe number for both.
+DOKUM	en	main.chip.180.label	WhatsApp Web Maximum
+DOKUM	en	main.chip.180.tip	• On the phone: 16 MB in chat, 2 GB as a document. • WhatsApp Web takes 180 MB per file. The user reports this, WhatsApp does not publish it. • So a file of 180 MB or less goes through the web side as it is.
+DOKUM	en	main.chip.25.tip	25 MB fits Gmail attachments, Discord Nitro Basic, and most ticket systems.
+DOKUM	en	main.chip.8.tip	8 MB fits Discord without Nitro, older forums, and strict e-mail gateways.
+DOKUM	en	main.chip.archive.tip	• The archive chip has no size ceiling. • The engine spends bits up to visually lossless quality and stops there. • While this chip is on, the number in the target box does not build the plan. • The file does get smaller, but the source decides how much, not you. • If you have to fit somewhere, pick one of the chips that names an MB figure. • Touching the target brings the size ceiling back.
+DOKUM	en	main.chip.half	Half
+DOKUM	en	main.chip.half.tip	• Half of the source size. • A mild request, so the engine usually keeps the original resolution and frame rate.
+DOKUM	en	main.chip.whatsapp.label	WhatsApp Recommended
+DOKUM	en	main.chip.whatsapp.tip	• WhatsApp re-encodes in-chat video with its own low-bitrate encoder. • Under 16 MB it usually passes your file through with far less damage, so what the other side sees is VidShrink's quality, not WhatsApp's. • To bypass re-encoding entirely, send the result as a document instead of as a video.
+DOKUM	en	main.codec.automatic	Automatic
+DOKUM	en	main.codec.compatible	H.264 (Compatible)
+DOKUM	en	main.codec.label	Compression Algorithm
+DOKUM	en	main.codec.smallest	H.265 (Smallest)
+DOKUM	en	main.command.title	FFmpeg Command
+DOKUM	en	main.convert.audio	Audio
+DOKUM	en	main.convert.audio-bitrate	Audio Bitrate K
+DOKUM	en	main.convert.audio-bitrate.tip	• Audio data rate in kilobits per second. • 128 is a compact general setting, 192 provides more detail, and 256 or 320 is useful for music. • This value is ignored for copy, drop, and raw PCM.
+DOKUM	en	main.convert.audio.tip	• AAC is the safe pairing for MP4 and the only codec every phone and WhatsApp accept. • Opus sounds better at low bitrates but belongs in WebM; inside MP4 it will not play on many phones. • MP3 suits older players. • PCM is uncompressed and very large. • Copy preserves the original audio without re-encoding when the container supports it. • Drop removes audio completely, which is the right call when you are squeezing a silent clip.
+DOKUM	en	main.convert.browse	Browse Source
+DOKUM	en	main.convert.command	FFmpeg Command
+DOKUM	en	main.convert.container	Container
+DOKUM	en	main.convert.container.tip	• The container is the file type. • MP4 is the safest general choice and the only one WhatsApp reliably sends as a playable video — every phone opens it. • MKV supports many stream types but WhatsApp and most phone galleries treat it as a document. • WebM is for browsers and is not a phone format. • MOV suits Apple workflows and plays on iPhone, but Android support is uneven. • AVI is for older software only. • MP3, M4A, and WAV create audio-only files.
+DOKUM	en	main.convert.copy	Copy
+DOKUM	en	main.convert.crf-label	CRF Quality / Bitrate K
+DOKUM	en	main.convert.crf-label.tip	• In CRF mode, a lower number means higher quality and a larger file; 23 is a common H.264 start. • In fixed bitrate mode, enter kilobits per second: a higher value gives more quality and a larger file.
+DOKUM	en	main.convert.custom	Custom
+DOKUM	en	main.convert.custom-fps	Custom FPS
+DOKUM	en	main.convert.custom-fps.tip	• Used only when frame rate is custom. • Enter the frames per second, such as 25 or 29.97. • Values above the source frame rate usually add no real motion detail.
+DOKUM	en	main.convert.custom-resolution	Custom Width X Height
+DOKUM	en	main.convert.custom-resolution.tip	• Used only when resolution is custom. • Enter width and height as 1280x720. • Even dimensions are safest for common video codecs.
+DOKUM	en	main.convert.drop	Drop
+DOKUM	en	main.convert.fixed-bitrate	Fixed Bitrate
+DOKUM	en	main.convert.frame-rate	Frame Rate
+DOKUM	en	main.convert.frame-rate.tip	• Source preserves the original frame rate. • 60 is smoother but needs more data. • 30 suits most video. • 24 gives a cinema-like motion style. • Reducing frame rate can reduce file size.
+DOKUM	en	main.convert.progress	Progress
+DOKUM	en	main.convert.quality-mode	Quality Mode
+DOKUM	en	main.convert.quality-mode.tip	• CRF targets visual quality, so final size can vary. • Fixed bitrate targets a data rate, so size is predictable. • Use CRF for normal viewing quality and fixed bitrate when size or bandwidth matters more.
+DOKUM	en	main.convert.ready	Ready.
+DOKUM	en	main.convert.resolution	Resolution
+DOKUM	en	main.convert.resolution.tip	• Source keeps the original dimensions. • A numbered option limits output height while preserving aspect ratio. • Lower resolution reduces file size and processing load. • Custom allows an exact width and height.
+DOKUM	en	main.convert.source-empty	Load a source in Shrink or browse here.
+DOKUM	en	main.convert.source-option	Source
+DOKUM	en	main.convert.title	Conversion
+DOKUM	en	main.convert.trim-end	End (HH:MM:SS)
+DOKUM	en	main.convert.trim-end.tip	• Optional trim end time. • Leave empty to continue to the end of the source. • The end time must be later than the start time.
+DOKUM	en	main.convert.trim-start	Start (HH:MM:SS)
+DOKUM	en	main.convert.trim-start.tip	• Optional trim start time. • Leave empty to begin at the start of the source. • Use hours:minutes:seconds, for example 00:01:30.
+DOKUM	en	main.convert.video-codec	Video Codec
+DOKUM	en	main.convert.video-codec.tip	• H.264 plays on nearly every device and is what WhatsApp expects; pick it when the file must just work. • H.265 makes files a third smaller at the same picture; phones since 2016 decode it in hardware. • But older handsets, some smart TVs, and several web players will not open it, and WhatsApp may re-encode it. • VP9 is a browser and WebM format; phones play it in apps but rarely in the gallery. • AV1 compresses best and is the slowest to encode, and only recent phones decode it. • Copy keeps the original video untouched — no quality loss, no waiting — if the container accepts it.
+DOKUM	en	main.derivation.no-cap	No Size Ceiling
+DOKUM	en	main.derivation.size	Target {0} MB
+DOKUM	en	main.drop.hint	Any format FFmpeg can open
+DOKUM	en	main.drop.no-folder	Folders cannot be dropped
+DOKUM	en	main.drop.release	Release to load this file
+DOKUM	en	main.drop.single	Only one file at a time
+DOKUM	en	main.drop.title	Drop a media file here
+DOKUM	en	main.duration.copied	Copied
+DOKUM	en	main.duration.copied-note	Nothing is re-encoded; the file is carried over as it is.
+DOKUM	en	main.duration.frames-per-second	Frames/s
+DOKUM	en	main.duration.hours	H
+DOKUM	en	main.duration.measured	Measured
+DOKUM	en	main.duration.minutes	Min
+DOKUM	en	main.duration.not-measured	The encoding speed has not been measured on this machine yet.
+DOKUM	en	main.duration.other-settings	The samples were not encoded with these settings, so no time is shown.
+DOKUM	en	main.duration.seconds	S
+DOKUM	en	main.error.disk-full	The target drive ran out of space. Free some room, or write the output to another drive.
+DOKUM	en	main.error.encoder-container	The chosen encoder and container do not fit together. Set the container to MP4 and the video codec to H.264, then try again.
+DOKUM	en	main.error.folder	The folder could not be opened
+DOKUM	en	main.error.generic	The operation could not be completed. The detail FFmpeg reported is below.
+DOKUM	en	main.error.link	The link could not be opened
+DOKUM	en	main.error.pick	The file could not be chosen
+DOKUM	en	main.error.probe	The hardware encoder probe failed
+DOKUM	en	main.error.setting	The setting could not be saved
+DOKUM	en	main.error.startup	Startup Did Not Finish
+DOKUM	en	main.error.undecodable	The source file could not be decoded; it may be damaged, or this FFmpeg build does not know the format.
+DOKUM	en	main.error.unusable	This file cannot be used
+DOKUM	en	main.estimate.basis.estimated	Estimated from source bitrate
+DOKUM	en	main.estimate.basis.measured	Measured Source Complexity
+DOKUM	en	main.estimate.calibrating	Calibrating with the planned settings...
+DOKUM	en	main.estimate.failed	Measurement Failed
+DOKUM	en	main.estimate.measuring	Measuring complexity...
+DOKUM	en	main.estimate.mode.ceiling	Quality mode; stays under the target
+DOKUM	en	main.estimate.mode.enforced	Two-pass enforces this size
+DOKUM	en	main.estimate.of-source	Of source
+DOKUM	en	main.estimate.predicted-quality	Predicted Quality
+DOKUM	en	main.fast-gpu	Fast Shrink (GPU)
+DOKUM	en	main.fast-gpu.bitrate-floor	{0} only follows {1} kbit/s and above while the plan asks for {2} kbit/s
+DOKUM	en	main.fast-gpu.off-as-advised	• {0}, so fast shrink stayed off.
+DOKUM	en	main.fast-gpu.off-usable	• {0} passed the measurement; the box stays off because it was turned off by hand.
+DOKUM	en	main.fast-gpu.on-against-advice	• {0}; the measurement advised leaving it off, but the box was turned on by hand.
+DOKUM	en	main.fast-gpu.on-usable	• Fast shrink turned itself on: {0} passed the probe in {1} ms and the requested {2} kbit/s sits above the {3} kbit/s it can follow.
+DOKUM	en	main.fast-gpu.probe-failed	The {0} probe did not pass
+DOKUM	en	main.fast-gpu.probe-slow	The {0} probe took {1} ms, past the {2} ms budget
+DOKUM	en	main.fast-gpu.tip	• Graphics cards encode many times faster than the CPU. • VidShrink picks the best encoder your card offers; on a modern card the AV1 encoder reaches nearly the software encoder's quality at about seven times the speed. • On older cards the speed still arrives, but it costs some quality per megabyte.
+DOKUM	en	main.fast-gpu.tip-missing	• No usable hardware encoder was found on this computer, so fast shrink is unavailable. • The graphics card would normally encode many times faster than the CPU.
+DOKUM	en	main.fill.ceiling	Stay at quality ceiling
+DOKUM	en	main.fill.label	Bit Budget
+DOKUM	en	main.fill.target	Fill Target
+DOKUM	en	main.hdr.label	HDR
+DOKUM	en	main.hdr.preserve	Preserve HDR
+DOKUM	en	main.hdr.sdr	Convert to SDR
+DOKUM	en	main.info.audio	Audio
+DOKUM	en	main.info.bitrate	Bitrate
+DOKUM	en	main.info.duration	Duration
+DOKUM	en	main.info.fps	FPS
+DOKUM	en	main.info.hdr	HDR
+DOKUM	en	main.info.no	No
+DOKUM	en	main.info.none	None
+DOKUM	en	main.info.resolution	Resolution
+DOKUM	en	main.info.size	Size
+DOKUM	en	main.info.video-codec	Video Codec
+DOKUM	en	main.info.yes	Yes
+DOKUM	en	main.intent.archive	Archive
+DOKUM	en	main.language.name	English
+DOKUM	en	main.output.current-size	Current Output Size
+DOKUM	en	main.output.estimated-output	Estimated Output
+DOKUM	en	main.output.estimated-output.tip	• Before planning, VidShrink encodes short samples of this clip at two resolutions and measures how many bits it needs — it does not guess from the source bitrate. • That is why the estimate is a measured number with a narrow range rather than a rule of thumb. • Two-pass runs land within a few percent; quality-capped runs come in under the target on purpose, because spending the rest would buy nothing you could see.
+DOKUM	en	main.output.estimated-time	Estimated Time
+DOKUM	en	main.output.estimated-time.tip	• VidShrink times the sample encodes it already ran on this clip, so the speed behind this figure comes from this machine and this file, not from a preset table. • Two-pass runs get a wide range because the first pass only analyses the picture and costs less than the second, and how much less is not measured. • If the plan moves to settings the samples were not encoded with, the time is left blank, not guessed.
+DOKUM	en	main.output.idle	Idle
+DOKUM	en	main.output.remaining	Remaining
+DOKUM	en	main.output.stage	Stage
+DOKUM	en	main.output.title	Output
+DOKUM	en	main.output.waiting	Waiting for your decision
+DOKUM	en	main.plan.audio.mono	Mono
+DOKUM	en	main.plan.automatic	Automatic
+DOKUM	en	main.plan.empty	Load a file and every decision the engine makes is listed here.
+DOKUM	en	main.plan.fact.audio	Audio
+DOKUM	en	main.plan.fact.encoder	Encoder
+DOKUM	en	main.plan.fact.estimated-size	Estimated Size
+DOKUM	en	main.plan.fact.frame-rate	Frame Rate
+DOKUM	en	main.plan.fact.mode	Mode
+DOKUM	en	main.plan.fact.plan	Plan
+DOKUM	en	main.plan.fact.preset	Preset
+DOKUM	en	main.plan.fact.resolution	Resolution
+DOKUM	en	main.plan.mode.copy	Stream Copy
+DOKUM	en	main.plan.mode.two-pass	Two-pass
+DOKUM	en	main.plan.reasons	Why these choices
+DOKUM	en	main.plan.splitter	Splitter between the preview and the plan panel
+DOKUM	en	main.plan.title	What it will do
+DOKUM	en	main.playback.encode-marker	Analysis {0}/{1} · Attempt {2}
+DOKUM	en	main.player.empty	No File Loaded
+DOKUM	en	main.player.menu	Player Menu
+DOKUM	en	main.player.menu.fullscreen	Full Screen
+DOKUM	en	main.player.menu.playpause	Play / Pause
+DOKUM	en	main.player.menu.reset	Reset Zoom
+DOKUM	en	main.player.paused	Paused
+DOKUM	en	main.player.playing	Playing
+DOKUM	en	main.player.seekfailed	Seek failed: the decoder pipe could not be restarted.
+DOKUM	en	main.player.stalled	Playback stopped advancing; the decoder pipe is not producing frames.
+DOKUM	en	main.player.state	Position {0} S - {1} - Zoom {2}%
+DOKUM	en	main.player.title	Player
+DOKUM	en	main.quality.above-ceiling	The requested quality is better than the source itself: the ceiling is {0} MB and the quality reached there is {1}/100.
+DOKUM	en	main.quality.basis	Basis
+DOKUM	en	main.quality.basis.estimated	Estimated from the source bitrate
+DOKUM	en	main.quality.basis.measured	Measured from a sample encoded from this clip
+DOKUM	en	main.quality.basis.under-target	The source is already under this target and is copied as it is
+DOKUM	en	main.quality.below-floor	The requested quality is below the floor: no target smaller than {0} MB is produced, and that target already reaches {1}/100.
+DOKUM	en	main.quality.loss	Loss against the source
+DOKUM	en	main.quality.loss-points	{0} Points
+DOKUM	en	main.quality.no-source	Load a video; a quality target can only be turned into a target size once the source is known.
+DOKUM	en	main.quality.predicted	Predicted Quality
+DOKUM	en	main.quality.target	Target
+DOKUM	en	main.quality.tip.empty	Load a video and this target's predicted quality score appears here.
+DOKUM	en	main.quality.title	Quality
+DOKUM	en	main.reason.budget-below-ceiling	The budget lands near CRF {0}, short of the CRF {1} ceiling, so two-pass VBR spends the whole {2} MB
+DOKUM	en	main.reason.budget-exceeds-ceiling	The budget affords CRF {0}, better than the CRF {1} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {2} MB instead of padding the file to {3} MB
+DOKUM	en	main.reason.encoder-fallback-not-in-build	The {0} encoder is not part of this FFmpeg build, so encoding falls back to {1}
+DOKUM	en	main.reason.encoder-fallback-not-measured	The {0} encoder has not been measured on this machine, so encoding falls back to {1}
+DOKUM	en	main.reason.encoder-fallback-not-working	The {0} encoder could not be used on this machine, so encoding falls back to {1}
+DOKUM	en	main.reason.fill-band-center	CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly
+DOKUM	en	main.reason.fill-band-narrow	One CRF step moves the file by {0}%, wider than the {1}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {2} MB directly
+DOKUM	en	main.reason.fill-crf-lowered	The fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band
+DOKUM	en	main.reason.frame-rate-reduced	Frame rate reduced to {0} to keep per-frame detail
+DOKUM	en	main.reason.hardware-bitrate-bias	The {0} hardware encoder is not calibrated for this clip yet and can land {1}% under the bitrate it is given, so the requested bitrate stays on the target and the estimate opens that much room underneath
+DOKUM	en	main.reason.hdr-tonemapped	The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709
+DOKUM	en	main.reason.manual-audio-bitrate-override	The audio target was fixed to {0}kbps; the engine would have picked {1}kbps
+DOKUM	en	main.reason.manual-audio-bitrate-superseded	The audio target was fixed to {0}kbps but the audio channel was also fixed to 'none'; the channel request wins, the output is silent
+DOKUM	en	main.reason.manual-audio-bitrate-unmet	The audio target was fixed to {0}kbps but the source has no audio stream; the request was not met, the output is silent
+DOKUM	en	main.reason.manual-audio-channels-override	The audio channel was fixed to {0}; the engine would have picked {1}
+DOKUM	en	main.reason.manual-audio-channels-unmet	The audio channel was fixed to {0} but the source has no audio stream; the request was not met, the output is silent
+DOKUM	en	main.reason.manual-crf-clamped	The fixed CRF {0} was outside the codec's allowed range, clamped to {2} (allowed range {1})
+DOKUM	en	main.reason.manual-crf-override	CRF was fixed to {0}; the target size no longer forces the plan, {3} MB is only an estimate — the engine had picked {2} in {1} mode
+DOKUM	en	main.reason.manual-encoder-path-override	The encoder path was fixed to {0}; the engine would have picked {1}, the encoder used is {2}
+DOKUM	en	main.reason.manual-encoder-path-superseded	The encoder path was fixed to {0} but the codec was also locked at the same time; the codec lock wins and the encoder used is {1}
+DOKUM	en	main.reason.manual-encoder-path-unmet	The encoder path was fixed to {0} but no usable encoder exists on this path on this machine; the request was not met, the encoder used is {1}
+DOKUM	en	main.reason.manual-min-fps-override	The frame-rate floor was fixed to at least {0}; the engine would have picked {1} fps, the plan comes out at {2} fps
+DOKUM	en	main.reason.manual-min-fps-unmet	The frame-rate floor was fixed to at least {0} but the source is under it; the request was not met, the plan comes out at {1} fps
+DOKUM	en	main.reason.manual-min-resolution-override	The resolution floor was fixed to at least {0}p; the engine would have picked {1}p, the plan comes out at {2}x{3}
+DOKUM	en	main.reason.manual-min-resolution-unmet	The resolution floor was fixed to at least {0}p but the source is under it and the engine does not upscale; the plan comes out at {1}x{2}
+DOKUM	en	main.reason.manual-mode-override	The encode mode was fixed to {0}; the engine would have picked {1}
+DOKUM	en	main.reason.manual-mode-superseded-by-crf	The encode mode was also fixed to {0} but an explicit CRF number wins; the mode came out CRF and the {0} request was not applied
+DOKUM	en	main.reason.manual-override-dropped-on-pass-through	The fixed {0} could not apply on the copy path; what applies instead is {1}
+DOKUM	en	main.reason.manual-preset-first-pass-relaxed	Turbo first pass runs with a different preset; the fixed {0} only applies to the second pass that produces the output (first pass: {1})
+DOKUM	en	main.reason.manual-preset-override	The preset was fixed to {0}; the engine would have picked {1}
+DOKUM	en	main.reason.measured-quality-stop	CRF {0} already reaches the quality measured on this source, so the encoder stops there and delivers about {1} MB instead of spending the rest of the {2} MB on an extrapolation no measurement covers
+DOKUM	en	main.reason.quality-estimated	Predicted quality {0}/100 estimated from the source bitrate
+DOKUM	en	main.reason.quality-measured	Predicted quality {0}/100 from a measured sample (bppf {1}, detail falloff {2})
+DOKUM	en	main.reason.ratio	{0}x reduction — {1} scenario.
+DOKUM	en	main.reason.regime.aggressive	Aggressive
+DOKUM	en	main.reason.regime.balanced	Balanced
+DOKUM	en	main.reason.regime.extreme	Extreme
+DOKUM	en	main.reason.regime.light	Light
+DOKUM	en	main.reason.resolution-restored	The ceiling left budget unused, so resolution was restored to {0}x{1}@{2} — the largest layout that still fits the target at CRF {3}
+DOKUM	en	main.reason.resolution-scaled	Scaled to {0}x{1} ({2}% of source); at this title's measured detail falloff that frees enough bits to raise predicted quality
+DOKUM	en	main.reason.retry-scaled	Retry: the previous attempt produced {0} MB against a {1} MB target; after reserving {2} MB for audio, video bitrate was scaled by {3} and capped to the remaining budget
+DOKUM	en	main.reason.source-under-target	The source is already {0} MB, under the {1} MB target, so it is copied as it is instead of being re-encoded
+DOKUM	en	main.reason.target-capped	The target was capped to {0} MB because the output is never larger than what it was made from ({1} MB was asked for)
+DOKUM	en	main.retry.again	Try Again
+DOKUM	en	main.retry.meaning-with-fallback	“Leave it as is” does not hand you the oversized file; it ends the run. A file larger than the target is never handed back: the last result that stayed under the target ({0} MB) is delivered instead.
+DOKUM	en	main.retry.meaning-without-fallback	“Leave it as is” does not hand you the oversized file; it ends the run. A file larger than the target is never handed back, and no result has stayed under the target yet, so no file will be written.
+DOKUM	en	main.retry.outcome	Attempt {0} of {1} came out at {2} MB — {4} MB ({5}%) over the {3} MB target. It took {6}; another attempt would take about the same.
+DOKUM	en	main.retry.stop	Leave it as is
+DOKUM	en	main.retry.title	Over the target
+DOKUM	en	main.run.cancelled	Cancelled.
+DOKUM	en	main.run.converted	Done. {0} MB → {1} MB.
+DOKUM	en	main.run.done	Done in {0} attempt(s). {1} MB → {2} MB ({3}% smaller).
+DOKUM	en	main.run.ended	Encoding ended unexpectedly and no file was written.
+DOKUM	en	main.run.no-space	Not enough free space on the target drive; at least {0} MB is needed.
+DOKUM	en	main.run.over-ceiling	Could not get under the {0} MB target after {1} attempt(s) (last result was {2} MB). No file was written, because a file larger than the target is never handed back. Raise the target and try again.
+DOKUM	en	main.section.advanced.none	All Automatic
+DOKUM	en	main.section.advanced.overrides	{0} set by hand
+DOKUM	en	main.section.audio	Audio
+DOKUM	en	main.section.frame	Cropping and resolution
+DOKUM	en	main.section.frame.fps-locked	Frame Rate Fixed
+DOKUM	en	main.section.frame.resolution-locked	Resolution Fixed
+DOKUM	en	main.section.outcome	What comes out
+DOKUM	en	main.section.quality	Quality and compatibility
+DOKUM	en	main.shrink-job.missing-paths	{0} of the paths in the shell request were not found on disk and were skipped: {1}
+DOKUM	en	main.shrink-job.open-in-app	Open in the app
+DOKUM	en	main.shrink-job.reason.no-path	No existing file was found in the shell request, so there is nothing to open.
+DOKUM	en	main.shrink-job.reason.no-target	The shell menu did not pass a target size after the shrink flag, so there is nothing to shrink to.
+DOKUM	en	main.shrink-job.reason.not-a-number	The target size that came from the shell menu is not a number, so it cannot be used as a size budget.
+DOKUM	en	main.shrink-job.reason.not-in-quick-list	The target size that came from the shell menu is not one of the quick sizes ({0}); pick one of those from the menu.
+DOKUM	en	main.shrink-job.reason.not-positive	The target size that came from the shell menu is zero or negative, and a file cannot be shrunk to that.
+DOKUM	en	main.shrink-job.rejected	The shrink request was not accepted
+DOKUM	en	main.shrink-job.target	Target {0} — file {1} of {2}
+DOKUM	en	main.shrink-job.waiting	Waiting for the shell request
+DOKUM	en	main.source.placeholder	Drop any media file here, or browse.
+DOKUM	en	main.source.title	Source
+DOKUM	en	main.stage.attempt	Attempt
+DOKUM	en	main.stage.converting	Converting
+DOKUM	en	main.stage.encoding	Encoding
+DOKUM	en	main.stage.gif-encode	GIF Encode
+DOKUM	en	main.stage.gif-palette	GIF Palette
+DOKUM	en	main.stage.pass	Pass
+DOKUM	en	main.status.probe-failed	The hardware encoder probe could not run: {0}. The plan falls back to the software encoder; compression still works.
+DOKUM	en	main.status.probe-unsettled	The hardware encoder probe did not settle, so the plan falls back to the software encoder. Compression still works.
+DOKUM	en	main.tab.about	About
+DOKUM	en	main.tab.advanced	Advanced
+DOKUM	en	main.tab.convert	Convert
+DOKUM	en	main.tab.player	Player
+DOKUM	en	main.tab.settings	Settings
+DOKUM	en	main.tab.shrink	Shrink
+DOKUM	en	main.tagline.converter	Media Converter
+DOKUM	en	main.tagline.lead	Target Size Media Compression
+DOKUM	en	main.target.crf-locked	CRF is fixed from the advanced settings; the target size no longer forces the plan, it is now only an estimate.
+DOKUM	en	main.target.title	Target
+DOKUM	en	main.update.applied	Updated to a new version
+DOKUM	en	main.update.available	A new version is available
+DOKUM	en	main.validation.container-audio-copy	The {0} container does not support copying the source {1} audio stream.
+DOKUM	en	main.validation.container-audio-encoder	The {0} container does not support the selected {1} audio encoder.
+DOKUM	en	main.validation.container-video-copy	The {0} container does not support copying the source {1} video stream.
+DOKUM	en	main.validation.container-video-encoder	The {0} container does not support the selected {1} video encoder.
+DOKUM	en	main.validation.copy-fixed	Stream copy cannot change resolution or frame rate.
+DOKUM	en	main.validation.end-before-start	End time must be after start time.
+DOKUM	en	main.validation.end-zero	End time must be greater than zero.
+DOKUM	en	main.validation.fps-zero	Frame rate must be greater than zero.
+DOKUM	en	main.validation.gif-copy	GIF requires video encoding and cannot use stream copy.
+DOKUM	en	main.validation.no-audio-copy	The source has no audio stream to copy.
+DOKUM	en	main.validation.no-audio-extract	The source has no audio stream to extract.
+DOKUM	en	main.validation.size-even	Resolution dimensions must be even for the selected pixel format.
+DOKUM	en	main.validation.size-positive	Resolution dimensions must be positive.
+DOKUM	en	main.validation.start-negative	Start time cannot be negative.
+DOKUM	en	main.validation.start-past-end	Start time must be before the end of the source.
+DOKUM	en	main.validation.trim-format	Trim times must use HH:MM:SS format.
+DOKUM	en	main.validation.trim-order	The trim end must come after the trim start.
+DOKUM	en	main.validation.untranslated-engine	Untranslated Engine Message: {0}
+DOKUM	en	main.window.close	Close
+DOKUM	en	main.window.maximize	Maximize
+DOKUM	en	main.window.minimize	Minimize
+DOKUM	en	performance.boundary	VidShrink does not capture video. What is measured here is what encoding costs on this machine, not what a capture tool does with it — its own encoder setting is the first place to look.
+DOKUM	en	performance.fact.hardware-encoder	Hardware Encoder
+DOKUM	en	performance.fact.hardware-pipeline	Hardware Pipeline
+DOKUM	en	performance.fact.logical-cores	Logical Cores
+DOKUM	en	performance.fact.measured-in	Measured in
+DOKUM	en	performance.fact.software-cost	Software Cost
+DOKUM	en	performance.fact.software-encoder	Software Encoder
+DOKUM	en	performance.failed	The check could not finish
+DOKUM	en	performance.headline.hardware	This machine has a working hardware encoder, but whether the processor carries that pass was not measured here.
+DOKUM	en	performance.headline.hardware-offloaded	This machine has a working hardware encoder and that pass does not lean on the processor.
+DOKUM	en	performance.headline.not-enough	There is not enough measured here to answer the question.
+DOKUM	en	performance.headline.software-heavy	No working hardware encoder was found, and software encoding wants a whole processor core to keep up with realtime.
+DOKUM	en	performance.headline.software-light	No working hardware encoder was found, but software encoding stays under one processor core at realtime.
+DOKUM	en	performance.line.budget-exhausted	The measurement budget ran out ({0} ms of {1} ms), so one leg of the check is missing.
+DOKUM	en	performance.line.cpu-unreliable	The processor time counter on this machine is not dependable ({0}× against the wall clock), so processor times are shown but nothing is decided from them.
+DOKUM	en	performance.line.hardware-cost-unknown	The processor cost of the hardware pass was not measured, so it must not be read as free.
+DOKUM	en	performance.line.hardware-failed	A hardware encoder is listed on this machine, but its test encode failed.
+DOKUM	en	performance.line.hardware-headroom	The hardware pass ran at {0}× realtime.
+DOKUM	en	performance.line.hardware-not-cpu-bound	The hardware pass does not lean on the processor: giving it one thread or leaving the threads free took the same time, within {0}×.
+DOKUM	en	performance.line.hardware-works	Hardware encoding works on this machine.
+DOKUM	en	performance.line.no-hardware	No hardware video encoder is available here, so encoding runs on the processor.
+DOKUM	en	performance.line.not-measured	Nothing has been measured on this machine yet.
+DOKUM	en	performance.line.software-costs-cores	That is a whole core or more ({0} cores), so software encoding owns one core for as long as it runs.
+DOKUM	en	performance.line.software-realtime	Software encoding wants {0} cores to keep up with realtime, on {1} logical cores.
+DOKUM	en	performance.line.software-small	That stays under one core ({0} cores), so it can be spread into the gaps left by other work.
+DOKUM	en	performance.run	Run the check
+DOKUM	en	performance.running	Measuring — this runs a few short encodes and takes up to twenty seconds.
+DOKUM	en	performance.title	Performance Check
+DOKUM	en	performance.value.cores	{0} Cores
+DOKUM	en	performance.value.ms	{0} ms
+DOKUM	en	performance.value.realtime	{0}× Realtime
+DOKUM	en	playback.badge.original	ORIGINAL
+DOKUM	en	playback.badge.processed	PROCESSED
+DOKUM	en	playback.control.pause	Pause
+DOKUM	en	playback.control.play	Play
+DOKUM	en	playback.control.restart	Back to the start
+DOKUM	en	playback.control.strip	Control Strip
+DOKUM	en	playback.control.timeline	Timeline
+DOKUM	en	playback.error.engine	Engine Message: {0}
+DOKUM	en	playback.error.exit-code	FFmpeg returned exit code {0}.
+DOKUM	en	playback.error.no-file	The clip file was not created.
+DOKUM	en	playback.error.window	The requested window falls outside the source.
+DOKUM	en	playback.panel.first-frame	The first frame is on its way
+DOKUM	en	playback.panel.hint	Load a file to see the two sides
+DOKUM	en	playback.panel.moved	The panel moved to the front
+DOKUM	en	playback.panel.pending	This part will be processed
+DOKUM	en	playback.panel.title	Comparison Panel
+DOKUM	en	playback.player-failed	The comparison player could not start
+DOKUM	en	playback.sample-failed	The preview sample could not be encoded
+DOKUM	en	settings-tab.advanced-default-open.hint	Opens the advanced section automatically every time the app starts.
+DOKUM	en	settings-tab.advanced-default-open.label	Show advanced options expanded by default
+DOKUM	en	settings-tab.default-target.hint	Sets the target size the Shrink tab opens with.
+DOKUM	en	settings-tab.default-target.label	Default Target Size (MB)
+DOKUM	en	settings-tab.ffmpeg-path.auto	Automatic
+DOKUM	en	settings-tab.ffmpeg-path.browse	Browse…
+DOKUM	en	settings-tab.ffmpeg-path.error	This path does not point to a valid FFmpeg executable.
+DOKUM	en	settings-tab.ffmpeg-path.hint	Manual overrides the bundled FFmpeg with a path you choose.
+DOKUM	en	settings-tab.ffmpeg-path.label	FFmpeg Path
+DOKUM	en	settings-tab.ffmpeg-path.manual	Manual
+DOKUM	en	settings-tab.general.title	General
+DOKUM	en	settings-tab.language.hint	Changes the interface language and is remembered on next launch.
+DOKUM	en	settings-tab.language.label	Language
+DOKUM	en	settings-tab.output-folder.beside-source	Next to the source file
+DOKUM	en	settings-tab.output-folder.browse	Browse…
+DOKUM	en	settings-tab.output-folder.fixed	Fixed Folder
+DOKUM	en	settings-tab.output-folder.hint	Fixed folder sends every output to the same place instead of next to the source file.
+DOKUM	en	settings-tab.output-folder.label	Output Folder
+DOKUM	en	settings.default-app.dismiss	Do not ask again
+DOKUM	en	settings.default-app.open	Default Apps
+DOKUM	en	settings.default-app.suggestion	VidShrink is not the default program for videos. You can pick it on the Windows Default apps page.
+DOKUM	en	settings.error.reset	Settings could not be reset
+DOKUM	en	settings.error.save	The setting could not be saved
+DOKUM	en	settings.reset-all	Reset All Settings
+DOKUM	en	settings.reset-cancel	Cancel
+DOKUM	en	settings.reset-confirm	Reset every saved setting and restore the defaults?
+DOKUM	en	settings.reset-confirm-button	Reset Settings
+DOKUM	en	settings.share.can-delete	{0} hands out a delete token, so a link can be closed before its lifetime runs out. The button works once a file has been shared.
+DOKUM	en	settings.share.cancelled	Cancelled.
+DOKUM	en	settings.share.ceiling	Ceiling
+DOKUM	en	settings.share.close-failed	The share could not be closed
+DOKUM	en	settings.share.closed	The share was closed.
+DOKUM	en	settings.share.day-one	1 Day
+DOKUM	en	settings.share.days	{0} Days
+DOKUM	en	settings.share.delete	Delete the shared file
+DOKUM	en	settings.share.deletion	Deletion
+DOKUM	en	settings.share.failed	The file could not be shared
+DOKUM	en	settings.share.hour-one-fixed	1 Hour, Fixed
+DOKUM	en	settings.share.hours-fixed	{0} Hours, Fixed
+DOKUM	en	settings.share.lifetime	Lifetime
+DOKUM	en	settings.share.no-delete	{0} hands out no delete token, so neither you nor VidShrink can close the link early.
+DOKUM	en	settings.share.no-delete-window	{0} hands out no delete token, so neither you nor VidShrink can close the link early. Its own deletion after {1} hours stands in for that.
+DOKUM	en	settings.share.not-stated	Not Stated
+DOKUM	en	settings.share.nothing	There is no file to share.
+DOKUM	en	settings.share.nothing-to-close	There is no share to close.
+DOKUM	en	settings.share.shared	Shared.
+DOKUM	en	settings.share.shared-until	Shared. The link stays open until {0}.
+DOKUM	en	settings.share.targets-missing	The share targets could not be read; {0} was not found.
+DOKUM	en	settings.share.tip	• The share target is the service a finished file is uploaded to. • storage.to carries up to 25 GiB and lets VidShrink delete the file, so a link can be closed early. • uguu.se carries up to 128 MiB and clears itself after 3 hours, but it hands out no delete token, so nobody can close the link early.
+DOKUM	en	settings.share.title	Share Target
+DOKUM	en	settings.share.upload-busy	An upload is already running; wait for it to finish or cancel it.
+DOKUM	en	settings.share.uploading	Uploading...
+DOKUM	en	settings.update.auto	Update Automatically
+DOKUM	en	settings.update.auto-effect	When this is off, VidShrink does not update itself: it only tells you that a new version exists and shows the command that installs it.
+DOKUM	en	settings.update.no-self-effect	VidShrink does not update itself on this system: it only tells you that a new version exists and shows the command that installs it.
+DOKUM	en	settings.update.title	Updates
+DOKUM	tr	main.about.ai.body	• AI modu yalnızca istem oluşturur ve yapıştırılan JSON'u doğrular. • Gömülü AI olmadığı için VidShrink çevrimdışı çalışır, API anahtarı istemez ve yanıt bozuk ya da uyumsuz olduğunda eksiksiz otomatik motora döner.
+DOKUM	tr	main.about.ai.title	AI Modu
+DOKUM	tr	main.about.codecs.body	• H.264 en geniş uyumluluğu sunar. • H.265 daha verimli sıkıştırır. • VP9, WebM için güçlü bir seçimdir. • AV1 daha yüksek işlemci maliyetiyle modern sıkıştırmayı en üst düzeye çıkarır. • Hedef kaynak akışlarını desteklediğinde akış kopyalama en hızlı ve kayıpsız seçenektir.
+DOKUM	tr	main.about.codecs.title	Kodekler
+DOKUM	tr	main.about.engine.body	• Boyut hedefli sıkıştırıcıların çoğu sabit bir tablo uygular: dakikada şu kadar megabayt şu çözünürlüğe karşılık gelir. • Bu tablo, ortalama olmayan her klip için yanlıştır. • VidShrink bunun yerine ölçer. Gerçek dosyanızdan kısa örnekleri iki çözünürlükte kodlar ve gerçekte kaç bit tuttuğunu, görüntü küçültüldüğünde bu maliyetin ne kadarının kaybolduğunu okur. • Bu iki ölçüm planı genel olarak videoya değil, tam olarak bu klibe özel kılar.
+DOKUM	tr	main.about.engine.title	Motor nasıl düşünüyor
+DOKUM	tr	main.about.intro	• VidShrink, hedef boyutlu video sıkıştırma ve format dönüştürme için çevrimdışı bir araçtır. • Ona bir dosya ve bir boyut tavanı verin; bir insanın gerçekten görebildiğinden en azını kaybettiren ayarları bulur ve istediğinizden büyük bir dosyayı asla geri vermez.
+DOKUM	tr	main.about.loss.body	• Belirli bir bit bütçesinin altında bir şeyden ödün vermek gerekir. • Motor kaybı gözün en az duyarlı olduğu yere yığar: bloklaşmadan önce yumuşaklık, bozuk pikselden önce daha az piksel, aç kalmış görüntüden önce tek kanallı ses. • Ne zaman duracağını da bilir — kalite, fazladan bitin gözle görülür hiçbir şey satın almadığı noktaya geldiğinde dosyayı hedefe kadar şişirmek yerine daha küçüğünü geri verir.
+DOKUM	tr	main.about.loss.title	Kayıp Nereye Gidiyor
+DOKUM	tr	main.about.measured.table	Karmaşıklık     bit hızından değil, dosyanızdan ölçülür Ayrıntı düşüşü  ölçülür; küçültmenin değip değmediğine karar verir Çözünürlük      sabit basamak değil, sürekli arama Kare hızı       çözünürlükten sonra değil, onunla birlikte aranır Kodek           hedefin gerçekte ne kadar zor olduğuna göre seçilir Ses             hedef sıkılaştıkça bütçe payı küçülür Tahmin          aralığıyla birlikte, baştan gösterilen ölçülmüş sayı
+DOKUM	tr	main.about.measured.title	Varsayılan Değil, Ölçülen
+DOKUM	tr	main.about.reading	Okunuyor...
+DOKUM	tr	main.about.scenario.body	• 1,2 katlık bir küçültme ile 600 katlık bir küçültme aynı sorun değildir, bu yüzden aynı muameleyi görmezler. • Hafif hedefler her şeyi korur ve yalnızca bütçeyi harcar. • Dengeli hedefler ölçek düşürmeye izin verir. • Agresif ve uç hedefler kare hızı düşürmeyi açar, H.265'e geçer ve ses payını kısar — üstelik uygulama neyi neden değiştirdiğini, siz başlata basmadan önce, sade bir dille söyler.
+DOKUM	tr	main.about.scenario.title	Senaryo Farkındalığı
+DOKUM	tr	main.about.status.title	Sistem Durumu
+DOKUM	tr	main.about.title	VidShrink Hakkında
+DOKUM	tr	main.about.tool-missing	{0} bulunamadı. VidShrink'in yanındaki tools/ffmpeg klasörüne koyun veya PATH'e kurun.
+DOKUM	tr	main.about.unavailable	Okunamadı
+DOKUM	tr	main.about.version	Sürüm
+DOKUM	tr	main.action.browse	Gözat
+DOKUM	tr	main.action.cancel	İptal
+DOKUM	tr	main.action.cancel-upload	Yüklemeyi İptal Et
+DOKUM	tr	main.action.convert	Dönüştür
+DOKUM	tr	main.action.copy	Kopyala
+DOKUM	tr	main.action.share	Dosyayı Paylaş
+DOKUM	tr	main.action.show-in-folder	Klasörde Göster
+DOKUM	tr	main.action.shrink	Küçült
+DOKUM	tr	main.advanced.audio-channels.label	Ses Kanalı
+DOKUM	tr	main.advanced.audio-channels.mono	Mono
+DOKUM	tr	main.advanced.audio-channels.none	Sessiz
+DOKUM	tr	main.advanced.audio-channels.stereo	Stereo
+DOKUM	tr	main.advanced.audio-kbps.label	Ses Hedefi (kbps)
+DOKUM	tr	main.advanced.codec-lock.label	Kodek Kilidi
+DOKUM	tr	main.advanced.crf.label	CRF
+DOKUM	tr	main.advanced.encoder-path.hardware	Donanım
+DOKUM	tr	main.advanced.encoder-path.label	Kodlayıcı Yolu
+DOKUM	tr	main.advanced.encoder-path.software	Yazılım
+DOKUM	tr	main.advanced.error	Gelişmiş Ayar Uygulanamadı: {0}
+DOKUM	tr	main.advanced.min-fps.label	Kare Hızı Tabanı (En Az)
+DOKUM	tr	main.advanced.min-resolution.label	Çözünürlük Tabanı (En Az)
+DOKUM	tr	main.advanced.mode.crf	CRF
+DOKUM	tr	main.advanced.mode.label	Kodlama Kipi
+DOKUM	tr	main.advanced.mode.two-pass	İki Geçiş
+DOKUM	tr	main.advanced.now	Şu an: {0}
+DOKUM	tr	main.advanced.preset.label	Ön Ayar / Hız
+DOKUM	tr	main.advanced.title	Gelişmiş Ayarlar
+DOKUM	tr	main.advice.audio-mono	Ses tek kanala indirildi — telefon hoparlöründe fark edilmez, görüntüye bit kazandırır.
+DOKUM	tr	main.advice.audio-reduced	Görüntüye bit kalsın diye ses bit hızı düşürüldü.
+DOKUM	tr	main.advice.below-codec-floor	Bu hedef bu kaynak için gerçekten çok küçük: hiçbir düzen kodlayıcının anlamlı bir görüntü için gereken piksel başına bit yoğunluğuna ulaşmıyor. En yoğun düzen seçildi ama sonuç belirgin şekilde bozuk çıkacak; hedefi büyütmek tek gerçek çare.
+DOKUM	tr	main.advice.budget-generous	Hedef bu kaynak için bol; motor bütçeyi zorlanmadan karşılıyor.
+DOKUM	tr	main.advice.codec-upgrade	Bu sıkışıklıkta H.265 aynı boyutta gözle görülür şekilde daha iyi sonuç verir; sıkıştırma algoritmasını otomatik veya H.265 yapmayı düşün.
+DOKUM	tr	main.advice.content-complex	İçerik yoğun ölçüldü; bit bütçesi bu yüzden zorlanıyor.
+DOKUM	tr	main.advice.content-simple	İçerik sade ölçüldü; hedefin altında rahat kalınıyor.
+DOKUM	tr	main.advice.encoder-fallback-gpu	Hızlı düşür (GPU) açık ama çalışan bir donanım kodlayıcı bulunamadı; kodlama yazılım kodlayıcısına düştü ve hız kazancı yok.
+DOKUM	tr	main.advice.encoder-fallback-not-in-build	Tercih edilen kodlayıcı bu FFmpeg derlemesinde yok; yazılım karşılığına düşüldü.
+DOKUM	tr	main.advice.encoder-fallback-not-measured	Tercih edilen kodlayıcı bu makinede henüz ölçülmedi; yazılım karşılığına düşüldü.
+DOKUM	tr	main.advice.encoder-fallback-not-working	Tercih edilen kodlayıcı bu makinede kullanılamadı; yazılım karşılığına düşüldü.
+DOKUM	tr	main.advice.extreme-ratio	Uç sıkıştırma: kayıp kaçınılmaz, motor kaybı en az hissedilecek yere yığıyor.
+DOKUM	tr	main.advice.frame-rate-for-floor	Kaynak kare hızında her kare kodlayıcının taban yoğunluğunun altına düşerdi; kare hızı düşürüldü ve kazanılan bitler kalan karelere gitti.
+DOKUM	tr	main.advice.frame-rate-reduced	Kalan karelere bit kazandırmak için kare hızı düşürüldü.
+DOKUM	tr	main.advice.hardware-costs-quality	Donanım kodlayıcısı hızlıdır ama bu kadar sıkışık bir hedefte megabayt başına belirgin kalite kaybettirir; hızlı düşür (GPU) kapalıyken sonuç daha iyi görünür.
+DOKUM	tr	main.advice.hdr-tonemapped	Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor; BT.709 SDR'ye tone-map edildi.
+DOKUM	tr	main.advice.motion-cut-cheap	Ölçüm bu klipte hareketin az olduğunu söylüyor; kare hızını düşürmek çok bit kazandırıyor ve kayıp zor fark ediliyor.
+DOKUM	tr	main.advice.motion-cut-expensive	Ölçüm bu klipte hareketin yoğun olduğunu söylüyor; kare düşürmek az kazandırdığı için önce çözünürlükten kısılıyor.
+DOKUM	tr	main.advice.quality-ceiling	Kalite tavanına ulaşıldı; kalan bütçe gözle görülür bir şey satın almayacağı için harcanmıyor.
+DOKUM	tr	main.advice.resolution-reduced	Bütçeye sığmak için çözünürlük düşürüldü.
+DOKUM	tr	main.advice.scale-saves-little	Bu klipte çözünürlük düşürmek az kazandırıyor; çözünürlük korunuyor.
+DOKUM	tr	main.advice.scale-saves-much	Bu klipte çözünürlük düşürmek çok bit kazandırıyor.
+DOKUM	tr	main.advice.two-pass	Hedef boyutu tutturmak için iki geçişli kodlama kullanılıyor.
+DOKUM	tr	main.ai.apply-json	Yapıştırılan JSON'u Uygula
+DOKUM	tr	main.ai.changes	Otomatik plana göre değişiklikler: • 
+DOKUM	tr	main.ai.clipboard-failed	Pano Kullanılamıyor
+DOKUM	tr	main.ai.copy-prompt	İstemi Kopyala
+DOKUM	tr	main.ai.load-first	Önce bir video yükleyin.
+DOKUM	tr	main.ai.no-clipboard	Pano sağlayıcısı yok.
+DOKUM	tr	main.ai.prompt-copied	İstem kopyalandı. JSON yanıtını aşağıya yapıştırın.
+DOKUM	tr	main.ai.rejected	Reddedildi; otomatik plan kullanılıyor: • 
+DOKUM	tr	main.ai.revert	Otomatiğe Dön
+DOKUM	tr	main.ai.reverted	Otomatik plana dönüldü.
+DOKUM	tr	main.ai.same-decision	AI otomatik planla aynı kararı verdi.
+DOKUM	tr	main.ai.stale	AI planı güncel seçeneklerle artık eşleşmiyor; otomatik plan kullanılıyor.
+DOKUM	tr	main.ai.tip	• Bu adım isteğe bağlı. • İstemi herhangi bir sohbet AI'ına kopyalayın, ardından JSON yanıtını yapıştırıp doğrulayın.
+DOKUM	tr	main.ai.title	AI Ayarları
+DOKUM	tr	main.ai.warnings	 Uyarılar: • 
+DOKUM	tr	main.allow.fps	Kare Hızı Düşürülebilir
+DOKUM	tr	main.allow.resolution	Çözünürlük Düşürülebilir
+DOKUM	tr	main.chip.100.tip	100 MB, kalitenin aktarım süresinden önemli olduğu arşiv ve yüklemelere uygundur.
+DOKUM	tr	main.chip.128.label	Paylaşım için en fazla
+DOKUM	tr	main.chip.128.tip	• 128 MiB, en dar sınırı olan anonim paylaşım hedefi uguu.se'nin ölçülmüş tavanıdır. • Bu boyutta ya da altında bir dosya iki paylaşım hedefine de geri çevrilmeden verilebilir. • Öteki hedef storage.to çok daha fazlasını taşır, bu yüzden bu yonga ikisi için de güvenli sayıdır.
+DOKUM	tr	main.chip.180.label	WhatsApp Web için en fazla
+DOKUM	tr	main.chip.180.tip	• Telefonda: sohbette 16 MB, belge olarak 2 GB. • Dosya başına 180 MB'ı web tarafı alır. Sayı kullanıcı bildirimi, WhatsApp yayımlamıyor. • 180 MB ve altı dosya bu yüzden web tarafından olduğu gibi geçer.
+DOKUM	tr	main.chip.25.tip	25 MB, Gmail ekine, Discord Nitro Basic'e ve çoğu talep sistemine uyar.
+DOKUM	tr	main.chip.8.tip	8 MB, Nitro'suz Discord'a, eski forumlara ve katı e-posta ağ geçitlerine uyar.
+DOKUM	tr	main.chip.archive.tip	• Arşiv yongasının boyut tavanı yoktur. • Motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur. • Bu yonga seçiliyken hedef kutusundaki sayı plana girmez. • Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil. • Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin. • Hedefe dokunduğunuz anda boyut tavanı geri gelir.
+DOKUM	tr	main.chip.half	Yarısı
+DOKUM	tr	main.chip.half.tip	• Kaynağın yarısı. • Yumuşak bir istek olduğu için motor genellikle özgün çözünürlüğü ve kare hızını korur.
+DOKUM	tr	main.chip.whatsapp.label	WhatsApp için önerilen
+DOKUM	tr	main.chip.whatsapp.tip	• WhatsApp sohbetteki videoyu kendi düşük bit hızlı kodlayıcısıyla yeniden kodlar. • 16 MB'ın altında dosyanızı genellikle çok daha az zarar vererek geçirir; karşı tarafın gördüğü WhatsApp'ın değil VidShrink'in kalitesi olur. • Yeniden kodlamayı tamamen atlamak için sonucu video olarak değil belge olarak gönderin.
+DOKUM	tr	main.codec.automatic	Otomatik
+DOKUM	tr	main.codec.compatible	H.264 (Uyumlu)
+DOKUM	tr	main.codec.label	Sıkıştırma Algoritması
+DOKUM	tr	main.codec.smallest	H.265 (En Küçük)
+DOKUM	tr	main.command.title	FFmpeg Komut Satırı
+DOKUM	tr	main.convert.audio	Ses
+DOKUM	tr	main.convert.audio-bitrate	Ses Bit Hızı K
+DOKUM	tr	main.convert.audio-bitrate.tip	• Saniyedeki kilobit cinsinden ses veri hızıdır. • 128 kompakt genel ayardır, 192 daha fazla ayrıntı sağlar, 256 veya 320 müzik için kullanışlıdır. • Kopyala, at ve sıkıştırılmamış PCM seçeneklerinde bu değer kullanılmaz.
+DOKUM	tr	main.convert.audio.tip	• AAC, MP4 için güvenli eşleşmedir ve her telefonun ve WhatsApp'ın sorunsuz işlediği tek ses kodeğidir. • Opus düşük bit hızlarında daha iyi duyulur ama yeri WebM'dir; MP4 içinde birçok telefonda oynamaz. • MP3 eski oynatıcılara uygundur. • PCM sıkıştırılmamış ve çok büyüktür. • Kopyala, kapsayıcı desteklediğinde özgün sesi yeniden kodlamadan korur. • At sesi tamamen kaldırır; sessiz bir klibi sıkıştırırken doğru seçim budur.
+DOKUM	tr	main.convert.browse	Kaynağa Gözat
+DOKUM	tr	main.convert.command	FFmpeg Komutu
+DOKUM	tr	main.convert.container	Kapsayıcı
+DOKUM	tr	main.convert.container.tip	• Kapsayıcı dosya türüdür. • MP4 en güvenli genel seçimdir ve WhatsApp'ın oynatılabilir video olarak güvenilir biçimde gönderdiği tek biçimdir — her telefon açar. • MKV birçok akış türünü destekler ancak WhatsApp ve çoğu telefon galerisi onu belge sayar. • WebM tarayıcılar içindir, telefon biçimi değildir. • MOV Apple iş akışlarına uygundur ve iPhone'da oynar, Android desteği ise düzensizdir. • AVI yalnızca eski yazılımlar içindir. • MP3, M4A ve WAV yalnızca ses dosyası oluşturur.
+DOKUM	tr	main.convert.copy	Kopyala
+DOKUM	tr	main.convert.crf-label	CRF Kalitesi / Bit Hızı K
+DOKUM	tr	main.convert.crf-label.tip	• CRF modunda düşük sayı daha yüksek kalite, daha büyük dosya demektir; H.264 için 23 yaygındır. • Sabit bit hızı modunda saniyedeki kilobit değerini girin: yüksek değer daha fazla kalite ve daha büyük dosya verir.
+DOKUM	tr	main.convert.custom	Özel
+DOKUM	tr	main.convert.custom-fps	Özel Kare Hızı
+DOKUM	tr	main.convert.custom-fps.tip	• Yalnızca kare hızı özel olduğunda kullanılır. • 25 veya 29.97 gibi istenen kare hızını girin. • Kaynağın üzerindeki değerler genellikle gerçek hareket ayrıntısı eklemez.
+DOKUM	tr	main.convert.custom-resolution	Özel Genişlik X Yükseklik
+DOKUM	tr	main.convert.custom-resolution.tip	• Yalnızca çözünürlük özel olduğunda kullanılır. • Genişlik ve yüksekliği 1280x720 biçiminde girin. • Yaygın video kodekleri için çift boyutlar en güvenlidir.
+DOKUM	tr	main.convert.drop	At
+DOKUM	tr	main.convert.fixed-bitrate	Sabit Bit Hızı
+DOKUM	tr	main.convert.frame-rate	Kare Hızı
+DOKUM	tr	main.convert.frame-rate.tip	• Kaynak özgün kare hızını korur. • 60 daha akıcıdır ancak daha fazla veri ister. • 30 çoğu videoya uygundur. • 24 sinema benzeri hareket verir. • Kare hızını düşürmek dosya boyutunu azaltabilir.
+DOKUM	tr	main.convert.progress	İlerleme
+DOKUM	tr	main.convert.quality-mode	Kalite Modu
+DOKUM	tr	main.convert.quality-mode.tip	• CRF görüntü kalitesini hedefler, son boyut değişebilir. • Sabit bit hızı bir veri hızını hedefleyerek dosya boyutunu daha öngörülebilir yapar. • Normal izleme kalitesi için CRF, boyut veya bant genişliği daha önemliyse sabit bit hızı kullanın.
+DOKUM	tr	main.convert.ready	Hazır.
+DOKUM	tr	main.convert.resolution	Çözünürlük
+DOKUM	tr	main.convert.resolution.tip	• Kaynak özgün boyutları korur. • Sayılı seçenekler en-boy oranını koruyarak çıktı yüksekliğini sınırlar. • Düşük çözünürlük boyutu ve işlem yükünü azaltır. • Özel, kesin genişlik ve yükseklik girmenizi sağlar.
+DOKUM	tr	main.convert.source-empty	Küçült sekmesinde kaynak yükleyin veya buradan gözatın.
+DOKUM	tr	main.convert.source-option	Kaynak
+DOKUM	tr	main.convert.title	Dönüştürme
+DOKUM	tr	main.convert.trim-end	Bitiş (SS:DD:SS)
+DOKUM	tr	main.convert.trim-end.tip	• İsteğe bağlı kırpma bitişidir. • Kaynağın sonuna kadar sürdürmek için boş bırakın. • Bitiş zamanı başlangıç zamanından sonra olmalıdır.
+DOKUM	tr	main.convert.trim-start	Başlangıç (SS:DD:SS)
+DOKUM	tr	main.convert.trim-start.tip	• İsteğe bağlı kırpma başlangıcıdır. • Kaynağın başından başlamak için boş bırakın. • Saat:dakika:saniye biçimini kullanın; örneğin 00:01:30.
+DOKUM	tr	main.convert.video-codec	Video Kodeği
+DOKUM	tr	main.convert.video-codec.tip	• H.264 üretilmiş hemen her cihazda oynar ve WhatsApp'ın beklediği biçimdir; dosyanın sorunsuz çalışması gerekiyorsa bunu seçin. • H.265 aynı görüntüyü üçte bir daha küçük dosyada verir; 2016 sonrası her telefon donanımda çözer. • Ancak eski cihazlar, bazı televizyonlar ve birkaç web oynatıcı açmaz; WhatsApp yeniden kodlayabilir. • VP9 bir tarayıcı ve WebM biçimidir; telefonlar uygulamalarda oynatır ama galeride nadiren. • AV1 en iyi sıkıştıranıdır ve en yavaş kodlanandır, yalnızca yeni telefonlar çözer. • Kopyala, kapsayıcı kabul ettiğinde özgün videoyu kalite kaybı ve bekleme olmadan olduğu gibi korur.
+DOKUM	tr	main.derivation.no-cap	Boyut Tavanı Yok
+DOKUM	tr	main.derivation.size	Hedef {0} MB
+DOKUM	tr	main.drop.hint	FFmpeg'in açabildiği her biçim
+DOKUM	tr	main.drop.no-folder	Klasör Bırakılamaz
+DOKUM	tr	main.drop.release	Yüklemek için bırakın
+DOKUM	tr	main.drop.single	Bir seferde tek dosya
+DOKUM	tr	main.drop.title	Bir medya dosyasını buraya bırakın
+DOKUM	tr	main.duration.copied	Kopyalanacak
+DOKUM	tr	main.duration.copied-note	Yeniden kodlama yok, dosya olduğu gibi aktarılıyor.
+DOKUM	tr	main.duration.frames-per-second	Kare/sn
+DOKUM	tr	main.duration.hours	Sa
+DOKUM	tr	main.duration.measured	Ölçülen
+DOKUM	tr	main.duration.minutes	Dk
+DOKUM	tr	main.duration.not-measured	Kodlama hızı bu makinede henüz ölçülmedi.
+DOKUM	tr	main.duration.other-settings	Örnekler bu plan ayarlarıyla kodlanmadı; süre tahmin edilmiyor.
+DOKUM	tr	main.duration.seconds	Sn
+DOKUM	tr	main.error.disk-full	Hedef sürücüde yer kalmadı. Yer açın ya da çıktıyı başka bir sürücüye alın.
+DOKUM	tr	main.error.encoder-container	Seçilen kodlayıcı ile kapsayıcı birbirine uymuyor. Kapsayıcıyı MP4, video kodeğini H.264 yapıp yeniden deneyin.
+DOKUM	tr	main.error.folder	Klasör Açılamadı
+DOKUM	tr	main.error.generic	İşlem tamamlanamadı. FFmpeg'in bildirdiği ayrıntı aşağıda.
+DOKUM	tr	main.error.link	Bağlantı Açılamadı
+DOKUM	tr	main.error.pick	Dosya Seçilemedi
+DOKUM	tr	main.error.probe	Donanım Kodlayıcı Yoklaması Başarısız
+DOKUM	tr	main.error.setting	Ayar Yazılamadı
+DOKUM	tr	main.error.startup	Açılış Tamamlanamadı
+DOKUM	tr	main.error.undecodable	Kaynak dosya çözülemedi; bozuk olabilir ya da bu FFmpeg sürümü bu biçimi tanımıyor.
+DOKUM	tr	main.error.unusable	Bu dosya kullanılamıyor
+DOKUM	tr	main.estimate.basis.estimated	Kaynak Bit Hızından Tahmin
+DOKUM	tr	main.estimate.basis.measured	Kaynaktan Ölçülen Karmaşıklık
+DOKUM	tr	main.estimate.calibrating	Plan ayarlarıyla kalibre ediliyor...
+DOKUM	tr	main.estimate.failed	Ölçüm Yapılamadı
+DOKUM	tr	main.estimate.measuring	Karmaşıklık ölçülüyor...
+DOKUM	tr	main.estimate.mode.ceiling	Kalite modu; hedefin altında kalır
+DOKUM	tr	main.estimate.mode.enforced	İki Geçişli Mod Boyutu Zorlar
+DOKUM	tr	main.estimate.of-source	Kaynağın
+DOKUM	tr	main.estimate.predicted-quality	Öngörülen Kalite
+DOKUM	tr	main.fast-gpu	Hızlı Düşür (GPU)
+DOKUM	tr	main.fast-gpu.bitrate-floor	{0} ancak {1} kbit/s ve üstünü takip ediyor, plan {2} kbit/s istiyor
+DOKUM	tr	main.fast-gpu.off-as-advised	• {0}, hızlı düşür kapalı kaldı.
+DOKUM	tr	main.fast-gpu.off-usable	• {0} ölçümü geçti; kutu elle kapatıldığı için kapalı kalıyor.
+DOKUM	tr	main.fast-gpu.on-against-advice	• {0}; ölçüm kapalı öneriyordu, kutu elle açıldı.
+DOKUM	tr	main.fast-gpu.on-usable	• Hızlı düşür kendiliğinden açıldı: {0} yoklamayı {1} ms'de geçti ve istenen {2} kbit/s takip edebildiği {3} kbit/s sınırının üstünde.
+DOKUM	tr	main.fast-gpu.probe-failed	{0} Yoklaması Geçmedi
+DOKUM	tr	main.fast-gpu.probe-slow	{0} Yoklaması {1} ms Sürdü, {2} ms Bütçesinin Üstünde
+DOKUM	tr	main.fast-gpu.tip	• Ekran kartı kodlamayı işlemciye göre kat kat hızlandırır. • VidShrink kartınızın sunduğu en iyi kodlayıcıyı seçer; modern kartlarda AV1 kodlayıcısı yazılım kodlayıcısıyla neredeyse aynı kaliteyi yaklaşık yedi kat hızlı verir. • Daha eski kartlarda hız yine gelir, ama bedeli megabayt başına bir miktar kalitedir.
+DOKUM	tr	main.fast-gpu.tip-missing	• Bu bilgisayarda kullanılabilir donanım kodlayıcı bulunamadı, bu yüzden hızlı düşürme kullanılamıyor. • Ekran kartı normalde işlemciden kat kat hızlı kodlar.
+DOKUM	tr	main.fill.ceiling	Kalite Tavanında Dur
+DOKUM	tr	main.fill.label	Bit Bütçesi
+DOKUM	tr	main.fill.target	Hedefi Doldur
+DOKUM	tr	main.hdr.label	HDR Biçimi
+DOKUM	tr	main.hdr.preserve	HDR'yi Koru
+DOKUM	tr	main.hdr.sdr	SDR'ye Çevir
+DOKUM	tr	main.info.audio	Ses
+DOKUM	tr	main.info.bitrate	Bit Hızı
+DOKUM	tr	main.info.duration	Süre
+DOKUM	tr	main.info.fps	Kare Hızı
+DOKUM	tr	main.info.hdr	HDR Aralığı
+DOKUM	tr	main.info.no	Hayır
+DOKUM	tr	main.info.none	Yok
+DOKUM	tr	main.info.resolution	Çözünürlük
+DOKUM	tr	main.info.size	Boyut
+DOKUM	tr	main.info.video-codec	Video Kodeği
+DOKUM	tr	main.info.yes	Evet
+DOKUM	tr	main.intent.archive	Arşiv
+DOKUM	tr	main.language.name	Türkçe
+DOKUM	tr	main.output.current-size	Güncel Çıktı Boyutu
+DOKUM	tr	main.output.estimated-output	Tahmini Çıktı
+DOKUM	tr	main.output.estimated-output.tip	• VidShrink plan yapmadan önce tam olarak bu klipten kısa örnekleri iki çözünürlükte kodlar ve gerçekte kaç bit gerektiğini ölçer — kaynak bit hızından tahmin yürütmez. • Tahminin bir kestirme kural değil, dar aralıklı ölçülmüş bir sayı olmasının sebebi budur. • İki geçişli işler yüzde birkaç içinde iner; kalite tavanlı işler ise bilerek hedefin altında kalır, çünkü kalanı harcamak gözle görülür bir şey satın almaz.
+DOKUM	tr	main.output.estimated-time	Tahmini Süre
+DOKUM	tr	main.output.estimated-time.tip	• VidShrink bu klip için koşturduğu örnek kodlamaların süresini ölçer; bu sayının arkasındaki hız ön ayar tablosundan değil, bu makineden ve bu dosyadan gelir. • İki geçişli işlerde aralık geniştir, çünkü birinci geçiş yalnızca görüntüyü çözümler ve ikinciden ucuza mal olur, ne kadar ucuz olduğu ise ölçülmez. • Plan, örneklerin kodlanmadığı ayarlara geçtiğinde süre tahmin edilmez, boş bırakılır.
+DOKUM	tr	main.output.idle	Boşta
+DOKUM	tr	main.output.remaining	Kalan
+DOKUM	tr	main.output.stage	Aşama
+DOKUM	tr	main.output.title	Çıktı
+DOKUM	tr	main.output.waiting	Kararınız Bekleniyor
+DOKUM	tr	main.plan.audio.mono	Tek Kanal
+DOKUM	tr	main.plan.automatic	Otomatik
+DOKUM	tr	main.plan.empty	Bir dosya yükleyin; motorun verdiği her karar burada madde madde listelenir.
+DOKUM	tr	main.plan.fact.audio	Ses
+DOKUM	tr	main.plan.fact.encoder	Kodlayıcı
+DOKUM	tr	main.plan.fact.estimated-size	Tahmini Boyut
+DOKUM	tr	main.plan.fact.frame-rate	Kare Hızı
+DOKUM	tr	main.plan.fact.mode	Mod
+DOKUM	tr	main.plan.fact.plan	Plan Türü
+DOKUM	tr	main.plan.fact.preset	Ön Ayar
+DOKUM	tr	main.plan.fact.resolution	Çözünürlük
+DOKUM	tr	main.plan.mode.copy	Kopyala
+DOKUM	tr	main.plan.mode.two-pass	İki Geçiş
+DOKUM	tr	main.plan.reasons	Neden böyle
+DOKUM	tr	main.plan.splitter	Önizleme ile plan paneli arasındaki ayırıcı
+DOKUM	tr	main.plan.title	Yapılacak İşlem
+DOKUM	tr	main.playback.encode-marker	Analiz {0}/{1} · Deneme {2}
+DOKUM	tr	main.player.empty	Yüklü Dosya Yok
+DOKUM	tr	main.player.menu	Oynatıcı Menüsü
+DOKUM	tr	main.player.menu.fullscreen	Tam Ekran
+DOKUM	tr	main.player.menu.playpause	Oynat / Duraklat
+DOKUM	tr	main.player.menu.reset	Yakınlaştırmayı Sıfırla
+DOKUM	tr	main.player.paused	Duraklatıldı
+DOKUM	tr	main.player.playing	Oynuyor
+DOKUM	tr	main.player.seekfailed	Arama başarısız: çözücü borusu yeniden başlatılamadı.
+DOKUM	tr	main.player.stalled	Oynatma ilerlemiyor; çözücü borusu kare üretmiyor.
+DOKUM	tr	main.player.state	Konum {0} Sn - {1} - Yakınlaştırma {2}%
+DOKUM	tr	main.player.title	Oynatıcı
+DOKUM	tr	main.quality.above-ceiling	İstenen kalite kaynağın kendisinden iyi: tavan {0} MB ve orada ulaşılan kalite {1}/100.
+DOKUM	tr	main.quality.basis	Dayanak
+DOKUM	tr	main.quality.basis.estimated	Kaynak Bit Hızından Tahmin Edildi
+DOKUM	tr	main.quality.basis.measured	Bu klipten kodlanan örnekle ölçüldü
+DOKUM	tr	main.quality.basis.under-target	Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır
+DOKUM	tr	main.quality.below-floor	İstenen kalite tabanın altında: {0} MB'dan küçük bir hedef üretilmiyor, o hedef zaten {1}/100 veriyor.
+DOKUM	tr	main.quality.loss	Kaynağa göre kayıp
+DOKUM	tr	main.quality.loss-points	{0} Puan
+DOKUM	tr	main.quality.no-source	Bir video yükleyin; kalite hedefi ancak kaynak bilinince hedef MB'a çevrilebilir.
+DOKUM	tr	main.quality.predicted	Tahmini Kalite
+DOKUM	tr	main.quality.target	Hedef
+DOKUM	tr	main.quality.tip.empty	Bir video yükleyin; bu hedefin tahmini kalite skoru burada çıkar.
+DOKUM	tr	main.quality.title	Kalite
+DOKUM	tr	main.reason.budget-below-ceiling	Bütçe CRF {0} civarında kalıyor, CRF {1} tavanının altında; bu yüzden iki geçişli VBR {2} MB'ın tamamını harcıyor
+DOKUM	tr	main.reason.budget-exceeds-ceiling	Bütçe CRF {0}'e imkan tanıyor, bu amaç için CRF {1} şeffaflık tavanından daha iyi; bu yüzden kodlayıcı tavanda durup dosyayı {3} MB'a şişirmek yerine yaklaşık {2} MB verir
+DOKUM	tr	main.reason.encoder-fallback-not-in-build	{0} kodlayıcısı bu FFmpeg derlemesinde yok, bu yüzden {1}'e düşüldü
+DOKUM	tr	main.reason.encoder-fallback-not-measured	{0} kodlayıcısı bu makinede henüz ölçülmedi, bu yüzden {1}'e düşüldü
+DOKUM	tr	main.reason.encoder-fallback-not-working	{0} kodlayıcısı bu makinede kullanılamadı, bu yüzden {1}'e düşüldü
+DOKUM	tr	main.reason.fill-band-center	CRF {0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {1} MB bant merkezini hedefliyor
+DOKUM	tr	main.reason.fill-band-narrow	Tek CRF adımı dosyayı %{0} kaydırıyor, bu da %{1}'lik doldurma bandından geniş; CRF banda giremediği için iki geçişli VBR doğrudan {2} MB hedefliyor
+DOKUM	tr	main.reason.fill-crf-lowered	Hedefi doldur politikası CRF'yi {0}'e düşürdü; şeffaflık tavanında durmak yerine {2}-{3} MB bandına, {1} MB bant merkezine yaklaşıldı
+DOKUM	tr	main.reason.frame-rate-reduced	Kare başına ayrıntıyı korumak için kare hızı {0}'e düşürüldü
+DOKUM	tr	main.reason.hardware-bitrate-bias	{0} donanım kodlayıcısı bu klip için henüz kalibre edilmedi; verilen bit hızının %{1} altına düşebilir, bu yüzden istenen bit hızı hedefte kalır ve tahminin alt ucu o kadar aşağı açılır
+DOKUM	tr	main.reason.hdr-tonemapped	Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi
+DOKUM	tr	main.reason.manual-audio-bitrate-override	Ses hedefi {0}kbps olarak sabitlendi; motor {1}kbps seçmişti
+DOKUM	tr	main.reason.manual-audio-bitrate-superseded	Ses hedefi {0}kbps olarak sabitlendi ama ses kanalı 'yok' olarak da sabitlenmişti; kanal isteği kazandı, çıktı sessiz
+DOKUM	tr	main.reason.manual-audio-bitrate-unmet	Ses hedefi {0}kbps olarak sabitlendi ama kaynakta ses akışı yok; istek karşılanmadı, çıktı sessiz
+DOKUM	tr	main.reason.manual-audio-channels-override	Ses kanalı {0} olarak sabitlendi; motor {1} seçmişti
+DOKUM	tr	main.reason.manual-audio-channels-unmet	Ses kanalı {0} olarak sabitlendi ama kaynakta ses akışı yok; istek karşılanmadı, çıktı sessiz
+DOKUM	tr	main.reason.manual-crf-clamped	Sabitlenen CRF {0} Kodekin İzin Verdiği Aralığın Dışındaydı, {2} Olarak Kırpıldı (İzin Verilen Aralık {1})
+DOKUM	tr	main.reason.manual-crf-override	CRF {0} olarak sabitlendi; hedef boyut artık zorlanmıyor, {3} MB yalnız bir tahmin — motor {1} kipinde {2} seçmişti
+DOKUM	tr	main.reason.manual-encoder-path-override	Kodlayıcı yolu {0} olarak sabitlendi; motor {1} seçmişti, kullanılan {2}
+DOKUM	tr	main.reason.manual-encoder-path-superseded	Kodlayıcı yolu {0} olarak sabitlendi ama aynı anda kodek de kilitlendi; kodek kilidi önceliklidir ve kullanılan {1}
+DOKUM	tr	main.reason.manual-encoder-path-unmet	Kodlayıcı yolu {0} olarak sabitlendi ama bu makinede o yolda kullanılabilir kodlayıcı yok; istek karşılanmadı, kullanılan {1}
+DOKUM	tr	main.reason.manual-min-fps-override	Kare hızı tabanı en az {0} olarak sabitlendi; motor {1} fps seçecekti, plan {2} fps ile çıkıyor
+DOKUM	tr	main.reason.manual-min-fps-unmet	Kare hızı tabanı en az {0} olarak sabitlendi ama kaynak bunun altında; istek karşılanmadı, plan {1} fps ile çıkıyor
+DOKUM	tr	main.reason.manual-min-resolution-override	Çözünürlük tabanı en az {0}p olarak sabitlendi; motor {1}p seçecekti, plan {2}x{3} ile çıkıyor
+DOKUM	tr	main.reason.manual-min-resolution-unmet	Çözünürlük tabanı en az {0}p olarak sabitlendi ama kaynak bunun altında ve motor yukarı ölçekleme yapmıyor; plan {1}x{2} ile çıkıyor
+DOKUM	tr	main.reason.manual-mode-override	Kodlama kipi {0} olarak sabitlendi; motor {1} seçmişti
+DOKUM	tr	main.reason.manual-mode-superseded-by-crf	Kodlama kipi {0} olarak da sabitlenmişti ama açık CRF sayısı önceliklidir; kip CRF oldu ve {0} isteği uygulanmadı
+DOKUM	tr	main.reason.manual-override-dropped-on-pass-through	Sabitlenen {0} kopyalama yolunda uygulanamadı; geçerli olan {1}
+DOKUM	tr	main.reason.manual-preset-first-pass-relaxed	Turbo ilk geçiş farklı bir ön ayarla çalışıyor; sabitlenen {0} yalnız çıktının üretildiği ikinci geçişte geçerli (ilk geçiş: {1})
+DOKUM	tr	main.reason.manual-preset-override	Ön ayar {0} olarak sabitlendi; motor {1} seçmişti
+DOKUM	tr	main.reason.measured-quality-stop	CRF {0} bu kaynakta ölçülen kaliteye zaten ulaşıyor; bu yüzden kodlayıcı orada durup {2} MB'ın kalanını hiçbir ölçümün kapsamadığı bir dışdeğerlemeye harcamak yerine yaklaşık {1} MB verir
+DOKUM	tr	main.reason.quality-estimated	Öngörülen Kalite {0}/100, Kaynak Bit Hızından Tahmin
+DOKUM	tr	main.reason.quality-measured	Öngörülen kalite {0}/100, ölçülen bir örnekten (bppf {1}, ayrıntı düşüşü {2})
+DOKUM	tr	main.reason.ratio	{0}x küçültme — {1} senaryo.
+DOKUM	tr	main.reason.regime.aggressive	Agresif
+DOKUM	tr	main.reason.regime.balanced	Dengeli
+DOKUM	tr	main.reason.regime.extreme	Uç
+DOKUM	tr	main.reason.regime.light	Hafif
+DOKUM	tr	main.reason.resolution-restored	Tavan bütçeyi boşta bıraktığı için çözünürlük {0}x{1}@{2}'e geri getirildi — CRF {3}'te hedefe hâlâ sığan en büyük düzen
+DOKUM	tr	main.reason.resolution-scaled	{0}x{1}'e ölçeklendi (kaynağın %{2}'i); bu klibin ölçülen ayrıntı düşüşünde bu, öngörülen kaliteyi yükseltecek kadar bit kazandırıyor
+DOKUM	tr	main.reason.retry-scaled	Yeniden deneme: önceki girişim {1} MB hedefe karşı {0} MB üretti; ses için {2} MB ayrıldıktan sonra video bit hızı {3} ile ölçeklendi ve kalan bütçeyle sınırlandı
+DOKUM	tr	main.reason.source-under-target	Kaynak zaten {0} MB, {1} MB hedefin altında; bu yüzden yeniden kodlanmadan olduğu gibi kopyalanıyor
+DOKUM	tr	main.reason.target-capped	Hedef {0} MB'a çekildi çünkü çıktı yapıldığı dosyadan büyük olamaz ({1} MB istenmişti)
+DOKUM	tr	main.retry.again	Tekrar Dene
+DOKUM	tr	main.retry.meaning-with-fallback	“Bu haliyle bırak” taşan dosyayı teslim etmek değildir; koşuyu bitirir. Hedeften büyük dosya asla verilmez: hedefin altında kalan son sonuç ({0} MB) teslim edilir.
+DOKUM	tr	main.retry.meaning-without-fallback	“Bu haliyle bırak” taşan dosyayı teslim etmek değildir; koşuyu bitirir. Hedeften büyük dosya asla verilmez ve hedefin altında kalan bir sonuç henüz yok, bu yüzden dosya yazılmaz.
+DOKUM	tr	main.retry.outcome	{0}/{1}. deneme {2} MB çıktı — {3} MB hedefinin {4} MB (%{5}) üzerinde. Bu deneme {6} sürdü; yeni bir deneme kabaca aynı süreyi alır.
+DOKUM	tr	main.retry.stop	Bu haliyle bırak
+DOKUM	tr	main.retry.title	Hedefin Üzerinde
+DOKUM	tr	main.run.cancelled	İptal edildi.
+DOKUM	tr	main.run.converted	Tamamlandı. {0} MB → {1} MB.
+DOKUM	tr	main.run.done	{0} denemede tamamlandı. {1} MB → {2} MB (%{3} daha küçük).
+DOKUM	tr	main.run.ended	Kodlama beklenmedik biçimde sonlandı, dosya yazılmadı.
+DOKUM	tr	main.run.no-space	Hedef sürücüde yeterli boş alan yok; en az {0} MB gerekiyor.
+DOKUM	tr	main.run.over-ceiling	{1} denemede {0} MB hedefinin altına inilemedi (son sonuç {2} MB). Dosya teslim edilmedi, çünkü hedeften büyük dosya asla verilmez. Hedefi büyütüp yeniden deneyin.
+DOKUM	tr	main.section.advanced.none	Hepsi Otomatik
+DOKUM	tr	main.section.advanced.overrides	{0} Ayar Elle
+DOKUM	tr	main.section.audio	Ses
+DOKUM	tr	main.section.frame	Kırpma ve çözünürlük
+DOKUM	tr	main.section.frame.fps-locked	Kare Hızı Sabit
+DOKUM	tr	main.section.frame.resolution-locked	Çözünürlük Sabit
+DOKUM	tr	main.section.outcome	Ne çıkacak
+DOKUM	tr	main.section.quality	Kalite ve uyumluluk
+DOKUM	tr	main.shrink-job.missing-paths	Kabuk isteğindeki {0} yol diskte bulunamadı ve atlandı: {1}
+DOKUM	tr	main.shrink-job.open-in-app	Uygulamada Aç
+DOKUM	tr	main.shrink-job.reason.no-path	Kabuk isteğinde var olan bir dosya bulunamadı; açılacak bir şey yok.
+DOKUM	tr	main.shrink-job.reason.no-target	Kabuk menüsü küçültme bayrağından sonra bir hedef boyut geçirmedi; küçültülecek bir ölçü yok.
+DOKUM	tr	main.shrink-job.reason.not-a-number	Kabuk menüsünden gelen hedef boyut sayı değil; boyut bütçesi olarak kullanılamıyor.
+DOKUM	tr	main.shrink-job.reason.not-in-quick-list	Kabuk menüsünden gelen hedef boyut hızlı boyutlardan biri değil ({0}); menüden bunlardan birini seçin.
+DOKUM	tr	main.shrink-job.reason.not-positive	Kabuk menüsünden gelen hedef boyut sıfır ya da negatif; bir dosya o ölçüye küçültülemez.
+DOKUM	tr	main.shrink-job.rejected	Küçültme İsteği Kabul Edilmedi
+DOKUM	tr	main.shrink-job.target	Hedef {0} — {2} dosyadan {1}.
+DOKUM	tr	main.shrink-job.waiting	Kabuk İsteği Bekleniyor
+DOKUM	tr	main.source.placeholder	Herhangi bir medya dosyasını buraya bırakın veya gözatın.
+DOKUM	tr	main.source.title	Kaynak
+DOKUM	tr	main.stage.attempt	Deneme
+DOKUM	tr	main.stage.converting	Dönüştürme
+DOKUM	tr	main.stage.encoding	Kodlama
+DOKUM	tr	main.stage.gif-encode	GIF Kodlama
+DOKUM	tr	main.stage.gif-palette	GIF Paleti
+DOKUM	tr	main.stage.pass	Geçiş
+DOKUM	tr	main.status.probe-failed	Donanım kodlayıcı yoklaması koşturulamadı: {0}. Plan yazılım kodlayıcısına düştü; sıkıştırma yine de çalışıyor.
+DOKUM	tr	main.status.probe-unsettled	Donanım kodlayıcı yoklaması sonuca varamadı, plan yazılım kodlayıcısına düştü. Sıkıştırma yine de çalışıyor.
+DOKUM	tr	main.tab.about	Hakkında
+DOKUM	tr	main.tab.advanced	Gelişmiş
+DOKUM	tr	main.tab.convert	Dönüştür
+DOKUM	tr	main.tab.player	Oynatıcı
+DOKUM	tr	main.tab.settings	Ayarlar
+DOKUM	tr	main.tab.shrink	Küçült
+DOKUM	tr	main.tagline.converter	Medya Dönüştürücü
+DOKUM	tr	main.tagline.lead	Boyut Hedefli Medya Sıkıştırma
+DOKUM	tr	main.target.crf-locked	CRF gelişmiş ayardan sabitlendi; hedef boyut artık zorlanmıyor, bir tahmine dönüştü.
+DOKUM	tr	main.target.title	Hedef
+DOKUM	tr	main.update.applied	Yeni Sürüme Geçildi
+DOKUM	tr	main.update.available	Yeni bir sürüm var
+DOKUM	tr	main.validation.container-audio-copy	{0} kapsayıcısı kaynaktaki {1} ses akışını kopyalamayı desteklemiyor.
+DOKUM	tr	main.validation.container-audio-encoder	{0} kapsayıcısı seçilen {1} ses kodlayıcısını desteklemiyor.
+DOKUM	tr	main.validation.container-video-copy	{0} kapsayıcısı kaynaktaki {1} video akışını kopyalamayı desteklemiyor.
+DOKUM	tr	main.validation.container-video-encoder	{0} kapsayıcısı seçilen {1} video kodlayıcısını desteklemiyor.
+DOKUM	tr	main.validation.copy-fixed	Akış kopyalama çözünürlüğü veya kare hızını değiştiremez.
+DOKUM	tr	main.validation.end-before-start	Bitiş zamanı başlangıç zamanından sonra olmalı.
+DOKUM	tr	main.validation.end-zero	Bitiş zamanı sıfırdan büyük olmalı.
+DOKUM	tr	main.validation.fps-zero	Kare hızı sıfırdan büyük olmalı.
+DOKUM	tr	main.validation.gif-copy	GIF video kodlaması gerektirir, akış kopyalama kullanamaz.
+DOKUM	tr	main.validation.no-audio-copy	Kaynakta kopyalanacak bir ses akışı yok.
+DOKUM	tr	main.validation.no-audio-extract	Kaynakta çıkarılacak bir ses akışı yok.
+DOKUM	tr	main.validation.size-even	Seçili piksel biçimi için çözünürlük değerleri çift sayı olmalı.
+DOKUM	tr	main.validation.size-positive	Çözünürlük değerleri sıfırdan büyük olmalı.
+DOKUM	tr	main.validation.start-negative	Başlangıç zamanı negatif olamaz.
+DOKUM	tr	main.validation.start-past-end	Başlangıç zamanı kaynağın bitişinden önce olmalı.
+DOKUM	tr	main.validation.trim-format	Kırpma zamanları SS:DD:SS biçiminde yazılmalı.
+DOKUM	tr	main.validation.trim-order	Kırpma bitişi kırpma başlangıcından sonra olmalı.
+DOKUM	tr	main.validation.untranslated-engine	Çevrilmemiş Motor İletisi: {0}
+DOKUM	tr	main.window.close	Kapat
+DOKUM	tr	main.window.maximize	Büyüt
+DOKUM	tr	main.window.minimize	Simge Durumuna Küçült
+DOKUM	tr	performance.boundary	VidShrink video kaydı yapmaz. Burada ölçülen şey, bu makinede kodlamanın maliyetidir; bir kayıt aracının onunla ne yaptığı değil — ilk bakılacak yer o aracın kendi kodlayıcı ayarıdır.
+DOKUM	tr	performance.fact.hardware-encoder	Donanım Kodlayıcısı
+DOKUM	tr	performance.fact.hardware-pipeline	Donanım Borusu
+DOKUM	tr	performance.fact.logical-cores	Mantıksal Çekirdek
+DOKUM	tr	performance.fact.measured-in	Ölçüm Süresi
+DOKUM	tr	performance.fact.software-cost	Yazılım Maliyeti
+DOKUM	tr	performance.fact.software-encoder	Yazılım Kodlayıcısı
+DOKUM	tr	performance.failed	Ölçüm Tamamlanamadı
+DOKUM	tr	performance.headline.hardware	Bu makinede çalışan bir donanım kodlayıcısı var, ancak o geçişi işlemcinin taşıyıp taşımadığı burada ölçülmedi.
+DOKUM	tr	performance.headline.hardware-offloaded	Bu makinede çalışan bir donanım kodlayıcısı var ve o geçiş işlemciye yaslanmıyor.
+DOKUM	tr	performance.headline.not-enough	Soruyu yanıtlayacak kadarı burada ölçülmedi.
+DOKUM	tr	performance.headline.software-heavy	Çalışan bir donanım kodlayıcısı bulunamadı ve yazılım kodlaması gerçek zamana yetişmek için bir işlemci çekirdeğinin tamamını istiyor.
+DOKUM	tr	performance.headline.software-light	Çalışan bir donanım kodlayıcısı bulunamadı, ama yazılım kodlaması gerçek zamanda tek çekirdeğin altında kalıyor.
+DOKUM	tr	performance.line.budget-exhausted	Ölçüm bütçesi tükendi ({1} ms bütçenin {0} ms'i), bu yüzden ölçümün bir ayağı eksik.
+DOKUM	tr	performance.line.cpu-unreliable	Bu makinedeki işlemci zamanı sayacı güvenilir değil (duvar saatine karşı {0}×), bu yüzden işlemci süreleri gösteriliyor ama onlardan bir karar çıkarılmıyor.
+DOKUM	tr	performance.line.hardware-cost-unknown	Donanım geçişinin işlemci maliyeti ölçülmedi, bu yüzden bedava sayılmamalı.
+DOKUM	tr	performance.line.hardware-failed	Bu makinede bir donanım kodlayıcısı listeleniyor, ancak deneme kodlaması başarısız oldu.
+DOKUM	tr	performance.line.hardware-headroom	Donanım geçişi gerçek zamanın {0}× hızında koştu.
+DOKUM	tr	performance.line.hardware-not-cpu-bound	Donanım geçişi işlemciye yaslanmıyor: ona tek iş parçacığı vermek ile iş parçacıklarını serbest bırakmak {0}× farkla aynı süreyi aldı.
+DOKUM	tr	performance.line.hardware-works	Bu makinede donanım kodlaması çalışıyor.
+DOKUM	tr	performance.line.no-hardware	Burada kullanılabilir bir donanım video kodlayıcısı yok, bu yüzden kodlama işlemcide koşuyor.
+DOKUM	tr	performance.line.not-measured	Bu makinede henüz hiçbir şey ölçülmedi.
+DOKUM	tr	performance.line.software-costs-cores	Bu bir çekirdek ya da fazlası ({0} çekirdek), yani yazılım kodlaması koştuğu sürece bir çekirdeği kendine ayırır.
+DOKUM	tr	performance.line.software-realtime	Yazılım kodlaması gerçek zamana yetişmek için {0} çekirdek istiyor; makinede {1} mantıksal çekirdek var.
+DOKUM	tr	performance.line.software-small	Bu tek çekirdeğin altında kalıyor ({0} çekirdek), yani başka işlerin bıraktığı boşluklara yayılabilir.
+DOKUM	tr	performance.run	Ölçümü Koştur
+DOKUM	tr	performance.running	Ölçülüyor — birkaç kısa kodlama koşuyor, en çok yirmi saniye sürer.
+DOKUM	tr	performance.title	Başarım Ölçümü
+DOKUM	tr	performance.value.cores	{0} Çekirdek
+DOKUM	tr	performance.value.ms	{0} ms
+DOKUM	tr	performance.value.realtime	{0}× Gerçek Zaman
+DOKUM	tr	playback.badge.original	ORİJİNAL
+DOKUM	tr	playback.badge.processed	İŞLENMİŞ
+DOKUM	tr	playback.control.pause	Duraklat
+DOKUM	tr	playback.control.play	Oynat
+DOKUM	tr	playback.control.restart	Başa Dön
+DOKUM	tr	playback.control.strip	Denetim Şeridi
+DOKUM	tr	playback.control.timeline	Zaman Çizgisi
+DOKUM	tr	playback.error.engine	Motor İletisi: {0}
+DOKUM	tr	playback.error.exit-code	FFmpeg {0} çıkış koduyla sonlandı.
+DOKUM	tr	playback.error.no-file	Parça dosyası üretilemedi.
+DOKUM	tr	playback.error.window	İstenen pencere kaynağın dışına düşüyor.
+DOKUM	tr	playback.panel.first-frame	İlk Kare Yolda
+DOKUM	tr	playback.panel.hint	İki tarafı görmek için bir dosya yükleyin
+DOKUM	tr	playback.panel.moved	Panel Öne Taşındı
+DOKUM	tr	playback.panel.pending	Bu bölüm işlenecek
+DOKUM	tr	playback.panel.title	Karşılaştırma Paneli
+DOKUM	tr	playback.player-failed	Karşılaştırma Oynatıcısı Başlayamadı
+DOKUM	tr	playback.sample-failed	Önizleme Örneği Kodlanamadı
+DOKUM	tr	settings-tab.advanced-default-open.hint	Gelişmiş bölümü uygulama her açıldığında otomatik olarak açar.
+DOKUM	tr	settings-tab.advanced-default-open.label	Gelişmiş Seçenekleri Varsayılan Olarak Açık Göster
+DOKUM	tr	settings-tab.default-target.hint	Küçült sekmesinin açılışta geleceği hedef boyutu belirler.
+DOKUM	tr	settings-tab.default-target.label	Varsayılan Hedef Boyut (MB)
+DOKUM	tr	settings-tab.ffmpeg-path.auto	Otomatik
+DOKUM	tr	settings-tab.ffmpeg-path.browse	Seç…
+DOKUM	tr	settings-tab.ffmpeg-path.error	Bu yol geçerli bir FFmpeg çalıştırılabilirine işaret etmiyor.
+DOKUM	tr	settings-tab.ffmpeg-path.hint	Elle, birlikte gelen FFmpeg yerine seçtiğiniz yolu kullanır.
+DOKUM	tr	settings-tab.ffmpeg-path.label	FFmpeg Yolu
+DOKUM	tr	settings-tab.ffmpeg-path.manual	Elle
+DOKUM	tr	settings-tab.general.title	Genel
+DOKUM	tr	settings-tab.language.hint	Arayüz dilini değiştirir ve bir sonraki açılışta hatırlanır.
+DOKUM	tr	settings-tab.language.label	Dil
+DOKUM	tr	settings-tab.output-folder.beside-source	Kaynağın Yanı
+DOKUM	tr	settings-tab.output-folder.browse	Seç…
+DOKUM	tr	settings-tab.output-folder.fixed	Sabit Klasör
+DOKUM	tr	settings-tab.output-folder.hint	Sabit klasör her çıktıyı kaynağın yanı yerine hep aynı yere gönderir.
+DOKUM	tr	settings-tab.output-folder.label	Çıktı Klasörü
+DOKUM	tr	settings.default-app.dismiss	Bir daha sorma
+DOKUM	tr	settings.default-app.open	Varsayılan Uygulamalar
+DOKUM	tr	settings.default-app.suggestion	VidShrink videolar için varsayılan program değil. Windows'un Varsayılan uygulamalar sayfasından seçebilirsiniz.
+DOKUM	tr	settings.error.reset	Ayarlar Sıfırlanamadı
+DOKUM	tr	settings.error.save	Ayar Yazılamadı
+DOKUM	tr	settings.reset-all	Tüm Ayarları Sıfırla
+DOKUM	tr	settings.reset-cancel	Vazgeç
+DOKUM	tr	settings.reset-confirm	Kaydedilen tüm ayarlar silinsin ve varsayılanlar geri yüklensin mi?
+DOKUM	tr	settings.reset-confirm-button	Ayarları Sıfırla
+DOKUM	tr	settings.share.can-delete	{0} silme jetonu veriyor, bu yüzden bağlantı ömrü dolmadan kapatılabilir. Düğme bir dosya paylaşıldıktan sonra çalışır.
+DOKUM	tr	settings.share.cancelled	İptal edildi.
+DOKUM	tr	settings.share.ceiling	Tavan
+DOKUM	tr	settings.share.close-failed	Paylaşım Kapatılamadı
+DOKUM	tr	settings.share.closed	Paylaşım kapatıldı.
+DOKUM	tr	settings.share.day-one	1 Gün
+DOKUM	tr	settings.share.days	{0} Gün
+DOKUM	tr	settings.share.delete	Paylaşılan Dosyayı Sil
+DOKUM	tr	settings.share.deletion	Silme
+DOKUM	tr	settings.share.failed	Paylaşılamadı
+DOKUM	tr	settings.share.hour-one-fixed	1 Saat, Sabit
+DOKUM	tr	settings.share.hours-fixed	{0} Saat, Sabit
+DOKUM	tr	settings.share.lifetime	Ömür
+DOKUM	tr	settings.share.no-delete	{0} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz.
+DOKUM	tr	settings.share.no-delete-window	{0} gönderene silme jetonu vermiyor, bu yüzden bağlantıyı ne siz ne biz erken kapatabiliriz. Onun yerine {1} saatlik kendiliğinden silme geçer.
+DOKUM	tr	settings.share.not-stated	Bildirilmemiş
+DOKUM	tr	settings.share.nothing	Paylaşılacak bir dosya yok.
+DOKUM	tr	settings.share.nothing-to-close	Kapatılacak bir paylaşım yok.
+DOKUM	tr	settings.share.shared	Paylaşıldı.
+DOKUM	tr	settings.share.shared-until	Paylaşıldı. Bağlantı {0} tarihine kadar açık.
+DOKUM	tr	settings.share.targets-missing	Paylaşım hedefleri okunamadı; {0} bulunamadı.
+DOKUM	tr	settings.share.tip	• Paylaşım hedefi, biten dosyanın yüklendiği servistir. • storage.to 25 GiB'a kadar taşır ve VidShrink dosyayı geri silebilir, bağlantı erken kapatılabilir. • uguu.se 128 MiB'a kadar taşır, 3 saat sonra siler; silme jetonu yok, bağlantı erken kapatılamaz.
+DOKUM	tr	settings.share.title	Paylaşım Hedefi
+DOKUM	tr	settings.share.upload-busy	Bir yükleme zaten sürüyor; bitmesini bekleyin ya da iptal edin.
+DOKUM	tr	settings.share.uploading	Yükleniyor...
+DOKUM	tr	settings.update.auto	Kendiliğinden Güncelle
+DOKUM	tr	settings.update.auto-effect	Bu kapalıyken VidShrink kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir.
+DOKUM	tr	settings.update.no-self-effect	VidShrink bu sistemde kendini güncellemez: yalnızca yeni sürümü ve kuran komutu gösterir.
+DOKUM	tr	settings.update.title	Güncelleme

@@ -1,0 +1,124 @@
+KOL	en	main.about.engine.title	How the engine thinks	How the engine thinks
+KOL	en	main.about.loss.title	Where the loss goes	Where the loss goes
+KOL	en	main.action.cancel-upload	Cancel the upload	Cancel the upload
+KOL	en	main.action.share	Share the file	Share the file
+KOL	en	main.action.show-in-folder	Show in folder	Show in folder
+KOL	en	main.advanced.error	Advanced setting could not be applied: {0}	Advanced setting could not be applied: {0}
+KOL	en	main.advanced.min-fps.label	Frame-rate floor (at least)	Frame-rate floor (at least)
+KOL	en	main.advanced.min-resolution.label	Resolution floor (at least)	Resolution floor (at least)
+KOL	en	main.ai.clipboard-failed	The clipboard is unavailable	The clipboard is unavailable
+KOL	en	main.ai.revert	Back to automatic	Back to automatic
+KOL	en	main.allow.fps	May lower frame rate	May lower frame rate
+KOL	en	main.allow.resolution	May lower resolution	May lower resolution
+KOL	en	main.drop.hint	Any format ffmpeg can open	Any format FFmpeg can open
+KOL	en	main.drop.no-folder	Folders cannot be dropped	Folders cannot be dropped
+KOL	en	main.drop.release	Release to load this file	Release to load this file
+KOL	en	main.drop.single	Only one file at a time	Only one file at a time
+KOL	en	main.drop.title	Drop a media file here	Drop a media file here
+KOL	en	main.error.folder	The folder could not be opened	The folder could not be opened
+KOL	en	main.error.link	The link could not be opened	The link could not be opened
+KOL	en	main.error.pick	The file could not be chosen	The file could not be chosen
+KOL	en	main.error.probe	The hardware encoder probe failed	The hardware encoder probe failed
+KOL	en	main.error.setting	The setting could not be saved	The setting could not be saved
+KOL	en	main.error.unusable	This file cannot be used	This file cannot be used
+KOL	en	main.estimate.basis.estimated	estimated from source bitrate	Estimated from source bitrate
+KOL	en	main.estimate.mode.enforced	two-pass enforces this size	Two-pass enforces this size
+KOL	en	main.estimate.of-source	Of source	Of source
+KOL	en	main.fast-gpu.bitrate-floor	{0} only follows {1} kbit/s and above while the plan asks for {2} kbit/s	{0} only follows {1} kbit/s and above while the plan asks for {2} kbit/s
+KOL	en	main.fast-gpu.probe-failed	the {0} probe did not pass	The {0} probe did not pass
+KOL	en	main.fast-gpu.probe-slow	the {0} probe took {1} ms, past the {2} ms budget	The {0} probe took {1} ms, past the {2} ms budget
+KOL	en	main.fill.ceiling	Stay at quality ceiling	Stay at quality ceiling
+KOL	en	main.hdr.sdr	Convert to SDR	Convert to SDR
+KOL	en	main.output.waiting	Waiting for your decision	Waiting for your decision
+KOL	en	main.plan.reasons	Why these choices	Why these choices
+KOL	en	main.plan.splitter	Splitter between the preview and the plan panel	Splitter between the preview and the plan panel
+KOL	en	main.plan.title	What it will do	What it will do
+KOL	en	main.quality.basis.estimated	Estimated from the source bitrate	Estimated from the source bitrate
+KOL	en	main.quality.basis.measured	Measured from a sample encoded from this clip	Measured from a sample encoded from this clip
+KOL	en	main.quality.basis.under-target	The source is already under this target and is copied as it is	The source is already under this target and is copied as it is
+KOL	en	main.quality.loss	Loss against the source	Loss against the source
+KOL	en	main.reason.budget-below-ceiling	the budget lands near CRF {0}, short of the CRF {1} ceiling, so two-pass VBR spends the whole {2} MB	The budget lands near CRF {0}, short of the CRF {1} ceiling, so two-pass VBR spends the whole {2} MB
+KOL	en	main.reason.budget-exceeds-ceiling	the budget affords CRF {0}, better than the CRF {1} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {2} MB instead of padding the file to {3} MB	The budget affords CRF {0}, better than the CRF {1} transparency ceiling for this intent, so the encoder stops at the ceiling and delivers about {2} MB instead of padding the file to {3} MB
+KOL	en	main.reason.encoder-fallback-not-in-build	the {0} encoder is not part of this ffmpeg build, so encoding falls back to {1}	The {0} encoder is not part of this FFmpeg build, so encoding falls back to {1}
+KOL	en	main.reason.encoder-fallback-not-measured	the {0} encoder has not been measured on this machine, so encoding falls back to {1}	The {0} encoder has not been measured on this machine, so encoding falls back to {1}
+KOL	en	main.reason.encoder-fallback-not-working	the {0} encoder could not be used on this machine, so encoding falls back to {1}	The {0} encoder could not be used on this machine, so encoding falls back to {1}
+KOL	en	main.reason.fill-band-center	CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly	CRF floor {0} was reached before the fill band, so two-pass VBR targets the {1} MB band center directly
+KOL	en	main.reason.fill-band-narrow	one CRF step moves the file by {0}%, wider than the {1}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {2} MB directly	One CRF step moves the file by {0}%, wider than the {1}% fill band, so single-pass CRF cannot land inside it and two-pass VBR targets {2} MB directly
+KOL	en	main.reason.fill-crf-lowered	the fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band	The fill target policy lowered CRF to {0} instead of stopping at the transparency ceiling, landing near the {1} MB band center inside the {2}-{3} MB band
+KOL	en	main.reason.frame-rate-reduced	frame rate reduced to {0} to keep per-frame detail	Frame rate reduced to {0} to keep per-frame detail
+KOL	en	main.reason.hardware-bitrate-bias	the {0} hardware encoder is not calibrated for this clip yet and can land {1}% under the bitrate it is given, so the requested bitrate stays on the target and the estimate opens that much room underneath	The {0} hardware encoder is not calibrated for this clip yet and can land {1}% under the bitrate it is given, so the requested bitrate stays on the target and the estimate opens that much room underneath
+KOL	en	main.reason.hdr-tonemapped	the source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709	The source is HDR but the selected encoder cannot preserve 10-bit, so it was tone-mapped to SDR BT.709
+KOL	en	main.reason.manual-crf-clamped	the fixed CRF {0} was outside the codec's allowed range, clamped to {2} (allowed range {1})	The fixed CRF {0} was outside the codec's allowed range, clamped to {2} (allowed range {1})
+KOL	en	main.reason.measured-quality-stop	CRF {0} already reaches the quality measured on this source, so the encoder stops there and delivers about {1} MB instead of spending the rest of the {2} MB on an extrapolation no measurement covers	CRF {0} already reaches the quality measured on this source, so the encoder stops there and delivers about {1} MB instead of spending the rest of the {2} MB on an extrapolation no measurement covers
+KOL	en	main.reason.quality-estimated	predicted quality {0}/100 estimated from the source bitrate	Predicted quality {0}/100 estimated from the source bitrate
+KOL	en	main.reason.quality-measured	predicted quality {0}/100 from a measured sample (bppf {1}, detail falloff {2})	Predicted quality {0}/100 from a measured sample (bppf {1}, detail falloff {2})
+KOL	en	main.reason.resolution-restored	the ceiling left budget unused, so resolution was restored to {0}x{1}@{2} — the largest layout that still fits the target at CRF {3}	The ceiling left budget unused, so resolution was restored to {0}x{1}@{2} — the largest layout that still fits the target at CRF {3}
+KOL	en	main.reason.source-under-target	the source is already {0} MB, under the {1} MB target, so it is copied as it is instead of being re-encoded	The source is already {0} MB, under the {1} MB target, so it is copied as it is instead of being re-encoded
+KOL	en	main.reason.target-capped	the target was capped to {0} MB because the output is never larger than what it was made from ({1} MB was asked for)	The target was capped to {0} MB because the output is never larger than what it was made from ({1} MB was asked for)
+KOL	en	main.retry.stop	Leave it as is	Leave it as is
+KOL	en	main.retry.title	Over the target	Over the target
+KOL	en	main.section.advanced.overrides	{0} set by hand	{0} set by hand
+KOL	en	main.section.frame	Cropping and resolution	Cropping and resolution
+KOL	en	main.section.outcome	What comes out	What comes out
+KOL	en	main.section.quality	Quality and compatibility	Quality and compatibility
+KOL	en	main.shrink-job.missing-paths	{0} of the paths in the shell request were not found on disk and were skipped: {1}	{0} of the paths in the shell request were not found on disk and were skipped: {1}
+KOL	en	main.shrink-job.open-in-app	Open in the app	Open in the app
+KOL	en	main.shrink-job.rejected	The shrink request was not accepted	The shrink request was not accepted
+KOL	en	main.shrink-job.target	Target {0} — file {1} of {2}	Target {0} — file {1} of {2}
+KOL	en	main.shrink-job.waiting	Waiting for the shell request	Waiting for the shell request
+KOL	en	main.update.applied	Updated to a new version	Updated to a new version
+KOL	en	main.update.available	A new version is available	A new version is available
+KOL	en	performance.fact.measured-in	Measured in	Measured in
+KOL	en	performance.failed	The check could not finish	The check could not finish
+KOL	en	performance.run	Run the check	Run the check
+KOL	en	playback.control.restart	Back to the start	Back to the start
+KOL	en	playback.panel.first-frame	The first frame is on its way	The first frame is on its way
+KOL	en	playback.panel.hint	Load a file to see the two sides	Load a file to see the two sides
+KOL	en	playback.panel.moved	The panel moved to the front	The panel moved to the front
+KOL	en	playback.panel.pending	This part will be processed	This part will be processed
+KOL	en	playback.player-failed	The comparison player could not start	The comparison player could not start
+KOL	en	playback.sample-failed	The preview sample could not be encoded	The preview sample could not be encoded
+KOL	en	settings-tab.advanced-default-open.label	Show advanced options expanded by default	Show advanced options expanded by default
+KOL	en	settings-tab.output-folder.beside-source	Next to the source file	Next to the source file
+KOL	en	settings.default-app.dismiss	Do not ask again	Do not ask again
+KOL	en	settings.error.reset	Settings could not be reset	Settings could not be reset
+KOL	en	settings.error.save	The setting could not be saved	The setting could not be saved
+KOL	en	settings.share.close-failed	The share could not be closed	The share could not be closed
+KOL	en	settings.share.delete	Delete the shared file	Delete the shared file
+KOL	en	settings.share.failed	The file could not be shared	The file could not be shared
+KOL	tr	main.about.engine.title	Motor nasıl düşünüyor	Motor nasıl düşünüyor
+KOL	tr	main.advanced.now	Şu an: {0}	Şu an: {0}
+KOL	tr	main.ai.changes	Otomatik plana göre değişiklikler: • 	Otomatik plana göre değişiklikler: • 
+KOL	tr	main.chip.128.label	Paylaşım için en fazla	Paylaşım için en fazla
+KOL	tr	main.chip.180.label	WhatsApp Web için en fazla	WhatsApp Web için en fazla
+KOL	tr	main.chip.whatsapp.label	WhatsApp için önerilen	WhatsApp için önerilen
+KOL	tr	main.convert.drop	At	At
+KOL	tr	main.drop.hint	Ffmpeg'in açabildiği her biçim	FFmpeg'in açabildiği her biçim
+KOL	tr	main.drop.release	Yüklemek için bırakın	Yüklemek için bırakın
+KOL	tr	main.drop.single	Bir seferde tek dosya	Bir seferde tek dosya
+KOL	tr	main.drop.title	Bir medya dosyasını buraya bırakın	Bir medya dosyasını buraya bırakın
+KOL	tr	main.error.unusable	Bu dosya kullanılamıyor	Bu dosya kullanılamıyor
+KOL	tr	main.fast-gpu.bitrate-floor	{0} ancak {1} kbit/s ve üstünü takip ediyor, plan {2} kbit/s istiyor	{0} ancak {1} kbit/s ve üstünü takip ediyor, plan {2} kbit/s istiyor
+KOL	tr	main.plan.reasons	Neden böyle	Neden böyle
+KOL	tr	main.plan.splitter	Önizleme ile plan paneli arasındaki ayırıcı	Önizleme ile plan paneli arasındaki ayırıcı
+KOL	tr	main.quality.basis.measured	Bu klipten kodlanan örnekle ölçüldü	Bu klipten kodlanan örnekle ölçüldü
+KOL	tr	main.quality.basis.under-target	Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır	Kaynak zaten bu hedefin altında, olduğu gibi kopyalanır
+KOL	tr	main.quality.loss	Kaynağa göre kayıp	Kaynağa göre kayıp
+KOL	tr	main.reason.encoder-fallback-not-in-build	{0} kodlayıcısı bu ffmpeg derlemesinde yok, bu yüzden {1}'e düşüldü	{0} kodlayıcısı bu FFmpeg derlemesinde yok, bu yüzden {1}'e düşüldü
+KOL	tr	main.reason.encoder-fallback-not-measured	{0} kodlayıcısı bu makinede henüz ölçülmedi, bu yüzden {1}'e düşüldü	{0} kodlayıcısı bu makinede henüz ölçülmedi, bu yüzden {1}'e düşüldü
+KOL	tr	main.reason.encoder-fallback-not-working	{0} kodlayıcısı bu makinede kullanılamadı, bu yüzden {1}'e düşüldü	{0} kodlayıcısı bu makinede kullanılamadı, bu yüzden {1}'e düşüldü
+KOL	tr	main.reason.fill-band-center	CRF {0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {1} MB bant merkezini hedefliyor	CRF {0} tabanına bandı doldurmadan ulaşıldığı için iki geçişli VBR doğrudan {1} MB bant merkezini hedefliyor
+KOL	tr	main.reason.frame-rate-reduced	kare başına ayrıntıyı korumak için kare hızı {0}'e düşürüldü	Kare başına ayrıntıyı korumak için kare hızı {0}'e düşürüldü
+KOL	tr	main.reason.hdr-tonemapped	kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi	Kaynak HDR ama seçili kodlayıcı 10-bit'i koruyamıyor, bu yüzden BT.709 SDR'ye tone-map edildi
+KOL	tr	main.reason.quality-measured	öngörülen kalite {0}/100, ölçülen bir örnekten (bppf {1}, ayrıntı düşüşü {2})	Öngörülen kalite {0}/100, ölçülen bir örnekten (bppf {1}, ayrıntı düşüşü {2})
+KOL	tr	main.reason.resolution-restored	tavan bütçeyi boşta bıraktığı için çözünürlük {0}x{1}@{2}'e geri getirildi — CRF {3}'te hedefe hâlâ sığan en büyük düzen	Tavan bütçeyi boşta bıraktığı için çözünürlük {0}x{1}@{2}'e geri getirildi — CRF {3}'te hedefe hâlâ sığan en büyük düzen
+KOL	tr	main.reason.target-capped	hedef {0} MB'a çekildi çünkü çıktı yapıldığı dosyadan büyük olamaz ({1} MB istenmişti)	Hedef {0} MB'a çekildi çünkü çıktı yapıldığı dosyadan büyük olamaz ({1} MB istenmişti)
+KOL	tr	main.retry.stop	Bu haliyle bırak	Bu haliyle bırak
+KOL	tr	main.section.frame	Kırpma ve çözünürlük	Kırpma ve çözünürlük
+KOL	tr	main.section.outcome	Ne çıkacak	Ne çıkacak
+KOL	tr	main.section.quality	Kalite ve uyumluluk	Kalite ve uyumluluk
+KOL	tr	main.shrink-job.missing-paths	Kabuk isteğindeki {0} yol diskte bulunamadı ve atlandı: {1}	Kabuk isteğindeki {0} yol diskte bulunamadı ve atlandı: {1}
+KOL	tr	main.update.available	Yeni bir sürüm var	Yeni bir sürüm var
+KOL	tr	playback.panel.hint	İki tarafı görmek için bir dosya yükleyin	İki tarafı görmek için bir dosya yükleyin
+KOL	tr	playback.panel.pending	Bu bölüm işlenecek	Bu bölüm işlenecek
+KOL	tr	settings.default-app.dismiss	Bir daha sorma	Bir daha sorma

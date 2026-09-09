@@ -1,0 +1,30 @@
+[
+  {
+    "Pencere": "p1-karisik",
+    "Kol": "taban",
+    "GerceklesenMb": 59.338571548461914,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": true,
+    "VmafMean": 91.20297506777796,
+    "VmafP10": 89.0829982,
+    "VmafMin": 79.145996,
+    "VmafWorstScene": 89.03484167500002,
+    "Bilinmiyor": null
+  },
+  {
+    "Pencere": "p1-karisik",
+    "Kol": "dagitim",
+    "GerceklesenMb": 61.49844264984131,
+    "HedefMb": 60,
+    "BandAltMb": 58.32,
+    "BandUstMb": 60,
+    "BandIcinde": false,
+    "VmafMean": 91.19797011777798,
+    "VmafP10": 89.18729590000001,
+    "VmafMin": 78.8211,
+    "VmafWorstScene": 89.57387279166664,
+    "Bilinmiyor": null
+  }
+]

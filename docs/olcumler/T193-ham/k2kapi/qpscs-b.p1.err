@@ -1,0 +1,41 @@
+Input #0, matroska,webm, from 'C:/Users/Teknesyum/Desktop/Projeler/VidShrink-T193/.calisma/T193/kaynak/p1-karisik.mkv':
+  Metadata:
+    COMPATIBLE_BRANDS: isommp42
+    DATE            : 2026
+    MAJOR_BRAND     : mp42
+    MINOR_VERSION   : 0
+    ENCODER         : Lavf63.1.100
+  Duration: 00:01:00.00, start: 0.000000, bitrate: 30219 kb/s
+  Stream #0:0: Video: hevc (Main 10), yuv420p10le(pc, bt2020nc/bt2020/smpte2084, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 60 fps, 60 tbr, 1k tbn (default)
+    Metadata:
+      ENCODER         : Lavc63.1.100 libx265
+      HANDLER_NAME    : VideoHandle
+      DURATION        : 00:01:00.000000000
+Stream mapping:
+  Stream #0:0 -> #0:0 (hevc (native) -> av1 (libsvtav1))
+Press [q] to stop, [?] for help
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [version]:	SVT-AV1 Encoder Lib v4.2.0-68-gc1e79b04f
+Svt[info]: SVT [build]  :	GCC 16.1.0	 64 bit
+Svt[info]: LIB Build date: Aug  2 2026 11:16:16
+Svt[info]: -------------------------------------------
+Svt[warn]: The input q value is ignored in vbr mode 43
+Svt[info]: -------------------------------------------
+Svt[info]: SVT [config]: preset 							: Pass 1
+Svt[info]: -------------------------------------------
+Output #0, null, to 'pipe:':
+  Metadata:
+    COMPATIBLE_BRANDS: isommp42
+    DATE            : 2026
+    MAJOR_BRAND     : mp42
+    MINOR_VERSION   : 0
+    encoder         : Lavf63.1.100
+  Stream #0:0: Video: av1, yuv420p10le(pc, bt2020nc/bt2020/smpte2084, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 8230 kb/s, 60 fps, 60 tbn (default)
+    Metadata:
+      encoder         : Lavc63.1.100 libsvtav1
+      HANDLER_NAME    : VideoHandle
+      DURATION        : 00:01:00.000000000
+    Side data:
+      CPB properties: bitrate max/min/avg: 0/0/8230000 buffer size: 8230000 vbv_delay: N/A
+frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.51    frame=   41 fps= 40 q=41.0 size=N/A time=00:00:00.66 bitrate=N/A speed=0.655x elapsed=0:00:01.01    frame=   91 fps= 59 q=44.0 size=N/A time=00:00:01.50 bitrate=N/A speed=0.971x elapsed=0:00:01.54    frame=  144 fps= 70 q=45.0 size=N/A time=00:00:02.38 bitrate=N/A speed=1.16x elapsed=0:00:02.05    frame=  196 fps= 76 q=45.0 size=N/A time=00:00:03.25 bitrate=N/A speed=1.26x elapsed=0:00:02.57    frame=  273 fps= 88 q=37.0 size=N/A time=00:00:04.53 bitrate=N/A speed=1.47x elapsed=0:00:03.08    frame=  340 fps= 94 q=44.0 size=N/A time=00:00:05.65 bitrate=N/A speed=1.57x elapsed=0:00:03.60    [out#0/null @ 000001276af17ac0] video:3132KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  360 fps= 99 q=45.0 Lsize=N/A time=00:00:05.98 bitrate=N/A speed=1.65x elapsed=0:00:03.63    

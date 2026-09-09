@@ -1,6 +1,6 @@
-# Satır sonları dosya türüne göre sabittir, klonlayan makinenin kabuğuna göre değil.
-# CRLF satır sonlu bir kabuk betiği Linux ve macOS'ta "bad interpreter" ile düşer,
-# bu yüzden .sh her yerde LF kalır.
+# Satir sonlari dosya turune gore sabittir, klonlayan makinenin kabuguna gore degil.
+# CRLF satir sonlu bir kabuk betigi Linux ve macOS'ta "bad interpreter" ile duser,
+# bu yuzden .sh her yerde LF kalir.
 
 * text=auto
 
@@ -15,3 +15,6 @@
 *.ttf  binary
 *.otf  binary
 *.mp4  binary
+
+# Uretecin ciktisiyla md5 karsilastirilan belge: LF, checkout makinesine bakmaz.
+docs/olcumler/max-mod-acilis.md text eol=lf

@@ -1,0 +1,10 @@
+Tekrar gurultusu kosumlarinin kaynagi (T193 tur 2)
+
+kontrol-1..4  : yapicinin kendi kosumu, 08-svtav1-kapisi.sh, 8 Eylul 2026 ~19:5x
+kontrol-5..8  : denetcinin bagimsiz tekrar kosumu, ayni duzenek
+                (ayni pencere p1-karisik, 6 sn, iki gecis, preset 6, lp=6, -b:v 8230k),
+                8 Eylul 2026 20:06-20:08. Denetci dosya adlari ctrl-1..4.mkv idi.
+ffqcomp-a/b   : denetcinin ffmpeg'in kendi -qcomp secenegiyle kosumu
+                (-qcomp 0.40 ve -qcomp 0.95), ayni duzenek, 8 Eylul 2026 20:08-20:09.
+
+Bu dosyalar denetci kosumundan bayt bayt kopyalandi; yeniden kodlanmadi.

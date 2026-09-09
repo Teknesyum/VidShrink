@@ -1,0 +1,52 @@
+C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T193\tests\VidShrink.Tests\bin\Release\net8.0\VidShrink.Tests.dll (.NETCoreApp,Version=v8.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+[xUnit.net 00:04:33.79]     VidShrink.Tests.UpdaterTests.TheIncomingBinaryRenamesItselfOntoTheTargetName [SKIP]
+  Atlandı VidShrink.Tests.UpdaterTests.TheIncomingBinaryRenamesItselfOntoTheTargetName [1 ms]
+[xUnit.net 00:04:44.63]     VidShrink.Tests.UpdaterTests.EveryLaunchChecksAndStaysWithinTheTimeout [SKIP]
+  Atlandı VidShrink.Tests.UpdaterTests.EveryLaunchChecksAndStaysWithinTheTimeout [1 ms]
+[xUnit.net 00:04:46.39]     VidShrink.Tests.UpdaterTests.SwitchedOffLauncherMakesNoNetworkRequestAtAll [SKIP]
+  Atlandı VidShrink.Tests.UpdaterTests.SwitchedOffLauncherMakesNoNetworkRequestAtAll [1 ms]
+[xUnit.net 00:05:28.36]     VidShrink.Tests.HardwareRateControlTests.LiveFastTargetsLandInsideTheBandOnTheFirstAttempt [SKIP]
+  Atlandı VidShrink.Tests.HardwareRateControlTests.LiveFastTargetsLandInsideTheBandOnTheFirstAttempt [1 ms]
+[xUnit.net 00:05:28.36]     VidShrink.Tests.HardwareRateControlTests.LiveProcessorTargetsStillLandInsideTheBandOnTheFirstAttempt [SKIP]
+  Atlandı VidShrink.Tests.HardwareRateControlTests.LiveProcessorTargetsStillLandInsideTheBandOnTheFirstAttempt [1 ms]
+[xUnit.net 00:06:08.96]     VidShrink.Tests.CalibrationProbeTests.LiveFastModeLandsInsideTheBandOnTheFirstAttempt [SKIP]
+  Atlandı VidShrink.Tests.CalibrationProbeTests.LiveFastModeLandsInsideTheBandOnTheFirstAttempt [1 ms]
+[xUnit.net 00:06:08.96]     VidShrink.Tests.CalibrationProbeTests.LiveEncodeTimeMatchesTheMeasuredEstimate [SKIP]
+[xUnit.net 00:06:08.96]     VidShrink.Tests.CalibrationProbeTests.LiveTimeSurvivesTheTargetsThatKeepThePlanShape [SKIP]
+  Atlandı VidShrink.Tests.CalibrationProbeTests.LiveEncodeTimeMatchesTheMeasuredEstimate [1 ms]
+  Atlandı VidShrink.Tests.CalibrationProbeTests.LiveTimeSurvivesTheTargetsThatKeepThePlanShape [1 ms]
+[xUnit.net 00:06:12.97]     VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir [FAIL]
+  Başarısız VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir [10 ms]
+  Hata İletisi:
+   System.ComponentModel.Win32Exception : Erişim engellendi.
+  Yığın İzleme:
+     at System.Diagnostics.ProcessManager.OpenProcess(Int32 processId, Int32 access, Boolean throwIfExited)
+   at System.Diagnostics.Process.GetProcessHandle(Int32 access, Boolean throwIfExited)
+   at System.Diagnostics.Process.UpdateHasExited()
+   at System.Diagnostics.Process.get_HasExited()
+   at VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir() in C:\Users\Teknesyum\Desktop\Projeler\VidShrink-T193\tests\VidShrink.Tests\OynaticiBoruTests.cs:line 379
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:06:26.18]     VidShrink.Tests.ExtremeCompressionTests.LiveQualityCurveShowsWhereTheCodecStopsCarryingThePicture [SKIP]
+[xUnit.net 00:06:26.18]     VidShrink.Tests.ExtremeCompressionTests.LiveProbeMeasuresMotionWithinItsTimeBudget [SKIP]
+  Atlandı VidShrink.Tests.ExtremeCompressionTests.LiveQualityCurveShowsWhereTheCodecStopsCarryingThePicture [1 ms]
+  Atlandı VidShrink.Tests.ExtremeCompressionTests.LiveProbeMeasuresMotionWithinItsTimeBudget [1 ms]
+[xUnit.net 00:06:26.18]     VidShrink.Tests.ExtremeCompressionTests.LiveExtremeTargetsProduceAPlayablePicture [SKIP]
+  Atlandı VidShrink.Tests.ExtremeCompressionTests.LiveExtremeTargetsProduceAPlayablePicture [1 ms]
+[xUnit.net 00:06:26.31]     VidShrink.Tests.HardwareVerdictTests.TheFirstLayoutDoesNotWaitForTheProbe [SKIP]
+  Atlandı VidShrink.Tests.HardwareVerdictTests.TheFirstLayoutDoesNotWaitForTheProbe [1 ms]
+[xUnit.net 00:06:26.37]     VidShrink.Tests.HardwareVerdictTests.LiveProbeDecidesOnThisMachine [SKIP]
+  Atlandı VidShrink.Tests.HardwareVerdictTests.LiveProbeDecidesOnThisMachine [1 ms]
+[xUnit.net 00:06:32.19]     VidShrink.Tests.HardwareFlagTests.LiveFastRunDoesNotSpendEveryAttempt [SKIP]
+  Atlandı VidShrink.Tests.HardwareFlagTests.LiveFastRunDoesNotSpendEveryAttempt [1 ms]
+[xUnit.net 00:08:17.72]     VidShrink.Tests.PlaybackFrameSourceTests.Duraklatma_sureci_oldurmez [SKIP]
+  Atlandı VidShrink.Tests.PlaybackFrameSourceTests.Duraklatma_sureci_oldurmez [1 ms]
+[xUnit.net 00:08:17.72]     VidShrink.Tests.PlaybackFrameSourceTests.Canli_kaynak_iki_paneli_besliyor [SKIP]
+  Atlandı VidShrink.Tests.PlaybackFrameSourceTests.Canli_kaynak_iki_paneli_besliyor [1 ms]
+[xUnit.net 00:08:29.81]     VidShrink.Tests.FillBandTests.LiveFillTargetRunStaysInsideTheBand [SKIP]
+  Atlandı VidShrink.Tests.FillBandTests.LiveFillTargetRunStaysInsideTheBand [1 ms]
+[xUnit.net 00:13:01.92]     VidShrink.Tests.PerformanceCheckTests.DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu [SKIP]
+  Atlandı VidShrink.Tests.PerformanceCheckTests.DonanimKodlayiciIslemciZamaniniOlculebilirYaziyorMu [1 ms]
+
+Başarısız! - Başarısız:     1, Başarılı:  1906, Atlanan:    18, Toplam:  1925, Süre: 13 m 29 s - VidShrink.Tests.dll (net8.0)
