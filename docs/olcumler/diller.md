@@ -72,3 +72,14 @@ Kırk dil için toplam ölçülen: **~3,7 milyon belirteç**, sekizerli beş dal
 
 Dördüncü dalga oturum kotasına çarptı: sekiz ajan da 429 aldı, `bg`/`el`/`hu` yine de
 tamamlanmıştı, yarım kalan `ro` silinip yeniden çevrildi.
+
+## Sağdan sola
+
+`Strings.RightToLeftLanguages` = `ar fa he ur`. Pencerenin `FlowDirection`'ı bu listeden
+kararlaştırılıyor: `MainWindow` kurulumda ve her dil değişiminde, `ShrinkJobWindow`
+açılışta.
+
+```
+dotnet test --filter "FullyQualifiedName~LocalizationTests|FullyQualifiedName~LanguageTests"
+Başarılı!  - Başarısız: 0, Başarılı: 138, Atlanan: 0, Toplam: 138, Süre: 20 s
+```

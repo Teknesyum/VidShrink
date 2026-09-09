@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -598,7 +598,13 @@ public partial class MainWindow : Window
 
         BuildLanguageList();
         MarkChosenLanguage();
+        ApplyFlowDirection();
     }
+
+    private void ApplyFlowDirection()
+        => FlowDirection = Strings.IsRightToLeft
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
 
     /// <summary>
     /// Ayarlardaki tam liste. Üst şerit yalnız kısayolu taşır; kurulumdaki her dil buradan
@@ -754,6 +760,7 @@ public partial class MainWindow : Window
         }
 
         MarkChosenLanguage();
+        ApplyFlowDirection();
         RefreshChoiceLabels();
         ApplyFastGpuTip();
         _preview?.SetLanguage(Strings.Language);

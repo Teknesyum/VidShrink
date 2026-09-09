@@ -107,6 +107,18 @@ public static class Strings
         }
     }
 
+    public static IReadOnlyList<string> RightToLeftLanguages { get; } = new[] { "ar", "fa", "he", "ur" };
+
+    public static bool IsRightToLeft => IsRightToLeftLanguage(Language);
+
+    public static bool IsRightToLeftLanguage(string? language)
+    {
+        if (string.IsNullOrWhiteSpace(language)) return false;
+
+        var head = language.Trim().Split('-')[0];
+        return RightToLeftLanguages.Any(code => string.Equals(code, head, StringComparison.OrdinalIgnoreCase));
+    }
+
     public static void Use(string language)
     {
         if (string.IsNullOrWhiteSpace(language))

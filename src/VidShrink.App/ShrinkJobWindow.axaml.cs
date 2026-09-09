@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -103,6 +103,10 @@ public partial class ShrinkJobWindow : Window
         Strings.Use(_language);
 
         InitializeComponent();
+
+        FlowDirection = Strings.IsRightToLeftLanguage(_language)
+            ? Avalonia.Media.FlowDirection.RightToLeft
+            : Avalonia.Media.FlowDirection.LeftToRight;
 
         BtnClose.Click += (_, _) => Close();
         BtnOpenInApp.Click += OnOpenInApp;

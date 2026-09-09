@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -1146,5 +1146,35 @@ public sealed class LanguageTests : IDisposable
         Assert.True(bozulan.Count == 0,
             $"Dil '{language}': {prose.Count} govde degeri, {karsilastirilan} sozcuk; "
             + $"{bozulan.Count} sozcuk bozuldu:\n" + string.Join("\n", bozulan));
+    }
+
+    [Theory]
+    [InlineData("ar")]
+    [InlineData("fa")]
+    [InlineData("he")]
+    [InlineData("ur")]
+    public void Sagdan_sola_diller_taninir(string language)
+    {
+        Assert.True(Strings.IsRightToLeftLanguage(language));
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    [InlineData("zh-Hans")]
+    [InlineData("ja")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void Soldan_saga_diller_sagdan_sola_sayilmaz(string? language)
+    {
+        Assert.False(Strings.IsRightToLeftLanguage(language));
+    }
+
+    [Fact]
+    public void Sagdan_sola_listesi_kurulumdaki_dillerin_altkumesi()
+    {
+        var shipped = Strings.Languages;
+        foreach (var code in Strings.RightToLeftLanguages)
+            Assert.Contains(shipped, l => string.Equals(l, code, StringComparison.OrdinalIgnoreCase));
     }
 }
