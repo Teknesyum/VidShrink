@@ -1,61 +1,60 @@
-# Devir — 2026-09-09
+# Handoff — 2026-09-09
 
-Dal: `claude/tema-paleti` (origin'e itildi, uç `097b141`).
-`main`e göre 55 commit ileri, 16 commit geri. PR açılmadı.
+Önce task, sonra changed_files oku. İlk bitmemiş parçadan sür; diff'in gösterdiğini yeniden
+yapma, yeniden doğrulama.
 
-Sıradaki turda önce `git pull`, sonra aşağıdaki "Sıradaki iş" listesinden sür.
+## changed_files
+Bu devirde eklenenler (hepsi commit'li):
+- `docs/inceleme/ui-denetim-2026-09-08.md` — arayüz denetim raporu, §8 geçerlilik bölümü eklendi
+- `docs/inceleme/ui-denetim-2026-09-08/` — 5 ham ajan çıktısı + 15 ekran görüntüsü
+- `tools/gorunum-yakalama/` — ss/click/kirp betikleri + AGENTS.md
 
-## Ne bitti
+## tests_run
+- `dotnet test` bu devirde başlatıldı; sonucu aşağıda "durum" altında.
 
-Plan tamamen uygulandı, `trash/plan-diller-tema-2026-09-09.md`'ye taşındı. Üç adımı:
+## plan
+`docs/plan.md`. Uygulanmış dil/tema planı `trash/plan-diller-tema-2026-09-09.md`.
 
-- **A — Dil seçici.** Üst şeritte yalnız `Strings.ShortcutLanguages` (en, tr) + ayar
-  tekerleği; tam liste ayarlardaki açılır kutuda. (`4dc3477`, `c4e6b1e`)
-- **B — Yirmi tema.** Palet dosyaları `Themes/Palette/` altında, ayardan seçiliyor,
-  çalışırken değişiyor. (`acb23db`, `aecc1b2`, `368777d`, `fca9ea2`)
-- **C — Diller.** 40 yeni dil indi; depoda **42 dil klasörü** var
-  (`src/VidShrink.App/Locales/`), her biri dört dosya ve **488 anahtar**.
-  Denetim: `python tools/dil-denetim.py` → hepsi
-  `TAMAM anahtar 488/488 eksik 0 fazla 0 yertutucu 0`.
-  Kanıt ve maliyet: `docs/olcumler/diller.md` (dil başına ~93 bin belirteç,
-  kırk dil ~3,7 milyon).
-- **Kalan iki dilli dikiş** kapandı: motorda İngilizce/Türkçe gömülü cümle yok. (`68d8e3a`)
-- **Sağdan sola.** `Strings.RightToLeftLanguages` = ar, fa, he, ur.
-  `MainWindow` kurulumda ve her dil değişiminde, `ShrinkJobWindow` açılışta
-  `FlowDirection`'ı buna bağlıyor. (`097b141`)
+## task
+İki iş açık, ikisi de karar bekliyor:
 
-## Testler
+**1. `claude/tema-paleti` dalı `main`e birleşmedi.** 18 commit: palet ayrı dosyaya alındı,
+20 hazır tema, dil altyapısı n dile açıldı, 40 dil, sağdan sola akış, oynatıcı açılış yolu.
+Dal `origin` ile eşitli (0/0). `main`in 55 commit'i (T192/T193 motor işleri) bu dalda yok.
+**Yalnız T0 `main`e birleştirir** — birleştirmeyi kendi başına yapma, kullanıcıya sor.
 
-```
-dotnet test --filter "FullyQualifiedName~LocalizationTests|FullyQualifiedName~LanguageTests"
-Başarılı!  - Başarısız: 0, Başarılı: 138, Atlanan: 0, Toplam: 138, Süre: 20 s
-```
+**2. Arayüz denetim raporunun 56 bulgusundan hiçbiri uygulanmadı.** Rapor 8 Eylül'de
+`44f4593` üzerinde yazıldı, sonrasındaki 18 commit bazılarını çoktan kapattı.
+Raporun **§8 Geçerlilik** bölümü hangisinin açık hangisinin kapalı olduğunu grep kanıtıyla
+söyler. Uygulamaya oradan başla, raporun gövdesindeki satır numaralarına körlemesine güvenme.
 
-Tam koşum (`dotnet test`, ~20 dk): 1935 başarılı / 18 atlanan / **1 başarısız**.
-Tek kırmızı: `VidShrink.Tests.OynaticiBoruTests_DecoderPipe.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`
-(`OynaticiBoruTests.cs:379`, `Process.get_HasExited()` → "Erişim engellendi").
-**Bu kırmızı dil işinden önce de vardı**, bu daldaki değişikliklerden değil.
+## steer
+- Denetim salt okumaydı; kod değiştirilmedi. Düzeltmeye geçmek ayrı bir karar.
+- **Sırayı kullanıcı seçer.** Raporun 7. bölümünde bir öneri var, emir değil.
+- Renk ve ölçü uydurma: renk `Themes/Palette/`, ölçü `Themes/Theme.axaml`.
+- Git'e giremeyen dosyalar `D:\!Tmp\Projeler\VidShrink-devir-2026-09-09\` altında,
+  yanında `OKU.md` neyin neden orada olduğunu yazar. `.calisma/` (6,2 GB) kopyalanmadı.
 
-## Sıradaki iş
+## decisions
+- Denetimin ham kanıtı gizlenmedi: beş ajanın çıktısı ve seçilen kareler `docs/` altında,
+  rapor onlara bağ veriyor. Toplam maliyet 719.607 token, en uzun ajan 304 sn.
+- Dört bulgu kanıtla çürütüldü ve rapordan düşürüldü (§4): sekme hayalet metni (çapraz geçiş
+  artefaktı), oynatıcının sahte desen göstermesi (kaynak klibin kendisi sınama deseni),
+  iş penceresinin İngilizce açılması (dili denetim sırasında ben değiştirmiştim),
+  16 MB'ın reddi (doğrulama doğru çalışıyor).
+- 9 Eylül geçerlilik denetiminde **1.2 ve 1.3 kapandı**: `MainWindow.axaml.cs:2513-2519`
+  dosyayla açılışta Oynatıcı sekmesine geçip `Player.OpenAsync(path)` çağırıyor.
+  Gözlemim ("Yüklü Dosya Yok") doğruydu, teşhisim ("sekme ezileniyor") yanlıştı.
+- **1.7 de kapandı**: ayar yazımları `Save(SettingsPathOverride)`e çevrilmiş.
+- Hâlâ açık ve doğrulanmış: 1.1, 1.4, 1.5, 1.6, 1.8, 1.10, 1.11, 1.14 ve `RadioButton`
+  teması. 1.9/1.12/1.13/1.15 ve 2. bölümün tamamı yeniden doğrulanmadı.
+- `.calisma/` 6,2 GB; kopyalamak pahalı ve içeriği yeniden üretilebilir — kopyalanmadı,
+  `OKU.md` içinde tek satırlık `robocopy` komutu duruyor.
 
-1. **`TipOverflowTests` yalnız EN/TR ölçüyor.** 42 dilde balon/ipucu taşması var mı
-   bakılmadı. Ölçüyü genişlet ya da uzun metinleri kısalt.
-2. **`KillTree` kırmızısı.** Yukarıdaki tek başarısız test; ayrı iş, dil işiyle ilgisiz.
-3. **Dalın geleceği.** `main`in 16 commit gerisinde. Birleştirme kararı T0'ın:
-   ya `main`den rebase, ya PR. Bu dal `main`e kendiliğinden birleşmez.
-4. Motor yol haritası (`docs/tasks/yol-haritasi.md`) P0'dan itibaren dokunulmadı.
-
-## Çalışma kalıntısı
-
-`.calisma/` (git dışı, ~6 GB) eski ölçüm turlarını taşıyor: `T158 T171 T176 T189*
-T192* gorunum kaynak kaynak-genis t57 t58 t60 t61 t63 test-ciktilari`.
-Dil işi buraya kalıcı hiçbir şey bırakmadı; boş klasörler silindi.
-Rapora giren sayı `docs/olcumler/diller.md`'ye, düzenek `tools/dil-denetim.py`'ye taşındı.
-`.calisma/`yi boşaltmak kullanıcının kararı.
-
-## Kurallar (bu depoda unutulmasın)
-
-- Kod yorumu yazma. Renk/ölçü uydurma.
-- `main`e yalnız T0 birleştirir; kendi dalında çalış.
-- Alt ajana arka plan komutu verme — ajanın turunu öldürüyor.
-- Kabuk Windows PowerShell 5.1: `&&`, `||`, ternary yok.
+## next_action
+1. Kullanıcıya iki soruyu sor (dal birleştirme, düzeltme sırası) ve cevabı bekle.
+2. Sıra gelirse: raporun §8'inden başla, açık bulguyu uygula, `dotnet test` yeşil tut,
+   her bulgu kendi commit'inde.
+3. §8'de "bakmadım" diyen maddelere dokunmadan önce grep'le doğrula — özellikle 2.9
+   (`Locales/` 2 dilden 42 dile çıktı, satır numaraları kaydı) ve 2.16-2.18 (palet
+   mimarisi tümden değişti).

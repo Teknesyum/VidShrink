@@ -7,11 +7,11 @@ Yöntem: beş paralel denetçi ajan statik inceleme yaptı (ham çıktılar `ui-
 ardından uygulama Debug derlenip `.calisma/T171/kaynak/buyuk-1.mp4` ile açıldı ve ekran
 görüntüsüyle doğrulandı (`ui-denetim-2026-09-08/ekran/`). **Kod değiştirilmedi.**
 
-> **Satır numaraları uyarısı.** Denetim `44f4593` üzerinde koştu. Rapor yazılırken çalışma
-> ağacında başka bir taraf `App.axaml`, `MainWindow.axaml`, `Themes/Theme.axaml`
-> (−35 satır), `Themes/Controls.axaml`, `Themes/Playback.axaml` dosyalarını commit'siz
-> değiştirmiş durumdaydı. Tema bölümündeki (1.16, 2.16-2.18) satır numaralarını uygulamadan
-> önce doğrula.
+> **Bu rapor 8 Eylül'de `44f4593` üzerinde yazıldı ve bugün bayattır.** `claude/tema-paleti`
+> dalı o günden sonra 18 commit aldı: 20 palet, 40 dil, sağdan sola akış ve oynatıcı
+> açılış yolu. Bulguların bir kısmı çoktan kapandı. Geçerlilik dökümü için
+> **[9 Eylül geçerlilik denetimi](#8-geçerlilik-9-eylül-2026)** bölümüne bak — hiçbir
+> maddeyi oraya bakmadan uygulama.
 
 Her satır: `dosya:satır — kusur — düzeltme` `[kaynak]`. Kaynak `A1..A5` ajan numarası,
 `G` benim canlı gözlemim.
@@ -425,3 +425,47 @@ Sıra senin, ama kırılganlığa göre en pahalıdan ucuza:
 - `ui-denetim-2026-09-08/ekran/` — 12 ekran görüntüsü ve kırpma
 
 Ajan toplamı: **719.607 token**, en uzun ajan 304 sn (beşi paralel koştu).
+
+---
+
+## 8. Geçerlilik — 9 Eylül 2026
+
+Rapor `44f4593` üzerinde yazıldı. `claude/tema-paleti` dalı o tarihten sonra 18 commit
+aldı (`b07ba24`…`058e3a1`): palet ayrı dosyaya alındı, 20 tema geldi, dil altyapısı
+n dile açıldı, 40 dil eklendi, sağdan sola akış yazıldı, oynatıcı açılış yolu değişti.
+
+Aşağısı **grep ile doğrulanmış** durum. Doğrulamadıklarımı da açıkça yazdım; onları
+uygulamadan önce kendin bak.
+
+### Kapanmış — uygulama, çünkü zaten yapılmış
+
+| Bulgu | Bugünkü kanıt |
+|---|---|
+| **1.2** Oynatıcı açılış dosyasını almıyor | `MainWindow.axaml.cs:2513-2519` artık `await Player.OpenAsync(path)` çağırıyor |
+| **1.3** Açılış sekmesi | `:2515` `Tabs.SelectedIndex = PlayerTabIndex` — dosyayla açılışta Oynatıcı **kasıtlı**; gözlemim doğruydu, teşhisim yanlıştı |
+| **1.7** `UpdateSettings.Save` budaması | `:1005-1006,1017,1766,2311,2330` hepsi `Save(SettingsPathOverride)`, yanında `CaptureAppSettings().Save(...)` |
+| **1.16** `PinkText` sabit `#FFFF54EB` | `grep FFFF54EB Themes/` boş — palet dosyalarına taşınmış |
+| **1.16** `drop-shadow` sabit rengi | `grep drop-shadow MainWindow.axaml` boş |
+| **1.16** kullanılmayan `CheckGlyphSize` | Kaynakta yok (yalnız bayat `obj/` içinde) |
+
+### Hâlâ açık — doğrulandı
+
+| Bulgu | Bugünkü kanıt |
+|---|---|
+| **1.1** Oynatıcı kare çizmiyor | `PlayerView.axaml.cs:339` tek `Draw(frame)` çağrısı, hâlâ seek yolunda |
+| **1.4** Zoom / kırpma | `PlayerView.axaml:27` hâlâ `Stretch="None" HorizontalAlignment="Left"` |
+| **1.5** Sabit çıktı klasörü ölü | `OutputFolderMode` yalnız `AppSettings.cs` ve `MainWindow.axaml.cs:209,794`'te; yol üretiminde yok |
+| **1.6** Elle ffmpeg yolu ölü | `ToolLocator.cs`'te hâlâ setter/`Override` yok |
+| **1.8** Eski çıktı ile karşılaştırma | `_lastOutput` yalnız `:3682,3929`'da yazılıyor, yükleyicide sıfırlanmıyor |
+| **1.10** Kapalı pencerede kuyruk | `ShrinkJobWindow.axaml.cs:218` döngüsü duruyor, `OnClosing`'de `_pending.Clear()` yok |
+| **1.11** `Player.Close()` çağrılmıyor | `MainWindow.axaml.cs:497` `OnClosing` içinde yok |
+| **1.14** `MinHeight=720` | `MainWindow.axaml:8` değişmemiş |
+| **1.16** `RadioButton` teması yok | `grep -l RadioButton Themes/` hâlâ boş |
+
+### Bakmadım — önce doğrula
+
+- **1.9, 1.12, 1.13, 1.15** ve 2. bölümün tamamı.
+- **2.9** sözlük tutarsızlıkları: `Locales/` 2 dilden **42 dile** çıktı; `tr/main.json`
+  satır numaraları kesinlikle kaymıştır, üstelik aynı kusur 40 dile kopyalanmış olabilir.
+- **2.16-2.18** tema bölümü: palet mimarisi tümden değişti (`Themes/Palette/` altında
+  20 dosya + `seeds.json`). **2.17** "tek koyu palet" maddesi büyük ihtimalle artık yanlış.
