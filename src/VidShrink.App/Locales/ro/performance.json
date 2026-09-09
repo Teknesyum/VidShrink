@@ -1,0 +1,36 @@
+{
+  "performance.title": "Verificare performanță",
+  "performance.run": "Rulează verificarea",
+  "performance.running": "Se măsoară — rulează câteva codări scurte și durează până la douăzeci de secunde.",
+  "performance.failed": "Verificarea nu s-a putut încheia",
+
+  "performance.headline.hardware-offloaded": "Acest calculator are un codor hardware funcțional, iar acea trecere nu apasă pe procesor.",
+  "performance.headline.hardware": "Acest calculator are un codor hardware funcțional, dar nu s-a măsurat aici dacă procesorul poartă acea trecere.",
+  "performance.headline.software-heavy": "Nu s-a găsit niciun codor hardware funcțional, iar codarea software cere un nucleu întreg de procesor ca să țină pasul cu timpul real.",
+  "performance.headline.software-light": "Nu s-a găsit niciun codor hardware funcțional, dar codarea software rămâne sub un nucleu de procesor în timp real.",
+  "performance.headline.not-enough": "Nu s-a măsurat destul aici ca să se răspundă la întrebare.",
+
+  "performance.line.not-measured": "Nu s-a măsurat încă nimic pe acest calculator.",
+  "performance.line.no-hardware": "Nu există niciun codor video hardware aici, deci codarea rulează pe procesor.",
+  "performance.line.hardware-failed": "Pe acest calculator apare un codor hardware, dar codarea lui de test a eșuat.",
+  "performance.line.hardware-works": "Codarea hardware funcționează pe acest calculator.",
+  "performance.line.hardware-not-cpu-bound": "Trecerea hardware nu apasă pe procesor: cu un singur fir sau cu firele libere a durat la fel, în limita a {0}×.",
+  "performance.line.hardware-cost-unknown": "Costul de procesor al trecerii hardware nu a fost măsurat, deci nu trebuie citit ca fiind gratuit.",
+  "performance.line.hardware-headroom": "Trecerea hardware a rulat la {0}× timp real.",
+  "performance.line.software-realtime": "Codarea software cere {0} nuclee ca să țină pasul cu timpul real, din {1} nuclee logice.",
+  "performance.line.software-costs-cores": "Adică un nucleu întreg sau mai mult ({0} nuclee), deci codarea software ocupă un nucleu cât timp rulează.",
+  "performance.line.software-small": "Rămâne sub un nucleu ({0} nuclee), deci se poate răspândi în golurile lăsate de alte sarcini.",
+  "performance.line.cpu-unreliable": "Contorul de timp de procesor de pe acest calculator nu este de încredere ({0}× față de ceasul de perete), deci timpii de procesor sunt afișați, dar nu se decide nimic pe baza lor.",
+  "performance.line.budget-exhausted": "Bugetul de măsurare s-a epuizat ({0} ms din {1} ms), deci o parte a verificării lipsește.",
+  "performance.boundary": "VidShrink nu captează video. Ce se măsoară aici este cât costă codarea pe acest calculator, nu ce face un instrument de captură cu ea — propria lui setare de codor este primul loc de verificat.",
+
+  "performance.fact.hardware-encoder": "Codor hardware",
+  "performance.fact.hardware-pipeline": "Lanț hardware",
+  "performance.fact.software-encoder": "Codor software",
+  "performance.fact.software-cost": "Cost software",
+  "performance.fact.logical-cores": "Nuclee logice",
+  "performance.fact.measured-in": "Măsurat în",
+  "performance.value.realtime": "{0}× timp real",
+  "performance.value.cores": "{0} nuclee",
+  "performance.value.ms": "{0} ms"
+}

@@ -1,0 +1,36 @@
+{
+  "performance.title": "Preverjanje zmogljivosti",
+  "performance.run": "Zaženi preverjanje",
+  "performance.running": "Merjenje — izvede nekaj kratkih kodiranj in traja do dvajset sekund.",
+  "performance.failed": "Preverjanja ni bilo mogoče dokončati",
+
+  "performance.headline.hardware-offloaded": "Ta računalnik ima delujoč strojni kodirnik in ta prehod ne obremenjuje procesorja.",
+  "performance.headline.hardware": "Ta računalnik ima delujoč strojni kodirnik, a ali procesor nosi ta prehod, tu ni bilo izmerjeno.",
+  "performance.headline.software-heavy": "Delujočega strojnega kodirnika ni, programsko kodiranje pa za realni čas potrebuje celo procesorsko jedro.",
+  "performance.headline.software-light": "Delujočega strojnega kodirnika ni, a programsko kodiranje v realnem času ostane pod enim procesorskim jedrom.",
+  "performance.headline.not-enough": "Tu ni dovolj izmerjenega, da bi odgovorili na vprašanje.",
+
+  "performance.line.not-measured": "Na tem računalniku še ni bilo nič izmerjeno.",
+  "performance.line.no-hardware": "Strojni video kodirnik tu ni na voljo, zato kodiranje teče na procesorju.",
+  "performance.line.hardware-failed": "Na tem računalniku je naveden strojni kodirnik, a njegovo preizkusno kodiranje ni uspelo.",
+  "performance.line.hardware-works": "Strojno kodiranje na tem računalniku deluje.",
+  "performance.line.hardware-not-cpu-bound": "Strojni prehod ne obremenjuje procesorja: z eno nitjo ali s prostimi nitmi je trajal enako, znotraj {0}×.",
+  "performance.line.hardware-cost-unknown": "Procesorski strošek strojnega prehoda ni bil izmerjen, zato ga ne gre razumeti kot brezplačnega.",
+  "performance.line.hardware-headroom": "Strojni prehod je tekel s {0}× realnega časa.",
+  "performance.line.software-realtime": "Programsko kodiranje za realni čas potrebuje {0} jeder od {1} logičnih jeder.",
+  "performance.line.software-costs-cores": "To je celo jedro ali več ({0} jeder), zato programsko kodiranje zaseda eno jedro, dokler teče.",
+  "performance.line.software-small": "To ostane pod enim jedrom ({0} jeder), zato se lahko porazdeli v vrzeli, ki jih pusti drugo delo.",
+  "performance.line.cpu-unreliable": "Števec procesorskega časa na tem računalniku ni zanesljiv ({0}× glede na stensko uro), zato so procesorski časi prikazani, a nič se ne odloča po njih.",
+  "performance.line.budget-exhausted": "Proračun merjenja je pošel ({0} ms od {1} ms), zato en del preverjanja manjka.",
+  "performance.boundary": "VidShrink ne zajema videa. Tu je izmerjeno, koliko kodiranje stane na tem računalniku, ne kaj z njim počne orodje za zajem — njegova lastna nastavitev kodirnika je prvo mesto za pogled.",
+
+  "performance.fact.hardware-encoder": "Strojni kodirnik",
+  "performance.fact.hardware-pipeline": "Strojni cevovod",
+  "performance.fact.software-encoder": "Programski kodirnik",
+  "performance.fact.software-cost": "Programski strošek",
+  "performance.fact.logical-cores": "Logična jedra",
+  "performance.fact.measured-in": "Izmerjeno v",
+  "performance.value.realtime": "{0}× realnega časa",
+  "performance.value.cores": "{0} jeder",
+  "performance.value.ms": "{0} ms"
+}

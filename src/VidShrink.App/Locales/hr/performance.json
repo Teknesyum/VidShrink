@@ -1,0 +1,36 @@
+{
+  "performance.title": "Provjera performansi",
+  "performance.run": "Pokreni provjeru",
+  "performance.running": "Mjerenje — izvodi se nekoliko kratkih kodiranja i traje do dvadeset sekundi.",
+  "performance.failed": "Provjera se nije mogla dovršiti",
+
+  "performance.headline.hardware-offloaded": "Ovo računalo ima ispravan hardverski koder i taj prolaz ne opterećuje procesor.",
+  "performance.headline.hardware": "Ovo računalo ima ispravan hardverski koder, ali nije izmjereno nosi li procesor taj prolaz.",
+  "performance.headline.software-heavy": "Nije pronađen ispravan hardverski koder, a softversko kodiranje treba cijelu jezgru procesora da prati stvarno vrijeme.",
+  "performance.headline.software-light": "Nije pronađen ispravan hardverski koder, ali softversko kodiranje ostaje ispod jedne jezgre u stvarnom vremenu.",
+  "performance.headline.not-enough": "Nije izmjereno dovoljno da bi se odgovorilo na pitanje.",
+
+  "performance.line.not-measured": "Na ovom računalu još ništa nije izmjereno.",
+  "performance.line.no-hardware": "Ovdje nema hardverskog video kodera, pa se kodiranje izvodi na procesoru.",
+  "performance.line.hardware-failed": "Na ovom računalu je naveden hardverski koder, ali njegovo probno kodiranje nije uspjelo.",
+  "performance.line.hardware-works": "Hardversko kodiranje radi na ovom računalu.",
+  "performance.line.hardware-not-cpu-bound": "Hardverski prolaz ne opterećuje procesor: s jednom niti ili sa slobodnim nitima trajao je jednako, unutar {0}×.",
+  "performance.line.hardware-cost-unknown": "Procesorski trošak hardverskog prolaza nije izmjeren, pa ga ne treba smatrati besplatnim.",
+  "performance.line.hardware-headroom": "Hardverski prolaz radio je pri {0}× stvarnog vremena.",
+  "performance.line.software-realtime": "Softversko kodiranje treba {0} jezgri da prati stvarno vrijeme, na {1} logičkih jezgri.",
+  "performance.line.software-costs-cores": "To je cijela jezgra ili više ({0} jezgri), pa softversko kodiranje zauzima jednu jezgru dok god radi.",
+  "performance.line.software-small": "To ostaje ispod jedne jezgre ({0} jezgri), pa se može rasporediti u praznine koje ostavlja drugi rad.",
+  "performance.line.cpu-unreliable": "Brojač procesorskog vremena na ovom računalu nije pouzdan ({0}× prema zidnom satu), pa se procesorska vremena prikazuju, ali se iz njih ništa ne odlučuje.",
+  "performance.line.budget-exhausted": "Proračun mjerenja je istekao ({0} ms od {1} ms), pa nedostaje jedan dio provjere.",
+  "performance.boundary": "VidShrink ne snima video. Ovdje se mjeri koliko kodiranje košta na ovom računalu, a ne što alat za snimanje radi s njim — njegova vlastita postavka kodera prvo je mjesto za provjeru.",
+
+  "performance.fact.hardware-encoder": "Hardverski koder",
+  "performance.fact.hardware-pipeline": "Hardverski cjevovod",
+  "performance.fact.software-encoder": "Softverski koder",
+  "performance.fact.software-cost": "Softverski trošak",
+  "performance.fact.logical-cores": "Logičke jezgre",
+  "performance.fact.measured-in": "Izmjereno za",
+  "performance.value.realtime": "{0}× stvarno vrijeme",
+  "performance.value.cores": "{0} jezgri",
+  "performance.value.ms": "{0} ms"
+}
