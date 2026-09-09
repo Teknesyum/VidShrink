@@ -1,0 +1,36 @@
+{
+  "performance.title": "Проверка на производителността",
+  "performance.run": "Пусни проверката",
+  "performance.running": "Измерване — пуска няколко кратки кодирания и отнема до двадесет секунди.",
+  "performance.failed": "Проверката не можа да завърши",
+
+  "performance.headline.hardware-offloaded": "Тази машина има работещ хардуерен енкодер и този проход не натоварва процесора.",
+  "performance.headline.hardware": "Тази машина има работещ хардуерен енкодер, но дали процесорът носи този проход тук не беше измерено.",
+  "performance.headline.software-heavy": "Не е намерен работещ хардуерен енкодер, а софтуерното кодиране иска цяло процесорно ядро, за да върви в реално време.",
+  "performance.headline.software-light": "Не е намерен работещ хардуерен енкодер, но софтуерното кодиране остава под едно процесорно ядро в реално време.",
+  "performance.headline.not-enough": "Измереното тук не стига, за да се отговори на въпроса.",
+
+  "performance.line.not-measured": "На тази машина още нищо не е измерено.",
+  "performance.line.no-hardware": "Тук няма наличен хардуерен видеоенкодер, затова кодирането върви на процесора.",
+  "performance.line.hardware-failed": "На тази машина е изброен хардуерен енкодер, но пробното му кодиране се провали.",
+  "performance.line.hardware-works": "Хардуерното кодиране работи на тази машина.",
+  "performance.line.hardware-not-cpu-bound": "Хардуерният проход не натоварва процесора: с една нишка или със свободни нишки отне същото време, в рамките на {0}×.",
+  "performance.line.hardware-cost-unknown": "Процесорната цена на хардуерния проход не беше измерена, затова не бива да се чете като безплатна.",
+  "performance.line.hardware-headroom": "Хардуерният проход вървя при {0}× реално време.",
+  "performance.line.software-realtime": "Софтуерното кодиране иска {0} ядра, за да върви в реално време, при {1} логически ядра.",
+  "performance.line.software-costs-cores": "Това е цяло ядро или повече ({0} ядра), така че софтуерното кодиране държи едно ядро, докато работи.",
+  "performance.line.software-small": "Това остава под едно ядро ({0} ядра), така че може да се разпредели в паузите между другата работа.",
+  "performance.line.cpu-unreliable": "Броячът на процесорно време на тази машина не е надежден ({0}× спрямо стенния часовник), затова процесорните времена се показват, но нищо не се решава по тях.",
+  "performance.line.budget-exhausted": "Бюджетът за измерване се изчерпа ({0} ms от {1} ms), затова една част от проверката липсва.",
+  "performance.boundary": "VidShrink не записва видео. Тук се измерва колко струва кодирането на тази машина, не какво прави с него инструмент за запис — първо погледнете неговата настройка на енкодера.",
+
+  "performance.fact.hardware-encoder": "Хардуерен енкодер",
+  "performance.fact.hardware-pipeline": "Хардуерен конвейер",
+  "performance.fact.software-encoder": "Софтуерен енкодер",
+  "performance.fact.software-cost": "Софтуерна цена",
+  "performance.fact.logical-cores": "Логически ядра",
+  "performance.fact.measured-in": "Измерено за",
+  "performance.value.realtime": "{0}× реално време",
+  "performance.value.cores": "{0} ядра",
+  "performance.value.ms": "{0} ms"
+}
