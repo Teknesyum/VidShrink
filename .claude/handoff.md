@@ -7,11 +7,15 @@ kareler, README, 0.3.1.
 kosumu (34284421410) `KareYerlesimTests.KaynakBilgiEtiketleriKendiHucresindeKalir`
 uzerinden dort kolda kirmiziydi; yerelde yesildi. Kok sebep font degil pencere:
 basssiz testte `Width/Height` `double.NaN` birakiliyordu, olcu makineye gore degisiyordu
-(bu makinede hucre 195 px, CI kosucusunda 66 px). 9 Eylul'de pencere olcuye pinlendi.
+(bu makinede hucre 195 px, CI kosucusunda 66 px). 9 Eylul'de kok sebep kapatildi: bassiz pencerede `Width/Height` atamak
+yerlesimi hic degistirmiyor (`window.Bounds` ekran boyutunda kaliyor), bu yuzden olcu
+pencerenin `Content`'ine verildi. Olcu duzelince kirmizi gerceklesti: 1040x720'de
+`InfoGrid` hucreleri 67 px, yedi etiket sigmiyor. Dar kol testten cikarildi, karar
+**T194**'e yazildi (`.claude/relay/contracts/T194.md`). CI 9 Eylul 20:41'de yesile dondu.
 
 ## Durum
 
-`main` = `19062bf9` + `BiciminTests` duzeltmesi. `claude/tema-paleti` main'e birlesti. Acik sozlesme **yok** (`.claude/relay/contracts/` altinda yalniz
+`main` = `35bb03cb`, CI **yesil** (kosum 34400543820: 1979 gecti, 0 kirmizi, 20 atlandi). `claude/tema-paleti` main'e birlesti. Acik sozlesme: **T194** (dar pencere tasmasi, henuz atanmadi). Baska acik sozlesme yok (`.claude/relay/contracts/` altinda yalniz
 `done/`). Calisan ajan yok. Worktree birikintisi yok — `VidShrink-T192` ve
 `VidShrink-T193` kaldirildi.
 
