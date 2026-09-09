@@ -1,11 +1,17 @@
 # Devir notu — 9 Eylul 2026
 
-Bir onceki devir notundaki dort adimin **ilk ikisi bitti ve muhurlendi**. `main` ilk kez
-tumuyle yesil. Kalan is: kareler, README, 0.3.1.
+Bir onceki devir notundaki dort adimin **ilk ikisi bitti ve muhurlendi**. Kalan is:
+kareler, README, 0.3.1.
+
+**Duzeltme:** "main ilk kez tumuyle yesil" cumlesi yanlisti. `aa03efc`'nin kendi CI
+kosumu (34284421410) `KareYerlesimTests.KaynakBilgiEtiketleriKendiHucresindeKalir`
+uzerinden dort kolda kirmiziydi; yerelde yesildi. Kok sebep font degil pencere:
+basssiz testte `Width/Height` `double.NaN` birakiliyordu, olcu makineye gore degisiyordu
+(bu makinede hucre 195 px, CI kosucusunda 66 px). 9 Eylul'de pencere olcuye pinlendi.
 
 ## Durum
 
-`main` = `aa03efc`. Acik sozlesme **yok** (`.claude/relay/contracts/` altinda yalniz
+`main` = `19062bf9` + `BiciminTests` duzeltmesi. `claude/tema-paleti` main'e birlesti. Acik sozlesme **yok** (`.claude/relay/contracts/` altinda yalniz
 `done/`). Calisan ajan yok. Worktree birikintisi yok — `VidShrink-T192` ve
 `VidShrink-T193` kaldirildi.
 
@@ -91,6 +97,12 @@ sonra.
 
 ## Git disindaki dosyalar
 
-`.calisma/` birikintisi (134 MB, cogu `t57`) `D:\!Tmp\Projeler\VidShrink-calisma`
-altina tasindi. Rapora giren her sayi zaten depoda: `docs/olcumler/T192-ham/` (17 dosya)
-ve `docs/olcumler/T193-ham/` (JSON'lar + 24 stderr dokumu).
+USB'deki iki devir klasoru (`VidShrink-devir-2026-09-09`, `VidShrink-calisma-2026-09-09`)
+9 Eylul'de projeye tasinip ayiklandi. Git'te birebir karsiligi dogrulanan 26 dosya silindi;
+karsiligi olmayan 1,33 MB **`docs/olcumler/kalinti-2026-09-09/`** altina kalicilasti
+(T176/, test-ciktilari/, t57/t58/t60/t61/t63 olcumleri, DEVIR-notu.md). Geri kalan
+136,6 MB (cogu t57 ham videosu) fable karariyla silindi; hicbir canli kod yolu oraya
+bakmiyordu (`git grep` bos dondu).
+
+Rapora giren her sayi zaten depoda: `docs/olcumler/T192-ham/` (17 dosya) ve
+`docs/olcumler/T193-ham/` (JSON'lar + 24 stderr dokumu).
