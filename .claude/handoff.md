@@ -7,7 +7,7 @@ Sıradaki turda önce `git pull`, sonra aşağıdaki "Sıradaki iş" listesinden
 
 ## Ne bitti
 
-Plan `docs/plan.md`'nin üç adımı da kapandı:
+Plan tamamen uygulandı, `trash/plan-diller-tema-2026-09-09.md`'ye taşındı. Üç adımı:
 
 - **A — Dil seçici.** Üst şeritte yalnız `Strings.ShortcutLanguages` (en, tr) + ayar
   tekerleği; tam liste ayarlardaki açılır kutuda. (`4dc3477`, `c4e6b1e`)
