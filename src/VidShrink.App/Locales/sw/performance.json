@@ -1,0 +1,36 @@
+{
+  "performance.title": "Ukaguzi wa utendaji",
+  "performance.run": "Endesha ukaguzi",
+  "performance.running": "Inapima — huendesha usimbaji mfupi kadhaa na huchukua hadi sekunde ishirini.",
+  "performance.failed": "Ukaguzi haukuweza kukamilika",
+
+  "performance.headline.hardware-offloaded": "Mashine hii ina kisimbaji cha maunzi kinachofanya kazi na hatua hiyo haitegemei kichakataji.",
+  "performance.headline.hardware": "Mashine hii ina kisimbaji cha maunzi kinachofanya kazi, lakini kama kichakataji hubeba hatua hiyo haikupimwa hapa.",
+  "performance.headline.software-heavy": "Hakuna kisimbaji cha maunzi kinachofanya kazi kilichopatikana, na usimbaji wa programu unahitaji kiini kizima cha kichakataji ili kuendana na muda halisi.",
+  "performance.headline.software-light": "Hakuna kisimbaji cha maunzi kinachofanya kazi kilichopatikana, lakini usimbaji wa programu unabaki chini ya kiini kimoja katika muda halisi.",
+  "performance.headline.not-enough": "Hakuna vipimo vya kutosha hapa kujibu swali.",
+
+  "performance.line.not-measured": "Hakuna kilichopimwa kwenye mashine hii bado.",
+  "performance.line.no-hardware": "Hakuna kisimbaji cha video cha maunzi hapa, kwa hiyo usimbaji unaendeshwa kwenye kichakataji.",
+  "performance.line.hardware-failed": "Kisimbaji cha maunzi kimeorodheshwa kwenye mashine hii, lakini usimbaji wake wa jaribio ulishindwa.",
+  "performance.line.hardware-works": "Usimbaji wa maunzi unafanya kazi kwenye mashine hii.",
+  "performance.line.hardware-not-cpu-bound": "Hatua ya maunzi haitegemei kichakataji: kuipa uzi mmoja au kuacha nyuzi huru kulichukua muda ule ule, ndani ya {0}×.",
+  "performance.line.hardware-cost-unknown": "Gharama ya kichakataji ya hatua ya maunzi haikupimwa, kwa hiyo isichukuliwe kama bure.",
+  "performance.line.hardware-headroom": "Hatua ya maunzi ilikimbia kwa {0}× ya muda halisi.",
+  "performance.line.software-realtime": "Usimbaji wa programu unahitaji viini {0} ili kuendana na muda halisi, kati ya viini {1} vya kimantiki.",
+  "performance.line.software-costs-cores": "Hicho ni kiini kizima au zaidi (viini {0}), kwa hiyo usimbaji wa programu unamiliki kiini kimoja muda wote unapoendeshwa.",
+  "performance.line.software-small": "Hicho kinabaki chini ya kiini kimoja (viini {0}), kwa hiyo kinaweza kugawanywa katika mapengo yaliyoachwa na kazi nyingine.",
+  "performance.line.cpu-unreliable": "Kihesabu cha muda wa kichakataji kwenye mashine hii hakitegemeki ({0}× dhidi ya saa ya ukutani), kwa hiyo muda wa kichakataji unaonyeshwa lakini hakuna kinachoamuliwa kutokana nao.",
+  "performance.line.budget-exhausted": "Bajeti ya kipimo iliisha ({0} ms kati ya {1} ms), kwa hiyo sehemu moja ya ukaguzi inakosekana.",
+  "performance.boundary": "VidShrink hainasi video. Kinachopimwa hapa ni gharama ya usimbaji kwenye mashine hii, si kile zana ya kunasa hufanya nacho — mpangilio wa kisimbaji chake ndio mahali pa kwanza pa kuangalia.",
+
+  "performance.fact.hardware-encoder": "Kisimbaji cha maunzi",
+  "performance.fact.hardware-pipeline": "Mkondo wa maunzi",
+  "performance.fact.software-encoder": "Kisimbaji cha programu",
+  "performance.fact.software-cost": "Gharama ya programu",
+  "performance.fact.logical-cores": "Viini vya kimantiki",
+  "performance.fact.measured-in": "Ilipimwa kwa",
+  "performance.value.realtime": "{0}× muda halisi",
+  "performance.value.cores": "viini {0}",
+  "performance.value.ms": "{0} ms"
+}
