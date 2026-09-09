@@ -25,6 +25,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.App.Localization;
+using VidShrink.App.Themes;
 using VidShrink.App.Performance;
 using VidShrink.App.Playback;
 using VidShrink.Core;
@@ -81,6 +82,9 @@ public partial class MainWindow : Window
     private string? _lastOutput;
     private string? _ffmpegVersion;
     private bool _syncing;
+    private IReadOnlyList<string> _languageOrder = Array.Empty<string>();
+    private IReadOnlyList<string> _themeOrder = Array.Empty<string>();
+    private string _theme = PaletteCatalog.Default;
 
     // T61/K1: iki denetim birbirini sürüyor. Bayrak "bu değeri kullanıcı değil program
     // yazıyor" demektir; yazılan tarafın işleyicisi o turda hiçbir şey türetmez, böylece
@@ -143,6 +147,7 @@ public partial class MainWindow : Window
 
         RefreshOutputAndFfmpegChoiceLists();
         BuildLanguageSwitch();
+        BuildThemeList();
         Strings.Changed += OnLanguageChanged;
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
@@ -199,6 +204,8 @@ public partial class MainWindow : Window
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
+        Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
+        Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
         Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -546,10 +553,6 @@ public partial class MainWindow : Window
         catch (Exception ex) { TxtSystemStatus.Text = $"{Say("main.error.link")}: {ex.Message}"; }
     }
 
-    /// <summary>Yürürlükteki dilin Türkçe olup olmadığı; yalnız büyük harf kuralı için.</summary>
-    private static bool IsTurkish
-        => Strings.Language.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
-
     /// <summary>
     /// Koddan yazılan her metnin geçtiği kapı: karşılık sözlükten anahtarla okunur, sonra
     /// yürürlükteki dilin büyük harf kuralından geçer. Biçimlemedeki <c>{loc:Text}</c> bağı
@@ -581,9 +584,7 @@ public partial class MainWindow : Window
     internal static string Percent(double ratio) => ratio.ToString("P1", Strings.Culture);
 
     private static string Speak(string language, string key, params object?[] args)
-        => LanguageCatalog.Title(
-            Strings.GetIn(language, key, args),
-            language.StartsWith("tr", StringComparison.OrdinalIgnoreCase));
+        => LanguageCatalog.Title(Strings.GetIn(language, key, args), language);
 
     /// <summary>
     /// Dil düğmeleri <c>Locales</c> altındaki klasörlerden kuruluyor; kodda hiçbir dil adı
@@ -593,26 +594,114 @@ public partial class MainWindow : Window
     private void BuildLanguageSwitch()
     {
         LangSwitch.Children.Clear();
-        SettingsLangSwitch.Children.Clear();
 
-        foreach (var language in Strings.Languages)
+        foreach (var language in Strings.ShortcutLanguages)
         {
-            foreach (var panel in new[] { LangSwitch, SettingsLangSwitch })
+            var button = new Button
             {
-                var button = new Button
-                {
-                    Content = Strings.GetIn(language, "main.language.name"),
-                    Theme = Look("LanguageButton"),
-                    Tag = language
-                };
+                Content = Strings.GetIn(language, "main.language.name"),
+                Theme = Look("LanguageButton"),
+                Tag = language
+            };
 
-                AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
-                button.Click += (_, _) => UseLanguage(language);
-                panel.Children.Add(button);
-            }
+            AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
+            button.Click += (_, _) => UseLanguage(language);
+            LangSwitch.Children.Add(button);
         }
 
+        BuildLanguageList();
         MarkChosenLanguage();
+        ApplyFlowDirection();
+    }
+
+    private void ApplyFlowDirection()
+        => FlowDirection = Strings.IsRightToLeft
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
+
+    /// <summary>
+    /// Ayarlardaki tam liste. Üst şerit yalnız kısayolu taşır; kurulumdaki her dil buradan
+    /// seçilir ve her satır dilin kendi adını kendi dosyasından yazar. Liste dosya
+    /// klasörlerinden kuruluyor, kodda hiçbir dil adı yazılı değil.
+    /// </summary>
+    /// <summary>
+    /// Ayarlardaki tema listesi. Adlar palet dosyalarının kendi adları; çeviriye girmezler,
+    /// her dilde aynı yazılırlar — marka adı gibi. Seçim <see cref="PaletteCatalog"/>
+    /// üzerinden yürürlüğe girer ve ayar dosyasında saklanır.
+    /// </summary>
+    private void BuildThemeList()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            _themeOrder = PaletteCatalog.Names;
+            CmbTheme.ItemsSource = _themeOrder.Select(PaletteCatalog.Label).ToArray();
+            MarkChosenTheme();
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+    }
+
+    private void MarkChosenTheme()
+    {
+        var index = -1;
+        for (var at = 0; at < _themeOrder.Count; at++)
+            if (string.Equals(_themeOrder[at], _theme, StringComparison.OrdinalIgnoreCase))
+            {
+                index = at;
+                break;
+            }
+
+        CmbTheme.SelectedIndex = index;
+    }
+
+    private void OnThemeChosen()
+    {
+        if (_syncing) return;
+        var chosen = CmbTheme.SelectedIndex;
+        if (chosen < 0 || chosen >= _themeOrder.Count) return;
+
+        _theme = PaletteCatalog.Use(_themeOrder[chosen]);
+        SaveAppSettings();
+    }
+
+    private void BuildLanguageList()
+    {
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            _languageOrder = Strings.Languages;
+            CmbLanguage.ItemsSource = _languageOrder
+                .Select(language => Strings.GetIn(language, "main.language.name"))
+                .ToArray();
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+    }
+
+    /// <summary>
+    /// Tekerlek düğmesi. Dil ayarı ayarlar sekmesinde durur; üst şeritteki kısayol yalnız
+    /// iki dile kestirme, geri kalanı buradan seçiliyor.
+    /// </summary>
+    private void OnOpenLanguageSettings(object? sender, RoutedEventArgs e)
+    {
+        Tabs.SelectedIndex = SettingsTabIndex;
+        CmbLanguage.BringIntoView();
+        CmbLanguage.Focus();
+    }
+
+    private void OnLanguageChosen()
+    {
+        if (_syncing) return;
+        var chosen = CmbLanguage.SelectedIndex;
+        if (chosen < 0 || chosen >= _languageOrder.Count) return;
+        UseLanguage(_languageOrder[chosen]);
     }
 
     /// <summary>
@@ -642,10 +731,29 @@ public partial class MainWindow : Window
 
     private void MarkChosenLanguage()
     {
-        foreach (var button in LangSwitch.Children.OfType<Button>().Concat(SettingsLangSwitch.Children.OfType<Button>()))
+        foreach (var button in LangSwitch.Children.OfType<Button>())
             button.Classes.Set(
                 "selected",
                 string.Equals(button.Tag as string, Strings.Language, StringComparison.OrdinalIgnoreCase));
+
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            var index = -1;
+            for (var at = 0; at < _languageOrder.Count; at++)
+                if (string.Equals(_languageOrder[at], Strings.Language, StringComparison.OrdinalIgnoreCase))
+                {
+                    index = at;
+                    break;
+                }
+
+            CmbLanguage.SelectedIndex = index;
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
     }
 
     private void UseLanguage(string language) => Strings.Use(language);
@@ -665,9 +773,10 @@ public partial class MainWindow : Window
         }
 
         MarkChosenLanguage();
+        ApplyFlowDirection();
         RefreshChoiceLabels();
         ApplyFastGpuTip();
-        _preview?.SetLanguage(IsTurkish);
+        _preview?.SetLanguage(Strings.Language);
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshSettingsTexts();
@@ -1006,7 +1115,8 @@ public partial class MainWindow : Window
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FfmpegPathMode = CmbFfmpegPathMode.SelectedIndex,
-            FfmpegPath = TxtFfmpegPath.Text ?? ""
+            FfmpegPath = TxtFfmpegPath.Text ?? "",
+            Theme = _theme
         };
     }
 
@@ -1031,6 +1141,9 @@ public partial class MainWindow : Window
             CmbOutputFolderMode.SelectedIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
             OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
+
+            _theme = PaletteCatalog.Use(settings.Theme);
+            MarkChosenTheme();
 
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
@@ -2405,6 +2518,8 @@ public partial class MainWindow : Window
         => _startupFile is null ? Task.CompletedTask : LoadStartupFileAsync(_startupFile);
 
     internal int PlayerTabIndex => Tabs.Items.IndexOf(TabPlayer);
+
+    private int SettingsTabIndex => Tabs.Items.IndexOf(TabSettings);
 
     internal PlayerView PlayerTab => Player;
 

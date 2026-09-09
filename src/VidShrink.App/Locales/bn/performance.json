@@ -1,0 +1,36 @@
+{
+  "performance.title": "কর্মক্ষমতা পরীক্ষা",
+  "performance.run": "পরীক্ষা চালান",
+  "performance.running": "মাপা হচ্ছে — কয়েকটি ছোট এনকোড চলে, সর্বোচ্চ বিশ সেকেন্ড লাগে।",
+  "performance.failed": "পরীক্ষা শেষ করা যায়নি",
+
+  "performance.headline.hardware-offloaded": "এই মেশিনে একটি কার্যকর হার্ডওয়্যার এনকোডার আছে এবং সেই পাসটি প্রসেসরের উপর নির্ভর করে না।",
+  "performance.headline.hardware": "এই মেশিনে একটি কার্যকর হার্ডওয়্যার এনকোডার আছে, তবে সেই পাসের ভার প্রসেসর বহন করে কি না তা এখানে মাপা হয়নি।",
+  "performance.headline.software-heavy": "কোনো কার্যকর হার্ডওয়্যার এনকোডার পাওয়া যায়নি, আর রিয়েলটাইমে চলতে সফটওয়্যার এনকোডিংয়ের একটি পুরো প্রসেসর কোর লাগে।",
+  "performance.headline.software-light": "কোনো কার্যকর হার্ডওয়্যার এনকোডার পাওয়া যায়নি, তবে রিয়েলটাইমে সফটওয়্যার এনকোডিং এক প্রসেসর কোরের নিচে থাকে।",
+  "performance.headline.not-enough": "প্রশ্নের উত্তর দেওয়ার মতো যথেষ্ট মাপ এখানে নেই।",
+
+  "performance.line.not-measured": "এই মেশিনে এখনো কিছু মাপা হয়নি।",
+  "performance.line.no-hardware": "এখানে কোনো হার্ডওয়্যার ভিডিও এনকোডার নেই, তাই এনকোডিং প্রসেসরে চলে।",
+  "performance.line.hardware-failed": "এই মেশিনে একটি হার্ডওয়্যার এনকোডার তালিকাভুক্ত, কিন্তু তার পরীক্ষামূলক এনকোড ব্যর্থ হয়েছে।",
+  "performance.line.hardware-works": "এই মেশিনে হার্ডওয়্যার এনকোডিং কাজ করে।",
+  "performance.line.hardware-not-cpu-bound": "হার্ডওয়্যার পাস প্রসেসরের উপর নির্ভর করে না: একটি থ্রেড দিলে বা থ্রেড মুক্ত রাখলে একই সময় লেগেছে, {0}× এর মধ্যে।",
+  "performance.line.hardware-cost-unknown": "হার্ডওয়্যার পাসের প্রসেসর খরচ মাপা হয়নি, তাই একে বিনামূল্যে ধরা যাবে না।",
+  "performance.line.hardware-headroom": "হার্ডওয়্যার পাস {0}× রিয়েলটাইমে চলেছে।",
+  "performance.line.software-realtime": "রিয়েলটাইমে চলতে সফটওয়্যার এনকোডিংয়ের {0} কোর লাগে, {1} লজিক্যাল কোরের মধ্যে।",
+  "performance.line.software-costs-cores": "এটি একটি পুরো কোর বা তার বেশি ({0} কোর), তাই সফটওয়্যার এনকোডিং যতক্ষণ চলে একটি কোর দখল করে রাখে।",
+  "performance.line.software-small": "এটি এক কোরের নিচে থাকে ({0} কোর), তাই অন্য কাজের ফাঁকে ছড়িয়ে দেওয়া যায়।",
+  "performance.line.cpu-unreliable": "এই মেশিনের প্রসেসর সময় গণক নির্ভরযোগ্য নয় (ওয়াল ক্লকের তুলনায় {0}×), তাই প্রসেসর সময় দেখানো হয় কিন্তু তা থেকে কোনো সিদ্ধান্ত নেওয়া হয় না।",
+  "performance.line.budget-exhausted": "মাপার বাজেট শেষ হয়ে গেছে ({1} ms এর মধ্যে {0} ms), তাই পরীক্ষার একটি অংশ অনুপস্থিত।",
+  "performance.boundary": "VidShrink ভিডিও ক্যাপচার করে না। এখানে যা মাপা হয় তা এই মেশিনে এনকোডিংয়ের খরচ, কোনো ক্যাপচার টুল তা নিয়ে কী করে তা নয় — সেটির নিজস্ব এনকোডার সেটিং প্রথমে দেখুন।",
+
+  "performance.fact.hardware-encoder": "হার্ডওয়্যার এনকোডার",
+  "performance.fact.hardware-pipeline": "হার্ডওয়্যার পাইপলাইন",
+  "performance.fact.software-encoder": "সফটওয়্যার এনকোডার",
+  "performance.fact.software-cost": "সফটওয়্যার খরচ",
+  "performance.fact.logical-cores": "লজিক্যাল কোর",
+  "performance.fact.measured-in": "মাপার সময়",
+  "performance.value.realtime": "{0}× রিয়েলটাইম",
+  "performance.value.cores": "{0} কোর",
+  "performance.value.ms": "{0} ms"
+}

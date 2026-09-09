@@ -1,0 +1,36 @@
+{
+  "performance.title": "Prestandakontroll",
+  "performance.run": "Kör kontrollen",
+  "performance.running": "Mäter — kör några korta kodningar och tar upp till tjugo sekunder.",
+  "performance.failed": "Kontrollen kunde inte slutföras",
+
+  "performance.headline.hardware-offloaded": "Den här datorn har en fungerande hårdvarukodare och det passet belastar inte processorn.",
+  "performance.headline.hardware": "Den här datorn har en fungerande hårdvarukodare, men om processorn bär det passet mättes inte här.",
+  "performance.headline.software-heavy": "Ingen fungerande hårdvarukodare hittades, och mjukvarukodning kräver en hel processorkärna för att hålla realtid.",
+  "performance.headline.software-light": "Ingen fungerande hårdvarukodare hittades, men mjukvarukodning håller sig under en processorkärna i realtid.",
+  "performance.headline.not-enough": "Det finns inte tillräckligt uppmätt här för att besvara frågan.",
+
+  "performance.line.not-measured": "Inget har mätts på den här datorn ännu.",
+  "performance.line.no-hardware": "Ingen hårdvarukodare för video finns här, så kodningen körs på processorn.",
+  "performance.line.hardware-failed": "En hårdvarukodare finns listad på den här datorn, men dess testkodning misslyckades.",
+  "performance.line.hardware-works": "Hårdvarukodning fungerar på den här datorn.",
+  "performance.line.hardware-not-cpu-bound": "Hårdvarupasset belastar inte processorn: en tråd eller fria trådar tog samma tid, inom {0}×.",
+  "performance.line.hardware-cost-unknown": "Processorkostnaden för hårdvarupasset mättes inte, så den får inte tolkas som gratis.",
+  "performance.line.hardware-headroom": "Hårdvarupasset kördes i {0}× realtid.",
+  "performance.line.software-realtime": "Mjukvarukodning kräver {0} kärnor för att hålla realtid, på {1} logiska kärnor.",
+  "performance.line.software-costs-cores": "Det är en hel kärna eller mer ({0} kärnor), så mjukvarukodning tar en kärna så länge den körs.",
+  "performance.line.software-small": "Det håller sig under en kärna ({0} kärnor), så det kan spridas i luckorna som annat arbete lämnar.",
+  "performance.line.cpu-unreliable": "Processortidsräknaren på den här datorn är inte pålitlig ({0}× mot väggklockan), så processortider visas men inget avgörs utifrån dem.",
+  "performance.line.budget-exhausted": "Mätbudgeten tog slut ({0} ms av {1} ms), så ett ben av kontrollen saknas.",
+  "performance.boundary": "VidShrink spelar inte in video. Det som mäts här är vad kodning kostar på den här datorn, inte vad ett inspelningsverktyg gör med den — dess egen kodarinställning är första stället att titta på.",
+
+  "performance.fact.hardware-encoder": "Hårdvarukodare",
+  "performance.fact.hardware-pipeline": "Hårdvarukedja",
+  "performance.fact.software-encoder": "Mjukvarukodare",
+  "performance.fact.software-cost": "Mjukvarukostnad",
+  "performance.fact.logical-cores": "Logiska kärnor",
+  "performance.fact.measured-in": "Mätt på",
+  "performance.value.realtime": "{0}× realtid",
+  "performance.value.cores": "{0} kärnor",
+  "performance.value.ms": "{0} ms"
+}

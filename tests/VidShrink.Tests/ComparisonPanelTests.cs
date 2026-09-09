@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -1126,7 +1126,7 @@ public sealed class ComparisonPanelTests
             panel.SetRightBadge(BadgeText);
             var en = panel.ApproxBadgeText.Text;
 
-            panel.SetLanguage(true);
+            panel.SetLanguage("tr");
             panel.SetRightBadge("Yakla\u015f\u0131k \u00d6nizleme \u00b7 CRF 21");
             return (en, panel.ApproxBadgeText.Text);
         });

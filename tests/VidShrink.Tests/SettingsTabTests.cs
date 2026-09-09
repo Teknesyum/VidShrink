@@ -231,8 +231,8 @@ public sealed class BrandSpellingTests
     [InlineData("BUY ME A COFFEE")]
     public void TheSponsorBrandKeepsItsOwnSpelling(string written)
     {
-        Assert.Equal(Sponsor, LanguageCatalog.Title(written, false));
-        Assert.Equal(Sponsor, LanguageCatalog.Title(written, true));
+        Assert.Equal(Sponsor, LanguageCatalog.Title(written, "en"));
+        Assert.Equal(Sponsor, LanguageCatalog.Title(written, "tr"));
     }
 
     /// <summary>Görünen metin ile erişilebilir ad aynı dizge olacak.</summary>

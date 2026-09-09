@@ -1,0 +1,36 @@
+{
+  "performance.title": "Verificação de desempenho",
+  "performance.run": "Executar a verificação",
+  "performance.running": "Medindo — isso roda algumas codificações curtas e leva até vinte segundos.",
+  "performance.failed": "A verificação não pôde terminar",
+
+  "performance.headline.hardware-offloaded": "Esta máquina tem um codificador de hardware funcional e essa passagem não pesa no processador.",
+  "performance.headline.hardware": "Esta máquina tem um codificador de hardware funcional, mas se o processador carrega essa passagem não foi medido aqui.",
+  "performance.headline.software-heavy": "Nenhum codificador de hardware funcional foi encontrado, e a codificação por software exige um núcleo inteiro do processador para acompanhar o tempo real.",
+  "performance.headline.software-light": "Nenhum codificador de hardware funcional foi encontrado, mas a codificação por software fica abaixo de um núcleo do processador em tempo real.",
+  "performance.headline.not-enough": "Não há medição suficiente aqui para responder à pergunta.",
+
+  "performance.line.not-measured": "Nada foi medido nesta máquina ainda.",
+  "performance.line.no-hardware": "Nenhum codificador de vídeo por hardware está disponível aqui, então a codificação roda no processador.",
+  "performance.line.hardware-failed": "Um codificador de hardware consta nesta máquina, mas sua codificação de teste falhou.",
+  "performance.line.hardware-works": "A codificação por hardware funciona nesta máquina.",
+  "performance.line.hardware-not-cpu-bound": "A passagem por hardware não pesa no processador: dar a ela uma thread ou deixar as threads livres levou o mesmo tempo, dentro de {0}×.",
+  "performance.line.hardware-cost-unknown": "O custo de processador da passagem por hardware não foi medido, então não deve ser lido como gratuito.",
+  "performance.line.hardware-headroom": "A passagem por hardware rodou a {0}× do tempo real.",
+  "performance.line.software-realtime": "A codificação por software exige {0} núcleos para acompanhar o tempo real, em {1} núcleos lógicos.",
+  "performance.line.software-costs-cores": "Isso é um núcleo inteiro ou mais ({0} núcleos), então a codificação por software ocupa um núcleo enquanto roda.",
+  "performance.line.software-small": "Isso fica abaixo de um núcleo ({0} núcleos), então pode ser distribuído nas folgas deixadas por outro trabalho.",
+  "performance.line.cpu-unreliable": "O contador de tempo de processador desta máquina não é confiável ({0}× contra o relógio de parede), então os tempos de processador são mostrados, mas nada é decidido a partir deles.",
+  "performance.line.budget-exhausted": "O orçamento de medição acabou ({0} ms de {1} ms), então uma parte da verificação está faltando.",
+  "performance.boundary": "O VidShrink não captura vídeo. O que se mede aqui é o que a codificação custa nesta máquina, não o que uma ferramenta de captura faz com isso — a configuração de codificador dela é o primeiro lugar a olhar.",
+
+  "performance.fact.hardware-encoder": "Codificador de hardware",
+  "performance.fact.hardware-pipeline": "Pipeline de hardware",
+  "performance.fact.software-encoder": "Codificador por software",
+  "performance.fact.software-cost": "Custo do software",
+  "performance.fact.logical-cores": "Núcleos lógicos",
+  "performance.fact.measured-in": "Medido em",
+  "performance.value.realtime": "{0}× tempo real",
+  "performance.value.cores": "{0} núcleos",
+  "performance.value.ms": "{0} ms"
+}

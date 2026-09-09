@@ -1,0 +1,36 @@
+{
+  "performance.title": "ตรวจสอบประสิทธิภาพ",
+  "performance.run": "เริ่มตรวจสอบ",
+  "performance.running": "กำลังวัด — จะเข้ารหัสสั้น ๆ ไม่กี่ครั้ง ใช้เวลาไม่เกินยี่สิบวินาที",
+  "performance.failed": "การตรวจสอบไม่สามารถทำจนจบได้",
+
+  "performance.headline.hardware-offloaded": "เครื่องนี้มีตัวเข้ารหัสฮาร์ดแวร์ที่ใช้งานได้ และรอบนั้นไม่พึ่งพาโปรเซสเซอร์",
+  "performance.headline.hardware": "เครื่องนี้มีตัวเข้ารหัสฮาร์ดแวร์ที่ใช้งานได้ แต่ยังไม่ได้วัดว่าโปรเซสเซอร์แบกรอบนั้นหรือไม่",
+  "performance.headline.software-heavy": "ไม่พบตัวเข้ารหัสฮาร์ดแวร์ที่ใช้งานได้ และการเข้ารหัสด้วยซอฟต์แวร์ต้องใช้แกนโปรเซสเซอร์เต็มหนึ่งแกนเพื่อให้ทันเรียลไทม์",
+  "performance.headline.software-light": "ไม่พบตัวเข้ารหัสฮาร์ดแวร์ที่ใช้งานได้ แต่การเข้ารหัสด้วยซอฟต์แวร์ใช้ไม่ถึงหนึ่งแกนโปรเซสเซอร์ที่เรียลไทม์",
+  "performance.headline.not-enough": "ข้อมูลที่วัดได้ยังไม่พอจะตอบคำถามนี้",
+
+  "performance.line.not-measured": "ยังไม่มีการวัดใด ๆ บนเครื่องนี้",
+  "performance.line.no-hardware": "เครื่องนี้ไม่มีตัวเข้ารหัสวิดีโอฮาร์ดแวร์ การเข้ารหัสจึงทำงานบนโปรเซสเซอร์",
+  "performance.line.hardware-failed": "เครื่องนี้มีตัวเข้ารหัสฮาร์ดแวร์อยู่ในรายการ แต่การเข้ารหัสทดสอบล้มเหลว",
+  "performance.line.hardware-works": "การเข้ารหัสด้วยฮาร์ดแวร์ใช้งานได้บนเครื่องนี้",
+  "performance.line.hardware-not-cpu-bound": "รอบฮาร์ดแวร์ไม่พึ่งพาโปรเซสเซอร์: ให้เธรดเดียวหรือปล่อยเธรดว่างใช้เวลาเท่ากัน ภายใน {0}×",
+  "performance.line.hardware-cost-unknown": "ยังไม่ได้วัดต้นทุนโปรเซสเซอร์ของรอบฮาร์ดแวร์ จึงไม่ควรถือว่าฟรี",
+  "performance.line.hardware-headroom": "รอบฮาร์ดแวร์ทำงานที่ {0}× เรียลไทม์",
+  "performance.line.software-realtime": "การเข้ารหัสด้วยซอฟต์แวร์ต้องใช้ {0} แกนเพื่อให้ทันเรียลไทม์ จากแกนตรรกะ {1} แกน",
+  "performance.line.software-costs-cores": "นั่นคือหนึ่งแกนเต็มหรือมากกว่า ({0} แกน) การเข้ารหัสด้วยซอฟต์แวร์จึงยึดหนึ่งแกนตลอดเวลาที่ทำงาน",
+  "performance.line.software-small": "นั่นยังไม่ถึงหนึ่งแกน ({0} แกน) จึงกระจายลงในช่องว่างที่งานอื่นเหลือไว้ได้",
+  "performance.line.cpu-unreliable": "ตัวนับเวลาโปรเซสเซอร์บนเครื่องนี้เชื่อถือไม่ได้ ({0}× เทียบกับนาฬิกาจริง) จึงแสดงเวลาโปรเซสเซอร์แต่ไม่ตัดสินอะไรจากค่านั้น",
+  "performance.line.budget-exhausted": "งบเวลาการวัดหมดลง ({0} ms จาก {1} ms) จึงขาดขั้นตอนหนึ่งของการตรวจสอบ",
+  "performance.boundary": "VidShrink ไม่ได้บันทึกวิดีโอ สิ่งที่วัดที่นี่คือต้นทุนการเข้ารหัสบนเครื่องนี้ ไม่ใช่สิ่งที่เครื่องมือบันทึกทำกับมัน — ค่าตัวเข้ารหัสของเครื่องมือนั้นคือจุดแรกที่ควรดู",
+
+  "performance.fact.hardware-encoder": "ตัวเข้ารหัสฮาร์ดแวร์",
+  "performance.fact.hardware-pipeline": "ไปป์ไลน์ฮาร์ดแวร์",
+  "performance.fact.software-encoder": "ตัวเข้ารหัสซอฟต์แวร์",
+  "performance.fact.software-cost": "ต้นทุนซอฟต์แวร์",
+  "performance.fact.logical-cores": "แกนตรรกะ",
+  "performance.fact.measured-in": "วัดใน",
+  "performance.value.realtime": "{0}× เรียลไทม์",
+  "performance.value.cores": "{0} แกน",
+  "performance.value.ms": "{0} ms"
+}

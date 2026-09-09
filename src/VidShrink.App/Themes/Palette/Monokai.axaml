@@ -1,0 +1,46 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Monokai Pro; canlı ve doygun şeker renkleri, sıcak gri zemin. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki on bir çekirdek renkten
+       üretildi. Değiştirmek için çekirdeği düzenle ve VidShrink.PaletteGen
+       aracını çalıştır; komut docs/tema.md içinde. -->
+
+  <Color x:Key="NeonBlueColor">#FF78DCE8</Color>
+  <Color x:Key="NeonPinkColor">#FFFF6188</Color>
+  <Color x:Key="NeonPurpleColor">#FFAB9DF2</Color>
+  <Color x:Key="NeonSuccessColor">#FFA9DC76</Color>
+  <Color x:Key="SurfaceToneColor">#FF403E41</Color>
+  <Color x:Key="AppBgColor">#FF2D2A2E</Color>
+  <Color x:Key="TextBodyColor">#FFFCFCFA</Color>
+  <Color x:Key="TextDisabledColor">#FFA5A3A6</Color>
+  <Color x:Key="OnNeonColor">#FF000000</Color>
+  <Color x:Key="PinkTextColor">#FFFF95AF</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1A78DCE8</Color>
+  <Color x:Key="NeonBlueHoverColor">#3378DCE8</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D78DCE8</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D78DCE8</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#8078DCE8</Color>
+  <Color x:Key="NeonPinkFillColor">#1AFF6188</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80AB9DF2</Color>
+
+  <Color x:Key="NeonEmberColor">#FFFF6188</Color>
+  <Color x:Key="EmberFlameColor">#FFFC9867</Color>
+  <Color x:Key="EmberBlazeColor">#FFFFD866</Color>
+  <Color x:Key="EmberDeepColor">#FF262225</Color>
+  <Color x:Key="EmberMidColor">#FF292226</Color>
+  <Color x:Key="EmberEdgeColor">#FF2C2327</Color>
+  <Color x:Key="EmberBarDeepColor">#FF373134</Color>
+  <Color x:Key="EmberBarMidColor">#FF3A3236</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF3C3237</Color>
+
+  <Color x:Key="PlaybackScrimColor">#CC2D2A2E</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#002D2A2E</Color>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #4078DCE8</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #40FF6188</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40AB9DF2</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+</ResourceDictionary>

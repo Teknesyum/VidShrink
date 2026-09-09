@@ -1,0 +1,36 @@
+{
+  "performance.title": "Teljesítményteszt",
+  "performance.run": "Teszt futtatása",
+  "performance.running": "Mérés folyamatban — néhány rövid kódolás fut, legfeljebb húsz másodpercig tart.",
+  "performance.failed": "A teszt nem tudott befejeződni",
+
+  "performance.headline.hardware-offloaded": "Ezen a gépen működő hardveres kódoló van, és ez a menet nem terheli a processzort.",
+  "performance.headline.hardware": "Ezen a gépen működő hardveres kódoló van, de itt nem mértük, hogy a processzor viszi-e ezt a menetet.",
+  "performance.headline.software-heavy": "Nem található működő hardveres kódoló, és a szoftveres kódolás egy teljes processzormagot igényel a valós idejű tempóhoz.",
+  "performance.headline.software-light": "Nem található működő hardveres kódoló, de a szoftveres kódolás valós időben egy processzormag alatt marad.",
+  "performance.headline.not-enough": "Nincs elég mérés a kérdés megválaszolásához.",
+
+  "performance.line.not-measured": "Ezen a gépen még semmit sem mértünk.",
+  "performance.line.no-hardware": "Itt nincs hardveres videokódoló, ezért a kódolás a processzoron fut.",
+  "performance.line.hardware-failed": "Ezen a gépen szerepel egy hardveres kódoló, de a próbakódolása nem sikerült.",
+  "performance.line.hardware-works": "A hardveres kódolás működik ezen a gépen.",
+  "performance.line.hardware-not-cpu-bound": "A hardveres menet nem terheli a processzort: egy szállal vagy szabadon hagyott szálakkal ugyanannyi ideig tartott, {0}× eltérésen belül.",
+  "performance.line.hardware-cost-unknown": "A hardveres menet processzorköltségét nem mértük, ezért nem tekinthető ingyenesnek.",
+  "performance.line.hardware-headroom": "A hardveres menet {0}× valós idejű sebességgel futott.",
+  "performance.line.software-realtime": "A szoftveres kódolásnak {0} mag kell a valós idejű tempóhoz, {1} logikai magból.",
+  "performance.line.software-costs-cores": "Ez egy teljes mag vagy több ({0} mag), tehát a szoftveres kódolás futása alatt egy magot lefoglal.",
+  "performance.line.software-small": "Ez egy mag alatt marad ({0} mag), így beilleszthető a más munkák által hagyott résekbe.",
+  "performance.line.cpu-unreliable": "A processzoridő-számláló ezen a gépen nem megbízható ({0}× a falióra ellenében), ezért a processzoridők megjelennek, de nem alapulunk rájuk.",
+  "performance.line.budget-exhausted": "A mérési keret kimerült ({0} ms a {1} ms-ból), így a teszt egyik ága hiányzik.",
+  "performance.boundary": "A VidShrink nem rögzít videót. Itt azt mérjük, mennyibe kerül a kódolás ezen a gépen, nem azt, mit csinál vele egy rögzítő eszköz — annak saját kódolóbeállítása az első hely, ahol keresni kell.",
+
+  "performance.fact.hardware-encoder": "Hardveres kódoló",
+  "performance.fact.hardware-pipeline": "Hardveres csővezeték",
+  "performance.fact.software-encoder": "Szoftveres kódoló",
+  "performance.fact.software-cost": "Szoftveres költség",
+  "performance.fact.logical-cores": "Logikai magok",
+  "performance.fact.measured-in": "Mérési idő",
+  "performance.value.realtime": "{0}× valós idő",
+  "performance.value.cores": "{0} mag",
+  "performance.value.ms": "{0} ms"
+}

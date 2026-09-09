@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -103,6 +103,10 @@ public partial class ShrinkJobWindow : Window
         Strings.Use(_language);
 
         InitializeComponent();
+
+        FlowDirection = Strings.IsRightToLeftLanguage(_language)
+            ? Avalonia.Media.FlowDirection.RightToLeft
+            : Avalonia.Media.FlowDirection.LeftToRight;
 
         BtnClose.Click += (_, _) => Close();
         BtnOpenInApp.Click += OnOpenInApp;
@@ -351,11 +355,8 @@ public partial class ShrinkJobWindow : Window
     }
 
     private string Say(string key)
-        => LanguageCatalog.Title(Strings.GetIn(_language, key), Turkish(_language));
+        => LanguageCatalog.Title(Strings.GetIn(_language, key), _language);
 
     private string Say(string key, params object?[] args)
-        => LanguageCatalog.Title(Strings.GetIn(_language, key, args), Turkish(_language));
-
-    internal static bool Turkish(string language)
-        => language.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
+        => LanguageCatalog.Title(Strings.GetIn(_language, key, args), _language);
 }

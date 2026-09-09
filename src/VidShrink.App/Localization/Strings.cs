@@ -90,6 +90,35 @@ public static class Strings
         }
     }
 
+    /// <summary>
+    /// Üst şeritteki kısayol düğmelerinin dilleri. Program bütün dilleri taşır ama üst şerit
+    /// yalnız bu ikisini gösterir; geri kalanı ayarlardaki listeden seçilir. Kurulumda
+    /// bulunmayan bir kısayol dili sessizce düşer, düğme basılmaz.
+    /// </summary>
+    public static IReadOnlyList<string> ShortcutLanguages
+    {
+        get
+        {
+            var shipped = Languages;
+            return new[] { FallbackLanguage, "tr" }
+                .Where(code => shipped.Any(
+                    language => string.Equals(language, code, StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+        }
+    }
+
+    public static IReadOnlyList<string> RightToLeftLanguages { get; } = new[] { "ar", "fa", "he", "ur" };
+
+    public static bool IsRightToLeft => IsRightToLeftLanguage(Language);
+
+    public static bool IsRightToLeftLanguage(string? language)
+    {
+        if (string.IsNullOrWhiteSpace(language)) return false;
+
+        var head = language.Trim().Split('-')[0];
+        return RightToLeftLanguages.Any(code => string.Equals(code, head, StringComparison.OrdinalIgnoreCase));
+    }
+
     public static void Use(string language)
     {
         if (string.IsNullOrWhiteSpace(language))
@@ -276,7 +305,11 @@ public static class Strings
             : (trimmed[..cut], trimmed[(cut + 1)..]);
     }
 
-    private static CultureInfo CultureOf(string language)
+    /// <summary>
+    /// Bir dil kodunun kültürü. Tanınmayan kod değişmez kültüre düşer, program durmaz.
+    /// Sayı biçimi ve büyük harf kuralı bu tek çeviriden geçer; ikinci bir tablo yok.
+    /// </summary>
+    internal static CultureInfo CultureOf(string language)
     {
         try
         {

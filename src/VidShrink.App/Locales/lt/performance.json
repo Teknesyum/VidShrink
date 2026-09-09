@@ -1,0 +1,36 @@
+{
+  "performance.title": "Našumo patikra",
+  "performance.run": "Paleisti patikrą",
+  "performance.running": "Matuojama — atliekami keli trumpi kodavimai, tai trunka iki dvidešimties sekundžių.",
+  "performance.failed": "Patikros nepavyko užbaigti",
+
+  "performance.headline.hardware-offloaded": "Šiame kompiuteryje yra veikiantis aparatinis koduotuvas ir tas etapas neapkrauna procesoriaus.",
+  "performance.headline.hardware": "Šiame kompiuteryje yra veikiantis aparatinis koduotuvas, bet ar procesorius neša tą etapą, čia nebuvo išmatuota.",
+  "performance.headline.software-heavy": "Veikiantis aparatinis koduotuvas nerastas, o programinis kodavimas realiu laiku reikalauja viso procesoriaus branduolio.",
+  "performance.headline.software-light": "Veikiantis aparatinis koduotuvas nerastas, bet programinis kodavimas realiu laiku telpa į mažiau nei vieną procesoriaus branduolį.",
+  "performance.headline.not-enough": "Išmatuota per mažai, kad būtų galima atsakyti į klausimą.",
+
+  "performance.line.not-measured": "Šiame kompiuteryje dar niekas nebuvo išmatuota.",
+  "performance.line.no-hardware": "Aparatinio vaizdo koduotuvo čia nėra, todėl kodavimas vyksta procesoriuje.",
+  "performance.line.hardware-failed": "Šiame kompiuteryje yra nurodytas aparatinis koduotuvas, bet jo bandomasis kodavimas nepavyko.",
+  "performance.line.hardware-works": "Aparatinis kodavimas šiame kompiuteryje veikia.",
+  "performance.line.hardware-not-cpu-bound": "Aparatinis etapas neapkrauna procesoriaus: su vienu siūlu ar laisvais siūlais laikas buvo tas pats, {0}× ribose.",
+  "performance.line.hardware-cost-unknown": "Aparatinio etapo procesoriaus sąnaudos nebuvo išmatuotos, todėl jo negalima laikyti nemokamu.",
+  "performance.line.hardware-headroom": "Aparatinis etapas vyko {0}× realaus laiko greičiu.",
+  "performance.line.software-realtime": "Programiniam kodavimui realiu laiku reikia {0} branduolių iš {1} loginių branduolių.",
+  "performance.line.software-costs-cores": "Tai visas branduolys ar daugiau ({0} branduolių), todėl programinis kodavimas užima vieną branduolį visą savo darbo laiką.",
+  "performance.line.software-small": "Tai mažiau nei vienas branduolys ({0} branduolių), todėl jį galima paskirstyti į kitų darbų paliktus tarpus.",
+  "performance.line.cpu-unreliable": "Šio kompiuterio procesoriaus laiko skaitiklis nepatikimas ({0}× lyginant su realiu laiku), todėl procesoriaus laikai rodomi, bet pagal juos nieko nesprendžiama.",
+  "performance.line.budget-exhausted": "Matavimo biudžetas išseko ({0} ms iš {1} ms), todėl trūksta vienos patikros dalies.",
+  "performance.boundary": "VidShrink vaizdo neįrašinėja. Čia matuojama, kiek kodavimas kainuoja šiame kompiuteryje, o ne ką su juo daro įrašymo įrankis — pirmiausia žiūrėkite jo paties koduotuvo nustatymus.",
+
+  "performance.fact.hardware-encoder": "Aparatinis koduotuvas",
+  "performance.fact.hardware-pipeline": "Aparatinis konvejeris",
+  "performance.fact.software-encoder": "Programinis koduotuvas",
+  "performance.fact.software-cost": "Programinės sąnaudos",
+  "performance.fact.logical-cores": "Loginiai branduoliai",
+  "performance.fact.measured-in": "Išmatuota per",
+  "performance.value.realtime": "{0}× realaus laiko",
+  "performance.value.cores": "{0} branduolių",
+  "performance.value.ms": "{0} ms"
+}

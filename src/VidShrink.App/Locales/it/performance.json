@@ -1,0 +1,36 @@
+{
+  "performance.title": "Verifica prestazioni",
+  "performance.run": "Avvia la verifica",
+  "performance.running": "Misurazione in corso — esegue alcune brevi codifiche e richiede fino a venti secondi.",
+  "performance.failed": "La verifica non è stata completata",
+
+  "performance.headline.hardware-offloaded": "Questa macchina ha un encoder hardware funzionante e quel passaggio non grava sul processore.",
+  "performance.headline.hardware": "Questa macchina ha un encoder hardware funzionante, ma qui non è stato misurato se il processore sostiene quel passaggio.",
+  "performance.headline.software-heavy": "Nessun encoder hardware funzionante trovato, e la codifica software richiede un intero core del processore per stare al passo con il tempo reale.",
+  "performance.headline.software-light": "Nessun encoder hardware funzionante trovato, ma la codifica software resta sotto un core del processore in tempo reale.",
+  "performance.headline.not-enough": "Le misurazioni raccolte qui non bastano per rispondere.",
+
+  "performance.line.not-measured": "Su questa macchina non è ancora stato misurato nulla.",
+  "performance.line.no-hardware": "Qui non è disponibile alcun encoder video hardware, quindi la codifica gira sul processore.",
+  "performance.line.hardware-failed": "Su questa macchina è elencato un encoder hardware, ma la sua codifica di prova è fallita.",
+  "performance.line.hardware-works": "La codifica hardware funziona su questa macchina.",
+  "performance.line.hardware-not-cpu-bound": "Il passaggio hardware non grava sul processore: con un solo thread o con i thread liberi ha impiegato lo stesso tempo, entro {0}×.",
+  "performance.line.hardware-cost-unknown": "Il costo del passaggio hardware sul processore non è stato misurato, quindi non va considerato gratuito.",
+  "performance.line.hardware-headroom": "Il passaggio hardware ha girato a {0}× il tempo reale.",
+  "performance.line.software-realtime": "La codifica software richiede {0} core per stare al passo con il tempo reale, su {1} core logici.",
+  "performance.line.software-costs-cores": "È un core intero o più ({0} core), quindi la codifica software occupa un core per tutta la sua durata.",
+  "performance.line.software-small": "Resta sotto un core ({0} core), quindi può distribuirsi negli spazi lasciati dagli altri lavori.",
+  "performance.line.cpu-unreliable": "Il contatore del tempo di processore su questa macchina non è affidabile ({0}× rispetto all'orologio), quindi i tempi di processore sono mostrati ma non se ne trae alcuna decisione.",
+  "performance.line.budget-exhausted": "Il budget di misurazione si è esaurito ({0} ms su {1} ms), quindi manca una parte della verifica.",
+  "performance.boundary": "VidShrink non registra video. Qui si misura quanto costa la codifica su questa macchina, non ciò che ne fa uno strumento di registrazione — la sua impostazione di encoder è il primo posto in cui guardare.",
+
+  "performance.fact.hardware-encoder": "Encoder hardware",
+  "performance.fact.hardware-pipeline": "Pipeline hardware",
+  "performance.fact.software-encoder": "Encoder software",
+  "performance.fact.software-cost": "Costo software",
+  "performance.fact.logical-cores": "Core logici",
+  "performance.fact.measured-in": "Misurato in",
+  "performance.value.realtime": "{0}× tempo reale",
+  "performance.value.cores": "{0} core",
+  "performance.value.ms": "{0} ms"
+}

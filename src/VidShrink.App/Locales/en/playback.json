@@ -3,6 +3,10 @@
   "playback.badge.processed": "PROCESSED",
   "playback.player-failed": "The comparison player could not start",
   "playback.sample-failed": "The preview sample could not be encoded",
+  "playback.zoom-readout": "{0}%",
+  "playback.source.tool-missing": "{0} was not found, so the comparison player cannot run.",
+  "playback.source.hstack-broken": "The hstack filter does not work in this ffmpeg build, so the comparison player cannot open.",
+  "playback.source.probe-inconclusive": "The check could not finish, the machine may be busy; try opening the player again.",
   "playback.error.exit-code": "ffmpeg returned exit code {0}.",
   "playback.error.engine": "engine message: {0}",
   "playback.error.no-file": "The clip file was not created.",
@@ -16,5 +20,11 @@
   "playback.control.timeline": "Timeline",
   "playback.control.strip": "Control strip",
   "playback.control.pause": "Pause",
-  "playback.control.play": "Play"
+  "playback.control.play": "Play",
+  "playback.pipe.seek-timeout": "The seek did not deliver a frame within {0} ms, so it was given up.",
+  "playback.pipe.seek-restarts": "The seek gave up after {0} restarts without delivering a frame.",
+  "playback.pipe.no-start": "ffmpeg could not start, so the pipe stayed idle.",
+  "playback.pipe.decoder-died": "The decoder process died unexpectedly; the pipe rebuilds itself on the next seek.",
+  "playback.pipe.decoder-unkillable": "The decoder ffmpeg process could not be killed and may still be running.",
+  "playback.pipe.audio-unkillable": "The audio ffmpeg process could not be killed and may still be running."
 }

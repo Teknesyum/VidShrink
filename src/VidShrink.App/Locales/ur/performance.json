@@ -1,0 +1,36 @@
+{
+  "performance.title": "کارکردگی جانچ",
+  "performance.run": "جانچ چلائیں",
+  "performance.running": "پیمائش جاری ہے — چند مختصر انکوڈ چلتے ہیں اور بیس سیکنڈ تک لگ سکتے ہیں۔",
+  "performance.failed": "جانچ مکمل نہ ہو سکی",
+
+  "performance.headline.hardware-offloaded": "اس مشین میں کام کرنے والا ہارڈویئر انکوڈر ہے اور وہ پاس پروسیسر پر بوجھ نہیں ڈالتا۔",
+  "performance.headline.hardware": "اس مشین میں کام کرنے والا ہارڈویئر انکوڈر ہے، مگر یہاں یہ نہیں ناپا گیا کہ وہ پاس پروسیسر پر چلتا ہے یا نہیں۔",
+  "performance.headline.software-heavy": "کوئی کام کرنے والا ہارڈویئر انکوڈر نہیں ملا، اور سافٹ ویئر انکوڈنگ کو حقیقی وقت کے برابر رہنے کے لیے ایک پورا پروسیسر کور چاہیے۔",
+  "performance.headline.software-light": "کوئی کام کرنے والا ہارڈویئر انکوڈر نہیں ملا، مگر سافٹ ویئر انکوڈنگ حقیقی وقت پر ایک پروسیسر کور سے کم رہتی ہے۔",
+  "performance.headline.not-enough": "سوال کا جواب دینے کے لیے یہاں کافی پیمائش موجود نہیں۔",
+
+  "performance.line.not-measured": "اس مشین پر ابھی کچھ نہیں ناپا گیا۔",
+  "performance.line.no-hardware": "یہاں کوئی ہارڈویئر ویڈیو انکوڈر دستیاب نہیں، اس لیے انکوڈنگ پروسیسر پر چلتی ہے۔",
+  "performance.line.hardware-failed": "اس مشین پر ایک ہارڈویئر انکوڈر درج ہے، مگر اس کا آزمائشی انکوڈ ناکام رہا۔",
+  "performance.line.hardware-works": "اس مشین پر ہارڈویئر انکوڈنگ کام کرتی ہے۔",
+  "performance.line.hardware-not-cpu-bound": "ہارڈویئر پاس پروسیسر پر بوجھ نہیں ڈالتا: ایک تھریڈ دینے یا تھریڈ آزاد چھوڑنے میں {0}× کے اندر ایک جتنا وقت لگا۔",
+  "performance.line.hardware-cost-unknown": "ہارڈویئر پاس کی پروسیسر لاگت نہیں ناپی گئی، اس لیے اسے مفت نہ سمجھا جائے۔",
+  "performance.line.hardware-headroom": "ہارڈویئر پاس {0}× حقیقی وقت پر چلا۔",
+  "performance.line.software-realtime": "سافٹ ویئر انکوڈنگ کو حقیقی وقت کے برابر رہنے کے لیے {0} کور چاہییں، {1} منطقی کوروں میں سے۔",
+  "performance.line.software-costs-cores": "یہ ایک پورا کور یا اس سے زیادہ ہے ({0} کور)، اس لیے سافٹ ویئر انکوڈنگ چلتے ہوئے ایک کور اپنے پاس رکھتی ہے۔",
+  "performance.line.software-small": "یہ ایک کور سے کم رہتا ہے ({0} کور)، اس لیے اسے دوسرے کاموں کے خلا میں پھیلایا جا سکتا ہے۔",
+  "performance.line.cpu-unreliable": "اس مشین پر پروسیسر وقت کا شمار قابل اعتماد نہیں (دیواری گھڑی کے مقابلے {0}×)، اس لیے پروسیسر اوقات دکھائے جاتے ہیں مگر ان سے کوئی فیصلہ نہیں ہوتا۔",
+  "performance.line.budget-exhausted": "پیمائش کا بجٹ ختم ہو گیا ({1} ms میں سے {0} ms)، اس لیے جانچ کا ایک حصہ غائب ہے۔",
+  "performance.boundary": "VidShrink ویڈیو ریکارڈ نہیں کرتا۔ یہاں یہ ناپا گیا ہے کہ اس مشین پر انکوڈنگ کی لاگت کیا ہے، نہ کہ کوئی ریکارڈنگ ٹول اس کے ساتھ کیا کرتا ہے — پہلے اس کی اپنی انکوڈر ترتیب دیکھیں۔",
+
+  "performance.fact.hardware-encoder": "ہارڈویئر انکوڈر",
+  "performance.fact.hardware-pipeline": "ہارڈویئر پائپ لائن",
+  "performance.fact.software-encoder": "سافٹ ویئر انکوڈر",
+  "performance.fact.software-cost": "سافٹ ویئر لاگت",
+  "performance.fact.logical-cores": "منطقی کور",
+  "performance.fact.measured-in": "پیمائش کا وقت",
+  "performance.value.realtime": "{0}× حقیقی وقت",
+  "performance.value.cores": "{0} کور",
+  "performance.value.ms": "{0} ms"
+}

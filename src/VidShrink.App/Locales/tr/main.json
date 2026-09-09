@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• Arşiv yongasının boyut tavanı yoktur.\n• Motor gözle kayıpsız kaliteye kadar bit harcar ve orada durur.\n• Bu yonga seçiliyken hedef kutusundaki sayı plana girmez.\n• Dosya küçülür ama ne kadar küçüleceğini kaynak belirler, siz değil.\n• Bir yere sığdırmanız gerekiyorsa MB yazan yongalardan birini seçin.\n• Hedefe dokunduğunuz anda boyut tavanı geri gelir.",
   "main.derivation.size": "Hedef {0} MB",
@@ -11,6 +11,7 @@
   "main.section.frame.fps-locked": "Kare hızı sabit",
   "main.section.advanced.overrides": "{0} ayar elle",
   "main.section.advanced.none": "Hepsi otomatik",
+  "main.language.settings": "Dil ayarları",
   "main.language.name": "Türkçe",
 
   "main.tagline.lead": "Boyut hedefli medya sıkıştırma",
@@ -392,6 +393,8 @@
   "main.playback.encode-marker": "analiz {0}/{1} · deneme {2}",
   "settings-tab.general.title": "Genel",
   "settings-tab.language.label": "Dil",
+  "settings-tab.theme.label": "Tema",
+  "settings-tab.theme.hint": "Programdaki bütün renkleri değiştirir ve bir sonraki açılışta hatırlanır.",
   "settings-tab.language.hint": "Arayüz dilini değiştirir ve bir sonraki açılışta hatırlanır.",
   "settings-tab.default-target.label": "Varsayılan hedef boyut (MB)",
   "settings-tab.default-target.hint": "Küçült sekmesinin açılışta geleceği hedef boyutu belirler.",

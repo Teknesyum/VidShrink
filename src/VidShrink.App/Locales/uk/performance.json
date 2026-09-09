@@ -1,0 +1,36 @@
+{
+  "performance.title": "Перевірка продуктивності",
+  "performance.run": "Запустити перевірку",
+  "performance.running": "Вимірювання — виконується кілька коротких кодувань, до двадцяти секунд.",
+  "performance.failed": "Перевірку не вдалося завершити",
+
+  "performance.headline.hardware-offloaded": "На цій машині є робочий апаратний кодер, і цей прохід не навантажує процесор.",
+  "performance.headline.hardware": "На цій машині є робочий апаратний кодер, але чи несе цей прохід процесор — тут не виміряно.",
+  "performance.headline.software-heavy": "Робочого апаратного кодера не знайдено, а програмне кодування потребує цілого ядра процесора для реального часу.",
+  "performance.headline.software-light": "Робочого апаратного кодера не знайдено, але програмне кодування в реальному часі лишається під одним ядром процесора.",
+  "performance.headline.not-enough": "Тут виміряно недостатньо, щоб відповісти на запитання.",
+
+  "performance.line.not-measured": "На цій машині ще нічого не виміряно.",
+  "performance.line.no-hardware": "Апаратного відеокодера тут немає, тож кодування виконується на процесорі.",
+  "performance.line.hardware-failed": "На цій машині є апаратний кодер, але його тестове кодування не вдалося.",
+  "performance.line.hardware-works": "Апаратне кодування на цій машині працює.",
+  "performance.line.hardware-not-cpu-bound": "Апаратний прохід не навантажує процесор: з одним потоком чи з вільними потоками час однаковий у межах {0}×.",
+  "performance.line.hardware-cost-unknown": "Процесорну вартість апаратного проходу не виміряно, тож її не можна вважати нульовою.",
+  "performance.line.hardware-headroom": "Апаратний прохід ішов зі швидкістю {0}× реального часу.",
+  "performance.line.software-realtime": "Програмне кодування потребує {0} ядер для реального часу на {1} логічних ядрах.",
+  "performance.line.software-costs-cores": "Це ціле ядро або більше ({0} ядер), тож програмне кодування займає одне ядро, поки працює.",
+  "performance.line.software-small": "Це менше одного ядра ({0} ядер), тож його можна розподілити в проміжки іншої роботи.",
+  "performance.line.cpu-unreliable": "Лічильник процесорного часу на цій машині ненадійний ({0}× проти настінного годинника), тож процесорні часи показано, але за ними нічого не вирішується.",
+  "performance.line.budget-exhausted": "Бюджет вимірювання вичерпано ({0} мс із {1} мс), тож одна частина перевірки відсутня.",
+  "performance.boundary": "VidShrink не захоплює відео. Тут виміряно, скільки коштує кодування на цій машині, а не що робить із ним інструмент захоплення — його власне налаштування кодера варто перевірити першим.",
+
+  "performance.fact.hardware-encoder": "Апаратний кодер",
+  "performance.fact.hardware-pipeline": "Апаратний конвеєр",
+  "performance.fact.software-encoder": "Програмний кодер",
+  "performance.fact.software-cost": "Програмна вартість",
+  "performance.fact.logical-cores": "Логічні ядра",
+  "performance.fact.measured-in": "Виміряно за",
+  "performance.value.realtime": "{0}× реального часу",
+  "performance.value.cores": "{0} ядер",
+  "performance.value.ms": "{0} мс"
+}

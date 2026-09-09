@@ -1,0 +1,36 @@
+{
+  "performance.title": "Ytelsessjekk",
+  "performance.run": "Kjør sjekken",
+  "performance.running": "Måler — dette kjører noen korte kodinger og tar opptil tjue sekunder.",
+  "performance.failed": "Sjekken kunne ikke fullføres",
+
+  "performance.headline.hardware-offloaded": "Denne maskinen har en fungerende maskinvarekoder, og det passet belaster ikke prosessoren.",
+  "performance.headline.hardware": "Denne maskinen har en fungerende maskinvarekoder, men om prosessoren bærer det passet ble ikke målt her.",
+  "performance.headline.software-heavy": "Ingen fungerende maskinvarekoder ble funnet, og programvarekoding trenger en hel prosessorkjerne for å holde sanntid.",
+  "performance.headline.software-light": "Ingen fungerende maskinvarekoder ble funnet, men programvarekoding holder seg under én prosessorkjerne i sanntid.",
+  "performance.headline.not-enough": "Det er ikke målt nok her til å svare på spørsmålet.",
+
+  "performance.line.not-measured": "Ingenting er målt på denne maskinen ennå.",
+  "performance.line.no-hardware": "Ingen maskinvarevideokoder er tilgjengelig her, så kodingen kjører på prosessoren.",
+  "performance.line.hardware-failed": "En maskinvarekoder er oppført på denne maskinen, men testkodingen mislyktes.",
+  "performance.line.hardware-works": "Maskinvarekoding fungerer på denne maskinen.",
+  "performance.line.hardware-not-cpu-bound": "Maskinvarepasset belaster ikke prosessoren: én tråd eller frie tråder tok like lang tid, innenfor {0}×.",
+  "performance.line.hardware-cost-unknown": "Prosessorkostnaden for maskinvarepasset ble ikke målt, så den må ikke leses som gratis.",
+  "performance.line.hardware-headroom": "Maskinvarepasset kjørte med {0}× sanntid.",
+  "performance.line.software-realtime": "Programvarekoding trenger {0} kjerner for å holde sanntid, på {1} logiske kjerner.",
+  "performance.line.software-costs-cores": "Det er en hel kjerne eller mer ({0} kjerner), så programvarekoding eier én kjerne så lenge den kjører.",
+  "performance.line.software-small": "Det holder seg under én kjerne ({0} kjerner), så det kan fordeles i pausene fra annet arbeid.",
+  "performance.line.cpu-unreliable": "Prosessortidtelleren på denne maskinen er ikke pålitelig ({0}× mot veggklokken), så prosessortider vises, men ingenting avgjøres ut fra dem.",
+  "performance.line.budget-exhausted": "Målebudsjettet tok slutt ({0} ms av {1} ms), så én del av sjekken mangler.",
+  "performance.boundary": "VidShrink tar ikke opp video. Det som måles her er hva koding koster på denne maskinen, ikke hva et opptaksverktøy gjør med den — dets egen koderinnstilling er første sted å se.",
+
+  "performance.fact.hardware-encoder": "Maskinvarekoder",
+  "performance.fact.hardware-pipeline": "Maskinvarekjede",
+  "performance.fact.software-encoder": "Programvarekoder",
+  "performance.fact.software-cost": "Programvarekostnad",
+  "performance.fact.logical-cores": "Logiske kjerner",
+  "performance.fact.measured-in": "Målt på",
+  "performance.value.realtime": "{0}× sanntid",
+  "performance.value.cores": "{0} kjerner",
+  "performance.value.ms": "{0} ms"
+}

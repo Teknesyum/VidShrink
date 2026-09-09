@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -79,7 +79,7 @@ internal sealed class PanelHost : IDisposable
     private Task _restart = Task.CompletedTask;
     private bool _open;
     private bool _awaitingFirst;
-    private bool _turkish;
+    private string _language = Strings.FallbackLanguage;
     private bool _disposed;
     private int _generation;
 
@@ -358,17 +358,15 @@ internal sealed class PanelHost : IDisposable
     /// Dil değişimi. Rozet metni burada yeniden sürülür: panel rozeti olduğu gibi gösteriyor,
     /// birleşik dizgenin sözlükte karşılığı yok, yani çeviriyi barındıran taraf yapmalı.
     /// </summary>
-    internal void SetLanguage(bool turkish)
+    internal void SetLanguage(string language)
     {
-        _turkish = turkish;
-        _panel.SetLanguage(turkish);
+        _language = language;
+        _panel.SetLanguage(language);
         _panel.SetRightBadge(ApproximateBadge);
     }
 
     private string PlaybackText(string key)
-        => LanguageCatalog.Title(
-            Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
-            _turkish);
+        => LanguageCatalog.Title(Strings.GetIn(_language, key), _language);
 
     /// <summary>
     /// Akışı panelin o anki ölçüsüyle kurar. Kare ölçüsü sabit bir sayıdan değil, panonun
@@ -951,8 +949,7 @@ internal sealed class PanelHost : IDisposable
         if (_disposed) return;
         if (status.State == ComparisonSourceState.Kullanilamiyor)
         {
-            var reason = (_turkish ? status.MessageTr : status.MessageEn) ?? status.MessageEn ?? status.MessageTr;
-            _panel.SetNotice(reason ?? "playback.player-failed");
+            _panel.SetNotice(status.MessageKey ?? "playback.player-failed", status.MessageArg);
             _panel.Controls.IsPlaying = false;
         }
         else if (status.State == ComparisonSourceState.Durdu && _submitted == 0)

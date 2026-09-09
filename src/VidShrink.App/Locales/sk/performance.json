@@ -1,0 +1,36 @@
+{
+  "performance.title": "Kontrola výkonu",
+  "performance.run": "Spustiť kontrolu",
+  "performance.running": "Meria sa — spustí sa niekoľko krátkych kódovaní, trvá to do dvadsať sekúnd.",
+  "performance.failed": "Kontrolu sa nepodarilo dokončiť",
+
+  "performance.headline.hardware-offloaded": "Tento počítač má funkčný hardvérový enkodér a tento prechod nezaťažuje procesor.",
+  "performance.headline.hardware": "Tento počítač má funkčný hardvérový enkodér, ale či tento prechod nesie procesor, sa tu nemeralo.",
+  "performance.headline.software-heavy": "Nenašiel sa funkčný hardvérový enkodér a softvérové kódovanie potrebuje celé jadro procesora, aby stíhalo reálny čas.",
+  "performance.headline.software-light": "Nenašiel sa funkčný hardvérový enkodér, ale softvérové kódovanie zostáva pod jedným jadrom procesora v reálnom čase.",
+  "performance.headline.not-enough": "Nameralo sa tu príliš málo na odpoveď.",
+
+  "performance.line.not-measured": "Na tomto počítači sa zatiaľ nič nemeralo.",
+  "performance.line.no-hardware": "Nie je tu dostupný žiadny hardvérový video enkodér, takže kódovanie beží na procesore.",
+  "performance.line.hardware-failed": "Na tomto počítači je uvedený hardvérový enkodér, ale jeho skúšobné kódovanie zlyhalo.",
+  "performance.line.hardware-works": "Hardvérové kódovanie na tomto počítači funguje.",
+  "performance.line.hardware-not-cpu-bound": "Hardvérový prechod nezaťažuje procesor: s jedným vláknom aj s voľnými vláknami trval rovnako, v rozpätí {0}×.",
+  "performance.line.hardware-cost-unknown": "Procesorová záťaž hardvérového prechodu sa nemerala, takže ju nemožno považovať za nulovú.",
+  "performance.line.hardware-headroom": "Hardvérový prechod bežal {0}× rýchlejšie ako reálny čas.",
+  "performance.line.software-realtime": "Softvérové kódovanie potrebuje {0} jadier, aby stíhalo reálny čas, z {1} logických jadier.",
+  "performance.line.software-costs-cores": "To je celé jadro alebo viac ({0} jadier), takže softvérové kódovanie zaberá jedno jadro po celý čas behu.",
+  "performance.line.software-small": "To zostáva pod jedným jadrom ({0} jadier), takže sa dá rozložiť do medzier po inej práci.",
+  "performance.line.cpu-unreliable": "Počítadlo procesorového času na tomto počítači nie je spoľahlivé ({0}× oproti reálnemu času), takže procesorové časy sa zobrazujú, ale nič sa z nich nerozhoduje.",
+  "performance.line.budget-exhausted": "Rozpočet merania sa vyčerpal ({0} ms z {1} ms), takže jedna časť kontroly chýba.",
+  "performance.boundary": "VidShrink nezaznamenáva video. Meria sa tu, koľko stojí kódovanie na tomto počítači, nie čo s ním robí nahrávací nástroj — jeho vlastné nastavenie enkodéra je prvé miesto, kam sa pozrieť.",
+
+  "performance.fact.hardware-encoder": "Hardvérový enkodér",
+  "performance.fact.hardware-pipeline": "Hardvérový reťazec",
+  "performance.fact.software-encoder": "Softvérový enkodér",
+  "performance.fact.software-cost": "Softvérová záťaž",
+  "performance.fact.logical-cores": "Logické jadrá",
+  "performance.fact.measured-in": "Namerané za",
+  "performance.value.realtime": "{0}× reálny čas",
+  "performance.value.cores": "{0} jadier",
+  "performance.value.ms": "{0} ms"
+}

@@ -1,0 +1,36 @@
+{
+  "performance.title": "Veiktspējas pārbaude",
+  "performance.run": "Palaist pārbaudi",
+  "performance.running": "Mēra — tiek veikti daži īsi kodējumi, līdz divdesmit sekundēm.",
+  "performance.failed": "Pārbaudi neizdevās pabeigt",
+
+  "performance.headline.hardware-offloaded": "Šim datoram ir strādājošs aparatūras kodētājs, un šī gaita nenoslogo procesoru.",
+  "performance.headline.hardware": "Šim datoram ir strādājošs aparatūras kodētājs, bet vai procesors nes šo gaitu, šeit netika mērīts.",
+  "performance.headline.software-heavy": "Strādājošs aparatūras kodētājs netika atrasts, un programmatūras kodēšanai vajag veselu procesora kodolu, lai turētu reāllaika tempu.",
+  "performance.headline.software-light": "Strādājošs aparatūras kodētājs netika atrasts, bet programmatūras kodēšana reāllaikā paliek zem viena procesora kodola.",
+  "performance.headline.not-enough": "Šeit nav pietiekami daudz mērījumu, lai atbildētu uz jautājumu.",
+
+  "performance.line.not-measured": "Šajā datorā vēl nekas nav mērīts.",
+  "performance.line.no-hardware": "Aparatūras video kodētājs šeit nav pieejams, tāpēc kodēšana notiek procesorā.",
+  "performance.line.hardware-failed": "Šajā datorā ir uzskaitīts aparatūras kodētājs, bet tā pārbaudes kodējums neizdevās.",
+  "performance.line.hardware-works": "Aparatūras kodēšana šajā datorā darbojas.",
+  "performance.line.hardware-not-cpu-bound": "Aparatūras gaita nenoslogo procesoru: viens pavediens vai brīvi pavedieni prasīja vienādu laiku, {0}× robežās.",
+  "performance.line.hardware-cost-unknown": "Aparatūras gaitas procesora izmaksas netika mērītas, tāpēc to nedrīkst uzskatīt par bezmaksas.",
+  "performance.line.hardware-headroom": "Aparatūras gaita darbojās ar {0}× reāllaika ātrumu.",
+  "performance.line.software-realtime": "Programmatūras kodēšanai vajag {0} kodolus, lai turētu reāllaika tempu, no {1} loģiskajiem kodoliem.",
+  "performance.line.software-costs-cores": "Tas ir vesels kodols vai vairāk ({0} kodoli), tāpēc programmatūras kodēšana aizņem vienu kodolu, kamēr vien darbojas.",
+  "performance.line.software-small": "Tas paliek zem viena kodola ({0} kodoli), tāpēc to var izkliedēt cita darba atstātajās spraugās.",
+  "performance.line.cpu-unreliable": "Procesora laika skaitītājs šajā datorā nav uzticams ({0}× pret sienas pulksteni), tāpēc procesora laiki tiek rādīti, bet nekas no tiem netiek izlemts.",
+  "performance.line.budget-exhausted": "Mērīšanas budžets izsīka ({0} ms no {1} ms), tāpēc viens pārbaudes posms trūkst.",
+  "performance.boundary": "VidShrink neieraksta video. Šeit mērīts, cik kodēšana maksā šajā datorā, nevis ko ar to dara ierakstīšanas rīks — tā paša kodētāja iestatījums ir pirmā vieta, kur skatīties.",
+
+  "performance.fact.hardware-encoder": "Aparatūras kodētājs",
+  "performance.fact.hardware-pipeline": "Aparatūras konveijers",
+  "performance.fact.software-encoder": "Programmatūras kodētājs",
+  "performance.fact.software-cost": "Programmatūras izmaksas",
+  "performance.fact.logical-cores": "Loģiskie kodoli",
+  "performance.fact.measured-in": "Mērīts",
+  "performance.value.realtime": "{0}× reāllaiks",
+  "performance.value.cores": "{0} kodoli",
+  "performance.value.ms": "{0} ms"
+}

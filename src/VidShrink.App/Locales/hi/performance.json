@@ -1,0 +1,36 @@
+{
+  "performance.title": "प्रदर्शन जाँच",
+  "performance.run": "जाँच चलाएँ",
+  "performance.running": "माप जारी — कुछ छोटे एन्कोड चलते हैं, बीस सेकंड तक लग सकते हैं।",
+  "performance.failed": "जाँच पूरी नहीं हो सकी",
+
+  "performance.headline.hardware-offloaded": "इस मशीन में काम करने वाला हार्डवेयर एन्कोडर है और वह पास प्रोसेसर पर भार नहीं डालता।",
+  "performance.headline.hardware": "इस मशीन में काम करने वाला हार्डवेयर एन्कोडर है, पर वह पास प्रोसेसर पर भार डालता है या नहीं, यह यहाँ मापा नहीं गया।",
+  "performance.headline.software-heavy": "कोई काम करने वाला हार्डवेयर एन्कोडर नहीं मिला, और सॉफ़्टवेयर एन्कोडिंग को रीयलटाइम बनाए रखने के लिए पूरा एक प्रोसेसर कोर चाहिए।",
+  "performance.headline.software-light": "कोई काम करने वाला हार्डवेयर एन्कोडर नहीं मिला, पर सॉफ़्टवेयर एन्कोडिंग रीयलटाइम पर एक प्रोसेसर कोर से कम में रहती है।",
+  "performance.headline.not-enough": "प्रश्न का उत्तर देने के लिए यहाँ पर्याप्त माप नहीं है।",
+
+  "performance.line.not-measured": "इस मशीन पर अभी तक कुछ भी मापा नहीं गया।",
+  "performance.line.no-hardware": "यहाँ कोई हार्डवेयर वीडियो एन्कोडर उपलब्ध नहीं है, इसलिए एन्कोडिंग प्रोसेसर पर चलती है।",
+  "performance.line.hardware-failed": "इस मशीन पर एक हार्डवेयर एन्कोडर सूचीबद्ध है, पर उसका परीक्षण एन्कोड विफल रहा।",
+  "performance.line.hardware-works": "इस मशीन पर हार्डवेयर एन्कोडिंग काम करती है।",
+  "performance.line.hardware-not-cpu-bound": "हार्डवेयर पास प्रोसेसर पर भार नहीं डालता: एक थ्रेड देने या थ्रेड खुले छोड़ने में {0}× के भीतर समान समय लगा।",
+  "performance.line.hardware-cost-unknown": "हार्डवेयर पास की प्रोसेसर लागत मापी नहीं गई, इसलिए इसे मुफ़्त नहीं मानना चाहिए।",
+  "performance.line.hardware-headroom": "हार्डवेयर पास {0}× रीयलटाइम पर चला।",
+  "performance.line.software-realtime": "सॉफ़्टवेयर एन्कोडिंग को रीयलटाइम बनाए रखने के लिए {0} कोर चाहिए, {1} लॉजिकल कोर में से।",
+  "performance.line.software-costs-cores": "यह पूरा एक कोर या अधिक है ({0} कोर), इसलिए सॉफ़्टवेयर एन्कोडिंग जब तक चलती है, एक कोर उसी का रहता है।",
+  "performance.line.software-small": "यह एक कोर से कम रहता है ({0} कोर), इसलिए इसे दूसरे कामों के बीच की खाली जगह में फैलाया जा सकता है।",
+  "performance.line.cpu-unreliable": "इस मशीन का प्रोसेसर समय काउंटर भरोसेमंद नहीं है (वॉल क्लॉक के मुकाबले {0}×), इसलिए प्रोसेसर समय दिखाए जाते हैं पर उनसे कोई निर्णय नहीं लिया जाता।",
+  "performance.line.budget-exhausted": "माप बजट खत्म हो गया ({1} ms में से {0} ms), इसलिए जाँच का एक हिस्सा अधूरा है।",
+  "performance.boundary": "VidShrink वीडियो कैप्चर नहीं करता। यहाँ जो मापा गया है वह इस मशीन पर एन्कोडिंग की लागत है, कैप्चर टूल उसका क्या करता है यह नहीं — पहले उसकी अपनी एन्कोडर सेटिंग देखें।",
+
+  "performance.fact.hardware-encoder": "हार्डवेयर एन्कोडर",
+  "performance.fact.hardware-pipeline": "हार्डवेयर पाइपलाइन",
+  "performance.fact.software-encoder": "सॉफ़्टवेयर एन्कोडर",
+  "performance.fact.software-cost": "सॉफ़्टवेयर लागत",
+  "performance.fact.logical-cores": "लॉजिकल कोर",
+  "performance.fact.measured-in": "माप समय",
+  "performance.value.realtime": "{0}× रीयलटाइम",
+  "performance.value.cores": "{0} कोर",
+  "performance.value.ms": "{0} ms"
+}

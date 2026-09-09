@@ -124,7 +124,7 @@ public sealed class BiciminTests : IDisposable
         var ham = Strings.GetIn(turkce ? "tr" : "en", anahtar);
 
         Assert.True(LanguageCatalog.ReadsAsProse(ham), $"'{ham}' govde sayilmadi");
-        Assert.Equal(ham, LanguageCatalog.Title(ham, turkce));
+        Assert.Equal(ham, LanguageCatalog.Title(ham, turkce ? "tr" : "en"));
     }
 
     /// <summary>
@@ -141,7 +141,7 @@ public sealed class BiciminTests : IDisposable
         var ham = Strings.GetIn(turkce ? "tr" : "en", anahtar);
 
         Assert.False(LanguageCatalog.ReadsAsProse(ham), $"'{ham}' yanlislikla govde sayildi");
-        Assert.Equal(beklenen, LanguageCatalog.Title(ham, turkce));
+        Assert.Equal(beklenen, LanguageCatalog.Title(ham, turkce ? "tr" : "en"));
     }
 }
 
@@ -444,9 +444,6 @@ public sealed class BaslikKapsamiTests
         return false;
     }
 
-    private static bool Turkce(string dil)
-        => dil.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
-
     /// <summary>
     /// Sozcugun bas tarafi <c>Names</c>'de bildirilmis bir ad mi? Sinir kurali
     /// <c>LanguageCatalog.KnownSpelling</c> ile ayni: bastaki harf disi imler atlanir,
@@ -489,7 +486,7 @@ public sealed class BaslikKapsamiTests
 
                 toplam++;
                 dilBasina[dil]++;
-                _cikti.WriteLine($"KOL\t{dil}\t{anahtar}\t{ham.ReplaceLineEndings(" ")}\t{LanguageCatalog.Title(ham, Turkce(dil)).ReplaceLineEndings(" ")}");
+                _cikti.WriteLine($"KOL\t{dil}\t{anahtar}\t{ham.ReplaceLineEndings(" ")}\t{LanguageCatalog.Title(ham, dil).ReplaceLineEndings(" ")}");
             }
         }
 
@@ -526,7 +523,7 @@ public sealed class BaslikKapsamiTests
         {
             foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
             {
-                var cikti = LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil));
+                var cikti = LanguageCatalog.Title(Strings.GetIn(dil, anahtar), dil);
                 gezilen++;
 
                 foreach (var sozcuk in cikti.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
@@ -554,7 +551,7 @@ public sealed class BaslikKapsamiTests
         {
             foreach (var anahtar in Strings.KeysOf(dil).OrderBy(k => k, StringComparer.Ordinal))
             {
-                _cikti.WriteLine($"DOKUM\t{dil}\t{anahtar}\t{LanguageCatalog.Title(Strings.GetIn(dil, anahtar), Turkce(dil)).ReplaceLineEndings(" ")}");
+                _cikti.WriteLine($"DOKUM\t{dil}\t{anahtar}\t{LanguageCatalog.Title(Strings.GetIn(dil, anahtar), dil).ReplaceLineEndings(" ")}");
                 satir++;
             }
         }
@@ -562,3 +559,4 @@ public sealed class BaslikKapsamiTests
         Assert.True(satir > 0);
     }
 }
+

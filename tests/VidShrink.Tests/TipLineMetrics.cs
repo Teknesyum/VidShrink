@@ -120,10 +120,10 @@ internal static class TipLineMetrics
     /// geniştir. Ölçüm de aynı geçitten geçer, yoksa satırlar olduğundan dar görünür.
     /// </summary>
     internal static IEnumerable<LineMeasurement> Measure(
-        string source, string language, string text, bool turkish)
+        string source, string language, string text)
     {
         var typeface = Prepare();
-        var lines = VidShrink.App.LanguageCatalog.Title(text, turkish).Split('\n');
+        var lines = VidShrink.App.LanguageCatalog.Title(text, language.ToLowerInvariant()).Split('\n');
 
         for (var index = 0; index < lines.Length; index++)
         {
@@ -156,9 +156,9 @@ internal static class TipLineMetrics
         foreach (var tip in TipSources.ReadTips())
         {
             var label = Label(tip);
-            all.AddRange(Measure(label, "EN", tip.Text, turkish: false));
+            all.AddRange(Measure(label, "EN", tip.Text));
             if (catalogue.TryGetValue(tip.Text, out var translated))
-                all.AddRange(Measure(label, "TR", translated, turkish: true));
+                all.AddRange(Measure(label, "TR", translated));
         }
 
         return (IReadOnlyList<LineMeasurement>)all;

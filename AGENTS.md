@@ -4,7 +4,9 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
 
 - `src/VidShrink.Core` — plan hesabı, argüman üretimi. Motorun kararları burada.
 - `src/VidShrink.Ffmpeg` — süreç çağrıları, yoklama, oynatma borusu.
-- `src/VidShrink.App` — Avalonia arayüzü. Renk ve ölçü yalnız `Themes/Theme.axaml` belirteçlerinden.
+- `src/VidShrink.App` — Avalonia arayüzü. Renk yalnız `Themes/Palette/` altındaki palet
+  dosyasından, ölçü yalnız `Themes/Theme.axaml` belirteçlerinden. Yürürlükteki paleti
+  `App.axaml` bildirir; paletteki renkleri değiştirmek bütün temayı değiştirir.
 - `tests/VidShrink.Tests` — tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok.
 - `tools/VidShrink.Bench` — ölçüm aracı. Rapora giren her sayı buradan çıkar.
 

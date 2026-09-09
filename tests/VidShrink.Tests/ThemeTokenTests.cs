@@ -35,13 +35,9 @@ public sealed class ThemeTokenTests
         "PhoenixGlowInner", "PhoenixGlowMid", "PhoenixGlowOuter", "PhoenixEmberSpark"
     };
 
-    private static XElement Theme() => XDocument.Load(TipSources.ThemePath).Root!;
+    private static XElement Resource(string key) => ThemeSources.Resource(key);
 
-    private static XElement Resource(string key) => Theme()
-        .Elements()
-        .Single(element => (string?)element.Attribute(X + "Key") == key);
-
-    private static string Token(string key) => Resource(key).Value.Trim();
+    private static string Token(string key) => ThemeSources.Token(key);
 
     private static double Opacity() =>
         double.Parse(Token("PhoenixOpacity"), CultureInfo.InvariantCulture);
@@ -99,8 +95,8 @@ public sealed class ThemeTokenTests
     [Fact]
     public void TheWarmRampAddsExactlyTwoEmberTokens()
     {
-        var emberTokens = Theme()
-            .Elements(Ui + "Color")
+        var emberTokens = ThemeSources.Resources()
+            .Where(element => element.Name == Ui + "Color")
             .Select(element => (string)element.Attribute(X + "Key")!)
             .Where(key => key.Contains("Ember", StringComparison.Ordinal))
             .ToList();

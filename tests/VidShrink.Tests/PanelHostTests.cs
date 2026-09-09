@@ -200,7 +200,7 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         AppHost.Run(() =>
         {
             host.SetFiles(_clips.Kaynak, null, 16.0 / 9, TimeSpan.FromSeconds(12), 30);
-            host.SetLanguage(false);
+            host.SetLanguage("en");
             host.Open();
         });
         Assert.True(string.IsNullOrEmpty(Rozet(panel)));
@@ -208,14 +208,14 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         // Parca: rozet dolu ve panele gecmis.
         AppHost.Run(() => host.SetPlan(Source(_clips.Kaynak), TwoPassPlan(), null));
         await host.LoadClipAsync(4);
-        AppHost.Run(() => host.SetLanguage(false));
+        AppHost.Run(() => host.SetLanguage("en"));
         Assert.Equal(host.ApproximateBadge, Rozet(panel));
         Assert.False(string.IsNullOrWhiteSpace(Rozet(panel)));
         var ingilizce = Rozet(panel)!;
         Record50($"T50 K1 rozet: parca=[{ingilizce}]");
 
         // Dil degisince metin de degisir: birlesik dizgeyi panel kendi ceviremez.
-        AppHost.Run(() => host.SetLanguage(true));
+        AppHost.Run(() => host.SetLanguage("tr"));
         Record50($"T50 K1 rozet: dil degisince=[{Rozet(panel)}]");
         Assert.NotEqual(ingilizce, Rozet(panel));
         Assert.Equal(host.ApproximateBadge, Rozet(panel));
@@ -323,22 +323,22 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
         Assert.Equal(sebep.Key, encoder.LastError);
         Assert.NotNull(sebep.Detail);
 
-        var turkce = AppHost.Run(() => { host.SetLanguage(true); return host.SampleFailureText(sebep); });
-        var ingilizce = AppHost.Run(() => { host.SetLanguage(false); return host.SampleFailureText(sebep); });
+        var turkce = AppHost.Run(() => { host.SetLanguage("tr"); return host.SampleFailureText(sebep); });
+        var ingilizce = AppHost.Run(() => { host.SetLanguage("en"); return host.SampleFailureText(sebep); });
 
         var tr = Locales.Values("tr");
         var en = Locales.Values("en");
 
-        foreach (var (shown, sozluk, turkish) in
-                 new[] { (turkce, tr, true), (ingilizce, en, false) })
+        foreach (var (shown, sozluk, dil) in
+                 new[] { (turkce, tr, "tr"), (ingilizce, en, "en") })
         {
             Assert.DoesNotContain(sebep.Key, shown, StringComparison.Ordinal);
             Assert.DoesNotContain("{0}", shown, StringComparison.Ordinal);
             Assert.Contains(sebep.Detail!, shown, StringComparison.Ordinal);
             Assert.Contains(
-                LanguageCatalog.Title(sozluk["playback.sample-failed"], turkish), shown, StringComparison.Ordinal);
+                LanguageCatalog.Title(sozluk["playback.sample-failed"], dil), shown, StringComparison.Ordinal);
 
-            foreach (var piece in LanguageCatalog.Title(sozluk[sebep.Key], turkish).Split("{0}"))
+            foreach (var piece in LanguageCatalog.Title(sozluk[sebep.Key], dil).Split("{0}"))
                 if (piece.Trim().Length >= 3)
                     Assert.Contains(piece.Trim(), shown, StringComparison.Ordinal);
         }

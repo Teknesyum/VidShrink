@@ -32,8 +32,8 @@ public sealed record ComparisonSourceStatus(
     double FeedFps,
     int ReadErrors,
     long PoolAllocations,
-    string? MessageTr = null,
-    string? MessageEn = null);
+    string? MessageKey = null,
+    string? MessageArg = null);
 
 /// <summary>
 /// Karsilastirma panelinin kare kaynagi. <b>Arayuz cizmez</b>, tek isi kare uretmek.

@@ -1,0 +1,36 @@
+{
+  "performance.title": "性能检测",
+  "performance.run": "运行检测",
+  "performance.running": "正在测量 — 会运行几段短编码，最多需要二十秒。",
+  "performance.failed": "检测未能完成",
+
+  "performance.headline.hardware-offloaded": "本机有可用的硬件编码器，且该过程不依赖处理器。",
+  "performance.headline.hardware": "本机有可用的硬件编码器，但此处未测量处理器是否承担该过程。",
+  "performance.headline.software-heavy": "未找到可用的硬件编码器，软件编码需要整整一个处理器核心才能跟上实时速度。",
+  "performance.headline.software-light": "未找到可用的硬件编码器，但软件编码在实时速度下占用不到一个处理器核心。",
+  "performance.headline.not-enough": "此处测得的数据不足以回答该问题。",
+
+  "performance.line.not-measured": "本机尚未进行任何测量。",
+  "performance.line.no-hardware": "本机没有可用的硬件视频编码器，因此编码在处理器上运行。",
+  "performance.line.hardware-failed": "本机列出了硬件编码器，但其测试编码失败。",
+  "performance.line.hardware-works": "本机硬件编码可用。",
+  "performance.line.hardware-not-cpu-bound": "硬件过程不依赖处理器：分配一个线程与不限线程所用时间相同，误差在 {0}× 以内。",
+  "performance.line.hardware-cost-unknown": "硬件过程的处理器开销未测量，因此不能视为零开销。",
+  "performance.line.hardware-headroom": "硬件过程以 {0}× 实时速度运行。",
+  "performance.line.software-realtime": "软件编码需要 {0} 个核心才能跟上实时速度，本机共 {1} 个逻辑核心。",
+  "performance.line.software-costs-cores": "这达到或超过一整个核心（{0} 个核心），因此软件编码运行期间会独占一个核心。",
+  "performance.line.software-small": "这不到一个核心（{0} 个核心），因此可以分散到其他工作留下的空隙中。",
+  "performance.line.cpu-unreliable": "本机的处理器时间计数器不可靠（相对挂钟时间为 {0}×），因此处理器时间仅供显示，不据此做出决定。",
+  "performance.line.budget-exhausted": "测量预算已用尽（{1} 毫秒中的 {0} 毫秒），因此检测缺少一个环节。",
+  "performance.boundary": "VidShrink 不录制视频。此处测量的是编码在本机的开销，而不是录制工具的表现 — 录制工具自身的编码器设置才是首先要查看的地方。",
+
+  "performance.fact.hardware-encoder": "硬件编码器",
+  "performance.fact.hardware-pipeline": "硬件管线",
+  "performance.fact.software-encoder": "软件编码器",
+  "performance.fact.software-cost": "软件开销",
+  "performance.fact.logical-cores": "逻辑核心",
+  "performance.fact.measured-in": "测量耗时",
+  "performance.value.realtime": "{0}× 实时",
+  "performance.value.cores": "{0} 个核心",
+  "performance.value.ms": "{0} 毫秒"
+}

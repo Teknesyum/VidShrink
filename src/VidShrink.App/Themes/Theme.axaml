@@ -2,33 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="using:System">
 
-  <Color x:Key="NeonBlueColor">#FF00F3FF</Color>
-  <Color x:Key="NeonPinkColor">#FFFF00EA</Color>
-  <Color x:Key="NeonPurpleColor">#FFB026FF</Color>
-  <Color x:Key="NeonSuccessColor">#FF34D399</Color>
-  <Color x:Key="SurfaceToneColor">#FF121216</Color>
-  <Color x:Key="AppBgColor">#FF050507</Color>
-  <Color x:Key="TextBodyColor">#FFFFFFFF</Color>
-  <Color x:Key="TextDisabledColor">#FF71717A</Color>
-
-  <Color x:Key="NeonBlueFillColor">#1A00F3FF</Color>
-  <Color x:Key="NeonBlueHoverColor">#3300F3FF</Color>
-  <Color x:Key="NeonBlueActiveColor">#4D00F3FF</Color>
-  <Color x:Key="NeonBlueBorderColor">#4D00F3FF</Color>
-  <Color x:Key="NeonBlueBorderStrongColor">#8000F3FF</Color>
-  <Color x:Key="NeonPinkFillColor">#1AFF00EA</Color>
-  <Color x:Key="NeonPurpleBorderColor">#80B026FF</Color>
-
-  <Color x:Key="NeonEmberColor">#FFFF0033</Color>
-  <Color x:Key="EmberFlameColor">#FFFF6600</Color>
-  <Color x:Key="EmberBlazeColor">#FFFFFF00</Color>
-  <Color x:Key="EmberDeepColor">#FF070306</Color>
-  <Color x:Key="EmberMidColor">#FF080407</Color>
-  <Color x:Key="EmberEdgeColor">#FF0B0407</Color>
-  <Color x:Key="EmberBarDeepColor">#FF130D10</Color>
-  <Color x:Key="EmberBarMidColor">#FF150E11</Color>
-  <Color x:Key="EmberBarEdgeColor">#FF170F12</Color>
-
   <SolidColorBrush x:Key="NeonBlue" Color="{StaticResource NeonBlueColor}"/>
   <SolidColorBrush x:Key="NeonPink" Color="{StaticResource NeonPinkColor}"/>
   <SolidColorBrush x:Key="NeonPurple" Color="{StaticResource NeonPurpleColor}"/>
@@ -45,7 +18,7 @@
   <SolidColorBrush x:Key="NeonBlueBorderStrong" Color="{StaticResource NeonBlueBorderStrongColor}"/>
   <SolidColorBrush x:Key="NeonPinkFill" Color="{StaticResource NeonPinkFillColor}"/>
   <SolidColorBrush x:Key="NeonPurpleBorder" Color="{StaticResource NeonPurpleBorderColor}"/>
-  <SolidColorBrush x:Key="OnNeon" Color="#FF000000"/>
+  <SolidColorBrush x:Key="OnNeon" Color="{StaticResource OnNeonColor}"/>
   <SolidColorBrush x:Key="NeonEmber" Color="{StaticResource NeonEmberColor}"/>
 
   <x:Double x:Key="PhoenixOpacity">0.08</x:Double>
@@ -387,6 +360,7 @@
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
   <x:Double x:Key="DropOutlineThickness">2</x:Double>
+  <x:Double x:Key="DropIconGlowRadius">6</x:Double>
   <x:Double x:Key="PlanFactMinWidth">136</x:Double>
   <x:Double x:Key="WindowPreferredWidth">1560</x:Double>
   <x:Double x:Key="WindowPreferredHeight">1060</x:Double>
@@ -394,11 +368,6 @@
 
   <Thickness x:Key="WrapItemMargin">0,0,24,8</Thickness>
   <Thickness x:Key="PlanBulletMargin">0,0,8,0</Thickness>
-
-  <BoxShadows x:Key="GlowBlue">0 0 20 0 #4000F3FF</BoxShadows>
-  <BoxShadows x:Key="GlowPink">0 0 20 0 #40FF00EA</BoxShadows>
-  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40B026FF</BoxShadows>
-  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
 
   <x:String x:Key="LinkGitHub">https://github.com/Teknesyum</x:String>
   <x:String x:Key="LinkRepo">https://github.com/Teknesyum/vidshrink</x:String>

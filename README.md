@@ -496,7 +496,10 @@ docs/gorseller/               every screenshot and badge this README and its Tur
 ```
 
 Design notes worth knowing before you send a patch. Colours and measurements come only from
-`src/VidShrink.App/Themes/Theme.axaml`; nothing is hard-coded at the call site. Every string
+tokens, never from the call site. Every colour lives in the palette under
+`src/VidShrink.App/Themes/Palette/`, and every measurement in
+`src/VidShrink.App/Themes/Theme.axaml`. Changing the palette file changes the whole look,
+splash image included; `App.axaml` names the palette in use and every reader follows it. Every string
 on screen comes from `Locales/<language>/<area>.json` and is read by key. Any number that
 reaches a document comes out of `tools/VidShrink.Bench`, not out of an estimate.
 

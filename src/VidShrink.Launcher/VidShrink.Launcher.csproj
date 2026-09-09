@@ -19,10 +19,13 @@
     <ProjectReference Include="..\VidShrink.Core\VidShrink.Core.csproj" />
   </ItemGroup>
 
-  <!-- Bekleme panelinin görüntüsü elle hazırlanmıyor: her derlemede Theme.axaml'dan
-       üretiliyor. Tema değişince görüntü de değişir, sessizce eskimez. -->
+  <!-- Bekleme panelinin görüntüsü elle hazırlanmıyor: her derlemede arayüzün kendi
+       kaynak sözlüklerinden üretiliyor. Girdi App.axaml: hangi paleti birleştiriyorsa
+       araç onu izler, palet adı burada yazılı değil. Tema ya da palet değişince görüntü
+       de değişir, sessizce eskimez. -->
   <PropertyGroup>
-    <SplashTheme>$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\Theme.axaml</SplashTheme>
+    <SplashTheme>$(MSBuildThisFileDirectory)..\VidShrink.App\App.axaml</SplashTheme>
+    <SplashSources>$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\*.axaml;$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\Palette\*.axaml</SplashSources>
     <SplashGenProject>$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\VidShrink.SplashGen.csproj</SplashGenProject>
     <SplashImage>$(BaseIntermediateOutputPath)splash.png</SplashImage>
   </PropertyGroup>
@@ -32,7 +35,7 @@
   </ItemGroup>
 
   <Target Name="GenerateSplashImage" BeforeTargets="BeforeBuild"
-          Inputs="$(SplashTheme);$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\Program.cs"
+          Inputs="$(SplashTheme);$(SplashSources);$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\Program.cs"
           Outputs="$(SplashImage)">
     <!-- Restore önce, ayrı bir çağrı olarak. Çözüm derlenirken geri yükleme çözüm
          genelinden geliyordu ve bu adım gereksiz görünüyordu; kurulum betiği başlatıcıyı

@@ -1,0 +1,36 @@
+{
+  "performance.title": "Prestatiecontrole",
+  "performance.run": "Controle uitvoeren",
+  "performance.running": "Bezig met meten — dit voert enkele korte encodes uit en duurt tot twintig seconden.",
+  "performance.failed": "De controle kon niet worden afgerond",
+
+  "performance.headline.hardware-offloaded": "Deze machine heeft een werkende hardware-encoder en die doorgang belast de processor niet.",
+  "performance.headline.hardware": "Deze machine heeft een werkende hardware-encoder, maar of de processor die doorgang draagt is hier niet gemeten.",
+  "performance.headline.software-heavy": "Geen werkende hardware-encoder gevonden, en software-encoding heeft een volledige processorkern nodig om realtime bij te houden.",
+  "performance.headline.software-light": "Geen werkende hardware-encoder gevonden, maar software-encoding blijft bij realtime onder één processorkern.",
+  "performance.headline.not-enough": "Er is hier niet genoeg gemeten om de vraag te beantwoorden.",
+
+  "performance.line.not-measured": "Op deze machine is nog niets gemeten.",
+  "performance.line.no-hardware": "Er is hier geen hardware-video-encoder beschikbaar, dus de encoding draait op de processor.",
+  "performance.line.hardware-failed": "Op deze machine staat een hardware-encoder vermeld, maar de test-encode is mislukt.",
+  "performance.line.hardware-works": "Hardware-encoding werkt op deze machine.",
+  "performance.line.hardware-not-cpu-bound": "De hardware-doorgang belast de processor niet: met één thread of met vrije threads duurde het even lang, binnen {0}×.",
+  "performance.line.hardware-cost-unknown": "De processorkosten van de hardware-doorgang zijn niet gemeten, dus die mag niet als gratis worden gelezen.",
+  "performance.line.hardware-headroom": "De hardware-doorgang liep op {0}× realtime.",
+  "performance.line.software-realtime": "Software-encoding heeft {0} kernen nodig om realtime bij te houden, op {1} logische kernen.",
+  "performance.line.software-costs-cores": "Dat is een volledige kern of meer ({0} kernen), dus software-encoding bezet één kern zolang die draait.",
+  "performance.line.software-small": "Dat blijft onder één kern ({0} kernen), dus het kan in de gaten van ander werk worden verdeeld.",
+  "performance.line.cpu-unreliable": "De processortijdteller op deze machine is niet betrouwbaar ({0}× tegenover de wandklok), dus processortijden worden getoond maar er wordt niets uit besloten.",
+  "performance.line.budget-exhausted": "Het meetbudget raakte op ({0} ms van {1} ms), dus één deel van de controle ontbreekt.",
+  "performance.boundary": "VidShrink neemt geen video op. Wat hier gemeten wordt is wat encoding op deze machine kost, niet wat een opnametool ermee doet — de encoderinstelling daarvan is de eerste plek om te kijken.",
+
+  "performance.fact.hardware-encoder": "Hardware-encoder",
+  "performance.fact.hardware-pipeline": "Hardware-pijplijn",
+  "performance.fact.software-encoder": "Software-encoder",
+  "performance.fact.software-cost": "Softwarekosten",
+  "performance.fact.logical-cores": "Logische kernen",
+  "performance.fact.measured-in": "Gemeten in",
+  "performance.value.realtime": "{0}× realtime",
+  "performance.value.cores": "{0} kernen",
+  "performance.value.ms": "{0} ms"
+}

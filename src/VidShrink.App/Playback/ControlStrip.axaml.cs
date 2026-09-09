@@ -31,7 +31,7 @@ internal partial class ControlStrip : UserControl
 
     private DispatcherTimer? _demoClock;
 
-    private bool _turkish;
+    private string _language = Strings.FallbackLanguage;
     private bool _playing;
     private bool _scrubbing;
     private bool _pointerOnBar;
@@ -98,7 +98,7 @@ internal partial class ControlStrip : UserControl
                 }
             };
 
-        SetLanguage(false);
+        SetLanguage(Strings.FallbackLanguage);
         Refresh();
     }
 
@@ -176,7 +176,7 @@ internal partial class ControlStrip : UserControl
         _encodePass = pass;
         _encodePassCount = passCount;
         _encodeAttempt = attempt;
-        EncodeText.Text = LanguageCatalog.EncodeMarker(_turkish, pass, passCount, attempt);
+        EncodeText.Text = LanguageCatalog.EncodeMarker(_language, pass, passCount, attempt);
         Refresh();
     }
 
@@ -193,9 +193,9 @@ internal partial class ControlStrip : UserControl
         PlayPauseRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    internal void SetLanguage(bool turkish)
+    internal void SetLanguage(string language)
     {
-        _turkish = turkish;
+        _language = language;
 
         // Düğme yüzleri metin değil işaret; ad erişilebilirlik adında duruyor.
         Restart.Content = "|◀";
@@ -204,7 +204,7 @@ internal partial class ControlStrip : UserControl
         AutomationProperties.SetName(Bar, Text("playback.control.strip"));
 
         if (_encodeFraction >= 0)
-            EncodeText.Text = LanguageCatalog.EncodeMarker(turkish, _encodePass, _encodePassCount, _encodeAttempt);
+            EncodeText.Text = LanguageCatalog.EncodeMarker(language, _encodePass, _encodePassCount, _encodeAttempt);
 
         Refresh();
     }
@@ -390,9 +390,7 @@ internal partial class ControlStrip : UserControl
     // ---- tema -----------------------------------------------------------------------
 
     private string Text(string key)
-        => LanguageCatalog.Title(
-            Strings.GetIn(_turkish ? "tr" : Strings.FallbackLanguage, key),
-            _turkish);
+        => LanguageCatalog.Title(Strings.GetIn(_language, key), _language);
 
     private double Scalar(string key, double fallback)
         => this.TryFindResource(key, out var value) && value is double number ? number : fallback;

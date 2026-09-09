@@ -36,8 +36,13 @@ public sealed class SplashTests
     public static readonly string ImagePath =
         Path.Combine(Root, "src", "VidShrink.Launcher", "obj", "splash.png");
 
-    public static readonly string ThemePath =
-        Path.Combine(Root, "src", "VidShrink.App", "Themes", "Theme.axaml");
+    /// <summary>
+    /// Belirteçlerin okunduğu giriş. Tek bir sözlük değil: <c>App.axaml</c> hangi kaynak
+    /// sözlüklerini birleştiriyorsa hepsi okunur, palet dosyası da böyle geliyor. Palet
+    /// adı ölçümde yazılı değil — arayüz başka bir palete geçince ölçüm onu izler.
+    /// </summary>
+    public static readonly string AppPath =
+        Path.Combine(Root, "src", "VidShrink.App", "App.axaml");
 
     public static string? LauncherPath => Directory
         .EnumerateFiles(Path.Combine(Root, "src", "VidShrink.Launcher"), "VidShrink.exe", SearchOption.AllDirectories)
@@ -219,15 +224,20 @@ public sealed class SplashTests
 
     private static Dictionary<string, string> ReadTheme()
     {
-        var text = File.ReadAllText(ThemePath);
         var values = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (Match match in Regex.Matches(
-                     text, @"<(?<tag>Color|x:Double|x:Int32|x:String|sys:TimeSpan|CornerRadius|Thickness|FontFamily|BoxShadows)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
+        foreach (var file in ThemeSources.Files(AppPath))
         {
-            values[match.Groups["key"].Value] = match.Groups["value"].Value.Trim();
+            var text = File.ReadAllText(file);
+            foreach (Match match in Regex.Matches(
+                         text, @"<(?<tag>Color|x:Double|x:Int32|x:String|sys:TimeSpan|CornerRadius|Thickness|FontFamily|BoxShadows)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
+            {
+                values[match.Groups["key"].Value] = match.Groups["value"].Value.Trim();
+            }
         }
+
         return values;
     }
+
 
     private static string FindRoot()
     {

@@ -159,7 +159,7 @@ public sealed class KabukIstegiTests
         var gorulen = PencereMetni(problem);
         var beklenen = LanguageCatalog.Title(
             Strings.GetIn(gorulen.Dil, anahtar, ShrinkProblemText.QuickList()),
-            ShrinkJobWindow.Turkish(gorulen.Dil));
+            gorulen.Dil);
 
         Assert.Equal(anahtar, ShrinkProblemText.Key(problem));
         Assert.False(string.IsNullOrWhiteSpace(beklenen), $"{anahtar} karsiligi bos.");
@@ -186,7 +186,7 @@ public sealed class KabukIstegiTests
             var gorulen = PencereMetni(ShrinkArgumentProblem.TargetNotInQuickList, surecDili);
             var beklenen = LanguageCatalog.Title(
                 Strings.GetIn(gorulen.Dil, ShrinkProblemText.TargetNotInQuickList, ShrinkProblemText.QuickList()),
-                ShrinkJobWindow.Turkish(gorulen.Dil));
+                gorulen.Dil);
 
             _output.WriteLine($"surec dili: {surecDili}  pencere dili: {gorulen.Dil}");
             _output.WriteLine($"  {gorulen.Metin}");
@@ -380,7 +380,7 @@ public sealed class KabukIstegiTests
 
         var beklenen = LanguageCatalog.Title(
             Strings.GetIn(okunan.Language, "main.shrink-job.missing-paths", 1, yok),
-            ShrinkJobWindow.Turkish(okunan.Language));
+            okunan.Language);
 
         _output.WriteLine($"dil: {okunan.Language}");
         _output.WriteLine($"  {okunan.NoticeText}");

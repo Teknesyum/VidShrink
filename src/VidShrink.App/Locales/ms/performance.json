@@ -1,0 +1,36 @@
+{
+  "performance.title": "Semakan prestasi",
+  "performance.run": "Jalankan semakan",
+  "performance.running": "Mengukur — beberapa pengekodan pendek dijalankan, sehingga dua puluh saat.",
+  "performance.failed": "Semakan tidak dapat diselesaikan",
+
+  "performance.headline.hardware-offloaded": "Mesin ini mempunyai pengekod perkakasan yang berfungsi dan laluan itu tidak membebankan pemproses.",
+  "performance.headline.hardware": "Mesin ini mempunyai pengekod perkakasan yang berfungsi, tetapi sama ada pemproses menanggung laluan itu tidak diukur di sini.",
+  "performance.headline.software-heavy": "Tiada pengekod perkakasan yang berfungsi ditemui, dan pengekodan perisian memerlukan satu teras pemproses penuh untuk mengikut masa nyata.",
+  "performance.headline.software-light": "Tiada pengekod perkakasan yang berfungsi ditemui, tetapi pengekodan perisian kekal di bawah satu teras pemproses pada masa nyata.",
+  "performance.headline.not-enough": "Ukuran di sini tidak mencukupi untuk menjawab soalan itu.",
+
+  "performance.line.not-measured": "Belum ada apa-apa diukur pada mesin ini.",
+  "performance.line.no-hardware": "Tiada pengekod video perkakasan tersedia di sini, jadi pengekodan berjalan pada pemproses.",
+  "performance.line.hardware-failed": "Pengekod perkakasan tersenarai pada mesin ini, tetapi pengekodan ujiannya gagal.",
+  "performance.line.hardware-works": "Pengekodan perkakasan berfungsi pada mesin ini.",
+  "performance.line.hardware-not-cpu-bound": "Laluan perkakasan tidak membebankan pemproses: memberinya satu bebenang atau membiarkan bebenang bebas mengambil masa yang sama, dalam lingkungan {0}×.",
+  "performance.line.hardware-cost-unknown": "Kos pemproses bagi laluan perkakasan tidak diukur, jadi ia tidak boleh dianggap percuma.",
+  "performance.line.hardware-headroom": "Laluan perkakasan berjalan pada {0}× masa nyata.",
+  "performance.line.software-realtime": "Pengekodan perisian memerlukan {0} teras untuk mengikut masa nyata, daripada {1} teras logik.",
+  "performance.line.software-costs-cores": "Itu satu teras penuh atau lebih ({0} teras), jadi pengekodan perisian memiliki satu teras selama ia berjalan.",
+  "performance.line.software-small": "Itu kekal di bawah satu teras ({0} teras), jadi ia boleh diselitkan ke celah yang ditinggalkan kerja lain.",
+  "performance.line.cpu-unreliable": "Pembilang masa pemproses pada mesin ini tidak boleh dipercayai ({0}× berbanding jam dinding), jadi masa pemproses dipaparkan tetapi tiada keputusan dibuat daripadanya.",
+  "performance.line.budget-exhausted": "Bajet pengukuran habis ({0} ms daripada {1} ms), jadi satu bahagian semakan tiada.",
+  "performance.boundary": "VidShrink tidak merakam video. Yang diukur di sini ialah kos pengekodan pada mesin ini, bukan apa yang alat rakaman lakukan dengannya — tetapan pengekodnya sendiri ialah tempat pertama untuk disemak.",
+
+  "performance.fact.hardware-encoder": "Pengekod perkakasan",
+  "performance.fact.hardware-pipeline": "Saluran perkakasan",
+  "performance.fact.software-encoder": "Pengekod perisian",
+  "performance.fact.software-cost": "Kos perisian",
+  "performance.fact.logical-cores": "Teras logik",
+  "performance.fact.measured-in": "Diukur dalam",
+  "performance.value.realtime": "{0}× masa nyata",
+  "performance.value.cores": "{0} teras",
+  "performance.value.ms": "{0} ms"
+}

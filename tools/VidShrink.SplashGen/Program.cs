@@ -6,15 +6,17 @@ using System.Text.RegularExpressions;
 namespace VidShrink.SplashGen;
 
 /// <summary>
-/// Başlatıcı bekleme panelinin arka planını üretir. Girdi <c>Theme.axaml</c>, çıktı bir
-/// PNG ve onun içine gömülü belirteç listesi.
+/// Başlatıcı bekleme panelinin arka planını üretir. Girdi <c>App.axaml</c>, çıktı bir
+/// PNG ve onun içine gömülü belirteç listesi. Girdi tek bir sözlük değil: <c>App.axaml</c>
+/// hangi kaynak sözlüklerini birleştiriyorsa hepsi okunur — palet dosyası da böyle
+/// geliyor. Paletin adı burada yazılı değil, arayüzün kendi bildirimi izleniyor.
 ///
 /// Elle hazırlanmış bir PNG kullanılmıyor: tema değiştiğinde görüntü sessizce eskir ve
 /// arayüzle uyumsuzlaşır. Buradaki her renk ve her ölçü temadan okunur, hiçbiri bu
 /// dosyada sabit değildir. Kullanılan belirteçler PNG'nin tEXt bölümüne yazılır;
 /// başlatıcı çalışma anındaki renklerini de oradan alır, testler de oradan doğrular.
 ///
-/// Kullanım: vidshrink-splashgen &lt;Theme.axaml&gt; &lt;cikti.png&gt;
+/// Kullanım: vidshrink-splashgen &lt;App.axaml&gt; &lt;cikti.png&gt;
 /// </summary>
 internal static class Program
 {
@@ -25,11 +27,11 @@ internal static class Program
     {
         if (args.Length != 2)
         {
-            Console.Error.WriteLine("Kullanım: vidshrink-splashgen <Theme.axaml> <cikti.png>");
+            Console.Error.WriteLine("Kullanım: vidshrink-splashgen <App.axaml> <cikti.png>");
             return 1;
         }
 
-        var theme = Theme.Read(args[0]);
+        var theme = Theme.Read(ResourceGraph.Sources(args[0]));
         var image = Compose(theme, out var tokens);
 
         var directory = Path.GetDirectoryName(Path.GetFullPath(args[1]));
@@ -136,18 +138,59 @@ internal static class Program
 
 internal readonly record struct Rect(double X, double Y, double Width, double Height);
 
-/// <summary>Theme.axaml'ın metin olarak okunması. Avalonia'ya bağımlılık yok.</summary>
+/// <summary>
+/// Bir <c>App.axaml</c>'ın birleştirdiği sözlük dosyalarının sırası. <c>ResourceInclude</c>
+/// bildirimleri özyinelemeli izlenir, dolayısıyla palet dosyasının adı burada değil
+/// arayüzün kendi bildiriminde durur: palet değişince bu araç yeni paleti okur.
+/// </summary>
+internal static class ResourceGraph
+{
+    private static readonly Regex Include = new(
+        @"<ResourceInclude\s+Source=""avares://VidShrink\.App/(?<path>[^""]+)""", RegexOptions.Compiled);
+
+    public static IReadOnlyList<string> Sources(string appAxamlPath)
+    {
+        var full = Path.GetFullPath(appAxamlPath);
+        var root = Path.GetDirectoryName(full)
+                   ?? throw new ArgumentException("App.axaml'ın klasörü okunamadı.", nameof(appAxamlPath));
+
+        var ordered = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        Walk(full, root, ordered, seen);
+        return ordered;
+    }
+
+    private static void Walk(string file, string root, List<string> ordered, HashSet<string> seen)
+    {
+        if (!seen.Add(file) || !File.Exists(file)) return;
+
+        var text = File.ReadAllText(file);
+        foreach (Match match in Include.Matches(text))
+        {
+            var path = match.Groups["path"].Value.Replace('/', Path.DirectorySeparatorChar);
+            Walk(Path.GetFullPath(Path.Combine(root, path)), root, ordered, seen);
+        }
+
+        ordered.Add(file);
+    }
+}
+
+/// <summary>Kaynak sözlüklerinin metin olarak okunması. Avalonia'ya bağımlılık yok.</summary>
 internal sealed class Theme
 {
     private readonly Dictionary<string, string> _values;
 
     private Theme(Dictionary<string, string> values) => _values = values;
 
-    public static Theme Read(string path)
+    public static Theme Read(IEnumerable<string> paths)
     {
-        var text = File.ReadAllText(path);
         var values = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var path in paths) Merge(values, File.ReadAllText(path));
+        return new Theme(values);
+    }
 
+    private static void Merge(Dictionary<string, string> values, string text)
+    {
         // <Color x:Key="X">#AARRGGBB</Color> ve aynı biçimdeki sayı/ölçü belirteçleri.
         foreach (Match match in Regex.Matches(
                      text, @"<(?<tag>Color|x:Double|x:Int32|x:String|sys:TimeSpan|CornerRadius|Thickness|FontFamily)\s+x:Key=""(?<key>[^""]+)""\s*>(?<value>[^<]*)</\1>"))
@@ -160,13 +203,11 @@ internal sealed class Theme
         {
             values[match.Groups["key"].Value] = match.Groups["value"].Value.Trim();
         }
-
-        return new Theme(values);
     }
 
     public string Raw(string key) => _values.TryGetValue(key, out var value)
         ? value
-        : throw new KeyNotFoundException($"Theme.axaml içinde belirteç yok: {key}");
+        : throw new KeyNotFoundException($"Kaynak sözlüklerinde belirteç yok: {key}");
 
     public double Number(string key) =>
         double.Parse(Raw(key).Split(',')[0], CultureInfo.InvariantCulture);

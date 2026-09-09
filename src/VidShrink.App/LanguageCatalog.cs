@@ -14,14 +14,25 @@ namespace VidShrink.App;
 internal static class LanguageCatalog
 {
     /// <summary>
-    /// Turkish casing. The invariant culture maps <c>i</c> to <c>I</c> and writes "Islem" where
-    /// "İşlem" belongs, so every Turkish capitalisation goes through this culture instead.
+    /// Satır başında değilse küçük kalan sözcükler, dile göre. Bu bir çeviri değil, dilin
+    /// kendi yazım kuralıdır — sözlükte değil burada durur. Listesi olmayan bir dil bütün
+    /// sözcüklerini büyütür; İngilizce böyle, çünkü başlıkları her sözcüğü büyük yazılıyor.
+    ///
+    /// <para>Dil kodu ülkesiyle gelebilir (<c>tr-TR</c>); eşleşme kodun ilk parçasına bakar,
+    /// böylece yeni bir dil eklendiğinde ülke kırılımı ayrıca yazılmak zorunda değil.</para>
     /// </summary>
-    private static readonly CultureInfo TurkishCulture = CultureInfo.GetCultureInfo("tr-TR");
+    private static readonly IReadOnlyDictionary<string, HashSet<string>> SmallWords =
+        new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["tr"] = new(StringComparer.Ordinal) { "ve", "veya", "ile", "ki", "da", "de" }
+        };
 
-    /// <summary>Conjunctions stay lower case unless they open the line.</summary>
-    private static readonly HashSet<string> Conjunctions =
-        new(StringComparer.Ordinal) { "ve", "veya", "ile", "ki", "da", "de" };
+    private static HashSet<string>? SmallWordsOf(string language)
+    {
+        var cut = language.IndexOf('-');
+        var bare = cut < 0 ? language : language[..cut];
+        return SmallWords.TryGetValue(bare, out var words) ? words : null;
+    }
 
     /// <summary>
     /// Names and abbreviations that are written a fixed way. A word typed in lower case here is
@@ -186,7 +197,7 @@ internal static class LanguageCatalog
             while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
             var word = text[index..end];
 
-            builder.Append(lineStart ? CapitaliseWord(word, culture, true) : KnownSpelling(word) ?? word);
+            builder.Append(lineStart ? CapitaliseWord(word, culture, null, true) : KnownSpelling(word) ?? word);
             if (word.Any(char.IsLetterOrDigit)) lineStart = false;
             index = end;
         }
@@ -194,11 +205,17 @@ internal static class LanguageCatalog
         return builder.ToString();
     }
 
-    internal static string Title(string text, bool turkish)
+    /// <summary>
+    /// Bir başlığı hedef dilin kuralına göre büyütür. Dil kodu iki şeyi belirler: büyük harf
+    /// kültürü ve satır başında değilken küçük kalan sözcükler. İkisi de <see cref="Strings"/>
+    /// ile aynı çeviriden geldiği için yeni bir dil eklemek burada değişiklik istemez.
+    /// </summary>
+    internal static string Title(string text, string language)
     {
         if (string.IsNullOrEmpty(text)) return text;
         if (Brands.TryGetValue(text, out var brand)) return brand;
-        var culture = turkish ? TurkishCulture : CultureInfo.InvariantCulture;
+        var culture = Strings.CultureOf(language);
+        var smallWords = SmallWordsOf(language);
         if (ReadsAsProse(text)) return Sentence(text, culture);
         var builder = new StringBuilder(text.Length);
         var index = 0;
@@ -217,7 +234,7 @@ internal static class LanguageCatalog
             var end = index;
             while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
             var word = text[index..end];
-            builder.Append(CapitaliseWord(word, culture, lineStart));
+            builder.Append(CapitaliseWord(word, culture, smallWords, lineStart));
             lineStart = false;
             index = end;
         }
@@ -260,7 +277,8 @@ internal static class LanguageCatalog
         return null;
     }
 
-    private static string CapitaliseWord(string word, CultureInfo culture, bool lineStart)
+    private static string CapitaliseWord(
+        string word, CultureInfo culture, HashSet<string>? smallWords, bool lineStart)
     {
         if (KnownSpelling(word) is { } spelled) return spelled;
 
@@ -281,7 +299,7 @@ internal static class LanguageCatalog
             if (char.IsUpper(letter))
                 return word;
 
-        if (!lineStart && Conjunctions.Contains(bare)) return word;
+        if (!lineStart && smallWords is not null && smallWords.Contains(bare)) return word;
 
         return string.Concat(
             word.AsSpan(0, offset),
@@ -294,8 +312,7 @@ internal static class LanguageCatalog
     /// burada uygulanır: Türkçede <c>i</c> harfi <c>İ</c> olur, öteki dillerde olmaz.
     /// Çeviri değil, dil kuralıdır — sözlük <c>Locales</c> altında durur.
     /// </summary>
-    internal static string Display(string text)
-        => Title(text, Strings.Language.StartsWith("tr", StringComparison.OrdinalIgnoreCase));
+    internal static string Display(string text) => Title(text, Strings.Language);
 
     /// <summary>
     /// Motorun ürettiği doğrulama iletisinin anahtarı. Buradaki İngilizce dizgeler ekrana
@@ -356,9 +373,8 @@ internal static class LanguageCatalog
     /// Oynatma zaman çizgisindeki kodlama imleci. Sayılar çağırandan gelir; metin ve
     /// sözcük sırası dil alanındaki tek anahtardan okunur.
     /// </summary>
-    internal static string EncodeMarker(bool turkish, int pass, int passCount, int attempt)
+    internal static string EncodeMarker(string language, int pass, int passCount, int attempt)
         => Title(
-            Strings.GetIn(turkish ? "tr" : Strings.FallbackLanguage,
-                "main.playback.encode-marker", pass, passCount, attempt),
-            turkish);
+            Strings.GetIn(language, "main.playback.encode-marker", pass, passCount, attempt),
+            language);
 }

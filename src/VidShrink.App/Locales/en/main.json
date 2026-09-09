@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• The archive chip has no size ceiling.\n• The engine spends bits up to visually lossless quality and stops there.\n• While this chip is on, the number in the target box does not build the plan.\n• The file does get smaller, but the source decides how much, not you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.\n• Touching the target brings the size ceiling back.",
   "main.derivation.size": "Target {0} MB",
@@ -11,6 +11,7 @@
   "main.section.frame.fps-locked": "Frame rate fixed",
   "main.section.advanced.overrides": "{0} set by hand",
   "main.section.advanced.none": "All automatic",
+  "main.language.settings": "Language settings",
   "main.language.name": "English",
 
   "main.tagline.lead": "Target size media compression",
@@ -392,6 +393,8 @@
   "main.playback.encode-marker": "analysis {0}/{1} · attempt {2}",
   "settings-tab.general.title": "General",
   "settings-tab.language.label": "Language",
+  "settings-tab.theme.label": "Theme",
+  "settings-tab.theme.hint": "Changes every colour in the program and is remembered on next launch.",
   "settings-tab.language.hint": "Changes the interface language and is remembered on next launch.",
   "settings-tab.default-target.label": "Default target size (MB)",
   "settings-tab.default-target.hint": "Sets the target size the Shrink tab opens with.",

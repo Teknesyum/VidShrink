@@ -1,0 +1,36 @@
+{
+  "performance.title": "Jõudluskontroll",
+  "performance.run": "Käivita kontroll",
+  "performance.running": "Mõõtmine — teeb paar lühikest kodeeringut ja võtab kuni kakskümmend sekundit.",
+  "performance.failed": "Kontroll ei jõudnud lõpuni",
+
+  "performance.headline.hardware-offloaded": "Selles masinas on töötav riistvarakodeerija ja see käik ei koorma protsessorit.",
+  "performance.headline.hardware": "Selles masinas on töötav riistvarakodeerija, kuid seda, kas protsessor seda käiku kannab, siin ei mõõdetud.",
+  "performance.headline.software-heavy": "Töötavat riistvarakodeerijat ei leitud ja tarkvarakodeerimine vajab reaalajas püsimiseks tervet protsessorituuma.",
+  "performance.headline.software-light": "Töötavat riistvarakodeerijat ei leitud, kuid tarkvarakodeerimine jääb reaalajas alla ühe protsessorituuma.",
+  "performance.headline.not-enough": "Küsimusele vastamiseks pole siin piisavalt mõõdetud.",
+
+  "performance.line.not-measured": "Selles masinas pole veel midagi mõõdetud.",
+  "performance.line.no-hardware": "Riistvaralist videokodeerijat pole siin saadaval, seega jookseb kodeerimine protsessoril.",
+  "performance.line.hardware-failed": "Selles masinas on riistvarakodeerija kirjas, kuid selle proovikodeering ebaõnnestus.",
+  "performance.line.hardware-works": "Riistvarakodeerimine töötab selles masinas.",
+  "performance.line.hardware-not-cpu-bound": "Riistvarakäik ei koorma protsessorit: ühe lõime andmine või lõimede vabaks jätmine võttis sama aja, {0}× piires.",
+  "performance.line.hardware-cost-unknown": "Riistvarakäigu protsessorikulu ei mõõdetud, seega ei tohi seda tasuta lugeda.",
+  "performance.line.hardware-headroom": "Riistvarakäik jooksis {0}× reaalajast.",
+  "performance.line.software-realtime": "Tarkvarakodeerimine vajab reaalajas püsimiseks {0} tuuma, {1} loogilisest tuumast.",
+  "performance.line.software-costs-cores": "See on terve tuum või rohkem ({0} tuuma), seega hõivab tarkvarakodeerimine ühe tuuma kogu jooksuajaks.",
+  "performance.line.software-small": "See jääb alla ühe tuuma ({0} tuuma), seega saab selle jaotada muu töö jäetud tühimikesse.",
+  "performance.line.cpu-unreliable": "Selle masina protsessoriaja loendur pole usaldusväärne ({0}× seinakella suhtes), seega protsessoriajad kuvatakse, kuid nende põhjal midagi ei otsustata.",
+  "performance.line.budget-exhausted": "Mõõtmiseelarve sai otsa ({0} ms {1} ms-st), seega on kontrolli üks haru puudu.",
+  "performance.boundary": "VidShrink ei salvesta videot. Siin mõõdetakse, mida kodeerimine selles masinas maksab, mitte seda, mida salvestustööriist sellega teeb — selle enda kodeerijaseade on esimene koht, kust vaadata.",
+
+  "performance.fact.hardware-encoder": "Riistvarakodeerija",
+  "performance.fact.hardware-pipeline": "Riistvaraline konveier",
+  "performance.fact.software-encoder": "Tarkvarakodeerija",
+  "performance.fact.software-cost": "Tarkvara kulu",
+  "performance.fact.logical-cores": "Loogilised tuumad",
+  "performance.fact.measured-in": "Mõõdetud",
+  "performance.value.realtime": "{0}× reaalajast",
+  "performance.value.cores": "{0} tuuma",
+  "performance.value.ms": "{0} ms"
+}

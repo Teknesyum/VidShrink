@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -214,6 +214,7 @@ public sealed class LanguageTests : IDisposable
     {
         "NeonBlueColor", "NeonPinkColor", "NeonPurpleColor", "NeonSuccessColor",
         "SurfaceToneColor", "AppBgColor", "TextBodyColor", "TextDisabledColor",
+        "OnNeonColor", "PinkTextColor",
         "NeonBlueFillColor", "NeonBlueHoverColor", "NeonBlueActiveColor",
         "NeonBlueBorderColor", "NeonBlueBorderStrongColor", "NeonPinkFillColor",
         "NeonPurpleBorderColor", "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor",
@@ -222,7 +223,8 @@ public sealed class LanguageTests : IDisposable
         "FontSans", "FontMono",
         "GlowBlue", "GlowPink", "GlowPurple",
         "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
-        "PlaybackMaximizeIcon", "PlaybackFullScreenIcon", "PlaybackScrimColor"
+        "PlaybackMaximizeIcon", "PlaybackFullScreenIcon",
+        "PlaybackScrimColor", "PlaybackScrimEdgeColor"
     };
 
     private static readonly Regex KeyAttribute = new(
@@ -537,6 +539,40 @@ public sealed class LanguageTests : IDisposable
         Assert.True(complaints.Length == 0, "Türkçesi yazılmamış anahtarlar:\n" + complaints);
     }
 
+    /// <summary>
+    /// Üst şeritteki tekerlek. Kısayol iki dili taşıyor, geri kalanı ayarlarda; tekerleğin
+    /// tek işi kullanıcıyı oraya götürmek. Ölçü düğmeye basıp hangi sekmenin açıldığına
+    /// bakıyor — sekme numarasını sabit yazmıyor, sekmeyi kendi başlığından buluyor.
+    /// </summary>
+    [Fact]
+    public void DilTekerlegiAyarlarSekmesindekiDilSecicisineGoturur()
+    {
+        var (chosenTab, settingsTab, shortcuts, listed) = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            Relayout(window, new Size(1400, 1000));
+
+            window.BtnLanguageSettings.RaiseEvent(
+                new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+
+            var settings = window.Tabs.Items
+                .OfType<TabItem>()
+                .Select((item, at) => (item, at))
+                .Single(pair => pair.item.Name == "TabSettings")
+                .at;
+
+            return (
+                window.Tabs.SelectedIndex,
+                settings,
+                window.LangSwitch.Children.OfType<Button>().Select(b => (string)b.Tag!).ToList(),
+                window.CmbLanguage.ItemsSource!.Cast<object?>().Count());
+        });
+
+        Assert.Equal(settingsTab, chosenTab);
+        Assert.Equal(Strings.ShortcutLanguages, shortcuts);
+        Assert.Equal(Strings.Languages.Count, listed);
+    }
+
     // ---- K7: üçüncü dil kod değişmeden ---------------------------------------------
 
     private readonly record struct Reading(IReadOnlyList<string> Offered, string Chosen);
@@ -578,16 +614,17 @@ public sealed class LanguageTests : IDisposable
                 var window = new MainWindow();
                 Relayout(window, new Size(1400, 1000));
 
-                var buttons = window.GetVisualDescendants().OfType<Button>()
-                    .Where(button => button.Tag is string tag && Strings.Languages.Contains(tag, StringComparer.Ordinal))
-                    .Select(button => button.Content?.ToString() ?? string.Empty)
+                // Üst şerit yalnız kısayolu taşır; üçüncü dil ayarlardaki tam listede
+                // görünür ve oradan seçilir. Ölçü listeyi okuyup seçimi oradan yapıyor.
+                var picker = window.CmbLanguage;
+
+                var offered = picker.ItemsSource!.Cast<object?>()
+                    .Select(item => item?.ToString() ?? string.Empty)
                     .ToList();
 
-                var third = window.GetVisualDescendants().OfType<Button>()
-                    .Single(button => (button.Tag as string) == "zz");
-                third.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+                picker.SelectedIndex = offered.IndexOf("Zzyzx");
 
-                return new Reading(buttons, window.TxtDropTitle.Text ?? string.Empty);
+                return new Reading(offered, window.TxtDropTitle.Text ?? string.Empty);
             });
 
             var (offered, chosen) = (read.Offered, read.Chosen);
@@ -613,18 +650,17 @@ public sealed class LanguageTests : IDisposable
     [Fact]
     public void KodlamaImleciMetniDilAnahtarindanGelir()
     {
-        Assert.Equal(Marker("en", 1, 2, 3), LanguageCatalog.EncodeMarker(false, 1, 2, 3));
-        Assert.Equal(Marker("tr", 1, 2, 3), LanguageCatalog.EncodeMarker(true, 1, 2, 3));
+        Assert.Equal(Marker("en", 1, 2, 3), LanguageCatalog.EncodeMarker("en", 1, 2, 3));
+        Assert.Equal(Marker("tr", 1, 2, 3), LanguageCatalog.EncodeMarker("tr", 1, 2, 3));
     }
 
     private static string Marker(string language, int pass, int passCount, int attempt)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
         var pattern = Locales.Values(language)["main.playback.encode-marker"];
 
         return LanguageCatalog.Title(
             string.Format(CultureInfo.GetCultureInfo(language), pattern, pass, passCount, attempt),
-            turkish);
+            language);
     }
 
     /// <summary>
@@ -652,9 +688,9 @@ public sealed class LanguageTests : IDisposable
                 new ComparisonPanel(),
                 () => throw new NotSupportedException("The frame source is not needed by this measurement."));
 
-            host.SetLanguage(false);
+            host.SetLanguage("en");
             var first = failures.Select(host.SampleFailureText).ToList();
-            host.SetLanguage(true);
+            host.SetLanguage("tr");
             var second = failures.Select(host.SampleFailureText).ToList();
             host.Dispose();
             return (first, second);
@@ -703,7 +739,7 @@ public sealed class LanguageTests : IDisposable
     /// arıyor, üretimin ürettiği dizgeyi yeniden kurmuyor.
     /// </summary>
     private static IReadOnlyList<string> Shown(string language, string pattern)
-        => Regex.Split(LanguageCatalog.Title(pattern, string.Equals(language, "tr", StringComparison.Ordinal)), @"\{\d+\}")
+        => Regex.Split(LanguageCatalog.Title(pattern, language), @"\{\d+\}")
             .Select(piece => piece.Trim())
             .Where(piece => piece.Length >= 3)
             .ToList();
@@ -793,14 +829,14 @@ public sealed class LanguageTests : IDisposable
         var (english, turkish) = AppHost.Run(() =>
         {
             var strip = new ControlStrip();
-            strip.SetLanguage(false);
+            strip.SetLanguage("en");
             var first = new[]
             {
                 AutomationProperties.GetName(strip.FindControl<Button>("Restart")!),
                 AutomationProperties.GetName(strip.FindControl<Grid>("Timeline")!),
                 AutomationProperties.GetName(strip.FindControl<Border>("Bar")!)
             };
-            strip.SetLanguage(true);
+            strip.SetLanguage("tr");
             var second = new[]
             {
                 AutomationProperties.GetName(strip.FindControl<Button>("Restart")!),
@@ -915,7 +951,7 @@ public sealed class LanguageTests : IDisposable
             // Dil düğmesi kasten öteki dilin adını taşıyor: her dil kendi adını yazar.
             if (key == "main.language.name") continue;
             if (mine.TryGetValue(key, out var same) && string.Equals(same, value, StringComparison.Ordinal)) continue;
-            foreign.Add(LanguageCatalog.Title(value, !string.Equals(language, "tr", StringComparison.Ordinal)));
+            foreign.Add(LanguageCatalog.Title(value, string.Equals(language, "tr", StringComparison.Ordinal) ? "en" : "tr"));
         }
 
         var caught = shown.Where(foreign.Contains).Distinct().ToList();
@@ -954,9 +990,7 @@ public sealed class LanguageTests : IDisposable
     // ---- ortak düzenek --------------------------------------------------------------
 
     private static string Cased(string language, string key)
-        => LanguageCatalog.Title(
-            Locales.Values(language)[key],
-            string.Equals(language, "tr", StringComparison.Ordinal));
+        => LanguageCatalog.Title(Locales.Values(language)[key], language);
 
     private static T OnScreen<T>(Func<MainWindow, T> read) =>
         AppHost.Run(() =>
@@ -1032,10 +1066,8 @@ public sealed class LanguageTests : IDisposable
     [InlineData("en", "Load a file and every decision the engine makes is listed here.")]
     public void GovdeCumlesiKelimeKelimeBuyutulmez(string language, string sentence)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
-
         Assert.True(LanguageCatalog.ReadsAsProse(sentence));
-        Assert.Equal(sentence, LanguageCatalog.Title(sentence, turkish));
+        Assert.Equal(sentence, LanguageCatalog.Title(sentence, language));
     }
 
     [Theory]
@@ -1044,10 +1076,8 @@ public sealed class LanguageTests : IDisposable
     [InlineData("en", "fill policy", "Fill Policy")]
     public void BaslikKelimeKelimeBuyutulmeyeDevamEder(string language, string heading, string expected)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
-
         Assert.False(LanguageCatalog.ReadsAsProse(heading));
-        Assert.Equal(expected, LanguageCatalog.Title(heading, turkish));
+        Assert.Equal(expected, LanguageCatalog.Title(heading, language));
     }
 
     /// <summary>
@@ -1077,8 +1107,6 @@ public sealed class LanguageTests : IDisposable
     [InlineData("en")]
     public void DilDosyasindakiButunGovdeCumleleriOlduguGibiKalir(string language)
     {
-        var turkish = string.Equals(language, "tr", StringComparison.Ordinal);
-
         var prose = Locales.Values(language)
             .Where(pair => LanguageCatalog.ReadsAsProse(pair.Value))
             .ToList();
@@ -1091,7 +1119,7 @@ public sealed class LanguageTests : IDisposable
 
         foreach (var (key, value) in prose)
         {
-            var shown = LanguageCatalog.Title(value, turkish);
+            var shown = LanguageCatalog.Title(value, language);
 
             foreach (var (kaynak, ekran) in value.Split('\n').Zip(shown.Split('\n')))
             {
@@ -1159,5 +1187,35 @@ public sealed class LanguageTests : IDisposable
         if (LanguageCatalog.Names.TryGetValue(bare, out var isim))
             return govde.StartsWith(isim, StringComparison.Ordinal);
         return false;
+    }
+
+    [Theory]
+    [InlineData("ar")]
+    [InlineData("fa")]
+    [InlineData("he")]
+    [InlineData("ur")]
+    public void Sagdan_sola_diller_taninir(string language)
+    {
+        Assert.True(Strings.IsRightToLeftLanguage(language));
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("tr")]
+    [InlineData("zh-Hans")]
+    [InlineData("ja")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void Soldan_saga_diller_sagdan_sola_sayilmaz(string? language)
+    {
+        Assert.False(Strings.IsRightToLeftLanguage(language));
+    }
+
+    [Fact]
+    public void Sagdan_sola_listesi_kurulumdaki_dillerin_altkumesi()
+    {
+        var shipped = Strings.Languages;
+        foreach (var code in Strings.RightToLeftLanguages)
+            Assert.Contains(shipped, l => string.Equals(l, code, StringComparison.OrdinalIgnoreCase));
     }
 }
