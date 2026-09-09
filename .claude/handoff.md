@@ -10,7 +10,9 @@ Bu devirde eklenenler (hepsi commit'li):
 - `tools/gorunum-yakalama/` — ss/click/kirp betikleri + AGENTS.md
 
 ## tests_run
-- `dotnet test` bu devirde başlatıldı; sonucu aşağıda "durum" altında.
+- `dotnet test` başlatıldı, 12 dakikada bitmedi, sonucu **görülmedi**. Bu devirde kaynak
+  kodu değişmedi (yalnız `docs/` ve `tools/`), o yüzden bekleyen bir kırmızı yok; yine de
+  düzeltmeye başlamadan önce yeşili kendin gör.
 
 ## plan
 `docs/plan.md`. Uygulanmış dil/tema planı `trash/plan-diller-tema-2026-09-09.md`.
