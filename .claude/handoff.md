@@ -10,9 +10,12 @@ Bu devirde eklenenler (hepsi commit'li):
 - `tools/gorunum-yakalama/` — ss/click/kirp betikleri + AGENTS.md
 
 ## tests_run
-- `dotnet test` başlatıldı, 12 dakikada bitmedi, sonucu **görülmedi**. Bu devirde kaynak
-  kodu değişmedi (yalnız `docs/` ve `tools/`), o yüzden bekleyen bir kırmızı yok; yine de
-  düzeltmeye başlamadan önce yeşili kendin gör.
+- `dotnet test` — **1946 başarılı, 1 başarısız, 18 atlanan, 17 dk 35 sn.**
+- Düşen ölçü: `OynaticiBoruTests.Oldurulemeyen_surec_icin_KillTree_basarisiz_bildirir`.
+  Bu dalın işiyle ilgisi yok — yükseltilmemiş oturumda PID 4 üzerinde `HasExited` okuyan
+  bir fikstür kusuru. `main`de `712c196` ile çözülmüş, bu dal 55 commit geride olduğu için
+  düzeltme burada yok. **Dal `main`e güncellenince kendiliğinden yeşile döner**; ayrı bir
+  düzeltme yazma.
 
 ## plan
 `docs/plan.md`. Uygulanmış dil/tema planı `trash/plan-diller-tema-2026-09-09.md`.
