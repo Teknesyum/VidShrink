@@ -122,28 +122,54 @@ internal static class Program
     /// <summary>Kabuk isteklerinin toplandigi tek kuyrugun kanal adi.</summary>
     internal const string QueueChannel = "kabuk-kucult";
 
+    internal static readonly TimeSpan ForwardConnectTimeout = TimeSpan.FromSeconds(3);
+    internal static readonly TimeSpan ForwardReplyTimeout = TimeSpan.FromSeconds(15);
+
     [STAThread]
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
         var startup = StartupFor(args);
-        if (startup is null)
-        {
-            Build(ShellIntegration.ResolveStartupPath(args)).StartWithClassicDesktopLifetime(args);
-            return;
-        }
+        if (startup is null) return RunMain(args);
 
         var queue = new ShrinkRequestQueue(QueueChannel);
         if (!OwnsQueue(queue))
         {
             var remaining = Handoff(startup, request => queue.Submit(request));
             queue.Dispose();
-            if (remaining is null) return;
-            BuildShrink(remaining, null).StartWithClassicDesktopLifetime(args);
-            return;
+            if (remaining is null) return 0;
+            return BuildShrink(remaining, null).StartWithClassicDesktopLifetime(args);
         }
 
-        BuildShrink(startup, queue).StartWithClassicDesktopLifetime(args);
+        return BuildShrink(startup, queue).StartWithClassicDesktopLifetime(args);
     }
+
+    private static int RunMain(string[] args)
+    {
+        var path = ShellIntegration.ResolveStartupPath(args);
+        using var instance = new SingleInstanceChannel(SingleInstanceChannel.DefaultChannel());
+        var files = new Integration.ForwardedFiles();
+
+        if (!instance.IsOwner)
+        {
+            AllowForeground();
+            var forwarded = path is null ? Array.Empty<string>() : new[] { path };
+            if (instance.Forward(forwarded, ForwardConnectTimeout, ForwardReplyTimeout)) return 0;
+            return Build(path, files).StartWithClassicDesktopLifetime(args);
+        }
+
+        instance.StartListening(files.Receive);
+        return Build(path, files).StartWithClassicDesktopLifetime(args);
+    }
+
+    private static void AllowForeground()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try { AllowSetForegroundWindow(-1); }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException) { }
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool AllowSetForegroundWindow(int processId);
 
     /// <summary>
     /// Kabuk istegini tuketen kol. Ayri durmasinin sebebi olculebilir olmasi: burasi
@@ -176,10 +202,10 @@ internal static class Program
     /// </summary>
     internal static bool OwnsQueue(ShrinkRequestQueue queue) => queue.IsOwner;
 
-    public static AppBuilder BuildAvaloniaApp() => Build(null);
+    public static AppBuilder BuildAvaloniaApp() => Build(null, null);
 
-    private static AppBuilder Build(string? startupFile)
-        => AppBuilder.Configure(() => new App(startupFile))
+    private static AppBuilder Build(string? startupFile, Integration.ForwardedFiles? files)
+        => AppBuilder.Configure(() => new App(startupFile, files))
             .UsePlatformDetect()
             .LogToTrace();
 

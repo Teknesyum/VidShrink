@@ -28,6 +28,8 @@ bundle=$4
 # adını kendi içinde taşıdığı için yeniden adlandırma onu bozmuyor.
 host='VidShrink'
 
+media_extensions='mp4 mkv mov avi webm wmv flv m4v mpg mpeg ts m2ts 3gp ogv vob asf rm rmvb divx mxf f4v mts dav gif'
+
 rm -rf "$bundle"
 mkdir -p "$bundle/Contents/MacOS" "$bundle/Contents/Resources"
 
@@ -77,6 +79,35 @@ cat > "$bundle/Contents/Info.plist" <<PLIST
     <string>11.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Video</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.movie</string>
+                <string>public.audiovisual-content</string>
+                <string>com.compuserve.gif</string>
+            </array>
+        </dict>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Video file</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+$(for extension in $media_extensions; do printf '                <string>%s</string>\n' "$extension"; done)
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
 PLIST
