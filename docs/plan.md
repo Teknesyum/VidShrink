@@ -403,3 +403,25 @@ seridinde dil tuslarinin sagina, sponsor tusunun soluna tasinir.
 - `ShrinkJobWindow.axaml(.cs)`: BorderOnly + istemci alani genisletme, govdeden surukleme.
 - Olcu: WindowLayout, VisibleText, SettingsTab, Language, OynaticiGirdi, KabukIstegi testleri;
   once/sonra kareleri `.calisma/baslik/`.
+
+## 6. dalga: sistem (dosya iliskilendirme, tek ornek)
+
+Kabul: cift tiklanan dosya acik pencereye iletilir; iki gercek surecle kanitlanir.
+
+- `Core/SingleInstanceChannel.cs`: adli mutex + adli boru (kullanici basina kanal,
+  `VIDSHRINK_INSTANCE_CHANNEL` ile degisir). Ikinci surec yolu JSON satiri olarak yollar,
+  TAMAM gelirse 0 ile cikar; HATA ya da zaman asimi gelirse kendi penceresini acar.
+- `Program.cs`: `Main` int doner; `--kucult` kolu degismez. `Integration/ForwardedFiles.cs`
+  pencere hazir olana kadar yolu bekletir, sonra UI is parcacigina verir.
+  `MainWindow.SingleInstance.cs`: kodlama suruyorsa (`_cts`) reddeder, yoksa pencereyi
+  one getirip `LoadStartupFileAsync` yolundan yukler. `PlayerView`e dokunulmaz.
+- macOS: `IActivatableLifetime.Activated` + `FileActivatedEventArgs` ayni kuyruga duser;
+  `macos-app-bundle.sh` `CFBundleDocumentTypes` yazar (Viewer, Alternate: varsayilani almaz).
+- Linux: `install-vidshrink.sh` `~/.local/share/applications/vidshrink.desktop` yazar
+  (`Exec=... %F`, 24 uzantinin MIME turleri, `.dav` icin kullanici MIME paketi);
+  `--uninstall` ikisini de siler.
+- Windows: `Install-VidShrink.ps1` HKCU'ya ProgID, `OpenWithProgids`, `Applications`,
+  `Capabilities` + `RegisteredApplications` yazar; `-RemoveFileAssociation` ve `-Uninstall`
+  yalniz kendi degerini siler. Sag tik menusu (`SystemFileAssociations`) ayri agacta kalir.
+  ProgID komutu baslaticiyi gosterir (`FileAssociation.LaunchTarget`). `UserChoice` yazilmaz.
+- Olcu: `TekOrnekTests`, `DosyaIliskiTests`; negatif kontroller `.calisma/dalga6/`.
