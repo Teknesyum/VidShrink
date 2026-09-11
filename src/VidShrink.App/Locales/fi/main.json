@@ -420,6 +420,6 @@
   "main.player.playing": "toistetaan",
   "main.player.paused": "tauolla",
   "main.player.state": "kohta {0} s - {1} - zoomaus {2} %",
-  "main.player.stalled": "Toisto lakkasi etenemästä; dekooderiputki ei tuota ruutuja.",
-  "main.player.seekfailed": "Haku epäonnistui: dekooderiputkea ei voitu käynnistää uudelleen."
+  "main.player.stalled": "Toisto lakkasi etenemästä; soitin ei tuota ruutuja.",
+  "main.player.seekfailed": "Haku epäonnistui: soitin ei näyttänyt kuvaa uudessa kohdassa."
 }

@@ -420,6 +420,6 @@
   "main.player.playing": "diputar",
   "main.player.paused": "dijeda",
   "main.player.state": "posisi {0} dtk - {1} - zoom {2}%",
-  "main.player.stalled": "Pemutaran berhenti maju; pipa decoder tidak menghasilkan frame.",
-  "main.player.seekfailed": "Pencarian gagal: pipa decoder tidak dapat dimulai ulang."
+  "main.player.stalled": "Pemutaran berhenti maju; pemutar tidak menghasilkan frame.",
+  "main.player.seekfailed": "Pencarian gagal: pemutar tidak menampilkan frame di posisi baru."
 }

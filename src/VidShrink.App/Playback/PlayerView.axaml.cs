@@ -12,7 +12,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
-using VidShrink.Ffmpeg.Playback;
+using VidShrink.Player;
 
 namespace VidShrink.App.Playback;
 
@@ -24,9 +24,7 @@ internal partial class PlayerView : UserControl
     private readonly SeekCoalescer _seek;
     private readonly List<string> _trace = new();
 
-    private DecoderPipe? _pipe;
-    private DecoderPipe.ContinuousPlayback? _play;
-    private AudioSink? _audio;
+    private IPlaybackEngine? _engine;
     private WriteableBitmap? _bitmap;
     private DispatcherTimer? _watchdog;
     private DispatcherTimer? _render;
@@ -69,6 +67,10 @@ internal partial class PlayerView : UserControl
     internal IReadOnlyList<string> Trace => _trace.ToArray();
 
     internal string? LoadedPath => _path;
+
+    internal IPlaybackEngine? Engine => _engine;
+
+    internal Func<IPlaybackEngine> EngineFactory { get; set; } = () => new MpvEngine();
 
     internal Func<int> PlayerTabIndex { get; set; } = () => 0;
 
@@ -262,28 +264,23 @@ internal partial class PlayerView : UserControl
     internal void TogglePlay()
     {
         _playing = !_playing;
-        if (_pipe is null) return;
+        if (_engine is not { } engine) return;
 
+        _stall.Reset();
         if (_playing)
         {
-            StartPlayback(_seek.Target);
-            _audio?.Play();
+            engine.Play();
         }
         else
         {
-            if (_play is { } play) _seek.Follow(play.LatestVideoPts);
-            StopPlayback();
-            _audio?.Pause();
+            _seek.Follow(engine.PositionSeconds);
+            engine.Pause();
         }
     }
 
-    private void StartPlayback(double atSeconds)
+    private void StartRender()
     {
-        if (_pipe is null) return;
-        _play?.Dispose();
-        _play = _pipe.StartContinuousPlayback(atSeconds);
         _shown = 0;
-        _stall.Reset();
         if (_render is null)
         {
             _render = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
@@ -292,52 +289,57 @@ internal partial class PlayerView : UserControl
         _render.Start();
     }
 
-    private void StopPlayback()
+    internal bool RenderLatest()
     {
-        _render?.Stop();
-        _play?.Dispose();
-        _play = null;
-        _stall.Reset();
-    }
-
-    private void RenderLatest()
-    {
-        if (_play is not { } play) return;
-        if (!play.TryCopyLatest(ref _shown, DrawBgra)) return;
-        var at = play.LatestVideoPts;
-        _seek.Follow(at);
-        RefreshState();
-        if (at >= _seek.Duration - 0.05) TogglePlay();
+        if (_engine is not { } engine) return false;
+        var drawn = engine.TryCopyLatest(ref _shown, DrawFrame);
+        if (drawn && _playing) _seek.Follow(engine.PositionSeconds);
+        if (drawn) RefreshState();
+        if (_playing && engine.EndReached) TogglePlay();
+        return drawn;
     }
 
     internal async Task OpenAsync(string path, CancellationToken ct = default)
     {
         Close();
-        var pipe = new DecoderPipe();
-        pipe.Faulted += OnFaulted;
-        await pipe.OpenAsync(path, null, ct).ConfigureAwait(true);
-        _pipe = pipe;
-        _path = path;
-        _seek.Duration = pipe.DurationSeconds;
-        if (pipe.HasAudio)
+        IPlaybackEngine? engine = null;
+        try
         {
-            _audio = new AudioSink(true);
-            pipe.AttachAudioSink(_audio);
+            engine = EngineFactory();
+            engine.Faulted += OnFaulted;
+            await engine.OpenAsync(path, ct).ConfigureAwait(true);
         }
+        catch
+        {
+            if (engine is not null)
+            {
+                engine.Faulted -= OnFaulted;
+                engine.Dispose();
+            }
+
+            throw;
+        }
+
+        _engine = engine;
+        _path = path;
+        _seek.Duration = engine.DurationSeconds > 0 ? engine.DurationSeconds : double.PositiveInfinity;
 
         TxtEmpty.IsVisible = false;
         StartWatchdog();
+        StartRender();
         _seek.GoTo(0);
         if (!_playing) TogglePlay();
         RefreshState();
     }
 
-    private void OnFaulted(object? sender, PipeFault fault)
+    private void OnFaulted(object? sender, PlaybackFault fault)
         => Dispatcher.UIThread.Post(() =>
         {
+            if (!ReferenceEquals(sender, _engine)) return;
+            var text = Strings.Get(fault.MessageKey);
+            if (!string.IsNullOrEmpty(fault.MessageArg)) text += ": " + fault.MessageArg;
             TxtStall.IsVisible = true;
-            TxtStall.Text = LanguageCatalog.Display(
-                Strings.Get(fault.MessageKey, fault.MessageArg ?? string.Empty));
+            TxtStall.Text = LanguageCatalog.Display(text);
         });
 
     private void StartWatchdog()
@@ -350,39 +352,32 @@ internal partial class PlayerView : UserControl
 
     internal void PollStall(double nowSeconds)
     {
-        var frames = _play?.FramesDecoded ?? 0;
-        var stalled = _stall.Observe(_playing, frames, nowSeconds);
+        var frames = _engine?.FramesRendered ?? 0;
+        var stalled = _stall.Observe(_playing && _engine is { EndReached: false }, frames, nowSeconds);
         TxtStall.IsVisible = stalled;
         if (stalled) TxtStall.Text = Strings.Get("main.player.stalled");
     }
 
     private async Task RunSeekAsync(double atSeconds)
     {
-        var pipe = _pipe;
-        if (pipe is null) return;
+        var engine = _engine;
+        if (engine is null) return;
 
-        var frame = await pipe.SeekAsync(atSeconds).ConfigureAwait(true);
-        if (frame is null)
+        var result = await engine.SeekAsync(atSeconds, SeekPrecision.Exact).ConfigureAwait(false);
+        if (result.Outcome is not (SeekOutcome.Failed or SeekOutcome.TimedOut)) return;
+
+        void ShowFailure()
         {
+            if (!ReferenceEquals(engine, _engine)) return;
             TxtStall.IsVisible = true;
             TxtStall.Text = Strings.Get("main.player.seekfailed");
-            return;
         }
 
-        if (Dispatcher.UIThread.CheckAccess()) ShowSeek(pipe, frame, atSeconds);
-        else await Dispatcher.UIThread.InvokeAsync(() => ShowSeek(pipe, frame, atSeconds));
+        if (Dispatcher.UIThread.CheckAccess()) ShowFailure();
+        else Dispatcher.UIThread.Post(ShowFailure);
     }
 
-    private void ShowSeek(DecoderPipe pipe, DecoderPipeFrame frame, double atSeconds)
-    {
-        pipe.SeekAudio(atSeconds);
-        Draw(frame);
-        if (_playing && ReferenceEquals(pipe, _pipe)) StartPlayback(atSeconds);
-    }
-
-    private void Draw(DecoderPipeFrame frame) => DrawBgra(frame.Bgra, frame.Width, frame.Height);
-
-    private void DrawBgra(byte[] bgra, int width, int height)
+    private void DrawFrame(IntPtr pixels, int width, int height, int stride)
     {
         var fresh = _bitmap is null || _bitmap.PixelSize.Width != width || _bitmap.PixelSize.Height != height;
         if (fresh)
@@ -396,10 +391,7 @@ internal partial class PlayerView : UserControl
         }
 
         using (var buffer = _bitmap!.Lock())
-        {
-            var count = Math.Min(bgra.Length, buffer.RowBytes * buffer.Size.Height);
-            System.Runtime.InteropServices.Marshal.Copy(bgra, 0, buffer.Address, count);
-        }
+            FramePixels.CopyRows(pixels, stride, buffer.Address, buffer.RowBytes, Math.Min(height, buffer.Size.Height));
 
         if (fresh || !ReferenceEquals(Frame.Source, _bitmap))
         {
@@ -450,11 +442,16 @@ internal partial class PlayerView : UserControl
     {
         _watchdog?.Stop();
         _watchdog = null;
-        StopPlayback();
-        _audio?.Dispose();
-        _audio = null;
-        _pipe?.Dispose();
-        _pipe = null;
+        _render?.Stop();
+        _stall.Reset();
+        if (_engine is { } engine)
+        {
+            engine.Faulted -= OnFaulted;
+            engine.Dispose();
+        }
+
+        _engine = null;
+        _shown = 0;
         _path = null;
         _playing = false;
     }

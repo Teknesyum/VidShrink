@@ -420,6 +420,6 @@
   "main.player.playing": "grojama",
   "main.player.paused": "pristabdyta",
   "main.player.state": "padėtis {0} s - {1} - mastelis {2}%",
-  "main.player.stalled": "Atkūrimas nustojo judėti; dekoderio kanalas negamina kadrų.",
-  "main.player.seekfailed": "Persukimas nepavyko: dekoderio kanalo nepavyko paleisti iš naujo."
+  "main.player.stalled": "Atkūrimas nustojo judėti; grotuvas negamina kadrų.",
+  "main.player.seekfailed": "Persukimas nepavyko: grotuvas naujoje padėtyje nerodė kadro."
 }

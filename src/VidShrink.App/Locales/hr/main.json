@@ -420,6 +420,6 @@
   "main.player.playing": "reprodukcija",
   "main.player.paused": "pauzirano",
   "main.player.state": "položaj {0} s - {1} - zum {2}%",
-  "main.player.stalled": "Reprodukcija je prestala napredovati; cijev dekodera ne proizvodi sličice.",
-  "main.player.seekfailed": "Premotavanje nije uspjelo: cijev dekodera nije se mogla ponovno pokrenuti."
+  "main.player.stalled": "Reprodukcija je prestala napredovati; preglednik ne proizvodi sličice.",
+  "main.player.seekfailed": "Premotavanje nije uspjelo: preglednik nije prikazao sličicu na novoj pozici."
 }

@@ -420,6 +420,6 @@
   "main.player.playing": "prehráva sa",
   "main.player.paused": "pozastavené",
   "main.player.state": "pozícia {0} s - {1} - priblíženie {2}%",
-  "main.player.stalled": "Prehrávanie prestalo postupovať; rúra dekodéra nevytvára snímky.",
-  "main.player.seekfailed": "Skok zlyhal: rúru dekodéra sa nepodarilo reštartovať."
+  "main.player.stalled": "Prehrávanie prestalo postupovať; prehrávač nevytvára snímky.",
+  "main.player.seekfailed": "Skok zlyhal: prehrávač na novej pozícii nezobrazil snímku."
 }

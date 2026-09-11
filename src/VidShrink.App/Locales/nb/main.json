@@ -420,6 +420,6 @@
   "main.player.playing": "spiller",
   "main.player.paused": "pauset",
   "main.player.state": "posisjon {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Avspillingen sluttet å gå fremover; dekoderrøret leverer ingen bilder.",
-  "main.player.seekfailed": "Søk mislyktes: dekoderrøret kunne ikke startes på nytt."
+  "main.player.stalled": "Avspillingen sluttet å gå fremover; spilleren leverer ingen bilder.",
+  "main.player.seekfailed": "Søk mislyktes: spilleren viste ikke et bilde på den nye posisjonen."
 }

@@ -420,6 +420,6 @@
   "main.player.playing": "odtwarzanie",
   "main.player.paused": "pauza",
   "main.player.state": "pozycja {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Odtwarzanie przestało postępować; potok dekodera nie produkuje klatek.",
-  "main.player.seekfailed": "Przewijanie nie powiodło się: nie udało się zrestartować potoku dekodera."
+  "main.player.stalled": "Odtwarzanie przestało postępować; odtwarzacz nie produkuje klatek.",
+  "main.player.seekfailed": "Przewijanie nie powiodło się: odtwarzacz nie wyświetlił klatki w nowej pozycji."
 }

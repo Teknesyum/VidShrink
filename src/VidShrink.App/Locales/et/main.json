@@ -420,6 +420,6 @@
   "main.player.playing": "esitab",
   "main.player.paused": "pausil",
   "main.player.state": "asukoht {0} s - {1} - suum {2}%",
-  "main.player.stalled": "Esitus ei edene; dekoodri toru ei tooda kaadreid.",
-  "main.player.seekfailed": "Kerimine ebaõnnestus: dekoodri toru ei saanud taaskäivitada."
+  "main.player.stalled": "Esitus ei edene; mängija ei tooda kaadreid.",
+  "main.player.seekfailed": "Kerimine ebaõnnestus: mängija ei näidanud uues asukohas kaadrit."
 }

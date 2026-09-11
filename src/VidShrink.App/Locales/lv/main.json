@@ -420,6 +420,6 @@
   "main.player.playing": "atskaņo",
   "main.player.paused": "pauzēts",
   "main.player.state": "pozīcija {0} s - {1} - tālummaiņa {2}%",
-  "main.player.stalled": "Atskaņošana pārstāja virzīties; dekodētāja kanāls neražo kadrus.",
-  "main.player.seekfailed": "Meklēšana neizdevās: dekodētāja kanālu neizdevās restartēt."
+  "main.player.stalled": "Atskaņošana pārstāja virzīties; atskaņotājs neražo kadrus.",
+  "main.player.seekfailed": "Meklēšana neizdevās: atskaņotājs jaunajā pozīcijā neparādīja kadru."
 }

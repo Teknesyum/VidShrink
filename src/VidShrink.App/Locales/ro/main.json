@@ -420,6 +420,6 @@
   "main.player.playing": "redă",
   "main.player.paused": "în pauză",
   "main.player.state": "poziție {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Redarea a încetat să avanseze; conducta decodorului nu produce cadre.",
-  "main.player.seekfailed": "Căutarea a eșuat: conducta decodorului nu a putut fi repornită."
+  "main.player.stalled": "Redarea a încetat să avanseze; playerul nu produce cadre.",
+  "main.player.seekfailed": "Căutarea a eșuat: playerul nu a afișat un cadru la noua poziție."
 }

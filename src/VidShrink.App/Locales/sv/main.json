@@ -420,6 +420,6 @@
   "main.player.playing": "spelar",
   "main.player.paused": "pausad",
   "main.player.state": "position {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Uppspelningen slutade gå framåt; avkodarröret producerar inga bildrutor.",
-  "main.player.seekfailed": "Sökningen misslyckades: avkodarröret kunde inte startas om."
+  "main.player.stalled": "Uppspelningen slutade gå framåt; spelaren producerar inga bildrutor.",
+  "main.player.seekfailed": "Sökningen misslyckades: spelaren visade ingen bildruta på den nya positionen."
 }

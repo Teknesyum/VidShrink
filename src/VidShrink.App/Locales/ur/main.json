@@ -420,6 +420,6 @@
   "main.player.playing": "چل رہا ہے",
   "main.player.paused": "رکا ہوا",
   "main.player.state": "مقام {0} س - {1} - زوم {2}%",
-  "main.player.stalled": "پلے بیک آگے بڑھنا بند ہو گیا؛ ڈی کوڈر پائپ فریم نہیں دے رہی۔",
-  "main.player.seekfailed": "سیک ناکام: ڈی کوڈر پائپ دوبارہ شروع نہ ہو سکی۔"
+  "main.player.stalled": "پلے بیک آگے بڑھنا بند ہو گیا؛ پلیئر فریم نہیں دے رہا۔",
+  "main.player.seekfailed": "سیک ناکام: پلیئر نئی پوزیشن پر فریم نہ دکھا سکا۔"
 }

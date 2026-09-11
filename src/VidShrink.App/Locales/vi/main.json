@@ -420,6 +420,6 @@
   "main.player.playing": "đang phát",
   "main.player.paused": "tạm dừng",
   "main.player.state": "vị trí {0} s - {1} - thu phóng {2}%",
-  "main.player.stalled": "Phát không tiến thêm; ống giải mã không tạo khung.",
-  "main.player.seekfailed": "Tua thất bại: không khởi động lại được ống giải mã."
+  "main.player.stalled": "Phát không tiến thêm; trình phát không tạo khung.",
+  "main.player.seekfailed": "Tua thất bại: trình phát không hiển thị khung ở vị trí mới."
 }

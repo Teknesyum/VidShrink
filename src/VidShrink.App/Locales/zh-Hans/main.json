@@ -420,6 +420,6 @@
   "main.player.playing": "播放中",
   "main.player.paused": "已暂停",
   "main.player.state": "位置 {0} 秒 - {1} - 缩放 {2}%",
-  "main.player.stalled": "播放停止前进；解码管道未产生任何帧。",
-  "main.player.seekfailed": "跳转失败：解码管道无法重启。"
+  "main.player.stalled": "播放停止前进；播放器未产生任何帧。",
+  "main.player.seekfailed": "跳转失败：播放器未在新位置显示帧。"
 }

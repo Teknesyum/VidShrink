@@ -420,6 +420,6 @@
   "main.player.playing": "afspiller",
   "main.player.paused": "pause",
   "main.player.state": "position {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Afspilningen holdt op med at rykke frem; dekoderrøret producerer ikke billeder.",
-  "main.player.seekfailed": "Søgning mislykkedes: dekoderrøret kunne ikke genstartes."
+  "main.player.stalled": "Afspilningen holdt op med at rykke frem; afspilleren producerer ikke billeder.",
+  "main.player.seekfailed": "Søgning mislykkedes: afspilleren viste ikke et billede på den nye position."
 }

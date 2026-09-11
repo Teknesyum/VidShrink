@@ -68,6 +68,34 @@ jobs:
             exit 1
           }
           Add-Content -Path $env:GITHUB_PATH -Value $bin
+      - name: libmpv kur (shinchiro mpv-winbuild-cmake 20260903, sabit sha256)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $expectedSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
+          $expectedDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
+          $archive = Join-Path $env:RUNNER_TEMP 'mpv-dev.7z'
+
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          $actual = (Get-FileHash -Path $archive -Algorithm SHA256).Hash
+          if ($actual -ne $expectedSha256) {
+            Write-Error "libmpv indirmesi sha256 uyusmuyor: beklenen=$expectedSha256 gelen=$actual"
+            exit 1
+          }
+
+          $dir = Join-Path $env:RUNNER_TEMP 'libmpv'
+          7z x $archive "-o$dir" -y | Out-Null
+          $dll = Join-Path $dir 'libmpv-2.dll'
+          if (-not (Test-Path $dll)) {
+            Write-Error "libmpv-2.dll beklenen yolda yok: $dll"
+            exit 1
+          }
+          $dllActual = (Get-FileHash -Path $dll -Algorithm SHA256).Hash
+          if ($dllActual -ne $expectedDllSha256) {
+            Write-Error "libmpv-2.dll sha256 uyusmuyor: beklenen=$expectedDllSha256 gelen=$dllActual"
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "VIDSHRINK_LIBMPV=$dll"
       # Informational only: this does not fail the build. If a future version swap drops
       # libvmaf, the quality-meter measures should degrade to a counted, documented skip
       # (contract T115 K2), not a red install step — the install step above already
@@ -86,7 +114,7 @@ jobs:
       # exits 0. -MinimumTotal reads the output and refuses a run that never finished.
       # -MaximumSkipped catches the other blind spot: Total stays the same when a test
       # silently flips from Passed to Skipped, so Total alone can't see it (T115 tur 2).
-      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1134 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
+      - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1143 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
 
       # Kosum asilirsa blame'in aldigi hang dump buraya duser. Yukarilmazsa asilmanin
       # hangi is parcaciginda oldugu gorulemiyor; koda=65 kirmizisi sebepsiz kaliyor.
