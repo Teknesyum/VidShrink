@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink வீடியோக்களுக்கான இயல்பு நிரல் அல்ல. Windows இயல்பு பயன்பாடுகள் பக்கத்தில் அதைத் தேர்வு செய்யலாம்.",
   "settings.default-app.open": "இயல்பு பயன்பாடுகள்",
-  "settings.default-app.dismiss": "மீண்டும் கேட்காதே"
+  "settings.default-app.dismiss": "மீண்டும் கேட்காதே",
+  "settings.player-shortcuts.title": "இயக்கி குறுக்குவழிகள்",
+  "settings.player-shortcuts.hint": "இயக்கி தாவல், அதன் மெனு மற்றும் இந்தப் பட்டியல் அனைத்தும் ஒரே அட்டவணையைப் படிக்கின்றன."
 }

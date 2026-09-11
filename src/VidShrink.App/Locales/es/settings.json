@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink no es el programa por defecto para vídeos. Puedes elegirlo en la página Aplicaciones predeterminadas de Windows.",
   "settings.default-app.open": "Aplicaciones predeterminadas",
-  "settings.default-app.dismiss": "No volver a preguntar"
+  "settings.default-app.dismiss": "No volver a preguntar",
+  "settings.player-shortcuts.title": "Atajos del reproductor",
+  "settings.player-shortcuts.hint": "La pestaña del reproductor, su menú y esta lista leen todos de la misma tabla."
 }

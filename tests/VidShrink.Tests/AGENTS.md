@@ -9,8 +9,8 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   PlayerView karesi, A/V farkı (audio-delay negatif kontrolü), 10 tık birikmesi, arama
   medyanları (1080p ≤60 ms, 2160p ≤200 ms, HEVC 1080p sayı), Dispose sırasında okuma
   yarışı. libmpv ya da ffmpeg yoksa kırmızı olur, atlanmaz. Yerelde `VIDSHRINK_LIBMPV` ister.
-  1080p/2160p eşikleri `[HedefMakineFact]`: CI'da (`GITHUB_ACTIONS`) hep atlanır, yerelde
-  yalnız sessiz makinede koşar. `[QuietMachineFact]` CI'yı ayırmaz; koşucu boş okununca koştu.
+  1080p/2160p ve 10 tıkın 150 ms eşikleri `[HedefMakineFact]`: CI'da (`GITHUB_ACTIONS`) hep
+  atlanır, yerelde yalnız sessiz makinede koşar; 10 tıkın birikme ve gösterim şartı CI'da da koşar. `[QuietMachineFact]` CI'yı ayırmaz; koşucu boş okununca koştu.
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucuların libmpv sabitleri CI ile aynı,
   `EngineFactory` ile açılamayan motor atılır.
 - `OynaticiKarsilastirmaTests.cs` — karşılaştırma paneli iki motor örneğinde: şerit kodlu

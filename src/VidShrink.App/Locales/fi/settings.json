@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink ei ole videoiden oletusohjelma. Voit valita sen Windowsin Oletussovellukset-sivulta.",
   "settings.default-app.open": "Oletussovellukset",
-  "settings.default-app.dismiss": "Älä kysy uudelleen"
+  "settings.default-app.dismiss": "Älä kysy uudelleen",
+  "settings.player-shortcuts.title": "Soittimen pikanäppäimet",
+  "settings.player-shortcuts.hint": "Soitin-välilehti, sen valikko ja tämä luettelo lukevat kaikki samaa taulukkoa."
 }

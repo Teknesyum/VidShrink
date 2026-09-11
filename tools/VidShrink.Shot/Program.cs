@@ -410,8 +410,16 @@ public static class Program
 
         task.GetAwaiter().GetResult();
 
-        Await(() => player.GetVisualDescendants().OfType<Image>().Any(image => image.Source is not null),
-            "Oynaticinin ilk karesi");
+        var render = player.GetType().GetMethod(
+            "RenderLatest",
+            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            ?? throw new MissingMethodException("PlayerView", "RenderLatest");
+
+        Await(() =>
+        {
+            render.Invoke(player, null);
+            return player.GetVisualDescendants().OfType<Image>().Any(image => image.Source is not null);
+        }, "Oynaticinin ilk karesi");
     }
 
     /// <summary>

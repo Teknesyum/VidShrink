@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink non è il programma predefinito per i video. Puoi sceglierlo nella pagina App predefinite di Windows.",
   "settings.default-app.open": "App predefinite",
-  "settings.default-app.dismiss": "Non chiedere più"
+  "settings.default-app.dismiss": "Non chiedere più",
+  "settings.player-shortcuts.title": "Scorciatoie del lettore",
+  "settings.player-shortcuts.hint": "La scheda del lettore, il suo menu e questo elenco leggono tutti la stessa tabella."
 }

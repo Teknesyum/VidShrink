@@ -35,6 +35,7 @@
 
     <StackPanel Grid.Row="2" Spacing="{StaticResource SpaceSm}">
       <TextBlock x:Name="TxtState" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
+      <TextBlock x:Name="TxtControls" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
       <TextBlock x:Name="TxtStall"
                  Theme="{StaticResource MonoValue}"
                  TextWrapping="Wrap"

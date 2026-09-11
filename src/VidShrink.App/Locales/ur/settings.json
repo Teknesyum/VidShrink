@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink ویڈیوز کے لیے طے شدہ پروگرام نہیں ہے۔ آپ اسے Windows کے طے شدہ ایپس صفحے پر چن سکتے ہیں۔",
   "settings.default-app.open": "طے شدہ ایپس",
-  "settings.default-app.dismiss": "دوبارہ نہ پوچھیں"
+  "settings.default-app.dismiss": "دوبارہ نہ پوچھیں",
+  "settings.player-shortcuts.title": "پلیئر شارٹ کٹس",
+  "settings.player-shortcuts.hint": "پلیئر ٹیب، اس کا مینو، اور یہ فہرست سب ایک ہی جدول سے پڑھتے ہیں۔"
 }

@@ -214,6 +214,56 @@ public sealed class MpvEngine : IPlaybackEngine
         await open.Task.ConfigureAwait(false);
     }
 
+    public double Speed => Finite(GetDouble("speed"), 1);
+
+    public double Volume => Finite(GetDouble("volume"), 100);
+
+    public bool Muted => GetProperty("mute") == "yes";
+
+    public double FramesPerSecond
+    {
+        get
+        {
+            var container = GetDouble("container-fps");
+            return double.IsFinite(container) && container > 0 ? container : GetDouble("estimated-vf-fps");
+        }
+    }
+
+    public double LoopStartSeconds => GetDouble("ab-loop-a");
+
+    public double LoopEndSeconds => GetDouble("ab-loop-b");
+
+    public void SetSpeed(double speed) => TrySet("speed", Number(speed));
+
+    public void SetVolume(double volume) => TrySet("volume", Number(volume));
+
+    public void SetMuted(bool muted) => TrySet("mute", muted ? "yes" : "no");
+
+    public void StepFrame(bool backward)
+    {
+        if (!_isOpen) return;
+        CommandRc(ControlTag, backward ? "frame-back-step" : "frame-step");
+    }
+
+    public void SetLoop(double startSeconds, double endSeconds)
+    {
+        TrySet("ab-loop-a", double.IsFinite(startSeconds) ? Number(Math.Max(0, startSeconds)) : "no");
+        TrySet("ab-loop-b", double.IsFinite(endSeconds) ? Number(Math.Max(0, endSeconds)) : "no");
+    }
+
+    private static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
+
+    private static double Finite(double value, double fallback) => double.IsFinite(value) ? value : fallback;
+
+    private bool TrySet(string name, string value)
+    {
+        lock (_handleGate)
+        {
+            if (!HandleAlive) return false;
+            return mpv_set_property_string(_mpv, name, value) >= 0;
+        }
+    }
+
     public void Play() => Command(ControlTag, "set", "pause", "no");
 
     public void Pause() => Command(ControlTag, "set", "pause", "yes");

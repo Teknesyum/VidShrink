@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nie jest domyślnym programem do wideo. Możesz go wybrać na stronie Aplikacje domyślne w Windows.",
   "settings.default-app.open": "Aplikacje domyślne",
-  "settings.default-app.dismiss": "Nie pytaj ponownie"
+  "settings.default-app.dismiss": "Nie pytaj ponownie",
+  "settings.player-shortcuts.title": "Skróty odtwarzacza",
+  "settings.player-shortcuts.hint": "Karta odtwarzacza, jego menu i ta lista czytają tę samą tabelę."
 }

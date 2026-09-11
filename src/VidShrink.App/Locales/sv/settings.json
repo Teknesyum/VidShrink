@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink är inte standardprogrammet för video. Du kan välja det på sidan Standardappar i Windows.",
   "settings.default-app.open": "Standardappar",
-  "settings.default-app.dismiss": "Fråga inte igen"
+  "settings.default-app.dismiss": "Fråga inte igen",
+  "settings.player-shortcuts.title": "Spelargenvägar",
+  "settings.player-shortcuts.hint": "Spelarfliken, dess meny och den här listan läser alla samma tabell."
 }

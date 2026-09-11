@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink ليس البرنامج الافتراضي للفيديو. يمكنك اختياره في صفحة التطبيقات الافتراضية في Windows.",
   "settings.default-app.open": "التطبيقات الافتراضية",
-  "settings.default-app.dismiss": "لا تسأل مجدداً"
+  "settings.default-app.dismiss": "لا تسأل مجدداً",
+  "settings.player-shortcuts.title": "اختصارات المشغّل",
+  "settings.player-shortcuts.hint": "تبويب المشغّل وقائمته وهذه القائمة كلها تقرأ من الجدول نفسه."
 }

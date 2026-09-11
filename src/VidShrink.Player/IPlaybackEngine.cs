@@ -83,6 +83,28 @@ public interface IPlaybackEngine : IDisposable
         frameSeconds = PositionSeconds;
         return TryCopyLatest(ref seen, copy);
     }
+
+    double Speed => 1;
+
+    double Volume => 100;
+
+    bool Muted => false;
+
+    double FramesPerSecond => double.NaN;
+
+    double LoopStartSeconds => double.NaN;
+
+    double LoopEndSeconds => double.NaN;
+
+    void SetSpeed(double speed) { }
+
+    void SetVolume(double volume) { }
+
+    void SetMuted(bool muted) { }
+
+    void StepFrame(bool backward) { }
+
+    void SetLoop(double startSeconds, double endSeconds) { }
 }
 
 public sealed class PlaybackOpenException : Exception
