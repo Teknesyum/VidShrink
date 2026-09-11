@@ -501,7 +501,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(784, toplam);
+        Assert.Equal(778, toplam);
         Assert.Equal(88, dilBasina["en"]);
         Assert.Equal(36, dilBasina["tr"]);
     }
@@ -516,10 +516,10 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
     /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
-    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784)
+    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 20984 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 20898 kalem)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// </summary>
     [Fact]
@@ -548,7 +548,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(20984, gezilen);
+        Assert.Equal(20898, gezilen);
         Assert.Empty(kayip);
     }
 
