@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
@@ -108,6 +109,9 @@ public partial class ShrinkJobWindow : Window
             ? Avalonia.Media.FlowDirection.RightToLeft
             : Avalonia.Media.FlowDirection.LeftToRight;
 
+        if (OperatingSystem.IsMacOS()) WindowDecorations = WindowDecorations.Full;
+        JobShell.PointerPressed += OnShellPointerPressed;
+
         BtnClose.Click += (_, _) => Close();
         BtnOpenInApp.Click += OnOpenInApp;
         BtnReveal.Click += OnReveal;
@@ -118,6 +122,11 @@ public partial class ShrinkJobWindow : Window
         TxtRemaining.Text = "-";
         TxtMessage.Text = "";
         TxtNotice.Text = "";
+    }
+
+    private void OnShellPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
     }
 
     /// <summary>

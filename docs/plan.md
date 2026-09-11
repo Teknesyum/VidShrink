@@ -383,3 +383,19 @@ esigini tutmaz ve HW yolu 1 sozlesmede kapanmaz; v1 zorunlu ozelliklerden ≥2's
 kutuphanede de yapilamaz; ikisi de win-x64 veya osx-arm64'te 2 turda paketlenemez; AGPL
 uyumsuzlugu ya da 12 ay commit'siz kutuphane; kurulum >300 MB ve kullanici sikayeti. Acilirsa
 once 1 sozlesmelik boru pilotu, karar kullanicinin.
+
+## Baslik duzeni (11 Eylul 2026, dal t0/baslik-duzeni)
+
+Kullanici istegi: is penceresinde sistem basligi yok; ust tuslarin anahati durgunken
+soluk gri, fare ustundeyken NeonBlueBorderStrong; koseler RadiusChip (6, tek yaricap);
+butun baslik tuslari ayni yukseklikte (TargetMinSize); Ayarlar sekmesi baslik
+seridinde dil tuslarinin sagina, sponsor tusunun soluna tasinir.
+
+- `Theme.axaml`: `HeaderRestBorder` = TextDisabledColor, border-decorative alfasi (0.3);
+  `HeaderButtonPadding` 12,0; `TabMargin` alta BorderThin (sekmeler cizginin ustunde ortalanir).
+- `Controls.axaml`: `HeaderButton` temasi; LanguageButton, TitleBarSupportButton,
+  TitleBarLinkButton ve yeni `TitleBarTabButton` ondan turer; NeonTabItem ayni kurala gecer.
+- `MainWindow.axaml(.cs)`: `BtnSettings` ekle, `TabSettings` basligini gizle, secili sinifini izle.
+- `ShrinkJobWindow.axaml(.cs)`: BorderOnly + istemci alani genisletme, govdeden surukleme.
+- Olcu: WindowLayout, VisibleText, SettingsTab, Language, OynaticiGirdi, KabukIstegi testleri;
+  once/sonra kareleri `.calisma/baslik/`.
