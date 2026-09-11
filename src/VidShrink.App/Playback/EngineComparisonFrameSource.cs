@@ -312,7 +312,8 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
             Compose(leftHalf, rightHalf, frame.Buffer, panelWidth, panelHeight);
             var sequence = Interlocked.Increment(ref _sequence) - 1;
             frame.Describe(panelWidth * 2, panelHeight, panelWidth, Seconds(leftSeconds), Seconds(rightSeconds), sequence);
-            ring.Publish(frame);            lastLeft = leftSeconds;
+            ring.Publish(frame);
+            lastLeft = leftSeconds;
             lastRight = rightSeconds;
             if (ended && (!left.EndReached || !right.EndReached)) ended = false;
 
@@ -418,7 +419,8 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
             left = _left;
             right = _right;
         }
-        _wantPlay = true;        if (_ready && left is not null && right is not null) PlayBoth(left, right);
+        _wantPlay = true;
+        if (_ready && left is not null && right is not null) PlayBoth(left, right);
         SetState(ComparisonSourceState.Oynuyor);
     }
 
@@ -433,7 +435,8 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
             left = _left;
             right = _right;
         }
-        _wantPlay = false;        if (left is not null && right is not null) PauseBoth(left, right);
+        _wantPlay = false;
+        if (left is not null && right is not null) PauseBoth(left, right);
         SetState(ComparisonSourceState.Duraklatildi);
     }
 
