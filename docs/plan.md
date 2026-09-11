@@ -322,3 +322,14 @@ istege bagli kalem. 1080p tutmazsa ikili tasarim: arayuzde OpenGL/ANGLE, basizda
 dalgaya +1 tur. ANGLE Avalonia 11'de baglanamazsa LibVLCSharp `libvlc_video_set_callbacks`
 yolu, 0. dalga bastan. GPL hazir ikiliyle baslanir; `-Dgpl=false` LGPL derlemesi 6. dalga
 sonrasi istege bagli.
+
+**Duzeltme:** fable'a verilen olgularda T167'nin LibVLC olcumu yoktu
+(`docs/olcumler/oynatici-hatti.md`: bellek geri cagrisi yolu bu depoda calisti, arama
+medyani 38,9-57,2 ms, senkron 2,1 ms, kurulum +106-293 MB). Fable'in agirliklariyla
+LibVLC 95 → ~109; libmpv 115 onde ama fark olculmemis iki sayida (libmpv SW hizi, acilmis
+DLL boyutu). 0. dalga adim 1 bu iki sayiyi LibVLC'nin olculmus degerleriyle kiyaslar:
+libmpv arama medyani ≤60 ms ve kurulum deltasi <106 MB tutmazsa LibVLC geri cagri yolu.
+
+**Sira:** 0. dalgadan once Avalonia 11.3.20 → 12.1.2 gecis sondasi (12.0.0 7 Nisan 2026'da
+cikti, net8.0 destekli). Yeni oynatici kodu 12'ye yazilir; sonda derleme hatasi sayisini ve
+tam suiti olcer.
