@@ -1,0 +1,148 @@
+name: macOS libmpv gate
+
+on:
+  push:
+    branches: [worktree-agent-a230c98d55c76529a]
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+      HOMEBREW_NO_INSTALL_CLEANUP: '1'
+      HOMEBREW_NO_ENV_HINTS: '1'
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      APP: publish/osx-arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Runner
+        run: |
+          set -euo pipefail
+          uname -a
+          sw_vers
+          brew --version
+          echo "brew prefix: $(brew --prefix)"
+          dotnet --version
+
+      - name: Install mpv from Homebrew
+        run: |
+          set -euo pipefail
+          brew install mpv
+          brew info --json=v2 mpv | jq -r '.formulae[0] | "formula mpv stable=\(.versions.stable) revision=\(.revision) installed=\(.installed[0].version) license=\(.license)"'
+          brew info --json=v2 ffmpeg | jq -r '.formulae[0] | "formula ffmpeg stable=\(.versions.stable) installed=\(.installed[0].version) license=\(.license)"'
+          lib="$(brew --prefix mpv)/lib/libmpv.2.dylib"
+          ls -l "$(brew --prefix mpv)/lib"
+          file "$lib"
+          shasum -a 256 "$(realpath "$lib")"
+          echo "brew deps --installed mpv: $(brew deps --installed mpv | wc -l | tr -d ' ') formulae"
+          brew deps --installed mpv | tr '\n' ' '; echo
+          echo "--- otool -L (Homebrew original)"
+          otool -L "$lib"
+
+      - name: Test clip
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=640x360:rate=30 -t 3 -c:v libx264 -pix_fmt yuv420p -y clip.mp4
+          ls -l clip.mp4
+
+      - name: Publish application and smoke tool
+        run: |
+          set -euo pipefail
+          dotnet publish src/VidShrink.App/VidShrink.App.csproj -c Release -r osx-arm64 --self-contained -o "$APP"
+          dotnet publish tools/VidShrink.MpvSmoke/VidShrink.MpvSmoke.csproj -c Release -r osx-arm64 --self-contained -o smoke
+
+      - name: Size before bundling
+        run: |
+          set -euo pipefail
+          bytes=$(find "$APP" -type f -exec stat -f %z {} + | awk '{s+=$1} END {print s}')
+          files=$(find "$APP" -type f | wc -l | tr -d ' ')
+          ( cd "$APP" && zip -qr "$GITHUB_WORKSPACE/before.zip" . )
+          echo "size-before publish-bytes=$bytes files=$files zip-bytes=$(stat -f %z before.zip)"
+
+      - name: Bundle libmpv and its Homebrew dependencies
+        run: |
+          set -euo pipefail
+          python3 tools/VidShrink.MpvSmoke/bundle-macos.py "$(brew --prefix mpv)/lib/libmpv.2.dylib" "$APP" | tee bundle.txt
+          awk '$1=="bundled"{print $2}' bundle.txt > bundled-names.txt
+
+      - name: Evidence (otool, rpath, arch, minos, signature)
+        run: |
+          set -euo pipefail
+          echo "--- otool -L libmpv.2.dylib (bundled)"
+          otool -L "$APP/libmpv.2.dylib"
+          leaks=0
+          while read -r n; do
+            f="$APP/$n"
+            refs=$(otool -L "$f" | tail -n +2 | grep -cE '/opt/homebrew|/usr/local' || true)
+            rps=$(otool -l "$f" | grep -A2 'cmd LC_RPATH' | grep -cE '/opt/homebrew|/usr/local' || true)
+            minos=$(otool -l "$f" | awk '/LC_BUILD_VERSION/{b=1} b&&/minos/{print $2; exit}')
+            codesign --verify "$f"
+            echo "lib $n archs=$(lipo -archs "$f") minos=$minos foreign-refs=$refs foreign-rpaths=$rps sig=ok"
+            leaks=$((leaks+refs+rps))
+          done < bundled-names.txt
+          echo "--- all load commands across bundle matching /opt/homebrew or /usr/local:"
+          while read -r n; do otool -L "$APP/$n"; otool -l "$APP/$n"; done < bundled-names.txt | grep -E '/opt/homebrew|/usr/local' || echo "(none)"
+          echo "foreign-total=$leaks"
+          test "$leaks" -eq 0
+
+      - name: Size after bundling
+        run: |
+          set -euo pipefail
+          dylib=0
+          while read -r n; do dylib=$((dylib + $(stat -f %z "$APP/$n"))); done < bundled-names.txt
+          bytes=$(find "$APP" -type f -exec stat -f %z {} + | awk '{s+=$1} END {print s}')
+          files=$(find "$APP" -type f | wc -l | tr -d ' ')
+          ( cd "$APP" && zip -qr "$GITHUB_WORKSPACE/after.zip" . )
+          mkdir dylibs && while read -r n; do cp "$APP/$n" dylibs/; done < bundled-names.txt
+          ( cd dylibs && zip -qr "$GITHUB_WORKSPACE/dylibs.zip" . )
+          echo "size-after publish-bytes=$bytes files=$files zip-bytes=$(stat -f %z after.zip)"
+          echo "size-dylibs count=$(wc -l < bundled-names.txt | tr -d ' ') bytes=$dylib zip-bytes=$(stat -f %z dylibs.zip)"
+          shasum -a 256 "$APP/libmpv.2.dylib"
+
+      - name: Make Homebrew unreachable
+        run: |
+          set -euo pipefail
+          sudo mv /opt/homebrew /opt/homebrew-hidden
+          for d in /usr/local/Cellar /usr/local/opt /usr/local/lib; do
+            if [ -e "$d" ]; then sudo mv "$d" "$d-hidden"; echo "hid $d"; fi
+          done
+          test ! -e /opt/homebrew
+          ls -ld /opt/homebrew-hidden
+          echo "/opt/homebrew exists: $([ -e /opt/homebrew ] && echo yes || echo no)"
+
+      - name: Smoke from the bundled folder
+        run: |
+          set -euo pipefail
+          ./smoke/VidShrink.MpvSmoke --lib "$APP/libmpv.2.dylib" --file clip.mp4 --timeout 30 | tee smoke.txt
+          DYLD_PRINT_LIBRARIES=1 ./smoke/VidShrink.MpvSmoke --lib "$APP/libmpv.2.dylib" --file clip.mp4 --timeout 30 > smoke2.txt 2> dyld.txt
+          tail -n 1 smoke2.txt
+          echo "dyld loaded images total=$(grep -c 'dyld' dyld.txt || true) from-bundle=$(grep -c "$APP/" dyld.txt || true) from-homebrew=$(grep -cE '/opt/homebrew|/usr/local' dyld.txt || true)"
+          grep -E "$APP/lib(mpv|avcodec|avformat|placebo)" dyld.txt | head -n 8 || true
+          grep -q 'smoke: PASS' smoke.txt
+
+      - name: Restore Homebrew
+        if: always()
+        run: |
+          if [ -e /opt/homebrew-hidden ]; then sudo mv /opt/homebrew-hidden /opt/homebrew; fi
+          for d in /usr/local/Cellar /usr/local/opt /usr/local/lib; do
+            if [ -e "$d-hidden" ]; then sudo mv "$d-hidden" "$d"; fi
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macos-libmpv-gate-logs
+          path: |
+            bundle.txt
+            smoke.txt
+            smoke2.txt
+            dyld.txt
+          if-no-files-found: ignore
