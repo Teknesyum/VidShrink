@@ -10,6 +10,10 @@
   <SolidColorBrush x:Key="AppBg" Color="{StaticResource AppBgColor}"/>
   <SolidColorBrush x:Key="TextBody" Color="{StaticResource TextBodyColor}"/>
   <SolidColorBrush x:Key="TextDisabled" Color="{StaticResource TextDisabledColor}"/>
+  <x:Double x:Key="BorderDecorativeOpacity">0.3</x:Double>
+  <SolidColorBrush x:Key="HeaderRestBorder"
+                   Color="{StaticResource TextDisabledColor}"
+                   Opacity="{StaticResource BorderDecorativeOpacity}"/>
 
   <SolidColorBrush x:Key="NeonBlueFill" Color="{StaticResource NeonBlueFillColor}"/>
   <SolidColorBrush x:Key="NeonBlueHover" Color="{StaticResource NeonBlueHoverColor}"/>
@@ -308,12 +312,13 @@
   <Thickness x:Key="ButtonPadding">24,12</Thickness>
   <Thickness x:Key="ButtonPaddingSm">16,8</Thickness>
   <Thickness x:Key="ChipPadding">12,4</Thickness>
+  <Thickness x:Key="HeaderButtonPadding">12,0</Thickness>
   <Thickness x:Key="FieldPadding">12,8</Thickness>
   <Thickness x:Key="TabPadding">24,12</Thickness>
   <Thickness x:Key="TooltipPadding">16,12</Thickness>
   <Thickness x:Key="LabelMargin">0,0,0,8</Thickness>
   <Thickness x:Key="ChipMargin">0,0,8,0</Thickness>
-  <Thickness x:Key="TabMargin">0,0,8,0</Thickness>
+  <Thickness x:Key="TabMargin">0,0,8,1</Thickness>
   <Thickness x:Key="WindowButtonMargin">4,0,0,0</Thickness>
   <Thickness x:Key="TitleBarContentMargin">16,0,0,0</Thickness>
   <Thickness x:Key="NoticeMargin">24,12,24,0</Thickness>
