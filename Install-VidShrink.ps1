@@ -4,6 +4,8 @@ param(
     [switch]$SkipShortcuts,
     [switch]$ShellMenuOnly,
     [switch]$RemoveShellMenu,
+    [switch]$RemoveFileAssociation,
+    [switch]$Uninstall,
     [ValidateSet('auto', 'tr', 'en')]
     [string]$MenuLanguage = 'auto',
     [string]$RegistryRoot = 'HKCU:\Software\Classes'
@@ -395,6 +397,131 @@ function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language)
     Write-Host "Sağ tık menüsü $written uzantıya, küçültme alt menüsü $shrinkWritten girdiye yazıldı ($path menü)." -ForegroundColor Green
 }
 
+$fileAssociationProgId = 'Teknesyum.VidShrink.Video'
+$fileAssociationName = 'VidShrink'
+$fileAssociationCapabilities = 'Teknesyum\VidShrink\Capabilities'
+
+function Get-CurrentUserSubKey([string]$Path) {
+    $trimmed = $Path.TrimEnd('\')
+    if ($trimmed -notmatch '^HKCU:\\(.+)$') { throw "Kayit koku HKCU:\ altinda olmali: $Path" }
+    return $Matches[1]
+}
+
+function Get-AssociationSoftwareRoot([string]$Root) {
+    if (Test-DefaultRegistryRoot $Root) { return 'Software' }
+    return (Get-CurrentUserSubKey $Root)
+}
+
+function Open-CurrentUserKey([string]$SubKey) {
+    return [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($SubKey)
+}
+
+function Set-RegistryString([string]$SubKey, [string]$Name, [string]$Value) {
+    $key = Open-CurrentUserKey $SubKey
+    try { $key.SetValue($Name, $Value, [Microsoft.Win32.RegistryValueKind]::String) }
+    finally { $key.Close() }
+}
+
+function Remove-EmptyCurrentUserKey([string]$SubKey) {
+    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($SubKey)
+    if ($null -eq $key) { return }
+    $empty = $key.SubKeyCount -eq 0 -and $key.ValueCount -eq 0
+    $key.Close()
+    if ($empty) { [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKey($SubKey, $false) }
+}
+
+function Send-AssociationChanged([string]$Root) {
+    if (-not (Test-DefaultRegistryRoot $Root)) { return }
+    try {
+        Add-Type -Namespace VidShrinkKurulum -Name Kabuk -MemberDefinition '[DllImport("shell32.dll")] public static extern void SHChangeNotify(int eventId, uint flags, IntPtr first, IntPtr second);' -ErrorAction Stop
+        [VidShrinkKurulum.Kabuk]::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)
+    }
+    catch { }
+}
+
+function Write-FileAssociation([string]$Root, [string]$Executable) {
+    $classes = Get-CurrentUserSubKey $Root
+    $software = Get-AssociationSoftwareRoot $Root
+    $command = '"{0}" "%1"' -f $Executable
+    $progId = "$classes\$fileAssociationProgId"
+    $application = "$classes\Applications\$([IO.Path]::GetFileName($Executable))"
+    $capabilities = "$software\$fileAssociationCapabilities"
+
+    Set-RegistryString $progId '' $fileAssociationName
+    Set-RegistryString $progId 'FriendlyTypeName' $fileAssociationName
+    Set-RegistryString "$progId\DefaultIcon" '' "$Executable,0"
+    Set-RegistryString "$progId\shell\open\command" '' $command
+
+    Set-RegistryString $application 'FriendlyAppName' $fileAssociationName
+    Set-RegistryString "$application\shell\open\command" '' $command
+
+    Set-RegistryString $capabilities 'ApplicationName' $fileAssociationName
+    Set-RegistryString $capabilities 'ApplicationDescription' $fileAssociationName
+
+    foreach ($extension in $shellMenuExtensions) {
+        Set-RegistryString "$application\SupportedTypes" ".$extension" ''
+        Set-RegistryString "$capabilities\FileAssociations" ".$extension" $fileAssociationProgId
+
+        $list = Open-CurrentUserKey "$classes\.$extension\OpenWithProgids"
+        try { $list.SetValue($fileAssociationProgId, [byte[]]@(), [Microsoft.Win32.RegistryValueKind]::None) }
+        finally { $list.Close() }
+    }
+
+    Set-RegistryString "$software\RegisteredApplications" $fileAssociationName $capabilities
+    Send-AssociationChanged $Root
+    return $shellMenuExtensions.Count
+}
+
+function Remove-FileAssociation([string]$Root) {
+    $classes = Get-CurrentUserSubKey $Root
+    $software = Get-AssociationSoftwareRoot $Root
+    $user = [Microsoft.Win32.Registry]::CurrentUser
+    $removed = 0
+
+    foreach ($extension in $shellMenuExtensions) {
+        $listPath = "$classes\.$extension\OpenWithProgids"
+        $list = $user.OpenSubKey($listPath, $true)
+        if ($null -eq $list) { continue }
+        $had = @($list.GetValueNames()) -contains $fileAssociationProgId
+        if ($had) { $list.DeleteValue($fileAssociationProgId, $false); $removed++ }
+        $list.Close()
+        Remove-EmptyCurrentUserKey $listPath
+        Remove-EmptyCurrentUserKey "$classes\.$extension"
+    }
+
+    $user.DeleteSubKeyTree("$classes\$fileAssociationProgId", $false)
+    $user.DeleteSubKeyTree("$classes\Applications\VidShrink.exe", $false)
+    Remove-EmptyCurrentUserKey "$classes\Applications"
+    $user.DeleteSubKeyTree("$software\$fileAssociationCapabilities", $false)
+    Remove-EmptyCurrentUserKey "$software\Teknesyum\VidShrink"
+    Remove-EmptyCurrentUserKey "$software\Teknesyum"
+
+    $registered = $user.OpenSubKey("$software\RegisteredApplications", $true)
+    if ($null -ne $registered) {
+        $registered.DeleteValue($fileAssociationName, $false)
+        $registered.Close()
+        if (-not (Test-DefaultRegistryRoot $Root)) { Remove-EmptyCurrentUserKey "$software\RegisteredApplications" }
+    }
+
+    Send-AssociationChanged $Root
+    return $removed
+}
+
+function Remove-Shortcut([string]$Path, [string]$Root) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $false }
+    $shell = New-Object -ComObject WScript.Shell
+    $target = $shell.CreateShortcut($Path).TargetPath
+    if (-not $target -or -not $target.StartsWith($Root, [StringComparison]::OrdinalIgnoreCase)) { return $false }
+    Remove-Item -LiteralPath $Path -Force
+    return $true
+}
+
+function Test-ProgramsInstallRoot([string]$Root) {
+    $programsRoot = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'Programs'))
+    return ($Root -ne $programsRoot -and
+        $Root.StartsWith($programsRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase))
+}
+
 function Get-InstallRootHolder([string]$Root) {
     $holders = @()
     foreach ($processName in 'VidShrink.App', 'VidShrink') {
@@ -441,10 +568,47 @@ function Remove-InstallRoot([string]$Root) {
         "birkaç saniye sonra komutu yeniden çalıştırın. Son hata: $lastMessage")
 }
 
-if ($RemoveShellMenu) {
+if ($Uninstall) {
+    $resolvedUninstallRoot = [IO.Path]::GetFullPath($InstallRoot)
+    foreach ($processName in 'VidShrink.App', 'VidShrink') {
+        Get-Process $processName -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -and $_.Path.StartsWith($resolvedUninstallRoot, [StringComparison]::OrdinalIgnoreCase) } |
+            Stop-Process -Force
+    }
+
     $cleared = Remove-ShellMenu $RegistryRoot
     $packages = Remove-Windows11ShellMenu $RegistryRoot
-    Write-Host "Sağ tık menüsü kaldırıldı: $cleared uzantı, $packages paket." -ForegroundColor Green
+    $unlinked = Remove-FileAssociation $RegistryRoot
+    Write-Host "Sağ tık menüsü ($cleared uzantı, $packages paket) ve dosya ilişkilendirmesi ($unlinked uzantı) kaldırıldı." -ForegroundColor Green
+
+    if (-not $SkipShortcuts) {
+        Remove-Shortcut (Join-Path ([Environment]::GetFolderPath('Desktop')) 'VidShrink.lnk') $resolvedUninstallRoot | Out-Null
+        $startMenuDirectory = Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink'
+        if (Remove-Shortcut (Join-Path $startMenuDirectory 'VidShrink.lnk') $resolvedUninstallRoot) {
+            if (-not (Get-ChildItem -LiteralPath $startMenuDirectory -Force)) { Remove-Item -LiteralPath $startMenuDirectory -Force }
+        }
+    }
+
+    if (Test-ProgramsInstallRoot $resolvedUninstallRoot) {
+        Remove-InstallRoot $resolvedUninstallRoot
+        Write-Host "VidShrink kaldırıldı: $resolvedUninstallRoot" -ForegroundColor Green
+    }
+    else {
+        Write-Host "Kurulum klasörü LocalAppData\Programs altında değil, silinmedi: $resolvedUninstallRoot" -ForegroundColor Yellow
+    }
+    return
+}
+
+if ($RemoveShellMenu -or $RemoveFileAssociation) {
+    if ($RemoveShellMenu) {
+        $cleared = Remove-ShellMenu $RegistryRoot
+        $packages = Remove-Windows11ShellMenu $RegistryRoot
+        Write-Host "Sağ tık menüsü kaldırıldı: $cleared uzantı, $packages paket." -ForegroundColor Green
+    }
+    if ($RemoveFileAssociation) {
+        $unlinked = Remove-FileAssociation $RegistryRoot
+        Write-Host "Dosya ilişkilendirmesi kaldırıldı: $unlinked uzantı." -ForegroundColor Green
+    }
     return
 }
 
@@ -458,6 +622,8 @@ if ($ShellMenuOnly) {
         throw "Kurulu VidShrink.exe bulunamadı: $shellMenuExecutable. Önce kurulumu çalıştırın."
     }
     Update-ShellMenu $RegistryRoot $shellMenuExecutable $MenuLanguage
+    $associated = Write-FileAssociation $RegistryRoot $shellMenuExecutable
+    Write-Host "Dosya ilişkilendirmesi $associated uzantıya yazıldı." -ForegroundColor Green
     return
 }
 
@@ -475,10 +641,8 @@ if (-not $ffmpeg -or -not $ffprobe) {
 }
 if (-not $ffmpeg -or -not $ffprobe) { throw 'FFmpeg veya FFprobe kurulumdan sonra bulunamadı.' }
 
-$programsRoot = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'Programs'))
 $resolvedInstallRoot = [IO.Path]::GetFullPath($InstallRoot)
-if ($resolvedInstallRoot -eq $programsRoot -or
-    -not $resolvedInstallRoot.StartsWith($programsRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+if (-not (Test-ProgramsInstallRoot $resolvedInstallRoot)) {
     throw "Güvenlik nedeniyle kurulum yolu LocalAppData\Programs altında olmalıdır: $resolvedInstallRoot"
 }
 
@@ -578,6 +742,8 @@ try {
         $startMenuShortcut.Save()
 
         Update-ShellMenu $RegistryRoot $installedExe $MenuLanguage
+        $associated = Write-FileAssociation $RegistryRoot $installedExe
+        Write-Host "Dosya ilişkilendirmesi $associated uzantıya yazıldı." -ForegroundColor Green
     }
 
     Write-Host "VidShrink $version kuruldu: $resolvedInstallRoot" -ForegroundColor Green

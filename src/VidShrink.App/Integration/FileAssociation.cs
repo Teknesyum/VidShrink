@@ -35,23 +35,38 @@ internal static class FileAssociation
     /// <c>OpenWithProgids</c> listesinde ad taşıyan ama içeriği olmayan satır budur.
     /// Uygulama koşmadan da sınanabilsin diye yazma işi ayrı durur.
     /// </summary>
-    internal static IReadOnlyList<(string Key, string Name, string? Value)> Plan(string executablePath)
+    internal static IReadOnlyList<(string Key, string Name, string? Value)> Plan(string executablePath, string classesRoot = ClassesRoot)
     {
         var entries = new List<(string, string, string?)>
         {
-            ($@"{ClassesRoot}\{ProgId}", "", DisplayName),
-            ($@"{ClassesRoot}\{ProgId}", "FriendlyTypeName", DisplayName),
-            ($@"{ClassesRoot}\{ProgId}\DefaultIcon", "", $"{executablePath},0"),
-            ($@"{ClassesRoot}\{ProgId}\shell\open\command", "", $"\"{executablePath}\" \"%1\""),
-            ($@"{ClassesRoot}\Applications\{Path.GetFileName(executablePath)}\shell\open\command", "", $"\"{executablePath}\" \"%1\"")
+            ($@"{classesRoot}\{ProgId}", "", DisplayName),
+            ($@"{classesRoot}\{ProgId}", "FriendlyTypeName", DisplayName),
+            ($@"{classesRoot}\{ProgId}\DefaultIcon", "", $"{executablePath},0"),
+            ($@"{classesRoot}\{ProgId}\shell\open\command", "", $"\"{executablePath}\" \"%1\""),
+            ($@"{classesRoot}\Applications\{Path.GetFileName(executablePath)}\shell\open\command", "", $"\"{executablePath}\" \"%1\"")
         };
 
         foreach (var extension in ShellIntegration.MediaExtensions)
         {
-            entries.Add(($@"{ClassesRoot}\.{extension}\OpenWithProgids", ProgId, null));
+            entries.Add(($@"{classesRoot}\.{extension}\OpenWithProgids", ProgId, null));
         }
 
         return entries;
+    }
+
+    internal const string LauncherName = "VidShrink.exe";
+
+    internal static string LaunchTarget(string processPath)
+    {
+        var directory = Path.GetDirectoryName(processPath);
+        if (string.IsNullOrEmpty(directory)) return processPath;
+        if (!string.Equals(Path.GetFileName(directory), "app", StringComparison.OrdinalIgnoreCase)) return processPath;
+
+        var root = Path.GetDirectoryName(directory);
+        if (string.IsNullOrEmpty(root)) return processPath;
+
+        var launcher = Path.Combine(root, LauncherName);
+        return File.Exists(launcher) ? launcher : processPath;
     }
 
     /// <summary>
@@ -59,10 +74,10 @@ internal static class FileAssociation
     /// Yönetici hakkı istemez. Yazılamayan satırın anahtarı döner; hepsi yazıldıysa liste boştur.
     /// </summary>
     [SupportedOSPlatform("windows")]
-    internal static IReadOnlyList<string> Register(string executablePath)
+    internal static IReadOnlyList<string> Register(string executablePath, string classesRoot = ClassesRoot)
     {
         var failed = new List<string>();
-        foreach (var (key, name, value) in Plan(executablePath))
+        foreach (var (key, name, value) in Plan(executablePath, classesRoot))
         {
             if (!Write(key, name, value)) failed.Add($"{key}|{name}");
         }

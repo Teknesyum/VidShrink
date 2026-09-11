@@ -40,11 +40,13 @@ internal static class DefaultApp
     internal static bool IsDefault(string executablePath, IReadOnlyList<string> extensions)
     {
         if (extensions.Count == 0) return false;
+        var target = FileAssociation.LaunchTarget(executablePath);
         foreach (var extension in extensions)
         {
             var handler = Handler(extension);
             if (handler is null) return false;
-            if (!string.Equals(handler, executablePath, StringComparison.OrdinalIgnoreCase)) return false;
+            if (!string.Equals(handler, executablePath, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(handler, target, StringComparison.OrdinalIgnoreCase)) return false;
         }
         return true;
     }

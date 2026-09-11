@@ -25,6 +25,99 @@ require_command() {
     command -v "$1" >/dev/null 2>&1 || fail "$1 bulunamadı. Kurulum için gereklidir."
 }
 
+data_directory="$HOME/.local/share"
+applications_directory="$data_directory/applications"
+desktop_entry="$applications_directory/vidshrink.desktop"
+mime_directory="$data_directory/mime"
+mime_package="$mime_directory/packages/vidshrink.xml"
+
+media_types='mp4 video/mp4
+mkv video/x-matroska
+mov video/quicktime
+avi video/x-msvideo
+webm video/webm
+wmv video/x-ms-wmv
+flv video/x-flv
+m4v video/x-m4v
+mpg video/mpeg
+mpeg video/mpeg
+ts video/mp2t
+m2ts video/mp2t
+3gp video/3gpp
+ogv video/ogg
+vob video/mpeg
+asf video/x-ms-asf
+rm application/vnd.rn-realmedia
+rmvb application/vnd.rn-realmedia-vbr
+divx video/vnd.avi
+mxf application/mxf
+f4v video/mp4
+mts video/mp2t
+dav video/x-dav
+gif image/gif'
+
+refresh_desktop_databases() {
+    if command -v update-mime-database >/dev/null 2>&1 && [ -d "$mime_directory" ]; then
+        update-mime-database "$mime_directory" >/dev/null 2>&1 || true
+    fi
+    if command -v update-desktop-database >/dev/null 2>&1 && [ -d "$applications_directory" ]; then
+        update-desktop-database "$applications_directory" >/dev/null 2>&1 || true
+    fi
+}
+
+write_desktop_entry() {
+    executable=$1
+    mime_list=$(printf '%s\n' "$media_types" | awk '{ print $2 }' | sort -u | tr '\n' ';')
+
+    mkdir -p "$applications_directory" "$mime_directory/packages"
+    icon_line=''
+    icon_file="$(dirname "$executable")/VidShrink.png"
+    if [ -f "$icon_file" ]; then
+        icon_line="Icon=$icon_file"
+    fi
+
+    cat > "$mime_package" <<MIME
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="video/x-dav">
+        <comment>DAV video</comment>
+        <glob pattern="*.dav"/>
+    </mime-type>
+</mime-info>
+MIME
+
+    {
+        printf '[Desktop Entry]\n'
+        printf 'Type=Application\n'
+        printf 'Name=VidShrink\n'
+        printf 'Comment=Play and shrink videos\n'
+        printf 'Exec="%s" %%F\n' "$executable"
+        [ -z "$icon_line" ] || printf '%s\n' "$icon_line"
+        printf 'Terminal=false\n'
+        printf 'Categories=AudioVideo;Video;Player;\n'
+        printf 'MimeType=%s\n' "$mime_list"
+    } > "$desktop_entry"
+
+    refresh_desktop_databases
+}
+
+remove_desktop_entry() {
+    touched=''
+    if [ -e "$desktop_entry" ]; then
+        rm -f "$desktop_entry"
+        removed="$removed$desktop_entry
+"
+        touched=1
+    fi
+    if [ -e "$mime_package" ]; then
+        rm -f "$mime_package"
+        removed="$removed$mime_package
+"
+        touched=1
+    fi
+    [ -z "$touched" ] || refresh_desktop_databases
+}
+
 # Kurulumun bıraktığı üç iz: uygulama paketi, düz kurulum dizini, PATH'teki kısayol.
 # Kısayol yalnız buraya bakıyorsa siliniyor; kullanıcının kendi koyduğu bir vidshrink
 # başka bir yeri gösteriyorsa ona dokunulmuyor.
@@ -42,6 +135,8 @@ uninstall() {
         removed="$removed$install_root
 "
     fi
+
+    remove_desktop_entry
 
     link="$bin_directory/vidshrink"
     if [ -L "$link" ]; then
@@ -69,6 +164,12 @@ esac
 case "${1:-}" in
     '') : ;;
     --uninstall) uninstall; exit 0 ;;
+    --desktop-entry)
+        [ -n "${2:-}" ] || fail 'Kullanım: --desktop-entry <çalıştırılabilir yolu>'
+        write_desktop_entry "$2"
+        say "Masaüstü kaydı yazıldı: $desktop_entry"
+        exit 0
+        ;;
     *) fail "Bilinmeyen seçenek: $1. Kaldırmak için --uninstall kullanın." ;;
 esac
 
@@ -313,6 +414,10 @@ else
     installed_executable="$install_root/$staged_executable"
     chmod +x "$installed_executable"
     say "VidShrink $version kuruldu: $install_root"
+    if [ "$(uname -s)" = 'Linux' ]; then
+        write_desktop_entry "$installed_executable"
+        say "Dosya yöneticisinde \"Birlikte aç\" listesine eklendi: $desktop_entry"
+    fi
 fi
 
 ln -sf "$installed_executable" "$bin_directory/vidshrink"
