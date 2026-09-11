@@ -294,6 +294,152 @@ public sealed class OynaticiMotorTests
         Assert.False(ayni, "arama bitti denildi ama gosterilen kare acilis karesiyle ayni");
     }
 
+    private static byte[] SonKare(MpvEngine engine)
+    {
+        long seen = 0;
+        byte[]? kare = null;
+        engine.TryCopyLatest(ref seen, (pixels, width, height, stride) =>
+        {
+            kare = new byte[stride * height];
+            Marshal.Copy(pixels, kare, 0, kare.Length);
+        });
+        Assert.True(kare is not null, "motorda kare yok");
+        return kare!;
+    }
+
+    [Fact]
+    public async Task OlayIsParcacigiSeekOlayindaGeciksedeDuraklatilmisAramaGosterilir()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        using var engine = new MpvEngine();
+        engine.SetProperty("ao", "null");
+        await engine.OpenAsync(clip);
+        await KareBekleAsync(engine, 0, TimeSpan.FromSeconds(10));
+
+        var gecikme = 0;
+        engine.BeforeEvent = id =>
+        {
+            if (id != Native.MPV_EVENT_SEEK) return;
+            Interlocked.Increment(ref gecikme);
+            Thread.Sleep(50);
+        };
+
+        var sonuclar = new List<(string Tur, double Hedef, SeekResult Sonuc, double Konum, double Onbellek)>();
+        foreach (var (hedef, hassas) in new[] { (9.3, SeekPrecision.Keyframe), (3.1, SeekPrecision.Keyframe), (13.1, SeekPrecision.Keyframe), (15.5, SeekPrecision.Exact) })
+        {
+            var sonuc = await engine.SeekAsync(hedef, hassas);
+            var onbellek = engine.PositionSeconds;
+            sonuclar.Add((hassas.ToString(), hedef, sonuc, MotorKanit.ReadDouble(engine, "time-pos"), onbellek));
+        }
+
+        engine.BeforeEvent = null;
+
+        static string F(double v) => v.ToString("0.000", CultureInfo.InvariantCulture);
+        var body = new StringBuilder();
+        body.AppendLine($"klip: {Path.GetFileName(clip)}, duraklatilmis; olay is parcacigi MPV_EVENT_SEEK'i 50 ms gec isler (BeforeEvent)");
+        body.AppendLine($"geciktirilen SEEK olayi: {gecikme}");
+        foreach (var s in sonuclar)
+            body.AppendLine($"{s.Tur} {F(s.Hedef)} -> {s.Sonuc.Outcome} {MotorKanit.Ms(s.Sonuc.LatencyMs)} ms, time-pos {F(s.Konum)}, PositionSeconds donuste {F(s.Onbellek)}");
+        MotorKanit.Write("k11-seek-olayi-gecikmesi.txt", body.ToString());
+
+        Assert.True(gecikme >= sonuclar.Count, $"SEEK olayi geciktirilmedi: {gecikme}");
+        foreach (var s in sonuclar)
+        {
+            Assert.Equal(SeekOutcome.Shown, s.Sonuc.Outcome);
+            Assert.True(Math.Abs(s.Konum - s.Hedef) < 2.0, $"{s.Tur} {F(s.Hedef)} inmedi: time-pos {F(s.Konum)}");
+            Assert.True(Math.Abs(s.Onbellek - s.Konum) <= 0.001, $"{s.Tur} {F(s.Hedef)}: PositionSeconds {F(s.Onbellek)}, time-pos {F(s.Konum)}");
+        }
+    }
+
+    [Fact]
+    public async Task AramadanKalanGecTimePosOlayiKonumuEzmez()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        using var engine = new MpvEngine();
+        engine.SetProperty("ao", "null");
+        await engine.OpenAsync(clip);
+        await KareBekleAsync(engine, 0, TimeSpan.FromSeconds(10));
+
+        var sonuclar = new List<(double Hedef, SeekResult Sonuc, double Konum, double Onbellek)>();
+        foreach (var hedef in new[] { 21.5, 9.3, 13.1 })
+        {
+            var sonuc = await engine.SeekAsync(hedef, SeekPrecision.Keyframe);
+            engine.OnTimePosChanged(hedef);
+            var onbellek = engine.PositionSeconds;
+            sonuclar.Add((hedef, sonuc, MotorKanit.ReadDouble(engine, "time-pos"), onbellek));
+        }
+
+        static string F(double v) => v.ToString("0.000", CultureInfo.InvariantCulture);
+        var body = new StringBuilder();
+        body.AppendLine($"klip: {Path.GetFileName(clip)}, duraklatilmis keyframes arama");
+        body.AppendLine("arama Shown dondukten sonra aramada yakalanan time-pos (hedef) gec teslim edilir: OnTimePosChanged(hedef)");
+        foreach (var s in sonuclar)
+            body.AppendLine($"keyframes {F(s.Hedef)} -> {s.Sonuc.Outcome} {MotorKanit.Ms(s.Sonuc.LatencyMs)} ms, time-pos {F(s.Konum)}, gec olaydan sonra PositionSeconds {F(s.Onbellek)}");
+        MotorKanit.Write("k13-gec-time-pos-olayi.txt", body.ToString());
+
+        foreach (var s in sonuclar)
+        {
+            Assert.Equal(SeekOutcome.Shown, s.Sonuc.Outcome);
+            Assert.True(Math.Abs(s.Konum - Math.Round(s.Konum / 2) * 2) <= 0.001, $"keyframes {F(s.Hedef)} anahtar kareye inmedi: time-pos {F(s.Konum)}");
+            Assert.True(Math.Abs(s.Onbellek - s.Konum) <= 0.001, $"keyframes {F(s.Hedef)}: gec olaydan sonra PositionSeconds {F(s.Onbellek)}, time-pos {F(s.Konum)}");
+        }
+    }
+
+    [Fact]
+    public async Task OynarkenAramaDonusundeEskiKareGosterilmez()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        using var engine = new MpvEngine();
+        engine.SetProperty("ao", "null");
+        await engine.OpenAsync(clip);
+        await KareBekleAsync(engine, 0, TimeSpan.FromSeconds(10));
+
+        var hedefler = new[] { 20.0, 8.0, 14.0 };
+        var referans = new Dictionary<double, List<byte[]>>();
+        foreach (var hedef in hedefler)
+        {
+            var kareler = new List<byte[]>();
+            for (var k = 0; k < 12; k++)
+            {
+                var r = await engine.SeekAsync(hedef + k / 30.0, SeekPrecision.Exact);
+                Assert.Equal(SeekOutcome.Shown, r.Outcome);
+                kareler.Add(SonKare(engine));
+            }
+
+            referans[hedef] = kareler;
+        }
+
+        Assert.Equal(SeekOutcome.Shown, (await engine.SeekAsync(2.0, SeekPrecision.Exact)).Outcome);
+        engine.Play();
+        await Task.Delay(1500);
+
+        var satirlar = new List<(double Hedef, SeekResult Sonuc, int Sira, double Konum)>();
+        foreach (var hedef in hedefler)
+        {
+            var sonuc = await engine.SeekAsync(hedef, SeekPrecision.Exact);
+            var kare = SonKare(engine);
+            var konum = engine.PositionSeconds;
+            satirlar.Add((hedef, sonuc, referans[hedef].FindIndex(r => r.AsSpan().SequenceEqual(kare)), konum));
+            await Task.Delay(700);
+        }
+
+        var oynuyor = !engine.IsPaused;
+        static string F(double v) => v.ToString("0.000", CultureInfo.InvariantCulture);
+        var body = new StringBuilder();
+        body.AppendLine($"klip: {Path.GetFileName(clip)}, oynarken exact arama; referans: duraklatilmis exact arama ile hedef + k/30, k=0..11");
+        body.AppendLine($"oynuyor: {oynuyor}");
+        foreach (var s in satirlar)
+            body.AppendLine($"{F(s.Hedef)} -> {s.Sonuc.Outcome} {MotorKanit.Ms(s.Sonuc.LatencyMs)} ms, donuste kare referansin {s.Sira}. karesi (-1: eslesme yok), PositionSeconds {F(s.Konum)}");
+        MotorKanit.Write("k12-oynarken-arama-karesi.txt", body.ToString());
+
+        Assert.True(oynuyor, "oynatma durdu; test oynarken aramayi olcmedi");
+        foreach (var s in satirlar)
+        {
+            Assert.Equal(SeekOutcome.Shown, s.Sonuc.Outcome);
+            Assert.True(s.Sira >= 0, $"{F(s.Hedef)} Shown dondu ama gosterilen kare hedefin karelerinden degil");
+        }
+    }
+
     [Fact]
     public void OynaticiGorunumuMotordanKareAlir()
     {

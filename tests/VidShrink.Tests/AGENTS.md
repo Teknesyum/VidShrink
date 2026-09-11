@@ -6,7 +6,9 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
 - Zamanlama ölçen testleri yük altında okuma; yerelde filtreli koş, tam süit CI'da.
 - Çıktı ve kanıt dosyaları `.calisma/` altına (`GirdiKanit`, `MotorKanit`).
 - `OynaticiMotorTests.cs` — libmpv motoru: başsız kare, bozuk dosya, exact/keyframe inişi,
-  PlayerView karesi, A/V farkı (audio-delay negatif kontrolü), 10 tık birikmesi, arama
+  geç işlenen SEEK olayı (`BeforeEvent` iç kancası), aramadan kalan geç `time-pos` olayı
+  (`OnTimePosChanged` iç girişi), oynarken aramanın karesi (referans
+  kareyle bayt eşitliği), PlayerView karesi, A/V farkı (audio-delay negatif kontrolü), 10 tık birikmesi, arama
   medyanları (1080p ≤60 ms, 2160p ≤200 ms, HEVC 1080p sayı), Dispose sırasında okuma
   yarışı. libmpv ya da ffmpeg yoksa kırmızı olur, atlanmaz. Yerelde `VIDSHRINK_LIBMPV` ister.
   1080p/2160p eşikleri `[HedefMakineFact]`: CI'da (`GITHUB_ACTIONS`) hep atlanır, yerelde

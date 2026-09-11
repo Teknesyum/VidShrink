@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static VidShrink.Player.Native;
 
+[assembly: InternalsVisibleTo("VidShrink.Tests")]
+
 namespace VidShrink.Player;
 
 public sealed class MpvEngine : IPlaybackEngine
@@ -56,13 +58,14 @@ public sealed class MpvEngine : IPlaybackEngine
     private long _seekGen;
     private long _replyGen = -1;
     private long _armedGen = -1;
-    private double _armedAt;
     private double _issuedAt;
     private TaskCompletionSource<SeekResult>? _seekDone;
-    private long _frameGen = -1;
     private long _restartGen = -1;
-    private double _frameAt;
     private double _restartAt;
+    private bool _newFrameInFlight;
+    private long _newFramesShown;
+    private long _newFramesAtIssue;
+    private double _newFrameAt;
     private readonly object _handleGate = new();
 
     public unsafe MpvEngine(PlaybackOptions? options = null)
@@ -126,6 +129,8 @@ public sealed class MpvEngine : IPlaybackEngine
     };
 
     public event EventHandler<PlaybackFault>? Faulted;
+
+    internal Action<int>? BeforeEvent { get; set; }
 
     public string Name => "libmpv";
 
@@ -222,6 +227,7 @@ public sealed class MpvEngine : IPlaybackEngine
             previous = _seekDone;
             _seekDone = done;
             _issuedAt = Now;
+            _newFramesAtIssue = _newFramesShown;
         }
 
         previous?.TrySetResult(new SeekResult(SeekOutcome.Superseded, 0));
@@ -277,6 +283,7 @@ public sealed class MpvEngine : IPlaybackEngine
         while (!_stopping)
         {
             var ev = mpv_wait_event(_mpv, 0.25);
+            BeforeEvent?.Invoke(ev->EventId);
             switch (ev->EventId)
             {
                 case MPV_EVENT_SHUTDOWN:
@@ -344,7 +351,6 @@ public sealed class MpvEngine : IPlaybackEngine
         {
             if (_seekDone is null || _replyGen != _seekGen || _armedGen == _seekGen) return;
             _armedGen = _seekGen;
-            _armedAt = Now;
         }
     }
 
@@ -370,10 +376,10 @@ public sealed class MpvEngine : IPlaybackEngine
     private TaskCompletionSource<SeekResult>? TakeShown(out double latency)
     {
         latency = 0;
-        if (_seekDone is null || _frameGen != _seekGen || _restartGen != _seekGen) return null;
+        if (_seekDone is null || _restartGen != _seekGen || _newFrameInFlight || _newFramesShown <= _newFramesAtIssue) return null;
         var done = _seekDone;
         _seekDone = null;
-        latency = Math.Max(_frameAt, _restartAt) - _issuedAt;
+        latency = Math.Max(_newFrameAt, _restartAt) - _issuedAt;
         return done;
     }
 
@@ -424,9 +430,15 @@ public sealed class MpvEngine : IPlaybackEngine
                 _paused = *(int*)property->Data != 0;
                 break;
             case TimeId when property->Format == MPV_FORMAT_DOUBLE:
-                Volatile.Write(ref _position, *(double*)property->Data);
+                OnTimePosChanged(*(double*)property->Data);
                 break;
         }
+    }
+
+    internal void OnTimePosChanged(double reported)
+    {
+        var current = GetDouble("time-pos");
+        Volatile.Write(ref _position, double.IsFinite(current) ? current : reported);
     }
 
     private unsafe void ReadVideoSize()
@@ -467,6 +479,8 @@ public sealed class MpvEngine : IPlaybackEngine
 
         MpvRenderFrameInfo info = default;
         var infoRc = mpv_render_context_get_info(_render, new MpvRenderParam(MPV_RENDER_PARAM_NEXT_FRAME_INFO, (IntPtr)(&info)));
+        var isNew = infoRc < 0
+            || ((info.Flags & MPV_RENDER_FRAME_INFO_PRESENT) != 0 && (info.Flags & MPV_RENDER_FRAME_INFO_REDRAW) == 0);
 
         var size = stackalloc int[2];
         size[0] = width;
@@ -481,30 +495,38 @@ public sealed class MpvEngine : IPlaybackEngine
         parameters[4] = new MpvRenderParam(MPV_RENDER_PARAM_BLOCK_FOR_TARGET_TIME, (IntPtr)(&block));
         parameters[5] = new MpvRenderParam(MPV_RENDER_PARAM_INVALID, IntPtr.Zero);
 
-        var start = Now;
-        if (mpv_render_context_render(_render, parameters) < 0) return;
-        var end = Now;
-
-        lock (_frameGate)
+        if (isNew)
         {
-            _back = _front;
-            _front = back;
-            _serial++;
+            lock (_seekGate) _newFrameInFlight = true;
         }
 
-        var isNew = infoRc < 0
-            || ((info.Flags & MPV_RENDER_FRAME_INFO_PRESENT) != 0 && (info.Flags & MPV_RENDER_FRAME_INFO_REDRAW) == 0);
-        if (!isNew) return;
+        var rendered = mpv_render_context_render(_render, parameters) >= 0;
+        var end = Now;
 
-        Interlocked.Increment(ref _framesRendered);
+        if (rendered)
+        {
+            lock (_frameGate)
+            {
+                _back = _front;
+                _front = back;
+                _serial++;
+            }
+        }
+
+        if (!isNew) return;
+        if (rendered) Interlocked.Increment(ref _framesRendered);
 
         TaskCompletionSource<SeekResult>? done;
         double latency;
         lock (_seekGate)
         {
-            if (_seekDone is null || _armedGen != _seekGen || _frameGen == _seekGen || start < _armedAt) return;
-            _frameGen = _seekGen;
-            _frameAt = end;
+            _newFrameInFlight = false;
+            if (rendered)
+            {
+                _newFramesShown++;
+                _newFrameAt = end;
+            }
+
             done = TakeShown(out latency);
         }
 

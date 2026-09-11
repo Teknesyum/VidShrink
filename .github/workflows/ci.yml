@@ -123,6 +123,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kosum-sonuc
-          path: .calisma/kosum-sonuc/**
+          path: |
+            .calisma/kosum-sonuc/**
+            .calisma/oynatici-motor/**
+            !.calisma/oynatici-motor/**/*.mp4
           if-no-files-found: ignore
           retention-days: 7
