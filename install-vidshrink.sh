@@ -65,12 +65,6 @@ refresh_desktop_databases() {
     fi
 }
 
-# Desktop Entry Specification'ın Exec anahtarı için tırnaklı argüman kaçışı: önce
-# tırnaklı argüman içinde ters bölü, ters tırnak, dolar ve çift tırnak birer ters bölüyle
-# kaçılır, sonra dosya düzeyindeki string kaçışı her ters bölüyü ikiye katlar. İki adım
-# art arda uygulanınca sıradaki dört karakter için net karşılık: ters bölü dört ters
-# bölüye, öteki üçü iki ters bölü + kendisine döner. % ayrı bir kural: %% olur, alan
-# kodunun (%f/%F) kendisiyle çakışmasın diye.
 exec_argument_escape() {
     printf '%s' "$1" | sed \
         -e 's/\\/\\\\\\\\/g' \
