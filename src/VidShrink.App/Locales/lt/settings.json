@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nėra numatytoji vaizdo įrašų programa. Ją galite pasirinkti Windows numatytųjų programų puslapyje.",
   "settings.default-app.open": "Numatytosios programos",
-  "settings.default-app.dismiss": "Daugiau neklausti"
+  "settings.default-app.dismiss": "Daugiau neklausti",
+  "settings.player-shortcuts.title": "Leistuvo spartieji klavišai",
+  "settings.player-shortcuts.hint": "Leistuvo skirtukas, jo meniu ir šis sąrašas visi skaito tą pačią lentelę."
 }

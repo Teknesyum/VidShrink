@@ -4,9 +4,6 @@
   "playback.player-failed": "Salīdzināšanas atskaņotāju neizdevās palaist",
   "playback.sample-failed": "Priekšskatījuma paraugu neizdevās kodēt",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} netika atrasts, tāpēc salīdzināšanas atskaņotājs nevar darboties.",
-  "playback.source.hstack-broken": "Filtrs hstack šajā ffmpeg būvējumā nedarbojas, tāpēc salīdzināšanas atskaņotāju nevar atvērt.",
-  "playback.source.probe-inconclusive": "Pārbaudi neizdevās pabeigt, dators var būt aizņemts; mēģiniet atvērt atskaņotāju vēlreiz.",
   "playback.error.exit-code": "ffmpeg atgrieza izejas kodu {0}.",
   "playback.error.engine": "dzinēja ziņojums: {0}",
   "playback.error.no-file": "Klipa fails netika izveidots.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Laika josla",
   "playback.control.strip": "Vadības josla",
   "playback.control.pause": "Pauze",
-  "playback.control.play": "Atskaņot",
-  "playback.pipe.seek-timeout": "Meklēšana {0} ms laikā nesniedza kadru, tāpēc tā tika pārtraukta.",
-  "playback.pipe.seek-restarts": "Meklēšana tika pārtraukta pēc {0} restartiem bez neviena kadra.",
-  "playback.pipe.no-start": "ffmpeg neizdevās palaist, tāpēc kanāls palika dīkstāvē.",
-  "playback.pipe.decoder-died": "Dekodētāja process negaidīti beidzās; kanāls tiks atjaunots nākamajā meklēšanā.",
-  "playback.pipe.decoder-unkillable": "Dekodētāja ffmpeg procesu neizdevās apturēt, un tas var joprojām darboties.",
-  "playback.pipe.audio-unkillable": "Audio ffmpeg procesu neizdevās apturēt, un tas var joprojām darboties."
+  "playback.control.play": "Atskaņot"
 }

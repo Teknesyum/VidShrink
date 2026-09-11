@@ -106,7 +106,16 @@ public sealed class MpvEngine : IPlaybackEngine
         _renderer.Start();
     }
 
-    public static IReadOnlyList<(string Name, string Value)> OptionsFor(PlaybackOptions options) => new[]
+    public static IReadOnlyList<(string Name, string Value)> OptionsFor(PlaybackOptions options)
+    {
+        var list = new List<(string Name, string Value)>(BaseOptions(options));
+        if (!options.Audio) list.Add(("aid", "no"));
+        if (!options.Video) list.Add(("vid", "no"));
+        if (options.Loop) list.Add(("loop-file", "inf"));
+        return list;
+    }
+
+    private static (string Name, string Value)[] BaseOptions(PlaybackOptions options) => new[]
     {
         ("vo", "libmpv"),
         ("hwdec", options.Hardware == HardwareDecoding.AutoCopy ? "auto-copy" : "no"),
@@ -205,6 +214,56 @@ public sealed class MpvEngine : IPlaybackEngine
         await open.Task.ConfigureAwait(false);
     }
 
+    public double Speed => Finite(GetDouble("speed"), 1);
+
+    public double Volume => Finite(GetDouble("volume"), 100);
+
+    public bool Muted => GetProperty("mute") == "yes";
+
+    public double FramesPerSecond
+    {
+        get
+        {
+            var container = GetDouble("container-fps");
+            return double.IsFinite(container) && container > 0 ? container : GetDouble("estimated-vf-fps");
+        }
+    }
+
+    public double LoopStartSeconds => GetDouble("ab-loop-a");
+
+    public double LoopEndSeconds => GetDouble("ab-loop-b");
+
+    public void SetSpeed(double speed) => TrySet("speed", Number(speed));
+
+    public void SetVolume(double volume) => TrySet("volume", Number(volume));
+
+    public void SetMuted(bool muted) => TrySet("mute", muted ? "yes" : "no");
+
+    public void StepFrame(bool backward)
+    {
+        if (!_isOpen) return;
+        CommandRc(ControlTag, backward ? "frame-back-step" : "frame-step");
+    }
+
+    public void SetLoop(double startSeconds, double endSeconds)
+    {
+        TrySet("ab-loop-a", double.IsFinite(startSeconds) ? Number(Math.Max(0, startSeconds)) : "no");
+        TrySet("ab-loop-b", double.IsFinite(endSeconds) ? Number(Math.Max(0, endSeconds)) : "no");
+    }
+
+    private static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
+
+    private static double Finite(double value, double fallback) => double.IsFinite(value) ? value : fallback;
+
+    private bool TrySet(string name, string value)
+    {
+        lock (_handleGate)
+        {
+            if (!HandleAlive) return false;
+            return mpv_set_property_string(_mpv, name, value) >= 0;
+        }
+    }
+
     public void Play() => Command(ControlTag, "set", "pause", "no");
 
     public void Pause() => Command(ControlTag, "set", "pause", "yes");
@@ -244,6 +303,19 @@ public sealed class MpvEngine : IPlaybackEngine
         {
             if (_front is not { } front || _serial == seen) return false;
             copy((IntPtr)front.Pixels, front.Width, front.Height, front.Stride);
+            seen = _serial;
+            return true;
+        }
+    }
+
+    public unsafe bool TryCopyLatest(ref long seen, FrameCopy copy, out double frameSeconds)
+    {
+        lock (_frameGate)
+        {
+            frameSeconds = double.NaN;
+            if (_front is not { } front || _serial == seen) return false;
+            copy((IntPtr)front.Pixels, front.Width, front.Height, front.Stride);
+            frameSeconds = front.Seconds;
             seen = _serial;
             return true;
         }
@@ -456,6 +528,11 @@ public sealed class MpvEngine : IPlaybackEngine
         var width = Volatile.Read(ref _videoWidth);
         var height = Volatile.Read(ref _videoHeight);
         if (width <= 0 || height <= 0) return;
+        if (_options.RenderWidth > 0 && _options.RenderHeight > 0)
+        {
+            width = _options.RenderWidth;
+            height = _options.RenderHeight;
+        }
 
         var back = _back;
         if (back is null || back.Width != width || back.Height != height)
@@ -484,6 +561,7 @@ public sealed class MpvEngine : IPlaybackEngine
         var start = Now;
         if (mpv_render_context_render(_render, parameters) < 0) return;
         var end = Now;
+        back.Seconds = Volatile.Read(ref _position);
 
         lock (_frameGate)
         {
@@ -624,6 +702,8 @@ public sealed class MpvEngine : IPlaybackEngine
         public int Stride { get; }
 
         public byte* Pixels { get; private set; }
+
+        public double Seconds { get; set; }
 
         public void Dispose()
         {

@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nav noklusējuma programma video failiem. To var izvēlēties Windows lapā Noklusējuma lietotnes.",
   "settings.default-app.open": "Noklusējuma lietotnes",
-  "settings.default-app.dismiss": "Vairs nejautāt"
+  "settings.default-app.dismiss": "Vairs nejautāt",
+  "settings.player-shortcuts.title": "Atskaņotāja saīsnes",
+  "settings.player-shortcuts.hint": "Atskaņotāja cilne, tās izvēlne un šis saraksts visi lasa vienu un to pašu tabulu."
 }

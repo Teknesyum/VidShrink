@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink 不是视频的默认程序。您可以在 Windows 的“默认应用”页面中选择它。",
   "settings.default-app.open": "默认应用",
-  "settings.default-app.dismiss": "不再询问"
+  "settings.default-app.dismiss": "不再询问",
+  "settings.player-shortcuts.title": "播放器快捷键",
+  "settings.player-shortcuts.hint": "播放器标签页、其菜单和此列表都读取同一个表。"
 }

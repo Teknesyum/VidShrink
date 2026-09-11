@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nu este programul implicit pentru videoclipuri. Îl poți alege în pagina Aplicații implicite din Windows.",
   "settings.default-app.open": "Aplicații implicite",
-  "settings.default-app.dismiss": "Nu mai întreba"
+  "settings.default-app.dismiss": "Nu mai întreba",
+  "settings.player-shortcuts.title": "Comenzi rapide player",
+  "settings.player-shortcuts.hint": "Fila playerului, meniul său și această listă citesc din același tabel."
 }

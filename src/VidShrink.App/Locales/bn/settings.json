@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink ভিডিওর ডিফল্ট প্রোগ্রাম নয়। Windows-এর ডিফল্ট অ্যাপ পাতায় এটি বেছে নিতে পারেন।",
   "settings.default-app.open": "ডিফল্ট অ্যাপ",
-  "settings.default-app.dismiss": "আর জিজ্ঞাসা করবেন না"
+  "settings.default-app.dismiss": "আর জিজ্ঞাসা করবেন না",
+  "settings.player-shortcuts.title": "প্লেয়ার শর্টকাট",
+  "settings.player-shortcuts.hint": "প্লেয়ার ট্যাব, তার মেনু এবং এই তালিকা সবই একই টেবিল থেকে পড়ে।"
 }

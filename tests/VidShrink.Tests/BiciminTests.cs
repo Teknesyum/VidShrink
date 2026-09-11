@@ -501,9 +501,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(778, toplam);
-        Assert.Equal(88, dilBasina["en"]);
-        Assert.Equal(36, dilBasina["tr"]);
+        Assert.Equal(844, toplam);
+        Assert.Equal(91, dilBasina["en"]);
+        Assert.Equal(37, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -516,11 +516,16 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
     /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
-    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778)
+    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 20898 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 21887 kalem)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
+    /// <para>Sayim yansimanin gordugu 43 dil uzerinden: 42 dil klasoru ve gomulu kaynak
+    /// adindan gelen bir dil daha, her biri 509 anahtar. 5. dalga ffmpeg oynatma borusunu
+    /// cop kutusuna tasiyinca okuyucusu kalmayan dokuz <c>playback.pipe.*</c> /
+    /// <c>playback.source.*</c> anahtari kataloglardan cikti: 43 x 486 = 20898'den
+    /// 43 x 477 = 20511'e. 1. dalga 32 oynatici anahtari ekledi: 43 x 509 = 21887.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -548,7 +553,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(20898, gezilen);
+        Assert.Equal(21887, gezilen);
         Assert.Empty(kayip);
     }
 

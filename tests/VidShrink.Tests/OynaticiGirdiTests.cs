@@ -9,7 +9,6 @@ using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Ffmpeg;
-using VidShrink.Ffmpeg.Playback;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -63,7 +62,7 @@ internal static class GirdiSurucu
         view.RaiseEvent(args);
     }
 
-    internal static void Press(PlayerView view, PointerUpdateKind kind, RawInputModifiers buttons)
+    internal static void Press(PlayerView view, PointerUpdateKind kind, RawInputModifiers buttons, int clicks = 1)
     {
         var args = new PointerPressedEventArgs(
             view,
@@ -72,7 +71,8 @@ internal static class GirdiSurucu
             new Point(1, 1),
             0,
             new PointerPointProperties(buttons, kind),
-            KeyModifiers.None)
+            KeyModifiers.None,
+            clicks)
         {
             RoutedEvent = InputElement.PointerPressedEvent
         };
@@ -80,8 +80,14 @@ internal static class GirdiSurucu
         view.RaiseEvent(args);
     }
 
-    internal static void Key(PlayerView view, Key key)
-        => view.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = key });
+    internal static void Key(PlayerView view, Key key, KeyModifiers modifiers = KeyModifiers.None, string? symbol = null)
+        => view.RaiseEvent(new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Key = key,
+            KeyModifiers = modifiers,
+            KeySymbol = symbol
+        });
 
     internal static PlayerView Kur(out Window window)
     {
@@ -110,7 +116,11 @@ public sealed class OynaticiGirdiTests
                 rows.Add($"{ad}\tkonum {before:0.###} -> {view.PositionSeconds:0.###} sn");
             }
 
-            Tekerlek("tekerlek", KeyModifiers.None);
+            var sesOnce = view.VolumeLevel;
+            var konumOnce = view.PositionSeconds;
+            GirdiSurucu.Wheel(view, -1, KeyModifiers.None);
+            rows.Add($"tekerlek\tses {sesOnce:0.###} -> {view.VolumeLevel:0.###} (konum {konumOnce:0.###} -> {view.PositionSeconds:0.###} sn)");
+
             Tekerlek("ctrl+tekerlek", KeyModifiers.Control);
             Tekerlek("shift+tekerlek", KeyModifiers.Shift);
             Tekerlek("ctrl+shift+tekerlek", KeyModifiers.Control | KeyModifiers.Shift);
@@ -122,7 +132,7 @@ public sealed class OynaticiGirdiTests
 
             var playBefore = view.IsPlaying;
             GirdiSurucu.Press(view, PointerUpdateKind.RightButtonPressed, RawInputModifiers.RightMouseButton);
-            rows.Add($"sag tik\toynatma {playBefore} -> {view.IsPlaying}");
+            rows.Add($"sag tik\tiz {view.Trace[^1]} (oynatma {playBefore} -> {view.IsPlaying})");
 
             var playBefore2 = view.IsPlaying;
             GirdiSurucu.Key(view, Avalonia.Input.Key.Space);
@@ -146,14 +156,14 @@ public sealed class OynaticiGirdiTests
         GirdiKanit.Write("k1-izgara.txt", string.Join(Environment.NewLine, satirlar) + Environment.NewLine);
 
         Assert.Equal(9, satirlar.Count);
-        Assert.Contains("konum 0 -> 1 sn", satirlar[0]);
-        Assert.Contains("konum 1 -> 11 sn", satirlar[1]);
-        Assert.Contains("konum 11 -> 71 sn", satirlar[2]);
-        Assert.Contains("konum 71 -> 371 sn", satirlar[3]);
+        Assert.Contains("ses 100 -> 95 (konum 0 -> 0 sn)", satirlar[0]);
+        Assert.Contains("konum 0 -> 10 sn", satirlar[1]);
+        Assert.Contains("konum 10 -> 70 sn", satirlar[2]);
+        Assert.Contains("konum 70 -> 370 sn", satirlar[3]);
         Assert.Contains("yakinlastirma 1 -> 1.24", satirlar[4]);
-        Assert.Contains("konum 371 -> 371 sn", satirlar[4]);
-        Assert.Contains("oynatma False -> True", satirlar[5]);
-        Assert.Contains("oynatma True -> False", satirlar[6]);
+        Assert.Contains("konum 370 -> 370 sn", satirlar[4]);
+        Assert.Contains("iz menu (oynatma False -> False)", satirlar[5]);
+        Assert.Contains("oynatma False -> True", satirlar[6]);
         Assert.Contains("tam ekran False -> True", satirlar[7]);
         Assert.Contains("tiklama sayaci 0 -> 1", satirlar[8]);
     }
@@ -161,15 +171,16 @@ public sealed class OynaticiGirdiTests
     [Fact]
     public void TekerlekAdimlariHaritadakiDortSayidir()
     {
-        Assert.Equal(1, PlayerInputMap.StepFor(PlayerModifiers.None));
-        Assert.Equal(10, PlayerInputMap.StepFor(PlayerModifiers.Ctrl));
-        Assert.Equal(60, PlayerInputMap.StepFor(PlayerModifiers.Shift));
-        Assert.Equal(300, PlayerInputMap.StepFor(PlayerModifiers.Ctrl | PlayerModifiers.Shift));
-        Assert.Equal(PlayerCommandKind.Zoom, PlayerInputMap.Wheel(1, PlayerModifiers.Alt).Kind);
-        Assert.Equal(PlayerCommandKind.None, PlayerInputMap.Press(PlayerButton.Left).Kind);
-        Assert.Equal(PlayerCommandKind.TogglePlay, PlayerInputMap.Press(PlayerButton.Right).Kind);
-        Assert.Equal(PlayerCommandKind.ToggleFullscreen, PlayerInputMap.Press(PlayerButton.Middle).Kind);
-        Assert.Equal(PlayerCommandKind.TogglePlay, PlayerInputMap.Key(PlayerKey.Space).Kind);
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Volume, 5), Keymap.ForWheel(1, KeyModifiers.None));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 10), Keymap.ForWheel(1, KeyModifiers.Control));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, 60), Keymap.ForWheel(1, KeyModifiers.Shift));
+        Assert.Equal(new PlayerCommand(PlayerCommandKind.Seek, -300), Keymap.ForWheel(-1, KeyModifiers.Control | KeyModifiers.Shift));
+        Assert.Equal(PlayerCommandKind.Zoom, Keymap.ForWheel(1, KeyModifiers.Alt).Kind);
+        Assert.Equal(PlayerCommandKind.None, Keymap.ForPress(PlayerButton.Left, 1).Kind);
+        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForPress(PlayerButton.Left, 2).Kind);
+        Assert.Equal(PlayerCommandKind.ContextMenu, Keymap.ForPress(PlayerButton.Right, 1).Kind);
+        Assert.Equal(PlayerCommandKind.ToggleFullscreen, Keymap.ForPress(PlayerButton.Middle, 1).Kind);
+        Assert.Equal(PlayerCommandKind.TogglePlay, Keymap.ForKey(Key.Space, KeyModifiers.None, " ").Kind);
     }
 
     [Fact]
@@ -184,7 +195,7 @@ public sealed class OynaticiGirdiTests
         })
         { Duration = 1000 };
 
-        for (var i = 0; i < 10; i++) coalescer.Nudge(PlayerInputMap.WheelStepSeconds);
+        for (var i = 0; i < 10; i++) coalescer.Nudge(Keymap.SeekFine);
 
         Assert.Equal(10, coalescer.Target);
         lock (calls) Assert.Single(calls);
@@ -234,11 +245,11 @@ public sealed class OynaticiGirdiTests
             view.CurrentTabIndex = () => 2;
             GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
             var fsPos = view.PositionSeconds;
-            GirdiSurucu.Wheel(view, 1, KeyModifiers.None);
+            GirdiSurucu.Wheel(view, 1, KeyModifiers.Control);
             GirdiSurucu.Key(view, Avalonia.Input.Key.Space);
-            body.AppendLine($"tam ekranda tekerlek: konum {fsPos:0.###} -> {view.PositionSeconds:0.###} sn, bosluk: oynatma {view.IsPlaying}");
+            body.AppendLine($"tam ekranda ctrl+tekerlek: konum {fsPos:0.###} -> {view.PositionSeconds:0.###} sn, bosluk: oynatma {view.IsPlaying}");
             Assert.True(view.Fullscreen.IsFullscreen);
-            Assert.Equal(fsPos + 1, view.PositionSeconds);
+            Assert.Equal(fsPos + Keymap.SeekSmall, view.PositionSeconds);
             Assert.True(view.IsPlaying);
 
             GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);
@@ -254,7 +265,7 @@ public sealed class OynaticiGirdiTests
     }
 
     [Fact]
-    public void MenuDugmesiBaglamMenusunuAcarVeUcSatirTasir()
+    public void MenuDugmesiBaglamMenusunuAcarVeKeymapSatirlariniTasir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -268,12 +279,12 @@ public sealed class OynaticiGirdiTests
                 var menu = view.BuildMenu();
                 var basliklar = menu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString() ?? "").ToList();
                 body.AppendLine($"{dil}: {string.Join(" | ", basliklar)}");
-                Assert.Equal(3, basliklar.Count);
+                Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
             }
 
             Strings.Use("en");
-            view.Apply(PlayerInputMap.MenuButton());
+            view.Apply(Keymap.OpenMenu.ToCommand());
             body.AppendLine($"menu izi: {view.Trace[^1]}");
             Assert.Equal("menu", view.Trace[^1]);
 
@@ -440,55 +451,12 @@ public sealed class OynaticiGirdiTestsKlipUretimi
     }
 }
 
-public sealed class OynaticiGirdiTestsGercekBoru : IClassFixture<GirdiKlipFixture>
+public sealed class FfmpegAvailableFactAttribute : FactAttribute
 {
-    private readonly GirdiKlipFixture _klip;
-
-    public OynaticiGirdiTestsGercekBoru(GirdiKlipFixture klip) => _klip = klip;
-
-    [FfmpegAvailableFact]
-    public async Task OnHizliTikGercekBoruyaKarsiBirikirVeAramalarSinirdaKalir()
+    public FfmpegAvailableFactAttribute()
     {
-        var path = _klip.ClipPath!;
-        using var pipe = new DecoderPipe();
-        await pipe.OpenAsync(path);
-
-        var bosKare = 0;
-        var coalescer = new SeekCoalescer(async at =>
-        {
-            var frame = await pipe.SeekAsync(at);
-            if (frame is null) Interlocked.Increment(ref bosKare);
-        })
-        { Duration = pipe.DurationSeconds };
-
-        var oncekiSurec = pipe.ProcessesStarted;
-        var saat = Stopwatch.StartNew();
-        for (var i = 0; i < 10; i++) coalescer.Nudge(PlayerInputMap.WheelStepSeconds);
-        await coalescer.Idle;
-        saat.Stop();
-
-        var body = new StringBuilder();
-        body.AppendLine($"klip: {Path.GetFileName(path)} sure {pipe.DurationSeconds:0.###} sn");
-        body.AppendLine($"10 hizli tik (tik basi 1 sn) -> hedef {coalescer.Target} sn, ulasilan konum {coalescer.Position} sn");
-        body.AppendLine($"tetiklenen arama sayisi: {coalescer.SeekCalls}");
-        body.AppendLine("arama hedefleri: " + string.Join(", ", coalescer.IssuedTargets));
-        body.AppendLine("arama gecikmeleri (ms): " + string.Join(", ", coalescer.LatenciesMs.Select(ms => ms.ToString("0.#", CultureInfo.InvariantCulture))));
-        body.AppendLine($"toplam sure: {saat.Elapsed.TotalMilliseconds:0.#} ms");
-        body.AppendLine($"ffmpeg surec sayisi: {oncekiSurec} -> {pipe.ProcessesStarted}");
-        body.AppendLine($"T175 150 ms sinirini asan arama: {coalescer.LatenciesMs.Count(ms => ms > 150)}");
-        body.AppendLine($"null donen arama (T175 yeniden baslatma tavani): {bosKare}");
-        body.AppendLine("arama hatalari: " + (coalescer.Failures.Count == 0 ? "yok" : string.Join(" | ", coalescer.Failures)));
-        GirdiKanit.Write("k3-gercek-boru.txt", body.ToString());
-
-        Assert.Equal(10, coalescer.Target);
-        Assert.Equal(10, coalescer.Position);
-        Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
-
-        Assert.NotEmpty(coalescer.LatenciesMs);
-        var asan = coalescer.LatenciesMs.Where(ms => ms > 150).ToList();
-        Assert.True(
-            asan.Count == 0,
-            "T175 150 ms sinirini asan arama: " + string.Join(", ", asan.Select(ms => ms.ToString("0.#", CultureInfo.InvariantCulture))));
+        if (!ToolLocator.IsAvailable(out var missing))
+            Skip = $"{missing} bulunamadi, ffmpeg isteyen test atlandi.";
     }
 }
 
@@ -596,7 +564,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
     }
 
     [Fact]
-    public void UcMenuSatirininUcuDeAyriBirEtkiUretir()
+    public void HerMenuSatiriAyriBirEtkiUretir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -617,14 +585,14 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             }
 
             body.AppendLine($"satir sayisi: {satirlar.Count}");
-            Assert.Equal(3, satirlar.Count);
+            Assert.Equal(Keymap.MenuActions.Count, satirlar.Count);
 
             window.Close();
             return body.ToString();
         });
 
-        GirdiKanit.Write("k9-menu-uc-satir.txt", rapor);
-        Assert.Contains("satir sayisi: 3", rapor);
+        GirdiKanit.Write("k9-menu-satirlari.txt", rapor);
+        Assert.Contains($"satir sayisi: {Keymap.MenuActions.Count}", rapor);
     }
 
     [Fact]

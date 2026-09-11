@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nije podrazumevani program za video. Možete ga izabrati na Windows stranici Podrazumevane aplikacije.",
   "settings.default-app.open": "Podrazumevane aplikacije",
-  "settings.default-app.dismiss": "Ne pitaj ponovo"
+  "settings.default-app.dismiss": "Ne pitaj ponovo",
+  "settings.player-shortcuts.title": "Prečice plejera",
+  "settings.player-shortcuts.hint": "Kartica plejera, njegov meni i ova lista čitaju istu tabelu."
 }

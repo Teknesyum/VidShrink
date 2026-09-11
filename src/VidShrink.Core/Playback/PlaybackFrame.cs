@@ -52,6 +52,15 @@ public sealed class PlaybackFrame
         Height = height;
         SplitX = splitX;
         Presentation = presentation;
+        RightPresentation = presentation;
         Sequence = sequence;
+    }
+
+    public TimeSpan RightPresentation { get; private set; }
+
+    public void Describe(int width, int height, int splitX, TimeSpan presentation, TimeSpan rightPresentation, long sequence)
+    {
+        Describe(width, height, splitX, presentation, sequence);
+        RightPresentation = rightPresentation;
     }
 }
