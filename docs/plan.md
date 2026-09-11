@@ -330,9 +330,24 @@ LibVLC 95 → ~109; libmpv 115 onde ama fark olculmemis iki sayida (libmpv SW hi
 DLL boyutu). 0. dalga adim 1 bu iki sayiyi LibVLC'nin olculmus degerleriyle kiyaslar:
 libmpv arama medyani ≤60 ms ve kurulum deltasi <106 MB tutmazsa LibVLC geri cagri yolu.
 
-**Sira:** 0. dalgadan once Avalonia 11.3.20 → 12.1.2 gecis sondasi (12.0.0 7 Nisan 2026'da
-cikti, net8.0 destekli). Yeni oynatici kodu 12'ye yazilir; sonda derleme hatasi sayisini ve
-tam suiti olcer.
+**Olcum sonucu (pilot 2, netlestirme 011):** `docs/olcumler/libmpv-sw-render.md`. SW render
+esigin 9-28 kati, timed oynatmada 0 dusme, islemci %3-8. Arama medyani H.264 1080p 36 ms,
+HEVC 1080p 58-62 ms (sinirda), 2160p 78-195 ms. Kurulum: `libmpv-2.dll` acilmis 120 MB,
+zip 48 MB; 007'deki "~34 MB" indirilen 7z'nin boyutuydu. Karar: **libmpv kalir, ek olcum
+yok.** Boyut kolu berabere (LibVLC'nin 106 MB'i dogrulanmamis, dogrulanmis 3 mimari 293 MB);
+4K arama kaybi kod cozucu/GOP siniri, motor degistirmek cevirmez. Kurallar:
+- arama esigi ayrilir: 1080p medyan ≤60 ms; 2160p `exact` medyani ≤ tam GOP cozum suresi
+  (bu duzenekte ≤200 ms);
+- surukleme sirasinda `seek absolute+keyframes`, birakinca `exact`;
+- varsayilan `hwdec=no`, `auto-copy` secenek;
+- HEVC 1080p arama 0. dalganin kendi olcumunde ayni aracla tekrar alinir;
+- kirpilmis libmpv derlemesi v1 sonrasi;
+- osx-arm64 gomme kapisi (010) surer.
+
+**Avalonia 12 gecisi tamam (pilot 1):** main'de 12.1.2. 8 derleme hatasi / 4 dosya, basiz
+kurulum `UseHarfBuzz`, 35 test kirmizisi kok nedenden duzeltildi (beklenti gevsetilmedi),
+4 RID publish cikti, CI yesil. Motor onerisine etkisi yok: oynatici yolu SW render →
+WriteableBitmap, surumden bagimsiz; Avalonia'ya bagli iki oynatici paketi kullanilmiyor.
 
 ### Avalonia 12, v1 kapsami, tahmin yontemi (netlestirme 008-010)
 
