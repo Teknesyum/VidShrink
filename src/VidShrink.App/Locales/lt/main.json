@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg komanda",
 
   "main.error.startup": "Paleidimas nebaigtas",
+  "main.instance.waiting": "Kodavimas vis dar vyksta; {0} atsidarys, kai jis baigsis.",
   "main.error.link": "Nuorodos nepavyko atidaryti",
   "main.error.folder": "Aplanko nepavyko atidaryti",
   "main.error.setting": "Nustatymo nepavyko išsaugoti",

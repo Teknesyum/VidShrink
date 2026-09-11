@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg käsk",
 
   "main.error.startup": "Käivitus ei lõppenud",
+  "main.instance.waiting": "Kodeerimine on veel käimas; {0} avatakse, kui see lõpetab.",
   "main.error.link": "Linki ei saanud avada",
   "main.error.folder": "Kausta ei saanud avada",
   "main.error.setting": "Seadet ei saanud salvestada",

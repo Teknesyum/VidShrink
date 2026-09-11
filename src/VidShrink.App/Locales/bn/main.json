@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg কমান্ড",
 
   "main.error.startup": "চালু হওয়া শেষ হয়নি",
+  "main.instance.waiting": "এনকোডিং চলছে; এটি শেষ হলে {0} খোলা হবে।",
   "main.error.link": "লিংক খোলা যায়নি",
   "main.error.folder": "ফোল্ডার খোলা যায়নি",
   "main.error.setting": "সেটিং সংরক্ষণ করা যায়নি",

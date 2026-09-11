@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg 命令",
 
   "main.error.startup": "启动未完成",
+  "main.instance.waiting": "编码仍在进行中；完成后将打开 {0}。",
   "main.error.link": "链接无法打开",
   "main.error.folder": "文件夹无法打开",
   "main.error.setting": "设置无法保存",

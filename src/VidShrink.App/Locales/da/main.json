@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg-kommando",
 
   "main.error.startup": "Opstarten blev ikke fuldført",
+  "main.instance.waiting": "Kodning kører stadig; {0} åbnes, når den er færdig.",
   "main.error.link": "Linket kunne ikke åbnes",
   "main.error.folder": "Mappen kunne ikke åbnes",
   "main.error.setting": "Indstillingen kunne ikke gemmes",

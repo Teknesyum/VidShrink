@@ -288,6 +288,7 @@
   "main.command.title": "Команда FFmpeg",
 
   "main.error.startup": "Запуск не завершился",
+  "main.instance.waiting": "Кодирование ещё выполняется; {0} откроется, когда оно закончится.",
   "main.error.link": "Не удалось открыть ссылку",
   "main.error.folder": "Не удалось открыть папку",
   "main.error.setting": "Не удалось сохранить настройку",
