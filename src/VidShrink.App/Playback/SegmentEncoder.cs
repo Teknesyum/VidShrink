@@ -9,12 +9,11 @@ namespace VidShrink.App.Playback;
 /// aynı anında başlar ve ikisi de kendi zaman ekseninde sıfırdan akar — hizayı bu kurar.
 /// </summary>
 /// <remarks>
-/// Hiza neden böyle: birleştirilmiş kare tek ffmpeg sürecinde <c>hstack</c> ile üretiliyor
-/// ve <see cref="VidShrink.Ffmpeg.Playback.ComparisonGraph"/> <c>-ss</c>'i <b>iki girdiye de
-/// aynı değerle</b> veriyor. Sağ yarıya 2 sn'lik bir parça, sol yarıya bütün kaynak
-/// konursa aynı <c>-ss</c> iki girdide iki ayrı ana düşer. Bu yüzden sol yarı da aynı
-/// pencereye kesiliyor: iki dosya aynı anda başlayınca <c>hstack</c> hizayı kendiliğinden
-/// tutturuyor. Sol kesit <c>-qp 0</c> ile kayıpsızdır; "orijinal" yarı yeniden
+/// Hiza neden böyle: iki yarı <see cref="EngineComparisonFrameSource"/> içinde iki ayrı
+/// motor örneğinde oynuyor ve ikisi de <b>aynı konuma</b> aranıyor. Sağ yarıya 2 sn'lik
+/// bir parça, sol yarıya bütün kaynak konursa aynı konum iki girdide iki ayrı ana düşer.
+/// Bu yüzden sol yarı da aynı pencereye kesiliyor: iki dosya aynı anda başlayınca hiza
+/// kendiliğinden tutuyor. Sol kesit <c>-qp 0</c> ile kayıpsızdır; "orijinal" yarı yeniden
 /// sıkıştırılmış görünmez.
 /// </remarks>
 internal sealed record PreviewClip

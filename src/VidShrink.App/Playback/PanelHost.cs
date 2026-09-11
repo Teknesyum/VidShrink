@@ -463,8 +463,8 @@ internal sealed class PanelHost : IDisposable
     }
 
     /// <summary>
-    /// Boru başa sarabilir mi. <c>ComparisonGraph</c> <c>-stream_loop -1</c> bayrağını
-    /// <b>iki girdiye ayrı ayrı</b> veriyor, yani her girdi kendi uzunluğunda başa sarıyor.
+    /// Boru başa sarabilir mi. Başa sarma <b>iki motor örneğine ayrı ayrı</b> veriliyor,
+    /// yani her girdi kendi uzunluğunda başa sarıyor.
     /// İki dosyanın süresi eşit değilse aradaki fark her turda birikir ve iki yarı
     /// birbirinden uzaklaşır — kayma sınırsızdır, izleme uzadıkça büyür. Ölçüldü: 4 sn'lik
     /// kaynağın karşısına 3,8 sn'lik bir çıktı konduğunda kayma tur başına 6 kaynak karesi
@@ -976,7 +976,12 @@ internal sealed class PanelHost : IDisposable
             if (!_audio.HasAudio) return;
 
             _audio.SeekTo(atSeconds);
-            if (!_panel.Controls.IsPlaying) _audio.Pause();
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_disposed || !_open || generation != _generation) return;
+                if (_panel.Controls.IsPlaying) _audio.Play();
+                else _audio.Pause();
+            });
         }
         catch
         {

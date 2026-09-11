@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink bukan program bawaan untuk video. Anda dapat memilihnya di halaman Aplikasi default Windows.",
   "settings.default-app.open": "Aplikasi default",
-  "settings.default-app.dismiss": "Jangan tanya lagi"
+  "settings.default-app.dismiss": "Jangan tanya lagi",
+  "settings.player-shortcuts.title": "Pintasan pemutar",
+  "settings.player-shortcuts.hint": "Tab pemutar, menunya, dan daftar ini semua membaca tabel yang sama."
 }

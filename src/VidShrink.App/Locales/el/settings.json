@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "Το VidShrink δεν είναι το προεπιλεγμένο πρόγραμμα για βίντεο. Μπορείτε να το επιλέξετε στη σελίδα Προεπιλεγμένες εφαρμογές των Windows.",
   "settings.default-app.open": "Προεπιλεγμένες εφαρμογές",
-  "settings.default-app.dismiss": "Να μην ερωτηθώ ξανά"
+  "settings.default-app.dismiss": "Να μην ερωτηθώ ξανά",
+  "settings.player-shortcuts.title": "Συντομεύσεις αναπαραγωγής",
+  "settings.player-shortcuts.hint": "Η καρτέλα αναπαραγωγής, το μενού της και αυτή η λίστα διαβάζουν όλα από τον ίδιο πίνακα."
 }

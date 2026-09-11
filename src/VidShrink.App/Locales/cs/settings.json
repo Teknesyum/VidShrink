@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink není výchozí program pro videa. Můžete jej vybrat na stránce Výchozí aplikace ve Windows.",
   "settings.default-app.open": "Výchozí aplikace",
-  "settings.default-app.dismiss": "Už se neptat"
+  "settings.default-app.dismiss": "Už se neptat",
+  "settings.player-shortcuts.title": "Klávesové zkratky přehrávače",
+  "settings.player-shortcuts.hint": "Karta přehrávače, jeho menu a tento seznam čtou ze stejné tabulky."
 }

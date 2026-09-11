@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "A VidShrink nem az alapértelmezett videóprogram. A Windows Alapértelmezett alkalmazások oldalán kiválaszthatja.",
   "settings.default-app.open": "Alapértelmezett alkalmazások",
-  "settings.default-app.dismiss": "Ne kérdezze újra"
+  "settings.default-app.dismiss": "Ne kérdezze újra",
+  "settings.player-shortcuts.title": "Lejátszó gyorsbillentyűi",
+  "settings.player-shortcuts.hint": "A lejátszó lap, annak menüje és ez a lista mind ugyanazt a táblát olvassa."
 }

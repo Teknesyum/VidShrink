@@ -4,9 +4,6 @@
   "playback.player-failed": "ไม่สามารถเริ่มตัวเล่นเปรียบเทียบได้",
   "playback.sample-failed": "ไม่สามารถเข้ารหัสตัวอย่างพรีวิวได้",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "ไม่พบ {0} ตัวเล่นเปรียบเทียบจึงทำงานไม่ได้",
-  "playback.source.hstack-broken": "ฟิลเตอร์ hstack ใช้งานไม่ได้ใน ffmpeg รุ่นนี้ ตัวเล่นเปรียบเทียบจึงเปิดไม่ได้",
-  "playback.source.probe-inconclusive": "การตรวจสอบทำไม่จบ เครื่องอาจกำลังยุ่ง ลองเปิดตัวเล่นอีกครั้ง",
   "playback.error.exit-code": "ffmpeg ส่งรหัสออก {0}",
   "playback.error.engine": "ข้อความจากเอนจิน: {0}",
   "playback.error.no-file": "ไม่ได้สร้างไฟล์คลิป",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "ไทม์ไลน์",
   "playback.control.strip": "แถบควบคุม",
   "playback.control.pause": "หยุดชั่วคราว",
-  "playback.control.play": "เล่น",
-  "playback.pipe.seek-timeout": "การค้นหาตำแหน่งไม่ส่งเฟรมภายใน {0} ms จึงยกเลิก",
-  "playback.pipe.seek-restarts": "การค้นหาตำแหน่งยกเลิกหลังเริ่มใหม่ {0} ครั้งโดยไม่ได้เฟรม",
-  "playback.pipe.no-start": "ffmpeg เริ่มไม่ได้ ไปป์จึงว่างอยู่",
-  "playback.pipe.decoder-died": "โปรเซสถอดรหัสหยุดทำงานโดยไม่คาดคิด ไปป์จะสร้างตัวเองใหม่เมื่อค้นหาตำแหน่งครั้งถัดไป",
-  "playback.pipe.decoder-unkillable": "ไม่สามารถปิดโปรเซส ffmpeg ตัวถอดรหัสได้ และอาจยังทำงานอยู่",
-  "playback.pipe.audio-unkillable": "ไม่สามารถปิดโปรเซส ffmpeg ฝั่งเสียงได้ และอาจยังทำงานอยู่"
+  "playback.control.play": "เล่น"
 }

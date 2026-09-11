@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink는 영상의 기본 프로그램이 아닙니다. Windows 기본 앱 페이지에서 선택할 수 있습니다.",
   "settings.default-app.open": "기본 앱",
-  "settings.default-app.dismiss": "다시 묻지 않기"
+  "settings.default-app.dismiss": "다시 묻지 않기",
+  "settings.player-shortcuts.title": "플레이어 단축키",
+  "settings.player-shortcuts.hint": "플레이어 탭, 메뉴, 이 목록은 모두 같은 표를 참조합니다."
 }

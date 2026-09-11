@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink वीडियो के लिए डिफ़ॉल्ट प्रोग्राम नहीं है। आप इसे Windows के डिफ़ॉल्ट ऐप पेज पर चुन सकते हैं।",
   "settings.default-app.open": "डिफ़ॉल्ट ऐप",
-  "settings.default-app.dismiss": "फिर न पूछें"
+  "settings.default-app.dismiss": "फिर न पूछें",
+  "settings.player-shortcuts.title": "प्लेयर शॉर्टकट",
+  "settings.player-shortcuts.hint": "प्लेयर टैब, इसका मेनू और यह सूची सभी एक ही टेबल से पढ़ते हैं।"
 }

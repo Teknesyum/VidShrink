@@ -18,6 +18,8 @@ namespace VidShrink.App.Playback;
 
 internal partial class PlayerView : UserControl
 {
+    internal const int HistorySaveTicks = 10;
+
     private readonly ZoomGesture _zoom = new();
     private readonly FullscreenSwitch _fullscreen = new();
     private readonly StallWatch _stall = new();
@@ -28,10 +30,18 @@ internal partial class PlayerView : UserControl
     private WriteableBitmap? _bitmap;
     private DispatcherTimer? _watchdog;
     private DispatcherTimer? _render;
+    private PlaybackHistory _history = new();
     private long _shown;
     private string? _path;
     private bool _playing;
+    private bool _trackPaused;
     private int _leftClicks;
+    private int _watchdogTicks;
+    private double _volume = 100;
+    private bool _muted;
+    private double _speed = 1;
+    private double _loopStart = double.NaN;
+    private double _loopEnd = double.NaN;
 
     public PlayerView()
     {
@@ -64,6 +74,18 @@ internal partial class PlayerView : UserControl
 
     internal double ZoomScale => _zoom.PanelScale;
 
+    internal double VolumeLevel => _volume;
+
+    internal bool IsMuted => _muted;
+
+    internal double SpeedFactor => _speed;
+
+    internal double LoopStart => _loopStart;
+
+    internal double LoopEnd => _loopEnd;
+
+    internal PlaybackHistory History => _history;
+
     internal IReadOnlyList<string> Trace => _trace.ToArray();
 
     internal string? LoadedPath => _path;
@@ -72,20 +94,13 @@ internal partial class PlayerView : UserControl
 
     internal Func<IPlaybackEngine> EngineFactory { get; set; } = () => new MpvEngine();
 
+    internal Func<string>? HistoryPath { get; set; }
+
     internal Func<int> PlayerTabIndex { get; set; } = () => 0;
 
     internal Func<int> CurrentTabIndex { get; set; } = () => 0;
 
     internal Action<int>? SelectTab { get; set; }
-
-    internal static PlayerModifiers Translate(KeyModifiers modifiers)
-    {
-        var value = PlayerModifiers.None;
-        if ((modifiers & KeyModifiers.Control) != 0) value |= PlayerModifiers.Ctrl;
-        if ((modifiers & KeyModifiers.Shift) != 0) value |= PlayerModifiers.Shift;
-        if ((modifiers & KeyModifiers.Alt) != 0) value |= PlayerModifiers.Alt;
-        return value;
-    }
 
     internal void Apply(PlayerCommand command)
     {
@@ -117,6 +132,49 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.LeaveFullscreen:
                 if (_fullscreen.IsFullscreen) ToggleFullscreen();
+                _trace.Add("leavefullscreen -> " + _fullscreen.IsFullscreen);
+                break;
+            case PlayerCommandKind.Volume:
+                _volume = Math.Clamp(_volume + command.Amount, 0, 100);
+                _engine?.SetVolume(_volume);
+                _trace.Add("volume " + command.Amount.ToString("0.###") + " -> " + _volume.ToString("0.###"));
+                break;
+            case PlayerCommandKind.ToggleMute:
+                _muted = !_muted;
+                _engine?.SetMuted(_muted);
+                _trace.Add("mute -> " + _muted);
+                break;
+            case PlayerCommandKind.Speed:
+                _speed = Math.Clamp(Math.Round(_speed + command.Amount, 2), Keymap.MinimumSpeed, Keymap.MaximumSpeed);
+                _engine?.SetSpeed(_speed);
+                _trace.Add("speed " + command.Amount.ToString("0.###") + " -> " + _speed.ToString("0.###"));
+                break;
+            case PlayerCommandKind.SpeedReset:
+                _speed = 1;
+                _engine?.SetSpeed(_speed);
+                _trace.Add("speedreset -> " + _speed.ToString("0.###"));
+                break;
+            case PlayerCommandKind.FrameStep:
+                StepFrame(command.Amount < 0);
+                _trace.Add("frame " + command.Amount.ToString("0.###"));
+                break;
+            case PlayerCommandKind.LoopStart:
+                MarkLoopStart();
+                break;
+            case PlayerCommandKind.LoopEnd:
+                MarkLoopEnd();
+                break;
+            case PlayerCommandKind.LoopClear:
+                _loopStart = double.NaN;
+                _loopEnd = double.NaN;
+                _engine?.SetLoop(_loopStart, _loopEnd);
+                _trace.Add("loopclear");
+                break;
+            case PlayerCommandKind.BookmarkAdd:
+                AddBookmark();
+                break;
+            case PlayerCommandKind.BookmarkNext:
+                NextBookmark();
                 break;
             default:
                 _trace.Add("none");
@@ -136,22 +194,99 @@ internal partial class PlayerView : UserControl
         catch (IOException) { }
     }
 
-    internal void FeedWheel(double notches, PlayerModifiers modifiers)
-        => Apply(PlayerInputMap.Wheel(notches, modifiers));
+    internal void FeedWheel(double notches, KeyModifiers modifiers)
+        => Apply(Keymap.ForWheel(notches, modifiers));
 
-    internal void FeedPress(PlayerButton button)
+    internal void FeedPress(PlayerButton button, int clicks = 1)
     {
         if (button == PlayerButton.Left) _leftClicks++;
-        Apply(PlayerInputMap.Press(button));
+        Apply(Keymap.ForPress(button, clicks));
     }
 
-    internal void FeedKey(PlayerKey key) => Apply(PlayerInputMap.Key(key));
+    internal bool FeedKey(Key key, KeyModifiers modifiers = KeyModifiers.None, string? symbol = null)
+    {
+        var command = Keymap.ForKey(key, modifiers, symbol);
+        if (command.Kind == PlayerCommandKind.None) return false;
+        Apply(command);
+        return true;
+    }
+
+    internal double CurrentPosition()
+    {
+        if (_engine is { IsOpen: true } engine && _seek.Idle.IsCompleted)
+        {
+            var at = engine.PositionSeconds;
+            if (double.IsFinite(at)) return at;
+        }
+
+        return _seek.Target;
+    }
+
+    private void StepFrame(bool backward)
+    {
+        if (_engine is not { } engine) return;
+        _playing = false;
+        _trackPaused = true;
+        _stall.Reset();
+        engine.StepFrame(backward);
+    }
+
+    private void MarkLoopStart()
+    {
+        _loopStart = CurrentPosition();
+        if (double.IsFinite(_loopEnd) && _loopEnd <= _loopStart) _loopEnd = double.NaN;
+        _engine?.SetLoop(_loopStart, _loopEnd);
+        _trace.Add("loop a -> " + _loopStart.ToString("0.###"));
+    }
+
+    private void MarkLoopEnd()
+    {
+        var at = CurrentPosition();
+        var start = double.IsFinite(_loopStart) ? _loopStart : 0;
+        if (at <= start)
+        {
+            _trace.Add("loop b -> no");
+            return;
+        }
+
+        _loopStart = start;
+        _loopEnd = at;
+        _engine?.SetLoop(_loopStart, _loopEnd);
+        _trace.Add("loop b -> " + _loopEnd.ToString("0.###"));
+    }
+
+    private void AddBookmark()
+    {
+        if (_path is not { } path)
+        {
+            _trace.Add("bookmarkadd -> no");
+            return;
+        }
+
+        var at = CurrentPosition();
+        _history.AddBookmark(path, at);
+        _history.Save(HistoryPath?.Invoke());
+        _trace.Add("bookmarkadd -> " +at.ToString("0.###"));
+    }
+
+    private void NextBookmark()
+    {
+        if (_path is not { } path || _history.NextBookmark(path, CurrentPosition()) is not { } next)
+        {
+            _trace.Add("bookmarknext -> no");
+            return;
+        }
+
+        _trackPaused = false;
+        _seek.GoTo(next);
+        _trace.Add("bookmarknext -> " +next.ToString("0.###"));
+    }
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)
     {
         var notches = e.Delta.Y != 0 ? e.Delta.Y : e.Delta.X;
         if (notches == 0) return;
-        FeedWheel(notches, Translate(e.KeyModifiers));
+        FeedWheel(notches, e.KeyModifiers);
         e.Handled = true;
     }
 
@@ -164,8 +299,8 @@ internal partial class PlayerView : UserControl
         else if (point.Properties.IsLeftButtonPressed) button = PlayerButton.Left;
         else return;
 
-        FeedPress(button);
-        if (button != PlayerButton.Left) e.Handled = true;
+        FeedPress(button, e.ClickCount);
+        if (button != PlayerButton.Left || e.ClickCount >= 2) e.Handled = true;
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -182,35 +317,32 @@ internal partial class PlayerView : UserControl
         Strings.Changed -= OnLanguageChanged;
         if (TopLevel.GetTopLevel(this) is { } top)
             top.RemoveHandler(KeyDownEvent, OnKey);
+        SaveHistory(false);
         base.OnDetachedFromVisualTree(e);
     }
 
     private void OnKey(object? sender, KeyEventArgs e)
     {
-        if (!IsEffectivelyVisible) return;
-
-        var key = e.Key switch
-        {
-            Key.Space => PlayerKey.Space,
-            Key.Apps => PlayerKey.Menu,
-            Key.Escape => PlayerKey.Escape,
-            _ => PlayerKey.None
-        };
-
-        if (key == PlayerKey.None) return;
-        FeedKey(key);
-        e.Handled = true;
+        if (e.Handled || !IsEffectivelyVisible) return;
+        if (e.Source is TextBox) return;
+        if (FeedKey(e.Key, e.KeyModifiers, e.KeySymbol)) e.Handled = true;
     }
 
     private void OnMenuButton(object? sender, RoutedEventArgs e)
-        => Apply(PlayerInputMap.MenuButton());
+        => Apply(Keymap.OpenMenu.ToCommand());
 
     internal MenuFlyout BuildMenu()
     {
         var flyout = new MenuFlyout();
-        foreach (var (row, key) in PlayerInputMap.MenuRows)
+        var group = 0;
+        foreach (var action in Keymap.MenuActions)
         {
-            var item = new MenuItem { Header = Strings.Get(key), Tag = row };
+            if (group != 0 && action.MenuGroup != group) flyout.Items.Add(new Separator());
+            group = action.MenuGroup;
+
+            var item = new MenuItem { Header = Strings.Get(action.LabelKey), Tag = action };
+            if (Keymap.FirstKeyRow(action) is { } row)
+                item.InputGesture = new KeyGesture(row.Input.Key, row.Input.Modifiers);
             item.Click += OnMenuRow;
             flyout.Items.Add(item);
         }
@@ -220,8 +352,8 @@ internal partial class PlayerView : UserControl
 
     private void OnMenuRow(object? sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Tag: PlayerMenuRow row })
-            Apply(PlayerInputMap.MenuRow(row));
+        if (sender is MenuItem { Tag: PlayerAction action })
+            Apply(action.ToCommand());
     }
 
     private void OpenMenu()
@@ -264,6 +396,7 @@ internal partial class PlayerView : UserControl
     internal void TogglePlay()
     {
         _playing = !_playing;
+        _trackPaused = false;
         if (_engine is not { } engine) return;
 
         _stall.Reset();
@@ -275,6 +408,7 @@ internal partial class PlayerView : UserControl
         {
             _seek.Follow(engine.PositionSeconds);
             engine.Pause();
+            SaveHistory(false);
         }
     }
 
@@ -293,9 +427,13 @@ internal partial class PlayerView : UserControl
     {
         if (_engine is not { } engine) return false;
         var drawn = engine.TryCopyLatest(ref _shown, DrawFrame);
-        if (drawn && _playing) _seek.Follow(engine.PositionSeconds);
+        if (drawn && (_playing || _trackPaused)) _seek.Follow(engine.PositionSeconds);
         if (drawn) RefreshState();
-        if (_playing && engine.EndReached) TogglePlay();
+        if (_playing && engine.EndReached)
+        {
+            TogglePlay();
+            SaveHistory(true);
+        }
         return drawn;
     }
 
@@ -323,13 +461,28 @@ internal partial class PlayerView : UserControl
         _engine = engine;
         _path = path;
         _seek.Duration = engine.DurationSeconds > 0 ? engine.DurationSeconds : double.PositiveInfinity;
+        _loopStart = double.NaN;
+        _loopEnd = double.NaN;
+        if (HistoryPath?.Invoke() is { } file) _history = PlaybackHistory.Load(file);
+        if (_volume != 100) engine.SetVolume(_volume);
+        if (_muted) engine.SetMuted(true);
+        if (_speed != 1) engine.SetSpeed(_speed);
 
         TxtEmpty.IsVisible = false;
         StartWatchdog();
         StartRender();
-        _seek.GoTo(0);
+        var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
+        _seek.GoTo(resume);
+        if (resume > 0) _trace.Add("resume -> " + resume.ToString("0.###"));
         if (!_playing) TogglePlay();
         RefreshState();
+    }
+
+    private void SaveHistory(bool finished)
+    {
+        if (_path is not { } path || HistoryPath?.Invoke() is not { } file) return;
+        _history.Remember(path, CurrentPosition(), finished);
+        _history.Save(file);
     }
 
     private void OnFaulted(object? sender, PlaybackFault fault)
@@ -345,9 +498,18 @@ internal partial class PlayerView : UserControl
     private void StartWatchdog()
     {
         _watchdog?.Stop();
+        _watchdogTicks = 0;
         _watchdog = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
-        _watchdog.Tick += (_, _) => PollStall(Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency);
+        _watchdog.Tick += (_, _) => OnWatchdog();
         _watchdog.Start();
+    }
+
+    private void OnWatchdog()
+    {
+        PollStall(Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency);
+        if (!_playing) return;
+        _watchdogTicks++;
+        if (_watchdogTicks % HistorySaveTicks == 0) SaveHistory(false);
     }
 
     internal void PollStall(double nowSeconds)
@@ -436,10 +598,21 @@ internal partial class PlayerView : UserControl
             _seek.Target.ToString("0.###"),
             _playing ? Strings.Get("main.player.playing") : Strings.Get("main.player.paused"),
             (_zoom.PanelScale * 100).ToString("0"));
+
+        if (TxtControls is null) return;
+        var parts = new List<string> { Strings.Get("main.player.volume", _volume.ToString("0")) };
+        if (_muted) parts.Add(Strings.Get("main.player.muted"));
+        parts.Add(Strings.Get("main.player.speed", _speed.ToString("0.##")));
+        parts.Add(double.IsFinite(_loopStart)
+            ? Strings.Get("main.player.loopstate", _loopStart.ToString("0.##"), double.IsFinite(_loopEnd) ? _loopEnd.ToString("0.##") : "…")
+            : Strings.Get("main.player.loopoff"));
+        parts.Add(Strings.Get("main.player.bookmarkcount", _path is null ? 0 : _history.Bookmarks(_path).Count));
+        TxtControls.Text = string.Join(" - ", parts);
     }
 
     internal void Close()
     {
+        SaveHistory(false);
         _watchdog?.Stop();
         _watchdog = null;
         _render?.Stop();
@@ -454,5 +627,6 @@ internal partial class PlayerView : UserControl
         _shown = 0;
         _path = null;
         _playing = false;
+        _trackPaused = false;
     }
 }

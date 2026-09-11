@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nije zadani program za videozapise. Možete ga odabrati na stranici Zadane aplikacije u Windowsima.",
   "settings.default-app.open": "Zadane aplikacije",
-  "settings.default-app.dismiss": "Ne pitaj više"
+  "settings.default-app.dismiss": "Ne pitaj više",
+  "settings.player-shortcuts.title": "Prečaci preglednika",
+  "settings.player-shortcuts.hint": "Kartica preglednika, njezin izbornik i ovaj popis svi čitaju istu tablicu."
 }

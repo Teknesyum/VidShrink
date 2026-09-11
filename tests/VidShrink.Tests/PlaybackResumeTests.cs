@@ -6,7 +6,6 @@ using Avalonia.VisualTree;
 using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Core.Playback;
-using VidShrink.Ffmpeg.Playback;
 
 namespace VidShrink.Tests;
 
@@ -497,7 +496,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
 
     /// <summary>
     /// K3'un ikinci yarisi, boru tarafi (denetim bulgusu D3). Gercek
-    /// <see cref="PipeComparisonFrameSource"/> uzerinde olculuyor, konak hic isin icinde
+    /// <see cref="EngineComparisonFrameSource"/> uzerinde olculuyor, konak hic isin icinde
     /// degil: kareler alinir, <c>Pause()</c> sonrasi halka bosaltilir (bekleyen kare kalmasin,
     /// yoksa "devam etti" sonucu <c>Play()</c> hic calismadan da cikardi), <c>Play()</c>
     /// sonrasi gelen ilk karenin damgasi duraklamadaki son damganin <b>hemen ardinda</b> mi
@@ -510,7 +509,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
     public async Task Duraklatilan_boru_kaldigi_karenin_ardindan_surer()
     {
         Assert.True(_clips.Ready);
-        using var source = new PipeComparisonFrameSource();
+        using var source = new EngineComparisonFrameSource();
         await source.StartAsync(new ComparisonFrameRequest
         {
             LeftPath = _clips.Kaynak,

@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink ไม่ใช่โปรแกรมเริ่มต้นสำหรับวิดีโอ คุณเลือกได้ในหน้าแอปเริ่มต้นของ Windows",
   "settings.default-app.open": "แอปเริ่มต้น",
-  "settings.default-app.dismiss": "ไม่ต้องถามอีก"
+  "settings.default-app.dismiss": "ไม่ต้องถามอีก",
+  "settings.player-shortcuts.title": "ปุ่มลัดตัวเล่น",
+  "settings.player-shortcuts.hint": "แท็บตัวเล่น เมนูของมัน และรายการนี้ ทั้งหมดอ่านจากตารางเดียวกัน"
 }

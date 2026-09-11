@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink videolar için varsayılan program değil. Windows'un Varsayılan uygulamalar sayfasından seçebilirsiniz.",
   "settings.default-app.open": "Varsayılan uygulamalar",
-  "settings.default-app.dismiss": "Bir daha sorma"
+  "settings.default-app.dismiss": "Bir daha sorma",
+  "settings.player-shortcuts.title": "Oynatıcı kısayolları",
+  "settings.player-shortcuts.hint": "Oynatıcı sekmesi, menüsü ve bu liste aynı tablodan okur."
 }

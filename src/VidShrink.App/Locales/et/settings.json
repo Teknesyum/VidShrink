@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink pole videote vaikeprogramm. Saad selle valida Windowsi vaikerakenduste lehel.",
   "settings.default-app.open": "Vaikerakendused",
-  "settings.default-app.dismiss": "Ära enam küsi"
+  "settings.default-app.dismiss": "Ära enam küsi",
+  "settings.player-shortcuts.title": "Mängija kiirklahvid",
+  "settings.player-shortcuts.hint": "Mängija vahekaart, selle menüü ja see loend loevad kõik sama tabelit."
 }

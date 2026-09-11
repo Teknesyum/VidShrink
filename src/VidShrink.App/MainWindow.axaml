@@ -1136,6 +1136,8 @@
                 </StackPanel>
               </Border>
 
+              <playback:PlayerShortcutsPanel x:Name="PlayerShortcutsPanel"/>
+
               <Border x:Name="ResetSettingsPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnResetSettings"

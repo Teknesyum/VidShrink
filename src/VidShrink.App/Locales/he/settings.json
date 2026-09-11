@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink אינו התוכנית המוגדרת כברירת מחדל לווידאו. אפשר לבחור בו בעמוד יישומי ברירת המחדל של Windows.",
   "settings.default-app.open": "יישומי ברירת מחדל",
-  "settings.default-app.dismiss": "אל תשאל שוב"
+  "settings.default-app.dismiss": "אל תשאל שוב",
+  "settings.player-shortcuts.title": "קיצורי מקלדת של הנגן",
+  "settings.player-shortcuts.hint": "לשונית הנגן, התפריט שלה ורשימה זו כולם קוראים מאותה טבלה."
 }

@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:VidShrink.App.Localization"
+             x:Class="VidShrink.App.Playback.PlayerShortcutsPanel">
+  <Border Theme="{StaticResource Panel}">
+    <StackPanel Spacing="{StaticResource SpaceMd}">
+      <TextBlock Text="{loc:Text settings.player-shortcuts.title}" Theme="{StaticResource H2}"/>
+      <TextBlock Text="{loc:Text settings.player-shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+      <Grid x:Name="Rows"
+            ColumnDefinitions="Auto,*"
+            ColumnSpacing="{StaticResource SpaceLg}"
+            RowSpacing="{StaticResource SpaceXs}"/>
+    </StackPanel>
+  </Border>
+</UserControl>

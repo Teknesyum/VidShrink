@@ -4,9 +4,6 @@
   "playback.player-failed": "Il lettore di confronto non si è avviato",
   "playback.sample-failed": "Il campione di anteprima non è stato codificato",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} non è stato trovato, quindi il lettore di confronto non può funzionare.",
-  "playback.source.hstack-broken": "Il filtro hstack non funziona in questa build di ffmpeg, quindi il lettore di confronto non può aprirsi.",
-  "playback.source.probe-inconclusive": "La verifica non è stata completata, la macchina potrebbe essere occupata; prova a riaprire il lettore.",
   "playback.error.exit-code": "ffmpeg ha restituito il codice di uscita {0}.",
   "playback.error.engine": "messaggio del motore: {0}",
   "playback.error.no-file": "Il file della clip non è stato creato.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Linea temporale",
   "playback.control.strip": "Barra dei controlli",
   "playback.control.pause": "Pausa",
-  "playback.control.play": "Riproduci",
-  "playback.pipe.seek-timeout": "La ricerca non ha fornito un fotogramma entro {0} ms, quindi è stata abbandonata.",
-  "playback.pipe.seek-restarts": "La ricerca è stata abbandonata dopo {0} riavvii senza fornire un fotogramma.",
-  "playback.pipe.no-start": "ffmpeg non si è avviato, quindi la pipe è rimasta inattiva.",
-  "playback.pipe.decoder-died": "Il processo del decoder si è chiuso inaspettatamente; la pipe si ricostruisce alla prossima ricerca.",
-  "playback.pipe.decoder-unkillable": "Il processo ffmpeg del decoder non è stato terminato e potrebbe essere ancora in esecuzione.",
-  "playback.pipe.audio-unkillable": "Il processo ffmpeg dell'audio non è stato terminato e potrebbe essere ancora in esecuzione."
+  "playback.control.play": "Riproduci"
 }
