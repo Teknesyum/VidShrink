@@ -40,7 +40,11 @@ internal enum PlayerCommandKind
     LoopEnd,
     LoopClear,
     BookmarkAdd,
-    BookmarkNext
+    BookmarkNext,
+    AudioCycle,
+    SubtitleCycle,
+    SubtitleDelay,
+    AudioDelay
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)

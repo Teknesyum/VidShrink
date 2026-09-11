@@ -920,26 +920,29 @@ public sealed class LanguageTests : IDisposable
     [Fact]
     public void DilDegisinceEkrandaOtekiDilinMetniKalmiyor()
     {
-        var (first, second, third) = AppHost.Run(() =>
+        var (first, second, third, neutral) = AppHost.Run(() =>
         {
             var window = new MainWindow();
             window.UseTurkish();
 
             var a = Sweep(window);
+            var tuslarTr = Keymap.Rows.Select(row => Keymap.Gesture(row.Input)).ToHashSet(StringComparer.Ordinal);
             Strings.Use("en");
             var b = Sweep(window);
+            var tuslarEn = Keymap.Rows.Select(row => Keymap.Gesture(row.Input)).ToHashSet(StringComparer.Ordinal);
             Strings.Use("tr");
             var c = Sweep(window);
 
-            return (a, b, c);
+            tuslarTr.IntersectWith(tuslarEn);
+            return (a, b, c, tuslarTr);
         });
 
-        AssertNoForeignText("tr", first);
-        AssertNoForeignText("en", second);
-        AssertNoForeignText("tr", third);
+        AssertNoForeignText("tr", first, neutral);
+        AssertNoForeignText("en", second, neutral);
+        AssertNoForeignText("tr", third, neutral);
     }
 
-    private static void AssertNoForeignText(string language, IReadOnlyCollection<string> shown)
+    private static void AssertNoForeignText(string language, IReadOnlyCollection<string> shown, IReadOnlySet<string> neutral)
     {
         var other = string.Equals(language, "tr", StringComparison.Ordinal) ? "en" : "tr";
         var mine = Locales.Values(language);
@@ -954,6 +957,7 @@ public sealed class LanguageTests : IDisposable
             foreign.Add(LanguageCatalog.Title(value, string.Equals(language, "tr", StringComparison.Ordinal) ? "en" : "tr"));
         }
 
+        foreign.ExceptWith(neutral);
         var caught = shown.Where(foreign.Contains).Distinct().ToList();
 
         Assert.True(caught.Count == 0,

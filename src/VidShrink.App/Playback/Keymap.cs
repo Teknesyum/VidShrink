@@ -134,7 +134,13 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift), Shuffle),
         new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift), RepeatCycle),
         new(PlayerInput.OnKey(Key.N), BookmarkAdd),
-        new(PlayerInput.OnKey(Key.B), BookmarkNext)
+        new(PlayerInput.OnKey(Key.B), BookmarkNext),
+        new(PlayerInput.OnKey(Key.A), SubtitleOptions.AudioCycle),
+        new(PlayerInput.OnKey(Key.S), SubtitleOptions.SubtitleCycle),
+        new(PlayerInput.OnSymbol(">", Key.OemPeriod), SubtitleOptions.SubtitleLater),
+        new(PlayerInput.OnSymbol("<", Key.OemComma), SubtitleOptions.SubtitleEarlier),
+        new(PlayerInput.OnKey(Key.OemPeriod, KeyModifiers.Control), SubtitleOptions.AudioLater),
+        new(PlayerInput.OnKey(Key.OemComma, KeyModifiers.Control), SubtitleOptions.AudioEarlier)
     };
 
     internal static readonly IReadOnlyList<PlayerAction> MenuActions = new[]
@@ -199,7 +205,7 @@ internal static class Keymap
         var action = row.Action;
         return action.Command switch
         {
-            PlayerCommandKind.Seek or PlayerCommandKind.Volume => Strings.Get(action.LabelKey, Signed(action.Amount, row.Input.Kind == PlayerInputKind.Wheel)),
+            PlayerCommandKind.Seek or PlayerCommandKind.Volume or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay => Strings.Get(action.LabelKey, Signed(action.Amount, row.Input.Kind == PlayerInputKind.Wheel)),
             _ => Strings.Get(action.LabelKey)
         };
     }
@@ -224,6 +230,8 @@ internal static class Keymap
             Key.Right => "→",
             Key.Up => "↑",
             Key.Down => "↓",
+            Key.OemComma => ",",
+            Key.OemPeriod => ".",
             Key.PageUp => "PgUp",
             Key.PageDown => "PgDn",
             _ => input.Key.ToString()
