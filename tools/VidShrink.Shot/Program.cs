@@ -758,6 +758,7 @@ internal static class Host
         {
             AppBuilder.Configure<VidShrink.App.App>()
                 .UseSkia()
+                .UseHarfBuzz()
                 .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false })
                 .SetupWithoutStarting();
 

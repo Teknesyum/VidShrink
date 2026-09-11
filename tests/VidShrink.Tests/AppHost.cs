@@ -45,7 +45,7 @@ internal static class AppHost
             {
                 if (Application.Current is null)
                 {
-                    var builder = AppBuilder.Configure<VidShrink.App.App>().UseSkia();
+                    var builder = AppBuilder.Configure<VidShrink.App.App>().UseSkia().UseHarfBuzz();
                     builder = Backend == "Win32"
                         ? builder.UseWin32()
                         : builder.UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
