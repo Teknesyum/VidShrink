@@ -4,9 +4,6 @@
   "playback.player-failed": "تعذر بدء مشغّل المقارنة",
   "playback.sample-failed": "تعذر ترميز عيّنة المعاينة",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "لم يُعثر على {0}، فلا يمكن تشغيل مشغّل المقارنة.",
-  "playback.source.hstack-broken": "مرشح hstack لا يعمل في بناء ffmpeg هذا، فلا يمكن فتح مشغّل المقارنة.",
-  "playback.source.probe-inconclusive": "تعذر إتمام الفحص، قد يكون الجهاز مشغولاً؛ جرّب فتح المشغّل مجدداً.",
   "playback.error.exit-code": "أعاد ffmpeg رمز الخروج {0}.",
   "playback.error.engine": "رسالة المحرك: {0}",
   "playback.error.no-file": "لم يُنشأ ملف المقطع.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "الخط الزمني",
   "playback.control.strip": "شريط التحكم",
   "playback.control.pause": "إيقاف مؤقت",
-  "playback.control.play": "تشغيل",
-  "playback.pipe.seek-timeout": "لم يسلّم الانتقال إطاراً خلال {0} م.ث، فتم التخلي عنه.",
-  "playback.pipe.seek-restarts": "تخلى الانتقال بعد {0} إعادة تشغيل دون تسليم إطار.",
-  "playback.pipe.no-start": "تعذر بدء ffmpeg، فبقي الأنبوب خاملاً.",
-  "playback.pipe.decoder-died": "مات عملية فك الترميز على نحو غير متوقع؛ يعيد الأنبوب بناء نفسه عند الانتقال التالي.",
-  "playback.pipe.decoder-unkillable": "تعذر إنهاء عملية ffmpeg لفك الترميز وقد تكون ما زالت تعمل.",
-  "playback.pipe.audio-unkillable": "تعذر إنهاء عملية ffmpeg للصوت وقد تكون ما زالت تعمل."
+  "playback.control.play": "تشغيل"
 }

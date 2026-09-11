@@ -4,9 +4,6 @@
   "playback.player-failed": "Не вдалося запустити плеєр порівняння",
   "playback.sample-failed": "Не вдалося закодувати зразок перегляду",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} не знайдено, тож плеєр порівняння не може працювати.",
-  "playback.source.hstack-broken": "Фільтр hstack не працює в цій збірці ffmpeg, тож плеєр порівняння не відкривається.",
-  "playback.source.probe-inconclusive": "Перевірку не вдалося завершити, машина може бути зайнята; спробуйте відкрити плеєр знову.",
   "playback.error.exit-code": "ffmpeg повернув код виходу {0}.",
   "playback.error.engine": "повідомлення рушія: {0}",
   "playback.error.no-file": "Файл кліпу не створено.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Часова шкала",
   "playback.control.strip": "Смуга керування",
   "playback.control.pause": "Пауза",
-  "playback.control.play": "Відтворити",
-  "playback.pipe.seek-timeout": "Перемотування не дало кадру за {0} мс, тож його припинено.",
-  "playback.pipe.seek-restarts": "Перемотування припинено після {0} перезапусків без кадру.",
-  "playback.pipe.no-start": "ffmpeg не вдалося запустити, тож канал лишився бездіяльним.",
-  "playback.pipe.decoder-died": "Процес декодера несподівано завершився; канал перебудується при наступному перемотуванні.",
-  "playback.pipe.decoder-unkillable": "Процес ffmpeg декодера не вдалося зупинити, він може досі працювати.",
-  "playback.pipe.audio-unkillable": "Процес ffmpeg звуку не вдалося зупинити, він може досі працювати."
+  "playback.control.play": "Відтворити"
 }

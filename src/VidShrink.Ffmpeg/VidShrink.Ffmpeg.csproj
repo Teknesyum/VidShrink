@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VidShrink.Core\VidShrink.Core.csproj" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
   <PropertyGroup>

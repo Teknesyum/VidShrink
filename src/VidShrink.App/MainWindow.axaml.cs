@@ -32,7 +32,6 @@ using VidShrink.App.Playback;
 using VidShrink.Core;
 using CoreShare = VidShrink.Core.Share;
 using VidShrink.Ffmpeg;
-using VidShrink.Ffmpeg.Playback;
 
 namespace VidShrink.App;
 
@@ -141,7 +140,7 @@ public partial class MainWindow : Window
 
         // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
         // panel hangi motorun kare ürettiğini bilmez.
-        _preview = new PanelHost(Preview, () => new PipeComparisonFrameSource());
+        _preview = new PanelHost(Preview, () => new EngineComparisonFrameSource());
 
         Player.PlayerTabIndex = () => PlayerTabIndex;
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;

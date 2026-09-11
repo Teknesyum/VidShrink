@@ -2,7 +2,6 @@ using VidShrink.App;
 using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Core.Playback;
-using VidShrink.Ffmpeg.Playback;
 
 namespace VidShrink.Tests;
 
@@ -514,7 +513,7 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
             var gecis = PanelHost.SwapAt(once.DurationSeconds, Fps);
             var hazirlik = once.DurationSeconds - (pay ?? PanelHost.HandoverLead);
 
-            PipeComparisonFrameSource? yeni = null;
+            EngineComparisonFrameSource? yeni = null;
             Task? acilis = null;
             var oynanan = 0.0;
             var sonEski = System.Diagnostics.Stopwatch.StartNew();
@@ -624,10 +623,10 @@ public sealed class PanelHostTests : IClassFixture<SegmentClips>
     private const int OlcumPanelWidth = 640;
     private const int OlcumPanelHeight = 360;
 
-    private static PipeComparisonFrameSource Pipe(PreviewClip clip)
+    private static EngineComparisonFrameSource Pipe(PreviewClip clip)
     {
         _ = clip;
-        return new PipeComparisonFrameSource();
+        return new EngineComparisonFrameSource();
     }
 
     private static ComparisonFrameRequest Istek(PreviewClip clip) => new()

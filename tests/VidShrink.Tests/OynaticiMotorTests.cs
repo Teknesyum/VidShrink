@@ -447,7 +447,27 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
     public OynaticiMotorTestsGirdi(GirdiKlipFixture klip) => _klip = klip;
 
     [Fact]
-    public async Task OnHizliTikMotoraKarsiBirikirVeAramalarSinirdaKalir()
+    public async Task OnHizliTikMotoraKarsiBirikirVeHepsiGosterilir()
+    {
+        var (coalescer, gosterilmeyen) = await OnTikKosAsync();
+
+        Assert.Equal(10, coalescer.Target);
+        Assert.Equal(10, coalescer.Position);
+        Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
+        Assert.NotEmpty(coalescer.LatenciesMs);
+        Assert.Empty(gosterilmeyen);
+    }
+
+    [HedefMakineFact]
+    public async Task OnHizliTikteAramalarYuzElliMilisaniyeSinirindaKalir()
+    {
+        var (coalescer, _) = await OnTikKosAsync();
+
+        var asan = coalescer.LatenciesMs.Where(ms => ms > 150).ToList();
+        Assert.True(asan.Count == 0, "150 ms sinirini asan arama: " + string.Join(", ", asan.Select(MotorKanit.Ms)));
+    }
+
+    private async Task<(SeekCoalescer Coalescer, List<SeekOutcome> Gosterilmeyen)> OnTikKosAsync()
     {
         Assert.True(_klip.ClipPath is not null, "girdi klibi uretilemedi; ffmpeg gerekli");
         var path = _klip.ClipPath!;
@@ -479,14 +499,7 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
         body.AppendLine("gosterilmeyen arama: " + (gosterilmeyen.Count == 0 ? "yok" : string.Join(", ", gosterilmeyen)));
         body.AppendLine("arama hatalari: " + (coalescer.Failures.Count == 0 ? "yok" : string.Join(" | ", coalescer.Failures)));
         MotorKanit.Write("k6-on-tik-motor.txt", body.ToString());
-
-        Assert.Equal(10, coalescer.Target);
-        Assert.Equal(10, coalescer.Position);
-        Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
-        Assert.NotEmpty(coalescer.LatenciesMs);
-        Assert.Empty(gosterilmeyen);
-        var asan = coalescer.LatenciesMs.Where(ms => ms > 150).ToList();
-        Assert.True(asan.Count == 0, "150 ms sinirini asan arama: " + string.Join(", ", asan.Select(MotorKanit.Ms)));
+        return (coalescer, gosterilmeyen);
     }
 }
 

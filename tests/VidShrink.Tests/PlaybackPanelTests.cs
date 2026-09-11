@@ -76,7 +76,7 @@ public sealed class PlaybackPanelTests : IClassFixture<PlaybackPanelTests.SesliK
         using var audio = new PreviewAudio();
         await audio.AttachAsync(_clips.Sesli);
 
-        Assert.True(audio.Attached, "AttachAudioSink kosmadi");
+        Assert.True(audio.Attached, "ses motoru takilmadi");
         Assert.True(audio.HasAudio, "sesli klipte ses akisi gorulmedi");
 
         audio.SeekTo(1.0);

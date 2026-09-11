@@ -4,9 +4,6 @@
   "playback.player-failed": "נגן ההשוואה לא הצליח להתחיל",
   "playback.sample-failed": "לא ניתן לקודד את דגימת התצוגה המקדימה",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} לא נמצא, ולכן נגן ההשוואה אינו יכול לרוץ.",
-  "playback.source.hstack-broken": "מסנן hstack אינו עובד בגרסת ffmpeg זו, ולכן נגן ההשוואה אינו יכול להיפתח.",
-  "playback.source.probe-inconclusive": "הבדיקה לא הצליחה להסתיים, ייתכן שהמחשב עסוק; נסה לפתוח את הנגן שוב.",
   "playback.error.exit-code": "ffmpeg החזיר קוד יציאה {0}.",
   "playback.error.engine": "הודעת מנוע: {0}",
   "playback.error.no-file": "קובץ הקליפ לא נוצר.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "ציר זמן",
   "playback.control.strip": "רצועת בקרה",
   "playback.control.pause": "השהה",
-  "playback.control.play": "נגן",
-  "playback.pipe.seek-timeout": "הדילוג לא סיפק פריים תוך {0} ms, ולכן נזנח.",
-  "playback.pipe.seek-restarts": "הדילוג נזנח אחרי {0} הפעלות מחדש בלי לספק פריים.",
-  "playback.pipe.no-start": "ffmpeg לא הצליח להתחיל, ולכן הצינור נשאר לא פעיל.",
-  "playback.pipe.decoder-died": "תהליך המפענח מת באופן בלתי צפוי; הצינור בונה את עצמו מחדש בדילוג הבא.",
-  "playback.pipe.decoder-unkillable": "לא ניתן לסיים את תהליך ffmpeg של המפענח וייתכן שהוא עדיין רץ.",
-  "playback.pipe.audio-unkillable": "לא ניתן לסיים את תהליך ffmpeg של השמע וייתכן שהוא עדיין רץ."
+  "playback.control.play": "נגן"
 }

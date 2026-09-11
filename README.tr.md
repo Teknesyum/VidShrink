@@ -472,18 +472,24 @@ flowchart LR
         CAL["CalibrationProbe"]
         EC["EncoderCapabilities"]
         ER["EncodeRunner"]
-        DP["Playback/DecoderPipe"]
+    end
+
+    subgraph PL["VidShrink.Player, oynatma"]
+        ME["MpvEngine"]
     end
 
     APP --> CORE
     APP --> FF
+    APP --> PL
     FF --> CORE
     FF --> BIN["ffmpeg · ffprobe<br/>dış süreçler"]
+    PL --> MPV["libmpv"]
 ```
 
 ```text
 src/VidShrink.Core            karmaşıklık modeli, strateji, plan hesabı, ffmpeg argümanları
-src/VidShrink.Ffmpeg          ffprobe, yoklamalar, kodlama koşumu, oynatma borusu
+src/VidShrink.Ffmpeg          ffprobe, yoklamalar, kodlama koşumu
+src/VidShrink.Player          oynatıcı sekmesinin ve karşılaştırma panelinin libmpv motoru
 src/VidShrink.App             Avalonia arayüzü, üç platform için tek kaynak ağacı
 src/VidShrink.Launcher        Windows başlatıcısı, dosya düzeyinde güncellemeyi uygular
 src/VidShrink.ShellExtension  Gezgin sağ tık girdisi

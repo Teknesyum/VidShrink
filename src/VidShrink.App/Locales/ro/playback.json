@@ -4,9 +4,6 @@
   "playback.player-failed": "Playerul de comparație nu a putut porni",
   "playback.sample-failed": "Mostra de previzualizare nu a putut fi codată",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} nu a fost găsit, deci playerul de comparație nu poate rula.",
-  "playback.source.hstack-broken": "Filtrul hstack nu funcționează în această versiune de ffmpeg, deci playerul de comparație nu se poate deschide.",
-  "playback.source.probe-inconclusive": "Verificarea nu s-a putut încheia, poate calculatorul este ocupat; încearcă să deschizi playerul din nou.",
   "playback.error.exit-code": "ffmpeg a returnat codul de ieșire {0}.",
   "playback.error.engine": "mesajul motorului: {0}",
   "playback.error.no-file": "Fișierul clipului nu a fost creat.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Cronologie",
   "playback.control.strip": "Bară de control",
   "playback.control.pause": "Pauză",
-  "playback.control.play": "Redă",
-  "playback.pipe.seek-timeout": "Căutarea nu a livrat niciun cadru în {0} ms, deci s-a renunțat.",
-  "playback.pipe.seek-restarts": "Căutarea a renunțat după {0} reporniri fără să livreze un cadru.",
-  "playback.pipe.no-start": "ffmpeg nu a putut porni, deci conducta a rămas inactivă.",
-  "playback.pipe.decoder-died": "Procesul decodorului s-a oprit neașteptat; conducta se reconstruiește la următoarea căutare.",
-  "playback.pipe.decoder-unkillable": "Procesul ffmpeg al decodorului nu a putut fi oprit și poate încă rulează.",
-  "playback.pipe.audio-unkillable": "Procesul ffmpeg audio nu a putut fi oprit și poate încă rulează."
+  "playback.control.play": "Redă"
 }
