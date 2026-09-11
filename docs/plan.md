@@ -276,3 +276,35 @@ tasarlanmaz. Karar kullanicinin.
 uc 60 sn'lik parcadan uretildi (~189 sn yerine ~60 sn, plan cozunurlugu `806x454`
 yerine `1920x1080`). Bu kosumun sayilari T114'un hucreleriyle dogrudan
 karsilastirilamaz; taban bu kosumda yeniden olculdu. Ayrinti raporun K0 bolumunde.
+
+## Oynatici — GOM paritesi (11 Eylul 2026)
+
+Kullanicinin cumlesi: "gom ve benzeri playerleri incele tüm özelliklerini istiyorum
+playerimde". Siniflandirma ve sira fable'in karari: `docs/netlestirme/004-...ra.md`.
+Envanterler: `docs/oynatici/rakip-envanter.md`, `docs/oynatici/mevcut-envanter.md`.
+
+**Siniflandirma:** Standart 30 (denetim cubugu + sag tik ust bolumu), Gelismis 13
+(sag tik en altta "Gelismis" alt menusu + Ayarlar > Oynatici > Gelismis katlanir grubu),
+Alinmayacak 6 (AB atlama, 360°, DVD, TTS, altyazi indirme, bitince kapat).
+
+**Mimari:** oynatici sekmesi libmpv'ye gecer, yazilim render (`MPV_RENDER_API_TYPE_SW`)
+BGRA tamponu bugunku WriteableBitmap yoluna verir. ffmpeg pakette kalir; Kucult,
+Donustur ve karsilastirma paneli dokunulmadan. Lisans: VidShrink AGPL-3.0, GPL libmpv
+derlemesi uyumlu. Tedarik ffmpeg gibi: yayin arsivine girmez, kurucu indirir
+(release.yml basligi), CI indirir ve sha256 dogrular; ikili yoksa olcu **kirmizi**.
+
+**Kisayollar:** GOM varsayilanlari; teker ses, Ctrl/Shift/Ctrl+Shift+teker arama
+10/60/300 sn, Alt+teker zoom, orta ve cift tik tam ekran. Tek `Keymap` tablosu; menu,
+ayarlar sayfasi ve test ayni tablodan okur.
+
+| # | Dalga | Kapsam | Kabul |
+|---|---|---|---|
+| 0 | Cekirdek | `VidShrink.Player`: P/Invoke, `IPlaybackEngine`, SW render → PlayerView, bugunku parite | Mevcut oynatici testleri yeni motorla yesil; arama ≤150 ms; avsync 10 sn sonra ≤40 ms; basliksiz kare cozulur |
+| 1 | Gunluk denetim | Ses/sessiz, hiz, kare kare, atlama, A-B, kaldigi yerden devam, yer imi, tam klavye/fare | 2× hizda 2 sn → 4 sn ±%5; kare adimi 1/fps ±%10; devam ±1 sn; her kisayol bir komuta bagli |
+| 2 | Altyazi, ses parcasi | Dis/gomulu altyazi, gecikme, boyut/konum, kodlama; aid, ses gecikmesi | 2 ses + 1 altyazili uretilmis dosyada gecis; gecikmeler yazilip okunur; cp1254 srt duzgun |
+| 3 | Goruntu, pencere, liste | En-boy, dondur/aynala, her zaman ustte, bilgi paneli, ekran goruntusu, bolum/yer imi cubugu, son acilanlar, klasorde sonraki, surukle-birak, karistir/tekrar | Ekran goruntusu kaynak cozunurlugunde; PgDn siradaki dosya; son acilanlar 10 ve kalici |
+| 4 | Gelismis | Renk ayarlari, keskinlik/deinterlace, ekolayzer, normallestirme, %200, kirpma, kucuk resim, klip/GIF, mini mod, URL, altyazi bicemi | Her ayar yazilir/okunur/sifirlanir; kucuk resim ≤300 ms |
+| 5 | Ortak cekirdek | Karsilastirma paneli ve PreviewAudio motora; DecoderPipe/NAudio → trash | Iki ornek arasi fark ≤1 kare; eski yola canli basvuru yok |
+| 6 | Sistem | Dosya iliskilendirme, tek ornek | Cift tiklanan dosya acik pencereye iletilir |
+
+Her dalga: kendi dali, 43 dil ayni dalgada, `dotnet test` tam yesil, `gh run list` yesil.
