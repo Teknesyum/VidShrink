@@ -68,6 +68,7 @@ public partial class MainWindow : Window
     };
 
     private MediaInfo? _info;
+    private string? _sourceName;
     private EncodePlan? _autoPlan;
     private EncodePlan? _aiPlan;
     private CancellationTokenSource? _cts;
@@ -150,6 +151,7 @@ public partial class MainWindow : Window
         BuildLanguageSwitch();
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
+        ShowSourceName();
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 
@@ -781,6 +783,7 @@ public partial class MainWindow : Window
         }
 
         MarkChosenLanguage();
+        ShowSourceName();
         ApplyFlowDirection();
         RefreshChoiceLabels();
         ApplyFastGpuTip();
@@ -2493,9 +2496,13 @@ public partial class MainWindow : Window
         TxtSourceStatus.IsVisible = false;
     }
 
+    private void ShowSourceName()
+        => TxtFileName.Text = _sourceName ?? Say("main.source.placeholder");
+
     private async Task LoadAsync(string path)
     {
-        TxtFileName.Text = Path.GetFileName(path);
+        _sourceName = Path.GetFileName(path);
+        ShowSourceName();
         Fade(SourceCard, true);
         ClearSourceError();
 
@@ -2568,7 +2575,8 @@ public partial class MainWindow : Window
 
     internal void LoadWithoutProbing(string path, MediaInfo info)
     {
-        TxtFileName.Text = Path.GetFileName(path);
+        _sourceName = Path.GetFileName(path);
+        ShowSourceName();
         Fade(SourceCard, true);
         ClearSourceError();
         ApplyLoaded(path, info);

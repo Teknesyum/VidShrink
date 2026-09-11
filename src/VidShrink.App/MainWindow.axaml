@@ -249,7 +249,7 @@
                     </Panel>
 
                     <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtFileName" Text="{loc:Text main.source.placeholder}" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                      <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                       <Button Grid.Column="1" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                     </Grid>
 
