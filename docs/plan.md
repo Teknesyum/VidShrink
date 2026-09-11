@@ -478,3 +478,39 @@ sonda durur; son acilanlar 10 ve kalici; dondur/aynala motor ozelligine yazilip 
 - Arayuz: zaman cubugu (tik ile arama, bolum ve yer imi isaretleri), bilgi rozeti,
   durum satiri. Anahtarlar `player.view.*`, `player.list.*`, `player.info.*`, 43 dil.
 - Olcu: `OynaticiGorunumTests`, `KeymapTests`; kanit `.calisma/dalga3/`.
+
+## 4a. dalga: gelismis goruntu ve ses
+
+4. dalganin A yarisi. B yarisi (kucuk resim, klip/GIF, mini mod, URL) ayri dalda paralel
+kosuyor; ortak dosyalara (`Keymap`, `PlayerView.axaml.cs`, `IPlaybackEngine`, `MpvEngine`,
+dil dosyalari) iki taraf da yalniz **ekleme** yapar, birlestirmeyi T0 yapar.
+
+Kapsam: renk (parlaklik, karsitlik, doygunluk, gama, ton), keskinlik, deinterlace, kirpma,
+on bant ekolayzer, ses normallestirme, %200 ses tavani, altyazi bicemi (yazi tipi, renk,
+anahat, golge, arka plan).
+
+Kabul: her ayar motora yazilir, **motordan** geri okunur ve sifirlanir; negatif kontrol
+kareden gelir — renk ayari altinda kare baytlari referanstan farklidir, sifirlamadan sonra
+referansla ayni olur. Ayarlar 3. dalganin ayar dosyasi duzeniyle kalicidir.
+
+- `Player/AdvancedSettings.cs`: `PictureAdjust`, `SoundAdjust`, `SubtitleStyle` kayitlari.
+  Arayuz olcusu -100..100; suzgec birimine cevirme yalniz `MpvEngine` icinde.
+- `IPlaybackEngine`: yalniz varsayilan govdeli ekler — `Picture`, `Sound`, `SubtitleLook`,
+  `VolumeCeiling`, `SetPicture`, `SetSound`, `SetSubtitleStyle`.
+- `Player/MpvEngine.Advanced.cs`: etiketli libavfilter halkalari (`@vscolor:eq`, `@vshue:hue`,
+  `@vssharp:unsharp`, `@vscrop:crop`, `@vseq:lavfi=[equalizer..]`, `@vsnorm:lavfi=[dynaudnorm]`),
+  `deinterlace`, `volume-max`, altyazi bicemi ozellikleri; sifirlama `option-info/<ad>/default-value`.
+  SW render gpu-only renk ozelliklerini yok saydigi icin renk suzgecten gecer.
+- `App/Playback/PlayerAdvanced.cs` + `player-advanced.json`: kalicilik, `PlayerSettings` duzeni.
+  `PlayerView.Advanced.cs` (partial): sag tik menusunun **sonuna** "Gelismis" alt menusu
+  (`AppendAdvancedMenu`), acilista motora yeniden yazma.
+- Arayuz: Ayarlar > Oynatici sayfasinda katlanir "Gelismis" kumesi (`PlayerAdvancedPanel`),
+  bicim var olan kumelerden kopyalanir; renk paletten, olcu `Theme.axaml` belirteclerinden.
+- Dil: yeni alan dosyasi `Locales/<dil>/advanced.json` (`player.advanced.*`), 43 dil;
+  B yarisiyla cakismasin diye ayri dosya. `BaslikKapsamiTests` pinleri yeniden olculur.
+- Olcu: `OynaticiGelismisTests`; sag tik menu beklentileri `OynaticiDenetimTests` ve
+  `OynaticiGirdiTests`'te guncellenir. Kanit `.calisma/dalga4a/`.
+
+**Acilis tahmini** (yontem: tur ×1,5 P50 / ×3 P90, 0,5 gun/tur P50, 0,7 gun/tur P90):
+cekirdek is 5 tur; P50 8 tur / 4 gun / 3 itme, P90 15 tur / 10,5 gun / 8 itme.
+Dosya: ~13 kod ve belge dosyasi + 42 dil dosyasi = ~55.

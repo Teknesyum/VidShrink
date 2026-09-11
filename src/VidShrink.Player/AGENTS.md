@@ -16,5 +16,6 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
   altyazılar `sub-reload` ile yeniden okunur. Görüntü: `video-rotate`, `vf @vsmirror:hflip`,
   `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size`.
   Arayüze yalnız varsayılan gövdeli üyeler eklenir.
-
+- Gelişmiş (`MpvEngine.Advanced.cs`): renk, ton, keskinlik, kırpma, ekolayzer ve normalleştirme etiketli `vf`/`af`
+  halkaları (`@vscolor`…); altyazı biçimi ve `volume-max` özellikten. Geri okumada mpv'nin `%uzunluk%` kaçışı ayıklanır.
 Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`, `OynaticiParcaTests.cs`, `OynaticiGorunumTests.cs`.

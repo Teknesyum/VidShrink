@@ -168,6 +168,20 @@ public interface IPlaybackEngine : IDisposable
     void SetRepeatFile(bool repeat) { }
 
     Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => Task.FromResult(false);
+
+    PictureAdjust Picture => PictureAdjust.Neutral;
+
+    SoundAdjust Sound => SoundAdjust.Neutral;
+
+    SubtitleStyle SubtitleLook => SubtitleStyle.Inherited;
+
+    double VolumeCeiling => SoundAdjust.PlainCeiling;
+
+    void SetPicture(PictureAdjust picture) { }
+
+    void SetSound(SoundAdjust sound) { }
+
+    void SetSubtitleStyle(SubtitleStyle style) { }
 }
 
 public sealed class PlaybackOpenException : Exception
