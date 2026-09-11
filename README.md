@@ -485,18 +485,24 @@ flowchart LR
         CAL["CalibrationProbe"]
         EC["EncoderCapabilities"]
         ER["EncodeRunner"]
-        DP["Playback/DecoderPipe"]
+    end
+
+    subgraph PL["VidShrink.Player, playback"]
+        ME["MpvEngine"]
     end
 
     APP --> CORE
     APP --> FF
+    APP --> PL
     FF --> CORE
     FF --> BIN["ffmpeg · ffprobe<br/>external processes"]
+    PL --> MPV["libmpv"]
 ```
 
 ```text
 src/VidShrink.Core            complexity model, strategy, planning, ffmpeg argument construction
-src/VidShrink.Ffmpeg          ffprobe, probes, encode execution, playback pipe
+src/VidShrink.Ffmpeg          ffprobe, probes, encode execution
+src/VidShrink.Player          libmpv playback engine behind the player tab and the comparison panel
 src/VidShrink.App             Avalonia interface, one source tree for all three platforms
 src/VidShrink.Launcher        Windows launcher, applies the file-level update before the app loads
 src/VidShrink.ShellExtension  the Explorer right-click entry

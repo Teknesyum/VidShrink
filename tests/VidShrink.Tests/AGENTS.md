@@ -11,4 +11,5 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   yarışı. libmpv ya da ffmpeg yoksa kırmızı olur, atlanmaz. Yerelde `VIDSHRINK_LIBMPV` ister.
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucuların libmpv sabitleri CI ile aynı,
   `EngineFactory` ile açılamayan motor atılır.
-- `OynaticiBoruTests.cs` — ffmpeg borusu (`DecoderPipe`); karşılaştırma paneli hâlâ kullanır.
+- `OynaticiKarsilastirmaTests.cs` — karşılaştırma paneli iki motor örneğinde: şerit kodlu
+  klipte iki yarının kare farkı ≤1; eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
