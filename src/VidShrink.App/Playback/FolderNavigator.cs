@@ -92,7 +92,7 @@ internal static class FolderNavigator
                     continue;
                 }
 
-                var byChar = char.ToUpperInvariant(x[i]).CompareTo(char.ToUpperInvariant(y[j]));
+                var byChar = char.ToLowerInvariant(x[i]).CompareTo(char.ToLowerInvariant(y[j]));
                 if (byChar != 0) return byChar;
                 i++;
                 j++;

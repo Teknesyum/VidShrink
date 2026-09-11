@@ -173,7 +173,7 @@ internal partial class PlayerView
     {
         EnsureSettings();
         if (_settings.Repeat != RepeatMode.All && !_settings.Shuffle) return;
-        _trace.Add("file auto -> " + StepFile(true));
+        _trace.Add("autonext -> " + StepFile(true));
     }
 
     private string StepFile(bool forward)
