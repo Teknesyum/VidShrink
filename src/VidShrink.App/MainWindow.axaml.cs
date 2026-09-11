@@ -68,6 +68,7 @@ public partial class MainWindow : Window
     };
 
     private MediaInfo? _info;
+    private string? _sourceName;
     private EncodePlan? _autoPlan;
     private EncodePlan? _aiPlan;
     private CancellationTokenSource? _cts;
@@ -150,6 +151,7 @@ public partial class MainWindow : Window
         BuildLanguageSwitch();
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
+        ShowSourceName();
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 
@@ -781,6 +783,7 @@ public partial class MainWindow : Window
         }
 
         MarkChosenLanguage();
+        ShowSourceName();
         ApplyFlowDirection();
         RefreshChoiceLabels();
         ApplyFastGpuTip();
@@ -793,7 +796,6 @@ public partial class MainWindow : Window
         RefreshAdvancedTexts();
         UpdateToolStatus();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
-        ApplyDropText();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
         else RefreshQualityPanels();
         RefreshQualityTargetAvailability();
@@ -2493,9 +2495,17 @@ public partial class MainWindow : Window
         TxtSourceStatus.IsVisible = false;
     }
 
+    private void ShowSourceName()
+    {
+        TxtFileName.Text = _sourceName ?? Say("main.source.placeholder");
+        TxtConvertSource.Text = _info is null ? Say("main.convert.source-empty") : _sourceName;
+        ApplyDropText();
+    }
+
     private async Task LoadAsync(string path)
     {
-        TxtFileName.Text = Path.GetFileName(path);
+        _sourceName = Path.GetFileName(path);
+        ShowSourceName();
         Fade(SourceCard, true);
         ClearSourceError();
 
@@ -2504,6 +2514,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             _info = null;
+            ShowSourceName();
             BtnStart.IsEnabled = BtnConvert.IsEnabled = false;
             Fade(InfoGrid, false);
             Fade(DropZone, true);
@@ -2568,7 +2579,8 @@ public partial class MainWindow : Window
 
     internal void LoadWithoutProbing(string path, MediaInfo info)
     {
-        TxtFileName.Text = Path.GetFileName(path);
+        _sourceName = Path.GetFileName(path);
+        ShowSourceName();
         Fade(SourceCard, true);
         ClearSourceError();
         ApplyLoaded(path, info);
@@ -2586,7 +2598,7 @@ public partial class MainWindow : Window
         BtnRevert.IsVisible = false;
         TxtAiStatus.Text = "";
         SetAiDetails(false);
-        TxtConvertSource.Text = Path.GetFileName(path);
+        ShowSourceName();
         ShowInfo(info);
         RefreshPreviewSource();
 

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using VidShrink.App;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -99,6 +100,26 @@ public sealed class ShellIntegrationTests : IDisposable
         Assert.Equal("belge.txt", fileName);
         Assert.True(visible, "Medya olmayan dosyada kaynak hatası satırı görünmedi.");
         Assert.False(string.IsNullOrWhiteSpace(status));
+    }
+
+    [Fact]
+    public void Language_change_keeps_the_loaded_file_name()
+    {
+        var file = Write("belge.txt");
+
+        var (fileName, convertSource, dropTitle) = AppHost.Run(() =>
+        {
+            var window = new MainWindow(file);
+            Drain(window.LoadStartupFileAsync());
+            Strings.Use("tr");
+            Strings.Use("en");
+            Dispatcher.UIThread.RunJobs();
+            return (Text(window, "TxtFileName"), Text(window, "TxtConvertSource"), Text(window, "TxtDropTitle"));
+        });
+
+        Assert.Equal("belge.txt", fileName);
+        Assert.False(string.IsNullOrWhiteSpace(convertSource));
+        Assert.False(string.IsNullOrWhiteSpace(dropTitle));
     }
 
     [Fact]
