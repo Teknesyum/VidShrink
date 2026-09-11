@@ -143,7 +143,7 @@ internal sealed record AramaOlcumu(
         body.AppendLine(baslik);
         body.AppendLine($"klip: {Klip} sure {Sure.ToString("0.###", CultureInfo.InvariantCulture)} sn");
         body.AppendLine("yontem: 2 sn isinma oynatma, sonra oynarken 20 arama, hedef 1.0 + rng*(sure-4.0), Random(1), aramalar arasi 400 ms, ao=null, hwdec=no, absolute+exact");
-        body.AppendLine("gecikme: seek komutu -> MPV_EVENT_SEEK sonrasi renderi baslayan ilk yeni karenin render bitisi");
+        body.AppendLine("gecikme: seek komutu -> max(MPV_EVENT_SEEK sonrasi renderi baslayan ilk yeni karenin render bitisi, o aramanin MPV_EVENT_PLAYBACK_RESTART'i)");
         body.AppendLine($"sistem mesgul % (arama penceresi, GetSystemTimes): {MotorKanit.Ms(MesgulYuzde)}");
         body.AppendLine($"gosterilen {Gosterilen.Count}/{Aramalar.Count}, medyan {MotorKanit.Ms(Medyan)} ms, min {MotorKanit.Ms(Gosterilen.DefaultIfEmpty(double.NaN).Min())}, max {MotorKanit.Ms(Gosterilen.DefaultIfEmpty(double.NaN).Max())}");
         foreach (var (hedef, sonuc) in Aramalar)
@@ -253,37 +253,45 @@ public sealed class OynaticiMotorTests
 
         var restarts = engine.PlaybackRestarts;
         var exact = await engine.SeekAsync(5.5, SeekPrecision.Exact);
-        var exactRestarted = await YenidenBaslamaBekleAsync(engine, restarts);
+        var exactRestarted = engine.PlaybackRestarts > restarts;
         var exactPos = MotorKanit.ReadDouble(engine, "time-pos");
-        long seen = 0;
-        var afterExact = await KareBekleAsync(engine, seen, TimeSpan.FromSeconds(5));
+        var exactCached = engine.PositionSeconds;
+        var afterExact = await KareBekleAsync(engine, 0, TimeSpan.FromSeconds(5));
 
-        restarts = engine.PlaybackRestarts;
-        var keyframe = await engine.SeekAsync(5.5, SeekPrecision.Keyframe);
-        var keyRestarted = await YenidenBaslamaBekleAsync(engine, restarts);
-        var keyPos = MotorKanit.ReadDouble(engine, "time-pos");
+        var inisler = new List<(double Hedef, SeekResult Sonuc, bool Restart, double Konum, double Onbellek)>();
+        foreach (var hedef in new[] { 5.5, 9.3, 13.1, 3.1, 17.1, 21.5 })
+        {
+            restarts = engine.PlaybackRestarts;
+            var sonuc = await engine.SeekAsync(hedef, SeekPrecision.Keyframe);
+            var restart = engine.PlaybackRestarts > restarts;
+            inisler.Add((hedef, sonuc, restart, MotorKanit.ReadDouble(engine, "time-pos"), engine.PositionSeconds));
+        }
 
+        static string F(double v) => v.ToString("0.000", CultureInfo.InvariantCulture);
         var ayni = first.Pixels.AsSpan().SequenceEqual(afterExact.Pixels);
-        MotorKanit.Write("k3-arama-inisi.txt",
-            $"klip: {Path.GetFileName(clip)} (GOP 2 sn, 30 kare/sn, duraklatilmis){Environment.NewLine}"
-            + $"exact 5.5 -> {exact.Outcome} {MotorKanit.Ms(exact.LatencyMs)} ms, time-pos {exactPos.ToString("0.000", CultureInfo.InvariantCulture)}{Environment.NewLine}"
-            + $"keyframes 5.5 -> {keyframe.Outcome} {MotorKanit.Ms(keyframe.LatencyMs)} ms, time-pos {keyPos.ToString("0.000", CultureInfo.InvariantCulture)}{Environment.NewLine}"
-            + $"acilis karesi ile arama sonrasi kare ayni mi: {ayni}{Environment.NewLine}");
+        var body = new StringBuilder();
+        body.AppendLine($"klip: {Path.GetFileName(clip)} (GOP 2 sn, 30 kare/sn, duraklatilmis)");
+        body.AppendLine("okuma: SeekAsync dondukten hemen sonra, bekleme yok");
+        body.AppendLine($"exact 5.5 -> {exact.Outcome} {MotorKanit.Ms(exact.LatencyMs)} ms, restart donuste {exactRestarted}, time-pos {F(exactPos)}, PositionSeconds {F(exactCached)}");
+        foreach (var inis in inisler)
+            body.AppendLine($"keyframes {F(inis.Hedef)} -> {inis.Sonuc.Outcome} {MotorKanit.Ms(inis.Sonuc.LatencyMs)} ms, restart donuste {inis.Restart}, time-pos {F(inis.Konum)}, PositionSeconds {F(inis.Onbellek)}");
+        body.AppendLine($"acilis karesi ile arama sonrasi kare ayni mi: {ayni}");
+        MotorKanit.Write("k3-arama-inisi.txt", body.ToString());
 
         Assert.Equal(SeekOutcome.Shown, exact.Outcome);
-        Assert.Equal(SeekOutcome.Shown, keyframe.Outcome);
-        Assert.True(exactRestarted, "exact aramadan sonra MPV_EVENT_PLAYBACK_RESTART gelmedi");
-        Assert.True(keyRestarted, "keyframes aramadan sonra MPV_EVENT_PLAYBACK_RESTART gelmedi");
+        Assert.True(exactRestarted, "exact arama Shown dondu ama MPV_EVENT_PLAYBACK_RESTART henuz gelmemisti");
         Assert.True(Math.Abs(exactPos - 5.5) <= 1.0 / 30 + 0.001, $"exact arama 5.5'e inmedi: {exactPos}");
-        Assert.True(Math.Abs(keyPos - 5.5) >= 0.4, $"keyframes arama anahtar kareye inmedi: {keyPos}");
-        Assert.False(ayni, "arama bitti denildi ama gosterilen kare acilis karesiyle ayni");
-    }
+        Assert.True(Math.Abs(exactCached - exactPos) <= 0.001, $"PositionSeconds {exactCached}, time-pos {exactPos}");
+        foreach (var inis in inisler)
+        {
+            Assert.Equal(SeekOutcome.Shown, inis.Sonuc.Outcome);
+            Assert.True(inis.Restart, $"keyframes {F(inis.Hedef)} Shown dondu ama MPV_EVENT_PLAYBACK_RESTART henuz gelmemisti");
+            Assert.True(Math.Abs(inis.Konum - Math.Round(inis.Konum / 2) * 2) <= 0.001, $"keyframes {F(inis.Hedef)} anahtar kareye inmedi: time-pos {F(inis.Konum)}");
+            Assert.True(Math.Abs(inis.Konum - inis.Hedef) < 2.0, $"keyframes {F(inis.Hedef)} komsu GOP disina indi: {F(inis.Konum)}");
+            Assert.True(Math.Abs(inis.Onbellek - inis.Konum) <= 0.001, $"keyframes {F(inis.Hedef)}: PositionSeconds {F(inis.Onbellek)}, time-pos {F(inis.Konum)}");
+        }
 
-    private static async Task<bool> YenidenBaslamaBekleAsync(MpvEngine engine, long before)
-    {
-        var saat = Stopwatch.StartNew();
-        while (engine.PlaybackRestarts <= before && saat.Elapsed < TimeSpan.FromSeconds(3)) await Task.Delay(5);
-        return engine.PlaybackRestarts > before;
+        Assert.False(ayni, "arama bitti denildi ama gosterilen kare acilis karesiyle ayni");
     }
 
     [Fact]
@@ -362,6 +370,60 @@ public sealed class OynaticiMotorTests
         Assert.True(once.Count >= 90, $"yalniz {once.Count} gecerli ornek");
         Assert.True(Math.Abs(medyan) <= 0.040, $"A/V farki {MotorKanit.Ms(medyan * 1000)} ms");
         Assert.InRange(Math.Abs(kayma), 0.150, 0.250);
+    }
+
+    [Fact]
+    public async Task DisposeSirasindakiOkumalarSerbestTutamacaDokunmaz()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var body = new StringBuilder();
+        for (var tur = 0; tur < 6; tur++)
+        {
+            var engine = new MpvEngine();
+            engine.SetProperty("ao", "null");
+            await engine.OpenAsync(clip);
+            engine.Play();
+            await KareBekleAsync(engine, 0, TimeSpan.FromSeconds(10));
+
+            using var basla = new ManualResetEventSlim();
+            long okuma = 0;
+            long bos = 0;
+            var hatalar = new System.Collections.Concurrent.ConcurrentQueue<Exception>();
+            var okuyucular = Enumerable.Range(0, 3).Select(sira => new Thread(() =>
+            {
+                basla.Wait();
+                var saat = Stopwatch.StartNew();
+                while (saat.ElapsedMilliseconds < 300)
+                {
+                    try
+                    {
+                        var konum = engine.GetProperty("time-pos");
+                        _ = engine.AudioVideoOffsetSeconds;
+                        Interlocked.Increment(ref okuma);
+                        if (konum is null) Interlocked.Increment(ref bos);
+                    }
+                    catch (Exception e)
+                    {
+                        hatalar.Enqueue(e);
+                    }
+                }
+            }) { IsBackground = true }).ToArray();
+
+            foreach (var okuyucu in okuyucular) okuyucu.Start();
+            basla.Set();
+            Thread.Sleep(40 + 25 * tur);
+            engine.Dispose();
+            foreach (var okuyucu in okuyucular) okuyucu.Join();
+
+            body.AppendLine($"tur {tur}: okuma {okuma}, dispose sonrasi bos {bos}, hata {hatalar.Count}");
+            Assert.Empty(hatalar);
+            Assert.True(bos > 0, $"tur {tur}: dispose sonrasi okuma olmadi, yaris denenmedi");
+            Assert.Null(engine.GetProperty("time-pos"));
+            Assert.True(double.IsNaN(engine.AudioVideoOffsetSeconds));
+            Assert.Throws<ObjectDisposedException>(() => engine.SetProperty("pause", "yes"));
+        }
+
+        MotorKanit.Write("k10-dispose-yarisi.txt", body.ToString());
     }
 
     private static async Task<List<double>> OrnekleAsync(MpvEngine engine)

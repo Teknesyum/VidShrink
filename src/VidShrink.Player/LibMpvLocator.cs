@@ -26,17 +26,35 @@ public static class LibMpvLocator
         }
     }
 
-    public static IReadOnlyList<string> Candidates(string? environmentValue, string baseDirectory)
+    public static readonly string[] MacLibraryDirectories = { "/opt/homebrew/lib", "/usr/local/lib", "/opt/local/lib" };
+
+    public static IReadOnlyList<string> AppDirectories(string baseDirectory)
+    {
+        var full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(baseDirectory));
+        var list = new List<string> { full, Path.Combine(full, "tools", "libmpv") };
+        var parent = Path.GetDirectoryName(full);
+        if (!string.IsNullOrEmpty(parent)) list.Add(Path.Combine(parent, "tools", "libmpv"));
+        return list;
+    }
+
+    public static IReadOnlyList<string> Candidates(string? environmentValue, string baseDirectory, bool? macOs = null)
     {
         var list = new List<string>();
-        if (!string.IsNullOrWhiteSpace(environmentValue))
+        var hasEnvironment = !string.IsNullOrWhiteSpace(environmentValue);
+        if (hasEnvironment)
         {
-            var value = environmentValue.Trim().Trim('"');
+            var value = environmentValue!.Trim().Trim('"');
             if (Directory.Exists(value)) list.AddRange(FileNames.Select(name => Path.Combine(value, name)));
             else list.Add(value);
         }
 
-        list.AddRange(FileNames.Select(name => Path.Combine(baseDirectory, name)));
+        foreach (var directory in AppDirectories(baseDirectory))
+            list.AddRange(FileNames.Select(name => Path.Combine(directory, name)));
+
+        if (!hasEnvironment && (macOs ?? OperatingSystem.IsMacOS()))
+            foreach (var directory in MacLibraryDirectories)
+                list.AddRange(FileNames.Select(name => Path.Combine(directory, name)));
+
         return list;
     }
 

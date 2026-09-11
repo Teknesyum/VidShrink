@@ -147,6 +147,58 @@ require_ffmpeg() {
     exit 1
 }
 
+libmpv_install_command() {
+    if [ "$(uname -s)" = 'Darwin' ]; then
+        printf 'brew install mpv\n'
+    elif command -v apt-get >/dev/null 2>&1; then
+        printf 'sudo apt install libmpv2\n'
+    elif command -v dnf >/dev/null 2>&1; then
+        printf 'sudo dnf install mpv-libs\n'
+    elif command -v pacman >/dev/null 2>&1; then
+        printf 'sudo pacman -S mpv\n'
+    elif command -v zypper >/dev/null 2>&1; then
+        printf 'sudo zypper install libmpv2\n'
+    fi
+}
+
+has_libmpv() {
+    if [ "$(uname -s)" = 'Darwin' ]; then
+        for directory in /opt/homebrew/lib /usr/local/lib /opt/local/lib; do
+            if [ -f "$directory/libmpv.2.dylib" ]; then return 0; fi
+        done
+        return 1
+    fi
+
+    for ldconfig in ldconfig /sbin/ldconfig /usr/sbin/ldconfig; do
+        if command -v "$ldconfig" >/dev/null 2>&1 && "$ldconfig" -p 2>/dev/null | grep -q 'libmpv\.so\.2'; then
+            return 0
+        fi
+    done
+
+    for directory in /usr/lib /usr/lib64 /usr/lib/x86_64-linux-gnu /usr/local/lib; do
+        if [ -f "$directory/libmpv.so.2" ]; then return 0; fi
+    done
+    return 1
+}
+
+require_libmpv() {
+    if has_libmpv; then
+        return 0
+    fi
+
+    say 'libmpv bulunamadı. Oynatıcı sekmesi onunla çalışır; VidShrink onu kendisi kurmaz.'
+    install_command=$(libmpv_install_command)
+    if [ -n "$install_command" ]; then
+        say 'Şu komutu çalıştırıp kurulumu yeniden başlatın:'
+        say ''
+        say "    $install_command"
+        say ''
+    else
+        say 'Paket yöneticinizle libmpv paketini (libmpv.so.2) kurup kurulumu yeniden başlatın.'
+    fi
+    exit 1
+}
+
 sha256_of() {
     if command -v sha256sum >/dev/null 2>&1; then
         sha256sum "$1" | cut -d' ' -f1
@@ -185,6 +237,7 @@ checksums_name="checksums-$runtime.txt"
 
 say 'VidShrink kurulumu hazırlanıyor...'
 require_ffmpeg
+require_libmpv
 
 work_root=$(mktemp -d 2>/dev/null || mktemp -d -t vidshrink-install)
 trap 'rm -rf "$work_root"' EXIT INT TERM

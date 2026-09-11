@@ -59,6 +59,11 @@ public sealed class MpvEngine : IPlaybackEngine
     private double _armedAt;
     private double _issuedAt;
     private TaskCompletionSource<SeekResult>? _seekDone;
+    private long _frameGen = -1;
+    private long _restartGen = -1;
+    private double _frameAt;
+    private double _restartAt;
+    private readonly object _handleGate = new();
 
     public unsafe MpvEngine(PlaybackOptions? options = null)
     {
@@ -146,25 +151,40 @@ public sealed class MpvEngine : IPlaybackEngine
     {
         get
         {
-            if (!_hasAudio || Volatile.Read(ref _disposed) != 0) return double.NaN;
-            var video = GetDouble("time-pos");
-            var audio = GetDouble("audio-pts");
-            return double.IsFinite(video) && double.IsFinite(audio) ? video - audio : double.NaN;
+            if (!_hasAudio) return double.NaN;
+            lock (_handleGate)
+            {
+                if (!HandleAlive) return double.NaN;
+                var video = GetDouble("time-pos");
+                var audio = GetDouble("audio-pts");
+                return double.IsFinite(video) && double.IsFinite(audio) ? video - audio : double.NaN;
+            }
         }
     }
 
     public string? GetProperty(string name)
     {
-        if (Volatile.Read(ref _disposed) != 0) return null;
-        var p = mpv_get_property_string(_mpv, name);
-        if (p == IntPtr.Zero) return null;
-        var value = Marshal.PtrToStringUTF8(p);
-        mpv_free(p);
-        return value;
+        lock (_handleGate)
+        {
+            if (!HandleAlive) return null;
+            var p = mpv_get_property_string(_mpv, name);
+            if (p == IntPtr.Zero) return null;
+            var value = Marshal.PtrToStringUTF8(p);
+            mpv_free(p);
+            return value;
+        }
     }
 
     public void SetProperty(string name, string value)
-        => Check(mpv_set_property_string(_mpv, name, value), $"set {name}={value}");
+    {
+        lock (_handleGate)
+        {
+            ObjectDisposedException.ThrowIf(!HandleAlive, this);
+            Check(mpv_set_property_string(_mpv, name, value), $"set {name}={value}");
+        }
+    }
+
+    private bool HandleAlive => Volatile.Read(ref _disposed) == 0 && _mpv != IntPtr.Zero;
 
     public async Task OpenAsync(string path, CancellationToken ct = default)
     {
@@ -280,7 +300,7 @@ public sealed class MpvEngine : IPlaybackEngine
                     OnSeek();
                     break;
                 case MPV_EVENT_PLAYBACK_RESTART:
-                    Interlocked.Increment(ref _restarts);
+                    OnRestart();
                     break;
                 case MPV_EVENT_PROPERTY_CHANGE:
                     OnProperty(ev->ReplyUserdata, (MpvEventProperty*)ev->Data);
@@ -326,6 +346,35 @@ public sealed class MpvEngine : IPlaybackEngine
             _armedGen = _seekGen;
             _armedAt = Now;
         }
+    }
+
+    private void OnRestart()
+    {
+        var position = GetDouble("time-pos");
+        if (double.IsFinite(position)) Volatile.Write(ref _position, position);
+        Interlocked.Increment(ref _restarts);
+
+        TaskCompletionSource<SeekResult>? done;
+        double latency;
+        lock (_seekGate)
+        {
+            if (_seekDone is null || _armedGen != _seekGen || _restartGen == _seekGen) return;
+            _restartGen = _seekGen;
+            _restartAt = Now;
+            done = TakeShown(out latency);
+        }
+
+        done?.TrySetResult(new SeekResult(SeekOutcome.Shown, latency));
+    }
+
+    private TaskCompletionSource<SeekResult>? TakeShown(out double latency)
+    {
+        latency = 0;
+        if (_seekDone is null || _frameGen != _seekGen || _restartGen != _seekGen) return null;
+        var done = _seekDone;
+        _seekDone = null;
+        latency = Math.Max(_frameAt, _restartAt) - _issuedAt;
+        return done;
     }
 
     private void OnLoaded()
@@ -449,16 +498,14 @@ public sealed class MpvEngine : IPlaybackEngine
 
         Interlocked.Increment(ref _framesRendered);
 
-        TaskCompletionSource<SeekResult>? done = null;
-        double latency = 0;
+        TaskCompletionSource<SeekResult>? done;
+        double latency;
         lock (_seekGate)
         {
-            if (_seekDone is not null && _armedGen == _seekGen && start >= _armedAt)
-            {
-                done = _seekDone;
-                _seekDone = null;
-                latency = end - _issuedAt;
-            }
+            if (_seekDone is null || _armedGen != _seekGen || _frameGen == _seekGen || start < _armedAt) return;
+            _frameGen = _seekGen;
+            _frameAt = end;
+            done = TakeShown(out latency);
         }
 
         done?.TrySetResult(new SeekResult(SeekOutcome.Shown, latency));
@@ -466,8 +513,12 @@ public sealed class MpvEngine : IPlaybackEngine
 
     private unsafe double GetDouble(string name)
     {
-        double value;
-        return mpv_get_property(_mpv, name, MPV_FORMAT_DOUBLE, &value) < 0 ? double.NaN : value;
+        lock (_handleGate)
+        {
+            if (!HandleAlive) return double.NaN;
+            double value;
+            return mpv_get_property(_mpv, name, MPV_FORMAT_DOUBLE, &value) < 0 ? double.NaN : value;
+        }
     }
 
     private void Command(ulong tag, params string[] args)
@@ -475,12 +526,15 @@ public sealed class MpvEngine : IPlaybackEngine
 
     private unsafe int CommandRc(ulong tag, params string[] args)
     {
-        if (Volatile.Read(ref _disposed) != 0) return -1;
         var pointers = new IntPtr[args.Length + 1];
         try
         {
             for (var i = 0; i < args.Length; i++) pointers[i] = Marshal.StringToCoTaskMemUTF8(args[i]);
-            fixed (IntPtr* p = pointers) return mpv_command_async(_mpv, tag, p);
+            lock (_handleGate)
+            {
+                if (!HandleAlive) return -1;
+                fixed (IntPtr* p = pointers) return mpv_command_async(_mpv, tag, p);
+            }
         }
         finally
         {
@@ -525,16 +579,19 @@ public sealed class MpvEngine : IPlaybackEngine
 
     private void Release()
     {
-        if (_render != IntPtr.Zero)
+        lock (_handleGate)
         {
-            mpv_render_context_free(_render);
-            _render = IntPtr.Zero;
-        }
+            if (_render != IntPtr.Zero)
+            {
+                mpv_render_context_free(_render);
+                _render = IntPtr.Zero;
+            }
 
-        if (_mpv != IntPtr.Zero)
-        {
-            mpv_terminate_destroy(_mpv);
-            _mpv = IntPtr.Zero;
+            if (_mpv != IntPtr.Zero)
+            {
+                mpv_terminate_destroy(_mpv);
+                _mpv = IntPtr.Zero;
+            }
         }
 
         if (_updateHandle.IsAllocated) _updateHandle.Free();
