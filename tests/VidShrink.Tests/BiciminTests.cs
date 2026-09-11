@@ -519,14 +519,14 @@ public sealed class BaslikKapsamiTests
     /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 23263 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 23306 kalem)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// <para>Sayim yansimanin gordugu 43 dil uzerinden: 42 dil klasoru ve gomulu kaynak
-    /// adindan gelen bir dil daha, her biri 541 anahtar. 5. dalga ffmpeg oynatma borusunu
+    /// adindan gelen bir dil daha, her biri 542 anahtar. 5. dalga ffmpeg oynatma borusunu
     /// cop kutusuna tasiyinca okuyucusu kalmayan dokuz <c>playback.pipe.*</c> /
     /// <c>playback.source.*</c> anahtari kataloglardan cikti: 43 x 486 = 20898'den
-    /// 43 x 477 = 20511'e. 1. dalga 32 oynatici anahtari ekledi: 43 x 509 = 21887.
-    /// 3. dalga 32 anahtar daha ekledi: 43 x 541 = 23263.</para>
+    /// 43 x 477 = 20511'e. 1. dalga 32 oynatici anahtari ekledi: 43 x 509 = 21887. 6. dalga Unix kapamasi
+    /// <c>main.instance.waiting</c> ekledi: 43 x 510 = 21930. 3. dalga 32 anahtar daha ekledi: 43 x 542 = 23306.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -554,7 +554,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(23263, gezilen);
+        Assert.Equal(23306, gezilen);
         Assert.Empty(kayip);
     }
 

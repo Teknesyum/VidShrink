@@ -288,6 +288,7 @@
   "main.command.title": "פקודת FFmpeg",
 
   "main.error.startup": "ההפעלה לא הושלמה",
+  "main.instance.waiting": "הקידוד עדיין פועל; {0} יפתח לאחר שיסתיים.",
   "main.error.link": "לא ניתן לפתוח את הקישור",
   "main.error.folder": "לא ניתן לפתוח את התיקייה",
   "main.error.setting": "לא ניתן לשמור את ההגדרה",

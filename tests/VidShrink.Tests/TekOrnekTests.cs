@@ -251,6 +251,51 @@ public sealed class TekOrnekTests : IDisposable
     }
 
     [Fact]
+    public void MacOS_kodlama_surerken_gelen_dosya_bekletilip_bitince_yukleniyor()
+    {
+        var file = Path.Combine(_work, "mac'te gelen.mp4");
+        File.WriteAllText(file, "mac");
+        var previous = MainWindow.IsMacOSPlatformForTest;
+
+        try
+        {
+            MainWindow.IsMacOSPlatformForTest = () => true;
+
+            var (queuedWhileBusy, statusWhileBusy, visibleWhileBusy, loadedAfter, nameAfter, statusAfter) = AppHost.Run(() =>
+            {
+                var window = new MainWindow(null);
+                window.BeginEncodingForTest();
+
+                var files = new ForwardedFiles();
+                files.Receive(new[] { file });
+                files.Attach(window.AcceptForwarded);
+
+                var queued = window.ForwardedLoad is null;
+                var status = window.SourceStatusText;
+                var visible = window.SourceStatusVisible;
+
+                window.EndEncodingForTest();
+                var load = window.ForwardedLoad;
+                if (load is not null) Drain(load);
+
+                return (queued, status, visible, load is not null,
+                    window.FindControl<TextBlock>("TxtFileName")?.Text, window.SourceStatusText);
+            });
+
+            Assert.True(queuedWhileBusy, "Kodlama sürerken dosya beklemeden yüklendi.");
+            Assert.Contains("mac'te gelen.mp4", statusWhileBusy);
+            Assert.True(visibleWhileBusy, "Bekleme durumu görünür olmadı.");
+            Assert.True(loadedAfter, "Kodlama bitince bekleyen dosya yüklenmedi.");
+            Assert.Equal("mac'te gelen.mp4", nameAfter);
+            Assert.NotEqual(statusWhileBusy, statusAfter);
+        }
+        finally
+        {
+            MainWindow.IsMacOSPlatformForTest = previous;
+        }
+    }
+
+    [Fact]
     public void Ikinci_surec_dosyayi_acik_pencereye_iletip_sifirla_cikiyor()
     {
         if (!OperatingSystem.IsWindows()) return;

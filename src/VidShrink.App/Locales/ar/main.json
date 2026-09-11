@@ -288,6 +288,7 @@
   "main.command.title": "أمر FFmpeg",
 
   "main.error.startup": "لم يكتمل بدء التشغيل",
+  "main.instance.waiting": "الترميز قيد التشغيل؛ سيتم فتح {0} عند انتهائه.",
   "main.error.link": "تعذر فتح الرابط",
   "main.error.folder": "تعذر فتح المجلد",
   "main.error.setting": "تعذر حفظ الإعداد",
