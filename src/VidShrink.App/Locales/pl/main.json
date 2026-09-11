@@ -288,6 +288,7 @@
   "main.command.title": "Polecenie FFmpeg",
 
   "main.error.startup": "Uruchamianie nie dokończyło się",
+  "main.instance.waiting": "Kodowanie wciąż trwa; {0} otworzy się po jego zakończeniu.",
   "main.error.link": "Nie udało się otworzyć łącza",
   "main.error.folder": "Nie udało się otworzyć folderu",
   "main.error.setting": "Nie udało się zapisać ustawienia",

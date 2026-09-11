@@ -65,6 +65,15 @@ refresh_desktop_databases() {
     fi
 }
 
+exec_argument_escape() {
+    printf '%s' "$1" | sed \
+        -e 's/\\/\\\\\\\\/g' \
+        -e 's/`/\\\\`/g' \
+        -e 's/\$/\\\\$/g' \
+        -e 's/"/\\\\"/g' \
+        -e 's/%/%%/g'
+}
+
 write_desktop_entry() {
     executable=$1
     mime_list=$(printf '%s\n' "$media_types" | awk '{ print $2 }' | sort -u | tr '\n' ';')
@@ -86,12 +95,14 @@ write_desktop_entry() {
 </mime-info>
 MIME
 
+    escaped_executable=$(exec_argument_escape "$executable")
+
     {
         printf '[Desktop Entry]\n'
         printf 'Type=Application\n'
         printf 'Name=VidShrink\n'
         printf 'Comment=Play and shrink videos\n'
-        printf 'Exec="%s" %%F\n' "$executable"
+        printf 'Exec="%s" %%F\n' "$escaped_executable"
         [ -z "$icon_line" ] || printf '%s\n' "$icon_line"
         printf 'Terminal=false\n'
         printf 'Categories=AudioVideo;Video;Player;\n'

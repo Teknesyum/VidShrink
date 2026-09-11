@@ -333,6 +333,39 @@ public sealed class DosyaIliskiTests : IDisposable
         Assert.False(File.Exists(mimePackage));
     }
 
+    /// <summary>
+    /// Desktop Entry Specification'ın Exec anahtarı: tırnaklı argüman içinde ters bölü,
+    /// ters tırnak, dolar ve çift tırnak birer ters bölüyle kaçılır; sonra dosya düzeyindeki
+    /// string kaçışı (değer türü "string") her ters bölüyü ikiye katlar. İki katman art arda
+    /// uygulanınca dört karakterin net karşılığı: ters bölü dört ters bölüye, öteki üçü iki
+    /// ters bölü + kendisine döner. <c>%</c> ayrı bir kural — alan kodu (<c>%f</c>/<c>%F</c>)
+    /// ile çakışmasın diye <c>%%</c> olur. Beklenen satır burada spesifikasyondan elle
+    /// türetiliyor; betiğin ürettiği satırdan kopyalanmıyor, öyle olsaydı betikteki bir hata
+    /// ölçüyle birlikte yeşil kalırdı.
+    /// </summary>
+    [Fact]
+    public void Linux_masaustu_kaydi_ozel_karakterli_yolu_spesifikasyona_gore_kaciyor()
+    {
+        var home = Path.Combine(_work, "ev-ozel");
+        Directory.CreateDirectory(home);
+        var entry = Path.Combine(home, ".local", "share", "applications", "vidshrink.desktop");
+
+        const string executable = "/opt/$var \"quote\" `cmd` back\\slash 100% dir/VidShrink";
+
+        var expectedExecutable =
+            "/opt/" + @"\\" + "$var " +
+            @"\\" + "\"" + "quote" + @"\\" + "\"" + " " +
+            @"\\" + "`" + "cmd" + @"\\" + "`" + " back" +
+            @"\\\\" + "slash 100" + "%%" + " dir/VidShrink";
+        var expectedLine = $"Exec=\"{expectedExecutable}\" %F";
+
+        var write = Sh(home, "install-vidshrink.sh", "--desktop-entry", executable);
+        Assert.True(write.Code == 0, write.Output);
+
+        var lines = File.ReadAllLines(entry);
+        Assert.Contains(expectedLine, lines);
+    }
+
     private static XElement? ValueAfter(XElement dict, string key)
         => dict.Elements("key").FirstOrDefault(element => element.Value == key)?.ElementsAfterSelf().FirstOrDefault();
 

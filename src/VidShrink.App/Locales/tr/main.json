@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg komut satırı",
 
   "main.error.startup": "Açılış tamamlanamadı",
+  "main.instance.waiting": "Kodlama sürüyor; {0} bitince açılacak.",
   "main.error.link": "Bağlantı açılamadı",
   "main.error.folder": "Klasör açılamadı",
   "main.error.setting": "Ayar yazılamadı",

@@ -425,3 +425,10 @@ Kabul: cift tiklanan dosya acik pencereye iletilir; iki gercek surecle kanitlani
   yalniz kendi degerini siler. Sag tik menusu (`SystemFileAssociations`) ayri agacta kalir.
   ProgID komutu baslaticiyi gosterir (`FileAssociation.LaunchTarget`). `UserChoice` yazilmaz.
 - Olcu: `TekOrnekTests`, `DosyaIliskiTests`; negatif kontroller `.calisma/dalga6/`.
+- Unix kapama: `install-vidshrink.sh`'daki `write_desktop_entry` artik `exec_argument_escape`
+  ile Desktop Entry Exec kacisini uyguluyor (ters bolu/ters tirnak/dolar/cift tirnak + `%%`);
+  ozel karakterli yol testi `DosyaIliskiTests`e, negatif kontrol `.calisma/dalga6-unix/`e.
+- `MainWindow.SingleInstance.cs`: macOS kolunda kodlama surerken artik reddetmiyor, yolu
+  bekletip kodlama bitince (`FlushPendingMacFile`) `main.instance.waiting` durumuyla yukluyor
+  (40 dil + en); test `IsMacOSPlatformForTest` ile ayni kuyruk cagrisindan geciyor, negatif
+  kontrol `.calisma/dalga6-unix/`e.
