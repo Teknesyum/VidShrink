@@ -490,9 +490,23 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
     }
 }
 
+public sealed class HedefMakineFactAttribute : FactAttribute
+{
+    public HedefMakineFactAttribute()
+    {
+        if (string.Equals(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"), "true", StringComparison.OrdinalIgnoreCase))
+        {
+            Skip = "CI kosucusu hedef makine degil; arama esikleri sessiz hedef makinede olculur (docs/olcumler/oynatici-motor-libmpv.md).";
+            return;
+        }
+
+        Skip = new QuietMachineFactAttribute().Skip;
+    }
+}
+
 public sealed class OynaticiMotorAramaOlculeri
 {
-    [QuietMachineFact]
+    [HedefMakineFact]
     public async Task H264_1080p_TamAramaMedyaniAltmisMilisaniyeAltinda()
     {
         var olcum = await AramaOlcumu.OlcAsync(MotorKlipleri.H264_1080p60);
@@ -502,7 +516,7 @@ public sealed class OynaticiMotorAramaOlculeri
         Assert.True(olcum.Medyan <= 60, $"1080p medyan {MotorKanit.Ms(olcum.Medyan)} ms > 60 ms");
     }
 
-    [QuietMachineFact]
+    [HedefMakineFact]
     public async Task H264_2160p_TamAramaMedyaniIkiYuzMilisaniyeAltinda()
     {
         var olcum = await AramaOlcumu.OlcAsync(MotorKlipleri.H264_2160p30);

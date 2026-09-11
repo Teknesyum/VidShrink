@@ -156,8 +156,9 @@ busy, so this is not the quiet reading either:
 | h264_2160p30 | 20/20 | 107.1 | 49.8 | 206.2 | 74.8 | ≤200 | PASS |
 | hevc_1080p60 | 20/20 | 86.7 | 22.8 | 183.4 | 56.4 | none (pilot 2: 61.7) | reported |
 
-Quiet machine. The two threshold tests (1080p, 2160p) are `[QuietMachineFact]`: they run
-only when `PerformanceProbe` reads a light software load, and skip in CI. The HEVC test
+Quiet machine. The two threshold tests (1080p, 2160p) are `[HedefMakineFact]`: they always
+skip in CI (`GITHUB_ACTIONS`) and run locally only when `PerformanceProbe` reads a light
+software load. The HEVC test
 has no threshold and stays a plain fact, so it runs in CI too:
 
 | file | shown | median ms | min | max | busy % | threshold | result |
@@ -186,6 +187,12 @@ same tests were plain facts and failed: 1080p median 85.2 ms (> 60) and 2160p me
 thresholds follow the repository's timing convention (`[QuietMachineFact]`, as in
 `FrameGrabberTests`): the number is judged on a quiet machine, and the hosted runner is
 not held to it. Missing libmpv still turns them red wherever they run.
+
+`[QuietMachineFact]` alone was not enough: on main run
+https://github.com/Teknesyum/VidShrink/actions/runs/34614432487 (`476b5d24`) the hosted
+runner read as lightly loaded, both tests ran and failed at 75.6 ms (1080p) and 273.8 ms
+(2160p). The gate now names the runner itself, `GITHUB_ACTIONS=true`, instead of inferring
+it from load.
 
 **Negative control for the threshold.** Adding `vd-lavc-threads=1` to the engine options
 (a real regression: single-threaded decode) turned the 2160p test red. A matched
