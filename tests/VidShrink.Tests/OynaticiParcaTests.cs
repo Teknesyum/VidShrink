@@ -351,7 +351,7 @@ public sealed class OynaticiParcaTests
     }
 
     [Fact]
-    public void AltyaziDosyasiBirakilincaYuklenirVideoBirakmaPencereyeGecer()
+    public void AltyaziDosyasiBirakilincaYuklenirVideoBirakmaOynaticidaKalir()
     {
         var clip = ParcaKanit.Klip;
         var srt = Path.Combine(ParcaKanit.Folder, "birakilan.srt");
@@ -406,7 +406,7 @@ public sealed class OynaticiParcaTests
         Assert.Single(rapor.altyaziSonuc.Dis);
         Assert.Equal(rapor.altyaziSonuc.Dis[0], rapor.altyaziSonuc.Sid);
         Assert.Null(rapor.altyaziSonuc.TrackNotice);
-        Assert.False(rapor.videoSonuc.Handled);
-        Assert.Equal(1, rapor.videoSonuc.Pencere);
+        Assert.True(rapor.videoSonuc.Handled);
+        Assert.Equal(0, rapor.videoSonuc.Pencere);
     }
 }

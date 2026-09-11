@@ -4,17 +4,17 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
 (libmpv, `vo=libmpv`, SW render, BGRA, stride 4*w, 64 bayt hizalı). osx-arm64 kapısı kapanırsa LibVLC aynı arayüze girer.
 
 - `Native.cs` — P/Invoke; imzalar `client.h`/`render.h`'den.
-- `LibMpvLocator` — sıra: `VIDSHRINK_LIBMPV`, uygulama klasörü, onun ve bir üstünün `tools/libmpv`'si,
-  macOS'ta Homebrew/MacPorts `lib`, sistem yolu; yoksa `PlaybackEngineUnavailableException`. libmpv
-  arşive girmez: Windows kurucusu sha256'lı indirir, macOS/Linux paket komutunu söyler, CI indirir.
+- `LibMpvLocator` — sıra: `VIDSHRINK_LIBMPV`, uygulama klasörü, onun ve bir üstünün `tools/libmpv`'si, macOS'ta
+  Homebrew/MacPorts `lib`, sistem yolu; yoksa `PlaybackEngineUnavailableException`. libmpv arşive girmez.
 - `MpvEngine` — üç iş parçacığı: çağıran, `mpv-events`, `mpv-render`. Render iş parçacığı yalnız
   `mpv_render_*` çağırır; çağıranın libmpv çağrıları `_handleGate` altında.
-- Arama bitişi: aramanın RESTART'ı, komuttan sonra takası biten yeni kare **ve** render'da yarım yeni
-  kare yok; olay iş parçacığının saati kareyle kıyaslanmaz. Dönüşte `time-pos` iner. `time-pos` özellik
-  olayı yalnız tetik; konum olay işlenirken `time-pos` okunarak yazılır.
-- `PlaybackOptions`: `RenderWidth/Height` sabit render ölçüsü, `Audio=false` → `aid=no`, `Video=false` →
-  `vid=no`, `Loop` → `loop-file=inf`. `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgası.
-  Karşılaştırma paneli iki örnek, önizleme sesi bir `vid=no` örnek. Varsayılan `hwdec=no`, `sid=no`.
+- Arama bitişi: aramanın RESTART'ı, komuttan sonra takası biten yeni kare **ve** render'da yarım yeni kare yok.
+  Dönüşte `time-pos` iner; `time-pos` özellik olayı yalnız tetik, konum olay işlenirken okunarak yazılır.
+- `PlaybackOptions`: `RenderWidth/Height`, `Audio=false` → `aid=no`, `Video=false` → `vid=no`, `Loop` → `loop-file=inf`.
+  `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgası. Varsayılan `hwdec=no`, `sid=no`.
 - Parçalar: `Tracks`, `aid`/`sid`, `sub-add`, gecikme, `sub-scale`/`sub-pos`; `sub-codepage` değişince dış
-  altyazılar `sub-reload` ile yeniden okunur. Arayüze yalnız varsayılan gövdeli üyeler eklendi.
-Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`, `OynaticiParcaTests.cs`; libmpv yoksa kırmızı.
+  altyazılar `sub-reload` ile yeniden okunur. Görüntü: `video-rotate`, `vf @vsmirror:hflip`,
+  `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size`.
+  Arayüze yalnız varsayılan gövdeli üyeler eklenir.
+
+Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`, `OynaticiParcaTests.cs`, `OynaticiGorunumTests.cs`.

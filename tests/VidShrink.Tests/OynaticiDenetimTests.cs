@@ -119,7 +119,16 @@ public sealed class KeymapTests
         [PlayerCommandKind.AudioCycle] = "audio -> ",
         [PlayerCommandKind.SubtitleCycle] = "subtitle -> ",
         [PlayerCommandKind.SubtitleDelay] = "subdelay ",
-        [PlayerCommandKind.AudioDelay] = "audiodelay "
+        [PlayerCommandKind.AudioDelay] = "audiodelay ",
+        [PlayerCommandKind.ToggleTopmost] = "topmost -> ",
+        [PlayerCommandKind.AspectCycle] = "aspect -> ",
+        [PlayerCommandKind.Rotate] = "rotate -> ",
+        [PlayerCommandKind.Mirror] = "mirror -> ",
+        [PlayerCommandKind.ToggleInfo] = "info -> ",
+        [PlayerCommandKind.Screenshot] = "screenshot -> ",
+        [PlayerCommandKind.FileStep] = "file ",
+        [PlayerCommandKind.ToggleShuffle] = "shuffle -> ",
+        [PlayerCommandKind.RepeatCycle] = "repeat -> "
     };
 
     private static void Tetikle(PlayerView view, PlayerInput input)
@@ -167,6 +176,13 @@ public sealed class KeymapTests
         var buyutme = view.ZoomScale;
         var altyazi = view.SubtitleDelay;
         var sesGecikme = view.AudioDelay;
+        var ustte = view.IsTopmost;
+        var oran = view.AspectRatio;
+        var aci = view.RotationDegrees;
+        var ayna = view.IsMirrored;
+        var bilgi = view.InfoVisible;
+        var karisik = view.Settings.Shuffle;
+        var tekrar = view.Settings.Repeat;
 
         tetik();
 
@@ -193,6 +209,15 @@ public sealed class KeymapTests
             PlayerCommandKind.AudioDelay when Math.Abs(view.AudioDelay - sesGecikme - action.Amount) > 1e-9 => $"ses gecikmesi {sesGecikme} -> {view.AudioDelay}, beklenen fark {action.Amount}",
             PlayerCommandKind.AudioCycle when yeni[0] != "audio -> no" => $"motorsuz ses dongusu '{yeni[0]}'",
             PlayerCommandKind.SubtitleCycle when yeni[0] != "subtitle -> no" => $"motorsuz altyazi dongusu '{yeni[0]}'",
+            PlayerCommandKind.ToggleTopmost when view.IsTopmost == ustte => "ustte degismedi",
+            PlayerCommandKind.AspectCycle when view.AspectRatio == oran => $"oran {oran} degismedi",
+            PlayerCommandKind.Rotate when view.RotationDegrees != (aci + (int)action.Amount) % 360 => $"aci {aci} -> {view.RotationDegrees}, beklenen fark {action.Amount}",
+            PlayerCommandKind.Mirror when view.IsMirrored == ayna => "ayna degismedi",
+            PlayerCommandKind.ToggleInfo when view.InfoVisible == bilgi => "bilgi paneli degismedi",
+            PlayerCommandKind.Screenshot when yeni[0] != "screenshot -> no" => $"motorsuz goruntu iz '{yeni[0]}'",
+            PlayerCommandKind.FileStep when !yeni[0].StartsWith("file " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> ", StringComparison.Ordinal) => $"iz '{yeni[0]}' yon {action.Amount}",
+            PlayerCommandKind.ToggleShuffle when view.Settings.Shuffle == karisik => "karistirma degismedi",
+            PlayerCommandKind.RepeatCycle when view.Settings.Repeat == tekrar => $"tekrar {tekrar} degismedi",
             _ => null
         };
     }
@@ -336,9 +361,9 @@ public sealed class KeymapTests
 
                 var tumu = view.BuildMenu().Items.OfType<MenuItem>().ToList();
                 var menu = tumu.Where(item => item.Tag is PlayerAction).ToList();
-                var parcalar = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
-                body.AppendLine($"[{dil}] menu {menu.Count} satir, parca alt menusu: {string.Join(" | ", parcalar)}");
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu") }, parcalar);
+                var ekler = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
+                body.AppendLine($"[{dil}] menu {menu.Count} satir, ek satirlar: {string.Join(" | ", ekler)}");
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
                 Assert.Equal(tumu.IndexOf(menu.First(item => ReferenceEquals(item.Tag, Keymap.Mute))) + 1, tumu.FindIndex(item => item.Tag is null));
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);
                 foreach (var (item, action) in menu.Zip(Keymap.MenuActions))

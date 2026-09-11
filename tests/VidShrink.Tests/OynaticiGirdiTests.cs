@@ -277,13 +277,13 @@ public sealed class OynaticiGirdiTests
             {
                 Strings.Use(dil);
                 var menu = view.BuildMenu();
-                var ogeler = menu.Items.OfType<MenuItem>().ToList();
-                var basliklar = ogeler.Where(item => item.Tag is PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
-                var altMenuler = ogeler.Where(item => item.Tag is null).Select(item => item.Header?.ToString() ?? "").ToList();
-                body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", altMenuler)}");
+                var satirlar = menu.Items.OfType<MenuItem>().ToList();
+                var basliklar = satirlar.Where(item => item.Tag is PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+                var ekler = satirlar.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+                body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", ekler)}");
                 Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu") }, altMenuler);
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
             }
 
             Strings.Use("en");
@@ -576,6 +576,8 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var menu = view.BuildMenu();
             var ogeler = menu.Items.OfType<MenuItem>().ToList();
             var satirlar = ogeler.Where(item => item.Tag is PlayerAction).ToList();
+            var ekler = ogeler.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+            Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
             var parcaSatirlari = ogeler.Where(item => item.Tag is null)
                 .SelectMany(altMenu => altMenu.Items.OfType<MenuItem>())
                 .Where(item => item.Tag is PlayerAction)

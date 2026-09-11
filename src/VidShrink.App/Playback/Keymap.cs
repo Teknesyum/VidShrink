@@ -61,6 +61,16 @@ internal static class Keymap
     internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause", 1);
     internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen", 1);
     internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset", 1);
+    internal static readonly PlayerAction AspectCycle = new(PlayerCommandKind.AspectCycle, 0, "player.view.aspect", 7);
+    internal static readonly PlayerAction Rotate = new(PlayerCommandKind.Rotate, 90, "player.view.rotate", 7);
+    internal static readonly PlayerAction Mirror = new(PlayerCommandKind.Mirror, 0, "player.view.mirror", 7);
+    internal static readonly PlayerAction Topmost = new(PlayerCommandKind.ToggleTopmost, 0, "player.view.topmost", 7);
+    internal static readonly PlayerAction Info = new(PlayerCommandKind.ToggleInfo, 0, "player.view.info", 7);
+    internal static readonly PlayerAction Screenshot = new(PlayerCommandKind.Screenshot, 0, "player.view.screenshot", 7);
+    internal static readonly PlayerAction PreviousFile = new(PlayerCommandKind.FileStep, -1, "player.list.previous", 8);
+    internal static readonly PlayerAction NextFile = new(PlayerCommandKind.FileStep, 1, "player.list.next", 8);
+    internal static readonly PlayerAction Shuffle = new(PlayerCommandKind.ToggleShuffle, 0, "player.list.shuffle", 8);
+    internal static readonly PlayerAction RepeatCycle = new(PlayerCommandKind.RepeatCycle, 0, "player.list.repeat", 8);
     internal static readonly PlayerAction Mute = new(PlayerCommandKind.ToggleMute, 0, "main.player.menu.mute", 2);
     internal static readonly PlayerAction Faster = new(PlayerCommandKind.Speed, SpeedStep, "main.player.menu.faster", 3);
     internal static readonly PlayerAction Slower = new(PlayerCommandKind.Speed, -SpeedStep, "main.player.menu.slower", 3);
@@ -113,6 +123,16 @@ internal static class Keymap
         new(PlayerInput.OnSymbol("[", Key.OemOpenBrackets), LoopStart),
         new(PlayerInput.OnSymbol("]", Key.OemCloseBrackets), LoopEnd),
         new(PlayerInput.OnSymbol("/", Key.Oem2), LoopClear),
+        new(PlayerInput.OnKey(Key.F5, KeyModifiers.Control), AspectCycle),
+        new(PlayerInput.OnKey(Key.S, KeyModifiers.Control | KeyModifiers.Shift), Rotate),
+        new(PlayerInput.OnKey(Key.H, KeyModifiers.Control), Mirror),
+        new(PlayerInput.OnKey(Key.A, KeyModifiers.Control), Topmost),
+        new(PlayerInput.OnKey(Key.F1, KeyModifiers.Control), Info),
+        new(PlayerInput.OnKey(Key.E, KeyModifiers.Control), Screenshot),
+        new(PlayerInput.OnKey(Key.PageUp), PreviousFile),
+        new(PlayerInput.OnKey(Key.PageDown), NextFile),
+        new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift), Shuffle),
+        new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift), RepeatCycle),
         new(PlayerInput.OnKey(Key.N), BookmarkAdd),
         new(PlayerInput.OnKey(Key.B), BookmarkNext),
         new(PlayerInput.OnKey(Key.A), SubtitleOptions.AudioCycle),
@@ -129,6 +149,8 @@ internal static class Keymap
         Mute,
         Faster, Slower, NormalSpeed,
         NextFrame, PreviousFrame,
+        AspectCycle, Rotate, Mirror, Topmost, Info, Screenshot,
+        PreviousFile, NextFile, Shuffle, RepeatCycle,
         LoopStart, LoopEnd, LoopClear,
         BookmarkAdd, BookmarkNext
     };
@@ -210,6 +232,8 @@ internal static class Keymap
             Key.Down => "↓",
             Key.OemComma => ",",
             Key.OemPeriod => ".",
+            Key.PageUp => "PgUp",
+            Key.PageDown => "PgDn",
             _ => input.Key.ToString()
         };
     }

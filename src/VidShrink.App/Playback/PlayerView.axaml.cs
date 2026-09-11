@@ -53,6 +53,7 @@ internal partial class PlayerView : UserControl
         AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
         Surface.SizeChanged += OnSurfaceSize;
         InitTracks();
+        InitWindow();
 
         RefreshState();
     }
@@ -190,7 +191,7 @@ internal partial class PlayerView : UserControl
                 ShiftAudioDelay(command.Amount);
                 break;
             default:
-                _trace.Add("none");
+                if (!ApplyWindow(command)) _trace.Add("none");
                 break;
         }
 
@@ -305,6 +306,7 @@ internal partial class PlayerView : UserControl
 
     private void OnPressed(object? sender, PointerPressedEventArgs e)
     {
+        if (IsSeekBarSource(e.Source)) return;
         var point = e.GetCurrentPoint(this);
         PlayerButton button;
         if (point.Properties.IsRightButtonPressed) button = PlayerButton.Right;
@@ -361,6 +363,7 @@ internal partial class PlayerView : UserControl
         }
 
         AddTrackMenus(flyout);
+        AppendWindowMenu(flyout);
         return flyout;
     }
 
@@ -447,6 +450,7 @@ internal partial class PlayerView : UserControl
         {
             TogglePlay();
             SaveHistory(true);
+            AfterEnd();
         }
         return drawn;
     }
@@ -489,6 +493,7 @@ internal partial class PlayerView : UserControl
         var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
         _seek.GoTo(resume);
         if (resume > 0) _trace.Add("resume -> " + resume.ToString("0.###"));
+        AfterOpen(path, engine);
         if (!_playing) TogglePlay();
         RefreshState();
     }
@@ -624,6 +629,7 @@ internal partial class PlayerView : UserControl
         parts.Add(Strings.Get("main.player.bookmarkcount", _path is null ? 0 : _history.Bookmarks(_path).Count));
         AppendTrackState(parts);
         TxtControls.Text = string.Join(" - ", parts);
+        RefreshWindowState();
     }
 
     internal void Close()

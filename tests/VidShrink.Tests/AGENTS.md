@@ -14,7 +14,7 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
 - `OynaticiParcaTests.cs` — ffmpeg'in ürettiği 2 ses + 1 gömülü altyazılı mkv: `aid`/`sid`, gecikme, boyut,
   konum geri okunur; cp1254 .srt `sub-text`'te bozulmaz, cp1252 negatif kontrolü bozar. Kısayol, menü ve
   altyazı bırakma PlayerView üstünden. Kanıt `.calisma/dalga2/`.
-- `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucuların libmpv sabitleri CI ile aynı,
-  `EngineFactory` ile açılamayan motor atılır.
-- `OynaticiKarsilastirmaTests.cs` — karşılaştırma paneli iki motor örneğinde: şerit kodlu
-  klipte iki yarının kare farkı ≤1; eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
+- `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucu sabitleri CI ile aynı, açılamayan motor atılır.
+- `OynaticiGorunumTests.cs` — 3. dalga; ayar/son dosyalar `.calisma/dalga3/gecici` altina yazar.
+- `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
+  gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
