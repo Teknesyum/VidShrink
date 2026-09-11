@@ -288,6 +288,7 @@
   "main.command.title": "Команда на FFmpeg",
 
   "main.error.startup": "Стартирането не завърши",
+  "main.instance.waiting": "Кодирането е в ход; {0} ще се отвори, когато приключи.",
   "main.error.link": "Връзката не можа да се отвори",
   "main.error.folder": "Папката не можа да се отвори",
   "main.error.setting": "Настройката не можа да се запази",

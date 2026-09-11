@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg naredba",
 
   "main.error.startup": "Pokretanje nije završilo",
+  "main.instance.waiting": "Kodiranje je još u tijeku; {0} će se otvoriti kada završi.",
   "main.error.link": "Poveznica se nije mogla otvoriti",
   "main.error.folder": "Mapa se nije mogla otvoriti",
   "main.error.setting": "Postavka se nije mogla spremiti",

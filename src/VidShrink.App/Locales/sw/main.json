@@ -288,6 +288,7 @@
   "main.command.title": "Amri ya FFmpeg",
 
   "main.error.startup": "Uanzishaji haukukamilika",
+  "main.instance.waiting": "Uandishaji bado unaendelea; {0} itafunguka ukikamilika.",
   "main.error.link": "Kiungo hakikuweza kufunguliwa",
   "main.error.folder": "Folda haikuweza kufunguliwa",
   "main.error.setting": "Mpangilio haukuweza kuhifadhiwa",

@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg komanda",
 
   "main.error.startup": "Pokretanje nije završeno",
+  "main.instance.waiting": "Кодирање је још у току; {0} ће се отворити када се заврши.",
   "main.error.link": "Veza se ne može otvoriti",
   "main.error.folder": "Fascikla se ne može otvoriti",
   "main.error.setting": "Podešavanje nije sačuvano",

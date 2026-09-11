@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg command",
 
   "main.error.startup": "Startup did not finish",
+  "main.instance.waiting": "Encoding is still running; {0} will open when it finishes.",
   "main.error.link": "The link could not be opened",
   "main.error.folder": "The folder could not be opened",
   "main.error.setting": "The setting could not be saved",

@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg-opdracht",
 
   "main.error.startup": "Het opstarten is niet voltooid",
+  "main.instance.waiting": "Coderen is nog steeds bezig; {0} wordt geopend zodra het klaar is.",
   "main.error.link": "De link kon niet worden geopend",
   "main.error.folder": "De map kon niet worden geopend",
   "main.error.setting": "De instelling kon niet worden opgeslagen",

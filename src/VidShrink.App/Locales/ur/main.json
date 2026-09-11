@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg کمانڈ",
 
   "main.error.startup": "آغاز مکمل نہ ہوا",
+  "main.instance.waiting": "انکوڈنگ ابھی جاری ہے؛ مکمل ہونے پر {0} کھل جائے گی۔",
   "main.error.link": "لنک نہ کھل سکا",
   "main.error.folder": "فولڈر نہ کھل سکا",
   "main.error.setting": "ترتیب محفوظ نہ ہو سکی",

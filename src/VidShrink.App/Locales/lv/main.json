@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg komanda",
 
   "main.error.startup": "Palaišana nepabeidzās",
+  "main.instance.waiting": "Kodēšana joprojām notiek; {0} atvērsies, kad tā pabeigsies.",
   "main.error.link": "Saiti neizdevās atvērt",
   "main.error.folder": "Mapi neizdevās atvērt",
   "main.error.setting": "Iestatījumu neizdevās saglabāt",

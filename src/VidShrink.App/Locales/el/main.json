@@ -288,6 +288,7 @@
   "main.command.title": "Εντολή FFmpeg",
 
   "main.error.startup": "Η εκκίνηση δεν ολοκληρώθηκε",
+  "main.instance.waiting": "Η κωδικοποίηση εξακολουθεί να εκτελείται· το {0} θα ανοίξει μόλις τελειώσει.",
   "main.error.link": "Ο σύνδεσμος δεν άνοιξε",
   "main.error.folder": "Ο φάκελος δεν άνοιξε",
   "main.error.setting": "Η ρύθμιση δεν αποθηκεύτηκε",

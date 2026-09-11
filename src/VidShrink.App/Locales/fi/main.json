@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg-komento",
 
   "main.error.startup": "Käynnistys ei valmistunut",
+  "main.instance.waiting": "Koodaus on vielä käynnissä; {0} avautuu, kun se valmistuu.",
   "main.error.link": "Linkkiä ei voitu avata",
   "main.error.folder": "Kansiota ei voitu avata",
   "main.error.setting": "Asetusta ei voitu tallentaa",

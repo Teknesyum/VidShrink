@@ -3765,6 +3765,7 @@ public partial class MainWindow : Window
             HideRetryAsk();
             SetRunning(false);
             RefreshConversion();
+            FlushPendingMacFile();
         }
     }
 
@@ -3991,6 +3992,7 @@ public partial class MainWindow : Window
             cts.Dispose();
             SetRunning(false);
             RefreshConversion();
+            FlushPendingMacFile();
         }
     }
 

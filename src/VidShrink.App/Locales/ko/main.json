@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg 명령",
 
   "main.error.startup": "시작이 끝나지 않았습니다",
+  "main.instance.waiting": "인코딩이 아직 진행 중입니다. 완료되면 {0}이(가) 열립니다.",
   "main.error.link": "링크를 열 수 없습니다",
   "main.error.folder": "폴더를 열 수 없습니다",
   "main.error.setting": "설정을 저장할 수 없습니다",

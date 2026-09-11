@@ -288,6 +288,7 @@
   "main.command.title": "Příkaz FFmpeg",
 
   "main.error.startup": "Spuštění se nedokončilo",
+  "main.instance.waiting": "Kódování stále probíhá; {0} se otevře, jakmile skončí.",
   "main.error.link": "Odkaz se nepodařilo otevřít",
   "main.error.folder": "Složku se nepodařilo otevřít",
   "main.error.setting": "Nastavení se nepodařilo uložit",

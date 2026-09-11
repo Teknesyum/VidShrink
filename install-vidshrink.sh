@@ -65,6 +65,21 @@ refresh_desktop_databases() {
     fi
 }
 
+# Desktop Entry Specification'ın Exec anahtarı için tırnaklı argüman kaçışı: önce
+# tırnaklı argüman içinde ters bölü, ters tırnak, dolar ve çift tırnak birer ters bölüyle
+# kaçılır, sonra dosya düzeyindeki string kaçışı her ters bölüyü ikiye katlar. İki adım
+# art arda uygulanınca sıradaki dört karakter için net karşılık: ters bölü dört ters
+# bölüye, öteki üçü iki ters bölü + kendisine döner. % ayrı bir kural: %% olur, alan
+# kodunun (%f/%F) kendisiyle çakışmasın diye.
+exec_argument_escape() {
+    printf '%s' "$1" | sed \
+        -e 's/\\/\\\\\\\\/g' \
+        -e 's/`/\\\\`/g' \
+        -e 's/\$/\\\\$/g' \
+        -e 's/"/\\\\"/g' \
+        -e 's/%/%%/g'
+}
+
 write_desktop_entry() {
     executable=$1
     mime_list=$(printf '%s\n' "$media_types" | awk '{ print $2 }' | sort -u | tr '\n' ';')
@@ -86,12 +101,14 @@ write_desktop_entry() {
 </mime-info>
 MIME
 
+    escaped_executable=$(exec_argument_escape "$executable")
+
     {
         printf '[Desktop Entry]\n'
         printf 'Type=Application\n'
         printf 'Name=VidShrink\n'
         printf 'Comment=Play and shrink videos\n'
-        printf 'Exec="%s" %%F\n' "$executable"
+        printf 'Exec="%s" %%F\n' "$escaped_executable"
         [ -z "$icon_line" ] || printf '%s\n' "$icon_line"
         printf 'Terminal=false\n'
         printf 'Categories=AudioVideo;Video;Player;\n'

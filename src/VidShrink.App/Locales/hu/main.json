@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg parancs",
 
   "main.error.startup": "Az indítás nem fejeződött be",
+  "main.instance.waiting": "A kódolás még folyamatban van; a {0} megnyílik, amint befejeződik.",
   "main.error.link": "A hivatkozást nem sikerült megnyitni",
   "main.error.folder": "A mappát nem sikerült megnyitni",
   "main.error.setting": "A beállítást nem sikerült menteni",

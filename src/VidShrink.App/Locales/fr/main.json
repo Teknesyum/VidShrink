@@ -288,6 +288,7 @@
   "main.command.title": "Commande FFmpeg",
 
   "main.error.startup": "Le démarrage ne s'est pas terminé",
+  "main.instance.waiting": "L'encodage est toujours en cours ; {0} s'ouvrira une fois terminé.",
   "main.error.link": "Le lien n'a pas pu être ouvert",
   "main.error.folder": "Le dossier n'a pas pu être ouvert",
   "main.error.setting": "Le réglage n'a pas pu être enregistré",

@@ -288,6 +288,7 @@
   "main.command.title": "فرمان FFmpeg",
 
   "main.error.startup": "راه‌اندازی تمام نشد",
+  "main.instance.waiting": "کدگذاری هنوز در حال اجراست؛ {0} پس از پایان باز خواهد شد.",
   "main.error.link": "پیوند باز نشد",
   "main.error.folder": "پوشه باز نشد",
   "main.error.setting": "تنظیم ذخیره نشد",

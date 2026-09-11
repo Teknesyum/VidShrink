@@ -288,6 +288,7 @@
   "main.command.title": "คำสั่ง FFmpeg",
 
   "main.error.startup": "การเริ่มต้นไม่เสร็จ",
+  "main.instance.waiting": "การเข้ารหัสยังทำงานอยู่ {0} จะเปิดขึ้นเมื่อเสร็จสิ้น",
   "main.error.link": "เปิดลิงก์ไม่ได้",
   "main.error.folder": "เปิดโฟลเดอร์ไม่ได้",
   "main.error.setting": "บันทึกการตั้งค่าไม่ได้",

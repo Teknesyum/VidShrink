@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg कमांड",
 
   "main.error.startup": "स्टार्टअप पूरा नहीं हुआ",
+  "main.instance.waiting": "एन्कोडिंग अभी भी चल रही है; समाप्त होने पर {0} खुल जाएगी।",
   "main.error.link": "लिंक खोला नहीं जा सका",
   "main.error.folder": "फ़ोल्डर खोला नहीं जा सका",
   "main.error.setting": "सेटिंग सहेजी नहीं जा सकी",

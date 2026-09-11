@@ -288,6 +288,7 @@
   "main.command.title": "FFmpegコマンド",
 
   "main.error.startup": "起動が完了しませんでした",
+  "main.instance.waiting": "エンコードはまだ実行中です。完了すると {0} が開きます。",
   "main.error.link": "リンクを開けませんでした",
   "main.error.folder": "フォルダーを開けませんでした",
   "main.error.setting": "設定を保存できませんでした",

@@ -288,6 +288,7 @@
   "main.command.title": "FFmpeg-Befehl",
 
   "main.error.startup": "Der Start wurde nicht abgeschlossen",
+  "main.instance.waiting": "Die Kodierung läuft noch; {0} wird geöffnet, sobald sie fertig ist.",
   "main.error.link": "Der Link konnte nicht geöffnet werden",
   "main.error.folder": "Der Ordner konnte nicht geöffnet werden",
   "main.error.setting": "Die Einstellung konnte nicht gespeichert werden",

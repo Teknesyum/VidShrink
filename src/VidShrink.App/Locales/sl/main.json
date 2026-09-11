@@ -288,6 +288,7 @@
   "main.command.title": "Ukaz FFmpeg",
 
   "main.error.startup": "Zagon se ni končal",
+  "main.instance.waiting": "Kodiranje še poteka; {0} se bo odprl, ko bo končano.",
   "main.error.link": "Povezave ni bilo mogoče odpreti",
   "main.error.folder": "Mape ni bilo mogoče odpreti",
   "main.error.setting": "Nastavitve ni bilo mogoče shraniti",

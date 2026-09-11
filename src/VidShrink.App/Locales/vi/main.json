@@ -288,6 +288,7 @@
   "main.command.title": "Lệnh FFmpeg",
 
   "main.error.startup": "Khởi động chưa hoàn tất",
+  "main.instance.waiting": "Quá trình mã hóa vẫn đang chạy; {0} sẽ mở khi hoàn tất.",
   "main.error.link": "Không mở được liên kết",
   "main.error.folder": "Không mở được thư mục",
   "main.error.setting": "Không lưu được cài đặt",

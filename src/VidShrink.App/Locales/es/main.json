@@ -288,6 +288,7 @@
   "main.command.title": "Comando FFmpeg",
 
   "main.error.startup": "El arranque no terminó",
+  "main.instance.waiting": "La codificación sigue en curso; {0} se abrirá cuando termine.",
   "main.error.link": "No se pudo abrir el enlace",
   "main.error.folder": "No se pudo abrir la carpeta",
   "main.error.setting": "No se pudo guardar el ajuste",
