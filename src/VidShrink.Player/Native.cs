@@ -74,6 +74,7 @@ internal static unsafe class Native
     public const int MPV_EVENT_FILE_LOADED = 8;
     public const int MPV_EVENT_VIDEO_RECONFIG = 17;
     public const int MPV_EVENT_SEEK = 20;
+    public const int MPV_EVENT_PLAYBACK_RESTART = 21;
     public const int MPV_EVENT_PROPERTY_CHANGE = 22;
 
     public const int MPV_END_FILE_REASON_ERROR = 4;

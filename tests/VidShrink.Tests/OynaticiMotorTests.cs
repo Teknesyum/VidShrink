@@ -251,12 +251,16 @@ public sealed class OynaticiMotorTests
         await engine.OpenAsync(clip);
         var first = await KareBekleAsync(engine, 0, TimeSpan.FromSeconds(10));
 
+        var restarts = engine.PlaybackRestarts;
         var exact = await engine.SeekAsync(5.5, SeekPrecision.Exact);
+        var exactRestarted = await YenidenBaslamaBekleAsync(engine, restarts);
         var exactPos = MotorKanit.ReadDouble(engine, "time-pos");
         long seen = 0;
         var afterExact = await KareBekleAsync(engine, seen, TimeSpan.FromSeconds(5));
 
+        restarts = engine.PlaybackRestarts;
         var keyframe = await engine.SeekAsync(5.5, SeekPrecision.Keyframe);
+        var keyRestarted = await YenidenBaslamaBekleAsync(engine, restarts);
         var keyPos = MotorKanit.ReadDouble(engine, "time-pos");
 
         var ayni = first.Pixels.AsSpan().SequenceEqual(afterExact.Pixels);
@@ -268,9 +272,18 @@ public sealed class OynaticiMotorTests
 
         Assert.Equal(SeekOutcome.Shown, exact.Outcome);
         Assert.Equal(SeekOutcome.Shown, keyframe.Outcome);
+        Assert.True(exactRestarted, "exact aramadan sonra MPV_EVENT_PLAYBACK_RESTART gelmedi");
+        Assert.True(keyRestarted, "keyframes aramadan sonra MPV_EVENT_PLAYBACK_RESTART gelmedi");
         Assert.True(Math.Abs(exactPos - 5.5) <= 1.0 / 30 + 0.001, $"exact arama 5.5'e inmedi: {exactPos}");
         Assert.True(Math.Abs(keyPos - 5.5) >= 0.4, $"keyframes arama anahtar kareye inmedi: {keyPos}");
         Assert.False(ayni, "arama bitti denildi ama gosterilen kare acilis karesiyle ayni");
+    }
+
+    private static async Task<bool> YenidenBaslamaBekleAsync(MpvEngine engine, long before)
+    {
+        var saat = Stopwatch.StartNew();
+        while (engine.PlaybackRestarts <= before && saat.Elapsed < TimeSpan.FromSeconds(3)) await Task.Delay(5);
+        return engine.PlaybackRestarts > before;
     }
 
     [Fact]
@@ -417,7 +430,7 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
 
 public sealed class OynaticiMotorAramaOlculeri
 {
-    [Fact]
+    [QuietMachineFact]
     public async Task H264_1080p_TamAramaMedyaniAltmisMilisaniyeAltinda()
     {
         var olcum = await AramaOlcumu.OlcAsync(MotorKlipleri.H264_1080p60);
@@ -427,7 +440,7 @@ public sealed class OynaticiMotorAramaOlculeri
         Assert.True(olcum.Medyan <= 60, $"1080p medyan {MotorKanit.Ms(olcum.Medyan)} ms > 60 ms");
     }
 
-    [Fact]
+    [QuietMachineFact]
     public async Task H264_2160p_TamAramaMedyaniIkiYuzMilisaniyeAltinda()
     {
         var olcum = await AramaOlcumu.OlcAsync(MotorKlipleri.H264_2160p30);

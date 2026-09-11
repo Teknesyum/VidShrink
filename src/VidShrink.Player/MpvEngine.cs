@@ -41,6 +41,7 @@ public sealed class MpvEngine : IPlaybackEngine
     private FrameBuffer? _back;
     private long _serial;
     private long _framesRendered;
+    private long _restarts;
     private int _videoWidth;
     private int _videoHeight;
 
@@ -136,6 +137,8 @@ public sealed class MpvEngine : IPlaybackEngine
     public double PositionSeconds => Volatile.Read(ref _position);
 
     public long FramesRendered => Interlocked.Read(ref _framesRendered);
+
+    public long PlaybackRestarts => Interlocked.Read(ref _restarts);
 
     public IReadOnlyList<string> RecentLog => _log.ToArray();
 
@@ -275,6 +278,9 @@ public sealed class MpvEngine : IPlaybackEngine
                     break;
                 case MPV_EVENT_SEEK:
                     OnSeek();
+                    break;
+                case MPV_EVENT_PLAYBACK_RESTART:
+                    Interlocked.Increment(ref _restarts);
                     break;
                 case MPV_EVENT_PROPERTY_CHANGE:
                     OnProperty(ev->ReplyUserdata, (MpvEventProperty*)ev->Data);
