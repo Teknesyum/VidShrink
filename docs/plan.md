@@ -333,3 +333,38 @@ libmpv arama medyani ≤60 ms ve kurulum deltasi <106 MB tutmazsa LibVLC geri ca
 **Sira:** 0. dalgadan once Avalonia 11.3.20 → 12.1.2 gecis sondasi (12.0.0 7 Nisan 2026'da
 cikti, net8.0 destekli). Yeni oynatici kodu 12'ye yazilir; sonda derleme hatasi sayisini ve
 tam suiti olcer.
+
+### Avalonia 12, v1 kapsami, tahmin yontemi (netlestirme 008-010)
+
+Kanit: `docs/netlestirme/010-...`; olgular kirilma analizi ve gecmis tahmin isabeti.
+
+**Avalonia 12:** paket guncellemesi, bastan insa degil (code-behind, `{Binding}` 0; resmi
+kirilma listesinin depo karsiligi 1 dosya/1 satir + dogrulanamayan 3 madde). Tahmin 1
+sozlesme, P50 2 tur, P90 4 tur. Sonda: dal `t0/avalonia-12`, 4 projede 12.1.2, derleme hata
+sayisi, tam suit, 4 RID publish, Windows'ta ac + bir dosya kucult. Kabul: hata ≤15 dosya,
+yeni kirmizi 0, 4 RID publish cikar, ≤3 tur. Tutmazsa 11.3.20'de kalinir, oynatici yuzeyi
+bitmap tabanli (surumden bagimsiz) kurulur, gecis v1 sonrasina.
+
+**Gelecek major'lar:** her biri ≤1 sozlesme butcesi. Yeni major'in .1.x'i cikinca ve oynatici
+kutuphanesi destekleyince gecilir, .0'a gecilmez. Kacinilacak: `internal`/`Unstable` API,
+`OpenGlControlBase`/`ICustomDrawOperation` dogrudan arayuzde (gerekirse tek adaptor dosyasi),
+Fluent ic stil anahtarlari, reflection tabanli Binding.
+
+**v1 kesiti:** win-x64 Standart 30 + Gelismis 13 tam; osx-arm64 Standart 30 + motordan bagimsiz
+Gelismisler; osx-x64 ve linux-x64 derlenir, "deneysel" etiketiyle, sinanmaz. ~19-20 tur / 8-12
+gun. Hepsi 4 RID'de sinanmis senaryosu ~24-30 tur / 12-20 gun. Ertelenen: macOS Gelismis 13,
+linux/osx-x64 sinanmis destek (v1.1-1.2); macOS CI testi v1'den hemen sonraki ilk is.
+0. dalga adim 1'e eklenir: osx-arm64 bundle'a libmpv gomme 1 turda calismali; calismazsa tek
+motor kurali ile her platformda LibVLC.
+
+**Tahmin yontemi:** 007'nin "1 tur = 3 gun" birimi gecersiz; olculen 0,28-0,64 gun/tur,
+standart 0,5 (P50) / 0,7 (P90). Tur tahminleri ×1,5 (P50) / ×3 (P90) okunur. Pilot 1 Avalonia
+12 sondasi, pilot 2 0. dalga libmpv olcumu. Her sozlesme acilista tahmin tur/gun/token yazar,
+kapanista gercegi `docs/olcumler/tahmin-isabet.md`'ye girer; katsayi iki pilottan sonra,
+sonra her 5 sozlesmede yenilenir.
+
+**Kendi kutuphane tetigi** (biri olculup yazilinca acilir): libmpv ve LibVLC ikisi de SW
+esigini tutmaz ve HW yolu 1 sozlesmede kapanmaz; v1 zorunlu ozelliklerden ≥2'si iki
+kutuphanede de yapilamaz; ikisi de win-x64 veya osx-arm64'te 2 turda paketlenemez; AGPL
+uyumsuzlugu ya da 12 ay commit'siz kutuphane; kurulum >300 MB ve kullanici sikayeti. Acilirsa
+once 1 sozlesmelik boru pilotu, karar kullanicinin.
