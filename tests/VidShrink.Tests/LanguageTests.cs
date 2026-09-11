@@ -974,7 +974,7 @@ public sealed class LanguageTests : IDisposable
             Relayout(window, size);
 
             texts.AddRange(window.GetVisualDescendants().OfType<TextBlock>()
-                .Where(block => block.IsEffectivelyVisible)
+                .Where(block => block.IsShown())
                 .Select(block => block.Text ?? string.Empty));
 
             texts.AddRange(window.GetVisualDescendants().OfType<ContentControl>()

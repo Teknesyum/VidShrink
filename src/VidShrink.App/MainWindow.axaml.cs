@@ -237,7 +237,7 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
-        Loaded += OnWindowLoaded;
+        Opened += OnWindowLoaded;
     }
 
     /// <summary>
@@ -459,7 +459,7 @@ public partial class MainWindow : Window
     private static void Watch(AvaloniaObject target, AvaloniaProperty property, Action handler)
         => target.PropertyChanged += (_, args) => { if (args.Property == property) handler(); };
 
-    private async void OnWindowLoaded(object? sender, RoutedEventArgs e)
+    private async void OnWindowLoaded(object? sender, EventArgs e)
     {
         try
         {

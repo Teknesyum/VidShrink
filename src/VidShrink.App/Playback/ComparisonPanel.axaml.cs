@@ -725,7 +725,7 @@ internal partial class ComparisonPanel : UserControl
 
         var area = overlay.Bounds.Size;
         if (area.Width > 0 && area.Height > 0) return area;
-        return (overlay.GetVisualParent() as Visual)?.Bounds.Size ?? area;
+        return overlay.GetVisualAncestors().OfType<VisualLayerManager>().FirstOrDefault()?.Bounds.Size ?? area;
     }
 
     /// <summary>Panelin taban boyu. Terfi ettikten sonra kabuk büyümüş olur; band saklanandır.</summary>

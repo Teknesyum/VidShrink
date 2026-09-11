@@ -453,7 +453,7 @@ public sealed class PerformanceCheckUiTests
             window => Named<ScrollViewer>(window, "PageAdvanced")
                 .GetSelfAndVisualDescendants()
                 .OfType<ScrollViewer>()
-                .Where(viewer => viewer.IsEffectivelyVisible && viewer.FindAncestorOfType<TextBox>() is null)
+                .Where(viewer => viewer.IsShown() && viewer.FindAncestorOfType<TextBox>() is null)
                 .Select(viewer => (
                     Name: string.IsNullOrEmpty(viewer.Name) ? viewer.GetType().Name : viewer.Name!,
                     Vertical: viewer.Extent.Height - viewer.Viewport.Height,

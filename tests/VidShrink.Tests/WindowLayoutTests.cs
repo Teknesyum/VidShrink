@@ -249,7 +249,7 @@ public sealed class WindowLayoutTests
 
             var blocks = window.GetVisualDescendants()
                 .OfType<TextBlock>()
-                .Where(block => block.IsEffectivelyVisible && block.Bounds.Width > 0)
+                .Where(block => block.IsShown() && block.Bounds.Width > 0)
                 .ToList();
 
             scans.Add(new TabScan(
@@ -352,7 +352,7 @@ public sealed class WindowLayoutTests
     private static IReadOnlyList<Overflow> LayOut(Size size, bool loaded) =>
         Read(size, loaded, window => (IReadOnlyList<Overflow>)window.GetVisualDescendants()
             .OfType<ScrollViewer>()
-            .Where(viewer => viewer.IsEffectivelyVisible && IsPageLevel(viewer))
+            .Where(viewer => viewer.IsShown() && IsPageLevel(viewer))
             .Select(viewer => new Overflow(
                 string.IsNullOrEmpty(viewer.Name) ? viewer.GetType().Name : viewer.Name!,
                 viewer.Extent.Height - viewer.Viewport.Height,
@@ -980,7 +980,7 @@ public sealed class WindowLayoutTests
                 var header = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
 
                 foreach (var button in window.GetVisualDescendants().OfType<Button>()
-                             .Where(candidate => candidate.IsEffectivelyVisible && candidate.Bounds.Height > 0)
+                             .Where(candidate => candidate.IsShown() && candidate.Bounds.Height > 0)
                              .Where(candidate => candidate.GetVisualDescendants()
                                  .OfType<Border>().Any(border => border.Name == "Badge"))
                              .Where(candidate => seen.Add(candidate)))
@@ -1087,7 +1087,7 @@ public sealed class WindowLayoutTests
         while (parent is not null)
         {
             var text = parent.GetVisualDescendants().OfType<TextBlock>()
-                .Where(block => block.IsEffectivelyVisible && block.Bounds.Height > 0)
+                .Where(block => block.IsShown() && block.Bounds.Height > 0)
                 .FirstOrDefault(block => !block.GetVisualAncestors().Contains(badge));
             if (text is not null) return text;
             parent = parent.GetVisualParent();
@@ -1288,11 +1288,11 @@ public sealed class WindowLayoutTests
     /// </summary>
     private static void WarmTextShaping(MainWindow window)
     {
-        foreach (var block in window.GetVisualDescendants().OfType<TextBlock>().Where(b => b.IsEffectivelyVisible))
+        foreach (var block in window.GetVisualDescendants().OfType<TextBlock>().Where(b => b.IsShown()))
             if (!string.IsNullOrEmpty(block.Text))
                 NeededWidth(block, block.Text!);
 
-        foreach (var box in window.GetVisualDescendants().OfType<ComboBox>().Where(b => b.IsEffectivelyVisible))
+        foreach (var box in window.GetVisualDescendants().OfType<ComboBox>().Where(b => b.IsShown()))
         {
             if (box.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault() is not { } shown) continue;
 
@@ -1304,13 +1304,11 @@ public sealed class WindowLayoutTests
     }
 
     private static double NeededWidth(TextBlock face, string text) =>
-        new FormattedText(
+        new Avalonia.Media.TextFormatting.TextLayout(
             text,
-            CultureInfo.InvariantCulture,
-            FlowDirection.LeftToRight,
             new Typeface(face.FontFamily, face.FontStyle, face.FontWeight),
             face.FontSize,
-            Brushes.Black).Width;
+            Brushes.Black).WidthIncludingTrailingWhitespace;
 
     /// <summary>
     /// Bir açılır kutunun yazısına kalan yer. Kutunun kendi genişliği değil: şablondaki
@@ -1405,7 +1403,7 @@ public sealed class WindowLayoutTests
 
                 var tab = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
 
-                foreach (var box in window.GetVisualDescendants().OfType<ComboBox>().Where(b => b.IsEffectivelyVisible))
+                foreach (var box in window.GetVisualDescendants().OfType<ComboBox>().Where(b => b.IsShown()))
                 {
                     if (box.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault() is not { } shown) continue;
 
@@ -1421,7 +1419,7 @@ public sealed class WindowLayoutTests
                         labels.Add(new BoxLabel(tab, $"{name} · seçenek", option!, NeededWidth(shown, option!), room));
                 }
 
-                foreach (var button in window.GetVisualDescendants().OfType<Button>().Where(b => b.IsEffectivelyVisible))
+                foreach (var button in window.GetVisualDescendants().OfType<Button>().Where(b => b.IsShown()))
                 {
                     if (button.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault() is not { } shown) continue;
                     if (string.IsNullOrWhiteSpace(shown.Text)) continue;

@@ -335,17 +335,32 @@ public sealed class OnizlemeBarinakTests
     [Fact]
     public void K4_Terfi_odagi_tutar_disari_tiklama_odagi_birakir()
     {
-        var (focusedOnPromote, focusReleasedAfterOutsideClick) = Read((window, panel) =>
+        var (focusedOnPromote, focusReleasedAfterOutsideClick) = AppHost.Run(() =>
         {
-            WheelTo(window, panel, ShelterStage.Mid);
-            var onPromote = ReferenceEquals(window.FocusManager?.GetFocusedElement(), panel.Shell);
+            var window = new MainWindow();
+            var opened = typeof(TopLevel).GetField(nameof(TopLevel.Opened), System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                ?? throw new InvalidOperationException("TopLevel.Opened alanı bulunamadı.");
+            opened.SetValue(window, null);
+            window.Show();
+            try
+            {
+                LayOutAt(window, WindowSize);
+                var panel = window.GetVisualDescendants().OfType<ComparisonPanel>().Single();
 
-            Tap(window, new Point(-5, -5));
+                WheelTo(window, panel, ShelterStage.Mid);
+                var onPromote = ReferenceEquals(window.FocusManager?.GetFocusedElement(), panel.Shell);
 
-            var afterOutside = window.FocusManager?.GetFocusedElement();
-            var released = !ReferenceEquals(afterOutside, panel.Shell);
+                Tap(window, new Point(-5, -5));
 
-            return (onPromote, released);
+                var afterOutside = window.FocusManager?.GetFocusedElement();
+                var released = !ReferenceEquals(afterOutside, panel.Shell);
+
+                return (onPromote, released);
+            }
+            finally
+            {
+                window.Close();
+            }
         });
 
         _output.WriteLine($"K4FOCUS onPromote={focusedOnPromote} released={focusReleasedAfterOutsideClick}");

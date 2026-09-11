@@ -60,7 +60,7 @@ public sealed class VisibleTextTests
 
                 result.AddRange(window.GetVisualDescendants()
                     .OfType<TextBlock>()
-                    .Where(block => block.IsEffectivelyVisible)
+                    .Where(block => block.IsShown())
                     .Where(block => block.TemplatedParent is null)
                     .Where(block => string.IsNullOrWhiteSpace(block.Text))
                     .Where(block => block.Inlines is null || !block.Inlines.OfType<Run>()
@@ -70,7 +70,7 @@ public sealed class VisibleTextTests
 
                 result.AddRange(window.GetVisualDescendants()
                     .OfType<Button>()
-                    .Where(button => button.IsEffectivelyVisible)
+                    .Where(button => button.IsShown())
                     .Where(button => button.Content is null || button.Content is string text && string.IsNullOrWhiteSpace(text))
                     .Where(button => !EmptyButtonExemptions.Contains(button.Name ?? string.Empty))
                     .Select(button => $"tab {index}: {button.Name ?? "<unnamed button>"}"));
