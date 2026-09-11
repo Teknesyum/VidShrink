@@ -464,7 +464,7 @@ public sealed class OynaticiMotorTestsGirdi : IClassFixture<GirdiKlipFixture>
         { Duration = engine.DurationSeconds };
 
         var saat = Stopwatch.StartNew();
-        for (var i = 0; i < 10; i++) coalescer.Nudge(PlayerInputMap.WheelStepSeconds);
+        for (var i = 0; i < 10; i++) coalescer.Nudge(Keymap.SeekFine);
         await coalescer.Idle;
         saat.Stop();
 

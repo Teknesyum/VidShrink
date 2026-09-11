@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink ni privzeti program za videe. Izberete ga lahko na strani Privzete aplikacije v sistemu Windows.",
   "settings.default-app.open": "Privzete aplikacije",
-  "settings.default-app.dismiss": "Ne sprašuj več"
+  "settings.default-app.dismiss": "Ne sprašuj več",
+  "settings.player-shortcuts.title": "Bližnjice predvajalnika",
+  "settings.player-shortcuts.hint": "Zavihek predvajalnika, njegov meni in ta seznam berejo isto tabelo."
 }

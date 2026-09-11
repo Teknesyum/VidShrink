@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink si programu chaguomsingi ya video. Unaweza kuichagua kwenye ukurasa wa Programu chaguomsingi wa Windows.",
   "settings.default-app.open": "Programu chaguomsingi",
-  "settings.default-app.dismiss": "Usiulize tena"
+  "settings.default-app.dismiss": "Usiulize tena",
+  "settings.player-shortcuts.title": "Njia za mkato za kichezaji",
+  "settings.player-shortcuts.hint": "Kichupo cha kichezaji, menyu yake, na orodha hii vyote vinasoma jedwali moja."
 }

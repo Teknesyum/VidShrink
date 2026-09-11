@@ -5,28 +5,11 @@ using System.Threading.Tasks;
 
 namespace VidShrink.App.Playback;
 
-[Flags]
-internal enum PlayerModifiers
-{
-    None = 0,
-    Ctrl = 1,
-    Shift = 2,
-    Alt = 4
-}
-
 internal enum PlayerButton
 {
     Left,
     Middle,
     Right
-}
-
-internal enum PlayerKey
-{
-    None,
-    Space,
-    Menu,
-    Escape
 }
 
 internal enum PlayerCommandKind
@@ -38,77 +21,22 @@ internal enum PlayerCommandKind
     ToggleFullscreen,
     ContextMenu,
     LeaveFullscreen,
-    ResetZoom
-}
-
-internal enum PlayerMenuRow
-{
-    PlayPause,
-    Fullscreen,
-    ResetZoom
+    ResetZoom,
+    Volume,
+    ToggleMute,
+    Speed,
+    SpeedReset,
+    FrameStep,
+    LoopStart,
+    LoopEnd,
+    LoopClear,
+    BookmarkAdd,
+    BookmarkNext
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)
 {
     internal static readonly PlayerCommand None = new(PlayerCommandKind.None, 0);
-}
-
-internal static class PlayerInputMap
-{
-    internal const double WheelStepSeconds = 1;
-    internal const double CtrlStepSeconds = 10;
-    internal const double ShiftStepSeconds = 60;
-    internal const double CtrlShiftStepSeconds = 300;
-
-    internal static double StepFor(PlayerModifiers modifiers)
-    {
-        var ctrl = (modifiers & PlayerModifiers.Ctrl) != 0;
-        var shift = (modifiers & PlayerModifiers.Shift) != 0;
-        if (ctrl && shift) return CtrlShiftStepSeconds;
-        if (shift) return ShiftStepSeconds;
-        if (ctrl) return CtrlStepSeconds;
-        return WheelStepSeconds;
-    }
-
-    internal static PlayerCommand Wheel(double notches, PlayerModifiers modifiers)
-    {
-        if ((modifiers & PlayerModifiers.Alt) != 0)
-            return new PlayerCommand(PlayerCommandKind.Zoom, notches);
-
-        return new PlayerCommand(PlayerCommandKind.Seek, notches * StepFor(modifiers));
-    }
-
-    internal static PlayerCommand Press(PlayerButton button) => button switch
-    {
-        PlayerButton.Right => new PlayerCommand(PlayerCommandKind.TogglePlay, 0),
-        PlayerButton.Middle => new PlayerCommand(PlayerCommandKind.ToggleFullscreen, 0),
-        _ => PlayerCommand.None
-    };
-
-    internal static PlayerCommand Key(PlayerKey key) => key switch
-    {
-        PlayerKey.Space => new PlayerCommand(PlayerCommandKind.TogglePlay, 0),
-        PlayerKey.Menu => new PlayerCommand(PlayerCommandKind.ContextMenu, 0),
-        PlayerKey.Escape => new PlayerCommand(PlayerCommandKind.LeaveFullscreen, 0),
-        _ => PlayerCommand.None
-    };
-
-    internal static PlayerCommand MenuButton() => new(PlayerCommandKind.ContextMenu, 0);
-
-    internal static PlayerCommand MenuRow(PlayerMenuRow row) => row switch
-    {
-        PlayerMenuRow.PlayPause => new PlayerCommand(PlayerCommandKind.TogglePlay, 0),
-        PlayerMenuRow.Fullscreen => new PlayerCommand(PlayerCommandKind.ToggleFullscreen, 0),
-        PlayerMenuRow.ResetZoom => new PlayerCommand(PlayerCommandKind.ResetZoom, 0),
-        _ => PlayerCommand.None
-    };
-
-    internal static readonly IReadOnlyList<(PlayerMenuRow Row, string Key)> MenuRows = new[]
-    {
-        (PlayerMenuRow.PlayPause, "main.player.menu.playpause"),
-        (PlayerMenuRow.Fullscreen, "main.player.menu.fullscreen"),
-        (PlayerMenuRow.ResetZoom, "main.player.menu.reset")
-    };
 }
 
 internal sealed class SeekCoalescer

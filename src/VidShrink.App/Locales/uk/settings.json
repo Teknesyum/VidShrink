@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink не є типовою програмою для відео. Її можна вибрати на сторінці «Програми за замовчуванням» у Windows.",
   "settings.default-app.open": "Програми за замовчуванням",
-  "settings.default-app.dismiss": "Більше не питати"
+  "settings.default-app.dismiss": "Більше не питати",
+  "settings.player-shortcuts.title": "Клавіші плеєра",
+  "settings.player-shortcuts.hint": "Вкладка плеєра, його меню та цей список читають одну й ту саму таблицю."
 }

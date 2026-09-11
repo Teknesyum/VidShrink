@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink không phải chương trình mặc định cho video. Bạn có thể chọn nó ở trang Ứng dụng mặc định của Windows.",
   "settings.default-app.open": "Ứng dụng mặc định",
-  "settings.default-app.dismiss": "Không hỏi lại"
+  "settings.default-app.dismiss": "Không hỏi lại",
+  "settings.player-shortcuts.title": "Phím tắt trình phát",
+  "settings.player-shortcuts.hint": "Tab trình phát, menu của nó và danh sách này đều đọc từ cùng một bảng."
 }

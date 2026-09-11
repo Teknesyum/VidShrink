@@ -67,6 +67,28 @@ public interface IPlaybackEngine : IDisposable
     Task<SeekResult> SeekAsync(double seconds, SeekPrecision precision, CancellationToken ct = default);
 
     bool TryCopyLatest(ref long seen, FrameCopy copy);
+
+    double Speed => 1;
+
+    double Volume => 100;
+
+    bool Muted => false;
+
+    double FramesPerSecond => double.NaN;
+
+    double LoopStartSeconds => double.NaN;
+
+    double LoopEndSeconds => double.NaN;
+
+    void SetSpeed(double speed) { }
+
+    void SetVolume(double volume) { }
+
+    void SetMuted(bool muted) { }
+
+    void StepFrame(bool backward) { }
+
+    void SetLoop(double startSeconds, double endSeconds) { }
 }
 
 public sealed class PlaybackOpenException : Exception

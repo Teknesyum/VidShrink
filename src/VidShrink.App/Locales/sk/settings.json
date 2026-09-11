@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink nie je predvolený program pre videá. Môžete ho vybrať na stránke Predvolené aplikácie vo Windows.",
   "settings.default-app.open": "Predvolené aplikácie",
-  "settings.default-app.dismiss": "Už sa nepýtať"
+  "settings.default-app.dismiss": "Už sa nepýtať",
+  "settings.player-shortcuts.title": "Klávesové skratky prehrávača",
+  "settings.player-shortcuts.hint": "Karta prehrávača, jeho ponuka a tento zoznam čítajú z rovnakej tabuľky."
 }

@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink برنامهٔ پیش‌فرض ویدیوها نیست. می‌توانید آن را در صفحهٔ «برنامه‌های پیش‌فرض» ویندوز انتخاب کنید.",
   "settings.default-app.open": "برنامه‌های پیش‌فرض",
-  "settings.default-app.dismiss": "دیگر نپرس"
+  "settings.default-app.dismiss": "دیگر نپرس",
+  "settings.player-shortcuts.title": "میانبرهای پخش‌کننده",
+  "settings.player-shortcuts.hint": "تب پخش‌کننده، منوی آن و این فهرست همگی از یک جدول می‌خوانند."
 }

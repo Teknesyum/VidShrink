@@ -38,5 +38,7 @@
 
   "settings.default-app.suggestion": "VidShrink bukan program lalai untuk video. Anda boleh memilihnya di halaman Aplikasi lalai Windows.",
   "settings.default-app.open": "Aplikasi lalai",
-  "settings.default-app.dismiss": "Jangan tanya lagi"
+  "settings.default-app.dismiss": "Jangan tanya lagi",
+  "settings.player-shortcuts.title": "Pintasan pemain",
+  "settings.player-shortcuts.hint": "Tab pemain, menunya dan senarai ini semuanya membaca jadual yang sama."
 }
