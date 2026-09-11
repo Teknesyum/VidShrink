@@ -796,7 +796,6 @@ public partial class MainWindow : Window
         RefreshAdvancedTexts();
         UpdateToolStatus();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
-        ApplyDropText();
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
         else RefreshQualityPanels();
         RefreshQualityTargetAvailability();
@@ -2497,7 +2496,11 @@ public partial class MainWindow : Window
     }
 
     private void ShowSourceName()
-        => TxtFileName.Text = _sourceName ?? Say("main.source.placeholder");
+    {
+        TxtFileName.Text = _sourceName ?? Say("main.source.placeholder");
+        TxtConvertSource.Text = _info is null ? Say("main.convert.source-empty") : _sourceName;
+        ApplyDropText();
+    }
 
     private async Task LoadAsync(string path)
     {
@@ -2511,6 +2514,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             _info = null;
+            ShowSourceName();
             BtnStart.IsEnabled = BtnConvert.IsEnabled = false;
             Fade(InfoGrid, false);
             Fade(DropZone, true);
@@ -2594,7 +2598,7 @@ public partial class MainWindow : Window
         BtnRevert.IsVisible = false;
         TxtAiStatus.Text = "";
         SetAiDetails(false);
-        TxtConvertSource.Text = Path.GetFileName(path);
+        ShowSourceName();
         ShowInfo(info);
         RefreshPreviewSource();
 

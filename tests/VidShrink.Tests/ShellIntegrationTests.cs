@@ -107,17 +107,19 @@ public sealed class ShellIntegrationTests : IDisposable
     {
         var file = Write("belge.txt");
 
-        var fileName = AppHost.Run(() =>
+        var (fileName, convertSource, dropTitle) = AppHost.Run(() =>
         {
             var window = new MainWindow(file);
             Drain(window.LoadStartupFileAsync());
             Strings.Use("tr");
             Strings.Use("en");
             Dispatcher.UIThread.RunJobs();
-            return Text(window, "TxtFileName");
+            return (Text(window, "TxtFileName"), Text(window, "TxtConvertSource"), Text(window, "TxtDropTitle"));
         });
 
         Assert.Equal("belge.txt", fileName);
+        Assert.False(string.IsNullOrWhiteSpace(convertSource));
+        Assert.False(string.IsNullOrWhiteSpace(dropTitle));
     }
 
     [Fact]
