@@ -6,6 +6,9 @@ from test output written under `.calisma/oynatici-motor/` (not in git) by
 `tests/VidShrink.Tests/OynaticiMotorTests.cs`, measured on commit `4ab27551` (after
 merging `origin/main` at `0e9e84b2`). The loaded seek table and the threshold mutation
 were measured earlier, on `ddb544be`, whose engine code differs only by the restart counter.
+The seek completion rule changed after that (seeks now wait for their own
+`MPV_EVENT_PLAYBACK_RESTART`); the table marked "after the restart condition" and the
+landing race negative control were measured on `fa4e596d`, which carries that rule.
 
 ## Design
 
@@ -165,6 +168,17 @@ has no threshold and stays a plain fact, so it runs in CI too:
 
 HEVC 1080p re-measured: median 55.2 ms against the pilot's 61.7 ms, on the same protocol.
 
+Quiet machine, after the restart condition (commit `ea8e25bc`, Release build, started after
+three 5 s CPU samples at 1 %; all three tests ran, 3/3 passed):
+
+| file | shown | median ms | min | max | busy % | threshold | result |
+|---|---|---|---|---|---|---|---|
+| h264_1080p60 | 20/20 | 32.8 | 17.7 | 57.2 | 1.5 | ≤60 | PASS |
+| h264_2160p30 | 20/20 | 66.2 | 42.3 | 97.1 | 1.9 | ≤200 | PASS |
+| hevc_1080p60 | 20/20 | 60.1 | 16.5 | 117.1 | 1.1 | none (pilot 2: 61.7) | reported |
+
+Waiting for the restart moved the quiet medians by +0.9, +2.4 and +4.9 ms.
+
 **CI runner.** On the first branch run
 (https://github.com/Teknesyum/VidShrink/actions/runs/34605972205, `windows-latest`) the
 same tests were plain facts and failed: 1080p median 85.2 ms (> 60) and 2160p median
@@ -199,3 +213,9 @@ total 1143, maximum skipped 30). The libmpv step downloaded the pinned build and
 hashes matched. The previous branch run skipped 20. In this run the only engine tests in
 the skip list are the two threshold tests, and the run had 0 failures. The console log does
 not name passed tests; the per-test record is the run's `kosum-sonuc` trx artifact.
+
+Branch run on `ea8e25bc` (restart condition, handle lock, installer libmpv, merged with
+`origin/main` at `7d404fc7`): https://github.com/Teknesyum/VidShrink/actions/runs/34612285286,
+`success`. Full suite: Failed 0, Passed 1990, Skipped 22, Total 2012; the gate printed
+`failed=0 total=2012 min=1143 skipped=22 max=30`. The only engine tests in the skip list are
+again the two threshold tests.
