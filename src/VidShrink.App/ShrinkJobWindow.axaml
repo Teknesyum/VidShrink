@@ -9,10 +9,14 @@
         ShowInTaskbar="True"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource AppBg}"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaTitleBarHeightHint="-1"
         FontFamily="{StaticResource FontSans}"
         Foreground="{StaticResource TextBody}">
 
-  <Border Background="{StaticResource PanelSurface}"
+  <Border x:Name="JobShell"
+          Background="{StaticResource PanelSurface}"
           BorderBrush="{StaticResource NeonBlueBorder}"
           BorderThickness="{StaticResource BorderThin}"
           CornerRadius="{StaticResource RadiusPanel}"

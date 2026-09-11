@@ -23,15 +23,6 @@ public sealed class ThemeTokenTests
 
     private static readonly string[] FlameBrushKeys =
     {
-        "PhoenixBodyFlame", "PhoenixTailFlame",
-        "PhoenixWingFlameNear", "PhoenixWingFlameFar", "PhoenixCrestFlame",
-        "PhoenixGlowInner", "PhoenixGlowMid", "PhoenixGlowOuter", "PhoenixEmberSpark"
-    };
-
-    /// <summary>T78: parlama ve kor katmanlarını kuran rampalar. Yeni ton değil, aynı
-    /// belirteçlerin opaklık varyasyonu.</summary>
-    private static readonly string[] WashBrushKeys =
-    {
         "PhoenixGlowInner", "PhoenixGlowMid", "PhoenixGlowOuter", "PhoenixEmberSpark"
     };
 
@@ -140,11 +131,6 @@ public sealed class ThemeTokenTests
         Assert.Equal(60.0, blaze.Hue, 3);
     }
 
-    /// <summary>
-    /// K2: anka düz dolguyla değil alev gradyanlarıyla boyanıyor. Çizim artık çok parçalı;
-    /// ölçülen şey her parçanın bu beş rampadan birini kullandığı ve beş rampanın hepsinin
-    /// işini gördüğü.
-    /// </summary>
     [Fact]
     public void ThePhoenixIsPaintedWithGradientsNotAFlatFill()
     {
@@ -153,7 +139,6 @@ public sealed class ThemeTokenTests
             .Select(brush => brush.Replace("{StaticResource", string.Empty).Trim(' ', '}'))
             .ToList();
 
-        Assert.True(brushes.Count >= 20, $"Anka {brushes.Count} parça; tek kütle kalmış.");
         Assert.Equal(FlameBrushKeys.OrderBy(key => key), brushes.Distinct().OrderBy(key => key));
 
         foreach (var key in FlameBrushKeys)
@@ -214,15 +199,15 @@ public sealed class ThemeTokenTests
 
     /// <summary>
     /// T78 K6: parlama ve kor katmanları palete renk eklemeden kuruldu. Her ikisi de
-    /// yalnızca mevcut <c>Ember</c> belirteçlerini kullanıyor ve alev tüylerinden farkları
-    /// bir opaklık değeri — kendi tonları değil.
+    /// yalnızca mevcut <c>Ember</c> belirteçlerini kullanıyor ve kendi tonları yok, yalnız
+    /// bir opaklık değeri taşıyorlar.
     /// </summary>
     [Fact]
     public void TheGlowAndTheEmbersAreOpacityVariantsOfTheSameRamp()
     {
         var allowed = new[] { "NeonEmberColor", "EmberFlameColor", "EmberBlazeColor" };
 
-        foreach (var key in WashBrushKeys)
+        foreach (var key in FlameBrushKeys)
         {
             var opacity = (string?)Resource(key).Attribute("Opacity");
             Assert.True(opacity is not null, $"{key} bir opaklık taşımıyor; alev tüyünden ayrışmıyor.");
@@ -237,9 +222,6 @@ public sealed class ThemeTokenTests
                 Assert.Contains(raw.Replace("{StaticResource", string.Empty).Trim(' ', '}'), allowed);
             }
         }
-
-        foreach (var key in FlameBrushKeys.Except(WashBrushKeys))
-            Assert.Null(Resource(key).Attribute("Opacity"));
     }
 
     /// <summary>

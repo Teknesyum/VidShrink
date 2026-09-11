@@ -166,6 +166,7 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
+        Watch(Tabs, SelectingItemsControl.SelectedIndexProperty, MarkSettingsButton);
         LoadTitleBarLogo();
 
         if (OperatingSystem.IsMacOS())
@@ -705,6 +706,12 @@ public partial class MainWindow : Window
         CmbLanguage.BringIntoView();
         CmbLanguage.Focus();
     }
+
+    private void OnOpenSettings(object? sender, RoutedEventArgs e)
+        => Tabs.SelectedIndex = SettingsTabIndex;
+
+    private void MarkSettingsButton()
+        => BtnSettings.Classes.Set("selected", ReferenceEquals(Tabs.SelectedItem, TabSettings));
 
     private void OnLanguageChosen()
     {
