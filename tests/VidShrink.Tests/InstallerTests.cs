@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using VidShrink.Core;
 
 namespace VidShrink.Tests;
@@ -75,7 +76,7 @@ public sealed class InstallerTests
     {
         foreach (var line in WindowsInstaller.Split('\n'))
         {
-            if (!line.Contains(".TargetPath", StringComparison.Ordinal)) continue;
+            if (!Regex.IsMatch(line, @"\.TargetPath\s*=")) continue;
             Assert.Contains("$installedExe", line, StringComparison.Ordinal);
         }
 
