@@ -1,6 +1,6 @@
 using VidShrink.Core.Playback;
 using VidShrink.Ffmpeg;
-using VidShrink.Ffmpeg.Playback;
+using VidShrink.App.Playback;
 using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
@@ -23,99 +23,6 @@ public sealed class PlaybackFrameSourceTests
     private readonly ITestOutputHelper _output;
 
     public PlaybackFrameSourceTests(ITestOutputHelper output) => _output = output;
-
-    private static ComparisonFrameRequest Request(string left = "left.mp4", string right = "right.mp4") => new()
-    {
-        LeftPath = left,
-        RightPath = right,
-        PanelWidth = 1920,
-        PanelHeight = 1080,
-        Fps = 60
-    };
-
-    // --- ComparisonGraph -----------------------------------------------------------------
-
-    [Fact]
-    public void Filter_yan_yana_iki_paneli_tek_cikisa_bagliyor()
-    {
-        var filter = ComparisonGraph.BuildFilter(1920, 1080, 60);
-
-        Assert.Equal(
-            "[0:v]fps=60,scale=1920:1080[l];[1:v]fps=60,scale=1920:1080[r];[l][r]hstack=inputs=2[v]",
-            filter);
-    }
-
-    [Fact]
-    public void Filter_panel_olcusunu_kullanir_kaynak_cozunurlugunu_degil()
-    {
-        var filter = ComparisonGraph.BuildFilter(640, 360, 30);
-
-        Assert.Contains("scale=640:360", filter);
-        Assert.Contains("fps=30", filter);
-        Assert.Equal(2, filter.Split("scale=640:360").Length - 1);
-    }
-
-    [Fact]
-    public void Dosya_yolu_filtre_metnine_girmez_ayri_arguman_olarak_gecer()
-    {
-        const string awkward = @"C:\Videolar\bir 'iki': uc\klip;dosya[1].mp4";
-        var args = ComparisonGraph.BuildArguments(Request(awkward, awkward));
-
-        var filterIndex = args.ToList().IndexOf("-filter_complex");
-        Assert.True(filterIndex >= 0);
-        var filter = args[filterIndex + 1];
-
-        Assert.DoesNotContain("Videolar", filter);
-        Assert.DoesNotContain("klip", filter);
-
-        // Yol tam olarak, bozulmadan, kendi argumaninda duruyor.
-        Assert.Equal(2, args.Count(a => a == awkward));
-        foreach (var i in Enumerable.Range(0, args.Count).Where(i => args[i] == awkward))
-            Assert.Equal("-i", args[i - 1]);
-    }
-
-    [Fact]
-    public void Kacis_filtre_ozel_karakterlerini_ters_bolu_ile_korur()
-    {
-        var escaped = ComparisonGraph.EscapeFilterValue(@"a'b:c,d[e]f;g=h\i");
-
-        Assert.Equal(@"a\'b\:c\,d\[e\]f\;g\=h\\i", escaped);
-    }
-
-    [Fact]
-    public void Kacis_sade_metni_degistirmez()
-    {
-        Assert.Equal("klip1.mp4", ComparisonGraph.EscapeFilterValue("klip1.mp4"));
-    }
-
-    [Fact]
-    public void Argumanlar_ham_bgra_boruya_yaziyor()
-    {
-        var args = ComparisonGraph.BuildArguments(Request());
-
-        Assert.Equal("-", args[^1]);
-        Assert.Contains("rawvideo", args);
-        Assert.Contains("bgra", args);
-        Assert.Contains("-map", args);
-        Assert.Contains("[v]", args);
-    }
-
-    [Fact]
-    public void Atlama_konumu_her_iki_girdiye_de_uygulanir()
-    {
-        var args = ComparisonGraph.BuildArguments(Request() with { Position = TimeSpan.FromSeconds(12.5) });
-
-        Assert.Equal(2, args.Count(a => a == "-ss"));
-        Assert.Equal(2, args.Count(a => a == "12.5"));
-    }
-
-    [Fact]
-    public void Gercek_zamanli_kapaliyken_re_verilmez()
-    {
-        var args = ComparisonGraph.BuildArguments(Request() with { Realtime = false });
-
-        Assert.DoesNotContain("-re", args);
-    }
 
     // --- FramePool -----------------------------------------------------------------------
 
@@ -275,77 +182,6 @@ public sealed class PlaybackFrameSourceTests
         Assert.Equal(1, ring.Count);
     }
 
-    // --- Kare tamponunun parca parca doldurulmasi -----------------------------------------
-
-    private sealed class ChunkRecordingStream : Stream
-    {
-        private readonly byte[] _data;
-        private readonly int _maxPerRead;
-        private int _position;
-
-        public ChunkRecordingStream(byte[] data, int maxPerRead)
-        {
-            _data = data;
-            _maxPerRead = maxPerRead;
-        }
-
-        public List<int> Requested { get; } = new();
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            Requested.Add(count);
-            var n = Math.Min(Math.Min(count, _maxPerRead), _data.Length - _position);
-            if (n <= 0) return 0;
-            Array.Copy(_data, _position, buffer, offset, n);
-            _position += n;
-            return n;
-        }
-
-        public override bool CanRead => true;
-        public override bool CanSeek => false;
-        public override bool CanWrite => false;
-        public override long Length => _data.Length;
-        public override long Position { get => _position; set => throw new NotSupportedException(); }
-        public override void Flush() { }
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-        public override void SetLength(long value) => throw new NotSupportedException();
-        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
-    }
-
-    [Fact]
-    public void Kare_tamponu_64_kb_parcalardan_toplanir()
-    {
-        // T33/P8: kareyi tek okumada istemek 70,9 fps, 64 KB parcalarla toplamak 148,0 fps.
-        Assert.Equal(64 * 1024, PipeComparisonFrameSource.ChunkBytes);
-
-        const int frameBytes = 300 * 1024;
-        var payload = new byte[frameBytes];
-        for (var i = 0; i < frameBytes; i++) payload[i] = (byte)(i % 251);
-
-        var stream = new ChunkRecordingStream(payload, 7000);
-        var buffer = new byte[frameBytes];
-
-        var read = PipeComparisonFrameSource.FillFrame(
-            stream, buffer, frameBytes, PipeComparisonFrameSource.ChunkBytes);
-
-        Assert.Equal(frameBytes, read);
-        Assert.Equal(payload, buffer);
-        Assert.True(stream.Requested.Count > 1, "Kare tek okumada istenmemeli.");
-        Assert.All(stream.Requested, count => Assert.True(count <= PipeComparisonFrameSource.ChunkBytes));
-    }
-
-    [Fact]
-    public void Yarim_kalan_kare_okunan_bayt_sayisini_doner()
-    {
-        var payload = new byte[1000];
-        var stream = new ChunkRecordingStream(payload, 256);
-        var buffer = new byte[4096];
-
-        var read = PipeComparisonFrameSource.FillFrame(stream, buffer, 4096, 1024);
-
-        Assert.Equal(1000, read);
-    }
-
     // --- Canli ---------------------------------------------------------------------------
 
     [LivePlaybackFact]
@@ -353,7 +189,7 @@ public sealed class PlaybackFrameSourceTests
     {
         var path = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
 
-        using var source = new PipeComparisonFrameSource();
+        using var source = new EngineComparisonFrameSource();
         await source.StartAsync(new ComparisonFrameRequest
         {
             LeftPath = path,
@@ -398,7 +234,7 @@ public sealed class PlaybackFrameSourceTests
     {
         var path = Environment.GetEnvironmentVariable("VIDSHRINK_LIVE_SOURCE")!;
 
-        using var source = new PipeComparisonFrameSource();
+        using var source = new EngineComparisonFrameSource();
         await source.StartAsync(new ComparisonFrameRequest
         {
             LeftPath = path,

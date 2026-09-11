@@ -34,5 +34,5 @@ Bes bilesim `Program.Grid`de, kaynagin butun alanlari `Program.Source`ta ve
 `AudioBitrateBps = 128_000`, `AudioChannels = 2`. Kodlayici yoklamasi
 `AllWorking` — alti kodlayicinin altisi da calisir durumda.
 
-`VidShrink.sln`e eklenmedi (`VidShrink.PresentBench` de disarida); `dotnet run --project`
+`VidShrink.sln`e eklenmedi; `dotnet run --project`
 ile kosuluyor.

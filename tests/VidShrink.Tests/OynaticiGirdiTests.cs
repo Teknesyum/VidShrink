@@ -9,7 +9,6 @@ using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Ffmpeg;
-using VidShrink.Ffmpeg.Playback;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -440,55 +439,12 @@ public sealed class OynaticiGirdiTestsKlipUretimi
     }
 }
 
-public sealed class OynaticiGirdiTestsGercekBoru : IClassFixture<GirdiKlipFixture>
+public sealed class FfmpegAvailableFactAttribute : FactAttribute
 {
-    private readonly GirdiKlipFixture _klip;
-
-    public OynaticiGirdiTestsGercekBoru(GirdiKlipFixture klip) => _klip = klip;
-
-    [FfmpegAvailableFact]
-    public async Task OnHizliTikGercekBoruyaKarsiBirikirVeAramalarSinirdaKalir()
+    public FfmpegAvailableFactAttribute()
     {
-        var path = _klip.ClipPath!;
-        using var pipe = new DecoderPipe();
-        await pipe.OpenAsync(path);
-
-        var bosKare = 0;
-        var coalescer = new SeekCoalescer(async at =>
-        {
-            var frame = await pipe.SeekAsync(at);
-            if (frame is null) Interlocked.Increment(ref bosKare);
-        })
-        { Duration = pipe.DurationSeconds };
-
-        var oncekiSurec = pipe.ProcessesStarted;
-        var saat = Stopwatch.StartNew();
-        for (var i = 0; i < 10; i++) coalescer.Nudge(PlayerInputMap.WheelStepSeconds);
-        await coalescer.Idle;
-        saat.Stop();
-
-        var body = new StringBuilder();
-        body.AppendLine($"klip: {Path.GetFileName(path)} sure {pipe.DurationSeconds:0.###} sn");
-        body.AppendLine($"10 hizli tik (tik basi 1 sn) -> hedef {coalescer.Target} sn, ulasilan konum {coalescer.Position} sn");
-        body.AppendLine($"tetiklenen arama sayisi: {coalescer.SeekCalls}");
-        body.AppendLine("arama hedefleri: " + string.Join(", ", coalescer.IssuedTargets));
-        body.AppendLine("arama gecikmeleri (ms): " + string.Join(", ", coalescer.LatenciesMs.Select(ms => ms.ToString("0.#", CultureInfo.InvariantCulture))));
-        body.AppendLine($"toplam sure: {saat.Elapsed.TotalMilliseconds:0.#} ms");
-        body.AppendLine($"ffmpeg surec sayisi: {oncekiSurec} -> {pipe.ProcessesStarted}");
-        body.AppendLine($"T175 150 ms sinirini asan arama: {coalescer.LatenciesMs.Count(ms => ms > 150)}");
-        body.AppendLine($"null donen arama (T175 yeniden baslatma tavani): {bosKare}");
-        body.AppendLine("arama hatalari: " + (coalescer.Failures.Count == 0 ? "yok" : string.Join(" | ", coalescer.Failures)));
-        GirdiKanit.Write("k3-gercek-boru.txt", body.ToString());
-
-        Assert.Equal(10, coalescer.Target);
-        Assert.Equal(10, coalescer.Position);
-        Assert.True(coalescer.SeekCalls < 10, $"birikme yok: {coalescer.SeekCalls} arama");
-
-        Assert.NotEmpty(coalescer.LatenciesMs);
-        var asan = coalescer.LatenciesMs.Where(ms => ms > 150).ToList();
-        Assert.True(
-            asan.Count == 0,
-            "T175 150 ms sinirini asan arama: " + string.Join(", ", asan.Select(ms => ms.ToString("0.#", CultureInfo.InvariantCulture))));
+        if (!ToolLocator.IsAvailable(out var missing))
+            Skip = $"{missing} bulunamadi, ffmpeg isteyen test atlandi.";
     }
 }
 

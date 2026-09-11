@@ -4,9 +4,6 @@
   "playback.player-failed": "比較プレーヤーを起動できませんでした",
   "playback.sample-failed": "プレビューサンプルをエンコードできませんでした",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0}が見つからないため、比較プレーヤーを実行できません。",
-  "playback.source.hstack-broken": "このffmpegビルドではhstackフィルターが動作しないため、比較プレーヤーを開けません。",
-  "playback.source.probe-inconclusive": "確認を完了できませんでした。マシンがビジー状態の可能性があります。もう一度プレーヤーを開いてみてください。",
   "playback.error.exit-code": "ffmpegが終了コード{0}を返しました。",
   "playback.error.engine": "エンジンのメッセージ: {0}",
   "playback.error.no-file": "クリップファイルが作成されませんでした。",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "タイムライン",
   "playback.control.strip": "コントロールバー",
   "playback.control.pause": "一時停止",
-  "playback.control.play": "再生",
-  "playback.pipe.seek-timeout": "シークが{0} ms以内にフレームを返さなかったため、中止しました。",
-  "playback.pipe.seek-restarts": "シークは{0}回再起動してもフレームを返さなかったため、中止しました。",
-  "playback.pipe.no-start": "ffmpegを起動できなかったため、パイプは待機状態のままです。",
-  "playback.pipe.decoder-died": "デコーダープロセスが予期せず終了しました。次のシーク時にパイプを再構築します。",
-  "playback.pipe.decoder-unkillable": "デコーダーのffmpegプロセスを終了できず、まだ実行中の可能性があります。",
-  "playback.pipe.audio-unkillable": "音声のffmpegプロセスを終了できず、まだ実行中の可能性があります。"
+  "playback.control.play": "再生"
 }

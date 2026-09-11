@@ -4,9 +4,6 @@
   "playback.player-failed": "Pemain perbandingan tidak dapat dimulakan",
   "playback.sample-failed": "Sampel pratonton tidak dapat dikodkan",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} tidak ditemui, jadi pemain perbandingan tidak dapat berjalan.",
-  "playback.source.hstack-broken": "Penapis hstack tidak berfungsi dalam binaan ffmpeg ini, jadi pemain perbandingan tidak dapat dibuka.",
-  "playback.source.probe-inconclusive": "Semakan tidak dapat diselesaikan, mesin mungkin sibuk; cuba buka pemain sekali lagi.",
   "playback.error.exit-code": "ffmpeg memulangkan kod keluar {0}.",
   "playback.error.engine": "mesej enjin: {0}",
   "playback.error.no-file": "Fail klip tidak dicipta.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Garis masa",
   "playback.control.strip": "Jalur kawalan",
   "playback.control.pause": "Jeda",
-  "playback.control.play": "Main",
-  "playback.pipe.seek-timeout": "Carian tidak menghantar bingkai dalam {0} ms, jadi ia dibatalkan.",
-  "playback.pipe.seek-restarts": "Carian dibatalkan selepas {0} mula semula tanpa menghantar bingkai.",
-  "playback.pipe.no-start": "ffmpeg tidak dapat dimulakan, jadi paip kekal melahu.",
-  "playback.pipe.decoder-died": "Proses penyahkod mati tanpa diduga; paip membina semula dirinya pada carian seterusnya.",
-  "playback.pipe.decoder-unkillable": "Proses ffmpeg penyahkod tidak dapat dimatikan dan mungkin masih berjalan.",
-  "playback.pipe.audio-unkillable": "Proses ffmpeg audio tidak dapat dimatikan dan mungkin masih berjalan."
+  "playback.control.play": "Main"
 }
