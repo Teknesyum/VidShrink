@@ -907,7 +907,7 @@ internal partial class ComparisonPanel : UserControl
         if (rect.Contains(pointOnTopLevel)) return false;
 
         Descend();
-        top.FocusManager?.ClearFocus();
+        top.FocusManager?.Focus(null);
         return true;
     }
 

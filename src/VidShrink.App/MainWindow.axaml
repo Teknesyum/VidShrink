@@ -11,7 +11,7 @@
         Background="{StaticResource WorkspaceGradient}"
         TransparencyLevelHint="Transparent"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
+        WindowDecorations="BorderOnly"
         ExtendClientAreaTitleBarHeightHint="-1"
         FontFamily="{StaticResource FontSans}"
         Foreground="{StaticResource TextBody}">

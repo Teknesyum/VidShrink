@@ -87,7 +87,7 @@ internal sealed class DefaultAppSuggestionBar : UserControl
         return button;
     }
 
-    private static IBinding Text(string key)
+    private static BindingBase Text(string key)
         => new Binding(nameof(LocalizedText.Value))
         {
             Source = LocalizedText.For(key),
