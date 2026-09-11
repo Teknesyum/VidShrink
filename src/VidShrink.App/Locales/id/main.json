@@ -288,6 +288,7 @@
   "main.command.title": "Perintah FFmpeg",
 
   "main.error.startup": "Pemulaian tidak selesai",
+  "main.instance.waiting": "Pengkodean masih berjalan; {0} akan terbuka setelah selesai.",
   "main.error.link": "Tautan tidak dapat dibuka",
   "main.error.folder": "Folder tidak dapat dibuka",
   "main.error.setting": "Pengaturan tidak dapat disimpan",

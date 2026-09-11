@@ -288,6 +288,7 @@
   "main.command.title": "Comandă FFmpeg",
 
   "main.error.startup": "Pornirea nu s-a încheiat",
+  "main.instance.waiting": "Codarea este încă în curs; {0} se va deschide când se termină.",
   "main.error.link": "Linkul nu a putut fi deschis",
   "main.error.folder": "Dosarul nu a putut fi deschis",
   "main.error.setting": "Setarea nu a putut fi salvată",
