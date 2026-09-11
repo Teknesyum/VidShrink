@@ -277,9 +277,12 @@ public sealed class OynaticiGirdiTests
             {
                 Strings.Use(dil);
                 var menu = view.BuildMenu();
-                var basliklar = menu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString() ?? "").ToList();
-                body.AppendLine($"{dil}: {string.Join(" | ", basliklar)}");
+                var ogeler = menu.Items.OfType<MenuItem>().ToList();
+                var basliklar = ogeler.Where(item => item.Tag is PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+                var altMenuler = ogeler.Where(item => item.Tag is null).Select(item => item.Header?.ToString() ?? "").ToList();
+                body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", altMenuler)}");
                 Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu") }, altMenuler);
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
             }
 
@@ -571,10 +574,16 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var view = new PlayerView();
             var window = new Window { Width = 640, Height = 480, Content = view };
             var menu = view.BuildMenu();
-            var satirlar = menu.Items.OfType<MenuItem>().ToList();
+            var ogeler = menu.Items.OfType<MenuItem>().ToList();
+            var satirlar = ogeler.Where(item => item.Tag is PlayerAction).ToList();
+            var parcaSatirlari = ogeler.Where(item => item.Tag is null)
+                .SelectMany(altMenu => altMenu.Items.OfType<MenuItem>())
+                .Where(item => item.Tag is PlayerAction)
+                .ToList();
+            Assert.Equal(Keymap.Rows.Count(row => row.Action.Command is PlayerCommandKind.AudioCycle or PlayerCommandKind.SubtitleCycle or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay), parcaSatirlari.Count);
             var body = new StringBuilder();
 
-            foreach (var (item, sira) in satirlar.Select((item, sira) => (item, sira)))
+            foreach (var (item, sira) in satirlar.Concat(parcaSatirlari).Select((item, sira) => (item, sira)))
             {
                 var oncekiIz = view.Trace.Count;
                 Tikla(item);

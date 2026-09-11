@@ -52,6 +52,7 @@ internal partial class PlayerView : UserControl
         AddHandler(PointerPressedEvent, OnPressed, RoutingStrategies.Tunnel);
         AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
         Surface.SizeChanged += OnSurfaceSize;
+        InitTracks();
 
         RefreshState();
     }
@@ -175,6 +176,18 @@ internal partial class PlayerView : UserControl
                 break;
             case PlayerCommandKind.BookmarkNext:
                 NextBookmark();
+                break;
+            case PlayerCommandKind.AudioCycle:
+                CycleAudio();
+                break;
+            case PlayerCommandKind.SubtitleCycle:
+                CycleSubtitle();
+                break;
+            case PlayerCommandKind.SubtitleDelay:
+                ShiftSubtitleDelay(command.Amount);
+                break;
+            case PlayerCommandKind.AudioDelay:
+                ShiftAudioDelay(command.Amount);
                 break;
             default:
                 _trace.Add("none");
@@ -347,6 +360,7 @@ internal partial class PlayerView : UserControl
             flyout.Items.Add(item);
         }
 
+        AddTrackMenus(flyout);
         return flyout;
     }
 
@@ -467,6 +481,7 @@ internal partial class PlayerView : UserControl
         if (_volume != 100) engine.SetVolume(_volume);
         if (_muted) engine.SetMuted(true);
         if (_speed != 1) engine.SetSpeed(_speed);
+        ApplyTrackOptions(engine);
 
         TxtEmpty.IsVisible = false;
         StartWatchdog();
@@ -607,6 +622,7 @@ internal partial class PlayerView : UserControl
             ? Strings.Get("main.player.loopstate", _loopStart.ToString("0.##"), double.IsFinite(_loopEnd) ? _loopEnd.ToString("0.##") : "…")
             : Strings.Get("main.player.loopoff"));
         parts.Add(Strings.Get("main.player.bookmarkcount", _path is null ? 0 : _history.Bookmarks(_path).Count));
+        AppendTrackState(parts);
         TxtControls.Text = string.Join(" - ", parts);
     }
 

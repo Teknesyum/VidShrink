@@ -11,10 +11,10 @@ stride 4*w, 64 bayt hizalı). osx-arm64 gömme kapısı kapalı kalırsa LibVLC 
 - `MpvEngine` — iş parçacıkları: çağıran, `mpv-events`, `mpv-render`. Render iş parçacığı
   `mpv_render_*` dışında libmpv çağırmaz; çağıranın çağrıları `_handleGate` altında.
 - Arama bitişi: `MPV_EVENT_SEEK`'ten sonra render'ı başlayan ilk yeni kare **ve** o aramanın
-  `MPV_EVENT_PLAYBACK_RESTART`'ı. Dönüşte `time-pos` iner. Varsayılan `hwdec=no`.
-- `PlaybackOptions`: `RenderWidth/Height` sabit render ölçüsü, `Audio=false` → `aid=no`,
-  `Video=false` → `vid=no`, `Loop` → `loop-file=inf`. `TryCopyLatest(.., out frameSeconds)`
-  karenin `time-pos` damgasını verir. Karşılaştırma paneli iki örnek, önizleme sesi bir
-  `vid=no` örnek (`App/Playback/EngineComparisonFrameSource`, `PreviewAudio`).
-
-Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`; libmpv yoksa kırmızı.
+  `MPV_EVENT_PLAYBACK_RESTART`'ı. Dönüşte `time-pos` iner. Varsayılan `hwdec=no`, `sid=no`.
+- Parçalar: `Tracks`, `aid`/`sid`, `sub-add`, gecikme, `sub-scale`/`sub-pos`; `sub-codepage` değişince dış
+  altyazılar `sub-reload` ile yeniden okunur. Arayüze yalnız varsayılan gövdeli üyeler eklendi.
+- `PlaybackOptions`: sabit `RenderWidth/Height`, `Audio=false` → `aid=no`, `Video=false` → `vid=no`, `Loop` →
+  `loop-file=inf`. `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgasını verir. Karşılaştırma
+  paneli iki örnek, önizleme sesi bir `vid=no` örnek (`App/Playback/EngineComparisonFrameSource`, `PreviewAudio`).
+Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`, `OynaticiParcaTests.cs`; libmpv yoksa kırmızı.

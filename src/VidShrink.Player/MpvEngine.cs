@@ -251,6 +251,81 @@ public sealed class MpvEngine : IPlaybackEngine
         TrySet("ab-loop-b", double.IsFinite(endSeconds) ? Number(Math.Max(0, endSeconds)) : "no");
     }
 
+    public IReadOnlyList<PlaybackTrack> Tracks
+    {
+        get
+        {
+            var tracks = new List<PlaybackTrack>();
+            if (!long.TryParse(GetProperty("track-list/count"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var count)) return tracks;
+            for (var i = 0; i < count; i++)
+            {
+                PlaybackTrackKind? kind = GetProperty($"track-list/{i}/type") switch
+                {
+                    "audio" => PlaybackTrackKind.Audio,
+                    "sub" => PlaybackTrackKind.Subtitle,
+                    "video" => PlaybackTrackKind.Video,
+                    _ => null
+                };
+                if (kind is null) continue;
+                if (!long.TryParse(GetProperty($"track-list/{i}/id"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)) continue;
+                tracks.Add(new PlaybackTrack(
+                    id,
+                    kind.Value,
+                    GetProperty($"track-list/{i}/title"),
+                    GetProperty($"track-list/{i}/lang"),
+                    GetProperty($"track-list/{i}/external") == "yes",
+                    GetProperty($"track-list/{i}/selected") == "yes"));
+            }
+
+            return tracks;
+        }
+    }
+
+    public long AudioTrack => TrackId("current-tracks/audio/id");
+
+    public long SubtitleTrack => TrackId("current-tracks/sub/id");
+
+    public double SubtitleDelaySeconds => Finite(GetDouble("sub-delay"), 0);
+
+    public double AudioDelaySeconds => Finite(GetDouble("audio-delay"), 0);
+
+    public double SubtitleScale => Finite(GetDouble("sub-scale"), 1);
+
+    public double SubtitlePosition => Finite(GetDouble("sub-pos"), 100);
+
+    public string SubtitleCodepage => GetProperty("sub-codepage") ?? "auto";
+
+    public void SetAudioTrack(long id) => TrySet("aid", TrackValue(id));
+
+    public void SetSubtitleTrack(long id) => TrySet("sid", TrackValue(id));
+
+    public bool AddSubtitle(string path)
+    {
+        if (!_isOpen || !File.Exists(path)) return false;
+        return CommandSync("sub-add", Path.GetFullPath(path), "select") >= 0;
+    }
+
+    public void SetSubtitleDelay(double seconds) => TrySet("sub-delay", Number(seconds));
+
+    public void SetAudioDelay(double seconds) => TrySet("audio-delay", Number(seconds));
+
+    public void SetSubtitleScale(double scale) => TrySet("sub-scale", Number(scale));
+
+    public void SetSubtitlePosition(double percent) => TrySet("sub-pos", Number(Math.Round(percent)));
+
+    public void SetSubtitleCodepage(string codepage)
+    {
+        if (!TrySet("sub-codepage", codepage) || !_isOpen) return;
+        foreach (var track in Tracks)
+            if (track is { Kind: PlaybackTrackKind.Subtitle, External: true })
+                CommandSync("sub-reload", track.Id.ToString(CultureInfo.InvariantCulture));
+    }
+
+    private long TrackId(string name)
+        => long.TryParse(GetProperty(name), NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) ? id : 0;
+
+    private static string TrackValue(long id) => id > 0 ? id.ToString(CultureInfo.InvariantCulture) : "no";
+
     private static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
 
     private static double Finite(double value, double fallback) => double.IsFinite(value) ? value : fallback;
@@ -612,6 +687,25 @@ public sealed class MpvEngine : IPlaybackEngine
             {
                 if (!HandleAlive) return -1;
                 fixed (IntPtr* p = pointers) return mpv_command_async(_mpv, tag, p);
+            }
+        }
+        finally
+        {
+            foreach (var pointer in pointers)
+                if (pointer != IntPtr.Zero) Marshal.FreeCoTaskMem(pointer);
+        }
+    }
+
+    private unsafe int CommandSync(params string[] args)
+    {
+        var pointers = new IntPtr[args.Length + 1];
+        try
+        {
+            for (var i = 0; i < args.Length; i++) pointers[i] = Marshal.StringToCoTaskMemUTF8(args[i]);
+            lock (_handleGate)
+            {
+                if (!HandleAlive) return -1;
+                fixed (IntPtr* p = pointers) return mpv_command(_mpv, p);
             }
         }
         finally

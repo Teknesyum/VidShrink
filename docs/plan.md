@@ -404,6 +404,27 @@ seridinde dil tuslarinin sagina, sponsor tusunun soluna tasinir.
 - Olcu: WindowLayout, VisibleText, SettingsTab, Language, OynaticiGirdi, KabukIstegi testleri;
   once/sonra kareleri `.calisma/baslik/`.
 
+## 2. dalga: altyazi ve ses parcasi
+
+Kabul: iki ses ve bir gomulu altyazili klipte `aid`/`sid` motor uzerinden degisir ve geri
+okunur; `sub-delay`/`audio-delay` yazilip okunur; cp1254 Turkce .srt bozulmadan gorunur,
+yanlis kod sayfasi bozar (negatif kontrol).
+
+- `Player/IPlaybackEngine.cs`: yalniz varsayilan govdeli ekler (`Tracks`, `AudioTrack`,
+  `SubtitleTrack`, gecikmeler, `SubtitleScale/Position/Codepage`, `AddSubtitle`).
+  `MpvEngine`: `track-list`, `current-tracks/*/id`, `sub-add ... select` (senkron),
+  kod sayfasi degisince dis altyazi `sub-reload`.
+- `App/Playback/SubtitleOptions.cs`: gecikme, boyut, konum, kod sayfasi durumu ve parca
+  dongusu; dosya acilinca motora yeniden yazilir.
+- `App/Playback/PlayerView.Tracks.cs` (partial): A/S dongusu, gecikme komutlari, dosya
+  secici, oynaticiya birakilan .srt/.ass/.ssa/.vtt (pencereye gecmez), sag tik ve dugme
+  menulerindeki parca listeleri. `TrackButtons.axaml`: baslik seridinde Altyazi ve Ses.
+- `Keymap`: A, S, `>`/`<` altyazi gecikmesi ±0,5 sn, Ctrl+./Ctrl+, ses gecikmesi ±0,1 sn.
+- Dil: yeni alan dosyasi `Locales/<dil>/tracks.json` (`player.tracks.*`,
+  `player.subtitle.*`), 43 dil; 3. dalgayla `main.json` cakismasin diye ayri dosya.
+- Olcu: `OynaticiParcaTests`, `KeymapTests` (yeni komutlarin iz onekleri ve etkileri),
+  `BiciminTests` pinleri; kanit `.calisma/dalga2/`.
+
 ## 6. dalga: sistem (dosya iliskilendirme, tek ornek)
 
 Kabul: cift tiklanan dosya acik pencereye iletilir; iki gercek surecle kanitlanir.

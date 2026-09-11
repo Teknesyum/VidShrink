@@ -115,7 +115,11 @@ public sealed class KeymapTests
         [PlayerCommandKind.LoopEnd] = "loop b -> ",
         [PlayerCommandKind.LoopClear] = "loopclear",
         [PlayerCommandKind.BookmarkAdd] = "bookmarkadd -> ",
-        [PlayerCommandKind.BookmarkNext] = "bookmarknext -> "
+        [PlayerCommandKind.BookmarkNext] = "bookmarknext -> ",
+        [PlayerCommandKind.AudioCycle] = "audio -> ",
+        [PlayerCommandKind.SubtitleCycle] = "subtitle -> ",
+        [PlayerCommandKind.SubtitleDelay] = "subdelay ",
+        [PlayerCommandKind.AudioDelay] = "audiodelay "
     };
 
     private static void Tetikle(PlayerView view, PlayerInput input)
@@ -141,7 +145,7 @@ public sealed class KeymapTests
     }
 
     private static string Durum(PlayerView view) => FormattableString.Invariant(
-        $"konum {view.PositionSeconds:0.###} ses {view.VolumeLevel:0.###} sessiz {view.IsMuted} hiz {view.SpeedFactor:0.##} oynatma {view.IsPlaying} tam {view.Fullscreen.IsFullscreen} buyutme {view.ZoomScale:0.###} A {view.LoopStart:0.###} B {view.LoopEnd:0.###}");
+        $"konum {view.PositionSeconds:0.###} ses {view.VolumeLevel:0.###} sessiz {view.IsMuted} hiz {view.SpeedFactor:0.##} oynatma {view.IsPlaying} tam {view.Fullscreen.IsFullscreen} buyutme {view.ZoomScale:0.###} A {view.LoopStart:0.###} B {view.LoopEnd:0.###} altyazi {view.SubtitleDelay:0.###} sesgecikme {view.AudioDelay:0.###}");
 
     private static string? Etki(PlayerView view, PlayerAction action, Action tetik)
     {
@@ -161,6 +165,8 @@ public sealed class KeymapTests
         var oynatma = view.IsPlaying;
         var tam = view.Fullscreen.IsFullscreen;
         var buyutme = view.ZoomScale;
+        var altyazi = view.SubtitleDelay;
+        var sesGecikme = view.AudioDelay;
 
         tetik();
 
@@ -183,6 +189,10 @@ public sealed class KeymapTests
             PlayerCommandKind.LoopStart when view.LoopStart != konum => $"A {view.LoopStart}, konum {konum}",
             PlayerCommandKind.LoopEnd when view.LoopEnd != konum => $"B {view.LoopEnd}, konum {konum}",
             PlayerCommandKind.LoopClear when double.IsFinite(view.LoopStart) || double.IsFinite(view.LoopEnd) => "dongu kalkmadi",
+            PlayerCommandKind.SubtitleDelay when Math.Abs(view.SubtitleDelay - altyazi - action.Amount) > 1e-9 => $"altyazi gecikmesi {altyazi} -> {view.SubtitleDelay}, beklenen fark {action.Amount}",
+            PlayerCommandKind.AudioDelay when Math.Abs(view.AudioDelay - sesGecikme - action.Amount) > 1e-9 => $"ses gecikmesi {sesGecikme} -> {view.AudioDelay}, beklenen fark {action.Amount}",
+            PlayerCommandKind.AudioCycle when yeni[0] != "audio -> no" => $"motorsuz ses dongusu '{yeni[0]}'",
+            PlayerCommandKind.SubtitleCycle when yeni[0] != "subtitle -> no" => $"motorsuz altyazi dongusu '{yeni[0]}'",
             _ => null
         };
     }
@@ -324,8 +334,12 @@ public sealed class KeymapTests
                 Strings.Use(dil);
                 Dispatcher.UIThread.RunJobs();
 
-                var menu = view.BuildMenu().Items.OfType<MenuItem>().ToList();
-                body.AppendLine($"[{dil}] menu {menu.Count} satir");
+                var tumu = view.BuildMenu().Items.OfType<MenuItem>().ToList();
+                var menu = tumu.Where(item => item.Tag is PlayerAction).ToList();
+                var parcalar = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
+                body.AppendLine($"[{dil}] menu {menu.Count} satir, parca alt menusu: {string.Join(" | ", parcalar)}");
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu") }, parcalar);
+                Assert.Equal(tumu.IndexOf(menu.First(item => ReferenceEquals(item.Tag, Keymap.Mute))) + 1, tumu.FindIndex(item => item.Tag is null));
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);
                 foreach (var (item, action) in menu.Zip(Keymap.MenuActions))
                 {

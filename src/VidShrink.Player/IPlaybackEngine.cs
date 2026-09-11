@@ -21,6 +21,15 @@ public enum HardwareDecoding
     AutoCopy
 }
 
+public enum PlaybackTrackKind
+{
+    Video,
+    Audio,
+    Subtitle
+}
+
+public sealed record PlaybackTrack(long Id, PlaybackTrackKind Kind, string? Title, string? Language, bool External, bool Selected);
+
 public readonly record struct SeekResult(SeekOutcome Outcome, double LatencyMs);
 
 public sealed record PlaybackFault(string MessageKey, string? MessageArg = null);
@@ -105,6 +114,38 @@ public interface IPlaybackEngine : IDisposable
     void StepFrame(bool backward) { }
 
     void SetLoop(double startSeconds, double endSeconds) { }
+
+    IReadOnlyList<PlaybackTrack> Tracks => Array.Empty<PlaybackTrack>();
+
+    long AudioTrack => 0;
+
+    long SubtitleTrack => 0;
+
+    double SubtitleDelaySeconds => 0;
+
+    double AudioDelaySeconds => 0;
+
+    double SubtitleScale => 1;
+
+    double SubtitlePosition => 100;
+
+    string SubtitleCodepage => "auto";
+
+    void SetAudioTrack(long id) { }
+
+    void SetSubtitleTrack(long id) { }
+
+    bool AddSubtitle(string path) => false;
+
+    void SetSubtitleDelay(double seconds) { }
+
+    void SetAudioDelay(double seconds) { }
+
+    void SetSubtitleScale(double scale) { }
+
+    void SetSubtitlePosition(double percent) { }
+
+    void SetSubtitleCodepage(string codepage) { }
 }
 
 public sealed class PlaybackOpenException : Exception
