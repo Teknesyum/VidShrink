@@ -105,6 +105,28 @@ public interface IPlaybackEngine : IDisposable
     void StepFrame(bool backward) { }
 
     void SetLoop(double startSeconds, double endSeconds) { }
+
+    int Rotation => 0;
+
+    bool Mirrored => false;
+
+    double AspectOverride => -1;
+
+    bool RepeatFile => false;
+
+    MediaDetails? Details => null;
+
+    IReadOnlyList<double> ChapterTimes => Array.Empty<double>();
+
+    void SetRotation(int degrees) { }
+
+    void SetMirrored(bool mirrored) { }
+
+    void SetAspectOverride(string ratio) { }
+
+    void SetRepeatFile(bool repeat) { }
+
+    Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => Task.FromResult(false);
 }
 
 public sealed class PlaybackOpenException : Exception

@@ -425,3 +425,28 @@ Kabul: cift tiklanan dosya acik pencereye iletilir; iki gercek surecle kanitlani
   yalniz kendi degerini siler. Sag tik menusu (`SystemFileAssociations`) ayri agacta kalir.
   ProgID komutu baslaticiyi gosterir (`FileAssociation.LaunchTarget`). `UserChoice` yazilmaz.
 - Olcu: `TekOrnekTests`, `DosyaIliskiTests`; negatif kontroller `.calisma/dalga6/`.
+
+## 3. dalga: goruntu, pencere, liste
+
+Kabul: ekran goruntusu kaynak cozunurlugunde (ffprobe, pencere boyutlu yakalama negatif
+kontrol); bilgi paneli motordan dort alan; PgDn ad sirasinda sonraki, tekrar kapaliyken
+sonda durur; son acilanlar 10 ve kalici; dondur/aynala motor ozelligine yazilip okunur.
+
+- `IPlaybackEngine`: yalniz varsayilan govdeli ekleme — `Rotation`, `Mirrored`,
+  `AspectOverride`, `RepeatFile`, `Details` (`MediaDetails`), `ChapterTimes`, setter'lar,
+  `SaveScreenshotAsync`. `MpvEngine`: `video-rotate`, `vf @vsmirror:hflip`,
+  `video-aspect-override`, `loop-file`, `screenshot-to-file <yol> video`, `track-list`.
+  `dwidth/dheight` donmeyi icermez; 90/270'te render tamponu en/boy degistirir. Ayna
+  `vf remove @vsmirror` ile kalkar (etiket `@` ister).
+- JSON `Utf8JsonWriter` ile yazilir: uygulamada yansimali serilestirme kapali,
+  `JsonNode.ToJsonString` calisma aninda atar.
+- `App/Playback`: `PlayerSettings` (goruntu klasoru/adi, tekrar, karistir;
+  `player-settings.json`), `RecentFiles` (10, `player-recent.json`), `FolderNavigator`
+  (dogal ad sirasi, tohumlu karistirma), `SeekMarks`; ikisi de gecmis dosyasinin klasorunde,
+  gecmis yolu yoksa yazilmaz. Mantik `PlayerView.Window.cs`'te; ana dosyada tek satirlik kancalar.
+- `Keymap`: Ctrl+F5 oran, Ctrl+Shift+S dondur, Ctrl+H aynala, Ctrl+A ustte, Ctrl+F1 bilgi,
+  Ctrl+E goruntu, PgUp/PgDn dosya, Ctrl+Alt+Shift+F karistir, Ctrl+Alt+Shift+B tekrar.
+  Menude isaretli satirlar, son dosyalar alt menusu, goruntu klasoru secimi.
+- Arayuz: zaman cubugu (tik ile arama, bolum ve yer imi isaretleri), bilgi rozeti,
+  durum satiri. Anahtarlar `player.view.*`, `player.list.*`, `player.info.*`, 43 dil.
+- Olcu: `OynaticiGorunumTests`, `KeymapTests`; kanit `.calisma/dalga3/`.

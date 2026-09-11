@@ -13,7 +13,11 @@ public sealed class MpvEngine : IPlaybackEngine
 
     private const ulong OpenTag = 1;
     private const ulong ControlTag = 2;
+    private const ulong ShotTag = 3;
     private const ulong SeekTag = 1UL << 40;
+    private const string MirrorLabel = "vsmirror";
+    private const string MirrorFilter = "@vsmirror:hflip";
+    private static readonly TimeSpan ScreenshotTimeout = TimeSpan.FromSeconds(10);
     private const ulong EofId = 1;
     private const ulong TimeId = 2;
     private const ulong PauseId = 3;
@@ -44,8 +48,10 @@ public sealed class MpvEngine : IPlaybackEngine
     private long _restarts;
     private int _videoWidth;
     private int _videoHeight;
+    private int _rotation;
 
     private TaskCompletionSource? _open;
+    private TaskCompletionSource<bool>? _shot;
     private volatile bool _isOpen;
     private volatile bool _hasAudio;
     private volatile bool _paused = true;
@@ -251,6 +257,145 @@ public sealed class MpvEngine : IPlaybackEngine
         TrySet("ab-loop-b", double.IsFinite(endSeconds) ? Number(Math.Max(0, endSeconds)) : "no");
     }
 
+    public int Rotation => int.TryParse(GetProperty("video-rotate"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var degrees) ? degrees : 0;
+
+    public bool Mirrored => (GetProperty("vf") ?? "").Contains(MirrorLabel, StringComparison.Ordinal);
+
+    public double AspectOverride => Finite(GetDouble("video-aspect-override"), -1);
+
+    public bool RepeatFile => GetProperty("loop-file") is "inf" or "yes";
+
+    public IReadOnlyList<double> ChapterTimes
+    {
+        get
+        {
+            var count = ReadInt("chapter-list/count");
+            var times = new List<double>();
+            for (var i = 0; i < count; i++)
+            {
+                var at = GetDouble($"chapter-list/{i}/time");
+                if (double.IsFinite(at)) times.Add(at);
+            }
+
+            return times;
+        }
+    }
+
+    public MediaDetails? Details
+    {
+        get
+        {
+            if (!_isOpen) return null;
+            string? videoCodec = null;
+            string? audioCodec = null;
+            var width = 0;
+            var height = 0;
+            var fps = double.NaN;
+            var channels = 0;
+            var sampleRate = 0;
+            var videoSelected = false;
+            var audioSelected = false;
+
+            var count = ReadInt("track-list/count");
+            for (var i = 0; i < count; i++)
+            {
+                var type = GetProperty($"track-list/{i}/type");
+                var selected = GetProperty($"track-list/{i}/selected") == "yes";
+                if (type == "video" && (videoCodec is null || (selected && !videoSelected)))
+                {
+                    videoCodec = GetProperty($"track-list/{i}/codec");
+                    width = (int)ReadInt($"track-list/{i}/demux-w");
+                    height = (int)ReadInt($"track-list/{i}/demux-h");
+                    fps = GetDouble($"track-list/{i}/demux-fps");
+                    videoSelected = selected;
+                }
+                else if (type == "audio" && (audioCodec is null || (selected && !audioSelected)))
+                {
+                    audioCodec = GetProperty($"track-list/{i}/codec");
+                    channels = (int)ReadInt($"track-list/{i}/demux-channel-count");
+                    sampleRate = (int)ReadInt($"track-list/{i}/demux-samplerate");
+                    audioSelected = selected;
+                }
+            }
+
+            if (!double.IsFinite(fps) || fps <= 0) fps = FramesPerSecond;
+            var size = ReadInt("file-size");
+            var duration = DurationSeconds;
+            var bits = size > 0 && duration > 0 ? size * 8.0 / duration : GetDouble("video-bitrate");
+            return new MediaDetails(videoCodec, width, height, fps, bits, audioCodec, channels, sampleRate);
+        }
+    }
+
+    public void SetRotation(int degrees)
+    {
+        var normal = ((degrees % 360) + 360) % 360;
+        TrySet("video-rotate", normal.ToString(CultureInfo.InvariantCulture));
+        Volatile.Write(ref _rotation, normal);
+        _update.Set();
+    }
+
+    public void SetMirrored(bool mirrored)
+    {
+        if (mirrored) CommandSync("vf", "add", MirrorFilter);
+        else CommandSync("vf", "remove", "@" + MirrorLabel);
+    }
+
+    public void SetAspectOverride(string ratio) => TrySet("video-aspect-override", string.IsNullOrWhiteSpace(ratio) ? "-1" : ratio);
+
+    public void SetRepeatFile(bool repeat) => TrySet("loop-file", repeat ? "inf" : "no");
+
+    public async Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default)
+    {
+        if (!_isOpen || Volatile.Read(ref _disposed) != 0) return false;
+        var target = Path.GetFullPath(path);
+        var done = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Interlocked.Exchange(ref _shot, done)?.TrySetResult(false);
+
+        if (CommandRc(ShotTag, "screenshot-to-file", target, "video") < 0)
+        {
+            Interlocked.CompareExchange(ref _shot, null, done);
+            return false;
+        }
+
+        var finished = await Task.WhenAny(done.Task, Task.Delay(ScreenshotTimeout, ct)).ConfigureAwait(false);
+        if (finished != done.Task)
+        {
+            Interlocked.CompareExchange(ref _shot, null, done);
+            return false;
+        }
+
+        return await done.Task.ConfigureAwait(false) && File.Exists(target);
+    }
+
+    private unsafe long ReadInt(string name)
+    {
+        lock (_handleGate)
+        {
+            if (!HandleAlive) return 0;
+            long value;
+            return mpv_get_property(_mpv, name, MPV_FORMAT_INT64, &value) < 0 ? 0 : value;
+        }
+    }
+
+    private unsafe int CommandSync(params string[] args)
+    {
+        var pointers = new IntPtr[args.Length + 1];
+        try
+        {
+            for (var i = 0; i < args.Length; i++) pointers[i] = Marshal.StringToCoTaskMemUTF8(args[i]);
+            lock (_handleGate)
+            {
+                if (!HandleAlive) return -1;
+                fixed (IntPtr* p = pointers) return mpv_command(_mpv, p);
+            }
+        }
+        finally
+        {
+            foreach (var pointer in pointers)
+                if (pointer != IntPtr.Zero) Marshal.FreeCoTaskMem(pointer);
+        }
+    }
+
     private static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
 
     private static double Finite(double value, double fallback) => double.IsFinite(value) ? value : fallback;
@@ -396,6 +541,12 @@ public sealed class MpvEngine : IPlaybackEngine
             return;
         }
 
+        if (tag == ShotTag)
+        {
+            Interlocked.Exchange(ref _shot, null)?.TrySetResult(error >= 0);
+            return;
+        }
+
         if (tag < SeekTag) return;
         var gen = (long)(tag - SeekTag);
         if (error < 0)
@@ -533,6 +684,10 @@ public sealed class MpvEngine : IPlaybackEngine
             width = _options.RenderWidth;
             height = _options.RenderHeight;
         }
+        else if (Volatile.Read(ref _rotation) is 90 or 270)
+        {
+            (width, height) = (height, width);
+        }
 
         var back = _back;
         if (back is null || back.Width != width || back.Height != height)
@@ -643,6 +798,7 @@ public sealed class MpvEngine : IPlaybackEngine
         _renderer?.Join();
 
         Interlocked.Exchange(ref _open, null)?.TrySetException(new ObjectDisposedException(nameof(MpvEngine)));
+        Interlocked.Exchange(ref _shot, null)?.TrySetResult(false);
         TaskCompletionSource<SeekResult>? pending;
         lock (_seekGate)
         {

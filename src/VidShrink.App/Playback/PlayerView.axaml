@@ -30,10 +30,33 @@
                    Theme="{StaticResource MonoValue}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
+        <Border x:Name="InfoPanel"
+                Theme="{StaticResource PlaybackBadge}"
+                Margin="{StaticResource PlaybackBadgeMargin}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                IsVisible="False">
+          <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
+        </Border>
       </Panel>
     </Border>
 
     <StackPanel Grid.Row="2" Spacing="{StaticResource SpaceSm}">
+      <Panel x:Name="SeekBar"
+             Height="{StaticResource PlaybackTimelineHeight}"
+             Background="Transparent"
+             Cursor="Hand"
+             auto:AutomationProperties.Name="{loc:Text playback.control.timeline}">
+        <Border x:Name="SeekTrack" Theme="{StaticResource PlaybackTrack}" VerticalAlignment="Center"/>
+        <Border x:Name="SeekFill"
+                Theme="{StaticResource PlaybackTrackFill}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="0"
+                IsVisible="False"/>
+        <Canvas x:Name="SeekMarkLayer" IsHitTestVisible="False"/>
+      </Panel>
+      <TextBlock x:Name="TxtView" Theme="{StaticResource MonoValue}" TextWrapping="Wrap" IsVisible="False"/>
       <TextBlock x:Name="TxtState" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
       <TextBlock x:Name="TxtControls" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
       <TextBlock x:Name="TxtStall"

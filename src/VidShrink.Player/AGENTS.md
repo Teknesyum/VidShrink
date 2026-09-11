@@ -17,4 +17,7 @@ stride 4*w, 64 bayt hizalı). osx-arm64 gömme kapısı kapalı kalırsa LibVLC 
   karenin `time-pos` damgasını verir. Karşılaştırma paneli iki örnek, önizleme sesi bir
   `vid=no` örnek (`App/Playback/EngineComparisonFrameSource`, `PreviewAudio`).
 
+- Goruntu: `video-rotate`, `vf @vsmirror:hflip`, `video-aspect-override`; ekran goruntusu
+  `screenshot-to-file .. video` (kaynak cozunurlugu), bilgi `track-list` + `file-size`.
+
 Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`; libmpv yoksa kırmızı.
