@@ -185,5 +185,6 @@ They are judged in CI, not locally under load.
 Branch run on `4ab27551`: https://github.com/Teknesyum/VidShrink/actions/runs/34609230675,
 `success`. Full suite: Failed 0, Passed 1987, Skipped 22, Total 2009 (run gate: minimum
 total 1143, maximum skipped 30). The libmpv step downloaded the pinned build and both
-hashes matched. The previous branch run skipped 20; this run's skip list includes the two
-engine threshold tests. The other seven engine tests, HEVC included, ran and passed.
+hashes matched. The previous branch run skipped 20. In this run the only engine tests in
+the skip list are the two threshold tests, and the run had 0 failures. The console log does
+not name passed tests; the per-test record is the run's `kosum-sonuc` trx artifact.
