@@ -16,4 +16,5 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucuların libmpv sabitleri CI ile aynı,
   `EngineFactory` ile açılamayan motor atılır.
 - `OynaticiKarsilastirmaTests.cs` — karşılaştırma paneli iki motor örneğinde: şerit kodlu
-  klipte iki yarının kare farkı ≤1; eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
+  klipte iki yarının kare farkı ≤1; yarı güncel bileşik kare ortağı gelmeden yayınlanmaz (elle
+  sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
