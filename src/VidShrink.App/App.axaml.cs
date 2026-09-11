@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Avalonia.Platform.Storage;
 using VidShrink.App.Themes;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -22,6 +24,14 @@ public partial class App : Application
     }
 
     public App(string? startupFile) => _startupFile = startupFile;
+
+    internal App(string? startupFile, Integration.ForwardedFiles? files)
+    {
+        _startupFile = startupFile;
+        _files = files;
+    }
+
+    private readonly Integration.ForwardedFiles? _files;
 
     internal App(ShellShrinkStartup startup, ShrinkRequestQueue? queue)
     {
@@ -50,6 +60,14 @@ public partial class App : Application
             var window = StartupWindow();
             window.Icon = LoadAppIcon();
             desktop.MainWindow = window;
+
+            if (window is MainWindow main)
+            {
+                var files = _files ?? new Integration.ForwardedFiles();
+                main.AcceptForwardedFiles(files);
+                if (this.TryGetFeature<IActivatableLifetime>() is { } activatable)
+                    activatable.Activated += (_, activation) => OpenActivatedFiles(files, activation);
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -80,11 +98,26 @@ public partial class App : Application
         try
         {
             var executable = Environment.ProcessPath;
-            if (!string.IsNullOrEmpty(executable)) Integration.FileAssociationSetup.Ensure(executable);
+            if (!string.IsNullOrEmpty(executable))
+                Integration.FileAssociationSetup.Ensure(Integration.FileAssociation.LaunchTarget(executable));
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or DllNotFoundException or EntryPointNotFoundException)
         {
         }
+    }
+
+    internal static bool OpenActivatedFiles(Integration.ForwardedFiles files, ActivatedEventArgs activation)
+    {
+        if (activation is not FileActivatedEventArgs opened) return false;
+
+        var paths = new List<string>();
+        foreach (var item in opened.Files)
+        {
+            var local = item.TryGetLocalPath();
+            if (!string.IsNullOrEmpty(local)) paths.Add(local);
+        }
+
+        return paths.Count > 0 && files.Receive(paths);
     }
 
     private static WindowIcon? LoadAppIcon()
