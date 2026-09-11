@@ -242,14 +242,14 @@
                             </Transitions>
                           </Path.Transitions>
                         </Path>
-                        <TextBlock x:Name="TxtDropTitle" Text="{loc:Text main.drop.title}" Theme="{StaticResource DropTitle}"/>
-                        <TextBlock x:Name="TxtDropHint" Text="{loc:Text main.drop.hint}" Theme="{StaticResource DropHint}"/>
+                        <TextBlock x:Name="TxtDropTitle" Theme="{StaticResource DropTitle}"/>
+                        <TextBlock x:Name="TxtDropHint" Theme="{StaticResource DropHint}"/>
                         <Button x:Name="BtnBrowseEmpty" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Center" Click="OnBrowse"/>
                       </StackPanel>
                     </Panel>
 
                     <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtFileName" Text="{loc:Text main.source.placeholder}" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                      <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                       <Button Grid.Column="1" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                     </Grid>
 
@@ -795,7 +795,7 @@
               <Border Grid.Column="0" Theme="{StaticResource Panel}" VerticalAlignment="Top">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
-                  <TextBlock x:Name="TxtConvertSource" Text="{loc:Text main.convert.source-empty}" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                  <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowse"/>
                   <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
