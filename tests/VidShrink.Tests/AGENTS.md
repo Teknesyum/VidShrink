@@ -17,4 +17,5 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   `EngineFactory` ile açılamayan motor atılır.
 - `OynaticiGorunumTests.cs` — 3. dalga; ayar/son dosyalar `.calisma/dalga3/gecici` altina yazar.
 - `OynaticiKarsilastirmaTests.cs` — karşılaştırma paneli iki motor örneğinde: şerit kodlu
-  klipte iki yarının kare farkı ≤1; eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
+  klipte iki yarının kare farkı ≤1; yarı güncel bileşik kare ortağı gelmeden yayınlanmaz (elle
+  sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.

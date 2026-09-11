@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using VidShrink.App.Playback;
@@ -282,6 +283,162 @@ public sealed class OynaticiKarsilastirmaTests
         Assert.True(oynarken - aramaSonrasi >= 0.4, $"Play sonrasi konum ilerlemedi: {KarsilastirmaKanit.F(aramaSonrasi)} -> {KarsilastirmaKanit.F(oynarken)}");
         Assert.True(duraklatildi, "Pause sonrasi ses motoru oynamaya devam ediyor");
         Assert.True(Math.Abs(sonra - durdugu) < 0.05, $"Pause sonrasi konum ilerledi: {KarsilastirmaKanit.F(durdugu)} -> {KarsilastirmaKanit.F(sonra)}");
+    }
+
+    [Fact]
+    public async Task YariGuncelBilesikKareOrtagiGelmedenYayinlanmaz()
+    {
+        var bekleme = TimeSpan.FromSeconds(1);
+        var motorlar = new List<ElleMotor>();
+        using var source = new EngineComparisonFrameSource(options =>
+        {
+            var motor = new ElleMotor(options);
+            motor.Kare(0, 1);
+            lock (motorlar) motorlar.Add(motor);
+            return motor;
+        }, pairWait: bekleme);
+        await source.StartAsync(new ComparisonFrameRequest
+        {
+            LeftPath = "sol.mp4",
+            RightPath = "sag.mp4",
+            PanelWidth = 8,
+            PanelHeight = 4,
+            Fps = 30,
+            Realtime = true,
+            Loop = false
+        });
+        var sol = motorlar[0];
+        var sag = motorlar[1];
+
+        var ilk = await AlAsync(source);
+        Assert.Equal((0.0, 0.0), (ilk.Sol, ilk.Sag));
+
+        for (var i = 1; i <= 2; i++)
+        {
+            sol.Kare(i / 30.0, (byte)(10 + i));
+            sag.Kare(i / 30.0, (byte)(20 + i));
+            var cift = await AlAsync(source);
+            Assert.Equal(i / 30.0, cift.Sol, 3);
+            Assert.Equal(i / 30.0, cift.Sag, 3);
+        }
+
+        sag.Kare(3 / 30.0, 23);
+        await Task.Delay(300);
+        var yarim = source.TryTake(out var erken);
+        var erkenMetin = yarim ? $"{erken.Presentation.TotalSeconds:0.000}/{erken.RightPresentation.TotalSeconds:0.000}" : "";
+        if (yarim) source.Return(erken);
+        Assert.False(yarim, $"sag yari tek basina yayinlandi (sol/sag damga {erkenMetin})");
+
+        sol.Kare(3 / 30.0, 13);
+        var eslesen = await AlAsync(source);
+        Assert.Equal(3 / 30.0, eslesen.Sol, 3);
+        Assert.Equal(3 / 30.0, eslesen.Sag, 3);
+        Assert.Equal((13, 23), (eslesen.SolPiksel, eslesen.SagPiksel));
+
+        var saat = Stopwatch.StartNew();
+        sag.Kare(4 / 30.0, 24);
+        var yalniz = await AlAsync(source);
+        Assert.True(saat.Elapsed >= bekleme * 0.9, $"ortak beklenmeden yayinlandi: {saat.Elapsed.TotalMilliseconds:0} ms");
+        Assert.Equal(3 / 30.0, yalniz.Sol, 3);
+        Assert.Equal(4 / 30.0, yalniz.Sag, 3);
+        Assert.Equal((13, 24), (yalniz.SolPiksel, yalniz.SagPiksel));
+        await source.StopAsync();
+    }
+
+    private sealed record Alinan(double Sol, double Sag, byte SolPiksel, byte SagPiksel);
+
+    private static async Task<Alinan> AlAsync(IComparisonFrameSource source)
+    {
+        var saat = Stopwatch.StartNew();
+        while (saat.Elapsed < TimeSpan.FromSeconds(10))
+        {
+            if (source.TryTake(out var frame))
+            {
+                var alinan = new Alinan(frame.Presentation.TotalSeconds, frame.RightPresentation.TotalSeconds, frame.Buffer[0], frame.Buffer[frame.SplitX * 4]);
+                source.Return(frame);
+                return alinan;
+            }
+            await Task.Delay(2);
+        }
+        throw new TimeoutException("kare gelmedi");
+    }
+
+    private sealed class ElleMotor : IPlaybackEngine
+    {
+        private readonly object _gate = new();
+        private readonly byte[] _pixels;
+        private readonly GCHandle _pin;
+        private readonly int _width;
+        private readonly int _height;
+        private long _serial;
+        private double _seconds = double.NaN;
+
+        public ElleMotor(PlaybackOptions options)
+        {
+            _width = options.RenderWidth;
+            _height = options.RenderHeight;
+            _pixels = new byte[_width * _height * 4];
+            _pin = GCHandle.Alloc(_pixels, GCHandleType.Pinned);
+        }
+
+        public void Kare(double seconds, byte value)
+        {
+            lock (_gate)
+            {
+                Array.Fill(_pixels, value);
+                _seconds = seconds;
+                _serial++;
+            }
+        }
+
+        public string Name => "elle";
+
+        public bool IsOpen => true;
+
+        public double DurationSeconds => 10;
+
+        public bool HasAudio => false;
+
+        public bool IsPaused => false;
+
+        public bool EndReached => false;
+
+        public double PositionSeconds { get { lock (_gate) return _seconds; } }
+
+        public double AudioVideoOffsetSeconds => double.NaN;
+
+        public long FramesRendered => Interlocked.Read(ref _serial);
+
+        public event EventHandler<PlaybackFault>? Faulted { add { } remove { } }
+
+        public Task OpenAsync(string path, CancellationToken ct = default) => Task.CompletedTask;
+
+        public void Play() { }
+
+        public void Pause() { }
+
+        public Task<SeekResult> SeekAsync(double seconds, SeekPrecision precision, CancellationToken ct = default)
+            => Task.FromResult(new SeekResult(SeekOutcome.Shown, 0));
+
+        public bool TryCopyLatest(ref long seen, FrameCopy copy) => TryCopyLatest(ref seen, copy, out _);
+
+        public bool TryCopyLatest(ref long seen, FrameCopy copy, out double frameSeconds)
+        {
+            lock (_gate)
+            {
+                frameSeconds = double.NaN;
+                if (_serial == 0 || _serial == seen) return false;
+                copy(_pin.AddrOfPinnedObject(), _width, _height, _width * 4);
+                frameSeconds = _seconds;
+                seen = _serial;
+                return true;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_pin.IsAllocated) _pin.Free();
+        }
     }
 }
 

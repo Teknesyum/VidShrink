@@ -17,9 +17,11 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
     private const int ForceHold = 2;
 
     private static readonly TimeSpan FirstFrameTimeout = TimeSpan.FromSeconds(5);
+    public static readonly TimeSpan DefaultPairWait = TimeSpan.FromMilliseconds(100);
 
     private readonly Func<PlaybackOptions, IPlaybackEngine> _create;
     private readonly int _ringCapacity;
+    private readonly TimeSpan _pairWait;
     private readonly object _gate = new();
 
     private ComparisonFrameRequest? _request;
@@ -48,12 +50,14 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
     {
     }
 
-    public EngineComparisonFrameSource(Func<PlaybackOptions, IPlaybackEngine> create, int ringCapacity = DefaultRingCapacity)
+    public EngineComparisonFrameSource(Func<PlaybackOptions, IPlaybackEngine> create, int ringCapacity = DefaultRingCapacity, TimeSpan? pairWait = null)
     {
         ArgumentNullException.ThrowIfNull(create);
         if (ringCapacity < FrameRing.MinimumCapacity) throw new ArgumentOutOfRangeException(nameof(ringCapacity));
+        if (pairWait is { } wait && wait <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(pairWait));
         _create = create;
         _ringCapacity = ringCapacity;
+        _pairWait = pairWait ?? DefaultPairWait;
     }
 
     public event EventHandler<ComparisonSourceStatus>? StatusChanged;
@@ -237,6 +241,9 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
         var rightHas = false;
         var lastLeft = double.NaN;
         var lastRight = double.NaN;
+        var leftStep = double.NaN;
+        var rightStep = double.NaN;
+        var holdSince = 0L;
         var ended = false;
 
         FrameCopy intoLeft = (pixels, width, height, stride) => CopyHalf(pixels, width, height, stride, leftHalf, panelWidth, panelHeight);
@@ -265,9 +272,8 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
                 return;
             }
 
-            if (gotLeft) { leftHas = true; leftSeconds = ls; }
-            if (gotRight) { rightHas = true; rightSeconds = rs; }
-
+            if (gotLeft) { leftStep = Step(leftSeconds, ls, leftStep); leftHas = true; leftSeconds = ls; }
+            if (gotRight) { rightStep = Step(rightSeconds, rs, rightStep); rightHas = true; rightSeconds = rs; }
             if (!gotLeft && !gotRight)
             {
                 if (!ended && !request.Loop && left.EndReached && right.EndReached)
@@ -276,7 +282,7 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
                     SetState(ComparisonSourceState.Durdu);
                 }
                 Thread.Sleep(1);
-                continue;
+                if (holdSince == 0) continue;
             }
 
             if (!leftHas || !rightHas || force == ForceHold) continue;
@@ -292,8 +298,15 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
             }
             else if (SameTime(leftSeconds, lastLeft) && SameTime(rightSeconds, lastRight))
             {
+                holdSince = 0;
                 continue;
             }
+            else if (Lags(leftSeconds, rightSeconds, leftStep, left) || Lags(rightSeconds, leftSeconds, rightStep, right))
+            {
+                if (holdSince == 0) holdSince = Stopwatch.GetTimestamp();
+                if (Stopwatch.GetElapsedTime(holdSince) < _pairWait) continue;
+            }
+            holdSince = 0;
 
             if (!TryAcquire(pool, ring, out var frame)) continue;
             Compose(leftHalf, rightHalf, frame.Buffer, panelWidth, panelHeight);
@@ -313,6 +326,17 @@ public sealed class EngineComparisonFrameSource : IComparisonFrameSource
 
     private static bool SameTime(double a, double b)
         => (double.IsNaN(a) && double.IsNaN(b)) || Math.Abs(a - b) < 1e-6;
+
+    private static double Step(double previous, double next, double step)
+    {
+        var delta = next - previous;
+        return delta > 1e-6 && delta < 1.0 ? delta : step;
+    }
+
+    private static bool Lags(double seconds, double other, double step, IPlaybackEngine engine)
+        => seconds < other - 1e-6
+            && !engine.EndReached
+            && (double.IsNaN(step) || seconds + step <= other + step / 2);
 
     private static TimeSpan Seconds(double value)
         => double.IsFinite(value) && value > 0 ? TimeSpan.FromSeconds(value) : TimeSpan.Zero;
