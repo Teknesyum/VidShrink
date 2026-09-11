@@ -309,6 +309,10 @@ ayarlar sayfasi ve test ayni tablodan okur.
 
 Her dalga: kendi dali, 43 dil ayni dalgada, `dotnet test` tam yesil, `gh run list` yesil.
 
+**Sira (11 Eylul 2026, 0. dalga main'de 476b5d24):** 1, 5 ve 6 paralel; dosya alanlari ayri,
+motor arayuzune yalniz ekleme. 2, 3 ve 4 oynatici yuzeyini paylastigi icin 1 birlestikten
+sonra sirayla; 2 ve 3'ten ayrisani paralel acilir.
+
 ### Motor secimi dogrulandi (netlestirme 005-007)
 
 On aday puanlandi (`docs/oynatici/kutuphane-karsilastirma.md`, karar
