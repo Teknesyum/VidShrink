@@ -420,6 +420,6 @@
   "main.player.playing": "pušta se",
   "main.player.paused": "pauzirano",
   "main.player.state": "pozicija {0} s - {1} - zum {2}%",
-  "main.player.stalled": "Reprodukcija je prestala da napreduje; dekoderska cev ne proizvodi kadrove.",
-  "main.player.seekfailed": "Premotavanje nije uspelo: dekoderska cev se nije mogla ponovo pokrenuti."
+  "main.player.stalled": "Reprodukcija je prestala da napreduje; plejer ne proizvodi kadrove.",
+  "main.player.seekfailed": "Premotavanje nije uspelo: plejer nije prikazao kadar na novoj poziciji."
 }

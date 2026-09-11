@@ -420,6 +420,6 @@
   "main.player.playing": "speelt",
   "main.player.paused": "gepauzeerd",
   "main.player.state": "positie {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Het afspelen ging niet verder; de decoderpijp levert geen beelden.",
-  "main.player.seekfailed": "Zoeken mislukt: de decoderpijp kon niet opnieuw worden gestart."
+  "main.player.stalled": "Het afspelen ging niet verder; de speler levert geen beelden.",
+  "main.player.seekfailed": "Zoeken mislukt: de speler toonde geen beeld op de nieuwe positie."
 }

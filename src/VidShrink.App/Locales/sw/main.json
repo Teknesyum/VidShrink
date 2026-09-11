@@ -420,6 +420,6 @@
   "main.player.playing": "inacheza",
   "main.player.paused": "imesitishwa",
   "main.player.state": "nafasi {0} s - {1} - kuza {2}%",
-  "main.player.stalled": "Uchezaji uliacha kusonga; bomba la kisimbuaji halitoi fremu.",
-  "main.player.seekfailed": "Utafutaji umeshindwa: bomba la kisimbuaji halikuweza kuanzishwa upya."
+  "main.player.stalled": "Uchezaji uliacha kusonga; kichezaji hakitoi fremu.",
+  "main.player.seekfailed": "Utafutaji umeshindwa: kichezaji hakionyesha fremu katika nafasi mpya."
 }

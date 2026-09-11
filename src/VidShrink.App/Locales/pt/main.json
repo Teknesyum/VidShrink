@@ -420,6 +420,6 @@
   "main.player.playing": "reproduzindo",
   "main.player.paused": "pausado",
   "main.player.state": "posição {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "A reprodução parou de avançar; o tubo do decodificador não está produzindo quadros.",
-  "main.player.seekfailed": "A busca falhou: o tubo do decodificador não pôde ser reiniciado."
+  "main.player.stalled": "A reprodução parou de avançar; o player não está produzindo quadros.",
+  "main.player.seekfailed": "A busca falhou: o player não exibiu um quadro na nova posição."
 }

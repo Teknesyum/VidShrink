@@ -420,6 +420,6 @@
   "main.player.playing": "in riproduzione",
   "main.player.paused": "in pausa",
   "main.player.state": "posizione {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "La riproduzione ha smesso di avanzare; la pipe del decoder non produce fotogrammi.",
-  "main.player.seekfailed": "Ricerca fallita: la pipe del decoder non è stata riavviata."
+  "main.player.stalled": "La riproduzione ha smesso di avanzare; il lettore non produce fotogrammi.",
+  "main.player.seekfailed": "Ricerca fallita: il lettore non ha mostrato un fotogramma nella nuova posizione."
 }

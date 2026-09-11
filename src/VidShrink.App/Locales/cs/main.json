@@ -420,6 +420,6 @@
   "main.player.playing": "přehrává se",
   "main.player.paused": "pozastaveno",
   "main.player.state": "pozice {0} s - {1} - zvětšení {2}%",
-  "main.player.stalled": "Přehrávání se přestalo posouvat; roura dekodéru nevytváří snímky.",
-  "main.player.seekfailed": "Přeskočení selhalo: rouru dekodéru se nepodařilo restartovat."
+  "main.player.stalled": "Přehrávání se přestalo posouvat; přehrávač nevytváří snímky.",
+  "main.player.seekfailed": "Přeskočení selhalo: přehrávač na nové pozici nezobrazil snímek."
 }

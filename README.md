@@ -50,8 +50,9 @@ what will come out.
 - **No HDR10+ or Dolby Vision passthrough.** An HDR10+ source is delivered as static HDR10.
 - **No right-click menu on macOS or Linux.** Windows only, and nothing equivalent is
   installed elsewhere.
-- **No FFmpeg in the box.** The installers fetch it from your package manager or tell you
-  the command; releases do not carry it.
+- **No FFmpeg or libmpv in the box.** The installers fetch them (WinGet, or a pinned and
+  hash-checked download) or tell you your package manager's command; releases do not carry
+  them.
 - **No perceptual planner yet.** VMAF judges the plan afterwards in the bench harness; it
   does not yet set the planner's constants. See the roadmap.
 - **No hardware win at small targets yet.** `av1_amf` still needs a second attempt at
@@ -71,8 +72,9 @@ downloads the `win-x64` archive and the launcher beside it, checks both against 
 release's own SHA-256 list, and refuses to continue if either digest differs.
 
 It installs under `%LOCALAPPDATA%\Programs\VidShrink`, fetches FFmpeg and FFprobe from
-WinGet, creates Desktop and Start Menu shortcuts pointing at the launcher, and adds the
-right-click entry. Running the same command again replaces the app with the newest release.
+WinGet, downloads libmpv (the player tab's engine) from a pinned build and checks both its
+archive and its DLL against fixed SHA-256 digests, creates Desktop and Start Menu shortcuts
+pointing at the launcher, and adds the right-click entry. Running the same command again replaces the app with the newest release.
 
 Only `win-x64` is published. A machine positively identified as ARM64 or 32-bit stops the
 installer rather than getting an architecture whose updates would never be found. An
@@ -107,15 +109,19 @@ that opens from Finder with its own name and icon, and `--uninstall` removes the
 the payload and the shortcut together. On Linux there is no bundle; the launcher link is
 the whole of it.
 
-FFmpeg is the one thing this installer will not put on your machine. If `ffmpeg` or
-`ffprobe` is missing it prints your package manager's command — `brew install ffmpeg`,
-`sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops before downloading
-anything else.
+FFmpeg and libmpv are the two things this installer will not put on your machine. If
+`ffmpeg` or `ffprobe` is missing it prints your package manager's command —
+`brew install ffmpeg`, `sudo apt install ffmpeg`, `sudo dnf install ffmpeg` — and stops
+before downloading anything else. It does the same when libmpv is missing:
+`brew install mpv`, `sudo apt install libmpv2`, `sudo dnf install mpv-libs`.
 
 ### Requirements
 
 - Windows 10 or 11, macOS 12 or newer, or a Linux desktop on X11 or Wayland
 - `ffmpeg` and `ffprobe` in a `tools/ffmpeg` folder beside the application, or on `PATH`
+- libmpv for the player tab: in `tools/libmpv` on Windows (the installer puts it there),
+  Homebrew's `lib` folder on macOS, the system library on Linux, or the file or folder
+  named by `VIDSHRINK_LIBMPV`
 - No .NET runtime and no .NET SDK. Releases are self-contained
 
 Hardware encoding is optional. A missing or broken GPU encoder is reported and the engine
@@ -407,7 +413,10 @@ not go to the network at all. The time of the last check sits next to the settin
 The launcher never blocks the application from opening. No network, unresolved DNS, a rate
 limit, a broken manifest, a full disk: it gives up silently and starts the installed
 version as it is. FFmpeg never travels with a release and is never re-downloaded; the
-launcher only checks that `ffmpeg.exe` and `ffprobe.exe` are still there.
+launcher only checks that `ffmpeg.exe` and `ffprobe.exe` are still there. libmpv does not
+travel with a release either: an update replaces `app\` and leaves `tools\libmpv` as the
+installer left it. An installation made before the player moved to libmpv gets it by
+running the install command once more.
 
 Automatic updates are on by default and can be switched off in the settings. The switch is
 stored in `%APPDATA%\VidShrink\settings.json`, next to your other settings rather than next
@@ -433,6 +442,7 @@ command again.
 | Right-click menu | yes | no | no |
 | Self-update | file-level, via the launcher | whole-bundle swap | notice only |
 | FFmpeg comes from | WinGet `Gyan.FFmpeg` | your `brew` | your `apt` or `dnf` |
+| libmpv comes from | pinned shinchiro build, SHA-256 checked | your `brew` (`mpv`) | your `apt` (`libmpv2`) or `dnf` (`mpv-libs`) |
 
 ![VidShrink open on macOS, running from its own application bundle with the Dock below it; window shown in Turkish](docs/gorseller/macos-paket-uygulama.png)
 
@@ -559,6 +569,12 @@ and Linux the installer installs nothing and prints your package manager's comma
 way the binary arrives on your own machine, under its own terms, at install time. VidShrink
 runs `ffmpeg` and `ffprobe` as external processes and links no GPL code into the AGPL-3.0
 application.
+
+libmpv, the player tab's engine, is handled the same way: VidShrink does not redistribute
+it. On Windows the installer downloads one pinned build from
+[shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake) straight
+onto your machine; on macOS and Linux it comes from your package manager. VidShrink loads
+it at run time through its C API, under the library's own licence.
 
 Releases do not carry FFmpeg, and the reason is size rather than licensing: FFmpeg and
 FFprobe are 424 MB of a 519 MB installation and do not change when VidShrink does. Anyone

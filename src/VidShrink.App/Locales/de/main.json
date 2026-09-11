@@ -420,6 +420,6 @@
   "main.player.playing": "läuft",
   "main.player.paused": "pausiert",
   "main.player.state": "Position {0} s - {1} - Zoom {2}%",
-  "main.player.stalled": "Die Wiedergabe kommt nicht voran; die Decoder-Pipe liefert keine Bilder.",
-  "main.player.seekfailed": "Sprung fehlgeschlagen: Die Decoder-Pipe konnte nicht neu gestartet werden."
+  "main.player.stalled": "Die Wiedergabe kommt nicht voran; der Player liefert keine Bilder.",
+  "main.player.seekfailed": "Sprung fehlgeschlagen: Der Player hat an der neuen Position kein Bild angezeigt."
 }

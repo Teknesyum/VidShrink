@@ -420,6 +420,6 @@
   "main.player.playing": "playing",
   "main.player.paused": "paused",
   "main.player.state": "position {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "Playback stopped advancing; the decoder pipe is not producing frames.",
-  "main.player.seekfailed": "Seek failed: the decoder pipe could not be restarted."
+  "main.player.stalled": "Playback stopped advancing; the player is not producing frames.",
+  "main.player.seekfailed": "Seek failed: the player did not show a frame at the new position."
 }

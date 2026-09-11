@@ -420,6 +420,6 @@
   "main.player.playing": "lecture",
   "main.player.paused": "pause",
   "main.player.state": "position {0} s - {1} - zoom {2} %",
-  "main.player.stalled": "La lecture n'avance plus ; le tube du décodeur ne produit pas d'images.",
-  "main.player.seekfailed": "Le déplacement a échoué : le tube du décodeur n'a pas pu être relancé."
+  "main.player.stalled": "La lecture n'avance plus ; le lecteur ne produit pas d'images.",
+  "main.player.seekfailed": "Le déplacement a échoué : le lecteur n'a pas affiché d'image à la nouvelle position."
 }

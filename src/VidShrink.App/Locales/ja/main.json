@@ -420,6 +420,6 @@
   "main.player.playing": "再生中",
   "main.player.paused": "一時停止",
   "main.player.state": "位置 {0} 秒 - {1} - ズーム {2}%",
-  "main.player.stalled": "再生が進まなくなりました。デコーダーパイプがフレームを生成していません。",
-  "main.player.seekfailed": "シークに失敗しました。デコーダーパイプを再起動できませんでした。"
+  "main.player.stalled": "再生が進まなくなりました。プレーヤーがフレームを生成していません。",
+  "main.player.seekfailed": "シークに失敗しました。プレーヤーが新しい位置でフレームを表示できませんでした。"
 }

@@ -420,6 +420,6 @@
   "main.player.playing": "predvajanje",
   "main.player.paused": "premor",
   "main.player.state": "položaj {0} s - {1} - povečava {2} %",
-  "main.player.stalled": "Predvajanje se je nehalo premikati; dekoderska cev ne izdeluje sličic.",
-  "main.player.seekfailed": "Iskanje ni uspelo: dekoderske cevi ni bilo mogoče znova zagnati."
+  "main.player.stalled": "Predvajanje se je nehalo premikati; predvajalnik ne izdeluje sličic.",
+  "main.player.seekfailed": "Iskanje ni uspelo: predvajalnik na novem mestu ni prikazal sličice."
 }

@@ -184,6 +184,57 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
     }
 }
 
+$libMpvUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+$libMpvArchiveSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
+$libMpvDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
+$libMpvFileName = 'libmpv-2.dll'
+
+function Get-FileSha256([string]$Path) {
+    return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+
+function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existing) {
+    New-Item -ItemType Directory -Path $Destination -Force | Out-Null
+    $target = Join-Path $Destination $libMpvFileName
+    if ($Existing -and (Test-Path -LiteralPath $Existing) -and (Get-FileSha256 $Existing) -eq $libMpvDllSha256) {
+        Copy-Item -LiteralPath $Existing -Destination $target -Force
+        return 'reused'
+    }
+
+    $tar = Join-Path $env:SystemRoot 'System32\tar.exe'
+    if (-not (Test-Path -LiteralPath $tar)) { throw "libmpv arşivini açmak için $tar gerekli; bu Windows'ta yok." }
+
+    $archive = Join-Path $WorkRoot 'mpv-dev.7z'
+    Write-Host 'libmpv indiriliyor...' -ForegroundColor Cyan
+    $ProgressPreference = 'SilentlyContinue'
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $libMpvUrl -OutFile $archive
+    }
+    catch {
+        throw "libmpv indirilemedi: $libMpvUrl"
+    }
+
+    $actual = Get-FileSha256 $archive
+    if ($actual -ne $libMpvArchiveSha256) {
+        throw "libmpv arşivinin sağlaması tutmuyor. Beklenen $libMpvArchiveSha256, bulunan $actual. Kurulum durduruldu."
+    }
+
+    $extract = Join-Path $WorkRoot 'libmpv'
+    New-Item -ItemType Directory -Path $extract -Force | Out-Null
+    & $tar -xf $archive -C $extract $libMpvFileName
+    if ($LASTEXITCODE -ne 0) { throw "libmpv arşivi açılamadı (tar çıkış kodu $LASTEXITCODE)." }
+
+    $dll = Join-Path $extract $libMpvFileName
+    if (-not (Test-Path -LiteralPath $dll)) { throw "libmpv arşivinde $libMpvFileName yok." }
+    $dllActual = Get-FileSha256 $dll
+    if ($dllActual -ne $libMpvDllSha256) {
+        throw "$libMpvFileName sağlaması tutmuyor. Beklenen $libMpvDllSha256, bulunan $dllActual. Kurulum durduruldu."
+    }
+
+    Copy-Item -LiteralPath $dll -Destination $target -Force
+    return 'downloaded'
+}
+
 $shellMenuKeyName = 'VidShrink'
 $shellShrinkMenuKeyName = 'VidShrinkKucult'
 $shellPackageName = 'Teknesyum.VidShrink.Shell'
@@ -486,6 +537,11 @@ try {
     New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null
     Copy-Item -LiteralPath $ffmpeg -Destination (Join-Path $toolsRoot 'ffmpeg.exe') -Force
     Copy-Item -LiteralPath $ffprobe -Destination (Join-Path $toolsRoot 'ffprobe.exe') -Force
+
+    $libMpvRoot = Join-Path $stageRoot 'tools\libmpv'
+    $installedLibMpv = Join-Path $resolvedInstallRoot "tools\libmpv\$libMpvFileName"
+    $libMpvSource = Install-LibMpv $workRoot $libMpvRoot $installedLibMpv
+    Write-Host "libmpv hazır ($libMpvSource, sha256 doğrulandı)." -ForegroundColor Cyan
 
     foreach ($processName in 'VidShrink.App', 'VidShrink') {
         Get-Process $processName -ErrorAction SilentlyContinue |

@@ -420,6 +420,6 @@
   "main.player.playing": "reproduciendo",
   "main.player.paused": "en pausa",
   "main.player.state": "posición {0} s - {1} - zoom {2}%",
-  "main.player.stalled": "La reproducción dejó de avanzar; la tubería del decodificador no produce fotogramas.",
-  "main.player.seekfailed": "El salto falló: la tubería del decodificador no pudo reiniciarse."
+  "main.player.stalled": "La reproducción dejó de avanzar; el reproductor no produce fotogramas.",
+  "main.player.seekfailed": "El salto falló: el reproductor no mostró un fotograma en la nueva posición."
 }

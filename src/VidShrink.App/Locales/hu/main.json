@@ -420,6 +420,6 @@
   "main.player.playing": "lejátszás",
   "main.player.paused": "szünet",
   "main.player.state": "pozíció {0} mp - {1} - nagyítás {2}%",
-  "main.player.stalled": "A lejátszás megállt; a dekódoló cső nem ad képkockákat.",
-  "main.player.seekfailed": "A keresés nem sikerült: a dekódoló csövet nem lehetett újraindítani."
+  "main.player.stalled": "A lejátszás megállt; a lejátszó nem ad képkockákat.",
+  "main.player.seekfailed": "A keresés nem sikerült: a lejátszó nem jelenített meg képkockát az új helyzetben."
 }

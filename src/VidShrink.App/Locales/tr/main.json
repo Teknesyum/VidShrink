@@ -420,6 +420,6 @@
   "main.player.playing": "oynuyor",
   "main.player.paused": "duraklatıldı",
   "main.player.state": "konum {0} sn - {1} - yakınlaştırma {2}%",
-  "main.player.stalled": "Oynatma ilerlemiyor; çözücü borusu kare üretmiyor.",
-  "main.player.seekfailed": "Arama başarısız: çözücü borusu yeniden başlatılamadı."
+  "main.player.stalled": "Oynatma ilerlemiyor; oynatıcı kare üretmiyor.",
+  "main.player.seekfailed": "Arama başarısız: oynatıcı yeni konumda kare gösteremedi."
 }

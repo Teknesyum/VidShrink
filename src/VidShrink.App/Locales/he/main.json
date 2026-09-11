@@ -420,6 +420,6 @@
   "main.player.playing": "מנגן",
   "main.player.paused": "מושהה",
   "main.player.state": "מיקום {0} שנ' - {1} - זום {2}%",
-  "main.player.stalled": "הניגון הפסיק להתקדם; צינור המפענח אינו מפיק פריימים.",
-  "main.player.seekfailed": "הדילוג נכשל: לא ניתן להפעיל מחדש את צינור המפענח."
+  "main.player.stalled": "הניגון הפסיק להתקדם; הנגן אינו מפיק פריימים.",
+  "main.player.seekfailed": "הדילוג נכשל: הנגן לא הציג פריים במיקום החדש."
 }

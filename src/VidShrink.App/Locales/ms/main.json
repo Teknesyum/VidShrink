@@ -420,6 +420,6 @@
   "main.player.playing": "dimainkan",
   "main.player.paused": "dijeda",
   "main.player.state": "kedudukan {0} s - {1} - zum {2}%",
-  "main.player.stalled": "Main balik berhenti bergerak; paip penyahkod tidak menghasilkan bingkai.",
-  "main.player.seekfailed": "Carian gagal: paip penyahkod tidak dapat dimulakan semula."
+  "main.player.stalled": "Main balik berhenti bergerak; pemain tidak menghasilkan bingkai.",
+  "main.player.seekfailed": "Carian gagal: pemain tidak memaparkan bingkai pada kedudukan baharu."
 }

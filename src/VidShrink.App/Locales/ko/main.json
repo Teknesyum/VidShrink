@@ -420,6 +420,6 @@
   "main.player.playing": "재생 중",
   "main.player.paused": "일시정지",
   "main.player.state": "위치 {0} s - {1} - 확대 {2}%",
-  "main.player.stalled": "재생이 진행되지 않습니다. 디코더 파이프가 프레임을 내지 않습니다.",
-  "main.player.seekfailed": "탐색 실패: 디코더 파이프를 다시 시작할 수 없습니다."
+  "main.player.stalled": "재생이 진행되지 않습니다. 플레이어가 프레임을 내지 않습니다.",
+  "main.player.seekfailed": "탐색 실패: 플레이어가 새 위치에서 프레임을 표시하지 못했습니다."
 }
