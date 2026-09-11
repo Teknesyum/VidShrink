@@ -4,9 +4,6 @@
   "playback.player-failed": "Primerjalnega predvajalnika ni bilo mogoče zagnati",
   "playback.sample-failed": "Vzorca predogleda ni bilo mogoče kodirati",
   "playback.zoom-readout": "{0} %",
-  "playback.source.tool-missing": "{0} ni bil najden, zato primerjalni predvajalnik ne more teči.",
-  "playback.source.hstack-broken": "Filter hstack v tej gradnji ffmpeg ne deluje, zato se primerjalni predvajalnik ne more odpreti.",
-  "playback.source.probe-inconclusive": "Preverjanja ni bilo mogoče dokončati, računalnik je morda zaseden; poskusite predvajalnik odpreti znova.",
   "playback.error.exit-code": "ffmpeg je vrnil izhodno kodo {0}.",
   "playback.error.engine": "sporočilo motorja: {0}",
   "playback.error.no-file": "Datoteka posnetka ni bila ustvarjena.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Časovnica",
   "playback.control.strip": "Nadzorni trak",
   "playback.control.pause": "Premor",
-  "playback.control.play": "Predvajaj",
-  "playback.pipe.seek-timeout": "Iskanje v {0} ms ni dostavilo sličice, zato je bilo opuščeno.",
-  "playback.pipe.seek-restarts": "Iskanje je po {0} ponovnih zagonih odnehalo, ne da bi dostavilo sličico.",
-  "playback.pipe.no-start": "ffmpeg se ni mogel zagnati, zato je cev ostala v mirovanju.",
-  "playback.pipe.decoder-died": "Dekoderski proces je nepričakovano umrl; cev se ob naslednjem iskanju znova zgradi.",
-  "playback.pipe.decoder-unkillable": "Dekoderskega procesa ffmpeg ni bilo mogoče ustaviti in morda še teče.",
-  "playback.pipe.audio-unkillable": "Zvočnega procesa ffmpeg ni bilo mogoče ustaviti in morda še teče."
+  "playback.control.play": "Predvajaj"
 }

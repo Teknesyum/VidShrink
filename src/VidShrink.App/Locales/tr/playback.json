@@ -4,9 +4,6 @@
   "playback.player-failed": "Karşılaştırma oynatıcısı başlayamadı",
   "playback.sample-failed": "Önizleme örneği kodlanamadı",
   "playback.zoom-readout": "%{0}",
-  "playback.source.tool-missing": "{0} bulunamadı; karşılaştırma oynatıcısı çalışamaz.",
-  "playback.source.hstack-broken": "Bu ffmpeg yapısında hstack filtresi çalışmıyor; karşılaştırma oynatıcısı açılamaz.",
-  "playback.source.probe-inconclusive": "Denetim tamamlanamadı, makine meşgul olabilir; oynatıcıyı yeniden açmayı deneyin.",
   "playback.error.exit-code": "ffmpeg {0} çıkış koduyla sonlandı.",
   "playback.error.engine": "motor iletisi: {0}",
   "playback.error.no-file": "Parça dosyası üretilemedi.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Zaman çizgisi",
   "playback.control.strip": "Denetim şeridi",
   "playback.control.pause": "Duraklat",
-  "playback.control.play": "Oynat",
-  "playback.pipe.seek-timeout": "Arama {0} ms içinde kare teslim edemedi, bırakıldı.",
-  "playback.pipe.seek-restarts": "Arama {0} yeniden başlatmadan sonra kare teslim edemedi, bırakıldı.",
-  "playback.pipe.no-start": "ffmpeg başlatılamadı, boru boşta kaldı.",
-  "playback.pipe.decoder-died": "Kod çözücü süreç beklenmeden düştü; boru bir sonraki aramada kendini yeniden kuracak.",
-  "playback.pipe.decoder-unkillable": "Kod çözücü ffmpeg süreci öldürülemedi, arka planda kalmış olabilir.",
-  "playback.pipe.audio-unkillable": "Ses ffmpeg süreci öldürülemedi, arka planda kalmış olabilir."
+  "playback.control.play": "Oynat"
 }

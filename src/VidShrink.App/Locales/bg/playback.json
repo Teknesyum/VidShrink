@@ -4,9 +4,6 @@
   "playback.player-failed": "Плейърът за сравнение не можа да стартира",
   "playback.sample-failed": "Пробата за преглед не можа да се кодира",
   "playback.zoom-readout": "{0}%",
-  "playback.source.tool-missing": "{0} не беше намерен, затова плейърът за сравнение не може да работи.",
-  "playback.source.hstack-broken": "Филтърът hstack не работи в тази версия на ffmpeg, затова плейърът за сравнение не може да се отвори.",
-  "playback.source.probe-inconclusive": "Проверката не можа да завърши, машината може да е заета; опитайте да отворите плейъра отново.",
   "playback.error.exit-code": "ffmpeg върна код на изход {0}.",
   "playback.error.engine": "съобщение от двигателя: {0}",
   "playback.error.no-file": "Файлът на клипа не беше създаден.",
@@ -20,11 +17,5 @@
   "playback.control.timeline": "Времева линия",
   "playback.control.strip": "Лента за управление",
   "playback.control.pause": "Пауза",
-  "playback.control.play": "Пускане",
-  "playback.pipe.seek-timeout": "Търсенето не даде кадър в рамките на {0} ms, затова беше изоставено.",
-  "playback.pipe.seek-restarts": "Търсенето се отказа след {0} рестарта, без да даде кадър.",
-  "playback.pipe.no-start": "ffmpeg не можа да стартира, затова тръбата остана в покой.",
-  "playback.pipe.decoder-died": "Декодерният процес умря неочаквано; тръбата се възстановява при следващото търсене.",
-  "playback.pipe.decoder-unkillable": "Декодерният процес на ffmpeg не можа да бъде спрян и може още да работи.",
-  "playback.pipe.audio-unkillable": "Аудио процесът на ffmpeg не можа да бъде спрян и може още да работи."
+  "playback.control.play": "Пускане"
 }
