@@ -277,10 +277,13 @@ public sealed class OynaticiGirdiTests
             {
                 Strings.Use(dil);
                 var menu = view.BuildMenu();
-                var basliklar = menu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString() ?? "").ToList();
-                body.AppendLine($"{dil}: {string.Join(" | ", basliklar)}");
+                var satirlar = menu.Items.OfType<MenuItem>().ToList();
+                var basliklar = satirlar.Where(item => item.Tag is PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+                var ekler = satirlar.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+                body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", ekler)}");
                 Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
+                Assert.Equal(new[] { Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
             }
 
             Strings.Use("en");
@@ -571,7 +574,9 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var view = new PlayerView();
             var window = new Window { Width = 640, Height = 480, Content = view };
             var menu = view.BuildMenu();
-            var satirlar = menu.Items.OfType<MenuItem>().ToList();
+            var satirlar = menu.Items.OfType<MenuItem>().Where(item => item.Tag is PlayerAction).ToList();
+            var ekler = menu.Items.OfType<MenuItem>().Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
+            Assert.Equal(new[] { Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
             var body = new StringBuilder();
 
             foreach (var (item, sira) in satirlar.Select((item, sira) => (item, sira)))

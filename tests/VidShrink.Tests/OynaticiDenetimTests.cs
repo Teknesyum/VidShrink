@@ -115,7 +115,16 @@ public sealed class KeymapTests
         [PlayerCommandKind.LoopEnd] = "loop b -> ",
         [PlayerCommandKind.LoopClear] = "loopclear",
         [PlayerCommandKind.BookmarkAdd] = "bookmarkadd -> ",
-        [PlayerCommandKind.BookmarkNext] = "bookmarknext -> "
+        [PlayerCommandKind.BookmarkNext] = "bookmarknext -> ",
+        [PlayerCommandKind.ToggleTopmost] = "topmost -> ",
+        [PlayerCommandKind.AspectCycle] = "aspect -> ",
+        [PlayerCommandKind.Rotate] = "rotate -> ",
+        [PlayerCommandKind.Mirror] = "mirror -> ",
+        [PlayerCommandKind.ToggleInfo] = "info -> ",
+        [PlayerCommandKind.Screenshot] = "screenshot -> ",
+        [PlayerCommandKind.FileStep] = "file ",
+        [PlayerCommandKind.ToggleShuffle] = "shuffle -> ",
+        [PlayerCommandKind.RepeatCycle] = "repeat -> "
     };
 
     private static void Tetikle(PlayerView view, PlayerInput input)
@@ -161,6 +170,13 @@ public sealed class KeymapTests
         var oynatma = view.IsPlaying;
         var tam = view.Fullscreen.IsFullscreen;
         var buyutme = view.ZoomScale;
+        var ustte = view.IsTopmost;
+        var oran = view.AspectRatio;
+        var aci = view.RotationDegrees;
+        var ayna = view.IsMirrored;
+        var bilgi = view.InfoVisible;
+        var karisik = view.Settings.Shuffle;
+        var tekrar = view.Settings.Repeat;
 
         tetik();
 
@@ -183,6 +199,15 @@ public sealed class KeymapTests
             PlayerCommandKind.LoopStart when view.LoopStart != konum => $"A {view.LoopStart}, konum {konum}",
             PlayerCommandKind.LoopEnd when view.LoopEnd != konum => $"B {view.LoopEnd}, konum {konum}",
             PlayerCommandKind.LoopClear when double.IsFinite(view.LoopStart) || double.IsFinite(view.LoopEnd) => "dongu kalkmadi",
+            PlayerCommandKind.ToggleTopmost when view.IsTopmost == ustte => "ustte degismedi",
+            PlayerCommandKind.AspectCycle when view.AspectRatio == oran => $"oran {oran} degismedi",
+            PlayerCommandKind.Rotate when view.RotationDegrees != (aci + (int)action.Amount) % 360 => $"aci {aci} -> {view.RotationDegrees}, beklenen fark {action.Amount}",
+            PlayerCommandKind.Mirror when view.IsMirrored == ayna => "ayna degismedi",
+            PlayerCommandKind.ToggleInfo when view.InfoVisible == bilgi => "bilgi paneli degismedi",
+            PlayerCommandKind.Screenshot when yeni[0] != "screenshot -> no" => $"motorsuz goruntu iz '{yeni[0]}'",
+            PlayerCommandKind.FileStep when !yeni[0].StartsWith("file " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> ", StringComparison.Ordinal) => $"iz '{yeni[0]}' yon {action.Amount}",
+            PlayerCommandKind.ToggleShuffle when view.Settings.Shuffle == karisik => "karistirma degismedi",
+            PlayerCommandKind.RepeatCycle when view.Settings.Repeat == tekrar => $"tekrar {tekrar} degismedi",
             _ => null
         };
     }
@@ -324,7 +349,7 @@ public sealed class KeymapTests
                 Strings.Use(dil);
                 Dispatcher.UIThread.RunJobs();
 
-                var menu = view.BuildMenu().Items.OfType<MenuItem>().ToList();
+                var menu = view.BuildMenu().Items.OfType<MenuItem>().Where(item => item.Tag is PlayerAction).ToList();
                 body.AppendLine($"[{dil}] menu {menu.Count} satir");
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);
                 foreach (var (item, action) in menu.Zip(Keymap.MenuActions))

@@ -17,4 +17,7 @@ LibVLC aynı arayüze girer.
   `vid=no`, `Loop` → `loop-file=inf`. `TryCopyLatest(.., out frameSeconds)` karenin `time-pos` damgası.
   Karşılaştırma paneli iki örnek, önizleme sesi bir `vid=no` örnek. Varsayılan `hwdec=no`.
 
+- Goruntu: `video-rotate`, `vf @vsmirror:hflip`, `video-aspect-override`; ekran goruntusu
+  `screenshot-to-file .. video` (kaynak cozunurlugu), bilgi `track-list` + `file-size`.
+
 Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`; libmpv yoksa kırmızı.
