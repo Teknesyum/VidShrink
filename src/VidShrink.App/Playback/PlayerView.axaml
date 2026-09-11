@@ -24,7 +24,7 @@
 
     <Border Grid.Row="1" x:Name="Stage" Theme="{StaticResource Panel}" Background="{StaticResource AppBg}">
       <Panel x:Name="Surface" Background="Transparent" ClipToBounds="True">
-        <Image x:Name="Frame" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Image x:Name="Frame" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <TextBlock x:Name="TxtEmpty"
                    Text="{loc:Text main.player.empty}"
                    Theme="{StaticResource MonoValue}"

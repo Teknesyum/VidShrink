@@ -29,6 +29,8 @@ internal partial class PlayerView : UserControl
     private AudioSink? _audio;
     private WriteableBitmap? _bitmap;
     private DispatcherTimer? _watchdog;
+    private DispatcherTimer? _render;
+    private long _shown;
     private string? _path;
     private bool _playing;
     private int _leftClicks;
@@ -41,6 +43,7 @@ internal partial class PlayerView : UserControl
         AddHandler(PointerWheelChangedEvent, OnWheel, RoutingStrategies.Tunnel);
         AddHandler(PointerPressedEvent, OnPressed, RoutingStrategies.Tunnel);
         AddHandler(KeyDownEvent, OnKey, RoutingStrategies.Tunnel);
+        Surface.SizeChanged += OnSurfaceSize;
 
         RefreshState();
     }
@@ -263,18 +266,48 @@ internal partial class PlayerView : UserControl
 
         if (_playing)
         {
-            _play?.Dispose();
-            _play = _pipe.StartContinuousPlayback(_seek.Target);
+            StartPlayback(_seek.Target);
             _audio?.Play();
-            _stall.Reset();
         }
         else
         {
-            _play?.Dispose();
-            _play = null;
+            if (_play is { } play) _seek.Follow(play.LatestVideoPts);
+            StopPlayback();
             _audio?.Pause();
-            _stall.Reset();
         }
+    }
+
+    private void StartPlayback(double atSeconds)
+    {
+        if (_pipe is null) return;
+        _play?.Dispose();
+        _play = _pipe.StartContinuousPlayback(atSeconds);
+        _shown = 0;
+        _stall.Reset();
+        if (_render is null)
+        {
+            _render = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+            _render.Tick += (_, _) => RenderLatest();
+        }
+        _render.Start();
+    }
+
+    private void StopPlayback()
+    {
+        _render?.Stop();
+        _play?.Dispose();
+        _play = null;
+        _stall.Reset();
+    }
+
+    private void RenderLatest()
+    {
+        if (_play is not { } play) return;
+        if (!play.TryCopyLatest(ref _shown, DrawBgra)) return;
+        var at = play.LatestVideoPts;
+        _seek.Follow(at);
+        RefreshState();
+        if (at >= _seek.Duration - 0.05) TogglePlay();
     }
 
     internal async Task OpenAsync(string path, CancellationToken ct = default)
@@ -295,6 +328,7 @@ internal partial class PlayerView : UserControl
         TxtEmpty.IsVisible = false;
         StartWatchdog();
         _seek.GoTo(0);
+        if (!_playing) TogglePlay();
         RefreshState();
     }
 
@@ -335,37 +369,66 @@ internal partial class PlayerView : UserControl
             return;
         }
 
-        pipe.SeekAudio(atSeconds);
-        Draw(frame);
+        if (Dispatcher.UIThread.CheckAccess()) ShowSeek(pipe, frame, atSeconds);
+        else await Dispatcher.UIThread.InvokeAsync(() => ShowSeek(pipe, frame, atSeconds));
     }
 
-    private void Draw(DecoderPipeFrame frame)
+    private void ShowSeek(DecoderPipe pipe, DecoderPipeFrame frame, double atSeconds)
     {
-        if (_bitmap is null || _bitmap.PixelSize.Width != frame.Width || _bitmap.PixelSize.Height != frame.Height)
+        pipe.SeekAudio(atSeconds);
+        Draw(frame);
+        if (_playing && ReferenceEquals(pipe, _pipe)) StartPlayback(atSeconds);
+    }
+
+    private void Draw(DecoderPipeFrame frame) => DrawBgra(frame.Bgra, frame.Width, frame.Height);
+
+    private void DrawBgra(byte[] bgra, int width, int height)
+    {
+        var fresh = _bitmap is null || _bitmap.PixelSize.Width != width || _bitmap.PixelSize.Height != height;
+        if (fresh)
         {
             _bitmap?.Dispose();
             _bitmap = new WriteableBitmap(
-                new PixelSize(frame.Width, frame.Height),
+                new PixelSize(width, height),
                 new Vector(96, 96),
                 PixelFormat.Bgra8888,
                 AlphaFormat.Opaque);
         }
 
-        using (var buffer = _bitmap.Lock())
+        using (var buffer = _bitmap!.Lock())
         {
-            var count = Math.Min(frame.Bgra.Length, buffer.RowBytes * buffer.Size.Height);
-            System.Runtime.InteropServices.Marshal.Copy(frame.Bgra, 0, buffer.Address, count);
+            var count = Math.Min(bgra.Length, buffer.RowBytes * buffer.Size.Height);
+            System.Runtime.InteropServices.Marshal.Copy(bgra, 0, buffer.Address, count);
         }
 
-        _zoom.SetSource(frame.Width, frame.Height);
-        _zoom.SetViewport(Surface.Bounds.Width, Surface.Bounds.Height);
-        Frame.Source = _bitmap;
-        Frame.Width = frame.Width * _zoom.Scale * _zoom.PanelScale;
-        Frame.Height = frame.Height * _zoom.Scale * _zoom.PanelScale;
+        if (fresh || !ReferenceEquals(Frame.Source, _bitmap))
+        {
+            _zoom.SetSource(width, height);
+            Frame.Source = _bitmap;
+            Resize();
+        }
         Frame.InvalidateVisual();
         TxtEmpty.IsVisible = false;
         RefreshState();
     }
+
+    /// <summary>
+    /// Goruntuyu panonun bugunku olcusune sigdirir. Olcu iki yerden degisir: yeni kare
+    /// gelince ve pano yeniden boyutlanınca. Ikisi de buraya girer, boylece pencere
+    /// buyudugunde duraklatilmis goruntu de buyur.
+    /// <c>ZoomGesture.Scale</c> band kademesinde <c>PanelScale</c>'i zaten iceriyor;
+    /// burada ikinci kez carpilmaz.
+    /// </summary>
+    private void Resize()
+    {
+        if (Frame.Source is null) return;
+        _zoom.SetViewport(Surface.Bounds.Width, Surface.Bounds.Height);
+        Frame.Width = _zoom.ContentWidth;
+        Frame.Height = _zoom.ContentHeight;
+        Frame.InvalidateVisual();
+    }
+
+    private void OnSurfaceSize(object? sender, SizeChangedEventArgs e) => Resize();
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
@@ -387,8 +450,7 @@ internal partial class PlayerView : UserControl
     {
         _watchdog?.Stop();
         _watchdog = null;
-        _play?.Dispose();
-        _play = null;
+        StopPlayback();
         _audio?.Dispose();
         _audio = null;
         _pipe?.Dispose();

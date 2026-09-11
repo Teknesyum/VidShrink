@@ -37,7 +37,7 @@
           BorderThickness="{StaticResource BorderThin}"
           CornerRadius="{StaticResource RadiusControl}"
           UseLayoutRounding="True">
-    <Grid RowDefinitions="Auto,Auto,*" Background="{StaticResource WorkspaceBackground}">
+    <Grid RowDefinitions="Auto,*" Background="{StaticResource WorkspaceBackground}">
 
       <Border x:Name="TitleBar"
               Grid.Row="0"
@@ -51,22 +51,22 @@
           o kazancı siler. Soldaki 16 px başlık için duruyor.
         -->
         <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
-          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+          <StackPanel Grid.Column="0" x:Name="TitleBrand" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
             <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
               <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
             </TextBlock>
           </StackPanel>
-          <StackPanel Grid.Column="1"
-                      x:Name="TaglineRow"
-                      Orientation="Horizontal"
-                      VerticalAlignment="Center"
-                      ClipToBounds="True">
-            <TextBlock x:Name="TaglineLead" Text="{loc:Text main.tagline.lead}" Theme="{StaticResource ProductTagline}"/>
-            <TextBlock x:Name="TaglineSeparator" Text=" &amp; " Theme="{StaticResource ProductTagline}" Foreground="{StaticResource TextBody}"/>
-            <TextBlock x:Name="TaglineConverter" Text="{loc:Text main.tagline.converter}" Theme="{StaticResource ProductTagline}" Foreground="{StaticResource NeonPink}"/>
-          </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
+              <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
+              <Button x:Name="BtnLanguageSettings"
+                      Content="⚙"
+                      Theme="{StaticResource LanguageButton}"
+                      auto:AutomationProperties.Name="{loc:Text main.language.settings}"
+                      ToolTip.Tip="{loc:Text main.language.settings}"
+                      Click="OnOpenLanguageSettings"/>
+            </StackPanel>
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <!-- The two empty MoveTo commands pin the icon's own 24x24 design box, so Uniform
@@ -99,97 +99,85 @@
         </Grid>
       </Border>
 
-      <StackPanel Grid.Row="1">
-        <Border x:Name="AppliedNotice"
-                Margin="{StaticResource NoticeMargin}"
-                IsVisible="False"
-                Background="{StaticResource Surface}"
-                BorderBrush="{StaticResource NeonBlueBorder}"
-                BorderThickness="{StaticResource BorderThin}"
-                CornerRadius="{StaticResource RadiusControl}"
-                BoxShadow="{StaticResource GlowBlue}"
-                Padding="{StaticResource ButtonPaddingSm}">
-          <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-            <TextBlock Grid.Column="0"
-                       x:Name="TxtAppliedLead"
-                       Text="{loc:Text main.update.applied}"
-                       Theme="{StaticResource Body}"
-                       VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="1"
-                       x:Name="TxtAppliedVersion"
-                       Theme="{StaticResource MonoValue}"
-                       Foreground="{StaticResource NeonBlue}"
-                       VerticalAlignment="Center"/>
-            <Button Grid.Column="3"
-                    x:Name="BtnAppliedDismiss"
-                    Content="×"
-                    Theme="{StaticResource GhostButton}"
-                    FontFamily="{StaticResource FontMono}"
-                    VerticalAlignment="Center"
-                    auto:AutomationProperties.Name="{loc:Text main.window.close}"
-                    Click="OnDismissAppliedNotice"/>
-          </Grid>
-        </Border>
 
-        <Border x:Name="UpdateNotice"
-                Margin="{StaticResource NoticeMargin}"
-                IsVisible="False"
-                Background="{StaticResource Surface}"
-                BorderBrush="{StaticResource NeonPurpleBorder}"
-                BorderThickness="{StaticResource BorderThin}"
-                CornerRadius="{StaticResource RadiusControl}"
-                BoxShadow="{StaticResource GlowPurple}"
-                Padding="{StaticResource ButtonPaddingSm}">
-          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-            <TextBlock Grid.Column="0"
-                       x:Name="TxtNoticeLead"
-                       Text="{loc:Text main.update.available}"
-                       Theme="{StaticResource Body}"
-                       VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="1"
-                       x:Name="TxtNoticeVersion"
-                       Theme="{StaticResource MonoValue}"
-                       Foreground="{StaticResource NeonPurple}"
-                       VerticalAlignment="Center"/>
-            <TextBox Grid.Column="2"
-                     x:Name="TxtNoticeCommand"
-                     IsReadOnly="True"
-                     MaxLines="1"
-                     FontFamily="{StaticResource FontMono}"
-                     VerticalAlignment="Center"/>
-            <Button Grid.Column="3"
-                    x:Name="BtnNoticeCopy"
-                    Content="{loc:Text main.action.copy}"
-                    Theme="{StaticResource GhostButton}"
-                    VerticalAlignment="Center"
-                    Click="OnCopyUpdateCommand"/>
-            <Button Grid.Column="4"
-                    x:Name="BtnNoticeDismiss"
-                    Content="×"
-                    Theme="{StaticResource GhostButton}"
-                    FontFamily="{StaticResource FontMono}"
-                    VerticalAlignment="Center"
-                    auto:AutomationProperties.Name="{loc:Text main.window.close}"
-                    Click="OnDismissUpdateNotice"/>
-          </Grid>
-        </Border>
-      </StackPanel>
+        <TabControl x:Name="Tabs" Grid.Row="0" Grid.RowSpan="2" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
+        <TabControl.Tag>
+        <StackPanel>
+          <Border x:Name="AppliedNotice"
+                  Margin="{StaticResource NoticeMargin}"
+                  IsVisible="False"
+                  Background="{StaticResource Surface}"
+                  BorderBrush="{StaticResource NeonBlueBorder}"
+                  BorderThickness="{StaticResource BorderThin}"
+                  CornerRadius="{StaticResource RadiusControl}"
+                  BoxShadow="{StaticResource GlowBlue}"
+                  Padding="{StaticResource ButtonPaddingSm}">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <TextBlock Grid.Column="0"
+                         x:Name="TxtAppliedLead"
+                         Text="{loc:Text main.update.applied}"
+                         Theme="{StaticResource Body}"
+                         VerticalAlignment="Center"/>
+              <TextBlock Grid.Column="1"
+                         x:Name="TxtAppliedVersion"
+                         Theme="{StaticResource MonoValue}"
+                         Foreground="{StaticResource NeonBlue}"
+                         VerticalAlignment="Center"/>
+              <Button Grid.Column="3"
+                      x:Name="BtnAppliedDismiss"
+                      Content="×"
+                      Theme="{StaticResource GhostButton}"
+                      FontFamily="{StaticResource FontMono}"
+                      VerticalAlignment="Center"
+                      auto:AutomationProperties.Name="{loc:Text main.window.close}"
+                      Click="OnDismissAppliedNotice"/>
+            </Grid>
+          </Border>
 
-      <Grid Grid.Row="2" Margin="{StaticResource WorkspaceMargin}">
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    ZIndex="1">
-          <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
-          <Button x:Name="BtnLanguageSettings"
-                  Content="⚙"
-                  Theme="{StaticResource LanguageButton}"
-                  auto:AutomationProperties.Name="{loc:Text main.language.settings}"
-                  ToolTip.Tip="{loc:Text main.language.settings}"
-                  Click="OnOpenLanguageSettings"/>
+          <Border x:Name="UpdateNotice"
+                  Margin="{StaticResource NoticeMargin}"
+                  IsVisible="False"
+                  Background="{StaticResource Surface}"
+                  BorderBrush="{StaticResource NeonPurpleBorder}"
+                  BorderThickness="{StaticResource BorderThin}"
+                  CornerRadius="{StaticResource RadiusControl}"
+                  BoxShadow="{StaticResource GlowPurple}"
+                  Padding="{StaticResource ButtonPaddingSm}">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <TextBlock Grid.Column="0"
+                         x:Name="TxtNoticeLead"
+                         Text="{loc:Text main.update.available}"
+                         Theme="{StaticResource Body}"
+                         VerticalAlignment="Center"/>
+              <TextBlock Grid.Column="1"
+                         x:Name="TxtNoticeVersion"
+                         Theme="{StaticResource MonoValue}"
+                         Foreground="{StaticResource NeonPurple}"
+                         VerticalAlignment="Center"/>
+              <TextBox Grid.Column="2"
+                       x:Name="TxtNoticeCommand"
+                       IsReadOnly="True"
+                       MaxLines="1"
+                       FontFamily="{StaticResource FontMono}"
+                       VerticalAlignment="Center"/>
+              <Button Grid.Column="3"
+                      x:Name="BtnNoticeCopy"
+                      Content="{loc:Text main.action.copy}"
+                      Theme="{StaticResource GhostButton}"
+                      VerticalAlignment="Center"
+                      Click="OnCopyUpdateCommand"/>
+              <Button Grid.Column="4"
+                      x:Name="BtnNoticeDismiss"
+                      Content="×"
+                      Theme="{StaticResource GhostButton}"
+                      FontFamily="{StaticResource FontMono}"
+                      VerticalAlignment="Center"
+                      auto:AutomationProperties.Name="{loc:Text main.window.close}"
+                      Click="OnDismissUpdateNotice"/>
+            </Grid>
+          </Border>
         </StackPanel>
-
-        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
+        </TabControl.Tag>
         <TabItem x:Name="TabPlayer" Theme="{StaticResource NeonTabItem}">
           <TabItem.Header>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
@@ -1281,8 +1269,6 @@
 
 
       </TabControl>
-
-      </Grid>
     </Grid>
   </Border>
 </Window>

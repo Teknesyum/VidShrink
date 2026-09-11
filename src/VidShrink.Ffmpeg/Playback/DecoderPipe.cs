@@ -116,9 +116,13 @@ public sealed class DecoderPipe : IDisposable
         string path;
         long frameBytes;
         double fps;
+        int width;
+        int height;
         lock (_gate)
         {
             path = _path;
+            width = _width;
+            height = _height;
             frameBytes = _frameBytes > 0 ? _frameBytes : 1;
             fps = _fps > 0 ? _fps : 30;
         }
@@ -140,7 +144,7 @@ public sealed class DecoderPipe : IDisposable
         StartStderrDrain(process);
 
         var life = new CancellationTokenSource();
-        var playback = new ContinuousPlayback(process, life, fromSeconds, fps, frameBytes);
+        var playback = new ContinuousPlayback(process, life, fromSeconds, fps, frameBytes, width, height);
         var reader = new Thread(playback.Pump) { IsBackground = true, Name = "vidshrink-continuous-playback" };
         playback.AttachReader(reader);
         reader.Start();
@@ -153,18 +157,34 @@ public sealed class DecoderPipe : IDisposable
         private readonly CancellationTokenSource _life;
         private readonly double _fromSeconds;
         private readonly double _fps;
-        private readonly byte[] _buffer;
+        private readonly object _frontGate = new();
+        private readonly int _width;
+        private readonly int _height;
+        private byte[] _buffer;
+        private byte[] _front;
         private long _framesDecoded;
         private Thread? _reader;
         private bool _disposed;
 
-        internal ContinuousPlayback(Process process, CancellationTokenSource life, double fromSeconds, double fps, long frameBytes)
+        internal ContinuousPlayback(Process process, CancellationTokenSource life, double fromSeconds, double fps, long frameBytes, int width = 0, int height = 0)
         {
             _process = process;
             _life = life;
             _fromSeconds = fromSeconds;
             _fps = fps;
+            _width = width;
+            _height = height;
             _buffer = new byte[frameBytes];
+            _front = new byte[frameBytes];
+        }
+
+        public bool TryCopyLatest(ref long seen, Action<byte[], int, int> copy)
+        {
+            var decoded = FramesDecoded;
+            if (decoded == 0 || decoded == seen || _width <= 0 || _height <= 0) return false;
+            lock (_frontGate) copy(_front, _width, _height);
+            seen = decoded;
+            return true;
         }
 
         internal void AttachReader(Thread reader) => _reader = reader;
@@ -188,6 +208,7 @@ public sealed class DecoderPipe : IDisposable
                 while (!_life.IsCancellationRequested)
                 {
                     if (!ReadFull(stream, _buffer, _life.Token)) break;
+                    lock (_frontGate) (_buffer, _front) = (_front, _buffer);
                     Interlocked.Increment(ref _framesDecoded);
                 }
             }

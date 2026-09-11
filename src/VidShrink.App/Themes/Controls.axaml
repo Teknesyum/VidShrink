@@ -786,14 +786,18 @@
         </Setter>
         <Setter Property="Template">
           <ControlTemplate TargetType="TabControl">
-            <Grid RowDefinitions="Auto,*" ClipToBounds="False" Background="{TemplateBinding Background}">
+            <Grid RowDefinitions="Auto,Auto,*" ClipToBounds="False">
               <ItemsPresenter Name="PART_ItemsPresenter"
                               Grid.Row="0"
+                              Height="{StaticResource TitleBarHeight}"
+                              HorizontalAlignment="Left"
                               ItemsPanel="{TemplateBinding ItemsPanel}"
                               ClipToBounds="False"
-                              Margin="0,0,0,2"/>
+                              Margin="{TemplateBinding Padding}"/>
+              <ContentPresenter Grid.Row="1" Content="{TemplateBinding Tag}"/>
               <TransitioningContentControl Name="SelectedContentHost"
-                                           Grid.Row="1"
+                                           Margin="{StaticResource WorkspaceMargin}"
+                                           Grid.Row="2"
                                            Content="{TemplateBinding SelectedContent}"
                                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
                                            HorizontalContentAlignment="Stretch"
@@ -816,6 +820,7 @@
         <Setter Property="Padding" Value="{StaticResource ChipPadding}"/>
         <Setter Property="Margin" Value="{StaticResource TabMargin}"/>
         <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
         <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>

@@ -313,7 +313,7 @@
   <Thickness x:Key="TooltipPadding">16,12</Thickness>
   <Thickness x:Key="LabelMargin">0,0,0,8</Thickness>
   <Thickness x:Key="ChipMargin">0,0,8,0</Thickness>
-  <Thickness x:Key="TabMargin">0,0,8,2</Thickness>
+  <Thickness x:Key="TabMargin">0,0,8,0</Thickness>
   <Thickness x:Key="WindowButtonMargin">4,0,0,0</Thickness>
   <Thickness x:Key="TitleBarContentMargin">16,0,0,0</Thickness>
   <Thickness x:Key="NoticeMargin">24,12,24,0</Thickness>
@@ -351,7 +351,7 @@
   <x:Double x:Key="SliderTrackHeight">10</x:Double>
   <x:Double x:Key="SliderThumbSize">20</x:Double>
   <x:Double x:Key="ProgressBarHeight">8</x:Double>
-  <x:Double x:Key="TitleBarHeight">38</x:Double>
+  <x:Double x:Key="TitleBarHeight">30</x:Double>
   <x:Double x:Key="TooltipMaxWidth">780</x:Double>
   <x:Double x:Key="DropDownMaxHeight">280</x:Double>
   <x:Double x:Key="PanelMinHeight">256</x:Double>

@@ -208,6 +208,9 @@ public sealed class AyarYuzeyiTests
     /// 625, <b>taşma 290</b>; aralık 285-295, yani ±5 piksel. Eskiden 0-300 yazıyordu ve
     /// taşmanın 10 piksel daha büyümesine sessizce izin veriyordu.</para>
     ///
+    /// <para>Üst bar turu: sekmeler başlık çubuğuna alındı, tagline satırı kalktı. Ölçü içerik
+    /// 915, görüş alanı 664, <b>taşma 251</b>; aralık 246-256.</para>
+    ///
     /// <para><b>720 pikselde sığma T180'e bağlı:</b> taşmayı orta sütunun taban boyu
     /// (<c>PlanPanelMinHeight</c>) tutuyor ve onu küçültmek karşılaştırma alanının yeniden
     /// tasarımı demek.</para>
@@ -269,7 +272,7 @@ public sealed class AyarYuzeyiTests
             $"Plan sütunu ({withoutSettings:0}) artık görüş alanına ({reading.Item3:0}) sığıyor; "
             + "taşmanın kaynağı ayar sütununa döndü, pim yeniden temellendirilmeli.");
 
-        Assert.InRange(reading.Item2 - reading.Item3, 285d, 295d);
+        Assert.InRange(reading.Item2 - reading.Item3, 246d, 256d);
     }
 
     /// <summary>

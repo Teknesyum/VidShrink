@@ -162,6 +162,7 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
+        TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
         LoadTitleBarLogo();
 
         if (OperatingSystem.IsMacOS())
@@ -502,6 +503,12 @@ public partial class MainWindow : Window
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
         _preview?.Dispose();
         base.OnClosing(e);
+    }
+
+    private void AlignTabsToTitle()
+    {
+        var gap = TitleBarContent.ColumnSpacing;
+        Tabs.Padding = new Thickness(TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap, 0, 0, 0);
     }
 
     private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -2527,9 +2534,9 @@ public partial class MainWindow : Window
     {
         Tabs.SelectedIndex = PlayerTabIndex;
         PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
-        await LoadAsync(path);
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
+        await LoadAsync(path);
     }
 
     internal static string TabHeaderText(TabItem tab) => tab.Header switch

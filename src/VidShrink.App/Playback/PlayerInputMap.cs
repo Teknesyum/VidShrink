@@ -144,6 +144,16 @@ internal sealed class SeekCoalescer
 
     internal void Nudge(double deltaSeconds) => GoTo(Target + deltaSeconds);
 
+    internal void Follow(double atSeconds)
+    {
+        lock (_gate)
+        {
+            if (_pending || _running) return;
+            _target = atSeconds < 0 ? 0 : atSeconds > Duration ? Duration : atSeconds;
+            Position = _target;
+        }
+    }
+
     internal void GoTo(double atSeconds)
     {
         lock (_gate)
