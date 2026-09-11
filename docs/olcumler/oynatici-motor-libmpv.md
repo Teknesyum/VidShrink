@@ -142,6 +142,17 @@ Loaded machine (25-37 CPU-heavy processes running, so these are not the quiet re
 | h264_2160p30 | 20/20 | 119.9 | 42.7 | 281.2 | 100.0 | ≤200 | PASS |
 | hevc_1080p60 | 20/20 | 90.8 | 27.0 | 174.0 | 99.8 | none (pilot 2: 61.7) | reported |
 
+Loaded machine, after the restart condition (merge commit `fa4e596d`, Debug build). Latency
+now ends at the later of the first new frame and `MPV_EVENT_PLAYBACK_RESTART`.
+`PerformanceProbe` let the two threshold tests run, but the seek window itself was 56-75 %
+busy, so this is not the quiet reading either:
+
+| file | shown | median ms | min | max | busy % | threshold | result |
+|---|---|---|---|---|---|---|---|
+| h264_1080p60 | 20/20 | 30.0 | 11.9 | 60.2 | 59.5 | ≤60 | PASS |
+| h264_2160p30 | 20/20 | 107.1 | 49.8 | 206.2 | 74.8 | ≤200 | PASS |
+| hevc_1080p60 | 20/20 | 86.7 | 22.8 | 183.4 | 56.4 | none (pilot 2: 61.7) | reported |
+
 Quiet machine. The two threshold tests (1080p, 2160p) are `[QuietMachineFact]`: they run
 only when `PerformanceProbe` reads a light software load, and skip in CI. The HEVC test
 has no threshold and stays a plain fact, so it runs in CI too:
