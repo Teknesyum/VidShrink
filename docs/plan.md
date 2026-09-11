@@ -308,3 +308,17 @@ ayarlar sayfasi ve test ayni tablodan okur.
 | 6 | Sistem | Dosya iliskilendirme, tek ornek | Cift tiklanan dosya acik pencereye iletilir |
 
 Her dalga: kendi dali, 43 dil ayni dalgada, `dotnet test` tam yesil, `gh run list` yesil.
+
+### Motor secimi dogrulandi (netlestirme 005-007)
+
+On aday puanlandi (`docs/oynatici/kutuphane-karsilastirma.md`, karar
+`docs/netlestirme/007-...`): libmpv + kendi P/Invoke 115/140, LibVLCSharp 95,
+HanumanInstitute 91, boru genisletme 88 (Gelismis 13'un ~5'i erisilmez), FFmpeg.AutoGen 80.
+Kendi yazim tahmini: boru ~22 tur, AutoGen ~36 tur; libmpv ~14 tur. Karar 004 korunur.
+
+**0. dalga, adim 1 — olcum:** libmpv SW render, basiz, 1080p60 ve 4K30. Esik: 1080p ≥55
+kare/s, 4K ≥24 kare/s. 4K tutmazsa GPU yolu (OpenGlControlBase + ANGLE) 4. dalgaya
+istege bagli kalem. 1080p tutmazsa ikili tasarim: arayuzde OpenGL/ANGLE, basizda SW, 0.
+dalgaya +1 tur. ANGLE Avalonia 11'de baglanamazsa LibVLCSharp `libvlc_video_set_callbacks`
+yolu, 0. dalga bastan. GPL hazir ikiliyle baslanir; `-Dgpl=false` LGPL derlemesi 6. dalga
+sonrasi istege bagli.
