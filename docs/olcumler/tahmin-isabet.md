@@ -15,3 +15,5 @@ Birim: 0,5 gun/tur (P50), 0,7 (P90); tur tahmini ×1,5 (P50), ×3 (P90).
 | 5. dalga: karsilastirma paneli ve onizleme sesi motorda | P50 3, P90 6 / 1,5-2 gun / 3-4M (ajanin acilis tahmini) | 4 itme (2 CI kirmizisi, 1 iptal) / 0 / ajan ~3,1 saat / 76 dosya +1157 -3604 / yapici 181k | 1,3 |
 | 1. dalga: gunluk denetim | 70 tur / 0,5 gun / ~4M (ajanin acilis tahmini) | 4 itme (2 CI kirmizisi, 1 iptal; son itme T0'in main birlesmesi) / 0 / ajan ~3,5 saat / 101 dosya +3027 -261 / yapici 186k | 0,06 |
 | libmpv SW render olcumu (pilot 2) | tahmin yazilmadi | 1 + 2 yuklu tekrar / 0 / ajan ~54 dk / 10 dosya +1602 / olcum ajani 152k, danisma 59k | - |
+| 3. dalga: goruntu, pencere, liste | 3 itme / 0,5 gun / ~70 dosya (ajanin acilis tahmini) | 2 itme (1 CI kirmizisi) / 0 / ajan ~2 saat 15 dk / 61 dosya / kayitli degil | 0,7 |
+| 2. dalga: altyazi ve ses parcasi | P50 3, P90 6 itme / 4 saat-1 gun (ajanin acilis tahmini) | 3 itme (1 CI kirmizisi) + T0 main birlesmesi / 0 / ajan ~2,5 saat / 60 dosya / kayitli degil | 1,0 |
