@@ -67,6 +67,10 @@ if ($text -and ($text -match $interruptPattern)) {
     Dur 65 'Kosum kesinti/iptal satiri iceriyor.'
 }
 
+if ($text -and ($text -match '(?im)\berror (?:NETSDK|MSB|CS)\d+')) {
+    Dur 64 'Kosum derlenemedi: derleyici/SDK hatasi var, ozet aranmadi.'
+}
+
 $total = $null
 $skipped = $null
 

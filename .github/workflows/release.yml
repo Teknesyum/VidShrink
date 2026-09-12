@@ -125,6 +125,10 @@ jobs:
             exit 1
           }
           Add-Content -Path $env:GITHUB_ENV -Value "VIDSHRINK_LIBMPV=$dll"
+      # Kapi `dotnet test --no-restore` kosuyor: restore'u yapan derleme adimi olmadan
+      # NETSDK1004 veriyor ve kapi bunu "Basarisiz/Failed ozeti yok" diye bildiriyor.
+      # ci.yml ile ayni adim, ayni sirada.
+      - run: dotnet build VidShrink.sln -c Release -warnaserror
       # Asilan bir testhost "Failed: 0" basip cikis kodu 0 dondurur. Duz `dotnet test`
       # bunu goremiyordu; yayin asilmis bir suitin uzerine yayinlanabilirdi.
       - run: pwsh -File tools/kosum-kapisi/kosum-kapisi.ps1 -MinimumTotal 1143 -MaximumSkipped 30 -ResultsDir .calisma/kosum-sonuc
