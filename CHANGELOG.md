@@ -13,7 +13,10 @@ ship as part of it.
   stroke-only geometry: colour comes from the owning control's `Foreground`, thickness from
   the `IconStroke` token, so an icon follows the palette instead of a font. Every tab now
   carries its own icon, the maximise/restore/close glyphs became geometry, and the player's
-  volume emoji went with them. Shapes are from the Lucide set (ISC licence).
+  volume emoji went with them. The last text glyphs went too: the expander arrows on the
+  quality, audio, frame, advanced, command, plan-reasons, performance and AI headers are
+  chevron geometries, and the control strip's play/pause and restart buttons are drawn
+  rather than typed. Shapes are from the Lucide set (ISC licence).
 - **Settings is a tab, not a separate panel.** The gear and its button left the title bar;
   Settings is the last tab of the strip, with the same gear as its icon. `main.language.settings`
   had no owner left and was removed from all 43 languages.
