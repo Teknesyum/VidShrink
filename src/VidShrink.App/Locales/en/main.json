@@ -31,7 +31,6 @@
   "main.action.browse": "Browse",
   "main.action.cancel": "Cancel",
   "main.action.cancel.disabled-tip": "No job is running yet",
-  "main.sponsor.label": "Buy Me a Coffee",
   "main.action.shrink": "Shrink",
   "main.action.shrink.disabled-tip": "Load a video file first",
   "main.action.convert": "Convert",

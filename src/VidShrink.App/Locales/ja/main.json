@@ -31,7 +31,6 @@
   "main.action.browse": "参照",
   "main.action.cancel": "キャンセル",
   "main.action.cancel.disabled-tip": "まだ実行中のジョブはありません",
-  "main.sponsor.label": "Buy Me a Coffee",
   "main.action.shrink": "圧縮",
   "main.action.shrink.disabled-tip": "先に動画ファイルを読み込んでください",
   "main.action.convert": "変換",

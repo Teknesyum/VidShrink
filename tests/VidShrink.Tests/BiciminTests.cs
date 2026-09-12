@@ -501,9 +501,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1054, toplam);
-        Assert.Equal(110, dilBasina["en"]);
-        Assert.Equal(48, dilBasina["tr"]);
+        Assert.Equal(1011, toplam);
+        Assert.Equal(109, dilBasina["en"]);
+        Assert.Equal(47, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -529,9 +529,9 @@ public sealed class BaslikKapsamiTests
     /// <c>main.instance.waiting</c> ekledi: 43 x 510 = 21930. 3. dalga 32 anahtar daha ekledi: 43 x 542 = 23306.
     /// 2. dalga 38 altyazi ve ses parcasi anahtari ekledi: 43 x 580 = 24940.
     /// 4. dalga 39 gelismis ve 12 arac anahtari ekledi: 43 x 631 = 27133. ui-kilavuz sozlesmesi disabled-affordance
-    /// icin 5 (main.action.cancel/shrink/convert.disabled-tip, main.sponsor.label, settings.share.delete.disabled-tip)
+    /// icin 4 (main.action.cancel/shrink/convert.disabled-tip, settings.share.delete.disabled-tip)
     /// ve unnamed-interactive/component-without-motion icin 4 (playback.panel.maximize/fullscreen, playback.zoom.out/in)
-    /// anahtar ekledi: 43 x 640 = 27520.</para>
+    /// anahtar ekledi: 43 x 639 = 27477. main.sponsor.label denendi, BrandSpellingTests ile cakisti, geri alindi.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -559,7 +559,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(27520, gezilen);
+        Assert.Equal(27477, gezilen);
         Assert.Empty(kayip);
     }
 
