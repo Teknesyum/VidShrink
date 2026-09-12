@@ -12,3 +12,5 @@ __pycache__/
 
 .claude/agent-memory/
 trash/
+.claude/jobs.md
+.claude/sonra.md
