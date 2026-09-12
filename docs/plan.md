@@ -570,3 +570,53 @@ olmayan uc anahtar (`state-mini`, `preview`, `length`) 42 dilden silindi;
 P90 18 tur**; 0,5 (P50) / 0,7 (P90) gun/tur ile **P50 ~4,5 gun, P90 ~12,6 gun**. Itme
 P50 5, P90 12. Dokunulan dosya ~55: kaynak 8, tema 2, dil 43, test 3, belge 3. Gercegi
 kapanista `docs/olcumler/tahmin-isabet.md`ye girer.
+
+## 7. dalga: oynatici etkileşimi (12 Eylul 2026)
+
+Kullanicinin istegi: ekranin neredeyse tamami oynaticiya; mp4'e cift tik sonrasi hicbir
+gecikme olmadan oynatma; sol tik duraklat/baslat; sol basili tutarak pencere tasima
+(maksimizede video tasinir, ortaya yaklasinca otomatik hizalanir); sag tik menu/ayarlar;
+altta kolay erisilen oynat, -10 sn, +10 sn, ses, hiz; gecen ve kalan sure; genis cubuga
+tiklayinca aninda o ana gitme; cubukta suruklerken akici kucuk resim onizlemesi.
+
+Uc kol, dosya sahipligi ayrik:
+
+### 7a. Fare: sol tik, tasima, sag tik menu
+
+Sahip dosyalar: `Playback/PlayerView.axaml.cs`, yeni `Playback/PlayerView.Fare.cs`,
+`Playback/Keymap.cs`, `Playback/PlayerInputMap.cs`.
+
+- Sol tik (ClickCount 1) duraklat/baslat; cift tik tam ekran kalir, ikisi cakismaz.
+- Sol basili tutup surukleme: pencere kipinde `BeginMoveDrag`, maksimize/tam ekran kipinde
+  video yuzeyi kaydirilir (pan); merkez esigine girilince otomatik hizalanir.
+- Sag tik menuyu **fare konumunda** acar (bugun sag ustteki `⋮` dugmesine tutturuluyor);
+  menunun ilk satiri ayarlar sayfasini acar.
+- Kabul: her giris icin oncesi/sonrasi olculur; tasima ile tiklama esigi ayrilir
+  (surukleme baslamadan birakilan basis duraklat/baslat sayilir).
+
+### 7b. Alt denetim seridi ve zaman cubugu
+
+Sahip dosyalar: `Playback/PlayerView.axaml`, yeni `Playback/PlayerView.Serit.cs`,
+`Playback/PlayerView.Window.cs` (zaman cubugu bolumu), `Themes/Playback.axaml`,
+`Playback/PlayerView.Tools.cs` (kucuk resim baglama).
+
+- Altta otomatik gizlenen serit: oynat/duraklat, -10 sn, +10 sn, ses, hiz. Olculer
+  `Playback.axaml` belirteclerinden; yeni renk/olcu uydurulmaz.
+- Sure etiketi `00:12 / 01:30` bicimi ve **kalan** sure; bugunku dort metin satiri kalkar,
+  video dikeyde buyur.
+- Genis zaman cubugu: basista aninda o ana gider (bugunku davranis korunur), suruklerken
+  kucuk resim onizlemesi fareyi takip eder (4b altyapisi `ShowThumbnailAsync`, olculen
+  medyan ~10 ms, esik 300 ms).
+- Kabul: serit gosterme gecikmesi 0 / gizleme 360 ms olculur, ±10 sn motora ulasir, ses ve
+  hiz motordan geri okunur, sure etiketi iki dilde bicimlenir.
+
+### 7c. Acilis hizi: cift tikdan ilk kareye
+
+Sahip dosyalar: `Program.cs`, `MainWindow.axaml.cs` (acilis yolu), `ShellIntegration`,
+`docs/olcumler/acilis-hizi.md`.
+
+- Uctan uca olcum yok; once olculur (cift tik → ilk kare), sonra yol kisaltilir: gereksiz
+  bekleme, sekme gecisi sirasi, tek ornek kanali zaman asimlari, ilk kare gelmeden
+  yapilan is.
+- Kabul: olcum dosyasi medyan/p95 verir, iyilestirme oncesi ve sonrasi ayni makinede
+  karsilastirilir; acilis sekmesi kabuk yolunda Oynatici kalir.

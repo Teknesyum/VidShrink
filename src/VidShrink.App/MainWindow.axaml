@@ -187,10 +187,6 @@
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
               <TextBlock Text="▷"/>
               <TextBlock Text="{loc:Text main.tab.player}"/>
-              <Border Width="{StaticResource BorderThinScalar}"
-                      Background="{StaticResource NeonBlueBorderStrong}"
-                      Margin="{StaticResource ChipMargin}"
-                      VerticalAlignment="Stretch"/>
             </StackPanel>
           </TabItem.Header>
           <playback:PlayerView x:Name="Player"/>
