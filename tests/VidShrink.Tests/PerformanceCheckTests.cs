@@ -972,7 +972,8 @@ public sealed class PerformanceCheckTests
     private static readonly string[] SaatCekirdegi =
     {
         "WallMs", "ElapsedMs", "RealtimeCores", "RealtimeFactor", "ReportedCpuParallelism",
-        "Stopwatch", "Elapsed", "WaitForExit", "WaitOne", "WaitAsync", ".Join(", ".Wait("
+        "Stopwatch", "Elapsed", "WaitForExit", "WaitOne", "WaitAsync", ".Join(", ".Wait(",
+        "ToApp", "ToExit"
     };
 
     private static readonly string[] SaatliDosyalar =

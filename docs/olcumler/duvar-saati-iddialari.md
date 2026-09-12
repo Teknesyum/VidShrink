@@ -559,3 +559,30 @@ ile tetiklendiğinde iki pencereden biri ölçülmeden kalır ve sayaç tam olar
 okunur — CI'da görülen düşüşün şekli. 45 yerel koşumda bir kez olmadı, ama 45 koşum
 CI'daki tek düşüşe karşı bunu **elemeye yetmez**. K0'ın sebep ataması bu yüzden
 kesin diye sunulmuyor.
+
+## Sayım 0.4.3'te 23'ten 21'e düştü, kaybolan bant yoktu
+
+0.4.3'ün yayın koşumu (`34711188877`) bu ölçüyle kırmızıya döndü:
+`saat turevi iddia sayisi 21, belge 23 diyor`. Düşen iki satır
+`UpdaterTests.cs:915` ve `:916`, yani ağsız açılışın 3 saniyelik iki tavanıydı.
+
+**İkisi de kodda duruyor.** 0.4.3, `MeasureLaunch`i tek bir `TimeSpan` yerine
+`LaunchTiming(ToApp, ToExit)` döndürecek şekilde yeniden yazdı; iddialar da
+`offlineFirst.ToApp < AgsizAcilisTavani` oldu (`UpdaterTests.cs:1109-1110`). Sayaç
+tohumları `MetotBasligi` ile türden çıkarıyor ve o desen yalnız
+`TimeSpan|Stopwatch|long|double|int` dönen üyeleri tanıyor. `LaunchTiming` dönen bir
+metot tanınmadığı için `offlineFirst` ve `offlineSecond` hiç tohum olmadı, iki bant
+sayımdan sessizce düştü.
+
+Düzeltme sayıyı indirmek değil, sayacın onları yeniden görmesi: `ToApp` ve `ToExit`
+saat çekirdeğine eklendi — tıpkı `WallMs`, `ElapsedMs`, `RealtimeFactor` gibi, saatten
+türeyen üye adları. Sayım 23'e döndü ve ölçü yeşil:
+
+```
+$ dotnet test --filter SaatTureviIddialarinSayisiBelgedekiyleAyni
+Başarılı!  - Başarısız: 0, Başarılı: 1, Atlanan: 0, Toplam: 1
+```
+
+**Ders: bu ölçü bandın kaybını değil, sayımın kaymasını da yakalıyor.** Kırmızı
+görünce önce satırın gerçekten silinip silinmediğine bakılır; duruyorsa kusur sayaçta,
+belgenin sayısında değil. Sayıyı 21'e çekmek iki gerçek bandı belgeden silmiş olurdu.

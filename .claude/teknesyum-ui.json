@@ -9,8 +9,7 @@
     {
       "rule": "forms/unmeasured-label",
       "file": "CHANGELOG.md",
-      "line": 605,
-      "reason": "16 MB WhatsApp'ın yayınladığı sınır, bizim ölçtüğümüz bir sayı değil; MainWindow.axaml.cs WhatsAppTargetMb = 16 pimliyor."
+      "reason": "16 MB WhatsApp'ın yayınladığı sınır, bizim ölçtüğümüz bir sayı değil; MainWindow.axaml.cs WhatsAppTargetMb = 16 pimliyor. Satır numarası yazılmıyor: günlük başa eklenerek büyüdüğü için her sürümde kayıyor ve yayınlanmış satırlar sonradan düzenlenmiyor."
     },
     {
       "rule": "forms/unmeasured-label",
