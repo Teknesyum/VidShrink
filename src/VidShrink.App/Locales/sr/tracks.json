@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kinesko (pojednostavljeno)",
   "player.subtitle.encoding.chinesetraditional": "Kinesko (tradicionalno)",
   "player.subtitle.encoding.korean": "Korejsko",
-  "player.subtitle.external": "spoljni",
+  "player.subtitle.external": " (spoljni)",
   "player.subtitle.novideo": "Otvorite video pre dodavanja titlova",
   "player.subtitle.loadfailed": "Fajl sa titlom nije mogao da se učita"
 }

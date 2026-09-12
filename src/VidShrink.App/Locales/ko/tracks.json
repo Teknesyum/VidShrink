@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "중국어(간체)",
   "player.subtitle.encoding.chinesetraditional": "중국어(번체)",
   "player.subtitle.encoding.korean": "한국어",
-  "player.subtitle.external": "외부",
+  "player.subtitle.external": " (외부)",
   "player.subtitle.novideo": "자막을 추가하기 전에 동영상을 여세요",
   "player.subtitle.loadfailed": "자막 파일을 불러올 수 없습니다"
 }

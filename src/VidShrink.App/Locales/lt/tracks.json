@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kinų (supaprastinta)",
   "player.subtitle.encoding.chinesetraditional": "Kinų (tradicinė)",
   "player.subtitle.encoding.korean": "Korėjiečių",
-  "player.subtitle.external": "išorinis",
+  "player.subtitle.external": " (išorinis)",
   "player.subtitle.novideo": "Prieš pridedant subtitrus atidarykite vaizdo įrašą",
   "player.subtitle.loadfailed": "Nepavyko įkelti subtitrų failo"
 }

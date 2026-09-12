@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kitajsko (poenostavljeno)",
   "player.subtitle.encoding.chinesetraditional": "Kitajsko (tradicionalno)",
   "player.subtitle.encoding.korean": "Korejsko",
-  "player.subtitle.external": "zunanji",
+  "player.subtitle.external": " (zunanji)",
   "player.subtitle.novideo": "Pred dodajanjem podnapisov odprite video",
   "player.subtitle.loadfailed": "Datoteke s podnapisi ni bilo mogoče naložiti"
 }

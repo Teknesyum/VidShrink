@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "چینی (ساده‌شده)",
   "player.subtitle.encoding.chinesetraditional": "چینی (سنتی)",
   "player.subtitle.encoding.korean": "کره‌ای",
-  "player.subtitle.external": "خارجی",
+  "player.subtitle.external": " (خارجی)",
   "player.subtitle.novideo": "پیش از افزودن زیرنویس، یک ویدیو باز کنید",
   "player.subtitle.loadfailed": "فایل زیرنویس بارگذاری نشد"
 }

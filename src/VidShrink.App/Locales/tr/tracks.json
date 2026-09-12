@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Çince (Basitleştirilmiş)",
   "player.subtitle.encoding.chinesetraditional": "Çince (Geleneksel)",
   "player.subtitle.encoding.korean": "Korece",
-  "player.subtitle.external": "dış",
+  "player.subtitle.external": " (dış)",
   "player.subtitle.novideo": "Altyazı eklemeden önce bir video açın",
   "player.subtitle.loadfailed": "Altyazı dosyası yüklenemedi"
 }

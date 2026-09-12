@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Китайская (упрощённая)",
   "player.subtitle.encoding.chinesetraditional": "Китайская (традиционная)",
   "player.subtitle.encoding.korean": "Корейская",
-  "player.subtitle.external": "внешний",
+  "player.subtitle.external": " (внешний)",
   "player.subtitle.novideo": "Откройте видео перед добавлением субтитров",
   "player.subtitle.loadfailed": "Не удалось загрузить файл субтитров"
 }

@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Chinois (simplifié)",
   "player.subtitle.encoding.chinesetraditional": "Chinois (traditionnel)",
   "player.subtitle.encoding.korean": "Coréen",
-  "player.subtitle.external": "externe",
+  "player.subtitle.external": " (externe)",
   "player.subtitle.novideo": "Ouvrez une vidéo avant d'ajouter des sous-titres",
   "player.subtitle.loadfailed": "Le fichier de sous-titres n'a pas pu être chargé"
 }

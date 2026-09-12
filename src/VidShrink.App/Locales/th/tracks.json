@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "จีน (ตัวย่อ)",
   "player.subtitle.encoding.chinesetraditional": "จีน (ตัวเต็ม)",
   "player.subtitle.encoding.korean": "เกาหลี",
-  "player.subtitle.external": "ภายนอก",
+  "player.subtitle.external": " (ภายนอก)",
   "player.subtitle.novideo": "เปิดวิดีโอก่อนเพิ่มคำบรรยาย",
   "player.subtitle.loadfailed": "โหลดไฟล์คำบรรยายไม่สำเร็จ"
 }

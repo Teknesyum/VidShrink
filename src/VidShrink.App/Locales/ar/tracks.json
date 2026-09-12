@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "الصينية (المبسطة)",
   "player.subtitle.encoding.chinesetraditional": "الصينية (التقليدية)",
   "player.subtitle.encoding.korean": "الكورية",
-  "player.subtitle.external": "خارجي",
+  "player.subtitle.external": " (خارجي)",
   "player.subtitle.novideo": "افتح فيديو قبل إضافة الترجمة",
   "player.subtitle.loadfailed": "تعذر تحميل ملف الترجمة"
 }

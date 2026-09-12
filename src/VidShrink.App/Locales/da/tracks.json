@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kinesisk (forenklet)",
   "player.subtitle.encoding.chinesetraditional": "Kinesisk (traditionel)",
   "player.subtitle.encoding.korean": "Koreansk",
-  "player.subtitle.external": "ekstern",
+  "player.subtitle.external": " (ekstern)",
   "player.subtitle.novideo": "Åbn en video, før du tilføjer undertekster",
   "player.subtitle.loadfailed": "Undertekstfilen kunne ikke indlæses"
 }

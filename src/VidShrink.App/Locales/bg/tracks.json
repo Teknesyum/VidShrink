@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Китайски (опростен)",
   "player.subtitle.encoding.chinesetraditional": "Китайски (традиционен)",
   "player.subtitle.encoding.korean": "Корейски",
-  "player.subtitle.external": "външни",
+  "player.subtitle.external": " (външни)",
   "player.subtitle.novideo": "Отворете видео, преди да добавите субтитри",
   "player.subtitle.loadfailed": "Файлът със субтитри не можа да бъде зареден"
 }

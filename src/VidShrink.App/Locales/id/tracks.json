@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Tionghoa (Sederhana)",
   "player.subtitle.encoding.chinesetraditional": "Tionghoa (Tradisional)",
   "player.subtitle.encoding.korean": "Korea",
-  "player.subtitle.external": "eksternal",
+  "player.subtitle.external": " (eksternal)",
   "player.subtitle.novideo": "Buka video sebelum menambahkan subtitel",
   "player.subtitle.loadfailed": "Berkas subtitel tidak dapat dimuat"
 }

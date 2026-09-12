@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "סינית (מפושטת)",
   "player.subtitle.encoding.chinesetraditional": "סינית (מסורתית)",
   "player.subtitle.encoding.korean": "קוריאנית",
-  "player.subtitle.external": "חיצוני",
+  "player.subtitle.external": " (חיצוני)",
   "player.subtitle.novideo": "פתח סרטון לפני הוספת כתוביות",
   "player.subtitle.loadfailed": "לא ניתן היה לטעון את קובץ הכתוביות"
 }
