@@ -223,5 +223,39 @@
         </StackPanel>
       </Border>
     </Grid>
+
+    <!-- Ses girdisi. Liste ffmpeg'in kendisinden geliyor; cihazsız makinede kutular
+         yalnız "sessiz" öğesiyle açılıyor ve kayıt sessiz sürüyor. -->
+    <Border Theme="{StaticResource Panel}">
+      <StackPanel Spacing="{StaticResource SpaceMd}">
+        <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H3}"/>
+
+        <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+          <StackPanel Grid.Column="0">
+            <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbMicrophone"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.audio.microphone}"/>
+          </StackPanel>
+
+          <StackPanel Grid.Column="1">
+            <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbSystemAudio"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.audio.system}"/>
+          </StackPanel>
+
+          <Button Grid.Column="2"
+                  x:Name="BtnAudioRefresh"
+                  Theme="{StaticResource GhostButton}"
+                  VerticalAlignment="Bottom"
+                  Content="{loc:Text recorder.audio.refresh}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.audio.refresh}"
+                  Click="OnAudioRefresh"/>
+        </Grid>
+
+        <TextBlock Text="{loc:Text recorder.audio.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
   </StackPanel>
 </UserControl>

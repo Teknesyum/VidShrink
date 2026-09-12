@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video-encoder",
   "recorder.option.preset": "Encoderprofiel",
   "recorder.option.cursor": "Muiscursor tonen",
+  "recorder.audio.title": "Geluid",
+  "recorder.audio.microphone": "Microfoon",
+  "recorder.audio.system": "Systeemgeluid",
+  "recorder.audio.none": "Geen geluid",
+  "recorder.audio.refresh": "Lijst vernieuwen",
+  "recorder.audio.hint": "Als u beide kiest, worden twee bronnen opgenomen en gemengd tot één spoor.",
   "recorder.output.title": "Uitvoermap",
   "recorder.output.browse": "Bladeren…",
   "recorder.output.reveal": "Tonen in map",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Deze instellingen staan geen opname toe: {0}",
   "recorder.error.number": "{0} moet een getal zijn.",
   "recorder.error.start": "De opname kon niet starten: {0}",
-  "recorder.error.folder": "De map kon niet worden gekozen: {0}"
+  "recorder.error.folder": "De map kon niet worden gekozen: {0}",
+  "recorder.error.audio": "De geluidsinvoer kon niet worden voorbereid: {0}"
 }

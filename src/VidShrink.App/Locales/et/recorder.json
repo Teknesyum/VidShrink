@@ -31,6 +31,12 @@
   "recorder.option.codec": "Videokoodek",
   "recorder.option.preset": "Koodeki eelseadistus",
   "recorder.option.cursor": "Näita hiirekursorit",
+  "recorder.audio.title": "Heli",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Süsteemiheli",
+  "recorder.audio.none": "Heli puudub",
+  "recorder.audio.refresh": "Värskenda loendit",
+  "recorder.audio.hint": "Mõlema valimisel salvestatakse kaks sisendit ja segatakse need üheks helirajaks.",
   "recorder.output.title": "Väljundkaust",
   "recorder.output.browse": "Sirvi…",
   "recorder.output.reveal": "Näita kaustas",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Need seaded ei võimalda salvestust: {0}",
   "recorder.error.number": "{0} peab olema arv.",
   "recorder.error.start": "Salvestust ei õnnestunud alustada: {0}",
-  "recorder.error.folder": "Kausta ei õnnestunud valida: {0}"
+  "recorder.error.folder": "Kausta ei õnnestunud valida: {0}",
+  "recorder.error.audio": "Helisisendit ei õnnestunud ette valmistada: {0}"
 }

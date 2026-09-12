@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video kodek",
   "recorder.option.preset": "Přednastavení kodeku",
   "recorder.option.cursor": "Zobrazit ukazatel myši",
+  "recorder.audio.title": "Zvuk",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Zvuk systému",
+  "recorder.audio.none": "Bez zvuku",
+  "recorder.audio.refresh": "Obnovit seznam",
+  "recorder.audio.hint": "Výběr obou zaznamená dva vstupy a smíchá je do jedné stopy.",
   "recorder.output.title": "Výstupní složka",
   "recorder.output.browse": "Procházet…",
   "recorder.output.reveal": "Zobrazit ve složce",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Tato nastavení neumožňují nahrávání: {0}",
   "recorder.error.number": "{0} musí být číslo.",
   "recorder.error.start": "Nahrávání se nepodařilo spustit: {0}",
-  "recorder.error.folder": "Složku se nepodařilo vybrat: {0}"
+  "recorder.error.folder": "Složku se nepodařilo vybrat: {0}",
+  "recorder.error.audio": "Zvukový vstup se nepodařilo připravit: {0}"
 }

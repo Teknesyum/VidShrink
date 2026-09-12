@@ -31,6 +31,12 @@
   "recorder.option.codec": "Encodeur vidéo",
   "recorder.option.preset": "Préréglage de l'encodeur",
   "recorder.option.cursor": "Afficher le curseur de la souris",
+  "recorder.audio.title": "Son",
+  "recorder.audio.microphone": "Microphone",
+  "recorder.audio.system": "Son système",
+  "recorder.audio.none": "Aucun son",
+  "recorder.audio.refresh": "Actualiser la liste",
+  "recorder.audio.hint": "Choisir les deux enregistre deux entrées et les mélange en une seule piste.",
   "recorder.output.title": "Dossier de sortie",
   "recorder.output.browse": "Parcourir…",
   "recorder.output.reveal": "Afficher dans le dossier",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Ces paramètres ne permettent pas un enregistrement : {0}",
   "recorder.error.number": "{0} doit être un nombre.",
   "recorder.error.start": "L'enregistrement n'a pas pu démarrer : {0}",
-  "recorder.error.folder": "Le dossier n'a pas pu être choisi : {0}"
+  "recorder.error.folder": "Le dossier n'a pas pu être choisi : {0}",
+  "recorder.error.audio": "L'entrée audio n'a pas pu être préparée : {0}"
 }

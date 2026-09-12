@@ -50,6 +50,16 @@ internal sealed class RecorderSettings
     internal int RegionHeight { get; set; } = DefaultRegionHeight;
 
     /// <summary>
+    /// Seçilen mikrofonun adı. Indeks değil ad saklanıyor: cihaz listesi iki açılış
+    /// arasında sıra değiştirdiğinde indeks başka cihazı gösterirdi. Cihaz artık yoksa
+    /// kutular sessizde açılıyor.
+    /// </summary>
+    internal string? MicrophoneName { get; set; }
+
+    /// <summary>Seçilen sistem sesi cihazının adı.</summary>
+    internal string? SystemAudioName { get; set; }
+
+    /// <summary>
     /// Ayarların durduğu klasör. Kaydedici ana pencereye bağlanmadığı için yolu kendisi
     /// çözüyor; program başına tek yer.
     /// </summary>
@@ -84,6 +94,8 @@ internal sealed class RecorderSettings
             settings.RegionY = (int?)root["regionY"] ?? 0;
             if ((int?)root["regionWidth"] is { } width && width > 0) settings.RegionWidth = width;
             if ((int?)root["regionHeight"] is { } height && height > 0) settings.RegionHeight = height;
+            settings.MicrophoneName = (string?)root["microphoneName"];
+            settings.SystemAudioName = (string?)root["systemAudioName"];
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -119,6 +131,10 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("regionY", RegionY);
                 writer.WriteNumber("regionWidth", RegionWidth);
                 writer.WriteNumber("regionHeight", RegionHeight);
+                if (MicrophoneName is null) writer.WriteNull("microphoneName");
+                else writer.WriteString("microphoneName", MicrophoneName);
+                if (SystemAudioName is null) writer.WriteNull("systemAudioName");
+                else writer.WriteString("systemAudioName", SystemAudioName);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);

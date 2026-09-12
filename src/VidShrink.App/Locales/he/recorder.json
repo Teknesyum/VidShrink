@@ -31,6 +31,12 @@
   "recorder.option.codec": "מקודד וידאו",
   "recorder.option.preset": "פריסט מקודד",
   "recorder.option.cursor": "הצג את סמן העכבר",
+  "recorder.audio.title": "קול",
+  "recorder.audio.microphone": "מיקרופון",
+  "recorder.audio.system": "קול המערכת",
+  "recorder.audio.none": "ללא קול",
+  "recorder.audio.refresh": "רענן את הרשימה",
+  "recorder.audio.hint": "בחירה בשניהם מקליטה שני קלטים וממזגת אותם לרצועה אחת.",
   "recorder.output.title": "תיקיית פלט",
   "recorder.output.browse": "עיון…",
   "recorder.output.reveal": "הצג בתיקייה",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "ההגדרות הללו אינן מאפשרות הקלטה: {0}",
   "recorder.error.number": "{0} חייב להיות מספר.",
   "recorder.error.start": "ההקלטה לא הצליחה להתחיל: {0}",
-  "recorder.error.folder": "לא ניתן היה לבחור את התיקייה: {0}"
+  "recorder.error.folder": "לא ניתן היה לבחור את התיקייה: {0}",
+  "recorder.error.audio": "לא ניתן היה להכין את קלט הקול: {0}"
 }

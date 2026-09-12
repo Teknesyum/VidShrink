@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video kodlayıcı",
   "recorder.option.preset": "Kodlayıcı ön ayarı",
   "recorder.option.cursor": "Fare imlecini göster",
+  "recorder.audio.title": "Ses",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Sistem sesi",
+  "recorder.audio.none": "Sessiz",
+  "recorder.audio.refresh": "Listeyi yenile",
+  "recorder.audio.hint": "İkisi birlikte seçilince iki girdi kaydedilir ve tek ses parçasına karıştırılır.",
   "recorder.output.title": "Çıkış klasörü",
   "recorder.output.browse": "Gözat…",
   "recorder.output.reveal": "Klasörde göster",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Bu ayarlar kayda izin vermiyor: {0}",
   "recorder.error.number": "{0} bir sayı olmalı.",
   "recorder.error.start": "Kayıt başlatılamadı: {0}",
-  "recorder.error.folder": "Klasör seçilemedi: {0}"
+  "recorder.error.folder": "Klasör seçilemedi: {0}",
+  "recorder.error.audio": "Ses girdisi hazırlanamadı: {0}"
 }

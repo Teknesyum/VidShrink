@@ -380,7 +380,13 @@ public sealed class OluUyeTests
     /// (<c>hic-okunmayan-tur</c>); rolu okuyan secim yuzeyi 8b'nin alaninda. Ayni koldaki
     /// <c>CaptureBackend</c> pime girmedi: <c>AudioCaptureArguments.cs:29</c> esitlik,
     /// <c>:153</c> switch kolu, yani tuketiliyor.
-    /// Olcunun kendi ciktisi: <c>uye: 167  bu dosyada adi gecmeyen: 119  pimlenen: 34</c>.
+    /// Kumeyi 34'ten 33'e indiren 8d: o beklenen secim yuzeyi acildi. <c>RecorderView.Ses.cs:62</c>
+    /// mikrofonu adiyla soruyor (<c>role == AudioSourceRole.Microphone ? CmbMicrophone : CmbSystemAudio</c>),
+    /// olcu bunu <c>esitlik-sag</c> tuketimi sayiyor ve <c>AudioSourceRole.Microphone</c>
+    /// <c>tuketiliyor</c>'a gecip pimden dustu (uretim 5, tuketim 1). Ikinci uye dusmedi, bicim
+    /// degistirdi: kardesi okundugu icin <c>hic-okunmayan-tur</c> yerine <c>varsayilan-kol</c>
+    /// cikiyor ve borc degil mesru sayiliyor — <c>ConversionQualityMode.Bitrate</c> ile ayni kalip.
+    /// Olcunun kendi ciktisi: <c>uye: 173  bu dosyada adi gecmeyen: 125  pimlenen: 33</c>.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -450,10 +456,8 @@ public sealed class OluUyeTests
             "Uretimde sifir gorunum, testlerde ve araclarda bes. Bu sinifin en saf hali: alani ayakta tutan tek taraf olcum tarafi. Dusurmek olcum duzenegini kirar, karar ayri sozlesme."),
         new("Intent.SocialMedia", "varsayilan-kol", Debt,
             "T177'ye kadar hicbir yerde gorunmuyordu. T177 yonga seridine niyeti tasidi: MainWindow.axaml.cs ChipPlans() icinde 8 MB yongasinin niyeti bu uye, yani uye artik uretimde uretiliyor. Tuketen kol hala yok — okuma tarafi niyeti adiyla ayirmiyor — o yuzden bicim hic-gorunmeyen'den varsayilan-kol'a dondu ve borc olarak duruyor."),
-        new("AudioSourceRole.Microphone", "hic-okunmayan-tur", Debt,
-            "8c ses girisi kolunun ekledigi rol. Uretimde uretiliyor: CaptureDevices.cs:249-252 cihaz adindan siniflandiriyor, AudioCaptureArguments.cs:99 secimi bu rolle dogruluyor. Tuketen kol yok — dogrulama esitlik karsilastirmasi (:171 expectedRole), role gore dallanan satir degil. Rolu adiyla okuyan kol 8b arayuzunde acilacak (mikrofon/sistem sesi secimi); o zamana kadar borc."),
-        new("AudioSourceRole.SystemAudio", "hic-okunmayan-tur", Debt,
-            "Ayni turun ikinci uyesi, ayni sinir: AudioCaptureArguments.cs:101 uretiyor, hicbir kol adiyla okumuyor."),
+        new("AudioSourceRole.SystemAudio", "varsayilan-kol", Legitimate,
+            "Iki degerli rolun olumsuz kolu. 8d ses girdisini motora baglayip secim yuzeyini acinca kardes uye tuketiciye kavustu: RecorderView.Ses.cs:62 'role == AudioSourceRole.Microphone ? CmbMicrophone : CmbSystemAudio' diye soruyor, sistem sesi o kosulun else'i. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; sistem sesini ayrica adlandirmak ayni kutuyu iki yere yazardi."),
         new("LauncherUpdate.CommitWindow", "hic-gorunmeyen", Debt,
             "public static readonly, hicbir yerde okunmuyor. Dusurulmesi UpdateCheck.cs'i degistirir, o dosya bu sozlesmenin owns listesinde yok."),
         new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Debt,

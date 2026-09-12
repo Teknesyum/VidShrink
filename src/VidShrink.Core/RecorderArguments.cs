@@ -82,11 +82,12 @@ public sealed record RecorderRequest
     public double Quality { get; init; } = RecorderArguments.DefaultQuality;
 
     /// <summary>
-    /// Ses girdisinin argumanlari. Bu kol ses cihazi <b>listelemez</b> ve arguman uretmez:
-    /// onlari 8c kendi dosyasinda uretiyor, burasi yalnizca girdiden sonra araya koyuyor.
-    /// Bos oldugunda kayit sessiz olur ve <c>-an</c> yazilir.
+    /// Ses kolu. Bu dosya ses cihazi <b>listelemez</b> ve arguman uretmez: plani
+    /// <see cref="AudioCaptureArguments"/> uretiyor, burasi yalnizca girdiden sonra araya
+    /// koyuyor, grafigini ve eslemelerini yaziyor. Bos oldugunda kayit sessiz olur ve
+    /// <c>-an</c> yazilir.
     /// </summary>
-    public IReadOnlyList<string>? AudioInputArgs { get; init; }
+    public AudioCapturePlan? Audio { get; init; }
 }
 
 /// <summary>
@@ -119,6 +120,14 @@ public static class RecorderArguments
 
     /// <summary>Kabul edilen en yuksek kare hizi.</summary>
     public const int MaxFps = 240;
+
+    /// <summary>
+    /// Ses girdilerinin ffmpeg girdi sirasindaki ilk numarasi. Yakalama girdisi her zaman
+    /// 0 oldugu icin 1; <see cref="AudioCaptureArguments.Build"/>in ucuncu argumani bu
+    /// olmak zorunda, yoksa <c>amix</c> grafigi var olmayan bir girdiye bakar. Sayi
+    /// arayuzde uydurulmuyor, motordan okunuyor.
+    /// </summary>
+    public const int AudioFirstInputIndex = 1;
 
     private static readonly string[] KnownVideoCodecs =
     {
@@ -197,16 +206,24 @@ public static class RecorderArguments
         var a = new List<string> { "-hide_banner", "-y" };
         a.AddRange(Input(request));
 
-        var hasAudio = request.AudioInputArgs is { Count: > 0 };
-        if (hasAudio) a.AddRange(request.AudioInputArgs!);
+        var audio = request.Audio is { InputCount: > 0 } plan ? plan : null;
+        if (audio is not null) a.AddRange(audio.Inputs);
 
         if (Crop(request) is { } crop) a.AddRange(new[] { "-vf", crop });
+
+        if (audio?.FilterComplex is { Length: > 0 } graph)
+            a.AddRange(new[] { "-filter_complex", graph });
 
         a.AddRange(new[] { "-c:v", request.VideoCodec, "-preset", request.Preset });
         a.AddRange(CodecModel.QualityArgs(request.VideoCodec, request.Quality));
         a.AddRange(new[] { "-pix_fmt", "yuv420p" });
 
-        if (hasAudio) a.AddRange(new[] { "-c:a", "aac", "-b:a", "160k" });
+        if (audio is not null)
+        {
+            a.AddRange(new[] { "-map", "0:v" });
+            foreach (var map in audio.Maps) a.AddRange(new[] { "-map", map });
+            a.AddRange(new[] { "-c:a", "aac", "-b:a", "160k" });
+        }
         else a.Add("-an");
 
         if (Path.GetExtension(outputPath).TrimStart('.').ToLowerInvariant() is "mp4" or "mov")

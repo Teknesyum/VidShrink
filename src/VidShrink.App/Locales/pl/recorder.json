@@ -31,6 +31,12 @@
   "recorder.option.codec": "Koder wideo",
   "recorder.option.preset": "Profil kodera",
   "recorder.option.cursor": "Pokaż kursor myszy",
+  "recorder.audio.title": "Dźwięk",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Dźwięk systemowy",
+  "recorder.audio.none": "Bez dźwięku",
+  "recorder.audio.refresh": "Odśwież listę",
+  "recorder.audio.hint": "Wybranie obu opcji nagrywa dwa wejścia dźwięku i miksuje je w jedną ścieżkę.",
   "recorder.output.title": "Folder wyjściowy",
   "recorder.output.browse": "Przeglądaj…",
   "recorder.output.reveal": "Pokaż w folderze",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Te ustawienia nie pozwalają na nagrywanie: {0}",
   "recorder.error.number": "{0} musi być liczbą.",
   "recorder.error.start": "Nie udało się rozpocząć nagrywania: {0}",
-  "recorder.error.folder": "Nie udało się wybrać folderu: {0}"
+  "recorder.error.folder": "Nie udało się wybrać folderu: {0}",
+  "recorder.error.audio": "Nie udało się przygotować wejścia dźwięku: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "Codificador de vídeo",
   "recorder.option.preset": "Preajuste del codificador",
   "recorder.option.cursor": "Mostrar el cursor del ratón",
+  "recorder.audio.title": "Sonido",
+  "recorder.audio.microphone": "Micrófono",
+  "recorder.audio.system": "Audio del sistema",
+  "recorder.audio.none": "Sin sonido",
+  "recorder.audio.refresh": "Actualizar la lista",
+  "recorder.audio.hint": "Elegir ambos graba dos entradas y las mezcla en una sola pista.",
   "recorder.output.title": "Carpeta de salida",
   "recorder.output.browse": "Examinar…",
   "recorder.output.reveal": "Mostrar en la carpeta",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Esta configuración no permite grabar: {0}",
   "recorder.error.number": "{0} tiene que ser un número.",
   "recorder.error.start": "No se pudo iniciar la grabación: {0}",
-  "recorder.error.folder": "No se pudo elegir la carpeta: {0}"
+  "recorder.error.folder": "No se pudo elegir la carpeta: {0}",
+  "recorder.error.audio": "No se pudo preparar la entrada de sonido: {0}"
 }

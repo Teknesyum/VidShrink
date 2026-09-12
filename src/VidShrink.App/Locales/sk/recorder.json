@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video kodek",
   "recorder.option.preset": "Profil kodéra",
   "recorder.option.cursor": "Zobraziť kurzor myši",
+  "recorder.audio.title": "Zvuk",
+  "recorder.audio.microphone": "Mikrofón",
+  "recorder.audio.system": "Systémový zvuk",
+  "recorder.audio.none": "Bez zvuku",
+  "recorder.audio.refresh": "Obnoviť zoznam",
+  "recorder.audio.hint": "Výber oboch nahráva dva vstupy a mieša ich do jednej stopy.",
   "recorder.output.title": "Výstupný priečinok",
   "recorder.output.browse": "Prehľadávať…",
   "recorder.output.reveal": "Zobraziť v priečinku",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Tieto nastavenia neumožňujú nahrávanie: {0}",
   "recorder.error.number": "{0} musí byť číslo.",
   "recorder.error.start": "Nahrávanie sa nepodarilo spustiť: {0}",
-  "recorder.error.folder": "Priečinok sa nepodarilo vybrať: {0}"
+  "recorder.error.folder": "Priečinok sa nepodarilo vybrať: {0}",
+  "recorder.error.audio": "Zvukový vstup sa nepodarilo pripraviť: {0}"
 }

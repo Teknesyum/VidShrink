@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video-Encoder",
   "recorder.option.preset": "Encoder-Voreinstellung",
   "recorder.option.cursor": "Mauszeiger anzeigen",
+  "recorder.audio.title": "Ton",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Systemton",
+  "recorder.audio.none": "Kein Ton",
+  "recorder.audio.refresh": "Liste aktualisieren",
+  "recorder.audio.hint": "Werden beide gewählt, werden zwei Eingänge aufgenommen und zu einer Spur gemischt.",
   "recorder.output.title": "Ausgabeordner",
   "recorder.output.browse": "Durchsuchen…",
   "recorder.output.reveal": "Im Ordner anzeigen",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Diese Einstellungen erlauben keine Aufnahme: {0}",
   "recorder.error.number": "{0} muss eine Zahl sein.",
   "recorder.error.start": "Die Aufnahme konnte nicht gestartet werden: {0}",
-  "recorder.error.folder": "Der Ordner konnte nicht ausgewählt werden: {0}"
+  "recorder.error.folder": "Der Ordner konnte nicht ausgewählt werden: {0}",
+  "recorder.error.audio": "Der Toneingang konnte nicht vorbereitet werden: {0}"
 }

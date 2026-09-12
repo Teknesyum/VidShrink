@@ -31,6 +31,12 @@
   "recorder.option.codec": "Videokódoló",
   "recorder.option.preset": "Kódoló előbeállítás",
   "recorder.option.cursor": "Egérmutató megjelenítése",
+  "recorder.audio.title": "Hang",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Rendszerhang",
+  "recorder.audio.none": "Nincs hang",
+  "recorder.audio.refresh": "Lista frissítése",
+  "recorder.audio.hint": "Ha mindkettőt kiválasztja, két bemenet kerül rögzítésre, és egy sávvá keverednek.",
   "recorder.output.title": "Kimeneti mappa",
   "recorder.output.browse": "Tallózás…",
   "recorder.output.reveal": "Megjelenítés a mappában",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Ezek a beállítások nem teszik lehetővé a felvételt: {0}",
   "recorder.error.number": "{0} számnak kell lennie.",
   "recorder.error.start": "A felvétel nem indítható el: {0}",
-  "recorder.error.folder": "A mappa nem választható ki: {0}"
+  "recorder.error.folder": "A mappa nem választható ki: {0}",
+  "recorder.error.audio": "A hangbemenetet nem sikerült előkészíteni: {0}"
 }

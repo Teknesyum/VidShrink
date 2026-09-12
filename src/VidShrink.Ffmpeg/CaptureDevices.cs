@@ -87,8 +87,12 @@ public sealed class CaptureDevices
         }
     }
 
-    /// <summary>Onbellegi bosaltir. Yalniz olcu icin; urun yolu listeyi bir kez okur.</summary>
-    internal static void Invalidate()
+    /// <summary>
+    /// Onbellegi bosaltir. Olcu bunu kullaniyor, ayrica kaydedicinin yenileme dugmesi:
+    /// mikrofonu program acikken takan kullanici <see cref="ReloadAfterFailureMs"/> kadar
+    /// beklemeden listeyi yeniden okutabiliyor.
+    /// </summary>
+    public static void Invalidate()
     {
         lock (InstanceGate)
         {

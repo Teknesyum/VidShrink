@@ -264,7 +264,14 @@ public sealed class KayitMotoruTests
     public void SesArgumanlariGirdidenSonraArayaGirer()
     {
         var args = RecorderArguments.Build(
-            Ekran(RecorderPlatform.Windows) with { AudioInputArgs = new[] { "-f", "dshow", "-i", "audio=Mikrofon" } },
+            Ekran(RecorderPlatform.Windows) with
+            {
+                Audio = new AudioCapturePlan(
+                    new[] { "-f", "dshow", "-i", "audio=Mikrofon" },
+                    null,
+                    new[] { "1:a" },
+                    1)
+            },
             @"C:\kayit\s.mp4");
 
         var metin = Arg(args);

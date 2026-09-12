@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video kodirnik",
   "recorder.option.preset": "Prednastavitev kodirnika",
   "recorder.option.cursor": "Prikaži kazalec miške",
+  "recorder.audio.title": "Zvok",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Sistemski zvok",
+  "recorder.audio.none": "Brez zvoka",
+  "recorder.audio.refresh": "Osveži seznam",
+  "recorder.audio.hint": "Če izbereš oboje, se snemata oba vira in združita v eno zvočno sled.",
   "recorder.output.title": "Izhodna mapa",
   "recorder.output.browse": "Prebrskaj…",
   "recorder.output.reveal": "Prikaži v mapi",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Te nastavitve ne dovoljujejo snemanja: {0}",
   "recorder.error.number": "{0} mora biti število.",
   "recorder.error.start": "Snemanja ni bilo mogoče začeti: {0}",
-  "recorder.error.folder": "Mape ni bilo mogoče izbrati: {0}"
+  "recorder.error.folder": "Mape ni bilo mogoče izbrati: {0}",
+  "recorder.error.audio": "Zvočnega vira ni bilo mogoče pripraviti: {0}"
 }

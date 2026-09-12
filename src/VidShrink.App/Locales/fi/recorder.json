@@ -31,6 +31,12 @@
   "recorder.option.codec": "Videokoodain",
   "recorder.option.preset": "Koodaimen esiasetus",
   "recorder.option.cursor": "Näytä hiiren osoitin",
+  "recorder.audio.title": "Ääni",
+  "recorder.audio.microphone": "Mikrofoni",
+  "recorder.audio.system": "Järjestelmän ääni",
+  "recorder.audio.none": "Ei ääntä",
+  "recorder.audio.refresh": "Päivitä luettelo",
+  "recorder.audio.hint": "Molempien valitseminen tallentaa kaksi lähdettä ja yhdistää ne yhdeksi ääniraidaksi.",
   "recorder.output.title": "Tuloskansio",
   "recorder.output.browse": "Selaa…",
   "recorder.output.reveal": "Näytä kansiossa",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Nämä asetukset eivät salli tallennusta: {0}",
   "recorder.error.number": "{0} on oltava luku.",
   "recorder.error.start": "Tallennusta ei voitu aloittaa: {0}",
-  "recorder.error.folder": "Kansiota ei voitu valita: {0}"
+  "recorder.error.folder": "Kansiota ei voitu valita: {0}",
+  "recorder.error.audio": "Ääntä ei voitu valmistella: {0}"
 }

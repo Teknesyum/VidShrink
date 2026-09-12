@@ -31,6 +31,12 @@
   "recorder.option.codec": "Κωδικοποιητής βίντεο",
   "recorder.option.preset": "Προεπιλογή κωδικοποιητή",
   "recorder.option.cursor": "Εμφάνιση δείκτη ποντικιού",
+  "recorder.audio.title": "Ήχος",
+  "recorder.audio.microphone": "Μικρόφωνο",
+  "recorder.audio.system": "Ήχος συστήματος",
+  "recorder.audio.none": "Χωρίς ήχο",
+  "recorder.audio.refresh": "Ανανέωση λίστας",
+  "recorder.audio.hint": "Η επιλογή και των δύο καταγράφει δύο εισόδους και τις αναμειγνύει σε ένα κομμάτι.",
   "recorder.output.title": "Φάκελος εξόδου",
   "recorder.output.browse": "Περιήγηση…",
   "recorder.output.reveal": "Εμφάνιση στον φάκελο",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Αυτές οι ρυθμίσεις δεν επιτρέπουν εγγραφή: {0}",
   "recorder.error.number": "Το {0} πρέπει να είναι αριθμός.",
   "recorder.error.start": "Η εγγραφή δεν ήταν δυνατό να ξεκινήσει: {0}",
-  "recorder.error.folder": "Ο φάκελος δεν ήταν δυνατό να επιλεγεί: {0}"
+  "recorder.error.folder": "Ο φάκελος δεν ήταν δυνατό να επιλεγεί: {0}",
+  "recorder.error.audio": "Δεν ήταν δυνατή η προετοιμασία της εισόδου ήχου: {0}"
 }

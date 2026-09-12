@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video encoder",
   "recorder.option.preset": "Encoder preset",
   "recorder.option.cursor": "Show the mouse cursor",
+  "recorder.audio.title": "Sound",
+  "recorder.audio.microphone": "Microphone",
+  "recorder.audio.system": "System audio",
+  "recorder.audio.none": "No sound",
+  "recorder.audio.refresh": "Refresh the list",
+  "recorder.audio.hint": "Choosing both records two inputs and mixes them into one track.",
   "recorder.output.title": "Output folder",
   "recorder.output.browse": "Browse…",
   "recorder.output.reveal": "Show in folder",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "These settings do not allow a recording: {0}",
   "recorder.error.number": "{0} has to be a number.",
   "recorder.error.start": "The recording could not start: {0}",
-  "recorder.error.folder": "The folder could not be chosen: {0}"
+  "recorder.error.folder": "The folder could not be chosen: {0}",
+  "recorder.error.audio": "The sound input could not be prepared: {0}"
 }

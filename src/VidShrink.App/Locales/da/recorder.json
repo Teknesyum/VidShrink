@@ -31,6 +31,12 @@
   "recorder.option.codec": "Videoenkoder",
   "recorder.option.preset": "Enkoder-forudindstilling",
   "recorder.option.cursor": "Vis musemarkøren",
+  "recorder.audio.title": "Lyd",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Systemlyd",
+  "recorder.audio.none": "Ingen lyd",
+  "recorder.audio.refresh": "Opdater listen",
+  "recorder.audio.hint": "Vælges begge dele, optages to lydkilder og blandes til ét spor.",
   "recorder.output.title": "Outputmappe",
   "recorder.output.browse": "Gennemse…",
   "recorder.output.reveal": "Vis i mappe",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Disse indstillinger tillader ikke en optagelse: {0}",
   "recorder.error.number": "{0} skal være et tal.",
   "recorder.error.start": "Optagelsen kunne ikke starte: {0}",
-  "recorder.error.folder": "Mappen kunne ikke vælges: {0}"
+  "recorder.error.folder": "Mappen kunne ikke vælges: {0}",
+  "recorder.error.audio": "Lydindgangen kunne ikke klargøres: {0}"
 }

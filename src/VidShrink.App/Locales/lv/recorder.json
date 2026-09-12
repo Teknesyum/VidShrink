@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video kodeks",
   "recorder.option.preset": "Kodera profils",
   "recorder.option.cursor": "Rādīt peles kursoru",
+  "recorder.audio.title": "Skaņa",
+  "recorder.audio.microphone": "Mikrofons",
+  "recorder.audio.system": "Sistēmas skaņa",
+  "recorder.audio.none": "Bez skaņas",
+  "recorder.audio.refresh": "Atsvaidzināt sarakstu",
+  "recorder.audio.hint": "Izvēloties abus, tiek ierakstītas divas ievades un sajauktas vienā celiņā.",
   "recorder.output.title": "Izvades mape",
   "recorder.output.browse": "Pārlūkot…",
   "recorder.output.reveal": "Rādīt mapē",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Šie iestatījumi neļauj veikt ierakstīšanu: {0}",
   "recorder.error.number": "{0} jābūt skaitlim.",
   "recorder.error.start": "Ierakstīšanu nevarēja sākt: {0}",
-  "recorder.error.folder": "Mapi nevarēja izvēlēties: {0}"
+  "recorder.error.folder": "Mapi nevarēja izvēlēties: {0}",
+  "recorder.error.audio": "Skaņas ievadi neizdevās sagatavot: {0}"
 }

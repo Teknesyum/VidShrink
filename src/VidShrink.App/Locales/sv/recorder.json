@@ -31,6 +31,12 @@
   "recorder.option.codec": "Videokodare",
   "recorder.option.preset": "Kodarförinställning",
   "recorder.option.cursor": "Visa muspekaren",
+  "recorder.audio.title": "Ljud",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Systemljud",
+  "recorder.audio.none": "Inget ljud",
+  "recorder.audio.refresh": "Uppdatera listan",
+  "recorder.audio.hint": "Att välja båda spelar in två källor och mixar dem till ett spår.",
   "recorder.output.title": "Utdatamapp",
   "recorder.output.browse": "Bläddra…",
   "recorder.output.reveal": "Visa i mapp",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Dessa inställningar tillåter inte en inspelning: {0}",
   "recorder.error.number": "{0} måste vara ett tal.",
   "recorder.error.start": "Inspelningen kunde inte starta: {0}",
-  "recorder.error.folder": "Mappen kunde inte väljas: {0}"
+  "recorder.error.folder": "Mappen kunde inte väljas: {0}",
+  "recorder.error.audio": "Ljudkällan kunde inte förberedas: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "வீடியோ குறியாக்கி",
   "recorder.option.preset": "குறியாக்கி முன்னமைவு",
   "recorder.option.cursor": "சுட்டி நிலைக்காட்டியைக் காட்டு",
+  "recorder.audio.title": "ஒலி",
+  "recorder.audio.microphone": "மைக்ரோஃபோன்",
+  "recorder.audio.system": "சிஸ்டம் ஒலி",
+  "recorder.audio.none": "ஒலி இல்லை",
+  "recorder.audio.refresh": "பட்டியலைப் புதுப்பி",
+  "recorder.audio.hint": "இரண்டையும் தேர்ந்தெடுத்தால் இரண்டு உள்ளீடுகளும் பதிவாகி ஒரே ஒலித் தடமாகக் கலக்கப்படும்.",
   "recorder.output.title": "வெளியீட்டு கோப்புறை",
   "recorder.output.browse": "உலாவு…",
   "recorder.output.reveal": "கோப்புறையில் காட்டு",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "இந்த அமைப்புகள் பதிவை அனுமதிக்காது: {0}",
   "recorder.error.number": "{0} ஒரு எண்ணாக இருக்க வேண்டும்.",
   "recorder.error.start": "பதிவைத் தொடங்க முடியவில்லை: {0}",
-  "recorder.error.folder": "கோப்புறையைத் தேர்ந்தெடுக்க முடியவில்லை: {0}"
+  "recorder.error.folder": "கோப்புறையைத் தேர்ந்தெடுக்க முடியவில்லை: {0}",
+  "recorder.error.audio": "ஒலி உள்ளீட்டைத் தயார் செய்ய முடியவில்லை: {0}"
 }

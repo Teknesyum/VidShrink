@@ -31,6 +31,12 @@
   "recorder.option.codec": "Enjin pengekod video",
   "recorder.option.preset": "Praset pengekod",
   "recorder.option.cursor": "Tunjukkan kursor tetikus",
+  "recorder.audio.title": "Bunyi",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Audio sistem",
+  "recorder.audio.none": "Tiada bunyi",
+  "recorder.audio.refresh": "Muat semula senarai",
+  "recorder.audio.hint": "Memilih kedua-duanya merakam dua input dan mencampurkannya menjadi satu trek.",
   "recorder.output.title": "Folder output",
   "recorder.output.browse": "Layari…",
   "recorder.output.reveal": "Tunjuk dalam folder",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Tetapan ini tidak membenarkan rakaman: {0}",
   "recorder.error.number": "{0} mesti nombor.",
   "recorder.error.start": "Rakaman tidak dapat dimulakan: {0}",
-  "recorder.error.folder": "Folder tidak dapat dipilih: {0}"
+  "recorder.error.folder": "Folder tidak dapat dipilih: {0}",
+  "recorder.error.audio": "Input bunyi tidak dapat disediakan: {0}"
 }

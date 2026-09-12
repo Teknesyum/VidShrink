@@ -31,6 +31,12 @@
   "recorder.option.codec": "Codor video",
   "recorder.option.preset": "Profil de codare",
   "recorder.option.cursor": "Arată cursorul mausului",
+  "recorder.audio.title": "Sunet",
+  "recorder.audio.microphone": "Microfon",
+  "recorder.audio.system": "Sunet de sistem",
+  "recorder.audio.none": "Fără sunet",
+  "recorder.audio.refresh": "Reîmprospătează lista",
+  "recorder.audio.hint": "Alegerea ambelor înregistrează două surse și le combină într-o singură pistă.",
   "recorder.output.title": "Dosar de ieșire",
   "recorder.output.browse": "Răsfoiește…",
   "recorder.output.reveal": "Arată în dosar",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Aceste setări nu permit o înregistrare: {0}",
   "recorder.error.number": "{0} trebuie să fie un număr.",
   "recorder.error.start": "Înregistrarea nu a putut începe: {0}",
-  "recorder.error.folder": "Dosarul nu a putut fi ales: {0}"
+  "recorder.error.folder": "Dosarul nu a putut fi ales: {0}",
+  "recorder.error.audio": "Intrarea de sunet nu a putut fi pregătită: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "ตัวเข้ารหัสวิดีโอ",
   "recorder.option.preset": "ค่าตั้งต้นของตัวเข้ารหัส",
   "recorder.option.cursor": "แสดงตัวชี้เมาส์",
+  "recorder.audio.title": "เสียง",
+  "recorder.audio.microphone": "ไมโครโฟน",
+  "recorder.audio.system": "เสียงระบบ",
+  "recorder.audio.none": "ไม่มีเสียง",
+  "recorder.audio.refresh": "รีเฟรชรายการ",
+  "recorder.audio.hint": "การเลือกทั้งสองอย่างจะบันทึกสองแหล่งเสียงและผสมรวมเป็นแทร็กเดียว",
   "recorder.output.title": "โฟลเดอร์ผลลัพธ์",
   "recorder.output.browse": "เรียกดู…",
   "recorder.output.reveal": "แสดงในโฟลเดอร์",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "การตั้งค่าเหล่านี้ไม่อนุญาตให้บันทึก: {0}",
   "recorder.error.number": "{0} ต้องเป็นตัวเลข",
   "recorder.error.start": "ไม่สามารถเริ่มการบันทึกได้: {0}",
-  "recorder.error.folder": "ไม่สามารถเลือกโฟลเดอร์ได้: {0}"
+  "recorder.error.folder": "ไม่สามารถเลือกโฟลเดอร์ได้: {0}",
+  "recorder.error.audio": "ไม่สามารถเตรียมแหล่งเสียงได้: {0}"
 }

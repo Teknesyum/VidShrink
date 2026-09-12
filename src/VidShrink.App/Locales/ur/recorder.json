@@ -31,6 +31,12 @@
   "recorder.option.codec": "ویڈیو انکوڈر",
   "recorder.option.preset": "انکوڈر پری سیٹ",
   "recorder.option.cursor": "ماؤس کرسر دکھائیں",
+  "recorder.audio.title": "آواز",
+  "recorder.audio.microphone": "مائیکروفون",
+  "recorder.audio.system": "سسٹم کی آواز",
+  "recorder.audio.none": "کوئی آواز نہیں",
+  "recorder.audio.refresh": "فہرست تازہ کریں",
+  "recorder.audio.hint": "دونوں کا انتخاب کرنے سے دو ان پٹس ریکارڈ ہوتے ہیں اور ایک ٹریک میں ملا دیے جاتے ہیں۔",
   "recorder.output.title": "آؤٹ پٹ فولڈر",
   "recorder.output.browse": "تلاش کریں…",
   "recorder.output.reveal": "فولڈر میں دکھائیں",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "یہ ترتیبات ریکارڈنگ کی اجازت نہیں دیتیں: {0}",
   "recorder.error.number": "{0} ایک عدد ہونا چاہیے۔",
   "recorder.error.start": "ریکارڈنگ شروع نہیں ہو سکی: {0}",
-  "recorder.error.folder": "فولڈر منتخب نہیں ہو سکا: {0}"
+  "recorder.error.folder": "فولڈر منتخب نہیں ہو سکا: {0}",
+  "recorder.error.audio": "آواز کا ان پٹ تیار نہیں ہو سکا: {0}"
 }

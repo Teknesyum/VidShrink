@@ -31,6 +31,12 @@
   "recorder.option.codec": "Bộ mã hóa video",
   "recorder.option.preset": "Cấu hình dựng sẵn của bộ mã hóa",
   "recorder.option.cursor": "Hiện con trỏ chuột",
+  "recorder.audio.title": "Âm thanh",
+  "recorder.audio.microphone": "Micrô",
+  "recorder.audio.system": "Âm thanh hệ thống",
+  "recorder.audio.none": "Không có âm thanh",
+  "recorder.audio.refresh": "Làm mới danh sách",
+  "recorder.audio.hint": "Chọn cả hai sẽ ghi hai nguồn đầu vào và trộn chúng thành một track duy nhất.",
   "recorder.output.title": "Thư mục đầu ra",
   "recorder.output.browse": "Duyệt…",
   "recorder.output.reveal": "Hiện trong thư mục",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Các cài đặt này không cho phép ghi hình: {0}",
   "recorder.error.number": "{0} phải là một số.",
   "recorder.error.start": "Không thể bắt đầu ghi hình: {0}",
-  "recorder.error.folder": "Không thể chọn thư mục: {0}"
+  "recorder.error.folder": "Không thể chọn thư mục: {0}",
+  "recorder.error.audio": "Không thể chuẩn bị nguồn âm thanh: {0}"
 }

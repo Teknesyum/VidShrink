@@ -128,6 +128,8 @@ internal partial class RecorderView
             return null;
         }
 
+        if (AudioPlan() is not { } audio) return null;
+
         var target = SelectedTarget;
         RecorderRegion? region = null;
 
@@ -149,7 +151,7 @@ internal partial class RecorderView
             WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text
         }
         with
-        { Region = region };
+        { Region = region, Audio = audio };
     }
 
     private RecorderRegion? Rect()
@@ -185,6 +187,8 @@ internal partial class RecorderView
         _settings.Preset = CmbPreset.SelectedItem as string ?? _settings.Preset;
         _settings.ShowCursor = ChkCursor.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
+        _settings.MicrophoneName = Chosen(AudioSourceRole.Microphone)?.Name;
+        _settings.SystemAudioName = Chosen(AudioSourceRole.SystemAudio)?.Name;
 
         if (int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps)) _settings.Fps = fps;
         if (double.TryParse(TxtQuality.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var quality)) _settings.Quality = quality;

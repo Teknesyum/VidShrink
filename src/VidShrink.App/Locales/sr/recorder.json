@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video enkoder",
   "recorder.option.preset": "Podešavanje enkodera",
   "recorder.option.cursor": "Prikaži pokazivač miša",
+  "recorder.audio.title": "Zvuk",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Sistemski zvuk",
+  "recorder.audio.none": "Bez zvuka",
+  "recorder.audio.refresh": "Osveži listu",
+  "recorder.audio.hint": "Ako izaberete oba, snimaju se dva ulaza i mešaju u jednu zvučnu traku.",
   "recorder.output.title": "Izlazni folder",
   "recorder.output.browse": "Pregledaj…",
   "recorder.output.reveal": "Prikaži u folderu",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Ova podešavanja ne dozvoljavaju snimanje: {0}",
   "recorder.error.number": "{0} mora biti broj.",
   "recorder.error.start": "Snimanje nije moglo da se pokrene: {0}",
-  "recorder.error.folder": "Folder nije mogao da se izabere: {0}"
+  "recorder.error.folder": "Folder nije mogao da se izabere: {0}",
+  "recorder.error.audio": "Zvučni ulaz nije mogao da se pripremi: {0}"
 }

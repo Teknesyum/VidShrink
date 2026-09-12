@@ -31,6 +31,12 @@
   "recorder.option.codec": "视频编码器",
   "recorder.option.preset": "编码器预设",
   "recorder.option.cursor": "显示鼠标指针",
+  "recorder.audio.title": "声音",
+  "recorder.audio.microphone": "麦克风",
+  "recorder.audio.system": "系统声音",
+  "recorder.audio.none": "无声音",
+  "recorder.audio.refresh": "刷新列表",
+  "recorder.audio.hint": "同时选择两者会录制两路输入并混合为一条音轨。",
   "recorder.output.title": "输出文件夹",
   "recorder.output.browse": "浏览…",
   "recorder.output.reveal": "在文件夹中显示",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "当前设置不允许录制：{0}",
   "recorder.error.number": "{0} 必须是一个数字。",
   "recorder.error.start": "无法开始录制：{0}",
-  "recorder.error.folder": "无法选择文件夹：{0}"
+  "recorder.error.folder": "无法选择文件夹：{0}",
+  "recorder.error.audio": "无法准备声音输入：{0}"
 }

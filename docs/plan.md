@@ -726,3 +726,53 @@ Iki maddeyi kapatan is: ses secim kutularini `RecorderView`e eklemek ve
 yakalamasinda akmiyor (8a olcumu, on bir blogun onunda sifir), bu yuzden seritte canli
 boyut gostergesi yok; gecen sure ve kare sayisi akiyor, boyut kayit bitince dosyanin
 kendisinden okunuyor.
+
+### 8d kol: ses girdisini motora baglamak
+
+Yukaridaki iki maddeyi kapatan kol. Uc kol da main'de oldugu icin dosya sahipligi
+bolunmuyor; T0 yaziyor, ceviri cocuk ajanlara gidiyor.
+
+**Olculen bosluk.** `AudioCapturePlan` uc parca tasiyor — `Inputs`, `FilterComplex`,
+`Maps` — ama `RecorderRequest` yalniz `AudioInputArgs`i aliyordu
+(`RecorderArguments.cs:89`), yani `amix` grafigi ve `-map` satirlari argumana **hic**
+yazilmiyordu. Iki cihaz secilse bile ffmpeg varsayilan eslemesine dusup tek akis aliyor,
+ikincisi sessizce dusuyordu. Depo `-map`i baska yerlerde yaziyor (`SceneDetector.cs:28`,
+`ComplexityProbe.cs:913`), kayit yolunda hic yazmiyordu.
+
+- `RecorderRequest.AudioInputArgs` yerine `AudioCapturePlan? Audio`. Alanin tek tuketicisi
+  `KayitMotoruTests.cs:267`ydi; iki alan birlikte tutulmuyor, ikincisi olu yuzey olurdu.
+- `Build` ses varken `-map 0:v` **ve** planin her eslemesini yaziyor; `FilterComplex` bos
+  degilse `-filter_complex` olarak geciyor. `-vf crop` ile birlikte durabiliyor: karmasik
+  grafik yalniz ses akisini besliyor, video akisi girdiden esleniyor.
+- Video girdisi 0 oldugu icin ses girdilerinin ilk numarasi 1. Sayi arayuzde uydurulmuyor,
+  `RecorderArguments.AudioFirstInputIndex` olarak motorda duruyor ve olcu onu pimliyor.
+- `RecorderView`e ses panosu: mikrofon ve sistem sesi kutulari, listeyi yenileme dugmesi,
+  secimi ayarda ada gore saklama. Bilinmeyen cihaz `TryBuild`in sebebiyle ekrana yaziliyor,
+  sessiz kayda dusulmuyor.
+- `CaptureDevices.Invalidate` urun yoluna aciliyor (yenileme dugmesi cagiriyor); mikrofonu
+  program acikken takan kullanici listeyi bes saniye beklemeden goruyor.
+- Kabul: sesli kayitta `ffprobe` iki akis gorur (8c'nin kapanmamis olcutu, canli kol),
+  iki cihaz secilince argumanda `amix` **ve** `[aout]` eslemi bulunur, tek cihazda filtre
+  kurulmaz, sessiz kayitta `-an` durur ve `-map` hic yazilmaz.
+
+**8d kapanisi.** Dort kabul olcutu de karsilandi ve 8. dalganin iki acik maddesi kapandi.
+Kanit `.calisma/dalga8d/`: `sesli.args.txt` uretilen komut satirini
+(`-map 0:v -map 1:a -c:a aac -b:a 160k`), `sesli.ffprobe.txt` ciktinin iki akisini
+(`codec_name=h264 / codec_type=video`, `codec_name=aac / codec_type=audio`,
+`duration=5.933333`, cikis kodu 0) tasiyor. Olcu `SesliKayitTests.cs`, yedi kol; filtreli
+kosum 256/256, **atlanan 0**, yani canli kol gercekten kostu.
+
+Pin sonuclari olcumden yazildi, uc yerde:
+
+- `OluUyeTests` pimi 34'ten 33'e indi. `AudioSourceRole.Microphone` artik tuketiliyor
+  (uretim 5, tuketim 1: `RecorderView.Ses.cs:62`), pimden dustu; `SystemAudio` dusmedi ama
+  bicimi `hic-okunmayan-tur`'den `varsayilan-kol`'a dondu ve borc degil mesru sayildi —
+  iki degerli rolun olumsuz kolu. 8c'nin borc olarak pimledigi iki satir boylece kapandi.
+- `BaslikKapsamiTests` sayimlari: `gezilen` 29455 -> 29756 (43 x 692; her dile yedi yeni
+  anahtar), `kol toplam` 1078 -> 1091, `en` 117 -> 119, `tr` 49 degismedi.
+- O 1091'in son birimi ceviriden degil yazim tutarliligindan geldi: `sr/recorder.json`
+  bastan sona Latin yazilmisken ceviri ajani yedi yeni satiri Kiril yazmisti; satirlar
+  dosyanin geri kalanindaki yazima dondurulunce sayim 1090'dan 1091'e cikti.
+
+Bu kolla birlikte 8. dalga kapandi: yakalama motoru, arayuz, ses girisi ve ses girdisinin
+motora baglanmasi main'de, acik kabul olcutu kalmadi.

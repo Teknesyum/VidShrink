@@ -31,6 +31,12 @@
   "recorder.option.codec": "비디오 인코더",
   "recorder.option.preset": "인코더 프리셋",
   "recorder.option.cursor": "마우스 커서 표시",
+  "recorder.audio.title": "소리",
+  "recorder.audio.microphone": "마이크",
+  "recorder.audio.system": "시스템 오디오",
+  "recorder.audio.none": "소리 없음",
+  "recorder.audio.refresh": "목록 새로고침",
+  "recorder.audio.hint": "둘 다 선택하면 두 입력이 녹음되어 하나의 트랙으로 믹싱됩니다.",
   "recorder.output.title": "출력 폴더",
   "recorder.output.browse": "찾아보기…",
   "recorder.output.reveal": "폴더에서 보기",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "이 설정으로는 녹화할 수 없습니다: {0}",
   "recorder.error.number": "{0}은(는) 숫자여야 합니다.",
   "recorder.error.start": "녹화를 시작할 수 없습니다: {0}",
-  "recorder.error.folder": "폴더를 선택할 수 없습니다: {0}"
+  "recorder.error.folder": "폴더를 선택할 수 없습니다: {0}",
+  "recorder.error.audio": "오디오 입력을 준비할 수 없습니다: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "Видео кодек",
   "recorder.option.preset": "Предварителна настройка на кодека",
   "recorder.option.cursor": "Показвай курсора на мишката",
+  "recorder.audio.title": "Звук",
+  "recorder.audio.microphone": "Микрофон",
+  "recorder.audio.system": "Системен звук",
+  "recorder.audio.none": "Без звук",
+  "recorder.audio.refresh": "Опресни списъка",
+  "recorder.audio.hint": "Избирането на двете записва два входа и ги смесва в една писта.",
   "recorder.output.title": "Изходна папка",
   "recorder.output.browse": "Преглед…",
   "recorder.output.reveal": "Покажи в папката",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Тези настройки не позволяват запис: {0}",
   "recorder.error.number": "{0} трябва да е число.",
   "recorder.error.start": "Записът не можа да започне: {0}",
-  "recorder.error.folder": "Папката не можа да бъде избрана: {0}"
+  "recorder.error.folder": "Папката не можа да бъде избрана: {0}",
+  "recorder.error.audio": "Звуковият вход не можа да бъде подготвен: {0}"
 }

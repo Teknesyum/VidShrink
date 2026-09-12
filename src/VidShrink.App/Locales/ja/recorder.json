@@ -31,6 +31,12 @@
   "recorder.option.codec": "ビデオエンコーダー",
   "recorder.option.preset": "エンコーダープリセット",
   "recorder.option.cursor": "マウスカーソルを表示",
+  "recorder.audio.title": "音声",
+  "recorder.audio.microphone": "マイク",
+  "recorder.audio.system": "システム音声",
+  "recorder.audio.none": "無音",
+  "recorder.audio.refresh": "リストを更新",
+  "recorder.audio.hint": "両方を選択すると、2つの入力が録音され、1つのトラックにミックスされます。",
   "recorder.output.title": "出力フォルダー",
   "recorder.output.browse": "参照…",
   "recorder.output.reveal": "フォルダーで表示",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "この設定では録画できません: {0}",
   "recorder.error.number": "{0} は数値である必要があります。",
   "recorder.error.start": "録画を開始できませんでした: {0}",
-  "recorder.error.folder": "フォルダーを選択できませんでした: {0}"
+  "recorder.error.folder": "フォルダーを選択できませんでした: {0}",
+  "recorder.error.audio": "音声入力を準備できませんでした: {0}"
 }

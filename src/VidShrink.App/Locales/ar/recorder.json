@@ -31,6 +31,12 @@
   "recorder.option.codec": "مُرمّز الفيديو",
   "recorder.option.preset": "الإعداد المسبق للمُرمّز",
   "recorder.option.cursor": "إظهار مؤشر الفأرة",
+  "recorder.audio.title": "الصوت",
+  "recorder.audio.microphone": "الميكروفون",
+  "recorder.audio.system": "صوت النظام",
+  "recorder.audio.none": "بلا صوت",
+  "recorder.audio.refresh": "تحديث القائمة",
+  "recorder.audio.hint": "اختيار كليهما يسجل مدخلين ويمزجهما في مسار صوتي واحد.",
   "recorder.output.title": "مجلد الإخراج",
   "recorder.output.browse": "استعراض…",
   "recorder.output.reveal": "إظهار في المجلد",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "لا تسمح هذه الإعدادات بالتسجيل: {0}",
   "recorder.error.number": "يجب أن يكون {0} رقمًا.",
   "recorder.error.start": "تعذّر بدء التسجيل: {0}",
-  "recorder.error.folder": "تعذّر اختيار المجلد: {0}"
+  "recorder.error.folder": "تعذّر اختيار المجلد: {0}",
+  "recorder.error.audio": "تعذّر تجهيز مدخل الصوت: {0}"
 }

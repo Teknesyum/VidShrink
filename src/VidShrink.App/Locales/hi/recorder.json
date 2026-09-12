@@ -31,6 +31,12 @@
   "recorder.option.codec": "वीडियो एन्कोडर",
   "recorder.option.preset": "एन्कोडर प्रीसेट",
   "recorder.option.cursor": "माउस कर्सर दिखाएं",
+  "recorder.audio.title": "ध्वनि",
+  "recorder.audio.microphone": "माइक्रोफ़ोन",
+  "recorder.audio.system": "सिस्टम ऑडियो",
+  "recorder.audio.none": "कोई ध्वनि नहीं",
+  "recorder.audio.refresh": "सूची ताज़ा करें",
+  "recorder.audio.hint": "दोनों चुनने पर दो इनपुट रिकॉर्ड होते हैं और एक ही ट्रैक में मिश्रित होते हैं।",
   "recorder.output.title": "आउटपुट फ़ोल्डर",
   "recorder.output.browse": "ब्राउज़ करें…",
   "recorder.output.reveal": "फ़ोल्डर में दिखाएं",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "ये सेटिंग्स रिकॉर्डिंग की अनुमति नहीं देतीं: {0}",
   "recorder.error.number": "{0} एक संख्या होनी चाहिए।",
   "recorder.error.start": "रिकॉर्डिंग शुरू नहीं हो सकी: {0}",
-  "recorder.error.folder": "फ़ोल्डर चुना नहीं जा सका: {0}"
+  "recorder.error.folder": "फ़ोल्डर चुना नहीं जा सका: {0}",
+  "recorder.error.audio": "ध्वनि इनपुट तैयार नहीं किया जा सका: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "Video kodek",
   "recorder.option.preset": "Predložak kodeka",
   "recorder.option.cursor": "Prikaži pokazivač miša",
+  "recorder.audio.title": "Zvuk",
+  "recorder.audio.microphone": "Mikrofon",
+  "recorder.audio.system": "Zvuk sustava",
+  "recorder.audio.none": "Bez zvuka",
+  "recorder.audio.refresh": "Osvježi popis",
+  "recorder.audio.hint": "Odabir oba snima dva ulaza i miješa ih u jednu traku.",
   "recorder.output.title": "Izlazna mapa",
   "recorder.output.browse": "Pregledaj…",
   "recorder.output.reveal": "Prikaži u mapi",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Ove postavke ne dopuštaju snimanje: {0}",
   "recorder.error.number": "{0} mora biti broj.",
   "recorder.error.start": "Snimanje se nije moglo pokrenuti: {0}",
-  "recorder.error.folder": "Mapa se nije mogla odabrati: {0}"
+  "recorder.error.folder": "Mapa se nije mogla odabrati: {0}",
+  "recorder.error.audio": "Zvučni ulaz nije bilo moguće pripremiti: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "Vaizdo kodekas",
   "recorder.option.preset": "Kodeko profilis",
   "recorder.option.cursor": "Rodyti pelės žymeklį",
+  "recorder.audio.title": "Garsas",
+  "recorder.audio.microphone": "Mikrofonas",
+  "recorder.audio.system": "Sistemos garsas",
+  "recorder.audio.none": "Be garso",
+  "recorder.audio.refresh": "Atnaujinti sąrašą",
+  "recorder.audio.hint": "Pasirinkus abu, įrašomos dvi įvestys ir sumaišomos į vieną garso takelį.",
   "recorder.output.title": "Išvesties aplankas",
   "recorder.output.browse": "Naršyti…",
   "recorder.output.reveal": "Rodyti aplanke",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Šie nustatymai neleidžia įrašyti: {0}",
   "recorder.error.number": "{0} turi būti skaičius.",
   "recorder.error.start": "Įrašymo nepavyko pradėti: {0}",
-  "recorder.error.folder": "Nepavyko pasirinkti aplanko: {0}"
+  "recorder.error.folder": "Nepavyko pasirinkti aplanko: {0}",
+  "recorder.error.audio": "Nepavyko paruošti garso įvesties: {0}"
 }

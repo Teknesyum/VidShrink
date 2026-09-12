@@ -31,6 +31,12 @@
   "recorder.option.codec": "کدگذار ویدیو",
   "recorder.option.preset": "پیش‌تنظیم کدگذار",
   "recorder.option.cursor": "نمایش نشانگر ماوس",
+  "recorder.audio.title": "صدا",
+  "recorder.audio.microphone": "میکروفون",
+  "recorder.audio.system": "صدای سیستم",
+  "recorder.audio.none": "بدون صدا",
+  "recorder.audio.refresh": "به‌روزرسانی فهرست",
+  "recorder.audio.hint": "انتخاب هر دو، دو ورودی را ضبط کرده و آن‌ها را در یک مسیر ترکیب می‌کند.",
   "recorder.output.title": "پوشهٔ خروجی",
   "recorder.output.browse": "مرور…",
   "recorder.output.reveal": "نمایش در پوشه",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "این تنظیمات اجازهٔ ضبط را نمی‌دهند: {0}",
   "recorder.error.number": "{0} باید یک عدد باشد.",
   "recorder.error.start": "ضبط آغاز نشد: {0}",
-  "recorder.error.folder": "پوشه انتخاب نشد: {0}"
+  "recorder.error.folder": "پوشه انتخاب نشد: {0}",
+  "recorder.error.audio": "ورودی صدا آماده نشد: {0}"
 }

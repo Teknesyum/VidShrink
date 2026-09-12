@@ -31,6 +31,12 @@
   "recorder.option.codec": "Видеокодек",
   "recorder.option.preset": "Профиль кодировщика",
   "recorder.option.cursor": "Показывать курсор мыши",
+  "recorder.audio.title": "Звук",
+  "recorder.audio.microphone": "Микрофон",
+  "recorder.audio.system": "Системный звук",
+  "recorder.audio.none": "Без звука",
+  "recorder.audio.refresh": "Обновить список",
+  "recorder.audio.hint": "Если выбраны оба варианта, записываются два источника и сводятся в одну дорожку.",
   "recorder.output.title": "Папка вывода",
   "recorder.output.browse": "Обзор…",
   "recorder.output.reveal": "Показать в папке",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "Эти настройки не позволяют выполнить запись: {0}",
   "recorder.error.number": "{0} должно быть числом.",
   "recorder.error.start": "Запись не удалось начать: {0}",
-  "recorder.error.folder": "Не удалось выбрать папку: {0}"
+  "recorder.error.folder": "Не удалось выбрать папку: {0}",
+  "recorder.error.audio": "Не удалось подготовить источник звука: {0}"
 }

@@ -31,6 +31,12 @@
   "recorder.option.codec": "ভিডিও এনকোডার",
   "recorder.option.preset": "এনকোডার প্রিসেট",
   "recorder.option.cursor": "মাউস কার্সার দেখান",
+  "recorder.audio.title": "শব্দ",
+  "recorder.audio.microphone": "মাইক্রোফোন",
+  "recorder.audio.system": "সিস্টেম অডিও",
+  "recorder.audio.none": "নীরব",
+  "recorder.audio.refresh": "তালিকা রিফ্রেশ করুন",
+  "recorder.audio.hint": "দুটোই বেছে নিলে দুটি ইনপুট রেকর্ড হয় এবং একটি ট্র্যাকে মিশে যায়।",
   "recorder.output.title": "আউটপুট ফোল্ডার",
   "recorder.output.browse": "ব্রাউজ করুন…",
   "recorder.output.reveal": "ফোল্ডারে দেখান",
@@ -41,5 +47,6 @@
   "recorder.error.invalid": "এই সেটিংসে রেকর্ডিং সম্ভব নয়: {0}",
   "recorder.error.number": "{0} একটি সংখ্যা হতে হবে।",
   "recorder.error.start": "রেকর্ডিং শুরু করা যায়নি: {0}",
-  "recorder.error.folder": "ফোল্ডারটি বেছে নেওয়া যায়নি: {0}"
+  "recorder.error.folder": "ফোল্ডারটি বেছে নেওয়া যায়নি: {0}",
+  "recorder.error.audio": "সাউন্ড ইনপুট প্রস্তুত করা যায়নি: {0}"
 }
