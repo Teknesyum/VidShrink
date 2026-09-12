@@ -20,3 +20,7 @@ Birim: 0,5 gun/tur (P50), 0,7 (P90); tur tahmini ×1,5 (P50), ×3 (P90).
 | 4a. dalga: gelismis goruntu ve ses | P50 8 tur / 4 gun / 3 itme, ~55 dosya (ajanin acilis tahmini) | 1 itme (0 CI kirmizisi) / 0 / kayitli degil / 60 dosya +3173 -14 / kayitli degil | 0,33 |
 | 4b. dalga: araclar (kucuk resim, klip/GIF, mini mod, URL) | P50 9 tur / 4,5 gun / P50 5 itme, ~55 dosya (ajanin acilis tahmini) | 2 itme (1 CI kirmizisi) / 0 / kayitli degil / 59 dosya +2118 -21 / kayitli degil | 0,4 |
 | Tema secimi kusuru ve acik paletler | tahmin yazilmadi | 1 itme (0 CI kirmizisi) / 0 / ajan ~40 dk / 14 dosya +687 -32 / ajan 100k | - |
+| 7a. dalga: fare etkilesimi (sol tik, surukleme, menu) | tahmin yazilmadi | 1 itme (0 CI kirmizisi) / 0 / ajan ~58 dk / 51 dosya +802 -17 / ajan 192k | - |
+| 7b. dalga: alt denetim seridi ve zaman cubugu | tahmin yazilmadi (ajan acilis tahmini birakmadigini kendi bildirdi) | 1 itme (0 CI kirmizisi) / 0 / ajan ~75 dk / 7 dosya +791 -39 / ajan 101k | - |
+| 7c. dalga: acilis hizi olcumu ve kisaltma | tahmin yazilmadi | 2 itme (0 CI kirmizisi) / 0 / ajan ~65 dk / 8 dosya +525 -4 / ajan 142k | - |
+| UI kilavuzu ihlalleri (MainWindow, Controls, oynatici panelleri) | tahmin yazilmadi | 2 itme (1 CI kirmizisi) / 0 / ajan ~87 dk / 134 dosya +2657 -2249 / ajan 102k | - |
