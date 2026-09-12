@@ -1,0 +1,227 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:auto="using:Avalonia.Automation"
+             xmlns:loc="using:VidShrink.App.Localization"
+             x:Class="VidShrink.App.Recorder.RecorderView">
+
+  <StackPanel Spacing="{StaticResource SpaceLg}">
+
+    <TextBlock Text="{loc:Text recorder.pane.title}" Theme="{StaticResource H2}"/>
+
+    <!--
+      Denetim şeridi. Şeridin okuduğu iki sayı geçen süre ve kare sayısıdır; yazılan
+      boyut kayıt sürerken akmıyor (gdigrab yakalamasında total_size son bloğa kadar
+      sıfır kalıyor), o yüzden boyut ancak kayıt bitince sonuçtan geliyor. Sebebi
+      okumanın ipucunda yazılı.
+
+      Düğmeler duruma göre IsEnabled değil IsVisible ile sürülüyor: devre dışı düğme
+      kendi başına bir açıklama borcu doğuruyor, görünmeyen düğme doğurmuyor.
+    -->
+    <Border x:Name="Strip"
+            Theme="{StaticResource Panel}"
+            Padding="{StaticResource RecorderStripPadding}"
+            auto:AutomationProperties.Name="{loc:Text recorder.strip.title}">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto"
+            ColumnSpacing="{StaticResource RecorderStripGap}">
+
+        <Ellipse Grid.Column="0"
+                 x:Name="LiveDot"
+                 Width="{StaticResource RecorderDotSize}"
+                 Height="{StaticResource RecorderDotSize}"
+                 Fill="{StaticResource NeonEmber}"
+                 IsVisible="False"
+                 VerticalAlignment="Center"/>
+
+        <TextBlock Grid.Column="1"
+                   x:Name="TxtState"
+                   Theme="{StaticResource MonoValue}"
+                   VerticalAlignment="Center"/>
+
+        <StackPanel Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="{StaticResource SpaceXl}"
+                    HorizontalAlignment="Center"
+                    ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
+
+          <StackPanel MinWidth="{StaticResource RecorderReadoutMinWidth}">
+            <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}"/>
+            <TextBlock x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
+          </StackPanel>
+
+          <StackPanel MinWidth="{StaticResource RecorderReadoutMinWidth}">
+            <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}"/>
+            <TextBlock x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
+          </StackPanel>
+
+          <StackPanel MinWidth="{StaticResource RecorderReadoutMinWidth}">
+            <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}"/>
+            <TextBlock x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
+          </StackPanel>
+        </StackPanel>
+
+        <Button Grid.Column="3"
+                x:Name="BtnStart"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource PrimaryButton}"
+                Content="{loc:Text recorder.strip.start}"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.start}"
+                Click="OnStart"/>
+
+        <Button Grid.Column="4"
+                x:Name="BtnPause"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.strip.pause}"
+                IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.pause}"
+                Click="OnPause"/>
+
+        <Button Grid.Column="5"
+                x:Name="BtnResume"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.strip.resume}"
+                IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.resume}"
+                Click="OnResume"/>
+
+        <Button Grid.Column="6"
+                x:Name="BtnStop"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource PrimaryButton}"
+                Content="{loc:Text recorder.strip.stop}"
+                IsVisible="False"
+                auto:AutomationProperties.Name="{loc:Text recorder.strip.stop}"
+                Click="OnStop"/>
+      </Grid>
+    </Border>
+
+    <!-- Kayıt bittiğinde teslim edilen dosya. Yol her zaman görünür; yarım dosya da
+         gizlenmiyor, kendi satırıyla bildiriliyor. -->
+    <Border x:Name="ResultPanel" Theme="{StaticResource Panel}" IsVisible="False">
+      <StackPanel Spacing="{StaticResource SpaceMd}">
+        <TextBlock x:Name="TxtResult" Theme="{StaticResource StatusSuccess}" TextWrapping="Wrap"/>
+        <TextBox x:Name="TxtResultPath"
+                 IsReadOnly="True"
+                 MaxLines="1"
+                 FontFamily="{StaticResource FontMono}"
+                 auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
+        <TextBlock x:Name="TxtWarning"
+                   Theme="{StaticResource StatusError}"
+                   TextWrapping="Wrap"
+                   IsVisible="False"/>
+        <Button x:Name="BtnReveal"
+                Theme="{StaticResource GhostButton}"
+                HorizontalAlignment="Left"
+                Content="{loc:Text recorder.output.reveal}"
+                auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
+                Click="OnReveal"/>
+      </StackPanel>
+    </Border>
+
+    <TextBlock x:Name="TxtError"
+               Theme="{StaticResource StatusError}"
+               TextWrapping="Wrap"
+               IsVisible="False"/>
+
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceMd}">
+
+      <Border Grid.Column="0" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
+        <StackPanel Spacing="{StaticResource SpaceMd}">
+          <TextBlock Text="{loc:Text recorder.target.title}" Theme="{StaticResource H3}"/>
+
+          <StackPanel>
+            <TextBlock Text="{loc:Text recorder.target.what}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbTarget"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.target.what}"/>
+          </StackPanel>
+
+          <StackPanel x:Name="RowWindow" IsVisible="False">
+            <TextBlock Text="{loc:Text recorder.target.window-title}" Theme="{StaticResource Label}"/>
+            <TextBox x:Name="TxtWindowTitle"
+                     ToolTip.Tip="{loc:Text recorder.target.window-title-hint}"
+                     auto:AutomationProperties.Name="{loc:Text recorder.target.window-title}"/>
+          </StackPanel>
+
+          <Grid x:Name="RowRegion"
+                IsVisible="False"
+                ColumnDefinitions="*,*,*,*"
+                ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.target.region-x}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtRegionX" auto:AutomationProperties.Name="{loc:Text recorder.target.region-x}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.target.region-y}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtRegionY" auto:AutomationProperties.Name="{loc:Text recorder.target.region-y}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="{loc:Text recorder.target.region-width}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtRegionWidth" auto:AutomationProperties.Name="{loc:Text recorder.target.region-width}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3">
+              <TextBlock Text="{loc:Text recorder.target.region-height}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtRegionHeight" auto:AutomationProperties.Name="{loc:Text recorder.target.region-height}"/>
+            </StackPanel>
+          </Grid>
+
+          <TextBlock Text="{loc:Text recorder.target.region-hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="1" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
+        <StackPanel Spacing="{StaticResource SpaceMd}">
+          <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H3}"/>
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="{loc:Text recorder.option.fps}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtFps" auto:AutomationProperties.Name="{loc:Text recorder.option.fps}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{loc:Text recorder.option.quality}" Theme="{StaticResource Label}"/>
+              <TextBox x:Name="TxtQuality"
+                       ToolTip.Tip="{loc:Text recorder.option.quality-hint}"
+                       auto:AutomationProperties.Name="{loc:Text recorder.option.quality}"/>
+            </StackPanel>
+          </Grid>
+
+          <StackPanel>
+            <TextBlock Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbCodec"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.codec}"/>
+          </StackPanel>
+
+          <StackPanel>
+            <TextBlock Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
+            <ComboBox x:Name="CmbPreset"
+                      HorizontalAlignment="Stretch"
+                      auto:AutomationProperties.Name="{loc:Text recorder.option.preset}"/>
+          </StackPanel>
+
+          <CheckBox x:Name="ChkCursor"
+                    Theme="{StaticResource CheckStyle}"
+                    Content="{loc:Text recorder.option.cursor}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.option.cursor}"/>
+
+          <StackPanel>
+            <TextBlock Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+              <TextBox Grid.Column="0"
+                       x:Name="TxtOutputFolder"
+                       auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
+              <Button Grid.Column="1"
+                      x:Name="BtnBrowse"
+                      Theme="{StaticResource GhostButton}"
+                      Content="{loc:Text recorder.output.browse}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.output.browse}"
+                      Click="OnBrowse"/>
+            </Grid>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </StackPanel>
+</UserControl>

@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
+        xmlns:recorder="using:VidShrink.App.Recorder"
         xmlns:loc="using:VidShrink.App.Localization"
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
@@ -1203,6 +1204,12 @@
                 <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
+          </ScrollViewer>
+        </TabItem>
+
+          <TabItem Header="{loc:Text main.tab.recorder}" x:Name="TabRecorder" Theme="{StaticResource NeonTabItem}">
+          <ScrollViewer x:Name="PageRecorder" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
+            <recorder:RecorderView x:Name="RecorderPane" Margin="{StaticResource SectionMargin}"/>
           </ScrollViewer>
         </TabItem>
 
