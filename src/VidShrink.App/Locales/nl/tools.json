@@ -10,8 +10,5 @@
   "player.tools.cancel": "Annuleren",
   "player.tools.saved": "Opgeslagen: {0}",
   "player.tools.failed": "Het bestand kon niet worden gemaakt",
-  "player.tools.novideo": "Open eerst een video",
-  "player.tools.state-mini": "minimodus",
-  "player.tools.preview": "Voorbeeld",
-  "player.tools.length": "Cliplengte {0} s"
+  "player.tools.novideo": "Open eerst een video"
 }

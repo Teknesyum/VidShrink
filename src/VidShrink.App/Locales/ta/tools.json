@@ -10,8 +10,5 @@
   "player.tools.cancel": "ரத்து",
   "player.tools.saved": "சேமிக்கப்பட்டது: {0}",
   "player.tools.failed": "கோப்பை உருவாக்க முடியவில்லை",
-  "player.tools.novideo": "முதலில் ஒரு வீடியோவைத் திறக்கவும்",
-  "player.tools.state-mini": "மினி பயன்முறை",
-  "player.tools.preview": "முன்னோட்டம்",
-  "player.tools.length": "கிளிப் நீளம் {0} வி"
+  "player.tools.novideo": "முதலில் ஒரு வீடியோவைத் திறக்கவும்"
 }

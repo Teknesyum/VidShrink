@@ -10,8 +10,5 @@
   "player.tools.cancel": "বাতিল",
   "player.tools.saved": "সংরক্ষিত হয়েছে: {0}",
   "player.tools.failed": "ফাইলটি তৈরি করা যায়নি",
-  "player.tools.novideo": "প্রথমে একটি ভিডিও খুলুন",
-  "player.tools.state-mini": "মিনি মোড",
-  "player.tools.preview": "পূর্বরূপ",
-  "player.tools.length": "ক্লিপের দৈর্ঘ্য {0} সে"
+  "player.tools.novideo": "প্রথমে একটি ভিডিও খুলুন"
 }

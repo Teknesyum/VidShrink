@@ -10,8 +10,5 @@
   "player.tools.cancel": "Avbryt",
   "player.tools.saved": "Sparad: {0}",
   "player.tools.failed": "Filen kunde inte skapas",
-  "player.tools.novideo": "Öppna en video först",
-  "player.tools.state-mini": "miniläge",
-  "player.tools.preview": "Förhandsgranskning",
-  "player.tools.length": "Klipplängd {0} s"
+  "player.tools.novideo": "Öppna en video först"
 }

@@ -10,8 +10,5 @@
   "player.tools.cancel": "Скасувати",
   "player.tools.saved": "Збережено: {0}",
   "player.tools.failed": "Не вдалося створити файл",
-  "player.tools.novideo": "Спочатку відкрийте відео",
-  "player.tools.state-mini": "міні-режим",
-  "player.tools.preview": "Попередній перегляд",
-  "player.tools.length": "Тривалість кліпу {0} с"
+  "player.tools.novideo": "Спочатку відкрийте відео"
 }

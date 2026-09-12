@@ -10,8 +10,5 @@
   "player.tools.cancel": "取消",
   "player.tools.saved": "已保存：{0}",
   "player.tools.failed": "无法创建文件",
-  "player.tools.novideo": "请先打开视频",
-  "player.tools.state-mini": "迷你模式",
-  "player.tools.preview": "预览",
-  "player.tools.length": "片段时长 {0} 秒"
+  "player.tools.novideo": "请先打开视频"
 }

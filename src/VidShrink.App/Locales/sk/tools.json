@@ -10,8 +10,5 @@
   "player.tools.cancel": "Zrušiť",
   "player.tools.saved": "Uložené: {0}",
   "player.tools.failed": "Súbor sa nepodarilo vytvoriť",
-  "player.tools.novideo": "Najprv otvorte video",
-  "player.tools.state-mini": "mini režim",
-  "player.tools.preview": "Ukážka",
-  "player.tools.length": "Dĺžka klipu {0} s"
+  "player.tools.novideo": "Najprv otvorte video"
 }

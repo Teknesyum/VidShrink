@@ -10,8 +10,5 @@
   "player.tools.cancel": "Atšaukti",
   "player.tools.saved": "Įrašyta: {0}",
   "player.tools.failed": "Nepavyko sukurti failo",
-  "player.tools.novideo": "Pirmiausia atverkite vaizdo įrašą",
-  "player.tools.state-mini": "mini režimas",
-  "player.tools.preview": "Peržiūra",
-  "player.tools.length": "Klipo trukmė {0} s"
+  "player.tools.novideo": "Pirmiausia atverkite vaizdo įrašą"
 }

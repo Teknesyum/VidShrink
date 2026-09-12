@@ -10,8 +10,5 @@
   "player.tools.cancel": "Atcelt",
   "player.tools.saved": "Saglabāts: {0}",
   "player.tools.failed": "Failu nevarēja izveidot",
-  "player.tools.novideo": "Vispirms atveriet video",
-  "player.tools.state-mini": "mini režīms",
-  "player.tools.preview": "Priekšskatījums",
-  "player.tools.length": "Klipa garums {0} s"
+  "player.tools.novideo": "Vispirms atveriet video"
 }

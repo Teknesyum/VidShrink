@@ -10,8 +10,5 @@
   "player.tools.cancel": "Otkaži",
   "player.tools.saved": "Sačuvano: {0}",
   "player.tools.failed": "Datoteka nije mogla da se napravi",
-  "player.tools.novideo": "Prvo otvorite video",
-  "player.tools.state-mini": "mini režim",
-  "player.tools.preview": "Pregled",
-  "player.tools.length": "Trajanje isečka {0} s"
+  "player.tools.novideo": "Prvo otvorite video"
 }

@@ -10,8 +10,5 @@
   "player.tools.cancel": "ยกเลิก",
   "player.tools.saved": "บันทึกแล้ว: {0}",
   "player.tools.failed": "ไม่สามารถสร้างไฟล์ได้",
-  "player.tools.novideo": "เปิดวิดีโอก่อน",
-  "player.tools.state-mini": "โหมดมินิ",
-  "player.tools.preview": "แสดงตัวอย่าง",
-  "player.tools.length": "ความยาวคลิป {0} วินาที"
+  "player.tools.novideo": "เปิดวิดีโอก่อน"
 }

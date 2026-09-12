@@ -10,8 +10,5 @@
   "player.tools.cancel": "취소",
   "player.tools.saved": "저장됨: {0}",
   "player.tools.failed": "파일을 만들 수 없습니다",
-  "player.tools.novideo": "먼저 동영상을 여세요",
-  "player.tools.state-mini": "미니 모드",
-  "player.tools.preview": "미리보기",
-  "player.tools.length": "클립 길이 {0}초"
+  "player.tools.novideo": "먼저 동영상을 여세요"
 }

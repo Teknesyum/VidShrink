@@ -10,8 +10,5 @@
   "player.tools.cancel": "Ghairi",
   "player.tools.saved": "Imehifadhiwa: {0}",
   "player.tools.failed": "Faili halikuweza kutengenezwa",
-  "player.tools.novideo": "Fungua video kwanza",
-  "player.tools.state-mini": "hali ya mini",
-  "player.tools.preview": "Onyesho la awali",
-  "player.tools.length": "Urefu wa klipu {0} s"
+  "player.tools.novideo": "Fungua video kwanza"
 }

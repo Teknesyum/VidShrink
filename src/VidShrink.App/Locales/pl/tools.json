@@ -10,8 +10,5 @@
   "player.tools.cancel": "Anuluj",
   "player.tools.saved": "Zapisano: {0}",
   "player.tools.failed": "Nie udało się utworzyć pliku",
-  "player.tools.novideo": "Najpierw otwórz film",
-  "player.tools.state-mini": "tryb mini",
-  "player.tools.preview": "Podgląd",
-  "player.tools.length": "Długość klipu {0} s"
+  "player.tools.novideo": "Najpierw otwórz film"
 }

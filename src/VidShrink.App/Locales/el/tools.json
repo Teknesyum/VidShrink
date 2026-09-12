@@ -10,8 +10,5 @@
   "player.tools.cancel": "Ακύρωση",
   "player.tools.saved": "Αποθηκεύτηκε: {0}",
   "player.tools.failed": "Δεν ήταν δυνατή η δημιουργία του αρχείου",
-  "player.tools.novideo": "Ανοίξτε πρώτα ένα βίντεο",
-  "player.tools.state-mini": "λειτουργία μίνι",
-  "player.tools.preview": "Προεπισκόπηση",
-  "player.tools.length": "Διάρκεια κλιπ {0} δευτ."
+  "player.tools.novideo": "Ανοίξτε πρώτα ένα βίντεο"
 }

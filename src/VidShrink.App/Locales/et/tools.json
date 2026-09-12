@@ -10,8 +10,5 @@
   "player.tools.cancel": "Loobu",
   "player.tools.saved": "Salvestatud: {0}",
   "player.tools.failed": "Faili ei õnnestunud luua",
-  "player.tools.novideo": "Ava kõigepealt video",
-  "player.tools.state-mini": "mini režiim",
-  "player.tools.preview": "Eelvaade",
-  "player.tools.length": "Klipi pikkus {0} s"
+  "player.tools.novideo": "Ava kõigepealt video"
 }

@@ -10,8 +10,5 @@
   "player.tools.cancel": "ביטול",
   "player.tools.saved": "נשמר: {0}",
   "player.tools.failed": "לא ניתן היה ליצור את הקובץ",
-  "player.tools.novideo": "פתחו סרטון תחילה",
-  "player.tools.state-mini": "מצב מיני",
-  "player.tools.preview": "תצוגה מקדימה",
-  "player.tools.length": "אורך הקליפ {0} שנ׳"
+  "player.tools.novideo": "פתחו סרטון תחילה"
 }

@@ -10,8 +10,5 @@
   "player.tools.cancel": "Batal",
   "player.tools.saved": "Disimpan: {0}",
   "player.tools.failed": "File tidak dapat dibuat",
-  "player.tools.novideo": "Buka video terlebih dahulu",
-  "player.tools.state-mini": "mode mini",
-  "player.tools.preview": "Pratinjau",
-  "player.tools.length": "Durasi klip {0} dtk"
+  "player.tools.novideo": "Buka video terlebih dahulu"
 }

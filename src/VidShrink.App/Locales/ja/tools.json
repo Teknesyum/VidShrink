@@ -10,8 +10,5 @@
   "player.tools.cancel": "キャンセル",
   "player.tools.saved": "保存しました: {0}",
   "player.tools.failed": "ファイルを作成できませんでした",
-  "player.tools.novideo": "先に動画を開いてください",
-  "player.tools.state-mini": "ミニモード",
-  "player.tools.preview": "プレビュー",
-  "player.tools.length": "クリップの長さ {0} 秒"
+  "player.tools.novideo": "先に動画を開いてください"
 }

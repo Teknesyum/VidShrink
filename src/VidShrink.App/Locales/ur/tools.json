@@ -10,8 +10,5 @@
   "player.tools.cancel": "منسوخ",
   "player.tools.saved": "محفوظ ہوگیا: {0}",
   "player.tools.failed": "فائل نہیں بن سکی",
-  "player.tools.novideo": "پہلے ایک ویڈیو کھولیں",
-  "player.tools.state-mini": "منی موڈ",
-  "player.tools.preview": "پیش منظر",
-  "player.tools.length": "کلپ کی طوالت {0} سیکنڈ"
+  "player.tools.novideo": "پہلے ایک ویڈیو کھولیں"
 }

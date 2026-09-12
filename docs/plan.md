@@ -510,6 +510,17 @@ gelir; http/https/rtsp adresi acilir; her durum yazilir, okunur, sifirlanir.
 - Dil: yeni alan dosyasi `Locales/<dil>/tools.json` (`player.tools.*`), 43 dil; A yarisiyla
   ayni dosyada bulusmamak icin ayri alan dosyasi, 2. dalganin `tracks.json` karariyla ayni.
   `BiciminTests` pinleri (kalem sayisi ve kol) testi kosarak yeniden olculur.
+
+Olculen (`worktree-agent-aab0e51a79169b7f8`, `baae77f9`, kanit `.calisma/dalga4b/`):
+kucuk resim medyan **10.35 ms**, p95 **10.43 ms** (10 olcum, esik 300 ms); gosterimin
+kendisi elle surulen sahte motorla ayrica olculur, o kol CI'da da kosar. Klip 3 sn
+istendiginde akis kopyasi anahtar kareye hizalar ve 4.011 sn verir (kaynak `-g 60` @30 fps,
+2 sn anahtar kare araligi) — kabul araligi bu hizalamaya gore. GIF 2.0 sn, 160x90.
+Mini mod 900x600/`Full` → 480x270/`None`+ustte → 900x600/`Full`. Dil sayimi
+43 x 592 = 25456, kol 967 (en 103, tr 43). Katalogda kalan ama kod yolunda karsiligi
+olmayan uc anahtar (`state-mini`, `preview`, `length`) 42 dilden silindi;
+`novideo` kaynaksiz klip/GIF isteginde durum satirinda gosteriliyor —
+`LocalizationTests.KatalogdaBirikenOluCeviriListesiBuyumuyor` olu anahtar biriktirmiyor.
 - Arayuz: onizleme yongasi `Surface` uzerinde, rengi paletten, olcusu `Theme.axaml`
   belirtecinden turetilmis `PlaybackThumbnail*` adlariyla; yeni renk/olcu uydurulmaz.
 - Olcu: `OynaticiAracTests` — kucuk resim medyan/p95 (esik `[HedefMakineFact]`, gosterimin

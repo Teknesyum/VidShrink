@@ -10,8 +10,5 @@
   "player.tools.cancel": "Vazgeç",
   "player.tools.saved": "Kaydedildi: {0}",
   "player.tools.failed": "Dosya oluşturulamadı",
-  "player.tools.novideo": "Önce bir video açın",
-  "player.tools.state-mini": "mini mod",
-  "player.tools.preview": "Önizleme",
-  "player.tools.length": "Klip süresi {0} sn"
+  "player.tools.novideo": "Önce bir video açın"
 }

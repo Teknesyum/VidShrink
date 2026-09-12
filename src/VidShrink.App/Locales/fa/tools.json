@@ -10,8 +10,5 @@
   "player.tools.cancel": "لغو",
   "player.tools.saved": "ذخیره شد: {0}",
   "player.tools.failed": "فایل ایجاد نشد",
-  "player.tools.novideo": "ابتدا یک ویدیو باز کنید",
-  "player.tools.state-mini": "حالت کوچک",
-  "player.tools.preview": "پیش‌نمایش",
-  "player.tools.length": "طول کلیپ {0} ثانیه"
+  "player.tools.novideo": "ابتدا یک ویدیو باز کنید"
 }

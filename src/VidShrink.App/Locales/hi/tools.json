@@ -10,8 +10,5 @@
   "player.tools.cancel": "रद्द करें",
   "player.tools.saved": "सेव किया गया: {0}",
   "player.tools.failed": "फ़ाइल नहीं बनाई जा सकी",
-  "player.tools.novideo": "पहले एक वीडियो खोलें",
-  "player.tools.state-mini": "मिनी मोड",
-  "player.tools.preview": "पूर्वावलोकन",
-  "player.tools.length": "क्लिप की लंबाई {0} सेकंड"
+  "player.tools.novideo": "पहले एक वीडियो खोलें"
 }

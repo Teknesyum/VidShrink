@@ -10,8 +10,5 @@
   "player.tools.cancel": "Hủy",
   "player.tools.saved": "Đã lưu: {0}",
   "player.tools.failed": "Không thể tạo tệp",
-  "player.tools.novideo": "Hãy mở video trước",
-  "player.tools.state-mini": "chế độ mini",
-  "player.tools.preview": "Xem trước",
-  "player.tools.length": "Độ dài clip {0} giây"
+  "player.tools.novideo": "Hãy mở video trước"
 }

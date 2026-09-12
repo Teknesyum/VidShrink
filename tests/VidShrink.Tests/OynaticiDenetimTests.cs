@@ -224,6 +224,7 @@ public sealed class KeymapTests
             PlayerCommandKind.ToggleShuffle when view.Settings.Shuffle == karisik => "karistirma degismedi",
             PlayerCommandKind.RepeatCycle when view.Settings.Repeat == tekrar => $"tekrar {tekrar} degismedi",
             PlayerCommandKind.ClipExport when yeni[0] != "clip -> no" => $"kaynaksiz klip izi '{yeni[0]}'",
+            PlayerCommandKind.ClipExport when !view.ViewStateText.Contains(Strings.Get("player.tools.novideo"), StringComparison.Ordinal) => $"kaynaksiz klip bildirimi yok: '{view.ViewStateText}'",
             PlayerCommandKind.GifExport when yeni[0] != "gif -> no" => $"kaynaksiz gif izi '{yeni[0]}'",
             PlayerCommandKind.MiniMode when view.IsMiniMode == mini => "mini mod degismedi",
             PlayerCommandKind.OpenUrl when yeni[0] != "url -> no" => $"gorunmez pencerede adres izi '{yeni[0]}'",

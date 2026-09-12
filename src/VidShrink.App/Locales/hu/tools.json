@@ -10,8 +10,5 @@
   "player.tools.cancel": "Mégse",
   "player.tools.saved": "Mentve: {0}",
   "player.tools.failed": "A fájlt nem sikerült létrehozni",
-  "player.tools.novideo": "Először nyisson meg egy videót",
-  "player.tools.state-mini": "mini mód",
-  "player.tools.preview": "Előnézet",
-  "player.tools.length": "Klip hossza {0} mp"
+  "player.tools.novideo": "Először nyisson meg egy videót"
 }

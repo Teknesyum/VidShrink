@@ -10,8 +10,5 @@
   "player.tools.cancel": "Отказ",
   "player.tools.saved": "Запазено: {0}",
   "player.tools.failed": "Файлът не можа да бъде създаден",
-  "player.tools.novideo": "Отвори видео първо",
-  "player.tools.state-mini": "мини режим",
-  "player.tools.preview": "Преглед",
-  "player.tools.length": "Дължина на клипа {0} сек"
+  "player.tools.novideo": "Отвори видео първо"
 }

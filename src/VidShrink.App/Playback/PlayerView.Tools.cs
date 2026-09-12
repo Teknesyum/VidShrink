@@ -312,7 +312,13 @@ internal partial class PlayerView
     /// </summary>
     private string StartExport(ClipKind kind)
     {
-        if (_path is not { } media || IsAddress(media)) return "no";
+        if (_path is not { } media || IsAddress(media))
+        {
+            _notice = Strings.Get("player.tools.novideo");
+            RefreshState();
+            return "no";
+        }
+
         EnsureSettings();
         EnsureTools();
 

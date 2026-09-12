@@ -10,8 +10,5 @@
   "player.tools.cancel": "Abbrechen",
   "player.tools.saved": "Gespeichert: {0}",
   "player.tools.failed": "Die Datei konnte nicht erstellt werden",
-  "player.tools.novideo": "Zuerst ein Video öffnen",
-  "player.tools.state-mini": "Minimodus",
-  "player.tools.preview": "Vorschau",
-  "player.tools.length": "Clip-Länge {0} s"
+  "player.tools.novideo": "Zuerst ein Video öffnen"
 }

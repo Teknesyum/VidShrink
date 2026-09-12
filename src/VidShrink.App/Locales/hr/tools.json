@@ -10,8 +10,5 @@
   "player.tools.cancel": "Odustani",
   "player.tools.saved": "Spremljeno: {0}",
   "player.tools.failed": "Datoteku nije bilo moguće izraditi",
-  "player.tools.novideo": "Najprije otvorite videozapis",
-  "player.tools.state-mini": "mini način rada",
-  "player.tools.preview": "Pregled",
-  "player.tools.length": "Trajanje isječka {0} s"
+  "player.tools.novideo": "Najprije otvorite videozapis"
 }

@@ -10,8 +10,5 @@
   "player.tools.cancel": "Batal",
   "player.tools.saved": "Disimpan: {0}",
   "player.tools.failed": "Fail tidak dapat dicipta",
-  "player.tools.novideo": "Buka video dahulu",
-  "player.tools.state-mini": "mod mini",
-  "player.tools.preview": "Pratonton",
-  "player.tools.length": "Tempoh klip {0} s"
+  "player.tools.novideo": "Buka video dahulu"
 }

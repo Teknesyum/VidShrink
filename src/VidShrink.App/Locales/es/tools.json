@@ -10,8 +10,5 @@
   "player.tools.cancel": "Cancelar",
   "player.tools.saved": "Guardado: {0}",
   "player.tools.failed": "No se pudo crear el archivo",
-  "player.tools.novideo": "Abre un vídeo primero",
-  "player.tools.state-mini": "modo mini",
-  "player.tools.preview": "Vista previa",
-  "player.tools.length": "Duración del clip {0} s"
+  "player.tools.novideo": "Abre un vídeo primero"
 }

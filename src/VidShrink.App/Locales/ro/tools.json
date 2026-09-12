@@ -10,8 +10,5 @@
   "player.tools.cancel": "Anulează",
   "player.tools.saved": "Salvat: {0}",
   "player.tools.failed": "Fișierul nu a putut fi creat",
-  "player.tools.novideo": "Deschide mai întâi un videoclip",
-  "player.tools.state-mini": "mod mini",
-  "player.tools.preview": "Previzualizare",
-  "player.tools.length": "Durata clipului {0} s"
+  "player.tools.novideo": "Deschide mai întâi un videoclip"
 }

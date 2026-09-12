@@ -10,8 +10,5 @@
   "player.tools.cancel": "Prekliči",
   "player.tools.saved": "Shranjeno: {0}",
   "player.tools.failed": "Datoteke ni bilo mogoče ustvariti",
-  "player.tools.novideo": "Najprej odprite videoposnetek",
-  "player.tools.state-mini": "mini način",
-  "player.tools.preview": "Predogled",
-  "player.tools.length": "Dolžina izrezka {0} s"
+  "player.tools.novideo": "Najprej odprite videoposnetek"
 }
