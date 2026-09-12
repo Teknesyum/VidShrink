@@ -43,7 +43,7 @@
   "player.list.end": "فایل دیگری در این پوشه نیست",
   "player.list.missing": "آن فایل دیگر وجود ندارد",
   "player.info.codec": "کدک ویدیو: {0}",
-  "player.info.resolution": "وضوح تصویر: {0}",
+  "player.info.resolution": "وضوح تصویر: {0}×{1}",
   "player.info.framerate": "نرخ فریم: {0} fps",
   "player.info.bitrate": "نرخ بیت: {0} kb/s",
   "player.info.audio": "صدا: {0}، {1} کانال، {2} Hz",

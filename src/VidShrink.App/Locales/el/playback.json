@@ -43,7 +43,7 @@
   "player.list.end": "δεν υπάρχουν άλλα αρχεία σε αυτόν τον φάκελο",
   "player.list.missing": "αυτό το αρχείο δεν υπάρχει πια",
   "player.info.codec": "Codec βίντεο: {0}",
-  "player.info.resolution": "Ανάλυση: {0}",
+  "player.info.resolution": "Ανάλυση: {0}×{1}",
   "player.info.framerate": "Ρυθμός καρέ: {0} fps",
   "player.info.bitrate": "Ρυθμός bit: {0} kb/s",
   "player.info.audio": "Ήχος: {0}, {1} καν., {2} Hz",

@@ -127,9 +127,12 @@
             <Grid Grid.Row="1"
                   ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto"
                   ColumnSpacing="{StaticResource SpaceSm}">
-              <Button Grid.Column="0" x:Name="BtnSeritPlay" Theme="{StaticResource PlaybackBarButton}"/>
-              <Button Grid.Column="1" x:Name="BtnSeritBack" Theme="{StaticResource PlaybackBarButton}" Content="-10"/>
-              <Button Grid.Column="2" x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}" Content="+10"/>
+              <Button Grid.Column="0" x:Name="BtnSeritPlay" Theme="{StaticResource PlaybackBarButton}"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.playpause}"/>
+              <Button Grid.Column="1" x:Name="BtnSeritBack" Theme="{StaticResource PlaybackBarButton}" Content="-10"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}"/>
+              <Button Grid.Column="2" x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}" Content="+10"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}"/>
 
               <TextBlock Grid.Column="3"
                          x:Name="TxtSeritTime"
@@ -137,19 +140,23 @@
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"/>
 
-              <Button Grid.Column="4" x:Name="BtnSeritVolumeDown" Theme="{StaticResource PlaybackBarButton}" Content="🔉"/>
+              <Button Grid.Column="4" x:Name="BtnSeritVolumeDown" Theme="{StaticResource PlaybackBarButton}" Content="🔉"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
               <TextBlock Grid.Column="5"
                          x:Name="TxtSeritVolume"
                          Theme="{StaticResource PlaybackTimeText}"
                          VerticalAlignment="Center"/>
-              <Button Grid.Column="6" x:Name="BtnSeritVolumeUp" Theme="{StaticResource PlaybackBarButton}" Content="🔊"/>
+              <Button Grid.Column="6" x:Name="BtnSeritVolumeUp" Theme="{StaticResource PlaybackBarButton}" Content="🔊"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
 
-              <Button Grid.Column="7" x:Name="BtnSeritSlower" Theme="{StaticResource PlaybackBarButton}" Content="«"/>
+              <Button Grid.Column="7" x:Name="BtnSeritSlower" Theme="{StaticResource PlaybackBarButton}" Content="«"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.slower}"/>
               <TextBlock Grid.Column="8"
                          x:Name="TxtSeritSpeed"
                          Theme="{StaticResource PlaybackTimeText}"
                          VerticalAlignment="Center"/>
-              <Button Grid.Column="9" x:Name="BtnSeritFaster" Theme="{StaticResource PlaybackBarButton}" Content="»"/>
+              <Button Grid.Column="9" x:Name="BtnSeritFaster" Theme="{StaticResource PlaybackBarButton}" Content="»"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
             </Grid>
           </Grid>
         </Border>

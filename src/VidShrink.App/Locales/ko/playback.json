@@ -43,7 +43,7 @@
   "player.list.end": "이 폴더에 더 이상 파일이 없습니다",
   "player.list.missing": "해당 파일이 더 이상 존재하지 않습니다",
   "player.info.codec": "비디오 코덱: {0}",
-  "player.info.resolution": "해상도: {0}",
+  "player.info.resolution": "해상도: {0}×{1}",
   "player.info.framerate": "프레임 속도: {0} fps",
   "player.info.bitrate": "비트레이트: {0} kb/s",
   "player.info.audio": "오디오: {0}, {1}채널, {2} Hz",

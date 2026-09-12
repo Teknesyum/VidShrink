@@ -423,11 +423,8 @@
                             <RadioButton x:Name="RbFillCeiling" GroupName="ShrinkFill" Content="{loc:Text main.fill.ceiling}"/>
                           </StackPanel>
                         </Grid>
-                        <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" HorizontalAlignment="Left" Content="{loc:Text main.fast-gpu}">
-                          <ToolTip.Tip>
-                            <TextBlock x:Name="TipFastGpu" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fast-gpu.tip}"/>
-                          </ToolTip.Tip>
-                        </CheckBox>
+                        <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" HorizontalAlignment="Left" Content="{loc:Text main.fast-gpu}"
+                                  ToolTip.Tip="{loc:Text main.fast-gpu.tip}"/>
                         <StackPanel x:Name="HdrPolicyPanel" IsVisible="False">
                           <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                             <TextBlock Grid.Column="0" Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
@@ -774,20 +771,10 @@
 
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
-                    <Button.Styles>
-                      <Style Selector="Button:disabled">
-                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.cancel.disabled-tip}"/>
-                      </Style>
-                    </Button.Styles>
-                  </Button>
-                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart">
-                    <Button.Styles>
-                      <Style Selector="Button:disabled">
-                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.shrink.disabled-tip}"/>
-                      </Style>
-                    </Button.Styles>
-                  </Button>
+                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"
+                          ToolTip.Tip="{Binding $self.IsEnabled, Converter={x:Static loc:DisabledTipConverter.Instance}, ConverterParameter=main.action.cancel.disabled-tip}"/>
+                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart"
+                          ToolTip.Tip="{Binding $self.IsEnabled, Converter={x:Static loc:DisabledTipConverter.Instance}, ConverterParameter=main.action.shrink.disabled-tip}"/>
                 </StackPanel>
 
               </StackPanel>
@@ -1022,20 +1009,10 @@
                   </StackPanel>
                 </Border>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnConvertCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
-                    <Button.Styles>
-                      <Style Selector="Button:disabled">
-                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.cancel.disabled-tip}"/>
-                      </Style>
-                    </Button.Styles>
-                  </Button>
-                  <Button x:Name="BtnConvert" Content="{loc:Text main.action.convert}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnConvert">
-                    <Button.Styles>
-                      <Style Selector="Button:disabled">
-                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.convert.disabled-tip}"/>
-                      </Style>
-                    </Button.Styles>
-                  </Button>
+                  <Button x:Name="BtnConvertCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"
+                          ToolTip.Tip="{Binding $self.IsEnabled, Converter={x:Static loc:DisabledTipConverter.Instance}, ConverterParameter=main.action.cancel.disabled-tip}"/>
+                  <Button x:Name="BtnConvert" Content="{loc:Text main.action.convert}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnConvert"
+                          ToolTip.Tip="{Binding $self.IsEnabled, Converter={x:Static loc:DisabledTipConverter.Instance}, ConverterParameter=main.action.convert.disabled-tip}"/>
                 </StackPanel>
               </StackPanel>
             </Grid>
@@ -1131,13 +1108,8 @@
                               Theme="{StaticResource GhostButton}"
                               HorizontalAlignment="Left"
                               IsEnabled="False"
-                              Click="OnShareDelete">
-                        <Button.Styles>
-                          <Style Selector="Button:disabled">
-                            <Setter Property="ToolTip.Tip" Value="{loc:Text settings.share.delete.disabled-tip}"/>
-                          </Style>
-                        </Button.Styles>
-                      </Button>
+                              Click="OnShareDelete"
+                              ToolTip.Tip="{Binding $self.IsEnabled, Converter={x:Static loc:DisabledTipConverter.Instance}, ConverterParameter=settings.share.delete.disabled-tip}"/>
                       <TextBlock x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>
                   </Grid>

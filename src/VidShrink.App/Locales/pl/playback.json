@@ -43,7 +43,7 @@
   "player.list.end": "brak kolejnych plików w tym folderze",
   "player.list.missing": "tego pliku już nie ma",
   "player.info.codec": "Kodek wideo: {0}",
-  "player.info.resolution": "Rozdzielczość: {0}",
+  "player.info.resolution": "Rozdzielczość: {0}×{1}",
   "player.info.framerate": "Liczba klatek: {0} fps",
   "player.info.bitrate": "Przepływność: {0} kb/s",
   "player.info.audio": "Audio: {0}, {1} kan., {2} Hz",

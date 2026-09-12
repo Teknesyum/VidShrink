@@ -43,7 +43,7 @@
   "player.list.end": "אין קבצים נוספים בתיקייה זו",
   "player.list.missing": "הקובץ הזה כבר לא קיים",
   "player.info.codec": "קודק וידאו: {0}",
-  "player.info.resolution": "רזולוציה: {0}",
+  "player.info.resolution": "רזולוציה: {0}×{1}",
   "player.info.framerate": "קצב פריימים: {0} fps",
   "player.info.bitrate": "קצב סיביות: {0} kb/s",
   "player.info.audio": "שמע: {0}, {1} ערוצים, {2} Hz",

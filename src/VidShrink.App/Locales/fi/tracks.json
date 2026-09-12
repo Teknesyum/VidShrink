@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kiinalainen (yksinkertaistettu)",
   "player.subtitle.encoding.chinesetraditional": "Kiinalainen (perinteinen)",
   "player.subtitle.encoding.korean": "Korealainen",
-  "player.subtitle.external": "ulkoinen",
+  "player.subtitle.external": " (ulkoinen)",
   "player.subtitle.novideo": "Avaa video ennen tekstitysten lisäämistä",
   "player.subtitle.loadfailed": "Tekstitystiedostoa ei voitu latata"
 }

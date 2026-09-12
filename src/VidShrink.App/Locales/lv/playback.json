@@ -43,7 +43,7 @@
   "player.list.end": "šajā mapē vairs nav datņu",
   "player.list.missing": "šī datne vairs nepastāv",
   "player.info.codec": "Videokodeks: {0}",
-  "player.info.resolution": "Izšķirtspēja: {0}",
+  "player.info.resolution": "Izšķirtspēja: {0}×{1}",
   "player.info.framerate": "Kadru biežums: {0} fps",
   "player.info.bitrate": "Bitu pārraides ātrums: {0} kb/s",
   "player.info.audio": "Audio: {0}, {1} kan., {2} Hz",

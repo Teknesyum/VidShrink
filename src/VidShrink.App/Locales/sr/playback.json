@@ -43,7 +43,7 @@
   "player.list.end": "у овом фолдеру нема више датотека",
   "player.list.missing": "та датотека више не постоји",
   "player.info.codec": "Видео кодек: {0}",
-  "player.info.resolution": "Резолуција: {0}",
+  "player.info.resolution": "Резолуција: {0}×{1}",
   "player.info.framerate": "Учестаност кадрова: {0} fps",
   "player.info.bitrate": "Битски проток: {0} kb/s",
   "player.info.audio": "Звук: {0}, {1} кан., {2} Hz",

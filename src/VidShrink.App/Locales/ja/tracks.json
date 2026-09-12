@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "中国語(簡体字)",
   "player.subtitle.encoding.chinesetraditional": "中国語(繁体字)",
   "player.subtitle.encoding.korean": "韓国語",
-  "player.subtitle.external": "外部",
+  "player.subtitle.external": " (外部)",
   "player.subtitle.novideo": "字幕を追加する前に動画を開いてください",
   "player.subtitle.loadfailed": "字幕ファイルを読み込めませんでした"
 }

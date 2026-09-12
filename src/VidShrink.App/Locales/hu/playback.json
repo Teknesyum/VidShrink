@@ -43,7 +43,7 @@
   "player.list.end": "nincs több fájl ebben a mappában",
   "player.list.missing": "ez a fájl már nem létezik",
   "player.info.codec": "Videokodek: {0}",
-  "player.info.resolution": "Felbontás: {0}",
+  "player.info.resolution": "Felbontás: {0}×{1}",
   "player.info.framerate": "Képfrissítés: {0} fps",
   "player.info.bitrate": "Bitráta: {0} kb/s",
   "player.info.audio": "Hang: {0}, {1} csat., {2} Hz",

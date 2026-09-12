@@ -43,7 +43,7 @@
   "player.list.end": "tidak ada file lain di folder ini",
   "player.list.missing": "file itu sudah tidak ada",
   "player.info.codec": "Codec video: {0}",
-  "player.info.resolution": "Resolusi: {0}",
+  "player.info.resolution": "Resolusi: {0}×{1}",
   "player.info.framerate": "Frame rate: {0} fps",
   "player.info.bitrate": "Bitrate: {0} kb/s",
   "player.info.audio": "Audio: {0}, {1} kanal, {2} Hz",

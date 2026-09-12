@@ -43,7 +43,7 @@
   "player.list.end": "hakuna faili nyingine katika folda hii",
   "player.list.missing": "faili hiyo haipo tena",
   "player.info.codec": "Kodeki ya video: {0}",
-  "player.info.resolution": "Ubora wa picha: {0}",
+  "player.info.resolution": "Ubora wa picha: {0}×{1}",
   "player.info.framerate": "Kasi ya fremu: {0} fps",
   "player.info.bitrate": "Kasi ya biti: {0} kb/s",
   "player.info.audio": "Sauti: {0}, {1} chaneli, {2} Hz",

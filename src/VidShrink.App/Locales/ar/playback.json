@@ -43,7 +43,7 @@
   "player.list.end": "لا توجد ملفات أخرى في هذا المجلد",
   "player.list.missing": "هذا الملف غير موجود بعد الآن",
   "player.info.codec": "مرمّز الفيديو: {0}",
-  "player.info.resolution": "الدقة: {0}",
+  "player.info.resolution": "الدقة: {0}×{1}",
   "player.info.framerate": "معدل الإطارات: {0} fps",
   "player.info.bitrate": "معدل البت: {0} kb/s",
   "player.info.audio": "الصوت: {0}، {1} قناة، {2} Hz",

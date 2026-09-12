@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Κινεζική (Απλοποιημένη)",
   "player.subtitle.encoding.chinesetraditional": "Κινεζική (Παραδοσιακή)",
   "player.subtitle.encoding.korean": "Κορεατική",
-  "player.subtitle.external": "εξωτερικό",
+  "player.subtitle.external": " (εξωτερικό)",
   "player.subtitle.novideo": "Ανοίξτε ένα βίντεο πριν προσθέσετε υπότιτλους",
   "player.subtitle.loadfailed": "Δεν ήταν δυνατή η φόρτωση του αρχείου υποτίτλων"
 }

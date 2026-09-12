@@ -43,7 +43,7 @@
   "player.list.end": "šiame aplanke daugiau failų nėra",
   "player.list.missing": "šio failo daugiau nėra",
   "player.info.codec": "Vaizdo kodekas: {0}",
-  "player.info.resolution": "Skiriamoji geba: {0}",
+  "player.info.resolution": "Skiriamoji geba: {0}×{1}",
   "player.info.framerate": "Kadrų dažnis: {0} fps",
   "player.info.bitrate": "Bitų dažnis: {0} kb/s",
   "player.info.audio": "Garsas: {0}, {1} kan., {2} Hz",

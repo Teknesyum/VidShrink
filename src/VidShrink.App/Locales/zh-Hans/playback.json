@@ -43,7 +43,7 @@
   "player.list.end": "此文件夹中没有更多文件",
   "player.list.missing": "该文件已不存在",
   "player.info.codec": "视频编码: {0}",
-  "player.info.resolution": "分辨率: {0}",
+  "player.info.resolution": "分辨率: {0}×{1}",
   "player.info.framerate": "帧率: {0} fps",
   "player.info.bitrate": "比特率: {0} kb/s",
   "player.info.audio": "音频: {0}, {1} 声道, {2} Hz",

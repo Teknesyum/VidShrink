@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Chiński (uproszczony)",
   "player.subtitle.encoding.chinesetraditional": "Chiński (tradycyjny)",
   "player.subtitle.encoding.korean": "Koreański",
-  "player.subtitle.external": "zewnętrzny",
+  "player.subtitle.external": " (zewnętrzny)",
   "player.subtitle.novideo": "Otwórz plik wideo przed dodaniem napisów",
   "player.subtitle.loadfailed": "Nie udało się wczytać pliku z napisami"
 }

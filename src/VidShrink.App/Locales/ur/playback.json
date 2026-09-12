@@ -43,7 +43,7 @@
   "player.list.end": "اس فولڈر میں مزید فائلیں نہیں ہیں",
   "player.list.missing": "وہ فائل مزید موجود نہیں",
   "player.info.codec": "ویڈیو کوڈیک: {0}",
-  "player.info.resolution": "ریزولوشن: {0}",
+  "player.info.resolution": "ریزولوشن: {0}×{1}",
   "player.info.framerate": "فریم ریٹ: {0} fps",
   "player.info.bitrate": "بٹ ریٹ: {0} kb/s",
   "player.info.audio": "آڈیو: {0}، {1} چینل، {2} Hz",

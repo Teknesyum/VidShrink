@@ -896,10 +896,9 @@ public partial class MainWindow : Window
 
     private void ApplyFastGpuTip()
     {
-        // Text yazmak koşuları silerdi: ipucu gövdesi aynı boyayıcıdan geçmeli.
         var body = Say(_hardwareProbed && !_hardwareEncoderAvailable ? "main.fast-gpu.tip-missing" : "main.fast-gpu.tip");
         var verdict = FastGpuVerdictLine(_hardwareVerdict, ChkFastGpu.IsChecked == true, Strings.Language);
-        PaintBullets(TipFastGpu, verdict is null ? body : $"{body}\n{verdict}");
+        ToolTip.SetTip(ChkFastGpu, verdict is null ? body : $"{body}\n{verdict}");
     }
 
     /// <summary>

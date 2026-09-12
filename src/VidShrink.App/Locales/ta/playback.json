@@ -43,7 +43,7 @@
   "player.list.end": "இந்த கோப்புறையில் மேலும் கோப்புகள் இல்லை",
   "player.list.missing": "அந்த கோப்பு இனி இல்லை",
   "player.info.codec": "வீடியோ கோடெக்: {0}",
-  "player.info.resolution": "தெளிவுத்திறன்: {0}",
+  "player.info.resolution": "தெளிவுத்திறன்: {0}×{1}",
   "player.info.framerate": "பிரேம் விகிதம்: {0} fps",
   "player.info.bitrate": "பிட் விகிதம்: {0} kb/s",
   "player.info.audio": "ஆடியோ: {0}, {1} சேனல், {2} Hz",

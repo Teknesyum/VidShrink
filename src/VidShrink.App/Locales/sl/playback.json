@@ -43,7 +43,7 @@
   "player.list.end": "v tej mapi ni več datotek",
   "player.list.missing": "te datoteke ni več",
   "player.info.codec": "Video kodek: {0}",
-  "player.info.resolution": "Ločljivost: {0}",
+  "player.info.resolution": "Ločljivost: {0}×{1}",
   "player.info.framerate": "Hitrost sličic: {0} fps",
   "player.info.bitrate": "Bitna hitrost: {0} kb/s",
   "player.info.audio": "Zvok: {0}, {1} kan., {2} Hz",

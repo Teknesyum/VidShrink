@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kínai (egyszerűsített)",
   "player.subtitle.encoding.chinesetraditional": "Kínai (hagyományos)",
   "player.subtitle.encoding.korean": "Koreai",
-  "player.subtitle.external": "külső",
+  "player.subtitle.external": " (külső)",
   "player.subtitle.novideo": "Nyisson meg egy videót a feliratok hozzáadása előtt",
   "player.subtitle.loadfailed": "A feliratfájlt nem sikerült betölteni"
 }

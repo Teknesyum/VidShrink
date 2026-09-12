@@ -43,7 +43,7 @@
   "player.list.end": "このフォルダーに他のファイルはありません",
   "player.list.missing": "そのファイルは存在しません",
   "player.info.codec": "動画コーデック: {0}",
-  "player.info.resolution": "解像度: {0}",
+  "player.info.resolution": "解像度: {0}×{1}",
   "player.info.framerate": "フレームレート: {0} fps",
   "player.info.bitrate": "ビットレート: {0} kb/s",
   "player.info.audio": "音声: {0}、{1} ch、{2} Hz",

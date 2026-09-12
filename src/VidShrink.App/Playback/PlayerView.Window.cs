@@ -487,9 +487,9 @@ internal partial class PlayerView
     {
         if (details is null) return Strings.Get("player.info.none");
         var unknown = Strings.Get("player.info.unknown");
-        var size = details.Width > 0 && details.Height > 0
-            ? details.Width.ToString(CultureInfo.InvariantCulture) + "×" + details.Height.ToString(CultureInfo.InvariantCulture)
-            : unknown;
+        var hasSize = details.Width > 0 && details.Height > 0;
+        var width = hasSize ? details.Width.ToString(CultureInfo.InvariantCulture) : unknown;
+        var height = hasSize ? details.Height.ToString(CultureInfo.InvariantCulture) : unknown;
         var fps = double.IsFinite(details.FramesPerSecond) && details.FramesPerSecond > 0
             ? details.FramesPerSecond.ToString("0.###", CultureInfo.CurrentCulture)
             : unknown;
@@ -500,7 +500,7 @@ internal partial class PlayerView
         var lines = new List<string>
         {
             Strings.Get("player.info.codec", details.VideoCodec ?? unknown),
-            Strings.Get("player.info.resolution", size),
+            Strings.Get("player.info.resolution", width, height),
             Strings.Get("player.info.framerate", fps),
             Strings.Get("player.info.bitrate", rate),
             details.AudioCodec is null

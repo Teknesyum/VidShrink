@@ -296,7 +296,7 @@ internal partial class PlayerView
         var name = Strings.Get("player.tracks.item", track.Id);
         if (!string.IsNullOrWhiteSpace(track.Title)) name += " · " + track.Title;
         if (!string.IsNullOrWhiteSpace(track.Language)) name += " [" + track.Language + "]";
-        if (track.External) name += " (" + Strings.Get("player.subtitle.external") + ")";
+        if (track.External) name += Strings.Get("player.subtitle.external");
         return name;
     }
 

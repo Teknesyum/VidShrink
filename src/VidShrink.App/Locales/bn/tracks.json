@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "চীনা (সরলীকৃত)",
   "player.subtitle.encoding.chinesetraditional": "চীনা (প্রথাগত)",
   "player.subtitle.encoding.korean": "কোরিয়ান",
-  "player.subtitle.external": "বাহ্যিক",
+  "player.subtitle.external": " (বাহ্যিক)",
   "player.subtitle.novideo": "সাবটাইটেল যুক্ত করার আগে একটি ভিডিও খুলুন",
   "player.subtitle.loadfailed": "সাবটাইটেল ফাইল লোড করা যায়নি"
 }

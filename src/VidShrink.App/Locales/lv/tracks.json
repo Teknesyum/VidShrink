@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Ķīniešu (vienkāršotā)",
   "player.subtitle.encoding.chinesetraditional": "Ķīniešu (tradicionālā)",
   "player.subtitle.encoding.korean": "Korejiešu",
-  "player.subtitle.external": "ārējs",
+  "player.subtitle.external": " (ārējs)",
   "player.subtitle.novideo": "Pirms subtitru pievienošanas atveriet video",
   "player.subtitle.loadfailed": "Neizdevās ielādēt subtitru failu"
 }

@@ -43,7 +43,7 @@
   "player.list.end": "এই ফোল্ডারে আর কোনো ফাইল নেই",
   "player.list.missing": "সেই ফাইলটি আর নেই",
   "player.info.codec": "ভিডিও কোডেক: {0}",
-  "player.info.resolution": "রিজলিউশন: {0}",
+  "player.info.resolution": "রিজলিউশন: {0}×{1}",
   "player.info.framerate": "ফ্রেম রেট: {0} fps",
   "player.info.bitrate": "বিটরেট: {0} kb/s",
   "player.info.audio": "অডিও: {0}, {1} চ্যানেল, {2} Hz",

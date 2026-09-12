@@ -436,7 +436,7 @@ public sealed class OynaticiGorunumTests
         var beklenen = new[]
         {
             Strings.Get("player.info.codec", codec),
-            Strings.Get("player.info.resolution", boyut.Genislik.ToString(CultureInfo.InvariantCulture) + "×" + boyut.Yukseklik.ToString(CultureInfo.InvariantCulture)),
+            Strings.Get("player.info.resolution", boyut.Genislik.ToString(CultureInfo.InvariantCulture), boyut.Yukseklik.ToString(CultureInfo.InvariantCulture)),
             Strings.Get("player.info.framerate", fps.ToString("0.###", CultureInfo.CurrentCulture)),
             Strings.Get("player.info.audio", ses[0], int.Parse(ses[2], CultureInfo.InvariantCulture), int.Parse(ses[1], CultureInfo.InvariantCulture))
         };

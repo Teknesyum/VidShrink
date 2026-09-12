@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Kinesko (pojednostavljeno)",
   "player.subtitle.encoding.chinesetraditional": "Kinesko (tradicionalno)",
   "player.subtitle.encoding.korean": "Korejsko",
-  "player.subtitle.external": "vanjski",
+  "player.subtitle.external": " (vanjski)",
   "player.subtitle.novideo": "Otvorite video prije dodavanja titlova",
   "player.subtitle.loadfailed": "Datoteku titlova nije moguće učitati"
 }

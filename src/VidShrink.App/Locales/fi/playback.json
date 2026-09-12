@@ -43,7 +43,7 @@
   "player.list.end": "tässä kansiossa ei ole enempää tiedostoja",
   "player.list.missing": "tätä tiedostoa ei enää ole",
   "player.info.codec": "Videokoodekki: {0}",
-  "player.info.resolution": "Tarkkuus: {0}",
+  "player.info.resolution": "Tarkkuus: {0}×{1}",
   "player.info.framerate": "Kuvataajuus: {0} fps",
   "player.info.bitrate": "Bittinopeus: {0} kb/s",
   "player.info.audio": "Ääni: {0}, {1} kan., {2} Hz",

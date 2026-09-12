@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Chinês (Simplificado)",
   "player.subtitle.encoding.chinesetraditional": "Chinês (Tradicional)",
   "player.subtitle.encoding.korean": "Coreano",
-  "player.subtitle.external": "externa",
+  "player.subtitle.external": " (externa)",
   "player.subtitle.novideo": "Abra um vídeo antes de adicionar legendas",
   "player.subtitle.loadfailed": "Não foi possível carregar o arquivo de legendas"
 }

@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Chinese (Simplified)",
   "player.subtitle.encoding.chinesetraditional": "Chinese (Traditional)",
   "player.subtitle.encoding.korean": "Korean",
-  "player.subtitle.external": "external",
+  "player.subtitle.external": " (external)",
   "player.subtitle.novideo": "Open a video before adding subtitles",
   "player.subtitle.loadfailed": "The subtitle file could not be loaded"
 }

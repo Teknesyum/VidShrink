@@ -43,7 +43,7 @@
   "player.list.end": "ไม่มีไฟล์อื่นในโฟลเดอร์นี้แล้ว",
   "player.list.missing": "ไฟล์นั้นไม่มีอยู่แล้ว",
   "player.info.codec": "โคเดควิดีโอ: {0}",
-  "player.info.resolution": "ความละเอียด: {0}",
+  "player.info.resolution": "ความละเอียด: {0}×{1}",
   "player.info.framerate": "อัตราเฟรม: {0} fps",
   "player.info.bitrate": "บิตเรต: {0} kb/s",
   "player.info.audio": "เสียง: {0}, {1} ช่อง, {2} Hz",

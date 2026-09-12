@@ -43,7 +43,7 @@
   "player.list.end": "no more files in this folder",
   "player.list.missing": "that file is gone",
   "player.info.codec": "Video codec: {0}",
-  "player.info.resolution": "Resolution: {0}",
+  "player.info.resolution": "Resolution: {0}×{1}",
   "player.info.framerate": "Frame rate: {0} fps",
   "player.info.bitrate": "Bitrate: {0} kb/s",
   "player.info.audio": "Audio: {0}, {1} ch, {2} Hz",

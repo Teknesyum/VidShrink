@@ -43,7 +43,7 @@
   "player.list.end": "inga fler filer i den här mappen",
   "player.list.missing": "den filen finns inte längre",
   "player.info.codec": "Videokodek: {0}",
-  "player.info.resolution": "Upplösning: {0}",
+  "player.info.resolution": "Upplösning: {0}×{1}",
   "player.info.framerate": "Bildfrekvens: {0} fps",
   "player.info.bitrate": "Bitfrekvens: {0} kb/s",
   "player.info.audio": "Ljud: {0}, {1} kan., {2} Hz",

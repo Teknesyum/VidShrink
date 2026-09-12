@@ -43,7 +43,7 @@
   "player.list.end": "không còn tệp nào khác trong thư mục này",
   "player.list.missing": "tệp đó không còn tồn tại",
   "player.info.codec": "Codec video: {0}",
-  "player.info.resolution": "Độ phân giải: {0}",
+  "player.info.resolution": "Độ phân giải: {0}×{1}",
   "player.info.framerate": "Tốc độ khung hình: {0} fps",
   "player.info.bitrate": "Tốc độ bit: {0} kb/s",
   "player.info.audio": "Âm thanh: {0}, {1} kênh, {2} Hz",

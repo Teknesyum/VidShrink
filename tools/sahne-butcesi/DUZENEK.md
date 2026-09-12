@@ -108,7 +108,7 @@ kaynak ve plan ciktisi ayni renk uzayinda oldugu icin ret gelmiyor; kontrol:
 
     ffprobe -v error -select_streams v:0 \
       -show_entries stream=width,height,pix_fmt,color_transfer,color_primaries \
-      -of default=nw=1 <dosya>
+      -of default=nw=1 <dosya>  # (default, unmeasured)
 
 Kaynak ve uc kolun plan ciktisi da `yuv420p10le / smpte2084 / bt2020` dondu.
 Cozunurluk farki sorun degil: `QualityMeter.RunFilterAsync` testi referansin

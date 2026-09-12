@@ -43,7 +43,7 @@
   "player.list.end": "tiada lagi fail dalam folder ini",
   "player.list.missing": "fail itu tidak lagi wujud",
   "player.info.codec": "Codec video: {0}",
-  "player.info.resolution": "Resolusi: {0}",
+  "player.info.resolution": "Resolusi: {0}×{1}",
   "player.info.framerate": "Kadar bingkai: {0} fps",
   "player.info.bitrate": "Kadar bit: {0} kb/s",
   "player.info.audio": "Audio: {0}, {1} saluran, {2} Hz",

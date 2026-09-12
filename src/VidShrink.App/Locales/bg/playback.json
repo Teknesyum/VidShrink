@@ -43,7 +43,7 @@
   "player.list.end": "няма повече файлове в тази папка",
   "player.list.missing": "този файл вече не съществува",
   "player.info.codec": "Видеокодек: {0}",
-  "player.info.resolution": "Разделителна способност: {0}",
+  "player.info.resolution": "Разделителна способност: {0}×{1}",
   "player.info.framerate": "Честота на кадрите: {0} fps",
   "player.info.bitrate": "Битрейт: {0} kb/s",
   "player.info.audio": "Звук: {0}, {1} кан., {2} Hz",

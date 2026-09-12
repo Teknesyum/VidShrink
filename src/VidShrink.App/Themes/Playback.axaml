@@ -173,7 +173,15 @@
   -->
   <LinearGradientBrush x:Key="PlaybackScrimVeil" StartPoint="50%,100%" EndPoint="50%,0%">
     <GradientStop Offset="0" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.1" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.2" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.3" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.4" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.5" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.6" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.7" Color="{StaticResource PlaybackScrimColor}"/>
     <GradientStop Offset="0.75" Color="{StaticResource PlaybackScrimColor}"/>
+    <GradientStop Offset="0.875" Color="{StaticResource PlaybackScrimEdgeColor}"/>
     <GradientStop Offset="1" Color="{StaticResource PlaybackScrimEdgeColor}"/>
   </LinearGradientBrush>
 

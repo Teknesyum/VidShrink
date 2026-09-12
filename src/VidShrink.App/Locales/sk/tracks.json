@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Čínske (zjednodušené)",
   "player.subtitle.encoding.chinesetraditional": "Čínske (tradičné)",
   "player.subtitle.encoding.korean": "Kórejské",
-  "player.subtitle.external": "externé",
+  "player.subtitle.external": " (externé)",
   "player.subtitle.novideo": "Pred pridaním titulkov otvorte video",
   "player.subtitle.loadfailed": "Súbor s titulkami sa nepodarilo načítať"
 }

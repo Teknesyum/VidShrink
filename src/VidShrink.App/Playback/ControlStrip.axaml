@@ -1,5 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:auto="using:Avalonia.Automation"
+             xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Playback.ControlStrip">
 
   <!--
@@ -19,8 +21,10 @@
 
     <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" VerticalAlignment="Center">
 
-      <Button x:Name="PlayPause" Grid.Column="0" Theme="{StaticResource ChipButton}"/>
-      <Button x:Name="Restart" Grid.Column="1" Theme="{StaticResource ChipButton}"/>
+      <Button x:Name="PlayPause" Grid.Column="0" Theme="{StaticResource ChipButton}"
+              auto:AutomationProperties.Name="{loc:Text playback.control.play}"/>
+      <Button x:Name="Restart" Grid.Column="1" Theme="{StaticResource ChipButton}"
+              auto:AutomationProperties.Name="{loc:Text playback.control.restart}"/>
 
       <!--
         Zaman çizgisi. Izgara dokunma hedefi kadar yüksek; yol ortada durur.

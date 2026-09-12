@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Chinees (vereenvoudigd)",
   "player.subtitle.encoding.chinesetraditional": "Chinees (traditioneel)",
   "player.subtitle.encoding.korean": "Koreaans",
-  "player.subtitle.external": "extern",
+  "player.subtitle.external": " (extern)",
   "player.subtitle.novideo": "Open een video voor het toevoegen van ondertitels",
   "player.subtitle.loadfailed": "Het ondertitelbestand kon niet worden geladen"
 }

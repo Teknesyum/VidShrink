@@ -43,7 +43,7 @@
   "player.list.end": "v tomto priečinku už nie sú žiadne súbory",
   "player.list.missing": "tento súbor už neexistuje",
   "player.info.codec": "Video kodek: {0}",
-  "player.info.resolution": "Rozlíšenie: {0}",
+  "player.info.resolution": "Rozlíšenie: {0}×{1}",
   "player.info.framerate": "Frekvencia snímok: {0} fps",
   "player.info.bitrate": "Dátový tok: {0} kb/s",
   "player.info.audio": "Zvuk: {0}, {1} kan., {2} Hz",

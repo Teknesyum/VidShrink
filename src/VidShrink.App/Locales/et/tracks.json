@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Hiina (lihtsustatud)",
   "player.subtitle.encoding.chinesetraditional": "Hiina (traditsiooniline)",
   "player.subtitle.encoding.korean": "Korea",
-  "player.subtitle.external": "väline",
+  "player.subtitle.external": " (väline)",
   "player.subtitle.novideo": "Ava video enne subtiitrite lisamist",
   "player.subtitle.loadfailed": "Subtiitrifaili ei saanud laadida"
 }

@@ -43,7 +43,7 @@
   "player.list.end": "bu klasörde başka dosya yok",
   "player.list.missing": "o dosya artık yok",
   "player.info.codec": "Video kodeği: {0}",
-  "player.info.resolution": "Çözünürlük: {0}",
+  "player.info.resolution": "Çözünürlük: {0}×{1}",
   "player.info.framerate": "Kare hızı: {0} fps",
   "player.info.bitrate": "Bit hızı: {0} kb/s",
   "player.info.audio": "Ses: {0}, {1} kanal, {2} Hz",

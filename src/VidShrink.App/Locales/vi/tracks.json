@@ -34,7 +34,7 @@
   "player.subtitle.encoding.chinesesimplified": "Trung Quốc (Giản thể)",
   "player.subtitle.encoding.chinesetraditional": "Trung Quốc (Phồn thể)",
   "player.subtitle.encoding.korean": "Hàn Quốc",
-  "player.subtitle.external": "bên ngoài",
+  "player.subtitle.external": " (bên ngoài)",
   "player.subtitle.novideo": "Mở video trước khi thêm phụ đề",
   "player.subtitle.loadfailed": "Không thể nạp tệp phụ đề"
 }
