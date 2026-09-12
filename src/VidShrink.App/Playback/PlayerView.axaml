@@ -4,9 +4,15 @@
              xmlns:loc="using:VidShrink.App.Localization"
              xmlns:playback="using:VidShrink.App.Playback"
              x:Class="VidShrink.App.Playback.PlayerView"
-             Focusable="True">
+             Focusable="True"
+             Loaded="OnSeritLoaded">
 
-  <Grid RowDefinitions="Auto,*,Auto" Margin="{StaticResource SectionMargin}" RowSpacing="{StaticResource SpaceMd}">
+  <!--
+    7b/K3: sayfanin iki satiri kaldi. Zaman cubugu, denetim seridi ve tanilama satirlari
+    artik yerlesimde yer kaplamiyor — hepsi panonun ustune binen katmanlar. Kok izgaranin
+    SectionMargin'i ve panonun PanelPadding'i de kalkti: video dikeyde o kadar buyuyor.
+  -->
+  <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceSm}">
 
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
       <TextBlock Grid.Column="0"
@@ -24,7 +30,11 @@
               Click="OnMenuButton"/>
     </Grid>
 
-    <Border Grid.Row="1" x:Name="Stage" Theme="{StaticResource Panel}" Background="{StaticResource AppBg}">
+    <Border Grid.Row="1"
+            x:Name="Stage"
+            Theme="{StaticResource Panel}"
+            Background="{StaticResource AppBg}"
+            Padding="0">
       <Panel x:Name="Surface" Background="Transparent" ClipToBounds="True">
         <Image x:Name="Frame" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <TextBlock x:Name="TxtEmpty"
@@ -32,14 +42,44 @@
                    Theme="{StaticResource MonoValue}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
-        <Border x:Name="InfoPanel"
-                Theme="{StaticResource PlaybackBadge}"
+
+        <!--
+          Bilgi rozeti ve tanilama satirlari. Dort duz metin satiri sayfadan kalkti ama
+          agactan kalkmadi: okuyuculari duruyor, artik yalnizca bilgi panosu acikken
+          gorunuyorlar. Gorunurluk kodla degil rozetin kendi bayragina baglanarak
+          suruluyor, boylece durumu tek yerden geliyor.
+        -->
+        <StackPanel HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="{StaticResource PlaybackBadgeMargin}"
+                    Spacing="{StaticResource PlaybackBadgeGap}">
+          <Border x:Name="InfoPanel" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
+            <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
+          </Border>
+          <Border x:Name="DiagPanel"
+                  Theme="{StaticResource PlaybackBadge}"
+                  IsVisible="{Binding #InfoPanel.IsVisible}">
+            <StackPanel Spacing="{StaticResource SpaceXs}">
+              <TextBlock x:Name="TxtView" Theme="{StaticResource MonoValue}" TextWrapping="Wrap" IsVisible="False"/>
+              <TextBlock x:Name="TxtState" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
+              <TextBlock x:Name="TxtControls" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- Takilma ve hata bildirimi tanilamaya bagli degil: kendi bayragiyla gorunur. -->
+        <Border Theme="{StaticResource PlaybackBadge}"
                 Margin="{StaticResource PlaybackBadgeMargin}"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Top"
-                IsVisible="False">
-          <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
+                IsVisible="{Binding #TxtStall.IsVisible}">
+          <TextBlock x:Name="TxtStall"
+                     Theme="{StaticResource MonoValue}"
+                     TextWrapping="Wrap"
+                     IsVisible="False"
+                     Foreground="{StaticResource NeonEmber}"/>
         </Border>
+
         <Canvas x:Name="ThumbLayer" IsHitTestVisible="False">
           <Border x:Name="ThumbChip" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
             <StackPanel Spacing="{StaticResource PlaybackBadgeGap}">
@@ -53,32 +93,67 @@
             </StackPanel>
           </Border>
         </Canvas>
+
+        <!--
+          7b/K1: otomatik gizlenen alt serit. Gizliyken IsVisible degil Opacity sifirdir —
+          klavye odagi icine dusunce belirmesi gerekiyor ve yerlesim olculeri (zaman
+          cubugunun genisligi) gizliyken de dogru kalmali. Fareye gorunmez olmasi
+          IsHitTestVisible ile kod tarafinda suruluyor.
+        -->
+        <Border x:Name="StripBar"
+                Theme="{StaticResource PlaybackStrip}"
+                VerticalAlignment="Bottom"
+                Opacity="0"
+                IsHitTestVisible="False"
+                auto:AutomationProperties.Name="{loc:Text playback.control.strip}">
+          <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+
+            <Panel Grid.Row="0"
+                   x:Name="SeekBar"
+                   Height="{StaticResource PlaybackSeekBarHeight}"
+                   Background="Transparent"
+                   Cursor="Hand"
+                   auto:AutomationProperties.Name="{loc:Text playback.control.timeline}">
+              <Border x:Name="SeekTrack" Theme="{StaticResource PlaybackSeekTrack}" VerticalAlignment="Center"/>
+              <Border x:Name="SeekFill"
+                      Theme="{StaticResource PlaybackSeekTrackFill}"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      Width="0"
+                      IsVisible="False"/>
+              <Canvas x:Name="SeekMarkLayer" IsHitTestVisible="False"/>
+            </Panel>
+
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="{StaticResource SpaceSm}">
+              <Button Grid.Column="0" x:Name="BtnSeritPlay" Theme="{StaticResource PlaybackBarButton}"/>
+              <Button Grid.Column="1" x:Name="BtnSeritBack" Theme="{StaticResource PlaybackBarButton}" Content="-10"/>
+              <Button Grid.Column="2" x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}" Content="+10"/>
+
+              <TextBlock Grid.Column="3"
+                         x:Name="TxtSeritTime"
+                         Theme="{StaticResource PlaybackTimeText}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"/>
+
+              <Button Grid.Column="4" x:Name="BtnSeritVolumeDown" Theme="{StaticResource PlaybackBarButton}" Content="🔉"/>
+              <TextBlock Grid.Column="5"
+                         x:Name="TxtSeritVolume"
+                         Theme="{StaticResource PlaybackTimeText}"
+                         VerticalAlignment="Center"/>
+              <Button Grid.Column="6" x:Name="BtnSeritVolumeUp" Theme="{StaticResource PlaybackBarButton}" Content="🔊"/>
+
+              <Button Grid.Column="7" x:Name="BtnSeritSlower" Theme="{StaticResource PlaybackBarButton}" Content="«"/>
+              <TextBlock Grid.Column="8"
+                         x:Name="TxtSeritSpeed"
+                         Theme="{StaticResource PlaybackTimeText}"
+                         VerticalAlignment="Center"/>
+              <Button Grid.Column="9" x:Name="BtnSeritFaster" Theme="{StaticResource PlaybackBarButton}" Content="»"/>
+            </Grid>
+          </Grid>
+        </Border>
       </Panel>
     </Border>
-
-    <StackPanel Grid.Row="2" Spacing="{StaticResource SpaceSm}">
-      <Panel x:Name="SeekBar"
-             Height="{StaticResource PlaybackTimelineHeight}"
-             Background="Transparent"
-             Cursor="Hand"
-             auto:AutomationProperties.Name="{loc:Text playback.control.timeline}">
-        <Border x:Name="SeekTrack" Theme="{StaticResource PlaybackTrack}" VerticalAlignment="Center"/>
-        <Border x:Name="SeekFill"
-                Theme="{StaticResource PlaybackTrackFill}"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Width="0"
-                IsVisible="False"/>
-        <Canvas x:Name="SeekMarkLayer" IsHitTestVisible="False"/>
-      </Panel>
-      <TextBlock x:Name="TxtView" Theme="{StaticResource MonoValue}" TextWrapping="Wrap" IsVisible="False"/>
-      <TextBlock x:Name="TxtState" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
-      <TextBlock x:Name="TxtControls" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
-      <TextBlock x:Name="TxtStall"
-                 Theme="{StaticResource MonoValue}"
-                 TextWrapping="Wrap"
-                 IsVisible="False"
-                 Foreground="{StaticResource NeonEmber}"/>
-    </StackPanel>
   </Grid>
 </UserControl>

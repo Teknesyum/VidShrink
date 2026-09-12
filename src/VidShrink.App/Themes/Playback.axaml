@@ -89,6 +89,22 @@
 
     T79: yuvarlak geri sayımın üç belirteci de (PlaybackCountdownSize/Radius/Stroke) ve
     perdesi kalktı. Bekleme olmayınca sayan bir gösterge de yok.
+
+    7b: oynatıcının alt denetim şeridi. Karşılaştırma panelinin şeridi dar bir aralığa
+    sıkışıyor, oynatıcı sekmesi sıkışmıyor — o yüzden şeridin ölçüleri ortak, yalnız bu üç
+    sayı ayrı ve üçü de var olan belirteçten geliyor, yenisi uydurulmadı:
+
+      PlaybackSeekBarHeight    <- FieldMinHeight (40). Zaman çubuğunun tıklanabilir
+                                  yüksekliği. Eskiden PlaybackTimelineHeight (24), yani
+                                  dokunma tabanının (TargetMinSize) kendisiydi: hedefin
+                                  alt sınırı. Programın "rahat satır" ölçüsü alan
+                                  yüksekliği olduğu için çubuk da oraya çekildi.
+      PlaybackSeekTrackHeight  <- SliderTrackHeight (10). Görünen yolun kalınlığı. Şeridin
+                                  yolu ilerleme çubuğu ölçüsünde (ProgressBarHeight, 8)
+                                  kalıyor; sürüklenen yol kaydırıcının ölçüsünde.
+      PlaybackBarButtonSize    <- FieldMinHeight (40). Şerit düğmesinin dokunma hedefi,
+                                  zaman çubuğuyla aynı sayı: alt şerit tek satır
+                                  yüksekliğinde okunuyor.
   -->
 
   <x:Double x:Key="PlaybackSeparatorWidth">2</x:Double>
@@ -108,6 +124,10 @@
   <x:Double x:Key="PlaybackTrackHeight">8</x:Double>
   <x:Double x:Key="PlaybackThumbSize">20</x:Double>
   <x:Double x:Key="PlaybackCursorWidth">2</x:Double>
+
+  <x:Double x:Key="PlaybackSeekBarHeight">40</x:Double>
+  <x:Double x:Key="PlaybackSeekTrackHeight">10</x:Double>
+  <x:Double x:Key="PlaybackBarButtonSize">40</x:Double>
 
   <x:Double x:Key="PlaybackThumbnailWidth">128</x:Double>
   <x:Double x:Key="PlaybackThumbnailHeight">72</x:Double>
@@ -348,6 +368,31 @@
     <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
     <Setter Property="FontWeight" Value="Bold"/>
     <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+  </ControlTheme>
+
+  <!--
+    7b: oynatıcının kendi zaman çubuğu. Biçim şeridinkiyle aynı — renk, çerçeve, köşe ve
+    odak kuralı oradan miras alınıyor, kopyalanmıyor. Değişen tek şey kalınlık, o da ayrı
+    belirteçten geliyor.
+  -->
+  <ControlTheme x:Key="PlaybackSeekTrack" TargetType="Border" BasedOn="{StaticResource PlaybackTrack}">
+    <Setter Property="Height" Value="{StaticResource PlaybackSeekTrackHeight}"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackSeekTrackFill" TargetType="Border" BasedOn="{StaticResource PlaybackTrackFill}">
+    <Setter Property="Height" Value="{StaticResource PlaybackSeekTrackHeight}"/>
+  </ControlTheme>
+
+  <!--
+    7b: alt şeridin düğmesi. Yüzü ChipButton'dan geliyor, yani şeritteki düğmelerle aynı
+    görünüyor. Değişen tek şey dokunma hedefi: kare ve alan yüksekliğinde.
+  -->
+  <ControlTheme x:Key="PlaybackBarButton" TargetType="Button" BasedOn="{StaticResource ChipButton}">
+    <Setter Property="MinWidth" Value="{StaticResource PlaybackBarButtonSize}"/>
+    <Setter Property="MinHeight" Value="{StaticResource PlaybackBarButtonSize}"/>
+    <Setter Property="Margin" Value="0"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
   </ControlTheme>
 
   <!-- Süre okuması. Sayı olduğu için mono; rengi beyaz, kontrastı perdeden alır. -->
