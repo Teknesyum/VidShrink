@@ -3,8 +3,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
@@ -241,6 +243,235 @@ internal sealed class MiniSunucu : IDisposable
 public sealed class OynaticiAracTests
 {
     private static string Ayar(string ad) => Path.Combine(AracKanit.Gecici(ad), "history.json");
+
+    private static readonly Pointer SeritFaresi = new(7, PointerType.Mouse, true);
+
+    private static readonly Size SeritPencere = new(1280, 720);
+
+    /// <summary>Şerit düğmesine basar. Düğme kendi komutunu tek yoldan uygular.</summary>
+    private static void Bas(PlayerView view, string ad)
+        => view.FindControl<Button>(ad)!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+    /// <summary>Zaman çubuğunda sürükleme başlatır: basış anında o ana gidilir.</summary>
+    private static void CubukBas(Panel cubuk, double x)
+        => cubuk.RaiseEvent(new PointerPressedEventArgs(
+            cubuk,
+            SeritFaresi,
+            cubuk,
+            new Point(x, cubuk.Bounds.Height / 2),
+            0,
+            new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.LeftButtonPressed),
+            KeyModifiers.None,
+            1)
+        {
+            RoutedEvent = InputElement.PointerPressedEvent
+        });
+
+    /// <summary>Sürükleme sırasında fareyi kaydırır.</summary>
+    private static void CubukHareket(Panel cubuk, double x)
+        => cubuk.RaiseEvent(new PointerEventArgs(
+            InputElement.PointerMovedEvent,
+            cubuk,
+            SeritFaresi,
+            cubuk,
+            new Point(x, cubuk.Bounds.Height / 2),
+            0,
+            new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.Other),
+            KeyModifiers.None));
+
+    /// <summary>
+    /// 7b/K1: şeridin beş düğmesi de motora ulaşıyor ve motordan geri okunuyor. Okunan
+    /// sayı görünümün kendi alanı değil, libmpv'ye sorulan özelliğin değeri: ±10 sn için
+    /// <c>time-pos</c>, ses için <c>volume</c>, hız için <c>speed</c>.
+    ///
+    /// <para>Atlama yarım saniyelik pencereyle sınanıyor, birebir değil: adım tıklama
+    /// anındaki canlı konumdan sayılıyor ve motor en yakın kareye oturuyor, ölçülen sapma
+    /// +10,167 / -9,833 sn. Pencerenin dar olması adımın kendisini koruyor — 10 sn yerine
+    /// 5 ya da 60 sn atlayan bir değişiklik pencereyi deler. Hedef ile motordan okunan
+    /// konumun örtüşmesi de komutun motora gerçekten ulaştığını gösteriyor — bir kare
+    /// payıyla: ikisi ayrı saat ve art arda okunuyor, arada motor bir kare ilerleyebiliyor.
+    /// Beş koşumun birinde ölçülen sapma 0,033 sn, yani 30 fps'lik klipte tam bir kare;
+    /// pay 0,05 sn ile bunun hemen üstünde tutuluyor, ikinci kareye izin vermiyor.</para>
+    ///
+    /// <para>Ses tavanda duruyor: <c>volume-max</c> 100 olduğu için 95'ten iki artış 105
+    /// değil 100 veriyor. Beklenen sayı tavanın kendisinden okunuyor, sabit yazılmıyor.</para>
+    /// </summary>
+    [Fact]
+    public void SeritDugmeleriMotoraUlasirVeMotordanGeriOkunur()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var history = Ayar("serit-motor");
+
+        var rapor = AppHost.Run(() =>
+        {
+            var body = new StringBuilder();
+            var view = DenetimSurucu.Ac(clip, out var window, history);
+            SeritKanit.LayOutAt(window, SeritPencere);
+            _ = view.SeritZone;
+            DenetimSurucu.Duraklat(view);
+            DenetimSurucu.Git(view, 5);
+
+            var motor = DenetimSurucu.Motor(view);
+            double Oku(string ad) => MotorKanit.ReadDouble(motor, ad);
+
+            var hedefOnce = view.Seek.Target;
+            var konumOnce = Oku("time-pos");
+            Bas(view, "BtnSeritForward");
+            DenetimSurucu.Bekle(view);
+            var hedefIleri = view.Seek.Target;
+            var ileri = Oku("time-pos");
+
+            Bas(view, "BtnSeritBack");
+            DenetimSurucu.Bekle(view);
+            var hedefGeri = view.Seek.Target;
+            var geri = Oku("time-pos");
+
+            var tavan = Oku("volume-max");
+            var sesOnce = Oku("volume");
+            Bas(view, "BtnSeritVolumeDown");
+            DenetimSurucu.Wait(view, 0.1);
+            var sesKisik = Oku("volume");
+            Bas(view, "BtnSeritVolumeUp");
+            DenetimSurucu.Wait(view, 0.1);
+            var sesGeri = Oku("volume");
+            Bas(view, "BtnSeritVolumeUp");
+            DenetimSurucu.Wait(view, 0.1);
+            var sesTavan = Oku("volume");
+
+            var hizOnce = Oku("speed");
+            Bas(view, "BtnSeritFaster");
+            DenetimSurucu.Wait(view, 0.1);
+            var hizli = Oku("speed");
+            Bas(view, "BtnSeritSlower");
+            DenetimSurucu.Wait(view, 0.1);
+            var normal = Oku("speed");
+
+            var sureEtiketi = view.SeritTimeText;
+            var sesEtiketi = view.SeritVolumeText;
+            var hizEtiketi = view.SeritSpeedText;
+
+            body.AppendLine("adim tiklama anindaki canli konumdan sayiliyor, motor en yakin kareye oturuyor:");
+            body.AppendLine($"  hedef {AracKanit.N(hedefOnce)} -> +10 sn -> {AracKanit.N(hedefIleri)} (fark {AracKanit.N(hedefIleri - hedefOnce)})");
+            body.AppendLine($"  motor {AracKanit.N(konumOnce)} -> +10 sn -> {AracKanit.N(ileri)} (fark {AracKanit.N(ileri - konumOnce)})");
+            body.AppendLine($"  hedef {AracKanit.N(hedefIleri)} -> -10 sn -> {AracKanit.N(hedefGeri)} (fark {AracKanit.N(hedefGeri - hedefIleri)})");
+            body.AppendLine($"  motor {AracKanit.N(ileri)} -> -10 sn -> {AracKanit.N(geri)} (fark {AracKanit.N(geri - ileri)})");
+            body.AppendLine($"  hedef-motor farki: ileri {AracKanit.N(Math.Abs(hedefIleri - ileri))} sn, geri {AracKanit.N(Math.Abs(hedefGeri - geri))} sn (pay 0.05 = bir kare)");
+            body.AppendLine($"ses tavani {AracKanit.N(tavan)}");
+            body.AppendLine($"ses {AracKanit.N(sesOnce)} -> kis -> {AracKanit.N(sesKisik)} -> ac -> {AracKanit.N(sesGeri)} -> tekrar ac -> {AracKanit.N(sesTavan)} (tavanda durdu)");
+            body.AppendLine($"hiz {AracKanit.N(hizOnce)} -> hizlan -> {AracKanit.N(hizli)} -> yavasla -> {AracKanit.N(normal)}");
+            body.AppendLine($"serit etiketleri: sure {sureEtiketi}, ses {sesEtiketi}, hiz {hizEtiketi}");
+
+            view.Close();
+            window.Close();
+            return (body.ToString(), hedefOnce, hedefIleri, hedefGeri, konumOnce, ileri, geri,
+                tavan, sesOnce, sesKisik, sesGeri, sesTavan, hizli, normal, sesEtiketi, hizEtiketi);
+        });
+
+        AracKanit.Write("serit-motor.txt", rapor.Item1);
+
+        Assert.InRange(rapor.hedefIleri - rapor.hedefOnce, 9.5, 10.5);
+        Assert.InRange(rapor.hedefGeri - rapor.hedefIleri, -10.5, -9.5);
+        Assert.InRange(rapor.ileri - rapor.konumOnce, 9.5, 10.5);
+        Assert.InRange(rapor.geri - rapor.ileri, -10.5, -9.5);
+        Assert.InRange(Math.Abs(rapor.hedefIleri - rapor.ileri), 0, 0.05);
+        Assert.InRange(Math.Abs(rapor.hedefGeri - rapor.geri), 0, 0.05);
+        Assert.Equal(rapor.sesOnce - 5, rapor.sesKisik);
+        Assert.Equal(rapor.sesOnce, rapor.sesGeri);
+        Assert.Equal(rapor.tavan, rapor.sesTavan);
+        Assert.Equal(AracKanit.N(rapor.tavan), rapor.sesEtiketi);
+        Assert.Equal(1.1, rapor.hizli, 3);
+        Assert.Equal(1.0, rapor.normal, 3);
+        Assert.Equal("1x", rapor.hizEtiketi);
+    }
+
+    /// <summary>
+    /// 7b/K4: sürüklerken küçük resim fareyi takip ediyor. Sürükleme yolu olayı
+    /// <c>Handled</c> işaretlediği için önizleme işleyicisi <c>handledEventsToo</c> ile
+    /// asılı; bu ölçüm o bağın kurulu olduğunu gerçek fare olaylarıyla gösteriyor.
+    ///
+    /// <para>Negatif kontrol iki yönlü: önizleme motoruna ulaşan konum farenin gittiği
+    /// yeri izliyor (yanlış konum farklı kare ister), ve arama başarısız olduğunda küçük
+    /// resim hiç gösterilmiyor.</para>
+    /// </summary>
+    [Fact]
+    public void SuruklerkenKucukResimFareyiTakipEder()
+    {
+        var clip = MotorKlipleri.Kucuk;
+        var history = Ayar("serit-surukleme");
+
+        var rapor = AppHost.Run(() =>
+        {
+            var body = new StringBuilder();
+            var view = DenetimSurucu.Ac(clip, out var window, history);
+            SeritKanit.LayOutAt(window, SeritPencere);
+            _ = view.SeritZone;
+            DenetimSurucu.Duraklat(view);
+
+            var motor = new SahteOnizleme();
+            view.PreviewFactory = () => motor;
+
+            var cubuk = view.FindControl<Panel>("SeekBar")!;
+            var genislik = cubuk.Bounds.Width;
+            body.AppendLine($"zaman cubugu genisligi {AracKanit.N(genislik)} px, yuksekligi {AracKanit.N(cubuk.Bounds.Height)} px");
+
+            CubukBas(cubuk, genislik * 0.1);
+            DenetimSurucu.Pump(view, () => view.ThumbnailWork.IsCompleted, 5);
+
+            var istenen = new List<double>();
+            foreach (var pay in new[] { 0.2, 0.35, 0.5, 0.65, 0.8, 0.95 })
+            {
+                CubukHareket(cubuk, genislik * pay);
+                DenetimSurucu.Pump(view, () => view.ThumbnailWork.IsCompleted, 5);
+                istenen.Add(motor.PositionSeconds);
+                body.AppendLine($"pay {AracKanit.N(pay)} -> onizleme motoru {AracKanit.N(motor.PositionSeconds)} sn, gorunur {view.ThumbnailVisible}");
+            }
+
+            var gorunur = view.ThumbnailVisible;
+            var gecikmeler = view.ThumbnailLatenciesMs.Where(d => !double.IsNaN(d)).ToList();
+            var medyan = AracKanit.Medyan(gecikmeler);
+            var p95 = AracKanit.Yuzde95(gecikmeler);
+            body.AppendLine($"olculen istek {gecikmeler.Count}, medyan {AracKanit.N(medyan)} ms, p95 {AracKanit.N(p95)} ms");
+
+            var artan = true;
+            for (var i = 1; i < istenen.Count; i++)
+            {
+                if (istenen[i] <= istenen[i - 1]) artan = false;
+            }
+
+            var bozuk = new SahteOnizleme(false);
+            view.PreviewFactory = () => bozuk;
+            view.Close();
+            var yeniden = view.OpenAsync(clip);
+            DenetimSurucu.Pump(view, () => yeniden.IsCompleted, 20);
+            yeniden.GetAwaiter().GetResult();
+            view.HideThumbnail();
+            var gizlendi = view.ThumbnailVisible;
+
+            var kotu = view.ShowThumbnailAsync(3);
+            DenetimSurucu.Pump(view, () => kotu.IsCompleted, 10);
+            var kotuSure = kotu.GetAwaiter().GetResult();
+            var kotuGorunur = view.ThumbnailVisible;
+            body.AppendLine($"surukleme bitti -> gizlendi, gorunur {gizlendi}");
+            body.AppendLine($"NEGATIF basarisiz arama -> sure {kotuSure}, gorunur {kotuGorunur}");
+            body.AppendLine($"NEGATIF konum takibi: istenen kareler {string.Join(", ", istenen.Select(AracKanit.N))} (artan {artan})");
+
+            view.Close();
+            window.Close();
+            return (body.ToString(), genislik, cubuk.Bounds.Height, gorunur, gecikmeler.Count, medyan, p95, artan, istenen, gizlendi, kotuSure, kotuGorunur);
+        });
+
+        AracKanit.Write("surukleme-kucukresim.txt", rapor.Item1);
+
+        Assert.True(rapor.genislik > 0, "zaman cubugunun genisligi olculemedi");
+        Assert.Equal(40, rapor.Item3);
+        Assert.True(rapor.gorunur, "suruklerken kucuk resim gosterilmedi");
+        Assert.True(rapor.Item5 >= 5, $"surukleme yolundan yeterli onizleme gelmedi: {rapor.Item5}");
+        Assert.True(rapor.artan, "onizleme fareyi takip etmedi");
+        Assert.NotEqual(rapor.istenen[0], rapor.istenen[^1]);
+        Assert.False(rapor.gizlendi, "surukleme bitince kucuk resim gizlenmedi");
+        Assert.True(double.IsNaN(rapor.kotuSure), "basarisiz arama sure dondurdu");
+        Assert.False(rapor.kotuGorunur, "basarisiz aramada kucuk resim gosterildi");
+    }
 
     [Fact]
     public void KucukResimAnahtarKaredenGosterilirBasarisizAramaGostermez()

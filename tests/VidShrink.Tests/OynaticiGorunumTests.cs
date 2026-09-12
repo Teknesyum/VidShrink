@@ -5,9 +5,11 @@ using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
@@ -16,6 +18,37 @@ using VidShrink.Player;
 using Xunit;
 
 namespace VidShrink.Tests;
+
+/// <summary>
+/// 7b: bekleme süresini duvar saati olmadan süren sahte saat. Bu iş parçacığında gerçek
+/// zamanlayıcı zaten tik atmıyor (ileti döngüsü yok); ölçüm süreyi kendi ilerletiyor, yani
+/// hiçbir ölçüm <c>Thread.Sleep</c> beklemiyor.
+/// </summary>
+internal sealed class SeritSaati : IHoverClock
+{
+    private Action? _tik;
+
+    /// <summary>Sayaca sorulan süre. Belirtecin koda ulaştığını bu gösterir.</summary>
+    internal TimeSpan Sure { get; private set; }
+
+    /// <summary>Bekleyen bir tik var mı. Yoksa karar beklemeden verilmiştir.</summary>
+    internal bool Bekliyor => _tik is not null;
+
+    public void Start(TimeSpan delay, Action fire)
+    {
+        Sure = delay;
+        _tik = fire;
+    }
+
+    public void Stop() => _tik = null;
+
+    internal void Ilerlet()
+    {
+        var tik = _tik;
+        _tik = null;
+        tik?.Invoke();
+    }
+}
 
 internal static class GorunumKanit
 {
@@ -112,9 +145,190 @@ internal static class GorunumKanit
         => DenetimSurucu.Pump(view, () => task().IsCompleted, seconds);
 }
 
+/// <summary>
+/// 7b dalgasinin kaniti. Yerlesim olcumu <see cref="WindowLayoutTests"/> ile ayni yolu
+/// izler: pencere gosterilmez, kok gorsel cocuk istenen gorus alaninda olculup
+/// yerlestirilir. Sekme secildikten sonra agacin tamami gecersizlenir, yoksa ilk kez
+/// olculen sekme sifir sinirla temiz isaretlenip olcumden kacar.
+/// </summary>
+internal static class SeritKanit
+{
+    /// <summary>Olcumun gorus alani: <c>WindowPreferredWidth</c> x <c>WindowPreferredHeight</c>.</summary>
+    internal static readonly Size Pencere = new(1560, 1060);
+
+    internal static string Folder
+    {
+        get
+        {
+            var path = Path.Combine(GirdiKanit.Root, ".calisma", "dalga7b");
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
+
+    internal static void Write(string name, string body)
+        => File.WriteAllText(Path.Combine(Folder, name), body, new UTF8Encoding(false));
+
+    internal static string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+
+    internal static void LayOutAt(Window window, Size size)
+    {
+        window.Width = double.NaN;
+        window.Height = double.NaN;
+        window.Measure(size);
+        window.Arrange(new Rect(size));
+        window.UpdateLayout();
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.Measure(size);
+        root.Arrange(new Rect(size));
+
+        foreach (var node in window.GetVisualDescendants().OfType<Visual>()) node.RenderTransform = null;
+    }
+
+    internal static void RelayoutAt(Window window, Size size)
+    {
+        foreach (var node in window.GetVisualDescendants().OfType<Layoutable>()) node.InvalidateMeasure();
+
+        var root = (Layoutable)window.GetVisualChildren().Single();
+        root.InvalidateMeasure();
+        root.Measure(size);
+        root.Arrange(new Rect(size));
+
+        foreach (var node in window.GetVisualDescendants().OfType<Visual>()) node.RenderTransform = null;
+    }
+
+    /// <summary>Oynatici sekmesi secili pencerede istenen denetimin olculmus siniri.</summary>
+    internal static T OynaticidaOku<T>(Func<PlayerView, T> oku)
+        => AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            LayOutAt(window, Pencere);
+            window.FindControl<TabControl>("Tabs")!.SelectedIndex = window.PlayerTabIndex;
+            RelayoutAt(window, Pencere);
+            var sonuc = oku(window.PlayerTab);
+            window.Close();
+            return sonuc;
+        });
+}
+
 public sealed class OynaticiGorunumTests
 {
     private static string Ayar(string ad) => Path.Combine(GorunumKanit.Gecici(ad), "history.json");
+
+    /// <summary>
+    /// 7b/K3 — dort duz metin satiri kalkinca video dikeyde ne kadar buyuyor. Olcu
+    /// <c>Surface</c> panosunun piksel alani; pencere 1560x1060 gorus alaninda basssiz
+    /// yerlestiriliyor. Sayi kanit dosyasina yazilir, pim alttaki taban degerdir.
+    /// </summary>
+    /// <summary>
+    /// 7b/K1: alt şerit gösterirken beklemez, gizlerken belirtecinin söylediği 360 ms'yi
+    /// bekler. İki sayı da <c>Themes/Playback.axaml</c>'den geliyor; ölçüm sayıyı
+    /// kodlamıyor, sayacın ne kadar beklemek istediğini okuyor.
+    /// </summary>
+    [Fact]
+    public void SeritGostermedeBeklemezGizlemedeBekler()
+    {
+        var olcu = SeritKanit.OynaticidaOku(view =>
+        {
+            var bolge = view.SeritZone;
+            bolge.Reset(false);
+
+            var saat = new SeritSaati();
+            bolge.Clock = saat;
+
+            bolge.PointerWithin(true);
+            var acildi = view.SeritRevealed;
+            var gostermedeSayac = saat.Bekliyor;
+
+            bolge.PointerWithin(false);
+            var halaAcik = view.SeritRevealed;
+            var gizlemeSuresi = saat.Sure;
+
+            saat.Ilerlet();
+            return (acildi, gostermedeSayac, halaAcik, gizlemeSuresi, view.SeritRevealed);
+        });
+
+        var body = new StringBuilder();
+        body.AppendLine($"gosterme -> gorunur {olcu.Item1}, sayac kuruldu {olcu.Item2}");
+        body.AppendLine($"gosterme beklemesi: 0 ms");
+        body.AppendLine($"fare cikti -> hala gorunur {olcu.Item3}");
+        body.AppendLine($"gizleme beklemesi: {SeritKanit.N(olcu.Item4.TotalMilliseconds)} ms");
+        body.AppendLine($"bekleme dolunca -> gorunur {olcu.Item5}");
+        SeritKanit.Write("serit-zamanlama.txt", body.ToString());
+
+        Assert.True(olcu.Item1, "serit gosterme icin bekledi");
+        Assert.False(olcu.Item2, "gosterme sayac kurdu");
+        Assert.True(olcu.Item3, "serit beklemeden gizlendi");
+        Assert.Equal(TimeSpan.FromMilliseconds(360), olcu.Item4);
+        Assert.False(olcu.Item5, "serit bekleme dolunca gizlenmedi");
+    }
+
+    /// <summary>
+    /// 7b/K2: süre etiketi geçen ve kalan süreyi birlikte gösteriyor. Sayılar değişmez
+    /// biçimde yazıldığı için iki dilde de birebir aynı; pimlenen şey budur. Süre
+    /// bilinmiyorken etiket sıfır değil belirsiz gösteriyor.
+    /// </summary>
+    [Fact]
+    public void SureEtiketiGecenVeKalaniIkiDildeAyniGosterir()
+    {
+        var okumalar = AppHost.Run(() =>
+        {
+            var satirlar = new List<(string dil, string kisa, string uzun, string bilinmeyen)>();
+            foreach (var dil in new[] { "en", "tr" })
+            {
+                Strings.Use(dil);
+                satirlar.Add((
+                    dil,
+                    PlayerView.ClockPair(12, 90),
+                    PlayerView.ClockPair(12, 3732),
+                    PlayerView.ClockPair(0, 0)));
+            }
+
+            Strings.Use("en");
+            return satirlar;
+        });
+
+        var body = new StringBuilder();
+        body.AppendLine("bicim: gecen / -kalan");
+        foreach (var satir in okumalar)
+        {
+            body.AppendLine($"{satir.dil}: 12 sn / 90 sn  -> {satir.kisa}");
+            body.AppendLine($"{satir.dil}: 12 sn / 3732 sn -> {satir.uzun}");
+            body.AppendLine($"{satir.dil}: sure bilinmiyor -> {satir.bilinmeyen}");
+        }
+
+        SeritKanit.Write("sure-etiketi.txt", body.ToString());
+
+        Assert.Equal("00:12 / -01:18", okumalar[0].kisa);
+        Assert.Equal("00:00:12 / -01:02:00", okumalar[0].uzun);
+        Assert.Equal("--:-- / --:--", okumalar[0].bilinmeyen);
+        Assert.Equal(okumalar[0].kisa, okumalar[1].kisa);
+        Assert.Equal(okumalar[0].uzun, okumalar[1].uzun);
+        Assert.Equal(okumalar[0].bilinmeyen, okumalar[1].bilinmeyen);
+    }
+
+    [Fact]
+    public void OynaticiYuzeyininPikselAlaniOlculur()
+    {
+        var olcu = SeritKanit.OynaticidaOku(view =>
+        {
+            var surface = view.FindControl<Panel>("Surface")!;
+            var stage = view.FindControl<Border>("Stage")!;
+            return (surface.Bounds.Width, surface.Bounds.Height, stage.Bounds.Height, view.Bounds.Height);
+        });
+
+        var alan = olcu.Item1 * olcu.Item2;
+        var body = new StringBuilder();
+        body.AppendLine($"gorus alani: {SeritKanit.N(SeritKanit.Pencere.Width)}x{SeritKanit.N(SeritKanit.Pencere.Height)}");
+        body.AppendLine($"PlayerView yuksekligi: {SeritKanit.N(olcu.Item4)}");
+        body.AppendLine($"Stage yuksekligi: {SeritKanit.N(olcu.Item3)}");
+        body.AppendLine($"Surface: {SeritKanit.N(olcu.Item1)} x {SeritKanit.N(olcu.Item2)}");
+        body.AppendLine($"Surface piksel alani: {SeritKanit.N(alan)}");
+        SeritKanit.Write("yuzey-alani.txt", body.ToString());
+
+        Assert.True(olcu.Item1 > 0 && olcu.Item2 > 0, body.ToString());
+    }
 
     [Fact]
     public async Task EkranGoruntusuKaynakCozunurlugundeKaydedilirPencereBoyutuKontroluKirilir()

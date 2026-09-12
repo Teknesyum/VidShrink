@@ -67,7 +67,7 @@ internal partial class PlayerView
 
     private void InitTools()
     {
-        SeekBar.AddHandler(PointerMovedEvent, OnThumbnailHover, RoutingStrategies.Bubble);
+        SeekBar.AddHandler(PointerMovedEvent, OnThumbnailHover, RoutingStrategies.Bubble, handledEventsToo: true);
         SeekBar.AddHandler(PointerExitedEvent, OnThumbnailLeave, RoutingStrategies.Bubble);
     }
 
@@ -144,10 +144,15 @@ internal partial class PlayerView
     /// Kucuk resim: fare zaman cubugunda gezerken o anin karesi. Kareyi ikinci bir motor
     /// uretir — sessiz (<c>Audio=false</c>), kucuk render olculu ve anahtar kareye aranan.
     /// Ana motor duraklamaz, konumu degismez.
+    ///
+    /// <para>7b: onizleme artik <b>suruklerken de</b> fareyi takip ediyor. Surukleme yolu
+    /// olayi <c>Handled</c> isaretliyor, o yuzden bu isleyici <c>handledEventsToo</c> ile
+    /// asiliyor — yoksa ayni denetimdeki ikinci isleyici hic cagrilmaz. Istekler
+    /// <see cref="QueueThumbnail"/> icinde birlestiriliyor: motor mesgulken yalniz
+    /// <b>son</b> konum bekliyor, dolayisiyla hizli surukleme kuyruk biriktirmiyor.</para>
     /// </summary>
     private void OnThumbnailHover(object? sender, PointerEventArgs e)
     {
-        if (_seekDragging) return;
         var duration = _seek.Duration;
         if (_engine is null || !double.IsFinite(duration) || duration <= 0)
         {
@@ -301,8 +306,19 @@ internal partial class PlayerView
         var chipWidth = ThumbChip.Bounds.Width > 0 ? ThumbChip.Bounds.Width : ThumbnailWidth;
         var chipHeight = ThumbChip.Bounds.Height > 0 ? ThumbChip.Bounds.Height : ThumbnailHeight;
         var margin = Resource("PlaybackBadgeGap");
-        Canvas.SetLeft(ThumbChip, Math.Clamp(share * width - chipWidth / 2, 0, Math.Max(0, width - chipWidth)));
-        Canvas.SetTop(ThumbChip, Math.Max(0, Surface.Bounds.Height - chipHeight - margin));
+
+        // Zaman cubugu artik panonun alt kenarinda degil, seridin icinde duruyor: yonga
+        // cubugun kendi kenarlarina gore konumlanmali, panonun tamamina gore degil.
+        var anchor = SeekBar.Bounds.Width > 0
+            ? SeekBar.TranslatePoint(new Point(share * SeekBar.Bounds.Width, 0), Surface)
+            : null;
+        var centre = anchor?.X ?? share * width;
+        var top = anchor is { } point
+            ? point.Y - chipHeight - margin
+            : Surface.Bounds.Height - chipHeight - margin;
+
+        Canvas.SetLeft(ThumbChip, Math.Clamp(centre - chipWidth / 2, 0, Math.Max(0, width - chipWidth)));
+        Canvas.SetTop(ThumbChip, Math.Max(0, top));
     }
 
     /// <summary>

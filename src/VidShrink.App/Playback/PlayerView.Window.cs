@@ -362,8 +362,16 @@ internal partial class PlayerView
         return path is not null && File.Exists(path) ? path : null;
     }
 
+    /// <summary>
+    /// Basis denetim seridinden mi geliyor. Serit panonun ustunde duruyor ve panonun
+    /// kendi tiklamasi oynatmayi duraklatiyor; seritteki dugmeye basmak o yolu
+    /// tetiklemesin diye seridin butun icerigi ayriliyor. Zaman cubugu de seridin
+    /// icinde, yine de adiyla ayrica soruluyor: cubuk seritten cikarsa kural kalir.
+    /// </summary>
     private bool IsSeekBarSource(object? source)
-        => source is Visual visual && (ReferenceEquals(visual, SeekBar) || SeekBar.IsVisualAncestorOf(visual));
+        => source is Visual visual
+           && (ReferenceEquals(visual, SeekBar) || SeekBar.IsVisualAncestorOf(visual)
+               || ReferenceEquals(visual, StripBar) || StripBar.IsVisualAncestorOf(visual));
 
     private void OnSeekPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -386,6 +394,7 @@ internal partial class PlayerView
         if (!_seekDragging) return;
         _seekDragging = false;
         e.Pointer.Capture(null);
+        HideThumbnail();
         e.Handled = true;
     }
 
@@ -418,6 +427,7 @@ internal partial class PlayerView
 
         TxtView.Text = LanguageCatalog.Display(string.Join(" - ", parts));
         TxtView.IsVisible = parts.Count > 0;
+        RefreshSerit();
     }
 
     private void RefreshSeekBar()
@@ -444,7 +454,7 @@ internal partial class PlayerView
         SeekMarkLayer.Children.Clear();
         if (_marks.Count == 0 || width <= 0) return;
         var markWidth = Resource("PlaybackCursorWidth");
-        var markHeight = Resource("PlaybackTimelineHeight");
+        var markHeight = Resource("PlaybackSeekBarHeight");
         var chapterBrush = this.TryFindResource("TextBody", out var body) ? body as IBrush : null;
         var bookmarkBrush = this.TryFindResource("NeonPink", out var pink) ? pink as IBrush : null;
 
