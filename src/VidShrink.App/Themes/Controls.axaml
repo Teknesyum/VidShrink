@@ -394,18 +394,6 @@
         </Style>
       </ControlTheme>
 
-      <ControlTheme x:Key="TitleBarTabButton" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
-        <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
-        <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
-        <Style Selector="^.selected">
-          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
-        </Style>
-        <Style Selector="^:pointerover">
-          <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
-        </Style>
-      </ControlTheme>
-
       <ControlTheme x:Key="SupportButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
         <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
@@ -858,13 +846,28 @@
                 </Transitions>
               </Border.Transitions>
               <Panel>
-                <ContentPresenter Name="PART_ContentPresenter"
-                                  Content="{TemplateBinding Header}"
-                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                  Padding="{TemplateBinding Padding}"
-                                  Foreground="{TemplateBinding Foreground}"
-                                  HorizontalContentAlignment="Center"
-                                  VerticalContentAlignment="Center"/>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{StaticResource SpaceSm}"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                  <Path Name="TabIcon"
+                        Width="{StaticResource IconSizeSm}"
+                        Height="{StaticResource IconSizeSm}"
+                        Stretch="Uniform"
+                        VerticalAlignment="Center"
+                        Data="{TemplateBinding Tag}"
+                        Stroke="{TemplateBinding Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}"
+                        StrokeLineCap="Round"
+                        StrokeJoin="Round"/>
+                  <ContentPresenter Name="PART_ContentPresenter"
+                                    Content="{TemplateBinding Header}"
+                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"/>
+                </StackPanel>
                 <Border Name="FocusRing"
                         IsHitTestVisible="False"
                         BorderBrush="Transparent"

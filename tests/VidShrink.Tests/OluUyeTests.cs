@@ -458,8 +458,6 @@ public sealed class OluUyeTests
             "T177'ye kadar hicbir yerde gorunmuyordu. T177 yonga seridine niyeti tasidi: MainWindow.axaml.cs ChipPlans() icinde 8 MB yongasinin niyeti bu uye, yani uye artik uretimde uretiliyor. Tuketen kol hala yok — okuma tarafi niyeti adiyla ayirmiyor — o yuzden bicim hic-gorunmeyen'den varsayilan-kol'a dondu ve borc olarak duruyor."),
         new("AudioSourceRole.SystemAudio", "varsayilan-kol", Legitimate,
             "Iki degerli rolun olumsuz kolu. 8d ses girdisini motora baglayip secim yuzeyini acinca kardes uye tuketiciye kavustu: RecorderView.Ses.cs:62 'role == AudioSourceRole.Microphone ? CmbMicrophone : CmbSystemAudio' diye soruyor, sistem sesi o kosulun else'i. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; sistem sesini ayrica adlandirmak ayni kutuyu iki yere yazardi."),
-        new("LauncherUpdate.CommitWindow", "hic-gorunmeyen", Debt,
-            "public static readonly, hicbir yerde okunmuyor. Dusurulmesi UpdateCheck.cs'i degistirir, o dosya bu sozlesmenin owns listesinde yok."),
         new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Debt,
             "public static readonly, hicbir yerde okunmuyor. Ayni dosya, ayni sinir."),
         new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,

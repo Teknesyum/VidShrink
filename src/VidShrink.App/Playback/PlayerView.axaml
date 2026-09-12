@@ -140,14 +140,22 @@
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"/>
 
-              <Button Grid.Column="4" x:Name="BtnSeritVolumeDown" Theme="{StaticResource PlaybackBarButton}" Content="🔉"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
+              <Button Grid.Column="4" x:Name="BtnSeritVolumeDown" Theme="{StaticResource PlaybackBarButton}"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}">
+                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                      Data="{StaticResource IconVolumeMute}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+              </Button>
               <TextBlock Grid.Column="5"
                          x:Name="TxtSeritVolume"
                          Theme="{StaticResource PlaybackTimeText}"
                          VerticalAlignment="Center"/>
-              <Button Grid.Column="6" x:Name="BtnSeritVolumeUp" Theme="{StaticResource PlaybackBarButton}" Content="🔊"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
+              <Button Grid.Column="6" x:Name="BtnSeritVolumeUp" Theme="{StaticResource PlaybackBarButton}"
+                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}">
+                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                      Data="{StaticResource IconVolume}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+              </Button>
 
               <Button Grid.Column="7" x:Name="BtnSeritSlower" Theme="{StaticResource PlaybackBarButton}" Content="«"
                       auto:AutomationProperties.Name="{loc:Text main.player.menu.slower}"/>

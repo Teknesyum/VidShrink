@@ -19,6 +19,21 @@ internal static class DefaultApp
     /// <summary>Windows'un varsayılan uygulamalar sayfasının adresi.</summary>
     internal const string SettingsPage = "ms-settings:defaultapps";
 
+    /// <summary>
+    /// Kurucunun <c>HKCU\Software\RegisteredApplications</c> altına yazdığı ad
+    /// (<c>Install-VidShrink.ps1</c>, <c>$fileAssociationName</c>). Windows'un derin
+    /// bağlantısı bu adla VidShrink'in kendi sayfasını açar.
+    /// </summary>
+    internal const string RegisteredName = "VidShrink";
+
+    /// <summary>
+    /// Kullanıcı başına kurulmuş uygulamanın sayfasını açan sorgu anahtarı. Windows 11
+    /// 21H2 (2023-04 toplu güncellemesi) ve sonrasında tanınır; tanımayan sürüm sorguyu
+    /// yok sayıp genel sayfayı açar, yani eski Windows'ta davranış bugünküyle aynı kalır.
+    /// Belge: https://learn.microsoft.com/en-us/windows/apps/develop/launch/launch-default-apps-settings
+    /// </summary>
+    private const string UserScopedQuery = "registeredAppUser";
+
     private const int Executable = 2;
 
     /// <summary>
@@ -51,12 +66,20 @@ internal static class DefaultApp
         return true;
     }
 
+    /// <summary>
+    /// Varsayılan uygulamalar sayfasının VidShrink'in kendi girdisine inen adresi.
+    /// Windows o sayfada yalnız bizim kaydettiğimiz uzantıları listeler ve hepsi video
+    /// biçimidir; kullanıcı listeyi kendi süzmek zorunda kalmaz.
+    /// </summary>
+    internal static string SettingsPageForThisApp() =>
+        $"{SettingsPage}?{UserScopedQuery}={Uri.EscapeDataString(RegisteredName)}";
+
     /// <summary>Ayar sayfasını açar. Açılamazsa yanlış döner, hata fırlatmaz.</summary>
     internal static bool OpenSettings()
     {
         try
         {
-            Process.Start(new ProcessStartInfo(SettingsPage) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(SettingsPageForThisApp()) { UseShellExecute = true });
             return true;
         }
         catch (Exception exception) when (exception is System.ComponentModel.Win32Exception or InvalidOperationException)

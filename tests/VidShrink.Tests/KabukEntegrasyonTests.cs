@@ -27,6 +27,41 @@ public sealed class KabukEntegrasyonTests
             Assert.StartsWith(@"Software\Classes", entry.Key, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Öneri şeridinin düğmesi Windows'un genel listesini değil VidShrink'in kendi
+    /// sayfasını açıyor mu. O sayfada yalnız kurucunun kaydettiği uzantılar listelenir ve
+    /// hepsi video biçimidir; sorgu anahtarının adı kurucudaki adla aynı olmazsa Windows
+    /// sayfayı bulamaz ve süzme kaybolur.
+    /// </summary>
+    [Fact]
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    public void VarsayilanUygulamaAdresiKendiSayfamizaIniyor()
+    {
+        var address = DefaultApp.SettingsPageForThisApp();
+
+        Assert.StartsWith(DefaultApp.SettingsPage + "?", address, StringComparison.Ordinal);
+        Assert.Contains("registeredAppUser=" + DefaultApp.RegisteredName, address, StringComparison.Ordinal);
+
+        var installer = File.ReadAllText(Path.Combine(TipSources.Root, "Install-VidShrink.ps1"));
+        Assert.Contains($"$fileAssociationName = '{DefaultApp.RegisteredName}'", installer, StringComparison.Ordinal);
+        Assert.Contains(@"Set-RegistryString ""$software\RegisteredApplications"" $fileAssociationName $capabilities",
+            installer, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Kurucunun o sayfaya yazdığı uzantıların hepsi video biçimi mi. Listeye ses ya da
+    /// resim uzantısı girerse Windows'un sayfası artık "video biçimleri" olmaz.
+    /// </summary>
+    [Fact]
+    public void KendiSayfamizdaYalnizVideoUzantilariListeleniyor()
+    {
+        var extensions = ShellIntegration.MediaExtensions;
+
+        Assert.NotEmpty(extensions);
+        Assert.All(extensions, extension =>
+            Assert.DoesNotContain(extension, new[] { "mp3", "wav", "flac", "aac", "ogg", "m4a", "jpg", "png" }));
+    }
+
     [Fact]
     public void ProgIdKomutuSecilenDosyayiUygulamayaVeriyor()
     {

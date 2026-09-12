@@ -540,20 +540,20 @@ public sealed class LanguageTests : IDisposable
     }
 
     /// <summary>
-    /// Üst şeritteki tekerlek. Kısayol iki dili taşıyor, geri kalanı ayarlarda; tekerleğin
-    /// tek işi kullanıcıyı oraya götürmek. Ölçü düğmeye basıp hangi sekmenin açıldığına
-    /// bakıyor — sekme numarasını sabit yazmıyor, sekmeyi kendi başlığından buluyor.
+    /// Başlık çubuğundaki tekerlek düğmesi kalktı: Ayarlar artık şeridin kendi sekmesi.
+    /// Kısayol iki dili taşıyor, geri kalanı ayarlarda. Ölçü giriş noktasını çağırıp hangi
+    /// sekmenin açıldığına bakıyor — sekme numarasını sabit yazmıyor, sekmeyi kendi
+    /// adından buluyor.
     /// </summary>
     [Fact]
-    public void DilTekerlegiAyarlarSekmesindekiDilSecicisineGoturur()
+    public void DilGirisiAyarlarSekmesindekiDilSecicisineGoturur()
     {
         var (chosenTab, settingsTab, shortcuts, listed) = AppHost.Run(() =>
         {
             var window = new MainWindow();
             Relayout(window, new Size(1400, 1000));
 
-            window.BtnLanguageSettings.RaiseEvent(
-                new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            window.OpenLanguageSettings();
 
             var settings = window.Tabs.Items
                 .OfType<TabItem>()

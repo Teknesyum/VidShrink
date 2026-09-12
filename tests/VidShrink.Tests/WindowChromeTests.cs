@@ -39,6 +39,13 @@ public sealed class WindowChromeTests
         Assert.Equal(WindowState.Minimized, state);
     }
 
+    private static Avalonia.Media.Geometry? Glyph(MainWindow window)
+    {
+        var path = window.FindControl<Avalonia.Controls.Shapes.Path>("MaximizeGlyph");
+        Assert.True(path is not null, "MaximizeGlyph biçimlemede yok.");
+        return path!.Data;
+    }
+
     [Fact]
     public void Maximize_button_toggles_between_maximized_and_normal()
     {
@@ -49,17 +56,19 @@ public sealed class WindowChromeTests
 
             window.WindowState = WindowState.Normal;
             Click(button);
-            var up = (window.WindowState, Control(window, "BtnMaximize").Content as string);
+            var up = (window.WindowState, Glyph(window));
 
             Click(button);
-            var down = (window.WindowState, Control(window, "BtnMaximize").Content as string);
+            var down = (window.WindowState, Glyph(window));
 
             return (up.WindowState, up.Item2, down.WindowState, down.Item2);
         });
 
         Assert.Equal(WindowState.Maximized, first);
         Assert.Equal(WindowState.Normal, second);
-        Assert.NotEqual(firstGlyph, secondGlyph);
+        Assert.NotNull(firstGlyph);
+        Assert.NotNull(secondGlyph);
+        Assert.NotSame(firstGlyph, secondGlyph);
     }
 
     [Fact]

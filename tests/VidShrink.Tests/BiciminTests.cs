@@ -536,7 +536,9 @@ public sealed class BaslikKapsamiTests
     /// 8. dalga 8b kolu kaydedici sekmesini ekledi: 43 recorder anahtari ve sekme basligi
     /// main.tab.recorder, 43 x 685 = 29455. 8d kolu ses girdisini motora baglayinca arayuze
     /// secim yuzeyi girdi: recorder.audio.* alti anahtar ve recorder.error.audio,
-    /// 43 x 692 = 29756.</para>
+    /// 43 x 692 = 29756. 0.4.4 yeni surum uyarisina Yukle dugmesini ekledi (main.action.install,
+    /// 43 x 693 = 29799); ayni turda Ayarlar seride kendi sekmesi olunca baslik cubugundaki
+    /// tekerlek dustu ve main.language.settings sahipsiz kaldi, silindi: 43 x 692 = 29756.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()

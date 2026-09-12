@@ -172,7 +172,6 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
-        Watch(Tabs, SelectingItemsControl.SelectedIndexProperty, MarkSettingsButton);
         LoadTitleBarLogo();
 
         if (OperatingSystem.IsMacOS())
@@ -302,6 +301,9 @@ public partial class MainWindow : Window
 
     private ControlTheme? Look(string key)
         => this.TryFindResource(key, out var value) ? value as ControlTheme : null;
+
+    private Geometry? Draw(string key)
+        => this.TryFindResource(key, out var value) ? value as Geometry : null;
 
     private void ApplyStartupSize()
     {
@@ -569,7 +571,8 @@ public partial class MainWindow : Window
     private void OnMaximizeRestore(object? sender, RoutedEventArgs e) => ToggleMaximizeRestore();
     private void OnClose(object? sender, RoutedEventArgs e) => Close();
     private void ToggleMaximizeRestore() => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-    private void UpdateMaximizeGlyph() => BtnMaximize.Content = WindowState == WindowState.Maximized ? "❐" : "□";
+    private void UpdateMaximizeGlyph()
+        => MaximizeGlyph.Data = Draw(WindowState == WindowState.Maximized ? "IconRestore" : "IconMaximize");
 
     private void OnOpenGitHub(object? sender, RoutedEventArgs e) => OpenExternal(this.TryFindResource("LinkGitHub", out var url) ? url as string : null);
     private void OnOpenSponsor(object? sender, RoutedEventArgs e) => OpenExternal(this.TryFindResource("LinkSponsor", out var url) ? url as string : null);
@@ -714,21 +717,15 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Tekerlek düğmesi. Dil ayarı ayarlar sekmesinde durur; üst şeritteki kısayol yalnız
-    /// iki dile kestirme, geri kalanı buradan seçiliyor.
+    /// Ayarlar sekmesini seçip dil seçicisine iner. Oynatıcının sağ klik menüsündeki
+    /// "Ayarlar" satırı da buraya bağlanır; sekme şeritte durduğu için ayrı bir düğme yok.
     /// </summary>
-    private void OnOpenLanguageSettings(object? sender, RoutedEventArgs e)
+    internal void OpenLanguageSettings()
     {
         Tabs.SelectedIndex = SettingsTabIndex;
         CmbLanguage.BringIntoView();
         CmbLanguage.Focus();
     }
-
-    private void OnOpenSettings(object? sender, RoutedEventArgs e)
-        => Tabs.SelectedIndex = SettingsTabIndex;
-
-    private void MarkSettingsButton()
-        => BtnSettings.Classes.Set("selected", ReferenceEquals(Tabs.SelectedItem, TabSettings));
 
     private void OnLanguageChosen()
     {
