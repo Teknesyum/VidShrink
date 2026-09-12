@@ -27,3 +27,4 @@ Birim: 0,5 gun/tur (P50), 0,7 (P90); tur tahmini ×1,5 (P50), ×3 (P90).
 | 8a. dalga: yakalama motoru (baslat, nazik durdur, ilerleme) | tahmin yazilmadi (uc kol ayni turda dagitildi) | 1 itme (0 CI kirmizisi) / 0 / kayitli degil / 5 dosya +1134 / kayitli degil | - |
 | 8c. dalga: ses girisi ve cihaz listesi | tahmin yazilmadi | 3 kosum (1 CI kirmizisi: OluUyeTests pimi, 1 iptal: escisi itilirken) / 0 / ajan ~72 dk / 4 dosya +947 / ajan 143k | - |
 | 8b. dalga: Kaydedici sekmesi, serit ve 42 dil | tahmin yazilmadi | 1 itme (0 CI kirmizisi; itmeden once 3 yerel kirmizi T0 tarafindan duzeltildi) / 0 / ajan ~23 dk + 4 ceviri ajani ~4 dk / 98 dosya +3055 -11 / yapici 176k, ceviri ajanlari 414k | - |
+| 8d. kol: ses girdisini motora baglamak | tahmin yazilmadi | 1 itme (0 CI kirmizisi; itmeden once 3 yerel pin kirmizisi olculup yazildi: OluUye 34->33, gezilen 29756, kol toplam 1091) / 0 / T0 yazdi + 4 ceviri ajani ~2 dk / 55 dosya +856 -65 / ceviri ajanlari 347k | - |
