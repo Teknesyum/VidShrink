@@ -182,13 +182,7 @@
           </Border>
         </StackPanel>
         </TabControl.Tag>
-        <TabItem x:Name="TabPlayer" Theme="{StaticResource NeonTabItem}">
-          <TabItem.Header>
-            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
-              <TextBlock Text="▷"/>
-              <TextBlock Text="{loc:Text main.tab.player}"/>
-            </StackPanel>
-          </TabItem.Header>
+        <TabItem x:Name="TabPlayer" Header="{loc:Text main.tab.player}" Theme="{StaticResource NeonTabItem}">
           <playback:PlayerView x:Name="Player"/>
         </TabItem>
 

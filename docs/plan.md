@@ -620,3 +620,81 @@ Sahip dosyalar: `Program.cs`, `MainWindow.axaml.cs` (acilis yolu), `ShellIntegra
   yapilan is.
 - Kabul: olcum dosyasi medyan/p95 verir, iyilestirme oncesi ve sonrasi ayni makinede
   karsilastirilir; acilis sekmesi kabuk yolunda Oynatici kalir.
+
+## 8. dalga: ekran kaydedici (12 Eylul 2026)
+
+Kullanicinin istegi: oynatici isi bitince ekran kaydedici moduluna gecmek.
+
+Envanter (ajan raporu, `docs/envanter/ekran-kaydedici.md`): depoda yakalama kodu **sifir**
+— `gdigrab`, `x11grab`, `avfoundation`, `dshow`, `pipewire` icin `src/` altinda hic eslesme
+yok; `Locales/en/performance.json:25` "VidShrink does not capture video" diye aciktan sinir
+ciziyor, `QualityTargetTests.cs:51` `LongScreenCapture()` yalnizca bir girdi profili.
+Mikrofon/sistem sesi yakalama da yok: `FfmpegArguments.cs:387` tek girdi kuruyor, NAudio
+yalnizca `.sln` disindaki `tools/VidShrink.PlayerProbe`'ta ve
+`OynaticiKarsilastirmaTests.cs:448,493` canli NAudio basvurusunu kirmiziya cevirmek uzere
+pimli.
+
+Iki tasiyici bosluk, plani bunlar sekillendiriyor:
+
+1. **Nazik durdurma yolu yok.** Her ffmpeg cagrisi "baslat, bitmesini bekle" kalibinda;
+   iptal `TryKill` (`FfmpegRunner.cs:78-81`), yani surec oldurulur. Argumanlarin nerdeyse
+   tumu `-nostdin` (`ClipExport.cs:58,67`, `SegmentEncoder.cs:175`, `FrameGrabber.cs:259`,
+   `ComplexityProbe.cs:878`). Oldurulen bir kayit yarim mux birakir. Tutunacak tek yer
+   `FfmpegRunner.cs:97` `RedirectStandardInput = true` — acik ama kullanilmiyor.
+2. **Suresi bilinmeyen iste ilerleme okunamiyor.** `EncodeRunner.RunCommandAsync` kesri
+   `durationSeconds`'a boluyor (`EncodeRunner.cs:391`); canli kayitta sure yok, yeni bir
+   ilerleme kipi gerekiyor.
+
+Uc kol, dosya sahipligi ayrik:
+
+### 8a. Yakalama motoru: baslat, nazik durdur, canli ilerleme
+
+Sahip dosyalar: yeni `src/VidShrink.Core/RecorderArguments.cs`, yeni
+`src/VidShrink.Ffmpeg/RecorderSession.cs`, `src/VidShrink.Ffmpeg/FfmpegRunner.cs` (stdin kolu).
+
+- Argumanlar `Core`da uretilir, `Ffmpeg` yalnizca kosturur — deponun kurulu ayrimi
+  (`AGENTS.md`) bozulmaz. Platform basina girdi: Windows `gdigrab`, macOS `avfoundation`,
+  Linux `x11grab`/`pipewire`; ekran, pencere ve bolge secimi ayni arguman ureticisinden.
+- `RecorderSession`: `StartAsync` / `PauseAsync` / `StopAsync`. Durdurma **stdin'e `q`**
+  yazar (`-nostdin` bu kolda verilmez), surec kendi mux'unu kapatir; `TryKill` yalnizca
+  zaman asiminda ve o zaman dosya "yarim" isaretlenir.
+- Ilerleme: `-progress pipe:1 -nostats` okunur ama kesir uretilmez; gecen sure,
+  yazilan boyut ve dusen kare sayisi raporlanir (`EncodeProgress` yerine yeni
+  `RecordProgress`).
+- Kabul: 5 sn'lik gercek kayit alinir, `ffprobe` ile suresi ve akislari okunur; `q` ile
+  durdurulan dosya oynatilabilir, `TryKill` ile durdurulan negatif kontrolde bozuk cikar.
+
+### 8b. Arayuz: Kaydedici sekmesi ve serit
+
+Sahip dosyalar: `src/VidShrink.App/MainWindow.axaml` (yeni `TabItem`),
+`MainWindow.axaml.cs` (indeks alani), yeni `src/VidShrink.App/Recorder/RecorderView.axaml(.cs)`,
+yeni `Themes/Recorder.axaml`, `Locales/*/recorder.json`.
+
+- Duzen `Playback/` desenini birebir izler: gorunum + konuya bolunmus kismi siniflar,
+  ayar kaliciligi `PlayerSettings.cs` ornegi, girdi `Keymap.cs` ornegi.
+- `Themes/Recorder.axaml` **yeni sayi uretmez**: her belirtec `Theme.axaml`'daki bir
+  belirtecten turetilir ve turetme dosya basindaki yorumda yazilir (`Themes/Playback.axaml:5-20`
+  kalibi). Yukleme `App.axaml`'a, Theme.axaml'dan **sonra**.
+- Sekme sirasi: Oynatici 0'da kalir (`WindowLayoutTests.cs:184,191` pimli), Kaydedici
+  Gelismis'ten once eklenir; acilis sekmesi Kucultme kalir (`WindowLayoutTests.cs:202`).
+- Dil: yeni `recorder` alani `LanguageTests.cs:30` ve `LocalizationTests.cs:171`
+  listelerine eklenmezse `Locales.Read` alani hic gormez — iki liste de guncellenir.
+  Anahtar bicimi `recorder.<grup>.<ad>` (`LocalizationTests.cs:119` regex).
+- Kabul: sekme 42 dilde basliksiz kalmaz, `Recorder.axaml` belirtecleri Theme.axaml'dan
+  turetilmis olarak okunur, serit dugmeleri motora ulasir.
+
+### 8c. Ses girisi ve cihaz listesi
+
+Sahip dosyalar: yeni `src/VidShrink.Ffmpeg/CaptureDevices.cs`,
+`src/VidShrink.Core/RecorderArguments.cs` (ikinci girdi kolu).
+
+- Cihaz listesi ffmpeg'in kendisinden: Windows `-list_devices true -f dshow -i dummy`,
+  macOS `-f avfoundation -list_devices true -i ""`, Linux `pactl`/`pipewire`. Ayristirma
+  `EncoderCapabilities.cs` kalibinda, sonuc onbelleklenir.
+- Mikrofon ve sistem sesi ayri girdi; ikisi birlikte secilince `amix`. NAudio
+  kullanilmaz — `OynaticiKarsilastirmaTests.cs:543` `Assert.Empty(naudio)` pimi duser.
+- Kabul: listelenen her cihaz icin arguman uretilir, bilinmeyen cihaz adi sessizce
+  yutulmaz (negatif kontrol), sesli kayitta `ffprobe` iki akis gorur.
+
+**Acilis tahmini:** yazilacak (kol sahipleri atanirken). Gercegi kapanista
+`docs/olcumler/tahmin-isabet.md`ye girer.
