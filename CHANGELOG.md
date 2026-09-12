@@ -5,6 +5,61 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.4.0] - 2026-09-12
+
+The player stopped being a tab and became the window. 0.3.0 could play the source; this
+release hands it the screen, puts every control where the hand already is, and measures
+the cost of the first frame instead of guessing at it.
+
+### Added
+
+- **A real playback engine.** The player runs on libmpv instead of an ffmpeg pipe, with
+  software rendering as the guaranteed floor. Seeks land on the frame asked for, the
+  engine survives a late seek event, and the handle is locked against a dispose race.
+- **The mouse does what a player's mouse does.** Left click pauses and resumes. Holding
+  left and dragging moves the window when it is windowed and pans the picture when it is
+  maximised or full screen, and a picture dragged near the centre snaps to it. Right click
+  opens the menu at the pointer, with Settings as its first row.
+- **A bottom control strip.** Play, ten seconds back, ten seconds forward, volume and
+  speed sit in reach along the bottom edge, with elapsed and remaining time beside them.
+  The strip appears instantly on hover and fades after a beat.
+- **A seekable timeline with a live preview.** Clicking the bar jumps there; dragging it
+  shows a preview thumbnail that follows the pointer.
+- **Subtitle and audio track selection**, per-track delay, encoding override, and
+  embedded-subtitle handling for files that carry more than one of each.
+- **A comparison panel.** Source and result play side by side from two engine instances,
+  frame-paired before either half is published.
+- **Advanced picture and sound controls** — every setting written to the engine and read
+  back from it, resettable in one move.
+- **Player tools** — thumbnail strip, clip and GIF export, a mini mode, and opening a
+  video straight from a URL.
+- **Shell integration.** Double-clicking a video opens it in the running instance through
+  a single queue, so a multi-file selection arrives as several jobs.
+- **Forty-two interface languages**, with right-to-left layout for Arabic, Persian, Hebrew
+  and Urdu.
+- **Twenty-six theme palettes**, six of them light, applied while the program is running
+  rather than at the next start.
+
+### Changed
+
+- **Avalonia 12.** The whole interface moved to 12.1.2.
+- **Double-click to first frame is measurably faster**: a paired measurement over twenty
+  runs puts it 241 ms ahead warm and 177 ms ahead cold, with not one repeat favouring the
+  old build. Temp-folder cleanup left the startup thread, libmpv now loads while the
+  window is being built, and the default-app suggestion and update check moved behind the
+  first frame. The measurement rig and the numbers are in `docs/olcumler/acilis-hizi.md`.
+- **The player fills the window.** The tab's own margins and padding are gone and the
+  controls became layers over the picture, which grew the video surface by 23,9 percent.
+- **The title bar** carries the tabs and the language picker; the job window dropped the
+  system chrome.
+
+### Fixed
+
+- Choosing a theme now repaints the running window instead of waiting for a restart.
+- The brand name on the support button is a fixed string again, not a translated entry.
+- Interface-guideline violations in the main window, the shared control themes and the
+  player panels — focus rings, unnamed interactive elements and motionless components.
+
 ## [0.3.0] - 2026-09-06
 
 The engine stopped guessing. Where 0.2.x picked constants that looked reasonable, this
