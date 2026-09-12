@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Masa aktif",
   "settings.share.deletion": "Penghapusan",
   "settings.share.delete": "Hapus berkas yang dibagikan",
+  "settings.share.delete.disabled-tip": "Belum ada berkas yang dibagikan untuk dihapus",
   "settings.share.day-one": "1 hari",
   "settings.share.days": "{0} hari",
   "settings.share.hour-one-fixed": "1 jam, tetap",

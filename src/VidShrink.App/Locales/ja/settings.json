@@ -11,6 +11,7 @@
   "settings.share.lifetime": "保持期間",
   "settings.share.deletion": "削除",
   "settings.share.delete": "共有ファイルを削除",
+  "settings.share.delete.disabled-tip": "削除できる共有ファイルはまだありません",
   "settings.share.day-one": "1日",
   "settings.share.days": "{0}日",
   "settings.share.hour-one-fixed": "1時間(固定)",

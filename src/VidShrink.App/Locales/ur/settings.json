@@ -11,6 +11,7 @@
   "settings.share.lifetime": "مدت",
   "settings.share.deletion": "حذف",
   "settings.share.delete": "شیئر شدہ فائل حذف کریں",
+  "settings.share.delete.disabled-tip": "حذف کرنے کے لیے ابھی تک کوئی مشترکہ فائل نہیں",
   "settings.share.day-one": "1 دن",
   "settings.share.days": "{0} دن",
   "settings.share.hour-one-fixed": "1 گھنٹہ، مقرر",

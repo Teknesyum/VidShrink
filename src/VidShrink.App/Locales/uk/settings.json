@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Термін",
   "settings.share.deletion": "Видалення",
   "settings.share.delete": "Видалити поширений файл",
+  "settings.share.delete.disabled-tip": "Поки немає спільного файлу для видалення",
   "settings.share.day-one": "1 день",
   "settings.share.days": "{0} дн.",
   "settings.share.hour-one-fixed": "1 година, фіксовано",

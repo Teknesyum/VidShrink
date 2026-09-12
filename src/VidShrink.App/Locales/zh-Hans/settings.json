@@ -11,6 +11,7 @@
   "settings.share.lifetime": "有效期",
   "settings.share.deletion": "删除",
   "settings.share.delete": "删除已分享的文件",
+  "settings.share.delete.disabled-tip": "目前没有可删除的共享文件",
   "settings.share.day-one": "1 天",
   "settings.share.days": "{0} 天",
   "settings.share.hour-one-fixed": "1 小时，固定",

@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Lifetime",
   "settings.share.deletion": "Deletion",
   "settings.share.delete": "Delete the shared file",
+  "settings.share.delete.disabled-tip": "No shared file to delete yet",
   "settings.share.day-one": "1 day",
   "settings.share.days": "{0} days",
   "settings.share.hour-one-fixed": "1 hour, fixed",

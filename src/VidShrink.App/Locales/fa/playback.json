@@ -49,5 +49,9 @@
   "player.info.audio": "صدا: {0}، {1} کانال، {2} Hz",
   "player.info.noaudio": "صدا: هیچ",
   "player.info.none": "رسانه‌ای باز نیست",
-  "player.info.unknown": "ناشناخته"
+  "player.info.unknown": "ناشناخته",
+  "playback.panel.maximize": "بزرگ‌نمایی پنل",
+  "playback.panel.fullscreen": "تمام‌صفحه",
+  "playback.zoom.out": "کوچک‌نمایی",
+  "playback.zoom.in": "بزرگ‌نمایی"
 }

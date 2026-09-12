@@ -49,5 +49,9 @@
   "player.info.audio": "Audio: {0}, {1} saluran, {2} Hz",
   "player.info.noaudio": "Audio: tiada",
   "player.info.none": "Tiada media dibuka",
-  "player.info.unknown": "tidak dikenali"
+  "player.info.unknown": "tidak dikenali",
+  "playback.panel.maximize": "Besarkan panel",
+  "playback.panel.fullscreen": "Skrin penuh",
+  "playback.zoom.out": "Zum keluar",
+  "playback.zoom.in": "Zum masuk"
 }

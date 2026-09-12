@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Derīgums",
   "settings.share.deletion": "Dzēšana",
   "settings.share.delete": "Dzēst koplietoto failu",
+  "settings.share.delete.disabled-tip": "Pagaidām nav kopīga faila, ko dzēst",
   "settings.share.day-one": "1 diena",
   "settings.share.days": "{0} dienas",
   "settings.share.hour-one-fixed": "1 stunda, fiksēta",

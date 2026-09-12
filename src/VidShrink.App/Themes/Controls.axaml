@@ -745,6 +745,8 @@
                   </Path.Transitions>
                 </Path>
                 <Border Name="FocusRing"
+                        Width="24" Height="24"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                         IsHitTestVisible="False"
                         BorderBrush="Transparent"
                         BorderThickness="{StaticResource FocusRingThickness}"
@@ -1173,10 +1175,10 @@
                        Orientation="{TemplateBinding Orientation}"
                        IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
                   <Track.DecreaseButton>
-                    <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource SliderFilledTrack}"/>
+                    <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource SliderFilledTrack}" Focusable="False"/>
                   </Track.DecreaseButton>
                   <Track.IncreaseButton>
-                    <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource SliderEmptyTrack}"/>
+                    <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource SliderEmptyTrack}" Focusable="False"/>
                   </Track.IncreaseButton>
                   <Track.Thumb>
                     <Thumb Name="ThumbVisual"
@@ -1276,10 +1278,10 @@
                        Orientation="Vertical"
                        IsDirectionReversed="True">
                   <Track.DecreaseButton>
-                    <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource ScrollBarPageButton}"/>
+                    <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource ScrollBarPageButton}" Focusable="False"/>
                   </Track.DecreaseButton>
                   <Track.IncreaseButton>
-                    <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource ScrollBarPageButton}"/>
+                    <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource ScrollBarPageButton}" Focusable="False"/>
                   </Track.IncreaseButton>
                   <Track.Thumb>
                     <Thumb Theme="{StaticResource ScrollBarThumb}"/>
@@ -1301,10 +1303,10 @@
                        ViewportSize="{TemplateBinding ViewportSize}"
                        Orientation="Horizontal">
                   <Track.DecreaseButton>
-                    <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource ScrollBarPageButton}"/>
+                    <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource ScrollBarPageButton}" Focusable="False"/>
                   </Track.DecreaseButton>
                   <Track.IncreaseButton>
-                    <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource ScrollBarPageButton}"/>
+                    <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource ScrollBarPageButton}" Focusable="False"/>
                   </Track.IncreaseButton>
                   <Track.Thumb>
                     <Thumb Theme="{StaticResource ScrollBarThumb}"/>

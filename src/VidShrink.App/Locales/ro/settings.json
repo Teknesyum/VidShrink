@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Durată",
   "settings.share.deletion": "Ștergere",
   "settings.share.delete": "Șterge fișierul partajat",
+  "settings.share.delete.disabled-tip": "Încă nu există un fișier partajat de șters",
   "settings.share.day-one": "1 zi",
   "settings.share.days": "{0} zile",
   "settings.share.hour-one-fixed": "1 oră, fixă",

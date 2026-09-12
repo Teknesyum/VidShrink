@@ -49,5 +49,9 @@
   "player.info.audio": "Zvuk: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Zvuk: nema",
   "player.info.none": "Nema otvorenog medija",
-  "player.info.unknown": "nepoznato"
+  "player.info.unknown": "nepoznato",
+  "playback.panel.maximize": "Povećaj ploču",
+  "playback.panel.fullscreen": "Puni zaslon",
+  "playback.zoom.out": "Umanji prikaz",
+  "playback.zoom.in": "Uvećaj prikaz"
 }

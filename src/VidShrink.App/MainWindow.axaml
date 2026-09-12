@@ -779,8 +779,20 @@
 
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
-                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart"/>
+                  <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
+                    <Button.Styles>
+                      <Style Selector="Button:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.cancel.disabled-tip}"/>
+                      </Style>
+                    </Button.Styles>
+                  </Button>
+                  <Button x:Name="BtnStart" Content="{loc:Text main.action.shrink}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnStart">
+                    <Button.Styles>
+                      <Style Selector="Button:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.shrink.disabled-tip}"/>
+                      </Style>
+                    </Button.Styles>
+                  </Button>
                 </StackPanel>
 
               </StackPanel>
@@ -1015,8 +1027,20 @@
                   </StackPanel>
                 </Border>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
-                  <Button x:Name="BtnConvertCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel"/>
-                  <Button x:Name="BtnConvert" Content="{loc:Text main.action.convert}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnConvert"/>
+                  <Button x:Name="BtnConvertCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
+                    <Button.Styles>
+                      <Style Selector="Button:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.cancel.disabled-tip}"/>
+                      </Style>
+                    </Button.Styles>
+                  </Button>
+                  <Button x:Name="BtnConvert" Content="{loc:Text main.action.convert}" Theme="{StaticResource PrimaryButton}" IsEnabled="False" Click="OnConvert">
+                    <Button.Styles>
+                      <Style Selector="Button:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.convert.disabled-tip}"/>
+                      </Style>
+                    </Button.Styles>
+                  </Button>
                 </StackPanel>
               </StackPanel>
             </Grid>
@@ -1112,7 +1136,13 @@
                               Theme="{StaticResource GhostButton}"
                               HorizontalAlignment="Left"
                               IsEnabled="False"
-                              Click="OnShareDelete"/>
+                              Click="OnShareDelete">
+                        <Button.Styles>
+                          <Style Selector="Button:disabled">
+                            <Setter Property="ToolTip.Tip" Value="{loc:Text settings.share.delete.disabled-tip}"/>
+                          </Style>
+                        </Button.Styles>
+                      </Button>
                       <TextBlock x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>
                   </Grid>

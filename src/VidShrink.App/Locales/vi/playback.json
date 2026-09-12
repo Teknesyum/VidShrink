@@ -49,5 +49,9 @@
   "player.info.audio": "Âm thanh: {0}, {1} kênh, {2} Hz",
   "player.info.noaudio": "Âm thanh: không có",
   "player.info.none": "Không có phương tiện nào đang mở",
-  "player.info.unknown": "không xác định"
+  "player.info.unknown": "không xác định",
+  "playback.panel.maximize": "Phóng to bảng điều khiển",
+  "playback.panel.fullscreen": "Toàn màn hình",
+  "playback.zoom.out": "Thu nhỏ",
+  "playback.zoom.in": "Phóng to"
 }

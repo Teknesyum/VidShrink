@@ -49,5 +49,9 @@
   "player.info.audio": "Heli: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Heli: puudub",
   "player.info.none": "Meediat ei ole avatud",
-  "player.info.unknown": "teadmata"
+  "player.info.unknown": "teadmata",
+  "playback.panel.maximize": "Suurenda paneeli",
+  "playback.panel.fullscreen": "Täisekraan",
+  "playback.zoom.out": "Vähenda suumi",
+  "playback.zoom.in": "Suurenda suumi"
 }

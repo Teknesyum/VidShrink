@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Διάρκεια",
   "settings.share.deletion": "Διαγραφή",
   "settings.share.delete": "Διαγραφή κοινοποιημένου αρχείου",
+  "settings.share.delete.disabled-tip": "Δεν υπάρχει ακόμη κοινόχρηστο αρχείο για διαγραφή",
   "settings.share.day-one": "1 ημέρα",
   "settings.share.days": "{0} ημέρες",
   "settings.share.hour-one-fixed": "1 ώρα, σταθερά",

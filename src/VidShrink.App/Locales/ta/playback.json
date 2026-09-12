@@ -49,5 +49,9 @@
   "player.info.audio": "ஆடியோ: {0}, {1} சேனல், {2} Hz",
   "player.info.noaudio": "ஆடியோ: இல்லை",
   "player.info.none": "மீடியா திறக்கப்படவில்லை",
-  "player.info.unknown": "தெரியாதது"
+  "player.info.unknown": "தெரியாதது",
+  "playback.panel.maximize": "பலகத்தை பெரிதாக்கவும்",
+  "playback.panel.fullscreen": "முழுத்திரை",
+  "playback.zoom.out": "சிறிதாக்கு",
+  "playback.zoom.in": "பெரிதாக்கு"
 }

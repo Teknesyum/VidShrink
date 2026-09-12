@@ -11,6 +11,7 @@
   "settings.share.lifetime": "משך חיים",
   "settings.share.deletion": "מחיקה",
   "settings.share.delete": "מחק את הקובץ המשותף",
+  "settings.share.delete.disabled-tip": "אין עדיין קובץ משותף למחיקה",
   "settings.share.day-one": "יום 1",
   "settings.share.days": "{0} ימים",
   "settings.share.hour-one-fixed": "שעה 1, קבוע",

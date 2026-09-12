@@ -49,5 +49,9 @@
   "player.info.audio": "Audio: {0}, {1} canale, {2} Hz",
   "player.info.noaudio": "Audio: fără",
   "player.info.none": "Niciun fișier media deschis",
-  "player.info.unknown": "necunoscut"
+  "player.info.unknown": "necunoscut",
+  "playback.panel.maximize": "Măriți panoul",
+  "playback.panel.fullscreen": "Ecran complet",
+  "playback.zoom.out": "Micșorați",
+  "playback.zoom.in": "Măriți"
 }

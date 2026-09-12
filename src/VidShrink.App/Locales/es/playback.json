@@ -49,5 +49,9 @@
   "player.info.audio": "Audio: {0}, {1} canales, {2} Hz",
   "player.info.noaudio": "Audio: ninguno",
   "player.info.none": "Ningún medio abierto",
-  "player.info.unknown": "desconocido"
+  "player.info.unknown": "desconocido",
+  "playback.panel.maximize": "Ampliar el panel",
+  "playback.panel.fullscreen": "Pantalla completa",
+  "playback.zoom.out": "Alejar",
+  "playback.zoom.in": "Acercar"
 }

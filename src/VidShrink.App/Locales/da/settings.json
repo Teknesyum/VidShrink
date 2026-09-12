@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Levetid",
   "settings.share.deletion": "Sletning",
   "settings.share.delete": "Slet den delte fil",
+  "settings.share.delete.disabled-tip": "Ingen delt fil at slette endnu",
   "settings.share.day-one": "1 dag",
   "settings.share.days": "{0} dage",
   "settings.share.hour-one-fixed": "1 time, fast",

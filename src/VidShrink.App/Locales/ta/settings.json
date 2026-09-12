@@ -11,6 +11,7 @@
   "settings.share.lifetime": "ஆயுட்காலம்",
   "settings.share.deletion": "நீக்கல்",
   "settings.share.delete": "பகிர்ந்த கோப்பை நீக்கு",
+  "settings.share.delete.disabled-tip": "நீக்க இன்னும் பகிரப்பட்ட கோப்பு இல்லை",
   "settings.share.day-one": "1 நாள்",
   "settings.share.days": "{0} நாட்கள்",
   "settings.share.hour-one-fixed": "1 மணி நேரம், நிலையானது",

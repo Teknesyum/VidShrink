@@ -3,6 +3,19 @@
              xmlns:auto="using:Avalonia.Automation"
              xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Playback.PlayerAdvancedPanel">
+  <UserControl.Styles>
+    <Style Selector="TextBlock#Glyph">
+      <Setter Property="RenderTransform" Value="none"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="TextBlock#Glyph.open">
+      <Setter Property="RenderTransform" Value="rotate(180deg)"/>
+    </Style>
+  </UserControl.Styles>
   <Border Theme="{StaticResource Panel}">
     <StackPanel Spacing="{StaticResource SpaceMd}">
       <Button x:Name="BtnToggle"

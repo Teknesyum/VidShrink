@@ -11,6 +11,7 @@
   "settings.share.lifetime": "مدت ماندگاری",
   "settings.share.deletion": "حذف",
   "settings.share.delete": "حذف فایل اشتراکی",
+  "settings.share.delete.disabled-tip": "هنوز فایل اشتراک‌گذاشته‌شده‌ای برای حذف نیست",
   "settings.share.day-one": "1 روز",
   "settings.share.days": "{0} روز",
   "settings.share.hour-one-fixed": "1 ساعت، ثابت",

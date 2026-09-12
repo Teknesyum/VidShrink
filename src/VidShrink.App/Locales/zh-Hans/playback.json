@@ -49,5 +49,9 @@
   "player.info.audio": "音频: {0}, {1} 声道, {2} Hz",
   "player.info.noaudio": "音频: 无",
   "player.info.none": "未打开任何媒体",
-  "player.info.unknown": "未知"
+  "player.info.unknown": "未知",
+  "playback.panel.maximize": "放大面板",
+  "playback.panel.fullscreen": "全屏",
+  "playback.zoom.out": "缩小",
+  "playback.zoom.in": "放大"
 }

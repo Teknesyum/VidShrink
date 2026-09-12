@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Срок хранения",
   "settings.share.deletion": "Удаление",
   "settings.share.delete": "Удалить отправленный файл",
+  "settings.share.delete.disabled-tip": "Пока нет общего файла для удаления",
   "settings.share.day-one": "1 день",
   "settings.share.days": "{0} дн.",
   "settings.share.hour-one-fixed": "1 час, фиксировано",

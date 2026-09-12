@@ -49,5 +49,9 @@
   "player.info.audio": "Garsas: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Garsas: nėra",
   "player.info.none": "Nėra atvertos medijos",
-  "player.info.unknown": "nežinoma"
+  "player.info.unknown": "nežinoma",
+  "playback.panel.maximize": "Padidinti skydelį",
+  "playback.panel.fullscreen": "Visas ekranas",
+  "playback.zoom.out": "Sumažinti mastelį",
+  "playback.zoom.in": "Padidinti mastelį"
 }

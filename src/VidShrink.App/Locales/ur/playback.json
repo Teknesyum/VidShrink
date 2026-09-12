@@ -49,5 +49,9 @@
   "player.info.audio": "آڈیو: {0}، {1} چینل، {2} Hz",
   "player.info.noaudio": "آڈیو: کوئی نہیں",
   "player.info.none": "کوئی میڈیا کھلا نہیں",
-  "player.info.unknown": "نامعلوم"
+  "player.info.unknown": "نامعلوم",
+  "playback.panel.maximize": "پینل کو بڑا کریں",
+  "playback.panel.fullscreen": "فل اسکرین",
+  "playback.zoom.out": "زوم آؤٹ",
+  "playback.zoom.in": "زوم ان"
 }

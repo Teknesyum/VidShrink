@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Élettartam",
   "settings.share.deletion": "Törlés",
   "settings.share.delete": "Megosztott fájl törlése",
+  "settings.share.delete.disabled-tip": "Még nincs megosztott fájl, amit törölni lehetne",
   "settings.share.day-one": "1 nap",
   "settings.share.days": "{0} nap",
   "settings.share.hour-one-fixed": "1 óra, rögzített",

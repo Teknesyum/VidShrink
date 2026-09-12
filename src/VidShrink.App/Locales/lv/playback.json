@@ -49,5 +49,9 @@
   "player.info.audio": "Audio: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Audio: nav",
   "player.info.none": "Nav atvērtas datnes",
-  "player.info.unknown": "nezināms"
+  "player.info.unknown": "nezināms",
+  "playback.panel.maximize": "Palielināt paneli",
+  "playback.panel.fullscreen": "Pilnekrāns",
+  "playback.zoom.out": "Samazināt tālummaiņu",
+  "playback.zoom.in": "Palielināt tālummaiņu"
 }

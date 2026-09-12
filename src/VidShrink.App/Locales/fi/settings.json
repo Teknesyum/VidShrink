@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Voimassaolo",
   "settings.share.deletion": "Poisto",
   "settings.share.delete": "Poista jaettu tiedosto",
+  "settings.share.delete.disabled-tip": "Ei vielä jaettua tiedostoa poistettavaksi",
   "settings.share.day-one": "1 päivä",
   "settings.share.days": "{0} päivää",
   "settings.share.hour-one-fixed": "1 tunti, kiinteä",

@@ -49,5 +49,9 @@
   "player.info.audio": "Ljud: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Ljud: inget",
   "player.info.none": "Inget öppnat media",
-  "player.info.unknown": "okänt"
+  "player.info.unknown": "okänt",
+  "playback.panel.maximize": "Förstora panelen",
+  "playback.panel.fullscreen": "Helskärm",
+  "playback.zoom.out": "Zooma ut",
+  "playback.zoom.in": "Zooma in"
 }

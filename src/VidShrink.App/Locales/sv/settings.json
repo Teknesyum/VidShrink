@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Livslängd",
   "settings.share.deletion": "Radering",
   "settings.share.delete": "Radera den delade filen",
+  "settings.share.delete.disabled-tip": "Ingen delad fil att ta bort ännu",
   "settings.share.day-one": "1 dag",
   "settings.share.days": "{0} dagar",
   "settings.share.hour-one-fixed": "1 timme, fast",

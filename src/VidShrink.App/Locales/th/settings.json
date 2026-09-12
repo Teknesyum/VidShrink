@@ -11,6 +11,7 @@
   "settings.share.lifetime": "อายุ",
   "settings.share.deletion": "การลบ",
   "settings.share.delete": "ลบไฟล์ที่แชร์",
+  "settings.share.delete.disabled-tip": "ยังไม่มีไฟล์ที่แชร์ให้ลบ",
   "settings.share.day-one": "1 วัน",
   "settings.share.days": "{0} วัน",
   "settings.share.hour-one-fixed": "1 ชั่วโมง ตายตัว",

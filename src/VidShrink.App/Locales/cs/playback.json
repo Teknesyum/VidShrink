@@ -49,5 +49,9 @@
   "player.info.audio": "Zvuk: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Zvuk: žádný",
   "player.info.none": "Žádné otevřené médium",
-  "player.info.unknown": "neznámý"
+  "player.info.unknown": "neznámý",
+  "playback.panel.maximize": "Zvětšit panel",
+  "playback.panel.fullscreen": "Celá obrazovka",
+  "playback.zoom.out": "Oddálit",
+  "playback.zoom.in": "Přiblížit"
 }

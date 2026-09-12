@@ -49,5 +49,9 @@
   "player.info.audio": "Audio: {0}, {1} kanalen, {2} Hz",
   "player.info.noaudio": "Audio: geen",
   "player.info.none": "Geen media geopend",
-  "player.info.unknown": "onbekend"
+  "player.info.unknown": "onbekend",
+  "playback.panel.maximize": "Paneel vergroten",
+  "playback.panel.fullscreen": "Volledig scherm",
+  "playback.zoom.out": "Uitzoomen",
+  "playback.zoom.in": "Inzoomen"
 }
