@@ -375,7 +375,12 @@ public sealed class OluUyeTests
     /// kullanicinin gordugu bir cumleye ceviriyor
     /// (<c>ShrinkProblemText.Key</c>, bes ayri yerellestirme anahtari), bicim
     /// <c>hic-okunmayan-tur</c>'den <c>tuketiliyor</c>'a gecti ve satirlarin pimde isi kalmadi.
-    /// Olcunun kendi ciktisi: <c>uye: 162  bu dosyada adi gecmeyen: 116  pimlenen: 32</c>.
+    /// Kumeyi 32'den 34'e cikaran 8c: ses girisi kolu <c>AudioSourceRole</c>'u Core'a ekledi,
+    /// iki uyesi de uretimde uretiliyor ama hicbir uretim kolu rolu adiyla ayirmiyor
+    /// (<c>hic-okunmayan-tur</c>); rolu okuyan secim yuzeyi 8b'nin alaninda. Ayni koldaki
+    /// <c>CaptureBackend</c> pime girmedi: <c>AudioCaptureArguments.cs:29</c> esitlik,
+    /// <c>:153</c> switch kolu, yani tuketiliyor.
+    /// Olcunun kendi ciktisi: <c>uye: 167  bu dosyada adi gecmeyen: 119  pimlenen: 34</c>.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -456,11 +461,7 @@ public sealed class OluUyeTests
         new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,
             "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir."),
         new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
-            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
-        new("AudioSourceRole.Microphone", "hic-okunmayan-tur", Debt,
-            "8c ses girisi kolu uyeyi uretiyor: CaptureDevices.ClassifyRole cihaz adini role ceviriyor ve AudioCaptureArguments.Build secimi rolle dogruluyor (Verify'a beklenen rol gecirilir). Tuketen kol yok, cunku dogrulama uyeyi adiyla dallandirmiyor, parametreyle karsilastiriyor: 'd.Role == expectedRole'. Rolu adiyla okuyan taraf ses girdisi secim yuzeyidir ve o 8b'nin alaninda; o yuzden pime uydurma bir switch yazilmadi, borc olarak kaydedildi."),
-        new("AudioSourceRole.SystemAudio", "hic-okunmayan-tur", Debt,
-            "Ayni bulgu, ayni kol: uye uretiliyor (ClassifyRole geri-dongu adlarini bu role ceviriyor, Build sistem sesi bacagini bu rolle dogruluyor), rolu adiyla ayiran hicbir uretim koluna henuz ulasilmiyor. Mikrofon ile sistem sesinin birbirinden ayrildigi yer amix karari degil kullanici secimi; o secim yuzeyi 8b ile gelecek, uctan uca kayit 8a ile birlesecek."),
+            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli.")
     };
 
     private readonly ITestOutputHelper _output;
@@ -509,7 +510,7 @@ public sealed class OluUyeTests
 
     /// <summary>
     /// K2: kume anahtar kelime listesinden degil turden cikiyor. Kanit, olcunun bu dosyada
-    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 32 satir 162 uyelik kumenin bir parcasi,
+    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 34 satir 167 uyelik kumenin bir parcasi,
     /// kumenin kendisi degil.
     /// </summary>
     [Fact]
