@@ -149,6 +149,34 @@ public static class FfmpegRunner
         return string.Join(Environment.NewLine, lines);
     }
 
+    /// <summary>
+    /// Kosan bir ffmpeg surecine stdin'den <c>q</c> yazar: surec yakalamayi birakir, kendi
+    /// mux'unu kapatir ve 0 ile doner. <see cref="RunAsync"/> zaten
+    /// <c>RedirectStandardInput</c> aciyor ama bugune kadar kimse yazmiyordu; suresi bastan
+    /// bilinmeyen kayit bu yol olmadan yalnizca oldurulerek durdurulabiliyor ve yarim mux
+    /// birakiyordu. Olculen fark: <c>q</c> ile 5.600 s / 84 kare / ffprobe 0, oldurulerek
+    /// 48 bayt / "moov atom not found" / ffprobe 1.
+    /// </summary>
+    /// <returns>
+    /// Yazma gerceklesti mi. Surec zaten bittiyse ya da stdin kapandiysa <c>false</c>;
+    /// cagiran o zaman zaman asimi yolundan devam eder.
+    /// </returns>
+    public static bool RequestGracefulStop(Process process)
+    {
+        ArgumentNullException.ThrowIfNull(process);
+        try
+        {
+            if (process.HasExited) return false;
+            process.StandardInput.Write('q');
+            process.StandardInput.Flush();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static void TryKill(Process process)
     {
         try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
