@@ -360,7 +360,7 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 32 satir: 27 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// Kume bugun 34 satir: 29 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
     /// (<c>Flagged = ZeroConsumer || Unused</c>). T163 kumeyi 51 satirdan 37'ye indirdi ve
     /// kalan bir satirin bicimini degistirdi. Dusen 19 satir T165'in <c>ReasonCode.Manual*</c>
     /// kodlariydi: T165 onlari uretmis ama okuyamamisti, cunku okuma tarafi
@@ -445,6 +445,10 @@ public sealed class OluUyeTests
             "Uretimde sifir gorunum, testlerde ve araclarda bes. Bu sinifin en saf hali: alani ayakta tutan tek taraf olcum tarafi. Dusurmek olcum duzenegini kirar, karar ayri sozlesme."),
         new("Intent.SocialMedia", "varsayilan-kol", Debt,
             "T177'ye kadar hicbir yerde gorunmuyordu. T177 yonga seridine niyeti tasidi: MainWindow.axaml.cs ChipPlans() icinde 8 MB yongasinin niyeti bu uye, yani uye artik uretimde uretiliyor. Tuketen kol hala yok — okuma tarafi niyeti adiyla ayirmiyor — o yuzden bicim hic-gorunmeyen'den varsayilan-kol'a dondu ve borc olarak duruyor."),
+        new("AudioSourceRole.Microphone", "hic-okunmayan-tur", Debt,
+            "8c ses girisi kolunun ekledigi rol. Uretimde uretiliyor: CaptureDevices.cs:249-252 cihaz adindan siniflandiriyor, AudioCaptureArguments.cs:99 secimi bu rolle dogruluyor. Tuketen kol yok — dogrulama esitlik karsilastirmasi (:171 expectedRole), role gore dallanan satir degil. Rolu adiyla okuyan kol 8b arayuzunde acilacak (mikrofon/sistem sesi secimi); o zamana kadar borc."),
+        new("AudioSourceRole.SystemAudio", "hic-okunmayan-tur", Debt,
+            "Ayni turun ikinci uyesi, ayni sinir: AudioCaptureArguments.cs:101 uretiyor, hicbir kol adiyla okumuyor."),
         new("LauncherUpdate.CommitWindow", "hic-gorunmeyen", Debt,
             "public static readonly, hicbir yerde okunmuyor. Dusurulmesi UpdateCheck.cs'i degistirir, o dosya bu sozlesmenin owns listesinde yok."),
         new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Debt,
@@ -452,7 +456,11 @@ public sealed class OluUyeTests
         new("UpdateCheck.ManifestTimeout", "yalniz-disarida", Debt,
             "Uretimde sifir, testlerde bir gorunum. Ayni dosya, ayni sinir."),
         new("EncoderPathOverride.Software", "varsayilan-kol", Legitimate,
-            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli.")
+            "Uc degerli turun orta uyesi; motor yolu 'Auto mu degil mi' ve 'Hardware mi' diye iki adimda soruyor (PlanCalculator.cs:271 kapiyi acar, :274 wantsHardware = EncoderPath == Hardware). Software ikinci sorunun else'i, o yuzden okuma tarafinda ada gerek kalmiyor; ayrica adlandirmak ayni dali ikiye bolerdi. T163 (64125dc) uretim tarafina tek uretici ekledi: MainWindow.axaml.cs:1005, gelismis ayarlar acilir kutusunun ikinci satiri kullanicinin secimini bu uyeye ceviriyor. Bicim o yuzden yalniz-disarida'dan varsayilan-kol'a dondu: uye artik uretimde uretiliyor ama hala hicbir kol onu adiyla tuketmiyor. Islevsel olarak ulasildigi asagidaki TheSoftwareEncoderPathIsReachedWithoutBeingNamed olcusuyle gosteriliyor: ayni girdide Auto donanim, Software yazilim, Hardware donanim kodegi veriyor ve uc sonuc da birbirinden farkli."),
+        new("AudioSourceRole.Microphone", "hic-okunmayan-tur", Debt,
+            "8c ses girisi kolu uyeyi uretiyor: CaptureDevices.ClassifyRole cihaz adini role ceviriyor ve AudioCaptureArguments.Build secimi rolle dogruluyor (Verify'a beklenen rol gecirilir). Tuketen kol yok, cunku dogrulama uyeyi adiyla dallandirmiyor, parametreyle karsilastiriyor: 'd.Role == expectedRole'. Rolu adiyla okuyan taraf ses girdisi secim yuzeyidir ve o 8b'nin alaninda; o yuzden pime uydurma bir switch yazilmadi, borc olarak kaydedildi."),
+        new("AudioSourceRole.SystemAudio", "hic-okunmayan-tur", Debt,
+            "Ayni bulgu, ayni kol: uye uretiliyor (ClassifyRole geri-dongu adlarini bu role ceviriyor, Build sistem sesi bacagini bu rolle dogruluyor), rolu adiyla ayiran hicbir uretim koluna henuz ulasilmiyor. Mikrofon ile sistem sesinin birbirinden ayrildigi yer amix karari degil kullanici secimi; o secim yuzeyi 8b ile gelecek, uctan uca kayit 8a ile birlesecek."),
     };
 
     private readonly ITestOutputHelper _output;
