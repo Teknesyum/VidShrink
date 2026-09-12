@@ -35,11 +35,19 @@ public sealed class BulletPaintingTests
         return (Styles)include.Loaded;
     });
 
+    /// <summary>
+    /// Anahtar önce <c>Controls.axaml</c>'da aranır (denetim temaları orada), bulunamazsa
+    /// <c>Application</c> kapsamına düşülür. Belirteçler ve fırçalar yalnız orada: palet
+    /// artık ikinci bir yerde merge edilmiyor, yoksa denetim temaları kullanıcının
+    /// seçiminden kopuyor (bkz. <c>PaletteApplyTests</c>). Ekrandaki çözüm sırası da bu.
+    /// </summary>
     private static object Resource(string key) => AppHost.Run<object>(() =>
     {
+        if (Controls.TryGetResource(key, ThemeVariant.Dark, out var local) && local is not null) return local;
+
         Assert.True(
-            Controls.TryGetResource(key, ThemeVariant.Dark, out var value) && value is not null,
-            $"Controls.axaml kaynak ağacında {key} yok.");
+            Application.Current!.TryGetResource(key, ThemeVariant.Dark, out var value) && value is not null,
+            $"Ne Controls.axaml ne de Application kaynak ağacında {key} var.");
         return value!;
     });
 

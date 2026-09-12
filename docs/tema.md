@@ -9,6 +9,15 @@ src/VidShrink.App/Themes/Palette/seeds.json
 Her tema burada **on bir hex** ile duruyor. Ölçüler (boşluk, yuvarlaklık, yazı boyu)
 `Themes/Theme.axaml` içinde ve palete dokunmuyor — renk değiştirince yerleşim yerinde kalır.
 
+Bugün **26 palet** var: 20 koyu zeminli, 6 açık zeminli. Ayarlardan seçilen palet
+**çalışırken** yürürlüğe girer, yeniden başlatma istemez (`PaletteCatalog.Use`).
+
+Açık/koyu ayrımı elle tutulmuyor: zemin renginin sRGB parlaklığı 0,5'in üstündeyse palet
+açık sayılır. Bunun iki sonucu var — Fluent'in kendi açılır listeleri ve kaydırma
+çubukları için `RequestedThemeVariant` Light'a geçer, ve başlık şeridi gövde yazısından
+uzaklaşmak için koyulaşmak yerine açılır (`PaletteGen`'deki `Dim`, aynı 0,78 büyüklüğü
+ters yönde).
+
 ## On Bir Çekirdek
 
 | Alan | Nerede görünür |
