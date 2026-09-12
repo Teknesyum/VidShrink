@@ -17,8 +17,11 @@ namespace VidShrink.Tests;
 /// İkincisi emoji yasağı. Kullanıcının cümlesi "ses simgemiz bile kötü" idi; şeridin
 /// 🔉/🔊 düğmeleri gitti, yerlerine <c>IconVolumeMute</c>/<c>IconVolume</c> geldi. Emoji
 /// yazı tipine bağlı, 42 dilin yazı yığınında aynı görünmüyor ve <c>Foreground</c>'dan
-/// renk almıyor. Ölçüm yalnız emoji bloklarını yakalıyor; <c>▾</c> <c>▶</c> gibi geometrik
-/// şekiller bu ağda değil — onları Kesit B düşürüyor.
+/// renk almıyor. Emojinin yanına ikinci bir ağ kuruldu: <c>▾ ▴ ▶ ❚ |◀</c> gibi geometrik
+/// şekiller de düğme yüzünde kalmıyor. Açılır başlıkların oku artık <c>IconChevronDown</c>,
+/// şeridin oynat/başa dön düğmeleri <c>IconPlay</c>/<c>IconPause</c>/<c>IconRestart</c>.
+/// Ağ <c>Content</c> ve <c>.Text</c> geçen satırlara bakıyor; belgelerdeki ve çizim
+/// açıklamalarındaki aynı karakter suçlanmıyor.
 ///
 /// Üçüncüsü Ayarlar sekmesinin yeri: kullanıcı "ayarlar sol tarafın en sağında olsun"
 /// dedi, şerit yatay ve sola yaslı, dolayısıyla en sağ = son sekme. Ayrıca görünür
@@ -38,6 +41,9 @@ public sealed class SimgeTakimiTests
 
     private static readonly Regex Emoji = new(
         @"[\uD83C-\uD83E][\uDC00-\uDFFF]|[☀-⛿️]", RegexOptions.Compiled);
+
+    private static readonly Regex Sekil = new(
+        @"[■-◿←-⇿«»❘]", RegexOptions.Compiled);
 
     private static IEnumerable<string> Dosyalar(string uzanti) =>
         Directory.EnumerateFiles(AppRoot, "*" + uzanti, SearchOption.AllDirectories)
@@ -82,6 +88,22 @@ public sealed class SimgeTakimiTests
 
         Assert.True(suclular.Count == 0,
             "Düğme içeriğinde emoji kaldı, simge takımından geometri kullanılmalı:\n"
+            + string.Join("\n", suclular));
+    }
+
+    [Fact]
+    public void HicbirDugmeGeometrikYaziSimgesiTasimiyor()
+    {
+        var suclular = Dosyalar(".axaml").Concat(Dosyalar(".cs"))
+            .SelectMany(yol => File.ReadAllLines(yol)
+                .Select((satir, sira) => (yol, satir, numara: sira + 1)))
+            .Where(giris => (giris.satir.Contains("Content") || giris.satir.Contains(".Text"))
+                         && Sekil.IsMatch(giris.satir))
+            .Select(giris => $"{Path.GetFileName(giris.yol)}:{giris.numara}: {giris.satir.Trim()}")
+            .ToList();
+
+        Assert.True(suclular.Count == 0,
+            "Düğme yüzünde yazı simgesi kaldı, Icons.axaml geometrisi kullanılmalı:\n"
             + string.Join("\n", suclular));
     }
 

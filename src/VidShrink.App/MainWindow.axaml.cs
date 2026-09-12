@@ -1363,11 +1363,17 @@ public partial class MainWindow : Window
 
     private void OnToggleFrame(object? sender, RoutedEventArgs e) => SetSection(FrameBody, GlyphFrame, !FrameBody.IsVisible);
 
-    private void SetSection(Control body, TextBlock glyph, bool open)
+    private void SetSection(Control body, Avalonia.Controls.Shapes.Path glyph, bool open)
     {
         body.IsVisible = open;
-        glyph.Text = open ? "▴" : "▾";
+        Chevron(glyph, open);
         RefreshSectionSummaries();
+    }
+
+    private void Chevron(Avalonia.Controls.Shapes.Path glyph, bool open)
+    {
+        if (this.TryFindResource(open ? "IconChevronUp" : "IconChevronDown", out var deger))
+            glyph.Data = deger as Geometry;
     }
 
     internal void ExpandAdvanced() => SetSection(AdvancedBody, GlyphAdvanced, true);
@@ -3560,7 +3566,7 @@ public partial class MainWindow : Window
         _commandExpanded = expanded;
         TxtCommand.TextWrapping = expanded ? TextWrapping.Wrap : TextWrapping.NoWrap;
         TxtCommand.MaxLines = expanded ? 8 : 1;
-        BtnCommandExpand.Content = expanded ? "▴" : "▾";
+        Chevron(GlyphCommand, expanded);
         ApplyScrollAffordance(TxtCommand, TxtCommand.IsPointerOver);
     }
 
@@ -3583,7 +3589,7 @@ public partial class MainWindow : Window
     {
         _reasonsExpanded = expanded;
         PlanReasons.IsVisible = expanded && PlanReasons.Children.Count > 0;
-        BtnPlanReasons.Content = expanded ? "▴" : "▾";
+        Chevron(GlyphPlanReasons, expanded);
     }
 
     private void OnTogglePerformance(object? sender, RoutedEventArgs e) => SetPerformanceDetails(!PerformanceDetails.IsVisible);
@@ -3591,7 +3597,7 @@ public partial class MainWindow : Window
     private void SetPerformanceDetails(bool visible)
     {
         PerformanceDetails.IsVisible = visible;
-        BtnPerformanceExpand.Content = visible ? "▴" : "▾";
+        Chevron(GlyphPerformance, visible);
     }
 
     /// <summary>
@@ -3689,7 +3695,7 @@ public partial class MainWindow : Window
     {
         AiDetails.IsVisible = visible;
         TxtAiHint.IsVisible = !visible;
-        BtnAiDetails.Content = visible ? "▴" : "▾";
+        Chevron(GlyphAiDetails, visible);
     }
 
     private async void OnCopyPrompt(object? sender, RoutedEventArgs e)

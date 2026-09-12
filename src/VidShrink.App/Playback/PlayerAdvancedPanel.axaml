@@ -4,7 +4,7 @@
              xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Playback.PlayerAdvancedPanel">
   <UserControl.Styles>
-    <Style Selector="TextBlock#Glyph">
+    <Style Selector="Path#Glyph">
       <Setter Property="RenderTransform" Value="none"/>
       <Setter Property="Transitions">
         <Transitions>
@@ -12,7 +12,7 @@
         </Transitions>
       </Setter>
     </Style>
-    <Style Selector="TextBlock#Glyph.open">
+    <Style Selector="Path#Glyph.open">
       <Setter Property="RenderTransform" Value="rotate(180deg)"/>
     </Style>
   </UserControl.Styles>
@@ -26,7 +26,7 @@
               Padding="{StaticResource ButtonPaddingSm}"
               auto:AutomationProperties.Name="{loc:Text player.advanced.title}">
         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-          <TextBlock x:Name="Glyph" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+          <Path x:Name="Glyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="1" Text="{loc:Text player.advanced.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="2" x:Name="TxtSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
         </Grid>

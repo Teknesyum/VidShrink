@@ -23,6 +23,8 @@
   <StreamGeometry x:Key="IconMenu">M 12,5 L 12.01,5 M 12,12 L 12.01,12 M 12,19 L 12.01,19</StreamGeometry>
   <StreamGeometry x:Key="IconCamera">M 3,8 H 7 L 9,5 H 15 L 17,8 H 21 V 19 H 3 Z M 12,10 A 3.5,3.5 0 1,0 12,17 A 3.5,3.5 0 1,0 12,10 Z</StreamGeometry>
   <StreamGeometry x:Key="IconChevronDown">M 5,9 L 12,16 L 19,9</StreamGeometry>
+  <StreamGeometry x:Key="IconChevronUp">M 5,15 L 12,8 L 19,15</StreamGeometry>
+  <StreamGeometry x:Key="IconRestart">M 5,5 V 19 M 20,5 L 9,12 L 20,19 Z</StreamGeometry>
   <StreamGeometry x:Key="IconClose">M 5,5 L 19,19 M 19,5 L 5,19</StreamGeometry>
   <StreamGeometry x:Key="IconMaximize">M 4,4 H 20 V 20 H 4 Z</StreamGeometry>
   <StreamGeometry x:Key="IconMinimize">M 4,12 H 20</StreamGeometry>

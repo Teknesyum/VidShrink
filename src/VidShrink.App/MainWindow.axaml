@@ -409,7 +409,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
                         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                          <TextBlock x:Name="GlyphQuality" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphQuality" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="2" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -456,7 +456,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
                         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                          <TextBlock x:Name="GlyphAudio" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphAudio" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="2" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -488,7 +488,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
                         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                          <TextBlock x:Name="GlyphFrame" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphFrame" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="2" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -524,7 +524,7 @@
                               Padding="{StaticResource ButtonPaddingSm}"
                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
                         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                          <TextBlock x:Name="GlyphAdvanced" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+                          <Path x:Name="GlyphAdvanced" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <TextBlock Grid.Column="2" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -646,12 +646,12 @@
                                    VerticalAlignment="Center"/>
                         <Button Grid.Column="1"
                                 x:Name="BtnPlanReasons"
-                                Content="▾"
                                 Theme="{StaticResource GhostButton}"
-                                FontFamily="{StaticResource FontMono}"
                                 VerticalAlignment="Center"
                                 auto:AutomationProperties.Name="{loc:Text main.plan.reasons}"
-                                Click="OnTogglePlanReasons"/>
+                                Click="OnTogglePlanReasons">
+                                  <Path x:Name="GlyphPlanReasons" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                                </Button>
                       </Grid>
                       <StackPanel x:Name="PlanReasons" Spacing="{StaticResource SpaceSm}" IsVisible="False"/>
                     </StackPanel>
@@ -1090,12 +1090,12 @@
                     <TextBlock Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                     <Button Grid.Column="1"
                             x:Name="BtnCommandExpand"
-                            Content="▾"
                             Theme="{StaticResource GhostButton}"
-                            FontFamily="{StaticResource FontMono}"
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text main.command.title}"
-                            Click="OnToggleCommand"/>
+                            Click="OnToggleCommand">
+                              <Path x:Name="GlyphCommand" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                            </Button>
                   </Grid>
                   <TextBox x:Name="TxtCommand" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinLines="1" MaxLines="1"/>
                 </StackPanel>
@@ -1117,12 +1117,12 @@
                     </TextBlock>
                     <Button Grid.Column="2"
                             x:Name="BtnAiDetails"
-                            Content="▾"
                             Theme="{StaticResource GhostButton}"
                             VerticalAlignment="Center"
-                            FontFamily="{StaticResource FontMono}"
                             auto:AutomationProperties.Name="{loc:Text main.ai.title}"
-                            Click="OnToggleAiDetails"/>
+                            Click="OnToggleAiDetails">
+                              <Path x:Name="GlyphAiDetails" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                            </Button>
                   </Grid>
                   <StackPanel x:Name="AiDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.ai.tip}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -1143,12 +1143,12 @@
                     <TextBlock Grid.Column="0" Text="{loc:Text performance.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                     <Button Grid.Column="1"
                             x:Name="BtnPerformanceExpand"
-                            Content="▾"
                             Theme="{StaticResource GhostButton}"
-                            FontFamily="{StaticResource FontMono}"
                             VerticalAlignment="Center"
                             auto:AutomationProperties.Name="{loc:Text performance.title}"
-                            Click="OnTogglePerformance"/>
+                            Click="OnTogglePerformance">
+                              <Path x:Name="GlyphPerformance" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                            </Button>
                   </Grid>
                   <StackPanel x:Name="PerformanceDetails" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <WrapPanel>

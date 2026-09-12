@@ -197,8 +197,6 @@ internal partial class ControlStrip : UserControl
     {
         _language = language;
 
-        // Düğme yüzleri metin değil işaret; ad erişilebilirlik adında duruyor.
-        Restart.Content = "|◀";
         AutomationProperties.SetName(Restart, Text("playback.control.restart"));
         AutomationProperties.SetName(Timeline, Text("playback.control.timeline"));
         AutomationProperties.SetName(Bar, Text("playback.control.strip"));
@@ -308,7 +306,8 @@ internal partial class ControlStrip : UserControl
 
     private void Refresh()
     {
-        PlayPause.Content = _playing ? "❚❚" : "▶";
+        if (this.TryFindResource(_playing ? "IconPause" : "IconPlay", out var simge))
+            GlyphPlayPause.Data = simge as Avalonia.Media.Geometry;
         AutomationProperties.SetName(PlayPause, _playing
             ? Text("playback.control.pause")
             : Text("playback.control.play"));

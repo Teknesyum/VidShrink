@@ -174,10 +174,10 @@ public sealed class PerformanceCheckUiTests
         Assert.Contains("x:Name=\"BtnPerformanceExpand\"", page, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"PerformanceDetails\" IsVisible=\"False\"", page, StringComparison.Ordinal);
 
-        // Açılır düğme diğer iki panelle aynı: ▾ içerikli GhostButton.
+        // Açılır düğme diğer iki panelle aynı: IconChevronDown taşıyan GhostButton.
         var after = page[page.IndexOf("BtnPerformanceExpand", StringComparison.Ordinal)..];
-        var toggle = after[..Math.Min(400, after.Length)];
-        Assert.Contains("Content=\"▾\"", toggle, StringComparison.Ordinal);
+        var toggle = after[..Math.Min(800, after.Length)];
+        Assert.Contains("Data=\"{StaticResource IconChevronDown}\"", toggle, StringComparison.Ordinal);
         Assert.Contains("Theme=\"{StaticResource GhostButton}\"", toggle, StringComparison.Ordinal);
 
         // Sütun düzeni CommandPanel ile aynı.

@@ -544,7 +544,7 @@ public sealed class AdvancedPanelTests
     ///
     /// <para>Bu kol kancayı hiç kullanmıyor: <c>Button.ClickEvent</c> yükseltiyor ve
     /// bağlantıyı ölçüyor. Düğmedeki <c>Click="OnToggleAdvanced"</c> silinirse düşer.
-    /// Yön oku da ölçülüyor — olay bağlıysa üçü birden döner.</para>
+    /// Yön oku da ölçülüyor: açıkken IconChevronUp, kapalıyken IconChevronDown geometrisi.</para>
     /// </summary>
     [Fact]
     public void TheAdvancedSectionOpensAndClosesFromItsButton()
@@ -556,18 +556,18 @@ public sealed class AdvancedPanelTests
 
             var body = window.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "AdvancedBody");
             var button = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "BtnAdvancedToggle");
-            var glyph = button.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "GlyphAdvanced");
+            var glyph = button.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>().Single(t => t.Name == "GlyphAdvanced");
 
             var s0 = body.IsVisible;
-            var g0 = glyph.Text;
+            var g0 = glyph.Data;
 
             ClickAdvancedToggle(window);
             var s1 = body.IsVisible;
-            var g1 = glyph.Text;
+            var g1 = glyph.Data;
 
             ClickAdvancedToggle(window);
             var s2 = body.IsVisible;
-            var g2 = glyph.Text;
+            var g2 = glyph.Data;
 
             return (s0, s1, s2, g0, g1, g2);
         });
@@ -581,9 +581,9 @@ public sealed class AdvancedPanelTests
             "R1: düğmeye basıldı ama gelişmiş bölüm açılmadı — Click bağlantısı yok, "
             + "çalışan uygulamada dokuz kontrole erişilemez.");
         Xunit.Assert.False(afterSecond, "R1: ikinci tıklama bölümü geri kapatmalı.");
-        Xunit.Assert.Equal("▾", glyphStart);
-        Xunit.Assert.Equal("▴", glyphOpen);
-        Xunit.Assert.Equal("▾", glyphClosed);
+        Xunit.Assert.NotNull(glyphStart);
+        Xunit.Assert.NotSame(glyphStart, glyphOpen);
+        Xunit.Assert.Same(glyphStart, glyphClosed);
     }
 
     /// <summary>K5: CRF sabitlenince hedef alanı artık zorlamadığını tek satırda söylüyor.</summary>

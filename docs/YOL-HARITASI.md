@@ -12,6 +12,14 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
 
 ## Kararlar
 
+### 12 işlik turun kesit sırası (12 Eylül 2026)
+
+Kullanıcının verdiği 12 iş dört kesite bölündü ve bu sırayla kuruluyor:
+**A** simge takımı ve Ayarlar sekmesi → **B** oynatıcı yerleşimi →
+**C** kaydedicinin ffmpeg kolu (worktree ajanı) → **D** kaydedicinin otomatik kipi.
+A ve B arayüzün aynı belirteçlerine dokunduğu için ardışık; C kendi dalında koştuğu
+için B ile çakışmıyor; D, C'nin ürettiği ayar yüzeyi olmadan ölçülemediği için sonda.
+
 ### Tek sürüm numarası, üç işletim sistemi (12 Eylül 2026)
 
 Windows, macOS ve Linux ayrı sürüm numarası taşımaz. `Directory.Build.props` içindeki tek

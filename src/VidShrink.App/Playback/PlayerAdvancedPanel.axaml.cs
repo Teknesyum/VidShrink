@@ -76,7 +76,6 @@ internal partial class PlayerAdvancedPanel : UserControl
     private void OnToggle(object? sender, RoutedEventArgs e)
     {
         Body.IsVisible = !Body.IsVisible;
-        Glyph.Text = Body.IsVisible ? "▴" : "▾";
         Glyph.Classes.Set("open", Body.IsVisible);
     }
 
