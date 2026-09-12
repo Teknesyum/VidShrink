@@ -40,6 +40,19 @@
                 IsVisible="False">
           <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
         </Border>
+        <Canvas x:Name="ThumbLayer" IsHitTestVisible="False">
+          <Border x:Name="ThumbChip" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
+            <StackPanel Spacing="{StaticResource PlaybackBadgeGap}">
+              <Image x:Name="ThumbImage"
+                     Width="{StaticResource PlaybackThumbnailWidth}"
+                     Height="{StaticResource PlaybackThumbnailHeight}"
+                     Stretch="Fill"/>
+              <TextBlock x:Name="ThumbTime"
+                         Theme="{StaticResource PlaybackTimeText}"
+                         HorizontalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+        </Canvas>
       </Panel>
     </Border>
 

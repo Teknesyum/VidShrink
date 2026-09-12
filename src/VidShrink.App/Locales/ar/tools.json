@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "أدوات",
+  "player.tools.clip": "حفظ المقطع",
+  "player.tools.gif": "حفظ GIF",
+  "player.tools.mini": "الوضع المصغّر",
+  "player.tools.url": "فتح عنوان…",
+  "player.tools.url-hint": "عنوان http أو https أو rtsp",
+  "player.tools.url-invalid": "تعذّرت قراءة العنوان",
+  "player.tools.open": "فتح",
+  "player.tools.cancel": "إلغاء",
+  "player.tools.saved": "تم الحفظ: {0}",
+  "player.tools.failed": "تعذّر إنشاء الملف",
+  "player.tools.novideo": "افتح فيديو أولاً",
+  "player.tools.state-mini": "الوضع المصغّر",
+  "player.tools.preview": "معاينة",
+  "player.tools.length": "مدة المقطع {0} ثانية"
+}

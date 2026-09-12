@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "اوزار",
+  "player.tools.clip": "کلپ محفوظ کریں",
+  "player.tools.gif": "GIF محفوظ کریں",
+  "player.tools.mini": "منی موڈ",
+  "player.tools.url": "پتہ کھولیں…",
+  "player.tools.url-hint": "http، https یا rtsp پتہ",
+  "player.tools.url-invalid": "پتہ پڑھا نہیں جا سکا",
+  "player.tools.open": "کھولیں",
+  "player.tools.cancel": "منسوخ",
+  "player.tools.saved": "محفوظ ہوگیا: {0}",
+  "player.tools.failed": "فائل نہیں بن سکی",
+  "player.tools.novideo": "پہلے ایک ویڈیو کھولیں",
+  "player.tools.state-mini": "منی موڈ",
+  "player.tools.preview": "پیش منظر",
+  "player.tools.length": "کلپ کی طوالت {0} سیکنڈ"
+}

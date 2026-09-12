@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "ابزارها",
+  "player.tools.clip": "ذخیره کلیپ",
+  "player.tools.gif": "ذخیره GIF",
+  "player.tools.mini": "حالت کوچک",
+  "player.tools.url": "باز کردن نشانی…",
+  "player.tools.url-hint": "نشانی http، https یا rtsp",
+  "player.tools.url-invalid": "نشانی خوانده نشد",
+  "player.tools.open": "باز کردن",
+  "player.tools.cancel": "لغو",
+  "player.tools.saved": "ذخیره شد: {0}",
+  "player.tools.failed": "فایل ایجاد نشد",
+  "player.tools.novideo": "ابتدا یک ویدیو باز کنید",
+  "player.tools.state-mini": "حالت کوچک",
+  "player.tools.preview": "پیش‌نمایش",
+  "player.tools.length": "طول کلیپ {0} ثانیه"
+}

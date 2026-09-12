@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Strumenti",
+  "player.tools.clip": "Salva clip",
+  "player.tools.gif": "Salva GIF",
+  "player.tools.mini": "Modalità mini",
+  "player.tools.url": "Apri indirizzo…",
+  "player.tools.url-hint": "Indirizzo http, https o rtsp",
+  "player.tools.url-invalid": "Impossibile leggere l'indirizzo",
+  "player.tools.open": "Apri",
+  "player.tools.cancel": "Annulla",
+  "player.tools.saved": "Salvato: {0}",
+  "player.tools.failed": "Impossibile creare il file",
+  "player.tools.novideo": "Apri prima un video",
+  "player.tools.state-mini": "modalità mini",
+  "player.tools.preview": "Anteprima",
+  "player.tools.length": "Durata clip {0} s"
+}

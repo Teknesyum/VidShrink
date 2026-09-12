@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Eszközök",
+  "player.tools.clip": "Klip mentése",
+  "player.tools.gif": "GIF mentése",
+  "player.tools.mini": "Mini mód",
+  "player.tools.url": "Cím megnyitása…",
+  "player.tools.url-hint": "http, https vagy rtsp cím",
+  "player.tools.url-invalid": "A cím nem olvasható be",
+  "player.tools.open": "Megnyitás",
+  "player.tools.cancel": "Mégse",
+  "player.tools.saved": "Mentve: {0}",
+  "player.tools.failed": "A fájlt nem sikerült létrehozni",
+  "player.tools.novideo": "Először nyisson meg egy videót",
+  "player.tools.state-mini": "mini mód",
+  "player.tools.preview": "Előnézet",
+  "player.tools.length": "Klip hossza {0} mp"
+}

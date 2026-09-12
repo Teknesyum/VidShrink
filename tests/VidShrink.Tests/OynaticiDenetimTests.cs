@@ -128,7 +128,11 @@ public sealed class KeymapTests
         [PlayerCommandKind.Screenshot] = "screenshot -> ",
         [PlayerCommandKind.FileStep] = "file ",
         [PlayerCommandKind.ToggleShuffle] = "shuffle -> ",
-        [PlayerCommandKind.RepeatCycle] = "repeat -> "
+        [PlayerCommandKind.RepeatCycle] = "repeat -> ",
+        [PlayerCommandKind.ClipExport] = "clip -> ",
+        [PlayerCommandKind.GifExport] = "gif -> ",
+        [PlayerCommandKind.MiniMode] = "mini -> ",
+        [PlayerCommandKind.OpenUrl] = "url -> "
     };
 
     private static void Tetikle(PlayerView view, PlayerInput input)
@@ -183,6 +187,7 @@ public sealed class KeymapTests
         var bilgi = view.InfoVisible;
         var karisik = view.Settings.Shuffle;
         var tekrar = view.Settings.Repeat;
+        var mini = view.IsMiniMode;
 
         tetik();
 
@@ -218,6 +223,10 @@ public sealed class KeymapTests
             PlayerCommandKind.FileStep when !yeni[0].StartsWith("file " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> ", StringComparison.Ordinal) => $"iz '{yeni[0]}' yon {action.Amount}",
             PlayerCommandKind.ToggleShuffle when view.Settings.Shuffle == karisik => "karistirma degismedi",
             PlayerCommandKind.RepeatCycle when view.Settings.Repeat == tekrar => $"tekrar {tekrar} degismedi",
+            PlayerCommandKind.ClipExport when yeni[0] != "clip -> no" => $"kaynaksiz klip izi '{yeni[0]}'",
+            PlayerCommandKind.GifExport when yeni[0] != "gif -> no" => $"kaynaksiz gif izi '{yeni[0]}'",
+            PlayerCommandKind.MiniMode when view.IsMiniMode == mini => "mini mod degismedi",
+            PlayerCommandKind.OpenUrl when yeni[0] != "url -> no" => $"gorunmez pencerede adres izi '{yeni[0]}'",
             _ => null
         };
     }
@@ -363,7 +372,7 @@ public sealed class KeymapTests
                 var menu = tumu.Where(item => item.Tag is PlayerAction).ToList();
                 var ekler = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
                 body.AppendLine($"[{dil}] menu {menu.Count} satir, ek satirlar: {string.Join(" | ", ekler)}");
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.tools.menu") }, ekler);
                 Assert.Equal(tumu.IndexOf(menu.First(item => ReferenceEquals(item.Tag, Keymap.Mute))) + 1, tumu.FindIndex(item => item.Tag is null));
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);
                 foreach (var (item, action) in menu.Zip(Keymap.MenuActions))

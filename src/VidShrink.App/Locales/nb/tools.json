@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Verktøy",
+  "player.tools.clip": "Lagre klipp",
+  "player.tools.gif": "Lagre GIF",
+  "player.tools.mini": "Minimodus",
+  "player.tools.url": "Åpne adresse…",
+  "player.tools.url-hint": "http-, https- eller rtsp-adresse",
+  "player.tools.url-invalid": "Adressen kunne ikke leses",
+  "player.tools.open": "Åpne",
+  "player.tools.cancel": "Avbryt",
+  "player.tools.saved": "Lagret: {0}",
+  "player.tools.failed": "Filen kunne ikke opprettes",
+  "player.tools.novideo": "Åpne en video først",
+  "player.tools.state-mini": "minimodus",
+  "player.tools.preview": "Forhåndsvisning",
+  "player.tools.length": "Klipplengde {0} sek"
+}

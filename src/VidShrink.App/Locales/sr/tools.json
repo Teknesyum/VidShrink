@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Alatke",
+  "player.tools.clip": "Sačuvaj isečak",
+  "player.tools.gif": "Sačuvaj GIF",
+  "player.tools.mini": "Mini režim",
+  "player.tools.url": "Otvori adresu…",
+  "player.tools.url-hint": "Adresa http, https ili rtsp",
+  "player.tools.url-invalid": "Adresa nije mogla da se pročita",
+  "player.tools.open": "Otvori",
+  "player.tools.cancel": "Otkaži",
+  "player.tools.saved": "Sačuvano: {0}",
+  "player.tools.failed": "Datoteka nije mogla da se napravi",
+  "player.tools.novideo": "Prvo otvorite video",
+  "player.tools.state-mini": "mini režim",
+  "player.tools.preview": "Pregled",
+  "player.tools.length": "Trajanje isečka {0} s"
+}

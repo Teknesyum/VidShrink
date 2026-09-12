@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Verktyg",
+  "player.tools.clip": "Spara klipp",
+  "player.tools.gif": "Spara GIF",
+  "player.tools.mini": "Miniläge",
+  "player.tools.url": "Öppna adress…",
+  "player.tools.url-hint": "http-, https- eller rtsp-adress",
+  "player.tools.url-invalid": "Adressen kunde inte läsas",
+  "player.tools.open": "Öppna",
+  "player.tools.cancel": "Avbryt",
+  "player.tools.saved": "Sparad: {0}",
+  "player.tools.failed": "Filen kunde inte skapas",
+  "player.tools.novideo": "Öppna en video först",
+  "player.tools.state-mini": "miniläge",
+  "player.tools.preview": "Förhandsgranskning",
+  "player.tools.length": "Klipplängd {0} s"
+}

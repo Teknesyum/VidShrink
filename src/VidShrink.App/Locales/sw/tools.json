@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Zana",
+  "player.tools.clip": "Hifadhi klipu",
+  "player.tools.gif": "Hifadhi GIF",
+  "player.tools.mini": "Hali ya mini",
+  "player.tools.url": "Fungua anwani…",
+  "player.tools.url-hint": "Anwani ya http, https au rtsp",
+  "player.tools.url-invalid": "Anwani haikuweza kusomwa",
+  "player.tools.open": "Fungua",
+  "player.tools.cancel": "Ghairi",
+  "player.tools.saved": "Imehifadhiwa: {0}",
+  "player.tools.failed": "Faili halikuweza kutengenezwa",
+  "player.tools.novideo": "Fungua video kwanza",
+  "player.tools.state-mini": "hali ya mini",
+  "player.tools.preview": "Onyesho la awali",
+  "player.tools.length": "Urefu wa klipu {0} s"
+}

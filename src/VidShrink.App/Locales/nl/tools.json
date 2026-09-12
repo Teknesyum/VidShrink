@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Hulpmiddelen",
+  "player.tools.clip": "Clip opslaan",
+  "player.tools.gif": "GIF opslaan",
+  "player.tools.mini": "Minimodus",
+  "player.tools.url": "Adres openen…",
+  "player.tools.url-hint": "http-, https- of rtsp-adres",
+  "player.tools.url-invalid": "Het adres kon niet worden gelezen",
+  "player.tools.open": "Openen",
+  "player.tools.cancel": "Annuleren",
+  "player.tools.saved": "Opgeslagen: {0}",
+  "player.tools.failed": "Het bestand kon niet worden gemaakt",
+  "player.tools.novideo": "Open eerst een video",
+  "player.tools.state-mini": "minimodus",
+  "player.tools.preview": "Voorbeeld",
+  "player.tools.length": "Cliplengte {0} s"
+}

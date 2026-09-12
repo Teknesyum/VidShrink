@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Værktøjer",
+  "player.tools.clip": "Gem klip",
+  "player.tools.gif": "Gem GIF",
+  "player.tools.mini": "Minitilstand",
+  "player.tools.url": "Åbn adresse…",
+  "player.tools.url-hint": "http-, https- eller rtsp-adresse",
+  "player.tools.url-invalid": "Adressen kunne ikke læses",
+  "player.tools.open": "Åbn",
+  "player.tools.cancel": "Annuller",
+  "player.tools.saved": "Gemt: {0}",
+  "player.tools.failed": "Filen kunne ikke oprettes",
+  "player.tools.novideo": "Åbn en video først",
+  "player.tools.state-mini": "minitilstand",
+  "player.tools.preview": "Forhåndsvisning",
+  "player.tools.length": "Klippets længde {0} sek."
+}

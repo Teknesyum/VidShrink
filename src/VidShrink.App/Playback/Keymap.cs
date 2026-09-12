@@ -140,7 +140,11 @@ internal static class Keymap
         new(PlayerInput.OnSymbol(">", Key.OemPeriod), SubtitleOptions.SubtitleLater),
         new(PlayerInput.OnSymbol("<", Key.OemComma), SubtitleOptions.SubtitleEarlier),
         new(PlayerInput.OnKey(Key.OemPeriod, KeyModifiers.Control), SubtitleOptions.AudioLater),
-        new(PlayerInput.OnKey(Key.OemComma, KeyModifiers.Control), SubtitleOptions.AudioEarlier)
+        new(PlayerInput.OnKey(Key.OemComma, KeyModifiers.Control), SubtitleOptions.AudioEarlier),
+        new(PlayerInput.OnKey(Key.K, KeyModifiers.Control), ToolsOptions.Clip),
+        new(PlayerInput.OnKey(Key.G, KeyModifiers.Control | KeyModifiers.Shift), ToolsOptions.Gif),
+        new(PlayerInput.OnKey(Key.M, KeyModifiers.Control), ToolsOptions.MiniMode),
+        new(PlayerInput.OnKey(Key.U, KeyModifiers.Control), ToolsOptions.OpenUrl)
     };
 
     internal static readonly IReadOnlyList<PlayerAction> MenuActions = new[]

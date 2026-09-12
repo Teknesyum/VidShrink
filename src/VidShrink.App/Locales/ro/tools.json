@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Instrumente",
+  "player.tools.clip": "Salvează clipul",
+  "player.tools.gif": "Salvează GIF",
+  "player.tools.mini": "Mod mini",
+  "player.tools.url": "Deschide adresa…",
+  "player.tools.url-hint": "Adresă http, https sau rtsp",
+  "player.tools.url-invalid": "Adresa nu a putut fi citită",
+  "player.tools.open": "Deschide",
+  "player.tools.cancel": "Anulează",
+  "player.tools.saved": "Salvat: {0}",
+  "player.tools.failed": "Fișierul nu a putut fi creat",
+  "player.tools.novideo": "Deschide mai întâi un videoclip",
+  "player.tools.state-mini": "mod mini",
+  "player.tools.preview": "Previzualizare",
+  "player.tools.length": "Durata clipului {0} s"
+}

@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Nástroje",
+  "player.tools.clip": "Uložit klip",
+  "player.tools.gif": "Uložit GIF",
+  "player.tools.mini": "Mini režim",
+  "player.tools.url": "Otevřít adresu…",
+  "player.tools.url-hint": "Adresa http, https nebo rtsp",
+  "player.tools.url-invalid": "Adresu se nepodařilo přečíst",
+  "player.tools.open": "Otevřít",
+  "player.tools.cancel": "Zrušit",
+  "player.tools.saved": "Uloženo: {0}",
+  "player.tools.failed": "Soubor se nepodařilo vytvořit",
+  "player.tools.novideo": "Nejprve otevřete video",
+  "player.tools.state-mini": "mini režim",
+  "player.tools.preview": "Náhled",
+  "player.tools.length": "Délka klipu {0} s"
+}

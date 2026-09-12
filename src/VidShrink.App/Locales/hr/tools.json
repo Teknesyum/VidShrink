@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Alati",
+  "player.tools.clip": "Spremi isječak",
+  "player.tools.gif": "Spremi GIF",
+  "player.tools.mini": "Mini način rada",
+  "player.tools.url": "Otvori adresu…",
+  "player.tools.url-hint": "http, https ili rtsp adresa",
+  "player.tools.url-invalid": "Adresu nije bilo moguće pročitati",
+  "player.tools.open": "Otvori",
+  "player.tools.cancel": "Odustani",
+  "player.tools.saved": "Spremljeno: {0}",
+  "player.tools.failed": "Datoteku nije bilo moguće izraditi",
+  "player.tools.novideo": "Najprije otvorite videozapis",
+  "player.tools.state-mini": "mini način rada",
+  "player.tools.preview": "Pregled",
+  "player.tools.length": "Trajanje isječka {0} s"
+}

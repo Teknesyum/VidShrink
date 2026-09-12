@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "கருவிகள்",
+  "player.tools.clip": "கிளிப்பைச் சேமி",
+  "player.tools.gif": "GIF சேமி",
+  "player.tools.mini": "மினி பயன்முறை",
+  "player.tools.url": "முகவரியைத் திற…",
+  "player.tools.url-hint": "http, https அல்லது rtsp முகவரி",
+  "player.tools.url-invalid": "முகவரியைப் படிக்க முடியவில்லை",
+  "player.tools.open": "திற",
+  "player.tools.cancel": "ரத்து",
+  "player.tools.saved": "சேமிக்கப்பட்டது: {0}",
+  "player.tools.failed": "கோப்பை உருவாக்க முடியவில்லை",
+  "player.tools.novideo": "முதலில் ஒரு வீடியோவைத் திறக்கவும்",
+  "player.tools.state-mini": "மினி பயன்முறை",
+  "player.tools.preview": "முன்னோட்டம்",
+  "player.tools.length": "கிளிப் நீளம் {0} வி"
+}

@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Инструменти",
+  "player.tools.clip": "Запази клипа",
+  "player.tools.gif": "Запази GIF",
+  "player.tools.mini": "Мини режим",
+  "player.tools.url": "Отвори адрес…",
+  "player.tools.url-hint": "Адрес http, https или rtsp",
+  "player.tools.url-invalid": "Адресът не можа да бъде прочетен",
+  "player.tools.open": "Отвори",
+  "player.tools.cancel": "Отказ",
+  "player.tools.saved": "Запазено: {0}",
+  "player.tools.failed": "Файлът не можа да бъде създаден",
+  "player.tools.novideo": "Отвори видео първо",
+  "player.tools.state-mini": "мини режим",
+  "player.tools.preview": "Преглед",
+  "player.tools.length": "Дължина на клипа {0} сек"
+}

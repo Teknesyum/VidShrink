@@ -1,0 +1,17 @@
+{
+  "player.tools.menu": "Tools",
+  "player.tools.clip": "Save clip",
+  "player.tools.gif": "Save GIF",
+  "player.tools.mini": "Mini mode",
+  "player.tools.url": "Open address…",
+  "player.tools.url-hint": "http, https or rtsp address",
+  "player.tools.url-invalid": "The address could not be read",
+  "player.tools.open": "Open",
+  "player.tools.cancel": "Cancel",
+  "player.tools.saved": "Saved: {0}",
+  "player.tools.failed": "The file could not be created",
+  "player.tools.novideo": "Open a video first",
+  "player.tools.state-mini": "mini mode",
+  "player.tools.preview": "Preview",
+  "player.tools.length": "Clip length {0} s"
+}
