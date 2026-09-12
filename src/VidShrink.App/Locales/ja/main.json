@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "このパスは有効なffmpeg実行ファイルを指していません。",
 
   "main.tab.player": "プレーヤー",
-  "main.player.title": "プレーヤー",
-  "main.player.menu": "プレーヤーメニュー",
   "main.player.menu.playpause": "再生 / 一時停止",
   "main.player.menu.fullscreen": "全画面",
   "main.player.menu.reset": "ズームをリセット",

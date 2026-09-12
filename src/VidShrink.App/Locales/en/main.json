@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "This path does not point to a valid ffmpeg executable.",
 
   "main.tab.player": "Player",
-  "main.player.title": "Player",
-  "main.player.menu": "Player menu",
   "main.player.menu.playpause": "Play / pause",
   "main.player.menu.fullscreen": "Full screen",
   "main.player.menu.reset": "Reset zoom",

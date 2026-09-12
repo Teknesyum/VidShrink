@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Denne banen peker ikke til en gyldig kjørbar ffmpeg.",
 
   "main.tab.player": "Spiller",
-  "main.player.title": "Spiller",
-  "main.player.menu": "Spillermeny",
   "main.player.menu.playpause": "Spill av / pause",
   "main.player.menu.fullscreen": "Fullskjerm",
   "main.player.menu.reset": "Nullstill zoom",

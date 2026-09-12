@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "נתיב זה אינו מצביע על קובץ הפעלה תקין של ffmpeg.",
 
   "main.tab.player": "נגן",
-  "main.player.title": "נגן",
-  "main.player.menu": "תפריט נגן",
   "main.player.menu.playpause": "נגן / השהה",
   "main.player.menu.fullscreen": "מסך מלא",
   "main.player.menu.reset": "אפס זום",

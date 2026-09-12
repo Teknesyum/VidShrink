@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Njia hii haielekezi kwenye faili halali ya ffmpeg inayotekelezeka.",
 
   "main.tab.player": "Kichezaji",
-  "main.player.title": "Kichezaji",
-  "main.player.menu": "Menyu ya kichezaji",
   "main.player.menu.playpause": "Cheza / sitisha",
   "main.player.menu.fullscreen": "Skrini nzima",
   "main.player.menu.reset": "Weka upya kuza",

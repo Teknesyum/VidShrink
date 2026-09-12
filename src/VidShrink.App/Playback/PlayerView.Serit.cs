@@ -5,8 +5,10 @@ using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
@@ -30,6 +32,7 @@ internal partial class PlayerView
     private HoverZone? _serit;
     private bool _seritWired;
     private bool _pointerOnSerit;
+    private bool _seritSliding;
 
     /// <summary>Seridin gorunurluk bolgesi. Olcum kendi saatini buraya takar.</summary>
     internal HoverZone SeritZone
@@ -105,10 +108,13 @@ internal partial class PlayerView
         BtnSeritPlay.Click += (_, _) => Apply(Keymap.PlayPause.ToCommand());
         BtnSeritBack.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, -Keymap.SeekSmall));
         BtnSeritForward.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, Keymap.SeekSmall));
-        BtnSeritVolumeDown.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Volume, -Keymap.VolumeStep));
-        BtnSeritVolumeUp.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Volume, Keymap.VolumeStep));
-        BtnSeritSlower.Click += (_, _) => Apply(Keymap.Slower.ToCommand());
-        BtnSeritFaster.Click += (_, _) => Apply(Keymap.Faster.ToCommand());
+        BtnSeritMute.Click += (_, _) => Apply(Keymap.Mute.ToCommand());
+        BtnSeritFullScreen.Click += (_, _) => Apply(Keymap.Fullscreen.ToCommand());
+
+        SliderSeritSpeed.Minimum = Keymap.MinimumSpeed;
+        SliderSeritSpeed.Maximum = Keymap.MaximumSpeed;
+        SliderSeritVolume.PropertyChanged += OnSeritSliderChanged;
+        SliderSeritSpeed.PropertyChanged += OnSeritSliderChanged;
 
         HoldSerit();
     }
@@ -138,22 +144,53 @@ internal partial class PlayerView
     {
         if (TxtSeritTime is null) return;
 
-        BtnSeritPlay.Content = _playing ? "❚❚" : "▶";
+        GlyphSeritPlay.Data = Icon(_playing ? "IconPause" : "IconPlay");
+        GlyphSeritVolume.Data = Icon(_volume <= 0 ? "IconVolumeMute" : "IconVolume");
+
         AutomationProperties.SetName(BtnSeritPlay,
             Strings.Get(_playing ? "playback.control.pause" : "playback.control.play"));
         AutomationProperties.SetName(BtnSeritBack, Strings.Get("main.player.menu.seek", -Keymap.SeekSmall));
         AutomationProperties.SetName(BtnSeritForward, Strings.Get("main.player.menu.seek", Keymap.SeekSmall));
-        AutomationProperties.SetName(BtnSeritVolumeDown, Strings.Get("main.player.menu.volume", -Keymap.VolumeStep));
-        AutomationProperties.SetName(BtnSeritVolumeUp, Strings.Get("main.player.menu.volume", Keymap.VolumeStep));
-        AutomationProperties.SetName(BtnSeritSlower, Strings.Get(Keymap.Slower.LabelKey));
-        AutomationProperties.SetName(BtnSeritFaster, Strings.Get(Keymap.Faster.LabelKey));
+        AutomationProperties.SetName(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey));
+        AutomationProperties.SetName(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey));
 
         TxtSeritTime.Text = ClockPair(_seek.Target, _seek.Duration);
         TxtSeritVolume.Text = _volume.ToString("0", CultureInfo.InvariantCulture);
         TxtSeritSpeed.Text = _speed.ToString("0.##", CultureInfo.InvariantCulture) + "x";
 
+        _seritSliding = true;
+        SliderSeritVolume.Maximum = VolumeCeiling();
+        SliderSeritVolume.Value = _volume;
+        SliderSeritSpeed.Value = Math.Clamp(_speed, Keymap.MinimumSpeed, Keymap.MaximumSpeed);
+        _seritSliding = false;
+
         HoldSerit();
     }
+
+    /// <summary>
+    /// Kesit B: ses ve hiz artik dugme cifti degil kaydirici. Kaydirici komut yolunu
+    /// atlamiyor — degeri okunup <see cref="PlayerView.Apply"/>'a <b>fark</b> olarak
+    /// veriliyor, boylece klavye, menu ve seritle ayni tek yoldan geciyor. Bayrak,
+    /// <see cref="RefreshSerit"/>'in kaydiriciyi geri yazmasinin yeni bir komut
+    /// dogurmasini engelliyor.
+    /// </summary>
+    private void OnSeritSliderChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (_seritSliding || e.Property != RangeBase.ValueProperty) return;
+
+        if (ReferenceEquals(sender, SliderSeritVolume))
+        {
+            var fark = SliderSeritVolume.Value - _volume;
+            if (Math.Abs(fark) > double.Epsilon) Apply(new PlayerCommand(PlayerCommandKind.Volume, fark));
+            return;
+        }
+
+        var hizFarki = SliderSeritSpeed.Value - _speed;
+        if (Math.Abs(hizFarki) > double.Epsilon) Apply(new PlayerCommand(PlayerCommandKind.Speed, hizFarki));
+    }
+
+    private Geometry? Icon(string key)
+        => this.TryFindResource(key, out var value) ? value as Geometry : null;
 
     /// <summary>Sure belirteci. Belirtec yoksa bekleme yoktur; kod sayi uydurmaz.</summary>
     private TimeSpan Span(string key)

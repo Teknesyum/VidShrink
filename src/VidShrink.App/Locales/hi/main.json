@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "यह पथ किसी मान्य ffmpeg निष्पादन योग्य फ़ाइल की ओर नहीं जाता।",
 
   "main.tab.player": "प्लेयर",
-  "main.player.title": "प्लेयर",
-  "main.player.menu": "प्लेयर मेनू",
   "main.player.menu.playpause": "चलाएँ / रोकें",
   "main.player.menu.fullscreen": "पूर्ण स्क्रीन",
   "main.player.menu.reset": "ज़ूम रीसेट",

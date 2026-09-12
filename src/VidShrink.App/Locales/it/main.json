@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Questo percorso non punta a un eseguibile ffmpeg valido.",
 
   "main.tab.player": "Lettore",
-  "main.player.title": "Lettore",
-  "main.player.menu": "Menu del lettore",
   "main.player.menu.playpause": "Riproduci / pausa",
   "main.player.menu.fullscreen": "Schermo intero",
   "main.player.menu.reset": "Azzera zoom",

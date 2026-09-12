@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "یہ راستہ درست ffmpeg ایگزیکیوٹیبل کی طرف نہیں جاتا۔",
 
   "main.tab.player": "پلیئر",
-  "main.player.title": "پلیئر",
-  "main.player.menu": "پلیئر مینیو",
   "main.player.menu.playpause": "چلائیں / روکیں",
   "main.player.menu.fullscreen": "پوری سکرین",
   "main.player.menu.reset": "زوم ری سیٹ",

@@ -30,8 +30,6 @@ internal partial class PlayerView
         DragDrop.SetAllowDrop(this, true);
         AddHandler(DragDrop.DragOverEvent, OnSubtitleDragOver);
         AddHandler(DragDrop.DropEvent, OnSubtitleDrop);
-        TrackBar.Subtitle.Click += (_, _) => ShowTrackMenu(TrackBar.Subtitle, BuildSubtitleItems());
-        TrackBar.Audio.Click += (_, _) => ShowTrackMenu(TrackBar.Audio, BuildAudioItems());
     }
 
     private void ApplyTrackOptions(IPlaybackEngine engine)
@@ -302,14 +300,6 @@ internal partial class PlayerView
 
     internal static string CodepageName(SubtitleCodepage codepage)
         => codepage.Name.Length == 0 ? Strings.Get(codepage.LabelKey) : Strings.Get(codepage.LabelKey) + " (" + codepage.Name + ")";
-
-    private void ShowTrackMenu(Control anchor, List<Control> items)
-    {
-        var flyout = new MenuFlyout();
-        foreach (var item in items) flyout.Items.Add(item);
-        try { flyout.ShowAt(anchor); }
-        catch (InvalidOperationException) { }
-    }
 
     private static MenuItem Submenu(string header, List<Control> children)
     {

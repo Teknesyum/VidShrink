@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Sökvägen pekar inte på en giltig körbar ffmpeg.",
 
   "main.tab.player": "Spelare",
-  "main.player.title": "Spelare",
-  "main.player.menu": "Spelarmeny",
   "main.player.menu.playpause": "Spela / paus",
   "main.player.menu.fullscreen": "Helskärm",
   "main.player.menu.reset": "Återställ zoom",

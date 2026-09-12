@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Ce chemin ne pointe pas vers un exécutable ffmpeg valide.",
 
   "main.tab.player": "Lecteur",
-  "main.player.title": "Lecteur",
-  "main.player.menu": "Menu du lecteur",
   "main.player.menu.playpause": "Lecture / pause",
   "main.player.menu.fullscreen": "Plein écran",
   "main.player.menu.reset": "Réinitialiser le zoom",

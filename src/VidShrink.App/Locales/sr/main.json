@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Ova putanja ne pokazuje na ispravan ffmpeg izvršni fajl.",
 
   "main.tab.player": "Plejer",
-  "main.player.title": "Plejer",
-  "main.player.menu": "Meni plejera",
   "main.player.menu.playpause": "Pusti / pauziraj",
   "main.player.menu.fullscreen": "Ceo ekran",
   "main.player.menu.reset": "Resetuj zum",

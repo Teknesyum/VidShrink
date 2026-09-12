@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Denne sti peger ikke på en gyldig ffmpeg-eksekverbar fil.",
 
   "main.tab.player": "Afspiller",
-  "main.player.title": "Afspiller",
-  "main.player.menu": "Afspillermenu",
   "main.player.menu.playpause": "Afspil / pause",
   "main.player.menu.fullscreen": "Fuld skærm",
   "main.player.menu.reset": "Nulstil zoom",

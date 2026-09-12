@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Bu yol geçerli bir ffmpeg çalıştırılabilirine işaret etmiyor.",
 
   "main.tab.player": "Oynatıcı",
-  "main.player.title": "Oynatıcı",
-  "main.player.menu": "Oynatıcı menüsü",
   "main.player.menu.playpause": "Oynat / duraklat",
   "main.player.menu.fullscreen": "Tam ekran",
   "main.player.menu.reset": "Yakınlaştırmayı sıfırla",

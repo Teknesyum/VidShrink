@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Šis ceļš nenorāda uz derīgu ffmpeg izpildāmo failu.",
 
   "main.tab.player": "Atskaņotājs",
-  "main.player.title": "Atskaņotājs",
-  "main.player.menu": "Atskaņotāja izvēlne",
   "main.player.menu.playpause": "Atskaņot / pauze",
   "main.player.menu.fullscreen": "Pilnekrāns",
   "main.player.menu.reset": "Atiestatīt tālummaiņu",

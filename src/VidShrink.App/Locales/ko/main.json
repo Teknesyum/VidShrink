@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "이 경로는 유효한 ffmpeg 실행 파일을 가리키지 않습니다.",
 
   "main.tab.player": "플레이어",
-  "main.player.title": "플레이어",
-  "main.player.menu": "플레이어 메뉴",
   "main.player.menu.playpause": "재생 / 일시정지",
   "main.player.menu.fullscreen": "전체 화면",
   "main.player.menu.reset": "확대 초기화",

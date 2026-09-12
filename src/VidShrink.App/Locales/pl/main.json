@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Ta ścieżka nie wskazuje na prawidłowy plik wykonywalny ffmpeg.",
 
   "main.tab.player": "Odtwarzacz",
-  "main.player.title": "Odtwarzacz",
-  "main.player.menu": "Menu odtwarzacza",
   "main.player.menu.playpause": "Odtwórz / pauza",
   "main.player.menu.fullscreen": "Pełny ekran",
   "main.player.menu.reset": "Resetuj zoom",

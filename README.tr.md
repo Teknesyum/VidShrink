@@ -307,7 +307,11 @@ yapılır.
 ![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu paneli](docs/gorseller/t26-pencere-tr.png)
 
 Oynatıcı sekmesi kaynağı pencerenin içinde oynatır; kod çözücü borusu aramalar arasında
-açık kalır.
+açık kalır. Sekmede videodan başka bir şey yok: başlık satırı, parça düğmeleri ve üç nokta
+kalktı. Denetim şeridi görüntünün üstünde duruyor ve fare alt kenara yaklaşınca beliriyor;
+üstünde saat, sayıları yanında duran ses ve hız kaydırıcıları ve ortada -10 / oynat / +10
+var, üçünün en büyüğü oynat. Geri kalan her şey sağ tık menüsünde. Programın uyarısı
+oynatıcıyı aşağı itmiyor, üstünde beliriyor.
 
 | Girdi | Etkisi |
 |---|---|

@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Táto cesta neukazuje na platný spustiteľný súbor ffmpeg.",
 
   "main.tab.player": "Prehrávač",
-  "main.player.title": "Prehrávač",
-  "main.player.menu": "Ponuka prehrávača",
   "main.player.menu.playpause": "Prehrať / pozastaviť",
   "main.player.menu.fullscreen": "Celá obrazovka",
   "main.player.menu.reset": "Obnoviť priblíženie",

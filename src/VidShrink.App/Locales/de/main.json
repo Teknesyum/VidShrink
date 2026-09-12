@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Dieser Pfad zeigt nicht auf eine gültige ffmpeg-Programmdatei.",
 
   "main.tab.player": "Player",
-  "main.player.title": "Player",
-  "main.player.menu": "Player-Menü",
   "main.player.menu.playpause": "Abspielen / Pause",
   "main.player.menu.fullscreen": "Vollbild",
   "main.player.menu.reset": "Zoom zurücksetzen",

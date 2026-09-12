@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Tämä polku ei osoita kelvolliseen ffmpeg-ohjelmaan.",
 
   "main.tab.player": "Soitin",
-  "main.player.title": "Soitin",
-  "main.player.menu": "Soittimen valikko",
   "main.player.menu.playpause": "Toista / tauko",
   "main.player.menu.fullscreen": "Koko näyttö",
   "main.player.menu.reset": "Nollaa zoomaus",

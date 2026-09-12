@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Această cale nu indică un executabil ffmpeg valid.",
 
   "main.tab.player": "Player",
-  "main.player.title": "Player",
-  "main.player.menu": "Meniu player",
   "main.player.menu.playpause": "Redă / pauză",
   "main.player.menu.fullscreen": "Ecran complet",
   "main.player.menu.reset": "Resetează zoomul",

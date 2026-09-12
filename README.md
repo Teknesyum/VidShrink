@@ -316,7 +316,12 @@ before execution. GIF conversion goes through `palettegen` then `paletteuse`.
 ![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command panel beside them; window shown in Turkish](docs/gorseller/t26-pencere-tr.png)
 
 The Player tab plays the source in the window, through a decoder pipe that stays open
-between seeks.
+between seeks. The tab is the video and nothing else: no title line, no track buttons, no
+overflow menu. The control strip sits over the picture and appears when the pointer comes
+near the bottom edge; it carries the clock, a volume slider and a speed slider with their
+numbers beside them, and -10 / play / +10 centred, with play the largest target of the
+three. Everything else lives in the right-click menu. A notice from the program floats over
+the player instead of pushing it down.
 
 | Input | Effect |
 |---|---|

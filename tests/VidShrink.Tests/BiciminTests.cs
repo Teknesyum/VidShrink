@@ -519,7 +519,7 @@ public sealed class BaslikKapsamiTests
     /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950, 4. dalga arac ve gelismis anahtarlariyla 985, 8b kaydedici anahtarlariyla 1078, 8d ses anahtarlariyla 1090, sr'nin yedi ses satiri Kiril'den dosyanin geri kalaniyla ayni Latin yazimina dondurulunce 1091)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 29756 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 29670 kalem)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// <para>Sayim yansimanin gordugu 43 dil uzerinden: 42 dil klasoru ve gomulu kaynak
     /// adindan gelen bir dil daha, her biri 692 anahtar. 5. dalga ffmpeg oynatma borusunu
@@ -538,7 +538,9 @@ public sealed class BaslikKapsamiTests
     /// secim yuzeyi girdi: recorder.audio.* alti anahtar ve recorder.error.audio,
     /// 43 x 692 = 29756. 0.4.4 yeni surum uyarisina Yukle dugmesini ekledi (main.action.install,
     /// 43 x 693 = 29799); ayni turda Ayarlar seride kendi sekmesi olunca baslik cubugundaki
-    /// tekerlek dustu ve main.language.settings sahipsiz kaldi, silindi: 43 x 692 = 29756.</para>
+    /// tekerlek dustu ve main.language.settings sahipsiz kaldi, silindi: 43 x 692 = 29756.
+    /// Kesit B oynatici basligini kaldirdi (baslik yazisi, parca dugmeleri, uc nokta);
+    /// main.player.title ve main.player.menu sahipsiz kaldi, silindi: 43 x 690 = 29670.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -566,7 +568,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(29756, gezilen);
+        Assert.Equal(29670, gezilen);
         Assert.Empty(kayip);
     }
 

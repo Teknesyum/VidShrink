@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Този път не сочи към валиден изпълним файл на ffmpeg.",
 
   "main.tab.player": "Плейър",
-  "main.player.title": "Плейър",
-  "main.player.menu": "Меню на плейъра",
   "main.player.menu.playpause": "Пускане / пауза",
   "main.player.menu.fullscreen": "Цял екран",
   "main.player.menu.reset": "Нулирай мащаба",

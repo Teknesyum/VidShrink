@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Dit pad wijst niet naar een geldig ffmpeg-programma.",
 
   "main.tab.player": "Speler",
-  "main.player.title": "Speler",
-  "main.player.menu": "Spelermenu",
   "main.player.menu.playpause": "Afspelen / pauze",
   "main.player.menu.fullscreen": "Volledig scherm",
   "main.player.menu.reset": "Zoom resetten",

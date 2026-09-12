@@ -362,12 +362,6 @@ internal partial class PlayerView : UserControl
         if (FeedKey(e.Key, e.KeyModifiers, e.KeySymbol)) e.Handled = true;
     }
 
-    private void OnMenuButton(object? sender, RoutedEventArgs e)
-    {
-        MenuAtPointer = false;
-        Apply(Keymap.OpenMenu.ToCommand());
-    }
-
     internal bool MenuAtPointer { get; set; }
 
     internal MenuFlyout BuildMenu()
@@ -402,11 +396,10 @@ internal partial class PlayerView : UserControl
     private void OpenMenu()
     {
         var flyout = BuildMenu();
-        MenuAnchor = MenuAtPointer ? "pointer" : "button";
+        MenuAnchor = MenuAtPointer ? "pointer" : "surface";
         try
         {
-            if (MenuAtPointer) flyout.ShowAt(Surface, true);
-            else flyout.ShowAt(BtnPlayerMenu);
+            flyout.ShowAt(Surface, MenuAtPointer);
         }
         catch (InvalidOperationException) { }
 

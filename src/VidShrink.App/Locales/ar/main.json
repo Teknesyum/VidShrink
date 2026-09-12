@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "هذا المسار لا يشير إلى ملف ffmpeg تنفيذي صالح.",
 
   "main.tab.player": "المشغّل",
-  "main.player.title": "المشغّل",
-  "main.player.menu": "قائمة المشغّل",
   "main.player.menu.playpause": "تشغيل / إيقاف مؤقت",
   "main.player.menu.fullscreen": "ملء الشاشة",
   "main.player.menu.reset": "إعادة ضبط التكبير",

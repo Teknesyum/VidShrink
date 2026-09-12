@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Αυτή η διαδρομή δεν οδηγεί σε έγκυρο εκτελέσιμο ffmpeg.",
 
   "main.tab.player": "Αναπαραγωγή",
-  "main.player.title": "Αναπαραγωγή",
-  "main.player.menu": "Μενού αναπαραγωγής",
   "main.player.menu.playpause": "Αναπαραγωγή / παύση",
   "main.player.menu.fullscreen": "Πλήρης οθόνη",
   "main.player.menu.reset": "Επαναφορά ζουμ",

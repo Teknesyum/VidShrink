@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Este caminho não aponta para um executável ffmpeg válido.",
 
   "main.tab.player": "Player",
-  "main.player.title": "Player",
-  "main.player.menu": "Menu do player",
   "main.player.menu.playpause": "Reproduzir / pausar",
   "main.player.menu.fullscreen": "Tela cheia",
   "main.player.menu.reset": "Redefinir zoom",

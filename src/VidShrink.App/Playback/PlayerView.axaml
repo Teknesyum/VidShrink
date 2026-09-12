@@ -8,30 +8,13 @@
              Loaded="OnSeritLoaded">
 
   <!--
-    7b/K3: sayfanin iki satiri kaldi. Zaman cubugu, denetim seridi ve tanilama satirlari
-    artik yerlesimde yer kaplamiyor — hepsi panonun ustune binen katmanlar. Kok izgaranin
-    SectionMargin'i ve panonun PanelPadding'i de kalkti: video dikeyde o kadar buyuyor.
+    Kesit B: sayfanin tek satiri kaldi. Baslik, ses/altyazi parcasi dugmeleri ve uc nokta
+    kalkti; ucunun de karsiligi sag klik menusunde duruyor. Zaman cubugu, denetim seridi ve
+    tanilama satirlari yerlesimde yer kaplamiyor — hepsi panonun ustune binen katmanlar.
   -->
-  <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceSm}">
+  <Grid>
 
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-      <TextBlock Grid.Column="0"
-                 Text="{loc:Text main.player.title}"
-                 Theme="{StaticResource H2}"
-                 VerticalAlignment="Center"/>
-      <playback:TrackButtons Grid.Column="1" x:Name="TrackBar" VerticalAlignment="Center"/>
-      <Button Grid.Column="2"
-              x:Name="BtnPlayerMenu"
-              Content="⋮"
-              Theme="{StaticResource GhostButton}"
-              FontFamily="{StaticResource FontMono}"
-              VerticalAlignment="Center"
-              auto:AutomationProperties.Name="{loc:Text main.player.menu}"
-              Click="OnMenuButton"/>
-    </Grid>
-
-    <Border Grid.Row="1"
-            x:Name="Stage"
+    <Border x:Name="Stage"
             Theme="{StaticResource Panel}"
             Background="{StaticResource AppBg}"
             Padding="0">
@@ -124,47 +107,84 @@
               <Canvas x:Name="SeekMarkLayer" IsHitTestVisible="False"/>
             </Panel>
 
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto"
-                  ColumnSpacing="{StaticResource SpaceSm}">
-              <Button Grid.Column="0" x:Name="BtnSeritPlay" Theme="{StaticResource PlaybackBarButton}"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.playpause}"/>
-              <Button Grid.Column="1" x:Name="BtnSeritBack" Theme="{StaticResource PlaybackBarButton}" Content="-10"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}"/>
-              <Button Grid.Column="2" x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}" Content="+10"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}"/>
+            <!--
+              Kesit B: uc oberk. Solda sure okumasi ve ses, ortada -10 / oynat / +10,
+              sagda hiz. Oynat dugmesi ortadaki obegin ortasinda durdugu icin izgara
+              simetrik: iki yan sutun da yildiz, ortadaki Auto.
+            -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
 
-              <TextBlock Grid.Column="3"
-                         x:Name="TxtSeritTime"
-                         Theme="{StaticResource PlaybackTimeText}"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"/>
+              <StackPanel Grid.Column="0"
+                          Orientation="Horizontal"
+                          Spacing="{StaticResource SpaceSm}"
+                          VerticalAlignment="Center">
+                <TextBlock x:Name="TxtSeritTime"
+                           Theme="{StaticResource PlaybackTimeText}"
+                           VerticalAlignment="Center"/>
+                <Button x:Name="BtnSeritMute" Theme="{StaticResource PlaybackBarButton}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.mute}">
+                  <Path x:Name="GlyphSeritVolume"
+                        Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                        Data="{StaticResource IconVolume}" Stroke="{Binding $parent[Button].Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                </Button>
+                <Slider x:Name="SliderSeritVolume"
+                        Theme="{StaticResource PlaybackSlider}"
+                        Minimum="0"
+                        Maximum="100"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
+                <TextBlock x:Name="TxtSeritVolume"
+                           Theme="{StaticResource PlaybackTimeText}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
 
-              <Button Grid.Column="4" x:Name="BtnSeritVolumeDown" Theme="{StaticResource PlaybackBarButton}"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconVolumeMute}" Stroke="{Binding $parent[Button].Foreground}"
+              <StackPanel Grid.Column="1"
+                          Orientation="Horizontal"
+                          Spacing="{StaticResource SpaceSm}"
+                          VerticalAlignment="Center">
+                <Button x:Name="BtnSeritBack" Theme="{StaticResource PlaybackBarButton}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
+                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                        Data="{StaticResource IconRewind}" Stroke="{Binding $parent[Button].Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                </Button>
+                <Button x:Name="BtnSeritPlay" Theme="{StaticResource PlaybackPlayButton}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.playpause}">
+                  <Path x:Name="GlyphSeritPlay"
+                        Width="{StaticResource IconSizeLg}" Height="{StaticResource IconSizeLg}" Stretch="Uniform"
+                        Data="{StaticResource IconPlay}" Stroke="{Binding $parent[Button].Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                </Button>
+                <Button x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
+                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                        Data="{StaticResource IconFastForward}" Stroke="{Binding $parent[Button].Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                </Button>
+              </StackPanel>
+
+              <StackPanel Grid.Column="2"
+                          Orientation="Horizontal"
+                          Spacing="{StaticResource SpaceSm}"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center">
+                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                      VerticalAlignment="Center"
+                      Data="{StaticResource IconSpeed}" Stroke="{StaticResource TextBody}"
                       StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-              </Button>
-              <TextBlock Grid.Column="5"
-                         x:Name="TxtSeritVolume"
-                         Theme="{StaticResource PlaybackTimeText}"
-                         VerticalAlignment="Center"/>
-              <Button Grid.Column="6" x:Name="BtnSeritVolumeUp" Theme="{StaticResource PlaybackBarButton}"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconVolume}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-              </Button>
-
-              <Button Grid.Column="7" x:Name="BtnSeritSlower" Theme="{StaticResource PlaybackBarButton}" Content="«"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.slower}"/>
-              <TextBlock Grid.Column="8"
-                         x:Name="TxtSeritSpeed"
-                         Theme="{StaticResource PlaybackTimeText}"
-                         VerticalAlignment="Center"/>
-              <Button Grid.Column="9" x:Name="BtnSeritFaster" Theme="{StaticResource PlaybackBarButton}" Content="»"
-                      auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
+                <Slider x:Name="SliderSeritSpeed"
+                        Theme="{StaticResource PlaybackSlider}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
+                <TextBlock x:Name="TxtSeritSpeed"
+                           Theme="{StaticResource PlaybackTimeText}"
+                           VerticalAlignment="Center"/>
+                <Button x:Name="BtnSeritFullScreen" Theme="{StaticResource PlaybackBarButton}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.fullscreen}">
+                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                        Data="{StaticResource IconFullScreen}" Stroke="{Binding $parent[Button].Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                </Button>
+              </StackPanel>
             </Grid>
           </Grid>
         </Border>

@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "See tee ei osuta kehtivale ffmpegi käivitusfailile.",
 
   "main.tab.player": "Mängija",
-  "main.player.title": "Mängija",
-  "main.player.menu": "Mängija menüü",
   "main.player.menu.playpause": "Esita / paus",
   "main.player.menu.fullscreen": "Täisekraan",
   "main.player.menu.reset": "Lähtesta suum",

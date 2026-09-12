@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Ez az útvonal nem érvényes ffmpeg futtatható fájlra mutat.",
 
   "main.tab.player": "Lejátszó",
-  "main.player.title": "Lejátszó",
-  "main.player.menu": "Lejátszó menü",
   "main.player.menu.playpause": "Lejátszás / szünet",
   "main.player.menu.fullscreen": "Teljes képernyő",
   "main.player.menu.reset": "Nagyítás visszaállítása",

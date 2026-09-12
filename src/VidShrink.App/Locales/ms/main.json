@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Laluan ini tidak menunjuk ke fail boleh laku ffmpeg yang sah.",
 
   "main.tab.player": "Pemain",
-  "main.player.title": "Pemain",
-  "main.player.menu": "Menu pemain",
   "main.player.menu.playpause": "Main / jeda",
   "main.player.menu.fullscreen": "Skrin penuh",
   "main.player.menu.reset": "Set semula zum",

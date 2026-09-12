@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "此路径未指向有效的 ffmpeg 可执行文件。",
 
   "main.tab.player": "播放器",
-  "main.player.title": "播放器",
-  "main.player.menu": "播放器菜单",
   "main.player.menu.playpause": "播放 / 暂停",
   "main.player.menu.fullscreen": "全屏",
   "main.player.menu.reset": "重置缩放",

@@ -129,6 +129,21 @@
   <x:Double x:Key="PlaybackSeekTrackHeight">10</x:Double>
   <x:Double x:Key="PlaybackBarButtonSize">40</x:Double>
 
+  <!--
+    Kesit B: oynat düğmesi şeridin ortasında ve diğerlerinden büyük. Üç sayı da var olan
+    belirteçten geliyor, yenisi uydurulmadı:
+
+      PlaybackPlayButtonSize   <- PlaybackHandleHeight (48). Karşılaştırma kolunun tutamak
+                                  yüksekliği; şeritteki en büyük dokunma hedefi zaten bu.
+      PlaybackPlayButtonWidth  <- PlaybackThumbnailHeight (72). "Daha geniş" istendi;
+                                  küçük resmin yüksekliği şeritteki bilinen en yakın sayı.
+      PlaybackSliderWidth      <- PlaybackThumbnailWidth (128). Ses ve hız kaydırıcısının
+                                  genişliği; küçük resmin genişliğiyle aynı hizada duruyor.
+  -->
+  <x:Double x:Key="PlaybackPlayButtonSize">48</x:Double>
+  <x:Double x:Key="PlaybackPlayButtonWidth">72</x:Double>
+  <x:Double x:Key="PlaybackSliderWidth">128</x:Double>
+
   <x:Double x:Key="PlaybackThumbnailWidth">128</x:Double>
   <x:Double x:Key="PlaybackThumbnailHeight">72</x:Double>
 
@@ -393,6 +408,16 @@
     <Setter Property="Margin" Value="0"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="HorizontalContentAlignment" Value="Center"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackPlayButton" TargetType="Button" BasedOn="{StaticResource PlaybackBarButton}">
+    <Setter Property="MinWidth" Value="{StaticResource PlaybackPlayButtonWidth}"/>
+    <Setter Property="MinHeight" Value="{StaticResource PlaybackPlayButtonSize}"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="PlaybackSlider" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
+    <Setter Property="Width" Value="{StaticResource PlaybackSliderWidth}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
   </ControlTheme>
 
   <!-- Süre okuması. Sayı olduğu için mono; rengi beyaz, kontrastı perdeden alır. -->

@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Ta pot ne kaže na veljavno izvedljivo datoteko ffmpeg.",
 
   "main.tab.player": "Predvajalnik",
-  "main.player.title": "Predvajalnik",
-  "main.player.menu": "Meni predvajalnika",
   "main.player.menu.playpause": "Predvajaj / premor",
   "main.player.menu.fullscreen": "Celoten zaslon",
   "main.player.menu.reset": "Ponastavi povečavo",

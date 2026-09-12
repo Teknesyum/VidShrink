@@ -945,8 +945,13 @@ public sealed class OynaticiFareTests
         FareKanit.Write("f4-miknatis.txt", body.ToString());
     }
 
+    /// <summary>
+    /// Kesit B: başlıktaki üç nokta düğmesi kalktı, menünün ikinci yolu artık klavye.
+    /// Sağ tık menüyü farenin altında açıyor, klavye ise panonun kendisine yaslıyor;
+    /// iki yol da aynı <c>BuildMenu</c>'den geçiyor, yani içerik tek yerden geliyor.
+    /// </summary>
     [Fact]
-    public void SagTikMenuyuFareKonumundaAcarDugmeYoluBozulmaz()
+    public void SagTikMenuyuFareKonumundaAcarKlavyeYoluPanoyaYaslanir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -960,7 +965,7 @@ public sealed class OynaticiFareTests
             view.MenuAtPointer = false;
             view.Apply(Keymap.OpenMenu.ToCommand());
             var dugme = view.MenuAnchor;
-            body.AppendLine($"menu dugmesi : yaslanma [{dugme}], iz {view.Trace[^1]}");
+            body.AppendLine($"klavye       : yaslanma [{dugme}], iz {view.Trace[^1]}");
 
             var basliklar = view.BuildMenu().Items.OfType<MenuItem>()
                 .Where(item => item.Tag is PlayerAction)
@@ -969,7 +974,7 @@ public sealed class OynaticiFareTests
             body.AppendLine($"ilk satir    : {basliklar[0]}");
 
             Assert.Equal("pointer", sagTik);
-            Assert.Equal("button", dugme);
+            Assert.Equal("surface", dugme);
             Assert.Equal(Strings.Get("main.player.menu.settings"), basliklar[0]);
 
             window.Close();

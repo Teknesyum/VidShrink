@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "এই পথ বৈধ ffmpeg এক্সিকিউটেবল নির্দেশ করে না।",
 
   "main.tab.player": "প্লেয়ার",
-  "main.player.title": "প্লেয়ার",
-  "main.player.menu": "প্লেয়ার মেনু",
   "main.player.menu.playpause": "চালান / বিরতি",
   "main.player.menu.fullscreen": "পূর্ণ পর্দা",
   "main.player.menu.reset": "জুম রিসেট",

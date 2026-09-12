@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Šis kelias nerodo į tinkamą ffmpeg vykdomąjį failą.",
 
   "main.tab.player": "Grotuvas",
-  "main.player.title": "Grotuvas",
-  "main.player.menu": "Grotuvo meniu",
   "main.player.menu.playpause": "Groti / pristabdyti",
   "main.player.menu.fullscreen": "Visas ekranas",
   "main.player.menu.reset": "Atstatyti mastelį",

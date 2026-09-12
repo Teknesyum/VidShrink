@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "เส้นทางนี้ไม่ชี้ไปยังไฟล์ ffmpeg ที่ใช้งานได้",
 
   "main.tab.player": "ตัวเล่น",
-  "main.player.title": "ตัวเล่น",
-  "main.player.menu": "เมนูตัวเล่น",
   "main.player.menu.playpause": "เล่น / หยุด",
   "main.player.menu.fullscreen": "เต็มจอ",
   "main.player.menu.reset": "รีเซ็ตซูม",

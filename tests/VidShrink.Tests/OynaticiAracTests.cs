@@ -252,6 +252,14 @@ public sealed class OynaticiAracTests
     private static void Bas(PlayerView view, string ad)
         => view.FindControl<Button>(ad)!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
+    /// <summary>
+    /// Kesit B: ses ve hız artık düğme çifti değil kaydırıcı. Sürükleme kaydırıcının
+    /// <c>Value</c>'sunu değiştirmekle aynı şey; ölçüm o değeri yazıp komutun motora
+    /// ulaşıp ulaşmadığına bakıyor.
+    /// </summary>
+    private static void Kaydir(PlayerView view, string ad, double deger)
+        => view.FindControl<Slider>(ad)!.Value = deger;
+
     /// <summary>Zaman çubuğunda sürükleme başlatır: basış anında o ana gidilir.</summary>
     private static void CubukBas(Panel cubuk, double x)
         => cubuk.RaiseEvent(new PointerPressedEventArgs(
@@ -293,8 +301,13 @@ public sealed class OynaticiAracTests
     /// Beş koşumun birinde ölçülen sapma 0,033 sn, yani 30 fps'lik klipte tam bir kare;
     /// pay 0,05 sn ile bunun hemen üstünde tutuluyor, ikinci kareye izin vermiyor.</para>
     ///
-    /// <para>Ses tavanda duruyor: <c>volume-max</c> 100 olduğu için 95'ten iki artış 105
-    /// değil 100 veriyor. Beklenen sayı tavanın kendisinden okunuyor, sabit yazılmıyor.</para>
+    /// <para>Ses tavanda duruyor: kaydırıcının üst sınırı motorun <c>volume-max</c>
+    /// değerine bağlı, tavanın üstüne yazılan sayı tavana oturuyor. Beklenen sayı tavanın
+    /// kendisinden okunuyor, sabit yazılmıyor.</para>
+    ///
+    /// <para>Kesit B: ses ve hız düğme çifti olmaktan çıkıp kaydırıcı oldu, ölçüm de
+    /// tıklama yerine <c>Value</c> yazıyor. Ölçtüğü şey değişmedi — komutun motora ulaşması
+    /// ve motordan geri okunması.</para>
     /// </summary>
     [Fact]
     public void SeritDugmeleriMotoraUlasirVeMotordanGeriOkunur()
@@ -328,21 +341,21 @@ public sealed class OynaticiAracTests
 
             var tavan = Oku("volume-max");
             var sesOnce = Oku("volume");
-            Bas(view, "BtnSeritVolumeDown");
+            Kaydir(view, "SliderSeritVolume", sesOnce - 5);
             DenetimSurucu.Wait(view, 0.1);
             var sesKisik = Oku("volume");
-            Bas(view, "BtnSeritVolumeUp");
+            Kaydir(view, "SliderSeritVolume", sesOnce);
             DenetimSurucu.Wait(view, 0.1);
             var sesGeri = Oku("volume");
-            Bas(view, "BtnSeritVolumeUp");
+            Kaydir(view, "SliderSeritVolume", tavan + 5);
             DenetimSurucu.Wait(view, 0.1);
             var sesTavan = Oku("volume");
 
             var hizOnce = Oku("speed");
-            Bas(view, "BtnSeritFaster");
+            Kaydir(view, "SliderSeritSpeed", hizOnce + 0.25);
             DenetimSurucu.Wait(view, 0.1);
             var hizli = Oku("speed");
-            Bas(view, "BtnSeritSlower");
+            Kaydir(view, "SliderSeritSpeed", hizOnce);
             DenetimSurucu.Wait(view, 0.1);
             var normal = Oku("speed");
 

@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Ova putanja ne pokazuje na valjanu izvršnu datoteku ffmpeg-a.",
 
   "main.tab.player": "Preglednik",
-  "main.player.title": "Preglednik",
-  "main.player.menu": "Izbornik preglednika",
   "main.player.menu.playpause": "Reproduciraj / pauza",
   "main.player.menu.fullscreen": "Cijeli zaslon",
   "main.player.menu.reset": "Poništi zum",

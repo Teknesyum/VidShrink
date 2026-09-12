@@ -789,7 +789,13 @@
         </Setter>
         <Setter Property="Template">
           <ControlTemplate TargetType="TabControl">
-            <Grid RowDefinitions="Auto,Auto,*" ClipToBounds="False">
+            <!--
+              Kesit B: uyari yigini artik icerigi asagi itmiyor. Onceden kendi satirindaydi
+              ve her acilisinda oynatici o kadar kisaliyordu; simdi icerikle ayni gozde,
+              uste yaslanmis bir katman. "Uyari cikacaksa oynaticinin ustunde ciksin"
+              cumlesinin karsiligi bu.
+            -->
+            <Grid RowDefinitions="Auto,*" ClipToBounds="False">
               <ItemsPresenter Name="PART_ItemsPresenter"
                               Grid.Row="0"
                               Height="{StaticResource TitleBarHeight}"
@@ -797,10 +803,9 @@
                               ItemsPanel="{TemplateBinding ItemsPanel}"
                               ClipToBounds="False"
                               Margin="{TemplateBinding Padding}"/>
-              <ContentPresenter Grid.Row="1" Content="{TemplateBinding Tag}"/>
               <TransitioningContentControl Name="SelectedContentHost"
                                            Margin="{StaticResource WorkspaceMargin}"
-                                           Grid.Row="2"
+                                           Grid.Row="1"
                                            Content="{TemplateBinding SelectedContent}"
                                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
                                            HorizontalContentAlignment="Stretch"
@@ -809,9 +814,20 @@
                   <CrossFade Duration="{StaticResource MotionBase}"/>
                 </TransitioningContentControl.PageTransition>
               </TransitioningContentControl>
+              <ContentPresenter Name="NoticeLayer"
+                                Grid.Row="1"
+                                VerticalAlignment="Top"
+                                Content="{TemplateBinding Tag}"/>
             </Grid>
           </ControlTemplate>
         </Setter>
+        <!--
+          Oynatici sekmesi tum alani kapsiyor: calisma kenari yalniz o sekmede sifir.
+          Sekme sirasi MainWindow.PlayerTabIndex ile pimli.
+        -->
+        <Style Selector="^[SelectedIndex=0] /template/ TransitioningContentControl#SelectedContentHost">
+          <Setter Property="Margin" Value="0"/>
+        </Style>
       </ControlTheme>
 
       <ControlTheme x:Key="NeonTabItem" TargetType="TabItem">

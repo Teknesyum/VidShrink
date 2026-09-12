@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "இந்தப் பாதை சரியான ffmpeg இயங்கு கோப்பைச் சுட்டவில்லை.",
 
   "main.tab.player": "இயக்கி",
-  "main.player.title": "இயக்கி",
-  "main.player.menu": "இயக்கி மெனு",
   "main.player.menu.playpause": "இயக்கு / இடைநிறுத்து",
   "main.player.menu.fullscreen": "முழுத்திரை",
   "main.player.menu.reset": "பெரிதாக்கலை மீட்டமை",

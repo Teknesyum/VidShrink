@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Jalur ini tidak menunjuk ke executable ffmpeg yang valid.",
 
   "main.tab.player": "Pemutar",
-  "main.player.title": "Pemutar",
-  "main.player.menu": "Menu pemutar",
   "main.player.menu.playpause": "Putar / jeda",
   "main.player.menu.fullscreen": "Layar penuh",
   "main.player.menu.reset": "Atur ulang zoom",

@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "Đường dẫn này không trỏ tới tệp ffmpeg hợp lệ.",
 
   "main.tab.player": "Trình phát",
-  "main.player.title": "Trình phát",
-  "main.player.menu": "Menu trình phát",
   "main.player.menu.playpause": "Phát / tạm dừng",
   "main.player.menu.fullscreen": "Toàn màn hình",
   "main.player.menu.reset": "Đặt lại thu phóng",

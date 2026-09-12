@@ -419,8 +419,6 @@
   "settings-tab.ffmpeg-path.error": "این مسیر به فایل اجرایی معتبر ffmpeg اشاره نمی‌کند.",
 
   "main.tab.player": "پخش‌کننده",
-  "main.player.title": "پخش‌کننده",
-  "main.player.menu": "منوی پخش‌کننده",
   "main.player.menu.playpause": "پخش / مکث",
   "main.player.menu.fullscreen": "تمام‌صفحه",
   "main.player.menu.reset": "بازنشانی بزرگ‌نمایی",
