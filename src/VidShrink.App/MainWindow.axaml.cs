@@ -145,6 +145,7 @@ public partial class MainWindow : Window
         Player.PlayerTabIndex = () => PlayerTabIndex;
         Player.CurrentTabIndex = () => Tabs.SelectedIndex;
         Player.SelectTab = index => Tabs.SelectedIndex = index;
+        PlayerAdvancedPanel.Player = Player;
         Player.HistoryPath = () => Path.Combine(
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
             "player-history.json");

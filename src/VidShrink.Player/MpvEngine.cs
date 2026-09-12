@@ -9,7 +9,7 @@ using static VidShrink.Player.Native;
 
 namespace VidShrink.Player;
 
-public sealed class MpvEngine : IPlaybackEngine
+public sealed partial class MpvEngine : IPlaybackEngine
 {
     public const string FailedKey = "main.error.unusable";
 

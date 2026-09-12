@@ -1,7 +1,6 @@
 # VidShrink.Tests
 
-Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşum kapalı
-(`LanguageTests.cs` içindeki assembly özniteliği).
+Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşum kapalı (`LanguageTests.cs` özniteliği).
 
 - Zamanlama ölçen testleri yük altında okuma; yerelde filtreli koş, tam süit CI'da.
 - Çıktı ve kanıt dosyaları `.calisma/` altına (`GirdiKanit`, `MotorKanit`).
@@ -16,5 +15,7 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   altyazı bırakma PlayerView üstünden. Kanıt `.calisma/dalga2/`.
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucu sabitleri CI ile aynı, açılamayan motor atılır.
 - `OynaticiGorunumTests.cs` — 3. dalga; ayar/son dosyalar `.calisma/dalga3/gecici` altina yazar.
+- `OynaticiGelismisTests.cs` — 4a dalga: her gelişmiş ayar motora yazılır, **motordan** geri okunur ve sıfırlanır;
+  negatif kontrol kareden gelir. Kanıt `.calisma/dalga4a/`.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.

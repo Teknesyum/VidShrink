@@ -363,7 +363,7 @@ public sealed class KeymapTests
                 var menu = tumu.Where(item => item.Tag is PlayerAction).ToList();
                 var ekler = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
                 body.AppendLine($"[{dil}] menu {menu.Count} satir, ek satirlar: {string.Join(" | ", ekler)}");
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder") }, ekler);
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.advanced.menu") }, ekler);
                 Assert.Equal(tumu.IndexOf(menu.First(item => ReferenceEquals(item.Tag, Keymap.Mute))) + 1, tumu.FindIndex(item => item.Tag is null));
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);
                 foreach (var (item, action) in menu.Zip(Keymap.MenuActions))

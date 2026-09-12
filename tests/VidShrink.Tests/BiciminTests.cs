@@ -501,8 +501,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(950, toplam);
-        Assert.Equal(99, dilBasina["en"]);
+        Assert.Equal(968, toplam);
+        Assert.Equal(100, dilBasina["en"]);
         Assert.Equal(41, dilBasina["tr"]);
     }
 
@@ -516,10 +516,10 @@ public sealed class BaslikKapsamiTests
     ///
     /// <para>Tur 2'de <c>Names</c> gecidi yalniz <c>CapitaliseWord</c> icindeydi ve
     /// <c>Sentence</c> onu sadece satir basi sozcugu icin cagiriyordu. Sonuc: baslik
-    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950)
+    /// kolundan govde koluna gecen metinlerde (o turda 124, kirk dil eklendikten sonra 784, tagline anahtarlari silinince 778, oynatici 1. dalga anahtarlariyla 844, 3. dalga anahtarlariyla 898, 2. dalga parca anahtarlariyla 950, 4a dalga gelismis anahtarlariyla 968)
     /// ilk sozcuk disindaki <c>ffmpeg</c>
     /// dil dosyasindaki yazimiyla kaliyordu — <c>en/main.drop.hint</c>,
-    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 24940 kalem)
+    /// <c>en|tr/main.reason.encoder-fallback-not-in-build</c>. Bu olcu butun dillerin butun anahtarlarinin (bugun 26617 kalem)
     /// <b>tamamini</b> gezer, tek bir kalemi bile atlamaz.</para>
     /// <para>Sayim yansimanin gordugu 43 dil uzerinden: 42 dil klasoru ve gomulu kaynak
     /// adindan gelen bir dil daha, her biri 580 anahtar. 5. dalga ffmpeg oynatma borusunu
@@ -527,7 +527,8 @@ public sealed class BaslikKapsamiTests
     /// <c>playback.source.*</c> anahtari kataloglardan cikti: 43 x 486 = 20898'den
     /// 43 x 477 = 20511'e. 1. dalga 32 oynatici anahtari ekledi: 43 x 509 = 21887. 6. dalga Unix kapamasi
     /// <c>main.instance.waiting</c> ekledi: 43 x 510 = 21930. 3. dalga 32 anahtar daha ekledi: 43 x 542 = 23306.
-    /// 2. dalga 38 altyazi ve ses parcasi anahtari ekledi: 43 x 580 = 24940.</para>
+    /// 2. dalga 38 altyazi ve ses parcasi anahtari ekledi: 43 x 580 = 24940.
+    /// 4a dalga 39 anahtar ekledi: 43 x 619 = 26617.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -555,7 +556,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(24940, gezilen);
+        Assert.Equal(26617, gezilen);
         Assert.Empty(kayip);
     }
 

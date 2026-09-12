@@ -137,7 +137,7 @@ internal partial class PlayerView : UserControl
                 _trace.Add("leavefullscreen -> " + _fullscreen.IsFullscreen);
                 break;
             case PlayerCommandKind.Volume:
-                _volume = Math.Clamp(_volume + command.Amount, 0, 100);
+                _volume = Math.Clamp(_volume + command.Amount, 0, VolumeCeiling());
                 _engine?.SetVolume(_volume);
                 _trace.Add("volume " + command.Amount.ToString("0.###") + " -> " + _volume.ToString("0.###"));
                 break;
@@ -364,6 +364,7 @@ internal partial class PlayerView : UserControl
 
         AddTrackMenus(flyout);
         AppendWindowMenu(flyout);
+        AppendAdvancedMenu(flyout);
         return flyout;
     }
 
@@ -482,6 +483,7 @@ internal partial class PlayerView : UserControl
         _loopStart = double.NaN;
         _loopEnd = double.NaN;
         if (HistoryPath?.Invoke() is { } file) _history = PlaybackHistory.Load(file);
+        ApplyAdvanced(engine);
         if (_volume != 100) engine.SetVolume(_volume);
         if (_muted) engine.SetMuted(true);
         if (_speed != 1) engine.SetSpeed(_speed);
@@ -628,6 +630,7 @@ internal partial class PlayerView : UserControl
             : Strings.Get("main.player.loopoff"));
         parts.Add(Strings.Get("main.player.bookmarkcount", _path is null ? 0 : _history.Bookmarks(_path).Count));
         AppendTrackState(parts);
+        AppendAdvancedState(parts);
         TxtControls.Text = string.Join(" - ", parts);
         RefreshWindowState();
     }

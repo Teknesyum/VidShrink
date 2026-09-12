@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:auto="using:Avalonia.Automation"
+             xmlns:loc="using:VidShrink.App.Localization"
+             x:Class="VidShrink.App.Playback.PlayerAdvancedPanel">
+  <Border Theme="{StaticResource Panel}">
+    <StackPanel Spacing="{StaticResource SpaceMd}">
+      <Button x:Name="BtnToggle"
+              Click="OnToggle"
+              Theme="{StaticResource GhostButton}"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Left"
+              Padding="{StaticResource ButtonPaddingSm}"
+              auto:AutomationProperties.Name="{loc:Text player.advanced.title}">
+        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+          <TextBlock x:Name="Glyph" Text="▾" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Text="{loc:Text player.advanced.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="2" x:Name="TxtSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        </Grid>
+      </Button>
+      <StackPanel x:Name="Body" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+        <TextBlock Text="{loc:Text player.advanced.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        <Grid x:Name="Rows"
+              ColumnDefinitions="Auto,Auto,Auto,Auto"
+              ColumnSpacing="{StaticResource SpaceMd}"
+              RowSpacing="{StaticResource SpaceXs}"/>
+        <StackPanel x:Name="Switches" Spacing="{StaticResource SpaceXs}"/>
+        <Button x:Name="BtnReset"
+                Content="{loc:Text player.advanced.reset}"
+                Theme="{StaticResource GhostButton}"
+                HorizontalAlignment="Left"
+                Click="OnReset"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
