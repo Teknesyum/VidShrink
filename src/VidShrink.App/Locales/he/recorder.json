@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} חייב להיות מספר.",
   "recorder.error.start": "ההקלטה לא הצליחה להתחיל: {0}",
   "recorder.error.folder": "לא ניתן היה לבחור את התיקייה: {0}",
-  "recorder.error.audio": "לא ניתן היה להכין את קלט הקול: {0}"
+  "recorder.error.audio": "לא ניתן היה להכין את קלט הקול: {0}",
+  "recorder.auto.enable": "מצב אוטומטי — תנו לתוכנה לבחור את ההגדרות הטובות ביותר",
+  "recorder.auto.hint": "כל עוד הוא פעיל, המקליט מבצע כמה הקלטות ניסיון קצרות ושומר את ההגדרה הגבוהה ביותר שאינה מפילה פריימים.",
+  "recorder.auto.measure": "מדוד שוב",
+  "recorder.auto.measuring": "מודד…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "נבדקו {0} מועמדים; המנצח הפיל {1} פריימים.",
+  "recorder.auto.unmeasured": "לא ניתן היה להריץ אף הקלטת ניסיון; נכתב המועמד הראשון ברשימה.",
+  "recorder.auto.native": "גודל הלכידה",
+  "recorder.auto.note.hardware": "נבדק מקודד חומרה",
+  "recorder.auto.note.software": "אין מקודד חומרה פעיל",
+  "recorder.auto.note.refresh": "קצב פריימים לפי קצב הרענון של המסך",
+  "recorder.auto.note.stepped": "קצב הפריימים הופחת",
+  "recorder.auto.note.kept": "הרזולוציה נשמרה",
+  "recorder.auto.note.halved": "הרזולוציה הופחתה בחצי",
+  "recorder.auto.note.container": "מארז mkv: הקלטה שנקטעה נשארת ניתנת לניגון",
+  "recorder.auto.note.preset": "הגדרה קבועה מראש מאוצר המילים של המקודד עצמו"
 }

@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} tiene que ser un número.",
   "recorder.error.start": "No se pudo iniciar la grabación: {0}",
   "recorder.error.folder": "No se pudo elegir la carpeta: {0}",
-  "recorder.error.audio": "No se pudo preparar la entrada de sonido: {0}"
+  "recorder.error.audio": "No se pudo preparar la entrada de sonido: {0}",
+  "recorder.auto.enable": "Modo automático — deja que el programa elija los mejores ajustes",
+  "recorder.auto.hint": "Mientras está activado, la grabadora realiza unas breves pruebas y conserva el ajuste más alto que no descarta fotogramas.",
+  "recorder.auto.measure": "Medir de nuevo",
+  "recorder.auto.measuring": "Midiendo…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Se probaron {0} candidatos; el ganador descartó {1} fotogramas.",
+  "recorder.auto.unmeasured": "No se pudo ejecutar ninguna prueba; se utilizó el primer candidato de la lista.",
+  "recorder.auto.native": "tamaño de captura",
+  "recorder.auto.note.hardware": "codificador por hardware probado",
+  "recorder.auto.note.software": "no hay codificador por hardware funcional",
+  "recorder.auto.note.refresh": "frecuencia de fotogramas según la tasa de refresco de la pantalla",
+  "recorder.auto.note.stepped": "frecuencia de fotogramas reducida",
+  "recorder.auto.note.kept": "resolución mantenida",
+  "recorder.auto.note.halved": "resolución reducida a la mitad",
+  "recorder.auto.note.container": "contenedor mkv: una grabación interrumpida sigue siendo reproducible",
+  "recorder.auto.note.preset": "preajuste tomado del propio vocabulario del codificador"
 }

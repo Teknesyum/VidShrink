@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} mesti nombor.",
   "recorder.error.start": "Rakaman tidak dapat dimulakan: {0}",
   "recorder.error.folder": "Folder tidak dapat dipilih: {0}",
-  "recorder.error.audio": "Input bunyi tidak dapat disediakan: {0}"
+  "recorder.error.audio": "Input bunyi tidak dapat disediakan: {0}",
+  "recorder.auto.enable": "Mod automatik — biarkan program memilih tetapan terbaik",
+  "recorder.auto.hint": "Semasa ia dihidupkan, perakam membuat beberapa rakaman percubaan pendek dan mengekalkan tetapan tertinggi yang tidak menggugurkan mana-mana bingkai.",
+  "recorder.auto.measure": "Ukur semula",
+  "recorder.auto.measuring": "Mengukur…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} calon dicuba; pemenang menggugurkan {1} bingkai.",
+  "recorder.auto.unmeasured": "Tiada rakaman percubaan dapat dijalankan; calon pertama dalam senarai telah ditulis.",
+  "recorder.auto.native": "saiz tangkapan",
+  "recorder.auto.note.hardware": "penyulit perkakasan diuji",
+  "recorder.auto.note.software": "tiada penyulit perkakasan yang berfungsi",
+  "recorder.auto.note.refresh": "kadar bingkai daripada kadar segar semula paparan",
+  "recorder.auto.note.stepped": "kadar bingkai diturunkan",
+  "recorder.auto.note.kept": "resolusi dikekalkan",
+  "recorder.auto.note.halved": "resolusi dibahagi dua",
+  "recorder.auto.note.container": "bekas mkv: rakaman yang terhenti kekal boleh dimainkan",
+  "recorder.auto.note.preset": "praset daripada perbendaharaan kata penyulit sendiri"
 }

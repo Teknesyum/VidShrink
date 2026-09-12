@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} lazima iwe namba.",
   "recorder.error.start": "Kurekodi hakukuweza kuanza: {0}",
   "recorder.error.folder": "Folda haikuweza kuchaguliwa: {0}",
-  "recorder.error.audio": "Chanzo cha sauti hakikuweza kuandaliwa: {0}"
+  "recorder.error.audio": "Chanzo cha sauti hakikuweza kuandaliwa: {0}",
+  "recorder.auto.enable": "Hali ya kiotomatiki — acha programu ichague mipangilio bora",
+  "recorder.auto.hint": "Ikiwa imewashwa, kinasa sauti hufanya rekodi chache fupi za majaribio na kubaki na mpangilio wa juu zaidi usioondoa fremu yoyote.",
+  "recorder.auto.measure": "Pima tena",
+  "recorder.auto.measuring": "Inapima…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Wagombeaji {0} walijaribiwa; mshindi alipoteza fremu {1}.",
+  "recorder.auto.unmeasured": "Hakuna rekodi ya majaribio iliyoweza kuendeshwa; mgombeaji wa kwanza kwenye orodha aliandikwa.",
+  "recorder.auto.native": "ukubwa wa kunasa",
+  "recorder.auto.note.hardware": "kisimbaji cha maunzi kimejaribiwa",
+  "recorder.auto.note.software": "hakuna kisimbaji cha maunzi kinachofanya kazi",
+  "recorder.auto.note.refresh": "kasi ya fremu kutoka kasi ya kuonyesha upya ya skrini",
+  "recorder.auto.note.stepped": "kasi ya fremu imepunguzwa",
+  "recorder.auto.note.kept": "ubora wa picha umehifadhiwa",
+  "recorder.auto.note.halved": "ubora wa picha umepunguzwa nusu",
+  "recorder.auto.note.container": "chombo cha mkv: rekodi iliyokatizwa bado inachezeka",
+  "recorder.auto.note.preset": "mpangilio uliowekwa tayari kutoka msamiati wa kisimbaji chenyewe"
 }

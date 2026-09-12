@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} doit être un nombre.",
   "recorder.error.start": "L'enregistrement n'a pas pu démarrer : {0}",
   "recorder.error.folder": "Le dossier n'a pas pu être choisi : {0}",
-  "recorder.error.audio": "L'entrée audio n'a pas pu être préparée : {0}"
+  "recorder.error.audio": "L'entrée audio n'a pas pu être préparée : {0}",
+  "recorder.auto.enable": "Mode automatique — le programme choisit les meilleurs réglages",
+  "recorder.auto.hint": "Tant qu'il est activé, l'enregistreur effectue quelques courts essais et conserve le réglage le plus élevé qui ne perd aucune image.",
+  "recorder.auto.measure": "Mesurer à nouveau",
+  "recorder.auto.measuring": "Mesure en cours…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} candidats testés ; le gagnant a perdu {1} images.",
+  "recorder.auto.unmeasured": "Aucun essai n'a pu être exécuté ; le premier candidat de la liste a été retenu.",
+  "recorder.auto.native": "taille de capture",
+  "recorder.auto.note.hardware": "encodeur matériel testé",
+  "recorder.auto.note.software": "aucun encodeur matériel fonctionnel",
+  "recorder.auto.note.refresh": "fréquence d'images calculée d'après le taux de rafraîchissement de l'écran",
+  "recorder.auto.note.stepped": "fréquence d'images réduite",
+  "recorder.auto.note.kept": "résolution conservée",
+  "recorder.auto.note.halved": "résolution réduite de moitié",
+  "recorder.auto.note.container": "conteneur mkv : un enregistrement interrompu reste lisible",
+  "recorder.auto.note.preset": "préréglage tiré du vocabulaire propre à l'encodeur"
 }

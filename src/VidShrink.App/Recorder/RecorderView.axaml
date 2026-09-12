@@ -174,31 +174,57 @@
         <StackPanel Spacing="{StaticResource SpaceMd}">
           <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H3}"/>
 
-          <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
-            <StackPanel Grid.Column="0">
-              <TextBlock Text="{loc:Text recorder.option.fps}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtFps" auto:AutomationProperties.Name="{loc:Text recorder.option.fps}"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1">
-              <TextBlock Text="{loc:Text recorder.option.quality}" Theme="{StaticResource Label}"/>
-              <TextBox x:Name="TxtQuality"
-                       ToolTip.Tip="{loc:Text recorder.option.quality-hint}"
-                       auto:AutomationProperties.Name="{loc:Text recorder.option.quality}"/>
-            </StackPanel>
-          </Grid>
+          <!--
+            Otomatik kip. Kutu işaretlenince kodlama kolunu program yazıyor: aday
+            merdivenini RecorderAutoPlan kuruyor, kazananı aday başına kısa bir gerçek
+            kayıt seçiyor. Elle panel gizleniyor, devre dışı bırakılmıyor — görünmeyen
+            kutu açıklama borcu doğurmuyor.
+          -->
+          <CheckBox x:Name="ChkAuto"
+                    Theme="{StaticResource CheckStyle}"
+                    Content="{loc:Text recorder.auto.enable}"
+                    ToolTip.Tip="{loc:Text recorder.auto.hint}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.auto.enable}"/>
 
-          <StackPanel>
-            <TextBlock Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbCodec"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.option.codec}"/>
+          <StackPanel x:Name="PanelAutoResult" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+            <TextBlock x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
           </StackPanel>
 
-          <StackPanel>
-            <TextBlock Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
-            <ComboBox x:Name="CmbPreset"
-                      HorizontalAlignment="Stretch"
-                      auto:AutomationProperties.Name="{loc:Text recorder.option.preset}"/>
+          <Button x:Name="BtnAutoMeasure"
+                  Theme="{StaticResource GhostButton}"
+                  HorizontalAlignment="Left"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.auto.measure}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.auto.measure}"
+                  Click="OnAutoMeasure"/>
+
+          <StackPanel x:Name="PanelManualOptions" Spacing="{StaticResource SpaceMd}">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
+              <StackPanel Grid.Column="0">
+                <TextBlock Text="{loc:Text recorder.option.fps}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtFps" auto:AutomationProperties.Name="{loc:Text recorder.option.fps}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1">
+                <TextBlock Text="{loc:Text recorder.option.quality}" Theme="{StaticResource Label}"/>
+                <TextBox x:Name="TxtQuality"
+                         ToolTip.Tip="{loc:Text recorder.option.quality-hint}"
+                         auto:AutomationProperties.Name="{loc:Text recorder.option.quality}"/>
+              </StackPanel>
+            </Grid>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbCodec"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.codec}"/>
+            </StackPanel>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
+              <ComboBox x:Name="CmbPreset"
+                        HorizontalAlignment="Stretch"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.preset}"/>
+            </StackPanel>
           </StackPanel>
 
           <CheckBox x:Name="ChkCursor"

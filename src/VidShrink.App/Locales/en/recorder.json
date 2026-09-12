@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} has to be a number.",
   "recorder.error.start": "The recording could not start: {0}",
   "recorder.error.folder": "The folder could not be chosen: {0}",
-  "recorder.error.audio": "The sound input could not be prepared: {0}"
+  "recorder.error.audio": "The sound input could not be prepared: {0}",
+  "recorder.auto.enable": "Automatic mode — let the program pick the best settings",
+  "recorder.auto.hint": "While it is on, the recorder takes a few short trial recordings and keeps the highest setting that drops no frames.",
+  "recorder.auto.measure": "Measure again",
+  "recorder.auto.measuring": "Measuring…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} candidates tried; the winner dropped {1} frames.",
+  "recorder.auto.unmeasured": "No trial recording could run; the first candidate on the ladder was written.",
+  "recorder.auto.native": "capture size",
+  "recorder.auto.note.hardware": "hardware encoder probed",
+  "recorder.auto.note.software": "no working hardware encoder",
+  "recorder.auto.note.refresh": "frame rate from the display refresh rate",
+  "recorder.auto.note.stepped": "frame rate stepped down",
+  "recorder.auto.note.kept": "resolution kept",
+  "recorder.auto.note.halved": "resolution halved",
+  "recorder.auto.note.container": "mkv container: a killed recording stays playable",
+  "recorder.auto.note.preset": "preset from the encoder's own vocabulary"
 }

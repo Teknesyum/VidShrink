@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} musí být číslo.",
   "recorder.error.start": "Nahrávání se nepodařilo spustit: {0}",
   "recorder.error.folder": "Složku se nepodařilo vybrat: {0}",
-  "recorder.error.audio": "Zvukový vstup se nepodařilo připravit: {0}"
+  "recorder.error.audio": "Zvukový vstup se nepodařilo připravit: {0}",
+  "recorder.auto.enable": "Automatický režim — nechte program vybrat nejlepší nastavení",
+  "recorder.auto.hint": "Dokud je zapnutý, nahrávač provede několik krátkých zkušebních nahrávek a ponechá nejvyšší nastavení, při kterém se neztrácejí žádné snímky.",
+  "recorder.auto.measure": "Změřit znovu",
+  "recorder.auto.measuring": "Měření…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Vyzkoušeno {0} kandidátů; vítěz ztratil {1} snímků.",
+  "recorder.auto.unmeasured": "Nepodařilo se spustit žádnou zkušební nahrávku; byl zapsán první kandidát ze seznamu.",
+  "recorder.auto.native": "velikost záznamu",
+  "recorder.auto.note.hardware": "ověřen hardwarový enkodér",
+  "recorder.auto.note.software": "žádný funkční hardwarový enkodér",
+  "recorder.auto.note.refresh": "snímková frekvence podle obnovovací frekvence displeje",
+  "recorder.auto.note.stepped": "snímková frekvence snížena",
+  "recorder.auto.note.kept": "rozlišení zachováno",
+  "recorder.auto.note.halved": "rozlišení sníženo na polovinu",
+  "recorder.auto.note.container": "kontejner mkv: přerušený záznam zůstává přehratelný",
+  "recorder.auto.note.preset": "předvolba z vlastního slovníku enkodéru"
 }

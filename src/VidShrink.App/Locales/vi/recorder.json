@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} phải là một số.",
   "recorder.error.start": "Không thể bắt đầu ghi hình: {0}",
   "recorder.error.folder": "Không thể chọn thư mục: {0}",
-  "recorder.error.audio": "Không thể chuẩn bị nguồn âm thanh: {0}"
+  "recorder.error.audio": "Không thể chuẩn bị nguồn âm thanh: {0}",
+  "recorder.auto.enable": "Chế độ tự động — để chương trình chọn cài đặt tốt nhất",
+  "recorder.auto.hint": "Trong khi bật, trình ghi sẽ thực hiện vài lần ghi thử ngắn và giữ lại cài đặt cao nhất không làm mất khung hình nào.",
+  "recorder.auto.measure": "Đo lại",
+  "recorder.auto.measuring": "Đang đo…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Đã thử {0} ứng viên; ứng viên thắng cuộc mất {1} khung hình.",
+  "recorder.auto.unmeasured": "Không thể chạy bản ghi thử nào; ứng viên đầu tiên trong danh sách đã được ghi.",
+  "recorder.auto.native": "kích thước ghi hình",
+  "recorder.auto.note.hardware": "đã kiểm tra bộ mã hóa phần cứng",
+  "recorder.auto.note.software": "không có bộ mã hóa phần cứng hoạt động",
+  "recorder.auto.note.refresh": "tốc độ khung hình theo tần số quét của màn hình",
+  "recorder.auto.note.stepped": "đã giảm tốc độ khung hình",
+  "recorder.auto.note.kept": "giữ nguyên độ phân giải",
+  "recorder.auto.note.halved": "giảm độ phân giải một nửa",
+  "recorder.auto.note.container": "định dạng mkv: bản ghi bị ngắt vẫn phát được",
+  "recorder.auto.note.preset": "cấu hình dựng sẵn theo từ vựng riêng của bộ mã hóa"
 }

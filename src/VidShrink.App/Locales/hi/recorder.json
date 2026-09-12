@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} एक संख्या होनी चाहिए।",
   "recorder.error.start": "रिकॉर्डिंग शुरू नहीं हो सकी: {0}",
   "recorder.error.folder": "फ़ोल्डर चुना नहीं जा सका: {0}",
-  "recorder.error.audio": "ध्वनि इनपुट तैयार नहीं किया जा सका: {0}"
+  "recorder.error.audio": "ध्वनि इनपुट तैयार नहीं किया जा सका: {0}",
+  "recorder.auto.enable": "स्वचालित मोड — प्रोग्राम को सबसे अच्छी सेटिंग चुनने दें",
+  "recorder.auto.hint": "जब तक यह चालू है, रिकॉर्डर कुछ छोटी परीक्षण रिकॉर्डिंग करता है और वह सबसे ऊँची सेटिंग रखता है जो कोई फ्रेम नहीं गिराती।",
+  "recorder.auto.measure": "फिर से मापें",
+  "recorder.auto.measuring": "माप रहा है…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} उम्मीदवारों को आज़माया गया; विजेता ने {1} फ्रेम गिराए।",
+  "recorder.auto.unmeasured": "कोई परीक्षण रिकॉर्डिंग नहीं चल सकी; सूची का पहला उम्मीदवार लिख दिया गया।",
+  "recorder.auto.native": "कैप्चर आकार",
+  "recorder.auto.note.hardware": "हार्डवेयर एन्कोडर जाँचा गया",
+  "recorder.auto.note.software": "कोई काम करने वाला हार्डवेयर एन्कोडर नहीं",
+  "recorder.auto.note.refresh": "डिस्प्ले की रिफ्रेश दर से फ्रेम दर",
+  "recorder.auto.note.stepped": "फ्रेम दर घटाई गई",
+  "recorder.auto.note.kept": "रिज़ॉल्यूशन बनाए रखा गया",
+  "recorder.auto.note.halved": "रिज़ॉल्यूशन आधा किया गया",
+  "recorder.auto.note.container": "mkv कंटेनर: रोकी गई रिकॉर्डिंग चलाने योग्य बनी रहती है",
+  "recorder.auto.note.preset": "एन्कोडर की अपनी शब्दावली से पहले से तय सेटिंग"
 }

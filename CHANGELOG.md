@@ -29,6 +29,27 @@ ship as part of it.
 
 ### Added
 
+- **Ten more arms on the recording command.** The recorder can now choose its container
+  (a recording killed by a timeout is playable only in Matroska, and the engine knows which
+  containers survive that), scale the capture after the crop, set the keyframe interval,
+  profile and tune, record to a target bitrate instead of a quality figure, write the pixel
+  format, colour space and colour range, stop at a duration, split into segments, keep audio
+  devices as separate tracks rather than mixing them, and take a single frame of the target.
+  A capture on a second monitor is translated into an offset region, so the picture is the
+  monitor asked for.
+- **An automatic mode in the recorder.** One checkbox and the program writes the encoding
+  itself. The decision is in two parts: `RecorderAutoPlan` builds a candidate ladder — the
+  first hardware H.264 encoder the probe has actually seen encode (NVENC, then QSV, then
+  AMF) or `libx264` where none works, a frame rate rounded down to the closed ladder
+  {24, 30, 60, 120} from the screen's refresh rate, the capture size and then half of it,
+  Matroska throughout, and a preset taken from the chosen encoder's own vocabulary rather
+  than x264's. `RecorderAutoProbe` then records three real seconds per candidate and reads
+  the dropped-frame counter: the first candidate that drops nothing wins outright,
+  otherwise the lowest drop ratio wins with ties broken by ladder order. No acceptable
+  drop-frame figure is invented, because none has been measured here. While the mode is on
+  the manual options are hidden and the chosen settings, with the reason for each, are
+  written in one line under the checkbox. The screen's refresh rate is read for the first
+  time (`EnumDisplaySettings` on Windows); where it cannot be read the ladder falls to 30.
 - **An Install button in the new-version notice.** The notice used to hand out a PowerShell
   one-liner and ask the user to run it. Wherever a launcher is installed it now shows a
   button instead: the application starts `VidShrink.exe --update-now <pid>` and closes, the

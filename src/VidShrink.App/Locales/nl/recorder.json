@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} moet een getal zijn.",
   "recorder.error.start": "De opname kon niet starten: {0}",
   "recorder.error.folder": "De map kon niet worden gekozen: {0}",
-  "recorder.error.audio": "De geluidsinvoer kon niet worden voorbereid: {0}"
+  "recorder.error.audio": "De geluidsinvoer kon niet worden voorbereid: {0}",
+  "recorder.auto.enable": "Automatische modus — laat het programma de beste instellingen kiezen",
+  "recorder.auto.hint": "Terwijl deze aan staat, maakt de recorder een paar korte testopnames en behoudt de hoogste instelling waarbij geen beelden worden overgeslagen.",
+  "recorder.auto.measure": "Opnieuw meten",
+  "recorder.auto.measuring": "Bezig met meten…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} kandidaten getest; de winnaar liet {1} beelden vallen.",
+  "recorder.auto.unmeasured": "Er kon geen testopname worden uitgevoerd; de eerste kandidaat op de ladder is weggeschreven.",
+  "recorder.auto.native": "opnamegrootte",
+  "recorder.auto.note.hardware": "hardware-encoder getest",
+  "recorder.auto.note.software": "geen werkende hardware-encoder",
+  "recorder.auto.note.refresh": "beeldsnelheid op basis van de vernieuwingsfrequentie van het scherm",
+  "recorder.auto.note.stepped": "beeldsnelheid verlaagd",
+  "recorder.auto.note.kept": "resolutie behouden",
+  "recorder.auto.note.halved": "resolutie gehalveerd",
+  "recorder.auto.note.container": "mkv-container: een afgebroken opname blijft afspeelbaar",
+  "recorder.auto.note.preset": "voorinstelling uit het eigen vocabulaire van de encoder"
 }

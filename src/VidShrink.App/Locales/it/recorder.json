@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} deve essere un numero.",
   "recorder.error.start": "Impossibile avviare la registrazione: {0}",
   "recorder.error.folder": "Impossibile scegliere la cartella: {0}",
-  "recorder.error.audio": "Impossibile preparare l'ingresso audio: {0}"
+  "recorder.error.audio": "Impossibile preparare l'ingresso audio: {0}",
+  "recorder.auto.enable": "Modalità automatica — lascia che il programma scelga le impostazioni migliori",
+  "recorder.auto.hint": "Quando è attiva, il registratore esegue alcune brevi registrazioni di prova e mantiene l'impostazione più alta che non perde fotogrammi.",
+  "recorder.auto.measure": "Misura di nuovo",
+  "recorder.auto.measuring": "Misurazione in corso…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} candidati provati; il vincitore ha perso {1} fotogrammi.",
+  "recorder.auto.unmeasured": "Non è stato possibile eseguire alcuna prova; è stato scritto il primo candidato della lista.",
+  "recorder.auto.native": "dimensione di acquisizione",
+  "recorder.auto.note.hardware": "encoder hardware verificato",
+  "recorder.auto.note.software": "nessun encoder hardware funzionante",
+  "recorder.auto.note.refresh": "frequenza fotogrammi dalla frequenza di aggiornamento dello schermo",
+  "recorder.auto.note.stepped": "frequenza fotogrammi ridotta",
+  "recorder.auto.note.kept": "risoluzione mantenuta",
+  "recorder.auto.note.halved": "risoluzione dimezzata",
+  "recorder.auto.note.container": "contenitore mkv: una registrazione interrotta resta riproducibile",
+  "recorder.auto.note.preset": "preset tratto dal vocabolario proprio dell'encoder"
 }

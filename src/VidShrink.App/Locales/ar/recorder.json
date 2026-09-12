@@ -48,5 +48,21 @@
   "recorder.error.number": "يجب أن يكون {0} رقمًا.",
   "recorder.error.start": "تعذّر بدء التسجيل: {0}",
   "recorder.error.folder": "تعذّر اختيار المجلد: {0}",
-  "recorder.error.audio": "تعذّر تجهيز مدخل الصوت: {0}"
+  "recorder.error.audio": "تعذّر تجهيز مدخل الصوت: {0}",
+  "recorder.auto.enable": "الوضع التلقائي — دع البرنامج يختار أفضل الإعدادات",
+  "recorder.auto.hint": "أثناء تفعيله، يجري المسجّل بضع تسجيلات تجريبية قصيرة ويحتفظ بأعلى إعداد لا يُسقط أي إطار.",
+  "recorder.auto.measure": "قياس مرة أخرى",
+  "recorder.auto.measuring": "جارٍ القياس…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "تمت تجربة {0} مرشحًا؛ فقد الفائز {1} إطارًا.",
+  "recorder.auto.unmeasured": "تعذّر تشغيل أي تسجيل تجريبي؛ تمت كتابة أول مرشح في القائمة.",
+  "recorder.auto.native": "حجم الالتقاط",
+  "recorder.auto.note.hardware": "تم اختبار مُرمِّز العتاد",
+  "recorder.auto.note.software": "لا يوجد مُرمِّز عتاد يعمل",
+  "recorder.auto.note.refresh": "معدل الإطارات من معدل تحديث الشاشة",
+  "recorder.auto.note.stepped": "تم خفض معدل الإطارات",
+  "recorder.auto.note.kept": "تم الإبقاء على الدقة",
+  "recorder.auto.note.halved": "تم تخفيض الدقة إلى النصف",
+  "recorder.auto.note.container": "حاوية mkv: يظل التسجيل المتوقَّف قابلاً للتشغيل",
+  "recorder.auto.note.preset": "إعداد مسبق من مفردات المُرمِّز نفسه"
 }

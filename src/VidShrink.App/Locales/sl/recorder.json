@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} mora biti število.",
   "recorder.error.start": "Snemanja ni bilo mogoče začeti: {0}",
   "recorder.error.folder": "Mape ni bilo mogoče izbrati: {0}",
-  "recorder.error.audio": "Zvočnega vira ni bilo mogoče pripraviti: {0}"
+  "recorder.error.audio": "Zvočnega vira ni bilo mogoče pripraviti: {0}",
+  "recorder.auto.enable": "Samodejni način — prepustite programu izbiro najboljših nastavitev",
+  "recorder.auto.hint": "Ko je vklopljen, snemalnik posname nekaj kratkih poskusnih posnetkov in obdrži najvišjo nastavitev, pri kateri se ne izgubi noben sličica.",
+  "recorder.auto.measure": "Ponovno izmeri",
+  "recorder.auto.measuring": "Merjenje…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Preizkušenih {0} kandidatov; zmagovalec je izgubil {1} sličic.",
+  "recorder.auto.unmeasured": "Nobenega poskusnega posnetka ni bilo mogoče izvesti; zapisan je bil prvi kandidat s seznama.",
+  "recorder.auto.native": "velikost zajema",
+  "recorder.auto.note.hardware": "preverjen strojni kodirnik",
+  "recorder.auto.note.software": "ni delujočega strojnega kodirnika",
+  "recorder.auto.note.refresh": "hitrost sličic glede na osvežilno frekvenco zaslona",
+  "recorder.auto.note.stepped": "hitrost sličic znižana",
+  "recorder.auto.note.kept": "ločljivost ohranjena",
+  "recorder.auto.note.halved": "ločljivost razpolovljena",
+  "recorder.auto.note.container": "vsebnik mkv: prekinjen posnetek ostane predvajljiv",
+  "recorder.auto.note.preset": "prednastavitev iz lastnega besedišča kodirnika"
 }

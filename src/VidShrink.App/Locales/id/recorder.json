@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} harus berupa angka.",
   "recorder.error.start": "Perekaman tidak dapat dimulai: {0}",
   "recorder.error.folder": "Folder tidak dapat dipilih: {0}",
-  "recorder.error.audio": "Input suara tidak dapat disiapkan: {0}"
+  "recorder.error.audio": "Input suara tidak dapat disiapkan: {0}",
+  "recorder.auto.enable": "Mode otomatis — biarkan program memilih pengaturan terbaik",
+  "recorder.auto.hint": "Selama aktif, perekam membuat beberapa rekaman percobaan singkat dan menyimpan pengaturan tertinggi yang tidak menjatuhkan bingkai apa pun.",
+  "recorder.auto.measure": "Ukur lagi",
+  "recorder.auto.measuring": "Mengukur…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} kandidat dicoba; pemenang kehilangan {1} bingkai.",
+  "recorder.auto.unmeasured": "Tidak ada rekaman percobaan yang bisa dijalankan; kandidat pertama pada daftar ditulis.",
+  "recorder.auto.native": "ukuran tangkapan",
+  "recorder.auto.note.hardware": "encoder perangkat keras diuji",
+  "recorder.auto.note.software": "tidak ada encoder perangkat keras yang berfungsi",
+  "recorder.auto.note.refresh": "frame rate dari refresh rate layar",
+  "recorder.auto.note.stepped": "frame rate diturunkan",
+  "recorder.auto.note.kept": "resolusi dipertahankan",
+  "recorder.auto.note.halved": "resolusi dibagi dua",
+  "recorder.auto.note.container": "wadah mkv: rekaman yang terhenti tetap dapat diputar",
+  "recorder.auto.note.preset": "preset dari kosakata encoder itu sendiri"
 }

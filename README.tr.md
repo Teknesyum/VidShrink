@@ -40,6 +40,9 @@ söylemez.
   kopyalanabilir — ve isteğe bağlı AI plan istemi. Özet değil, komutun kendisi.
 - **Oynatıcı sekmesi.** Pencere kaynağı kendi oynatır; kod çözücü borusu her sürüklemede
   yeni ffmpeg başlatmak yerine aramalar arasında açık kalır.
+- **Kaydedici sekmesi.** Ekran, tek pencere ya da bölge; mikrofon ve sistem sesiyle, her
+  platformun kendi yakalama kolundan. Tek kutu kodlama ayarlarını programa bırakıyor;
+  program da tahmin etmek yerine sizin makinenizde ölçüyor.
 - **On iki kodlayıcı, güvenilmez, sınanır.** Yazılım, NVENC, Quick Sync ve AMF adayları
   motor birini seçmeden önce sizin makinenizde tek tek denenir.
 - **Windows'ta sağ tık menüsü ve kendini güncelleme.** Gezgin menüsünde "VidShrink ile
@@ -324,6 +327,29 @@ oynatıcıyı aşağı itmiyor, üstünde beliriyor.
 | Orta tık | tam ekranı açıp kapatır, pencereyi eski yerine koyar |
 
 Bağlam menüsü de aynı üç eylemi taşır.
+
+### Kaydedici sekmesi
+
+Kaydedici tüm ekranı, tek bir pencereyi ya da bir bölgeyi, her platformun gerçekten sahip
+olduğu yakalama kolundan kaydeder: Windows'ta gdigrab, macOS'te avfoundation, Linux'ta
+x11grab. Mikrofonu, sistem çıkışını ya da ikisini birden alır; cihaz sırayla değil adıyla
+hatırlanır, böylece iki açılış arasında sırası değişen bir liste sessizce başka bir mikrofon
+seçemez. Durdurma ffmpeg'i öldürmez, dosyayı kapatmasını ister; durdurulan kayıt oynar.
+Zaman aşımında öldürülen kayıt çalışan bir dosya gibi teslim edilmez, yarım olduğu söylenir.
+
+Kodlama ayarları da orada — kare hızı, kalite, kodlayıcı, ön ayar, kap, ölçekleme, anahtar
+kare aralığı, profil, tune, piksel biçimi, süre sınırı ve bölme — ama hiçbirine dokunmak
+zorunda değilsiniz.
+
+**Otomatik kip** tek kutu. Program aday merdivenini makinenin kendisinden kuruyor: gerçekten
+kodladığını gördüğü ilk donanım H.264 kolu (önce NVENC, sonra Quick Sync, sonra AMF), hiçbiri
+çalışmıyorsa `libx264`; ekranın yenileme hızından aşağı yuvarlanmış bir kare hızı
+({24, 30, 60, 120}); yakalama boyutu, sonra yarısı; her adayda Matroska, çünkü öldürülen bir
+kaydın oynak kaldığı kap o; ve x264'ün değil seçilen kodlayıcının kendi sözlüğünden bir ön
+ayar. Ardından aday başına üç saniyelik **gerçek** kayıt alıp düşen kare sayacını okuyor. Kare
+düşürmeyen ilk aday doğrudan kazanıyor; hiçbiri sıfır değilse oranı en küçük olan kazanıyor.
+Seçilen ayarlar ve her birinin gerekçesi kutunun altında tek satırda yazıyor; kip açıkken elle
+ayar paneli gizleniyor.
 
 ### Kodlayıcılar
 

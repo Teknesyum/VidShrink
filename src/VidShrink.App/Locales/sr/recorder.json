@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} mora biti broj.",
   "recorder.error.start": "Snimanje nije moglo da se pokrene: {0}",
   "recorder.error.folder": "Folder nije mogao da se izabere: {0}",
-  "recorder.error.audio": "Zvučni ulaz nije mogao da se pripremi: {0}"
+  "recorder.error.audio": "Zvučni ulaz nije mogao da se pripremi: {0}",
+  "recorder.auto.enable": "Automatski režim — neka program izabere najbolja podešavanja",
+  "recorder.auto.hint": "Dok je uključen, snimač pravi nekoliko kratkih probnih snimaka i zadržava najviše podešavanje koje ne gubi kadrove.",
+  "recorder.auto.measure": "Izmeri ponovo",
+  "recorder.auto.measuring": "Merenje…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Isprobano {0} kandidata; pobednik je izgubio {1} kadrova.",
+  "recorder.auto.unmeasured": "Nijedan probni snimak nije mogao da se izvrši; zapisan je prvi kandidat sa liste.",
+  "recorder.auto.native": "veličina snimka",
+  "recorder.auto.note.hardware": "proveren hardverski enkoder",
+  "recorder.auto.note.software": "nema funkcionalnog hardverskog enkodera",
+  "recorder.auto.note.refresh": "broj kadrova prema frekvenciji osvežavanja ekrana",
+  "recorder.auto.note.stepped": "broj kadrova smanjen",
+  "recorder.auto.note.kept": "rezolucija zadržana",
+  "recorder.auto.note.halved": "rezolucija prepolovljena",
+  "recorder.auto.note.container": "mkv kontejner: prekinut snimak ostaje moguć za reprodukciju",
+  "recorder.auto.note.preset": "unapred podešeno iz sopstvenog rečnika enkodera"
 }

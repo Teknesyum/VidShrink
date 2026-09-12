@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} трябва да е число.",
   "recorder.error.start": "Записът не можа да започне: {0}",
   "recorder.error.folder": "Папката не можа да бъде избрана: {0}",
-  "recorder.error.audio": "Звуковият вход не можа да бъде подготвен: {0}"
+  "recorder.error.audio": "Звуковият вход не можа да бъде подготвен: {0}",
+  "recorder.auto.enable": "Автоматичен режим — оставете програмата да избере най-добрите настройки",
+  "recorder.auto.hint": "Докато е включен, рекордерът прави няколко кратки пробни записа и запазва най-високата настройка, при която не се губят кадри.",
+  "recorder.auto.measure": "Измерване отново",
+  "recorder.auto.measuring": "Измерване…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Изпробвани са {0} кандидата; победителят е загубил {1} кадъра.",
+  "recorder.auto.unmeasured": "Не можа да се изпълни нито един пробен запис; беше записан първият кандидат от списъка.",
+  "recorder.auto.native": "размер на записа",
+  "recorder.auto.note.hardware": "проверен хардуерен кодер",
+  "recorder.auto.note.software": "няма работещ хардуерен кодер",
+  "recorder.auto.note.refresh": "честота на кадрите според честотата на опресняване на екрана",
+  "recorder.auto.note.stepped": "намалена честота на кадрите",
+  "recorder.auto.note.kept": "запазена разделителна способност",
+  "recorder.auto.note.halved": "наполовина намалена разделителна способност",
+  "recorder.auto.note.container": "контейнер mkv: прекъснат запис остава възпроизводим",
+  "recorder.auto.note.preset": "предварителна настройка от собствения речник на кодера"
 }

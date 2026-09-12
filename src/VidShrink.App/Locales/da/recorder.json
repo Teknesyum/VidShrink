@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} skal være et tal.",
   "recorder.error.start": "Optagelsen kunne ikke starte: {0}",
   "recorder.error.folder": "Mappen kunne ikke vælges: {0}",
-  "recorder.error.audio": "Lydindgangen kunne ikke klargøres: {0}"
+  "recorder.error.audio": "Lydindgangen kunne ikke klargøres: {0}",
+  "recorder.auto.enable": "Automatisk tilstand — lad programmet vælge de bedste indstillinger",
+  "recorder.auto.hint": "Mens den er slået til, laver optageren nogle korte prøveoptagelser og beholder den højeste indstilling, der ikke taber billeder.",
+  "recorder.auto.measure": "Mål igen",
+  "recorder.auto.measuring": "Måler…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} kandidater afprøvet; vinderen tabte {1} billeder.",
+  "recorder.auto.unmeasured": "Ingen prøveoptagelse kunne køre; den første kandidat på listen blev skrevet.",
+  "recorder.auto.native": "optagelsesstørrelse",
+  "recorder.auto.note.hardware": "hardwareenkoder afprøvet",
+  "recorder.auto.note.software": "ingen fungerende hardwareenkoder",
+  "recorder.auto.note.refresh": "billedfrekvens ud fra skærmens opdateringsfrekvens",
+  "recorder.auto.note.stepped": "billedfrekvens sat ned",
+  "recorder.auto.note.kept": "opløsning bevaret",
+  "recorder.auto.note.halved": "opløsning halveret",
+  "recorder.auto.note.container": "mkv-beholder: en afbrudt optagelse forbliver afspillelig",
+  "recorder.auto.note.preset": "forudindstilling fra enkoderens eget ordforråd"
 }

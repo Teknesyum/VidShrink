@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} bir sayı olmalı.",
   "recorder.error.start": "Kayıt başlatılamadı: {0}",
   "recorder.error.folder": "Klasör seçilemedi: {0}",
-  "recorder.error.audio": "Ses girdisi hazırlanamadı: {0}"
+  "recorder.error.audio": "Ses girdisi hazırlanamadı: {0}",
+  "recorder.auto.enable": "Otomatik kip — en iyi ayarları program seçsin",
+  "recorder.auto.hint": "Açıkken kaydedici birkaç kısa deneme kaydı alır ve kare düşürmeyen en yüksek ayarı seçer.",
+  "recorder.auto.measure": "Yeniden ölç",
+  "recorder.auto.measuring": "Ölçülüyor…",
+  "recorder.auto.summary": "{0} · {1} kare/sn · {2} · {3}",
+  "recorder.auto.trials": "{0} aday denendi; kazananın düşen karesi {1}.",
+  "recorder.auto.unmeasured": "Deneme kaydı koşulamadı; merdivenin ilk adayı yazıldı.",
+  "recorder.auto.native": "yakalama boyutu",
+  "recorder.auto.note.hardware": "donanım kodlayıcısı yoklandı",
+  "recorder.auto.note.software": "çalışan donanım kodlayıcısı yok",
+  "recorder.auto.note.refresh": "kare hızı ekranın yenileme hızından",
+  "recorder.auto.note.stepped": "kare hızı bir basamak indirildi",
+  "recorder.auto.note.kept": "çözünürlük korundu",
+  "recorder.auto.note.halved": "çözünürlük yarıya indirildi",
+  "recorder.auto.note.container": "kap mkv: öldürülen kayıt oynatılabilir kalıyor",
+  "recorder.auto.note.preset": "ön ayar kodlayıcının sözlüğünden"
 }

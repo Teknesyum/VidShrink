@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} måste vara ett tal.",
   "recorder.error.start": "Inspelningen kunde inte starta: {0}",
   "recorder.error.folder": "Mappen kunde inte väljas: {0}",
-  "recorder.error.audio": "Ljudkällan kunde inte förberedas: {0}"
+  "recorder.error.audio": "Ljudkällan kunde inte förberedas: {0}",
+  "recorder.auto.enable": "Automatiskt läge — låt programmet välja de bästa inställningarna",
+  "recorder.auto.hint": "Medan det är på gör inspelaren några korta testinspelningar och behåller den högsta inställningen som inte tappar några bilder.",
+  "recorder.auto.measure": "Mät igen",
+  "recorder.auto.measuring": "Mäter…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} kandidater testade; vinnaren tappade {1} bilder.",
+  "recorder.auto.unmeasured": "Ingen testinspelning kunde köras; den första kandidaten på listan skrevs.",
+  "recorder.auto.native": "inspelningsstorlek",
+  "recorder.auto.note.hardware": "hårdvarukodare testad",
+  "recorder.auto.note.software": "ingen fungerande hårdvarukodare",
+  "recorder.auto.note.refresh": "bildfrekvens baserad på skärmens uppdateringsfrekvens",
+  "recorder.auto.note.stepped": "bildfrekvens sänkt",
+  "recorder.auto.note.kept": "upplösning bibehållen",
+  "recorder.auto.note.halved": "upplösning halverad",
+  "recorder.auto.note.container": "mkv-behållare: en avbruten inspelning går fortfarande att spela upp",
+  "recorder.auto.note.preset": "förinställning från kodarens eget vokabulär"
 }

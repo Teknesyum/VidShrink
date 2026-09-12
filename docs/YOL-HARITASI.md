@@ -6,7 +6,7 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
 
 - [x] 8. dalga — ekran kaydı motoru, ses girdisi, Kaydedici sekmesi (0.4.1)
 - [x] Güncelleme senkronunun yakınsaması — kurulu 0.3.0 kendi senkronuyla ilerleyebiliyor (0.4.2)
-- [ ] Ekran kaydedici modülünün tamamlanması — kullanıcının bir sonraki işi
+- [x] Ekran kaydedici modülünün tamamlanması — ffmpeg kolu (9c) ve otomatik kip (9d) girdi
 - [ ] WhatsApp'a özel azami kalite — karanlık videoda törpüleme ölçümü, `.claude/sonra.md`
 - [ ] Başlık çubuğu düğmelerinin keskin köşesi — kullanıcı çalışan bir yapıyı açtıktan sonra bakacak
 
@@ -19,6 +19,15 @@ Kullanıcının verdiği 12 iş dört kesite bölündü ve bu sırayla kuruluyor
 **C** kaydedicinin ffmpeg kolu (worktree ajanı) → **D** kaydedicinin otomatik kipi.
 A ve B arayüzün aynı belirteçlerine dokunduğu için ardışık; C kendi dalında koştuğu
 için B ile çakışmıyor; D, C'nin ürettiği ayar yüzeyi olmadan ölçülemediği için sonda.
+
+### Otomatik kipte eşik yok, ölçüm var (12 Eylül 2026)
+
+Kaydedicinin otomatik kipi "kabul edilebilir düşen kare" sayısı **uydurmuyor**: bu depoda
+kayıt için ölçülmüş böyle bir sayı yok. Karar iki parçaya bölündü — `RecorderAutoPlan`
+(Core, saf) adayları sıralıyor, `RecorderAutoProbe` (Ffmpeg) aday başına 3 saniyelik gerçek
+kayıt alıp `RecordProgress.DroppedFrames` okuyor. Kare düşürmeyen ilk aday kısa devre
+ediyor; hiçbiri sıfır değilse oranı en küçük olan, eşitlikte merdiven sırası kazanıyor.
+Sabit bir eşik istenirse önce `tools/VidShrink.Bench` ölçer, sonra yazılır.
 
 ### Tek sürüm numarası, üç işletim sistemi (12 Eylül 2026)
 

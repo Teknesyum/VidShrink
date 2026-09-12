@@ -27,6 +27,13 @@ internal sealed class RecorderSettings
 
     internal string? OutputFolder { get; set; }
 
+    /// <summary>
+    /// Otomatik kip açık mı. Açıkken kodlama kolunu kullanıcı değil
+    /// <see cref="RecorderAutoPlan"/> yazıyor; kaydedilen tek şey seçimin kendisi değil
+    /// "otomatik istendi" bilgisi, çünkü makine iki açılış arasında değişebiliyor.
+    /// </summary>
+    internal bool AutoMode { get; set; }
+
     internal int Fps { get; set; } = RecorderArguments.DefaultFps;
 
     internal string Codec { get; set; } = RecorderArguments.DefaultVideoCodec;
@@ -175,6 +182,7 @@ internal sealed class RecorderSettings
         {
             if (JsonNode.Parse(File.ReadAllText(file)) is not JsonObject root) return settings;
             settings.OutputFolder = (string?)root["outputFolder"];
+            settings.AutoMode = (bool?)root["autoMode"] ?? false;
             if ((int?)root["fps"] is { } fps && fps > 0) settings.Fps = fps;
             if ((string?)root["codec"] is { Length: > 0 } codec) settings.Codec = codec;
             if ((string?)root["preset"] is { Length: > 0 } preset) settings.Preset = preset;
@@ -232,6 +240,7 @@ internal sealed class RecorderSettings
                 writer.WriteStartObject();
                 if (OutputFolder is null) writer.WriteNull("outputFolder");
                 else writer.WriteString("outputFolder", OutputFolder);
+                writer.WriteBoolean("autoMode", AutoMode);
                 writer.WriteNumber("fps", Fps);
                 writer.WriteString("codec", Codec);
                 writer.WriteString("preset", Preset);

@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} باید یک عدد باشد.",
   "recorder.error.start": "ضبط آغاز نشد: {0}",
   "recorder.error.folder": "پوشه انتخاب نشد: {0}",
-  "recorder.error.audio": "ورودی صدا آماده نشد: {0}"
+  "recorder.error.audio": "ورودی صدا آماده نشد: {0}",
+  "recorder.auto.enable": "حالت خودکار — بگذارید برنامه بهترین تنظیمات را انتخاب کند",
+  "recorder.auto.hint": "تا زمانی که روشن است، ضبط‌کننده چند ضبط آزمایشی کوتاه انجام می‌دهد و بالاترین تنظیمی را که هیچ فریمی را از دست نمی‌دهد نگه می‌دارد.",
+  "recorder.auto.measure": "اندازه‌گیری دوباره",
+  "recorder.auto.measuring": "در حال اندازه‌گیری…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} گزینه آزموده شد؛ برنده {1} فریم را از دست داد.",
+  "recorder.auto.unmeasured": "هیچ ضبط آزمایشی اجرا نشد؛ اولین گزینه فهرست نوشته شد.",
+  "recorder.auto.native": "اندازه ضبط",
+  "recorder.auto.note.hardware": "رمزگذار سخت‌افزاری آزموده شد",
+  "recorder.auto.note.software": "هیچ رمزگذار سخت‌افزاری کارآمدی وجود ندارد",
+  "recorder.auto.note.refresh": "نرخ فریم بر اساس نرخ به‌روزرسانی نمایشگر",
+  "recorder.auto.note.stepped": "نرخ فریم کاهش یافت",
+  "recorder.auto.note.kept": "وضوح حفظ شد",
+  "recorder.auto.note.halved": "وضوح نصف شد",
+  "recorder.auto.note.container": "قالب mkv: ضبط قطع‌شده همچنان قابل پخش می‌ماند",
+  "recorder.auto.note.preset": "پیش‌تنظیم از واژگان خود رمزگذار"
 }

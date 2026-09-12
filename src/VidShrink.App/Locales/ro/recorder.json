@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} trebuie să fie un număr.",
   "recorder.error.start": "Înregistrarea nu a putut începe: {0}",
   "recorder.error.folder": "Dosarul nu a putut fi ales: {0}",
-  "recorder.error.audio": "Intrarea de sunet nu a putut fi pregătită: {0}"
+  "recorder.error.audio": "Intrarea de sunet nu a putut fi pregătită: {0}",
+  "recorder.auto.enable": "Mod automat — lasă programul să aleagă cele mai bune setări",
+  "recorder.auto.hint": "Cât timp este activat, recorderul face câteva înregistrări scurte de test și păstrează cea mai bună setare care nu pierde cadre.",
+  "recorder.auto.measure": "Măsoară din nou",
+  "recorder.auto.measuring": "Se măsoară…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "S-au testat {0} candidați; câștigătorul a pierdut {1} cadre.",
+  "recorder.auto.unmeasured": "Nu s-a putut rula nicio înregistrare de test; a fost scris primul candidat din listă.",
+  "recorder.auto.native": "dimensiunea de captură",
+  "recorder.auto.note.hardware": "codor hardware testat",
+  "recorder.auto.note.software": "niciun codor hardware funcțional",
+  "recorder.auto.note.refresh": "rata de cadre calculată din rata de reîmprospătare a ecranului",
+  "recorder.auto.note.stepped": "rata de cadre redusă",
+  "recorder.auto.note.kept": "rezoluție păstrată",
+  "recorder.auto.note.halved": "rezoluție înjumătățită",
+  "recorder.auto.note.container": "container mkv: o înregistrare întreruptă rămâne redabilă",
+  "recorder.auto.note.preset": "presetare din vocabularul propriu al codorului"
 }

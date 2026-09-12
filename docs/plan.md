@@ -87,16 +87,38 @@ Araştırmanın (a) kümesinden, otomatik kipin **girdisi olanlar önce**:
 C'nin 1-5'i olmadan anlamsız: sihirbazın kararı **kap + çözünürlük + kodlayıcı + hız
 denetimi** dörtlüsünü yazacak yer ister; bugün kayıt kolunda yalnız kalite tabanlı tek kol var.
 
-Model (OBS'in kayıt kolu, yayın kolu alınmıyor):
-- Aday kümesi kapalı: 2160p, 1440p, 1080p, 720p, 480p × {30, 60}.
-- Donanım envanteri `EncoderAvailability`den; yeğleme NVENC > QSV > Apple VT > AMF > x264.
-- Her aday için kısa gerçek kayıt, `RecorderSession`ın saydığı atlanan kare okunuyor.
-- Kabul ölçütü ve eşikler **ölçümden** yazılıyor (`tools/VidShrink.Bench`), OBS'in 10 karesi
-  varsayılan değil başlangıç noktası.
-- En çok 3 kazanan; aralarından CPU sınıfı tavanını aşmayan en yükseği seçiliyor.
+Kurulan model (OBS'in kayıt kolu, yayın kolu alınmıyor) — karar iki dosyaya bölündü:
 
-Pim: `KayitOtomatikKipTests` — aday kümesinin kapalılığı, elenen adayın seçilmemesi,
-donanım yokken x264'e düşme, uydurma kodlayıcının negatif kontrolü.
+**`src/VidShrink.Core/RecorderAutoPlan.cs`** aday merdivenini kuruyor. Saf, statik,
+ffmpeg'e bağlı değil; deseni `CompressionStrategy` ile birebir aynı.
+- Kodlayıcı: yeğleme `h264_nvenc > h264_qsv > h264_amf`, hiçbiri **çalışmıyorsa**
+  `libx264`. "Çalışıyor" sayılması için yoklamanın `EncoderProbeState.Working` dönmesi
+  gerekiyor; `Unmeasured` yetmiyor (sürücüsü olmayan makinede `h264_nvenc` listede duruyor
+  ama kodlamıyor).
+- Kare hızı kapalı merdivenden: `{24, 30, 60, 120}`, ekranın yenileme hızına **aşağı**
+  yuvarlanıyor. 75 Hz'lik ekran 60 alıyor; hız okunamazsa 30.
+- Ölçek: yakalama boyutu, sonra yarısı (`yuv420p` için çifte yuvarlanmış).
+- Kap her adayda **mkv**: öldürülen kayıt oynatılabilir kalan tek kap.
+- Ön ayar kodlayıcının kendi sözlüğünden (`p4` / `speed` / `veryfast` / `veryfast`).
+- En çok 4 aday; sıra önce kare hızını, sonra çözünürlüğü indiriyor.
+
+**`src/VidShrink.Ffmpeg/RecorderAutoProbe.cs`** kazananı seçiyor: aday başına 3 saniyelik
+**gerçek** kayıt, `RecordProgress.DroppedFrames` okunuyor. Kare düşürmeyen ilk aday
+merdiveni kısa devre ediyor; hiçbiri sıfır değilse oranı en küçük olan kazanıyor, eşitlikte
+merdiven sırası. **Eşik yok**: bu depoda kayıt için ölçülmüş bir "kabul edilebilir düşen
+kare" sayısı bulunmadığı için sayı uydurulmadı.
+
+Yenileme hızı bugüne kadar depoda hiç okunmuyordu; `Recorder/ScreenRefresh.cs`
+(`EnumDisplaySettings`) eklendi. Windows dışında sıfır dönüyor ve 30'a düşülüyor.
+
+Arayüz: seçenek panelinde tek kutu (`ChkAuto`). İşaretlenince ölçüm kendiliğinden koşuyor,
+elle panel gizleniyor (devre dışı bırakılmıyor), seçim ve gerekçeleri özet satırında
+yazıyor. Kullanıcıdan beklenen tek iş kutuyu işaretlemek.
+
+Pim: `KayitOtomatikKipTests` (25 ölçü) — aday kümesinin kapalılığı, yeğlenmeyen ve uydurma
+kodlayıcının seçilmemesi, donanım yokken x264'e düşme, kare hızı merdiveni, yarı boyutun
+çift olması, **her adayın motorun kendi `Validate`'inden geçmesi**, `Apply`'ın bit hızı
+kolunu temizlemesi, ölçülemeyen denemenin kazanmaması.
 
 ## Sıra
 

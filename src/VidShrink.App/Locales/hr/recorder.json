@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} mora biti broj.",
   "recorder.error.start": "Snimanje se nije moglo pokrenuti: {0}",
   "recorder.error.folder": "Mapa se nije mogla odabrati: {0}",
-  "recorder.error.audio": "Zvučni ulaz nije bilo moguće pripremiti: {0}"
+  "recorder.error.audio": "Zvučni ulaz nije bilo moguće pripremiti: {0}",
+  "recorder.auto.enable": "Automatski način — neka program odabere najbolje postavke",
+  "recorder.auto.hint": "Dok je uključen, snimač radi nekoliko kratkih probnih snimanja i zadržava najvišu postavku koja ne gubi sličice.",
+  "recorder.auto.measure": "Ponovno izmjeri",
+  "recorder.auto.measuring": "Mjerenje…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Isprobano {0} kandidata; pobjednik je izgubio {1} sličica.",
+  "recorder.auto.unmeasured": "Nije bilo moguće pokrenuti nijedno probno snimanje; zapisan je prvi kandidat s popisa.",
+  "recorder.auto.native": "veličina snimanja",
+  "recorder.auto.note.hardware": "provjeren hardverski koder",
+  "recorder.auto.note.software": "nema funkcionalnog hardverskog kodera",
+  "recorder.auto.note.refresh": "broj sličica prema frekvenciji osvježavanja zaslona",
+  "recorder.auto.note.stepped": "broj sličica smanjen",
+  "recorder.auto.note.kept": "razlučivost zadržana",
+  "recorder.auto.note.halved": "razlučivost prepolovljena",
+  "recorder.auto.note.container": "mkv spremnik: prekinuto snimanje ostaje reproducibilno",
+  "recorder.auto.note.preset": "predefinirana postavka iz vlastitog rječnika kodera"
 }

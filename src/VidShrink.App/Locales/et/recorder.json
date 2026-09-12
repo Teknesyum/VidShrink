@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} peab olema arv.",
   "recorder.error.start": "Salvestust ei õnnestunud alustada: {0}",
   "recorder.error.folder": "Kausta ei õnnestunud valida: {0}",
-  "recorder.error.audio": "Helisisendit ei õnnestunud ette valmistada: {0}"
+  "recorder.error.audio": "Helisisendit ei õnnestunud ette valmistada: {0}",
+  "recorder.auto.enable": "Automaatrežiim — las programm valib parimad seaded",
+  "recorder.auto.hint": "Kui see on sees, teeb salvesti mõne lühikese proovisalvestuse ja jätab kõrgeima seade, mis ei jäta kaadreid vahele.",
+  "recorder.auto.measure": "Mõõda uuesti",
+  "recorder.auto.measuring": "Mõõtmine…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Katsetati {0} kandidaati; võitja jättis vahele {1} kaadrit.",
+  "recorder.auto.unmeasured": "Ühtegi proovisalvestust ei õnnestunud käivitada; kirjutati loendi esimene kandidaat.",
+  "recorder.auto.native": "salvestussuurus",
+  "recorder.auto.note.hardware": "riistvaraline kodeerija testitud",
+  "recorder.auto.note.software": "töötavat riistvaralist kodeerijat pole",
+  "recorder.auto.note.refresh": "kaadrisagedus ekraani värskendussageduse järgi",
+  "recorder.auto.note.stepped": "kaadrisagedust vähendatud",
+  "recorder.auto.note.kept": "eraldusvõime säilitatud",
+  "recorder.auto.note.halved": "eraldusvõime poole võrra vähendatud",
+  "recorder.auto.note.container": "mkv-konteiner: katkestatud salvestus jääb esitatavaks",
+  "recorder.auto.note.preset": "eelseadistus kodeerija enda sõnavarast"
 }

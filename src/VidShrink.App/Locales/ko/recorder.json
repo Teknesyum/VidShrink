@@ -48,5 +48,21 @@
   "recorder.error.number": "{0}은(는) 숫자여야 합니다.",
   "recorder.error.start": "녹화를 시작할 수 없습니다: {0}",
   "recorder.error.folder": "폴더를 선택할 수 없습니다: {0}",
-  "recorder.error.audio": "오디오 입력을 준비할 수 없습니다: {0}"
+  "recorder.error.audio": "오디오 입력을 준비할 수 없습니다: {0}",
+  "recorder.auto.enable": "자동 모드 — 프로그램이 최적의 설정을 선택하도록 합니다",
+  "recorder.auto.hint": "켜져 있는 동안 레코더는 짧은 시험 녹화를 몇 차례 진행하고, 프레임을 하나도 떨어뜨리지 않는 가장 높은 설정을 유지합니다.",
+  "recorder.auto.measure": "다시 측정",
+  "recorder.auto.measuring": "측정 중…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0}개의 후보를 시도했으며, 선택된 설정은 {1}개의 프레임을 놓쳤습니다.",
+  "recorder.auto.unmeasured": "시험 녹화를 하나도 실행할 수 없어 목록의 첫 번째 후보가 기록되었습니다.",
+  "recorder.auto.native": "캡처 크기",
+  "recorder.auto.note.hardware": "하드웨어 인코더 확인됨",
+  "recorder.auto.note.software": "작동하는 하드웨어 인코더 없음",
+  "recorder.auto.note.refresh": "디스플레이 주사율에 따른 프레임 속도",
+  "recorder.auto.note.stepped": "프레임 속도 낮춤",
+  "recorder.auto.note.kept": "해상도 유지",
+  "recorder.auto.note.halved": "해상도 절반으로 축소",
+  "recorder.auto.note.container": "mkv 컨테이너: 중단된 녹화도 재생 가능",
+  "recorder.auto.note.preset": "인코더 고유 어휘에서 가져온 프리셋"
 }

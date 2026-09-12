@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} muss eine Zahl sein.",
   "recorder.error.start": "Die Aufnahme konnte nicht gestartet werden: {0}",
   "recorder.error.folder": "Der Ordner konnte nicht ausgewählt werden: {0}",
-  "recorder.error.audio": "Der Toneingang konnte nicht vorbereitet werden: {0}"
+  "recorder.error.audio": "Der Toneingang konnte nicht vorbereitet werden: {0}",
+  "recorder.auto.enable": "Automatikmodus — das Programm wählt die besten Einstellungen",
+  "recorder.auto.hint": "Solange er aktiv ist, macht der Rekorder ein paar kurze Testaufnahmen und behält die höchste Einstellung, bei der keine Bilder verworfen werden.",
+  "recorder.auto.measure": "Erneut messen",
+  "recorder.auto.measuring": "Wird gemessen…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} Kandidaten getestet; der Gewinner hat {1} Bilder verworfen.",
+  "recorder.auto.unmeasured": "Es konnte keine Testaufnahme laufen; der erste Kandidat der Liste wurde geschrieben.",
+  "recorder.auto.native": "Aufnahmegröße",
+  "recorder.auto.note.hardware": "Hardware-Encoder geprüft",
+  "recorder.auto.note.software": "kein funktionierender Hardware-Encoder",
+  "recorder.auto.note.refresh": "Bildrate von der Bildwiederholrate des Displays",
+  "recorder.auto.note.stepped": "Bildrate herabgesetzt",
+  "recorder.auto.note.kept": "Auflösung beibehalten",
+  "recorder.auto.note.halved": "Auflösung halbiert",
+  "recorder.auto.note.container": "MKV-Container: eine abgebrochene Aufnahme bleibt abspielbar",
+  "recorder.auto.note.preset": "Voreinstellung aus dem Vokabular des Encoders"
 }

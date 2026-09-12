@@ -30,6 +30,7 @@ internal partial class RecorderView : UserControl
         InitializeComponent();
         _settings = RecorderSettings.Load(RecorderSettings.FilePath);
         InitHedef();
+        InitOtomatik();
         InitSes();
         InitSerit();
         RefreshSerit();

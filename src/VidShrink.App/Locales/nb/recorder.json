@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} må være et tall.",
   "recorder.error.start": "Opptaket kunne ikke starte: {0}",
   "recorder.error.folder": "Mappen kunne ikke velges: {0}",
-  "recorder.error.audio": "Lydinngangen kunne ikke klargjøres: {0}"
+  "recorder.error.audio": "Lydinngangen kunne ikke klargjøres: {0}",
+  "recorder.auto.enable": "Automatisk modus — la programmet velge de beste innstillingene",
+  "recorder.auto.hint": "Mens den er på, gjør opptakeren noen korte prøveopptak og beholder den høyeste innstillingen som ikke mister bilder.",
+  "recorder.auto.measure": "Mål på nytt",
+  "recorder.auto.measuring": "Måler…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} kandidater testet; vinneren mistet {1} bilder.",
+  "recorder.auto.unmeasured": "Ingen prøveopptak kunne kjøres; den første kandidaten på listen ble skrevet.",
+  "recorder.auto.native": "opptaksstørrelse",
+  "recorder.auto.note.hardware": "maskinvarekoder testet",
+  "recorder.auto.note.software": "ingen fungerende maskinvarekoder",
+  "recorder.auto.note.refresh": "bildefrekvens fra skjermens oppdateringsfrekvens",
+  "recorder.auto.note.stepped": "bildefrekvens senket",
+  "recorder.auto.note.kept": "oppløsning beholdt",
+  "recorder.auto.note.halved": "oppløsning halvert",
+  "recorder.auto.note.container": "mkv-beholder: et avbrutt opptak forblir avspillbart",
+  "recorder.auto.note.preset": "forhåndsinnstilling fra koderens eget vokabular"
 }

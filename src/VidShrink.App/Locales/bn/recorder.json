@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} একটি সংখ্যা হতে হবে।",
   "recorder.error.start": "রেকর্ডিং শুরু করা যায়নি: {0}",
   "recorder.error.folder": "ফোল্ডারটি বেছে নেওয়া যায়নি: {0}",
-  "recorder.error.audio": "সাউন্ড ইনপুট প্রস্তুত করা যায়নি: {0}"
+  "recorder.error.audio": "সাউন্ড ইনপুট প্রস্তুত করা যায়নি: {0}",
+  "recorder.auto.enable": "স্বয়ংক্রিয় মোড — প্রোগ্রামকে সেরা সেটিংস বেছে নিতে দিন",
+  "recorder.auto.hint": "এটি চালু থাকা অবস্থায়, রেকর্ডার কয়েকটি সংক্ষিপ্ত পরীক্ষামূলক রেকর্ডিং করে এবং সর্বোচ্চ সেটিং রাখে যা কোনো ফ্রেম বাদ দেয় না।",
+  "recorder.auto.measure": "আবার পরিমাপ করুন",
+  "recorder.auto.measuring": "পরিমাপ করা হচ্ছে…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0}টি প্রার্থী পরীক্ষা করা হয়েছে; বিজয়ী {1}টি ফ্রেম বাদ দিয়েছে।",
+  "recorder.auto.unmeasured": "কোনো পরীক্ষামূলক রেকর্ডিং চালানো যায়নি; তালিকার প্রথম প্রার্থী লেখা হয়েছে।",
+  "recorder.auto.native": "ক্যাপচার আকার",
+  "recorder.auto.note.hardware": "হার্ডওয়্যার এনকোডার পরীক্ষা করা হয়েছে",
+  "recorder.auto.note.software": "কার্যকর হার্ডওয়্যার এনকোডার নেই",
+  "recorder.auto.note.refresh": "ডিসপ্লের রিফ্রেশ হার থেকে ফ্রেম হার",
+  "recorder.auto.note.stepped": "ফ্রেম হার কমানো হয়েছে",
+  "recorder.auto.note.kept": "রেজোলিউশন অপরিবর্তিত রাখা হয়েছে",
+  "recorder.auto.note.halved": "রেজোলিউশন অর্ধেক করা হয়েছে",
+  "recorder.auto.note.container": "mkv কনটেইনার: থামানো রেকর্ডিং চালানোর যোগ্য থাকে",
+  "recorder.auto.note.preset": "এনকোডারের নিজস্ব শব্দভাণ্ডার থেকে প্রিসেট"
 }

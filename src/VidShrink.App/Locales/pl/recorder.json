@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} musi być liczbą.",
   "recorder.error.start": "Nie udało się rozpocząć nagrywania: {0}",
   "recorder.error.folder": "Nie udało się wybrać folderu: {0}",
-  "recorder.error.audio": "Nie udało się przygotować wejścia dźwięku: {0}"
+  "recorder.error.audio": "Nie udało się przygotować wejścia dźwięku: {0}",
+  "recorder.auto.enable": "Tryb automatyczny — pozwól programowi wybrać najlepsze ustawienia",
+  "recorder.auto.hint": "Gdy jest włączony, rejestrator wykonuje kilka krótkich nagrań próbnych i zachowuje najwyższe ustawienie, przy którym nie gubi się żadna klatka.",
+  "recorder.auto.measure": "Zmierz ponownie",
+  "recorder.auto.measuring": "Trwa pomiar…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Sprawdzono {0} kandydatów; zwycięzca zgubił {1} klatek.",
+  "recorder.auto.unmeasured": "Nie udało się uruchomić żadnego nagrania próbnego; zapisano pierwszego kandydata z listy.",
+  "recorder.auto.native": "rozmiar przechwytywania",
+  "recorder.auto.note.hardware": "sprawdzono sprzętowy koder",
+  "recorder.auto.note.software": "brak działającego sprzętowego kodera",
+  "recorder.auto.note.refresh": "liczba klatek na podstawie częstotliwości odświeżania ekranu",
+  "recorder.auto.note.stepped": "liczba klatek obniżona",
+  "recorder.auto.note.kept": "rozdzielczość zachowana",
+  "recorder.auto.note.halved": "rozdzielczość zmniejszona o połowę",
+  "recorder.auto.note.container": "kontener mkv: przerwane nagranie pozostaje odtwarzalne",
+  "recorder.auto.note.preset": "ustawienie predefiniowane z własnego słownika kodera"
 }

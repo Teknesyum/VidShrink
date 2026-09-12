@@ -40,6 +40,9 @@ what will come out.
   AI-plan prompt. No summary, the command itself.
 - **Player tab.** The window plays the source through a decoder pipe that stays open
   between seeks instead of launching ffmpeg for every scrub.
+- **Recorder tab.** The screen, a single window or a region, with microphone and system
+  sound, through each platform's own capture backend. One checkbox hands the encoding
+  settings to the program, which measures them on your machine rather than guessing.
 - **Twelve encoders, probed not trusted.** Software, NVENC, Quick Sync and AMF candidates
   are each tested on your machine before the engine will name one.
 - **Windows right-click menu and self-update.** "Shrink with VidShrink" in the Explorer
@@ -334,6 +337,31 @@ the player instead of pushing it down.
 | Middle-click | toggle full screen, and put the window back where it was |
 
 The context menu carries the same three actions.
+
+### The Recorder tab
+
+The Recorder records the whole screen, a single window or a region, through the capture
+backend each platform actually has: gdigrab on Windows, avfoundation on macOS, x11grab on
+Linux. It records a microphone, the system output, or both — chosen by name, so a device
+list that reorders between two launches cannot quietly pick a different microphone. Stopping
+asks ffmpeg to close the file rather than killing it, so a stopped recording plays back; a
+recording killed by a timeout is reported as partial instead of being handed over as a
+working file.
+
+The encoding options are there — frame rate, quality, encoder, preset, container, scaling,
+keyframe interval, profile, tune, pixel format, a duration limit and segment splitting — but
+you do not have to touch any of them.
+
+**Automatic mode** is one checkbox. The program builds a short ladder of candidate settings
+from the machine itself: the first hardware H.264 encoder it has actually seen encode
+(NVENC, then Quick Sync, then AMF) or `libx264` where none works, a frame rate rounded down
+to {24, 30, 60, 120} from the screen's refresh rate, the capture size and then half of it,
+Matroska throughout because that is the container a killed recording survives in, and a
+preset from the chosen encoder's own vocabulary rather than x264's. Then it records three
+real seconds per candidate and reads the dropped-frame counter. The first candidate that
+drops nothing wins outright; otherwise the lowest drop ratio wins. The chosen settings and
+the reason for each are written in one line under the checkbox, and the manual options are
+hidden while the mode is on.
 
 ### Encoders
 

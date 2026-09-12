@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} має бути числом.",
   "recorder.error.start": "Не вдалося почати запис: {0}",
   "recorder.error.folder": "Не вдалося вибрати папку: {0}",
-  "recorder.error.audio": "Не вдалося підготувати джерело звуку: {0}"
+  "recorder.error.audio": "Не вдалося підготувати джерело звуку: {0}",
+  "recorder.auto.enable": "Автоматичний режим — дозволити програмі обрати найкращі налаштування",
+  "recorder.auto.hint": "Поки він увімкнений, рекордер робить кілька коротких пробних записів і залишає найвищу настройку, яка не втрачає кадрів.",
+  "recorder.auto.measure": "Виміряти знову",
+  "recorder.auto.measuring": "Вимірювання…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Випробувано кандидатів: {0}; переможець втратив {1} кадрів.",
+  "recorder.auto.unmeasured": "Жоден пробний запис не вдалося виконати; записано першого кандидата зі списку.",
+  "recorder.auto.native": "розмір захоплення",
+  "recorder.auto.note.hardware": "перевірено апаратний кодер",
+  "recorder.auto.note.software": "немає працездатного апаратного кодера",
+  "recorder.auto.note.refresh": "частота кадрів за частотою оновлення екрана",
+  "recorder.auto.note.stepped": "частоту кадрів знижено",
+  "recorder.auto.note.kept": "роздільна здатність збережена",
+  "recorder.auto.note.halved": "роздільна здатність зменшена вдвічі",
+  "recorder.auto.note.container": "контейнер mkv: перерваний запис лишається придатним для відтворення",
+  "recorder.auto.note.preset": "пресет із власного словника кодера"
 }

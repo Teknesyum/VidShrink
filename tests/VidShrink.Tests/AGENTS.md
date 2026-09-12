@@ -35,5 +35,10 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   başına), tek kare `BuildSnapshot`, çoklu monitörün ofsetli bölgeye çevrilmesi. Her kolun negatif kontrolü var;
   44 ölçünün 24'ü üretilen argüman dizisini okur, 20'si doğrulama hata listesini ya da
   kapalı küme dönüşlerini. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
+- `KayitOtomatikKipTests.cs` — 9d kolu, kaydedicinin otomatik kipi: aday merdiveni (`RecorderAutoPlan`) ve kazanma
+  kuralı (`RecorderAutoProbe`). Kodlayıcı yeğlemesi nvenc/qsv/amf, donanım yokken x264, yeğlenmeyen ve uydurma adın
+  negatif kontrolü, kare hızı merdiveni (75 Hz → 60), yarı boyutun çift olması, **her adayın
+  `RecorderArguments.Validate`'inden geçmesi**, `Apply`'ın bit hızı kolunu temizlemesi, `Unmeasured` donanımın
+  seçilmemesi, tamamlanmayan denemenin kazanmaması. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.

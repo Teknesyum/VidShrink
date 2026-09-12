@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} on oltava luku.",
   "recorder.error.start": "Tallennusta ei voitu aloittaa: {0}",
   "recorder.error.folder": "Kansiota ei voitu valita: {0}",
-  "recorder.error.audio": "Ääntä ei voitu valmistella: {0}"
+  "recorder.error.audio": "Ääntä ei voitu valmistella: {0}",
+  "recorder.auto.enable": "Automaattitila — anna ohjelman valita parhaat asetukset",
+  "recorder.auto.hint": "Kun se on päällä, tallennin tekee muutaman lyhyen koetallenteen ja säilyttää korkeimman asetuksen, joka ei pudota kuvia.",
+  "recorder.auto.measure": "Mittaa uudelleen",
+  "recorder.auto.measuring": "Mitataan…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} ehdokasta testattu; voittaja pudotti {1} kuvaa.",
+  "recorder.auto.unmeasured": "Yhtään koetallennetta ei voitu suorittaa; listan ensimmäinen ehdokas kirjoitettiin.",
+  "recorder.auto.native": "tallennuskoko",
+  "recorder.auto.note.hardware": "laitteistokoodain testattu",
+  "recorder.auto.note.software": "ei toimivaa laitteistokoodainta",
+  "recorder.auto.note.refresh": "kuvataajuus näytön virkistystaajuuden mukaan",
+  "recorder.auto.note.stepped": "kuvataajuutta laskettu",
+  "recorder.auto.note.kept": "tarkkuus säilytetty",
+  "recorder.auto.note.halved": "tarkkuus puolitettu",
+  "recorder.auto.note.container": "mkv-säiliö: keskeytetty tallenne pysyy toistettavana",
+  "recorder.auto.note.preset": "esiasetus koodaimen omasta sanastosta"
 }

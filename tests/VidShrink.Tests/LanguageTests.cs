@@ -224,7 +224,14 @@ public sealed class LanguageTests : IDisposable
         "GlowBlue", "GlowPink", "GlowPurple",
         "LinkGitHub", "LinkRepo", "LinkSponsor", "AppIconUri",
         "PlaybackMaximizeIcon", "PlaybackFullScreenIcon",
-        "PlaybackScrimColor", "PlaybackScrimEdgeColor"
+        "PlaybackScrimColor", "PlaybackScrimEdgeColor",
+        "IconPlayer", "IconShrink", "IconConvert", "IconRecorder", "IconAdvanced",
+        "IconAbout", "IconSettings",
+        "IconPlay", "IconPause", "IconRewind", "IconFastForward",
+        "IconVolume", "IconVolumeMute", "IconSpeed", "IconFullScreen", "IconMenu",
+        "IconCamera", "IconChevronDown", "IconChevronUp", "IconRestart",
+        "IconClose", "IconMaximize", "IconMinimize", "IconRestore",
+        "IconCoffee", "IconCode"
     };
 
     private static readonly Regex KeyAttribute = new(

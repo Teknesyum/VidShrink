@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} должно быть числом.",
   "recorder.error.start": "Запись не удалось начать: {0}",
   "recorder.error.folder": "Не удалось выбрать папку: {0}",
-  "recorder.error.audio": "Не удалось подготовить источник звука: {0}"
+  "recorder.error.audio": "Не удалось подготовить источник звука: {0}",
+  "recorder.auto.enable": "Автоматический режим — пусть программа сама выберет лучшие настройки",
+  "recorder.auto.hint": "Пока он включён, программа записи делает несколько коротких пробных записей и оставляет самую высокую настройку, при которой кадры не теряются.",
+  "recorder.auto.measure": "Измерить снова",
+  "recorder.auto.measuring": "Измерение…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Проверено кандидатов: {0}; победитель потерял {1} кадров.",
+  "recorder.auto.unmeasured": "Не удалось выполнить ни одной пробной записи; была записана первая позиция из списка.",
+  "recorder.auto.native": "размер захвата",
+  "recorder.auto.note.hardware": "проверен аппаратный кодировщик",
+  "recorder.auto.note.software": "нет работающего аппаратного кодировщика",
+  "recorder.auto.note.refresh": "частота кадров по частоте обновления экрана",
+  "recorder.auto.note.stepped": "частота кадров снижена",
+  "recorder.auto.note.kept": "разрешение сохранено",
+  "recorder.auto.note.halved": "разрешение уменьшено вдвое",
+  "recorder.auto.note.container": "контейнер mkv: прерванная запись остаётся воспроизводимой",
+  "recorder.auto.note.preset": "пресет из собственного словаря кодировщика"
 }

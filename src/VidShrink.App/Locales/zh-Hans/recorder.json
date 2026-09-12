@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} 必须是一个数字。",
   "recorder.error.start": "无法开始录制：{0}",
   "recorder.error.folder": "无法选择文件夹：{0}",
-  "recorder.error.audio": "无法准备声音输入：{0}"
+  "recorder.error.audio": "无法准备声音输入：{0}",
+  "recorder.auto.enable": "自动模式 — 让程序选择最佳设置",
+  "recorder.auto.hint": "开启期间，录制器会进行几次简短的试录，并保留不丢帧的最高设置。",
+  "recorder.auto.measure": "重新测量",
+  "recorder.auto.measuring": "正在测量…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "已尝试 {0} 个候选项；获胜设置丢失了 {1} 帧。",
+  "recorder.auto.unmeasured": "没有任何试录能够运行；已写入列表中的第一个候选项。",
+  "recorder.auto.native": "捕获尺寸",
+  "recorder.auto.note.hardware": "已探测硬件编码器",
+  "recorder.auto.note.software": "没有可用的硬件编码器",
+  "recorder.auto.note.refresh": "根据显示器刷新率得出的帧率",
+  "recorder.auto.note.stepped": "帧率已下调",
+  "recorder.auto.note.kept": "分辨率保持不变",
+  "recorder.auto.note.halved": "分辨率减半",
+  "recorder.auto.note.container": "mkv 容器：被中断的录制仍可播放",
+  "recorder.auto.note.preset": "取自编码器自身词汇表的预设"
 }

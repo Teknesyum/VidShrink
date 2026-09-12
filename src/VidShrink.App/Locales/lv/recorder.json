@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} jābūt skaitlim.",
   "recorder.error.start": "Ierakstīšanu nevarēja sākt: {0}",
   "recorder.error.folder": "Mapi nevarēja izvēlēties: {0}",
-  "recorder.error.audio": "Skaņas ievadi neizdevās sagatavot: {0}"
+  "recorder.error.audio": "Skaņas ievadi neizdevās sagatavot: {0}",
+  "recorder.auto.enable": "Automātiskais režīms — ļaujiet programmai izvēlēties labākos iestatījumus",
+  "recorder.auto.hint": "Kamēr tas ir ieslēgts, ierakstītājs veic dažus īsus izmēģinājuma ierakstus un patur augstāko iestatījumu, kas nezaudē kadrus.",
+  "recorder.auto.measure": "Mērīt vēlreiz",
+  "recorder.auto.measuring": "Notiek mērīšana…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "Pārbaudīti {0} kandidāti; uzvarētājs zaudēja {1} kadrus.",
+  "recorder.auto.unmeasured": "Nevarēja palaist nevienu izmēģinājuma ierakstu; tika ierakstīts pirmais saraksta kandidāts.",
+  "recorder.auto.native": "ieraksta izmērs",
+  "recorder.auto.note.hardware": "pārbaudīts aparatūras kodētājs",
+  "recorder.auto.note.software": "nav darbojoša aparatūras kodētāja",
+  "recorder.auto.note.refresh": "kadru nomaiņas ātrums pēc ekrāna atsvaidzes intensitātes",
+  "recorder.auto.note.stepped": "kadru nomaiņas ātrums samazināts",
+  "recorder.auto.note.kept": "izšķirtspēja saglabāta",
+  "recorder.auto.note.halved": "izšķirtspēja samazināta uz pusi",
+  "recorder.auto.note.container": "mkv konteiners: pārtraukts ieraksts paliek atskaņojams",
+  "recorder.auto.note.preset": "sākotnējais iestatījums no kodētāja paša vārdnīcas"
 }

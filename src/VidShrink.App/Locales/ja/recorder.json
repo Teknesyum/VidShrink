@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} は数値である必要があります。",
   "recorder.error.start": "録画を開始できませんでした: {0}",
   "recorder.error.folder": "フォルダーを選択できませんでした: {0}",
-  "recorder.error.audio": "音声入力を準備できませんでした: {0}"
+  "recorder.error.audio": "音声入力を準備できませんでした: {0}",
+  "recorder.auto.enable": "自動モード — プログラムに最適な設定を選ばせる",
+  "recorder.auto.hint": "オンになっている間、レコーダーは短い試し録画を数回行い、フレームを落とさない最も高い設定を採用します。",
+  "recorder.auto.measure": "もう一度測定",
+  "recorder.auto.measuring": "測定中…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} 件の候補を試行し、採用された設定は {1} フレームを落としました。",
+  "recorder.auto.unmeasured": "試し録画を1件も実行できなかったため、候補リストの先頭が採用されました。",
+  "recorder.auto.native": "キャプチャサイズ",
+  "recorder.auto.note.hardware": "ハードウェアエンコーダーを検証済み",
+  "recorder.auto.note.software": "動作するハードウェアエンコーダーなし",
+  "recorder.auto.note.refresh": "ディスプレイのリフレッシュレートによるフレームレート",
+  "recorder.auto.note.stepped": "フレームレートを引き下げ",
+  "recorder.auto.note.kept": "解像度を維持",
+  "recorder.auto.note.halved": "解像度を半分に縮小",
+  "recorder.auto.note.container": "mkvコンテナ: 中断された録画も再生可能なまま",
+  "recorder.auto.note.preset": "エンコーダー自身の語彙によるプリセット"
 }

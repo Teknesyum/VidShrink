@@ -307,7 +307,9 @@ public sealed class OynaticiAracTests
     ///
     /// <para>Kesit B: ses ve hız düğme çifti olmaktan çıkıp kaydırıcı oldu, ölçüm de
     /// tıklama yerine <c>Value</c> yazıyor. Ölçtüğü şey değişmedi — komutun motora ulaşması
-    /// ve motordan geri okunması.</para>
+    /// ve motordan geri okunması. Beklenen hız da onunla birlikte değişti: düğme çifti
+    /// 0,1'lik adım atıyordu ve pim 1,1'di; kaydırıcı doğrudan <c>hizOnce + 0,25</c>
+    /// yazdığı için motordan okunan 1,25.</para>
     /// </summary>
     [Fact]
     public void SeritDugmeleriMotoraUlasirVeMotordanGeriOkunur()
@@ -392,7 +394,7 @@ public sealed class OynaticiAracTests
         Assert.Equal(rapor.sesOnce, rapor.sesGeri);
         Assert.Equal(rapor.tavan, rapor.sesTavan);
         Assert.Equal(AracKanit.N(rapor.tavan), rapor.sesEtiketi);
-        Assert.Equal(1.1, rapor.hizli, 3);
+        Assert.Equal(1.25, rapor.hizli, 3);
         Assert.Equal(1.0, rapor.normal, 3);
         Assert.Equal("1x", rapor.hizEtiketi);
     }

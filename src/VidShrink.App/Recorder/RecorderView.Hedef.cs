@@ -113,8 +113,14 @@ internal partial class RecorderView
     /// <summary>
     /// Kullanıcının seçtiği istek. Sayı alanlarından biri okunamazsa istek üretilmiyor ve
     /// sebebi ekranda bildiriliyor; sessiz varsayılana düşmüyor.
+    /// <para>
+    /// Otomatik kip açıkken kodlama kolu <see cref="RecorderAutoPlan.Apply"/> ile üstüne
+    /// yazılıyor. <paramref name="applyAuto"/> yalnız ölçümün kendisi için yanlış veriliyor:
+    /// deneme kaydının temel isteği otomatik kipin kararını taşımamalı, taşısa merdivenin
+    /// her basamağı aynı ayarla ölçülürdü.
+    /// </para>
     /// </summary>
-    internal RecorderRequest? BuildRequest()
+    internal RecorderRequest? BuildRequest(bool applyAuto = true)
     {
         if (!int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps))
         {
@@ -139,7 +145,7 @@ internal partial class RecorderView
             region = rect;
         }
 
-        return new RecorderRequest
+        var request = new RecorderRequest
         {
             Platform = HostPlatform,
             Target = target,
@@ -177,6 +183,10 @@ internal partial class RecorderView
             MaxDuration = _settings.MaxDuration,
             Split = _settings.Split
         };
+
+        return applyAuto && AutoMode && AutoChoice is { } choice
+            ? RecorderAutoPlan.Apply(request, choice)
+            : request;
     }
 
     /// <summary>

@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} ต้องเป็นตัวเลข",
   "recorder.error.start": "ไม่สามารถเริ่มการบันทึกได้: {0}",
   "recorder.error.folder": "ไม่สามารถเลือกโฟลเดอร์ได้: {0}",
-  "recorder.error.audio": "ไม่สามารถเตรียมแหล่งเสียงได้: {0}"
+  "recorder.error.audio": "ไม่สามารถเตรียมแหล่งเสียงได้: {0}",
+  "recorder.auto.enable": "โหมดอัตโนมัติ — ให้โปรแกรมเลือกการตั้งค่าที่ดีที่สุด",
+  "recorder.auto.hint": "ขณะเปิดใช้งาน เครื่องบันทึกจะทำการบันทึกทดลองสั้น ๆ ไม่กี่ครั้งและเก็บการตั้งค่าสูงสุดที่ไม่มีการดรอปเฟรม",
+  "recorder.auto.measure": "วัดอีกครั้ง",
+  "recorder.auto.measuring": "กำลังวัด…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "ทดลอง {0} ตัวเลือก; ตัวที่ชนะดรอปไป {1} เฟรม",
+  "recorder.auto.unmeasured": "ไม่สามารถรันการบันทึกทดลองได้เลย; ได้บันทึกตัวเลือกแรกในลำดับแทน",
+  "recorder.auto.native": "ขนาดการจับภาพ",
+  "recorder.auto.note.hardware": "ตรวจสอบตัวเข้ารหัสฮาร์ดแวร์แล้ว",
+  "recorder.auto.note.software": "ไม่มีตัวเข้ารหัสฮาร์ดแวร์ที่ใช้งานได้",
+  "recorder.auto.note.refresh": "อัตราเฟรมจากอัตรารีเฟรชของจอแสดงผล",
+  "recorder.auto.note.stepped": "ลดอัตราเฟรมลง",
+  "recorder.auto.note.kept": "คงความละเอียดไว้",
+  "recorder.auto.note.halved": "ลดความละเอียดลงครึ่งหนึ่ง",
+  "recorder.auto.note.container": "คอนเทนเนอร์ mkv: การบันทึกที่ถูกหยุดกะทันหันยังคงเล่นได้",
+  "recorder.auto.note.preset": "ค่าที่ตั้งไว้ล่วงหน้าจากคำศัพท์เฉพาะของตัวเข้ารหัส"
 }

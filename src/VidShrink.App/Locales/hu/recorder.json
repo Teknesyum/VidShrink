@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} számnak kell lennie.",
   "recorder.error.start": "A felvétel nem indítható el: {0}",
   "recorder.error.folder": "A mappa nem választható ki: {0}",
-  "recorder.error.audio": "A hangbemenetet nem sikerült előkészíteni: {0}"
+  "recorder.error.audio": "A hangbemenetet nem sikerült előkészíteni: {0}",
+  "recorder.auto.enable": "Automatikus mód — hagyd, hogy a program válassza ki a legjobb beállításokat",
+  "recorder.auto.hint": "Amíg be van kapcsolva, a felvevő néhány rövid próbafelvételt készít, és megtartja a legmagasabb beállítást, amely nem dob el képkockát.",
+  "recorder.auto.measure": "Mérés újra",
+  "recorder.auto.measuring": "Mérés…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} jelölt kipróbálva; a győztes {1} képkockát dobott el.",
+  "recorder.auto.unmeasured": "Egyetlen próbafelvétel sem tudott lefutni; a lista első jelöltje került rögzítésre.",
+  "recorder.auto.native": "felvételi méret",
+  "recorder.auto.note.hardware": "hardveres kódoló tesztelve",
+  "recorder.auto.note.software": "nincs működő hardveres kódoló",
+  "recorder.auto.note.refresh": "képkockasebesség a kijelző képfrissítési sebességéből",
+  "recorder.auto.note.stepped": "csökkentett képkockasebesség",
+  "recorder.auto.note.kept": "felbontás megtartva",
+  "recorder.auto.note.halved": "felbontás felezve",
+  "recorder.auto.note.container": "mkv konténer: a megszakított felvétel is lejátszható marad",
+  "recorder.auto.note.preset": "előbeállítás a kódoló saját szókészletéből"
 }

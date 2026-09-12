@@ -48,5 +48,21 @@
   "recorder.error.number": "{0} ایک عدد ہونا چاہیے۔",
   "recorder.error.start": "ریکارڈنگ شروع نہیں ہو سکی: {0}",
   "recorder.error.folder": "فولڈر منتخب نہیں ہو سکا: {0}",
-  "recorder.error.audio": "آواز کا ان پٹ تیار نہیں ہو سکا: {0}"
+  "recorder.error.audio": "آواز کا ان پٹ تیار نہیں ہو سکا: {0}",
+  "recorder.auto.enable": "خودکار موڈ — پروگرام کو بہترین ترتیبات چننے دیں",
+  "recorder.auto.hint": "جب تک یہ آن ہے، ریکارڈر چند مختصر آزمائشی ریکارڈنگز کرتا ہے اور وہ سب سے اعلیٰ ترتیب رکھتا ہے جو کوئی فریم نہیں گراتی۔",
+  "recorder.auto.measure": "دوبارہ ناپیں",
+  "recorder.auto.measuring": "ناپا جا رہا ہے…",
+  "recorder.auto.summary": "{0} · {1} fps · {2} · {3}",
+  "recorder.auto.trials": "{0} امیدواروں کو آزمایا گیا؛ فاتح نے {1} فریمز گرائے۔",
+  "recorder.auto.unmeasured": "کوئی آزمائشی ریکارڈنگ نہیں چل سکی؛ فہرست کا پہلا امیدوار لکھ دیا گیا۔",
+  "recorder.auto.native": "کیپچر سائز",
+  "recorder.auto.note.hardware": "ہارڈویئر انکوڈر کی جانچ کی گئی",
+  "recorder.auto.note.software": "کوئی کارآمد ہارڈویئر انکوڈر نہیں",
+  "recorder.auto.note.refresh": "فریم ریٹ ڈسپلے کی ریفریش ریٹ سے",
+  "recorder.auto.note.stepped": "فریم ریٹ کم کر دیا گیا",
+  "recorder.auto.note.kept": "ریزولوشن برقرار رکھا گیا",
+  "recorder.auto.note.halved": "ریزولوشن آدھا کر دیا گیا",
+  "recorder.auto.note.container": "mkv کنٹینر: روکی گئی ریکارڈنگ قابلِ چلاؤ رہتی ہے",
+  "recorder.auto.note.preset": "انکوڈر کی اپنی لغت سے پہلے سے طے شدہ ترتیب"
 }
