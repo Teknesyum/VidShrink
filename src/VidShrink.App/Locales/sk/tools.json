@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Nástroje",
+  "player.tools.clip": "Uložiť klip",
+  "player.tools.gif": "Uložiť GIF",
+  "player.tools.mini": "Mini režim",
+  "player.tools.url": "Otvoriť adresu…",
+  "player.tools.url-hint": "Adresa http, https alebo rtsp",
+  "player.tools.url-invalid": "Adresu sa nepodarilo prečítať",
+  "player.tools.open": "Otvoriť",
+  "player.tools.cancel": "Zrušiť",
+  "player.tools.saved": "Uložené: {0}",
+  "player.tools.failed": "Súbor sa nepodarilo vytvoriť",
+  "player.tools.novideo": "Najprv otvorte video"
+}

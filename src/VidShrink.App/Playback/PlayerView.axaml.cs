@@ -54,6 +54,7 @@ internal partial class PlayerView : UserControl
         Surface.SizeChanged += OnSurfaceSize;
         InitTracks();
         InitWindow();
+        InitTools();
 
         RefreshState();
     }
@@ -191,7 +192,7 @@ internal partial class PlayerView : UserControl
                 ShiftAudioDelay(command.Amount);
                 break;
             default:
-                if (!ApplyWindow(command)) _trace.Add("none");
+                if (!ApplyWindow(command) && !ApplyTools(command)) _trace.Add("none");
                 break;
         }
 
@@ -364,6 +365,7 @@ internal partial class PlayerView : UserControl
 
         AddTrackMenus(flyout);
         AppendWindowMenu(flyout);
+        AppendToolsMenu(flyout);
         AppendAdvancedMenu(flyout);
         return flyout;
     }
@@ -638,6 +640,7 @@ internal partial class PlayerView : UserControl
     internal void Close()
     {
         SaveHistory(false);
+        ClosePreview();
         _watchdog?.Stop();
         _watchdog = null;
         _render?.Stop();

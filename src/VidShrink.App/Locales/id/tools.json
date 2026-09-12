@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Alat",
+  "player.tools.clip": "Simpan klip",
+  "player.tools.gif": "Simpan GIF",
+  "player.tools.mini": "Mode mini",
+  "player.tools.url": "Buka alamat…",
+  "player.tools.url-hint": "Alamat http, https, atau rtsp",
+  "player.tools.url-invalid": "Alamat tidak dapat dibaca",
+  "player.tools.open": "Buka",
+  "player.tools.cancel": "Batal",
+  "player.tools.saved": "Disimpan: {0}",
+  "player.tools.failed": "File tidak dapat dibuat",
+  "player.tools.novideo": "Buka video terlebih dahulu"
+}

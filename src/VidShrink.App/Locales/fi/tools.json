@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Työkalut",
+  "player.tools.clip": "Tallenna klippi",
+  "player.tools.gif": "Tallenna GIF",
+  "player.tools.mini": "Minitila",
+  "player.tools.url": "Avaa osoite…",
+  "player.tools.url-hint": "http-, https- tai rtsp-osoite",
+  "player.tools.url-invalid": "Osoitetta ei voitu lukea",
+  "player.tools.open": "Avaa",
+  "player.tools.cancel": "Peruuta",
+  "player.tools.saved": "Tallennettu: {0}",
+  "player.tools.failed": "Tiedostoa ei voitu luoda",
+  "player.tools.novideo": "Avaa ensin video"
+}

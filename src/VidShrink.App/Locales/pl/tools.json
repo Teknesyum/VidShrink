@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Narzędzia",
+  "player.tools.clip": "Zapisz klip",
+  "player.tools.gif": "Zapisz GIF",
+  "player.tools.mini": "Tryb mini",
+  "player.tools.url": "Otwórz adres…",
+  "player.tools.url-hint": "Adres http, https lub rtsp",
+  "player.tools.url-invalid": "Nie udało się odczytać adresu",
+  "player.tools.open": "Otwórz",
+  "player.tools.cancel": "Anuluj",
+  "player.tools.saved": "Zapisano: {0}",
+  "player.tools.failed": "Nie udało się utworzyć pliku",
+  "player.tools.novideo": "Najpierw otwórz film"
+}

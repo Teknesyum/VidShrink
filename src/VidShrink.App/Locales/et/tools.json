@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Tööriistad",
+  "player.tools.clip": "Salvesta klipp",
+  "player.tools.gif": "Salvesta GIF",
+  "player.tools.mini": "Mini režiim",
+  "player.tools.url": "Ava aadress…",
+  "player.tools.url-hint": "http, https või rtsp aadress",
+  "player.tools.url-invalid": "Aadressi ei õnnestunud lugeda",
+  "player.tools.open": "Ava",
+  "player.tools.cancel": "Loobu",
+  "player.tools.saved": "Salvestatud: {0}",
+  "player.tools.failed": "Faili ei õnnestunud luua",
+  "player.tools.novideo": "Ava kõigepealt video"
+}

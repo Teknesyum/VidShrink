@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "টুলস",
+  "player.tools.clip": "ক্লিপ সংরক্ষণ করুন",
+  "player.tools.gif": "GIF সংরক্ষণ করুন",
+  "player.tools.mini": "মিনি মোড",
+  "player.tools.url": "ঠিকানা খুলুন…",
+  "player.tools.url-hint": "http, https বা rtsp ঠিকানা",
+  "player.tools.url-invalid": "ঠিকানাটি পড়া যায়নি",
+  "player.tools.open": "খুলুন",
+  "player.tools.cancel": "বাতিল",
+  "player.tools.saved": "সংরক্ষিত হয়েছে: {0}",
+  "player.tools.failed": "ফাইলটি তৈরি করা যায়নি",
+  "player.tools.novideo": "প্রথমে একটি ভিডিও খুলুন"
+}

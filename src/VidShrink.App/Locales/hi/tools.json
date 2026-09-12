@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "टूल्स",
+  "player.tools.clip": "क्लिप सेव करें",
+  "player.tools.gif": "GIF सेव करें",
+  "player.tools.mini": "मिनी मोड",
+  "player.tools.url": "पता खोलें…",
+  "player.tools.url-hint": "http, https या rtsp पता",
+  "player.tools.url-invalid": "पता पढ़ा नहीं जा सका",
+  "player.tools.open": "खोलें",
+  "player.tools.cancel": "रद्द करें",
+  "player.tools.saved": "सेव किया गया: {0}",
+  "player.tools.failed": "फ़ाइल नहीं बनाई जा सकी",
+  "player.tools.novideo": "पहले एक वीडियो खोलें"
+}

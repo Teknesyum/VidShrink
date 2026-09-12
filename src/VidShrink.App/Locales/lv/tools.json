@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Rīki",
+  "player.tools.clip": "Saglabāt klipu",
+  "player.tools.gif": "Saglabāt GIF",
+  "player.tools.mini": "Mini režīms",
+  "player.tools.url": "Atvērt adresi…",
+  "player.tools.url-hint": "http, https vai rtsp adrese",
+  "player.tools.url-invalid": "Adresi nevarēja nolasīt",
+  "player.tools.open": "Atvērt",
+  "player.tools.cancel": "Atcelt",
+  "player.tools.saved": "Saglabāts: {0}",
+  "player.tools.failed": "Failu nevarēja izveidot",
+  "player.tools.novideo": "Vispirms atveriet video"
+}

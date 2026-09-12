@@ -115,6 +115,19 @@ public sealed partial class MpvEngine : IPlaybackEngine
         _renderer.Start();
     }
 
+    /// <summary>
+    /// Uzaktan oynatilan semalar: libmpv bunlari kendisi acar. Yerel yol eskisi gibi tam
+    /// yola cevrilir; <c>file</c> semasi listede degil, cunku o da yerel yoldur.
+    /// </summary>
+    public static readonly IReadOnlyList<string> RemoteSchemes = new[] { "http", "https", "rtsp", "rtmp", "srt", "udp" };
+
+    /// <summary>Bir kaynagin libmpv'ye verilecek hali: adres oldugu gibi, dosya tam yolla.</summary>
+    public static string Target(string path)
+        => Uri.TryCreate(path, UriKind.Absolute, out var uri)
+           && RemoteSchemes.Any(scheme => string.Equals(scheme, uri.Scheme, StringComparison.OrdinalIgnoreCase))
+            ? path.Trim()
+            : Path.GetFullPath(path);
+
     public static IReadOnlyList<(string Name, string Value)> OptionsFor(PlaybackOptions options)
     {
         var list = new List<(string Name, string Value)>(BaseOptions(options));
@@ -211,7 +224,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
         var open = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Volatile.Write(ref _open, open);
-        Command(OpenTag, "loadfile", Path.GetFullPath(path));
+        Command(OpenTag, "loadfile", Target(path));
 
         var timeout = Task.Delay(_options.OpenTimeout, ct);
         var finished = await Task.WhenAny(open.Task, timeout).ConfigureAwait(false);

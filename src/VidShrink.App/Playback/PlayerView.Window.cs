@@ -157,8 +157,11 @@ internal partial class PlayerView
     private void AfterOpen(string path, IPlaybackEngine engine)
     {
         EnsureSettings();
-        _recent.Add(path);
-        _recent.Save(RecentFile());
+        if (!IsAddress(path))
+        {
+            _recent.Add(path);
+            _recent.Save(RecentFile());
+        }
         _chapters = engine.ChapterTimes;
         _marksKey = "";
         _aspectIndex = 0;

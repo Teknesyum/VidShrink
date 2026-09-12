@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Araçlar",
+  "player.tools.clip": "Klip kaydet",
+  "player.tools.gif": "GIF kaydet",
+  "player.tools.mini": "Mini mod",
+  "player.tools.url": "Adres aç…",
+  "player.tools.url-hint": "http, https ya da rtsp adresi",
+  "player.tools.url-invalid": "Adres okunamadı",
+  "player.tools.open": "Aç",
+  "player.tools.cancel": "Vazgeç",
+  "player.tools.saved": "Kaydedildi: {0}",
+  "player.tools.failed": "Dosya oluşturulamadı",
+  "player.tools.novideo": "Önce bir video açın"
+}

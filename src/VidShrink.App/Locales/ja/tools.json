@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "ツール",
+  "player.tools.clip": "クリップを保存",
+  "player.tools.gif": "GIFを保存",
+  "player.tools.mini": "ミニモード",
+  "player.tools.url": "アドレスを開く…",
+  "player.tools.url-hint": "http、https、rtspのアドレス",
+  "player.tools.url-invalid": "アドレスを読み取れませんでした",
+  "player.tools.open": "開く",
+  "player.tools.cancel": "キャンセル",
+  "player.tools.saved": "保存しました: {0}",
+  "player.tools.failed": "ファイルを作成できませんでした",
+  "player.tools.novideo": "先に動画を開いてください"
+}

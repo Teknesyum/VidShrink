@@ -1,0 +1,21 @@
+# İşler
+
+- [x] Avalonia 12, 0. dalga A/B, başlık/kuş düzeni — main'de, CI yeşil
+- [x] Arama eşiği düzeltmesi main'de c8a2d254
+- [x] 6. dalga: sistem — main e9594d9f, CI 34621623542 yeşil
+- [x] 5. dalga: main ebd50312, CI 34632653296 yeşil
+- [x] 1. dalga: main f7ab2b28 (dal CI 34634652940 yeşil), worktree ve dallar silindi, kanıt .calisma/dalga1
+- [x] Tahmin-isabet satırları 5 ve 1. dalga — main 1f24fb8d itildi
+- [x] main CI 1f24fb8d — 34637067764 yeşil
+- [x] 6. dalga Unix boşlukları: dal CI 34643619473 yeşil, main d06ce601, worktree ve dallar silindi, kanıt .calisma/unix-bosluk
+- [x] main CI d06ce601 — 34645936116 yeşil
+- [x] PlaybackResumeTests duraklatma yarışı — dal CI 34647602469 yeşil, main d58c9e1b, worktree ve dallar silindi, kanıt .calisma/duraklatma
+- [x] Keyframe arama zaman aşımı yarışı — dal CI 34644670288 yeşil, main d899b747, worktree ve dallar silindi, kanıt .calisma/arama-yarisi
+- [x] main CI d899b747 — 34647307608 yeşil
+- [x] main CI d58c9e1b — 34649791654 yeşil
+- [x] 3. dalga: görüntü, pencere, liste — dal CI 34649824656 yeşil, main b159dee3, worktree ve dallar silindi, kanıt .calisma/dalga3
+- [x] main CI b159dee3 — 34651770308 yeşil
+- [x] 2. dalga: altyazı ve ses parçası — dal CI 34652407105 yeşil, main 3a91a443 (sayım 43×580=24940, kol 950/en 99/tr 41), worktree ve dallar silindi, kanıt .calisma/dalga2
+- [x] Tahmin-isabet satırları 3 ve 2. dalga — main 15faa8bf; sonra.md eklemeleri yapıldı
+- [ ] main CI 15faa8bf — koşuyor
+- [ ] 4. dalga: gelişmiş — iki ajan 1ccf222c üstünde koşuyor (4a görüntü/ses ayarları, 4b araçlar)

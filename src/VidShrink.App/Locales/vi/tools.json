@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Công cụ",
+  "player.tools.clip": "Lưu clip",
+  "player.tools.gif": "Lưu GIF",
+  "player.tools.mini": "Chế độ mini",
+  "player.tools.url": "Mở địa chỉ…",
+  "player.tools.url-hint": "Địa chỉ http, https hoặc rtsp",
+  "player.tools.url-invalid": "Không thể đọc địa chỉ",
+  "player.tools.open": "Mở",
+  "player.tools.cancel": "Hủy",
+  "player.tools.saved": "Đã lưu: {0}",
+  "player.tools.failed": "Không thể tạo tệp",
+  "player.tools.novideo": "Hãy mở video trước"
+}

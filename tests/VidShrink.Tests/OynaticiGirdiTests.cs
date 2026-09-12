@@ -283,7 +283,7 @@ public sealed class OynaticiGirdiTests
                 body.AppendLine($"{dil}: {string.Join(" | ", basliklar)} || {string.Join(" | ", ekler)}");
                 Assert.Equal(Keymap.MenuActions.Count, basliklar.Count);
                 Assert.All(basliklar, baslik => Assert.False(string.IsNullOrWhiteSpace(baslik)));
-                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.advanced.menu") }, ekler);
+                Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.tools.menu"), Strings.Get("player.advanced.menu") }, ekler);
             }
 
             Strings.Use("en");
@@ -577,12 +577,18 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var ogeler = menu.Items.OfType<MenuItem>().ToList();
             var satirlar = ogeler.Where(item => item.Tag is PlayerAction).ToList();
             var ekler = ogeler.Where(item => item.Tag is not PlayerAction).Select(item => item.Header?.ToString() ?? "").ToList();
-            Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.advanced.menu") }, ekler);
+            Assert.Equal(new[] { Strings.Get("player.tracks.audio"), Strings.Get("player.subtitle.menu"), Strings.Get("player.list.recent"), Strings.Get("player.view.screenshot-folder"), Strings.Get("player.tools.menu"), Strings.Get("player.advanced.menu") }, ekler);
             var parcaSatirlari = ogeler.Where(item => item.Tag is null)
                 .SelectMany(altMenu => altMenu.Items.OfType<MenuItem>())
                 .Where(item => item.Tag is PlayerAction)
                 .ToList();
-            Assert.Equal(Keymap.Rows.Count(row => row.Action.Command is PlayerCommandKind.AudioCycle or PlayerCommandKind.SubtitleCycle or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay), parcaSatirlari.Count);
+            Assert.Equal(
+                Keymap.Rows.Count(row => row.Action.Command
+                    is PlayerCommandKind.AudioCycle or PlayerCommandKind.SubtitleCycle
+                    or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay
+                    or PlayerCommandKind.ClipExport or PlayerCommandKind.GifExport
+                    or PlayerCommandKind.MiniMode or PlayerCommandKind.OpenUrl),
+                parcaSatirlari.Count);
             var body = new StringBuilder();
 
             foreach (var (item, sira) in satirlar.Concat(parcaSatirlari).Select((item, sira) => (item, sira)))

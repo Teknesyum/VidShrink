@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Orodja",
+  "player.tools.clip": "Shrani izrezek",
+  "player.tools.gif": "Shrani GIF",
+  "player.tools.mini": "Mini način",
+  "player.tools.url": "Odpri naslov…",
+  "player.tools.url-hint": "Naslov http, https ali rtsp",
+  "player.tools.url-invalid": "Naslova ni bilo mogoče prebrati",
+  "player.tools.open": "Odpri",
+  "player.tools.cancel": "Prekliči",
+  "player.tools.saved": "Shranjeno: {0}",
+  "player.tools.failed": "Datoteke ni bilo mogoče ustvariti",
+  "player.tools.novideo": "Najprej odprite videoposnetek"
+}

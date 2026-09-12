@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "כלים",
+  "player.tools.clip": "שמירת קליפ",
+  "player.tools.gif": "שמירת GIF",
+  "player.tools.mini": "מצב מיני",
+  "player.tools.url": "פתיחת כתובת…",
+  "player.tools.url-hint": "כתובת http,‏ https או rtsp",
+  "player.tools.url-invalid": "לא ניתן היה לקרוא את הכתובת",
+  "player.tools.open": "פתיחה",
+  "player.tools.cancel": "ביטול",
+  "player.tools.saved": "נשמר: {0}",
+  "player.tools.failed": "לא ניתן היה ליצור את הקובץ",
+  "player.tools.novideo": "פתחו סרטון תחילה"
+}

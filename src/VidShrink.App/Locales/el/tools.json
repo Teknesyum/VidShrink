@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Εργαλεία",
+  "player.tools.clip": "Αποθήκευση κλιπ",
+  "player.tools.gif": "Αποθήκευση GIF",
+  "player.tools.mini": "Λειτουργία μίνι",
+  "player.tools.url": "Άνοιγμα διεύθυνσης…",
+  "player.tools.url-hint": "Διεύθυνση http, https ή rtsp",
+  "player.tools.url-invalid": "Δεν ήταν δυνατή η ανάγνωση της διεύθυνσης",
+  "player.tools.open": "Άνοιγμα",
+  "player.tools.cancel": "Ακύρωση",
+  "player.tools.saved": "Αποθηκεύτηκε: {0}",
+  "player.tools.failed": "Δεν ήταν δυνατή η δημιουργία του αρχείου",
+  "player.tools.novideo": "Ανοίξτε πρώτα ένα βίντεο"
+}

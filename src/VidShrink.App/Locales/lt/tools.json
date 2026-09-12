@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Įrankiai",
+  "player.tools.clip": "Įrašyti klipą",
+  "player.tools.gif": "Įrašyti GIF",
+  "player.tools.mini": "Mini režimas",
+  "player.tools.url": "Atverti adresą…",
+  "player.tools.url-hint": "http, https arba rtsp adresas",
+  "player.tools.url-invalid": "Nepavyko nuskaityti adreso",
+  "player.tools.open": "Atverti",
+  "player.tools.cancel": "Atšaukti",
+  "player.tools.saved": "Įrašyta: {0}",
+  "player.tools.failed": "Nepavyko sukurti failo",
+  "player.tools.novideo": "Pirmiausia atverkite vaizdo įrašą"
+}

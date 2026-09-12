@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Інструменти",
+  "player.tools.clip": "Зберегти кліп",
+  "player.tools.gif": "Зберегти GIF",
+  "player.tools.mini": "Міні-режим",
+  "player.tools.url": "Відкрити адресу…",
+  "player.tools.url-hint": "Адреса http, https або rtsp",
+  "player.tools.url-invalid": "Не вдалося прочитати адресу",
+  "player.tools.open": "Відкрити",
+  "player.tools.cancel": "Скасувати",
+  "player.tools.saved": "Збережено: {0}",
+  "player.tools.failed": "Не вдалося створити файл",
+  "player.tools.novideo": "Спочатку відкрийте відео"
+}

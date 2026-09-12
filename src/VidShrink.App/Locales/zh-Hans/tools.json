@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "工具",
+  "player.tools.clip": "保存片段",
+  "player.tools.gif": "保存 GIF",
+  "player.tools.mini": "迷你模式",
+  "player.tools.url": "打开地址…",
+  "player.tools.url-hint": "http、https 或 rtsp 地址",
+  "player.tools.url-invalid": "无法读取地址",
+  "player.tools.open": "打开",
+  "player.tools.cancel": "取消",
+  "player.tools.saved": "已保存：{0}",
+  "player.tools.failed": "无法创建文件",
+  "player.tools.novideo": "请先打开视频"
+}

@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "Ferramentas",
+  "player.tools.clip": "Salvar clipe",
+  "player.tools.gif": "Salvar GIF",
+  "player.tools.mini": "Modo mini",
+  "player.tools.url": "Abrir endereço…",
+  "player.tools.url-hint": "Endereço http, https ou rtsp",
+  "player.tools.url-invalid": "Não foi possível ler o endereço",
+  "player.tools.open": "Abrir",
+  "player.tools.cancel": "Cancelar",
+  "player.tools.saved": "Salvo: {0}",
+  "player.tools.failed": "Não foi possível criar o arquivo",
+  "player.tools.novideo": "Abra um vídeo primeiro"
+}

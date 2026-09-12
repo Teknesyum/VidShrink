@@ -514,3 +514,59 @@ referansla ayni olur. Ayarlar 3. dalganin ayar dosyasi duzeniyle kalicidir.
 **Acilis tahmini** (yontem: tur ×1,5 P50 / ×3 P90, 0,5 gun/tur P50, 0,7 gun/tur P90):
 cekirdek is 5 tur; P50 8 tur / 4 gun / 3 itme, P90 15 tur / 10,5 gun / 8 itme.
 Dosya: ~13 kod ve belge dosyasi + 42 dil dosyasi = ~55.
+
+## 4b. dalga: araclar (kucuk resim, klip/GIF, mini mod, URL)
+
+4. dalganin B yarisi. A yarisi (renk, keskinlik, ekolayzer, %200, kirpma, altyazi bicemi)
+ayri dalda ve sag tik menusunun en altina "Gelismis" alt menusu koyuyor; bu yari menuye
+"Araclar" alt menusunu ekler. Ortak dosyalarda (Keymap, PlayerView.axaml(.cs),
+IPlaybackEngine, MpvEngine, dil dosyalari) yalniz ekleme yapilir, birlestirmeyi T0 yapar.
+
+Kabul: zaman cubugunda farenin durdugu anin karesi cubugun ustunde gorunur ve **kucuk
+resim ≤300 ms** (medyan ve p95 olculur, kanit dosyasina yazilir); A-B isaretlerinden ya da
+bulunulan konumdan kesilen klip ile GIF'in suresi ve boyutu ffprobe ile dogrulanir; mini
+mod cercevesiz + hep ustte kucuk pencereye gecer ve cikista onceki boyut/konum aynen geri
+gelir; http/https/rtsp adresi acilir; her durum yazilir, okunur, sifirlanir.
+
+- `Player/IPlaybackEngine.cs`: yalniz varsayilan govdeli ekleme. `MpvEngine`: `loadfile`
+  hedefi artik kosulsuz `Path.GetFullPath` degil — sema tanindiginda (http, https, rtsp,
+  rtmp, srt, udp) adres oldugu gibi verilir, yerel yol eskisi gibi tam yola cevrilir.
+  Kucuk resim ikinci bir motor ornegi: `Audio=false`, kucuk `RenderWidth/Height`, arama
+  `SeekPrecision.Keyframe`. Karsilastirma paneli ve onizleme sesi ornekleri degismez.
+- `App/Playback/PlayerView.Tools.cs` (partial): kucuk resim onizlemesi (fare zaman
+  cubugunda gezerken), klip ve GIF cikarma, mini mod gecisi, URL ac penceresi ve
+  `AppendToolsMenu(flyout)`. `App/Playback/ToolsOptions.cs`: mini mod boyu, klip suresi,
+  GIF kare hizi/genisligi ve son adres; kendi dosyasinda (`player-tools.json`) durur,
+  `PlayerSettings`e dokunulmaz — A yarisiyla ayni dosyaya yazmamak icin.
+- `App/Playback/ClipExport.cs`: `VidShrink.Ffmpeg`in surec deseni (`FfmpegRunner.RunAsync`,
+  stdout **ve** stderr ayni anda bosaltilir; bosalmayan boru surece kilit atar). Klip
+  akis kopyasi (`-c copy`), GIF iki gecisli palet (`palettegen`/`paletteuse`).
+- `Keymap`: Araclar satirlari tek tabloya eklenir (GOM varsayilanlarina yakin); menu,
+  ayarlar sayfasi ve test yine ayni tablodan okur.
+- Dil: yeni alan dosyasi `Locales/<dil>/tools.json` (`player.tools.*`), 43 dil; A yarisiyla
+  ayni dosyada bulusmamak icin ayri alan dosyasi, 2. dalganin `tracks.json` karariyla ayni.
+  `BiciminTests` pinleri (kalem sayisi ve kol) testi kosarak yeniden olculur.
+
+Olculen (`worktree-agent-aab0e51a79169b7f8`, `baae77f9`, kanit `.calisma/dalga4b/`):
+kucuk resim medyan **10.35 ms**, p95 **10.43 ms** (10 olcum, esik 300 ms); gosterimin
+kendisi elle surulen sahte motorla ayrica olculur, o kol CI'da da kosar. Klip 3 sn
+istendiginde akis kopyasi anahtar kareye hizalar ve 4.011 sn verir (kaynak `-g 60` @30 fps,
+2 sn anahtar kare araligi) — kabul araligi bu hizalamaya gore. GIF 2.0 sn, 160x90.
+Mini mod 900x600/`Full` → 480x270/`None`+ustte → 900x600/`Full`. Dil sayimi
+43 x 592 = 25456, kol 967 (en 103, tr 43). Katalogda kalan ama kod yolunda karsiligi
+olmayan uc anahtar (`state-mini`, `preview`, `length`) 42 dilden silindi;
+`novideo` kaynaksiz klip/GIF isteginde durum satirinda gosteriliyor —
+`LocalizationTests.KatalogdaBirikenOluCeviriListesiBuyumuyor` olu anahtar biriktirmiyor.
+- Arayuz: onizleme yongasi `Surface` uzerinde, rengi paletten, olcusu `Theme.axaml`
+  belirtecinden turetilmis `PlaybackThumbnail*` adlariyla; yeni renk/olcu uydurulmaz.
+- Olcu: `OynaticiAracTests` — kucuk resim medyan/p95 (esik `[HedefMakineFact]`, gosterimin
+  kendisi CI'da da kosar), yanlis konumun karesi farkli (negatif kontrol), klip/GIF sure ve
+  boyut, gecersiz A-B araligi dosya uretmez, mini moddan cikista pencere olculeri birebir,
+  mini moda girmeden cikis bir sey yapmaz, testin icindeki `HttpListener`dan URL acilir,
+  kapali kapiya istek hata verir. Menu beklentileri `OynaticiGirdiTests` ve
+  `OynaticiDenetimTests`te guncellenir. Kanit ve gecici cikti `.calisma/dalga4b/`.
+
+**Acilis tahmini (12 Eylul 2026):** taban 6 tur; yontem geregi ×1,5 / ×3 → **P50 9 tur,
+P90 18 tur**; 0,5 (P50) / 0,7 (P90) gun/tur ile **P50 ~4,5 gun, P90 ~12,6 gun**. Itme
+P50 5, P90 12. Dokunulan dosya ~55: kaynak 8, tema 2, dil 43, test 3, belge 3. Gercegi
+kapanista `docs/olcumler/tahmin-isabet.md`ye girer.

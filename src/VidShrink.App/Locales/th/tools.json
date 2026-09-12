@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "เครื่องมือ",
+  "player.tools.clip": "บันทึกคลิป",
+  "player.tools.gif": "บันทึก GIF",
+  "player.tools.mini": "โหมดมินิ",
+  "player.tools.url": "เปิดที่อยู่…",
+  "player.tools.url-hint": "ที่อยู่ http, https หรือ rtsp",
+  "player.tools.url-invalid": "ไม่สามารถอ่านที่อยู่ได้",
+  "player.tools.open": "เปิด",
+  "player.tools.cancel": "ยกเลิก",
+  "player.tools.saved": "บันทึกแล้ว: {0}",
+  "player.tools.failed": "ไม่สามารถสร้างไฟล์ได้",
+  "player.tools.novideo": "เปิดวิดีโอก่อน"
+}

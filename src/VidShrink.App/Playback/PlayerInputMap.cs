@@ -44,7 +44,11 @@ internal enum PlayerCommandKind
     AudioCycle,
     SubtitleCycle,
     SubtitleDelay,
-    AudioDelay
+    AudioDelay,
+    ClipExport,
+    GifExport,
+    MiniMode,
+    OpenUrl
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)

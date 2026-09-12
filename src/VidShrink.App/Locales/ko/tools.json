@@ -1,0 +1,14 @@
+{
+  "player.tools.menu": "도구",
+  "player.tools.clip": "클립 저장",
+  "player.tools.gif": "GIF 저장",
+  "player.tools.mini": "미니 모드",
+  "player.tools.url": "주소 열기…",
+  "player.tools.url-hint": "http, https 또는 rtsp 주소",
+  "player.tools.url-invalid": "주소를 읽을 수 없습니다",
+  "player.tools.open": "열기",
+  "player.tools.cancel": "취소",
+  "player.tools.saved": "저장됨: {0}",
+  "player.tools.failed": "파일을 만들 수 없습니다",
+  "player.tools.novideo": "먼저 동영상을 여세요"
+}
