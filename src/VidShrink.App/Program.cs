@@ -145,9 +145,11 @@ internal static class Program
 
     private static int RunMain(string[] args)
     {
+        AcilisIzi.Yaz("main");
         var path = ShellIntegration.ResolveStartupPath(args);
         using var instance = new SingleInstanceChannel(SingleInstanceChannel.DefaultChannel());
         var files = new Integration.ForwardedFiles();
+        AcilisIzi.Yaz("tek-ornek");
 
         if (!instance.IsOwner)
         {
