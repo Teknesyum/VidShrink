@@ -28,5 +28,11 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.
+- `KayitFfmpegKoluTests.cs` — 9c kolu, kaydın ffmpeg argümanına eklenen on kol: kap (mkv `+faststart` yazmaz,
+  öldürülen kaydı yalnız Matroska taşır), `-vf scale` zinciri (kırpma önce), `-g`/`-profile:v`/`-tune`, hedef bit
+  hızı kolu (`-b:v` varken `-crf` yok, satıcının hız kontrolü motordan), `-pix_fmt`/`-colorspace`/`-color_range`,
+  `-t` ve bölme ölçütünün argümana girmemesi, ayrı ses izleri (`-c:a:N`), ses filtreleri (karışımdan önce girdi
+  başına), tek kare `BuildSnapshot`, çoklu monitörün ofsetli bölgeye çevrilmesi. Her kolun negatif kontrolü var;
+  ölçüler üretilen argüman dizisini okur. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
