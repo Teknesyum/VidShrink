@@ -8,7 +8,7 @@ namespace VidShrink.App.Themes;
 
 /// <summary>
 /// Yürürlükteki palet. Renk programın hiçbir yerinde yazılı değil; hepsi
-/// <c>Themes/Palette/&lt;ad&gt;.axaml</c> içinde durur. Ölçüler <c>Theme.axaml</c>'de
+/// <c>Themes/Palette/&lt;ad&gt;/Theme.axaml</c> içinde durur. Ölçüler <c>Themes/Theme.axaml</c>'de
 /// kaldığı için palet değişince yalnız renk değişir, yerleşim yerinde kalır.
 ///
 /// <para>Seçim çalışırken yürürlüğe girer, yeniden başlatma istemez. Bunun iki adımı var
@@ -107,7 +107,7 @@ public static class PaletteCatalog
         => Names.FirstOrDefault(palette => string.Equals(palette, name, StringComparison.OrdinalIgnoreCase))
            ?? Default;
 
-    private static Uri Address(string name) => new($"{Folder}/{name}.axaml");
+    private static Uri Address(string name) => new($"{Folder}/{name}/Theme.axaml");
 
     private static IResourceDictionary Load(string name)
         => new ResourceInclude((Uri?)null) { Source = Address(name) }.Loaded;

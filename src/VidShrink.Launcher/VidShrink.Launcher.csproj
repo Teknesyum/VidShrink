@@ -25,7 +25,7 @@
        de değişir, sessizce eskimez. -->
   <PropertyGroup>
     <SplashTheme>$(MSBuildThisFileDirectory)..\VidShrink.App\App.axaml</SplashTheme>
-    <SplashSources>$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\*.axaml;$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\Palette\*.axaml</SplashSources>
+    <SplashSources>$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\*.axaml;$(MSBuildThisFileDirectory)..\VidShrink.App\Themes\Palette\**\*.axaml</SplashSources>
     <SplashGenProject>$(MSBuildThisFileDirectory)..\..\tools\VidShrink.SplashGen\VidShrink.SplashGen.csproj</SplashGenProject>
     <SplashImage>$(BaseIntermediateOutputPath)splash.png</SplashImage>
   </PropertyGroup>

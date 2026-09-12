@@ -52,8 +52,13 @@ dotnet run --project tools/VidShrink.PaletteGen
    Unutursan `PaletteTests` kırmızı yanar ve söyler.
 4. `dotnet test --filter PaletteTests`.
 
-Araç `Palette/*.axaml` dosyalarının hepsini silip yeniden yazar; o dosyaları elle
+Araç `Palette/<Ad>/Theme.axaml` dosyalarının hepsini silip yeniden yazar; o dosyaları elle
 düzenleme, düzenlemen çekirdekte kalıcı olur.
+
+Palet adı klasör adında, dosya adı her palette `Theme.axaml`: UI kılavuzunun `raw-colour`
+kuralı ham rengi yalnız belirteç dosyası adına muaf tutuyor, kümesi kodda sabit ve
+muafiyet yolu yok. Adres bu yüzden
+`avares://VidShrink.App/Themes/Palette/<Ad>/Theme.axaml`.
 
 ## Yalnız Bir Rengi Denemek
 

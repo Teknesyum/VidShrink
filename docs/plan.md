@@ -776,3 +776,52 @@ Pin sonuclari olcumden yazildi, uc yerde:
 
 Bu kolla birlikte 8. dalga kapandi: yakalama motoru, arayuz, ses girisi ve ses girdisinin
 motora baglanmasi main'de, acik kabul olcutu kalmadi.
+
+## Palet dosyalarini belirtec dosyasi adina tasimak
+
+Karar kullanicinin: "yeniden adlandir". Sebep olculdu — `teknesyum-ui` eklentisinin
+`colour/raw-colour` kurali (`scripts/rules/colour.js`) ham rengi yalnizca **dosya
+adindan** muaf tutuyor:
+
+```js
+const TOKEN_FILE = new Set([
+  'theme.css', 'theme.tokens.json', 'Theme.xaml', 'Theme.axaml', 'Palette.cs',
+]);
+function base(file) { return String(file).replace(/\/g, '/').split('/').pop(); }
+function isTokenFile(file) { return TOKEN_FILE.has(base(file)); }
+```
+
+Kume kodda sabit; `scan.js` proje ve makine ayar dosyasini okuyor ama ikisi de bu kumeye
+ad ekleyemiyor. Yani 26 palet dosyasindaki ~800 bulgunun tek yolu her paletin dosya adini
+`Theme.axaml` yapmak. Ayni klasorde 26 tane `Theme.axaml` olamaz, dolayisiyla duzen:
+
+```
+Themes/Palette/seeds.json
+Themes/Palette/Neon/Theme.axaml
+Themes/Palette/Dracula/Theme.axaml
+...
+```
+
+Palet adi kaybolmuyor, **klasor adina** taşiniyor; `seeds.json` yerinde kaliyor.
+
+Dokunulacak yerler (envanter, `Explore` ajaninin okumasi):
+
+1. `tools/VidShrink.PaletteGen/Program.cs:25,29` — cikis yolu `folder/<ad>/Theme.axaml`,
+   bayat dosya temizligi alt klasorleri de gezecek.
+2. `src/VidShrink.App/Themes/PaletteCatalog.cs:110` — `Address`, `{Folder}/{name}/Theme.axaml`.
+3. `src/VidShrink.App/App.axaml:10` — `Palette/Neon/Theme.axaml`.
+4. `src/VidShrink.Launcher/VidShrink.Launcher.csproj:28` — `Palette\*.axaml` glob'u
+   `Palette\**\*.axaml` olacak, yoksa acilis goruntusu bayat girdiyle uretilir.
+5. `tests/VidShrink.Tests/PaletteTests.cs:19,44,47,83` — dosya taramasi alt klasorlu,
+   ad dosya adindan degil klasor adindan cikacak.
+6. Belgeler ve yorumlar: `docs/tema.md`, `docs/olcumler/tema-paleti.md`, `README.md:515-518`,
+   `AGENTS.md:10-12`, `Themes/Controls.axaml:6`, `VidShrink.PaletteGen.csproj:13`.
+
+Degismeyen yerler olculdu: `VidShrink.App.csproj` palet dosyalarini adiyla saymiyor
+(Avalonia SDK varsayilan toplamasi), `ThemeSources.cs` ve `SplashTests.cs` paleti
+`App.axaml`in `ResourceInclude` bildiriminden buluyor, `seeds.json` hicbir
+`AvaloniaResource` girdisinde gecmiyor.
+
+Kabul: `PaletteGen` calisip 26 dosyayi yeni duzene yazar, tam suit yesil, `App.axaml`in
+paleti acilista yurur, ve UI taramasinda `colour/raw-colour` bulgusu palet dosyalarindan
+kalkar.

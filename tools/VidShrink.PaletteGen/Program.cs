@@ -22,11 +22,13 @@ var seeds = JsonSerializer.Deserialize<List<Seed>>(
     File.ReadAllText(seedFile),
     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<Seed>();
 
-foreach (var stale in Directory.GetFiles(folder, "*.axaml")) File.Delete(stale);
+foreach (var stale in Directory.GetFiles(folder, "*.axaml", SearchOption.AllDirectories)) File.Delete(stale);
 
 foreach (var seed in seeds)
 {
-    var path = Path.Combine(folder, seed.Name + ".axaml");
+    var home = Path.Combine(folder, seed.Name);
+    Directory.CreateDirectory(home);
+    var path = Path.Combine(home, "Theme.axaml");
     File.WriteAllText(path, Build(seed), new UTF8Encoding(false));
     Console.WriteLine($"{seed.Name,-14} {seed.Accent1} {seed.Accent2} {seed.Accent3}");
 }

@@ -3,7 +3,7 @@
   <Styles.Resources>
     <ResourceDictionary>
       <!--
-        Burada palet ikinci kez birleştirilmez. Eskiden Palette/Neon.axaml ve Theme.axaml
+        Burada palet ikinci kez birleştirilmez. Eskiden Palette/Neon/Theme.axaml ve Theme.axaml
         bu sözlüğe de merge ediliyordu; sonuç, programın bütün denetim temalarının
         App.axaml'ın bildirdiği paletten değil kendi özel Neon kopyasından boyanmasıydı —
         ayarlardan tema seçmek bu yüzeylere hiç ulaşmıyordu. Belirteçler artık tek yerden,

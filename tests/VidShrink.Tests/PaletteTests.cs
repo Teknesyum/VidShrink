@@ -16,7 +16,17 @@ public sealed class PaletteTests
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "Themes", "Palette");
 
     private static IReadOnlyList<string> Files()
-        => Directory.GetFiles(Folder, "*.axaml").OrderBy(path => path, StringComparer.Ordinal).ToArray();
+        => Directory.GetFiles(Folder, "*.axaml", SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.Ordinal).ToArray();
+
+    /// <summary>
+    /// Palet adı dosya adında değil klasör adında: her palet kendi klasöründe
+    /// <c>Theme.axaml</c> olarak durur, çünkü UI kılavuzu ham rengi yalnız belirteç
+    /// dosyası adına muaf tutuyor.
+    /// </summary>
+    private static string Name(string file) => Path.GetFileName(Path.GetDirectoryName(file))!;
+
+    private static string Address(string name) => Path.Combine(Folder, name, "Theme.axaml");
 
     private static SortedSet<string> Keys(string file)
     {
@@ -41,10 +51,10 @@ public sealed class PaletteTests
         Assert.True(files.Count >= 20, $"Palet sayısı yirmiden az: {files.Count}");
 
         Assert.Equal(
-            files.Select(file => Path.GetFileNameWithoutExtension(file)).OrderBy(n => n, StringComparer.Ordinal),
+            files.Select(Name).OrderBy(n => n, StringComparer.Ordinal),
             PaletteCatalog.Names.OrderBy(n => n, StringComparer.Ordinal));
 
-        var reference = Keys(Path.Combine(Folder, PaletteCatalog.Default + ".axaml"));
+        var reference = Keys(Address(PaletteCatalog.Default));
         Assert.NotEmpty(reference);
 
         var complaints = new List<string>();
@@ -52,7 +62,7 @@ public sealed class PaletteTests
         foreach (var file in files)
         {
             var keys = Keys(file);
-            var name = Path.GetFileNameWithoutExtension(file);
+            var name = Name(file);
 
             foreach (var missing in reference.Except(keys, StringComparer.Ordinal))
                 complaints.Add($"{name}: '{missing}' eksik.");
@@ -80,7 +90,7 @@ public sealed class PaletteTests
         foreach (var seed in listed)
         {
             var name = seed.GetProperty("name").GetString()!;
-            var body = File.ReadAllText(Path.Combine(Folder, name + ".axaml"));
+            var body = File.ReadAllText(Address(name));
 
             foreach (var (field, key) in new[]
                      {
@@ -106,7 +116,7 @@ public sealed class PaletteTests
         foreach (var file in Files())
         {
             var body = string.Join("|", XDocument.Load(file).Root!.Elements().Select(e => e.Value.Trim()));
-            var name = Path.GetFileNameWithoutExtension(file);
+            var name = Name(file);
 
             Assert.False(seen.TryGetValue(body, out var twin), $"{name} ile {twin} aynı renkleri taşıyor.");
             seen[body] = name;

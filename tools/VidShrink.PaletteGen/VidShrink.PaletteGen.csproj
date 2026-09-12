@@ -10,7 +10,7 @@
     <RootNamespace>VidShrink.PaletteGen</RootNamespace>
   </PropertyGroup>
 
-  <!-- Uygulama koduna basvuru yok: arac Neon.axaml'i metin olarak okur ve kardes
-       palet dosyalarini yazar. Urettigi hicbir sey program koduna bagli degil. -->
+  <!-- Uygulama koduna basvuru yok: arac seeds.json'i okur ve her paletin kendi
+       klasorune Theme.axaml yazar. Urettigi hicbir sey program koduna bagli degil. -->
 
 </Project>

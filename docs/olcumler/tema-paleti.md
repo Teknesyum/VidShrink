@@ -7,6 +7,9 @@ Tarih: 2026-09-09. Dal: `claude/tema-paleti`.
 Yirmi palet `src/VidShrink.App/Themes/Palette/` altında, her biri **32 anahtar**
 (28 `Color` + 4 `BoxShadows`).
 
+Not (12 Eylül 2026): dosya düzeni değişti, her palet kendi klasöründe `Theme.axaml`
+oldu — sayılar ve renkler aynı, yalnız yol değişti. Sebep `docs/tema.md` içinde.
+
 Renk uydurulmadı: on dokuzu **tanınmış açık şemaların gerçek renkleri** (Dracula, Nord,
 Gruvbox, Tokyo Night, Catppuccin Mocha, One Dark, Monokai Pro, Solarized Dark,
 Everforest, Rosé Pine, Ayu, Night Owl, SynthWave '84, Cobalt2, Material Ocean,
