@@ -43,11 +43,28 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); } catch { }
+        AcilisIzi.Yaz("cerceve");
+
+        // Temizlik gecici klasoru tarar; acilista arayuz is parcaciginda durdugu icin ilk
+        // karenin onune olculebilir bir bekleme koyuyordu. Isin kendisi ilk kareyle ilgisiz:
+        // silinen artiklar olu kosumlarin kalintisi, yeni kosum kendi kiralamasini zaten
+        // yaziyor. Arka plana alindi; sonucu bekleyen kimse yok.
+        _ = System.Threading.Tasks.Task.Run(() =>
+        {
+            try { TempCleanup.CleanupStaleArtifacts(Path.GetTempPath()); } catch { }
+            AcilisIzi.Yaz("gecici-temizlik");
+        });
 
         // Palet pencereden once yurutuluyor: sonra uygulanirsa program bir kare
         // varsayilan renklerle cizilir ve acilista goz alan bir sicrama olur.
-        try { PaletteCatalog.Use(AppSettings.Load().Theme); } catch { }
+        try
+        {
+            var tema = AppSettings.Load().Theme;
+            AcilisIzi.Yaz("ayar-okundu");
+            PaletteCatalog.Use(tema);
+        }
+        catch { }
+        AcilisIzi.Yaz("palet");
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -60,6 +77,7 @@ public partial class App : Application
             var window = StartupWindow();
             window.Icon = LoadAppIcon();
             desktop.MainWindow = window;
+            AcilisIzi.Yaz("pencere-kuruldu");
 
             if (window is MainWindow main)
             {

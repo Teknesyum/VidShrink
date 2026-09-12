@@ -135,7 +135,9 @@ public partial class MainWindow : Window
     public MainWindow(string? startupFile)
     {
         _startupFile = startupFile;
+        AcilisIzi.Yaz("pencere-yapici");
         InitializeComponent();
+        AcilisIzi.Yaz("xaml");
         _controlsReady = true;
 
         // T43: panel ana pencereye burada bağlanıyor. Kaynağı üreten çağrı tek yerde durur;
@@ -245,6 +247,7 @@ public partial class MainWindow : Window
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         Opened += OnWindowLoaded;
+        AcilisIzi.Yaz("yapici-bitti");
     }
 
     /// <summary>
@@ -470,6 +473,7 @@ public partial class MainWindow : Window
     {
         try
         {
+            AcilisIzi.Yaz("pencere-yuklendi");
             UpdateMaximizeGlyph();
             ApplyWindowFrame();
             WindowShell.Margin = OffScreenMargin;
@@ -482,10 +486,19 @@ public partial class MainWindow : Window
             var appSettings = AppSettings.Load(SettingsPathOverride);
             RestoreAppSettings(appSettings);
             InitializeUpdateUi(settings);
-            ShowDefaultAppSuggestion();
-            _ = CheckForUpdateAsync();
+            AcilisIzi.Yaz("ayarlar");
             PlayPanelEntrance();
+            AcilisIzi.Yaz("giris-canlandirmasi");
             await LoadStartupFileAsync();
+
+            // Varsayilan uygulama onerisi ile surum sorusu ilk karenin onunden alindi:
+            // ikisi de kullanicinin acmak istedigi dosyayla ilgisiz, ikisi de acilis
+            // yolunda arayuz is parcaciginda durur (oneri uzanti basina bir
+            // AssocQueryString, surum sorusu bir HttpClient kurulumu). Sirayi degistirmek
+            // gorunurlerini degistirmez: serit de bildirim de ayni acilista belirir.
+            ShowDefaultAppSuggestion();
+            AcilisIzi.Yaz("varsayilan-oneri");
+            _ = CheckForUpdateAsync();
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }
@@ -2557,9 +2570,13 @@ public partial class MainWindow : Window
     {
         Tabs.SelectedIndex = PlayerTabIndex;
         PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
+        AcilisIzi.Yaz("sekme");
+        IlkKareyiBekle();
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
+        AcilisIzi.Yaz("motor-acildi");
         await LoadAsync(path);
+        AcilisIzi.Yaz("kucultme-yuklendi");
     }
 
     internal static string TabHeaderText(TabItem tab) => tab.Header switch
