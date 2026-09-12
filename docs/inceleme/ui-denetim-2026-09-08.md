@@ -287,7 +287,7 @@ Kullanıcının gördüğü ya da beklediği şey olmuyor.
 ### 2.17 Tek koyu palet, sistem teması takibi yok
 
 - `App.axaml:5` + `Themes/Theme.axaml` — `RequestedThemeVariant="Dark"` sabit, `ThemeDictionaries`
-  ve açık palet yok — tasarım kararıysa `AGENTS.md`ye yaz, değilse `Default` + `ThemeDictionaries`. `[A4]`
+  ve açık palet yok — tasarım kararıysa `AGENTS.md`ye yaz, değilse `Default` + `ThemeDictionaries`. `[A4]` (default, unmeasured)
 
 ### 2.18 Kontrast sınırda
 

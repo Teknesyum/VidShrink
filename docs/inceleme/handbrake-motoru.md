@@ -82,7 +82,7 @@ Kapı, geçişlerden önce:
 
 - `libhb/hb.c:1946-1949` — `vquality` geçerliyse (yani CRF modundaysak) ve
   `hb_video_multipass_is_supported(codec, 1)` sıfır dönüyorsa `multipass = 0`.
-- `libhb/common.c:1946-1947` — o fonksiyonun `default` dalı
+- `libhb/common.c:1946-1947` — o fonksiyonun `default` dalı (default, unmeasured)
   `return !constant_quality;`. x264/x265 bu dala düşüyor
   (`libhb/common.c:1909-1944` arasındaki `case` listesinde yoklar).
 
@@ -312,7 +312,7 @@ metni, biri `Default` bayrağı):
 | `VideoPreset` | `"veryfast"` (`:332`) | `"fast"` (`:1012`) | var — `EncodePlan.Preset`, auto'da libsvtav1 preset 6 (`docs/olcumler/auto-mod.md` § "K3 — Uzman açığı" — "Motor libsvtav1, preset 6, -g 120…", şu an `:229`) |
 | `VideoQualitySlider` | `24.0` (`:338`) | `22.0` (`:1018`) | var — `PlanCalculator.cs:226` (`budgetCrf`), **ama bütçeden türetiliyor, sabit değil** |
 | `VideoAvgBitrate` | `4000` (`:324`) | `6000` (`:1004`) | var — `PlanCalculator.cs:156` (`videoK`), hedef boyuttan türetiliyor |
-| `PictureCombDetectPreset` | `"fast"` (`:392`) | `"default"` (`:1072`) | **yok** |
+| `PictureCombDetectPreset` | `"fast"` (`:392`) | `"default"` (`:1072`) (default, unmeasured) | **yok** |
 | `PresetDescription` / `Default` | metin / `false` | metin / `true` | — |
 
 Değişmeyen ve bizde karşılığı olmayan alanlar (ikisinde de aynı):

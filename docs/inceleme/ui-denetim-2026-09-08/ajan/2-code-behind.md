@@ -28,7 +28,7 @@ Kısaltma: `MW` = `src/VidShrink.App/MainWindow.axaml.cs`
 
 - MW:3404-3417 — performans ölçümü `CancellationToken.None`, iptal düğmesi yok; uzun sürer — `_cts` benzeri CTS ve iptal düğmesi.
 - MW:2259-2261 — koşum sürerken `OnBrowse` sessizce döner, düğme (`BtnBrowseEmpty`, 249/255/801) etkin kalır — `SetRunning`de kapat.
-- MW:1611-1632 — `OnShareDelete` iptal/zaman aşımı yok (`DeleteAsync` `default` CT) — `UpdateProbeTimeout` benzeri CTS ver.
+- MW:1611-1632 — `OnShareDelete` iptal/zaman aşımı yok (`DeleteAsync` `default` CT) — `UpdateProbeTimeout` benzeri CTS ver. (default, unmeasured)
 - MW:4040-4050 — `paylasim-hedefleri.json` bozuksa sessizce `Fallback`; kullanıcı öğrenmez — `TxtShareStatus`a tek satır.
 - MW:2266 — dosya seçici türü `"Media"` sabit İngilizce — `Say("main.pick.media")`.
 - MW:441 — `AppLogo` `Bitmap` hiç dispose edilmez (pencere ömrü, sızıntı değil) — `OnClosing`de dispose.

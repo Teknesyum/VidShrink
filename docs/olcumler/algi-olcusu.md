@@ -453,9 +453,9 @@ karşılık gelen filtre listede geçmiyor. Kurulu olmadıkları için eklenmedi
        log_path          <string>     ..FV....... Set the file path to be used to write log.
        log_fmt           <string>     ..FV....... Set the format of the log (csv, json, xml, or sub). (default "xml")
        pool              <string>     ..FV....... Set the pool method to be used for computing vmaf.
-       n_threads         <int>        ..FV....... Set number of threads to be used when computing vmaf. (default 0)
-       n_subsample       <int>        ..FV....... Set interval for frame subsampling used when computing vmaf. (default 1)
-       model             <string>     ..FV....... Set the model to be used for computing vmaf. (default "version=vmaf_v0.6.1")
+       n_threads         <int>        ..FV....... Set number of threads to be used when computing vmaf. (default 0) (default, unmeasured)
+       n_subsample       <int>        ..FV....... Set interval for frame subsampling used when computing vmaf. (default 1) (default, unmeasured)
+       model             <string>     ..FV....... Set the model to be used for computing vmaf. (default "version=vmaf_v0.6.1") (default, unmeasured)
        feature           <string>     ..FV....... Set the feature to be used for computing vmaf.
 
     framesync AVOptions:

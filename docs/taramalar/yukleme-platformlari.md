@@ -56,10 +56,7 @@ Kayıt zorunlu (Google Cloud projesi). İki ayrı onay katmanı var ve ikisi de 
 **4. Ücretsiz katmandan yüklenebiliyor mu? — kota hesabı**
 Depolama tarafı ücretsiz ve sınırsız sayılır, ama API kotası eleyici.
 
-Belge (`determine_quota_cost`, **2026-06-01 UTC**): *"Projects that enable the YouTube Data API have
-a default quota allocation of 100 search.list calls, 100 videos.insert calls, and 10,000 units per
-day combined for all other endpoints."* ve *"The search.list and videos.insert methods have their
-own quota buckets. Each of these methods has a default daily limit of 100 per day."*
+Belge (`determine_quota_cost`, **2026-06-01 UTC**): *"Projects that enable the YouTube Data API have a default quota allocation of 100 search.list calls, 100 videos.insert calls, and 10,000 units per day combined for all other endpoints."* (default, unmeasured) ve *"The search.list and videos.insert methods have their own quota buckets. Each of these methods has a default daily limit of 100 per day."* (default, unmeasured)
 
 Hesap — kota **proje başına**, kullanıcı başına değil:
 
