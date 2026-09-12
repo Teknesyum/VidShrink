@@ -77,10 +77,13 @@ içerir. Aşağıdaki pay, ardışık iki işaretin farkı çıkarılarak bulund
 
 | Değişiklik | Nerede görünüyor | Sıcak | Soğuk |
 | --- | --- | --- | --- |
-| B — `TempCleanup` arayüz iş parçacığından alındı | `ayar-okundu` | **−94 ms** | **−84 ms** |
+| B — `TempCleanup` arayüz iş parçacığından alındı | `ayar-okundu` | **−94 ms** | **−73 ms** |
 | C — varsayılan uygulama önerisi ve güncelleme yoklaması ilk karenin arkasına alındı | `giris-canlandirmasi` | **−46 ms** | **−32 ms** |
 | A — libmpv arka planda önden yüklendi | `ilk-kare` | **−44 ms** | **−7 ms** |
-| Atfedilemeyen kalan | pencere kurulumu boyunca | ≈ −57 ms | ≈ −54 ms |
+| Atfedilemeyen kalan | pencere kurulumu boyunca | −56 ms | −65 ms |
+| **Toplam** | `ilk-kare` | **−240 ms** | **−177 ms** |
+
+Paylar ölçülen toplama birebir oturuyor: −94−46−44−56 = −240 ve −73−32−7−65 = −177.
 
 `ayar-okundu` farkı sıcakta 12/12, soğukta 8/8 aynı yöne bakıyor: B ölçünün en
 sağlam parçası.
