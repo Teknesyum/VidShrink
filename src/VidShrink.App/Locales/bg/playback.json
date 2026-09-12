@@ -49,5 +49,9 @@
   "player.info.audio": "Звук: {0}, {1} кан., {2} Hz",
   "player.info.noaudio": "Звук: няма",
   "player.info.none": "Няма отворена медия",
-  "player.info.unknown": "неизвестен"
+  "player.info.unknown": "неизвестен",
+  "playback.panel.maximize": "Уголеми панела",
+  "playback.panel.fullscreen": "Цял екран",
+  "playback.zoom.out": "Намали мащаба",
+  "playback.zoom.in": "Увеличи мащаба"
 }

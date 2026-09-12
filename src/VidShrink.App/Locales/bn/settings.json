@@ -11,6 +11,7 @@
   "settings.share.lifetime": "মেয়াদ",
   "settings.share.deletion": "মুছে ফেলা",
   "settings.share.delete": "শেয়ার করা ফাইল মুছুন",
+  "settings.share.delete.disabled-tip": "এখনও মুছে ফেলার মতো কোনো শেয়ার করা ফাইল নেই",
   "settings.share.day-one": "1 দিন",
   "settings.share.days": "{0} দিন",
   "settings.share.hour-one-fixed": "1 ঘণ্টা, নির্দিষ্ট",

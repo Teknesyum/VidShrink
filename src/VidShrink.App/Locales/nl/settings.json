@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Levensduur",
   "settings.share.deletion": "Verwijdering",
   "settings.share.delete": "Gedeeld bestand verwijderen",
+  "settings.share.delete.disabled-tip": "Nog geen gedeeld bestand om te verwijderen",
   "settings.share.day-one": "1 dag",
   "settings.share.days": "{0} dagen",
   "settings.share.hour-one-fixed": "1 uur, vast",

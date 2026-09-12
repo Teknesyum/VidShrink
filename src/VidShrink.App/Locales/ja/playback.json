@@ -49,5 +49,9 @@
   "player.info.audio": "音声: {0}、{1} ch、{2} Hz",
   "player.info.noaudio": "音声: なし",
   "player.info.none": "メディアが開かれていません",
-  "player.info.unknown": "不明"
+  "player.info.unknown": "不明",
+  "playback.panel.maximize": "パネルを最大化",
+  "playback.panel.fullscreen": "フルスクリーン",
+  "playback.zoom.out": "ズームアウト",
+  "playback.zoom.in": "ズームイン"
 }

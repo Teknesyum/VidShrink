@@ -49,5 +49,9 @@
   "player.info.audio": "Zvok: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Zvok: brez",
   "player.info.none": "Ni odprtega medija",
-  "player.info.unknown": "neznano"
+  "player.info.unknown": "neznano",
+  "playback.panel.maximize": "Povečaj ploščo",
+  "playback.panel.fullscreen": "Celozaslonski način",
+  "playback.zoom.out": "Pomanjšaj",
+  "playback.zoom.in": "Povečaj"
 }

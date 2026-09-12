@@ -1,6 +1,8 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:playback="using:VidShrink.App.Playback"
+             xmlns:auto="using:Avalonia.Automation"
+             xmlns:loc="using:VidShrink.App.Localization"
              x:Class="VidShrink.App.Playback.ComparisonPanel">
 
   <!--
@@ -8,6 +10,20 @@
     kendisi. Terfi edince Shell bu ızgaradan çıkıp kök katmana taşınır, yer tutucu
     aynı boyutta görünür kalır — altındaki düzen zıplamaz (K4).
   -->
+  <UserControl.Styles>
+    <Style Selector="Border#SeparatorHandle">
+      <Setter Property="RenderTransform" Value="none"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border#SeparatorHandle:pointerover">
+      <Setter Property="RenderTransform" Value="scale(1.15)"/>
+    </Style>
+  </UserControl.Styles>
+
   <Grid x:Name="Root">
 
     <Border x:Name="Placeholder"
@@ -97,7 +113,7 @@
                       Orientation="Horizontal"
                       HorizontalAlignment="Right"
                       Spacing="{StaticResource PlaybackZoomButtonGap}">
-            <Button x:Name="BtnPanelMaximize" Theme="{StaticResource PlaybackZoomButton}">
+            <Button x:Name="BtnPanelMaximize" Theme="{StaticResource PlaybackZoomButton}" auto:AutomationProperties.Name="{loc:Text playback.panel.maximize}">
               <Path Data="{StaticResource PlaybackMaximizeIcon}"
                     Stroke="{StaticResource NeonBlue}"
                     StrokeThickness="{StaticResource BorderThinScalar}"
@@ -105,7 +121,7 @@
                     Height="{StaticResource PlaybackButtonIconSize}"
                     Stretch="Uniform"/>
             </Button>
-            <Button x:Name="BtnPanelFullScreen" Theme="{StaticResource PlaybackZoomButton}">
+            <Button x:Name="BtnPanelFullScreen" Theme="{StaticResource PlaybackZoomButton}" auto:AutomationProperties.Name="{loc:Text playback.panel.fullscreen}">
               <Path Data="{StaticResource PlaybackFullScreenIcon}"
                     Stroke="{StaticResource NeonBlue}"
                     StrokeThickness="{StaticResource BorderThinScalar}"
@@ -155,8 +171,8 @@
                       VerticalAlignment="Center"
                       Spacing="{StaticResource PlaybackZoomButtonGap}"
                       Margin="{StaticResource PlaybackBadgeMargin}">
-            <Button x:Name="BtnZoomOut" Content="-" Theme="{StaticResource PlaybackZoomButton}"/>
-            <Button x:Name="BtnZoomIn" Content="+" Theme="{StaticResource PlaybackZoomButton}"/>
+            <Button x:Name="BtnZoomOut" Content="-" Theme="{StaticResource PlaybackZoomButton}" auto:AutomationProperties.Name="{loc:Text playback.zoom.out}"/>
+            <Button x:Name="BtnZoomIn" Content="+" Theme="{StaticResource PlaybackZoomButton}" auto:AutomationProperties.Name="{loc:Text playback.zoom.in}"/>
             <Border x:Name="ZoomBadge" Theme="{StaticResource PlaybackBadge}" VerticalAlignment="Center">
               <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
             </Border>

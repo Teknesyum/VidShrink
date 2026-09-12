@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Životnosť",
   "settings.share.deletion": "Mazanie",
   "settings.share.delete": "Zmazať zdieľaný súbor",
+  "settings.share.delete.disabled-tip": "Zatiaľ nie je zdieľaný súbor na vymazanie",
   "settings.share.day-one": "1 deň",
   "settings.share.days": "{0} dní",
   "settings.share.hour-one-fixed": "1 hodina, pevne",

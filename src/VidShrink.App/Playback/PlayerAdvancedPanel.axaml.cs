@@ -77,6 +77,7 @@ internal partial class PlayerAdvancedPanel : UserControl
     {
         Body.IsVisible = !Body.IsVisible;
         Glyph.Text = Body.IsVisible ? "▴" : "▾";
+        Glyph.Classes.Set("open", Body.IsVisible);
     }
 
     private void OnReset(object? sender, RoutedEventArgs e) => _player?.ResetAdvanced();

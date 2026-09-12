@@ -49,5 +49,9 @@
   "player.info.audio": "שמע: {0}, {1} ערוצים, {2} Hz",
   "player.info.noaudio": "שמע: אין",
   "player.info.none": "לא נפתחה מדיה",
-  "player.info.unknown": "לא ידוע"
+  "player.info.unknown": "לא ידוע",
+  "playback.panel.maximize": "הגדל את הלוח",
+  "playback.panel.fullscreen": "מסך מלא",
+  "playback.zoom.out": "הקטן תצוגה",
+  "playback.zoom.in": "הגדל תצוגה"
 }

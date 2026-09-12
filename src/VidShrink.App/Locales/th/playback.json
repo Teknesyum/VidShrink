@@ -49,5 +49,9 @@
   "player.info.audio": "เสียง: {0}, {1} ช่อง, {2} Hz",
   "player.info.noaudio": "เสียง: ไม่มี",
   "player.info.none": "ไม่มีสื่อเปิดอยู่",
-  "player.info.unknown": "ไม่ทราบ"
+  "player.info.unknown": "ไม่ทราบ",
+  "playback.panel.maximize": "ขยายแผงให้ใหญ่สุด",
+  "playback.panel.fullscreen": "เต็มหน้าจอ",
+  "playback.zoom.out": "ซูมออก",
+  "playback.zoom.in": "ซูมเข้า"
 }

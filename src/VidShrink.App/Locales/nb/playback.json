@@ -49,5 +49,9 @@
   "player.info.audio": "Lyd: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Lyd: ingen",
   "player.info.none": "Ingen media åpen",
-  "player.info.unknown": "ukjent"
+  "player.info.unknown": "ukjent",
+  "playback.panel.maximize": "Forstørr panelet",
+  "playback.panel.fullscreen": "Fullskjerm",
+  "playback.zoom.out": "Zoom ut",
+  "playback.zoom.in": "Zoom inn"
 }

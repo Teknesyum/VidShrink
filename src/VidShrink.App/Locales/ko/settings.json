@@ -11,6 +11,7 @@
   "settings.share.lifetime": "유지 기간",
   "settings.share.deletion": "삭제",
   "settings.share.delete": "공유 파일 삭제",
+  "settings.share.delete.disabled-tip": "삭제할 공유 파일이 아직 없습니다",
   "settings.share.day-one": "1일",
   "settings.share.days": "{0}일",
   "settings.share.hour-one-fixed": "1시간, 고정",

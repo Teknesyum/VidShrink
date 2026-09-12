@@ -11,6 +11,7 @@
   "settings.share.lifetime": "مدة البقاء",
   "settings.share.deletion": "الحذف",
   "settings.share.delete": "حذف الملف المشارك",
+  "settings.share.delete.disabled-tip": "لا يوجد ملف مشترك للحذف بعد",
   "settings.share.day-one": "يوم واحد",
   "settings.share.days": "{0} أيام",
   "settings.share.hour-one-fixed": "ساعة واحدة، ثابتة",

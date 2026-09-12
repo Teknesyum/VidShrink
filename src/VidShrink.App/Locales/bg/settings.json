@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Живот",
   "settings.share.deletion": "Изтриване",
   "settings.share.delete": "Изтрий споделения файл",
+  "settings.share.delete.disabled-tip": "Все още няма споделен файл за изтриване",
   "settings.share.day-one": "1 ден",
   "settings.share.days": "{0} дни",
   "settings.share.hour-one-fixed": "1 час, фиксирано",

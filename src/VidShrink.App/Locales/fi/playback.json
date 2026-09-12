@@ -49,5 +49,9 @@
   "player.info.audio": "Ääni: {0}, {1} kan., {2} Hz",
   "player.info.noaudio": "Ääni: ei ääntä",
   "player.info.none": "Ei avattua mediaa",
-  "player.info.unknown": "tuntematon"
+  "player.info.unknown": "tuntematon",
+  "playback.panel.maximize": "Suurenna paneeli",
+  "playback.panel.fullscreen": "Koko näyttö",
+  "playback.zoom.out": "Loitonna",
+  "playback.zoom.in": "Lähennä"
 }

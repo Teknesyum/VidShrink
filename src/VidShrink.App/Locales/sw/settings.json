@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Muda wa kuishi",
   "settings.share.deletion": "Ufutaji",
   "settings.share.delete": "Futa faili iliyoshirikiwa",
+  "settings.share.delete.disabled-tip": "Hakuna faili lililoshirikiwa la kufuta bado",
   "settings.share.day-one": "siku 1",
   "settings.share.days": "siku {0}",
   "settings.share.hour-one-fixed": "saa 1, thabiti",

@@ -49,5 +49,9 @@
   "player.info.audio": "الصوت: {0}، {1} قناة، {2} Hz",
   "player.info.noaudio": "الصوت: لا يوجد",
   "player.info.none": "لا توجد وسائط مفتوحة",
-  "player.info.unknown": "غير معروف"
+  "player.info.unknown": "غير معروف",
+  "playback.panel.maximize": "اللوحة كبيرة",
+  "playback.panel.fullscreen": "ملء الشاشة",
+  "playback.zoom.out": "تصغير",
+  "playback.zoom.in": "تكبير"
 }

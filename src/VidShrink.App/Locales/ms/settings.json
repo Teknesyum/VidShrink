@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Tempoh hayat",
   "settings.share.deletion": "Pemadaman",
   "settings.share.delete": "Padam fail yang dikongsi",
+  "settings.share.delete.disabled-tip": "Belum ada fail kongsi untuk dipadam",
   "settings.share.day-one": "1 hari",
   "settings.share.days": "{0} hari",
   "settings.share.hour-one-fixed": "1 jam, tetap",

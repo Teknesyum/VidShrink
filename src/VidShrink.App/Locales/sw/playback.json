@@ -49,5 +49,9 @@
   "player.info.audio": "Sauti: {0}, {1} chaneli, {2} Hz",
   "player.info.noaudio": "Sauti: hakuna",
   "player.info.none": "Hakuna midia iliyofunguliwa",
-  "player.info.unknown": "haijulikani"
+  "player.info.unknown": "haijulikani",
+  "playback.panel.maximize": "Panua paneli",
+  "playback.panel.fullscreen": "Skrini nzima",
+  "playback.zoom.out": "Punguza ukubwa",
+  "playback.zoom.in": "Ongeza ukubwa"
 }

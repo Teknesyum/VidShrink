@@ -49,5 +49,9 @@
   "player.info.audio": "Ήχος: {0}, {1} καν., {2} Hz",
   "player.info.noaudio": "Ήχος: κανένας",
   "player.info.none": "Δεν υπάρχει ανοιχτό πολυμέσο",
-  "player.info.unknown": "άγνωστο"
+  "player.info.unknown": "άγνωστο",
+  "playback.panel.maximize": "Μεγέθυνση πίνακα",
+  "playback.panel.fullscreen": "Πλήρης οθόνη",
+  "playback.zoom.out": "Σμίκρυνση",
+  "playback.zoom.in": "Μεγέθυνση"
 }

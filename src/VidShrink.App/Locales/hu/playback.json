@@ -49,5 +49,9 @@
   "player.info.audio": "Hang: {0}, {1} csat., {2} Hz",
   "player.info.noaudio": "Hang: nincs",
   "player.info.none": "Nincs megnyitott médiafájl",
-  "player.info.unknown": "ismeretlen"
+  "player.info.unknown": "ismeretlen",
+  "playback.panel.maximize": "Panel nagyítása",
+  "playback.panel.fullscreen": "Teljes képernyő",
+  "playback.zoom.out": "Kicsinyítés",
+  "playback.zoom.in": "Nagyítás"
 }

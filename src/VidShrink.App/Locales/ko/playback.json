@@ -49,5 +49,9 @@
   "player.info.audio": "오디오: {0}, {1}채널, {2} Hz",
   "player.info.noaudio": "오디오: 없음",
   "player.info.none": "열려 있는 미디어 없음",
-  "player.info.unknown": "알 수 없음"
+  "player.info.unknown": "알 수 없음",
+  "playback.panel.maximize": "패널 최대화",
+  "playback.panel.fullscreen": "전체 화면",
+  "playback.zoom.out": "축소",
+  "playback.zoom.in": "확대"
 }

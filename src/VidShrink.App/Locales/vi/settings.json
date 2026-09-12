@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Thời hạn",
   "settings.share.deletion": "Xóa",
   "settings.share.delete": "Xóa tệp đã chia sẻ",
+  "settings.share.delete.disabled-tip": "Chưa có tệp chia sẻ nào để xóa",
   "settings.share.day-one": "1 ngày",
   "settings.share.days": "{0} ngày",
   "settings.share.hour-one-fixed": "1 giờ, cố định",

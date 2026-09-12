@@ -49,5 +49,9 @@
   "player.info.audio": "Ses: {0}, {1} kanal, {2} Hz",
   "player.info.noaudio": "Ses: yok",
   "player.info.none": "Açık medya yok",
-  "player.info.unknown": "bilinmiyor"
+  "player.info.unknown": "bilinmiyor",
+  "playback.panel.maximize": "Paneli büyüt",
+  "playback.panel.fullscreen": "Tam ekran",
+  "playback.zoom.out": "Uzaklaştır",
+  "playback.zoom.in": "Yakınlaştır"
 }

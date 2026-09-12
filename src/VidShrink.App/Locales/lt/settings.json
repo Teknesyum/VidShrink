@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Galiojimas",
   "settings.share.deletion": "Trynimas",
   "settings.share.delete": "Ištrinti bendrintą failą",
+  "settings.share.delete.disabled-tip": "Kol kas nėra bendrinamo failo, kurį būtų galima ištrinti",
   "settings.share.day-one": "1 diena",
   "settings.share.days": "{0} d.",
   "settings.share.hour-one-fixed": "1 valanda, fiksuota",

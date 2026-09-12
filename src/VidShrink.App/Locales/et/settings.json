@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Eluiga",
   "settings.share.deletion": "Kustutamine",
   "settings.share.delete": "Kustuta jagatud fail",
+  "settings.share.delete.disabled-tip": "Kustutamiseks pole veel ühtegi jagatud faili",
   "settings.share.day-one": "1 päev",
   "settings.share.days": "{0} päeva",
   "settings.share.hour-one-fixed": "1 tund, fikseeritud",

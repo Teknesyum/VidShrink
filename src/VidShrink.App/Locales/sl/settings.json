@@ -11,6 +11,7 @@
   "settings.share.lifetime": "Življenjska doba",
   "settings.share.deletion": "Brisanje",
   "settings.share.delete": "Izbriši deljeno datoteko",
+  "settings.share.delete.disabled-tip": "Še ni deljene datoteke za brisanje",
   "settings.share.day-one": "1 dan",
   "settings.share.days": "{0} dni",
   "settings.share.hour-one-fixed": "1 ura, fiksno",

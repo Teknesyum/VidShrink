@@ -49,5 +49,9 @@
   "player.info.audio": "অডিও: {0}, {1} চ্যানেল, {2} Hz",
   "player.info.noaudio": "অডিও: নেই",
   "player.info.none": "কোনো মিডিয়া খোলা নেই",
-  "player.info.unknown": "অজানা"
+  "player.info.unknown": "অজানা",
+  "playback.panel.maximize": "প্যানেল বড় করুন",
+  "playback.panel.fullscreen": "পূর্ণ পর্দা",
+  "playback.zoom.out": "জুম আউট করুন",
+  "playback.zoom.in": "জুম ইন করুন"
 }
