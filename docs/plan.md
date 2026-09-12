@@ -685,8 +685,12 @@ yeni `Themes/Recorder.axaml`, `Locales/*/recorder.json`.
 
 ### 8c. Ses girisi ve cihaz listesi
 
-Sahip dosyalar: yeni `src/VidShrink.Ffmpeg/CaptureDevices.cs`,
-`src/VidShrink.Core/RecorderArguments.cs` (ikinci girdi kolu).
+Sahip dosyalar: yeni `src/VidShrink.Ffmpeg/CaptureDevices.cs`, yeni
+`src/VidShrink.Core/AudioCaptureArguments.cs`.
+
+`RecorderArguments.cs` 8a'nin dosyasi, 8c ona **dokunmaz**: 8c yalnizca cihaz listesini
+ve ses girdisinin argumanlarini kendi dosyasinda uretir, ikisini 8a birlestirir. Boyle
+bolunmemis haliyle iki kol ayni dosyayi yazacakti.
 
 - Cihaz listesi ffmpeg'in kendisinden: Windows `-list_devices true -f dshow -i dummy`,
   macOS `-f avfoundation -list_devices true -i ""`, Linux `pactl`/`pipewire`. Ayristirma
