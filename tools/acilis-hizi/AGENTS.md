@@ -1,34 +1,33 @@
 # Acilis hizi olcumu
 
-Cift tiktan ilk kareye kadar gecen sureyi olcer (7. dalga, 7c kolu). Sayilar
+Cift tiktan ilk kareye gecen sureyi olcer (7. dalga, 7c kolu). Sayilar
 `docs/olcumler/acilis-hizi.md` icinde; burada onlari **ureten** duzenek var.
 
-    pwsh -File tools/acilis-hizi/olcum.ps1 -Exe <VidShrink.App.exe> -Klip <video> `
-         -Cikti .calisma/dalga7c -Kip sicak -Tekrar 12 -Libmpv <libmpv-2.dll> -Etiket once-sicak
+    pwsh -File tools/acilis-hizi/olcum.ps1 -Exe <taban.exe> -ExeB <yeni.exe> `
+         -Etiket taban -EtiketB iyilestirme -Klip <video> -Cikti .calisma/dalga7c/eslesik `
+         -Kip sicak -Tekrar 12 -Libmpv <libmpv-2.dll>
+
+**`-ExeB` olmadan olcum alma.** Bu makine oturumlar arasinda 1,7 kata kadar kayiyor:
+ayri oturumlarda alinan once/sonra sayilari kaymayi iyilesme sanma tuzagidir, bir kez
+dusuldu. `-ExeB` verilince her tekrarda iki yapi da kosar ve sira tekrardan tekrara
+doner; hukum `eslesik fark` tablosundan, farkin ortancasi ve kac tekrarda ayni yone
+baktigi okunarak verilir. Ortanca sutunlari kaymayi tasir, hukum vermez.
 
 - `-Kip sicak` — ayni yayin klasorunden art arda acilis.
-- `-Kip soguk` — her tekrarda yayin klasoru yeni bir yola kopyalanir; **disk onbellegi
-  temizlenmez**, sogukluk surec ve yol sogukluguydur, sayfa onbellegi degil.
-- Cikti: `ham-<etiket>.csv` (her tekrarin butun adimlari) ve `ozet-<etiket>.txt`
-  (adim basina n, en az, ortanca, p95, en cok). p95 en yakin sira yontemi: `ceil(0.95*n)`.
+- `-Kip soguk` — yayin klasoru her tekrarda yeni yola kopyalanir; **disk onbellegi
+  temizlenmez**, sogukluk surec ve yol sogukluguydur. p95: `ceil(0.95*n)`.
+- Cikti: `ham-*.csv` (her tekrarin butun adimlari), `ozet-*.txt` (n/en az/ortanca/p95).
 
 **Saat surecin kendisinde.** Uygulama `VIDSHRINK_ACILIS_IZI` doluyken her adimi
-`adim<TAB>ms` olarak o dosyaya yazar; sifir noktasi `Process.StartTime`, yani surecin
-isletim sistemince yaratildigi an. Betik saat okumaz, dosyayi bekler. Kabugun
-`CreateProcess`'ten onceki kendi payi bu sayiya **girmez**.
-
-Iz kancasi uretimde bedelsiz: `AcilisIzi.Yaz` degisken bos oldugunda tek bir ortam
-degiskeni okumasidir, dosya acmaz. Ilk kareyi bekleyen 1 ms'lik saat (`IlkKareyiBekle`)
-yalniz degisken doluyken kurulur.
+`adim<TAB>ms` yazar; sifir noktasi `Process.StartTime`. Kabugun `CreateProcess`
+oncesi payi bu sayiya **girmez**. Kanca uretimde bedelsiz: degisken bosken
+`AcilisIzi.Yaz` tek bir ortam degiskeni okumasidir, `IlkKareyiBekle` hic kurulmaz.
 
 **Her kosum kendi tek ornek kanalini alir** (`VIDSHRINK_INSTANCE_CHANNEL`): yoksa ikinci
-acilis yolu koşan surece iletip hemen cikar ve olcum bos doner. Surec her tekrarda
-`Stop-Process` ile kapatilir ve kapandigi dogrulanir.
+acilis yolu kosan surece iletip cikar ve olcum bos doner.
 
-Adimlar sirayla: `main`, `tek-ornek`, `cerceve`, `gecici-temizlik`, `palet`,
-`pencere-kuruldu`, `pencere-yuklendi`, `ayarlar`, `varsayilan-oneri`,
-`giris-canlandirmasi`, `sekme`, `kare-kaynagi`, `ilk-kare`, `motor-acildi`,
-`kucultme-yuklendi`.
+Isaretler birikimlidir: bir adimin farki kendinden oncekileri de icerir, pay cikarmak
+icin ardisik iki isaretin farki alinir. `varsayilan-oneri` bilerek ilk karenin arkasina
+alindi; buyuk gorunmesi yavaslama degil, yer degistirmedir.
 
-Klipler `.calisma/dalga7c/klip/` altinda; olcum ciktisi da `.calisma/dalga7c/` altina.
-`.sln`e eklenmedi — betik, CI'da kosmaz.
+Klipler ve cikti `.calisma/dalga7c/` altinda. `.sln`e eklenmedi, CI'da kosmaz.

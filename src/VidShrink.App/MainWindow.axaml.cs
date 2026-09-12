@@ -486,12 +486,18 @@ public partial class MainWindow : Window
             RestoreAppSettings(appSettings);
             InitializeUpdateUi(settings);
             AcilisIzi.Yaz("ayarlar");
-            ShowDefaultAppSuggestion();
-            AcilisIzi.Yaz("varsayilan-oneri");
-            _ = CheckForUpdateAsync();
             PlayPanelEntrance();
             AcilisIzi.Yaz("giris-canlandirmasi");
             await LoadStartupFileAsync();
+
+            // Varsayilan uygulama onerisi ile surum sorusu ilk karenin onunden alindi:
+            // ikisi de kullanicinin acmak istedigi dosyayla ilgisiz, ikisi de acilis
+            // yolunda arayuz is parcaciginda durur (oneri uzanti basina bir
+            // AssocQueryString, surum sorusu bir HttpClient kurulumu). Sirayi degistirmek
+            // gorunurlerini degistirmez: serit de bildirim de ayni acilista belirir.
+            ShowDefaultAppSuggestion();
+            AcilisIzi.Yaz("varsayilan-oneri");
+            _ = CheckForUpdateAsync();
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }

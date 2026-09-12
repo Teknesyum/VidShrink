@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Avalonia;
 using VidShrink.Core;
+using VidShrink.Player;
 
 namespace VidShrink.App;
 
@@ -150,6 +152,7 @@ internal static class Program
         using var instance = new SingleInstanceChannel(SingleInstanceChannel.DefaultChannel());
         var files = new Integration.ForwardedFiles();
         AcilisIzi.Yaz("tek-ornek");
+        if (path is not null) WarmPlayback();
 
         if (!instance.IsOwner)
         {
@@ -162,6 +165,27 @@ internal static class Program
         instance.StartListening(files.Receive);
         return Build(path, files).StartWithClassicDesktopLifetime(args);
     }
+
+    /// <summary>
+    /// Oynaticinin yerel kitapligini arka planda yuklemeye baslar. Kitaplik 115 MB ve
+    /// bugun ilk karenin hemen onunde, pencere kurulduktan sonra yukleniyor; o bekleme
+    /// aciligin sonuna dusuyor. Burada pencere kurulurken baslatilir.
+    ///
+    /// <para><see cref="LibMpvLocator.EnsureLoaded"/> kilitli ve tekrar cagrilabilir:
+    /// oynatici ayni kitapligi ikinci kez yuklemez, hazirsa hic beklemez, hazir degilse
+    /// ayni yuklemeyi bekler. Kitaplik bulunamazsa burada susulur — gerekce dosya
+    /// acilirken <c>PlaybackEngineUnavailableException</c> olarak zaten bildiriliyor.</para>
+    ///
+    /// <para>Yalniz kabuktan bir dosya geldiginde cagrilir: bos acilan pencerede oynatici
+    /// kullanilmayabilir, o kosumda 115 MB'lik okuma bedava degildir.</para>
+    /// </summary>
+    internal static Task WarmPlayback()
+        => Task.Run(() =>
+        {
+            try { LibMpvLocator.EnsureLoaded(); }
+            catch (Exception) { }
+            AcilisIzi.Yaz("libmpv-hazir");
+        });
 
     private static void AllowForeground()
     {
