@@ -58,6 +58,7 @@ internal static class Keymap
     internal const double SeekLarge = 300;
     internal const double SeekFine = 1;
 
+    internal static readonly PlayerAction Settings = new(PlayerCommandKind.OpenSettings, 0, "main.player.menu.settings", 1);
     internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause", 1);
     internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen", 1);
     internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset", 1);
@@ -97,6 +98,7 @@ internal static class Keymap
         new(PlayerInput.OnWheel(KeyModifiers.Shift), Seek(SeekMedium)),
         new(PlayerInput.OnWheel(KeyModifiers.Control | KeyModifiers.Shift), Seek(SeekLarge)),
         new(PlayerInput.OnWheel(KeyModifiers.Alt), Zoom),
+        new(PlayerInput.OnPress(PlayerButton.Left), PlayPause),
         new(PlayerInput.OnPress(PlayerButton.Middle), Fullscreen),
         new(PlayerInput.OnDoubleClick(), Fullscreen),
         new(PlayerInput.OnPress(PlayerButton.Right), OpenMenu),
@@ -149,7 +151,7 @@ internal static class Keymap
 
     internal static readonly IReadOnlyList<PlayerAction> MenuActions = new[]
     {
-        PlayPause, Fullscreen, ResetZoom,
+        Settings, PlayPause, Fullscreen, ResetZoom,
         Mute,
         Faster, Slower, NormalSpeed,
         NextFrame, PreviousFrame,
@@ -197,6 +199,7 @@ internal static class Keymap
         {
             PlayerInputKind.Wheel => Strings.Get("main.player.input.wheel"),
             PlayerInputKind.DoubleClick => Strings.Get("main.player.input.double"),
+            PlayerInputKind.Press when input.Button == PlayerButton.Left => Strings.Get("main.player.input.left"),
             PlayerInputKind.Press when input.Button == PlayerButton.Middle => Strings.Get("main.player.input.middle"),
             PlayerInputKind.Press => Strings.Get("main.player.input.right"),
             _ => KeyName(input)

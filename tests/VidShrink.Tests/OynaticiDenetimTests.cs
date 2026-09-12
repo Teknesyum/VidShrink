@@ -104,6 +104,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.TogglePlay] = "play -> ",
         [PlayerCommandKind.ToggleFullscreen] = "fullscreen -> ",
         [PlayerCommandKind.ContextMenu] = "menu",
+        [PlayerCommandKind.OpenSettings] = "settings -> ",
         [PlayerCommandKind.LeaveFullscreen] = "leavefullscreen -> ",
         [PlayerCommandKind.ResetZoom] = "zoomreset -> ",
         [PlayerCommandKind.Volume] = "volume ",
@@ -144,6 +145,11 @@ public sealed class KeymapTests
                 break;
             case PlayerInputKind.DoubleClick:
                 GirdiSurucu.Press(view, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton, 2);
+                break;
+            case PlayerInputKind.Press when input.Button == PlayerButton.Left:
+                GirdiSurucu.Press(view, PointerUpdateKind.LeftButtonPressed, RawInputModifiers.LeftMouseButton);
+                view.FareRelease(0);
+                view.FareDue(ClickArbiter.DoubleWindowMs);
                 break;
             case PlayerInputKind.Press when input.Button == PlayerButton.Middle:
                 GirdiSurucu.Press(view, PointerUpdateKind.MiddleButtonPressed, RawInputModifiers.MiddleMouseButton);

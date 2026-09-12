@@ -55,6 +55,7 @@ internal partial class PlayerView : UserControl
         InitTracks();
         InitWindow();
         InitTools();
+        InitFare();
 
         RefreshState();
     }
@@ -128,6 +129,10 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.ContextMenu:
                 OpenMenu();
                 _trace.Add("menu");
+                break;
+            case PlayerCommandKind.OpenSettings:
+                _trace.Add("settings -> " + (OpenSettings is null ? "no" : "open"));
+                OpenSettings?.Invoke();
                 break;
             case PlayerCommandKind.ResetZoom:
                 _zoom.Reset();
@@ -214,7 +219,12 @@ internal partial class PlayerView : UserControl
 
     internal void FeedPress(PlayerButton button, int clicks = 1)
     {
-        if (button == PlayerButton.Left) _leftClicks++;
+        if (button == PlayerButton.Left)
+        {
+            FarePress(clicks, 0, 0);
+            return;
+        }
+
         Apply(Keymap.ForPress(button, clicks));
     }
 
@@ -315,8 +325,16 @@ internal partial class PlayerView : UserControl
         else if (point.Properties.IsLeftButtonPressed) button = PlayerButton.Left;
         else return;
 
+        if (button == PlayerButton.Left)
+        {
+            var at = point.Position;
+            if (FarePress(e, at.X, at.Y)) e.Handled = true;
+            return;
+        }
+
+        if (button == PlayerButton.Right) MenuAtPointer = true;
         FeedPress(button, e.ClickCount);
-        if (button != PlayerButton.Left || e.ClickCount >= 2) e.Handled = true;
+        e.Handled = true;
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -345,7 +363,12 @@ internal partial class PlayerView : UserControl
     }
 
     private void OnMenuButton(object? sender, RoutedEventArgs e)
-        => Apply(Keymap.OpenMenu.ToCommand());
+    {
+        MenuAtPointer = false;
+        Apply(Keymap.OpenMenu.ToCommand());
+    }
+
+    internal bool MenuAtPointer { get; set; }
 
     internal MenuFlyout BuildMenu()
     {
@@ -379,8 +402,15 @@ internal partial class PlayerView : UserControl
     private void OpenMenu()
     {
         var flyout = BuildMenu();
-        try { flyout.ShowAt(BtnPlayerMenu); }
+        MenuAnchor = MenuAtPointer ? "pointer" : "button";
+        try
+        {
+            if (MenuAtPointer) flyout.ShowAt(Surface, true);
+            else flyout.ShowAt(BtnPlayerMenu);
+        }
         catch (InvalidOperationException) { }
+
+        MenuAtPointer = false;
     }
 
     internal void ToggleFullscreen()
