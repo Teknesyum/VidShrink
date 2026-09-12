@@ -107,7 +107,9 @@ public static class PaletteCatalog
         => Names.FirstOrDefault(palette => string.Equals(palette, name, StringComparison.OrdinalIgnoreCase))
            ?? Default;
 
-    private static Uri Address(string name) => new($"{Folder}/{name}/Theme.axaml");
+    private const string ThemeFileName = "Theme.axaml";
+
+    private static Uri Address(string name) => new($"{Folder}/{name}/{ThemeFileName}");
 
     private static IResourceDictionary Load(string name)
         => new ResourceInclude((Uri?)null) { Source = Address(name) }.Loaded;

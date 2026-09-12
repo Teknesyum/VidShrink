@@ -5,7 +5,7 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
-## [0.4.2] - 2026-09-12
+## [0.4.3] - 2026-09-12
 
 An installation that could not reach a newer release now does. 0.4.1 shipped a self-update
 that a 0.3.0 installation was unable to finish, so a desktop shortcut kept opening the old
@@ -30,6 +30,10 @@ build no matter how many releases came out.
   205.22 MB payload, `libSkiaSharp.pdb` alone 84 MB, and an installation that never had them
   counted every one as a missing file. They are deleted from the publish folder before the
   manifest is written, so neither the manifest nor the archive lists them.
+- **A red gate on `main`.** `PaletteCatalog.Address` built the theme address as one
+  interpolated literal, which the localization scan read as a sentence left in code. The
+  file name is now a constant, so the literal carries no sentence. 0.4.2 was tagged with
+  this still red and produced no release; 0.4.3 is the same work with the gate green.
 
 ## [0.4.1] - 2026-09-12
 
