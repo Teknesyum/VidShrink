@@ -825,3 +825,37 @@ Degismeyen yerler olculdu: `VidShrink.App.csproj` palet dosyalarini adiyla saymi
 Kabul: `PaletteGen` calisip 26 dosyayi yeni duzene yazar, tam suit yesil, `App.axaml`in
 paleti acilista yurur, ve UI taramasinda `colour/raw-colour` bulgusu palet dosyalarindan
 kalkar.
+
+## Kalan UI bulgularinin ayiklanmasi
+
+Ajan 20 bulgunun 13'unu kapattigini bildirdi; olculdukten sonra 10'u alindi, ucu
+geri cevrildi. Tarama 28 -> 18, `states/unnamed-interactive` sifir.
+
+**Alinan.** Dokuz dugmeye `AutomationProperties.Name` (`PlayerView.axaml`,
+`ControlStrip.axaml`) — metin uydurulmadi, o dugmelerin zaten kullandigi
+`main.player.menu.*` ve `playback.control.*` anahtarlari XAML'e tasindi. Ve
+`player.subtitle.external` parantezini kendi tasiyor, kod tek `Strings.Get`e indi
+(42 dilde `tracks.json`).
+
+**Geri cevrilen ve sebebi.**
+
+- `MainWindow.axaml`in ipucu yeniden yazimi. Alti denetimin ipucu **zaten vardi**:
+  `<Style Selector="Button:disabled">` ile `ToolTip.Tip` kuruyorlardi. Yeni yazim
+  onlari `IsEnabled`e bagli bir donusturucuyle degistirdi ve `ChkFastGpu`'da
+  `loc:Bullets.Text` boyayicisini dusurdu — silinen yorumun kendisi bunu soyluyordu:
+  "Text yazmak kosulari silerdi: ipucu govdesi ayni boyayicidan gecmeli." Kazanc sifir:
+  tarama alti satiri hala isaretliyor, cunku kuralin deseni `/ToolTip\s*=/` ve Avalonia'da
+  o ozellik `ToolTip.Tip`. Kural WPF varsayimiyla yazilmis; bulgu eklentide, kodda degil.
+- `Themes/Playback.axaml`e sekiz yeni durak. Hepsi ayni `PlaybackScrimColor`, yani gecis
+  gorsel olarak hic degismiyor; yalnizca sayaci 11'e cikariyor.
+- `player.info.resolution`un `{0}` yerine `{0}x{1}` olmasi. Boyut bilinmedigi kolda
+  ciktinin "bilinmiyor x bilinmiyor" oluyordu; tek alanlik bilinmeyen deger bozuluyor.
+- `DUZENEK.md:111`e `(default, unmeasured)`. Satirdaki "default" olculmemis bir varsayilan
+  degil, ffprobe'un `-of default=nw=1` cikti bicimi adi; etiket yanlis olurdu.
+
+Kalan 18: 9 `forms/unmeasured-label` (7'si `reg query` ham ciktisi, 1'i
+`CHANGELOG.md:605`teki gercek WhatsApp sinirı, 1'i `DUZENEK.md`), 6
+`states/disabled-affordance` (eklentinin WPF deseni), 1 `forms/no-ui-string-literal`
+(`BrandSpellingTests` "Buy Me a Coffee" dizesini kaynakta pimliyor, daha once
+`main.sponsor.label` denenip geri alinmis), 1 `forms/no-sentence-concat`, 1
+`colour/background-gradient`. Kanit `.calisma/ui-tarama/ajan-sonrasi.txt`.
