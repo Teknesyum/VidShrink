@@ -360,7 +360,7 @@ public sealed class OluUyeTests
     /// tuketicili uye acilirsa ya da var olan birine gercek bir tuketici gelirse burasi kirmizi
     /// olur.
     /// <para>
-    /// Kume bugun 32 satir: 27 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
+    /// Kume bugun 34 satir: 29 sifir uretim tuketicili uye + 5 hic kullanilmayan uye
     /// (<c>Flagged = ZeroConsumer || Unused</c>). T163 kumeyi 51 satirdan 37'ye indirdi ve
     /// kalan bir satirin bicimini degistirdi. Dusen 19 satir T165'in <c>ReasonCode.Manual*</c>
     /// kodlariydi: T165 onlari uretmis ama okuyamamisti, cunku okuma tarafi
@@ -375,7 +375,12 @@ public sealed class OluUyeTests
     /// kullanicinin gordugu bir cumleye ceviriyor
     /// (<c>ShrinkProblemText.Key</c>, bes ayri yerellestirme anahtari), bicim
     /// <c>hic-okunmayan-tur</c>'den <c>tuketiliyor</c>'a gecti ve satirlarin pimde isi kalmadi.
-    /// Olcunun kendi ciktisi: <c>uye: 162  bu dosyada adi gecmeyen: 116  pimlenen: 32</c>.
+    /// Kumeyi 32'den 34'e cikaran 8c: ses girisi kolu <c>AudioSourceRole</c>'u Core'a ekledi,
+    /// iki uyesi de uretimde uretiliyor ama hicbir uretim kolu rolu adiyla ayirmiyor
+    /// (<c>hic-okunmayan-tur</c>); rolu okuyan secim yuzeyi 8b'nin alaninda. Ayni koldaki
+    /// <c>CaptureBackend</c> pime girmedi: <c>AudioCaptureArguments.cs:29</c> esitlik,
+    /// <c>:153</c> switch kolu, yani tuketiliyor.
+    /// Olcunun kendi ciktisi: <c>uye: 167  bu dosyada adi gecmeyen: 119  pimlenen: 34</c>.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -445,6 +450,10 @@ public sealed class OluUyeTests
             "Uretimde sifir gorunum, testlerde ve araclarda bes. Bu sinifin en saf hali: alani ayakta tutan tek taraf olcum tarafi. Dusurmek olcum duzenegini kirar, karar ayri sozlesme."),
         new("Intent.SocialMedia", "varsayilan-kol", Debt,
             "T177'ye kadar hicbir yerde gorunmuyordu. T177 yonga seridine niyeti tasidi: MainWindow.axaml.cs ChipPlans() icinde 8 MB yongasinin niyeti bu uye, yani uye artik uretimde uretiliyor. Tuketen kol hala yok — okuma tarafi niyeti adiyla ayirmiyor — o yuzden bicim hic-gorunmeyen'den varsayilan-kol'a dondu ve borc olarak duruyor."),
+        new("AudioSourceRole.Microphone", "hic-okunmayan-tur", Debt,
+            "8c ses girisi kolunun ekledigi rol. Uretimde uretiliyor: CaptureDevices.cs:249-252 cihaz adindan siniflandiriyor, AudioCaptureArguments.cs:99 secimi bu rolle dogruluyor. Tuketen kol yok — dogrulama esitlik karsilastirmasi (:171 expectedRole), role gore dallanan satir degil. Rolu adiyla okuyan kol 8b arayuzunde acilacak (mikrofon/sistem sesi secimi); o zamana kadar borc."),
+        new("AudioSourceRole.SystemAudio", "hic-okunmayan-tur", Debt,
+            "Ayni turun ikinci uyesi, ayni sinir: AudioCaptureArguments.cs:101 uretiyor, hicbir kol adiyla okumuyor."),
         new("LauncherUpdate.CommitWindow", "hic-gorunmeyen", Debt,
             "public static readonly, hicbir yerde okunmuyor. Dusurulmesi UpdateCheck.cs'i degistirir, o dosya bu sozlesmenin owns listesinde yok."),
         new("MacUpdate.DownloadTimeout", "hic-gorunmeyen", Debt,
@@ -501,7 +510,7 @@ public sealed class OluUyeTests
 
     /// <summary>
     /// K2: kume anahtar kelime listesinden degil turden cikiyor. Kanit, olcunun bu dosyada
-    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 32 satir 162 uyelik kumenin bir parcasi,
+    /// adi hic gecmeyen uyeleri de bulmasi — pimlenen 34 satir 167 uyelik kumenin bir parcasi,
     /// kumenin kendisi degil.
     /// </summary>
     [Fact]
