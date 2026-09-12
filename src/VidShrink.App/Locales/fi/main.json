@@ -29,6 +29,10 @@
   "main.update.available": "Uusi versio on saatavilla",
 
   "main.action.copy": "Kopioi",
+
+
+  "main.action.install": "Asenna",
+
   "main.action.browse": "Selaa",
   "main.action.cancel": "Peruuta",
   "main.action.cancel.disabled-tip": "Yhtään tehtävää ei ole vielä käynnissä",

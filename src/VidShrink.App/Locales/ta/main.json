@@ -29,6 +29,10 @@
   "main.update.available": "புதிய பதிப்பு கிடைக்கிறது",
 
   "main.action.copy": "நகலெடு",
+
+
+  "main.action.install": "நிறுவு",
+
   "main.action.browse": "உலாவு",
   "main.action.cancel": "ரத்து",
   "main.action.cancel.disabled-tip": "இன்னும் எந்த பணியும் இயங்கவில்லை",

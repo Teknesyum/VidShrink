@@ -29,6 +29,10 @@
   "main.update.available": "En ny versjon er tilgjengelig",
 
   "main.action.copy": "Kopier",
+
+
+  "main.action.install": "Installer",
+
   "main.action.browse": "Bla gjennom",
   "main.action.cancel": "Avbryt",
   "main.action.cancel.disabled-tip": "Ingen jobb kjører ennå",

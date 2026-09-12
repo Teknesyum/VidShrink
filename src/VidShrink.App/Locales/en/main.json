@@ -29,6 +29,10 @@
   "main.update.available": "A new version is available",
 
   "main.action.copy": "Copy",
+
+
+  "main.action.install": "Install",
+
   "main.action.browse": "Browse",
   "main.action.cancel": "Cancel",
   "main.action.cancel.disabled-tip": "No job is running yet",

@@ -29,6 +29,10 @@
   "main.update.available": "Versi baharu tersedia",
 
   "main.action.copy": "Salin",
+
+
+  "main.action.install": "Pasang",
+
   "main.action.browse": "Layari",
   "main.action.cancel": "Batal",
   "main.action.cancel.disabled-tip": "Belum ada tugas yang sedang berjalan",

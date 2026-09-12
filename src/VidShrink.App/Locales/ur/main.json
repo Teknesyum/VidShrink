@@ -29,6 +29,10 @@
   "main.update.available": "نیا ورژن دستیاب ہے",
 
   "main.action.copy": "کاپی",
+
+
+  "main.action.install": "انسٹال کریں",
+
   "main.action.browse": "براؤز",
   "main.action.cancel": "منسوخ",
   "main.action.cancel.disabled-tip": "ابھی تک کوئی کام نہیں چل رہا",

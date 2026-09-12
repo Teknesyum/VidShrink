@@ -29,6 +29,10 @@
   "main.update.available": "Eine neue Version ist verfügbar",
 
   "main.action.copy": "Kopieren",
+
+
+  "main.action.install": "Installieren",
+
   "main.action.browse": "Durchsuchen",
   "main.action.cancel": "Abbrechen",
   "main.action.cancel.disabled-tip": "Es läuft noch kein Auftrag",

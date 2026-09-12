@@ -29,6 +29,10 @@
   "main.update.available": "نسخهٔ جدیدی موجود است",
 
   "main.action.copy": "کپی",
+
+
+  "main.action.install": "نصب",
+
   "main.action.browse": "انتخاب",
   "main.action.cancel": "لغو",
   "main.action.cancel.disabled-tip": "هنوز هیچ کاری در حال اجرا نیست",

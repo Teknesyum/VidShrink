@@ -434,6 +434,15 @@ stored in `%APPDATA%\VidShrink\settings.json`, next to your other settings rathe
 to the executable, so reinstalling does not reset it. With it off, Windows behaves like the
 others: the application asks once at startup whether a newer version exists and tells you.
 
+That notice carries an **Install** button wherever a launcher is installed. The application
+cannot update itself — it is the process holding its own DLLs — so the button starts the
+launcher in manual-install mode, closes the application, and the launcher waits for it to
+exit, downloads and applies the update behind the startup panel, then opens the new version.
+One click, and the version on screen afterwards is the new one. The button does not read the
+automatic-update switch and never writes it: installing once by hand leaves your preference
+exactly as it was. Where there is no launcher — a Linux installation, a plain macOS copy —
+the notice shows the install command instead, because there is nothing there to drive.
+
 On macOS the update swaps the whole bundle. A bundle's signature covers every file inside
 it, so a file-by-file update would break the signature and the application would refuse to
 open. The new bundle is built beside the installed one while you work, its signature is

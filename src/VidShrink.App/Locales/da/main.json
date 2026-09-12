@@ -29,6 +29,10 @@
   "main.update.available": "En ny version er tilgængelig",
 
   "main.action.copy": "Kopier",
+
+
+  "main.action.install": "Installer",
+
   "main.action.browse": "Gennemse",
   "main.action.cancel": "Annuller",
   "main.action.cancel.disabled-tip": "Der kører endnu ingen opgave",

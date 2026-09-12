@@ -44,10 +44,14 @@ internal static class Updater
     /// <summary>İki başlatıcı aynı sahneye yazmasın; ikincisi hiç başlamaz.</summary>
     private const string MutexName = @"Global\Teknesyum.VidShrink.Update";
 
-    public static bool Run(string baseDirectory, string appDirectory)
+    /// <param name="force">
+    /// Kullanıcı "Yükle" düğmesine bastı: kendiliğinden güncelleme ayarı okunmaz. Ayar yine
+    /// yazılmaz, yani elle bir kez yüklemek tercihi değiştirmez.
+    /// </param>
+    public static bool Run(string baseDirectory, string appDirectory, bool force = false)
     {
         // Ayar kapalıyken manifest bile çekilmez: kapatan kullanıcı ağ turunu da istemiyor.
-        if (!UpdateCheck.AutoUpdateEnabled()) return false;
+        if (!force && !UpdateCheck.AutoUpdateEnabled()) return false;
         if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return false;
 
         using var only = new Mutex(initiallyOwned: false, MutexName);

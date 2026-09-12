@@ -29,6 +29,10 @@
   "main.update.available": "有新版本可用",
 
   "main.action.copy": "复制",
+
+
+  "main.action.install": "安装",
+
   "main.action.browse": "浏览",
   "main.action.cancel": "取消",
   "main.action.cancel.disabled-tip": "目前没有正在运行的任务",

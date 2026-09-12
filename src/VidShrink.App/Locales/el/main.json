@@ -29,6 +29,10 @@
   "main.update.available": "Διατίθεται νέα έκδοση",
 
   "main.action.copy": "Αντιγραφή",
+
+
+  "main.action.install": "Εγκατάσταση",
+
   "main.action.browse": "Αναζήτηση",
   "main.action.cancel": "Ακύρωση",
   "main.action.cancel.disabled-tip": "Δεν εκτελείται ακόμη καμία εργασία",

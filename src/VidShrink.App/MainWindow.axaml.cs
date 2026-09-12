@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -1853,9 +1853,45 @@ public partial class MainWindow : Window
         {
             _noticeVersion = version;
             TxtNoticeVersion.Text = version;
-            TxtNoticeCommand.Text = UpdateCheck.UpdateInstruction();
+
+            // Başlatıcısı olan kurulumda kullanıcıdan komut kopyalaması istenmez: düğme
+            // güncellemeyi kendi senkronumuzla yükler. Başlatıcısız kurulumda (Linux, düz
+            // macOS kopyası) yükleyecek bir şey yok, orada komut yazılır.
+            var launcher = LauncherUpdate.LocateLauncher(AppContext.BaseDirectory);
+            BtnNoticeInstall.IsVisible = launcher is not null;
+            BtnNoticeCopy.IsVisible = launcher is null;
+            TxtNoticeCommand.IsVisible = launcher is null;
+            TxtNoticeCommand.Text = launcher is null ? UpdateCheck.UpdateInstruction() : "";
+
             UpdateNotice.IsVisible = true;
         });
+    }
+
+    /// <summary>
+    /// Yükle düğmesi. Güncellemeyi uygulama yapamaz: kendi dll'lerini tutan süreç odur. Bu
+    /// yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır, başlatıcı çıkışı
+    /// bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar. Kendiliğinden
+    /// güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi değiştirmez.
+    /// </summary>
+    private void OnInstallUpdate(object? sender, RoutedEventArgs e)
+    {
+        var launcher = LauncherUpdate.LocateLauncher(AppContext.BaseDirectory);
+        if (launcher is null) return;
+
+        try
+        {
+            var start = new ProcessStartInfo { FileName = launcher, UseShellExecute = false };
+            start.ArgumentList.Add(LauncherUpdate.UpdateNowArgument);
+            start.ArgumentList.Add(Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
+            Process.Start(start);
+        }
+        catch (Exception exception)
+        {
+            TxtSystemStatus.Text = $"{Say("main.error.setting")}: {exception.Message}";
+            return;
+        }
+
+        Close();
     }
 
     private async void OnCopyUpdateCommand(object? sender, RoutedEventArgs e)

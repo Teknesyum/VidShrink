@@ -29,6 +29,10 @@
   "main.update.available": "새 버전이 있습니다",
 
   "main.action.copy": "복사",
+
+
+  "main.action.install": "설치",
+
   "main.action.browse": "찾아보기",
   "main.action.cancel": "취소",
   "main.action.cancel.disabled-tip": "아직 실행 중인 작업이 없습니다",

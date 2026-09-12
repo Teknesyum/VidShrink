@@ -36,6 +36,15 @@ internal static class Program
         if (args.Length > 0 && args[0] == LauncherUpdate.CommitArgument)
             return LauncherUpdate.Commit(baseDirectory, ParentProcessId(args)) ? 0 : 3;
 
+        // Elle yükleme kipi: düğmeye basan uygulama kendini kapatıyor, dosyalarını bırakması
+        // beklenir. Argüman uygulamaya geçirilmez.
+        var updateNow = args.Length > 0 && args[0] == LauncherUpdate.UpdateNowArgument;
+        if (updateNow)
+        {
+            WaitForExit(ParentProcessId(args));
+            args = Array.Empty<string>();
+        }
+
         if (!File.Exists(executable))
         {
             Alert($"VidShrink uygulaması bulunamadı:{Environment.NewLine}{executable}{Environment.NewLine}{Environment.NewLine}" +
@@ -64,6 +73,15 @@ internal static class Program
             // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
             try { UpdateStage.ResumePending(appDirectory); }
             catch (Exception) { }
+
+            // Elle yüklemede indirme panelin içinde, açılıştan önce koşar: kullanıcı düğmeye
+            // bastığı turda yeni sürümü görmeli. Kendiliğinden güncellemede tersi geçerli,
+            // aşağıda; ayara da dokunulmaz.
+            if (updateNow)
+            {
+                try { pendingSwap |= Updater.Run(baseDirectory, appDirectory, force: true); }
+                catch (Exception) { }
+            }
         }
 
         try { RecordAppliedUpdate(appDirectory, previousVersion); }
@@ -93,8 +111,11 @@ internal static class Program
         // hızına göre açılışı dakikalarca geciktirebilir. İnen sahne bir sonraki açılışta
         // milisaniyelerde yerine geçer (yukarıdaki ResumePending). Ağ yok, manifest bozuk,
         // disk dolu: hepsinde sessizce vazgeçilir, yarım sahne silinmez.
-        try { pendingSwap |= Updater.Run(baseDirectory, appDirectory); }
-        catch (Exception) { }
+        if (!updateNow)
+        {
+            try { pendingSwap |= Updater.Run(baseDirectory, appDirectory); }
+            catch (Exception) { }
+        }
 
         // Geçiş en sonda kurulur, çünkü bu sürecin çıkmasını bekliyor.
         if (pendingSwap)
@@ -126,6 +147,24 @@ internal static class Program
         start.ArgumentList.Add(LauncherUpdate.CommitArgument);
         start.ArgumentList.Add(Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
         Process.Start(start);
+    }
+
+    /// <summary>
+    /// Düğmeye basan uygulamanın çıkmasını bekler; yüklü dll'ler serbest kalmadan güncelleme
+    /// uygulanamaz. Süre dolarsa yine sürülür: kilitli dosya zaten sahnede bekler ve bir
+    /// sonraki açılışta yerine geçer.
+    /// </summary>
+    private static void WaitForExit(int? processId)
+    {
+        if (processId is null) return;
+        try
+        {
+            using var caller = Process.GetProcessById(processId.Value);
+            caller.WaitForExit((int)LauncherUpdate.CommitWindow.TotalMilliseconds);
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        {
+        }
     }
 
     private static int? ParentProcessId(string[] args) =>

@@ -29,6 +29,10 @@
   "main.update.available": "Toleo jipya linapatikana",
 
   "main.action.copy": "Nakili",
+
+
+  "main.action.install": "Sakinisha",
+
   "main.action.browse": "Vinjari",
   "main.action.cancel": "Ghairi",
   "main.action.cancel.disabled-tip": "Hakuna kazi inayoendelea bado",

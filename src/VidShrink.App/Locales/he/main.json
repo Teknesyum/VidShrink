@@ -29,6 +29,10 @@
   "main.update.available": "גרסה חדשה זמינה",
 
   "main.action.copy": "העתק",
+
+
+  "main.action.install": "התקן",
+
   "main.action.browse": "עיון",
   "main.action.cancel": "ביטול",
   "main.action.cancel.disabled-tip": "אין עדיין עבודה פעילה",

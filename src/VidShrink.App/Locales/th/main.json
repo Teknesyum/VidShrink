@@ -29,6 +29,10 @@
   "main.update.available": "มีเวอร์ชันใหม่",
 
   "main.action.copy": "คัดลอก",
+
+
+  "main.action.install": "ติดตั้ง",
+
   "main.action.browse": "เรียกดู",
   "main.action.cancel": "ยกเลิก",
   "main.action.cancel.disabled-tip": "ยังไม่มีงานที่กำลังทำงานอยู่",

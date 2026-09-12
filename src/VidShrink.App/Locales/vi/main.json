@@ -29,6 +29,10 @@
   "main.update.available": "Có phiên bản mới",
 
   "main.action.copy": "Sao chép",
+
+
+  "main.action.install": "Cài đặt",
+
   "main.action.browse": "Duyệt",
   "main.action.cancel": "Hủy",
   "main.action.cancel.disabled-tip": "Chưa có tác vụ nào đang chạy",

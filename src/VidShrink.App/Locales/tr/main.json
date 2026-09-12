@@ -29,6 +29,10 @@
   "main.update.available": "Yeni bir sürüm var",
 
   "main.action.copy": "Kopyala",
+
+
+  "main.action.install": "Yükle",
+
   "main.action.browse": "Gözat",
   "main.action.cancel": "İptal",
   "main.action.cancel.disabled-tip": "Şu an çalışan bir iş yok",

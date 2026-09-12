@@ -29,6 +29,10 @@
   "main.update.available": "Este disponibilă o versiune nouă",
 
   "main.action.copy": "Copiază",
+
+
+  "main.action.install": "Instalează",
+
   "main.action.browse": "Răsfoiește",
   "main.action.cancel": "Anulează",
   "main.action.cancel.disabled-tip": "Încă nu rulează nicio sarcină",

@@ -29,6 +29,10 @@
   "main.update.available": "Доступна нова версія",
 
   "main.action.copy": "Копіювати",
+
+
+  "main.action.install": "Встановити",
+
   "main.action.browse": "Огляд",
   "main.action.cancel": "Скасувати",
   "main.action.cancel.disabled-tip": "Поки що жодне завдання не виконується",

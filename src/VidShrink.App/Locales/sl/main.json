@@ -29,6 +29,10 @@
   "main.update.available": "Na voljo je nova različica",
 
   "main.action.copy": "Kopiraj",
+
+
+  "main.action.install": "Namesti",
+
   "main.action.browse": "Prebrskaj",
   "main.action.cancel": "Prekliči",
   "main.action.cancel.disabled-tip": "Noben opravilo še ne teče",

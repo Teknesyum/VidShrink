@@ -421,6 +421,15 @@ ayarlarınızın yanında durur; bu yüzden yeniden kurmak onu sıfırlamaz. Kap
 ötekiler gibi davranır: uygulama açılışta bir kez yeni sürüm var mı diye sorar ve size
 söyler.
 
+Başlatıcısı olan her kurulumda o uyarı bir **Yükle** düğmesi taşır. Uygulama kendini
+güncelleyemez — kendi dll'lerini tutan süreç odur — bu yüzden düğme başlatıcıyı elle yükleme
+kipinde açar ve uygulamayı kapatır; başlatıcı onun çıkışını bekler, güncellemeyi açılış
+panelinin arkasında indirip uygular ve yeni sürümü açar. Tek tık, sonrasında ekrandaki sürüm
+yeni olandır. Düğme kendiliğinden güncelleme anahtarını okumaz ve hiç yazmaz: elle bir kez
+yüklemek tercihinizi olduğu gibi bırakır. Başlatıcı olmayan yerde — Linux kurulumu, düz bir
+macOS kopyası — uyarı onun yerine kurulum komutunu gösterir, çünkü orada sürülecek bir şey
+yok.
+
 macOS'ta güncelleme paketin tamamını takas eder. Bir paketin imzası içindeki her dosyayı
 kapsar; dosya dosya güncelleme imzayı bozar ve uygulama açılmayı reddeder. Yeni paket siz
 çalışırken kurulu olanın yanında kurulur, imzası herhangi bir şey yer değiştirmeden *önce*

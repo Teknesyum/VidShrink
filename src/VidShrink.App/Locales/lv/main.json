@@ -29,6 +29,10 @@
   "main.update.available": "Pieejama jauna versija",
 
   "main.action.copy": "Kopēt",
+
+
+  "main.action.install": "Instalēt",
+
   "main.action.browse": "Pārlūkot",
   "main.action.cancel": "Atcelt",
   "main.action.cancel.disabled-tip": "Pagaidām nenotiek neviens uzdevums",

@@ -5,6 +5,20 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.4.4] - 2026-09-12
+
+### Added
+
+- **An Install button in the new-version notice.** The notice used to hand out a PowerShell
+  one-liner and ask the user to run it. Wherever a launcher is installed it now shows a
+  button instead: the application starts `VidShrink.exe --update-now <pid>` and closes, the
+  launcher waits for that process to exit, downloads and applies the update behind the
+  startup panel, and opens the new version. The version on screen after the click is the new
+  one. The button neither reads nor writes the automatic-update switch, so installing once by
+  hand does not change the preference. Where `LauncherUpdate.LocateLauncher` finds no
+  launcher — a Linux installation, a plain macOS copy — the command is still shown, because
+  there is nothing there to drive. `main.action.install` is translated in all 42 languages.
+
 ## [0.4.3] - 2026-09-12
 
 An installation that could not reach a newer release now does. 0.4.1 shipped a self-update

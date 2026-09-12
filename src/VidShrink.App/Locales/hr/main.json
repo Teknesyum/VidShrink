@@ -29,6 +29,10 @@
   "main.update.available": "Dostupna je nova verzija",
 
   "main.action.copy": "Kopiraj",
+
+
+  "main.action.install": "Instaliraj",
+
   "main.action.browse": "Pregledaj",
   "main.action.cancel": "Odustani",
   "main.action.cancel.disabled-tip": "Još nijedan zadatak nije u tijeku",

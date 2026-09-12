@@ -29,6 +29,10 @@
   "main.update.available": "يتوفر إصدار جديد",
 
   "main.action.copy": "نسخ",
+
+
+  "main.action.install": "تثبيت",
+
   "main.action.browse": "استعراض",
   "main.action.cancel": "إلغاء",
   "main.action.cancel.disabled-tip": "لا توجد مهمة قيد التشغيل بعد",

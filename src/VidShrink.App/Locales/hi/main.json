@@ -29,6 +29,10 @@
   "main.update.available": "नया संस्करण उपलब्ध है",
 
   "main.action.copy": "कॉपी",
+
+
+  "main.action.install": "इंस्टॉल करें",
+
   "main.action.browse": "ब्राउज़",
   "main.action.cancel": "रद्द करें",
   "main.action.cancel.disabled-tip": "अभी कोई काम नहीं चल रहा",

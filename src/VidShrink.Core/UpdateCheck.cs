@@ -844,7 +844,27 @@ public static class LauncherUpdate
     /// </summary>
     public const string CommitArgument = "--commit-launcher";
 
+    /// <summary>
+    /// Kullanıcının "Yükle" düğmesiyle istediği kip. Bu argümanla açılan başlatıcı, kendisini
+    /// çağıran uygulamanın çıkmasını bekler, kendiliğinden güncelleme ayarına bakmadan
+    /// güncellemeyi açılış panelinin içinde uygular ve uygulamayı yeni sürümle açar. Ayar
+    /// okunmaz, yazılmaz: elle bir kez yüklemek kullanıcının tercihini değiştirmez.
+    /// </summary>
+    public const string UpdateNowArgument = "--update-now";
+
     public const string JournalName = ".launcher-pending.json";
+
+    /// <summary>
+    /// Uygulamanın <c>app</c> klasöründen kurulum kökündeki başlatıcıya yol. Başlatıcısı
+    /// olmayan kurulumda (macOS paketi, Linux) null döner; orada yükleme düğmesi çizilmez.
+    /// </summary>
+    public static string? LocateLauncher(string appDirectory)
+    {
+        var parent = Path.GetDirectoryName(appDirectory.TrimEnd(Path.DirectorySeparatorChar));
+        if (string.IsNullOrEmpty(parent)) return null;
+        var launcher = Path.Combine(parent, ExecutableName);
+        return File.Exists(launcher) ? launcher : null;
+    }
 
     /// <summary>Kurulu başlatıcının sürümü; uygulamanınki app klasöründe ayrı durur.</summary>
     public const string VersionMarkerName = ".launcher-version";

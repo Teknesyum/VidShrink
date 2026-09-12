@@ -29,6 +29,10 @@
   "main.update.available": "Saadaval on uus versioon",
 
   "main.action.copy": "Kopeeri",
+
+
+  "main.action.install": "Paigalda",
+
   "main.action.browse": "Sirvi",
   "main.action.cancel": "Loobu",
   "main.action.cancel.disabled-tip": "Ükski töö ei ole veel käimas",

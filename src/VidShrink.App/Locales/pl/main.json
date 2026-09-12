@@ -29,6 +29,10 @@
   "main.update.available": "Dostępna jest nowa wersja",
 
   "main.action.copy": "Kopiuj",
+
+
+  "main.action.install": "Zainstaluj",
+
   "main.action.browse": "Przeglądaj",
   "main.action.cancel": "Anuluj",
   "main.action.cancel.disabled-tip": "Żadne zadanie jeszcze nie trwa",

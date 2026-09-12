@@ -29,6 +29,10 @@
   "main.update.available": "En ny version finns tillgänglig",
 
   "main.action.copy": "Kopiera",
+
+
+  "main.action.install": "Installera",
+
   "main.action.browse": "Bläddra",
   "main.action.cancel": "Avbryt",
   "main.action.cancel.disabled-tip": "Inget jobb körs ännu",

@@ -295,6 +295,38 @@ public sealed class UpdaterTests : IDisposable
         Assert.Equal(OperatingSystem.IsWindows(), UpdateCheck.AutoUpdateEnabled(on));
     }
 
+    /// <summary>
+    /// Yükle düğmesi yalnız başlatıcısı olan kurulumda çizilir. Yolu uygulamanın kendi
+    /// klasöründen bir üste çıkarak arar; orada dosya yoksa null döner ve arayüz kurulum
+    /// komutunu yazar.
+    /// </summary>
+    [Fact]
+    public void TheInstallButtonOnlyAppearsWhereALauncherIsInstalled()
+    {
+        var installation = Folder("kurulum");
+        var app = Path.Combine(installation, "app");
+        Directory.CreateDirectory(app);
+
+        Assert.Null(LauncherUpdate.LocateLauncher(app));
+
+        var launcher = Path.Combine(installation, LauncherUpdate.ExecutableName);
+        File.WriteAllText(launcher, "başlatıcı");
+
+        Assert.Equal(launcher, LauncherUpdate.LocateLauncher(app));
+        Assert.Equal(launcher, LauncherUpdate.LocateLauncher(app + Path.DirectorySeparatorChar));
+    }
+
+    /// <summary>
+    /// Elle yükleme ayarı okumaz: kipin argümanı geçiş kipinin argümanıyla karışmamalı,
+    /// yoksa başlatıcı uygulamayı hiç açmayan kola sapar.
+    /// </summary>
+    [Fact]
+    public void TheManualInstallModeHasItsOwnArgument()
+    {
+        Assert.NotEqual(LauncherUpdate.CommitArgument, LauncherUpdate.UpdateNowArgument);
+        Assert.StartsWith("--", LauncherUpdate.UpdateNowArgument, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task AnUnreachableSourceIsGivenUpWithinTheManifestTimeout()
     {

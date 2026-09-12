@@ -29,6 +29,10 @@
   "main.update.available": "Yra nauja versija",
 
   "main.action.copy": "Kopijuoti",
+
+
+  "main.action.install": "Įdiegti",
+
   "main.action.browse": "Naršyti",
   "main.action.cancel": "Atšaukti",
   "main.action.cancel.disabled-tip": "Kol kas nevykdoma jokia užduotis",

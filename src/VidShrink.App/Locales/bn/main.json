@@ -29,6 +29,10 @@
   "main.update.available": "নতুন সংস্করণ পাওয়া যাচ্ছে",
 
   "main.action.copy": "কপি",
+
+
+  "main.action.install": "ইনস্টল করুন",
+
   "main.action.browse": "ব্রাউজ",
   "main.action.cancel": "বাতিল",
   "main.action.cancel.disabled-tip": "এখনও কোনো কাজ চলছে না",

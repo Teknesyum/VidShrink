@@ -29,6 +29,10 @@
   "main.update.available": "Je dostupná nová verzia",
 
   "main.action.copy": "Kopírovať",
+
+
+  "main.action.install": "Nainštalovať",
+
   "main.action.browse": "Prehľadávať",
   "main.action.cancel": "Zrušiť",
   "main.action.cancel.disabled-tip": "Zatiaľ nebeží žiadna úloha",

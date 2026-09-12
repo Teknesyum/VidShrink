@@ -29,6 +29,10 @@
   "main.update.available": "Налична е нова версия",
 
   "main.action.copy": "Копирай",
+
+
+  "main.action.install": "Инсталирай",
+
   "main.action.browse": "Избери",
   "main.action.cancel": "Отказ",
   "main.action.cancel.disabled-tip": "Все още няма изпълняваща се задача",

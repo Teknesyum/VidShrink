@@ -29,6 +29,10 @@
   "main.update.available": "Er is een nieuwe versie beschikbaar",
 
   "main.action.copy": "Kopiëren",
+
+
+  "main.action.install": "Installeren",
+
   "main.action.browse": "Bladeren",
   "main.action.cancel": "Annuleren",
   "main.action.cancel.disabled-tip": "Er loopt nog geen taak",

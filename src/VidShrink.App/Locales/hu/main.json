@@ -29,6 +29,10 @@
   "main.update.available": "Új verzió érhető el",
 
   "main.action.copy": "Másolás",
+
+
+  "main.action.install": "Telepítés",
+
   "main.action.browse": "Tallózás",
   "main.action.cancel": "Mégse",
   "main.action.cancel.disabled-tip": "Még nem fut feladat",
