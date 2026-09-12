@@ -33,6 +33,7 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   hızı kolu (`-b:v` varken `-crf` yok, satıcının hız kontrolü motordan), `-pix_fmt`/`-colorspace`/`-color_range`,
   `-t` ve bölme ölçütünün argümana girmemesi, ayrı ses izleri (`-c:a:N`), ses filtreleri (karışımdan önce girdi
   başına), tek kare `BuildSnapshot`, çoklu monitörün ofsetli bölgeye çevrilmesi. Her kolun negatif kontrolü var;
-  ölçüler üretilen argüman dizisini okur. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
+  44 ölçünün 24'ü üretilen argüman dizisini okur, 20'si doğrulama hata listesini ya da
+  kapalı küme dönüşlerini. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
