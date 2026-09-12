@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace VidShrink.Core;
 
 /// <summary>
@@ -35,6 +37,50 @@ public sealed record AudioCaptureSelection(
     AudioCaptureDevice? SystemAudio = null)
 {
     public int Count => (Microphone is null ? 0 : 1) + (SystemAudio is null ? 0 : 1);
+}
+
+/// <summary>
+/// Iki girdi secildiginde ciktinin kac ses izi tasiyacagi. Mimari degismiyor: iki kol da
+/// ayni <see cref="AudioCapturePlan.Maps"/> listesini dolduruyor, yalniz uzunlugu ve
+/// grafigi ayrisiyor.
+/// </summary>
+public enum AudioTrackLayout
+{
+    /// <summary><c>amix</c> ile tek ize karistirma; oynaticilarin hepsi tek izi calar.</summary>
+    MixedSingleTrack,
+
+    /// <summary>
+    /// Her girdi kendi izine gider (<c>-map</c> basina bir iz). Kurguda mikrofon ve sistem
+    /// sesi ayri ayri sessize alinabiliyor; karsiliginda oynaticilarin bir kismi yalniz ilk
+    /// izi caliyor.
+    /// </summary>
+    SeparateTracks
+}
+
+/// <summary>
+/// Girdi basina uygulanan ses filtreleri. Hepsi <c>-filter_complex</c> zincirine giriyor;
+/// hicbiri secilmediginde grafik kurulmuyor ve arguman bugunku haliyle kaliyor.
+/// </summary>
+/// <param name="GainDb">
+/// <c>volume</c> kazanci, desibel. Sifir halkayi hic kurmaz.
+/// </param>
+/// <param name="NoiseGate">
+/// <c>agate</c>: esigin altindaki sessizlik kisiliyor. Klavye ve fan sesini kesiyor,
+/// esigin yakinindaki konusmayi da kesebiliyor.
+/// </param>
+/// <param name="NoiseSuppression">
+/// <c>afftdn</c>: genis bantli gurultuyu frekans alaninda bastiriyor.
+/// </param>
+public sealed record AudioFilterOptions(
+    double GainDb = 0,
+    bool NoiseGate = false,
+    bool NoiseSuppression = false)
+{
+    /// <summary>Hicbir filtre kurulmayan hal.</summary>
+    public static AudioFilterOptions None { get; } = new();
+
+    /// <summary>En az bir halka kuruluyor mu.</summary>
+    public bool IsSet => GainDb != 0 || NoiseGate || NoiseSuppression;
 }
 
 /// <summary>
@@ -78,6 +124,21 @@ public static class AudioCaptureArguments
     /// <summary><see cref="MixFilterName"/> cikisinin etiketi.</summary>
     public const string MixOutputLabel = "aout";
 
+    /// <summary>Kazanc halkasinin filtre adi.</summary>
+    public const string GainFilterName = "volume";
+
+    /// <summary>Gurultu kapisinin filtre adi.</summary>
+    public const string NoiseGateFilterName = "agate";
+
+    /// <summary>Gurultu bastirmanin filtre adi.</summary>
+    public const string NoiseSuppressionFilterName = "afftdn";
+
+    /// <summary>Kabul edilen en dusuk kazanc, desibel.</summary>
+    public const double MinGainDb = -60;
+
+    /// <summary>Kabul edilen en yuksek kazanc, desibel.</summary>
+    public const double MaxGainDb = 30;
+
     /// <summary>
     /// Secimi argumana cevirir. <paramref name="listed"/> o an listelenmis cihazlardir;
     /// secilen her cihaz bu kumede adiyla <b>ve</b> roluyle bulunmak zorundadir.
@@ -88,11 +149,33 @@ public static class AudioCaptureArguments
         AudioCaptureSelection selection,
         IReadOnlyCollection<AudioCaptureDevice> listed,
         int firstInputIndex)
+        => Build(selection, listed, firstInputIndex, AudioTrackLayout.MixedSingleTrack, null);
+
+    /// <summary>
+    /// Secimi argumana cevirir; iz duzenini ve filtreleri de okur.
+    /// <para>
+    /// Filtre secilmediginde ve duzen <see cref="AudioTrackLayout.MixedSingleTrack"/>
+    /// oldugunda uretilen plan uc argumanli asiri yuklemeninkiyle birebir ayni kaliyor:
+    /// tek girdide grafik kurulmuyor, iki girdide yalniz <c>amix</c> var.
+    /// </para>
+    /// </summary>
+    public static AudioCapturePlan Build(
+        AudioCaptureSelection selection,
+        IReadOnlyCollection<AudioCaptureDevice> listed,
+        int firstInputIndex,
+        AudioTrackLayout layout,
+        AudioFilterOptions? filters)
     {
         ArgumentNullException.ThrowIfNull(selection);
         ArgumentNullException.ThrowIfNull(listed);
         if (firstInputIndex < 0)
             throw new ArgumentOutOfRangeException(nameof(firstInputIndex), firstInputIndex, "girdi sirasi negatif olamaz.");
+
+        var options = filters ?? AudioFilterOptions.None;
+        if (options.GainDb < MinGainDb || options.GainDb > MaxGainDb)
+            throw new ArgumentOutOfRangeException(
+                nameof(filters), options.GainDb,
+                $"kazanc {MinGainDb} ile {MaxGainDb} dB arasinda olmali; arguman uretilmedi.");
 
         var chosen = new List<AudioCaptureDevice>(2);
         if (selection.Microphone is { } microphone)
@@ -105,14 +188,78 @@ public static class AudioCaptureArguments
         var inputs = new List<string>();
         foreach (var device in chosen) inputs.AddRange(InputArguments(device));
 
-        if (chosen.Count == 1)
+        var chain = FilterChain(options);
+        var separate = layout switch
+        {
+            AudioTrackLayout.MixedSingleTrack => false,
+            AudioTrackLayout.SeparateTracks => chosen.Count > 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(layout), layout, "tanimsiz ses izi duzeni; arguman uretilmedi.")
+        };
+
+        if (chain is null && !separate && chosen.Count == 1)
             return new AudioCapturePlan(inputs, null, new[] { $"{firstInputIndex}:a" }, 1);
 
-        var labels = string.Concat(Enumerable
-            .Range(firstInputIndex, chosen.Count)
-            .Select(i => $"[{i}:a]"));
-        var filter = $"{labels}{MixFilterName}=inputs={chosen.Count}:duration=longest:dropout_transition=0[{MixOutputLabel}]";
-        return new AudioCapturePlan(inputs, filter, new[] { $"[{MixOutputLabel}]" }, chosen.Count);
+        if (chain is null && separate)
+            return new AudioCapturePlan(
+                inputs,
+                null,
+                Enumerable.Range(firstInputIndex, chosen.Count).Select(i => $"{i}:a").ToArray(),
+                chosen.Count);
+
+        if (chain is null)
+        {
+            var labels = string.Concat(Enumerable
+                .Range(firstInputIndex, chosen.Count)
+                .Select(i => $"[{i}:a]"));
+            var mix = $"{labels}{MixFilterName}=inputs={chosen.Count}:duration=longest:dropout_transition=0[{MixOutputLabel}]";
+            return new AudioCapturePlan(inputs, mix, new[] { $"[{MixOutputLabel}]" }, chosen.Count);
+        }
+
+        if (separate)
+        {
+            var branches = Enumerable
+                .Range(0, chosen.Count)
+                .Select(track => $"[{firstInputIndex + track}:a]{chain}[{MixOutputLabel}{track}]");
+            return new AudioCapturePlan(
+                inputs,
+                string.Join(';', branches),
+                Enumerable.Range(0, chosen.Count).Select(track => $"[{MixOutputLabel}{track}]").ToArray(),
+                chosen.Count);
+        }
+
+        if (chosen.Count == 1)
+            return new AudioCapturePlan(
+                inputs,
+                $"[{firstInputIndex}:a]{chain}[{MixOutputLabel}]",
+                new[] { $"[{MixOutputLabel}]" },
+                1);
+
+        var filtered = Enumerable
+            .Range(0, chosen.Count)
+            .Select(track => $"[{firstInputIndex + track}:a]{chain}[{MixFilterName}{track}]");
+        var mixInputs = string.Concat(Enumerable.Range(0, chosen.Count).Select(track => $"[{MixFilterName}{track}]"));
+        var graph = string.Join(';', filtered)
+                    + $";{mixInputs}{MixFilterName}=inputs={chosen.Count}:duration=longest:dropout_transition=0[{MixOutputLabel}]";
+        return new AudioCapturePlan(inputs, graph, new[] { $"[{MixOutputLabel}]" }, chosen.Count);
+    }
+
+    /// <summary>
+    /// Girdi basina kurulan filtre zinciri; hicbir secim yoksa <c>null</c> ve grafik hic
+    /// kurulmuyor. Sira sabit: once kazanc, sonra kapi, sonra bastirma — kapiya kazanci
+    /// uygulanmis isaret giriyor, yoksa esik kullanicinin duydugu seviyeye gore degil ham
+    /// seviyeye gore calisiyor.
+    /// </summary>
+    public static string? FilterChain(AudioFilterOptions? filters)
+    {
+        var options = filters ?? AudioFilterOptions.None;
+        if (!options.IsSet) return null;
+
+        var links = new List<string>(3);
+        if (options.GainDb != 0)
+            links.Add($"{GainFilterName}={options.GainDb.ToString("0.##", CultureInfo.InvariantCulture)}dB");
+        if (options.NoiseGate) links.Add(NoiseGateFilterName);
+        if (options.NoiseSuppression) links.Add(NoiseSuppressionFilterName);
+        return links.Count == 0 ? null : string.Join(',', links);
     }
 
     /// <summary>
@@ -126,14 +273,35 @@ public static class AudioCaptureArguments
         int firstInputIndex,
         out AudioCapturePlan plan,
         out string? reason)
+        => TryBuild(selection, listed, firstInputIndex, AudioTrackLayout.MixedSingleTrack, null, out plan, out reason);
+
+    /// <summary>
+    /// <see cref="Build(AudioCaptureSelection, IReadOnlyCollection{AudioCaptureDevice}, int, AudioTrackLayout, AudioFilterOptions)"/>in
+    /// atmayan hali. Kabul edilemez kazanc da sessizce kirpilmiyor, sebebiyle geri
+    /// donuyor.
+    /// </summary>
+    public static bool TryBuild(
+        AudioCaptureSelection selection,
+        IReadOnlyCollection<AudioCaptureDevice> listed,
+        int firstInputIndex,
+        AudioTrackLayout layout,
+        AudioFilterOptions? filters,
+        out AudioCapturePlan plan,
+        out string? reason)
     {
         try
         {
-            plan = Build(selection, listed, firstInputIndex);
+            plan = Build(selection, listed, firstInputIndex, layout, filters);
             reason = null;
             return true;
         }
         catch (UnknownCaptureDeviceException ex)
+        {
+            plan = AudioCapturePlan.Silent;
+            reason = ex.Message;
+            return false;
+        }
+        catch (ArgumentOutOfRangeException ex)
         {
             plan = AudioCapturePlan.Silent;
             reason = ex.Message;

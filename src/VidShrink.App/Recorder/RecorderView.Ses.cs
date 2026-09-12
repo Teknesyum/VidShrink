@@ -80,7 +80,8 @@ internal partial class RecorderView
         if (selection.Count == 0) return AudioCapturePlan.Silent;
 
         if (AudioCaptureArguments.TryBuild(
-                selection, _devices, RecorderArguments.AudioFirstInputIndex, out var plan, out var reason))
+                selection, _devices, RecorderArguments.AudioFirstInputIndex,
+                _settings.AudioLayout, _settings.AudioFilters, out var plan, out var reason))
             return plan;
 
         ShowError(Say("recorder.error.audio", reason ?? string.Empty));

@@ -59,6 +59,98 @@ internal sealed class RecorderSettings
     /// <summary>Seçilen sistem sesi cihazının adı.</summary>
     internal string? SystemAudioName { get; set; }
 
+    /// <summary>Kaydın yazıldığı kap; çıktı uzantısı bundan geliyor.</summary>
+    internal RecorderContainer Container { get; set; } = RecorderContainer.Mp4;
+
+    /// <summary>
+    /// Seçilen monitörün indeksi. Windows'ta sıfırdan farklı indeks monitör sınırlarından
+    /// bölge ofsetine çevriliyor; sınırlar okunamazsa motor seçimi reddediyor.
+    /// </summary>
+    internal int ScreenIndex { get; set; }
+
+    /// <summary>Çıktı ölçeklemesinin genişliği; sıfır ölçekleme yok demek.</summary>
+    internal int ScaleWidth { get; set; }
+
+    /// <summary>Çıktı ölçeklemesinin yüksekliği; sıfır ölçekleme yok demek.</summary>
+    internal int ScaleHeight { get; set; }
+
+    /// <summary>Anahtar kare aralığı, saniye.</summary>
+    internal int KeyframeSeconds { get; set; } = RecorderArguments.DefaultKeyframeSeconds;
+
+    /// <summary>Kodlayıcı profili; boş bırakılırsa <c>-profile:v</c> yazılmıyor.</summary>
+    internal string? Profile { get; set; }
+
+    /// <summary>Kodlayıcı ayarı; boş bırakılırsa <c>-tune</c> yazılmıyor.</summary>
+    internal string? Tune { get; set; }
+
+    /// <summary>Hangi hız kontrolü kolunun koşacağı.</summary>
+    internal RecorderRateControl RateControl { get; set; } = RecorderRateControl.Quality;
+
+    /// <summary>Hedef görüntü bit hızı, kbit/s. Sıfır "verilmedi" demek.</summary>
+    internal int BitrateKbps { get; set; }
+
+    /// <summary>Tavan bit hızı, kbit/s. Sıfır "verilmedi" demek.</summary>
+    internal int MaxBitrateKbps { get; set; }
+
+    /// <summary>Tampon boyu, kbit. Sıfır "verilmedi" demek.</summary>
+    internal int BufferKbits { get; set; }
+
+    /// <summary>Piksel biçimi.</summary>
+    internal string PixelFormat { get; set; } = RecorderArguments.DefaultPixelFormat;
+
+    /// <summary>Renk uzayı; boş bırakılırsa yazılmıyor.</summary>
+    internal string? ColorSpace { get; set; }
+
+    /// <summary>Renk aralığı; boş bırakılırsa yazılmıyor.</summary>
+    internal string? ColorRange { get; set; }
+
+    /// <summary>Kaydın kendiliğinden duracağı süre, saniye. Sıfır sınır yok demek.</summary>
+    internal double MaxDurationSeconds { get; set; }
+
+    /// <summary>Kendiliğinden bölme süresi, saniye. Sıfır ölçüt yok demek.</summary>
+    internal double SplitSeconds { get; set; }
+
+    /// <summary>Kendiliğinden bölme boyutu, MB. Sıfır ölçüt yok demek.</summary>
+    internal double SplitMegabytes { get; set; }
+
+    /// <summary>İki ses girdisi seçildiğinde tek ize karıştırılsın mı, ayrı izlere mi gitsin.</summary>
+    internal AudioTrackLayout AudioLayout { get; set; } = AudioTrackLayout.MixedSingleTrack;
+
+    /// <summary>Ses kazancı, desibel.</summary>
+    internal double AudioGainDb { get; set; }
+
+    /// <summary>Gürültü kapısı (<c>agate</c>) açık mı.</summary>
+    internal bool AudioNoiseGate { get; set; }
+
+    /// <summary>Gürültü bastırma (<c>afftdn</c>) açık mı.</summary>
+    internal bool AudioNoiseSuppression { get; set; }
+
+    /// <summary>
+    /// Kullanıcının seçtiği ses filtreleri. Hiçbiri açık değilse
+    /// <see cref="AudioFilterOptions.None"/> dönüyor ve grafik hiç kurulmuyor.
+    /// </summary>
+    internal AudioFilterOptions AudioFilters =>
+        new(AudioGainDb, AudioNoiseGate, AudioNoiseSuppression);
+
+    /// <summary>Ölçekleme seçilmişse boyut, seçilmemişse <c>null</c>.</summary>
+    internal RecorderScale? Scale =>
+        ScaleWidth > 0 && ScaleHeight > 0 ? new RecorderScale(ScaleWidth, ScaleHeight) : null;
+
+    /// <summary>Bölme ölçütü verilmişse ölçüt, verilmemişse <c>null</c>.</summary>
+    internal RecorderSplit? Split
+    {
+        get
+        {
+            var duration = SplitSeconds > 0 ? TimeSpan.FromSeconds(SplitSeconds) : (TimeSpan?)null;
+            var megabytes = SplitMegabytes > 0 ? SplitMegabytes : (double?)null;
+            return duration is null && megabytes is null ? null : new RecorderSplit(duration, megabytes);
+        }
+    }
+
+    /// <summary>Süre sınırı verilmişse süre, verilmemişse <c>null</c>.</summary>
+    internal TimeSpan? MaxDuration =>
+        MaxDurationSeconds > 0 ? TimeSpan.FromSeconds(MaxDurationSeconds) : null;
+
     /// <summary>
     /// Ayarların durduğu klasör. Kaydedici ana pencereye bağlanmadığı için yolu kendisi
     /// çözüyor; program başına tek yer.
@@ -96,6 +188,27 @@ internal sealed class RecorderSettings
             if ((int?)root["regionHeight"] is { } height && height > 0) settings.RegionHeight = height;
             settings.MicrophoneName = (string?)root["microphoneName"];
             settings.SystemAudioName = (string?)root["systemAudioName"];
+            if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container)) settings.Container = container;
+            settings.ScreenIndex = (int?)root["screenIndex"] ?? 0;
+            settings.ScaleWidth = (int?)root["scaleWidth"] ?? 0;
+            settings.ScaleHeight = (int?)root["scaleHeight"] ?? 0;
+            settings.KeyframeSeconds = (int?)root["keyframeSeconds"] ?? RecorderArguments.DefaultKeyframeSeconds;
+            settings.Profile = (string?)root["profile"];
+            settings.Tune = (string?)root["tune"];
+            if (Enum.TryParse<RecorderRateControl>((string?)root["rateControl"], true, out var rate)) settings.RateControl = rate;
+            settings.BitrateKbps = (int?)root["bitrateKbps"] ?? 0;
+            settings.MaxBitrateKbps = (int?)root["maxBitrateKbps"] ?? 0;
+            settings.BufferKbits = (int?)root["bufferKbits"] ?? 0;
+            if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = pixelFormat;
+            settings.ColorSpace = (string?)root["colorSpace"];
+            settings.ColorRange = (string?)root["colorRange"];
+            settings.MaxDurationSeconds = (double?)root["maxDurationSeconds"] ?? 0;
+            settings.SplitSeconds = (double?)root["splitSeconds"] ?? 0;
+            settings.SplitMegabytes = (double?)root["splitMegabytes"] ?? 0;
+            if (Enum.TryParse<AudioTrackLayout>((string?)root["audioLayout"], true, out var layout)) settings.AudioLayout = layout;
+            settings.AudioGainDb = (double?)root["audioGainDb"] ?? 0;
+            settings.AudioNoiseGate = (bool?)root["audioNoiseGate"] ?? false;
+            settings.AudioNoiseSuppression = (bool?)root["audioNoiseSuppression"] ?? false;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -135,6 +248,31 @@ internal sealed class RecorderSettings
                 else writer.WriteString("microphoneName", MicrophoneName);
                 if (SystemAudioName is null) writer.WriteNull("systemAudioName");
                 else writer.WriteString("systemAudioName", SystemAudioName);
+                writer.WriteString("container", Container.ToString());
+                writer.WriteNumber("screenIndex", ScreenIndex);
+                writer.WriteNumber("scaleWidth", ScaleWidth);
+                writer.WriteNumber("scaleHeight", ScaleHeight);
+                writer.WriteNumber("keyframeSeconds", KeyframeSeconds);
+                if (Profile is null) writer.WriteNull("profile");
+                else writer.WriteString("profile", Profile);
+                if (Tune is null) writer.WriteNull("tune");
+                else writer.WriteString("tune", Tune);
+                writer.WriteString("rateControl", RateControl.ToString());
+                writer.WriteNumber("bitrateKbps", BitrateKbps);
+                writer.WriteNumber("maxBitrateKbps", MaxBitrateKbps);
+                writer.WriteNumber("bufferKbits", BufferKbits);
+                writer.WriteString("pixelFormat", PixelFormat);
+                if (ColorSpace is null) writer.WriteNull("colorSpace");
+                else writer.WriteString("colorSpace", ColorSpace);
+                if (ColorRange is null) writer.WriteNull("colorRange");
+                else writer.WriteString("colorRange", ColorRange);
+                writer.WriteNumber("maxDurationSeconds", MaxDurationSeconds);
+                writer.WriteNumber("splitSeconds", SplitSeconds);
+                writer.WriteNumber("splitMegabytes", SplitMegabytes);
+                writer.WriteString("audioLayout", AudioLayout.ToString());
+                writer.WriteNumber("audioGainDb", AudioGainDb);
+                writer.WriteBoolean("audioNoiseGate", AudioNoiseGate);
+                writer.WriteBoolean("audioNoiseSuppression", AudioNoiseSuppression);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);
@@ -158,15 +296,32 @@ internal sealed class RecorderSettings
 
     /// <summary>
     /// Yeni kaydın dosya yolu. Ad zaman damgasından geliyor; aynı saniyede ikinci kayıt
-    /// başlarsa sona sayı ekleniyor, var olan dosyanın üstüne yazılmıyor.
+    /// başlarsa sona sayı ekleniyor, var olan dosyanın üstüne yazılmıyor. Uzantı
+    /// <see cref="Container"/>'dan okunuyor — motorun doğrulaması kapla uzantının
+    /// ayrışmasını reddediyor, o yüzden burada sabit bir uzantı yazılamaz.
     /// </summary>
     internal string OutputPath(DateTime now)
     {
         var folder = ResolveFolder();
+        var extension = "." + RecorderArguments.Extension(Container);
         var stem = "kayit_" + now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
-        var candidate = Path.Combine(folder, stem + ".mp4");
+        var candidate = Path.Combine(folder, stem + extension);
         for (var index = 2; File.Exists(candidate); index++)
-            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + ".mp4");
+            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
+        return candidate;
+    }
+
+    /// <summary>
+    /// Kayıt sürerken alınan ekran görüntüsünün dosya yolu. Kaydın adının yanına
+    /// numaralanıyor; var olan dosyanın üstüne yazılmıyor.
+    /// </summary>
+    internal string SnapshotPath(DateTime now)
+    {
+        var folder = ResolveFolder();
+        var stem = "kare_" + now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        var candidate = Path.Combine(folder, stem + ".png");
+        for (var index = 2; File.Exists(candidate); index++)
+            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + ".png");
         return candidate;
     }
 }

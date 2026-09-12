@@ -151,7 +151,52 @@ internal partial class RecorderView
             WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text
         }
         with
-        { Region = region, Audio = audio };
+        {
+            Region = region,
+            Audio = audio,
+            Container = _settings.Container,
+            ScreenIndex = _settings.ScreenIndex,
+            Screens = MonitorBounds(),
+            Scale = _settings.Scale,
+            KeyframeSeconds = _settings.KeyframeSeconds,
+            Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,
+            Tune = string.IsNullOrWhiteSpace(_settings.Tune) ? null : _settings.Tune,
+            RateControl = _settings.RateControl,
+            BitrateKbps = _settings.RateControl == RecorderRateControl.Bitrate && _settings.BitrateKbps > 0
+                ? _settings.BitrateKbps
+                : null,
+            MaxBitrateKbps = _settings.RateControl == RecorderRateControl.Bitrate && _settings.MaxBitrateKbps > 0
+                ? _settings.MaxBitrateKbps
+                : null,
+            BufferKbits = _settings.RateControl == RecorderRateControl.Bitrate && _settings.BufferKbits > 0
+                ? _settings.BufferKbits
+                : null,
+            PixelFormat = _settings.PixelFormat,
+            ColorSpace = string.IsNullOrWhiteSpace(_settings.ColorSpace) ? null : _settings.ColorSpace,
+            ColorRange = string.IsNullOrWhiteSpace(_settings.ColorRange) ? null : _settings.ColorRange,
+            MaxDuration = _settings.MaxDuration,
+            Split = _settings.Split
+        };
+    }
+
+    /// <summary>
+    /// Masaüstündeki monitörlerin sınırları. <c>gdigrab</c> ekran indeksi almadığı için
+    /// ikinci monitörü seçmenin tek yolu bu listeden çıkan bölge ofseti; liste okunamazsa
+    /// boş dönüyor ve motor sıfırdan farklı indeksi reddediyor.
+    /// </summary>
+    private IReadOnlyList<ScreenBounds> MonitorBounds()
+    {
+        var screens = TopLevel.GetTopLevel(this)?.Screens;
+        if (screens is null) return Array.Empty<ScreenBounds>();
+
+        var bounds = new List<ScreenBounds>(screens.ScreenCount);
+        for (var index = 0; index < screens.All.Count; index++)
+        {
+            var area = screens.All[index].Bounds;
+            bounds.Add(new ScreenBounds(index, area.X, area.Y, area.Width, area.Height));
+        }
+
+        return bounds;
     }
 
     private RecorderRegion? Rect()

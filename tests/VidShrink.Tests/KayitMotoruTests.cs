@@ -136,7 +136,12 @@ public sealed class KayitMotoruTests
     public void WindowsPenceresiBasliktanGirer()
     {
         var args = RecorderArguments.Build(
-            Ekran(RecorderPlatform.Windows) with { Target = RecorderTargetKind.Window, WindowTitle = "Not Defteri" },
+            Ekran(RecorderPlatform.Windows) with
+            {
+                Target = RecorderTargetKind.Window,
+                WindowTitle = "Not Defteri",
+                Container = RecorderContainer.Mkv
+            },
             @"C:\kayit\p.mkv");
 
         Assert.Contains("-i title=Not Defteri", Arg(args));
@@ -162,7 +167,9 @@ public sealed class KayitMotoruTests
     [Fact]
     public void MacEkraniAvfoundationIndeksiVerir()
     {
-        var args = RecorderArguments.Build(Ekran(RecorderPlatform.MacOs) with { ScreenIndex = 2 }, "/tmp/a.mov");
+        var args = RecorderArguments.Build(
+            Ekran(RecorderPlatform.MacOs) with { ScreenIndex = 2, Container = RecorderContainer.Mov },
+            "/tmp/a.mov");
 
         Assert.Contains("-f avfoundation", Arg(args));
         Assert.Contains("-i 2:none", Arg(args));
@@ -180,7 +187,8 @@ public sealed class KayitMotoruTests
             Ekran(RecorderPlatform.MacOs) with
             {
                 Target = RecorderTargetKind.Region,
-                Region = new RecorderRegion(10, 30, 320, 240)
+                Region = new RecorderRegion(10, 30, 320, 240),
+                Container = RecorderContainer.Mov
             },
             "/tmp/b.mov");
 
@@ -192,7 +200,12 @@ public sealed class KayitMotoruTests
     [Fact]
     public void MacPencereSecimiSessizceYutulmaz()
     {
-        var istek = Ekran(RecorderPlatform.MacOs) with { Target = RecorderTargetKind.Window, WindowTitle = "Safari" };
+        var istek = Ekran(RecorderPlatform.MacOs) with
+        {
+            Target = RecorderTargetKind.Window,
+            WindowTitle = "Safari",
+            Container = RecorderContainer.Mov
+        };
 
         var hata = Assert.Throws<InvalidOperationException>(() => RecorderArguments.Build(istek, "/tmp/p.mov"));
         Assert.Contains("avfoundation", hata.Message);

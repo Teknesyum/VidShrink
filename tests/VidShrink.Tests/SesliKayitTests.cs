@@ -153,7 +153,8 @@ public sealed class SesliKayitTests
         {
             Platform = RecorderPlatform.MacOs,
             Target = RecorderTargetKind.Region,
-            Region = new RecorderRegion(10, 30, 320, 240)
+            Region = new RecorderRegion(10, 30, 320, 240),
+            Container = RecorderContainer.Mov
         };
 
         var metin = Arg(RecorderArguments.Build(istek, "/tmp/k.mov"));

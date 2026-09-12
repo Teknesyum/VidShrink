@@ -50,6 +50,11 @@ public enum RecorderState
 /// <param name="StandardError">Son satirlar; sebep hep sonda durur.</param>
 /// <param name="Segments">Kac parca kaydedildi. Duraklatma her seferinde yeni bir parca acar.</param>
 /// <param name="DroppedOptions">ffmpeg'in kabul etmeyip sessizce dusurdugu ayarlarin tanili satirlari.</param>
+/// <param name="Files">
+/// Teslim edilen dosyalarin hepsi. Birlestirilen kayitta tek eleman ve
+/// <paramref name="OutputPath"/> ile ayni; kendiliginden bolunen kayitta bolum sayisi
+/// kadar eleman var ve <paramref name="OutputPath"/> ilki oluyor.
+/// </param>
 public sealed record RecordResult(
     bool Ok,
     string OutputPath,
@@ -58,10 +63,14 @@ public sealed record RecordResult(
     int ExitCode,
     string StandardError,
     int Segments,
-    IReadOnlyList<string>? DroppedOptions = null)
+    IReadOnlyList<string>? DroppedOptions = null,
+    IReadOnlyList<string>? Files = null)
 {
     /// <summary>Kayitta verilen ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
+
+    /// <summary>Kayit birden fazla dosyaya bolunmus.</summary>
+    public bool WasSplit => Files is { Count: > 1 };
 }
 
 /// <summary>
@@ -89,13 +98,23 @@ public sealed class RecorderSession : IAsyncDisposable
     /// <summary>Ilk ilerleme blogu icin beklenen sure; dolmadan surec olurse baslatma hatasi bildirilir.</summary>
     public const int StartTimeoutMs = 15_000;
 
+    /// <summary>
+    /// Bolme olcutunun ne siklikta yoklandigi. Yoklama ilerleme borusundan degil ayri bir
+    /// gorevden yapiliyor: bolme o anki parcayi kapatip yenisini aciyor, kapatma ise
+    /// ilerleme borusunu okuyan gorevi bekliyor — ayni gorevden cagrilsa kilitlenirdi.
+    /// </summary>
+    public const int SplitPollMs = 250;
+
     private readonly RecorderRequest _request;
     private readonly string _outputPath;
     private readonly IProgress<RecordProgress>? _progress;
     private readonly List<string> _segments = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly EncodeRunner.StderrWatch _watch = new();
+    private readonly SemaphoreSlim _turn = new(1, 1);
 
+    private CancellationTokenSource? _watchStop;
+    private Task? _watcher;
     private Process? _process;
     private Task? _stdoutPump;
     private Task? _stderrPump;
@@ -136,7 +155,32 @@ public sealed class RecorderSession : IAsyncDisposable
 
         var session = new RecorderSession(request, outputPath, progress);
         await session.StartSegmentAsync(ct);
+
+        if (request.Split is { IsSet: true })
+        {
+            session._watchStop = new CancellationTokenSource();
+            var token = session._watchStop.Token;
+            session._watcher = Task.Run(() => session.WatchSplitAsync(token), CancellationToken.None);
+        }
+
         return session;
+    }
+
+    /// <summary>
+    /// Kayit surerken tek karelik bir ekran goruntusu alir. Kaydi kesmiyor: yakalama
+    /// girdisinden ikinci, kisa omurlu bir ffmpeg surecine okunuyor. Kare kayit
+    /// dosyasindan degil ekrandan geliyor — <c>FrameGrabber</c> dosyadan kare kesiyor ve
+    /// canli ekranin dosyasi yok.
+    /// </summary>
+    public async Task<bool> SnapshotAsync(string imagePath, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath)) throw new ArgumentException("Image path is required.", nameof(imagePath));
+
+        var folder = Path.GetDirectoryName(imagePath);
+        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+
+        var run = await FfmpegRunner.RunAsync(RecorderArguments.BuildSnapshot(_request, imagePath), ct);
+        return run.Ok && File.Exists(imagePath) && new FileInfo(imagePath).Length > 0;
     }
 
     /// <summary>
@@ -145,37 +189,114 @@ public sealed class RecorderSession : IAsyncDisposable
     /// </summary>
     public async Task PauseAsync(int stopTimeoutMs = StopTimeoutMs, CancellationToken ct = default)
     {
-        if (State != RecorderState.Running) return;
-        await FinishSegmentAsync(stopTimeoutMs, ct);
-        State = RecorderState.Paused;
+        await _turn.WaitAsync(ct);
+        try
+        {
+            if (State != RecorderState.Running) return;
+            await FinishSegmentAsync(stopTimeoutMs, ct);
+            State = RecorderState.Paused;
+        }
+        finally { _turn.Release(); }
     }
 
     /// <summary>Duraklatilmis kayda yeni bir parca acar.</summary>
     public async Task ResumeAsync(CancellationToken ct = default)
     {
-        if (State != RecorderState.Paused) return;
-        await StartSegmentAsync(ct);
+        await _turn.WaitAsync(ct);
+        try
+        {
+            if (State != RecorderState.Paused) return;
+            await StartSegmentAsync(ct);
+        }
+        finally { _turn.Release(); }
     }
 
     /// <summary>
     /// Kaydi bitirir: son parca nazikce kapatilir, birden fazla parca varsa yeniden
-    /// kodlanmadan birlestirilir. <paramref name="stopTimeoutMs"/> dolarsa surec oldurulur
-    /// ve sonuc <see cref="RecordResult.Partial"/> doner.
+    /// kodlanmadan birlestirilir. Kendiliginden bolme acikken birlestirme <b>yapilmaz</b>,
+    /// parcalar numarali dosyalar olarak teslim edilir.
+    /// <paramref name="stopTimeoutMs"/> dolarsa surec oldurulur ve sonuc
+    /// <see cref="RecordResult.Partial"/> doner.
     /// </summary>
     public async Task<RecordResult> StopAsync(int stopTimeoutMs = StopTimeoutMs, CancellationToken ct = default)
     {
-        if (_process is not null) await FinishSegmentAsync(stopTimeoutMs, ct);
-        State = RecorderState.Stopped;
+        await StopWatcherAsync();
+        await _turn.WaitAsync(ct);
+        try
+        {
+            if (_process is not null) await FinishSegmentAsync(stopTimeoutMs, ct);
+            State = RecorderState.Stopped;
+        }
+        finally { _turn.Release(); }
+
         return await AssembleAsync(ct);
     }
 
     /// <summary>Yarida kalan bir oturum makinede ffmpeg birakmaz.</summary>
     public async ValueTask DisposeAsync()
     {
+        await StopWatcherAsync();
         if (_process is null) return;
         _partial = true;
         await FinishSegmentAsync(0, CancellationToken.None);
         State = RecorderState.Stopped;
+    }
+
+    /// <summary>
+    /// Bolme olcutu dolmus mu. Sure o anki <b>parcanin</b> suresi, boyut da o parcanin
+    /// dosyasi: ikisi de her bolunmede sifirdan basliyor.
+    /// </summary>
+    private bool SplitDue()
+    {
+        if (_request.Split is not { } split) return false;
+        if (split.Duration is { } every && _capturedNow >= every) return true;
+        return split.Megabytes is { } megabytes && _outputMb >= megabytes;
+    }
+
+    private async Task WatchSplitAsync(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            try { await Task.Delay(SplitPollMs, ct); }
+            catch (OperationCanceledException) { return; }
+
+            if (ct.IsCancellationRequested) return;
+            if (State != RecorderState.Running || !SplitDue()) continue;
+
+            await _turn.WaitAsync(CancellationToken.None);
+            try
+            {
+                if (State != RecorderState.Running || !SplitDue()) continue;
+                await FinishSegmentAsync(StopTimeoutMs, CancellationToken.None);
+                if (_partial)
+                {
+                    State = RecorderState.Stopped;
+                    return;
+                }
+
+                await StartSegmentAsync(CancellationToken.None);
+            }
+            catch (InvalidOperationException)
+            {
+                State = RecorderState.Stopped;
+                return;
+            }
+            finally { _turn.Release(); }
+        }
+    }
+
+    private async Task StopWatcherAsync()
+    {
+        if (_watchStop is null) return;
+        _watchStop.Cancel();
+        if (_watcher is not null)
+        {
+            try { await _watcher; } catch { }
+        }
+
+        _watchStop.Dispose();
+        _watchStop = null;
+        _watcher = null;
     }
 
     private async Task StartSegmentAsync(CancellationToken ct)
@@ -299,11 +420,27 @@ public sealed class RecorderSession : IAsyncDisposable
         if (_segments.Count == 1)
         {
             Deliver(_segments[0], _outputPath);
-            return new RecordResult(!_partial, _outputPath, SizeMb(_outputPath), _partial, _lastExitCode, tail, 1, outcome.DroppedOptions);
+            return new RecordResult(!_partial, _outputPath, SizeMb(_outputPath), _partial, _lastExitCode, tail, 1,
+                outcome.DroppedOptions, new[] { _outputPath });
         }
 
         if (_partial)
-            return new RecordResult(false, _segments[^1], SizeMb(_segments[^1]), true, _lastExitCode, tail, _segments.Count, outcome.DroppedOptions);
+            return new RecordResult(false, _segments[^1], SizeMb(_segments[^1]), true, _lastExitCode, tail, _segments.Count,
+                outcome.DroppedOptions, new[] { _segments[^1] });
+
+        if (_request.Split is { IsSet: true })
+        {
+            var parts = new List<string>(_segments.Count);
+            for (var index = 0; index < _segments.Count; index++)
+            {
+                var part = SplitPath(index);
+                Deliver(_segments[index], part);
+                parts.Add(part);
+            }
+
+            return new RecordResult(true, parts[0], parts.Sum(SizeMb), false, _lastExitCode, tail, parts.Count,
+                outcome.DroppedOptions, parts);
+        }
 
         var listPath = _outputPath + ".parcalar.txt";
         File.WriteAllLines(listPath, _segments.Select(path => $"file '{path.Replace("'", @"'\''")}'"));
@@ -314,12 +451,14 @@ public sealed class RecorderSession : IAsyncDisposable
         }, ct);
 
         if (!join.Ok)
-            return new RecordResult(false, _segments[^1], SizeMb(_segments[^1]), _partial, join.ExitCode, join.StandardError, _segments.Count, join.DroppedOptions);
+            return new RecordResult(false, _segments[^1], SizeMb(_segments[^1]), _partial, join.ExitCode, join.StandardError, _segments.Count,
+                join.DroppedOptions, new[] { _segments[^1] });
 
         foreach (var segment in _segments) TryDelete(segment);
         TryDelete(listPath);
 
-        return new RecordResult(true, _outputPath, SizeMb(_outputPath), false, join.ExitCode, tail, _segments.Count, outcome.DroppedOptions);
+        return new RecordResult(true, _outputPath, SizeMb(_outputPath), false, join.ExitCode, tail, _segments.Count,
+            outcome.DroppedOptions, new[] { _outputPath });
     }
 
     /// <summary>Tek parcali kayit dogrudan istenen ada tasinir; yarim dosya da tasinir, gizlenmez.</summary>
@@ -337,6 +476,19 @@ public sealed class RecorderSession : IAsyncDisposable
             Path.GetDirectoryName(_outputPath) ?? string.Empty,
             Path.GetFileNameWithoutExtension(_outputPath));
         return $"{withoutExtension}.kayit{index}{extension}";
+    }
+
+    /// <summary>
+    /// Kendiliginden bolunen kaydin bolum dosyasi. Ilk bolum de numarali: numarasiz bir
+    /// ilk dosya bolunmus kaydi tek dosyali kayittan ayirt edilemez yapardi.
+    /// </summary>
+    private string SplitPath(int index)
+    {
+        var extension = Path.GetExtension(_outputPath);
+        var withoutExtension = Path.Combine(
+            Path.GetDirectoryName(_outputPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(_outputPath));
+        return $"{withoutExtension}.bolum{index + 1}{extension}";
     }
 
     private static double SizeMb(string path)
