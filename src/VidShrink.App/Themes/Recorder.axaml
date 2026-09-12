@@ -1,0 +1,32 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    K6: burada tanımlanan her belirteç Theme.axaml'daki bir belirtecin değerini alır.
+    Yeni ölçü üretilmiyor; yalnız kaydediciye ait ad veriliyor.
+
+    Renk hiç tanımlanmıyor. Kaydediyor göstergesinin rengi Theme.axaml'ın NeonEmber
+    fırçasıdır ve görünümde doğrudan o çağrılıyor: ikinci bir ton üretmemek için burada
+    fırça açılmadı, dolayısıyla palet değiştiğinde gösterge de paletle birlikte değişir.
+
+      RecorderStripPadding    <- ButtonPaddingSm (16,8). Denetim şeridi tek sıra düğmeden
+                                 oluşuyor; iç boşluğu da o düğmelerin kendi boşluğu.
+      RecorderStripGap        <- SpaceSm (8). Şeritteki iki öğe arası.
+      RecorderButtonSize      <- FieldMinHeight (40). Şerit düğmesinin dokunma hedefi;
+                                 alan yüksekliğiyle aynı sayı, şerit tek satır okunuyor.
+      RecorderDotSize         <- SpaceMd (12). Kaydediyor göstergesinin çapı.
+      RecorderReadoutMinWidth <- PlanFactMinWidth (136). Geçen süre ve kare sayısı
+                                 okumasının taban genişliği. Sayı büyüdükçe şerit
+                                 kaymasın diye sabit: programın tek "olgu sütunu" ölçüsü.
+      RecorderPanelMinHeight  <- PanelMinHeight (256). Kaydedici panosunun taban boyu,
+                                 öteki panellerle aynı.
+  -->
+
+  <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
+  <x:Double x:Key="RecorderStripGap">8</x:Double>
+  <x:Double x:Key="RecorderButtonSize">40</x:Double>
+  <x:Double x:Key="RecorderDotSize">12</x:Double>
+  <x:Double x:Key="RecorderReadoutMinWidth">136</x:Double>
+  <x:Double x:Key="RecorderPanelMinHeight">256</x:Double>
+
+</ResourceDictionary>

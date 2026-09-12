@@ -20,5 +20,7 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   `-nostdin` verilmediğinin pimi, negatif kontroller (uydurma kodek, macOS pencere, tek sayılı bölge). Canlı kol
   `[KayitFact]` ile gdigrab'a bağlı: 5 sn'lik gerçek kayıt, `q` ile kapanan dosya ffprobe'ta okunur, zaman aşımında
   öldürülen dosya bozuk çıkar, duraklatılan kayıt iki parçadan birleşir. Kanıt `.calisma/dalga8a/`.
+- `KaydediciArayuzTests.cs` — 8b dalgası, Kaydedici sekmesi: kodlayıcı ve ön ayar listeleri motorun doğrulamasından
+  geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kanıt `.calisma/dalga8b/`.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.

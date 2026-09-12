@@ -27,7 +27,7 @@ internal static class Locales
     internal static readonly string Folder =
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "Locales");
 
-    internal static readonly string[] Domains = { "main", "playback", "performance", "settings" };
+    internal static readonly string[] Domains = { "main", "playback", "performance", "recorder", "settings" };
 
     internal static IReadOnlyList<string> Languages =>
         Directory.GetDirectories(Folder).Select(path => Path.GetFileName(path)!).OrderBy(name => name).ToList();

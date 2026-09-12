@@ -160,13 +160,13 @@ public sealed class LocalizationTests : IDisposable
     }
 
     [Fact]
-    public void DortAlanDosyasiHerDilIcinCiktidaVar()
+    public void BesAlanDosyasiHerDilIcinCiktidaVar()
     {
         var root = Path.Combine(AppContext.BaseDirectory, "Locales");
 
         foreach (var language in new[] { "en", "tr" })
         {
-            foreach (var domain in new[] { "main", "playback", "performance", "settings" })
+            foreach (var domain in new[] { "main", "playback", "performance", "recorder", "settings" })
             {
                 var file = Path.Combine(root, language, domain + ".json");
                 Assert.True(File.Exists(file), $"eksik: {file}");

@@ -2564,6 +2564,8 @@ public partial class MainWindow : Window
 
     private int SettingsTabIndex => Tabs.Items.IndexOf(TabSettings);
 
+    internal int RecorderTabIndex => Tabs.Items.IndexOf(TabRecorder);
+
     internal PlayerView PlayerTab => Player;
 
     internal async Task LoadStartupFileAsync(string path)
