@@ -3,7 +3,7 @@
     {
       "rule": "forms/no-ui-string-literal",
       "file": "src/VidShrink.App/MainWindow.axaml",
-      "line": 85,
+      "line": 74,
       "reason": "\"Buy Me a Coffee\" marka adıdır, çevrilmez; yazımı BrandSpellingTests pimliyor."
     },
     {
