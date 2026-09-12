@@ -5,6 +5,43 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.4.1] - 2026-09-12
+
+VidShrink learned to record. 0.4.0 handed the window to the player; this release adds the
+screen recorder beside it — capture, sound, and a tab that exposes both without asking the
+user to know an ffmpeg flag.
+
+### Added
+
+- **A screen recorder.** The whole screen, a single window, or a region, on each platform
+  through the capture backend it actually has: gdigrab on Windows, avfoundation on macOS,
+  x11grab on Linux. Stopping is gentle — ffmpeg is asked to close the file rather than
+  killed — so a stopped recording plays back, and a recording killed by a timeout is
+  reported as partial instead of being handed over as a broken file.
+- **Sound in the recording.** The recorder lists the machine's audio devices and records a
+  microphone, the system output, or both. Choosing both records two inputs and mixes them
+  into one track. The chosen device is remembered by name rather than by position, so a
+  device list that reorders between two launches cannot quietly select a different
+  microphone, and a device that is gone is reported instead of falling back to silence.
+- **The Recorder tab**, in all 42 languages: a control strip with elapsed time and frame
+  counters, panels for the target and the encoding options (frame rate, quality, encoder,
+  preset, mouse cursor), an output folder, and the audio panel with a button that reloads
+  the device list for a microphone plugged in while the program is running.
+
+### Fixed
+
+- The audio plan reached ffmpeg only in part. The recorder passed the audio inputs but
+  never the filter graph or the stream maps, so selecting two devices still produced a
+  single stream — the second was dropped without a word. A complex filter graph also means
+  ffmpeg no longer maps the video stream on its own, so the video mapping is now written
+  explicitly alongside every audio mapping.
+
+### Known limitation
+
+- Written size does not stream while a recording runs: the `total_size` field stays at zero
+  in ffmpeg's progress output for a gdigrab capture, measured across eleven blocks. Elapsed
+  time and the frame counters do stream; the size is read from the finished file.
+
 ## [0.4.0] - 2026-09-12
 
 The player stopped being a tab and became the window. 0.3.0 could play the source; this
