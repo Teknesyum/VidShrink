@@ -38,6 +38,7 @@ return 0;
 static string Build(Seed seed)
 {
     var onAccent = Luminance(seed.Accent1) > 0.45 ? "#FF000000" : "#FFFFFFFF";
+    var light = Luminance(seed.Bg) > 0.5;
 
     return $"""
         <ResourceDictionary xmlns="https://github.com/avaloniaui"
@@ -70,12 +71,12 @@ static string Build(Seed seed)
           <Color x:Key="NeonEmberColor">{Solid(seed.Ember)}</Color>
           <Color x:Key="EmberFlameColor">{Solid(seed.Flame)}</Color>
           <Color x:Key="EmberBlazeColor">{Solid(seed.Blaze)}</Color>
-          <Color x:Key="EmberDeepColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.02)))}</Color>
-          <Color x:Key="EmberMidColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.035)))}</Color>
-          <Color x:Key="EmberEdgeColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.05)))}</Color>
-          <Color x:Key="EmberBarDeepColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.03)))}</Color>
-          <Color x:Key="EmberBarMidColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.05)))}</Color>
-          <Color x:Key="EmberBarEdgeColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.07)))}</Color>
+          <Color x:Key="EmberDeepColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.02), light))}</Color>
+          <Color x:Key="EmberMidColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.035), light))}</Color>
+          <Color x:Key="EmberEdgeColor">{Solid(Dim(Mix(seed.Bg, seed.Ember, 0.05), light))}</Color>
+          <Color x:Key="EmberBarDeepColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.03), light))}</Color>
+          <Color x:Key="EmberBarMidColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.05), light))}</Color>
+          <Color x:Key="EmberBarEdgeColor">{Solid(Dim(Mix(seed.Surface, seed.Ember, 0.07), light))}</Color>
 
           <Color x:Key="PlaybackScrimColor">{Alpha(seed.Bg, 0xCC)}</Color>
           <Color x:Key="PlaybackScrimEdgeColor">{Alpha(seed.Bg, 0x00)}</Color>
@@ -108,11 +109,17 @@ static string Alpha(string hex, int alpha)
     return $"#{alpha:X2}{r:X2}{g:X2}{b:X2}";
 }
 
-// Ateş şeridi zeminin üstünde ısınır ama koyulaşır: karışım tek başına rengi
-// açıyor ve başlık çubuğundaki yazı kontrastını düşürüyordu. Ölçü:
-// ThemeBackdropTests.WarmingTheTitleBarDoesNotCostBodyTextContrast.
-static string Dim(string hex)
+// Ateş şeridi zeminin üstünde ısınır ama gövde yazısından uzaklaşır: karışım tek
+// başına zemini yazıya yaklaştırıyor ve başlık çubuğundaki kontrastı düşürüyordu.
+// Ölçü: ThemeBackdropTests.WarmingTheTitleBarDoesNotCostBodyTextContrast.
+//
+// Yön paletin zeminine bağlı. Koyu palette yazı açık olduğu için şerit koyulaşır
+// (0,78 ile ölçeklenir); açık palette yazı koyu olduğu için aynı büyüklükte ters
+// yöne, beyaza doğru 0,22 kadar gider. İki kolda da uzaklaşılan şey gövde yazısı.
+static string Dim(string hex, bool light)
 {
+    if (light) return Mix(hex, "#FFFFFF", 1 - 0.78);
+
     var (r, g, b) = Parse(hex);
     return $"#{(int)Math.Round(r * 0.78):X2}{(int)Math.Round(g * 0.78):X2}{(int)Math.Round(b * 0.78):X2}";
 }
