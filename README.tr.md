@@ -376,34 +376,43 @@ powershell -NoProfile -ExecutionPolicy Bypass -File C:\path\to\Install-VidShrink
 
 ### Güncel kalmak
 
-Windows'ta uygulama açılırken kendini sormadan günceller. Kısayollar uygulamanın üstünde
-duran küçük bir başlatıcıyı, `VidShrink.exe`'yi gösterir. Tipik bir sürüm 519 MB'lık
-kurulumun yaklaşık 1,7 MB'ını değiştirir; telden inen de yalnız o kadardır.
+Windows'ta uygulama kendini sormadan günceller. Kısayollar uygulamanın üstünde duran küçük
+bir başlatıcıyı, `VidShrink.exe`'yi gösterir. Tipik bir sürüm 519 MB'lık kurulumun yaklaşık
+1,7 MB'ını değiştirir; telden inen de yalnız o kadardır.
+
+Açılış yolunda ağa çıkan hiçbir iş yok. Uygulama açılmadan önce başlatıcı yalnız yerel işi
+yapar: yarım kalmış başlatıcı değişimini toplar ve hazır bekleyen güncellemeyi yerine taşır.
+Bildirim çekmek ve indirmek uygulama ekrana geldikten **sonra** koşar; topladığı iş bir
+sonraki açılışta uygulanır — doğrulanmış dosyaları taşımak milisaniyeler sürer.
 
 ```mermaid
 flowchart TD
     S["Kısayol"] --> LA["VidShrink.exe başlatıcı"]
-    LA --> Q{"Son 24 saatte bakıldı mı?"}
-    Q -->|evet| RUN["Kurulu uygulamayı başlat"]
-    Q -->|hayır| MF["Bildirimi çek, 800 ms zaman aşımı"]
-    MF -->|"çevrimdışı, hız sınırı ya da bozuk"| RUN
+    LA --> RES["Hazır bekleyeni yerine taşı"]
+    RES --> RUN["Kurulu uygulamayı başlat"]
+    RUN --> MF["Bildirimi çek, 5 sn zaman aşımı"]
+    MF -->|"çevrimdışı, hız sınırı ya da bozuk"| END["Sessizce vazgeç"]
     MF --> DIFF["Dosya dosya SHA-256 karşılaştır"]
-    DIFF -->|"fark yok"| RUN
+    DIFF -->|"fark yok"| END
     DIFF --> DL["Yalnız değişen dosyaları ara klasöre indir"]
     DL --> VER{"Her özet doğrulanıyor mu?"}
-    VER -->|hayır| DISC["At, bu turu iptal et"]
-    DISC --> RUN
-    VER -->|evet| SWAP["Tek adımda yerine taşı"]
-    SWAP --> RUN
+    VER -->|hayır| END
+    VER -->|evet| NEXT["Hazır; sonraki açılışta uygulanır"]
 ```
 
-Denetim günde en çok bir kez koşar; yirmi dört saat geçmeden başlatıcı ağa hiç çıkmaz. Son
-denetimin zamanı ayarın yanında, `%APPDATA%\VidShrink` içinde durur. Yarım kalmış güncelleme
-bu sınırın dışındadır ve bir sonraki açılışta tamamlanır.
+Ara klasör başarısız turdan sağ çıkar. Kopan hat ya da zaman aşımı inen dosyaları yerinde
+bırakır, sonraki tur onları özetinden tanıyıp atlar; böylece yavaş hat sıfırdan başlamak
+yerine birkaç açılışta yakınsar. Ara klasör yalnız başka bir sürüm için toplanmışsa atılır.
+Doğrulanmamış bayt hiç yazılmadığı için yarım bir klasör yanlış dosya taşıyamaz. Aynı anda
+tek başlatıcı toplar; ikincisi işin zaten yürüdüğünü görüp hiç başlamaz.
+
+Sürümler hata ayıklama simgesi taşımaz. `.pdb` dosyaları yapıyı ayıklamayan hiç kimseye
+yaramaz; onlara hiç sahip olmamış bir kurulum ise her birini eksik dosya sayıp her açılışta
+yeniden indiriyordu.
 
 Başlatıcı uygulamanın açılmasını hiçbir zaman engellemez. Ağ yok, DNS çözülmüyor, hız
-sınırı, bozuk bildirim, dolu disk: hepsinde sessizce vazgeçer ve kurulu sürümü olduğu gibi
-başlatır. FFmpeg sürümlerle taşınmaz ve bir daha indirilmez; başlatıcı yalnız `ffmpeg.exe`
+sınırı, bozuk bildirim, dolu disk: hepsinde sessizce vazgeçer, kurulu sürüm olduğu gibi
+kalır. FFmpeg sürümlerle taşınmaz ve bir daha indirilmez; başlatıcı yalnız `ffmpeg.exe`
 ile `ffprobe.exe` yerinde mi diye bakar.
 
 Otomatik güncelleme öntanımlı olarak açıktır ve ayarlardan kapatılabilir. Anahtar

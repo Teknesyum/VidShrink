@@ -20,14 +20,29 @@ namespace VidShrink.Launcher;
 ///
 /// Başlatıcı geçişi burada yapılmaz, yalnız kurulur. Geçişi çıkışta yerine geçecek ikili
 /// yapar; döndürülen değer o çağrının gerekip gerekmediğidir.
+///
+/// Bu çağrı açılış yolunda değil: uygulama ekrana geldikten sonra koşar
+/// (<c>Program.cs</c>). Eskiden açılış kapısının içindeydi ve bu yüzden bütçesi 90
+/// saniyeydi; ölçülen 0.3.0 → 0.4.1 farkı 375 dosya ve 134,8 MB, yani o bütçede
+/// bitmesi mümkün değildi. Yarıda kalan sahne de silindiği için her açılış sıfırdan
+/// başlıyor, kurulum hiç yakınsamıyordu.
 /// </summary>
 internal static class Updater
 {
-    /// <summary>İndirme dahil tüm güncellemenin üst sınırı.</summary>
-    private static readonly TimeSpan Budget = TimeSpan.FromSeconds(90);
+    /// <summary>
+    /// İndirme dahil tüm güncellemenin üst sınırı. Açılış yolunda olmadığı için geniş:
+    /// yavaş hatta yarım kalan iş sahnede kalır, sonraki tur kaldığı yerden sürer.
+    /// </summary>
+    private static readonly TimeSpan Budget = TimeSpan.FromMinutes(30);
 
     private const string StageDirectoryName = "update-stage";
     private const string HashCacheName = ".update-hashes.json";
+
+    /// <summary>Sahnenin hangi sürüm için toplandığını söyleyen işaret.</summary>
+    private const string StageVersionName = ".stage-version";
+
+    /// <summary>İki başlatıcı aynı sahneye yazmasın; ikincisi hiç başlamaz.</summary>
+    private const string MutexName = @"Global\Teknesyum.VidShrink.Update";
 
     public static bool Run(string baseDirectory, string appDirectory)
     {
@@ -35,9 +50,16 @@ internal static class Updater
         if (!UpdateCheck.AutoUpdateEnabled()) return false;
         if (Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_DISABLED") == "1") return false;
 
+        using var only = new Mutex(initiallyOwned: false, MutexName);
+        var held = false;
+        try { held = only.WaitOne(TimeSpan.Zero); }
+        catch (AbandonedMutexException) { held = true; }
+        if (!held) return false;
+
         using var cancellation = new CancellationTokenSource(Budget);
         try { return RunAsync(baseDirectory, appDirectory, cancellation.Token).GetAwaiter().GetResult(); }
         catch (Exception) { return false; }
+        finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
     }
 
     private static async Task<bool> RunAsync(string baseDirectory, string appDirectory, CancellationToken cancellationToken)
@@ -68,41 +90,70 @@ internal static class Updater
             return false;
         }
 
-        UpdateStage.Discard(stage);
-        Directory.CreateDirectory(stage);
-
-        try
-        {
-            if (changed.Count > 0)
-            {
-                var archive = await RemoteZip.OpenAsync(ArchiveSource(rid, source), cancellationToken);
-                foreach (var file in changed)
-                    await StageFileAsync(archive, file, UpdateCheck.LocalPath(stage, file.Path), cancellationToken);
-            }
-
-            if (launcherChanged.Count > 0 || shellChanged.Count > 0)
-            {
-                var archive = await RemoteZip.OpenAsync(LauncherArchiveSource(rid, source), cancellationToken);
-                foreach (var file in launcherChanged)
-                    await StageFileAsync(archive, file, LauncherUpdate.StagePath(stage, file.Path), cancellationToken);
-                foreach (var file in shellChanged)
-                    await StageFileAsync(archive, file, ShellUpdate.StagePath(stage, file.Path), cancellationToken);
-            }
-
-            // Başlatıcı yan klasörden çıkarılıyor: bir alttaki Apply yan klasörü siliyor.
-            LauncherUpdate.Stage(stage, baseDirectory, launcherChanged);
-        }
-        catch (Exception)
+        // Sahne yalnız başka bir sürüm için toplandıysa atılır. Aynı sürümün yarım kalmış
+        // sahnesi duruyorsa korunur: özeti tutan dosya bir daha indirilmez, yavaş hatta
+        // güncelleme turlar boyunca yakınsar.
+        if (StageVersion(stage) != manifest.Version)
         {
             UpdateStage.Discard(stage);
-            throw;
+            Directory.CreateDirectory(stage);
+            WriteStageVersion(stage, manifest.Version);
         }
+        else Directory.CreateDirectory(stage);
+
+        // Hata sahneyi silmez: zaman aşımı ya da kopan hat yarım bir indirme bırakır, o
+        // dosyalar sonraki turda özetiyle sınanır ve tutanlar atlanır. Özeti tutmayanı
+        // StageFileAsync hiç yazmıyor, yani yarım sahne yanlış bayt taşımıyor.
+        if (changed.Count > 0)
+        {
+            var archive = await RemoteZip.OpenAsync(ArchiveSource(rid, source), cancellationToken);
+            foreach (var file in changed)
+                await StageFileAsync(archive, file, UpdateCheck.LocalPath(stage, file.Path), cancellationToken);
+        }
+
+        if (launcherChanged.Count > 0 || shellChanged.Count > 0)
+        {
+            var archive = await RemoteZip.OpenAsync(LauncherArchiveSource(rid, source), cancellationToken);
+            foreach (var file in launcherChanged)
+                await StageFileAsync(archive, file, LauncherUpdate.StagePath(stage, file.Path), cancellationToken);
+            foreach (var file in shellChanged)
+                await StageFileAsync(archive, file, ShellUpdate.StagePath(stage, file.Path), cancellationToken);
+        }
+
+        // Başlatıcı yan klasörden çıkarılıyor: bir alttaki Apply yan klasörü siliyor.
+        LauncherUpdate.Stage(stage, baseDirectory, launcherChanged);
 
         return UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest, shellChanged);
     }
 
+    /// <summary>Sahnenin hangi sürüm için toplandığı; işaret yoksa null.</summary>
+    private static string? StageVersion(string stage)
+    {
+        var marker = Path.Combine(stage, StageVersionName);
+        if (!File.Exists(marker)) return null;
+        try { return File.ReadAllText(marker).Trim(); }
+        catch (IOException) { return null; }
+    }
+
+    private static void WriteStageVersion(string stage, string version) =>
+        File.WriteAllText(Path.Combine(stage, StageVersionName), version);
+
+    /// <summary>Sahnedeki dosya boyutu ve özetiyle manifeste oturuyor mu.</summary>
+    private static bool AlreadyStaged(string target, ManifestFile file)
+    {
+        if (!File.Exists(target)) return false;
+        try
+        {
+            if (new FileInfo(target).Length != file.Size) return false;
+            return string.Equals(UpdateCheck.HashFile(target), file.Sha256, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (IOException) { return false; }
+    }
+
     private static async Task StageFileAsync(RemoteZip archive, ManifestFile file, string target, CancellationToken cancellationToken)
     {
+        if (AlreadyStaged(target, file)) return;
+
         var entry = archive.Resolve(file.Path)
             ?? throw new FileNotFoundException($"Arşivde yok: {file.Path}");
         var bytes = await archive.ExtractAsync(entry, cancellationToken);

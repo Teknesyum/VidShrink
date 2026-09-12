@@ -1043,24 +1043,19 @@ public sealed class UpdaterTests : IDisposable
     }
 
     /// <summary>
-    /// Ağsız açılışa verilen tavan. Sayı serbest bir tahmin değil, başlatıcının kendi
-    /// bütçelerinin toplamı; T145'te ölçüldü ve <b>daraltılamaz</b> çıktı:
+    /// Ağsız açılışa verilen tavan. Ölçtüğü şey artık uygulama sürecinin görünmesi
+    /// (<see cref="LaunchTiming.ToApp"/>), başlatıcının çıkışı değil: manifest çekme ve
+    /// indirme <c>Program.cs</c> içinde uygulama başlatıldıktan <b>sonra</b> koşuyor, yani
+    /// ağsız bacağın bekleyişi açılış yolunda değil.
     ///
-    /// <list type="bullet">
-    /// <item>süreç açılışı 81–117 ms — yayımlanmış başlatıcının geçiş kipinde beş koşum;</item>
-    /// <item>manifest bekleyişi 806–832 ms — yönlendirilemeyen adrese sekiz çağrı,
-    /// <see cref="UpdateCheck.ManifestTimeout"/> (800 ms) ile pimli;</item>
-    /// <item>bekleme panelinin kapanış payı 2 000 ms — panel eşiği 400 ms, ağsız bacak
-    /// hep 800 ms'i geçtiği için panel her ağsız açılışta çiziliyor ve kapanışta iş
-    /// parçacığı bu tavanla bekleniyor.</item>
-    /// </list>
+    /// Açılış yolunda kalan iş yalnız yerel: süreç açılışı (T145'te beş koşumda 81–117 ms),
+    /// yarım kalmış sahnenin uygulanması ve bekleme panelinin kapanış payı (panel eşiği
+    /// 400 ms, kapanış tavanı 2 000 ms). Tavan bu üçünü kapsıyor.
     ///
-    /// Toplam 2 887–2 949 ms; 3 sn'lik tavanın altında yalnız 51–113 ms pay var. Tavanı
-    /// küçültmek ölçüyü ürünün kendi izin verdiği en kötü hâlde kırmızıya düşürür.
-    ///
-    /// Uçtan uca ölçüm bu makinede yapılamaz: panel eşiği (400 ms) manifest bütçesinden
-    /// (800 ms) küçük olduğu için ağsız bacak kullanıcının masaüstüne pencere çizer.
-    /// Ayrıntı <c>docs/olcumler/kalan-alti-bant.md</c> içinde.
+    /// Eski gerekçe manifest bekleyişini (806–832 ms, o zamanki 800 ms'lik
+    /// <see cref="UpdateCheck.ManifestTimeout"/> ile pimli) toplamın içinde sayıyordu ve
+    /// 3 sn'nin altında 51–113 ms pay bırakıyordu; o bacak açılıştan çıktı, pay büyüdü.
+    /// Ayrıntı <c>docs/olcumler/kalan-alti-bant.md</c> ve <c>docs/plan.md</c> içinde.
     /// </summary>
     private static readonly TimeSpan AgsizAcilisTavani = TimeSpan.FromSeconds(3);
 
@@ -1076,11 +1071,11 @@ public sealed class UpdaterTests : IDisposable
         var offlineSecond = MeasureLaunch(exe, settings, "http://10.255.255.1/vidshrink");
         var online = MeasureLaunch(exe, settings, null);
 
-        _output.WriteLine($"ağsız ilk açılış: {offlineFirst.TotalMilliseconds:F0} ms");
-        _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.TotalMilliseconds:F0} ms");
-        _output.WriteLine($"ağlı açılış (güncelleme yok): {online.TotalMilliseconds:F0} ms");
-        Assert.True(offlineFirst < AgsizAcilisTavani, $"ağsız açılış çok uzun: {offlineFirst}");
-        Assert.True(offlineSecond < AgsizAcilisTavani, $"ağsız ikinci açılış çok uzun: {offlineSecond}");
+        _output.WriteLine($"ağsız ilk açılış: {offlineFirst.ToApp.TotalMilliseconds:F0} ms (başlatıcı çıkışı {offlineFirst.ToExit.TotalMilliseconds:F0} ms)");
+        _output.WriteLine($"ağsız ikinci açılış: {offlineSecond.ToApp.TotalMilliseconds:F0} ms (başlatıcı çıkışı {offlineSecond.ToExit.TotalMilliseconds:F0} ms)");
+        _output.WriteLine($"ağlı açılış (güncelleme yok): {online.ToApp.TotalMilliseconds:F0} ms (başlatıcı çıkışı {online.ToExit.TotalMilliseconds:F0} ms)");
+        Assert.True(offlineFirst.ToApp < AgsizAcilisTavani, $"ağsız açılış çok uzun: {offlineFirst.ToApp}");
+        Assert.True(offlineSecond.ToApp < AgsizAcilisTavani, $"ağsız ikinci açılış çok uzun: {offlineSecond.ToApp}");
     }
 
     [LiveLauncherFact]
@@ -1099,29 +1094,60 @@ public sealed class UpdaterTests : IDisposable
         var withUpdates = MeasureLaunch(exe, settings, server.BaseUrl);
         var requestsWhileOn = server.Requests - requestsWhileOff;
 
-        _output.WriteLine($"ayar kapalı: {requestsWhileOff} istek, {withoutUpdates.TotalMilliseconds:F0} ms");
-        _output.WriteLine($"ayar açık: {requestsWhileOn} istek, {withUpdates.TotalMilliseconds:F0} ms");
+        _output.WriteLine($"ayar kapalı: {requestsWhileOff} istek, {withoutUpdates.ToApp.TotalMilliseconds:F0} ms");
+        _output.WriteLine($"ayar açık: {requestsWhileOn} istek, {withUpdates.ToApp.TotalMilliseconds:F0} ms");
 
         Assert.Equal(0, requestsWhileOff);
         Assert.True(requestsWhileOn > 0, "ayar açıkken manifest hiç istenmedi");
     }
 
-    private static TimeSpan MeasureLaunch(string exe, string settingsPath, string? baseUrl)
+    /// <summary>
+    /// Bir açılışın iki süresi. <paramref name="ToApp"/> kullanıcının beklediği süre:
+    /// uygulama süreci görünene kadar geçen zaman. <paramref name="ToExit"/> başlatıcının
+    /// kendi çıkışı; indirme açılıştan sonra koştuğu için bu ikinci sayı ağsız turda
+    /// manifest zaman aşımını da içerir ve kullanıcıyı bekletmez.
+    /// </summary>
+    private readonly record struct LaunchTiming(TimeSpan ToApp, TimeSpan ToExit);
+
+    private static LaunchTiming MeasureLaunch(string exe, string settingsPath, string? baseUrl)
     {
         var start = new ProcessStartInfo { FileName = exe, UseShellExecute = false };
         start.Environment["VIDSHRINK_SETTINGS_PATH"] = settingsPath;
         if (baseUrl is not null) start.Environment["VIDSHRINK_UPDATE_BASE_URL"] = baseUrl;
         var stopwatch = Stopwatch.StartNew();
         using var process = Process.Start(start)!;
-        process.WaitForExit();
+
+        var appSeen = TimeSpan.Zero;
+        while (stopwatch.Elapsed < LauncherExitTavani)
+        {
+            if (Process.GetProcessesByName("VidShrink.App").Length > 0)
+            {
+                appSeen = stopwatch.Elapsed;
+                break;
+            }
+            if (process.HasExited)
+            {
+                appSeen = stopwatch.Elapsed;
+                break;
+            }
+            Thread.Sleep(10);
+        }
+
+        process.WaitForExit((int)LauncherExitTavani.TotalMilliseconds);
         stopwatch.Stop();
         foreach (var running in Process.GetProcessesByName("VidShrink.App"))
         {
             try { running.Kill(); } catch (InvalidOperationException) { }
             running.Dispose();
         }
-        return stopwatch.Elapsed;
+        return new LaunchTiming(appSeen, stopwatch.Elapsed);
     }
+
+    /// <summary>
+    /// Başlatıcının kendi çıkışına verilen tavan. Uygulama çoktan ekrandadır; bu süre
+    /// yalnız arkada koşan güncelleme turunun vazgeçmesini bekler.
+    /// </summary>
+    private static readonly TimeSpan LauncherExitTavani = TimeSpan.FromSeconds(30);
 
     /// <summary>Başlatıcının ağa hiç çıkmadığını göstermek için istekleri sayan yerel sunucu.</summary>
     private sealed class CountingHttpServer : IDisposable

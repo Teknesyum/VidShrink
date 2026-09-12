@@ -859,3 +859,73 @@ Kalan 18: 9 `forms/unmeasured-label` (7'si `reg query` ham ciktisi, 1'i
 (`BrandSpellingTests` "Buy Me a Coffee" dizesini kaynakta pimliyor, daha once
 `main.sponsor.label` denenip geri alinmis), 1 `forms/no-sentence-concat`, 1
 `colour/background-gradient`. Kanit `.calisma/ui-tarama/ajan-sonrasi.txt`.
+
+## Guncelleme senkronunun yakinsamasi
+
+Kullanicinin sikayeti: masaustundeki kisayol hala eski surumu aciyor. Kurulu agac
+`%LOCALAPPDATA%\Programs\VidShrink`, olculen durum:
+
+```
+app\.update-version   = 0.3.0
+.launcher-version     = 0.3.0
+app\.update-hashes.json  12.09.2026 20:37  (46485 bayt)
+yayindaki surum       = 0.4.1
+settings.json autoUpdate = true
+```
+
+Hash onbellegi bugun 20:37'de yazilmis, yani senkron kostu ve fark hesabini bitirdi;
+sonra hicbir sey degismedi. Uc olcum sebebi soyluyor.
+
+**1. Manifest kapisi gercek maliyetin altinda.** `UpdateCheck.ManifestTimeout` 800 ms.
+Yayindaki `manifest-win-x64.json` (90589 bayt) soguk cekimde **1817 ms** indi.
+Zaman asiminda `FetchManifestAsync` `null` donuyor, `Updater.Run` `false` donuyor:
+cogu acilis manifeste bakmadan vazgeciyor.
+
+**2. Butce indirilecek yuke gore degil, sabit.** `Updater.Budget` 90 sn ve indirme de
+bu butcenin icinde. Kurulu 0.3.0 ile 0.4.1 manifesti arasindaki olculen fark:
+
+```
+degisen dosya : 375 / 562
+toplam        : 141382981 bayt (134,8 MB)
+en buyuk      : libSkiaSharp.pdb 84033536, libHarfBuzzSharp.pdb 20918272
+```
+
+134,8 MB, dosya basina bir HTTP aralik istegi, 90 saniye. Yetismesi mumkun degil.
+
+**3. Yarida kalan is atiliyor.** Zaman asiminda `catch` blogu `UpdateStage.Discard(stage)`
+cagiriyor; inen dosyalar silinir. Her acilis sifirdan basliyor, hicbir zaman yakinsamiyor.
+Ustelik `Run` her hatayi yutuyor, yani disardan gorunen tek sey "hicbir sey olmadi".
+
+### Dorduncu olcum: yukun yarisi hata ayiklama simgesi
+
+```
+manifestteki pdb : 6 dosya, 100,45 MB
+manifest toplami : 205,22 MB
+pdb haric        : 104,77 MB
+```
+
+Degisen 134,8 MB'in 105 MB'i pdb. Kurulu 0.3.0 agacinda `libSkiaSharp.pdb` ve
+`libHarfBuzzSharp.pdb` **hic yok**, yani fark hesabi onlari her turda "eksik" gorup
+yeniden indirmeye kalkiyor. Son kullanicinin kurulumunda simge dosyasinin isi yok.
+
+### Yapilacak
+
+`Program.cs` senkronu **uygulama acilmadan once**, acilis kapisinin (`SplashGate`)
+icinde kosturuyor. Butceler bu yuzden dar: tasarim yakinsamayi acilis hizina feda ediyor.
+Kullanicinin kurali ise hizi da senkronu da istiyor. Cozum butceyi buyutmek degil, sirayi
+ayirmak.
+
+1. **Yuk kucultulur.** Yayin yukunden `*.pdb` cikar (`release.yml`, manifest yazilmadan
+   once). Olculen etki: yayin yuku 205,22 -> 104,77 MB, 0.3.0'dan gelen fark 134,8 -> ~30 MB.
+2. **Manifest kapisi olcume oturur.** `ManifestTimeout` 800 ms -> 2500 ms; sebebi
+   olculen 1817 ms. Bu cagri acilis yolunda kaldigi icin buyutulmuyor, yalnizca gercek
+   maliyetin ustune cikariliyor.
+3. **Indirme acilis yolundan cikar.** Acilistan once yalnizca **yerel** is yapilir:
+   hazirda bekleyen sahne uygulanir (`UpdateStage.ResumePending`, `LauncherUpdate.Repair`).
+   Manifest cekme ve indirme uygulama `Process.Start` ile ekrana geldikten **sonra**
+   kosar; inen sahne bir sonraki acilista milisaniyelerde yerine gecer.
+4. **Sahne kalici olur.** Zaman asimi ya da ag hatasi sahneyi **silmez**. Sonraki turda
+   ozeti manifestle tutan sahne dosyalari yeniden indirilmez. Boylece senkron yavas
+   hatta da turlar boyunca yakinsar. Bozuk ozet hala atilir.
+
+Davranis degisiyor: iki README ayni commit'te guncellenir.

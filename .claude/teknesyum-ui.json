@@ -1,0 +1,22 @@
+{
+  "ignore": [
+    {
+      "rule": "forms/no-ui-string-literal",
+      "file": "src/VidShrink.App/MainWindow.axaml",
+      "line": 85,
+      "reason": "\"Buy Me a Coffee\" marka adıdır, çevrilmez; yazımı BrandSpellingTests pimliyor."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "CHANGELOG.md",
+      "line": 605,
+      "reason": "16 MB WhatsApp'ın yayınladığı sınır, bizim ölçtüğümüz bir sayı değil; MainWindow.axaml.cs WhatsAppTargetMb = 16 pimliyor."
+    },
+    {
+      "rule": "forms/unmeasured-label",
+      "file": "docs/netlestirme/012-teknesyum-ui-taramasinin-kapanmayan-18-b-girdi.md",
+      "line": 92,
+      "reason": "Danışma girdisi, yukarıdaki CHANGELOG satırını alıntılıyor; kayıt belgesi sonradan düzenlenmez."
+    }
+  ]
+}

@@ -218,6 +218,21 @@ jobs:
           name: shell-extension-win-x64
           path: publish-launcher/shell
 
+      - name: Drop the debug symbols
+        # Measured on 12 Sep 2026 against the published 0.4.1 manifest: the six .pdb
+        # files weigh 100.45 MB of a 205.22 MB payload, and libSkiaSharp.pdb alone is
+        # 84 MB. An install at 0.3.0 has none of them, so the differ counted them as
+        # missing and tried to fetch 134.8 MB on every launch. End users have no use for
+        # symbols. DebugType cannot reach the ones that arrive inside native packages,
+        # so they are deleted from the publish folder instead — before the manifest is
+        # written, so neither the manifest nor the archive lists them.
+        run: |
+          set -euo pipefail
+          find publish -name '*.pdb' -type f -print -delete | wc -l
+          if [ -d publish-launcher ]; then
+            find publish-launcher -name '*.pdb' -type f -print -delete | wc -l
+          fi
+
       - name: Write manifest.json
         # The manifest tool is a CI helper and is not in VidShrink.sln, so it is built
         # from its own project file.
@@ -240,9 +255,9 @@ jobs:
           # top-level field is simply ignored by those older clients, so they keep
           # updating app/ exactly as before.
           #
-          # Only VidShrink.exe is listed under "launcher". The .pdb beside it is in the
-          # archive but is not part of the swap, and the name is pinned by a test against
-          # LauncherUpdate.ExecutableName.
+          # Only VidShrink.exe is listed under "launcher", and the name is pinned by a
+          # test against LauncherUpdate.ExecutableName. The .pdb that used to sit beside
+          # it in the archive is gone: the step above deletes every symbol file.
           #
           # The shell/ folder next to it goes into a second top-level array, "shell". Those
           # files live at the install root like the launcher, and travel in the same launcher

@@ -183,8 +183,13 @@ public static class UpdateCheck
     public static string LatestAssetUrl(string asset) =>
         $"https://github.com/Teknesyum/VidShrink/releases/latest/download/{asset}";
 
-    /// <summary>Manifest çekmenin zaman aşımı; açılışın gecikebileceği en uzun süre budur.</summary>
-    public static readonly TimeSpan ManifestTimeout = TimeSpan.FromMilliseconds(800);
+    /// <summary>
+    /// Manifest çekmenin zaman aşımı. Eskiden 800 ms'ti, çünkü çağrı açılış yolundaydı;
+    /// ölçüm o kapının gerçek maliyetin altında olduğunu gösterdi: yayındaki
+    /// <c>manifest-win-x64.json</c> (90589 bayt) soğuk çekimde 1817 ms indi, yani çoğu
+    /// açılış manifeste hiç bakmadan vazgeçiyordu. Çağrı artık açılıştan sonra koşuyor.
+    /// </summary>
+    public static readonly TimeSpan ManifestTimeout = TimeSpan.FromSeconds(5);
 
     public static async Task<string?> FetchManifestAsync(string url, CancellationToken cancellationToken)
     {

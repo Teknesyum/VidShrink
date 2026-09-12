@@ -5,6 +5,32 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [0.4.2] - 2026-09-12
+
+An installation that could not reach a newer release now does. 0.4.1 shipped a self-update
+that a 0.3.0 installation was unable to finish, so a desktop shortcut kept opening the old
+build no matter how many releases came out.
+
+### Fixed
+
+- **The update now converges instead of restarting.** Three measured defects made it
+  impossible for a 0.3.0 installation to reach 0.4.1. The manifest gate was 800 ms while the
+  published `manifest-win-x64.json` (90589 bytes) took 1817 ms to fetch cold, so most
+  launches gave up before reading it. The whole update, download included, had a 90 s budget
+  while the measured 0.3.0 → 0.4.1 difference was 375 files and 134.8 MB. And any failure
+  discarded the staging folder, so no progress survived the round. The manifest timeout is
+  now 5 s, staging persists and is resumed by digest, and it is discarded only when it was
+  collected for a different version.
+- **The download left the startup path.** Before the application opens, the launcher now
+  only does local work — finishing a half-done launcher swap and moving staged files into
+  place. The manifest fetch and the download run after the window is up, under a 30 minute
+  budget, and what they collect is applied on the next launch. A second launcher finds the
+  work already running through a named mutex and does nothing.
+- **Releases no longer carry debug symbols.** The six `.pdb` files weighed 100.45 MB of a
+  205.22 MB payload, `libSkiaSharp.pdb` alone 84 MB, and an installation that never had them
+  counted every one as a missing file. They are deleted from the publish folder before the
+  manifest is written, so neither the manifest nor the archive lists them.
+
 ## [0.4.1] - 2026-09-12
 
 VidShrink learned to record. 0.4.0 handed the window to the player; this release adds the

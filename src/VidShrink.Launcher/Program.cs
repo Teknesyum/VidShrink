@@ -64,10 +64,6 @@ internal static class Program
             // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
             try { UpdateStage.ResumePending(appDirectory); }
             catch (Exception) { }
-
-            // Ağ yok, manifest bozuk, disk dolu: hepsinde sessizce vazgeçilir.
-            try { pendingSwap |= Updater.Run(baseDirectory, appDirectory); }
-            catch (Exception) { }
         }
 
         try { RecordAppliedUpdate(appDirectory, previousVersion); }
@@ -92,6 +88,13 @@ internal static class Program
             Path.Combine(baseDirectory, "tools", "ffmpeg") + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
         foreach (var argument in args) start.ArgumentList.Add(argument);
         Process.Start(start);
+
+        // İndirme uygulama ekrana geldikten sonra: açılış yolundaki bir ağ turu, hattın
+        // hızına göre açılışı dakikalarca geciktirebilir. İnen sahne bir sonraki açılışta
+        // milisaniyelerde yerine geçer (yukarıdaki ResumePending). Ağ yok, manifest bozuk,
+        // disk dolu: hepsinde sessizce vazgeçilir, yarım sahne silinmez.
+        try { pendingSwap |= Updater.Run(baseDirectory, appDirectory); }
+        catch (Exception) { }
 
         // Geçiş en sonda kurulur, çünkü bu sürecin çıkmasını bekliyor.
         if (pendingSwap)

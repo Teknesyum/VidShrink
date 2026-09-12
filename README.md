@@ -385,33 +385,44 @@ powershell -NoProfile -ExecutionPolicy Bypass -File C:\path\to\Install-VidShrink
 
 ### Staying up to date
 
-On Windows the application updates itself while it opens, without asking. The shortcuts
-point at `VidShrink.exe`, a small launcher above the application. A typical release changes
-about 1.7 MB of a 519 MB installation, and that is all that comes down the wire.
+On Windows the application updates itself, without asking. The shortcuts point at
+`VidShrink.exe`, a small launcher above the application. A typical release changes about
+1.7 MB of a 519 MB installation, and that is all that comes down the wire.
+
+Nothing on the startup path touches the network. Before the application opens, the launcher
+only does local work: it finishes a half-done launcher swap and moves a staged update into
+place. The manifest fetch and the download run **after** the application is on screen, and
+what they collect is applied on the next launch — moving files that are already verified
+takes milliseconds.
 
 ```mermaid
 flowchart TD
     S["Shortcut"] --> LA["VidShrink.exe launcher"]
-    LA --> Q{"Checked in the last 24 hours?"}
-    Q -->|yes| RUN["Start the installed app"]
-    Q -->|no| MF["Fetch the manifest, 800 ms timeout"]
-    MF -->|"offline, rate-limited or broken"| RUN
+    LA --> RES["Apply what is already staged"]
+    RES --> RUN["Start the installed app"]
+    RUN --> MF["Fetch the manifest, 5 s timeout"]
+    MF -->|"offline, rate-limited or broken"| END["Give up silently"]
     MF --> DIFF["Compare SHA-256 file by file"]
-    DIFF -->|"no difference"| RUN
+    DIFF -->|"no difference"| END
     DIFF --> DL["Download only the changed files into staging"]
     DL --> VER{"Every digest verifies?"}
-    VER -->|no| DISC["Discard, cancel this round"]
-    DISC --> RUN
-    VER -->|yes| SWAP["Move into place in one step"]
-    SWAP --> RUN
+    VER -->|no| END
+    VER -->|yes| NEXT["Ready; applied on the next launch"]
 ```
 
-The check runs at most once a day; until twenty-four hours have passed the launcher does
-not go to the network at all. The time of the last check sits next to the setting in
-`%APPDATA%\VidShrink`. An interrupted update is exempt and is finished on the next launch.
+Staging survives a failed round. A dropped line or a timeout leaves the files that did come
+down where they are, and the next round skips them by digest, so a slow connection converges
+over several launches instead of starting from zero each time. Staging is thrown away only
+when it was collected for a different version. An unverified byte is never written, so a
+half-finished stage cannot carry the wrong file. One launcher stages at a time; a second one
+finds the update already running and does nothing.
+
+Releases carry no debug symbols. The `.pdb` files are useless to anyone who is not debugging
+the build, and an installation that never had them counted every one as a missing file and
+fetched it again on each launch.
 
 The launcher never blocks the application from opening. No network, unresolved DNS, a rate
-limit, a broken manifest, a full disk: it gives up silently and starts the installed
+limit, a broken manifest, a full disk: it gives up silently and leaves the installed
 version as it is. FFmpeg never travels with a release and is never re-downloaded; the
 launcher only checks that `ffmpeg.exe` and `ffprobe.exe` are still there. libmpv does not
 travel with a release either: an update replaces `app\` and leaves `tools\libmpv` as the
