@@ -17,3 +17,6 @@ Birim: 0,5 gun/tur (P50), 0,7 (P90); tur tahmini ×1,5 (P50), ×3 (P90).
 | libmpv SW render olcumu (pilot 2) | tahmin yazilmadi | 1 + 2 yuklu tekrar / 0 / ajan ~54 dk / 10 dosya +1602 / olcum ajani 152k, danisma 59k | - |
 | 3. dalga: goruntu, pencere, liste | 3 itme / 0,5 gun / ~70 dosya (ajanin acilis tahmini) | 2 itme (1 CI kirmizisi) / 0 / ajan ~2 saat 15 dk / 61 dosya / kayitli degil | 0,7 |
 | 2. dalga: altyazi ve ses parcasi | P50 3, P90 6 itme / 4 saat-1 gun (ajanin acilis tahmini) | 3 itme (1 CI kirmizisi) + T0 main birlesmesi / 0 / ajan ~2,5 saat / 60 dosya / kayitli degil | 1,0 |
+| 4a. dalga: gelismis goruntu ve ses | P50 8 tur / 4 gun / 3 itme, ~55 dosya (ajanin acilis tahmini) | 1 itme (0 CI kirmizisi) / 0 / kayitli degil / 60 dosya +3173 -14 / kayitli degil | 0,33 |
+| 4b. dalga: araclar (kucuk resim, klip/GIF, mini mod, URL) | P50 9 tur / 4,5 gun / P50 5 itme, ~55 dosya (ajanin acilis tahmini) | 2 itme (1 CI kirmizisi) / 0 / kayitli degil / 59 dosya +2118 -21 / kayitli degil | 0,4 |
+| Tema secimi kusuru ve acik paletler | tahmin yazilmadi | 1 itme (0 CI kirmizisi) / 0 / ajan ~40 dk / 14 dosya +687 -32 / ajan 100k | - |
