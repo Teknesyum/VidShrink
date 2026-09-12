@@ -700,5 +700,29 @@ bolunmemis haliyle iki kol ayni dosyayi yazacakti.
 - Kabul: listelenen her cihaz icin arguman uretilir, bilinmeyen cihaz adi sessizce
   yutulmaz (negatif kontrol), sesli kayitta `ffprobe` iki akis gorur.
 
-**Acilis tahmini:** yazilacak (kol sahipleri atanirken). Gercegi kapanista
-`docs/olcumler/tahmin-isabet.md`ye girer.
+**Acilis tahmini:** yazilmadi — uc kol ayni turda ajanlara dagitildi, tahmin adimi atlandi.
+Gercek `docs/olcumler/tahmin-isabet.md`de uc satir olarak duruyor.
+
+### 8. dalga kapanisi
+
+Uc kol da `main`de: 8a `85ea55de` (5 dosya, +1134), 8c `e11f9148` (4 dosya, +947),
+8b `4b631faf` (98 dosya, +3055 -11). Kapi toplami her birleşmede olcuduldu: 8a'dan sonra
+2141 test, 8c'den sonra 2154, 8b'den sonra dal kosumunda 2163.
+
+Kabul olcutlerinden **ikisi bu dalgada karsilanmadi**, ikisi de ayni sebepten — ses girdisi
+motora bagli degil:
+
+1. 8c'nin "sesli kayitta `ffprobe` iki akis gorur" olcutu. 8c arguman duzeyinde olctu
+   (iki girdi, `amix`, tek `[aout]` eslemi); uctan uca olcum `RecorderArguments.cs` ile
+   `AudioCaptureArguments.cs` birleşmeden alinamaz.
+2. 8b'de mikrofon/sistem sesi secim yuzeyi yok — 8c main'e 8b ile ayni turda girdigi icin
+   kapsamdan cikarildi. `AudioSourceRole`'un iki uyesi bu yuzden `OluUyeTests`'te borc
+   olarak pimli.
+
+Iki maddeyi kapatan is: ses secim kutularini `RecorderView`e eklemek ve
+`RecorderArguments`'in girdi listesini `AudioCapturePlan`dan beslemek.
+
+8b'nin acikta biraktigi olculmus sinir: `-progress` akisinda `total_size` gdigrab
+yakalamasinda akmiyor (8a olcumu, on bir blogun onunda sifir), bu yuzden seritte canli
+boyut gostergesi yok; gecen sure ve kare sayisi akiyor, boyut kayit bitince dosyanin
+kendisinden okunuyor.

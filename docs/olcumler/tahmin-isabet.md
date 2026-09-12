@@ -24,3 +24,6 @@ Birim: 0,5 gun/tur (P50), 0,7 (P90); tur tahmini ×1,5 (P50), ×3 (P90).
 | 7b. dalga: alt denetim seridi ve zaman cubugu | tahmin yazilmadi (ajan acilis tahmini birakmadigini kendi bildirdi) | 1 itme (0 CI kirmizisi) / 0 / ajan ~75 dk / 7 dosya +791 -39 / ajan 101k | - |
 | 7c. dalga: acilis hizi olcumu ve kisaltma | tahmin yazilmadi | 2 itme (0 CI kirmizisi) / 0 / ajan ~65 dk / 8 dosya +525 -4 / ajan 142k | - |
 | UI kilavuzu ihlalleri (MainWindow, Controls, oynatici panelleri) | tahmin yazilmadi | 2 itme (1 CI kirmizisi) / 0 / ajan ~87 dk / 134 dosya +2657 -2249 / ajan 102k | - |
+| 8a. dalga: yakalama motoru (baslat, nazik durdur, ilerleme) | tahmin yazilmadi (uc kol ayni turda dagitildi) | 1 itme (0 CI kirmizisi) / 0 / kayitli degil / 5 dosya +1134 / kayitli degil | - |
+| 8c. dalga: ses girisi ve cihaz listesi | tahmin yazilmadi | 3 kosum (1 CI kirmizisi: OluUyeTests pimi, 1 iptal: escisi itilirken) / 0 / ajan ~72 dk / 4 dosya +947 / ajan 143k | - |
+| 8b. dalga: Kaydedici sekmesi, serit ve 42 dil | tahmin yazilmadi | 1 itme (0 CI kirmizisi; itmeden once 3 yerel kirmizi T0 tarafindan duzeltildi) / 0 / ajan ~23 dk + 4 ceviri ajani ~4 dk / 98 dosya +3055 -11 / yapici 176k, ceviri ajanlari 414k | - |
