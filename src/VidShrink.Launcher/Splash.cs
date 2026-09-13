@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Text;
+using VidShrink.Core;
 
 namespace VidShrink.Launcher;
 
@@ -32,21 +33,21 @@ internal sealed class SplashGate : IDisposable
     /// <summary>Panelin gerçekten açıldığını dışarıdan görmek için; ölçüm ve testler kullanır.</summary>
     public const string TraceVariable = "VIDSHRINK_SPLASH_TRACE";
 
-    private readonly Func<string> _status;
+    private readonly InstallProgress _progress;
     private readonly ManualResetEventSlim _closing = new(false);
     private readonly object _sync = new();
     private Timer? _timer;
     private Thread? _thread;
 
-    private SplashGate(Func<string> status) => _status = status;
+    private SplashGate(InstallProgress progress) => _progress = progress;
 
     /// <summary>
     /// Sayacı kurar ve hemen döner. Panel ancak eşik dolarsa ve o ana kadar
     /// <see cref="Dispose"/> çağrılmadıysa oluşturulur.
     /// </summary>
-    public static SplashGate Arm(Func<string> status)
+    public static SplashGate Arm(InstallProgress progress)
     {
-        var gate = new SplashGate(status);
+        var gate = new SplashGate(progress);
         gate._timer = new Timer(_ => gate.Show(), null, Threshold, Timeout.InfiniteTimeSpan);
         return gate;
     }
@@ -71,7 +72,7 @@ internal sealed class SplashGate : IDisposable
             var started = DateTime.UtcNow;
             do
             {
-                window.Render(_status(), DateTime.UtcNow - started);
+                window.Render(_progress, DateTime.UtcNow - started);
             }
             while (!_closing.Wait(FrameInterval) && DateTime.UtcNow - started < Lifetime);
         }
@@ -86,8 +87,8 @@ internal sealed class SplashGate : IDisposable
         }
     }
 
-    /// <summary>Kare aralığı temanın hareket adımından geliyor.</summary>
-    private static TimeSpan FrameInterval => TimeSpan.FromMilliseconds(SplashArt.Instance.FrameMilliseconds);
+    /// <summary>Kare aralığı panel ölçütünün yazdığı yenileme adımı.</summary>
+    private static TimeSpan FrameInterval => TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds);
 
     /// <summary>
     /// Paneli kapatır. İş bittiğinde de, yarıda kaldığında da aynı yol işler: panel
@@ -380,7 +381,7 @@ internal sealed class SplashWindow : IDisposable
     public static SplashWindow Create() => new();
 
     /// <summary>Bir kare çizer ve pencereyi tazeler.</summary>
-    public void Render(string status, TimeSpan elapsed)
+    public void Render(InstallProgress progress, TimeSpan elapsed)
     {
         Pump();
 
@@ -395,8 +396,14 @@ internal sealed class SplashWindow : IDisposable
         // Tema kuralı: başlık vurgudur, neon mavi alır; durum satırı gövde metnidir.
         // §2 gereği ikisine de hale verilmiyor — panel dar, hale komşunun altına girer.
         DrawLine(title, "VIDSHRINK", _titleFont, _art.ColorRef("NeonBlueColor"));
-        DrawLine(statusBox, status, _statusFont, _art.ColorRef("TextBodyColor"));
-        DrawSweep(elapsed);
+        DrawLine(statusBox, progress.Sentence, _statusFont, _art.ColorRef("TextBodyColor"));
+
+        var state = progress.State;
+        var bar = progress.Advance();
+        DrawLine(_art.Box("percent"), progress.PercentText, _statusFont, StateColor(state), RightAligned);
+        DrawLog(progress.Log);
+        DrawFill(bar, state);
+        if (state == InstallState.Running) DrawSweep(elapsed, bar);
 
         // GDI alfa kanalını sıfırlıyor. Yazının ve parçanın düştüğü alan panelin tümüyle
         // donuk iç bölgesi olduğu için o dikdörtgende alfa geri 255'e çekiliyor; yuvarlak
@@ -437,13 +444,73 @@ internal sealed class SplashWindow : IDisposable
         }
     }
 
-    private void DrawLine((int X, int Y, int Width, int Height) box, string text, IntPtr font, uint color)
+    /// <summary>DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_NOPREFIX | DT_END_ELLIPSIS.</summary>
+    private const uint SingleLine = 0x20 | 0x04 | 0x00 | 0x800 | 0x8000;
+
+    /// <summary>Yüzde sütunu sağa yaslı: rakam büyüdükçe sola doğru uzuyor.</summary>
+    private const uint RightAligned = SingleLine | 0x02;
+
+    private void DrawLine((int X, int Y, int Width, int Height) box, string text, IntPtr font, uint color, uint format = SingleLine)
     {
         SelectObject(_memoryDc, font);
         SetTextColor(_memoryDc, color);
         var rect = new RECT { left = box.X, top = box.Y, right = box.X + box.Width, bottom = box.Y + box.Height };
-        // DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_NOPREFIX
-        DrawTextW(_memoryDc, text, text.Length, ref rect, 0x20 | 0x04 | 0x00 | 0x800);
+        // Kırpma noktasını GDI ölçüyor; satır sarmıyor, üç noktayla kesiliyor.
+        DrawTextW(_memoryDc, text, text.Length, ref rect, format);
+    }
+
+    /// <summary>Durumun rengi: çalışırken vurgu, bitince başarı, hatada kor.</summary>
+    private uint StateColor(InstallState state) => state switch
+    {
+        InstallState.Done => _art.ColorRef("NeonSuccessColor"),
+        InstallState.Failed => _art.ColorRef("NeonEmberColor"),
+        _ => _art.ColorRef("NeonBlueColor")
+    };
+
+    /// <summary>
+    /// Ekranda duran son satırlar, eskiden yeniye ve alta yaslı. Sonuncusu gövde rengiyle
+    /// vurgulu, öncekiler sönük: kullanıcı nerede olduğunu bir bakışta görüyor.
+    /// </summary>
+    private void DrawLog(IReadOnlyList<string> log)
+    {
+        var box = _art.Box("log");
+        var lines = _art.Number("LogLines");
+        if (lines <= 0 || log.Count == 0) return;
+
+        var height = box.Height / lines;
+        var body = _art.ColorRef("TextBodyColor");
+        var faded = _art.ColorRef("TextDisabledColor");
+        var first = lines - Math.Min(lines, log.Count);
+
+        for (var index = 0; index < log.Count && index < lines; index++)
+        {
+            var row = (box.X, box.Y + ((first + index) * height), box.Width, height);
+            DrawLine(row, log[index], _statusFont, index == log.Count - 1 ? body : faded);
+        }
+    }
+
+    /// <summary>
+    /// Yolun dolan kısmı. Genişlik <see cref="InstallProgress.Advance"/>'in döndürdüğü
+    /// çubuk değerinden geliyor; tavan kuralı burada değil, orada işliyor. Çalışırken
+    /// vurgu rengi, bitince durumun düz rengi.
+    /// </summary>
+    private void DrawFill(double bar, InstallState state)
+    {
+        var track = _art.Box("track");
+        var height = _art.Number("ProgressBarHeight");
+        var width = (int)Math.Round(track.Width * Math.Clamp(bar, 0, 100) / 100.0);
+        if (width <= 0) return;
+
+        var region = CreateRoundRectRgn(track.X, track.Y, track.X + width, track.Y + height, height, height);
+        SelectClipRgn(_memoryDc, region);
+
+        var brush = CreateSolidBrush(StateColor(state));
+        var filled = new RECT { left = track.X, top = track.Y, right = track.X + width, bottom = track.Y + height };
+        FillRect(_memoryDc, ref filled, brush);
+        DeleteObject(brush);
+
+        SelectClipRgn(_memoryDc, IntPtr.Zero);
+        DeleteObject(region);
     }
 
     /// <summary>
@@ -456,14 +523,18 @@ internal sealed class SplashWindow : IDisposable
         _art.Duration("MotionSlow").TotalMilliseconds * _art.Number("MotionStaggerCount") * 2);
 
     /// <summary>
-    /// İlerleme yolu görüntüde duruk; üzerinde gezen parça burada çiziliyor. Süre
-    /// bilinmediği için belirsiz kip: parça yolu bir uçtan diğerine tarar.
+    /// Dolan kısmın üstünde gezen tarama ışığı. Yüzde uzun bir adımda dursa bile panel
+    /// yaşadığını gösteriyor; ışık dolan alanın dışına çıkmıyor.
     /// </summary>
-    private void DrawSweep(TimeSpan elapsed)
+    private void DrawSweep(TimeSpan elapsed, double bar)
     {
-        var track = _art.Box("track");
+        var whole = _art.Box("track");
         var height = _art.Number("ProgressBarHeight");
-        var width = track.Width / 4;
+        var filled = (int)Math.Round(whole.Width * Math.Clamp(bar, 0, 100) / 100.0);
+        var width = filled / 4;
+        if (width <= 0) return;
+
+        var track = (whole.X, whole.Y, Width: filled, whole.Height);
         var period = SweepPeriod.TotalMilliseconds;
         var phase = (elapsed.TotalMilliseconds % period) / period;
 

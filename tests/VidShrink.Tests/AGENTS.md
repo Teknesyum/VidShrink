@@ -44,6 +44,10 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   hedef verilmeyince kalite kolunun korunması, bozuk/sıfır/negatif hedefin elenmesi, taban sınırının iki yakası
   (0,7 MB elenir — 0,8 MB geçer), `ApplyBudget`'in kalite kolunu tavanlı bit hızına çevirip `Validate`'ten geçmesi.
   Süreç çalıştırmaz, kanıt dosyası bırakmaz.
+- `KurulumIlerlemesiTests.cs` — kurulum panelinin tavan kuralı: çubuğun yüzdeye fark × 0,08 (en az 0,2) ile
+  yaklaşması, yüzde durunca tavana fark × 0,006 ile sürünüp tavanı geçmemesi, geriye yazan adımın yüzdeyi
+  düşürmemesi, 0-100 kırpması, günlüğün ekranda dokuz satırda durup diske tamamının gitmesi, sonucun duyurulması.
+  Çizim ölçmez; ölçtüğü şey köprünün kararı.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
 - `IkonKutusuTests.cs` — `Themes/Icons.axaml`'daki 26 yolun tasarım kutusu: hepsinin başında `M 0,0 M 24,24`

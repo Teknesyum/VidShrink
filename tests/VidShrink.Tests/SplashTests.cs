@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using VidShrink.Core;
 
 namespace VidShrink.Tests;
 
@@ -63,8 +64,9 @@ public sealed class SplashTests
         Assert.NotEmpty(tokens);
         foreach (var (key, value) in tokens)
         {
-            // Türetilmiş yerleşim kutuları temada yok; onlar ayrıca ölçülüyor.
-            if (key is "panel" or "track" or "title" or "status") continue;
+            // Türetilmiş yerleşim kutuları ve günlük satır sayısı temada yok; onlar
+            // ayrıca ölçülüyor.
+            if (key is "panel" or "track" or "title" or "status" or "percent" or "log" or "LogLines") continue;
             Assert.True(theme.ContainsKey(key), $"Theme.axaml içinde {key} belirteci yok.");
             Assert.Equal(theme[key], value);
         }
@@ -87,8 +89,8 @@ public sealed class SplashTests
     }
 
     /// <summary>
-    /// K2/K3: panelin ölçüleri de temadan geliyor. Yükseklik dolgu, satır yüksekliği,
-    /// aralık ve çubuk yüksekliğinin toplamı; genişlik ipucu genişliği.
+    /// K2/K3: panelin ölçüleri de temadan geliyor. Yükseklik başlık, durum, günlük
+    /// satırları ve çubuğun aralıklarıyla toplamı; genişlik ipucu genişliği.
     /// </summary>
     [SplashImageFact]
     public void PanelGeometryIsDerivedFromSpacingTokens()
@@ -99,20 +101,46 @@ public sealed class SplashTests
 
         var padding = Number("PanelPadding");
         var line = Number("LineHeightBody");
-        var expectedHeight = padding + line + Number("SpaceSm") + line
+        var spaceSm = Number("SpaceSm");
+        var lines = Number("LogLines");
+        var expectedHeight = padding + line + spaceSm + line + spaceSm + (lines * line)
                              + Number("SpaceLg") + Number("ProgressBarHeight") + padding;
 
         var panel = Box("panel");
         Assert.Equal(Number("TipMaxWidth"), panel[2]);
         Assert.Equal(expectedHeight, panel[3]);
 
-        // Yazı ve çubuk panel dolgusunun içinde kalmalı.
-        foreach (var key in new[] { "title", "status", "track" })
+        // Başlık, günlük ve çubuk panel dolgusunun içinde, tam genişlikte.
+        foreach (var key in new[] { "title", "log", "track" })
         {
             var box = Box(key);
             Assert.Equal(panel[0] + padding, box[0]);
             Assert.Equal(panel[2] - (padding * 2), box[2]);
         }
+
+        // Durum cümlesi yüzde sütununun soluna çekiliyor; ikisi aynı satırda ve çakışmıyor.
+        var status = Box("status");
+        var percent = Box("percent");
+        Assert.Equal(status[1], percent[1]);
+        Assert.Equal(panel[0] + panel[2] - padding, percent[0] + percent[2]);
+        Assert.True(status[0] + status[2] + spaceSm <= percent[0]);
+
+        // Günlük kutusu tam sayı satıra bölünüyor; bir satır yarım kalmıyor.
+        Assert.Equal(lines * line, Box("log")[3]);
+    }
+
+    /// <summary>
+    /// Çizen taraf ile işi bildiren taraf aynı satır sayısını sayıyor. Görüntüyü üreten
+    /// araç uygulama koduna bağlanmadığı için sayı iki yerde yazılı; eşitliği bu ölçü
+    /// pimliyor. Ayrılırlarsa günlük ya kırpılır ya boşluk bırakır.
+    /// </summary>
+    [SplashImageFact]
+    public void LogLineCountMatchesTheInstallBridge()
+    {
+        var tokens = ReadTokens(File.ReadAllBytes(ImagePath));
+        Assert.Equal(
+            InstallProgress.LogLines,
+            (int)double.Parse(tokens["LogLines"], CultureInfo.InvariantCulture));
     }
 
     /// <summary>
@@ -159,6 +187,46 @@ public sealed class SplashTests
 
         var program = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Program.cs"));
         Assert.Contains("using (SplashGate.Arm(", program);
+    }
+
+    /// <summary>
+    /// Panel ölçütünün iki kuralı kaynakta duruyor: yenileme aralığı köprünün yazdığı
+    /// sayıdan geliyor ve iş tarafı ekrana yalnız <c>Step</c> ile konuşuyor — her adım
+    /// bir tavanla birlikte. Cümleyi doğrudan çizen bir yol açılırsa buradan görülür.
+    /// </summary>
+    [Fact]
+    public void PanelFollowsTheInstallProgressContract()
+    {
+        var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
+        Assert.Contains("TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds)", source);
+        Assert.Contains("progress.Advance()", source);
+        Assert.DoesNotContain("Func<string>", source);
+
+        var program = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Program.cs"));
+        var steps = Regex.Matches(program, @"progress\.Step\(");
+        Assert.Equal(4, steps.Count);
+        Assert.Single(Regex.Matches(program, @"progress\.Finish\("));
+
+        // Her adımın tavanı bir öncekinin tabanı: sıra tek yönlü.
+        Assert.Contains("progress.Step(2, RepairCeiling", program);
+        Assert.Contains("progress.Step(RepairCeiling, MarkerCeiling", program);
+        Assert.Contains("progress.Step(MarkerCeiling, ResumeCeiling", program);
+        Assert.Contains("progress.Step(ResumeCeiling, DownloadCeiling", program);
+    }
+
+    /// <summary>
+    /// Durumun rengi ölçütün yazdığı yerden: biten iş başarı, hata kor rengini alıyor.
+    /// Sönük günlük satırları da belirteçten okunuyor.
+    /// </summary>
+    [Fact]
+    public void StateColoursComeFromTokens()
+    {
+        var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
+        foreach (var key in new[] { "NeonSuccessColor", "NeonEmberColor", "TextDisabledColor" })
+            Assert.Contains($"ColorRef(\"{key}\")", source);
+
+        Assert.Contains("InstallState.Done => _art.ColorRef(\"NeonSuccessColor\")", source);
+        Assert.Contains("InstallState.Failed => _art.ColorRef(\"NeonEmberColor\")", source);
     }
 
     /// <summary>

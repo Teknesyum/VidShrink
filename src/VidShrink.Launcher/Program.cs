@@ -25,6 +25,22 @@ internal static class Program
     /// <summary>İndirilenlerin toplandığı klasör; Updater ile aynı ad.</summary>
     private const string StageDirectoryName = "update-stage";
 
+    /// <summary>
+    /// Adımların tavanları. Her adım "en fazla buraya kadar" der ve çubuk o adım uzarsa
+    /// tavana sürünür; sayılar süre tahmini değil, adımların ekranda kapladığı pay.
+    /// Sıralama tek yönlü: bir adımın tabanı bir öncekinin tavanıdır.
+    /// </summary>
+    private const double RepairCeiling = 10;
+
+    /// <inheritdoc cref="RepairCeiling"/>
+    private const double MarkerCeiling = 18;
+
+    /// <inheritdoc cref="RepairCeiling"/>
+    private const double ResumeCeiling = 35;
+
+    /// <inheritdoc cref="RepairCeiling"/>
+    private const double DownloadCeiling = 92;
+
     [STAThread]
     private static int Main(string[] args)
     {
@@ -57,20 +73,24 @@ internal static class Program
         // Panel ancak eşik dolarsa çizilir; hızlı turda hiç oluşturulmaz. Bloktan çıkış
         // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
         var pendingSwap = false;
-        using (SplashGate.Arm(() => Status(baseDirectory)))
+        var progress = new InstallProgress();
+        using (SplashGate.Arm(progress))
         {
             // Başlatıcının kendi değişimi yarım kaldıysa önce o okunur: ayar kapalı olsa
             // bile, çünkü burada eksik kalan şey kısayolun gösterdiği dosyanın kendisi.
             // Bu çağrı hedef dosyaya dokunmaz, artıkları siler ve bekleyeni bildirir.
+            progress.Step(2, RepairCeiling, "Yarım kalan başlatıcı değişimi toplanıyor");
             try { pendingSwap = LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
             catch (Exception) { }
 
             // Kurulumdan sonraki ilk açılış: kurulu başlatıcının sürümü çalışan ikiliden
             // okunur, sonraki turlarda işareti değişimin kendisi yazar.
+            progress.Step(RepairCeiling, MarkerCeiling, "Kurulu sürüm işareti yazılıyor");
             try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
             catch (Exception) { }
 
             // Önceki açılışta kopyalama yarım kaldıysa iş burada tamamlanır.
+            progress.Step(MarkerCeiling, ResumeCeiling, "Bekleyen dosyalar yerine taşınıyor");
             try { UpdateStage.ResumePending(appDirectory); }
             catch (Exception) { }
 
@@ -79,9 +99,12 @@ internal static class Program
             // aşağıda; ayara da dokunulmaz.
             if (updateNow)
             {
+                progress.Step(ResumeCeiling, DownloadCeiling, Status(baseDirectory));
                 try { pendingSwap |= Updater.Run(baseDirectory, appDirectory, force: true); }
                 catch (Exception) { }
             }
+
+            progress.Finish(true, "Uygulama açılıyor");
         }
 
         try { RecordAppliedUpdate(appDirectory, previousVersion); }

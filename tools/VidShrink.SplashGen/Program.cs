@@ -23,6 +23,13 @@ internal static class Program
     /// <summary>PNG'ye gömülen belirteç listesinin anahtarı.</summary>
     public const string TokenChunkKeyword = "vidshrink-tokens";
 
+    /// <summary>
+    /// Ekranda duran gunluk satiri sayisi. Ayni sayi <c>VidShrink.Core.InstallProgress</c>
+    /// icinde de var; bu arac uygulama koduna baglanmadigi icin burada tekrar yazilir ve
+    /// ikisinin esitligi <c>SplashTests</c> ile pimlenir.
+    /// </summary>
+    private const int LogLines = 9;
+
     private static int Main(string[] args)
     {
         if (args.Length != 2)
@@ -56,7 +63,7 @@ internal static class Program
         var glow = theme.GlowRadius("GlowBlue");
 
         var panelWidth = theme.Number("TipMaxWidth");
-        var panelHeight = padding + line + spaceSm + line + spaceLg + bar + padding;
+        var panelHeight = padding + line + spaceSm + line + spaceSm + (LogLines * line) + spaceLg + bar + padding;
 
         var width = panelWidth + (glow * 2);
         var height = panelHeight + (glow * 2);
@@ -85,6 +92,9 @@ internal static class Program
 
         var titleTop = panel.Y + padding;
         var statusTop = titleTop + line + spaceSm;
+        var logTop = statusTop + line + spaceSm;
+        var percentWidth = spaceLg * 2;
+        var textWidth = panel.Width - (padding * 2);
 
         tokens = string.Join(";", new[]
         {
@@ -114,8 +124,14 @@ internal static class Program
             // Türetilmiş yerleşim: başlatıcı metni ve gezen parçayı bunlara göre koyar.
             $"panel={Box(panel)}",
             $"track={Box(track)}",
-            $"title={Box(new Rect(panel.X + padding, titleTop, panel.Width - (padding * 2), line))}",
-            $"status={Box(new Rect(panel.X + padding, statusTop, panel.Width - (padding * 2), line))}",
+            $"title={Box(new Rect(panel.X + padding, titleTop, textWidth, line))}",
+            $"status={Box(new Rect(panel.X + padding, statusTop, textWidth - percentWidth - spaceSm, line))}",
+            $"percent={Box(new Rect(panel.X + panel.Width - padding - percentWidth, statusTop, percentWidth, line))}",
+            $"log={Box(new Rect(panel.X + padding, logTop, textWidth, LogLines * line))}",
+            $"LogLines={LogLines.ToString(CultureInfo.InvariantCulture)}",
+            $"TextDisabledColor={theme.Raw("TextDisabledColor")}",
+            $"NeonSuccessColor={theme.Raw("NeonSuccessColor")}",
+            $"NeonEmberColor={theme.Raw("NeonEmberColor")}",
         });
 
         return raster;

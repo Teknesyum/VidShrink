@@ -148,3 +148,43 @@ uygulanmaz ve ekranda "hedef çok küçük" denir; sessizce bozuk kayıt üretil
 - Taban altı hedef → `null`, sebep `TooSmall`.
 - `ApplyBudget` kalite kolunu bit hızı koluna çeviriyor ve `Validate`'ten geçiyor.
 - Varsayılan açılışta elle panel gizli, otomatik özet görünür.
+
+# 2d — Güncelleme Paneli Ölçüte Getiriliyor
+
+Ölçüt `pp/guncelleme-paneli.md`. Panel iki kanal: başlatıcının kurulum penceresi ve
+uygulamanın günlük güncelleme rozeti. Bu tur başlatıcı kanalını ölçüte getiriyor.
+
+Tek köprü bir durum nesnesi. İş tarafı ekrana yalnız `Step(yüzde, tavan, cümle)` ile
+konuşuyor, çizen taraf `Advance()` ile bir kare ilerletip okuyor. Sayı arayüzde
+uydurulmuyor.
+
+**Tavan kuralı:** çubuk yüzdeye fark × 0,08 (en az 0,2) ile yaklaşır, yüzde durursa
+tavana fark × 0,006 ile sürünür, yenileme 16 ms, yüzde geri gitmez. Uzayan adımda panel
+yaşar ama sonraki adımın alanını yemez.
+
+Ekranda her zaman üç şey var: cümle, yüzde, son dokuz günlük satırı. Son satır gövde
+rengiyle vurgulu, öncekiler sönük; satır sarmıyor, GDI'nın `DT_END_ELLIPSIS`'i kırpıyor.
+
+Durum renkleri: çalışırken vurgu, bitince `NeonSuccessColor`, hatada `NeonEmberColor`.
+
+## Dokunulan dosyalar
+
+1. `src/VidShrink.Core/InstallProgress.cs` — yeni, köprü ve tavan kuralı.
+2. `src/VidShrink.Launcher/Splash.cs` — `Arm(InstallProgress)`, yüzde kutusu, günlük,
+   belirli kipe geçen çubuk, dolan kısmın üstündeki tarama ışığı.
+3. `src/VidShrink.Launcher/Program.cs` — dört adımın `Step` çağrısı ve `Finish`.
+4. `tools/VidShrink.SplashGen/Program.cs` — panel dokuz satır günlük ve yüzde sütunu
+   kadar büyüdü; `percent`, `log` kutuları ve `LogLines` belirteci gömülüyor.
+5. `tests/VidShrink.Tests/KurulumIlerlemesiTests.cs` — yeni ölçü.
+6. `tests/VidShrink.Tests/SplashTests.cs` — yeni yerleşim ve sözleşme pimleri.
+
+## Ölçüler
+
+- Çubuk yüzdeye fark × 0,08 ile yaklaşıyor, en az 0,2 adımla.
+- Yüzde durunca tavana sürünüyor ve tavanı geçmiyor (20 500 kare).
+- Geriye yazan adım yüzdeyi düşürmüyor; 0–100 dışı kırpılıyor.
+- Günlük ekranda dokuz satır, diskte tamamı.
+- Görüntüye gömülü `LogLines` ile `InstallProgress.LogLines` eşit.
+- Panel yüksekliği başlık + durum + dokuz satır + çubuk aralıklarının toplamı.
+- Durum cümlesi ile yüzde sütunu aynı satırda ve çakışmıyor.
+- Başlatıcı dört `Step` ve bir `Finish` çağırıyor; tavanlar tek yönlü sıralı.
