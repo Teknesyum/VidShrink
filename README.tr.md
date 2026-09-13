@@ -11,7 +11,7 @@ tek bir ücretsiz, çevrimdışı pencereden.**
 [![Lisans AGPL-3.0-or-later](https://img.shields.io/badge/lisans-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#kurulum)
 
-![VidShrink Küçült sekmesi Türkçe: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T189-kucult-tr.png)
+![VidShrink Küçült sekmesi Türkçe: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T190-kucult-tr.png)
 
 ## Bunların hiçbirini bilmenize gerek yok
 

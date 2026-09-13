@@ -30,7 +30,7 @@ public static class Program
 {
     private const int Width = 1600;
     private const int Height = 1000;
-    private const string Contract = "T189";
+    private const string Contract = "T190";
 
     private static readonly Size Viewport = new(Width, Height);
 
@@ -87,6 +87,11 @@ public static class Program
                 SettlePlan(window, "donustur");
             }),
 
+            Shot(language, outDir, "kaydedici", window =>
+            {
+                SelectTab(window, "main.tab.recorder");
+                AutomaticRecorder(window);
+            }),
             Shot(language, outDir, "ayarlar", window => SelectTab(window, "main.tab.settings")),
             Shot(language, outDir, "gelismis", window => SelectTab(window, "main.tab.advanced")),
             Shot(language, outDir, "hakkinda", window => SelectTab(window, "main.tab.about")),
@@ -230,7 +235,7 @@ public static class Program
 
             using var bitmap = new RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));
             bitmap.Render(target);
-            bitmap.Save(path);
+            bitmap.Save(path, PngBitmapEncoderOptions.Default);
         }
         finally
         {
@@ -384,6 +389,21 @@ public static class Program
         }
 
         throw new InvalidOperationException($"Sekme bulunamadi: {headerKey} ({wanted}).");
+    }
+
+    /// <summary>
+    /// Kaydedici karesi otomatik kiple cekilir: <c>ChkManual</c> bosaltilinca kodlayici,
+    /// kare hizi ve boyut kararini programin kendisi veriyor ve gerekce satiri aciliyor.
+    /// </summary>
+    private static void AutomaticRecorder(MainWindow window)
+    {
+        var pane = Named(window, "RecorderPane");
+        var field = pane.GetType().GetField(
+            "ChkManual",
+            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            ?? throw new MissingFieldException(pane.GetType().Name, "ChkManual");
+
+        ((CheckBox)field.GetValue(pane)!).IsChecked = false;
     }
 
     private static void SetTarget(MainWindow window, string megabytes)

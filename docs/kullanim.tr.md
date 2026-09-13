@@ -7,7 +7,7 @@ Sekmelerin turu. Kısa hâli [README](../README.tr.md) içinde.
 Dosya yüklendikten sonra her karar, gerekçesiyle birlikte, siz başlamadan önce ekrandadır —
 kodek, CRF, çözünürlük, kare hızı, kestirim ve aralığı.
 
-![Küçült sekmesi dosya yüklüyken: üstte kaynak bilgileri, hedef 17 MB'a ayarlı ve Ne Yapacak paneli seçilen kodlayıcıyı, CRF'i, çözünürlüğü ve motorun neden kalite tavanında durduğunu tek tek yazıyor](gorseller/T189-kucult-tr.png)
+![Küçült sekmesi dosya yüklüyken: üstte kaynak bilgileri, hedef 17 MB'a ayarlı ve Ne Yapacak paneli seçilen kodlayıcıyı, CRF'i, çözünürlüğü ve motorun neden kalite tavanında durduğunu tek tek yazıyor](gorseller/T190-kucult-tr.png)
 
 Her hedef yongası bir yerde gerçek bir sınırdır; `?` rozeti hangisi olduğunu söyler.
 
@@ -30,7 +30,7 @@ sohbet yapay zekâsına yapıştırırsınız; dönen JSON'u geri yapıştırdı
 şimdiki kaynağa ve seçeneklere karşı doğrular. Çevrimdışı kalır, API anahtarı istemez ve
 yanıt bozuk ya da bayatsa otomatik plana döner.
 
-![Gelişmiş sekmesi: FFmpeg Komutu kutusu ve AI Ayarları kutusu](gorseller/T189-gelismis-tr.png)
+![Gelişmiş sekmesi: FFmpeg Komutu kutusu ve AI Ayarları kutusu](gorseller/T190-gelismis-tr.png)
 
 Dönüştür sekmesi işin elle yapılan tarafı: kapsayıcı, video kodeği, CRF ya da bit hızı,
 çözünürlük, kare hızı, ses kodeği ve bit hızı, bir de başlangıç ve bitiş zamanı. Akış
@@ -38,7 +38,7 @@ kopyası gerçek `-c:v copy` ve `-c:a copy` kullanır; uyumsuz kapsayıcı ve ka
 eşleşmeleri koşumdan önce engellenir. GIF dönüşümü `palettegen` ardından `paletteuse` ile
 yapılır.
 
-![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu paneli](gorseller/T189-donustur-tr.png)
+![Dönüştür sekmesi: kapsayıcı, kodek, kalite kipi, çözünürlük, kare hızı ve kırpma alanları, yanlarında FFmpeg Komutu paneli](gorseller/T190-donustur-tr.png)
 
 Oynatıcı sekmesi kaynağı pencerenin içinde oynatır; kod çözücü borusu aramalar arasında
 açık kalır. Sekmede videodan başka bir şey yok: başlık satırı, parça düğmeleri ve üç nokta
@@ -60,6 +60,8 @@ oynatıcıyı aşağı itmiyor, üstünde beliriyor.
 Bağlam menüsü de aynı üç eylemi taşır.
 
 ### Kaydedici sekmesi
+
+![Kaydedici sekmesi otomatik kipte: solda kaynak seçici, sağda tahmini süre ve boyut alanları ile Yeniden Ölç düğmesi, altta mikrofonu ve sistem sesini adıyla seçen Ses bölümü](gorseller/T190-kaydedici-tr.png)
 
 Kaydedici tüm ekranı, tek bir pencereyi ya da bir bölgeyi, her platformun gerçekten sahip
 olduğu yakalama kolundan kaydeder: Windows'ta gdigrab, macOS'te avfoundation, Linux'ta

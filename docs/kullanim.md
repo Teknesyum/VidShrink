@@ -7,7 +7,7 @@ A tour of the tabs. The short version is in the [README](../README.md).
 Once a file is loaded, every decision is on screen with the reasoning behind it, before you
 start — the codec, the CRF, the resolution, the frame rate, the estimate and its range.
 
-![The Shrink tab with a file loaded: source details across the top, the target set to 17 MB, and the What It Will Do panel spelling out the chosen encoder, CRF, resolution and the reason the engine stopped at the quality ceiling](gorseller/T189-kucult-en.png)
+![The Shrink tab with a file loaded: source details across the top, the target set to 17 MB, and the What It Will Do panel spelling out the chosen encoder, CRF, resolution and the reason the engine stopped at the quality ceiling](gorseller/T190-kucult-en.png)
 
 Each target chip is a real limit somewhere, and its `?` badge says which.
 
@@ -30,14 +30,14 @@ then validates the JSON you paste back against the current source and options. I
 offline, needs no API key, and falls back to the automatic plan when a response is
 malformed or stale.
 
-![The Advanced tab, holding the FFmpeg command box and the AI settings box](gorseller/T189-gelismis-en.png)
+![The Advanced tab, holding the FFmpeg command box and the AI settings box](gorseller/T190-gelismis-en.png)
 
 The Convert tab is the manual side: container, video codec, CRF or bitrate, resolution,
 frame rate, audio codec and bitrate, and a start and end time. Stream copy uses real
 `-c:v copy` and `-c:a copy`, and incompatible container and source-codec pairs are blocked
 before execution. GIF conversion goes through `palettegen` then `paletteuse`.
 
-![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command panel beside them](gorseller/T189-donustur-en.png)
+![The Convert tab with container, codec, quality mode, resolution, frame rate and trim fields, and the FFmpeg command panel beside them](gorseller/T190-donustur-en.png)
 
 The Player tab plays the source in the window, through a decoder pipe that stays open
 between seeks. The tab is the video and nothing else: no title line, no track buttons, no
@@ -60,6 +60,8 @@ the player instead of pushing it down.
 The context menu carries the same three actions.
 
 ### The Recorder tab
+
+![The Recorder tab in automatic mode: the source picker on the left, the approximate length and size fields with Measure Again beside them, and the sound section choosing microphone and system audio by name](gorseller/T190-kaydedici-en.png)
 
 The Recorder records the whole screen, a single window or a region, through the capture
 backend each platform actually has: gdigrab on Windows, avfoundation on macOS, x11grab on

@@ -23,7 +23,7 @@ aşağıda kalan bayatlar ve hiç görüntüsü olmayan yerler duruyor.
 | Eksik | Neden gerekli | Ne çekilmeli |
 |---|---|---|
 | **Kaydedici sekmesi** | README artık kaydediciyi küçültmeyle eşit görünürlükte duyuruyor, ama T189 takımında kaydedici karesi yok. | Kaydedici sekmesi, **otomatik kip kutucuğu işaretliyken**: seçilen kodlayıcı, kare hızı ve kayıt boyutu kutucuğun altındaki gerekçe satırında görünsün. TR ve EN. |
-| **Oynatıcı karşılaştırma paneli** | `T189-oynatici-*.png` yalnız oynatıcıyı gösteriyor, öncesi-sonrası paneli yok. | Karşılaştırma paneli açık, iki kaynak yüklü hâlde. TR ve EN. |
+| **Oynatıcı karşılaştırma paneli** | `T190-oynatici-*.png` yalnız oynatıcıyı gösteriyor, öncesi-sonrası paneli yok. | Karşılaştırma paneli açık, iki kaynak yüklü hâlde. TR ve EN. |
 | **Sağ tık menüsü** | Windows 11 birincil menüsündeki girdi hiç belgelenmemiş. | Explorer'da bir videoya sağ tık, "Bu videoyu VidShrink ile aç" birincil menüde görünür hâlde. |
 
 ## Çekim kuralları

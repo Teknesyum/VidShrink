@@ -11,7 +11,7 @@ from one free, offline window.**
 [![License AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#install)
 
-![The VidShrink Shrink tab in English: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T189-kucult-en.png)
+![The VidShrink Shrink tab in English: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T190-kucult-en.png)
 
 ## You Do Not Have To Know Any Of This
 
