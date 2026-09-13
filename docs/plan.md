@@ -86,3 +86,65 @@ boş `MoveTo`'su — 24×24 kutuyu sabitleyen iki komut.
 - 11. madde: araştırma alt ajanda, çıktısı `docs/arastirma/ikon-estetigi.md`.
 - 15. madde: kaydedicinin reddi — kullanıcı neyin eksik olduğunu söylemeden yeniden
   kurulmuyor, `.claude/jobs.md`'de gerekçeli açık duruyor.
+
+## Durum — 13 Eylül 2026
+
+E, F, G ve H kuruldu. Ölçüler `docs/arastirma/ikon-estetigi.md`'den geldi;
+`IkonKutusuTests` 26 yolun kutusunu, `GelistiriciSekmesiTests` gizli sekmenin
+sayacını pimliyor. Kanıt kareleri `.calisma/kesit-ef/`.
+
+Açık kalan iki madde: **1** (ölü `v0.4.3` etiketi — kanca hem Bash'i hem
+PowerShell'i durduruyor, tek cümlelik onay bekliyor) ve **15** (kaydedici reddi —
+hangi özelliğin eksik olduğu söylenmeden yeniden kurulmuyor).
+
+
+---
+
+# Plan — Kaydedicide otomatik varsayılan, hedef süre ve hedef MB (13 Eylül 2026)
+
+Girdi: kullanıcının 13 Eylül 2026 ikinci turu, 2c maddesi.
+
+> ayrıca en iyi ayarı program nasıl ayarlıyorsa shrink için burdada en iyi ayarı kullanıcı
+> değil program ayarlayacak kullanıcı dilerse istediği tahmini süre ve istediği tahmini mb
+> yi ayarlayabilecek ancak ayarlamasa bile otomatik en iyi sonuçlarla işlem yapıcağız
+
+## Karar
+
+Otomatik kip **varsayılan** olur. Onay kutusunun anlamı ters çevrilir: `ChkAuto`
+("Otomatik ayar") gider, yerine `ChkManual` ("Kendim ayarlayacağım") gelir ve işaretsiz
+başlar. Elle panel yalnız bu kutu işaretlenince görünür.
+
+Hedef süre ve hedef MB **iki isteğe bağlı kutu**. İkisi de doluysa bit hızı hesaplanır ve
+aday merdiveninin üstüne yazılır; biri boşsa kalite kolu (CRF/CQP) olduğu gibi kalır.
+
+Formül OBS'in tampon hesabının tersi, katsayı OBS'in yazımı:
+
+    video_kbps = (hedef_MB × 8 × 1024 × 1024 / 1000) / süre_sn − ses_kbps × iz_sayısı
+
+Kayıt gerçek zamanlı olduğu için iki geçiş yok; tavanlı bit hızı kullanılır —
+`BitrateKbps = MaxBitrateKbps = kbps`, `BufferKbits = 2 × kbps`. Hedef süre ayrıca
+`MaxDuration`'a yazılır, yani kayıt kendi kendine biter.
+
+Hesap taban bit hızının altına düşerse (`RecorderBudget.MinimumVideoKbps`) bütçe
+uygulanmaz ve ekranda "hedef çok küçük" denir; sessizce bozuk kayıt üretilmez.
+
+## Dokunulan dosyalar
+
+1. `src/VidShrink.Core/RecorderBudget.cs` — yeni, saf hesap.
+2. `src/VidShrink.Core/RecorderAutoPlan.cs` — `ApplyBudget`.
+3. `src/VidShrink.App/Recorder/RecorderSettings.cs` — `ManualMode`, `TargetSeconds`,
+   `TargetMegabytes`; eski `autoMode` anahtarı okunmaya devam eder.
+4. `src/VidShrink.App/Recorder/RecorderView.axaml` — kutunun tersi, iki hedef kutusu.
+5. `src/VidShrink.App/Recorder/RecorderView.Otomatik.cs` — `AutoMode` artık `!ManualMode`.
+6. `src/VidShrink.App/Recorder/RecorderView.Hedef.cs` — bütçenin isteğe yazılması.
+7. `src/VidShrink.App/Locales/<42 dil>/main.json` — yeni anahtarlar.
+8. `tests/VidShrink.Tests/KayitButceTests.cs` — yeni ölçü.
+
+## Ölçüler
+
+- Boş hedef → bütçe yok, kalite kolu korunuyor (negatif kontrol).
+- 10 MB / 30 sn → OBS katsayısıyla 2796 kbps toplam, eksi 160 ses = 2636 video.
+- Süre var MB yok, MB var süre yok, sıfır ve negatif değerler → `null`.
+- Taban altı hedef → `null`, sebep `TooSmall`.
+- `ApplyBudget` kalite kolunu bit hızı koluna çeviriyor ve `Validate`'ten geçiyor.
+- Varsayılan açılışta elle panel gizli, otomatik özet görünür.

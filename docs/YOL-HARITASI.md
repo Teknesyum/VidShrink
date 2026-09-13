@@ -59,3 +59,53 @@ osx-arm64 paketinin libmpv'si Homebrew şişelerinden geliyor ve 48 dylib'in 47'
 derlemek ya da MPVKit'e geçmek demek; ikisi de kendi yayın zincirini getiriyor. Oynatıcı
 libmpv'ye bağlı olduğu için alt sürüm macOS 15 ilan edilir. Daha düşük bir taban istenirse
 iş `.claude/sonra.md`'deki libmpv derleme maddesinden açılır.
+
+### Kaydedicinin kullanışlılık sırası araştırmadan gelir (13 Eylül 2026)
+
+On iki kaydedici okundu; üç rapor `docs/arastirma/` altında duruyor:
+`kaydedici-kullanislilik.md` (833 satır, sekiz başlık), `kaydedici-bolge-ve-cerceve.md`
+(bölge seçimi ve çerçeve, sayılar ShareX ve OBS kaynağından), `kaydedici-otomatik-ayar-ve-hedef-boyut.md`
+(OBS sihirbazının bit hızı formülü, hedef boyut, lisans yükü).
+
+Sıra kullanıcının değil, iki ölçüte göre dizildi: **kaydedici o özellik olmadan kullanılmıyor mu**,
+ve **bizi rakipten ayırıyor mu**. Numaralar aşağıda; her biri kendi kesitidir.
+
+1. Sürükleyerek bölge seçimi + son bölgeyi hatırlama — kapı. Zorluk orta (çok monitör, DPI).
+2. Genel kısayol: başlat/durdur, duraklat, iptal; `RegisterHotKey` çakışırsa kullanıcıya söylenir.
+3. Tepsi simgesi: üç durumlu renk, canlı ipuçta süre **ve anlık MB** — anlık boyut bizim farkımız.
+4. Bitiş penceresi: **Sıkıştır** / Klasörü Aç / Önizle. Kaydedici ile sıkıştırıcının aynı
+   programda olması tek gerçek üstünlüğümüz; "Sıkıştır" birinci düğmedir.
+5. Otomatik bitirme: süre sınırı ve dosya boyutu sınırı, 30 saniye kala uyarı.
+6. Kayıt çerçevesi: üstte kalan, tıklamayı geçiren, kısayolla gizlenen. Zorluk yüksek.
+7. Geri sayım 3-2-1 (0/3/5/10 saniye seçenekli).
+8. Oran kilidi ve hazır boyutlar (16:9, 4:3; 1920x1080, 1280x720, dikey 1080x1920).
+9. Otomatik kodlayıcı seçimi — **bu turda yapıldı**, aşağıya bakın.
+10. Tıklama halkası ve imleç gizleme.
+11. Piksel piksel klavye ayarı (ok 1 px, Shift+ok 10 px) ve büyüteç.
+12. Tuş gösterimi; parola kutusunda otomatik susma. Zorluk yüksek, kitle dar.
+
+Tam ekranda üstte duran çerçeve konusunda bir düzeltme kayda geçti: **Bandicam'de
+"yanıp sönen dikdörtgen" diye belgelenmiş bir ayar yok**; yeşilden kırmızıya dönen şey
+FPS bindirmesidir, dikdörtgen penceresi kayıt sırasında düz kırmızıdır. Çerçevenin kayda
+karışmaması için iki yol var: `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` — Windows 10
+2004 altında işe yaramaz — ve ShareX'in ucuz numarası, kayıt dikdörtgenini her yönden
+1 px içeri almak. İkincisi P/Invoke istemiyor, önce o denenir.
+
+WGC'nin sarı kenarlığı kapatılamaz: `IsBorderRequired = false` manifest yeteneği istiyor,
+o da MSIX paketi demek. Paketsiz exe'de bu yol kapalı; OBS aynı isteği "planlanmadı" diye
+kapattı. Pencere yakalamada sarı kenarlık bilinen ve kabul edilen kısıttır.
+
+### Kaydedicide en iyi ayarı program seçer, kullanıcı isterse üstüne yazar (13 Eylül 2026)
+
+Otomatik kip artık **varsayılan**. Onay kutusu kalktı; kullanıcı hiçbir şey seçmezse
+`RecorderAutoPlan` merdiveni koşuyor. Elle ayar yüzeyi kaybolmuyor, "Kendim ayarlayacağım"
+denince açılıyor — sıkıştırma tarafındaki davranışın aynısı.
+
+Hedef süre ve hedef MB **isteğe bağlı**: boş bırakılırsa otomatik en iyi sonuç, doldurulursa
+bit hızı `(hedef_MB × 8 × 1024 × 1024 / 1000) / süre_sn − ses_kbps` ile hesaplanıp aday
+merdiveninin üstüne biniyor. Katsayı seçimi belgeye yazıldı: OBS'in `×1000/8/1024/1024`
+yazımı ile yaygın `×8192` yazımı arasında %2,4 fark var, biz OBS'in yazımını kullanıyoruz.
+
+HandBrake'in "hedef boyut kötü fikirdir" tezi biliniyor ve bilerek reddediliyor: VidShrink'in
+varlık sebebi hedef boyuta oturtmak. Ama tez raporda duruyor, çünkü hedef boyut kolunun neden
+iki geçiş ya da tavanlı CRF gerektirdiğini o açıklıyor.
