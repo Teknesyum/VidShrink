@@ -36,6 +36,17 @@ public static class Program
 
     private static readonly string[] Languages = { "en", "tr" };
 
+    /// <summary>
+    /// Karelerin okudugu ve yazdigi ayar dosyasi. <see cref="MainWindow"/> yol verilmezse
+    /// <c>%APPDATA%\VidShrink\settings.json</c>'i acar — yani makinede kurulu uygulamanin
+    /// kendi ayarini. 13 Eylul 2026'da T191 takimi cekilirken oldu: arac pencereyi
+    /// Ingilizce'ye cevirdi, kapanirken kullanicinin dosyasina <c>language: en</c> ve
+    /// <c>autoUpdate: false</c> yazdi, masaustundeki kurulumun otomatik guncellemesi kapandi.
+    /// Arac artik kendi dosyasini <c>.calisma/</c> altinda tutuyor.
+    /// </summary>
+    private static readonly string SettingsFile =
+        Path.Combine(RepoRoot(), ".calisma", "shot-ayar", "settings.json");
+
     public static int Main(string[] args)
     {
         var outDir = args.Length > 0
@@ -214,9 +225,11 @@ public static class Program
     {
         Strings.Use(language == "tr" ? "en" : "tr");
 
+        Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile)!);
         var window = new MainWindow { Width = double.NaN, Height = double.NaN };
         try
         {
+            SetProperty(window, "SettingsPathOverride", SettingsFile);
             Invoke(window, "UseLanguage", language);
 
             LayOut(window);

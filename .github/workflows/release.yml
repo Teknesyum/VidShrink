@@ -350,3 +350,27 @@ jobs:
             gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "manifest-$rid.json"
           done
           test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "false"
+
+  # A tag whose release run goes red publishes nothing, and nothing says so: installed
+  # copies keep following releases/latest and sit on the previous version. That is what
+  # happened to 0.5.0 and 0.5.1 on 13 September 2026 - both tags exist, neither shipped an
+  # asset, and the desktop stayed on 0.4.5 until 0.5.2 landed. This job turns that silence
+  # into a push.
+  alarm:
+    needs: [version, test, shell-extension, publish, release]
+    if: ${{ !cancelled() && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TOPIC: ${{ secrets.NTFY_TOPIC }}
+    steps:
+      - name: Push to phone
+        if: env.TOPIC != ''
+        run: |
+          curl -sS \
+            -H "Title: VidShrink ${{ github.ref_name }} yayinlanmadi" \
+            -H "Priority: urgent" \
+            -H "Tags: rotating_light" \
+            -H "Click: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -d "Etiket itildi, release kosumu kirmizi. Kurulu kopyalar eski surumde kaliyor." \
+            "https://ntfy.sh/$TOPIC"

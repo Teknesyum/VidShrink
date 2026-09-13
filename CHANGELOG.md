@@ -7,6 +7,19 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- The screenshot tool no longer writes the settings of the copy installed on the machine.
+  `MainWindow` opens `%APPDATA%/VidShrink/settings.json` when it is handed no path, and the
+  player history, the recent list and the recorder settings sit beside it. Shooting the T191
+  set on 13 September 2026 switched the window to English and saved that file back with
+  `language: en` and `autoUpdate: false`, so the installed copy stopped following releases -
+  0.5.2 did not arrive on its own - and the test clips landed in the user's recent list. The
+  tool now keeps its own file under `.calisma/`.
+- A tag whose release run fails now pushes a notification. 0.5.0 and 0.5.1 both have tags and
+  neither published an asset, so installed copies kept reading 0.4.5 from
+  `releases/latest` with nothing saying anything was wrong.
+
 ## [0.5.2] - 2026-09-13
 
 ### Fixed
