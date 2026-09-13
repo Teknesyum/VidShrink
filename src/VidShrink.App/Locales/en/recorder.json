@@ -40,6 +40,8 @@
   "recorder.output.title": "Output folder",
   "recorder.output.browse": "Browse…",
   "recorder.output.reveal": "Show in folder",
+  "recorder.output.to-shrink": "Send to Shrink",
+  "recorder.output.to-player": "Open in player",
   "recorder.output.done": "Recording finished: {0} MB in {1} segments",
   "recorder.output.partial": "The recording was cut short and the file never closed; it may not play.",
   "recorder.output.failed": "ffmpeg ended with code {0}.",

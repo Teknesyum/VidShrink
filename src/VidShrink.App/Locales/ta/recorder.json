@@ -40,6 +40,8 @@
   "recorder.output.title": "வெளியீட்டு கோப்புறை",
   "recorder.output.browse": "உலாவு…",
   "recorder.output.reveal": "கோப்புறையில் காட்டு",
+  "recorder.output.to-shrink": "சுருக்கிற்கு அனுப்பு",
+  "recorder.output.to-player": "இயக்கியில் திற",
   "recorder.output.done": "பதிவு முடிந்தது: {1} பிரிவுகளில் {0} MB",
   "recorder.output.partial": "பதிவு பாதியில் நிறுத்தப்பட்டது, கோப்பு மூடப்படவில்லை; அது இயங்காமல் போகலாம்.",
   "recorder.output.failed": "ffmpeg குறியீடு {0} உடன் முடிந்தது.",

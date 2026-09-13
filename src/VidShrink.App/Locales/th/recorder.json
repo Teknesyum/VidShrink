@@ -40,6 +40,8 @@
   "recorder.output.title": "โฟลเดอร์ผลลัพธ์",
   "recorder.output.browse": "เรียกดู…",
   "recorder.output.reveal": "แสดงในโฟลเดอร์",
+  "recorder.output.to-shrink": "ส่งไปที่ย่อ",
+  "recorder.output.to-player": "เปิดในตัวเล่น",
   "recorder.output.done": "บันทึกเสร็จแล้ว: {0} MB ใน {1} ส่วน",
   "recorder.output.partial": "การบันทึกถูกตัดตอนกลางคันและไฟล์ไม่ได้ปิด อาจเล่นไม่ได้",
   "recorder.output.failed": "ffmpeg สิ้นสุดด้วยรหัส {0}",

@@ -40,6 +40,8 @@
   "recorder.output.title": "आउटपुट फ़ोल्डर",
   "recorder.output.browse": "ब्राउज़ करें…",
   "recorder.output.reveal": "फ़ोल्डर में दिखाएं",
+  "recorder.output.to-shrink": "सिकोड़ें में भेजें",
+  "recorder.output.to-player": "प्लेयर में खोलें",
   "recorder.output.done": "रिकॉर्डिंग समाप्त: {1} खंडों में {0} MB",
   "recorder.output.partial": "रिकॉर्डिंग बीच में कट गई और फ़ाइल कभी बंद नहीं हुई; यह चल नहीं सकती।",
   "recorder.output.failed": "ffmpeg कोड {0} के साथ समाप्त हुआ।",

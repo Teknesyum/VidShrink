@@ -48,6 +48,16 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   yaklaşması, yüzde durunca tavana fark × 0,006 ile sürünüp tavanı geçmemesi, geriye yazan adımın yüzdeyi
   düşürmemesi, 0-100 kırpması, günlüğün ekranda dokuz satırda durup diske tamamının gitmesi, sonucun duyurulması.
   Çizim ölçmez; ölçtüğü şey köprünün kararı.
+- `KayitTeslimTests.cs` — kayıt bittikten sonraki teslim: sonuç panelindeki dört kapı (klasör, küçültme, oynatıcı,
+  paylaşım), yolun metin kutusundan değil alandan okunması, ana pencerenin iki kapısının sekmeyi değiştirip yükleyiciyi
+  çağırması, paylaşımın `ShareFlow`/`Core/Share` üstünden gitmesi, hedef tablosunun yayın paketine girmesi ve iki yeni
+  anahtarın 42 dilde bulunması. Kaynak metin okur, pencere açmaz.
+- `PencereKabuguTests.cs` — pencere kabuğunun iki kararı: üst şeridin içerikle aynı gözde durup katman olması (görünüp
+  kaybolurken içeriğin yer değiştirmemesi), belirme eşiğinin başlık çubuğunun kendi yüksekliğinden gelmesi, kenarlık
+  kuralının tek yerde durup oynatıcı sekmesini tam ekranla aynı kola koyması. Kaynak metin okur, pencere açmaz.
+- `KabukMenusuTests.cs` — sağ tık menüsünün iki tarafı: `ShellMenu.cs` ile `Install-VidShrink.ps1`'in anahtar adları,
+  uzantı listesi ve hedef listesi birebir aynı; silme kolu Appx paketini de kaldırıyor; kutu Ayarlar sekmesinde;
+  etiket arayüz dilini izliyor; sekiz yeni anahtar 42 dilde. Kayıt defterine yazmaz, kaynak metin okur.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
 - `IkonKutusuTests.cs` — `Themes/Icons.axaml`'daki 26 yolun tasarım kutusu: hepsinin başında `M 0,0 M 24,24`

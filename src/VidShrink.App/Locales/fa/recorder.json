@@ -40,6 +40,8 @@
   "recorder.output.title": "پوشهٔ خروجی",
   "recorder.output.browse": "مرور…",
   "recorder.output.reveal": "نمایش در پوشه",
+  "recorder.output.to-shrink": "ارسال به فشرده‌سازی",
+  "recorder.output.to-player": "باز کردن در پخش‌کننده",
   "recorder.output.done": "ضبط پایان یافت: {0} MB در {1} بخش",
   "recorder.output.partial": "ضبط ناتمام قطع شد و فایل هرگز بسته نشد؛ ممکن است پخش نشود.",
   "recorder.output.failed": "ffmpeg با کد {0} پایان یافت.",

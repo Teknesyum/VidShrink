@@ -40,6 +40,8 @@
   "recorder.output.title": "Izvades mape",
   "recorder.output.browse": "Pārlūkot…",
   "recorder.output.reveal": "Rādīt mapē",
+  "recorder.output.to-shrink": "Sūtīt saspiešanai",
+  "recorder.output.to-player": "Atvērt atskaņotājā",
   "recorder.output.done": "Ierakstīšana pabeigta: {0} MB, {1} daļās",
   "recorder.output.partial": "Ieraksts tika pārtraukts un fails nekad netika aizvērts; tas var neatskaņoties.",
   "recorder.output.failed": "ffmpeg beidza darbu ar kodu {0}.",

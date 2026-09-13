@@ -40,6 +40,8 @@
   "recorder.output.title": "আউটপুট ফোল্ডার",
   "recorder.output.browse": "ব্রাউজ করুন…",
   "recorder.output.reveal": "ফোল্ডারে দেখান",
+  "recorder.output.to-shrink": "সংকোচনে পাঠান",
+  "recorder.output.to-player": "প্লেয়ারে খুলুন",
   "recorder.output.done": "রেকর্ডিং শেষ হয়েছে: {1} খণ্ডে {0} MB",
   "recorder.output.partial": "রেকর্ডিং মাঝপথে থেমে গেছে এবং ফাইলটি বন্ধ হয়নি; এটি নাও চলতে পারে।",
   "recorder.output.failed": "ffmpeg কোড {0} নিয়ে শেষ হয়েছে।",

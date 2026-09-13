@@ -40,6 +40,8 @@
   "recorder.output.title": "출력 폴더",
   "recorder.output.browse": "찾아보기…",
   "recorder.output.reveal": "폴더에서 보기",
+  "recorder.output.to-shrink": "축소로 보내기",
+  "recorder.output.to-player": "플레이어에서 열기",
   "recorder.output.done": "녹화 완료: {1}개 구간에 {0} MB",
   "recorder.output.partial": "녹화가 중간에 끊겨 파일이 제대로 닫히지 않았습니다. 재생되지 않을 수 있습니다.",
   "recorder.output.failed": "ffmpeg가 코드 {0}로 종료되었습니다.",

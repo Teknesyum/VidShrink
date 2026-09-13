@@ -40,6 +40,8 @@
   "recorder.output.title": "Folder output",
   "recorder.output.browse": "Layari…",
   "recorder.output.reveal": "Tunjuk dalam folder",
+  "recorder.output.to-shrink": "Hantar ke Kecilkan",
+  "recorder.output.to-player": "Buka dalam pemain",
   "recorder.output.done": "Rakaman selesai: {0} MB dalam {1} segmen",
   "recorder.output.partial": "Rakaman terputus dan fail tidak pernah ditutup; ia mungkin tidak boleh dimainkan.",
   "recorder.output.failed": "ffmpeg tamat dengan kod {0}.",

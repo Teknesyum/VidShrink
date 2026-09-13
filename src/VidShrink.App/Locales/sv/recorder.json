@@ -40,6 +40,8 @@
   "recorder.output.title": "Utdatamapp",
   "recorder.output.browse": "Bläddra…",
   "recorder.output.reveal": "Visa i mapp",
+  "recorder.output.to-shrink": "Skicka till Krymp",
+  "recorder.output.to-player": "Öppna i spelaren",
   "recorder.output.done": "Inspelning klar: {0} MB i {1} segment",
   "recorder.output.partial": "Inspelningen avbröts och filen stängdes aldrig; den kanske inte går att spela upp.",
   "recorder.output.failed": "ffmpeg avslutades med kod {0}.",

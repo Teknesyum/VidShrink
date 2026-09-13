@@ -40,6 +40,8 @@
   "recorder.output.title": "Išvesties aplankas",
   "recorder.output.browse": "Naršyti…",
   "recorder.output.reveal": "Rodyti aplanke",
+  "recorder.output.to-shrink": "Siųsti mažinti",
+  "recorder.output.to-player": "Atverti grotuve",
   "recorder.output.done": "Įrašymas baigtas: {0} MB, {1} dalyse",
   "recorder.output.partial": "Įrašymas buvo nutrauktas ir failas taip ir neuždarytas; jis gali neatsiverti.",
   "recorder.output.failed": "ffmpeg baigė darbą su kodu {0}.",

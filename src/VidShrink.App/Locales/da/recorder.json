@@ -40,6 +40,8 @@
   "recorder.output.title": "Outputmappe",
   "recorder.output.browse": "Gennemse…",
   "recorder.output.reveal": "Vis i mappe",
+  "recorder.output.to-shrink": "Send til Krymp",
+  "recorder.output.to-player": "Åbn i afspilleren",
   "recorder.output.done": "Optagelse afsluttet: {0} MB i {1} segmenter",
   "recorder.output.partial": "Optagelsen blev afbrudt, og filen blev aldrig lukket; den kan muligvis ikke afspilles.",
   "recorder.output.failed": "ffmpeg afsluttede med kode {0}.",

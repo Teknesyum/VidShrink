@@ -1,4 +1,4 @@
-<Styles xmlns="https://github.com/avaloniaui"
+﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Styles.Resources>
     <ResourceDictionary>
@@ -813,16 +813,10 @@
               cumlesinin karsiligi bu.
             -->
             <Grid RowDefinitions="Auto,*" ClipToBounds="False">
-              <ItemsPresenter Name="PART_ItemsPresenter"
-                              Grid.Row="0"
-                              Height="{StaticResource TitleBarHeight}"
-                              HorizontalAlignment="Left"
-                              ItemsPanel="{TemplateBinding ItemsPanel}"
-                              ClipToBounds="False"
-                              Margin="{TemplateBinding Padding}"/>
               <TransitioningContentControl Name="SelectedContentHost"
                                            Margin="{StaticResource WorkspaceMargin}"
-                                           Grid.Row="1"
+                                           Grid.Row="0"
+                                           Grid.RowSpan="2"
                                            Content="{TemplateBinding SelectedContent}"
                                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
                                            HorizontalContentAlignment="Stretch"
@@ -835,6 +829,14 @@
                                 Grid.Row="1"
                                 VerticalAlignment="Top"
                                 Content="{TemplateBinding Tag}"/>
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              Grid.Row="0"
+                              Height="{StaticResource TitleBarHeight}"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Top"
+                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                              ClipToBounds="False"
+                              Margin="{TemplateBinding Padding}"/>
             </Grid>
           </ControlTemplate>
         </Setter>

@@ -40,6 +40,8 @@
   "recorder.output.title": "Kimeneti mappa",
   "recorder.output.browse": "Tallózás…",
   "recorder.output.reveal": "Megjelenítés a mappában",
+  "recorder.output.to-shrink": "Küldés a tömörítéshez",
+  "recorder.output.to-player": "Megnyitás a lejátszóban",
   "recorder.output.done": "Felvétel kész: {0} MB {1} szegmensben",
   "recorder.output.partial": "A felvétel megszakadt, és a fájl soha nem záródott le; lehet, hogy nem játszható le.",
   "recorder.output.failed": "Az ffmpeg {0} kóddal fejeződött be.",

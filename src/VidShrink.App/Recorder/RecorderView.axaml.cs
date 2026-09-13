@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -24,6 +25,14 @@ namespace VidShrink.App.Recorder;
 internal partial class RecorderView : UserControl
 {
     private readonly RecorderSettings _settings;
+
+    private string? _lastRecording;
+
+    /// <summary>Biten kaydı küçültme sekmesine taşıyan kapı; ana pencere kuruyor.</summary>
+    internal Func<string, Task>? OpenInShrink { get; set; }
+
+    /// <summary>Biten kaydı oynatıcı sekmesinde açan kapı; ana pencere kuruyor.</summary>
+    internal Func<string, Task>? OpenInPlayer { get; set; }
 
     public RecorderView()
     {
@@ -86,6 +95,8 @@ internal partial class RecorderView : UserControl
         TxtError.Text = string.Empty;
         ResultPanel.IsVisible = false;
         TxtWarning.IsVisible = false;
+        _lastRecording = null;
+        ResetShare();
     }
 
     private void ShowError(string message)
@@ -101,7 +112,9 @@ internal partial class RecorderView : UserControl
     private void ShowResult(RecordResult result)
     {
         ResultPanel.IsVisible = true;
+        _lastRecording = result.OutputPath;
         TxtResultPath.Text = result.OutputPath;
+        ResetShare();
         TxtResult.Text = Say(
             "recorder.output.done",
             result.OutputMb.ToString("0.0", Strings.Culture),
@@ -121,8 +134,24 @@ internal partial class RecorderView : UserControl
 
     private void OnReveal(object? sender, RoutedEventArgs e)
     {
-        var path = TxtResultPath.Text;
-        if (!string.IsNullOrWhiteSpace(path)) VidShrink.App.Platform.Reveal(path!);
+        if (Delivered() is { } path) VidShrink.App.Platform.Reveal(path);
+    }
+
+    /// <summary>
+    /// Teslim edilmiş dosya. Yol kutudan değil alandan okunuyor: kutu salt okunur olsa da
+    /// bir metin kutusudur, sonraki işin girdisi ekrandaki metne bağlanmaz.
+    /// </summary>
+    private string? Delivered()
+        => !string.IsNullOrWhiteSpace(_lastRecording) && File.Exists(_lastRecording) ? _lastRecording : null;
+
+    private async void OnToShrink(object? sender, RoutedEventArgs e)
+    {
+        if (Delivered() is { } path && OpenInShrink is { } gate) await gate(path);
+    }
+
+    private async void OnToPlayer(object? sender, RoutedEventArgs e)
+    {
+        if (Delivered() is { } path && OpenInPlayer is { } gate) await gate(path);
     }
 
     /// <summary>

@@ -40,6 +40,8 @@
   "recorder.output.title": "Cartella di output",
   "recorder.output.browse": "Sfoglia…",
   "recorder.output.reveal": "Mostra nella cartella",
+  "recorder.output.to-shrink": "Invia a Riduci",
+  "recorder.output.to-player": "Apri nel lettore",
   "recorder.output.done": "Registrazione terminata: {0} MB in {1} segmenti",
   "recorder.output.partial": "La registrazione è stata interrotta e il file non si è mai chiuso; potrebbe non essere riproducibile.",
   "recorder.output.failed": "ffmpeg è terminato con il codice {0}.",

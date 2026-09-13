@@ -40,6 +40,8 @@
   "recorder.output.title": "Výstupný priečinok",
   "recorder.output.browse": "Prehľadávať…",
   "recorder.output.reveal": "Zobraziť v priečinku",
+  "recorder.output.to-shrink": "Poslať na zmenšenie",
+  "recorder.output.to-player": "Otvoriť v prehrávači",
   "recorder.output.done": "Nahrávanie dokončené: {0} MB v {1} segmentoch",
   "recorder.output.partial": "Nahrávanie bolo predčasne prerušené a súbor sa nikdy nezavrel; nemusí sa dať prehrať.",
   "recorder.output.failed": "ffmpeg skončil s kódom {0}.",

@@ -40,6 +40,8 @@
   "recorder.output.title": "آؤٹ پٹ فولڈر",
   "recorder.output.browse": "تلاش کریں…",
   "recorder.output.reveal": "فولڈر میں دکھائیں",
+  "recorder.output.to-shrink": "سکیڑیں کو بھیجیں",
+  "recorder.output.to-player": "پلیئر میں کھولیں",
   "recorder.output.done": "ریکارڈنگ مکمل ہوئی: {1} حصوں میں {0} MB",
   "recorder.output.partial": "ریکارڈنگ ادھوری رہ گئی اور فائل بند نہیں ہوئی؛ ہو سکتا ہے یہ چل نہ سکے۔",
   "recorder.output.failed": "ffmpeg کوڈ {0} کے ساتھ ختم ہوا۔",

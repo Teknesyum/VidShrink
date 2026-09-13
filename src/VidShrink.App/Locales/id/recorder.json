@@ -40,6 +40,8 @@
   "recorder.output.title": "Folder keluaran",
   "recorder.output.browse": "Jelajahi…",
   "recorder.output.reveal": "Tampilkan di folder",
+  "recorder.output.to-shrink": "Kirim ke Perkecil",
+  "recorder.output.to-player": "Buka di pemutar",
   "recorder.output.done": "Perekaman selesai: {0} MB dalam {1} segmen",
   "recorder.output.partial": "Perekaman terpotong dan file tidak pernah ditutup; mungkin tidak dapat diputar.",
   "recorder.output.failed": "ffmpeg berakhir dengan kode {0}.",

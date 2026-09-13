@@ -40,6 +40,8 @@
   "recorder.output.title": "输出文件夹",
   "recorder.output.browse": "浏览…",
   "recorder.output.reveal": "在文件夹中显示",
+  "recorder.output.to-shrink": "发送到压缩",
+  "recorder.output.to-player": "在播放器中打开",
   "recorder.output.done": "录制完成：{1} 个片段共 {0} MB",
   "recorder.output.partial": "录制被中途截断，文件未正常关闭；可能无法播放。",
   "recorder.output.failed": "ffmpeg 以代码 {0} 结束。",

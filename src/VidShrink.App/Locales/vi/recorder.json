@@ -40,6 +40,8 @@
   "recorder.output.title": "Thư mục đầu ra",
   "recorder.output.browse": "Duyệt…",
   "recorder.output.reveal": "Hiện trong thư mục",
+  "recorder.output.to-shrink": "Gửi tới Nén",
+  "recorder.output.to-player": "Mở trong trình phát",
   "recorder.output.done": "Ghi hình hoàn tất: {0} MB trong {1} phân đoạn",
   "recorder.output.partial": "Việc ghi hình bị cắt ngang và tệp chưa bao giờ đóng lại; tệp có thể không phát được.",
   "recorder.output.failed": "ffmpeg đã kết thúc với mã {0}.",

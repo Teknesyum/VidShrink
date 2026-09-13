@@ -40,6 +40,8 @@
   "recorder.output.title": "مجلد الإخراج",
   "recorder.output.browse": "استعراض…",
   "recorder.output.reveal": "إظهار في المجلد",
+  "recorder.output.to-shrink": "أرسل إلى التقليص",
+  "recorder.output.to-player": "افتح في المشغّل",
   "recorder.output.done": "انتهى التسجيل: {0} MB في {1} جزءًا",
   "recorder.output.partial": "انقطع التسجيل قبل الأوان ولم يُغلق الملف؛ قد لا يعمل التشغيل.",
   "recorder.output.failed": "انتهى ffmpeg بالرمز {0}.",

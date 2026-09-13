@@ -40,6 +40,8 @@
   "recorder.output.title": "Dosar de ieșire",
   "recorder.output.browse": "Răsfoiește…",
   "recorder.output.reveal": "Arată în dosar",
+  "recorder.output.to-shrink": "Trimite la Micșorare",
+  "recorder.output.to-player": "Deschide în player",
   "recorder.output.done": "Înregistrare terminată: {0} MB în {1} segmente",
   "recorder.output.partial": "Înregistrarea a fost întreruptă și fișierul nu s-a închis niciodată; e posibil să nu se redea.",
   "recorder.output.failed": "ffmpeg s-a încheiat cu codul {0}.",

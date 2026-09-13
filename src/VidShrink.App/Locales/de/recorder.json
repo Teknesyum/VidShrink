@@ -40,6 +40,8 @@
   "recorder.output.title": "Ausgabeordner",
   "recorder.output.browse": "Durchsuchen…",
   "recorder.output.reveal": "Im Ordner anzeigen",
+  "recorder.output.to-shrink": "An Verkleinern senden",
+  "recorder.output.to-player": "Im Player öffnen",
   "recorder.output.done": "Aufnahme beendet: {0} MB in {1} Segmenten",
   "recorder.output.partial": "Die Aufnahme wurde vorzeitig abgebrochen und die Datei nie geschlossen; sie lässt sich möglicherweise nicht abspielen.",
   "recorder.output.failed": "ffmpeg wurde mit Code {0} beendet.",

@@ -188,3 +188,111 @@ Durum renkleri: çalışırken vurgu, bitince `NeonSuccessColor`, hatada `NeonEm
 - Panel yüksekliği başlık + durum + dokuz satır + çubuk aralıklarının toplamı.
 - Durum cümlesi ile yüzde sütunu aynı satırda ve çakışmıyor.
 - Başlatıcı dört `Step` ve bir `Finish` çağırıyor; tavanlar tek yönlü sıralı.
+
+# 3 — Kayıt Biter Bitmez: Shrink, Oynatıcı, Paylaş
+
+Kullanıcının cümlesi: kayıttan sonra aynı dosya ister Shrink'te ister oynatıcıda
+rahatlıkla oynatılabilecek; "klasörü göster" yetmez, paylaş seçeneği olacak — hem
+sıkıştırdıktan sonra hem kaydettikten sonra.
+
+## Bugün ne var, ne yok
+
+Sıkıştırma sonrası paylaşım **var**: `MainWindow.axaml:751-773` (`BtnShare`,
+`ShareProgress`, `ShareLinkRow`) ve `MainWindow.axaml.cs:1712-1760`, altında
+`Core/Share` katmanı. Kayıt sonrası panelde ise yalnız `BtnReveal` duruyor
+(`Recorder/RecorderView.axaml:113-118`).
+
+Ama sıkıştırma sonrası paylaşım **kurulu yapıda çalışmıyor**: hedef tablosu
+`paylasim-hedefleri.json` hiçbir `.csproj`'da taşınmıyor, `ShareTargets.Locate`
+(`src/VidShrink.Core/Share/ShareTargets.cs:137`) onu yalnız kaynak ağacında buluyor.
+Kurulu yapıda düğme `settings.share.targets-missing` diyor. Araştırma
+(`docs/taramalar/anonim-kisa-omurlu-video.md`) boşa gitmemiş, dosyası pakete girmemiş.
+
+## Yapılacaklar
+
+1. `paylasim-hedefleri.json` `VidShrink.App.csproj`'a `None … CopyToOutputDirectory` +
+   `CopyToPublishDirectory` olarak girer; yayın paketinin yanında durur.
+2. Küçültme sekmesi `x:Name="TabShrink"` alır; `MainWindow` iki kapı açar:
+   `OpenInShrinkAsync(path)` ve `OpenInPlayerAsync(path)`.
+3. `RecorderView` ana pencereye iki geri çağrı ile bağlanır (`OpenInShrink`,
+   `OpenInPlayer`) — kalıp oynatıcının geri çağrılarıyla aynı, sekme dizini dışında
+   kablo yok.
+4. Kayıt sonucu paneline üç düğme: **Shrink'e gönder**, **Oynatıcıda aç**, **Paylaş**;
+   yanına yükleme çubuğu, bağlantı satırı, kopyala ve durum satırı.
+5. Teslim edilen yol artık `TxtResultPath.Text`ten okunmuyor; `_lastRecording` alanında
+   duruyor, `ClearMessages` onu da siliyor.
+6. Paylaşım işi `ShareFlow` ve `Core/Share` üstünden yürür; ikinci bir yükleme kodu
+   yazılmaz. Hedef, tablonun varsayılanı.
+
+## Dokunulan dosyalar
+
+`src/VidShrink.App/VidShrink.App.csproj`, `MainWindow.axaml`, `MainWindow.axaml.cs`,
+`Recorder/RecorderView.axaml`, `Recorder/RecorderView.axaml.cs`,
+`Recorder/RecorderView.Paylas.cs` (yeni), 42 dilin `Locales/<dil>/recorder.json`'u,
+`tests/VidShrink.Tests/KayitTeslimTests.cs` (yeni).
+
+## Ölçüler
+
+1. Hedef tablosu yayın çıktısına kopyalanır (csproj pimi).
+2. Kayıt panelinde dört düğme bulunur: klasör, Shrink, oynatıcı, paylaş.
+3. Düğmeler dosya yokken görünmez.
+4. `OpenInShrinkAsync` sekmeyi değiştirip `LoadAsync`i çağırır.
+5. `OpenInPlayerAsync` sekmeyi değiştirip `Player.OpenAsync`i çağırır.
+6. Kayıt paylaşımı `ShareFlow` üstünden gider, ikinci yükleyici yoktur.
+7. İki yeni anahtar 42 dilin hepsinde vardır.
+
+# 4 — Pencere Kabuğu, Sağ Tık Menüsü ve Issue Bildirimi
+
+## 4.1 Üst şerit gizli, fare üste gidince beliriyor
+
+Eski düzende dış ızgara `Auto,*` idi; başlık çubuğu 0. satırda, sekme denetimi iki satıra
+yayılıydı ve şablonun kendi 0. satırı sekme şeridine aitti. Şeridi gizlemek için satırı
+çökertmek gerekiyordu, o da içeriği 30 px yukarı kaydırıyordu: şerit her belirdiğinde
+içerik zıplıyordu.
+
+Yeni düzende dış ızgara tek gözlü. Başlık çubuğu `VerticalAlignment="Top"` ile üste
+yaslı bir katman, sekme denetimi ızgaranın tamamını kaplıyor. Şablonda
+`SelectedContentHost` iki satırı da kaplıyor (`Grid.RowSpan="2"`) ve `PART_ItemsPresenter`
+**ondan sonra** bildiriliyor: sekme şeridi içeriğin üstünde duruyor.
+
+Gizleme `Window.chrome-hidden` sınıfı; `TrackChrome()` pencereye tünel kipinde bir
+`PointerMoved` bağlıyor ve işaretçinin y'si `TitleBar.Height`'ı geçmediği sürece şeridi
+gösteriyor. Eşik uydurulmadı: başlık çubuğunun kendi yüksekliği.
+
+Pim: `tests/VidShrink.Tests/PencereKabuguTests.cs`.
+
+## 4.2 Oynatıcı sekmesinde ana hat yok
+
+Kenarlık kuralı zaten tek yerdeydi (`ApplyWindowFrame`), yalnız tam ekranı biliyordu.
+Koşul `maximized || Tabs.SelectedIndex == PlayerTabIndex` oldu ve `Tabs.SelectionChanged`
+aynı yordamı çağırıyor. İkinci bir stil ya da ikinci bir sayı eklenmedi.
+
+## 4.3 Sağ tık menüsü artık bir ayar
+
+Issue #1'de kullanıcıya PowerShell tek satırı verildi. Doğru cevap bu değil: menüyü
+kuran biz olduğumuza göre kaldırmayı da arayüzden vermeliyiz.
+
+`src/VidShrink.App/ShellMenu.cs` kurucunun yazdığı kayıt defteri düzeninin aynısını
+yazıyor ve siliyor — aynı anahtar adları, aynı 24 uzantı, aynı 5 hedef, aynı bayrak.
+Silme kolu Windows 11'in Appx paketini de kaldırıyor; issue'daki kusur buydu.
+`Ayarlar → Sağ tık menüsü` altındaki tek kutu bu iki kolu çağırıyor.
+
+Etiketler `shell.menu.open` ve `shell.menu.shrink` anahtarlarından geliyor, yani 42 dili
+izliyor. Dil değişince `RelabelShellMenu()` kurulu menüyü yeniden yazıyor. Kurucunun
+`-MenuLanguage auto|tr|en` kısıtı böylece uygulamada kalkmış oluyor.
+
+Pim: `tests/VidShrink.Tests/KabukMenusuTests.cs` — iki tarafın anahtar/uzantı/hedef
+listeleri eşit olmazsa kırmızı.
+
+## 4.4 Issue açılınca telefona bildirim
+
+`.github/workflows/issue-bildirim.yml` iki kol taşıyor. Birincisi `issues: opened` ve
+`issue_comment: created` olaylarında `ntfy.sh`'e bir gönderi atıyor; konu adı
+`NTFY_TOPIC` deposu gizli anahtarında duruyor, depo dışına sızmıyor. Kendi yazdığımız
+girdiler elenir.
+
+İkincisi 15 dakikada bir açık issue'ları tarıyor ve içinde bakımcı cevabı olmayan her
+issue için yüksek öncelikli bir bildirim atıyor: "cevapsız bekleyen issue" diye bir
+durum kalmasın diye.
+
+SMS gönderilmiyor; telefona ulaşan yol ntfy uygulamasının aboneliği.

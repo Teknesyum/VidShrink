@@ -40,6 +40,8 @@
   "recorder.output.title": "Izlazni folder",
   "recorder.output.browse": "Pregledaj…",
   "recorder.output.reveal": "Prikaži u folderu",
+  "recorder.output.to-shrink": "Pošalji na smanjivanje",
+  "recorder.output.to-player": "Otvori u plejeru",
   "recorder.output.done": "Snimanje završeno: {0} MB u {1} segmenata",
   "recorder.output.partial": "Snimanje je prekinuto i fajl se nije zatvorio; možda se neće reprodukovati.",
   "recorder.output.failed": "ffmpeg je završio sa kodom {0}.",

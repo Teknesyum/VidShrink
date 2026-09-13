@@ -40,6 +40,8 @@
   "recorder.output.title": "Uitvoermap",
   "recorder.output.browse": "Bladeren…",
   "recorder.output.reveal": "Tonen in map",
+  "recorder.output.to-shrink": "Naar Verkleinen sturen",
+  "recorder.output.to-player": "Openen in de speler",
   "recorder.output.done": "Opname voltooid: {0} MB in {1} segmenten",
   "recorder.output.partial": "De opname werd afgebroken en het bestand is nooit gesloten; het speelt mogelijk niet af.",
   "recorder.output.failed": "ffmpeg is gestopt met code {0}.",

@@ -40,6 +40,8 @@
   "recorder.output.title": "Izhodna mapa",
   "recorder.output.browse": "Prebrskaj…",
   "recorder.output.reveal": "Prikaži v mapi",
+  "recorder.output.to-shrink": "Pošlji v Skrči",
+  "recorder.output.to-player": "Odpri v predvajalniku",
   "recorder.output.done": "Snemanje končano: {0} MB v {1} delih",
   "recorder.output.partial": "Snemanje je bilo prekinjeno in datoteka se ni zaprla; morda se ne bo predvajala.",
   "recorder.output.failed": "ffmpeg se je končal s kodo {0}.",

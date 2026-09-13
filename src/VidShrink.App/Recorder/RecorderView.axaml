@@ -110,12 +110,62 @@
                    Theme="{StaticResource StatusError}"
                    TextWrapping="Wrap"
                    IsVisible="False"/>
-        <Button x:Name="BtnReveal"
-                Theme="{StaticResource GhostButton}"
-                HorizontalAlignment="Left"
-                Content="{loc:Text recorder.output.reveal}"
-                auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
-                Click="OnReveal"/>
+        <WrapPanel>
+          <Button x:Name="BtnReveal"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  Content="{loc:Text recorder.output.reveal}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
+                  Click="OnReveal"/>
+          <Button x:Name="BtnToShrink"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  Content="{loc:Text recorder.output.to-shrink}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-shrink}"
+                  Click="OnToShrink"/>
+          <Button x:Name="BtnToPlayer"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  Content="{loc:Text recorder.output.to-player}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-player}"
+                  Click="OnToPlayer"/>
+          <Button x:Name="BtnRecShare"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  Content="{loc:Text main.action.share}"
+                  auto:AutomationProperties.Name="{loc:Text main.action.share}"
+                  Click="OnShare"/>
+          <Button x:Name="BtnRecShareCancel"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text main.action.cancel-upload}"
+                  auto:AutomationProperties.Name="{loc:Text main.action.cancel-upload}"
+                  Click="OnShareCancel"/>
+        </WrapPanel>
+
+        <ProgressBar x:Name="RecShareProgress" Maximum="1" IsVisible="False"/>
+
+        <Grid x:Name="RecShareLinkRow"
+              IsVisible="False"
+              ColumnDefinitions="*,Auto"
+              ColumnSpacing="{StaticResource SpaceMd}">
+          <TextBox Grid.Column="0"
+                   x:Name="TxtRecShareLink"
+                   IsReadOnly="True"
+                   MaxLines="1"
+                   FontFamily="{StaticResource FontMono}"
+                   VerticalAlignment="Center"/>
+          <Button Grid.Column="1"
+                  x:Name="BtnRecShareCopy"
+                  Theme="{StaticResource GhostButton}"
+                  VerticalAlignment="Center"
+                  Content="{loc:Text main.action.copy}"
+                  auto:AutomationProperties.Name="{loc:Text main.action.copy}"
+                  Click="OnCopyShareLink"/>
+        </Grid>
+
+        <TextBlock x:Name="TxtRecShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
       </StackPanel>
     </Border>
 

@@ -7,6 +7,45 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-13
+
+### Added
+- Recording hand-off. When a recording finishes, the result panel now offers **Send to Shrink**,
+  **Open in player** and **Share** beside Show folder, so the file you just captured goes straight
+  into the next job without a trip through the file manager.
+- Sharing after a recording runs through the same upload layer as sharing after a shrink: one
+  provider table, one progress bar, one cancel button, one link to copy.
+- **Settings → Right-Click Menu.** A single checkbox adds or removes the Windows context-menu
+  entries. It writes to `HKCU\Software\Classes` only, needs no administrator rights, and removal
+  also unregisters the Windows 11 menu package. No installer script, no command line.
+- The context-menu labels follow the interface language across all 42 shipped languages, and are
+  rewritten as soon as the language changes.
+
+### Changed
+- The title bar and the tab strip are now an overlay that stays hidden. Move the pointer to the top
+  edge and they appear; move away and they go. The full window height belongs to the content, and
+  nothing shifts when the strip comes and goes.
+- No window outline while the player tab is selected.
+
+### Documentation
+- The README was rewritten around what a reader needs in the first minute: what the program does,
+  the four tools, install, then the numbers. It is now 200 lines instead of 652; the engine
+  walkthrough, the usage tour and the install detail moved to `docs/motor.md`, `docs/kullanim.md`
+  and `docs/kurulum.md`, and the development notes to `CONTRIBUTING.md`. Screenshots are current
+  and the two remaining diagrams are compact.
+- The benchmark baseline was re-measured on today's engine: 36 cases over three clips, three
+  targets, a software and a hardware arm, two repeats each
+  (`docs/olcumler/bench-2026-09-13.md`). The 0.1.0-era numbers that README and `docs/motor.md`
+  quoted are replaced and the old result files are marked stale.
+- Two findings are published rather than buried: the AV1 branch undershoots the fill band (all
+  five misses and the single hard-floor violation are `libsvtav1`), and the measurement rig locks
+  the two streams by frame index, which exaggerates loss whenever a plan lowers the frame rate.
+
+### Fixed
+- The share target table (`paylasim-hedefleri.json`) is now part of the published package. In an
+  installed build the Share button could not find a target, which made sharing fail with
+  "no targets" no matter how it was configured.
+
 ## [0.4.5] - 2026-09-13
 
 ### Changed

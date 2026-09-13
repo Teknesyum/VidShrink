@@ -40,6 +40,8 @@
   "recorder.output.title": "Φάκελος εξόδου",
   "recorder.output.browse": "Περιήγηση…",
   "recorder.output.reveal": "Εμφάνιση στον φάκελο",
+  "recorder.output.to-shrink": "Αποστολή στη Σμίκρυνση",
+  "recorder.output.to-player": "Άνοιγμα στην αναπαραγωγή",
   "recorder.output.done": "Η εγγραφή ολοκληρώθηκε: {0} MB σε {1} τμήματα",
   "recorder.output.partial": "Η εγγραφή διακόπηκε νωρίτερα και το αρχείο δεν έκλεισε ποτέ· ενδέχεται να μην αναπαράγεται.",
   "recorder.output.failed": "Το ffmpeg τερματίστηκε με κωδικό {0}.",

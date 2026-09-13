@@ -40,6 +40,8 @@
   "recorder.output.title": "Папка вывода",
   "recorder.output.browse": "Обзор…",
   "recorder.output.reveal": "Показать в папке",
+  "recorder.output.to-shrink": "Отправить в Сжать",
+  "recorder.output.to-player": "Открыть в плеере",
   "recorder.output.done": "Запись завершена: {0} МБ в {1} сегментах",
   "recorder.output.partial": "Запись была прервана, и файл так и не закрылся; он может не воспроизводиться.",
   "recorder.output.failed": "ffmpeg завершился с кодом {0}.",

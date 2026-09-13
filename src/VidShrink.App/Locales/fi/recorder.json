@@ -40,6 +40,8 @@
   "recorder.output.title": "Tuloskansio",
   "recorder.output.browse": "Selaa…",
   "recorder.output.reveal": "Näytä kansiossa",
+  "recorder.output.to-shrink": "Lähetä pakkaukseen",
+  "recorder.output.to-player": "Avaa soittimessa",
   "recorder.output.done": "Tallennus valmis: {0} MB, {1} segmentissä",
   "recorder.output.partial": "Tallennus katkesi kesken eikä tiedosto sulkeutunut; se ei ehkä toistu.",
   "recorder.output.failed": "ffmpeg päättyi koodilla {0}.",

@@ -98,6 +98,10 @@ public partial class MainWindow : Window
     private bool _hardwareEncoderAvailable;
     private HardwareVerdict _hardwareVerdict = HardwareVerdict.NotProbed;
     private bool _motionReduced;
+
+    private const string ChromeHidden = "chrome-hidden";
+
+    private bool _chromeShown = true;
     private DropVisual _dropVisual = DropVisual.Idle;
     private DispatcherTimer? _recalculateTimer;
     private DateTime _lastEstimatePulse = DateTime.MinValue;
@@ -151,6 +155,9 @@ public partial class MainWindow : Window
         Player.SelectTab = index => Tabs.SelectedIndex = index;
         Player.OpenSettings = () => Tabs.SelectedIndex = SettingsTabIndex;
         PlayerAdvancedPanel.Player = Player;
+
+        RecorderPane.OpenInShrink = OpenInShrinkAsync;
+        RecorderPane.OpenInPlayer = OpenInPlayerAsync;
         Player.HistoryPath = () => Path.Combine(
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
             "player-history.json");
@@ -175,6 +182,9 @@ public partial class MainWindow : Window
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
         LoadTitleBarLogo();
+        TrackChrome();
+        SetupShellMenu();
+        Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
 
         if (OperatingSystem.IsMacOS())
         {
@@ -536,6 +546,29 @@ public partial class MainWindow : Window
         Tabs.Padding = new Thickness(TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap, 0, 0, 0);
     }
 
+    /// <summary>
+    /// Üst şerit gizli başlar; işaretçi pencerenin ilk <c>TitleBarHeight</c> pikseline
+    /// girdiğinde belirir, şeridi terk edince kaybolur. Şerit içeriğin üstünde bir katman
+    /// olduğu için görünüp kaybolurken hiçbir şey yer değiştirmiyor.
+    /// </summary>
+    private void TrackChrome()
+    {
+        ShowChrome(false);
+        AddHandler(PointerMovedEvent, OnChromePointerMoved, RoutingStrategies.Tunnel);
+        PointerExited += (_, _) => ShowChrome(false);
+    }
+
+    private void OnChromePointerMoved(object? sender, PointerEventArgs e)
+        => ShowChrome(e.GetPosition(this).Y <= TitleBar.Height);
+
+    private void ShowChrome(bool show)
+    {
+        if (show == _chromeShown) return;
+        _chromeShown = show;
+        if (show) Classes.Remove(ChromeHidden);
+        else Classes.Add(ChromeHidden);
+    }
+
     private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
@@ -549,7 +582,7 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Tam ekranda kabuk kenarlığını ve köşe yuvarlamasını kaldırır. Windows kendi pencerelerinde
+    /// Tam ekranda ve oynatıcı sekmesinde kabuk kenarlığını kaldırır. Windows kendi pencerelerinde
     /// de böyle yapar ve sebebi süs değil: 1 piksellik kenarlık kalırsa ekranın sağ üst pikseli
     /// kapatma düğmesinin değil kenarlığın üstüne düşer, köşenin kolay hedef olma kazancı gider.
     /// Normal boyutta kenarlık ve yuvarlama belirteçlerden geri gelir.
@@ -557,7 +590,7 @@ public partial class MainWindow : Window
     private void ApplyWindowFrame()
     {
         var maximized = WindowState == WindowState.Maximized;
-        WindowShell.BorderThickness = maximized
+        WindowShell.BorderThickness = maximized || Tabs.SelectedIndex == PlayerTabIndex
             ? new Thickness(0)
             : this.TryFindResource("BorderThin", out var border) && border is Thickness thickness
                 ? thickness
@@ -815,6 +848,7 @@ public partial class MainWindow : Window
         RefreshUpdateTexts();
         RefreshSettingsTexts();
         RefreshOutputAndFfmpegChoiceLists();
+        RelabelShellMenu();
         RefreshShareTarget();
         RefreshAdvancedTexts();
         UpdateToolStatus();
@@ -2667,6 +2701,26 @@ public partial class MainWindow : Window
         => _startupFile is null ? Task.CompletedTask : LoadStartupFileAsync(_startupFile);
 
     internal int PlayerTabIndex => Tabs.Items.IndexOf(TabPlayer);
+
+    internal int ShrinkTabIndex => Tabs.Items.IndexOf(TabShrink);
+
+    /// <summary>
+    /// Biten bir kaydı küçültme sekmesine taşır. Yükleyici sürükle-bırakınkiyle aynı;
+    /// kaydedici kendi çözümleyicisini kurmuyor.
+    /// </summary>
+    internal async Task OpenInShrinkAsync(string path)
+    {
+        Tabs.SelectedIndex = ShrinkTabIndex;
+        await LoadAsync(path);
+    }
+
+    /// <summary>Biten bir kaydı oynatıcı sekmesinde açar.</summary>
+    internal async Task OpenInPlayerAsync(string path)
+    {
+        Tabs.SelectedIndex = PlayerTabIndex;
+        try { await Player.OpenAsync(path); }
+        catch (Exception ex) { ReportPlayerOpenFailure(ex); }
+    }
 
     private int SettingsTabIndex => Tabs.Items.IndexOf(TabSettings);
 

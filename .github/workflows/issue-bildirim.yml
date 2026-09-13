@@ -1,0 +1,73 @@
+name: Issue Notification
+
+on:
+  issues:
+    types: [opened, reopened]
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: read
+
+concurrency:
+  group: issue-notification
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    env:
+      TOPIC: ${{ secrets.NTFY_TOPIC }}
+    steps:
+      - name: Push to phone
+        if: env.TOPIC != ''
+        env:
+          TITLE: ${{ github.event.issue.title }}
+          NUMBER: ${{ github.event.issue.number }}
+          URL: ${{ github.event.issue.html_url }}
+          AUTHOR: ${{ github.event.sender.login }}
+          KIND: ${{ github.event_name }}
+        run: |
+          if [ "$AUTHOR" = "Teknesyum" ]; then
+            echo "Kendi yazdigimiz girdi, bildirim yok."
+            exit 0
+          fi
+          curl -sS \
+            -H "Title: VidShrink #$NUMBER" \
+            -H "Priority: high" \
+            -H "Tags: rotating_light" \
+            -H "Click: $URL" \
+            -d "$KIND — $TITLE" \
+            "https://ntfy.sh/$TOPIC"
+
+  waiting:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      TOPIC: ${{ secrets.NTFY_TOPIC }}
+    steps:
+      - name: Nag about unanswered issues
+        if: env.TOPIC != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue list --repo "$REPO" --state open --json number,title,url,createdAt,comments \
+            --jq '.[] | select([.comments[] | select(.author.login == "Teknesyum")] | length == 0) | "\(.number)\t\(.title)\t\(.url)"' > pending.tsv
+          if [ ! -s pending.tsv ]; then
+            echo "Bekleyen issue yok."
+            exit 0
+          fi
+          while IFS=$'\t' read -r number title url; do
+            curl -sS \
+              -H "Title: Cevapsiz: VidShrink #$number" \
+              -H "Priority: max" \
+              -H "Tags: hourglass" \
+              -H "Click: $url" \
+              -d "$title" \
+              "https://ntfy.sh/$TOPIC"
+          done < pending.tsv

@@ -40,6 +40,8 @@
   "recorder.output.title": "Izlazna mapa",
   "recorder.output.browse": "Pregledaj…",
   "recorder.output.reveal": "Prikaži u mapi",
+  "recorder.output.to-shrink": "Pošalji na smanjivanje",
+  "recorder.output.to-player": "Otvori u pregledniku",
   "recorder.output.done": "Snimanje završeno: {0} MB u {1} segmenata",
   "recorder.output.partial": "Snimanje je prekinuto i datoteka se nikad nije zatvorila; možda se neće reproducirati.",
   "recorder.output.failed": "ffmpeg je završio s kodom {0}.",

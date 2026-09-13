@@ -29,7 +29,17 @@
     <EmbeddedResource Include="Locales\**\*.json" />
   </ItemGroup>
 
+  <!-- Paylasim hedefleri koddan degil tablodan gelir; tablo pakete girmezse kurulu yapida
+       paylas dugmesi hedef bulamaz. Kaynak agacinda kokte durur, yanina kopyalanir. -->
   <ItemGroup>
+    <None Include="..\..\paylasim-hedefleri.json"
+          Link="paylasim-hedefleri.json"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Avalonia" Version="12.1.2" />
     <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />

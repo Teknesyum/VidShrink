@@ -40,6 +40,8 @@
   "recorder.output.title": "Väljundkaust",
   "recorder.output.browse": "Sirvi…",
   "recorder.output.reveal": "Näita kaustas",
+  "recorder.output.to-shrink": "Saada tihendamisse",
+  "recorder.output.to-player": "Ava mängijas",
   "recorder.output.done": "Salvestus lõpetatud: {0} MB {1} segmendis",
   "recorder.output.partial": "Salvestus katkes enneaegselt ja fail ei sulgunud kunagi; see ei pruugi mängida.",
   "recorder.output.failed": "ffmpeg lõpetas koodiga {0}.",

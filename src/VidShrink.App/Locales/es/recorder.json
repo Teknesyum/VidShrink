@@ -40,6 +40,8 @@
   "recorder.output.title": "Carpeta de salida",
   "recorder.output.browse": "Examinar…",
   "recorder.output.reveal": "Mostrar en la carpeta",
+  "recorder.output.to-shrink": "Enviar a Reducir",
+  "recorder.output.to-player": "Abrir en el reproductor",
   "recorder.output.done": "Grabación terminada: {0} MB en {1} segmentos",
   "recorder.output.partial": "La grabación se cortó y el archivo nunca se cerró; puede que no se reproduzca.",
   "recorder.output.failed": "ffmpeg terminó con el código {0}.",

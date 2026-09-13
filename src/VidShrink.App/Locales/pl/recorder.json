@@ -40,6 +40,8 @@
   "recorder.output.title": "Folder wyjściowy",
   "recorder.output.browse": "Przeglądaj…",
   "recorder.output.reveal": "Pokaż w folderze",
+  "recorder.output.to-shrink": "Wyślij do Zmniejsz",
+  "recorder.output.to-player": "Otwórz w odtwarzaczu",
   "recorder.output.done": "Nagrywanie zakończone: {0} MB w {1} segmentach",
   "recorder.output.partial": "Nagranie zostało przerwane, a plik nigdy się nie zamknął; może się nie odtwarzać.",
   "recorder.output.failed": "ffmpeg zakończył działanie z kodem {0}.",

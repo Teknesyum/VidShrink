@@ -30,6 +30,17 @@
     <Style Selector="Window.reduced-motion Path">
       <Setter Property="RenderTransform" Value="none"/>
     </Style>
+
+    <!--
+      Ust serit bir katman: icerik zaten tam yukseklikte duruyor, serit onun ustunde
+      goruntuleniyor. Gizlenip acilirken icerik yer degistirmiyor.
+    -->
+    <Style Selector="Window.chrome-hidden Border#TitleBar">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+    <Style Selector="Window.chrome-hidden TabControl#Tabs /template/ ItemsPresenter#PART_ItemsPresenter">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
   </Window.Styles>
 
   <Border x:Name="WindowShell"
@@ -38,10 +49,10 @@
           BorderThickness="{StaticResource BorderThin}"
           CornerRadius="{StaticResource RadiusControl}"
           UseLayoutRounding="True">
-    <Grid RowDefinitions="Auto,*" Background="{StaticResource WorkspaceBackground}">
+    <Grid Background="{StaticResource WorkspaceBackground}">
 
       <Border x:Name="TitleBar"
-              Grid.Row="0"
+              VerticalAlignment="Top"
               Height="{StaticResource TitleBarHeight}"
               Background="{StaticResource TitleBarBackground}"
               BorderBrush="{StaticResource NeonBlueBorderStrong}"
@@ -113,7 +124,7 @@
       </Border>
 
 
-        <TabControl x:Name="Tabs" Grid.Row="0" Grid.RowSpan="2" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
+        <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
         <TabControl.Tag>
         <StackPanel>
           <Border x:Name="AppliedNotice"
@@ -190,7 +201,7 @@
         </TabItem>
 
 
-        <TabItem Header="{loc:Text main.tab.shrink}" Tag="{StaticResource IconShrink}" Theme="{StaticResource NeonTabItem}">
+        <TabItem x:Name="TabShrink" Header="{loc:Text main.tab.shrink}" Tag="{StaticResource IconShrink}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageShrink" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource SectionMargin}" ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
@@ -1222,6 +1233,19 @@
                     </StackPanel>
                     <TextBlock x:Name="TxtFfmpegPathError" Theme="{StaticResource Hint}" Foreground="{StaticResource NeonPink}" TextWrapping="Wrap" IsVisible="False"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="ShellMenuPanel" Theme="{StaticResource Panel}">
+                <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <TextBlock Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <StackPanel Orientation="Horizontal">
+                      <CheckBox x:Name="ChkShellMenu" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.shell-menu.label}"/>
+                    </StackPanel>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.hint}"/>
+                    <TextBlock x:Name="TxtShellMenuStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
