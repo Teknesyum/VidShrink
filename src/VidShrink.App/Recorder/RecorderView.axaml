@@ -175,7 +175,7 @@
           <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H3}"/>
 
           <StackPanel x:Name="PanelAutoResult" Spacing="{StaticResource SpaceSm}">
-            <TextBlock x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+            <TextBlock x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
           </StackPanel>
 
           <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">

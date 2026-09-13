@@ -118,7 +118,7 @@ internal partial class RecorderView
         {
             _autoChoice = null;
             _autoResult = null;
-            TxtAutoSummary.Text = string.Empty;
+            ShowSummary(string.Empty);
             return;
         }
 
@@ -156,7 +156,7 @@ internal partial class RecorderView
             return;
         }
 
-        TxtAutoSummary.Text = Say("recorder.auto.measuring");
+        ShowSummary(Say("recorder.auto.measuring"));
         BtnAutoMeasure.IsEnabled = false;
 
         _autoStop?.Cancel();
@@ -191,7 +191,7 @@ internal partial class RecorderView
     {
         if (_autoChoice is not { } choice)
         {
-            TxtAutoSummary.Text = string.Empty;
+            ShowSummary(string.Empty);
             return;
         }
 
@@ -213,7 +213,17 @@ internal partial class RecorderView
                 result.Trials.First(t => t.Choice == result.Choice).DroppedFrames.ToString("N0", Strings.Culture))
             : Say("recorder.auto.unmeasured");
 
-        TxtAutoSummary.Text = head + " — " + tail + " " + string.Join(" · ", choice.Notes.Select(NoteText));
+        ShowSummary(head + " — " + tail + " " + string.Join(" · ", choice.Notes.Select(NoteText)));
+    }
+
+    /// <summary>
+    /// Özet satırı. Söylenecek bir şey yokken gizleniyor: boş bir metin düğümü ekranda
+    /// yer kaplar ve altındaki her şeyi aşağı iter.
+    /// </summary>
+    private void ShowSummary(string text)
+    {
+        TxtAutoSummary.Text = text;
+        TxtAutoSummary.IsVisible = text.Length > 0;
     }
 
     private static string NoteText(RecorderAutoNote note) => note switch

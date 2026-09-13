@@ -387,6 +387,9 @@ public sealed class OluUyeTests
     /// degistirdi: kardesi okundugu icin <c>hic-okunmayan-tur</c> yerine <c>varsayilan-kol</c>
     /// cikiyor ve borc degil mesru sayiliyor — <c>ConversionQualityMode.Bitrate</c> ile ayni kalip.
     /// Olcunun kendi ciktisi: <c>uye: 173  bu dosyada adi gecmeyen: 125  pimlenen: 33</c>.
+    /// Kumeyi bir satir buyuten hedef boyut butcesi: <c>RecorderBudgetVerdict</c> dort uyeli
+    /// acildi, ucu adiyla okunuyor, <c>NotRequested</c> olumsuz kol olarak kaliyor —
+    /// <c>QualityTargetBound.Matched</c> ile ayni kalip, gosterilecek cumlesi olmayan hal.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -426,6 +429,8 @@ public sealed class OluUyeTests
             "Ayni tur, ayni bulgu: uretiliyor, okuma tarafinda adi gecmiyor."),
         new("QualityTargetBound.Matched", "varsayilan-kol", Legitimate,
             "Hedefe varildi demek; arayuz yalniz sapmalari yaziyor (MainWindow.axaml.cs:2517-2519: BelowFloor, AboveSourceCeiling, '_ => \"\"'). Varildiginda gosterilecek bir cumle yok, o yuzden okuyan da yok."),
+        new("RecorderBudgetVerdict.NotRequested", "varsayilan-kol", Legitimate,
+            "Hedef boyut istenmedigi hal. Iki okuyan da olumlu kolu soruyor (RecorderAutoPlan.cs:260 ve RecorderView.Hedef.cs:192 'Verdict != Usable', RecorderView.Otomatik.cs:96-101 uc uyeyi adiyla sayip '_ => string.Empty' diyor); istenmemis bir hedefin soyleyecegi cumle yok, o yuzden okuyan da yok."),
         new("RecordingImpact.HardwareOffload", "varsayilan-kol", Legitimate,
             "PerformanceReportText.cs:22-26 mansetin Impact uzerinden kurulmadigini olcumle yaziyor: makine mesgulken Impact yazilim dalina kayiyor, dogru bilgi bulgularda. Alan raporda tasiniyor, karar vermiyor."),
         new("RecordingImpact.SoftwareHeavyLoad", "varsayilan-kol", Legitimate,
