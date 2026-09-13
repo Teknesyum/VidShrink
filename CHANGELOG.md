@@ -7,8 +7,36 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-13
+
+### Changed
+
+- The top strip only slides away on the player tab. It used to hide itself everywhere, so a
+  pointer that drifted below the title bar on the shrink, recorder or settings tabs took the
+  tabs with it. Hiding is the player's own need; on every other tab the strip stays put.
+- The right-click menu is now two separate settings. One checkbox writes the "open with
+  VidShrink" entry, the other writes the "shrink with VidShrink" submenu, and each one reads
+  and writes its own registry branch - wanting one without the other no longer means taking
+  both. Both checkboxes carry the exact text the menu entry will show, in the interface
+  language.
+
 ### Fixed
 
+- Title bar buttons on the player tab are now reachable: the bar's content moved above the tab content, so the full-window player surface no longer swallows the clicks.
+
+- The Windows 11 primary menu entry now follows the interface language. Its title lives in
+  the C++ shell extension, which drew it from the Windows UI language and knew only Turkish
+  or English: a French user read English, while `shell.menu.open` has been translated in all
+  42 locales all along. The app now leaves the chosen label in the registry and the extension
+  reads it from there. Every quick-size entry carries the launcher icon too.
+- A manual update says what it is doing. The launcher panel showed one sentence -
+  "Güncelleme uygulanıyor" - for the whole download; the updater now reports each stage into
+  the shared progress object: the version it found, how many files change, the name of each
+  file as it comes down, and the move into place. The full log is written to
+  `update-log.txt` beside the launcher, since the panel only holds nine lines.
+- `VIDSHRINK_UPDATE_PROVA=1` runs the panel end to end without installing anything. The
+  files are downloaded and verified, nothing is moved into place and no launcher swap is
+  armed.
 - The screenshot tool no longer writes the settings of the copy installed on the machine.
   `MainWindow` opens `%APPDATA%/VidShrink/settings.json` when it is handed no path, and the
   player history, the recent list and the recorder settings sit beside it. Shooting the T191

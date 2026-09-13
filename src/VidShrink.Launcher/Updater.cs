@@ -48,7 +48,20 @@ internal static class Updater
     /// Kullanıcı "Yükle" düğmesine bastı: kendiliğinden güncelleme ayarı okunmaz. Ayar yine
     /// yazılmaz, yani elle bir kez yüklemek tercihi değiştirmez.
     /// </param>
-    public static bool Run(string baseDirectory, string appDirectory, bool force = false)
+    /// <param name="progress">
+    /// Paneli besleyen köprü. Verilmezse güncelleme sessiz koşar (açılıştan sonraki tur);
+    /// verilirse her aşama kullanıcıya bir cümleyle görünür — indirilen dosya adı dahil.
+    /// Kullanıcı elle "Yükle"ye bastığında ne olduğunu adım adım izlemesi bunun üstünden.
+    /// </param>
+    /// <param name="floor">Panelde bu işin başladığı yüzde.</param>
+    /// <param name="ceiling">Panelde bu işin bitiş tavanı.</param>
+    public static bool Run(
+        string baseDirectory,
+        string appDirectory,
+        bool force = false,
+        InstallProgress? progress = null,
+        double floor = 0,
+        double ceiling = 100)
     {
         // Ayar kapalıyken manifest bile çekilmez: kapatan kullanıcı ağ turunu da istemiyor.
         if (!force && !UpdateCheck.AutoUpdateEnabled()) return false;
@@ -61,34 +74,61 @@ internal static class Updater
         if (!held) return false;
 
         using var cancellation = new CancellationTokenSource(Budget);
-        try { return RunAsync(baseDirectory, appDirectory, cancellation.Token).GetAwaiter().GetResult(); }
+        try { return RunAsync(baseDirectory, appDirectory, progress, floor, ceiling, cancellation.Token).GetAwaiter().GetResult(); }
         catch (Exception) { return false; }
         finally { try { only.ReleaseMutex(); } catch (ApplicationException) { } }
     }
 
-    private static async Task<bool> RunAsync(string baseDirectory, string appDirectory, CancellationToken cancellationToken)
+    /// <summary>Prova kipi: panel birebir aynı koşar ama inen sahne yerine taşınmaz.</summary>
+    internal const string RehearsalVariable = "VIDSHRINK_UPDATE_PROVA";
+
+    internal static bool Rehearsing =>
+        Environment.GetEnvironmentVariable(RehearsalVariable) == "1";
+
+    private static async Task<bool> RunAsync(
+        string baseDirectory,
+        string appDirectory,
+        InstallProgress? progress,
+        double floor,
+        double ceiling,
+        CancellationToken cancellationToken)
     {
+        void Step(double part, double roof, string sentence) =>
+            progress?.Step(floor + (ceiling - floor) * part, floor + (ceiling - floor) * roof, sentence);
+
         var stage = Path.Combine(baseDirectory, StageDirectoryName);
         var rid = UpdateCheck.Rid;
         var source = Environment.GetEnvironmentVariable("VIDSHRINK_UPDATE_SOURCE");
 
+        Step(0, 0.10, "Sürüm listesi alınıyor");
         var json = await FetchManifestAsync(rid, source, cancellationToken);
-        if (json is null) return false;
+        if (json is null)
+        {
+            Step(0.10, 0.10, "Sürüm listesine ulaşılamadı, güncelleme atlandı");
+            return false;
+        }
 
         var manifest = UpdateCheck.ParseManifest(json);
         if (manifest.Files.Count == 0) return false;
 
         // Aynı sürüm zaten uygulanmışsa hiçbir dosya özetlenmez. Kapı başlatıcının
         // sürümüne de bakıyor; yoksa geride kalan bir başlatıcı hiç fark edilmiyor.
-        if (UpdateCheck.AlreadyCurrent(baseDirectory, appDirectory, manifest)) return false;
+        if (UpdateCheck.AlreadyCurrent(baseDirectory, appDirectory, manifest))
+        {
+            Step(1, 1, "Program zaten güncel");
+            return false;
+        }
 
         var cache = new HashCache(Path.Combine(appDirectory, HashCacheName));
         var changed = UpdateCheck.Diff(appDirectory, manifest, cache);
         var launcherChanged = UpdateCheck.Diff(baseDirectory, manifest.Launcher, cache);
         var shellChanged = UpdateCheck.Diff(baseDirectory, manifest.Shell, cache);
         cache.Save();
+        Step(0.12, 0.20, "Sürüm " + manifest.Version + " bulundu, " +
+            (changed.Count + launcherChanged.Count + shellChanged.Count) + " dosya yenilenecek");
         if (changed.Count == 0 && launcherChanged.Count == 0 && shellChanged.Count == 0)
         {
+            Step(1, 1, "Program zaten güncel");
             UpdateCheck.WriteVersionMarker(appDirectory, manifest.Version);
             LauncherUpdate.MarkVerified(baseDirectory, manifest);
             return false;
@@ -108,26 +148,57 @@ internal static class Updater
         // Hata sahneyi silmez: zaman aşımı ya da kopan hat yarım bir indirme bırakır, o
         // dosyalar sonraki turda özetiyle sınanır ve tutanlar atlanır. Özeti tutmayanı
         // StageFileAsync hiç yazmıyor, yani yarım sahne yanlış bayt taşımıyor.
+        var total = changed.Count + launcherChanged.Count + shellChanged.Count;
+        var done = 0;
+
+        void Downloading(ManifestFile file)
+        {
+            done++;
+            var part = 0.20 + 0.70 * done / Math.Max(1, total);
+            Step(part, Math.Min(0.90, part + 0.70 / Math.Max(1, total)),
+                Path.GetFileName(file.Path) + " indiriliyor (" + done + "/" + total + ")");
+        }
+
         if (changed.Count > 0)
         {
             var archive = await RemoteZip.OpenAsync(ArchiveSource(rid, source), cancellationToken);
             foreach (var file in changed)
+            {
+                Downloading(file);
                 await StageFileAsync(archive, file, UpdateCheck.LocalPath(stage, file.Path), cancellationToken);
+            }
         }
 
         if (launcherChanged.Count > 0 || shellChanged.Count > 0)
         {
             var archive = await RemoteZip.OpenAsync(LauncherArchiveSource(rid, source), cancellationToken);
             foreach (var file in launcherChanged)
+            {
+                Downloading(file);
                 await StageFileAsync(archive, file, LauncherUpdate.StagePath(stage, file.Path), cancellationToken);
+            }
             foreach (var file in shellChanged)
+            {
+                Downloading(file);
                 await StageFileAsync(archive, file, ShellUpdate.StagePath(stage, file.Path), cancellationToken);
+            }
+        }
+
+        // Prova kipi: inen her şey sahnede durur, hiçbir dosya yerine taşınmaz ve
+        // başlatıcı geçişi kurulmaz. Panelin kendisi birebir aynı koşar.
+        if (Rehearsing)
+        {
+            Step(1, 1, "Prova kipi: " + total + " dosya indirildi, kurulum yapılmadı");
+            return false;
         }
 
         // Başlatıcı yan klasörden çıkarılıyor: bir alttaki Apply yan klasörü siliyor.
         LauncherUpdate.Stage(stage, baseDirectory, launcherChanged);
 
-        return UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest, shellChanged);
+        Step(0.92, 1, "Dosyalar yerine taşınıyor");
+        var applied = UpdateRollout.Apply(stage, baseDirectory, appDirectory, changed, launcherChanged, manifest, shellChanged);
+        Step(1, 1, "Sürüm " + manifest.Version + " kuruldu");
+        return applied;
     }
 
     /// <summary>Sahnenin hangi sürüm için toplandığı; işaret yoksa null.</summary>

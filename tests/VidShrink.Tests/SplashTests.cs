@@ -193,6 +193,11 @@ public sealed class SplashTests
     /// Panel ölçütünün iki kuralı kaynakta duruyor: yenileme aralığı köprünün yazdığı
     /// sayıdan geliyor ve iş tarafı ekrana yalnız <c>Step</c> ile konuşuyor — her adım
     /// bir tavanla birlikte. Cümleyi doğrudan çizen bir yol açılırsa buradan görülür.
+    ///
+    /// <para>13 Eylül 2026'da dördüncü adım kaldırıldı: indirme bandını artık başlatıcı
+    /// tek cümleyle anlatmıyor, <c>Updater.Run</c>'a <c>floor</c>/<c>ceiling</c> olarak
+    /// veriliyor ve her dosya kendi cümlesini yazıyor. Sayı bu yüzden 4 değil 3; bandın
+    /// güncelleyiciye devredildiği son satırla pimleniyor.</para>
     /// </summary>
     [Fact]
     public void PanelFollowsTheInstallProgressContract()
@@ -204,14 +209,14 @@ public sealed class SplashTests
 
         var program = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Program.cs"));
         var steps = Regex.Matches(program, @"progress\.Step\(");
-        Assert.Equal(4, steps.Count);
+        Assert.Equal(3, steps.Count);
         Assert.Single(Regex.Matches(program, @"progress\.Finish\("));
 
         // Her adımın tavanı bir öncekinin tabanı: sıra tek yönlü.
         Assert.Contains("progress.Step(2, RepairCeiling", program);
         Assert.Contains("progress.Step(RepairCeiling, MarkerCeiling", program);
         Assert.Contains("progress.Step(MarkerCeiling, ResumeCeiling", program);
-        Assert.Contains("progress.Step(ResumeCeiling, DownloadCeiling", program);
+        Assert.Contains("floor: ResumeCeiling, ceiling: DownloadCeiling", program);
     }
 
     /// <summary>

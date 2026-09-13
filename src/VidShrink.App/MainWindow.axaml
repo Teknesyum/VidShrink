@@ -38,6 +38,9 @@
     <Style Selector="Window.chrome-hidden Border#TitleBar">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
+    <Style Selector="Window.chrome-hidden Border#TitleBarLayer">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
     <Style Selector="Window.chrome-hidden TabControl#Tabs /template/ ItemsPresenter#PART_ItemsPresenter">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
@@ -56,72 +59,7 @@
               Height="{StaticResource TitleBarHeight}"
               Background="{StaticResource TitleBarBackground}"
               BorderBrush="{StaticResource NeonBlueBorderStrong}"
-              BorderThickness="0,0,0,1">
-        <!--
-          Sağda boşluk yok: kapatma düğmesi pencerenin sağ kenarına dayanır. Ekranın köşesi
-          işaretçiyle vurulması en kolay hedeftir ve fare orada durur; araya konan her piksel
-          o kazancı siler. Soldaki 16 px başlık için duruyor.
-        -->
-        <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
-          <StackPanel Grid.Column="0" x:Name="TitleBrand" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-            <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
-            <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
-              <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
-            </TextBlock>
-          </StackPanel>
-          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-            <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
-                    ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"
-                         VerticalAlignment="Center" Fill="{StaticResource TextDisabled}"/>
-                <TextBlock x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
-              <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
-            </StackPanel>
-            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
-                      Data="{StaticResource IconCoffee}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-                <TextBlock x:Name="TxtSponsor" Text="Buy Me a Coffee" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
-              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
-                      Data="{StaticResource IconCode}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-                <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <!--
-              Üç düğme Windows'taki gibi bitişik dikdörtgen: aralarında boşluk yok, başlık
-              çubuğu boyunca tam yükseklikte. Soldaki tek boşluk imza bloğundan ayırmak için.
-            -->
-            <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Stretch"
-                        Margin="{StaticResource WindowButtonMargin}">
-              <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.minimize}" auto:AutomationProperties.Name="{loc:Text main.window.minimize}" Click="OnMinimize">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconMinimize}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-              </Button>
-              <Button x:Name="BtnMaximize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.maximize}" auto:AutomationProperties.Name="{loc:Text main.window.maximize}" Click="OnMaximizeRestore">
-                <Path x:Name="MaximizeGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconMaximize}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-              </Button>
-              <Button x:Name="BtnClose" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="{loc:Text main.window.close}" auto:AutomationProperties.Name="{loc:Text main.window.close}" Click="OnClose">
-                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
-                      Data="{StaticResource IconClose}" Stroke="{Binding $parent[Button].Foreground}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
-              </Button>
-            </StackPanel>
-          </StackPanel>
-        </Grid>
-      </Border>
+              BorderThickness="0,0,0,1"/>
 
 
         <TabControl x:Name="Tabs" Theme="{StaticResource NeonTabControl}" SelectedIndex="1">
@@ -1241,9 +1179,9 @@
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <StackPanel Orientation="Horizontal">
-                      <CheckBox x:Name="ChkShellMenu" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.shell-menu.label}"/>
-                    </StackPanel>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.label}"/>
+                    <CheckBox x:Name="ChkShellMenuOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text shell.menu.open}"/>
+                    <CheckBox x:Name="ChkShellMenuShrink" Theme="{StaticResource CheckStyle}" Content="{loc:Text shell.menu.shrink}"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.hint}"/>
                     <TextBlock x:Name="TxtShellMenuStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                   </StackPanel>
@@ -1337,6 +1275,75 @@
 
 
       </TabControl>
+
+      <Border x:Name="TitleBarLayer"
+              VerticalAlignment="Top"
+              Height="{StaticResource TitleBarHeight}">
+        <!--
+          Sağda boşluk yok: kapatma düğmesi pencerenin sağ kenarına dayanır. Ekranın köşesi
+          işaretçiyle vurulması en kolay hedeftir ve fare orada durur; araya konan her piksel
+          o kazancı siler. Soldaki 16 px başlık için duruyor.
+        -->
+        <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
+          <StackPanel Grid.Column="0" x:Name="TitleBrand" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+            <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
+            <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
+              <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
+            </TextBlock>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+            <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
+                    ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"
+                         VerticalAlignment="Center" Fill="{StaticResource TextDisabled}"/>
+                <TextBlock x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
+              <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
+            </StackPanel>
+            <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
+                      Data="{StaticResource IconCoffee}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                <TextBlock x:Name="TxtSponsor" Text="Buy Me a Coffee" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="Teknesyum" Click="OnOpenGitHub">
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
+                      Data="{StaticResource IconCode}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                <TextBlock x:Name="TxtGitHub" Text="Teknesyum" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <!--
+              Üç düğme Windows'taki gibi bitişik dikdörtgen: aralarında boşluk yok, başlık
+              çubuğu boyunca tam yükseklikte. Soldaki tek boşluk imza bloğundan ayırmak için.
+            -->
+            <StackPanel x:Name="WindowButtons" Orientation="Horizontal" VerticalAlignment="Stretch"
+                        Margin="{StaticResource WindowButtonMargin}">
+              <Button x:Name="BtnMinimize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.minimize}" auto:AutomationProperties.Name="{loc:Text main.window.minimize}" Click="OnMinimize">
+                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                      Data="{StaticResource IconMinimize}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+              </Button>
+              <Button x:Name="BtnMaximize" Theme="{StaticResource WindowControlButton}" ToolTip.Tip="{loc:Text main.window.maximize}" auto:AutomationProperties.Name="{loc:Text main.window.maximize}" Click="OnMaximizeRestore">
+                <Path x:Name="MaximizeGlyph" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                      Data="{StaticResource IconMaximize}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+              </Button>
+              <Button x:Name="BtnClose" Theme="{StaticResource CloseWindowButton}" ToolTip.Tip="{loc:Text main.window.close}" auto:AutomationProperties.Name="{loc:Text main.window.close}" Click="OnClose">
+                <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform"
+                      Data="{StaticResource IconClose}" Stroke="{Binding $parent[Button].Foreground}"
+                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
     </Grid>
   </Border>
 </Window>

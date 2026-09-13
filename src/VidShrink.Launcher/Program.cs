@@ -25,6 +25,9 @@ internal static class Program
     /// <summary>İndirilenlerin toplandığı klasör; Updater ile aynı ad.</summary>
     private const string StageDirectoryName = "update-stage";
 
+    /// <summary>Panelde dokuz satır duruyor; tamamı buraya yazılır.</summary>
+    private const string UpdateLogName = "update-log.txt";
+
     /// <summary>
     /// Adımların tavanları. Her adım "en fazla buraya kadar" der ve çubuk o adım uzarsa
     /// tavana sürünür; sayılar süre tahmini değil, adımların ekranda kapladığı pay.
@@ -99,12 +102,17 @@ internal static class Program
             // aşağıda; ayara da dokunulmaz.
             if (updateNow)
             {
-                progress.Step(ResumeCeiling, DownloadCeiling, Status(baseDirectory));
-                try { pendingSwap |= Updater.Run(baseDirectory, appDirectory, force: true); }
+                try
+                {
+                    pendingSwap |= Updater.Run(
+                        baseDirectory, appDirectory, force: true,
+                        progress: progress, floor: ResumeCeiling, ceiling: DownloadCeiling);
+                }
                 catch (Exception) { }
             }
 
-            progress.Finish(true, "Uygulama açılıyor");
+            progress.Finish(true, Updater.Rehearsing ? "Prova bitti, uygulama açılıyor" : "Uygulama açılıyor");
+            progress.WriteLog(Path.Combine(baseDirectory, UpdateLogName));
         }
 
         try { RecordAppliedUpdate(appDirectory, previousVersion); }
@@ -194,16 +202,6 @@ internal static class Program
         args.Length > 1 && int.TryParse(args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)
             ? id
             : null;
-
-    /// <summary>
-    /// Panelin iki durumu. İndirilenlerin toplandığı klasör görünmüşse iş artık ağ
-    /// denetimi değil, uygulamadır. Güncelleyiciye haber kancası eklemeye gerek yok:
-    /// klasörün varlığı zaten aynı bilgiyi taşıyor.
-    /// </summary>
-    private static string Status(string baseDirectory) =>
-        Directory.Exists(Path.Combine(baseDirectory, StageDirectoryName))
-            ? "Güncelleme uygulanıyor"
-            : "Güncelleme kontrol ediliyor";
 
     /// <summary>
     /// Bir güncelleme uygulandıysa geçilen sürümü uygulamanın okuyacağı yere bırakır.

@@ -7,6 +7,8 @@
 static const CLSID CLSID_VidShrinkCommand =
 { 0x7b8b4a16, 0xe3f5, 0x4c4a, { 0xa8, 0xd2, 0x26, 0xb2, 0xf8, 0x95, 0xbe, 0x58 } };
 
+static const wchar_t* const LabelKey = L"Software\\Teknesyum\\VidShrink\\ShellLabels";
+
 static HMODULE moduleHandle;
 static long objectCount;
 
@@ -22,6 +24,15 @@ static HRESULT LauncherPath(wchar_t* path, DWORD capacity)
     if (!PathRemoveFileSpecW(path) || !PathRemoveFileSpecW(path)) return E_FAIL;
     if (!PathAppendW(path, L"VidShrink.exe")) return E_FAIL;
     return S_OK;
+}
+
+static HRESULT MenuLabel(wchar_t* label, DWORD capacity)
+{
+    DWORD bytes = capacity * sizeof(wchar_t);
+    auto status = RegGetValueW(HKEY_CURRENT_USER, LabelKey, L"open",
+        RRF_RT_REG_SZ, nullptr, label, &bytes);
+    if (status != ERROR_SUCCESS) return HRESULT_FROM_WIN32(status);
+    return label[0] ? S_OK : E_FAIL;
 }
 
 class VidShrinkCommand final : public IExplorerCommand
@@ -54,9 +65,9 @@ public:
 
     IFACEMETHODIMP GetTitle(IShellItemArray*, PWSTR* title) override
     {
-        return CopyText(PRIMARYLANGID(GetUserDefaultUILanguage()) == LANG_TURKISH
-            ? L"Bu Videoyu VidShrink ile Aç"
-            : L"Open this video with VidShrink", title);
+        wchar_t label[256];
+        if (SUCCEEDED(MenuLabel(label, ARRAYSIZE(label)))) return CopyText(label, title);
+        return CopyText(L"Open this video with VidShrink", title);
     }
 
     IFACEMETHODIMP GetIcon(IShellItemArray*, PWSTR* icon) override

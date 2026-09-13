@@ -141,6 +141,26 @@ public sealed class InstallProgress
         }
     }
 
+    /// <summary>
+    /// Ekranda yalnız son dokuz satır duruyor; kullanıcı bittikten sonra ne olduğuna
+    /// bakabilsin diye bütün günlük diske de yazılır. Yazamamak işi bozmaz: panel
+    /// günlüğü yüzünden güncelleme yarıda kalmaz.
+    /// </summary>
+    public bool WriteLog(string path)
+    {
+        try
+        {
+            var folder = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+            File.WriteAllLines(path, History);
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
     /// <summary>Yüzdenin ekrandaki yazımı; sarmayan tek satır için.</summary>
     public string PercentText => Math.Round(Percent).ToString("0", CultureInfo.InvariantCulture) + "%";
 

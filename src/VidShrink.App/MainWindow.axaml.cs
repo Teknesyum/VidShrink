@@ -547,19 +547,37 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Üst şerit gizli başlar; işaretçi pencerenin ilk <c>TitleBarHeight</c> pikseline
-    /// girdiğinde belirir, şeridi terk edince kaybolur. Şerit içeriğin üstünde bir katman
-    /// olduğu için görünüp kaybolurken hiçbir şey yer değiştirmiyor.
+    /// Üst şerit yalnız <b>oynatıcı sekmesinde</b> kendiliğinden gizlenir: işaretçi
+    /// pencerenin ilk <c>TitleBarHeight</c> pikseline girdiğinde belirir, şeridi terk
+    /// edince kaybolur. Şerit içeriğin üstünde bir katman olduğu için görünüp kaybolurken
+    /// hiçbir şey yer değiştirmiyor.
+    ///
+    /// <para>Diğer sekmelerde şerit sabit durur. Gizlenme oynatıcının kendi gereği —
+    /// görüntünün üstünü kapatmasın diye; küçültme, dönüştürme, kaydedici ve ayarlar
+    /// sayfalarında ise okurken kaybolan bir sekme şeridi oluyordu.</para>
     /// </summary>
     private void TrackChrome()
     {
-        ShowChrome(false);
         AddHandler(PointerMovedEvent, OnChromePointerMoved, RoutingStrategies.Tunnel);
-        PointerExited += (_, _) => ShowChrome(false);
+        PointerExited += (_, _) => ShowChrome(!ChromeHidesItself);
+        Tabs.SelectionChanged += (_, _) => ApplyChromeMode();
+        ApplyChromeMode();
     }
 
+    internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex;
+
+    private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);
+
     private void OnChromePointerMoved(object? sender, PointerEventArgs e)
-        => ShowChrome(e.GetPosition(this).Y <= TitleBar.Height);
+    {
+        if (!ChromeHidesItself)
+        {
+            ShowChrome(true);
+            return;
+        }
+
+        ShowChrome(e.GetPosition(this).Y <= TitleBar.Height);
+    }
 
     private void ShowChrome(bool show)
     {

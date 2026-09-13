@@ -48,6 +48,31 @@ public class PencereKabuguTests
         Assert.Contains("Grid.RowSpan=\"2\"", controls[icerik..serit]);
     }
 
+    /// <summary>
+    /// Başlık çubuğunun düğmeleri sekme denetiminden <b>sonra</b> bildiriliyor. Avalonia'da
+    /// aynı gözdeki kardeşlerin sırası z düzenidir: düğmeler önce bildirildiği sürece
+    /// oynatıcı sekmesinin tam pencereyi kaplayan donuk sahnesi onların üstüne biniyordu,
+    /// şerit geri gelince düğmeler görünmüyor ve tıklama oynatıcıya gidiyordu.
+    ///
+    /// <para>Bandın zemini <c>TitleBar</c>'da kaldı, içerik <c>TitleBarLayer</c>'a çıktı.
+    /// Katmanın kendi zemini yok; ortadaki boş sütun tıklamayı altındaki sekme şeridine
+    /// geçiriyor, yalnız iki yandaki düğmeler hedef oluyor.</para>
+    /// </summary>
+    [Fact]
+    public void BaslikDugmeleriIcerigiUstunde()
+    {
+        var xaml = Xaml();
+
+        var serit = xaml.IndexOf("</TabControl>", StringComparison.Ordinal);
+        var katman = xaml.IndexOf("<Border x:Name=\"TitleBarLayer\"", StringComparison.Ordinal);
+
+        Assert.True(serit > 0 && katman > 0, "iki parça da bulunmalı");
+        Assert.True(katman > serit, "başlık katmanı sekme denetiminden sonra bildirilmeli");
+        Assert.Contains("x:Name=\"TitleBarContent\"", xaml[katman..]);
+        Assert.DoesNotContain("Background", xaml[katman..(katman + 160)]);
+        Assert.Contains("Selector=\"Window.chrome-hidden Border#TitleBarLayer\"", xaml);
+    }
+
     /// <summary>Gizleme sınıfı hem başlık çubuğunu hem sekme şeridini kapatıyor.</summary>
     [Fact]
     public void GizlemeSinifiIkiParcayiKapatiyor()
@@ -62,6 +87,11 @@ public class PencereKabuguTests
     /// <summary>
     /// Belirme eşiği uydurulmuyor: işaretçinin y'si başlık çubuğunun kendi yüksekliğiyle
     /// karşılaştırılıyor, kaynağa ikinci bir sayı yazılmıyor.
+    ///
+    /// <para>Pim önce <c>ShowChrome(false)</c> arıyordu, yani şerit her sekmede kendiliğinden
+    /// kayboluyordu. 13 Eylül 2026'da gizlenme yalnız oynatıcıya bağlandı: kaybolma artık
+    /// koşulsuz değil, <see cref="MainWindow.ChromeHidesItself"/>'in tersine bakıyor.
+    /// Değişen şey eşik değil, eşiğin uygulandığı yer — ölçünün eşik satırı aynı kaldı.</para>
     /// </summary>
     [Fact]
     public void EsikBaslikYuksekligindenGeliyor()
@@ -69,8 +99,23 @@ public class PencereKabuguTests
         var code = Code();
 
         Assert.Contains("ShowChrome(e.GetPosition(this).Y <= TitleBar.Height)", code);
-        Assert.Contains("ShowChrome(false);", code);
-        Assert.Contains("PointerExited += (_, _) => ShowChrome(false);", code);
+        Assert.Contains("PointerExited += (_, _) => ShowChrome(!ChromeHidesItself);", code);
+    }
+
+    /// <summary>
+    /// Üst şerit yalnız oynatıcı sekmesinde kendiliğinden küçülüyor. Diğer sekmelerde
+    /// işaretçi nereye giderse gitsin şerit yerinde duruyor; gizlenme oynatıcının kendi
+    /// ihtiyacı, uygulamanın geneline dayatılan bir davranış değil.
+    /// </summary>
+    [Fact]
+    public void GizlenmeYalnizOynaticidaGecerli()
+    {
+        var code = Code();
+
+        Assert.Contains("internal bool ChromeHidesItself => Tabs.SelectedIndex == PlayerTabIndex;", code);
+        Assert.Contains("private void ApplyChromeMode() => ShowChrome(!ChromeHidesItself);", code);
+        Assert.Contains("Tabs.SelectionChanged += (_, _) => ApplyChromeMode();", code);
+        Assert.Contains("if (!ChromeHidesItself)", code);
     }
 
     /// <summary>Kenarlık kuralı tek yerde: oynatıcı sekmesi tam ekranla aynı kolda.</summary>

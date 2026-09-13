@@ -77,8 +77,65 @@ public class KabukMenusuTests
         var xaml = File.ReadAllText(TipSources.WindowXamlPath);
 
         Assert.Contains("x:Name=\"ShellMenuPanel\"", xaml);
-        Assert.Contains("x:Name=\"ChkShellMenu\"", xaml);
+        Assert.Contains("x:Name=\"ChkShellMenuOpen\"", xaml);
+        Assert.Contains("x:Name=\"ChkShellMenuShrink\"", xaml);
         Assert.Contains("{loc:Text settings-tab.shell-menu.hint}", xaml);
+    }
+
+    /// <summary>
+    /// İki girdi iki ayrı kutu. Kullanıcı açma girdisini isteyip küçültme alt menüsünü
+    /// istemeyebilir; tek kutu ikisini birden dayatıyordu. Ölçülen şey kolların gerçekten
+    /// ayrı olması: her kutu kendi kayıt defteri anahtarını yazıyor ve siliyor.
+    /// </summary>
+    [Fact]
+    public void IkiGirdiAyriKollardan()
+    {
+        var code = Code();
+        var panel = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.KabukMenusu.cs"));
+
+        foreach (var member in new[] { "InstallOpen", "InstallShrink", "RemoveOpen", "RemoveShrink" })
+            Assert.Contains(member, code);
+
+        Assert.DoesNotContain("Install(string executable, string openLabel", code);
+        Assert.Contains("ShellMenu.InstallOpen", panel);
+        Assert.Contains("ShellMenu.InstallShrink", panel);
+        Assert.Contains("ShellMenu.RemoveOpen", panel);
+        Assert.Contains("ShellMenu.RemoveShrink", panel);
+        Assert.Contains("Installed(ShellMenu.MenuKey)", panel);
+        Assert.Contains("Installed(ShellMenu.ShrinkMenuKey)", panel);
+    }
+
+    /// <summary>
+    /// Windows 11'in üst düzey girdisi ayrı bir süreçte, C++ tarafında çizilir ve
+    /// uygulamanın dil ayarını göremez. Eskiden başlık Windows arayüz diline bakıp
+    /// Türkçe ya da İngilizce yazıyordu: Fransızca kullanan biri İngilizce görüyordu,
+    /// oysa 42 dilin hepsinde <c>shell.menu.open</c> çevrilmiş duruyor. Artık uygulama
+    /// seçili dildeki etiketi kayıt defterine bırakıyor, uzantı başlığı oradan okuyor.
+    /// </summary>
+    [Fact]
+    public void UstDuzeyGirdiUygulamaninDiliniOkuyor()
+    {
+        var extension = File.ReadAllText(Path.Combine(
+            TipSources.Root, "src", "VidShrink.ShellExtension", "VidShrink.ShellExtension.cpp"));
+
+        Assert.DoesNotContain("LANG_TURKISH", extension);
+        Assert.DoesNotContain("GetUserDefaultUILanguage", extension);
+        Assert.Contains("RegGetValueW(HKEY_CURRENT_USER, LabelKey", extension);
+        Assert.Contains("ShellLabels", extension);
+        Assert.Contains("ShellLabels", Code());
+        Assert.Contains("WriteLabel(\"open\", label);", Code());
+        Assert.Contains("WriteLabel(\"shrink\", label);", Code());
+    }
+
+    /// <summary>Her girdi ikonu taşıyor: açma, küçültme başlığı ve her hedef.</summary>
+    [Fact]
+    public void HerGirdideIkonVar()
+    {
+        var code = Code();
+        var icons = Regex.Matches(code, @"SetValue\(""Icon"", executable").Count;
+
+        Assert.Equal(3, icons);
     }
 
     /// <summary>Menü etiketi arayüz dilini izliyor: dil değişince yeniden yazılıyor.</summary>

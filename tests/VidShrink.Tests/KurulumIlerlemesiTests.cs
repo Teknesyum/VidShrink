@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Linq;
 using VidShrink.Core;
 using Xunit;
@@ -125,5 +127,74 @@ public class KurulumIlerlemesiTests
         Assert.Equal(InstallState.Failed, q.State);
         Assert.Equal(30, q.Percent);
         Assert.Equal(30, q.Bar);
+    }
+
+    /// <summary>
+    /// Günlüğün tamamı diske de yazılıyor: ekranda dokuz satır duruyor, kullanıcı iş
+    /// bittikten sonra ne olduğuna dosyadan bakabiliyor.
+    /// </summary>
+    [Fact]
+    public void GunlukDiskeYaziliyor()
+    {
+        var p = new InstallProgress();
+        for (var i = 1; i <= 14; i++) p.Step(i, 100, "Adım " + i);
+        p.Finish(true, "Bitti");
+
+        var yol = Path.Combine(Path.GetTempPath(), "vidshrink-gunluk-" + Guid.NewGuid().ToString("N"), "update-log.txt");
+        try
+        {
+            Assert.True(p.WriteLog(yol));
+            var satirlar = File.ReadAllLines(yol);
+
+            Assert.Equal(15, satirlar.Length);
+            Assert.Equal("Adım 1", satirlar[0]);
+            Assert.Equal("Bitti", satirlar[^1]);
+        }
+        finally
+        {
+            var klasor = Path.GetDirectoryName(yol);
+            if (klasor is not null && Directory.Exists(klasor)) Directory.Delete(klasor, true);
+        }
+    }
+
+    /// <summary>
+    /// Elle yükleme artık kullanıcıya sessiz gelmiyor: güncelleyici panele bağlanıyor ve
+    /// her aşama — sürüm listesi, bulunan sürüm, inen her dosya adı, yerine taşıma — bir
+    /// cümleyle günlüğe düşüyor. Eskiden bütün indirme tek bir "Güncelleme uygulanıyor"
+    /// satırıydı; kullanıcı ne olduğunu göremiyordu.
+    /// </summary>
+    [Fact]
+    public void GuncelleyiciPaneleKonusuyor()
+    {
+        var kaynak = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+        var program = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Program.cs"));
+
+        Assert.Contains("InstallProgress? progress = null", kaynak);
+        Assert.Contains("progress?.Step(", kaynak);
+        Assert.Contains("\"Sürüm listesi alınıyor\"", kaynak);
+        Assert.Contains("indiriliyor (\" + done + \"/\" + total + \")\"", kaynak);
+        Assert.Contains("\"Dosyalar yerine taşınıyor\"", kaynak);
+        Assert.Contains("progress: progress", program);
+        Assert.Contains("progress.WriteLog(", program);
+    }
+
+    /// <summary>
+    /// Prova kipi: panel birebir aynı koşuyor, dosyalar iniyor, ama hiçbiri yerine
+    /// taşınmıyor ve başlatıcı geçişi kurulmuyor. Panel provasız yayımlanmaz.
+    /// </summary>
+    [Fact]
+    public void ProvaKipiKurmuyor()
+    {
+        var kaynak = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+
+        Assert.Contains("VIDSHRINK_UPDATE_PROVA", kaynak);
+        var prova = kaynak.IndexOf("if (Rehearsing)", StringComparison.Ordinal);
+        var kurulum = kaynak.IndexOf("LauncherUpdate.Stage(stage", StringComparison.Ordinal);
+
+        Assert.True(prova > 0, "prova kolu yok");
+        Assert.True(prova < kurulum, "prova kolu kurulumdan önce dönmeli");
     }
 }
