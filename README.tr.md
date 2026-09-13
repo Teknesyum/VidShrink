@@ -7,11 +7,14 @@
 **Videoyu istediğiniz dosya boyutuna indirin, ekranınızı kaydedin, oynatın ve paylaşın —
 tek bir ücretsiz, çevrimdışı pencereden.**
 
+**Ömür boyu ücretsiz · Reklam yok · Hesap yok · Abonelik yok · Telemetri yok · İnternet
+kapalıyken de çalışır · 42 dil · 26 tema · Açık kaynak**
+
 [![Son sürüm](https://img.shields.io/github/v/release/Teknesyum/VidShrink?label=s%C3%BCr%C3%BCm)](https://github.com/Teknesyum/VidShrink/releases/latest)
 [![Lisans AGPL-3.0-or-later](https://img.shields.io/badge/lisans-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#kurulum)
 
-![VidShrink Küçült sekmesi Türkçe: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T190-kucult-tr.png)
+![VidShrink Küçült sekmesi Türkçe: solda Kaynak bırakma alanı, altında hedef boyut yongaları ve kaydırıcısı, ortada kodeki, CRF'i, çözünürlüğü ve kare hızını tek tek yazan Ne Yapacak paneli, sağda boyut kestirimini gösteren Çıktı paneli](docs/gorseller/T191-kucult-tr.png)
 
 ## Bunların hiçbirini bilmenize gerek yok
 
@@ -21,9 +24,14 @@ seçiyor ve beklenen boyutu daha hiçbir şey koşmadan söylüyor. İstediğini
 dosya asla almıyorsunuz.
 
 Ekran kaydedici de aynı şekilde: tek bir kutucuk, ve program kodlayıcıyı, kare hızını ve
-kayıt boyutunu size sormak yerine kendi makinenizde ölçüp buluyor. Her şey Türkçe ve
-İngilizce; köşedeki `TR` / `EN` düğmeleri bütün pencereyi çeviriyor. Hesap yok, telemetri
-yok, ücretli katman yok, internet gerekmiyor.
+kayıt boyutunu size sormak yerine kendi makinenizde ölçüp buluyor.
+
+**Pencerenin tamamı 42 dil konuşuyor** — her düğme, her uyarı, her ipucu; Arapçadan
+Vietnamcaya — ve yanında **26 renk teması** geliyor (Catppuccin, Dracula, Gruvbox, Nord,
+Rose Pine, Solarized, Tokyo Night ve yirmi tanesi daha, açık ve koyu). İkisini de Ayarlar'dan
+seçiyorsunuz, hiçbir şey yeniden başlamıyor. Diliniz yok mu, ya da çeviri sizin dilinizde
+kötü mü duruyor? [Issue açın](https://github.com/Teknesyum/VidShrink/issues/new), bir sonraki
+sürüme giriyor — süreç bundan ibaret.
 
 ## Tek pencerede dört araç
 
@@ -49,6 +57,45 @@ boyut tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
 Ayrıca bir Dönüştür sekmesi (MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265,
 VP9, AV1 ya da akış kopyası; kırpma ve ses çıkarma) ve tam ffmpeg komutunu tutan gizli bir
 Gelişmiş sekmesi var. Tam tur: [`docs/kullanim.tr.md`](docs/kullanim.tr.md).
+
+## Her sekme
+
+<details>
+<summary>Altı sekmenin, önizlemenin ve gizli Gelişmiş sekmesinin ekran görüntüleri</summary>
+
+**Oynatıcı** — kaynak pencerede oynuyor, karşılaştırma paneli yanında duruyor.
+
+![Oynatıcı sekmesi: alt şerit, sayısı görünen ses ve hız kaydırıcıları, karşılaştırma paneli](docs/gorseller/T191-oynatici-tr.png)
+
+**Küçült** — solda kaynak, ortada hedef boyut ve kalite, sağda kestirim.
+
+![Küçült sekmesi: kaynak bilgileri, hedef boyut yongaları ve kaydırıcısı, plan paneli, çıktı kestirimi](docs/gorseller/T191-kucult-tr.png)
+
+**Önizleme** — plan koşmadan önce ne üreteceği.
+
+![Planlanan çıktıyı gösteren önizleme paneli](docs/gorseller/T191-onizleme-tr.png)
+
+**Dönüştür** — kap, kodek, kırpma ve ses çıkarma.
+
+![Dönüştür sekmesi: çıktı biçimi, kodek, kırpma alanları, ses çıkarma](docs/gorseller/T191-donustur-tr.png)
+
+**Kaydedici** — otomatik kip işaretli; seçilen kodlayıcı, kare hızı ve kayıt boyutu kutucuğun altında yazıyor.
+
+![Kaydedici sekmesi otomatik kipte, kutucuğun altında gerekçe satırı](docs/gorseller/T191-kaydedici-tr.png)
+
+**Ayarlar** — dil, tema, sağ tık menüsü, güncelleme davranışı.
+
+![Ayarlar sekmesi: dil ve tema seçicileri, sağ tık menüsü anahtarı, güncelleme ayarları](docs/gorseller/T191-ayarlar-tr.png)
+
+**Hakkında** — sürüm, lisans, VidShrink'in üstünde durduğu projeler.
+
+![Hakkında sekmesi: sürüm, lisans ve teşekkürler](docs/gorseller/T191-hakkinda-tr.png)
+
+**Gelişmiş** (açana kadar gizli) — koşacak tam ffmpeg komutu.
+
+![Gizli Gelişmiş sekmesi, tam ffmpeg komut satırını gösteriyor](docs/gorseller/T191-gelismis-tr.png)
+
+</details>
 
 ## Kurulum
 
@@ -118,6 +165,9 @@ haritasının ilk maddesi.
 Düzenek, yargıladığı özellikten uzun sürdü; çünkü iki kodlamayı ayırt edemeyen bir düzenek
 sonsuza kadar sayı basar ve yanlışlığını kendi söylemez.
 
+<details>
+<summary>Bir sayıya güvenilebilmesi için düzeneğin yaptığı altı şey</summary>
+
 - **Cevap vermeyi reddeden bir renk kapısı.** Her çıktının renk uzayı, transferi,
   primaries'i ve piksel biçimi ffprobe ile okunup referansla karşılaştırılıyor. Etiketsiz
   çıktı, PQ'ya karşı HLG, SDR referansa karşı HDR sonuç: araç makul bir sayı yerine *hiç
@@ -141,6 +191,8 @@ sonsuza kadar sayı basar ve yanlışlığını kendi söylemez.
   puanıyla ayırmak zorunda; ayıramazsa kendini duyarsız işaretliyor. Ölçülen: HandBrake için
   **+39,26**, VidShrink için **+39,85** — eşiğin kırk katı.
 
+</details>
+
 Düzeneğin tamamı: [`docs/olcumler/ab-duzenegi.md`](docs/olcumler/ab-duzenegi.md).
 Kaydedicinin otomatik kipi de aynı yolla ölçülüyor — makineden kurulan bir aday merdiveni,
 sonra [aday başına üç saniyelik gerçek kayıt](src/VidShrink.Ffmpeg/RecorderAutoProbe.cs) ve
@@ -150,6 +202,9 @@ aşkın böyle belge [`docs/olcumler/`](docs/olcumler/) altında; buradaki her s
 geliyor.
 
 ## Kaputun altında
+
+<details>
+<summary>Dosyayı bıraktığınızla çıktıyı aldığınız an arasında ne koşuyor</summary>
 
 ```mermaid
 flowchart LR
@@ -177,6 +232,8 @@ flowchart LR
     G --> H
 ```
 
+</details>
+
 Uzun hâli — kalibrasyon, durma ölçütü, dört sıkıştırma rejimi, HDR, algısal puanlama,
 bugünkü sınırlar: [`docs/motor.tr.md`](docs/motor.tr.md).
 
@@ -190,7 +247,10 @@ bugünkü sınırlar: [`docs/motor.tr.md`](docs/motor.tr.md).
 
 Ölçülmüş, açık, bu sırayla — ayrıntı [`docs/YOL-HARITASI.md`](docs/YOL-HARITASI.md) içinde.
 
-- **Psiko-görsel kodlayıcı ayarları** — yukarıdaki 8,79 puanlık açık ve sebebi.
+- **HandBrake'i algı tarafında da geçmek.** Hedef boyuta oturtmayı zaten biz kazanıyoruz;
+  yukarıdaki 8,79 VMAF-NEG açığı psy-rd, psy-rdoq ve uyarlamalı nicelemeden geliyor ve bu
+  anahtarlar bizim argümanlarımızda henüz yok. Ölçüt aynı düzenek, aynı kaynak, açık önce
+  sıfıra sonra bizim tarafa — iddia değil, ölçüm.
 - **AV1 dalının hedef altına düşmesi** — beş bant kaçağının beşi `libsvtav1`, düzeltme
   turları kapatamıyor.
 - **Ölçüm düzeneğinin zamanda hizalanması**, ki kare hızı düşüren planlar ölçülebilsin.

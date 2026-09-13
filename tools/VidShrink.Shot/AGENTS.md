@@ -11,7 +11,7 @@ açık) kurulur, `MainWindow` 1600x1000 görüş alanında ölçülüp yerleşti
 `RenderTargetBitmap` üzerine çizilir. Ekran kapısı gerekmez, masaüstü ölçeklemesi ve
 pencere yöneticisi sonucu değiştirmez.
 
-Ad kalıbı `docs/gorseller/T190-<konu>-<dil>.png`; diller `en` ve `tr`, konular
+Ad kalıbı `docs/gorseller/T191-<konu>-<dil>.png`; diller `en` ve `tr`, konular
 `kucult`, `donustur`, `ayarlar`, `gelismis`, `hakkinda`, `onizleme`, `oynatici`.
 Tam pencere kareleri 1600x1000; `onizleme` panelin kendi ölçüsünde (506x512).
 

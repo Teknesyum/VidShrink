@@ -30,7 +30,7 @@ public static class Program
 {
     private const int Width = 1600;
     private const int Height = 1000;
-    private const string Contract = "T190";
+    private const string Contract = "T191";
 
     private static readonly Size Viewport = new(Width, Height);
 
@@ -225,6 +225,8 @@ public static class Program
             Relayout(window);
             ClearEntrance(window);
             StillPulses(window, topic, language);
+            window.Classes.Remove("chrome-hidden");
+            Relayout(window);
 
             var target = pick(window);
             var bounds = target.Bounds;

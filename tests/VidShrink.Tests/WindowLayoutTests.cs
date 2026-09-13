@@ -636,10 +636,15 @@ public sealed class WindowLayoutTests
     /// içeriğini sonsuz yükseklikle ölçmesi ve yatay çubuğun kapalı olması. O yapı
     /// değişirse arama sessizce başka bir yükseklik bulur ve test yeşil kalır —
     /// aralık 90 piksel geniş, 90 pikselden dar bir delik görünmez.</para>
+    ///
+    /// <para>Katman turu: başlık çubuğu ile sekme şeridi içeriğin akışından çıkıp üstüne
+    /// katman oldu, sayfa o kadar erken sığıyor. <b>Boş</b> 967-1057 → 899-989 (ölçülen
+    /// <b>944</b>), <b>dolu</b> 975-1065 → 903-993 (ölçülen <b>948</b>). İki aralığın da
+    /// genişliği 90 piksel (±45), değişen yalnız merkez.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 967, 1057)]
-    [InlineData(true, 975, 1065)]
+    [InlineData(false, 899, 989)]
+    [InlineData(true, 903, 993)]
     public void ThePageStopsScrollingAtThisHeight(bool loaded, double least, double most)
     {
         var width = DesignSize().Width;

@@ -157,10 +157,17 @@ public sealed class OynaticiYerlesimTests
         Assert.Equal(calisma, digeri);
     }
 
+    /// <summary>
+    /// Uyarı katmanı içeriği aşağı itmiyor. Ölçü göz eşitliği aramıyor artık: katman
+    /// turunda içerik denetimi iki satırı birden kapsar oldu (<c>Grid.RowSpan</c>) ve
+    /// gözler eşit olmadığı halde kural bozulmamıştı. Şimdi sorulan şey doğru soru:
+    /// <b>uyarının satırı içeriğin kapsadığı satırların içinde mi</b>. Katman kendi
+    /// satırını geri alırsa kapsamın dışına çıkar ve ölçü kırmızıya düşer.
+    /// </summary>
     [Fact]
     public void UyariKatmaniIcerigiAsagiItmiyor()
     {
-        var (ayniGoz, ustte) = AppHost.Run(() =>
+        var (katmanSatir, icerikIlk, icerikKapsam, ustte) = AppHost.Run(() =>
         {
             var pencere = new MainWindow();
             var serit = pencere.FindControl<TabControl>("Tabs")!;
@@ -174,10 +181,11 @@ public sealed class OynaticiYerlesimTests
                 .OfType<TransitioningContentControl>()
                 .First(denetim => denetim.Name == "SelectedContentHost");
 
-            return (Grid.GetRow(katman) == Grid.GetRow(host), katman.VerticalAlignment);
+            return (Grid.GetRow(katman), Grid.GetRow(host), Grid.GetRowSpan(host), katman.VerticalAlignment);
         });
 
-        Assert.True(ayniGoz, "Uyarı katmanı içerikle aynı ızgara gözünde değil, hâlâ yer kaplıyor.");
+        Assert.True(icerikKapsam > 1, "İçerik tek göze çekildi; uyarı yine kendi satırını isteyebilir.");
+        Assert.InRange(katmanSatir, icerikIlk, icerikIlk + icerikKapsam - 1);
         Assert.Equal(VerticalAlignment.Top, ustte);
     }
 }

@@ -7,11 +7,14 @@
 **Shrink a video to an exact file size, record your screen, play it back and share it —
 from one free, offline window.**
 
+**Free forever · No ads · No account · No subscription · No telemetry · Works with the
+internet off · 42 languages · 26 themes · Open source**
+
 [![Latest release](https://img.shields.io/github/v/release/Teknesyum/VidShrink?label=release)](https://github.com/Teknesyum/VidShrink/releases/latest)
 [![License AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](LICENSE)
 [![Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#install)
 
-![The VidShrink Shrink tab in English: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T190-kucult-en.png)
+![The VidShrink Shrink tab in English: the source drop zone on the left, the target size chips and slider below it, the What It Will Do panel in the middle spelling out codec, CRF, resolution and frame rate, and the Output panel with the size estimate on the right](docs/gorseller/T191-kucult-en.png)
 
 ## You Do Not Have To Know Any Of This
 
@@ -22,8 +25,13 @@ file larger than the number you asked for.
 
 The screen recorder works the same way: one checkbox, and the program works out the
 encoder, the frame rate and the capture size for your machine instead of asking you to.
-Everything is in Turkish and English, and the whole window switches with the `TR` / `EN`
-buttons in the corner. No account, no telemetry, no paid tier, no internet needed.
+
+**The whole window speaks 42 languages** — every button, every warning, every tooltip, from
+Arabic to Vietnamese — and **26 colour themes** ship with it (Catppuccin, Dracula, Gruvbox,
+Nord, Rose Pine, Solarized, Tokyo Night and twenty more, light and dark). Pick both in
+Settings; nothing restarts. Your language missing, or a translation reading badly in yours?
+[Open an issue](https://github.com/Teknesyum/VidShrink/issues/new) and it goes into the next
+release — that is the whole process.
 
 ## Four Tools, One Window
 
@@ -49,6 +57,45 @@ their real size ceilings live in [`paylasim-hedefleri.json`](paylasim-hedefleri.
 Plus a Convert tab (MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265, VP9, AV1
 or stream copy; trimming and audio extraction) and a hidden Advanced tab holding the exact
 ffmpeg command. Full tour: [`docs/kullanim.md`](docs/kullanim.md).
+
+## Every Tab
+
+<details>
+<summary>Screenshots of all six tabs, the preview and the hidden Advanced tab</summary>
+
+**Player** — the source plays in the window; the comparison panel sits beside it.
+
+![The Player tab: transport bar, volume and speed sliders with their numbers, and the comparison panel](docs/gorseller/T191-oynatici-en.png)
+
+**Shrink** — source on the left, target size and quality in the middle, the estimate on the right.
+
+![The Shrink tab: source facts, target size chips and slider, the plan panel and the output estimate](docs/gorseller/T191-kucult-en.png)
+
+**Preview** — what the plan will actually produce, before it runs.
+
+![The preview panel showing the planned output](docs/gorseller/T191-onizleme-en.png)
+
+**Convert** — container, codec, trimming and audio extraction.
+
+![The Convert tab: output format, codec, trim fields and audio extraction](docs/gorseller/T191-donustur-en.png)
+
+**Recorder** — automatic mode ticked; the chosen encoder, frame rate and capture size are written under the checkbox.
+
+![The Recorder tab in automatic mode with the reason line under the checkbox](docs/gorseller/T191-kaydedici-en.png)
+
+**Settings** — language, theme, right-click menu, update behaviour.
+
+![The Settings tab: language and theme pickers, right-click menu switch, update settings](docs/gorseller/T191-ayarlar-en.png)
+
+**About** — version, licence, the projects VidShrink stands on.
+
+![The About tab: version, licence and credits](docs/gorseller/T191-hakkinda-en.png)
+
+**Advanced** (hidden until you unlock it) — the exact ffmpeg command that will run.
+
+![The hidden Advanced tab showing the exact ffmpeg command line](docs/gorseller/T191-gelismis-en.png)
+
+</details>
 
 ## Install
 
@@ -119,6 +166,9 @@ item on the roadmap.
 The rig took longer to build than the feature it judges, because a rig that cannot tell two
 encodes apart prints numbers forever and never says it is wrong.
 
+<details>
+<summary>The six things the rig does so a number can be trusted</summary>
+
 - **A colour gate that refuses to answer.** Every output's colour space, transfer,
   primaries and pixel format are read with ffprobe and compared to the reference. Untagged
   output, PQ against HLG, an SDR reference against an HDR result: the tool prints *no
@@ -141,6 +191,8 @@ encodes apart prints numbers forever and never says it is wrong.
   least 1.00 VMAF-NEG point or it marks itself insensitive. Measured: **+39.26** for
   HandBrake, **+39.85** for VidShrink — forty times the threshold.
 
+</details>
+
 Full rig: [`docs/olcumler/ab-duzenegi.md`](docs/olcumler/ab-duzenegi.md). The recorder's
 automatic mode is measured the same way — a candidate ladder built from the machine, then
 [three real seconds of recording per candidate](src/VidShrink.Ffmpeg/RecorderAutoProbe.cs)
@@ -150,6 +202,9 @@ hundred such documents live in [`docs/olcumler/`](docs/olcumler/); every number 
 from one of them.
 
 ## Under The Hood
+
+<details>
+<summary>What runs between dropping a file in and getting one out</summary>
 
 ```mermaid
 flowchart LR
@@ -177,6 +232,8 @@ flowchart LR
     G --> H
 ```
 
+</details>
+
 Long version — calibration, the stopping rule, the four compression regimes, HDR handling,
 perceptual scoring, today's limits: [`docs/motor.md`](docs/motor.md).
 
@@ -190,7 +247,10 @@ perceptual scoring, today's limits: [`docs/motor.md`](docs/motor.md).
 
 Measured, open, in this order — detail in [`docs/YOL-HARITASI.md`](docs/YOL-HARITASI.md).
 
-- **Psycho-visual encoder settings** — the 8.79-point gap above, and the reason for it.
+- **Beating HandBrake on perceptual quality too.** We already win on hitting a target size;
+  the 8.79 VMAF-NEG gap above is psy-rd, psy-rdoq and adaptive quantisation, which our
+  arguments do not carry yet. The bar is the same rig, the same source, the gap at zero and
+  then on our side — not a claim, a measurement.
 - **The AV1 branch's undershoot** — five band misses out of five are `libsvtav1`, and the
   correction rounds do not close them.
 - **Time-aligning the measurement rig**, so frame-rate-lowering plans can be scored at all.

@@ -160,7 +160,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         // baslangici 12 - 5 = 7. [2,7] penceresinin ardili Clamp(12, 7) = 7, yani dosyanin
         // icinde kaliyor ve PrepareAheadAsync'in tekillik kontrolu kirpilmadan gecebiliyor.
         var clipTask = AppHost.Run(() => host.LoadClipAsync(2));
-        await Bekle(() => clipTask.IsCompleted);
+        Assert.True(await Bekle(() => clipTask.IsCompleted), "LoadClipAsync suresinde bitmedi");
         await clipTask;
         Assert.NotNull(host.ActiveClip);
         Assert.True(await Bekle(() => host.SourceStatus is not null), "Restart gercekten kosup kaynagi kurmadi");
@@ -310,7 +310,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         // LoadClipAsync konak iş parçacığında başlatılır (bkz. Hazirla) — RestartCore'un
         // panel dokunuşları başka bir iş parçacığından "Call from invalid thread" ile düşer.
         var clipTask = AppHost.Run(() => host.LoadClipAsync(4));
-        await Bekle(() => clipTask.IsCompleted);
+        Assert.True(await Bekle(() => clipTask.IsCompleted), "LoadClipAsync suresinde bitmedi");
         await clipTask;
         await Bekle(() => sayac > ilkParcaOncesi);
         var ilkParcaSonrasi = sayac;
@@ -358,7 +358,7 @@ public sealed class PlaybackResumeTests : IClassFixture<SegmentClips>
         var yeniPlanGecikme = AppHost.Run(() => host.ClipScheduled);
 
         var yukle = AppHost.Run(() => host.SegmentDelayElapsed());
-        await Bekle(() => yukle.IsCompleted, 60000);
+        Assert.True(await Bekle(() => yukle.IsCompleted, 60000), "SegmentDelayElapsed 60 saniyede bitmedi");
         await yukle;
         await Bekle(() => sayac > oncekiFabrika);
 

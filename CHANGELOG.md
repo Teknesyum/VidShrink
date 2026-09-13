@@ -7,6 +7,40 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-13
+
+### Changed
+
+- Every screenshot in the repository was retaken as the **T191** set. The T190 set, shot
+  earlier the same day, showed no title bar and no tab strip at all: the top strip now
+  starts hidden and appears on hover, and a headless capture has no pointer. The shot tool
+  drops the `chrome-hidden` class before it renders, so the eight screens carry the window
+  the way it looks in use. T190 moved to `trash/gorseller-T190/`.
+- README leads with what the program costs and what it refuses to do - free for good, no
+  ads, no account, no subscription, no telemetry, works offline - and says plainly that the
+  window speaks 42 languages and ships 26 themes, with a one-click issue link for a missing
+  language. Every tab now has a current screenshot behind a collapsed gallery, and the two
+  heaviest sections (the rig's six guarantees, the pipeline diagrams) are collapsed so the
+  first screen stays readable.
+- The roadmap says the goal out loud: **HandBrake is to be passed on perceptual quality
+  too**, measured on the same rig against the same source, gap to zero and then past it.
+
+### Fixed
+
+- The 0.5.0 release never reached users: its release run stopped at the test gate. Six
+  measurements still described the layout the way it looked before the title bar and the
+  tab strip became an overlay, and the shell-menu keys added in 0.5.0 moved two key
+  counts. The page now fits at 944 px empty and 948 px loaded (was 1012 / 1020), the
+  Shrink tab's overflow at the window's floor is 221 px (was 251), and the localized key
+  counts are 31261 walked and 1172 title-cased.
+- The notice layer's pin asked whether the notice and the content sat in the same grid
+  cell. Since the content spans both rows, that question had no true answer any more; it
+  now asks whether the notice's row falls inside the content's span, which is what "the
+  notice does not push the player down" actually means.
+- A timed wait in the playback resume measurements threw its result away and then awaited
+  the task anyway, so a timeout became an indefinite hang - the 0.4.5 run was aborted
+  after ten idle minutes with a hang dump. The wait now fails with its own message.
+
 ## [0.5.0] - 2026-09-13
 
 ### Added

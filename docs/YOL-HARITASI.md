@@ -10,6 +10,11 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
 - [ ] WhatsApp'a özel azami kalite — karanlık videoda törpüleme ölçümü, `.claude/sonra.md`
 - [x] Başlık çubuğu düğmelerinin keskin köşesi — Kesit E anahat dilini tek sözleşmeye bağladı (`RadiusSquare`, `HoverRing`)
 - [ ] Simge takımının dolgu diline geçmesi — `docs/arastirma/ikon-estetigi.md` ikinci tavsiyesi (Fluent), karar kullanıcının
+- [ ] **HandBrake algı tarafında da geçilecek** — bugün eşit boyutta (±%2) HandBrake'in x265 ön ayarı
+  8,79 VMAF-NEG, 2,60 dB XPSNR ve 0,0299 SSIM önde (`docs/olcumler/handbrake-acigi.md`). Hedef boyuta
+  oturtmayı biz kazanıyoruz; kalan açık psy-rd, psy-rdoq ve uyarlamalı niceleme anahtarlarının
+  argümanlarımıza girmemesinden geliyor. Ölçüt: aynı düzenekte aynı kaynakta fark **0'a** insin,
+  sonra artıya geçsin. Bu koşullarda ölçülmemiş bir kazanım rapora girmez.
 
 ## Kararlar
 
