@@ -26,6 +26,10 @@
 
   "main.update.applied": "新しいバージョンに更新しました",
   "main.update.available": "新しいバージョンがあります",
+  "main.update.checking": "確認中…",
+  "main.update.current": "最新",
+  "main.update.offline": "オフライン",
+  "main.update.starting": "インストーラーを開いています…",
 
   "main.action.copy": "コピー",
 

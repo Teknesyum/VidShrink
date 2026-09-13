@@ -26,6 +26,10 @@
 
   "main.update.applied": "Bijgewerkt naar een nieuwe versie",
   "main.update.available": "Er is een nieuwe versie beschikbaar",
+  "main.update.checking": "Controleren…",
+  "main.update.current": "Up-to-date",
+  "main.update.offline": "Offline",
+  "main.update.starting": "Installatieprogramma wordt geopend…",
 
   "main.action.copy": "Kopiëren",
 

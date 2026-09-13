@@ -26,6 +26,10 @@
 
   "main.update.applied": "새 버전으로 업데이트됨",
   "main.update.available": "새 버전이 있습니다",
+  "main.update.checking": "확인 중…",
+  "main.update.current": "최신 상태",
+  "main.update.offline": "오프라인",
+  "main.update.starting": "설치 프로그램 여는 중…",
 
   "main.action.copy": "복사",
 

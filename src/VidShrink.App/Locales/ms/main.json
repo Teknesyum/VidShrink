@@ -26,6 +26,10 @@
 
   "main.update.applied": "Dikemas kini ke versi baharu",
   "main.update.available": "Versi baharu tersedia",
+  "main.update.checking": "Menyemak…",
+  "main.update.current": "Terkini",
+  "main.update.offline": "Luar talian",
+  "main.update.starting": "Membuka pemasang…",
 
   "main.action.copy": "Salin",
 

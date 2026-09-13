@@ -26,6 +26,10 @@
 
   "main.update.applied": "به نسخهٔ جدید به‌روز شد",
   "main.update.available": "نسخهٔ جدیدی موجود است",
+  "main.update.checking": "در حال بررسی…",
+  "main.update.current": "به‌روز",
+  "main.update.offline": "آفلاین",
+  "main.update.starting": "باز کردن نصب‌کننده…",
 
   "main.action.copy": "کپی",
 

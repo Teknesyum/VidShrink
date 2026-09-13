@@ -26,6 +26,10 @@
 
   "main.update.applied": "Actualizat la o versiune nouă",
   "main.update.available": "Este disponibilă o versiune nouă",
+  "main.update.checking": "Se verifică…",
+  "main.update.current": "Actualizat",
+  "main.update.offline": "Offline",
+  "main.update.starting": "Se deschide instalatorul…",
 
   "main.action.copy": "Copiază",
 

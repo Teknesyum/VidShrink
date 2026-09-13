@@ -26,6 +26,10 @@
 
   "main.update.applied": "อัปเดตเป็นเวอร์ชันใหม่แล้ว",
   "main.update.available": "มีเวอร์ชันใหม่",
+  "main.update.checking": "กำลังตรวจสอบ…",
+  "main.update.current": "เป็นปัจจุบัน",
+  "main.update.offline": "ออฟไลน์",
+  "main.update.starting": "กำลังเปิดตัวติดตั้ง…",
 
   "main.action.copy": "คัดลอก",
 

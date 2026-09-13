@@ -26,6 +26,10 @@
 
   "main.update.applied": "Päivitetty uuteen versioon",
   "main.update.available": "Uusi versio on saatavilla",
+  "main.update.checking": "Tarkistetaan…",
+  "main.update.current": "Ajan tasalla",
+  "main.update.offline": "Ei yhteyttä",
+  "main.update.starting": "Asennusohjelma avautuu…",
 
   "main.action.copy": "Kopioi",
 

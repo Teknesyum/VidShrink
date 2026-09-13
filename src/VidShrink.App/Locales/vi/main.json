@@ -26,6 +26,10 @@
 
   "main.update.applied": "Đã cập nhật lên phiên bản mới",
   "main.update.available": "Có phiên bản mới",
+  "main.update.checking": "Đang kiểm tra…",
+  "main.update.current": "Đã cập nhật",
+  "main.update.offline": "Ngoại tuyến",
+  "main.update.starting": "Đang mở trình cài đặt…",
 
   "main.action.copy": "Sao chép",
 

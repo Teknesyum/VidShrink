@@ -26,6 +26,10 @@
 
   "main.update.applied": "Mis à jour vers une nouvelle version",
   "main.update.available": "Une nouvelle version est disponible",
+  "main.update.checking": "Vérification…",
+  "main.update.current": "À jour",
+  "main.update.offline": "Hors ligne",
+  "main.update.starting": "Ouverture de l'installateur…",
 
   "main.action.copy": "Copier",
 

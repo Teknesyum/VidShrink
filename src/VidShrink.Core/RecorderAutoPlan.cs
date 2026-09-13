@@ -247,4 +247,24 @@ public static class RecorderAutoPlan
             Tune = null
         };
     }
+
+    /// <summary>
+    /// Kullanicinin verdigi hedef boyutu isteğe yazar. Kalite kolu bit hizi koluna
+    /// cevrilir ve tavan bit hizina esitlenir; tampon iki kati alinir. Butce
+    /// kullanilabilir degilse istek degismeden doner.
+    /// </summary>
+    public static RecorderRequest ApplyBudget(RecorderRequest request, RecorderBudget budget)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (budget.Verdict != RecorderBudgetVerdict.Usable) return request;
+
+        return request with
+        {
+            RateControl = RecorderRateControl.Bitrate,
+            BitrateKbps = budget.VideoKbps,
+            MaxBitrateKbps = budget.VideoKbps,
+            BufferKbits = budget.VideoKbps * 2
+        };
+    }
 }

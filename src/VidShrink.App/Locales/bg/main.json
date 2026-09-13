@@ -26,6 +26,10 @@
 
   "main.update.applied": "Обновено до нова версия",
   "main.update.available": "Налична е нова версия",
+  "main.update.checking": "Проверка…",
+  "main.update.current": "Актуално",
+  "main.update.offline": "Офлайн",
+  "main.update.starting": "Отваряне на инсталатора…",
 
   "main.action.copy": "Копирай",
 

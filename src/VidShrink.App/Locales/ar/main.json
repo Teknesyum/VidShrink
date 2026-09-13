@@ -26,6 +26,10 @@
 
   "main.update.applied": "تم التحديث إلى إصدار جديد",
   "main.update.available": "يتوفر إصدار جديد",
+  "main.update.checking": "جارٍ الفحص…",
+  "main.update.current": "محدَّث",
+  "main.update.offline": "غير متصل",
+  "main.update.starting": "يفتح المثبت…",
 
   "main.action.copy": "نسخ",
 

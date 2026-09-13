@@ -26,6 +26,10 @@
 
   "main.update.applied": "Yeni sürüme geçildi",
   "main.update.available": "Yeni bir sürüm var",
+  "main.update.checking": "Denetleniyor…",
+  "main.update.current": "Güncel",
+  "main.update.offline": "Çevrimdışı",
+  "main.update.starting": "Başlatıcı açılıyor…",
 
   "main.action.copy": "Kopyala",
 

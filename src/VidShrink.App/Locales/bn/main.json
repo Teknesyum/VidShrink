@@ -26,6 +26,10 @@
 
   "main.update.applied": "নতুন সংস্করণে আপডেট হয়েছে",
   "main.update.available": "নতুন সংস্করণ পাওয়া যাচ্ছে",
+  "main.update.checking": "পরীক্ষা করা হচ্ছে…",
+  "main.update.current": "হালনাগাদ",
+  "main.update.offline": "অফলাইন",
+  "main.update.starting": "ইনস্টলার খুলছে…",
 
   "main.action.copy": "কপি",
 

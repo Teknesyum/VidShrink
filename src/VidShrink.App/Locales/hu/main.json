@@ -26,6 +26,10 @@
 
   "main.update.applied": "Új verzióra frissítve",
   "main.update.available": "Új verzió érhető el",
+  "main.update.checking": "Ellenőrzés…",
+  "main.update.current": "Naprakész",
+  "main.update.offline": "Nincs kapcsolat",
+  "main.update.starting": "A telepítő megnyitása…",
 
   "main.action.copy": "Másolás",
 

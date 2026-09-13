@@ -26,6 +26,10 @@
 
   "main.update.applied": "已更新到新版本",
   "main.update.available": "有新版本可用",
+  "main.update.checking": "检查中…",
+  "main.update.current": "已是最新",
+  "main.update.offline": "离线",
+  "main.update.starting": "正在打开安装程序…",
 
   "main.action.copy": "复制",
 

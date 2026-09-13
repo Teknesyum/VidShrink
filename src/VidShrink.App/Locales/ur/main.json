@@ -26,6 +26,10 @@
 
   "main.update.applied": "نئے ورژن پر اپ ڈیٹ ہو گیا",
   "main.update.available": "نیا ورژن دستیاب ہے",
+  "main.update.checking": "جانچا جا رہا ہے…",
+  "main.update.current": "تازہ",
+  "main.update.offline": "آف لائن",
+  "main.update.starting": "انسٹالر کھل رہا ہے…",
 
   "main.action.copy": "کاپی",
 

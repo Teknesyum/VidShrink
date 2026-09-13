@@ -26,6 +26,10 @@
 
   "main.update.applied": "Atnaujinta į naują versiją",
   "main.update.available": "Yra nauja versija",
+  "main.update.checking": "Tikrinama…",
+  "main.update.current": "Atnaujinta",
+  "main.update.offline": "Neprisijungta",
+  "main.update.starting": "Atveriama diegimo programa…",
 
   "main.action.copy": "Kopijuoti",
 

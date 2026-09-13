@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -107,6 +107,7 @@ public partial class MainWindow : Window
     private string? _noticeVersion;
     private readonly DeveloperUnlock _developerUnlock = new();
     private AppliedUpdateNotice? _appliedNotice;
+    private UpdateBadgeState _updateBadgeState = UpdateBadgeState.Checking;
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
     private CoreShare.ShareTargetTable? _shareEndpoints;
     private CoreShare.IHttpTransport? _shareTransport;
@@ -1832,9 +1833,63 @@ public partial class MainWindow : Window
     /// Yeni sürümü arka planda sorar. Açılışı geciktirmez ve hiçbir hatada kullanıcıya
     /// bir şey göstermez: haber verilecek bir şey yoksa şerit hiç belirmez.
     /// </summary>
+    /// <summary>
+    /// Rozeti durumuna göre yazar: nokta rengi, metin ve ipucu tek yerden gelir. Metnin
+    /// saatli biçimi <see cref="UpdateBadge.Compose"/>'da, renk eşlemesi burada; ikisi de
+    /// özel rafın güncelleme paneli ölçütünden. Rozet denetim başlayana kadar görünmez.
+    /// </summary>
+    private void SetUpdateBadge(UpdateBadgeState state)
+    {
+        _updateBadgeState = state;
+        var govde = Say(state switch
+        {
+            UpdateBadgeState.Checking => "main.update.checking",
+            UpdateBadgeState.UpToDate => "main.update.current",
+            UpdateBadgeState.NewVersion => "main.update.available",
+            UpdateBadgeState.Installing => "main.update.starting",
+            _ => "main.update.offline"
+        });
+
+        var firca = state switch
+        {
+            UpdateBadgeState.UpToDate => "NeonSuccess",
+            UpdateBadgeState.NewVersion => "NeonPurple",
+            UpdateBadgeState.Installing => "NeonBlue",
+            UpdateBadgeState.Offline => "NeonEmber",
+            _ => "TextDisabled"
+        };
+
+        TxtUpdateBadge.Text = UpdateBadge.Compose(state, govde, DateTimeOffset.Now);
+        if (this.TryFindResource(firca, out var kaynak) && kaynak is IBrush brush) UpdateBadgeDot.Fill = brush;
+        ToolTip.SetTip(BtnUpdateBadge, TxtUpdateBadge.Text);
+        BtnUpdateBadge.IsVisible = true;
+    }
+
+    /// <summary>
+    /// Rozete tıklamak denetimi hemen tekrarlar ve rozet anında <c>Denetleniyor…</c>'ya
+    /// düşer. Denetim sürerken ikinci tık işlemez.
+    /// </summary>
+    private void OnUpdateBadgeClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_updateBadgeState == UpdateBadgeState.Checking) return;
+        if (_updateBadgeState == UpdateBadgeState.NewVersion && _noticeVersion is not null)
+        {
+            UpdateNotice.IsVisible = true;
+            return;
+        }
+
+        _ = CheckForUpdateAsync();
+    }
+
     private async Task CheckForUpdateAsync()
     {
-        if (UpdateCheck.AutoUpdateEnabled()) return;
+        if (UpdateCheck.AutoUpdateEnabled())
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => BtnUpdateBadge.IsVisible = false);
+            return;
+        }
+
+        await Dispatcher.UIThread.InvokeAsync(() => SetUpdateBadge(UpdateBadgeState.Checking));
 
         string version;
         try
@@ -1846,15 +1901,18 @@ public partial class MainWindow : Window
         }
         catch (Exception)
         {
-            // Ağ yok, oran sınırı, bozuk manifest: sessizce vazgeçilir.
+            await Dispatcher.UIThread.InvokeAsync(() => SetUpdateBadge(UpdateBadgeState.Offline));
             return;
         }
 
-        if (!UpdateCheck.IsNewer(version, AppVersion())) return;
-        if (string.Equals(ReadDismissedVersion(), version, StringComparison.OrdinalIgnoreCase)) return;
+        var yeniMi = UpdateCheck.IsNewer(version, AppVersion());
+        var susturulmus = string.Equals(ReadDismissedVersion(), version, StringComparison.OrdinalIgnoreCase);
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
+            SetUpdateBadge(yeniMi ? UpdateBadgeState.NewVersion : UpdateBadgeState.UpToDate);
+            if (!yeniMi || susturulmus) return;
+
             _noticeVersion = version;
             TxtNoticeVersion.Text = version;
 
@@ -1880,6 +1938,8 @@ public partial class MainWindow : Window
             OpenExternal(UpdateCheck.ReleasesPageUrl);
             return;
         }
+
+        SetUpdateBadge(UpdateBadgeState.Installing);
 
         try
         {

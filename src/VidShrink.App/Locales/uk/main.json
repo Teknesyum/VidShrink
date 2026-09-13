@@ -26,6 +26,10 @@
 
   "main.update.applied": "Оновлено до нової версії",
   "main.update.available": "Доступна нова версія",
+  "main.update.checking": "Перевірка…",
+  "main.update.current": "Актуально",
+  "main.update.offline": "Офлайн",
+  "main.update.starting": "Відкриття встановлювача…",
 
   "main.action.copy": "Копіювати",
 

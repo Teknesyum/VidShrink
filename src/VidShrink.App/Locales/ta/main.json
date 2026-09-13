@@ -26,6 +26,10 @@
 
   "main.update.applied": "புதிய பதிப்பிற்குப் புதுப்பிக்கப்பட்டது",
   "main.update.available": "புதிய பதிப்பு கிடைக்கிறது",
+  "main.update.checking": "சரிபார்க்கிறது…",
+  "main.update.current": "புதுப்பித்தது",
+  "main.update.offline": "ஆஃப்லைன்",
+  "main.update.starting": "நிறுவி திறக்கிறது…",
 
   "main.action.copy": "நகலெடு",
 

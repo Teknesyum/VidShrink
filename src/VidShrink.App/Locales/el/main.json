@@ -26,6 +26,10 @@
 
   "main.update.applied": "Ενημερώθηκε σε νέα έκδοση",
   "main.update.available": "Διατίθεται νέα έκδοση",
+  "main.update.checking": "Έλεγχος…",
+  "main.update.current": "Ενημερωμένο",
+  "main.update.offline": "Εκτός σύνδεσης",
+  "main.update.starting": "Άνοιγμα εγκαταστάτη…",
 
   "main.action.copy": "Αντιγραφή",
 

@@ -26,6 +26,10 @@
 
   "main.update.applied": "עודכן לגרסה חדשה",
   "main.update.available": "גרסה חדשה זמינה",
+  "main.update.checking": "בודק…",
+  "main.update.current": "מעודכן",
+  "main.update.offline": "לא מקוון",
+  "main.update.starting": "פותח את המתקין…",
 
   "main.action.copy": "העתק",
 

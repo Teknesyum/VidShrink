@@ -26,6 +26,10 @@
 
   "main.update.applied": "Posodobljeno na novo različico",
   "main.update.available": "Na voljo je nova različica",
+  "main.update.checking": "Preverjanje…",
+  "main.update.current": "Posodobljeno",
+  "main.update.offline": "Brez povezave",
+  "main.update.starting": "Odpiranje namestitvenega programa…",
 
   "main.action.copy": "Kopiraj",
 

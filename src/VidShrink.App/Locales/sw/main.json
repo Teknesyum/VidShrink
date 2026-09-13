@@ -26,6 +26,10 @@
 
   "main.update.applied": "Imesasishwa hadi toleo jipya",
   "main.update.available": "Toleo jipya linapatikana",
+  "main.update.checking": "Inakagua…",
+  "main.update.current": "Ya sasa",
+  "main.update.offline": "Nje ya mtandao",
+  "main.update.starting": "Inafungua kisakinishi…",
 
   "main.action.copy": "Nakili",
 

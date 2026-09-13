@@ -26,6 +26,10 @@
 
   "main.update.applied": "Opdateret til en ny version",
   "main.update.available": "En ny version er tilgængelig",
+  "main.update.checking": "Kontrollerer…",
+  "main.update.current": "Opdateret",
+  "main.update.offline": "Offline",
+  "main.update.starting": "Åbner installationsprogrammet…",
 
   "main.action.copy": "Kopier",
 

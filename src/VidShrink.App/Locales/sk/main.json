@@ -26,6 +26,10 @@
 
   "main.update.applied": "Aktualizované na novú verziu",
   "main.update.available": "Je dostupná nová verzia",
+  "main.update.checking": "Kontroluje sa…",
+  "main.update.current": "Aktuálne",
+  "main.update.offline": "Offline",
+  "main.update.starting": "Otvára sa inštalátor…",
 
   "main.action.copy": "Kopírovať",
 

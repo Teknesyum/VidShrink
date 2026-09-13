@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -59,15 +59,19 @@
             </TextBlock>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+            <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
+                    ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"
+                         VerticalAlignment="Center" Fill="{StaticResource TextDisabled}"/>
+                <TextBlock x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
               <StackPanel x:Name="LangSwitch" Orientation="Horizontal"/>
             </StackPanel>
             <Button x:Name="BtnSponsor" Theme="{StaticResource TitleBarSupportButton}" auto:AutomationProperties.Name="Buy Me a Coffee" Click="OnOpenSponsor">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <!-- The two empty MoveTo commands at the head of IconCoffee pin the icon's own
-                     24x24 design box, so Uniform scales that box instead of the ink. Without them
-                     the stretch centres the ink, and because the steam sits above the cup the cup
-                     itself landed below the text. -->
                 <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
                       Data="{StaticResource IconCoffee}" Stroke="{Binding $parent[Button].Foreground}"
                       StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>

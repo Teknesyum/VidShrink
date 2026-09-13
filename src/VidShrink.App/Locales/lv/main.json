@@ -26,6 +26,10 @@
 
   "main.update.applied": "Atjaunināts uz jaunu versiju",
   "main.update.available": "Pieejama jauna versija",
+  "main.update.checking": "Notiek pārbaude…",
+  "main.update.current": "Atjaunināts",
+  "main.update.offline": "Bezsaistē",
+  "main.update.starting": "Tiek atvērts instalētājs…",
 
   "main.action.copy": "Kopēt",
 

@@ -184,9 +184,17 @@ internal partial class RecorderView
             Split = _settings.Split
         };
 
-        return applyAuto && AutoMode && AutoChoice is { } choice
-            ? RecorderAutoPlan.Apply(request, choice)
-            : request;
+        if (!applyAuto || !AutoMode) return request;
+
+        if (AutoChoice is { } choice) request = RecorderAutoPlan.Apply(request, choice);
+
+        var budget = Budget;
+        if (budget.Verdict != RecorderBudgetVerdict.Usable) return request;
+
+        return RecorderAutoPlan.ApplyBudget(request, budget) with
+        {
+            MaxDuration = TimeSpan.FromSeconds(_settings.TargetSeconds ?? 0)
+        };
     }
 
     /// <summary>

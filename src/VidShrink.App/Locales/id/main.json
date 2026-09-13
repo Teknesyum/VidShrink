@@ -26,6 +26,10 @@
 
   "main.update.applied": "Diperbarui ke versi baru",
   "main.update.available": "Versi baru tersedia",
+  "main.update.checking": "Memeriksa…",
+  "main.update.current": "Terbaru",
+  "main.update.offline": "Offline",
+  "main.update.starting": "Membuka penginstal…",
 
   "main.action.copy": "Salin",
 

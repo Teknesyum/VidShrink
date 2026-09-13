@@ -26,6 +26,10 @@
 
   "main.update.applied": "Uuendatud uuele versioonile",
   "main.update.available": "Saadaval on uus versioon",
+  "main.update.checking": "Kontrollimine…",
+  "main.update.current": "Ajakohane",
+  "main.update.offline": "Võrguühenduseta",
+  "main.update.starting": "Installija avamine…",
 
   "main.action.copy": "Kopeeri",
 

@@ -19,8 +19,13 @@ namespace VidShrink.App.Recorder;
 /// <see cref="RecorderAutoProbe"/> (aday başına kısa gerçek kayıt, düşen kare sayımı)
 /// üretiyor.
 ///
-/// <para>Kip açıkken elle ayar paneli gizleniyor: devre dışı bırakılmış kutu bırakmak
-/// yerine görünmüyor — deponun şeritte de izlediği kalıp bu.</para>
+/// <para>Kip varsayılan: kullanıcı hiçbir şey seçmezse program seçiyor. Elle ayar paneli
+/// yalnız "Kendim ayarlayacağım" işaretlenince görünüyor; devre dışı bırakılmış kutu
+/// bırakmak yerine görünmüyor — deponun şeritte de izlediği kalıp bu.</para>
+
+/// <para>Hedef süre ve hedef boyut isteğe bağlı. İkisi de doluysa
+/// <see cref="RecorderBudget"/> bit hızını hesaplıyor ve aday merdiveninin üstüne
+/// biniyor; biri boşsa kalite kolu olduğu gibi kalıyor.</para>
 /// </summary>
 internal partial class RecorderView
 {
@@ -28,8 +33,30 @@ internal partial class RecorderView
     private RecorderAutoResult? _autoResult;
     private CancellationTokenSource? _autoStop;
 
-    /// <summary>Otomatik kip açık mı.</summary>
-    internal bool AutoMode => ChkAuto.IsChecked ?? false;
+    /// <summary>Otomatik kip açık mı; elle kip istenmediği sürece açıktır.</summary>
+    internal bool AutoMode => !ManualMode;
+
+    /// <summary>Kullanıcı kodlama kolunu kendi mi yazıyor.</summary>
+    internal bool ManualMode => ChkManual.IsChecked ?? false;
+
+    /// <summary>Kullanıcının verdiği hedeften çıkan bütçe; hedef yoksa hükmü <c>NotRequested</c>.</summary>
+    internal RecorderBudget Budget => RecorderBudget.From(TargetMegabytes, TargetSeconds, AudioTrackCount());
+
+    private int AudioTrackCount()
+    {
+        var selection = Selection;
+        return (selection.Microphone is null ? 0 : 1) + (selection.SystemAudio is null ? 0 : 1);
+    }
+
+    private int? TargetSeconds =>
+        int.TryParse(TxtTargetSeconds.Text, NumberStyles.Integer, CultureInfo.CurrentCulture, out var sn) ? sn
+        : string.IsNullOrWhiteSpace(TxtTargetSeconds.Text) ? null
+        : 0;
+
+    private double? TargetMegabytes =>
+        double.TryParse(TxtTargetMegabytes.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out var mb) ? mb
+        : string.IsNullOrWhiteSpace(TxtTargetMegabytes.Text) ? null
+        : 0;
 
     /// <summary>Yazılacak aday; ölçüm koşmadıysa merdivenin ilk adayı.</summary>
     internal RecorderAutoChoice? AutoChoice => _autoChoice;
@@ -41,18 +68,49 @@ internal partial class RecorderView
 
     private void InitOtomatik()
     {
-        ChkAuto.IsChecked = _settings.AutoMode;
-        ChkAuto.IsCheckedChanged += OnAutoToggled;
+        ChkManual.IsChecked = _settings.ManualMode;
+        TxtTargetSeconds.Text = _settings.TargetSeconds?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
+        TxtTargetMegabytes.Text = _settings.TargetMegabytes?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
+        ChkManual.IsCheckedChanged += OnAutoToggled;
+        TxtTargetSeconds.TextChanged += OnBudgetChanged;
+        TxtTargetMegabytes.TextChanged += OnBudgetChanged;
         ApplyAutoVisibility();
+        ShowBudgetNote();
     }
 
     /// <summary>
-    /// Kip açılınca ölçüm kendiliğinden koşuyor: kullanıcıdan beklenen tek şey kutuyu
-    /// işaretlemek. Kapanınca elle panel geri geliyor ve ölçüm sonucu düşüyor.
+    /// Hedef kutuları her değiştiğinde hüküm ekranda güncelleniyor: kullanıcı kaydı
+    /// başlatana kadar hedefin tutup tutmadığını bilmeden beklemiyor.
+    /// </summary>
+    private void OnBudgetChanged(object? sender, TextChangedEventArgs e)
+    {
+        _settings.TargetSeconds = TargetSeconds is { } sn && sn > 0 ? sn : null;
+        _settings.TargetMegabytes = TargetMegabytes is { } mb && mb > 0 ? mb : null;
+        _settings.Save(RecorderSettings.FilePath);
+        ShowBudgetNote();
+    }
+
+    private void ShowBudgetNote()
+    {
+        var budget = Budget;
+        TxtBudgetNote.Text = budget.Verdict switch
+        {
+            RecorderBudgetVerdict.Usable => Say("recorder.budget.result", budget.VideoKbps.ToString("N0", Strings.Culture)),
+            RecorderBudgetVerdict.TooSmall => Say("recorder.budget.too-small", RecorderBudget.MinimumVideoKbps.ToString("N0", Strings.Culture)),
+            RecorderBudgetVerdict.Invalid => Say("recorder.budget.invalid"),
+            _ => string.Empty
+        };
+
+        TxtBudgetNote.IsVisible = TxtBudgetNote.Text.Length > 0;
+    }
+
+    /// <summary>
+    /// Elle kip kapanınca ölçüm kendiliğinden koşuyor. Açılınca elle panel geri geliyor ve
+    /// ölçüm sonucu düşüyor.
     /// </summary>
     private async void OnAutoToggled(object? sender, RoutedEventArgs e)
     {
-        _settings.AutoMode = AutoMode;
+        _settings.ManualMode = ManualMode;
         _settings.Save(RecorderSettings.FilePath);
         ApplyAutoVisibility();
 
@@ -75,6 +133,8 @@ internal partial class RecorderView
         PanelManualOptions.IsVisible = !auto;
         PanelAutoResult.IsVisible = auto;
         BtnAutoMeasure.IsVisible = auto;
+        TxtTargetSeconds.IsEnabled = auto;
+        TxtTargetMegabytes.IsEnabled = auto;
     }
 
     /// <summary>
