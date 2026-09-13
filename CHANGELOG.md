@@ -7,6 +7,18 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-13
+
+### Fixed
+
+- The player strip's seek check no longer goes red on a loaded machine. It compares the
+  target the button asked for against the position read back from libmpv, and those are two
+  separate clock reads: on the release runner the engine advanced 0.066667 s - exactly two
+  frames of the 30 fps clip - between them. The margin was one frame; it is now two
+  (0.08 s), which still rejects a third frame at 0.1 s. The 0.5.1 tag built green on CI and
+  red on the release run for this one reason, so it published no assets; 0.5.2 supersedes
+  it.
+
 ## [0.5.1] - 2026-09-13
 
 ### Changed

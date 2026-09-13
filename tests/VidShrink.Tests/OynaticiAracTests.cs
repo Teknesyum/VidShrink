@@ -298,8 +298,11 @@ public sealed class OynaticiAracTests
     /// 5 ya da 60 sn atlayan bir değişiklik pencereyi deler. Hedef ile motordan okunan
     /// konumun örtüşmesi de komutun motora gerçekten ulaştığını gösteriyor — bir kare
     /// payıyla: ikisi ayrı saat ve art arda okunuyor, arada motor bir kare ilerleyebiliyor.
-    /// Beş koşumun birinde ölçülen sapma 0,033 sn, yani 30 fps'lik klipte tam bir kare;
-    /// pay 0,05 sn ile bunun hemen üstünde tutuluyor, ikinci kareye izin vermiyor.</para>
+    /// Beş koşumun birinde ölçülen sapma 0,033 sn, yani 30 fps'lik klipte tam bir kare.
+    /// Pay önce 0,05 sn idi; 13 Eylül 2026'da CI koşucusu iki ayrı okuma arasında
+    /// 0,066667 sn — tam iki kare — ilerledi ve ölçü kırmızıya döndü. Yüklü makinede iki
+    /// karenin geçmesi motorun kusuru değil, iki saatin arasındaki gecikme; pay 0,08 sn'ye
+    /// açıldı: iki kareye izin verir, üçüncüsü (0,1 sn) yine dışarıda kalır.</para>
     ///
     /// <para>Ses tavanda duruyor: kaydırıcının üst sınırı motorun <c>volume-max</c>
     /// değerine bağlı, tavanın üstüne yazılan sayı tavana oturuyor. Beklenen sayı tavanın
@@ -370,7 +373,7 @@ public sealed class OynaticiAracTests
             body.AppendLine($"  motor {AracKanit.N(konumOnce)} -> +10 sn -> {AracKanit.N(ileri)} (fark {AracKanit.N(ileri - konumOnce)})");
             body.AppendLine($"  hedef {AracKanit.N(hedefIleri)} -> -10 sn -> {AracKanit.N(hedefGeri)} (fark {AracKanit.N(hedefGeri - hedefIleri)})");
             body.AppendLine($"  motor {AracKanit.N(ileri)} -> -10 sn -> {AracKanit.N(geri)} (fark {AracKanit.N(geri - ileri)})");
-            body.AppendLine($"  hedef-motor farki: ileri {AracKanit.N(Math.Abs(hedefIleri - ileri))} sn, geri {AracKanit.N(Math.Abs(hedefGeri - geri))} sn (pay 0.05 = bir kare)");
+            body.AppendLine($"  hedef-motor farki: ileri {AracKanit.N(Math.Abs(hedefIleri - ileri))} sn, geri {AracKanit.N(Math.Abs(hedefGeri - geri))} sn (pay 0.08 = iki kare)");
             body.AppendLine($"ses tavani {AracKanit.N(tavan)}");
             body.AppendLine($"ses {AracKanit.N(sesOnce)} -> kis -> {AracKanit.N(sesKisik)} -> ac -> {AracKanit.N(sesGeri)} -> tekrar ac -> {AracKanit.N(sesTavan)} (tavanda durdu)");
             body.AppendLine($"hiz {AracKanit.N(hizOnce)} -> hizlan -> {AracKanit.N(hizli)} -> yavasla -> {AracKanit.N(normal)}");
@@ -388,8 +391,8 @@ public sealed class OynaticiAracTests
         Assert.InRange(rapor.hedefGeri - rapor.hedefIleri, -10.5, -9.5);
         Assert.InRange(rapor.ileri - rapor.konumOnce, 9.5, 10.5);
         Assert.InRange(rapor.geri - rapor.ileri, -10.5, -9.5);
-        Assert.InRange(Math.Abs(rapor.hedefIleri - rapor.ileri), 0, 0.05);
-        Assert.InRange(Math.Abs(rapor.hedefGeri - rapor.geri), 0, 0.05);
+        Assert.InRange(Math.Abs(rapor.hedefIleri - rapor.ileri), 0, 0.08);
+        Assert.InRange(Math.Abs(rapor.hedefGeri - rapor.geri), 0, 0.08);
         Assert.Equal(rapor.sesOnce - 5, rapor.sesKisik);
         Assert.Equal(rapor.sesOnce, rapor.sesGeri);
         Assert.Equal(rapor.tavan, rapor.sesTavan);
