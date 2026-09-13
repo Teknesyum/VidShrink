@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-09-13
+
 ### Changed
 
 - **One outline language for every button.** At rest a title-bar button, a tab and a page
@@ -26,12 +28,31 @@ ship as part of it.
   volume snaps to multiples of 5 and speed to multiples of 0.05, so 1.00 is exactly
   reachable. The speed icon became a button: press it at any other speed to go to 1, press
   it again to return to the speed you left.
+- **The update panel says where it is.** The bar is no longer an indeterminate sweep: a
+  single bridge object carries the percentage, a ceiling, the sentence and the log, and the
+  work speaks to the screen only through it. The bar closes on the percentage quickly and
+  creeps towards the ceiling when a step runs long, so it stays alive without eating the
+  next step's room; the percentage never goes backwards. Three things are always on screen -
+  the sentence, the percentage and the last nine log lines, the newest bright and the rest
+  dim, trimmed with an ellipsis rather than wrapped. Green when it finishes, ember when it
+  fails.
 - **The update notice has one action.** The shell-command box and its copy button are gone;
   a single **Install** button remains. Where no launcher is installed the same button opens
   the releases page.
 
 ### Added
 
+- **The recorder picks its own settings.** The encoder, frame rate, capture size, container
+  and preset are no longer questions. A candidate ladder is built from what the machine
+  reports - a hardware encoder only after a real ffmpeg probe encodes with it - and the
+  winner is decided by a short trial recording, not by a table. Tick **I will pick the
+  settings myself** to get the old controls back.
+- **An approximate length and size, if you want one.** Give both and the recording aims for
+  that file size; the bitrate comes out of OBS's own writing of the formula
+  (`MB x 8 x 1024 x 1024 / 1000 / seconds - audio`). Real-time capture rules out two passes,
+  so the budget becomes a capped bitrate with a buffer of twice the rate. A target below the
+  floor is refused out loud instead of quietly producing a broken recording. Leave both
+  empty and the program picks the best settings.
 - **A hidden developer tab.** Advanced no longer shows in the strip. Clicking the
   system-status line in About seven times, with no more than two seconds between clicks,
   reveals it and selects it; a button inside the tab puts it away again. The counter is
