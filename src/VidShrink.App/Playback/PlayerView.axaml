@@ -132,6 +132,8 @@
                         Theme="{StaticResource PlaybackSlider}"
                         Minimum="0"
                         Maximum="100"
+                        TickFrequency="{StaticResource PlaybackVolumeTick}"
+                        IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
                 <TextBlock x:Name="TxtSeritVolume"
                            Theme="{StaticResource PlaybackTimeText}"
@@ -168,12 +170,17 @@
                           Spacing="{StaticResource SpaceSm}"
                           HorizontalAlignment="Right"
                           VerticalAlignment="Center">
-                <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
-                      VerticalAlignment="Center"
-                      Data="{StaticResource IconSpeed}" Stroke="{StaticResource TextBody}"
-                      StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                <Button x:Name="BtnSeritSpeedReset" Theme="{StaticResource PlaybackBarButton}"
+                        auto:AutomationProperties.Name="{loc:Text main.player.menu.normalspeed}">
+                  <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
+                        VerticalAlignment="Center"
+                        Data="{StaticResource IconSpeed}" Stroke="{Binding $parent[Button].Foreground}"
+                        StrokeThickness="{StaticResource IconStroke}" StrokeLineCap="Round" StrokeJoin="Round"/>
+                </Button>
                 <Slider x:Name="SliderSeritSpeed"
                         Theme="{StaticResource PlaybackSlider}"
+                        TickFrequency="{StaticResource PlaybackSpeedTick}"
+                        IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
                 <TextBlock x:Name="TxtSeritSpeed"
                            Theme="{StaticResource PlaybackTimeText}"

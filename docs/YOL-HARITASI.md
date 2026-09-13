@@ -8,7 +8,8 @@ Sıra kullanıcının. Biten madde silinmez, `[x]` ile işaretlenir ve nedeni sa
 - [x] Güncelleme senkronunun yakınsaması — kurulu 0.3.0 kendi senkronuyla ilerleyebiliyor (0.4.2)
 - [x] Ekran kaydedici modülünün tamamlanması — ffmpeg kolu (9c) ve otomatik kip (9d) girdi
 - [ ] WhatsApp'a özel azami kalite — karanlık videoda törpüleme ölçümü, `.claude/sonra.md`
-- [ ] Başlık çubuğu düğmelerinin keskin köşesi — kullanıcı çalışan bir yapıyı açtıktan sonra bakacak
+- [x] Başlık çubuğu düğmelerinin keskin köşesi — Kesit E anahat dilini tek sözleşmeye bağladı (`RadiusSquare`, `HoverRing`)
+- [ ] Simge takımının dolgu diline geçmesi — `docs/arastirma/ikon-estetigi.md` ikinci tavsiyesi (Fluent), karar kullanıcının
 
 ## Kararlar
 
@@ -19,6 +20,21 @@ Kullanıcının verdiği 12 iş dört kesite bölündü ve bu sırayla kuruluyor
 **C** kaydedicinin ffmpeg kolu (worktree ajanı) → **D** kaydedicinin otomatik kipi.
 A ve B arayüzün aynı belirteçlerine dokunduğu için ardışık; C kendi dalında koştuğu
 için B ile çakışmıyor; D, C'nin ürettiği ayar yüzeyi olmadan ölçülemediği için sonda.
+
+### 15 işlik turun kesit sırası (13 Eylül 2026)
+
+Kullanıcının verdiği 15 iş dört kesite bölündü: **E** anahat dili → **F** simge takımı →
+**G** oynatıcı barları, **H** güncelleme paneli ve geliştirici sekmesi bağımsız.
+E, F ve G aynı belirteçlere dokunduğu için ardışık; H arayüzün başka bir köşesinde.
+
+### Simge ölçüleri araştırmadan gelir, gözden değil (13 Eylül 2026)
+
+`IconStroke` 1.5'ten **2**'ye, pencere düğmesi üçlüsü 14:16:16'dan **12:18:14**'e,
+kaymış merkezler 12'ye çekildi. Üç sayı da `docs/arastirma/ikon-estetigi.md`'de ölçülüp
+sektör kaynaklarıyla (Lucide, Material) karşılaştırıldı; hiçbiri gözle seçilmedi.
+`IkonKutusuTests` 26 yolu ayrıştırıp kenar payını ve merkezi pimliyor, böylece bir daha
+kayan simge sessizce giremez. Tek muafiyet `IconPlay`: üçgen kütlesi tabanda toplandığı
+için sektör onu bilerek sağa kaydırıyor, ölçü orada +0.5..+1.5 aralığını sınıyor.
 
 ### Otomatik kipte eşik yok, ölçüm var (12 Eylül 2026)
 

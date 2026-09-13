@@ -231,7 +231,10 @@ public static class UpdateCheck
             || LauncherUpdate.Armed(baseDirectory, manifest))
         && ShellUpdate.Installed(baseDirectory, manifest);
 
-    /// <summary>Kendini güncelleyemeyen platformlarda kullanıcıya gösterilecek komut.</summary>
+    /// <summary>Yayın sayfası. Kendini güncelleyemeyen kurulumda yükle düğmesi burayı açar.</summary>
+    public const string ReleasesPageUrl = "https://github.com/Teknesyum/VidShrink/releases/latest";
+
+    /// <summary>Kendini güncelleyemeyen platformlarda kurucunun yazdığı komut.</summary>
     public static string UpdateInstruction()
     {
         if (OperatingSystem.IsWindows())

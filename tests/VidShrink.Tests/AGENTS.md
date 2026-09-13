@@ -42,3 +42,11 @@ Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşu
   seçilmemesi, tamamlanmayan denemenin kazanmaması. Süreç çalıştırmaz, kanıt dosyası bırakmaz.
 - `OynaticiKarsilastirmaTests.cs` — iki motor örneği: şerit kodlu klipte kare farkı ≤1; yarı güncel bileşik kare ortağı
   gelmeden yayınlanmaz (elle sürülen sahte motor); eski ffmpeg borusuna ve NAudio'ya canlı başvuru yok.
+- `IkonKutusuTests.cs` — `Themes/Icons.axaml`'daki 26 yolun tasarım kutusu: hepsinin başında `M 0,0 M 24,24`
+  sabitleyicisi, mürekkebin 2 birimlik kenar payı içinde kalması, merkezin 12/12'ye ±0.55 oturması.
+  Tek muafiyet `IconPlay` (üçgen optik olarak sağa kaydırılır, +0.5..+1.5 sınanır). Ölçünün kaynağı
+  `docs/arastirma/ikon-estetigi.md`. Yolları `AppHost` üstünden ayrıştırır.
+- `GelistiriciSekmesiTests.cs` — gizli Gelişmiş sekmesi: `DeveloperUnlock` eşiği, pencere sınırı, ara açılınca
+  sıfırlanma, açıldıktan sonra baştan başlama; biçimlemede sekmenin gizli başladığının ve kapatma düğmesinin pimi.
+- `GoruntuCekTests.cs` — kanıt karesi üretir: `.calisma/kesit-ef/` altına güncelleme panelini ve 26 simgelik
+  sayfayı PNG olarak yazar. Ölçmez, sınamaz; tarz kararlarının resmi buradan çıkar.

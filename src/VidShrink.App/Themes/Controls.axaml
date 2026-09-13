@@ -206,7 +206,7 @@
         <Setter Property="Padding" Value="{StaticResource ButtonPaddingSm}"/>
         <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="{StaticResource NeonPurpleBorder}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource HeaderRestBorder}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -238,6 +238,17 @@
                                   Foreground="{TemplateBinding Foreground}"
                                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                <Border Name="HoverRing"
+                        IsHitTestVisible="False"
+                        BorderBrush="Transparent"
+                        BorderThickness="{StaticResource BorderStrong}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                  <Border.Transitions>
+                    <Transitions>
+                      <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
+                    </Transitions>
+                  </Border.Transitions>
+                </Border>
                 <Border Name="FocusRing"
                         IsHitTestVisible="False"
                         BorderBrush="Transparent"
@@ -250,6 +261,9 @@
         <Style Selector="^:pointerover">
           <Setter Property="Foreground" Value="{StaticResource NeonPurple}"/>
           <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#HoverRing">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#Root">
           <Setter Property="BorderBrush" Value="{StaticResource NeonPurple}"/>
@@ -372,7 +386,7 @@
         <Setter Property="Margin" Value="{StaticResource WindowButtonMargin}"/>
         <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSquare}"/>
         <Setter Property="BorderBrush" Value="{StaticResource HeaderRestBorder}"/>
         <Style Selector="^:pointerover">
           <Setter Property="RenderTransform" Value="none"/>
@@ -380,6 +394,9 @@
         <Style Selector="^:pointerover /template/ Border#Root">
           <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
           <Setter Property="BoxShadow" Value="{StaticResource GlowNone}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#HoverRing">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
         </Style>
         <Style Selector="^:pressed">
           <Setter Property="RenderTransform" Value="none"/>
@@ -843,7 +860,7 @@
         <Setter Property="Background" Value="{StaticResource NeonBlueFill}"/>
         <Setter Property="BorderBrush" Value="{StaticResource HeaderRestBorder}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource RadiusChip}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSquare}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="ClipToBounds" Value="False"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
@@ -884,6 +901,17 @@
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"/>
                 </StackPanel>
+                <Border Name="HoverRing"
+                        IsHitTestVisible="False"
+                        BorderBrush="Transparent"
+                        BorderThickness="{StaticResource BorderStrong}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                  <Border.Transitions>
+                    <Transitions>
+                      <BrushTransition Property="BorderBrush" Duration="{StaticResource MotionInstant}"/>
+                    </Transitions>
+                  </Border.Transitions>
+                </Border>
                 <Border Name="FocusRing"
                         IsHitTestVisible="False"
                         BorderBrush="Transparent"
@@ -896,8 +924,14 @@
         <Style Selector="^:selected">
           <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
         </Style>
+        <Style Selector="^:selected /template/ Border#HoverRing">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>
+        </Style>
         <Style Selector="^:pointerover">
           <Setter Property="Foreground" Value="{StaticResource NeonPink}"/>
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#HoverRing">
+          <Setter Property="BorderBrush" Value="{StaticResource NeonPink}"/>
         </Style>
         <Style Selector="^:pointerover /template/ Border#TabOutline">
           <Setter Property="BorderBrush" Value="{StaticResource NeonBlueBorderStrong}"/>

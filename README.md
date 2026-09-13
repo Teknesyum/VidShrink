@@ -37,7 +37,8 @@ what will come out.
 - **Convert tab.** MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265, VP9, AV1
   or stream copy; trimming and audio extraction.
 - **Advanced tab.** The exact ffmpeg command, selectable and copyable, plus the optional
-  AI-plan prompt. No summary, the command itself.
+  AI-plan prompt. No summary, the command itself. The tab is hidden until you click the
+  system-status line in About seven times in a row, and a button inside it puts it away.
 - **Player tab.** The window plays the source through a decoder pipe that stays open
   between seeks instead of launching ffmpeg for every scrub.
 - **Recorder tab.** The screen, a single window or a region, with microphone and system
@@ -473,8 +474,9 @@ launcher in manual-install mode, closes the application, and the launcher waits 
 exit, downloads and applies the update behind the startup panel, then opens the new version.
 One click, and the version on screen afterwards is the new one. The button does not read the
 automatic-update switch and never writes it: installing once by hand leaves your preference
-exactly as it was. Where there is no launcher — a Linux installation, a plain macOS copy —
-the notice shows the install command instead, because there is nothing there to drive.
+exactly as it was. The notice has one action and no shell command in it. Where there is no
+launcher — a Linux installation, a plain macOS copy — the same button opens the releases
+page, because there is nothing there to drive.
 
 On macOS the update swaps the whole bundle. A bundle's signature covers every file inside
 it, so a file-by-file update would break the signature and the application would refuse to

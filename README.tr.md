@@ -37,7 +37,9 @@ söylemez.
 - **Dönüştür sekmesi.** MP4, MKV, WebM, MOV, AVI, GIF, MP3, M4A, WAV; H.264, H.265, VP9,
   AV1 ya da akış kopyası; kırpma ve ses çıkarma.
 - **Gelişmiş sekmesi.** Motorun koşacağı FFmpeg komutunun kendisi — seçilebilir,
-  kopyalanabilir — ve isteğe bağlı AI plan istemi. Özet değil, komutun kendisi.
+  kopyalanabilir — ve isteğe bağlı AI plan istemi. Özet değil, komutun kendisi. Sekme
+  gizlidir: Hakkında'daki sistem durumu satırına arka arkaya yedi kez tıklayınca açılır,
+  içindeki düğme geri kapatır.
 - **Oynatıcı sekmesi.** Pencere kaynağı kendi oynatır; kod çözücü borusu her sürüklemede
   yeni ffmpeg başlatmak yerine aramalar arasında açık kalır.
 - **Kaydedici sekmesi.** Ekran, tek pencere ya da bölge; mikrofon ve sistem sesiyle, her
@@ -456,9 +458,9 @@ güncelleyemez — kendi dll'lerini tutan süreç odur — bu yüzden düğme ba
 kipinde açar ve uygulamayı kapatır; başlatıcı onun çıkışını bekler, güncellemeyi açılış
 panelinin arkasında indirip uygular ve yeni sürümü açar. Tek tık, sonrasında ekrandaki sürüm
 yeni olandır. Düğme kendiliğinden güncelleme anahtarını okumaz ve hiç yazmaz: elle bir kez
-yüklemek tercihinizi olduğu gibi bırakır. Başlatıcı olmayan yerde — Linux kurulumu, düz bir
-macOS kopyası — uyarı onun yerine kurulum komutunu gösterir, çünkü orada sürülecek bir şey
-yok.
+yüklemek tercihinizi olduğu gibi bırakır. Panelin tek eylemi budur; içinde kabuk komutu
+yazmaz. Başlatıcı olmayan yerde — Linux kurulumu, düz bir macOS kopyası — aynı düğme yayın
+sayfasını açar, çünkü orada sürülecek bir şey yok.
 
 macOS'ta güncelleme paketin tamamını takas eder. Bir paketin imzası içindeki her dosyayı
 kapsar; dosya dosya güncelleme imzayı bozar ve uygulama açılmayı reddeder. Yeni paket siz

@@ -105,6 +105,7 @@ public partial class MainWindow : Window
     private bool _updateUiSyncing;
     private bool _settingsSyncing;
     private string? _noticeVersion;
+    private readonly DeveloperUnlock _developerUnlock = new();
     private AppliedUpdateNotice? _appliedNotice;
     private ShareTargetTable _shareTargets = ShareTargetTable.Fallback;
     private CoreShare.ShareTargetTable? _shareEndpoints;
@@ -1857,29 +1858,28 @@ public partial class MainWindow : Window
             _noticeVersion = version;
             TxtNoticeVersion.Text = version;
 
-            // Başlatıcısı olan kurulumda kullanıcıdan komut kopyalaması istenmez: düğme
-            // güncellemeyi kendi senkronumuzla yükler. Başlatıcısız kurulumda (Linux, düz
-            // macOS kopyası) yükleyecek bir şey yok, orada komut yazılır.
-            var launcher = LauncherUpdate.LocateLauncher(AppContext.BaseDirectory);
-            BtnNoticeInstall.IsVisible = launcher is not null;
-            BtnNoticeCopy.IsVisible = launcher is null;
-            TxtNoticeCommand.IsVisible = launcher is null;
-            TxtNoticeCommand.Text = launcher is null ? UpdateCheck.UpdateInstruction() : "";
-
             UpdateNotice.IsVisible = true;
         });
     }
 
     /// <summary>
-    /// Yükle düğmesi. Güncellemeyi uygulama yapamaz: kendi dll'lerini tutan süreç odur. Bu
-    /// yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır, başlatıcı çıkışı
-    /// bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar. Kendiliğinden
-    /// güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi değiştirmez.
+    /// Yükle düğmesi — panelin tek eylemi. Güncellemeyi uygulama yapamaz: kendi dll'lerini
+    /// tutan süreç odur. Bu yüzden başlatıcı elle yükleme kipinde açılır, bu süreç kapanır,
+    /// başlatıcı çıkışı bekleyip güncellemeyi uygular ve uygulamayı yeni sürümle açar.
+    /// Kendiliğinden güncelleme ayarına bakılmaz ve yazılmaz; elle bir yükleme tercihi
+    /// değiştirmez.
+    ///
+    /// <para>Başlatıcısı olmayan kurulumda (Linux, düz macOS kopyası) yükleyecek bir şey
+    /// yok; düğme o zaman yayın sayfasını açar. Panel kabuk komutu yazmıyor.</para>
     /// </summary>
     private void OnInstallUpdate(object? sender, RoutedEventArgs e)
     {
         var launcher = LauncherUpdate.LocateLauncher(AppContext.BaseDirectory);
-        if (launcher is null) return;
+        if (launcher is null)
+        {
+            OpenExternal(UpdateCheck.ReleasesPageUrl);
+            return;
+        }
 
         try
         {
@@ -1897,17 +1897,24 @@ public partial class MainWindow : Window
         Close();
     }
 
-    private async void OnCopyUpdateCommand(object? sender, RoutedEventArgs e)
+    /// <summary>
+    /// Gelismis sekmesi gorunurde degil; Hakkinda sekmesindeki sistem durumu satirina
+    /// arka arkaya basmak aciyor. Sayac <see cref="DeveloperUnlock"/>'ta, esik ve
+    /// pencere oradan okunuyor. Acilan sekme secilir; icindeki dugme onu geri kapatir.
+    /// </summary>
+    private void OnSystemStatusTapped(object? sender, PointerPressedEventArgs e)
     {
-        // Pano yoksa komut yine de okunabilir ve seçilebilir kalır; kullanıcıya hata basılmaz.
-        try
-        {
-            if (Clipboard is null) return;
-            await Clipboard.SetTextAsync(TxtNoticeCommand.Text ?? "");
-        }
-        catch (Exception)
-        {
-        }
+        if (TabAdvanced.IsVisible) return;
+        if (!_developerUnlock.Tap(DateTimeOffset.UtcNow)) return;
+        TabAdvanced.IsVisible = true;
+        Tabs.SelectedItem = TabAdvanced;
+    }
+
+    private void OnHideAdvanced(object? sender, RoutedEventArgs e)
+    {
+        TabAdvanced.IsVisible = false;
+        _developerUnlock.Reset();
+        if (ReferenceEquals(Tabs.SelectedItem, TabAdvanced)) Tabs.SelectedIndex = 1;
     }
 
     private void OnDismissUpdateNotice(object? sender, RoutedEventArgs e)

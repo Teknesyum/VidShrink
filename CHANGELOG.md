@@ -5,6 +5,39 @@ All notable changes to VidShrink are recorded here. The format follows
 release; the dated sections below it are the development record that led up to it and
 ship as part of it.
 
+## [Unreleased]
+
+### Changed
+
+- **One outline language for every button.** At rest a title-bar button, a tab and a page
+  button all carry the same faint `HeaderRestBorder` hairline; on pointer-over a
+  transparent overlay ring inside the template picks up colour at `BorderStrong` (2). The
+  ring is an overlay rather than a thicker real border, so nothing shifts by a pixel when
+  the pointer arrives. Tabs and title-bar buttons moved from `RadiusChip` (6) to the new
+  `RadiusSquare` (3).
+- **Icon geometry now follows measured numbers.** `IconStroke` went from 1.5 to 2, the
+  value the 24-unit grid is drawn for; the title-bar trio moved from 14 : 16 : 16 to
+  12 : 18 : 14; pause, play, speed, coffee, volume, both chevrons and restart were recentred
+  on the design box. Play keeps a deliberate rightward optical offset. The Teknesyum glyph
+  is a technetium atom instead of `<>`, and Settings is a ringed cog instead of a sunburst.
+  Every number comes from `docs/arastirma/ikon-estetigi.md`, and `IkonKutusuTests` parses
+  all 26 paths to pin the 2-unit margin and the centre.
+- **The player's sliders are longer and snap.** Both are `PlaybackSliderWidth` (192) wide;
+  volume snaps to multiples of 5 and speed to multiples of 0.05, so 1.00 is exactly
+  reachable. The speed icon became a button: press it at any other speed to go to 1, press
+  it again to return to the speed you left.
+- **The update notice has one action.** The shell-command box and its copy button are gone;
+  a single **Install** button remains. Where no launcher is installed the same button opens
+  the releases page.
+
+### Added
+
+- **A hidden developer tab.** Advanced no longer shows in the strip. Clicking the
+  system-status line in About seven times, with no more than two seconds between clicks,
+  reveals it and selects it; a button inside the tab puts it away again. The counter is
+  `DeveloperUnlock` in Core and takes the clock from its caller, so the threshold and the
+  window are measured rather than guessed.
+
 ## [0.4.4] - 2026-09-12
 
 ### Changed

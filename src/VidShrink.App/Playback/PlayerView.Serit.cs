@@ -33,6 +33,7 @@ internal partial class PlayerView
     private bool _seritWired;
     private bool _pointerOnSerit;
     private bool _seritSliding;
+    private double _seritOncekiHiz;
 
     /// <summary>Seridin gorunurluk bolgesi. Olcum kendi saatini buraya takar.</summary>
     internal HoverZone SeritZone
@@ -110,6 +111,7 @@ internal partial class PlayerView
         BtnSeritForward.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, Keymap.SeekSmall));
         BtnSeritMute.Click += (_, _) => Apply(Keymap.Mute.ToCommand());
         BtnSeritFullScreen.Click += (_, _) => Apply(Keymap.Fullscreen.ToCommand());
+        BtnSeritSpeedReset.Click += (_, _) => ToggleSeritSpeed();
 
         SliderSeritSpeed.Minimum = Keymap.MinimumSpeed;
         SliderSeritSpeed.Maximum = Keymap.MaximumSpeed;
@@ -187,6 +189,25 @@ internal partial class PlayerView
 
         var hizFarki = SliderSeritSpeed.Value - _speed;
         if (Math.Abs(hizFarki) > double.Epsilon) Apply(new PlayerCommand(PlayerCommandKind.Speed, hizFarki));
+    }
+
+    /// <summary>
+    /// Hiz simgesi bir dugme: x hizdayken basinca 1'e doner, 1'deyken basinca en son
+    /// kullanilan x hiza geri gider. Komut yolu atlanmiyor — degisim yine
+    /// <see cref="PlayerView.Apply"/>'a fark olarak veriliyor. Bir kez bile x hiza
+    /// gidilmemisse 1'deki basis hicbir sey yapmaz; kod bir hiz uydurmuyor.
+    /// </summary>
+    private void ToggleSeritSpeed()
+    {
+        if (Math.Abs(_speed - 1) > double.Epsilon)
+        {
+            _seritOncekiHiz = _speed;
+            Apply(Keymap.NormalSpeed.ToCommand());
+            return;
+        }
+
+        if (_seritOncekiHiz <= 0) return;
+        Apply(new PlayerCommand(PlayerCommandKind.Speed, _seritOncekiHiz - _speed));
     }
 
     private Geometry? Icon(string key)

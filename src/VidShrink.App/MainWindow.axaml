@@ -152,7 +152,7 @@
                   CornerRadius="{StaticResource RadiusControl}"
                   BoxShadow="{StaticResource GlowPurple}"
                   Padding="{StaticResource ButtonPaddingSm}">
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
               <TextBlock Grid.Column="0"
                          x:Name="TxtNoticeLead"
                          Text="{loc:Text main.update.available}"
@@ -163,28 +163,13 @@
                          Theme="{StaticResource MonoValue}"
                          Foreground="{StaticResource NeonPurple}"
                          VerticalAlignment="Center"/>
-              <TextBox Grid.Column="2"
-                       x:Name="TxtNoticeCommand"
-                       IsReadOnly="True"
-                       IsVisible="False"
-                       MaxLines="1"
-                       FontFamily="{StaticResource FontMono}"
-                       VerticalAlignment="Center"/>
               <Button Grid.Column="3"
-                      x:Name="BtnNoticeCopy"
-                      Content="{loc:Text main.action.copy}"
-                      IsVisible="False"
-                      Theme="{StaticResource GhostButton}"
-                      VerticalAlignment="Center"
-                      Click="OnCopyUpdateCommand"/>
-              <Button Grid.Column="4"
                       x:Name="BtnNoticeInstall"
                       Content="{loc:Text main.action.install}"
-                      IsVisible="False"
                       Theme="{StaticResource PrimaryButton}"
                       VerticalAlignment="Center"
                       Click="OnInstallUpdate"/>
-              <Button Grid.Column="5"
+              <Button Grid.Column="4"
                       x:Name="BtnNoticeDismiss"
                       Content="×"
                       Theme="{StaticResource GhostButton}"
@@ -1074,7 +1059,8 @@
                 <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
                 <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
                 <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
-                <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
+                <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
+                           Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
               </StackPanel>
             </Border>
           </ScrollViewer>
@@ -1086,9 +1072,14 @@
           </ScrollViewer>
         </TabItem>
 
-          <TabItem Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
+          <TabItem x:Name="TabAdvanced" IsVisible="False" Header="{loc:Text main.tab.advanced}" Tag="{StaticResource IconAdvanced}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageAdvanced" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <StackPanel Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceLg}">
+
+              <Button x:Name="BtnHideAdvanced" Theme="{StaticResource GhostButton}"
+                      HorizontalAlignment="Right"
+                      Content="{loc:Text main.window.close}"
+                      Click="OnHideAdvanced"/>
 
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
