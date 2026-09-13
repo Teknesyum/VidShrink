@@ -26,7 +26,7 @@ public sealed class GoruntuCekTests
         h = (int)size.Height;
         using var bitmap = new RenderTargetBitmap(new PixelSize((int)(w * olcek), (int)(h * olcek)), new Vector(96 * olcek, 96 * olcek));
         bitmap.Render(kok);
-        bitmap.Save(Path.Combine(Klasor, ad));
+        bitmap.Save(Path.Combine(Klasor, ad), PngBitmapEncoderOptions.Default);
     }
 
     [Fact]
