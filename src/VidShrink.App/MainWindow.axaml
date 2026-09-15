@@ -6,7 +6,7 @@
         xmlns:loc="using:VidShrink.App.Localization"
         x:Class="VidShrink.App.MainWindow"
         Title="VidShrink"
-        Width="1560" Height="1060" MinWidth="1040" MinHeight="720"
+        Width="1560" Height="1060" MinWidth="1136" MinHeight="720"
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WorkspaceGradient}"
@@ -1285,13 +1285,13 @@
           o kazancı siler. Soldaki 16 px başlık için duruyor.
         -->
         <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
-          <StackPanel Grid.Column="0" x:Name="TitleBrand" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+          <StackPanel Grid.Column="0" x:Name="TitleBrand" IsHitTestVisible="False" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
             <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
             <TextBlock x:Name="TxtAppName" Theme="{StaticResource H2}" VerticalAlignment="Center">
               <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
             </TextBlock>
           </StackPanel>
-          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+          <StackPanel Grid.Column="2" x:Name="TitleBarRight" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
             <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
                     ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">

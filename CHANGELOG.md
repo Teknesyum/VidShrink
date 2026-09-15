@@ -7,6 +7,30 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-09-15
+
+### Added
+
+- Mini mode for the Recorder tab: a borderless TinyTask-sized strip carrying only the
+  live dot, the elapsed counter, a single start/pause/resume button, stop and expand.
+  The counter doubles as the drag handle, the strip stays on top only while a recording
+  runs, and it places itself outside the capture frame. `F7` toggles, `F8` stops.
+- The install panel keeps the window open while progress is still moving and runs the
+  bar to full in a short sweep before closing.
+- After a recording finishes, the "open target folder" and "share" buttons are
+  emphasised in the result panel.
+- A large translucent pause glyph fades in and out over the player for half a second
+  when playback is paused; play stays clean so nothing covers the picture.
+
+### Fixed
+
+- The top strip no longer swallows clicks aimed at the controls beneath it.
+
+### Research
+
+- `docs/plan.md` plans the Recorder tab up to OBS/Bandicam level over four waves,
+  grounded in 69 source-read projects across three reports under `docs/arastirma/`.
+
 ## [0.5.3] - 2026-09-13
 
 ### Changed

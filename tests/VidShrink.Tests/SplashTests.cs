@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -266,6 +267,33 @@ public sealed class SplashTests
 
         // Renk sabitlenmiş olamaz: 0x00BBGGRR biçiminde elle yazılmış bir değer yok.
         Assert.Empty(Regex.Matches(source, @"CreateSolidBrush\(\s*0x"));
+    }
+
+    /// <summary>
+    /// Panelin siniri sure degil sessizlik: <c>Stall</c> son adimin uzerinden gecen
+    /// zamana bakiyor, boylece ilerleyen is paneli ekranda tutuyor. Kapanis da ani
+    /// degil: <c>Dispose</c> once <c>_settling</c>'i kaldirip cubugun yuzdeye
+    /// kosmasini bekliyor, <c>Settle</c> suresi bunu sinirliyor.
+    /// </summary>
+    [Fact]
+    public void PanelStaysWhileTheWorkAdvancesAndFillsBeforeClosing()
+    {
+        var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
+
+        Assert.DoesNotContain("Lifetime", source);
+        Assert.Contains("TimeSpan Stall = ", source);
+        Assert.Contains("TimeSpan Settle = ", source);
+        Assert.Contains("DateTime.UtcNow - _progress.LastStep >= Stall", source);
+        Assert.Contains("_settling && _progress.Bar >= _progress.Percent", source);
+        Assert.Contains("!Stalled() && !Settled()", source);
+
+        var dispose = source[source.IndexOf("public void Dispose()", StringComparison.Ordinal)..];
+        var settling = dispose.IndexOf("_settling = true;", StringComparison.Ordinal);
+        var join = dispose.IndexOf("_thread?.Join(Settle);", StringComparison.Ordinal);
+        var closing = dispose.IndexOf("_closing.Set();", StringComparison.Ordinal);
+
+        Assert.True(settling > 0 && join > settling, "once dolmaya birakilir, sonra beklenir");
+        Assert.True(closing > join, "kapanis bayragi beklemeden sonra kalkar");
     }
 
     private static Dictionary<string, string> ReadTokens(byte[] png)

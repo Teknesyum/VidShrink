@@ -1,3 +1,4 @@
+using System.Linq;
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -24,6 +25,7 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.Controls.Presenters;
 using Avalonia.VisualTree;
 using VidShrink.App.Localization;
 using VidShrink.App.Themes;
@@ -98,6 +100,8 @@ public partial class MainWindow : Window
     private bool _hardwareEncoderAvailable;
     private HardwareVerdict _hardwareVerdict = HardwareVerdict.NotProbed;
     private bool _motionReduced;
+
+    private double _titleBarRightFull;
 
     private const string ChromeHidden = "chrome-hidden";
 
@@ -181,7 +185,9 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
+        SizeChanged += (_, _) => AlignTabsToTitle();
         LoadTitleBarLogo();
+        AlignTabsToTitle();
         TrackChrome();
         SetupShellMenu();
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
@@ -540,11 +546,36 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
+    /// <summary>
+    /// Ust seridin uc blogu ayni 30 pikseli paylasiyor: marka, sekme seridi ve sag grup.
+    /// Sekme seridi kendi sablonunda oldugu icin izgara onlari ayiramiyor; dar pencerede
+    /// sag grup seridin uzerine biniyor ve en sonra bildirildigi icin tiklari yutuyordu.
+    /// Olculdu: marka 181, serit 652, sag grup 585 piksel; 1418'in altinda ortusme
+    /// kacinilmaz.
+    ///
+    /// <para>Cozum sekmeyi degil bagi feda ediyor: yer yetmeyince destek ve GitHub
+    /// dugmeleri gizleniyor, ikisi de Hakkinda sekmesinde duruyor. Esik sabit degil,
+    /// o anki genisliklerden hesaplaniyor.</para>
+    /// </summary>
     private void AlignTabsToTitle()
     {
         var gap = TitleBarContent.ColumnSpacing;
-        Tabs.Padding = new Thickness(TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap, 0, 0, 0);
+        var sol = TitleBarContent.Margin.Left + TitleBrand.Bounds.Width + gap;
+        Tabs.Padding = new Thickness(sol, 0, 0, 0);
+
+        var serit = Tabs.GetVisualDescendants().OfType<ItemsPresenter>().FirstOrDefault()?.Bounds.Width ?? 0;
+        if (serit <= 0 || TitleBarLayer.Bounds.Width <= 0) return;
+
+        if (BtnSponsor.IsVisible && BtnGitHub.IsVisible && TitleBarRight.Bounds.Width > _titleBarRightFull)
+            _titleBarRightFull = TitleBarRight.Bounds.Width;
+
+        if (_titleBarRightFull <= 0) return;
+
+        var sigar = TitleBarLayer.Bounds.Width - sol - serit >= _titleBarRightFull;
+        BtnSponsor.IsVisible = sigar;
+        BtnGitHub.IsVisible = sigar;
     }
+
 
     /// <summary>
     /// Üst şerit yalnız <b>oynatıcı sekmesinde</b> kendiliğinden gizlenir: işaretçi

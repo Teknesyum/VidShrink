@@ -20,6 +20,21 @@
                                  kaymasın diye sabit: programın tek "olgu sütunu" ölçüsü.
       RecorderPanelMinHeight  <- PanelMinHeight (256). Kaydedici panosunun taban boyu,
                                  öteki panellerle aynı.
+
+    Mini kip belirteçleri. Yeni sayı yine üretilmiyor; üçü de yukarıdakilerden türüyor.
+
+      RecorderMiniHeight      <- RecorderButtonSize + 2 × SpaceSm = 40 + 16 = 56. Yani
+                                 bugünkü şeridin yüksekliği; saha taramasının 30-64
+                                 aralığının ortasında, yeni bir ölçü gerekmiyor.
+      RecorderMiniReadoutWidth<- MonoValue temasıyla "00:00:00" metninin ölçülen
+                                 genişliğinin SpaceMd katına yuvarlanmışı. Göz kararı
+                                 değil: ölçüm MiniKipOlcusuTests'te koşuyor, kanıt
+                                 .calisma/mini-olcu/sayac.txt. 136'lık okuma genişliği
+                                 iki satırlık düzen için; mini kipte sayaç tek satır.
+      RecorderMiniMinWidth    <- Şeridin kendi toplamı: 16 + 12 + 8 + 72 + 8 + 40 + 8 +
+                                 40 + 8 + 40 + 16 = 268, SpaceMd katına yuvarlanınca
+                                 276. Yani kenar payı, nokta, sayaç, üç düğme ve
+                                 aralarındaki SpaceSm boşluklar.
   -->
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
@@ -28,5 +43,9 @@
   <x:Double x:Key="RecorderDotSize">12</x:Double>
   <x:Double x:Key="RecorderReadoutMinWidth">136</x:Double>
   <x:Double x:Key="RecorderPanelMinHeight">256</x:Double>
+
+  <x:Double x:Key="RecorderMiniHeight">56</x:Double>
+  <x:Double x:Key="RecorderMiniReadoutWidth">72</x:Double>
+  <x:Double x:Key="RecorderMiniMinWidth">276</x:Double>
 
 </ResourceDictionary>

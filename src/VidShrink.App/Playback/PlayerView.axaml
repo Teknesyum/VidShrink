@@ -17,9 +17,33 @@
     <Border x:Name="Stage"
             Theme="{StaticResource Panel}"
             Background="{StaticResource AppBg}"
+            BorderThickness="0"
+            CornerRadius="0"
             Padding="0">
       <Panel x:Name="Surface" Background="Transparent" ClipToBounds="True">
         <Image x:Name="Frame" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Border x:Name="PauseGlyph"
+                IsVisible="False"
+                IsHitTestVisible="False"
+                Opacity="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                RenderTransform="scale(0.8)">
+          <Border.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}"/>
+              <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionFast}"/>
+            </Transitions>
+          </Border.Transitions>
+          <Path Width="{StaticResource PauseGlyphSize}"
+                Height="{StaticResource PauseGlyphSize}"
+                Stretch="Uniform"
+                Data="{StaticResource IconPause}"
+                Stroke="{StaticResource TextBody}"
+                StrokeThickness="{StaticResource IconStroke}"
+                StrokeLineCap="Round"
+                StrokeJoin="Round"/>
+        </Border>
         <TextBlock x:Name="TxtEmpty"
                    Text="{loc:Text main.player.empty}"
                    Theme="{StaticResource MonoValue}"

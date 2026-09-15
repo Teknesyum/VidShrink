@@ -21,7 +21,7 @@
             Theme="{StaticResource Panel}"
             Padding="{StaticResource RecorderStripPadding}"
             auto:AutomationProperties.Name="{loc:Text recorder.strip.title}">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto"
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto"
             ColumnSpacing="{StaticResource RecorderStripGap}">
 
         <Ellipse Grid.Column="0"
@@ -93,6 +93,24 @@
                 IsVisible="False"
                 auto:AutomationProperties.Name="{loc:Text recorder.strip.stop}"
                 Click="OnStop"/>
+
+        <!-- Geçiş ayar kutusunda değil şeritte: bulunamayan bir kip hiç kullanılmıyor. -->
+        <Button Grid.Column="7"
+                x:Name="BtnMini"
+                Width="{StaticResource RecorderButtonSize}"
+                Height="{StaticResource RecorderButtonSize}"
+                Theme="{StaticResource GhostButton}"
+                auto:AutomationProperties.Name="{loc:Text recorder.mini.shrink}"
+                ToolTip.Tip="{loc:Text recorder.mini.shrink}">
+          <Path Width="{StaticResource IconSizeLg}"
+                Height="{StaticResource IconSizeLg}"
+                Stretch="Uniform"
+                Data="{StaticResource IconRestore}"
+                Stroke="{StaticResource TextBody}"
+                StrokeThickness="{StaticResource IconStroke}"
+                StrokeLineCap="Round"
+                StrokeJoin="Round"/>
+        </Button>
       </Grid>
     </Border>
 
@@ -112,7 +130,7 @@
                    IsVisible="False"/>
         <WrapPanel>
           <Button x:Name="BtnReveal"
-                  Theme="{StaticResource GhostButton}"
+                  Theme="{StaticResource PrimaryButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   Content="{loc:Text recorder.output.reveal}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
@@ -130,7 +148,7 @@
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-player}"
                   Click="OnToPlayer"/>
           <Button x:Name="BtnRecShare"
-                  Theme="{StaticResource GhostButton}"
+                  Theme="{StaticResource PrimaryButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   Content="{loc:Text main.action.share}"
                   auto:AutomationProperties.Name="{loc:Text main.action.share}"

@@ -1,9 +1,10 @@
-# Handoff — 2026-09-13 16:59
+# Handoff — 2026-09-15 13:54
 
 Önce task, sonra changed_files oku. İlk bitmemiş parçadan sür; diff'in gösterdiğini yeniden yapma, yeniden doğrulama.
 
 ## changed_files
-(no diff)
+.claude/handoff.md | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 ## tests_run
 - none
@@ -15,7 +16,9 @@ docs/plan.md
 "izin verildi önce avalonia son sürüme güncelleme tamamlansın sonra v1 versiyon için gereksinimler önerdiğin şekilde yapılsın ... gerekirse fable a sor fable ne derse onu uygula v1 e koşalım"
 
 ## steer
-- This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation. Summary: 1. Primary Request and Intent:    Three genuine user turns drove this window.    **Turn A (earlier, still in force — job 2d of the prior li
+- etiketi tasi
+- provayi kostur
+- </task-notification>
 
 ## decisions
 (fill)

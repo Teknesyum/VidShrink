@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using VidShrink.Core;
@@ -106,27 +107,54 @@ public class KurulumIlerlemesiTests
         Assert.Equal("Adım 14", p.Sentence);
     }
 
-    /// <summary>İş bitene kadar durum çalışıyor; bitince yüzde ve çubuk sona çekiliyor.</summary>
+    /// <summary>
+    /// Is bitene kadar durum calisiyor; bitince yuzde sona tasiniyor. 15 Eylul 2026'da
+    /// cubugun sicramasi kaldirildi: Finish artik _bar'a dokunmuyor, cubuk ayni
+    /// yaklasma yasasiyla sona kosuyor ve panel ancak dolduktan sonra kapaniyor.
+    /// </summary>
     [Fact]
     public void SonucDuyuruluyor()
     {
         var p = new InstallProgress();
-        p.Step(30, 80, "Yazılıyor");
+        p.Step(30, 80, "Yazilir");
         Assert.Equal(InstallState.Running, p.State);
 
-        p.Finish(true, "Güncelleme uygulandı");
+        p.Finish(true, "Guncelleme uygulandi");
         Assert.Equal(InstallState.Done, p.State);
         Assert.Equal(100, p.Percent);
-        Assert.Equal(100, p.Bar);
         Assert.Equal("100%", p.PercentText);
 
+        Assert.True(p.Bar < 100, "bitis cubugu sicratmiyor");
+        for (var i = 0; i < 400; i++) p.Advance();
+        Assert.Equal(100, p.Bar);
+
         var q = new InstallProgress();
-        q.Step(30, 80, "Yazılıyor");
-        q.Finish(false, "Güncelleme uygulanamadı");
+        q.Step(30, 80, "Yazilir");
+        q.Finish(false, "Guncelleme uygulanamadi");
 
         Assert.Equal(InstallState.Failed, q.State);
         Assert.Equal(30, q.Percent);
+        for (var i = 0; i < 400; i++) q.Advance();
         Assert.Equal(30, q.Bar);
+    }
+
+    /// <summary>
+    /// Adim yazildiginda sessizlik saati sifirlaniyor: panel bu ana bakip ilerleyen isi
+    /// ekranda tutuyor, donan isi birakiyor.
+    /// </summary>
+    [Fact]
+    public void AdimSessizlikSaatiniSifirliyor()
+    {
+        var p = new InstallProgress();
+        var once = p.LastStep;
+        Thread.Sleep(20);
+        p.Step(10, 50, "Yazilir");
+        Assert.True(p.LastStep > once, "adim son adim anini ileri tasimali");
+
+        var sonra = p.LastStep;
+        Thread.Sleep(20);
+        p.Finish(true, "Bitti");
+        Assert.True(p.LastStep > sonra, "bitis de son adim anini ileri tasimali");
     }
 
     /// <summary>

@@ -42,6 +42,7 @@ internal partial class RecorderView : UserControl
         InitOtomatik();
         InitSes();
         InitSerit();
+        InitMini();
         RefreshSerit();
     }
 

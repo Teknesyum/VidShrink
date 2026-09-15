@@ -25,10 +25,19 @@ internal sealed class SplashGate : IDisposable
     public static readonly TimeSpan Threshold = TimeSpan.FromMilliseconds(400);
 
     /// <summary>
-    /// Panelin kendi zaman aşımı. İş beklenenden uzun sürerse panel yine de kapanır;
-    /// donmuş bir splash, gecikmeden çok daha kötüdür.
+    /// Panelin sessizlik sınırı. Sınır geçen süre değil, <see cref="InstallProgress.Step"/>
+    /// yazılmadan geçen süre: ilerleyen iş paneli ekranda tutuyor, donan iş bırakıyor.
+    /// Donmuş bir splash gecikmeden çok daha kötüdür, ama ilerlediğini söyleyen bir işi
+    /// ekrandan silmek de kullanıcıyı karanlıkta bırakıyordu.
     /// </summary>
-    public static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(20);
+    public static readonly TimeSpan Stall = TimeSpan.FromSeconds(20);
+
+    /// <summary>
+    /// İş bitince panele tanınan süre. Çubuk bu sürede yüzdeye koşar ve dolunca panel
+    /// kapanır; dolamazsa süre sonunda yine kapanır.
+    /// </summary>
+    public static readonly TimeSpan Settle = TimeSpan.FromSeconds(2);
+
 
     /// <summary>Panelin gerçekten açıldığını dışarıdan görmek için; ölçüm ve testler kullanır.</summary>
     public const string TraceVariable = "VIDSHRINK_SPLASH_TRACE";
@@ -38,6 +47,7 @@ internal sealed class SplashGate : IDisposable
     private readonly object _sync = new();
     private Timer? _timer;
     private Thread? _thread;
+    private volatile bool _settling;
 
     private SplashGate(InstallProgress progress) => _progress = progress;
 
@@ -74,7 +84,7 @@ internal sealed class SplashGate : IDisposable
             {
                 window.Render(_progress, DateTime.UtcNow - started);
             }
-            while (!_closing.Wait(FrameInterval) && DateTime.UtcNow - started < Lifetime);
+            while (!_closing.Wait(FrameInterval) && !Stalled() && !Settled());
         }
         catch (Exception exception)
         {
@@ -86,6 +96,12 @@ internal sealed class SplashGate : IDisposable
             Trace("closed");
         }
     }
+
+    /// <summary>İşin sessiz geçirdiği süre sınırı aştı mı.</summary>
+    private bool Stalled() => DateTime.UtcNow - _progress.LastStep >= Stall;
+
+    /// <summary>İş bitti ve çubuk yüzdeye vardı mı; panel ancak dolduktan sonra kapanır.</summary>
+    private bool Settled() => _settling && _progress.Bar >= _progress.Percent;
 
     /// <summary>Kare aralığı panel ölçütünün yazdığı yenileme adımı.</summary>
     private static TimeSpan FrameInterval => TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds);
@@ -100,8 +116,11 @@ internal sealed class SplashGate : IDisposable
         {
             _timer?.Dispose();
             _timer = null;
-            _closing.Set();
         }
+
+        _settling = true;
+        _thread?.Join(Settle);
+        _closing.Set();
         // Beklemede olan kare, olay nesnesi bırakılırsa ona dokunabilir; kapatılmıyor.
         _thread?.Join(TimeSpan.FromSeconds(2));
     }

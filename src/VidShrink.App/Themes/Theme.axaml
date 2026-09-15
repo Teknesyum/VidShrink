@@ -35,6 +35,7 @@
   <x:Double x:Key="EmberAtmosphereVeilOpacity">0.13</x:Double>
   <x:Double x:Key="EmberAtmosphereCoalOpacity">0.62</x:Double>
   <x:Double x:Key="PanelSurfaceOpacity">0.90</x:Double>
+  <x:Double x:Key="PauseGlyphOpacity">0.5</x:Double>
 
   <SolidColorBrush x:Key="PanelSurface"
                    Color="{StaticResource SurfaceToneColor}"
@@ -247,6 +248,7 @@
   <sys:TimeSpan x:Key="MotionFast">00:00:00.1600000</sys:TimeSpan>
   <sys:TimeSpan x:Key="MotionBase">00:00:00.2400000</sys:TimeSpan>
   <sys:TimeSpan x:Key="MotionSlow">00:00:00.3600000</sys:TimeSpan>
+  <sys:TimeSpan x:Key="PauseGlyphHold">00:00:00.5000000</sys:TimeSpan>
   <x:Double x:Key="MotionStaggerMs">40</x:Double>
   <x:Int32 x:Key="MotionStaggerCount">6</x:Int32>
 
@@ -273,6 +275,7 @@
   <x:Double x:Key="PlanPanelMaxHeight">512</x:Double>
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
   <x:Double x:Key="DropIconSize">48</x:Double>
+  <x:Double x:Key="PauseGlyphSize">96</x:Double>
   <x:Double x:Key="DropOutlineThickness">2</x:Double>
   <x:Double x:Key="DropIconGlowRadius">6</x:Double>
   <x:Double x:Key="PlanFactMinWidth">136</x:Double>

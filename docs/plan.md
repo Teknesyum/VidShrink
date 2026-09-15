@@ -1,298 +1,168 @@
-# Plan — 15 işlik tur: simge takımı, anahat dili, oynatıcı barları, güncelleme paneli
+# Hipersürüş — çift tıktan ilk kareye
+
+> "ister güncelleme olsun ister olmasın bir videoya tıklandığı oynatmaya geçme
+> basamaklarını minimuma indirecek bir hipersürüş tasarısı tıklandığı anda ms ler
+> içinde video oynayacak — gerekirse güncelleme ertelenecek bu konu mühim"
+
+## Bugün nerede duruyoruz
+
+Ölçü deponun kendi aracından: `tools/acilis-hizi/olcum.ps1`, enstrüman
+`src/VidShrink.App/MainWindow.AcilisIzi.cs`, sonuçlar
+[docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md).
 
-Girdi: kullanıcının 13 Eylül 2026 turu (15 madde) ve iki eski cümlesi (aşağıda verbatim).
-`docs/arastirma/ikon-estetigi.md` araştırması bu planla paralel koşuyor; 5-8, 10 ve 14
-numaralı maddelerin geometri kararı o rapor gelince kesinleşir.
+| Ölçü | Değer |
+| --- | --- |
+| `ilk-kare` ortancası, sıcak | 1857,8 ms |
+| `ilk-kare` ortancası, soğuk | 1586,0 ms |
+| `sekme` → `ilk-kare` arası | ~330 ms |
+| libmpv ön yüklemesi (arka planda) | 74,0 / 67,1 ms |
+
+**Bütçenin dağılımı burada saklı.** Motorun kendisi (mpv_create + ilk çözme) ~330 ms.
+Geriye kalan ~1250-1500 ms, sekmeye geçilmeden önce, yani **oynatmayla hiç ilgisi
+olmayan işlerde** harcanıyor. Hipersürüşün hedefi bu 1250 ms'dir; 330 ms'lik motor
+payı ikinci sırada gelir.
 
-## Kullanıcının kendi cümleleri (2. madde buna bakıyor)
+Ayrıca ölçünün sıfır noktası app sürecinin `Process.StartTime`'ı
+([acilis-hizi.md:10-14](olcumler/acilis-hizi.md)); **başlatıcının harcadığı süre bu
+sayılara hiç girmiyor.** Kullanıcının beklediği süre bugün ölçtüğümüzden büyük ve
+ne kadar büyük olduğunu bilmiyoruz. İlk iş bunu ölçmek.
+
+## Fable'ın netleştirmesi
+
+[docs/netlestirme/014](netlestirme/014-bir-videoya-cift-tiklandigi-andan-ilk-ka.md).
+Beş soru sordu; üçünü burada cevaplıyorum, ikisi kullanıcının kararı:
+
+- **Sıfır noktası** çift tıkın kendisi olacak: başlatıcı dahil. Ölçü bunu göremiyor,
+  H0 bunu düzeltiyor.
+- **İlk kare** tanımı bugünkü işaret kalıyor: `Frame.Source = _bitmap`
+  ([PlayerView.axaml.cs:647](../src/VidShrink.App/Playback/PlayerView.axaml.cs:647)).
+  Poster ya da boş pencere sayılmaz — kullanıcı "video oynayacak" dedi, çerçeve değil.
+- **Doğrulama zemini** mevcut düzenek: eşleşik (paired) A/B, ortanca fark, ve her
+  tekrarın hangi yöne baktığı. Ölçüm bu makinede eşleşmemiş karşılaştırmanın
+  geçersiz olduğunu gösterdi ([acilis-hizi.md:22-40](olcumler/acilis-hizi.md)).
+- **Hedef eşik** ve **hangi görünür davranışlara dokunulabileceği** kullanıcının;
+  aşağıda iki çatal olarak duruyor.
+
+## H0 — Ölçüyü çift tıka kadar geriye çek
+
+Ölçemediğimiz şeyi iyileştiremeyiz. Başlatıcı, app'i doğurmadan önce sekiz iş
+yapıyor ve hiçbiri ölçüde görünmüyor:
+
+| Yer | İş | Neden açılış yolunda değil |
+| --- | --- | --- |
+| [Launcher/Program.cs:92](../src/VidShrink.Launcher/Program.cs:92) | `SeedVersionMarker` | Her açılışta disk yazımı |
+| [:97](../src/VidShrink.Launcher/Program.cs:97) | `UpdateStage.ResumePending` | Bekleyen güncelleme varsa **yüzlerce MB kopyalama** |
+| [:115](../src/VidShrink.Launcher/Program.cs:115) | `progress.WriteLog` | `update-log.txt`, her açılışta |
+| [:116](../src/VidShrink.Launcher/Program.cs:116) → [Splash.cs:122](../src/VidShrink.Launcher/Splash.cs:122) | Splash join | Panel çizildiyse **2+2 sn tavan** |
+| [:121](../src/VidShrink.Launcher/Program.cs:121) | `ToolsPresent` + PATH taraması | **Oynatma ffmpeg kullanmıyor** |
+
+H0: başlatıcıya kendi iz işaretini koy, sıfır noktasını `CreateProcess` anına taşı,
+ölçüyü tekrar al. Kazanç hedefi yok; bu **tartıyı kurmak**.
+
+## A dalgası — Oynatma yolunu açılış yolundan ayır
+
+Tek fikir: **argv'de bir video varsa uygulama açılmaz, oynatıcı açılır.** Geri kalan
+her şey ilk karenin arkasına düşer.
+
+### A1 — Başlatıcıyı yoldan çıkar (~ölçülecek, tahmin 300-800 ms)
+
+Video yolu argv'deyse başlatıcı **önce** `Process.Start` eder, güncelleme işlerini
+**sonra** yapar. Bugün `ResumePending` ve `ToolsPresent` app'in önünde
+([Program.cs:97,121](../src/VidShrink.Launcher/Program.cs:97)); ikisi de app doğduktan
+sonra koşabilir. `Updater.Run` zaten doğru tarafta ([:145](../src/VidShrink.Launcher/Program.cs:145)) —
+onu örnek al.
+
+Kullanıcının cümlesinin karşılığı bu madde: *"ister güncelleme olsun ister olmasın"*.
+Bekleyen bir güncelleme varsa **bir sonraki açılışa** ertelenir, video önce oynar.
+
+### A2 — Oynatıcıyı `MainWindow`'dan önce aç (tahmin 400-900 ms)
+
+Bugün [MainWindow.axaml.cs:149](../src/VidShrink.App/MainWindow.axaml.cs:149)
+`InitializeComponent()` **dört sekmenin tamamını** kuruyor: küçültme, dönüştürme,
+kaydedici, ayarlar, gelişmiş paneller, karşılaştırma paneli. Arkasından ~60 `Watch`
+bağlaması, liste kurulumları, `LoadTitleBarLogo`, `SetupShellMenu`
+([:169-265](../src/VidShrink.App/MainWindow.axaml.cs:169)) ve `OnWindowLoaded`'daki
+ayar yığını ([:500-508](../src/VidShrink.App/MainWindow.axaml.cs:500)) geliyor.
+Kullanıcı bunların hiçbirini görmeyecek.
+
+A2: argv'de video varken `PlayerView`'i taşıyan ince bir pencere önce açılır; dört
+sekmeli kabuk ilk kareden **sonra**, arka planda kurulur ve oynatıcı oraya taşınır —
+ya da kabuk hiç kurulmaz, kullanıcı bir sekmeye basana kadar bekler.
+
+İki seçenek arasındaki fark kullanıcıya görünür (üst şerit ilk anda var mı yok mu),
+bu yüzden karar kullanıcının.
+
+### A3 — Motoru arayüzle paralel kur (tahmin 150-300 ms)
+
+`new MpvEngine()` bugün arayüz iş parçacığında, senkron
+([PlayerView.axaml.cs:529](../src/VidShrink.App/Playback/PlayerView.axaml.cs:529));
+içinde `mpv_create` + `mpv_initialize` + render bağlamı var
+([MpvEngine.cs:82,90,96](../src/VidShrink.Player/MpvEngine.cs:82)) ve
+`mpv_initialize` soğuk açılışın en pahalı tek çağrısı.
 
-**11 Eylül 2026, 13:48** — başlık çubuğu düğmeleri:
+A3: argv'de video varken motor, `libmpv` ön yüklemesinin hemen ardından
+([App/Program.cs:182-188](../src/VidShrink.App/Program.cs:182)) arka planda kurulur
+ve `loadfile` XAML açılımıyla **aynı anda** koşar. Pencere hazır olduğunda kare zaten
+bekliyor olur.
 
-> üstteki tuşların anahattı ince görünmez bir gri gibi olsun daha karemsi olsun kenarları
-> fare ile üzerlerine geldiğimde ancak mavi şuanki anahat olsun ayarlar sağda teknesyum
-> sponsor vb yazan yerin hemen solunda (dil ayarlarının sağında) olsun
-> anahat header içinde mükemmel yükseklikte olamalı fare üzerinde değilken anahat yok gibi olmalı
+### A4 — `Play()`'in önündeki dört dosya işini arkaya al (tahmin 20-80 ms)
 
-"Keskin köşe" diye not ettiğim şey buradaki **"daha karemsi olsun kenarları"**. 10. madde
-aynı kuralın bütün programa genelleştirilmiş hâli.
+`Play()` çağrısından **önce** koşan senkron disk işleri:
 
-**12 Eylül 2026, 18:34** — güncelleme paneli (4. ve 13. madde buna bakıyor):
+| Yer | İş |
+| --- | --- |
+| [PlayerView.axaml.cs:549](../src/VidShrink.App/Playback/PlayerView.axaml.cs:549) | `PlaybackHistory.Load` |
+| [PlayerView.Window.cs:252-253](../src/VidShrink.App/Playback/PlayerView.Window.cs:252) | `PlayerSettings.Load` + `RecentFiles.Load` |
+| [PlayerView.Window.cs:163](../src/VidShrink.App/Playback/PlayerView.Window.cs:163) | **`RecentFiles.Save` — diske yazım** |
 
-> yeni sürüm uyarısında tek satır güncelleme kodu veriyor powershell için ancak yükle tuşu
-> da olması lazım hatta powershell vermesin yükle tuşu çıksın sadece güncelleme sonrası
-> otomatik güncelleme ayarımız değişmemeli
+Son kullanılanlar listesinin **yazımı** ilk karenin önünde duruyor. Dördü de
+`Play()`'den sonra koşabilir; tek istisna `PlaybackHistory.Load`, çünkü kaldığı yere
+arama ondan geliyor ([:559-561](../src/VidShrink.App/Playback/PlayerView.axaml.cs:559)).
 
-`pp`'de güncelleme panelinin tarzı **yazmıyor**. Özel rafta yalnız şu var
-(`private/tercihler/depo.md:11`): "Kur penceresi ilk kurulum içindir; sil-baştan-kur yalnız
-`-Onar` ile, günlük güncelleme uygulamanın kendi senkronunda." Panelin biçimine dair bir
-satır yok; bu turda yazılıyor.
+### A5 — İlk kareyi saatten kopar
 
-## Kesitler
+`StartRender()` 16 ms'lik bir `DispatcherTimer`
+([PlayerView.axaml.cs:557](../src/VidShrink.App/Playback/PlayerView.axaml.cs:557));
+ilk kare en kötü halde bir tam tık bekliyor. A5: ilk kare motorun kendi güncelleme
+geri çağrısıyla ([MpvEngine.cs:96-104](../src/VidShrink.Player/MpvEngine.cs:96))
+saati beklemeden çizilir, saat ikinci kareden itibaren devralır. Kazanç küçük
+(0-16 ms) ama bedeli de küçük.
 
-Bağımlılık tek yönlü: **E → F → G**, **H** bağımsız.
+## B dalgası — Motorun kendi payı (~330 ms)
 
-### Kesit E — anahat dili (10, 2)
+Bu dalga kullanıcıya görünür davranışa dokunuyor; **çatal 2** buraya bakıyor.
 
-Tek bir durum sözleşmesi, üç yerde aynı: başlık çubuğu düğmeleri, üst sekme şeridi, sayfa
-içi düğmeler.
+| # | Değişiklik | Bugün | Tahmin |
+| --- | --- | --- | --- |
+| B1 | `hwdec=auto-copy` varsayılan olsun | `no` ([MpvEngine.cs:143](../src/VidShrink.Player/MpvEngine.cs:143)) | çözme ucuzlar, kare kopyası durur |
+| B2 | `demuxer-lavf-probe-info` / `demuxer-max-bytes` kısılsın | dokunulmuyor | ilk `loadfile` erken döner |
+| B3 | `cache=no` ya da küçük önbellek | libmpv varsayılanı | ilk kare öne çekilir |
+| B4 | `vo` SW render yerine donanım yüzeyi | `libmpv` BGRA, CPU kopyası ([:142](../src/VidShrink.Player/MpvEngine.cs:142)) | en büyük kazanç, **en pahalı iş** |
 
-- Dinlenirken: kenarlık `HeaderRestBorder` (zaten var, "yok gibi gri"), kalınlık `BorderThin`.
-- Fare üstündeyken: kenarlık `NeonBlueBorderStrong`, kalınlık yeni `BorderRegular` belirteci.
-- Köşe: `RadiusChip` (6) yerine daha karemsi bir yeni belirteç.
+B1-B3 seçenek yazısı; B4 render yolunun yeniden yazımı ve
+`ComparisonSurface`/`EngineComparisonFrameSource` de ondan besleniyor. B4 kendi
+dalgası olmayı hak ediyor, A ve B1-B3 ölçülmeden başlanmaz.
 
-Renk ve ölçü uydurulmuyor: kenarlık fırçaları paletten, yeni kalınlık ve yarıçap
-`Themes/Theme.axaml` belirteci olarak bir kez tanımlanıyor.
+## Sıra ve ölçü
 
-### Kesit F — simge takımı (5, 6, 7, 8, 14)
+1. **H0** — tartıyı kur. Bunsuz hiçbir sayı doğrulanamaz.
+2. **A1, A4, A5** — görünür davranışa dokunmayan, ucuz, kesin kazançlar.
+3. **A3** — paralelleştirme; A2'den önce çünkü A2'nin kazancını o açığa çıkarıyor.
+4. **A2** — en büyük tek kalem, en görünür karar.
+5. **B1-B3** — mpv seçenekleri, her biri ayrı ölçülür.
+6. **B4** — ayrı dalga.
 
-`Themes/Icons.axaml` elle çizilmiş 26 `StreamGeometry` taşıyor. Sorunlar ölçülebilir:
+Her adım eşleşik A/B ile ölçülür ve kazancı `docs/olcumler/acilis-hizi.md`'ye yazılır.
+Tahminler burada **tahmindir**; hükmü ölçüm verir. `tools/acilis-hizi` `.sln`'e
+eklenip CI'da koşan bir eşik pimi kazanır — bugün bu yolun süresini ölçen **hiçbir
+test yok** ve kazanılan her ms sessizce geri kaybedilebilir.
 
-| # | Simge | Kusur |
-|---|---|---|
-| 5 | `IconPause` | `M 9,4 V 20 M 15,4 V 20` — iki çubuk 9 ve 15'te, `Stretch="Uniform"` yalnız 9..15 mürekkebini ölçüyor; `IconPlay` 6..20 ölçülüyor. İki simge aynı kutuda farklı büyüyor, duraklat sağa kayıyor. |
-| 6 | `IconMinimize` | `M 4,12 H 20` — tek yatay çizgi. |
-| 7 | hepsi | Mürekkep sınırı 24×24 tasarım kutusundan küçük olduğunda `Uniform` mürekkebi ortalıyor, kutuyu değil. `IconCoffee` bunu iki boş `MoveTo` ile çözmüş; geri kalan 25 simgede aynı çözüm yok. |
-| 8 | `IconCode` | `M 9,6 L 3,12 L 9,18 M 15,6 L 21,12 L 15,18` — Teknesyum imzasının `<>` işareti. |
-| 14 | `IconSettings` | Nokta + sekiz kısa çentik. Önceki simge `Content="⚙"` metin karakteriydi (`06f2112b` öncesi `MainWindow.axaml:65`). |
+## İki çatal — kullanıcının kararı
 
-Karar: takım araştırmanın önerdiği **lisansı temiz hazır setten** alınıp `StreamGeometry`'ye
-çevriliyor, elle yeniden çizilmiyor. 7'nin yapısal çözümü her simgeye `IconCoffee`'nin iki
-boş `MoveTo`'su — 24×24 kutuyu sabitleyen iki komut.
+**Çatal 1 — hedef eşik.** "ms'ler içinde" ne demek: 100 ms altı mı, 300 ms altı mı,
+yoksa "bugünkünün yarısı" mı? 100 ms altı B4'ü zorunlu kılar; 300 ms A dalgasıyla
+erişilebilir görünüyor.
 
-### Kesit G — oynatıcı barları (9)
-
-`PlayerView.axaml:131` ses, `:175` hız. İkisi de `PlaybackSlider`.
-
-- İkisi de uzar: genişlik belirteçten, `SpaceSm` boşlukla.
-- Ses: `TickFrequency=5`, `IsSnapToTickEnabled` — 5'in katlarına oturur.
-- Hız: `TickFrequency=0.05`.
-- `BtnSeritMute`'un hız karşılığı yok; hız simgesi düğmeye dönüyor. ×1 değilken basınca 1'e,
-  1'deyken basınca bir önceki hıza döner. Önceki hız alanda tutulur.
-
-### Kesit H — güncelleme paneli ve geliştirici sekmesi (4, 13, 12)
-
-- `MainWindow.axaml:167-180`: `TxtNoticeCommand` ve `BtnNoticeCopy` kaldırılıyor.
-  `BtnNoticeInstall` panelin tek eylemi. Kullanıcının 18:34 cümlesi zaten bunu diyordu;
-  13. madde onun tekrarı.
-- Kaldırılan iki anahtar 42 dilden düşüyor → `BiciminTests` sayım pinleri yeniden ölçülür.
-- `TabItem main.tab.advanced` görünürlükten çıkıyor. Hakkında sekmesinde sürüm satırına
-  arka arkaya tıklamak sekmeyi açıyor; sekmenin içinde onu tekrar kapatan bir düğme var.
-  Kaç tık gerektiği ve sayaç penceresi kod tarafında tek yerde, testle pimli.
-- Davranış değiştiği için iki README aynı commit'te güncelleniyor.
-
-## Kapsam dışı
-
-- 3. madde: cevap verildi, iş yok.
-- 11. madde: araştırma alt ajanda, çıktısı `docs/arastirma/ikon-estetigi.md`.
-- 15. madde: kaydedicinin reddi — kullanıcı neyin eksik olduğunu söylemeden yeniden
-  kurulmuyor, `.claude/jobs.md`'de gerekçeli açık duruyor.
-
-## Durum — 13 Eylül 2026
-
-E, F, G ve H kuruldu. Ölçüler `docs/arastirma/ikon-estetigi.md`'den geldi;
-`IkonKutusuTests` 26 yolun kutusunu, `GelistiriciSekmesiTests` gizli sekmenin
-sayacını pimliyor. Kanıt kareleri `.calisma/kesit-ef/`.
-
-Açık kalan iki madde: **1** (ölü `v0.4.3` etiketi — kanca hem Bash'i hem
-PowerShell'i durduruyor, tek cümlelik onay bekliyor) ve **15** (kaydedici reddi —
-hangi özelliğin eksik olduğu söylenmeden yeniden kurulmuyor).
-
-
----
-
-# Plan — Kaydedicide otomatik varsayılan, hedef süre ve hedef MB (13 Eylül 2026)
-
-Girdi: kullanıcının 13 Eylül 2026 ikinci turu, 2c maddesi.
-
-> ayrıca en iyi ayarı program nasıl ayarlıyorsa shrink için burdada en iyi ayarı kullanıcı
-> değil program ayarlayacak kullanıcı dilerse istediği tahmini süre ve istediği tahmini mb
-> yi ayarlayabilecek ancak ayarlamasa bile otomatik en iyi sonuçlarla işlem yapıcağız
-
-## Karar
-
-Otomatik kip **varsayılan** olur. Onay kutusunun anlamı ters çevrilir: `ChkAuto`
-("Otomatik ayar") gider, yerine `ChkManual` ("Kendim ayarlayacağım") gelir ve işaretsiz
-başlar. Elle panel yalnız bu kutu işaretlenince görünür.
-
-Hedef süre ve hedef MB **iki isteğe bağlı kutu**. İkisi de doluysa bit hızı hesaplanır ve
-aday merdiveninin üstüne yazılır; biri boşsa kalite kolu (CRF/CQP) olduğu gibi kalır.
-
-Formül OBS'in tampon hesabının tersi, katsayı OBS'in yazımı:
-
-    video_kbps = (hedef_MB × 8 × 1024 × 1024 / 1000) / süre_sn − ses_kbps × iz_sayısı
-
-Kayıt gerçek zamanlı olduğu için iki geçiş yok; tavanlı bit hızı kullanılır —
-`BitrateKbps = MaxBitrateKbps = kbps`, `BufferKbits = 2 × kbps`. Hedef süre ayrıca
-`MaxDuration`'a yazılır, yani kayıt kendi kendine biter.
-
-Hesap taban bit hızının altına düşerse (`RecorderBudget.MinimumVideoKbps`) bütçe
-uygulanmaz ve ekranda "hedef çok küçük" denir; sessizce bozuk kayıt üretilmez.
-
-## Dokunulan dosyalar
-
-1. `src/VidShrink.Core/RecorderBudget.cs` — yeni, saf hesap.
-2. `src/VidShrink.Core/RecorderAutoPlan.cs` — `ApplyBudget`.
-3. `src/VidShrink.App/Recorder/RecorderSettings.cs` — `ManualMode`, `TargetSeconds`,
-   `TargetMegabytes`; eski `autoMode` anahtarı okunmaya devam eder.
-4. `src/VidShrink.App/Recorder/RecorderView.axaml` — kutunun tersi, iki hedef kutusu.
-5. `src/VidShrink.App/Recorder/RecorderView.Otomatik.cs` — `AutoMode` artık `!ManualMode`.
-6. `src/VidShrink.App/Recorder/RecorderView.Hedef.cs` — bütçenin isteğe yazılması.
-7. `src/VidShrink.App/Locales/<42 dil>/main.json` — yeni anahtarlar.
-8. `tests/VidShrink.Tests/KayitButceTests.cs` — yeni ölçü.
-
-## Ölçüler
-
-- Boş hedef → bütçe yok, kalite kolu korunuyor (negatif kontrol).
-- 10 MB / 30 sn → OBS katsayısıyla 2796 kbps toplam, eksi 160 ses = 2636 video.
-- Süre var MB yok, MB var süre yok, sıfır ve negatif değerler → `null`.
-- Taban altı hedef → `null`, sebep `TooSmall`.
-- `ApplyBudget` kalite kolunu bit hızı koluna çeviriyor ve `Validate`'ten geçiyor.
-- Varsayılan açılışta elle panel gizli, otomatik özet görünür.
-
-# 2d — Güncelleme Paneli Ölçüte Getiriliyor
-
-Ölçüt `pp/guncelleme-paneli.md`. Panel iki kanal: başlatıcının kurulum penceresi ve
-uygulamanın günlük güncelleme rozeti. Bu tur başlatıcı kanalını ölçüte getiriyor.
-
-Tek köprü bir durum nesnesi. İş tarafı ekrana yalnız `Step(yüzde, tavan, cümle)` ile
-konuşuyor, çizen taraf `Advance()` ile bir kare ilerletip okuyor. Sayı arayüzde
-uydurulmuyor.
-
-**Tavan kuralı:** çubuk yüzdeye fark × 0,08 (en az 0,2) ile yaklaşır, yüzde durursa
-tavana fark × 0,006 ile sürünür, yenileme 16 ms, yüzde geri gitmez. Uzayan adımda panel
-yaşar ama sonraki adımın alanını yemez.
-
-Ekranda her zaman üç şey var: cümle, yüzde, son dokuz günlük satırı. Son satır gövde
-rengiyle vurgulu, öncekiler sönük; satır sarmıyor, GDI'nın `DT_END_ELLIPSIS`'i kırpıyor.
-
-Durum renkleri: çalışırken vurgu, bitince `NeonSuccessColor`, hatada `NeonEmberColor`.
-
-## Dokunulan dosyalar
-
-1. `src/VidShrink.Core/InstallProgress.cs` — yeni, köprü ve tavan kuralı.
-2. `src/VidShrink.Launcher/Splash.cs` — `Arm(InstallProgress)`, yüzde kutusu, günlük,
-   belirli kipe geçen çubuk, dolan kısmın üstündeki tarama ışığı.
-3. `src/VidShrink.Launcher/Program.cs` — dört adımın `Step` çağrısı ve `Finish`.
-4. `tools/VidShrink.SplashGen/Program.cs` — panel dokuz satır günlük ve yüzde sütunu
-   kadar büyüdü; `percent`, `log` kutuları ve `LogLines` belirteci gömülüyor.
-5. `tests/VidShrink.Tests/KurulumIlerlemesiTests.cs` — yeni ölçü.
-6. `tests/VidShrink.Tests/SplashTests.cs` — yeni yerleşim ve sözleşme pimleri.
-
-## Ölçüler
-
-- Çubuk yüzdeye fark × 0,08 ile yaklaşıyor, en az 0,2 adımla.
-- Yüzde durunca tavana sürünüyor ve tavanı geçmiyor (20 500 kare).
-- Geriye yazan adım yüzdeyi düşürmüyor; 0–100 dışı kırpılıyor.
-- Günlük ekranda dokuz satır, diskte tamamı.
-- Görüntüye gömülü `LogLines` ile `InstallProgress.LogLines` eşit.
-- Panel yüksekliği başlık + durum + dokuz satır + çubuk aralıklarının toplamı.
-- Durum cümlesi ile yüzde sütunu aynı satırda ve çakışmıyor.
-- Başlatıcı dört `Step` ve bir `Finish` çağırıyor; tavanlar tek yönlü sıralı.
-
-# 3 — Kayıt Biter Bitmez: Shrink, Oynatıcı, Paylaş
-
-Kullanıcının cümlesi: kayıttan sonra aynı dosya ister Shrink'te ister oynatıcıda
-rahatlıkla oynatılabilecek; "klasörü göster" yetmez, paylaş seçeneği olacak — hem
-sıkıştırdıktan sonra hem kaydettikten sonra.
-
-## Bugün ne var, ne yok
-
-Sıkıştırma sonrası paylaşım **var**: `MainWindow.axaml:751-773` (`BtnShare`,
-`ShareProgress`, `ShareLinkRow`) ve `MainWindow.axaml.cs:1712-1760`, altında
-`Core/Share` katmanı. Kayıt sonrası panelde ise yalnız `BtnReveal` duruyor
-(`Recorder/RecorderView.axaml:113-118`).
-
-Ama sıkıştırma sonrası paylaşım **kurulu yapıda çalışmıyor**: hedef tablosu
-`paylasim-hedefleri.json` hiçbir `.csproj`'da taşınmıyor, `ShareTargets.Locate`
-(`src/VidShrink.Core/Share/ShareTargets.cs:137`) onu yalnız kaynak ağacında buluyor.
-Kurulu yapıda düğme `settings.share.targets-missing` diyor. Araştırma
-(`docs/taramalar/anonim-kisa-omurlu-video.md`) boşa gitmemiş, dosyası pakete girmemiş.
-
-## Yapılacaklar
-
-1. `paylasim-hedefleri.json` `VidShrink.App.csproj`'a `None … CopyToOutputDirectory` +
-   `CopyToPublishDirectory` olarak girer; yayın paketinin yanında durur.
-2. Küçültme sekmesi `x:Name="TabShrink"` alır; `MainWindow` iki kapı açar:
-   `OpenInShrinkAsync(path)` ve `OpenInPlayerAsync(path)`.
-3. `RecorderView` ana pencereye iki geri çağrı ile bağlanır (`OpenInShrink`,
-   `OpenInPlayer`) — kalıp oynatıcının geri çağrılarıyla aynı, sekme dizini dışında
-   kablo yok.
-4. Kayıt sonucu paneline üç düğme: **Shrink'e gönder**, **Oynatıcıda aç**, **Paylaş**;
-   yanına yükleme çubuğu, bağlantı satırı, kopyala ve durum satırı.
-5. Teslim edilen yol artık `TxtResultPath.Text`ten okunmuyor; `_lastRecording` alanında
-   duruyor, `ClearMessages` onu da siliyor.
-6. Paylaşım işi `ShareFlow` ve `Core/Share` üstünden yürür; ikinci bir yükleme kodu
-   yazılmaz. Hedef, tablonun varsayılanı.
-
-## Dokunulan dosyalar
-
-`src/VidShrink.App/VidShrink.App.csproj`, `MainWindow.axaml`, `MainWindow.axaml.cs`,
-`Recorder/RecorderView.axaml`, `Recorder/RecorderView.axaml.cs`,
-`Recorder/RecorderView.Paylas.cs` (yeni), 42 dilin `Locales/<dil>/recorder.json`'u,
-`tests/VidShrink.Tests/KayitTeslimTests.cs` (yeni).
-
-## Ölçüler
-
-1. Hedef tablosu yayın çıktısına kopyalanır (csproj pimi).
-2. Kayıt panelinde dört düğme bulunur: klasör, Shrink, oynatıcı, paylaş.
-3. Düğmeler dosya yokken görünmez.
-4. `OpenInShrinkAsync` sekmeyi değiştirip `LoadAsync`i çağırır.
-5. `OpenInPlayerAsync` sekmeyi değiştirip `Player.OpenAsync`i çağırır.
-6. Kayıt paylaşımı `ShareFlow` üstünden gider, ikinci yükleyici yoktur.
-7. İki yeni anahtar 42 dilin hepsinde vardır.
-
-# 4 — Pencere Kabuğu, Sağ Tık Menüsü ve Issue Bildirimi
-
-## 4.1 Üst şerit gizli, fare üste gidince beliriyor
-
-Eski düzende dış ızgara `Auto,*` idi; başlık çubuğu 0. satırda, sekme denetimi iki satıra
-yayılıydı ve şablonun kendi 0. satırı sekme şeridine aitti. Şeridi gizlemek için satırı
-çökertmek gerekiyordu, o da içeriği 30 px yukarı kaydırıyordu: şerit her belirdiğinde
-içerik zıplıyordu.
-
-Yeni düzende dış ızgara tek gözlü. Başlık çubuğu `VerticalAlignment="Top"` ile üste
-yaslı bir katman, sekme denetimi ızgaranın tamamını kaplıyor. Şablonda
-`SelectedContentHost` iki satırı da kaplıyor (`Grid.RowSpan="2"`) ve `PART_ItemsPresenter`
-**ondan sonra** bildiriliyor: sekme şeridi içeriğin üstünde duruyor.
-
-Gizleme `Window.chrome-hidden` sınıfı; `TrackChrome()` pencereye tünel kipinde bir
-`PointerMoved` bağlıyor ve işaretçinin y'si `TitleBar.Height`'ı geçmediği sürece şeridi
-gösteriyor. Eşik uydurulmadı: başlık çubuğunun kendi yüksekliği.
-
-Pim: `tests/VidShrink.Tests/PencereKabuguTests.cs`.
-
-## 4.2 Oynatıcı sekmesinde ana hat yok
-
-Kenarlık kuralı zaten tek yerdeydi (`ApplyWindowFrame`), yalnız tam ekranı biliyordu.
-Koşul `maximized || Tabs.SelectedIndex == PlayerTabIndex` oldu ve `Tabs.SelectionChanged`
-aynı yordamı çağırıyor. İkinci bir stil ya da ikinci bir sayı eklenmedi.
-
-## 4.3 Sağ tık menüsü artık bir ayar
-
-Issue #1'de kullanıcıya PowerShell tek satırı verildi. Doğru cevap bu değil: menüyü
-kuran biz olduğumuza göre kaldırmayı da arayüzden vermeliyiz.
-
-`src/VidShrink.App/ShellMenu.cs` kurucunun yazdığı kayıt defteri düzeninin aynısını
-yazıyor ve siliyor — aynı anahtar adları, aynı 24 uzantı, aynı 5 hedef, aynı bayrak.
-Silme kolu Windows 11'in Appx paketini de kaldırıyor; issue'daki kusur buydu.
-`Ayarlar → Sağ tık menüsü` altındaki tek kutu bu iki kolu çağırıyor.
-
-Etiketler `shell.menu.open` ve `shell.menu.shrink` anahtarlarından geliyor, yani 42 dili
-izliyor. Dil değişince `RelabelShellMenu()` kurulu menüyü yeniden yazıyor. Kurucunun
-`-MenuLanguage auto|tr|en` kısıtı böylece uygulamada kalkmış oluyor.
-
-Pim: `tests/VidShrink.Tests/KabukMenusuTests.cs` — iki tarafın anahtar/uzantı/hedef
-listeleri eşit olmazsa kırmızı.
-
-## 4.4 Issue açılınca telefona bildirim
-
-`.github/workflows/issue-bildirim.yml` iki kol taşıyor. Birincisi `issues: opened` ve
-`issue_comment: created` olaylarında `ntfy.sh`'e bir gönderi atıyor; konu adı
-`NTFY_TOPIC` deposu gizli anahtarında duruyor, depo dışına sızmıyor. Kendi yazdığımız
-girdiler elenir.
-
-İkincisi 15 dakikada bir açık issue'ları tarıyor ve içinde bakımcı cevabı olmayan her
-issue için yüksek öncelikli bir bildirim atıyor: "cevapsız bekleyen issue" diye bir
-durum kalmasın diye.
-
-SMS gönderilmiyor; telefona ulaşan yol ntfy uygulamasının aboneliği.
+**Çatal 2 — görünür davranışa dokunma izni.** A2'de dört sekmeli kabuk ilk anda
+görünmeyecek; B1'de donanım çözme varsayılan olacak; B4'te render yolu değişecek.
+Yalnız sıralama/erteleme/paralelleştirme mi, yoksa bunlar da masada mı?

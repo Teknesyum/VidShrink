@@ -133,6 +133,7 @@ internal partial class RecorderView
         try
         {
             var result = await session.StopAsync();
+            ExpandFromMini();
             ShowResult(result);
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
@@ -151,6 +152,7 @@ internal partial class RecorderView
         TxtElapsed.Text = Clock(progress.Elapsed);
         TxtFrames.Text = progress.Frames.ToString("N0", Strings.Culture);
         TxtDropped.Text = progress.DroppedFrames.ToString("N0", Strings.Culture);
+        RefreshMini();
     }
 
     /// <summary>
@@ -172,5 +174,7 @@ internal partial class RecorderView
         TxtState.Text = running ? Say("recorder.strip.live")
             : paused ? Say("recorder.strip.paused")
             : Say("recorder.strip.idle");
+
+        RefreshMini();
     }
 }

@@ -8,6 +8,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media.Transformation;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -34,6 +35,14 @@ internal partial class PlayerView : UserControl
     private long _shown;
     private string? _path;
     private bool _playing;
+    private DispatcherTimer? _pauseFlash;
+
+    private double PauseGlyphOpacity => this.FindResource("PauseGlyphOpacity") is double d ? d : 0.5;
+
+    private TimeSpan PauseGlyphHold => this.FindResource("PauseGlyphHold") is TimeSpan t ? t : TimeSpan.FromMilliseconds(500);
+
+    private TimeSpan MotionFast => this.FindResource("MotionFast") is TimeSpan t ? t : TimeSpan.FromMilliseconds(160);
+
     private bool _trackPaused;
     private int _leftClicks;
     private int _watchdogTicks;
@@ -452,7 +461,37 @@ internal partial class PlayerView : UserControl
             _seek.Follow(engine.PositionSeconds);
             engine.Pause();
             SaveHistory(false);
+            FlashPause();
         }
+    }
+
+    /// <summary>
+    /// Duraklatinca sahnenin ortasinda kisa bir duraklatma simgesi belirir: girisi ve
+    /// cikisi <c>MotionFast</c>, ekranda kalisi <c>PauseGlyphHold</c>. Oynatmada karsiligi
+    /// yok — orada goruntunun onune konan her sey icerigi kapatir.
+    /// </summary>
+    private void FlashPause()
+    {
+        _pauseFlash ??= new DispatcherTimer();
+        _pauseFlash.Stop();
+
+        PauseGlyph.IsVisible = true;
+        PauseGlyph.Opacity = PauseGlyphOpacity;
+        PauseGlyph.RenderTransform = TransformOperations.Parse("scale(1)");
+
+        _pauseFlash.Interval = PauseGlyphHold;
+        _pauseFlash.Tick -= OnPauseFlashDone;
+        _pauseFlash.Tick += OnPauseFlashDone;
+        _pauseFlash.Start();
+    }
+
+    private void OnPauseFlashDone(object? sender, EventArgs e)
+    {
+        _pauseFlash?.Stop();
+        PauseGlyph.Opacity = 0;
+        PauseGlyph.RenderTransform = TransformOperations.Parse("scale(0.8)");
+
+        DispatcherTimer.RunOnce(() => PauseGlyph.IsVisible = false, MotionFast);
     }
 
     private void StartRender()

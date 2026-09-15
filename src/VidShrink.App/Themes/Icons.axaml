@@ -24,6 +24,7 @@
   <StreamGeometry x:Key="IconCamera">M 0,0 M 24,24 M 3,8 H 7 L 9,5 H 15 L 17,8 H 21 V 19 H 3 Z M 12,10 A 3.5,3.5 0 1,0 12,17 A 3.5,3.5 0 1,0 12,10 Z</StreamGeometry>
   <StreamGeometry x:Key="IconChevronDown">M 0,0 M 24,24 M 5,8.5 L 12,15.5 L 19,8.5</StreamGeometry>
   <StreamGeometry x:Key="IconChevronUp">M 0,0 M 24,24 M 5,15.5 L 12,8.5 L 19,15.5</StreamGeometry>
+  <StreamGeometry x:Key="IconStop">M 0,0 M 24,24 M 7,6 H 17 A 1,1 0 0,1 18,7 V 17 A 1,1 0 0,1 17,18 H 7 A 1,1 0 0,1 6,17 V 7 A 1,1 0 0,1 7,6 Z</StreamGeometry>
   <StreamGeometry x:Key="IconRestart">M 0,0 M 24,24 M 4.5,5 V 19 M 19.5,5 L 8.5,12 L 19.5,19 Z</StreamGeometry>
   <StreamGeometry x:Key="IconClose">M 0,0 M 24,24 M 6,6 L 18,18 M 18,6 L 6,18</StreamGeometry>
   <StreamGeometry x:Key="IconMaximize">M 0,0 M 24,24 M 5,3 H 19 A 2,2 0 0,1 21,5 V 19 A 2,2 0 0,1 19,21 H 5 A 2,2 0 0,1 3,19 V 5 A 2,2 0 0,1 5,3 Z</StreamGeometry>

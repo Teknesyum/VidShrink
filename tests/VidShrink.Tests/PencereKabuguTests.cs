@@ -129,4 +129,22 @@ public class PencereKabuguTests
             code);
         Assert.Contains("Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();", code);
     }
+
+    /// <summary>
+    /// Sahnenin kendisinde de anahat yok. Kabuk kenarlığı oynatıcı sekmesinde kalkıyor ama
+    /// <c>Stage</c> Panel temasından bir kenarlık daha alıyordu; görüntünün etrafında
+    /// çerçeve kalmıyor.
+    /// </summary>
+    [Fact]
+    public void SahneninEtrafindaAnahatYok()
+    {
+        var xaml = File.ReadAllText(
+            Path.Combine(TipSources.Root, "src", "VidShrink.App", "Playback", "PlayerView.axaml"));
+
+        var sahne = xaml[xaml.IndexOf("x:Name=\"Stage\"", StringComparison.Ordinal)..];
+        var kapanis = sahne.IndexOf(">", StringComparison.Ordinal);
+
+        Assert.Contains("BorderThickness=\"0\"", sahne[..kapanis]);
+        Assert.Contains("CornerRadius=\"0\"", sahne[..kapanis]);
+    }
 }

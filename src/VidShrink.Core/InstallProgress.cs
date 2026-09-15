@@ -50,6 +50,7 @@ public sealed class InstallProgress
     private readonly List<string> _log = new();
     private readonly object _gate = new();
 
+    private DateTime _lastStep = DateTime.UtcNow;
     private double _percent;
     private double _ceiling;
     private double _bar;
@@ -70,6 +71,12 @@ public sealed class InstallProgress
 
     /// <summary>Panelin durumu.</summary>
     public InstallState State { get { lock (_gate) return _state; } }
+
+    /// <summary>
+    /// Son adımın yazıldığı an. Panel buna bakıp ilerleyen işi ekranda tutuyor, donan işi
+    /// bırakıyor: sınır geçen süre değil, sessiz geçen süredir.
+    /// </summary>
+    public DateTime LastStep { get { lock (_gate) return _lastStep; } }
 
     /// <summary>Ekranda duran son <see cref="LogLines"/> satır, eskiden yeniye.</summary>
     public IReadOnlyList<string> Log
@@ -98,6 +105,7 @@ public sealed class InstallProgress
             _percent = Math.Max(_percent, Clamp(percent));
             _ceiling = Math.Max(_percent, Clamp(ceiling));
             _sentence = sentence ?? string.Empty;
+            _lastStep = DateTime.UtcNow;
             _log.Add(_sentence);
         }
     }
@@ -125,8 +133,9 @@ public sealed class InstallProgress
     }
 
     /// <summary>
-    /// İşi bitirir: durum değişir, çubuk yüzde ve tavanla birlikte sona çekilir. Sonuç
-    /// duyurulduktan sonra düğmeler görünür.
+    /// İşi bitirir: durum değişir, yüzde ve tavan sona taşınır. Çubuk sıçramaz; aynı
+    /// yaklaşma yasasıyla (fark × <see cref="Approach"/>) sona koşar, panel dolduktan
+    /// sonra kapanır. Sonuç duyurulduktan sonra düğmeler görünür.
     /// </summary>
     public void Finish(bool succeeded, string sentence)
     {
@@ -135,8 +144,8 @@ public sealed class InstallProgress
             _state = succeeded ? InstallState.Done : InstallState.Failed;
             _percent = succeeded ? 100 : _percent;
             _ceiling = _percent;
-            _bar = _percent;
             _sentence = sentence ?? string.Empty;
+            _lastStep = DateTime.UtcNow;
             _log.Add(_sentence);
         }
     }
