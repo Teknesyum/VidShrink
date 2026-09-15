@@ -114,18 +114,34 @@ public sealed class InstallProgress
     /// Bir kareyi ilerletir ve yeni çubuk değerini döndürür. Çubuk yüzdenin altındaysa
     /// hızla yaklaşır, yüzdeye vardıysa tavana sürünür; ikisini de geçmez.
     /// </summary>
-    public double Advance()
+    public double Advance() => Advance(TimeSpan.FromMilliseconds(FrameMilliseconds));
+
+    /// <summary>
+    /// Aynı yasa, geçen süreye göre. Kareler eşit aralıklı düşmüyor: panel her karede
+    /// tüm pencereyi yeniden çiziyor ve Windows'un bekleme çözünürlüğü de kabaca bir kare;
+    /// adımı kare <b>sayısına</b> bağlamak çubuğun hızını bu titremeye bağlıyordu.
+    /// Burada oran geçen süreden geliyor, katsayılar aynı kalıyor: bir karelik süre
+    /// geçtiğinde sonuç <see cref="Advance()"/> ile birebir aynı.
+    ///
+    /// <para>Yakalama <see cref="Approach"/>'ın zaman sabitiyle sınırlı; donmuş bir
+    /// karenin ardından çubuk sıçramıyor, hızlanıyor.</para>
+    /// </summary>
+    public double Advance(TimeSpan elapsed)
     {
+        var frames = Math.Clamp(elapsed.TotalMilliseconds / FrameMilliseconds, 0, 1 / Approach);
+
         lock (_gate)
         {
             if (_bar < _percent)
             {
-                var step = Math.Max((_percent - _bar) * Approach, MinimumStep);
+                var step = Math.Max(
+                    (_percent - _bar) * (1 - Math.Pow(1 - Approach, frames)),
+                    MinimumStep * frames);
                 _bar = Math.Min(_percent, _bar + step);
             }
             else if (_bar < _ceiling)
             {
-                _bar = Math.Min(_ceiling, _bar + (_ceiling - _bar) * Creep);
+                _bar = Math.Min(_ceiling, _bar + (_ceiling - _bar) * (1 - Math.Pow(1 - Creep, frames)));
             }
 
             return _bar;

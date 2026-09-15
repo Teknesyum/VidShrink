@@ -149,12 +149,21 @@ harita.
 Her dalga `dotnet test` yeşiliyle kapanır. Süre tahmini yazmıyorum; bu depoda tahminin
 hükmünü ölçüm verir.
 
-## İki çatal — kullanıcının kararı
+## Çatal 2 — cevaplandı (16 Eylül 2026)
 
-**Çatal 1 — odak el değiştirmesi.** Kayıt bitince odak kendiliğinden yeni videoya mı
-geçsin, yoksa "Düzenleyicide Aç" düğmesiyle mi? Aynı soru oynatıcıda başka bir dosya
-açıldığında da geçerli: küçültme sekmesi onu izlesin mi, kendi dosyasında kalsın mı?
+**Sıra: önce hipersürüş.** [docs/plan.md](plan.md) bu işin önünde koşuyor; düzenleyici
+dalgaları hipersürüş kapandıktan sonra başlıyor.
 
-**Çatal 2 — sıra.** Bu iş [docs/plan.md](plan.md)'deki hipersürüş tasarısının önüne mi
-geçiyor, arkasına mı? Hipersürüşün kendi iki çatalı da hâlâ cevapsız (hedef eşik, görünür
-davranışa dokunma izni).
+## Çatal 1 — açık: odak kimin elinde
+
+Tek bir "geçerli video" olacak (D0). Soru o videonun **ne zaman değiştiği**:
+
+- **Kendiliğinden:** kaydı durdurduğun anda yeni dosya geçerli video olur. Oynatıcıya
+  geçtiğinde o dosya orada, küçültmeye geçtiğinde o dosya orada; hiçbir düğmeye basmazsın.
+  Bedeli şu: küçültme sekmesinde başka bir dosyayla uğraşıyorduysan, kayıt bitince o
+  dosya senin altından kayar.
+- **Düğmeyle:** kayıt biter, sonuç panelinde "Düzenleyicide Aç" durur. Basmazsan hiçbir
+  sekme değişmez. Bedeli şu: her kayıttan sonra bir tık fazla.
+
+Aynı soru oynatıcı için de geçerli: oynatıcıda yeni bir dosya açtığında küçültme sekmesi
+onu izlesin mi, kendi dosyasında kalsın mı.

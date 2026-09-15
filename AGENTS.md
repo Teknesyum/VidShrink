@@ -11,7 +11,10 @@ Hedef boyuta sıkıştıran video aracı. .NET 8 + Avalonia + ffmpeg.
   dosyasından, ölçü yalnız `Themes/Theme.axaml` belirteçlerinden. Açılış paletini
   `App.axaml` bildirir, seçimi `PaletteCatalog.Use` çalışırken uygular; palet ikinci bir
   yerde merge edilmez, yoksa o kapsam seçimden kopar.
-- `tests/VidShrink.Tests` — tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok.
+- `tests/VidShrink.Tests` — tek test projesi. Ölçüsü **dokunulan alan**: değişen her dosyanın
+  testleri yerelde yeşil olmadan teslim yok. Tam süit yerelde koşulmaz; itmeden sonra CI
+  koşar ve `gh run list` yeşili teslimin şartıdır. `tools/kosum-kapisi` yalnız **majör**
+  sürümden (`x.0.0`) önce koşar; minörde ve yamada gerekmiyor.
 - `tools/VidShrink.Bench` — ölçüm aracı. Rapora giren her sayı buradan çıkar.
 
 ## Geçici dosyalar

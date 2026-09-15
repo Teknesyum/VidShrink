@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Headers;
 using VidShrink.Core;
 
@@ -34,6 +34,14 @@ internal static class Updater
     /// yavaş hatta yarım kalan iş sahnede kalır, sonraki tur kaldığı yerden sürer.
     /// </summary>
     private static readonly TimeSpan Budget = TimeSpan.FromMinutes(30);
+
+    /// <summary>
+    /// Aynı anda inen dosya sayısı. Dosyalar tek tek inerken hattın kendisi değil her
+    /// isteğin gidiş dönüşü sınırdı: ölçülen 0.3.0 → 0.4.1 farkı 375 dosya, yani 375 ayrı
+    /// tur. Şerit sayısı bunu böler; sayı bant genişliğini doyurmaya değil gecikmeyi
+    /// örtmeye yetecek kadar, sunucuya yüklenmeyecek kadar küçük.
+    /// </summary>
+    private const int Lanes = 6;
 
     private const string StageDirectoryName = "update-stage";
     private const string HashCacheName = ".update-hashes.json";
@@ -151,37 +159,40 @@ internal static class Updater
         var total = changed.Count + launcherChanged.Count + shellChanged.Count;
         var done = 0;
 
-        void Downloading(ManifestFile file)
+        // Şeritler paralel indiği için sayaç kilitli artıyor; panele düşen sıra inişin
+        // bittiği sıradır, dosya listesinin sırası değil.
+        void Downloaded(ManifestFile file)
         {
-            done++;
-            var part = 0.20 + 0.70 * done / Math.Max(1, total);
+            var sira = Interlocked.Increment(ref done);
+            var part = 0.20 + 0.70 * sira / Math.Max(1, total);
             Step(part, Math.Min(0.90, part + 0.70 / Math.Max(1, total)),
-                Path.GetFileName(file.Path) + " indiriliyor (" + done + "/" + total + ")");
+                Path.GetFileName(file.Path) + " indi (" + sira + "/" + total + ")");
+        }
+
+        async Task Fetch(RemoteZip archive, IReadOnlyList<ManifestFile> files, Func<ManifestFile, string> target)
+        {
+            if (files.Count == 0) return;
+            await Parallel.ForEachAsync(
+                files,
+                new ParallelOptions { MaxDegreeOfParallelism = Lanes, CancellationToken = cancellationToken },
+                async (file, token) =>
+                {
+                    await StageFileAsync(archive, file, target(file), token);
+                    Downloaded(file);
+                });
         }
 
         if (changed.Count > 0)
         {
             var archive = await RemoteZip.OpenAsync(ArchiveSource(rid, source), cancellationToken);
-            foreach (var file in changed)
-            {
-                Downloading(file);
-                await StageFileAsync(archive, file, UpdateCheck.LocalPath(stage, file.Path), cancellationToken);
-            }
+            await Fetch(archive, changed, file => UpdateCheck.LocalPath(stage, file.Path));
         }
 
         if (launcherChanged.Count > 0 || shellChanged.Count > 0)
         {
             var archive = await RemoteZip.OpenAsync(LauncherArchiveSource(rid, source), cancellationToken);
-            foreach (var file in launcherChanged)
-            {
-                Downloading(file);
-                await StageFileAsync(archive, file, LauncherUpdate.StagePath(stage, file.Path), cancellationToken);
-            }
-            foreach (var file in shellChanged)
-            {
-                Downloading(file);
-                await StageFileAsync(archive, file, ShellUpdate.StagePath(stage, file.Path), cancellationToken);
-            }
+            await Fetch(archive, launcherChanged, file => LauncherUpdate.StagePath(stage, file.Path));
+            await Fetch(archive, shellChanged, file => ShellUpdate.StagePath(stage, file.Path));
         }
 
         // Prova kipi: inen her şey sahnede durur, hiçbir dosya yerine taşınmaz ve
@@ -280,7 +291,14 @@ internal static class Updater
 internal sealed class HttpRangeSource : IRangeSource
 {
     private readonly string _url;
-    private readonly HttpClient _client = new() { Timeout = TimeSpan.FromSeconds(30) };
+    private readonly HttpClient _client = new(new SocketsHttpHandler
+    {
+        // Şeritlerin hepsi aynı sunucuya bakıyor; varsayılan sınır bağlantıları sıraya
+        // sokup paralelliği boşa çıkarırdı.
+        MaxConnectionsPerServer = 16,
+        PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+    })
+    { Timeout = TimeSpan.FromSeconds(30) };
     private long _length = -1;
 
     public HttpRangeSource(string url)

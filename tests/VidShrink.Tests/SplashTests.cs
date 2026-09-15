@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -205,7 +205,8 @@ public sealed class SplashTests
     {
         var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
         Assert.Contains("TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds)", source);
-        Assert.Contains("progress.Advance()", source);
+        Assert.Contains("progress.Advance(delta)", source);
+        Assert.DoesNotContain("progress.Advance();", source);
         Assert.DoesNotContain("Func<string>", source);
 
         var program = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Program.cs"));

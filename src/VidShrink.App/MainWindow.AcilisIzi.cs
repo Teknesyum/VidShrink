@@ -20,10 +20,23 @@ internal static class AcilisIzi
 {
     internal const string Degisken = "VIDSHRINK_ACILIS_IZI";
 
+    /// <summary>Baslaticinin gecirdigi sifir noktasi; UTC tick.</summary>
+    internal const string SifirDegiskeni = "VIDSHRINK_ACILIS_T0";
+
     private static readonly DateTime Baslangic = SurecBaslangici();
 
+    /// <summary>
+    /// Baslatici kendi dogum anini gecirdiyse taban odur: cift tikin harcadigi sure
+    /// boylece olcunun icine girer. Gecmediyse (app dogrudan acildi) surecin kendi
+    /// baslangici kullanilir.
+    /// </summary>
     private static DateTime SurecBaslangici()
     {
+        var isaret = Environment.GetEnvironmentVariable(SifirDegiskeni);
+        if (long.TryParse(isaret, NumberStyles.Integer, CultureInfo.InvariantCulture, out var tick) &&
+            tick > 0 && tick <= DateTime.UtcNow.Ticks)
+            return new DateTime(tick, DateTimeKind.Utc);
+
         try { return Process.GetCurrentProcess().StartTime.ToUniversalTime(); }
         catch (Exception) { return DateTime.UtcNow; }
     }

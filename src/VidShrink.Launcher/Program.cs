@@ -71,7 +71,40 @@ internal static class Program
             return 1;
         }
 
+        AcilisIzi.Yaz("baslatici");
         var previousVersion = UpdateCheck.ReadVersionMarker(appDirectory);
+
+        // Hipersürüş A1: argümanda açılacak bir dosya varsa kullanıcı video bekliyor,
+        // güncelleme beklemiyor. Uygulama önce doğar, bakım işleri arkasına düşer. Bekleyen
+        // dosyaların yerine taşınması bu turda hiç yapılmaz: taşıma uygulama klasörüne
+        // yazmak demek ve uygulama o klasörden yeni açılmış olur. Bir sonraki normal
+        // açılışta milisaniyelerde tamamlanır.
+        //
+        // ffmpeg varlık sınaması da bu turda atlanıyor: oynatma libmpv ile yapılıyor,
+        // ffmpeg'e ihtiyaç duyan sekmeler eksikliği kendileri bildiriyor.
+        if (!updateNow && args.Length > 0 && File.Exists(args[0]))
+        {
+            StartApp(executable, appDirectory, baseDirectory, args);
+            AcilisIzi.Yaz("app-dogdu");
+
+            try { LauncherUpdate.Repair(baseDirectory, UpdateCheck.CurrentVersion()); }
+            catch (Exception) { }
+            try { LauncherUpdate.SeedVersionMarker(baseDirectory, UpdateCheck.CurrentVersion()); }
+            catch (Exception) { }
+            try { RecordAppliedUpdate(appDirectory, previousVersion); }
+            catch (Exception) { }
+
+            var gecikmis = false;
+            try { gecikmis = Updater.Run(baseDirectory, appDirectory); }
+            catch (Exception) { }
+            if (gecikmis)
+            {
+                try { StartCommitter(baseDirectory); }
+                catch (Exception) { }
+            }
+
+            return 0;
+        }
 
         // Panel ancak eşik dolarsa çizilir; hızlı turda hiç oluşturulmaz. Bloktan çıkış
         // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
@@ -126,17 +159,8 @@ internal static class Program
             return 2;
         }
 
-        var start = new ProcessStartInfo
-        {
-            FileName = executable,
-            WorkingDirectory = appDirectory,
-            UseShellExecute = false
-        };
-        // ffmpeg kurulum kökünde duruyor, app klasöründe değil; uygulama onu PATH'ten bulur.
-        start.Environment["PATH"] =
-            Path.Combine(baseDirectory, "tools", "ffmpeg") + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
-        foreach (var argument in args) start.ArgumentList.Add(argument);
-        Process.Start(start);
+        StartApp(executable, appDirectory, baseDirectory, args);
+        AcilisIzi.Yaz("app-dogdu");
 
         // İndirme uygulama ekrana geldikten sonra: açılış yolundaki bir ağ turu, hattın
         // hızına göre açılışı dakikalarca geciktirebilir. İnen sahne bir sonraki açılışta
@@ -156,6 +180,26 @@ internal static class Program
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// Uygulamayı doğurur. Tek yer: hızlı tur da normal tur da buradan geçiyor, ikisi
+    /// yalnız çağrı sırasında ayrılıyor. İz açıksa başlatıcının doğum anı çocuğa geçer.
+    /// </summary>
+    private static void StartApp(string executable, string appDirectory, string baseDirectory, string[] args)
+    {
+        var start = new ProcessStartInfo
+        {
+            FileName = executable,
+            WorkingDirectory = appDirectory,
+            UseShellExecute = false
+        };
+        // ffmpeg kurulum kökünde duruyor, app klasöründe değil; uygulama onu PATH'ten bulur.
+        start.Environment["PATH"] =
+            Path.Combine(baseDirectory, "tools", "ffmpeg") + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
+        if (AcilisIzi.Acik) start.Environment[AcilisIzi.SifirDegiskeni] = AcilisIzi.SifirIsareti;
+        foreach (var argument in args) start.ArgumentList.Add(argument);
+        Process.Start(start);
     }
 
     /// <summary>

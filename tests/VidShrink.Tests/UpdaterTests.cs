@@ -1,8 +1,9 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using VidShrink.Core;
 using Xunit.Abstractions;
 
@@ -1419,19 +1420,29 @@ exit $code
     /// T77-2: <c>Program.cs</c>'te bekleyen geçişi başlatan çağrıyı tutan ölçü. Çağrı
     /// silinirse burası kırmızıya döner; kablo yalnız kaynak metinde tutulabiliyor, çünkü
     /// <c>Main</c> ölçüden çağrılamaz.
+    ///
+    /// <para>16 Eylül 2026'da başlatıcı iki kola ayrıldı: argümanda dosya varken koşan
+    /// hızlı tur ve olağan tur. Ölçü ikisini de sayıyor — her kolda uygulama
+    /// <c>StartApp</c> ile önce doğuyor, geçiş ancak ondan sonra ve kendi kapısının
+    /// (<c>gecikmis</c> / <c>pendingSwap</c>) içinde kuruluyor.</para>
     /// </summary>
     [Fact]
     public void TheLauncherStartsTheCommitterOnTheWayOut()
     {
         var code = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Program.cs"));
 
-        var launch = code.IndexOf("Process.Start(start);", StringComparison.Ordinal);
-        var gate = code.IndexOf("if (pendingSwap)", StringComparison.Ordinal);
-        var call = code.IndexOf("StartCommitter(baseDirectory);", StringComparison.Ordinal);
+        var launches = Regex.Matches(code, @"StartApp\(executable");
+        var calls = Regex.Matches(code, @"StartCommitter\(baseDirectory\);");
+        var gates = Regex.Matches(code, @"if \(pendingSwap\)|if \(gecikmis\)");
 
-        Assert.True(call >= 0, "Program.cs bekleyen geçişi başlatan çağrıyı taşımıyor");
-        Assert.True(gate >= 0 && gate < call, "geçiş çağrısı bekleyen geçiş kapısının içinde değil");
-        Assert.True(launch >= 0 && launch < call, "geçiş, uygulama başlatılmadan önce kuruluyor");
+        Assert.Equal(2, launches.Count);
+        Assert.Equal(2, calls.Count);
+        Assert.Equal(2, gates.Count);
+        for (var i = 0; i < 2; i++)
+        {
+            Assert.True(launches[i].Index < calls[i].Index, "gecis, uygulama baslatilmadan once kuruluyor");
+            Assert.True(gates[i].Index < calls[i].Index, "gecis cagrisi bekleyen gecis kapisinin icinde degil");
+        }
         Assert.Contains("private static void StartCommitter(string baseDirectory)", code, StringComparison.Ordinal);
         Assert.Contains("LauncherUpdate.Commit(baseDirectory, ParentProcessId(args))", code, StringComparison.Ordinal);
     }

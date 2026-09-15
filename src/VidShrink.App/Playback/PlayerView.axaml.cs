@@ -494,15 +494,33 @@ internal partial class PlayerView : UserControl
         DispatcherTimer.RunOnce(() => PauseGlyph.IsVisible = false, MotionFast);
     }
 
+    /// <summary>Çizim saatinin olağan adımı; ekranın kendi hızı.</summary>
+    private const int RenderFrameMs = 16;
+
+    /// <summary>
+    /// İlk karenin beklediği adım. Saat bir tam kare beklerse ilk görüntü en kötü halde
+    /// 16 ms gecikiyor ve bu gecikme motorun kendi payının üstüne biniyor; ilk kare gelene
+    /// kadar saat sıkı koşuyor, kare düştükten sonra olağan adıma dönüyor.
+    /// </summary>
+    private const int FirstFrameMs = 1;
+
     private void StartRender()
     {
         _shown = 0;
         if (_render is null)
         {
-            _render = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
-            _render.Tick += (_, _) => RenderLatest();
+            _render = new DispatcherTimer();
+            _render.Tick += (_, _) =>
+            {
+                var vardi = _shown > 0;
+                RenderLatest();
+                if (!vardi && _shown > 0 && _render is { } saat)
+                    saat.Interval = TimeSpan.FromMilliseconds(RenderFrameMs);
+            };
         }
+        _render.Interval = TimeSpan.FromMilliseconds(FirstFrameMs);
         _render.Start();
+        RenderLatest();
     }
 
     internal bool RenderLatest()
@@ -526,7 +544,7 @@ internal partial class PlayerView : UserControl
         IPlaybackEngine? engine = null;
         try
         {
-            engine = EngineFactory();
+            engine = await Task.Run(EngineFactory).ConfigureAwait(true);
             engine.Faulted += OnFaulted;
             await engine.OpenAsync(path, ct).ConfigureAwait(true);
         }
@@ -559,8 +577,8 @@ internal partial class PlayerView : UserControl
         var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
         _seek.GoTo(resume);
         if (resume > 0) _trace.Add("resume -> " + resume.ToString("0.###"));
-        AfterOpen(path, engine);
         if (!_playing) TogglePlay();
+        AfterOpen(path, engine);
         RefreshState();
     }
 

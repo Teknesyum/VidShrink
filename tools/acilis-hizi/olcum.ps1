@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)][string]$Exe,
     [Parameter(Mandatory = $true)][string]$Klip,
@@ -14,7 +14,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$Adimlar = @('main', 'tek-ornek', 'libmpv-hazir', 'cerceve', 'gecici-temizlik', 'ayar-okundu',
+$Adimlar = @('baslatici', 'app-dogdu', 'main', 'tek-ornek', 'libmpv-hazir', 'cerceve', 'gecici-temizlik', 'ayar-okundu',
              'palet', 'pencere-yapici', 'xaml', 'yapici-bitti', 'pencere-kuruldu',
              'pencere-yuklendi', 'ayarlar', 'varsayilan-oneri', 'giris-canlandirmasi',
              'sekme', 'kare-kaynagi', 'ilk-kare', 'motor-acildi', 'kucultme-yuklendi')

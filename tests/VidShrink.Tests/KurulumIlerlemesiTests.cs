@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.IO;
 using System.Linq;
@@ -202,7 +202,7 @@ public class KurulumIlerlemesiTests
         Assert.Contains("InstallProgress? progress = null", kaynak);
         Assert.Contains("progress?.Step(", kaynak);
         Assert.Contains("\"Sürüm listesi alınıyor\"", kaynak);
-        Assert.Contains("indiriliyor (\" + done + \"/\" + total + \")\"", kaynak);
+        Assert.Contains("indi (\" + sira + \"/\" + total + \")\"", kaynak);
         Assert.Contains("\"Dosyalar yerine taşınıyor\"", kaynak);
         Assert.Contains("progress: progress", program);
         Assert.Contains("progress.WriteLog(", program);
@@ -224,5 +224,65 @@ public class KurulumIlerlemesiTests
 
         Assert.True(prova > 0, "prova kolu yok");
         Assert.True(prova < kurulum, "prova kolu kurulumdan önce dönmeli");
+    }
+
+    /// <summary>
+    /// Bir karelik sure gectiginde zamana bagli adim, kareye bagli adimla birebir ayni:
+    /// katsayilar degismedi, yalnizca neyle carpildigi degisti.
+    /// </summary>
+    [Fact]
+    public void BirKarelikSureEskiAdimlaAyni()
+    {
+        var a = new InstallProgress();
+        var b = new InstallProgress();
+        a.Step(50, 60, "x");
+        b.Step(50, 60, "x");
+
+        for (var i = 0; i < 40; i++)
+        {
+            a.Advance();
+            b.Advance(TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds));
+        }
+
+        Assert.Equal(a.Bar, b.Bar, 9);
+    }
+
+    /// <summary>
+    /// Kare gec dustugunde cubuk ayni yere variyor: iki yarim kare bir tam kare ediyor.
+    /// Cubugun hizi panelin cizim yukune degil gecen sureye bagli olan sey budur.
+    /// </summary>
+    [Fact]
+    public void GecikenKareyiSureTelafiEdiyor()
+    {
+        var tek = new InstallProgress();
+        var yarim = new InstallProgress();
+        tek.Step(50, 60, "x");
+        yarim.Step(50, 60, "x");
+
+        var kare = TimeSpan.FromMilliseconds(InstallProgress.FrameMilliseconds);
+        for (var i = 0; i < 20; i++)
+        {
+            tek.Advance(kare);
+            yarim.Advance(kare / 2);
+            yarim.Advance(kare / 2);
+        }
+
+        Assert.Equal(tek.Bar, yarim.Bar, 6);
+    }
+
+    /// <summary>
+    /// Donmus bir kareden sonra cubuk sicramiyor. Yakalama yasasinin kendi zaman sabiti
+    /// tavan: on saniyelik bir duraklama tek karede hedefe atlamiyor.
+    /// </summary>
+    [Fact]
+    public void UzunDurakCubugaSicratmiyor()
+    {
+        var p = new InstallProgress();
+        p.Step(100, 100, "x");
+
+        p.Advance(TimeSpan.FromSeconds(10));
+
+        Assert.True(p.Bar < 100, "tek karede hedefe varmamali");
+        Assert.True(p.Bar > InstallProgress.MinimumStep, "yine de gorunur ilerlemeli");
     }
 }

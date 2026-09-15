@@ -40,8 +40,8 @@ Beş soru sordu; üçünü burada cevaplıyorum, ikisi kullanıcının kararı:
 - **Doğrulama zemini** mevcut düzenek: eşleşik (paired) A/B, ortanca fark, ve her
   tekrarın hangi yöne baktığı. Ölçüm bu makinede eşleşmemiş karşılaştırmanın
   geçersiz olduğunu gösterdi ([acilis-hizi.md:22-40](olcumler/acilis-hizi.md)).
-- **Hedef eşik** ve **hangi görünür davranışlara dokunulabileceği** kullanıcının;
-  aşağıda iki çatal olarak duruyor.
+- **Hedef eşik** ve **hangi görünür davranışlara dokunulabileceği** kullanıcının kararıydı;
+  16 Eylül 2026'da ikisi de cevaplandı, aşağıda.
 
 ## H0 — Ölçüyü çift tıka kadar geriye çek
 
@@ -157,12 +157,35 @@ Tahminler burada **tahmindir**; hükmü ölçüm verir. `tools/acilis-hizi` `.sl
 eklenip CI'da koşan bir eşik pimi kazanır — bugün bu yolun süresini ölçen **hiçbir
 test yok** ve kazanılan her ms sessizce geri kaybedilebilir.
 
-## İki çatal — kullanıcının kararı
+## İki çatal — cevaplandı (16 Eylül 2026)
 
-**Çatal 1 — hedef eşik.** "ms'ler içinde" ne demek: 100 ms altı mı, 300 ms altı mı,
-yoksa "bugünkünün yarısı" mı? 100 ms altı B4'ü zorunlu kılar; 300 ms A dalgasıyla
-erişilebilir görünüyor.
+**Çatal 1 — hedef eşik: 100 ms altı, mümkünse.** Mümkün değilse erişilebilenin en iyisi.
+Bu eşik B4'ü (render yolunun yeniden yazımı) planın zorunlu bir dalgası yapıyor: A dalgası
+tek başına ~300 ms'e iniyor, 100 ms'in altı motorun kendi payına dokunmadan görünmüyor.
 
-**Çatal 2 — görünür davranışa dokunma izni.** A2'de dört sekmeli kabuk ilk anda
-görünmeyecek; B1'de donanım çözme varsayılan olacak; B4'te render yolu değişecek.
-Yalnız sıralama/erteleme/paralelleştirme mi, yoksa bunlar da masada mı?
+**Çatal 2 — hepsi masada.** Görünür davranış değişebilir: A2'de dört sekmeli kabuk ilk
+anda görünmeyebilir, B1'de donanım çözme varsayılan olabilir, B4'te render yolu değişebilir.
+
+## Yapıldı
+
+**H0 — tartı kuruldu.** Başlatıcının kendi izi var (`src/VidShrink.Launcher/AcilisIzi.cs`);
+sıfır noktası artık başlatıcının doğumu ve bu an `VIDSHRINK_ACILIS_T0` ile app'e geçiyor,
+yani iki sürecin satırları aynı eksende okunuyor. `olcum.ps1` iki yeni adım sayıyor:
+`baslatici`, `app-dogdu`.
+
+**A1 — başlatıcı yoldan çıktı.** Argümanda açılacak bir dosya varsa uygulama bakım
+işlerinin önünde doğuyor; onarım, sürüm işareti ve güncelleme arkasına düşüyor. Bekleyen
+dosyaların taşınması (`ResumePending`) o turda hiç koşmuyor, bir sonraki normal açılışa
+kalıyor. ffmpeg varlık sınaması da atlanıyor: oynatma libmpv ile.
+
+**A3 — motor arayüz ipliğinden çıktı.** `new MpvEngine()` artık `Task.Run` içinde;
+`mpv_initialize` koşarken pencere kendi düzenini kuruyor.
+
+**A4 — ayar yazımları oynatmanın arkasına düştü.** `AfterOpen` (ayar okuması, son
+kullanılanlar listesinin diske yazımı) `TogglePlay`'den sonra çağrılıyor.
+
+**A5 — ilk kare saatten koptu.** Çizim saati ilk kare düşene kadar 1 ms adımla koşuyor,
+sonra 16 ms'e dönüyor; ayrıca kurulur kurulmaz bir kare deneniyor.
+
+Sırada **A2** (oynatıcıyı `MainWindow`'dan önce açmak) ve **B** dalgası var. Her adımın
+kazancı eşleşik A/B ile ölçülüp `docs/olcumler/acilis-hizi.md`'ye yazılacak.

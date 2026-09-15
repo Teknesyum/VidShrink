@@ -1,4 +1,4 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
@@ -1664,8 +1664,17 @@ public sealed class RemoteZip
     private const uint CentralFileHeaderSignature = 0x02014b50;
     private const uint Zip64Marker = 0xFFFFFFFF;
 
+    /// <summary>
+    /// Tek istekte cekilecek en buyuk blok. Bir girdinin yerel basligi ile bir sonrakinin
+    /// basligi arasindaki bosluk normalde dosyanin kendisi kadardir; bundan buyuk bir
+    /// bosluk arsivin duzeninin beklenmedik oldugunu soyler ve iki adimli yola donulur.
+    /// </summary>
+    private const long SingleReadCeiling = 128L * 1024 * 1024;
+
     private readonly IRangeSource _source;
     private readonly Dictionary<string, Entry> _entries = new(StringComparer.Ordinal);
+    private long[] _offsets = Array.Empty<long>();
+    private long _directoryOffset;
 
     private sealed record Entry(string Path, ushort Method, long CompressedSize, long UncompressedSize, long LocalHeaderOffset);
 
@@ -1719,6 +1728,8 @@ public sealed class RemoteZip
             position += 46 + nameLength + extraLength + commentLength;
         }
 
+        zip._directoryOffset = directoryOffset;
+        zip._offsets = zip._entries.Values.Select(e => e.LocalHeaderOffset).Distinct().Order().ToArray();
         return zip;
     }
 
@@ -1732,10 +1743,41 @@ public sealed class RemoteZip
         return null;
     }
 
+    /// <summary>
+    /// Girdinin yerel basligindan sonraki girdinin basligina kadar olan araligi soyler.
+    /// Merkezi dizin her girdinin basligini bildirdigi icin bu sinir sunucuya sorulmadan
+    /// bilinir; son girdide sinir merkezi dizinin kendisidir.
+    /// </summary>
+    private long Sinir(long offset)
+    {
+        var index = Array.BinarySearch(_offsets, offset);
+        if (index < 0) index = ~index - 1;
+        var next = index >= 0 && index + 1 < _offsets.Length ? _offsets[index + 1] : _directoryOffset;
+        return Math.Max(next, offset);
+    }
+
     public async Task<byte[]> ExtractAsync(string entryPath, CancellationToken cancellationToken)
     {
         if (!_entries.TryGetValue(entryPath, out var entry))
             throw new FileNotFoundException($"Arşivde bulunamadı: {entryPath}");
+
+        // Bir dosya iki istek ediyordu: once otuz baytlik yerel baslik, sonra govde. Yuz
+        // dosyalik bir guncellemede bu, indirilen bayttan bagimsiz olarak iki kat gidis
+        // donus demekti. Baslik ile govde bitisik durdugu ve bitis siniri merkezi dizinden
+        // bilindigi icin ikisi tek aralikla cekiliyor.
+        var blok = Sinir(entry.LocalHeaderOffset) - entry.LocalHeaderOffset;
+        if (blok >= 30 + entry.CompressedSize && blok <= SingleReadCeiling)
+        {
+            var whole = await _source.ReadAsync(entry.LocalHeaderOffset, (int)blok, cancellationToken);
+            if (whole.Length >= 30)
+            {
+                var names = BinaryPrimitives.ReadUInt16LittleEndian(whole.AsSpan(26));
+                var extras = BinaryPrimitives.ReadUInt16LittleEndian(whole.AsSpan(28));
+                var body = 30 + names + extras;
+                if (body + entry.CompressedSize <= whole.Length)
+                    return Inflate(entry, whole.AsSpan(body, (int)entry.CompressedSize).ToArray());
+            }
+        }
 
         var header = await _source.ReadAsync(entry.LocalHeaderOffset, 30, cancellationToken);
         if (header.Length < 30) throw new InvalidDataException("Yerel başlık okunamadı.");
@@ -1746,13 +1788,18 @@ public sealed class RemoteZip
         var payload = await _source.ReadAsync(dataOffset, (int)entry.CompressedSize, cancellationToken);
         if (payload.Length != entry.CompressedSize) throw new InvalidDataException("Dosya eksik indi.");
 
+        return Inflate(entry, payload);
+    }
+
+    private static byte[] Inflate(Entry entry, byte[] payload)
+    {
         if (entry.Method == 0) return payload;
         if (entry.Method != 8) throw new NotSupportedException($"Desteklenmeyen sıkıştırma: {entry.Method}");
 
         using var compressed = new MemoryStream(payload);
         using var inflater = new DeflateStream(compressed, CompressionMode.Decompress);
         using var output = new MemoryStream((int)entry.UncompressedSize);
-        await inflater.CopyToAsync(output, cancellationToken);
+        inflater.CopyTo(output);
         return output.ToArray();
     }
 }

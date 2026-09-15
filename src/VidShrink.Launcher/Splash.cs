@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
 using System.IO.Compression;
 using System.Resources;
@@ -80,9 +80,12 @@ internal sealed class SplashGate : IDisposable
             Trace("shown");
             using var window = SplashWindow.Create();
             var started = DateTime.UtcNow;
+            var previous = started;
             do
             {
-                window.Render(_progress, DateTime.UtcNow - started);
+                var now = DateTime.UtcNow;
+                window.Render(_progress, now - started, now - previous);
+                previous = now;
             }
             while (!_closing.Wait(FrameInterval) && !Stalled() && !Settled());
         }
@@ -400,7 +403,7 @@ internal sealed class SplashWindow : IDisposable
     public static SplashWindow Create() => new();
 
     /// <summary>Bir kare çizer ve pencereyi tazeler.</summary>
-    public void Render(InstallProgress progress, TimeSpan elapsed)
+    public void Render(InstallProgress progress, TimeSpan elapsed, TimeSpan delta)
     {
         Pump();
 
@@ -418,7 +421,7 @@ internal sealed class SplashWindow : IDisposable
         DrawLine(statusBox, progress.Sentence, _statusFont, _art.ColorRef("TextBodyColor"));
 
         var state = progress.State;
-        var bar = progress.Advance();
+        var bar = progress.Advance(delta);
         DrawLine(_art.Box("percent"), progress.PercentText, _statusFont, StateColor(state), RightAligned);
         DrawLog(progress.Log);
         DrawFill(bar, state);

@@ -1,6 +1,11 @@
 # VidShrink.Tests
 
-Tek test projesi. `dotnet test` tamamı yeşil olmadan teslim yok; paralel koşum kapalı (`LanguageTests.cs` özniteliği).
+Tek test projesi. Paralel koşum kapalı (`LanguageTests.cs` özniteliği).
+
+**Ne zaman ne koşulur:** yerelde yalnız dokunulan alanın filtresi (`--filter`), her
+teslimde. Tam süit yerelde koşulmaz — 35 dakika sürüyor ve CI'da zaten paralel koşuyor;
+itmeden sonra `gh run list` yeşili teslimin şartı. `tools/kosum-kapisi` yalnız majör
+sürümden (`x.0.0`) önce koşar.
 
 - Zamanlama ölçen testleri yük altında okuma; yerelde filtreli koş, tam süit CI'da.
 - Çıktı ve kanıt dosyaları `.calisma/` altına (`GirdiKanit`, `MotorKanit`).
