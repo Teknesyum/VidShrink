@@ -7,6 +7,32 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-09-16
+
+### Changed
+
+- The launcher no longer stands between a double-click and the window. When a file is
+  passed on the command line it starts the application first and does its housekeeping —
+  repair, version marker, update check — behind it. Pending file moves are skipped on
+  that path and left to the next ordinary launch.
+- The playback engine is created on a worker thread, the recent-files write and settings
+  read moved behind playback, and the render clock no longer waits a full frame for the
+  first picture.
+- Updates download in six lanes instead of one at a time, and each file now costs a
+  single HTTP range request instead of two: the end of a file's payload is derived from
+  the central directory, so the local header and the payload arrive together. On the
+  measured 0.3.0 to 0.4.1 difference that removes 375 round trips.
+- The install bar advances by elapsed time rather than by frame count, with the same
+  constants. One frame's worth of time yields exactly the old step, so the law did not
+  change — only what it is multiplied by. A late frame no longer makes the bar stutter.
+
+### Measured
+
+- Double-click to first frame, paired warm run of 14 repetitions: 1796.5 ms before,
+  1747.7 ms after, a median paired difference of -71.0 ms with 9 of 14 pairs favouring
+  the new build. The remaining 1.7 seconds sit inside the application. See
+  `docs/olcumler/acilis-hizi.md`.
+
 ## [0.5.4] - 2026-09-15
 
 ### Added

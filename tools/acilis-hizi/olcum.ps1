@@ -14,7 +14,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$Adimlar = @('baslatici', 'app-dogdu', 'main', 'tek-ornek', 'libmpv-hazir', 'cerceve', 'gecici-temizlik', 'ayar-okundu',
+$Adimlar = @('kabuk-ilk-kare', 'baslatici', 'app-dogdu', 'main', 'tek-ornek', 'libmpv-hazir', 'cerceve', 'gecici-temizlik', 'ayar-okundu',
              'palet', 'pencere-yapici', 'xaml', 'yapici-bitti', 'pencere-kuruldu',
              'pencere-yuklendi', 'ayarlar', 'varsayilan-oneri', 'giris-canlandirmasi',
              'sekme', 'kare-kaynagi', 'ilk-kare', 'motor-acildi', 'kucultme-yuklendi')
@@ -51,15 +51,26 @@ function Kosum([string]$KosanExe, [string]$Iz, [string]$Etiketi, [int]$Sira, [st
             $metin = Get-Content -LiteralPath $Iz -Raw -ErrorAction SilentlyContinue
             if ($metin -and $metin -match '(?m)^ilk-kare\t') { $geldi = $true; break }
         }
-        if ($surec.HasExited) { break }
+        if ($surec.HasExited -and -not (Test-Path -LiteralPath $Iz) -and
+            $bekleme.Elapsed.TotalSeconds -gt 5) { break }
         Start-Sleep -Milliseconds 20
     }
+
+    $disSaat = if ($geldi) { $bekleme.Elapsed.TotalMilliseconds } else { $null }
 
     if ($geldi) { Start-Sleep -Milliseconds 1500 }
 
     try { Stop-Process -Id $surec.Id -Force -ErrorAction Stop } catch {}
     try { $surec.WaitForExit(10000) | Out-Null } catch {}
     if (-not $surec.HasExited) { throw "Surec kapanmadi: pid $($surec.Id)" }
+
+    $kok = Split-Path -Parent $KosanExe
+    $cocuklar = @(Get-Process -Name 'VidShrink', 'VidShrink.App' -ErrorAction SilentlyContinue |
+                  Where-Object { $_.Path -and $_.Path.StartsWith($kok, [StringComparison]::OrdinalIgnoreCase) })
+    foreach ($cocuk in $cocuklar) {
+        try { Stop-Process -Id $cocuk.Id -Force -ErrorAction Stop } catch {}
+        try { $cocuk.WaitForExit(10000) | Out-Null } catch {}
+    }
 
     $satirlar = @{}
     if (Test-Path -LiteralPath $Iz) {
@@ -75,6 +86,7 @@ function Kosum([string]$KosanExe, [string]$Iz, [string]$Etiketi, [int]$Sira, [st
     foreach ($adim in $Adimlar) {
         $kayit[$adim] = if ($satirlar.ContainsKey($adim)) { $satirlar[$adim] } else { $null }
     }
+    $kayit['kabuk-ilk-kare'] = $disSaat
     Write-Host ("{0,3}. {1,-26} ilk-kare={2} ms" -f $Sira, $Etiketi, $kayit['ilk-kare'])
     return [pscustomobject]$kayit
 }
@@ -155,6 +167,9 @@ $govde = New-Object System.Collections.ArrayList
 [void]$govde.Add("makine   : $env:COMPUTERNAME / $([Environment]::OSVersion.VersionString)")
 [void]$govde.Add("an       : $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))")
 [void]$govde.Add("birim    : ms, surec yaratilmasindan (Process.StartTime) itibaren")
+[void]$govde.Add("kabuk-ilk-kare : ms, olcerin kendi saati; Start-Process cagrisindan ilk-kare satiri")
+[void]$govde.Add("           gorulene kadar, yoklama 20 ms. Sifir noktasi yapidan bagimsiz oldugu")
+[void]$govde.Add("           icin iki yapiyi karsilastiran tek adil sutun budur.")
 [void]$govde.Add("p95      : en yakin sira yontemi, ceil(0.95*n)")
 if ($ExeB -ne '') { [void]$govde.Add("eslesik  : her tekrarda iki yapi, sira tekrardan tekrara donuyor") }
 [void]$govde.Add("")

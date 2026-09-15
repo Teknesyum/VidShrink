@@ -23,6 +23,12 @@ baktigi okunarak verilir. Ortanca sutunlari kaymayi tasir, hukum vermez.
 oncesi payi bu sayiya **girmez**. Kanca uretimde bedelsiz: degisken bosken
 `AcilisIzi.Yaz` tek bir ortam degiskeni okumasidir, `IlkKareyiBekle` hic kurulmaz.
 
+**Olculen sey `VidShrink.exe`, uygulama degil.** Baslatici uygulamayi doguruyor ve kendi
+cikiyor; bu yuzden surecin olmesi kosumun bittigi anlamina gelmez. Dongu izi bekler,
+oldurulen sey de baslatici degil olcum klasorunden kosan uygulamadir. Kullanicinin kurulu
+VidShrink'i ayni adi tasiyor; oldurmeden once yolun olcum klasorunun altinda oldugu
+dogrulanir.
+
 **Her kosum kendi tek ornek kanalini alir** (`VIDSHRINK_INSTANCE_CHANNEL`): yoksa ikinci
 acilis yolu kosan surece iletip cikar ve olcum bos doner.
 

@@ -138,3 +138,60 @@ bile 747 → 1456'ya çıktı). O setten hüküm çıkarılmadı; rapordaki büt
 | Klipler | `.calisma/dalga7c/klip/kucuk.mp4`, `buyuk-1080p.mp4` |
 
 Düzeneğin kendisi ve kullanımı: `tools/acilis-hizi/`.
+
+
+# Hipersürüş A dalgası — 16 Eylül 2026
+
+Düzenek aynı, iki şey değişti. Birincisi **ölçülen süreç**: artık `VidShrink.exe`
+(başlatıcı) koşuyor, uygulama değil — kullanıcının çift tıkladığı şey bu. İkincisi
+**dış saat**: `kabuk-ilk-kare` sütunu ölçerin kendi kronometresinden geliyor,
+`Start-Process` çağrısından ilk kare satırı görülene kadar, 20 ms yoklamayla.
+
+Bu sütun zorunluydu. Tabanın izi sıfır noktası olarak uygulamanın doğumunu alıyor,
+yeni yapınınki başlatıcının doğumunu; `ilk-kare` sütunları bu yüzden aynı şeyi
+ölçmüyor ve yeni yapı haksız yere ~70 ms geride görünüyor. Sıfır noktası yapıdan
+bağımsız olan tek sütun `kabuk-ilk-kare`'dir, hüküm oradan verilir.
+
+Eşleşik sıcak, 14 tekrar, 6,2 MB 720p klip, taban `1a1385c1`, yeni `d2ea8bd5`:
+
+| Sütun | Taban ortanca | Hipersürüş ortanca | Eşleşik fark |
+| --- | --- | --- | --- |
+| `kabuk-ilk-kare` | 1796,5 ms | 1747,7 ms | **−71,0 ms**, 14 çiftin 9'u yeni yapı lehine |
+| `ilk-kare` (izden) | 1692,4 ms | 1734,4 ms | +12,2 ms — sıfır noktası farklı, **hüküm vermez** |
+| `app-dogdu` | yok | 67,4 ms | başlatıcının uygulamayı doğurmaya kadar harcadığı süre |
+
+**Hüküm: A dalgası ~71 ms kazandırdı, hedef 100 ms'e 1,7 saniye var.** Fark
+gürültülü (en az −267,5, en çok +101,5); ortancası tutarlı ama kazanç, açılışın
+%4'ü. Bu şaşırtıcı değil: A dalgasının dokunduğu yer başlatıcının bakım işleriydi
+ve o işler zaten ~70 ms'ti.
+
+Kalan 1,7 saniyenin dağılımı yeni yapının kendi tablosundan okunur ve hepsi
+uygulamanın içinde:
+
+| Aralık | Süre | Ne yapılıyor |
+| --- | --- | --- |
+| `app-dogdu` → `pencere-yapici` | ~660 ms | .NET başlangıcı, palet, geçici temizlik |
+| `pencere-yapici` → `pencere-yuklendi` | ~700 ms | XAML açılımı, yedi sekmenin kurulması |
+| `sekme` → `ilk-kare` | ~275 ms | `mpv_create` ve ilk çözme |
+
+Ortadaki 700 ms **A2**'nin (oynatıcıyı `MainWindow`'dan önce açmak), sondaki 275 ms
+**B4**'ün konusu. 100 ms eşiği bu ikisi yapılmadan görünmüyor.
+
+## Ölçülürken düzeltilen iki şey
+
+**Betik başlatıcının ölümünü koşumun sonu sanıyordu.** Başlatıcı uygulamayı doğurup
+hemen çıkıyor; ilk koşum 24 tekrarın hepsinde boş döndü. Döngü artık izi bekliyor
+([olcum.ps1:57](../../tools/acilis-hizi/olcum.ps1:57)).
+
+**Öldürme adla değil yolla yapılıyor.** Ölçüm uygulamayı kapatırken `VidShrink.App`
+adını arıyordu; kullanıcının masaüstündeki kurulumu da aynı adı taşıyor. Artık
+yalnız ölçüm klasörünün altından koşan süreç öldürülüyor.
+
+## Kanıt
+
+| Ne | Yol |
+| --- | --- |
+| Eşleşik sıcak, özet (depoya alındı) | `docs/olcumler/T-hipersurus-A-ozet.txt` |
+| Eşleşik sıcak, ham | `.calisma/hiper/eslesik/ham-taban-vs-hipersurus-sicak.csv` |
+| İki yapı | `.calisma/hiper/taban/`, `.calisma/hiper/yeni/` |
+| Klip | `.calisma/hiper/klip/kucuk.mp4` (720p30, 20 sn, 6,2 MB) |

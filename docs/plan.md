@@ -187,5 +187,14 @@ kullanılanlar listesinin diske yazımı) `TogglePlay`'den sonra çağrılıyor.
 **A5 — ilk kare saatten koptu.** Çizim saati ilk kare düşene kadar 1 ms adımla koşuyor,
 sonra 16 ms'e dönüyor; ayrıca kurulur kurulmaz bir kare deneniyor.
 
+**Ölçüldü (16 Eylül 2026).** Eşleşik sıcak, 14 tekrar, taban `1a1385c1` — yeni `d2ea8bd5`:
+dış saatte (`kabuk-ilk-kare`) ortanca fark **−71,0 ms**, 14 çiftin 9'u yeni yapı lehine.
+Taban 1796,5 ms, yeni 1747,7 ms. Tam tablo ve okuma tuzakları:
+[acilis-hizi.md](olcumler/acilis-hizi.md).
+
+**Hedefe 1,7 saniye var.** Kalanın hepsi uygulamanın içinde: ~700 ms XAML açılımı ve yedi
+sekmenin kurulması (**A2**), ~275 ms `mpv_create` ve ilk çözme (**B4**). 100 ms eşiği bu
+ikisi yapılmadan görünmüyor; A dalgasının dokunabildiği yer zaten ~70 ms'ti.
+
 Sırada **A2** (oynatıcıyı `MainWindow`'dan önce açmak) ve **B** dalgası var. Her adımın
 kazancı eşleşik A/B ile ölçülüp `docs/olcumler/acilis-hizi.md`'ye yazılacak.

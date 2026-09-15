@@ -1,0 +1,85 @@
+kip      : sicak
+klip     : C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\klip\kucuk.mp4 (6.2 MB)
+tekrar   : 14
+makine   : DESKTOP-0J80KVV / Microsoft Windows NT 10.0.22631.0
+an       : 2026-09-16 01:33:13
+birim    : ms, surec yaratilmasindan (Process.StartTime) itibaren
+kabuk-ilk-kare : ms, olcerin kendi saati; Start-Process cagrisindan ilk-kare satiri
+           gorulene kadar, yoklama 20 ms. Sifir noktasi yapidan bagimsiz oldugu
+           icin iki yapiyi karsilastiran tek adil sutun budur.
+p95      : en yakin sira yontemi, ceil(0.95*n)
+eslesik  : her tekrarda iki yapi, sira tekrardan tekrara donuyor
+
+== taban ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\taban\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n   en_az ortanca     p95  en_cok
+----                 -   ----- -------     ---  ------
+kabuk-ilk-kare      14 1693,80 1796,50 2039,60 2039,60
+main                14   40,70   55,60   65,00   65,00
+tek-ornek           14   46,60   65,00   74,40   74,40
+libmpv-hazir        14   57,30   78,80   87,40   87,40
+cerceve             14  299,50  381,30  404,10  404,10
+gecici-temizlik     14  396,10  467,00  493,90  493,90
+ayar-okundu         14  304,20  385,20  408,30  408,30
+palet               14  512,10  575,20  611,40  611,40
+pencere-yapici      14  555,50  659,80  737,20  737,20
+xaml                14  850,80  948,00 1023,40 1023,40
+yapici-bitti        14  949,70 1040,90 1111,80 1111,80
+pencere-kuruldu     14 1062,40 1146,80 1216,90 1216,90
+pencere-yuklendi    14 1260,70 1346,20 1416,30 1416,30
+ayarlar             14 1291,90 1374,60 1444,40 1444,40
+giris-canlandirmasi 14 1294,00 1376,90 1446,40 1446,40
+sekme               14 1296,30 1378,90 1448,40 1448,40
+kare-kaynagi        14 1597,90 1691,70 1962,70 1962,70
+ilk-kare            14 1598,40 1692,40 1963,70 1963,70
+motor-acildi        14 1567,70 1659,60 1732,20 1732,20
+
+== hipersurus ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\yeni\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n   en_az ortanca     p95  en_cok
+----                 -   ----- -------     ---  ------
+kabuk-ilk-kare      14 1662,80 1747,70 1810,80 1810,80
+baslatici           14   48,60   57,60   73,00   73,00
+app-dogdu           14   58,40   67,40   86,20   86,20
+main                14  114,10  122,20  138,40  138,40
+tek-ornek           14  120,10  128,40  143,20  143,20
+libmpv-hazir        14  132,80  143,10  157,80  157,80
+cerceve             14  426,80  450,90  489,60  489,60
+gecici-temizlik     14  510,80  542,60  582,00  582,00
+ayar-okundu         14  430,90  455,20  495,00  495,00
+palet               14  615,70  650,80  708,90  708,90
+pencere-yapici      14  656,40  743,30  822,90  822,90
+xaml                14  917,80 1014,40 1100,70 1100,70
+yapici-bitti        14 1012,00 1105,90 1188,90 1188,90
+pencere-kuruldu     14 1123,40 1213,70 1296,70 1296,70
+pencere-yuklendi    14 1317,30 1410,40 1486,80 1486,80
+ayarlar             14 1349,70 1438,60 1516,30 1516,30
+giris-canlandirmasi 14 1351,70 1440,60 1518,30 1518,30
+sekme               14 1353,60 1442,60 1520,30 1520,30
+kare-kaynagi        14 1636,00 1731,60 1797,60 1797,60
+ilk-kare            14 1638,70 1734,40 1800,80 1800,80
+motor-acildi        14 1629,50 1725,60 1792,20 1792,20
+
+== eslesik fark (hipersurus eksi taban, eksi deger hipersurus lehine) ==
+
+adim                cift fark_ortanca fark_en_az fark_en_cok b_lehine_cift
+----                ---- ------------ ---------- ----------- -------------
+kabuk-ilk-kare        14       -71,00    -267,50      101,50             9
+main                  14        68,10      58,20       95,70             0
+tek-ornek             14        63,20      53,80       96,10             0
+libmpv-hazir          14        64,20      55,30      100,50             0
+cerceve               14        73,30      44,80      190,10             0
+gecici-temizlik       14        82,20      35,10      185,90             0
+ayar-okundu           14        73,60      45,00      190,80             0
+palet                 14        70,20      37,70      196,80             0
+pencere-yapici        14        85,90     -40,70      267,40             4
+xaml                  14        72,30     -60,60      249,90             4
+yapici-bitti          14        70,70     -53,70      238,10             4
+pencere-kuruldu       14        71,60     -46,70      186,50             4
+pencere-yuklendi      14        65,90     -43,00      183,00             4
+ayarlar               14        64,60     -38,20      189,30             4
+giris-canlandirmasi   14        64,40     -38,50      189,40             4
+sekme                 14        64,40     -38,70      189,40             4
+kare-kaynagi          14        10,20    -198,90      159,50             5
+ilk-kare              14        12,20    -196,30      162,00             6
+motor-acildi          14        73,00     -31,60      179,40             4
