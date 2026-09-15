@@ -1,0 +1,90 @@
+kip      : sicak
+klip     : C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\klip\kucuk.mp4 (6.2 MB)
+tekrar   : 14
+makine   : DESKTOP-0J80KVV / Microsoft Windows NT 10.0.22631.0
+an       : 2026-09-16 02:47:51
+birim    : ms, surec yaratilmasindan (Process.StartTime) itibaren
+kabuk-ilk-kare : ms, olcerin kendi saati; Start-Process cagrisindan ilk-kare satiri
+           gorulene kadar, yoklama 20 ms. Sifir noktasi yapidan bagimsiz oldugu
+           icin iki yapiyi karsilastiran tek adil sutun budur.
+p95      : en yakin sira yontemi, ceil(0.95*n)
+eslesik  : her tekrarda iki yapi, sira tekrardan tekrara donuyor
+
+== taban ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\yeni\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n   en_az ortanca     p95  en_cok
+----                 -   ----- -------     ---  ------
+kabuk-ilk-kare      14 5715,80 6506,30 7988,40 7988,40
+baslatici           14   90,60  164,90  722,20  722,20
+app-dogdu           14  110,60  208,90  768,50  768,50
+main                14  214,10  328,00 1019,60 1019,60
+tek-ornek           14  226,50  359,00 1029,00 1029,00
+libmpv-hazir        14  263,20  392,80 1089,40 1089,40
+cerceve             14  948,00 1220,20 2260,40 2260,40
+gecici-temizlik     14 1269,50 1613,40 2776,20 2776,20
+ayar-okundu         14  952,80 1232,80 2265,60 2265,60
+palet               14 2129,40 2416,40 3555,10 3555,10
+pencere-yapici      14 2240,30 2732,50 3855,80 3855,80
+xaml                14 3539,60 4267,50 5567,20 5567,20
+yapici-bitti        14 4001,10 4734,20 6108,80 6108,80
+pencere-kuruldu     14 4250,20 5072,50 6471,30 6471,30
+pencere-yuklendi    14 5076,10 5881,90 7351,90 7351,90
+ayarlar             14 5136,70 5943,80 7419,50 7419,50
+giris-canlandirmasi 14 5140,70 5948,50 7422,20 7422,20
+sekme               14 5147,20 5954,20 7425,20 7425,20
+kare-kaynagi        14 5664,20 6473,80 7955,10 7955,10
+ilk-kare            14 5692,80 6491,80 7961,30 7961,30
+motor-acildi        14 5649,40 6458,70 7932,00 7932,00
+
+== hiperC ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\c\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n   en_az ortanca     p95  en_cok
+----                 -   ----- -------     ---  ------
+kabuk-ilk-kare      14 3321,10 4064,00 5092,30 5092,30
+baslatici           14   75,30  128,40  390,50  390,50
+perde               14  149,90  211,40  669,10  669,10
+app-dogdu           14  116,30  164,40  627,20  627,20
+main                14  240,50  285,80  999,20  999,20
+tek-ornek           14  247,90  291,20 1021,40 1021,40
+libmpv-hazir        14  276,60  333,00 1060,50 1060,50
+cerceve             14  725,80  888,00 1844,20 1844,20
+gecici-temizlik     14 1029,50 1355,90 2267,40 2267,40
+ayar-okundu         14  737,60  900,40 1873,10 1873,10
+palet               14  738,40  901,60 1876,70 1876,70
+pencere-yapici      14  825,90 1071,10 1937,50 1937,50
+xaml                14 1659,40 2296,30 3344,80 3344,80
+yapici-bitti        14 2021,30 2771,90 3798,50 3798,50
+pencere-kuruldu     14 2366,90 3185,00 4114,60 4114,60
+pencere-yuklendi    14 2811,70 3591,60 4582,80 4582,80
+ayarlar             14 2847,50 3629,60 4618,40 4618,40
+giris-canlandirmasi 14 2849,40 3630,60 4620,10 4620,10
+sekme               14 2853,30 3632,30 4623,90 4623,90
+kare-kaynagi        14 3254,60 4022,90 5045,80 5045,80
+ilk-kare            14 3260,20 4027,20 5051,40 5051,40
+motor-acildi        14 3244,40 4012,70 5033,80 5033,80
+
+== eslesik fark (hiperC eksi taban, eksi deger hiperC lehine) ==
+
+adim                cift fark_ortanca fark_en_az fark_en_cok b_lehine_cift
+----                ---- ------------ ---------- ----------- -------------
+kabuk-ilk-kare        14     -2603,30   -4422,70    -1402,80            14
+baslatici             14         3,20    -607,60      277,90             6
+app-dogdu             14       -15,30    -625,20      469,50             8
+main                  14       -10,40    -773,90      756,20             7
+tek-ornek             14       -22,80    -773,00      770,60             7
+libmpv-hazir          14       -14,30    -775,70      777,90             7
+cerceve               14      -310,20   -1456,30      835,40            13
+gecici-temizlik       14      -267,20   -1442,90      760,90            10
+ayar-okundu           14      -328,00   -1453,20      837,20            13
+palet                 14     -1548,50   -2741,80     -517,40            14
+pencere-yapici        14     -1703,20   -2852,60     -658,10            14
+xaml                  14     -2034,00   -3469,40     -818,30            14
+yapici-bitti          14     -2076,70   -3614,70     -860,20            14
+pencere-kuruldu       14     -1995,30   -3681,40     -978,90            14
+pencere-yuklendi      14     -2473,60   -4249,40    -1261,90            14
+ayarlar               14     -2488,00   -4287,70    -1286,90            14
+giris-canlandirmasi   14     -2491,20   -4289,50    -1289,10            14
+sekme                 14     -2494,60   -4291,00    -1290,40            14
+kare-kaynagi          14     -2619,80   -4415,30    -1390,70            14
+ilk-kare              14     -2625,90   -4417,70    -1412,60            14
+motor-acildi          14     -2615,00   -4408,20    -1384,70            14

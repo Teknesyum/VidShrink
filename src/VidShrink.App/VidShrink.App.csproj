@@ -8,6 +8,15 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\VidShrink.ico</ApplicationIcon>
+    <TieredPGO>true</TieredPGO>
+  </PropertyGroup>
+
+  <!-- C1: acilista butun IL'i JIT'lemek olculen kuyrugun buyuk parcasiydi. ReadyToRun
+       onceden derlenmis kodu pakete koyuyor; yayin buyuyor, acilis kisaliyor. Yalniz
+       yayinda acik, gelistirme derlemesi degismiyor. -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishReadyToRunComposite>false</PublishReadyToRunComposite>
   </PropertyGroup>
 
   <ItemGroup>

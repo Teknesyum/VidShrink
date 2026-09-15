@@ -526,6 +526,28 @@ public partial class MainWindow : Window
         {
             ReportSourceError($"{Say("main.error.startup")}: {ex.Message}");
         }
+        finally
+        {
+            AcilisPerdesi.Kapat();
+        }
+    }
+
+    /// <summary>
+    /// Açılış perdesini ilk karenin geldiği anda kaldırır. Kare <c>PlayerView</c>'in çizim
+    /// saatinden geliyor; buradan görünen işaret görüntünün kaynağının dolması. Saat kare
+    /// düşünce duruyor, dosya hiç açılamazsa <see cref="OnWindowLoaded"/>'ın sonu perdeyi
+    /// zaten kaldırıyor.
+    /// </summary>
+    private void PerdeyiIzle()
+    {
+        var saat = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(1) };
+        saat.Tick += (_, _) =>
+        {
+            if (Player.Frame.Source is null) return;
+            saat.Stop();
+            AcilisPerdesi.Kapat();
+        };
+        saat.Start();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -2783,6 +2805,7 @@ public partial class MainWindow : Window
         PlayerView.Echo("startup-tab=" + Tabs.SelectedIndex + "|header=" + TabHeaderText((TabItem)Tabs.Items[Tabs.SelectedIndex]!));
         AcilisIzi.Yaz("sekme");
         IlkKareyiBekle();
+        PerdeyiIzle();
         try { await Player.OpenAsync(path); }
         catch (Exception ex) { ReportPlayerOpenFailure(ex); }
         AcilisIzi.Yaz("motor-acildi");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -175,6 +175,10 @@ public sealed class SplashTests
     /// <summary>
     /// K1'in kaynaktaki karşılığı: eşik bir sabit ve panel yalnız o sayaç dolduğunda
     /// kuruluyor. Eşiğin düşürülmesi ya da sayacın kaldırılması buradan görülür.
+    ///
+    /// <para>16 Eylül 2026'da eşik çağırana geçti: açılış perdesi aynı paneli sıfır
+    /// gecikmeyle açıyor. Kurulum panelinin eşiği değişmedi — parametresiz <c>Arm</c> hâlâ
+    /// <c>Threshold</c> veriyor ve <c>Program.cs</c> yalnız onu çağırıyor.</para>
     /// </summary>
     [Fact]
     public void ThresholdIsFourHundredMillisecondsAndGuardsEveryDraw()
@@ -182,12 +186,13 @@ public sealed class SplashTests
         var source = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Splash.cs"));
         Assert.Contains("Threshold = TimeSpan.FromMilliseconds(400)", source);
 
-        // Pencere yalnız Show içinde kuruluyor, Show da yalnız sayaçtan çağrılıyor.
-        Assert.Contains("new Timer(_ => gate.Show(), null, Threshold", source);
+        Assert.Contains("new Timer(_ => gate.Show(), null, gecikme", source);
+        Assert.Contains("Arm(InstallProgress progress) => Arm(progress, Threshold);", source);
         Assert.Single(Regex.Matches(source, @"SplashWindow\.Create\(\)"));
 
         var program = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Launcher", "Program.cs"));
         Assert.Contains("using (SplashGate.Arm(", program);
+        Assert.Single(Regex.Matches(program, @"SplashGate\.Arm\("));
     }
 
     /// <summary>

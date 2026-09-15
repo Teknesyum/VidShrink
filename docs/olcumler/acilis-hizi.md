@@ -195,3 +195,74 @@ yalnız ölçüm klasörünün altından koşan süreç öldürülüyor.
 | Eşleşik sıcak, ham | `.calisma/hiper/eslesik/ham-taban-vs-hipersurus-sicak.csv` |
 | İki yapı | `.calisma/hiper/taban/`, `.calisma/hiper/yeni/` |
 | Klip | `.calisma/hiper/klip/kucuk.mp4` (720p30, 20 sn, 6,2 MB) |
+
+## Hipersürüş C dalgası — 16 Eylül 2026
+
+Eşleşik sıcak, 14 tekrar, 720p30 20 sn 6,2 MB klip. Taban `20208611` (sürüm 0.5.5), yeni
+yapı C dalgası. Ham özet: [T-hipersurus-C-ozet.txt](T-hipersurus-C-ozet.txt).
+
+**Bu oturum yüklü bir makinede koştu.** Taban aynı yapı olduğu halde A dalgası ölçümünde
+1796,5 ms veren sütun burada 6506,3 ms veriyor — makine ~3,6 kat kaymış. Bu yüzden mutlak
+sayılar iki oturum arasında karşılaştırılmaz; hüküm yalnız `eşleşik fark` tablosundan
+okunur, orada iki yapı aynı tekrarda sırayla koşuyor.
+
+### Hüküm
+
+| Sütun | Taban ortanca | C ortanca | Eşleşik fark ortancası | C lehine çift |
+| --- | --- | --- | --- | --- |
+| `kabuk-ilk-kare` (dış saat) | 6506,3 ms | 4064,0 ms | **−2603,3 ms** | **14/14** |
+
+En az −4422,7, en çok −1402,8. On dört çiftin **hepsi** aynı yöne bakıyor; A dalgasında
+bu sayı 9/14 ve fark −71,0 ms'ti.
+
+### Perde
+
+Yeni `perde` adımı: başlatıcının doğumundan ekranda ilk görüntü olana kadar geçen süre.
+
+| | Ortanca | En az | p95 |
+| --- | --- | --- | --- |
+| `perde` | 211,4 ms | 149,9 ms | 669,1 ms |
+
+Aynı koşumda tabanın ilk karesi 6506,3 ms'te geliyor, yani kullanıcı **6,5 saniye boş
+ekrana** bakıyordu; perdeyle ekran 211 ms'te doluyor. Makinenin kayması bu sütunu da
+büyütüyor: aynı kaymayla A dalgası oturumuna indirgenirse karşılığı ~58 ms. **100 ms
+hedefi bu saatte tutuluyor**, ama sayının kendisi yüklü makinede 211 ms.
+
+Perde bir örtü değil: uygulamanın "ilk karem ekranda" işareti gelene kadar duruyor,
+gelince kalkıyor. İşaret hiç gelmezse 8 saniyelik tavanla kalkıyor.
+
+### Nereden geldi
+
+Ortanca sütunları kaymayı taşıyor; aşağıdaki paylar iki yapının **kendi içinde**
+ardışık iki işaretin ortancası çıkarılarak okundu, yani yaklaşık.
+
+| Adım | Taban payı | C payı | Not |
+| --- | --- | --- | --- |
+| `ayar-okundu` → `palet` | 1183,6 ms | **1,2 ms** | C3: yürürlükteki palet yeniden uygulanmıyor |
+| `pencere-yapici` → `xaml` | 1535,0 ms | 1225,2 ms | C1: XAML açılımının JIT payı düştü |
+| `app-dogdu` → `cerceve` | 1011,3 ms | 723,6 ms | C1: .NET ve Avalonia başlatması |
+| `sekme` → `motor-acildi` | 504,5 ms | 380,4 ms | dokunulmadı; kayma |
+
+Paletin payı **1183,6 ms'ten 1,2 ms'e** indi. A dalgası ölçümünde bu adım 194,1 ms'ti;
+aradaki fark makinenin kayması. Tek satırlık bir kapı: istenen palet zaten yürürlükteyse
+iki palet dosyası ayrıştırılmıyor, sözlüğün ilk sırası yenilenmiyor, kurulmuş fırçalar
+gezilmiyor.
+
+### Bedeli
+
+| | Taban | C |
+| --- | --- | --- |
+| `app/` klasörü | 207 MB | 224 MB |
+| `VidShrink.exe` | 64,9 MB | 65,6 MB |
+
+ReadyToRun önceden derlenmiş kodu pakete koyuyor; güncelleme indirmesi ~%8 büyüyor.
+
+### Kanıt
+
+| Ne | Nerede |
+| --- | --- |
+| Ham özet | [T-hipersurus-C-ozet.txt](T-hipersurus-C-ozet.txt) |
+| Ölçüm düzeneği | [tools/acilis-hizi/olcum.ps1](../../tools/acilis-hizi/olcum.ps1) |
+| Plan ve kararlar | [docs/plan.md](../plan.md) C dalgası |
+| Fable'ın netleştirmesi | [016](../netlestirme/016-a-dalgasi-olculdu-cift-tik-ilk-kare-1796.md) |
+| Pimler | [HipersurusTests.cs](../../tests/VidShrink.Tests/HipersurusTests.cs) |

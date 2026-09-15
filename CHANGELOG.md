@@ -7,6 +7,38 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-16
+
+### Added
+
+- A startup curtain. The launcher now raises its own panel the moment it spawns the
+  application and holds it until the first video frame is on screen, so the wait is
+  covered by something visible instead of an empty desktop. It is the same bare Win32
+  panel the installer already uses, armed with a zero threshold; the application signals
+  it through a per-launch named event carried in `VIDSHRINK_ACILIS_PERDESI`. Both launcher
+  paths — the double-click fast path and the ordinary one — raise and release it, and the
+  400 ms threshold of the install panel is unchanged.
+
+### Changed
+
+- Release builds are pre-compiled. `PublishReadyToRun` and `TieredPGO` are on for the
+  application and the launcher, so startup no longer JITs the whole of the IL. Development
+  builds are untouched.
+- Selecting the palette that is already current does nothing. `PaletteCatalog.Use` returned
+  early only after running the full merge, which is the normal case at startup because
+  `App.axaml` already declares the opening palette.
+
+### Measured
+
+- Double-click to first frame, paired warm run of 14 repetitions: a median paired
+  difference of -2603.3 ms, with 14 of 14 pairs favouring the new build, range -4422.7 to
+  -1402.8 ms. The palette step alone fell from 1183.6 ms to 1.2 ms in this session's units.
+- The curtain appears at a median of 211.4 ms (minimum 149.9, p95 669.1). The machine ran
+  about 3.6 times slower this session than when 0.5.5 was measured, so absolute numbers are
+  not comparable across sessions; only the paired difference is. See
+  `docs/olcumler/acilis-hizi.md`.
+- The publish grew: `app/` from 207 to 224 MB, `VidShrink.exe` from 64.9 to 65.6 MB.
+
 ## [0.5.5] - 2026-09-16
 
 ### Changed

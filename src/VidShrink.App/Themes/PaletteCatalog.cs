@@ -76,10 +76,18 @@ public static class PaletteCatalog
     /// <summary>
     /// Adı verilen paleti yürürlüğe koyar ve gerçekten uygulanan adı döndürür. Tanınmayan
     /// ad varsayılana düşer: elle düzenlenmiş bir ayar dosyası programı açılışta durdurmaz.
+    ///
+    /// <para>İstenen palet zaten yürürlükteyse hiçbir şey yapılmaz. Açılışta bu hal kuraldı,
+    /// istisna değil: <c>App.axaml</c> varsayılan paleti zaten birleştirmiş oluyor ve ayar
+    /// çoğunlukla aynı paleti söylüyordu; yine de iki palet dosyası ayrıştırılıp renk tablosu
+    /// çıkarılıyor, birleşmiş sözlüğün ilk sırası yenileniyor ve kurulmuş her fırça
+    /// geziliyordu. Ölçülen payı 194,1 ms (<c>docs/olcumler/acilis-hizi.md</c>).</para>
     /// </summary>
     public static string Use(string? name)
     {
         var wanted = Resolve(name);
+
+        if (string.Equals(wanted, Current, StringComparison.Ordinal)) return wanted;
 
         if (Application.Current is not { } app)
         {

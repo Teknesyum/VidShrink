@@ -198,3 +198,82 @@ ikisi yapılmadan görünmüyor; A dalgasının dokunabildiği yer zaten ~70 ms'
 
 Sırada **A2** (oynatıcıyı `MainWindow`'dan önce açmak) ve **B** dalgası var. Her adımın
 kazancı eşleşik A/B ile ölçülüp `docs/olcumler/acilis-hizi.md`'ye yazılacak.
+
+## C dalgası — Algı + JIT + palet (16 Eylül 2026)
+
+Fable'ın netleştirmesi: [016](netlestirme/016-a-dalgasi-olculdu-cift-tik-ilk-kare-1796.md).
+Beş soruyu burada cevaplıyorum.
+
+**1. Hedefin bittiği işaret — iki saat.** Kullanıcının izin verdiği algı yolu hedefi
+ikiye ayırıyor:
+
+| Saat | Ne ölçer | Hedef |
+| --- | --- | --- |
+| `perde` | Çift tıktan **ekranda bir şey görünene** kadar | ~100 ms |
+| `kabuk-ilk-kare` | Çift tıktan **gerçek videonun ilk karesine** kadar | elden geldiğince, üst sınır yok |
+
+Perde bir örtü değil oyalama: arkasında gerçek iş koşuyor ve ilk kare gelir gelmez
+kapanıyor. "Bitti" demeden kapanmıyor, donmuş bir panel gecikmeden kötüdür.
+
+**2. İskeletin sahibi — başlatıcı.** Yeni bir çatı kurulmuyor: başlatıcıda **zaten**
+çıplak Win32 bir panel var (`src/VidShrink.Launcher/Splash.cs`, 847 satır) ve görüntüsü
+her derlemede `App.axaml`'ın paletinden üretiliyor. Bugün yalnız kurulum 400 ms'i geçince
+çiziliyor. C2 eşiği sıfırlıyor ve panelin kapanış şartını değiştiriyor. Üçüncü süreç yok.
+
+**3. Başlatıcının sırası — değişmiyor.** A1 bunu zaten yaptı: argümanda dosya varsa
+uygulama bakım işlerinin önünde doğuyor.
+
+**4. Teknik sınırlar.**
+
+| Teknik | Karar |
+| --- | --- |
+| `PublishReadyToRun` | **Bu dalgada.** Yayın boyutu büyür, açılışta JIT'in payı düşer |
+| `TieredPGO` | **Bu dalgada.** Bedava anahtar |
+| `PublishAot` | **Yasak.** Avalonia XAML ve palet yansımayla kuruluyor |
+| Yedi sekmeyi `UserControl`e bölmek | **Bu dalgada değil.** 4601 satırlık kod-arkası sekmelerin içindeki `x:Name`'lere bağlı; ayrı dalga, ayrı ölçüm |
+| `hwdec` | **Bu dalgada değil.** B1 olarak duruyor, uyumluluk kolu ayrı ölçülür |
+| Yerleşik bekleyen süreç | **Yasak.** Kullanıcının makinesinde boşta duran süreç bırakmıyoruz |
+
+**5. Başarı ölçüsü — aynı protokol.** Eşleşik sıcak, 14 tekrar, ortanca, `olcum.ps1`.
+Explorer'ın `CreateProcess` öncesi payı dış saate girmiyor; ölçer `Start-Process`'ten
+sayıyor ve bu iki yapı için de aynı.
+
+### C1 — ReadyToRun ve TieredPGO
+
+`VidShrink.App.csproj` ve `VidShrink.Launcher.csproj` bugün hiçbir açılış anahtarı
+taşımıyor; her açılışta bütün IL JIT'leniyor. `cerceve` öncesi 303 ms ile `xaml`
+adımının 305 ms'i büyük ölçüde bu.
+
+### C2 — Açılış perdesi
+
+Başlatıcı uygulamayı doğurduğu anda paneli açıyor ve uygulamanın "ilk karem ekranda"
+işaretini bekliyor. İşaret adlandırılmış bir olay (`VIDSHRINK_ACILIS_PERDESI` ortam
+değişkeniyle geçen ad); uygulama ilk kareyi ya da ilk yüklenen pencereyi gördüğü anda
+kuruyor. Olay gelmezse tavan süre panelin kendi durma kuralına düşüyor.
+
+Yeni iz adımı: `perde`. `olcum.ps1` onu sayıyor, ölçüm tablosu iki saatli oluyor.
+
+### C3 — Palet kısa devresi
+
+`PaletteCatalog.Use` bugün ayardaki palet **zaten yürürlükteki palet olsa da** tam turu
+koşuyor: iki palet dosyasını ayrıştırıyor, renk tablosu çıkarıyor, birleşmiş sözlüğün ilk
+sırasını yeni bir `ResourceInclude` ile değiştiriyor ve kurulmuş bütün fırçaları geziyor.
+Ölçümde `cerceve` → `palet` arası **194,1 ms**. İstenen palet yürürlüktekiyle aynıysa
+yapılacak iş yok.
+
+### Sıra
+
+C1 ve C3 ucuz ve görünür davranışa dokunmuyor, önce onlar. C2 davranışı değiştiriyor,
+sonra o. Üçü bittikten sonra tek bir eşleşik ölçüm; hüküm `kabuk-ilk-kare` ve `perde`
+sütunlarından okunur.
+
+**C dalgası yapıldı ve ölçüldü (16 Eylül 2026).** Eşleşik sıcak, 14 tekrar: dış saatte
+(`kabuk-ilk-kare`) ortanca fark **−2603,3 ms**, **14 çiftin 14'ü** yeni yapı lehine. Yeni
+`perde` adımı ortanca **211,4 ms** — bu oturumda tabanın ilk karesi 6506,3 ms'te geliyordu.
+Makine bu oturumda ~3,6 kat kaymış durumda; mutlak sayılar oturumlar arası
+karşılaştırılmaz, tam tablo ve okuma tuzakları
+[acilis-hizi.md](olcumler/acilis-hizi.md).
+
+Sırada **A2** (yedi sekmeyi ayrı `UserControl`lere bölmek) ve **B1-B4** (mpv seçenekleri,
+render yolu) var. Perde algı saatini hedefe getirdi; gerçek ilk kareyi 100 ms'e indirmek
+hâlâ bu iki dalgadan geçiyor.

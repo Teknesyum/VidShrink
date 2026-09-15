@@ -154,16 +154,16 @@ hükmünü ölçüm verir.
 **Sıra: önce hipersürüş.** [docs/plan.md](plan.md) bu işin önünde koşuyor; düzenleyici
 dalgaları hipersürüş kapandıktan sonra başlıyor.
 
-## Çatal 1 — açık: odak kimin elinde
+## Çatal 1 — cevaplandı (16 Eylül 2026)
 
-Tek bir "geçerli video" olacak (D0). Soru o videonun **ne zaman değiştiği**:
+**Varsayılan düğmeyle.** Kayıt biter, sonuç panelinde "Düzenleyicide Aç" durur; basmazsan
+hiçbir sekme değişmez. Küçültme sekmesinde başka bir dosyayla uğraşıyorsan o dosya altından
+kaymaz.
 
-- **Kendiliğinden:** kaydı durdurduğun anda yeni dosya geçerli video olur. Oynatıcıya
-  geçtiğinde o dosya orada, küçültmeye geçtiğinde o dosya orada; hiçbir düğmeye basmazsın.
-  Bedeli şu: küçültme sekmesinde başka bir dosyayla uğraşıyorduysan, kayıt bitince o
-  dosya senin altından kayar.
-- **Düğmeyle:** kayıt biter, sonuç panelinde "Düzenleyicide Aç" durur. Basmazsan hiçbir
-  sekme değişmez. Bedeli şu: her kayıttan sonra bir tık fazla.
+**Kendiliğinden Ayarlar'da bir seçenek.** Açık olduğunda kaydı durdurduğun anda yeni dosya
+geçerli video olur ve bütün sekmeler ona döner. Aynı anahtar oynatıcıda açılan dosya için de
+geçerli: seçenek kapalıyken küçültme sekmesi kendi dosyasında kalır.
 
-Aynı soru oynatıcı için de geçerli: oynatıcıda yeni bir dosya açtığında küçültme sekmesi
-onu izlesin mi, kendi dosyasında kalsın mı.
+D0 bu yüzden iki şey taşıyor: ortak `CurrentMedia` nesnesi ve onu **kimin** değiştirebildiğini
+söyleyen tek bir ayar. Ayarın adı ve yeri D0 başlarken belirteçlerle birlikte kararlaştırılır;
+metin uydurmuyorum.

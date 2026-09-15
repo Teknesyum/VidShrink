@@ -29,6 +29,11 @@ oldurulen sey de baslatici degil olcum klasorunden kosan uygulamadir. Kullanicin
 VidShrink'i ayni adi tasiyor; oldurmeden once yolun olcum klasorunun altinda oldugu
 dogrulanir.
 
+**Iki saat var.** `kabuk-ilk-kare` gercek videonun ilk karesine kadar gecen suredir;
+`perde` ise ekranda **bir sey gorunene** kadar gecen sure. Hipersurus C dalgasindan beri
+baslatici uygulamayi dogurdugu anda kendi panelini aciyor ve ilk kare gelince kaldiriyor.
+Hukum ikisinden birlikte okunur: `perde` algiyi, `kabuk-ilk-kare` gercek isi olcer.
+
 **Her kosum kendi tek ornek kanalini alir** (`VIDSHRINK_INSTANCE_CHANNEL`): yoksa ikinci
 acilis yolu kosan surece iletip cikar ve olcum bos doner.
 

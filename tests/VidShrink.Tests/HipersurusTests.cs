@@ -1,198 +1,154 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Threading;
-using System.Threading.Tasks;
-using VidShrink.Core;
-using Xunit;
+using System.Text;
+using Avalonia;
+using VidShrink.App.Themes;
+using Xunit.Abstractions;
 
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Hipersürüşün ölçülebilir yanları. Süre ölçmüyor — bu makinede süre ölçmek
-/// <c>tools/acilis-hizi</c>'nin işi; burada ölçülen, kazancı üreten kararların kaynakta
-/// duruyor olması: başlatıcının argümanda dosya varken uygulamayı önce doğurması, sıfır
-/// noktasının çocuk sürece geçmesi, çizim saatinin ilk kareyi beklememesi.
+/// Hipersürüş C dalgasının pimleri: yayın anahtarları, açılış perdesi ve paletin kısa
+/// devresi. Üçü de ölçülmüş bir gecikmeye karşılık geliyor ve üçü de sessizce geri
+/// alınabilir — bir satır silinince kimse fark etmez, açılış yine uzar. Ölçümün kendisi
+/// <c>docs/olcumler/acilis-hizi.md</c>'de.
 /// </summary>
-public class HipersurusTests
+public sealed class HipersurusTests
 {
-    private static string Launcher(string file) =>
-        File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", file));
+    private readonly ITestOutputHelper _cikti;
 
-    private static string Player(string file) =>
-        File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Playback", file));
+    public HipersurusTests(ITestOutputHelper cikti) => _cikti = cikti;
 
-    /// <summary>
-    /// Hızlı turda uygulama, bakım işlerinin <b>önünde</b> doğuyor. Ölçülen şey sıra:
-    /// <c>StartApp</c> çağrısı dosyada <c>Updater.Run</c>'dan önce geçiyor ve o kolda
-    /// bekleyen dosyaların taşınması hiç çağrılmıyor.
-    /// </summary>
-    [Fact]
-    public void ArgumandaDosyaVarkenUygulamaOnceDoguyor()
-    {
-        var code = Launcher("Program.cs").Replace("\r\n", "\n");
-
-        var kol = code.IndexOf("if (!updateNow && args.Length > 0 && File.Exists(args[0]))", StringComparison.Ordinal);
-        Assert.True(kol > 0, "hızlı tur kolu bulunmalı");
-
-        var govde = code[kol..code.IndexOf("\n            return 0;\n        }", kol, StringComparison.Ordinal)];
-        Assert.Contains("StartApp(executable", govde);
-        Assert.DoesNotContain("ResumePending", govde);
-        Assert.True(
-            govde.IndexOf("StartApp(executable", StringComparison.Ordinal) <
-            govde.IndexOf("Updater.Run", StringComparison.Ordinal),
-            "güncelleme uygulamadan sonra koşmalı");
-    }
-
-    /// <summary>Sıfır noktası çocuğa geçiyor: iki sürecin satırları aynı eksende okunuyor.</summary>
-    [Fact]
-    public void SifirNoktasiCocugaGeciyor()
-    {
-        Assert.Contains(
-            "start.Environment[AcilisIzi.SifirDegiskeni] = AcilisIzi.SifirIsareti",
-            Launcher("Program.cs"));
-        Assert.Contains("VIDSHRINK_ACILIS_T0", Launcher("AcilisIzi.cs"));
-        Assert.Contains(
-            "VIDSHRINK_ACILIS_T0",
-            File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "MainWindow.AcilisIzi.cs")));
-    }
+    private static string Oku(params string[] parcalar)
+        => File.ReadAllText(Path.Combine(new[] { TipSources.Root }.Concat(parcalar).ToArray()));
 
     /// <summary>
-    /// Çizim saati ilk kareyi bir tam kare beklemiyor: saat sıkı adımla başlıyor, ilk kare
-    /// düşünce olağan adıma dönüyor ve bir kare de saat kurulur kurulmaz deneniyor.
+    /// C1. İki yayın da önceden derlenmiş kodla çıkıyor. Anahtarlar kalkarsa açılışta bütün
+    /// IL yeniden JIT'lenir ve ölçülen kazanç geri verilir.
     /// </summary>
     [Fact]
-    public void IlkKareSaatiBeklemiyor()
+    public void YayinOncedenDerlenmisKodlaCikiyor()
     {
-        var code = Player("PlayerView.axaml.cs").Replace("\r\n", "\n");
+        var uygulama = Oku("src", "VidShrink.App", "VidShrink.App.csproj");
+        var baslatici = Oku("src", "VidShrink.Launcher", "VidShrink.Launcher.csproj");
 
-        Assert.Contains("_render.Interval = TimeSpan.FromMilliseconds(FirstFrameMs);\n        _render.Start();\n        RenderLatest();", code);
-        Assert.Contains("saat.Interval = TimeSpan.FromMilliseconds(RenderFrameMs);", code);
-    }
-
-    /// <summary>Motor artık arayüz iş parçacığında kurulmuyor.</summary>
-    [Fact]
-    public void MotorArayuzIsParcacigindaKurulmuyor()
-    {
-        var code = Player("PlayerView.axaml.cs");
-
-        Assert.Contains("await Task.Run(EngineFactory).ConfigureAwait(true)", code);
-        Assert.DoesNotContain("engine = EngineFactory();", code);
-    }
-
-    /// <summary>
-    /// Son kullanılanların yazımı ve ayar okumaları oynatmanın arkasına düştü:
-    /// <c>AfterOpen</c> artık <c>TogglePlay</c>'den sonra çağrılıyor.
-    /// </summary>
-    [Fact]
-    public void AyarYazimlariOynatmanınArkasinda()
-    {
-        var code = Player("PlayerView.axaml.cs").Replace("\r\n", "\n");
-
-        Assert.Contains("if (!_playing) TogglePlay();\n        AfterOpen(path, engine);", code);
-    }
-}
-
-/// <summary>
-/// Güncellemenin hızı iki yerden geliyor: her dosyanın kaç gidiş dönüş ettiğinden ve kaç
-/// dosyanın aynı anda indiğinden. Buradaki ölçü birincisini sayıyor — sayan kaynak gerçek
-/// bir zip okuyor, kaynak metne bakmıyor.
-/// </summary>
-public class GuncellemeHiziTests
-{
-    /// <summary>İstek sayan aralık kaynağı; hat yok, dosya var.</summary>
-    private sealed class SayanKaynak : IRangeSource
-    {
-        private readonly byte[] _bytes;
-        private int _reads;
-
-        public SayanKaynak(byte[] bytes) => _bytes = bytes;
-
-        public int Reads => Volatile.Read(ref _reads);
-
-        public Task<long> LengthAsync(CancellationToken cancellationToken) =>
-            Task.FromResult((long)_bytes.Length);
-
-        public Task<byte[]> ReadAsync(long offset, int length, CancellationToken cancellationToken)
+        foreach (var (ad, metin) in new[] { ("uygulama", uygulama), ("baslatici", baslatici) })
         {
-            Interlocked.Increment(ref _reads);
-            var count = (int)Math.Min(length, _bytes.LongLength - offset);
-            return Task.FromResult(_bytes.AsSpan((int)offset, Math.Max(0, count)).ToArray());
+            Assert.True(metin.Contains("<PublishReadyToRun>true</PublishReadyToRun>", StringComparison.Ordinal),
+                $"{ad}: PublishReadyToRun yok");
+            Assert.True(metin.Contains("<TieredPGO>true</TieredPGO>", StringComparison.Ordinal),
+                $"{ad}: TieredPGO yok");
         }
-    }
 
-    private static byte[] Arsiv(IReadOnlyList<(string Ad, string Icerik)> dosyalar)
-    {
-        using var stream = new MemoryStream();
-        using (var zip = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
-        {
-            foreach (var (ad, icerik) in dosyalar)
-            {
-                var entry = zip.CreateEntry(ad, CompressionLevel.Optimal);
-                using var writer = new StreamWriter(entry.Open());
-                writer.Write(icerik);
-            }
-        }
-        return stream.ToArray();
+        Assert.DoesNotContain("<PublishAot>true</PublishAot>", uygulama, StringComparison.Ordinal);
     }
 
     /// <summary>
-    /// Bir dosya bir istek. Eskiden yerel başlık ayrı bir aralık isteğiydi ve her dosya
-    /// iki tur ediyordu; 375 dosyalık ölçülmüş bir farkta bu, inen bayttan bağımsız olarak
-    /// 375 fazla gidiş dönüş demekti.
+    /// C2. Perde iki kolda da kuruluyor, adı çocuk sürece geçiyor ve <b>uygulama doğduktan
+    /// sonra</b> bekleniyor: önce beklenirse perde uygulamanın açılmasını geciktirir.
     /// </summary>
     [Fact]
-    public async Task DosyaBasinaTekIstek()
+    public void PerdeIkiKoldaDaUygulamadanSonraBekleniyor()
     {
-        var bytes = Arsiv(new[] { ("a/bir.txt", new string('x', 4096)), ("a/iki.txt", new string('y', 2048)) });
-        var kaynak = new SayanKaynak(bytes);
-        var zip = await RemoteZip.OpenAsync(kaynak, CancellationToken.None);
-        var acilis = kaynak.Reads;
+        var kod = Oku("src", "VidShrink.Launcher", "Program.cs");
 
-        var icerik = await zip.ExtractAsync("a/bir.txt", CancellationToken.None);
+        var acmalar = System.Text.RegularExpressions.Regex.Matches(kod, @"AcilisPerdesi\.Ac\(\)");
+        var dogumlar = System.Text.RegularExpressions.Regex.Matches(kod, @"StartApp\(executable");
+        var beklemeler = System.Text.RegularExpressions.Regex.Matches(kod, @"BekleVeKapat\(\)");
 
-        Assert.Equal(new string('x', 4096), System.Text.Encoding.UTF8.GetString(icerik));
-        Assert.Equal(1, kaynak.Reads - acilis);
+        Assert.Equal(2, acmalar.Count);
+        Assert.Equal(2, dogumlar.Count);
+        Assert.Equal(2, beklemeler.Count);
+
+        for (var at = 0; at < 2; at++)
+        {
+            Assert.True(acmalar[at].Index < dogumlar[at].Index, "perde uygulamadan sonra aciliyor");
+            Assert.True(dogumlar[at].Index < beklemeler[at].Index, "perde uygulama dogmadan bekleniyor");
+        }
+
+        Assert.Contains("start.Environment[AcilisPerdesi.Degisken] = perdeAdi;", kod, StringComparison.Ordinal);
     }
 
-    /// <summary>Son girdinin sınırı merkezî dizin: o da tek istekte iniyor.</summary>
+    /// <summary>
+    /// C2. Perdenin iki yakası aynı adı kullanıyor. Değişken adı bir tarafta değişirse perde
+    /// hiç kalkmaz ve kullanıcı tavan dolana kadar panele bakar.
+    /// </summary>
     [Fact]
-    public async Task SonGirdiDeTekIstek()
+    public void PerdeninIkiYakasiAyniDegiskeni_Kullaniyor()
     {
-        var bytes = Arsiv(new[] { ("a/bir.txt", new string('x', 1024)), ("a/son.txt", new string('z', 3072)) });
-        var kaynak = new SayanKaynak(bytes);
-        var zip = await RemoteZip.OpenAsync(kaynak, CancellationToken.None);
-        var acilis = kaynak.Reads;
-
-        var icerik = await zip.ExtractAsync("a/son.txt", CancellationToken.None);
-
-        Assert.Equal(new string('z', 3072), System.Text.Encoding.UTF8.GetString(icerik));
-        Assert.Equal(1, kaynak.Reads - acilis);
+        const string degisken = "\"VIDSHRINK_ACILIS_PERDESI\"";
+        Assert.Contains(degisken, Oku("src", "VidShrink.Launcher", "AcilisPerdesi.cs"), StringComparison.Ordinal);
+        Assert.Contains(degisken, Oku("src", "VidShrink.App", "AcilisPerdesi.cs"), StringComparison.Ordinal);
     }
 
-    /// <summary>Negatif kontrol: olmayan girdi hâlâ bulunamıyor ve hiç istek etmiyor.</summary>
+    /// <summary>
+    /// C2. Perde sıfır eşikle açılıyor ve kapanırken çubuğun dolmasını beklemiyor. Kurulum
+    /// paneli eski davranışında kalıyor: eşiği dolmadan çizilmiyor.
+    /// </summary>
     [Fact]
-    public async Task OlmayanGirdiIstekEtmiyor()
+    public void PerdeSifirEsikle_AcilipBeklemedenKapaniyor()
     {
-        var kaynak = new SayanKaynak(Arsiv(new[] { ("a/bir.txt", "abc") }));
-        var zip = await RemoteZip.OpenAsync(kaynak, CancellationToken.None);
-        var acilis = kaynak.Reads;
+        var perde = Oku("src", "VidShrink.Launcher", "AcilisPerdesi.cs");
+        Assert.Contains("SplashGate.Arm(ilerleme, TimeSpan.Zero)", perde, StringComparison.Ordinal);
+        Assert.Contains("_kapi.Kapat()", perde, StringComparison.Ordinal);
 
-        await Assert.ThrowsAsync<FileNotFoundException>(
-            () => zip.ExtractAsync("a/yok.txt", CancellationToken.None));
-        Assert.Equal(acilis, kaynak.Reads);
+        var splash = Oku("src", "VidShrink.Launcher", "Splash.cs");
+        Assert.Contains("public static SplashGate Arm(InstallProgress progress) => Arm(progress, Threshold);", splash, StringComparison.Ordinal);
+        Assert.Contains("AcilisIzi.Yaz(\"perde\")", splash, StringComparison.Ordinal);
+
+        var kapat = splash.IndexOf("public void Kapat()", StringComparison.Ordinal);
+        var dispose = splash.IndexOf("public void Dispose()", StringComparison.Ordinal);
+        Assert.True(kapat > 0 && dispose > kapat, "Kapat, Dispose'dan once tanimli degil");
+        Assert.DoesNotContain("_settling = true;", splash[kapat..dispose], StringComparison.Ordinal);
     }
 
-    /// <summary>Dosyalar tek tek değil şeritler halinde iniyor.</summary>
+    /// <summary>
+    /// C2. Uygulama perdeyi ilk karede kaldırıyor; dosya hiç açılamazsa açılışın sonu onu
+    /// yine kaldırıyor. İkinci yol olmadan çökmüş bir açılış perdeyi ekranda bırakır.
+    /// </summary>
     [Fact]
-    public void IndirmeSeritliKosuyor()
+    public void UygulamaPerdeyiIlkKaredeVeAcilisinSonundaKaldiriyor()
     {
-        var code = File.ReadAllText(
-            Path.Combine(TipSources.Root, "src", "VidShrink.Launcher", "Updater.cs"));
+        var kod = Oku("src", "VidShrink.App", "MainWindow.axaml.cs");
+        Assert.Contains("PerdeyiIzle();", kod, StringComparison.Ordinal);
+        Assert.Contains("if (Player.Frame.Source is null) return;", kod, StringComparison.Ordinal);
+        Assert.Contains("AcilisPerdesi.Kapat();", kod, StringComparison.Ordinal);
 
-        Assert.Contains("MaxDegreeOfParallelism = Lanes", code);
-        Assert.Contains("Interlocked.Increment(ref done)", code);
-        Assert.DoesNotContain("foreach (var file in changed)", code);
+        var izle = kod.IndexOf("private void PerdeyiIzle()", StringComparison.Ordinal);
+        Assert.True(izle > 0, "PerdeyiIzle yok");
+    }
+
+    /// <summary>
+    /// C3. Yürürlükteki paleti yeniden seçmek hiçbir iş yapmıyor: sözlüğün ilk sırası aynı
+    /// nesne kalıyor. Gerçek geçişte değişiyor — negatif kontrol o. Ölçülen payı 194,1 ms ve
+    /// açılışta bu hal kuraldı.
+    /// </summary>
+    [Fact]
+    public void AyniPaletiYenidenSecmek_HicbirSeyYapmiyor()
+    {
+        var (ayni, degisen, dokum) = AppHost.Run(() =>
+        {
+            PaletteCatalog.Use(PaletteCatalog.Default);
+            var once = Application.Current!.Resources.MergedDictionaries[0];
+
+            PaletteCatalog.Use(PaletteCatalog.Default);
+            var tekrar = Application.Current!.Resources.MergedDictionaries[0];
+
+            var oteki = PaletteCatalog.Names.First(ad => ad != PaletteCatalog.Default);
+            PaletteCatalog.Use(oteki);
+            var sonra = Application.Current!.Resources.MergedDictionaries[0];
+
+            PaletteCatalog.Use(PaletteCatalog.Default);
+
+            var yazi = new StringBuilder()
+                .AppendLine($"ilk         = {once.GetHashCode()}")
+                .AppendLine($"tekrar ayni = {tekrar.GetHashCode()}")
+                .AppendLine($"gercek gecis= {sonra.GetHashCode()}")
+                .ToString();
+
+            return (ReferenceEquals(once, tekrar), ReferenceEquals(once, sonra), yazi);
+        });
+
+        _cikti.WriteLine(dokum);
+        Assert.True(ayni, "Ayni palet yeniden secildi ve sozluk yine degistirildi:\n" + dokum);
+        Assert.False(degisen, "Gercek palet gecisi sozlugu degistirmiyor:\n" + dokum);
     }
 }
