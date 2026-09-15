@@ -1,0 +1,15 @@
+Makine: Windows 11 Pro 22631, ffmpeg 9.0-full_build (gyan.dev)
+Malzeme: testsrc2 1920x1080@30, 300 sn, libx264 ultrafast, -g 250 (anahtar kare 8.3333 sn), AAC ses. 584 MB.
+Tek kosum, tekrar yok. Sentetik kaynak - gercek kamera goruntusunde kodlama sureleri daha uzun olur.
+
+[Anahtar kare listesi]           show_packets 201 ms | skip_frame nokey 308 ms | 36 anahtar kare
+[Kesme 104->126 (22.000 sn)]     copy 65 ms/26.030 sn(+4.030 HATA) | smart 1111 ms/22.052 sn(+0.052) | tam kodlama 2550 ms/22.000 sn  [preset medium]
+[Kesme ayni, ultrafast]          smart 545 ms | tam 770 ms
+[atempo sinir]                   0.4 RED, 4.0 KABUL, 150 RED -> aralik [0.5,100.0]
+[reverse bellek 1080p30]         5sn 727MB | 10sn 1193MB | 20sn 2101MB | 40sn 3967MB  -> ~99 MB/sn
+[reverse parcali 60 sn]          6226 ms, parca basina tepe 1325 MB, cikti 60.007 sn
+[geri -100x kare atlamali]       select mod100 2260 ms/90 kare | skip_frame nokey 389 ms/36 kare
+[kucuk resim 5 dk]               skip_frame nokey tek gecis 369 ms/36 kare/148 KB | fps=1/10 2122 ms/30 kare | 30 ayri -ss 2618 ms
+[dalga bicimi 5 dk]              showwavespic 263 ms | s16le 8kHz 275 ms/4.58 MB | s16le 1kHz 309 ms/600 KB | -vn once 251 ms
+[concat farkli cozunurluk]       demuxer+copy SESSIZCE GECTI (720p etiketli 6 sn) | concat filtresi HATA VERDI
+[ffmpeg 9 notu]                  -vsync kaldirildi -> -fps_mode
