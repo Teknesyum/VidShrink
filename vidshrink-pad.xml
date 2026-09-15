@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XML_DIZ_INFO>
+  <MASTER_PAD_VERSION_INFO>
+    <MASTER_PAD_VERSION>4.0</MASTER_PAD_VERSION>
+    <MASTER_PAD_INFO>Portable Application Description (PAD) metadata for VidShrink.</MASTER_PAD_INFO>
+  </MASTER_PAD_VERSION_INFO>
+  <Company_Info>
+    <Company_Name>Teknesyum</Company_Name>
+    <Address_1 />
+    <Address_2 />
+    <City_Town />
+    <State_Province />
+    <Zip_Postal_Code />
+    <Country>Turkey</Country>
+    <Company_WebSite_URL>https://github.com/Teknesyum</Company_WebSite_URL>
+    <Contact_Info>
+      <Author_First_Name>Teknesyum</Author_First_Name>
+      <Author_Last_Name />
+      <Author_Email>tcggmn@gmail.com</Author_Email>
+      <Contact_First_Name>Teknesyum</Contact_First_Name>
+      <Contact_Last_Name />
+      <Contact_Email>tcggmn@gmail.com</Contact_Email>
+    </Contact_Info>
+    <Support_Info>
+      <Sales_Email />
+      <Support_Email>tcggmn@gmail.com</Support_Email>
+      <General_Email>tcggmn@gmail.com</General_Email>
+      <Sales_Phone />
+      <Support_Phone />
+      <General_Phone />
+      <Fax_Phone />
+    </Support_Info>
+  </Company_Info>
+  <Program_Info>
+    <Program_Name>VidShrink</Program_Name>
+    <Program_Version>0.5.3</Program_Version>
+    <Program_Release_Month>09</Program_Release_Month>
+    <Program_Release_Day>13</Program_Release_Day>
+    <Program_Release_Year>2026</Program_Release_Year>
+    <Program_Cost_Dollars>0.00</Program_Cost_Dollars>
+    <Program_Cost_Other_Code>USD</Program_Cost_Other_Code>
+    <Program_Cost_Other />
+    <Program_Type>Freeware</Program_Type>
+    <Program_Release_Status>Minor Update</Program_Release_Status>
+    <Program_Install_Support>Install and Uninstall</Program_Install_Support>
+    <Program_OS_Support>Win10 x64,Win11</Program_OS_Support>
+    <Program_Language>Multilingual</Program_Language>
+    <File_Info>
+      <Filename_Versioned>vidshrink-win-x64.zip</Filename_Versioned>
+      <Filename_Previous />
+      <Filename_Generic>vidshrink-win-x64.zip</Filename_Generic>
+      <Filename_Long>VidShrink 0.5.3 for Windows x64</Filename_Long>
+      <File_Size_Bytes>47366028</File_Size_Bytes>
+      <File_Size_K>46256</File_Size_K>
+      <File_Size_MB>45.17</File_Size_MB>
+    </File_Info>
+    <Expire_Info>
+      <Has_Expire_Info>N</Has_Expire_Info>
+      <Expire_Count />
+      <Expire_Based_On>Days</Expire_Based_On>
+      <Expire_Other_Info />
+      <Expire_Month />
+      <Expire_Day />
+      <Expire_Year />
+    </Expire_Info>
+    <Program_Change_Info>Version 0.5.3 keeps the top strip visible outside the player, separates the Windows right-click menu settings, restores player title-bar clicks, localizes the Windows 11 primary menu, and adds detailed update progress plus an update log.</Program_Change_Info>
+    <Program_Specific_Category>Other VIDEO Tools</Program_Specific_Category>
+    <Program_Categories>Multimedia::Video</Program_Categories>
+    <Program_System_Requirements>Windows 10 or 11 x64. No administrator rights or .NET SDK required. The installer retrieves verified FFmpeg and libmpv dependencies.</Program_System_Requirements>
+    <Includes_JAVA_VM>N</Includes_JAVA_VM>
+    <Includes_VB_Runtime>N</Includes_VB_Runtime>
+    <Includes_DirectX>N</Includes_DirectX>
+  </Program_Info>
+  <Program_Descriptions>
+    <English>
+      <Keywords>video compressor,target file size,screen recorder,video converter,video player,FFmpeg,Avalonia,offline,open source</Keywords>
+      <Char_Desc_45>Exact-size offline video toolkit</Char_Desc_45>
+      <Char_Desc_80>Compress, record, convert and play video offline</Char_Desc_80>
+      <Char_Desc_250>VidShrink is a free offline video compressor, recorder, converter and player. Its automatic planner targets an exact file-size ceiling without exceeding it and estimates the result before encoding.</Char_Desc_250>
+      <Char_Desc_450>VidShrink is a free and open-source desktop video toolkit. Its main workflow compresses a video to a selected file-size ceiling without exceeding it. Automatic planning chooses the codec, quality, resolution and frame rate for the source. The same window also provides screen recording, playback with before-and-after comparison, conversion, trimming, audio extraction and sharing.</Char_Desc_450>
+      <Char_Desc_2000>VidShrink is a free and open-source desktop video toolkit for Windows, macOS and Linux. Its main Shrink workflow compresses a video to a user-selected file-size ceiling and estimates the result before encoding. Automatic planning chooses the codec, quality, resolution and frame rate for the source file, while calibration and retry logic keep the delivered file below the requested limit. The same window also includes screen recording, playback with before-and-after comparison, format conversion, trimming, audio extraction and sharing. It supports 42 interface languages and 26 color themes. VidShrink has no ads, account, subscription or telemetry and works offline after its dependencies are installed.</Char_Desc_2000>
+    </English>
+  </Program_Descriptions>
+  <Web_Info>
+    <Application_URLs>
+      <Application_Info_URL>https://github.com/Teknesyum/VidShrink</Application_Info_URL>
+      <Application_Order_URL />
+      <Application_Screenshot_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.5.3/docs/gorseller/T191-kucult-en.png</Application_Screenshot_URL>
+      <Application_Icon_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.5.3/src/VidShrink.App/Assets/VidShrink.png</Application_Icon_URL>
+      <Application_XML_File_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/main/vidshrink-pad.xml</Application_XML_File_URL>
+    </Application_URLs>
+    <Download_URLs>
+      <Primary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/download/v0.5.3/vidshrink-win-x64.zip</Primary_Download_URL>
+      <Secondary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/tag/v0.5.3</Secondary_Download_URL>
+      <Additional_Download_URL_1 />
+      <Additional_Download_URL_2 />
+    </Download_URLs>
+  </Web_Info>
+  <Permissions>
+    <Distribution_Permissions>VidShrink may be copied and redistributed under the GNU Affero General Public License version 3 or any later version. Distributors must preserve the license and corresponding source availability. FFmpeg and libmpv are separate programs and are not included in the VidShrink release archive.</Distribution_Permissions>
+    <EULA>https://github.com/Teknesyum/VidShrink/blob/v0.5.3/LICENSE</EULA>
+  </Permissions>
+  <ASP>
+    <ASP_Member>N</ASP_Member>
+    <ASP_Member_Number />
+  </ASP>
+</XML_DIZ_INFO>
