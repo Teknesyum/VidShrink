@@ -106,11 +106,10 @@ internal static class Program
             return 0;
         }
 
-        // Panel ancak eşik dolarsa çizilir; hızlı turda hiç oluşturulmaz. Bloktan çıkış
-        // tek yol: iş bitse de yarıda kalsa da panel kapanır ve uygulama açılır.
+        // Bakım sessiz koşar; panel yalnız elle güncellemede, eşik dolarsa çizilir.
         var pendingSwap = false;
         var progress = new InstallProgress();
-        using (SplashGate.Arm(progress))
+        using (updateNow ? SplashGate.Arm(progress) : null)
         {
             // Başlatıcının kendi değişimi yarım kaldıysa önce o okunur: ayar kapalı olsa
             // bile, çünkü burada eksik kalan şey kısayolun gösterdiği dosyanın kendisi.

@@ -44,7 +44,9 @@ public sealed class HipersurusTests
 
     /// <summary>
     /// F1. Olağan açılışta perde yok: başlatıcı uygulamayı bekletmeden doğuruyor, uygulamada
-    /// perdeyi kaldıran yol da yok. Kurulum paneli yalnız 400 ms eşikli bakım kolunda kalıyor.
+    /// perdeyi kaldıran yol da yok. Bakım sessiz koşuyor: kurulum paneli yalnız elle güncellemede
+    /// (<c>updateNow</c>) kuruluyor; olağan ve dosyayla açılışta hiç kurulmuyor. Uygulama doğmadan
+    /// önceki yolda bekleme yok; tek bekleme elle güncellemede eski sürecin kapanması.
     /// </summary>
     [Fact]
     public void OlaganAcilistaPerdeYok()
@@ -60,6 +62,21 @@ public sealed class HipersurusTests
         Assert.DoesNotContain("PerdeyiIzle", uygulama, StringComparison.Ordinal);
         Assert.Equal(2, System.Text.RegularExpressions.Regex.Matches(baslatici, @"StartApp\(executable").Count);
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(baslatici, @"SplashGate\.Arm\("));
+        Assert.Contains("using (updateNow ? SplashGate.Arm(progress) : null)", baslatici, StringComparison.Ordinal);
+
+        var dosyaKolu = baslatici[baslatici.IndexOf("if (!updateNow && args.Length > 0 && File.Exists(args[0]))", StringComparison.Ordinal)..];
+        dosyaKolu = dosyaKolu[..dosyaKolu.IndexOf("return 0;", StringComparison.Ordinal)];
+        Assert.DoesNotContain("SplashGate", dosyaKolu, StringComparison.Ordinal);
+        Assert.DoesNotContain("InstallProgress", dosyaKolu, StringComparison.Ordinal);
+
+        var main = baslatici[baslatici.IndexOf("private static int Main(", StringComparison.Ordinal)..];
+        var dogumOncesi = main[..main.LastIndexOf("StartApp(executable", StringComparison.Ordinal)];
+        foreach (var bekleme in new[] { "Thread.Sleep", "Task.Delay", "SpinWait", ".Wait(", ".Join(" })
+            Assert.DoesNotContain(bekleme, dogumOncesi, StringComparison.Ordinal);
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(dogumOncesi, @"WaitForExit\("));
+        Assert.True(dogumOncesi.IndexOf("WaitForExit(", StringComparison.Ordinal)
+                    < dogumOncesi.IndexOf("if (!File.Exists(executable))", StringComparison.Ordinal));
+        Assert.Matches(@"if \(updateNow\)\s*\{\s*WaitForExit\(", dogumOncesi);
     }
 
     /// <summary>
