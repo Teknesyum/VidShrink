@@ -491,10 +491,11 @@ Kaynak: `.calisma/denetim/yol-haritasi-denetimi.md`, "Küçült, karşılaştır
 1. Taşma kararı: `EncodeRunner` taşmada her denemede sorar (son deneme dahil). Seçenekler: tekrar dene, bırak,
    büyüğü kabul et, sondan/baştan/ikisinden kes. Kesme yalnız taşma ≤ %3 iken önerilir; `Core/OvershootTrim`
    paket boylarından kesim noktası seçer, `Ffmpeg/TrimRunner` akış kopyasıyla keser, ölçer, hedefe inene dek sıkar.
-2. Sıfırla: `App/UserDataReset` ayar klasöründeki bütün VidShrink veri dosyalarını siler.
-3. Küçült: `WhatsApp uyumlu` kutusu, `Dinamik` kutusu; kapalıyken AV1/H.264 şeridi ve sabit çözünürlük
-   (`PlanOptions.FixedHeight`).
-4. Ayarlar: iki seçenekli açılır listeler yatay şerit; etiket ile denetim tek satır.
+2. Sıfırla: `App/AppDataReset` ayar klasöründeki on veri dosyasını ve bozuk paylaşım defteri kopyalarını siler;
+   güncelleme günlüğü ve yarım güncelleme kaydı kalır.
+3. Küçült: Kalite bölümünde `WhatsApp uyumlu (H.264)` kutusu, kodek şeridini kilitler. Kare bölümünde
+   "Çözünürlük düşürülebilir" dinamik kutudur; kalkınca Kaynak/1080p/720p/480p şeridi (`PlanOptions.FixedResolution`, kısa kenar).
+4. Ayarlar: çıktı klasörü ve ffmpeg yolu radyo şeridi, etiket ile tek satır; dil/tema ve hedef/gelişmiş yan yana.
 5. Karşılaştırma rozeti yalnız `CRF n`; ORİJİNAL/İŞLENMİŞ orta panelin üstünde solda/sağda.
 6. Opus: MP4'te WhatsApp/iOS uyumu bozuluyor → uygulanmaz, `.calisma/kucult-kabuk/soru-opus.md`.
 7. Güncelleme: `AutoUpdate` varsayılanı kapalı; indirme/kurulum sürerken panel kapanmaz; eski Ayarlar

@@ -34,7 +34,7 @@
 
   "settings.update.title": "Masasisho",
   "settings.update.auto": "Sasisha kiotomatiki",
-  "settings.update.auto-effect": "Hii ikiwa imezimwa, VidShrink haijisasishi: inakuambia tu kuwa toleo jipya lipo na kuonyesha amri inayolisakinisha.",
+  "settings.update.auto-effect": "Imezimwa kwa default: toleo jipya hutangazwa kwenye upau wa juu na kupakuliwa na kusakinishwa kwa kitufe. Ikiwashwa, VidShrink husasisha yenyewe kimya kimya.",
   "settings.update.no-self-effect": "VidShrink haijisasishi kwenye mfumo huu: inakuambia tu kuwa toleo jipya lipo na kuonyesha amri inayolisakinisha.",
 
   "settings.default-app.suggestion": "VidShrink si programu chaguomsingi ya video. Unaweza kuichagua kwenye ukurasa wa Programu chaguomsingi wa Windows.",

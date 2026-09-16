@@ -114,6 +114,9 @@
   "main.codec.smallest": "H.265 (smallest)",
 
   "main.allow.resolution": "May lower resolution",
+  "main.whatsapp-compatible": "WhatsApp compatible (H.264)",
+  "main.fixed-resolution.label": "Fixed resolution",
+  "main.fixed-resolution.source": "Source",
   "main.allow.fps": "May lower frame rate",
 
   "main.fast-gpu": "Fast shrink (GPU)",

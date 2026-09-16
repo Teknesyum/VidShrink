@@ -549,9 +549,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1217, toplam);
-        Assert.Equal(139, dilBasina["en"]);
-        Assert.Equal(52, dilBasina["tr"]);
+        Assert.Equal(1248, toplam);
+        Assert.Equal(146, dilBasina["en"]);
+        Assert.Equal(54, dilBasina["tr"]);
     }
 
     /// <summary>

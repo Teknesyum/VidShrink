@@ -114,6 +114,9 @@
   "main.codec.smallest": "H.265 (en küçük)",
 
   "main.allow.resolution": "Çözünürlük düşürülebilir",
+  "main.whatsapp-compatible": "WhatsApp uyumlu (H.264)",
+  "main.fixed-resolution.label": "Sabit çözünürlük",
+  "main.fixed-resolution.source": "Kaynak",
   "main.allow.fps": "Kare hızı düşürülebilir",
 
   "main.fast-gpu": "Hızlı düşür (GPU)",

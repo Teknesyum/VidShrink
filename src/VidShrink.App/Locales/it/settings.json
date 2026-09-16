@@ -34,7 +34,7 @@
 
   "settings.update.title": "Aggiornamenti",
   "settings.update.auto": "Aggiorna automaticamente",
-  "settings.update.auto-effect": "Quando è disattivato, VidShrink non si aggiorna da solo: segnala soltanto che esiste una nuova versione e mostra il comando che la installa.",
+  "settings.update.auto-effect": "Disattivato di default: una nuova versione viene annunciata nella barra superiore e scaricata e installata con un pulsante. Se attivo, VidShrink si aggiorna da solo, in silenzio.",
   "settings.update.no-self-effect": "VidShrink non si aggiorna da solo su questo sistema: segnala soltanto che esiste una nuova versione e mostra il comando che la installa.",
 
   "settings.default-app.suggestion": "VidShrink non è il programma predefinito per i video. Puoi sceglierlo nella pagina App predefinite di Windows.",
