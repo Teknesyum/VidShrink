@@ -187,6 +187,7 @@ function Assert-Checksum([hashtable]$Table, [string]$Name, [string]$Path) {
 }
 
 $libMpvUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+$libMpvMirrorUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
 $libMpvArchiveSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
 $libMpvDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
 $libMpvFileName = 'libmpv-2.dll'
@@ -209,14 +210,25 @@ function Install-LibMpv([string]$WorkRoot, [string]$Destination, [string]$Existi
     $archive = Join-Path $WorkRoot 'mpv-dev.7z'
     Write-Host 'libmpv indiriliyor...' -ForegroundColor Cyan
     $ProgressPreference = 'SilentlyContinue'
-    try {
-        Invoke-WebRequest -UseBasicParsing -Uri $libMpvUrl -OutFile $archive
-    }
-    catch {
-        throw "libmpv indirilemedi: $libMpvUrl"
+    $actual = $null
+    $failures = @()
+    foreach ($source in @($libMpvUrl, $libMpvMirrorUrl)) {
+        try {
+            Invoke-WebRequest -UseBasicParsing -Uri $source -OutFile $archive
+        }
+        catch {
+            $failures += $source
+            Write-Host "libmpv indirilemedi, yedek kaynak deneniyor: $source" -ForegroundColor Yellow
+            continue
+        }
+        $actual = Get-FileSha256 $archive
+        if ($actual -eq $libMpvArchiveSha256) { break }
+        Write-Host "libmpv sağlaması tutmadı, yedek kaynak deneniyor: $source" -ForegroundColor Yellow
     }
 
-    $actual = Get-FileSha256 $archive
+    if ($null -eq $actual) {
+        throw "libmpv indirilemedi: $($failures -join ', ')"
+    }
     if ($actual -ne $libMpvArchiveSha256) {
         throw "libmpv arşivinin sağlaması tutmuyor. Beklenen $libMpvArchiveSha256, bulunan $actual. Kurulum durduruldu."
     }

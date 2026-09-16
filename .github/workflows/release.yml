@@ -103,10 +103,24 @@ jobs:
           $url = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $expectedSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
           $expectedDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
+          $mirrorUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/libmpv-mirror/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $archive = Join-Path $env:RUNNER_TEMP 'mpv-dev.7z'
 
-          Invoke-WebRequest -Uri $url -OutFile $archive
-          $actual = (Get-FileHash -Path $archive -Algorithm SHA256).Hash
+          $actual = $null
+          foreach ($source in @($url, $mirrorUrl)) {
+            try {
+              Invoke-WebRequest -Uri $source -OutFile $archive
+            } catch {
+              Write-Warning "libmpv indirilemedi: $source ($($_.Exception.Message))"
+              continue
+            }
+            $actual = (Get-FileHash -Path $archive -Algorithm SHA256).Hash
+            if ($actual -eq $expectedSha256) {
+              Write-Host "libmpv kaynagi: $source"
+              break
+            }
+            Write-Warning "libmpv sha256 uyusmuyor: $source beklenen=$expectedSha256 gelen=$actual"
+          }
           if ($actual -ne $expectedSha256) {
             Write-Error "libmpv indirmesi sha256 uyusmuyor: beklenen=$expectedSha256 gelen=$actual"
             exit 1
