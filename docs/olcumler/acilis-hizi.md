@@ -395,7 +395,7 @@ boyudur. Geri alınan değişiklik yok; dört kalemin hepsi kendi aralığında 
 
 ## F dalgası — Olağan açılışta perde yok, etiket yenilemesi menüyü yeniden kurmuyor (16 Eylül 2026)
 
-Eşleşik sıcak ölçüm, 14 tekrar, aynı 6,2 MB klip, sıra her tekrarda döner. Taban **3ba42150**
+Eşleşik sıcak ölçüm, 14 tekrar, 6,1 MB klip (ham özet: `macenta.mp4 (6.1 MB)`), sıra her tekrarda döner. Taban **3ba42150**
 (origin/main, 0.8.2), karşı taraf **6619209f** (`t0/acilis-anlik`). Saat uygulamanın kendi
 izi; sıfır başlatıcının `Process.StartTime`'ı.
 
@@ -408,7 +408,8 @@ izi; sıfır başlatıcının `Process.StartTime`'ı.
 
 Farkın tamamına yakını `xaml → yapici-bitti` aralığında: taban 1015 ms, F 24 ms. Bu, etiket
 yenilemesinin her açılışta sağ tık menüsünü (648 değer) baştan yazmasıydı; F yalnız farklı
-etiketi yazar. Perdenin payı (`app-dogdu → perde`, tabanda ~17 ms) aynı farkın içinde küçük.
+etiketi yazar. **−992 ms taklit kovanda ölçüldü:** HKCU yazımları `KayitKalkani` ile özel bir
+kovana yönlendi (aşağıda "Düzenek değişti"); gerçek HKCU'daki kazanç bu sayı değildir. Perdenin payı (`app-dogdu → perde`, tabanda ~17 ms) aynı farkın içinde küçük.
 
 ### Düzenek değişti
 
