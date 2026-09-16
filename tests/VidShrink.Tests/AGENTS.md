@@ -37,7 +37,9 @@ sürümden (`x.0.0`) önce koşar.
   kapalı sayılır; eski `manualMode: true` Gelişmiş açılır; altı anahtar 42 dilde. Geri sayım
   (0/3/5/10): sahte bekleme işiyle 3-2-1 şeritte sayılır, iptal düğmesi, F8 ve F7 keser; mini şerit sayıyı gösterir
   (mini pencere artık `InitializeComponent` ile kuruluyor, adlı alanlar boş kalmıyordu); sayım doğrulamadan sonra,
-  oturumdan önce koşar (kaynak pimi). Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
+  oturumdan önce koşar (kaynak pimi). Kayıt çerçevesi: bölgenin dışına çizilir (`Outer`, ölçekte yukarı yuvarlanan
+  kenar), tıklamayı geçiren WS_EX stili saf fonksiyonla, yalnız bölge kaydında ve F9 ile gizlenmemişken istenir;
+  pencere sahte `IRecorderFrameHost` ile, gerçek pencere gösterilmeden. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

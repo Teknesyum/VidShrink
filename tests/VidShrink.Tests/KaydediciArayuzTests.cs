@@ -572,6 +572,110 @@ public sealed class KaydediciArayuzTests
             Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault(key)), $"{language} dilinde {key} yok.");
     }
 
+    [Theory]
+    [InlineData(100, 200, 640, 360, 2, 98, 198, 644, 364)]
+    [InlineData(0, 0, 1280, 720, 3, -3, -3, 1286, 726)]
+    public void CerceveBolgeninDisinaCizilir(int x, int y, int w, int h, int kenar, int ox, int oy, int ow, int oh)
+    {
+        var bolge = new Avalonia.PixelRect(x, y, w, h);
+        var dis = RecorderFrame.Outer(bolge, kenar);
+
+        Assert.Equal(new Avalonia.PixelRect(ox, oy, ow, oh), dis);
+        Assert.True(dis.Contains(bolge));
+        Assert.Equal(bolge, bolge.Intersect(dis));
+        Assert.True(dis.X + kenar <= bolge.X && dis.Right - kenar >= bolge.Right);
+    }
+
+    [Theory]
+    [InlineData(2.0, 1.0, 2)]
+    [InlineData(2.0, 1.5, 3)]
+    [InlineData(2.0, 1.25, 3)]
+    [InlineData(0.0, 2.0, 1)]
+    public void CerceveKenariOlceklemeyleYuvarlanir(double kalinlik, double olcek, int beklenen)
+        => Assert.Equal(beklenen, RecorderFrame.EdgePixels(kalinlik, olcek));
+
+    [Fact]
+    public void CerceveTiklamayiGecirirVeOdakAlmaz()
+    {
+        var stil = RecorderFrame.ClickThroughStyle(0x100);
+
+        Assert.Equal(0x100, stil & 0x100);
+        Assert.NotEqual(0, stil & 0x20);
+        Assert.NotEqual(0, stil & 0x80000);
+        Assert.NotEqual(0, stil & 0x80);
+        Assert.NotEqual(0, stil & 0x08000000);
+        Assert.Equal(0, RecorderFrame.ClickThroughStyle(0) & 0x10);
+
+        var (ustte, odak, vurus, gorev, kalinlik) = AppHost.Run<(bool, bool, bool, bool, double)>(() =>
+        {
+            var cerceve = new RecorderFrame();
+            return (cerceve.Topmost, cerceve.ShowActivated, cerceve.IsHitTestVisible, cerceve.ShowInTaskbar, cerceve.Thickness);
+        });
+
+        Assert.True(ustte);
+        Assert.False(odak);
+        Assert.False(vurus);
+        Assert.False(gorev);
+        Assert.True(kalinlik > 0);
+    }
+
+    [Fact]
+    public void CerceveYalnizBolgeKaydindaVeGizlenmemisseIstenir()
+    {
+        var bolge = new Avalonia.PixelRect(10, 20, 320, 240);
+
+        Assert.Equal(bolge, RecorderFrame.Wanted(true, bolge, false));
+        Assert.Null(RecorderFrame.Wanted(false, bolge, false));
+        Assert.Null(RecorderFrame.Wanted(true, bolge, true));
+        Assert.Null(RecorderFrame.Wanted(true, null, false));
+    }
+
+    private sealed class SahteCerceve : IRecorderFrameHost
+    {
+        public List<string> Cagrilar { get; } = new();
+
+        public void Show(Avalonia.PixelRect region) => Cagrilar.Add("goster");
+
+        public void Hide() => Cagrilar.Add("gizle");
+    }
+
+    [Fact]
+    public void CerceveKisayoluGizlemeyiCevirir()
+    {
+        var (ilk, ikinci, cagrilar) = AppHost.Run<(bool, bool, List<string>)>(() =>
+        {
+            var view = new RecorderView();
+            var sahte = new SahteCerceve();
+            view.FrameHost = sahte;
+            view.RaiseEvent(new Avalonia.Input.KeyEventArgs
+            {
+                RoutedEvent = Avalonia.Input.InputElement.KeyDownEvent,
+                Key = Avalonia.Input.Key.F9
+            });
+            var once = view.FrameHiddenByUser;
+            view.ToggleFrame();
+            return (once, view.FrameHiddenByUser, sahte.Cagrilar);
+        });
+
+        Assert.True(ilk);
+        Assert.False(ikinci);
+        Assert.Empty(cagrilar);
+    }
+
+    [Fact]
+    public void CerceveKayitBaslayincaKurulurDurunkaKalkar()
+    {
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var serit = File.ReadAllText(Path.Combine(kok!.FullName, "src", "VidShrink.App", "Recorder", "RecorderView.Serit.cs"));
+
+        var oturum = serit.IndexOf("RecorderSession.StartAsync(", StringComparison.Ordinal);
+        var bolge = serit.IndexOf("_frameRegion = RegionOf(request);", StringComparison.Ordinal);
+        Assert.True(oturum >= 0 && bolge > oturum);
+        Assert.Contains("_frameRegion = null;", serit);
+        Assert.Contains("SyncFrame();", serit);
+    }
+
     [Fact]
     public void KareDugmesiOturumunKaresiniAlir()
     {

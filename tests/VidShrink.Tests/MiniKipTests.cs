@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -68,7 +68,7 @@ public class MiniKipTests
     {
         var kod = Oku("src", "VidShrink.App", "Recorder", "RecorderMini.axaml.cs");
 
-        Assert.Contains("Topmost = running || paused;", kod);
+        Assert.Contains("Topmost = running || paused || counting;", kod);
         Assert.DoesNotContain("Topmost=\"True\"", Oku("src", "VidShrink.App", "Recorder", "RecorderMini.axaml"));
     }
 
@@ -128,7 +128,8 @@ public class MiniKipTests
         var bag = Oku("src", "VidShrink.App", "Recorder", "RecorderView.Mini.cs");
 
         Assert.Contains("case Key.F7:", bag);
-        Assert.Contains("case Key.F8 when HasSession:", bag);
+        Assert.Contains("case Key.F8 when HasSession || CountingDown:", bag);
+        Assert.Contains("case Key.F9:", bag);
         Assert.Contains("_mini.AddHandler(KeyDownEvent, OnHotkey", bag);
     }
 

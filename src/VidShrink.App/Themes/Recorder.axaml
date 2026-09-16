@@ -48,4 +48,7 @@
   <x:Double x:Key="RecorderMiniReadoutWidth">72</x:Double>
   <x:Double x:Key="RecorderMiniMinWidth">276</x:Double>
 
+  <Thickness x:Key="RecorderFrameBorder">2</Thickness>
+  <x:Double x:Key="RecorderFrameThickness">2</x:Double>
+
 </ResourceDictionary>

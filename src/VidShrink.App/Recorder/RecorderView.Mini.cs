@@ -50,9 +50,14 @@ internal partial class RecorderView
                 await ToggleAsync();
                 break;
 
-            case Key.F8 when HasSession:
+            case Key.F8 when HasSession || CountingDown:
                 e.Handled = true;
                 await StopAsync();
+                break;
+
+            case Key.F9:
+                e.Handled = true;
+                ToggleFrame();
                 break;
         }
     }

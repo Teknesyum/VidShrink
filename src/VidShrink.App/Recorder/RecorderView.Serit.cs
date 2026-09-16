@@ -130,6 +130,7 @@ internal partial class RecorderView
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? _settings.ResolveFolder());
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));
+            _frameRegion = RegionOf(request);
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
         {
@@ -187,6 +188,7 @@ internal partial class RecorderView
         finally
         {
             _session = null;
+            _frameRegion = null;
             RefreshSerit();
         }
     }
@@ -224,6 +226,7 @@ internal partial class RecorderView
             : paused ? Say("recorder.strip.paused")
             : Say("recorder.strip.idle");
 
+        SyncFrame();
         RefreshMini();
     }
 }
