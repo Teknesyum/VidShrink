@@ -34,6 +34,8 @@ internal sealed class RecorderSettings
     /// </summary>
     internal bool ManualMode { get; set; }
 
+    internal bool AdvancedMode { get; set; }
+
     /// <summary>Kullanıcının istediği tahmini süre; verilmediyse <c>null</c>.</summary>
     internal int? TargetSeconds { get; set; }
 
@@ -192,6 +194,7 @@ internal sealed class RecorderSettings
             if (JsonNode.Parse(File.ReadAllText(file)) is not JsonObject root) return settings;
             settings.OutputFolder = (string?)root["outputFolder"];
             settings.ManualMode = (bool?)root["manualMode"] ?? !((bool?)root["autoMode"] ?? true);
+            settings.AdvancedMode = (bool?)root["advancedMode"] ?? settings.ManualMode;
             if ((int?)root["targetSeconds"] is { } targetSeconds && targetSeconds > 0) settings.TargetSeconds = targetSeconds;
             if ((double?)root["targetMegabytes"] is { } targetMegabytes && targetMegabytes > 0) settings.TargetMegabytes = targetMegabytes;
             if ((int?)root["fps"] is { } fps && fps > 0) settings.Fps = fps;
@@ -254,6 +257,7 @@ internal sealed class RecorderSettings
                 if (OutputFolder is null) writer.WriteNull("outputFolder");
                 else writer.WriteString("outputFolder", OutputFolder);
                 writer.WriteBoolean("manualMode", ManualMode);
+                writer.WriteBoolean("advancedMode", AdvancedMode);
                 if (TargetSeconds is { } ts) writer.WriteNumber("targetSeconds", ts);
                 else writer.WriteNull("targetSeconds");
                 if (TargetMegabytes is { } tm) writer.WriteNumber("targetMegabytes", tm);

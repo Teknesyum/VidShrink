@@ -57,7 +57,7 @@
   "recorder.error.folder": "The folder could not be chosen: {0}",
   "recorder.error.audio": "The sound input could not be prepared: {0}",
   "recorder.auto.manual": "I will pick the settings myself",
-  "recorder.auto.manual-hint": "When it is ticked the encoder, frame rate and quality controls open; while it is clear the program picks them.",
+  "recorder.auto.manual-hint": "The encoder, frame rate and quality controls open and you pick them.",
   "recorder.budget.seconds": "Approximate length (s)",
   "recorder.budget.megabytes": "Approximate size (MB)",
   "recorder.budget.optional": "optional",
@@ -84,5 +84,11 @@
   "recorder.snapshot.failed": "The snapshot could not be taken.",
   "recorder.output.to-mp4": "Save as MP4",
   "recorder.output.mp4-saved": "MP4 saved: {0}",
-  "recorder.output.mp4-failed": "Could not save as MP4."
+  "recorder.output.mp4-failed": "Could not save as MP4.",
+  "recorder.level.simple": "Simple",
+  "recorder.level.simple-hint": "Only the source, audio and Start. The program picks the encoding settings.",
+  "recorder.level.advanced": "Advanced",
+  "recorder.level.advanced-hint": "Every setting: target size, encoder, frame rate, output folder.",
+  "recorder.auto.automatic": "Let the program pick the settings",
+  "recorder.auto.automatic-hint": "The program picks the encoder, frame rate and quality with a short trial on this machine."
 }

@@ -324,6 +324,87 @@ public sealed class KaydediciArayuzTests
     }
 
     [Fact]
+    public void BasitVeGelismisKipSecenekPaneliniSurer()
+    {
+        var dosya = RecorderSettings.FilePath!;
+        var onceki = File.Exists(dosya) ? File.ReadAllBytes(dosya) : null;
+        try
+        {
+            var olcu = AppHost.Run<(bool, bool, int, bool, bool, int, bool, bool, bool, bool)>(() =>
+            {
+                var view = new RecorderView();
+                T Bul<T>(string ad) where T : Avalonia.Controls.Control
+                    => Avalonia.Controls.ControlExtensions.FindControl<T>(view, ad)!;
+
+                Bul<Avalonia.Controls.RadioButton>("RadSimple").IsChecked = true;
+                var basitGelismis = view.AdvancedMode;
+                var basitPanel = Bul<Avalonia.Controls.Border>("PanelOptions").IsVisible;
+                var basitYayilim = Avalonia.Controls.Grid.GetColumnSpan(Bul<Avalonia.Controls.Border>("PanelTarget"));
+
+                Bul<Avalonia.Controls.RadioButton>("RadAdvanced").IsChecked = true;
+                Bul<Avalonia.Controls.RadioButton>("RadManual").IsChecked = true;
+                var gelismisPanel = Bul<Avalonia.Controls.Border>("PanelOptions").IsVisible;
+                var gelismisYayilim = Avalonia.Controls.Grid.GetColumnSpan(Bul<Avalonia.Controls.Border>("PanelTarget"));
+                var gelismisElle = view.ManualMode;
+                var elleKaydi = view.Settings.ManualMode && view.Settings.AdvancedMode;
+
+                Bul<Avalonia.Controls.RadioButton>("RadSimple").IsChecked = true;
+                return (basitGelismis, basitPanel, basitYayilim, gelismisPanel, gelismisElle, gelismisYayilim,
+                    elleKaydi, view.ManualMode, view.AutoMode, view.Settings.ManualMode);
+            });
+
+            Assert.False(olcu.Item1);
+            Assert.False(olcu.Item2);
+            Assert.Equal(2, olcu.Item3);
+            Assert.True(olcu.Item4);
+            Assert.True(olcu.Item5);
+            Assert.Equal(1, olcu.Item6);
+            Assert.True(olcu.Item7);
+            Assert.False(olcu.Item8);
+            Assert.True(olcu.Item9);
+            Assert.True(olcu.Item10);
+        }
+        finally
+        {
+            if (onceki is null) File.Delete(dosya);
+            else File.WriteAllBytes(dosya, onceki);
+        }
+    }
+
+    [Theory]
+    [InlineData("{\"manualMode\":true}", true)]
+    [InlineData("{\"manualMode\":false}", false)]
+    [InlineData("{\"manualMode\":true,\"advancedMode\":false}", false)]
+    [InlineData("{}", false)]
+    public void EskiElleAyarGelismisKipteAcilir(string json, bool gelismis)
+    {
+        var klasor = CalismaKlasoru();
+        try
+        {
+            var dosya = Path.Combine(klasor, "recorder.json");
+            File.WriteAllText(dosya, json);
+            Assert.Equal(gelismis, RecorderSettings.Load(dosya).AdvancedMode);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Theory]
+    [InlineData("recorder.level.simple")]
+    [InlineData("recorder.level.simple-hint")]
+    [InlineData("recorder.level.advanced")]
+    [InlineData("recorder.level.advanced-hint")]
+    [InlineData("recorder.auto.automatic")]
+    [InlineData("recorder.auto.automatic-hint")]
+    public void KipAnahtarlariButunDillerde(string key)
+    {
+        foreach (var language in Locales.Languages)
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault(key)), $"{language} dilinde {key} yok.");
+    }
+
+    [Fact]
     public void KareDugmesiOturumunKaresiniAlir()
     {
         var kok = new DirectoryInfo(AppContext.BaseDirectory);

@@ -57,7 +57,7 @@
   "recorder.error.folder": "Klasör seçilemedi: {0}",
   "recorder.error.audio": "Ses girdisi hazırlanamadı: {0}",
   "recorder.auto.manual": "Ayarları kendim seçeceğim",
-  "recorder.auto.manual-hint": "İşaretlenince kodlayıcı, kare hızı ve kalite kolları açılır; işaretsizken bunları program seçer.",
+  "recorder.auto.manual-hint": "Kodlayıcı, kare hızı ve kalite kolları açılır; bunları siz seçersiniz.",
   "recorder.budget.seconds": "Tahmini süre (sn)",
   "recorder.budget.megabytes": "Tahmini boyut (MB)",
   "recorder.budget.optional": "isteğe bağlı",
@@ -84,5 +84,11 @@
   "recorder.snapshot.failed": "Kare alınamadı.",
   "recorder.output.to-mp4": "MP4 olarak kaydet",
   "recorder.output.mp4-saved": "MP4 kaydedildi: {0}",
-  "recorder.output.mp4-failed": "MP4'e çevrilemedi."
+  "recorder.output.mp4-failed": "MP4'e çevrilemedi.",
+  "recorder.level.simple": "Basit",
+  "recorder.level.simple-hint": "Yalnız kaynak, ses ve Başlat. Kodlama ayarlarını program seçer.",
+  "recorder.level.advanced": "Gelişmiş",
+  "recorder.level.advanced-hint": "Bütün ayarlar: hedef boyut, kodlayıcı, kare hızı, çıkış klasörü.",
+  "recorder.auto.automatic": "Ayarları program seçsin",
+  "recorder.auto.automatic-hint": "Kodlayıcı, kare hızı ve kaliteyi bu makinede kısa bir denemeyle program seçer."
 }

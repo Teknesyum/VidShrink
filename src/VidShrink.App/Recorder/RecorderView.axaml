@@ -8,6 +8,19 @@
 
     <TextBlock Text="{loc:Text recorder.pane.title}" Theme="{StaticResource H2}"/>
 
+    <StackPanel x:Name="RowLevel" Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+      <RadioButton x:Name="RadSimple"
+                   GroupName="RecorderLevel"
+                   Content="{loc:Text recorder.level.simple}"
+                   ToolTip.Tip="{loc:Text recorder.level.simple-hint}"
+                   auto:AutomationProperties.Name="{loc:Text recorder.level.simple}"/>
+      <RadioButton x:Name="RadAdvanced"
+                   GroupName="RecorderLevel"
+                   Content="{loc:Text recorder.level.advanced}"
+                   ToolTip.Tip="{loc:Text recorder.level.advanced-hint}"
+                   auto:AutomationProperties.Name="{loc:Text recorder.level.advanced}"/>
+    </StackPanel>
+
     <!--
       Denetim şeridi. Şeridin okuduğu iki sayı geçen süre ve kare sayısıdır; yazılan
       boyut kayıt sürerken akmıyor (gdigrab yakalamasında total_size son bloğa kadar
@@ -215,7 +228,7 @@
 
     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceMd}">
 
-      <Border Grid.Column="0" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
+      <Border x:Name="PanelTarget" Grid.Column="0" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
         <StackPanel Spacing="{StaticResource SpaceMd}">
           <TextBlock Text="{loc:Text recorder.target.title}" Theme="{StaticResource H3}"/>
 
@@ -259,7 +272,7 @@
         </StackPanel>
       </Border>
 
-      <Border Grid.Column="1" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
+      <Border x:Name="PanelOptions" Grid.Column="1" Theme="{StaticResource Panel}" MinHeight="{StaticResource RecorderPanelMinHeight}">
         <StackPanel Spacing="{StaticResource SpaceMd}">
           <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H3}"/>
 
@@ -293,11 +306,18 @@
                   auto:AutomationProperties.Name="{loc:Text recorder.auto.measure}"
                   Click="OnAutoMeasure"/>
 
-          <CheckBox x:Name="ChkManual"
-                    Theme="{StaticResource CheckStyle}"
-                    Content="{loc:Text recorder.auto.manual}"
-                    ToolTip.Tip="{loc:Text recorder.auto.manual-hint}"
-                    auto:AutomationProperties.Name="{loc:Text recorder.auto.manual}"/>
+          <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
+            <RadioButton x:Name="RadAuto"
+                         GroupName="RecorderEncoding"
+                         Content="{loc:Text recorder.auto.automatic}"
+                         ToolTip.Tip="{loc:Text recorder.auto.automatic-hint}"
+                         auto:AutomationProperties.Name="{loc:Text recorder.auto.automatic}"/>
+            <RadioButton x:Name="RadManual"
+                         GroupName="RecorderEncoding"
+                         Content="{loc:Text recorder.auto.manual}"
+                         ToolTip.Tip="{loc:Text recorder.auto.manual-hint}"
+                         auto:AutomationProperties.Name="{loc:Text recorder.auto.manual}"/>
+          </StackPanel>
 
           <StackPanel x:Name="PanelManualOptions" Spacing="{StaticResource SpaceMd}">
             <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">

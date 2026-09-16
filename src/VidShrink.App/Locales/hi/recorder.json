@@ -84,5 +84,11 @@
   "recorder.snapshot.failed": "The snapshot could not be taken.",
   "recorder.output.to-mp4": "Save as MP4",
   "recorder.output.mp4-saved": "MP4 saved: {0}",
-  "recorder.output.mp4-failed": "Could not save as MP4."
+  "recorder.output.mp4-failed": "Could not save as MP4.",
+  "recorder.level.simple": "Simple",
+  "recorder.level.simple-hint": "Only the source, audio and Start. The program picks the encoding settings.",
+  "recorder.level.advanced": "Advanced",
+  "recorder.level.advanced-hint": "Every setting: target size, encoder, frame rate, output folder.",
+  "recorder.auto.automatic": "Let the program pick the settings",
+  "recorder.auto.automatic-hint": "The program picks the encoder, frame rate and quality with a short trial on this machine."
 }

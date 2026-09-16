@@ -33,7 +33,8 @@ sürümden (`x.0.0`) önce koşar.
   `VIDSHRINK_SETTINGS_PATH` klasörüne gitmesi; "Kare al" düğmesi (sahte kare işiyle yolun görünmesi, başarısız ve atan
   işin hata satırı, üç anahtarın 42 dilde olması). Varsayılan kap Matroska: eski `container: Mp4` varsayılana döner,
   seçim `containerChoice`'a yazılır; sonuç panelinde "MP4 olarak kaydet" yalnız mkv'de görünür, `-c copy` ile
-  sahte süreçten geçer. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
+  sahte süreçten geçer. Basit/Gelişmiş kip: Basit'te seçenek paneli gizli, hedef iki sütuna yayılır ve elle kip
+  kapalı sayılır; eski `manualMode: true` Gelişmiş açılır; altı anahtar 42 dilde. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

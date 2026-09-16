@@ -37,7 +37,32 @@ internal partial class RecorderView
     internal bool AutoMode => !ManualMode;
 
     /// <summary>Kullanıcı kodlama kolunu kendi mi yazıyor.</summary>
-    internal bool ManualMode => ChkManual.IsChecked ?? false;
+    internal bool ManualMode => AdvancedMode && (RadManual.IsChecked ?? false);
+
+    internal bool AdvancedMode => RadAdvanced.IsChecked ?? false;
+
+    private void InitLevel()
+    {
+        RadAdvanced.IsChecked = _settings.AdvancedMode;
+        RadSimple.IsChecked = !_settings.AdvancedMode;
+        RadAdvanced.IsCheckedChanged += OnLevelToggled;
+        ApplyLevel();
+    }
+
+    private void OnLevelToggled(object? sender, RoutedEventArgs e)
+    {
+        _settings.AdvancedMode = AdvancedMode;
+        _settings.Save(RecorderSettings.FilePath);
+        ApplyLevel();
+        ApplyAutoVisibility();
+    }
+
+    private void ApplyLevel()
+    {
+        var advanced = AdvancedMode;
+        PanelOptions.IsVisible = advanced;
+        Grid.SetColumnSpan(PanelTarget, advanced ? 1 : 2);
+    }
 
     /// <summary>Kullanıcının verdiği hedeften çıkan bütçe; hedef yoksa hükmü <c>NotRequested</c>.</summary>
     internal RecorderBudget Budget => RecorderBudget.From(TargetMegabytes, TargetSeconds, AudioTrackCount());
@@ -68,10 +93,12 @@ internal partial class RecorderView
 
     private void InitOtomatik()
     {
-        ChkManual.IsChecked = _settings.ManualMode;
+        RadManual.IsChecked = _settings.ManualMode;
+        RadAuto.IsChecked = !_settings.ManualMode;
         TxtTargetSeconds.Text = _settings.TargetSeconds?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
         TxtTargetMegabytes.Text = _settings.TargetMegabytes?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
-        ChkManual.IsCheckedChanged += OnAutoToggled;
+        RadManual.IsCheckedChanged += OnAutoToggled;
+        InitLevel();
         TxtTargetSeconds.TextChanged += OnBudgetChanged;
         TxtTargetMegabytes.TextChanged += OnBudgetChanged;
         ApplyAutoVisibility();
@@ -110,7 +137,7 @@ internal partial class RecorderView
     /// </summary>
     private async void OnAutoToggled(object? sender, RoutedEventArgs e)
     {
-        _settings.ManualMode = ManualMode;
+        _settings.ManualMode = RadManual.IsChecked ?? false;
         _settings.Save(RecorderSettings.FilePath);
         ApplyAutoVisibility();
 

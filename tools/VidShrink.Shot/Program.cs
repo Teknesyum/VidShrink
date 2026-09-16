@@ -407,18 +407,21 @@ public static class Program
     }
 
     /// <summary>
-    /// Kaydedici karesi otomatik kiple cekilir: <c>ChkManual</c> bosaltilinca kodlayici,
+    /// Kaydedici karesi Gelismis ve otomatik kiple cekilir: <c>RadAuto</c> secilince kodlayici,
     /// kare hizi ve boyut kararini programin kendisi veriyor ve gerekce satiri aciliyor.
     /// </summary>
     private static void AutomaticRecorder(MainWindow window)
     {
         var pane = Named(window, "RecorderPane");
-        var field = pane.GetType().GetField(
-            "ChkManual",
-            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-            ?? throw new MissingFieldException(pane.GetType().Name, "ChkManual");
+        foreach (var name in new[] { "RadAdvanced", "RadAuto" })
+        {
+            var field = pane.GetType().GetField(
+                name,
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                ?? throw new MissingFieldException(pane.GetType().Name, name);
 
-        ((CheckBox)field.GetValue(pane)!).IsChecked = false;
+            ((RadioButton)field.GetValue(pane)!).IsChecked = true;
+        }
     }
 
     private static void SetTarget(MainWindow window, string megabytes)
