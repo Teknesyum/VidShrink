@@ -115,6 +115,9 @@ public partial class ShrinkJobWindow : Window
         BtnClose.Click += (_, _) => Close();
         BtnOpenInApp.Click += OnOpenInApp;
         BtnReveal.Click += OnReveal;
+        BtnShare.Click += OnShare;
+        BtnShareCancel.Click += OnShareCancel;
+        BtnShareCopy.Click += OnCopyShareLink;
 
         TxtHeadline.Text = Say("main.shrink-job.waiting");
         TxtTarget.Text = "";
@@ -244,6 +247,7 @@ public partial class ShrinkJobWindow : Window
         Progress.IsVisible = true;
         RowFacts.IsVisible = true;
         BtnReveal.IsVisible = false;
+        ResetShare(false);
         Progress.Value = 0;
         TxtHeadline.Text = Path.GetFileName(request.Path);
         TxtTarget.Text = Say("main.shrink-job.target",
@@ -278,6 +282,7 @@ public partial class ShrinkJobWindow : Window
                 Progress.Value = 1;
                 TxtMessage.Text = result.OutputPath;
                 BtnReveal.IsVisible = true;
+                ResetShare(true);
             }
             else
             {
@@ -314,6 +319,7 @@ public partial class ShrinkJobWindow : Window
         _closeTimer = new DispatcherTimer { Interval = Linger };
         _closeTimer.Tick += (_, _) =>
         {
+            if (_shareFlow?.Running ?? false) return;
             _closeTimer?.Stop();
             if (_pending.Count == 0 && !_busy) Close();
         };
@@ -348,6 +354,7 @@ public partial class ShrinkJobWindow : Window
     {
         _closeTimer?.Stop();
         _cts?.Cancel();
+        _shareFlow?.Cancel();
         _queue?.Dispose();
         base.OnClosing(e);
     }
