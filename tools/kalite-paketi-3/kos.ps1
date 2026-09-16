@@ -96,8 +96,9 @@ function Kesitler {
         Ffmpeg @('-ss', $secim[$ad].Baslangic.ToString($Inv), '-i', $Kaynak, '-t', '10', '-an', '-sn', '-map', '0:v:0', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', $hedef)
     }
     if ($EkranKaynak) {
-        Ffmpeg @('-ss', '5', '-i', $EkranKaynak, '-t', '10', '-an', '-sn', '-map', '0:v:0', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', (Join-Path $Cikti 'kesit-ekran.mkv'))
-        $secim['ekran'] = [pscustomobject]@{ Kaynak = (Split-Path $EkranKaynak -Leaf); Baslangic = 5 }
+        $ekranBas = if ((Probe $EkranKaynak).Sure -ge 15) { 5 } else { 0 }
+        Ffmpeg @('-ss', "$ekranBas", '-i', $EkranKaynak, '-t', '10', '-an', '-sn', '-map', '0:v:0', '-c:v', 'ffv1', '-pix_fmt', 'yuv420p', (Join-Path $Cikti 'kesit-ekran.mkv'))
+        $secim['ekran'] = [pscustomobject]@{ Kaynak = (Split-Path $EkranKaynak -Leaf); Baslangic = $ekranBas }
     }
     [pscustomobject]@{ Kaynak = (Split-Path $Kaynak -Leaf); Genislik = $bilgi.W; Yukseklik = $bilgi.H; Fps = $bilgi.FpsMetin; Sure = $bilgi.Sure; Secim = $secim; Adaylar = $adaylar } |
         ConvertTo-Json -Depth 5 | Set-Content (Join-Path $Cikti 'kesitler.json')

@@ -42,11 +42,17 @@ jobs:
         shell: pwsh
         run: |
           $varsayilan = 'whatsapp,handbrake,ceza'
-          if ('${{ github.ref_name }}' -match '^olcum-kalite-([a-z0-9+]+)--') { $varsayilan = $Matches[1].Replace('+', ',') }
+          $kesitVarsayilan = 'karanlik,parlak,orta'
+          if ('${{ github.ref_name }}' -match '^olcum-kalite-([a-z0-9+]+)(?:__([a-z0-9+]+))?--') {
+            $varsayilan = $Matches[1].Replace('+', ',')
+            if ($Matches[2]) { $kesitVarsayilan = $Matches[2].Replace('+', ',') }
+          }
           $isler = '${{ inputs.isler }}'
           if (-not $isler) { $isler = $varsayilan }
           $isler = $isler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-          $kesitler = '${{ inputs.kesitler || 'karanlik,parlak,orta' }}'.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          $kesitler = '${{ inputs.kesitler }}'
+          if (-not $kesitler) { $kesitler = $kesitVarsayilan }
+          $kesitler = $kesitler.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
           $liste = @()
           foreach ($is in $isler) {
             if ($is -eq 'whatsapp') { $liste += @{ is = $is; kesit = '' } }
@@ -77,8 +83,9 @@ jobs:
           $beklenen = '${{ inputs.kaynak_sha256 }}'
           if ($beklenen -and $beklenen.ToUpperInvariant() -ne $sha) { throw "kaynak sha256 uyusmuyor: $sha" }
           $ekran = '${{ inputs.ekran_url }}'
+          if (-not $ekran -and '${{ github.ref_name }}' -match 'ekran') { $ekran = 'https://media.xiph.org/video/aomctc/test_set/b2_scc/Debugging_1920x1080_30fps_8bit_420.y4m' }
           if ($ekran) {
-            $e = Join-Path $env:RUNNER_TEMP 'ekran.mkv'
+            $e = Join-Path $env:RUNNER_TEMP ('ekran' + [IO.Path]::GetExtension(([uri]$ekran).AbsolutePath))
             Invoke-WebRequest -Uri $ekran -OutFile $e
             "ekran sha256=$((Get-FileHash $e -Algorithm SHA256).Hash)" | Tee-Object -Append -FilePath (Join-Path $env:RUNNER_TEMP 'kaynak-sha256.txt')
           }
@@ -87,7 +94,8 @@ jobs:
       - name: kesitleri sec
         run: |
           $a = @('-Is', 'kesit', '-Kaynak', "$env:RUNNER_TEMP\kaynak.mkv", '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH)
-          if (Test-Path "$env:RUNNER_TEMP\ekran.mkv") { $a += @('-EkranKaynak', "$env:RUNNER_TEMP\ekran.mkv") }
+          $ekran = Get-ChildItem $env:RUNNER_TEMP -Filter 'ekran.*' | Select-Object -First 1
+          if ($ekran) { $a += @('-EkranKaynak', $ekran.FullName) }
           pwsh tools/kalite-paketi-3/kos.ps1 @a
           Copy-Item "$env:RUNNER_TEMP\kaynak-sha256.txt" "$env:RUNNER_TEMP\olcum\"
       - uses: actions/upload-artifact@v4
