@@ -166,8 +166,7 @@ public partial class MainWindow : Window
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
             PlayerHistoryFileName);
 
-        RefreshOutputAndFfmpegChoiceLists();
-        BuildLanguageSwitch();
+       BuildLanguageSwitch();
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
         ShowSourceName();
@@ -237,10 +236,10 @@ public partial class MainWindow : Window
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
         Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
         Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
-        Watch(CmbOutputFolderMode, SelectingItemsControl.SelectedIndexProperty, OnOutputFolderModeChanged);
+        Watch(RbOutputFixed, ToggleButton.IsCheckedProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
-        Watch(CmbFfmpegPathMode, SelectingItemsControl.SelectedIndexProperty, OnFfmpegPathModeChanged);
+        Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(CmbShareTarget, SelectingItemsControl.SelectedIndexProperty, OnShareTargetChanged);
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
@@ -917,8 +916,7 @@ public partial class MainWindow : Window
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);
         RefreshUpdateTexts();
         RefreshSettingsTexts();
-        RefreshOutputAndFfmpegChoiceLists();
-        RelabelShellMenu();
+       RelabelShellMenu();
         RefreshShareTarget();
         RefreshAdvancedTexts();
         UpdateToolStatus();
@@ -938,26 +936,26 @@ public partial class MainWindow : Window
         BtnCancelResetSettings.Content = Strings.Get("settings.reset-cancel");
     }
 
-    private void RefreshOutputAndFfmpegChoiceLists()
+    /// <summary>Çıktı klasörü kipi: 0 kaynağın yanı, 1 sabit klasör. Kayıtlı ayarla aynı sayı.</summary>
+    internal int OutputFolderModeIndex
     {
-        var wasSyncing = _syncing;
-        _syncing = true;
-        var outputIndex = CmbOutputFolderMode.SelectedIndex;
-        CmbOutputFolderMode.ItemsSource = new[]
+        get => RbOutputFixed.IsChecked == true ? 1 : 0;
+        set
         {
-            Say("settings-tab.output-folder.beside-source"),
-            Say("settings-tab.output-folder.fixed")
-        };
-        CmbOutputFolderMode.SelectedIndex = outputIndex >= 0 ? outputIndex : 0;
+            RbOutputBesideSource.IsChecked = value != 1;
+            RbOutputFixed.IsChecked = value == 1;
+        }
+    }
 
-        var ffmpegIndex = CmbFfmpegPathMode.SelectedIndex;
-        CmbFfmpegPathMode.ItemsSource = new[]
+    /// <summary>ffmpeg yolu kipi: 0 otomatik, 1 elle. Kayıtlı ayarla aynı sayı.</summary>
+    internal int FfmpegPathModeIndex
+    {
+        get => RbFfmpegManual.IsChecked == true ? 1 : 0;
+        set
         {
-            Say("settings-tab.ffmpeg-path.auto"),
-            Say("settings-tab.ffmpeg-path.manual")
-        };
-        CmbFfmpegPathMode.SelectedIndex = ffmpegIndex >= 0 ? ffmpegIndex : 0;
-        _syncing = wasSyncing;
+            RbFfmpegAuto.IsChecked = value != 1;
+            RbFfmpegManual.IsChecked = value == 1;
+        }
     }
 
     internal static string ResolveLanguage(string? saved, string? operatingSystem)
@@ -1251,10 +1249,10 @@ public partial class MainWindow : Window
             AdvMinFps = boxes[5].SelectedIndex,
             AdvEncoderPath = AdvEncoderPathIndex,
             AdvCodecLock = boxes[6].SelectedIndex,
-            OutputFolderMode = CmbOutputFolderMode.SelectedIndex,
+            OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
-            FfmpegPathMode = CmbFfmpegPathMode.SelectedIndex,
+            FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             Theme = _theme
         };
@@ -1278,7 +1276,7 @@ public partial class MainWindow : Window
             for (var i = 0; i < boxes.Length; i++)
                 if (indices[i] >= 0 && indices[i] < boxes[i].ItemCount) boxes[i].SelectedIndex = indices[i];
 
-            CmbOutputFolderMode.SelectedIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
+            OutputFolderModeIndex = Math.Clamp(settings.OutputFolderMode, 0, 1);
             TxtOutputFolder.Text = settings.OutputFolder;
             OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
 
@@ -1288,7 +1286,7 @@ public partial class MainWindow : Window
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
 
-            CmbFfmpegPathMode.SelectedIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
+            FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
             FfmpegPathPickerRow.IsVisible = settings.FfmpegPathMode == 1;
             ValidateFfmpegPath();
@@ -1311,13 +1309,13 @@ public partial class MainWindow : Window
 
     private void OnOutputFolderModeChanged()
     {
-        OutputFolderPickerRow.IsVisible = CmbOutputFolderMode.SelectedIndex == 1;
+        OutputFolderPickerRow.IsVisible = OutputFolderModeIndex == 1;
         SaveAppSettings();
     }
 
     private void OnFfmpegPathModeChanged()
     {
-        FfmpegPathPickerRow.IsVisible = CmbFfmpegPathMode.SelectedIndex == 1;
+        FfmpegPathPickerRow.IsVisible = FfmpegPathModeIndex == 1;
         ValidateFfmpegPath();
         SaveAppSettings();
     }
@@ -1330,7 +1328,7 @@ public partial class MainWindow : Window
 
     private void ValidateFfmpegPath()
     {
-        if (CmbFfmpegPathMode.SelectedIndex != 1)
+        if (FfmpegPathModeIndex != 1)
         {
             TxtFfmpegPathError.IsVisible = false;
             return;
