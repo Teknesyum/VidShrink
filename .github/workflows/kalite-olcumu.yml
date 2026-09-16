@@ -26,6 +26,12 @@ on:
       izgara:
         description: AV1 izgarasi JSON
         default: '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}'
+      uzun_sure:
+        description: hedefbant kaynak suresi (sn)
+        default: '120'
+      hedefler:
+        description: hedefbant hedefleri (MB, virgullu)
+        default: '50,100'
 
 env:
   DOTNET_NOLOGO: 'true'
@@ -125,6 +131,42 @@ jobs:
           path: ${{ runner.temp }}/olcum
       - name: bench derle
         run: dotnet build tools/VidShrink.Bench -c Release -m:2
+      - name: e1 bench derle
+        if: matrix.is == 'hedefbant' || matrix.is == 'oran'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $d = Join-Path $env:RUNNER_TEMP 'e1'
+          git worktree add --detach $d HEAD
+          $f = Join-Path $d 'src/VidShrink.Core/FfmpegArguments.cs'
+          $eski = 'tune=1:enable-variance-boost=0'
+          $yeni = 'tune=0:enable-variance-boost=1:variance-boost-strength=2'
+          $t = [IO.File]::ReadAllText($f)
+          $n = ([regex]::Matches($t, [regex]::Escape($eski))).Count
+          if ($n -ne 2) { throw "e1 dizgesi $n yerde bulundu, 2 bekleniyordu" }
+          [IO.File]::WriteAllText($f, $t.Replace($eski, $yeni))
+          dotnet build (Join-Path $d 'tools/VidShrink.Bench') -c Release -m:2
+          if ($LASTEXITCODE -ne 0) { throw 'e1 bench derlenemedi' }
+          "BENCH_E1=$(Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll')" | Add-Content $env:GITHUB_ENV
+          dotnet (Join-Path $d 'tools/VidShrink.Bench/bin/Release/net8.0/VidShrink.Bench.dll') psy-args libsvtav1
+          dotnet $env:BENCH psy-args libsvtav1
+      - name: uzun kaynak indir
+        if: matrix.is == 'hedefbant'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          if ('${{ matrix.kesit }}' -eq 'ekran') {
+            $ekran = '${{ inputs.ekran_url }}'
+            if (-not $ekran) { $ekran = 'https://media.xiph.org/video/aomctc/test_set/b2_scc/Debugging_1920x1080_30fps_8bit_420.y4m' }
+            $e = Join-Path $env:RUNNER_TEMP ('uzun-ekran' + [IO.Path]::GetExtension(([uri]$ekran).AbsolutePath))
+            Invoke-WebRequest -Uri $ekran -OutFile $e
+            "UZUN_EKRAN=$e" | Add-Content $env:GITHUB_ENV
+            "ekran sha256=$((Get-FileHash $e -Algorithm SHA256).Hash)"
+          } else {
+            $hedef = Join-Path $env:RUNNER_TEMP 'uzun.mkv'
+            Invoke-WebRequest -Uri '${{ inputs.kaynak_url || 'https://download.blender.org/durian/movies/Sintel.2010.1080p.mkv' }}' -OutFile $hedef
+            "UZUN=$hedef" | Add-Content $env:GITHUB_ENV
+            "kaynak sha256=$((Get-FileHash $hedef -Algorithm SHA256).Hash)"
+          }
       - name: olc
         env:
           IZGARA: ${{ inputs.izgara || '{"preset":[4,6,8,10],"crf":[28,36,44],"kbit":[],"filmgrain":[0,8],"tune":[0,1],"keyint":[240]}' }}
@@ -136,6 +178,10 @@ jobs:
           Write-Host "izgara=$env:IZGARA"
           $a = @('-Is', '${{ matrix.is }}', '-Kaynak', 'kesitler', '-Cikti', "$env:RUNNER_TEMP\olcum", '-Bench', $env:BENCH, '-HandBrake', $env:HANDBRAKE_CLI, '-Kbitler', $env:KBITLER, '-Izgara', $env:IZGARA)
           if ('${{ matrix.kesit }}') { $a += @('-Kesit', '${{ matrix.kesit }}') }
+          if ($env:BENCH_E1) { $a += @('-BenchE1', $env:BENCH_E1) }
+          if ($env:UZUN) { $a += @('-Uzun', $env:UZUN) }
+          if ($env:UZUN_EKRAN) { $a += @('-EkranUzun', $env:UZUN_EKRAN) }
+          if ('${{ matrix.is }}' -eq 'hedefbant') { $a += @('-UzunSure', '${{ inputs.uzun_sure || '120' }}', '-Hedefler', '${{ inputs.hedefler || '50,100' }}') }
           pwsh tools/kalite-paketi-3/kos.ps1 @a
       - name: sonuclari ayir
         if: always()

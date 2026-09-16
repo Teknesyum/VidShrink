@@ -529,8 +529,8 @@ public static class FfmpegArguments
             && Supported("-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2"))
             args.AddRange(new[] { "-x265-params", "psy-rd=2:psy-rdoq=1:aq-mode=2" });
         else if (codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase)
-                 && Supported("-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2"))
-            args.AddRange(new[] { "-svtav1-params", "tune=0:enable-variance-boost=1:variance-boost-strength=2" });
+                 && Supported("-svtav1-params", "tune=1:enable-variance-boost=0"))
+            args.AddRange(new[] { "-svtav1-params", "tune=1:enable-variance-boost=0" });
         else if (codec.Contains("nvenc", StringComparison.OrdinalIgnoreCase))
         {
             if (Supported("-spatial-aq", "1"))
