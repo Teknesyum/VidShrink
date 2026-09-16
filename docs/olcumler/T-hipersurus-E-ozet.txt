@@ -1,0 +1,133 @@
+kip      : sicak
+klip     : C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\klip\kucuk.mp4 (6.2 MB)
+tekrar   : 14
+makine   : DESKTOP-0J80KVV / Microsoft Windows NT 10.0.22631.0
+an       : 2026-09-16 12:26:33
+birim    : ms, surec yaratilmasindan (Process.StartTime) itibaren
+kabuk-ilk-kare : ms, olcerin kendi saati; Start-Process cagrisindan ilk-kare satiri
+           gorulene kadar, yoklama 20 ms. Sifir noktasi yapidan bagimsiz oldugu
+           icin iki yapiyi karsilastiran tek adil sutun budur.
+p95      : en yakin sira yontemi, ceil(0.95*n)
+eslesik  : her tekrarda iki yapi, sira tekrardan tekrara donuyor
+
+== taban ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper-e2\temiz-taban\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n  en_az ortanca     p95  en_cok
+----                 -  ----- -------     ---  ------
+kabuk-ilk-kare      14 951,40 1230,10 1567,30 1567,30
+baslatici           14  45,30   61,20   84,20   84,20
+perde               14  79,80  104,80  121,40  121,40
+app-dogdu           14  56,20   73,90   98,70   98,70
+main                14 108,50  133,70  194,50  194,50
+tek-ornek           14 112,20  137,50  200,20  200,20
+libmpv-hazir        14 126,90  150,60  215,00  215,00
+cerceve             14 344,60  396,50  463,10  463,10
+gecici-temizlik     14 428,10  503,60  566,10  566,10
+ayar-okundu         14 347,50  400,10  470,20  470,20
+palet               14 347,80  400,50  470,60  470,60
+pencere-yapici      14 373,40  542,60  613,10  613,10
+xaml-sekmeler       14 414,60  583,80  664,70  664,70
+xaml-oynatici       14 437,50  606,20  694,40  694,40
+xaml-kucultme       14 454,20  624,00  715,20  715,20
+xaml-donusturme     14 480,90  646,40  743,30  743,30
+xaml-hakkinda       14 485,80  650,70  749,10  749,10
+xaml-kaydedici      14 487,30  652,20  750,70  750,70
+xaml-gelismis       14 487,60  652,40  751,00  751,00
+xaml-ayarlar        14 488,50  653,40  751,90  751,90
+xaml-sekmeler-bitti 14 491,80  656,60  756,50  756,50
+xaml                14 493,20  658,00  758,60  758,60
+yapici-bitti        14 577,90  745,80  899,00  899,00
+pencere-kuruldu     14 758,20  931,70 1084,70 1084,70
+pencere-yuklendi    14 872,10 1045,70 1205,60 1205,60
+ayarlar             14 887,70 1062,60 1224,30 1224,30
+giris-canlandirmasi 14 888,30 1063,20 1224,80 1224,80
+sekme               14 889,20 1064,20 1225,70 1225,70
+kare-kaynagi        14 946,40 1134,60 1290,60 1290,60
+ilk-kare            14 946,70 1215,40 1538,10 1538,10
+motor-acildi        14 911,80 1085,80 1249,00 1249,00
+
+== e ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper-e2\temiz-yeni\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n  en_az ortanca    p95 en_cok
+----                 -  ----- -------    --- ------
+kabuk-ilk-kare      14 707,40  803,50 974,00 974,00
+baslatici           14  45,50   59,10 107,30 107,30
+perde               14  82,10  102,40 154,20 154,20
+app-dogdu           14  54,70   71,70 125,50 125,50
+main                14 108,50  132,00 236,40 236,40
+tek-ornek           14 111,60  136,00 242,40 242,40
+libmpv-hazir        14 124,70  150,40 258,50 258,50
+cerceve             14 346,90  394,60 495,50 495,50
+gecici-temizlik     14 434,70  497,00 595,00 595,00
+ayar-okundu         14 349,80  398,40 501,50 501,50
+palet               14 350,10  398,80 501,80 501,80
+pencere-yapici      14 417,60  493,20 640,50 640,50
+xaml-sekmeler       14 459,70  538,80 686,90 686,90
+xaml-oynatici       14 483,20  564,20 713,60 713,60
+xaml-kucultme       14 499,70  581,10 733,00 733,00
+xaml-donusturme     14 523,70  603,90 755,70 755,70
+xaml-hakkinda       14 529,00  608,10 761,50 761,50
+xaml-kaydedici      14 531,30  609,90 763,00 763,00
+xaml-gelismis       14 531,60  610,20 763,40 763,40
+xaml-ayarlar        14 533,00  611,00 764,30 764,30
+xaml-sekmeler-bitti 14 537,50  614,50 767,40 767,40
+xaml                14 539,50  615,90 768,80 768,80
+yapici-bitti        14 560,20  636,50 818,00 818,00
+pencere-kuruldu     14 566,20  642,10 824,10 824,10
+pencere-yuklendi    14 643,60  726,70 902,70 902,70
+ayarlar             14 661,70  745,90 921,70 921,70
+giris-canlandirmasi 14 661,90  746,20 921,90 921,90
+sekme               14 662,20  746,40 922,10 922,10
+kare-kaynagi        14 705,80  788,30 967,10 967,10
+ilk-kare            14 706,10  788,70 967,40 967,40
+motor-acildi        14 682,20  766,30 941,90 941,90
+
+== eslesik fark (e eksi taban, eksi deger e lehine) ==
+
+adim                cift fark_ortanca fark_en_az fark_en_cok b_lehine_cift
+----                ---- ------------ ---------- ----------- -------------
+kabuk-ilk-kare        14      -455,20    -673,70      -49,00            14
+baslatici             14        -0,10     -24,20       23,10             7
+perde                 14        -1,00     -27,50       50,60             8
+app-dogdu             14        -0,90     -25,40       26,80             8
+main                  14        -0,90     -29,00       47,50             8
+tek-ornek             14        -1,30     -29,40       48,50             8
+libmpv-hazir          14         1,80     -34,40       48,40             7
+cerceve               14        -5,70     -62,40       95,10             9
+gecici-temizlik       14       -14,60     -75,10      130,20            10
+ayar-okundu           14        -6,10     -63,10       95,90             9
+palet                 14        -6,10     -63,10       95,90             9
+pencere-yapici        14       -23,50    -161,60      230,90             7
+xaml-sekmeler         14       -22,20    -161,20      238,60             7
+xaml-oynatici         14       -22,10    -161,10      236,80             7
+xaml-kucultme         14       -20,90    -161,20      237,50             7
+xaml-donusturme       14       -19,10    -159,90      233,00             7
+xaml-hakkinda         14       -19,10    -158,60      233,20             7
+xaml-kaydedici        14       -18,90    -157,80      234,00             7
+xaml-gelismis         14       -18,90    -157,70      233,90             7
+xaml-ayarlar          14       -19,00    -157,30      233,90             7
+xaml-sekmeler-bitti   14       -19,30    -156,20      234,00             7
+xaml                  14       -19,30    -155,60      234,20             7
+yapici-bitti          14       -96,90    -219,80      168,80             9
+pencere-kuruldu       14      -276,20    -396,90       -5,40            14
+pencere-yuklendi      14      -315,00    -446,40      -38,10            14
+ayarlar               14      -314,20    -446,10      -33,30            14
+giris-canlandirmasi   14      -314,60    -446,60      -33,70            14
+sekme                 14      -315,40    -447,40      -34,30            14
+kare-kaynagi          14      -364,30    -463,20      -47,90            14
+ilk-kare              14      -449,20    -658,80      -45,20            14
+motor-acildi          14      -319,60    -452,70      -36,30            14
+
+== aralik bazinda eslesik fark (iz dosyalarindan, e eksi taban) ==
+
+aralik                               taban      e fark_ortanca lehine
+------                               -----      - ------------ ------
+pencere-yapici -> xaml              119,80 121,40         2,50 6/14
+xaml -> yapici-bitti                 83,40  20,70       -62,90 14/14
+yapici-bitti -> pencere-kuruldu     182,80   5,80      -176,60 14/14
+pencere-kuruldu -> pencere-yuklendi 116,80  78,80       -34,70 14/14
+pencere-yuklendi -> sekme            18,80  18,80        -0,40 8/14
+sekme -> kare-kaynagi                59,70  43,10       -16,80 14/14
+kare-kaynagi -> ilk-kare            114,80   0,30      -114,40 12/14
+
+

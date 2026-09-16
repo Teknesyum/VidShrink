@@ -262,6 +262,7 @@ public partial class MainWindow : Window
         RefreshSectionSummaries();
         // Sınır cümlesi ölçüm koşmadan da ekranda durur; sonda burada çağrılmıyor.
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
+        if (_startupFile is not null) Tabs.SelectedIndex = PlayerTabIndex;
         Opened += OnWindowLoaded;
         AcilisIzi.Yaz("yapici-bitti");
     }
@@ -472,19 +473,30 @@ public partial class MainWindow : Window
 
     private void LoadTitleBarLogo()
     {
-        try
-        {
-            if (!this.TryFindResource("AppIconUri", out var uri) || uri is not string source) return;
-            using var stream = AssetLoader.Open(new Uri(source));
-            var logo = new Bitmap(stream);
-            AppLogo.Source = logo;
-            UpdateNoticeIcon.Source = logo;
-            AppLogo.IsVisible = true;
-        }
-        catch (Exception)
+        if (!this.TryFindResource("AppIconUri", out var uri) || uri is not string source)
         {
             AppLogo.IsVisible = false;
+            return;
         }
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                using var stream = AssetLoader.Open(new Uri(source));
+                var logo = new Bitmap(stream);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    AppLogo.Source = logo;
+                    UpdateNoticeIcon.Source = logo;
+                    AppLogo.IsVisible = true;
+                });
+            }
+            catch (Exception)
+            {
+                Dispatcher.UIThread.Post(() => AppLogo.IsVisible = false);
+            }
+        });
     }
 
     private static void Watch(AvaloniaObject target, AvaloniaProperty property, Action handler)
@@ -738,12 +750,12 @@ public partial class MainWindow : Window
         {
             var button = new Button
             {
-                Content = Strings.GetIn(language, "main.language.name"),
+                Content = Strings.PeekIn(language, "main.language.name"),
                 Theme = Look("LanguageButton"),
                 Tag = language
             };
 
-            AutomationProperties.SetName(button, Strings.GetIn(language, "main.language.name"));
+            AutomationProperties.SetName(button, Strings.PeekIn(language, "main.language.name"));
             button.Click += (_, _) => UseLanguage(language);
             LangSwitch.Children.Add(button);
         }
@@ -815,7 +827,7 @@ public partial class MainWindow : Window
         {
             _languageOrder = Strings.Languages;
             CmbLanguage.ItemsSource = _languageOrder
-                .Select(language => Strings.GetIn(language, "main.language.name"))
+                .Select(language => Strings.PeekIn(language, "main.language.name"))
                 .ToArray();
         }
         finally

@@ -317,3 +317,78 @@ hedef 1 sn'nin biraz altında.
 | Plan ve kararlar | [docs/plan.md](../plan.md) D dalgası |
 | Fable'ın netleştirmesi | [017](../netlestirme/017-c-dalgasindan-sonra-cift-tik-ile-ilk-kar.md) |
 | Pimler | [HipersurusTests.cs](../../tests/VidShrink.Tests/HipersurusTests.cs) |
+
+## E dalgası — Pencere kurulumunda kalan kendi kalemlerimiz (16 Eylül 2026)
+
+D dalgası "kendi kodumuzda büyük kalem kalmadı" demişti. Bu iddia sondayla ölçüldü ve
+tutmadı: yapıcı ile ilk kare arasında dört kendi kalemimiz vardı, en büyüğü 186 ms.
+
+Eşleşik sıcak ölçüm, 14 tekrar, aynı 6,2 MB klip. Taban **c87c2afb** (0.8.0), karşı taraf
+**E**. İki yapı da iz noktasız; aynı başlatıcı ve `tools\libmpv` ile.
+
+| Sütun | c87c2afb | E | Eşleşik fark ortancası | E lehine çift |
+| --- | --- | --- | --- | --- |
+| kabuk-ilk-kare | 1230,1 ms | 803,5 ms | **−455,2 ms** | 14/14 |
+| ilk-kare | 1215,4 ms | 788,7 ms | −449,2 ms | 14/14 |
+| pencere-kuruldu | 931,7 ms | 642,1 ms | −276,2 ms | 14/14 |
+| perde | 104,8 ms | 102,4 ms | −1,0 ms | 8/14 |
+
+Aralık bazında (iz dosyalarından, çift içi fark):
+
+| Aralık | c87c2afb | E | Fark ortancası | E lehine |
+| --- | --- | --- | --- | --- |
+| pencere-yapici → xaml | 119,8 | 121,4 | +2,5 | 6/14 |
+| xaml → yapici-bitti | 83,4 | 20,7 | −62,9 | 14/14 |
+| yapici-bitti → pencere-kuruldu | 182,8 | 5,8 | −176,6 | 14/14 |
+| pencere-kuruldu → pencere-yuklendi | 116,8 | 78,8 | −34,7 | 14/14 |
+| pencere-yuklendi → sekme | 18,8 | 18,8 | −0,4 | 8/14 |
+| sekme → kare-kaynagi | 59,7 | 43,1 | −16,8 | 14/14 |
+| kare-kaynagi → ilk-kare | 114,8 | 0,3 | −114,4 | 12/14 |
+
+### Sonda: kalemler nerede
+
+Geçici iz noktaları yapıcıya, `OnWindowLoaded`'a, `App.OnFrameworkInitializationCompleted`'a,
+`PlayerView.OpenAsync`'e ve pencerenin ilk ölçü/yerleşim/`OnOpened` geçişlerine kondu. İki
+sondalı yapı eşleşik koştu (14 tekrar); ortanca pay, ms:
+
+| Kalem | Taban | E | Değişiklik |
+| --- | --- | --- | --- |
+| `window.Icon` için PNG okuma | 47,9 | 2,2 | E1 |
+| `window.Icon =` ataması (1254 px PNG → HICON) | 138,2 | 3,4 | E1 |
+| Dil düğmeleri + dil listesi (42 kataloğun tamamı yükleniyordu) | 64,0 | 13,7 | E3 |
+| Başlık logosu çözümü (1254 px PNG) | 20,8 | 5,0 | E2 |
+| İlk ölçü (Measure) | 56,6 | 33,2 | E4 |
+| Yerleşimden `OnOpened`'a | 52,4 | 35,8 | E1 + E4, ayrılmadı |
+| Sekme değişiminden sonra oynatıcı yerleşimi | 25,2 | 14,4 | E4 |
+| `kare-kaynagi → ilk-kare` | 79,8 | 0,3 | ayrılmadı |
+
+Kalemin küçüklüğü yüzünden kesilmeyenler: güncelleme paneli (`InitializeUpdateUi`) ~0,2 ms,
+`UseLanguage(tr)` ~17 ms, `ApplyAdvanced` ~9 ms, `TogglePlay` ~8 ms. `pencere-yapici → xaml`
+Avalonia'nın ve XAML ağacının kendisi; tek bir kod kalemi yok.
+
+`kare-kaynagi → ilk-kare` 80–115 ms'den 0,3 ms'ye indi ama hangi değişikliğin getirdiği
+ayrı ölçülmedi; ilk karenin çizimi arayüz iş parçacığının boşalmasını bekliyordu.
+
+### Değişiklikler
+
+- **E1** Windows'ta pencere simgesi `Assets/VidShrink.ico`'dan (16–256 px hazır boylar);
+  PNG yalnız diğer platformlarda.
+- **E2** Başlık logosu arka planda çözülüyor, arayüz iş parçacığına hazır bitmap gelir.
+- **E3** `Strings.PeekIn`: dil adını kataloğu yüklemeden, JSON'u baştan tarayarak okur;
+  diskteki ve gömülü dosyalarda sonra gelen kazanır, `Build` ile aynı sıra.
+- **E4** Kabuktan dosya geldiyse yapıcı oynatıcı sekmesini seçiyor; ilk yerleşim küçültme
+  sekmesini kurmuyor.
+
+Görünür davranış: pencere doğrudan oynatıcı sekmesinde açılır; başlık logosu pencereden
+birkaç ms sonra belirir; Windows görev çubuğu simgesi ölçeklenmiş PNG yerine ICO'nun kendi
+boyudur. Geri alınan değişiklik yok; dört kalemin hepsi kendi aralığında 14/14 lehine.
+
+### Kanıt
+
+| Ne | Nerede |
+| --- | --- |
+| Ham özet ve aralık farkları | [T-hipersurus-E-ozet.txt](T-hipersurus-E-ozet.txt) |
+| Sondalı eşleşik ölçüm | [T-hipersurus-E-sonda.txt](T-hipersurus-E-sonda.txt) |
+| Ölçüm düzeneği | [tools/acilis-hizi/olcum.ps1](../../tools/acilis-hizi/olcum.ps1) |
+| Plan | [docs/plan.md](../plan.md) "Hipersürüş E dalgası" |
+| Pimler | `LocalizationTests.DilAdiniKatalogYuklemedenOkumakTamYuklemeyleAyni`, `OynaticiGirdiTests.KabukYolununActigiSekmeOynaticidir` |

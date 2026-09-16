@@ -374,3 +374,24 @@ Dal `t0/oynatici-serit`. Dokunulan dosyalar: `PlayerView.axaml`, `PlayerView.Ser
 5. Üst sekmeler sağdaki başlık düğmeleriyle aynı yüz: dolgu yok, mavi yazı, pembe üzerine gelme.
 6. Şeridin üst anahattı güçlü mavi (`NeonBlueBorderStrong`), perde üst kenarda soluklaştırmasın.
 7. Doğrulama: `OynaticiGercekGirdiTests` ham fareyle mute/ses/hız/oynat; `PencereKabuguTests` pinleri güncellenir.
+
+## Hipersürüş E dalgası — Pencere kurulumunda kalan kendi kalemler (16 Eylül 2026)
+
+D dalgasının "kendi kodumuzda büyük kalem kalmadı" hükmü ölçülmemişti. Sonda (geçici
+`AcilisIzi` noktaları) dört hedef aralığa kondu: `pencere-yapici → xaml`,
+`yapici-bitti → pencere-kuruldu`, `pencere-kuruldu → pencere-yuklendi`,
+`sekme → kare-kaynagi`. Kabul: eşleşik 14 tekrar, `kabuk-ilk-kare` fark ortancası;
+kazanç yoksa geri al.
+
+1. **E1** Pencere simgesi Windows'ta ICO'dan. 1254 px PNG'nin HICON'a çevrilmesi 186 ms.
+2. **E2** Başlık logosunun çözümü arayüz iş parçacığından çıkıyor. 21 ms.
+3. **E3** Dil adları `Strings.PeekIn` ile; 42 kataloğun tamamı açılışta yüklenmiyor. 64 ms.
+4. **E4** Kabuktan dosya geldiyse oynatıcı sekmesi yapıcıda seçili; ilk ölçü küçültme
+   sekmesini kurmuyor. Pim `KabukYolununActigiSekmeOynaticidir` "sekme değişir" yerine
+   "baştan oynatıcı" diyor.
+
+Kesilmeyen: güncelleme paneli ~0,2 ms, `UseLanguage` ~17 ms, `pencere-yapici → xaml`
+(çerçeve + XAML ağacı, tek kalem yok).
+
+Sonuç: `kabuk-ilk-kare` 1230,1 → 803,5 ms, eşleşik fark **−455,2 ms**, 14/14. Tablo
+[docs/olcumler/acilis-hizi.md](olcumler/acilis-hizi.md) E dalgası.

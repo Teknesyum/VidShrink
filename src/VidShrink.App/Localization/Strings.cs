@@ -11,6 +11,8 @@ public static class Strings
     private const string ResourcePrefix = "VidShrink.App.Locales.";
     private const string ResourceSuffix = ".json";
 
+    private static ReadOnlySpan<byte> Utf8Bom => new byte[] { 0xEF, 0xBB, 0xBF };
+
     private static readonly object Gate = new();
 
     private static readonly Dictionary<string, IReadOnlyDictionary<string, string>> Loaded =
@@ -166,6 +168,70 @@ public static class Strings
         }
 
         return key;
+    }
+
+    public static string PeekIn(string language, string key)
+    {
+        ArgumentNullException.ThrowIfNull(language);
+        ArgumentNullException.ThrowIfNull(key);
+
+        string folder;
+        lock (Gate)
+        {
+            if (Loaded.TryGetValue(language, out var known))
+                return known.TryGetValue(key, out var loaded) ? loaded : GetIn(language, key);
+            folder = root;
+        }
+
+        var directory = Path.Combine(folder, language);
+        if (Directory.Exists(directory))
+        {
+            foreach (var file in Directory
+                         .EnumerateFiles(directory, "*" + ResourceSuffix)
+                         .OrderByDescending(f => f, StringComparer.Ordinal))
+            {
+                if (Peek(File.ReadAllBytes(file), key) is { } fromDisk) return fromDisk;
+            }
+        }
+
+        foreach (var name in EmbeddedNames().OrderByDescending(n => n, StringComparer.Ordinal))
+        {
+            if (!string.Equals(SplitResource(name).Language, language, StringComparison.OrdinalIgnoreCase)) continue;
+
+            using var stream = typeof(Strings).Assembly.GetManifestResourceStream(name);
+            if (stream is null) continue;
+
+            var bytes = new byte[stream.Length];
+            stream.ReadExactly(bytes);
+            if (Peek(bytes, key) is { } embedded) return embedded;
+        }
+
+        return GetIn(language, key);
+    }
+
+    private static string? Peek(byte[] json, string wanted)
+    {
+        try
+        {
+            ReadOnlySpan<byte> body = json;
+            if (body.StartsWith(Utf8Bom)) body = body[Utf8Bom.Length..];
+            var reader = new Utf8JsonReader(body);
+            if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject) return null;
+
+            while (reader.Read())
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName) return null;
+                var match = reader.ValueTextEquals(wanted);
+                if (!reader.Read()) return null;
+                if (match && reader.TokenType == JsonTokenType.String) return reader.GetString();
+                reader.Skip();
+            }
+        }
+        catch (JsonException)
+        {
+        }
+
+        return null;
     }
 
     public static string Get(string key, params object?[] args) => GetIn(Language, key, args);
