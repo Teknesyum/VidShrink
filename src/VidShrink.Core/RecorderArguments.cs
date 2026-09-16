@@ -243,7 +243,14 @@ public static class RecorderArguments
     /// </summary>
     public const int DefaultKeyframeSeconds = 2;
 
-    /// <summary>Kabul edilen en uzun anahtar kare araligi, saniye.</summary>
+    /// <summary>
+    /// Kabul edilen en uzun anahtar kare araligi, saniye. <b>Olculmus bir sayi degil</b>:
+    /// ffmpeg'in boyle bir siniri yok, sayi yalniz yazim hatasini (kare sayisini saniye
+    /// yerine yazmak gibi) yakalamak icin konan bir korkuluk. Bir dakikadan seyrek anahtar
+    /// kare, ekran kaydinda aramayi bir dakikaya kadar bekletir; bundan uzununu isteyen bir
+    /// kullanim bilinmiyor. Kanitlanmis bir alt ya da ust sinir gerekirse olculup
+    /// degistirilmeli.
+    /// </summary>
     public const int MaxKeyframeSeconds = 60;
 
     /// <summary>Varsayilan piksel bicimi.</summary>

@@ -102,6 +102,13 @@ public sealed class RecorderSession : IAsyncDisposable
     /// Bolme olcutunun ne siklikta yoklandigi. Yoklama ilerleme borusundan degil ayri bir
     /// gorevden yapiliyor: bolme o anki parcayi kapatip yenisini aciyor, kapatma ise
     /// ilerleme borusunu okuyan gorevi bekliyor — ayni gorevden cagrilsa kilitlenirdi.
+    /// <para>
+    /// 250 ms <b>olculmus bir sayi degil</b>. Ust siniri <c>-progress</c> akisi koyuyor:
+    /// ffmpeg ilerleme blogunu varsayilan olarak yarim saniyede bir yaziyor, yani bolme
+    /// olcutunun okudugu sure ve boyut o siklikta tazeleniyor; yarim saniyenin yarisinda
+    /// yoklamak her blogu en gec bir yoklama gecikmesiyle gormeye yetiyor, daha sik yoklamak
+    /// yeni bilgi getirmiyor. Bolmenin olcutu kac milisaniye astigi olculmedi.
+    /// </para>
     /// </summary>
     public const int SplitPollMs = 250;
 
