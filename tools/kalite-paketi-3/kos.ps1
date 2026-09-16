@@ -17,12 +17,12 @@ $Inv = [Globalization.CultureInfo]::InvariantCulture
 New-Item -ItemType Directory -Force $Cikti | Out-Null
 
 function Ffmpeg([string[]]$Argumanlar) {
-    & ffmpeg -hide_banner -nostdin -loglevel error -y @Argumanlar
+    & ffmpeg.exe -hide_banner -nostdin -loglevel error -y @Argumanlar
     if ($LASTEXITCODE -ne 0) { throw "ffmpeg basarisiz: $($Argumanlar -join ' ')" }
 }
 
 function Probe([string]$Yol) {
-    $j = & ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate:format=duration -of json $Yol | ConvertFrom-Json
+    $j = & ffprobe.exe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate:format=duration -of json $Yol | ConvertFrom-Json
     $p = $j.streams[0].r_frame_rate.Split('/')
     [pscustomobject]@{
         W = [int]$j.streams[0].width
