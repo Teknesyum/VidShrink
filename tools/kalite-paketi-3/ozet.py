@@ -94,7 +94,7 @@ def handbrake(kok, kesitler):
 if __name__ == "__main__":
     if sys.argv[1] == "handbrake":
         handbrake(sys.argv[2], sys.argv[3].split(","))
-    if sys.argv[1] == "whatsapp":
+    elif sys.argv[1] == "whatsapp":
         whatsapp(sys.argv[2])
     elif sys.argv[1] == "ceza":
         ceza(sys.argv[2], sys.argv[3].split(","))

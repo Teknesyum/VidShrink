@@ -44,8 +44,8 @@ for ($t = 1; $t -le $Tur; $t++) {
     foreach ($s in $surecler) {
         $s.P.WaitForExit()
         $metin = Get-Content (Join-Path $s.Dizin 'cikti.txt') -Raw
-        $satir = (Get-Content (Join-Path $s.Dizin 'cikti.txt') | Where-Object { $_ -match 'Total:' } | Select-Object -Last 1)
-        $toplam = if ($metin -match 'Total:\s*(\d+)') { [int]$Matches[1] } else { $null }
+        $satir = (Get-Content (Join-Path $s.Dizin 'cikti.txt') | Where-Object { $_ -match '^Test Run (Successful|Failed|Aborted)' } | Select-Object -Last 1)
+        $toplam = if ($metin -match 'Total tests:\s*(\d+)') { [int]$Matches[1] } else { $null }
         $ozet += [pscustomobject]@{
             Tur = $t; Surec = $s.Surec; Esszamanli = $Esszamanli
             Cikis = $s.P.ExitCode
