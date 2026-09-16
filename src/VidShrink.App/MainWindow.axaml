@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -719,11 +719,22 @@
                       <StackPanel Spacing="{StaticResource SpaceSm}">
                         <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}"/>
                         <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
-                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
                         <WrapPanel>
                           <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
+                          <Button x:Name="BtnRetryTrim" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
+                          <Button x:Name="BtnRetryAccept" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAccept"/>
                           <Button x:Name="BtnRetryStop" Content="{loc:Text main.retry.stop}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryStop"/>
                         </WrapPanel>
+                        <StackPanel x:Name="RetryTrimPanel" IsVisible="False" Spacing="{StaticResource SpaceSm}">
+                          <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpaceLg}">
+                            <RadioButton x:Name="RbTrimEnd" GroupName="OvershootTrim" IsChecked="True" Content="{loc:Text main.retry.trim.end}"/>
+                            <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
+                            <RadioButton x:Name="RbTrimBoth" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.both}"/>
+                          </StackPanel>
+                          <TextBlock x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
+                          <Button x:Name="BtnTrimConfirm" Content="{loc:Text main.retry.trim.confirm}" Theme="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnTrimConfirm"/>
+                        </StackPanel>
+                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
                       </StackPanel>
                     </Border>
                     <StackPanel Spacing="{StaticResource SpaceSm}">

@@ -483,3 +483,19 @@ preset × CRF/kbit × film-grain × tune × keyint ızgarasıyla (`IZGARA` JSON)
 `isler`, `kesitler`, `kbitler`, `izgara`, `ekran_url`. Tablolar `docs/olcumler/handbrake-kesit-turu.md`,
 `docs/olcumler/av1-izgara.md`. Adlı ızgara: etiket `olcum-kalite-av1__<kesitler>__<ad>--N`, dosya
 `tools/kalite-paketi-3/izgaralar/<ad>.json`; eş bayt koşumu `docs/olcumler/av1-esbayt.md`.
+
+## İş 14 — Küçült ve Kabuk Açıkları (`t0/kucult-kabuk-aciklari`)
+
+Kaynak: `.calisma/denetim/yol-haritasi-denetimi.md`, "Küçült, karşılaştırma, ayarlar" ve "Kabuk, güncelleme, açılış".
+
+1. Taşma kararı: `EncodeRunner` taşmada her denemede sorar (son deneme dahil). Seçenekler: tekrar dene, bırak,
+   büyüğü kabul et, sondan/baştan/ikisinden kes. Kesme yalnız taşma ≤ %3 iken önerilir; `Core/OvershootTrim`
+   paket boylarından kesim noktası seçer, `Ffmpeg/TrimRunner` akış kopyasıyla keser, ölçer, hedefe inene dek sıkar.
+2. Sıfırla: `App/UserDataReset` ayar klasöründeki bütün VidShrink veri dosyalarını siler.
+3. Küçült: `WhatsApp uyumlu` kutusu, `Dinamik` kutusu; kapalıyken AV1/H.264 şeridi ve sabit çözünürlük
+   (`PlanOptions.FixedHeight`).
+4. Ayarlar: iki seçenekli açılır listeler yatay şerit; etiket ile denetim tek satır.
+5. Karşılaştırma rozeti yalnız `CRF n`; ORİJİNAL/İŞLENMİŞ orta panelin üstünde solda/sağda.
+6. Opus: MP4'te WhatsApp/iOS uyumu bozuluyor → uygulanmaz, `.calisma/kucult-kabuk/soru-opus.md`.
+7. Güncelleme: `AutoUpdate` varsayılanı kapalı; indirme/kurulum sürerken panel kapanmaz; eski Ayarlar
+   simgesi (dişli); Hakkında'da platform satırı.

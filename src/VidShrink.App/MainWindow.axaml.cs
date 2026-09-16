@@ -94,7 +94,7 @@ public partial class MainWindow : Window
     // döngü tek turda kapanır. İki bayrak var çünkü iki yön ayrı ayrı bastırılıyor.
     private bool _targetIsDerived;
     private bool _qualityIsDerived;
-    private TaskCompletionSource<bool>? _retryDecision;
+    private TaskCompletionSource<OvershootChoice>? _retryDecision;
     private RetryPrompt? _activeRetryPrompt;
     private bool _hardwareProbed;
     private bool _hardwareEncoderAvailable;
@@ -230,6 +230,8 @@ public partial class MainWindow : Window
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
+        foreach (var radio in new[] { RbTrimEnd, RbTrimStart, RbTrimBoth })
+            Watch(radio, ToggleButton.IsCheckedProperty, RefreshTrimRange);
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
         Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
         Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
@@ -4023,6 +4025,10 @@ public partial class MainWindow : Window
                 var saved = 100 - result.OutputMb / _info.FileSizeMb * 100;
                 TxtResult.Text = Say("main.run.done",
                     result.Attempts, Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"), Num(saved, "0.#"));
+                if (result.OverTarget)
+                    TxtResult.Text += " " + Say("main.run.accepted-larger", Num(result.OutputMb - targetMb, "0.00"), Num(targetMb, "0.##"));
+                if (result.Trim is { } trim)
+                    TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
             }
             else if (result.CeilingExceeded)
             {
@@ -4060,9 +4066,9 @@ public partial class MainWindow : Window
 
     // The engine stops after an attempt that lands over the target and hands the decision here.
     // Nothing blocks: the panel is shown, the awaited task completes when a button is pressed.
-    private async Task<bool> AskBeforeRetryAsync(RetryPrompt prompt, CancellationToken ct)
+    private async Task<OvershootChoice> AskBeforeRetryAsync(RetryPrompt prompt, CancellationToken ct)
     {
-        var decision = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
         _retryDecision = decision;
 
         await Dispatcher.UIThread.InvokeAsync(() => ShowRetryAsk(prompt));
@@ -4096,6 +4102,22 @@ public partial class MainWindow : Window
         TxtRetryMeaning.Text = prompt.HasUnderBandFallback
             ? Say("main.retry.meaning-with-fallback", Num(prompt.FallbackMb, "0.0"))
             : Say("main.retry.meaning-without-fallback");
+        BtnRetryAgain.IsVisible = prompt.CanRetry;
+        BtnRetryAccept.Content = Say("main.retry.accept", Num(prompt.ActualMb, "0.0"));
+        var canTrim = prompt.Trims is { Count: > 0 };
+        BtnRetryTrim.IsVisible = canTrim;
+        if (canTrim)
+            BtnRetryTrim.Content = Say("main.retry.trim", Num(prompt.Trims!.Min(plan => plan.RemovedSeconds), "0.#"));
+        RbTrimEnd.IsEnabled = prompt.TrimFor(TrimSide.End) is not null;
+        RbTrimStart.IsEnabled = prompt.TrimFor(TrimSide.Start) is not null;
+        RbTrimBoth.IsEnabled = prompt.TrimFor(TrimSide.Both) is not null;
+        if (!RetryTrimPanel.IsVisible)
+        {
+            var first = new[] { RbTrimEnd, RbTrimStart, RbTrimBoth }.FirstOrDefault(radio => radio.IsEnabled);
+            if (first is not null) first.IsChecked = true;
+        }
+        RetryTrimPanel.IsVisible = canTrim && RetryTrimPanel.IsVisible;
+        RefreshTrimRange();
         RetryAskPanel.IsVisible = true;
         SetStage(TxtStage, Say("main.output.waiting"));
     }
@@ -4104,11 +4126,69 @@ public partial class MainWindow : Window
     {
         _activeRetryPrompt = null;
         RetryAskPanel.IsVisible = false;
+        RetryTrimPanel.IsVisible = false;
     }
 
-    private void OnRetryAgain(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(true);
+    private TrimSide SelectedTrimSide =>
+        RbTrimStart.IsChecked == true ? TrimSide.Start
+        : RbTrimBoth.IsChecked == true ? TrimSide.Both
+        : TrimSide.End;
 
-    private void OnRetryStop(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(false);
+    private void RefreshTrimRange()
+    {
+        if (_activeRetryPrompt?.TrimFor(SelectedTrimSide) is not { } plan)
+        {
+            TxtTrimRange.Text = "";
+            BtnTrimConfirm.IsEnabled = false;
+            return;
+        }
+
+        var removed = new List<string>();
+        if (plan.RemovedFromStart > 0) removed.Add($"{Clock(0)}–{Clock(plan.StartSeconds)}");
+        if (plan.RemovedFromEnd > 0) removed.Add($"{Clock(plan.EndSeconds)}–{Clock(plan.DurationSeconds)}");
+        TxtTrimRange.Text = Say("main.retry.trim.range",
+            Num(plan.RemovedSeconds, "0.#"),
+            Clock(plan.DurationSeconds),
+            Clock(plan.KeptSeconds),
+            string.Join(" · ", removed),
+            Num(plan.KeptBytes / 1024.0 / 1024.0, "0.00"));
+        BtnTrimConfirm.IsEnabled = true;
+    }
+
+    private static string Clock(double seconds)
+    {
+        var span = TimeSpan.FromSeconds(Math.Max(0, seconds));
+        return span.TotalHours >= 1
+            ? span.ToString(@"h\:mm\:ss\.f", CultureInfo.InvariantCulture)
+            : span.ToString(@"m\:ss\.f", CultureInfo.InvariantCulture);
+    }
+
+    internal Task<OvershootChoice> ShowRetryAskForTest(RetryPrompt prompt)
+    {
+        var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _retryDecision = decision;
+        ShowRetryAsk(prompt);
+        return decision.Task;
+    }
+
+    private void OnRetryAgain(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(OvershootChoice.Retry);
+
+    private void OnRetryStop(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(OvershootChoice.Leave);
+
+    private void OnRetryAccept(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(OvershootChoice.AcceptLarger);
+
+    private void OnRetryTrim(object? sender, RoutedEventArgs e)
+    {
+        RetryTrimPanel.IsVisible = !RetryTrimPanel.IsVisible;
+        RefreshTrimRange();
+    }
+
+    private void OnTrimConfirm(object? sender, RoutedEventArgs e) => _retryDecision?.TrySetResult(SelectedTrimSide switch
+    {
+        TrimSide.Start => OvershootChoice.TrimStart,
+        TrimSide.Both => OvershootChoice.TrimBoth,
+        _ => OvershootChoice.TrimEnd
+    });
 
     private ConversionPlan ReadConversionPlan()
     {

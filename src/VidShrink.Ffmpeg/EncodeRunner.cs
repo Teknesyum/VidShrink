@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Concurrent;
 using VidShrink.Core;
@@ -15,7 +15,7 @@ public sealed record EncodeAttempt(int Number, string Branch, double AimMb, doub
 /// ayarlarin tamamini tasimiyorsa cagiran bunu buradan ogrenir. Dolu olmasi
 /// <see cref="Success"/> degerini dusurmez.
 /// </summary>
-public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null)
+public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null, bool OverTarget = false, TrimPlan? Trim = null)
 {
     /// <summary>Teslim edilen kodlamada motorun verdigi ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
@@ -58,7 +58,8 @@ public sealed record SceneMapAttempt(SceneMap? Map, TimeSpan Elapsed, SceneMapFa
 public delegate Task<SceneScan> SceneScanAsync(string path, CancellationToken ct);
 
 /// <summary>
-/// What the caller is told when an attempt lands over the target and another attempt is still allowed.
+/// What the caller is told when an attempt lands over the target. <see cref="Trims"/> is filled only
+/// when the overshoot is within <see cref="OvershootTrim.ThresholdPercent"/>.
 /// </summary>
 public sealed record RetryPrompt(
     int Attempt,
@@ -67,17 +68,30 @@ public sealed record RetryPrompt(
     double ActualMb,
     TimeSpan AttemptDuration,
     bool HasUnderBandFallback,
-    double FallbackMb)
+    double FallbackMb,
+    IReadOnlyList<TrimPlan>? Trims = null)
 {
     public double OverMb => ActualMb - TargetMb;
     public double OverPercent => TargetMb > 0 ? (ActualMb - TargetMb) / TargetMb * 100.0 : 0.0;
+    public bool CanRetry => Attempt < MaxAttempts;
+    public TrimPlan? TrimFor(TrimSide side) => Trims?.FirstOrDefault(plan => plan.Side == side);
+}
+
+public enum OvershootChoice
+{
+    Leave,
+    Retry,
+    AcceptLarger,
+    TrimEnd,
+    TrimStart,
+    TrimBoth
 }
 
 /// <summary>
-/// Returns true to run one more attempt, false to end the run. Ending the run never hands back an
-/// oversized file: the last under-band result is delivered if there is one, otherwise no file is written.
+/// Leave ends the run without handing back the oversized file: the last under-band result is delivered
+/// if there is one, otherwise no file is written. AcceptLarger delivers the oversized file as it is.
 /// </summary>
-public delegate Task<bool> RetryDecisionAsync(RetryPrompt prompt, CancellationToken ct);
+public delegate Task<OvershootChoice> RetryDecisionAsync(RetryPrompt prompt, CancellationToken ct);
 
 public sealed class EncodeRunner
 {
@@ -188,25 +202,65 @@ public sealed class EncodeRunner
                             UnderBand: false, CeilingExceeded: true, Trace: trace, DroppedOptions: dropped);
                     }
 
-                    if (attempt >= MaxAttempts)
-                        return EndRun();
-
-                    if (askBeforeRetry is not null)
+                    if (askBeforeRetry is null)
                     {
-                        var prompt = new RetryPrompt(
-                            attempt,
-                            MaxAttempts,
-                            effectiveTargetMb,
-                            actualMb,
-                            attemptClock.Elapsed,
-                            fallbackPlan is not null && File.Exists(fallbackPath),
-                            fallbackMb);
+                        if (attempt >= MaxAttempts) return EndRun();
+                        current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);
+                        continue;
+                    }
 
-                        if (!await askBeforeRetry(prompt, ct))
+                    var targetBytes = (long)Math.Floor(effectiveTargetMb * 1024 * 1024);
+                    IReadOnlyList<TrimPlan> trims = Array.Empty<TrimPlan>();
+                    if (OvershootTrim.Offered(actualMb, effectiveTargetMb))
+                    {
+                        var map = await OvershootTrimmer.ReadAsync(partialPath, ct);
+                        if (map is not null) trims = OvershootTrimmer.PlanAll(map, targetBytes);
+                    }
+
+                    var prompt = new RetryPrompt(
+                        attempt,
+                        MaxAttempts,
+                        effectiveTargetMb,
+                        actualMb,
+                        attemptClock.Elapsed,
+                        fallbackPlan is not null && File.Exists(fallbackPath),
+                        fallbackMb,
+                        trims);
+
+                    var choice = await askBeforeRetry(prompt, ct);
+                    ct.ThrowIfCancellationRequested();
+
+                    if (choice == OvershootChoice.AcceptLarger)
+                    {
+                        trace.Add(new EncodeAttempt(attempt, "larger result accepted by the user", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                        File.Move(partialPath, outputPath, overwrite: true);
+                        return new EncodeResult(true, outputPath, actualMb, current, attempt, null, Trace: trace, DroppedOptions: dropped, OverTarget: true);
+                    }
+
+                    if ((choice is OvershootChoice.TrimEnd or OvershootChoice.TrimStart or OvershootChoice.TrimBoth) && trims.Count > 0)
+                    {
+                        var side = choice switch
                         {
-                            trace.Add(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
-                            return EndRun();
+                            OvershootChoice.TrimStart => TrimSide.Start,
+                            OvershootChoice.TrimBoth => TrimSide.Both,
+                            _ => TrimSide.End
+                        };
+                        var trimmed = await OvershootTrimmer.TrimAsync(partialPath, outputPath, targetBytes, side, ct);
+                        if (trimmed.Landed)
+                        {
+                            var trimmedMb = trimmed.Bytes / 1024.0 / 1024.0;
+                            trace.Add(new EncodeAttempt(attempt, $"trimmed {trimmed.Plan!.RemovedSeconds:0.###} s ({side})", aimMb, trimmedMb, current.VideoBitrateK, current.Mode));
+                            TryDelete(partialPath);
+                            return new EncodeResult(true, outputPath, trimmedMb, current, attempt, null, Trace: trace, DroppedOptions: dropped, Trim: trimmed.Plan);
                         }
+                        trace.Add(new EncodeAttempt(attempt, "trim did not land under the target", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                        return EndRun();
+                    }
+
+                    if (choice != OvershootChoice.Retry || attempt >= MaxAttempts)
+                    {
+                        trace.Add(new EncodeAttempt(attempt, "stopped at the user's request", aimMb, actualMb, current.VideoBitrateK, current.Mode));
+                        return EndRun();
                     }
 
                     current = PlanCalculator.Correct(current, actualMb, effectiveTargetMb, info.DurationSeconds);

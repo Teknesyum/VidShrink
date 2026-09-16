@@ -20,7 +20,7 @@ public sealed class RetryPromptTests
             var result = await new EncodeRunner().RunAsync(
                 InfoFor(source), Plan(), outputPath, targetMb: 0.001, progress: null, ct: CancellationToken.None,
                 fillPolicy: FillPolicy.QualityCeiling, profile: null,
-                askBeforeRetry: (prompt, _) => { prompts.Add(prompt); return Task.FromResult(false); });
+                askBeforeRetry: (prompt, _) => { prompts.Add(prompt); return Task.FromResult(OvershootChoice.Leave); });
 
             Assert.Single(prompts);
             Assert.Equal(1, prompts[0].Attempt);
@@ -47,7 +47,7 @@ public sealed class RetryPromptTests
             await new EncodeRunner().RunAsync(
                 InfoFor(source), Plan(), outputPath, targetMb: 0.001, progress: null, ct: CancellationToken.None,
                 fillPolicy: FillPolicy.QualityCeiling, profile: null,
-                askBeforeRetry: (prompt, _) => { seen ??= prompt; return Task.FromResult(false); });
+                askBeforeRetry: (prompt, _) => { seen ??= prompt; return Task.FromResult(OvershootChoice.Leave); });
 
             Assert.NotNull(seen);
             Assert.Equal(3, seen!.MaxAttempts);
@@ -62,7 +62,7 @@ public sealed class RetryPromptTests
     }
 
     [Fact]
-    public async Task SayingTryAgainRunsAnotherAttemptAndTheCeilingStillStopsTheAsking()
+    public async Task SayingTryAgainRunsAnotherAttemptAndTheLastAttemptIsAskedToo()
     {
         if (!ToolLocator.IsAvailable(out _)) return;
 
@@ -76,10 +76,9 @@ public sealed class RetryPromptTests
             var result = await new EncodeRunner().RunAsync(
                 InfoFor(source), Plan(), outputPath, targetMb: 0.001, progress: null, ct: CancellationToken.None,
                 fillPolicy: FillPolicy.QualityCeiling, profile: null,
-                askBeforeRetry: (prompt, _) => { asked.Add(prompt.Attempt); return Task.FromResult(true); });
+                askBeforeRetry: (prompt, _) => { asked.Add(prompt.Attempt); return Task.FromResult(OvershootChoice.Retry); });
 
-            // Asked after attempt 1 and 2; at the MaxAttempts ceiling the run finishes without asking.
-            Assert.Equal(new[] { 1, 2 }, asked);
+            Assert.Equal(new[] { 1, 2, 3 }, asked);
             Assert.Equal(3, result.Attempts);
             Assert.False(result.Success);
             Assert.True(result.CeilingExceeded);
@@ -103,7 +102,7 @@ public sealed class RetryPromptTests
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new EncodeRunner().RunAsync(
                 InfoFor(source), Plan(), outputPath, targetMb: 0.001, progress: null, ct: cts.Token,
                 fillPolicy: FillPolicy.QualityCeiling, profile: null,
-                askBeforeRetry: (_, ct) => { cts.Cancel(); ct.ThrowIfCancellationRequested(); return Task.FromResult(true); }));
+                askBeforeRetry: (_, ct) => { cts.Cancel(); ct.ThrowIfCancellationRequested(); return Task.FromResult(OvershootChoice.Retry); }));
 
             Assert.False(File.Exists(outputPath));
         }
