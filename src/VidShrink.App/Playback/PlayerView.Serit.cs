@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
@@ -131,6 +132,15 @@ internal partial class PlayerView
     /// </summary>
     private void HoldSerit() => _serit?.Hold(_pointerOnSerit || !_playing);
 
+    internal static KeymapRow? SeekRow(double seconds)
+        => Keymap.Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && r.Action.Command == PlayerCommandKind.Seek && r.Action.Amount == seconds);
+
+    private static void SeritLabel(Control control, string name, KeymapRow? row)
+    {
+        AutomationProperties.SetName(control, name);
+        ToolTip.SetTip(control, row is null ? name : name + " (" + Keymap.Gesture(row.Input) + ")");
+    }
+
     private void RevealSerit(bool shown)
     {
         StripBar.Opacity = shown ? 1 : 0;
@@ -149,12 +159,12 @@ internal partial class PlayerView
         GlyphSeritPlay.Data = Icon(_playing ? "IconPause" : "IconPlay");
         GlyphSeritVolume.Data = Icon(_muted || _volume <= 0 ? "IconVolumeMute" : "IconVolume");
 
-        AutomationProperties.SetName(BtnSeritPlay,
-            Strings.Get(_playing ? "playback.control.pause" : "playback.control.play"));
-        AutomationProperties.SetName(BtnSeritBack, Strings.Get("main.player.menu.seek", -Keymap.SeekSmall));
-        AutomationProperties.SetName(BtnSeritForward, Strings.Get("main.player.menu.seek", Keymap.SeekSmall));
-        AutomationProperties.SetName(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey));
-        AutomationProperties.SetName(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey));
+        SeritLabel(BtnSeritPlay, Strings.Get(_playing ? "playback.control.pause" : "playback.control.play"), Keymap.FirstKeyRow(Keymap.PlayPause));
+        SeritLabel(BtnSeritBack, Strings.Get("main.player.menu.seek", "−" + Keymap.SeekSmall.ToString(CultureInfo.CurrentCulture)), SeekRow(-Keymap.SeekSmall));
+        SeritLabel(BtnSeritForward, Strings.Get("main.player.menu.seek", "+" + Keymap.SeekSmall.ToString(CultureInfo.CurrentCulture)), SeekRow(Keymap.SeekSmall));
+        SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
+        SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
+        SeritLabel(BtnSeritSpeedReset, Strings.Get(Keymap.NormalSpeed.LabelKey), Keymap.FirstKeyRow(Keymap.NormalSpeed));
 
         TxtSeritTime.Text = ClockPair(_seek.Target, _seek.Duration);
         TxtSeritVolume.Text = _volume.ToString("0", CultureInfo.InvariantCulture);

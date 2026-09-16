@@ -465,8 +465,8 @@ public sealed class FfmpegAvailableFactAttribute : FactAttribute
 
 public sealed class OynaticiGirdiTestsMenuSatirlari
 {
-    private static MenuItem Satir(PlayerView view, int sira)
-        => view.BuildMenu().Items.OfType<MenuItem>().ElementAt(sira);
+    private static MenuItem Satir(PlayerView view, PlayerAction eylem)
+        => view.BuildMenu().Items.OfType<MenuItem>().First(item => ReferenceEquals(item.Tag, eylem));
 
     private static void Tikla(MenuItem item)
         => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent) { Source = item });
@@ -480,10 +480,10 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var window = new Window { Width = 640, Height = 480, Content = view };
 
             var once = view.IsPlaying;
-            var item = Satir(view, 1);
+            var item = Satir(view, Keymap.PlayPause);
             Tikla(item);
             var sonra = view.IsPlaying;
-            Tikla(Satir(view, 1));
+            Tikla(Satir(view, Keymap.PlayPause));
             var geri = view.IsPlaying;
 
             var body = $"satir 1 basligi: {item.Header}{Environment.NewLine}"
@@ -515,10 +515,10 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
             var window = new Window { Width = 640, Height = 480, Content = view };
 
             var once = view.Fullscreen.IsFullscreen;
-            var item = Satir(view, 2);
+            var item = Satir(view, Keymap.Fullscreen);
             Tikla(item);
             var acik = view.Fullscreen.IsFullscreen;
-            Tikla(Satir(view, 2));
+            Tikla(Satir(view, Keymap.Fullscreen));
             var kapali = view.Fullscreen.IsFullscreen;
 
             var body = $"satir 2 basligi: {item.Header}{Environment.NewLine}"
@@ -548,7 +548,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
 
             GirdiSurucu.Wheel(view, 3, KeyModifiers.Alt);
             var buyutulmus = view.ZoomScale;
-            var item = Satir(view, 3);
+            var item = Satir(view, Keymap.ResetZoom);
             Tikla(item);
             var sifirlanmis = view.ZoomScale;
 

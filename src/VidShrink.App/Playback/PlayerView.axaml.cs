@@ -191,7 +191,16 @@ internal partial class PlayerView : UserControl
                 AddBookmark();
                 break;
             case PlayerCommandKind.BookmarkNext:
-                NextBookmark();
+                StepBookmark(command.Amount < 0);
+                break;
+            case PlayerCommandKind.Stop:
+                if (_playing) TogglePlay();
+                _seek.GoTo(0);
+                _trace.Add("stop -> " + _playing);
+                break;
+            case PlayerCommandKind.GoToStart:
+                _seek.GoTo(0);
+                _trace.Add("tostart");
                 break;
             case PlayerCommandKind.AudioCycle:
                 CycleAudio();
@@ -303,17 +312,22 @@ internal partial class PlayerView : UserControl
         _trace.Add("bookmarkadd -> " +at.ToString("0.###"));
     }
 
-    private void NextBookmark()
+    private void StepBookmark(bool backward)
     {
-        if (_path is not { } path || _history.NextBookmark(path, CurrentPosition()) is not { } next)
+        var name = backward ? "bookmarkprev -> " : "bookmarknext -> ";
+        var at = CurrentPosition();
+        var mark = _path is not { } path
+            ? null
+            : backward ? _history.PreviousBookmark(path, at) : _history.NextBookmark(path, at);
+        if (mark is not { } next)
         {
-            _trace.Add("bookmarknext -> no");
+            _trace.Add(name + "no");
             return;
         }
 
         _trackPaused = false;
         _seek.GoTo(next);
-        _trace.Add("bookmarknext -> " +next.ToString("0.###"));
+        _trace.Add(name + next.ToString("0.###"));
     }
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)
@@ -373,6 +387,10 @@ internal partial class PlayerView : UserControl
 
     internal bool MenuAtPointer { get; set; }
 
+    private MenuFlyout? _menu;
+
+    internal bool MenuOpen => _menu?.IsOpen ?? false;
+
     internal MenuFlyout BuildMenu()
     {
         var flyout = new MenuFlyout();
@@ -405,6 +423,7 @@ internal partial class PlayerView : UserControl
     private void OpenMenu()
     {
         var flyout = BuildMenu();
+        _menu = flyout;
         MenuAnchor = MenuAtPointer ? "pointer" : "surface";
         try
         {

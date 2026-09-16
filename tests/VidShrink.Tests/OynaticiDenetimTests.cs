@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using VidShrink.App;
@@ -133,8 +135,13 @@ public sealed class KeymapTests
         [PlayerCommandKind.ClipExport] = "clip -> ",
         [PlayerCommandKind.GifExport] = "gif -> ",
         [PlayerCommandKind.MiniMode] = "mini -> ",
-        [PlayerCommandKind.OpenUrl] = "url -> "
+        [PlayerCommandKind.OpenUrl] = "url -> ",
+        [PlayerCommandKind.Stop] = "stop -> ",
+        [PlayerCommandKind.GoToStart] = "tostart"
     };
+
+    private static string Onek(PlayerAction action)
+        => action.Command == PlayerCommandKind.BookmarkNext && action.Amount < 0 ? "bookmarkprev -> " : Iz[action.Command];
 
     private static void Tetikle(PlayerView view, PlayerInput input)
     {
@@ -175,6 +182,7 @@ public sealed class KeymapTests
         if (action.Command == PlayerCommandKind.SpeedReset) view.Apply(new PlayerCommand(PlayerCommandKind.Speed, 0.5));
         if (action.Command == PlayerCommandKind.LeaveFullscreen) view.Apply(new PlayerCommand(PlayerCommandKind.ToggleFullscreen, 0));
         if (action.Command == PlayerCommandKind.LoopClear) view.Apply(new PlayerCommand(PlayerCommandKind.LoopStart, 0));
+        if (action.Command == PlayerCommandKind.Stop && !view.IsPlaying) view.Apply(new PlayerCommand(PlayerCommandKind.TogglePlay, 0));
 
         var izOnce = view.Trace.Count;
         var konum = view.PositionSeconds;
@@ -199,7 +207,7 @@ public sealed class KeymapTests
 
         var yeni = view.Trace.Skip(izOnce).ToList();
         if (yeni.Count != 1) return $"iz satiri {yeni.Count}: {string.Join(" | ", yeni)}";
-        if (!yeni[0].StartsWith(Iz[action.Command], StringComparison.Ordinal)) return $"iz '{yeni[0]}' beklenen onek '{Iz[action.Command]}'";
+        if (!yeni[0].StartsWith(Onek(action), StringComparison.Ordinal)) return $"iz '{yeni[0]}' beklenen onek '{Onek(action)}'";
 
         return action.Command switch
         {
@@ -234,6 +242,8 @@ public sealed class KeymapTests
             PlayerCommandKind.GifExport when yeni[0] != "gif -> no" => $"kaynaksiz gif izi '{yeni[0]}'",
             PlayerCommandKind.MiniMode when view.IsMiniMode == mini => "mini mod degismedi",
             PlayerCommandKind.OpenUrl when yeni[0] != "url -> no" => $"gorunmez pencerede adres izi '{yeni[0]}'",
+            PlayerCommandKind.Stop when !oynatma || view.IsPlaying || view.PositionSeconds != 0 => $"oynatma {oynatma} -> {view.IsPlaying}, konum {konum} -> {view.PositionSeconds}",
+            PlayerCommandKind.GoToStart when konum == 0 || view.PositionSeconds != 0 => $"konum {konum} -> {view.PositionSeconds}",
             _ => null
         };
     }
@@ -276,9 +286,9 @@ public sealed class KeymapTests
 
         var semboller = Keymap.Rows
             .Where(row => row.Input.Symbol is not null)
-            .GroupBy(row => row.Input.Symbol)
+            .GroupBy(row => (row.Input.Symbol, Keymap.Commanding(row.Input.Modifiers)))
             .Where(group => group.Count() > 1)
-            .Select(group => group.Key!)
+            .Select(group => group.Key.Symbol + (group.Key.Item2 ? " (ctrl)" : ""))
             .ToList();
 
         var golgelenen = Keymap.Rows
@@ -356,6 +366,58 @@ public sealed class KeymapTests
         Assert.Equal("loopclear", rapor.Item2[^1]);
         Assert.False(rapor.yutuldu);
         Assert.False(rapor.bagsiz);
+    }
+
+    [Fact]
+    public void SeritIpucundakiKisayolDugmeyleAyniIsiYapar()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var body = new StringBuilder();
+            var hatalar = new List<string>();
+            foreach (var dil in new[] { "en", "tr" })
+            {
+                Strings.Use(dil);
+                foreach (var ad in new[] { "BtnSeritPlay", "BtnSeritBack", "BtnSeritForward", "BtnSeritMute", "BtnSeritFullScreen" })
+                {
+                    var dugmeli = GirdiSurucu.Kur(out var w1);
+                    dugmeli.Seek.Duration = 100000;
+                    _ = dugmeli.SeritZone;
+                    dugmeli.Seek.GoTo(1000);
+                    var dugme = dugmeli.FindControl<Button>(ad)!;
+                    var ipucu = ToolTip.GetTip(dugme) as string ?? "";
+                    var erisim = AutomationProperties.GetName(dugme) ?? "\0";
+                    var once = dugmeli.Trace.Count;
+                    dugme.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    var dugmeIzi = string.Join(" | ", dugmeli.Trace.Skip(once));
+                    w1.Close();
+
+                    var ac = ipucu.LastIndexOf('(');
+                    var jest = ac < 0 ? "" : ipucu[(ac + 1)..].TrimEnd(')');
+                    var satir = Keymap.Rows.FirstOrDefault(r => r.Input.Kind == PlayerInputKind.Key && Keymap.Gesture(r.Input) == jest);
+                    var tusIzi = "satir yok";
+                    if (satir is not null)
+                    {
+                        var tuslu = GirdiSurucu.Kur(out var w2);
+                        tuslu.Seek.Duration = 100000;
+                        tuslu.Seek.GoTo(1000);
+                        var tOnce = tuslu.Trace.Count;
+                        Tetikle(tuslu, satir.Input);
+                        tusIzi = string.Join(" | ", tuslu.Trace.Skip(tOnce));
+                        w2.Close();
+                    }
+
+                    var ok = dugmeIzi.Length > 0 && dugmeIzi == tusIzi && ipucu.StartsWith(erisim, StringComparison.Ordinal);
+                    body.AppendLine($"[{dil}] {ad}: ipucu '{ipucu}' | dugme '{dugmeIzi}' | tus {jest} '{tusIzi}' {(ok ? "GECTI" : "KALDI")}");
+                    if (!ok) hatalar.Add($"{dil} {ad}");
+                }
+            }
+            Strings.Use("en");
+            return (body.ToString(), hatalar);
+        });
+
+        DenetimKanit.Write("serit-ipucu.txt", rapor.Item1);
+        Assert.True(rapor.hatalar.Count == 0, rapor.Item1);
     }
 
     [Fact]
