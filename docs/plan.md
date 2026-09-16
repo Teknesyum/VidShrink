@@ -464,3 +464,21 @@ kesitler kaynağın kendi parlaklık taramasından seçilir (en karanlık pencer
    uyum koda girmez. Çökme için `cokme-yeniden-uretim.yml`: iki süit aynı koşucuda eşzamanlı,
    `--blame-crash --blame-hang`, döküm artifact'a. Tablolar `docs/olcumler/ceza-kalibrasyonu.md`,
    `docs/olcumler/cokme-yeniden-uretim.md`.
+
+**Durum (ölçüm sonrası).** Ölçüm yeri sonradan değişti: `workflow_dispatch` varsayılan dalda olmayan iş akışında
+404 döndü, tetik etiket oldu (`olcum-kalite-<is+is>__<kesit+kesit>--N`, `olcum-cokme-N`). Kaynak Tears of Steel
+URL'si 404, yerine Sintel 1080p (sha256 pinli).
+
+1. WhatsApp: `aq-mode=3` kolları karanlık PSNR'ı 8 satırda −0,01 ile +0,07 dB oynattı; kod değişmedi (koşum 35111531254).
+2. HandBrake: yazılım yolunda XPSNR 6/6 önde, VMAF-NEG `karanlik`ta −0,65/−0,61 geride; kod değişmedi (koşum 35112822877).
+3. Ceza: sadeleştirilmiş model 9/9 grupta iyimser, tutulan kesit doğrulaması geçmedi; sabitler değişmedi.
+   Çökme: 12 süreçte 0 çökme, eşzamanlı 2–3'te 9 kararsız kalış (koşum 35109530525).
+
+## İş 13 — HandBrake Kesit Türüne Göre, AV1 Izgarası
+
+`kalite-olcumu.yml` ikinci iş için genişledi: `handbrake` işi kesit başına kbit listesiyle (`KBITLER`), `av1` işi
+preset × CRF/kbit × film-grain × tune × keyint ızgarasıyla (`IZGARA` JSON). Kesit türleri `karanlik`, `hareketli`
+(en yüksek YDIF) ve `ekran` (Netflix "Debugging", CC BY 4.0). Ağır ızgara CI'da; yerelde yalnız kısa kontrol.
+Çağrı: etiket `olcum-kalite-handbrake+av1__karanlik+hareketli+ekran--N` ya da dispatch girdileri
+`isler`, `kesitler`, `kbitler`, `izgara`, `ekran_url`. Tablolar `docs/olcumler/handbrake-kesit-turu.md`,
+`docs/olcumler/av1-izgara.md`.

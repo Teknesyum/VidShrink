@@ -91,8 +91,94 @@ def handbrake(kok, kesitler):
         print(f"| {k} | {kbit} | {kol} | {f(dk,1)} | {f(dv)} | {f(dx)} | {f(dp)} |")
 
 
+ANAHTAR = ("kesit", "preset", "kontrol", "deger", "filmgrain", "tune", "keyint", "ek", "pixfmt")
+
+
+def av1(kok, kesitler):
+    tum = []
+    for k in kesitler:
+        tum += yukle(Path(kok) / k / f"av1-{k}.json")
+    for s in tum:
+        s.setdefault("ek", "")
+        s.setdefault("pixfmt", "yuv420p10le")
+        s.setdefault("sha256", None)
+    ekler = []
+    for s in tum:
+        if s["ek"] not in ekler:
+            ekler.append(s["ek"])
+    sirali = sorted(tum, key=lambda s: (kesitler.index(s["kesit"]), s["preset"], s["kontrol"], s["deger"], s["filmgrain"], s["tune"], s["keyint"], ekler.index(s["ek"]), s["pixfmt"]))
+    if len(ekler) > 1:
+        print("| Ek | svtav1-params eki |")
+        print("|---|---|")
+        for i, e in enumerate(ekler):
+            print(f"| e{i} | `{e or '(yok)'}` |")
+        print()
+    print("| Kesit | Preset | Kontrol | Değer | Film-grain | Tune | Keyint | Ek | Piksel | kbps | VMAF-NEG ort | VMAF-NEG harm | VMAF-NEG p10 | XPSNR | Karanlık PSNR | Kodlama sn |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for s in sirali:
+        print(f"| {s['kesit']} | {s['preset']} | {s['kontrol']} | {s['deger']} | {s['filmgrain']} | {s['tune']} | {s['keyint']} | e{ekler.index(s['ek'])} | {s['pixfmt']} | {f(s['kbps'],1)} | {f(s['vmafneg_ort'])} | {f(s['vmafneg_harm'])} | {f(s['vmafneg_p10'])} | {f(s['xpsnr'])} | {f(s['karanlik_psnr'])} | {f(s['kodlama_sn'],1)} |")
+
+    def eslesik(alan, a, b):
+        sonuc = {}
+        for s in tum:
+            if s[alan] != b:
+                continue
+            anahtar = {x: s[x] for x in ANAHTAR}
+            anahtar[alan] = a
+            t = next((x for x in tum if all(x[y] == v for y, v in anahtar.items())), None)
+            if t is None:
+                continue
+            ayni = s["sha256"] is not None and s["sha256"] == t["sha256"]
+            sonuc.setdefault(s["kesit"], []).append((s["kbps"] / t["kbps"] - 1, s["vmafneg_ort"] - t["vmafneg_ort"], s["xpsnr"] - t["xpsnr"], s["karanlik_psnr"] - t["karanlik_psnr"], s["kodlama_sn"] / t["kodlama_sn"] - 1, ayni))
+        return sonuc
+
+    def aralik(v, n=2, yuzde=False):
+        c = 100 if yuzde else 1
+        return f"{f(sum(v)/len(v)*c, n)} ({f(min(v)*c, n)} … {f(max(v)*c, n)})"
+
+    degisimler = [("tune 0 → 1", "tune", 0, 1), ("film-grain 0 → 8", "filmgrain", 0, 8), ("yuv420p → yuv420p10le", "pixfmt", "yuv420p", "yuv420p10le")]
+    degisimler += [(f"e0 → e{i}", "ek", ekler[0], e) for i, e in enumerate(ekler) if i > 0]
+    print()
+    print("| Kesit | Değişim | Çift | Aynı çıktı (sha256) | Δ kbps % | Δ VMAF-NEG ort | Δ XPSNR | Δ karanlık PSNR | Δ kodlama sn % |")
+    print("|---|---|---|---|---|---|---|---|---|")
+    for etiket, alan, a, b in degisimler:
+        for k, v in eslesik(alan, a, b).items():
+            sha = sum(1 for x in v if x[5])
+            print(f"| {k} | {etiket} | {len(v)} | {sha} | {aralik([x[0] for x in v], 1, True)} | {aralik([x[1] for x in v])} | {aralik([x[2] for x in v])} | {aralik([x[3] for x in v])} | {aralik([x[4] for x in v], 1, True)} |")
+
+    egriler = {}
+    for s in tum:
+        if s["kontrol"] != "crf":
+            continue
+        egriler.setdefault((s["kesit"], s["preset"], s["filmgrain"], s["tune"], s["keyint"], s["ek"], s["pixfmt"]), []).append(s)
+    if not egriler:
+        return
+    print()
+    print("| Kesit | Ortak kbps | Preset | Film-grain | Tune | VMAF-NEG ort | XPSNR | Karanlık PSNR | Ort. kodlama sn |")
+    print("|---|---|---|---|---|---|---|---|---|")
+    for k in kesitler:
+        benim = {a: sorted(v, key=lambda s: s["kbps"]) for a, v in egriler.items() if a[0] == k and len(v) >= 2}
+        if not benim:
+            continue
+        alt = max(v[0]["kbps"] for v in benim.values())
+        ust = min(v[-1]["kbps"] for v in benim.values())
+        if alt >= ust:
+            continue
+        hedef = math.sqrt(alt * ust)
+        for a, v in sorted(benim.items(), key=lambda x: (x[0][1], x[0][2], x[0][3])):
+            def ara(alan):
+                for s0, s1 in zip(v, v[1:]):
+                    if s0["kbps"] <= hedef <= s1["kbps"]:
+                        w = (math.log(hedef) - math.log(s0["kbps"])) / (math.log(s1["kbps"]) - math.log(s0["kbps"]))
+                        return s0[alan] + w * (s1[alan] - s0[alan])
+                return None
+            sure = sum(s["kodlama_sn"] for s in v) / len(v)
+            print(f"| {k} | {f(hedef,1)} | {a[1]} | {a[2]} | {a[3]} | {f(ara('vmafneg_ort'))} | {f(ara('xpsnr'))} | {f(ara('karanlik_psnr'))} | {f(sure,1)} |")
+
 if __name__ == "__main__":
-    if sys.argv[1] == "handbrake":
+    if sys.argv[1] == "av1":
+        av1(sys.argv[2], sys.argv[3].split(","))
+    elif sys.argv[1] == "handbrake":
         handbrake(sys.argv[2], sys.argv[3].split(","))
     elif sys.argv[1] == "whatsapp":
         whatsapp(sys.argv[2])
