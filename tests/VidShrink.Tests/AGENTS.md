@@ -75,4 +75,4 @@ sürümden (`x.0.0`) önce koşar.
   sıfırlanma, açıldıktan sonra baştan başlama; biçimlemede sekmenin gizli başladığının ve kapatma düğmesinin pimi.
 - `GoruntuCekTests.cs` — kanıt karesi üretir: `.calisma/kesit-ef/` altına güncelleme panelini ve 26 simgelik
   sayfayı PNG olarak yazar. Ölçmez, sınamaz; tarz kararlarının resmi buradan çıkar.
-- `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurulum-exe/`.
+- `KurucuExeTests.cs` — `VidShrink-Setup.exe` motoru (`Core/Setup`): betikle aynı kayıt ağacını yazıp siler (test anahtarında), kilitli klasör denemeleri, sahte yayınla çevrimdışı kurulum ve kaldırma, sağlama tutmazsa eski kuruluma dokunulmaması, yarım kurulumda geri koyma, sabitlerin betikle aynılığı. Gerçek kayıt köküne test konağı yazamaz. Çıktı `.calisma/test-ciktilari/kurucu-exe/`.
