@@ -81,5 +81,8 @@
   "recorder.auto.note.preset": "ön ayar kodlayıcının sözlüğünden",
   "recorder.strip.snapshot": "Kare al",
   "recorder.snapshot.saved": "Kare kaydedildi: {0}",
-  "recorder.snapshot.failed": "Kare alınamadı."
+  "recorder.snapshot.failed": "Kare alınamadı.",
+  "recorder.output.to-mp4": "MP4 olarak kaydet",
+  "recorder.output.mp4-saved": "MP4 kaydedildi: {0}",
+  "recorder.output.mp4-failed": "MP4'e çevrilemedi."
 }

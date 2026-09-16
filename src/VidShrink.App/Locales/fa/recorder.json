@@ -81,5 +81,8 @@
   "recorder.auto.note.preset": "پیش‌تنظیم از واژگان خود رمزگذار",
   "recorder.strip.snapshot": "Snapshot",
   "recorder.snapshot.saved": "Snapshot saved: {0}",
-  "recorder.snapshot.failed": "The snapshot could not be taken."
+  "recorder.snapshot.failed": "The snapshot could not be taken.",
+  "recorder.output.to-mp4": "Save as MP4",
+  "recorder.output.mp4-saved": "MP4 saved: {0}",
+  "recorder.output.mp4-failed": "Could not save as MP4."
 }

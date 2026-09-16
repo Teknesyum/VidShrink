@@ -348,6 +348,33 @@ public static class RecorderArguments
         _ => "mp4"
     };
 
+    public static IReadOnlyList<string> BuildRemuxToMp4(string source, string target)
+    {
+        if (string.IsNullOrWhiteSpace(source)) throw new ArgumentException("Source path is required.", nameof(source));
+        if (ContainerOf(target ?? string.Empty) != RecorderContainer.Mp4)
+            throw new ArgumentException("The remux target must be an .mp4 file.", nameof(target));
+        return new[]
+        {
+            "-hide_banner", "-y", "-nostdin",
+            "-i", source,
+            "-map", "0",
+            "-c", "copy",
+            "-movflags", "+faststart",
+            target!
+        };
+    }
+
+    public static string RemuxTarget(string source, Func<string, bool> exists)
+    {
+        ArgumentNullException.ThrowIfNull(exists);
+        var folder = Path.GetDirectoryName(source) ?? string.Empty;
+        var stem = Path.GetFileNameWithoutExtension(source);
+        var candidate = Path.Combine(folder, stem + ".mp4");
+        for (var index = 2; exists(candidate); index++)
+            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + ".mp4");
+        return candidate;
+    }
+
     public static RecorderContainer CaptureContainer(RecorderContainer container)
         => container == RecorderContainer.Gif ? RecorderContainer.Mkv : container;
 

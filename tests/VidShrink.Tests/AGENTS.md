@@ -31,7 +31,9 @@ sürümden (`x.0.0`) önce koşar.
 - `KaydediciArayuzTests.cs` — 8b dalgası, Kaydedici sekmesi: kodlayıcı ve ön ayar listeleri motorun doğrulamasından
   geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kaydedici ayarının
   `VIDSHRINK_SETTINGS_PATH` klasörüne gitmesi; "Kare al" düğmesi (sahte kare işiyle yolun görünmesi, başarısız ve atan
-  işin hata satırı, üç anahtarın 42 dilde olması). Kanıt `.calisma/dalga8b/`.
+  işin hata satırı, üç anahtarın 42 dilde olması). Varsayılan kap Matroska: eski `container: Mp4` varsayılana döner,
+  seçim `containerChoice`'a yazılır; sonuç panelinde "MP4 olarak kaydet" yalnız mkv'de görünür, `-c copy` ile
+  sahte süreçten geçer. Geçici ayar dosyaları `.calisma/kap-olcu-*`, test siler.
 - `SesliKayitTests.cs` — 8d kolu, ses girdisinin motora bağlanması: iki cihazda `amix` **ve** `[aout]` eşlemi,
   tek cihazda filtre kurulmaması, sessiz kayıtta `-map` yazılmaması, bölge kırpmasının ses grafiğiyle birlikte
   durması. Canlı kol gerçek mikrofon ister: `ffprobe` iki akış görür. Kanıt `.calisma/dalga8d/`.

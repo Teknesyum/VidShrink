@@ -156,6 +156,13 @@
                   Content="{loc:Text recorder.output.to-player}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-player}"
                   Click="OnToPlayer"/>
+          <Button x:Name="BtnToMp4"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.output.to-mp4}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-mp4}"
+                  Click="OnToMp4"/>
           <Button x:Name="BtnRecShare"
                   Theme="{StaticResource PrimaryButton}"
                   Margin="{StaticResource WrapItemMargin}"

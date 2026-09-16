@@ -893,6 +893,24 @@ public sealed class KayitFfmpegKoluTests
     }
 
     [Fact]
+    public void Mp4KaydiYenidenKodlamadanKurulur()
+    {
+        var args = RecorderArguments.BuildRemuxToMp4(@"C:\kayit\a.mkv", @"C:\kayit\a.mp4");
+
+        Assert.Equal(@"C:\kayit\a.mkv", Deger(args, "-i"));
+        Assert.Equal("copy", Deger(args, "-c"));
+        Assert.Equal("0", Deger(args, "-map"));
+        Assert.Equal("+faststart", Deger(args, "-movflags"));
+        Assert.DoesNotContain("-c:v", args);
+        Assert.Equal(@"C:\kayit\a.mp4", args[^1]);
+        Assert.Throws<ArgumentException>(() => RecorderArguments.BuildRemuxToMp4(@"C:\kayit\a.mkv", @"C:\kayit\a.mov"));
+
+        var mevcut = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { @"C:\kayit\a.mp4", @"C:\kayit\a_2.mp4" };
+        Assert.Equal(@"C:\kayit\a_3.mp4", RecorderArguments.RemuxTarget(@"C:\kayit\a.mkv", mevcut.Contains));
+        Assert.Equal(@"C:\kayit\b.mp4", RecorderArguments.RemuxTarget(@"C:\kayit\b.mkv", mevcut.Contains));
+    }
+
+    [Fact]
     public void GifKabiUzantisiniVerirVeMatroskayaYakalar()
     {
         Assert.Equal("gif", RecorderArguments.Extension(RecorderContainer.Gif));

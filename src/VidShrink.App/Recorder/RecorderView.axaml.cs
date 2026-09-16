@@ -120,11 +120,12 @@ internal partial class RecorderView : UserControl
     /// Biten kaydın teslimi. Yol her koşulda görünür oluyor — yarım dosyada bile — çünkü
     /// kullanıcının aradığı ilk şey dosyanın nereye yazıldığı.
     /// </summary>
-    private void ShowResult(RecordResult result)
+    internal void ShowResult(RecordResult result)
     {
         ResultPanel.IsVisible = true;
         _lastRecording = result.OutputPath;
         TxtResultPath.Text = result.OutputPath;
+        BtnToMp4.IsVisible = VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) == VidShrink.Core.RecorderContainer.Mkv;
         ResetShare();
         TxtResult.Text = Say(
             "recorder.output.done",
@@ -163,6 +164,35 @@ internal partial class RecorderView : UserControl
     private async void OnToPlayer(object? sender, RoutedEventArgs e)
     {
         if (Delivered() is { } path && OpenInPlayer is { } gate) await gate(path);
+    }
+
+    internal bool Mp4Visible => BtnToMp4.IsVisible;
+
+    private async void OnToMp4(object? sender, RoutedEventArgs e)
+        => await SaveAsMp4Async(async args => (await FfmpegRunner.RunAsync(args)).Ok);
+
+    internal async Task<string?> SaveAsMp4Async(Func<System.Collections.Generic.IReadOnlyList<string>, Task<bool>> run)
+    {
+        if (Delivered() is not { } source) return null;
+
+        var target = VidShrink.Core.RecorderArguments.RemuxTarget(source, File.Exists);
+        bool ok;
+        try { ok = await run(VidShrink.Core.RecorderArguments.BuildRemuxToMp4(source, target)); }
+        catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            ok = false;
+        }
+
+        if (ok)
+        {
+            TxtError.IsVisible = false;
+            ShowNotice(Say("recorder.output.mp4-saved", target));
+            return target;
+        }
+
+        TxtNotice.IsVisible = false;
+        ShowError(Say("recorder.output.mp4-failed"));
+        return null;
     }
 
     /// <summary>

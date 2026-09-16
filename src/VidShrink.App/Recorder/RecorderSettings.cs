@@ -73,7 +73,7 @@ internal sealed class RecorderSettings
     internal string? SystemAudioName { get; set; }
 
     /// <summary>Kaydın yazıldığı kap; çıktı uzantısı bundan geliyor.</summary>
-    internal RecorderContainer Container { get; set; } = RecorderContainer.Mp4;
+    internal RecorderContainer Container { get; set; } = RecorderContainer.Mkv;
 
     /// <summary>
     /// Seçilen monitörün indeksi. Windows'ta sıfırdan farklı indeks monitör sınırlarından
@@ -207,7 +207,9 @@ internal sealed class RecorderSettings
             if ((int?)root["regionHeight"] is { } height && height > 0) settings.RegionHeight = height;
             settings.MicrophoneName = (string?)root["microphoneName"];
             settings.SystemAudioName = (string?)root["systemAudioName"];
-            if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container)) settings.Container = container;
+            if (Enum.TryParse<RecorderContainer>((string?)root["containerChoice"], true, out var choice)) settings.Container = choice;
+            else if (Enum.TryParse<RecorderContainer>((string?)root["container"], true, out var container) && container != RecorderContainer.Mp4)
+                settings.Container = container;
             settings.ScreenIndex = (int?)root["screenIndex"] ?? 0;
             settings.ScaleWidth = (int?)root["scaleWidth"] ?? 0;
             settings.ScaleHeight = (int?)root["scaleHeight"] ?? 0;
@@ -272,7 +274,7 @@ internal sealed class RecorderSettings
                 else writer.WriteString("microphoneName", MicrophoneName);
                 if (SystemAudioName is null) writer.WriteNull("systemAudioName");
                 else writer.WriteString("systemAudioName", SystemAudioName);
-                writer.WriteString("container", Container.ToString());
+                writer.WriteString("containerChoice", Container.ToString());
                 writer.WriteNumber("screenIndex", ScreenIndex);
                 writer.WriteNumber("scaleWidth", ScaleWidth);
                 writer.WriteNumber("scaleHeight", ScaleHeight);

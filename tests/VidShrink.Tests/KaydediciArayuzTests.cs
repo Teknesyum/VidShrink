@@ -213,6 +213,116 @@ public sealed class KaydediciArayuzTests
         }
     }
 
+    private static string CalismaKlasoru()
+    {
+        var kok = new DirectoryInfo(AppContext.BaseDirectory);
+        while (kok is not null && !File.Exists(Path.Combine(kok.FullName, "VidShrink.sln"))) kok = kok.Parent;
+        var klasor = Path.Combine(kok!.FullName, ".calisma", "kap-olcu-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        return klasor;
+    }
+
+    [Fact]
+    public void VarsayilanKapMatroska()
+    {
+        var settings = new RecorderSettings { OutputFolder = @"C:\kayit" };
+
+        Assert.Equal(RecorderContainer.Mkv, settings.Container);
+        Assert.EndsWith(".mkv", settings.OutputPath(new DateTime(2026, 9, 16, 10, 0, 0, DateTimeKind.Local)));
+    }
+
+    [Theory]
+    [InlineData("{\"container\":\"Mp4\"}", RecorderContainer.Mkv)]
+    [InlineData("{\"container\":\"Mov\"}", RecorderContainer.Mov)]
+    [InlineData("{\"containerChoice\":\"Mp4\",\"container\":\"Mov\"}", RecorderContainer.Mp4)]
+    [InlineData("{}", RecorderContainer.Mkv)]
+    public void EskiAyardakiKapOkunur(string json, RecorderContainer beklenen)
+    {
+        var klasor = CalismaKlasoru();
+        try
+        {
+            var dosya = Path.Combine(klasor, "recorder.json");
+            File.WriteAllText(dosya, json);
+            Assert.Equal(beklenen, RecorderSettings.Load(dosya).Container);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Fact]
+    public void SecilenMp4KabiKaydedilipGeriOkunur()
+    {
+        var klasor = CalismaKlasoru();
+        try
+        {
+            var dosya = Path.Combine(klasor, "recorder.json");
+            new RecorderSettings { Container = RecorderContainer.Mp4 }.Save(dosya);
+
+            Assert.Contains("\"containerChoice\": \"Mp4\"", File.ReadAllText(dosya));
+            Assert.Equal(RecorderContainer.Mp4, RecorderSettings.Load(dosya).Container);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Fact]
+    public void MatroskaSonucuMp4OlarakKaydedilir()
+    {
+        var klasor = CalismaKlasoru();
+        try
+        {
+            var mkv = Path.Combine(klasor, "kayit.mkv");
+            var mp4 = Path.Combine(klasor, "kayit.mp4");
+            File.WriteAllText(mkv, "x");
+
+            var (gorunur, hedef, argumanlar, bildirim, mp4Gorunur, hata) =
+                AppHost.Run<(bool, string?, IReadOnlyList<string>?, string, bool, string)>(() =>
+                {
+                    var view = new RecorderView();
+                    view.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mkv, 1, false, 0, string.Empty, 1));
+                    var ilk = view.Mp4Visible;
+                    IReadOnlyList<string>? yazilan = null;
+                    var sonuc = view.SaveAsMp4Async(a => { yazilan = a; return System.Threading.Tasks.Task.FromResult(true); })
+                        .GetAwaiter().GetResult();
+                    var not = view.NoticeText;
+
+                    var baska = new RecorderView();
+                    baska.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mp4, 1, false, 0, string.Empty, 1));
+                    var hataView = new RecorderView();
+                    hataView.ShowResult(new VidShrink.Ffmpeg.RecordResult(true, mkv, 1, false, 0, string.Empty, 1));
+                    hataView.SaveAsMp4Async(_ => System.Threading.Tasks.Task.FromResult(false)).GetAwaiter().GetResult();
+                    return (ilk, sonuc, yazilan, not, baska.Mp4Visible, hataView.ErrorText);
+                });
+
+            Assert.True(gorunur);
+            Assert.Equal(mp4, hedef);
+            Assert.NotNull(argumanlar);
+            Assert.Equal(mkv, argumanlar![argumanlar.ToList().IndexOf("-i") + 1]);
+            Assert.Equal(mp4, argumanlar[^1]);
+            Assert.Contains(mp4, bildirim);
+            Assert.False(mp4Gorunur);
+            Assert.NotEqual(string.Empty, hata);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Theory]
+    [InlineData("recorder.output.to-mp4")]
+    [InlineData("recorder.output.mp4-saved")]
+    [InlineData("recorder.output.mp4-failed")]
+    public void Mp4AnahtarlariButunDillerde(string key)
+    {
+        foreach (var language in Locales.Languages)
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(language).GetValueOrDefault(key)), $"{language} dilinde {key} yok.");
+    }
+
     [Fact]
     public void KareDugmesiOturumunKaresiniAlir()
     {
