@@ -142,7 +142,9 @@ public partial class App : Application
     {
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://VidShrink.App/Assets/VidShrink.png"));
+            using var stream = AssetLoader.Open(new Uri(OperatingSystem.IsWindows()
+                ? "avares://VidShrink.App/Assets/VidShrink.ico"
+                : "avares://VidShrink.App/Assets/VidShrink.png"));
             return new WindowIcon(stream);
         }
         catch

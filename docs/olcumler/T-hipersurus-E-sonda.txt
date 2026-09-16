@@ -1,0 +1,289 @@
+sonda: iz noktali iki yapi eslesik, 14 tekrar sicak, ayni klip. taban = c87c2afb + sonda, yeni = E1..E4 + sonda.
+ortanca birikimli ms ve bir onceki satira gore pay.
+
+== taban ==
+
+adim                 n ortanca    pay
+----                 - -------    ---
+baslatici           14   61,40  61,40
+app-dogdu           14   72,30  10,90
+perde               14  101,80  29,50
+main                14  129,00  27,20
+tek-ornek           14  133,70   4,70
+libmpv-hazir        14  148,90  15,20
+cerceve             14  397,20 248,30
+ayar-okundu         14  400,70   3,50
+palet               14  401,00   0,30
+pencere-yapici      14  484,60  83,60
+gecici-temizlik     14  497,80  13,20
+xaml-sekmeler       14  532,40  34,60
+xaml-oynatici       14  557,90  25,50
+xaml-kucultme       14  575,80  17,90
+xaml-donusturme     14  598,20  22,40
+xaml-hakkinda       14  603,20   5,00
+xaml-kaydedici      14  604,80   1,60
+xaml-gelismis       14  605,10   0,30
+xaml-ayarlar        14  606,00   0,90
+xaml-sekmeler-bitti 14  609,50   3,50
+xaml                14  610,90   1,40
+s-panelhost         14  611,40   0,50
+s-oynatici-bag      14  612,30   0,90
+s-secim-listeleri   14  612,60   0,30
+s-dil-dugmeleri     14  676,60  64,00
+s-tema-listesi      14  677,50   0,90
+s-kaynak-adi        14  677,80   0,30
+s-animasyon-sorgu   14  678,00   0,20
+s-boyut             14  678,30   0,30
+s-surukle-birak     14  679,00   0,70
+s-logo              14  699,80  20,80
+s-krom              14  700,40   0,60
+s-kabuk-menusu      14  701,20   0,80
+s-izleyici-1        14  701,60   0,40
+s-gelismis-ui       14  703,20   1,60
+s-izleyici-2        14  703,30   0,10
+s-kalite-hedef      14  703,60   0,30
+s-cip               14  703,70   0,10
+s-ozetler           14  703,80   0,10
+yapici-bitti        14  704,60   0,80
+s-app-pencere-dondu 14  704,70   0,10
+s-app-ikon-yuklendi 14  752,60  47,90
+s-app-ikon-atandi   14  890,80 138,20
+pencere-kuruldu     14  891,10   0,30
+s-app-yonlendirme   14  891,20   0,10
+s-app-cerceve-bitti 14  891,30   0,10
+s-gorunur           14  893,00   1,70
+s-sablon-basla      14  896,00   3,00
+s-sablon-bitti      14  896,50   0,50
+s-olcum-basla       14  896,60   0,10
+s-olcum-bitti       14  953,20  56,60
+s-yerlesim-basla    14  953,80   0,60
+s-yerlesim-bitti    14  958,60   4,80
+s-onopened          14 1011,00  52,40
+pencere-yuklendi    14 1011,80   0,80
+s-y-cerceve         14 1012,20   0,40
+s-y-ayar-oku        14 1012,80   0,60
+s-y-dil             14 1029,70  16,90
+s-y-paylasim        14 1030,90   1,20
+s-y-ayar-geri       14 1031,40   0,50
+s-y-uygulama-ayar   14 1031,60   0,20
+ayarlar             14 1031,80   0,20
+giris-canlandirmasi 14 1032,30   0,50
+s-sekme-once        14 1032,60   0,30
+s-sekme-secildi     14 1033,40   0,80
+sekme               14 1033,70   0,30
+s-p-devral-bekle    14 1033,90   0,20
+s-p-devralindi      14 1034,20   0,30
+s-p-gecmis          14 1034,20   0,00
+s-p-ayarlar         14 1043,00   8,80
+s-p-oynat           14 1052,30   9,30
+s-p-afteropen       14 1056,00   3,70
+motor-acildi        14 1057,90   1,90
+s-oynatici-yerlesim 14 1083,10  25,20
+kare-kaynagi        14 1094,00  10,90
+ilk-kare            14 1173,80  79,80
+s-loaded            14 1176,40   2,60
+
+
+== yeni ==
+
+adim                 n ortanca    pay
+----                 - -------    ---
+baslatici           14   59,60  59,60
+app-dogdu           14   72,00  12,40
+perde               14  103,10  31,10
+main                14  132,40  29,30
+tek-ornek           14  137,10   4,70
+libmpv-hazir        14  152,30  15,20
+cerceve             14  388,00 235,70
+ayar-okundu         14  391,40   3,40
+palet               14  391,80   0,40
+gecici-temizlik     14  483,80  92,00
+pencere-yapici      14  489,20   5,40
+xaml-sekmeler       14  538,40  49,20
+xaml-oynatici       14  562,80  24,40
+xaml-kucultme       14  580,00  17,20
+xaml-donusturme     14  603,00  23,00
+xaml-hakkinda       14  607,50   4,50
+xaml-kaydedici      14  609,00   1,50
+xaml-gelismis       14  609,20   0,20
+xaml-ayarlar        14  610,20   1,00
+xaml-sekmeler-bitti 14  613,60   3,40
+xaml                14  615,00   1,40
+s-panelhost         14  615,60   0,60
+s-oynatici-bag      14  616,40   0,80
+s-secim-listeleri   14  616,60   0,20
+s-dil-dugmeleri     14  630,30  13,70
+s-tema-listesi      14  631,20   0,90
+s-kaynak-adi        14  631,40   0,20
+s-animasyon-sorgu   14  631,60   0,20
+s-boyut             14  631,80   0,20
+s-surukle-birak     14  632,40   0,60
+s-logo              14  637,40   5,00
+s-krom              14  642,70   5,30
+s-kabuk-menusu      14  643,60   0,90
+s-izleyici-1        14  643,80   0,20
+s-gelismis-ui       14  645,80   2,00
+s-izleyici-2        14  646,00   0,20
+s-kalite-hedef      14  646,20   0,20
+s-cip               14  646,40   0,20
+s-ozetler           14  646,60   0,20
+yapici-bitti        14  648,60   2,00
+s-app-pencere-dondu 14  648,80   0,20
+s-app-ikon-yuklendi 14  651,00   2,20
+s-app-ikon-atandi   14  654,40   3,40
+pencere-kuruldu     14  654,60   0,20
+s-app-yonlendirme   14  654,70   0,10
+s-app-cerceve-bitti 14  654,80   0,10
+s-gorunur           14  655,10   0,30
+s-sablon-basla      14  658,00   2,90
+s-sablon-bitti      14  658,40   0,40
+s-olcum-basla       14  658,60   0,20
+s-olcum-bitti       14  691,80  33,20
+s-yerlesim-basla    14  692,30   0,50
+s-yerlesim-bitti    14  700,00   7,70
+s-onopened          14  735,80  35,80
+pencere-yuklendi    14  736,30   0,50
+s-y-cerceve         14  736,60   0,30
+s-y-ayar-oku        14  737,00   0,40
+s-y-dil             14  756,10  19,10
+s-y-paylasim        14  757,40   1,30
+s-y-ayar-geri       14  757,80   0,40
+s-y-uygulama-ayar   14  758,00   0,20
+ayarlar             14  758,20   0,20
+giris-canlandirmasi 14  758,40   0,20
+s-sekme-once        14  758,60   0,20
+s-sekme-secildi     14  758,70   0,10
+sekme               14  758,80   0,10
+s-p-devral-bekle    14  759,00   0,20
+s-p-devralindi      14  759,20   0,20
+s-p-gecmis          14  759,30   0,10
+s-p-ayarlar         14  767,50   8,20
+s-p-oynat           14  775,00   7,50
+s-p-afteropen       14  778,10   3,10
+motor-acildi        14  780,10   2,00
+s-oynatici-yerlesim 14  794,50  14,40
+kare-kaynagi        14  803,70   9,20
+ilk-kare            14  804,00   0,30
+s-loaded            14  804,30   0,30
+
+
+== olcum.ps1 ozeti ==
+kip      : sicak
+klip     : C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper\klip\kucuk.mp4 (6.2 MB)
+tekrar   : 14
+makine   : DESKTOP-0J80KVV / Microsoft Windows NT 10.0.22631.0
+an       : 2026-09-16 12:20:40
+birim    : ms, surec yaratilmasindan (Process.StartTime) itibaren
+kabuk-ilk-kare : ms, olcerin kendi saati; Start-Process cagrisindan ilk-kare satiri
+           gorulene kadar, yoklama 20 ms. Sifir noktasi yapidan bagimsiz oldugu
+           icin iki yapiyi karsilastiran tek adil sutun budur.
+p95      : en yakin sira yontemi, ceil(0.95*n)
+eslesik  : her tekrarda iki yapi, sira tekrardan tekrara donuyor
+
+== taban ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper-e2\sonda\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n  en_az ortanca     p95  en_cok
+----                 -  ----- -------     ---  ------
+kabuk-ilk-kare      14 990,10 1186,30 1427,20 1427,20
+baslatici           14  37,30   61,40   71,00   71,00
+perde               14  66,10  101,80  131,90  131,90
+app-dogdu           14  44,90   72,30   86,00   86,00
+main                14  93,50  129,00  153,80  153,80
+tek-ornek           14  97,80  133,70  158,80  158,80
+libmpv-hazir        14 109,90  148,90  176,30  176,30
+cerceve             14 304,60  397,20  444,50  444,50
+gecici-temizlik     14 397,10  497,80  582,70  582,70
+ayar-okundu         14 307,30  400,70  448,80  448,80
+palet               14 307,60  401,00  449,20  449,20
+pencere-yapici      14 333,00  484,60  600,60  600,60
+xaml-sekmeler       14 378,60  532,40  647,60  647,60
+xaml-oynatici       14 403,00  557,90  669,70  669,70
+xaml-kucultme       14 420,80  575,80  687,90  687,90
+xaml-donusturme     14 443,70  598,20  710,60  710,60
+xaml-hakkinda       14 448,00  603,20  714,60  714,60
+xaml-kaydedici      14 449,70  604,80  716,10  716,10
+xaml-gelismis       14 450,00  605,10  716,40  716,40
+xaml-ayarlar        14 451,00  606,00  717,20  717,20
+xaml-sekmeler-bitti 14 454,70  609,50  720,50  720,50
+xaml                14 456,40  610,90  722,00  722,00
+yapici-bitti        14 559,60  704,60  819,70  819,70
+pencere-kuruldu     14 745,20  891,10 1002,00 1002,00
+pencere-yuklendi    14 865,40 1011,80 1119,60 1119,60
+ayarlar             14 884,30 1031,80 1135,50 1135,50
+giris-canlandirmasi 14 884,80 1032,30 1136,00 1136,00
+sekme               14 886,10 1033,70 1137,10 1137,10
+kare-kaynagi        14 947,70 1094,00 1194,80 1194,80
+ilk-kare            14 969,30 1173,80 1408,90 1408,90
+motor-acildi        14 911,40 1057,90 1159,50 1159,50
+
+== yeni ==  exe: C:\Users\Administrator\Desktop\Projeler\VidShrink\.calisma\hiper-e2\sonda-yeni\VidShrink.exe  (ilk kare gelen: 14)
+
+adim                 n  en_az ortanca     p95  en_cok
+----                 -  ----- -------     ---  ------
+kabuk-ilk-kare      14 680,70  820,90 1006,60 1006,60
+baslatici           14  46,60   59,60   65,50   65,50
+perde               14  82,30  103,10  113,90  113,90
+app-dogdu           14  57,20   72,00   82,30   82,30
+main                14 115,60  132,40  148,90  148,90
+tek-ornek           14 119,90  137,10  153,20  153,20
+libmpv-hazir        14 133,10  152,30  168,30  168,30
+cerceve             14 356,20  388,00  435,50  435,50
+gecici-temizlik     14 442,80  483,80  550,10  550,10
+ayar-okundu         14 358,70  391,40  439,00  439,00
+palet               14 359,00  391,80  439,50  439,50
+pencere-yapici      14 383,00  489,20  594,00  594,00
+xaml-sekmeler       14 425,20  538,40  635,10  635,10
+xaml-oynatici       14 454,00  562,80  656,90  656,90
+xaml-kucultme       14 471,40  580,00  673,90  673,90
+xaml-donusturme     14 493,50  603,00  699,90  699,90
+xaml-hakkinda       14 497,40  607,50  704,60  704,60
+xaml-kaydedici      14 498,90  609,00  706,20  706,20
+xaml-gelismis       14 499,10  609,20  706,40  706,40
+xaml-ayarlar        14 500,00  610,20  707,30  707,30
+xaml-sekmeler-bitti 14 503,20  613,60  710,50  710,50
+xaml                14 505,10  615,00  712,20  712,20
+yapici-bitti        14 529,20  648,60  745,30  745,30
+pencere-kuruldu     14 535,90  654,60  751,80  751,80
+pencere-yuklendi    14 614,70  736,30  841,50  841,50
+ayarlar             14 637,30  758,20  863,00  863,00
+giris-canlandirmasi 14 637,40  758,40  863,10  863,10
+sekme               14 637,90  758,80  863,50  863,50
+kare-kaynagi        14 681,70  803,70  998,00  998,00
+ilk-kare            14 682,00  804,00  998,50  998,50
+motor-acildi        14 659,40  780,10  883,50  883,50
+
+== eslesik fark (yeni eksi taban, eksi deger yeni lehine) ==
+
+adim                cift fark_ortanca fark_en_az fark_en_cok b_lehine_cift
+----                ---- ------------ ---------- ----------- -------------
+kabuk-ilk-kare        14      -404,60    -746,50      -60,10            14
+baslatici             14        -0,20     -17,10       17,60             7
+perde                 14        -3,00     -25,80       22,70             8
+app-dogdu             14        -2,10     -18,10       21,20             8
+main                  14         1,70     -27,90       37,10             7
+tek-ornek             14         1,80     -27,60       37,60             7
+libmpv-hazir          14         1,10     -28,30       42,80             7
+cerceve               14         4,40     -57,30       75,90             6
+gecici-temizlik       14         7,80     -96,60       90,70             7
+ayar-okundu           14         4,50     -58,70       77,10             6
+palet                 14         4,60     -58,70       77,30             6
+pencere-yapici        14         0,20    -178,40      196,20             7
+xaml-sekmeler         14         3,10    -181,90      200,10             7
+xaml-oynatici         14         3,90    -181,80      199,00             7
+xaml-kucultme         14         3,10    -181,20      198,20             7
+xaml-donusturme       14         2,90    -182,70      199,30             7
+xaml-hakkinda         14         3,20    -183,50      199,00             7
+xaml-kaydedici        14         3,00    -183,40      198,80             7
+xaml-gelismis         14         3,00    -183,50      198,80             7
+xaml-ayarlar          14         3,10    -183,50      199,10             7
+xaml-sekmeler-bitti   14         3,20    -183,30      198,60             7
+xaml                  14         3,40    -182,70      198,30             7
+yapici-bitti          14       -55,80    -255,50      131,10             7
+pencere-kuruldu       14      -236,20    -434,40      -45,20            14
+pencere-yuklendi      14      -274,40    -469,20      -70,30            14
+ayarlar               14      -271,30    -464,90      -69,10            14
+giris-canlandirmasi   14      -271,60    -465,30      -69,60            14
+sekme                 14      -272,40    -466,20      -70,60            14
+kare-kaynagi          14      -283,90    -486,20       50,30            13
+ilk-kare              14      -391,80    -726,90      -81,40            14
+motor-acildi          14      -273,00    -469,10      -73,70            14

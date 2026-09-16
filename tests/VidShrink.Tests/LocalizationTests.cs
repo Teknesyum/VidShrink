@@ -330,6 +330,21 @@ public sealed class LocalizationTests : IDisposable
     }
 
     [Fact]
+    public void DilAdiniKatalogYuklemedenOkumakTamYuklemeyleAyni()
+    {
+        var peeked = Strings.Languages.ToDictionary(l => l, l => Strings.PeekIn(l, "main.language.name"));
+        Assert.True(peeked.Count >= 42, "Sevkiyattaki dil sayısı: " + peeked.Count);
+        Strings.Reset();
+        foreach (var (language, name) in peeked)
+            Assert.Equal(Strings.GetIn(language, "main.language.name"), name);
+
+        Write("tr", "zz", new Dictionary<string, string> { ["main.language.name"] = "Diskten" });
+        Strings.UseRoot(sandbox);
+        Assert.Equal("Diskten", Strings.PeekIn("tr", "main.language.name"));
+        Assert.Equal("Diskten", Strings.GetIn("tr", "main.language.name"));
+    }
+
+    [Fact]
     public void AnahtarTuketenKapilarKaynaktakiBildirimlerleAyni()
     {
         var scan = Measure();
@@ -356,6 +371,7 @@ public sealed class LocalizationTests : IDisposable
                 "VidShrink.App.Localization.LocalizedText::For",
                 "VidShrink.App.Localization.Strings::Get",
                 "VidShrink.App.Localization.Strings::GetIn",
+                "VidShrink.App.Localization.Strings::PeekIn",
                 "VidShrink.App.Localization.TextExtension::.ctor"
             },
             scan.Seeds);

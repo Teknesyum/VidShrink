@@ -318,7 +318,7 @@ public sealed class OynaticiGirdiTests
             var sonra = window.Tabs.SelectedIndex;
             var baslik = MainWindow.TabHeaderText((TabItem)window.Tabs.Items[oynaticiIndex]!);
             _ = yukleme.ContinueWith(_ => { }, TaskScheduler.Default);
-            Assert.NotEqual(basta, sonra);
+            Assert.Equal(oynaticiIndex, basta);
             Assert.Equal(oynaticiIndex, sonra);
             window.Close();
 

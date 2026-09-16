@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\VidShrink.png" />
+    <AvaloniaResource Include="Assets\VidShrink.ico" />
     <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-Regular.ttf" />
     <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-SemiBold.ttf" />
     <AvaloniaResource Include="Fonts\AtkinsonHyperlegibleNext-Bold.ttf" />
