@@ -52,7 +52,9 @@ public enum RecorderContainer
     Mkv,
 
     /// <summary><c>.mov</c> — mp4 ile ayni muxer ailesi, ayni kirilganlik.</summary>
-    Mov
+    Mov,
+
+    Gif
 }
 
 /// <summary>
@@ -342,8 +344,28 @@ public static class RecorderArguments
     {
         RecorderContainer.Mkv => "mkv",
         RecorderContainer.Mov => "mov",
+        RecorderContainer.Gif => "gif",
         _ => "mp4"
     };
+
+    public static RecorderContainer CaptureContainer(RecorderContainer container)
+        => container == RecorderContainer.Gif ? RecorderContainer.Mkv : container;
+
+    public static string CapturePath(string outputPath, RecorderContainer container)
+    {
+        if (container != RecorderContainer.Gif || string.IsNullOrWhiteSpace(outputPath)) return outputPath;
+        return Path.Combine(
+            Path.GetDirectoryName(outputPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(outputPath) + ".gif-kayit.mkv");
+    }
+
+    public static RecorderRequest CaptureRequest(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.Container == RecorderContainer.Gif
+            ? request with { Container = CaptureContainer(request.Container) }
+            : request;
+    }
 
     /// <summary>
     /// Kabin adindan kap. Tanimadigi uzantida <c>null</c> doner; cagiran sessizce mp4'e
@@ -360,6 +382,7 @@ public static class RecorderArguments
             "mp4" => RecorderContainer.Mp4,
             "mkv" => RecorderContainer.Mkv,
             "mov" => RecorderContainer.Mov,
+            "gif" => RecorderContainer.Gif,
             _ => null
         };
     }
@@ -484,7 +507,7 @@ public static class RecorderArguments
 
         if (string.IsNullOrWhiteSpace(outputPath)) errors.Add("Output path is required.");
         else if (ContainerOf(outputPath) is not { } written)
-            errors.Add($"The {Path.GetExtension(outputPath)} output extension is not one of the recorder's containers (mp4, mkv, mov).");
+            errors.Add($"The {Path.GetExtension(outputPath)} output extension is not one of the recorder's containers (mp4, mkv, mov, gif).");
         else if (written != request.Container)
             errors.Add($"The output extension says {Extension(written)} but the selected container is {Extension(request.Container)}.");
 
@@ -501,6 +524,7 @@ public static class RecorderArguments
         errors.AddRange(StreamShapeErrors(request));
         errors.AddRange(ColourErrors(request));
         errors.AddRange(LimitErrors(request));
+        errors.AddRange(GifErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -624,6 +648,18 @@ public static class RecorderArguments
             yield return "Split duration cannot be longer than the recording time limit.";
     }
 
+    private static IEnumerable<string> GifErrors(RecorderRequest request)
+    {
+        if (request.Container != RecorderContainer.Gif) yield break;
+
+        if (request.Audio is { InputCount: > 0 })
+            yield return "A GIF has no audio track; turn the audio inputs off.";
+        if (request.Split is not null)
+            yield return "A GIF recording is converted as one file and cannot be split.";
+        if (request.Fps > GifPalette.MaxFps)
+            yield return $"A GIF frame delay is counted in hundredths of a second; the frame rate must not exceed {GifPalette.MaxFps}.";
+    }
+
     private static IEnumerable<string> ScreenSelectionErrors(RecorderRequest request)
     {
         if (request.Platform != RecorderPlatform.Windows || request.ScreenIndex == 0) yield break;
@@ -661,6 +697,8 @@ public static class RecorderArguments
         ArgumentNullException.ThrowIfNull(request);
         var errors = Validate(request, outputPath);
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+        if (request.Container == RecorderContainer.Gif)
+            return Build(CaptureRequest(request), CapturePath(outputPath, request.Container));
 
         var a = new List<string> { "-hide_banner", "-y" };
         a.AddRange(Input(request));

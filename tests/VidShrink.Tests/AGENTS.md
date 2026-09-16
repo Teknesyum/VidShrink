@@ -44,6 +44,8 @@ sürümden (`x.0.0`) önce koşar.
   kapalı küme dönüşlerini. Piksel biçimi kodlayıcı başına küme (`PixelFormatsFor`): libx264'ün sessizce çevirdiği beş
   ad reddedilir, Quick Sync/NVENC/AMF'de paketli ad yazılır. Tek süreç `ffmpeg -h encoder=<ad>` (11 kısa çağrı), kümenin
   ffmpeg'in bildirdiği biçimlerde olduğunu okur. Kanıt dosyası bırakmaz; tablo `docs/olcumler/kaydedici-piksel-bicimleri.md`.
+  GIF kabı: yakalama `.gif-kayit.mkv`'ye, durunca `GifPalette` (klip dışa aktarımıyla aynı filtre) ile GIF'e; ses, bölme
+  ve 50'yi aşan kare hızı reddedilir. Tek kısa lavfi çevirisi (1 sn, 64x48) `GIF89a` başlığını okur, `.calisma/`'yı temizler.
 - `KayitOtomatikKipTests.cs` — 9d kolu, kaydedicinin otomatik kipi: aday merdiveni (`RecorderAutoPlan`) ve kazanma
   kuralı (`RecorderAutoProbe`). Kodlayıcı yeğlemesi nvenc/qsv/amf, donanım yokken x264, yeğlenmeyen ve uydurma adın
   negatif kontrolü, kare hızı merdiveni (75 Hz → 60), yarı boyutun çift olması, **her adayın

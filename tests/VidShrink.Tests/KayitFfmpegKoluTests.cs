@@ -891,4 +891,95 @@ public sealed class KayitFfmpegKoluTests
             < Metin(args).IndexOf("-c:v", StringComparison.Ordinal),
             "kodlama kolu girdiden sonra gelmeli");
     }
+
+    [Fact]
+    public void GifKabiUzantisiniVerirVeMatroskayaYakalar()
+    {
+        Assert.Equal("gif", RecorderArguments.Extension(RecorderContainer.Gif));
+        Assert.Equal(RecorderContainer.Gif, RecorderArguments.ContainerOf(@"C:\kayit\a.gif"));
+        Assert.Equal(RecorderContainer.Mkv, RecorderArguments.CaptureContainer(RecorderContainer.Gif));
+        Assert.Equal(RecorderContainer.Mp4, RecorderArguments.CaptureContainer(RecorderContainer.Mp4));
+        Assert.Equal(@"C:\kayit\a.gif-kayit.mkv", RecorderArguments.CapturePath(@"C:\kayit\a.gif", RecorderContainer.Gif));
+        Assert.Equal(@"C:\kayit\a.mp4", RecorderArguments.CapturePath(@"C:\kayit\a.mp4", RecorderContainer.Mp4));
+
+        var args = RecorderArguments.Build(Istek() with { Container = RecorderContainer.Gif, Fps = 15 }, @"C:\kayit\a.gif");
+
+        Assert.Equal(@"C:\kayit\a.gif-kayit.mkv", args[^1]);
+        Assert.DoesNotContain("-movflags", args);
+        Assert.DoesNotContain("palettegen", Metin(args));
+    }
+
+    [Fact]
+    public void GifIstegiSesBolmeVeYuksekKareHiziniReddeder()
+    {
+        var gif = Istek() with { Container = RecorderContainer.Gif };
+        const string yol = @"C:\kayit\a.gif";
+
+        Assert.Empty(RecorderArguments.Validate(gif with { Fps = GifPalette.MaxFps }, yol));
+        Assert.Contains(RecorderArguments.Validate(gif with { Fps = GifPalette.MaxFps + 1 }, yol),
+            satir => satir.Contains("hundredths of a second"));
+        Assert.Contains(RecorderArguments.Validate(gif with { Audio = Plan(AudioTrackLayout.MixedSingleTrack) }, yol),
+            satir => satir.Contains("no audio track"));
+        Assert.Contains(RecorderArguments.Validate(gif with { Split = new RecorderSplit(TimeSpan.FromMinutes(1)) }, yol),
+            satir => satir.Contains("cannot be split"));
+        Assert.Empty(RecorderArguments.Validate(
+            Istek() with { Container = RecorderContainer.Mkv, Fps = 60, Audio = Plan(AudioTrackLayout.MixedSingleTrack) },
+            @"C:\kayit\a.mkv"));
+        Assert.Contains(RecorderArguments.Validate(gif, @"C:\kayit\a.mkv"), satir => satir.Contains("selected container is gif"));
+    }
+
+    [Fact]
+    public void GifPaletiKlipVeKaydaAyniFiltreyiVerir()
+    {
+        Assert.Equal(
+            "fps=12,scale=480:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse",
+            VidShrink.App.Playback.ClipExport.Filter(12, 480));
+        Assert.Equal("fps=15,split[a][b];[a]palettegen[p];[b][p]paletteuse", GifPalette.Filter(15, null));
+
+        var args = GifPalette.Build(@"C:\kayit\a.gif-kayit.mkv", @"C:\kayit\a.gif", 15);
+        Assert.Equal(@"C:\kayit\a.gif-kayit.mkv", Deger(args, "-i"));
+        Assert.Equal("0", Deger(args, "-loop"));
+        Assert.Contains("-nostdin", args);
+        Assert.Equal(@"C:\kayit\a.gif", args[^1]);
+        Assert.Throws<ArgumentException>(() => GifPalette.Build(" ", @"C:\kayit\a.gif", 15));
+    }
+
+    [Fact]
+    public void OturumGifiDurunkaYakalamadanCevirir()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(KokDizin(), "src", "VidShrink.Ffmpeg", "RecorderSession.cs"));
+
+        Assert.Contains("RecorderArguments.CaptureRequest(request)", kaynak);
+        Assert.Contains("GifPalette.Build(capture.OutputPath, _gifPath, _request.Fps)", kaynak);
+        Assert.Contains("return _gifPath is null ? result : await ConvertToGifAsync(result, ct);", kaynak);
+    }
+
+    [Fact]
+    public async Task KisaMatroskaGifeCevrilir()
+    {
+        var klasor = Path.Combine(KokDizin(), ".calisma", "gif-olcu-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        try
+        {
+            var mkv = Path.Combine(klasor, "a.gif-kayit.mkv");
+            var gif = Path.Combine(klasor, "a.gif");
+            var uret = await VidShrink.Ffmpeg.FfmpegRunner.RunAsync(new[]
+            {
+                "-hide_banner", "-y", "-nostdin", "-f", "lavfi", "-i", "testsrc=size=64x48:rate=10:duration=1",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", mkv
+            });
+            Assert.True(uret.Ok, uret.StandardError);
+
+            var cevir = await VidShrink.Ffmpeg.FfmpegRunner.RunAsync(GifPalette.Build(mkv, gif, 10));
+            Assert.True(cevir.Ok, cevir.StandardError);
+
+            var bas = new byte[6];
+            using (var dosya = File.OpenRead(gif)) Assert.Equal(6, dosya.Read(bas, 0, 6));
+            Assert.Equal("GIF89a", System.Text.Encoding.ASCII.GetString(bas));
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
 }

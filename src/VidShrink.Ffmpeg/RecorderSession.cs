@@ -134,6 +134,7 @@ public sealed class RecorderSession : IAsyncDisposable
     private TimeSpan _capturedNow;
     private int _lastExitCode;
     private bool _partial;
+    private string? _gifPath;
 
     private RecorderSession(RecorderRequest request, string outputPath, IProgress<RecordProgress>? progress)
     {
@@ -160,7 +161,22 @@ public sealed class RecorderSession : IAsyncDisposable
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(outputPath)) throw new ArgumentException("Output path is required.", nameof(outputPath));
 
-        var session = new RecorderSession(request, outputPath, progress);
+        RecorderSession session;
+        if (request.Container == RecorderContainer.Gif)
+        {
+            var errors = RecorderArguments.Validate(request, outputPath);
+            if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+            session = new RecorderSession(
+                RecorderArguments.CaptureRequest(request),
+                RecorderArguments.CapturePath(outputPath, request.Container),
+                progress)
+            { _gifPath = outputPath };
+        }
+        else
+        {
+            session = new RecorderSession(request, outputPath, progress);
+        }
+
         await session.StartSegmentAsync(ct);
 
         if (request.Split is { IsSet: true })
@@ -236,7 +252,20 @@ public sealed class RecorderSession : IAsyncDisposable
         }
         finally { _turn.Release(); }
 
-        return await AssembleAsync(ct);
+        var result = await AssembleAsync(ct);
+        return _gifPath is null ? result : await ConvertToGifAsync(result, ct);
+    }
+
+    private async Task<RecordResult> ConvertToGifAsync(RecordResult capture, CancellationToken ct)
+    {
+        if (!capture.Ok || _gifPath is null || !File.Exists(capture.OutputPath)) return capture;
+
+        var run = await FfmpegRunner.RunAsync(GifPalette.Build(capture.OutputPath, _gifPath, _request.Fps), ct);
+        if (!run.Ok || !File.Exists(_gifPath))
+            return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError };
+
+        TryDelete(capture.OutputPath);
+        return capture with { OutputPath = _gifPath, OutputMb = SizeMb(_gifPath), Files = new[] { _gifPath } };
     }
 
     /// <summary>Yarida kalan bir oturum makinede ffmpeg birakmaz.</summary>

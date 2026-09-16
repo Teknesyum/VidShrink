@@ -71,11 +71,7 @@ internal static class ClipExport
         };
     }
 
-    internal static string Filter(int fps, int width)
-        => string.Concat(
-            "fps=", fps.ToString(CultureInfo.InvariantCulture),
-            ",scale=", width.ToString(CultureInfo.InvariantCulture),
-            ":-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse");
+    internal static string Filter(int fps, int width) => VidShrink.Core.GifPalette.Filter(fps, width);
 
     internal static async Task<ClipResult> RunAsync(ClipRequest request, CancellationToken ct = default)
     {
